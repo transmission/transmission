@@ -32,10 +32,11 @@
 /* return the xfer rate over the last `interval' seconds in KiB/sec */
 static float
 rateForInterval( const tr_ratecontrol * r,
-                 int                    interval_msec )
+                 int                    interval_msec,
+                 uint64_t               now )
 {
     uint64_t       bytes = 0;
-    const uint64_t cutoff = tr_date ( ) - interval_msec;
+    const uint64_t cutoff = (now?now:tr_date()) - interval_msec;
     int            i = r->newest;
 
     for( ; ; )
@@ -57,12 +58,12 @@ rateForInterval( const tr_ratecontrol * r,
 ***/
 
 float
-tr_rcRate( const tr_ratecontrol * r )
+tr_rcRate( const tr_ratecontrol * r, uint64_t now )
 {
     float ret = 0.0f;
 
     if( r )
-        ret = rateForInterval( r, TR_RC_HISTORY_MSEC );
+        ret = rateForInterval( r, TR_RC_HISTORY_MSEC, now );
 
     return ret;
 }

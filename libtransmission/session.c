@@ -735,13 +735,13 @@ tr_sessionGetPeerLimitPerTorrent( const tr_session * session )
 double
 tr_sessionGetPieceSpeed( const tr_session * session, tr_direction dir )
 {
-    return session ? tr_bandwidthGetPieceSpeed( session->bandwidth, dir ) : 0.0;
+    return session ? tr_bandwidthGetPieceSpeed( session->bandwidth, 0, dir ) : 0.0;
 }
 
 double
 tr_sessionGetRawSpeed( const tr_session * session, tr_direction dir )
 {
-    return session ? tr_bandwidthGetPieceSpeed( session->bandwidth, dir ) : 0.0;
+    return session ? tr_bandwidthGetPieceSpeed( session->bandwidth, 0, dir ) : 0.0;
 }
 
 int

@@ -1638,10 +1638,9 @@ canRead( tr_peerIo * io, void * vmsgs, size_t * piece )
 **/
 
 static int
-ratePulse( void * vmsgs )
+ratePulse( tr_peermsgs * msgs, uint64_t now )
 {
-    tr_peermsgs * msgs = vmsgs;
-    const double rateToClient = tr_peerGetPieceSpeed( msgs->peer, TR_PEER_TO_CLIENT );
+    const double rateToClient = tr_peerGetPieceSpeed( msgs->peer, now, TR_PEER_TO_CLIENT );
     const int seconds = 10;
     const int floor = 8;
     const int estimatedBlocksInPeriod = ( rateToClient * seconds * 1024 ) / msgs->torrent->blockSize;
@@ -1687,7 +1686,7 @@ fillOutputBuffer( tr_peermsgs * msgs, time_t now )
     ***  Blocks
     **/
 
-    if( ( tr_peerIoGetWriteBufferSpace( msgs->peer->io ) >= msgs->torrent->blockSize )
+    if( ( tr_peerIoGetWriteBufferSpace( msgs->peer->io, now ) >= msgs->torrent->blockSize )
         && popNextRequest( msgs, &req ) )
     {
         if( requestIsValid( msgs, &req )
@@ -1747,7 +1746,7 @@ peerPulse( void * vmsgs )
     tr_peermsgs * msgs = vmsgs;
     const time_t  now = time( NULL );
 
-    ratePulse( msgs );
+    ratePulse( msgs, now );
 
     pumpRequestQueue( msgs, now );
     expireOldRequests( msgs, now );
@@ -2123,7 +2122,7 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
     tellPeerWhatWeHave( m );
 
     tr_peerIoSetIOFuncs( m->peer->io, canRead, didWrite, gotError, m );
-    ratePulse( m );
+    ratePulse( m, tr_date() );
 
     return m;
 }

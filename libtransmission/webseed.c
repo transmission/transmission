@@ -252,11 +252,11 @@ tr_webseedIsActive( const tr_webseed * w )
 }
 
 int
-tr_webseedGetSpeed( const tr_webseed * w, float * setme_KiBs )
+tr_webseedGetSpeed( const tr_webseed * w, uint64_t now, float * setme_KiBs )
 {
     const int isActive = tr_webseedIsActive( w );
 
-    *setme_KiBs = isActive ? tr_rcRate( &w->rateDown ) : 0.0f;
+    *setme_KiBs = isActive ? tr_rcRate( &w->rateDown, now ) : 0.0f;
     return isActive;
 }
 

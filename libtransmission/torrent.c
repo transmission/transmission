@@ -722,6 +722,7 @@ tr_torrentStat( tr_torrent * tor )
     struct tr_tracker *     tc;
     const tr_tracker_info * ti;
     int                     usableSeeds = 0;
+    uint64_t                now;
 
     if( !tor )
         return NULL;
@@ -758,10 +759,12 @@ tr_torrentStat( tr_torrent * tor )
                             &s->peersGettingFromUs,
                             s->peersFrom );
 
-    s->rawUploadSpeed     = tr_bandwidthGetRawSpeed  ( tor->bandwidth, TR_UP );
-    s->rawDownloadSpeed   = tr_bandwidthGetRawSpeed  ( tor->bandwidth, TR_DOWN );
-    s->pieceUploadSpeed   = tr_bandwidthGetPieceSpeed( tor->bandwidth, TR_UP );
-    s->pieceDownloadSpeed = tr_bandwidthGetPieceSpeed( tor->bandwidth, TR_DOWN );
+    now = tr_date( );
+    s->swarmSpeed         = tr_rcRate( &tor->swarmSpeed, now );
+    s->rawUploadSpeed     = tr_bandwidthGetRawSpeed  ( tor->bandwidth, now, TR_UP );
+    s->rawDownloadSpeed   = tr_bandwidthGetRawSpeed  ( tor->bandwidth, now, TR_DOWN );
+    s->pieceUploadSpeed   = tr_bandwidthGetPieceSpeed( tor->bandwidth, now, TR_UP );
+    s->pieceDownloadSpeed = tr_bandwidthGetPieceSpeed( tor->bandwidth, now, TR_DOWN );
 
     usableSeeds += tor->info.webseedCount;
 
@@ -777,7 +780,6 @@ tr_torrentStat( tr_torrent * tor )
                            (double) tor->info.pieceCount )
                        : 0.0;
 
-    s->swarmSpeed = tr_rcRate( &tor->swarmSpeed );
 
     s->activityDate = tor->activityDate;
     s->addedDate    = tor->addedDate;

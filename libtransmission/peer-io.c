@@ -118,6 +118,8 @@ canReadWrapper( tr_peerIo * io )
 
     dbgmsg( io, "canRead" );
 
+    tr_peerIoRef( io );
+
     /* try to consume the input buffer */
     if( io->canRead )
     {
@@ -159,6 +161,8 @@ canReadWrapper( tr_peerIo * io )
 
         tr_globalUnlock( session );
     }
+
+    tr_peerIoUnref( io );
 }
 
 tr_bool
@@ -166,6 +170,7 @@ tr_isPeerIo( const tr_peerIo * io )
 {
     return ( io != NULL )
         && ( io->magicNumber == MAGIC_NUMBER )
+        && ( io->refCount > 0 )
         && ( tr_isBandwidth( &io->bandwidth ) )
         && ( tr_isAddress( &io->addr ) )
         && ( tr_isBool( io->isEncrypted ) )
@@ -344,6 +349,7 @@ tr_peerIoNew( tr_session       * session,
 
     io = tr_new0( tr_peerIo, 1 );
     io->magicNumber = MAGIC_NUMBER;
+    io->refCount = 1;
     io->crypto = tr_cryptoNew( torrentHash, isIncoming );
     io->session = session;
     io->addr = *addr;
@@ -424,7 +430,7 @@ io_dtor( void * vio )
     tr_free( io );
 }
 
-void
+static void
 tr_peerIoFree( tr_peerIo * io )
 {
     if( io )
@@ -434,6 +440,23 @@ tr_peerIoFree( tr_peerIo * io )
         io->gotError = NULL;
         tr_runInEventThread( io->session, io_dtor, io );
     }
+}
+
+void
+tr_peerIoRef( tr_peerIo * io )
+{
+    assert( tr_isPeerIo( io ) );
+
+    ++io->refCount;
+}
+
+void
+tr_peerIoUnref( tr_peerIo * io )
+{
+    assert( tr_isPeerIo( io ) );
+
+    if( !--io->refCount )
+        tr_peerIoFree( io );
 }
 
 const tr_address*
@@ -569,23 +592,23 @@ tr_peerIoEnableLTEP( tr_peerIo  * io,
 **/
 
 static size_t
-getDesiredOutputBufferSize( const tr_peerIo * io )
+getDesiredOutputBufferSize( const tr_peerIo * io, uint64_t now )
 {
     /* this is all kind of arbitrary, but what seems to work well is
      * being large enough to hold the next 20 seconds' worth of input,
      * or a few blocks, whichever is bigger.
      * It's okay to tweak this as needed */
     const double maxBlockSize = 16 * 1024; /* 16 KiB is from BT spec */
-    const double currentSpeed = tr_bandwidthGetPieceSpeed( &io->bandwidth, TR_UP );
+    const double currentSpeed = tr_bandwidthGetPieceSpeed( &io->bandwidth, now, TR_UP );
     const double period = 20; /* arbitrary */
     const double numBlocks = 5.5; /* the 5 is arbitrary; the .5 is to leave room for messages */
     return MAX( maxBlockSize*numBlocks, currentSpeed*1024*period );
 }
 
 size_t
-tr_peerIoGetWriteBufferSpace( const tr_peerIo * io )
+tr_peerIoGetWriteBufferSpace( const tr_peerIo * io, uint64_t now )
 {
-    const size_t desiredLen = getDesiredOutputBufferSize( io );
+    const size_t desiredLen = getDesiredOutputBufferSize( io, now );
     const size_t currentLen = EVBUFFER_LENGTH( io->outbuf );
     size_t freeSpace = 0;
 

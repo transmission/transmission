@@ -76,6 +76,7 @@ typedef struct tr_peer
 tr_peer;
 
 double tr_peerGetPieceSpeed( const tr_peer    * peer,
+                             uint64_t           now,
                              tr_direction       direction );
 
 #endif

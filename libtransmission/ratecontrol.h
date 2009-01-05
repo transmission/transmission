@@ -70,7 +70,8 @@ static inline void tr_rcDestruct  ( tr_ratecontrol * rc ) { memset( rc, 0xDEAD, 
 void             tr_rcTransferred ( tr_ratecontrol         * ratecontrol,
                                     size_t                   byteCount );
 
-float            tr_rcRate        ( const tr_ratecontrol   * ratecontrol );
+float            tr_rcRate        ( const tr_ratecontrol   * ratecontrol,
+                                    uint64_t                 now );
 
 
 #endif

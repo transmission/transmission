@@ -33,10 +33,10 @@
 ***/
 
 static float
-getSpeed( const struct bratecontrol * r, int interval_msec )
+getSpeed( const struct bratecontrol * r, int interval_msec, uint64_t now )
 {
     uint64_t       bytes = 0;
-    const uint64_t cutoff = tr_date ( ) - interval_msec;
+    const uint64_t cutoff = (now?now:tr_date()) - interval_msec;
     int            i = r->newest;
 
     for( ;; )
@@ -205,6 +205,9 @@ tr_bandwidthAllocate( tr_bandwidth  * b,
     peers = (struct tr_peerIo**) tr_ptrArrayBase( &tmp );
     peerCount = tr_ptrArraySize( &tmp );
 
+    for( i=0; i<peerCount; ++i )
+        tr_peerIoRef( peers[i] );
+
     /* Stop all peers from listening for the socket to be ready for IO.
      * See "Second phase of IO" lower in this function for more info. */
     for( i=0; i<peerCount; ++i )
@@ -246,6 +249,9 @@ tr_bandwidthAllocate( tr_bandwidth  * b,
         if( tr_peerIoHasBandwidthLeft( peers[i], dir ) )
             tr_peerIoSetEnabled( peers[i], dir, TRUE );
 
+    for( i=0; i<peerCount; ++i )
+        tr_peerIoUnref( peers[i] );
+
     /* cleanup */
     tr_ptrArrayDestruct( &tmp, NULL );
 }
@@ -284,21 +290,21 @@ tr_bandwidthClamp( const tr_bandwidth  * b,
 }
 
 double
-tr_bandwidthGetRawSpeed( const tr_bandwidth * b, tr_direction dir )
+tr_bandwidthGetRawSpeed( const tr_bandwidth * b, const uint64_t now, const tr_direction dir )
 {
     assert( tr_isBandwidth( b ) );
     assert( tr_isDirection( dir ) );
 
-    return getSpeed( &b->band[dir].raw, HISTORY_MSEC );
+    return getSpeed( &b->band[dir].raw, HISTORY_MSEC, now );
 }
 
 double
-tr_bandwidthGetPieceSpeed( const tr_bandwidth * b, tr_direction dir )
+tr_bandwidthGetPieceSpeed( const tr_bandwidth * b, const uint64_t now, const tr_direction dir )
 {
     assert( tr_isBandwidth( b ) );
     assert( tr_isDirection( dir ) );
 
-    return getSpeed( &b->band[dir].piece, HISTORY_MSEC );
+    return getSpeed( &b->band[dir].piece, HISTORY_MSEC, now );
 }
 
 static void

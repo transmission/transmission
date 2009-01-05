@@ -144,7 +144,6 @@ struct tr_peerMgr
     tr_session      * session;
     tr_ptrArray       torrents; /* Torrent */
     tr_ptrArray       incomingHandshakes; /* tr_handshake */
-    tr_ptrArray       finishedHandshakes; /* tr_handshake */
     tr_timer        * bandwidthTimer;
 };
 
@@ -356,7 +355,7 @@ peerDestructor( tr_peer * peer )
         tr_peerMsgsFree( peer->msgs );
     }
 
-    tr_peerIoFree( peer->io );
+    tr_peerIoUnref( peer->io );
 
     tr_bitfieldFree( peer->have );
     tr_bitfieldFree( peer->blame );
@@ -459,7 +458,6 @@ tr_peerMgrNew( tr_session * session )
     m->session = session;
     m->torrents = TR_PTR_ARRAY_INIT;
     m->incomingHandshakes = TR_PTR_ARRAY_INIT;
-    m->finishedHandshakes = TR_PTR_ARRAY_INIT;
     m->bandwidthTimer = tr_timerNew( session, bandwidthPulse, m, BANDWIDTH_PERIOD_MSEC );
     return m;
 }
@@ -467,8 +465,6 @@ tr_peerMgrNew( tr_session * session )
 void
 tr_peerMgrFree( tr_peerMgr * manager )
 {
-    tr_handshake * handshake;
-
     managerLock( manager );
 
     tr_timerFree( &manager->bandwidthTimer );
@@ -479,11 +475,6 @@ tr_peerMgrFree( tr_peerMgr * manager )
         tr_handshakeAbort( tr_ptrArrayNth( &manager->incomingHandshakes, 0 ) );
 
     tr_ptrArrayDestruct( &manager->incomingHandshakes, NULL );
-
-    while(( handshake = tr_ptrArrayPop( &manager->finishedHandshakes )))
-        tr_handshakeFree( handshake );
-
-    tr_ptrArrayDestruct( &manager->finishedHandshakes, NULL );
 
     /* free the torrents. */
     tr_ptrArrayDestruct( &manager->torrents, torrentDestructor );
@@ -1276,7 +1267,7 @@ myHandshakeDoneCB( tr_handshake  * handshake,
     }
 
     if( !success )
-        tr_ptrArrayAppend( &manager->finishedHandshakes, handshake );
+        tr_handshakeFree( handshake );
 
     if( t )
         torrentUnlock( t );
@@ -1793,6 +1784,7 @@ tr_peerMgrWebSpeeds( const tr_peerMgr * manager,
     int i;
     int webseedCount;
     float * ret;
+    uint64_t now;
 
     assert( manager );
     managerLock( manager );
@@ -1802,9 +1794,10 @@ tr_peerMgrWebSpeeds( const tr_peerMgr * manager,
     webseedCount = tr_ptrArraySize( &t->webseeds );
     assert( webseedCount == t->tor->info.webseedCount );
     ret = tr_new0( float, webseedCount );
+    now = tr_date( );
 
     for( i=0; i<webseedCount; ++i )
-        if( !tr_webseedGetSpeed( webseeds[i], &ret[i] ) )
+        if( !tr_webseedGetSpeed( webseeds[i], now, &ret[i] ) )
             ret[i] = -1.0;
 
     managerUnlock( manager );
@@ -1812,9 +1805,9 @@ tr_peerMgrWebSpeeds( const tr_peerMgr * manager,
 }
 
 double
-tr_peerGetPieceSpeed( const tr_peer * peer, tr_direction direction )
+tr_peerGetPieceSpeed( const tr_peer * peer, uint64_t now, tr_direction direction )
 {
-    return peer->io ? tr_peerIoGetPieceSpeed( peer->io, direction ) : 0.0;
+    return peer->io ? tr_peerIoGetPieceSpeed( peer->io, now, direction ) : 0.0;
 }
 
 
@@ -1827,6 +1820,7 @@ tr_peerMgrPeerStats( const   tr_peerMgr  * manager,
     const Torrent * t;
     const tr_peer ** peers;
     tr_peer_stat * ret;
+    uint64_t now;
 
     assert( manager );
     managerLock( manager );
@@ -1835,6 +1829,7 @@ tr_peerMgrPeerStats( const   tr_peerMgr  * manager,
     size = tr_ptrArraySize( &t->peers );
     peers = (const tr_peer**) tr_ptrArrayBase( &t->peers );
     ret = tr_new0( tr_peer_stat, size );
+    now = tr_date( );
 
     for( i = 0; i < size; ++i )
     {
@@ -1853,8 +1848,8 @@ tr_peerMgrPeerStats( const   tr_peerMgr  * manager,
         stat->from               = atom->from;
         stat->progress           = peer->progress;
         stat->isEncrypted        = tr_peerIoIsEncrypted( peer->io ) ? 1 : 0;
-        stat->rateToPeer         = tr_peerGetPieceSpeed( peer, TR_CLIENT_TO_PEER );
-        stat->rateToClient       = tr_peerGetPieceSpeed( peer, TR_PEER_TO_CLIENT );
+        stat->rateToPeer         = tr_peerGetPieceSpeed( peer, now, TR_CLIENT_TO_PEER );
+        stat->rateToClient       = tr_peerGetPieceSpeed( peer, now, TR_PEER_TO_CLIENT );
         stat->peerIsChoked       = peer->peerIsChoked;
         stat->peerIsInterested   = peer->peerIsInterested;
         stat->clientIsChoked     = peer->clientIsChoked;
@@ -1937,6 +1932,7 @@ rechoke( Torrent * t )
     tr_peer ** peers = (tr_peer**) tr_ptrArrayBase( &t->peers );
     struct ChokeData * choke = tr_new0( struct ChokeData, peerCount );
     const int chokeAll = !tr_torrentIsPieceTransferAllowed( t->tor, TR_CLIENT_TO_PEER );
+    const uint64_t now = tr_date( );
 
     assert( torrentIsLocked( t ) );
 
@@ -1964,7 +1960,7 @@ rechoke( Torrent * t )
             n->peer         = peer;
             n->isInterested = peer->peerIsInterested;
             n->isChoked     = peer->peerIsChoked;
-            n->rate         = tr_peerGetPieceSpeed( peer, TR_CLIENT_TO_PEER ) * 1024;
+            n->rate         = tr_peerGetPieceSpeed( peer, now, TR_CLIENT_TO_PEER ) * 1024;
         }
     }
 
@@ -2373,7 +2369,6 @@ pumpAllPeers( tr_peerMgr * mgr )
 static int
 bandwidthPulse( void * vmgr )
 {
-    tr_handshake * handshake;
     tr_peerMgr * mgr = vmgr;
     managerLock( mgr );
 
@@ -2383,10 +2378,6 @@ bandwidthPulse( void * vmgr )
     /* allocate bandwidth to the peers */
     tr_bandwidthAllocate( mgr->session->bandwidth, TR_UP, BANDWIDTH_PERIOD_MSEC );
     tr_bandwidthAllocate( mgr->session->bandwidth, TR_DOWN, BANDWIDTH_PERIOD_MSEC );
-
-    /* free all the finished handshakes */
-    while(( handshake = tr_ptrArrayPop( &mgr->finishedHandshakes )))
-        tr_handshakeFree( handshake );
 
     managerUnlock( mgr );
     return TRUE;

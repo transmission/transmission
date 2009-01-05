@@ -202,11 +202,13 @@ size_t  tr_bandwidthClamp             ( const tr_bandwidth  * bandwidth,
 
 /** @brief Get the raw total of bytes read or sent by this bandwidth subtree. */
 double tr_bandwidthGetRawSpeed( const tr_bandwidth  * bandwidth,
-                                tr_direction          direction );
+                                const uint64_t        now,
+                                const tr_direction    direction );
 
 /** @brief Get the number of piece data bytes read or sent by this bandwidth subtree. */
 double tr_bandwidthGetPieceSpeed( const tr_bandwidth  * bandwidth,
-                                  tr_direction          direction );
+                                  const uint64_t        now,
+                                  const tr_direction    direction );
 
 /**
  * @brief Notify the bandwidth object that some of its allocated bandwidth has been consumed.

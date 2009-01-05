@@ -1095,7 +1095,7 @@ void
 tr_handshakeFree( tr_handshake * handshake )
 {
     if( handshake->io )
-        tr_peerIoFree( handshake->io );
+        tr_peerIoUnref( handshake->io );
 
     tr_free( handshake );
 }

@@ -67,8 +67,11 @@ typedef struct tr_peerIo
     int                   magicNumber;
 
     uint8_t               encryptionMode;
+
     tr_port               port;
     int                   socket;
+
+    ssize_t               refCount;
 
     uint8_t               peerId[SHA_DIGEST_LENGTH];
     time_t                timeCreated;
@@ -110,7 +113,9 @@ tr_peerIo*  tr_peerIoNewIncoming( tr_session              * session,
                                   tr_port                   port,
                                   int                       socket );
 
-void        tr_peerIoFree       ( tr_peerIo               * io );
+void tr_peerIoRef               ( tr_peerIo * io );
+
+void tr_peerIoUnref             ( tr_peerIo * io );
 
 tr_bool     tr_isPeerIo         ( const tr_peerIo         * io );
 
@@ -309,7 +314,7 @@ void      tr_peerIoDrain( tr_peerIo *       io,
 ***
 **/
 
-size_t    tr_peerIoGetWriteBufferSpace( const tr_peerIo * io );
+size_t    tr_peerIoGetWriteBufferSpace( const tr_peerIo * io, uint64_t now );
 
 static inline void tr_peerIoSetParent( tr_peerIo            * io,
                                        struct tr_bandwidth  * parent )
@@ -332,12 +337,12 @@ static inline tr_bool tr_peerIoHasBandwidthLeft( const tr_peerIo  * io,
     return tr_bandwidthClamp( &io->bandwidth, dir, 1024 ) > 0;
 }
 
-static inline double tr_peerIoGetPieceSpeed( const tr_peerIo * io, tr_direction dir )
+static inline double tr_peerIoGetPieceSpeed( const tr_peerIo * io, uint64_t now, tr_direction dir )
 {
     assert( tr_isPeerIo( io ) );
     assert( tr_isDirection( dir ) );
 
-    return tr_bandwidthGetPieceSpeed( &io->bandwidth, dir );
+    return tr_bandwidthGetPieceSpeed( &io->bandwidth, now, dir );
 }
 
 /**
