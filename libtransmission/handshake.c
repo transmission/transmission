@@ -1095,7 +1095,7 @@ void
 tr_handshakeFree( tr_handshake * handshake )
 {
     if( handshake->io )
-        tr_peerIoUnref( handshake->io );
+        tr_peerIoUnref( handshake->io ); /* balanced by the ref in tr_handshakeNew */
 
     tr_free( handshake );
 }
@@ -1172,6 +1172,7 @@ tr_handshakeNew( tr_peerIo *        io,
     handshake->doneUserData = doneUserData;
     handshake->session = tr_peerIoGetSession( io );
 
+    tr_peerIoRef( io ); /* balanced by the unref in tr_handshakeFree */
     tr_peerIoSetIOFuncs( handshake->io, canRead, NULL, gotError, handshake );
 
     if( tr_peerIoIsIncoming( handshake->io ) )

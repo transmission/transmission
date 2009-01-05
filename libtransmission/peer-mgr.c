@@ -355,7 +355,7 @@ peerDestructor( tr_peer * peer )
         tr_peerMsgsFree( peer->msgs );
     }
 
-    tr_peerIoUnref( peer->io );
+    tr_peerIoUnref( peer->io ); /* balanced by the ref in handshakeDoneCB() */
 
     tr_bitfieldFree( peer->have );
     tr_bitfieldFree( peer->blame );
@@ -1258,6 +1258,7 @@ myHandshakeDoneCB( tr_handshake  * handshake,
 
                 peer->port = port;
                 peer->io = tr_handshakeStealIO( handshake );
+                tr_peerIoRef( peer->io ); /* balanced by the unref in peerDestructor() */
                 tr_peerIoSetParent( peer->io, t->tor->bandwidth );
                 tr_peerMsgsNew( t->tor, peer, peerCallbackFunc, t, &peer->msgsTag );
 
@@ -1303,6 +1304,8 @@ tr_peerMgrAddIncoming( tr_peerMgr * manager,
                                      manager->session->encryptionMode,
                                      myHandshakeDoneCB,
                                      manager );
+
+        tr_peerIoUnref( io ); /* balanced by the implicit ref in tr_peerIoNewIncoming() */
 
         tr_ptrArrayInsertSorted( &manager->incomingHandshakes, handshake,
                                  handshakeCompare );
@@ -2324,6 +2327,8 @@ tordbg( t, "nCandidates is %d, MAX_RECONNECTIONS_PER_PULSE is %d, getPeerCount(t
                                                             mgr );
 
                 assert( tr_peerIoGetTorrentHash( io ) );
+
+                tr_peerIoUnref( io ); /* balanced by the implicit ref in tr_peerIoNewOutgoing() */
 
                 ++newConnectionsThisSecond;
 
