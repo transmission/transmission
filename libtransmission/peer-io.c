@@ -191,12 +191,13 @@ event_read_cb( int fd, short event UNUSED, void * vio )
     size_t howmuch;
     const tr_direction dir = TR_DOWN;
     const size_t max = 256 * 1024;
-    const size_t curlen = EVBUFFER_LENGTH( io->inbuf );
-
-    howmuch = curlen >= max ? 0 : max - curlen;
-    howmuch = tr_bandwidthClamp( &io->bandwidth, TR_DOWN, howmuch );
+    size_t curlen;
 
     assert( tr_isPeerIo( io ) );
+
+    curlen = EVBUFFER_LENGTH( io->inbuf );
+    howmuch = curlen >= max ? 0 : max - curlen;
+    howmuch = tr_bandwidthClamp( &io->bandwidth, TR_DOWN, howmuch );
 
     dbgmsg( io, "libevent says this peer is ready to read" );
 
@@ -494,6 +495,14 @@ tr_peerIoSetIOFuncs( tr_peerIo        * io,
     io->didWrite = writecb;
     io->gotError = errcb;
     io->userData = userData;
+}
+
+void
+tr_peerIoClear( tr_peerIo * io )
+{
+    tr_peerIoSetIOFuncs( io, NULL, NULL, NULL, NULL );
+    tr_peerIoSetEnabled( io, TR_UP, FALSE );
+    tr_peerIoSetEnabled( io, TR_DOWN, FALSE );
 }
 
 int

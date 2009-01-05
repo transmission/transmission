@@ -210,6 +210,8 @@ void    tr_peerIoSetIOFuncs      ( tr_peerIo        * io,
                                    tr_net_error_cb    errcb,
                                    void             * user_data );
 
+void    tr_peerIoClear           ( tr_peerIo        * io );
+
 /**
 ***
 **/

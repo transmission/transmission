@@ -106,7 +106,7 @@ reqListRemoveFromSorted( struct request_list * list, const struct peer_request *
 static void
 reqListRemoveNthFromFifo( struct request_list * list, int n )
 {
-    memmove( &list->fifo[n], &list->fifo[n+1], (list->len-1)*sizeof(struct peer_request));
+    memmove( &list->fifo[n], &list->fifo[n+1], (list->len-n-1)*sizeof(struct peer_request));
 }
 
 tr_bool
