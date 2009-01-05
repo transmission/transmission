@@ -355,6 +355,7 @@ peerDestructor( tr_peer * peer )
         tr_peerMsgsFree( peer->msgs );
     }
 
+    tr_peerIoSetIOFuncs( peer->io, NULL, NULL, NULL, NULL );
     tr_peerIoUnref( peer->io ); /* balanced by the ref in handshakeDoneCB() */
 
     tr_bitfieldFree( peer->have );
