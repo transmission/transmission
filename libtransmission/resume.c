@@ -73,6 +73,9 @@ savePeers( tr_benc *          dict,
 
     if( count > 0 )
         tr_bencDictAddRaw( dict, KEY_PEERS, pex, sizeof( tr_pex ) * count );
+
+    tr_free( pex );
+    pex = NULL;
     
     count = tr_peerMgrGetPeers( tor->session->peerMgr, tor->info.hash, &pex,
                                 TR_AF_INET6 );
