@@ -177,7 +177,6 @@ tr_cpBlockAdd( tr_completion *  cp,
     }
 }
 
-#if 0
 int
 tr_cpBlockBitfieldSet( tr_completion * cp,
                        tr_bitfield *   bitfield )
@@ -199,8 +198,8 @@ tr_cpBlockBitfieldSet( tr_completion * cp,
 
     return success;
 }
-#endif
 
+#if 0
 int
 tr_cpBlockBitfieldSet( tr_completion * cp, tr_bitfield * blockBitfield )
 {
@@ -245,6 +244,7 @@ tr_cpBlockBitfieldSet( tr_completion * cp, tr_bitfield * blockBitfield )
 
     return success;
 }
+#endif
 
 /***
 ****
