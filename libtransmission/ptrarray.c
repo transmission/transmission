@@ -106,7 +106,7 @@ tr_ptrArrayBack( tr_ptrArray* t )
 
 int
 tr_ptrArrayInsert( tr_ptrArray * t,
-                   void *        ptr,
+                   void        * ptr,
                    int           pos )
 {
     if( pos < 0 || pos > t->n_items )
@@ -119,8 +119,8 @@ tr_ptrArrayInsert( tr_ptrArray * t,
     }
 
     memmove( t->items + pos + 1,
-            t->items + pos,
-            sizeof( void* ) * ( t->n_items - pos ) );
+             t->items + pos,
+             sizeof( void* ) * ( t->n_items - pos ) );
 
     t->items[pos] = ptr;
     t->n_items++;
@@ -205,7 +205,7 @@ assertSortedAndUnique( const tr_ptrArray * t,
     int i;
 
     for( i = 0; i < t->n_items - 2; ++i )
-        assert( compare( t->items[i], t->items[i + 1] ) < 0 );
+        assert( compare( t->items[i], t->items[i + 1] ) <= 0 );
 }
 
 int
