@@ -35,8 +35,7 @@ tr_cpReset( tr_completion * cp )
 {
     tr_bitfieldClear( &cp->pieceBitfield );
     tr_bitfieldClear( &cp->blockBitfield );
-    memset( cp->completeBlocks, 0,
-            sizeof( uint16_t ) * cp->tor->info.pieceCount );
+    memset( cp->completeBlocks, 0, sizeof( uint16_t ) * cp->tor->info.pieceCount );
     cp->sizeNow = 0;
     cp->sizeWhenDoneIsDirty = 1;
     cp->haveValidIsDirty = 1;
@@ -178,6 +177,7 @@ tr_cpBlockAdd( tr_completion *  cp,
     }
 }
 
+#if 0
 int
 tr_cpBlockBitfieldSet( tr_completion * cp,
                        tr_bitfield *   bitfield )
@@ -195,6 +195,52 @@ tr_cpBlockBitfieldSet( tr_completion * cp,
             if( tr_bitfieldHasFast( bitfield, i ) )
                 tr_cpBlockAdd( cp, i );
         success = TRUE;
+    }
+
+    return success;
+}
+#endif
+
+int
+tr_cpBlockBitfieldSet( tr_completion * cp, tr_bitfield * blockBitfield )
+{
+    int success = FALSE;
+
+    assert( cp );
+    assert( blockBitfield );
+
+    if(( success = tr_bitfieldTestFast( blockBitfield, cp->tor->blockCount - 1 )))
+    {
+        tr_piece_index_t p;
+        const tr_torrent * tor = cp->tor;
+
+        tr_cpReset( cp );
+
+        for( p=0; p<tor->info.pieceCount; ++p )
+        {
+            tr_block_index_t i;
+            uint16_t completeBlocksInPiece = 0;
+
+            const tr_block_index_t start = tr_torPieceFirstBlock( tor, p );
+            const tr_block_index_t end = start + tr_torPieceCountBlocks( tor, p );
+
+            for( i=start; i!=end; ++i ) {
+                if( tr_bitfieldTestFast( blockBitfield, i ) ) {
+                    ++completeBlocksInPiece;
+                    cp->sizeNow += tr_torBlockCountBytes( tor, i );
+                }
+            }
+
+            cp->completeBlocks[p] = completeBlocksInPiece;
+
+            if( completeBlocksInPiece == end - start )
+                tr_bitfieldAdd( &cp->pieceBitfield, p );
+        }
+
+        memcpy( cp->blockBitfield->bits, blockBitfield->bits, cp->blockBitfield->byteCount );
+
+        cp->haveValidIsDirty = 1;
+        cp->sizeWhenDoneIsDirty = 1;
     }
 
     return success;
