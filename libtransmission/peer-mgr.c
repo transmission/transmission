@@ -1258,8 +1258,8 @@ myHandshakeDoneCB( tr_handshake  * handshake,
                 }
 
                 peer->port = port;
-                peer->io = tr_handshakeStealIO( handshake );
-                tr_peerIoRef( peer->io ); /* balanced by the unref in peerDestructor() */
+                peer->io = tr_handshakeStealIO( handshake ); /* this steals its refcount too, which is
+                                                                balanced by our unref in peerDestructor()  */
                 tr_peerIoSetParent( peer->io, t->tor->bandwidth );
                 tr_peerMsgsNew( t->tor, peer, peerCallbackFunc, t, &peer->msgsTag );
 
