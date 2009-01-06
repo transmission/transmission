@@ -255,7 +255,8 @@
     if (!fGroupRulesSheetWindow)
         [NSBundle loadNibNamed: @"GroupRules" owner: self];
 
-	NSPredicate *predicate = [[GroupsController groups] autoAssignRulesForIndex: [fTableView selectedRow]];
+    NSInteger index = [[GroupsController groups] indexForRow: [fTableView selectedRow]];
+	NSPredicate *predicate = [[GroupsController groups] autoAssignRulesForIndex: index];
 	[fRuleEditor setObjectValue: predicate];
 	
     if ([fRuleEditor numberOfRows] == 0)
