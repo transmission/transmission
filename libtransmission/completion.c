@@ -237,7 +237,7 @@ tr_cpBlockBitfieldSet( tr_completion * cp, tr_bitfield * blockBitfield )
                 tr_bitfieldAdd( &cp->pieceBitfield, p );
         }
 
-        memcpy( cp->blockBitfield->bits, blockBitfield->bits, cp->blockBitfield->byteCount );
+        memcpy( cp->blockBitfield.bits, blockBitfield->bits, cp->blockBitfield.byteCount );
 
         cp->haveValidIsDirty = 1;
         cp->sizeWhenDoneIsDirty = 1;
