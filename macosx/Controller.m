@@ -2065,9 +2065,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     }
     
     [fTableView selectValues: selectedValues];
-    #warning still happens anyway?
-    //removed because it made the inspector reset (noticeable when a transfer with web seeds is selected)
-    //[self resetInfo]; //if group is already selected, but the torrents in it change
+    [self resetInfo]; //if group is already selected, but the torrents in it change
     
     [self setBottomCountText: groupRows || filterStatus || filterGroup || filterText];
     

@@ -434,14 +434,14 @@ tr_session * fHandle;
 
 - (void) setPeersGlobal: (id) sender
 {
-    int count = [sender intValue];
+    const int count = [sender intValue];
     [fDefaults setInteger: count forKey: @"PeersTotal"];
     tr_sessionSetPeerLimit(fHandle, count);
 }
 
 - (void) setPeersTorrent: (id) sender
 {
-    int count = [sender intValue];
+    const int count = [sender intValue];
     [fDefaults setInteger: count forKey: @"PeersTorrent"];
 }
 
@@ -452,13 +452,14 @@ tr_session * fHandle;
 
 - (void) setEncryptionMode: (id) sender
 {
-    tr_sessionSetEncryption(fHandle, [fDefaults boolForKey: @"EncryptionPrefer"] ? 
-        ([fDefaults boolForKey: @"EncryptionRequire"] ? TR_ENCRYPTION_REQUIRED : TR_ENCRYPTION_PREFERRED) : TR_CLEAR_PREFERRED);
+    const tr_encryption_mode mode = [fDefaults boolForKey: @"EncryptionPrefer"] ? 
+        ([fDefaults boolForKey: @"EncryptionRequire"] ? TR_ENCRYPTION_REQUIRED : TR_ENCRYPTION_PREFERRED) : TR_CLEAR_PREFERRED;
+    tr_sessionSetEncryption(fHandle, mode);
 }
 
 - (void) setBlocklistEnabled: (id) sender
 {
-    BOOL enable = [sender state] == NSOnState;
+    const BOOL enable = [sender state] == NSOnState;
     [fDefaults setBool: enable forKey: @"Blocklist"];
     tr_blocklistSetEnabled(fHandle, enable);
     

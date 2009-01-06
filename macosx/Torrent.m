@@ -777,6 +777,7 @@ int trashDataFile(const char * filename)
     return allTrackers;
 }
 
+//used by auto group rules
 - (NSString *) trackerList
 {
     return [[self allTrackers: NO] componentsJoinedByString: @"\n"];
@@ -1431,7 +1432,7 @@ int trashDataFile(const char * filename)
     for (NSInteger index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
         have += fFileStat[index].bytesCompleted;
     
-    NSAssert([node size], @"director in torrent file has size 0");
+    NSAssert([node size], @"directory in torrent file has size 0");
     return (CGFloat)have / [node size];
 }
 

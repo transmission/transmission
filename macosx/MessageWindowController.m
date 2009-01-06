@@ -233,9 +233,9 @@
     if (!fAttributes)
         fAttributes = [[[[column dataCell] attributedStringValue] attributesAtIndex: 0 effectiveRange: NULL] retain];
     
-    CGFloat count = floorf([[[fMessages objectAtIndex: row] objectForKey: @"Message"] sizeWithAttributes: fAttributes].width
-                            / [column width]);
-    return [tableView rowHeight] * (count + 1.0f);
+    const CGFloat count = floorf([[[fMessages objectAtIndex: row] objectForKey: @"Message"] sizeWithAttributes: fAttributes].width
+                                / [column width]);
+    return [tableView rowHeight] * (count + 1.0);
 }
 
 - (void) tableView: (NSTableView *) tableView sortDescriptorsDidChange: (NSArray *) oldDescriptors
