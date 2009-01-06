@@ -1268,9 +1268,6 @@ myHandshakeDoneCB( tr_handshake  * handshake,
         }
     }
 
-    if( !success )
-        tr_handshakeFree( handshake );
-
     if( t )
         torrentUnlock( t );
 

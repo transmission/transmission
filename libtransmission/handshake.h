@@ -38,8 +38,6 @@ tr_handshake *         tr_handshakeNew( struct tr_peerIo * io,
 const tr_address *     tr_handshakeGetAddr( const struct tr_handshake  * handshake,
                                             tr_port                    * port );
 
-void                   tr_handshakeFree( tr_handshake * handshake );
-
 void                   tr_handshakeAbort( tr_handshake * handshake );
 
 struct tr_peerIo*      tr_handshakeGetIO( tr_handshake * handshake );

@@ -1091,7 +1091,7 @@ fireDoneFunc( tr_handshake * handshake,
     return success;
 }
 
-void
+static void
 tr_handshakeFree( tr_handshake * handshake )
 {
     if( handshake->io )
@@ -1110,6 +1110,8 @@ tr_handshakeDone( tr_handshake * handshake,
     tr_peerIoSetIOFuncs( handshake->io, NULL, NULL, NULL, NULL );
 
     success = fireDoneFunc( handshake, isOK );
+
+    tr_handshakeFree( handshake );    
 
     return success ? READ_LATER : READ_ERR;
 }
