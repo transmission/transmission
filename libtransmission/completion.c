@@ -221,7 +221,7 @@ tr_cpBlockBitfieldSet( tr_completion * cp, tr_bitfield * blockBitfield )
             cp->sizeNow += tr_torBlockCountBytes( cp->tor, cp->tor->blockCount-1 );
         }
 
-#if 0
+#if 1
 #warning these checks are to see if the implementation is good, since getting this function wrong could make Transmission think their downloaded data has disappeared.  But they are also expensive, so this block should be turned off after the nightly build users had a chance to smoke out any errors.
         /**
         ***  correctness checks
