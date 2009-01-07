@@ -152,8 +152,7 @@ tr_cpPieceRem( tr_completion *  cp,
 }
 
 void
-tr_cpBlockAdd( tr_completion *  cp,
-               tr_block_index_t block )
+tr_cpBlockAdd( tr_completion * cp, tr_block_index_t block )
 {
     const tr_torrent * tor = cp->tor;
 
@@ -177,30 +176,7 @@ tr_cpBlockAdd( tr_completion *  cp,
     }
 }
 
-int
-tr_cpBlockBitfieldSet( tr_completion * cp,
-                       tr_bitfield *   bitfield )
-{
-    int success = FALSE;
-
-    assert( cp );
-    assert( bitfield );
-
-    if( tr_bitfieldTestFast( bitfield, cp->tor->blockCount - 1 ) )
-    {
-        tr_block_index_t i;
-        tr_cpReset( cp );
-        for( i = 0; i < cp->tor->blockCount; ++i )
-            if( tr_bitfieldHasFast( bitfield, i ) )
-                tr_cpBlockAdd( cp, i );
-        success = TRUE;
-    }
-
-    return success;
-}
-
-#if 0
-int
+tr_bool
 tr_cpBlockBitfieldSet( tr_completion * cp, tr_bitfield * blockBitfield )
 {
     int success = FALSE;
@@ -208,43 +184,82 @@ tr_cpBlockBitfieldSet( tr_completion * cp, tr_bitfield * blockBitfield )
     assert( cp );
     assert( blockBitfield );
 
-    if(( success = tr_bitfieldTestFast( blockBitfield, cp->tor->blockCount - 1 )))
+    if(( success = blockBitfield->byteCount == cp->blockBitfield.byteCount ))
     {
-        tr_piece_index_t p;
-        const tr_torrent * tor = cp->tor;
+        tr_block_index_t b = 0;
+        tr_piece_index_t p = 0;
+        uint32_t pieceBlock = 0;
+        uint32_t completeBlocksInPiece = 0;
+        tr_block_index_t completeBlocksInTorrent = 0;
+        uint32_t blocksInCurrentPiece = tr_torPieceCountBlocks( cp->tor, p );
+
+        assert( blockBitfield->byteCount == cp->blockBitfield.byteCount );
 
         tr_cpReset( cp );
 
-        for( p=0; p<tor->info.pieceCount; ++p )
+        cp->sizeWhenDoneIsDirty = TRUE;
+        cp->haveValidIsDirty = TRUE;
+        memcpy( cp->blockBitfield.bits, blockBitfield->bits, blockBitfield->byteCount );
+
+        while( b < cp->tor->blockCount )
         {
-            tr_block_index_t i;
-            uint16_t completeBlocksInPiece = 0;
+            if( tr_bitfieldHasFast( blockBitfield, b ) )
+                ++completeBlocksInPiece;
 
-            const tr_block_index_t start = tr_torPieceFirstBlock( tor, p );
-            const tr_block_index_t end = start + tr_torPieceCountBlocks( tor, p );
+            ++b;
+            ++pieceBlock;
 
-            for( i=start; i!=end; ++i ) {
-                if( tr_bitfieldTestFast( blockBitfield, i ) ) {
-                    ++completeBlocksInPiece;
-                    cp->sizeNow += tr_torBlockCountBytes( tor, i );
-                }
+            if( pieceBlock == blocksInCurrentPiece )
+            {
+                cp->completeBlocks[p] = completeBlocksInPiece;
+
+                completeBlocksInTorrent += completeBlocksInPiece;
+
+                if( completeBlocksInPiece == blocksInCurrentPiece )
+                    tr_bitfieldAdd( &cp->pieceBitfield, p );
+
+                ++p;
+                completeBlocksInPiece = 0;
+                pieceBlock = 0;
+                blocksInCurrentPiece = tr_torPieceCountBlocks( cp->tor, p );
             }
-
-            cp->completeBlocks[p] = completeBlocksInPiece;
-
-            if( completeBlocksInPiece == end - start )
-                tr_bitfieldAdd( &cp->pieceBitfield, p );
         }
 
-        memcpy( cp->blockBitfield.bits, blockBitfield->bits, cp->blockBitfield.byteCount );
+        /* update sizeNow */
+        cp->sizeNow = completeBlocksInTorrent;
+        cp->sizeNow *= tr_torBlockCountBytes( cp->tor, 0 );
+        if( tr_bitfieldHasFast( &cp->blockBitfield, cp->tor->blockCount-1 ) ) {
+            cp->sizeNow -= tr_torBlockCountBytes( cp->tor, 0 );
+            cp->sizeNow += tr_torBlockCountBytes( cp->tor, cp->tor->blockCount-1 );
+        }
 
-        cp->haveValidIsDirty = 1;
-        cp->sizeWhenDoneIsDirty = 1;
+#if 1
+#warning these checks are to see if the implementation is good, since getting this function wrong could make Transmission think their downloaded data has disappeared.  But they are also expensive, so this block should be turned off after the nightly build users had a chance to smoke out any errors.
+        /**
+        ***  correctness checks
+        **/
+        for( b=0; b<cp->tor->blockCount; ++b )
+            assert( tr_bitfieldHasFast( blockBitfield, b ) == tr_bitfieldHasFast( &cp->blockBitfield, b ) );
+
+        assert( cp->sizeNow <= cp->tor->info.totalSize );
+        for( p=0; p<cp->tor->info.pieceCount; ++p ) {
+            const uint32_t blocksInCurrentPiece = tr_torPieceCountBlocks( cp->tor, p );
+            const tr_block_index_t start = tr_torPieceFirstBlock( cp->tor, p );
+            const tr_block_index_t end = start + tr_torPieceCountBlocks( cp->tor, p );
+            uint32_t completeBlocksInPiece = 0;
+
+            assert( tr_bitfieldHasFast( &cp->pieceBitfield, p ) == ( blocksInCurrentPiece == cp->completeBlocks[p] ) );
+
+            for( b=start; b<end; ++b )
+                if( tr_bitfieldHasFast( &cp->blockBitfield, b ) )
+                    ++completeBlocksInPiece;
+            assert( completeBlocksInPiece == cp->completeBlocks[p] );
+        }
+#endif
     }
 
     return success;
 }
-#endif
 
 /***
 ****
@@ -322,7 +337,7 @@ tr_cpMissingBlocksInPiece( const tr_completion * cp, tr_piece_index_t piece )
 }
 
 
-int
+tr_bool
 tr_cpPieceIsComplete( const tr_completion * cp, tr_piece_index_t piece )
 {
     return cp->completeBlocks[piece] == tr_torPieceCountBlocks( cp->tor, piece );

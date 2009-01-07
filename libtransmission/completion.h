@@ -131,8 +131,8 @@ static inline float tr_cpPercentDone( const tr_completion * cp )
 int tr_cpMissingBlocksInPiece( const tr_completion  * cp,
                                tr_piece_index_t       piece );
 
-int    tr_cpPieceIsComplete( const tr_completion * cp,
-                             tr_piece_index_t      piece );
+tr_bool  tr_cpPieceIsComplete( const tr_completion * cp,
+                               tr_piece_index_t      piece );
 
 void   tr_cpPieceAdd( tr_completion    * completion,
                       tr_piece_index_t   piece );
@@ -148,11 +148,11 @@ static inline int tr_cpBlockIsComplete( const tr_completion * cp, tr_block_index
     return tr_bitfieldHas( &cp->blockBitfield, block );
 }
 
-void                       tr_cpBlockAdd( tr_completion * completion,
-                                          tr_block_index_t block );
+void      tr_cpBlockAdd( tr_completion * completion,
+                         tr_block_index_t block );
 
-int                        tr_cpBlockBitfieldSet( tr_completion      * completion,
-                                                  struct tr_bitfield * blocks );
+tr_bool   tr_cpBlockBitfieldSet( tr_completion      * completion,
+                                 struct tr_bitfield * blocks );
 
 /***
 ****
