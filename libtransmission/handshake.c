@@ -843,19 +843,19 @@ readCryptoProvide( tr_handshake *    handshake,
     tr_sha1( req3, "req3", 4, handshake->mySecret, KEY_LEN, NULL );
     for( i = 0; i < SHA_DIGEST_LENGTH; ++i )
         obfuscatedTorrentHash[i] = req2[i] ^ req3[i];
-    if( ( tor =
-             tr_torrentFindFromObfuscatedHash( handshake->session,
-                                               obfuscatedTorrentHash ) ) )
+    if(( tor = tr_torrentFindFromObfuscatedHash( handshake->session, obfuscatedTorrentHash )))
     {
+        const tr_bool clientIsSeed = tr_torrentIsSeed( tor );
+        const tr_bool peerIsSeed = tr_peerMgrPeerIsSeed( handshake->session->peerMgr,
+                                                         tor->info.hash,
+                                                         tr_peerIoGetAddress( handshake->io, NULL ) );
         dbgmsg( handshake, "got INCOMING connection's encrypted handshake for torrent [%s]",
                 tor->info.name );
         tr_peerIoSetTorrentHash( handshake->io, tor->info.hash );
-        if( !tr_torrentAllowsPex( tor )
-          && tr_peerMgrPeerIsSeed( handshake->session->peerMgr,
-                                  tor->info.hash,
-                                  tr_peerIoGetAddress( handshake->io, NULL ) ) )
+
+        if( clientIsSeed && peerIsSeed )
         {
-            dbgmsg( handshake, "a peer has tried to reconnect to us!" );
+            dbgmsg( handshake, "another seed tried to reconnect to us!" );
             return tr_handshakeDone( handshake, FALSE );
         }
     }
