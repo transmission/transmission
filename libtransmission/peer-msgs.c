@@ -1693,10 +1693,7 @@ fillOutputBuffer( tr_peermsgs * msgs, time_t now )
             && tr_cpPieceIsComplete( &msgs->torrent->completion, req.index ) )
         {
             int err;
-            static uint8_t * buf = NULL;
-
-            if( buf == NULL )
-                buf = tr_new( uint8_t, MAX_BLOCK_SIZE );
+            static uint8_t buf[MAX_BLOCK_SIZE];
 
             /* send a block */
             if(( err = tr_ioRead( msgs->torrent, req.index, req.offset, req.length, buf ))) {
