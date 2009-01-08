@@ -6,17 +6,17 @@ Lead Developers <dev@transmissionbt.com>
   Mitchell Livingston <livings124@transmissionbt.com>  (Mac OS X client)
 
 Project Contributors
-  Tomas Carnecky (Profiling, Patches, and Sneaky Bug Spotting)
-  John Clay (Website maintenance and troubleshooting)
+  Tomas Carnecky  (Profiling, patches, and detection of sneaky bugs)
+  John Clay  (Website maintenance and troubleshooting)
   Rashid Eissing  (Mac OS X Transfers preferences icon)
-  Kendall Hopkins <SoftwareElves@gmail.com> (Web UI)
-  Malcom Jarvis <mjarvis@transmissionbt.com> (Web UI)
+  Hugo van Heuven, madebysofa  (Main icon design)
+  Kendall Hopkins <SoftwareElves@gmail.com>  (Web UI)
+  Malcom Jarvis <mjarvis@transmissionbt.com>  (Web UI)
   Rick Patrick  (Mac OS X images)
   Nick Pucius  (Help documentation)
   Jonas Rask  (Mac OS X Globe icon)
-  Erick Turnquist <jhujhiti@adjectivism.org> (IPv6 Support)
-  Maarten Van Coile (Wiki Wrangler)
-  Hugo van Heuven, madebysofa  (Main icon design)
+  Erick Turnquist <jhujhiti@adjectivism.org>  (IPv6 code, support)
+  Maarten Van Coile  (Wiki Wrangler, troubleshooting, support)
 
 Previous Developers
   Eric Petit <titer@m0k.org>  (Project originator)
