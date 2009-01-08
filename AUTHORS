@@ -5,25 +5,23 @@ Lead Developers <dev@transmissionbt.com>
   Charles Kerr <charles@transmissionbt.com>  (Daemon, Backend, GTK+ client)
   Mitchell Livingston <livings124@transmissionbt.com>  (Mac OS X client)
 
-Web Client Developers
-  Malcom Jarvis <mjarvis@transmissionbt.com>
-  Dave Perrett
-  Kendall Hopkins <SoftwareElves@gmail.com>
-  Charles Kerr
+Project Contributors
+  Tomas Carnecky (Profiling, Patches, and Sneaky Bug Spotting)
+  John Clay (Website maintenance and troubleshooting)
+  Rashid Eissing  (Mac OS X Transfers preferences icon)
+  Kendall Hopkins <SoftwareElves@gmail.com> (Web UI)
+  Malcom Jarvis <mjarvis@transmissionbt.com> (Web UI)
+  Rick Patrick  (Mac OS X images)
+  Nick Pucius  (Help documentation)
+  Jonas Rask  (Mac OS X Globe icon)
+  Erick Turnquist <jhujhiti@adjectivism.org> (IPv6 Support)
+  Maarten Van Coile (Wiki Wrangler)
+  Hugo van Heuven, madebysofa  (Main icon design)
 
 Previous Developers
-  Eric Petit <titer@m0k.org>  (Creator)
+  Eric Petit <titer@m0k.org>  (Project originator)
   Josh Elsasser <josh@elsasser.org>  (Daemon, Backend, GTK+ client)
   Bryan Varner <bryan@varnernet.com>  (BeOS client)
-
-Project Contributors
-  John Clay (Website maintenance and troubleshooting)
-  Hugo van Heuven, madebysofa  (Main icon design)
-  Nick Pucius  (Help documentation)
-  Rick Patrick  (Mac OS X images)
-  Jonas Rask  (Mac OS X Globe icon)
-  Rashid Eissing  (Mac OS X Transfers preferences icon)
-  Erick Turnquist <jhujhiti@adjectivism.org> (IPv6 Support)
 
 Mac OS X Translators, current release:
   Jorge Carrasco  (Spanish)
