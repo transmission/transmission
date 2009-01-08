@@ -90,6 +90,8 @@ EXTRA_DIST = \
     PiecesView.m \
     PortChecker.h \
     PortChecker.m \
+    PredicateEditorRowTemplateAny.h \
+    PredicateEditorRowTemplateAny.m \
     PrefsController.h \
     PrefsController.m \
     PrefsWindow.h \

@@ -777,10 +777,9 @@ int trashDataFile(const char * filename)
     return allTrackers;
 }
 
-//used by auto group rules
-- (NSString *) trackerList
+- (NSArray *) allTrackersFlat
 {
-    return [[self allTrackers: NO] componentsJoinedByString: @"\n"];
+    return [self allTrackers: NO];
 }
 
 - (BOOL) updateAllTrackersForAdd: (NSMutableArray *) trackers
@@ -1705,13 +1704,13 @@ int trashDataFile(const char * filename)
     
     fWaitToStart = waitToStart && [waitToStart boolValue];
     fResumeOnWake = NO;
-    
+	
+    [self createFileList];
+	
     fOrderValue = orderValue ? [orderValue intValue] : tr_sessionCountTorrents(lib) - 1;
     fGroupValue = groupValue ? [groupValue intValue] : [[GroupsController groups] groupIndexForTorrent: self];
     
-    fAddedTrackers = addedTrackers ? [addedTrackers boolValue] : NO; 
-    
-    [self createFileList];
+    fAddedTrackers = addedTrackers ? [addedTrackers boolValue] : NO;    
     
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(checkGroupValueForRemoval:)
         name: @"GroupValueRemoved" object: nil];
