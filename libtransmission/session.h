@@ -74,6 +74,7 @@ struct tr_session
     struct tr_event_handle *     events;
 
     uint16_t                     peerLimitPerTorrent;
+    uint16_t                     openFileLimit;
 
     tr_port                      peerPort;
     tr_port                      randomPortLow;

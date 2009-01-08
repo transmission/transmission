@@ -28,12 +28,8 @@
 
 #include "net.h"
 
-/***********************************************************************
- * tr_fdInit
- ***********************************************************************
- * Detect the maximum number of open files and initializes things.
- **********************************************************************/
-void tr_fdInit( int globalPeerLimit );
+void tr_fdInit( size_t openFileLimit,
+                size_t globalPeerLimit );
 
 /**
  * Returns an fd to the specified filename.

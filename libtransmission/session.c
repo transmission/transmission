@@ -227,6 +227,7 @@ tr_sessionGetDefaultSettings( tr_benc * d )
     tr_bencDictAddInt( d, TR_PREFS_KEY_ENCRYPTION,               TR_DEFAULT_ENCRYPTION );
     tr_bencDictAddInt( d, TR_PREFS_KEY_LAZY_BITFIELD,            TRUE );
     tr_bencDictAddInt( d, TR_PREFS_KEY_MSGLEVEL,                 TR_MSG_INF );
+    tr_bencDictAddInt( d, TR_PREFS_KEY_OPEN_FILE_LIMIT,          atoi( TR_DEFAULT_OPEN_FILE_LIMIT_STR ) );
     tr_bencDictAddInt( d, TR_PREFS_KEY_PEER_LIMIT_GLOBAL,        atoi( TR_DEFAULT_PEER_LIMIT_GLOBAL_STR ) );
     tr_bencDictAddInt( d, TR_PREFS_KEY_PEER_LIMIT_TORRENT,       atoi( TR_DEFAULT_PEER_LIMIT_TORRENT_STR ) );
     tr_bencDictAddInt( d, TR_PREFS_KEY_PEER_PORT,                atoi( TR_DEFAULT_PEER_PORT_STR ) );
@@ -270,6 +271,7 @@ tr_sessionGetSettings( tr_session * s, struct tr_benc * d )
     tr_bencDictAddInt( d, TR_PREFS_KEY_ENCRYPTION,               s->encryptionMode );
     tr_bencDictAddInt( d, TR_PREFS_KEY_LAZY_BITFIELD,            s->useLazyBitfield );
     tr_bencDictAddInt( d, TR_PREFS_KEY_MSGLEVEL,                 tr_getMessageLevel( ) );
+    tr_bencDictAddInt( d, TR_PREFS_KEY_OPEN_FILE_LIMIT,          s->openFileLimit );
     tr_bencDictAddInt( d, TR_PREFS_KEY_PEER_LIMIT_GLOBAL,        tr_sessionGetPeerLimit( s ) );
     tr_bencDictAddInt( d, TR_PREFS_KEY_PEER_LIMIT_TORRENT,       s->peerLimitPerTorrent );
     tr_bencDictAddInt( d, TR_PREFS_KEY_PEER_PORT,                tr_sessionGetPeerPort( s ) );
@@ -458,9 +460,12 @@ tr_sessionInit( const char  * tag,
 
     /* Initialize rate and file descripts controls */
 
-    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_PEER_LIMIT_GLOBAL, &i ); 
+    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_OPEN_FILE_LIMIT, &i ); 
     assert( found ); 
-    tr_fdInit( i ); 
+    session->openFileLimit = i;
+    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_PEER_LIMIT_GLOBAL, &j ); 
+    assert( found ); 
+    tr_fdInit( session->openFileLimit, j );
 
     /** 
     *** random port 
