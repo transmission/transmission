@@ -939,7 +939,7 @@ readIA( tr_handshake *    handshake,
     else
     {
         dbgmsg( handshake, "peer didn't offer an encryption mode we like." );
-        evbuffer_free( outbuf );
+        tr_releaseBuffer( outbuf );
         return tr_handshakeDone( handshake, FALSE );
     }
 
