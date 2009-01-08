@@ -172,12 +172,7 @@ tr_isPeerIo( const tr_peerIo * io )
         && ( io->magicNumber == MAGIC_NUMBER )
         && ( io->refCount > 0 )
         && ( tr_isBandwidth( &io->bandwidth ) )
-        && ( tr_isAddress( &io->addr ) )
-        && ( tr_isBool( io->isEncrypted ) )
-        && ( tr_isBool( io->isIncoming ) )
-        && ( tr_isBool( io->peerIdIsSet ) )
-        && ( tr_isBool( io->extendedProtocolSupported ) )
-        && ( tr_isBool( io->fastExtensionSupported ) );
+        && ( tr_isAddress( &io->addr ) );
 }
 
 static void
@@ -841,8 +836,6 @@ tr_peerIoFlush( tr_peerIo  * io, tr_direction dir, size_t limit )
 static void
 event_enable( tr_peerIo * io, short event )
 {
-    assert( tr_isPeerIo( io ) );
-
     if( event & EV_READ )
         event_add( &io->event_read, NULL );
 
@@ -853,8 +846,6 @@ event_enable( tr_peerIo * io, short event )
 static void
 event_disable( struct tr_peerIo * io, short event )
 {
-    assert( tr_isPeerIo( io ) );
-
     if( event & EV_READ )
         event_del( &io->event_read );
 
@@ -868,12 +859,10 @@ tr_peerIoSetEnabled( tr_peerIo    * io,
                      tr_direction   dir,
                      tr_bool        isEnabled )
 {
-    short event;
+    const short event = dir == TR_UP ? EV_WRITE : EV_READ;
 
     assert( tr_isPeerIo( io ) );
     assert( tr_isDirection( dir ) );
-
-    event = dir == TR_UP ? EV_WRITE : EV_READ;
 
     if( isEnabled )
         event_enable( io, event );

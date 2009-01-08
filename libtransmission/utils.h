@@ -300,7 +300,7 @@ char*       tr_strndup( const void * str, int len ) TR_GNUC_MALLOC;
 
 static inline char* tr_strdup( const void * in )
 {
-    return tr_strndup( in, in ? strlen( (const char*)in ) : 0 );
+    return tr_strndup( in, in ? strlen( in ) : 0 );
 }
 
 /* @brief same argument list as bsearch() */
