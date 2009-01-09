@@ -164,6 +164,7 @@ tr_cpBlockAdd( tr_completion * cp, tr_block_index_t block )
     }
 }
 
+/* Initialize a completion object from a bitfield indicating which blocks we have */
 tr_bool
 tr_cpBlockBitfieldSet( tr_completion * cp, tr_bitfield * blockBitfield )
 {
@@ -172,6 +173,8 @@ tr_cpBlockBitfieldSet( tr_completion * cp, tr_bitfield * blockBitfield )
     assert( cp );
     assert( blockBitfield );
 
+    /* The bitfield of block flags is typically loaded from a resume file.
+       Test the bitfield's length in case the resume file somehow got corrupted */
     if(( success = blockBitfield->byteCount == cp->blockBitfield.byteCount ))
     {
         tr_block_index_t b = 0;
@@ -181,14 +184,17 @@ tr_cpBlockBitfieldSet( tr_completion * cp, tr_bitfield * blockBitfield )
         tr_block_index_t completeBlocksInTorrent = 0;
         uint32_t blocksInCurrentPiece = tr_torPieceCountBlocks( cp->tor, p );
 
-        assert( blockBitfield->byteCount == cp->blockBitfield.byteCount );
-
+        /* start cp with a state where it thinks we have nothing */
         tr_cpReset( cp );
 
-        cp->sizeWhenDoneIsDirty = TRUE;
-        cp->haveValidIsDirty = TRUE;
+        /* init our block bitfield from the one passed in */
         memcpy( cp->blockBitfield.bits, blockBitfield->bits, blockBitfield->byteCount );
 
+        /* invalidate the fields that are lazy-evaluated */
+        cp->sizeWhenDoneIsDirty = TRUE;
+        cp->haveValidIsDirty = TRUE;
+
+        /* to set the remaining fields, we walk through every block... */
         while( b < cp->tor->blockCount )
         {
             if( tr_bitfieldHasFast( blockBitfield, b ) )
@@ -197,15 +203,16 @@ tr_cpBlockBitfieldSet( tr_completion * cp, tr_bitfield * blockBitfield )
             ++b;
             ++pieceBlock;
 
+            /* by the time we reach the end of a piece, we have enough info
+               to update that piece's slot in cp.completeBlocks and cp.pieceBitfield */
             if( pieceBlock == blocksInCurrentPiece )
             {
                 cp->completeBlocks[p] = completeBlocksInPiece;
-
                 completeBlocksInTorrent += completeBlocksInPiece;
-
                 if( completeBlocksInPiece == blocksInCurrentPiece )
                     tr_bitfieldAdd( &cp->pieceBitfield, p );
 
+                /* reset the per-piece counters because we're starting on a new piece now */
                 ++p;
                 completeBlocksInPiece = 0;
                 pieceBlock = 0;
@@ -217,33 +224,11 @@ tr_cpBlockBitfieldSet( tr_completion * cp, tr_bitfield * blockBitfield )
         cp->sizeNow = completeBlocksInTorrent;
         cp->sizeNow *= tr_torBlockCountBytes( cp->tor, 0 );
         if( tr_bitfieldHasFast( &cp->blockBitfield, cp->tor->blockCount-1 ) ) {
+            /* the last block is usually smaller than the other blocks,
+               so handle that special case or cp->sizeNow might be too large */
             cp->sizeNow -= tr_torBlockCountBytes( cp->tor, 0 );
             cp->sizeNow += tr_torBlockCountBytes( cp->tor, cp->tor->blockCount-1 );
         }
-
-#if 1
-#warning these checks are to see if the implementation is good, since getting this function wrong could make Transmission think their downloaded data has disappeared.  But they are also expensive, so this block should be turned off after the nightly build users had a chance to smoke out any errors.
-        /**
-        ***  correctness checks
-        **/
-        for( b=0; b<cp->tor->blockCount; ++b )
-            assert( tr_bitfieldHasFast( blockBitfield, b ) == tr_bitfieldHasFast( &cp->blockBitfield, b ) );
-
-        assert( cp->sizeNow <= cp->tor->info.totalSize );
-        for( p=0; p<cp->tor->info.pieceCount; ++p ) {
-            const uint32_t blocksInCurrentPiece = tr_torPieceCountBlocks( cp->tor, p );
-            const tr_block_index_t start = tr_torPieceFirstBlock( cp->tor, p );
-            const tr_block_index_t end = start + tr_torPieceCountBlocks( cp->tor, p );
-            uint32_t completeBlocksInPiece = 0;
-
-            assert( tr_bitfieldHasFast( &cp->pieceBitfield, p ) == ( blocksInCurrentPiece == cp->completeBlocks[p] ) );
-
-            for( b=start; b<end; ++b )
-                if( tr_bitfieldHasFast( &cp->blockBitfield, b ) )
-                    ++completeBlocksInPiece;
-            assert( completeBlocksInPiece == cp->completeBlocks[p] );
-        }
-#endif
     }
 
     return success;
