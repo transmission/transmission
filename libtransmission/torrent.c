@@ -434,11 +434,12 @@ torrentRealInit( tr_session      * session,
                  tr_torrent      * tor,
                  const tr_ctor   * ctor )
 {
-    int        doStart;
-    uint64_t   loaded;
-    uint64_t   t;
-    tr_info *  info = &tor->info;
-    static int nextUniqueId = 1;
+    int          doStart;
+    uint64_t     loaded;
+    uint64_t     t;
+    const char * dir;
+    static int   nextUniqueId = 1;
+    tr_info    * info = &tor->info;
 
     tr_globalLock( session );
 
@@ -450,6 +451,10 @@ torrentRealInit( tr_session      * session,
     tor->bandwidth = tr_bandwidthNew( session, session->bandwidth );
 
     tor->blockSize = getBlockSize( info->pieceSize );
+
+    if( !tr_ctorGetDownloadDir( ctor, TR_FORCE, &dir ) ||
+        !tr_ctorGetDownloadDir( ctor, TR_FALLBACK, &dir ) )
+            tor->downloadDir = tr_strdup( dir );
 
     tor->lastPieceSize = info->totalSize % info->pieceSize;
 
