@@ -24,13 +24,13 @@
 #include "utils.h"
 #include "web.h"
 
-enum 
+enum
 {
     /* arbitrary number */
-    MAX_CONCURRENT_TASKS = 24,
+    MAX_CONCURRENT_TASKS = 100,
 
     /* arbitrary number */
-    DEFAULT_TIMER_MSEC = 2000
+    DEFAULT_TIMER_MSEC = 2500
 };
 
 #if 0
@@ -49,13 +49,15 @@ enum
 
 struct tr_web
 {
-    tr_bool isClosing;
+    tr_bool closing;
     int prev_running;
     int still_running;
     long timer_ms;
     CURLM * multi;
     tr_session * session;
+#if 0
     tr_list * easy_queue;
+#endif
     struct event timer_event;
 };
 
@@ -123,10 +125,9 @@ addTask( void * vtask )
             tr_free( str );
         }
 
-        curl_easy_setopt( easy, CURLOPT_DNS_CACHE_TIMEOUT, 360L );
-        curl_easy_setopt( easy, CURLOPT_CONNECTTIMEOUT, 60L );
+        curl_easy_setopt( easy, CURLOPT_DNS_CACHE_TIMEOUT, 3600L );
+        curl_easy_setopt( easy, CURLOPT_CONNECTTIMEOUT, 120L );
         curl_easy_setopt( easy, CURLOPT_FOLLOWLOCATION, 1L );
-        curl_easy_setopt( easy, CURLOPT_MAXREDIRS, 16L );
         curl_easy_setopt( easy, CURLOPT_NOSIGNAL, 1L );
         curl_easy_setopt( easy, CURLOPT_PRIVATE, task );
         curl_easy_setopt( easy, CURLOPT_SSL_VERIFYHOST, 0L );
@@ -143,11 +144,16 @@ addTask( void * vtask )
         else /* don't set encoding on webseeds; it messes up binary data */
             curl_easy_setopt( easy, CURLOPT_ENCODING, "" );
 
-        if( web->still_running >= MAX_CONCURRENT_TASKS ) {
+#if 0
+        if( web->still_running >= MAX_CONCURRENT_TASKS )
+        {
             tr_list_append( &web->easy_queue, easy );
             dbgmsg( " >> enqueueing a task ... size is now %d",
                                            tr_list_size( web->easy_queue ) );
-        } else {
+        }
+        else
+#endif
+        {
             const CURLMcode rc = curl_multi_add_handle( web->multi, easy );
             if( rc == CURLM_OK )
                 ++web->still_running;
@@ -208,9 +214,9 @@ remove_finished_tasks( tr_web * g )
             struct tr_web_task * task;
             curl_easy_getinfo( easy, CURLINFO_PRIVATE, (void*)&task );
             curl_easy_getinfo( easy, CURLINFO_RESPONSE_CODE, &code );
+            task_finish( task, code );
             curl_multi_remove_handle( g->multi, easy );
             curl_easy_cleanup( easy );
-            task_finish( task, code );
         }
     }
 
@@ -237,6 +243,7 @@ restart_timer( tr_web * g )
     evtimer_add( &g->timer_event, &interval );
 }
 
+#if 0
 static void
 add_tasks_from_queue( tr_web * g )
 {
@@ -257,6 +264,7 @@ add_tasks_from_queue( tr_web * g )
         }
     }
 }
+#endif
 
 static void
 web_close( tr_web * g )
@@ -266,7 +274,7 @@ web_close( tr_web * g )
     tr_free( g );
 }
 
-/* note: this function can free the tr_web if its 'isClosing' flag is set
+/* note: this function can free the tr_web if its 'closing' flag is set
    and no tasks remain.  callers must not reference their g pointer
    after calling this function */
 static void
@@ -289,11 +297,13 @@ tr_multi_socket_action( tr_web * g, int fd )
 
     remove_finished_tasks( g );
 
+#if 0
     add_tasks_from_queue( g );
+#endif
 
     if( !g->still_running ) {
         stop_timer( g );
-        if( g->isClosing ) {
+        if( g->closing ) {
             web_close( g );
             closed = TRUE;
         }
@@ -466,7 +476,7 @@ tr_webClose( tr_web ** web_in )
     if( web->still_running < 1 )
         web_close( web );
     else
-        web->isClosing = 1;
+        web->closing = 1;
 }
 
 /*****
