@@ -253,6 +253,7 @@ tr_sessionGetDefaultSettings( tr_benc * d )
     tr_bencDictAddInt( d, TR_PREFS_KEY_RPC_PORT,                 atoi( TR_DEFAULT_RPC_PORT_STR ) );
     tr_bencDictAddInt( d, TR_PREFS_KEY_USPEED,                   100 );
     tr_bencDictAddInt( d, TR_PREFS_KEY_USPEED_ENABLED,           0 );
+    tr_bencDictAddInt( d, TR_PREFS_KEY_UPLOAD_SLOTS_PER_TORRENT, 14 );
 }
 
 void
@@ -297,6 +298,7 @@ tr_sessionGetSettings( tr_session * s, struct tr_benc * d )
     tr_bencDictAddInt( d, TR_PREFS_KEY_RPC_WHITELIST_ENABLED,    tr_sessionGetRPCWhitelistEnabled( s ) );
     tr_bencDictAddInt( d, TR_PREFS_KEY_USPEED,                   tr_sessionGetSpeedLimit( s, TR_UP ) );
     tr_bencDictAddInt( d, TR_PREFS_KEY_USPEED_ENABLED,           tr_sessionIsSpeedLimitEnabled( s, TR_UP ) );
+    tr_bencDictAddInt( d, TR_PREFS_KEY_UPLOAD_SLOTS_PER_TORRENT, s->uploadSlotsPerTorrent );
 
     for( i=0; i<n; ++i )
         tr_free( freeme[i] );
@@ -492,6 +494,10 @@ tr_sessionInit( const char  * tag,
 
     /** 
     **/ 
+
+    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_UPLOAD_SLOTS_PER_TORRENT, &i );
+    assert( found );
+    session->uploadSlotsPerTorrent = i;
  
     found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_USPEED, &i )
          && tr_bencDictFindInt( &settings, TR_PREFS_KEY_USPEED_ENABLED, &j );

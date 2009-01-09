@@ -76,6 +76,8 @@ struct tr_session
     uint16_t                     peerLimitPerTorrent;
     uint16_t                     openFileLimit;
 
+    int                          uploadSlotsPerTorrent;
+
     tr_port                      peerPort;
     tr_port                      randomPortLow;
     tr_port                      randomPortHigh;

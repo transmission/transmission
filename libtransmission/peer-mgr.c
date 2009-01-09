@@ -67,10 +67,6 @@ enum
     * this throttle is to avoid overloading the router */
     MAX_CONNECTIONS_PER_SECOND = 32,
 
-    /* number of unchoked peers per torrent.
-     * FIXME: this probably ought to be configurable */
-    MAX_UNCHOKED_PEERS = 14,
-
     /* number of bad pieces a peer is allowed to send before we ban them */
     MAX_BAD_PIECES_PER_PEER = 5,
 
@@ -1932,6 +1928,7 @@ rechoke( Torrent * t )
     const int peerCount = tr_ptrArraySize( &t->peers );
     tr_peer ** peers = (tr_peer**) tr_ptrArrayBase( &t->peers );
     struct ChokeData * choke = tr_new0( struct ChokeData, peerCount );
+    const tr_session * session = t->manager->session;
     const int chokeAll = !tr_torrentIsPieceTransferAllowed( t->tor, TR_CLIENT_TO_PEER );
     const uint64_t now = tr_date( );
 
@@ -1981,7 +1978,7 @@ rechoke( Torrent * t )
      * rate to decide which peers to unchoke.
      */
     unchokedInterested = 0;
-    for( i=0; i<size && unchokedInterested<MAX_UNCHOKED_PEERS; ++i ) {
+    for( i=0; i<size && unchokedInterested<session->uploadSlotsPerTorrent; ++i ) {
         choke[i].doUnchoke = 1;
         if( choke[i].isInterested )
             ++unchokedInterested;

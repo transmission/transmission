@@ -155,6 +155,7 @@ tr_encryption_mode;
 #define TR_PREFS_KEY_RPC_WHITELIST              "rpc-whitelist"
 #define TR_PREFS_KEY_USPEED_ENABLED             "upload-limit-enabled"
 #define TR_PREFS_KEY_USPEED                     "upload-limit"
+#define TR_PREFS_KEY_UPLOAD_SLOTS_PER_TORRENT   "upload-slots-per-torrent"
 
 struct tr_benc;
 
