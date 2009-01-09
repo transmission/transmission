@@ -156,9 +156,12 @@ getConfigDir( int argc, const char ** argv )
     const char * optarg;
     const int ind = tr_optind;
 
-    while(( c = tr_getopt( getUsage( ), argc, argv, options, &optarg )))
-        if( c == 'g' )
+    while(( c = tr_getopt( getUsage( ), argc, argv, options, &optarg ))) {
+        if( c == 'g' ) {
             configDir = optarg;
+            break;
+        }
+    }
 
     tr_optind = ind;
 

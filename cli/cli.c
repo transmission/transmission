@@ -48,7 +48,6 @@ static sig_atomic_t manualUpdate     = 0;
 static const char * torrentPath  = NULL;
 static const char * finishCall   = NULL;
 static const char * announce     = NULL;
-static const char * configdir    = NULL;
 static const char * sourceFile   = NULL;
 static const char * comment      = NULL;
 
@@ -272,9 +271,12 @@ getConfigDir( int argc, const char ** argv )
     const char * optarg;
     const int ind = tr_optind;
 
-    while(( c = tr_getopt( getUsage( ), argc, argv, options, &optarg )))
-        if( c == 'g' )
-            configdir = optarg;
+    while(( c = tr_getopt( getUsage( ), argc, argv, options, &optarg ))) {
+        if( c == 'g' ) {
+            configDir = optarg;
+            break;
+        }
+    }
 
     tr_optind = ind;
 
