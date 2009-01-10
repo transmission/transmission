@@ -124,9 +124,9 @@ tr_metainfoMigrate( tr_session * session,
 ***/
 
 static int
-getfile( char **      setme,
-         const char * root,
-         tr_benc *    path )
+getfile( char        ** setme,
+         const char   * root,
+         tr_benc      * path )
 {
     int err;
 
@@ -356,6 +356,7 @@ tr_metainfoParseImpl( const tr_session * session,
     const uint8_t * raw;
     tr_benc *       beInfo;
     tr_benc *       meta = (tr_benc *) meta_in;
+    tr_bool         err;
 
     /* info_hash: urlencoded 20-byte SHA1 hash of the value of the info key
      * from the Metainfo file. Note that the value will be a bencoded
@@ -378,21 +379,21 @@ tr_metainfoParseImpl( const tr_session * session,
     if( !str || !*str )
         return "name";
     tr_free( inf->name );
-    inf->name = tr_strdup( str );
+    inf->name = tr_utf8clean( str, -1, &err );
 
     /* comment */
     if( !tr_bencDictFindStr( meta, "comment.utf-8", &str ) )
         if( !tr_bencDictFindStr( meta, "comment", &str ) )
             str = "";
     tr_free( inf->comment );
-    inf->comment = tr_strdup( str );
+    inf->comment = tr_utf8clean( str, -1, &err );
 
     /* created by */
     if( !tr_bencDictFindStr( meta, "created by.utf-8", &str ) )
         if( !tr_bencDictFindStr( meta, "created by", &str ) )
             str = "";
     tr_free( inf->creator );
-    inf->creator = tr_strdup( str );
+    inf->creator = tr_utf8clean( str, -1, &err );
 
     /* creation date */
     if( !tr_bencDictFindInt( meta, "creation date", &i ) )

@@ -32,6 +32,7 @@
 #endif
 
 #include "transmission.h"
+#include "ConvertUTF.h"
 #include "list.h"
 #include "utils.h"
 #include "platform.h"
@@ -1318,4 +1319,43 @@ tr_lowerBound( const void * key,
         *exact_match = FALSE;
 
     return first;
+}
+
+/***
+****
+***/
+
+char*
+tr_utf8clean( const char * str, ssize_t max_len, tr_bool * err )
+{
+    const char zero = '\0';
+    char * ret;
+    struct evbuffer * buf = evbuffer_new( );
+    const char * end;
+
+    if( err != NULL )
+        *err = FALSE;
+
+    if( max_len < 0 )
+        max_len = (ssize_t) strlen( str );
+
+    while( !tr_utf8_validate ( str, max_len, &end ) )
+    {
+        const ssize_t good_len = end - str;
+
+        evbuffer_add( buf, str, good_len );
+        max_len -= ( good_len + 1 );
+        str += ( good_len + 1 );
+        evbuffer_add( buf, "?", 1 );
+
+        if( err != NULL )
+            *err = TRUE;
+    }
+
+    evbuffer_add( buf, str, max_len );
+    evbuffer_add( buf, &zero, 1 );
+    ret = tr_memdup( EVBUFFER_DATA( buf ), EVBUFFER_LENGTH( buf ) );
+    assert( tr_utf8_validate( ret, -1, NULL ) );
+    evbuffer_free( buf );
+    return ret;
 }

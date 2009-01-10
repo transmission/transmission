@@ -237,6 +237,11 @@ uint64_t       tr_date( void );
 /* wait the specified number of milliseconds */
 void           tr_wait( uint64_t delay_milliseconds );
 
+char*          tr_utf8clean( const char  * str,
+                             ssize_t       max_len,
+                             tr_bool     * err );
+
+
 /***
 ****
 ***/

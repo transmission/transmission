@@ -39,11 +39,12 @@
 
 ------------------------------------------------------------------------ */
 
-
-#include "ConvertUTF.h"
 #ifdef CVTUTF_DEBUG
-#include <stdio.h>
+ #include <stdio.h>
 #endif
+#include <string.h> /* strlen() */
+#include <unistd.h> /* ssize_t */
+#include "ConvertUTF.h"
 
 static const int halfShift  = 10; /* used for shifting by 10 bits */
 
@@ -344,6 +345,56 @@ Boolean isLegalUTF8Sequence(const UTF8 *source, const UTF8 *sourceEnd) {
         }
     }
 }
+
+/**
+ * This is a variation of isLegalUTF8Sequence() that behaves like g_utf8_validate().
+ * In addition to knowing if the sequence is legal, it also tells you the last good character.
+ */
+Boolean
+tr_utf8_validate( const char * str, ssize_t max_len, const char ** end )
+{
+    const UTF8* source = (const UTF8*) str;
+    const UTF8* sourceEnd = source;
+
+    if( max_len == 0 )
+        return true;
+
+    if( str == NULL )
+        return false;
+
+    sourceEnd = source + ((max_len < 0) ? strlen(str) : (size_t)max_len);
+
+    if( source == sourceEnd )
+    {
+        if( end != NULL )
+            *end = (const char*) source;
+        return true;
+    }
+
+    for( ;; )
+    {
+        const int length = trailingBytesForUTF8[*source] + 1;
+        if (source + length > sourceEnd) {
+            if( end != NULL )
+                *end = (const char*) source;
+            return false;
+        }
+        if (!isLegalUTF8(source, length)) {
+            if( end != NULL )
+                *end = (const char*) source;
+            return false;
+        }
+        source += length;
+        if (source >= sourceEnd) {
+            if( end != NULL )
+                *end = (const char*) source;
+            return true;
+        }
+    }
+
+    
+}
+
 
 /* --------------------------------------------------------------------- */
 
