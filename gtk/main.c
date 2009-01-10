@@ -1226,7 +1226,7 @@ about( GtkWindow * parent )
                            "website", website_url,
                            "website-label", website_url,
                            "copyright",
-                           _( "Copyright 2005-2008 The Transmission Project" ),
+                           _( "Copyright 2005-2009 The Transmission Project" ),
                            "logo-icon-name", MY_NAME,
 #ifdef SHOW_LICENSE
                            "license", LICENSE,
