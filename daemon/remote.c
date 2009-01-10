@@ -719,6 +719,18 @@ getStatusString( tr_benc * t, char * buf, size_t buflen )
     return buf;
 }
 
+static const char*
+getTrackerDateStr( const time_t t, tr_bool isStopped )
+{
+    const char * str;
+    switch( t ) {
+        case 0: str = isStopped ? "None (Stopped)\n" : "None\n"; break;
+        case 1: str = "In Progress\n"; break;
+        default: str = ctime( &t ); break;
+    }
+    return str;
+}
+
 static void
 printDetails( tr_benc * top )
 {
@@ -737,6 +749,9 @@ printDetails( tr_benc * top )
             char         buf[512];
             char         buf2[512];
             int64_t      i, j, k;
+            tr_bool      isStopped;
+
+            isStopped = tr_bencDictFindInt( t, "status", &i ) && (i==TR_STATUS_STOPPED);
 
             printf( "NAME\n" );
             if( tr_bencDictFindInt( t, "id", &i ) )
@@ -850,42 +865,24 @@ printDetails( tr_benc * top )
             printf( "\n" );
 
             printf( "TRACKER\n" );
-            if( tr_bencDictFindInt( t, "lastAnnounceTime", &i ) && i )
-            {
-                const time_t tt = i;
-                printf( "  Latest announce: %s", ctime( &tt ) );
-            }
+            if( tr_bencDictFindInt( t, "lastAnnounceTime", &i ) )
+                printf( "  Latest announce: %s", getTrackerDateStr( (time_t)i, isStopped ) );
             if( tr_bencDictFindStr( t, "announceURL", &str ) )
                 printf( "  Announce URL: %s\n", str );
-            if( tr_bencDictFindStr( t, "announceResponse",
-                                    &str ) && str && *str )
+            if( tr_bencDictFindStr( t, "announceResponse", &str ) && str && *str )
                 printf( "  Announce response: %s\n", str );
-            if( tr_bencDictFindInt( t, "nextAnnounceTime", &i ) && i )
-            {
-                const time_t tt = i;
-                printf( "  Next announce:   %s", ctime( &tt ) );
-            }
-            if( tr_bencDictFindInt( t, "lastScrapeTime", &i ) && i )
-            {
-                const time_t tt = i;
-                printf( "  Latest scrape:   %s", ctime( &tt ) );
-            }
+            if( tr_bencDictFindInt( t, "nextAnnounceTime", &i ) )
+                printf( "  Next announce:   %s", getTrackerDateStr( (time_t)i, isStopped ) );
+            if( tr_bencDictFindInt( t, "lastScrapeTime", &i ) )
+                printf( "  Latest scrape:   %s", getTrackerDateStr( (time_t)i, isStopped ) );
             if( tr_bencDictFindStr( t, "scrapeResponse", &str ) )
                 printf( "  Scrape response: %s\n", str );
-            if( tr_bencDictFindInt( t, "nextScrapeTime", &i ) && i )
-            {
-                const time_t tt = i;
-                printf( "  Next scrape:     %s", ctime( &tt ) );
-            }
-            if( tr_bencDictFindInt( t, "seeders", &i )
-              && tr_bencDictFindInt( t, "leechers", &j ) )
-                printf(
-                    "  Tracker knows of %" PRId64 " seeders and %" PRId64
-                    " leechers\n", i, j );
+            if( tr_bencDictFindInt( t, "nextScrapeTime", &i ) )
+                printf( "  Next scrape:     %s", getTrackerDateStr( (time_t)i, isStopped ) );
+            if( tr_bencDictFindInt( t, "seeders", &i ) && tr_bencDictFindInt( t, "leechers", &j ) )
+                printf( "  Tracker knows of %" PRId64 " seeders and %" PRId64 " leechers\n", i, j );
             if( tr_bencDictFindInt( t, "timesCompleted", &i ) )
-                printf(
-                    "  Tracker has seen %" PRId64
-                    " clients complete this torrent\n", i );
+                printf( "  Tracker has seen %" PRId64 " clients complete this torrent\n", i );
             printf( "\n" );
 
             printf( "ORIGINS\n" );
