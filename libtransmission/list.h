@@ -63,10 +63,13 @@ struct __tr_list
     struct __tr_list * next, * prev;
 };
 
-#define __tr_list_entry(ptr, type, member) ({            \
-    const struct __tr_list *__mptr = (ptr);              \
-    (void *)( (char *)__mptr - offsetof(type,member) );  \
-})
+/**
+ * Given a __tr_list node that's embedded in a struct, returns a pointer to the struct.
+ * @param ptr     pointer to the embedded __tr_list
+ * @param type    struct type that has contains the __tr_list
+ * @param field   the name of the struct's _tr_list field
+ */
+#define __tr_list_entry(ptr,type,field) ((type*) (((char*)ptr) - offsetof(type,field)))
 
 typedef int  ( *__tr_list_cmp_t ) ( const void * a, const void * b );
 typedef void ( *__tr_list_free_t )( void * );

@@ -50,6 +50,10 @@ extern "C" {
 #endif
 #include <time.h> /* time_t */
 
+#if defined(_MSC_VER) && !defined( __cplusplus )
+ #define inline __inline
+#endif
+
 #define SHA_DIGEST_LENGTH 20
 #define TR_INET6_ADDRSTRLEN 46
 

@@ -161,12 +161,12 @@ makeroom( tr_benc * val,
         const int len = val->val.l.alloc + count +
                         ( count % LIST_SIZE ? LIST_SIZE -
                           ( count % LIST_SIZE ) : 0 );
-        void *    new = realloc( val->val.l.vals, len * sizeof( tr_benc ) );
-        if( NULL == new )
+        void * tmp = realloc( val->val.l.vals, len * sizeof( tr_benc ) );
+        if( !tmp )
             return 1;
 
         val->val.l.alloc = len;
-        val->val.l.vals  = new;
+        val->val.l.vals  = tmp;
     }
 
     return 0;

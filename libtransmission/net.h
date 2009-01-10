@@ -32,6 +32,7 @@
 #ifdef WIN32
  #include <inttypes.h>
  #include <winsock2.h>
+ #include <WS2tcpip.h>
  typedef int socklen_t;
 #else
  #include <sys/types.h>

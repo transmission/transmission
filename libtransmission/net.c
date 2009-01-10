@@ -32,6 +32,7 @@
 
 #ifdef WIN32
  #include <winsock2.h> /* inet_addr */
+ #include <WS2tcpip.h>
 #else
  #include <arpa/inet.h> /* inet_addr */
  #include <netdb.h>

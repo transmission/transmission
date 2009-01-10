@@ -11,6 +11,7 @@
  */
 
 #include <assert.h>
+#include <errno.h>
 #include <limits.h> /* INT_MAX */
 #include <string.h>
 #include <stdio.h>
@@ -87,8 +88,7 @@ didWriteWrapper( tr_peerIo * io, size_t bytes_transferred )
 {
     while( bytes_transferred )
     {
-        struct tr_datatype * next = __tr_list_entry( io->outbuf_datatypes.next,
-                                                     struct tr_datatype, head );
+        struct tr_datatype * next = __tr_list_entry( io->outbuf_datatypes.next, struct tr_datatype, head );
         const size_t payload = MIN( next->length, bytes_transferred );
         const size_t overhead = getPacketOverhead( payload );
 
