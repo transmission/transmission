@@ -152,7 +152,7 @@ getfile( char        ** setme,
             }
         }
 
-        *setme = tr_strndup( EVBUFFER_DATA( buf ), EVBUFFER_LENGTH( buf ) );
+        *setme = tr_utf8clean( (char*)EVBUFFER_DATA( buf ), EVBUFFER_LENGTH( buf ), NULL );
         /* fprintf( stderr, "[%s]\n", *setme ); */
         tr_releaseBuffer( buf );
         err = 0;
@@ -422,11 +422,8 @@ tr_metainfoParseImpl( const tr_session * session,
                 SHA_DIGEST_LENGTH );
 
     /* files */
-    if( ( str =
-             parseFiles( inf,
-                        tr_bencDictFind( beInfo,
-                                         "files" ),
-                        tr_bencDictFind( beInfo, "length" ) ) ) )
+    if( ( str = parseFiles( inf, tr_bencDictFind( beInfo, "files" ),
+                                 tr_bencDictFind( beInfo, "length" ) ) ) )
         return str;
     if( !inf->fileCount || !inf->totalSize )
         return "files";
