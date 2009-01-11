@@ -1,7 +1,7 @@
 /******************************************************************************
  * $Id$
  *
- * Copyright (c) 2006-2008 Transmission authors and contributors
+ * Copyright (c) 2006-2009 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -60,7 +60,7 @@ typedef enum
     NSString * fNameString, * fHashString;
     
     tr_file_stat * fFileStat;
-    NSArray * fFileList;
+    NSArray * fFileList, * fFlatFileList;
     
     NSIndexSet * fPreviousFinishedIndexes;
     NSDate * fPreviousFinishedIndexesDate;
@@ -154,6 +154,7 @@ typedef enum
 - (NSString *) scrapeResponse;
 
 - (NSMutableArray *) allTrackers: (BOOL) separators;
+- (NSArray *) allTrackersFlat;
 - (BOOL) updateAllTrackersForAdd: (NSMutableArray *) trackers;
 - (void) updateAllTrackersForRemove: (NSMutableArray *) trackers;
 - (BOOL) hasAddedTrackers;
@@ -240,6 +241,7 @@ typedef enum
 - (NSArray *) fileList;
 - (NSInteger) fileCount;
 - (void) updateFileStat;
+- (NSArray *) flatFileList;
 
 //methods require fileStats to have been updated recently to be accurate
 - (CGFloat) fileProgress: (FileListNode *) node;

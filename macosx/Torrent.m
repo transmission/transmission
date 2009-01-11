@@ -1,7 +1,7 @@
 /******************************************************************************
  * $Id$
  *
- * Copyright (c) 2006-2008 Transmission authors and contributors
+ * Copyright (c) 2006-2009 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -27,7 +27,6 @@
 #import "FileListNode.h"
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
-#import "metainfo.h"
 #import "utils.h" //tr_httpIsValidURL
 
 @interface Torrent (Private)
@@ -44,7 +43,8 @@
 - (void) updateDownloadFolder;
 
 - (void) createFileList;
-- (void) insertPath: (NSMutableArray *) components forParent: (FileListNode *) parent fileSize: (uint64_t) size index: (NSInteger) index;
+- (void) insertPath: (NSMutableArray *) components forParent: (FileListNode *) parent fileSize: (uint64_t) size
+    index: (NSInteger) index flatList: (NSMutableArray *) flatFileList;
 
 - (void) completenessChange: (NSNumber *) status;
 
@@ -55,7 +55,7 @@
 
 - (void) updateAllTrackers: (NSMutableArray *) trackers;
 
-- (void) trashFile: (NSString *) path;
++ (void) trashFile: (NSString *) path;
 
 - (void) setTimeMachineExclude: (BOOL) exclude forPath: (NSString *) path;
 
@@ -65,6 +65,12 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
 {
     [(Torrent *)torrentData performSelectorOnMainThread: @selector(completenessChange:)
                 withObject: [[NSNumber alloc] initWithInt: status] waitUntilDone: NO];
+}
+
+int trashDataFile(const char * filename)
+{
+    [Torrent trashFile: [NSString stringWithUTF8String: filename]];
+    return 0;
 }
 
 @implementation Torrent
@@ -89,7 +95,7 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
             fPublicTorrentLocation = nil;
         }
         else if (!fPublicTorrent)
-            [self trashFile: path];
+            [Torrent trashFile: path];
         else;
     }
     return self;
@@ -189,6 +195,7 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
     [fIcon release];
     
     [fFileList release];
+    [fFlatFileList release];
     
     [fQuickPauseDict release];
     
@@ -220,6 +227,9 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
 
 - (void) changeDownloadFolder: (NSString *) folder
 {
+    if (fDownloadFolder && [folder isEqualToString: fDownloadFolder])
+        return;
+    
     [fDownloadFolder release];
     fDownloadFolder = [folder retain];
     
@@ -449,14 +459,14 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
 
 - (void) trashData
 {
-    [self trashFile: [self dataLocation]];
+    tr_torrentDeleteLocalData(fHandle, trashDataFile);
 }
 
 - (void) trashTorrent
 {
     if (fPublicTorrent)
     {
-        [self trashFile: fPublicTorrentLocation];
+        [Torrent trashFile: fPublicTorrentLocation];
         [fPublicTorrentLocation release];
         fPublicTorrentLocation = nil;
         
@@ -758,9 +768,8 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
 
 - (NSMutableArray *) allTrackers: (BOOL) separators
 {
-    NSInteger count = fInfo->trackerCount, capacity = count;
-    if (separators)
-        capacity += fInfo->trackers[count-1].tier + 1;
+    const NSInteger count = fInfo->trackerCount;
+    const NSInteger capacity = separators ? count + fInfo->trackers[count-1].tier + 1 : count;
     NSMutableArray * allTrackers = [NSMutableArray arrayWithCapacity: capacity];
     
     for (NSInteger i = 0, tier = -1; i < count; i++)
@@ -775,6 +784,11 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
     }
     
     return allTrackers;
+}
+
+- (NSArray *) allTrackersFlat
+{
+    return [self allTrackers: NO];
 }
 
 - (BOOL) updateAllTrackersForAdd: (NSMutableArray *) trackers
@@ -981,12 +995,13 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
     for (int i = 0; i < totalPeers; i++)
     {
         tr_peer_stat * peer = &peers[i];
-        NSMutableDictionary * dict = [NSMutableDictionary dictionaryWithCapacity: 9];
+        NSMutableDictionary * dict = [NSMutableDictionary dictionaryWithCapacity: 10];
         
         [dict setObject: [NSNumber numberWithInt: peer->from] forKey: @"From"];
         [dict setObject: [NSString stringWithUTF8String: peer->addr] forKey: @"IP"];
         [dict setObject: [NSNumber numberWithInt: peer->port] forKey: @"Port"];
         [dict setObject: [NSNumber numberWithFloat: peer->progress] forKey: @"Progress"];
+        [dict setObject: [NSNumber numberWithBool: peer->isSeed] forKey: @"Seed"];
         [dict setObject: [NSNumber numberWithBool: peer->isEncrypted] forKey: @"Encryption"];
         [dict setObject: [NSString stringWithUTF8String: peer->client] forKey: @"Client"];
         [dict setObject: [NSString stringWithUTF8String: peer->flagStr] forKey: @"Flags"];
@@ -1425,8 +1440,13 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
     for (NSInteger index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
         have += fFileStat[index].bytesCompleted;
     
-    NSAssert([node size], @"director in torrent file has size 0");
+    NSAssert([node size], @"directory in torrent file has size 0");
     return (CGFloat)have / [node size];
+}
+
+- (NSArray *) flatFileList
+{
+    return fFlatFileList;
 }
 
 - (BOOL) canChangeDownloadCheckForFile: (NSInteger) index
@@ -1717,7 +1737,8 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
     if ([self isFolder])
     {
         NSInteger count = [self fileCount];
-        NSMutableArray * fileList = [[NSMutableArray alloc] initWithCapacity: count];
+        NSMutableArray * fileList = [[NSMutableArray alloc] initWithCapacity: count],
+                    * flatFileList = [[NSMutableArray alloc] initWithCapacity: count];
         
         for (NSInteger i = 0; i < count; i++)
         {
@@ -1745,12 +1766,13 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
                 }
                 
                 [node insertIndex: i withSize: file->length];
-                [self insertPath: pathComponents forParent: node fileSize: file->length index: i];
+                [self insertPath: pathComponents forParent: node fileSize: file->length index: i flatList: flatFileList];
             }
             else
             {
                 FileListNode * node = [[FileListNode alloc] initWithFileName: name path: path size: file->length index: i];
                 [fileList addObject: node];
+                [flatFileList addObject: node];
                 [node release];
             }
             
@@ -1759,16 +1781,21 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
         
         fFileList = [[NSArray alloc] initWithArray: fileList];
         [fileList release];
+        
+        fFlatFileList = [[NSArray alloc] initWithArray: flatFileList];
+        [flatFileList release];
     }
     else
     {
         FileListNode * node = [[FileListNode alloc] initWithFileName: [self name] path: @"" size: [self size] index: 0];
         fFileList = [[NSArray arrayWithObject: node] retain];
+        fFlatFileList = [fFileList copy];
         [node release];
     }
 }
 
-- (void) insertPath: (NSMutableArray *) components forParent: (FileListNode *) parent fileSize: (uint64_t) size index: (NSInteger) index
+- (void) insertPath: (NSMutableArray *) components forParent: (FileListNode *) parent fileSize: (uint64_t) size
+    index: (NSInteger) index flatList: (NSMutableArray *) flatFileList
 {
     NSString * name = [components objectAtIndex: 0];
     BOOL isFolder = [components count] > 1;
@@ -1788,7 +1815,10 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
         if (isFolder)
             node = [[FileListNode alloc] initWithFolderName: name path: [parent fullPath]];
         else
+        {
             node = [[FileListNode alloc] initWithFileName: name path: [parent fullPath] size: size index: index];
+            [flatFileList addObject: node];
+        }
         
         [parent insertChild: node];
         [node release];
@@ -1799,7 +1829,7 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
         [node insertIndex: index withSize: size];
         
         [components removeObjectAtIndex: 0];
-        [self insertPath: components forParent: node fileSize: size index: index];
+        [self insertPath: components forParent: node fileSize: size index: index flatList: flatFileList];
     }
 }
 
@@ -1828,8 +1858,8 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
     BOOL canMove;
     switch ([status intValue])
     {
-        case TR_CP_DONE:
-        case TR_CP_COMPLETE:
+        case TR_SEED:
+        case TR_PARTIAL_SEED:
             canMove = YES;
             
             //move file from incomplete folder to download folder
@@ -1862,7 +1892,7 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
             [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFinishedDownloading" object: self];
             break;
         
-        case TR_CP_INCOMPLETE:
+        case TR_LEECH:
             //do not allow to be backed up by Time Machine
             [self setTimeMachineExclude: YES forPath: [[self downloadFolder] stringByAppendingPathComponent: [self name]]];
             
@@ -1948,7 +1978,7 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
     tr_free(trackerStructs);
 }
 
-- (void) trashFile: (NSString *) path
++ (void) trashFile: (NSString *) path
 {
     //attempt to move to trash
     if (![[NSWorkspace sharedWorkspace] performFileOperation: NSWorkspaceRecycleOperation
