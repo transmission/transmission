@@ -10,6 +10,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Groups can have a default location when adding transfers
    + Bonjour support for the web interface
    + File filter field in the inspector
+   + Option to include beta releases when auto-updating
 
 1.50 (2009/01/dd)
 <http://trac.transmissionbt.com/query?milestone=1.50&group=component&groupdesc=1&order=severity>
