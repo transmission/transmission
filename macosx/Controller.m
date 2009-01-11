@@ -908,7 +908,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [panel setCanChooseFiles: YES];
     [panel setCanChooseDirectories: NO];
 
-    [panel beginSheetForDirectory: nil file: nil types: [NSArray arrayWithObject: @"torrent"]
+    [panel beginSheetForDirectory: nil file: nil types: [NSArray arrayWithObject: @"org.bittorrent.torrent"]
         modalForWindow: fWindow modalDelegate: self didEndSelector: @selector(openSheetClosed:returnCode:contextInfo:)
         contextInfo: [NSNumber numberWithBool: sender == fOpenIgnoreDownloadFolder]];
 }
@@ -1340,7 +1340,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     else
     {
         NSSavePanel * panel = [NSSavePanel savePanel];
-        [panel setRequiredFileType: @"torrent"];
+        [panel setRequiredFileType: @"org.bittorrent.torrent"];
         [panel setCanSelectHiddenExtension: YES];
         
         [panel beginSheetForDirectory: nil file: [torrent name] modalForWindow: fWindow modalDelegate: self
