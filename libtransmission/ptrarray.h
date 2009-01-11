@@ -66,13 +66,13 @@ void*         tr_ptrArrayBack( tr_ptrArray  * array );
 void**        tr_ptrArrayPeek( tr_ptrArray  * array,
                                int          * size );
 
-static inline void  tr_ptrArrayClear( tr_ptrArray * a ) { a->n_items = 0; }
+static TR_INLINE void  tr_ptrArrayClear( tr_ptrArray * a ) { a->n_items = 0; }
 
 int           tr_ptrArrayInsert( tr_ptrArray * array,
                                  void        * insertMe,
                                  int           pos );
 
-static inline int tr_ptrArrayAppend( tr_ptrArray * array, void * appendMe )
+static TR_INLINE int tr_ptrArrayAppend( tr_ptrArray * array, void * appendMe )
 {
     return tr_ptrArrayInsert( array, appendMe, -1 );
 }
@@ -83,17 +83,17 @@ void          tr_ptrArrayErase( tr_ptrArray  * array,
                                 int            begin,
                                 int            end );
 
-static inline void** tr_ptrArrayBase( const tr_ptrArray * a )
+static TR_INLINE void** tr_ptrArrayBase( const tr_ptrArray * a )
 {
     return a->items;
 }
 
-static inline int tr_ptrArraySize( const tr_ptrArray *  a )
+static TR_INLINE int tr_ptrArraySize( const tr_ptrArray *  a )
 {
     return a->n_items;
 }
 
-static inline tr_bool tr_ptrArrayEmpty( const tr_ptrArray * a )
+static TR_INLINE tr_bool tr_ptrArrayEmpty( const tr_ptrArray * a )
 {
     return tr_ptrArraySize(a) == 0;
 }

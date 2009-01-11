@@ -63,9 +63,9 @@ tr_ratecontrol;
 ****
 ***/
 
-static inline void tr_rcConstruct ( tr_ratecontrol * rc ) { memset( rc, 0, sizeof( tr_ratecontrol ) ); }
+static TR_INLINE void tr_rcConstruct ( tr_ratecontrol * rc ) { memset( rc, 0, sizeof( tr_ratecontrol ) ); }
 
-static inline void tr_rcDestruct  ( tr_ratecontrol * rc ) { memset( rc, 0xDEAD, sizeof( tr_ratecontrol ) ); }
+static TR_INLINE void tr_rcDestruct  ( tr_ratecontrol * rc ) { memset( rc, 0xDEAD, sizeof( tr_ratecontrol ) ); }
 
 void             tr_rcTransferred ( tr_ratecontrol         * ratecontrol,
                                     size_t                   byteCount );

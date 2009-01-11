@@ -274,20 +274,20 @@ void tr_releaseBuffer( struct evbuffer * buf );
 ****
 ***/
 
-static inline void* tr_malloc( size_t size )
+static TR_INLINE void* tr_malloc( size_t size )
 {
     return size ? malloc( size ) : NULL;
 }
-static inline void* tr_malloc0( size_t size )
+static TR_INLINE void* tr_malloc0( size_t size )
 {
     return size ? calloc( 1, size ) : NULL;
 }
-static inline void tr_free( void * p )
+static TR_INLINE void tr_free( void * p )
 {
     if( p != NULL )
         free( p );
 }
-static inline void* tr_memdup( const void * src, int byteCount )
+static TR_INLINE void* tr_memdup( const void * src, int byteCount )
 {
     return memcpy( tr_malloc( byteCount ), src, byteCount );
 }
@@ -301,11 +301,13 @@ static inline void* tr_memdup( const void * src, int byteCount )
 #define tr_renew( struct_type, mem, n_structs )    \
     ( (struct_type *) realloc ( ( mem ), ( (size_t) sizeof ( struct_type ) ) * ( ( size_t) ( n_structs ) ) ) )
 
-char*       tr_strndup( const void * str, int len ) TR_GNUC_MALLOC;
+/** @param in is a void* so that callers can pass in both signed & unsigned without a cast */
+char* tr_strndup( const void * in, int len ) TR_GNUC_MALLOC;
 
-static inline char* tr_strdup( const void * in )
+/** @param in is a void* so that callers can pass in both signed & unsigned without a cast */
+static TR_INLINE char* tr_strdup( const void * in )
 {
-    return tr_strndup( in, in ? strlen( in ) : 0 );
+    return tr_strndup( in, in ? strlen( (const char *) in ) : 0 );
 }
 
 /* @brief same argument list as bsearch() */
@@ -387,12 +389,12 @@ tr_bitfield* tr_bitfieldConstruct( tr_bitfield*, size_t bitcount );
 
 tr_bitfield* tr_bitfieldDestruct( tr_bitfield* );
 
-static inline tr_bitfield* tr_bitfieldNew( size_t bitcount )
+static TR_INLINE tr_bitfield* tr_bitfieldNew( size_t bitcount )
 {
     return tr_bitfieldConstruct( tr_new0( tr_bitfield, 1 ), bitcount );
 }
 
-static inline void tr_bitfieldFree( tr_bitfield * b )
+static TR_INLINE void tr_bitfieldFree( tr_bitfield * b )
 {
     tr_free( tr_bitfieldDestruct( b ) );
 }
@@ -422,20 +424,20 @@ tr_bitfield* tr_bitfieldOr( tr_bitfield*, const tr_bitfield* );
     has none of tr_bitfieldHas()'s safety checks, so you
     need to call tr_bitfieldTestFast() first before you
     start looping. */
-static inline tr_bool tr_bitfieldHasFast( const tr_bitfield * b, const size_t nth )
+static TR_INLINE tr_bool tr_bitfieldHasFast( const tr_bitfield * b, const size_t nth )
 {
     return ( b->bits[nth>>3u] << ( nth & 7u ) & 0x80 ) != 0;
 }
 
 /** @param high the highest nth bit you're going to access */
-static inline tr_bool tr_bitfieldTestFast( const tr_bitfield * b, const size_t high )
+static TR_INLINE tr_bool tr_bitfieldTestFast( const tr_bitfield * b, const size_t high )
 {
     return ( b != NULL )
         && ( b->bits != NULL )
         && ( high < b->bitCount );
 }
 
-static inline tr_bool tr_bitfieldHas( const tr_bitfield * b, size_t nth )
+static TR_INLINE tr_bool tr_bitfieldHas( const tr_bitfield * b, size_t nth )
 {
     return tr_bitfieldTestFast( b, nth ) && tr_bitfieldHasFast( b, nth );
 }

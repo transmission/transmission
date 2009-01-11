@@ -377,7 +377,7 @@ struct RandomTracker
 
 /* the tiers will be sorted from lowest to highest,
  * and trackers are randomized within the tiers */
-static inline int
+static TR_INLINE int
 compareRandomTracker( const void * va,
                       const void * vb )
 {
@@ -653,7 +653,7 @@ tr_torrentChangeMyPort( tr_torrent * tor )
         tr_trackerChangeMyPort( tor->tracker );
 }
 
-static inline void
+static TR_INLINE void
 tr_torrentManualUpdateImpl( void * vtor )
 {
     tr_torrent * tor = vtor;

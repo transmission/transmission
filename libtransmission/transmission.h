@@ -50,8 +50,10 @@ extern "C" {
 #endif
 #include <time.h> /* time_t */
 
-#if defined(_MSC_VER) && !defined( __cplusplus )
- #define inline __inline
+#if defined( WIN32 ) && defined(_MSC_VER)
+ #define TR_INLINE __inline
+#else
+ #define TR_INLINE inline
 #endif
 
 #define SHA_DIGEST_LENGTH 20
@@ -1422,10 +1424,10 @@ void tr_torrentSetDoneDate( tr_torrent  * torrent,
                             time_t        doneDate );
 
 /** @brief Sanity checker to test that the direction is TR_UP or TR_DOWN */
-static inline tr_bool tr_isDirection( tr_direction d ) { return d==TR_UP || d==TR_DOWN; }
+static TR_INLINE tr_bool tr_isDirection( tr_direction d ) { return d==TR_UP || d==TR_DOWN; }
 
 /** @brief Sanity checker to test that a bool is TRUE or FALSE */
-static inline tr_bool tr_isBool( tr_bool b ) { return b==1 || b==0; }
+static TR_INLINE tr_bool tr_isBool( tr_bool b ) { return b==1 || b==0; }
 
 /** @} */
 

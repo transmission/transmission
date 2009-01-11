@@ -71,7 +71,7 @@ bytesUsed( const uint64_t now, struct bratecontrol * r, size_t size )
 *******
 ******/
 
-static inline int
+static TR_INLINE int
 comparePointers( const void * a, const void * b )
 {
     if( a != b )

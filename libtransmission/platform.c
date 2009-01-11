@@ -239,7 +239,7 @@ getHomeDir( void )
 #ifdef WIN32
             char appdata[MAX_PATH]; /* SHGetFolderPath() requires MAX_PATH */
             *appdata = '\0';
-            SHGetFolderPath( NULL, CSIDL_MYDOCUMENTS, NULL, 0, appdata );
+            SHGetFolderPath( NULL, CSIDL_PERSONAL, NULL, 0, appdata );
             home = tr_strdup( appdata );
 #else
             struct passwd * pw = getpwuid( getuid( ) );

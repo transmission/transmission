@@ -42,13 +42,15 @@
 #endif
 
 #ifdef WIN32
- #define ECONNREFUSED WSAECONNREFUSED
- #define ECONNRESET   WSAECONNRESET
- #define EHOSTUNREACH WSAEHOSTUNREACH
- #define EINPROGRESS  WSAEINPROGRESS
- #define ENOTCONN     WSAENOTCONN
- #define EWOULDBLOCK  WSAEWOULDBLOCK
- #define sockerrno WSAGetLastError( )
+ #define ECONNREFUSED            WSAECONNREFUSED
+ #define ECONNRESET              WSAECONNRESET
+ #define EHOSTUNREACH            WSAEHOSTUNREACH
+ #define EINPROGRESS             WSAEINPROGRESS
+ #define ENOTCONN                WSAENOTCONN
+ #define EWOULDBLOCK             WSAEWOULDBLOCK
+ #define EAFNOSUPPORT            WSAEAFNOSUPPORT
+ #define ENETUNREACH             WSAENETUNREACH
+ #define sockerrno               WSAGetLastError( )
 #else
  #include <errno.h>
  #define sockerrno errno
@@ -88,7 +90,7 @@ void tr_normalizeV4Mapped( tr_address * const addr );
 
 void tr_suspectAddress( const tr_address * a, const char * source );
 
-static inline tr_bool tr_isAddress( const tr_address * a ) { return ( a != NULL ) && ( a->type==TR_AF_INET || a->type==TR_AF_INET6 ); }
+static TR_INLINE tr_bool tr_isAddress( const tr_address * a ) { return ( a != NULL ) && ( a->type==TR_AF_INET || a->type==TR_AF_INET6 ); }
 
 typedef struct tr_net_af_support
 {

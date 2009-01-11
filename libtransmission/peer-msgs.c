@@ -246,7 +246,7 @@ pokeBatchPeriod( tr_peermsgs * msgs,
     }
 }
 
-static inline void
+static TR_INLINE void
 dbgOutMessageLen( tr_peermsgs * msgs )
 {
     dbgmsg( msgs, "outMessage size is now %zu", EVBUFFER_LENGTH( msgs->outMessages ) );
@@ -819,7 +819,7 @@ pumpRequestQueue( tr_peermsgs * msgs, const time_t now )
         fireNeedReq( msgs );
 }
 
-static inline int
+static TR_INLINE int
 requestQueueIsFull( const tr_peermsgs * msgs )
 {
     const int req_max = msgs->maxActiveRequests;
@@ -1506,7 +1506,7 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
     return READ_NOW;
 }
 
-static inline void
+static TR_INLINE void
 decrementDownloadedCount( tr_peermsgs * msgs, uint32_t byteCount )
 {
     tr_torrent * tor = msgs->torrent;
@@ -1514,7 +1514,7 @@ decrementDownloadedCount( tr_peermsgs * msgs, uint32_t byteCount )
     tor->downloadedCur -= MIN( tor->downloadedCur, byteCount );
 }
 
-static inline void
+static TR_INLINE void
 clientGotUnwantedBlock( tr_peermsgs * msgs, const struct peer_request * req )
 {
     decrementDownloadedCount( msgs, req->length );
@@ -1882,7 +1882,7 @@ pexAddedCb( void * vpex,
     }
 }
 
-static inline void
+static TR_INLINE void
 pexDroppedCb( void * vpex,
               void * userData )
 {
@@ -1895,7 +1895,7 @@ pexDroppedCb( void * vpex,
     }
 }
 
-static inline void
+static TR_INLINE void
 pexElementCb( void * vpex,
               void * userData )
 {
@@ -2067,7 +2067,7 @@ sendPex( tr_peermsgs * msgs )
     }
 }
 
-static inline int
+static TR_INLINE int
 pexPulse( void * vpeer )
 {
     sendPex( vpeer );
