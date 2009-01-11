@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2007-2008 Charles Kerr <charles@rebelbase.com>
+ * This file Copyright (C) 2007-2009 Charles Kerr <charles@transmissionbt.com>
  *
  * This file is licensed by the GPL version 2.  Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
@@ -113,7 +113,7 @@ getShortTransferString( const tr_stat * torStat,
         tr_strlspeed( upStr, torStat->pieceUploadSpeed, sizeof( upStr ) );
 
     if( haveDown && haveUp )
-        /* Translators: do not translate the "speed|" disambiguation prefix.
+        /* Translators: "speed|" is here for disambiguation.  Please remove it from your translation.
            %1$s is the download speed
            %2$s is the upload speed */
         g_snprintf( buf, buflen, Q_(
@@ -467,7 +467,7 @@ torrent_cell_renderer_render(
 
             my_bg.y = tmp_bg.y + tmp_bg.height;
             my_cell.y = tmp_cell.y + tmp_cell.height;
-            my_expose.y += tmp_expose.y + tmp_cell.height;
+            my_expose.y = tmp_expose.y + tmp_cell.height;
 
             g_free( str );
             g_free( statusStr );

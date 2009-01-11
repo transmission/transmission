@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2007-2008 Charles Kerr <charles@rebelbase.com>
+ * This file Copyright (C) 2007-2009 Charles Kerr <charles@transmissionbt.com>
  *
  * This file is licensed by the GPL version 2.  Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
@@ -45,9 +45,9 @@ tr_natpmp_state;
 
 struct tr_natpmp
 {
+    tr_bool            isMapped;
+    tr_bool            hasDiscovered;
     int                port;
-    unsigned int       isMapped      : 1;
-    unsigned int       hasDiscovered : 1;
     time_t             renewTime;
     time_t             commandTime;
     tr_natpmp_state    state;
@@ -167,9 +167,9 @@ tr_natpmpPulse( struct tr_natpmp * nat,
         logVal( "readnatpmpresponseorretry", val );
         if( val >= 0 )
         {
-            const int port = resp.pnu.newportmapping.privateport;
-            tr_ninf( getKey( ), _( "no longer forwarding port %d" ), port );
-            if( nat->port == port )
+            const int p = resp.pnu.newportmapping.privateport;
+            tr_ninf( getKey( ), _( "no longer forwarding port %d" ), p );
+            if( nat->port == p )
             {
                 nat->port = -1;
                 nat->state = TR_NATPMP_IDLE;

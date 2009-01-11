@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2007-2008 Charles Kerr <charles@rebelbase.com>
+ * This file Copyright (C) 2007-2009 Charles Kerr <charles@transmissionbt.com>
  *
  * This file is licensed by the GPL version 2.  Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
@@ -14,16 +14,39 @@
 #include "list.h"
 #include "utils.h"
 
+/***
+****
+***/
+
+static tr_list * _unusedNodes = NULL;
+
+static const tr_list TR_LIST_INIT = { NULL, NULL, NULL };
+
 static tr_list*
 node_alloc( void )
 {
-    return tr_new0( tr_list, 1 );
+    tr_list * node;
+
+    if( _unusedNodes == NULL )
+        node = tr_new( tr_list, 1 );
+    else {
+        node = _unusedNodes;
+        _unusedNodes = node->next;
+    }
+
+    *node = TR_LIST_INIT;
+    return node;
 }
 
 static void
 node_free( tr_list* node )
 {
-    tr_free( node );
+    if( node )
+    {
+        *node = TR_LIST_INIT;
+        node->next = _unusedNodes;
+        _unusedNodes = node;
+    }
 }
 
 /***
@@ -158,3 +181,63 @@ tr_list_size( const tr_list * list )
     return size;
 }
 
+
+
+/*
+ * Double-linked list with easy memory management and fast
+ * insert/remove operations
+ */
+
+void
+__tr_list_init( struct __tr_list * head )
+{
+    head->next = head;
+    head->prev = head;
+}
+
+void
+__tr_list_insert( struct __tr_list * list,
+		  struct __tr_list * prev,
+		  struct __tr_list * next)
+{
+    next->prev = list;
+    list->next = next;
+    list->prev = prev;
+    prev->next = list;
+}
+
+void
+__tr_list_splice( struct __tr_list * prev,
+		  struct __tr_list * next)
+{
+    next->prev = prev;
+    prev->next = next;
+}
+
+ 
+void
+__tr_list_append( struct __tr_list * head,
+		  struct __tr_list * list)
+{
+    __tr_list_insert( list, head->prev, head );
+}
+
+void
+__tr_list_remove( struct __tr_list * head )
+{
+    __tr_list_splice( head->prev, head->next );
+    head->next = head->prev = NULL;
+}
+
+void
+__tr_list_destroy( struct __tr_list * head,
+                   __tr_list_free_t   func)
+{
+    while ( head->next != head )
+    {
+        struct __tr_list * list = head->next;
+        __tr_list_splice( list->prev, list->next );
+
+        func( list );
+    }
+}

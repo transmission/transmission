@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2008 Charles Kerr <charles@rebelbase.com>
+ * This file Copyright (C) 2008-2009 Charles Kerr <charles@transmissionbt.com>
  *
  * This file is licensed by the GPL version 2.  Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
@@ -10,13 +10,7 @@
  * $Id$
  */
 
-#ifdef __BEOS__
- #include <signal.h>
- #include <fs_info.h>
- #include <FindDirectory.h>
- #include <kernel/OS.h>
- #define BEOS_MAX_THREADS 256
-#elif defined( WIN32 )
+#ifdef WIN32
  #include <windows.h>
  #include <shlobj.h> /* for CSIDL_APPDATA, CSIDL_MYDOCUMENTS */
 #else
@@ -46,6 +40,7 @@
 #include <unistd.h> /* getuid getpid close */
 
 #include "transmission.h"
+#include "session.h"
 #include "list.h"
 #include "platform.h"
 #include "utils.h"
@@ -54,9 +49,7 @@
 ****  THREADS
 ***/
 
-#ifdef __BEOS__
-typedef thread_id tr_thread_id;
-#elif defined( WIN32 )
+#ifdef WIN32
 typedef DWORD tr_thread_id;
 #else
 typedef pthread_t tr_thread_id;
@@ -65,9 +58,7 @@ typedef pthread_t tr_thread_id;
 static tr_thread_id
 tr_getCurrentThread( void )
 {
-#ifdef __BEOS__
-    return find_thread( NULL );
-#elif defined( WIN32 )
+#ifdef WIN32
     return GetCurrentThreadId( );
 #else
     return pthread_self( );
@@ -78,9 +69,7 @@ static int
 tr_areThreadsEqual( tr_thread_id a,
                     tr_thread_id b )
 {
-#ifdef __BEOS__
-    return a == b;
-#elif defined( WIN32 )
+#ifdef WIN32
     return a == b;
 #else
     return pthread_equal( a, b );
@@ -114,12 +103,6 @@ ThreadFunc( void * _t )
 {
     tr_thread * t = _t;
 
-#ifdef __BEOS__
-    /* This is required because on BeOS, SIGINT is sent to each thread,
-       which kills them not nicely */
-    signal( SIGINT, SIG_IGN );
-#endif
-
     t->func( t->arg );
 
 #ifdef WIN32
@@ -137,12 +120,7 @@ tr_threadNew( void   ( *func )(void *),
     t->func = func;
     t->arg  = arg;
 
-#ifdef __BEOS__
-    t->thread =
-        spawn_thread( (void*)ThreadFunc, "beos thread", B_NORMAL_PRIORITY,
-                     t );
-    resume_thread( t->thread );
-#elif defined( WIN32 )
+#ifdef WIN32
     {
         unsigned int id;
         t->thread_handle =
@@ -165,10 +143,7 @@ tr_threadNew( void   ( *func )(void *),
 struct tr_lock
 {
     int                 depth;
-#ifdef __BEOS__
-    sem_id              lock;
-    thread_id           lockThread;
-#elif defined( WIN32 )
+#ifdef WIN32
     CRITICAL_SECTION    lock;
     DWORD               lockThread;
 #else
@@ -182,9 +157,7 @@ tr_lockNew( void )
 {
     tr_lock *           l = tr_new0( tr_lock, 1 );
 
-#ifdef __BEOS__
-    l->lock = create_sem( 1, "" );
-#elif defined( WIN32 )
+#ifdef WIN32
     InitializeCriticalSection( &l->lock ); /* supports recursion */
 #else
     pthread_mutexattr_t attr;
@@ -199,9 +172,7 @@ tr_lockNew( void )
 void
 tr_lockFree( tr_lock * l )
 {
-#ifdef __BEOS__
-    delete_sem( l->lock );
-#elif defined( WIN32 )
+#ifdef WIN32
     DeleteCriticalSection( &l->lock );
 #else
     pthread_mutex_destroy( &l->lock );
@@ -212,9 +183,7 @@ tr_lockFree( tr_lock * l )
 void
 tr_lockLock( tr_lock * l )
 {
-#ifdef __BEOS__
-    acquire_sem( l->lock );
-#elif defined( WIN32 )
+#ifdef WIN32
     EnterCriticalSection( &l->lock );
 #else
     pthread_mutex_lock( &l->lock );
@@ -241,9 +210,7 @@ tr_lockUnlock( tr_lock * l )
 
     --l->depth;
     assert( l->depth >= 0 );
-#ifdef __BEOS__
-    release_sem( l->lock );
-#elif defined( WIN32 )
+#ifdef WIN32
     LeaveCriticalSection( &l->lock );
 #else
     pthread_mutex_unlock( &l->lock );
@@ -254,7 +221,7 @@ tr_lockUnlock( tr_lock * l )
 ****  PATHS
 ***/
 
-#if !defined( WIN32 ) && !defined( __BEOS__ ) && !defined( __AMIGAOS4__ )
+#ifndef WIN32
  #include <pwd.h>
 #endif
 
@@ -272,10 +239,8 @@ getHomeDir( void )
 #ifdef WIN32
             char appdata[MAX_PATH]; /* SHGetFolderPath() requires MAX_PATH */
             *appdata = '\0';
-            SHGetFolderPath( NULL, CSIDL_MYDOCUMENTS, NULL, 0, appdata );
+            SHGetFolderPath( NULL, CSIDL_PERSONAL, NULL, 0, appdata );
             home = tr_strdup( appdata );
-#elif defined( __BEOS__ ) || defined( __AMIGAOS4__ )
-            home = tr_strdup( "" );
 #else
             struct passwd * pw = getpwuid( getuid( ) );
             if( pw )
@@ -298,18 +263,10 @@ getOldConfigDir( void )
 
     if( !path )
     {
-#ifdef __BEOS__
-        char buf[MAX_PATH_LENGTH];
-        find_directory( B_USER_SETTINGS_DIRECTORY,
-                       dev_for_path( "/boot" ), true,
-                       buf, sizeof( buf ) );
-        path = tr_buildPath( buf, "Transmission", NULL );
-#elif defined( SYS_DARWIN )
+#ifdef SYS_DARWIN
         path = tr_buildPath( getHomeDir( ), "Library",
                               "Application Support",
                               "Transmission", NULL );
-#elif defined( __AMIGAOS4__ )
-        path = tr_strdup( "PROGDIR:.transmission" );
 #elif defined( WIN32 )
         char appdata[MAX_PATH]; /* SHGetFolderPath() requires MAX_PATH */
         SHGetFolderPath( NULL, CSIDL_APPDATA, NULL, 0, appdata );
@@ -348,7 +305,7 @@ getOldCacheDir( void )
 
     if( !path )
     {
-#if defined( __BEOS__ ) || defined( WIN32 )
+#if defined( WIN32 )
         path = tr_buildPath( getOldConfigDir( ), "Cache", NULL );
 #elif defined( SYS_DARWIN )
         path = tr_buildPath( getHomeDir( ), "Library", "Caches", "Transmission", NULL );
@@ -394,7 +351,7 @@ moveFiles( const char * oldDir,
 }
 
 static void
-migrateFiles( const tr_handle * handle )
+migrateFiles( const tr_session * session )
 {
     static int migrated = FALSE;
 
@@ -405,56 +362,59 @@ migrateFiles( const tr_handle * handle )
         migrated = TRUE;
 
         oldDir = getOldTorrentsDir( );
-        newDir = tr_getTorrentDir( handle );
+        newDir = tr_getTorrentDir( session );
         moveFiles( oldDir, newDir );
 
         oldDir = getOldCacheDir( );
-        newDir = tr_getResumeDir( handle );
+        newDir = tr_getResumeDir( session );
         moveFiles( oldDir, newDir );
     }
 }
 
 void
-tr_setConfigDir( tr_handle *  handle,
+tr_setConfigDir( tr_session * session,
                  const char * configDir )
 {
     char * path;
 
-    handle->configDir = tr_strdup( configDir );
+    session->configDir = tr_strdup( configDir );
 
     path = tr_buildPath( configDir, RESUME_SUBDIR, NULL );
     tr_mkdirp( path, 0777 );
-    handle->resumeDir = path;
+    session->resumeDir = path;
 
     path = tr_buildPath( configDir, TORRENT_SUBDIR, NULL );
     tr_mkdirp( path, 0777 );
-    handle->torrentDir = path;
+    session->torrentDir = path;
 
-    migrateFiles( handle );
+    migrateFiles( session );
 }
 
 const char *
-tr_sessionGetConfigDir( const tr_handle * handle )
+tr_sessionGetConfigDir( const tr_session * session )
 {
-    return handle->configDir;
+    return session->configDir;
 }
 
 const char *
-tr_getTorrentDir( const tr_handle * handle )
+tr_getTorrentDir( const tr_session * session )
 {
-    return handle->torrentDir;
+    return session->torrentDir;
 }
 
 const char *
-tr_getResumeDir( const tr_handle * handle )
+tr_getResumeDir( const tr_session * session )
 {
-    return handle->resumeDir;
+    return session->resumeDir;
 }
 
 const char*
-tr_getDefaultConfigDir( void )
+tr_getDefaultConfigDir( const char * appname )
 {
     static char * s = NULL;
+
+    if( !appname || !*appname )
+        appname = "Transmission";
 
     if( !s )
     {
@@ -465,20 +425,31 @@ tr_getDefaultConfigDir( void )
         else
         {
 #ifdef SYS_DARWIN
-            s = tr_buildPath( getHomeDir( ), "Library",
-                              "Application Support", "Transmission", NULL );
+            s = tr_buildPath( getHomeDir( ), "Library", "Application Support",
+                              appname, NULL );
 #elif defined( WIN32 )
             char appdata[MAX_PATH]; /* SHGetFolderPath() requires MAX_PATH */
             SHGetFolderPath( NULL, CSIDL_APPDATA, NULL, 0, appdata );
-            s = tr_buildPath( appdata, "Transmission", NULL );
+            s = tr_buildPath( appdata, appname, NULL );
 #else
             if( ( s = getenv( "XDG_CONFIG_HOME" ) ) )
-                s = tr_buildPath( s, "transmission", NULL );
+                s = tr_buildPath( s, appname, NULL );
             else
-                s = tr_buildPath( getHomeDir( ), ".config", "transmission", NULL );
+                s = tr_buildPath( getHomeDir( ), ".config", appname, NULL );
 #endif
         }
     }
+
+    return s;
+}
+
+const char*
+tr_getDefaultDownloadDir( void )
+{
+    static char * s = NULL;
+
+    if( s == NULL )
+        s = tr_buildPath( getHomeDir( ), "Downloads", NULL );
 
     return s;
 }

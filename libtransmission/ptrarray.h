@@ -1,7 +1,7 @@
 /******************************************************************************
  * $Id$
  *
- * This file Copyright (C) 2007-2008 Charles Kerr <charles@rebelbase.com>
+ * This file Copyright (C) 2007-2009 Charles Kerr <charles@transmissionbt.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -29,12 +29,24 @@
 #ifndef _TR_PTR_ARRAY_H_
 #define _TR_PTR_ARRAY_H_
 
+#include "transmission.h"
+
 /**
  * A simple pointer array that resizes itself dynamically.
  */
-typedef struct tr_ptrArray tr_ptrArray;
+typedef struct tr_ptrArray
+{
+    void ** items;
+    int     n_items;
+    int     n_alloc;
+}
+tr_ptrArray;
 
 typedef void ( *PtrArrayForeachFunc )( void * );
+
+extern const tr_ptrArray TR_PTR_ARRAY_INIT;
+
+void          tr_ptrArrayDestruct( tr_ptrArray*, PtrArrayForeachFunc func );
 
 tr_ptrArray * tr_ptrArrayNew( void );
 
@@ -54,16 +66,16 @@ void*         tr_ptrArrayBack( tr_ptrArray  * array );
 void**        tr_ptrArrayPeek( tr_ptrArray  * array,
                                int          * size );
 
-void**        tr_ptrArrayBase( tr_ptrArray  * array );
-
-void          tr_ptrArrayClear( tr_ptrArray * array );
+static TR_INLINE void  tr_ptrArrayClear( tr_ptrArray * a ) { a->n_items = 0; }
 
 int           tr_ptrArrayInsert( tr_ptrArray * array,
                                  void        * insertMe,
                                  int           pos );
 
-int           tr_ptrArrayAppend( tr_ptrArray * array,
-                                 void        * appendMe );
+static TR_INLINE int tr_ptrArrayAppend( tr_ptrArray * array, void * appendMe )
+{
+    return tr_ptrArrayInsert( array, appendMe, -1 );
+}
 
 void*         tr_ptrArrayPop( tr_ptrArray    * array );
 
@@ -71,9 +83,20 @@ void          tr_ptrArrayErase( tr_ptrArray  * array,
                                 int            begin,
                                 int            end );
 
-int           tr_ptrArraySize( const tr_ptrArray* );
+static TR_INLINE void** tr_ptrArrayBase( const tr_ptrArray * a )
+{
+    return a->items;
+}
 
-int           tr_ptrArrayEmpty( const tr_ptrArray* );
+static TR_INLINE int tr_ptrArraySize( const tr_ptrArray *  a )
+{
+    return a->n_items;
+}
+
+static TR_INLINE tr_bool tr_ptrArrayEmpty( const tr_ptrArray * a )
+{
+    return tr_ptrArraySize(a) == 0;
+}
 
 int           tr_ptrArrayInsertSorted( tr_ptrArray * array,
                                        void        * value,

@@ -1,6 +1,6 @@
 /*
  * Xmission - a cross-platform bittorrent client
- * Copyright (C) 2007 Charles Kerr <charles@rebelbase.com>
+ * Copyright (C) 2007 Charles Kerr <charles@transmissionbt.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ class SpeedStats: public wxPanel
 
         void SetTorrent( struct tr_torrent * );
 
-        void Pulse( tr_handle * handle );
+        void Pulse( tr_session * handle );
 
     public:
 

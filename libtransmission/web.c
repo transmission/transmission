@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2008 Charles Kerr <charles@rebelbase.com>
+ * This file Copyright (C) 2008-2009 Charles Kerr <charles@transmissionbt.com>
  *
  * This file is licensed by the GPL version 2.  Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
@@ -17,17 +17,21 @@
 #include <curl/curl.h>
 
 #include "transmission.h"
+#include "session.h"
 #include "list.h"
 #include "net.h" /* socklen_t */
 #include "trevent.h"
 #include "utils.h"
 #include "web.h"
 
-/* arbitrary number */
-#define MAX_CONCURRENT_TASKS 24
+enum
+{
+    /* arbitrary number */
+    MAX_CONCURRENT_TASKS = 100,
 
-/* arbitrary number */
-#define DEFAULT_TIMER_MSEC 2000
+    /* arbitrary number */
+    DEFAULT_TIMER_MSEC = 2500
+};
 
 #if 0
 #define dbgmsg(...) \
@@ -45,13 +49,15 @@
 
 struct tr_web
 {
-    unsigned int closing : 1;
+    tr_bool closing;
     int prev_running;
     int still_running;
     long timer_ms;
     CURLM * multi;
     tr_session * session;
+#if 0
     tr_list * easy_queue;
+#endif
     struct event timer_event;
 };
 
@@ -94,7 +100,7 @@ static void
 addTask( void * vtask )
 {
     struct tr_web_task * task = vtask;
-    const tr_handle * session = task->session;
+    const tr_session * session = task->session;
 
     if( session && session->web )
     {
@@ -119,10 +125,9 @@ addTask( void * vtask )
             tr_free( str );
         }
 
-        curl_easy_setopt( easy, CURLOPT_DNS_CACHE_TIMEOUT, 360L );
-        curl_easy_setopt( easy, CURLOPT_CONNECTTIMEOUT, 60L );
+        curl_easy_setopt( easy, CURLOPT_DNS_CACHE_TIMEOUT, 3600L );
+        curl_easy_setopt( easy, CURLOPT_CONNECTTIMEOUT, 120L );
         curl_easy_setopt( easy, CURLOPT_FOLLOWLOCATION, 1L );
-        curl_easy_setopt( easy, CURLOPT_MAXREDIRS, 16L );
         curl_easy_setopt( easy, CURLOPT_NOSIGNAL, 1L );
         curl_easy_setopt( easy, CURLOPT_PRIVATE, task );
         curl_easy_setopt( easy, CURLOPT_SSL_VERIFYHOST, 0L );
@@ -139,11 +144,16 @@ addTask( void * vtask )
         else /* don't set encoding on webseeds; it messes up binary data */
             curl_easy_setopt( easy, CURLOPT_ENCODING, "" );
 
-        if( web->still_running >= MAX_CONCURRENT_TASKS ) {
+#if 0
+        if( web->still_running >= MAX_CONCURRENT_TASKS )
+        {
             tr_list_append( &web->easy_queue, easy );
             dbgmsg( " >> enqueueing a task ... size is now %d",
                                            tr_list_size( web->easy_queue ) );
-        } else {
+        }
+        else
+#endif
+        {
             const CURLMcode rc = curl_multi_add_handle( web->multi, easy );
             if( rc == CURLM_OK )
                 ++web->still_running;
@@ -188,32 +198,27 @@ task_finish( struct tr_web_task * task, long response_code )
 static void
 remove_finished_tasks( tr_web * g )
 {
-    CURL * easy;
-
-    do
+    for( ;; )
     {
-        CURLMsg * msg;
-        int msgs_left;
+        int ignored;
+        CURLMsg * msg = curl_multi_info_read( g->multi, &ignored );
 
-        easy = NULL;
-        while(( msg = curl_multi_info_read( g->multi, &msgs_left ))) {
-            if( msg->msg == CURLMSG_DONE ) {
-                easy = msg->easy_handle;
-                break;
-            }
+        if( msg == NULL )
+        {
+            break;
         }
-
-        if( easy ) {
+        else if( ( msg->msg == CURLMSG_DONE ) && ( msg->easy_handle != NULL ) )
+        {
+            CURL * easy = msg->easy_handle;
             long code;
             struct tr_web_task * task;
             curl_easy_getinfo( easy, CURLINFO_PRIVATE, (void*)&task );
             curl_easy_getinfo( easy, CURLINFO_RESPONSE_CODE, &code );
+            task_finish( task, code );
             curl_multi_remove_handle( g->multi, easy );
             curl_easy_cleanup( easy );
-            task_finish( task, code );
         }
     }
-    while ( easy );
 
     g->prev_running = g->still_running;
 }
@@ -238,6 +243,7 @@ restart_timer( tr_web * g )
     evtimer_add( &g->timer_event, &interval );
 }
 
+#if 0
 static void
 add_tasks_from_queue( tr_web * g )
 {
@@ -258,6 +264,7 @@ add_tasks_from_queue( tr_web * g )
         }
     }
 }
+#endif
 
 static void
 web_close( tr_web * g )
@@ -271,7 +278,7 @@ web_close( tr_web * g )
    and no tasks remain.  callers must not reference their g pointer
    after calling this function */
 static void
-tr_multi_socket_action( tr_web * g, int fd, int mask )
+tr_multi_socket_action( tr_web * g, int fd )
 {
     int closed = FALSE;
     CURLMcode rc;
@@ -281,16 +288,18 @@ tr_multi_socket_action( tr_web * g, int fd, int mask )
 
     /* invoke libcurl's processing */
     do {
-        rc = curl_multi_socket_action( g->multi, fd, mask, &g->still_running );
-        dbgmsg( "event_cb(): fd %d, mask %d, still_running is %d",
-                fd, mask, g->still_running );
+        rc = curl_multi_socket_action( g->multi, fd, 0, &g->still_running );
+        dbgmsg( "event_cb(): fd %d, still_running is %d",
+                fd, g->still_running );
     } while( rc == CURLM_CALL_MULTI_PERFORM );
     if( rc != CURLM_OK )
         tr_err( "%s", curl_multi_strerror( rc ) );
 
     remove_finished_tasks( g );
 
+#if 0
     add_tasks_from_queue( g );
+#endif
 
     if( !g->still_running ) {
         stop_timer( g );
@@ -306,24 +315,9 @@ tr_multi_socket_action( tr_web * g, int fd, int mask )
 
 /* libevent says that sock is ready to be processed, so wake up libcurl */
 static void
-event_cb( int fd, short kind, void * g )
+event_cb( int fd, short kind UNUSED, void * g )
 {
-    int error;
-    int mask;
-    socklen_t errsz;
-
-    error = 0;
-    errsz = sizeof( error );
-    getsockopt( fd, SOL_SOCKET, SO_ERROR, &error, &errsz );
-    if( error )
-        mask = CURL_CSELECT_ERR;
-    else {
-        mask = 0;
-        if( kind & EV_READ  ) mask |= CURL_CSELECT_IN;
-        if( kind & EV_WRITE ) mask |= CURL_CSELECT_OUT;
-    }
-
-    tr_multi_socket_action( g, fd, mask );
+    tr_multi_socket_action( g, fd );
 }
 
 /* libevent says that timer_ms have passed, so wake up libcurl */
@@ -331,7 +325,7 @@ static void
 timer_cb( int socket UNUSED, short action UNUSED, void * g )
 {
     dbgmsg( "libevent timer is done" );
-    tr_multi_socket_action( g, CURL_SOCKET_TIMEOUT, 0 );
+    tr_multi_socket_action( g, CURL_SOCKET_TIMEOUT );
 }
 
 static void

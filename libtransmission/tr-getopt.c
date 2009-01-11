@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2008 Charles Kerr <charles@rebelbase.com>
+ * This file Copyright (C) 2008-2009 Charles Kerr <charles@transmissionbt.com>
  *
  * This file is licensed by the GPL version 2.  Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id$
+ * $Id: tr-getopt.c 7658 2009-01-10 23:09:07Z charles $
  */
 
 #include <stdio.h>
@@ -47,8 +47,9 @@ getopts_usage_line( const tr_option * opt,
     const char * shortName  = opt->shortName ? opt->shortName : "";
     const char * arg        = getArgName( opt );
 
-    printf( "  -%-*s --%-*s %-*s  %s\n", shortWidth, shortName,
-            longWidth, longName,
+    printf( "  %s%-*s %s%-*s %-*s  %s\n",
+            (shortName && *shortName ? "-" : " "), shortWidth, shortName,
+            (longName && *longName ? "--" : "  "), longWidth, longName,
             argWidth, arg,
             opt->description );
 }

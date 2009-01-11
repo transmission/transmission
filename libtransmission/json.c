@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2008 Charles Kerr <charles@rebelbase.com>
+ * This file Copyright (C) 2008-2009 Charles Kerr <charles@transmissionbt.com>
  *
  * This file is licensed by the GPL version 2.  Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
@@ -29,7 +29,7 @@
 struct json_benc_data
 {
     tr_benc *      top;
-    tr_ptrArray *  stack;
+    tr_ptrArray    stack;
     char *         key;
 };
 
@@ -39,10 +39,10 @@ getNode( struct json_benc_data * data )
     tr_benc * parent;
     tr_benc * node = NULL;
 
-    if( tr_ptrArrayEmpty( data->stack ) )
+    if( tr_ptrArrayEmpty( &data->stack ) )
         parent = NULL;
     else
-        parent = tr_ptrArrayBack( data->stack );
+        parent = tr_ptrArrayBack( &data->stack );
 
     if( !parent )
         node = data->top;
@@ -71,21 +71,21 @@ callback( void *             vdata,
         case JSON_T_ARRAY_BEGIN:
             node = getNode( data );
             tr_bencInitList( node, 0 );
-            tr_ptrArrayAppend( data->stack, node );
+            tr_ptrArrayAppend( &data->stack, node );
             break;
 
         case JSON_T_ARRAY_END:
-            tr_ptrArrayPop( data->stack );
+            tr_ptrArrayPop( &data->stack );
             break;
 
         case JSON_T_OBJECT_BEGIN:
             node = getNode( data );
             tr_bencInitDict( node, 0 );
-            tr_ptrArrayAppend( data->stack, node );
+            tr_ptrArrayAppend( &data->stack, node );
             break;
 
         case JSON_T_OBJECT_END:
-            tr_ptrArrayPop( data->stack );
+            tr_ptrArrayPop( &data->stack );
             break;
 
         case JSON_T_FLOAT:
@@ -148,7 +148,7 @@ tr_jsonParse( const void *     vbuf,
 
     data.key = NULL;
     data.top = setme_benc;
-    data.stack = tr_ptrArrayNew( );
+    data.stack = TR_PTR_ARRAY_INIT;
 
     checker = new_JSON_parser( &config );
     while( ( buf != bufend ) && JSON_parser_char( checker, *buf ) )
@@ -161,7 +161,7 @@ tr_jsonParse( const void *     vbuf,
         *setme_end = (const uint8_t*) buf;
 
     delete_JSON_parser( checker );
-    tr_ptrArrayFree( data.stack, NULL );
+    tr_ptrArrayDestruct( &data.stack, NULL );
     return err;
 }
 

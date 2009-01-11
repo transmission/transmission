@@ -1,8 +1,5 @@
 ACLOCAL_AMFLAGS = -I m4
 
-if BUILD_BEOS
-  BEOS_DIR = beos
-endif
 if BUILD_CLI
   CLI_DIR = cli
 endif

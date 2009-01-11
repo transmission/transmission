@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2008 Charles Kerr <charles@rebelbase.com>
+ * This file Copyright (C) 2008-2009 Charles Kerr <charles@transmissionbt.com>
  *
  * This file is licensed by the GPL version 2.  Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
@@ -40,7 +40,7 @@ struct tr_webseed
     uint32_t            pieceOffset;
     uint32_t            byteCount;
 
-    tr_ratecontrol    * rateDown;
+    tr_ratecontrol      rateDown;
 
     tr_session        * session;
 
@@ -99,7 +99,7 @@ makeURL( tr_webseed *    w,
          const tr_file * file )
 {
     char *            ret;
-    struct evbuffer * out = evbuffer_new( );
+    struct evbuffer * out = tr_getBuffer( );
     const char *      url = w->url;
     const size_t      url_len = strlen( url );
 
@@ -140,7 +140,7 @@ makeURL( tr_webseed *    w,
     }
 
     ret = tr_strndup( EVBUFFER_DATA( out ), EVBUFFER_LENGTH( out ) );
-    evbuffer_free( out );
+    tr_releaseBuffer( out );
     return ret;
 }
 
@@ -169,7 +169,7 @@ webResponseFunc( tr_session    * session,
         if( !w->dead )
         {
             fireClientGotData( w, response_byte_count );
-            tr_rcTransferred( w->rateDown, response_byte_count );
+            tr_rcTransferred( &w->rateDown, response_byte_count );
         }
 
         if( EVBUFFER_LENGTH( w->content ) < w->byteCount )
@@ -252,11 +252,11 @@ tr_webseedIsActive( const tr_webseed * w )
 }
 
 int
-tr_webseedGetSpeed( const tr_webseed * w, float * setme_KiBs )
+tr_webseedGetSpeed( const tr_webseed * w, uint64_t now, float * setme_KiBs )
 {
     const int isActive = tr_webseedIsActive( w );
 
-    *setme_KiBs = isActive ? tr_rcRate( w->rateDown ) : 0.0f;
+    *setme_KiBs = isActive ? tr_rcRate( &w->rateDown, now ) : 0.0f;
     return isActive;
 }
 
@@ -275,10 +275,10 @@ tr_webseedNew( struct tr_torrent * torrent,
     memcpy( w->hash, torrent->info.hash, SHA_DIGEST_LENGTH );
     w->session = torrent->session;
     w->content = evbuffer_new( );
-    w->rateDown = tr_rcInit( );
     w->url = tr_strdup( url );
     w->callback = callback;
     w->callback_userdata = callback_userdata;
+    tr_rcConstruct( &w->rateDown );
 /*fprintf( stderr, "w->callback_userdata is %p\n", w->callback_userdata );*/
     return w;
 }
@@ -295,7 +295,7 @@ tr_webseedFree( tr_webseed * w )
         else
         {
             evbuffer_free( w->content );
-            tr_rcClose( w->rateDown );
+            tr_rcDestruct( &w->rateDown );
             tr_free( w->url );
             tr_free( w );
         }

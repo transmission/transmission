@@ -1,26 +1,14 @@
-/******************************************************************************
+/*
+ * This file Copyright (C) 2009 Charles Kerr <charles@transmissionbt.com>
+ *
+ * This file is licensed by the GPL version 2.  Works owned by the
+ * Transmission project are granted a special exemption to clause 2(b)
+ * so that the bulk of its code can remain under the MIT license.
+ * This exemption does not extend to derived works not owned by
+ * the Transmission project.
+ *
  * $Id$
- *
- * Copyright (c) 2005-2008 Transmission authors and contributors
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- *****************************************************************************/
+ */
 
 #include <assert.h>
 #include <ctype.h> /* isalpha, tolower */
@@ -41,17 +29,17 @@
 #ifdef WIN32
  #include <direct.h> /* _getcwd */
  #include <windows.h> /* Sleep */
-#elif defined( __BEOS__ )
- #include <kernel/OS.h>
 #endif
 
 #include "transmission.h"
+#include "ConvertUTF.h"
+#include "list.h"
 #include "utils.h"
 #include "platform.h"
 
 static tr_lock *      messageLock = NULL;
 static int            messageLevel = 0;
-static int            messageQueuing = FALSE;
+static tr_bool        messageQueuing = FALSE;
 static tr_msg_list *  messageQueue = NULL;
 static tr_msg_list ** messageQueueTail = &messageQueue;
 
@@ -61,11 +49,21 @@ static tr_msg_list ** messageQueueTail = &messageQueue;
     static void OutputDebugString( const void * unused UNUSED ) { }
 #endif
 
-void
+static void
 tr_msgInit( void )
 {
-    if( !messageLock )
+    static tr_bool initialized = FALSE;
+
+    if( !initialized )
+    {
+        char * env = getenv( "TR_DEBUG" );
+        messageLevel = ( env ? atoi( env ) : 0 ) + 1;
+        messageLevel = MAX( 1, messageLevel );
+
         messageLock = tr_lockNew( );
+
+        initialized = TRUE;
+    }
 }
 
 FILE*
@@ -102,7 +100,9 @@ tr_setMessageLevel( int level )
 {
     tr_msgInit( );
     tr_lockLock( messageLock );
+
     messageLevel = MAX( 0, level );
+
     tr_lockUnlock( messageLock );
 }
 
@@ -110,34 +110,36 @@ int
 tr_getMessageLevel( void )
 {
     int ret;
-
     tr_msgInit( );
     tr_lockLock( messageLock );
-    ret = messageLevel;
-    tr_lockUnlock( messageLock );
 
+    ret = messageLevel;
+
+    tr_lockUnlock( messageLock );
     return ret;
 }
 
 void
-tr_setMessageQueuing( int enabled )
+tr_setMessageQueuing( tr_bool enabled )
 {
     tr_msgInit( );
     tr_lockLock( messageLock );
+
     messageQueuing = enabled;
+
     tr_lockUnlock( messageLock );
 }
 
-int
+tr_bool
 tr_getMessageQueuing( void )
 {
     int ret;
-
     tr_msgInit( );
     tr_lockLock( messageLock );
-    ret = messageQueuing;
-    tr_lockUnlock( messageLock );
 
+    ret = messageQueuing;
+
+    tr_lockUnlock( messageLock );
     return ret;
 }
 
@@ -145,14 +147,14 @@ tr_msg_list *
 tr_getQueuedMessages( void )
 {
     tr_msg_list * ret;
-
-    assert( NULL != messageLock );
+    tr_msgInit( );
     tr_lockLock( messageLock );
+
     ret = messageQueue;
     messageQueue = NULL;
     messageQueueTail = &messageQueue;
-    tr_lockUnlock( messageLock );
 
+    tr_lockUnlock( messageLock );
     return ret;
 }
 
@@ -209,10 +211,15 @@ tr_getLogTimeStr( char * buf,
     return buf;
 }
 
-int
+tr_bool
 tr_deepLoggingIsActive( void )
 {
-    return IsDebuggerPresent() || (tr_getLog()!=NULL);
+    static int8_t deepLoggingIsActive = -1;
+
+    if( deepLoggingIsActive < 0 )
+        deepLoggingIsActive = IsDebuggerPresent() || (tr_getLog()!=NULL);
+
+    return deepLoggingIsActive != 0;
 }
 
 void
@@ -227,7 +234,7 @@ tr_deepLog( const char  * file,
     {
         va_list           args;
         char              timestr[64];
-        struct evbuffer * buf = evbuffer_new( );
+        struct evbuffer * buf = tr_getBuffer( );
         char *            base = tr_basename( file );
 
         evbuffer_add_printf( buf, "[%s] ",
@@ -243,13 +250,22 @@ tr_deepLog( const char  * file,
             (void) fwrite( EVBUFFER_DATA( buf ), 1, EVBUFFER_LENGTH( buf ), fp );
 
         tr_free( base );
-        evbuffer_free( buf );
+        tr_releaseBuffer( buf );
     }
 }
 
 /***
 ****
 ***/
+    
+
+int
+tr_msgLoggingIsActive( int level )
+{
+    tr_msgInit( );
+
+    return messageLevel >= level;
+}
 
 void
 tr_msg( const char * file,
@@ -260,32 +276,25 @@ tr_msg( const char * file,
         ... )
 {
     FILE * fp;
-
-    if( messageLock )
-        tr_lockLock( messageLock );
+    tr_msgInit( );
+    tr_lockLock( messageLock );
 
     fp = tr_getLog( );
 
-    if( !messageLevel )
-    {
-        char * env = getenv( "TR_DEBUG" );
-        messageLevel = ( env ? atoi( env ) : 0 ) + 1;
-        messageLevel = MAX( 1, messageLevel );
-    }
-
     if( messageLevel >= level )
     {
-        va_list           ap;
-        struct evbuffer * buf = evbuffer_new( );
+        char buf[MAX_STACK_ARRAY_SIZE];
+        va_list ap;
 
         /* build the text message */
+        *buf = '\0';
         va_start( ap, fmt );
-        evbuffer_add_vprintf( buf, fmt, ap );
+        evutil_vsnprintf( buf, sizeof( buf ), fmt, ap );
         va_end( ap );
 
-        OutputDebugString( EVBUFFER_DATA( buf ) );
+        OutputDebugString( buf );
 
-        if( EVBUFFER_LENGTH( buf ) )
+        if( *buf )
         {
             if( messageQueuing )
             {
@@ -293,7 +302,7 @@ tr_msg( const char * file,
                 newmsg = tr_new0( tr_msg_list, 1 );
                 newmsg->level = level;
                 newmsg->when = time( NULL );
-                newmsg->message = tr_strdup( EVBUFFER_DATA( buf ) );
+                newmsg->message = tr_strdup( buf );
                 newmsg->file = file;
                 newmsg->line = line;
                 newmsg->name = tr_strdup( name );
@@ -306,19 +315,15 @@ tr_msg( const char * file,
                 if( fp == NULL )
                     fp = stderr;
                 if( name )
-                    fprintf( fp, "%s: %s\n", name,
-                            (char*)EVBUFFER_DATA( buf ) );
+                    fprintf( fp, "%s: %s\n", name, buf );
                 else
-                    fprintf( fp, "%s\n", (char*)EVBUFFER_DATA( buf ) );
+                    fprintf( fp, "%s\n", buf );
                 fflush( fp );
             }
-
-            evbuffer_free( buf );
         }
     }
 
-    if( messageLock )
-        tr_lockUnlock( messageLock );
+    tr_lockUnlock( messageLock );
 }
 
 /***
@@ -491,19 +496,6 @@ tr_loadFile( const char * path,
 }
 
 char*
-tr_getcwd( void )
-{
-    char buf[2048];
-    *buf = '\0';
-#ifdef WIN32
-    _getcwd( buf, sizeof( buf ) );
-#else
-    getcwd( buf, sizeof( buf ) );
-#endif
-    return tr_strdup( buf );
-}
-
-char*
 tr_basename( const char * path )
 {
     char * tmp = tr_strdup( path );
@@ -644,22 +636,6 @@ tr_buildPath( const char *first_element, ... )
 *****
 ****/
 
-void*
-tr_memdup( const void * in,
-           int          byteCount )
-{
-    void * out = tr_new( uint8_t, byteCount );
-
-    memcpy( out, in, byteCount );
-    return out;
-}
-
-char*
-tr_strdup( const void * in )
-{
-    return tr_strndup( in, in ? strlen( (const char*)in ) : 0 );
-}
-
 char*
 tr_strndup( const void * in,
             int          len )
@@ -681,41 +657,21 @@ tr_strndup( const void * in,
 }
 
 char*
-tr_strdup_printf( const char * fmt,
-                  ... )
+tr_strdup_printf( const char * fmt, ... )
 {
     char *            ret = NULL;
     struct evbuffer * buf;
     va_list           ap;
 
-    buf = evbuffer_new( );
+    buf = tr_getBuffer( );
     va_start( ap, fmt );
 
     if( evbuffer_add_vprintf( buf, fmt, ap ) != -1 )
         ret = tr_strdup( EVBUFFER_DATA( buf ) );
 
     va_end( ap );
-    evbuffer_free( buf );
+    tr_releaseBuffer( buf );
     return ret;
-}
-
-void*
-tr_malloc( size_t size )
-{
-    return size ? malloc( size ) : NULL;
-}
-
-void*
-tr_malloc0( size_t size )
-{
-    return size ? calloc( 1, size ) : NULL;
-}
-
-void
-tr_free( void * p )
-{
-    if( p )
-        free( p );
 }
 
 const char*
@@ -761,14 +717,20 @@ tr_strstrip( char * str )
 ****/
 
 tr_bitfield*
-tr_bitfieldNew( size_t bitCount )
+tr_bitfieldConstruct( tr_bitfield * b, size_t bitCount )
 {
-    tr_bitfield * ret = tr_new0( tr_bitfield, 1 );
+    b->bitCount = bitCount;
+    b->byteCount = ( bitCount + 7u ) / 8u;
+    b->bits = tr_new0( uint8_t, b->byteCount );
+    return b;
+}
 
-    ret->bitCount = bitCount;
-    ret->byteCount = ( bitCount + 7u ) / 8u;
-    ret->bits = tr_new0( uint8_t, ret->byteCount );
-    return ret;
+tr_bitfield*
+tr_bitfieldDestruct( tr_bitfield * b )
+{
+    if( b )
+        tr_free( b->bits );
+    return b;
 }
 
 tr_bitfield*
@@ -780,16 +742,6 @@ tr_bitfieldDup( const tr_bitfield * in )
     ret->byteCount = in->byteCount;
     ret->bits = tr_memdup( in->bits, in->byteCount );
     return ret;
-}
-
-void
-tr_bitfieldFree( tr_bitfield * bitfield )
-{
-    if( bitfield )
-    {
-        tr_free( bitfield->bits );
-        tr_free( bitfield );
-    }
 }
 
 void
@@ -1002,9 +954,7 @@ tr_date( void )
 void
 tr_wait( uint64_t delay_milliseconds )
 {
-#ifdef __BEOS__
-    snooze( 1000 * delay_milliseconds );
-#elif defined( WIN32 )
+#ifdef WIN32
     Sleep( (DWORD)delay_milliseconds );
 #else
     usleep( 1000 * delay_milliseconds );
@@ -1272,8 +1222,140 @@ tr_base64_decode( const void * input,
     return ret;
 }
 
-tr_bool
-tr_isDirection( tr_direction dir )
+int
+tr_ptr2int( void* v )
 {
-    return dir==TR_UP || dir==TR_DOWN;
+    return (intptr_t)v;
+}
+
+void*
+tr_int2ptr( int i )
+{
+    return (void*)(intptr_t)i;
+}
+
+/***
+****
+***/
+
+static tr_list * _bufferList = NULL;
+
+static tr_lock *
+getBufferLock( void )
+{
+    static tr_lock * lock = NULL;
+    if( lock == NULL )
+        lock = tr_lockNew( );
+    return lock;
+}
+
+struct evbuffer*
+tr_getBuffer( void )
+{
+    struct evbuffer * buf;
+    tr_lock * l = getBufferLock( );
+    tr_lockLock( l );
+
+    buf = tr_list_pop_front( &_bufferList );
+    if( buf == NULL )
+        buf = evbuffer_new( );
+
+    tr_lockUnlock( l );
+    return buf;
+}
+
+void
+tr_releaseBuffer( struct evbuffer * buf )
+{
+    tr_lock * l = getBufferLock( );
+    tr_lockLock( l );
+
+    evbuffer_drain( buf, EVBUFFER_LENGTH( buf ) );
+    assert( EVBUFFER_LENGTH( buf ) == 0 );
+    tr_list_prepend( &_bufferList, buf );
+
+    tr_lockUnlock( l );
+}
+
+/***
+****
+***/
+
+int
+tr_lowerBound( const void * key,
+               const void * base,
+               size_t       nmemb,
+               size_t       size,
+               int       (* compar)(const void* key, const void* arrayMember),
+               tr_bool    * exact_match )
+{
+    size_t first = 0;
+    const char * cbase = base;
+
+    while( nmemb )
+    {
+        const size_t half = nmemb / 2;
+        const size_t middle = first + half;
+        const int c = compar( key, cbase + size*middle );
+
+        if( c < 0 )
+        {
+            first = middle + 1;
+            nmemb = nmemb - half - 1;
+        }
+        else if( !c )
+        {
+            if( exact_match )
+                *exact_match = TRUE;
+            return middle;
+        }
+        else
+        {
+            nmemb = half;
+        }
+    }
+
+    if( exact_match )
+        *exact_match = FALSE;
+
+    return first;
+}
+
+/***
+****
+***/
+
+char*
+tr_utf8clean( const char * str, ssize_t max_len, tr_bool * err )
+{
+    const char zero = '\0';
+    char * ret;
+    struct evbuffer * buf = evbuffer_new( );
+    const char * end;
+
+    if( err != NULL )
+        *err = FALSE;
+
+    if( max_len < 0 )
+        max_len = (ssize_t) strlen( str );
+
+    while( !tr_utf8_validate ( str, max_len, &end ) )
+    {
+        const ssize_t good_len = end - str;
+
+        evbuffer_add( buf, str, good_len );
+        max_len -= ( good_len + 1 );
+        str += ( good_len + 1 );
+        evbuffer_add( buf, "?", 1 );
+
+        if( err != NULL )
+            *err = TRUE;
+    }
+
+    evbuffer_add( buf, str, max_len );
+    evbuffer_add( buf, &zero, 1 );
+    ret = tr_memdup( EVBUFFER_DATA( buf ), EVBUFFER_LENGTH( buf ) );
+    assert( tr_utf8_validate( ret, -1, NULL ) );
+    evbuffer_free( buf );
+    return ret;
 }

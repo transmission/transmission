@@ -18,6 +18,11 @@
 .Op Fl t | T
 .Op Fl u Ar username
 .Op Fl v Ar password
+.Op Fl P Ar port
+.Op Fl m | M
+.Op Fl l Ar limit
+.Op Fl L Ar limit
+.Op Fl er | ep | et
 .Op Fl w Ar download-dir
 .Ek
 
@@ -49,11 +54,31 @@ Run in the foreground and print errors to stderr.
 .It Fl g Fl -config-dir Ar directory
 Where to look for .torrent and config files on startup.
 
+.It Fl er Fl -encryption-required
+Encrypt all peer connections.
+.It Fl ep Fl -encryption-preferred
+Prefer encrypted peer connections.
+.It Fl et Fl -encryption-tolerated
+Prefer unencrypted peer connections.
+
 .It Fl h Fl -help
 Print command-line option descriptions.
 
+.It Fl L Fl -peerlimit-global Ar limit
+Overall peer limit. Useful on embedded systems where the default might be unsuitable. Default: 240
+.It Fl l Fl -peerlimit-torrent Ar limit
+Peer limit per torrent. Useful on embedded systems where the default might be unsuitable. Default: 60
+
+.It Fl m Fl -portmap
+Enable portmapping via NAT-PMP or UPnP
+.It Fl M Fl -no-portmap
+Disable portmapping
+
 .It Fl p Fl -port Ar port
 Port to open and listen for RPC requests on.  Default: 9091
+
+.It Fl P, -peerport Ar port
+Port to listen for incoming peers on. Default: 51413
 
 .It Fl t Fl -auth
 Require clients to authenticate themselves.

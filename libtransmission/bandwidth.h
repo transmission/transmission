@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2008 Charles Kerr <charles@transmissionbt.com>
+ * This file Copyright (C) 2008-2009 Charles Kerr <charles@transmissionbt.com>
  *
  * This file is licensed by the GPL version 2.  Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id:$
+ * $Id$
  */
 
 #ifndef __TRANSMISSION__
@@ -17,7 +17,42 @@
 #ifndef TR_BANDWIDTH_H
 #define TR_BANDWIDTH_H
 
-struct tr_iobuf;
+#include "transmission.h"
+#include "ptrarray.h"
+#include "utils.h" /* tr_new(), tr_free() */
+
+struct tr_peerIo;
+
+/* these are PRIVATE IMPLEMENTATION details that should not be touched.
+ * it's included in the header for inlining and composition. */
+enum
+{
+    HISTORY_MSEC = 2000,
+    INTERVAL_MSEC = HISTORY_MSEC,
+    GRANULARITY_MSEC = 50,
+    HISTORY_SIZE = ( INTERVAL_MSEC / GRANULARITY_MSEC ),
+    MAGIC_NUMBER = 43143
+};
+
+/* these are PRIVATE IMPLEMENTATION details that should not be touched.
+ * it's included in the header for inlining and composition. */
+struct bratecontrol
+{
+    int newest;
+    struct { uint64_t date, size; } transfers[HISTORY_SIZE];
+};
+
+/* these are PRIVATE IMPLEMENTATION details that should not be touched.
+ * it's included in the header for inlining and composition. */
+struct tr_band
+{
+    tr_bool isLimited;
+    tr_bool honorParentLimits;
+    size_t bytesLeft;
+    double desiredSpeed;
+    struct bratecontrol raw;
+    struct bratecontrol piece;
+};
 
 /**
  * Bandwidth is an object for measuring and constraining bandwidth speeds.
@@ -49,34 +84,57 @@ struct tr_iobuf;
  *   Call tr_bandwidthAllocate() periodically.  tr_bandwidth knows its current
  *   speed and will decide how many bytes to make available over the
  *   user-specified period to reach the user-specified desired speed.
- *   If appropriate, it notifies its iobufs that new bandwidth is available.
+ *   If appropriate, it notifies its peer-ios that new bandwidth is available.
  * 
  *   tr_bandwidthAllocate() operates on the tr_bandwidth subtree, so usually 
  *   you'll only need to invoke it for the top-level tr_session bandwidth.
  *
- *   The iobufs all have a pointer to their associated tr_bandwidth object,
+ *   The peer-ios all have a pointer to their associated tr_bandwidth object,
  *   and call tr_bandwidthClamp() before performing I/O to see how much 
  *   bandwidth they can safely use.
  */
+typedef struct tr_bandwidth
+{
+    /* these are PRIVATE IMPLEMENTATION details that should not be touched.
+     * it's included in the header for inlining and composition. */
 
-typedef struct tr_bandwidth tr_bandwidth;
+    struct tr_band band[2];
+    struct tr_bandwidth * parent;
+    int magicNumber;
+    tr_session * session;
+    tr_ptrArray children; /* struct tr_bandwidth */
+    struct tr_peerIo * peer;
+}
+tr_bandwidth;
 
-struct tr_peerIo;
 
 /**
 ***
 **/
 
-/** @brief create a new tr_bandwidth object */
-tr_bandwidth*
-         tr_bandwidthNew              ( tr_session          * session,
-                                        tr_bandwidth        * parent );
+tr_bandwidth* tr_bandwidthConstruct( tr_bandwidth * bandwidth,
+                                     tr_session   * session,
+                                     tr_bandwidth * parent );
 
-/** @brief destroy a tr_bandwidth object */
-void     tr_bandwidthFree             ( tr_bandwidth        * bandwidth );
+/** @brief create a new tr_bandwidth object */
+static TR_INLINE tr_bandwidth* tr_bandwidthNew( tr_session * session, tr_bandwidth * parent )
+{
+    return tr_bandwidthConstruct( tr_new0( tr_bandwidth, 1 ), session, parent );
+}
+
+tr_bandwidth* tr_bandwidthDestruct( tr_bandwidth * bandwidth );
+
+/** @brief free a tr_bandwidth object */
+static TR_INLINE void tr_bandwidthFree( tr_bandwidth * bandwidth )
+{
+    tr_free( tr_bandwidthDestruct( bandwidth ) );
+}
 
 /** @brief test to see if the pointer refers to a live bandwidth object */
-tr_bool  tr_isBandwidth               ( const tr_bandwidth  * bandwidth );
+static TR_INLINE tr_bool tr_isBandwidth( const tr_bandwidth  * b )
+{
+    return ( b != NULL ) && ( b->magicNumber == MAGIC_NUMBER );
+}
 
 /******
 *******
@@ -87,32 +145,45 @@ tr_bool  tr_isBandwidth               ( const tr_bandwidth  * bandwidth );
  * @see tr_bandwidthAllocate
  * @see tr_bandwidthGetDesiredSpeed
  */
-void    tr_bandwidthSetDesiredSpeed   ( tr_bandwidth        * bandwidth,
-                                        tr_direction          direction,
-                                        double                desiredSpeed );
+static TR_INLINE void tr_bandwidthSetDesiredSpeed( tr_bandwidth        * bandwidth,
+                                                tr_direction          dir,
+                                                double                desiredSpeed )
+{
+    bandwidth->band[dir].desiredSpeed = desiredSpeed;
+}
 
 /**
  * @brief Get the desired speed (in KiB/s) for ths bandwidth subtree.
  * @see tr_bandwidthSetDesiredSpeed
  */
-double  tr_bandwidthGetDesiredSpeed   ( const tr_bandwidth  * bandwidth,
-                                        tr_direction          direction );
+static TR_INLINE double
+tr_bandwidthGetDesiredSpeed( const tr_bandwidth  * bandwidth,
+                             tr_direction          dir )
+{
+    return bandwidth->band[dir].desiredSpeed;
+}
 
 /**
- * @brief Set whether or not this bandwidth should throttle its iobufs' speeds
+ * @brief Set whether or not this bandwidth should throttle its peer-io's speeds
  */
-void    tr_bandwidthSetLimited        ( tr_bandwidth        * bandwidth,
-                                        tr_direction          direction,
-                                        tr_bool               isLimited );
+static TR_INLINE void tr_bandwidthSetLimited( tr_bandwidth        * bandwidth,
+                                           tr_direction          dir,
+                                           tr_bool               isLimited )
+{
+    bandwidth->band[dir].isLimited = isLimited;
+}
 
 /**
- * @return nonzero if this bandwidth throttles its iobufs' speeds
+ * @return nonzero if this bandwidth throttles its peer-ios speeds
  */
-tr_bool tr_bandwidthIsLimited         ( const tr_bandwidth  * bandwidth,
-                                        tr_direction          direction );
+static TR_INLINE tr_bool tr_bandwidthIsLimited( const tr_bandwidth  * bandwidth,
+                                             tr_direction          dir )
+{
+    return bandwidth->band[dir].isLimited;
+}
 
 /**
- * @brief allocate the next period_msec's worth of bandwidth for the iobufs to consume
+ * @brief allocate the next period_msec's worth of bandwidth for the peer-ios to consume
  */
 void    tr_bandwidthAllocate          ( tr_bandwidth        * bandwidth,
                                         tr_direction          direction,
@@ -129,21 +200,19 @@ size_t  tr_bandwidthClamp             ( const tr_bandwidth  * bandwidth,
 *******
 ******/
 
-/**
- * @brief Get the raw total of bytes read or sent by this bandwidth subtree.
- */
-double  tr_bandwidthGetRawSpeed       ( const tr_bandwidth  * bandwidth,
-                                        tr_direction          direction );
+/** @brief Get the raw total of bytes read or sent by this bandwidth subtree. */
+double tr_bandwidthGetRawSpeed( const tr_bandwidth  * bandwidth,
+                                const uint64_t        now,
+                                const tr_direction    direction );
 
-/**
- * @brief Get the number of piece data bytes read or sent by this bandwidth subtree.
- */
-double  tr_bandwidthGetPieceSpeed     ( const tr_bandwidth  * bandwidth,
-                                        tr_direction          direction );
+/** @brief Get the number of piece data bytes read or sent by this bandwidth subtree. */
+double tr_bandwidthGetPieceSpeed( const tr_bandwidth  * bandwidth,
+                                  const uint64_t        now,
+                                  const tr_direction    direction );
 
 /**
  * @brief Notify the bandwidth object that some of its allocated bandwidth has been consumed.
- * This is is usually invoked by the iobuf after a read or write.
+ * This is is usually invoked by the peer-io after a read or write.
  */
 void    tr_bandwidthUsed              ( tr_bandwidth        * bandwidth,
                                         tr_direction          direction,
@@ -163,25 +232,21 @@ void    tr_bandwidthSetParent         ( tr_bandwidth        * bandwidth,
  * But when we set a torrent's speed mode to TR_SPEEDLIMIT_UNLIMITED, then
  * in that particular case we want to ignore the global speed limit...
  */
-void    tr_bandwidthHonorParentLimits ( tr_bandwidth        * bandwidth,
-                                        tr_direction          direction,
-                                        tr_bool               isEnabled );
+static TR_INLINE void tr_bandwidthHonorParentLimits ( tr_bandwidth        * bandwidth,
+                                                   tr_direction          direction,
+                                                   tr_bool               isEnabled )
+{
+    assert( tr_isBandwidth( bandwidth ) );
+    assert( tr_isDirection( direction ) );
+
+    bandwidth->band[direction].honorParentLimits = isEnabled;
+}
 
 /******
 *******
 ******/
 
-/**
- * @brief add a tr_peerIo to this bandwidth's list.
- * They will be notified when more bandwidth is made available for them to consume.
- */
-void    tr_bandwidthAddPeer           ( tr_bandwidth        * bandwidth,
-                                        struct tr_peerIo    * peerIo );
-
-/**
- * @brief remove an iobuf from this bandwidth's list of iobufs.
- */
-void    tr_bandwidthRemovePeer        ( tr_bandwidth        * bandwidth,
-                                        struct tr_peerIo    * peerIo );
+void tr_bandwidthSetPeer( tr_bandwidth        * bandwidth,
+                          struct tr_peerIo    * peerIo );
 
 #endif

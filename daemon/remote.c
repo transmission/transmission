@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2008 Charles Kerr <charles@rebelbase.com>
+ * This file Copyright (C) 2008-2009 Charles Kerr <charles@transmissionbt.com>
  *
  * This file is licensed by the GPL version 2.  Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
@@ -15,6 +15,12 @@
 #include <stdlib.h>
 #include <string.h> /* strcmp */
 
+#ifdef WIN32 
+ #include <direct.h> /* getcwd */ 
+#else 
+ #include <unistd.h> /* getcwd */ 
+#endif 
+
 #include <libevent/event.h>
 #include <curl/curl.h>
 
@@ -28,7 +34,7 @@
 
 #define MY_NAME "transmission-remote"
 #define DEFAULT_HOST "localhost"
-#define DEFAULT_PORT TR_DEFAULT_RPC_PORT
+#define DEFAULT_PORT atoi(TR_DEFAULT_RPC_PORT_STR)
 
 enum { TAG_LIST, TAG_DETAILS, TAG_FILES, TAG_PEERS };
 
@@ -56,9 +62,9 @@ static tr_option opts[] =
       "a",  0, NULL                  },
     { 'b', "debug",                "Print debugging information",
       "b",  0, NULL                  },
-    { 'd', "downlimit",            "Set the maximum download speed in KB/s",
+    { 'd', "downlimit",            "Set the maximum global download speed in KB/s",
       "d",  1, "<speed>"             },
-    { 'D', "no-downlimit",         "Don't limit the download speed",
+    { 'D', "no-downlimit",         "Don't limit the global download speed",
       "D",  0, NULL                  },
     { 910, "encryption-required",  "Encrypt all peer connections",
       "er", 0, NULL                  },
@@ -83,7 +89,7 @@ static tr_option opts[] =
     { 'n', "auth",                 "Set authentication info",
       "n",  1, "<username:password>" },
     { 'p', "port",
-      "Port for incoming peers (Default: " TR_DEFAULT_PORT_STR ")",
+      "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")",
       "p", 1, "<port>" },
     { 900, "priority-high",        "Set the files' priorities as high",
       "ph", 1, "<files>"             },
@@ -93,15 +99,17 @@ static tr_option opts[] =
       "pl", 1, "<files>"             },
     { 'r', "remove",               "Remove the current torrent(s)",
       "r",  0, NULL                  },
+    { 'R', "remove-and-delete",    "Remove the current torrent(s) and delete local data",
+      NULL, 0, NULL                  },
     { 's', "start",                "Start the current torrent(s)",
       "s",  0, NULL                  },
     { 'S', "stop",                 "Stop the current torrent(s)",
       "S",  0, NULL                  },
     { 't', "torrent",              "Set the current torrent(s)",
       "t",  1, "<torrent>"           },
-    { 'u', "uplimit",              "Set the maximum upload speed in KB/s",
+    { 'u', "uplimit",              "Set the maximum global upload speed in KB/s",
       "u",  1, "<speed>"             },
-    { 'U', "no-uplimit",           "Don't limit the upload speed",
+    { 'U', "no-uplimit",           "Don't limit the global upload speed",
       "U",  0, NULL                  },
     { 'v', "verify",               "Verify the current torrent(s)",
       "v",  0, NULL                  },
@@ -142,6 +150,19 @@ static char * reqs[256]; /* arbitrary max */
 static int    reqCount = 0;
 static int    debug = 0;
 static char * auth = NULL;
+
+static char* 
+tr_getcwd( void ) 
+{ 
+    char buf[2048]; 
+    *buf = '\0'; 
+#ifdef WIN32 
+    _getcwd( buf, sizeof( buf ) ); 
+#else 
+    getcwd( buf, sizeof( buf ) ); 
+#endif 
+    return tr_strdup( buf ); 
+} 
 
 static char*
 absolutify( const char * path )
@@ -395,6 +416,12 @@ readargs( int           argc,
                 addIdArg( args, id );
                 break;
 
+            case 'R':
+                tr_bencDictAddStr( &top, "method", "torrent-remove" );
+                addIdArg( args, id );
+                tr_bencDictAddInt( args, "delete-local-data", 1 );
+                break;
+
             case 's':
                 tr_bencDictAddStr( &top, "method", "torrent-start" );
                 addIdArg( args, id );
@@ -497,7 +524,12 @@ readargs( int           argc,
         }
 
         if( addArg )
-            reqs[reqCount++] = tr_bencSaveAsJSON( &top, NULL );
+        {
+            struct evbuffer * buf = tr_getBuffer( );
+            reqs[reqCount++] = tr_strdup( tr_bencSaveAsJSON( &top, buf ) );
+            tr_releaseBuffer( buf );
+        }
+
         tr_bencFree( &top );
     }
 }
@@ -687,6 +719,18 @@ getStatusString( tr_benc * t, char * buf, size_t buflen )
     return buf;
 }
 
+static const char*
+getTrackerDateStr( const time_t t, tr_bool isStopped )
+{
+    const char * str;
+    switch( t ) {
+        case 0: str = isStopped ? "None (Stopped)\n" : "None\n"; break;
+        case 1: str = "In Progress\n"; break;
+        default: str = ctime( &t ); break;
+    }
+    return str;
+}
+
 static void
 printDetails( tr_benc * top )
 {
@@ -705,6 +749,9 @@ printDetails( tr_benc * top )
             char         buf[512];
             char         buf2[512];
             int64_t      i, j, k;
+            tr_bool      isStopped;
+
+            isStopped = tr_bencDictFindInt( t, "status", &i ) && (i==TR_STATUS_STOPPED);
 
             printf( "NAME\n" );
             if( tr_bencDictFindInt( t, "id", &i ) )
@@ -818,42 +865,24 @@ printDetails( tr_benc * top )
             printf( "\n" );
 
             printf( "TRACKER\n" );
-            if( tr_bencDictFindInt( t, "lastAnnounceTime", &i ) && i )
-            {
-                const time_t tt = i;
-                printf( "  Latest announce: %s", ctime( &tt ) );
-            }
+            if( tr_bencDictFindInt( t, "lastAnnounceTime", &i ) )
+                printf( "  Latest announce: %s", getTrackerDateStr( (time_t)i, isStopped ) );
             if( tr_bencDictFindStr( t, "announceURL", &str ) )
                 printf( "  Announce URL: %s\n", str );
-            if( tr_bencDictFindStr( t, "announceResponse",
-                                    &str ) && str && *str )
+            if( tr_bencDictFindStr( t, "announceResponse", &str ) && str && *str )
                 printf( "  Announce response: %s\n", str );
-            if( tr_bencDictFindInt( t, "nextAnnounceTime", &i ) && i )
-            {
-                const time_t tt = i;
-                printf( "  Next announce:   %s", ctime( &tt ) );
-            }
-            if( tr_bencDictFindInt( t, "lastScrapeTime", &i ) && i )
-            {
-                const time_t tt = i;
-                printf( "  Latest scrape:   %s", ctime( &tt ) );
-            }
+            if( tr_bencDictFindInt( t, "nextAnnounceTime", &i ) )
+                printf( "  Next announce:   %s", getTrackerDateStr( (time_t)i, isStopped ) );
+            if( tr_bencDictFindInt( t, "lastScrapeTime", &i ) )
+                printf( "  Latest scrape:   %s", getTrackerDateStr( (time_t)i, isStopped ) );
             if( tr_bencDictFindStr( t, "scrapeResponse", &str ) )
                 printf( "  Scrape response: %s\n", str );
-            if( tr_bencDictFindInt( t, "nextScrapeTime", &i ) && i )
-            {
-                const time_t tt = i;
-                printf( "  Next scrape:     %s", ctime( &tt ) );
-            }
-            if( tr_bencDictFindInt( t, "seeders", &i )
-              && tr_bencDictFindInt( t, "leechers", &j ) )
-                printf(
-                    "  Tracker knows of %" PRId64 " seeders and %" PRId64
-                    " leechers\n", i, j );
+            if( tr_bencDictFindInt( t, "nextScrapeTime", &i ) )
+                printf( "  Next scrape:     %s", getTrackerDateStr( (time_t)i, isStopped ) );
+            if( tr_bencDictFindInt( t, "seeders", &i ) && tr_bencDictFindInt( t, "leechers", &j ) )
+                printf( "  Tracker knows of %" PRId64 " seeders and %" PRId64 " leechers\n", i, j );
             if( tr_bencDictFindInt( t, "timesCompleted", &i ) )
-                printf(
-                    "  Tracker has seen %" PRId64
-                    " clients complete this torrent\n", i );
+                printf( "  Tracker has seen %" PRId64 " clients complete this torrent\n", i );
             printf( "\n" );
 
             printf( "ORIGINS\n" );
@@ -1055,7 +1084,7 @@ processResponse( const char * host,
     tr_benc top;
 
     if( debug )
-        fprintf( stderr, "got response:\n--------\n%*.*s\n--------\n", 
+        fprintf( stderr, "got response:\n--------\n%*.*s\n--------\n",
                  (int)len, (int)len, (const char*) response );
 
     if( tr_jsonParse( response, len, &top, NULL ) )
@@ -1124,7 +1153,7 @@ processRequests( const char *  host,
         CURLcode res;
         curl_easy_setopt( curl, CURLOPT_POSTFIELDS, reqs[i] );
         if( debug )
-            fprintf( stderr, "posting:\n--------\n%s\n--------\n", reqs[i] ); 
+            fprintf( stderr, "posting:\n--------\n%s\n--------\n", reqs[i] );
         if( ( res = curl_easy_perform( curl ) ) )
             tr_nerr( MY_NAME, "(%s:%d) %s", host, port,
                     curl_easy_strerror( res ) );

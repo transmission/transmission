@@ -53,5 +53,5 @@ rm -rf $RPM_BUILD_ROOT
 
 %changelog
 
-* Wed Jul 18 2006 Charles Kerr <charles@rebelbase.com>
+* Wed Jul 18 2006 Charles Kerr <charles@transmissionbt.com>
 - first draft at a spec file, cribbed from Pan's spec file

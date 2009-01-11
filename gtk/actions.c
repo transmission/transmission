@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2007-2008 Charles Kerr <charles@rebelbase.com>
+ * This file Copyright (C) 2007-2009 Charles Kerr <charles@transmissionbt.com>
  *
  * This file is licensed by the GPL version 2.  Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
@@ -108,64 +108,31 @@ static GtkToggleActionEntry  pref_toggle_entries[] =
 
 static GtkActionEntry        entries[] =
 {
-    { "torrent-menu",         NULL,                           N_(
-          "_Torrent" ),
-      NULL,            NULL,                   NULL                    },
-    { "view-menu",            NULL,                  N_( "_View" ),
-      NULL,            NULL,                   NULL                    },
-    { "sort-menu",            NULL,                  N_(
-          "_Sort Torrents By" ),        NULL,            NULL,
-      NULL                    },
-    { "edit-menu",            NULL,                  N_( "_Edit" ),
-      NULL,            NULL,                   NULL                    },
-    { "help-menu",            NULL,                  N_( "_Help" ),
-      NULL,            NULL,                   NULL                    },
-    { "add-torrent-toolbar",  GTK_STOCK_ADD,         NULL,
-      NULL,            N_( "Add a torrent" ),  G_CALLBACK( action_cb ) },
-    { "add-torrent-menu",     GTK_STOCK_ADD,         N_( "_Add..." ),
-      "<control>D",    N_( "Add a torrent" ),  G_CALLBACK( action_cb ) },
-    { "start-torrent",        GTK_STOCK_MEDIA_PLAY,
-      N_( "_Start" ), "<control>S", N_( "Start torrent" ), G_CALLBACK(
-          action_cb ) },
-    { "show-stats",           NULL,                  N_( "_Statistics" ),
-      NULL,            NULL,                   G_CALLBACK( action_cb ) },
-    { "verify-torrent",       NULL,
-      N_( "_Verify Local Data" ), NULL, NULL, G_CALLBACK( action_cb ) },
-    { "pause-torrent",        GTK_STOCK_MEDIA_PAUSE,
-      N_( "_Pause" ), "<control>P", N_( "Pause torrent" ), G_CALLBACK(
-          action_cb ) },
-    { "remove-torrent",       GTK_STOCK_REMOVE,      NULL,
-      "Delete",        N_( "Remove torrent" ), G_CALLBACK( action_cb ) },
-    { "delete-torrent",       GTK_STOCK_DELETE,      N_(
-          "_Delete Files and Remove" ), "<shift>Delete", NULL,
-      G_CALLBACK( action_cb ) },
-    { "new-torrent",          GTK_STOCK_NEW,         N_( "_New..." ),
-      NULL,
-      N_( "Create a torrent" ),
-      G_CALLBACK( action_cb ) },
-    { "quit",                 GTK_STOCK_QUIT,        N_( "_Quit" ),
-      NULL,            NULL,                   G_CALLBACK( action_cb ) },
-    { "select-all",           GTK_STOCK_SELECT_ALL,
-      N_( "Select _All" ), "<control>A", NULL, G_CALLBACK( action_cb ) },
-    { "deselect-all",         NULL,
-      N_( "Dese_lect All" ), "<shift><control>A", NULL, G_CALLBACK(
-          action_cb ) },
-    { "edit-preferences",     GTK_STOCK_PREFERENCES, NULL,
-      NULL,            NULL,                   G_CALLBACK( action_cb ) },
-    { "show-torrent-details", GTK_STOCK_INFO,
-      N_( "_Details" ), "<alt>Return", N_( "Torrent details" ), G_CALLBACK(
-          action_cb ) },
-    { "open-torrent-folder",  GTK_STOCK_OPEN,
-      N_( "_Open Folder" ), NULL, NULL, G_CALLBACK( action_cb ) },
-    { "show-about-dialog",    GTK_STOCK_ABOUT,       NULL,
-      NULL,            NULL,                   G_CALLBACK( action_cb ) },
-    { "help",                 GTK_STOCK_HELP,        N_( "_Contents" ),
-      "F1",            NULL,                   G_CALLBACK( action_cb ) },
-    { "update-tracker",       GTK_STOCK_NETWORK,
-      N_( "Ask Tracker for _More Peers" ), NULL, NULL, G_CALLBACK(
-          action_cb ) },
-    { "present-main-window",  NULL,                  NULL,
-      NULL,            NULL,                   G_CALLBACK( action_cb ) },
+    { "torrent-menu", NULL, N_( "_Torrent" ), NULL, NULL, NULL  },
+    { "view-menu", NULL, N_( "_View" ), NULL, NULL, NULL  },
+    { "sort-menu", NULL, N_( "_Sort Torrents By" ), NULL, NULL, NULL },
+    { "edit-menu", NULL, N_( "_Edit" ), NULL, NULL, NULL },
+    { "help-menu", NULL, N_( "_Help" ), NULL, NULL, NULL },
+    { "add-torrent-toolbar",  GTK_STOCK_ADD, NULL, NULL, N_( "Add a torrent" ),  G_CALLBACK( action_cb ) },
+    { "add-torrent-menu", GTK_STOCK_ADD, N_( "_Add..." ), "<control>D", N_( "Add a torrent" ), G_CALLBACK( action_cb ) },
+    { "start-torrent", GTK_STOCK_MEDIA_PLAY, N_( "_Start" ), "<control>S", N_( "Start torrent" ), G_CALLBACK( action_cb ) },
+    { "show-stats", NULL, N_( "_Statistics" ), NULL, NULL, G_CALLBACK( action_cb ) },
+    { "verify-torrent", NULL, N_( "_Verify Local Data" ), NULL, NULL, G_CALLBACK( action_cb ) },
+    { "pause-torrent", GTK_STOCK_MEDIA_PAUSE, N_( "_Pause" ), "<control>P", N_( "Pause torrent" ), G_CALLBACK( action_cb ) },
+    { "pause-all-torrents", GTK_STOCK_MEDIA_PAUSE, N_( "_Pause All" ), NULL, N_( "Pause all torrents" ), G_CALLBACK( action_cb ) },
+    { "remove-torrent", GTK_STOCK_REMOVE, NULL, "Delete", N_( "Remove torrent" ), G_CALLBACK( action_cb ) },
+    { "delete-torrent", GTK_STOCK_DELETE, N_( "_Delete Files and Remove" ), "<shift>Delete", NULL, G_CALLBACK( action_cb ) },
+    { "new-torrent", GTK_STOCK_NEW, N_( "_New..." ), NULL, N_( "Create a torrent" ), G_CALLBACK( action_cb ) },
+    { "quit", GTK_STOCK_QUIT, N_( "_Quit" ), NULL, NULL, G_CALLBACK( action_cb ) },
+    { "select-all", GTK_STOCK_SELECT_ALL, N_( "Select _All" ), "<control>A", NULL, G_CALLBACK( action_cb ) },
+    { "deselect-all", NULL, N_( "Dese_lect All" ), "<shift><control>A", NULL, G_CALLBACK( action_cb ) },
+    { "edit-preferences", GTK_STOCK_PREFERENCES, NULL, NULL, NULL, G_CALLBACK( action_cb ) },
+    { "show-torrent-properties", GTK_STOCK_PROPERTIES, NULL, "<alt>Return", N_( "Torrent properties" ), G_CALLBACK( action_cb ) },
+    { "open-torrent-folder",  GTK_STOCK_OPEN, N_( "_Open Folder" ), NULL, NULL, G_CALLBACK( action_cb ) },
+    { "show-about-dialog", GTK_STOCK_ABOUT, NULL, NULL, NULL, G_CALLBACK( action_cb ) },
+    { "help", GTK_STOCK_HELP, N_( "_Contents" ), "F1", NULL, G_CALLBACK( action_cb ) },
+    { "update-tracker", GTK_STOCK_NETWORK, N_( "Ask Tracker for _More Peers" ), NULL, NULL, G_CALLBACK( action_cb ) },
+    { "present-main-window", NULL, NULL, NULL, NULL, G_CALLBACK( action_cb ) },
 };
 
 typedef struct

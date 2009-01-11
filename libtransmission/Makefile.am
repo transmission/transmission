@@ -39,6 +39,7 @@ libtransmission_a_SOURCES = \
     ptrarray.c \
     publish.c \
     ratecontrol.c \
+    request-list.c \
     resume.c \
     rpcimpl.c \
     rpc-server.c \
@@ -86,6 +87,7 @@ noinst_HEADERS = \
     ptrarray.h \
     publish.h \
     ratecontrol.h \
+    request-list.h \
     resume.h \
     rpcimpl.h \
     rpc-server.h \
@@ -108,6 +110,7 @@ TESTS = \
     clients-test \
     json-test \
     peer-msgs-test \
+    request-list-test \
     rpc-test \
     test-peer-id \
     utils-test
@@ -149,13 +152,17 @@ rpc_test_SOURCES = rpc-test.c
 rpc_test_LDADD = ${apps_ldadd}
 rpc_test_LDFLAGS = ${apps_ldflags}
 
-peer_msgs_test_SOURCES = peer-msgs-test.c
-peer_msgs_test_LDADD = ${apps_ldadd}
-peer_msgs_test_LDFLAGS = ${apps_ldflags}
-
 test_peer_id_SOURCES = test-peer-id.c
 test_peer_id_LDADD = ${apps_ldadd}
 test_peer_id_LDFLAGS = ${apps_ldflags}
+
+request_list_test_SOURCES = request-list-test.c
+request_list_test_LDADD = ${apps_ldadd}
+request_list_test_LDFLAGS = ${apps_ldflags}
+
+peer_msgs_test_SOURCES = peer-msgs-test.c
+peer_msgs_test_LDADD = ${apps_ldadd}
+peer_msgs_test_LDFLAGS = ${apps_ldflags}
 
 utils_test_SOURCES = utils-test.c
 utils_test_LDADD = ${apps_ldadd}

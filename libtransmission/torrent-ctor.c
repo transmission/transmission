@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2007-2008 Charles Kerr <charles@rebelbase.com>
+ * This file Copyright (C) 2007-2009 Charles Kerr <charles@transmissionbt.com>
  *
  * This file is licensed by the GPL version 2.  Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
@@ -18,15 +18,13 @@
 #include "torrent.h" /* tr_ctorGetSave() */
 #include "utils.h"
 
-#define DEFAULT_MAX_CONNECTED_PEERS 50
-
 struct optional_args
 {
-    unsigned int    isSet_paused      : 1;
-    unsigned int    isSet_connected   : 1;
-    unsigned int    isSet_downloadDir : 1;
+    tr_bool         isSet_paused;
+    tr_bool         isSet_connected;
+    tr_bool         isSet_downloadDir;
 
-    unsigned int    isPaused          : 1;
+    tr_bool         isPaused;
     uint16_t        peerLimit;
     char          * downloadDir;
 };
@@ -35,12 +33,12 @@ struct optional_args
  * @ingroup tr_ctor */
 struct tr_ctor
 {
-    const tr_handle *       handle;
-    unsigned int            saveInOurTorrentsDir : 1;
-    unsigned int            doDelete             : 1;
+    const tr_session *      session;
+    tr_bool                 saveInOurTorrentsDir;
+    tr_bool                 doDelete;
 
-    unsigned int            isSet_metainfo       : 1;
-    unsigned int            isSet_delete         : 1;
+    tr_bool                 isSet_metainfo;
+    tr_bool                 isSet_delete;
     tr_benc                 metainfo;
     char *                  sourceFile;
 
@@ -139,7 +137,7 @@ tr_ctorSetMetainfoFromHash( tr_ctor *    ctor,
     int          err;
     const char * filename;
 
-    filename = tr_sessionFindTorrentFile( ctor->handle, hashString );
+    filename = tr_sessionFindTorrentFile( ctor->session, hashString );
     if( !filename )
         err = EINVAL;
     else
@@ -154,9 +152,9 @@ tr_ctorSetMetainfoFromHash( tr_ctor *    ctor,
 
 void
 tr_ctorSetDeleteSource( tr_ctor * ctor,
-                        uint8_t   deleteSource )
+                        tr_bool   deleteSource )
 {
-    ctor->doDelete = deleteSource ? 1 : 0;
+    ctor->doDelete = deleteSource != 0;
     ctor->isSet_delete = 1;
 }
 
@@ -180,9 +178,9 @@ tr_ctorGetDeleteSource( const tr_ctor * ctor,
 
 void
 tr_ctorSetSave( tr_ctor * ctor,
-                int       saveInOurTorrentsDir )
+                tr_bool   saveInOurTorrentsDir )
 {
-    ctor->saveInOurTorrentsDir = saveInOurTorrentsDir ? 1 : 0;
+    ctor->saveInOurTorrentsDir = saveInOurTorrentsDir != 0;
 }
 
 int
@@ -194,7 +192,7 @@ tr_ctorGetSave( const tr_ctor * ctor )
 void
 tr_ctorSetPaused( tr_ctor *   ctor,
                   tr_ctorMode mode,
-                  uint8_t     isPaused )
+                  tr_bool     isPaused )
 {
     struct optional_args * args = &ctor->optionalArgs[mode];
 
@@ -298,14 +296,14 @@ tr_ctorGetMetainfo( const tr_ctor *  ctor,
 ***/
 
 tr_ctor*
-tr_ctorNew( const tr_handle * handle )
+tr_ctorNew( const tr_session * session )
 {
     tr_ctor * ctor = tr_new0( struct tr_ctor, 1 );
 
-    ctor->handle = handle;
-    tr_ctorSetPeerLimit( ctor, TR_FALLBACK, DEFAULT_MAX_CONNECTED_PEERS );
+    ctor->session = session;
+    tr_ctorSetPeerLimit( ctor, TR_FALLBACK, session->peerLimitPerTorrent );
     tr_ctorSetPaused( ctor, TR_FALLBACK, FALSE );
-    tr_ctorSetDownloadDir( ctor, TR_FALLBACK, handle->downloadDir );
+    tr_ctorSetDownloadDir( ctor, TR_FALLBACK, session->downloadDir );
     tr_ctorSetSave( ctor, TRUE );
     return ctor;
 }

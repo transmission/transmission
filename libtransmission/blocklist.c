@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2008 Charles Kerr <charles@rebelbase.com>
+ * This file Copyright (C) 2008-2009 Charles Kerr <charles@transmissionbt.com>
  *
  * This file is licensed by the GPL version 2.  Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
@@ -25,14 +25,16 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <assert.h>
 
 #include "ggets.h"
 
 #include "transmission.h"
 #include "platform.h"
 #include "blocklist.h"
-#include "net.h" /* tr_netResolve() */
+#include "net.h"
 #include "utils.h"
+
 
 /***
 ****  PRIVATE
@@ -46,7 +48,7 @@ struct tr_ip_range
 
 struct tr_blocklist
 {
-    unsigned int          isEnabled : 1;
+    tr_bool               isEnabled;
     int                   fd;
     size_t                ruleCount;
     size_t                byteCount;
@@ -198,20 +200,22 @@ _tr_blocklistSetEnabled( tr_blocklist * b,
 }
 
 int
-_tr_blocklistHasAddress( tr_blocklist         * b,
-                         const struct in_addr * addr )
+_tr_blocklistHasAddress( tr_blocklist     * b,
+                         const tr_address * addr )
 {
     uint32_t                   needle;
     const struct tr_ip_range * range;
 
-    if( !b->isEnabled )
+    assert( tr_isAddress( addr ) );
+
+    if( !b->isEnabled || addr->type == TR_AF_INET6 )
         return 0;
 
     blocklistEnsureLoaded( b );
     if( !b->rules )
         return 0;
 
-    needle = ntohl( addr->s_addr );
+    needle = ntohl( addr->addr.addr4.s_addr );
 
     range = bsearch( &needle,
                      b->rules,
@@ -257,10 +261,10 @@ _tr_blocklistSetContent( tr_blocklist * b,
 
     while( !fggets( &line, in ) )
     {
-        char *  rangeBegin;
-        char *  rangeEnd;
-        char *  crpos;
-        struct in_addr in_addr;
+        char * rangeBegin;
+        char * rangeEnd;
+        char * crpos;
+        tr_address  addr;
         struct tr_ip_range range;
 
         rangeBegin = strrchr( line, ':' );
@@ -270,17 +274,16 @@ _tr_blocklistSetContent( tr_blocklist * b,
         rangeEnd = strchr( rangeBegin, '-' );
         if( !rangeEnd ){ free( line ); continue; }
         *rangeEnd++ = '\0';
-
         if(( crpos = strchr( rangeEnd, '\r' )))
             *crpos = '\0';
 
-        if( tr_netResolve( rangeBegin, &in_addr ) )
+        if( !tr_pton( rangeBegin, &addr ) )
             tr_err( "blocklist skipped invalid address [%s]\n", rangeBegin );
-        range.begin = ntohl( in_addr.s_addr );
+        range.begin = ntohl( addr.addr.addr4.s_addr );
 
-        if( tr_netResolve( rangeEnd, &in_addr ) )
+        if( !tr_pton( rangeEnd, &addr ) )
             tr_err( "blocklist skipped invalid address [%s]\n", rangeEnd );
-        range.end = ntohl( in_addr.s_addr );
+        range.end = ntohl( addr.addr.addr4.s_addr );
 
         free( line );
 

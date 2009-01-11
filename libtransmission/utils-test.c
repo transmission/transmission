@@ -1,6 +1,8 @@
 #include <stdio.h> /* fprintf */
 #include <string.h> /* strcmp */
 #include "transmission.h"
+#include <unistd.h> /* ssize_t */
+#include "ConvertUTF.h" /* tr_utf8_validate*/
 #include "platform.h"
 #include "utils.h"
 #include "crypto.h"
@@ -135,6 +137,48 @@ test_buildpath( void )
     return 0;
 }
 
+static int
+test_utf8( void )
+{
+    const char * in;
+    char * out;
+    tr_bool err;
+
+    in = "hello world";
+    out = tr_utf8clean( in, -1, &err );
+    check( err == FALSE )
+    check( out != NULL )
+    check( !strcmp( out, in ) )
+    tr_free( out );
+
+    in = "hello world";
+    out = tr_utf8clean( in, 5, &err );
+    check( err == FALSE )
+    check( out != NULL )
+    check( !strcmp( out, "hello" ) )
+    tr_free( out );
+
+    /* this version is not utf-8 */
+    in = "“Û‰ÌÓ ·˚Ú¸ ¡Ó„ÓÏ";
+    out = tr_utf8clean( in, 17, &err );
+    check( out != NULL )
+    check( err != 0 )
+    check( strlen( out ) == 17 )
+    check( tr_utf8_validate( out, -1, NULL ) )
+    tr_free( out );
+
+    /* same string, but utf-8 clean */
+    in = "√í√∞√≥√§√≠√Æ √°√ª√≤√º √Å√Æ√£√Æ√¨";
+    out = tr_utf8clean( in, -1, &err );
+    check( out != NULL )
+    check( !err );
+    check( tr_utf8_validate( out, -1, NULL ) )
+    check ( !strcmp( in, out ) )
+    tr_free( out );
+
+    return 0;
+}
+
 int
 main( void )
 {
@@ -159,6 +203,8 @@ main( void )
     if( ( i = test_strstrip( ) ) )
         return i;
     if( ( i = test_buildpath( ) ) )
+        return i;
+    if( ( i = test_utf8( ) ) )
         return i;
 
     /* test that tr_cryptoRandInt() stays in-bounds */

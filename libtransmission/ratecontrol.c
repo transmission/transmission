@@ -29,34 +29,14 @@
 #include "ratecontrol.h"
 #include "utils.h"
 
-enum
-{
-    INTERVAL_MSEC = TR_RATECONTROL_HISTORY_MSEC,
-
-    GRANULARITY_MSEC = 250,
-
-    HISTORY_SIZE = ( INTERVAL_MSEC / GRANULARITY_MSEC )
-};
-
-struct tr_transfer
-{
-    uint64_t    date;
-    uint64_t    size;
-};
-
-struct tr_ratecontrol
-{
-    int                   newest;
-    struct tr_transfer    transfers[HISTORY_SIZE];
-};
-
 /* return the xfer rate over the last `interval' seconds in KiB/sec */
 static float
 rateForInterval( const tr_ratecontrol * r,
-                 int                    interval_msec )
+                 int                    interval_msec,
+                 uint64_t               now )
 {
     uint64_t       bytes = 0;
-    const uint64_t cutoff = tr_date ( ) - interval_msec;
+    const uint64_t cutoff = (now?now:tr_date()) - interval_msec;
     int            i = r->newest;
 
     for( ; ; )
@@ -66,7 +46,7 @@ rateForInterval( const tr_ratecontrol * r,
 
         bytes += r->transfers[i].size;
 
-        if( --i == -1 ) i = HISTORY_SIZE - 1; /* circular history */
+        if( --i == -1 ) i = TR_RC_HISTORY_SIZE - 1; /* circular history */
         if( i == r->newest ) break; /* we've come all the way around */
     }
 
@@ -77,30 +57,13 @@ rateForInterval( const tr_ratecontrol * r,
 ****
 ***/
 
-tr_ratecontrol*
-tr_rcInit( void )
-{
-    return tr_new0( tr_ratecontrol, 1 );
-}
-
-void
-tr_rcClose( tr_ratecontrol * r )
-{
-    memset( r, 0, sizeof( tr_ratecontrol ) );
-    tr_free( r );
-}
-
-/***
-****
-***/
-
 float
-tr_rcRate( const tr_ratecontrol * r )
+tr_rcRate( const tr_ratecontrol * r, uint64_t now )
 {
     float ret = 0.0f;
 
     if( r )
-        ret = rateForInterval( r, INTERVAL_MSEC );
+        ret = rateForInterval( r, TR_RC_HISTORY_MSEC, now );
 
     return ret;
 }
@@ -115,11 +78,11 @@ tr_rcTransferred( tr_ratecontrol * r,
 {
     const uint64_t now = tr_date ( );
 
-    if( r->transfers[r->newest].date + GRANULARITY_MSEC >= now )
+    if( r->transfers[r->newest].date + TR_RC_GRANULARITY_MSEC >= now )
         r->transfers[r->newest].size += size;
     else
     {
-        if( ++r->newest == HISTORY_SIZE ) r->newest = 0;
+        if( ++r->newest == TR_RC_HISTORY_SIZE ) r->newest = 0;
         r->transfers[r->newest].date = now;
         r->transfers[r->newest].size = size;
     }

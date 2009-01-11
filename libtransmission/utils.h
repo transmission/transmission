@@ -1,35 +1,27 @@
-/******************************************************************************
+/*
+ * This file Copyright (C) 2009 Charles Kerr <charles@transmissionbt.com>
+ *
+ * This file is licensed by the GPL version 2.  Works owned by the
+ * Transmission project are granted a special exemption to clause 2(b)
+ * so that the bulk of its code can remain under the MIT license. 
+ * This exemption does not extend to derived works not owned by
+ * the Transmission project.
+ *
  * $Id$
- *
- * Copyright (c) 2005-2008 Transmission authors and contributors
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- *****************************************************************************/
+ */
 
 #ifndef TR_UTILS_H
 #define TR_UTILS_H 1
 
 #include <inttypes.h>
 #include <stdarg.h>
-#include <stddef.h> /* for size_t */
+#include <stddef.h> /* size_t */
 #include <stdio.h> /* FILE* */
+#include <string.h> /* memcpy()* */
+#include <stdlib.h> /* malloc() */
 #include <time.h> /* time_t* */
+
+#include "transmission.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -107,22 +99,11 @@ extern "C" {
  #define _( a ) tr_strip_positional_args( a )
 #endif
 
-#define tr_nerr( n, ... ) tr_msg( __FILE__, __LINE__, TR_MSG_ERR, n, __VA_ARGS__ )
-#define tr_ninf( n, ... ) tr_msg( __FILE__, __LINE__, TR_MSG_INF, n, __VA_ARGS__ )
-#define tr_ndbg( n, ... ) tr_msg( __FILE__, __LINE__, TR_MSG_DBG, n, __VA_ARGS__ )
+/****
+*****
+****/
 
-#define tr_torerr( tor, ... ) tr_msg( __FILE__, __LINE__, TR_MSG_ERR, tor->info.name, __VA_ARGS__ )
-#define tr_torinf( tor, ... ) tr_msg( __FILE__, __LINE__, TR_MSG_INF, tor->info.name, __VA_ARGS__ )
-#define tr_tordbg( tor, ... ) tr_msg( __FILE__, __LINE__, TR_MSG_DBG, tor->info.name, __VA_ARGS__ )
-
-#define tr_err( ... ) tr_msg( __FILE__, __LINE__, TR_MSG_ERR, NULL, __VA_ARGS__ )
-#define tr_inf( ... ) tr_msg( __FILE__, __LINE__, TR_MSG_INF, NULL, __VA_ARGS__ )
-#define tr_dbg( ... ) tr_msg( __FILE__, __LINE__, TR_MSG_DBG, NULL, __VA_ARGS__ )
-
-int            tr_wildmat( const char * text,
-                           const char * pattern );
-
-void           tr_msgInit( void );
+int            tr_msgLoggingIsActive( int level );
 
 void           tr_msg( const char * file,
                        int          line,
@@ -131,9 +112,65 @@ void           tr_msg( const char * file,
                        const char * fmt,
                        ... ) TR_GNUC_PRINTF( 5, 6 );
 
+#define tr_nerr( n, ... ) \
+    do { \
+        if( tr_msgLoggingIsActive( TR_MSG_ERR ) ) \
+            tr_msg( __FILE__, __LINE__, TR_MSG_ERR, n, __VA_ARGS__ ); \
+    } while( 0 )
+
+#define tr_ninf( n, ... ) \
+    do { \
+        if( tr_msgLoggingIsActive( TR_MSG_INF) ) \
+            tr_msg( __FILE__, __LINE__, TR_MSG_INF, n, __VA_ARGS__ ); \
+    } while( 0 )
+
+#define tr_ndbg( n, ... ) \
+    do { \
+        if( tr_msgLoggingIsActive( TR_MSG_DBG) ) \
+            tr_msg( __FILE__, __LINE__, TR_MSG_DBG, n, __VA_ARGS__ ); \
+    } while( 0 )
+
+#define tr_torerr( tor, ... ) \
+    do { \
+        if( tr_msgLoggingIsActive( TR_MSG_ERR ) ) \
+            tr_msg( __FILE__, __LINE__, TR_MSG_ERR, tor->info.name, __VA_ARGS__ ); \
+    } while( 0 )
+
+#define tr_torinf( tor, ... ) \
+    do { \
+        if( tr_msgLoggingIsActive( TR_MSG_INF ) ) \
+            tr_msg( __FILE__, __LINE__, TR_MSG_INF, tor->info.name, __VA_ARGS__ ); \
+    } while( 0 )
+
+#define tr_tordbg( tor, ... ) \
+    do { \
+        if( tr_msgLoggingIsActive( TR_MSG_DBG ) ) \
+            tr_msg( __FILE__, __LINE__, TR_MSG_DBG, tor->info.name, __VA_ARGS__ ); \
+    } while( 0 )
+
+#define tr_err( ... ) \
+    do { \
+        if( tr_msgLoggingIsActive( TR_MSG_ERR ) ) \
+            tr_msg( __FILE__, __LINE__, TR_MSG_ERR, NULL, __VA_ARGS__ ); \
+    } while( 0 )
+
+#define tr_inf( ... ) \
+    do { \
+        if( tr_msgLoggingIsActive( TR_MSG_INF ) ) \
+            tr_msg( __FILE__, __LINE__, TR_MSG_INF, NULL, __VA_ARGS__ ); \
+    } while( 0 )
+
+#define tr_dbg( ... ) \
+    do { \
+        if( tr_msgLoggingIsActive( TR_MSG_DBG ) ) \
+            tr_msg( __FILE__, __LINE__, TR_MSG_DBG, NULL, __VA_ARGS__ ); \
+    } while( 0 )
+
+
+
 FILE*          tr_getLog( void );
 
-int            tr_deepLoggingIsActive( void );
+tr_bool        tr_deepLoggingIsActive( void );
 
 void           tr_deepLog( const char * file,
                            int          line,
@@ -144,8 +181,9 @@ void           tr_deepLog( const char * file,
 char*          tr_getLogTimeStr( char * buf,
                                  int    buflen );
 
-/** a portability wrapper for getcwd(). */
-char*          tr_getcwd( void ) TR_GNUC_MALLOC;
+
+int            tr_wildmat( const char * text,
+                           const char * pattern );
 
 /** a portability wrapper for basename(). */
 char*          tr_basename( const char * path ) TR_GNUC_MALLOC;
@@ -199,6 +237,26 @@ uint64_t       tr_date( void );
 /* wait the specified number of milliseconds */
 void           tr_wait( uint64_t delay_milliseconds );
 
+char*          tr_utf8clean( const char  * str,
+                             ssize_t       max_len,
+                             tr_bool     * err );
+
+
+/***
+****
+***/
+
+struct evbuffer;
+
+/** @brief pool of reusable buffers
+    @see tr_releaseBuffer() */
+struct evbuffer * tr_getBuffer( void );
+
+/** @brief return a buffer to the pool
+    @see tr_getBuffer() */
+void tr_releaseBuffer( struct evbuffer * buf );
+
+
 /***
 ****
 ***/
@@ -216,33 +274,50 @@ void           tr_wait( uint64_t delay_milliseconds );
 ****
 ***/
 
+static TR_INLINE void* tr_malloc( size_t size )
+{
+    return size ? malloc( size ) : NULL;
+}
+static TR_INLINE void* tr_malloc0( size_t size )
+{
+    return size ? calloc( 1, size ) : NULL;
+}
+static TR_INLINE void tr_free( void * p )
+{
+    if( p != NULL )
+        free( p );
+}
+static TR_INLINE void* tr_memdup( const void * src, int byteCount )
+{
+    return memcpy( tr_malloc( byteCount ), src, byteCount );
+}
+
 #define tr_new( struct_type, n_structs )           \
-    ( (struct_type *) tr_malloc ( ( (size_t) sizeof ( struct_type ) ) * ( (\
-                                                                             size_t) (\
-                                                                             n_structs ) ) ) )
+    ( (struct_type *) tr_malloc ( ( (size_t) sizeof ( struct_type ) ) * ( ( size_t) ( n_structs ) ) ) )
+
 #define tr_new0( struct_type, n_structs )          \
-    ( (struct_type *) tr_malloc0 ( ( (size_t) sizeof ( struct_type ) ) * ( (\
-                                                                              size_t) (\
-                                                                              n_structs ) ) ) )
+    ( (struct_type *) tr_malloc0 ( ( (size_t) sizeof ( struct_type ) ) * ( ( size_t) ( n_structs ) ) ) )
+
 #define tr_renew( struct_type, mem, n_structs )    \
-    ( (struct_type *) realloc ( ( mem ),\
-                               ( (size_t) sizeof ( struct_type ) ) * ( (\
-                                                                          size_t) (\
-                                                                          n_structs ) ) ) )
+    ( (struct_type *) realloc ( ( mem ), ( (size_t) sizeof ( struct_type ) ) * ( ( size_t) ( n_structs ) ) ) )
 
-void*       tr_malloc( size_t ) TR_GNUC_MALLOC;
+/** @param in is a void* so that callers can pass in both signed & unsigned without a cast */
+char* tr_strndup( const void * in, int len ) TR_GNUC_MALLOC;
 
-void*       tr_malloc0( size_t ) TR_GNUC_MALLOC;
+/** @param in is a void* so that callers can pass in both signed & unsigned without a cast */
+static TR_INLINE char* tr_strdup( const void * in )
+{
+    return tr_strndup( in, in ? strlen( (const char *) in ) : 0 );
+}
 
-void        tr_free( void* );
+/* @brief same argument list as bsearch() */
+int tr_lowerBound( const void * key,
+                   const void * base,
+                   size_t       nmemb,
+                   size_t       size,
+                   int       (* compar)(const void* key, const void* arrayMember),
+                   tr_bool    * exact_match );
 
-char*       tr_strdup( const void * str ) TR_GNUC_MALLOC;
-
-char*       tr_strndup( const void * str,
-                        int          len ) TR_GNUC_MALLOC;
-
-void*       tr_memdup( const void * src,
-                       int          byteCount ) TR_GNUC_MALLOC;
 
 char*       tr_strdup_printf( const char * fmt,
                               ... )  TR_GNUC_PRINTF( 1, 2 ) TR_GNUC_MALLOC;
@@ -302,66 +377,77 @@ int  tr_httpParseURL( const char * url,
 ****
 ***/
 
-struct tr_bitfield
+typedef struct tr_bitfield
 {
     uint8_t *  bits;
     size_t     bitCount;
     size_t     byteCount;
-};
+}
+tr_bitfield;
 
-typedef struct tr_bitfield tr_bitfield;
+tr_bitfield* tr_bitfieldConstruct( tr_bitfield*, size_t bitcount );
 
-tr_bitfield* tr_bitfieldNew( size_t bitcount ) TR_GNUC_MALLOC;
+tr_bitfield* tr_bitfieldDestruct( tr_bitfield* );
+
+static TR_INLINE tr_bitfield* tr_bitfieldNew( size_t bitcount )
+{
+    return tr_bitfieldConstruct( tr_new0( tr_bitfield, 1 ), bitcount );
+}
+
+static TR_INLINE void tr_bitfieldFree( tr_bitfield * b )
+{
+    tr_free( tr_bitfieldDestruct( b ) );
+}
 
 tr_bitfield* tr_bitfieldDup( const tr_bitfield* ) TR_GNUC_MALLOC;
 
-void         tr_bitfieldFree( tr_bitfield* );
-
 void         tr_bitfieldClear( tr_bitfield* );
 
-int          tr_bitfieldAdd(                             tr_bitfield*,
-                                                  size_t bit );
+int          tr_bitfieldAdd( tr_bitfield*, size_t bit );
 
-int          tr_bitfieldRem(                             tr_bitfield*,
-                                                  size_t bit );
+int          tr_bitfieldRem( tr_bitfield*, size_t bit );
 
-int          tr_bitfieldAddRange(                             tr_bitfield *,
-                                                       size_t begin,
-                                                       size_t end );
+int          tr_bitfieldAddRange( tr_bitfield *, size_t begin, size_t end );
 
-int          tr_bitfieldRemRange(                             tr_bitfield*,
-                                                       size_t begin,
-                                                       size_t end );
+int          tr_bitfieldRemRange( tr_bitfield*, size_t begin, size_t end );
 
-void         tr_bitfieldDifference(                         tr_bitfield *,
-                                                      const tr_bitfield * );
+void         tr_bitfieldDifference( tr_bitfield *, const tr_bitfield * );
 
 int          tr_bitfieldIsEmpty( const tr_bitfield* );
 
 size_t       tr_bitfieldCountTrueBits( const tr_bitfield* );
 
-tr_bitfield* tr_bitfieldOr(                               tr_bitfield*,
-                                                    const tr_bitfield* );
+tr_bitfield* tr_bitfieldOr( tr_bitfield*, const tr_bitfield* );
 
 /** A stripped-down version of bitfieldHas to be used
     for speed when you're looping quickly.  This version
     has none of tr_bitfieldHas()'s safety checks, so you
     need to call tr_bitfieldTestFast() first before you
     start looping. */
-#define tr_bitfieldHasFast( bitfield, nth ) \
-    ( ( bitfield->bits[( nth ) >> 3u] << ( ( nth ) & 7u ) & 0x80 ) != 0 )
+static TR_INLINE tr_bool tr_bitfieldHasFast( const tr_bitfield * b, const size_t nth )
+{
+    return ( b->bits[nth>>3u] << ( nth & 7u ) & 0x80 ) != 0;
+}
 
 /** @param high the highest nth bit you're going to access */
-#define tr_bitfieldTestFast( bitfield, high ) \
-    ( ( bitfield ) && ( ( bitfield )->bits )\
-    && ( ( high ) < ( bitfield )->bitCount ) )
+static TR_INLINE tr_bool tr_bitfieldTestFast( const tr_bitfield * b, const size_t high )
+{
+    return ( b != NULL )
+        && ( b->bits != NULL )
+        && ( high < b->bitCount );
+}
 
-#define tr_bitfieldHas( bitfield, nth ) \
-    ( tr_bitfieldTestFast( bitfield, nth )    \
-    && tr_bitfieldHasFast( bitfield, nth ) )
+static TR_INLINE tr_bool tr_bitfieldHas( const tr_bitfield * b, size_t nth )
+{
+    return tr_bitfieldTestFast( b, nth ) && tr_bitfieldHasFast( b, nth );
+}
 
-double tr_getRatio( double numerator,
-                    double denominator );
+double tr_getRatio( double numerator, double denominator );
+
+
+int tr_ptr2int( void* );
+
+void* tr_int2ptr( int );
 
 #ifdef __cplusplus
 }

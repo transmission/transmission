@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2008 Charles Kerr <charles@rebelbase.com>
+ * This file Copyright (C) 2008-2009 Charles Kerr <charles@transmissionbt.com>
  *
  * This file is licensed by the GPL version 2.  Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
@@ -240,6 +240,7 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
         else if( !memcmp( id+1, "QD", 2 ) ) four_digits( buf, buflen, "QQDownload", id+3 );
         else if( !memcmp( id+1, "RS", 2 ) ) four_digits( buf, buflen, "Rufus", id+3 );
         else if( !memcmp( id+1, "RT", 2 ) ) four_digits( buf, buflen, "Retriever", id+3 );
+        else if( !memcmp( id+1, "SD", 2 ) ) four_digits( buf, buflen, "Xunlei", id+3 );
         else if( !memcmp( id+1, "SS", 2 ) ) four_digits( buf, buflen, "SwarmScope", id+3 );
         else if( !memcmp( id+1, "SZ", 2 ) ) four_digits( buf, buflen, "Shareaza", id+3 );
         else if( !memcmp( id+1, "S~", 2 ) ) four_digits( buf, buflen, "Shareaza", id+3 );
@@ -409,7 +410,7 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
     /* No match */
     if( !*buf )
     {
-        struct evbuffer * out = evbuffer_new( );
+        struct evbuffer * out = tr_getBuffer( );
         const char *in, *in_end;
         for( in=(const char*)id, in_end=in+8; in!=in_end; ++in ) {
             if( isprint( *in ) )
@@ -419,6 +420,6 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
         }
 
         tr_strlcpy( buf, EVBUFFER_DATA( out ), buflen );
-        evbuffer_free( out );
+        tr_releaseBuffer( out );
     }
 }

@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2008 Charles Kerr <charles@rebelbase.com>
+ * This file Copyright (C) 2008-2009 Charles Kerr <charles@transmissionbt.com>
  *
  * This file is licensed by the GPL version 2.  Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
@@ -15,10 +15,10 @@
 #include <string.h>
 
 #include "transmission.h"
+#include "session.h"
 #include "bencode.h"
 #include "completion.h"
 #include "fastresume.h"
-#include "net.h"
 #include "peer-mgr.h" /* pex */
 #include "platform.h" /* tr_getResumeDir */
 #include "resume.h"
@@ -35,6 +35,7 @@
 #define KEY_MAX_PEERS       "max-peers"
 #define KEY_PAUSED          "paused"
 #define KEY_PEERS           "peers"
+#define KEY_PEERS6          "peers6"
 #define KEY_PRIORITY        "priority"
 #define KEY_PROGRESS        "progress"
 #define KEY_SPEEDLIMIT      "speed-limit"
@@ -66,12 +67,21 @@ static void
 savePeers( tr_benc *          dict,
            const tr_torrent * tor )
 {
-    tr_pex *  pex = NULL;
-    const int count = tr_peerMgrGetPeers( tor->session->peerMgr,
-                                          tor->info.hash, &pex );
+    tr_pex * pex = NULL;
+    int count = tr_peerMgrGetPeers( tor->session->peerMgr,
+                                    tor->info.hash, &pex, TR_AF_INET );
 
     if( count > 0 )
         tr_bencDictAddRaw( dict, KEY_PEERS, pex, sizeof( tr_pex ) * count );
+
+    tr_free( pex );
+    pex = NULL;
+    
+    count = tr_peerMgrGetPeers( tor->session->peerMgr, tor->info.hash, &pex,
+                                TR_AF_INET6 );
+    if( count > 0 )
+        tr_bencDictAddRaw( dict, KEY_PEERS6, pex, sizeof( tr_pex ) * count );
+    
     tr_free( pex );
 }
 
@@ -94,7 +104,22 @@ loadPeers( tr_benc *    dict,
             tr_peerMgrAddPex( tor->session->peerMgr,
                               tor->info.hash, TR_PEER_FROM_CACHE, &pex );
         }
-        tr_tordbg( tor, "Loaded %d peers from resume file", count );
+        tr_tordbg( tor, "Loaded %d IPv4 peers from resume file", count );
+        ret = TR_FR_PEERS;
+    }
+    
+    if( tr_bencDictFindRaw( dict, KEY_PEERS6, &str, &len ) )
+    {
+        int       i;
+        const int count = len / sizeof( tr_pex );
+        for( i = 0; i < count; ++i )
+        {
+            tr_pex pex;
+            memcpy( &pex, str + ( i * sizeof( tr_pex ) ), sizeof( tr_pex ) );
+            tr_peerMgrAddPex( tor->session->peerMgr,
+                              tor->info.hash, TR_PEER_FROM_CACHE, &pex );
+        }
+        tr_tordbg( tor, "Loaded %d IPv6 peers from resume file", count );
         ret = TR_FR_PEERS;
     }
 
@@ -286,7 +311,7 @@ saveProgress( tr_benc *          dict,
     }
 
     /* add the bitfield */
-    bitfield = tr_cpBlockBitfield( tor->completion );
+    bitfield = tr_cpBlockBitfield( &tor->completion );
     tr_bencDictAddRaw( p, KEY_PROGRESS_BITFIELD,
                        bitfield->bits, bitfield->byteCount );
 
@@ -354,7 +379,7 @@ loadProgress( tr_benc *    dict,
             tmp.byteCount = rawlen;
             tmp.bitCount = tmp.byteCount * 8;
             tmp.bits = (uint8_t*) raw;
-            if( !tr_cpBlockBitfieldSet( tor->completion, &tmp ) )
+            if( !tr_cpBlockBitfieldSet( &tor->completion, &tmp ) )
             {
                 tr_torrentUncheck( tor );
                 tr_tordbg(
@@ -461,7 +486,8 @@ loadFromFile( tr_torrent * tor,
     }
 
     if( ( fieldsToLoad & ( TR_FR_PROGRESS | TR_FR_DOWNLOAD_DIR ) )
-      && tr_bencDictFindStr( &top, KEY_DOWNLOAD_DIR, &str ) )
+      && ( tr_bencDictFindStr( &top, KEY_DOWNLOAD_DIR, &str ) )
+      && ( str && *str ) )
     {
         tr_free( tor->downloadDir );
         tor->downloadDir = tr_strdup( str );
@@ -561,12 +587,12 @@ setFromCtor( tr_torrent *    tor,
 
     if( fields & TR_FR_DOWNLOAD_DIR )
     {
-        const char * downloadDir;
-        if( !tr_ctorGetDownloadDir( ctor, mode, &downloadDir ) )
+        const char * path;
+        if( !tr_ctorGetDownloadDir( ctor, mode, &path ) && path && *path )
         {
             ret |= TR_FR_DOWNLOAD_DIR;
             tr_free( tor->downloadDir );
-            tor->downloadDir = tr_strdup( downloadDir );
+            tor->downloadDir = tr_strdup( path );
         }
     }
 

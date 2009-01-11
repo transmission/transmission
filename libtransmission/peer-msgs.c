@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2007-2008 Charles Kerr <charles@rebelbase.com>
+ * This file Copyright (C) 2007-2009 Charles Kerr <charles@transmissionbt.com>
  *
  * This file is licensed by the GPL version 2.  Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
@@ -20,6 +20,7 @@
 #include <event.h>
 
 #include "transmission.h"
+#include "session.h"
 #include "bencode.h"
 #include "completion.h"
 #include "crypto.h"
@@ -31,7 +32,9 @@
 #include "peer-mgr.h"
 #include "peer-mgr-private.h"
 #include "peer-msgs.h"
+#include "platform.h" /* MAX_STACK_ARRAY_SIZE */
 #include "ratecontrol.h"
+#include "request-list.h"
 #include "stats.h"
 #include "torrent.h"
 #include "trevent.h"
@@ -75,7 +78,9 @@ enum
 
     PEX_INTERVAL            = ( 90 * 1000 ), /* msec between sendPex() calls */
 
-    MAX_QUEUE_SIZE          = ( 100 ),
+
+    MAX_BLOCK_SIZE          = ( 1024 * 16 ),
+
 
     /* how long an unsent request can stay queued before it's returned
        back to the peer-mgr's pool of requests */
@@ -98,10 +103,6 @@ enum
     MAX_FAST_SET_SIZE = 3
 };
 
-/**
-***  REQUEST MANAGEMENT
-**/
-
 enum
 {
     AWAITING_BT_LENGTH,
@@ -109,136 +110,6 @@ enum
     AWAITING_BT_MESSAGE,
     AWAITING_BT_PIECE
 };
-
-struct peer_request
-{
-    uint32_t    index;
-    uint32_t    offset;
-    uint32_t    length;
-    time_t      time_requested;
-};
-
-static int
-compareRequest( const void * va, const void * vb )
-{
-    const struct peer_request * a = va;
-    const struct peer_request * b = vb;
-
-    if( a->index != b->index )
-        return a->index < b->index ? -1 : 1;
-
-    if( a->offset != b->offset )
-        return a->offset < b->offset ? -1 : 1;
-
-    if( a->length != b->length )
-        return a->length < b->length ? -1 : 1;
-
-    return 0;
-}
-
-struct request_list
-{
-    uint16_t               count;
-    uint16_t               max;
-    struct peer_request *  requests;
-};
-
-static const struct request_list REQUEST_LIST_INIT = { 0, 0, NULL };
-
-static void
-reqListReserve( struct request_list * list,
-                uint16_t              max )
-{
-    if( list->max < max )
-    {
-        list->max = max;
-        list->requests = tr_renew( struct peer_request,
-                                   list->requests,
-                                   list->max );
-    }
-}
-
-static void
-reqListClear( struct request_list * list )
-{
-    tr_free( list->requests );
-    *list = REQUEST_LIST_INIT;
-}
-
-static void
-reqListCopy( struct request_list * dest, const struct request_list * src )
-{
-    dest->count = dest->max = src->count;
-    dest->requests = tr_memdup( src->requests, dest->count * sizeof( struct peer_request ) );
-}
-
-static void
-reqListRemoveOne( struct request_list * list,
-                  int                   i )
-{
-    assert( 0 <= i && i < list->count );
-
-    memmove( &list->requests[i],
-             &list->requests[i + 1],
-             sizeof( struct peer_request ) * ( --list->count - i ) );
-}
-
-static void
-reqListAppend( struct request_list *       list,
-               const struct peer_request * req )
-{
-    if( ++list->count >= list->max )
-        reqListReserve( list, list->max + 8 );
-
-    list->requests[list->count - 1] = *req;
-}
-
-static int
-reqListPop( struct request_list * list,
-            struct peer_request * setme )
-{
-    int success;
-
-    if( !list->count )
-        success = FALSE;
-    else {
-        *setme = list->requests[0];
-        reqListRemoveOne( list, 0 );
-        success = TRUE;
-    }
-
-    return success;
-}
-
-static int
-reqListFind( struct request_list *       list,
-             const struct peer_request * key )
-{
-    uint16_t i;
-
-    for( i = 0; i < list->count; ++i )
-        if( !compareRequest( key, list->requests + i ) )
-            return i;
-
-    return -1;
-}
-
-static int
-reqListRemove( struct request_list *       list,
-               const struct peer_request * key )
-{
-    int success;
-    const int i = reqListFind( list, key );
-
-    if( i < 0 )
-        success = FALSE;
-    else {
-        reqListRemoveOne( list, i );
-        success = TRUE;
-    }
-
-    return success;
-}
 
 /**
 ***
@@ -270,7 +141,6 @@ struct tr_incoming
  */
 struct tr_peermsgs
 {
-    tr_bool         peerSentBitfield;
     tr_bool         peerSupportsPex;
     tr_bool         clientSentLtepHandshake;
     tr_bool         peerSentLtepHandshake;
@@ -279,6 +149,7 @@ struct tr_peermsgs
     uint8_t         state;
     uint8_t         ut_pex_id;
     uint16_t        pexCount;
+    uint16_t        pexCount6;
     uint16_t        maxActiveRequests;
 
     size_t                 fastsetSize;
@@ -294,7 +165,7 @@ struct tr_peermsgs
     tr_session *           session;
     tr_torrent *           torrent;
 
-    tr_publisher_t *       publisher;
+    tr_publisher           publisher;
 
     struct evbuffer *      outMessages; /* all the non-piece messages */
 
@@ -304,6 +175,7 @@ struct tr_peermsgs
 
     tr_timer             * pexTimer;
     tr_pex               * pex;
+    tr_pex               * pex6;
 
     time_t                 clientSentPexAt;
     time_t                 clientSentAnythingAt;
@@ -334,7 +206,7 @@ myDebug( const char * file, int line,
     {
         va_list           args;
         char              timestr[64];
-        struct evbuffer * buf = evbuffer_new( );
+        struct evbuffer * buf = tr_getBuffer( );
         char *            base = tr_basename( file );
 
         evbuffer_add_printf( buf, "[%s] %s - %s [%s]: ",
@@ -349,7 +221,7 @@ myDebug( const char * file, int line,
         fwrite( EVBUFFER_DATA( buf ), 1, EVBUFFER_LENGTH( buf ), fp );
 
         tr_free( base );
-        evbuffer_free( buf );
+        tr_releaseBuffer( buf );
     }
 }
 
@@ -374,7 +246,7 @@ pokeBatchPeriod( tr_peermsgs * msgs,
     }
 }
 
-static void
+static TR_INLINE void
 dbgOutMessageLen( tr_peermsgs * msgs )
 {
     dbgmsg( msgs, "outMessage size is now %zu", EVBUFFER_LENGTH( msgs->outMessages ) );
@@ -527,7 +399,7 @@ publish( tr_peermsgs * msgs, tr_peer_event * e )
     assert( msgs->peer );
     assert( msgs->peer->msgs == msgs );
 
-    tr_publisherPublish( msgs->publisher, msgs->peer, e );
+    tr_publisherPublish( &msgs->publisher, msgs->peer, e );
 }
 
 static void
@@ -653,12 +525,12 @@ tr_generateAllowedSet( tr_piece_index_t * setmePieces,
     assert( infohash );
     assert( addr );
 
-    if( 1 )
+    if( addr->type == TR_AF_INET )
     {
         uint8_t w[SHA_DIGEST_LENGTH + 4];
         uint8_t x[SHA_DIGEST_LENGTH];
 
-        *(uint32_t*)w = ntohl( htonl( addr->s_addr ) & 0xffffff00 ); /* (1) */
+        *(uint32_t*)w = ntohl( htonl( addr->addr.addr4.s_addr ) & 0xffffff00 );   /* (1) */
         memcpy( w + 4, infohash, SHA_DIGEST_LENGTH );                /* (2) */
         tr_sha1( x, w, sizeof( w ), NULL );                          /* (3) */
 
@@ -723,7 +595,7 @@ isPieceInteresting( const tr_peermsgs * msgs,
     const tr_torrent * torrent = msgs->torrent;
 
     return ( !torrent->info.pieces[piece].dnd )                 /* we want it */
-          && ( !tr_cpPieceIsComplete( torrent->completion, piece ) ) /* !have */
+          && ( !tr_cpPieceIsComplete( &torrent->completion, piece ) ) /* !have */
           && ( tr_bitfieldHas( msgs->peer->have, piece ) );    /* peer has it */
 }
 
@@ -743,7 +615,7 @@ isPeerInteresting( const tr_peermsgs * msgs )
         return FALSE;
 
     torrent = msgs->torrent;
-    bitfield = tr_cpPieceBitfield( torrent->completion );
+    bitfield = tr_cpPieceBitfield( &torrent->completion );
 
     if( !msgs->peer->have )
         return TRUE;
@@ -863,35 +735,44 @@ requestIsValid( const tr_peermsgs * msgs, const struct peer_request * req )
 }
 
 static void
+expireFromList( tr_peermsgs          * msgs,
+                struct request_list  * list,
+                const time_t           oldestAllowed )
+{
+    size_t i;
+    struct request_list tmp = REQUEST_LIST_INIT;
+
+    /* since the fifo list is sorted by time, the oldest will be first */
+    if( !list->len || ( list->fifo[0].time_requested >= oldestAllowed ) )
+        return;
+
+    /* if we found one too old, start pruning them */
+    reqListCopy( &tmp, list );
+    for( i=0; i<tmp.len; ++i ) {
+        const struct peer_request * req = &tmp.fifo[i];
+        if( req->time_requested >= oldestAllowed )
+            break;
+        tr_peerMsgsCancel( msgs, req->index, req->offset, req->length );
+    }
+    reqListClear( &tmp );
+}
+
+static void
 expireOldRequests( tr_peermsgs * msgs, const time_t now  )
 {
-    int i;
     time_t oldestAllowed;
-    struct request_list tmp = REQUEST_LIST_INIT;
     const tr_bool fext = tr_peerIoSupportsFEXT( msgs->peer->io );
     dbgmsg( msgs, "entering `expire old requests' block" );
 
     /* cancel requests that have been queued for too long */
     oldestAllowed = now - QUEUED_REQUEST_TTL_SECS;
-    reqListCopy( &tmp, &msgs->clientWillAskFor );
-    for( i=0; i<tmp.count; ++i ) {
-        const struct peer_request * req = &tmp.requests[i];
-        if( req->time_requested < oldestAllowed )
-            tr_peerMsgsCancel( msgs, req->index, req->offset, req->length );
-    }
-    reqListClear( &tmp );
+    expireFromList( msgs, &msgs->clientWillAskFor, oldestAllowed );
 
     /* if the peer doesn't support "Reject Request",
      * cancel requests that were sent too long ago. */
     if( !fext ) {
         oldestAllowed = now - SENT_REQUEST_TTL_SECS;
-        reqListCopy( &tmp, &msgs->clientAskedFor );
-        for( i=0; i<tmp.count; ++i ) {
-            const struct peer_request * req = &tmp.requests[i];
-            if( req->time_requested < oldestAllowed )
-                tr_peerMsgsCancel( msgs, req->index, req->offset, req->length );
-        }
-        reqListClear( &tmp );
+        expireFromList( msgs, &msgs->clientAskedFor, oldestAllowed );
     }
 
     dbgmsg( msgs, "leaving `expire old requests' block" );
@@ -902,7 +783,7 @@ pumpRequestQueue( tr_peermsgs * msgs, const time_t now )
 {
     const int           max = msgs->maxActiveRequests;
     int                 sent = 0;
-    int                 count = msgs->clientAskedFor.count;
+    int                 len = msgs->clientAskedFor.len;
     struct peer_request req;
 
     if( msgs->peer->clientIsChoked )
@@ -910,7 +791,7 @@ pumpRequestQueue( tr_peermsgs * msgs, const time_t now )
     if( !tr_torrentIsPieceTransferAllowed( msgs->torrent, TR_PEER_TO_CLIENT ) )
         return;
 
-    while( ( count < max ) && reqListPop( &msgs->clientWillAskFor, &req ) )
+    while( ( len < max ) && reqListPop( &msgs->clientWillAskFor, &req ) )
     {
         const tr_block_index_t block = _tr_block( msgs->torrent, req.index, req.offset );
 
@@ -919,30 +800,30 @@ pumpRequestQueue( tr_peermsgs * msgs, const time_t now )
 
         /* don't ask for it if we've already got it... this block may have
          * come in from a different peer after we cancelled a request for it */
-        if( !tr_cpBlockIsComplete( msgs->torrent->completion, block ) )
+        if( !tr_cpBlockIsComplete( &msgs->torrent->completion, block ) )
         {
             protocolSendRequest( msgs, &req );
             req.time_requested = now;
             reqListAppend( &msgs->clientAskedFor, &req );
 
-            ++count;
+            ++len;
             ++sent;
         }
     }
 
     if( sent )
         dbgmsg( msgs, "pump sent %d requests, now have %d active and %d queued",
-                sent, msgs->clientAskedFor.count, msgs->clientWillAskFor.count );
+                sent, msgs->clientAskedFor.len, msgs->clientWillAskFor.len );
 
-    if( count < max )
+    if( len < max )
         fireNeedReq( msgs );
 }
 
-static int
+static TR_INLINE int
 requestQueueIsFull( const tr_peermsgs * msgs )
 {
     const int req_max = msgs->maxActiveRequests;
-    return msgs->clientWillAskFor.count >= req_max;
+    return msgs->clientWillAskFor.len >= (size_t)req_max;
 }
 
 tr_addreq_t
@@ -981,11 +862,11 @@ tr_peerMsgsAddRequest( tr_peermsgs *    msgs,
     req.index = index;
     req.offset = offset;
     req.length = length;
-    if( reqListFind( &msgs->clientAskedFor, &req ) != -1 ) {
+    if( reqListHas( &msgs->clientAskedFor, &req ) ) {
         dbgmsg( msgs, "declining because it's a duplicate" );
         return TR_ADDREQ_DUPLICATE;
     }
-    if( reqListFind( &msgs->clientWillAskFor, &req ) != -1 ) {
+    if( reqListHas( &msgs->clientWillAskFor, &req ) ) {
         dbgmsg( msgs, "declining because it's a duplicate" );
         return TR_ADDREQ_DUPLICATE;
     }
@@ -1004,7 +885,7 @@ tr_peerMsgsAddRequest( tr_peermsgs *    msgs,
 static void
 cancelAllRequestsToPeer( tr_peermsgs * msgs, tr_bool sendCancel )
 {
-    int i;
+    size_t i;
     struct request_list a = msgs->clientWillAskFor;
     struct request_list b = msgs->clientAskedFor;
     dbgmsg( msgs, "cancelling all requests to peer" );
@@ -1012,13 +893,13 @@ cancelAllRequestsToPeer( tr_peermsgs * msgs, tr_bool sendCancel )
     msgs->clientAskedFor = REQUEST_LIST_INIT;
     msgs->clientWillAskFor = REQUEST_LIST_INIT;
 
-    for( i=0; i<a.count; ++i )
-        fireCancelledReq( msgs, &a.requests[i] );
+    for( i=0; i<a.len; ++i )
+        fireCancelledReq( msgs, &a.fifo[i] );
 
-    for( i = 0; i < b.count; ++i ) {
-        fireCancelledReq( msgs, &b.requests[i] );
+    for( i = 0; i < b.len; ++i ) {
+        fireCancelledReq( msgs, &b.fifo[i] );
         if( sendCancel )
-            protocolSendCancel( msgs, &b.requests[i] );
+            protocolSendCancel( msgs, &b.fifo[i] );
     }
 
     reqListClear( &a );
@@ -1173,21 +1054,40 @@ parseUtPex( tr_peermsgs * msgs, int msglen, struct evbuffer * inbuf )
     tr_peerIoReadBytes( msgs->peer->io, inbuf, tmp, msglen );
 
     if( tr_torrentAllowsPex( tor )
-      && ( ( loaded = !tr_bencLoad( tmp, msglen, &val, NULL ) ) )
-      && tr_bencDictFindRaw( &val, "added", &added, &added_len ) )
+      && ( ( loaded = !tr_bencLoad( tmp, msglen, &val, NULL ) ) ) )
     {
-        const uint8_t * added_f = NULL;
-        tr_pex *        pex;
-        size_t          i, n;
-        size_t          added_f_len = 0;
-        tr_bencDictFindRaw( &val, "added.f", &added_f, &added_f_len );
-        pex =
-            tr_peerMgrCompactToPex( added, added_len, added_f, added_f_len,
-                                    &n );
-        for( i = 0; i < n; ++i )
-            tr_peerMgrAddPex( msgs->session->peerMgr, tor->info.hash,
-                              TR_PEER_FROM_PEX, pex + i );
-        tr_free( pex );
+        if( tr_bencDictFindRaw( &val, "added", &added, &added_len ) )
+        {
+            const uint8_t * added_f = NULL;
+            tr_pex *        pex;
+            size_t          i, n;
+            size_t          added_f_len = 0;
+            tr_bencDictFindRaw( &val, "added.f", &added_f, &added_f_len );
+            pex =
+                tr_peerMgrCompactToPex( added, added_len, added_f, added_f_len,
+                                        &n );
+            for( i = 0; i < n; ++i )
+                tr_peerMgrAddPex( msgs->session->peerMgr, tor->info.hash,
+                                  TR_PEER_FROM_PEX, pex + i );
+            tr_free( pex );
+        }
+        
+        if( tr_bencDictFindRaw( &val, "added6", &added, &added_len ) )
+        {
+            const uint8_t * added_f = NULL;
+            tr_pex *        pex;
+            size_t          i, n;
+            size_t          added_f_len = 0;
+            tr_bencDictFindRaw( &val, "added6.f", &added_f, &added_f_len );
+            pex =
+                tr_peerMgrCompact6ToPex( added, added_len, added_f, added_f_len,
+                                         &n );
+            for( i = 0; i < n; ++i )
+                tr_peerMgrAddPex( msgs->session->peerMgr, tor->info.hash,
+                                  TR_PEER_FROM_PEX, pex + i );
+            tr_free( pex );
+        }
+        
     }
 
     if( loaded )
@@ -1299,7 +1199,7 @@ peerMadeRequest( tr_peermsgs *               msgs,
 {
     const tr_bool fext = tr_peerIoSupportsFEXT( msgs->peer->io );
     const int reqIsValid = requestIsValid( msgs, req );
-    const int clientHasPiece = reqIsValid && tr_cpPieceIsComplete( msgs->torrent->completion, req->index );
+    const int clientHasPiece = reqIsValid && tr_cpPieceIsComplete( &msgs->torrent->completion, req->index );
     const int peerIsChoked = msgs->peer->peerIsChoked;
 
     int allow = FALSE;
@@ -1392,13 +1292,19 @@ readBtPiece( tr_peermsgs      * msgs,
         /* read in another chunk of data */
         const size_t nLeft = req->length - EVBUFFER_LENGTH( msgs->incoming.block );
         size_t n = MIN( nLeft, inlen );
-        uint8_t * buf = tr_new( uint8_t, n );
-        assert( EVBUFFER_LENGTH( inbuf ) >= n );
-        tr_peerIoReadBytes( msgs->peer->io, inbuf, buf, n );
-        evbuffer_add( msgs->incoming.block, buf, n );
+        size_t i = n;
+
+        while( i > 0 )
+        {
+            uint8_t buf[MAX_STACK_ARRAY_SIZE];
+            const size_t thisPass = MIN( i, sizeof( buf ) );
+            tr_peerIoReadBytes( msgs->peer->io, inbuf, buf, thisPass );
+            evbuffer_add( msgs->incoming.block, buf, thisPass );
+            i -= thisPass;
+        }
+
         fireClientGotData( msgs, n, TRUE );
         *setme_piece_bytes_read += n;
-        tr_free( buf );
         dbgmsg( msgs, "got %zu bytes for block %u:%u->%u ... %d remain",
                n, req->index, req->offset, req->length,
                (int)( req->length - EVBUFFER_LENGTH( msgs->incoming.block ) ) );
@@ -1477,14 +1383,13 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
                 return READ_ERR;
             }
             updatePeerProgress( msgs );
-            tr_rcTransferred( msgs->torrent->swarmSpeed,
+            tr_rcTransferred( &msgs->torrent->swarmSpeed,
                               msgs->torrent->info.pieceSize );
             break;
 
         case BT_BITFIELD:
         {
             dbgmsg( msgs, "got a bitfield" );
-            msgs->peerSentBitfield = 1;
             tr_peerIoReadBytes( msgs->peer->io, inbuf, msgs->peer->have->bits, msglen );
             updatePeerProgress( msgs );
             fireNeedReq( msgs );
@@ -1601,7 +1506,7 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
     return READ_NOW;
 }
 
-static void
+static TR_INLINE void
 decrementDownloadedCount( tr_peermsgs * msgs, uint32_t byteCount )
 {
     tr_torrent * tor = msgs->torrent;
@@ -1609,7 +1514,7 @@ decrementDownloadedCount( tr_peermsgs * msgs, uint32_t byteCount )
     tor->downloadedCur -= MIN( tor->downloadedCur, byteCount );
 }
 
-static void
+static TR_INLINE void
 clientGotUnwantedBlock( tr_peermsgs * msgs, const struct peer_request * req )
 {
     decrementDownloadedCount( msgs, req->length );
@@ -1656,13 +1561,13 @@ clientGotBlock( tr_peermsgs *               msgs,
     }
 
     dbgmsg( msgs, "peer has %d more blocks we've asked for",
-            msgs->clientAskedFor.count );
+            msgs->clientAskedFor.len );
 
     /**
     *** Error checks
     **/
 
-    if( tr_cpBlockIsComplete( tor->completion, block ) ) {
+    if( tr_cpBlockIsComplete( &tor->completion, block ) ) {
         dbgmsg( msgs, "we have this block already..." );
         clientGotUnwantedBlock( msgs, req );
         return 0;
@@ -1733,10 +1638,9 @@ canRead( tr_peerIo * io, void * vmsgs, size_t * piece )
 **/
 
 static int
-ratePulse( void * vmsgs )
+ratePulse( tr_peermsgs * msgs, uint64_t now )
 {
-    tr_peermsgs * msgs = vmsgs;
-    const double rateToClient = tr_peerGetPieceSpeed( msgs->peer, TR_PEER_TO_CLIENT );
+    const double rateToClient = tr_peerGetPieceSpeed( msgs->peer, now, TR_PEER_TO_CLIENT );
     const int seconds = 10;
     const int floor = 8;
     const int estimatedBlocksInPeriod = ( rateToClient * seconds * 1024 ) / msgs->torrent->blockSize;
@@ -1782,22 +1686,23 @@ fillOutputBuffer( tr_peermsgs * msgs, time_t now )
     ***  Blocks
     **/
 
-    if( ( tr_peerIoGetWriteBufferSpace( msgs->peer->io ) >= msgs->torrent->blockSize )
+    if( ( tr_peerIoGetWriteBufferSpace( msgs->peer->io, now ) >= msgs->torrent->blockSize )
         && popNextRequest( msgs, &req ) )
     {
         if( requestIsValid( msgs, &req )
-            && tr_cpPieceIsComplete( msgs->torrent->completion, req.index ) )
+            && tr_cpPieceIsComplete( &msgs->torrent->completion, req.index ) )
         {
+            int err;
+            static uint8_t buf[MAX_BLOCK_SIZE];
+
             /* send a block */
-            uint8_t * buf = tr_new( uint8_t, req.length );
-            const int err = tr_ioRead( msgs->torrent, req.index, req.offset, req.length, buf );
-            if( err ) {
+            if(( err = tr_ioRead( msgs->torrent, req.index, req.offset, req.length, buf ))) {
                 fireError( msgs, err );
                 bytesWritten = 0;
                 msgs = NULL;
             } else {
                 tr_peerIo * io = msgs->peer->io;
-                struct evbuffer * out = evbuffer_new( );
+                struct evbuffer * out = tr_getBuffer( );
                 dbgmsg( msgs, "sending block %u:%u->%u", req.index, req.offset, req.length );
                 tr_peerIoWriteUint32( io, out, sizeof( uint8_t ) + 2 * sizeof( uint32_t ) + req.length );
                 tr_peerIoWriteUint8 ( io, out, BT_PIECE );
@@ -1806,10 +1711,9 @@ fillOutputBuffer( tr_peermsgs * msgs, time_t now )
                 tr_peerIoWriteBytes ( io, out, buf, req.length );
                 tr_peerIoWriteBuf( io, out, TRUE );
                 bytesWritten += EVBUFFER_LENGTH( out );
-                evbuffer_free( out );
                 msgs->clientSentAnythingAt = now;
+                tr_releaseBuffer( out );
             }
-            tr_free( buf );
         }
         else if( fext ) /* peer needs a reject message */
         {
@@ -1839,7 +1743,7 @@ peerPulse( void * vmsgs )
     tr_peermsgs * msgs = vmsgs;
     const time_t  now = time( NULL );
 
-    ratePulse( msgs );
+    ratePulse( msgs, now );
 
     pumpRequestQueue( msgs, now );
     expireOldRequests( msgs, now );
@@ -1880,7 +1784,7 @@ sendBitfield( tr_peermsgs * msgs )
     size_t            i;
     size_t            lazyCount = 0;
 
-    field = tr_bitfieldDup( tr_cpPieceBitfield( msgs->torrent->completion ) );
+    field = tr_bitfieldDup( tr_cpPieceBitfield( &msgs->torrent->completion ) );
 
     if( tr_sessionIsLazyBitfieldEnabled( msgs->session ) )
     {
@@ -1929,11 +1833,11 @@ tellPeerWhatWeHave( tr_peermsgs * msgs )
 {
     const tr_bool fext = tr_peerIoSupportsFEXT( msgs->peer->io );
 
-    if( fext && ( tr_cpGetStatus( msgs->torrent->completion ) == TR_CP_COMPLETE ) )
+    if( fext && ( tr_cpGetStatus( &msgs->torrent->completion ) == TR_SEED ) )
     {
         protocolSendHaveAll( msgs );
     }
-    else if( fext && ( tr_cpHaveValid( msgs->torrent->completion ) == 0 ) )
+    else if( fext && ( tr_cpHaveValid( &msgs->torrent->completion ) == 0 ) )
     {
         protocolSendHaveNone( msgs );
     }
@@ -1978,7 +1882,7 @@ pexAddedCb( void * vpex,
     }
 }
 
-static void
+static TR_INLINE void
 pexDroppedCb( void * vpex,
               void * userData )
 {
@@ -1991,12 +1895,12 @@ pexDroppedCb( void * vpex,
     }
 }
 
-static void
+static TR_INLINE void
 pexElementCb( void * vpex,
               void * userData )
 {
     PexDiffs * diffs = userData;
-    tr_pex *   pex = vpex;
+    tr_pex * pex = vpex;
 
     diffs->elements[diffs->elementCount++] = *pex;
 }
@@ -2007,10 +1911,15 @@ sendPex( tr_peermsgs * msgs )
     if( msgs->peerSupportsPex && tr_torrentAllowsPex( msgs->torrent ) )
     {
         PexDiffs diffs;
+        PexDiffs diffs6;
         tr_pex * newPex = NULL;
+        tr_pex * newPex6 = NULL;
         const int newCount = tr_peerMgrGetPeers( msgs->session->peerMgr,
                                                  msgs->torrent->info.hash,
-                                                 &newPex );
+                                                 &newPex, TR_AF_INET );
+        const int newCount6 = tr_peerMgrGetPeers( msgs->session->peerMgr,
+                                                  msgs->torrent->info.hash,
+                                                  &newPex6, TR_AF_INET6 );
 
         /* build the diffs */
         diffs.added = tr_new( tr_pex, newCount );
@@ -2023,14 +1932,28 @@ sendPex( tr_peermsgs * msgs )
                         newPex, newCount,
                         tr_pexCompare, sizeof( tr_pex ),
                         pexDroppedCb, pexAddedCb, pexElementCb, &diffs );
+        diffs6.added = tr_new( tr_pex, newCount6 );
+        diffs6.addedCount = 0;
+        diffs6.dropped = tr_new( tr_pex, msgs->pexCount6 );
+        diffs6.droppedCount = 0;
+        diffs6.elements = tr_new( tr_pex, newCount6 + msgs->pexCount6 );
+        diffs6.elementCount = 0;
+        tr_set_compare( msgs->pex6, msgs->pexCount6,
+                        newPex6, newCount6,
+                        tr_pexCompare, sizeof( tr_pex ),
+                        pexDroppedCb, pexAddedCb, pexElementCb, &diffs6 );
         dbgmsg(
             msgs,
             "pex: old peer count %d, new peer count %d, added %d, removed %d",
-            msgs->pexCount, newCount, diffs.addedCount, diffs.droppedCount );
+            msgs->pexCount, newCount + newCount6,
+            diffs.addedCount + diffs6.addedCount,
+            diffs.droppedCount + diffs6.droppedCount );
 
-        if( !diffs.addedCount && !diffs.droppedCount )
+        if( !diffs.addedCount && !diffs.droppedCount && !diffs6.addedCount &&
+            !diffs6.droppedCount )
         {
             tr_free( diffs.elements );
+            tr_free( diffs6.elements );
         }
         else
         {
@@ -2045,14 +1968,20 @@ sendPex( tr_peermsgs * msgs )
             tr_free( msgs->pex );
             msgs->pex = diffs.elements;
             msgs->pexCount = diffs.elementCount;
+            tr_free( msgs->pex6 );
+            msgs->pex6 = diffs6.elements;
+            msgs->pexCount6 = diffs6.elementCount;
 
             /* build the pex payload */
-            tr_bencInitDict( &val, 3 );
+            tr_bencInitDict( &val, 3 ); /* ipv6 support: left as 3:
+                                         * speed vs. likelihood? */
 
             /* "added" */
             tmp = walk = tr_new( uint8_t, diffs.addedCount * 6 );
-            for( i = 0; i < diffs.addedCount; ++i ) {
-                memcpy( walk, &diffs.added[i].addr, 4 ); walk += 4;
+            for( i = 0; i < diffs.addedCount; ++i )
+            {
+                tr_suspectAddress( &diffs.added[i].addr, "pex" );
+                memcpy( walk, &diffs.added[i].addr.addr, 4 ); walk += 4;
                 memcpy( walk, &diffs.added[i].port, 2 ); walk += 2;
             }
             assert( ( walk - tmp ) == diffs.addedCount * 6 );
@@ -2069,12 +1998,48 @@ sendPex( tr_peermsgs * msgs )
 
             /* "dropped" */
             tmp = walk = tr_new( uint8_t, diffs.droppedCount * 6 );
-            for( i = 0; i < diffs.droppedCount; ++i ) {
-                memcpy( walk, &diffs.dropped[i].addr, 4 ); walk += 4;
+            for( i = 0; i < diffs.droppedCount; ++i )
+            {
+                memcpy( walk, &diffs.dropped[i].addr.addr, 4 ); walk += 4;
                 memcpy( walk, &diffs.dropped[i].port, 2 ); walk += 2;
             }
             assert( ( walk - tmp ) == diffs.droppedCount * 6 );
             tr_bencDictAddRaw( &val, "dropped", tmp, walk - tmp );
+            tr_free( tmp );
+            
+            /* "added6" */
+            tmp = walk = tr_new( uint8_t, diffs6.addedCount * 18 );
+            for( i = 0; i < diffs6.addedCount; ++i )
+            {
+                tr_suspectAddress( &diffs6.added[i].addr, "pex6" );
+                memcpy( walk, &diffs6.added[i].addr.addr.addr6.s6_addr, 16 );
+                walk += 16;
+                memcpy( walk, &diffs6.added[i].port, 2 );
+                walk += 2;
+            }
+            assert( ( walk - tmp ) == diffs6.addedCount * 18 );
+            tr_bencDictAddRaw( &val, "added6", tmp, walk - tmp );
+            tr_free( tmp );
+            
+            /* "added6.f" */
+            tmp = walk = tr_new( uint8_t, diffs6.addedCount );
+            for( i = 0; i < diffs6.addedCount; ++i )
+                *walk++ = diffs6.added[i].flags;
+            assert( ( walk - tmp ) == diffs6.addedCount );
+            tr_bencDictAddRaw( &val, "added6.f", tmp, walk - tmp );
+            tr_free( tmp );
+            
+            /* "dropped6" */
+            tmp = walk = tr_new( uint8_t, diffs6.droppedCount * 18 );
+            for( i = 0; i < diffs6.droppedCount; ++i )
+            {
+                memcpy( walk, &diffs6.dropped[i].addr.addr.addr6.s6_addr, 16 );
+                walk += 16;
+                memcpy( walk, &diffs6.dropped[i].port, 2 );
+                walk += 2;
+            }
+            assert( ( walk - tmp ) == diffs6.droppedCount * 18);
+            tr_bencDictAddRaw( &val, "dropped6", tmp, walk - tmp );
             tr_free( tmp );
 
             /* write the pex message */
@@ -2094,12 +2059,15 @@ sendPex( tr_peermsgs * msgs )
         tr_free( diffs.added );
         tr_free( diffs.dropped );
         tr_free( newPex );
+        tr_free( diffs6.added );
+        tr_free( diffs6.dropped );
+        tr_free( newPex6 );
 
         msgs->clientSentPexAt = time( NULL );
     }
 }
 
-static int
+static TR_INLINE int
 pexPulse( void * vpeer )
 {
     sendPex( vpeer );
@@ -2123,7 +2091,7 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
     assert( peer->io );
 
     m = tr_new0( tr_peermsgs, 1 );
-    m->publisher = tr_publisherNew( );
+    m->publisher = TR_PUBLISHER_INIT;
     m->peer = peer;
     m->session = torrent->session;
     m->torrent = torrent;
@@ -2143,7 +2111,7 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
     m->clientWillAskFor = REQUEST_LIST_INIT;
     peer->msgs = m;
 
-    *setme = tr_publisherSubscribe( m->publisher, func, userData );
+    *setme = tr_publisherSubscribe( &m->publisher, func, userData );
 
     if( tr_peerIoSupportsLTEP( peer->io ) )
         sendLtepHandshake( m );
@@ -2151,7 +2119,7 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
     tellPeerWhatWeHave( m );
 
     tr_peerIoSetIOFuncs( m->peer->io, canRead, didWrite, gotError, m );
-    ratePulse( m );
+    ratePulse( m, tr_date() );
 
     return m;
 }
@@ -2162,13 +2130,14 @@ tr_peerMsgsFree( tr_peermsgs* msgs )
     if( msgs )
     {
         tr_timerFree( &msgs->pexTimer );
-        tr_publisherFree( &msgs->publisher );
+        tr_publisherDestruct( &msgs->publisher );
         reqListClear( &msgs->clientWillAskFor );
         reqListClear( &msgs->clientAskedFor );
         reqListClear( &msgs->peerAskedFor );
 
         evbuffer_free( msgs->incoming.block );
         evbuffer_free( msgs->outMessages );
+        tr_free( msgs->pex6 );
         tr_free( msgs->pex );
 
         memset( msgs, ~0, sizeof( tr_peermsgs ) );
@@ -2180,6 +2149,6 @@ void
 tr_peerMsgsUnsubscribe( tr_peermsgs *    peer,
                         tr_publisher_tag tag )
 {
-    tr_publisherUnsubscribe( peer->publisher, tag );
+    tr_publisherUnsubscribe( &peer->publisher, tag );
 }
 

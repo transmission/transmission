@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2007-2008 Charles Kerr <charles@rebelbase.com>
+ * This file Copyright (C) 2007-2009 Charles Kerr <charles@transmissionbt.com>
  *
  * This file is licensed by the GPL version 2.  Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
@@ -73,21 +73,22 @@ readOrWriteBytes( const tr_torrent * tor,
     const tr_file * file = &info->files[fileIndex];
 
     typedef size_t ( *iofunc )( int, void *, size_t );
-    iofunc          func = ioMode ==
-                           TR_IO_READ ? (iofunc)read : (iofunc)write;
-    char          * path;
+    iofunc          func = ioMode == TR_IO_READ ? (iofunc)read : (iofunc)write;
     struct stat     sb;
     int             fd = -1;
     int             err;
     int             fileExists;
 
+    assert( tor->downloadDir && *tor->downloadDir );
     assert( fileIndex < info->fileCount );
     assert( !file->length || ( fileOffset < file->length ) );
     assert( fileOffset + buflen <= file->length );
 
-    path = tr_buildPath( tor->downloadDir, file->name, NULL );
-    fileExists = !stat( path, &sb );
-    tr_free( path );
+    {
+        char path[MAX_PATH_LENGTH];
+        tr_snprintf( path, sizeof( path ), "%s%c%s", tor->downloadDir, TR_PATH_DELIMITER, file->name );
+        fileExists = !stat( path, &sb );
+    }
 
     if( !file->length )
         return 0;
@@ -171,11 +172,9 @@ readOrWritePiece( const tr_torrent * tor,
     while( buflen && !err )
     {
         const tr_file * file = &info->files[fileIndex];
-        const uint64_t  bytesThisPass = MIN( buflen,
-                                             file->length - fileOffset );
+        const uint64_t  bytesThisPass = MIN( buflen, file->length - fileOffset );
 
-        err = readOrWriteBytes( tor, ioMode,
-                                fileIndex, fileOffset, buf, bytesThisPass );
+        err = readOrWriteBytes( tor, ioMode, fileIndex, fileOffset, buf, bytesThisPass );
         buf += bytesThisPass;
         buflen -= bytesThisPass;
         ++fileIndex;
@@ -211,31 +210,42 @@ tr_ioWrite( const tr_torrent * tor,
 *****
 ****/
 
-static int
+static tr_bool
 recalculateHash( const tr_torrent * tor,
                  tr_piece_index_t   pieceIndex,
+                 void             * buffer,
+                 size_t             buflen,
                  uint8_t *          setme )
 {
     size_t   bytesLeft;
     uint32_t offset = 0;
-    int      success = TRUE;
+    tr_bool  success = TRUE;
+    uint8_t  stackbuf[MAX_STACK_ARRAY_SIZE];
     SHA_CTX  sha;
 
-    assert( tor );
-    assert( setme );
+    /* fallback buffer */
+    if( ( buffer == NULL ) || ( buflen < 1 ) )
+    {
+        buffer = stackbuf;
+        buflen = sizeof( stackbuf );
+    }
+
+    assert( tor != NULL );
     assert( pieceIndex < tor->info.pieceCount );
+    assert( buffer != NULL );
+    assert( buflen > 0 );
+    assert( setme != NULL );
 
     SHA1_Init( &sha );
     bytesLeft = tr_torPieceCountBytes( tor, pieceIndex );
 
     while( bytesLeft )
     {
-        uint8_t   buf[8192];
-        const int len = MIN( bytesLeft, sizeof( buf ) );
-        success = !tr_ioRead( tor, pieceIndex, offset, len, buf );
+        const int len = MIN( bytesLeft, buflen );
+        success = !tr_ioRead( tor, pieceIndex, offset, len, buffer );
         if( !success )
             break;
-        SHA1_Update( &sha, buf, len );
+        SHA1_Update( &sha, buffer, len );
         offset += len;
         bytesLeft -= len;
     }
@@ -246,12 +256,14 @@ recalculateHash( const tr_torrent * tor,
     return success;
 }
 
-int
-tr_ioTestPiece( const tr_torrent * tor,
-                int                pieceIndex )
+tr_bool
+tr_ioTestPiece( const tr_torrent  * tor,
+                tr_piece_index_t    pieceIndex,
+                void              * buffer,
+                size_t              buflen )
 {
     uint8_t hash[SHA_DIGEST_LENGTH];
-    const int recalculated = recalculateHash( tor, pieceIndex, hash );
-    return recalculated && !memcmp( hash, tor->info.pieces[pieceIndex].hash, SHA_DIGEST_LENGTH );
-}
 
+    return recalculateHash( tor, pieceIndex, buffer, buflen, hash )
+           && !memcmp( hash, tor->info.pieces[pieceIndex].hash, SHA_DIGEST_LENGTH );
+}

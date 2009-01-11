@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2007-2008 Charles Kerr <charles@rebelbase.com>
+ * This file Copyright (C) 2007-2009 Charles Kerr <charles@transmissionbt.com>
  *
  * This file is licensed by the GPL version 2.  Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
@@ -86,9 +86,9 @@ struct tr_crypto
     RC4_KEY         dec_key;
     RC4_KEY         enc_key;
     uint8_t         torrentHash[SHA_DIGEST_LENGTH];
-    unsigned int    isIncoming       : 1;
-    unsigned int    torrentHashIsSet : 1;
-    unsigned int    mySecretIsSet    : 1;
+    tr_bool         isIncoming;
+    tr_bool         torrentHashIsSet;
+    tr_bool         mySecretIsSet;
     uint8_t         myPublicKey[KEY_LEN];
     uint8_t         mySecret[KEY_LEN];
 };

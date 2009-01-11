@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2008 Charles Kerr <charles@rebelbase.com>
+ * This file Copyright (C) 2008-2009 Charles Kerr <charles@transmissionbt.com>
  *
  * This file is licensed by the GPL version 2.  Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
@@ -36,6 +36,7 @@ tr_addreq_t tr_webseedAddRequest( tr_webseed *     w,
 
 /** @return true if a request is being processed, or false if idle */
 int         tr_webseedGetSpeed( const tr_webseed * w,
+                                uint64_t           now,
                                 float *            setme_KiBs );
 
 /** @return true if a request is being processed, or false if idle */

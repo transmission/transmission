@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2007-2008 Charles Kerr <charles@rebelbase.com>
+ * This file Copyright (C) 2007-2009 Charles Kerr <charles@transmissionbt.com>
  *
  * This file is licensed by the GPL version 2.  Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
@@ -45,7 +45,7 @@ typedef struct tr_metainfo_builder
     uint32_t                    pieceSize;
     uint32_t                    pieceCount;
     int                         isSingleFile;
-    tr_handle *                 handle;
+    tr_session *                handle;
 
     /**
     ***  These are set inside tr_makeMetaInfo()
@@ -87,7 +87,7 @@ typedef struct tr_metainfo_builder
 tr_metainfo_builder;
 
 
-tr_metainfo_builder*tr_metaInfoBuilderCreate( tr_handle *  handle,
+tr_metainfo_builder*tr_metaInfoBuilderCreate( tr_session * session,
                                               const char * topFile );
 
 void                tr_metaInfoBuilderFree( tr_metainfo_builder* );

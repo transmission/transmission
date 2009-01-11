@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2008 Charles Kerr <charles@rebelbase.com>
+ * This file Copyright (C) 2008-2009 Charles Kerr <charles@transmissionbt.com>
  *
  * This file is licensed by the GPL version 2.  Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
@@ -42,7 +42,7 @@ get_recent_destinations( void )
 }
 
 static void
-save_recent_destination( const char * dir  )
+save_recent_destination( TrCore * core, const char * dir  )
 {
     int      i;
     GSList * list = get_recent_destinations( );
@@ -70,7 +70,7 @@ save_recent_destination( const char * dir  )
         g_snprintf( key, sizeof( key ), "recent-download-dir-%d", i + 1 );
         pref_string_set( key, l->data );
     }
-    pref_save( );
+    pref_save( tr_core_session( core ) );
 
     /* cleanup */
     g_slist_foreach( list, (GFunc)g_free, NULL );
@@ -116,17 +116,20 @@ addResponseCB( GtkDialog * dialog,
     if( data->gtor )
     {
         if( response != GTK_RESPONSE_ACCEPT )
+        {
             removeOldTorrent( data );
+        }
         else
         {
-            if( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( data->
-                                                                 run_check ) ) )
+            if( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( data->run_check ) ) )
                 tr_torrentStart( tr_torrent_handle( data->gtor ) );
+
             tr_core_add_torrent( data->core, data->gtor );
-            if( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( data->
-                                                                 trash_check ) ) )
+
+            if( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( data->trash_check ) ) )
+
                 tr_file_trash_or_unlink( data->filename );
-            save_recent_destination( data->downloadDir );
+            save_recent_destination( data->core, data->downloadDir );
         }
     }
 

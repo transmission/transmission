@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2007-2008 Charles Kerr <charles@rebelbase.com>
+ * This file Copyright (C) 2007-2009 Charles Kerr <charles@transmissionbt.com>
  *
  * This file is licensed by the GPL version 2.  Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
@@ -60,9 +60,11 @@ getVerifyLock( void )
 }
 
 static int
-checkFile( tr_torrent *    tor,
-           tr_file_index_t fileIndex,
-           int *           abortFlag )
+checkFile( tr_torrent      * tor,
+           void            * buffer,
+           size_t            buflen,
+           tr_file_index_t   fileIndex,
+           int             * abortFlag )
 {
     tr_piece_index_t i;
     int              changed = FALSE;
@@ -84,10 +86,9 @@ checkFile( tr_torrent *    tor,
         }
         else if( !tr_torrentIsPieceChecked( tor, i ) )
         {
-            const int      wasComplete = tr_cpPieceIsComplete(
-                tor->completion, i );
+            const int wasComplete = tr_cpPieceIsComplete( &tor->completion, i );
 
-            if( tr_ioTestPiece( tor, i ) ) /* yay */
+            if( tr_ioTestPiece( tor, i, buffer, buflen ) ) /* yay */
             {
                 tr_torrentSetHasPiece( tor, i, TRUE );
                 if( !wasComplete )
@@ -119,12 +120,13 @@ checkFile( tr_torrent *    tor,
 static void
 verifyThreadFunc( void * unused UNUSED )
 {
-    for( ; ; )
+    for( ;; )
     {
         int                  changed = 0;
         tr_file_index_t      i;
-        tr_torrent *         tor;
+        tr_torrent         * tor;
         struct verify_node * node;
+        void               * buffer;
 
         tr_lockLock( getVerifyLock( ) );
         stopCurrent = FALSE;
@@ -141,12 +143,12 @@ verifyThreadFunc( void * unused UNUSED )
         tr_free( node );
         tr_lockUnlock( getVerifyLock( ) );
 
-        tor->verifyState = TR_VERIFY_NOW;
-
         tr_torinf( tor, _( "Verifying torrent" ) );
+        tor->verifyState = TR_VERIFY_NOW;
+        buffer = tr_new( uint8_t, tor->info.pieceSize );
         for( i = 0; i < tor->info.fileCount && !stopCurrent; ++i )
-            changed |= checkFile( tor, i, &stopCurrent );
-
+            changed |= checkFile( tor, buffer, tor->info.pieceSize, i, &stopCurrent );
+        tr_free( buffer );
         tor->verifyState = TR_VERIFY_NONE;
 
         if( !stopCurrent )

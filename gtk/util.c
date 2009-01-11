@@ -514,21 +514,22 @@ tr_object_ref_sink( gpointer object )
     return object;
 }
 
-void
+int
 tr_file_trash_or_unlink( const char * filename )
 {
     if( filename && *filename )
     {
         gboolean trashed = FALSE;
 #ifdef HAVE_GIO
-        GError * err = NULL;
         GFile *  file = g_file_new_for_path( filename );
-        trashed = g_file_trash( file, NULL, &err );
+        trashed = g_file_trash( file, NULL, NULL );
         g_object_unref( G_OBJECT( file ) );
 #endif
         if( !trashed )
             g_unlink( filename );
     }
+
+    return 0;
 }
 
 char*

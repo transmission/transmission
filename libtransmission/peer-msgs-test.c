@@ -27,7 +27,7 @@ main( void )
     uint32_t           i;
     int                test = 0;
     uint8_t            infohash[SHA_DIGEST_LENGTH];
-    tr_address         addr;
+    struct tr_address  addr;
     tr_piece_index_t   pieceCount = 1313;
     size_t             numwant;
     size_t             numgot;
@@ -36,7 +36,7 @@ main( void )
 
     for( i = 0; i < SHA_DIGEST_LENGTH; ++i )
         infohash[i] = 0xaa;
-    tr_netResolve( "80.4.4.200", &addr );
+    tr_pton( "80.4.4.200", &addr );
 
     numwant = 7;
     numgot = tr_generateAllowedSet( buf, numwant, pieceCount, infohash, &addr );

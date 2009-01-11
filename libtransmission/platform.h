@@ -1,26 +1,15 @@
-/******************************************************************************
+/*
+ * This file Copyright (C) 2009 Charles Kerr <charles@transmissionbt.com>
+ *
+ * This file is licensed by the GPL version 2.  Works owned by the
+ * Transmission project are granted a special exemption to clause 2(b)
+ * so that the bulk of its code can remain under the MIT license. 
+ * This exemption does not extend to derived works not owned by
+ * the Transmission project.
+ *
  * $Id$
- *
- * Copyright (c) 2005-2008 Transmission authors and contributors
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- *****************************************************************************/
+ */
+
 #ifndef TR_PLATFORM_H
 #define TR_PLATFORM_H
 
@@ -32,29 +21,26 @@
  #define TR_PATH_DELIMITER_STR "/"
 #endif
 
-#ifdef __BEOS__
- #include <StorageDefs.h>
- #define MAX_PATH_LENGTH  B_FILE_NAME_LENGTH
-#elif defined(WIN32)
+#ifdef WIN32
  #include <windows.h>
  #define MAX_PATH_LENGTH  MAX_PATH
 #else
- #define MAX_PATH_LENGTH  1024
+ #define MAX_PATH_LENGTH  2048
 #endif
+
+#define MAX_STACK_ARRAY_SIZE 7168
 
 typedef struct tr_lock   tr_lock;
 typedef struct tr_thread tr_thread;
 
-struct tr_handle;
+void                tr_setConfigDir( tr_session * session,
+                                     const char * configDir );
 
-void                tr_setConfigDir( struct tr_handle * handle,
-                                     const char *       configDir );
+const char *        tr_getResumeDir( const tr_session * );
 
-const char *        tr_getResumeDir( const struct tr_handle * );
+const char *        tr_getTorrentDir( const tr_session * );
 
-const char *        tr_getTorrentDir( const struct tr_handle * );
-
-const char *        tr_getClutchDir( const struct tr_handle * );
+const char *        tr_getClutchDir( const tr_session * );
 
 
 tr_thread*          tr_threadNew( void   ( *func )(void *),

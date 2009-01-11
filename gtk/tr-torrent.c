@@ -166,7 +166,7 @@ completenessChangedCallback( tr_torrent       * tor UNUSED,
                              tr_completeness    completeness,
                              void *             user_data )
 {
-    if( completeness == TR_CP_COMPLETE )
+    if( completeness != TR_LEECH )
         g_idle_add( notifyInMainThread, user_data );
 }
 
@@ -318,24 +318,7 @@ tr_torrent_set_remove_flag( TrTorrent * gtor,
 void
 tr_torrent_delete_files( TrTorrent * gtor )
 {
-    tr_file_index_t i;
-    const tr_info * info = tr_torrent_info( gtor );
-    const char *    stop =
-        tr_torrentGetDownloadDir( tr_torrent_handle( gtor ) );
-
-    for( i = 0; info && i < info->fileCount; ++i )
-    {
-        char * file = g_build_filename( stop, info->files[i].name, NULL );
-        while( strcmp( stop, file ) && strlen( stop ) < strlen( file ) )
-        {
-            char * swap = g_path_get_dirname( file );
-            tr_file_trash_or_unlink( file );
-            g_free( file );
-            file = swap;
-        }
-
-        g_free( file );
-    }
+    tr_torrentDeleteLocalData( tr_torrent_handle( gtor ), tr_file_trash_or_unlink );
 }
 
 void

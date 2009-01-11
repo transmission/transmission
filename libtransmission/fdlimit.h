@@ -28,14 +28,8 @@
 
 #include "net.h"
 
-/***********************************************************************
- * tr_fdInit
- ***********************************************************************
- * Detect the maximum number of open files and initializes things.
- **********************************************************************/
-void tr_fdInit( int globalPeerLimit );
-
-void tr_fdClose( void );
+void tr_fdInit( size_t openFileLimit,
+                size_t globalPeerLimit );
 
 /**
  * Returns an fd to the specified filename.
@@ -85,11 +79,11 @@ void     tr_fdFileClose( const char * filename );
 /***********************************************************************
  * Sockets
  **********************************************************************/
-int      tr_fdSocketCreate( int type );
+int      tr_fdSocketCreate( int domain, int type );
 
-int      tr_fdSocketAccept( int              b,
-                            struct in_addr * addr,
-                            tr_port_t *      port );
+int      tr_fdSocketAccept( int           b,
+                            tr_address  * addr,
+                            tr_port     * port );
 
 void     tr_fdSocketClose( int s );
 

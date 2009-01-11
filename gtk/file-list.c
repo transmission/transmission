@@ -660,12 +660,9 @@ onViewButtonPressed( GtkWidget *      w,
         if( gtk_tree_view_get_path_at_pos( view, event->x, event->y,
                                            &path, &column, &cell_x, &cell_y ) )
         {
-            const char *   column_title = gtk_tree_view_column_get_title(
-                column );
-            const gboolean downloadColumn =
-                !strcmp( column_title, Q_( "filedetails|Download" ) );
-            const gboolean priorityColumn =
-                !strcmp( column_title, _( "Priority" ) );
+            const char * column_title = gtk_tree_view_column_get_title( column );
+            const gboolean downloadColumn = !strcmp( column_title, _( "Download" ) );
+            const gboolean priorityColumn = !strcmp( column_title, _( "Priority" ) );
             if( downloadColumn || priorityColumn )
             {
                 GArray *           a = getActiveFilesForPath( view, path );
@@ -793,13 +790,7 @@ file_list_new( TrTorrent * gtor )
 
     col = GTK_TREE_VIEW_COLUMN ( g_object_new ( GTK_TYPE_TREE_VIEW_COLUMN,
                                                 "expand", TRUE,
-                                                /* Translators: this is a column
-                                                   header in Files tab, Details
-                                                   dialog;
-                                                   Don't include the prefix
-                                                   "filedetails|" in the
-                                                   translation. */
-                                                "title", Q_( "filedetails|File" ),
+                                                "title", _( "File" ),
                                                 NULL ) );
     rend = gtk_cell_renderer_pixbuf_new( );
     gtk_tree_view_column_pack_start( col, rend, FALSE );
@@ -808,27 +799,19 @@ file_list_new( TrTorrent * gtor )
     rend = gtk_cell_renderer_text_new( );
     g_object_set( rend, "ellipsize", PANGO_ELLIPSIZE_END, NULL );
     gtk_tree_view_column_pack_start( col, rend, TRUE );
-    gtk_tree_view_column_set_cell_data_func( col, rend, renderFilename,
-                                             NULL,
-                                             NULL );
+    gtk_tree_view_column_set_cell_data_func( col, rend, renderFilename, NULL, NULL );
     gtk_tree_view_column_set_resizable( col, TRUE );
     gtk_tree_view_append_column( GTK_TREE_VIEW( view ), col );
 
-
     rend = gtk_cell_renderer_progress_new( );
-    /* Translators: this is a column header in Files tab, Details dialog;
-       Don't include the prefix "filedetails|" in the translation. */
-    col = gtk_tree_view_column_new_with_attributes( Q_( "filedetails|Progress" ), rend, NULL );
+    col = gtk_tree_view_column_new_with_attributes( _( "Progress" ), rend, NULL );
     gtk_tree_view_column_set_cell_data_func( col, rend, renderProgress, NULL, NULL );
     gtk_tree_view_column_set_resizable( col, FALSE );
     gtk_tree_view_append_column ( GTK_TREE_VIEW( view ), col );
 
     /* add "enabled" column */
     rend = gtk_cell_renderer_toggle_new( );
-    /* Translators: this is a column header in Files tab, Details dialog;
-       Don't include the prefix "filedetails|" in the translation.
-       The items for this column are checkboxes (yes/no) */
-    col = gtk_tree_view_column_new_with_attributes( Q_( "filedetails|Download" ), rend, NULL );
+    col = gtk_tree_view_column_new_with_attributes( _( "Download" ), rend, NULL );
     gtk_tree_view_column_set_cell_data_func( col, rend, renderDownload, NULL, NULL );
     gtk_tree_view_column_set_resizable( col, FALSE );
     gtk_tree_view_append_column ( GTK_TREE_VIEW( view ), col );

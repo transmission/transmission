@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2007-2008 Charles Kerr <charles@rebelbase.com>
+ * This file Copyright (C) 2007-2009 Charles Kerr <charles@transmissionbt.com>
  *
  * This file is licensed by the GPL version 2.  Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
@@ -37,12 +37,12 @@ tr_upnp_state;
 
 struct tr_upnp
 {
+    tr_bool            hasDiscovered;
     struct UPNPUrls    urls;
     struct IGDdatas    data;
     int                port;
     char               lanaddr[16];
     unsigned int       isMapped;
-    unsigned int       hasDiscovered : 1;
     tr_upnp_state      state;
 };
 
@@ -152,18 +152,20 @@ tr_upnpPulse( tr_upnp * handle,
     if( handle->state == TR_UPNP_MAP )
     {
         int  err = -1;
-        char portStr[16];
-        tr_snprintf( portStr, sizeof( portStr ), "%d", port );
         errno = 0;
 
         if( !handle->urls.controlURL || !handle->data.servicetype )
             handle->isMapped = 0;
         else
         {
+            char portStr[16];
+            char desc[64];
+            tr_snprintf( portStr, sizeof( portStr ), "%d", port );
+            tr_snprintf( desc, sizeof( desc ), "%s at %d", TR_NAME, port );
             err = UPNP_AddPortMapping( handle->urls.controlURL,
                                        handle->data.servicetype,
                                        portStr, portStr, handle->lanaddr,
-                                       "Transmission", "TCP" );
+                                       desc, "TCP" );
             handle->isMapped = !err;
         }
         tr_ninf( getKey( ),

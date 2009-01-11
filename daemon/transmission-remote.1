@@ -28,6 +28,7 @@ and
 .Op Fl pl Ar files
 .Op Fl pn Ar files
 .Op Fl r
+.Op Fl R
 .Op Fl s | S
 .Op Fl t Ar all | Ar id | Ar hash
 .Op Fl u Ar number | Fl U
@@ -59,12 +60,12 @@ into transmission.
 Enable debugging mode.
 
 .It Fl d Fl -downlimit Ar limit
-Limit the download speed to
+Limit the global download speed to
 .Ar limit
 kilobytes per second.
 
 .It Fl D Fl -no-downlimit
-Remove the download limit.
+Remove the global download limit.
 
 .It Fl er Fl -encryption-required
 Encrypt all peer connections.
@@ -134,6 +135,9 @@ Mark file(s) as low priority.
 .It Fl r Fl -remove
 Remove the current torrent(s).  This does not delete the downloaded data.
 
+.It Fl -remove-and-delete
+Remove the current torrent(s) and delete their downloaded data.
+
 .It Fl s Fl -start
 Start the current torrent(s)
 
@@ -151,11 +155,11 @@ To set more than one current torrent, join their ids or hashes together in a lis
 such as "-t2,4,6-8" to operate on the torrents whose IDs are 2, 4, 6, 7, and 8.
 
 .It Fl u Fl -uplimit Ar limit
-Limit the upload speed to
+Limit the global upload speed to
 .Ar limit
 kilobytes per second.
 .It Fl U Fl -no-uplimit
-Remove the upload limit.
+Remove the global upload limit.
 
 .It Fl v Fl -verify
 Verify the current torrent(s)

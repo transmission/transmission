@@ -1,3 +1,7 @@
+#ifndef __TRANSMISSION__
+#error only libtransmission should #include this header.
+#endif
+
 #ifndef JSON_PARSER_H
 #define JSON_PARSER_H
 

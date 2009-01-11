@@ -1,6 +1,6 @@
 /*
  * Xmission - a cross-platform bittorrent client
- * Copyright (C) 2007 Charles Kerr <charles@rebelbase.com>
+ * Copyright (C) 2007 Charles Kerr <charles@transmissionbt.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,6 +53,7 @@ extern "C"
 {
   #include <libtransmission/transmission.h>
   #include <libtransmission/utils.h>
+  #include <libtransmission/bencode.h>
 
   #include <images/play.xpm>
   #include <images/stop.xpm>
@@ -136,7 +137,7 @@ class MyApp : public wxApp
 
 namespace
 {
-    tr_handle * handle = NULL;
+    tr_session * handle = NULL;
 
     typedef std::vector<tr_torrent*> torrents_v;
 }
@@ -390,11 +391,16 @@ void MyFrame :: OnOpen( wxCommandEvent& WXUNUSED(event) )
 bool
 MyApp :: OnInit( )
 {
-    const wxString downloadDir = wxStandardPaths::Get().GetDocumentsDir( );
+    tr_benc settings;
+    const char * configDir;
 
-    handle = tr_sessionInit( tr_getDefaultConfigDir(),
-                             toStr(downloadDir).c_str(),
-                             "wx" );
+    tr_bencInitDict( &settings, 0 );
+    tr_sessionGetDefaultSettings( &settings );
+    configDir = tr_getDefaultConfigDir( "xmission" );
+
+    handle = tr_sessionInit( "wx", configDir, true, &settings );
+    
+    tr_bencFree( &settings );
 
     wxCmdLineParser cmdParser( cmdLineDesc, argc, argv );
     if( cmdParser.Parse ( ) )
@@ -519,7 +525,7 @@ MyFrame :: MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size
 
     long port;
     wxString key = _T("port");
-    if( !myConfig->Read( key, &port, TR_DEFAULT_PORT ) )
+    if( !myConfig->Read( key, &port, atoi( TR_DEFAULT_PEER_PORT_STR ) ) )
         myConfig->Write( key, port );
     tr_sessionSetPeerPort( handle, port );
 
