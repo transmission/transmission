@@ -306,6 +306,8 @@
 		BEFC1E5D0C07861A00B0BB3C /* bencode.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E240C07861A00B0BB3C /* bencode.c */; };
 		D4AF3B2F0C41F7A500D46B6B /* list.c in Sources */ = {isa = PBXBuildFile; fileRef = D4AF3B2D0C41F7A500D46B6B /* list.c */; };
 		D4AF3B300C41F7A600D46B6B /* list.h in Headers */ = {isa = PBXBuildFile; fileRef = D4AF3B2E0C41F7A500D46B6B /* list.h */; };
+		D9EA1D950F1A6B130090EC0A /* request-list.c in Sources */ = {isa = PBXBuildFile; fileRef = D9EA1D930F1A6B130090EC0A /* request-list.c */; };
+		D9EA1D960F1A6B130090EC0A /* request-list.h in Headers */ = {isa = PBXBuildFile; fileRef = D9EA1D940F1A6B130090EC0A /* request-list.h */; };
 		E138A9770C04D88F00C5426C /* CTGradient.m in Sources */ = {isa = PBXBuildFile; fileRef = E138A9740C04D88F00C5426C /* CTGradient.m */; };
 		E138A9780C04D88F00C5426C /* ProgressGradients.m in Sources */ = {isa = PBXBuildFile; fileRef = E138A9760C04D88F00C5426C /* ProgressGradients.m */; };
 /* End PBXBuildFile section */
@@ -777,6 +779,8 @@
 		BEFC1E240C07861A00B0BB3C /* bencode.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = bencode.c; path = libtransmission/bencode.c; sourceTree = "<group>"; };
 		D4AF3B2D0C41F7A500D46B6B /* list.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = list.c; path = libtransmission/list.c; sourceTree = "<group>"; };
 		D4AF3B2E0C41F7A500D46B6B /* list.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = list.h; path = libtransmission/list.h; sourceTree = "<group>"; };
+		D9EA1D930F1A6B130090EC0A /* request-list.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "request-list.c"; path = "libtransmission/request-list.c"; sourceTree = "<group>"; };
+		D9EA1D940F1A6B130090EC0A /* request-list.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "request-list.h"; path = "libtransmission/request-list.h"; sourceTree = "<group>"; };
 		E138A9730C04D88F00C5426C /* CTGradient.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = CTGradient.h; path = macosx/CTGradient/CTGradient.h; sourceTree = "<group>"; };
 		E138A9740C04D88F00C5426C /* CTGradient.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = CTGradient.m; path = macosx/CTGradient/CTGradient.m; sourceTree = "<group>"; };
 		E138A9750C04D88F00C5426C /* ProgressGradients.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ProgressGradients.h; path = macosx/ProgressGradients.h; sourceTree = "<group>"; };
@@ -1113,6 +1117,8 @@
 		4D1838DC09DEC04A0047D688 /* libtransmission */ = {
 			isa = PBXGroup;
 			children = (
+				D9EA1D930F1A6B130090EC0A /* request-list.c */,
+				D9EA1D940F1A6B130090EC0A /* request-list.h */,
 				A2AAB65B0DE0CF6200E04DDA /* rpcimpl.c */,
 				A2AAB6590DE0CF6200E04DDA /* rpcimpl.h */,
 				A2AAB6580DE0CF6200E04DDA /* rpc-server.c */,
@@ -1435,6 +1441,7 @@
 				A2DF58590DE4B2B1000795D5 /* JSON_parser.h in Headers */,
 				A25E03E20E4015380086C225 /* tr-getopt.h in Headers */,
 				A21FBBAB0EDA78C300BC3C51 /* bandwidth.h in Headers */,
+				D9EA1D960F1A6B130090EC0A /* request-list.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1848,6 +1855,7 @@
 				A25E03E30E4015380086C225 /* tr-getopt.c in Sources */,
 				4DB74F080E8CD75100AEB1A8 /* wildmat.c in Sources */,
 				A21FBBAC0EDA78C300BC3C51 /* bandwidth.c in Sources */,
+				D9EA1D950F1A6B130090EC0A /* request-list.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
