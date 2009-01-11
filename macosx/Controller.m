@@ -263,14 +263,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         SUUpdater * updater = [SUUpdater sharedUpdater];
         [updater setDelegate: self];
         fUpdateInProgress = NO;
-        
-        //reset old Sparkle settings from previous versions
-        [fDefaults removeObjectForKey: @"SUScheduledCheckInterval"];
-        if ([fDefaults objectForKey: @"CheckForUpdates"])
-        {
-            [updater setAutomaticallyChecksForUpdates: [fDefaults boolForKey: @"CheckForUpdates"]];
-            [fDefaults removeObjectForKey: @"CheckForUpdates"];
-        }
     }
     return self;
 }

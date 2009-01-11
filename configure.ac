@@ -1,5 +1,5 @@
 dnl convention: -TR MAJOR MINOR MAINT STATUS - (each a single char)
-dnl STATUS: "X" for prerelease test builds,
+dnl STATUS: "X" for prerelease beta builds,
 dnl         "Z" for unsupported trunk builds,
 dnl         "0" for stable, supported releases
 dnl these should be the only two lines you need to change

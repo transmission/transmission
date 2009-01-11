@@ -65,6 +65,8 @@
 + (void) setHandle: (tr_session *) handle;
 + (tr_session *) handle;
 
+- (void) updateAppcastURL: (id) sender;
+
 - (void) setPort: (id) sender;
 - (void) randomPort: (id) sender;
 - (void) setNat: (id) sender;

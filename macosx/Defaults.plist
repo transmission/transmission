@@ -8,6 +8,8 @@
 	<false/>
 	<key>AutoStartDownload</key>
 	<true/>
+	<key>AutoUpdateBeta</key>
+	<false/>
 	<key>BadgeDownloadRate</key>
 	<true/>
 	<key>BadgeUploadRate</key>

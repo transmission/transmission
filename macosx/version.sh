@@ -3,7 +3,7 @@
 # $Id$
 
 # convention: -TR MAJOR MINOR MAINT STATUS - (each a single char)
-# STATUS: "X" for prerelease test builds,
+# STATUS: "X" for prerelease beta builds,
 #         "Z" for unsupported trunk builds,
 #         "0" for stable, supported releases
 # these should be the only two lines you need to change
@@ -37,6 +37,14 @@ cat > libtransmission/version.h.new << EOF
 #define VERSION_STRING_INFOPLIST  $USERAGENT_PREFIX
 #define BUNDLE_VERSION_INFOPLIST  $SVN_REVISION
 EOF
+
+# Check if it's a beta release
+if [ ${PEERID_PREFIX:6:1} = X ]; then
+cat >> libtransmission/version.h.new << EOF
+#define BETA_RELEASE              "BETA"
+EOF
+fi
+
 replace_if_differs libtransmission/version.h.new libtransmission/version.h
 
 exit 0

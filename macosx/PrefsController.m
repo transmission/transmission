@@ -31,6 +31,8 @@
 #import "UKKQueue.h"
 #import "utils.h"
 
+#import <Sparkle/Sparkle.h>
+
 #define DOWNLOAD_FOLDER     0
 #define DOWNLOAD_TORRENT    2
 
@@ -139,6 +141,16 @@ tr_session * fHandle;
         if (!fRPCWhitelistArray)
             fRPCWhitelistArray = [[NSMutableArray arrayWithObject: @"127.0.0.1"] retain];
         [self updateRPCWhitelist];
+        
+        //reset old Sparkle settings from previous versions
+        [fDefaults removeObjectForKey: @"SUScheduledCheckInterval"];
+        if ([fDefaults objectForKey: @"CheckForUpdates"])
+        {
+            [[SUUpdater sharedUpdater] setAutomaticallyChecksForUpdates: [fDefaults boolForKey: @"CheckForUpdates"]];
+            [fDefaults removeObjectForKey: @"CheckForUpdates"];
+        }
+        
+        [self updateAppcastURL: nil];
     }
     
     return self;
@@ -324,6 +336,17 @@ tr_session * fHandle;
 {
     return [NSArray arrayWithObjects: TOOLBAR_GENERAL, TOOLBAR_TRANSFERS, TOOLBAR_GROUPS, TOOLBAR_BANDWIDTH,
                                         TOOLBAR_PEERS, TOOLBAR_NETWORK, TOOLBAR_REMOTE, nil];
+}
+
+//for a beta release, always use the beta appcast
+#if defined(BETA_RELEASE)
+#define APPCAST_URL @"AppcastBeta"
+#else
+#define APPCAST_URL ([[NSUserDefaults standardUserDefaults] boolForKey: @"AutoUpdateBeta"] ? @"AppcastBeta" : @"AppcastRelease")
+#endif
+- (void) updateAppcastURL: (id) sender
+{
+    [[SUUpdater sharedUpdater] setFeedURL: [NSURL URLWithString: [[[NSBundle mainBundle] infoDictionary] objectForKey: APPCAST_URL]]];
 }
 
 - (void) setPort: (id) sender

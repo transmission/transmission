@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+  <channel>
+    <title>Transmission Appcast</title>
+    <link>http://www.transmissionbt.com/appcast.xml</link>
+    <description>Most recent version available.</description>
+    <language>en</language>
+    <pubDate>Wed, 24 Dec 2008 12:30:00 -0400</pubDate>
+
+	<item>
+		<title>Transmission 1.42</title>
+		<sparkle:releaseNotesLink>http://www.transmissionbt.com/appcast/releasenotes.html</sparkle:releaseNotesLink>
+      	<pubDate>Wed, 24 Dec 2008 12:30:00 -0400</pubDate>
+      	<enclosure
+      	url="http://mirrors.m0k.org/transmission/files/Transmission-1.42.dmg" 
+      	sparkle:version="7494"
+      	sparkle:shortVersionString="1.42"
+      	sparkle:dsaSignature="MC0CFDGYBe/7/7bAtZXeOqYO26iKrNJMAhUAiHvc+yWm071G/wnKsbOXUlzAgoM="
+      	length="3674660"
+      	sparkle:minimumSystemVersion="10.4.11"
+      	type="application/octet-stream"/>
+    </item>
+    
+  </channel>
+</rss>
