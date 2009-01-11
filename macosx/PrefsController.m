@@ -1062,22 +1062,33 @@ tr_session * fHandle;
 
 - (void) setPrefView: (id) sender
 {
-    NSView * view = fGeneralView;
+    NSString * identifier;
     if (sender)
     {
-        NSString * identifier = [sender itemIdentifier];
-        if ([identifier isEqualToString: TOOLBAR_TRANSFERS])
-            view = fTransfersView;
-        else if ([identifier isEqualToString: TOOLBAR_BANDWIDTH])
-            view = fBandwidthView;
-        else if ([identifier isEqualToString: TOOLBAR_PEERS])
-            view = fPeersView;
-        else if ([identifier isEqualToString: TOOLBAR_NETWORK])
-            view = fNetworkView;
-        else if ([identifier isEqualToString: TOOLBAR_REMOTE])
-            view = fRemoteView;
-        else; //general view already selected
+        identifier = [sender itemIdentifier];
+        [[NSUserDefaults standardUserDefaults] setObject: identifier forKey: @"SelectedPrefView"];
     }
+    else
+        identifier = [[NSUserDefaults standardUserDefaults] stringForKey: @"SelectedPrefView"];
+    
+    NSView * view;
+    if ([identifier isEqualToString: TOOLBAR_TRANSFERS])
+        view = fTransfersView;
+    else if ([identifier isEqualToString: TOOLBAR_BANDWIDTH])
+        view = fBandwidthView;
+    else if ([identifier isEqualToString: TOOLBAR_PEERS])
+        view = fPeersView;
+    else if ([identifier isEqualToString: TOOLBAR_NETWORK])
+        view = fNetworkView;
+    else if ([identifier isEqualToString: TOOLBAR_REMOTE])
+        view = fRemoteView;
+    else
+    {
+        identifier = TOOLBAR_GENERAL; //general view is the default selected
+        view = fGeneralView;
+    }
+    
+    [[[self window] toolbar] setSelectedItemIdentifier: identifier];
     
     NSWindow * window = [self window];
     if ([window contentView] == view)
