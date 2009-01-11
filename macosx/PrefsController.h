@@ -62,8 +62,8 @@
     IBOutlet NSSegmentedControl * fRPCAddRemoveControl;
 }
 
-+ (void) setHandle: (tr_handle *) handle;
-+ (tr_handle *) handle;
++ (void) setHandle: (tr_session *) handle;
++ (tr_session *) handle;
 
 - (void) setPort: (id) sender;
 - (void) setNat: (id) sender;

@@ -40,7 +40,7 @@
 
 @implementation Badger
 
-- (id) initWithLib: (tr_handle *) lib
+- (id) initWithLib: (tr_session *) lib
 {
     if ((self = [super init]))
     {

@@ -27,7 +27,7 @@
 
 @interface BadgeView : NSView
 {
-    tr_handle * fLib;
+    tr_session * fLib;
     
     NSDictionary * fAttributes;
     
@@ -35,7 +35,7 @@
     BOOL fQuitting;
 }
 
-- (id) initWithFrame: (NSRect) frame lib: (tr_handle *) lib;
+- (id) initWithFrame: (NSRect) frame lib: (tr_session *) lib;
 
 - (BOOL) setRatesWithDownload: (CGFloat) downloadRate upload: (CGFloat) uploadRate;
 - (void) setQuitting;

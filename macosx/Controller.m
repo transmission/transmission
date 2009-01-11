@@ -49,7 +49,8 @@
 #import "ExpandedPathToPathTransformer.h"
 #import "ExpandedPathToIconTransformer.h"
 #import "SpeedLimitToTurtleIconTransformer.h"
-#import "metainfo.h"
+
+#import "bencode.h"
 #import "utils.h"
 
 #import "UKKQueue.h"
@@ -147,7 +148,7 @@ typedef enum
 #define TRAC_URL   @"http://trac.transmissionbt.com/"
 #define DONATE_URL  @"http://www.transmissionbt.com/donate.php"
 
-static tr_rpc_callback_status rpcCallback(tr_handle * handle UNUSED, tr_rpc_callback_type type, struct tr_torrent * torrentStruct, void * controller)
+static tr_rpc_callback_status rpcCallback(tr_session * handle UNUSED, tr_rpc_callback_type type, struct tr_torrent * torrentStruct, void * controller)
 {
     [(Controller *)controller rpcCallback: type forTorrentStruct: torrentStruct];
     return TR_RPC_NOREMOVE; //we'll do the remove manually
@@ -209,39 +210,44 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     {
         fDefaults = [NSUserDefaults standardUserDefaults];
         
-        fLib = tr_sessionInitFull(NULL, /* use default config directory (Application Support) */
-                                "macosx",
-#warning update when changing in prefs 
-                                [[[fDefaults stringForKey: @"DownloadFolder"] stringByExpandingTildeInPath] UTF8String],
-                                [fDefaults boolForKey: @"PEXGlobal"],
-                                [fDefaults boolForKey: @"NatTraversal"],
-                                [fDefaults integerForKey: @"BindPort"],
-                                TR_DEFAULT_ENCRYPTION, /* reset in prefs */
-                                TR_DEFAULT_LAZY_BITFIELD_ENABLED,
-                                NO, /* reset in prefs */
-                                -1, /* reset in prefs */
-                                NO, /* reset in prefs */
-                                -1, /* reset in prefs */
-                                [fDefaults integerForKey: @"PeersTotal"],
-                                [fDefaults integerForKey: @"MessageLevel"],
-                                YES,
-                                [fDefaults boolForKey: @"Blocklist"],
-                                [fDefaults integerForKey: @"PeerSocketTOS"], /* hidden pref - default is TR_DEFAULT_PEER_SOCKET_TOS */
-                                [fDefaults boolForKey: @"RPC"],
-                                [fDefaults integerForKey: @"RPCPort"],
-                                [fDefaults boolForKey: @"RPCUseWhitelist"],
-                                NULL, /* reset in prefs */
-                                [fDefaults boolForKey: @"RPCAuthorize"],
-                                [[fDefaults stringForKey: @"RPCUsername"] UTF8String],
-                                "", /* reset in prefs - from Keychain */
-                                [fDefaults boolForKey: @"Proxy"],
-                                [[fDefaults stringForKey: @"ProxyAddress"] UTF8String],
-                                [fDefaults integerForKey: @"ProxyPort"],
-                                TR_DEFAULT_PROXY_TYPE, /* reset in prefs */
-                                [fDefaults boolForKey: @"ProxyAuthorize"],
-                                [[fDefaults stringForKey: @"ProxyUsername"] UTF8String],
-                                ""); /* reset in prefs - from Keychain */
+        tr_benc settings;
+        tr_bencInitDict(&settings, 21);
+        tr_sessionGetDefaultSettings(&settings);
         
+        tr_bencDictAddInt(&settings, TR_PREFS_KEY_BLOCKLIST_ENABLED, [fDefaults boolForKey: @"Blocklist"]);
+        
+        #warning update when changing in prefs
+        tr_bencDictAddStr(&settings, TR_PREFS_KEY_DOWNLOAD_DIR, [[[fDefaults stringForKey: @"DownloadFolder"]
+                                                                    stringByExpandingTildeInPath] UTF8String]);
+        
+        tr_bencDictAddInt(&settings, TR_PREFS_KEY_MSGLEVEL, [fDefaults boolForKey: @"MessageLevel"]);
+        tr_bencDictAddInt(&settings, TR_PREFS_KEY_PEER_LIMIT_GLOBAL, [fDefaults integerForKey: @"PeersTotal"]);
+        tr_bencDictAddInt(&settings, TR_PREFS_KEY_PEER_LIMIT_TORRENT, [fDefaults integerForKey: @"PeersTorrent"]);
+        
+        const BOOL randomPort = /*[fDefaults boolForKey: @"RandomPort"]*/NO;
+        tr_bencDictAddInt(&settings, TR_PREFS_KEY_PEER_PORT_RANDOM_ENABLED, randomPort);
+        if (!randomPort)
+            tr_bencDictAddInt(&settings, TR_PREFS_KEY_PEER_PORT, [fDefaults integerForKey: @"BindPort"]);
+        
+        //hidden pref
+        if ([fDefaults objectForKey: @"PeerSocketTOS"])
+            tr_bencDictAddInt(&settings, TR_PREFS_KEY_PEER_SOCKET_TOS, [fDefaults integerForKey: @"PeerSocketTOS"]);
+        
+        tr_bencDictAddInt(&settings, TR_PREFS_KEY_PEX_ENABLED, [fDefaults boolForKey: @"PEXGlobal"]);
+        tr_bencDictAddInt(&settings, TR_PREFS_KEY_PORT_FORWARDING, [fDefaults boolForKey: @"NatTraversal"]);
+        tr_bencDictAddInt(&settings, TR_PREFS_KEY_PROXY_AUTH_ENABLED, [fDefaults boolForKey: @"ProxyAuthorize"]);
+        tr_bencDictAddInt(&settings, TR_PREFS_KEY_PROXY_ENABLED, [fDefaults boolForKey: @"Proxy"]);
+        tr_bencDictAddInt(&settings, TR_PREFS_KEY_PROXY_PORT, [fDefaults integerForKey: @"ProxyPort"]);
+        tr_bencDictAddStr(&settings, TR_PREFS_KEY_PROXY, [[fDefaults stringForKey: @"ProxyAddress"] UTF8String]);
+        tr_bencDictAddStr(&settings, TR_PREFS_KEY_PROXY_USERNAME,  [[fDefaults stringForKey: @"ProxyUsername"] UTF8String]);
+        tr_bencDictAddInt(&settings, TR_PREFS_KEY_RPC_AUTH_REQUIRED,  [fDefaults boolForKey: @"RPCAuthorize"]);
+        tr_bencDictAddInt(&settings, TR_PREFS_KEY_RPC_ENABLED,  [fDefaults boolForKey: @"RPC"]);
+        tr_bencDictAddInt(&settings, TR_PREFS_KEY_RPC_PORT,  [fDefaults integerForKey: @"RPCPort"]);
+        tr_bencDictAddStr(&settings, TR_PREFS_KEY_RPC_USERNAME,  [[fDefaults stringForKey: @"RPCUsername"] UTF8String]);
+        tr_bencDictAddInt(&settings, TR_PREFS_KEY_RPC_WHITELIST_ENABLED,  [fDefaults boolForKey: @"RPCUseWhitelist"]);
+        
+        fLib = tr_sessionInit("macosx", tr_getDefaultConfigDir("Transmission"), YES, &settings);
+        tr_bencFree(&settings);        
         [NSApp setDelegate: self];
         
         fTorrents = [[NSMutableArray alloc] init];

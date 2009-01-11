@@ -49,7 +49,7 @@ typedef enum
 
 @interface Controller : NSObject <GrowlApplicationBridgeDelegate>
 {
-    tr_handle                       * fLib;
+    tr_session                       * fLib;
     
     NSMutableArray                  * fTorrents, * fDisplayedTorrents;
     

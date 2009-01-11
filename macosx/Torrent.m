@@ -31,7 +31,7 @@
 
 @interface Torrent (Private)
 
-- (id) initWithHash: (NSString *) hashString path: (NSString *) path torrentStruct: (tr_torrent *) torrentStruct lib: (tr_handle *) lib
+- (id) initWithHash: (NSString *) hashString path: (NSString *) path torrentStruct: (tr_torrent *) torrentStruct lib: (tr_session *) lib
         publicTorrent: (NSNumber *) publicTorrent
         downloadFolder: (NSString *) downloadFolder
         useIncompleteFolder: (NSNumber *) useIncompleteFolder incompleteFolder: (NSString *) incompleteFolder
@@ -76,7 +76,7 @@ int trashDataFile(const char * filename)
 @implementation Torrent
 
 - (id) initWithPath: (NSString *) path location: (NSString *) location deleteTorrentFile: (torrentFileState) torrentDelete
-        lib: (tr_handle *) lib
+        lib: (tr_session *) lib
 {
     self = [self initWithHash: nil path: path torrentStruct: NULL lib: lib
             publicTorrent: torrentDelete != TORRENT_FILE_DEFAULT ? [NSNumber numberWithBool: torrentDelete == TORRENT_FILE_SAVE] : nil
@@ -101,7 +101,7 @@ int trashDataFile(const char * filename)
     return self;
 }
 
-- (id) initWithTorrentStruct: (tr_torrent *) torrentStruct location: (NSString *) location lib: (tr_handle *) lib
+- (id) initWithTorrentStruct: (tr_torrent *) torrentStruct location: (NSString *) location lib: (tr_session *) lib
 {
     self = [self initWithHash: nil path: nil torrentStruct: torrentStruct lib: lib
             publicTorrent: [NSNumber numberWithBool: NO]
@@ -113,7 +113,7 @@ int trashDataFile(const char * filename)
     return self;
 }
 
-- (id) initWithHistory: (NSDictionary *) history lib: (tr_handle *) lib
+- (id) initWithHistory: (NSDictionary *) history lib: (tr_session *) lib
 {
     self = [self initWithHash: [history objectForKey: @"TorrentHash"]
                 path: [history objectForKey: @"TorrentPath"] torrentStruct: NULL lib: lib
@@ -1619,7 +1619,7 @@ int trashDataFile(const char * filename)
 @implementation Torrent (Private)
 
 //if a hash is given, attempt to load that; otherwise, attempt to open file at path
-- (id) initWithHash: (NSString *) hashString path: (NSString *) path torrentStruct: (tr_torrent *) torrentStruct lib: (tr_handle *) lib
+- (id) initWithHash: (NSString *) hashString path: (NSString *) path torrentStruct: (tr_torrent *) torrentStruct lib: (tr_session *) lib
         publicTorrent: (NSNumber *) publicTorrent
         downloadFolder: (NSString *) downloadFolder
         useIncompleteFolder: (NSNumber *) useIncompleteFolder incompleteFolder: (NSString *) incompleteFolder

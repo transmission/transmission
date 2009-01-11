@@ -70,13 +70,13 @@
 
 @implementation PrefsController
 
-tr_handle * fHandle;
-+ (void) setHandle: (tr_handle *) handle
+tr_session * fHandle;
++ (void) setHandle: (tr_session *) handle
 {
     fHandle = handle;
 }
 
-+ (tr_handle *) handle
++ (tr_session *) handle
 {
     return fHandle;
 }
