@@ -1,17 +1,21 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
-1.50 (2009/mm/dd)
-<http://trac.transmissionbt.com/query?milestone=1.50&group=component&groupdesc=1&order=severity>
+1.60 (2009/mm/dd)
+<http://trac.transmissionbt.com/query?milestone=1.60&group=component&groupdesc=1&order=severity>
 - All Platforms
-   + IPv6 support
    + Random port, with optional randomization on startup
-   + When removing local data only remove data from the torrent
 - Mac
    + Requires Mac OS X 10.5 Leopard or newer
-   + Groups (moved to preferences) can be auto-assigned to transfers when adding based on name and tracker
+   + Groups (moved to preferences) can be auto-assigned to transfers when adding based on multiple criteria
    + Groups can have a default location when adding transfers
    + Bonjour support for the web interface
    + File filter field in the inspector
+
+1.50 (2009/01/dd)
+<http://trac.transmissionbt.com/query?milestone=1.50&group=component&groupdesc=1&order=severity>
+- All Platforms
+   + IPv6 support
+   + When removing local data only remove data from the torrent
 - GTK+
    + Minor display improvements and HIG compliance
 
