@@ -20,6 +20,8 @@
 #include <string.h> /* memcmp */
 #include <stdlib.h> /* qsort */
 
+#include <event.h> /* evbuffer */
+
 #include "transmission.h"
 #include "session.h"
 #include "bandwidth.h"
@@ -1129,23 +1131,33 @@ tr_torrentVerify( tr_torrent * tor )
 }
 
 static void
-stopTorrent( void * vtor )
+tr_torrentCloseLocalFiles( const tr_torrent * tor )
 {
     tr_file_index_t i;
+    struct evbuffer * buf = evbuffer_new( );
 
-    tr_torrent *    tor = vtor;
+    for( i=0; i<tor->info.fileCount; ++i )
+    {
+        const tr_file * file = &tor->info.files[i];
+        evbuffer_drain( buf, EVBUFFER_LENGTH( buf ) );
+        evbuffer_add_printf( buf, "%s%s%s", tor->downloadDir, TR_PATH_DELIMITER_STR, file->name );
+        tr_fdFileClose( (const char*) EVBUFFER_DATA( buf ) );
+    }
+
+    evbuffer_free( buf );
+}
+
+
+static void
+stopTorrent( void * vtor )
+{
+    tr_torrent * tor = vtor;
 
     tr_verifyRemove( tor );
     tr_peerMgrStopTorrent( tor->session->peerMgr, tor->info.hash );
     tr_trackerStop( tor->tracker );
 
-    for( i = 0; i < tor->info.fileCount; ++i )
-    {
-        const tr_file * file = &tor->info.files[i];
-        char * path = tr_buildPath( tor->downloadDir, file->name, NULL );
-        tr_fdFileClose( path );
-        tr_free( path );
-    }
+    tr_torrentCloseLocalFiles( tor );
 }
 
 void
@@ -1277,6 +1289,7 @@ tr_torrentRecheckCompleteness( tr_torrent * tor )
         }
 
         tor->completeness = completeness;
+        tr_torrentCloseLocalFiles( tor );
         fireCompletenessChange( tor, completeness );
 
         if( recentChange && ( completeness == TR_SEED ) )
@@ -1854,13 +1867,6 @@ deleteLocalData( tr_torrent * tor, tr_fileFunc fileFunc )
     /* build the set of folders and dirtyFolders */
     walkLocalData( tor, root, root, NULL, &torrentFiles, &folders, &dirtyFolders );
 
-    /* close all the files because we're about to delete them */
-    for( f=0; f<tor->info.fileCount; ++f ) {
-        char * path = tr_buildPath( tor->downloadDir, tor->info.files[f].name, NULL );
-        tr_fdFileClose( path );
-        tr_free( path );
-    }
-
     /* try to remove entire folders first, so that the recycle bin will be tidy */
     s = (char**) tr_ptrArrayPeek( &folders, &n );
     for( i=0; i<n; ++i )
@@ -1903,12 +1909,14 @@ tr_torrentDeleteLocalData( tr_torrent * tor, tr_fileFunc fileFunc )
     if( fileFunc == NULL )
         fileFunc = unlink;
 
+    /* close all the files because we're about to delete them */
+    tr_torrentCloseLocalFiles( tor );
+
     if( tor->info.fileCount > 1 )
         deleteLocalData( tor, fileFunc );
     else {
         /* torrent only has one file */
         char * path = tr_buildPath( tor->downloadDir, tor->info.files[0].name, NULL );
-        tr_fdFileClose( path );
         fileFunc( path );
         tr_free( path );
     }
