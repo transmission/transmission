@@ -32,6 +32,7 @@ GtkWidget * tr_prefs_dialog_new( GObject *   core,
 #define PREF_KEY_DIR_WATCH                  "watch-dir"
 #define PREF_KEY_DIR_WATCH_ENABLED          "watch-dir-enabled"
 #define PREF_KEY_SHOW_TRAY_ICON             "show-notification-area-icon"
+#define PREF_KEY_SHOW_DESKTOP_NOTIFICATION  "show-desktop-notification"
 #define PREF_KEY_START                      "start-added-torrents"
 #define PREF_KEY_TRASH_ORIGINAL             "trash-original-torrent-files"
 #define PREF_KEY_ASKQUIT                    "prompt-before-exit"

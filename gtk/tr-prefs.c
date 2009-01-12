@@ -39,7 +39,7 @@ tr_prefs_init_global( void )
 
     cf_check_older_configs( );
 
-#if HAVE_GIO
+#ifdef HAVE_GIO
     str = NULL;
     if( !str ) str = g_get_user_special_dir( G_USER_DIRECTORY_DESKTOP );
     if( !str ) str = tr_getDefaultDownloadDir( );
@@ -56,6 +56,7 @@ tr_prefs_init_global( void )
     pref_flag_set_default   ( PREF_KEY_FILTERBAR, TRUE );
     pref_flag_set_default   ( PREF_KEY_STATUSBAR, TRUE );
     pref_flag_set_default   ( PREF_KEY_SHOW_TRAY_ICON, FALSE );
+    pref_flag_set_default   ( PREF_KEY_SHOW_DESKTOP_NOTIFICATION, TRUE );
     pref_string_set_default ( PREF_KEY_STATUSBAR_STATS, "total-ratio" );
 
     pref_flag_set_default   ( PREF_KEY_SCHED_LIMIT_ENABLED, FALSE );
@@ -348,6 +349,10 @@ desktopPage( GObject * core )
 
     s = _( "Show _icon in the desktop Notification Area" );
     w = new_check_button( s, PREF_KEY_SHOW_TRAY_ICON, core );
+    hig_workarea_add_wide_control( t, &row, w );
+
+    s = _( "Show desktop _notifications" );
+    w = new_check_button( s, PREF_KEY_SHOW_DESKTOP_NOTIFICATION, core );
     hig_workarea_add_wide_control( t, &row, w );
 
     hig_workarea_finish( t, &row );
