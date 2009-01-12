@@ -26,6 +26,7 @@
 #include "clients.h"
 #include "completion.h"
 #include "crypto.h"
+#include "fdlimit.h"
 #include "handshake.h"
 #include "inout.h" /* tr_ioTestPiece */
 #include "net.h"
@@ -1062,7 +1063,7 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
 
         case TR_PEER_CLIENT_GOT_BLOCK:
         {
-            tr_torrent *     tor = t->tor;
+            tr_torrent * tor = t->tor;
 
             tr_block_index_t block = _tr_block( tor, e->pieceIndex, e->offset );
 
@@ -1087,14 +1088,32 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
                 tr_peerMgrSetBlame( tor->session->peerMgr, tor->info.hash, p, ok );
 
                 if( !ok )
+                {
                     gotBadPiece( t, p );
+                }
                 else
                 {
                     int i;
-                    int peerCount = tr_ptrArraySize( &t->peers );
-                    tr_peer ** peers = (tr_peer**) tr_ptrArrayBase( &t->peers );
+                    int peerCount;
+                    tr_peer ** peers;
+                    tr_file_index_t fileIndex;
+
+                    peerCount = tr_ptrArraySize( &t->peers );
+                    peers = (tr_peer**) tr_ptrArrayBase( &t->peers );
                     for( i=0; i<peerCount; ++i )
                         tr_peerMsgsHave( peers[i]->msgs, p );
+
+                    for( fileIndex=0; fileIndex<tor->info.fileCount; ++fileIndex )
+                    {
+                        const tr_file * file = &tor->info.files[fileIndex];
+                        if( ( file->firstPiece <= p ) && ( p <= file->lastPiece ) && tr_cpFileIsComplete( &tor->completion, fileIndex ) )
+                        {
+                            char * path = tr_buildPath( tor->downloadDir, file->name, NULL );
+                            tordbg( t, "closing recently-completed file \"%s\"", path );
+                            tr_fdFileClose( path );
+                            tr_free( path );
+                        }
+                    }
                 }
 
                 tr_torrentRecheckCompleteness( tor );

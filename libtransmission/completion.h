@@ -128,11 +128,13 @@ void   tr_cpPieceAdd( tr_completion    * completion,
 void   tr_cpPieceRem( tr_completion     * completion,
                       tr_piece_index_t   piece );
 
+tr_bool tr_cpFileIsComplete( const tr_completion * cp, tr_file_index_t );
+
 /**
 *** Blocks
 **/
 
-static TR_INLINE int tr_cpBlockIsComplete( const tr_completion * cp, tr_block_index_t block ) {
+static TR_INLINE tr_bool tr_cpBlockIsComplete( const tr_completion * cp, tr_block_index_t block ) {
     return tr_bitfieldHas( &cp->blockBitfield, block );
 }
 
