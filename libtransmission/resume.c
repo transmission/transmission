@@ -228,11 +228,11 @@ loadPriorities( tr_benc *    dict,
     if( tr_bencDictFindList( dict, KEY_PRIORITY, &list )
       && ( tr_bencListSize( list ) == n ) )
     {
-        int64_t         tmp;
+        int64_t priority;
         tr_file_index_t i;
         for( i = 0; i < n; ++i )
-            if( tr_bencGetInt( tr_bencListChild( list, i ), &tmp ) )
-                inf->files[i].priority = tmp;
+            if( tr_bencGetInt( tr_bencListChild( list, i ), &priority ) )
+                tr_torrentInitFilePriority( tor, i, priority );
         ret = TR_FR_PRIORITY;
     }
 
