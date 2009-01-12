@@ -49,8 +49,6 @@
 	<string>BUNDLE_VERSION_INFOPLIST</string>
 	<key>CFBundleGetInfoString</key>
 	<string>VERSION_STRING_INFOPLIST (BUNDLE_VERSION_INFOPLIST)</string>
-	<key>LSMinimumSystemVersion</key>
-	<string>10.5.0</string>
 	<key>NSAppleScriptEnabled</key>
 	<string>YES</string>
 	<key>NSMainNibFile</key>
