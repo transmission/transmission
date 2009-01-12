@@ -71,10 +71,8 @@
 	</array>
 	<key>SUAllowsAutomaticUpdates</key>
 	<false/>
-	<key>AppcastRelease</key>
+	<key>SUFeedURL</key>
 	<string>http://www.transmissionbt.com/appcast.xml</string>
-	<key>AppcastBeta</key>
-	<string>http://www.transmissionbt.com/appcast_beta.xml</string>
 	<key>SUPublicDSAKeyFile</key>
 	<string>sparkle_dsa_pub.pem</string>
 	<key>SUScheduledCheckInterval</key>
