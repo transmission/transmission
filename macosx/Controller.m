@@ -201,7 +201,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         fDefaults = [NSUserDefaults standardUserDefaults];
         
         tr_benc settings;
-        tr_bencInitDict(&settings, 21);
+        tr_bencInitDict(&settings, 20);
         tr_sessionGetDefaultSettings(&settings);
         
         tr_bencDictAddInt(&settings, TR_PREFS_KEY_BLOCKLIST_ENABLED, [fDefaults boolForKey: @"Blocklist"]);
