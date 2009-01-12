@@ -11,6 +11,7 @@
  */
 
 #include <errno.h>
+#include <math.h> /* ceil() */
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -1010,8 +1011,10 @@ refresh_activity( GtkWidget * top )
     char            sizeStr2[64];
     char            buf[128];
     const tr_stat * stat = tr_torrent_stat( a->gtor );
+    const tr_info * info = tr_torrent_info( a->gtor );
     const double    complete = stat->percentComplete * 100.0;
     const double    done = stat->percentDone * 100.0;
+    const double    verifiedPieceCount = (double)stat->haveValid / info->pieceSize;
 
     pch = tr_torrent_status_str( a->gtor );
     gtk_label_set_text ( GTK_LABEL( a->state_lb ), pch );
@@ -1034,9 +1037,10 @@ refresh_activity( GtkWidget * top )
     tr_strlsize( sizeStr2, stat->haveValid,
                 sizeof( sizeStr2 ) );
     /* %1$s is total size of what we've saved to disk
-       %2$s is how much of it's passed the checksum test */
-    g_snprintf( buf, sizeof( buf ), _(
-                    "%1$s (%2$s verified)" ), sizeStr, sizeStr2 );
+       %2$s is how much of it's passed the checksum test
+       %3$s is how many pieces are verified */
+    g_snprintf( buf, sizeof( buf ), _( "%1$s (%2$s verified in %3$d pieces)" ),
+                sizeStr, sizeStr2, (int)ceil(verifiedPieceCount) );
     gtk_label_set_text( GTK_LABEL( a->have_lb ), buf );
 
     tr_strlsize( sizeStr, stat->downloadedEver, sizeof( sizeStr ) );
