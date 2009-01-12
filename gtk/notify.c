@@ -16,6 +16,7 @@
 #endif
 #include <glib/gi18n.h>
 #include "notify.h"
+#include "tr-prefs.h"
 #include "util.h"
 
 #ifndef HAVE_LIBNOTIFY
