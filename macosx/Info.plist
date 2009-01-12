@@ -7,32 +7,22 @@
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
+			<key>CFBundleTypeIconFile</key>
+			<string>TransmissionDocument</string>
+			<key>CFBundleTypeName</key>
+			<string>BitTorrent Document</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>torrent</string>
 			</array>
-			<key>CFBundleTypeIconFile</key>
-			<string>TransmissionDocument</string>
-			<key>CFBundleTypeMIMETypes</key>
-			<array>
-				<string>application/x-bittorrent</string>
-			</array>
-			<key>CFBundleTypeName</key>
-			<string>BitTorrent Document</string>
-			<key>CFBundleTypeOSTypes</key>
-			<array>
-				<string>TORR</string>
-			</array>
-			<key>CFBundleTypeRole</key>
-			<string>Viewer</string>
 			<key>LSItemContentTypes</key>
 			<array>
 				<string>org.bittorrent.torrent</string>
 			</array>
-			<key>LSTypeIsPackage</key>
-			<false/>
-			<key>NSPersistentStoreTypeKey</key>
-			<string>XML</string>
+			<key>LSHandlerRank</key>
+			<string>Owner</string>
 		</dict>
 	</array>
 	<key>CFBundleExecutable</key>
@@ -59,6 +49,8 @@
 	<string>BUNDLE_VERSION_INFOPLIST</string>
 	<key>CFBundleGetInfoString</key>
 	<string>VERSION_STRING_INFOPLIST (BUNDLE_VERSION_INFOPLIST)</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>10.5.0</string>
 	<key>NSAppleScriptEnabled</key>
 	<string>YES</string>
 	<key>NSMainNibFile</key>
@@ -79,8 +71,10 @@
 	</array>
 	<key>SUAllowsAutomaticUpdates</key>
 	<false/>
-	<key>SUFeedURL</key>
+	<key>AppcastRelease</key>
 	<string>http://www.transmissionbt.com/appcast.xml</string>
+	<key>AppcastBeta</key>
+	<string>http://www.transmissionbt.com/appcast_beta.xml</string>
 	<key>SUPublicDSAKeyFile</key>
 	<string>sparkle_dsa_pub.pem</string>
 	<key>SUScheduledCheckInterval</key>
