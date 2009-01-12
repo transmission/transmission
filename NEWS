@@ -8,13 +8,13 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Fix 1.42 error that made tracker announces slower over time
    + When removing local data only remove data from the torrent
    + Better performance when sharing with very fast peers
-   + Better handling of non-UTF-8 .torrent files
+   + Better handling of non-UTF-8 torrent files
 - GTK+
    + Various HIG and usability changes
 - Daemon
    + Make i18n support optional for cli and daemon clients
 - CLI
-   + Now supports session.json settings as the Daemon and GTK+ clients do
+   + Support session.json settings as the Daemon and GTK+ clients do
 
 1.42 (2008/12/24)
 <http://trac.transmissionbt.com/query?milestone=1.42&group=component&groupdesc=1&order=severity>
