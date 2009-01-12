@@ -93,7 +93,7 @@ gotsig( int sig UNUSED )
 
 #if defined(WIN32)
  #define USE_NO_DAEMON
-#elif !defined(HAVE_DAEMON) || defined(__MIPSEL__) || defined(__UCLIBC__)
+#elif !defined(HAVE_DAEMON) || defined(__UCLIBC__)
  #define USE_TR_DAEMON
 #else
  #define USE_OS_DAEMON
