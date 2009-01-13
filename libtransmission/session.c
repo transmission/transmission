@@ -369,8 +369,6 @@ tr_sessionInit( const char  * tag,
     tr_benc settings;
     tr_session * session;
     char * filename;
-    int64_t rpc_enabled, whitelist_enabled, rpc_auth_enabled, rpc_port;
-    const char * whitelist = NULL, *rpc_passwd = NULL, *rpc_username = NULL;
 
     assert( tr_bencIsDict( clientSettings ) );
 
@@ -527,16 +525,7 @@ tr_sessionInit( const char  * tag,
     tr_statsInit( session );
 
     session->web = tr_webInit( session ); 
-    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_RPC_ENABLED, &rpc_enabled ) 
-         && tr_bencDictFindInt( &settings, TR_PREFS_KEY_RPC_PORT, &rpc_port ) 
-         && tr_bencDictFindInt( &settings, TR_PREFS_KEY_RPC_WHITELIST_ENABLED, &whitelist_enabled ) 
-         && tr_bencDictFindInt( &settings, TR_PREFS_KEY_RPC_AUTH_REQUIRED, &rpc_auth_enabled ) 
-         && tr_bencDictFindStr( &settings, TR_PREFS_KEY_RPC_WHITELIST, &whitelist ) 
-         && tr_bencDictFindStr( &settings, TR_PREFS_KEY_RPC_USERNAME, &rpc_username ) 
-         && tr_bencDictFindStr( &settings, TR_PREFS_KEY_RPC_PASSWORD, &rpc_passwd ); 
-    assert( found ); 
-    session->rpcServer = tr_rpcInit( session, rpc_enabled, rpc_port, whitelist_enabled, whitelist, 
-                                     rpc_auth_enabled, rpc_username, rpc_passwd ); 
+    session->rpcServer = tr_rpcInit( session, &settings ); 
 
     metainfoLookupRescan( session );
 
