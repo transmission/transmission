@@ -227,20 +227,7 @@ addFiles( tr_benc *    args,
     }
     if( strcmp( arg, "all" ) )
     {
-        const char * walk = arg;
-        while( *walk )
-        {
-            char *        p;
-            unsigned long l;
-            errno = 0;
-            l = strtol( walk, &p, 10 );
-            if( errno )
-                break;
-            tr_bencListAddInt( files, l - 1 );
-            if( *p != ',' )
-                break;
-            walk = p + 1;
-        }
+        tr_rpc_parse_list_str( files, arg, strlen( arg ) );
     }
 }
 
