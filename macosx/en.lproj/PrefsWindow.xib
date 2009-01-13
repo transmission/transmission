@@ -3069,6 +3069,7 @@ zcfN584IzijOSc5pzorOqs66ztvO+88czzzPXc99z57Pvs/fz+/QANAg0EHQYdCC0KLQw9Dj0PPRFNE0
 								</object>
 								<string key="NSFrame">{{1, 1}, {141, 169}}</string>
 								<reference key="NSSuperview" ref="544077474"/>
+								<reference key="NSNextKeyView" ref="638525082"/>
 								<reference key="NSDocView" ref="638525082"/>
 								<reference key="NSBGColor" ref="729660797"/>
 								<int key="NScvFlags">4</int>
@@ -3096,6 +3097,7 @@ zcfN584IzijOSc5pzorOqs66ztvO+88czzzPXc99z57Pvs/fz+/QANAg0EHQYdCC0KLQw9Dj0PPRFNE0
 						</object>
 						<string key="NSFrame">{{20, 49}, {143, 171}}</string>
 						<reference key="NSSuperview" ref="284666863"/>
+						<reference key="NSNextKeyView" ref="568562479"/>
 						<int key="NSsFlags">530</int>
 						<reference key="NSVScroller" ref="287972127"/>
 						<reference key="NSHScroller" ref="781866080"/>
@@ -5534,11 +5536,6 @@ AAABAAAAAQ</bytes>
 				<string key="NSExtension">NSResponder</string>
 			</object>
 			<object class="NSUserDefaultsController" id="356871564">
-				<object class="NSMutableArray" key="NSDeclaredKeys">
-					<bool key="EncodedWithXMLCoder">YES</bool>
-					<string>AutoUpdateBeta</string>
-					<string>SUEnableAutomaticChecks</string>
-				</object>
 				<bool key="NSSharedInstance">YES</bool>
 			</object>
 			<object class="NSCustomObject" id="981493640">
@@ -8732,28 +8729,12 @@ AAABAAAAAQ</bytes>
 					<int key="connectionID">1897</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
-						<string key="label">enabled: values.SUEnableAutomaticChecks</string>
-						<reference key="source" ref="1005555131"/>
-						<reference key="destination" ref="356871564"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="1005555131"/>
-							<reference key="NSDestination" ref="356871564"/>
-							<string key="NSLabel">enabled: values.SUEnableAutomaticChecks</string>
-							<string key="NSBinding">enabled</string>
-							<string key="NSKeyPath">values.SUEnableAutomaticChecks</string>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">1898</int>
-				</object>
-				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">updateAppcastURL:</string>
+						<string key="label">setAutoUpdateToBeta:</string>
 						<reference key="source" ref="511492310"/>
 						<reference key="destination" ref="1005555131"/>
 					</object>
-					<int key="connectionID">1899</int>
+					<int key="connectionID">1900</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -12551,7 +12532,7 @@ AAABAAAAAQ</bytes>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">1899</int>
+			<int key="maxID">1900</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -12706,6 +12687,7 @@ AAABAAAAAQ</bytes>
 							<string>setAutoImport:</string>
 							<string>setAutoSize:</string>
 							<string>setAutoSpeedLimit:</string>
+							<string>setAutoUpdateToBeta:</string>
 							<string>setBadge:</string>
 							<string>setBlocklistAutoUpdate:</string>
 							<string>setBlocklistEnabled:</string>
@@ -12738,7 +12720,6 @@ AAABAAAAAQ</bytes>
 							<string>setSpeedLimit:</string>
 							<string>setStalled:</string>
 							<string>setStalledMinutes:</string>
-							<string>updateAppcastURL:</string>
 							<string>updateBlocklist:</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">

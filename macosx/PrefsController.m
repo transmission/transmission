@@ -150,7 +150,7 @@ tr_session * fHandle;
             [fDefaults removeObjectForKey: @"CheckForUpdates"];
         }
         
-        [self updateAppcastURL: nil];
+        [self setAutoUpdateToBeta: nil];
     }
     
     return self;
@@ -338,15 +338,16 @@ tr_session * fHandle;
                                         TOOLBAR_PEERS, TOOLBAR_NETWORK, TOOLBAR_REMOTE, nil];
 }
 
+#warning add custom Sparkle to support this; reenable in XIB
 //for a beta release, always use the beta appcast
 #if defined(BETA_RELEASE)
-#define APPCAST_URL @"AppcastBeta"
+#define SPARKLE_TAG YES
 #else
-#define APPCAST_URL ([[NSUserDefaults standardUserDefaults] boolForKey: @"AutoUpdateBeta"] ? @"AppcastBeta" : @"AppcastRelease")
+#define SPARKLE_TAG [fDefaults boolForKey: @"AutoUpdateBeta"]
 #endif
-- (void) updateAppcastURL: (id) sender
+- (void) setAutoUpdateToBeta: (id) sender
 {
-    [[SUUpdater sharedUpdater] setFeedURL: [NSURL URLWithString: [[[NSBundle mainBundle] infoDictionary] objectForKey: APPCAST_URL]]];
+    [[SUUpdater sharedUpdater] setAllowedTags: SPARKLE_TAG ? [NSSet setWithObject: @"beta"] : nil];
 }
 
 - (void) setPort: (id) sender
