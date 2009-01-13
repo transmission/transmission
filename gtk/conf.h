@@ -22,14 +22,11 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-struct tr_benc;
-
-/**
-***
-**/
-
 #ifndef TG_CONF_H
 #define TG_CONF_H
+
+#include <inttypes.h>
+#include <libtransmission/transmission.h>
 
 int64_t          pref_int_get           ( const char * key );
 void             pref_int_set           ( const char * key, int64_t value );
