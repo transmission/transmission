@@ -68,8 +68,7 @@ savePeers( tr_benc *          dict,
            const tr_torrent * tor )
 {
     tr_pex * pex = NULL;
-    int count = tr_peerMgrGetPeers( tor->session->peerMgr,
-                                    tor->info.hash, &pex, TR_AF_INET );
+    int count = tr_peerMgrGetPeers( (tr_torrent*) tor, &pex, TR_AF_INET );
 
     if( count > 0 )
         tr_bencDictAddRaw( dict, KEY_PEERS, pex, sizeof( tr_pex ) * count );
@@ -77,8 +76,7 @@ savePeers( tr_benc *          dict,
     tr_free( pex );
     pex = NULL;
     
-    count = tr_peerMgrGetPeers( tor->session->peerMgr, tor->info.hash, &pex,
-                                TR_AF_INET6 );
+    count = tr_peerMgrGetPeers( (tr_torrent*) tor, &pex, TR_AF_INET6 );
     if( count > 0 )
         tr_bencDictAddRaw( dict, KEY_PEERS6, pex, sizeof( tr_pex ) * count );
     
@@ -101,8 +99,7 @@ loadPeers( tr_benc *    dict,
         {
             tr_pex pex;
             memcpy( &pex, str + ( i * sizeof( tr_pex ) ), sizeof( tr_pex ) );
-            tr_peerMgrAddPex( tor->session->peerMgr,
-                              tor->info.hash, TR_PEER_FROM_CACHE, &pex );
+            tr_peerMgrAddPex( tor, TR_PEER_FROM_CACHE, &pex );
         }
         tr_tordbg( tor, "Loaded %d IPv4 peers from resume file", count );
         ret = TR_FR_PEERS;
@@ -116,8 +113,7 @@ loadPeers( tr_benc *    dict,
         {
             tr_pex pex;
             memcpy( &pex, str + ( i * sizeof( tr_pex ) ), sizeof( tr_pex ) );
-            tr_peerMgrAddPex( tor->session->peerMgr,
-                              tor->info.hash, TR_PEER_FROM_CACHE, &pex );
+            tr_peerMgrAddPex( tor, TR_PEER_FROM_CACHE, &pex );
         }
         tr_tordbg( tor, "Loaded %d IPv6 peers from resume file", count );
         ret = TR_FR_PEERS;

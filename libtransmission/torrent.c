@@ -205,8 +205,7 @@ onTrackerResponse( void * tracker UNUSED,
             {
                 if( event->allAreSeeds )
                     pex[i].flags |= ADDED_F_SEED_FLAG;
-                tr_peerMgrAddPex( tor->session->peerMgr, tor->info.hash,
-                                  TR_PEER_FROM_TRACKER, pex + i );
+                tr_peerMgrAddPex( tor, TR_PEER_FROM_TRACKER, pex + i );
             }
 
             tr_free( pex );
@@ -744,8 +743,7 @@ tr_torrentStat( tr_torrent * tor )
                              &s->seeders,
                              &s->downloaders );
 
-    tr_peerMgrTorrentStats( tor->session->peerMgr,
-                            tor->info.hash,
+    tr_peerMgrTorrentStats( tor,
                             &s->peersKnown,
                             &s->peersConnected,
                             &usableSeeds,
@@ -799,10 +797,7 @@ tr_torrentStat( tr_torrent * tor )
     else
     {
         tr_piece_index_t i;
-        tr_bitfield *    peerPieces = tr_peerMgrGetAvailable(
-            tor->session->peerMgr,
-            tor->info.
-            hash );
+        tr_bitfield *    peerPieces = tr_peerMgrGetAvailable( tor );
         s->desiredAvailable = 0;
         for( i = 0; i < tor->info.pieceCount; ++i )
             if( !tor->info.pieces[i].dnd && tr_bitfieldHas( peerPieces, i ) )
@@ -919,8 +914,7 @@ tr_torrentFilesFree( tr_file_stat *            files,
 float*
 tr_torrentWebSpeeds( const tr_torrent * tor )
 {
-    return tor ? tr_peerMgrWebSpeeds( tor->session->peerMgr, tor->info.hash )
-           : NULL;
+    return tor ? tr_peerMgrWebSpeeds( tor ) : NULL;
 }
 
 tr_peer_stat *
@@ -930,8 +924,7 @@ tr_torrentPeers( const tr_torrent * tor,
     tr_peer_stat * ret = NULL;
 
     if( tor )
-        ret = tr_peerMgrPeerStats( tor->session->peerMgr,
-                                   tor->info.hash, peerCount );
+        ret = tr_peerMgrPeerStats( tor, peerCount );
 
     return ret;
 }
@@ -948,9 +941,7 @@ tr_torrentAvailability( const tr_torrent * tor,
                         int8_t *           tab,
                         int                size )
 {
-    tr_peerMgrTorrentAvailability( tor->session->peerMgr,
-                                   tor->info.hash,
-                                   tab, size );
+    tr_peerMgrTorrentAvailability( tor, tab, size );
 }
 
 void
@@ -1012,7 +1003,7 @@ freeTorrent( tr_torrent * tor )
 
     tr_globalLock( session );
 
-    tr_peerMgrRemoveTorrent( session->peerMgr, tor->info.hash );
+    tr_peerMgrRemoveTorrent( tor );
 
     tr_cpDestruct( &tor->completion );
 
@@ -1065,7 +1056,7 @@ checkAndStartImpl( void * vtor )
     tr_torrentSaveResume( tor );
     tor->startDate = time( NULL );
     tr_trackerStart( tor->tracker );
-    tr_peerMgrStartTorrent( tor->session->peerMgr, tor->info.hash );
+    tr_peerMgrStartTorrent( tor );
 
     tr_globalUnlock( tor->session );
 }
@@ -1154,7 +1145,7 @@ stopTorrent( void * vtor )
     tr_torrent * tor = vtor;
 
     tr_verifyRemove( tor );
-    tr_peerMgrStopTorrent( tor->session->peerMgr, tor->info.hash );
+    tr_peerMgrStopTorrent( tor );
     tr_trackerStop( tor->tracker );
 
     tr_torrentCloseLocalFiles( tor );

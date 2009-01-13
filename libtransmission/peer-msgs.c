@@ -1046,7 +1046,7 @@ parseUtPex( tr_peermsgs * msgs, int msglen, struct evbuffer * inbuf )
     int loaded = 0;
     uint8_t * tmp = tr_new( uint8_t, msglen );
     tr_benc val;
-    const tr_torrent * tor = msgs->torrent;
+    tr_torrent * tor = msgs->torrent;
     const uint8_t * added;
     size_t added_len;
 
@@ -1066,8 +1066,7 @@ parseUtPex( tr_peermsgs * msgs, int msglen, struct evbuffer * inbuf )
                 tr_peerMgrCompactToPex( added, added_len, added_f, added_f_len,
                                         &n );
             for( i = 0; i < n; ++i )
-                tr_peerMgrAddPex( msgs->session->peerMgr, tor->info.hash,
-                                  TR_PEER_FROM_PEX, pex + i );
+                tr_peerMgrAddPex( tor, TR_PEER_FROM_PEX, pex + i );
             tr_free( pex );
         }
         
@@ -1082,8 +1081,7 @@ parseUtPex( tr_peermsgs * msgs, int msglen, struct evbuffer * inbuf )
                 tr_peerMgrCompact6ToPex( added, added_len, added_f, added_f_len,
                                          &n );
             for( i = 0; i < n; ++i )
-                tr_peerMgrAddPex( msgs->session->peerMgr, tor->info.hash,
-                                  TR_PEER_FROM_PEX, pex + i );
+                tr_peerMgrAddPex( tor, TR_PEER_FROM_PEX, pex + i );
             tr_free( pex );
         }
         
@@ -1913,12 +1911,8 @@ sendPex( tr_peermsgs * msgs )
         PexDiffs diffs6;
         tr_pex * newPex = NULL;
         tr_pex * newPex6 = NULL;
-        const int newCount = tr_peerMgrGetPeers( msgs->session->peerMgr,
-                                                 msgs->torrent->info.hash,
-                                                 &newPex, TR_AF_INET );
-        const int newCount6 = tr_peerMgrGetPeers( msgs->session->peerMgr,
-                                                  msgs->torrent->info.hash,
-                                                  &newPex6, TR_AF_INET6 );
+        const int newCount = tr_peerMgrGetPeers( msgs->torrent, &newPex, TR_AF_INET );
+        const int newCount6 = tr_peerMgrGetPeers( msgs->torrent, &newPex6, TR_AF_INET6 );
 
         /* build the diffs */
         diffs.added = tr_new( tr_pex, newCount );

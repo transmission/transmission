@@ -415,9 +415,7 @@ parsePeers( tr_torrent *    tor,
         {
             tr_pex pex;
             readBytes( &pex, &buf, sizeof( tr_pex ) );
-            tr_peerMgrAddPex( tor->session->peerMgr, tor->info.hash,
-                              TR_PEER_FROM_CACHE,
-                              &pex );
+            tr_peerMgrAddPex( tor, TR_PEER_FROM_CACHE, &pex );
         }
 
         tr_tordbg( tor, "Loaded %d peers from resume file", count );

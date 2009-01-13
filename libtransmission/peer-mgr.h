@@ -105,9 +105,8 @@ tr_peerMgr* tr_peerMgrNew( tr_session * );
 
 void tr_peerMgrFree( tr_peerMgr * manager );
 
-tr_bool tr_peerMgrPeerIsSeed( const tr_peerMgr  * mgr,
-                              const uint8_t     * torrentHash,
-                              const tr_address  * addr );
+tr_bool tr_peerMgrPeerIsSeed( const tr_torrent * tor,
+                              const tr_address * addr );
 
 void tr_peerMgrAddIncoming( tr_peerMgr  * manager,
                             tr_address  * addr,
@@ -130,46 +129,37 @@ tr_pex * tr_peerMgrArrayToPex( const void * array,
                                size_t       arrayLen,
                                size_t      * setme_pex_count );
 
-void tr_peerMgrAddPex( tr_peerMgr     * manager,
-                       const uint8_t  * torrentHash,
+void tr_peerMgrAddPex( tr_torrent     * tor,
                        uint8_t          from,
                        const tr_pex   * pex );
 
-void tr_peerMgrSetBlame( tr_peerMgr        * manager,
-                         const uint8_t     * torrentHash,
+void tr_peerMgrSetBlame( tr_torrent        * tor,
                          tr_piece_index_t    pieceIndex,
                          int                 success );
 
-int  tr_peerMgrGetPeers( tr_peerMgr      * manager,
-                         const uint8_t   * torrentHash,
+int  tr_peerMgrGetPeers( tr_torrent      * tor,
                          tr_pex         ** setme_pex,
                          uint8_t           af);
 
-void tr_peerMgrStartTorrent( tr_peerMgr     * manager,
-                             const uint8_t  * torrentHash );
+void tr_peerMgrStartTorrent( tr_torrent * tor );
 
-void tr_peerMgrStopTorrent( tr_peerMgr      * manager,
-                             const uint8_t  * torrentHash );
+void tr_peerMgrStopTorrent( tr_torrent * tor );
 
 void tr_peerMgrAddTorrent( tr_peerMgr         * manager,
                            struct tr_torrent  * tor );
 
-void tr_peerMgrRemoveTorrent( tr_peerMgr     * manager,
-                              const uint8_t  * torrentHash );
+void tr_peerMgrRemoveTorrent( tr_torrent * tor );
 
-void tr_peerMgrTorrentAvailability( const tr_peerMgr * manager,
-                                    const uint8_t    * torrentHash,
+void tr_peerMgrTorrentAvailability( const tr_torrent * tor,
                                     int8_t           * tab,
                                     unsigned int       tabCount );
 
-struct tr_bitfield* tr_peerMgrGetAvailable( const tr_peerMgr * manager,
-                                            const uint8_t    * torrentHash );
+struct tr_bitfield* tr_peerMgrGetAvailable( const tr_torrent * tor );
 
 int tr_peerMgrHasConnections( const tr_peerMgr * manager,
                               const uint8_t    * torrentHash );
 
-void tr_peerMgrTorrentStats( const tr_peerMgr * manager,
-                             const uint8_t * torrentHash,
+void tr_peerMgrTorrentStats( tr_torrent * tor,
                              int * setmePeersKnown,
                              int * setmePeersConnected,
                              int * setmeSeedsConnected,
@@ -178,12 +168,10 @@ void tr_peerMgrTorrentStats( const tr_peerMgr * manager,
                              int * setmePeersGettingFromUs,
                              int * setmePeersFrom ); /* TR_PEER_FROM__MAX */
 
-struct tr_peer_stat* tr_peerMgrPeerStats( const tr_peerMgr  * manager,
-                                          const uint8_t     * torrentHash,
-                                          int               * setmeCount );
+struct tr_peer_stat* tr_peerMgrPeerStats( const tr_torrent * tor,
+                                          int              * setmeCount );
 
-float* tr_peerMgrWebSpeeds( const tr_peerMgr  * manager,
-                            const uint8_t     * torrentHash );
+float* tr_peerMgrWebSpeeds( const tr_torrent * tor );
 
 
 double tr_peerGetPieceSpeed( const tr_peer    * peer,

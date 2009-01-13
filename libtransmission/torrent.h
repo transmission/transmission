@@ -24,6 +24,7 @@
 
 struct tr_bandwidth;
 struct tr_ratecontrol;
+struct tr_torrent_peers;
 
 /**
 ***  Package-visible ctor API
@@ -197,6 +198,8 @@ struct tr_torrent
     int                        uniqueId;
 
     struct tr_bandwidth      * bandwidth;
+
+    struct tr_torrent_peers  * torrentPeers;
 };
 
 /* get the index of this piece's first block */
