@@ -936,7 +936,8 @@ trackerPulse( void * vsession )
         dbgmsg( NULL, "tracker pulse... %d running", th->runningCount );
 
     /* upkeep: queue periodic rescrape / reannounce */
-    for( tor = session->torrentList; tor; tor = tor->next )
+    tor = NULL;
+    while(( tor = tr_torrentNext( session, tor )))
     {
         tr_tracker * t = tor->tracker;
 
@@ -965,7 +966,7 @@ trackerPulse( void * vsession )
     /* free the tracker manager if no torrents are left */
     if( ( session->tracker )
       && ( session->tracker->runningCount < 1 )
-      && ( session->torrentList == NULL ) )
+      && ( tr_sessionCountTorrents( session ) == 0 ) )
     {
         tr_trackerSessionClose( session );
     }

@@ -165,8 +165,7 @@ bindCb( int * const socket,
 static void
 incomingPeersPulse( tr_shared * s )
 {
-    int allPaused;
-    tr_torrent * tor;
+    tr_bool allPaused;
     
     if( s->shouldChange )
     {
@@ -176,17 +175,7 @@ incomingPeersPulse( tr_shared * s )
             tr_socketListForEach( s->bindSockets, &bindCb, s );
     }
     
-    /* see if any torrents aren't paused */
-    allPaused = 1;
-    tor = NULL;
-    while( ( tor = tr_torrentNext( s->session, tor ) ) )
-    {
-        if( TR_STATUS_IS_ACTIVE( tr_torrentGetActivity( tor ) ) )
-        {
-            allPaused = 0;
-            break;
-        }
-    }
+    allPaused = tr_sessionGetActiveTorrentCount( s->session ) == 0;
     
     /* if we have any running torrents, check for new incoming peer connections */
     /* (jhujhiti):
