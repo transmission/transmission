@@ -15,6 +15,7 @@
  #include <gio/gio.h>
 #endif
 #include <glib/gi18n.h>
+#include "conf.h"
 #include "notify.h"
 #include "tr-prefs.h"
 #include "util.h"

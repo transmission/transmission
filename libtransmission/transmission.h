@@ -563,6 +563,8 @@ tr_torrent ** tr_sessionLoadTorrents( tr_session  * session,
                                       tr_ctor     * ctor,
                                       int         * setmeCount );
 
+int tr_sessionGetActiveTorrentCount( tr_session * session );
+
 /** @} */
 
 /**
@@ -816,15 +818,6 @@ typedef int tr_fileFunc( const char * filename );
  *                 tr_torrentDeleteLocalData() ignores fileFunc's return value.
  */
 void tr_torrentDeleteLocalData( tr_torrent * torrent,  tr_fileFunc fileFunc );
-
-/**
- * @brief Iterate through the torrents.
- *
- * Pass in a NULL pointer to get the first torrent.
- */
-tr_torrent* tr_torrentNext( tr_session  * session,
-                            tr_torrent  * current );
-
 
 uint64_t tr_torrentGetBytesLeftToAllocate( const tr_torrent * torrent );
 

@@ -111,6 +111,10 @@ int              tr_torrentPromoteTracker( tr_torrent   * tor,
 time_t*          tr_torrentGetMTimes( const tr_torrent  * tor,
                                       size_t            * setmeCount );
 
+tr_torrent*      tr_torrentNext( tr_session  * session,
+                                 tr_torrent  * current );
+
+
 typedef enum
 {
     TR_VERIFY_NONE,

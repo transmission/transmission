@@ -1399,3 +1399,15 @@ tr_sessionSetProxyPassword( tr_session * session,
     }
 }
 
+int
+tr_sessionGetActiveTorrentCount( tr_session * session )
+{
+    int ret;
+    tr_torrent * tor;
+
+    while(( tor = tr_torrentNext( session, tor )))
+        if( tr_torrentGetActivity( tor ) != TR_STATUS_STOPPED )
+            ++ret;
+    
+    return ret;
+}
