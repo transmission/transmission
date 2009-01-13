@@ -32,7 +32,6 @@
 #include "net.h"
 #include "peer-io.h"
 #include "peer-mgr.h"
-#include "peer-mgr-private.h"
 #include "peer-msgs.h"
 #include "ptrarray.h"
 #include "stats.h" /* tr_statsAddUploaded, tr_statsAddDownloaded */

@@ -24,6 +24,7 @@
 #endif
 
 #include "net.h"
+#include "publish.h" /* tr_publisher_tag */
 
 struct tr_peer_stat;
 struct tr_torrent;
@@ -45,6 +46,58 @@ typedef struct tr_pex
     uint8_t    flags;
 }
 tr_pex;
+
+
+struct tr_bandwidth;
+struct tr_bitfield;
+struct tr_peerIo;
+struct tr_peermsgs;
+
+enum
+{
+    ENCRYPTION_PREFERENCE_UNKNOWN,
+    ENCRYPTION_PREFERENCE_YES,
+    ENCRYPTION_PREFERENCE_NO
+};
+
+/**
+ * State information about a connected peer.
+ *
+ * @see struct peer_atom
+ * @see tr_peermsgs
+ */
+typedef struct tr_peer
+{
+    tr_bool                  peerIsChoked;
+    tr_bool                  peerIsInterested;
+    tr_bool                  clientIsChoked;
+    tr_bool                  clientIsInterested;
+    tr_bool                  doPurge;
+
+    /* number of bad pieces they've contributed to */
+    uint8_t                  strikes;
+
+    uint8_t                  encryption_preference;
+    tr_port                  port;
+    tr_address               addr;
+    struct tr_peerIo       * io;
+
+    struct tr_bitfield     * blame;
+    struct tr_bitfield     * have;
+
+    /** how complete the peer's copy of the torrent is. [0.0...1.0] */
+    float                    progress;
+
+    /* the client name from the `v' string in LTEP's handshake dictionary */
+    char                   * client;
+
+    time_t                   chokeChangedAt;
+
+    struct tr_peermsgs     * msgs;
+    tr_publisher_tag         msgsTag;
+}
+tr_peer;
+
 
 int tr_pexCompare( const void * a, const void * b );
 
@@ -132,5 +185,9 @@ struct tr_peer_stat* tr_peerMgrPeerStats( const tr_peerMgr  * manager,
 float* tr_peerMgrWebSpeeds( const tr_peerMgr  * manager,
                             const uint8_t     * torrentHash );
 
+
+double tr_peerGetPieceSpeed( const tr_peer    * peer,
+                             uint64_t           now,
+                             tr_direction       direction );
 
 #endif

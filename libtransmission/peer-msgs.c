@@ -30,7 +30,6 @@
 #endif
 #include "peer-io.h"
 #include "peer-mgr.h"
-#include "peer-mgr-private.h"
 #include "peer-msgs.h"
 #include "platform.h" /* MAX_STACK_ARRAY_SIZE */
 #include "ratecontrol.h"
