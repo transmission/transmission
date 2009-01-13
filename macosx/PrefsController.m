@@ -338,7 +338,6 @@ tr_session * fHandle;
                                         TOOLBAR_PEERS, TOOLBAR_NETWORK, TOOLBAR_REMOTE, nil];
 }
 
-#warning add custom Sparkle to support this; reenable in XIB
 //for a beta release, always use the beta appcast
 #if defined(BETA_RELEASE)
 #define SPARKLE_TAG YES
