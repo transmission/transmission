@@ -156,9 +156,6 @@ void tr_peerMgrTorrentAvailability( const tr_torrent * tor,
 
 struct tr_bitfield* tr_peerMgrGetAvailable( const tr_torrent * tor );
 
-int tr_peerMgrHasConnections( const tr_peerMgr * manager,
-                              const uint8_t    * torrentHash );
-
 void tr_peerMgrTorrentStats( tr_torrent * tor,
                              int * setmePeersKnown,
                              int * setmePeersConnected,
