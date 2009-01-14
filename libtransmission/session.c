@@ -1402,7 +1402,7 @@ tr_sessionSetProxyPassword( tr_session * session,
 int
 tr_sessionGetActiveTorrentCount( tr_session * session )
 {
-    int ret;
+    int ret = 0;
     tr_torrent * tor = NULL;
 
     while(( tor = tr_torrentNext( session, tor )))
