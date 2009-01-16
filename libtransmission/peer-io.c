@@ -395,6 +395,7 @@ tr_peerIoNewOutgoing( tr_session        * session,
     assert( torrentHash );
 
     socket = tr_netOpenTCP( session, addr, port );
+    dbgmsg( NULL, "tr_netOpenTCP returned fd %d", socket );
 
     return socket < 0
            ? NULL
