@@ -71,6 +71,7 @@ readOrWriteBytes( const tr_torrent * tor,
 {
     const tr_info * info = &tor->info;
     const tr_file * file = &info->files[fileIndex];
+    tr_preallocation_mode preallocationMode;
 
     typedef size_t ( *iofunc )( int, void *, size_t );
     iofunc          func = ioMode == TR_IO_READ ? (iofunc)read : (iofunc)write;
@@ -93,9 +94,14 @@ readOrWriteBytes( const tr_torrent * tor,
     if( !file->length )
         return 0;
 
+    if( ( file->dnd ) || ( ioMode != TR_IO_WRITE ) )
+        preallocationMode = TR_PREALLOCATE_NONE;
+    else
+        preallocationMode = tor->session->preallocationMode;
+
     if( ( ioMode == TR_IO_READ ) && !fileExists ) /* does file exist? */
         err = errno;
-    else if( ( fd = tr_fdFileCheckout ( tor->downloadDir, file->name, ioMode == TR_IO_WRITE, !file->dnd, file->length ) ) < 0 )
+    else if( ( fd = tr_fdFileCheckout ( tor->downloadDir, file->name, ioMode == TR_IO_WRITE, preallocationMode, file->length ) ) < 0 )
         err = errno;
     else if( tr_lseek( fd, (int64_t)fileOffset, SEEK_SET ) == -1 )
         err = errno;

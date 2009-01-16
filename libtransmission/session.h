@@ -71,6 +71,8 @@ struct tr_session
 
     tr_encryption_mode           encryptionMode;
 
+    tr_preallocation_mode        preallocationMode;
+
     struct tr_event_handle *     events;
 
     uint16_t                     peerLimitPerTorrent;

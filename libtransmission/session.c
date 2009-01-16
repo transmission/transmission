@@ -237,6 +237,7 @@ tr_sessionGetDefaultSettings( tr_benc * d )
     tr_bencDictAddInt( d, TR_PREFS_KEY_PEER_SOCKET_TOS,          atoi( TR_DEFAULT_PEER_SOCKET_TOS_STR ) );
     tr_bencDictAddInt( d, TR_PREFS_KEY_PEX_ENABLED,              TRUE );
     tr_bencDictAddInt( d, TR_PREFS_KEY_PORT_FORWARDING,          TRUE );
+    tr_bencDictAddInt( d, TR_PREFS_KEY_PREALLOCATION,            TR_PREALLOCATE_SPARSE );
     tr_bencDictAddStr( d, TR_PREFS_KEY_PROXY,                    "" );
     tr_bencDictAddInt( d, TR_PREFS_KEY_PROXY_AUTH_ENABLED,       FALSE );
     tr_bencDictAddInt( d, TR_PREFS_KEY_PROXY_ENABLED,            FALSE );
@@ -282,6 +283,7 @@ tr_sessionGetSettings( tr_session * s, struct tr_benc * d )
     tr_bencDictAddInt( d, TR_PREFS_KEY_PEER_SOCKET_TOS,          s->peerSocketTOS );
     tr_bencDictAddInt( d, TR_PREFS_KEY_PEX_ENABLED,              s->isPexEnabled );
     tr_bencDictAddInt( d, TR_PREFS_KEY_PORT_FORWARDING,          tr_sessionIsPortForwardingEnabled( s ) );
+    tr_bencDictAddInt( d, TR_PREFS_KEY_PREALLOCATION,            s->preallocationMode );
     tr_bencDictAddStr( d, TR_PREFS_KEY_PROXY,                    s->proxy );
     tr_bencDictAddInt( d, TR_PREFS_KEY_PROXY_AUTH_ENABLED,       s->isProxyAuthEnabled );
     tr_bencDictAddInt( d, TR_PREFS_KEY_PROXY_ENABLED,            s->isProxyEnabled );
@@ -403,7 +405,13 @@ tr_sessionInit( const char  * tag,
  
     found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_ENCRYPTION, &i ); 
     assert( found ); 
+    assert( tr_isEncryptionMode( i ) );
     session->encryptionMode = i; 
+
+    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_PREALLOCATION, &i );
+    assert( found );
+    assert( tr_isPreallocationMode( i ) );
+    session->preallocationMode = i;
  
     found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_PEER_SOCKET_TOS, &i ); 
     assert( found ); 
