@@ -722,6 +722,8 @@ sessionGet( tr_session * session,
     tr_bencDictAddInt( d, "pex-allowed", tr_sessionIsPexEnabled( session ) );
     tr_bencDictAddInt( d, "port", tr_sessionGetPeerPort( session ) );
     tr_bencDictAddInt( d, "port-forwarding-enabled", tr_sessionIsPortForwardingEnabled( session ) );
+    tr_bencDictAddInt( d, "rpc-version", 4 );
+    tr_bencDictAddInt( d, "rpc-version-minimum", 1 );
     tr_bencDictAddInt( d, "speed-limit-up", tr_sessionGetSpeedLimit( session, TR_UP ) );
     tr_bencDictAddInt( d, "speed-limit-up-enabled", tr_sessionIsSpeedLimitEnabled( session, TR_UP ) );
     tr_bencDictAddInt( d, "speed-limit-down", tr_sessionGetSpeedLimit( session, TR_DOWN ) );

@@ -68,7 +68,6 @@
 
    Method name         | libtransmission function
    --------------------+-------------------------------------------------
-   "torrent-remove"    | tr_torrentRemove
    "torrent-start"     | tr_torrentStart
    "torrent-stop"      | tr_torrentStop
    "torrent-verify"    | tr_torrentVerify
@@ -133,6 +132,7 @@
    desiredAvailable       | number                               | tr_stat
    doneDate               | number                               | tr_stat
    downloadedEver         | number                               | tr_stat
+   downloaders            | number                               | tr_stat
    downloadLimitMode      | number                               | tr_torrent
    downloadLimit          | number                               | tr_torrent
    error                  | number                               | tr_stat
@@ -292,6 +292,19 @@
                        form of one of 3.3's tr_info objects with the
                        fields for id, name, and hashString.
 
+3.5.  Removing a Torrent
+
+   Method name: "torrent-remove"
+
+   Request arguments:
+
+   string                     | value type & description
+   ---------------------------+-------------------------------------------------
+   "ids"                      | array      torrent list, as described in 3.1
+   "delete-local-data"        | 'boolean'  delete local data. (default: false)
+
+   Response arguments: none
+
 
 4.   Session Requests
 
@@ -310,7 +323,16 @@
    "speed-limit-up"           | number     max global upload speed (in K/s)
    "speed-limit-up-enabled"   | 'boolean'  true means enabled
    "version"                  | string     long version string "$version ($revision)"
+   "rpc-version"              | number     the current RPC API version
+   "rpc-version-minimum"      | number     the minimum RPC API version supported
 
+   "rpc-version" indicates the RPC interface version supported by the RPC server.
+   It is incremented when a new version of Transmission changes the RPC interface.
+
+   "rpc-version-minimum" indicates the oldest API supported by the RPC server.
+   It is changes when a new version of Transmission changes the RPC interface
+   in a way that is not backwards compatible.  There are no plans for this
+   to be common behavior.
 
 4.1.1.  Mutators
 
@@ -340,4 +362,24 @@
    "torrentCount"             | number
    "uploadSpeed"              | number
    
+
+5.0.  Protocol Versions
+
+  The following changes have been made to the RPC interface:
+
+   RPC   | Release | Backwards |                |
+   Vers. | Version | Compat?   | Method         | Description
+   ------+---------+-----------+----------------+-------------------------------
+   1     | 1.30    | n/a       | n/a            | Initial version
+   ------+---------+-----------+----------------+-------------------------------
+   2     | 1.34    | yes       | torrent-get    | new arg "peers"
+   ------+---------+-----------+----------------+-------------------------------
+   3     | 1.41    | yes       | torrent-get    | added "port" to "peers"
+         |         |           | torrent-get    | new arg "downloaders"
+         |         |           | session-get    | new arg "version"
+         |         |           | torrent-remove | new method
+   ------+---------+-----------+----------------+-------------------------------
+   4     | 1.50    | yes       | session-get    | new arg "rpc-version"
+         |         |           | session-get    | new arg "rpc-version-minimum"
+   ------+---------+-----------+----------------+-------------------------------
 
