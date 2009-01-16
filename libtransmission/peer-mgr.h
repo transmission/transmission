@@ -24,6 +24,7 @@
 #endif
 
 #include "net.h"
+#include "publish.h" /* tr_publisher_tag */
 
 struct tr_peer_stat;
 struct tr_torrent;
@@ -46,15 +47,66 @@ typedef struct tr_pex
 }
 tr_pex;
 
+
+struct tr_bandwidth;
+struct tr_bitfield;
+struct tr_peerIo;
+struct tr_peermsgs;
+
+enum
+{
+    ENCRYPTION_PREFERENCE_UNKNOWN,
+    ENCRYPTION_PREFERENCE_YES,
+    ENCRYPTION_PREFERENCE_NO
+};
+
+/**
+ * State information about a connected peer.
+ *
+ * @see struct peer_atom
+ * @see tr_peermsgs
+ */
+typedef struct tr_peer
+{
+    tr_bool                  peerIsChoked;
+    tr_bool                  peerIsInterested;
+    tr_bool                  clientIsChoked;
+    tr_bool                  clientIsInterested;
+    tr_bool                  doPurge;
+
+    /* number of bad pieces they've contributed to */
+    uint8_t                  strikes;
+
+    uint8_t                  encryption_preference;
+    tr_port                  port;
+    tr_address               addr;
+    struct tr_peerIo       * io;
+
+    struct tr_bitfield     * blame;
+    struct tr_bitfield     * have;
+
+    /** how complete the peer's copy of the torrent is. [0.0...1.0] */
+    float                    progress;
+
+    /* the client name from the `v' string in LTEP's handshake dictionary */
+    char                   * client;
+
+    time_t                   chokeChangedAt;
+
+    struct tr_peermsgs     * msgs;
+    tr_publisher_tag         msgsTag;
+}
+tr_peer;
+
+
 int tr_pexCompare( const void * a, const void * b );
 
 tr_peerMgr* tr_peerMgrNew( tr_session * );
 
 void tr_peerMgrFree( tr_peerMgr * manager );
 
-tr_bool tr_peerMgrPeerIsSeed( const tr_peerMgr  * mgr,
-                              const uint8_t     * torrentHash,
-                              const tr_address  * addr );
+tr_bool tr_peerMgrPeerIsSeed( const tr_torrent * tor,
+                              const tr_address * addr );
 
 void tr_peerMgrAddIncoming( tr_peerMgr  * manager,
                             tr_address  * addr,
@@ -77,46 +129,34 @@ tr_pex * tr_peerMgrArrayToPex( const void * array,
                                size_t       arrayLen,
                                size_t      * setme_pex_count );
 
-void tr_peerMgrAddPex( tr_peerMgr     * manager,
-                       const uint8_t  * torrentHash,
+void tr_peerMgrAddPex( tr_torrent     * tor,
                        uint8_t          from,
                        const tr_pex   * pex );
 
-void tr_peerMgrSetBlame( tr_peerMgr        * manager,
-                         const uint8_t     * torrentHash,
+void tr_peerMgrSetBlame( tr_torrent        * tor,
                          tr_piece_index_t    pieceIndex,
                          int                 success );
 
-int  tr_peerMgrGetPeers( tr_peerMgr      * manager,
-                         const uint8_t   * torrentHash,
+int  tr_peerMgrGetPeers( tr_torrent      * tor,
                          tr_pex         ** setme_pex,
                          uint8_t           af);
 
-void tr_peerMgrStartTorrent( tr_peerMgr     * manager,
-                             const uint8_t  * torrentHash );
+void tr_peerMgrStartTorrent( tr_torrent * tor );
 
-void tr_peerMgrStopTorrent( tr_peerMgr      * manager,
-                             const uint8_t  * torrentHash );
+void tr_peerMgrStopTorrent( tr_torrent * tor );
 
 void tr_peerMgrAddTorrent( tr_peerMgr         * manager,
                            struct tr_torrent  * tor );
 
-void tr_peerMgrRemoveTorrent( tr_peerMgr     * manager,
-                              const uint8_t  * torrentHash );
+void tr_peerMgrRemoveTorrent( tr_torrent * tor );
 
-void tr_peerMgrTorrentAvailability( const tr_peerMgr * manager,
-                                    const uint8_t    * torrentHash,
+void tr_peerMgrTorrentAvailability( const tr_torrent * tor,
                                     int8_t           * tab,
                                     unsigned int       tabCount );
 
-struct tr_bitfield* tr_peerMgrGetAvailable( const tr_peerMgr * manager,
-                                            const uint8_t    * torrentHash );
+struct tr_bitfield* tr_peerMgrGetAvailable( const tr_torrent * tor );
 
-int tr_peerMgrHasConnections( const tr_peerMgr * manager,
-                              const uint8_t    * torrentHash );
-
-void tr_peerMgrTorrentStats( const tr_peerMgr * manager,
-                             const uint8_t * torrentHash,
+void tr_peerMgrTorrentStats( tr_torrent * tor,
                              int * setmePeersKnown,
                              int * setmePeersConnected,
                              int * setmeSeedsConnected,
@@ -125,12 +165,14 @@ void tr_peerMgrTorrentStats( const tr_peerMgr * manager,
                              int * setmePeersGettingFromUs,
                              int * setmePeersFrom ); /* TR_PEER_FROM__MAX */
 
-struct tr_peer_stat* tr_peerMgrPeerStats( const tr_peerMgr  * manager,
-                                          const uint8_t     * torrentHash,
-                                          int               * setmeCount );
+struct tr_peer_stat* tr_peerMgrPeerStats( const tr_torrent * tor,
+                                          int              * setmeCount );
 
-float* tr_peerMgrWebSpeeds( const tr_peerMgr  * manager,
-                            const uint8_t     * torrentHash );
+float* tr_peerMgrWebSpeeds( const tr_torrent * tor );
 
+
+double tr_peerGetPieceSpeed( const tr_peer    * peer,
+                             uint64_t           now,
+                             tr_direction       direction );
 
 #endif

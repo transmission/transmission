@@ -237,12 +237,8 @@ refreshTorrentActions( struct cbdata * data )
     }
 
     {
-        tr_torrent * tor = NULL;
         tr_session * session = tr_core_session( data->core );
-        int activeCount = 0;
-        while(( tor = tr_torrentNext( session, tor )))
-            if( TR_STATUS_IS_ACTIVE( tr_torrentGetActivity( tor )))
-                ++activeCount;
+        int activeCount = tr_sessionGetActiveTorrentCount( session );
         action_sensitize( "pause-all-torrents", activeCount != 0 );
     }
 }

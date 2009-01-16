@@ -237,6 +237,7 @@ tr_sessionGetDefaultSettings( tr_benc * d )
     tr_bencDictAddInt( d, TR_PREFS_KEY_PEER_SOCKET_TOS,          atoi( TR_DEFAULT_PEER_SOCKET_TOS_STR ) );
     tr_bencDictAddInt( d, TR_PREFS_KEY_PEX_ENABLED,              TRUE );
     tr_bencDictAddInt( d, TR_PREFS_KEY_PORT_FORWARDING,          TRUE );
+    tr_bencDictAddInt( d, TR_PREFS_KEY_PREALLOCATION,            TR_PREALLOCATE_SPARSE );
     tr_bencDictAddStr( d, TR_PREFS_KEY_PROXY,                    "" );
     tr_bencDictAddInt( d, TR_PREFS_KEY_PROXY_AUTH_ENABLED,       FALSE );
     tr_bencDictAddInt( d, TR_PREFS_KEY_PROXY_ENABLED,            FALSE );
@@ -282,6 +283,7 @@ tr_sessionGetSettings( tr_session * s, struct tr_benc * d )
     tr_bencDictAddInt( d, TR_PREFS_KEY_PEER_SOCKET_TOS,          s->peerSocketTOS );
     tr_bencDictAddInt( d, TR_PREFS_KEY_PEX_ENABLED,              s->isPexEnabled );
     tr_bencDictAddInt( d, TR_PREFS_KEY_PORT_FORWARDING,          tr_sessionIsPortForwardingEnabled( s ) );
+    tr_bencDictAddInt( d, TR_PREFS_KEY_PREALLOCATION,            s->preallocationMode );
     tr_bencDictAddStr( d, TR_PREFS_KEY_PROXY,                    s->proxy );
     tr_bencDictAddInt( d, TR_PREFS_KEY_PROXY_AUTH_ENABLED,       s->isProxyAuthEnabled );
     tr_bencDictAddInt( d, TR_PREFS_KEY_PROXY_ENABLED,            s->isProxyEnabled );
@@ -369,8 +371,6 @@ tr_sessionInit( const char  * tag,
     tr_benc settings;
     tr_session * session;
     char * filename;
-    int64_t rpc_enabled, whitelist_enabled, rpc_auth_enabled, rpc_port;
-    const char * whitelist = NULL, *rpc_passwd = NULL, *rpc_username = NULL;
 
     assert( tr_bencIsDict( clientSettings ) );
 
@@ -405,7 +405,13 @@ tr_sessionInit( const char  * tag,
  
     found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_ENCRYPTION, &i ); 
     assert( found ); 
+    assert( tr_isEncryptionMode( i ) );
     session->encryptionMode = i; 
+
+    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_PREALLOCATION, &i );
+    assert( found );
+    assert( tr_isPreallocationMode( i ) );
+    session->preallocationMode = i;
  
     found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_PEER_SOCKET_TOS, &i ); 
     assert( found ); 
@@ -527,16 +533,7 @@ tr_sessionInit( const char  * tag,
     tr_statsInit( session );
 
     session->web = tr_webInit( session ); 
-    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_RPC_ENABLED, &rpc_enabled ) 
-         && tr_bencDictFindInt( &settings, TR_PREFS_KEY_RPC_PORT, &rpc_port ) 
-         && tr_bencDictFindInt( &settings, TR_PREFS_KEY_RPC_WHITELIST_ENABLED, &whitelist_enabled ) 
-         && tr_bencDictFindInt( &settings, TR_PREFS_KEY_RPC_AUTH_REQUIRED, &rpc_auth_enabled ) 
-         && tr_bencDictFindStr( &settings, TR_PREFS_KEY_RPC_WHITELIST, &whitelist ) 
-         && tr_bencDictFindStr( &settings, TR_PREFS_KEY_RPC_USERNAME, &rpc_username ) 
-         && tr_bencDictFindStr( &settings, TR_PREFS_KEY_RPC_PASSWORD, &rpc_passwd ); 
-    assert( found ); 
-    session->rpcServer = tr_rpcInit( session, rpc_enabled, rpc_port, whitelist_enabled, whitelist, 
-                                     rpc_auth_enabled, rpc_username, rpc_passwd ); 
+    session->rpcServer = tr_rpcInit( session, &settings ); 
 
     metainfoLookupRescan( session );
 
@@ -1410,3 +1407,15 @@ tr_sessionSetProxyPassword( tr_session * session,
     }
 }
 
+int
+tr_sessionGetActiveTorrentCount( tr_session * session )
+{
+    int ret = 0;
+    tr_torrent * tor = NULL;
+
+    while(( tor = tr_torrentNext( session, tor )))
+        if( tr_torrentGetActivity( tor ) != TR_STATUS_STOPPED )
+            ++ret;
+    
+    return ret;
+}

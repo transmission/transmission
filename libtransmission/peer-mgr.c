@@ -1,3 +1,4 @@
+
 /*
  * This file Copyright (C) 2007-2009 Charles Kerr <charles@transmissionbt.com>
  *
@@ -26,12 +27,12 @@
 #include "clients.h"
 #include "completion.h"
 #include "crypto.h"
+#include "fdlimit.h"
 #include "handshake.h"
 #include "inout.h" /* tr_ioTestPiece */
 #include "net.h"
 #include "peer-io.h"
 #include "peer-mgr.h"
-#include "peer-mgr-private.h"
 #include "peer-msgs.h"
 #include "ptrarray.h"
 #include "stats.h" /* tr_statsAddUploaded, tr_statsAddDownloaded */
@@ -115,7 +116,7 @@ struct peer_atom
     time_t      piece_data_time;
 };
 
-typedef struct
+typedef struct tr_torrent_peers
 {
     tr_bool         isRunning;
 
@@ -138,7 +139,6 @@ Torrent;
 struct tr_peerMgr
 {
     tr_session      * session;
-    tr_ptrArray       torrents; /* Torrent */
     tr_ptrArray       incomingHandshakes; /* tr_handshake */
     tr_timer        * bandwidthTimer;
 };
@@ -234,33 +234,13 @@ comparePeerAtoms( const void * va, const void * vb )
 ***
 **/
 
-static int
-torrentCompare( const void * va,
-                const void * vb )
-{
-    const Torrent * a = va;
-    const Torrent * b = vb;
-
-    return memcmp( a->hash, b->hash, SHA_DIGEST_LENGTH );
-}
-
-static int
-torrentCompareToHash( const void * va,
-                      const void * vb )
-{
-    const Torrent * a = va;
-    const uint8_t * b_hash = vb;
-
-    return memcmp( a->hash, b_hash, SHA_DIGEST_LENGTH );
-}
-
 static Torrent*
 getExistingTorrent( tr_peerMgr *    manager,
                     const uint8_t * hash )
 {
-    return (Torrent*) tr_ptrArrayFindSorted( &manager->torrents,
-                                             hash,
-                                             torrentCompareToHash );
+    tr_torrent * tor = tr_torrentFindFromHash( manager->session, hash );
+
+    return tor == NULL ? NULL : tor->torrentPeers;
 }
 
 static int
@@ -453,7 +433,6 @@ tr_peerMgrNew( tr_session * session )
     tr_peerMgr * m = tr_new0( tr_peerMgr, 1 );
 
     m->session = session;
-    m->torrents = TR_PTR_ARRAY_INIT;
     m->incomingHandshakes = TR_PTR_ARRAY_INIT;
     m->bandwidthTimer = tr_timerNew( session, bandwidthPulse, m, BANDWIDTH_PERIOD_MSEC );
     return m;
@@ -472,9 +451,6 @@ tr_peerMgrFree( tr_peerMgr * manager )
         tr_handshakeAbort( tr_ptrArrayNth( &manager->incomingHandshakes, 0 ) );
 
     tr_ptrArrayDestruct( &manager->incomingHandshakes, NULL );
-
-    /* free the torrents. */
-    tr_ptrArrayDestruct( &manager->torrents, torrentDestructor );
 
     managerUnlock( manager );
     tr_free( manager );
@@ -497,17 +473,13 @@ clientIsUploadingTo( const tr_peer * peer )
 ***/
 
 tr_bool
-tr_peerMgrPeerIsSeed( const tr_peerMgr  * mgr,
-                      const uint8_t     * torrentHash,
+tr_peerMgrPeerIsSeed( const tr_torrent  * tor,
                       const tr_address  * addr )
 {
     tr_bool isSeed = FALSE;
-    const Torrent * t = NULL;
-    const struct peer_atom * atom = NULL;
+    const Torrent * t = tor->torrentPeers;
+    const struct peer_atom * atom = getExistingAtom( t, addr );
 
-    t = getExistingTorrent( (tr_peerMgr*)mgr, torrentHash );
-    if( t )
-        atom = getExistingAtom( t, addr );
     if( atom )
         isSeed = ( atom->flags & ADDED_F_SEED_FLAG ) != 0;
 
@@ -1062,7 +1034,7 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
 
         case TR_PEER_CLIENT_GOT_BLOCK:
         {
-            tr_torrent *     tor = t->tor;
+            tr_torrent * tor = t->tor;
 
             tr_block_index_t block = _tr_block( tor, e->pieceIndex, e->offset );
 
@@ -1084,17 +1056,35 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
 
                 tr_torrentSetHasPiece( tor, p, ok );
                 tr_torrentSetPieceChecked( tor, p, TRUE );
-                tr_peerMgrSetBlame( tor->session->peerMgr, tor->info.hash, p, ok );
+                tr_peerMgrSetBlame( tor, p, ok );
 
                 if( !ok )
+                {
                     gotBadPiece( t, p );
+                }
                 else
                 {
                     int i;
-                    int peerCount = tr_ptrArraySize( &t->peers );
-                    tr_peer ** peers = (tr_peer**) tr_ptrArrayBase( &t->peers );
+                    int peerCount;
+                    tr_peer ** peers;
+                    tr_file_index_t fileIndex;
+
+                    peerCount = tr_ptrArraySize( &t->peers );
+                    peers = (tr_peer**) tr_ptrArrayBase( &t->peers );
                     for( i=0; i<peerCount; ++i )
                         tr_peerMsgsHave( peers[i]->msgs, p );
+
+                    for( fileIndex=0; fileIndex<tor->info.fileCount; ++fileIndex )
+                    {
+                        const tr_file * file = &tor->info.files[fileIndex];
+                        if( ( file->firstPiece <= p ) && ( p <= file->lastPiece ) && tr_cpFileIsComplete( &tor->completion, fileIndex ) )
+                        {
+                            char * path = tr_buildPath( tor->downloadDir, file->name, NULL );
+                            tordbg( t, "closing recently-completed file \"%s\"", path );
+                            tr_fdFileClose( path );
+                            tr_free( path );
+                        }
+                    }
                 }
 
                 tr_torrentRecheckCompleteness( tor );
@@ -1315,21 +1305,19 @@ tr_isPex( const tr_pex * pex )
 }
 
 void
-tr_peerMgrAddPex( tr_peerMgr *    manager,
-                  const uint8_t * torrentHash,
+tr_peerMgrAddPex( tr_torrent   *  tor,
                   uint8_t         from,
                   const tr_pex *  pex )
 {
     if( tr_isPex( pex ) ) /* safeguard against corrupt data */
     {
-        Torrent * t;
-        managerLock( manager );
+        Torrent * t = tor->torrentPeers;
+        managerLock( t->manager );
 
-        t = getExistingTorrent( manager, torrentHash );
         if( !tr_sessionIsAddressBlocked( t->manager->session, &pex->addr ) )
             ensureAtomExists( t, &pex->addr, pex->port, pex->flags, from );
 
-        managerUnlock( manager );
+        managerUnlock( t->manager );
     }
 }
 
@@ -1396,6 +1384,7 @@ tr_peerMgrArrayToPex( const void * array,
     
     for( i = 0 ; i < n ; i++ ) {
         memcpy( &pex[i].addr, walk, sizeof( tr_address ) );
+        tr_suspectAddress( &pex[i].addr, "tracker"  );
         memcpy( &pex[i].port, walk + sizeof( tr_address ), 2 );
         pex[i].flags = 0x00;
         walk += sizeof( tr_address ) + 2;
@@ -1410,15 +1399,14 @@ tr_peerMgrArrayToPex( const void * array,
 **/
 
 void
-tr_peerMgrSetBlame( tr_peerMgr *     manager,
-                    const uint8_t *  torrentHash,
+tr_peerMgrSetBlame( tr_torrent     * tor,
                     tr_piece_index_t pieceIndex,
                     int              success )
 {
     if( !success )
     {
         int        peerCount, i;
-        Torrent *  t = getExistingTorrent( manager, torrentHash );
+        Torrent *  t = tor->torrentPeers;
         tr_peer ** peers;
 
         assert( torrentIsLocked( t ) );
@@ -1470,22 +1458,15 @@ peerPrefersCrypto( const tr_peer * peer )
 }
 
 int
-tr_peerMgrGetPeers( tr_peerMgr      * manager,
-                    const uint8_t   * torrentHash,
+tr_peerMgrGetPeers( tr_torrent      * tor,
                     tr_pex         ** setme_pex,
                     uint8_t           af)
 {
     int peersReturning = 0;
-    const Torrent *  t;
+    const Torrent * t = tor->torrentPeers;
 
-    managerLock( manager );
+    managerLock( t->manager );
 
-    t = getExistingTorrent( manager, torrentHash );
-    if( t == NULL )
-    {
-        *setme_pex = NULL;
-    }
-    else
     {
         int i;
         const tr_peer ** peers = (const tr_peer**) tr_ptrArrayBase( &t->peers );
@@ -1520,7 +1501,7 @@ tr_peerMgrGetPeers( tr_peerMgr      * manager,
         *setme_pex = pex;
     }
 
-    managerUnlock( manager );
+    managerUnlock( t->manager );
     return peersReturning;
 }
 
@@ -1529,14 +1510,11 @@ static int reconnectPulse( void * vtorrent );
 static int rechokePulse( void * vtorrent );
 
 void
-tr_peerMgrStartTorrent( tr_peerMgr *    manager,
-                        const uint8_t * torrentHash )
+tr_peerMgrStartTorrent( tr_torrent * tor )
 {
-    Torrent * t;
+    Torrent * t = tor->torrentPeers;
 
-    managerLock( manager );
-
-    t = getExistingTorrent( manager, torrentHash );
+    managerLock( t->manager );
 
     assert( t );
     assert( ( t->isRunning != 0 ) == ( t->reconnectTimer != NULL ) );
@@ -1562,7 +1540,7 @@ tr_peerMgrStartTorrent( tr_peerMgr *    manager,
             refillSoon( t );
     }
 
-    managerUnlock( manager );
+    managerUnlock( t->manager );
 }
 
 static void
@@ -1585,66 +1563,56 @@ stopTorrent( Torrent * t )
 }
 
 void
-tr_peerMgrStopTorrent( tr_peerMgr *    manager,
-                       const uint8_t * torrentHash )
+tr_peerMgrStopTorrent( tr_torrent * tor )
 {
-    managerLock( manager );
+    Torrent * t = tor->torrentPeers;
 
-    stopTorrent( getExistingTorrent( manager, torrentHash ) );
+    managerLock( t->manager );
 
-    managerUnlock( manager );
+    stopTorrent( t );
+
+    managerUnlock( t->manager );
 }
 
 void
 tr_peerMgrAddTorrent( tr_peerMgr * manager,
                       tr_torrent * tor )
 {
-    Torrent * t;
-
     managerLock( manager );
 
     assert( tor );
-    assert( getExistingTorrent( manager, tor->info.hash ) == NULL );
+    assert( tor->torrentPeers == NULL );
 
-    t = torrentConstructor( manager, tor );
-    tr_ptrArrayInsertSorted( &manager->torrents, t, torrentCompare );
+    tor->torrentPeers = torrentConstructor( manager, tor );
 
     managerUnlock( manager );
 }
 
 void
-tr_peerMgrRemoveTorrent( tr_peerMgr *    manager,
-                         const uint8_t * torrentHash )
+tr_peerMgrRemoveTorrent( tr_torrent * tor )
 {
-    Torrent * t;
+    tr_torrentLock( tor );
 
-    managerLock( manager );
+    stopTorrent( tor->torrentPeers );
+    torrentDestructor( tor->torrentPeers );
 
-    t = getExistingTorrent( manager, torrentHash );
-    assert( t );
-    stopTorrent( t );
-    tr_ptrArrayRemoveSorted( &manager->torrents, t, torrentCompare );
-    torrentDestructor( t );
-
-    managerUnlock( manager );
+    tr_torrentUnlock( tor );
 }
 
 void
-tr_peerMgrTorrentAvailability( const tr_peerMgr * manager,
-                               const uint8_t *    torrentHash,
-                               int8_t *           tab,
+tr_peerMgrTorrentAvailability( const tr_torrent * tor,
+                               int8_t           * tab,
                                unsigned int       tabCount )
 {
     tr_piece_index_t   i;
     const Torrent *    t;
-    const tr_torrent * tor;
     float              interval;
     tr_bool            isSeed;
     int                peerCount;
     const tr_peer **   peers;
-    managerLock( manager );
+    tr_torrentLock( tor );
 
-    t = getExistingTorrent( (tr_peerMgr*)manager, torrentHash );
+    t = tor->torrentPeers;
     tor = t->tor;
     interval = tor->info.pieceCount / (float)tabCount;
     isSeed = tor && ( tr_cpGetStatus ( &tor->completion ) == TR_SEED );
@@ -1667,50 +1635,32 @@ tr_peerMgrTorrentAvailability( const tr_peerMgr * manager,
         }
     }
 
-    managerUnlock( manager );
+    tr_torrentUnlock( tor );
 }
 
 /* Returns the pieces that are available from peers */
 tr_bitfield*
-tr_peerMgrGetAvailable( const tr_peerMgr * manager,
-                        const uint8_t *    torrentHash )
+tr_peerMgrGetAvailable( const tr_torrent * tor )
 {
     int i;
     int peerCount;
-    Torrent * t;
+    Torrent * t = tor->torrentPeers;
     const tr_peer ** peers;
     tr_bitfield * pieces;
-    managerLock( manager );
+    managerLock( t->manager );
 
-    t = getExistingTorrent( (tr_peerMgr*)manager, torrentHash );
     pieces = tr_bitfieldNew( t->tor->info.pieceCount );
     peerCount = tr_ptrArraySize( &t->peers );
     peers = (const tr_peer**) tr_ptrArrayBase( &t->peers );
     for( i=0; i<peerCount; ++i )
         tr_bitfieldOr( pieces, peers[i]->have );
 
-    managerUnlock( manager );
+    managerUnlock( t->manager );
     return pieces;
 }
 
-int
-tr_peerMgrHasConnections( const tr_peerMgr * manager,
-                          const uint8_t *    torrentHash )
-{
-    int ret;
-    const Torrent * t;
-    managerLock( manager );
-
-    t = getExistingTorrent( (tr_peerMgr*)manager, torrentHash );
-    ret = t && ( !tr_ptrArrayEmpty( &t->peers ) || !tr_ptrArrayEmpty( &t->webseeds ) );
-
-    managerUnlock( manager );
-    return ret;
-}
-
 void
-tr_peerMgrTorrentStats( const tr_peerMgr * manager,
-                        const uint8_t    * torrentHash,
+tr_peerMgrTorrentStats( tr_torrent       * tor,
                         int              * setmePeersKnown,
                         int              * setmePeersConnected,
                         int              * setmeSeedsConnected,
@@ -1720,13 +1670,12 @@ tr_peerMgrTorrentStats( const tr_peerMgr * manager,
                         int              * setmePeersFrom )
 {
     int i, size;
-    const Torrent * t;
+    const Torrent * t = tor->torrentPeers;
     const tr_peer ** peers;
     const tr_webseed ** webseeds;
 
-    managerLock( manager );
+    managerLock( t->manager );
 
-    t = getExistingTorrent( (tr_peerMgr*)manager, torrentHash );
     peers = (const tr_peer **) tr_ptrArrayBase( &t->peers );
     size = tr_ptrArraySize( &t->peers );
 
@@ -1768,27 +1717,25 @@ tr_peerMgrTorrentStats( const tr_peerMgr * manager,
         if( tr_webseedIsActive( webseeds[i] ) )
             ++*setmeWebseedsSendingToUs;
 
-    managerUnlock( manager );
+    managerUnlock( t->manager );
 }
 
 float*
-tr_peerMgrWebSpeeds( const tr_peerMgr * manager,
-                     const uint8_t *    torrentHash )
+tr_peerMgrWebSpeeds( const tr_torrent * tor )
 {
-    const Torrent * t;
+    const Torrent * t = tor->torrentPeers;
     const tr_webseed ** webseeds;
     int i;
     int webseedCount;
     float * ret;
     uint64_t now;
 
-    assert( manager );
-    managerLock( manager );
+    assert( t->manager );
+    managerLock( t->manager );
 
-    t = getExistingTorrent( (tr_peerMgr*)manager, torrentHash );
     webseeds = (const tr_webseed**) tr_ptrArrayBase( &t->webseeds );
     webseedCount = tr_ptrArraySize( &t->webseeds );
-    assert( webseedCount == t->tor->info.webseedCount );
+    assert( webseedCount == tor->info.webseedCount );
     ret = tr_new0( float, webseedCount );
     now = tr_date( );
 
@@ -1796,7 +1743,7 @@ tr_peerMgrWebSpeeds( const tr_peerMgr * manager,
         if( !tr_webseedGetSpeed( webseeds[i], now, &ret[i] ) )
             ret[i] = -1.0;
 
-    managerUnlock( manager );
+    managerUnlock( t->manager );
     return ret;
 }
 
@@ -1808,20 +1755,18 @@ tr_peerGetPieceSpeed( const tr_peer * peer, uint64_t now, tr_direction direction
 
 
 struct tr_peer_stat *
-tr_peerMgrPeerStats( const   tr_peerMgr  * manager,
-                     const   uint8_t     * torrentHash,
+tr_peerMgrPeerStats( const tr_torrent    * tor,
                      int                 * setmeCount )
 {
     int i, size;
-    const Torrent * t;
+    const Torrent * t = tor->torrentPeers;
     const tr_peer ** peers;
     tr_peer_stat * ret;
     uint64_t now;
 
-    assert( manager );
-    managerLock( manager );
+    assert( t->manager );
+    managerLock( t->manager );
 
-    t = getExistingTorrent( (tr_peerMgr*)manager, torrentHash );
     size = tr_ptrArraySize( &t->peers );
     peers = (const tr_peer**) tr_ptrArrayBase( &t->peers );
     ret = tr_new0( tr_peer_stat, size );
@@ -1871,7 +1816,7 @@ tr_peerMgrPeerStats( const   tr_peerMgr  * manager,
 
     *setmeCount = size;
 
-    managerUnlock( manager );
+    managerUnlock( t->manager );
     return ret;
 }
 
@@ -2351,12 +2296,13 @@ tordbg( t, "nCandidates is %d, MAX_RECONNECTIONS_PER_PULSE is %d, getPeerCount(t
 static void
 pumpAllPeers( tr_peerMgr * mgr )
 {
-    const int torrentCount = tr_ptrArraySize( &mgr->torrents );
-    int       i, j;
+    tr_torrent * tor = NULL;
 
-    for( i=0; i<torrentCount; ++i )
+    while(( tor = tr_torrentNext( mgr->session, tor )))
     {
-        Torrent * t = tr_ptrArrayNth( &mgr->torrents, i );
+        int j;
+        Torrent * t = tor->torrentPeers;
+
         for( j=0; j<tr_ptrArraySize( &t->peers ); ++j )
         {
             tr_peer * peer = tr_ptrArrayNth( &t->peers, j );

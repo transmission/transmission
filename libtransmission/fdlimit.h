@@ -26,6 +26,7 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include "transmission.h"
 #include "net.h"
 
 void tr_fdInit( size_t openFileLimit,
@@ -50,11 +51,11 @@ void tr_fdInit( size_t openFileLimit,
  * @see tr_fdFileReturn
  * @see tr_fdFileClose
  */
-int  tr_fdFileCheckout( const char * folder,
-                        const char * torrentFile,
-                        int          doWrite,
-                        int          doPreallocate,
-                        uint64_t     desiredFileSize );
+int  tr_fdFileCheckout( const char             * folder,
+                        const char             * torrentFile,
+                        tr_bool                  doWrite,
+                        tr_preallocation_mode    preallocationMode,
+                        uint64_t                 desiredFileSize );
 
 /**
  * Returns an fd from tr_fdFileCheckout() so that other clients may borrow it.

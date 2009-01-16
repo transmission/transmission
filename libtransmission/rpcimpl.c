@@ -687,25 +687,21 @@ sessionStats( tr_session  * session,
               tr_benc     * args_in UNUSED,
               tr_benc     * args_out )
 {
-    tr_benc    * d;
-    tr_torrent * tor;
-    int          running;
-    int          total;
+    int running = 0;
+    int total = 0;
+    tr_torrent * tor = NULL;
 
-    tor = NULL;
-    total = running = 0;
     while(( tor = tr_torrentNext( session, tor ))) {
         ++total;
         if( tor->isRunning )
             ++running;
     }
 
-    d = tr_bencDictAddDict( args_out, "session-stats", 5 );
-    tr_bencDictAddInt( d, "activeTorrentCount", running );
-    tr_bencDictAddInt( d, "downloadSpeed", (int)( tr_sessionGetPieceSpeed( session, TR_DOWN ) * 1024 ) );
-    tr_bencDictAddInt( d, "pausedTorrentCount", total - running );
-    tr_bencDictAddInt( d, "torrentCount", total );
-    tr_bencDictAddInt( d, "uploadSpeed", (int)( tr_sessionGetPieceSpeed( session, TR_UP ) * 1024 ) );
+    tr_bencDictAddInt( args_out, "activeTorrentCount", running );
+    tr_bencDictAddInt( args_out, "downloadSpeed", (int)( tr_sessionGetPieceSpeed( session, TR_DOWN ) * 1024 ) );
+    tr_bencDictAddInt( args_out, "pausedTorrentCount", total - running );
+    tr_bencDictAddInt( args_out, "torrentCount", total );
+    tr_bencDictAddInt( args_out, "uploadSpeed", (int)( tr_sessionGetPieceSpeed( session, TR_UP ) * 1024 ) );
     return NULL;
 }
 

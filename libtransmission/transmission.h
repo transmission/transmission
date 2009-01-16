@@ -106,6 +106,21 @@ typedef struct tr_session tr_session;
 
 typedef enum
 {
+    TR_PREALLOCATE_NONE   = 0,
+    TR_PREALLOCATE_SPARSE = 1,
+    TR_PREALLOCATE_FULL   = 2
+}
+tr_preallocation_mode;
+
+static TR_INLINE tr_bool tr_isPreallocationMode( tr_preallocation_mode m  )
+{
+    return ( m == TR_PREALLOCATE_NONE )
+        || ( m == TR_PREALLOCATE_SPARSE )
+        || ( m == TR_PREALLOCATE_FULL );
+}
+
+typedef enum
+{
     TR_PROXY_HTTP,
     TR_PROXY_SOCKS4,
     TR_PROXY_SOCKS5
@@ -119,6 +134,14 @@ typedef enum
     TR_ENCRYPTION_REQUIRED
 }
 tr_encryption_mode;
+
+static TR_INLINE tr_bool tr_isEncryptionMode( tr_encryption_mode m )
+{
+    return ( m == TR_CLEAR_PREFERRED )
+        || ( m == TR_ENCRYPTION_PREFERRED )
+        || ( m == TR_ENCRYPTION_REQUIRED );
+}
+
 
 #define TR_DEFAULT_OPEN_FILE_LIMIT_STR "32"
 #define TR_DEFAULT_RPC_WHITELIST "127.0.0.1"
@@ -146,6 +169,7 @@ tr_encryption_mode;
 #define TR_PREFS_KEY_PEX_ENABLED                "pex-enabled"
 #define TR_PREFS_KEY_PORT_FORWARDING            "port-forwarding-enabled"
 #define TR_PREFS_KEY_PROXY_AUTH_ENABLED         "proxy-auth-enabled"
+#define TR_PREFS_KEY_PREALLOCATION              "preallocation"
 #define TR_PREFS_KEY_PROXY_ENABLED              "proxy-enabled"
 #define TR_PREFS_KEY_PROXY_PASSWORD             "proxy-auth-password"
 #define TR_PREFS_KEY_PROXY_PORT                 "proxy-port"
@@ -563,6 +587,8 @@ tr_torrent ** tr_sessionLoadTorrents( tr_session  * session,
                                       tr_ctor     * ctor,
                                       int         * setmeCount );
 
+int tr_sessionGetActiveTorrentCount( tr_session * session );
+
 /** @} */
 
 /**
@@ -816,15 +842,6 @@ typedef int tr_fileFunc( const char * filename );
  *                 tr_torrentDeleteLocalData() ignores fileFunc's return value.
  */
 void tr_torrentDeleteLocalData( tr_torrent * torrent,  tr_fileFunc fileFunc );
-
-/**
- * @brief Iterate through the torrents.
- *
- * Pass in a NULL pointer to get the first torrent.
- */
-tr_torrent* tr_torrentNext( tr_session  * session,
-                            tr_torrent  * current );
-
 
 uint64_t tr_torrentGetBytesLeftToAllocate( const tr_torrent * torrent );
 

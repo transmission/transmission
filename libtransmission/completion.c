@@ -315,3 +315,23 @@ tr_cpPieceIsComplete( const tr_completion * cp, tr_piece_index_t piece )
 {
     return cp->completeBlocks[piece] == tr_torPieceCountBlocks( cp->tor, piece );
 }
+
+tr_bool
+tr_cpFileIsComplete( const tr_completion * cp, tr_file_index_t fileIndex )
+{
+    tr_block_index_t block;
+
+    const tr_torrent * tor = cp->tor;
+    const tr_file * file = &tor->info.files[fileIndex];
+    const tr_block_index_t firstBlock = file->offset / tor->blockSize;
+    const tr_block_index_t lastBlock = ( file->offset + file->length - 1 ) / tor->blockSize;
+
+    assert( tr_torBlockPiece( tor, firstBlock ) == file->firstPiece );
+    assert( tr_torBlockPiece( tor, lastBlock ) == file->lastPiece );
+
+    for( block=firstBlock; block<=lastBlock; ++block )
+        if( !tr_cpBlockIsComplete( cp, block ) )
+            return FALSE;
+
+    return TRUE;
+}

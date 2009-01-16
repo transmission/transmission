@@ -708,25 +708,43 @@ tr_rpcClose( tr_rpc_server ** ps )
 
 tr_rpc_server *
 tr_rpcInit( tr_session  * session,
-            tr_bool       isEnabled,
-            tr_port       port,
-            tr_bool       isWhitelistEnabled,
-            const char  * whitelist,
-            tr_bool       isPasswordEnabled,
-            const char  * username,
-            const char  * password )
+            tr_benc * settings )
 {
     tr_rpc_server * s;
+    tr_bool found;
+    int64_t i;
+    const char *str;
 
     s = tr_new0( tr_rpc_server, 1 );
     s->session = session;
-    s->port = port;
-    s->username = tr_strdup( username );
-    s->password = tr_strdup( password );
-    s->isWhitelistEnabled = isWhitelistEnabled;
-    s->isPasswordEnabled = isPasswordEnabled;
-    s->isEnabled = isEnabled != 0;
-    tr_rpcSetWhitelist( s, whitelist ? whitelist : "127.0.0.1" );
+
+    found = tr_bencDictFindInt( settings, TR_PREFS_KEY_RPC_ENABLED, &i );
+    assert( found );
+    s->isEnabled = i != 0;
+
+    found = tr_bencDictFindInt( settings, TR_PREFS_KEY_RPC_PORT, &i );
+    assert( found );
+    s->port = i;
+
+    found = tr_bencDictFindInt( settings, TR_PREFS_KEY_RPC_WHITELIST_ENABLED, &i );
+    assert( found );
+    s->isWhitelistEnabled = i != 0;
+
+    found = tr_bencDictFindInt( settings, TR_PREFS_KEY_RPC_AUTH_REQUIRED, &i );
+    assert( found );
+    s->isPasswordEnabled = i != 0;
+
+    found = tr_bencDictFindStr( settings, TR_PREFS_KEY_RPC_WHITELIST, &str );
+    assert( found );
+    tr_rpcSetWhitelist( s, str ? str : "127.0.0.1" );
+
+    found = tr_bencDictFindStr( settings, TR_PREFS_KEY_RPC_USERNAME, &str );
+    assert( found );
+    s->username = tr_strdup( str );
+
+    found = tr_bencDictFindStr( settings, TR_PREFS_KEY_RPC_PASSWORD, &str );
+    assert( found );
+    s->password = tr_strdup( str );
 
 #ifdef HAVE_ZLIB
     s->stream.zalloc = (alloc_func) Z_NULL;
@@ -735,17 +753,15 @@ tr_rpcInit( tr_session  * session,
     deflateInit( &s->stream, Z_BEST_COMPRESSION );
 #endif
 
-    if( isEnabled )
+    if( s->isEnabled )
+    {
+        tr_ninf( MY_NAME, _( "Serving RPC and Web requests on port %d" ), (int) s->port );
         tr_runInEventThread( session, startServer, s );
 
-    if( isEnabled )
-    {
-        tr_ninf( MY_NAME, _( "Serving RPC and Web requests on port %d" ), (int)port );
-
-        if( isWhitelistEnabled )
+        if( s->isWhitelistEnabled )
             tr_ninf( MY_NAME, _( "Whitelist enabled" ) );
 
-        if( isPasswordEnabled )
+        if( s->isPasswordEnabled )
             tr_ninf( MY_NAME, _( "Password required" ) );
     }
 

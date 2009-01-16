@@ -108,10 +108,28 @@ static struct tr_fd_s * gFd = NULL;
  #define O_LARGEFILE 0
 #endif
 
-static int
-preallocateFile( const char * filename, uint64_t length )
+static tr_bool
+preallocateFileSparse( int fd, uint64_t length )
 {
-    int success = 0;
+    const char zero = '\0';
+
+    if( length == 0 )
+        return TRUE;
+
+    if( lseek( fd, length-1, SEEK_SET ) == -1 )
+        return FALSE;
+    if( write( fd, &zero, 1 ) == -1 )
+        return FALSE;
+    if( ftruncate( fd, length ) == -1 )
+        return FALSE;
+
+    return TRUE;
+}
+
+static tr_bool
+preallocateFileFull( const char * filename, uint64_t length )
+{
+    tr_bool success = 0;
 
 #ifdef WIN32
 
@@ -170,12 +188,12 @@ preallocateFile( const char * filename, uint64_t length )
  * plus the errno values set by tr_mkdirp() and open().
  */
 static int
-TrOpenFile( int          i,
-            const char * folder,
-            const char * torrentFile,
-            int          doWrite,
-            int          doPreallocate,
-            uint64_t     desiredFileSize )
+TrOpenFile( int                      i,
+            const char             * folder,
+            const char             * torrentFile,
+            tr_bool                  doWrite,
+            tr_preallocation_mode    preallocationMode,
+            uint64_t                 desiredFileSize )
 {
     struct tr_openfile * file = &gFd->openFiles[i];
     int                  flags;
@@ -202,8 +220,8 @@ TrOpenFile( int          i,
 
     alreadyExisted = !stat( filename, &sb ) && S_ISREG( sb.st_mode );
 
-    if( doWrite && !alreadyExisted && doPreallocate )
-        if( preallocateFile( filename, desiredFileSize ) )
+    if( doWrite && !alreadyExisted && ( preallocationMode == TR_PREALLOCATE_FULL ) )
+        if( preallocateFileFull( filename, desiredFileSize ) )
             tr_inf( _( "Preallocated file \"%s\"" ), filename );
     
     /* open the file */
@@ -223,6 +241,9 @@ TrOpenFile( int          i,
         tr_free( filename );
         return err;
     }
+
+    if( doWrite && !alreadyExisted && ( preallocationMode == TR_PREALLOCATE_SPARSE ) )
+        preallocateFileSparse( file->fd, desiredFileSize );
 
     tr_free( filename );
     return 0;
@@ -256,11 +277,11 @@ fileIsCheckedOut( const struct tr_openfile * o )
 
 /* returns an fd on success, or a -1 on failure and sets errno */
 int
-tr_fdFileCheckout( const char * folder,
-                   const char * torrentFile,
-                   int          doWrite,
-                   int          doPreallocate,
-                   uint64_t     desiredFileSize )
+tr_fdFileCheckout( const char             * folder,
+                   const char             * torrentFile,
+                   tr_bool                  doWrite,
+                   tr_preallocation_mode    preallocationMode,
+                   uint64_t                 desiredFileSize )
 {
     int i, winner = -1;
     struct tr_openfile * o;
@@ -358,7 +379,7 @@ tr_fdFileCheckout( const char * folder,
     o = &gFd->openFiles[winner];
     if( !fileIsOpen( o ) )
     {
-        const int err = TrOpenFile( winner, folder, torrentFile, doWrite, doPreallocate, desiredFileSize );
+        const int err = TrOpenFile( winner, folder, torrentFile, doWrite, preallocationMode, desiredFileSize );
         if( err ) {
             tr_lockUnlock( gFd->lock );
             errno = err;

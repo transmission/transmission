@@ -30,7 +30,6 @@
 #endif
 #include "peer-io.h"
 #include "peer-mgr.h"
-#include "peer-mgr-private.h"
 #include "peer-msgs.h"
 #include "platform.h" /* MAX_STACK_ARRAY_SIZE */
 #include "ratecontrol.h"
@@ -1047,7 +1046,7 @@ parseUtPex( tr_peermsgs * msgs, int msglen, struct evbuffer * inbuf )
     int loaded = 0;
     uint8_t * tmp = tr_new( uint8_t, msglen );
     tr_benc val;
-    const tr_torrent * tor = msgs->torrent;
+    tr_torrent * tor = msgs->torrent;
     const uint8_t * added;
     size_t added_len;
 
@@ -1067,8 +1066,7 @@ parseUtPex( tr_peermsgs * msgs, int msglen, struct evbuffer * inbuf )
                 tr_peerMgrCompactToPex( added, added_len, added_f, added_f_len,
                                         &n );
             for( i = 0; i < n; ++i )
-                tr_peerMgrAddPex( msgs->session->peerMgr, tor->info.hash,
-                                  TR_PEER_FROM_PEX, pex + i );
+                tr_peerMgrAddPex( tor, TR_PEER_FROM_PEX, pex + i );
             tr_free( pex );
         }
         
@@ -1083,8 +1081,7 @@ parseUtPex( tr_peermsgs * msgs, int msglen, struct evbuffer * inbuf )
                 tr_peerMgrCompact6ToPex( added, added_len, added_f, added_f_len,
                                          &n );
             for( i = 0; i < n; ++i )
-                tr_peerMgrAddPex( msgs->session->peerMgr, tor->info.hash,
-                                  TR_PEER_FROM_PEX, pex + i );
+                tr_peerMgrAddPex( tor, TR_PEER_FROM_PEX, pex + i );
             tr_free( pex );
         }
         
@@ -1623,6 +1620,7 @@ canRead( tr_peerIo * io, void * vmsgs, size_t * piece )
             ret = readBtMessage( msgs, in, inlen ); break;
 
         default:
+            ret = READ_ERR;
             assert( 0 );
     }
 
@@ -1914,12 +1912,8 @@ sendPex( tr_peermsgs * msgs )
         PexDiffs diffs6;
         tr_pex * newPex = NULL;
         tr_pex * newPex6 = NULL;
-        const int newCount = tr_peerMgrGetPeers( msgs->session->peerMgr,
-                                                 msgs->torrent->info.hash,
-                                                 &newPex, TR_AF_INET );
-        const int newCount6 = tr_peerMgrGetPeers( msgs->session->peerMgr,
-                                                  msgs->torrent->info.hash,
-                                                  &newPex6, TR_AF_INET6 );
+        const int newCount = tr_peerMgrGetPeers( msgs->torrent, &newPex, TR_AF_INET );
+        const int newCount6 = tr_peerMgrGetPeers( msgs->torrent, &newPex6, TR_AF_INET6 );
 
         /* build the diffs */
         diffs.added = tr_new( tr_pex, newCount );
@@ -1980,6 +1974,7 @@ sendPex( tr_peermsgs * msgs )
             tmp = walk = tr_new( uint8_t, diffs.addedCount * 6 );
             for( i = 0; i < diffs.addedCount; ++i )
             {
+                tr_suspectAddress( &diffs.added[i].addr, "pex" );
                 memcpy( walk, &diffs.added[i].addr.addr, 4 ); walk += 4;
                 memcpy( walk, &diffs.added[i].port, 2 ); walk += 2;
             }
@@ -2010,6 +2005,7 @@ sendPex( tr_peermsgs * msgs )
             tmp = walk = tr_new( uint8_t, diffs6.addedCount * 18 );
             for( i = 0; i < diffs6.addedCount; ++i )
             {
+                tr_suspectAddress( &diffs6.added[i].addr, "pex6" );
                 memcpy( walk, &diffs6.added[i].addr.addr.addr6.s6_addr, 16 );
                 walk += 16;
                 memcpy( walk, &diffs6.added[i].port, 2 );

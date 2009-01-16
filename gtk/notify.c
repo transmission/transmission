@@ -15,7 +15,9 @@
  #include <gio/gio.h>
 #endif
 #include <glib/gi18n.h>
+#include "conf.h"
 #include "notify.h"
+#include "tr-prefs.h"
 #include "util.h"
 
 #ifndef HAVE_LIBNOTIFY
@@ -60,20 +62,27 @@ notifyCallback( NotifyNotification * n UNUSED,
 void
 tr_notify_send( TrTorrent *tor )
 {
-    const tr_info *      info = tr_torrent_info( tor );
-    NotifyNotification * n = notify_notification_new( _(
-                                                          "Torrent Complete" ),
-                                                      info->name,
-                                                      "transmission", NULL );
+    if( pref_flag_get( PREF_KEY_SHOW_DESKTOP_NOTIFICATION ) )
+    {
+        const tr_info * info = tr_torrent_info( tor );
+        NotifyNotification * n;
 
-    if( info->fileCount == 1 )
-        notify_notification_add_action( n, "file", _( "Open File" ),
-                                        NOTIFY_ACTION_CALLBACK(
-                                            notifyCallback ), tor, NULL );
-    notify_notification_add_action( n, "folder", _( "Open Folder" ),
-                                    NOTIFY_ACTION_CALLBACK(
-                                        notifyCallback ), tor, NULL );
-    notify_notification_show( n, NULL );
+        n = notify_notification_new( _( "Torrent Complete" ),
+                                     info->name,
+                                     "transmission", NULL );
+
+        if( info->fileCount == 1 )
+            notify_notification_add_action(
+                n, "file", _( "Open File" ),
+                NOTIFY_ACTION_CALLBACK( notifyCallback ), tor,
+                NULL );
+
+        notify_notification_add_action(
+            n, "folder", _( "Open Folder" ),
+            NOTIFY_ACTION_CALLBACK( notifyCallback ), tor, NULL );
+
+        notify_notification_show( n, NULL );
+    }
 }
 
 #endif

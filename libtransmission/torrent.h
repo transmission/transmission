@@ -24,6 +24,7 @@
 
 struct tr_bandwidth;
 struct tr_ratecontrol;
+struct tr_torrent_peers;
 
 /**
 ***  Package-visible ctor API
@@ -111,6 +112,10 @@ int              tr_torrentPromoteTracker( tr_torrent   * tor,
 time_t*          tr_torrentGetMTimes( const tr_torrent  * tor,
                                       size_t            * setmeCount );
 
+tr_torrent*      tr_torrentNext( tr_session  * session,
+                                 tr_torrent  * current );
+
+
 typedef enum
 {
     TR_VERIFY_NONE,
@@ -193,6 +198,8 @@ struct tr_torrent
     int                        uniqueId;
 
     struct tr_bandwidth      * bandwidth;
+
+    struct tr_torrent_peers  * torrentPeers;
 };
 
 /* get the index of this piece's first block */
