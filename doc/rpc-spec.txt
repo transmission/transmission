@@ -323,6 +323,16 @@
    "speed-limit-up"           | number     max global upload speed (in K/s)
    "speed-limit-up-enabled"   | 'boolean'  true means enabled
    "version"                  | string     long version string "$version ($revision)"
+   "rpc-version"              | number     the current RPC API version
+   "rpc-version-minimum"      | number     the minimum RPC API version supported
+
+   "rpc-version" indicates the RPC interface version supported by the RPC server.
+   It is incremented when a new version of Transmission changes the RPC interface.
+
+   "rpc-version-minimum" indicates the oldest API supported by the RPC server.
+   It is changes when a new version of Transmission changes the RPC interface
+   in a way that is not backwards compatible.  There are no plans for this
+   to be common behavior.
 
 4.1.1.  Mutators
 
@@ -352,4 +362,24 @@
    "torrentCount"             | number
    "uploadSpeed"              | number
    
+
+5.0.  Protocol Versions
+
+  The following changes have been made to the RPC interface:
+
+   RPC   | Release | Backwards |                |
+   Vers. | Version | Compat?   | Method         | Description
+   ------+---------+-----------+----------------+-------------------------------
+   1     | 1.30    | n/a       | n/a            | Initial version
+   ------+---------+-----------+----------------+-------------------------------
+   2     | 1.34    | yes       | torrent-get    | new arg "peers"
+   ------+---------+-----------+----------------+-------------------------------
+   3     | 1.41    | yes       | torrent-get    | added "port" to "peers"
+         |         |           | torrent-get    | new arg "downloaders"
+         |         |           | session-get    | new arg "version"
+         |         |           | torrent-remove | new method
+   ------+---------+-----------+----------------+-------------------------------
+   4     | 1.50    | yes       | session-get    | new arg "rpc-version"
+         |         |           | session-get    | new arg "rpc-version-minimum"
+   ------+---------+-----------+----------------+-------------------------------
 
