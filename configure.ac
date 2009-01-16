@@ -19,14 +19,17 @@ AC_CONFIG_SRCDIR(libtransmission/transmission.h)
 AM_INIT_AUTOMAKE([1.9 tar-ustar])
 AC_PROG_LIBTOOL
 
-if test m4_substr(peer_id_prefix,6,1) = "Z"; then
-  AC_DEFINE(TR_UNSTABLE, 1, [Define to 1 if this is an unstable version of Transmission])
-  TR_UNSTABLE=yes
-  enable_debug=yes
+if test m4_substr(peer_id_prefix,6,1) = "X"; then
+  AC_DEFINE(TR_BETA_RELEASE, 1, [Define to 1 if this is a beta release of Transmission])
+  supported_build=no
+elif test m4_substr(peer_id_prefix,6,1) = "Z"; then
+  AC_DEFINE(TR_NIGHTLY_RELEASE, 1, [Define to 1 if this is a nightly release of Transmission])
+  supported_build=no
 else
-  enable_debug=no
+  AC_DEFINE(TR_STABLE_RELEASE, 1, [Define to 1 if this is a stable release of Transmission])
+  supported_build=yes
 fi
-AM_CONDITIONAL(TR_UNSTABLE, test "x$TR_UNSTABLE" = "xyes")
+AM_CONDITIONAL(TR_UNSTABLE, test "x$supported_build" = "xno")
 
 OPENSSL_MINIMUM=0.9.4
 CURL_MINIMUM=7.16.3
