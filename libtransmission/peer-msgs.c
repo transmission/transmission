@@ -1620,6 +1620,7 @@ canRead( tr_peerIo * io, void * vmsgs, size_t * piece )
             ret = readBtMessage( msgs, in, inlen ); break;
 
         default:
+            ret = READ_ERR;
             assert( 0 );
     }
 

@@ -129,8 +129,11 @@ tr_netInit( void )
 }
 
 void
-tr_suspectAddress( const tr_address * a, const char * source )
+tr_suspectAddress( const tr_address * a UNUSED, const char * source UNUSED )
 {
+/* this is overkill for a production environment,
+ * but useful in the nightly builds, so only compile it into the nightlies */
+#ifdef TR_UNSTABLE
     /* be really aggressive in what we report */
     if( a->type == TR_AF_INET && !( ntohl( a->addr.addr4.s_addr ) & 0xff000000 ) )
         tr_err(  "Funny looking address %s from %s", tr_ntop_non_ts( a ), source );
@@ -156,6 +159,7 @@ tr_suspectAddress( const tr_address * a, const char * source )
         if( !good && !IN6_IS_ADDR_V4MAPPED( &a->addr.addr6 ) )
             tr_err(  "Funny looking address %s from %s", tr_ntop_non_ts( a ), source );
     }
+#endif
 }
 
 const char * 
