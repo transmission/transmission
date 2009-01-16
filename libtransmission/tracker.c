@@ -291,13 +291,12 @@ publishNewPeersCompact6( tr_tracker * t,
     {
         memcpy( &addr.addr.addr6, compactWalk, 16 );
         memcpy( &port, compactWalk + 16, 2 );
+        compactWalk += 16;
         tr_suspectAddress( &addr, "compact6" );
         
         memcpy( walk, &addr, sizeof( addr ) );
         memcpy( walk + sizeof( addr ), &port, 2 );
-        
         walk += sizeof( tr_address ) + 2;
-        compactWalk += 6;
     }
     publishNewPeers( t, allAreSeeds, array, arrayLen );
     tr_free( array );
