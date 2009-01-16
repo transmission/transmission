@@ -159,7 +159,7 @@ const char* tr_peerIoAddrStr( const struct tr_address * addr,
 
 static TR_INLINE const char* tr_peerIoGetAddrStr( const tr_peerIo * io )
 {
-    return tr_peerIoAddrStr( &io->addr, io->port );
+    return tr_isPeerIo( io ) ? tr_peerIoAddrStr( &io->addr, io->port ) : "error";
 }
 
 const struct tr_address * tr_peerIoGetAddress( const tr_peerIo * io,

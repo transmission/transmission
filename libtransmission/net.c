@@ -477,11 +477,10 @@ tr_netOpenTCP( tr_session        * session,
     /* don't try to connect to multicast addresses */
     if( addr->type == TR_AF_INET && IN_MULTICAST( htonl( addr->addr.addr4.s_addr ) ) )
         return -EINVAL;
-    if( addr->type == TR_AF_INET6 && ( addr->addr.addr6.s6_addr[0] & 0xff ) )
+    if( addr->type == TR_AF_INET6 && ( addr->addr.addr6.s6_addr[0] == 0xff ) )
         return -EINVAL;
 
-    if( ( s = createSocket( ( addr->type == TR_AF_INET ? AF_INET : AF_INET6 ),
-                            type ) ) < 0 )
+    if( ( s = createSocket( ( addr->type == TR_AF_INET ? AF_INET : AF_INET6 ), type ) ) < 0 )
         return s;
 
     setSndBuf( session, s );
