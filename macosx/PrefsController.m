@@ -339,7 +339,7 @@ tr_session * fHandle;
 }
 
 //for a beta release, always use the beta appcast
-#if defined(BETA_RELEASE)
+#if defined(TR_BETA_RELEASE)
 #define SPARKLE_TAG YES
 #else
 #define SPARKLE_TAG [fDefaults boolForKey: @"AutoUpdateBeta"]

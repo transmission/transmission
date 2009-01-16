@@ -349,7 +349,7 @@
 					<object class="NSButton" id="1005555131">
 						<reference key="NSNextResponder" ref="249126185"/>
 						<int key="NSvFlags">256</int>
-						<string key="NSFrame">{{208, 18}, {155, 18}}</string>
+						<string key="NSFrame">{{189, 18}, {155, 18}}</string>
 						<reference key="NSSuperview" ref="249126185"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="794987986">
@@ -5536,10 +5536,6 @@ AAABAAAAAQ</bytes>
 				<string key="NSExtension">NSResponder</string>
 			</object>
 			<object class="NSUserDefaultsController" id="356871564">
-				<object class="NSMutableArray" key="NSDeclaredKeys">
-					<bool key="EncodedWithXMLCoder">YES</bool>
-					<string>SUEnableAutomaticChecks</string>
-				</object>
 				<bool key="NSSharedInstance">YES</bool>
 			</object>
 			<object class="NSCustomObject" id="981493640">
@@ -8739,22 +8735,6 @@ AAABAAAAAQ</bytes>
 						<reference key="destination" ref="1005555131"/>
 					</object>
 					<int key="connectionID">1900</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
-						<string key="label">enabled: values.SUEnableAutomaticChecks</string>
-						<reference key="source" ref="1005555131"/>
-						<reference key="destination" ref="356871564"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="1005555131"/>
-							<reference key="NSDestination" ref="356871564"/>
-							<string key="NSLabel">enabled: values.SUEnableAutomaticChecks</string>
-							<string key="NSBinding">enabled</string>
-							<string key="NSKeyPath">values.SUEnableAutomaticChecks</string>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">1901</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
