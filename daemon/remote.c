@@ -963,21 +963,24 @@ static void
 printPeersImpl( tr_benc * peers )
 {
     int i, n;
-    printf( "%-20s  %-12s  %-6s  %-6s  %s\n",
-            "Address", "Flags", "Down", "Up", "Client" );
+    printf( "%-20s  %-12s  %-5s %-6s  %-6s  %s\n",
+            "Address", "Flags", "Done", "Down", "Up", "Client" );
     for( i = 0, n = tr_bencListSize( peers ); i < n; ++i )
     {
+        double progress;
         const char * address, * client, * flagstr;
-        int64_t      rateToClient, rateToPeer;
-        tr_benc *    d = tr_bencListChild( peers, i );
+        int64_t rateToClient, rateToPeer;
+        tr_benc * d = tr_bencListChild( peers, i );
+
         if( tr_bencDictFindStr( d, "address", &address )
           && tr_bencDictFindStr( d, "clientName", &client )
+          && tr_bencDictFindDouble( d, "progress", &progress )
           && tr_bencDictFindStr( d, "flagStr", &flagstr )
           && tr_bencDictFindInt( d, "rateToClient", &rateToClient )
           && tr_bencDictFindInt( d, "rateToPeer", &rateToPeer ) )
         {
-            printf( "%-20s  %-12s  %6.1f  %6.1f  %s\n",
-                    address, flagstr,
+            printf( "%-20s  %-12s  %-5.1f %6.1f  %6.1f  %s\n",
+                    address, flagstr, (progress*100.0),
                     rateToClient / 1024.0,
                     rateToPeer / 1024.0,
                     client );
