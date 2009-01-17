@@ -19,15 +19,20 @@ AC_CONFIG_SRCDIR(libtransmission/transmission.h)
 AM_INIT_AUTOMAKE([1.9 tar-ustar])
 AC_PROG_LIBTOOL
 
-if test m4_substr(peer_id_prefix,6,1) = "X"; then
-  AC_DEFINE(TR_BETA_RELEASE, 1, [Define to 1 if this is a beta release of Transmission])
-  supported_build=no
-elif test m4_substr(peer_id_prefix,6,1) = "Z"; then
-  AC_DEFINE(TR_NIGHTLY_RELEASE, 1, [Define to 1 if this is a nightly release of Transmission])
-  supported_build=no
-else
-  AC_DEFINE(TR_STABLE_RELEASE, 1, [Define to 1 if this is a stable release of Transmission])
+if test m4_substr(peer_id_prefix,6,1) = "0"; then
   supported_build=yes
+  CFLAGS="$CFLAGS -g -O3 -funroll-loops "
+  CXXFLAGS="$CXXFLAGS -g -O3 -funroll-loops "
+  AC_DEFINE(TR_STABLE_RELEASE, 1, [Define to 1 if this is a stable release of Transmission])
+else
+  supported_build=no
+  CFLAGS="$CFLAGS -g -O0"
+  CXXFLAGS="$CXXFLAGS -g -O0"
+  if test m4_substr(peer_id_prefix,6,1) = "X"; then
+    AC_DEFINE(TR_BETA_RELEASE, 1, [Define to 1 if this is a beta release of Transmission])
+  else
+    AC_DEFINE(TR_NIGHTLY_RELEASE, 1, [Define to 1 if this is a nightly release of Transmission])
+  fi
 fi
 AM_CONDITIONAL(TR_UNSTABLE, test "x$supported_build" = "xno")
 
@@ -93,20 +98,6 @@ AC_TRY_LINK([#include <stdarg.h>], [va_list ap1, ap2; va_copy(ap1, ap2);],
         AC_MSG_RESULT([memcpy])]
     )
 ])
-
-
-dnl ----------------------------------------------------------------------------
-dnl
-dnl  debugging support
-AC_ARG_ENABLE([debug], AS_HELP_STRING([--enable-debug],[build with debugging support]),,,)
-if test "x$enable_debug" = "xyes" ; then
-	CFLAGS="$CFLAGS -g -O0"
-	CXXFLAGS="$CXXFLAGS -g -O0"
-else
-	CFLAGS="$CFLAGS -g -O3 -funroll-loops -DNDEBUG "
-	CXXFLAGS="$CXXFLAGS -g -O3 -funroll-loops -DNDEBUG "
-fi
-
 
 dnl ----------------------------------------------------------------------------
 dnl
@@ -335,7 +326,6 @@ Configuration:
 
         Source code location:       ${srcdir}
         Compiler:                   ${CXX}
-        Debugging support           ${enable_debug}
         Build Command-Line client:  ${build_cli}
         Build Daemon:               ${build_daemon}
         Build GTK+ client:          ${build_gtk}

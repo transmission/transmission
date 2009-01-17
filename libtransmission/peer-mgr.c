@@ -1315,7 +1315,8 @@ tr_peerMgrAddPex( tr_torrent   *  tor,
         managerLock( t->manager );
 
         if( !tr_sessionIsAddressBlocked( t->manager->session, &pex->addr ) )
-            ensureAtomExists( t, &pex->addr, pex->port, pex->flags, from );
+            if( tr_isValidPeerAddress( &pex->addr, pex->port ) )
+                ensureAtomExists( t, &pex->addr, pex->port, pex->flags, from );
 
         managerUnlock( t->manager );
     }

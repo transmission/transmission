@@ -57,7 +57,6 @@ const tr_address tr_in6addr_any = { TR_AF_INET6, { IN6ADDR_ANY_INIT } };
 const tr_address tr_inaddr_any = { TR_AF_INET, 
     { { { { INADDR_ANY, 0x00, 0x00, 0x00 } } } } }; 
 
-
 #ifdef WIN32
 static const char *
 inet_ntop(int af, const void *src, char *dst, socklen_t cnt)
@@ -462,6 +461,30 @@ setup_sockaddr( const tr_address        * addr,
     }
 }
 
+static tr_bool
+isMulticastAddress( const tr_address * addr )
+{
+    if( addr->type == TR_AF_INET && IN_MULTICAST( htonl( addr->addr.addr4.s_addr ) ) )
+        return TRUE;
+
+    if( addr->type == TR_AF_INET6 && ( addr->addr.addr6.s6_addr[0] == 0xff ) )
+        return TRUE;
+
+    return FALSE;
+}
+
+tr_bool
+tr_isValidPeerAddress( const tr_address * addr, tr_port port )
+{
+    if( isMulticastAddress( addr ) )
+        return FALSE;
+
+    if( port == 0 )
+        return FALSE;
+
+    return TRUE;
+}
+
 int
 tr_netOpenTCP( tr_session        * session,
                const tr_address  * addr,
@@ -474,10 +497,7 @@ tr_netOpenTCP( tr_session        * session,
 
     assert( tr_isAddress( addr ) );
 
-    /* don't try to connect to multicast addresses */
-    if( addr->type == TR_AF_INET && IN_MULTICAST( htonl( addr->addr.addr4.s_addr ) ) )
-        return -EINVAL;
-    if( addr->type == TR_AF_INET6 && ( addr->addr.addr6.s6_addr[0] == 0xff ) )
+    if( isMulticastAddress( addr ) )
         return -EINVAL;
 
     if( ( s = createSocket( ( addr->type == TR_AF_INET ? AF_INET : AF_INET6 ), type ) ) < 0 )
