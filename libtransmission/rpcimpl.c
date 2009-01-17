@@ -293,6 +293,8 @@ addField( const tr_torrent * tor,
         tr_bencDictAddInt( d, key, st->desiredAvailable );
     else if( !strcmp( key, "doneDate" ) )
         tr_bencDictAddInt( d, key, st->doneDate );
+    else if( !strcmp( key, "downloadDir" ) )
+        tr_bencDictAddStr( d, key, tr_torrentGetDownloadDir( tor ) );
     else if( !strcmp( key, "downloadedEver" ) )
         tr_bencDictAddInt( d, key, st->downloadedEver );
     else if( !strcmp( key, "downloaders" ) )
