@@ -203,7 +203,10 @@ TrOpenFile( int                      i,
 
     /* confirm the parent folder exists */
     if( stat( folder, &sb ) || !S_ISDIR( sb.st_mode ) )
+    {
+        tr_err( _( "Couldn't create \"%1$s\": parent folder \"%2$s\" does not exist" ), torrentFile, folder );
         return ENOENT;
+    }
 
     /* create subfolders, if any */
     filename = tr_buildPath( folder, torrentFile, NULL );
@@ -211,11 +214,13 @@ TrOpenFile( int                      i,
     {
         char * tmp = tr_dirname( filename );
         const int err = tr_mkdirp( tmp, 0777 ) ? errno : 0;
-        tr_free( tmp );
         if( err ) {
+            tr_err( _( "Couldn't create \"%1$s\": %2$s" ), tmp, tr_strerror( err ) );
+            tr_free( tmp );
             tr_free( filename );
             return err;
         }
+        tr_free( tmp );
     }
 
     alreadyExisted = !stat( filename, &sb ) && S_ISREG( sb.st_mode );
@@ -236,8 +241,7 @@ TrOpenFile( int                      i,
     if( file->fd == -1 )
     {
         const int err = errno;
-        tr_err( _( "Couldn't open \"%1$s\": %2$s" ), filename,
-               tr_strerror( err ) );
+        tr_err( _( "Couldn't open \"%1$s\": %2$s" ), filename, tr_strerror( err ) );
         tr_free( filename );
         return err;
     }
