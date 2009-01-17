@@ -131,6 +131,7 @@
    dateCreated            | number                               | tr_info
    desiredAvailable       | number                               | tr_stat
    doneDate               | number                               | tr_stat
+   downloadDir            | string                               | tr_torrent
    downloadedEver         | number                               | tr_stat
    downloaders            | number                               | tr_stat
    downloadLimitMode      | number                               | tr_torrent
@@ -381,5 +382,6 @@
    ------+---------+-----------+----------------+-------------------------------
    4     | 1.50    | yes       | session-get    | new arg "rpc-version"
          |         |           | session-get    | new arg "rpc-version-minimum"
+         |         |           | torrent-get    | new arg "downloadDir"
    ------+---------+-----------+----------------+-------------------------------
 
