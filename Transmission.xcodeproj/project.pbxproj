@@ -27,7 +27,6 @@
 		4D36BA730CA2F00800A63CA5 /* handshake.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D36BA640CA2F00800A63CA5 /* handshake.h */; };
 		4D36BA740CA2F00800A63CA5 /* peer-io.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D36BA650CA2F00800A63CA5 /* peer-io.c */; };
 		4D36BA750CA2F00800A63CA5 /* peer-io.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D36BA660CA2F00800A63CA5 /* peer-io.h */; };
-		4D36BA760CA2F00800A63CA5 /* peer-mgr-private.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D36BA670CA2F00800A63CA5 /* peer-mgr-private.h */; };
 		4D36BA770CA2F00800A63CA5 /* peer-mgr.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D36BA680CA2F00800A63CA5 /* peer-mgr.c */; };
 		4D36BA780CA2F00800A63CA5 /* peer-mgr.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D36BA690CA2F00800A63CA5 /* peer-mgr.h */; };
 		4D36BA790CA2F00800A63CA5 /* peer-msgs.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D36BA6A0CA2F00800A63CA5 /* peer-msgs.c */; };
@@ -399,7 +398,6 @@
 		4D36BA640CA2F00800A63CA5 /* handshake.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = handshake.h; path = libtransmission/handshake.h; sourceTree = "<group>"; };
 		4D36BA650CA2F00800A63CA5 /* peer-io.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = "peer-io.c"; path = "libtransmission/peer-io.c"; sourceTree = "<group>"; };
 		4D36BA660CA2F00800A63CA5 /* peer-io.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = "peer-io.h"; path = "libtransmission/peer-io.h"; sourceTree = "<group>"; };
-		4D36BA670CA2F00800A63CA5 /* peer-mgr-private.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = "peer-mgr-private.h"; path = "libtransmission/peer-mgr-private.h"; sourceTree = "<group>"; };
 		4D36BA680CA2F00800A63CA5 /* peer-mgr.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = "peer-mgr.c"; path = "libtransmission/peer-mgr.c"; sourceTree = "<group>"; };
 		4D36BA690CA2F00800A63CA5 /* peer-mgr.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = "peer-mgr.h"; path = "libtransmission/peer-mgr.h"; sourceTree = "<group>"; };
 		4D36BA6A0CA2F00800A63CA5 /* peer-msgs.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = "peer-msgs.c"; path = "libtransmission/peer-msgs.c"; sourceTree = "<group>"; };
@@ -1088,7 +1086,6 @@
 				4D36BA640CA2F00800A63CA5 /* handshake.h */,
 				4D36BA650CA2F00800A63CA5 /* peer-io.c */,
 				4D36BA660CA2F00800A63CA5 /* peer-io.h */,
-				4D36BA670CA2F00800A63CA5 /* peer-mgr-private.h */,
 				4D36BA680CA2F00800A63CA5 /* peer-mgr.c */,
 				4D36BA690CA2F00800A63CA5 /* peer-mgr.h */,
 				4D36BA6A0CA2F00800A63CA5 /* peer-msgs.c */,
@@ -1378,7 +1375,6 @@
 				4D36BA700CA2F00800A63CA5 /* crypto.h in Headers */,
 				4D36BA730CA2F00800A63CA5 /* handshake.h in Headers */,
 				4D36BA750CA2F00800A63CA5 /* peer-io.h in Headers */,
-				4D36BA760CA2F00800A63CA5 /* peer-mgr-private.h in Headers */,
 				4D36BA780CA2F00800A63CA5 /* peer-mgr.h in Headers */,
 				4D36BA7A0CA2F00800A63CA5 /* peer-msgs.h in Headers */,
 				4D36BA7B0CA2F00800A63CA5 /* ptrarray.h in Headers */,
