@@ -58,7 +58,7 @@ getUsage( void )
 
 static tr_option opts[] =
 {
-    { 'a', "add",                  "Add torrent files", "a",  0, NULL },
+    { 'a', "add",                  "Add torrent files by filename or URL", "a",  0, NULL },
     { 'b', "debug",                "Print debugging information", "b",  0, NULL },
     { 'd', "downlimit",            "Set the maximum global download speed in KB/s", "d",  1, "<speed>" },
     { 'D', "no-downlimit",         "Don't limit the global download speed", "D",  0, NULL },
