@@ -1380,7 +1380,7 @@ pauseAllTorrents( struct cbdata * data )
 {
     tr_session * session = tr_core_session( data->core );
     const char * cmd = "{ \"method\": \"torrent-stop\" }";
-    tr_rpc_request_exec_json( session, cmd, strlen( cmd ), NULL );
+    tr_rpc_request_exec_json( session, cmd, strlen( cmd ), NULL, NULL );
 }
 
 void
