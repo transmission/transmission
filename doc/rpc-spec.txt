@@ -281,7 +281,7 @@
    key                | value type & description
    -------------------+-------------------------------------------------
    "download-dir"     | string      path to download the torrent to
-   "filename"         | string      location of the .torrent file
+   "filename"         | string      filename or URL of the .torrent file
    "metainfo"         | string      base64-encoded .torrent content
    "paused"           | 'boolean'   if true, don't start the torrent
    "peer-limit"       | number      maximum number of peers

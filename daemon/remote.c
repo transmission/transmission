@@ -300,8 +300,8 @@ readargs( int           argc,
                     }
                     else
                     {
-                        fprintf( stderr, "Couldn't add file: %s\n", optarg );
-                        addArg = FALSE;
+                        tr_bencDictAddStr( &top, "method", "torrent-add" );
+                        tr_bencDictAddStr( args, "filename", optarg );
                     }
                 }
                 else

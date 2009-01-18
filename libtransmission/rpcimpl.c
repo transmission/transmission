@@ -15,6 +15,8 @@
 #include <stdlib.h> /* strtol */
 #include <string.h> /* strcmp */
 
+#include <event.h> /* evbuffer */
+
 #include "transmission.h"
 #include "bencode.h"
 #include "rpcimpl.h"
@@ -22,8 +24,16 @@
 #include "session.h"
 #include "torrent.h"
 #include "utils.h"
+#include "web.h"
 
 #define TR_N_ELEMENTS( ary ) ( sizeof( ary ) / sizeof( *ary ) )
+
+#define dbgmsg( ... ) \
+    do { \
+        if( tr_deepLoggingIsActive( ) ) \
+            tr_deepLog( __FILE__, __LINE__, "RPC", __VA_ARGS__ ); \
+    } while( 0 )
+
 
 /***
 ****
@@ -41,6 +51,41 @@ notify( tr_session * session,
                                     session->rpc_func_user_data );
 
     return status;
+}
+
+/***
+****
+***/
+
+/* For functions that can't be immediately executed, like torrentAdd,
+ * this is the callback data used to pass a response to the caller
+ * when the task is complete */
+struct tr_rpc_idle_data
+{
+    tr_session            * session;
+    tr_benc               * response;
+    tr_benc               * args_out;
+    tr_rpc_response_func  * callback;
+    void                  * callback_user_data;
+};
+
+static void
+function_done( struct tr_rpc_idle_data * data, const char * result )
+{
+    struct evbuffer * buf = tr_getBuffer( );
+
+    if( result == NULL )
+        result = "success";
+    tr_bencDictAddStr( data->response, "result", result );
+
+    tr_bencSaveAsJSON( data->response, buf );
+    data->callback( data->session, (const char*)EVBUFFER_DATA(buf),
+                    EVBUFFER_LENGTH(buf), data->callback_user_data );
+
+    tr_releaseBuffer( buf );
+    tr_bencFree( data->response );
+    tr_free( data->response );
+    tr_free( data );
 }
 
 /***
@@ -99,12 +144,15 @@ getTorrents( tr_session * session,
 }
 
 static const char*
-torrentStart( tr_session * session,
-              tr_benc    * args_in,
-              tr_benc    * args_out UNUSED )
+torrentStart( tr_session               * session,
+              tr_benc                  * args_in,
+              tr_benc                  * args_out UNUSED,
+              struct tr_rpc_idle_data  * idle_data )
 {
     int           i, torrentCount;
     tr_torrent ** torrents = getTorrents( session, args_in, &torrentCount );
+
+    assert( idle_data == NULL );
 
     for( i = 0; i < torrentCount; ++i )
     {
@@ -117,12 +165,15 @@ torrentStart( tr_session * session,
 }
 
 static const char*
-torrentStop( tr_session * session,
-             tr_benc    * args_in,
-             tr_benc    * args_out UNUSED )
+torrentStop( tr_session               * session,
+             tr_benc                  * args_in,
+             tr_benc                  * args_out UNUSED,
+             struct tr_rpc_idle_data  * idle_data )
 {
     int           i, torrentCount;
     tr_torrent ** torrents = getTorrents( session, args_in, &torrentCount );
+
+    assert( idle_data == NULL );
 
     for( i = 0; i < torrentCount; ++i )
     {
@@ -135,13 +186,16 @@ torrentStop( tr_session * session,
 }
 
 static const char*
-torrentRemove( tr_session  * session,
-               tr_benc     * args_in,
-               tr_benc     * args_out UNUSED )
+torrentRemove( tr_session               * session,
+               tr_benc                  * args_in,
+               tr_benc                  * args_out UNUSED,
+               struct tr_rpc_idle_data  * idle_data )
 {
     int i;
     int torrentCount;
     tr_torrent ** torrents = getTorrents( session, args_in, &torrentCount );
+
+    assert( idle_data == NULL );
 
     for( i=0; i<torrentCount; ++i )
     {
@@ -159,12 +213,15 @@ torrentRemove( tr_session  * session,
 }
 
 static const char*
-torrentVerify( tr_session  * session,
-               tr_benc     * args_in,
-               tr_benc     * args_out UNUSED )
+torrentVerify( tr_session               * session,
+               tr_benc                  * args_in,
+               tr_benc                  * args_out UNUSED,
+               struct tr_rpc_idle_data  * idle_data )
 {
     int           i, torrentCount;
     tr_torrent ** torrents = getTorrents( session, args_in, &torrentCount );
+
+    assert( idle_data == NULL );
 
     for( i = 0; i < torrentCount; ++i )
     {
@@ -435,16 +492,18 @@ addInfo( const tr_torrent * tor,
 }
 
 static const char*
-torrentGet( tr_session * session,
-            tr_benc    * args_in,
-            tr_benc    * args_out )
+torrentGet( tr_session               * session,
+            tr_benc                  * args_in,
+            tr_benc                  * args_out,
+            struct tr_rpc_idle_data  * idle_data )
 {
     int           i, torrentCount;
     tr_torrent ** torrents = getTorrents( session, args_in, &torrentCount );
-    tr_benc *     list = tr_bencDictAddList( args_out, "torrents",
-                                             torrentCount );
+    tr_benc *     list = tr_bencDictAddList( args_out, "torrents", torrentCount );
     tr_benc *     fields;
     char *        msg = NULL;
+
+    assert( idle_data == NULL );
 
     if( !tr_bencDictFindList( args_in, "fields", &fields ) )
         msg = "no fields specified";
@@ -522,12 +581,15 @@ setFileDLs( tr_torrent * tor,
 }
 
 static const char*
-torrentSet( tr_session * session,
-            tr_benc    * args_in,
-            tr_benc    * args_out UNUSED )
+torrentSet( tr_session               * session,
+            tr_benc                  * args_in,
+            tr_benc                  * args_out UNUSED,
+            struct tr_rpc_idle_data  * idle_data )
 {
     int           i, torrentCount;
     tr_torrent ** torrents = getTorrents( session, args_in, &torrentCount );
+
+    assert( idle_data == NULL );
 
     for( i = 0; i < torrentCount; ++i )
     {
@@ -570,13 +632,94 @@ torrentSet( tr_session * session,
 ****
 ***/
 
+static void
+addTorrentImpl( struct tr_rpc_idle_data * data, tr_ctor * ctor )
+{
+    int err = 0;
+    const char * result = NULL;
+    tr_torrent * tor = tr_torrentNew( data->session, ctor, &err );
+
+    tr_ctorFree( ctor );
+
+    if( tor )
+    {
+        tr_benc fields;
+        tr_bencInitList( &fields, 3 );
+        tr_bencListAddStr( &fields, "id" );
+        tr_bencListAddStr( &fields, "name" );
+        tr_bencListAddStr( &fields, "hashString" );
+        addInfo( tor, tr_bencDictAdd( data->args_out, "torrent-added" ), &fields );
+        notify( data->session, TR_RPC_TORRENT_ADDED, tor );
+        tr_bencFree( &fields );
+    }
+    else if( err == TR_EDUPLICATE )
+    {
+        result = "duplicate torrent";
+    }
+    else if( err == TR_EINVALID )
+    {
+        result = "invalid or corrupt torrent file";
+    }
+
+    function_done( data, result );
+}
+
+
+struct add_torrent_idle_data
+{
+    struct tr_rpc_idle_data * data;
+    tr_ctor * ctor;
+};
+
+static void
+gotMetadataFromURL( tr_session       * session UNUSED,
+                    long               response_code,
+                    const void       * response,
+                    size_t             response_byte_count,
+                    void             * user_data )
+{
+    struct add_torrent_idle_data * data = user_data;
+
+    dbgmsg( "torrentAdd: HTTP response code was %ld (%s); response length was %zu bytes",
+            response_code, tr_webGetResponseStr( response_code ), response_byte_count );
+
+    if( response_code == 200 )
+    {
+        tr_ctorSetMetainfo( data->ctor, response, response_byte_count );
+        addTorrentImpl( data->data, data->ctor );
+    }
+    else
+    {
+        char result[1024];
+        tr_snprintf( result, sizeof( result ), "http error %ld: %s",
+                     response_code, tr_webGetResponseStr( response_code ) );
+        function_done( data->data, result );
+    }
+
+    tr_free( data );
+}
+
+static tr_bool
+isCurlURL( const char * filename )
+{
+    if( filename == NULL )
+        return FALSE;
+
+    return ( strstr( filename, "ftp://" ) != NULL )
+        || ( strstr( filename, "http://" ) != NULL )
+        || ( strstr( filename, "https://" ) != NULL );
+}
+
 static const char*
-torrentAdd( tr_session * session,
-            tr_benc    * args_in,
-            tr_benc    * args_out )
+torrentAdd( tr_session               * session,
+            tr_benc                  * args_in,
+            tr_benc                  * args_out UNUSED,
+            struct tr_rpc_idle_data  * idle_data )
 {
     const char * filename = NULL;
     const char * metainfo_base64 = NULL;
+
+    assert( idle_data != NULL );
 
     tr_bencDictFindStr( args_in, "filename", &filename );
     tr_bencDictFindStr( args_in, "metainfo", &metainfo_base64 );
@@ -585,23 +728,8 @@ torrentAdd( tr_session * session,
     else
     {
         int64_t      i;
-        int          err = 0;
         const char * str;
-        tr_ctor *    ctor;
-        tr_torrent * tor;
-
-        ctor = tr_ctorNew( session );
-
-        /* set the metainfo */
-        if( filename )
-            tr_ctorSetMetainfoFromFile( ctor, filename );
-        else
-        {
-            int    len;
-            char * metainfo = tr_base64_decode( metainfo_base64, -1,  &len );
-            tr_ctorSetMetainfo( ctor, (uint8_t*)metainfo, len );
-            tr_free( metainfo );
-        }
+        tr_ctor    * ctor = tr_ctorNew( session );
 
         /* set the optional arguments */
         if( tr_bencDictFindStr( args_in, "download-dir", &str ) )
@@ -611,29 +739,28 @@ torrentAdd( tr_session * session,
         if( tr_bencDictFindInt( args_in, "peer-limit", &i ) )
             tr_ctorSetPeerLimit( ctor, TR_FORCE, i );
 
-        tor = tr_torrentNew( session, ctor, &err );
-        tr_ctorFree( ctor );
+        dbgmsg( "torrentAdd: filename is \"%s\"", filename );
 
-        if( tor )
+        if( isCurlURL( filename ) )
         {
-            tr_benc fields;
-            tr_bencInitList( &fields, 3 );
-            tr_bencListAddStr( &fields, "id" );
-            tr_bencListAddStr( &fields, "name" );
-            tr_bencListAddStr( &fields, "hashString" );
-            addInfo( tor, tr_bencDictAdd( args_out,
-                                          "torrent-added" ), &fields );
-            notify( session, TR_RPC_TORRENT_ADDED, tor );
-            tr_bencFree( &fields );
+            struct add_torrent_idle_data * d = tr_new0( struct add_torrent_idle_data, 1 );
+            d->data = idle_data;
+            d->ctor = ctor;
+            tr_webRun( session, filename, NULL, gotMetadataFromURL, d );
         }
-        else if( err == TR_EDUPLICATE )
+        else
         {
-            return "duplicate torrent";
+            if( filename != NULL )
+                tr_ctorSetMetainfoFromFile( ctor, filename );
+            else {
+                int len;
+                char * metainfo = tr_base64_decode( metainfo_base64, -1,  &len );
+                tr_ctorSetMetainfo( ctor, (uint8_t*)metainfo, len );
+                tr_free( metainfo );
+            }
+            addTorrentImpl( idle_data, ctor );
         }
-        else if( err == TR_EINVALID )
-        {
-            return "invalid or corrupt torrent file";
-        }
+
     }
 
     return NULL;
@@ -644,12 +771,15 @@ torrentAdd( tr_session * session,
 ***/
 
 static const char*
-sessionSet( tr_session * session,
-            tr_benc    * args_in,
-            tr_benc    * args_out UNUSED )
+sessionSet( tr_session               * session,
+            tr_benc                  * args_in,
+            tr_benc                  * args_out UNUSED,
+            struct tr_rpc_idle_data  * idle_data )
 {
     int64_t      i;
     const char * str;
+
+    assert( idle_data == NULL );
 
     if( tr_bencDictFindStr( args_in, "download-dir", &str ) )
         tr_sessionSetDownloadDir( session, str );
@@ -685,13 +815,16 @@ sessionSet( tr_session * session,
 }
 
 static const char*
-sessionStats( tr_session  * session,
-              tr_benc     * args_in UNUSED,
-              tr_benc     * args_out )
+sessionStats( tr_session               * session,
+              tr_benc                  * args_in UNUSED,
+              tr_benc                  * args_out,
+              struct tr_rpc_idle_data  * idle_data )
 {
     int running = 0;
     int total = 0;
     tr_torrent * tor = NULL;
+
+    assert( idle_data == NULL );
 
     while(( tor = tr_torrentNext( session, tor ))) {
         ++total;
@@ -708,12 +841,15 @@ sessionStats( tr_session  * session,
 }
 
 static const char*
-sessionGet( tr_session * session,
-            tr_benc    * args_in UNUSED,
-            tr_benc    * args_out )
+sessionGet( tr_session               * session,
+            tr_benc                  * args_in UNUSED,
+            tr_benc                  * args_out,
+            struct tr_rpc_idle_data  * idle_data )
 {
     const char * str;
     tr_benc *    d = args_out;
+
+    assert( idle_data == NULL );
 
     tr_bencDictAddStr( d, "download-dir", tr_sessionGetDownloadDir( session ) );
     tr_bencDictAddInt( d, "peer-limit", tr_sessionGetPeerLimit( session ) );
@@ -741,71 +877,112 @@ sessionGet( tr_session * session,
 ****
 ***/
 
-typedef const char* ( handler )( tr_session*, tr_benc*, tr_benc* );
+typedef const char* ( handler )( tr_session*, tr_benc*, tr_benc*, struct tr_rpc_idle_data * );
 
 static struct method
 {
     const char *  name;
-    handler *     func;
-} methods[] = {
-    { "session-get",    sessionGet          },
-    { "session-set",    sessionSet          },
-    { "session-stats",  sessionStats        },
-    { "torrent-add",    torrentAdd          },
-    { "torrent-get",    torrentGet          },
-    { "torrent-remove", torrentRemove       },
-    { "torrent-set",    torrentSet          },
-    { "torrent-start",  torrentStart        },
-    { "torrent-stop",   torrentStop         },
-    { "torrent-verify", torrentVerify       }
+    tr_bool       immediate;
+    handler    *  func;
+}
+methods[] =
+{
+    { "session-get",    TRUE,  sessionGet          },
+    { "session-set",    TRUE,  sessionSet          },
+    { "session-stats",  TRUE,  sessionStats        },
+    { "torrent-add",    FALSE, torrentAdd          },
+    { "torrent-get",    TRUE,  torrentGet          },
+    { "torrent-remove", TRUE,  torrentRemove       },
+    { "torrent-set",    TRUE,  torrentSet          },
+    { "torrent-start",  TRUE,  torrentStart        },
+    { "torrent-stop",   TRUE,  torrentStop         },
+    { "torrent-verify", TRUE,  torrentVerify       }
 };
 
 static void
-request_exec( tr_session       * session,
-              tr_benc          * request,
-              struct evbuffer  * response_buf )
+request_exec( tr_session             * session,
+              tr_benc                * request,
+              tr_rpc_response_func     callback,
+              void                   * callback_user_data )
 {
     int64_t      i;
     const char * str;
-    tr_benc      response;
     tr_benc *    args_in = tr_bencDictFind( request, "arguments" );
-    tr_benc *    args_out = NULL;
     const char * result = NULL;
-
-    /* build the response skeleton */
-    tr_bencInitDict( &response, 3 );
-    args_out = tr_bencDictAddDict( &response, "arguments", 0 );
 
     /* parse the request */
     if( !tr_bencDictFindStr( request, "method", &str ) )
         result = "no method name";
-    else
-    {
+    else {
         const int n = TR_N_ELEMENTS( methods );
         for( i = 0; i < n; ++i )
             if( !strcmp( str, methods[i].name ) )
                 break;
-        result = i == n
-                 ? "method name not recognized"
-                 : ( *methods[i].func )( session, args_in, args_out );
+        if( i ==n )
+            result = "method name not recognized";
     }
 
-    /* serialize & return the response */
-    if( !result )
-        result = "success";
-    tr_bencDictAddStr( &response, "result", result );
-    if( tr_bencDictFindInt( request, "tag", &i ) )
-        tr_bencDictAddInt( &response, "tag", i );
-    if( response_buf != NULL )
-        tr_bencSaveAsJSON( &response, response_buf );
-    tr_bencFree( &response );
+    /* if we couldn't figure out which method to use, return an error */
+    if( result != NULL )
+    {
+        tr_benc response;
+        struct evbuffer * buf = tr_getBuffer( );
+
+        tr_bencInitDict( &response, 3 );
+        tr_bencDictAddDict( &response, "arguments", 0 );
+        tr_bencDictAddStr( &response, "result", result );
+        if( tr_bencDictFindInt( request, "tag", &i ) )
+            tr_bencDictAddInt( &response, "tag", i );
+        tr_bencSaveAsJSON( &response, buf );
+        callback( session, (const char*)EVBUFFER_DATA(buf),
+                  EVBUFFER_LENGTH( buf ), callback_user_data );
+
+        tr_releaseBuffer( buf );
+        tr_bencFree( &response );
+    }
+
+    if( methods[i].immediate )
+    {
+        tr_benc response;
+        tr_benc * args_out;
+        struct evbuffer * buf = tr_getBuffer( );
+
+        tr_bencInitDict( &response, 3 );
+        args_out = tr_bencDictAddDict( &response, "arguments", 0 );
+        result = (*methods[i].func)( session, args_in, args_out, NULL );
+        if( result == NULL )
+            result = "success";
+        tr_bencDictAddStr( &response, "result", result );
+        if( tr_bencDictFindInt( request, "tag", &i ) )
+            tr_bencDictAddInt( &response, "tag", i );
+        tr_bencSaveAsJSON( &response, buf );
+        callback( session, (const char*)EVBUFFER_DATA(buf),
+                  EVBUFFER_LENGTH(buf), callback_user_data );
+
+        tr_releaseBuffer( buf );
+        tr_bencFree( &response );
+    }
+    else
+    {
+        struct tr_rpc_idle_data * data = tr_new0( struct tr_rpc_idle_data, 1 );
+        data->session = session;
+        data->response = tr_new0( tr_benc, 1 );
+        if( tr_bencDictFindInt( request, "tag", &i ) )
+            tr_bencDictAddInt( data->response, "tag", i );
+        tr_bencInitDict( data->response, 3 );
+        data->args_out = tr_bencDictAddDict( data->response, "arguments", 0 );
+        data->callback = callback;
+        data->callback_user_data = callback_user_data;
+        (*methods[i].func)( session, args_in, data->args_out, data );
+    }
 }
 
 void
-tr_rpc_request_exec_json( tr_session      * session,
-                          const void      * request_json,
-                          int               request_len,
-                          struct evbuffer * response )
+tr_rpc_request_exec_json( tr_session            * session,
+                          const void            * request_json,
+                          ssize_t                 request_len,
+                          tr_rpc_response_func    callback,
+                          void                  * callback_user_data )
 {
     tr_benc top;
     int have_content;
@@ -814,7 +991,7 @@ tr_rpc_request_exec_json( tr_session      * session,
         request_len = strlen( request_json );
 
     have_content = !tr_jsonParse( request_json, request_len, &top, NULL );
-    request_exec( session, have_content ? &top : NULL, response );
+    request_exec( session, have_content ? &top : NULL, callback, callback_user_data );
 
     if( have_content )
         tr_bencFree( &top );
@@ -853,9 +1030,9 @@ addToken( tr_benc *    list,
  * - all other values are strings
  */
 void
-tr_rpc_parse_list_str( tr_benc *    setme,
-                       const char * str_in,
-                       size_t       len )
+tr_rpc_parse_list_str( tr_benc     * setme,
+                       const char  * str_in,
+                       ssize_t       len )
 
 {
     char *       str = tr_strndup( str_in, len );
@@ -900,10 +1077,11 @@ tr_rpc_parse_list_str( tr_benc *    setme,
 }
 
 void
-tr_rpc_request_exec_uri( tr_session      * session,
-                         const void      * request_uri,
-                         int               request_len,
-                         struct evbuffer * response )
+tr_rpc_request_exec_uri( tr_session           * session,
+                         const void           * request_uri,
+                         ssize_t                request_len,
+                         tr_rpc_response_func   callback,
+                         void                 * callback_user_data )
 {
     tr_benc      top, * args;
     char *       request = tr_strndup( request_uri, request_len );
@@ -933,7 +1111,7 @@ tr_rpc_request_exec_uri( tr_session      * session,
         pch = next ? next + 1 : NULL;
     }
 
-    request_exec( session, &top, response );
+    request_exec( session, &top, callback, callback_user_data );
 
     /* cleanup */
     tr_bencFree( &top );
