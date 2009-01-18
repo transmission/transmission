@@ -637,8 +637,7 @@ tr_buildPath( const char *first_element, ... )
 ****/
 
 char*
-tr_strndup( const void * in,
-            int          len )
+tr_strndup( const void * in, ssize_t len )
 {
     char * out = NULL;
 
