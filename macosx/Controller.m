@@ -3966,16 +3966,16 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         //calculate width the buttons can take up
         const CGFloat allowedWidth = (searchFrame.origin.x - 5.0) - allRect.origin.x;
-        
-        const CGFloat currentTotal = NSWidth(allRect) + NSWidth(activeRect) + NSWidth(downloadRect) + NSWidth(seedRect)
-                                        + NSWidth(pauseRect);
+        const CGFloat currentWidth = NSWidth(allRect) + NSWidth(activeRect) + NSWidth(downloadRect) + NSWidth(seedRect)
+                                        + NSWidth(pauseRect) + 4.0; //add 4 for space between buttons
+        const CGFloat ratio = allowedWidth / currentWidth;
         
         //decrease button widths proportionally
-        allRect.size.width  = NSWidth(allRect) * (allowedWidth / currentTotal);
-        activeRect.size.width = NSWidth(activeRect) * (allowedWidth / currentTotal);
-        downloadRect.size.width = NSWidth(downloadRect) * (allowedWidth / currentTotal);
-        seedRect.size.width = NSWidth(seedRect) * (allowedWidth / currentTotal);
-        pauseRect.size.width = NSWidth(pauseRect) * (allowedWidth / currentTotal);
+        allRect.size.width  = NSWidth(allRect) * ratio;
+        activeRect.size.width = NSWidth(activeRect) * ratio;
+        downloadRect.size.width = NSWidth(downloadRect) * ratio;
+        seedRect.size.width = NSWidth(seedRect) * ratio;
+        pauseRect.size.width = NSWidth(pauseRect) * ratio;
     }
     else;
     
