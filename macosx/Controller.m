@@ -4050,12 +4050,16 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         return;
     
     //replace all buttons
+    [fNoFilterButton sizeToFit];
     [fActiveFilterButton sizeToFit];
     [fDownloadFilterButton sizeToFit];
     [fSeedFilterButton sizeToFit];
     [fPauseFilterButton sizeToFit];
     
+    NSRect allRect = [fNoFilterButton frame];
+    
     NSRect activeRect = [fActiveFilterButton frame];
+    activeRect.origin.x = NSMaxX(allRect) + 1.0;
     
     NSRect downloadRect = [fDownloadFilterButton frame];
     downloadRect.origin.x = NSMaxX(activeRect) + 1.0;
@@ -4082,28 +4086,36 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         searchFrame.origin.x += searchFrame.size.width - SEARCH_FILTER_MIN_WIDTH;
         searchFrame.size.width = SEARCH_FILTER_MIN_WIDTH;
         
-        //resize the buttons so they don't overlay
-        NSInteger difference = (NSMaxX(pauseRect) + 5.0) - searchFrame.origin.x - 1; //subtract 1, since 0 will be counted
+        //calculate width the buttons can take up
+        const CGFloat allowedWidth = (searchFrame.origin.x - 5.0) - allRect.origin.x;
         
-        //decrease downloading by 8, seeding by 1, paused by 1, active by 1, repeat
-        NSInteger download = (difference / 11 * 8) + MIN(difference % 11 + 1, 8); //8 for every 11
-        NSInteger seed = (difference / 11) + (difference % 11 >= 8 ? 1 : 0);
-        NSInteger paused = (difference / 11) + (difference % 11 >= 9 ? 1 : 0);
-        NSInteger active = (difference / 11) + (difference % 11 >= 10 ? 1 : 0);
+        const CGFloat currentTotal = NSWidth(allRect) + NSWidth(activeRect) + NSWidth(downloadRect) + NSWidth(seedRect)
+                                        + NSWidth(pauseRect);
         
-        activeRect.size.width -= active;
+        //decrease button widths proportionally
+        const NSInteger all = NSWidth(allRect) * (allowedWidth / currentTotal);
+        const NSInteger active = NSWidth(activeRect) * (allowedWidth / currentTotal);
+        const NSInteger download = NSWidth(downloadRect) * (allowedWidth / currentTotal);
+        const NSInteger seed = NSWidth(seedRect) * (allowedWidth / currentTotal);
+        const NSInteger paused = NSWidth(pauseRect) * (allowedWidth / currentTotal);
         
-        downloadRect.origin.x -= active;
-        downloadRect.size.width -= download;
+        allRect.size.width = all;
         
-        seedRect.origin.x -= active + download;
-        seedRect.size.width -= seed;
+        activeRect.size.width = active;
+        activeRect.origin.x = NSMaxX(allRect) + 1.0;
         
-        pauseRect.origin.x -= active + download + seed;
-        pauseRect.size.width -= paused;
+        downloadRect.size.width = download;
+        downloadRect.origin.x = NSMaxX(activeRect) + 1.0;
+        
+        seedRect.size.width = seed;
+        seedRect.origin.x = NSMaxX(downloadRect) + 1.0;
+        
+        pauseRect.size.width = paused;
+        pauseRect.origin.x = NSMaxX(seedRect) + 1.0;
     }
     else;
     
+    [fNoFilterButton setFrame: allRect];
     [fActiveFilterButton setFrame: activeRect];
     [fDownloadFilterButton setFrame: downloadRect];
     [fSeedFilterButton setFrame: seedRect];
