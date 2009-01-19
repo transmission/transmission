@@ -927,9 +927,9 @@ request_exec( tr_session             * session,
               tr_rpc_response_func     callback,
               void                   * callback_user_data )
 {
-    int64_t      i;
+    int i;
     const char * str;
-    tr_benc *    args_in = tr_bencDictFind( request, "arguments" );
+    tr_benc * args_in = tr_bencDictFind( request, "arguments" );
     const char * result = NULL;
 
     /* parse the request */
@@ -947,14 +947,15 @@ request_exec( tr_session             * session,
     /* if we couldn't figure out which method to use, return an error */
     if( result != NULL )
     {
+        int64_t tag;
         tr_benc response;
         struct evbuffer * buf = tr_getBuffer( );
 
         tr_bencInitDict( &response, 3 );
         tr_bencDictAddDict( &response, "arguments", 0 );
         tr_bencDictAddStr( &response, "result", result );
-        if( tr_bencDictFindInt( request, "tag", &i ) )
-            tr_bencDictAddInt( &response, "tag", i );
+        if( tr_bencDictFindInt( request, "tag", &tag ) )
+            tr_bencDictAddInt( &response, "tag", tag );
         tr_bencSaveAsJSON( &response, buf );
         (*callback)( session, (const char*)EVBUFFER_DATA(buf),
                      EVBUFFER_LENGTH( buf ), callback_user_data );
@@ -965,6 +966,7 @@ request_exec( tr_session             * session,
 
     if( methods[i].immediate )
     {
+        int64_t tag;
         tr_benc response;
         tr_benc * args_out;
         struct evbuffer * buf = tr_getBuffer( );
@@ -975,8 +977,8 @@ request_exec( tr_session             * session,
         if( result == NULL )
             result = "success";
         tr_bencDictAddStr( &response, "result", result );
-        if( tr_bencDictFindInt( request, "tag", &i ) )
-            tr_bencDictAddInt( &response, "tag", i );
+        if( tr_bencDictFindInt( request, "tag", &tag ) )
+            tr_bencDictAddInt( &response, "tag", tag );
         tr_bencSaveAsJSON( &response, buf );
         (*callback)( session, (const char*)EVBUFFER_DATA(buf),
                      EVBUFFER_LENGTH(buf), callback_user_data );
@@ -986,12 +988,13 @@ request_exec( tr_session             * session,
     }
     else
     {
+        int64_t tag;
         struct tr_rpc_idle_data * data = tr_new0( struct tr_rpc_idle_data, 1 );
         data->session = session;
         data->response = tr_new0( tr_benc, 1 );
-        if( tr_bencDictFindInt( request, "tag", &i ) )
-            tr_bencDictAddInt( data->response, "tag", i );
         tr_bencInitDict( data->response, 3 );
+        if( tr_bencDictFindInt( request, "tag", &tag ) )
+            tr_bencDictAddInt( data->response, "tag", tag );
         data->args_out = tr_bencDictAddDict( data->response, "arguments", 0 );
         data->callback = callback;
         data->callback_user_data = callback_user_data;
