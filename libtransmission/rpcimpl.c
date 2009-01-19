@@ -70,7 +70,7 @@ struct tr_rpc_idle_data
 };
 
 static void
-function_done( struct tr_rpc_idle_data * data, const char * result )
+tr_idle_function_done( struct tr_rpc_idle_data * data, const char * result )
 {
     struct evbuffer * buf = tr_getBuffer( );
 
@@ -661,7 +661,7 @@ addTorrentImpl( struct tr_rpc_idle_data * data, tr_ctor * ctor )
         result = "invalid or corrupt torrent file";
     }
 
-    function_done( data, result );
+    tr_idle_function_done( data, result );
 }
 
 
@@ -693,7 +693,7 @@ gotMetadataFromURL( tr_session       * session UNUSED,
         char result[1024];
         tr_snprintf( result, sizeof( result ), "http error %ld: %s",
                      response_code, tr_webGetResponseStr( response_code ) );
-        function_done( data->data, result );
+        tr_idle_function_done( data->data, result );
     }
 
     tr_free( data );
