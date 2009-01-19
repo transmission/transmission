@@ -362,6 +362,22 @@
    "pausedTorrentCount"       | number
    "torrentCount"             | number
    "uploadSpeed"              | number
+   ---------------------------+-------------------------------+
+   "cumulative-stats"         | object, containing:           |
+                              +------------------+------------+
+                              | uploadedBytes    | number     | tr_session_stats
+                              | downloadedBytes  | number     | tr_session_stats
+                              | filesAdded       | number     | tr_session_stats
+                              | sessionCount     | number     | tr_session_stats
+                              | secondsActive    | number     | tr_session_stats
+   ---------------------------+-------------------------------+
+   "current-stats"            | object, containing:           |
+                              +------------------+------------+
+                              | uploadedBytes    | number     | tr_session_stats
+                              | downloadedBytes  | number     | tr_session_stats
+                              | filesAdded       | number     | tr_session_stats
+                              | sessionCount     | number     | tr_session_stats
+                              | secondsActive    | number     | tr_session_stats
    
 
 5.0.  Protocol Versions
@@ -382,6 +398,8 @@
    ------+---------+-----------+----------------+-------------------------------
    4     | 1.50    | yes       | session-get    | new arg "rpc-version"
          |         |           | session-get    | new arg "rpc-version-minimum"
+         |         |           | session-stats  | added "cumulative-stats"
+         |         |           | session-stats  | added "current-stats"
          |         |           | torrent-get    | new arg "downloadDir"
    ------+---------+-----------+----------------+-------------------------------
 
