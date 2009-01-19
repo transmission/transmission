@@ -223,11 +223,11 @@ tr_bandwidthAllocate( tr_bandwidth  * b,
     while( n > 1 )
     {
         const size_t increment = 1024;
-        const ssize_t bytesUsed = tr_peerIoFlush( peers[i], dir, increment );
+        const int bytesUsed = tr_peerIoFlush( peers[i], dir, increment );
 
-        dbgmsg( "peer #%d of %d used %zd bytes in this pass", i, n, bytesUsed );
+        dbgmsg( "peer #%d of %d used %d bytes in this pass", i, n, bytesUsed );
 
-        if( bytesUsed == (ssize_t)increment )
+        if( bytesUsed == (int)increment )
             ++i;
         else {
             /* peer is done writing for now; move it to the end of the list */

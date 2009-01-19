@@ -1,7 +1,6 @@
 #include <stdio.h> /* fprintf */
 #include <string.h> /* strcmp */
 #include "transmission.h"
-#include <unistd.h> /* ssize_t */
 #include "ConvertUTF.h" /* tr_utf8_validate*/
 #include "platform.h"
 #include "utils.h"

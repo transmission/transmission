@@ -13,8 +13,6 @@
 #ifndef TR_RPC_H
 #define TR_RPC_H
 
-#include <unistd.h> /* ssize_t */
-
 /***
 ****  RPC processing
 ***/
@@ -28,20 +26,20 @@ typedef void( tr_rpc_response_func )( tr_session      * session,
 /* http://www.json.org/ */
 void tr_rpc_request_exec_json( tr_session            * session,
                                const void            * request_json,
-                               ssize_t                 request_len,
+                               int                     request_len,
                                tr_rpc_response_func    callback,
                                void                  * callback_user_data );
 
 /* see the RPC spec's "Request URI Notation" section */
 void tr_rpc_request_exec_uri( tr_session           * session,
                               const void           * request_uri,
-                              ssize_t                request_len,
+                              int                    request_len,
                               tr_rpc_response_func   callback,
                               void                 * callback_user_data );
 
 void tr_rpc_parse_list_str( struct tr_benc * setme,
                             const char     * list_str,
-                            ssize_t          list_str_len );
+                            int              list_str_len );
 
 
 #endif

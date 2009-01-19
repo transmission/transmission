@@ -43,7 +43,6 @@
  #include <stdio.h>
 #endif
 #include <string.h> /* strlen() */
-#include <unistd.h> /* ssize_t */
 #include "ConvertUTF.h"
 
 static const int halfShift  = 10; /* used for shifting by 10 bits */
@@ -351,7 +350,7 @@ Boolean isLegalUTF8Sequence(const UTF8 *source, const UTF8 *sourceEnd) {
  * In addition to knowing if the sequence is legal, it also tells you the last good character.
  */
 Boolean
-tr_utf8_validate( const char * str, ssize_t max_len, const char ** end )
+tr_utf8_validate( const char * str, int max_len, const char ** end )
 {
     const UTF8* source = (const UTF8*) str;
     const UTF8* sourceEnd = source;

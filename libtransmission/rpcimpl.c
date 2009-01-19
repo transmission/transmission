@@ -980,7 +980,7 @@ request_exec( tr_session             * session,
 void
 tr_rpc_request_exec_json( tr_session            * session,
                           const void            * request_json,
-                          ssize_t                 request_len,
+                          int                     request_len,
                           tr_rpc_response_func    callback,
                           void                  * callback_user_data )
 {
@@ -1032,7 +1032,7 @@ addToken( tr_benc *    list,
 void
 tr_rpc_parse_list_str( tr_benc     * setme,
                        const char  * str_in,
-                       ssize_t       len )
+                       int           len )
 
 {
     char *       str = tr_strndup( str_in, len );
@@ -1079,7 +1079,7 @@ tr_rpc_parse_list_str( tr_benc     * setme,
 void
 tr_rpc_request_exec_uri( tr_session           * session,
                          const void           * request_uri,
-                         ssize_t                request_len,
+                         int                    request_len,
                          tr_rpc_response_func   callback,
                          void                 * callback_user_data )
 {

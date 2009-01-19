@@ -238,7 +238,7 @@ uint64_t       tr_date( void );
 void           tr_wait( uint64_t delay_milliseconds );
 
 char*          tr_utf8clean( const char  * str,
-                             ssize_t       max_len,
+                             int           max_len,
                              tr_bool     * err );
 
 
@@ -302,7 +302,7 @@ static TR_INLINE void* tr_memdup( const void * src, int byteCount )
     ( (struct_type *) realloc ( ( mem ), ( (size_t) sizeof ( struct_type ) ) * ( ( size_t) ( n_structs ) ) ) )
 
 /** @param in is a void* so that callers can pass in both signed & unsigned without a cast */
-char* tr_strndup( const void * in, ssize_t len ) TR_GNUC_MALLOC;
+char* tr_strndup( const void * in, int len ) TR_GNUC_MALLOC;
 
 /** @param in is a void* so that callers can pass in both signed & unsigned without a cast */
 static TR_INLINE char* tr_strdup( const void * in )
