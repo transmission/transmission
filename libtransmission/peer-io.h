@@ -64,6 +64,11 @@ typedef struct tr_peerIo
     tr_bool               extendedProtocolSupported;
     tr_bool               fastExtensionSupported;
 
+    /* we create the socket in a nonblocking way, so this flag is initially
+     * false and then set to true when libevent says that the socket is ready
+     * for reading or writing */
+    tr_bool               hasFinishedConnecting;
+
     int                   magicNumber;
 
     uint8_t               encryptionMode;

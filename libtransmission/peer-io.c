@@ -190,6 +190,8 @@ event_read_cb( int fd, short event UNUSED, void * vio )
 
     assert( tr_isPeerIo( io ) );
 
+    io->hasFinishedConnecting = TRUE;
+
     curlen = EVBUFFER_LENGTH( io->inbuf );
     howmuch = curlen >= max ? 0 : max - curlen;
     howmuch = tr_bandwidthClamp( &io->bandwidth, TR_DOWN, howmuch );
@@ -269,6 +271,8 @@ event_write_cb( int fd, short event UNUSED, void * vio )
     const tr_direction dir = TR_UP;
 
     assert( tr_isPeerIo( io ) );
+
+    io->hasFinishedConnecting = TRUE;
 
     dbgmsg( io, "libevent says this peer is ready to write" );
 
@@ -352,6 +356,7 @@ tr_peerIoNew( tr_session       * session,
     io->port = port;
     io->socket = socket;
     io->isIncoming = isIncoming != 0;
+    io->hasFinishedConnecting = FALSE;
     io->timeCreated = time( NULL );
     io->inbuf = evbuffer_new( );
     io->outbuf = evbuffer_new( );
@@ -821,10 +826,13 @@ tr_peerIoFlush( tr_peerIo  * io, tr_direction dir, size_t limit )
     assert( tr_isPeerIo( io ) );
     assert( tr_isDirection( dir ) );
 
-    if( dir == TR_DOWN )
-        bytesUsed = tr_peerIoTryRead( io, limit );
-    else
-        bytesUsed = tr_peerIoTryWrite( io, limit );
+    if( io->hasFinishedConnecting )
+    {
+        if( dir == TR_DOWN )
+            bytesUsed = tr_peerIoTryRead( io, limit );
+        else
+            bytesUsed = tr_peerIoTryWrite( io, limit );
+    }
 
     dbgmsg( io, "flushing peer-io, direction %d, limit %zu, bytesUsed %zd", (int)dir, limit, bytesUsed );
     return bytesUsed;
