@@ -19,10 +19,10 @@
 
 struct tr_benc;
 
-typedef void( tr_rpc_response_func )( tr_session      * session,
-                                      const char      * response,
-                                      size_t            response_len,
-                                      void            * user_data );
+typedef void( *tr_rpc_response_func )( tr_session      * session,
+                                       const char      * response,
+                                       size_t            response_len,
+                                       void            * user_data );
 /* http://www.json.org/ */
 void tr_rpc_request_exec_json( tr_session            * session,
                                const void            * request_json,

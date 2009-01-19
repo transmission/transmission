@@ -65,7 +65,7 @@ struct tr_rpc_idle_data
     tr_session            * session;
     tr_benc               * response;
     tr_benc               * args_out;
-    tr_rpc_response_func  * callback;
+    tr_rpc_response_func    callback;
     void                  * callback_user_data;
 };
 
@@ -79,8 +79,8 @@ tr_idle_function_done( struct tr_rpc_idle_data * data, const char * result )
     tr_bencDictAddStr( data->response, "result", result );
 
     tr_bencSaveAsJSON( data->response, buf );
-    data->callback( data->session, (const char*)EVBUFFER_DATA(buf),
-                    EVBUFFER_LENGTH(buf), data->callback_user_data );
+    (*data->callback)( data->session, (const char*)EVBUFFER_DATA(buf),
+                       EVBUFFER_LENGTH(buf), data->callback_user_data );
 
     tr_releaseBuffer( buf );
     tr_bencFree( data->response );
@@ -877,13 +877,13 @@ sessionGet( tr_session               * session,
 ****
 ***/
 
-typedef const char* ( handler )( tr_session*, tr_benc*, tr_benc*, struct tr_rpc_idle_data * );
+typedef const char* ( *handler )( tr_session*, tr_benc*, tr_benc*, struct tr_rpc_idle_data * );
 
 static struct method
 {
     const char *  name;
     tr_bool       immediate;
-    handler    *  func;
+    handler       func;
 }
 methods[] =
 {
@@ -934,8 +934,8 @@ request_exec( tr_session             * session,
         if( tr_bencDictFindInt( request, "tag", &i ) )
             tr_bencDictAddInt( &response, "tag", i );
         tr_bencSaveAsJSON( &response, buf );
-        callback( session, (const char*)EVBUFFER_DATA(buf),
-                  EVBUFFER_LENGTH( buf ), callback_user_data );
+        (*callback)( session, (const char*)EVBUFFER_DATA(buf),
+                     EVBUFFER_LENGTH( buf ), callback_user_data );
 
         tr_releaseBuffer( buf );
         tr_bencFree( &response );
@@ -956,8 +956,8 @@ request_exec( tr_session             * session,
         if( tr_bencDictFindInt( request, "tag", &i ) )
             tr_bencDictAddInt( &response, "tag", i );
         tr_bencSaveAsJSON( &response, buf );
-        callback( session, (const char*)EVBUFFER_DATA(buf),
-                  EVBUFFER_LENGTH(buf), callback_user_data );
+        (*callback)( session, (const char*)EVBUFFER_DATA(buf),
+                     EVBUFFER_LENGTH(buf), callback_user_data );
 
         tr_releaseBuffer( buf );
         tr_bencFree( &response );
