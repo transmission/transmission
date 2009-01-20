@@ -255,8 +255,10 @@
 				<form action="#" method="post" id="torrent_upload_form" 
 					enctype="multipart/form-data" target="torrent_upload_frame">  
 					<div class="dialog_message">
-						Please select a torrent file to upload:
+						<label for="torrent_upload_file">Please select a torrent file to upload:</label>
 							<input type="file" name="torrent_file" id="torrent_upload_file"/>
+						<label for="torrent_upload_url">Or enter a URL:</label>
+							<input type="text" id="torrent_upload_url"/>
 					</div>
 					<a href="#upload" id="upload_confirm_button">Upload</a>
 					<a href="#cancel" id="upload_cancel_button">Cancel</a>

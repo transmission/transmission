@@ -121,7 +121,15 @@ TransmissionRemote.prototype =
 	removeTorrents: function( torrents ) {
 		this.sendTorrentCommand( 'torrent-remove', torrents );
 	},
-
+	addTorrentByUrl: function( url, options ) {
+		this.sendRequest( RPC._Root, $.toJSON({
+			method: 'torrent-add',
+			arguments: {
+				paused: (options.paused ? 'true' : 'false'),
+				filename: url
+			}
+		}) );
+	},
 	savePrefs: function( args ) {
 		var remote = this;
 		var o = { };
