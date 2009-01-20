@@ -1164,16 +1164,20 @@ Transmission.prototype =
 		} else {
 			var tr = this;
 			var args = { };
-			args.url = '/transmission/upload?paused=' + (this[Prefs._AutoStart] ? 'false' : 'true');
-			args.type = 'POST';
-			args.dataType = 'xml';
-			args.iframe = true;
-			args.success = function( data ) {
-				tr.remote.loadTorrents( );
-				tr.togglePeriodicRefresh( true );
-			};
-			this.togglePeriodicRefresh( false );
-			$('#torrent_upload_form').ajaxSubmit( args );
+			if ('' != $('#torrent_upload_url').val()) {
+				tr.remote.addTorrentByUrl($('#torrent_upload_url').val(), { paused: !this[Prefs._Autostart] });
+			} else {
+				args.url = '/transmission/upload?paused=' + (this[Prefs._AutoStart] ? 'false' : 'true');
+				args.type = 'POST';
+				args.dataType = 'xml';
+				args.iframe = true;
+				args.success = function( data ) {
+					tr.remote.loadTorrents( );
+					tr.togglePeriodicRefresh( true );
+				};
+				this.togglePeriodicRefresh( false );
+				$('#torrent_upload_form').ajaxSubmit( args );
+			}
 		}
 	},
    
