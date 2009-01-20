@@ -29,11 +29,19 @@
 
 #define TR_N_ELEMENTS( ary ) ( sizeof( ary ) / sizeof( *ary ) )
 
+#if 0
+#define dbgmsg(fmt, ...) \
+    do { \
+        fprintf( stderr, "%s:%d"#fmt, __FILE__, __LINE__, __VA_ARGS__ ); \
+        fprintf( stderr, "\n" ); \
+    } while( 0 )
+#else
 #define dbgmsg( ... ) \
     do { \
         if( tr_deepLoggingIsActive( ) ) \
             tr_deepLog( __FILE__, __LINE__, "RPC", __VA_ARGS__ ); \
     } while( 0 )
+#endif
 
 
 /***
@@ -922,6 +930,14 @@ methods[] =
 };
 
 static void
+noop_response_callback( tr_session * session UNUSED,
+                        const char * response UNUSED,
+                        size_t       response_len UNUSED,
+                        void       * user_data UNUSED )
+{
+}
+
+static void
 request_exec( tr_session             * session,
               tr_benc                * request,
               tr_rpc_response_func     callback,
@@ -931,6 +947,9 @@ request_exec( tr_session             * session,
     const char * str;
     tr_benc * args_in = tr_bencDictFind( request, "arguments" );
     const char * result = NULL;
+
+    if( callback == NULL )
+        callback = noop_response_callback;
 
     /* parse the request */
     if( !tr_bencDictFindStr( request, "method", &str ) )
