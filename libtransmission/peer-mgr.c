@@ -2031,8 +2031,8 @@ shouldPeerBeClosed( const Torrent * t,
         /* if we have >= relaxIfFewerThan, strictness is 100%.
          * if we have zero connections, strictness is 0% */
         const float strictness = peerCount >= relaxStrictnessIfFewerThanN
-            ? 1.0
-            : peerCount / (float)relaxStrictnessIfFewerThanN;
+                               ? 1.0
+                               : peerCount / (float)relaxStrictnessIfFewerThanN;
         const int lo = MIN_UPLOAD_IDLE_SECS;
         const int hi = MAX_UPLOAD_IDLE_SECS;
         const int limit = hi - ( ( hi - lo ) * strictness );
@@ -2212,6 +2212,12 @@ reconnectPulse( void * vtorrent )
         int i, nCandidates, nBad;
         struct peer_atom ** candidates = getPeerCandidates( t, &nCandidates );
         struct tr_peer ** connections = getPeersToClose( t, &nBad );
+        int maxCandidates;
+
+        maxCandidates = nCandidates;
+        maxCandidates = MAX( maxCandidates, MAX_RECONNECTIONS_PER_PULSE );
+        maxCandidates = MAX( maxCandidates, getMaxPeerCount( t->tor ) - getPeerCount( t ) );
+        maxCandidates = MAX( maxCandidates, MAX_CONNECTIONS_PER_SECOND - newConnectionsThisSecond );
 
         //if( nBad || nCandidates )
             tordbg( t, "reconnect pulse for [%s]: %d bad connections, "
@@ -2220,11 +2226,11 @@ reconnectPulse( void * vtorrent )
                     tr_ptrArraySize( &t->pool ),
                     (int)MAX_RECONNECTIONS_PER_PULSE );
 
-        /* disconnect some peers.
+        /* disconnect some peers to make room for better ones.
            if we transferred piece data, then they might be good peers,
            so reset their `numFails' weight to zero.  otherwise we connected
            to them fruitlessly, so mark it as another fail */
-        for( i = 0; i < nBad; ++i ) {
+        for( i = 0; ( i < nBad ) && ( i < maxCandidates ) ; ++i ) {
             tr_peer * peer = connections[i];
             struct peer_atom * atom = getExistingAtom( t, &peer->addr );
             if( atom->piece_data_time )
