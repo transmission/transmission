@@ -946,7 +946,7 @@ printFileList( tr_benc * top )
                                 pristr = "Normal"; break;
                         }
                         printf( "%3d: %3.0f%% %-8s %-3s %9s  %s\n",
-                                ( j + 1 ),
+                                j,
                                 ( 100.0 * percent ),
                                 pristr,
                                 ( wanted ? "Yes" : "No" ),
