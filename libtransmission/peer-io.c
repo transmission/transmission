@@ -821,7 +821,7 @@ tr_peerIoTryWrite( tr_peerIo * io, size_t howmuch )
 int
 tr_peerIoFlush( tr_peerIo  * io, tr_direction dir, size_t limit )
 {
-    int bytesUsed;
+    int bytesUsed = 0;
 
     assert( tr_isPeerIo( io ) );
     assert( tr_isDirection( dir ) );
