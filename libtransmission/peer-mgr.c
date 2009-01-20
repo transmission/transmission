@@ -2215,9 +2215,9 @@ reconnectPulse( void * vtorrent )
         int maxCandidates;
 
         maxCandidates = nCandidates;
-        maxCandidates = MAX( maxCandidates, MAX_RECONNECTIONS_PER_PULSE );
-        maxCandidates = MAX( maxCandidates, getMaxPeerCount( t->tor ) - getPeerCount( t ) );
-        maxCandidates = MAX( maxCandidates, MAX_CONNECTIONS_PER_SECOND - newConnectionsThisSecond );
+        maxCandidates = MIN( maxCandidates, MAX_RECONNECTIONS_PER_PULSE );
+        maxCandidates = MIN( maxCandidates, getMaxPeerCount( t->tor ) - getPeerCount( t ) );
+        maxCandidates = MIN( maxCandidates, MAX_CONNECTIONS_PER_SECOND - newConnectionsThisSecond );
 
         //if( nBad || nCandidates )
             tordbg( t, "reconnect pulse for [%s]: %d bad connections, "
