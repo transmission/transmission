@@ -1983,10 +1983,18 @@ rechokePulse( void * vtorrent )
 ****
 ***/
 
-static int
-shouldPeerBeClosed( const Torrent * t,
-                    const tr_peer * peer,
-                    int             peerCount )
+typedef enum
+{
+    TR_CAN_KEEP,
+    TR_CAN_CLOSE,
+    TR_MUST_CLOSE,
+}
+tr_close_type_t;
+
+static tr_close_type_t
+shouldPeerBeClosed( const Torrent    * t,
+                    const tr_peer    * peer,
+                    int                peerCount )
 {
     const tr_torrent *       tor = t->tor;
     const time_t             now = time( NULL );
@@ -1997,7 +2005,7 @@ shouldPeerBeClosed( const Torrent * t,
     {
         tordbg( t, "purging peer %s because its doPurge flag is set",
                 tr_peerIoAddrStr( &atom->addr, atom->port ) );
-        return TRUE;
+        return TR_MUST_CLOSE;
     }
 
     /* if we're seeding and the peer has everything we have,
@@ -2020,7 +2028,7 @@ shouldPeerBeClosed( const Torrent * t,
         {
             tordbg( t, "purging peer %s because we're both seeds",
                     tr_peerIoAddrStr( &atom->addr, atom->port ) );
-            return TRUE;
+            return TR_MUST_CLOSE;
         }
     }
 
@@ -2041,15 +2049,15 @@ shouldPeerBeClosed( const Torrent * t,
         if( idleTime > limit ) {
             tordbg( t, "purging peer %s because it's been %d secs since we shared anything",
                        tr_peerIoAddrStr( &atom->addr, atom->port ), idleTime );
-            return TRUE;
+            return TR_CAN_CLOSE;
         }
     }
 
-    return FALSE;
+    return TR_CAN_KEEP;
 }
 
 static tr_peer **
-getPeersToClose( Torrent * t, int * setmeSize )
+getPeersToClose( Torrent * t, tr_close_type_t closeType, int * setmeSize )
 {
     int i, peerCount, outsize;
     tr_peer ** peers = (tr_peer**) tr_ptrArrayPeek( &t->peers, &peerCount );
@@ -2058,7 +2066,7 @@ getPeersToClose( Torrent * t, int * setmeSize )
     assert( torrentIsLocked( t ) );
 
     for( i = outsize = 0; i < peerCount; ++i )
-        if( shouldPeerBeClosed( t, peers[i], peerCount ) )
+        if( shouldPeerBeClosed( t, peers[i], peerCount ) == closeType )
             ret[outsize++] = peers[i];
 
     *setmeSize = outsize;
@@ -2186,6 +2194,27 @@ getPeerCandidates( Torrent * t, int * setmeSize )
     return ret;
 }
 
+static void
+closePeer( Torrent * t, tr_peer * peer )
+{
+    struct peer_atom * atom;
+
+    assert( t != NULL );
+    assert( peer != NULL );
+
+    /* if we transferred piece data, then they might be good peers,
+       so reset their `numFails' weight to zero.  otherwise we connected
+       to them fruitlessly, so mark it as another fail */
+    atom = getExistingAtom( t, &peer->addr );
+    if( atom->piece_data_time )
+        atom->numFails = 0;
+    else
+        ++atom->numFails;
+
+    tordbg( t, "removing bad peer %s", tr_peerIoGetAddrStr( peer->io ) );
+    removePeer( t, peer );
+}
+
 static int
 reconnectPulse( void * vtorrent )
 {
@@ -2209,50 +2238,57 @@ reconnectPulse( void * vtorrent )
     }
     else
     {
-        int i, nCandidates, nBad;
-        struct peer_atom ** candidates = getPeerCandidates( t, &nCandidates );
-        struct tr_peer ** connections = getPeersToClose( t, &nBad );
+        int i;
+        int canCloseCount;
+        int mustCloseCount;
+        int candidateCount;
         int maxCandidates;
+        struct tr_peer ** canClose = getPeersToClose( t, TR_CAN_CLOSE, &canCloseCount );
+        struct tr_peer ** mustClose = getPeersToClose( t, TR_MUST_CLOSE, &mustCloseCount );
+        struct peer_atom ** candidates = getPeerCandidates( t, &candidateCount );
 
-        maxCandidates = nCandidates;
+        tordbg( t, "reconnect pulse for [%s]: "
+                   "%d must-close connections, "
+                   "%d can-close connections, "
+                   "%d connection candidates, "
+                   "%d atoms, "
+                   "max per pulse is %d",
+                   t->tor->info.name,
+                   mustCloseCount,
+                   canCloseCount,
+                   candidateCount,
+                   tr_ptrArraySize( &t->pool ),
+                   MAX_RECONNECTIONS_PER_PULSE );
+
+        /* disconnect the really bad peers */
+        for( i=0; i<mustCloseCount; ++i )
+            closePeer( t, mustClose[i] );
+
+        /* decide how many peers can we try to add in this pass */
+        maxCandidates = candidateCount;
         maxCandidates = MIN( maxCandidates, MAX_RECONNECTIONS_PER_PULSE );
         maxCandidates = MIN( maxCandidates, getMaxPeerCount( t->tor ) - getPeerCount( t ) );
         maxCandidates = MIN( maxCandidates, MAX_CONNECTIONS_PER_SECOND - newConnectionsThisSecond );
 
-        //if( nBad || nCandidates )
-            tordbg( t, "reconnect pulse for [%s]: %d bad connections, "
-                    "%d connection candidates, %d atoms, max per pulse is %d",
-                    t->tor->info.name, nBad, nCandidates,
-                    tr_ptrArraySize( &t->pool ),
-                    (int)MAX_RECONNECTIONS_PER_PULSE );
+        /* maybe disconnect some lesser peers, if we have candidates to replace them with */
+        for( i=0; ( i<canCloseCount ) && ( i<maxCandidates ); ++i )
+            closePeer( t, canClose[i] );
 
-        /* disconnect some peers to make room for better ones.
-           if we transferred piece data, then they might be good peers,
-           so reset their `numFails' weight to zero.  otherwise we connected
-           to them fruitlessly, so mark it as another fail */
-        for( i = 0; ( i < nBad ) && ( i < maxCandidates ) ; ++i ) {
-            tr_peer * peer = connections[i];
-            struct peer_atom * atom = getExistingAtom( t, &peer->addr );
-            if( atom->piece_data_time )
-                atom->numFails = 0;
-            else
-                ++atom->numFails;
-            tordbg( t, "removing bad peer %s", tr_peerIoGetAddrStr( peer->io ) );
-            removePeer( t, peer );
-        }
-
-tordbg( t, "nCandidates is %d, MAX_RECONNECTIONS_PER_PULSE is %d, getPeerCount(t) is %d, getMaxPeerCount(t) is %d, newConnectionsThisSecond is %d, MAX_CONNECTIONS_PER_SECOND is %d",
-        (int)nCandidates, (int)MAX_RECONNECTIONS_PER_PULSE, (int)getPeerCount( t ), (int)getMaxPeerCount( t->tor ), (int)newConnectionsThisSecond, (int)MAX_CONNECTIONS_PER_SECOND );
+        tordbg( t, "candidateCount is %d, MAX_RECONNECTIONS_PER_PULSE is %d,"
+                   " getPeerCount(t) is %d, getMaxPeerCount(t) is %d, "
+                   "newConnectionsThisSecond is %d, MAX_CONNECTIONS_PER_SECOND is %d",
+                   candidateCount,
+                   MAX_RECONNECTIONS_PER_PULSE,
+                   getPeerCount( t ),
+                   getMaxPeerCount( t->tor ),
+                   newConnectionsThisSecond, MAX_CONNECTIONS_PER_SECOND );
 
         /* add some new ones */
-        for( i = 0;    ( i < nCandidates )
-           && ( i < MAX_RECONNECTIONS_PER_PULSE )
-           && ( getPeerCount( t ) < getMaxPeerCount( t->tor ) )
-           && ( newConnectionsThisSecond < MAX_CONNECTIONS_PER_SECOND ); ++i )
+        for( i=0; i<maxCandidates; ++i )
         {
-            tr_peerMgr *       mgr = t->manager;
-            struct peer_atom * atom = candidates[i];
-            tr_peerIo *        io;
+            tr_peerMgr        * mgr = t->manager;
+            struct peer_atom  * atom = candidates[i];
+            tr_peerIo         * io;
 
             tordbg( t, "Starting an OUTGOING connection with %s",
                    tr_peerIoAddrStr( &atom->addr, atom->port ) );
@@ -2286,8 +2322,9 @@ tordbg( t, "nCandidates is %d, MAX_RECONNECTIONS_PER_PULSE is %d, getPeerCount(t
         }
 
         /* cleanup */
-        tr_free( connections );
         tr_free( candidates );
+        tr_free( mustClose );
+        tr_free( canClose );
     }
 
     torrentUnlock( t );
