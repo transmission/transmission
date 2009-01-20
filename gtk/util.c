@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #include <ctype.h> /* isxdigit() */
+#include <errno.h>
 #include <stdarg.h>
 #include <stdlib.h> /* free() */
 #include <string.h> /* strcmp() */
@@ -521,12 +522,22 @@ tr_file_trash_or_unlink( const char * filename )
     {
         gboolean trashed = FALSE;
 #ifdef HAVE_GIO
+        GError * err = NULL;
         GFile *  file = g_file_new_for_path( filename );
-        trashed = g_file_trash( file, NULL, NULL );
+        trashed = g_file_trash( file, NULL, &err );
+        if( err )
+            g_message( "Unable to trash file \"%s\": %s", filename, err->message );
+        g_clear_error( &err );
         g_object_unref( G_OBJECT( file ) );
+       
+        
 #endif
-        if( !trashed )
-            g_unlink( filename );
+        if( !trashed ) {
+            if( g_unlink( filename ) ) {
+                const int err = errno;
+                g_message( "Unable to unlink file \"%s\": %s", filename, g_strerror( err ) );
+            }
+        }
     }
 
     return 0;

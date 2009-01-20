@@ -5,8 +5,6 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <unistd.h> /* ssize_t */
-
 /*
  * Copyright 2001-2004 Unicode, Inc.
  * 
@@ -153,7 +151,7 @@ Boolean isLegalUTF8Sequence(const UTF8 *source, const UTF8 *sourceEnd);
 
 
 /* intended to work the same as g_utf8_validate */
-Boolean tr_utf8_validate( const char * str, ssize_t max_len, const char ** end );
+Boolean tr_utf8_validate( const char * str, int max_len, const char ** end );
 
 
 #ifdef __cplusplus

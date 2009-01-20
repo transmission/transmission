@@ -176,7 +176,7 @@ handle_upload( struct evhttp_request * req,
                         tr_rpc_request_exec_json( server->session,
                                                   EVBUFFER_DATA( json ),
                                                   EVBUFFER_LENGTH( json ),
-                                                  NULL );
+                                                  NULL, NULL );
 
                         tr_releaseBuffer( json );
                         tr_free( b64 );
@@ -374,39 +374,54 @@ handle_clutch( struct evhttp_request * req,
     }
 }
 
+struct rpc_response_data
+{
+    struct evhttp_request * req;
+    struct tr_rpc_server  * server;
+};
+
+static void
+rpc_response_func( tr_session      * session UNUSED,
+                   const char      * response,
+                   size_t            response_len,
+                   void            * user_data )
+{
+    struct rpc_response_data * data = user_data;
+    struct evbuffer * buf = tr_getBuffer( );
+
+    add_response( data->req, data->server, buf, response, response_len );
+    evhttp_add_header( data->req->output_headers,
+                           "Content-Type", "application/json; charset=UTF-8" );
+    evhttp_send_reply( data->req, HTTP_OK, "OK", buf );
+
+    tr_releaseBuffer( buf );
+    tr_free( data );
+}
+
+
 static void
 handle_rpc( struct evhttp_request * req,
             struct tr_rpc_server  * server )
 {
-    struct evbuffer * response = tr_getBuffer( );
+    struct rpc_response_data * data = tr_new0( struct rpc_response_data, 1 );
 
+    data->req = req;
+    data->server = server;
+    
     if( req->type == EVHTTP_REQ_GET )
     {
         const char * q;
         if( ( q = strchr( req->uri, '?' ) ) )
-            tr_rpc_request_exec_uri( server->session, q + 1, strlen( q + 1 ), response );
+            tr_rpc_request_exec_uri( server->session, q+1, -1, rpc_response_func, data );
     }
     else if( req->type == EVHTTP_REQ_POST )
     {
         tr_rpc_request_exec_json( server->session,
                                   EVBUFFER_DATA( req->input_buffer ),
                                   EVBUFFER_LENGTH( req->input_buffer ),
-                                  response );
+                                  rpc_response_func, data );
     }
 
-    {
-        struct evbuffer * buf = tr_getBuffer( );
-        add_response( req, server, buf,
-                      EVBUFFER_DATA( response ),
-                      EVBUFFER_LENGTH( response ) );
-        evhttp_add_header( req->output_headers, "Content-Type",
-                                                "application/json; charset=UTF-8" );
-        evhttp_send_reply( req, HTTP_OK, "OK", buf );
-        tr_releaseBuffer( buf );
-    }
-
-    /* cleanup */
-    tr_releaseBuffer( response );
 }
 
 static tr_bool

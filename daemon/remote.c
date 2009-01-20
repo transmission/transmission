@@ -58,7 +58,7 @@ getUsage( void )
 
 static tr_option opts[] =
 {
-    { 'a', "add",                  "Add torrent files", "a",  0, NULL },
+    { 'a', "add",                  "Add torrent files by filename or URL", "a",  0, NULL },
     { 'b', "debug",                "Print debugging information", "b",  0, NULL },
     { 'd', "downlimit",            "Set the maximum global download speed in KB/s", "d",  1, "<speed>" },
     { 'D', "no-downlimit",         "Don't limit the global download speed", "D",  0, NULL },
@@ -300,8 +300,8 @@ readargs( int           argc,
                     }
                     else
                     {
-                        fprintf( stderr, "Couldn't add file: %s\n", optarg );
-                        addArg = FALSE;
+                        tr_bencDictAddStr( &top, "method", "torrent-add" );
+                        tr_bencDictAddStr( args, "filename", optarg );
                     }
                 }
                 else
@@ -946,7 +946,7 @@ printFileList( tr_benc * top )
                                 pristr = "Normal"; break;
                         }
                         printf( "%3d: %3.0f%% %-8s %-3s %9s  %s\n",
-                                ( j + 1 ),
+                                j,
                                 ( 100.0 * percent ),
                                 pristr,
                                 ( wanted ? "Yes" : "No" ),

@@ -64,6 +64,11 @@ typedef struct tr_peerIo
     tr_bool               extendedProtocolSupported;
     tr_bool               fastExtensionSupported;
 
+    /* we create the socket in a nonblocking way, so this flag is initially
+     * false and then set to true when libevent says that the socket is ready
+     * for reading or writing */
+    tr_bool               hasFinishedConnecting;
+
     int                   magicNumber;
 
     uint8_t               encryptionMode;
@@ -71,7 +76,7 @@ typedef struct tr_peerIo
     tr_port               port;
     int                   socket;
 
-    ssize_t               refCount;
+    int                   refCount;
 
     uint8_t               peerId[SHA_DIGEST_LENGTH];
     time_t                timeCreated;
@@ -355,7 +360,7 @@ void      tr_peerIoSetEnabled( tr_peerIo    * io,
                                tr_direction   dir,
                                tr_bool        isEnabled );
                        
-ssize_t   tr_peerIoFlush( tr_peerIo     * io,
+int       tr_peerIoFlush( tr_peerIo     * io,
                           tr_direction    dir,
                           size_t          byteLimit );
 

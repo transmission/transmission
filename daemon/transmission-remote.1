@@ -11,7 +11,7 @@ and
 .Bk -words
 .Nm
 .Op Ar host:port | host | port
-.Op Fl a Ar torrent-files
+.Op Fl a Ar filenames-or-URLs
 .Op Fl b
 .Op Fl d Ar number | Fl D
 .Op Fl er | ep | et
@@ -51,10 +51,8 @@ Other sessions can be controlled by specifying a different host and/or port.
 
 .Sh OPTIONS
 .Bl -tag -width Ds
-.It Fl a Fl -add Ar torrent-file(s)
-Add
-.Ar torrent-file(s)
-into transmission.
+.It Fl a Fl -add Ar filenames-or-URLs
+Add torrents to transmission.
 
 .It Fl b Fl -debug
 Enable debugging mode.

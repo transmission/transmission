@@ -637,8 +637,7 @@ tr_buildPath( const char *first_element, ... )
 ****/
 
 char*
-tr_strndup( const void * in,
-            int          len )
+tr_strndup( const void * in, int len )
 {
     char * out = NULL;
 
@@ -1326,7 +1325,7 @@ tr_lowerBound( const void * key,
 ***/
 
 char*
-tr_utf8clean( const char * str, ssize_t max_len, tr_bool * err )
+tr_utf8clean( const char * str, int max_len, tr_bool * err )
 {
     const char zero = '\0';
     char * ret;
@@ -1337,11 +1336,11 @@ tr_utf8clean( const char * str, ssize_t max_len, tr_bool * err )
         *err = FALSE;
 
     if( max_len < 0 )
-        max_len = (ssize_t) strlen( str );
+        max_len = (int) strlen( str );
 
     while( !tr_utf8_validate ( str, max_len, &end ) )
     {
-        const ssize_t good_len = end - str;
+        const int good_len = end - str;
 
         evbuffer_add( buf, str, good_len );
         max_len -= ( good_len + 1 );

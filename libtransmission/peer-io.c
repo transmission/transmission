@@ -190,6 +190,8 @@ event_read_cb( int fd, short event UNUSED, void * vio )
 
     assert( tr_isPeerIo( io ) );
 
+    io->hasFinishedConnecting = TRUE;
+
     curlen = EVBUFFER_LENGTH( io->inbuf );
     howmuch = curlen >= max ? 0 : max - curlen;
     howmuch = tr_bandwidthClamp( &io->bandwidth, TR_DOWN, howmuch );
@@ -234,23 +236,23 @@ event_read_cb( int fd, short event UNUSED, void * vio )
     }
 }
 
-static ssize_t
+static int
 tr_evbuffer_write( tr_peerIo * io, int fd, size_t howmuch )
 {
     int e;
-    ssize_t n;
+    int n;
     struct evbuffer * buffer = io->outbuf;
 
     howmuch = MIN( EVBUFFER_LENGTH( buffer ), howmuch );
 
     errno = 0;
 #ifdef WIN32
-    n = send(fd, buffer->buffer, howmuch,  0 );
+    n = (int) send(fd, buffer->buffer, howmuch,  0 );
 #else
-    n = write(fd, buffer->buffer, howmuch );
+    n = (int) write(fd, buffer->buffer, howmuch );
 #endif
     e = errno;
-    dbgmsg( io, "wrote %zd to peer (%s)", n, (n==-1?strerror(e):"") );
+    dbgmsg( io, "wrote %d to peer (%s)", n, (n==-1?strerror(e):"") );
 
     if( n > 0 )
         evbuffer_drain( buffer, n );
@@ -269,6 +271,8 @@ event_write_cb( int fd, short event UNUSED, void * vio )
     const tr_direction dir = TR_UP;
 
     assert( tr_isPeerIo( io ) );
+
+    io->hasFinishedConnecting = TRUE;
 
     dbgmsg( io, "libevent says this peer is ready to write" );
 
@@ -352,6 +356,7 @@ tr_peerIoNew( tr_session       * session,
     io->port = port;
     io->socket = socket;
     io->isIncoming = isIncoming != 0;
+    io->hasFinishedConnecting = FALSE;
     io->timeCreated = time( NULL );
     io->inbuf = evbuffer_new( );
     io->outbuf = evbuffer_new( );
@@ -757,10 +762,10 @@ tr_peerIoDrain( tr_peerIo       * io,
 ****
 ***/
 
-static ssize_t
+static int
 tr_peerIoTryRead( tr_peerIo * io, size_t howmuch )
 {
-    ssize_t res = 0;
+    int res = 0;
 
     if(( howmuch = tr_bandwidthClamp( &io->bandwidth, TR_DOWN, howmuch )))
     {
@@ -769,7 +774,7 @@ tr_peerIoTryRead( tr_peerIo * io, size_t howmuch )
         res = evbuffer_read( io->inbuf, io->socket, howmuch );
         e = errno;
 
-        dbgmsg( io, "read %zd from peer (%s)", res, (res==-1?strerror(e):"") );
+        dbgmsg( io, "read %d from peer (%s)", res, (res==-1?strerror(e):"") );
 
         if( EVBUFFER_LENGTH( io->inbuf ) )
             canReadWrapper( io );
@@ -779,7 +784,7 @@ tr_peerIoTryRead( tr_peerIo * io, size_t howmuch )
             short what = EVBUFFER_READ | EVBUFFER_ERROR;
             if( res == 0 )
                 what |= EVBUFFER_EOF;
-            dbgmsg( io, "tr_peerIoTryRead got an error. res is %zd, what is %hd, errno is %d (%s)", res, what, e, strerror( e ) );
+            dbgmsg( io, "tr_peerIoTryRead got an error. res is %d, what is %hd, errno is %d (%s)", res, what, e, strerror( e ) );
             io->gotError( io, what, io->userData );
         }
     }
@@ -787,10 +792,10 @@ tr_peerIoTryRead( tr_peerIo * io, size_t howmuch )
     return res;
 }
 
-static ssize_t
+static int
 tr_peerIoTryWrite( tr_peerIo * io, size_t howmuch )
 {
-    ssize_t n = 0;
+    int n = 0;
 
     if(( howmuch = tr_bandwidthClamp( &io->bandwidth, TR_UP, howmuch )))
     {
@@ -805,7 +810,7 @@ tr_peerIoTryWrite( tr_peerIo * io, size_t howmuch )
         if( ( n < 0 ) && ( io->gotError ) && ( e != EPIPE ) && ( e != EAGAIN ) && ( e != EINTR ) && ( e != EINPROGRESS ) )
         {
             const short what = EVBUFFER_WRITE | EVBUFFER_ERROR;
-            dbgmsg( io, "tr_peerIoTryWrite got an error. res is %zd, what is %hd, errno is %d (%s)", n, what, e, strerror( e ) );
+            dbgmsg( io, "tr_peerIoTryWrite got an error. res is %d, what is %hd, errno is %d (%s)", n, what, e, strerror( e ) );
             io->gotError( io, what, io->userData );
         }
     }
@@ -813,20 +818,23 @@ tr_peerIoTryWrite( tr_peerIo * io, size_t howmuch )
     return n;
 }
 
-ssize_t
+int
 tr_peerIoFlush( tr_peerIo  * io, tr_direction dir, size_t limit )
 {
-    ssize_t bytesUsed;
+    int bytesUsed = 0;
 
     assert( tr_isPeerIo( io ) );
     assert( tr_isDirection( dir ) );
 
-    if( dir == TR_DOWN )
-        bytesUsed = tr_peerIoTryRead( io, limit );
-    else
-        bytesUsed = tr_peerIoTryWrite( io, limit );
+    if( io->hasFinishedConnecting )
+    {
+        if( dir == TR_DOWN )
+            bytesUsed = tr_peerIoTryRead( io, limit );
+        else
+            bytesUsed = tr_peerIoTryWrite( io, limit );
+    }
 
-    dbgmsg( io, "flushing peer-io, direction %d, limit %zu, bytesUsed %zd", (int)dir, limit, bytesUsed );
+    dbgmsg( io, "flushing peer-io, direction %d, limit %zu, bytesUsed %d", (int)dir, limit, bytesUsed );
     return bytesUsed;
 }
 
