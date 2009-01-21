@@ -785,6 +785,11 @@ pumpRequestQueue( tr_peermsgs * msgs, const time_t now )
     int                 len = msgs->clientAskedFor.len;
     struct peer_request req;
 
+    dbgmsg( msgs, "clientIsChoked %d, download allowed %d, len %d, max %d, msgs->clientWillAskFor.len %d",
+            (int)msgs->peer->clientIsChoked,
+            (int)tr_torrentIsPieceTransferAllowed( msgs->torrent, TR_PEER_TO_CLIENT ),
+            len, max, msgs->clientWillAskFor.len );
+
     if( msgs->peer->clientIsChoked )
         return;
     if( !tr_torrentIsPieceTransferAllowed( msgs->torrent, TR_PEER_TO_CLIENT ) )
@@ -808,6 +813,7 @@ pumpRequestQueue( tr_peermsgs * msgs, const time_t now )
             ++len;
             ++sent;
         }
+        else dbgmsg( msgs, "not asking for it because we've already got it..." );
     }
 
     if( sent )
