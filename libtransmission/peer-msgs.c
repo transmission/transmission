@@ -1172,6 +1172,7 @@ readBtId( tr_peermsgs *     msgs,
 
     tr_peerIoReadUint8( msgs->peer->io, inbuf, &id );
     msgs->incoming.id = id;
+    dbgmsg( msgs, "msgs->incoming.id is now %d; msgs->incoming.length is %zu", id, (size_t)msgs->incoming.length );
 
     if( id == BT_PIECE )
     {
@@ -1341,10 +1342,10 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
 
     --msglen; /* id length */
 
+    dbgmsg( msgs, "got BT id %d, len %d, buffer size is %zu", (int)id, (int)msglen, inlen );
+
     if( inlen < msglen )
         return READ_LATER;
-
-    dbgmsg( msgs, "got BT id %d, len %d, buffer size is %zu", (int)id, (int)msglen, inlen );
 
     if( !messageLengthIsCorrect( msgs, id, msglen + 1 ) )
     {
@@ -1606,6 +1607,8 @@ canRead( tr_peerIo * io, void * vmsgs, size_t * piece )
     struct evbuffer * in = tr_peerIoGetReadBuffer( io );
     const size_t      inlen = EVBUFFER_LENGTH( in );
 
+    dbgmsg( msgs, "canRead: inlen is %zu, msgs->state is %d", inlen, msgs->state );
+
     if( !inlen )
     {
         ret = READ_LATER;
@@ -1629,6 +1632,8 @@ canRead( tr_peerIo * io, void * vmsgs, size_t * piece )
             ret = READ_ERR;
             assert( 0 );
     }
+
+    dbgmsg( msgs, "canRead: ret is %d", (int)ret );
 
     /* log the raw data that was read */
     if( ( ret != READ_ERR ) && ( EVBUFFER_LENGTH( in ) != inlen ) )
@@ -1962,6 +1967,7 @@ sendPex( tr_peermsgs * msgs )
             char * benc;
             int bencLen;
             uint8_t * tmp, *walk;
+            tr_peerIo       * io  = msgs->peer->io;
             struct evbuffer * out = msgs->outMessages;
 
             /* update peer */
@@ -2044,12 +2050,13 @@ sendPex( tr_peermsgs * msgs )
 
             /* write the pex message */
             benc = tr_bencSave( &val, &bencLen );
-            tr_peerIoWriteUint32( msgs->peer->io, out, 2 * sizeof( uint8_t ) + bencLen );
-            tr_peerIoWriteUint8 ( msgs->peer->io, out, BT_LTEP );
-            tr_peerIoWriteUint8 ( msgs->peer->io, out, msgs->ut_pex_id );
-            tr_peerIoWriteBytes ( msgs->peer->io, out, benc, bencLen );
+            tr_peerIoWriteUint32( io, out, 2 * sizeof( uint8_t ) + bencLen );
+            tr_peerIoWriteUint8 ( io, out, BT_LTEP );
+            tr_peerIoWriteUint8 ( io, out, msgs->ut_pex_id );
+            tr_peerIoWriteBytes ( io, out, benc, bencLen );
             pokeBatchPeriod( msgs, HIGH_PRIORITY_INTERVAL_SECS );
             dbgmsg( msgs, "sending a pex message; outMessage size is now %zu", EVBUFFER_LENGTH( out ) );
+            dbgOutMessageLen( msgs );
 
             tr_free( benc );
             tr_bencFree( &val );
