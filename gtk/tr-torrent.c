@@ -212,7 +212,7 @@ tr_torrent_new_ctor( tr_session   * session,
 
         /* #1294: don't delete the source .torrent file if it's our internal copy */
         if( !is_internal )
-            tr_file_trash_or_unlink( source );
+            tr_file_trash_or_remove( source );
     }
 
     if( !tor )
@@ -318,7 +318,7 @@ tr_torrent_set_remove_flag( TrTorrent * gtor,
 void
 tr_torrent_delete_files( TrTorrent * gtor )
 {
-    tr_torrentDeleteLocalData( tr_torrent_handle( gtor ), tr_file_trash_or_unlink );
+    tr_torrentDeleteLocalData( tr_torrent_handle( gtor ), tr_file_trash_or_remove );
 }
 
 void

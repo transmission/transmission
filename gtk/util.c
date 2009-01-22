@@ -516,7 +516,7 @@ tr_object_ref_sink( gpointer object )
 }
 
 int
-tr_file_trash_or_unlink( const char * filename )
+tr_file_trash_or_remove( const char * filename )
 {
     if( filename && *filename )
     {
@@ -529,14 +529,12 @@ tr_file_trash_or_unlink( const char * filename )
             g_message( "Unable to trash file \"%s\": %s", filename, err->message );
         g_clear_error( &err );
         g_object_unref( G_OBJECT( file ) );
-       
-        
 #endif
-        if( !trashed ) {
-            if( g_unlink( filename ) ) {
-                const int err = errno;
-                g_message( "Unable to unlink file \"%s\": %s", filename, g_strerror( err ) );
-            }
+
+        if( !trashed && g_remove( filename ) )
+        {
+            const int err = errno;
+            g_message( "Unable to remove file \"%s\": %s", filename, g_strerror( err ) );
         }
     }
 
