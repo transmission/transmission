@@ -8,7 +8,7 @@
 #         "0" for stable, supported releases
 # these should be the only two lines you need to change
 PEERID_PREFIX="-TR142X-"
-USERAGENT_PREFIX="1.50b2"
+USERAGENT_PREFIX="1.50b3"
 
 SVN_REVISION=`find ./libtransmission -name "*\.[chmp]" -o -name "*\.cpp" -o -name "*\.po" -o -name "*\.sh" | \
               xargs grep "\$Id:" | \

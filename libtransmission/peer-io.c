@@ -649,69 +649,58 @@ tr_peerIoSetEncryption( tr_peerIo * io,
 
 void
 tr_peerIoWrite( tr_peerIo   * io,
-                const void  * writeme,
-                size_t        writemeLen,
-                int           isPieceData )
+                const void  * bytes,
+                size_t        byteCount,
+                tr_bool       isPieceData )
 {
     struct tr_datatype * datatype;
 
     assert( tr_amInEventThread( io->session ) );
-    dbgmsg( io, "adding %zu bytes into io->output", writemeLen );
+    dbgmsg( io, "adding %zu bytes into io->output", byteCount );
 
     datatype = tr_new( struct tr_datatype, 1 );
     datatype->isPieceData = isPieceData != 0;
-    datatype->length = writemeLen;
+    datatype->length = byteCount;
 
     __tr_list_init( &datatype->head );
     __tr_list_append( &io->outbuf_datatypes, &datatype->head );
 
-    evbuffer_add( io->outbuf, writeme, writemeLen );
-}
-
-void
-tr_peerIoWriteBuf( tr_peerIo         * io,
-                   struct evbuffer   * buf,
-                   int                 isPieceData )
-{
-    const size_t n = EVBUFFER_LENGTH( buf );
-    tr_peerIoWrite( io, EVBUFFER_DATA( buf ), n, isPieceData );
-    evbuffer_drain( buf, n );
-}
-
-/**
-***
-**/
-
-void
-tr_peerIoWriteBytes( tr_peerIo       * io,
-                     struct evbuffer * outbuf,
-                     const void      * bytes,
-                     size_t            byteCount )
-{
-    uint8_t tmp[MAX_STACK_ARRAY_SIZE];
-
     switch( io->encryptionMode )
     {
-        case PEER_ENCRYPTION_NONE:
-            evbuffer_add( outbuf, bytes, byteCount );
-            break;
-
-        case PEER_ENCRYPTION_RC4: {
+        case PEER_ENCRYPTION_RC4:
+        {
+            uint8_t tmp[MAX_STACK_ARRAY_SIZE];
             const uint8_t * walk = bytes;
-            evbuffer_expand( outbuf, byteCount );
-            while( byteCount > 0 ) {
+            evbuffer_expand( io->outbuf, byteCount );
+            while( byteCount > 0 )
+            {
                 const size_t thisPass = MIN( byteCount, sizeof( tmp ) );
                 tr_cryptoEncrypt( io->crypto, thisPass, walk, tmp );
-                evbuffer_add( outbuf, tmp, thisPass );
+                evbuffer_add( io->outbuf, tmp, thisPass );
                 walk += thisPass;
                 byteCount -= thisPass;
             }
             break;
         }
 
+        case PEER_ENCRYPTION_NONE:
+            evbuffer_add( io->outbuf, bytes, byteCount );
+            break;
+
         default:
             assert( 0 );
+            break;
     }
+}
+
+void
+tr_peerIoWriteBuf( tr_peerIo         * io,
+                   struct evbuffer   * buf,
+                   tr_bool             isPieceData )
+{
+    const size_t n = EVBUFFER_LENGTH( buf );
+    tr_peerIoWrite( io, EVBUFFER_DATA( buf ), n, isPieceData );
+    evbuffer_drain( buf, n );
 }
 
 /***

@@ -456,6 +456,7 @@ readYb( tr_handshake *    handshake,
     {
         uint8_t vc[VC_LENGTH] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
+        tr_peerIoWriteBuf( handshake->io, outbuf, FALSE );
         tr_cryptoEncryptInit( handshake->crypto );
         tr_peerIoSetEncryption( handshake->io, PEER_ENCRYPTION_RC4 );
 
@@ -952,7 +953,10 @@ readIA( tr_handshake *    handshake,
 
     /* maybe de-encrypt our connection */
     if( crypto_select == CRYPTO_PROVIDE_PLAINTEXT )
+    {
+        tr_peerIoWriteBuf( handshake->io, outbuf, FALSE );
         tr_peerIoSetEncryption( handshake->io, PEER_ENCRYPTION_NONE );
+    }
 
     dbgmsg( handshake, "sending handshake" );
     /* send our handshake */
@@ -1174,6 +1178,7 @@ tr_handshakeNew( tr_peerIo *        io,
 
     tr_peerIoRef( io ); /* balanced by the unref in tr_handshakeFree */
     tr_peerIoSetIOFuncs( handshake->io, canRead, NULL, gotError, handshake );
+    tr_peerIoSetEncryption( io, PEER_ENCRYPTION_NONE );
 
     if( tr_peerIoIsIncoming( handshake->io ) )
         setReadState( handshake, AWAITING_HANDSHAKE );
