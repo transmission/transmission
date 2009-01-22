@@ -1898,7 +1898,7 @@ void
 tr_torrentDeleteLocalData( tr_torrent * tor, tr_fileFunc fileFunc )
 {
     if( fileFunc == NULL )
-        fileFunc = unlink;
+        fileFunc = remove;
 
     /* close all the files because we're about to delete them */
     tr_torrentCloseLocalFiles( tor );
