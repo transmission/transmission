@@ -132,7 +132,7 @@ gboolean    on_tree_view_button_released( GtkWidget *      view,
 
 gpointer    tr_object_ref_sink( gpointer object );
 
-int         tr_file_trash_or_unlink( const char * filename );
+int         tr_file_trash_or_remove( const char * filename );
 
 #endif /* GTK_MAJOR_VERSION */
 

@@ -128,7 +128,7 @@ addResponseCB( GtkDialog * dialog,
 
             if( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( data->trash_check ) ) )
 
-                tr_file_trash_or_unlink( data->filename );
+                tr_file_trash_or_remove( data->filename );
             save_recent_destination( data->core, data->downloadDir );
         }
     }
