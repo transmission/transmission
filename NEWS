@@ -10,7 +10,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Groups can have a default location when adding transfers
    + Bonjour support for the web interface
    + File filter field in the inspector
-   + Option to include beta releases when auto-updating
+   + Option to include beta releases when auto-updating (using modified Sparkle 1.5)
 
 1.50 (2009/01/dd)
 <http://trac.transmissionbt.com/query?milestone=1.50&group=component&groupdesc=1&order=severity>
@@ -27,6 +27,8 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Make i18n support optional for cli and daemon clients
 - CLI
    + Support session.json settings as the Daemon and GTK+ clients do
+- Web Interface
+   + Re-add the ability to add transfers using torrent file URLs
 
 1.42 (2008/12/24)
 <http://trac.transmissionbt.com/query?milestone=1.42&group=component&groupdesc=1&order=severity>
