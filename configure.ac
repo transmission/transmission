@@ -26,8 +26,8 @@ if test m4_substr(peer_id_prefix,6,1) = "0"; then
   AC_DEFINE(TR_STABLE_RELEASE, 1, [Define to 1 if this is a stable release of Transmission])
 else
   supported_build=no
-  CFLAGS="$CFLAGS -g -O0"
-  CXXFLAGS="$CXXFLAGS -g -O0"
+  CFLAGS="$CFLAGS -g -O"
+  CXXFLAGS="$CXXFLAGS -g -O"
   if test m4_substr(peer_id_prefix,6,1) = "X"; then
     AC_DEFINE(TR_BETA_RELEASE, 1, [Define to 1 if this is a beta release of Transmission])
   else
@@ -57,8 +57,21 @@ AC_PROG_CC
 AC_PROG_CXX
 AC_C_INLINE
 if test "x$GCC" = "xyes" ; then
-    CFLAGS="-std=gnu99 -ggdb3 -Wall -Wextra -Wredundant-decls -Wpointer-arith -Wformat-security -W -Wmissing-declarations -Wdeclaration-after-statement -Wcast-align -Winit-self -Wundef -Wnested-externs -Wmissing-format-attribute"
-    CXXFLAGS="-Wall -Wformat-security -W"
+
+    CFLAGS="-std=gnu99 -ggdb3 -Wall -W -Wpointer-arith -Wformat-security -Wcast-align -Wundef -Wcast-align -Wstrict-prototypes -Wmissing-declarations -Wmissing-format-attribute -Wredundant-decls -Wnested-externs -Wunreachable-code -Wunused-parameter -Wwrite-strings"
+
+    dnl figure out gcc version
+    AC_MSG_CHECKING([gcc version])
+    GCC_VERSION=`$CC -dumpversion`
+    GCC_MAJOR=`echo $GCC_VERSION | cut -d . -f1`
+    GCC_MINOR=`echo $GCC_VERSION | cut -d . -f2`
+    GCC_VERSION_NUM=`(expr $GCC_MAJOR "*" 100 + $GCC_MINOR) 2>/dev/null`
+
+    AC_MSG_RESULT($GCC_VERSION)
+    if test $GCC_VERSION_NUM -ge 304; then
+        dnl these were added in 3.4
+        CFLAGS="$CFLAGS -Wextra -Wdeclaration-after-statement -Winit-self"
+    fi
 fi
 
 AC_HEADER_STDC
