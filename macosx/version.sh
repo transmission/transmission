@@ -38,7 +38,7 @@ cat > libtransmission/version.h.new << EOF
 #define BUNDLE_VERSION_INFOPLIST  $SVN_REVISION
 EOF
 
-# add a release definition
+# Add a release definition
 if [ ${PEERID_PREFIX:6:1} = X ]; then
     line='#define TR_BETA_RELEASE     "BETA"'
 elif [ ${PEERID_PREFIX:6:1} = Z ]; then

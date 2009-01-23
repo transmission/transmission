@@ -456,10 +456,12 @@
                 else if (fInfo->result == TR_MAKEMETA_IO_WRITE)
                     [alert setInformativeText: [NSString stringWithFormat: NSLocalizedString(@"Could not write \"%s\": %s.",
                         "Create torrent -> failed -> warning"), fInfo->errfile, strerror(fInfo->my_errno)]];
-                else; //invalid url should have been caught before creating
+                else //invalid url should have been caught before creating
+                    [alert setInformativeText: [NSString stringWithFormat: @"%@ (%d)",
+                        NSLocalizedString(@"An unknown error has occurred.", "Create torrent -> failed -> warning"), fInfo->result]];
                 
                 [alert beginSheetModalForWindow: [self window] modalDelegate: self
-                        didEndSelector: @selector(failureSheetClosed:returnCode:contextInfo:) contextInfo: nil];
+                    didEndSelector: @selector(failureSheetClosed:returnCode:contextInfo:) contextInfo: nil];
         }
     }
     else
