@@ -25,7 +25,7 @@ int tr_optind = 1;
 static const char*
 getArgName( const tr_option * opt )
 {
-    char * arg;
+    const char * arg;
 
     if( !opt->has_arg )
         arg = "";

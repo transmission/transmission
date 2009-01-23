@@ -2,23 +2,31 @@
 #include "transmission.h"
 #include "request-list.h"
 
-#define VERBOSE 0
+#undef VERBOSE
 
 static int test = 0;
 
-#define check( A ) \
+#ifdef VERBOSE
+  #define check( A ) \
     { \
         ++test; \
         if( A ){ \
-            if( VERBOSE ) \
-                fprintf( stderr, "PASS test #%d (%s, %d)\n", test, __FILE__,\
-                         __LINE__ );\
+            fprintf( stderr, "PASS test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
         } else { \
-            fprintf( stderr, "FAIL test #%d (%s, %d)\n", test, __FILE__,\
-                     __LINE__ ); \
+            fprintf( stderr, "FAIL test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
             return test; \
         } \
     }
+#else
+  #define check( A ) \
+    { \
+        ++test; \
+        if( !( A ) ){ \
+            fprintf( stderr, "FAIL test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
+            return test; \
+        } \
+    }
+#endif
 
 static int
 testFoo( void )

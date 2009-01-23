@@ -5,22 +5,29 @@
 #include "session.h"
 #include "utils.h"
 
-#define VERBOSE 0
+#undef VERBOSE
 
-#define check( A ) \
+#ifdef VERBOSE
+  #define check( A ) \
     { \
         ++test; \
         if( A ){ \
-            if( VERBOSE ) \
-                fprintf( stderr, "PASS test #%d (%s, %d)\n", test, __FILE__,\
-                         __LINE__ );\
+            fprintf( stderr, "PASS test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
         } else { \
-            if( VERBOSE ) \
-                fprintf( stderr, "FAIL test #%d (%s, %d)\n", test, __FILE__,\
-                         __LINE__ );\
+            fprintf( stderr, "FAIL test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
             return test; \
         } \
     }
+#else
+  #define check( A ) \
+    { \
+        ++test; \
+        if( !( A ) ){ \
+            fprintf( stderr, "FAIL test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
+            return test; \
+        } \
+    }
+#endif
 
 int
 main( void )
