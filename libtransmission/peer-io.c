@@ -823,7 +823,7 @@ tr_peerIoFlush( tr_peerIo  * io, tr_direction dir, size_t limit )
             bytesUsed = tr_peerIoTryWrite( io, limit );
     }
 
-    dbgmsg( io, "flushing peer-io, direction %d, limit %zu, bytesUsed %d", (int)dir, limit, bytesUsed );
+    dbgmsg( io, "flushing peer-io, hasFinishedConnecting %d, direction %d, limit %zu, bytesUsed %d", (int)io->hasFinishedConnecting, (int)dir, limit, bytesUsed );
     return bytesUsed;
 }
 
@@ -834,21 +834,29 @@ tr_peerIoFlush( tr_peerIo  * io, tr_direction dir, size_t limit )
 static void
 event_enable( tr_peerIo * io, short event )
 {
-    if( event & EV_READ )
+    if( event & EV_READ ) {
+        dbgmsg( io, "enabling libevent ready-to-read polling" );
         event_add( &io->event_read, NULL );
+    }
 
-    if( event & EV_WRITE )
+    if( event & EV_WRITE ) {
+        dbgmsg( io, "enabling libevent ready-to-write polling" );
         event_add( &io->event_write, NULL );
+    }
 }
 
 static void
 event_disable( struct tr_peerIo * io, short event )
 {
-    if( event & EV_READ )
+    if( event & EV_READ ) {
+        dbgmsg( io, "disabling libevent ready-to-read polling" );
         event_del( &io->event_read );
+    }
 
-    if( event & EV_WRITE )
+    if( event & EV_WRITE ) {
+        dbgmsg( io, "disabling libevent ready-to-write polling" );
         event_del( &io->event_write );
+    }
 }
 
 

@@ -208,11 +208,6 @@ tr_bandwidthAllocate( tr_bandwidth  * b,
     for( i=0; i<peerCount; ++i )
         tr_peerIoRef( peers[i] );
 
-    /* Stop all peers from listening for the socket to be ready for IO.
-     * See "Second phase of IO" lower in this function for more info. */
-    for( i=0; i<peerCount; ++i )
-        tr_peerIoSetEnabled( peers[i], dir, FALSE );
-
     /* First phase of IO.  Tries to distribute bandwidth fairly to keep faster
      * peers from starving the others.  Loop through the peers, giving each a
      * small chunk of bandwidth.  Keep looping until we run out of bandwidth
@@ -246,8 +241,7 @@ tr_bandwidthAllocate( tr_bandwidth  * b,
      * This on-demand IO is enabled until (1) the peer runs out of bandwidth,
      * or (2) the next tr_bandwidthAllocate() call, when we start over again. */
     for( i=0; i<peerCount; ++i )
-        if( tr_peerIoHasBandwidthLeft( peers[i], dir ) )
-            tr_peerIoSetEnabled( peers[i], dir, TRUE );
+        tr_peerIoSetEnabled( peers[i], dir, tr_peerIoHasBandwidthLeft( peers[i], dir ) );
 
     for( i=0; i<peerCount; ++i )
         tr_peerIoUnref( peers[i] );
