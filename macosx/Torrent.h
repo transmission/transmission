@@ -69,7 +69,7 @@ typedef enum
     NSInteger fRatioSetting;
     BOOL fFinishedSeeding, fWaitToStart, fStalled;
     
-    NSInteger fOrderValue, fGroupValue;
+    NSInteger fGroupValue;
     
     BOOL fAddedTrackers;
     
@@ -229,9 +229,6 @@ typedef enum
 - (uint64_t) uploadedTotal;
 - (uint64_t) failedHash;
 - (CGFloat) swarmSpeed;
-
-- (NSInteger) orderValue;
-- (void) setOrderValue: (NSInteger) orderValue;
 
 - (NSInteger) groupValue;
 - (void) setGroupValue: (NSInteger) groupValue;

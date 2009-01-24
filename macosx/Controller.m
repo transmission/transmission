@@ -841,8 +841,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     if (add)
     {
-        [torrent setOrderValue: [fTorrents count]]; //ensure that queue order is always sequential
-        
         [torrent update];
         [fTorrents addObject: torrent];
         [torrent release];
@@ -1216,7 +1214,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     [fTorrents removeObjectsInArray: torrents];
     
-    NSInteger lowestOrderValue = NSIntegerMax;
     for (Torrent * torrent in torrents)
     {
         //let's expand all groups that have removed items - they either don't exist anymore, are already expanded, or are collapsed (rpc)
@@ -1227,19 +1224,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         if (deleteTorrent)
             [torrent trashTorrent];
         
-        lowestOrderValue = MIN(lowestOrderValue, [torrent orderValue]);
-        
         [torrent closeRemoveTorrent];
     }
     
     [torrents release];
-
-    //reset the order values if necessary
-    if (lowestOrderValue < [fTorrents count])
-    {
-        for (NSInteger i = lowestOrderValue; i < [fTorrents count]; i++)
-            [[fTorrents objectAtIndex: i] setOrderValue: i];
-    }
     
     [fTableView deselectAll: nil];
     
@@ -1722,10 +1710,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 - (void) updateTorrentHistory
 {
     NSMutableArray * history = [NSMutableArray arrayWithCapacity: [fTorrents count]];
-
+    
     for (Torrent * torrent in fTorrents)
         [history addObject: [torrent history]];
-
+    
     [history writeToFile: [NSHomeDirectory() stringByAppendingPathComponent: SUPPORT_FOLDER] atomically: YES];
 }
 
@@ -1796,17 +1784,13 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     NSString * sortType = [fDefaults stringForKey: @"Sort"];
     const BOOL asc = ![fDefaults boolForKey: @"SortReverse"];
     
-    NSSortDescriptor * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"orderValue" ascending: asc] autorelease];
-    
-    NSArray * descriptors;
-    if ([sortType isEqualToString: SORT_ORDER])
-        descriptors = [[NSArray alloc] initWithObjects: orderDescriptor, nil];
-    else if ([sortType isEqualToString: SORT_NAME])
+    NSArray * descriptors = nil;
+    if ([sortType isEqualToString: SORT_NAME])
     {
         NSSortDescriptor * nameDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"name" ascending: asc
                                                 selector: @selector(compareFinder:)] autorelease];
         
-        descriptors = [[NSArray alloc] initWithObjects: nameDescriptor, orderDescriptor, nil];
+        descriptors = [[NSArray alloc] initWithObjects: nameDescriptor, nil];
     }
     else if ([sortType isEqualToString: SORT_STATE])
     {
@@ -1817,7 +1801,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                         * ratioDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"ratio" ascending: !asc] autorelease];
         
         descriptors = [[NSArray alloc] initWithObjects: stateDescriptor, progressDescriptor, ratioDescriptor,
-                                                            nameDescriptor, orderDescriptor, nil];
+                                                            nameDescriptor, nil];
     }
     else if ([sortType isEqualToString: SORT_PROGRESS])
     {
@@ -1829,7 +1813,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                         * ratioDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"ratio" ascending: asc] autorelease];
         
         descriptors = [[NSArray alloc] initWithObjects: progressDescriptor, ratioProgressDescriptor, ratioDescriptor,
-                                                            nameDescriptor, orderDescriptor, nil];
+                                                            nameDescriptor, nil];
     }
     else if ([sortType isEqualToString: SORT_TRACKER])
     {
@@ -1838,7 +1822,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                         * trackerDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"trackerAddressAnnounce" ascending: asc
                                                 selector: @selector(localizedCaseInsensitiveCompare:)] autorelease];
         
-        descriptors = [[NSArray alloc] initWithObjects: trackerDescriptor, nameDescriptor, orderDescriptor, nil];
+        descriptors = [[NSArray alloc] initWithObjects: trackerDescriptor, nameDescriptor, nil];
     }
     else if ([sortType isEqualToString: SORT_ACTIVITY])
     {
@@ -1846,25 +1830,29 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         NSSortDescriptor * activityDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"dateActivityOrAdd" ascending: !asc]
                                                     autorelease];
         
-        descriptors = [[NSArray alloc] initWithObjects: rateDescriptor, activityDescriptor, orderDescriptor, nil];
+        descriptors = [[NSArray alloc] initWithObjects: rateDescriptor, activityDescriptor, nil];
     }
-    else
+    else if ([sortType isEqualToString: SORT_DATE])
     {
         NSSortDescriptor * dateDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"dateAdded" ascending: asc] autorelease];
     
-        descriptors = [[NSArray alloc] initWithObjects: dateDescriptor, orderDescriptor, nil];
+        descriptors = [[NSArray alloc] initWithObjects: dateDescriptor, nil];
     }
+    else; //no need to sort by queue order
     
     //actually sort
-    if ([fDefaults boolForKey: @"SortByGroup"])
+    if (descriptors)
     {
-        for (TorrentGroup * group in fDisplayedTorrents)
-            [[group torrents] sortUsingDescriptors: descriptors];
+        if ([fDefaults boolForKey: @"SortByGroup"])
+        {
+            for (TorrentGroup * group in fDisplayedTorrents)
+                [[group torrents] sortUsingDescriptors: descriptors];
+        }
+        else
+            [fDisplayedTorrents sortUsingDescriptors: descriptors];
+        
+        [descriptors release];
     }
-    else
-        [fDisplayedTorrents sortUsingDescriptors: descriptors];
-    
-    [descriptors release];
     
     [fTableView reloadData];
 }
@@ -2718,10 +2706,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             NSUInteger insertIndex = topTorrent ? [fTorrents indexOfObject: topTorrent] + 1 : 0;
             NSIndexSet * insertIndexes = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(insertIndex, [movingTorrents count])];
             [fTorrents insertObjects: movingTorrents atIndexes: insertIndexes];
-            
-            //redo order values
-            for (NSInteger i = 0; i < [fTorrents count]; i++)
-                [[fTorrents objectAtIndex: i] setOrderValue: i];
         }
         
         [self applyFilter: nil];

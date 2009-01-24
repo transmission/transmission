@@ -36,7 +36,7 @@
         useIncompleteFolder: (NSNumber *) useIncompleteFolder incompleteFolder: (NSString *) incompleteFolder
         ratioSetting: (NSNumber *) ratioSetting ratioLimit: (NSNumber *) ratioLimit
         waitToStart: (NSNumber *) waitToStart
-        orderValue: (NSNumber *) orderValue groupValue: (NSNumber *) groupValue addedTrackers: (NSNumber *) addedTrackers;
+        groupValue: (NSNumber *) groupValue addedTrackers: (NSNumber *) addedTrackers;
 
 - (BOOL) shouldUseIncompleteFolderForName: (NSString *) name;
 - (void) updateDownloadFolder;
@@ -82,7 +82,7 @@ int trashDataFile(const char * filename)
             downloadFolder: location
             useIncompleteFolder: nil incompleteFolder: nil
             ratioSetting: nil ratioLimit: nil
-            waitToStart: nil orderValue: nil groupValue: nil addedTrackers: nil];
+            waitToStart: nil groupValue: nil addedTrackers: nil];
     
     if (self)
     {
@@ -107,7 +107,7 @@ int trashDataFile(const char * filename)
             downloadFolder: location
             useIncompleteFolder: nil incompleteFolder: nil
             ratioSetting: nil ratioLimit: nil
-            waitToStart: nil orderValue: nil groupValue: nil addedTrackers: nil];
+            waitToStart: nil groupValue: nil addedTrackers: nil];
     
     return self;
 }
@@ -123,7 +123,6 @@ int trashDataFile(const char * filename)
                 ratioSetting: [history objectForKey: @"RatioSetting"]
                 ratioLimit: [history objectForKey: @"RatioLimit"]
                 waitToStart: [history objectForKey: @"WaitToStart"]
-                orderValue: [history objectForKey: @"OrderValue"]
                 groupValue: [history objectForKey: @"GroupValue"]
                 addedTrackers: [history objectForKey: @"AddedTrackers"]];
     
@@ -160,7 +159,6 @@ int trashDataFile(const char * filename)
                     [NSNumber numberWithInt: fRatioSetting], @"RatioSetting",
                     [NSNumber numberWithFloat: fRatioLimit], @"RatioLimit",
                     [NSNumber numberWithBool: fWaitToStart], @"WaitToStart",
-                    [NSNumber numberWithInt: fOrderValue], @"OrderValue",
                     [NSNumber numberWithInt: fGroupValue], @"GroupValue",
                     [NSNumber numberWithBool: fAddedTrackers], @"AddedTrackers", nil];
     
@@ -1365,16 +1363,6 @@ int trashDataFile(const char * filename)
     return fStat->swarmSpeed;
 }
 
-- (NSInteger) orderValue
-{
-    return fOrderValue;
-}
-
-- (void) setOrderValue: (NSInteger) orderValue
-{
-    fOrderValue = orderValue;
-}
-
 - (NSInteger) groupValue
 {
     return fGroupValue;
@@ -1616,7 +1604,7 @@ int trashDataFile(const char * filename)
         useIncompleteFolder: (NSNumber *) useIncompleteFolder incompleteFolder: (NSString *) incompleteFolder
         ratioSetting: (NSNumber *) ratioSetting ratioLimit: (NSNumber *) ratioLimit
         waitToStart: (NSNumber *) waitToStart
-        orderValue: (NSNumber *) orderValue groupValue: (NSNumber *) groupValue addedTrackers: (NSNumber *) addedTrackers
+        groupValue: (NSNumber *) groupValue addedTrackers: (NSNumber *) addedTrackers
 {
     if (!(self = [super init]))
         return nil;
@@ -1707,7 +1695,6 @@ int trashDataFile(const char * filename)
 	
     [self createFileList];
 	
-    fOrderValue = orderValue ? [orderValue intValue] : tr_sessionCountTorrents(lib) - 1;
     fGroupValue = groupValue ? [groupValue intValue] : [[GroupsController groups] groupIndexForTorrent: self];
     
     fAddedTrackers = addedTrackers ? [addedTrackers boolValue] : NO;    
