@@ -420,7 +420,9 @@ static void
 io_dtor( void * vio )
 {
     tr_peerIo * io = vio;
+    assert( tr_isPeerIo( io ) );
 
+    dbgmsg( io, "in tr_peerIo destructor" );
     event_del( &io->event_read );
     event_del( &io->event_write );
     tr_bandwidthDestruct( &io->bandwidth );
@@ -430,7 +432,7 @@ io_dtor( void * vio )
     tr_cryptoFree( io->crypto );
     __tr_list_destroy( &io->outbuf_datatypes, trDatatypeFree );
 
-    io->magicNumber = 0xDEAD;
+    memset( io, ~0, sizeof( tr_peerIo ) ); 
     tr_free( io );
 }
 
@@ -439,6 +441,7 @@ tr_peerIoFree( tr_peerIo * io )
 {
     if( io )
     {
+        dbgmsg( io, "in tr_peerIoFree" );
         io->canRead = NULL;
         io->didWrite = NULL;
         io->gotError = NULL;

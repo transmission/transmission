@@ -103,8 +103,8 @@ tr_bandwidthDestruct( tr_bandwidth * b )
 
     tr_bandwidthSetParent( b, NULL );
     tr_ptrArrayDestruct( &b->children, NULL );
-    b->magicNumber = 0xDEAD;
 
+    memset( b, ~0, sizeof( tr_bandwidth ) );
     return b;
 }
 
