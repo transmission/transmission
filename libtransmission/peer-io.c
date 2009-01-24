@@ -191,6 +191,7 @@ event_read_cb( int fd, short event UNUSED, void * vio )
     assert( tr_isPeerIo( io ) );
 
     io->hasFinishedConnecting = TRUE;
+    io->pendingEvents &= ~EV_READ;
 
     curlen = EVBUFFER_LENGTH( io->inbuf );
     howmuch = curlen >= max ? 0 : max - curlen;
@@ -273,6 +274,7 @@ event_write_cb( int fd, short event UNUSED, void * vio )
     assert( tr_isPeerIo( io ) );
 
     io->hasFinishedConnecting = TRUE;
+    io->pendingEvents &= ~EV_WRITE;
 
     dbgmsg( io, "libevent says this peer is ready to write" );
 
@@ -834,28 +836,42 @@ tr_peerIoFlush( tr_peerIo  * io, tr_direction dir, size_t limit )
 static void
 event_enable( tr_peerIo * io, short event )
 {
-    if( event & EV_READ ) {
+    assert( event_initialized( &io->event_read ) );
+    assert( event_initialized( &io->event_write ) );
+
+    if( ( event & EV_READ ) && ! ( io->pendingEvents & EV_READ ) )
+    {
         dbgmsg( io, "enabling libevent ready-to-read polling" );
         event_add( &io->event_read, NULL );
+        io->pendingEvents |= EV_READ;
     }
 
-    if( event & EV_WRITE ) {
+    if( ( event & EV_WRITE ) && ! ( io->pendingEvents & EV_WRITE ) )
+    {
         dbgmsg( io, "enabling libevent ready-to-write polling" );
         event_add( &io->event_write, NULL );
+        io->pendingEvents |= EV_WRITE;
     }
 }
 
 static void
 event_disable( struct tr_peerIo * io, short event )
 {
-    if( event & EV_READ ) {
+    assert( event_initialized( &io->event_read ) );
+    assert( event_initialized( &io->event_write ) );
+
+    if( ( event & EV_READ ) && ( io->pendingEvents & EV_READ ) )
+    {
         dbgmsg( io, "disabling libevent ready-to-read polling" );
         event_del( &io->event_read );
+        io->pendingEvents &= ~EV_READ;
     }
 
-    if( event & EV_WRITE ) {
+    if( ( event & EV_WRITE ) && ( io->pendingEvents & EV_WRITE ) )
+    {
         dbgmsg( io, "disabling libevent ready-to-write polling" );
         event_del( &io->event_write );
+        io->pendingEvents &= ~EV_WRITE;
     }
 }
 

@@ -69,6 +69,8 @@ typedef struct tr_peerIo
      * for reading or writing */
     tr_bool               hasFinishedConnecting;
 
+    int                   pendingEvents;
+
     int                   magicNumber;
 
     uint8_t               encryptionMode;
