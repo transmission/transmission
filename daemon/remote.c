@@ -22,6 +22,8 @@
 #endif 
 
 #include <libevent/event.h>
+
+#define CURL_DISABLE_TYPECHECK /* otherwise -Wunreachable-code goes insane */
 #include <curl/curl.h>
 
 #include <libtransmission/transmission.h>
