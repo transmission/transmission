@@ -228,7 +228,7 @@ buildHandshakeMessage( tr_handshake * handshake,
 }
 
 static int tr_handshakeDone( tr_handshake * handshake,
-                             int            isConnected );
+                             tr_bool        isConnected );
 
 enum
 {
@@ -1078,7 +1078,7 @@ canRead( struct tr_peerIo * io, void * arg, size_t * piece )
 
 static int
 fireDoneFunc( tr_handshake * handshake,
-              int            isConnected )
+              tr_bool        isConnected )
 {
     const uint8_t * peer_id = isConnected && handshake->havePeerID
                               ? handshake->peer_id
@@ -1104,7 +1104,7 @@ tr_handshakeFree( tr_handshake * handshake )
 
 static int
 tr_handshakeDone( tr_handshake * handshake,
-                  int            isOK )
+                  tr_bool        isOK )
 {
     tr_bool success;
 

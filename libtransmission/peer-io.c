@@ -450,25 +450,30 @@ tr_peerIoFree( tr_peerIo * io )
 }
 
 void
-tr_peerIoRef( tr_peerIo * io )
+tr_peerIoRefImpl( const char * file, int line, tr_peerIo * io )
 {
     assert( tr_isPeerIo( io ) );
+
+    dbgmsg( io, "%s:%d is incrementing the IO's refcount from %d to %d\n",
+                file, line, io->refCount, io->refCount+1 );
 
     ++io->refCount;
 }
 
 void
-tr_peerIoUnref( tr_peerIo * io )
+tr_peerIoUnrefImpl( const char * file, int line, tr_peerIo * io )
 {
     assert( tr_isPeerIo( io ) );
+
+    dbgmsg( io, "%s:%d is decrementing the IO's refcount from %d to %d\n",
+                file, line, io->refCount, io->refCount+1 );
 
     if( !--io->refCount )
         tr_peerIoFree( io );
 }
 
 const tr_address*
-tr_peerIoGetAddress( const tr_peerIo * io,
-                           tr_port   * port )
+tr_peerIoGetAddress( const tr_peerIo * io, tr_port   * port )
 {
     assert( tr_isPeerIo( io ) );
 

@@ -1160,7 +1160,7 @@ getPeerCount( const Torrent * t )
 static tr_bool
 myHandshakeDoneCB( tr_handshake  * handshake,
                    tr_peerIo     * io,
-                   int             isConnected,
+                   tr_bool         isConnected,
                    const uint8_t * peer_id,
                    void          * vmanager )
 {
@@ -1173,7 +1173,7 @@ myHandshakeDoneCB( tr_handshake  * handshake,
     tr_handshake     * ours;
 
     assert( io );
-    assert( isConnected == 0 || isConnected == 1 );
+    assert( tr_isBool( ok ) );
 
     t = tr_peerIoHasTorrentHash( io )
         ? getExistingTorrent( manager, tr_peerIoGetTorrentHash( io ) )

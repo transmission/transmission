@@ -120,9 +120,17 @@ tr_peerIo*  tr_peerIoNewIncoming( tr_session              * session,
                                   tr_port                   port,
                                   int                       socket );
 
-void tr_peerIoRef               ( tr_peerIo * io );
+void tr_peerIoRefImpl           ( const char              * file,
+                                  int                       line,
+                                  tr_peerIo               * io );
 
-void tr_peerIoUnref             ( tr_peerIo * io );
+#define tr_peerIoRef(io) tr_peerIoRefImpl( __FILE__, __LINE__, (io) );
+
+void tr_peerIoUnrefImpl         ( const char              * file,
+                                  int                       line,
+                                  tr_peerIo               * io );
+
+#define tr_peerIoUnref(io) tr_peerIoUnrefImpl( __FILE__, __LINE__, (io) );
 
 tr_bool     tr_isPeerIo         ( const tr_peerIo         * io );
 
