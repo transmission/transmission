@@ -170,7 +170,7 @@ tr_isPeerIo( const tr_peerIo * io )
 {
     return ( io != NULL )
         && ( io->magicNumber == MAGIC_NUMBER )
-        && ( io->refCount > 0 )
+        && ( io->refCount >= 0 )
         && ( tr_isBandwidth( &io->bandwidth ) )
         && ( tr_isAddress( &io->addr ) );
 }
@@ -454,7 +454,7 @@ tr_peerIoRefImpl( const char * file, int line, tr_peerIo * io )
 {
     assert( tr_isPeerIo( io ) );
 
-    dbgmsg( io, "%s:%d is incrementing the IO's refcount from %d to %d\n",
+    dbgmsg( io, "%s:%d is incrementing the IO's refcount from %d to %d",
                 file, line, io->refCount, io->refCount+1 );
 
     ++io->refCount;
@@ -465,8 +465,8 @@ tr_peerIoUnrefImpl( const char * file, int line, tr_peerIo * io )
 {
     assert( tr_isPeerIo( io ) );
 
-    dbgmsg( io, "%s:%d is decrementing the IO's refcount from %d to %d\n",
-                file, line, io->refCount, io->refCount+1 );
+    dbgmsg( io, "%s:%d is decrementing the IO's refcount from %d to %d",
+                file, line, io->refCount, io->refCount-1 );
 
     if( !--io->refCount )
         tr_peerIoFree( io );
