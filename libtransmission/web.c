@@ -14,6 +14,8 @@
 #include <stdlib.h> /* bsearch */
 
 #include <event.h>
+
+#define CURL_DISABLE_TYPECHECK /* otherwise -Wunreachable-code goes insane */
 #include <curl/curl.h>
 
 #include "transmission.h"
