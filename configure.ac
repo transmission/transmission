@@ -96,6 +96,18 @@ AC_PATH_ZLIB
 
 AC_SYS_LARGEFILE
 
+
+dnl ----------------------------------------------------------------------------
+dnl
+dnl posix_fadvise
+
+dnl can posix_fadvise be used
+AC_CHECK_DECLS(posix_fadvise, [], [], [
+#define _XOPEN_SOURCE 600
+#include <fcntl.h>])
+AC_CHECK_FUNCS([posix_fadvise])
+
+
 dnl ----------------------------------------------------------------------------
 dnl
 dnl va_copy
