@@ -26,6 +26,13 @@
  #define HAVE_GETRLIMIT
 #endif
 
+#ifdef HAVE_POSIX_FADVISE
+ #ifdef _XOPEN_SOURCE
+  #undef _XOPEN_SOURCE
+ #endif
+ #define _XOPEN_SOURCE 600
+#endif
+
 #include <assert.h>
 #include <errno.h>
 #include <inttypes.h>
@@ -47,14 +54,8 @@
  #include <sys/resource.h> /* getrlimit */
 #endif
 #include <unistd.h>
+#include <fcntl.h> /* O_LARGEFILE posix_fadvise */
 
-#ifdef HAVE_POSIX_FADVISE
- /* required for getting posix_fadvise() from fcntl.h */
- #define _XOPEN_SOURCE 600
-#endif
-#include <fcntl.h> /* O_LARGEFILE; posix_fadvise() */
-
-#include <event.h>
 #include <evutil.h>
 
 #include "transmission.h"
