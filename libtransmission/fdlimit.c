@@ -47,7 +47,12 @@
  #include <sys/resource.h> /* getrlimit */
 #endif
 #include <unistd.h>
-#include <fcntl.h> /* O_LARGEFILE */
+
+#ifdef HAVE_POSIX_FADVISE
+ /* required for getting posix_fadvise() from fcntl.h */
+ #define _XOPEN_SOURCE 600
+#endif
+#include <fcntl.h> /* O_LARGEFILE; posix_fadvise() */
 
 #include <event.h>
 #include <evutil.h>
