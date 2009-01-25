@@ -326,8 +326,21 @@ tr_cpFileIsComplete( const tr_completion * cp, tr_file_index_t fileIndex )
     const tr_block_index_t firstBlock = file->offset / tor->blockSize;
     const tr_block_index_t lastBlock = file->length ? ( ( file->offset + file->length - 1 ) / tor->blockSize ) : firstBlock;
 
-    assert( tr_torBlockPiece( tor, firstBlock ) == file->firstPiece );
-    assert( tr_torBlockPiece( tor, lastBlock ) == file->lastPiece );
+    tr_assert( tr_torBlockPiece( tor, firstBlock ) == file->firstPiece,
+               "file->offset %"PRIu64"; file->length %"PRIu64"; "
+               "pieceSize %"PRIu32"; blockSize %"PRIu32"; "
+               "firstBlock %"PRIu64"; lastBlock %"PRIu64,
+               file->offset, file->length,
+               tor->info.pieceSize, tor->blockSize,
+               firstBlock, lastBlock );
+
+    tr_assert( tr_torBlockPiece( tor, lastBlock ) == file->lastPiece,
+               "file->offset %"PRIu64"; file->length %"PRIu64"; "
+               "pieceSize %"PRIu32"; blockSize %"PRIu32"; "
+               "firstBlock %"PRIu64"; lastBlock %"PRIu64,
+               file->offset, file->length,
+               tor->info.pieceSize, tor->blockSize,
+               firstBlock, lastBlock );
 
     for( block=firstBlock; block<=lastBlock; ++block )
         if( !tr_cpBlockIsComplete( cp, block ) )

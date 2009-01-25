@@ -103,6 +103,15 @@ extern "C" {
 *****
 ****/
 
+void tr_assertImpl( const char * file, int line, const char * test, const char * fmt, ... ) TR_GNUC_PRINTF( 4, 5 );
+
+#ifdef NDEBUG
+ #define tr_assert( test, fmt, ... )
+#else
+ #define tr_assert( test, fmt, ... ) \
+    do { if( ! ( test ) ) tr_assertImpl( __FILE__, __LINE__, #test, fmt, __VA_ARGS__ ); } while( 0 )
+#endif
+        
 int            tr_msgLoggingIsActive( int level );
 
 void           tr_msg( const char * file,
