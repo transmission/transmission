@@ -324,7 +324,7 @@ tr_cpFileIsComplete( const tr_completion * cp, tr_file_index_t fileIndex )
     const tr_torrent * tor = cp->tor;
     const tr_file * file = &tor->info.files[fileIndex];
     const tr_block_index_t firstBlock = file->offset / tor->blockSize;
-    const tr_block_index_t lastBlock = ( file->offset + file->length - 1 ) / tor->blockSize;
+    const tr_block_index_t lastBlock = file->length ? ( ( file->offset + file->length - 1 ) / tor->blockSize ) : firstBlock;
 
     assert( tr_torBlockPiece( tor, firstBlock ) == file->firstPiece );
     assert( tr_torBlockPiece( tor, lastBlock ) == file->lastPiece );
