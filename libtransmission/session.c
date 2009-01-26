@@ -357,6 +357,7 @@ tr_sessionSaveSettings( tr_session * session, const char * configDir, tr_benc * 
 }
 
 static void metainfoLookupRescan( tr_session * );
+static void tr_sessionInitImpl( void * );
 
 tr_session *
 tr_sessionInit( const char  * tag,
@@ -514,10 +515,6 @@ tr_sessionInit( const char  * tag,
     assert( found ); 
     tr_sessionSetSpeedLimit( session, TR_DOWN, i );
     tr_sessionSetSpeedLimitEnabled( session, TR_DOWN, j );
- 
-    /* first %s is the application name
-       second %s is the version number */
-    tr_inf( _( "%s %s started" ), TR_NAME, LONG_VERSION_STRING );
 
     /* initialize the blocklist */
     filename = tr_buildPath( session->configDir, "blocklists", NULL );
@@ -528,15 +525,27 @@ tr_sessionInit( const char  * tag,
     session->isBlocklistEnabled = i; 
     loadBlocklists( session ); 
 
+    session->rpcServer = tr_rpcInit( session, &settings ); 
+
+    tr_bencFree( &settings );
+
+    tr_runInEventThread( session, tr_sessionInitImpl, session );
+    return session;
+}
+static void
+tr_sessionInitImpl( void * vsession )
+{
+    tr_session * session = vsession;
+ 
+    /* first %s is the application name
+       second %s is the version number */
+    tr_inf( _( "%s %s started" ), TR_NAME, LONG_VERSION_STRING );
+
     tr_statsInit( session );
 
     session->web = tr_webInit( session ); 
-    session->rpcServer = tr_rpcInit( session, &settings ); 
 
     metainfoLookupRescan( session );
-
-    tr_bencFree( &settings );
-    return session;
 }
 
 /***
