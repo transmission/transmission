@@ -232,7 +232,6 @@ static void
 libeventThreadFunc( void * veh )
 {
     tr_event_handle * eh = veh;
-
     tr_dbg( "Starting libevent thread" );
 
 #ifndef WIN32
@@ -240,16 +239,18 @@ libeventThreadFunc( void * veh )
     signal( SIGPIPE, SIG_IGN );
 #endif
 
+    eh->base = event_init( );
     eh->session->events = eh;
 
     /* listen to the pipe's read fd */
-    event_set( &eh->pipeEvent, eh->fds[0], EV_READ | EV_PERSIST,
-               readFromPipe,
-               veh );
+    event_set( &eh->pipeEvent, eh->fds[0], EV_READ | EV_PERSIST, readFromPipe, veh );
     event_add( &eh->pipeEvent, NULL );
     event_set_log_callback( logFunc );
+
+    /* loop until all the events are done */
     event_dispatch( );
 
+    /* shut down the thread */
     tr_lockFree( eh->lock );
     event_base_free( eh->base );
     eh->session->events = NULL;
@@ -262,12 +263,17 @@ tr_eventInit( tr_session * session )
 {
     tr_event_handle * eh;
 
+    session->events = NULL;
+
     eh = tr_new0( tr_event_handle, 1 );
     eh->lock = tr_lockNew( );
     pipe( eh->fds );
     eh->session = session;
-    eh->base = event_init( );
     eh->thread = tr_threadNew( libeventThreadFunc, eh );
+
+    /* wait until the libevent thread is running */
+    while( session->events == NULL )
+        tr_wait( 100 );
 }
 
 void

@@ -455,10 +455,8 @@ tr_sessionInit( const char  * tag,
     tr_setConfigDir( session, configDir ); 
 
     tr_netInit( ); /* must go before tr_eventInit */
-
     tr_eventInit( session );
-    while( !session->events )
-        tr_wait( 50 );
+    assert( session->events != NULL );
 
     session->peerMgr = tr_peerMgrNew( session );
 

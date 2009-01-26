@@ -420,7 +420,10 @@ static void
 io_dtor( void * vio )
 {
     tr_peerIo * io = vio;
+
     assert( tr_isPeerIo( io ) );
+    assert( tr_amInEventThread( io->session ) );
+    assert( io->session->events != NULL );
 
     dbgmsg( io, "in tr_peerIo destructor" );
     event_del( &io->event_read );
@@ -844,6 +847,8 @@ tr_peerIoFlush( tr_peerIo  * io, tr_direction dir, size_t limit )
 static void
 event_enable( tr_peerIo * io, short event )
 {
+    assert( tr_amInEventThread( io->session ) );
+    assert( io->session->events != NULL );
     assert( event_initialized( &io->event_read ) );
     assert( event_initialized( &io->event_write ) );
 
@@ -865,6 +870,8 @@ event_enable( tr_peerIo * io, short event )
 static void
 event_disable( struct tr_peerIo * io, short event )
 {
+    assert( tr_amInEventThread( io->session ) );
+    assert( io->session->events != NULL );
     assert( event_initialized( &io->event_read ) );
     assert( event_initialized( &io->event_write ) );
 
@@ -893,6 +900,8 @@ tr_peerIoSetEnabled( tr_peerIo    * io,
 
     assert( tr_isPeerIo( io ) );
     assert( tr_isDirection( dir ) );
+    assert( tr_amInEventThread( io->session ) );
+    assert( io->session->events != NULL );
 
     if( isEnabled )
         event_enable( io, event );
