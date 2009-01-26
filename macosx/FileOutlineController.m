@@ -29,7 +29,7 @@
 #import "FileListNode.h"
 #import "QuickLookController.h"
 
-#define ROW_SMALL_HEIGHT 18.0f
+#define ROW_SMALL_HEIGHT 18.0
 
 typedef enum
 {

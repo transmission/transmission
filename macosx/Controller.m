@@ -347,8 +347,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     if (!history)
     {
         if ((history = [fDefaults arrayForKey: @"History"]))
+        {
             [history retain];
-        [fDefaults removeObjectForKey: @"History"];
+            [fDefaults removeObjectForKey: @"History"];
+        }
     }
     
     if (history)
@@ -1782,59 +1784,59 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 - (void) sortTorrentsIgnoreSelected
 {
     NSString * sortType = [fDefaults stringForKey: @"Sort"];
-    const BOOL asc = ![fDefaults boolForKey: @"SortReverse"];
     
-    NSSortDescriptor * nameDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"name" ascending: asc
-                                            selector: @selector(compareFinder:)] autorelease];
-    
-    NSArray * descriptors = nil;
-    if ([sortType isEqualToString: SORT_NAME])
-        descriptors = [[NSArray alloc] initWithObjects: nameDescriptor, nil];
-    else if ([sortType isEqualToString: SORT_STATE])
+    if (![sortType isEqualToString: SORT_ORDER])
     {
-        NSSortDescriptor * stateDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"stateSortKey" ascending: !asc] autorelease],
-                        * progressDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"progress" ascending: !asc] autorelease],
-                        * ratioDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"ratio" ascending: !asc] autorelease];
+        const BOOL asc = ![fDefaults boolForKey: @"SortReverse"];
         
-        descriptors = [[NSArray alloc] initWithObjects: stateDescriptor, progressDescriptor, ratioDescriptor,
-                                                            nameDescriptor, nil];
-    }
-    else if ([sortType isEqualToString: SORT_PROGRESS])
-    {
-        NSSortDescriptor * progressDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"progress" ascending: asc] autorelease],
-                        * ratioProgressDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"progressStopRatio"
-                                                        ascending: asc] autorelease],
-                        * ratioDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"ratio" ascending: asc] autorelease];
+        NSArray * descriptors;
+        NSSortDescriptor * nameDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"name" ascending: asc
+                                                selector: @selector(compareFinder:)] autorelease];
         
-        descriptors = [[NSArray alloc] initWithObjects: progressDescriptor, ratioProgressDescriptor, ratioDescriptor,
-                                                            nameDescriptor, nil];
-    }
-    else if ([sortType isEqualToString: SORT_TRACKER])
-    {
-        NSSortDescriptor * trackerDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"trackerAddressAnnounce" ascending: asc
-                                                selector: @selector(localizedCaseInsensitiveCompare:)] autorelease];
+        if ([sortType isEqualToString: SORT_STATE])
+        {
+            NSSortDescriptor * stateDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"stateSortKey" ascending: !asc] autorelease],
+                            * progressDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"progress" ascending: !asc] autorelease],
+                            * ratioDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"ratio" ascending: !asc] autorelease];
+            
+            descriptors = [[NSArray alloc] initWithObjects: stateDescriptor, progressDescriptor, ratioDescriptor,
+                                                                nameDescriptor, nil];
+        }
+        else if ([sortType isEqualToString: SORT_PROGRESS])
+        {
+            NSSortDescriptor * progressDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"progress" ascending: asc] autorelease],
+                            * ratioProgressDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"progressStopRatio"
+                                                            ascending: asc] autorelease],
+                            * ratioDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"ratio" ascending: asc] autorelease];
+            
+            descriptors = [[NSArray alloc] initWithObjects: progressDescriptor, ratioProgressDescriptor, ratioDescriptor,
+                                                                nameDescriptor, nil];
+        }
+        else if ([sortType isEqualToString: SORT_TRACKER])
+        {
+            NSSortDescriptor * trackerDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"trackerAddressAnnounce" ascending: asc
+                                                    selector: @selector(localizedCaseInsensitiveCompare:)] autorelease];
+            
+            descriptors = [[NSArray alloc] initWithObjects: trackerDescriptor, nameDescriptor, nil];
+        }
+        else if ([sortType isEqualToString: SORT_ACTIVITY])
+        {
+            NSSortDescriptor * rateDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"totalRate" ascending: !asc] autorelease];
+            NSSortDescriptor * activityDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"dateActivityOrAdd" ascending: !asc]
+                                                        autorelease];
+            
+            descriptors = [[NSArray alloc] initWithObjects: rateDescriptor, activityDescriptor, nameDescriptor, nil];
+        }
+        else if ([sortType isEqualToString: SORT_DATE])
+        {
+            NSSortDescriptor * dateDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"dateAdded" ascending: asc] autorelease];
         
-        descriptors = [[NSArray alloc] initWithObjects: trackerDescriptor, nameDescriptor, nil];
-    }
-    else if ([sortType isEqualToString: SORT_ACTIVITY])
-    {
-        NSSortDescriptor * rateDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"totalRate" ascending: !asc] autorelease];
-        NSSortDescriptor * activityDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"dateActivityOrAdd" ascending: !asc]
-                                                    autorelease];
+            descriptors = [[NSArray alloc] initWithObjects: dateDescriptor, nameDescriptor, nil];
+        }
+        else
+            descriptors = [[NSArray alloc] initWithObjects: nameDescriptor, nil];
         
-        descriptors = [[NSArray alloc] initWithObjects: rateDescriptor, activityDescriptor, nameDescriptor, nil];
-    }
-    else if ([sortType isEqualToString: SORT_DATE])
-    {
-        NSSortDescriptor * dateDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"dateAdded" ascending: asc] autorelease];
-    
-        descriptors = [[NSArray alloc] initWithObjects: dateDescriptor, nameDescriptor, nil];
-    }
-    else; //no need to sort by queue order
-    
-    //actually sort
-    if (descriptors)
-    {
+        //actually sort
         if ([fDefaults boolForKey: @"SortByGroup"])
         {
             for (TorrentGroup * group in fDisplayedTorrents)
@@ -1865,7 +1867,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     NSArray * selectedValues = [fTableView selectedValues];
     
-    NSInteger active = 0, downloading = 0, seeding = 0, paused = 0;
+    NSUInteger active = 0, downloading = 0, seeding = 0, paused = 0;
     NSString * filterType = [fDefaults stringForKey: @"Filter"];
     BOOL filterActive = NO, filterDownload = NO, filterSeed = NO, filterPause = NO, filterStatus = YES;
     if ([filterType isEqualToString: FILTER_ACTIVE])
@@ -1879,12 +1881,12 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     else
         filterStatus = NO;
     
-    NSInteger groupFilterValue = [fDefaults integerForKey: @"FilterGroup"];
-    BOOL filterGroup = groupFilterValue != GROUP_FILTER_ALL_TAG;
+    const NSInteger groupFilterValue = [fDefaults integerForKey: @"FilterGroup"];
+    const BOOL filterGroup = groupFilterValue != GROUP_FILTER_ALL_TAG;
     
     NSString * searchString = [fSearchFilterField stringValue];
-    BOOL filterText = [searchString length] > 0,
-        filterTracker = filterText && [[fDefaults stringForKey: @"FilterSearchType"] isEqualToString: FILTER_TYPE_TRACKER];
+    const BOOL filterText = [searchString length] > 0,
+            filterTracker = filterText && [[fDefaults stringForKey: @"FilterSearchType"] isEqualToString: FILTER_TYPE_TRACKER];
     
     NSMutableArray * allTorrents = [NSMutableArray arrayWithCapacity: [fTorrents count]];
     

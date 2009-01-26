@@ -158,14 +158,13 @@
         NSDictionary * message  = [NSDictionary dictionaryWithObjectsAndKeys:
                                     [NSString stringWithUTF8String: currentMessage->message], @"Message",
                                     [NSDate dateWithTimeIntervalSince1970: currentMessage->when], @"Date",
-                                    [NSNumber numberWithUnsignedInt: fIndex], @"Index", //more accurate when sorting by date
+                                    [NSNumber numberWithUnsignedInt: fIndex++], @"Index", //more accurate when sorting by date
                                     [NSNumber numberWithInt: currentMessage->level], @"Level",
                                     name, @"Name",
                                     [NSString stringWithUTF8String: currentMessage->file], @"File",
                                     [NSNumber numberWithInt: currentMessage->line], @"Line", nil];
                                 
         [fMessages addObject: message];
-        fIndex++;
     }
     
     tr_freeMessageList(messages);
