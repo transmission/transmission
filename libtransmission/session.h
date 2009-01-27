@@ -64,6 +64,7 @@ struct tr_session
     tr_bool                      isProxyEnabled;
     tr_bool                      isProxyAuthEnabled;
     tr_bool                      isClosed;
+    tr_bool                      isWaiting;
     tr_bool                      useLazyBitfield;
 
     tr_bool                      isSpeedLimited[2];

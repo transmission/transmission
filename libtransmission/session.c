@@ -529,7 +529,11 @@ tr_sessionInit( const char  * tag,
 
     tr_bencFree( &settings );
 
+    session->isWaiting = TRUE;
     tr_runInEventThread( session, tr_sessionInitImpl, session );
+    while( session->isWaiting )
+        tr_wait( 100 );
+
     return session;
 }
 static void
@@ -542,10 +546,9 @@ tr_sessionInitImpl( void * vsession )
     tr_inf( _( "%s %s started" ), TR_NAME, LONG_VERSION_STRING );
 
     tr_statsInit( session );
-
     session->web = tr_webInit( session ); 
-
     metainfoLookupRescan( session );
+    session->isWaiting = FALSE;
 }
 
 /***
