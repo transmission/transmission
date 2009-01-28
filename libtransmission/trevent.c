@@ -346,8 +346,8 @@ tr_timerNew( tr_session * session,
 {
     tr_timer * timer;
 
-    assert( session );
-    assert( session->events );
+    assert( session != NULL );
+    assert( session->events != NULL );
 
     timer = tr_new0( tr_timer, 1 );
     tr_timevalMsec( interval_milliseconds, &timer->tv );
@@ -379,8 +379,8 @@ void
 tr_runInEventThread( tr_session * session,
                      void func( void* ), void * user_data )
 {
-    assert( session );
-    assert( session->events );
+    assert( session != NULL );
+    assert( session->events != NULL );
 
     if( tr_amInThread( session->events->thread ) )
     {

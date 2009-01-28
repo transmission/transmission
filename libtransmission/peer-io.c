@@ -346,6 +346,10 @@ tr_peerIoNew( tr_session       * session,
 {
     tr_peerIo * io;
 
+    assert( session != NULL );
+    assert( session->events != NULL );
+    assert( tr_amInEventThread( session ) );
+
     if( socket >= 0 )
         tr_netSetTOS( socket, session->peerSocketTOS );
 
@@ -848,6 +852,7 @@ static void
 event_enable( tr_peerIo * io, short event )
 {
     assert( tr_amInEventThread( io->session ) );
+    assert( io->session != NULL );
     assert( io->session->events != NULL );
     assert( event_initialized( &io->event_read ) );
     assert( event_initialized( &io->event_write ) );
@@ -871,6 +876,7 @@ static void
 event_disable( struct tr_peerIo * io, short event )
 {
     assert( tr_amInEventThread( io->session ) );
+    assert( io->session != NULL );
     assert( io->session->events != NULL );
     assert( event_initialized( &io->event_read ) );
     assert( event_initialized( &io->event_write ) );

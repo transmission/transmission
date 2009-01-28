@@ -246,6 +246,11 @@ static void
 restart_timer( tr_web * g )
 {
     struct timeval interval;
+
+    assert( tr_amInEventThread( g->session ) );
+    assert( g->session != NULL );
+    assert( g->session->events != NULL );
+
     stop_timer( g );
     dbgmsg( "adding a timeout for %ld seconds from now", g->timer_ms/1000L );
     tr_timevalMsec( g->timer_ms, &interval );
@@ -357,6 +362,11 @@ setsock( curl_socket_t            sockfd,
     const int kind = EV_PERSIST
                    | (( action & CURL_POLL_IN ) ? EV_READ : 0 )
                    | (( action & CURL_POLL_OUT ) ? EV_WRITE : 0 );
+
+    assert( tr_amInEventThread( g->session ) );
+    assert( g->session != NULL );
+    assert( g->session->events != NULL );
+
     dbgmsg( "setsock: fd is %d, curl action is %d, libevent action is %d",
             sockfd, action, kind );
     if( f->evset )
