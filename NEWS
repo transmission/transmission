@@ -6,9 +6,11 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + IPv6 support
    + Fix a couple of 1.42 crashes
    + Fix 1.42 error that made tracker announces slower over time
-   + When removing local data only remove data from the torrent
+   + Improved connectivity for encrypted peers
+   + Fix a Mac-centric peer connection bug from 1.41
    + Better performance when sharing with very fast peers
-   + Better handling of non-UTF-8 torrent files
+   + Handle non-UTF-8 torrent files more gracefully
+   + When removing local data only remove data from the torrent
 - GTK+
    + Various HIG and usability changes
 - Daemon
