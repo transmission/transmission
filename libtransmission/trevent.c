@@ -279,6 +279,8 @@ tr_eventInit( tr_session * session )
 void
 tr_eventClose( tr_session * session )
 {
+    assert( tr_isSession( session ) );
+
     session->events->die = TRUE;
     tr_deepLog( __FILE__, __LINE__, NULL, "closing trevent pipe" );
     EVUTIL_CLOSESOCKET( session->events->fds[1] );
@@ -291,7 +293,7 @@ tr_eventClose( tr_session * session )
 tr_bool
 tr_amInEventThread( tr_session * session )
 {
-    assert( session );
+    assert( tr_isSession( session ) );
     assert( session->events );
 
     return tr_amInThread( session->events->thread );
@@ -346,7 +348,7 @@ tr_timerNew( tr_session * session,
 {
     tr_timer * timer;
 
-    assert( session != NULL );
+    assert( tr_isSession( session ) );
     assert( session->events != NULL );
 
     timer = tr_new0( tr_timer, 1 );
@@ -379,7 +381,7 @@ void
 tr_runInEventThread( tr_session * session,
                      void func( void* ), void * user_data )
 {
-    assert( session != NULL );
+    assert( tr_isSession( session ) );
     assert( session->events != NULL );
 
     if( tr_amInThread( session->events->thread ) )
@@ -405,5 +407,7 @@ tr_runInEventThread( tr_session * session,
 struct event_base *
 tr_eventGetBase( tr_session * session )
 {
+    assert( tr_isSession( session ) );
+
     return session->events->base;
 }

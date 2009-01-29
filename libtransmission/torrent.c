@@ -1064,6 +1064,9 @@ checkAndStartImpl( void * vtor )
 static void
 checkAndStartCB( tr_torrent * tor )
 {
+    assert( tor );
+    assert( tr_isSession( tor->session ) );
+
     tr_runInEventThread( tor->session, checkAndStartImpl, tor );
 }
 
