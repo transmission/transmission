@@ -5,6 +5,7 @@
 #include <glib/gprintf.h>
 #include <glib/gi18n.h>
 
+#define CURL_DISABLE_TYPECHECK /* otherwise -Wunreachable-code goes insane */
 #include <curl/curl.h>
 
 #include <libtransmission/transmission.h>

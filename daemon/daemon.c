@@ -66,6 +66,7 @@ static const struct tr_option options[] =
     { 'T', "no-auth", "Don't require authentication", "T", 0, NULL },
     { 'u', "username", "Set username for authentication", "u", 1, "<username>" },
     { 'v', "password", "Set password for authentication", "v", 1, "<password>" },
+    { 'V', "version", "Show version number and exit", "V", 0, NULL },
     { 'w', "download-dir", "Where to save downloaded data", "w", 1, "<path>" },
     { 'P', "peerport", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "P", 1, "<port>" },
     { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", 0, NULL },
@@ -215,6 +216,9 @@ main( int     argc,
                       break;
             case 'g': /* handled above */
                       break;
+	    case 'V': /* version */
+		      fprintf(stderr, "Transmission %s\n", LONG_VERSION_STRING);
+		      exit( 0 );
             case 'p': tr_bencDictAddInt( &settings, TR_PREFS_KEY_RPC_PORT, atoi( optarg ) );
                       break;
             case 't': tr_bencDictAddInt( &settings, TR_PREFS_KEY_RPC_AUTH_REQUIRED, 1 );

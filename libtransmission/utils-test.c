@@ -6,32 +6,39 @@
 #include "utils.h"
 #include "crypto.h"
 
-#define VERBOSE 0
+#undef VERBOSE
 #define NUM_LOOPS 1
 #define SPEED_TEST 0
 
 #if SPEED_TEST
- #undef VERBOSE
- #define VERBOSE 0
+ #define VERBOSE
  #undef NUM_LOOPS
  #define NUM_LOOPS 200
 #endif
 
 static int test = 0;
 
-#define check( A ) \
+#ifdef VERBOSE
+  #define check( A ) \
     { \
         ++test; \
         if( A ){ \
-            if( VERBOSE ) \
-                fprintf( stderr, "PASS test #%d (%s, %d)\n", test, __FILE__,\
-                         __LINE__ );\
+            fprintf( stderr, "PASS test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
         } else { \
-            fprintf( stderr, "FAIL test #%d (%s, %d)\n", test, __FILE__,\
-                     __LINE__ ); \
+            fprintf( stderr, "FAIL test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
             return test; \
         } \
     }
+#else
+  #define check( A ) \
+    { \
+        ++test; \
+        if( !( A ) ){ \
+            fprintf( stderr, "FAIL test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
+            return test; \
+        } \
+    }
+#endif
 
 static int
 test_bitfields( void )
@@ -187,8 +194,7 @@ main( void )
     int   l;
 
     /* base64 */
-    in = "YOYO!";
-    out = tr_base64_encode( in, -1, &len );
+    out = tr_base64_encode( "YOYO!", -1, &len );
     check( out );
     check( !strcmp( out, "WU9ZTyE=\n" ) );
     check( len == 9 );

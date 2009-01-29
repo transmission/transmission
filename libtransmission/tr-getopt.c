@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: tr-getopt.c 7658 2009-01-10 23:09:07Z charles $
+ * $Id: tr-getopt.c 7783 2009-01-23 18:44:15Z charles $
  */
 
 #include <stdio.h>
@@ -25,7 +25,7 @@ int tr_optind = 1;
 static const char*
 getArgName( const tr_option * opt )
 {
-    char * arg;
+    const char * arg;
 
     if( !opt->has_arg )
         arg = "";

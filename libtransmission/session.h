@@ -64,10 +64,12 @@ struct tr_session
     tr_bool                      isProxyEnabled;
     tr_bool                      isProxyAuthEnabled;
     tr_bool                      isClosed;
+    tr_bool                      isWaiting;
     tr_bool                      useLazyBitfield;
 
     tr_bool                      isSpeedLimited[2];
     int                          speedLimit[2];
+    int                          magicNumber;
 
     tr_encryption_mode           encryptionMode;
 
@@ -145,5 +147,15 @@ void         tr_globalLock( tr_session * );
 void         tr_globalUnlock( tr_session * );
 
 tr_bool      tr_globalIsLocked( const tr_session * );
+
+enum
+{
+    SESSION_MAGIC_NUMBER = 3845
+};
+
+static inline tr_bool tr_isSession( const tr_session * session )
+{
+    return ( session != NULL ) && ( session->magicNumber == SESSION_MAGIC_NUMBER );
+}
 
 #endif

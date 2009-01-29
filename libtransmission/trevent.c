@@ -232,7 +232,6 @@ static void
 libeventThreadFunc( void * veh )
 {
     tr_event_handle * eh = veh;
-
     tr_dbg( "Starting libevent thread" );
 
 #ifndef WIN32
@@ -240,16 +239,18 @@ libeventThreadFunc( void * veh )
     signal( SIGPIPE, SIG_IGN );
 #endif
 
+    eh->base = event_init( );
     eh->session->events = eh;
 
     /* listen to the pipe's read fd */
-    event_set( &eh->pipeEvent, eh->fds[0], EV_READ | EV_PERSIST,
-               readFromPipe,
-               veh );
+    event_set( &eh->pipeEvent, eh->fds[0], EV_READ | EV_PERSIST, readFromPipe, veh );
     event_add( &eh->pipeEvent, NULL );
     event_set_log_callback( logFunc );
+
+    /* loop until all the events are done */
     event_dispatch( );
 
+    /* shut down the thread */
     tr_lockFree( eh->lock );
     event_base_free( eh->base );
     eh->session->events = NULL;
@@ -262,17 +263,24 @@ tr_eventInit( tr_session * session )
 {
     tr_event_handle * eh;
 
+    session->events = NULL;
+
     eh = tr_new0( tr_event_handle, 1 );
     eh->lock = tr_lockNew( );
     pipe( eh->fds );
     eh->session = session;
-    eh->base = event_init( );
     eh->thread = tr_threadNew( libeventThreadFunc, eh );
+
+    /* wait until the libevent thread is running */
+    while( session->events == NULL )
+        tr_wait( 100 );
 }
 
 void
 tr_eventClose( tr_session * session )
 {
+    assert( tr_isSession( session ) );
+
     session->events->die = TRUE;
     tr_deepLog( __FILE__, __LINE__, NULL, "closing trevent pipe" );
     EVUTIL_CLOSESOCKET( session->events->fds[1] );
@@ -285,7 +293,7 @@ tr_eventClose( tr_session * session )
 tr_bool
 tr_amInEventThread( tr_session * session )
 {
-    assert( session );
+    assert( tr_isSession( session ) );
     assert( session->events );
 
     return tr_amInThread( session->events->thread );
@@ -340,8 +348,8 @@ tr_timerNew( tr_session * session,
 {
     tr_timer * timer;
 
-    assert( session );
-    assert( session->events );
+    assert( tr_isSession( session ) );
+    assert( session->events != NULL );
 
     timer = tr_new0( tr_timer, 1 );
     tr_timevalMsec( interval_milliseconds, &timer->tv );
@@ -373,8 +381,8 @@ void
 tr_runInEventThread( tr_session * session,
                      void func( void* ), void * user_data )
 {
-    assert( session );
-    assert( session->events );
+    assert( tr_isSession( session ) );
+    assert( session->events != NULL );
 
     if( tr_amInThread( session->events->thread ) )
     {
@@ -399,5 +407,7 @@ tr_runInEventThread( tr_session * session,
 struct event_base *
 tr_eventGetBase( tr_session * session )
 {
+    assert( tr_isSession( session ) );
+
     return session->events->base;
 }

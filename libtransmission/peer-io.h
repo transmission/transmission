@@ -69,6 +69,8 @@ typedef struct tr_peerIo
      * for reading or writing */
     tr_bool               hasFinishedConnecting;
 
+    int                   pendingEvents;
+
     int                   magicNumber;
 
     uint8_t               encryptionMode;
@@ -118,9 +120,17 @@ tr_peerIo*  tr_peerIoNewIncoming( tr_session              * session,
                                   tr_port                   port,
                                   int                       socket );
 
-void tr_peerIoRef               ( tr_peerIo * io );
+void tr_peerIoRefImpl           ( const char              * file,
+                                  int                       line,
+                                  tr_peerIo               * io );
 
-void tr_peerIoUnref             ( tr_peerIo * io );
+#define tr_peerIoRef(io) tr_peerIoRefImpl( __FILE__, __LINE__, (io) );
+
+void tr_peerIoUnrefImpl         ( const char              * file,
+                                  int                       line,
+                                  tr_peerIo               * io );
+
+#define tr_peerIoUnref(io) tr_peerIoUnrefImpl( __FILE__, __LINE__, (io) );
 
 tr_bool     tr_isPeerIo         ( const tr_peerIo         * io );
 
@@ -327,7 +337,7 @@ void      tr_peerIoDrain( tr_peerIo        * io,
 size_t    tr_peerIoGetWriteBufferSpace( const tr_peerIo * io, uint64_t now );
 
 static TR_INLINE void tr_peerIoSetParent( tr_peerIo            * io,
-                                       struct tr_bandwidth  * parent )
+                                          struct tr_bandwidth  * parent )
 {
     assert( tr_isPeerIo( io ) );
 
@@ -340,11 +350,12 @@ void      tr_peerIoBandwidthUsed( tr_peerIo           * io,
                                   int                   isPieceData );
 
 static TR_INLINE tr_bool tr_peerIoHasBandwidthLeft( const tr_peerIo  * io,
-                                                 tr_direction       dir )
+                                                    tr_direction       dir )
 {
     assert( tr_isPeerIo( io ) );
 
-    return tr_bandwidthClamp( &io->bandwidth, dir, 1024 ) > 0;
+    return !io->hasFinishedConnecting
+        || ( tr_bandwidthClamp( &io->bandwidth, dir, 1024 ) > 0 );
 }
 
 static TR_INLINE double tr_peerIoGetPieceSpeed( const tr_peerIo * io, uint64_t now, tr_direction dir )

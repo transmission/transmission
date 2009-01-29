@@ -22,6 +22,8 @@
 #endif 
 
 #include <libevent/event.h>
+
+#define CURL_DISABLE_TYPECHECK /* otherwise -Wunreachable-code goes insane */
 #include <curl/curl.h>
 
 #include <libtransmission/transmission.h>
@@ -36,7 +38,7 @@
 #define DEFAULT_HOST "localhost"
 #define DEFAULT_PORT atoi(TR_DEFAULT_RPC_PORT_STR)
 
-enum { TAG_LIST, TAG_DETAILS, TAG_FILES, TAG_PEERS };
+enum { TAG_SESSION, TAG_LIST, TAG_DETAILS, TAG_FILES, TAG_PEERS };
 
 static const char*
 getUsage( void )
@@ -79,12 +81,14 @@ static tr_option opts[] =
     { 902, "priority-low",         "Set the files' priorities as low", "pl", 1, "<files>" },
     { 'r', "remove",               "Remove the current torrent(s)", "r",  0, NULL },
     { 'R', "remove-and-delete",    "Remove the current torrent(s) and delete local data", NULL, 0, NULL },
+    { 920, "session",              "Print session information", NULL,  0, NULL },
     { 's', "start",                "Start the current torrent(s)", "s",  0, NULL },
     { 'S', "stop",                 "Stop the current torrent(s)", "S",  0, NULL },
     { 't', "torrent",              "Set the current torrent(s)", "t",  1, "<torrent>" },
     { 'u', "uplimit",              "Set the maximum global upload speed in KB/s", "u",  1, "<speed>" },
     { 'U', "no-uplimit",           "Don't limit the global upload speed", "U",  0, NULL },
     { 'v', "verify",               "Verify the current torrent(s)", "v",  0, NULL },
+    { 'V', "version",              "Show version number and exit", "V", 0, NULL },
     { 'w', "download-dir",         "Set the default download folder", "w",  1, "<path>" },
     { 'x', "pex",                  "Enable peer exchange (PEX)", "x",  0, NULL },
     { 'X', "no-pex",               "Disable peer exchange (PEX)", "X",  0, NULL },
@@ -435,6 +439,11 @@ readargs( int           argc,
                 addIdArg( args, id );
                 break;
 
+            case 'V':
+		fprintf(stderr, "Transmission %s\n", LONG_VERSION_STRING);
+		exit(0);
+                break;
+
             case 'w': {
                 char * path = absolutify( optarg );
                 tr_bencDictAddStr( &top, "method", "session-set" );
@@ -492,6 +501,11 @@ readargs( int           argc,
             case 912:
                 tr_bencDictAddStr( &top, "method", "session-set" );
                 tr_bencDictAddStr( args, "encryption", "tolerated" );
+                break;
+
+            case 920:
+                tr_bencDictAddStr( &top, "method", "session-get" );
+                tr_bencDictAddInt( &top, "tag", TAG_SESSION );
                 break;
 
             case TR_OPT_ERR:
@@ -711,6 +725,52 @@ getTrackerDateStr( const time_t t, tr_bool isStopped )
         default: str = ctime( &t ); break;
     }
     return str;
+}
+
+static void
+printSession( tr_benc * top )
+{
+    tr_benc *args;
+    if( ( tr_bencDictFindDict( top, "arguments", &args ) ) )
+    {
+        const char * str;
+        int64_t      i;
+
+        printf( "VERSION\n" );
+        if( tr_bencDictFindStr( args,  "version", &str ) )
+            printf( "  Daemon version: %s\n", str );
+        if( tr_bencDictFindInt( args, "rpc-version", &i ) )
+            printf( "  RPC version: %" PRId64 "\n", i );
+        if( tr_bencDictFindInt( args, "rpc-version-minimum", &i ) )
+            printf( "  RPC minimum version: %" PRId64 "\n", i );
+        printf( "\n" );
+
+        printf( "TRANSFER\n" );
+        if( tr_bencDictFindStr( args,  "download-dir", &str ) )
+            printf( "  Download directory: %s\n", str );
+        if( tr_bencDictFindInt( args, "port", &i ) )
+            printf( "  Listenport: %" PRId64 "\n", i );
+        if( tr_bencDictFindInt( args, "port-forwarding-enabled", &i ) )
+            printf( "  Portforwarding enabled: %s\n", ( i ? "Yes" : "No" ) );
+        if( tr_bencDictFindInt( args, "pex-allowed", &i ) )
+            printf( "  Peer exchange allowed: %s\n", ( i ? "Yes" : "No" ) );
+        if( tr_bencDictFindStr( args,  "encryption", &str ) )
+            printf( "  Encryption: %s\n", str );
+        printf( "\n" );
+
+        printf( "LIMITS\n" );
+        if( tr_bencDictFindInt( args, "peer-limit", &i ) )
+            printf( "  Peer limit: %" PRId64 "\n", i );
+        if( tr_bencDictFindInt( args, "speed-limit-down-enabled", &i ) )
+            printf( "  Downloadlimit enabled: %s\n", ( i ? "Yes" : "No" ) );
+        if( tr_bencDictFindInt( args, "speed-limit-down", &i ) )
+            printf( "  Downloadlimit: %6" PRId64 " KB/sec\n", i );
+        if( tr_bencDictFindInt( args, "speed-limit-up-enabled", &i ) )
+            printf( "  Uploadlimit enabled:   %s\n", ( i ? "Yes" : "No" ) );
+        if( tr_bencDictFindInt( args, "speed-limit-up", &i ) )
+            printf( "  Uploadlimit:   %6" PRId64 " KB/sec\n", i );
+		
+    }
 }
 
 static void
@@ -1086,6 +1146,9 @@ processResponse( const char * host,
 
         switch( tag )
         {
+            case TAG_SESSION:
+                printSession( &top ); break;
+
             case TAG_FILES:
                 printFileList( &top ); break;
 

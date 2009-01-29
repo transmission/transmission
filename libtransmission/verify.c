@@ -34,20 +34,18 @@ struct verify_node
 };
 
 static void
-fireCheckDone( tr_torrent *      torrent,
-               tr_verify_done_cb verify_done_cb )
+fireCheckDone( tr_torrent * tor, tr_verify_done_cb verify_done_cb )
 {
+    assert( tr_isTorrent( tor ) );
+
     if( verify_done_cb )
-        verify_done_cb( torrent );
+        verify_done_cb( tor );
 }
 
 static struct verify_node currentNode;
-
-static tr_list *          verifyList = NULL;
-
-static tr_thread *        verifyThread = NULL;
-
-static int                stopCurrent = FALSE;
+static tr_list * verifyList = NULL;
+static tr_thread * verifyThread = NULL;
+static int stopCurrent = FALSE;
 
 static tr_lock*
 getVerifyLock( void )
@@ -144,12 +142,14 @@ verifyThreadFunc( void * unused UNUSED )
         tr_lockUnlock( getVerifyLock( ) );
 
         tr_torinf( tor, _( "Verifying torrent" ) );
+        assert( tr_isTorrent( tor ) );
         tor->verifyState = TR_VERIFY_NOW;
         buffer = tr_new( uint8_t, tor->info.pieceSize );
         for( i = 0; i < tor->info.fileCount && !stopCurrent; ++i )
             changed |= checkFile( tor, buffer, tor->info.pieceSize, i, &stopCurrent );
         tr_free( buffer );
         tor->verifyState = TR_VERIFY_NONE;
+        assert( tr_isTorrent( tor ) );
 
         if( !stopCurrent )
         {
@@ -168,6 +168,8 @@ tr_verifyAdd( tr_torrent *      tor,
               tr_verify_done_cb verify_done_cb )
 {
     const int uncheckedCount = tr_torrentCountUncheckedPieces( tor );
+
+    assert( tr_isTorrent( tor ) );
 
     if( !uncheckedCount )
     {
@@ -210,6 +212,8 @@ tr_verifyInProgress( const tr_torrent * tor )
     tr_lock * lock = getVerifyLock( );
     tr_lockLock( lock );
 
+    assert( tr_isTorrent( tor ) );
+
     found = ( tor == currentNode.torrent )
          || ( tr_list_find( verifyList, tor, compareVerifyByTorrent ) != NULL );
 
@@ -221,8 +225,9 @@ void
 tr_verifyRemove( tr_torrent * tor )
 {
     tr_lock * lock = getVerifyLock( );
-
     tr_lockLock( lock );
+
+    assert( tr_isTorrent( tor ) );
 
     if( tor == currentNode.torrent )
     {

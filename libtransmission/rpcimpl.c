@@ -510,7 +510,7 @@ torrentGet( tr_session               * session,
     tr_torrent ** torrents = getTorrents( session, args_in, &torrentCount );
     tr_benc *     list = tr_bencDictAddList( args_out, "torrents", torrentCount );
     tr_benc *     fields;
-    char *        msg = NULL;
+    const char *  msg = NULL;
 
     assert( idle_data == NULL );
 
