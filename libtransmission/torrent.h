@@ -133,6 +133,8 @@ struct tr_torrent
 
     struct tr_ratecontrol    swarmSpeed;
 
+    int                      magicNumber;
+
     int                      error;
     char                     errorString[128];
 
@@ -275,6 +277,22 @@ static TR_INLINE tr_bool tr_torrentAllowsPex( const tr_torrent * tor )
 static TR_INLINE tr_bool tr_torrentIsPieceChecked( const tr_torrent  * tor, tr_piece_index_t i )
 {
     return tr_bitfieldHas( &tor->checkedPieces, i );
+}
+
+/***
+****
+***/
+
+enum
+{
+    TORRENT_MAGIC_NUMBER = 95549
+};
+
+static inline tr_bool tr_isTorrent( const tr_torrent * tor )
+{
+    return ( tor != NULL )
+        && ( tor->magicNumber == TORRENT_MAGIC_NUMBER )
+        && ( tr_isSession( tor->session ) );
 }
 
 #endif
