@@ -630,9 +630,7 @@ strlratio( char * buf,
 }
 
 static char*
-strlsize( char *  buf,
-          int64_t size,
-          size_t  buflen )
+strlsize( char *  buf, int64_t size, size_t  buflen )
 {
     if( !size )
         tr_strlcpy( buf, "None", buflen );
@@ -1079,8 +1077,8 @@ printTorrentList( tr_benc * top )
       && ( tr_bencDictFindList( args, "torrents", &list ) ) )
     {
         int i, n;
-        printf( "%-4s  %-4s  %-8s  %-6s  %-6s  %-5s  %-11s  %s\n",
-                "ID", "Done", "ETA", "Up", "Down", "Ratio", "Status",
+        printf( "%-4s  %-4s  %-8s  %-8s  %-6s  %-6s  %-5s  %-11s  %s\n",
+                "ID", "Done", "Have", "ETA", "Up", "Down", "Ratio", "Status",
                 "Name" );
         for( i = 0, n = tr_bencListSize( list ); i < n; ++i )
         {
@@ -1102,16 +1100,19 @@ printTorrentList( tr_benc * top )
                 char etaStr[16];
                 char statusStr[64];
                 char ratioStr[32];
+                char haveStr[32];
+
+                strlsize( haveStr, sizeWhenDone - leftUntilDone, sizeof( haveStr ) );
 
                 if( leftUntilDone )
                     etaToString( etaStr, sizeof( etaStr ), eta );
                 else
                     tr_snprintf( etaStr, sizeof( etaStr ), "Done" );
                 printf(
-                    "%4d  %3d%%  %-8s  %6.1f  %6.1f  %5s  %-11s  %s\n",
+                    "%4d  %3d%%  %-8s  %8s  %6.1f  %6.1f  %5s  %-11s  %s\n",
                     (int)id,
-                    (int)( 100.0 *
-                           ( sizeWhenDone - leftUntilDone ) / sizeWhenDone ),
+                    (int)( 100.0 * ( sizeWhenDone - leftUntilDone ) / sizeWhenDone ),
+                    haveStr,
                     etaStr,
                     up / 1024.0,
                     down / 1024.0,
