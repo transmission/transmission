@@ -737,7 +737,7 @@ webPage( GObject * core )
     g_signal_connect( w, "clicked", G_CALLBACK( onRPCToggled ), page );
     h = gtk_hbox_new( FALSE, GUI_PAD_BIG );
     gtk_box_pack_start( GTK_BOX( h ), w, TRUE, TRUE, 0 );
-    w = gtk_button_new_from_stock( GTK_STOCK_OPEN );
+    w = gtr_button_new_from_stock( GTK_STOCK_OPEN, _( "_Open web interface" ) );
     page->widgets = g_slist_append( page->widgets, w );
     g_signal_connect( w, "clicked", G_CALLBACK( onLaunchClutchCB ), NULL );
     gtk_box_pack_start( GTK_BOX( h ), w, FALSE, FALSE, 0 );
