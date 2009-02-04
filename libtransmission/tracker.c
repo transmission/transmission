@@ -880,6 +880,8 @@ invokeRequest( void * vreq )
     assert( req->reqtype >= 0 );
     assert( req->reqtype < TR_NUM_REQ_TYPES );
 
+    dbgmsg( NULL, "invokeRequest got session %p, tracker %p", req->session, req->session->tracker );
+
     t = findTracker( req->session, req->torrentId );
 
     if( t != NULL )

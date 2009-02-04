@@ -496,6 +496,7 @@ tr_sessionInitImpl( void * vdata )
     tr_setConfigDir( session, data->configDir ); 
 
     tr_trackerSessionInit( session );
+    assert( session->tracker != NULL );
 
     session->peerMgr = tr_peerMgrNew( session );
 
@@ -577,6 +578,7 @@ tr_sessionInitImpl( void * vdata )
     session->web = tr_webInit( session ); 
     metainfoLookupRescan( session );
     session->isWaiting = FALSE;
+    dbgmsg( "returning session %p; session->tracker is %p", session, session->tracker );
 }
 
 /***
