@@ -47,8 +47,7 @@ typedef enum
     TR_PEER_PEER_PROGRESS,
     TR_PEER_ERROR,
     TR_PEER_CANCEL,
-    TR_PEER_UPLOAD_ONLY,
-    TR_PEER_NEED_REQ
+    TR_PEER_UPLOAD_ONLY
 }
 PeerEventType;
 

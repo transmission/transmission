@@ -841,17 +841,14 @@ struct tr_tracker_handle
 
 static int trackerPulse( void * vsession );
 
-static void
-ensureGlobalsExist( tr_session * session )
+void
+tr_trackerSessionInit( tr_session * session )
 {
-    if( session->tracker == NULL )
-    {
-        session->tracker = tr_new0( struct tr_tracker_handle, 1 );
-        session->tracker->pulseTimer =
-            tr_timerNew( session, trackerPulse, session,
-                         PULSE_INTERVAL_MSEC );
-        dbgmsg( NULL, "creating tracker timer" );
-    }
+    assert( tr_isSession( session ) );
+
+    session->tracker = tr_new0( struct tr_tracker_handle, 1 );
+    session->tracker->pulseTimer = tr_timerNew( session, trackerPulse, session, PULSE_INTERVAL_MSEC );
+    dbgmsg( NULL, "creating tracker timer" );
 }
 
 void
@@ -1034,8 +1031,6 @@ tr_trackerNew( const tr_torrent * torrent )
 {
     const tr_info * info = &torrent->info;
     tr_tracker *    t;
-
-    ensureGlobalsExist( torrent->session );
 
     t = tr_new0( tr_tracker, 1 );
     t->publisher                = TR_PUBLISHER_INIT;

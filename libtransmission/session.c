@@ -359,27 +359,65 @@ tr_sessionSaveSettings( tr_session * session, const char * configDir, tr_benc * 
 static void metainfoLookupRescan( tr_session * );
 static void tr_sessionInitImpl( void * );
 
+struct init_data
+{
+    tr_session  * session;
+    const char  * configDir;
+    tr_bool       messageQueuingEnabled;
+    tr_benc     * clientSettings;
+};
+
 tr_session *
 tr_sessionInit( const char  * tag,
                 const char  * configDir,
                 tr_bool       messageQueuingEnabled,
                 tr_benc     * clientSettings )
 {
-    int64_t i;
-    int64_t j;
-    tr_bool found;
-    const char * str;
-    tr_benc settings;
     tr_session * session;
-    char * filename;
+    struct init_data data;
 
     assert( tr_bencIsDict( clientSettings ) );
 
+    /* initialize the bare skeleton of the session object */
     session = tr_new0( tr_session, 1 );
     session->bandwidth = tr_bandwidthNew( session, NULL );
     session->lock = tr_lockNew( );
     session->tag = tr_strdup( tag );
     session->magicNumber = SESSION_MAGIC_NUMBER;
+
+    /* start the libtransmission thread */
+    tr_netInit( ); /* must go before tr_eventInit */
+    tr_eventInit( session );
+    assert( session->events != NULL );
+
+    /* run the rest in the libtransmission thread */
+    session->isWaiting = TRUE;
+    data.session = session;
+    data.configDir = configDir;
+    data.messageQueuingEnabled = messageQueuingEnabled;
+    data.clientSettings = clientSettings;
+    tr_runInEventThread( session, tr_sessionInitImpl, &data );
+    while( session->isWaiting )
+        tr_wait( 100 );
+
+    return session;
+}
+
+static void
+tr_sessionInitImpl( void * vdata )
+{
+    int64_t i;
+    int64_t j;
+    tr_bool found;
+    const char * str;
+    tr_benc settings;
+    char * filename;
+    struct init_data * data = vdata;
+    tr_benc * clientSettings = data->clientSettings;
+    tr_session * session = data->session;
+
+    assert( tr_amInEventThread( session ) );
+    assert( tr_bencIsDict( clientSettings ) );
 
     dbgmsg( "tr_sessionInit: the session's top-level bandwidth object is %p", session->bandwidth );
 
@@ -399,7 +437,7 @@ tr_sessionInit( const char  * tag,
     found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_MSGLEVEL, &i ); 
     assert( found ); 
     tr_setMessageLevel( i ); 
-    tr_setMessageQueuing( messageQueuingEnabled ); 
+    tr_setMessageQueuing( data->messageQueuingEnabled ); 
  
  
     found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_PEX_ENABLED, &i ); 
@@ -455,11 +493,9 @@ tr_sessionInit( const char  * tag,
     session->so_sndbuf = 1500 * 3; /* 3x MTU for most ethernet/wireless */ 
     session->so_rcvbuf = 8192; 
  
-    tr_setConfigDir( session, configDir ); 
+    tr_setConfigDir( session, data->configDir ); 
 
-    tr_netInit( ); /* must go before tr_eventInit */
-    tr_eventInit( session );
-    assert( session->events != NULL );
+    tr_trackerSessionInit( session );
 
     session->peerMgr = tr_peerMgrNew( session );
 
@@ -530,18 +566,6 @@ tr_sessionInit( const char  * tag,
     session->rpcServer = tr_rpcInit( session, &settings ); 
 
     tr_bencFree( &settings );
-
-    session->isWaiting = TRUE;
-    tr_runInEventThread( session, tr_sessionInitImpl, session );
-    while( session->isWaiting )
-        tr_wait( 100 );
-
-    return session;
-}
-static void
-tr_sessionInitImpl( void * vsession )
-{
-    tr_session * session = vsession;
 
     assert( tr_isSession( session ) );
  

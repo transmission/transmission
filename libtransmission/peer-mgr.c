@@ -1,4 +1,3 @@
-
 /*
  * This file Copyright (C) 2007-2009 Charles Kerr <charles@transmissionbt.com>
  *
@@ -47,19 +46,19 @@ enum
     RECHOKE_PERIOD_MSEC = ( 10 * 1000 ),
 
     /* minimum interval for refilling peers' request lists */
-    REFILL_PERIOD_MSEC = 333,
+    REFILL_PERIOD_MSEC = 400,
+   
+    /* how frequently to reallocate bandwidth */
+    BANDWIDTH_PERIOD_MSEC = 500,
+
+    /* how frequently to decide which peers live and die */
+    RECONNECT_PERIOD_MSEC = 500,
 
     /* when many peers are available, keep idle ones this long */
     MIN_UPLOAD_IDLE_SECS = ( 30 ),
 
     /* when few peers are available, keep idle ones this long */
     MAX_UPLOAD_IDLE_SECS = ( 60 * 5 ),
-
-    /* how frequently to decide which peers live and die */
-    RECONNECT_PERIOD_MSEC = ( 2 * 1000 ),
-   
-    /* how frequently to reallocate bandwidth */
-    BANDWIDTH_PERIOD_MSEC = 500,
 
     /* max # of peers to ask fer per torrent per reconnect pulse */
     MAX_RECONNECTIONS_PER_PULSE = 16,
@@ -74,6 +73,7 @@ enum
     /* use for bitwise operations w/peer_atom.myflags */
     MYFLAG_BANNED = 1,
 
+    /* use for bitwise operations w/peer_atom.myflags */
     /* unreachable for now... but not banned.
      * if they try to connect to us it's okay */
     MYFLAG_UNREACHABLE = 2,
@@ -126,9 +126,6 @@ typedef struct tr_torrent_peers
     tr_ptrArray     pool; /* struct peer_atom */
     tr_ptrArray     peers; /* tr_peer */
     tr_ptrArray     webseeds; /* tr_webseed */
-    tr_timer *      reconnectTimer;
-    tr_timer *      rechokeTimer;
-    tr_timer *      refillTimer;
     tr_torrent *    tor;
     tr_peer *       optimistic; /* the optimistic peer, or NULL if none */
 
@@ -141,6 +138,9 @@ struct tr_peerMgr
     tr_session      * session;
     tr_ptrArray       incomingHandshakes; /* tr_handshake */
     tr_timer        * bandwidthTimer;
+    tr_timer        * rechokeTimer;
+    tr_timer        * refillTimer;
+    tr_timer        * reconnectTimer;
 };
 
 #define tordbg( t, ... ) \
@@ -380,10 +380,6 @@ torrentDestructor( void * vt )
 
     memcpy( hash, t->hash, SHA_DIGEST_LENGTH );
 
-    tr_timerFree( &t->reconnectTimer );
-    tr_timerFree( &t->rechokeTimer );
-    tr_timerFree( &t->refillTimer );
-
     tr_ptrArrayDestruct( &t->webseeds, (PtrArrayForeachFunc)tr_webseedFree );
     tr_ptrArrayDestruct( &t->pool, (PtrArrayForeachFunc)tr_free );
     tr_ptrArrayDestruct( &t->outgoingHandshakes, NULL );
@@ -424,8 +420,10 @@ torrentConstructor( tr_peerMgr * manager,
 }
 
 
-static int bandwidthPulse( void * vmgr );
-
+static int bandwidthPulse ( void * vmgr );
+static int rechokePulse   ( void * vmgr );
+static int refillPulse    ( void * vmgr );
+static int reconnectPulse ( void * vmgr );
 
 tr_peerMgr*
 tr_peerMgrNew( tr_session * session )
@@ -435,6 +433,12 @@ tr_peerMgrNew( tr_session * session )
     m->session = session;
     m->incomingHandshakes = TR_PTR_ARRAY_INIT;
     m->bandwidthTimer = tr_timerNew( session, bandwidthPulse, m, BANDWIDTH_PERIOD_MSEC );
+    m->rechokeTimer   = tr_timerNew( session, rechokePulse,   m, RECHOKE_PERIOD_MSEC );
+    m->refillTimer    = tr_timerNew( session, refillPulse,    m, REFILL_PERIOD_MSEC );
+    m->reconnectTimer = tr_timerNew( session, reconnectPulse, m, RECONNECT_PERIOD_MSEC );
+
+    rechokePulse( m );
+
     return m;
 }
 
@@ -443,6 +447,9 @@ tr_peerMgrFree( tr_peerMgr * manager )
 {
     managerLock( manager );
 
+    tr_timerFree( &manager->reconnectTimer );
+    tr_timerFree( &manager->refillTimer );
+    tr_timerFree( &manager->rechokeTimer );
     tr_timerFree( &manager->bandwidthTimer );
 
     /* free the handshakes.  Abort invokes handshakeDoneCB(), which removes
@@ -727,8 +734,8 @@ getBlockOffsetInPiece( const tr_torrent * tor, uint64_t b )
     return (uint32_t)( blockPos - piecePos );
 }
 
-static int
-refillPulse( void * vtorrent )
+static void
+refillTorrent( Torrent * t )
 {
     tr_block_index_t block;
     int peerCount;
@@ -736,15 +743,13 @@ refillPulse( void * vtorrent )
     tr_peer ** peers;
     tr_webseed ** webseeds;
     struct tr_blockIterator * blockIterator;
-    Torrent * t = vtorrent;
     tr_torrent * tor = t->tor;
 
     if( !t->isRunning )
-        return TRUE;
+        return;
     if( tr_torrentIsSeed( t->tor ) )
-        return TRUE;
+        return;
 
-    torrentLock( t );
     tordbg( t, "Refilling Request Buffers..." );
 
     blockIterator = blockIteratorNew( t );
@@ -816,10 +821,21 @@ refillPulse( void * vtorrent )
     blockIteratorFree( blockIterator );
     tr_free( webseeds );
     tr_free( peers );
+}
 
-    t->refillTimer = NULL;
-    torrentUnlock( t );
-    return FALSE;
+static int
+refillPulse( void * vmgr )
+{
+    tr_torrent * tor = NULL;
+    tr_peerMgr * mgr = vmgr;
+    managerLock( mgr );
+
+    while(( tor = tr_torrentNext( mgr->session, tor )))
+        if( tor->isRunning && !tr_torrentIsSeed( tor ) )
+            refillTorrent( tor->torrentPeers );
+
+    managerUnlock( mgr );
+    return TRUE;
 }
 
 static void
@@ -866,15 +882,6 @@ gotBadPiece( Torrent *        t,
 
     tor->corruptCur += byteCount;
     tor->downloadedCur -= MIN( tor->downloadedCur, byteCount );
-}
-
-static void
-refillSoon( Torrent * t )
-{
-    if( t->refillTimer == NULL )
-        t->refillTimer = tr_timerNew( t->manager->session,
-                                      refillPulse, t,
-                                      REFILL_PERIOD_MSEC );
 }
 
 static void
@@ -942,10 +949,6 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
                 struct peer_atom * a = getExistingAtom( t, &peer->addr );
                 a->uploadOnly = e->uploadOnly ? UPLOAD_ONLY_YES : UPLOAD_ONLY_NO;
             }
-            break;
-
-        case TR_PEER_NEED_REQ:
-            refillSoon( t );
             break;
 
         case TR_PEER_CANCEL:
@@ -1506,42 +1509,10 @@ tr_peerMgrGetPeers( tr_torrent      * tor,
     return peersReturning;
 }
 
-static int reconnectPulse( void * vtorrent );
-
-static int rechokePulse( void * vtorrent );
-
 void
 tr_peerMgrStartTorrent( tr_torrent * tor )
 {
-    Torrent * t = tor->torrentPeers;
-
-    managerLock( t->manager );
-
-    assert( t );
-    assert( ( t->isRunning != 0 ) == ( t->reconnectTimer != NULL ) );
-    assert( ( t->isRunning != 0 ) == ( t->rechokeTimer != NULL ) );
-
-    if( !t->isRunning )
-    {
-        t->isRunning = 1;
-
-        t->reconnectTimer = tr_timerNew( t->manager->session,
-                                         reconnectPulse, t,
-                                         RECONNECT_PERIOD_MSEC );
-
-        t->rechokeTimer = tr_timerNew( t->manager->session,
-                                       rechokePulse, t,
-                                       RECHOKE_PERIOD_MSEC );
-
-        reconnectPulse( t );
-
-        rechokePulse( t );
-
-        if( !tr_ptrArrayEmpty( &t->webseeds ) )
-            refillSoon( t );
-    }
-
-    managerUnlock( t->manager );
+    tor->torrentPeers->isRunning = TRUE;
 }
 
 static void
@@ -1549,9 +1520,7 @@ stopTorrent( Torrent * t )
 {
     assert( torrentIsLocked( t ) );
 
-    t->isRunning = 0;
-    tr_timerFree( &t->rechokeTimer );
-    tr_timerFree( &t->reconnectTimer );
+    t->isRunning = FALSE;
 
     /* disconnect the peers. */
     tr_ptrArrayForeach( &t->peers, (PtrArrayForeachFunc)peerDestructor );
@@ -1867,7 +1836,7 @@ isSame( const tr_peer * peer )
 **/
 
 static void
-rechoke( Torrent * t )
+rechokeTorrent( Torrent * t )
 {
     int i, size, unchokedInterested;
     const int peerCount = tr_ptrArraySize( &t->peers );
@@ -1967,13 +1936,17 @@ rechoke( Torrent * t )
 }
 
 static int
-rechokePulse( void * vtorrent )
+rechokePulse( void * vmgr )
 {
-    Torrent * t = vtorrent;
+    tr_torrent * tor = NULL;
+    tr_peerMgr * mgr = vmgr;
+    managerLock( mgr );
 
-    torrentLock( t );
-    rechoke( t );
-    torrentUnlock( t );
+    while(( tor = tr_torrentNext( mgr->session, tor )))
+        if( tor->isRunning )
+            rechokeTorrent( tor->torrentPeers );
+
+    managerUnlock( mgr );
     return TRUE;
 }
 
@@ -2215,15 +2188,12 @@ closePeer( Torrent * t, tr_peer * peer )
     removePeer( t, peer );
 }
 
-static int
-reconnectPulse( void * vtorrent )
+static void
+reconnectTorrent( Torrent * t )
 {
-    Torrent *     t = vtorrent;
     static time_t prevTime = 0;
     static int    newConnectionsThisSecond = 0;
     time_t        now;
-
-    torrentLock( t );
 
     now = time( NULL );
     if( prevTime != now )
@@ -2326,8 +2296,20 @@ reconnectPulse( void * vtorrent )
         tr_free( mustClose );
         tr_free( canClose );
     }
+}
 
-    torrentUnlock( t );
+static int
+reconnectPulse( void * vmgr )
+{
+    tr_torrent * tor = NULL;
+    tr_peerMgr * mgr = vmgr;
+    managerLock( mgr );
+
+    while(( tor = tr_torrentNext( mgr->session, tor )))
+        if( tor->isRunning )
+            reconnectTorrent( tor->torrentPeers );
+
+    managerUnlock( mgr );
     return TRUE;
 }
 
