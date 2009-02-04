@@ -720,7 +720,8 @@ enum
     TR_REQ_STOPPED,
     TR_REQ_PAUSED,     /* BEP 21 */
     TR_REQ_REANNOUNCE,
-    TR_REQ_SCRAPE
+    TR_REQ_SCRAPE,
+    TR_NUM_REQ_TYPES
 };
 
 struct tr_tracker_request
@@ -871,9 +872,17 @@ static void
 invokeRequest( void * vreq )
 {
     struct tr_tracker_request * req = vreq;
-    tr_tracker * t = findTracker( req->session, req->torrentId );
+    tr_tracker * t;
 
-    if( t )
+    assert( req != NULL );
+    assert( tr_isSession( req->session ) );
+    assert( req->torrentId >= 0 );
+    assert( req->reqtype >= 0 );
+    assert( req->reqtype < TR_NUM_REQ_TYPES );
+
+    t = findTracker( req->session, req->torrentId );
+
+    if( t != NULL )
     {
         const time_t now = time( NULL );
 
@@ -890,6 +899,7 @@ invokeRequest( void * vreq )
         }
     }
 
+    assert( req->session->tracker != NULL );
     ++req->session->tracker->runningCount;
 
     tr_webRun( req->session,
@@ -904,7 +914,10 @@ static void
 enqueueScrape( tr_session * session,
                tr_tracker * tracker )
 {
-    struct tr_tracker_request * req = createScrape( session, tracker );
+    struct tr_tracker_request * req;
+    assert( tr_isSession( session ) );
+
+    req = createScrape( session, tracker );
     tr_runInEventThread( session, invokeRequest, req );
 }
 
@@ -913,7 +926,10 @@ enqueueRequest( tr_session * session,
                 tr_tracker * tracker,
                 int          reqtype )
 {
-    struct tr_tracker_request * req = createRequest( session, tracker, reqtype );
+    struct tr_tracker_request * req;
+    assert( tr_isSession( session ) );
+
+    req = createRequest( session, tracker, reqtype );
     tr_runInEventThread( session, invokeRequest, req );
 }
 
