@@ -836,6 +836,7 @@ createScrape( tr_session * session,
 
 struct tr_tracker_handle
 {
+    tr_bool     shutdownHint;
     int         runningCount;
     tr_timer *  pulseTimer;
 };
@@ -854,6 +855,14 @@ tr_trackerSessionInit( tr_session * session )
 
 void
 tr_trackerSessionClose( tr_session * session )
+{
+    assert( tr_isSession( session ) );
+
+    session->tracker->shutdownHint = TRUE;
+}
+
+static void
+tr_trackerSessionDestroy( tr_session * session )
 {
     if( session && session->tracker )
     {
@@ -943,7 +952,7 @@ trackerPulse( void * vsession )
     tr_torrent *               tor;
     const time_t               now = time( NULL );
 
-    if( !session->tracker )
+    if( !th )
         return FALSE;
 
     if( th->runningCount )
@@ -978,17 +987,16 @@ trackerPulse( void * vsession )
                 th->runningCount );
 
     /* free the tracker manager if no torrents are left */
-    if( ( session->tracker )
-      && ( session->tracker->runningCount < 1 )
-      && ( tr_sessionCountTorrents( session ) == 0 ) )
+    if(    ( th != NULL )
+        && ( th->shutdownHint != FALSE )
+        && ( th->runningCount < 1 )
+        && ( tr_sessionCountTorrents( session ) == 0 ) )
     {
-        tr_trackerSessionClose( session );
+        tr_trackerSessionDestroy( session );
+        return FALSE;
     }
 
-    /* if there are still running torrents (as indicated by
-     * the existence of the tracker manager) then keep the
-     * trackerPulse() timer alive */
-    return session->tracker != NULL;
+    return TRUE;
 }
 
 static void
