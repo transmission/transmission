@@ -158,11 +158,12 @@ addTask( void * vtask )
         else
 #endif
         {
-            const CURLMcode rc = curl_multi_add_handle( web->multi, easy );
-            if( rc == CURLM_OK )
+            const CURLMcode mcode = curl_multi_add_handle( web->multi, easy );
+            tr_assert( mcode == CURLM_OK, "curl_multi_add_handle() failed: %d (%s)", mcode, curl_multi_strerror( mcode ) );
+            if( mcode == CURLM_OK )
                 ++web->still_running;
             else
-                tr_err( "%s", curl_multi_strerror( rc ) );
+                tr_err( "%s", curl_multi_strerror( mcode ) );
         }
     }
 }
@@ -220,9 +221,14 @@ remove_finished_tasks( tr_web * g )
         if( easy ) {
             long code;
             struct tr_web_task * task;
-            curl_easy_getinfo( easy, CURLINFO_PRIVATE, (void*)&task );
-            curl_easy_getinfo( easy, CURLINFO_RESPONSE_CODE, &code );
-            curl_multi_remove_handle( g->multi, easy );
+            CURLcode ecode;
+            CURLMcode mcode;
+            ecode = curl_easy_getinfo( easy, CURLINFO_PRIVATE, (void*)&task );
+            tr_assert( ecode == CURLE_OK, "curl_easy_getinfo() failed: %d (%s)", ecode, curl_easy_strerror( ecode ) );
+            ecode = curl_easy_getinfo( easy, CURLINFO_RESPONSE_CODE, &code );
+            tr_assert( ecode == CURLE_OK, "curl_easy_getinfo() failed: %d (%s)", ecode, curl_easy_strerror( ecode ) );
+            mcode = curl_multi_remove_handle( g->multi, easy );
+            tr_assert( mcode == CURLM_OK, "curl_multi_socket_action() failed: %d (%s)", mcode, curl_multi_strerror( mcode ) );
             curl_easy_cleanup( easy );
             task_finish( task, code );
         }
@@ -283,8 +289,15 @@ add_tasks_from_queue( tr_web * g )
 static void
 web_close( tr_web * g )
 {
+    CURLMcode mcode;
+
     stop_timer( g );
-    curl_multi_cleanup( g->multi );
+
+    mcode = curl_multi_cleanup( g->multi );
+    tr_assert( mcode == CURLM_OK, "curl_multi_cleanup() failed: %d (%s)", mcode, curl_multi_strerror( mcode ) );
+    if( mcode != CURLM_OK )
+        tr_err( "%s", curl_multi_strerror( mcode ) );
+
     tr_free( g );
 }
 
@@ -295,19 +308,19 @@ static void
 tr_multi_socket_action( tr_web * g, int fd )
 {
     int closed = FALSE;
-    CURLMcode rc;
+    CURLMcode mcode;
 
     dbgmsg( "check_run_count: prev_running %d, still_running %d",
             g->prev_running, g->still_running );
 
     /* invoke libcurl's processing */
     do {
-        rc = curl_multi_socket_action( g->multi, fd, 0, &g->still_running );
-        dbgmsg( "event_cb(): fd %d, still_running is %d",
-                fd, g->still_running );
-    } while( rc == CURLM_CALL_MULTI_PERFORM );
-    if( rc != CURLM_OK )
-        tr_err( "%s", curl_multi_strerror( rc ) );
+        mcode = curl_multi_socket_action( g->multi, fd, 0, &g->still_running );
+        dbgmsg( "event_cb(): fd %d, still_running is %d", fd, g->still_running );
+    } while( mcode == CURLM_CALL_MULTI_PERFORM );
+    tr_assert( mcode == CURLM_OK, "curl_multi_socket_action() failed: %d (%s)", mcode, curl_multi_strerror( mcode ) );
+    if( mcode != CURLM_OK )
+        tr_err( "%s", curl_multi_strerror( mcode ) );
 
     remove_finished_tasks( g );
 
@@ -381,10 +394,17 @@ addsock( curl_socket_t    sockfd,
          int              action,
          struct tr_web  * g )
 {
-    struct tr_web_sockinfo * f = tr_new0( struct tr_web_sockinfo, 1 );
+    CURLMcode mcode;
+    struct tr_web_sockinfo * f;
+
+    f = tr_new0( struct tr_web_sockinfo, 1 );
     dbgmsg( "creating a sockinfo %p for fd %d", f, sockfd );
     setsock( sockfd, action, g, f );
-    curl_multi_assign( g->multi, sockfd, f );
+
+    mcode = curl_multi_assign( g->multi, sockfd, f );
+    tr_assert( mcode == CURLM_OK, "curl_multi_assign() failed: %d (%s)", mcode, curl_multi_strerror( mcode ) );
+    if( mcode != CURLM_OK )
+        tr_err( "%s", curl_multi_strerror( mcode ) );
 }
 
 /* CURLMOPT_SOCKETFUNCTION */
@@ -461,6 +481,7 @@ tr_webRun( tr_session         * session,
 tr_web*
 tr_webInit( tr_session * session )
 {
+    CURLMcode mcode;
     static int curlInited = FALSE;
     tr_web * web;
 
@@ -479,10 +500,14 @@ tr_webInit( tr_session * session )
     web->timer_ms = DEFAULT_TIMER_MSEC; /* overwritten by multi_timer_cb() */
 
     evtimer_set( &web->timer_event, timer_cb, web );
-    curl_multi_setopt( web->multi, CURLMOPT_SOCKETDATA, web );
-    curl_multi_setopt( web->multi, CURLMOPT_SOCKETFUNCTION, sock_cb );
-    curl_multi_setopt( web->multi, CURLMOPT_TIMERDATA, web );
-    curl_multi_setopt( web->multi, CURLMOPT_TIMERFUNCTION, multi_timer_cb );
+    mcode = curl_multi_setopt( web->multi, CURLMOPT_SOCKETDATA, web );
+    tr_assert( mcode == CURLM_OK, "curl_mutli_setopt() failed: %d (%s)", mcode, curl_multi_strerror( mcode ) );
+    mcode = curl_multi_setopt( web->multi, CURLMOPT_SOCKETFUNCTION, sock_cb );
+    tr_assert( mcode == CURLM_OK, "curl_mutli_setopt() failed: %d (%s)", mcode, curl_multi_strerror( mcode ) );
+    mcode = curl_multi_setopt( web->multi, CURLMOPT_TIMERDATA, web );
+    tr_assert( mcode == CURLM_OK, "curl_mutli_setopt() failed: %d (%s)", mcode, curl_multi_strerror( mcode ) );
+    mcode = curl_multi_setopt( web->multi, CURLMOPT_TIMERFUNCTION, multi_timer_cb );
+    tr_assert( mcode == CURLM_OK, "curl_mutli_setopt() failed: %d (%s)", mcode, curl_multi_strerror( mcode ) );
 
     return web;
 }
