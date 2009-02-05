@@ -1000,14 +1000,10 @@ tr_torrentSetHasPiece( tr_torrent *     tor,
     assert( tr_isTorrent( tor ) );
     assert( pieceIndex < tor->info.pieceCount );
 
-    tr_torrentLock( tor );
-
     if( has )
         tr_cpPieceAdd( &tor->completion, pieceIndex );
     else
         tr_cpPieceRem( &tor->completion, pieceIndex );
-
-    tr_torrentUnlock( tor );
 }
 
 /***
