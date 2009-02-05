@@ -318,7 +318,7 @@ tr_multi_socket_action( tr_web * g, int fd )
         mcode = curl_multi_socket_action( g->multi, fd, 0, &g->still_running );
         dbgmsg( "event_cb(): fd %d, still_running is %d", fd, g->still_running );
     } while( mcode == CURLM_CALL_MULTI_PERFORM );
-    tr_assert( mcode == CURLM_OK, "curl_multi_socket_action() failed: %d (%s)", mcode, curl_multi_strerror( mcode ) );
+    tr_assert( mcode == CURLM_OK, "curl_multi_socket_action() failed on fd %d: %d (%s)", fd, mcode, curl_multi_strerror( mcode ) );
     if( mcode != CURLM_OK )
         tr_err( "%s", curl_multi_strerror( mcode ) );
 
