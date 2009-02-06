@@ -263,15 +263,25 @@ remove_finished_tasks( tr_web * g )
 
         if( easy ) {
             long code;
+            long fd;
             struct tr_web_task * task;
             CURLcode ecode;
             CURLMcode mcode;
+
             ecode = curl_easy_getinfo( easy, CURLINFO_PRIVATE, (void*)&task );
             tr_assert( ecode == CURLE_OK, "curl_easy_getinfo() failed: %d (%s)", ecode, curl_easy_strerror( ecode ) );
+
             ecode = curl_easy_getinfo( easy, CURLINFO_RESPONSE_CODE, &code );
             tr_assert( ecode == CURLE_OK, "curl_easy_getinfo() failed: %d (%s)", ecode, curl_easy_strerror( ecode ) );
+
+            ecode = curl_easy_getinfo( easy, CURLINFO_LASTSOCKET, &fd );
+            tr_assert( ecode == CURLE_OK, "curl_easy_getinfo() failed: %d (%s)", ecode, curl_easy_strerror( ecode ) );
+            if( fd != -1L )
+                purgeSockinfo( g, fd );
+
             mcode = curl_multi_remove_handle( g->multi, easy );
             tr_assert( mcode == CURLM_OK, "curl_multi_socket_action() failed: %d (%s)", mcode, curl_multi_strerror( mcode ) );
+
             curl_easy_cleanup( easy );
             task_finish( task, code );
         }
