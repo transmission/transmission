@@ -661,7 +661,7 @@ onScrapeResponse( tr_session * session,
                     t->scrapeIntervalSec = DEFAULT_SCRAPE_INTERVAL_SEC;
 
                 tr_ndbg( t->name,
-                         "Scrape successful.  Rescraping in %d seconds.",
+                         "Scrape successful. Rescraping in %d seconds.",
                          t->scrapeIntervalSec );
 
                 success = TRUE;
@@ -685,16 +685,16 @@ onScrapeResponse( tr_session * session,
     if( 200 <= responseCode && responseCode <= 299 )
     {
         const int interval = t->scrapeIntervalSec + t->randOffset;
-        dbgmsg( t->name, "request succeeded. rescraping in %d seconds",
+        dbgmsg( t->name, "Request succeeded. Rescraping in %d seconds",
                 interval );
-        tr_ndbg( t->name, "request succeeded. rescraping in %d seconds",
+        tr_ndbg( t->name, "Request succeeded. Rescraping in %d seconds",
                  interval );
         t->scrapeAt = time( NULL ) + interval;
     }
     else if( 300 <= responseCode && responseCode <= 399 )
     {
         const int interval = 5;
-        dbgmsg( t->name, "got a redirect. retrying in %d seconds", interval );
+        dbgmsg( t->name, "Got a redirect. Retrying in %d seconds", interval );
         t->scrapeAt = time( NULL ) + interval;
     }
     else
@@ -702,7 +702,7 @@ onScrapeResponse( tr_session * session,
         const int interval = t->retryScrapeIntervalSec + t->randOffset;
         dbgmsg(
             t->name,
-            "Tracker responded to scrape with %ld.  Retrying in %d seconds.",
+            "Tracker responded to scrape with %ld. Retrying in %d seconds.",
             responseCode,  interval );
         t->retryScrapeIntervalSec *= 2;
         t->scrapeAt = time( NULL ) + interval;
