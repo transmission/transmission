@@ -242,33 +242,22 @@ tr_compareAddresses( const tr_address * a, const tr_address * b)
     return memcmp( &a->addr, &b->addr, addrlen );
 } 
 
-tr_net_af_support
-tr_net_getAFSupport( tr_port port )
+tr_bool
+tr_net_hasIPv6( tr_port port )
 {
-    /* Do we care if an address is in use? Probably not, since it will be
-     * caught later. This will only set up the list of sockets to bind. */
-    static tr_bool alreadyDone       = FALSE;
-    static tr_net_af_support support = { FALSE, FALSE };
-    int s4, s6;
+    static tr_bool alreadyDone = FALSE;
+    static tr_bool result      = FALSE;
+    int s;
     if( alreadyDone )
-        return support;
-    s6 = tr_netBindTCP( &tr_in6addr_any, port, TRUE );
-    if( s6 >= 0 || -s6 != EAFNOSUPPORT ) /* we support ipv6 */
+        return result;
+    s = tr_netBindTCP( &tr_in6addr_any, port, TRUE );
+    if( s >= 0 || -s != EAFNOSUPPORT ) /* we support ipv6 */
     {
-        listen( s6, 1 );
-        support.has_inet6 = TRUE;
+        result = TRUE;
+        tr_netClose( s );
     }
-    s4 = tr_netBindTCP( &tr_inaddr_any, port, TRUE );
-    if( s4 >= 0 ) /* we bound *with* the ipv6 socket bound (need both)
-                   * or only have ipv4 */
-    {
-        tr_netClose( s4 );
-        support.needs_inet4 = TRUE;
-    }
-    if( s6 >= 0 )
-        tr_netClose( s6 );
     alreadyDone = TRUE;
-    return support;
+    return result;
 }
 
 /***********************************************************************
@@ -537,9 +526,10 @@ tr_netBindTCP( const tr_address * addr, tr_port port, tr_bool suppressMsgs )
     struct sockaddr_storage sock;
     const int               type = SOCK_STREAM;
     int                     addrlen;
+    int                     retval;
 
-#if defined( SO_REUSEADDR ) || defined( SO_REUSEPORT )
-    int                optval;
+#if defined( SO_REUSEADDR ) || defined( SO_REUSEPORT ) || defined( IPV6_V6ONLY )
+    int                optval = 1;
 #endif
 
     assert( tr_isAddress( addr ) );
@@ -549,8 +539,16 @@ tr_netBindTCP( const tr_address * addr, tr_port port, tr_bool suppressMsgs )
         return s;
 
 #ifdef SO_REUSEADDR
-    optval = 1;
     setsockopt( s, SOL_SOCKET, SO_REUSEADDR, (char*)&optval, sizeof( optval ) );
+#endif
+
+#ifdef IPV6_V6ONLY
+    if( retval = setsockopt( s, IPPROTO_IPV6, IPV6_V6ONLY, &optval,
+                sizeof( optval ) ) == -1 ) {
+        /* the kernel may not support this. if not, ignore it */
+        if( errno != ENOPROTOOPT )
+            return -errno;
+    }
 #endif
 
     addrlen = setup_sockaddr( addr, htons( port ), &sock );

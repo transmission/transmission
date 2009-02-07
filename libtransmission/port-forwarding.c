@@ -224,17 +224,15 @@ sharedPulse( void * vshared )
 static tr_socketList *
 setupBindSockets( tr_port port )
 {
-    tr_net_af_support support = tr_net_getAFSupport( port );
+    tr_bool hasIPv6 = tr_net_hasIPv6( port );
     tr_socketList * socks = NULL;
-    if( support.has_inet6 )
+    if( hasIPv6 )
         socks = tr_socketListNew( &tr_in6addr_any );
-    if( support.needs_inet4 )
-    {
-        if( socks )
-            tr_socketListAppend( socks, &tr_inaddr_any );
-        else
-            socks = tr_socketListNew( &tr_inaddr_any );
-    }
+
+    if( socks )
+        tr_socketListAppend( socks, &tr_inaddr_any );
+    else
+        socks = tr_socketListNew( &tr_inaddr_any );
     return socks; /* Because the dryer gremlins won't */
 }
 
