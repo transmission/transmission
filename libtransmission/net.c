@@ -543,8 +543,9 @@ tr_netBindTCP( const tr_address * addr, tr_port port, tr_bool suppressMsgs )
 #endif
 
 #ifdef IPV6_V6ONLY
-    if( retval = setsockopt( s, IPPROTO_IPV6, IPV6_V6ONLY, &optval,
-                sizeof( optval ) ) == -1 ) {
+    if( addr->type == TR_AF_INET6 && 
+        ( retval = setsockopt( s, IPPROTO_IPV6, IPV6_V6ONLY, &optval,
+                             sizeof( optval ) ) ) == -1 ) {
         /* the kernel may not support this. if not, ignore it */
         if( errno != ENOPROTOOPT )
             return -errno;
