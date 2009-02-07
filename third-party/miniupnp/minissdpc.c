@@ -1,4 +1,4 @@
-/* $Id: minissdpc.c,v 1.6 2008/10/06 23:08:39 nanard Exp $ */
+/* $Id: minissdpc.c,v 1.7 2008/12/18 17:45:48 nanard Exp $ */
 /* Project : miniupnp
  * Author : Thomas BERNARD
  * copyright (c) 2005-2008 Thomas Bernard
@@ -10,8 +10,14 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
+#ifdef WIN32
+#include <winsock2.h>
+#include <Ws2tcpip.h>
+#include <io.h>
+#else
 #include <sys/socket.h>
 #include <sys/un.h>
+#endif
 
 #include "minissdpc.h"
 #include "miniupnpc.h"

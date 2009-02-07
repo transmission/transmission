@@ -1,4 +1,4 @@
-/* $Id: miniwget.c,v 1.19 2007/11/02 14:16:19 nanard Exp $ */
+/* $Id: miniwget.c,v 1.21 2008/12/18 17:45:18 nanard Exp $ */
 /* Project : miniupnp
  * Author : Thomas Bernard
  * Copyright (c) 2005 Thomas Bernard
@@ -30,6 +30,8 @@
 #if defined(__sun) || defined(sun)
 #include <utility.h>
 #endif
+
+#include "miniupnpcstrings.h"
 
 /* miniwget2() :
  * */
@@ -96,6 +98,8 @@ miniwget2(const char * url, const char * host,
                  "GET %s HTTP/1.1\r\n"
 			     "Host: %s:%d\r\n"
 				 "Connection: Close\r\n"
+				 "User-Agent: " OS_STRING ", UPnP/1.0, MiniUPnPc/" MINIUPNPC_VERSION_STRING "\r\n"
+
 				 "\r\n",
 		    path, host, port);
 	/*write(s, buf, strlen(buf));*/
@@ -137,7 +141,7 @@ miniwget2(const char * url, const char * host,
 			}
 		}
 		*size = allreadyread;
-#ifndef NDEBUG
+#ifdef DEBUG
 		printf("%d bytes read\n", *size);
 #endif
 		closesocket(s);

@@ -133,7 +133,7 @@ tr_upnpPulse( tr_upnp * handle,
         tr_snprintf( portStr, sizeof( portStr ), "%d", handle->port );
         UPNP_DeletePortMapping( handle->urls.controlURL,
                                 handle->data.servicetype,
-                                portStr, "TCP" );
+                                portStr, "TCP", NULL );
         tr_ninf( getKey( ),
                  _(
                      "Stopping port forwarding through \"%s\", service \"%s\"" ),
@@ -165,7 +165,7 @@ tr_upnpPulse( tr_upnp * handle,
             err = UPNP_AddPortMapping( handle->urls.controlURL,
                                        handle->data.servicetype,
                                        portStr, portStr, handle->lanaddr,
-                                       desc, "TCP" );
+                                       desc, "TCP", NULL );
             handle->isMapped = !err;
         }
         tr_ninf( getKey( ),
