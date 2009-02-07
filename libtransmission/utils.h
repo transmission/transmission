@@ -79,9 +79,7 @@ extern "C" {
 ***/
 
 #if !defined( _ )
- #if defined( SYS_DARWIN )
-  #define _( a ) ( a )
- #elif defined( HAVE_LIBINTL_H )
+ #if defined( HAVE_LIBINTL_H ) && !defined( SYS_DARWIN )
   #include <libintl.h>
   #define _( a ) gettext ( a )
  #else
@@ -109,7 +107,7 @@ void tr_assertImpl( const char * file, int line, const char * test, const char *
  #define tr_assert( test, fmt, ... )
 #else
  #define tr_assert( test, fmt, ... ) \
-    do { if( ! ( test ) ) tr_assertImpl( __FILE__, __LINE__, #test, fmt, __VA_ARGS__ ); } while( 0 )
+    if( ! ( test ) ) tr_assertImpl( __FILE__, __LINE__, #test, fmt, __VA_ARGS__ );
 #endif
         
 int            tr_msgLoggingIsActive( int level );
