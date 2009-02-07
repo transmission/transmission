@@ -107,7 +107,7 @@ void tr_assertImpl( const char * file, int line, const char * test, const char *
  #define tr_assert( test, fmt, ... )
 #else
  #define tr_assert( test, fmt, ... ) \
-    if( ! ( test ) ) tr_assertImpl( __FILE__, __LINE__, #test, fmt, __VA_ARGS__ );
+    do { if( ! ( test ) ) tr_assertImpl( __FILE__, __LINE__, #test, fmt, __VA_ARGS__ ); } while( 0 )
 #endif
         
 int            tr_msgLoggingIsActive( int level );
