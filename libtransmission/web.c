@@ -185,6 +185,7 @@ addTask( void * vtask )
             tr_free( str );
         }
 
+        curl_easy_setopt( easy, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4 );
         curl_easy_setopt( easy, CURLOPT_DNS_CACHE_TIMEOUT, 360L );
         curl_easy_setopt( easy, CURLOPT_CONNECTTIMEOUT, 60L );
         curl_easy_setopt( easy, CURLOPT_FOLLOWLOCATION, 1L );
