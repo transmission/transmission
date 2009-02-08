@@ -94,13 +94,7 @@ void tr_suspectAddress( const tr_address * a, const char * source );
 
 static TR_INLINE tr_bool tr_isAddress( const tr_address * a ) { return ( a != NULL ) && ( a->type==TR_AF_INET || a->type==TR_AF_INET6 ); }
 
-typedef struct tr_net_af_support
-{
-    tr_bool has_inet6;
-    tr_bool needs_inet4;
-} tr_net_af_support;
-
-tr_net_af_support tr_net_getAFSupport( tr_port );
+tr_bool tr_net_hasIPv6( tr_port );
 
 /***********************************************************************
  * Socket list housekeeping
