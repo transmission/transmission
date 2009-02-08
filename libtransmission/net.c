@@ -514,7 +514,8 @@ tr_netOpenTCP( tr_session        * session,
     {
         int tmperrno;
         tmperrno = sockerrno;
-        if( tmperrno != ENETUNREACH || addr->type == TR_AF_INET )
+        if( ( tmperrno != ENETUNREACH && tmperrno != EHOSTUNREACH )
+                || addr->type == TR_AF_INET )
             tr_err( _( "Couldn't connect socket %d to %s, port %d (errno %d - %s)" ),
                     s, tr_ntop_non_ts( addr ), (int)port, tmperrno,
                     tr_strerror( tmperrno ) );
