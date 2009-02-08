@@ -462,10 +462,19 @@ isMulticastAddress( const tr_address * addr )
     return FALSE;
 }
 
+static TR_INLINE tr_bool
+isIPv6LinkLocalAddress( const tr_address * addr )
+{
+    if( addr->type == TR_AF_INET6 &&
+            IN6_IS_ADDR_LINKLOCAL( &addr->addr.addr6 ))
+        return TRUE;
+    return FALSE;
+}
+
 tr_bool
 tr_isValidPeerAddress( const tr_address * addr, tr_port port )
 {
-    if( isMulticastAddress( addr ) )
+    if( isMulticastAddress( addr ) || isIPv6LinkLocalAddress( addr ) )
         return FALSE;
 
     if( port == 0 )
@@ -486,7 +495,7 @@ tr_netOpenTCP( tr_session        * session,
 
     assert( tr_isAddress( addr ) );
 
-    if( isMulticastAddress( addr ) )
+    if( isMulticastAddress( addr ) || isIPv6LinkLocalAddress( addr ))
         return -EINVAL;
 
     if( ( s = createSocket( ( addr->type == TR_AF_INET ? AF_INET : AF_INET6 ), type ) ) < 0 )
