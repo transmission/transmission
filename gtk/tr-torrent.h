@@ -75,7 +75,7 @@ TrTorrent *    tr_torrent_new_preexisting( tr_torrent * tor );
 
 TrTorrent *    tr_torrent_new_ctor( tr_session  * session,
                                     tr_ctor     * ctor,
-                                    char       ** err );
+                                    int         * errcode );
 
 void           tr_torrent_set_remove_flag( TrTorrent *,
                                            gboolean );
