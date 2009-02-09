@@ -982,8 +982,7 @@ request_exec( tr_session             * session,
         tr_releaseBuffer( buf );
         tr_bencFree( &response );
     }
-
-    if( methods[i].immediate )
+    else if( methods[i].immediate )
     {
         int64_t tag;
         tr_benc response;
