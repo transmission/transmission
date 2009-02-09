@@ -896,11 +896,11 @@ add_filename( TrCore *     core,
                     if( doPrompt )
                         g_signal_emit( core, TR_CORE_GET_CLASS( core )->promptsig, 0, ctor );
                     else {
-                        tr_torrent * tor = tr_torrentNew( session, ctor, &err );
+                        TrTorrent * gtor = tr_torrent_new_ctor( session, ctor, &err );
                         if( err )
                             tr_core_errsig( core, err, filename );
                         else
-                            tr_core_add_torrent( core, tr_torrent_new_preexisting( tor ) );
+                            tr_core_add_torrent( core, gtor );
                     }
                     tr_metainfoFree( &inf );
                     break;

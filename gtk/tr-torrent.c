@@ -189,20 +189,16 @@ tr_torrent_new_preexisting( tr_torrent * tor )
 TrTorrent *
 tr_torrent_new_ctor( tr_session   * session,
                      tr_ctor      * ctor,
-                     char        ** err )
+                     int          * errcode )
 {
     tr_torrent * tor;
-    int          errcode;
     uint8_t      doTrash = FALSE;
-
-    errcode = -1;
-    *err = NULL;
 
     /* let the gtk client handle the removal, since libT
      * doesn't have any concept of the glib trash API */
     tr_ctorGetDeleteSource( ctor, &doTrash );
     tr_ctorSetDeleteSource( ctor, FALSE );
-    tor = tr_torrentNew( session, ctor, &errcode );
+    tor = tr_torrentNew( session, ctor, errcode );
 
     if( tor && doTrash )
     {
@@ -215,36 +211,7 @@ tr_torrent_new_ctor( tr_session   * session,
             tr_file_trash_or_remove( source );
     }
 
-    if( !tor )
-    {
-        const char * filename = tr_ctorGetSourceFile( ctor );
-        if( !filename )
-            filename = "(null)";
-
-        switch( errcode )
-        {
-            case TR_EINVALID:
-                *err =
-                    g_strdup_printf( _(
-                                         "File \"%s\" isn't a valid torrent" ),
-                                     filename );
-                break;
-
-            case TR_EDUPLICATE:
-                *err = g_strdup_printf( _(
-                                            "File \"%s\" is already open" ),
-                                        filename );
-                break;
-
-            default:
-                *err = g_strdup( filename );
-                break;
-        }
-
-        return NULL;
-    }
-
-    return maketorrent( tor );
+    return tor ? maketorrent( tor ) : NULL;
 }
 
 char *
