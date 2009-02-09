@@ -198,7 +198,12 @@ addFiles( tr_benc *    args,
     }
     if( strcmp( arg, "all" ) )
     {
-        tr_rpc_parse_list_str( files, arg, strlen( arg ) );
+        int i;
+        int valueCount;
+        int * values = tr_parseNumberRange( arg, -1, &valueCount );
+        for( i=0; i<valueCount; ++i )
+            tr_bencListAddInt( files, values[i] );
+        tr_free( values );
     }
 }
 
@@ -1077,7 +1082,7 @@ printTorrentList( tr_benc * top )
       && ( tr_bencDictFindList( args, "torrents", &list ) ) )
     {
         int i, n;
-        printf( "%-4s  %-4s  %8s  %-8s  %6s  %6s  %-5s  %-11s  %s\n",
+        printf( "%-4s  %-4s  %9s  %-8s  %6s  %6s  %-5s  %-11s  %s\n",
                 "ID", "Done", "Have", "ETA", "Up", "Down", "Ratio", "Status",
                 "Name" );
         for( i = 0, n = tr_bencListSize( list ); i < n; ++i )
@@ -1101,6 +1106,12 @@ printTorrentList( tr_benc * top )
                 char statusStr[64];
                 char ratioStr[32];
                 char haveStr[32];
+                char doneStr[8];
+
+                if( sizeWhenDone )
+                    tr_snprintf( doneStr, sizeof( doneStr ), "%d%%", (int)( 100.0 * ( sizeWhenDone - leftUntilDone ) / sizeWhenDone ) );
+                else
+                    tr_strlcpy( doneStr, "n/a", sizeof( doneStr ) );
 
                 strlsize( haveStr, sizeWhenDone - leftUntilDone, sizeof( haveStr ) );
 
@@ -1109,9 +1120,9 @@ printTorrentList( tr_benc * top )
                 else
                     tr_snprintf( etaStr, sizeof( etaStr ), "Done" );
                 printf(
-                    "%4d  %3d%%  %8s  %-8s  %6.1f  %6.1f  %5s  %-11s  %s\n",
+                    "%4d  %4s  %9s  %-8s  %6.1f  %6.1f  %5s  %-11s  %s\n",
                     (int)id,
-                    (int)( 100.0 * ( sizeWhenDone - leftUntilDone ) / sizeWhenDone ),
+                    doneStr,
                     haveStr,
                     etaStr,
                     up / 1024.0,
