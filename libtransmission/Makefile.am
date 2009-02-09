@@ -80,7 +80,6 @@ noinst_HEADERS = \
     peer-common.h \
     peer-io.h \
     peer-mgr.h \
-    peer-mgr-private.h \
     peer-msgs.h \
     platform.h \
     port-forwarding.h \

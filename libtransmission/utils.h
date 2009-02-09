@@ -79,9 +79,7 @@ extern "C" {
 ***/
 
 #if !defined( _ )
- #if defined( SYS_DARWIN )
-  #define _( a ) ( a )
- #elif defined( HAVE_LIBINTL_H )
+ #if defined( HAVE_LIBINTL_H ) && !defined( SYS_DARWIN )
   #include <libintl.h>
   #define _( a ) gettext ( a )
  #else
@@ -452,6 +450,8 @@ static TR_INLINE tr_bool tr_bitfieldHas( const tr_bitfield * b, size_t nth )
 }
 
 double tr_getRatio( double numerator, double denominator );
+
+int* tr_parseNumberRange( const char * str, int str_len, int * setmeCount );
 
 
 int tr_ptr2int( void* );

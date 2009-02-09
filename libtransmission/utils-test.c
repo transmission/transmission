@@ -185,6 +185,46 @@ test_utf8( void )
     return 0;
 }
 
+static int
+test_numbers( void )
+{
+    int i;
+    int count;
+    int * numbers;
+
+    numbers = tr_parseNumberRange( "1-10,13,16-19", -1, &count );
+    check( count == 15 );
+    check( numbers != NULL );
+    check( numbers[0] == 1 );
+    check( numbers[5] == 6 );
+    check( numbers[9] == 10 );
+    check( numbers[10] == 13 );
+    check( numbers[11] == 16 );
+    check( numbers[14] == 19 );
+    tr_free( numbers );
+
+    numbers = tr_parseNumberRange( "1-5,3-7,2-6", -1, &count );
+    check( count == 7 );
+    check( numbers != NULL );
+    for( i=0; i<count; ++i )
+        check( numbers[i] == i+1 );
+    tr_free( numbers );
+
+    numbers = tr_parseNumberRange( "1-Hello", -1, &count );
+    check( count == 0 );
+    check( numbers == NULL );
+
+    numbers = tr_parseNumberRange( "1-", -1, &count );
+    check( count == 0 );
+    check( numbers == NULL );
+
+    numbers = tr_parseNumberRange( "Hello", -1, &count );
+    check( count == 0 );
+    check( numbers == NULL );
+
+    return 0;
+}
+
 int
 main( void )
 {
@@ -210,6 +250,8 @@ main( void )
     if( ( i = test_buildpath( ) ) )
         return i;
     if( ( i = test_utf8( ) ) )
+        return i;
+    if( ( i = test_numbers( ) ) )
         return i;
 
     /* test that tr_cryptoRandInt() stays in-bounds */

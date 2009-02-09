@@ -22,6 +22,17 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+/*
+ * NOTE: THIS FILE IS DEPRECATED
+ *
+ *  The fastresume file format is brittle and was replaced in Transmission 1.20
+ *  with the benc-formatted ".resume" files implemented in resume.[ch].
+ *
+ *  This older format is kept only for reading older resume files for users
+ *  who upgrade from older versions of Transmission, and may be removed
+ *  after more time has passed.
+ */  
+
 /***********************************************************************
  * Fast resume
  ***********************************************************************
