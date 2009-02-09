@@ -67,10 +67,11 @@ static tr_option opts[] =
     { 910, "encryption-required",  "Encrypt all peer connections", "er", 0, NULL },
     { 911, "encryption-preferred", "Prefer encrypted peer connections", "ep", 0, NULL },
     { 912, "encryption-tolerated", "Prefer unencrypted peer connections", "et", 0, NULL },
-    { 'f', "files",                "List the current torrent's files", "f",  0, NULL },
+    { 'f', "files",                "List the current torrent(s)' files", "f",  0, NULL },
     { 'g', "get",                  "Mark files for download", "g",  1, "<files>" },
     { 'G', "no-get",               "Mark files for not downloading", "G",  1, "<files>" },
-    { 'i', "info",                 "Show details of the current torrent(s)", "i",  0, NULL },
+    { 'i', "info",                 "Show the current torrent(s)' details", "i",  0, NULL },
+    { 920, "session-info",         "Show the session's details", "si", 0, NULL },
     { 'l', "list",                 "List all torrents", "l",  0, NULL },
     { 'm', "portmap",              "Enable portmapping via NAT-PMP or UPnP", "m",  0, NULL },
     { 'M', "no-portmap",           "Disable portmapping", "M",  0, NULL },
@@ -80,8 +81,9 @@ static tr_option opts[] =
     { 901, "priority-normal",      "Set the files' priorities as normal", "pn", 1, "<files>" },
     { 902, "priority-low",         "Set the files' priorities as low", "pl", 1, "<files>" },
     { 'r', "remove",               "Remove the current torrent(s)", "r",  0, NULL },
+    { 930, "peers",                "Set the current torrent(s)' maximum number of peers each", "pr", 1, "<max>" },
+    { 931, "global-peers",         "Set the global maximum number of peers", "gpr", 1, "<max>" },
     { 'R', "remove-and-delete",    "Remove the current torrent(s) and delete local data", NULL, 0, NULL },
-    { 920, "session",              "Print session information", NULL,  0, NULL },
     { 's', "start",                "Start the current torrent(s)", "s",  0, NULL },
     { 'S', "stop",                 "Stop the current torrent(s)", "S",  0, NULL },
     { 't', "torrent",              "Set the current torrent(s)", "t",  1, "<torrent>" },
@@ -92,7 +94,7 @@ static tr_option opts[] =
     { 'w', "download-dir",         "Set the default download folder", "w",  1, "<path>" },
     { 'x', "pex",                  "Enable peer exchange (PEX)", "x",  0, NULL },
     { 'X', "no-pex",               "Disable peer exchange (PEX)", "X",  0, NULL },
-    { 'z', "peers",                "List the current torrent's peers", "z",  0, NULL },
+    { 940, "peer-info",            "List the current torrent(s)' peers", "pi",  0, NULL },
     {   0, NULL,                   NULL, NULL, 0, NULL }
 };
 
@@ -467,14 +469,6 @@ readargs( int           argc,
                 tr_bencDictAddInt( args, "pex-allowed", 0 );
                 break;
 
-            case 'z':
-                tr_bencDictAddStr( &top, "method", "torrent-get" );
-                tr_bencDictAddInt( &top, "tag", TAG_PEERS );
-                addIdArg( args, id );
-                fields = tr_bencDictAddList( args, "fields", 1 );
-                tr_bencListAddStr( fields, "peers" );
-                break;
-
             case 900:
                 tr_bencDictAddStr( &top, "method", "torrent-set" );
                 addIdArg( args, id );
@@ -511,6 +505,25 @@ readargs( int           argc,
             case 920:
                 tr_bencDictAddStr( &top, "method", "session-get" );
                 tr_bencDictAddInt( &top, "tag", TAG_SESSION );
+                break;
+
+            case 930:
+                tr_bencDictAddStr( &top, "method", "torrent-set" );
+                addIdArg( args, id );
+                tr_bencDictAddInt( args, "peer-limit", atoi(optarg) );
+                break;
+
+            case 931:
+                tr_bencDictAddStr( &top, "method", "session-set" );
+                tr_bencDictAddInt( args, "peer-limit", atoi(optarg) );
+                break;
+
+            case 940:
+                tr_bencDictAddStr( &top, "method", "torrent-get" );
+                tr_bencDictAddInt( &top, "tag", TAG_PEERS );
+                addIdArg( args, id );
+                fields = tr_bencDictAddList( args, "fields", 1 );
+                tr_bencListAddStr( fields, "peers" );
                 break;
 
             case TR_OPT_ERR:
