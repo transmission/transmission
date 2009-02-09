@@ -451,6 +451,8 @@ static TR_INLINE tr_bool tr_bitfieldHas( const tr_bitfield * b, size_t nth )
 
 double tr_getRatio( double numerator, double denominator );
 
+int* tr_parseNumberRange( const char * str, int str_len, int * setmeCount );
+
 
 int tr_ptr2int( void* );
 

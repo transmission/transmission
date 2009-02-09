@@ -1378,3 +1378,138 @@ tr_utf8clean( const char * str, int max_len, tr_bool * err )
     evbuffer_free( buf );
     return ret;
 }
+
+/***
+****
+***/
+
+struct number_range
+{
+    int low;
+    int high;
+};
+
+/**
+ * This should be a single number (ex. "6") or a range (ex. "6-9").
+ * Anything else is an error and will return failure.
+ */
+static tr_bool
+parseNumberSection( const char * str, int len, struct number_range * setme )
+{
+    long a, b;
+    tr_bool success;
+    char * end;
+    const int error = errno;
+    char * tmp = tr_strndup( str, len );
+
+    errno = 0;
+    a = strtol( tmp, &end, 10 );
+    if( errno || ( end == tmp ) ) {
+        success = FALSE;
+    } else if( *end != '-' ) {
+        b = a;
+        success = TRUE;
+    } else {
+        const char * pch = end + 1;
+        b = strtol( pch, &end, 10 );
+        if( errno || ( pch == end ) )
+            success = FALSE;
+        else if( *end ) /* trailing data */
+            success = FALSE;
+        else
+            success = TRUE;
+    }
+    tr_free( tmp );
+
+    setme->low = MIN( a, b );
+    setme->high = MAX( a, b );
+
+    errno = error;
+    return success;
+}
+
+static int
+compareInt( const void * va, const void * vb )
+{
+    const int a = *(const int *)va;
+    const int b = *(const int *)vb;
+    return a - b;
+}
+
+/**
+ * Given a string like "1-4" or "1-4,6,9,14-51", this allocates and returns an
+ * array of setmeCount ints of all the values in the array.
+ * For example, "5-8" will return [ 5, 6, 7, 8 ] and setmeCount will be 4.
+ * It's the caller's responsibility to call tr_free() on the returned array. 
+ * If a fragment of the string can't be parsed, NULL is returned.
+ */
+int*
+tr_parseNumberRange( const char * str_in, int len, int * setmeCount )
+{
+    int n = 0;
+    int * uniq = NULL;
+    char * str = tr_strndup( str_in, len );
+    const char * walk;
+    tr_list * ranges = NULL;
+    tr_bool success = TRUE;
+
+    walk = str;
+    while( walk && *walk && success ) {
+        struct number_range range;
+        const char * pch = strchr( walk, ',' );
+        if( pch ) {
+            success = parseNumberSection( walk, pch-walk, &range );
+            walk = pch + 1;
+        } else {
+            success = parseNumberSection( walk, strlen( walk ), &range );
+            walk += strlen( walk );
+        }
+        if( success )
+            tr_list_append( &ranges, tr_memdup( &range, sizeof( struct number_range ) ) );
+    }
+
+    if( !success )
+    {
+        *setmeCount = 0;
+        uniq = NULL;
+    }
+    else
+    {
+        int i;
+        int n2;
+        tr_list * l;
+        int * sorted = NULL;
+
+        /* build a sorted number array */
+        n = n2 = 0;
+        for( l=ranges; l!=NULL; l=l->next ) {
+            const struct number_range * r = l->data;
+            n += r->high + 1 - r->low;
+        }
+        sorted = tr_new( int, n );
+        for( l=ranges; l!=NULL; l=l->next ) {
+            const struct number_range * r = l->data;
+            int i;
+            for( i=r->low; i<=r->high; ++i )
+                sorted[n2++] = i;
+        }
+        qsort( sorted, n, sizeof( int ), compareInt );
+        assert( n == n2 );
+
+        /* remove duplicates */
+        uniq = tr_new( int, n );
+        for( i=n=0; i<n2; ++i )
+            if( !n || uniq[n-1] != sorted[i] )
+                uniq[n++] = sorted[i];
+
+        tr_free( sorted );
+    }
+
+    /* cleanup */
+    tr_list_free( &ranges, tr_free );
+    tr_free( str );
+
+    /* return the result */
+    *setmeCount = n;
+    return uniq;
+}

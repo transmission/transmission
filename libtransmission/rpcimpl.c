@@ -1040,29 +1040,6 @@ tr_rpc_request_exec_json( tr_session            * session,
         tr_bencFree( &top );
 }
 
-static void
-addToken( tr_benc *    list,
-          const char * token,
-          size_t       len )
-{
-    char *       p;
-    const char * end = token + len;
-    const long   a = strtol( token, &p, 10 );
-
-    if( p == end )
-        tr_bencListAddInt( list, a );
-    else if( *p == '-' && isdigit( p[1] ) )
-    {
-        const long b = strtol( p + 1, &p, 10 );
-        if( ( p == end ) && ( b > a ) )
-        {
-            long i;
-            for( i = a; i <= b; ++i )
-                tr_bencListAddInt( list, i );
-        }
-    }
-}
-
 /**
  * Munge the URI into a usable form.
  *
@@ -1074,49 +1051,25 @@ addToken( tr_benc *    list,
  */
 void
 tr_rpc_parse_list_str( tr_benc     * setme,
-                       const char  * str_in,
+                       const char  * str,
                        int           len )
 
 {
-    char *       str = tr_strndup( str_in, len );
-    int          isNum;
-    int          isNumList;
-    int          commaCount;
-    const char * walk;
+    int valueCount;
+    int * values = tr_parseNumberRange( str, len, &valueCount );
 
-    isNum = 1;
-    isNumList = 1;
-    commaCount = 0;
-    walk = str;
-    for( ; *walk && ( isNumList || isNum ); ++walk )
-    {
-        if( isNumList ) isNumList = *walk == '-' || isdigit( *walk )
-                                    || *walk == ',';
-        if( isNum     ) isNum     = *walk == '-' || isdigit( *walk );
-        if( *walk == ',' ) ++commaCount;
-    }
-
-    if( isNum )
-        tr_bencInitInt( setme, strtol( str, NULL, 10 ) );
-    else if( !isNumList )
+    if( valueCount == 0 )
         tr_bencInitStr( setme, str, len );
-    else
-    {
-        tr_bencInitList( setme, commaCount + 1 );
-        walk = str;
-        while( *walk )
-        {
-            const char * p = strchr( walk, ',' );
-            if( !p )
-                p = walk + strlen( walk );
-            addToken( setme, walk, p - walk );
-            if( *p != ',' )
-                break;
-            walk = p + 1;
-        }
+    else if( valueCount == 1 )
+        tr_bencInitInt( setme, values[0] );
+    else {
+        int i;
+        tr_bencInitList( setme, valueCount );
+        for( i=0; i<valueCount; ++i )
+            tr_bencListAddInt( setme, values[i] );
     }
 
-    tr_free( str );
+    tr_free( values );
 }
 
 void
