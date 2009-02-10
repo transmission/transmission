@@ -48,10 +48,16 @@
 2.3.  Transport Mechanism
 
    HTTP POSTing a JSON-encoded request is the preferred way of communicating
-   with a Transmission RPC server; however, a simple notation also exists
-   for sending requests in the query portion of a URL.
+   with a Transmission RPC server.  The current Transmission implementation
+   has the default URL as http://host:9091/transmission/rpc.  Clients
+   may use this as a default, but should allow the URL to be reconfigured,
+   since the port and path may be changed to allow mapping and/or multiple
+   daemons to run on a single server.
 
-   The URL notation works as follows:
+   In addition to POSTing, there's also a simple notation for sending
+   requests in the query portion of a URL.  This is not as robust, but can
+   be useful for debugging and simple tasks.  The notation works as follows:
+
    (1) Any key not "tag" or "method" is treated as an argument.
    (2) The "arguments" key isn't needed, since data isn't nested.
    (3) If the value in a key/value pair can be parsed as a number, then it is.
@@ -61,6 +67,7 @@
    Examples:
    ?method=torrent-start&ids=1,2
    ?method=session-set&speed-limit-down=50&speed-limit-down-enabled=1
+   
 
 3.  Torrent Requests
 
@@ -244,7 +251,8 @@
 
       {
          "arguments": {
-             "fields": [ "id", "name", "totalSize" ]
+             "fields": [ "id", "name", "totalSize" ],
+             "ids": [ 7, 10 ]
          },
          "method": "torrent-get",
          "tag": 39693
@@ -281,7 +289,7 @@
    key                | value type & description
    -------------------+-------------------------------------------------
    "download-dir"     | string      path to download the torrent to
-   "filename"         | string      location of the .torrent file
+   "filename"         | string      filename or URL of the .torrent file
    "metainfo"         | string      base64-encoded .torrent content
    "paused"           | 'boolean'   if true, don't start the torrent
    "peer-limit"       | number      maximum number of peers
@@ -362,6 +370,22 @@
    "pausedTorrentCount"       | number
    "torrentCount"             | number
    "uploadSpeed"              | number
+   ---------------------------+-------------------------------+
+   "cumulative-stats"         | object, containing:           |
+                              +------------------+------------+
+                              | uploadedBytes    | number     | tr_session_stats
+                              | downloadedBytes  | number     | tr_session_stats
+                              | filesAdded       | number     | tr_session_stats
+                              | sessionCount     | number     | tr_session_stats
+                              | secondsActive    | number     | tr_session_stats
+   ---------------------------+-------------------------------+
+   "current-stats"            | object, containing:           |
+                              +------------------+------------+
+                              | uploadedBytes    | number     | tr_session_stats
+                              | downloadedBytes  | number     | tr_session_stats
+                              | filesAdded       | number     | tr_session_stats
+                              | sessionCount     | number     | tr_session_stats
+                              | secondsActive    | number     | tr_session_stats
    
 
 5.0.  Protocol Versions
@@ -382,6 +406,8 @@
    ------+---------+-----------+----------------+-------------------------------
    4     | 1.50    | yes       | session-get    | new arg "rpc-version"
          |         |           | session-get    | new arg "rpc-version-minimum"
+         |         |           | session-stats  | added "cumulative-stats"
+         |         |           | session-stats  | added "current-stats"
          |         |           | torrent-get    | new arg "downloadDir"
    ------+---------+-----------+----------------+-------------------------------
 
