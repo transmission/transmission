@@ -1,5 +1,4 @@
-/*
- * This file Copyright (C) 2007-2009 Charles Kerr <charles@transmissionbt.com>
+/* * This file Copyright (C) 2007-2009 Charles Kerr <charles@transmissionbt.com>
  *
  * This file is licensed by the GPL version 2.  Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
@@ -21,6 +20,7 @@
 
 #include <openssl/bn.h>
 #include <openssl/dh.h>
+#include <openssl/err.h>
 #include <openssl/rc4.h>
 #include <openssl/sha.h>
 #include <openssl/rand.h>
@@ -29,6 +29,8 @@
 
 #include "crypto.h"
 #include "utils.h"
+
+#define MY_NAME "tr_crypto"
 
 /**
 ***
@@ -97,6 +99,15 @@ struct tr_crypto
 ***
 **/
 
+#define logErrorFromSSL( ... ) \
+    do { \
+        if( tr_msgLoggingIsActive( TR_MSG_ERR ) ) { \
+            char buf[512]; \
+            ERR_error_string_n( ERR_get_error( ), buf, sizeof( buf ) ); \
+            tr_msg( __FILE__, __LINE__, TR_MSG_ERR, MY_NAME, "%s", buf ); \
+        } \
+    } while( 0 )
+
 static DH*
 getSharedDH( void )
 {
@@ -105,9 +116,17 @@ getSharedDH( void )
     if( dh == NULL )
     {
         dh = DH_new( );
+
         dh->p = BN_bin2bn( dh_P, sizeof( dh_P ), NULL );
+        if( dh->p == NULL )
+            logErrorFromSSL( );
+
         dh->g = BN_bin2bn( dh_G, sizeof( dh_G ), NULL );
-        DH_generate_key( dh );
+        if( dh->g == NULL )
+            logErrorFromSSL( );
+
+        if( !DH_generate_key( dh ) )
+            logErrorFromSSL( );
     }
 
     return dh;
@@ -151,7 +170,7 @@ const uint8_t*
 tr_cryptoComputeSecret( tr_crypto *     crypto,
                         const uint8_t * peerPublicKey )
 {
-    int      len, offset;
+    int      len;
     uint8_t  secret[KEY_LEN];
     BIGNUM * bn = BN_bin2bn( peerPublicKey, KEY_LEN, NULL );
     DH *     dh = getSharedDH( );
@@ -159,14 +178,18 @@ tr_cryptoComputeSecret( tr_crypto *     crypto,
     assert( DH_size( dh ) == KEY_LEN );
 
     len = DH_compute_key( secret, bn, dh );
-    assert( len <= KEY_LEN );
-    offset = KEY_LEN - len;
-    memset( crypto->mySecret, 0, offset );
-    memcpy( crypto->mySecret + offset, secret, len );
-    crypto->mySecretIsSet = 1;
+    if( len == -1 )
+        logErrorFromSSL( );
+    else {
+        int offset;
+        assert( len <= KEY_LEN );
+        offset = KEY_LEN - len;
+        memset( crypto->mySecret, 0, offset );
+        memcpy( crypto->mySecret + offset, secret, len );
+        crypto->mySecretIsSet = 1;
+    }
 
     BN_free( bn );
-
     return crypto->mySecret;
 }
 
@@ -193,12 +216,18 @@ initRC4( tr_crypto *  crypto,
     assert( crypto->torrentHashIsSet );
     assert( crypto->mySecretIsSet );
 
-    SHA1_Init( &sha );
-    SHA1_Update( &sha, key, 4 );
-    SHA1_Update( &sha, crypto->mySecret, KEY_LEN );
-    SHA1_Update( &sha, crypto->torrentHash, SHA_DIGEST_LENGTH );
-    SHA1_Final( buf, &sha );
-    RC4_set_key( setme, SHA_DIGEST_LENGTH, buf );
+    if( SHA1_Init( &sha )
+        && SHA1_Update( &sha, key, 4 )
+        && SHA1_Update( &sha, crypto->mySecret, KEY_LEN )
+        && SHA1_Update( &sha, crypto->torrentHash, SHA_DIGEST_LENGTH )
+        && SHA1_Final( buf, &sha ) )
+    {
+        RC4_set_key( setme, SHA_DIGEST_LENGTH, buf );
+    }
+    else
+    {
+        logErrorFromSSL( );
+    }
 }
 
 void
@@ -306,6 +335,7 @@ void
 tr_cryptoRandBuf( unsigned char *buf,
                   size_t         len )
 {
-    RAND_pseudo_bytes ( buf, len );
+    if( RAND_pseudo_bytes ( buf, len ) != 1 )
+        logErrorFromSSL( );
 }
 
