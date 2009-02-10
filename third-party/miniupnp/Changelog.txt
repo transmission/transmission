@@ -1,5 +1,23 @@
-$Id: Changelog.txt,v 1.72 2008/09/25 18:02:50 nanard Exp $
+$Id: Changelog.txt,v 1.77 2008/12/18 17:47:32 nanard Exp $
 miniUPnP client Changelog.
+
+2008/12/18:
+  cleanup in Makefile (thanks to Paul de Weerd)
+  minissdpc.c : win32 compatibility
+  miniupnpc.c : changed xmlns prefix from 'm' to 'u'
+  Removed NDEBUG (using DEBUG)
+
+2008/10/14:
+  Added the ExternalHost argument to DeletePortMapping()
+
+2008/10/11:
+  Added the ExternalHost argument to AddPortMapping()
+  Put a correct User-Agent: header in HTTP requests.
+
+VERSION 1.2 :
+
+2008/10/07:
+  Update docs
 
 2008/09/25:
   Integrated sameport patch from Dario Meloni : Added a "sameport"
