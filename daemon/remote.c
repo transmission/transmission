@@ -76,6 +76,7 @@ static tr_option opts[] =
     { 'm', "portmap",              "Enable portmapping via NAT-PMP or UPnP", "m",  0, NULL },
     { 'M', "no-portmap",           "Disable portmapping", "M",  0, NULL },
     { 'n', "auth",                 "Set authentication info", "n",  1, "<username:password>" },
+    { 'N', "netrc",                "Set authentication info from a .netrc file", "N",  1, "<filename>" },
     { 'p', "port",                 "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "p", 1, "<port>" },
     { 900, "priority-high",        "Set the files' priorities as high", "ph", 1, "<files>" },
     { 901, "priority-normal",      "Set the files' priorities as normal", "pn", 1, "<files>" },
@@ -123,6 +124,7 @@ static char * reqs[256]; /* arbitrary max */
 static int    reqCount = 0;
 static int    debug = 0;
 static char * auth = NULL;
+static char * netrc = NULL;
 
 static char* 
 tr_getcwd( void ) 
@@ -396,6 +398,11 @@ readargs( int           argc,
 
             case 'n':
                 auth = tr_strdup( optarg );
+                addArg = FALSE;
+                break;
+
+            case 'N':
+                netrc = tr_strdup( optarg );
                 addArg = FALSE;
                 break;
 
@@ -1212,17 +1219,17 @@ processRequests( const char *  host,
 #ifdef HAVE_LIBZ
     curl_easy_setopt( curl, CURLOPT_ENCODING, "deflate" );
 #endif
-    curl_easy_setopt( curl, CURLOPT_USERAGENT,
-                      MY_NAME "/" LONG_VERSION_STRING );
+    curl_easy_setopt( curl, CURLOPT_USERAGENT, MY_NAME "/" LONG_VERSION_STRING );
     curl_easy_setopt( curl, CURLOPT_WRITEFUNCTION, writeFunc );
     curl_easy_setopt( curl, CURLOPT_WRITEDATA, buf );
     curl_easy_setopt( curl, CURLOPT_POST, 1 );
     curl_easy_setopt( curl, CURLOPT_URL, url );
+    curl_easy_setopt( curl, CURLOPT_NETRC, CURL_NETRC_OPTIONAL );
+    curl_easy_setopt( curl, CURLOPT_HTTPAUTH, CURLAUTH_ANY );
+    if( netrc )
+        curl_easy_setopt( curl, CURLOPT_NETRC_FILE, netrc );
     if( auth )
-    {
         curl_easy_setopt( curl, CURLOPT_USERPWD, auth );
-        curl_easy_setopt( curl, CURLOPT_HTTPAUTH, CURLAUTH_ANY );
-    }
 
     for( i = 0; i < reqCount; ++i )
     {

@@ -24,6 +24,7 @@ and
 .Op Fl l
 .Op Fl m | M
 .Op Fl n Ar user:pass
+.Op Fl N Ar netrc
 .Op Fl p Ar port
 .Op Fl ph Ar files
 .Op Fl pl Ar files
@@ -115,6 +116,11 @@ Set the
 and
 .Ar password
 for authentication
+
+.It Fl N Fl -netrc Ar filename
+Set the authentication information from a
+.Ar netrc file.
+See netrc(5) for more information.
 
 .It Fl p Fl -port Ar port
 Set the
