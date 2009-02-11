@@ -2231,12 +2231,6 @@ msgstr "В очереди на проверку"
 #~ msgid "Failed to set up socket: %s"
 #~ msgstr "Не удалось установить сокет: %s"
 
-#~ msgid "File"
-#~ msgid_plural "Files"
-#~ msgstr[0] "Файл"
-#~ msgstr[1] "Файла"
-#~ msgstr[2] "Файлов"
-
 #~ msgid "Piece"
 #~ msgid_plural "Pieces"
 #~ msgstr[0] "Часть"

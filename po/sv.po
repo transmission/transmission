@@ -1864,11 +1864,6 @@ msgstr "Köad för verifiering"
 #~ msgid "Failed to set up socket: %s"
 #~ msgstr "Misslyckades med att konfigurera uttag: %s"
 
-#~ msgid "File"
-#~ msgid_plural "Files"
-#~ msgstr[0] "Fil"
-#~ msgstr[1] "Filer"
-
 #~ msgid "Directory"
 #~ msgstr "Katalog"
 
