@@ -1,21 +1,21 @@
-# Irish translation for transmission
-# Copyright (c) 2008 Rosetta Contributors and Canonical Ltd 2008
+# Kazakh translation for transmission
+# Copyright (c) 2009 Rosetta Contributors and Canonical Ltd 2009
 # This file is distributed under the same license as the transmission package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2008.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2009.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2009-01-16 11:33-0600\n"
-"PO-Revision-Date: 2008-05-03 16:28+0000\n"
-"Last-Translator: Seanan <Unknown>\n"
-"Language-Team: Irish <ga@li.org>\n"
+"PO-Revision-Date: 2009-01-07 18:27+0000\n"
+"Last-Translator: arruah <Unknown>\n"
+"Language-Team: Kazakh <kk@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=n==1 ? 0 : n==2 ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2009-02-11 20:56+0000\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Launchpad-Export-Date: 2009-02-11 20:57+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -76,11 +76,11 @@ msgstr ""
 
 #: ../gtk/actions.c:111
 msgid "_Torrent"
-msgstr "_Torrent"
+msgstr ""
 
 #: ../gtk/actions.c:112
 msgid "_View"
-msgstr "_Amharc"
+msgstr ""
 
 #: ../gtk/actions.c:113
 msgid "_Sort Torrents By"
@@ -88,23 +88,23 @@ msgstr ""
 
 #: ../gtk/actions.c:114
 msgid "_Edit"
-msgstr "_Eagar"
+msgstr ""
 
 #: ../gtk/actions.c:115
 msgid "_Help"
-msgstr "_Cabhair"
+msgstr "_Анықтама"
 
 #: ../gtk/actions.c:116 ../gtk/actions.c:117
 msgid "Add a torrent"
-msgstr ""
+msgstr "Торрент қосу"
 
 #: ../gtk/actions.c:117
 msgid "_Add..."
-msgstr "_Cuir Leis..."
+msgstr ""
 
 #: ../gtk/actions.c:118
 msgid "_Start"
-msgstr "_Tosaigh"
+msgstr ""
 
 #: ../gtk/actions.c:118
 msgid "Start torrent"
@@ -120,7 +120,7 @@ msgstr ""
 
 #: ../gtk/actions.c:121
 msgid "_Pause"
-msgstr "_"
+msgstr ""
 
 #: ../gtk/actions.c:121
 msgid "Pause torrent"
@@ -144,23 +144,23 @@ msgstr ""
 
 #: ../gtk/actions.c:125
 msgid "_New..."
-msgstr "_Nua..."
+msgstr ""
 
 #: ../gtk/actions.c:125
 msgid "Create a torrent"
-msgstr "Cruthaigh torrent"
+msgstr ""
 
 #: ../gtk/actions.c:126
 msgid "_Quit"
-msgstr "_Scoir"
+msgstr ""
 
 #: ../gtk/actions.c:127
 msgid "Select _All"
-msgstr "Roghnaigh _Uile"
+msgstr ""
 
 #: ../gtk/actions.c:128
 msgid "Dese_lect All"
-msgstr "_Díroghnaigh Gach Rud"
+msgstr ""
 
 #: ../gtk/actions.c:130
 msgid "Torrent properties"
@@ -180,15 +180,15 @@ msgstr ""
 
 #: ../gtk/add-dialog.c:241
 msgid "Torrent files"
-msgstr "Comhaid Torrent"
+msgstr ""
 
 #: ../gtk/add-dialog.c:246
 msgid "All files"
-msgstr "Gach comhad"
+msgstr "Барлық файлдарды"
 
 #: ../gtk/add-dialog.c:274
 msgid "Torrent Options"
-msgstr "Roghanna Torrent"
+msgstr ""
 
 #: ../gtk/add-dialog.c:298
 msgid "_Move source file to Trash"
@@ -216,7 +216,7 @@ msgstr ""
 
 #: ../gtk/add-dialog.c:437
 msgid "Add a Torrent"
-msgstr "Cuir Torrent Leis"
+msgstr ""
 
 #: ../gtk/add-dialog.c:454 ../gtk/tr-prefs.c:312
 msgid "Display _options dialog"
@@ -272,20 +272,20 @@ msgstr ""
 #. 'download speed' column header. terse to keep the column narrow.
 #: ../gtk/details.c:276 ../gtk/details.c:318
 msgid "Down"
-msgstr ""
+msgstr "Төмен"
 
 #: ../gtk/details.c:316
 msgid "Address"
-msgstr ""
+msgstr "Адрес"
 
 #. 'upload speed' column header.  terse to keep the column narrow.
 #: ../gtk/details.c:320
 msgid "Up"
-msgstr ""
+msgstr "Жоғары"
 
 #: ../gtk/details.c:321
 msgid "Client"
-msgstr ""
+msgstr "Клиент"
 
 #. 'percent done' column header. terse to keep the column narrow.
 #: ../gtk/details.c:323
@@ -294,7 +294,7 @@ msgstr ""
 
 #: ../gtk/details.c:325
 msgid "Status"
-msgstr ""
+msgstr "Күй-жай"
 
 #: ../gtk/details.c:619
 msgid "Optimistic unchoke"
@@ -749,7 +749,7 @@ msgstr ""
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
-"  Seanan https://launchpad.net/~seananoc-gmail"
+"  arruah https://launchpad.net/~arruah"
 
 #: ../gtk/makemeta-ui.c:111
 msgid "Torrent created!"
