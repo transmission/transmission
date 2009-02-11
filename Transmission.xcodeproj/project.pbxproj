@@ -216,6 +216,7 @@
 		A2DF58580DE4B2B0000795D5 /* JSON_parser.c in Sources */ = {isa = PBXBuildFile; fileRef = A2DF576A0DE468C6000795D5 /* JSON_parser.c */; };
 		A2DF58590DE4B2B1000795D5 /* JSON_parser.h in Headers */ = {isa = PBXBuildFile; fileRef = A2DF576B0DE468C6000795D5 /* JSON_parser.h */; };
 		A2E23AC60CB5E1930002BB25 /* InfoTabButtonCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A2E23AC40CB5E1930002BB25 /* InfoTabButtonCell.m */; };
+		A2E672520F4258CB00A07949 /* miniupnpcstrings.h in Headers */ = {isa = PBXBuildFile; fileRef = A2E672510F4258CB00A07949 /* miniupnpcstrings.h */; };
 		A2E9AA760C249AF400085DCF /* Create.png in Resources */ = {isa = PBXBuildFile; fileRef = A2E9AA750C249AF400085DCF /* Create.png */; };
 		A2ED7D8F0CEF431B00970975 /* FilterButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A2ED7D8E0CEF431B00970975 /* FilterButton.m */; };
 		A2EF7DEC0C96297400FA9811 /* PurpleDot.png in Resources */ = {isa = PBXBuildFile; fileRef = A2EF7DEB0C96297400FA9811 /* PurpleDot.png */; };
@@ -682,6 +683,7 @@
 		A2DF57730DE46A6A000795D5 /* QuickLookController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = QuickLookController.m; path = macosx/QuickLookController.m; sourceTree = "<group>"; };
 		A2E23AC30CB5E1930002BB25 /* InfoTabButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = InfoTabButtonCell.h; path = macosx/InfoTabButtonCell.h; sourceTree = "<group>"; };
 		A2E23AC40CB5E1930002BB25 /* InfoTabButtonCell.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = InfoTabButtonCell.m; path = macosx/InfoTabButtonCell.m; sourceTree = "<group>"; };
+		A2E672510F4258CB00A07949 /* miniupnpcstrings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = miniupnpcstrings.h; path = "third-party/miniupnp/miniupnpcstrings.h"; sourceTree = "<group>"; };
 		A2E9AA750C249AF400085DCF /* Create.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Create.png; path = macosx/Images/Create.png; sourceTree = "<group>"; };
 		A2EA8E3C0CC3C9830081201C /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = macosx/fr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A2EA8E3E0CC3C9830081201C /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = macosx/fr.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -1290,6 +1292,7 @@
 				BE1183540CE160C50002D0F3 /* upnpcommands.h */,
 				BE1183550CE160C50002D0F3 /* miniupnpc.h */,
 				BE1183560CE160C50002D0F3 /* minissdpc.h */,
+				A2E672510F4258CB00A07949 /* miniupnpcstrings.h */,
 				A25485390EB66CBB004539DA /* codelength.h */,
 			);
 			name = libminiupnp;
@@ -1460,6 +1463,7 @@
 				BE11835F0CE160C50002D0F3 /* miniupnpc.h in Headers */,
 				BE1183600CE160C50002D0F3 /* minissdpc.h in Headers */,
 				A254853C0EB66CD4004539DA /* codelength.h in Headers */,
+				A2E672520F4258CB00A07949 /* miniupnpcstrings.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
