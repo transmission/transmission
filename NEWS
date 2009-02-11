@@ -1,16 +1,17 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
-1.50 (2009/01/dd)
+1.50 (2009/02/dd)
 <http://trac.transmissionbt.com/query?milestone=1.50&group=component&groupdesc=1&order=severity>
 - All Platforms
-   + IPv6 support
-   + Fix a couple of 1.42 crashes
-   + Fix 1.42 error that made tracker announces slower over time
+   + IPv6 peer support
+   + IPv6 support for trackers with explicit IPv6 addresses
    + Improved connectivity for encrypted peers
+   + Fix 1.42 error that made tracker announces slower over time
    + Fix a Mac-centric peer connection bug from 1.41
    + Better performance when sharing with very fast peers
    + Handle non-UTF-8 torrent files more gracefully
    + When removing local data only remove data from the torrent
+   + Fix a couple of 1.42 crashes
 - GTK+
    + Various HIG and usability changes
 - Daemon
