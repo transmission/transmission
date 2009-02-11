@@ -7,15 +7,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-12-21 13:37-0600\n"
-"PO-Revision-Date: 2008-12-14 13:18+0000\n"
+"POT-Creation-Date: 2009-01-16 11:33-0600\n"
+"PO-Revision-Date: 2009-01-20 14:16+0000\n"
 "Last-Translator: Daniel Nylander <yeager@ubuntu.com>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2008-12-22 05:09+0000\n"
+"X-Launchpad-Export-Date: 2009-02-11 20:56+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -74,147 +74,151 @@ msgstr "_Statusrad"
 msgid "_Toolbar"
 msgstr "_Verktygsrad"
 
-#: ../gtk/actions.c:112
+#: ../gtk/actions.c:111
 msgid "_Torrent"
 msgstr "_Torrent"
 
-#: ../gtk/actions.c:114
+#: ../gtk/actions.c:112
 msgid "_View"
 msgstr "_Visa"
 
-#: ../gtk/actions.c:117
+#: ../gtk/actions.c:113
 msgid "_Sort Torrents By"
 msgstr "_Sortera torrent-filer efter"
 
-#: ../gtk/actions.c:119
+#: ../gtk/actions.c:114
 msgid "_Edit"
 msgstr "R_edigera"
 
-#: ../gtk/actions.c:121
+#: ../gtk/actions.c:115
 msgid "_Help"
 msgstr "_Hjälp"
 
-#: ../gtk/actions.c:124 ../gtk/actions.c:126
+#: ../gtk/actions.c:116 ../gtk/actions.c:117
 msgid "Add a torrent"
 msgstr "Lägg till en torrentfil"
 
-#: ../gtk/actions.c:125
+#: ../gtk/actions.c:117
 msgid "_Add..."
 msgstr "_Lägg till..."
 
-#: ../gtk/actions.c:128
+#: ../gtk/actions.c:118
 msgid "_Start"
 msgstr "Sta_rta"
 
-#: ../gtk/actions.c:128
+#: ../gtk/actions.c:118
 msgid "Start torrent"
 msgstr "Starta torrentfil"
 
-#: ../gtk/actions.c:130
+#: ../gtk/actions.c:119
 msgid "_Statistics"
 msgstr "_Statistik"
 
-#: ../gtk/actions.c:133 ../gtk/add-dialog.c:361
+#: ../gtk/actions.c:120 ../gtk/add-dialog.c:364
 msgid "_Verify Local Data"
 msgstr "_Verifiera lokalt data"
 
-#: ../gtk/actions.c:135
+#: ../gtk/actions.c:121
 msgid "_Pause"
 msgstr "Gör _paus"
 
-#: ../gtk/actions.c:135
+#: ../gtk/actions.c:121
 msgid "Pause torrent"
 msgstr "Pausa torrentfil"
 
-#: ../gtk/actions.c:138
+#: ../gtk/actions.c:122
+msgid "_Pause All"
+msgstr "_Pausa alla"
+
+#: ../gtk/actions.c:122
+msgid "Pause all torrents"
+msgstr "Pausa alla torrentfiler"
+
+#: ../gtk/actions.c:123
 msgid "Remove torrent"
 msgstr "Ta bort torrentfil"
 
-#: ../gtk/actions.c:140
+#: ../gtk/actions.c:124
 msgid "_Delete Files and Remove"
 msgstr "_Radera filer och ta bort"
 
-#: ../gtk/actions.c:142
+#: ../gtk/actions.c:125
 msgid "_New..."
 msgstr "_Ny..."
 
-#: ../gtk/actions.c:144
+#: ../gtk/actions.c:125
 msgid "Create a torrent"
 msgstr "Skapa en torrent"
 
-#: ../gtk/actions.c:146
+#: ../gtk/actions.c:126
 msgid "_Quit"
 msgstr "A_vsluta"
 
-#: ../gtk/actions.c:149
+#: ../gtk/actions.c:127
 msgid "Select _All"
 msgstr "Markera _allt"
 
-#: ../gtk/actions.c:151
+#: ../gtk/actions.c:128
 msgid "Dese_lect All"
 msgstr "Avma_rkera allt"
 
-#: ../gtk/actions.c:156
-msgid "_Details"
-msgstr "_Detaljer"
+#: ../gtk/actions.c:130
+msgid "Torrent properties"
+msgstr "Egenskaper för torrent"
 
-#: ../gtk/actions.c:156
-msgid "Torrent details"
-msgstr "Torrentdetaljer"
-
-#: ../gtk/actions.c:159
+#: ../gtk/actions.c:131
 msgid "_Open Folder"
 msgstr "_Öppna mapp"
 
-#: ../gtk/actions.c:162
+#: ../gtk/actions.c:133
 msgid "_Contents"
 msgstr "_Innehåll"
 
-#: ../gtk/actions.c:165
+#: ../gtk/actions.c:134
 msgid "Ask Tracker for _More Peers"
 msgstr "Fråga bevakare efter f_ler klienter"
 
-#: ../gtk/add-dialog.c:238
+#: ../gtk/add-dialog.c:241
 msgid "Torrent files"
 msgstr "Torrent-filer"
 
-#: ../gtk/add-dialog.c:243
+#: ../gtk/add-dialog.c:246
 msgid "All files"
 msgstr "Alla filer"
 
-#: ../gtk/add-dialog.c:271
+#: ../gtk/add-dialog.c:274
 msgid "Torrent Options"
 msgstr "Torrentalternativ"
 
-#: ../gtk/add-dialog.c:295
+#: ../gtk/add-dialog.c:298
 msgid "_Move source file to Trash"
 msgstr "Fl_ytta källfilen till papperskorgen"
 
-#: ../gtk/add-dialog.c:297 ../gtk/tr-prefs.c:370
+#: ../gtk/add-dialog.c:300 ../gtk/tr-prefs.c:316
 msgid "_Start when added"
 msgstr "_Starta när tillagd"
 
-#: ../gtk/add-dialog.c:308
+#: ../gtk/add-dialog.c:311
 msgid "_Torrent file:"
 msgstr "_Torrentfil:"
 
-#: ../gtk/add-dialog.c:314
+#: ../gtk/add-dialog.c:317
 msgid "Select Source File"
 msgstr "Välj källfil"
 
-#: ../gtk/add-dialog.c:329 ../gtk/tr-prefs.c:379
+#: ../gtk/add-dialog.c:332 ../gtk/tr-prefs.c:325
 msgid "_Destination folder:"
 msgstr "_Målmapp:"
 
-#: ../gtk/add-dialog.c:336
+#: ../gtk/add-dialog.c:339
 msgid "Select Destination Folder"
 msgstr "Välj målmapp"
 
-#: ../gtk/add-dialog.c:434
+#: ../gtk/add-dialog.c:437
 msgid "Add a Torrent"
 msgstr "Lägg till en torrentfil"
 
-#: ../gtk/add-dialog.c:451 ../gtk/tr-prefs.c:366
+#: ../gtk/add-dialog.c:454 ../gtk/tr-prefs.c:312
 msgid "Display _options dialog"
 msgstr "Visa a_lternativdialogrutan"
 
@@ -244,116 +248,116 @@ msgstr "Tolkar blockeringslista..."
 msgid "Blocklist updated with %'d entries"
 msgstr "Blockeringslista uppdaterad med %'d poster"
 
-#: ../gtk/conf.c:61 ../gtk/makemeta-ui.c:142 ../libtransmission/metainfo.c:97
-#: ../libtransmission/utils.c:572 ../libtransmission/utils.c:583
+#: ../gtk/conf.c:63 ../gtk/makemeta-ui.c:142 ../libtransmission/metainfo.c:98
+#: ../libtransmission/utils.c:564 ../libtransmission/utils.c:575
 #, c-format
 msgid "Couldn't create \"%1$s\": %2$s"
 msgstr "Kunde inte skapa \"%1$s\": %2$s"
 
-#: ../gtk/conf.c:86 ../libtransmission/bencode.c:1332
-#: ../libtransmission/fdlimit.c:220
+#: ../gtk/conf.c:88 ../libtransmission/bencode.c:1423
+#: ../libtransmission/fdlimit.c:239
 #, c-format
 msgid "Couldn't open \"%1$s\": %2$s"
 msgstr "Kunde inte öppna \"%1$s\": %2$s"
 
-#: ../gtk/conf.c:91
+#: ../gtk/conf.c:93
 #, c-format
 msgid "%s is already running."
 msgstr "%s kör redan."
 
-#: ../gtk/details.c:273
+#: ../gtk/details.c:274
 msgid "Web Seeds"
 msgstr "Webbdistributörer"
 
 #. 'download speed' column header. terse to keep the column narrow.
-#: ../gtk/details.c:275 ../gtk/details.c:317
+#: ../gtk/details.c:276 ../gtk/details.c:318
 msgid "Down"
 msgstr "Ner"
 
-#: ../gtk/details.c:315
+#: ../gtk/details.c:316
 msgid "Address"
 msgstr "Adress"
 
 #. 'upload speed' column header.  terse to keep the column narrow.
-#: ../gtk/details.c:319
+#: ../gtk/details.c:320
 msgid "Up"
 msgstr "Upp"
 
-#: ../gtk/details.c:320
+#: ../gtk/details.c:321
 msgid "Client"
 msgstr "Klient"
 
 #. 'percent done' column header. terse to keep the column narrow.
-#: ../gtk/details.c:322
+#: ../gtk/details.c:323
 msgid "%"
 msgstr "%"
 
-#: ../gtk/details.c:324
+#: ../gtk/details.c:325
 msgid "Status"
 msgstr "Status"
 
 # I brist på bättre ord. Choke är en algoritm
-#: ../gtk/details.c:618
+#: ../gtk/details.c:619
 msgid "Optimistic unchoke"
 msgstr "Optimistisk avstrypning"
 
-#: ../gtk/details.c:621
+#: ../gtk/details.c:622
 msgid "Downloading from this peer"
 msgstr "Hämtar från denna klient"
 
-#: ../gtk/details.c:625
+#: ../gtk/details.c:626
 msgid "We would download from this peer if they would let us"
 msgstr "Vi skulle hämta från denna klient om de låter oss"
 
-#: ../gtk/details.c:629
+#: ../gtk/details.c:630
 msgid "Uploading to peer"
 msgstr "Skickar till klient"
 
-#: ../gtk/details.c:632
+#: ../gtk/details.c:633
 msgid "We would upload to this peer if they asked"
 msgstr "Vi skulle skicka till denna klient om de frågar oss"
 
-#: ../gtk/details.c:637
+#: ../gtk/details.c:638
 msgid "Peer has unchoked us, but we're not interested"
 msgstr "Klienten har avstrypt oss, men vi är inte intresserade"
 
-#: ../gtk/details.c:642
+#: ../gtk/details.c:643
 msgid "We unchoked this peer, but they're not interested"
 msgstr "Vi har avstrypt denna klient, men de är inte intresserade"
 
-#: ../gtk/details.c:646
+#: ../gtk/details.c:647
 msgid "Encrypted connection"
 msgstr "Krypterad anslutning"
 
-#: ../gtk/details.c:650
+#: ../gtk/details.c:651
 msgid "Peer was discovered through Peer Exchange (PEX)"
 msgstr "Klient upptäcktes genom Peer Exchange (PEX)"
 
-#: ../gtk/details.c:654
+#: ../gtk/details.c:655
 msgid "Peer is an incoming connection"
 msgstr "Klient är en inkommande anslutning"
 
-#: ../gtk/details.c:845
+#: ../gtk/details.c:846
 msgid "<b>Seeders:</b>"
 msgstr "<b>Distributörer:</b>"
 
-#: ../gtk/details.c:853
+#: ../gtk/details.c:854
 msgid "<b>Leechers:</b>"
 msgstr "<b>Reciprokörer:</b>"
 
-#: ../gtk/details.c:861
+#: ../gtk/details.c:862
 msgid "<b>Times Completed:</b>"
 msgstr "<b>Antal gånger färdig:</b>"
 
-#: ../gtk/details.c:883 ../gtk/details.c:1419 ../gtk/details.c:1430
+#: ../gtk/details.c:884 ../gtk/details.c:1423 ../gtk/details.c:1434
 msgid "Never"
 msgstr "Aldrig"
 
-#: ../gtk/details.c:908
+#: ../gtk/details.c:909
 msgid "Details"
 msgstr "Detaljer"
 
-#: ../gtk/details.c:911 ../gtk/makemeta-ui.c:284
+#: ../gtk/details.c:912 ../gtk/makemeta-ui.c:284
 #, c-format
 msgid "%'d Piece"
 msgid_plural "%'d Pieces"
@@ -362,235 +366,239 @@ msgstr[1] "%'d delar"
 
 #. %1$s is number of pieces;
 #. %2$s is how big each piece is
-#: ../gtk/details.c:917 ../gtk/makemeta-ui.c:290
+#: ../gtk/details.c:918 ../gtk/makemeta-ui.c:290
 #, c-format
 msgid "%1$s @ %2$s"
 msgstr "%1$s @ %2$s"
 
-#: ../gtk/details.c:921
+#: ../gtk/details.c:922
 msgid "Pieces:"
 msgstr "Delar:"
 
-#: ../gtk/details.c:929
+#: ../gtk/details.c:930
 msgid "Hash:"
 msgstr "Hash:"
 
-#: ../gtk/details.c:932
+#: ../gtk/details.c:933
 msgid "Private to this tracker -- PEX disabled"
 msgstr "Privat för den här bevakaren -- PEX inaktiverad"
 
-#: ../gtk/details.c:933
+#: ../gtk/details.c:934
 msgid "Public torrent"
 msgstr "Publik torrent"
 
-#: ../gtk/details.c:935
+#: ../gtk/details.c:936
 msgid "Privacy:"
 msgstr "Integritet:"
 
-#: ../gtk/details.c:947
+#: ../gtk/details.c:948
 msgid "Comment:"
 msgstr "Kommentar:"
 
-#: ../gtk/details.c:951
+#: ../gtk/details.c:952
 msgid "Origins"
 msgstr "Ursprung"
 
-#: ../gtk/details.c:953
+#: ../gtk/details.c:954
 msgid "Unknown"
 msgstr "Okänt"
 
-#: ../gtk/details.c:955
+#: ../gtk/details.c:956
 msgid "Creator:"
 msgstr "Skapare:"
 
-#: ../gtk/details.c:959
+#: ../gtk/details.c:960
 msgid "Date:"
 msgstr "Datum:"
 
-#: ../gtk/details.c:962
+#: ../gtk/details.c:963
 msgid "Location"
 msgstr "Plats"
 
-#: ../gtk/details.c:968
+#: ../gtk/details.c:969
 msgid "Destination folder:"
 msgstr "Målmapp:"
 
-#: ../gtk/details.c:975
+#: ../gtk/details.c:976
 msgid "Torrent file:"
 msgstr "Torrentfil:"
 
-#: ../gtk/details.c:1021
+#: ../gtk/details.c:1024
 #, c-format
 msgid "%.1f%%"
 msgstr "%.1f%%"
 
-#: ../gtk/details.c:1027
+#: ../gtk/details.c:1030
 #, c-format
 msgid "%1$.1f%% (%2$.1f%% selected)"
 msgstr "%1$.1f%% (%2$.1f%% markerat)"
 
-#: ../gtk/details.c:1039
+#. %1$s is total size of what we've saved to disk
+#. %2$s is how much of it's passed the checksum test
+#. %3$s is how many pieces are verified
+#: ../gtk/details.c:1042
 #, c-format
-msgid "%1$s (%2$s verified)"
-msgstr "%1$s (%2$s verifierat)"
+msgid "%1$s (%2$s verified in %3$d pieces)"
+msgstr "%1$s (%2$s verifierat i %3$d delar)"
 
-#: ../gtk/details.c:1058 ../gtk/util.c:56 ../gtk/util.c:78
+#: ../gtk/details.c:1062 ../gtk/util.c:56 ../gtk/util.c:78
 msgid "None"
 msgstr "Inget"
 
-#: ../gtk/details.c:1080
+#: ../gtk/details.c:1084
 msgid "Transfer"
 msgstr "Överföring"
 
-#: ../gtk/details.c:1083
+#: ../gtk/details.c:1087
 msgid "State:"
 msgstr "Tillstånd:"
 
-#: ../gtk/details.c:1086
+#: ../gtk/details.c:1090
 msgid "Progress:"
 msgstr "Förlopp:"
 
 #. "Have" refers to how much of the torrent we have
-#: ../gtk/details.c:1090
+#: ../gtk/details.c:1094
 msgid "Have:"
 msgstr "Har:"
 
-#: ../gtk/details.c:1093 ../gtk/stats.c:149 ../gtk/stats.c:161
+#: ../gtk/details.c:1097 ../gtk/stats.c:149 ../gtk/stats.c:161
 msgid "Downloaded:"
 msgstr "Hämtat:"
 
-#: ../gtk/details.c:1096 ../gtk/stats.c:147 ../gtk/stats.c:159
+#: ../gtk/details.c:1100 ../gtk/stats.c:147 ../gtk/stats.c:159
 msgid "Uploaded:"
 msgstr "Skickat:"
 
-#: ../gtk/details.c:1100
+#: ../gtk/details.c:1104
 msgid "Failed DL:"
 msgstr "Misslyckad hämtning:"
 
-#: ../gtk/details.c:1103 ../gtk/stats.c:151 ../gtk/stats.c:163
+#: ../gtk/details.c:1107 ../gtk/stats.c:151 ../gtk/stats.c:163
 msgid "Ratio:"
 msgstr "Förhållande:"
 
-#: ../gtk/details.c:1106
+#: ../gtk/details.c:1110
 msgid "Swarm rate:"
 msgstr "Svärmfrekvens:"
 
-#: ../gtk/details.c:1109
+#: ../gtk/details.c:1113
 msgid "Error:"
 msgstr "Fel:"
 
-#: ../gtk/details.c:1113
+#: ../gtk/details.c:1117
 msgid "Completion"
 msgstr "Kompletthet"
 
-#: ../gtk/details.c:1125
+#: ../gtk/details.c:1129
 msgid "Dates"
 msgstr "Datum"
 
-#: ../gtk/details.c:1128
+#: ../gtk/details.c:1132
 msgid "Started at:"
 msgstr "Startad:"
 
-#: ../gtk/details.c:1131
+#: ../gtk/details.c:1135
 msgid "Last activity at:"
 msgstr "Senaste aktivitet:"
 
-#: ../gtk/details.c:1222 ../gtk/tr-prefs.c:554 ../gtk/tr-prefs.c:1165
+#: ../gtk/details.c:1226 ../gtk/tr-prefs.c:504 ../gtk/tr-prefs.c:1107
 msgid "Limits"
 msgstr "Begränsningar"
 
-#: ../gtk/details.c:1226 ../gtk/tr-prefs.c:1167
+#: ../gtk/details.c:1230 ../gtk/tr-prefs.c:1109
 msgid "Limit _download speed (KB/s):"
 msgstr "Begränsa hämtnin_gshastighet (KB/s):"
 
-#: ../gtk/details.c:1245 ../gtk/tr-prefs.c:1175
+#: ../gtk/details.c:1249 ../gtk/tr-prefs.c:1116
 msgid "Limit _upload speed (KB/s):"
 msgstr "Begränsa sä_ndningshastighet (KB/s):"
 
-#: ../gtk/details.c:1263
+#: ../gtk/details.c:1267
 msgid "Peer Connections"
 msgstr "Klientanslutningar"
 
-#: ../gtk/details.c:1268
+#: ../gtk/details.c:1272
 msgid "_Maximum peers:"
 msgstr "_Maximalt antal klienter:"
 
-#: ../gtk/details.c:1323 ../gtk/makemeta-ui.c:427 ../gtk/tr-prefs.c:1427
+#: ../gtk/details.c:1327 ../gtk/makemeta-ui.c:427 ../gtk/tr-prefs.c:1363
 msgid "Trackers"
 msgstr "Bevakare"
 
-#: ../gtk/details.c:1329
+#: ../gtk/details.c:1333
 msgid "Scrape"
 msgstr "Scrape"
 
-#: ../gtk/details.c:1331
+#: ../gtk/details.c:1335
 msgid "Last scrape at:"
 msgstr "Senaste scrape:"
 
-#: ../gtk/details.c:1336 ../gtk/details.c:1358
+#: ../gtk/details.c:1340 ../gtk/details.c:1362
 msgid "Tracker responded:"
 msgstr "Bevakare svarade:"
 
-#: ../gtk/details.c:1341
+#: ../gtk/details.c:1345
 msgid "Next scrape in:"
 msgstr "Nästa scrape om:"
 
-#: ../gtk/details.c:1347
+#: ../gtk/details.c:1351
 msgid "Announce"
 msgstr "Annonsering"
 
-#: ../gtk/details.c:1351
+#: ../gtk/details.c:1355
 msgid "Tracker:"
 msgstr "Bevakare:"
 
-#: ../gtk/details.c:1353
+#: ../gtk/details.c:1357
 msgid "Last announce at:"
 msgstr "Senaste annonsering:"
 
-#: ../gtk/details.c:1363
+#: ../gtk/details.c:1367
 msgid "Next announce in:"
 msgstr "Nästa annonsering:"
 
 #. how long until the tracker will honor user
 #. * pressing the "ask for more peers" button
-#: ../gtk/details.c:1370
+#: ../gtk/details.c:1374
 msgid "Manual announce allowed in:"
 msgstr "Manuell annonsering tillåts om:"
 
-#: ../gtk/details.c:1389
+#: ../gtk/details.c:1393
 msgid "In progress"
 msgstr "Pågår"
 
-#: ../gtk/details.c:1434
+#: ../gtk/details.c:1438
 msgid "Now"
 msgstr "Nu"
 
-#: ../gtk/details.c:1490
+#. create the dialog
+#: ../gtk/details.c:1489
 #, c-format
-msgid "Details for %1$s (%2$s)"
-msgstr "Detaljer för %1$s (%2$s)"
+msgid "%s Properties"
+msgstr "Egenskaper för %s"
 
-#: ../gtk/details.c:1508
+#: ../gtk/details.c:1507
 msgid "Activity"
 msgstr "Aktivitet"
 
-#: ../gtk/details.c:1513 ../gtk/tr-prefs.c:1412
+#: ../gtk/details.c:1512 ../gtk/tr-prefs.c:1348
 msgid "Peers"
 msgstr "Klienter"
 
-#: ../gtk/details.c:1518 ../gtk/tr-window.c:524
+#: ../gtk/details.c:1517 ../gtk/tr-window.c:525
 msgid "Tracker"
 msgstr "Bevakare"
 
-#: ../gtk/details.c:1522 ../gtk/msgwin.c:193
+#: ../gtk/details.c:1521 ../gtk/msgwin.c:193
 msgid "Information"
 msgstr "Information"
 
-#: ../gtk/details.c:1528 ../gtk/tr-window.c:524
+#: ../gtk/details.c:1527 ../gtk/tr-window.c:525
 msgid "Files"
 msgstr "Filer"
 
-#: ../gtk/details.c:1533 ../gtk/tr-prefs.c:398 ../gtk/tr-prefs.c:563
+#: ../gtk/details.c:1532 ../gtk/tr-prefs.c:344 ../gtk/tr-prefs.c:512
 msgid "Options"
 msgstr "Alternativ"
 
@@ -602,30 +610,41 @@ msgstr "<big><b>Avsluta Transmission?</b></big>"
 msgid "_Don't ask me again"
 msgstr "_Fråga mig inte igen"
 
-#: ../gtk/dialogs.c:227
+#: ../gtk/dialogs.c:235
 msgid "Remove torrent?"
 msgid_plural "Remove torrents?"
 msgstr[0] "Ta bort torrentfil?"
 msgstr[1] "Ta bort torrentfiler?"
 
-#: ../gtk/dialogs.c:230
+#: ../gtk/dialogs.c:241
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these torrents' downloaded files?"
 msgstr[0] "Ta bort hämtade filer för denna torrentfil?"
 msgstr[1] "Ta bort hämtade filer för dessa torrentfiler?"
 
-#: ../gtk/dialogs.c:236
-msgid "Some of these torrents are incomplete or connected to peers."
-msgstr ""
-"Några av dessa torrentfiler är inte kompletta eller anslutna till klienter."
+#: ../gtk/dialogs.c:254
+msgid "This torrent has not finished downloading."
+msgid_plural "These torrents have not finished downloading."
+msgstr[0] "Denna torrentfil har inte hämtats färdigt."
+msgstr[1] "Dessa torrentfiler har inte hämtats färdigt."
 
-#: ../gtk/dialogs.c:241
-msgid "This torrent is incomplete or connected to peers."
-msgid_plural "One of these torrents is incomplete or connected to peers."
-msgstr[0] ""
-"Denna torrentfil är inte komplett eller är ansluten till klienter."
-msgstr[1] ""
-"En av dessa torrentfiler är inte komplett eller är ansluten till klienter."
+#: ../gtk/dialogs.c:260
+msgid "This torrent is connected to peers."
+msgid_plural "These torrents are connected to peers."
+msgstr[0] "Denna torrentfil är ansluten till klienter."
+msgstr[1] "Dessa torrentfiler är anslutna till klienter."
+
+#: ../gtk/dialogs.c:267
+msgid "One of these torrents is connected to peers."
+msgid_plural "Some of these torrents are connected to peers."
+msgstr[0] "En av dessa torrentfiler är ansluten till klienter."
+msgstr[1] "Några av dessa torrentfiler är anslutna till klienter."
+
+#: ../gtk/dialogs.c:274
+msgid "One of these torrents has not finished downloading."
+msgid_plural "Some of these torrents have not finished downloading."
+msgstr[0] "En av dessa torrentfiler har inte hämtats färdigt."
+msgstr[1] "Några av dessa torrentfiler har inte hämtats färdigt."
 
 #: ../gtk/file-list.c:622
 msgid "High"
@@ -643,108 +662,98 @@ msgstr "Låg"
 msgid "Mixed"
 msgstr "Blandad"
 
-#. Translators: this is a column header in Files tab, Details dialog;
-#. Don't include the prefix "filedetails|" in the translation.
-#. The items for this column are checkboxes (yes/no)
-#: ../gtk/file-list.c:666 ../gtk/file-list.c:831
-msgid "filedetails|Download"
-msgstr "Hämtning"
+#: ../gtk/file-list.c:664 ../gtk/file-list.c:814
+msgid "Download"
+msgstr "Hämta"
 
-#: ../gtk/file-list.c:668 ../gtk/file-list.c:838
+#: ../gtk/file-list.c:665 ../gtk/file-list.c:821
 msgid "Priority"
 msgstr "Prioritet"
 
-#. Translators: this is a column
-#. header in Files tab, Details
-#. dialog;
-#. Don't include the prefix
-#. "filedetails|" in the
-#. translation.
-#: ../gtk/file-list.c:802
-msgid "filedetails|File"
+#: ../gtk/file-list.c:793
+msgid "File"
 msgstr "Fil"
 
-#. Translators: this is a column header in Files tab, Details dialog;
-#. Don't include the prefix "filedetails|" in the translation.
-#: ../gtk/file-list.c:821
-msgid "filedetails|Progress"
+#: ../gtk/file-list.c:807
+msgid "Progress"
 msgstr "Förlopp"
 
-#: ../gtk/main.c:369
+#: ../gtk/main.c:359
 msgid "Start with all torrents paused"
 msgstr "Starta med alla torrentfiler pausade"
 
-#: ../gtk/main.c:371
+#: ../gtk/main.c:361
 msgid "Show version number and exit"
 msgstr "Visa versionsnummer och avsluta"
 
-#: ../gtk/main.c:375
+#: ../gtk/main.c:365
 msgid "Start minimized in system tray"
 msgstr "Starta minimerad i meddelandefält"
 
-#: ../gtk/main.c:378
+#: ../gtk/main.c:368
 msgid "Where to look for configuration files"
 msgstr "Plats för konfigurationsfiler"
 
-#: ../gtk/main.c:391
+#: ../gtk/main.c:381
 msgid "Transmission"
 msgstr "Transmission"
 
-#: ../gtk/main.c:398
+#: ../gtk/main.c:388
 msgid "[torrent files]"
 msgstr "[torrentfiler]"
 
-#: ../gtk/main.c:552
+#: ../gtk/main.c:508
 msgid "Beginning to use scheduled bandwidth limits"
 msgstr "Börja använda schemalagda bandbreddsbegränsningar"
 
-#: ../gtk/main.c:566
+#: ../gtk/main.c:522
 msgid "Ending use of scheduled bandwidth limits"
 msgstr "Sluta använda schemalagda bandbreddsbegränsningar"
 
-#: ../gtk/main.c:867
+#: ../gtk/main.c:776
 msgid "<b>Closing Connections</b>"
 msgstr "<b>Stänger anslutningar</b>"
 
-#: ../gtk/main.c:871
+#: ../gtk/main.c:780
 msgid "Sending upload/download totals to tracker..."
 msgstr "Skickar information om sändning/hämtning till bevakare..."
 
-#: ../gtk/main.c:876
+#: ../gtk/main.c:785
 msgid "_Quit Now"
 msgstr "A_vsluta nu"
 
-#: ../gtk/main.c:1030
+#: ../gtk/main.c:944
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
 msgstr[0] "Kunde inte lägga till skadad torrentfil"
 msgstr[1] "Kunde inte lägga till skadade torrentfiler"
 
-#: ../gtk/main.c:1037
+#: ../gtk/main.c:951
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] "Kunde inte lägga till dubblett av torrentfil"
 msgstr[1] "Kunde inte lägga till dubbletter av torrentfiler"
 
-#: ../gtk/main.c:1297
+#: ../gtk/main.c:1220
 msgid "A fast and easy BitTorrent client"
 msgstr "En snabb och enkel BitTorrent-klient"
 
-#: ../gtk/main.c:1303
-msgid "Copyright 2005-2008 The Transmission Project"
-msgstr "Copyright 2005-2008 The Transmission Project"
+#: ../gtk/main.c:1225
+msgid "Copyright 2005-2009 The Transmission Project"
+msgstr "Copyright 2005-2009 The Transmission Project"
 
 #. Translators: translate "translator-credits" as
 #. your name
 #. to have it appear in the credits in the "About"
 #. dialog
-#: ../gtk/main.c:1314
+#: ../gtk/main.c:1236
 msgid "translator-credits"
 msgstr ""
 "Daniel Nylander <po@danielnylander.se>\n"
 "\n"
 "Launchpad Contributions:\n"
 "  Anders Pamdal https://launchpad.net/~anders-pamdal\n"
+"  AndrewJ https://launchpad.net/~andrew-jonsson\n"
 "  Daniel Nylander https://launchpad.net/~yeager\n"
 "  Gustaf Johansson https://launchpad.net/~gustaf-joh\n"
 "  Michael Dundee https://launchpad.net/~dundee-michael\n"
@@ -769,8 +778,8 @@ msgstr "Ogiltig url"
 msgid "Torrent creation cancelled"
 msgstr "Skapandet av torrentfil avbröts"
 
-#: ../gtk/makemeta-ui.c:128 ../libtransmission/blocklist.c:76
-#: ../libtransmission/blocklist.c:233 ../libtransmission/utils.c:441
+#: ../gtk/makemeta-ui.c:128 ../libtransmission/blocklist.c:78
+#: ../libtransmission/blocklist.c:237 ../libtransmission/utils.c:446
 #, c-format
 msgid "Couldn't read \"%1$s\": %2$s"
 msgstr "Kunde inte läsa \"%1$s\": %2$s"
@@ -828,8 +837,8 @@ msgstr "Kommen_tar:"
 msgid "_Private torrent"
 msgstr "_Privat torrentfil"
 
-#: ../gtk/msgwin.c:87 ../libtransmission/bencode.c:1338
-#: ../libtransmission/blocklist.c:290
+#: ../gtk/msgwin.c:87 ../libtransmission/bencode.c:1429
+#: ../libtransmission/blocklist.c:293
 #, c-format
 msgid "Couldn't save file \"%1$s\": %2$s"
 msgstr "Kunde inte spara filen \"%1$s\": %2$s"
@@ -850,7 +859,7 @@ msgstr "Felsökning"
 msgid "Time"
 msgstr "Tid"
 
-#: ../gtk/msgwin.c:272 ../gtk/tr-window.c:524
+#: ../gtk/msgwin.c:272 ../gtk/tr-window.c:525
 msgid "Name"
 msgstr "Namn"
 
@@ -866,15 +875,15 @@ msgstr "Meddelandelogg"
 msgid "Level"
 msgstr "Nivå"
 
-#: ../gtk/notify.c:65
+#: ../gtk/notify.c:70
 msgid "Torrent Complete"
 msgstr "Torrentfilen är komplett"
 
-#: ../gtk/notify.c:70
+#: ../gtk/notify.c:76
 msgid "Open File"
 msgstr "Öppna fil"
 
-#: ../gtk/notify.c:73
+#: ../gtk/notify.c:81
 msgid "Open Folder"
 msgstr "Öppna mapp"
 
@@ -973,8 +982,8 @@ msgstr "Väntar på att verifiera lokalt data"
 msgid "Verifying local data (%.1f%% tested)"
 msgstr "Verifierar lokalt data (%.1f%% testat)"
 
-#: ../gtk/torrent-cell-renderer.c:163 ../gtk/tr-window.c:735
-#: ../gtk/tr-window.c:763
+#: ../gtk/torrent-cell-renderer.c:163 ../gtk/tr-window.c:747
+#: ../gtk/tr-window.c:775
 #, c-format
 msgid "Ratio: %s"
 msgstr "Förhållande: %s"
@@ -993,11 +1002,11 @@ msgid_plural "Seeding to %1$'d of %2$'d connected peers"
 msgstr[0] "Distribuerar till %1$'d av %2$'d ansluten klient"
 msgstr[1] "Distribuerar till %1$'d av %2$'d anslutna klienter"
 
-#: ../gtk/tracker-list.c:328
+#: ../gtk/tracker-list.c:327
 msgid "Tier"
 msgstr "Part"
 
-#: ../gtk/tracker-list.c:340
+#: ../gtk/tracker-list.c:339
 msgid "Announce URL"
 msgstr "URL för annonsering"
 
@@ -1011,26 +1020,26 @@ msgstr "Hämta och dela ut filer över BitTorrent"
 
 #: ../gtk/transmission.desktop.in.h:3
 msgid "Transmission BitTorrent Client"
-msgstr "BitTorrent-klienten Transmission"
+msgstr "Transmission BitTorrent-klient"
 
-#: ../gtk/tr-core.c:1108
+#: ../gtk/tr-core.c:1124
 msgid "Transmission Bittorrent Client"
-msgstr "Bittorrent-klienten Transmission"
+msgstr "Transmission Bittorrent-klient"
 
-#: ../gtk/tr-core.c:1109
+#: ../gtk/tr-core.c:1125
 msgid "BitTorrent Activity"
 msgstr "BitTorrent-aktivitet"
 
-#: ../gtk/tr-core.c:1117
+#: ../gtk/tr-core.c:1133
 msgid "Disallowing desktop hibernation"
 msgstr "Tillåter inte viloläge"
 
-#: ../gtk/tr-core.c:1121
+#: ../gtk/tr-core.c:1137
 #, c-format
 msgid "Couldn't disable desktop hibernation: %s"
 msgstr "Kunde inte inaktivera viloläge: %s"
 
-#: ../gtk/tr-core.c:1145
+#: ../gtk/tr-core.c:1161
 msgid "Allowing desktop hibernation"
 msgstr "Tillåter viloläge"
 
@@ -1047,194 +1056,198 @@ msgstr ""
 "%1$'d distribueras, %2$'d hämtas\n"
 "Ned: %3$s, Upp: %4$s"
 
-#: ../gtk/tr-prefs.c:354
+#: ../gtk/tr-prefs.c:300
 msgid "Adding Torrents"
 msgstr "Lägg till torrentfiler"
 
-#: ../gtk/tr-prefs.c:357
+#: ../gtk/tr-prefs.c:303
 msgid "Automatically _add torrents from:"
 msgstr "_Lägg automatiskt till torrentfiler från:"
 
-#: ../gtk/tr-prefs.c:374
+#: ../gtk/tr-prefs.c:320
 msgid "Mo_ve source files to Trash"
 msgstr "Fl_ytta källfilerna till papperskorgen"
 
-#: ../gtk/tr-prefs.c:400
+#: ../gtk/tr-prefs.c:346
 msgid "Inhibit desktop _hibernation when torrents are active"
-msgstr ""
+msgstr "Förhindra _viloläge när torrentfiler är aktiva"
 
-#: ../gtk/tr-prefs.c:404
+#: ../gtk/tr-prefs.c:350
 msgid "Show _icon in the desktop Notification Area"
 msgstr "Visa _ikon i skrivbordets notifieringsyta"
 
-#: ../gtk/tr-prefs.c:434
+#: ../gtk/tr-prefs.c:354
+msgid "Show desktop _notifications"
+msgstr "Visa skrivbords_notifieringar"
+
+#: ../gtk/tr-prefs.c:384
 #, c-format
 msgid "Enable _blocklist (contains %'d rule)"
 msgid_plural "Enable _blocklist (contains %'d rules)"
 msgstr[0] "Aktivera _blockeringslista (innehåller %'d regel)"
 msgstr[1] "Aktivera _blockeringslista (innehåller %'d regler)"
 
-#: ../gtk/tr-prefs.c:484
+#: ../gtk/tr-prefs.c:434
 msgid "Updating Blocklist"
 msgstr "Uppdaterar blockeringslista"
 
-#: ../gtk/tr-prefs.c:531
+#: ../gtk/tr-prefs.c:481
 msgid "Blocklist"
 msgstr "Blockeringslista"
 
-#: ../gtk/tr-prefs.c:537
+#: ../gtk/tr-prefs.c:487
 msgid "_Update"
 msgstr "_Uppdatera"
 
-#: ../gtk/tr-prefs.c:547
+#: ../gtk/tr-prefs.c:497
 msgid "Enable _automatic updates"
 msgstr "Aktivera _automatiska uppdateringar"
 
-#: ../gtk/tr-prefs.c:557
+#: ../gtk/tr-prefs.c:507
 msgid "Maximum peers _overall:"
 msgstr "Maximalt antal klienter t_otalt:"
 
-#: ../gtk/tr-prefs.c:560
+#: ../gtk/tr-prefs.c:509
 msgid "Maximum peers per _torrent:"
 msgstr "Maximalt antal klienter per _torrentfil:"
 
-#: ../gtk/tr-prefs.c:565
+#: ../gtk/tr-prefs.c:514
 msgid "_Ignore unencrypted peers"
 msgstr "_Ignorera okrypterade klienter"
 
-#: ../gtk/tr-prefs.c:574
+#: ../gtk/tr-prefs.c:522
 msgid "Use peer e_xchange"
 msgstr "Använd peer e_xchange"
 
-#: ../gtk/tr-prefs.c:783
+#: ../gtk/tr-prefs.c:731
 msgid "Web Interface"
 msgstr "Webbgränssnitt"
 
 #. "enabled" checkbutton
-#: ../gtk/tr-prefs.c:786
+#: ../gtk/tr-prefs.c:734
 msgid "_Enable web interface"
 msgstr "_Aktivera webbgränssnitt"
 
-#: ../gtk/tr-prefs.c:801 ../gtk/tr-prefs.c:1362
+#: ../gtk/tr-prefs.c:749 ../gtk/tr-prefs.c:1299
 msgid "Listening _port:"
 msgstr "Lyssnings_port:"
 
 #. require authentication
-#: ../gtk/tr-prefs.c:805
+#: ../gtk/tr-prefs.c:753
 msgid "_Require username"
 msgstr "_Kräv användarnamn"
 
 #. username
-#: ../gtk/tr-prefs.c:813 ../gtk/tr-prefs.c:1037
+#: ../gtk/tr-prefs.c:761 ../gtk/tr-prefs.c:979
 msgid "_Username:"
 msgstr "_Användarnamn:"
 
 #. password
-#: ../gtk/tr-prefs.c:820 ../gtk/tr-prefs.c:1043
+#: ../gtk/tr-prefs.c:768 ../gtk/tr-prefs.c:985
 msgid "Pass_word:"
 msgstr "Lösen_ord:"
 
 #. require authentication
-#: ../gtk/tr-prefs.c:828
+#: ../gtk/tr-prefs.c:776
 msgid "Only allow the following IP _addresses to connect:"
 msgstr "Tillåt endast följande IP-_adresser att ansluta:"
 
-#: ../gtk/tr-prefs.c:855
+#: ../gtk/tr-prefs.c:803
 msgid "IP addresses may use wildcards, such as 192.168.*.*"
 msgstr "IP-adresser kan använda jokertecken, såsom 192.168.*.*"
 
-#: ../gtk/tr-prefs.c:878
+#: ../gtk/tr-prefs.c:826
 msgid "Addresses:"
 msgstr "Adresser:"
 
-#: ../gtk/tr-prefs.c:998
+#: ../gtk/tr-prefs.c:942
 msgid "Tracker Proxy"
 msgstr "Bevakarproxy"
 
-#: ../gtk/tr-prefs.c:1000
+#: ../gtk/tr-prefs.c:944
 msgid "Connect to tracker via a pro_xy"
 msgstr "Anslut till en bevakare via en pro_xy"
 
-#: ../gtk/tr-prefs.c:1005
+#: ../gtk/tr-prefs.c:949
 msgid "Proxy _server:"
 msgstr "Proxy_server:"
 
-#: ../gtk/tr-prefs.c:1013
+#: ../gtk/tr-prefs.c:957
 msgid "Proxy _port:"
 msgstr "Proxy_port:"
 
-#: ../gtk/tr-prefs.c:1016
+#: ../gtk/tr-prefs.c:960
 msgid "Proxy _type:"
 msgstr "Proxy_typ:"
 
-#: ../gtk/tr-prefs.c:1031
+#: ../gtk/tr-prefs.c:973
 msgid "_Authentication is required"
 msgstr "_Autentisering krävs"
 
-#: ../gtk/tr-prefs.c:1184
+#: ../gtk/tr-prefs.c:1124
 msgid "Scheduled Limits"
 msgstr "Schemalagda begränsningar"
 
-#: ../gtk/tr-prefs.c:1190
+#: ../gtk/tr-prefs.c:1130
 msgid " and "
 msgstr " och "
 
-#: ../gtk/tr-prefs.c:1197
+#: ../gtk/tr-prefs.c:1137
 msgid "_Limit bandwidth between"
 msgstr "_Begränsa bandbredd mellan"
 
-#: ../gtk/tr-prefs.c:1205
+#: ../gtk/tr-prefs.c:1144
 msgid "Limit d_ownload speed (KB/s):"
 msgstr "Begränsa hä_mtningshastighet (KB/s):"
 
-#: ../gtk/tr-prefs.c:1212
+#: ../gtk/tr-prefs.c:1149
 msgid "Limit u_pload speed (KB/s):"
 msgstr "Begränsa sä_ndningshastighet (KB/s):"
 
-#: ../gtk/tr-prefs.c:1263
+#: ../gtk/tr-prefs.c:1200
 #, c-format
 msgid "Port is <b>open</b>"
 msgstr "Porten är <b>öppen</b>"
 
-#: ../gtk/tr-prefs.c:1264
+#: ../gtk/tr-prefs.c:1201
 #, c-format
 msgid "Port is <b>closed</b>"
 msgstr "Porten är <b>stängd</b>"
 
-#: ../gtk/tr-prefs.c:1308
+#: ../gtk/tr-prefs.c:1245
 msgid "<i>Testing port...</i>"
 msgstr "<i>Testar port...</i>"
 
-#: ../gtk/tr-prefs.c:1354
+#: ../gtk/tr-prefs.c:1291
 msgid "Incoming Peers"
 msgstr "Inkommande klienter"
 
-#: ../gtk/tr-prefs.c:1372
+#: ../gtk/tr-prefs.c:1308
 msgid "Use UPnP or NAT-PMP port _forwarding from my router"
 msgstr ""
 "Använd vidarebefordring av port via UPnP eller NAT-PMP från min router"
 
-#: ../gtk/tr-prefs.c:1394
+#: ../gtk/tr-prefs.c:1330
 msgid "Transmission Preferences"
 msgstr "Inställningar för Transmission"
 
-#: ../gtk/tr-prefs.c:1409
+#: ../gtk/tr-prefs.c:1345
 msgid "Torrents"
 msgstr "Torrentfiler"
 
-#: ../gtk/tr-prefs.c:1415
+#: ../gtk/tr-prefs.c:1351
 msgid "Network"
 msgstr "Nätverk"
 
-#: ../gtk/tr-prefs.c:1418
+#: ../gtk/tr-prefs.c:1354
 msgid "Desktop"
 msgstr "Skrivbord"
 
-#: ../gtk/tr-prefs.c:1421
+#: ../gtk/tr-prefs.c:1357
 msgid "Bandwidth"
 msgstr "Bandbredd"
 
-#: ../gtk/tr-prefs.c:1424
+#: ../gtk/tr-prefs.c:1360
 msgid "Web"
 msgstr "Webb"
 
@@ -1259,7 +1272,7 @@ msgstr "Väntar på att verifiera lokalt data (%.1f%% testade)"
 msgid "%1$s remaining"
 msgstr "%1$s återstår"
 
-#: ../gtk/tr-torrent.c:299 ../libtransmission/port-forwarding.c:174
+#: ../gtk/tr-torrent.c:299 ../libtransmission/port-forwarding.c:206
 msgid "Stopped"
 msgstr "Stoppad"
 
@@ -1289,45 +1302,45 @@ msgid "Tracker will allow requests in %s"
 msgstr "Bevakare kommer att tillåta begäran om %s"
 
 #. show all torrents
-#: ../gtk/tr-window.c:513
+#: ../gtk/tr-window.c:514
 msgid "A_ll"
 msgstr "A_lla"
 
 #. show only torrents that have connected peers
-#: ../gtk/tr-window.c:515
+#: ../gtk/tr-window.c:516
 msgid "_Active"
 msgstr "_Aktiva"
 
 #. show only torrents that are trying to download
-#: ../gtk/tr-window.c:517
+#: ../gtk/tr-window.c:518
 msgid "_Downloading"
 msgstr "_Hämtar"
 
 #. show only torrents that are trying to upload
-#: ../gtk/tr-window.c:519
+#: ../gtk/tr-window.c:520
 msgid "_Seeding"
 msgstr "_Distribuerar"
 
 #. show only torrents that are paused
-#: ../gtk/tr-window.c:521
+#: ../gtk/tr-window.c:522
 msgid "_Paused"
 msgstr "_Pausade"
 
-#: ../gtk/tr-window.c:708
+#: ../gtk/tr-window.c:720
 #, c-format
 msgid "%1$'d of %2$'d Torrent"
 msgid_plural "%1$'d of %2$'d Torrents"
 msgstr[0] "%1$'d av %2$'d torrentfil"
 msgstr[1] "%1$'d av %2$'d torrentfiler"
 
-#: ../gtk/tr-window.c:713
+#: ../gtk/tr-window.c:725
 #, c-format
 msgid "%'d Torrent"
 msgid_plural "%'d Torrents"
 msgstr[0] "%'d torrentfil"
 msgstr[1] "%'d torrentfiler"
 
-#: ../gtk/tr-window.c:746 ../gtk/tr-window.c:757
+#: ../gtk/tr-window.c:758 ../gtk/tr-window.c:769
 #, c-format
 msgid "size|Down: %1$s, Up: %2$s"
 msgstr "Ner: %1$s, Upp: %2$s"
@@ -1426,16 +1439,16 @@ msgid "Error opening torrent"
 msgstr "Fel vid öppning av torrentfil"
 
 #. did caller give us an uninitialized val?
-#: ../libtransmission/bencode.c:965
+#: ../libtransmission/bencode.c:982
 msgid "Invalid metadata"
 msgstr "Ogiltigt metadata"
 
-#: ../libtransmission/blocklist.c:108
+#: ../libtransmission/blocklist.c:110
 #, c-format
 msgid "Blocklist \"%s\" contains %'zu entries"
 msgstr "Blockeringslistan \"%s\" innehåller %'zu poster"
 
-#: ../libtransmission/blocklist.c:300
+#: ../libtransmission/blocklist.c:303
 #, c-format
 msgid "Blocklist \"%1$s\" updated with %2$'d entries"
 msgstr "Blockeringslistan \"%1$s\" uppdaterad med %2$'d poster"
@@ -1445,22 +1458,22 @@ msgstr "Blockeringslistan \"%1$s\" uppdaterad med %2$'d poster"
 msgid "Couldn't read resume file"
 msgstr "Kunde inte läsa återupptagningsfil"
 
-#: ../libtransmission/fdlimit.c:206
+#: ../libtransmission/fdlimit.c:225
 #, c-format
 msgid "Preallocated file \"%s\""
 msgstr "Förallokerade filen \"%s\""
 
-#: ../libtransmission/fdlimit.c:461 ../libtransmission/net.c:109
+#: ../libtransmission/fdlimit.c:484 ../libtransmission/net.c:403
 #, c-format
 msgid "Couldn't create socket: %s"
 msgstr "Kunde inte skapa uttag: %s"
 
-#: ../libtransmission/makemeta.c:59
+#: ../libtransmission/makemeta.c:60
 #, c-format
 msgid "Torrent Creator is skipping file \"%s\": %s"
 msgstr "Torrentskaparen hoppar över filen \"%s\": %s"
 
-#: ../libtransmission/metainfo.c:453
+#: ../libtransmission/metainfo.c:457
 #, c-format
 msgid "Invalid metadata entry \"%s\""
 msgstr "Ogiltig metadata-post \"%s\""
@@ -1489,95 +1502,97 @@ msgstr "vidarebefordrar inte längre port %d"
 msgid "Port %d forwarded successfully"
 msgstr "Vidarebefordring av port %d lyckades"
 
-#: ../libtransmission/net.c:166
+#: ../libtransmission/net.c:501
 #, c-format
 msgid "Couldn't connect socket %d to %s, port %d (errno %d - %s)"
 msgstr "Kunde inte ansluta uttag %d till %s, port %d (felkod %d - %s)"
 
-#: ../libtransmission/net.c:206
+#: ../libtransmission/net.c:544
 #, c-format
-msgid "Couldn't bind port %d: %s"
-msgstr "Kunde inte binda port %d: %s"
+msgid "Couldn't bind port %d on %s: %s"
+msgstr "Kunde inte binda port %d på %s: %s"
 
-#: ../libtransmission/port-forwarding.c:31
+#: ../libtransmission/port-forwarding.c:32
 msgid "Port Forwarding"
 msgstr "Vidarebefordring av portar"
 
-#: ../libtransmission/port-forwarding.c:63
+#: ../libtransmission/port-forwarding.c:64
 msgid "Starting"
 msgstr "Startar"
 
-#: ../libtransmission/port-forwarding.c:67
+#: ../libtransmission/port-forwarding.c:68
 msgid "Forwarded"
 msgstr "Vidarebefordrad"
 
-#: ../libtransmission/port-forwarding.c:71
+#: ../libtransmission/port-forwarding.c:72
 msgid "Stopping"
 msgstr "Stoppar"
 
-#: ../libtransmission/port-forwarding.c:75
+#: ../libtransmission/port-forwarding.c:76
 msgid "Not forwarded"
 msgstr "Inte vidarebefordrad"
 
-#: ../libtransmission/port-forwarding.c:98 ../libtransmission/torrent.c:1319
+#: ../libtransmission/port-forwarding.c:99 ../libtransmission/torrent.c:1277
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
 msgstr "Tillstånd ändrades från \"%1$s\" till \"%2$s\""
 
-#: ../libtransmission/port-forwarding.c:108
+#: ../libtransmission/port-forwarding.c:115
 #, c-format
-msgid "Closing port %d"
-msgstr "Stänger port %d"
+msgid "Closing port %d on %s"
+msgstr "Stänger port %d på %s"
 
-#: ../libtransmission/port-forwarding.c:122
+#: ../libtransmission/port-forwarding.c:152
 #, c-format
-msgid "Opened port %d to listen for incoming peer connections"
-msgstr "Öppnade port %d för att lyssna på inkommande klientanslutningar"
+msgid "Opened port %d on %s to listen for incoming peer connections"
+msgstr ""
+"Öppnade port %d på %s för att lyssna efter inkommande klientanslutningar"
 
-#: ../libtransmission/port-forwarding.c:132
+#: ../libtransmission/port-forwarding.c:160
 #, c-format
 msgid ""
-"Couldn't open port %d to listen for incoming peer connections (errno %d - %s)"
+"Couldn't open port %d on %s to listen for incoming peer connections (errno "
+"%d - %s)"
 msgstr ""
-"Kunde inte öppna port %d för att lyssna på inkommande klientanslutningar "
-"(felkod %d - %s)"
+"Kunde inte öppna port %d på %s för att lyssna efter inkommande "
+"klientanslutningar (felkod %d - %s)"
 
 #. first %s is the application name
 #. second %s is the version number
-#: ../libtransmission/session.c:289
+#: ../libtransmission/session.c:522
 #, c-format
 msgid "%s %s started"
 msgstr "%s %s startad"
 
-#: ../libtransmission/session.c:704
+#: ../libtransmission/session.c:921
 #, c-format
 msgid "Loaded %d torrents"
 msgstr "Läste in %d torrentfiler"
 
-#: ../libtransmission/torrent.c:236
+#: ../libtransmission/torrent.c:202
 #, c-format
 msgid "Got %d peers from tracker"
 msgstr "Fick %d klienter från bevakare"
 
-#: ../libtransmission/torrent.c:251
+#: ../libtransmission/torrent.c:216
 #, c-format
 msgid "Tracker warning: \"%s\""
 msgstr "Varning från bevakare: \"%s\""
 
-#: ../libtransmission/torrent.c:258
+#: ../libtransmission/torrent.c:223
 #, c-format
 msgid "Tracker error: \"%s\""
 msgstr "Fel i bevakare: \"%s\""
 
-#: ../libtransmission/torrent.c:1265
+#: ../libtransmission/torrent.c:1223
 msgid "Done"
 msgstr "Klar"
 
-#: ../libtransmission/torrent.c:1268
+#: ../libtransmission/torrent.c:1226
 msgid "Complete"
 msgstr "Färdig"
 
-#: ../libtransmission/torrent.c:1271
+#: ../libtransmission/torrent.c:1229
 msgid "Incomplete"
 msgstr "Ofärdig"
 
@@ -1600,7 +1615,7 @@ msgstr "Lokal adress är \"%s\""
 msgid "Stopping port forwarding through \"%s\", service \"%s\""
 msgstr "Stoppar vidarebefordring av port genom \"%s\", tjänsten \"%s\""
 
-#: ../libtransmission/upnp.c:171
+#: ../libtransmission/upnp.c:173
 #, c-format
 msgid ""
 "Port forwarding through \"%s\", service \"%s\".  (local address: %s:%d)"
@@ -1608,20 +1623,20 @@ msgstr ""
 "Vidarebefordring av portar genom \"%s\", tjänsten \"%s\".  (lokal adress: "
 "%s:%d)"
 
-#: ../libtransmission/upnp.c:176
+#: ../libtransmission/upnp.c:178
 msgid "Port forwarding successful!"
 msgstr "Vidarebefordring av portar lyckades!"
 
-#: ../libtransmission/utils.c:455
+#: ../libtransmission/utils.c:460
 msgid "Not a regular file"
 msgstr "Inte en vanlig fil"
 
-#: ../libtransmission/utils.c:473
+#: ../libtransmission/utils.c:478
 msgid "Memory allocation failed"
 msgstr "Minnesallokering misslyckades"
 
 #. Node exists but isn't a folder
-#: ../libtransmission/utils.c:582
+#: ../libtransmission/utils.c:574
 #, c-format
 msgid "File \"%s\" is in the way"
 msgstr "Filen \"%s\" är i vägen"
@@ -1630,15 +1645,21 @@ msgstr "Filen \"%s\" är i vägen"
 msgid "Verifying torrent"
 msgstr "Verifierar torrentfil"
 
-#: ../libtransmission/verify.c:179
+#: ../libtransmission/verify.c:181
 msgid "Queued for verification"
 msgstr "Köad för verifiering"
+
+#~ msgid "_Details"
+#~ msgstr "_Detaljer"
 
 #~ msgid "Bad IPC protocol version"
 #~ msgstr "Felaktig IPC-protokollversion"
 
 #~ msgid "_Quit Immediately"
 #~ msgstr "Avsluta _omedelbart"
+
+#~ msgid "Copyright 2005-2008 The Transmission Project"
+#~ msgstr "Copyright 2005-2008 The Transmission Project"
 
 #~ msgid "Preferences"
 #~ msgstr "Inställningar"

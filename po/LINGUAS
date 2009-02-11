@@ -1,20 +1,21 @@
 # please keep this list sorted alphabetically
 ar
 bg
+br
 ca
 ckb
 cs
 da
 de
+el
 en_AU
 en_CA
 en_GB
 eo
+es
 et
 eu
 fa
-el
-es
 fi
 fr
 ga
@@ -26,6 +27,8 @@ is
 it
 ja
 ka
+kk
+ko
 ku
 li
 lt
@@ -38,8 +41,8 @@ nb
 nl
 nn
 pl
-pt_BR
 pt
+pt_BR
 ro
 ru
 sk
@@ -50,5 +53,6 @@ sv
 te
 tr
 uk
+vi
 zh_CN
 zh_TW
