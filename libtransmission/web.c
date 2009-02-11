@@ -281,7 +281,7 @@ remove_finished_tasks( tr_web * g )
                 purgeSockinfo( g, fd );
 
             mcode = curl_multi_remove_handle( g->multi, easy );
-            tr_assert( mcode == CURLM_OK, "curl_multi_socket_action() failed: %d (%s)", mcode, curl_multi_strerror( mcode ) );
+            tr_assert( mcode == CURLM_OK, "curl_multi_remove_handle() failed: %d (%s)", mcode, curl_multi_strerror( mcode ) );
 
             curl_easy_cleanup( easy );
             task_finish( task, code );
@@ -336,7 +336,7 @@ web_close( tr_web * g )
    and no tasks remain.  callers must not reference their g pointer
    after calling this function */
 static void
-tr_multi_socket_action( tr_web * g, int fd )
+tr_multi_perform( tr_web * g )
 {
     int closed = FALSE;
     CURLMcode mcode;
@@ -346,16 +346,13 @@ tr_multi_socket_action( tr_web * g, int fd )
 
     /* invoke libcurl's processing */
     do {
-        mcode = curl_multi_socket_action( g->multi, fd, 0, &g->still_running );
-        dbgmsg( "event_cb(): fd %d, still_running is %d", fd, g->still_running );
+        dbgmsg( "calling curl_multi_perform..." );
+        mcode = curl_multi_perform( g->multi, &g->still_running );
+        dbgmsg( "done calling curl_multi_perform..." );
     } while( mcode == CURLM_CALL_MULTI_PERFORM );
-    if( ( mcode == CURLM_BAD_SOCKET ) && ( fd != CURL_SOCKET_TIMEOUT ) )
-        purgeSockinfo( g, fd );
-    else {
-        tr_assert( mcode == CURLM_OK, "curl_multi_socket_action() failed on fd %d: %d (%s)", fd, mcode, curl_multi_strerror( mcode ) );
-        if( mcode != CURLM_OK )
-            tr_err( "%s", curl_multi_strerror( mcode ) );
-    }
+    tr_assert( mcode == CURLM_OK, "curl_multi_perform() failed: %d (%s)", mcode, curl_multi_strerror( mcode ) );
+    if( mcode != CURLM_OK )
+        tr_err( "%s", curl_multi_strerror( mcode ) );
 
     remove_finished_tasks( g );
 
@@ -374,9 +371,9 @@ tr_multi_socket_action( tr_web * g, int fd )
 
 /* libevent says that sock is ready to be processed, so wake up libcurl */
 static void
-event_cb( int fd, short kind UNUSED, void * g )
+event_cb( int fd UNUSED, short kind UNUSED, void * g )
 {
-    tr_multi_socket_action( g, fd );
+    tr_multi_perform( g );
 }
 
 /* libevent says that timer_ms have passed, so wake up libcurl */
@@ -384,7 +381,7 @@ static void
 timer_cb( int socket UNUSED, short action UNUSED, void * g )
 {
     dbgmsg( "libevent timer is done" );
-    tr_multi_socket_action( g, CURL_SOCKET_TIMEOUT );
+    tr_multi_perform( g );
 }
 
 /* CURLMOPT_SOCKETFUNCTION */

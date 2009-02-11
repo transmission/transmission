@@ -306,21 +306,31 @@ tr_cryptoHasTorrentHash( const tr_crypto * crypto )
 }
 
 int
-tr_cryptoRandInt( int sup )
+tr_cryptoRandInt( int upperBound )
 {
-    int r;
+    int noise;
+    int val;
 
-    RAND_pseudo_bytes ( (unsigned char *) &r, sizeof r );
+    if( RAND_pseudo_bytes ( (unsigned char *) &noise, sizeof noise ) >= 0 )
+    {
+        val = abs( noise ) % upperBound;
+    }
+    else /* fall back to a weaker implementation... */
+    {
+        val = tr_cryptoWeakRandInt( upperBound );
+    }
 
-    return (int) ( sup * ( abs( r ) / ( INT_MAX + 1.0 ) ) );
+    assert( val >= 0 );
+    assert( val < upperBound );
+    return val;
 }
 
 int
-tr_cryptoWeakRandInt( int sup )
+tr_cryptoWeakRandInt( int upperBound )
 {
     static int init = 0;
 
-    assert( sup > 0 );
+    assert( upperBound > 0 );
 
     if( !init )
     {
@@ -328,7 +338,7 @@ tr_cryptoWeakRandInt( int sup )
         init = 1;
     }
 
-    return rand( ) % sup;
+    return rand( ) % upperBound;
 }
 
 void
