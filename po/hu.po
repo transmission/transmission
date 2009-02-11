@@ -1801,11 +1801,6 @@ msgstr "Ellenőrzéshez sorba állítva"
 #~ msgid "Failed to set up socket: %s"
 #~ msgstr "A socket beállítása sikertelen: %s"
 
-#~ msgid "File"
-#~ msgid_plural "Files"
-#~ msgstr[0] "Fájl"
-#~ msgstr[1] "Fájl"
-
 #~ msgid "Piece"
 #~ msgid_plural "Pieces"
 #~ msgstr[0] "Egység"

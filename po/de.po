@@ -1895,11 +1895,6 @@ msgstr "Wartet auf Überprüfung"
 #~ msgid "Failed to set up socket: %s"
 #~ msgstr "Konnte Socket nicht einrichten: %s"
 
-#~ msgid "File"
-#~ msgid_plural "Files"
-#~ msgstr[0] "Datei"
-#~ msgstr[1] "Dateien"
-
 #~ msgid "Piece"
 #~ msgid_plural "Pieces"
 #~ msgstr[0] "Stück"
