@@ -62,6 +62,14 @@ publish( tr_webseed *    w,
 }
 
 static void
+fireNeedReq( tr_webseed * w )
+{
+    tr_peer_event e = blankEvent;
+    e.eventType = TR_PEER_NEED_REQ;
+    publish( w, &e );
+}
+
+static void
 fireClientGotBlock( tr_webseed * w, uint32_t pieceIndex, uint32_t offset, uint32_t length )
 {
     tr_peer_event e = blankEvent;
@@ -172,8 +180,10 @@ webResponseFunc( tr_session    * session,
             w->busy = 0;
             if( w->dead )
                 tr_webseedFree( w );
-            else
+            else  {
                 fireClientGotBlock( w, w->pieceIndex, w->pieceOffset, w->byteCount );
+                fireNeedReq( w );
+            }
         }
     }
 }

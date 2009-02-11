@@ -420,6 +420,14 @@ fireUploadOnly( tr_peermsgs * msgs, tr_bool uploadOnly )
 }
 
 static void
+fireNeedReq( tr_peermsgs * msgs )
+{
+    tr_peer_event e = blankEvent;
+    e.eventType = TR_PEER_NEED_REQ;
+    publish( msgs, &e );
+}
+
+static void
 firePeerProgress( tr_peermsgs * msgs )
 {
     tr_peer_event e = blankEvent;
@@ -645,6 +653,8 @@ updateInterest( tr_peermsgs * msgs )
 
     if( i != msgs->peer->clientIsInterested )
         sendInterest( msgs, i );
+    if( i )
+        fireNeedReq( msgs );
 }
 
 static int
@@ -809,6 +819,9 @@ pumpRequestQueue( tr_peermsgs * msgs, const time_t now )
     if( sent )
         dbgmsg( msgs, "pump sent %d requests, now have %d active and %d queued",
                 sent, msgs->clientAskedFor.len, msgs->clientWillAskFor.len );
+
+    if( len < max )
+        fireNeedReq( msgs );
 }
 
 static TR_INLINE int
@@ -1353,6 +1366,7 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
         case BT_UNCHOKE:
             dbgmsg( msgs, "got Unchoke" );
             msgs->peer->clientIsChoked = 0;
+            fireNeedReq( msgs );
             break;
 
         case BT_INTERESTED:
@@ -1378,10 +1392,13 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
             break;
 
         case BT_BITFIELD:
+        {
             dbgmsg( msgs, "got a bitfield" );
             tr_peerIoReadBytes( msgs->peer->io, inbuf, msgs->peer->have->bits, msglen );
             updatePeerProgress( msgs );
+            fireNeedReq( msgs );
             break;
+        }
 
         case BT_REQUEST:
         {

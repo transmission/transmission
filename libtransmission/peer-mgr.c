@@ -1,3 +1,4 @@
+
 /*
  * This file Copyright (C) 2007-2009 Charles Kerr <charles@transmissionbt.com>
  *
@@ -126,6 +127,7 @@ typedef struct tr_torrent_peers
     tr_ptrArray     pool; /* struct peer_atom */
     tr_ptrArray     peers; /* tr_peer */
     tr_ptrArray     webseeds; /* tr_webseed */
+    tr_timer *      refillTimer;
     tr_torrent *    tor;
     tr_peer *       optimistic; /* the optimistic peer, or NULL if none */
 
@@ -139,7 +141,6 @@ struct tr_peerMgr
     tr_ptrArray       incomingHandshakes; /* tr_handshake */
     tr_timer        * bandwidthTimer;
     tr_timer        * rechokeTimer;
-    tr_timer        * refillTimer;
     tr_timer        * reconnectTimer;
 };
 
@@ -380,6 +381,8 @@ torrentDestructor( void * vt )
 
     memcpy( hash, t->hash, SHA_DIGEST_LENGTH );
 
+    tr_timerFree( &t->refillTimer );
+
     tr_ptrArrayDestruct( &t->webseeds, (PtrArrayForeachFunc)tr_webseedFree );
     tr_ptrArrayDestruct( &t->pool, (PtrArrayForeachFunc)tr_free );
     tr_ptrArrayDestruct( &t->outgoingHandshakes, NULL );
@@ -422,7 +425,6 @@ torrentConstructor( tr_peerMgr * manager,
 
 static int bandwidthPulse ( void * vmgr );
 static int rechokePulse   ( void * vmgr );
-static int refillPulse    ( void * vmgr );
 static int reconnectPulse ( void * vmgr );
 
 tr_peerMgr*
@@ -434,7 +436,6 @@ tr_peerMgrNew( tr_session * session )
     m->incomingHandshakes = TR_PTR_ARRAY_INIT;
     m->bandwidthTimer = tr_timerNew( session, bandwidthPulse, m, BANDWIDTH_PERIOD_MSEC );
     m->rechokeTimer   = tr_timerNew( session, rechokePulse,   m, RECHOKE_PERIOD_MSEC );
-    m->refillTimer    = tr_timerNew( session, refillPulse,    m, REFILL_PERIOD_MSEC );
     m->reconnectTimer = tr_timerNew( session, reconnectPulse, m, RECONNECT_PERIOD_MSEC );
 
     rechokePulse( m );
@@ -448,7 +449,6 @@ tr_peerMgrFree( tr_peerMgr * manager )
     managerLock( manager );
 
     tr_timerFree( &manager->reconnectTimer );
-    tr_timerFree( &manager->refillTimer );
     tr_timerFree( &manager->rechokeTimer );
     tr_timerFree( &manager->bandwidthTimer );
 
@@ -734,8 +734,8 @@ getBlockOffsetInPiece( const tr_torrent * tor, uint64_t b )
     return (uint32_t)( blockPos - piecePos );
 }
 
-static void
-refillTorrent( Torrent * t )
+static int
+refillPulse( void * vtorrent )
 {
     tr_block_index_t block;
     int peerCount;
@@ -743,13 +743,15 @@ refillTorrent( Torrent * t )
     tr_peer ** peers;
     tr_webseed ** webseeds;
     struct tr_blockIterator * blockIterator;
+    Torrent * t = vtorrent;
     tr_torrent * tor = t->tor;
 
     if( !t->isRunning )
-        return;
+        return TRUE;
     if( tr_torrentIsSeed( t->tor ) )
-        return;
+        return TRUE;
 
+    torrentLock( t );
     tordbg( t, "Refilling Request Buffers..." );
 
     blockIterator = blockIteratorNew( t );
@@ -821,21 +823,10 @@ refillTorrent( Torrent * t )
     blockIteratorFree( blockIterator );
     tr_free( webseeds );
     tr_free( peers );
-}
 
-static int
-refillPulse( void * vmgr )
-{
-    tr_torrent * tor = NULL;
-    tr_peerMgr * mgr = vmgr;
-    managerLock( mgr );
-
-    while(( tor = tr_torrentNext( mgr->session, tor )))
-        if( tor->isRunning && !tr_torrentIsSeed( tor ) )
-            refillTorrent( tor->torrentPeers );
-
-    managerUnlock( mgr );
-    return TRUE;
+    t->refillTimer = NULL;
+    torrentUnlock( t );
+    return FALSE;
 }
 
 static void
@@ -882,6 +873,15 @@ gotBadPiece( Torrent *        t,
 
     tor->corruptCur += byteCount;
     tor->downloadedCur -= MIN( tor->downloadedCur, byteCount );
+}
+
+static void
+refillSoon( Torrent * t )
+{
+    if( t->refillTimer == NULL )
+        t->refillTimer = tr_timerNew( t->manager->session,
+                                      refillPulse, t,
+                                      REFILL_PERIOD_MSEC );
 }
 
 static void
@@ -949,6 +949,10 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
                 struct peer_atom * a = getExistingAtom( t, &peer->addr );
                 a->uploadOnly = e->uploadOnly ? UPLOAD_ONLY_YES : UPLOAD_ONLY_NO;
             }
+            break;
+
+        case TR_PEER_NEED_REQ:
+            refillSoon( t );
             break;
 
         case TR_PEER_CANCEL:
@@ -1512,7 +1516,21 @@ tr_peerMgrGetPeers( tr_torrent      * tor,
 void
 tr_peerMgrStartTorrent( tr_torrent * tor )
 {
-    tor->torrentPeers->isRunning = TRUE;
+    Torrent * t = tor->torrentPeers;
+
+    managerLock( t->manager );
+
+    assert( t );
+
+    if( !t->isRunning )
+    {
+        t->isRunning = TRUE;
+
+        if( !tr_ptrArrayEmpty( &t->webseeds ) )
+            refillSoon( t );
+    }
+
+    managerUnlock( t->manager );
 }
 
 static void
