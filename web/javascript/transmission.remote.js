@@ -121,6 +121,20 @@ TransmissionRemote.prototype =
 	removeTorrents: function( torrents ) {
 		this.sendTorrentCommand( 'torrent-remove', torrents );
 	},
+	removeTorrentsAndData: function( torrents ) {
+		var remote = this,
+			o = { };
+		o.method = 'torrent-remove';
+		o.arguments = { };
+		o.arguments['delete-local-data'] = true;
+		o.arguments.ids = [ ];
+		if( torrents != null )
+			for( var i=0, len=torrents.length; i<len; ++i )
+				o.arguments.ids.push( torrents[i].id() );
+		this.sendRequest( RPC._Root, $.toJSON(o), function( ) {
+			remote.loadTorrents();
+		}, "json" );
+	},
 	addTorrentByUrl: function( url, options ) {
 		this.sendRequest( RPC._Root, $.toJSON({
 			method: 'torrent-add',
