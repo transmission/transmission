@@ -113,7 +113,15 @@ li#remove div div.toolbar_image, li#remove.disabled div:active div.toolbar_image
 	background-position: left -32px;
 }
 
+li#removedata div div.toolbar_image, li#removedata.disabled div:active div.toolbar_image {
+	background-position: left -32px;
+}
+
 li#remove div:active div.toolbar_image {
+	background-position: right -32px;
+}
+
+li#removedata div:active div.toolbar_image {
 	background-position: right -32px;
 }
 

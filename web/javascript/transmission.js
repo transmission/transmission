@@ -46,6 +46,7 @@ Transmission.prototype =
 		$('#pause_selected_link').bind('click', this.stopSelectedClicked );
 		$('#resume_selected_link').bind('click', this.startSelectedClicked);
 		$('#remove_link').bind('click',  this.removeClicked);
+		$('#removedata_link').bind('click',  this.removeDataClicked);
 		$('#filter_all_link').parent().bind('click', this.showAllClicked);
 		$('#filter_downloading_link').parent().bind('click', this.showDownloadingClicked);
 		$('#filter_seeding_link').parent().bind('click', this.showSeedingClicked);
@@ -197,6 +198,9 @@ Transmission.prototype =
 	contextRemoveSelected: function( ) {
 		transmission.removeSelectedTorrents( );
 	},
+	contextRemoveDataSelected: function( ) {
+		transmission.removeSelectedTorrentsAndData( );
+	},
 	contextToggleInspector: function( ) {
 		transmission.toggleInspector( );
 	},
@@ -216,6 +220,7 @@ Transmission.prototype =
 			context_pause_selected:    this.contextStopSelected,
 			context_resume_selected:   this.contextStartSelected,
 			context_remove:            this.contextRemoveSelected,
+			context_removedata:        this.contextRemoveDataSelected,
 			context_toggle_inspector:  this.contextToggleInspector,
 			context_select_all:        this.contextSelectAll,
 			context_deselect_all:      this.contextDeselectAll
@@ -543,6 +548,14 @@ Transmission.prototype =
 		var tr = transmission;
 		if( tr.isButtonEnabled( event ) ) {
 			tr.removeSelectedTorrents( );
+			tr.hideiPhoneAddressbar( );
+		}
+	},
+
+	removeDataClicked: function( event ) {	
+		var tr = transmission;
+		if( tr.isButtonEnabled( event ) ) {
+			tr.removeSelectedTorrentsAndData( );
 			tr.hideiPhoneAddressbar( );
 		}
 	},
@@ -1187,6 +1200,12 @@ Transmission.prototype =
 			this.promptToRemoveTorrents( torrents );
 	},
 
+	removeSelectedTorrentsAndData: function() {
+		var torrents = this.getSelectedTorrents( );
+		if( torrents.length )
+			this.promptToRemoveTorrentsAndData( torrents );
+	},
+
 	promptToRemoveTorrents:function( torrents )
 	{
 		if( torrents.length == 1 )
@@ -1204,8 +1223,29 @@ Transmission.prototype =
 		}
 	},
 
+	promptToRemoveTorrentsAndData:function( torrents )
+	{
+		if( torrents.length == 1 )
+		{
+			var torrent = torrents[0],
+				header = 'Remove ' + torrent.name() + ' and delete data?',
+				message = 'All data downloaded for this torrent will be deleted. Are you sure you want to remove it?';
+			dialog.confirm( header, message, 'Remove', 'transmission.removeTorrentsAndData', torrents );
+		}
+		else 
+		{
+			var header = 'Remove ' + torrents.length + ' transfers and delete data?',
+				message = 'All data downloaded for these torrents will be deleted. Are you sure you want to remove them?';
+			dialog.confirm( header, message, 'Remove', 'transmission.removeTorrentsAndData', torrents );
+		}
+	},
+
 	removeTorrents: function( torrents ) {
 		this.remote.removeTorrents( torrents );
+	},
+
+	removeTorrentsAndData: function( torrents ) {
+		this.remote.removeTorrentsAndData( torrents );
 	},
 
 	startSelectedTorrents: function( ) {
@@ -1336,6 +1376,7 @@ Transmission.prototype =
 			this.setEnabled( 'li#resume_selected', havePausedSelection );
 			this.setEnabled( 'li.context_resume_selected', havePausedSelection );
 			this.setEnabled( 'li#remove', haveSelection );
+			this.setEnabled( 'li#removedata', haveSelection );
 			this.setEnabled( 'li#pause_all', haveActive );
 			this.setEnabled( 'li#resume_all', havePaused );
 		}
