@@ -165,8 +165,6 @@ bindCb( int * const socket,
 static void
 incomingPeersPulse( tr_shared * s )
 {
-    tr_bool allPaused;
-    
     if( s->shouldChange )
     {
         tr_socketListForEach( s->bindSockets, &closeCb, s );
@@ -175,9 +173,6 @@ incomingPeersPulse( tr_shared * s )
             tr_socketListForEach( s->bindSockets, &bindCb, s );
     }
     
-    allPaused = tr_sessionGetActiveTorrentCount( s->session ) == 0;
-    
-    /* if we have any running torrents, check for new incoming peer connections */
     /* (jhujhiti):
      * This has been changed from a loop that will end when the listener queue
      * is exhausted to one that will only check for one connection at a time.
@@ -185,8 +180,7 @@ incomingPeersPulse( tr_shared * s )
      * time between pulses (currently one second). However, just to be safe,
      * I have increased the length of the listener queue from 5 to 10
      * (see acceptCb() above). */
-    if( !allPaused )
-        tr_socketListForEach( s->bindSockets, &acceptCb, s );
+    tr_socketListForEach( s->bindSockets, &acceptCb, s );
 }
 
 static int
