@@ -59,7 +59,10 @@ enum
     VC_LENGTH                      = 8,
     KEY_LEN                        = 96,
     CRYPTO_PROVIDE_PLAINTEXT       = 1,
-    CRYPTO_PROVIDE_CRYPTO          = 2
+    CRYPTO_PROVIDE_CRYPTO          = 2,
+
+    /* how long to wait before giving up on a handshake */
+    HANDSHAKE_TIMEOUT_MSEC         = 60 * 1000
 };
 
 
@@ -106,6 +109,7 @@ struct tr_handshake
     uint8_t               peer_id[PEER_ID_LEN];
     handshakeDoneCB       doneCB;
     void *                doneUserData;
+    tr_timer *            timeout;
 };
 
 /**
@@ -1099,6 +1103,8 @@ tr_handshakeFree( tr_handshake * handshake )
     if( handshake->io )
         tr_peerIoUnref( handshake->io ); /* balanced by the ref in tr_handshakeNew */
 
+    tr_timerFree( &handshake->timeout );
+
     tr_free( handshake );
 }
 
@@ -1160,6 +1166,13 @@ gotError( tr_peerIo  * io UNUSED,
 ***
 **/
 
+static int
+handshakeTimeout( void * handshake )
+{
+    tr_handshakeAbort( handshake );
+    return FALSE;
+}
+
 tr_handshake*
 tr_handshakeNew( tr_peerIo *        io,
                  tr_encryption_mode encryptionMode,
@@ -1175,6 +1188,7 @@ tr_handshakeNew( tr_peerIo *        io,
     handshake->doneCB = doneCB;
     handshake->doneUserData = doneUserData;
     handshake->session = tr_peerIoGetSession( io );
+    handshake->timeout = tr_timerNew( handshake->session, handshakeTimeout, handshake, HANDSHAKE_TIMEOUT_MSEC );
 
     tr_peerIoRef( io ); /* balanced by the unref in tr_handshakeFree */
     tr_peerIoSetIOFuncs( handshake->io, canRead, NULL, gotError, handshake );
