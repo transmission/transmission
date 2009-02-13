@@ -12,43 +12,27 @@
 			<table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0" summary="Two column table with heading">
 				<tr>
 					<td class="blue">
-						<h3>1.42 Core Changes</h3>
+						<h3>1.50 Changes</h3>
 					</td>
 				</tr>
 				<tr>
 					<td>
 						<ul>
-						<li>Fix 1.41 lockup issue</li>
+						<li>IPv6 support for peers, and for trackers with explicit IPv6 addresses</li>
+						<li>Re-add to the Web UI the ability to add transfers using torrent file URLs</li>
+						<li>Improved connectivity for encrypted peers</li>
+						<li>Fix 1.42 error that made tracker announces slower over time</li>
+						<li>Fix a Mac-centric peer connection bug from 1.41</li>
+						<li>Use less CPU cycles when managing very fast peers</li>
+						<li>Better handling of non-UTF-8 torrent files</li>
+						<li>When removing local data, only remove data from the torrent</li>
+						<li>Close potential DoS vulnerability in 1.41</li>
+						<li>Many other bugfixes</li>
 						</ul>
 					</td>
 				</tr>
 			</table>
-			<br>
-			<table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0" summary="Two column table with heading">
-				<tr>
-					<td class="blue">
-						<h3>1.41 Core Changes</h3>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<ul>
-						<li>Better peer management in large swarms</li>
-						<li>Support BitTorrent Enhancement Proposal (BEP) #21 "Extension for Partial Seeds"</li>
-						<li>Partial support for BEP #6 "Fast Extension" (reject, have all/none)</li>
-						<li>Honor the peer's BEP #10 reqq key, when available</li>
-						<li>Fix 1.40 "Got HTTP Status Code: 0" error message</li>
-						<li>Fix 1.40 "lazy bitfield" error</li>
-						<li>Fix 1.40 "jumpy upload speed" bug</li>
-						<li>Fix handshake peer_id error</li>
-						<li>Corrrectly handle Windows-style newlines in Bluetack blocklists</li>
-						<li>More accurate bandwidth measurement</li>
-						<li>File selection & priority was reset when editing a torrent's tracker list</li>
-						</ul>
-					</td>
-				</tr>
-			</table>
-			<p>For a full list of changes, <a href="http://trac.transmissionbt.com/query?milestone=1.41&group=component&groupdesc=1&order=severity">click here</a>.</p>
+			<p>For a full list of changes, <a href="http://trac.transmissionbt.com/query?milestone=1.50&group=component&groupdesc=1&order=severity">click here</a>.</p>
 			<table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0" summary="Two column table with heading">
 				<tr>
 					<td class="red">
