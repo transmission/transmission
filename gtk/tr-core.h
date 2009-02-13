@@ -204,6 +204,11 @@ void     tr_core_set_pref_int( TrCore *     self,
                                const char * key,
                                int          val );
 
+/* Set a double preference value, save the prefs file, and emit the
+   "prefs-changed" signal */
+void     tr_core_set_pref_double( TrCore *     self,
+                                  const char * key,
+                                  double       val );
 
 /**
 ***

@@ -1596,7 +1596,9 @@ didWrite( tr_peerIo * io UNUSED, size_t bytesWritten, int wasPieceData, void * v
 {
     tr_peermsgs * msgs = vmsgs;
     firePeerGotData( msgs, bytesWritten, wasPieceData );
-    peerPulse( msgs );
+
+    if ( tr_isPeerIo( io ) && io->userData )
+        peerPulse( msgs );
 }
 
 static ReadState

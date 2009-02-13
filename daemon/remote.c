@@ -85,6 +85,11 @@ static tr_option opts[] =
     { 930, "peers",                "Set the current torrent(s)' maximum number of peers each", "pr", 1, "<max>" },
     { 931, "global-peers",         "Set the global maximum number of peers", "gpr", 1, "<max>" },
     { 'R', "remove-and-delete",    "Remove the current torrent(s) and delete local data", NULL, 0, NULL },
+    { 950, "seedratio",            "Let the current torrent(s) seed until a specific ratio", "sr", 1, "ratio" },
+    { 951, "seedratio-default",    "Let the current torrent(s) use the global seedratio settings", "srd", 0, NULL },
+    { 952, "no-seedratio",         "Let the current torrent(s) seed regardless of ratio", "SR", 0, NULL },
+    { 953, "global-seedratio",     "All torrents, unless overridden by a per-torrent setting, should seed until a specific ratio", "gsr", 1, "ratio" },
+    { 954, "no-global-seedratio",  "All torrents, unless overridden by a per-torrent setting, should seed regardless of ratio", "GSR", 0, NULL },
     { 's', "start",                "Start the current torrent(s)", "s",  0, NULL },
     { 'S', "stop",                 "Stop the current torrent(s)", "S",  0, NULL },
     { 't', "torrent",              "Set the current torrent(s)", "t",  1, "<torrent>" },
@@ -531,6 +536,36 @@ readargs( int           argc,
                 addIdArg( args, id );
                 fields = tr_bencDictAddList( args, "fields", 1 );
                 tr_bencListAddStr( fields, "peers" );
+                break;
+
+            case 950:
+                tr_bencDictAddStr( &top, "method", "torrent-set" );
+                tr_bencDictAddDouble( args, "ratio-limit", atof(optarg) );
+                tr_bencDictAddInt( args, "ratio-limit-mode", TR_RATIOLIMIT_SINGLE );
+                addIdArg( args, id );
+                break;
+
+            case 951:
+                tr_bencDictAddStr( &top, "method", "torrent-set" );
+                tr_bencDictAddInt( args, "ratio-limit-mode", TR_RATIOLIMIT_GLOBAL );
+                addIdArg( args, id );
+                break;
+
+            case 952:
+                tr_bencDictAddStr( &top, "method", "torrent-set" );
+                tr_bencDictAddInt( args, "ratio-limit-mode", TR_RATIOLIMIT_UNLIMITED );
+                addIdArg( args, id );
+                break;
+
+            case 953:
+                tr_bencDictAddStr( &top, "method", "session-set" );
+                tr_bencDictAddDouble( args, "ratio-limit", atof(optarg) );
+                tr_bencDictAddInt( args, "ratio-limit-enabled", 1 );
+                break;
+
+            case 954:
+                tr_bencDictAddStr( &top, "method", "session-set" );
+                tr_bencDictAddInt( args, "ratio-limit-enabled", 0 );
                 break;
 
             case TR_OPT_ERR:

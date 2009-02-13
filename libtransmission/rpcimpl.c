@@ -603,6 +603,7 @@ torrentSet( tr_session               * session,
     for( i = 0; i < torrentCount; ++i )
     {
         int64_t      tmp;
+        double       d;
         tr_benc *    files;
         tr_torrent * tor = torrents[i];
 
@@ -629,7 +630,10 @@ torrentSet( tr_session               * session,
         if( tr_bencDictFindInt( args_in, "speed-limit-up-enabled", &tmp ) )
             tr_torrentSetSpeedMode( tor, TR_UP, tmp ? TR_SPEEDLIMIT_SINGLE
                                     : TR_SPEEDLIMIT_GLOBAL );
-
+        if( tr_bencDictFindDouble( args_in, "ratio-limit", &d ) )
+            tr_torrentSetRatioLimit( tor, d );
+        if( tr_bencDictFindInt( args_in, "ratio-limit-mode", &tmp ) )
+            tr_torrentSetRatioMode( tor, tmp );
         notify( session, TR_RPC_TORRENT_CHANGED, tor );
     }
 
@@ -786,6 +790,7 @@ sessionSet( tr_session               * session,
             struct tr_rpc_idle_data  * idle_data )
 {
     int64_t      i;
+    double       d;
     const char * str;
 
     assert( idle_data == NULL );
@@ -808,6 +813,10 @@ sessionSet( tr_session               * session,
         tr_sessionSetSpeedLimit( session, TR_UP, i );
     if( tr_bencDictFindInt( args_in, "speed-limit-up-enabled", &i ) )
         tr_sessionSetSpeedLimitEnabled( session, TR_UP, i );
+    if( tr_bencDictFindDouble( args_in, "ratio-limit", &d ) )
+        tr_sessionSetRatioLimit( session, d );
+    if( tr_bencDictFindInt( args_in, "ratio-limit-enabled", &i ) )
+        tr_sessionSetRatioLimited( session, i );
     if( tr_bencDictFindStr( args_in, "encryption", &str ) )
     {
         if( !strcmp( str, "required" ) )
@@ -892,6 +901,8 @@ sessionGet( tr_session               * session,
     tr_bencDictAddInt( d, "speed-limit-up-enabled", tr_sessionIsSpeedLimitEnabled( session, TR_UP ) );
     tr_bencDictAddInt( d, "speed-limit-down", tr_sessionGetSpeedLimit( session, TR_DOWN ) );
     tr_bencDictAddInt( d, "speed-limit-down-enabled", tr_sessionIsSpeedLimitEnabled( session, TR_DOWN ) );
+    tr_bencDictAddDouble( d, "ratio-limit", tr_sessionGetRatioLimit( session ) );
+    tr_bencDictAddInt( d, "ratio-limit-enabled", tr_sessionIsRatioLimited( session ) );
     tr_bencDictAddStr( d, "version", LONG_VERSION_STRING );
     switch( tr_sessionGetEncryption( session ) ) {
         case TR_CLEAR_PREFERRED: str = "tolerated"; break;

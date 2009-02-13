@@ -32,7 +32,8 @@ enum
     TR_FR_MAX_PEERS      = ( 1 << 10 ),
     TR_FR_ADDED_DATE     = ( 1 << 11 ),
     TR_FR_DONE_DATE      = ( 1 << 12 ),
-    TR_FR_ACTIVITY_DATE  = ( 1 << 13 )
+    TR_FR_ACTIVITY_DATE  = ( 1 << 13 ),
+    TR_FR_RATIOLIMIT     = ( 1 << 14 )
 };
 
 /**

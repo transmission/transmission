@@ -245,6 +245,8 @@ tr_sessionGetDefaultSettings( tr_benc * d )
     tr_bencDictAddInt( d, TR_PREFS_KEY_PROXY_PORT,               80 );
     tr_bencDictAddInt( d, TR_PREFS_KEY_PROXY_TYPE,               TR_PROXY_HTTP );
     tr_bencDictAddStr( d, TR_PREFS_KEY_PROXY_USERNAME,           "" );
+    tr_bencDictAddDouble( d, TR_PREFS_KEY_RATIO,                 2.0 );
+    tr_bencDictAddInt( d, TR_PREFS_KEY_RATIO_ENABLED,            FALSE );
     tr_bencDictAddInt( d, TR_PREFS_KEY_RPC_AUTH_REQUIRED,        FALSE );
     tr_bencDictAddInt( d, TR_PREFS_KEY_RPC_ENABLED,              TRUE );
     tr_bencDictAddStr( d, TR_PREFS_KEY_RPC_PASSWORD,             "" );
@@ -291,6 +293,8 @@ tr_sessionGetSettings( tr_session * s, struct tr_benc * d )
     tr_bencDictAddInt( d, TR_PREFS_KEY_PROXY_PORT,               s->proxyPort );
     tr_bencDictAddInt( d, TR_PREFS_KEY_PROXY_TYPE,               s->proxyType );
     tr_bencDictAddStr( d, TR_PREFS_KEY_PROXY_USERNAME,           s->proxyUsername );
+    tr_bencDictAddDouble( d, TR_PREFS_KEY_RATIO,                 s->desiredRatio );
+    tr_bencDictAddInt( d, TR_PREFS_KEY_RATIO_ENABLED,            s->isRatioLimited );
     tr_bencDictAddInt( d, TR_PREFS_KEY_RPC_AUTH_REQUIRED,        tr_sessionIsRPCPasswordEnabled( s ) );
     tr_bencDictAddInt( d, TR_PREFS_KEY_RPC_ENABLED,              tr_sessionIsRPCEnabled( s ) );
     tr_bencDictAddStr( d, TR_PREFS_KEY_RPC_PASSWORD,             freeme[n++] = tr_sessionGetRPCPassword( s ) );
@@ -408,6 +412,7 @@ tr_sessionInitImpl( void * vdata )
 {
     int64_t i;
     int64_t j;
+    double  d;
     tr_bool found;
     const char * str;
     tr_benc settings;
@@ -554,6 +559,12 @@ tr_sessionInitImpl( void * vdata )
     assert( found );
     tr_sessionSetSpeedLimit( session, TR_DOWN, i );
     tr_sessionSetSpeedLimitEnabled( session, TR_DOWN, j );
+
+    found = tr_bencDictFindDouble( &settings, TR_PREFS_KEY_RATIO, &d )
+         && tr_bencDictFindInt( &settings, TR_PREFS_KEY_RATIO_ENABLED, &j );
+    assert( found );
+    tr_sessionSetRatioLimit( session, d );
+    tr_sessionSetRatioLimited( session, j );
 
     /* initialize the blocklist */
     filename = tr_buildPath( session->configDir, "blocklists", NULL );
@@ -738,6 +749,15 @@ tr_sessionSetSpeedLimitEnabled( tr_session      * session,
 }
 
 void
+tr_sessionSetRatioLimited( tr_session      * session,
+                           tr_bool           isLimited )
+{
+    assert( tr_isSession( session ) );
+    
+    session->isRatioLimited = isLimited;
+}
+
+void
 tr_sessionSetSpeedLimit( tr_session    * session,
                          tr_direction    dir,
                          int             desiredSpeed )
@@ -747,6 +767,15 @@ tr_sessionSetSpeedLimit( tr_session    * session,
 
     session->speedLimit[dir] = desiredSpeed;
     updateBandwidth( session, dir );
+}
+
+void
+tr_sessionSetRatioLimit( tr_session    * session,
+                         double          desiredRatio )
+{
+    assert( tr_isSession( session ) );
+
+    session->desiredRatio = desiredRatio;
 }
 
 tr_bool
@@ -759,6 +788,14 @@ tr_sessionIsSpeedLimitEnabled( const tr_session  * session,
     return session->isSpeedLimited[dir];
 }
 
+tr_bool
+tr_sessionIsRatioLimited( const tr_session  * session )
+{
+    assert( tr_isSession( session ) );
+
+    return session->isRatioLimited;
+}
+
 int
 tr_sessionGetSpeedLimit( const tr_session  * session,
                          tr_direction        dir )
@@ -767,6 +804,14 @@ tr_sessionGetSpeedLimit( const tr_session  * session,
     assert( tr_isDirection( dir ) );
 
     return session->speedLimit[dir];
+}
+
+double
+tr_sessionGetRatioLimit( const tr_session  * session )
+{
+    assert( tr_isSession( session ) );
+
+    return session->desiredRatio;
 }
 
 /***

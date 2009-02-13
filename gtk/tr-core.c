@@ -1270,3 +1270,17 @@ tr_core_set_pref_int( TrCore *     self,
     }
 }
 
+void
+tr_core_set_pref_double( TrCore *     self,
+                         const char * key,
+                         double       newval )
+{
+    const double oldval = pref_double_get( key );
+
+    if( oldval != newval )
+    {
+        pref_double_set( key, newval );
+        commitPrefsChange( self, key );
+    }
+}
+

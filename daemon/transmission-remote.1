@@ -19,6 +19,8 @@ and
 .Op Fl g Ar files
 .Op Fl gpr Ar peers
 .Op Fl G Ar files
+.Op Fl gsr Ar ratio
+.Op Fl GSR
 .Op Fl h
 .Op Fl i
 .Op Fl l
@@ -33,6 +35,9 @@ and
 .Op Fl r
 .Op Fl R
 .Op Fl s | S
+.Op Fl sr Ar ratio
+.Op Fl SR
+.Op Fl srd
 .Op Fl si
 .Op Fl t Ar all | Ar id | Ar hash
 .Op Fl u Ar number | Fl U
@@ -92,6 +97,13 @@ such as "-g1,3-5" to add files #1, #3, #4, and #5 to the download list.
 
 .It Fl G Fl -no-get Ar all | file-index | files
 Mark file(s) for not downloading.
+
+.It Fl gsr Fl -global-seedratio Ar ratio
+All torrents, unless overridden by a per-torrent setting, should seed until a specific
+.Ar ratio
+
+.It Fl GSR Fl -no-global-seedratio
+All torrents, unless overridden by a per-torrent setting, should seed regardless of ratio
 
 .It Fl h Fl -help
 Print command-line option descriptions.
@@ -154,6 +166,16 @@ Remove the current torrent(s).  This does not delete the downloaded data.
 
 .It Fl -remove-and-delete
 Remove the current torrent(s) and delete their downloaded data.
+
+.It Fl sr Fl -seedratio Ar ratio
+Let the current torrent(s) seed until a specific
+.Ar ratio
+
+.It Fl SR Fl -no-seedratio
+Let the current torrent(s) seed regardless of ratio
+
+.It Fl srd Fl -seedratio-default
+Let the current torrent(s) use the global seedratio settings
 
 .It Fl s Fl -start
 Start the current torrent(s)

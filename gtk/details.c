@@ -30,6 +30,13 @@
 #include "util.h"
 
 #define UPDATE_INTERVAL_SECONDS 2
+typedef struct 
+{
+    gpointer    gtor;
+    TrCore    * core;
+    guint       handler;
+} ResponseData;
+
 
 /****
 *****  PIECES VIEW
@@ -1170,6 +1177,19 @@ dl_speed_toggled_cb( GtkToggleButton *tb,
     speed_toggled_cb( tb, gtor, TR_DOWN );
 }
 
+#define RATIO_MODE_KEY "ratio-mode"
+
+static void
+ratio_mode_changed_cb( GtkToggleButton * tb, gpointer gtor )
+{
+    if( gtk_toggle_button_get_active( tb ) )
+    {
+        tr_torrent * tor = tr_torrent_handle( gtor );
+        const int mode = GPOINTER_TO_INT( g_object_get_data( G_OBJECT( tb ), RATIO_MODE_KEY ) );
+        tr_torrentSetRatioMode( tor, mode );
+    }
+}
+
 static void
 sensitize_from_check_cb( GtkToggleButton *toggle,
                          gpointer         w )
@@ -1204,6 +1224,16 @@ dl_speed_spun_cb( GtkSpinButton *spin,
 }
 
 static void
+ratio_spun_cb( GtkSpinButton *spin,
+               gpointer       gtor )
+{
+    tr_torrent * tor = tr_torrent_handle ( gtor );
+    float        ratio = gtk_spin_button_get_value ( spin );
+
+    tr_torrentSetRatioLimit( tor, ratio );
+}
+
+static void
 max_peers_spun_cb( GtkSpinButton * spin,
                    gpointer        gtor )
 {
@@ -1212,13 +1242,45 @@ max_peers_spun_cb( GtkSpinButton * spin,
     tr_torrentSetPeerLimit( tr_torrent_handle( gtor ), n );
 }
 
+static char*
+get_global_ratio_radiobutton_string( void )
+{
+    char * s;
+    const gboolean b = pref_flag_get( TR_PREFS_KEY_RATIO_ENABLED );
+    const double d = pref_double_get( TR_PREFS_KEY_RATIO );
+
+    if( b )
+        s = g_strdup_printf( _( "Use _Global setting  (currently: stop seeding when a torrent's ratio reaches %.2f)" ), d );
+    else
+        s = g_strdup( _( "Use _Global setting  (currently: seed regardless of ratio)" ) );
+
+    return s;
+}
+
+static void
+prefsChanged( TrCore * core UNUSED, const char *  key, gpointer rb )
+{
+    if( !strcmp( key, TR_PREFS_KEY_RATIO_ENABLED ) || !strcmp( key, TR_PREFS_KEY_RATIO ) )
+    {
+        char * s = get_global_ratio_radiobutton_string( );
+        gtk_button_set_label( GTK_BUTTON( rb ), s );
+        g_free( s );
+    }
+}
+
 static GtkWidget*
-options_page_new( TrTorrent * gtor )
+options_page_new( ResponseData * data )
 {
     uint16_t     maxConnectedPeers;
     int          i, row;
+    double       d;
     gboolean     b;
-    GtkWidget *  t, *w, *tb;
+    char       * s;
+    GSList     * group;
+    GtkWidget  * t, *w, *tb, *h;
+    tr_ratiolimit mode;
+    TrCore     * core = data->core;
+    TrTorrent  * gtor = data->gtor;
     tr_torrent * tor = tr_torrent_handle ( gtor );
 
     row = 0;
@@ -1263,6 +1325,44 @@ options_page_new( TrTorrent * gtor )
     sensitize_from_check_cb ( GTK_TOGGLE_BUTTON( tb ), w );
     hig_workarea_add_row_w ( t, &row, tb, w, NULL );
 
+    hig_workarea_add_section_divider ( t, &row );
+    hig_workarea_add_section_title ( t, &row, _( "Seed-Until Ratio" ) );
+
+
+        group = NULL;
+        mode = tr_torrentGetRatioMode( tor );
+        s = get_global_ratio_radiobutton_string( );
+        w = gtk_radio_button_new_with_mnemonic( group, s );
+        data->handler = g_signal_connect( core, "prefs-changed", G_CALLBACK( prefsChanged ), w );
+        group = gtk_radio_button_get_group( GTK_RADIO_BUTTON( w ) );
+        gtk_toggle_button_set_active ( GTK_TOGGLE_BUTTON( w ), mode == TR_RATIOLIMIT_GLOBAL);
+        hig_workarea_add_wide_control( t, &row, w );
+        g_free( s );
+        g_object_set_data( G_OBJECT( w ), RATIO_MODE_KEY, GINT_TO_POINTER( TR_RATIOLIMIT_GLOBAL ) );
+        g_signal_connect( w, "toggled", G_CALLBACK( ratio_mode_changed_cb ), gtor );
+
+        w = gtk_radio_button_new_with_mnemonic( group, _( "Seed _regardless of ratio" ) );
+        group = gtk_radio_button_get_group( GTK_RADIO_BUTTON( w ) );
+        gtk_toggle_button_set_active ( GTK_TOGGLE_BUTTON( w ), mode == TR_RATIOLIMIT_UNLIMITED);
+        hig_workarea_add_wide_control( t, &row, w );
+        g_object_set_data( G_OBJECT( w ), RATIO_MODE_KEY, GINT_TO_POINTER( TR_RATIOLIMIT_UNLIMITED ) );
+        g_signal_connect( w, "toggled", G_CALLBACK( ratio_mode_changed_cb ), gtor );
+
+        h = gtk_hbox_new ( FALSE, GUI_PAD );
+        w = gtk_radio_button_new_with_mnemonic( group, _( "_Stop seeding when a torrent's ratio reaches" ) );
+        g_object_set_data( G_OBJECT( w ), RATIO_MODE_KEY, GINT_TO_POINTER( TR_RATIOLIMIT_SINGLE ) );
+        gtk_toggle_button_set_active ( GTK_TOGGLE_BUTTON( w ), mode == TR_RATIOLIMIT_SINGLE);
+        g_signal_connect( w, "toggled", G_CALLBACK( ratio_mode_changed_cb ), gtor );
+        group = gtk_radio_button_get_group( GTK_RADIO_BUTTON( w ) );
+        gtk_box_pack_start ( GTK_BOX( h ), w, FALSE, FALSE, 0 );
+        d = tr_torrentGetRatioLimit( tor );
+        w = gtk_spin_button_new_with_range( 0.5, INT_MAX, .05 );
+        gtk_spin_button_set_digits( GTK_SPIN_BUTTON( w ), 2 );
+        gtk_spin_button_set_value( GTK_SPIN_BUTTON( w ), d );
+        g_signal_connect ( w, "value-changed", G_CALLBACK( ratio_spun_cb ), gtor );
+        gtk_box_pack_start ( GTK_BOX( h ), w, FALSE, FALSE, 0 );
+        hig_workarea_add_wide_control( t, &row, h );
+   
     hig_workarea_add_section_divider ( t, &row );
     hig_workarea_add_section_title ( t, &row, _( "Peer Connections" ) );
 
@@ -1458,10 +1558,17 @@ remove_tag( gpointer tag )
 static void
 response_cb( GtkDialog *  dialog,
              int response UNUSED,
-             gpointer     gtor )
+             gpointer     data )
 {
-    g_object_weak_unref ( G_OBJECT( gtor ), torrent_destroyed, dialog );
+    ResponseData *rd = data;
+    TrCore * core = rd->core;
+    gulong handler = rd-> handler;
+
+    g_signal_handler_disconnect( core, handler );
+    g_object_weak_unref ( G_OBJECT( rd->gtor ), torrent_destroyed, dialog );
     gtk_widget_destroy ( GTK_WIDGET( dialog ) );
+
+    g_free ( rd );
 }
 
 static gboolean
@@ -1477,6 +1584,7 @@ periodic_refresh( gpointer data )
 
 GtkWidget*
 torrent_inspector_new( GtkWindow * parent,
+                       TrCore    * core,
                        TrTorrent * gtor )
 {
     guint           tag;
@@ -1484,14 +1592,18 @@ torrent_inspector_new( GtkWindow * parent,
     tr_torrent *    tor = tr_torrent_handle ( gtor );
     char            title[512];
     const tr_info * info = tr_torrent_info ( gtor );
+    ResponseData  * rd;
 
     /* create the dialog */
+    rd = g_new0(ResponseData, 1);
+    rd->gtor = gtor;
+    rd->core = core;
     g_snprintf( title, sizeof( title ), _( "%s Properties" ), info->name );
     d = gtk_dialog_new_with_buttons ( title, parent, 0,
                                       GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
                                       NULL );
     gtk_window_set_role ( GTK_WINDOW( d ), "tr-info" );
-    g_signal_connect ( d, "response", G_CALLBACK ( response_cb ), gtor );
+    g_signal_connect ( d, "response", G_CALLBACK ( response_cb ), rd );
     gtk_dialog_set_has_separator( GTK_DIALOG( d ), FALSE );
     gtk_container_set_border_width( GTK_CONTAINER( d ), GUI_PAD );
     g_object_weak_ref ( G_OBJECT( gtor ), torrent_destroyed, d );
@@ -1526,10 +1638,10 @@ torrent_inspector_new( GtkWindow * parent,
     gtk_notebook_append_page ( GTK_NOTEBOOK( n ), w,
                               gtk_label_new ( _( "Files" ) ) );
 
-    w = options_page_new ( gtor );
+    w = options_page_new ( rd );
     g_object_set_data ( G_OBJECT( d ), "options-top", w );
     gtk_notebook_append_page ( GTK_NOTEBOOK( n ), w,
-                              gtk_label_new ( _( "Options" ) ) );
+                               gtk_label_new ( _( "Options" ) ) );
 
     gtk_box_pack_start( GTK_BOX( GTK_DIALOG( d )->vbox ), n, TRUE, TRUE, 0 );
 

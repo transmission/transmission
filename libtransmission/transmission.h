@@ -176,6 +176,8 @@ static TR_INLINE tr_bool tr_isEncryptionMode( tr_encryption_mode m )
 #define TR_PREFS_KEY_PROXY                      "proxy"
 #define TR_PREFS_KEY_PROXY_TYPE                 "proxy-type"
 #define TR_PREFS_KEY_PROXY_USERNAME             "proxy-auth-username"
+#define TR_PREFS_KEY_RATIO                      "ratio-limit"
+#define TR_PREFS_KEY_RATIO_ENABLED              "ratio-limit-enabled"
 #define TR_PREFS_KEY_RPC_AUTH_REQUIRED          "rpc-authentication-required"
 #define TR_PREFS_KEY_RPC_ENABLED                "rpc-enabled"
 #define TR_PREFS_KEY_RPC_PASSWORD               "rpc-password"
@@ -560,6 +562,16 @@ void       tr_sessionSetSpeedLimit        ( tr_session        * session,
 int        tr_sessionGetSpeedLimit        ( const tr_session  * session,
                                             tr_direction        direction );
 
+void       tr_sessionSetRatioLimited      ( tr_session        * session,
+                                            tr_bool             isEnabled );
+
+tr_bool    tr_sessionIsRatioLimited       ( const tr_session  * session);
+
+void       tr_sessionSetRatioLimit        ( tr_session        * session,
+                                            double              desiredRatio);
+
+double     tr_sessionGetRatioLimit        ( const tr_session  * session);
+
 double     tr_sessionGetRawSpeed          ( const tr_session  * session,
                                            tr_direction         direction );
 
@@ -866,6 +878,14 @@ typedef enum
 }
 tr_speedlimit;
 
+typedef enum
+{
+    TR_RATIOLIMIT_GLOBAL    = 0, /* follow the global settings */
+    TR_RATIOLIMIT_SINGLE    = 1, /* override the global settings, seeding until a certain ratio */
+    TR_RATIOLIMIT_UNLIMITED = 2  /* override the global settings, seeding regardless of ratio */
+}
+tr_ratiolimit;
+
 void          tr_torrentSetSpeedMode( tr_torrent     * tor,
                                       tr_direction     up_or_down,
                                       tr_speedlimit    mode );
@@ -879,6 +899,16 @@ void          tr_torrentSetSpeedLimit( tr_torrent    * tor,
 
 int           tr_torrentGetSpeedLimit( const tr_torrent  * tor,
                                        tr_direction        direction );
+
+void          tr_torrentSetRatioMode( tr_torrent         * tor,
+                                      tr_ratiolimit        mode );
+
+tr_ratiolimit tr_torrentGetRatioMode( const tr_torrent   * tor );
+
+void          tr_torrentSetRatioLimit( tr_torrent        * tor,
+                                       double              ratio );
+
+double        tr_torrentGetRatioLimit( const tr_torrent  * tor );
 
 /****
 *****  Peer Limits
@@ -994,6 +1024,9 @@ typedef void ( tr_torrent_completeness_func )( tr_torrent       * torrent,
                                                tr_completeness    completeness,
                                                void             * user_data );
 
+typedef void ( tr_torrent_ratio_limit_hit_func )( tr_torrent   * torrent,
+                                                  void         * user_data );
+
 /**
  * Register to be notified whenever a torrent's "completeness"
  * changes.  This will be called, for example, when a torrent
@@ -1013,6 +1046,21 @@ void tr_torrentSetCompletenessCallback(
          void                          * user_data );
 
 void tr_torrentClearCompletenessCallback( tr_torrent * torrent );
+
+
+/**
+ * Register to be notified whenever a torrent's ratio limit
+ * has been hit. This will be called when the torrent's
+ * ul/dl ratio has met or exceeded the designated ratio limit.
+ *
+ * Has the same restrictions as tr_torrentSetCompletenessCallback
+ */
+void tr_torrentSetRatioLimitHitCallback(
+     tr_torrent                     * torrent,
+     tr_torrent_ratio_limit_hit_func  func,
+     void                           * user_data );
+
+void tr_torrentClearRatioLimitHitCallback( tr_torrent * torrent );
 
 
 /**

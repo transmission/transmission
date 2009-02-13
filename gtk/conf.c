@@ -200,6 +200,30 @@ pref_int_set_default( const char * key,
         pref_int_set( key, value );
 }
 
+double
+pref_double_get( const char * key )
+{
+    double d = 0.0;
+
+    tr_bencDictFindDouble( getPrefs( ), key, &d );
+    return d;
+}
+
+void
+pref_double_set( const char * key,
+                 double       value )
+{
+    tr_bencDictAddDouble( getPrefs( ), key, value );
+}
+
+void
+pref_double_set_default( const char * key,
+                         double       value )
+{
+    if ( !tr_bencDictFind( getPrefs( ), key ) )
+         pref_double_set( key, value );
+}
+
 /***
 ****
 ***/

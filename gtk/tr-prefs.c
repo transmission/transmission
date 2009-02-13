@@ -145,6 +145,7 @@ struct spin_idle_data
 {
     gpointer    core;
     GTimer *    last_change;
+    gboolean    isDouble;
 };
 
 static void
@@ -168,9 +169,17 @@ spun_cb_idle( gpointer spin )
     {
         /* update the core */
         const char * key = g_object_get_data( o, PREF_KEY );
-        const int    value = gtk_spin_button_get_value_as_int(
-             GTK_SPIN_BUTTON( spin ) );
-        tr_core_set_pref_int( TR_CORE( data->core ), key, value );
+        if (data->isDouble)
+        {
+            const double value = gtk_spin_button_get_value( GTK_SPIN_BUTTON( spin ) );
+            tr_core_set_pref_double( TR_CORE( data->core ), key, value );
+        }
+        else
+        {
+            const int    value = gtk_spin_button_get_value_as_int(
+                                 GTK_SPIN_BUTTON( spin ) );
+            tr_core_set_pref_int( TR_CORE( data->core ), key, value );
+        }
 
         /* cleanup */
         g_object_set_data( o, IDLE_DATA, NULL );
@@ -183,7 +192,8 @@ spun_cb_idle( gpointer spin )
 
 static void
 spun_cb( GtkSpinButton * w,
-         gpointer        core )
+         gpointer        core,
+         gboolean        isDouble )
 {
     /* user may be spinning through many values, so let's hold off
        for a moment to keep from flooding the core with changes */
@@ -195,11 +205,26 @@ spun_cb( GtkSpinButton * w,
         data = g_new( struct spin_idle_data, 1 );
         data->core = core;
         data->last_change = g_timer_new( );
+        data->isDouble = isDouble;
         g_object_set_data_full( o, IDLE_DATA, data, spin_idle_data_free );
         g_object_ref( G_OBJECT( o ) );
         g_timeout_add( 100, spun_cb_idle, w );
     }
     g_timer_start( data->last_change );
+}
+
+static void
+spun_cb_int( GtkSpinButton * w,
+             gpointer        core )
+{
+    spun_cb( w, core, FALSE );
+}
+
+static void
+spun_cb_double( GtkSpinButton * w,
+                gpointer        core )
+{
+    spun_cb( w, core, TRUE );
 }
 
 static GtkWidget*
@@ -215,7 +240,24 @@ new_spin_button( const char * key,
                                 key ), g_free );
     gtk_spin_button_set_digits( GTK_SPIN_BUTTON( w ), 0 );
     gtk_spin_button_set_value( GTK_SPIN_BUTTON( w ), pref_int_get( key ) );
-    g_signal_connect( w, "value-changed", G_CALLBACK( spun_cb ), core );
+    g_signal_connect( w, "value-changed", G_CALLBACK( spun_cb_int ), core );
+    return w;
+}
+
+static GtkWidget*
+new_spin_button_double( const char * key,
+                       gpointer      core,
+                       double        low,
+                       double        high,
+                       double        step )
+{
+    GtkWidget * w = gtk_spin_button_new_with_range( low, high, step );
+
+    g_object_set_data_full( G_OBJECT( w ), PREF_KEY, g_strdup(
+                                key ), g_free );
+    gtk_spin_button_set_digits( GTK_SPIN_BUTTON( w ), 2 );
+    gtk_spin_button_set_value( GTK_SPIN_BUTTON( w ), pref_double_get( key ) );
+    g_signal_connect( w, "value-changed", G_CALLBACK( spun_cb_double ), core );
     return w;
 }
 
@@ -1117,6 +1159,13 @@ bandwidthPage( GObject * core )
     w = new_check_button( s, TR_PREFS_KEY_USPEED_ENABLED, core );
     w2 = new_spin_button( TR_PREFS_KEY_USPEED, core, 0, INT_MAX, 5 );
     gtk_widget_set_sensitive( GTK_WIDGET( w2 ), pref_flag_get( TR_PREFS_KEY_USPEED_ENABLED ) );
+    g_signal_connect( w, "toggled", G_CALLBACK( target_cb ), w2 );
+    hig_workarea_add_row_w( t, &row, w, w2, NULL );
+
+    s = _( "_Stop seeding when a torrent's ratio reaches:" );
+    w = new_check_button( s, TR_PREFS_KEY_RATIO_ENABLED, core );
+    w2 = new_spin_button_double( TR_PREFS_KEY_RATIO, core, .5, INT_MAX, .05 );
+    gtk_widget_set_sensitive( GTK_WIDGET( w2 ), pref_flag_get( TR_PREFS_KEY_RATIO_ENABLED ) );
     g_signal_connect( w, "toggled", G_CALLBACK( target_cb ), w2 );
     hig_workarea_add_row_w( t, &row, w, w2, NULL );
 
