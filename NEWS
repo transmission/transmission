@@ -12,23 +12,30 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + File filter field in the inspector
    + Option to include beta releases when auto-updating (using modified Sparkle 1.5)
 
-1.50 (2009/01/dd)
+1.50 (2009/02/13)
 <http://trac.transmissionbt.com/query?milestone=1.50&group=component&groupdesc=1&order=severity>
 - All Platforms
-   + IPv6 support
-   + Fix a couple of 1.42 crashes
+   + IPv6 support for peers, and for trackers with explicit IPv6 addresses
+   + Improved connectivity for encrypted peers
    + Fix 1.42 error that made tracker announces slower over time
-   + When removing local data only remove data from the torrent
-   + Better performance when sharing with very fast peers
-   + Better handling of non-UTF-8 torrent files
+   + Fix a Mac-centric peer connection bug from 1.41
+   + Use less CPU cycles when managing very fast peers
+   + Better handling of non-UTF-8 torrent files 
+   + When removing local data, only remove data from the torrent
+   + Close potential DoS vulnerability in 1.41
+   + Many other bugfixes
 - GTK+
-   + Various HIG and usability changes
+   + Various usability improvements 
+   + Better Gnome HIG compliance in the statusbar, properties dialog, and more
 - Daemon
+   + Lots of new options added to transmission-remote
+   + Fix 1.42 whitelist bug
    + Make i18n support optional for cli and daemon clients
 - CLI
-   + Support session.json settings as the Daemon and GTK+ clients do
-- Web Interface
-   + Re-add the ability to add transfers using torrent file URLs
+   + Support session.json settings, just as the Daemon and GTK+ clients do
+- Web Interface 
+   + Torrents can now be added by URL
+   + Add the ability to "remove local data" from the web client
 
 1.42 (2008/12/24)
 <http://trac.transmissionbt.com/query?milestone=1.42&group=component&groupdesc=1&order=severity>
