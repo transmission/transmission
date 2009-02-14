@@ -1331,8 +1331,8 @@ typedef struct tr_stat
 
 #define TR_ETA_NOT_AVAIL -1
 #define TR_ETA_UNKNOWN -2
-    /** Estimated number of seconds left until the torrent is done,
-        or TR_ETA_NOT_AVAIL or TR_ETA_UNKNOWN */
+    /** If downloading, estimated number of seconds left until the torrent is done.
+        If seeding, estimated number of seconds left until seed ratio is reached. */
     int    eta;
 
     /** Number of peers that the tracker says this torrent has */

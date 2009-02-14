@@ -801,6 +801,7 @@ tr_torrentStat( tr_torrent * tor )
     const tr_tracker_info * ti;
     int                     usableSeeds = 0;
     uint64_t                now;
+    double                  downloadedForRatio, seedRatio;
 
     if( !tor )
         return NULL;
@@ -870,7 +871,6 @@ tr_torrentStat( tr_torrent * tor )
     s->haveValid       = tr_cpHaveValid( &tor->completion );
     s->haveUnchecked   = tr_cpHaveTotal( &tor->completion ) - s->haveValid;
 
-
     if( usableSeeds > 0 )
     {
         s->desiredAvailable = s->leftUntilDone;
@@ -891,17 +891,36 @@ tr_torrentStat( tr_torrent * tor )
         tr_bitfieldFree( peerPieces );
     }
 
-    if( s->leftUntilDone > s->desiredAvailable )
-        s->eta = TR_ETA_NOT_AVAIL;
-    else if( s->pieceDownloadSpeed < 0.1 )
-        s->eta = TR_ETA_UNKNOWN;
-    else
-        s->eta = s->leftUntilDone / s->pieceDownloadSpeed / 1024.0;
+    downloadedForRatio = s->downloadedEver ? s->downloadedEver : s->haveValid;
+    s->ratio = tr_getRatio( s->uploadedEver, downloadedForRatio );
 
-    s->ratio = tr_getRatio(
-        s->uploadedEver,
-        s->downloadedEver ? s->downloadedEver : s->
-        haveValid );
+    switch( s->activity )
+    {
+        case TR_STATUS_DOWNLOAD:
+            if( s->leftUntilDone > s->desiredAvailable )
+                s->eta = TR_ETA_NOT_AVAIL;
+            else if( s->pieceDownloadSpeed < 0.1 )
+                s->eta = TR_ETA_UNKNOWN;
+            else
+                s->eta = s->leftUntilDone / s->pieceDownloadSpeed / 1024.0;
+            break;
+        
+        case TR_STATUS_SEED:
+            if( tr_torrentGetSeedRatio( tor, &seedRatio ) )
+            {
+                if( s->pieceUploadSpeed < 0.1 )
+                    s->eta = TR_ETA_UNKNOWN;
+                else
+                    s->eta = (downloadedForRatio * (seedRatio - s->ratio)) / s->pieceUploadSpeed / 1024.0;
+            }
+            else
+                s->eta = TR_ETA_NOT_AVAIL;
+            break;
+        
+        default:
+            s->eta = TR_ETA_NOT_AVAIL;
+            break;
+    }
 
     tr_torrentUnlock( tor );
 
