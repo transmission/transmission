@@ -191,7 +191,7 @@ tr_session * fHandle;
     [fFolderPopUp selectItemAtIndex: [fDefaults boolForKey: @"DownloadLocationConstant"] ? DOWNLOAD_FOLDER : DOWNLOAD_TORRENT];
     
     //set stop ratio
-    [self updateRatioStopField];
+    [fRatioStopField setFloatValue: [fDefaults floatForKey: @"RatioLimit"]];
     
     //set limits
     [self updateLimitFields];
@@ -568,15 +568,15 @@ tr_session * fHandle;
 
 - (void) applyRatioSetting: (id) sender
 {
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil];
+    //[[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil];
+    tr_sessionSetRatioLimited(fHandle, [fDefaults boolForKey: @"RatioCheck"]);
+    tr_sessionSetRatioLimit(fHandle, [fDefaults floatForKey: @"RatioLimit"]);
 }
 
 - (void) updateRatioStopField
 {
-    if (!fHasLoaded)
-        return;
-    
-    [fRatioStopField setFloatValue: [fDefaults floatForKey: @"RatioLimit"]];
+    if (fHasLoaded)
+        [fRatioStopField setFloatValue: [fDefaults floatForKey: @"RatioLimit"]];
     
     [self applyRatioSetting: nil];
 }
@@ -584,6 +584,7 @@ tr_session * fHandle;
 - (void) setRatioStop: (id) sender
 {
     [fDefaults setFloat: [sender floatValue] forKey: @"RatioLimit"];
+    
     [self applyRatioSetting: nil];
 }
 

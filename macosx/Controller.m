@@ -201,7 +201,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         fDefaults = [NSUserDefaults standardUserDefaults];
         
         tr_benc settings;
-        tr_bencInitDict(&settings, 20);
+        tr_bencInitDict(&settings, 22);
         tr_sessionGetDefaultSettings(&settings);
         
         tr_bencDictAddInt(&settings, TR_PREFS_KEY_BLOCKLIST_ENABLED, [fDefaults boolForKey: @"Blocklist"]);
@@ -231,6 +231,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         tr_bencDictAddStr(&settings, TR_PREFS_KEY_PROXY, [[fDefaults stringForKey: @"ProxyAddress"] UTF8String]);
         tr_bencDictAddStr(&settings, TR_PREFS_KEY_PROXY_USERNAME,  [[fDefaults stringForKey: @"ProxyUsername"] UTF8String]);
         tr_bencDictAddInt(&settings, TR_PREFS_KEY_RPC_AUTH_REQUIRED,  [fDefaults boolForKey: @"RPCAuthorize"]);
+        tr_bencDictAddDouble(&settings, TR_PREFS_KEY_RATIO, [fDefaults floatForKey: @"RatioLimit"]);
+        tr_bencDictAddInt(&settings, TR_PREFS_KEY_RATIO_ENABLED, [fDefaults boolForKey: @"RatioCheck"]);
         tr_bencDictAddInt(&settings, TR_PREFS_KEY_RPC_ENABLED,  [fDefaults boolForKey: @"RPC"]);
         tr_bencDictAddInt(&settings, TR_PREFS_KEY_RPC_PORT,  [fDefaults integerForKey: @"RPCPort"]);
         tr_bencDictAddStr(&settings, TR_PREFS_KEY_RPC_USERNAME,  [[fDefaults stringForKey: @"RPCUsername"] UTF8String]);
@@ -2396,6 +2398,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 - (void) setRatioGlobalEnabled: (id) sender
 {
     [fDefaults setBool: sender == fCheckRatioItem forKey: @"RatioCheck"];
+    
+    [fPrefsController applyRatioSetting: nil];
 }
 
 - (void) setQuickRatioGlobal: (id) sender

@@ -605,18 +605,18 @@ typedef enum
     }
     
     //set ratio view
-    if (checkRatio == NSOnState)
+    if (checkRatio == TR_RATIOLIMIT_SINGLE)
         index = OPTION_POPUP_LIMIT;
-    else if (checkRatio == NSOffState)
+    else if (checkRatio == TR_RATIOLIMIT_UNLIMITED)
         index = OPTION_POPUP_NO_LIMIT;
-    else if (checkRatio == NSMixedState)
+    else if (checkRatio == TR_RATIOLIMIT_GLOBAL)
         index = OPTION_POPUP_GLOBAL;
     else
         index = -1;
     [fRatioPopUp selectItemAtIndex: index];
     [fRatioPopUp setEnabled: YES];
     
-    [fRatioLimitField setHidden: checkRatio != NSOnState];
+    [fRatioLimitField setHidden: checkRatio != TR_RATIOLIMIT_SINGLE];
     if (ratioLimit != INVALID)
         [fRatioLimitField setFloatValue: ratioLimit];
     else
@@ -1229,16 +1229,18 @@ typedef enum
 - (void) setRatioSetting: (id) sender
 {
     NSInteger setting;
+    bool single = NO;
     switch ([sender indexOfSelectedItem])
     {
         case OPTION_POPUP_LIMIT:
-            setting = NSOnState;
+            setting = TR_RATIOLIMIT_SINGLE;
+            single = YES;
             break;
         case OPTION_POPUP_NO_LIMIT:
-            setting = NSOffState;
+            setting = TR_RATIOLIMIT_UNLIMITED;
             break;
         case OPTION_POPUP_GLOBAL:
-            setting = NSMixedState;
+            setting = TR_RATIOLIMIT_GLOBAL;
             break;
         default:
             return;
@@ -1247,12 +1249,11 @@ typedef enum
     for (Torrent * torrent in fTorrents)
         [torrent setRatioSetting: setting];
     
-    BOOL single = setting == NSOnState;
     [fRatioLimitField setHidden: !single];
     if (single)
     {
         [fRatioLimitField selectText: self];
-        [[self window] makeKeyAndOrderFront:self];
+        [[self window] makeKeyAndOrderFront: self];
     }
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil];

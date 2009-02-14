@@ -27,8 +27,6 @@
 
 @class FileListNode;
 
-#define INVALID -99
-
 typedef enum
 {
     TORRENT_FILE_DELETE,
@@ -65,8 +63,6 @@ typedef enum
     NSIndexSet * fPreviousFinishedIndexes;
     NSDate * fPreviousFinishedIndexesDate;
     
-    CGFloat fRatioLimit;
-    NSInteger fRatioSetting;
     BOOL fFinishedSeeding, fWaitToStart, fStalled;
     
     NSInteger fGroupValue;
@@ -107,11 +103,11 @@ typedef enum
 - (void) resetCache;
 
 - (CGFloat) ratio;
-- (NSInteger) ratioSetting;
-- (void) setRatioSetting: (NSInteger) setting;
+- (tr_ratiolimit) ratioSetting;
+- (void) setRatioSetting: (tr_ratiolimit) setting;
 - (CGFloat) ratioLimit;
 - (void) setRatioLimit: (CGFloat) limit;
-- (CGFloat) actualStopRatio; //returns INVALID if will not stop
+- (BOOL) seedRatioSet;
 - (CGFloat) progressStopRatio;
 
 - (tr_speedlimit) speedMode: (BOOL) upload;
@@ -180,7 +176,6 @@ typedef enum
 - (CGFloat) checkingProgress;
 
 - (NSInteger) eta;
-- (NSInteger) etaRatio;
 
 - (CGFloat) notAvailableDesired;
 

@@ -217,19 +217,20 @@ tr_torrentIsPieceTransferAllowed( const tr_torrent  * tor,
 tr_bool
 tr_torrentGetSeedRatio( const tr_torrent * tor, double * ratio )
 {
-    double r = 0;
     tr_bool isLimited;
 
     switch( tr_torrentGetRatioMode( tor ) )
     {
         case TR_RATIOLIMIT_SINGLE:
             isLimited = TRUE;
-            r = tr_torrentGetRatioLimit( tor );
+            if( ratio )
+                *ratio = tr_torrentGetRatioLimit( tor );
             break;
 
         case TR_RATIOLIMIT_GLOBAL:
             if(( isLimited = tr_sessionIsRatioLimited( tor->session )))
-                r = tr_sessionGetRatioLimit( tor->session );
+                if( ratio )
+                    *ratio = tr_sessionGetRatioLimit( tor->session );
             break;
 
         case TR_RATIOLIMIT_UNLIMITED:
@@ -237,7 +238,6 @@ tr_torrentGetSeedRatio( const tr_torrent * tor, double * ratio )
             break;
     }
 
-    *ratio = r;
     return isLimited;
 }
 

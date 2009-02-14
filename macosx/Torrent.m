@@ -34,7 +34,6 @@
         publicTorrent: (NSNumber *) publicTorrent
         downloadFolder: (NSString *) downloadFolder
         useIncompleteFolder: (NSNumber *) useIncompleteFolder incompleteFolder: (NSString *) incompleteFolder
-        ratioSetting: (NSNumber *) ratioSetting ratioLimit: (NSNumber *) ratioLimit
         waitToStart: (NSNumber *) waitToStart
         groupValue: (NSNumber *) groupValue addedTrackers: (NSNumber *) addedTrackers;
 
@@ -47,10 +46,12 @@
 
 - (void) completenessChange: (NSNumber *) status;
 
+- (void) ratioLimitHit;
+
 - (void) quickPause;
 - (void) endQuickPause;
 
-- (NSString *) etaString: (NSInteger) eta;
+- (NSString *) etaString;
 
 - (void) updateAllTrackers: (NSMutableArray *) trackers;
 
@@ -63,7 +64,12 @@
 void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, void * torrentData)
 {
     [(Torrent *)torrentData performSelectorOnMainThread: @selector(completenessChange:)
-                withObject: [[NSNumber alloc] initWithInt: status] waitUntilDone: NO];
+        withObject: [[NSNumber alloc] initWithInt: status] waitUntilDone: NO];
+}
+
+void ratioLimitHitCallback(tr_torrent * torrent, void * torrentData)
+{
+    [(Torrent *)torrentData performSelectorOnMainThread: @selector(ratioLimitHit) withObject: nil waitUntilDone: NO];
 }
 
 int trashDataFile(const char * filename)
@@ -81,7 +87,6 @@ int trashDataFile(const char * filename)
             publicTorrent: torrentDelete != TORRENT_FILE_DEFAULT ? [NSNumber numberWithBool: torrentDelete == TORRENT_FILE_SAVE] : nil
             downloadFolder: location
             useIncompleteFolder: nil incompleteFolder: nil
-            ratioSetting: nil ratioLimit: nil
             waitToStart: nil groupValue: nil addedTrackers: nil];
     
     if (self)
@@ -106,7 +111,6 @@ int trashDataFile(const char * filename)
             publicTorrent: [NSNumber numberWithBool: NO]
             downloadFolder: location
             useIncompleteFolder: nil incompleteFolder: nil
-            ratioSetting: nil ratioLimit: nil
             waitToStart: nil groupValue: nil addedTrackers: nil];
     
     return self;
@@ -120,8 +124,6 @@ int trashDataFile(const char * filename)
                 downloadFolder: [history objectForKey: @"DownloadFolder"]
                 useIncompleteFolder: [history objectForKey: @"UseIncompleteFolder"]
                 incompleteFolder: [history objectForKey: @"IncompleteFolder"]
-                ratioSetting: [history objectForKey: @"RatioSetting"]
-                ratioLimit: [history objectForKey: @"RatioLimit"]
                 waitToStart: [history objectForKey: @"WaitToStart"]
                 groupValue: [history objectForKey: @"GroupValue"]
                 addedTrackers: [history objectForKey: @"AddedTrackers"]];
@@ -144,6 +146,21 @@ int trashDataFile(const char * filename)
             tr_torrentSetActivityDate(fHandle, [date timeIntervalSince1970]);
         if ((date = [history objectForKey: @"DateCompleted"]))
             tr_torrentSetDoneDate(fHandle, [date timeIntervalSince1970]);
+        
+        //upgrading from versions < 1.60: get old stop ratio settings
+        NSNumber * ratioSetting;
+        if ((ratioSetting = [history objectForKey: @"RatioSetting"]))
+        {
+            switch ([ratioSetting intValue])
+            {
+                case NSOnState: [self setRatioSetting: TR_RATIOLIMIT_SINGLE]; break;
+                case NSOffState: [self setRatioSetting: TR_RATIOLIMIT_UNLIMITED]; break;
+                case NSMixedState: [self setRatioSetting: TR_RATIOLIMIT_GLOBAL]; break;
+            }
+        }
+        NSNumber * ratioLimit;
+        if ((ratioLimit = [history objectForKey: @"RatioLimit"]))
+            [self setRatioLimit: [ratioLimit floatValue]];
     }
     return self;
 }
@@ -156,8 +173,6 @@ int trashDataFile(const char * filename)
                     fDownloadFolder, @"DownloadFolder",
                     [NSNumber numberWithBool: fUseIncompleteFolder], @"UseIncompleteFolder",
                     [NSNumber numberWithBool: [self isActive]], @"Active",
-                    [NSNumber numberWithInt: fRatioSetting], @"RatioSetting",
-                    [NSNumber numberWithFloat: fRatioLimit], @"RatioLimit",
                     [NSNumber numberWithBool: fWaitToStart], @"WaitToStart",
                     [NSNumber numberWithInt: fGroupValue], @"GroupValue",
                     [NSNumber numberWithBool: fAddedTrackers], @"AddedTrackers", nil];
@@ -279,19 +294,6 @@ int trashDataFile(const char * filename)
     
     fStat = tr_torrentStat(fHandle);
     
-    //check to stop for ratio
-    CGFloat stopRatio;
-    if ([self isSeeding] && (stopRatio = [self actualStopRatio]) != INVALID && [self ratio] >= stopRatio)
-    {
-        [self setRatioSetting: NSOffState];
-        [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentStoppedForRatio" object: self];
-        
-        [self stopTransfer];
-        fStat = tr_torrentStat(fHandle);
-        
-        fFinishedSeeding = YES;
-    }
-    
     //check if stalled (stored because based on time and needs to check if it was previously stalled)
     fStalled = [self isActive] && [fDefaults boolForKey: @"CheckStalled"]
                 && [self stalledMinutes] > [fDefaults integerForKey: @"StalledMinutes"];
@@ -359,41 +361,37 @@ int trashDataFile(const char * filename)
     return fStat->ratio;
 }
 
-- (NSInteger) ratioSetting
+- (tr_ratiolimit) ratioSetting
 {
-    return fRatioSetting;
+    return tr_torrentGetRatioMode(fHandle);
 }
 
-- (void) setRatioSetting: (NSInteger) setting
+- (void) setRatioSetting: (tr_ratiolimit) setting
 {
-    fRatioSetting = setting;
+    tr_torrentSetRatioMode(fHandle, setting);
 }
 
 - (CGFloat) ratioLimit
 {
-    return fRatioLimit;
+    return tr_torrentGetRatioLimit(fHandle);
 }
 
 - (void) setRatioLimit: (CGFloat) limit
 {
-    if (limit >= 0)
-        fRatioLimit = limit;
+    NSAssert(limit >= 0, @"Ratio cannot be negative");
+    tr_torrentSetRatioLimit(fHandle, limit);
 }
 
-- (CGFloat) actualStopRatio
+- (BOOL) seedRatioSet
 {
-    if (fRatioSetting == NSOnState)
-        return fRatioLimit;
-    else if (fRatioSetting == NSMixedState && [fDefaults boolForKey: @"RatioCheck"])
-        return [fDefaults floatForKey: @"RatioLimit"];
-    else
-        return INVALID;
+    return tr_torrentGetSeedRatio(fHandle, NULL);
 }
 
+#warning move to libtransmission
 - (CGFloat) progressStopRatio
 {
-    CGFloat stopRatio, ratio;
-    if ((stopRatio = [self actualStopRatio]) == INVALID || (ratio = [self ratio]) >= stopRatio)
+    double stopRatio, ratio;
+    if (!tr_torrentGetSeedRatio(fHandle, &stopRatio) || (ratio = [self ratio]) >= stopRatio)
         return 1.0;
     else if (stopRatio > 0.0)
         return ratio / stopRatio;
@@ -903,24 +901,6 @@ int trashDataFile(const char * filename)
     return fStat->eta;
 }
 
-- (NSInteger) etaRatio
-{
-    if (![self isSeeding])
-        return TR_ETA_UNKNOWN;
-    
-    CGFloat uploadRate = [self uploadRate];
-    if (uploadRate < 0.1)
-        return TR_ETA_UNKNOWN;
-    
-    CGFloat stopRatio = [self actualStopRatio], ratio = [self ratio];
-    if (stopRatio == INVALID || ratio >= stopRatio)
-        return TR_ETA_UNKNOWN;
-    
-    CGFloat haveDownloaded = (CGFloat)([self downloadedTotal] > 0 ? [self downloadedTotal] : [self haveVerified]);
-    CGFloat needUploaded = haveDownloaded * (stopRatio - ratio);
-    return needUploaded / uploadRate / 1024.0;
-}
-
 - (CGFloat) notAvailableDesired
 {
     return 1.0 - (CGFloat)fStat->desiredAvailable / [self sizeLeft];
@@ -1086,12 +1066,8 @@ int trashDataFile(const char * filename)
     }
     
     //add time when downloading
-    if (fStat->activity == TR_STATUS_DOWNLOAD || ([self isSeeding]
-        && (fRatioSetting == NSOnState || (fRatioSetting == NSMixedState && [fDefaults boolForKey: @"RatioCheck"]))))
-    {
-        NSInteger eta = fStat->activity == TR_STATUS_DOWNLOAD ? [self eta] : [self etaRatio];
-        string = [string stringByAppendingFormat: @" - %@", [self etaString: eta]];
-    }
+    if (fStat->activity == TR_STATUS_DOWNLOAD || ([self isSeeding] && [self seedRatioSet]))
+        string = [string stringByAppendingFormat: @" - %@", [self etaString]];
     
     return string;
 }
@@ -1229,11 +1205,10 @@ int trashDataFile(const char * filename)
 
 - (NSString *) remainingTimeString
 {
-    if (![self isActive] || ([self isSeeding]
-        && !(fRatioSetting == NSOnState || (fRatioSetting == NSMixedState && [fDefaults boolForKey: @"RatioCheck"]))))
+    if (fStat->activity == TR_STATUS_DOWNLOAD || ([self isSeeding] && [self seedRatioSet]))
+        return [self etaString];
+    else
         return [self shortStatusString];
-    
-    return [self etaString: [self isSeeding] ? [self etaRatio] : [self eta]];
 }
 
 - (NSString *) stateString
@@ -1602,7 +1577,6 @@ int trashDataFile(const char * filename)
         publicTorrent: (NSNumber *) publicTorrent
         downloadFolder: (NSString *) downloadFolder
         useIncompleteFolder: (NSNumber *) useIncompleteFolder incompleteFolder: (NSString *) incompleteFolder
-        ratioSetting: (NSNumber *) ratioSetting ratioLimit: (NSNumber *) ratioLimit
         waitToStart: (NSNumber *) waitToStart
         groupValue: (NSNumber *) groupValue addedTrackers: (NSNumber *) addedTrackers
 {
@@ -1682,12 +1656,11 @@ int trashDataFile(const char * filename)
     }
     
     tr_torrentSetCompletenessCallback(fHandle, completenessChangeCallback, self);
+    tr_torrentSetRatioLimitHitCallback(fHandle, ratioLimitHitCallback, self);
     
     fNameString = [[NSString alloc] initWithUTF8String: fInfo->name];
     fHashString = [[NSString alloc] initWithUTF8String: fInfo->hashString];
 	
-    fRatioSetting = ratioSetting ? [ratioSetting intValue] : NSMixedState;
-    fRatioLimit = ratioLimit ? [ratioLimit floatValue] : [fDefaults floatForKey: @"RatioLimit"];
     fFinishedSeeding = NO;
     
     fWaitToStart = waitToStart && [waitToStart boolValue];
@@ -1878,7 +1851,16 @@ int trashDataFile(const char * filename)
     [status release];
     
     [self update];
-} 
+}
+
+- (void) ratioLimitHit
+{
+    fStat = tr_torrentStat(fHandle);
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentStoppedForRatio" object: self];
+    
+    fFinishedSeeding = YES;
+}
 
 - (void) quickPause
 {
@@ -1911,8 +1893,9 @@ int trashDataFile(const char * filename)
     fQuickPauseDict = nil;
 }
 
-- (NSString *) etaString: (NSInteger) eta
+- (NSString *) etaString
 {
+    const NSInteger eta = [self eta];
     switch (eta)
     {
         case TR_ETA_NOT_AVAIL:

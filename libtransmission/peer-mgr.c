@@ -997,6 +997,10 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
                 double ratio = tr_getRatio( up, down );
                 if( ratio >= seedRatio ) {
                     tr_torrentStop( tor );
+                    
+                    /* set to no ratio limit to allow easy restarting */
+                    tr_torrentSetRatioMode( tor, TR_RATIOLIMIT_UNLIMITED );
+                    
                     fireRatioLimitHit( tor );
                 }
             }

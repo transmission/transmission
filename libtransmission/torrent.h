@@ -70,8 +70,6 @@ tr_torrent* tr_torrentFindFromObfuscatedHash( tr_session    * session,
 tr_bool     tr_torrentIsPieceTransferAllowed( const tr_torrent * torrent,
                                               tr_direction       direction );
 
-tr_bool     tr_torrentGetSeedRatio( const tr_torrent * tor, double * ratio );
-
 
 
 #define tr_block( a, b ) _tr_block( tor, a, b )

@@ -572,6 +572,8 @@ void       tr_sessionSetRatioLimit        ( tr_session        * session,
 
 double     tr_sessionGetRatioLimit        ( const tr_session  * session);
 
+tr_bool    tr_torrentGetSeedRatio         ( const tr_torrent * tor, double * ratio );
+
 double     tr_sessionGetRawSpeed          ( const tr_session  * session,
                                            tr_direction         direction );
 
