@@ -992,9 +992,9 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
 
             /* if we're seeding and we've reached our seed ratio limit, stop the torrent */
             if( tr_torrentIsSeed( tor ) && tr_torrentGetSeedRatio( tor, &seedRatio ) ) {
-                double up = (double)tor->uploadedCur + (double)tor->uploadedPrev;
-                double down = (double)tor->downloadedCur + (double)tor->downloadedPrev;
-                double ratio = tr_getRatio( up, down );
+                const double up = tor->uploadedCur + tor->uploadedPrev;
+                const double down = tor->downloadedCur + tor->downloadedPrev;
+                const double ratio = tr_getRatio( up, down );
                 if( ratio >= seedRatio ) {
                     tr_torrentStop( tor );
                     

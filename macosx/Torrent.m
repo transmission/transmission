@@ -1484,7 +1484,7 @@ int trashDataFile(const char * filename)
         if (![self canChangeDownloadCheckForFile: index])
             continue;
         
-        NSInteger priority = tr_torrentGetFilePriority(fHandle, index);
+        const NSInteger priority = tr_torrentGetFilePriority(fHandle, index);
         if (priority == TR_PRI_LOW)
         {
             if (low)
@@ -1513,19 +1513,19 @@ int trashDataFile(const char * filename)
 
 - (NSDate *) dateAdded
 {
-    time_t date = fStat->addedDate;
+    const time_t date = fStat->addedDate;
     return [NSDate dateWithTimeIntervalSince1970: date];
 }
 
 - (NSDate *) dateCompleted
 {
-    time_t date = fStat->doneDate;
+    const time_t date = fStat->doneDate;
     return date != 0 ? [NSDate dateWithTimeIntervalSince1970: date] : nil;
 }
 
 - (NSDate *) dateActivity
 {
-    time_t date = fStat->activityDate;
+    const time_t date = fStat->activityDate;
     return date != 0 ? [NSDate dateWithTimeIntervalSince1970: date] : nil;
 }
 

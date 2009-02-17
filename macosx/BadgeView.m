@@ -101,7 +101,6 @@
 
 @implementation BadgeView (Private)
 
-//dock icon must have locked focus
 - (void) badge: (NSImage *) badge string: (NSString *) string atHeight: (CGFloat) height adjustForQuit: (BOOL) quit
 {
     if (!fAttributes)

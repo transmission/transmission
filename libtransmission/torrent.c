@@ -228,9 +228,9 @@ tr_torrentGetSeedRatio( const tr_torrent * tor, double * ratio )
             break;
 
         case TR_RATIOLIMIT_GLOBAL:
-            if(( isLimited = tr_sessionIsRatioLimited( tor->session )))
-                if( ratio )
-                    *ratio = tr_sessionGetRatioLimit( tor->session );
+            isLimited = tr_sessionIsRatioLimited( tor->session );
+            if( isLimited && ratio )
+                *ratio = tr_sessionGetRatioLimit( tor->session );
             break;
 
         case TR_RATIOLIMIT_UNLIMITED:

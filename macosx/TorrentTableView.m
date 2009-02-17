@@ -722,7 +722,7 @@
 
 - (void) setQuickLimitMode: (id) sender
 {
-    NSInteger mode;
+    tr_speedlimit mode;
     switch ([sender tag])
     {
         case ACTION_MENU_UNLIMITED_TAG:
@@ -745,7 +745,7 @@
 
 - (void) setQuickLimit: (id) sender
 {
-    BOOL upload = [sender menu] == fUploadMenu;
+    const BOOL upload = [sender menu] == fUploadMenu;
     [fMenuTorrent setSpeedMode: TR_SPEEDLIMIT_SINGLE upload: upload];
     [fMenuTorrent setSpeedLimit: [[sender representedObject] intValue] upload: upload];
     
