@@ -594,8 +594,7 @@ torrentRealInit( tr_session      * session,
 
     if( !( loaded & TR_FR_RATIOLIMIT ) )
     {
-        tr_torrentSetRatioMode( tor, tr_sessionIsRatioLimited( tor-> session ) 
-                                     ? TR_RATIOLIMIT_GLOBAL : TR_RATIOLIMIT_UNLIMITED );
+        tr_torrentSetRatioMode( tor, TR_RATIOLIMIT_GLOBAL );
         tr_torrentSetRatioLimit( tor, tr_sessionGetRatioLimit( tor->session ) );
     }
 
