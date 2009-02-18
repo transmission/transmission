@@ -359,27 +359,65 @@ tr_sessionSaveSettings( tr_session * session, const char * configDir, tr_benc * 
 static void metainfoLookupRescan( tr_session * );
 static void tr_sessionInitImpl( void * );
 
+struct init_data
+{
+    tr_session  * session;
+    const char  * configDir;
+    tr_bool       messageQueuingEnabled;
+    tr_benc     * clientSettings;
+};
+
 tr_session *
 tr_sessionInit( const char  * tag,
                 const char  * configDir,
                 tr_bool       messageQueuingEnabled,
                 tr_benc     * clientSettings )
 {
-    int64_t i;
-    int64_t j;
-    tr_bool found;
-    const char * str;
-    tr_benc settings;
     tr_session * session;
-    char * filename;
+    struct init_data data;
 
     assert( tr_bencIsDict( clientSettings ) );
 
+    /* initialize the bare skeleton of the session object */
     session = tr_new0( tr_session, 1 );
     session->bandwidth = tr_bandwidthNew( session, NULL );
     session->lock = tr_lockNew( );
     session->tag = tr_strdup( tag );
     session->magicNumber = SESSION_MAGIC_NUMBER;
+
+    /* start the libtransmission thread */
+    tr_netInit( ); /* must go before tr_eventInit */
+    tr_eventInit( session );
+    assert( session->events != NULL );
+
+    /* run the rest in the libtransmission thread */
+    session->isWaiting = TRUE;
+    data.session = session;
+    data.configDir = configDir;
+    data.messageQueuingEnabled = messageQueuingEnabled;
+    data.clientSettings = clientSettings;
+    tr_runInEventThread( session, tr_sessionInitImpl, &data );
+    while( session->isWaiting )
+        tr_wait( 100 );
+
+    return session;
+}
+
+static void
+tr_sessionInitImpl( void * vdata )
+{
+    int64_t i;
+    int64_t j;
+    tr_bool found;
+    const char * str;
+    tr_benc settings;
+    char * filename;
+    struct init_data * data = vdata;
+    tr_benc * clientSettings = data->clientSettings;
+    tr_session * session = data->session;
+
+    assert( tr_amInEventThread( session ) );
+    assert( tr_bencIsDict( clientSettings ) );
 
     dbgmsg( "tr_sessionInit: the session's top-level bandwidth object is %p", session->bandwidth );
 
@@ -392,129 +430,128 @@ tr_sessionInit( const char  * tag,
     signal( SIGPIPE, SIG_IGN );
 #endif
 
-    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_PEER_LIMIT_TORRENT, &i ); 
-    assert( found ); 
-    session->peerLimitPerTorrent = i; 
- 
-    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_MSGLEVEL, &i ); 
-    assert( found ); 
-    tr_setMessageLevel( i ); 
-    tr_setMessageQueuing( messageQueuingEnabled ); 
- 
- 
-    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_PEX_ENABLED, &i ); 
-    assert( found ); 
-    session->isPexEnabled = i != 0; 
- 
-    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_ENCRYPTION, &i ); 
-    assert( found ); 
+    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_PEER_LIMIT_TORRENT, &i );
+    assert( found );
+    session->peerLimitPerTorrent = i;
+
+    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_MSGLEVEL, &i );
+    assert( found );
+    tr_setMessageLevel( i );
+    tr_setMessageQueuing( data->messageQueuingEnabled );
+
+
+    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_PEX_ENABLED, &i );
+    assert( found );
+    session->isPexEnabled = i != 0;
+
+    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_ENCRYPTION, &i );
+    assert( found );
     assert( tr_isEncryptionMode( i ) );
-    session->encryptionMode = i; 
+    session->encryptionMode = i;
 
     found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_PREALLOCATION, &i );
     assert( found );
     assert( tr_isPreallocationMode( i ) );
     session->preallocationMode = i;
- 
-    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_PEER_SOCKET_TOS, &i ); 
-    assert( found ); 
-    session->peerSocketTOS = i; 
- 
-    found = tr_bencDictFindStr( &settings, TR_PREFS_KEY_DOWNLOAD_DIR, &str ); 
-    assert( found ); 
-    session->downloadDir = tr_strdup( str ); 
- 
-    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_PROXY_ENABLED, &i ); 
-    assert( found ); 
-    session->isProxyEnabled = i != 0; 
- 
-    found = tr_bencDictFindStr( &settings, TR_PREFS_KEY_PROXY, &str ); 
-    assert( found ); 
-    session->proxy = tr_strdup( str ); 
- 
-    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_PROXY_PORT, &i ); 
-    assert( found ); 
-    session->proxyPort = i; 
- 
-    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_PROXY_TYPE, &i ); 
-    assert( found ); 
-    session->proxyType = i; 
- 
-    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_PROXY_AUTH_ENABLED, &i ); 
-    assert( found ); 
-    session->isProxyAuthEnabled = i != 0; 
- 
-    found = tr_bencDictFindStr( &settings, TR_PREFS_KEY_PROXY_USERNAME, &str ); 
-    assert( found ); 
-    session->proxyUsername = tr_strdup( str ); 
- 
-    found = tr_bencDictFindStr( &settings, TR_PREFS_KEY_PROXY_PASSWORD, &str ); 
-    assert( found ); 
-    session->proxyPassword = tr_strdup( str ); 
- 
-    session->so_sndbuf = 1500 * 3; /* 3x MTU for most ethernet/wireless */ 
-    session->so_rcvbuf = 8192; 
- 
-    tr_setConfigDir( session, configDir ); 
 
-    tr_netInit( ); /* must go before tr_eventInit */
-    tr_eventInit( session );
-    assert( session->events != NULL );
+    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_PEER_SOCKET_TOS, &i );
+    assert( found );
+    session->peerSocketTOS = i;
+
+    found = tr_bencDictFindStr( &settings, TR_PREFS_KEY_DOWNLOAD_DIR, &str );
+    assert( found );
+    session->downloadDir = tr_strdup( str );
+
+    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_PROXY_ENABLED, &i );
+    assert( found );
+    session->isProxyEnabled = i != 0;
+
+    found = tr_bencDictFindStr( &settings, TR_PREFS_KEY_PROXY, &str );
+    assert( found );
+    session->proxy = tr_strdup( str );
+
+    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_PROXY_PORT, &i );
+    assert( found );
+    session->proxyPort = i;
+
+    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_PROXY_TYPE, &i );
+    assert( found );
+    session->proxyType = i;
+
+    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_PROXY_AUTH_ENABLED, &i );
+    assert( found );
+    session->isProxyAuthEnabled = i != 0;
+
+    found = tr_bencDictFindStr( &settings, TR_PREFS_KEY_PROXY_USERNAME, &str );
+    assert( found );
+    session->proxyUsername = tr_strdup( str );
+
+    found = tr_bencDictFindStr( &settings, TR_PREFS_KEY_PROXY_PASSWORD, &str );
+    assert( found );
+    session->proxyPassword = tr_strdup( str );
+
+    session->so_sndbuf = 1500 * 3; /* 3x MTU for most ethernet/wireless */
+    session->so_rcvbuf = 8192;
+
+    tr_setConfigDir( session, data->configDir );
+
+    tr_trackerSessionInit( session );
+    assert( session->tracker != NULL );
 
     session->peerMgr = tr_peerMgrNew( session );
 
-    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_LAZY_BITFIELD, &i ); 
-    assert( found ); 
-    session->useLazyBitfield = i != 0; 
+    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_LAZY_BITFIELD, &i );
+    assert( found );
+    session->useLazyBitfield = i != 0;
 
     /* Initialize rate and file descripts controls */
 
-    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_OPEN_FILE_LIMIT, &i ); 
-    assert( found ); 
+    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_OPEN_FILE_LIMIT, &i );
+    assert( found );
     session->openFileLimit = i;
-    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_PEER_LIMIT_GLOBAL, &j ); 
-    assert( found ); 
+    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_PEER_LIMIT_GLOBAL, &j );
+    assert( found );
     tr_fdInit( session->openFileLimit, j );
 
-    /** 
-    *** random port 
-    **/ 
- 
-    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_PEER_PORT_RANDOM_ENABLED, &i ); 
-    assert( found ); 
-    session->isPortRandom = i != 0; 
- 
-    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_PEER_PORT_RANDOM_LOW, &i ); 
-    assert( found ); 
-    session->randomPortLow = i; 
- 
-    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_PEER_PORT_RANDOM_HIGH, &i ); 
-    assert( found ); 
-    session->randomPortHigh = i; 
- 
-    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_PORT_FORWARDING, &i ) 
-         && tr_bencDictFindInt( &settings, TR_PREFS_KEY_PEER_PORT, &j ); 
-    assert( found ); 
-    session->peerPort = session->isPortRandom ? getRandomPort( session ) : j; 
-    session->shared = tr_sharedInit( session, i, session->peerPort ); 
-    session->isPortSet = session->isPortRandom || j>0; 
+    /**
+    *** random port
+    **/
 
-    /** 
-    **/ 
+    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_PEER_PORT_RANDOM_ENABLED, &i );
+    assert( found );
+    session->isPortRandom = i != 0;
+
+    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_PEER_PORT_RANDOM_LOW, &i );
+    assert( found );
+    session->randomPortLow = i;
+
+    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_PEER_PORT_RANDOM_HIGH, &i );
+    assert( found );
+    session->randomPortHigh = i;
+
+    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_PORT_FORWARDING, &i )
+         && tr_bencDictFindInt( &settings, TR_PREFS_KEY_PEER_PORT, &j );
+    assert( found );
+    session->peerPort = session->isPortRandom ? getRandomPort( session ) : j;
+    session->shared = tr_sharedInit( session, i, session->peerPort );
+    session->isPortSet = session->isPortRandom || j>0;
+
+    /**
+    **/
 
     found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_UPLOAD_SLOTS_PER_TORRENT, &i );
     assert( found );
     session->uploadSlotsPerTorrent = i;
- 
+
     found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_USPEED, &i )
          && tr_bencDictFindInt( &settings, TR_PREFS_KEY_USPEED_ENABLED, &j );
-    assert( found ); 
+    assert( found );
     tr_sessionSetSpeedLimit( session, TR_UP, i );
     tr_sessionSetSpeedLimitEnabled( session, TR_UP, j );
- 
+
     found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_DSPEED, &i )
          && tr_bencDictFindInt( &settings, TR_PREFS_KEY_DSPEED_ENABLED, &j );
-    assert( found ); 
+    assert( found );
     tr_sessionSetSpeedLimit( session, TR_DOWN, i );
     tr_sessionSetSpeedLimitEnabled( session, TR_DOWN, j );
 
@@ -522,37 +559,26 @@ tr_sessionInit( const char  * tag,
     filename = tr_buildPath( session->configDir, "blocklists", NULL );
     tr_mkdirp( filename, 0777 );
     tr_free( filename );
-    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_BLOCKLIST_ENABLED, &i ); 
-    assert( found ); 
-    session->isBlocklistEnabled = i; 
-    loadBlocklists( session ); 
+    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_BLOCKLIST_ENABLED, &i );
+    assert( found );
+    session->isBlocklistEnabled = i;
+    loadBlocklists( session );
 
-    session->rpcServer = tr_rpcInit( session, &settings ); 
+    session->rpcServer = tr_rpcInit( session, &settings );
 
     tr_bencFree( &settings );
 
-    session->isWaiting = TRUE;
-    tr_runInEventThread( session, tr_sessionInitImpl, session );
-    while( session->isWaiting )
-        tr_wait( 100 );
-
-    return session;
-}
-static void
-tr_sessionInitImpl( void * vsession )
-{
-    tr_session * session = vsession;
-
     assert( tr_isSession( session ) );
- 
+
     /* first %s is the application name
        second %s is the version number */
     tr_inf( _( "%s %s started" ), TR_NAME, LONG_VERSION_STRING );
 
     tr_statsInit( session );
-    session->web = tr_webInit( session ); 
+    session->web = tr_webInit( session );
     metainfoLookupRescan( session );
     session->isWaiting = FALSE;
+    dbgmsg( "returning session %p; session->tracker is %p", session, session->tracker );
 }
 
 /***
@@ -1303,7 +1329,7 @@ tr_sessionSetRPCPort( tr_session * session,
     tr_rpcSetPort( session->rpcServer, port );
 }
 
-tr_port 
+tr_port
 tr_sessionGetRPCPort( const tr_session * session )
 {
     assert( tr_isSession( session ) );
@@ -1554,6 +1580,6 @@ tr_sessionGetActiveTorrentCount( tr_session * session )
     while(( tor = tr_torrentNext( session, tor )))
         if( tr_torrentGetActivity( tor ) != TR_STATUS_STOPPED )
             ++ret;
-    
+
     return ret;
 }

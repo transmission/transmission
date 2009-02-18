@@ -191,19 +191,6 @@ readFromPipe( int    fd,
             break;
         }
 
-        case 't': /* create timer */
-        {
-            tr_timer *    timer;
-            const size_t  nwant = sizeof( timer );
-            const ssize_t ngot = piperead( fd, &timer, nwant );
-            if( !eh->die && ( ngot == (ssize_t)nwant ) )
-            {
-                dbgmsg( "adding timer in libevent thread" );
-                evtimer_add( &timer->event, &timer->tv );
-            }
-            break;
-        }
-
         case '\0': /* eof */
         {
             dbgmsg( "pipe eof reached... removing event listener" );
@@ -294,7 +281,7 @@ tr_bool
 tr_amInEventThread( tr_session * session )
 {
     assert( tr_isSession( session ) );
-    assert( session->events );
+    assert( session->events != NULL );
 
     return tr_amInThread( session->events->thread );
 }
@@ -341,38 +328,23 @@ tr_timerFree( tr_timer ** ptimer )
 }
 
 tr_timer*
-tr_timerNew( tr_session * session,
-             timer_func   func,
-             void       * user_data,
-             uint64_t     interval_milliseconds )
+tr_timerNew( tr_session  * session,
+             timer_func    func,
+             void        * user_data,
+             uint64_t      interval_milliseconds )
 {
     tr_timer * timer;
 
-    assert( tr_isSession( session ) );
-    assert( session->events != NULL );
+    assert( tr_amInEventThread( session ) );
 
     timer = tr_new0( tr_timer, 1 );
-    tr_timevalMsec( interval_milliseconds, &timer->tv );
     timer->func = func;
     timer->user_data = user_data;
     timer->eh = session->events;
+
+    tr_timevalMsec( interval_milliseconds, &timer->tv );
     evtimer_set( &timer->event, timerCallback, timer );
-
-    if( tr_amInThread( session->events->thread ) )
-    {
-        evtimer_add( &timer->event,  &timer->tv );
-    }
-    else
-    {
-        const char ch = 't';
-        int        fd = session->events->fds[1];
-        tr_lock *  lock = session->events->lock;
-
-        tr_lockLock( lock );
-        pipewrite( fd, &ch, 1 );
-        pipewrite( fd, &timer, sizeof( timer ) );
-        tr_lockUnlock( lock );
-    }
+    evtimer_add( &timer->event,  &timer->tv );
 
     return timer;
 }

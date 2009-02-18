@@ -1403,7 +1403,7 @@ parseNumberSection( const char * str, int len, struct number_range * setme )
     char * tmp = tr_strndup( str, len );
 
     errno = 0;
-    a = strtol( tmp, &end, 10 );
+    a = b = strtol( tmp, &end, 10 );
     if( errno || ( end == tmp ) ) {
         success = FALSE;
     } else if( *end != '-' ) {
