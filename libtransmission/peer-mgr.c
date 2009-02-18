@@ -818,6 +818,8 @@ refillPulse( void * vtorrent )
         const uint32_t offset = getBlockOffsetInPiece( tor, block );
         const uint32_t length = tr_torBlockCountBytes( tor, block );
 
+        assert( block < tor->blockCount );
+
         /* find a peer who can ask for this block */
         for( j=0; !handled && j<peerCount; )
         {

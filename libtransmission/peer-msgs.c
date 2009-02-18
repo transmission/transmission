@@ -718,7 +718,7 @@ tr_peerMsgsHave( tr_peermsgs * msgs,
 ***
 **/
 
-static int
+static tr_bool
 reqIsValid( const tr_peermsgs * peer,
             uint32_t            index,
             uint32_t            offset,
@@ -727,7 +727,7 @@ reqIsValid( const tr_peermsgs * peer,
     return tr_torrentReqIsValid( peer->torrent, index, offset, length );
 }
 
-static int
+static tr_bool
 requestIsValid( const tr_peermsgs * msgs, const struct peer_request * req )
 {
     return reqIsValid( msgs, req->index, req->offset, req->length );
@@ -841,7 +841,6 @@ tr_peerMsgsAddRequest( tr_peermsgs *    msgs,
 
     assert( msgs );
     assert( msgs->torrent );
-    assert( reqIsValid( msgs, index, offset, length ) );
 
     /**
     ***  Reasons to decline the request
