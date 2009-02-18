@@ -28,9 +28,10 @@
 
 struct json_benc_data
 {
-    tr_benc *      top;
+    tr_bool        hasContent;
+    tr_benc      * top;
     tr_ptrArray    stack;
-    char *         key;
+    char         * key;
 };
 
 static tr_benc*
@@ -69,6 +70,7 @@ callback( void *             vdata,
     switch( type )
     {
         case JSON_T_ARRAY_BEGIN:
+            data->hasContent = TRUE;
             node = getNode( data );
             tr_bencInitList( node, 0 );
             tr_ptrArrayAppend( &data->stack, node );
@@ -79,6 +81,7 @@ callback( void *             vdata,
             break;
 
         case JSON_T_OBJECT_BEGIN:
+            data->hasContent = TRUE;
             node = getNode( data );
             tr_bencInitDict( node, 0 );
             tr_ptrArrayAppend( &data->stack, node );
@@ -94,32 +97,39 @@ callback( void *             vdata,
             tr_snprintf( buf, sizeof( buf ), "%f",
                          (double)value->vu.float_value );
             tr_bencInitStr( getNode( data ), buf, -1 );
+            data->hasContent = TRUE;
             break;
         }
 
         case JSON_T_NULL:
+            data->hasContent = TRUE;
             tr_bencInitStr( getNode( data ), "", 0 );
             break;
 
         case JSON_T_INTEGER:
+            data->hasContent = TRUE;
             tr_bencInitInt( getNode( data ), value->vu.integer_value );
             break;
 
         case JSON_T_TRUE:
+            data->hasContent = TRUE;
             tr_bencInitInt( getNode( data ), 1 );
             break;
 
         case JSON_T_FALSE:
+            data->hasContent = TRUE;
             tr_bencInitInt( getNode( data ), 0 );
             break;
 
         case JSON_T_STRING:
+            data->hasContent = TRUE;
             tr_bencInitStr( getNode( data ),
                             value->vu.str.value,
                             value->vu.str.length );
             break;
 
         case JSON_T_KEY:
+            data->hasContent = TRUE;
             assert( !data->key );
             data->key = tr_strdup( value->vu.str.value );
             break;
@@ -129,14 +139,14 @@ callback( void *             vdata,
 }
 
 int
-tr_jsonParse( const void *     vbuf,
+tr_jsonParse( const void     * vbuf,
               size_t           len,
-              tr_benc *        setme_benc,
+              tr_benc        * setme_benc,
               const uint8_t ** setme_end )
 {
     int                         err = 0;
-    const unsigned char *       buf = vbuf;
-    const void *                bufend = buf + len;
+    const unsigned char       * buf = vbuf;
+    const void                * bufend = buf + len;
     struct JSON_config_struct   config;
     struct JSON_parser_struct * checker;
     struct json_benc_data       data;
@@ -146,6 +156,7 @@ tr_jsonParse( const void *     vbuf,
     config.callback_ctx = &data;
     config.depth = -1;
 
+    data.hasContent = FALSE;
     data.key = NULL;
     data.top = setme_benc;
     data.stack = TR_PTR_ARRAY_INIT;
@@ -156,6 +167,9 @@ tr_jsonParse( const void *     vbuf,
 
     if( buf != bufend )
         err = EILSEQ;
+
+    if( !data.hasContent )
+        err = EINVAL;
 
     if( setme_end )
         *setme_end = (const uint8_t*) buf;
