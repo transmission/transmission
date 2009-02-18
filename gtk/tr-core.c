@@ -245,9 +245,26 @@ tr_core_class_init( gpointer              g_class,
 ****  SORTING
 ***/
 
+static gboolean
+isValidETA( int t )
+{
+    return ( t != TR_ETA_NOT_AVAIL ) && ( t != TR_ETA_UNKNOWN );
+}
+
 static int
-compareDouble( double a,
-               double b )
+compareETA( int a, int b )
+{
+    const gboolean a_valid = isValidETA( a );
+    const gboolean b_valid = isValidETA( b );
+
+    if( !a_valid && !b_valid ) return 0;
+    if( !a_valid ) return -1;
+    if( !b_valid ) return 1;
+    return a < b ? 1 : -1;
+}
+
+static int
+compareDouble( double a, double b )
 {
     if( a < b ) return -1;
     if( a > b ) return 1;
@@ -255,8 +272,7 @@ compareDouble( double a,
 }
 
 static int
-compareRatio( double a,
-              double b )
+compareRatio( double a, double b )
 {
     if( (int)a == TR_RATIO_INF && (int)b == TR_RATIO_INF ) return 0;
     if( (int)a == TR_RATIO_INF ) return 1;
@@ -265,8 +281,7 @@ compareRatio( double a,
 }
 
 static int
-compareTime( time_t a,
-             time_t b )
+compareTime( time_t a, time_t b )
 {
     if( a < b ) return -1;
     if( a > b ) return 1;
@@ -274,12 +289,12 @@ compareTime( time_t a,
 }
 
 static int
-compareByRatio( GtkTreeModel *           model,
-                GtkTreeIter *            a,
-                GtkTreeIter *            b,
-                gpointer       user_data UNUSED )
+compareByRatio( GtkTreeModel  * model,
+                GtkTreeIter   * a,
+                GtkTreeIter   * b,
+                gpointer        user_data UNUSED )
 {
-    tr_torrent *   ta, *tb;
+    tr_torrent *ta, *tb;
     const tr_stat *sa, *sb;
 
     gtk_tree_model_get( model, a, MC_TORRENT_RAW, &ta, -1 );
@@ -369,6 +384,21 @@ compareByProgress( GtkTreeModel *             model,
 }
 
 static int
+compareByETA( GtkTreeModel * model,
+              GtkTreeIter  * a,
+              GtkTreeIter  * b,
+              gpointer       user_data UNUSED )
+{
+    tr_torrent *ta, *tb;
+
+    gtk_tree_model_get( model, a, MC_TORRENT_RAW, &ta, -1 );
+    gtk_tree_model_get( model, b, MC_TORRENT_RAW, &tb, -1 );
+
+    return compareETA( tr_torrentStatCached( ta )->eta,
+                       tr_torrentStatCached( tb )->eta );
+}
+
+static int
 compareByState( GtkTreeModel * model,
                 GtkTreeIter *  a,
                 GtkTreeIter *  b,
@@ -420,6 +450,8 @@ setSort( TrCore *     core,
         sort_func = compareByAge;
     else if( !strcmp( mode, "sort-by-progress" ) )
         sort_func = compareByProgress;
+    else if( !strcmp( mode, "sort-by-eta" ) )
+        sort_func = compareByETA;
     else if( !strcmp( mode, "sort-by-ratio" ) )
         sort_func = compareByRatio;
     else if( !strcmp( mode, "sort-by-state" ) )

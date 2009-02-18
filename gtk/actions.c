@@ -57,7 +57,9 @@ static GtkRadioActionEntry sort_radio_entries[] =
     { "sort-by-tracker",  NULL,        N_( "Sort by _Tracker" ),  NULL,
       NULL, 5 },
     { "sort-by-age",      NULL,        N_( "Sort by A_ge" ),      NULL,
-      NULL, 6 }
+      NULL, 6 },
+    { "sort-by-eta",      NULL,        N_( "Sort by _ETA" ),      NULL,
+      NULL, 7 }
 };
 
 static void
