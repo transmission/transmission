@@ -853,15 +853,15 @@ tr_peerMsgsAddRequest( tr_peermsgs *    msgs,
         return TR_ADDREQ_CLIENT_CHOKED;
     }
 
-    /* peer doesn't have this piece */
-    if( !tr_bitfieldHas( msgs->peer->have, index ) )
-        return TR_ADDREQ_MISSING;
-
     /* peer's queue is full */
     if( requestQueueIsFull( msgs ) ) {
         dbgmsg( msgs, "declining request because we're full" );
         return TR_ADDREQ_FULL;
     }
+
+    /* peer doesn't have this piece */
+    if( !tr_bitfieldHas( msgs->peer->have, index ) )
+        return TR_ADDREQ_MISSING;
 
     /* have we already asked for this piece? */
     req.index = index;

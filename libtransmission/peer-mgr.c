@@ -665,11 +665,11 @@ static struct tr_blockIterator*
 blockIteratorNew( Torrent * t )
 {
     struct tr_blockIterator * i = tr_new0( struct tr_blockIterator, 1 );
-    tordbg( t, "creating new refill queue" );
     i->expirationDate = time( NULL ) + PIECE_LIST_SHELF_LIFE_SECS;
     i->t = t;
     i->pieces = getPreferredPieces( t, &i->pieceCount );
     i->blocks = tr_new0( tr_block_index_t, t->tor->blockCountInPiece );
+    tordbg( t, "creating new refill queue.. it contains %"PRIu32" pieces", i->pieceCount );
     return i;
 }
 
@@ -871,9 +871,10 @@ refillPulse( void * vtorrent )
     tr_free( webseeds );
     tr_free( peers );
 
-    /* if we're out of blocks to request, free the request queue */
-    if( !hasNext )
+    if( !hasNext ) {
+        tordbg( t, "refill queue has no more blocks to request... freeing (webseed count: %d, peer count: %d)", webseedCount, peerCount );
         blockIteratorFree( &t->refillQueue );
+    }
 
     t->refillTimer = NULL;
     torrentUnlock( t );

@@ -416,6 +416,7 @@ handle_rpc( struct evhttp_request * req,
     }
     else if( req->type == EVHTTP_REQ_POST )
     {
+fprintf( stderr, "%s\n", (char*)EVBUFFER_DATA(req->input_buffer) );
         tr_rpc_request_exec_json( server->session,
                                   EVBUFFER_DATA( req->input_buffer ),
                                   EVBUFFER_LENGTH( req->input_buffer ),
