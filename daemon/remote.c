@@ -751,7 +751,7 @@ getStatusString( tr_benc * t, char * buf, size_t buflen )
         case TR_STATUS_DOWNLOAD:
         case TR_STATUS_SEED: {
             const char * err = NULL;
-            if( tr_bencDictFindStr( t, "errorString", &err ) )
+            if( tr_bencDictFindStr( t, "errorString", &err ) && err && *err )
                 tr_strlcpy( buf, err, buflen );
             else {
                 int64_t fromUs = 0;
