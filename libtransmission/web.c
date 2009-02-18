@@ -26,6 +26,13 @@
 #include "utils.h"
 #include "web.h"
 
+/* Use curl_multi_socket_action() instead of curl_multi_perform()
+   if libcurl >= 7.18.2.  See http://trac.transmissionbt.com/ticket/1844 */
+#if LIBCURL_VERSION_NUM >= 0x071202
+    #define USE_CURL_MULTI_SOCKET_ACTION
+#endif
+
+
 enum
 {
     /* arbitrary number */
@@ -336,7 +343,7 @@ web_close( tr_web * g )
    and no tasks remain.  callers must not reference their g pointer
    after calling this function */
 static void
-tr_multi_perform( tr_web * g )
+tr_multi_perform( tr_web * g, int fd )
 {
     int closed = FALSE;
     CURLMcode mcode;
@@ -345,11 +352,20 @@ tr_multi_perform( tr_web * g )
             g->prev_running, g->still_running );
 
     /* invoke libcurl's processing */
+#ifdef USE_CURL_MULTI_SOCKET_ACTION
+    do {
+        dbgmsg( "calling curl_multi_socket_action..." );
+        mcode = curl_multi_socket_action( g->multi, fd, 0, &g->still_running );
+        fd = CURL_SOCKET_TIMEOUT;
+        dbgmsg( "done calling curl_multi_socket_action..." );
+    } while( mcode == CURLM_CALL_MULTI_SOCKET );
+#else
     do {
         dbgmsg( "calling curl_multi_perform..." );
         mcode = curl_multi_perform( g->multi, &g->still_running );
         dbgmsg( "done calling curl_multi_perform..." );
     } while( mcode == CURLM_CALL_MULTI_PERFORM );
+#endif
     tr_assert( mcode == CURLM_OK, "curl_multi_perform() failed: %d (%s)", mcode, curl_multi_strerror( mcode ) );
     if( mcode != CURLM_OK )
         tr_err( "%s", curl_multi_strerror( mcode ) );
@@ -371,9 +387,9 @@ tr_multi_perform( tr_web * g )
 
 /* libevent says that sock is ready to be processed, so wake up libcurl */
 static void
-event_cb( int fd UNUSED, short kind UNUSED, void * g )
+event_cb( int fd, short kind UNUSED, void * g )
 {
-    tr_multi_perform( g );
+    tr_multi_perform( g, fd );
 }
 
 /* libevent says that timer_ms have passed, so wake up libcurl */
@@ -381,7 +397,7 @@ static void
 timer_cb( int socket UNUSED, short action UNUSED, void * g )
 {
     dbgmsg( "libevent timer is done" );
-    tr_multi_perform( g );
+    tr_multi_perform( g, CURL_SOCKET_TIMEOUT );
 }
 
 /* CURLMOPT_SOCKETFUNCTION */
