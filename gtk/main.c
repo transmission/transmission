@@ -208,7 +208,7 @@ accumulateCanUpdateForeach( GtkTreeModel *      model,
 static void
 refreshTorrentActions( struct cbdata * data )
 {
-    int                canUpdate;
+    int canUpdate;
     struct counts_data counts;
     GtkTreeSelection * s = data->sel;
 
@@ -231,15 +231,17 @@ refreshTorrentActions( struct cbdata * data )
     {
         GtkTreeView *  view = gtk_tree_selection_get_tree_view( s );
         GtkTreeModel * model = gtk_tree_view_get_model( view );
-        const int  torrentCount = gtk_tree_model_iter_n_children( model, NULL ) != 0;
+        const int torrentCount = gtk_tree_model_iter_n_children( model, NULL ) != 0;
         action_sensitize( "select-all", torrentCount != 0 );
         action_sensitize( "deselect-all", torrentCount != 0 );
     }
 
     {
         tr_session * session = tr_core_session( data->core );
-        int activeCount = tr_sessionGetActiveTorrentCount( session );
-        action_sensitize( "pause-all-torrents", activeCount != 0 );
+        const int active = tr_sessionGetActiveTorrentCount( session );
+        const int total = tr_sessionCountTorrents( session );
+        action_sensitize( "pause-all-torrents", active != 0 );
+        action_sensitize( "start-all-torrents", active != total );
     }
 }
 
@@ -1386,6 +1388,14 @@ removeSelected( struct cbdata * data,
 }
 
 static void
+startAllTorrents( struct cbdata * data )
+{
+    tr_session * session = tr_core_session( data->core );
+    const char * cmd = "{ \"method\": \"torrent-start\" }";
+    tr_rpc_request_exec_json( session, cmd, strlen( cmd ), NULL, NULL );
+}
+
+static void
 pauseAllTorrents( struct cbdata * data )
 {
     tr_session * session = tr_core_session( data->core );
@@ -1418,6 +1428,10 @@ doAction( const char * action_name, gpointer user_data )
     else if( !strcmp( action_name, "pause-all-torrents" ) )
     {
         pauseAllTorrents( data );
+    }
+    else if( !strcmp( action_name, "start-all-torrents" ) )
+    {
+        startAllTorrents( data );
     }
     else if( !strcmp( action_name, "pause-torrent" ) )
     {
