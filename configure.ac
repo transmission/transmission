@@ -21,13 +21,17 @@ AC_PROG_LIBTOOL
 
 if test m4_substr(peer_id_prefix,6,1) = "0"; then
   supported_build=yes
-  CFLAGS="$CFLAGS -g -O3 -funroll-loops "
-  CXXFLAGS="$CXXFLAGS -g -O3 -funroll-loops "
+  if test "x$GCC" = "xyes" ; then
+    CFLAGS="$CFLAGS -g -O3 -funroll-loops "
+    CXXFLAGS="$CXXFLAGS -g -O3 -funroll-loops "
+  fi
   AC_DEFINE(TR_STABLE_RELEASE, 1, [Define to 1 if this is a stable release of Transmission])
 else
   supported_build=no
-  CFLAGS="$CFLAGS -g -O0"
-  CXXFLAGS="$CXXFLAGS -g -O0"
+  if test "x$GCC" = "xyes" ; then
+    CFLAGS="$CFLAGS -g -O0"
+    CXXFLAGS="$CXXFLAGS -g -O0"
+  fi
   if test m4_substr(peer_id_prefix,6,1) = "X"; then
     AC_DEFINE(TR_BETA_RELEASE, 1, [Define to 1 if this is a beta release of Transmission])
   else
@@ -57,7 +61,7 @@ AC_PROG_CC
 AC_PROG_CXX
 AC_C_INLINE
 if test "x$GCC" = "xyes" ; then
-    CFLAGS="$CFLAGS -std=gnu99 -ggdb3 -Wall -Wextra -Wredundant-decls -Wpointer-arith -Wformat-security -W -Wmissing-declarations -Wdeclaration-after-statement -Wcast-align -Winit-self -Wundef -Wnested-externs -Wmissing-format-attribute"
+  CFLAGS="$CFLAGS -std=gnu99 -ggdb3 -Wall -Wextra -Wredundant-decls -Wpointer-arith -Wformat-security -W -Wmissing-declarations -Wdeclaration-after-statement -Wcast-align -Winit-self -Wundef -Wnested-externs -Wmissing-format-attribute"
 fi
 
 AC_HEADER_STDC
