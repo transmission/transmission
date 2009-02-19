@@ -49,7 +49,7 @@ clutch_DATA = \
 clutch_cssdir = $(clutchdir)/stylesheets
 clutch_css_DATA = \
   web/stylesheets/iphone.css \
-  web/stylesheets/common.css
+  web/stylesheets/common.css \
   web/stylesheets/ie6.css \
   web/stylesheets/ie7.css
 
