@@ -587,7 +587,7 @@ updateFastSet( tr_peermsgs * msgs UNUSED )
 ***  INTEREST
 **/
 
-static int
+static tr_bool
 isPieceInteresting( const tr_peermsgs * msgs,
                     tr_piece_index_t    piece )
 {
@@ -599,7 +599,7 @@ isPieceInteresting( const tr_peermsgs * msgs,
 }
 
 /* "interested" means we'll ask for piece data if they unchoke us */
-static int
+static tr_bool
 isPeerInteresting( const tr_peermsgs * msgs )
 {
     tr_piece_index_t    i;
@@ -657,7 +657,7 @@ updateInterest( tr_peermsgs * msgs )
         fireNeedReq( msgs );
 }
 
-static int
+static tr_bool
 popNextRequest( tr_peermsgs *         msgs,
                 struct peer_request * setme )
 {
@@ -824,7 +824,7 @@ pumpRequestQueue( tr_peermsgs * msgs, const time_t now )
         fireNeedReq( msgs );
 }
 
-static TR_INLINE int
+static TR_INLINE tr_bool
 requestQueueIsFull( const tr_peermsgs * msgs )
 {
     const int req_max = msgs->maxActiveRequests;
@@ -1222,7 +1222,7 @@ peerMadeRequest( tr_peermsgs *               msgs,
         protocolSendReject( msgs, req );
 }
 
-static int
+static tr_bool
 messageLengthIsCorrect( const tr_peermsgs * msg, uint8_t id, uint32_t len )
 {
     switch( id )
