@@ -21,13 +21,17 @@ AC_PROG_LIBTOOL
 
 if test m4_substr(peer_id_prefix,6,1) = "0"; then
   supported_build=yes
-  CFLAGS="$CFLAGS -g -O3 -funroll-loops "
-  CXXFLAGS="$CXXFLAGS -g -O3 -funroll-loops "
+  if test "x$GCC" = "xyes" ; then
+    CFLAGS="$CFLAGS -g -O3 -funroll-loops "
+    CXXFLAGS="$CXXFLAGS -g -O3 -funroll-loops "
+  fi
   AC_DEFINE(TR_STABLE_RELEASE, 1, [Define to 1 if this is a stable release of Transmission])
 else
   supported_build=no
-  CFLAGS="$CFLAGS -g -O"
-  CXXFLAGS="$CXXFLAGS -g -O"
+  if test "x$GCC" = "xyes" ; then
+    CFLAGS="$CFLAGS -g -O0"
+    CXXFLAGS="$CXXFLAGS -g -O0"
+  fi
   if test m4_substr(peer_id_prefix,6,1) = "X"; then
     AC_DEFINE(TR_BETA_RELEASE, 1, [Define to 1 if this is a beta release of Transmission])
   else
@@ -58,7 +62,7 @@ AC_PROG_CXX
 AC_C_INLINE
 if test "x$GCC" = "xyes" ; then
 
-    CFLAGS="$CFLAGS -std=gnu99 -ggdb3 -Wall -W -Wpointer-arith -Wformat-security -Wcast-align -Wundef -Wcast-align -Wstrict-prototypes -Wmissing-declarations -Wmissing-format-attribute -Wredundant-decls -Wnested-externs -Wunreachable-code -Wunused-parameter -Wwrite-strings"
+    CFLAGS="$CFLAGS -std=gnu99 -ggdb3 -Wall -W -Wpointer-arith -Wformat-security -Wcast-align -Wundef -Wcast-align -Wstrict-prototypes -Wmissing-declarations -Wmissing-format-attribute -Wredundant-decls -Wnested-externs -Wunused-parameter -Wwrite-strings"
 
     dnl figure out gcc version
     AC_MSG_CHECKING([gcc version])
