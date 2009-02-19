@@ -30,6 +30,7 @@
 			 <ul>    
 				 <li id="open"><div id="open_link"><div class="toolbar_image"></div>Open</div></li>
 				 <li id="remove" class="disabled"><div id="remove_link"><div class="toolbar_image"></div>Remove</div></li>
+				 <li class="divider">&nbsp;</li>
 				 <li id="removedata" class="disabled"><div id="removedata_link"><div class="toolbar_image"></div>Remove Data</div></li>
 				 <li class="divider">&nbsp;</li>
 				 <li id="pause_selected" class="disabled"><div id="pause_selected_link"><div class="toolbar_image"></div>Pause</div></li>
@@ -55,7 +56,7 @@
 				 <li><a href="#seeding" id="filter_seeding_link">Seeding</a></li>
 				 <li><a href="#paused" id="filter_paused_link">Paused</a></li>
 			</ul>
-			<input type="search" id="torrent_search" placeholder="Filter" results="0" />		
+			<input type="text" id="torrent_search" name="Filter"/>		
 		</div>
 		<div id="torrent_inspector" style="display:none;">
 			
@@ -172,7 +173,7 @@
 		</div>
 		
 		<div id="torrent_container">
-			<ul class="torrent_list" id="torrent_list"></ul>
+			<ul class="torrent_list" id="torrent_list"><li></li></ul>
 	</div>
 		
 		
@@ -193,7 +194,7 @@
 			<div class="dialog_window">
 				<h2 class="dialog_heading">Preferences</h2>
 				<div id="pref_error"></div>
-				<form id="prefs_form">
+				<form action="" id="prefs_form">
 					<div class="preference download_location">
 						<label class="category">Add transfers:</label>
 						<div class="formdiv">
@@ -348,7 +349,9 @@
 				<li id="context_pause_selected" class="disabled context_pause_selected">Pause Selected</li>
 				<li id="context_resume_selected" class="disabled context_resume_selected">Resume Selected</li>
 				<li id="context_remove">Remove From List...</li>
+				<li class="separator"></li>
 				<li id="context_removedata">Delete Data And Remove From List...</li>
+				<li class="separator"></li>
 				<li id="context_toggle_inspector">Show Inspector</li>
 				<li class="separator"></li>
 				<li id="context_select_all" class="context_select_all">Select All</li>
