@@ -1,0 +1,16 @@
+div.torrent_global_menu ul li {
+	width: 60px;
+}
+div#torrent_filter_bar ul li {
+	width: 100px;
+}
+div.torrent_footer {
+	position: static;
+}
+div#torrent_container {
+	position: static;
+	top: 97px;
+}
+div#torrent_inspector {
+	position: absolute;
+}

@@ -1,0 +1,13 @@
+div.torrent_global_menu ul li {
+	width: 100px;
+}
+div#torrent_container {
+	overflow-x: hidden;
+}
+div#torrent_container ul li {
+	padding-right: 40px;
+}
+li.torrent a div {
+	right: -2px;
+	top: -12px;
+}
