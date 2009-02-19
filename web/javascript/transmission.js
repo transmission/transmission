@@ -20,11 +20,14 @@ Transmission.prototype =
 
 	initialize: function()
 	{
-		// Before we do anything, browser compatability test
+		// IE specific fixes here
 		if ($.browser.msie) {
-			$('div.torrent_footer').hide();
-			$('div#unsupported_browser').show();
-			return;
+			try {
+			  document.execCommand("BackgroundImageCache", false, true);
+			} catch(err) {}
+			$('head').append('<link media="screen" href="./stylesheets/common.css" type="text/css" rel="stylesheet" />');
+			$('head').append('<link media="screen" href="./stylesheets/ie'+$.browser.version.substr(0,1)+'.css" type="text/css" rel="stylesheet" />');
+			$('.dialog_container').css('height',$(window).height()+'px');
 		}
 		
 		// Initialize the helper classes
@@ -1032,7 +1035,7 @@ Transmission.prototype =
 	},
 
 	showFilter: function( ) {
-		var container_top = parseInt($('#torrent_container').css('top')) + $('#torrent_filter_bar').height() + 1;
+		var container_top = parseInt($('#torrent_container').position().top) + $('#torrent_filter_bar').height() + 1;
 		$('#torrent_container').css('top', container_top + 'px');
 		$('#torrent_filter_bar').show();
 		this.setPref( Prefs._ShowFilter, true );

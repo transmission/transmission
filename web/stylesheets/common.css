@@ -849,52 +849,6 @@ div#prefs_container div#pref_error {
 
 /*--------------------------------------
  *
- * U N S U P P O R T E D   B R O W S E R
- *
- *--------------------------------------*/
-
-div#unsupported_browser {
-	position: absolute;
-	top: 0px;
-	left: 0px;
-	margin: 0px;
-	width: 100%;
-	height: 100%;
-	z-index: 3;
-	text-align: center;
-	background: #fff;
-}
-
-div#unsupported_browser div.dialog_window {
-	position: relative;
-	top: 150px;
-	width: 450px;
-	height: 250px;
-	margin: 0 auto;
-	border: 1px solid #979797;
-}
-
-div#unsupported_browser div.dialog_window img {
-	margin: 10px;
-}
-
-div#unsupported_browser div.dialog_window img.logo {
-	display: block;
-	margin: 20px auto 0;
-}
-
-div#unsupported_browser div.dialog_window h2 {
-	margin: 40px auto 0;
-	width: 305px;
-}
-
-div#unsupported_browser div.dialog_window p {
-	clear: both;
-	font-size: 1.4em;
-}
-
-/*--------------------------------------
- *
  * T R A N S   M E N U
  *
  *--------------------------------------*/
