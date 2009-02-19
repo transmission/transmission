@@ -77,15 +77,12 @@ clutch_images_DATA = \
 
 clutch_graphicsdir = $(clutch_imagesdir)/graphics
 clutch_graphics_DATA = \
-  web/images/graphics/browser_firefox.gif \
   web/images/graphics/logo.png \
   web/images/graphics/chrome.png \
   web/images/graphics/iphone_chrome.png \
-  web/images/graphics/browser_opera.gif \
   web/images/graphics/filter_bar.png \
   web/images/graphics/filter_icon.png \
-  web/images/graphics/transfer_arrows.png \
-  web/images/graphics/browser_safari.gif
+  web/images/graphics/transfer_arrows.png
 
 clutch_progressdir = $(clutch_imagesdir)/progress
 clutch_progress_DATA = \
