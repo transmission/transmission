@@ -50,6 +50,8 @@ clutch_cssdir = $(clutchdir)/stylesheets
 clutch_css_DATA = \
   web/stylesheets/iphone.css \
   web/stylesheets/common.css
+  web/stylesheets/ie6.css \
+  web/stylesheets/ie7.css
 
 clutch_jsdir = $(clutchdir)/javascript
 clutch_js_DATA = \
@@ -77,15 +79,12 @@ clutch_images_DATA = \
 
 clutch_graphicsdir = $(clutch_imagesdir)/graphics
 clutch_graphics_DATA = \
-  web/images/graphics/browser_firefox.gif \
   web/images/graphics/logo.png \
   web/images/graphics/chrome.png \
   web/images/graphics/iphone_chrome.png \
-  web/images/graphics/browser_opera.gif \
   web/images/graphics/filter_bar.png \
   web/images/graphics/filter_icon.png \
-  web/images/graphics/transfer_arrows.png \
-  web/images/graphics/browser_safari.gif
+  web/images/graphics/transfer_arrows.png
 
 clutch_progressdir = $(clutch_imagesdir)/progress
 clutch_progress_DATA = \
