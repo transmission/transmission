@@ -8,7 +8,7 @@
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="2"/>
+			<integer value="3088"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -211,7 +211,7 @@
 										<bool key="EncodedWithXMLCoder">YES</bool>
 										<object class="NSOutlineView" id="675318801">
 											<reference key="NSNextResponder" ref="306237956"/>
-											<int key="NSvFlags">274</int>
+											<int key="NSvFlags">256</int>
 											<string key="NSFrameSize">{468, 173}</string>
 											<reference key="NSSuperview" ref="306237956"/>
 											<bool key="NSEnabled">YES</bool>
@@ -3851,11 +3851,6 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 				<string key="NSClassName">SUUpdater</string>
 			</object>
 			<object class="NSUserDefaultsController" id="171637775">
-				<object class="NSMutableArray" key="NSDeclaredKeys">
-					<bool key="EncodedWithXMLCoder">YES</bool>
-					<string>SpeedLimit</string>
-					<string>SpeedLimitTemplate</string>
-				</object>
 				<bool key="NSSharedInstance">YES</bool>
 			</object>
 			<object class="NSWindowTemplate" id="992647214">
@@ -9417,7 +9412,7 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">3180</int>
+			<int key="maxID">3189</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
