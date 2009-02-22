@@ -69,6 +69,11 @@ $(document).ready( function() {
 		// different padding.
 		$('div.dialog_container div.dialog_window a').css('padding', '2px 10px 3px');
 	}
+    if (iPhone)
+        if(window.navigator.standalone)
+            // Fix min height for iPhone when run in full screen mode from home screen
+            // so the footer appears in the right place
+            $('body div#torrent_container').css('min-height', '338px');
 });
 
 /*
