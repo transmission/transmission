@@ -272,6 +272,7 @@ static const char * details_keys[] = {
 };
 
 static const char * list_keys[] = {
+    "error",
     "errorString",
     "eta",
     "id",
@@ -750,28 +751,23 @@ getStatusString( tr_benc * t, char * buf, size_t buflen )
 
         case TR_STATUS_DOWNLOAD:
         case TR_STATUS_SEED: {
-            const char * err = NULL;
-            if( tr_bencDictFindStr( t, "errorString", &err ) && err && *err )
-                tr_strlcpy( buf, err, buflen );
-            else {
-                int64_t fromUs = 0;
-                int64_t toUs = 0;
-                tr_bencDictFindInt( t, "peersGettingFromUs", &fromUs );
-                tr_bencDictFindInt( t, "peersSendingToUs", &toUs );
-                if( !fromUs && !toUs )
-                    tr_strlcpy( buf, "Idle", buflen );
-                else if( fromUs && toUs )
-                    tr_strlcpy( buf, "Up & Down", buflen );
-                else if( toUs )
-                    tr_strlcpy( buf, "Downloading", buflen );
-                else if( fromUs ) {
-                    int64_t leftUntilDone = 0;
-                    tr_bencDictFindInt( t, "leftUntilDone", &leftUntilDone );
-                    if( leftUntilDone > 0 )
-                        tr_strlcpy( buf, "Uploading", buflen );
-                    else
-                        tr_strlcpy( buf, "Seeding", buflen );
-                }
+	    int64_t fromUs = 0; 
+	    int64_t toUs = 0; 
+ 	    tr_bencDictFindInt( t, "peersGettingFromUs", &fromUs ); 
+ 	    tr_bencDictFindInt( t, "peersSendingToUs", &toUs ); 
+ 	    if( fromUs && toUs ) 
+ 	        tr_strlcpy( buf, "Up & Down", buflen ); 
+ 	    else if( toUs ) 
+ 	        tr_strlcpy( buf, "Downloading", buflen ); 
+ 	    else if( fromUs ) { 
+ 	        int64_t leftUntilDone = 0; 
+ 	        tr_bencDictFindInt( t, "leftUntilDone", &leftUntilDone ); 
+ 	        if( leftUntilDone > 0 )
+ 	            tr_strlcpy( buf, "Uploading", buflen ); 
+ 	        else
+ 	            tr_strlcpy( buf, "Seeding", buflen ); 
+ 	    } else {
+ 	        tr_strlcpy( buf, "Idle", buflen ); 
             }
             break;
         }
@@ -1144,7 +1140,7 @@ printTorrentList( tr_benc * top )
       && ( tr_bencDictFindList( args, "torrents", &list ) ) )
     {
         int i, n;
-        printf( "%-4s  %-4s  %9s  %-8s  %6s  %6s  %-5s  %-11s  %s\n",
+        printf( "%-4s   %-4s  %9s  %-8s  %6s  %6s  %-5s  %-11s  %s\n",
                 "ID", "Done", "Have", "ETA", "Up", "Down", "Ratio", "Status",
                 "Name" );
         for( i = 0, n = tr_bencListSize( list ); i < n; ++i )
@@ -1169,6 +1165,8 @@ printTorrentList( tr_benc * top )
                 char ratioStr[32];
                 char haveStr[32];
                 char doneStr[8];
+                int64_t error;
+                char errorMark;
 
                 if( sizeWhenDone )
                     tr_snprintf( doneStr, sizeof( doneStr ), "%d%%", (int)( 100.0 * ( sizeWhenDone - leftUntilDone ) / sizeWhenDone ) );
@@ -1181,9 +1179,13 @@ printTorrentList( tr_benc * top )
                     etaToString( etaStr, sizeof( etaStr ), eta );
                 else
                     tr_snprintf( etaStr, sizeof( etaStr ), "Done" );
+                if( tr_bencDictFindInt( d, "error", &error ) && error )
+                    errorMark = '*';
+                else
+                    errorMark = ' ';
                 printf(
-                    "%4d  %4s  %9s  %-8s  %6.1f  %6.1f  %5s  %-11s  %s\n",
-                    (int)id,
+                    "%4d%c  %4s  %9s  %-8s  %6.1f  %6.1f  %5s  %-11s  %s\n",
+                    (int)id, errorMark,
                     doneStr,
                     haveStr,
                     etaStr,
