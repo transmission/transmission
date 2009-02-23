@@ -1,5 +1,10 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
+1.51 (2009/mm/dd)
+<http://trac.transmissionbt.com/query?milestone=1.51&group=component&groupdesc=1&order=severity>
+- Mac
+   + Fix Tiger-only cropping bug where progress bars would extend past the right border
+
 1.50 (2009/02/13)
 <http://trac.transmissionbt.com/query?milestone=1.50&group=component&groupdesc=1&order=severity>
 - All Platforms
