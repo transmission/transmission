@@ -8,7 +8,6 @@ html {
 	margin: 0;
 /* setting border: 0 hoses ie6 win window inner well border */
 	padding: 0;
-	/width: 480px;
 }
 
 body {
@@ -78,7 +77,7 @@ div.torrent_global_menu ul li {
 	display: inline-block;
 }
 
-li#remove {
+li#remove, li#removedata {
 	float: left;
 }
 
@@ -88,9 +87,9 @@ li#resume_all, li#pause_all {
 
 div.torrent_global_menu ul li > div {
 	color: #fff;
-	font-size: 11px;
+	font-size: 9px;
 	text-decoration: none;
-	padding: 0 5px 0;
+	padding: 0 4px 0;
 	display: block;
 	margin: 0;
 	background-position: top center;
@@ -118,6 +117,10 @@ div.torrent_global_menu ul li#remove div div.toolbar_image {
 	background-position: left -32px;
 }
 
+div.torrent_global_menu ul li#removedata div div.toolbar_image {
+	background-position: left -32px;
+}
+
 div.torrent_global_menu ul li#resume_selected div div.toolbar_image {
 	background-position: left -96px;
 }
@@ -139,15 +142,6 @@ div.torrent_global_menu ul li#filter, div.torrent_global_menu ul li#inspector {
 }
 
 div.torrent_global_menu ul li.divider {
-	height: 45px;
-	float: left;
-	width: 0;
-	border-right: 1px dotted #fff;
-	opacity: 0.25;
-	margin: 5px 3px 0;
-}
-
-div.torrent_global_menu ul li#remove + li.divider {
 	display: none;
 }
 
