@@ -1255,8 +1255,6 @@ typedef enum
         [fRatioLimitField selectText: self];
         [[self window] makeKeyAndOrderFront: self];
     }
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil];
 }
 
 - (void) setRatioLimit: (id) sender

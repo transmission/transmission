@@ -631,18 +631,18 @@
             }
         }
         
-        NSInteger mode = [fMenuTorrent ratioSetting];
+        tr_ratiolimit mode = [fMenuTorrent ratioSetting];
         
         item = [menu itemWithTag: ACTION_MENU_LIMIT_TAG];
-        [item setState: mode == NSOnState ? NSOnState : NSOffState];
+        [item setState: mode == TR_RATIOLIMIT_SINGLE ? NSOnState : NSOffState];
         [item setTitle: [NSString localizedStringWithFormat: NSLocalizedString(@"Stop at Ratio (%.2f)",
             "torrent action menu -> ratio stop"), [fMenuTorrent ratioLimit]]];
         
         item = [menu itemWithTag: ACTION_MENU_UNLIMITED_TAG];
-        [item setState: mode == NSOffState ? NSOnState : NSOffState];
+        [item setState: mode == TR_RATIOLIMIT_UNLIMITED ? NSOnState : NSOffState];
         
         item = [menu itemWithTag: ACTION_MENU_GLOBAL_TAG];
-        [item setState: mode == NSMixedState ? NSOnState : NSOffState];
+        [item setState: mode == TR_RATIOLIMIT_GLOBAL ? NSOnState : NSOffState];
     }
     else //assume the menu is part of the file list
     {
@@ -754,17 +754,17 @@
 
 - (void) setQuickRatioMode: (id) sender
 {
-    NSInteger mode;
+    tr_ratiolimit mode;
     switch ([sender tag])
     {
         case ACTION_MENU_UNLIMITED_TAG:
-            mode = NSOffState;
+            mode = TR_RATIOLIMIT_UNLIMITED;
             break;
         case ACTION_MENU_LIMIT_TAG:
-            mode = NSOnState;
+            mode = TR_RATIOLIMIT_SINGLE;
             break;
         case ACTION_MENU_GLOBAL_TAG:
-            mode = NSMixedState;
+            mode = TR_RATIOLIMIT_GLOBAL;
             break;
         default:
             return;
@@ -777,7 +777,7 @@
 
 - (void) setQuickRatio: (id) sender
 {
-    [fMenuTorrent setRatioSetting: NSOnState];
+    [fMenuTorrent setRatioSetting: TR_RATIOLIMIT_SINGLE];
     [fMenuTorrent setRatioLimit: [[sender representedObject] floatValue]];
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptions" object: nil];
