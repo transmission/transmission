@@ -53,7 +53,7 @@ enum
     BANDWIDTH_PERIOD_MSEC = 500,
 
     /* how frequently to age out old piece request lists */
-    REFILL_UPKEEP_PERIOD_MSEC = 1000,
+    REFILL_UPKEEP_PERIOD_MSEC = 10000,
 
     /* how frequently to decide which peers live and die */
     RECONNECT_PERIOD_MSEC = 500,
