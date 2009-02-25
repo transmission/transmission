@@ -2,8 +2,18 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 
 1.51 (2009/mm/dd)
 <http://trac.transmissionbt.com/query?milestone=1.51&group=component&groupdesc=1&order=severity>
+- All Platforms
+   + Fix configure script issues with non-gcc compilers and user-defined CFLAGS environment variables 
+   + Close a rare race condition on startup
+   + More efficient use of libcurl when curl 7.18.0 or newer is present
 - Mac
    + Fix Tiger-only cropping bug where progress bars would extend past the right border
+- GTK+
+   + Play nicely with Ubuntu's new notification server
+   + Add Pause All, Resume All buttons
+- Web Client
+   + Added support for Internet Explorer
+   + Layout fixes when viewed on an iPhone
 
 1.50 (2009/02/13)
 <http://trac.transmissionbt.com/query?milestone=1.50&group=component&groupdesc=1&order=severity>
