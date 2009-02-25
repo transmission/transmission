@@ -706,6 +706,12 @@ blockIteratorNext( struct tr_blockIterator * i, tr_block_index_t * setme )
 }
 
 static void
+blockIteratorSkipCurrentPiece( struct tr_blockIterator * i )
+{
+    i->blockIndex = i->blockCount;
+}
+
+static void
 blockIteratorFree( struct tr_blockIterator ** inout )
 {
     struct tr_blockIterator * it = *inout;
@@ -812,7 +818,7 @@ refillPulse( void * vtorrent )
         && (( hasNext = blockIteratorNext( t->refillQueue, &block ))) )
     {
         int j;
-        int handled = FALSE;
+        tr_bool handled = FALSE;
 
         const tr_piece_index_t index = tr_torBlockPiece( tor, block );
         const uint32_t offset = getBlockOffsetInPiece( tor, block );
@@ -867,6 +873,9 @@ refillPulse( void * vtorrent )
                     break;
             }
         }
+
+        if( !handled )
+            blockIteratorSkipCurrentPiece( t->refillQueue );
     }
 
     /* cleanup */
