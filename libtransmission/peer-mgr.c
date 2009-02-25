@@ -52,6 +52,9 @@ enum
     /* how frequently to reallocate bandwidth */
     BANDWIDTH_PERIOD_MSEC = 500,
 
+    /* how frequently to age out old piece request lists */
+    REFILL_UPKEEP_PERIOD_MSEC = 10000,
+
     /* how frequently to decide which peers live and die */
     RECONNECT_PERIOD_MSEC = 500,
 
@@ -70,6 +73,10 @@ enum
 
     /* number of bad pieces a peer is allowed to send before we ban them */
     MAX_BAD_PIECES_PER_PEER = 5,
+
+    /* amount of time to keep a list of request pieces lying around
+       before it's considered too old and needs to be rebuilt */
+    PIECE_LIST_SHELF_LIFE_SECS = 60,
 
     /* use for bitwise operations w/peer_atom.myflags */
     MYFLAG_BANNED = 1,
@@ -117,21 +124,30 @@ struct peer_atom
     time_t      piece_data_time;
 };
 
+struct tr_blockIterator
+{
+    time_t expirationDate;
+    struct tr_torrent_peers * t;
+    tr_block_index_t blockIndex, blockCount, *blocks;
+    tr_piece_index_t pieceIndex, pieceCount, *pieces;
+};
+
 typedef struct tr_torrent_peers
 {
-    tr_bool         isRunning;
+    tr_bool                    isRunning;
 
-    uint8_t         hash[SHA_DIGEST_LENGTH];
-    int         *   pendingRequestCount;
-    tr_ptrArray     outgoingHandshakes; /* tr_handshake */
-    tr_ptrArray     pool; /* struct peer_atom */
-    tr_ptrArray     peers; /* tr_peer */
-    tr_ptrArray     webseeds; /* tr_webseed */
-    tr_timer *      refillTimer;
-    tr_torrent *    tor;
-    tr_peer *       optimistic; /* the optimistic peer, or NULL if none */
+    uint8_t                    hash[SHA_DIGEST_LENGTH];
+    int                      * pendingRequestCount;
+    tr_ptrArray                outgoingHandshakes; /* tr_handshake */
+    tr_ptrArray                pool; /* struct peer_atom */
+    tr_ptrArray                peers; /* tr_peer */
+    tr_ptrArray                webseeds; /* tr_webseed */
+    tr_timer                 * refillTimer;
+    tr_torrent               * tor;
+    tr_peer                  * optimistic; /* the optimistic peer, or NULL if none */
+    struct tr_blockIterator  * refillQueue; /* used in refillPulse() */
 
-    struct tr_peerMgr * manager;
+    struct tr_peerMgr        * manager;
 }
 Torrent;
 
@@ -142,6 +158,7 @@ struct tr_peerMgr
     tr_timer        * bandwidthTimer;
     tr_timer        * rechokeTimer;
     tr_timer        * reconnectTimer;
+    tr_timer        * refillUpkeepTimer;
 };
 
 #define tordbg( t, ... ) \
@@ -367,6 +384,8 @@ removeAllPeers( Torrent * t )
         removePeer( t, tr_ptrArrayNth( &t->peers, 0 ) );
 }
 
+static void blockIteratorFree( struct tr_blockIterator ** inout );
+
 static void
 torrentDestructor( void * vt )
 {
@@ -383,6 +402,7 @@ torrentDestructor( void * vt )
 
     tr_timerFree( &t->refillTimer );
 
+    blockIteratorFree( &t->refillQueue );
     tr_ptrArrayDestruct( &t->webseeds, (PtrArrayForeachFunc)tr_webseedFree );
     tr_ptrArrayDestruct( &t->pool, (PtrArrayForeachFunc)tr_free );
     tr_ptrArrayDestruct( &t->outgoingHandshakes, NULL );
@@ -426,6 +446,7 @@ torrentConstructor( tr_peerMgr * manager,
 static int bandwidthPulse ( void * vmgr );
 static int rechokePulse   ( void * vmgr );
 static int reconnectPulse ( void * vmgr );
+static int refillUpkeep   ( void * vmgr );
 
 tr_peerMgr*
 tr_peerMgrNew( tr_session * session )
@@ -434,9 +455,10 @@ tr_peerMgrNew( tr_session * session )
 
     m->session = session;
     m->incomingHandshakes = TR_PTR_ARRAY_INIT;
-    m->bandwidthTimer = tr_timerNew( session, bandwidthPulse, m, BANDWIDTH_PERIOD_MSEC );
-    m->rechokeTimer   = tr_timerNew( session, rechokePulse,   m, RECHOKE_PERIOD_MSEC );
-    m->reconnectTimer = tr_timerNew( session, reconnectPulse, m, RECONNECT_PERIOD_MSEC );
+    m->bandwidthTimer    = tr_timerNew( session, bandwidthPulse, m, BANDWIDTH_PERIOD_MSEC );
+    m->rechokeTimer      = tr_timerNew( session, rechokePulse,   m, RECHOKE_PERIOD_MSEC );
+    m->reconnectTimer    = tr_timerNew( session, reconnectPulse, m, RECONNECT_PERIOD_MSEC );
+    m->refillUpkeepTimer = tr_timerNew( session, refillUpkeep,   m, REFILL_UPKEEP_PERIOD_MSEC );
 
     rechokePulse( m );
 
@@ -448,6 +470,7 @@ tr_peerMgrFree( tr_peerMgr * manager )
 {
     managerLock( manager );
 
+    tr_timerFree( &manager->refillUpkeepTimer );
     tr_timerFree( &manager->reconnectTimer );
     tr_timerFree( &manager->rechokeTimer );
     tr_timerFree( &manager->bandwidthTimer );
@@ -638,27 +661,22 @@ getPreferredPieces( Torrent * t, tr_piece_index_t * pieceCount )
     return pool;
 }
 
-struct tr_blockIterator
-{
-    Torrent * t;
-    tr_block_index_t blockIndex, blockCount, *blocks;
-    tr_piece_index_t pieceIndex, pieceCount, *pieces;
-};
-
 static struct tr_blockIterator*
 blockIteratorNew( Torrent * t )
 {
     struct tr_blockIterator * i = tr_new0( struct tr_blockIterator, 1 );
+    i->expirationDate = time( NULL ) + PIECE_LIST_SHELF_LIFE_SECS;
     i->t = t;
     i->pieces = getPreferredPieces( t, &i->pieceCount );
     i->blocks = tr_new0( tr_block_index_t, t->tor->blockCountInPiece );
+    tordbg( t, "creating new refill queue.. it contains %"PRIu32" pieces", i->pieceCount );
     return i;
 }
 
-static int
+static tr_bool
 blockIteratorNext( struct tr_blockIterator * i, tr_block_index_t * setme )
 {
-    int found;
+    tr_bool found;
     Torrent * t = i->t;
     tr_torrent * tor = t->tor;
 
@@ -688,11 +706,24 @@ blockIteratorNext( struct tr_blockIterator * i, tr_block_index_t * setme )
 }
 
 static void
-blockIteratorFree( struct tr_blockIterator * i )
+blockIteratorSkipCurrentPiece( struct tr_blockIterator * i )
 {
-    tr_free( i->blocks );
-    tr_free( i->pieces );
-    tr_free( i );
+    i->blockIndex = i->blockCount;
+}
+
+static void
+blockIteratorFree( struct tr_blockIterator ** inout )
+{
+    struct tr_blockIterator * it = *inout;
+
+    if( it != NULL )
+    {
+        tr_free( it->blocks );
+        tr_free( it->pieces );
+        tr_free( it );
+    }
+
+    *inout = NULL;
 }
 
 static tr_peer**
@@ -735,6 +766,27 @@ getBlockOffsetInPiece( const tr_torrent * tor, uint64_t b )
 }
 
 static int
+refillUpkeep( void * vmgr )
+{
+    tr_torrent * tor = NULL;
+    tr_peerMgr * mgr = vmgr;
+    time_t now;
+    managerLock( mgr );
+
+    now = time( NULL );
+    while(( tor = tr_torrentNext( mgr->session, tor ))) {
+        Torrent * t = tor->torrentPeers;
+        if( t && t->refillQueue && ( t->refillQueue->expirationDate <= now ) ) {
+            tordbg( t, "refill queue is past its shelf date; discarding." );
+            blockIteratorFree( &t->refillQueue );
+        }
+    }
+
+    managerUnlock( mgr );
+    return TRUE;
+}
+
+static int
 refillPulse( void * vtorrent )
 {
     tr_block_index_t block;
@@ -742,9 +794,9 @@ refillPulse( void * vtorrent )
     int webseedCount;
     tr_peer ** peers;
     tr_webseed ** webseeds;
-    struct tr_blockIterator * blockIterator;
     Torrent * t = vtorrent;
     tr_torrent * tor = t->tor;
+    tr_bool hasNext = TRUE;
 
     if( !t->isRunning )
         return TRUE;
@@ -754,21 +806,25 @@ refillPulse( void * vtorrent )
     torrentLock( t );
     tordbg( t, "Refilling Request Buffers..." );
 
-    blockIterator = blockIteratorNew( t );
+    if( t->refillQueue == NULL )
+        t->refillQueue = blockIteratorNew( t );
+
     peers = getPeersUploadingToClient( t, &peerCount );
     webseedCount = tr_ptrArraySize( &t->webseeds );
     webseeds = tr_memdup( tr_ptrArrayBase( &t->webseeds ),
                           webseedCount * sizeof( tr_webseed* ) );
 
     while( ( webseedCount || peerCount )
-        && blockIteratorNext( blockIterator, &block ) )
+        && (( hasNext = blockIteratorNext( t->refillQueue, &block ))) )
     {
         int j;
-        int handled = FALSE;
+        tr_bool handled = FALSE;
 
         const tr_piece_index_t index = tr_torBlockPiece( tor, block );
         const uint32_t offset = getBlockOffsetInPiece( tor, block );
         const uint32_t length = tr_torBlockCountBytes( tor, block );
+
+        assert( block < tor->blockCount );
 
         /* find a peer who can ask for this block */
         for( j=0; !handled && j<peerCount; )
@@ -817,12 +873,19 @@ refillPulse( void * vtorrent )
                     break;
             }
         }
+
+        if( !handled )
+            blockIteratorSkipCurrentPiece( t->refillQueue );
     }
 
     /* cleanup */
-    blockIteratorFree( blockIterator );
     tr_free( webseeds );
     tr_free( peers );
+
+    if( !hasNext ) {
+        tordbg( t, "refill queue has no more blocks to request... freeing (webseed count: %d, peer count: %d)", webseedCount, peerCount );
+        blockIteratorFree( &t->refillQueue );
+    }
 
     t->refillTimer = NULL;
     torrentUnlock( t );
