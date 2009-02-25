@@ -59,6 +59,29 @@ notifyCallback( NotifyNotification * n UNUSED,
     }
 }
 
+static gboolean
+can_support_actions( void )
+{
+    static gboolean supported;
+    static gboolean have_checked = FALSE;
+
+    if( !have_checked )
+    {
+        GList * c;
+        GList * caps = notify_get_server_caps( );
+
+        have_checked = TRUE;
+
+        for( c=caps; c && !supported; c=c->next )
+            supported = !strcmp( "actions", (char*)c->data );
+
+        g_list_foreach( caps, (GFunc)g_free, NULL );
+        g_list_free( caps );
+    }
+
+    return supported;
+}
+
 void
 tr_notify_send( TrTorrent *tor )
 {
@@ -71,15 +94,18 @@ tr_notify_send( TrTorrent *tor )
                                      info->name,
                                      "transmission", NULL );
 
-        if( info->fileCount == 1 )
-            notify_notification_add_action(
-                n, "file", _( "Open File" ),
-                NOTIFY_ACTION_CALLBACK( notifyCallback ), tor,
-                NULL );
+        if( can_support_actions( ) )
+        {
+            if( info->fileCount == 1 )
+                notify_notification_add_action(
+                    n, "file", _( "Open File" ),
+                    NOTIFY_ACTION_CALLBACK( notifyCallback ), tor,
+                    NULL );
 
-        notify_notification_add_action(
-            n, "folder", _( "Open Folder" ),
-            NOTIFY_ACTION_CALLBACK( notifyCallback ), tor, NULL );
+            notify_notification_add_action(
+                n, "folder", _( "Open Folder" ),
+                NOTIFY_ACTION_CALLBACK( notifyCallback ), tor, NULL );
+        }
 
         notify_notification_show( n, NULL );
     }
