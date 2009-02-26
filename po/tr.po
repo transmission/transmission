@@ -1753,10 +1753,6 @@ msgstr "Doğrulama için kuyrukta"
 #~ msgid "Failed to set up socket: %s"
 #~ msgstr "Soket ayarlanamadı: %s"
 
-#~ msgid "File"
-#~ msgid_plural "Files"
-#~ msgstr[0] "Dosya"
-
 #~ msgid "Piece"
 #~ msgid_plural "Pieces"
 #~ msgstr[0] "Parça"
