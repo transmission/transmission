@@ -1,6 +1,6 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
-1.51 (2009/mm/dd)
+1.51 (2009/02/26)
 <http://trac.transmissionbt.com/query?milestone=1.51&group=component&groupdesc=1&order=severity>
 - All Platforms
    + Fix configure script issues with non-gcc compilers and user-defined CFLAGS environment variables 
