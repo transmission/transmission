@@ -43,6 +43,7 @@ tr_prefs_init_global( void )
     str = NULL;
     if( !str ) str = g_get_user_special_dir( G_USER_DIRECTORY_DESKTOP );
     if( !str ) str = tr_getDefaultDownloadDir( );
+    mkdir_p( str, 0777 );
     pref_string_set_default ( PREF_KEY_DIR_WATCH, str );
     pref_flag_set_default   ( PREF_KEY_DIR_WATCH_ENABLED, FALSE );
 #endif
@@ -77,7 +78,8 @@ tr_prefs_init_global( void )
 #if GLIB_CHECK_VERSION( 2, 14, 0 )
     if( !str ) str = g_get_user_special_dir( G_USER_DIRECTORY_DOWNLOAD );
 #endif
-    if( !str ) str = g_get_home_dir( );
+    if( !str ) str = tr_getDefaultDownloadDir( );
+    mkdir_p( str, 0777 );
     pref_string_set_default ( TR_PREFS_KEY_DOWNLOAD_DIR, str );
 
     pref_flag_set_default   ( PREF_KEY_ASKQUIT, TRUE );
