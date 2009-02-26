@@ -2,15 +2,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-01-16 11:33-0600\n"
-"PO-Revision-Date: 2009-02-11 15:40+0000\n"
-"Last-Translator: Yaron <sh.yaron@gmail.com>\n"
+"POT-Creation-Date: 2009-02-23 17:50-0600\n"
+"PO-Revision-Date: 2009-02-21 20:07+0000\n"
+"Last-Translator: Eyal Levin <eyalev@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2009-02-11 20:56+0000\n"
+"X-Launchpad-Export-Date: 2009-02-26 18:32+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Language: Hebrew\n"
 
@@ -131,46 +131,54 @@ msgid "Pause all torrents"
 msgstr "השהה את כל הטורנטים"
 
 #: ../gtk/actions.c:123
+msgid "_Start All"
+msgstr ""
+
+#: ../gtk/actions.c:123
+msgid "Start all torrents"
+msgstr ""
+
+#: ../gtk/actions.c:124
 msgid "Remove torrent"
 msgstr "הסר טורנט"
 
-#: ../gtk/actions.c:124
+#: ../gtk/actions.c:125
 msgid "_Delete Files and Remove"
 msgstr "_מחק קבצים והסר"
 
-#: ../gtk/actions.c:125
+#: ../gtk/actions.c:126
 msgid "_New..."
 msgstr "_חדש..."
 
-#: ../gtk/actions.c:125
+#: ../gtk/actions.c:126
 msgid "Create a torrent"
 msgstr "יצירת טורנט"
 
-#: ../gtk/actions.c:126
+#: ../gtk/actions.c:127
 msgid "_Quit"
 msgstr "י_ציאה"
 
-#: ../gtk/actions.c:127
+#: ../gtk/actions.c:128
 msgid "Select _All"
 msgstr "בחר _הכל"
 
-#: ../gtk/actions.c:128
+#: ../gtk/actions.c:129
 msgid "Dese_lect All"
 msgstr "בטל בחי_רה"
 
-#: ../gtk/actions.c:130
+#: ../gtk/actions.c:131
 msgid "Torrent properties"
 msgstr "מאפייני הטורנט"
 
-#: ../gtk/actions.c:131
+#: ../gtk/actions.c:132
 msgid "_Open Folder"
 msgstr "_פתח תיקייה"
 
-#: ../gtk/actions.c:133
+#: ../gtk/actions.c:134
 msgid "_Contents"
 msgstr "_תכנים"
 
-#: ../gtk/actions.c:134
+#: ../gtk/actions.c:135
 msgid "Ask Tracker for _More Peers"
 msgstr "בקש מהטראקר מקורות _נוספים"
 
@@ -218,40 +226,41 @@ msgstr "הוסף טורנט"
 msgid "Display _options dialog"
 msgstr "הצג חלון _אפשרויות"
 
-#: ../gtk/blocklist.c:89
+#: ../gtk/blocklist.c:90
 msgid "Retrieving blocklist..."
 msgstr "מוריד רשימת חסומים"
 
-#: ../gtk/blocklist.c:99
+#: ../gtk/blocklist.c:100
 #, c-format
 msgid "Unable to get blocklist: %s"
 msgstr "לא ניתן לאחזר את רשימת החסימה: %s"
 
-#: ../gtk/blocklist.c:125
+#: ../gtk/blocklist.c:126
 msgid "Unable to get blocklist."
 msgstr "לא ניתן להשיג רשימת חסומים."
 
-#: ../gtk/blocklist.c:131
+#: ../gtk/blocklist.c:132
 msgid "Uncompressing blocklist..."
 msgstr "מחלץ את רשימת החסימה..."
 
-#: ../gtk/blocklist.c:141
+#: ../gtk/blocklist.c:142
 msgid "Parsing blocklist..."
 msgstr "עובר על רשימת חסומים..."
 
-#: ../gtk/blocklist.c:148
+#: ../gtk/blocklist.c:149
 #, c-format
 msgid "Blocklist updated with %'d entries"
 msgstr "רשימת חסומים התעדכנה עם %'d רשומות"
 
-#: ../gtk/conf.c:63 ../gtk/makemeta-ui.c:142 ../libtransmission/metainfo.c:98
-#: ../libtransmission/utils.c:564 ../libtransmission/utils.c:575
+#: ../gtk/conf.c:63 ../gtk/makemeta-ui.c:142 ../libtransmission/fdlimit.c:228
+#: ../libtransmission/metainfo.c:98 ../libtransmission/utils.c:589
+#: ../libtransmission/utils.c:600
 #, c-format
 msgid "Couldn't create \"%1$s\": %2$s"
 msgstr "לא ניתן ליצור \"%1$s\": %2$s"
 
-#: ../gtk/conf.c:88 ../libtransmission/bencode.c:1423
-#: ../libtransmission/fdlimit.c:239
+#: ../gtk/conf.c:88 ../libtransmission/bencode.c:1427
+#: ../libtransmission/fdlimit.c:257
 #, c-format
 msgid "Couldn't open \"%1$s\": %2$s"
 msgstr "לא ניתן לפתוח \"%1$s\": %2$s"
@@ -436,7 +445,7 @@ msgstr "%1$.1f%% (%2$.1f%% נבחרו)"
 msgid "%1$s (%2$s verified in %3$d pieces)"
 msgstr ""
 
-#: ../gtk/details.c:1062 ../gtk/util.c:56 ../gtk/util.c:78
+#: ../gtk/details.c:1062 ../gtk/util.c:57 ../gtk/util.c:79
 msgid "None"
 msgstr "ללא"
 
@@ -673,67 +682,67 @@ msgstr ""
 msgid "Progress"
 msgstr ""
 
-#: ../gtk/main.c:359
+#: ../gtk/main.c:361
 msgid "Start with all torrents paused"
 msgstr "התחל עם כל הטורנטים מושהים"
 
-#: ../gtk/main.c:361
+#: ../gtk/main.c:363
 msgid "Show version number and exit"
 msgstr ""
 
-#: ../gtk/main.c:365
+#: ../gtk/main.c:367
 msgid "Start minimized in system tray"
 msgstr "התחל ממוזער במגש המערכת"
 
-#: ../gtk/main.c:368
+#: ../gtk/main.c:370
 msgid "Where to look for configuration files"
 msgstr ""
 
-#: ../gtk/main.c:381
+#: ../gtk/main.c:383
 msgid "Transmission"
 msgstr "Transmission"
 
-#: ../gtk/main.c:388
+#: ../gtk/main.c:390
 msgid "[torrent files]"
 msgstr "[torrent files]"
 
-#: ../gtk/main.c:508
+#: ../gtk/main.c:510
 msgid "Beginning to use scheduled bandwidth limits"
 msgstr ""
 
-#: ../gtk/main.c:522
+#: ../gtk/main.c:524
 msgid "Ending use of scheduled bandwidth limits"
 msgstr ""
 
-#: ../gtk/main.c:776
+#: ../gtk/main.c:778
 msgid "<b>Closing Connections</b>"
 msgstr "<b>סוגר חיבורים</b>"
 
-#: ../gtk/main.c:780
+#: ../gtk/main.c:782
 msgid "Sending upload/download totals to tracker..."
 msgstr "שולח את נתוני ההעלאה/הורדה לטראקר..."
 
-#: ../gtk/main.c:785
+#: ../gtk/main.c:787
 msgid "_Quit Now"
 msgstr "_לצאת עכשיו"
 
-#: ../gtk/main.c:944
+#: ../gtk/main.c:946
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/main.c:951
+#: ../gtk/main.c:953
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/main.c:1220
+#: ../gtk/main.c:1222
 msgid "A fast and easy BitTorrent client"
 msgstr "תוכנת ביטורנט קלה ופשוטה"
 
-#: ../gtk/main.c:1225
+#: ../gtk/main.c:1227
 msgid "Copyright 2005-2009 The Transmission Project"
 msgstr ""
 
@@ -741,14 +750,14 @@ msgstr ""
 #. your name
 #. to have it appear in the credits in the "About"
 #. dialog
-#: ../gtk/main.c:1236
+#: ../gtk/main.c:1238
 msgid "translator-credits"
 msgstr ""
 "מארק קרפיבנר <mark125@gmail.com>\n"
 "\n"
 "Launchpad Contributions:\n"
 "  Mark Krapivner https://launchpad.net/~mark125\n"
-"  Shachar Or https://launchpad.net/~dawnlight\n"
+"  Shahar Or https://launchpad.net/~dawnlight\n"
 "  Yaron https://launchpad.net/~sh-yaron"
 
 #: ../gtk/makemeta-ui.c:111
@@ -770,7 +779,7 @@ msgid "Torrent creation cancelled"
 msgstr "יצירת טורנט בוטלה"
 
 #: ../gtk/makemeta-ui.c:128 ../libtransmission/blocklist.c:78
-#: ../libtransmission/blocklist.c:237 ../libtransmission/utils.c:446
+#: ../libtransmission/blocklist.c:237 ../libtransmission/utils.c:471
 #, c-format
 msgid "Couldn't read \"%1$s\": %2$s"
 msgstr ""
@@ -828,7 +837,7 @@ msgstr "הער_ה:"
 msgid "_Private torrent"
 msgstr "טורנט _פרטי"
 
-#: ../gtk/msgwin.c:87 ../libtransmission/bencode.c:1429
+#: ../gtk/msgwin.c:87 ../libtransmission/bencode.c:1433
 #: ../libtransmission/blocklist.c:293
 #, c-format
 msgid "Couldn't save file \"%1$s\": %2$s"
@@ -927,7 +936,7 @@ msgstr "%1$s מתוך %2$s (%3$.2f%%), הועלה %4$s (יחס שיתוף: %5$s)
 msgid "%1$s, uploaded %2$s (Ratio: %3$s)"
 msgstr "%1$s, הועלה %2$s (יחס שיתוף: %3$s)"
 
-#: ../gtk/torrent-cell-renderer.c:86 ../gtk/tr-torrent.c:280
+#: ../gtk/torrent-cell-renderer.c:86 ../gtk/tr-torrent.c:247
 #, c-format
 msgid "Remaining time unknown"
 msgstr ""
@@ -968,7 +977,7 @@ msgstr "מושהה"
 msgid "Waiting to verify local data"
 msgstr "ממתין לבדיקת נתונים מקומיים"
 
-#: ../gtk/torrent-cell-renderer.c:152 ../gtk/tr-torrent.c:273
+#: ../gtk/torrent-cell-renderer.c:152 ../gtk/tr-torrent.c:240
 #, c-format
 msgid "Verifying local data (%.1f%% tested)"
 msgstr "בודק נתונים מקומיים (%.1f%% נבדקו)"
@@ -986,7 +995,7 @@ msgid_plural "Downloading from %1$'d of %2$'d connected peers"
 msgstr[0] "מוריד מ %1$'d מתוך %2$'d מקורות מחוברים"
 msgstr[1] "מוריד מ %1$'d מתוך %2$'d מקורות מחוברים"
 
-#: ../gtk/torrent-cell-renderer.c:216 ../gtk/tr-torrent.c:292
+#: ../gtk/torrent-cell-renderer.c:216 ../gtk/tr-torrent.c:259
 #, c-format
 msgid "Seeding to %1$'d of %2$'d connected peer"
 msgid_plural "Seeding to %1$'d of %2$'d connected peers"
@@ -1119,6 +1128,10 @@ msgstr "מנשק דפדפן"
 msgid "_Enable web interface"
 msgstr "_הפעל מנשק דפדפן"
 
+#: ../gtk/tr-prefs.c:740
+msgid "_Open web interface"
+msgstr ""
+
 #: ../gtk/tr-prefs.c:749 ../gtk/tr-prefs.c:1299
 msgid "Listening _port:"
 msgstr ""
@@ -1241,28 +1254,18 @@ msgstr "תעבורה"
 msgid "Web"
 msgstr "רשת"
 
-#: ../gtk/tr-torrent.c:229
-#, c-format
-msgid "File \"%s\" isn't a valid torrent"
-msgstr "הקובץ \"%s\" אינו טורנט תקין"
-
-#: ../gtk/tr-torrent.c:235
-#, c-format
-msgid "File \"%s\" is already open"
-msgstr "הקובץ \"%s\" כבר פץוח"
-
-#: ../gtk/tr-torrent.c:266
+#: ../gtk/tr-torrent.c:233
 #, c-format
 msgid "Waiting to verify local data (%.1f%% tested)"
 msgstr "ממתין לבדיקת הנתונים המקומיים (%.1f%% נבדקו)"
 
 #. %s is # of minutes
-#: ../gtk/tr-torrent.c:286
+#: ../gtk/tr-torrent.c:253
 #, c-format
 msgid "%1$s remaining"
 msgstr ""
 
-#: ../gtk/tr-torrent.c:299 ../libtransmission/port-forwarding.c:206
+#: ../gtk/tr-torrent.c:266 ../libtransmission/port-forwarding.c:200
 msgid "Stopped"
 msgstr "נעצר"
 
@@ -1335,101 +1338,101 @@ msgstr[1] "%'d טורנטים"
 msgid "size|Down: %1$s, Up: %2$s"
 msgstr "ירד: %1$s, הועלה: %2$s"
 
-#: ../gtk/util.c:89
+#: ../gtk/util.c:90
 #, c-format
 msgid "%'u byte"
 msgid_plural "%'u bytes"
 msgstr[0] "%'u byte"
 msgstr[1] "%'u bytes"
 
-#: ../gtk/util.c:97
+#: ../gtk/util.c:98
 #, c-format
 msgid "%'.1f KB"
 msgstr "%'.1f ק\"ב"
 
-#: ../gtk/util.c:102
+#: ../gtk/util.c:103
 #, c-format
 msgid "%'.1f MB"
 msgstr "%'.1f מ\"ב"
 
-#: ../gtk/util.c:107
+#: ../gtk/util.c:108
 #, c-format
 msgid "%'.1f GB"
 msgstr "%'.1f ג\"ב"
 
 #. 0.0 KB to 999.9 KB
-#: ../gtk/util.c:122
+#: ../gtk/util.c:123
 #, c-format
 msgid "%'.1f KB/s"
 msgstr "%'.1f ק\"ב/ש"
 
 #. 0.98 MB to 99.99 MB
-#: ../gtk/util.c:124
+#: ../gtk/util.c:125
 #, c-format
 msgid "%'.2f MB/s"
 msgstr "%'.2f מ\"ב/ש"
 
 #. 100.0 MB to 999.9 MB
-#: ../gtk/util.c:126
+#: ../gtk/util.c:127
 #, c-format
 msgid "%'.1f MB/s"
 msgstr "%'.1f מ\"ב/ש"
 
 #. insane speeds
-#: ../gtk/util.c:128
+#: ../gtk/util.c:129
 #, c-format
 msgid "%'.2f GB/s"
 msgstr "%'.2f ג\"ב/ש"
 
-#: ../gtk/util.c:149
+#: ../gtk/util.c:150
 #, c-format
 msgid "%'d day"
 msgid_plural "%'d days"
 msgstr[0] "יום אחד"
 msgstr[1] "%'d ימים"
 
-#: ../gtk/util.c:151
+#: ../gtk/util.c:152
 #, c-format
 msgid "%'d hour"
 msgid_plural "%'d hours"
 msgstr[0] "שעה אחת"
 msgstr[1] "%'d שעות"
 
-#: ../gtk/util.c:154
+#: ../gtk/util.c:155
 #, c-format
 msgid "%'d minute"
 msgid_plural "%'d minutes"
 msgstr[0] "דקה אחת"
 msgstr[1] "%'d דקות"
 
-#: ../gtk/util.c:156
+#: ../gtk/util.c:157
 #, c-format
 msgid "%'d second"
 msgid_plural "%'d seconds"
 msgstr[0] "שניה אחת"
 msgstr[1] "%'d שניות"
 
-#: ../gtk/util.c:377
+#: ../gtk/util.c:378
 #, c-format
 msgid "The torrent file \"%s\" contains invalid data."
 msgstr "קובץ הטורנט \"%s\" מכיל נתונים לא תקינים."
 
-#: ../gtk/util.c:381
+#: ../gtk/util.c:382
 #, c-format
 msgid "The torrent file \"%s\" is already in use."
 msgstr "קובץ הטורנט \"%s\" כבר בשימוש."
 
-#: ../gtk/util.c:385
+#: ../gtk/util.c:386
 #, c-format
 msgid "The torrent file \"%s\" encountered an unknown error."
 msgstr "קובץ הטורנט \"%s\" ניתקע בשגיאה לא ידועה."
 
-#: ../gtk/util.c:397
+#: ../gtk/util.c:398
 msgid "Error opening torrent"
 msgstr "שגיאה בפתיחת טורנט"
 
 #. did caller give us an uninitialized val?
-#: ../libtransmission/bencode.c:982
+#: ../libtransmission/bencode.c:986
 msgid "Invalid metadata"
 msgstr ""
 
@@ -1444,16 +1447,21 @@ msgid "Blocklist \"%1$s\" updated with %2$'d entries"
 msgstr ""
 
 #. %s is the torrent name
-#: ../libtransmission/fastresume.c:542 ../libtransmission/fastresume.c:555
+#: ../libtransmission/fastresume.c:553 ../libtransmission/fastresume.c:566
 msgid "Couldn't read resume file"
 msgstr ""
 
-#: ../libtransmission/fdlimit.c:225
+#: ../libtransmission/fdlimit.c:217
+#, c-format
+msgid "Couldn't create \"%1$s\": parent folder \"%2$s\" does not exist"
+msgstr ""
+
+#: ../libtransmission/fdlimit.c:240
 #, c-format
 msgid "Preallocated file \"%s\""
 msgstr ""
 
-#: ../libtransmission/fdlimit.c:484 ../libtransmission/net.c:403
+#: ../libtransmission/fdlimit.c:517 ../libtransmission/net.c:391
 #, c-format
 msgid "Couldn't create socket: %s"
 msgstr ""
@@ -1492,12 +1500,12 @@ msgstr "לא מעביר יותר את הפורט %d"
 msgid "Port %d forwarded successfully"
 msgstr "הפורט %d הועבר בהצלחה"
 
-#: ../libtransmission/net.c:501
+#: ../libtransmission/net.c:519
 #, c-format
 msgid "Couldn't connect socket %d to %s, port %d (errno %d - %s)"
 msgstr ""
 
-#: ../libtransmission/net.c:544
+#: ../libtransmission/net.c:572
 #, c-format
 msgid "Couldn't bind port %d on %s: %s"
 msgstr ""
@@ -1522,7 +1530,7 @@ msgstr "עוצר"
 msgid "Not forwarded"
 msgstr "לא מועבר"
 
-#: ../libtransmission/port-forwarding.c:99 ../libtransmission/torrent.c:1277
+#: ../libtransmission/port-forwarding.c:99 ../libtransmission/torrent.c:1322
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
 msgstr ""
@@ -1546,12 +1554,12 @@ msgstr ""
 
 #. first %s is the application name
 #. second %s is the version number
-#: ../libtransmission/session.c:522
+#: ../libtransmission/session.c:575
 #, c-format
 msgid "%s %s started"
 msgstr "%s %s התחיל"
 
-#: ../libtransmission/session.c:921
+#: ../libtransmission/session.c:997
 #, c-format
 msgid "Loaded %d torrents"
 msgstr "ניטענו %d טורנטים"
@@ -1571,15 +1579,15 @@ msgstr "אזהרת טראקר: \"%s\""
 msgid "Tracker error: \"%s\""
 msgstr "שגיאת טראקר: \"%s\""
 
-#: ../libtransmission/torrent.c:1223
+#: ../libtransmission/torrent.c:1265
 msgid "Done"
 msgstr "הושלם"
 
-#: ../libtransmission/torrent.c:1226
+#: ../libtransmission/torrent.c:1268
 msgid "Complete"
 msgstr "הסתיים"
 
-#: ../libtransmission/torrent.c:1229
+#: ../libtransmission/torrent.c:1271
 msgid "Incomplete"
 msgstr "לא שלם"
 
@@ -1612,25 +1620,25 @@ msgstr ""
 msgid "Port forwarding successful!"
 msgstr "העברת פורטים הצליחה!"
 
-#: ../libtransmission/utils.c:460
+#: ../libtransmission/utils.c:485
 msgid "Not a regular file"
 msgstr "לא קובץ רגיל"
 
-#: ../libtransmission/utils.c:478
+#: ../libtransmission/utils.c:503
 msgid "Memory allocation failed"
 msgstr "הקצאת זיכרון נכשלה"
 
 #. Node exists but isn't a folder
-#: ../libtransmission/utils.c:574
+#: ../libtransmission/utils.c:599
 #, c-format
 msgid "File \"%s\" is in the way"
 msgstr ""
 
-#: ../libtransmission/verify.c:146
+#: ../libtransmission/verify.c:144
 msgid "Verifying torrent"
 msgstr ""
 
-#: ../libtransmission/verify.c:181
+#: ../libtransmission/verify.c:183
 msgid "Queued for verification"
 msgstr ""
 
@@ -1758,6 +1766,10 @@ msgstr ""
 
 #~ msgid "Preferences"
 #~ msgstr "העדפות"
+
+#, c-format
+#~ msgid "File \"%s\" is already open"
+#~ msgstr "הקובץ \"%s\" כבר פץוח"
 
 #, c-format
 #~ msgid "Stalled (%.1f%%)"
