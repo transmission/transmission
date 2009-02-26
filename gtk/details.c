@@ -290,7 +290,8 @@ webseed_model_new( const tr_torrent * tor )
     {
         GtkTreeIter iter;
         gtk_list_store_append( store, &iter );
-        gtk_list_store_set( store, &iter, WEBSEED_COL_URL, inf->webseeds[i],
+        gtk_list_store_set( store, &iter,
+                            WEBSEED_COL_URL, inf->webseeds[i],
                             WEBSEED_COL_DOWNLOAD_RATE, speeds[i],
                             -1 );
     }
@@ -696,41 +697,40 @@ peer_page_new( TrTorrent * gtor )
         GtkTreeViewColumn * c;
         GtkCellRenderer *   r;
         const char *        t;
-        GtkWidget *         fr;
+        GtkWidget *         w;
+        GtkWidget *         v;
 
         m = webseed_model_new( tr_torrent_handle( gtor ) );
-        webtree = gtk_tree_view_new_with_model( m );
-        g_signal_connect( webtree, "button-release-event",
-                          G_CALLBACK( on_tree_view_button_released ), NULL );
-        gtk_tree_view_set_rules_hint( GTK_TREE_VIEW( webtree ), TRUE );
+        v = gtk_tree_view_new_with_model( m );
+        g_signal_connect( v, "button-release-event", G_CALLBACK( on_tree_view_button_released ), NULL );
+        gtk_tree_view_set_rules_hint( GTK_TREE_VIEW( v ), TRUE );
         p->webseeds = GTK_LIST_STORE( m );
         g_object_unref( G_OBJECT( m ) );
 
         t = _( webseed_column_names[WEBSEED_COL_URL] );
         r = gtk_cell_renderer_text_new ( );
         g_object_set( G_OBJECT( r ), "ellipsize", PANGO_ELLIPSIZE_END, NULL );
-        c =
-            gtk_tree_view_column_new_with_attributes( t, r, "text",
-                                                      WEBSEED_COL_URL,
-                                                      NULL );
+        c = gtk_tree_view_column_new_with_attributes( t, r, "text", WEBSEED_COL_URL, NULL );
         g_object_set( G_OBJECT( c ), "expand", TRUE, NULL );
         gtk_tree_view_column_set_sort_column_id( c, WEBSEED_COL_URL );
-        gtk_tree_view_append_column( GTK_TREE_VIEW( webtree ), c );
+        gtk_tree_view_append_column( GTK_TREE_VIEW( v ), c );
 
         t = _( webseed_column_names[WEBSEED_COL_DOWNLOAD_RATE] );
         r = gtk_cell_renderer_text_new ( );
-        c = gtk_tree_view_column_new_with_attributes (
-            t, r, "text", WEBSEED_COL_DOWNLOAD_RATE, NULL );
-        gtk_tree_view_column_set_cell_data_func ( c, r, render_dl_rate,
-                                                  NULL, NULL );
-        gtk_tree_view_column_set_sort_column_id( c,
-                                                 WEBSEED_COL_DOWNLOAD_RATE );
-        gtk_tree_view_append_column( GTK_TREE_VIEW( webtree ), c );
+        c = gtk_tree_view_column_new_with_attributes ( t, r, "text", WEBSEED_COL_DOWNLOAD_RATE, NULL );
+        gtk_tree_view_column_set_cell_data_func ( c, r, render_dl_rate, NULL, NULL );
+        gtk_tree_view_column_set_sort_column_id( c, WEBSEED_COL_DOWNLOAD_RATE );
+        gtk_tree_view_append_column( GTK_TREE_VIEW( v ), c );
 
-        fr = gtk_frame_new( NULL );
-        gtk_frame_set_shadow_type( GTK_FRAME( fr ), GTK_SHADOW_IN );
-        gtk_container_add( GTK_CONTAINER( fr ), webtree );
-        webtree = fr;
+        w = gtk_scrolled_window_new ( NULL, NULL );
+        gtk_scrolled_window_set_policy ( GTK_SCROLLED_WINDOW( w ),
+                                         GTK_POLICY_AUTOMATIC,
+                                         GTK_POLICY_AUTOMATIC );
+        gtk_scrolled_window_set_shadow_type ( GTK_SCROLLED_WINDOW( w ),
+                                              GTK_SHADOW_IN );
+        gtk_container_add ( GTK_CONTAINER( w ), v );
+
+        webtree = w;
     }
 
     m  = peer_model_new ( tor );
@@ -834,12 +834,14 @@ peer_page_new( TrTorrent * gtor )
     vbox = gtk_vbox_new ( FALSE, GUI_PAD );
     gtk_container_set_border_width ( GTK_CONTAINER( vbox ), GUI_PAD_BIG );
 
-    if( webtree )
-        gtk_box_pack_start( GTK_BOX( vbox ), webtree, FALSE, FALSE, 0 );
-
-    /* h = gtk_hbox_new (FALSE, GUI_PAD); */
-    /* gtk_box_pack_start_defaults (GTK_BOX(h), sw); */
-    gtk_box_pack_start( GTK_BOX( vbox ), sw, TRUE, TRUE, 0 );
+    if( webtree == NULL )
+        gtk_box_pack_start( GTK_BOX( vbox ), sw, TRUE, TRUE, 0 );
+    else {
+        GtkWidget * vpaned = gtk_vpaned_new( );
+        gtk_paned_pack1( GTK_PANED( vpaned ), webtree, FALSE, TRUE );
+        gtk_paned_pack2( GTK_PANED( vpaned ), sw, TRUE, TRUE );
+        gtk_box_pack_start( GTK_BOX( vbox ), vpaned, TRUE, TRUE, 0 );
+    }
 
     hbox = gtk_hbox_new ( FALSE, GUI_PAD );
     l = gtk_label_new ( NULL );
