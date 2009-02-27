@@ -4,16 +4,15 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 <http://trac.transmissionbt.com/query?milestone=1.51&group=component&groupdesc=1&order=severity>
 - All Platforms
    + Fix configure script issues with non-gcc compilers and user-defined CFLAGS environment variables 
+   + Decrease CPU usage in some situations
    + Close a rare race condition on startup
    + More efficient use of libcurl when curl 7.18.0 or newer is present
-- Mac
-   + Fix Tiger-only cropping bug where progress bars would extend past the right border
 - GTK+
    + Play nicely with Ubuntu's new notification server
-   + Add Pause All, Resume All buttons
+   + Add Pause All and Resume All buttons
 - Web Client
-   + Added support for Internet Explorer
-   + Layout fixes when viewed on an iPhone
+   + Support for Internet Explorer
+   + Layout fixes when viewed on an iPhone/iPod touch
 
 1.50 (2009/02/13)
 <http://trac.transmissionbt.com/query?milestone=1.50&group=component&groupdesc=1&order=severity>
@@ -36,7 +35,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Make i18n support optional for cli and daemon clients
 - CLI
    + Support session.json settings, just as the Daemon and GTK+ clients do
-- Web Interface
+- Web Client
    + Torrents can now be added by URL
    + Add the ability to "remove local data" from the web client
 
