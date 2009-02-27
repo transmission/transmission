@@ -144,6 +144,8 @@ tr_jsonParse( const void     * vbuf,
               tr_benc        * setme_benc,
               const uint8_t ** setme_end )
 {
+    int                         line = 1;
+    int                         column = 1;
     int                         err = 0;
     const unsigned char       * buf = vbuf;
     const void                * bufend = buf + len;
@@ -162,11 +164,20 @@ tr_jsonParse( const void     * vbuf,
     data.stack = TR_PTR_ARRAY_INIT;
 
     checker = new_JSON_parser( &config );
-    while( ( buf != bufend ) && JSON_parser_char( checker, *buf ) )
+    while( ( buf != bufend ) && JSON_parser_char( checker, *buf ) ) {
+        if( *buf != '\n' )
+            ++column;
+        else {
+            ++line;
+            column = 1;
+        }
         ++buf;
+    }
 
-    if( buf != bufend )
+    if( buf != bufend ) {
+        tr_err( "JSON parser failed at line %d, column %d: \"%.16s\"", line, column, buf );
         err = EILSEQ;
+    }
 
     if( !data.hasContent )
         err = EINVAL;
