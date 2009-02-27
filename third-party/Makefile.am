@@ -1,4 +1,5 @@
 SUBDIRS = \
+    filewatcher \
     libevent \
     libnatpmp \
     miniupnp

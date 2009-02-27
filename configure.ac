@@ -337,6 +337,7 @@ AC_CONFIG_FILES([Makefile
                  doc/Makefile
                  libtransmission/Makefile
                  third-party/Makefile
+                 third-party/filewatcher/Makefile
                  third-party/miniupnp/Makefile
                  third-party/libnatpmp/Makefile
                  macosx/Makefile

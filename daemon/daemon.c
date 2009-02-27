@@ -31,7 +31,13 @@
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
 
+#include <filewatcher/file-watcher.h>
+
 #define MY_NAME "transmission-daemon"
+
+#define PREF_KEY_DIR_WATCH          "watch-dir"
+#define PREF_KEY_DIR_WATCH_ENABLED  "watch-dir-enabled"
+
 
 static int           closing = FALSE;
 static tr_session  * mySession = NULL;
@@ -58,6 +64,8 @@ static const struct tr_option options[] =
     { 'a', "allowed", "Allowed IP addresses.  (Default: " TR_DEFAULT_RPC_WHITELIST ")", "a", 1, "<list>" },
     { 'b', "blocklist", "Enable peer blocklists", "b", 0, NULL },
     { 'B', "no-blocklist", "Disable peer blocklists", "B", 0, NULL },
+    { 'c', "watch-dir", "Directory to watch for new .torrent files", "c", 1, "<directory>" },
+    { 'C', "no-watch-dir", "Disable the watch-dir", "C", 0, NULL },
     { 'd', "dump-settings", "Dump the settings and exit", "d", 0, NULL },
     { 'f', "foreground", "Run in the foreground instead of daemonizing", "f", 0, NULL },
     { 'g', "config-dir", "Where to look for configuration files", "g", 1, "<path>" },
@@ -172,10 +180,23 @@ getConfigDir( int argc, const char ** argv )
     return configDir;
 }
 
+static void
+dirChangedCB( CFW_Watch * watch UNUSED, const char * directory, const char * filename, CFW_Action action, void * userData )
+{
+    if( action & ( CFW_ACTION_ADD | CFW_ACTION_DELETE ) )
+    {
+        int err;
+        char * path = tr_buildPath( directory, filename, NULL );
+        tr_session * session = userData;
+        tr_ctor * ctor = tr_ctorNew( session );
+        tr_ctorSetMetainfoFromFile( ctor, path );
+        tr_torrentNew( session, ctor, &err );
+        tr_free( path );
+    }
+}
 
 int
-main( int     argc,
-      char ** argv )
+main( int argc, char ** argv )
 {
     int c;
     int64_t i;
@@ -184,6 +205,7 @@ main( int     argc,
     tr_bool foreground = FALSE;
     tr_bool dumpSettings = FALSE;
     const char * configDir = NULL;
+    CFW_Watch * watch = NULL;
 
     signal( SIGINT, gotsig );
     signal( SIGTERM, gotsig );
@@ -209,6 +231,11 @@ main( int     argc,
             case 'b': tr_bencDictAddInt( &settings, TR_PREFS_KEY_BLOCKLIST_ENABLED, 1 );
                       break;
             case 'B': tr_bencDictAddInt( &settings, TR_PREFS_KEY_BLOCKLIST_ENABLED, 0 );
+                      break;
+            case 'c': tr_bencDictAddStr( &settings, PREF_KEY_DIR_WATCH, optarg );
+                      tr_bencDictAddInt( &settings, PREF_KEY_DIR_WATCH_ENABLED, 1 );
+                      break;
+            case 'C': tr_bencDictAddInt( &settings, PREF_KEY_DIR_WATCH_ENABLED, 0 );
                       break;
             case 'd': dumpSettings = TRUE;
                       break;
@@ -275,6 +302,21 @@ main( int     argc,
     if( tr_bencDictFindInt( &settings, TR_PREFS_KEY_RPC_AUTH_REQUIRED, &i ) && i!=0 )
         tr_ninf( MY_NAME, "requiring authentication" );
 
+    /* maybe add a watchdir */
+    {
+        int64_t doWatch;
+        const char * watchDir;
+        if( tr_bencDictFindInt( &settings, PREF_KEY_DIR_WATCH_ENABLED, &doWatch )
+            && doWatch
+            && tr_bencDictFindStr( &settings, PREF_KEY_DIR_WATCH, &watchDir )
+            && watchDir
+            && *watchDir )
+        {
+            tr_ninf( MY_NAME, "watching \"%s\" for added .torrent files", watchDir );
+            watch = cfw_addWatch( watchDir, dirChangedCB, mySession );
+        }
+    }
+
     /* load the torrents */
     {
         tr_ctor * ctor = tr_ctorNew( mySession );
@@ -283,11 +325,16 @@ main( int     argc,
         tr_ctorFree( ctor );
     }
 
-    while( !closing )
+    while( !closing ) {
         tr_wait( 1000 ); /* sleep one second */
+        if( watch )
+            cfw_update( watch );
+    }
 
     /* shutdown */
     printf( "Closing transmission session..." );
+    if( watch )
+        cfw_removeWatch( watch );
     tr_sessionSaveSettings( mySession, configDir, &settings );
     tr_sessionClose( mySession );
     printf( " done.\n" );
