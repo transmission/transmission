@@ -1198,7 +1198,7 @@ printTorrentList( tr_benc * top )
                     name );
 
                 total_up += up;
-                total_down += up;
+                total_down += down;
                 total_size += sizeWhenDone - leftUntilDone;
             }
         }
