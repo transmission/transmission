@@ -1,5 +1,0 @@
-License.txt, ReadMe.txt, and C++ source files
-are from the 2009.02.17 Snapshot of FileWatcher by Jason Wynn at http://jameswynn.com/tag/filewatcher/
-
-file-watcher.cc, file-watcher.h
-is a very simple wrapper for C around Jason's library

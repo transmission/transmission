@@ -19,7 +19,6 @@ bin_PROGRAMS = \
 
 LDADD = \
     $(top_builddir)/libtransmission/libtransmission.a \
-    $(top_builddir)/third-party/filewatcher/libfilewatcher.a -lstdc++ \
     $(top_builddir)/third-party/miniupnp/libminiupnp.a \
     $(top_builddir)/third-party/libnatpmp/libnatpmp.a \
     $(top_builddir)/third-party/libevent/libevent.la \

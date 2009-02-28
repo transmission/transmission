@@ -18,6 +18,7 @@
 
 #include <sys/types.h> /* umask*/
 #include <sys/stat.h> /* umask*/
+#include <dirent.h> /* readdir */
 
 #include <fcntl.h> /* open */
 #include <signal.h>
@@ -31,12 +32,12 @@
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
 
-#include <filewatcher/file-watcher.h>
-
 #define MY_NAME "transmission-daemon"
 
 #define PREF_KEY_DIR_WATCH          "watch-dir"
 #define PREF_KEY_DIR_WATCH_ENABLED  "watch-dir-enabled"
+
+#define WATCHDIR_POLL_INTERVAL_SECS  15
 
 
 static int           closing = FALSE;
@@ -180,25 +181,46 @@ getConfigDir( int argc, const char ** argv )
     return configDir;
 }
 
+/**
+ * This is crude compared to using kqueue/inotify/etc, but has the advantage
+ * of working portably on whatever random embedded platform we throw at it.
+ * Since we're only walking a single directory, nonrecursively, a few times
+ * per minute, let's go with this unless users complain about the load
+ */
 static void
-dirChangedCB( CFW_Watch  * watch UNUSED,
-              const char * directory,
-              const char * filename,
-              CFW_Action   action,
-              void       * userData )
+checkForNewFiles( tr_session * session, const char * dirname, time_t oldTime )
 {
-    if( ( action & CFW_ACTION_ADD ) && ( strstr( filename, ".torrent" ) != NULL ) )
+    struct stat sb;
+    DIR * odir;
+
+    if( !stat( dirname, &sb ) && S_ISDIR( sb.st_mode ) && (( odir = opendir( dirname ))) )
     {
-        int err;
-        char * path = tr_buildPath( directory, filename, NULL );
-        tr_session * session = userData;
-        tr_ctor * ctor = tr_ctorNew( session );
+        struct dirent * d;
 
-        err = tr_ctorSetMetainfoFromFile( ctor, path );
-        if( !err )
-            tr_torrentNew( session, ctor, &err );
+        for( d = readdir( odir ); d != NULL; d = readdir( odir ) )
+        {
+            char * filename;
 
-        tr_free( path );
+            if( !d->d_name || *d->d_name=='.' ) /* skip dotfiles */
+                continue;
+            if( !strstr( d->d_name, ".torrent" ) ) /* skip non-torrents */
+                continue;
+
+            /* if the file's changed since our last pass, try adding it */
+            filename = tr_buildPath( dirname, d->d_name, NULL );
+            if( !stat( filename, &sb ) && sb.st_mtime >= oldTime )
+            {
+                tr_ctor * ctor = tr_ctorNew( session );
+                int err = tr_ctorSetMetainfoFromFile( ctor, filename );
+                if( !err )
+                    tr_torrentNew( session, ctor, &err );
+                tr_ctorFree( ctor );
+            }
+
+            tr_free( filename );
+        }
+
+        closedir( odir );
     }
 }
 
@@ -212,7 +234,8 @@ main( int argc, char ** argv )
     tr_bool foreground = FALSE;
     tr_bool dumpSettings = FALSE;
     const char * configDir = NULL;
-    CFW_Watch * watch = NULL;
+    const char * watchDir = NULL;
+    time_t lastCheckTime = 0;
 
     signal( SIGINT, gotsig );
     signal( SIGTERM, gotsig );
@@ -312,7 +335,6 @@ main( int argc, char ** argv )
     /* maybe add a watchdir */
     {
         int64_t doWatch;
-        const char * watchDir;
         if( tr_bencDictFindInt( &settings, PREF_KEY_DIR_WATCH_ENABLED, &doWatch )
             && doWatch
             && tr_bencDictFindStr( &settings, PREF_KEY_DIR_WATCH, &watchDir )
@@ -320,7 +342,6 @@ main( int argc, char ** argv )
             && *watchDir )
         {
             tr_ninf( MY_NAME, "watching \"%s\" for added .torrent files", watchDir );
-            watch = cfw_addWatch( watchDir, dirChangedCB, mySession );
         }
     }
 
@@ -336,14 +357,15 @@ main( int argc, char ** argv )
     {
         tr_wait( 1000 ); /* sleep one second */
 
-        if( watch != NULL ) /* maybe look for new .torrent files */
-            cfw_update( watch );
+        if( watchDir && ( lastCheckTime + WATCHDIR_POLL_INTERVAL_SECS < time( NULL ) ) )
+        {
+            checkForNewFiles( mySession, watchDir, lastCheckTime );
+            lastCheckTime = time( NULL );
+        }
     }
 
     /* shutdown */
     printf( "Closing transmission session..." );
-    if( watch )
-        cfw_removeWatch( watch );
     tr_sessionSaveSettings( mySession, configDir, &settings );
     tr_sessionClose( mySession );
     printf( " done.\n" );
