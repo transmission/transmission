@@ -7,7 +7,7 @@
 	@date 4/15/2009
 */
 
-#ifdef __APPLE_CC__
+#if defined(WITH_KQUEUE) || defined(__APPLE_CC__)
 
 #include "FileWatcherOSX.h"
 
@@ -129,4 +129,4 @@ namespace FW
 
 };//namespace FW
 
-#endif//__APPLE_CC__
+#endif // WITH_KQUEUE || __APPLE_CC__

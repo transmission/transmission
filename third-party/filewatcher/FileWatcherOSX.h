@@ -15,8 +15,6 @@
 #define _FW_FILEWATCHEROSX_H_
 #pragma once
 
-#ifdef __APPLE_CC__
-
 #include "FileWatcher.h"
 #include <map>
 #include <sys/types.h>
@@ -70,7 +68,5 @@ namespace FW
 	};//end FileWatcherOSX
 
 };//namespace FW
-
-#endif//__APPLE_CC__
 
 #endif//_FW_FILEWATCHEROSX_H_

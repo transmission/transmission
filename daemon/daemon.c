@@ -181,16 +181,23 @@ getConfigDir( int argc, const char ** argv )
 }
 
 static void
-dirChangedCB( CFW_Watch * watch UNUSED, const char * directory, const char * filename, CFW_Action action, void * userData )
+dirChangedCB( CFW_Watch  * watch UNUSED,
+              const char * directory,
+              const char * filename,
+              CFW_Action   action,
+              void       * userData )
 {
-    if( action & ( CFW_ACTION_ADD | CFW_ACTION_DELETE ) )
+    if( ( action & CFW_ACTION_ADD ) && ( strstr( filename, ".torrent" ) != NULL ) )
     {
         int err;
         char * path = tr_buildPath( directory, filename, NULL );
         tr_session * session = userData;
         tr_ctor * ctor = tr_ctorNew( session );
-        tr_ctorSetMetainfoFromFile( ctor, path );
-        tr_torrentNew( session, ctor, &err );
+
+        err = tr_ctorSetMetainfoFromFile( ctor, path );
+        if( !err )
+            tr_torrentNew( session, ctor, &err );
+
         tr_free( path );
     }
 }
@@ -325,9 +332,11 @@ main( int argc, char ** argv )
         tr_ctorFree( ctor );
     }
 
-    while( !closing ) {
+    while( !closing )
+    {
         tr_wait( 1000 ); /* sleep one second */
-        if( watch )
+
+        if( watch != NULL ) /* maybe look for new .torrent files */
             cfw_update( watch );
     }
 

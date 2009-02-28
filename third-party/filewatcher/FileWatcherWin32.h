@@ -16,8 +16,6 @@
 #define _FW_FILEWATCHERWIN32_H_
 #pragma once
 
-#ifdef _WIN32
-
 #include "FileWatcher.h"
 #include <map>
 
@@ -67,7 +65,5 @@ namespace FW
 	};//end FileWatcherWin32
 
 };//namespace FW
-
-#endif//_WIN32
 
 #endif//_FW_FILEWATCHERWIN32_H_

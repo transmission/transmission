@@ -28,13 +28,19 @@ CFW_Action;
 
 typedef struct CFW_Impl CFW_Watch;
 
-typedef void ( CFW_ActionCallback )( CFW_Watch*, const char * dir, const char * filename, CFW_Action, void * callbackData );
+typedef void ( CFW_ActionCallback )( CFW_Watch  * watch,
+                                     const char * dir,
+                                     const char * filename,
+                                     CFW_Action   action,
+                                     void       * callbackData );
 
-CFW_Watch*  cfw_addWatch    ( const char * directory, CFW_ActionCallback * callback, void * callbackData );
+CFW_Watch*  cfw_addWatch    ( const char         * directory,
+                              CFW_ActionCallback * callback,
+                              void               * callbackData );
 
-void        cfw_removeWatch ( CFW_Watch * );
+void        cfw_removeWatch ( CFW_Watch * watch );
 
-void        cfw_update      ( CFW_Watch * );
+void        cfw_update      ( CFW_Watch * watch );
 
 
 #ifdef __cplusplus

@@ -11,9 +11,9 @@
 
 #if defined(_WIN32)
 #	include "FileWatcherWin32.h"
-#elif defined(__APPLE_CC__)
+#elif defined(WITH_KQUEUE) || defined(__APPLE_CC__)
 #	include "FileWatcherOSX.h"
-#elif defined(__linux__)
+#elif defined(WITH_INOTIFY) || defined(__linux__)
 #	include "FileWatcherLinux.h"
 #else
 #       error FIXME

@@ -7,7 +7,7 @@
 	@date 4/15/2009
 */
 
-#ifdef __linux__
+#if defined(WITH_INOTIFY)
 
 #include "FileWatcherLinux.h"
 
@@ -163,4 +163,4 @@ namespace FW
 };//namespace FW
 
 
-#endif//__linux__
+#endif // WITH_INOTIFY || __linux__

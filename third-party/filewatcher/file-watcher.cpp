@@ -21,7 +21,9 @@ struct CFW_Impl: public FileWatchListener
         void * myCallbackData;
 
     public:
-        CFW_Impl( const char * dir, CFW_ActionCallback * callback, void * callbackData ):
+        CFW_Impl( const char         * dir,
+                  CFW_ActionCallback * callback,
+                  void               * callbackData ):
             myID( myWatcher.addWatch( dir, this ) ),
             myCallback( callback ),
             myCallbackData( callbackData )
@@ -31,10 +33,18 @@ struct CFW_Impl: public FileWatchListener
         {
             myWatcher.removeWatch( myID );
         }
-        virtual void handleFileAction( WatchID watchid, const String& dir, const String& filename, FileWatcher::Action action )
+
+    public:
+        virtual void handleFileAction( WatchID                watchid,
+                                       const String         & dir,
+                                       const String         & filename,
+                                       FileWatcher::Action    action )
         {
-std::cerr << __FILE__ << ':' << __LINE__ << " dir is " << dir << " filename is " << filename << std::endl;
-            (*myCallback)( this, dir.c_str(), filename.c_str(), (CFW_Action)action, myCallbackData );
+            (*myCallback)( this,
+                           dir.c_str(),
+                           filename.c_str(),
+                           (CFW_Action)action,
+                           myCallbackData );
         }
         void update( )
         {
@@ -42,20 +52,25 @@ std::cerr << __FILE__ << ':' << __LINE__ << " dir is " << dir << " filename is "
         }
 };
 
-extern "C" CFW_Watch*
-cfw_addWatch( const char * directory, CFW_ActionCallback * callback, void * callbackData )
+extern "C"
 {
-    return new CFW_Impl( directory, callback, callbackData );
-}
+    CFW_Watch*
+    cfw_addWatch( const char * directory, CFW_ActionCallback * callback, void * callbackData )
+    {
+        return new CFW_Impl( directory, callback, callbackData );
+    }
 
-extern "C" void
-cfw_removeWatch( CFW_Watch * watch )
-{
-    delete watch;
-}
+    void
+    cfw_removeWatch( CFW_Watch * watch )
+    {
+        if( watch != 0 )
+            delete watch;
+    }
 
-extern "C" void
-cfw_update( CFW_Watch * watch )
-{
-    watch->update( );
+    void
+    cfw_update( CFW_Watch * watch )
+    {
+        if( watch != 0 )
+            watch->update( );
+    }
 }
