@@ -117,7 +117,7 @@ tr_session * fLib;
     [fResetButton sizeToFit];
     
     NSRect buttonFrame = [fResetButton frame];
-    buttonFrame.size.width += 10.0f;
+    buttonFrame.size.width += 10.0;
     buttonFrame.origin.x -= buttonFrame.size.width - oldButtonWidth;
     [fResetButton setFrame: buttonFrame];
 }

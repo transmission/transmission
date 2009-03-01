@@ -262,8 +262,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         [[UKKQueue sharedFileWatcher] setDelegate: self];
         
-        SUUpdater * updater = [SUUpdater sharedUpdater];
-        [updater setDelegate: self];
+        [[SUUpdater sharedUpdater] setDelegate: self];
         fUpdateInProgress = NO;
     }
     return self;
