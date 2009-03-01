@@ -350,10 +350,10 @@ compareByName( GtkTreeModel *             model,
 }
 
 static int
-compareByAge( GtkTreeModel *             model,
-              GtkTreeIter *              a,
-              GtkTreeIter *              b,
-              gpointer         user_data UNUSED )
+compareByAge( GtkTreeModel * model,
+              GtkTreeIter  * a,
+              GtkTreeIter  * b,
+              gpointer       user_data UNUSED )
 {
     tr_torrent *ta, *tb;
 
@@ -364,19 +364,38 @@ compareByAge( GtkTreeModel *             model,
 }
 
 static int
+compareBySize( GtkTreeModel * model,
+               GtkTreeIter  * a,
+               GtkTreeIter  * b,
+               gpointer       user_data UNUSED )
+{
+    tr_torrent *t;
+    const tr_info *ia, *ib;
+
+    gtk_tree_model_get( model, a, MC_TORRENT_RAW, &t, -1 );
+    ia = tr_torrentInfo( t );
+    gtk_tree_model_get( model, b, MC_TORRENT_RAW, &t, -1 );
+    ib = tr_torrentInfo( t );
+
+    if( ia->totalSize < ib->totalSize ) return 1;
+    if( ia->totalSize > ib->totalSize ) return -1;
+    return 0;
+}
+
+static int
 compareByProgress( GtkTreeModel *             model,
                    GtkTreeIter *              a,
                    GtkTreeIter *              b,
                    gpointer         user_data UNUSED )
 {
-    int            ret;
-    tr_torrent *   ta, *tb;
+    int ret;
+    tr_torrent * t;
     const tr_stat *sa, *sb;
 
-    gtk_tree_model_get( model, a, MC_TORRENT_RAW, &ta, -1 );
-    gtk_tree_model_get( model, b, MC_TORRENT_RAW, &tb, -1 );
-    sa = tr_torrentStatCached( ta );
-    sb = tr_torrentStatCached( tb );
+    gtk_tree_model_get( model, a, MC_TORRENT_RAW, &t, -1 );
+    sa = tr_torrentStatCached( t );
+    gtk_tree_model_get( model, b, MC_TORRENT_RAW, &t, -1 );
+    sb = tr_torrentStatCached( t );
     ret = compareDouble( sa->percentDone, sb->percentDone );
     if( !ret )
         ret = compareRatio( sa->ratio, sb->ratio );
@@ -419,10 +438,10 @@ compareByState( GtkTreeModel * model,
 }
 
 static int
-compareByTracker( GtkTreeModel *             model,
-                  GtkTreeIter *              a,
-                  GtkTreeIter *              b,
-                  gpointer         user_data UNUSED )
+compareByTracker( GtkTreeModel * model,
+                  GtkTreeIter  * a,
+                  GtkTreeIter  * b,
+                  gpointer       user_data UNUSED )
 {
     const tr_torrent *ta, *tb;
 
@@ -458,8 +477,9 @@ setSort( TrCore *     core,
         sort_func = compareByState;
     else if( !strcmp( mode, "sort-by-tracker" ) )
         sort_func = compareByTracker;
-    else
-    {
+    else if( !strcmp( mode, "sort-by-size" ) )
+        sort_func = compareBySize;
+    else {
         sort_func = compareByName;
         type = isReversed ? GTK_SORT_DESCENDING : GTK_SORT_ASCENDING;
     }
