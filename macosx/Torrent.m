@@ -387,16 +387,9 @@ int trashDataFile(const char * filename)
     return tr_torrentGetSeedRatio(fHandle, NULL);
 }
 
-#warning move to libtransmission
 - (CGFloat) progressStopRatio
 {
-    double stopRatio, ratio;
-    if (!tr_torrentGetSeedRatio(fHandle, &stopRatio) || (ratio = [self ratio]) >= stopRatio)
-        return 1.0;
-    else if (stopRatio > 0.0)
-        return ratio / stopRatio;
-    else
-        return 0.0;
+    return fStat->percentRatio;
 }
 
 - (tr_speedlimit) speedMode: (BOOL) upload

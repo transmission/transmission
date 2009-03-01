@@ -804,6 +804,7 @@ tr_torrentStat( tr_torrent * tor )
     int                     usableSeeds = 0;
     uint64_t                now;
     double                  downloadedForRatio, seedRatio;
+    tr_bool                 checkSeedRatio;
 
     if( !tor )
         return NULL;
@@ -861,7 +862,6 @@ tr_torrentStat( tr_torrent * tor )
                            (double) tor->info.pieceCount )
                        : 0.0;
 
-
     s->activityDate = tor->activityDate;
     s->addedDate    = tor->addedDate;
     s->doneDate     = tor->doneDate;
@@ -896,6 +896,8 @@ tr_torrentStat( tr_torrent * tor )
     downloadedForRatio = s->downloadedEver ? s->downloadedEver : s->haveValid;
     s->ratio = tr_getRatio( s->uploadedEver, downloadedForRatio );
 
+    checkSeedRatio = tr_torrentGetSeedRatio( tor, &seedRatio );
+
     switch( s->activity )
     {
         case TR_STATUS_DOWNLOAD:
@@ -908,7 +910,7 @@ tr_torrentStat( tr_torrent * tor )
             break;
 
         case TR_STATUS_SEED:
-            if( tr_torrentGetSeedRatio( tor, &seedRatio ) )
+            if( checkSeedRatio )
             {
                 if( s->pieceUploadSpeed < 0.1 )
                     s->eta = TR_ETA_UNKNOWN;
@@ -923,6 +925,13 @@ tr_torrentStat( tr_torrent * tor )
             s->eta = TR_ETA_NOT_AVAIL;
             break;
     }
+
+    if ( !checkSeedRatio || s->ratio >= seedRatio || s->ratio == TR_RATIO_INF )
+        s->percentRatio = 1.0;
+    else if ( s->ratio == TR_RATIO_NA )
+        s->percentRatio = 0.0;
+    else 
+        s->percentRatio = s->ratio / seedRatio;
 
     tr_torrentUnlock( tor );
 
@@ -2148,7 +2157,6 @@ tr_torrentCheckSeedRatio( tr_torrent * tor )
             /* maybe notify the client */
             if( tor->ratio_limit_hit_func != NULL )
                 tor->ratio_limit_hit_func( tor, tor->ratio_limit_hit_func_user_data );
-
         }
     }
 }
