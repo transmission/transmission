@@ -996,15 +996,6 @@ peerSuggestedPiece( Torrent            * t UNUSED,
 }
 
 static void
-fireRatioLimitHit( tr_torrent * tor )
-{
-    assert( tr_isTorrent( tor ) );
-
-    if( tor->ratio_limit_hit_func )
-        tor->ratio_limit_hit_func( tor, tor->ratio_limit_hit_func_user_data );
-}
-
-static void
 peerCallbackFunc( void * vpeer, void * vevent, void * vt )
 {
     tr_peer * peer = vpeer; /* may be NULL if peer is a webseed */
@@ -1035,7 +1026,6 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
         {
             const time_t now = time( NULL );
             tr_torrent * tor = t->tor;
-            double seedRatio;
 
             tor->activityDate = now;
 
@@ -1053,20 +1043,7 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
                     a->piece_data_time = now;
             }
 
-            /* if we're seeding and we've reached our seed ratio limit, stop the torrent */
-            if( tr_torrentIsSeed( tor ) && tr_torrentGetSeedRatio( tor, &seedRatio ) ) {
-                const double up = tor->uploadedCur + tor->uploadedPrev;
-                const double down = tor->downloadedCur + tor->downloadedPrev;
-                const double ratio = tr_getRatio( up, down );
-                if( ratio >= seedRatio ) {
-                    tr_torrentStop( tor );
-                    
-                    /* set to no ratio limit to allow easy restarting */
-                    tr_torrentSetRatioMode( tor, TR_RATIOLIMIT_UNLIMITED );
-                    
-                    fireRatioLimitHit( tor );
-                }
-            }
+            tr_torrentCheckSeedRatio( tor );
 
             break;
         }

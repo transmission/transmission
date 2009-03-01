@@ -91,7 +91,6 @@ void             tr_torrentInitFilePriority( tr_torrent       * tor,
                                              tr_file_index_t    fileIndex,
                                              tr_priority_t      priority );
 
-
 int              tr_torrentCountUncheckedPieces( const tr_torrent * );
 
 tr_bool          tr_torrentIsFileChecked( const tr_torrent  * tor,
@@ -115,6 +114,9 @@ time_t*          tr_torrentGetMTimes( const tr_torrent  * tor,
 
 tr_torrent*      tr_torrentNext( tr_session  * session,
                                  tr_torrent  * current );
+
+void             tr_torrentCheckSeedRatio( tr_torrent * tor );
+
 
 
 typedef enum

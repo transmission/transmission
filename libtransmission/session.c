@@ -343,7 +343,7 @@ tr_sessionSaveSettings( tr_session * session, const char * configDir, tr_benc * 
     char * filename;
 
     assert( tr_bencIsDict( settings ) );
- 
+
     filename = tr_buildPath( configDir, "settings.json", NULL );
 
     tr_sessionGetSettings( session, settings );
@@ -723,6 +723,53 @@ tr_sessionGetPortForwarding( const tr_session * session )
 ***/
 
 static void
+updateSeedRatio( tr_session * session )
+{
+    tr_torrent * tor = NULL;
+
+    while(( tor = tr_torrentNext( session, tor )))
+        tr_torrentCheckSeedRatio( tor );
+}
+
+void
+tr_sessionSetRatioLimited( tr_session * session, tr_bool isLimited )
+{
+    assert( tr_isSession( session ) );
+
+    session->isRatioLimited = isLimited;
+    updateSeedRatio( session );
+}
+
+void
+tr_sessionSetRatioLimit( tr_session * session, double desiredRatio )
+{
+    assert( tr_isSession( session ) );
+
+    session->desiredRatio = desiredRatio;
+    updateSeedRatio( session );
+}
+
+tr_bool
+tr_sessionIsRatioLimited( const tr_session  * session )
+{
+    assert( tr_isSession( session ) );
+
+    return session->isRatioLimited;
+}
+
+double
+tr_sessionGetRatioLimit( const tr_session * session )
+{
+    assert( tr_isSession( session ) );
+
+    return session->desiredRatio;
+}
+
+/***
+****
+***/
+
+static void
 updateBandwidth( tr_session * session, tr_direction dir )
 {
     tr_bool zeroCase;
@@ -749,15 +796,6 @@ tr_sessionSetSpeedLimitEnabled( tr_session      * session,
 }
 
 void
-tr_sessionSetRatioLimited( tr_session      * session,
-                           tr_bool           isLimited )
-{
-    assert( tr_isSession( session ) );
-    
-    session->isRatioLimited = isLimited;
-}
-
-void
 tr_sessionSetSpeedLimit( tr_session    * session,
                          tr_direction    dir,
                          int             desiredSpeed )
@@ -769,18 +807,8 @@ tr_sessionSetSpeedLimit( tr_session    * session,
     updateBandwidth( session, dir );
 }
 
-void
-tr_sessionSetRatioLimit( tr_session    * session,
-                         double          desiredRatio )
-{
-    assert( tr_isSession( session ) );
-
-    session->desiredRatio = desiredRatio;
-}
-
 tr_bool
-tr_sessionIsSpeedLimitEnabled( const tr_session  * session,
-                               tr_direction        dir )
+tr_sessionIsSpeedLimitEnabled( const tr_session * session, tr_direction dir )
 {
     assert( tr_isSession( session ) );
     assert( tr_isDirection( dir ) );
@@ -788,17 +816,8 @@ tr_sessionIsSpeedLimitEnabled( const tr_session  * session,
     return session->isSpeedLimited[dir];
 }
 
-tr_bool
-tr_sessionIsRatioLimited( const tr_session  * session )
-{
-    assert( tr_isSession( session ) );
-
-    return session->isRatioLimited;
-}
-
 int
-tr_sessionGetSpeedLimit( const tr_session  * session,
-                         tr_direction        dir )
+tr_sessionGetSpeedLimit( const tr_session * session, tr_direction dir )
 {
     assert( tr_isSession( session ) );
     assert( tr_isDirection( dir ) );
@@ -806,21 +825,12 @@ tr_sessionGetSpeedLimit( const tr_session  * session,
     return session->speedLimit[dir];
 }
 
-double
-tr_sessionGetRatioLimit( const tr_session  * session )
-{
-    assert( tr_isSession( session ) );
-
-    return session->desiredRatio;
-}
-
 /***
 ****
 ***/
 
 void
-tr_sessionSetPeerLimit( tr_session * session,
-                        uint16_t     maxGlobalPeers )
+tr_sessionSetPeerLimit( tr_session * session, uint16_t maxGlobalPeers )
 {
     assert( tr_isSession( session ) );
 

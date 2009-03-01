@@ -58,7 +58,7 @@ tr_torrentFindFromId( tr_session * session, int id )
 {
     tr_torrent * tor = NULL;
 
-    while( ( tor = tr_torrentNext( session, tor ) ) )
+    while(( tor = tr_torrentNext( session, tor )))
         if( tor->uniqueId == id )
             return tor;
 
@@ -70,7 +70,7 @@ tr_torrentFindFromHashString( tr_session *  session, const char * str )
 {
     tr_torrent * tor = NULL;
 
-    while( ( tor = tr_torrentNext( session, tor ) ) )
+    while(( tor = tr_torrentNext( session, tor )))
         if( !strcmp( str, tor->info.hashString ) )
             return tor;
 
@@ -82,7 +82,7 @@ tr_torrentFindFromHash( tr_session * session, const uint8_t * torrentHash )
 {
     tr_torrent * tor = NULL;
 
-    while( ( tor = tr_torrentNext( session, tor ) ) )
+    while(( tor = tr_torrentNext( session, tor )))
         if( *tor->info.hash == *torrentHash )
             if( !memcmp( tor->info.hash, torrentHash, SHA_DIGEST_LENGTH ) )
                 return tor;
@@ -96,7 +96,7 @@ tr_torrentFindFromObfuscatedHash( tr_session * session,
 {
     tr_torrent * tor = NULL;
 
-    while( ( tor = tr_torrentNext( session, tor ) ) )
+    while(( tor = tr_torrentNext( session, tor )))
         if( !memcmp( tor->obfuscatedHash, obfuscatedTorrentHash,
                      SHA_DIGEST_LENGTH ) )
             return tor;
@@ -151,13 +151,14 @@ tr_torrentGetSpeedLimit( const tr_torrent * tor,
 }
 
 void
-tr_torrentSetRatioMode( tr_torrent *  tor,                    
-                        tr_ratiolimit mode )
+tr_torrentSetRatioMode( tr_torrent *  tor, tr_ratiolimit mode )
 {
     assert( tr_isTorrent( tor ) );
     assert( mode==TR_RATIOLIMIT_GLOBAL || mode==TR_RATIOLIMIT_SINGLE || mode==TR_RATIOLIMIT_UNLIMITED  );
 
     tor->ratioLimitMode = mode;
+
+    tr_torrentCheckSeedRatio( tor );
 }
 
 tr_ratiolimit
@@ -174,7 +175,9 @@ tr_torrentSetRatioLimit( tr_torrent * tor,
 {
     assert( tr_isTorrent( tor ) );
 
-    tor->desiredRatio = desiredRatio;   
+    tor->desiredRatio = desiredRatio;
+
+    tr_torrentCheckSeedRatio( tor );
 }
 
 double
@@ -903,7 +906,7 @@ tr_torrentStat( tr_torrent * tor )
             else
                 s->eta = s->leftUntilDone / s->pieceDownloadSpeed / 1024.0;
             break;
-        
+
         case TR_STATUS_SEED:
             if( tr_torrentGetSeedRatio( tor, &seedRatio ) )
             {
@@ -915,7 +918,7 @@ tr_torrentStat( tr_torrent * tor )
             else
                 s->eta = TR_ETA_NOT_AVAIL;
             break;
-        
+
         default:
             s->eta = TR_ETA_NOT_AVAIL;
             break;
@@ -1544,9 +1547,7 @@ tr_torrentGetFileDL( const tr_torrent * tor,
 }
 
 static void
-setFileDND( tr_torrent *    tor,
-            tr_file_index_t fileIndex,
-            int             doDownload )
+setFileDND( tr_torrent * tor, tr_file_index_t fileIndex, int doDownload )
 {
     tr_file *        file;
     const int        dnd = !doDownload;
@@ -1601,7 +1602,7 @@ setFileDND( tr_torrent *    tor,
 }
 
 void
-tr_torrentInitFileDLs( tr_torrent *      tor,
+tr_torrentInitFileDLs( tr_torrent      * tor,
                        tr_file_index_t * files,
                        tr_file_index_t   fileCount,
                        tr_bool           doDownload )
@@ -1612,9 +1613,10 @@ tr_torrentInitFileDLs( tr_torrent *      tor,
 
     tr_torrentLock( tor );
 
-    for( i = 0; i < fileCount; ++i )
+    for( i=0; i<fileCount; ++i )
         setFileDND( tor, files[i], doDownload );
-    tr_cpInvalidateDND ( &tor->completion );
+    tr_cpInvalidateDND( &tor->completion );
+    tr_torrentCheckSeedRatio( tor );
 
     tr_torrentUnlock( tor );
 }
@@ -1748,9 +1750,9 @@ tr_torrentSetFileChecked( tr_torrent *    tor,
     assert( tr_isTorrent( tor ) );
 
     if( isChecked )
-        tr_bitfieldAddRange ( &tor->checkedPieces, begin, end );
+        tr_bitfieldAddRange( &tor->checkedPieces, begin, end );
     else
-        tr_bitfieldRemRange ( &tor->checkedPieces, begin, end );
+        tr_bitfieldRemRange( &tor->checkedPieces, begin, end );
 }
 
 tr_bool
@@ -1777,7 +1779,7 @@ tr_torrentUncheck( tr_torrent * tor )
 {
     assert( tr_isTorrent( tor ) );
 
-    tr_bitfieldRemRange ( &tor->checkedPieces, 0, tor->info.pieceCount );
+    tr_bitfieldRemRange( &tor->checkedPieces, 0, tor->info.pieceCount );
 }
 
 int
@@ -2109,5 +2111,37 @@ tr_torrentDeleteLocalData( tr_torrent * tor, tr_fileFunc fileFunc )
         char * path = tr_buildPath( tor->downloadDir, tor->info.files[0].name, NULL );
         fileFunc( path );
         tr_free( path );
+    }
+}
+
+/***
+****
+***/
+
+void
+tr_torrentCheckSeedRatio( tr_torrent * tor )
+{
+    double seedRatio;
+
+    assert( tr_isTorrent( tor ) );
+
+    /* if we're seeding and we've reached our seed ratio limit, stop the torrent */
+    if( tr_torrentIsSeed( tor ) && tr_torrentGetSeedRatio( tor, &seedRatio ) )
+    {
+        const double up = tor->uploadedCur + tor->uploadedPrev;
+        const double down = tor->downloadedCur + tor->downloadedPrev;
+        const double ratio = tr_getRatio( up, down );
+        if( ratio >= seedRatio )
+        {
+            tr_torrentStop( tor );
+
+            /* set to no ratio limit to allow easy restarting */
+            tr_torrentSetRatioMode( tor, TR_RATIOLIMIT_UNLIMITED );
+
+            /* maybe notify the client */
+            if( tor->ratio_limit_hit_func != NULL )
+                tor->ratio_limit_hit_func( tor, tor->ratio_limit_hit_func_user_data );
+
+        }
     }
 }
