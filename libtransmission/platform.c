@@ -488,7 +488,7 @@ tr_getClutchDir( const tr_session * session UNUSED )
         else
         {
 
-#ifdef SYS_DARWIN /* on Mac, look in the app package first, before default unix directories */
+#ifdef SYS_DARWIN /* on Mac, look in the app package first, then the Application Support folder (for daemon, etc) */
 
             CFURLRef appURL = CFBundleCopyBundleURL( CFBundleGetMainBundle( ) );
             CFStringRef appRef = CFURLCopyFileSystemPath( appURL,
@@ -549,7 +549,7 @@ tr_getClutchDir( const tr_session * session UNUSED )
                 }
             }
 
-#else /* follow the XDG spec */
+#else /* everyone else, follow the XDG spec */
 
             tr_list *candidates = NULL, *l;
             const char * tmp;

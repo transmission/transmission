@@ -2129,7 +2129,10 @@ tr_torrentCheckSeedRatio( tr_torrent * tor )
     if( tr_torrentIsSeed( tor ) && tr_torrentGetSeedRatio( tor, &seedRatio ) )
     {
         const double up = tor->uploadedCur + tor->uploadedPrev;
-        const double down = tor->downloadedCur + tor->downloadedPrev;
+        double down = tor->downloadedCur + tor->downloadedPrev;
+        if (!down)
+            down = tr_cpHaveValid( &tor->completion );
+        
         const double ratio = tr_getRatio( up, down );
         if( ratio >= seedRatio )
         {
