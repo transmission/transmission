@@ -926,9 +926,9 @@ tr_torrentStat( tr_torrent * tor )
             break;
     }
 
-    if ( !checkSeedRatio || s->ratio >= seedRatio || s->ratio == TR_RATIO_INF )
+    if( !checkSeedRatio || s->ratio >= seedRatio || s->ratio == TR_RATIO_INF )
         s->percentRatio = 1.0;
-    else if ( s->ratio == TR_RATIO_NA )
+    else if( s->ratio == TR_RATIO_NA )
         s->percentRatio = 0.0;
     else 
         s->percentRatio = s->ratio / seedRatio;
@@ -2147,7 +2147,7 @@ tr_torrentCheckSeedRatio( tr_torrent * tor )
 
         ratio = tr_getRatio( up, down );
 
-        if( ratio >= seedRatio )
+        if( ratio >= seedRatio || ratio == TR_RATIO_INF )
         {
             tr_torrentStop( tor );
 
