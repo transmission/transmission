@@ -200,6 +200,7 @@
 		A2D22A130D65EEE700007D5F /* verify.c in Sources */ = {isa = PBXBuildFile; fileRef = A2D22A100D65EED100007D5F /* verify.c */; };
 		A2D307A40D9EC6870051FD27 /* BlocklistDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = A2D307A30D9EC6870051FD27 /* BlocklistDownloader.m */; };
 		A2D307B10D9EC9F50051FD27 /* BlocklistStatusWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A2D307B00D9EC9F50051FD27 /* BlocklistStatusWindow.xib */; };
+		A2D5972A0F5AE49E0001AB3C /* watch.c in Sources */ = {isa = PBXBuildFile; fileRef = A2D597280F5AE49E0001AB3C /* watch.c */; };
 		A2DA362A0CBC674900C2ED41 /* InfoActivity.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DA36270CBC674900C2ED41 /* InfoActivity.png */; };
 		A2DA362B0CBC674900C2ED41 /* InfoFiles.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DA36280CBC674900C2ED41 /* InfoFiles.png */; };
 		A2DA362C0CBC674900C2ED41 /* InfoPeers.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DA36290CBC674900C2ED41 /* InfoPeers.png */; };
@@ -646,6 +647,8 @@
 		A2D307A20D9EC6870051FD27 /* BlocklistDownloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BlocklistDownloader.h; path = macosx/BlocklistDownloader.h; sourceTree = "<group>"; };
 		A2D307A30D9EC6870051FD27 /* BlocklistDownloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BlocklistDownloader.m; path = macosx/BlocklistDownloader.m; sourceTree = "<group>"; };
 		A2D307B00D9EC9F50051FD27 /* BlocklistStatusWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = BlocklistStatusWindow.xib; path = macosx/BlocklistStatusWindow.xib; sourceTree = "<group>"; };
+		A2D597280F5AE49E0001AB3C /* watch.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = watch.c; path = daemon/watch.c; sourceTree = "<group>"; };
+		A2D597290F5AE49E0001AB3C /* watch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = watch.h; path = daemon/watch.h; sourceTree = "<group>"; };
 		A2DA36270CBC674900C2ED41 /* InfoActivity.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = InfoActivity.png; path = macosx/Images/InfoActivity.png; sourceTree = "<group>"; };
 		A2DA36280CBC674900C2ED41 /* InfoFiles.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = InfoFiles.png; path = macosx/Images/InfoFiles.png; sourceTree = "<group>"; };
 		A2DA36290CBC674900C2ED41 /* InfoPeers.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = InfoPeers.png; path = macosx/Images/InfoPeers.png; sourceTree = "<group>"; };
@@ -1272,6 +1275,8 @@
 			children = (
 				BEFC1C0E0C07756200B0BB3C /* daemon.c */,
 				BEFC1C140C07756200B0BB3C /* remote.c */,
+				A2D597280F5AE49E0001AB3C /* watch.c */,
+				A2D597290F5AE49E0001AB3C /* watch.h */,
 			);
 			name = daemon;
 			sourceTree = "<group>";
@@ -1909,6 +1914,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BEFC1C1A0C07756200B0BB3C /* daemon.c in Sources */,
+				A2D5972A0F5AE49E0001AB3C /* watch.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
