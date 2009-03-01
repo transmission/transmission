@@ -18,7 +18,6 @@
 
 #include <sys/types.h> /* umask*/
 #include <sys/stat.h> /* umask*/
-#include <dirent.h> /* readdir */
 
 #include <fcntl.h> /* open */
 #include <signal.h>
@@ -32,16 +31,16 @@
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
 
+#include "watch.h"
+
 #define MY_NAME "transmission-daemon"
 
 #define PREF_KEY_DIR_WATCH          "watch-dir"
 #define PREF_KEY_DIR_WATCH_ENABLED  "watch-dir-enabled"
 
-#define WATCHDIR_POLL_INTERVAL_SECS  15
 
-
-static int           closing = FALSE;
-static tr_session  * mySession = NULL;
+static tr_bool closing = FALSE;
+static tr_session * mySession = NULL;
 
 /***
 ****  Config File
@@ -181,46 +180,20 @@ getConfigDir( int argc, const char ** argv )
     return configDir;
 }
 
-/**
- * This is crude compared to using kqueue/inotify/etc, but has the advantage
- * of working portably on whatever random embedded platform we throw at it.
- * Since we're only walking a single directory, nonrecursively, a few times
- * per minute, let's go with this unless users complain about the load
- */
 static void
-checkForNewFiles( tr_session * session, const char * dirname, time_t oldTime )
+onFileAdded( tr_session * session, const char * dir, const char * file )
 {
-    struct stat sb;
-    DIR * odir;
-
-    if( !stat( dirname, &sb ) && S_ISDIR( sb.st_mode ) && (( odir = opendir( dirname ))) )
+    if( strstr( file, ".torrent" ) != NULL )
     {
-        struct dirent * d;
+        char * filename = tr_buildPath( dir, file, NULL );
+        tr_ctor * ctor = tr_ctorNew( session );
 
-        for( d = readdir( odir ); d != NULL; d = readdir( odir ) )
-        {
-            char * filename;
+        int err = tr_ctorSetMetainfoFromFile( ctor, filename );
+        if( !err )
+            tr_torrentNew( session, ctor, &err );
 
-            if( !d->d_name || *d->d_name=='.' ) /* skip dotfiles */
-                continue;
-            if( !strstr( d->d_name, ".torrent" ) ) /* skip non-torrents */
-                continue;
-
-            /* if the file's changed since our last pass, try adding it */
-            filename = tr_buildPath( dirname, d->d_name, NULL );
-            if( !stat( filename, &sb ) && sb.st_mtime >= oldTime )
-            {
-                tr_ctor * ctor = tr_ctorNew( session );
-                int err = tr_ctorSetMetainfoFromFile( ctor, filename );
-                if( !err )
-                    tr_torrentNew( session, ctor, &err );
-                tr_ctorFree( ctor );
-            }
-
-            tr_free( filename );
-        }
-
-        closedir( odir );
+        tr_ctorFree( ctor );
+        tr_free( filename );
     }
 }
 
@@ -234,8 +207,7 @@ main( int argc, char ** argv )
     tr_bool foreground = FALSE;
     tr_bool dumpSettings = FALSE;
     const char * configDir = NULL;
-    const char * watchDir = NULL;
-    time_t lastCheckTime = 0;
+    dtr_watchdir * watchdir = NULL;
 
     signal( SIGINT, gotsig );
     signal( SIGTERM, gotsig );
@@ -335,13 +307,16 @@ main( int argc, char ** argv )
     /* maybe add a watchdir */
     {
         int64_t doWatch;
+        const char * dir;
+
         if( tr_bencDictFindInt( &settings, PREF_KEY_DIR_WATCH_ENABLED, &doWatch )
             && doWatch
-            && tr_bencDictFindStr( &settings, PREF_KEY_DIR_WATCH, &watchDir )
-            && watchDir
-            && *watchDir )
+            && tr_bencDictFindStr( &settings, PREF_KEY_DIR_WATCH, &dir )
+            && dir
+            && *dir )
         {
-            tr_ninf( MY_NAME, "watching \"%s\" for added .torrent files", watchDir );
+            tr_inf( "Watching \"%s\" for new .torrent files", dir );
+            watchdir = dtr_watchdir_new( mySession, dir, onFileAdded );
         }
     }
 
@@ -356,17 +331,13 @@ main( int argc, char ** argv )
     while( !closing )
     {
         tr_wait( 1000 ); /* sleep one second */
-
-        if( watchDir && ( lastCheckTime + WATCHDIR_POLL_INTERVAL_SECS < time( NULL ) ) )
-        {
-            checkForNewFiles( mySession, watchDir, lastCheckTime );
-            lastCheckTime = time( NULL );
-        }
+        dtr_watchdir_update( watchdir );
     }
 
     /* shutdown */
     printf( "Closing transmission session..." );
     tr_sessionSaveSettings( mySession, configDir, &settings );
+    dtr_watchdir_free( watchdir );
     tr_sessionClose( mySession );
     printf( " done.\n" );
 

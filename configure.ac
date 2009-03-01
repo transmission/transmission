@@ -114,6 +114,41 @@ AC_CHECK_FUNCS([posix_fadvise])
 
 dnl ----------------------------------------------------------------------------
 dnl
+dnl file monitoring for the daemon
+
+AC_CHECK_HEADER([sys/inotify.h], 
+                [AC_CHECK_FUNC([inotify_init],[have_inotify="yes"],[have_inotify="no"])], 
+                [have_inotify="no"]) 
+AC_ARG_WITH([inotify], 
+            [AS_HELP_STRING([--with-inotify],[Enable inotify support (default=auto)])], 
+            [want_inotify=${enableval}], 
+            [want_inotify=${have_inotify}]) 
+if test "x$want_inotify" = "xyes" ; then 
+    if test "x$have_inotify" = "xyes"; then 
+      AC_DEFINE([WITH_INOTIFY],[1]) 
+    else 
+      AC_MSG_ERROR("inotify not found!") 
+    fi 
+fi 
+ 
+AC_CHECK_HEADER([sys/event.h], 
+                [AC_CHECK_FUNC([kqueue],[have_kqueue="yes"],[have_kqueue="no"])], 
+                [have_kqueue="no"]) 
+AC_ARG_WITH([kqueue], 
+            [AS_HELP_STRING([--with-kqueue],[Enable kqueue support (default=auto)])], 
+            [want_kqueue=${enableval}], 
+            [want_kqueue=${have_kqueue}]) 
+if test "x$want_kqueue" = "xyes" ; then 
+    if test "x$have_kqueue" = "xyes"; then 
+      AC_DEFINE([WITH_KQUEUE],[1]) 
+    else 
+      AC_MSG_ERROR("kqueue not found!") 
+    fi 
+fi 
+
+
+dnl ----------------------------------------------------------------------------
+dnl
 dnl va_copy
 
 AC_MSG_CHECKING([how to copy va_list])
