@@ -10,8 +10,6 @@
  * $Id:$
  */
 
-#undef WITH_INOTIFY
-
 #ifdef WITH_INOTIFY
   #include <sys/inotify.h>
   #include <sys/select.h>
