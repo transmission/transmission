@@ -1013,17 +1013,16 @@ Activity;
 static void
 refresh_activity( GtkWidget * top )
 {
-    Activity *      a = g_object_get_data ( G_OBJECT(
-                                                top ), "activity-data" );
-    char *          pch;
-    char            sizeStr[64];
-    char            sizeStr2[64];
-    char            buf[128];
+    int i;
+    char * pch;
+    char buf1[128];
+    char buf2[128];
+    Activity * a = g_object_get_data ( G_OBJECT( top ), "activity-data" );
     const tr_stat * stat = tr_torrent_stat( a->gtor );
     const tr_info * info = tr_torrent_info( a->gtor );
-    const double    complete = stat->percentComplete * 100.0;
-    const double    done = stat->percentDone * 100.0;
-    const double    verifiedPieceCount = (double)stat->haveValid / info->pieceSize;
+    const double complete = stat->percentComplete * 100.0;
+    const double done = stat->percentDone * 100.0;
+    const double verifiedPieceCount = (double)stat->haveValid / info->pieceSize;
 
     pch = tr_torrent_status_str( a->gtor );
     gtk_label_set_text ( GTK_LABEL( a->state_lb ), pch );
@@ -1033,39 +1032,38 @@ refresh_activity( GtkWidget * top )
         pch = g_strdup_printf( _( "%.1f%%" ), complete );
     else
         /* %1$.1f is percent of how much of what we want's been downloaded,
-           %2$.1f is percent of how much of the whole torrent we've downloaded
-           */
-        pch = g_strdup_printf( _(
-                                   "%1$.1f%% (%2$.1f%% selected)" ),
+         * %2$.1f is percent of how much of the whole torrent we've downloaded */
+        pch = g_strdup_printf( _( "%1$.1f%% (%2$.1f%% selected)" ),
                                complete, done );
     gtk_label_set_text ( GTK_LABEL( a->progress_lb ), pch );
     g_free ( pch );
 
-    tr_strlsize( sizeStr,  stat->haveValid + stat->haveUnchecked,
-                sizeof( sizeStr ) );
-    tr_strlsize( sizeStr2, stat->haveValid,
-                sizeof( sizeStr2 ) );
+    i = (int) ceil( verifiedPieceCount );
+    tr_strlsize( buf1,  stat->haveValid + stat->haveUnchecked, sizeof( buf1 ) );
+    tr_strlsize( buf2, stat->haveValid, sizeof( buf2 ) );
     /* %1$s is total size of what we've saved to disk
-       %2$s is how much of it's passed the checksum test
-       %3$s is how many pieces are verified */
-    g_snprintf( buf, sizeof( buf ), _( "%1$s (%2$s verified in %3$d pieces)" ),
-                sizeStr, sizeStr2, (int)ceil(verifiedPieceCount) );
-    gtk_label_set_text( GTK_LABEL( a->have_lb ), buf );
+     * %2$s is how much of it's passed the checksum test
+     * %3$s is how many pieces are verified */
+    pch = g_strdup_printf( ngettext( "%1$s (%2$s verified in %3$d piece)",
+                                     "%1$s (%2$s verified in %3$d pieces)", i ),
+                           buf1, buf2, i );
+    gtk_label_set_text( GTK_LABEL( a->have_lb ), pch );
+    g_free( pch );
 
-    tr_strlsize( sizeStr, stat->downloadedEver, sizeof( sizeStr ) );
-    gtk_label_set_text( GTK_LABEL( a->dl_lb ), sizeStr );
+    tr_strlsize( buf1, stat->downloadedEver, sizeof( buf1 ) );
+    gtk_label_set_text( GTK_LABEL( a->dl_lb ), buf1 );
 
-    tr_strlsize( sizeStr, stat->uploadedEver, sizeof( sizeStr ) );
-    gtk_label_set_text( GTK_LABEL( a->ul_lb ), sizeStr );
+    tr_strlsize( buf1, stat->uploadedEver, sizeof( buf1 ) );
+    gtk_label_set_text( GTK_LABEL( a->ul_lb ), buf1 );
 
-    tr_strlsize( sizeStr, stat->corruptEver, sizeof( sizeStr ) );
-    gtk_label_set_text( GTK_LABEL( a->failed_lb ), sizeStr );
+    tr_strlsize( buf1, stat->corruptEver, sizeof( buf1 ) );
+    gtk_label_set_text( GTK_LABEL( a->failed_lb ), buf1 );
 
-    tr_strlratio( buf, stat->ratio, sizeof( buf ) );
-    gtk_label_set_text( GTK_LABEL( a->ratio_lb ), buf );
+    tr_strlratio( buf1, stat->ratio, sizeof( buf1 ) );
+    gtk_label_set_text( GTK_LABEL( a->ratio_lb ), buf1 );
 
-    tr_strlspeed( buf, stat->swarmSpeed, sizeof( buf ) );
-    gtk_label_set_text ( GTK_LABEL( a->swarm_lb ), buf );
+    tr_strlspeed( buf1, stat->swarmSpeed, sizeof( buf1 ) );
+    gtk_label_set_text ( GTK_LABEL( a->swarm_lb ), buf1 );
 
     gtk_label_set_text ( GTK_LABEL( a->err_lb ),
                         *stat->errorString ? stat->errorString : _( "None" ) );
