@@ -1178,6 +1178,7 @@ checkAndStartImpl( void * vtor )
     tor->startDate = time( NULL );
     tr_trackerStart( tor->tracker );
     tr_peerMgrStartTorrent( tor );
+    tr_torrentCheckSeedRatio( tor );
 
     tr_globalUnlock( tor->session );
 }
