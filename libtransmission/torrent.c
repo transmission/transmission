@@ -2135,7 +2135,7 @@ tr_torrentCheckSeedRatio( tr_torrent * tor )
     assert( tr_isTorrent( tor ) );
 
     /* if we're seeding and we've reached our seed ratio limit, stop the torrent */
-    if( tr_torrentIsSeed( tor ) && tr_torrentGetSeedRatio( tor, &seedRatio ) )
+    if( tor->isRunning && tr_torrentIsSeed( tor ) && tr_torrentGetSeedRatio( tor, &seedRatio ) )
     {
         const uint64_t up = tor->uploadedCur + tor->uploadedPrev;
         uint64_t down = tor->downloadedCur + tor->downloadedPrev;
