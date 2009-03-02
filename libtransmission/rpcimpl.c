@@ -24,6 +24,7 @@
 #include "session.h"
 #include "stats.h"
 #include "torrent.h"
+#include "completion.h"
 #include "utils.h"
 #include "web.h"
 
@@ -424,6 +425,12 @@ addField( const tr_torrent * tor,
         tr_bencDictAddInt( d, key, st->peersKnown );
     else if( !strcmp( key, "peersSendingToUs" ) )
         tr_bencDictAddInt( d, key, st->peersSendingToUs );
+    else if( !strcmp( key, "pieces" ) ) {
+        const tr_bitfield * pieces = tr_cpPieceBitfield( &tor->completion );
+        char * str = tr_base64_encode( pieces->bits, pieces->byteCount, NULL );
+        tr_bencDictAddStr( d, key, str );
+        tr_free( str );
+    }
     else if( !strcmp( key, "pieceCount" ) )
         tr_bencDictAddInt( d, key, inf->pieceCount );
     else if( !strcmp( key, "pieceSize" ) )

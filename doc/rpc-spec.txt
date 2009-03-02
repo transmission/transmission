@@ -167,6 +167,7 @@
    peersGettingFromUs     | number                               | tr_stat
    peersKnown             | number                               | tr_stat
    peersSendingToUs       | number                               | tr_stat
+   pieces                 | string (see below)                   | tr_torrent
    pieceCount             | tnumber                              | tr_info
    pieceSize              | tnumber                              | tr_info
    priorities             | array (see below)                    | n/a
@@ -223,6 +224,12 @@
                           | fromIncoming            | number     | tr_stat
                           | fromPex                 | number     | tr_stat
                           | fromTracker             | number     | tr_stat
+   -----------------------+--------------------------------------+
+   pieces                 | A bitfield holding pieceCount flags  | tr_torrent
+                          | which are set to 'true' if we have   |
+                          | the piece matching that position.    |
+                          | JSON doesn't allow raw binary data,  |
+                          | so this is a base64-encoded string.  |
    -----------------------+--------------------------------------+
    priorities             | an array of tr_info.filecount        | tr_info
                           | numbers. each is the tr_priority_t   |
@@ -410,4 +417,7 @@
          |         |           | session-stats  | added "current-stats"
          |         |           | torrent-get    | new arg "downloadDir"
    ------+---------+-----------+----------------+-------------------------------
+   6     | 1.60    | yes       | torrent-get    | new arg "pieces"
+   ------+---------+-----------+----------------+-------------------------------
+
 

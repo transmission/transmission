@@ -267,6 +267,7 @@ static const char * details_keys[] = {
     "timesCompleted",
     "totalSize",
     "uploadedEver",
+    "pieces",
     "webseeds",
     "webseedsSendingToUs"
 };
@@ -847,6 +848,8 @@ printDetails( tr_benc * top )
         {
             tr_benc *    t = tr_bencListChild( torrents, ti );
             tr_benc *    l;
+            const uint8_t * raw;
+            size_t       rawlen;
             const char * str;
             char         buf[512];
             char         buf2[512];
@@ -1006,6 +1009,23 @@ printDetails( tr_benc * top )
                 printf( "  Piece Count: %" PRId64 "\n", i );
             if( tr_bencDictFindInt( t, "pieceSize", &i ) )
                 printf( "  Piece Size: %" PRId64 "\n", i );
+            printf( "\n" );
+
+            printf("PIECES\n  ");
+            if( tr_bencDictFindRaw( t, "pieces", &raw, &rawlen ) && tr_bencDictFindInt( t, "pieceCount", &j ) ) {
+                int len;
+                char * str = tr_base64_decode( raw, rawlen, &len );
+                for( i=k=0; k<len; ++k ) {
+                    int e;
+                    for( e=0; i<j && e<8; ++e, ++i )
+                        printf( str[k] & (1<<(7-e)) ? "1" : "0" );
+                    printf( " " );
+                    if( !(i%64) )
+                        printf( "\n  " );
+                }
+                tr_free( str );
+            }
+            printf( "\n" );
         }
     }
 }
@@ -1203,7 +1223,7 @@ printTorrentList( tr_benc * top )
             }
         }
 
-        printf( "Sum:         %9s             %6.1f  %6.1f\n",
+        printf( "Sum:         %9s            %6.1f  %6.1f\n",
                 strlsize( haveStr, total_size, sizeof( haveStr ) ),
                 total_up / 1024.0,
                 total_down / 1024.0 );
