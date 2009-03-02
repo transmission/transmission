@@ -147,15 +147,20 @@ makeview( PrivateData * p,
 
     view = gtk_tree_view_new( );
     gtk_tree_view_set_headers_visible( GTK_TREE_VIEW( view ), FALSE );
+    gtk_tree_view_set_fixed_height_mode( GTK_TREE_VIEW( view ), TRUE );
 
     p->selection = gtk_tree_view_get_selection( GTK_TREE_VIEW( view ) );
 
+    p->column = col = GTK_TREE_VIEW_COLUMN (g_object_new (GTK_TYPE_TREE_VIEW_COLUMN,		      
+        "title", _("Torrent"),
+        "resizable", TRUE,
+        "sizing", GTK_TREE_VIEW_COLUMN_FIXED,
+        NULL));
+
     p->renderer = r = torrent_cell_renderer_new( );
-    p->column = col = gtk_tree_view_column_new_with_attributes(
-                    _( "Torrent" ), r, "torrent", MC_TORRENT_RAW, NULL );
-    g_object_set( G_OBJECT( col ), "resizable", TRUE,
-                  "sizing", GTK_TREE_VIEW_COLUMN_FIXED,
-                  NULL );
+    gtk_tree_view_column_pack_start( col, r, FALSE );
+    gtk_tree_view_column_add_attribute( col, r, "torrent", MC_TORRENT_RAW );
+    
     gtk_tree_view_append_column( GTK_TREE_VIEW( view ), col );
     g_object_set( r, "xpad", GUI_PAD_SMALL, "ypad", GUI_PAD_SMALL, NULL );
 
@@ -198,8 +203,10 @@ prefsChanged( TrCore * core UNUSED,
     if( !strcmp( key, PREF_KEY_MINIMAL_VIEW ) )
     {
         g_object_set( p->renderer, "minimal", pref_flag_get( key ), NULL );
-        gtk_tree_view_column_queue_resize( p->column );
-        gtk_widget_queue_draw( p->view );
+        /* since the cell size has changed, we need gtktreeview to revalidate
+         * its fixed-height mode values.  Unfortunately there's not an API call
+         * for that, but it *does* revalidate when it thinks the style's been tweaked */
+        g_signal_emit_by_name( p->view, "style-set", NULL, NULL );
     }
     else if( !strcmp( key, PREF_KEY_STATUSBAR ) )
     {
