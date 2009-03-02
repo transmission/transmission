@@ -42,6 +42,7 @@ noinst_HEADERS = \
     details.h \
     dialogs.h \
     hig.h \
+    icons.h \
     file-list.h \
     lock.h \
     logo.h \
@@ -75,6 +76,7 @@ transmission_SOURCES = \
     dialogs.c \
     file-list.c \
     hig.c \
+    icons.c \
     main.c \
     makemeta-ui.c \
     msgwin.c \

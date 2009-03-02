@@ -34,6 +34,7 @@
 
 #include "file-list.h"
 #include "hig.h"
+#include "icons.h"
 
 enum
 {
@@ -49,7 +50,7 @@ enum
 
 enum
 {
-    FC_STOCK,
+    FC_ICON,
     FC_LABEL,
     FC_PROG,
     FC_KEY,
@@ -103,28 +104,30 @@ freeData( gpointer gdata )
 ***/
 
 static void
-parsepath( const tr_torrent * tor,
-           GtkTreeStore *     store,
-           GtkTreeIter *      ret,
-           const char *       path,
-           tr_file_index_t    index,
-           uint64_t           size )
+parsepath( GtkWidget         * w,
+           const tr_torrent  * tor,
+           GtkTreeStore      * store,
+           GtkTreeIter       * ret,
+           const char        * path,
+           tr_file_index_t     index,
+           uint64_t            size )
 {
     GtkTreeModel * model;
-    GtkTreeIter *  parent, start, iter;
-    char *         file, * lower, * mykey;
-    const char *   stock;
+    GtkTreeIter  * parent, start, iter;
+    char         * file, * lower, * mykey;
     int            priority = 0;
     gboolean       enabled = TRUE;
     gboolean       is_file;
-
+    GdkPixbuf    * icon;
+    const char   * mime_type;
+    
     model  = GTK_TREE_MODEL( store );
     parent = NULL;
     file   = g_path_get_basename( path );
     if( 0 != strcmp( file, path ) )
     {
         char * dir = g_path_get_dirname( path );
-        parsepath( tor, store, &start, dir, index, size );
+        parsepath( w, tor, store, &start, dir, index, size );
         parent = &start;
         g_free( dir );
     }
@@ -145,38 +148,43 @@ parsepath( const tr_torrent * tor,
     gtk_tree_store_append( store, &iter, parent );
     if( ( is_file = !ret ) )
     {
-        stock = GTK_STOCK_FILE;
         priority = tr_torrentGetFilePriority( tor, index );
         enabled  = tr_torrentGetFileDL( tor, index );
+	mime_type = get_mime_type_from_filename( file );
     }
     else
     {
-        stock = GTK_STOCK_DIRECTORY;
         size  = 0;
+	mime_type = DIRECTORY_MIME_TYPE; 
     }
+
+    icon = get_mime_type_icon( mime_type, GTK_ICON_SIZE_MENU, w ); 
 
 #if 0
     gtk_tree_store_set( store, &iter, FC_INDEX, index,
-                        FC_LABEL, file,
-                        FC_KEY, mykey,
-                        FC_STOCK, stock,
-                        FC_PRIORITY, priority,
-                        FC_ENABLED, enabled,
-                        FC_IS_FILE, is_file,
-                        FC_SIZE, size,
-                        FC_HAVE, 0,
-                        -1 );
+                                      FC_LABEL, file,
+                                      FC_KEY, mykey,
+                                      FC_ICON, icon,
+                                      FC_PRIORITY, priority,
+                                      FC_ENABLED, enabled,
+                                      FC_IS_FILE, is_file,
+                                      FC_SIZE, size,
+                                      FC_HAVE, 0,
+                                      -1 );
 #else
     gtk_tree_store_set( store, &iter, FC_INDEX, index, -1 );
     gtk_tree_store_set( store, &iter, FC_LABEL, file, -1 );
     gtk_tree_store_set( store, &iter, FC_KEY, mykey, -1 );
-    gtk_tree_store_set( store, &iter, FC_STOCK, stock, -1 );
+    gtk_tree_store_set( store, &iter, FC_ICON, icon, -1 );
     gtk_tree_store_set( store, &iter, FC_PRIORITY, priority, -1 );
     gtk_tree_store_set( store, &iter, FC_ENABLED, enabled, -1 );
     gtk_tree_store_set( store, &iter, FC_IS_FILE, is_file, -1 );
     gtk_tree_store_set( store, &iter, FC_SIZE, size, -1 );
     gtk_tree_store_set( store, &iter, FC_HAVE, 0, -1 );
 #endif
+
+    if( icon != NULL )
+	g_object_unref( icon );
 
 done:
     g_free( mykey );
@@ -447,7 +455,7 @@ file_list_set_torrent( GtkWidget * w,
 
     /* instantiate the model */
     store = gtk_tree_store_new ( N_FILE_COLS,
-                                 G_TYPE_STRING,    /* stock */
+    				 GDK_TYPE_PIXBUF,  /* icon */
                                  G_TYPE_STRING,    /* label */
                                  G_TYPE_INT,       /* prog [0..100] */
                                  G_TYPE_STRING,    /* key */
@@ -478,7 +486,7 @@ file_list_set_torrent( GtkWidget * w,
             const char * base =
                 g_path_is_absolute( path ) ? g_path_skip_root( path ) :
                 path;
-            parsepath( tor, store, NULL, base, i, inf->files[i].length );
+            parsepath( w, tor, store, NULL, base, i, inf->files[i].length );
         }
 
         refresh( data );
@@ -794,7 +802,7 @@ file_list_new( TrTorrent * gtor )
                                                 NULL ) );
     rend = gtk_cell_renderer_pixbuf_new( );
     gtk_tree_view_column_pack_start( col, rend, FALSE );
-    gtk_tree_view_column_add_attribute( col, rend, "stock-id", FC_STOCK );
+    gtk_tree_view_column_add_attribute( col, rend, "pixbuf", FC_ICON );
     /* add text renderer */
     rend = gtk_cell_renderer_text_new( );
     g_object_set( rend, "ellipsize", PANGO_ELLIPSIZE_END, NULL );
