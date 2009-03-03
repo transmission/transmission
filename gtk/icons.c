@@ -4,17 +4,16 @@
  */
 
 #include <glib.h>
-#include <glib/gi18n.h>
-#include <gio/gio.h>
 #include <gtk/gtk.h>
 #include "icons.h"
 
+#ifdef HAVE_GIO
+
+#include <gio/gio.h>
 
 #define VOID_PIXBUF_KEY "void-pixbuf"
 
-
 static GHashTable *static_strings = NULL;
-
 
 static const char *
 get_static_string( const char *s )
@@ -249,3 +248,22 @@ get_mime_type_from_filename( const char *file )
 {
     return get_static_string( g_content_type_guess( file, NULL, 0, NULL ));
 }
+
+#else
+
+GdkPixbuf * 
+get_mime_type_icon( const char   * mime_type,
+                    GtkIconSize    icon_size,
+                    GtkWidget    * for_widget )
+{
+    return NULL;
+}                    
+
+
+const char * 
+get_mime_type_from_filename( const char *file )
+{
+    return "uncertain";
+}
+
+#endif

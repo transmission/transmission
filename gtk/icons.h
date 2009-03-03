@@ -3,7 +3,6 @@
  * "There is no problem for me, you can license my code under whatever licence you wish :)"
  */
 
-
 #ifndef ICONS_H
 #define ICONS_H
 
