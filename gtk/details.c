@@ -709,7 +709,6 @@ peer_page_new( TrTorrent * gtor )
 
         m = webseed_model_new( tr_torrent_handle( gtor ) );
         v = gtk_tree_view_new_with_model( m );
-        gtk_tree_view_set_fixed_height_mode( GTK_TREE_VIEW( v ), TRUE );
         g_signal_connect( v, "button-release-event", G_CALLBACK( on_tree_view_button_released ), NULL );
         gtk_tree_view_set_rules_hint( GTK_TREE_VIEW( v ), TRUE );
         p->webseeds = GTK_LIST_STORE( m );
@@ -749,7 +748,6 @@ peer_page_new( TrTorrent * gtor )
                                   "has-tooltip", TRUE,
 #endif
                                   NULL ) );
-    gtk_tree_view_set_fixed_height_mode( GTK_TREE_VIEW( v ), TRUE );
     p->peer_tree_view = v;
 
 #if GTK_CHECK_VERSION( 2, 12, 0 )
