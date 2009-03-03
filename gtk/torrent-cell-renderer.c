@@ -11,6 +11,7 @@
  */
 
 #include "assert.h"
+#include <string.h> /* strcmp */
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
 #include <libtransmission/transmission.h>
@@ -364,6 +365,7 @@ get_size_minimal( TorrentCellRenderer * cell,
 
     /* cleanup */
     g_free( status );
+    g_object_unref( icon );
 }
 
 #define MAX3(a,b,c) MAX(a,MAX(b,c))
@@ -426,6 +428,7 @@ get_size_full( TorrentCellRenderer * cell,
     /* cleanup */
     g_free( status );
     g_free( progress );
+    g_object_unref( icon );
 }
 
 
@@ -555,6 +558,7 @@ render_minimal( TorrentCellRenderer   * cell,
 
     /* cleanup */
     g_free( status );
+    g_object_unref( icon );
 }
 
 static void
@@ -663,6 +667,7 @@ render_full( TorrentCellRenderer   * cell,
     /* cleanup */
     g_free( status );
     g_free( progress );
+    g_object_unref( icon );
 }
 
 static void

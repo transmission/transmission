@@ -3,13 +3,14 @@
  * "There is no problem for me, you can license my code under whatever licence you wish :)"
  */
 
+#include <string.h> /* strcmp */
 #include <glib.h>
 #include <gtk/gtk.h>
 #include "icons.h"
 
 #ifdef HAVE_GIO
-
-#include <gio/gio.h>
+ #include <gio/gio.h>
+#endif
 
 #define VOID_PIXBUF_KEY "void-pixbuf"
 
@@ -96,6 +97,7 @@ icon_cache_new (GtkWidget * for_widget,
     return icon_cache;
 }
 
+#ifdef HAVE_GIO
 static const char *
 _icon_cache_get_icon_key( GIcon * icon )
 {
@@ -218,6 +220,38 @@ icon_cache_get_mime_type_icon( IconCache  * icon_cache,
     return pixbuf;
 }
 
+#else /* HAVE_GIO */
+
+static GdkPixbuf *
+icon_cache_get_mime_type_icon( IconCache  * icon_cache,
+		               const char * mime_type )
+{
+    GdkPixbuf  * pixbuf;
+    const char * stock_name;
+
+    if( !strcmp( mime_type, DIRECTORY_MIME_TYPE ) )
+        stock_name = GTK_STOCK_DIRECTORY;
+    else
+        stock_name = GTK_STOCK_FILE;
+
+    pixbuf = g_hash_table_lookup( icon_cache->cache, stock_name );
+
+    if( pixbuf != NULL )
+    {
+        g_object_ref( pixbuf );
+        return pixbuf;
+    }
+
+    pixbuf = gtk_icon_theme_load_icon( icon_cache->icon_theme,
+                                       stock_name,
+                                       icon_cache->icon_size,
+                                       0, NULL );
+    g_hash_table_insert( icon_cache->cache, (gpointer) stock_name, g_object_ref( pixbuf ));
+    return pixbuf;
+}
+
+#endif
+
 
 GdkPixbuf * 
 get_mime_type_icon( const char   * mime_type,
@@ -244,26 +278,11 @@ get_mime_type_icon( const char   * mime_type,
 
 
 const char * 
-get_mime_type_from_filename( const char *file )
+get_mime_type_from_filename( const char * file G_GNUC_UNUSED )
 {
+#ifdef HAVE_GIO
     return get_static_string( g_content_type_guess( file, NULL, 0, NULL ));
-}
-
 #else
-
-GdkPixbuf * 
-get_mime_type_icon( const char   * mime_type,
-                    GtkIconSize    icon_size,
-                    GtkWidget    * for_widget )
-{
-    return NULL;
-}                    
-
-
-const char * 
-get_mime_type_from_filename( const char *file )
-{
     return "uncertain";
-}
-
 #endif
+}
