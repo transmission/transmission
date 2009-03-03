@@ -534,23 +534,29 @@ torrentGet( tr_session               * session,
 ****
 ***/
 
-static void
+static const char*
 setFilePriorities( tr_torrent * tor,
                    int          priority,
                    tr_benc *    list )
 {
-    int               i;
-    int64_t           tmp;
-    int               fileCount = 0;
-    const int         n = tr_bencListSize( list );
+    int i;
+    int64_t tmp;
+    int fileCount = 0;
+    const int n = tr_bencListSize( list );
+    const char * errmsg = NULL;
     tr_file_index_t * files = tr_new0( tr_file_index_t, tor->info.fileCount );
 
     if( n )
     {
-        for( i = 0; i < n; ++i )
-            if( tr_bencGetInt( tr_bencListChild( list, i ), &tmp ) )
-                if( 0 <= tmp && tmp < tor->info.fileCount )
+        for( i = 0; i < n; ++i ) {
+            if( tr_bencGetInt( tr_bencListChild( list, i ), &tmp ) ) {
+                if( 0 <= tmp && tmp < tor->info.fileCount ) {
                     files[fileCount++] = tmp;
+                } else {
+                    errmsg = "file index out of range";
+                }
+            }
+        }
     }
     else /* if empty set, apply to all */
     {
@@ -563,25 +569,32 @@ setFilePriorities( tr_torrent * tor,
         tr_torrentSetFilePriorities( tor, files, fileCount, priority );
 
     tr_free( files );
+    return errmsg;
 }
 
-static void
+static const char*
 setFileDLs( tr_torrent * tor,
             int          do_download,
             tr_benc *    list )
 {
-    int               i;
-    int64_t           tmp;
-    int               fileCount = 0;
-    const int         n = tr_bencListSize( list );
+    int i;
+    int64_t tmp;
+    int fileCount = 0;
+    const int n = tr_bencListSize( list );
+    const char * errmsg = NULL;
     tr_file_index_t * files = tr_new0( tr_file_index_t, tor->info.fileCount );
 
     if( n ) /* if argument list, process them */
     {
-        for( i = 0; i < n; ++i )
-            if( tr_bencGetInt( tr_bencListChild( list, i ), &tmp ) )
-                if( 0 <= tmp && tmp < tor->info.fileCount )
+        for( i = 0; i < n; ++i ) {
+            if( tr_bencGetInt( tr_bencListChild( list, i ), &tmp ) ) {
+                if( 0 <= tmp && tmp < tor->info.fileCount ) {
                     files[fileCount++] = tmp;
+                } else {
+                    errmsg = "file index out of range";
+                }
+            }
+        }
     }
     else /* if empty set, apply to all */
     {
@@ -594,6 +607,7 @@ setFileDLs( tr_torrent * tor,
         tr_torrentSetFileDLs( tor, files, fileCount, do_download );
 
     tr_free( files );
+    return errmsg;
 }
 
 static const char*
@@ -602,7 +616,8 @@ torrentSet( tr_session               * session,
             tr_benc                  * args_out UNUSED,
             struct tr_rpc_idle_data  * idle_data )
 {
-    int           i, torrentCount;
+    const char * errmsg = NULL;
+    int i, torrentCount;
     tr_torrent ** torrents = getTorrents( session, args_in, &torrentCount );
 
     assert( idle_data == NULL );
@@ -620,12 +635,12 @@ torrentSet( tr_session               * session,
             setFileDLs( tor, TRUE, files );
         if( tr_bencDictFindInt( args_in, "peer-limit", &tmp ) )
             tr_torrentSetPeerLimit( tor, tmp );
-        if( tr_bencDictFindList( args_in, "priority-high", &files ) )
-            setFilePriorities( tor, TR_PRI_HIGH, files );
-        if( tr_bencDictFindList( args_in, "priority-low", &files ) )
-            setFilePriorities( tor, TR_PRI_LOW, files );
-        if( tr_bencDictFindList( args_in, "priority-normal", &files ) )
-            setFilePriorities( tor, TR_PRI_NORMAL, files );
+        if( !errmsg &&  tr_bencDictFindList( args_in, "priority-high", &files ) )
+            errmsg = setFilePriorities( tor, TR_PRI_HIGH, files );
+        if( !errmsg && tr_bencDictFindList( args_in, "priority-low", &files ) )
+            errmsg = setFilePriorities( tor, TR_PRI_LOW, files );
+        if( !errmsg && tr_bencDictFindList( args_in, "priority-normal", &files ) )
+            errmsg = setFilePriorities( tor, TR_PRI_NORMAL, files );
         if( tr_bencDictFindInt( args_in, "speed-limit-down", &tmp ) )
             tr_torrentSetSpeedLimit( tor, TR_DOWN, tmp );
         if( tr_bencDictFindInt( args_in, "speed-limit-down-enabled", &tmp ) )
@@ -645,7 +660,7 @@ torrentSet( tr_session               * session,
     }
 
     tr_free( torrents );
-    return NULL;
+    return errmsg;
 }
 
 /***
