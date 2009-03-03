@@ -1,16 +1,14 @@
 /*
  * jQuery Form Plugin
- * version: 2.12 (06/07/2008)
+ * version: 2.21 (08-FEB-2009)
  * @requires jQuery v1.2.2 or later
  *
  * Examples and documentation at: http://malsup.com/jquery/form/
  * Dual licensed under the MIT and GPL licenses:
  *   http://www.opensource.org/licenses/mit-license.php
  *   http://www.gnu.org/licenses/gpl.html
- *
- * Revision: $Id$
  */
-(function($) {
+;(function($) {
 
 /*
     Usage Note:  
@@ -48,7 +46,7 @@
 $.fn.ajaxSubmit = function(options) {
     // fast fail if nothing selected (http://dev.jquery.com/ticket/2752)
     if (!this.length) {
-        console.log('ajaxSubmit: skipping submit process - no element selected');
+        log('ajaxSubmit: skipping submit process - no element selected');
         return this;
     }
 
@@ -67,13 +65,25 @@ $.fn.ajaxSubmit = function(options) {
     if (veto.veto) {
         log('ajaxSubmit: submit vetoed via form-pre-serialize trigger');
         return this;
-   }
+    }
 
+    // provide opportunity to alter form data before it is serialized
+    if (options.beforeSerialize && options.beforeSerialize(this, options) === false) {
+        log('ajaxSubmit: submit aborted via beforeSerialize callback');
+        return this;
+    }    
+   
     var a = this.formToArray(options.semantic);
     if (options.data) {
         options.extraData = options.data;
-        for (var n in options.data)
-            a.push( { name: n, value: options.data[n] } );
+        for (var n in options.data) {
+          if(options.data[n] instanceof Array) {
+            for (var k in options.data[n])
+              a.push( { name: n, value: options.data[n][k] } )
+          }  
+          else
+             a.push( { name: n, value: options.data[n] } );
+        }
     }
 
     // give pre-submit callback an opportunity to abort the submit
@@ -114,7 +124,7 @@ $.fn.ajaxSubmit = function(options) {
 
     options.success = function(data, status) {
         for (var i=0, max=callbacks.length; i < max; i++)
-            callbacks[i](data, status, $form);
+            callbacks[i].apply(options, [data, status, $form]);
     };
 
     // are there files to upload?
@@ -128,7 +138,7 @@ $.fn.ajaxSubmit = function(options) {
    if (options.iframe || found) { 
        // hack to fix Safari hang (thanks to Tim Molendijk for this)
        // see:  http://groups.google.com/group/jquery-dev/browse_thread/thread/36395b7ab510dd5d
-       if ($.browser.safari && options.closeKeepAlive)
+       if (options.closeKeepAlive)
            $.get(options.closeKeepAlive, fileUpload);
        else
            fileUpload();
@@ -145,29 +155,33 @@ $.fn.ajaxSubmit = function(options) {
     function fileUpload() {
         var form = $form[0];
         
-        if ($(':input[@name=submit]', form).length) {
+        if ($(':input[name=submit]', form).length) {
             alert('Error: Form elements must not be named "submit".');
             return;
         }
         
         var opts = $.extend({}, $.ajaxSettings, options);
+		var s = jQuery.extend(true, {}, $.extend(true, {}, $.ajaxSettings), opts);
 
         var id = 'jqFormIO' + (new Date().getTime());
-        var $io = $('<iframe id="' + id + '" name="' + id + '" />');
+        var $io = $('<iframe id="' + id + '" name="' + id + '" src="about:blank" />');
         var io = $io[0];
 
-        if ($.browser.msie || $.browser.opera) 
-            io.src = 'javascript:false;document.write("");';
         $io.css({ position: 'absolute', top: '-1000px', left: '-1000px' });
 
         var xhr = { // mock object
+            aborted: 0,
             responseText: null,
             responseXML: null,
             status: 0,
             statusText: 'n/a',
             getAllResponseHeaders: function() {},
             getResponseHeader: function() {},
-            setRequestHeader: function() {}
+            setRequestHeader: function() {},
+            abort: function() { 
+                this.aborted = 1; 
+                $io.attr('src','about:blank'); // abort op in progress
+            }
         };
 
         var g = opts.global;
@@ -175,6 +189,13 @@ $.fn.ajaxSubmit = function(options) {
         if (g && ! $.active++) $.event.trigger("ajaxStart");
         if (g) $.event.trigger("ajaxSend", [xhr, opts]);
 
+		if (s.beforeSend && s.beforeSend(xhr, s) === false) {
+			s.global && jQuery.active--;
+			return;
+        }
+        if (xhr.aborted)
+            return;
+        
         var cbInvoked = 0;
         var timedOut = 0;
 
@@ -191,18 +212,26 @@ $.fn.ajaxSubmit = function(options) {
                 }
             }
         }
-        
+
         // take a breath so that pending repaints get some cpu time before the upload starts
         setTimeout(function() {
             // make sure form attrs are set
             var t = $form.attr('target'), a = $form.attr('action');
-            $form.attr({
-                target:   id,
-                encoding: 'multipart/form-data',
-                enctype:  'multipart/form-data',
-                method:   'POST',
-                action:   opts.url
-            });
+
+			// update form attrs in IE friendly way
+			form.setAttribute('target',id);
+			if (form.getAttribute('method') != 'POST')
+				form.setAttribute('method', 'POST');
+			if (form.getAttribute('action') != opts.url)
+				form.setAttribute('action', opts.url);
+							
+            // ie borks in some cases when setting encoding
+            if (! options.skipEncodingOverride) {
+                $form.attr({
+                    encoding: 'multipart/form-data',
+                    enctype:  'multipart/form-data'
+                });
+            }
 
             // support timout
             if (opts.timeout)
@@ -224,18 +253,19 @@ $.fn.ajaxSubmit = function(options) {
             }
             finally {
                 // reset attrs and remove "extra" input elements
-                $form.attr('action', a);
-                t ? $form.attr('target', t) : $form.removeAttr('target');
+				form.setAttribute('action',a);
+                t ? form.setAttribute('target', t) : $form.removeAttr('target');
                 $(extraInputs).remove();
             }
         }, 10);
 
+        var nullCheckFlag = 0;
+		
         function cb() {
             if (cbInvoked++) return;
             
             io.detachEvent ? io.detachEvent('onload', cb) : io.removeEventListener('load', cb, false);
 
-            var operaHack = 0;
             var ok = true;
             try {
                 if (timedOut) throw 'timeout';
@@ -244,10 +274,10 @@ $.fn.ajaxSubmit = function(options) {
 
                 doc = io.contentWindow ? io.contentWindow.document : io.contentDocument ? io.contentDocument : io.document;
                 
-                if (doc.body == null && !operaHack && $.browser.opera) {
-                    // In Opera 9.2.x the iframe DOM is not always traversable when
-                    // the onload callback fires so we give Opera 100ms to right itself
-                    operaHack = 1;
+                if ((doc.body == null || doc.body.innerHTML == '') && !nullCheckFlag) {
+                    // in some browsers (cough, Opera 9.2.x) the iframe DOM is not always traversable when
+                    // the onload callback fires, so we give them a 2nd chance
+                    nullCheckFlag = 1;
                     cbInvoked--;
                     setTimeout(cb, 100);
                     return;
@@ -325,23 +355,23 @@ $.fn.ajaxForm = function(options) {
     }).each(function() {
         // store options in hash
         $(":submit,input:image", this).bind('click.form-plugin',function(e) {
-            var $form = this.form;
-            $form.clk = this;
+            var form = this.form;
+            form.clk = this;
             if (this.type == 'image') {
                 if (e.offsetX != undefined) {
-                    $form.clk_x = e.offsetX;
-                    $form.clk_y = e.offsetY;
+                    form.clk_x = e.offsetX;
+                    form.clk_y = e.offsetY;
                 } else if (typeof $.fn.offset == 'function') { // try to use dimensions plugin
                     var offset = $(this).offset();
-                    $form.clk_x = e.pageX - offset.left;
-                    $form.clk_y = e.pageY - offset.top;
+                    form.clk_x = e.pageX - offset.left;
+                    form.clk_y = e.pageY - offset.top;
                 } else {
-                    $form.clk_x = e.pageX - this.offsetLeft;
-                    $form.clk_y = e.pageY - this.offsetTop;
+                    form.clk_x = e.pageX - this.offsetLeft;
+                    form.clk_y = e.pageY - this.offsetTop;
                 }
             }
             // clear form vars
-            setTimeout(function() { $form.clk = $form.clk_x = $form.clk_y = null; }, 10);
+            setTimeout(function() { form.clk = form.clk_x = form.clk_y = null; }, 10);
         });
     });
 };
@@ -508,8 +538,9 @@ $.fieldValue = function(el, successful) {
         for(var i=(one ? index : 0); i < max; i++) {
             var op = ops[i];
             if (op.selected) {
-                // extra pain for IE...
-                var v = $.browser.msie && !(op.attributes['value'].specified) ? op.text : op.value;
+				var v = op.value;
+				if (!v) // extra pain for IE...
+                	v = (op.attributes && op.attributes['value'] && !(op.attributes['value'].specified)) ? op.text : op.value;
                 if (one) return v;
                 a.push(v);
             }
@@ -574,7 +605,7 @@ $.fn.enable = function(b) {
  * Checks/unchecks any matching checkboxes or radio buttons and
  * selects/deselects and matching option elements.
  */
-$.fn.select = function(select) {
+$.fn.selected = function(select) {
     if (select == undefined) select = true;
     return this.each(function() { 
         var t = this.type;
@@ -584,7 +615,7 @@ $.fn.select = function(select) {
             var $sel = $(this).parent('select');
             if (select && $sel[0] && $sel[0].type == 'select-one') {
                 // deselect all other options
-                $sel.find('option').select(false);
+                $sel.find('option').selected(false);
             }
             this.selected = select;
         }
