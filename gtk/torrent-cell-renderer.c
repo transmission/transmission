@@ -285,25 +285,12 @@ get_icon( const tr_torrent * tor, GtkIconSize icon_size, GtkWidget * for_widget 
     const char * mime_type;
     const tr_info * info = tr_torrentInfo( tor );
 
-    /* a very basic cache, but hits about 80% of the time... */
-    static GdkPixbuf   * prev_icon = NULL;
-    static GtkWidget   * prev_widget = NULL;
-    static const char  * prev_mime_type = NULL;
-    static GtkIconSize   prev_size = 0;
-
     if( info->fileCount > 1 )
         mime_type = DIRECTORY_MIME_TYPE;
     else
         mime_type = get_mime_type_from_filename( info->files[0].name );
 
-    if( ( for_widget == prev_widget ) && ( prev_size == icon_size ) && !strcmp( prev_mime_type, mime_type ) )
-        return prev_icon;
-
-    prev_mime_type = mime_type;
-    prev_size = icon_size;
-    prev_widget = for_widget;
-    prev_icon = get_mime_type_icon( mime_type, icon_size, for_widget );
-    return prev_icon;
+    return get_mime_type_icon( mime_type, icon_size, for_widget );
 }
 
 static GtkCellRenderer*
