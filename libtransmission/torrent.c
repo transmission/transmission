@@ -1454,6 +1454,7 @@ tr_torrentRecheckCompleteness( tr_torrent * tor )
         }
 
         tr_torrentSaveResume( tor );
+        tr_torrentCheckSeedRatio( tor );
     }
 
     tr_torrentUnlock( tor );
