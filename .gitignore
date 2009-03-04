@@ -1,6 +1,5 @@
 /.depend
-Transmission.xcodeproj/*.mode*v3
-Transmission.xcodeproj/*.mode1
+Transmission.xcodeproj/*.mode*
 Transmission.xcodeproj/*.pbxuser
 /beta
 /build
