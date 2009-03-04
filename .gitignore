@@ -1,6 +1,7 @@
 /.depend
 Transmission.xcodeproj/*.mode1
 Transmission.xcodeproj/*.pbxuser
+/beta
 /build
 cli/.depend
 cli/transmissioncli
@@ -18,3 +19,4 @@ macosx/Info.plist
 macosx/Transmission.app
 macosx/en.lproj/*~.nib
 po/*.mo
+/release
