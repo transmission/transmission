@@ -83,7 +83,7 @@ blocklistThreadFunc( gpointer gcore )
     gboolean ok = TRUE;
     char * filename = NULL;
     char * filename2 = NULL;
-    const char * url = "http://download.m0k.org/transmission/files/level1.gz";
+    const char * url = "http://update.transmissionbt.com/level1.gz";
     TrCore * core = TR_CORE( gcore );
 
     emitProgress( core, FALSE, _( "Retrieving blocklist..." ) );
