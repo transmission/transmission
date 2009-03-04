@@ -387,11 +387,11 @@ parseSpeedLimit( tr_torrent *    tor,
         readBytes( &i16, &buf, sizeof( i16 ) );
         tr_torrentSetSpeedLimit( tor, TR_DOWN, i16 );
         readBytes( &i8, &buf, sizeof( i8 ) );
-        tr_torrentSetSpeedMode( tor, TR_DOWN, (tr_speedlimit)i8 );
+        /*tr_torrentSetSpeedMode( tor, TR_DOWN, (tr_speedlimit)i8 );*/
         readBytes( &i16, &buf, sizeof( i16 ) );
         tr_torrentSetSpeedLimit( tor, TR_UP, i16 );
         readBytes( &i8, &buf, sizeof( i8 ) );
-        tr_torrentSetSpeedMode( tor, TR_UP, (tr_speedlimit)i8 );
+        /*tr_torrentSetSpeedMode( tor, TR_UP, (tr_speedlimit)i8 );*/
 
         ret = TR_FR_SPEEDLIMIT;
     }

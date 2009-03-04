@@ -132,8 +132,6 @@ struct tr_torrent
     tr_session *             session;
     tr_info                  info;
 
-    tr_speedlimit            speedLimitMode[2];
-
     struct tr_ratecontrol    swarmSpeed;
 
     int                      magicNumber;

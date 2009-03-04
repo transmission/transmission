@@ -366,10 +366,6 @@ addField( const tr_torrent * tor,
         tr_bencDictAddInt( d, key, st->downloadedEver );
     else if( !strcmp( key, "downloaders" ) )
         tr_bencDictAddInt( d, key, st->downloaders );
-    else if( !strcmp( key, "downloadLimitMode" ) )
-        tr_bencDictAddInt( d, key, tr_torrentGetSpeedMode( tor, TR_DOWN ) );
-    else if( !strcmp( key, "downloadLimit" ) )
-        tr_bencDictAddInt( d, key, tr_torrentGetSpeedLimit( tor, TR_DOWN ) );
     else if( !strcmp( key, "error" ) )
         tr_bencDictAddInt( d, key, st->error );
     else if( !strcmp( key, "errorString" ) )
@@ -456,6 +452,18 @@ addField( const tr_torrent * tor,
         tr_bencDictAddInt( d, key, st->seeders );
     else if( !strcmp( key, "sizeWhenDone" ) )
         tr_bencDictAddInt( d, key, st->sizeWhenDone );
+    else if( !strcmp( key, "speed-limit-down" ) )
+        tr_bencDictAddInt( d, key, tr_torrentGetSpeedLimit( tor, TR_DOWN ) );
+    else if( !strcmp( key, "speed-limit-down-enabled" ) )
+        tr_bencDictAddInt( d, key, tr_torrentIsUsingSpeedLimit( tor, TR_DOWN ) );
+    else if( !strcmp( key, "speed-limit-down-global-enabled" ) )
+        tr_bencDictAddInt( d, key, tr_torrentIsUsingGlobalSpeedLimit( tor, TR_DOWN ) );
+    else if( !strcmp( key, "speed-limit-up" ) )
+        tr_bencDictAddInt( d, key, tr_torrentGetSpeedLimit( tor, TR_UP ) );
+    else if( !strcmp( key, "speed-limit-up-enabled" ) )
+        tr_bencDictAddInt( d, key, tr_torrentIsUsingSpeedLimit( tor, TR_UP ) );
+    else if( !strcmp( key, "speed-limit-up-global-enabled" ) )
+        tr_bencDictAddInt( d, key, tr_torrentIsUsingGlobalSpeedLimit( tor, TR_UP ) );
     else if( !strcmp( key, "startDate" ) )
         tr_bencDictAddInt( d, key, st->startDate );
     else if( !strcmp( key, "status" ) )
@@ -470,10 +478,6 @@ addField( const tr_torrent * tor,
         tr_bencDictAddInt( d, key, inf->totalSize );
     else if( !strcmp( key, "uploadedEver" ) )
         tr_bencDictAddInt( d, key, st->uploadedEver );
-    else if( !strcmp( key, "uploadLimitMode" ) )
-        tr_bencDictAddInt( d, key,   tr_torrentGetSpeedMode( tor, TR_UP ) );
-    else if( !strcmp( key, "uploadLimit" ) )
-        tr_bencDictAddInt( d, key, tr_torrentGetSpeedLimit( tor, TR_UP ) );
     else if( !strcmp( key, "uploadRatio" ) )
         tr_bencDictAddDouble( d, key,
                              tr_getRatio( st->uploadedEver,
@@ -644,14 +648,15 @@ torrentSet( tr_session               * session,
         if( tr_bencDictFindInt( args_in, "speed-limit-down", &tmp ) )
             tr_torrentSetSpeedLimit( tor, TR_DOWN, tmp );
         if( tr_bencDictFindInt( args_in, "speed-limit-down-enabled", &tmp ) )
-            tr_torrentSetSpeedMode(
-                tor, TR_DOWN, tmp ? TR_SPEEDLIMIT_SINGLE
-                : TR_SPEEDLIMIT_GLOBAL );
+            tr_torrentUseSpeedLimit( tor, TR_DOWN, tmp!=0 );
+        if( tr_bencDictFindInt( args_in, "speed-limit-down-global-enabled", &tmp ) )
+            tr_torrentUseGlobalSpeedLimit( tor, TR_DOWN, tmp!=0 );
         if( tr_bencDictFindInt( args_in, "speed-limit-up", &tmp ) )
             tr_torrentSetSpeedLimit( tor, TR_UP, tmp );
         if( tr_bencDictFindInt( args_in, "speed-limit-up-enabled", &tmp ) )
-            tr_torrentSetSpeedMode( tor, TR_UP, tmp ? TR_SPEEDLIMIT_SINGLE
-                                    : TR_SPEEDLIMIT_GLOBAL );
+            tr_torrentUseSpeedLimit( tor, TR_UP, tmp!=0 );
+        if( tr_bencDictFindInt( args_in, "speed-limit-up-global-enabled", &tmp ) )
+            tr_torrentUseGlobalSpeedLimit( tor, TR_UP, tmp!=0 );
         if( tr_bencDictFindDouble( args_in, "ratio-limit", &d ) )
             tr_torrentSetRatioLimit( tor, d );
         if( tr_bencDictFindInt( args_in, "ratio-limit-mode", &tmp ) )

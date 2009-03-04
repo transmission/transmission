@@ -872,13 +872,21 @@ int tr_torrentId( const tr_torrent * torrent );
 *****  Speed Limits
 ****/
 
-typedef enum
-{
-    TR_SPEEDLIMIT_GLOBAL,    /* only follow the overall speed limit */
-    TR_SPEEDLIMIT_SINGLE,    /* only follow the per-torrent limit */
-    TR_SPEEDLIMIT_UNLIMITED  /* no limits at all */
-}
-tr_speedlimit;
+void     tr_torrentSetSpeedLimit( tr_torrent *, tr_direction, int KiB_sec );
+
+int      tr_torrentGetSpeedLimit( const tr_torrent *, tr_direction );
+
+void     tr_torrentUseSpeedLimit( tr_torrent *, tr_direction, tr_bool do_use );
+
+tr_bool  tr_torrentIsUsingSpeedLimit( const tr_torrent *, tr_direction );
+
+void     tr_torrentUseGlobalSpeedLimit( tr_torrent *, tr_direction, tr_bool do_use );
+
+tr_bool  tr_torrentIsUsingGlobalSpeedLimit ( const tr_torrent *, tr_direction );
+
+/****
+*****  Ratio Limits
+****/
 
 typedef enum
 {
@@ -887,20 +895,6 @@ typedef enum
     TR_RATIOLIMIT_UNLIMITED = 2  /* override the global settings, seeding regardless of ratio */
 }
 tr_ratiolimit;
-
-void          tr_torrentSetSpeedMode( tr_torrent     * tor,
-                                      tr_direction     up_or_down,
-                                      tr_speedlimit    mode );
-
-tr_speedlimit tr_torrentGetSpeedMode( const tr_torrent * tor,
-                                      tr_direction       direction );
-
-void          tr_torrentSetSpeedLimit( tr_torrent    * tor,
-                                       tr_direction    up_or_down,
-                                       int             KiB_sec );
-
-int           tr_torrentGetSpeedLimit( const tr_torrent  * tor,
-                                       tr_direction        direction );
 
 void          tr_torrentSetRatioMode( tr_torrent         * tor,
                                       tr_ratiolimit        mode );

@@ -109,46 +109,62 @@ tr_torrentFindFromObfuscatedHash( tr_session * session,
 ***/
 
 void
-tr_torrentSetSpeedMode( tr_torrent *  tor,
-                        tr_direction  dir,
-                        tr_speedlimit mode )
+tr_torrentSetSpeedLimit( tr_torrent * tor, tr_direction dir, int KiB_sec )
 {
-    assert( tor != NULL );
-    assert( tr_isDirection( dir ) );
-    assert( mode==TR_SPEEDLIMIT_GLOBAL || mode==TR_SPEEDLIMIT_SINGLE || mode==TR_SPEEDLIMIT_UNLIMITED  );
-
-    tor->speedLimitMode[dir] = mode;
-
-    tr_bandwidthSetLimited( tor->bandwidth, dir, mode==TR_SPEEDLIMIT_SINGLE );
-    tr_bandwidthHonorParentLimits( tor->bandwidth, dir, mode==TR_SPEEDLIMIT_GLOBAL );
-}
-
-tr_speedlimit
-tr_torrentGetSpeedMode( const tr_torrent * tor,
-                        tr_direction       dir )
-{
-    assert( tor != NULL );
+    assert( tr_isTorrent( tor ) );
     assert( tr_isDirection( dir ) );
 
-    return tor->speedLimitMode[dir];
-}
-
-void
-tr_torrentSetSpeedLimit( tr_torrent * tor,
-                         tr_direction dir,
-                         int          desiredSpeed )
-{
-    tr_bandwidthSetDesiredSpeed( tor->bandwidth, dir, desiredSpeed );
+    tr_bandwidthSetDesiredSpeed( tor->bandwidth, dir, KiB_sec );
 }
 
 int
-tr_torrentGetSpeedLimit( const tr_torrent * tor,
-                         tr_direction       dir )
+tr_torrentGetSpeedLimit( const tr_torrent * tor, tr_direction dir )
 {
     assert( tr_isTorrent( tor ) );
+    assert( tr_isDirection( dir ) );
 
     return tr_bandwidthGetDesiredSpeed( tor->bandwidth, dir );
 }
+
+void
+tr_torrentUseSpeedLimit( tr_torrent * tor, tr_direction dir, tr_bool do_use )
+{
+    assert( tr_isTorrent( tor ) );
+    assert( tr_isDirection( dir ) );
+
+    tr_bandwidthSetLimited( tor->bandwidth, dir, do_use );
+}
+
+tr_bool
+tr_torrentIsUsingSpeedLimit( const tr_torrent * tor, tr_direction dir )
+{
+    assert( tr_isTorrent( tor ) );
+    assert( tr_isDirection( dir ) );
+
+    return tr_bandwidthIsLimited( tor->bandwidth, dir );
+}
+
+void
+tr_torrentUseGlobalSpeedLimit( tr_torrent * tor, tr_direction dir, tr_bool do_use )
+{
+    assert( tr_isTorrent( tor ) );
+    assert( tr_isDirection( dir ) );
+
+    tr_bandwidthHonorParentLimits( tor->bandwidth, dir, do_use );
+}
+
+tr_bool
+tr_torrentIsUsingGlobalSpeedLimit( const tr_torrent * tor, tr_direction dir )
+{
+    assert( tr_isTorrent( tor ) );
+    assert( tr_isDirection( dir ) );
+
+    return tr_bandwidthAreParentLimitsHonored( tor->bandwidth, dir );
+}
+
+/***
+****
+***/
 
 void
 tr_torrentSetRatioMode( tr_torrent *  tor, tr_ratiolimit mode )
@@ -192,29 +208,18 @@ tr_bool
 tr_torrentIsPieceTransferAllowed( const tr_torrent  * tor,
                                   tr_direction        direction )
 {
-    tr_bool isEnabled = FALSE;
+    tr_bool allowed = TRUE;
 
-    switch( tr_torrentGetSpeedMode( tor, direction ) )
-    {
-        case TR_SPEEDLIMIT_GLOBAL:
-            isEnabled = !tr_sessionIsSpeedLimitEnabled( tor->session, direction )
-                      || tr_sessionGetSpeedLimit( tor->session, direction ) > 0;
-            break;
+    if( tr_torrentIsUsingSpeedLimit( tor, direction ) )
+        if( tr_torrentGetSpeedLimit( tor, direction ) <= 0 )
+            allowed = FALSE;
 
-        case TR_SPEEDLIMIT_SINGLE:
-            isEnabled = tr_torrentGetSpeedLimit( tor, direction ) > 0;
-            break;
+    if( tr_torrentIsUsingGlobalSpeedLimit( tor, direction ) )
+        if( tr_sessionIsSpeedLimitEnabled( tor->session, direction ) )
+            if( tr_sessionGetSpeedLimit( tor->session, direction ) <= 0 )
+                allowed = FALSE;
 
-        case TR_SPEEDLIMIT_UNLIMITED:
-            isEnabled = TRUE;
-            break;
-
-        default:
-            assert( 0 && "unhandled speed mode" );
-            break;
-    }
-
-    return isEnabled;
+    return allowed;
 }
 
 tr_bool

@@ -51,7 +51,7 @@
 char*
 tr_strlratio( char * buf, double ratio, size_t buflen )
 {
-    tr_strratio( buf, buflen, ratio, "\xE2\x88\x9E" );
+    return tr_strratio( buf, buflen, ratio, "\xE2\x88\x9E" );
 }
 
 #define KILOBYTE_FACTOR 1024.0

@@ -1152,29 +1152,33 @@ activity_page_new( TrTorrent * gtor )
 ****/
 
 static void
-speed_toggled_cb( GtkToggleButton * tb,
-                  gpointer          gtor,
-                  int               up_or_down )
+up_speed_toggled_cb( GtkToggleButton *tb,
+                     gpointer         gtor )
 {
     tr_torrent * tor = tr_torrent_handle ( gtor );
-    gboolean     b = gtk_toggle_button_get_active( tb );
+    const gboolean b = gtk_toggle_button_get_active( tb );
 
-    tr_torrentSetSpeedMode( tor, up_or_down, b ? TR_SPEEDLIMIT_SINGLE
-                            : TR_SPEEDLIMIT_GLOBAL );
+    tr_torrentUseSpeedLimit( tor, TR_UP, b );
 }
 
 static void
-ul_speed_toggled_cb( GtkToggleButton *tb,
-                     gpointer         gtor )
+down_speed_toggled_cb( GtkToggleButton *tb,
+                       gpointer         gtor )
 {
-    speed_toggled_cb( tb, gtor, TR_UP );
+    tr_torrent * tor = tr_torrent_handle ( gtor );
+    const gboolean b = gtk_toggle_button_get_active( tb );
+
+    tr_torrentUseSpeedLimit( tor, TR_DOWN, b );
 }
 
 static void
-dl_speed_toggled_cb( GtkToggleButton *tb,
-                     gpointer         gtor )
+global_speed_toggled_cb( GtkToggleButton * tb, gpointer gtor )
 {
-    speed_toggled_cb( tb, gtor, TR_DOWN );
+    tr_torrent * tor = tr_torrent_handle ( gtor );
+    const gboolean b = gtk_toggle_button_get_active( tb );
+
+    tr_torrentUseGlobalSpeedLimit( tor, TR_UP, b );
+    tr_torrentUseGlobalSpeedLimit( tor, TR_DOWN, b );
 }
 
 #define RATIO_MODE_KEY "ratio-mode"
@@ -1191,41 +1195,35 @@ ratio_mode_changed_cb( GtkToggleButton * tb, gpointer gtor )
 }
 
 static void
-sensitize_from_check_cb( GtkToggleButton *toggle,
-                         gpointer         w )
+sensitize_from_check_cb( GtkToggleButton * toggle, gpointer w )
 {
     gtk_widget_set_sensitive ( GTK_WIDGET( w ),
-                              gtk_toggle_button_get_active( toggle ) );
+                               gtk_toggle_button_get_active( toggle ) );
 }
 
 static void
-setSpeedLimit( GtkSpinButton* spin,
-               gpointer       gtor,
-               int            up_or_down )
+setSpeedLimit( GtkSpinButton* spin, gpointer gtor, int up_or_down )
 {
     tr_torrent * tor = tr_torrent_handle ( gtor );
-    int          kb_sec = gtk_spin_button_get_value_as_int ( spin );
+    const int kb_sec = gtk_spin_button_get_value_as_int ( spin );
 
     tr_torrentSetSpeedLimit( tor, up_or_down, kb_sec );
 }
 
 static void
-ul_speed_spun_cb( GtkSpinButton *spin,
-                  gpointer       gtor )
+up_speed_spun_cb( GtkSpinButton * spin, gpointer gtor )
 {
     setSpeedLimit( spin, gtor, TR_UP );
 }
 
 static void
-dl_speed_spun_cb( GtkSpinButton *spin,
-                  gpointer       gtor )
+down_speed_spun_cb( GtkSpinButton * spin, gpointer gtor )
 {
     setSpeedLimit( spin, gtor, TR_DOWN );
 }
 
 static void
-ratio_spun_cb( GtkSpinButton *spin,
-               gpointer       gtor )
+ratio_spun_cb( GtkSpinButton * spin, gpointer gtor )
 {
     tr_torrent * tor = tr_torrent_handle ( gtor );
     float        ratio = gtk_spin_button_get_value ( spin );
@@ -1234,8 +1232,7 @@ ratio_spun_cb( GtkSpinButton *spin,
 }
 
 static void
-max_peers_spun_cb( GtkSpinButton * spin,
-                   gpointer        gtor )
+max_peers_spun_cb( GtkSpinButton * spin, gpointer gtor )
 {
     const uint16_t n = gtk_spin_button_get_value( spin );
 
@@ -1285,49 +1282,40 @@ options_page_new( ResponseData * data )
 
     row = 0;
     t = hig_workarea_create ( );
-    hig_workarea_add_section_title ( t, &row, _( "Limits" ) );
+    hig_workarea_add_section_title ( t, &row, _( "Speed Limits" ) );
 
-    tb =
-        gtk_check_button_new_with_mnemonic ( _(
-                                                "Limit _download speed (KB/s):" ) );
-    b = tr_torrentGetSpeedMode( tor, TR_DOWN ) == TR_SPEEDLIMIT_SINGLE;
-    gtk_toggle_button_set_active ( GTK_TOGGLE_BUTTON( tb ), b );
-    g_signal_connect ( tb, "toggled", G_CALLBACK(
-                           dl_speed_toggled_cb ), gtor );
+        b = tr_torrentIsUsingGlobalSpeedLimit( tor, TR_UP );
+        tb = hig_workarea_add_wide_checkbutton( t, &row, _( "Honor global _limits" ), b );
+        g_signal_connect( tb, "toggled", G_CALLBACK( global_speed_toggled_cb ), gtor );
 
-    i = tr_torrentGetSpeedLimit( tor, TR_DOWN );
-    w = gtk_spin_button_new_with_range( 1, INT_MAX, 5 );
-    gtk_spin_button_set_value( GTK_SPIN_BUTTON( w ), i );
+        tb = gtk_check_button_new_with_mnemonic ( _( "Limit _download speed (KB/s):" ) );
+        b = tr_torrentIsUsingSpeedLimit( tor, TR_DOWN );
+        gtk_toggle_button_set_active ( GTK_TOGGLE_BUTTON( tb ), b );
+        g_signal_connect ( tb, "toggled", G_CALLBACK( down_speed_toggled_cb ), gtor );
 
-    g_signal_connect ( w, "value-changed", G_CALLBACK(
-                           dl_speed_spun_cb ), gtor );
-    g_signal_connect ( tb, "toggled", G_CALLBACK(
-                           sensitize_from_check_cb ), w );
-    sensitize_from_check_cb ( GTK_TOGGLE_BUTTON( tb ), w );
-    hig_workarea_add_row_w ( t, &row, tb, w, NULL );
+        i = tr_torrentGetSpeedLimit( tor, TR_DOWN );
+        w = gtk_spin_button_new_with_range( 1, INT_MAX, 5 );
+        gtk_spin_button_set_value( GTK_SPIN_BUTTON( w ), i );
+        g_signal_connect ( w, "value-changed", G_CALLBACK( down_speed_spun_cb ), gtor );
+        g_signal_connect ( tb, "toggled", G_CALLBACK( sensitize_from_check_cb ), w );
+        sensitize_from_check_cb ( GTK_TOGGLE_BUTTON( tb ), w );
+        hig_workarea_add_row_w ( t, &row, tb, w, NULL );
 
-    tb =
-        gtk_check_button_new_with_mnemonic ( _(
-                                                "Limit _upload speed (KB/s):" ) );
-    b = tr_torrentGetSpeedMode( tor, TR_UP ) == TR_SPEEDLIMIT_SINGLE;
-    gtk_toggle_button_set_active ( GTK_TOGGLE_BUTTON( tb ), b );
-    g_signal_connect ( tb, "toggled", G_CALLBACK(
-                           ul_speed_toggled_cb ), gtor );
+        tb = gtk_check_button_new_with_mnemonic ( _( "Limit _upload speed (KB/s):" ) );
+        b = tr_torrentIsUsingSpeedLimit( tor, TR_UP );
+        gtk_toggle_button_set_active ( GTK_TOGGLE_BUTTON( tb ), b );
+        g_signal_connect ( tb, "toggled", G_CALLBACK( up_speed_toggled_cb ), gtor );
 
-    i = tr_torrentGetSpeedLimit( tor, TR_UP );
-    w = gtk_spin_button_new_with_range( 1, INT_MAX, 5 );
-    gtk_spin_button_set_value( GTK_SPIN_BUTTON( w ), i );
-
-    g_signal_connect ( w, "value-changed", G_CALLBACK(
-                           ul_speed_spun_cb ), gtor );
-    g_signal_connect ( tb, "toggled", G_CALLBACK(
-                           sensitize_from_check_cb ), w );
-    sensitize_from_check_cb ( GTK_TOGGLE_BUTTON( tb ), w );
-    hig_workarea_add_row_w ( t, &row, tb, w, NULL );
+        i = tr_torrentGetSpeedLimit( tor, TR_UP );
+        w = gtk_spin_button_new_with_range( 1, INT_MAX, 5 );
+        gtk_spin_button_set_value( GTK_SPIN_BUTTON( w ), i );
+        g_signal_connect ( w, "value-changed", G_CALLBACK( up_speed_spun_cb ), gtor );
+        g_signal_connect ( tb, "toggled", G_CALLBACK( sensitize_from_check_cb ), w );
+        sensitize_from_check_cb ( GTK_TOGGLE_BUTTON( tb ), w );
+        hig_workarea_add_row_w ( t, &row, tb, w, NULL );
 
     hig_workarea_add_section_divider ( t, &row );
     hig_workarea_add_section_title ( t, &row, _( "Seed-Until Ratio" ) );
-
 
         group = NULL;
         mode = tr_torrentGetRatioMode( tor );
