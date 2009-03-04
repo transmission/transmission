@@ -78,14 +78,13 @@ writeFunc( void * ptr,
 static gpointer
 blocklistThreadFunc( gpointer gcore )
 {
-    TrCore *     core = TR_CORE( gcore );
-    const char * url =
-        "http://download.m0k.org/transmission/files/level1.gz";
-    gboolean     ok = TRUE;
-    char *       filename = NULL;
-    char *       filename2 = NULL;
-    int          fd;
-    int          rules;
+    int fd;
+    int rules;
+    gboolean ok = TRUE;
+    char * filename = NULL;
+    char * filename2 = NULL;
+    const char * url = "http://download.m0k.org/transmission/files/level1.gz";
+    TrCore * core = TR_CORE( gcore );
 
     emitProgress( core, FALSE, _( "Retrieving blocklist..." ) );
 
