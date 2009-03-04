@@ -658,6 +658,20 @@ etaToString( char *  buf,
 #define MEGABYTE_FACTOR ( 1024.0 * 1024.0 )
 #define GIGABYTE_FACTOR ( 1024.0 * 1024.0 * 1024.0 )
 
+static void
+printf_double_without_rounding( char * buf, int buflen, double d, int places )
+{
+    char * pch;
+    char tmp[128];
+    int len;
+    tr_snprintf( tmp, sizeof( tmp ), "%'.64f", d );
+    pch = strchr( tmp, '.' );
+    pch += places + 1;
+    len = MIN( buflen - 1, pch - tmp );
+    memcpy( buf, tmp, len );
+    buf[len] = '\0';
+}
+
 static char*
 strlratio2( char * buf, double ratio, size_t buflen )
 {
@@ -666,9 +680,9 @@ strlratio2( char * buf, double ratio, size_t buflen )
     else if( (int)ratio == TR_RATIO_INF )
         tr_strlcpy( buf, "Inf", buflen );
     else if( ratio < 10.0 )
-        tr_snprintf( buf, buflen, "%'.2f", ratio );
+        printf_double_without_rounding( buf, buflen, ratio, 2 );
     else if( ratio < 100.0 )
-        tr_snprintf( buf, buflen, "%'.1f", ratio );
+        printf_double_without_rounding( buf, buflen, ratio, 1 );
     else
         tr_snprintf( buf, buflen, "%'.0f", ratio );
     return buf;
