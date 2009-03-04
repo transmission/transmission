@@ -135,6 +135,9 @@ TransmissionRemote.prototype =
 			remote.loadTorrents();
 		}, "json" );
 	},
+	verifyTorrents: function( torrents ) {
+		this.sendTorrentCommand( 'torrent-verify', torrents );
+	},
 	addTorrentByUrl: function( url, options ) {
 		this.sendRequest( RPC._Root, $.toJSON({
 			method: 'torrent-add',

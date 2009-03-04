@@ -204,6 +204,9 @@ Transmission.prototype =
 	contextRemoveDataSelected: function( ) {
 		transmission.removeSelectedTorrentsAndData( );
 	},
+	contextVerifySelected: function( ) {
+		transmission.verifySelectedTorrents( );
+	},
 	contextToggleInspector: function( ) {
 		transmission.toggleInspector( );
 	},
@@ -224,6 +227,7 @@ Transmission.prototype =
 			context_resume_selected:   this.contextStartSelected,
 			context_remove:            this.contextRemoveSelected,
 			context_removedata:        this.contextRemoveDataSelected,
+			context_verify:            this.contextVerifySelected,
 			context_toggle_inspector:  this.contextToggleInspector,
 			context_select_all:        this.contextSelectAll,
 			context_deselect_all:      this.contextDeselectAll
@@ -1251,6 +1255,10 @@ Transmission.prototype =
 		this.remote.removeTorrentsAndData( torrents );
 	},
 
+	verifySelectedTorrents: function() {
+		this.verifyTorrents( this.getSelectedTorrents( ) );
+	},
+
 	startSelectedTorrents: function( ) {
 		this.startTorrents( this.getSelectedTorrents( ) );
 	},
@@ -1262,6 +1270,12 @@ Transmission.prototype =
 	},
 	startTorrents: function( torrents ) {
 		this.remote.startTorrents( torrents );
+	},
+	verifyTorrent: function( torrent ) {
+		this.verifyTorrents( [ torrent ] );
+	},
+	verifyTorrents: function( torrents ) {
+		this.remote.verifyTorrents( torrents );
 	},
     
 	stopSelectedTorrents: function( ) {
