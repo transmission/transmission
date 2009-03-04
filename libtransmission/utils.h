@@ -458,6 +458,15 @@ int tr_ptr2int( void* );
 
 void* tr_int2ptr( int );
 
+/**
+ * @param buf the buffer to write the string to
+ * @param buflef buf's size
+ * @param ratio the ratio to convert to a string
+ * @param the string represntation of "infinity"
+ */
+char* tr_strratio( char * buf, size_t buflen, double ratio, const char * infinity );
+
+
 #ifdef __cplusplus
 }
 #endif

@@ -48,34 +48,10 @@
 #include "tr-prefs.h"
 #include "util.h"
 
-static void
-printf_double_without_rounding( char * buf, int buflen, double d, int places )
-{
-    char * pch;
-    char tmp[128];
-    int len;
-    g_snprintf( tmp, sizeof( tmp ), "%'.64f", d );
-    pch = strchr( tmp, '.' );
-    pch += places + 1;
-    len = MIN( buflen - 1, pch - tmp );
-    memcpy( buf, tmp, len );
-    buf[len] = '\0';
-}
-
 char*
 tr_strlratio( char * buf, double ratio, size_t buflen )
 {
-    if( (int)ratio == TR_RATIO_NA )
-        g_strlcpy( buf, _( "None" ), buflen );
-    else if( (int)ratio == TR_RATIO_INF )
-        g_strlcpy( buf, "\xE2\x88\x9E", buflen );
-    else if( ratio < 10.0 )
-        printf_double_without_rounding( buf, buflen, ratio, 2 );
-    else if( ratio < 100.0 )
-        printf_double_without_rounding( buf, buflen, ratio, 1 );
-    else
-        g_snprintf( buf, buflen, "%'.0f", ratio );
-    return buf;
+    tr_strratio( buf, buflen, ratio, "\xE2\x88\x9E" );
 }
 
 #define KILOBYTE_FACTOR 1024.0
