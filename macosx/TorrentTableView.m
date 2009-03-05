@@ -601,7 +601,6 @@
         }
         
         const BOOL upload = menu == fUploadMenu;
-        
         const BOOL limit = [fMenuTorrent usesSpeedLimit: upload];
         
         item = [menu itemWithTag: ACTION_MENU_LIMIT_TAG];
@@ -630,7 +629,7 @@
             }
         }
         
-        tr_ratiolimit mode = [fMenuTorrent ratioSetting];
+        const tr_ratiolimit mode = [fMenuTorrent ratioSetting];
         
         item = [menu itemWithTag: ACTION_MENU_LIMIT_TAG];
         [item setState: mode == TR_RATIOLIMIT_SINGLE ? NSOnState : NSOffState];
