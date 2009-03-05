@@ -14,11 +14,11 @@
 
 #define VOID_PIXBUF_KEY "void-pixbuf"
 
-static GHashTable *static_strings = NULL;
-
+#ifdef HAVE_GIO
 static const char *
 get_static_string( const char *s )
 {
+    static GHashTable *static_strings = NULL;
     const char *result;
 
     if ( s == NULL )
@@ -36,6 +36,7 @@ get_static_string( const char *s )
 
     return result;
 }
+#endif
 
 
 typedef struct {
