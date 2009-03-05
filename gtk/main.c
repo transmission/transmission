@@ -35,12 +35,6 @@
 #include <glib/gi18n.h>
 #include <glib/gstdio.h>
 
-#include <gdk/gdk.h>
-#ifdef GDK_WINDOWING_X11
- #include <X11/Xatom.h>
- #include <gdk/gdkx.h>
-#endif
-
 #include <libtransmission/transmission.h>
 #include <libtransmission/rpcimpl.h>
 #include <libtransmission/utils.h>
@@ -65,16 +59,9 @@
 #include "util.h"
 #include "ui.h"
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/version.h>
-
 #define MY_NAME "transmission"
 
-/* interval in milliseconds to update the torrent list display */
-#define UPDATE_INTERVAL         1666
-
-/* interval in milliseconds to check for stopped torrents and update display */
-#define EXIT_CHECK_INTERVAL     500
+#define REFRESH_INTERVAL_SECONDS 2
 
 #if GTK_CHECK_VERSION( 2, 8, 0 )
  #define SHOW_LICENSE
@@ -352,7 +339,7 @@ main( int     argc,
     gboolean            showversion = FALSE;
     gboolean            startpaused = FALSE;
     gboolean            startminimized = FALSE;
-    char *              domain = MY_NAME;
+    const char *        domain = MY_NAME;
     char *              configDir = NULL;
     tr_lockfile_state_t tr_state;
 
@@ -388,7 +375,7 @@ main( int     argc,
 
     gerr = NULL;
     if( !gtk_init_with_args( &argc, &argv, _( "[torrent files]" ), entries,
-                             domain, &gerr ) )
+                             (char*)domain, &gerr ) )
     {
         fprintf( stderr, "%s\n", gerr->message );
         g_clear_error( &gerr );
@@ -612,7 +599,7 @@ appsetup( TrWindow *      wind,
     prefschanged( cbdata->core, PREF_KEY_SHOW_TRAY_ICON, cbdata );
 
     /* start model update timer */
-    cbdata->timer = g_timeout_add( UPDATE_INTERVAL, updatemodel, cbdata );
+    cbdata->timer = gtr_timeout_add_seconds( REFRESH_INTERVAL_SECONDS, updatemodel, cbdata );
     updatemodel( cbdata );
 
     /* start scheduled rate timer */
@@ -900,9 +887,9 @@ setupdrag( GtkWidget *    widget,
            struct cbdata *data )
 {
     GtkTargetEntry targets[] = {
-        { "STRING",          0, 0 },
-        { "text/plain",      0, 0 },
-        { "text/uri-list",   0, 0 },
+        { (char*)"STRING",          0, 0 },
+        { (char*)"text/plain",      0, 0 },
+        { (char*)"text/uri-list",   0, 0 },
     };
 
     g_signal_connect( widget, "drag_data_received", G_CALLBACK(
