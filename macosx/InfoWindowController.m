@@ -541,19 +541,19 @@ typedef enum
                 || downloadUseSpeedLimit != NSMixedState || downloadSpeedLimit != INVALID
                 || globalUseSpeedLimit != NSMixedState))
     {
-        if (uploadUseSpeedLimit != INVALID && uploadUseSpeedLimit != ([torrent usesSpeedLimit: YES] ? NSOnState : NSOffState))
+        if (uploadUseSpeedLimit != NSMixedState && uploadUseSpeedLimit != ([torrent usesSpeedLimit: YES] ? NSOnState : NSOffState))
             uploadUseSpeedLimit = NSMixedState;
         
         if (uploadSpeedLimit != INVALID && uploadSpeedLimit != [torrent speedLimit: YES])
             uploadSpeedLimit = INVALID;
         
-        if (downloadUseSpeedLimit != INVALID && downloadUseSpeedLimit != ([torrent usesSpeedLimit: NO] ? NSOnState : NSOffState))
+        if (downloadUseSpeedLimit != NSMixedState && downloadUseSpeedLimit != ([torrent usesSpeedLimit: NO] ? NSOnState : NSOffState))
             downloadUseSpeedLimit = NSMixedState;
         
         if (downloadSpeedLimit != INVALID && downloadSpeedLimit != [torrent speedLimit: NO])
             downloadSpeedLimit = INVALID;
         
-        if (globalUseSpeedLimit != INVALID && globalUseSpeedLimit != ([torrent usesGlobalSpeedLimit] ? NSOnState : NSOffState))
+        if (globalUseSpeedLimit != NSMixedState && globalUseSpeedLimit != ([torrent usesGlobalSpeedLimit] ? NSOnState : NSOffState))
             globalUseSpeedLimit = NSMixedState;
     }
     
@@ -1180,6 +1180,9 @@ typedef enum
 - (void) setUseSpeedLimit: (id) sender
 {
     const BOOL upload = sender == fUploadLimitCheck;
+    
+    if ([sender state] == NSMixedState)
+        [sender setState: NSOnState];
     const BOOL limit = [sender state] == NSOnState;
     
     for (Torrent * torrent in fTorrents)
@@ -1197,10 +1200,20 @@ typedef enum
     [label setEnabled: limit];
 }
 
+- (void) setUseGlobalSpeedLimit: (id) sender
+{
+    if ([sender state] == NSMixedState)
+        [sender setState: NSOnState];
+    const BOOL limit = [sender state] == NSOnState;
+    
+    for (Torrent * torrent in fTorrents)
+        [torrent setUseGlobalSpeedLimit: limit];
+}
+
 - (void) setSpeedLimit: (id) sender
 {
-    BOOL upload = sender == fUploadLimitField;
-    NSInteger limit = [sender intValue];
+    const BOOL upload = sender == fUploadLimitField;
+    const NSInteger limit = [sender intValue];
     
     for (Torrent * torrent in fTorrents)
         [torrent setSpeedLimit: limit upload: upload];
@@ -1235,14 +1248,6 @@ typedef enum
         [fRatioLimitField selectText: self];
         [[self window] makeKeyAndOrderFront: self];
     }
-}
-
-- (void) setUseGlobalSpeedLimit: (id) sender
-{
-    const BOOL limit = [sender state] == NSOnState;
-    
-    for (Torrent * torrent in fTorrents)
-        [torrent setUseGlobalSpeedLimit: limit];
 }
 
 - (void) setRatioLimit: (id) sender
