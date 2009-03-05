@@ -33,7 +33,7 @@
  * If you add a new preferences key, you /must/ add a default value here.
  */
 void
-tr_prefs_init_global( void )
+tr_prefs_init_defaults( void )
 {
     const char * str;
 
@@ -42,8 +42,8 @@ tr_prefs_init_global( void )
 #ifdef HAVE_GIO
     str = NULL;
     if( !str ) str = g_get_user_special_dir( G_USER_DIRECTORY_DESKTOP );
+    if( !str ) str = g_get_user_special_dir( G_USER_DIRECTORY_DOWNLOAD );
     if( !str ) str = tr_getDefaultDownloadDir( );
-    mkdir_p( str, 0777 );
     pref_string_set_default ( PREF_KEY_DIR_WATCH, str );
     pref_flag_set_default   ( PREF_KEY_DIR_WATCH_ENABLED, FALSE );
 #endif
@@ -79,7 +79,6 @@ tr_prefs_init_global( void )
     if( !str ) str = g_get_user_special_dir( G_USER_DIRECTORY_DOWNLOAD );
 #endif
     if( !str ) str = tr_getDefaultDownloadDir( );
-    mkdir_p( str, 0777 );
     pref_string_set_default ( TR_PREFS_KEY_DOWNLOAD_DIR, str );
 
     pref_flag_set_default   ( PREF_KEY_ASKQUIT, TRUE );

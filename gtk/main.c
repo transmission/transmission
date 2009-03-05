@@ -406,7 +406,7 @@ main( int     argc,
 
     tr_notify_init( );
     didinit = cf_init( configDir, NULL ); /* must come before actions_init */
-    tr_prefs_init_global( );
+    tr_prefs_init_defaults( );
 
     myUIManager = gtk_ui_manager_new ( );
     actions_init ( myUIManager, cbdata );
@@ -438,8 +438,15 @@ main( int     argc,
 
     if( didlock && ( didinit || cf_init( configDir, &err ) ) )
     {
+        const char * str;
         GtkWindow * win;
         tr_session * session;
+
+        /* ensure the directories are created */
+       if(( str = pref_string_get( PREF_KEY_DIR_WATCH )))
+           mkdir_p( str, 0777 );
+       if(( str = pref_string_get( TR_PREFS_KEY_DOWNLOAD_DIR )))
+           mkdir_p( str, 0777 );
 
         /* initialize the libtransmission session */
         session = tr_sessionInit( "gtk", configDir, TRUE, pref_get_all( ) );
