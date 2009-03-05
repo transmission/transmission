@@ -555,6 +555,9 @@
     fMenuTorrent = [[self itemAtRow: row] retain];
     [self createFileMenu: fActionMenu forFiles: [fMenuTorrent fileList]];
     
+    //update global limit check
+    [fGlobalLimitItem setState: [fMenuTorrent usesGlobalSpeedLimit] ? NSOnState : NSOffState];
+    
     //place menu below button
     NSRect rect = [fTorrentCell iconRectForBounds: [self rectOfRow: row]];
     NSPoint location = rect.origin;
@@ -580,7 +583,6 @@
     if (!fMenuTorrent || ![menu supermenu])
         return;
     
-    #warning add menu item for global limit
     if (menu == fUploadMenu || menu == fDownloadMenu)
     {
         NSMenuItem * item;
@@ -731,6 +733,13 @@
     const BOOL upload = [sender menu] == fUploadMenu;
     [fMenuTorrent setUseSpeedLimit: YES upload: upload];
     [fMenuTorrent setSpeedLimit: [[sender representedObject] intValue] upload: upload];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptions" object: nil];
+}
+
+- (void) setGlobalLimit: (id) sender
+{
+    [fMenuTorrent setUseGlobalSpeedLimit: [sender state] != NSOnState];
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptions" object: nil];
 }

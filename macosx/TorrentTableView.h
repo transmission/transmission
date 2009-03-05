@@ -46,6 +46,7 @@
     NSArray * fSelectedValues;
     
     IBOutlet NSMenu * fActionMenu, * fUploadMenu, * fDownloadMenu, * fRatioMenu;
+    IBOutlet NSMenuItem * fGlobalLimitItem;
     Torrent * fMenuTorrent;
     
     CGFloat fPiecesBarPercent;
@@ -76,6 +77,7 @@
 
 - (void) setQuickLimitMode: (id) sender;
 - (void) setQuickLimit: (id) sender;
+- (void) setGlobalLimit: (id) sender;
 
 - (void) setQuickRatioMode: (id) sender;
 - (void) setQuickRatio: (id) sender;

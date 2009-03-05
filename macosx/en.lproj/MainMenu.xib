@@ -9,7 +9,7 @@
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
 			<integer value="3088"/>
-			<integer value="1945"/>
+			<integer value="3190"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -4364,6 +4364,15 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 							</object>
 						</object>
 					</object>
+					<object class="NSMenuItem" id="689076287">
+						<reference key="NSMenu" ref="588646173"/>
+						<string key="NSTitle">Stay Within Global Limit</string>
+						<string key="NSKeyEquiv"/>
+						<int key="NSKeyEquivModMask">1048576</int>
+						<int key="NSMnemonicLoc">2147483647</int>
+						<reference key="NSOnImage" ref="322614661"/>
+						<reference key="NSMixedImage" ref="3851078"/>
+					</object>
 					<object class="NSMenuItem" id="113299757">
 						<reference key="NSMenu" ref="588646173"/>
 						<bool key="NSIsDisabled">YES</bool>
@@ -6123,6 +6132,22 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					</object>
 					<int key="connectionID">3180</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">setGlobalLimit:</string>
+						<reference key="source" ref="675318801"/>
+						<reference key="destination" ref="689076287"/>
+					</object>
+					<int key="connectionID">3191</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fGlobalLimitItem</string>
+						<reference key="source" ref="675318801"/>
+						<reference key="destination" ref="689076287"/>
+					</object>
+					<int key="connectionID">3193</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -7555,6 +7580,7 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 							<reference ref="113299757"/>
 							<reference ref="1033685900"/>
 							<reference ref="922629505"/>
+							<reference ref="689076287"/>
 						</object>
 						<reference key="parent" ref="52096491"/>
 						<string key="objectName">TorrentActionMenu</string>
@@ -8136,6 +8162,11 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<reference key="object" ref="763908271"/>
 						<reference key="parent" ref="434296936"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">3190</int>
+						<reference key="object" ref="689076287"/>
+						<reference key="parent" ref="588646173"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -8689,6 +8720,7 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<string>3170.ImportedFromIB2</string>
 					<string>3172.IBPluginDependency</string>
 					<string>3172.ImportedFromIB2</string>
+					<string>3190.IBPluginDependency</string>
 					<string>418.IBPluginDependency</string>
 					<string>418.ImportedFromIB2</string>
 					<string>456.IBEditorWindowLastContentRect</string>
@@ -9042,7 +9074,7 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
-					<string>{{0, 882}, {214, 113}}</string>
+					<string>{{0, 862}, {230, 133}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>{{381, 469}, {214, 113}}</string>
@@ -9291,6 +9323,7 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>{{529, 336}, {277, 273}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -9363,7 +9396,7 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">3189</int>
+			<int key="maxID">3193</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -9756,6 +9789,7 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 							<string>checkFile:</string>
 							<string>moveDataFile:</string>
 							<string>paste:</string>
+							<string>setGlobalLimit:</string>
 							<string>setQuickLimit:</string>
 							<string>setQuickLimitMode:</string>
 							<string>setQuickRatio:</string>
@@ -9763,6 +9797,7 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -9781,6 +9816,7 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 							<string>fContextRow</string>
 							<string>fController</string>
 							<string>fDownloadMenu</string>
+							<string>fGlobalLimitItem</string>
 							<string>fRatioMenu</string>
 							<string>fUploadMenu</string>
 						</object>
@@ -9791,6 +9827,7 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 							<string>NSMenu</string>
 							<string>Controller</string>
 							<string>NSMenu</string>
+							<string>NSMenuItem</string>
 							<string>NSMenu</string>
 							<string>NSMenu</string>
 						</object>
