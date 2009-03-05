@@ -584,7 +584,7 @@
     if (menu == fUploadMenu || menu == fDownloadMenu)
     {
         NSMenuItem * item;
-        if ([menu numberOfItems] == 4)
+        if ([menu numberOfItems] == 3)
         {
             const NSInteger speedLimitActionValue[] = { 0, 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750, -1 };
             
@@ -600,9 +600,9 @@
             }
         }
         
-        BOOL upload = menu == fUploadMenu;
+        const BOOL upload = menu == fUploadMenu;
         
-        BOOL limit = [fMenuTorrent usesSpeedLimit: upload];
+        const BOOL limit = [fMenuTorrent usesSpeedLimit: upload];
         
         item = [menu itemWithTag: ACTION_MENU_LIMIT_TAG];
         [item setState: limit ? NSOnState : NSOffState];
@@ -610,7 +610,7 @@
                             "torrent action menu -> upload/download limit"), [fMenuTorrent speedLimit: upload]]];
         
         item = [menu itemWithTag: ACTION_MENU_UNLIMITED_TAG];
-        [item setState:limit ? NSOnState : NSOffState];
+        [item setState: !limit ? NSOnState : NSOffState];
     }
     else if (menu == fRatioMenu)
     {
