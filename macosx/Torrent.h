@@ -110,10 +110,12 @@ typedef enum
 - (BOOL) seedRatioSet;
 - (CGFloat) progressStopRatio;
 
-- (tr_speedlimit) speedMode: (BOOL) upload;
-- (void) setSpeedMode: (tr_speedlimit) mode upload: (BOOL) upload;
+- (BOOL) usesSpeedLimit: (BOOL) upload;
+- (void) setUseSpeedLimit: (BOOL) use upload: (BOOL) upload;
 - (NSInteger) speedLimit: (BOOL) upload;
 - (void) setSpeedLimit: (NSInteger) limit upload: (BOOL) upload;
+- (BOOL) usesGlobalSpeedLimit;
+- (void) setUseGlobalSpeedLimit: (BOOL) use;
 
 - (void) setMaxPeerConnect: (uint16_t) count;
 - (uint16_t) maxPeerConnect;

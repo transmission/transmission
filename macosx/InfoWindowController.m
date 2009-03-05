@@ -274,17 +274,20 @@ typedef enum
             [fRatioField setStringValue: @""];
             
             //options fields
-            [fUploadLimitPopUp setEnabled: NO];
-            [fUploadLimitPopUp selectItemAtIndex: -1];
-            [fUploadLimitField setHidden: YES];
-            [fUploadLimitLabel setHidden: YES];
+            [fUploadLimitCheck setEnabled: NO];
+            [fUploadLimitCheck setState: NSOffState];
+            [fUploadLimitField setEnabled: NO];
+            [fUploadLimitLabel setEnabled: NO];
             [fUploadLimitField setStringValue: @""];
             
-            [fDownloadLimitPopUp setEnabled: NO];
-            [fDownloadLimitPopUp selectItemAtIndex: -1];
-            [fDownloadLimitField setHidden: YES];
-            [fDownloadLimitLabel setHidden: YES];
+            [fDownloadLimitCheck setEnabled: NO];
+            [fDownloadLimitCheck setState: NSOffState];
+            [fDownloadLimitField setEnabled: NO];
+            [fDownloadLimitLabel setEnabled: NO];
             [fDownloadLimitField setStringValue: @""];
+            
+            [fGlobalLimitCheck setEnabled: NO];
+            [fGlobalLimitCheck setState: NSOffState];
             
             [fRatioPopUp setEnabled: NO];
             [fRatioPopUp selectItemAtIndex: -1];
@@ -527,66 +530,58 @@ typedef enum
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
     Torrent * torrent = [enumerator nextObject]; //first torrent
     
-    NSInteger uploadSpeedMode = [torrent speedMode: YES],
+    NSInteger uploadUseSpeedLimit = [torrent usesSpeedLimit: YES] ? NSOnState : NSOffState,
                 uploadSpeedLimit = [torrent speedLimit: YES],
-                downloadSpeedMode = [torrent speedMode: NO],
-                downloadSpeedLimit = [torrent speedLimit: NO];
+                downloadUseSpeedLimit = [torrent usesSpeedLimit: NO] ? NSOnState : NSOffState,
+                downloadSpeedLimit = [torrent speedLimit: NO],
+                globalUseSpeedLimit = [torrent usesGlobalSpeedLimit] ? NSOnState : NSOffState;
     
     while ((torrent = [enumerator nextObject])
-            && (uploadSpeedMode != INVALID || uploadSpeedLimit != INVALID
-                || downloadSpeedMode != INVALID || downloadSpeedLimit != INVALID))
+            && (uploadUseSpeedLimit != NSMixedState || uploadSpeedLimit != INVALID
+                || downloadUseSpeedLimit != NSMixedState || downloadSpeedLimit != INVALID
+                || globalUseSpeedLimit != NSMixedState))
     {
-        if (uploadSpeedMode != INVALID && uploadSpeedMode != [torrent speedMode: YES])
-            uploadSpeedMode = INVALID;
+        if (uploadUseSpeedLimit != INVALID && uploadUseSpeedLimit != ([torrent usesSpeedLimit: YES] ? NSOnState : NSOffState))
+            uploadUseSpeedLimit = NSMixedState;
         
         if (uploadSpeedLimit != INVALID && uploadSpeedLimit != [torrent speedLimit: YES])
             uploadSpeedLimit = INVALID;
         
-        if (downloadSpeedMode != INVALID && downloadSpeedMode != [torrent speedMode: NO])
-            downloadSpeedMode = INVALID;
+        if (downloadUseSpeedLimit != INVALID && downloadUseSpeedLimit != ([torrent usesSpeedLimit: NO] ? NSOnState : NSOffState))
+            downloadUseSpeedLimit = NSMixedState;
         
         if (downloadSpeedLimit != INVALID && downloadSpeedLimit != [torrent speedLimit: NO])
             downloadSpeedLimit = INVALID;
+        
+        if (globalUseSpeedLimit != INVALID && globalUseSpeedLimit != ([torrent usesGlobalSpeedLimit] ? NSOnState : NSOffState))
+            globalUseSpeedLimit = NSMixedState;
     }
     
     //set upload view
-    NSInteger index;
-    if (uploadSpeedMode == TR_SPEEDLIMIT_SINGLE)
-        index = OPTION_POPUP_LIMIT;
-    else if (uploadSpeedMode == TR_SPEEDLIMIT_UNLIMITED)
-        index = OPTION_POPUP_NO_LIMIT;
-    else if (uploadSpeedMode == TR_SPEEDLIMIT_GLOBAL)
-        index = OPTION_POPUP_GLOBAL;
-    else
-        index = -1;
-    [fUploadLimitPopUp selectItemAtIndex: index];
-    [fUploadLimitPopUp setEnabled: YES];
+    [fUploadLimitCheck setState: uploadUseSpeedLimit];
+    [fUploadLimitCheck setEnabled: YES];
     
-    [fUploadLimitLabel setHidden: uploadSpeedMode != TR_SPEEDLIMIT_SINGLE];
-    [fUploadLimitField setHidden: uploadSpeedMode != TR_SPEEDLIMIT_SINGLE];
+    [fUploadLimitLabel setEnabled: uploadUseSpeedLimit == NSOnState];
+    [fUploadLimitField setEnabled: uploadUseSpeedLimit == NSOnState];
     if (uploadSpeedLimit != INVALID)
         [fUploadLimitField setIntValue: uploadSpeedLimit];
     else
         [fUploadLimitField setStringValue: @""];
     
     //set download view
-    if (downloadSpeedMode == TR_SPEEDLIMIT_SINGLE)
-        index = OPTION_POPUP_LIMIT;
-    else if (downloadSpeedMode == TR_SPEEDLIMIT_UNLIMITED)
-        index = OPTION_POPUP_NO_LIMIT;
-    else if (downloadSpeedMode == TR_SPEEDLIMIT_GLOBAL)
-        index = OPTION_POPUP_GLOBAL;
-    else
-        index = -1;
-    [fDownloadLimitPopUp selectItemAtIndex: index];
-    [fDownloadLimitPopUp setEnabled: YES];
+    [fDownloadLimitCheck setState: downloadUseSpeedLimit];
+    [fDownloadLimitCheck setEnabled: YES];
     
-    [fDownloadLimitLabel setHidden: downloadSpeedMode != TR_SPEEDLIMIT_SINGLE];
-    [fDownloadLimitField setHidden: downloadSpeedMode != TR_SPEEDLIMIT_SINGLE];
+    [fDownloadLimitLabel setEnabled: downloadUseSpeedLimit == NSOnState];
+    [fDownloadLimitField setEnabled: downloadUseSpeedLimit == NSOnState];
     if (downloadSpeedLimit != INVALID)
         [fDownloadLimitField setIntValue: downloadSpeedLimit];
     else
         [fDownloadLimitField setStringValue: @""];
+    
+    //set global check
+    [fGlobalLimitCheck setState: globalUseSpeedLimit];
+    [fGlobalLimitCheck setEnabled: YES];
     
     //get ratio info
     enumerator = [fTorrents objectEnumerator];
@@ -605,6 +600,7 @@ typedef enum
     }
     
     //set ratio view
+    NSInteger index;
     if (checkRatio == TR_RATIOLIMIT_SINGLE)
         index = OPTION_POPUP_LIMIT;
     else if (checkRatio == TR_RATIOLIMIT_UNLIMITED)
@@ -1181,40 +1177,24 @@ typedef enum
     [fFileController setFilterText: [sender stringValue]];
 }
 
-- (void) setSpeedMode: (id) sender
+- (void) setUseSpeedLimit: (id) sender
 {
-    BOOL upload = sender == fUploadLimitPopUp;
-    NSInteger mode;
-    switch ([sender indexOfSelectedItem])
-    {
-        case OPTION_POPUP_LIMIT:
-            mode = TR_SPEEDLIMIT_SINGLE;
-            break;
-        case OPTION_POPUP_NO_LIMIT:
-            mode = TR_SPEEDLIMIT_UNLIMITED;
-            break;
-        case OPTION_POPUP_GLOBAL:
-            mode = TR_SPEEDLIMIT_GLOBAL;
-            break;
-        default:
-            return;
-    }
+    const BOOL upload = sender == fUploadLimitCheck;
+    const BOOL limit = [sender state] == NSOnState;
     
     for (Torrent * torrent in fTorrents)
-        [torrent setSpeedMode: mode upload: upload];
+        [torrent setUseSpeedLimit: limit upload: upload];
     
     NSTextField * field = upload ? fUploadLimitField : fDownloadLimitField;
-    
-    BOOL single = mode == TR_SPEEDLIMIT_SINGLE;
-    [field setHidden: !single];
-    if (single)
+    [field setEnabled: limit];
+    if (limit)
     {
         [field selectText: self];
-        [[self window] makeKeyAndOrderFront:self];
+        [[self window] makeKeyAndOrderFront: self];
     }
     
     NSTextField * label = upload ? fUploadLimitLabel : fDownloadLimitLabel;
-    [label setHidden: !single];
+    [label setEnabled: limit];
 }
 
 - (void) setSpeedLimit: (id) sender
@@ -1255,6 +1235,14 @@ typedef enum
         [fRatioLimitField selectText: self];
         [[self window] makeKeyAndOrderFront: self];
     }
+}
+
+- (void) setUseGlobalSpeedLimit: (id) sender
+{
+    const BOOL limit = [sender state] == NSOnState;
+    
+    for (Torrent * torrent in fTorrents)
+        [torrent setUseGlobalSpeedLimit: limit];
 }
 
 - (void) setRatioLimit: (id) sender

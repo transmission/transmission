@@ -392,14 +392,14 @@ int trashDataFile(const char * filename)
     return fStat->percentRatio;
 }
 
-- (tr_speedlimit) speedMode: (BOOL) upload
+- (BOOL) usesSpeedLimit: (BOOL) upload
 {
-    return tr_torrentGetSpeedMode(fHandle, upload ? TR_UP : TR_DOWN);
+    return tr_torrentIsUsingSpeedLimit(fHandle, upload ? TR_UP : TR_DOWN);
 }
 
-- (void) setSpeedMode: (tr_speedlimit) mode upload: (BOOL) upload
+- (void) setUseSpeedLimit: (BOOL) use upload: (BOOL) upload
 {
-    tr_torrentSetSpeedMode(fHandle, upload ? TR_UP : TR_DOWN, mode);
+    tr_torrentUseSpeedLimit(fHandle, upload ? TR_UP : TR_DOWN, use);
 }
 
 - (NSInteger) speedLimit: (BOOL) upload
@@ -410,6 +410,20 @@ int trashDataFile(const char * filename)
 - (void) setSpeedLimit: (NSInteger) limit upload: (BOOL) upload
 {
     tr_torrentSetSpeedLimit(fHandle, upload ? TR_UP : TR_DOWN, limit);
+}
+
+- (BOOL) usesGlobalSpeedLimit
+{
+    const BOOL up = tr_torrentIsUsingGlobalSpeedLimit(fHandle, TR_UP);
+    const BOOL down = tr_torrentIsUsingGlobalSpeedLimit(fHandle, TR_DOWN);
+    NSAssert(up == down, @"upload and download globallimit setting should have the same");
+    return up;
+}
+
+- (void) setUseGlobalSpeedLimit: (BOOL) use
+{
+    tr_torrentUseGlobalSpeedLimit(fHandle, TR_UP, use);
+    tr_torrentUseGlobalSpeedLimit(fHandle, TR_DOWN, use);
 }
 
 - (void) setMaxPeerConnect: (uint16_t) count
@@ -1861,14 +1875,14 @@ int trashDataFile(const char * filename)
         return;
 
     fQuickPauseDict = [[NSDictionary alloc] initWithObjectsAndKeys:
-                    [NSNumber numberWithInt: [self speedMode: YES]], @"UploadSpeedMode",
+                    [NSNumber numberWithInt: [self usesSpeedLimit: YES]], @"UploadUsesSpeedLimit",
                     [NSNumber numberWithInt: [self speedLimit: YES]], @"UploadSpeedLimit",
-                    [NSNumber numberWithInt: [self speedMode: NO]], @"DownloadSpeedMode",
+                    [NSNumber numberWithInt: [self usesSpeedLimit: NO]], @"DownloadUsesSpeedLimit",
                     [NSNumber numberWithInt: [self speedLimit: NO]], @"DownloadSpeedLimit", nil];
     
-    [self setSpeedMode: TR_SPEEDLIMIT_SINGLE upload: YES];
+    [self setUseSpeedLimit: YES upload: YES];
     [self setSpeedLimit: 0 upload: YES];
-    [self setSpeedMode: TR_SPEEDLIMIT_SINGLE upload: NO];
+    [self setUseSpeedLimit: YES upload: NO];
     [self setSpeedLimit: 0 upload: NO];
 }
 
@@ -1877,9 +1891,9 @@ int trashDataFile(const char * filename)
     if (!fQuickPauseDict)
         return;
     
-    [self setSpeedMode: [[fQuickPauseDict objectForKey: @"UploadSpeedMode"] intValue] upload: YES];
+    [self setUseSpeedLimit: [[fQuickPauseDict objectForKey: @"UploadUsesSpeedLimit"] intValue] upload: YES];
     [self setSpeedLimit: [[fQuickPauseDict objectForKey: @"UploadSpeedLimit"] intValue] upload: YES];
-    [self setSpeedMode: [[fQuickPauseDict objectForKey: @"DownloadSpeedMode"] intValue] upload: NO];
+    [self setUseSpeedLimit: [[fQuickPauseDict objectForKey: @"DownloadUsesSpeedLimit"] intValue] upload: NO];
     [self setSpeedLimit: [[fQuickPauseDict objectForKey: @"DownloadSpeedLimit"] intValue] upload: NO];
     
     [fQuickPauseDict release];

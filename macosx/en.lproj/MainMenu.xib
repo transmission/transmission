@@ -9,6 +9,7 @@
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
 			<integer value="3088"/>
+			<integer value="1945"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -4282,16 +4283,6 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 							<string key="NSTitle">Download Rate</string>
 							<object class="NSMutableArray" key="NSMenuItems">
 								<bool key="EncodedWithXMLCoder">YES</bool>
-								<object class="NSMenuItem" id="839294439">
-									<reference key="NSMenu" ref="137637493"/>
-									<string key="NSTitle">Global</string>
-									<string key="NSKeyEquiv"/>
-									<int key="NSKeyEquivModMask">1048576</int>
-									<int key="NSMnemonicLoc">2147483647</int>
-									<reference key="NSOnImage" ref="322614661"/>
-									<reference key="NSMixedImage" ref="3851078"/>
-									<int key="NSTag">101</int>
-								</object>
 								<object class="NSMenuItem" id="701056891">
 									<reference key="NSMenu" ref="137637493"/>
 									<string key="NSTitle">Unlimited</string>
@@ -4339,16 +4330,6 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 							<string key="NSTitle">Upload Rate</string>
 							<object class="NSMutableArray" key="NSMenuItems">
 								<bool key="EncodedWithXMLCoder">YES</bool>
-								<object class="NSMenuItem" id="17038383">
-									<reference key="NSMenu" ref="192501462"/>
-									<string key="NSTitle">Global</string>
-									<string key="NSKeyEquiv"/>
-									<int key="NSKeyEquivModMask">1048576</int>
-									<int key="NSMnemonicLoc">2147483647</int>
-									<reference key="NSOnImage" ref="322614661"/>
-									<reference key="NSMixedImage" ref="3851078"/>
-									<int key="NSTag">101</int>
-								</object>
 								<object class="NSMenuItem" id="67180675">
 									<reference key="NSMenu" ref="192501462"/>
 									<string key="NSTitle">Unlimited</string>
@@ -5954,14 +5935,6 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<object class="IBActionConnection" key="connection">
 						<string key="label">setQuickLimitMode:</string>
 						<reference key="source" ref="675318801"/>
-						<reference key="destination" ref="839294439"/>
-					</object>
-					<int key="connectionID">3109</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">setQuickLimitMode:</string>
-						<reference key="source" ref="675318801"/>
 						<reference key="destination" ref="701056891"/>
 					</object>
 					<int key="connectionID">3110</int>
@@ -5973,14 +5946,6 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<reference key="destination" ref="222549207"/>
 					</object>
 					<int key="connectionID">3111</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">setQuickLimitMode:</string>
-						<reference key="source" ref="675318801"/>
-						<reference key="destination" ref="17038383"/>
-					</object>
-					<int key="connectionID">3112</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
@@ -7610,7 +7575,6 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<reference ref="701056891"/>
 							<reference ref="222549207"/>
-							<reference ref="839294439"/>
 							<reference ref="1015648063"/>
 						</object>
 						<reference key="parent" ref="665673233"/>
@@ -7623,11 +7587,6 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<object class="IBObjectRecord">
 						<int key="objectID">1960</int>
 						<reference key="object" ref="222549207"/>
-						<reference key="parent" ref="137637493"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">1961</int>
-						<reference key="object" ref="839294439"/>
 						<reference key="parent" ref="137637493"/>
 					</object>
 					<object class="IBObjectRecord">
@@ -7649,17 +7608,11 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<reference key="object" ref="192501462"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="17038383"/>
 							<reference ref="67180675"/>
 							<reference ref="141452599"/>
 							<reference ref="641699304"/>
 						</object>
 						<reference key="parent" ref="624203829"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">1962</int>
-						<reference key="object" ref="17038383"/>
-						<reference key="parent" ref="192501462"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">1963</int>
@@ -8488,11 +8441,13 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<string>1930.ImportedFromIB2</string>
 					<string>1933.IBPluginDependency</string>
 					<string>1933.ImportedFromIB2</string>
+					<string>1936.IBEditorWindowLastContentRect</string>
 					<string>1936.IBPluginDependency</string>
 					<string>1936.ImportedFromIB2</string>
 					<string>1936.editorWindowContentRectSynchronizationRect</string>
 					<string>1944.IBPluginDependency</string>
 					<string>1944.ImportedFromIB2</string>
+					<string>1945.IBEditorWindowLastContentRect</string>
 					<string>1945.IBPluginDependency</string>
 					<string>1945.ImportedFromIB2</string>
 					<string>1945.editorWindowContentRectSynchronizationRect</string>
@@ -8500,6 +8455,7 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<string>1946.ImportedFromIB2</string>
 					<string>1950.IBPluginDependency</string>
 					<string>1950.ImportedFromIB2</string>
+					<string>1951.IBEditorWindowLastContentRect</string>
 					<string>1951.IBPluginDependency</string>
 					<string>1951.ImportedFromIB2</string>
 					<string>1951.editorWindowContentRectSynchronizationRect</string>
@@ -8509,10 +8465,6 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<string>196.ImportedFromIB2</string>
 					<string>1960.IBPluginDependency</string>
 					<string>1960.ImportedFromIB2</string>
-					<string>1961.IBPluginDependency</string>
-					<string>1961.ImportedFromIB2</string>
-					<string>1962.IBPluginDependency</string>
-					<string>1962.ImportedFromIB2</string>
 					<string>1963.IBPluginDependency</string>
 					<string>1963.ImportedFromIB2</string>
 					<string>1964.IBPluginDependency</string>
@@ -9090,11 +9042,13 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
+					<string>{{0, 882}, {214, 113}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>{{381, 469}, {214, 113}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
+					<string>{{214, 942}, {135, 53}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>{{595, 509}, {135, 73}}</string>
@@ -9102,13 +9056,10 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
+					<string>{{214, 922}, {135, 53}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>{{595, 489}, {135, 73}}</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<reference ref="9"/>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>

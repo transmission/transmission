@@ -70,9 +70,11 @@
     IBOutlet FileOutlineController * fFileController;
     IBOutlet NSSearchField * fFileFilterField;
     
-    IBOutlet NSPopUpButton * fRatioPopUp, * fUploadLimitPopUp, * fDownloadLimitPopUp;
-    IBOutlet NSTextField * fUploadLimitField, * fDownloadLimitField, * fRatioLimitField, * fPeersConnectField,
-                        * fUploadLimitLabel, * fDownloadLimitLabel, * fPeersConnectLabel;
+    IBOutlet NSPopUpButton * fRatioPopUp;
+    IBOutlet NSButton * fUploadLimitCheck, * fDownloadLimitCheck, * fGlobalLimitCheck;
+    IBOutlet NSTextField * fUploadLimitField, * fDownloadLimitField, * fRatioLimitField,
+                        * fUploadLimitLabel, * fDownloadLimitLabel, * fPeersConnectLabel,
+                        * fPeersConnectField;
     
     NSString * fInitialString;
 }
@@ -101,8 +103,9 @@
 
 - (void) setFileFilterText: (id) sender;
 
-- (void) setSpeedMode: (id) sender;
+- (void) setUseSpeedLimit: (id) sender;
 - (void) setSpeedLimit: (id) sender;
+- (void) setUseGlobalSpeedLimit: (id) sender;
 
 - (void) setRatioSetting: (id) sender;
 - (void) setRatioLimit: (id) sender;

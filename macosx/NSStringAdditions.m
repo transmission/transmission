@@ -91,7 +91,7 @@
 }
 
 + (NSString *) stringForRatio: (CGFloat) ratio
-{
+{ratio = .997;
     if (ratio == TR_RATIO_NA)
         return NSLocalizedString(@"N/A", "No Ratio");
     else if (ratio == TR_RATIO_INF)

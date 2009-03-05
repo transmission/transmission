@@ -580,6 +580,7 @@
     if (!fMenuTorrent || ![menu supermenu])
         return;
     
+    #warning add menu item for global limit
     if (menu == fUploadMenu || menu == fDownloadMenu)
     {
         NSMenuItem * item;
@@ -600,18 +601,16 @@
         }
         
         BOOL upload = menu == fUploadMenu;
-        NSInteger mode = [fMenuTorrent speedMode: upload];
+        
+        BOOL limit = [fMenuTorrent usesSpeedLimit: upload];
         
         item = [menu itemWithTag: ACTION_MENU_LIMIT_TAG];
-        [item setState: mode == TR_SPEEDLIMIT_SINGLE ? NSOnState : NSOffState];
+        [item setState: limit ? NSOnState : NSOffState];
         [item setTitle: [NSString stringWithFormat: NSLocalizedString(@"Limit (%d KB/s)",
                             "torrent action menu -> upload/download limit"), [fMenuTorrent speedLimit: upload]]];
         
         item = [menu itemWithTag: ACTION_MENU_UNLIMITED_TAG];
-        [item setState: mode == TR_SPEEDLIMIT_UNLIMITED ? NSOnState : NSOffState];
-        
-        item = [menu itemWithTag: ACTION_MENU_GLOBAL_TAG];
-        [item setState: mode == TR_SPEEDLIMIT_GLOBAL ? NSOnState : NSOffState];
+        [item setState:limit ? NSOnState : NSOffState];
     }
     else if (menu == fRatioMenu)
     {
@@ -722,23 +721,8 @@
 
 - (void) setQuickLimitMode: (id) sender
 {
-    tr_speedlimit mode;
-    switch ([sender tag])
-    {
-        case ACTION_MENU_UNLIMITED_TAG:
-            mode = TR_SPEEDLIMIT_UNLIMITED;
-            break;
-        case ACTION_MENU_LIMIT_TAG:
-            mode = TR_SPEEDLIMIT_SINGLE;
-            break;
-        case ACTION_MENU_GLOBAL_TAG:
-            mode = TR_SPEEDLIMIT_GLOBAL;
-            break;
-        default:
-            return;
-    }
-    
-    [fMenuTorrent setSpeedMode: mode upload: [sender menu] == fUploadMenu];
+    const BOOL limit = [sender tag] == ACTION_MENU_LIMIT_TAG;
+    [fMenuTorrent setUseSpeedLimit: limit upload: [sender menu] == fUploadMenu];
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptions" object: nil];
 }
@@ -746,7 +730,7 @@
 - (void) setQuickLimit: (id) sender
 {
     const BOOL upload = [sender menu] == fUploadMenu;
-    [fMenuTorrent setSpeedMode: TR_SPEEDLIMIT_SINGLE upload: upload];
+    [fMenuTorrent setUseSpeedLimit: YES upload: upload];
     [fMenuTorrent setSpeedLimit: [[sender representedObject] intValue] upload: upload];
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptions" object: nil];
