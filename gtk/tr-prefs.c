@@ -41,8 +41,8 @@ tr_prefs_init_defaults( void )
 
 #ifdef HAVE_GIO
     str = NULL;
-    if( !str ) str = g_get_user_special_dir( G_USER_DIRECTORY_DESKTOP );
     if( !str ) str = g_get_user_special_dir( G_USER_DIRECTORY_DOWNLOAD );
+    if( !str ) str = g_get_user_special_dir( G_USER_DIRECTORY_DESKTOP );
     if( !str ) str = tr_getDefaultDownloadDir( );
     pref_string_set_default ( PREF_KEY_DIR_WATCH, str );
     pref_flag_set_default   ( PREF_KEY_DIR_WATCH_ENABLED, FALSE );
