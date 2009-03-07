@@ -9,7 +9,8 @@
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
 			<integer value="3088"/>
-			<integer value="3190"/>
+			<integer value="1060"/>
+			<integer value="1944"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -4119,7 +4120,7 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					</object>
 					<object class="NSMenuItem" id="689898645">
 						<reference key="NSMenu" ref="354817592"/>
-						<string key="NSTitle">Total Download Rate</string>
+						<string key="NSTitle">Download Bandwidth Limit</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSKeyEquivModMask">1048576</int>
 						<int key="NSMnemonicLoc">2147483647</int>
@@ -4127,7 +4128,7 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<reference key="NSMixedImage" ref="3851078"/>
 						<string key="NSAction">submenuAction:</string>
 						<object class="NSMenu" key="NSSubmenu" id="30727689">
-							<string key="NSTitle">Total Download Rate</string>
+							<string key="NSTitle">Download Bandwidth Limit</string>
 							<object class="NSMutableArray" key="NSMenuItems">
 								<bool key="EncodedWithXMLCoder">YES</bool>
 								<object class="NSMenuItem" id="450135695">
@@ -4164,7 +4165,7 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					</object>
 					<object class="NSMenuItem" id="637529483">
 						<reference key="NSMenu" ref="354817592"/>
-						<string key="NSTitle">Total Upload Rate</string>
+						<string key="NSTitle">Upload Bandwidth Limit</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSKeyEquivModMask">1048576</int>
 						<int key="NSMnemonicLoc">2147483647</int>
@@ -4172,7 +4173,7 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<reference key="NSMixedImage" ref="3851078"/>
 						<string key="NSAction">submenuAction:</string>
 						<object class="NSMenu" key="NSSubmenu" id="501349102">
-							<string key="NSTitle">Total Upload Rate</string>
+							<string key="NSTitle">Upload Bandwidth Limit</string>
 							<object class="NSMutableArray" key="NSMenuItems">
 								<bool key="EncodedWithXMLCoder">YES</bool>
 								<object class="NSMenuItem" id="215540247">
@@ -4272,7 +4273,7 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<bool key="EncodedWithXMLCoder">YES</bool>
 					<object class="NSMenuItem" id="665673233">
 						<reference key="NSMenu" ref="588646173"/>
-						<string key="NSTitle">Download Rate</string>
+						<string key="NSTitle">Download Bandwidth Limit</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSKeyEquivModMask">1048576</int>
 						<int key="NSMnemonicLoc">2147483647</int>
@@ -4280,7 +4281,7 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<reference key="NSMixedImage" ref="3851078"/>
 						<string key="NSAction">submenuAction:</string>
 						<object class="NSMenu" key="NSSubmenu" id="137637493">
-							<string key="NSTitle">Download Rate</string>
+							<string key="NSTitle">Download Bandwidth Limit</string>
 							<object class="NSMutableArray" key="NSMenuItems">
 								<bool key="EncodedWithXMLCoder">YES</bool>
 								<object class="NSMenuItem" id="701056891">
@@ -4319,7 +4320,7 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					</object>
 					<object class="NSMenuItem" id="624203829">
 						<reference key="NSMenu" ref="588646173"/>
-						<string key="NSTitle">Upload Rate</string>
+						<string key="NSTitle">Upload Bandwidth Limit</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSKeyEquivModMask">1048576</int>
 						<int key="NSMnemonicLoc">2147483647</int>
@@ -4327,7 +4328,7 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<reference key="NSMixedImage" ref="3851078"/>
 						<string key="NSAction">submenuAction:</string>
 						<object class="NSMenu" key="NSSubmenu" id="192501462">
-							<string key="NSTitle">Upload Rate</string>
+							<string key="NSTitle">Upload Bandwidth Limit</string>
 							<object class="NSMutableArray" key="NSMenuItems">
 								<bool key="EncodedWithXMLCoder">YES</bool>
 								<object class="NSMenuItem" id="67180675">
@@ -4364,9 +4365,9 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 							</object>
 						</object>
 					</object>
-					<object class="NSMenuItem" id="689076287">
+					<object class="NSMenuItem" id="1039703472">
 						<reference key="NSMenu" ref="588646173"/>
-						<string key="NSTitle">Stay Within Global Limit</string>
+						<string key="NSTitle">Stay Within Global Bandwidth Limits</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSKeyEquivModMask">1048576</int>
 						<int key="NSMnemonicLoc">2147483647</int>
@@ -6136,7 +6137,7 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<object class="IBActionConnection" key="connection">
 						<string key="label">setGlobalLimit:</string>
 						<reference key="source" ref="675318801"/>
-						<reference key="destination" ref="689076287"/>
+						<reference key="destination" ref="1039703472"/>
 					</object>
 					<int key="connectionID">3191</int>
 				</object>
@@ -6144,7 +6145,7 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">fGlobalLimitItem</string>
 						<reference key="source" ref="675318801"/>
-						<reference key="destination" ref="689076287"/>
+						<reference key="destination" ref="1039703472"/>
 					</object>
 					<int key="connectionID">3193</int>
 				</object>
@@ -7580,7 +7581,7 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 							<reference ref="113299757"/>
 							<reference ref="1033685900"/>
 							<reference ref="922629505"/>
-							<reference ref="689076287"/>
+							<reference ref="1039703472"/>
 						</object>
 						<reference key="parent" ref="52096491"/>
 						<string key="objectName">TorrentActionMenu</string>
@@ -8164,7 +8165,7 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">3190</int>
-						<reference key="object" ref="689076287"/>
+						<reference key="object" ref="1039703472"/>
 						<reference key="parent" ref="588646173"/>
 					</object>
 				</object>
@@ -8187,6 +8188,7 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<string>1041.editorWindowContentRectSynchronizationRect</string>
 					<string>1044.IBPluginDependency</string>
 					<string>1044.ImportedFromIB2</string>
+					<string>1045.IBEditorWindowLastContentRect</string>
 					<string>1045.IBPluginDependency</string>
 					<string>1045.ImportedFromIB2</string>
 					<string>1045.editorWindowContentRectSynchronizationRect</string>
@@ -8202,6 +8204,7 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<string>106.IBPluginDependency</string>
 					<string>106.ImportedFromIB2</string>
 					<string>106.editorWindowContentRectSynchronizationRect</string>
+					<string>1060.IBEditorWindowLastContentRect</string>
 					<string>1060.IBPluginDependency</string>
 					<string>1060.ImportedFromIB2</string>
 					<string>1060.editorWindowContentRectSynchronizationRect</string>
@@ -8783,12 +8786,13 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
-					<string>{{105, 707}, {225, 173}}</string>
+					<string>{{105, 707}, {251, 173}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>{{72, 664}, {214, 143}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
+					<string>{{356, 707}, {135, 53}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>{{286, 714}, {135, 53}}</string>
@@ -8804,6 +8808,7 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>{{599, 808}, {242, 93}}</string>
+					<string>{{356, 727}, {135, 53}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>{{286, 734}, {135, 53}}</string>
@@ -9074,13 +9079,13 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
-					<string>{{0, 862}, {230, 133}}</string>
+					<string>{{0, 862}, {313, 133}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>{{381, 469}, {214, 113}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
-					<string>{{214, 942}, {135, 53}}</string>
+					<string>{{313, 942}, {135, 53}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>{{595, 509}, {135, 73}}</string>
@@ -9088,7 +9093,7 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
-					<string>{{214, 922}, {135, 53}}</string>
+					<string>{{313, 922}, {135, 53}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>{{595, 489}, {135, 73}}</string>
