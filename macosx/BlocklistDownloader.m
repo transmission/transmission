@@ -27,7 +27,7 @@
 #import "BlocklistScheduler.h"
 #import "PrefsController.h"
 
-#define LIST_URL @"http://update.transmissionbt.com/files/level1.gz"
+#define LIST_URL @"http://update.transmissionbt.com/level1.gz"
 #define DESTINATION [NSTemporaryDirectory() stringByAppendingPathComponent: @"level1.gz"]
 
 @interface BlocklistDownloader (Private)
