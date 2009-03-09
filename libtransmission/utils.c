@@ -1530,8 +1530,10 @@ printf_double_without_rounding( char * buf, int buflen, double d, int places )
     char tmp[128];
     int len;
     tr_snprintf( tmp, sizeof( tmp ), "%'.64f", d );
-    pch = strchr( tmp, '.' );
-    pch += places + 1;
+    pch = tmp;
+    while( isdigit( *pch ) ) ++pch; /* walk to the decimal point */
+    ++pch; /* walk over the decimal point */
+    pch += places;
     len = MIN( buflen - 1, pch - tmp );
     memcpy( buf, tmp, len );
     buf[len] = '\0';
