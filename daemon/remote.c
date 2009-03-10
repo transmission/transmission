@@ -1245,6 +1245,7 @@ processRequests( const char *  host,
     curl_easy_setopt( curl, CURLOPT_URL, url );
     curl_easy_setopt( curl, CURLOPT_NETRC, CURL_NETRC_OPTIONAL );
     curl_easy_setopt( curl, CURLOPT_HTTPAUTH, CURLAUTH_ANY );
+    curl_easy_setopt( curl, CURLOPT_TIMEOUT, 60L );
     if( netrc )
         curl_easy_setopt( curl, CURLOPT_NETRC_FILE, netrc );
     if( auth )
