@@ -311,11 +311,17 @@ tr_sessionLoadSettings( tr_benc * d, const char * configDir, const char * appNam
 {
     char * filename;
     tr_benc fileSettings;
+    tr_benc sessionDefaults;
+    tr_benc tmp;
 
     assert( tr_bencIsDict( d ) );
 
-    /* get the defaults */
-    tr_sessionGetDefaultSettings( d );
+    /* initializing the defaults: caller may have passed in some app-level defaults.
+     * preserve those and use the session defaults to fill in any missing gaps. */
+    tr_bencInitDict( &sessionDefaults, 0 );
+    tr_sessionGetDefaultSettings( &sessionDefaults );
+    tr_bencMergeDicts( &sessionDefaults, d );
+    tmp = *d; *d = sessionDefaults; sessionDefaults = tmp;
 
     /* if caller didn't specify a config dir, use the default */
     if( !configDir || !*configDir )
@@ -329,6 +335,7 @@ tr_sessionLoadSettings( tr_benc * d, const char * configDir, const char * appNam
     }
 
     /* cleanup */
+    tr_bencFree( &sessionDefaults );
     tr_free( filename );
 }
 
