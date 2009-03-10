@@ -64,8 +64,7 @@ clutch_jquery_DATA = \
   web/javascript/jquery/jquery.contextmenu.min.js \
   web/javascript/jquery/jquery.min.js \
   web/javascript/jquery/jquery.form.min.js \
-  web/javascript/jquery/jquery.transmenu.min.js \
-  web/javascript/jquery/jquery.dimensions.min.js
+  web/javascript/jquery/jquery.transmenu.min.js
 
 clutch_imagesdir = $(clutchdir)/images
 clutch_images_DATA = \
