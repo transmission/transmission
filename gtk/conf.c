@@ -39,6 +39,7 @@
 #include <libtransmission/platform.h>
 
 #include "conf.h"
+#include "tr-prefs.h"
 #include "util.h"
 
 #define MY_NAME "transmission"
@@ -143,6 +144,71 @@ cf_lock( tr_lockfile_state_t *tr_state,
 ****
 ***/
 
+static void cf_check_older_configs( void );
+
+/**
+ * This is where we initialize the preferences file with the default values.
+ * If you add a new preferences key, you /must/ add a default value here.
+ */
+static void
+tr_prefs_init_defaults( tr_benc * d )
+{
+    const char * str;
+
+    cf_check_older_configs( );
+
+#ifdef HAVE_GIO
+    str = NULL;
+    if( !str ) str = g_get_user_special_dir( G_USER_DIRECTORY_DOWNLOAD );
+    if( !str ) str = g_get_user_special_dir( G_USER_DIRECTORY_DESKTOP );
+    if( !str ) str = tr_getDefaultDownloadDir( );
+    tr_bencDictAddStr( d, PREF_KEY_DIR_WATCH, str );
+    tr_bencDictAddInt( d, PREF_KEY_DIR_WATCH_ENABLED, FALSE );
+#endif
+
+    tr_bencDictAddInt( d, PREF_KEY_INHIBIT_HIBERNATION, FALSE );
+    tr_bencDictAddInt( d, PREF_KEY_BLOCKLIST_UPDATES_ENABLED, TRUE );
+
+    tr_bencDictAddStr( d, PREF_KEY_OPEN_DIALOG_FOLDER, g_get_home_dir( ) );
+
+    tr_bencDictAddInt( d, PREF_KEY_TOOLBAR, TRUE );
+    tr_bencDictAddInt( d, PREF_KEY_FILTERBAR, TRUE );
+    tr_bencDictAddInt( d, PREF_KEY_STATUSBAR, TRUE );
+    tr_bencDictAddInt( d, PREF_KEY_SHOW_TRAY_ICON, FALSE );
+    tr_bencDictAddInt( d, PREF_KEY_SHOW_DESKTOP_NOTIFICATION, TRUE );
+    tr_bencDictAddStr( d, PREF_KEY_STATUSBAR_STATS, "total-ratio" );
+
+    tr_bencDictAddInt( d, PREF_KEY_SCHED_LIMIT_ENABLED, FALSE );
+    tr_bencDictAddInt( d, PREF_KEY_SCHED_BEGIN,    60 * 23 ); /* 11pm */
+    tr_bencDictAddInt( d, PREF_KEY_SCHED_END,      60 * 7 );  /* 7am */
+    tr_bencDictAddInt( d, PREF_KEY_SCHED_DL_LIMIT, 200 );   /* 2x the other limit */
+    tr_bencDictAddInt( d, PREF_KEY_SCHED_UL_LIMIT, 100 );   /* 2x the other limit */
+
+    tr_bencDictAddInt( d, PREF_KEY_OPTIONS_PROMPT, TRUE );
+
+    tr_bencDictAddInt( d, PREF_KEY_MAIN_WINDOW_HEIGHT, 500 );
+    tr_bencDictAddInt( d, PREF_KEY_MAIN_WINDOW_WIDTH, 300 );
+    tr_bencDictAddInt( d, PREF_KEY_MAIN_WINDOW_X, 50 );
+    tr_bencDictAddInt( d, PREF_KEY_MAIN_WINDOW_Y, 50 );
+    tr_bencDictAddStr( d, PREF_KEY_MAIN_WINDOW_LAYOUT_ORDER, "menu,toolbar,filter,list,statusbar" );
+
+    str = NULL;
+#if GLIB_CHECK_VERSION( 2, 14, 0 )
+    if( !str ) str = g_get_user_special_dir( G_USER_DIRECTORY_DOWNLOAD );
+#endif
+    if( !str ) str = tr_getDefaultDownloadDir( );
+    tr_bencDictAddStr( d, TR_PREFS_KEY_DOWNLOAD_DIR, str );
+
+    tr_bencDictAddInt( d, PREF_KEY_ASKQUIT, TRUE );
+
+    tr_bencDictAddStr( d, PREF_KEY_SORT_MODE, "sort-by-name" );
+    tr_bencDictAddInt( d, PREF_KEY_SORT_REVERSED, FALSE );
+    tr_bencDictAddInt( d, PREF_KEY_MINIMAL_VIEW, FALSE );
+
+    tr_bencDictAddInt( d, PREF_KEY_START, TRUE );
+    tr_bencDictAddInt( d, PREF_KEY_TRASH_ORIGINAL, FALSE );
+}
+
 static char*
 getPrefsFilename( void )
 {
@@ -159,6 +225,7 @@ getPrefs( void )
     if( !loaded )
     {
         tr_bencInitDict( &settings, 0 );
+        tr_prefs_init_defaults( &settings );
         tr_sessionLoadSettings( &settings, gl_confdir, MY_NAME );
         loaded = TRUE;
     }
@@ -192,14 +259,6 @@ pref_int_set( const char * key,
     tr_bencDictAddInt( getPrefs( ), key, value );
 }
 
-void
-pref_int_set_default( const char * key,
-                      int64_t      value )
-{
-    if( !tr_bencDictFind( getPrefs( ), key ) )
-        pref_int_set( key, value );
-}
-
 double
 pref_double_get( const char * key )
 {
@@ -214,14 +273,6 @@ pref_double_set( const char * key,
                  double       value )
 {
     tr_bencDictAddDouble( getPrefs( ), key, value );
-}
-
-void
-pref_double_set_default( const char * key,
-                         double       value )
-{
-    if ( !tr_bencDictFind( getPrefs( ), key ) )
-         pref_double_set( key, value );
 }
 
 /***
@@ -261,13 +312,6 @@ pref_flag_set( const char * key,
     pref_int_set( key, value != 0 );
 }
 
-void
-pref_flag_set_default( const char * key,
-                       gboolean     value )
-{
-    pref_int_set_default( key, value != 0 );
-}
-
 /***
 ****
 ***/
@@ -276,24 +320,14 @@ const char*
 pref_string_get( const char * key )
 {
     const char * str = NULL;
-
     tr_bencDictFindStr( getPrefs( ), key, &str );
     return str;
 }
 
 void
-pref_string_set( const char * key,
-                 const char * value )
+pref_string_set( const char * key, const char * value )
 {
     tr_bencDictAddStr( getPrefs( ), key, value );
-}
-
-void
-pref_string_set_default( const char * key,
-                         const char * value )
-{
-    if( !tr_bencDictFind( getPrefs( ), key ) )
-        pref_string_set( key, value );
 }
 
 /***
@@ -470,7 +504,7 @@ translate_keyfile_to_json( const char * old_file,
     tr_bencFree( &dict );
 }
 
-void
+static void
 cf_check_older_configs( void )
 {
     char * filename = getPrefsFilename( );
@@ -483,18 +517,19 @@ cf_check_older_configs( void )
 
         if( g_file_test( key1, G_FILE_TEST_IS_REGULAR ) )
         {
+            g_message( _( "Importing \"%s\"" ), key1 );
             translate_keyfile_to_json( key1, filename );
         }
         else if( g_file_test( key2, G_FILE_TEST_IS_REGULAR ) )
         {
+            g_message( _( "Importing \"%s\"" ), key2 );
             translate_keyfile_to_json( key2, filename );
         }
         else if( g_file_test( benc, G_FILE_TEST_IS_REGULAR ) )
         {
             char * tmpfile;
-            int    fd =
-                g_file_open_tmp( "transmission-prefs-XXXXXX", &tmpfile,
-                                 NULL );
+            int    fd = g_file_open_tmp( "transmission-prefs-XXXXXX", &tmpfile, NULL );
+            g_message( _( "Importing \"%s\"" ), benc );
             if( fd != -1 ) close( fd );
             translate_08_to_09( benc, tmpfile );
             translate_keyfile_to_json( tmpfile, filename );
@@ -508,4 +543,3 @@ cf_check_older_configs( void )
 
     g_free( filename );
 }
-

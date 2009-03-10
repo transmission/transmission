@@ -29,69 +29,6 @@
 #include "util.h"
 
 /**
- * This is where we initialize the preferences file with the default values.
- * If you add a new preferences key, you /must/ add a default value here.
- */
-void
-tr_prefs_init_defaults( void )
-{
-    const char * str;
-
-    cf_check_older_configs( );
-
-#ifdef HAVE_GIO
-    str = NULL;
-    if( !str ) str = g_get_user_special_dir( G_USER_DIRECTORY_DOWNLOAD );
-    if( !str ) str = g_get_user_special_dir( G_USER_DIRECTORY_DESKTOP );
-    if( !str ) str = tr_getDefaultDownloadDir( );
-    pref_string_set_default ( PREF_KEY_DIR_WATCH, str );
-    pref_flag_set_default   ( PREF_KEY_DIR_WATCH_ENABLED, FALSE );
-#endif
-
-    pref_flag_set_default   ( PREF_KEY_INHIBIT_HIBERNATION, FALSE );
-    pref_flag_set_default   ( PREF_KEY_BLOCKLIST_UPDATES_ENABLED, TRUE );
-
-    pref_string_set_default ( PREF_KEY_OPEN_DIALOG_FOLDER, g_get_home_dir( ) );
-
-    pref_flag_set_default   ( PREF_KEY_TOOLBAR, TRUE );
-    pref_flag_set_default   ( PREF_KEY_FILTERBAR, TRUE );
-    pref_flag_set_default   ( PREF_KEY_STATUSBAR, TRUE );
-    pref_flag_set_default   ( PREF_KEY_SHOW_TRAY_ICON, FALSE );
-    pref_flag_set_default   ( PREF_KEY_SHOW_DESKTOP_NOTIFICATION, TRUE );
-    pref_string_set_default ( PREF_KEY_STATUSBAR_STATS, "total-ratio" );
-
-    pref_flag_set_default   ( PREF_KEY_SCHED_LIMIT_ENABLED, FALSE );
-    pref_int_set_default    ( PREF_KEY_SCHED_BEGIN,    60 * 23 ); /* 11pm */
-    pref_int_set_default    ( PREF_KEY_SCHED_END,      60 * 7 );  /* 7am */
-    pref_int_set_default    ( PREF_KEY_SCHED_DL_LIMIT, 200 );   /* 2x the other limit */
-    pref_int_set_default    ( PREF_KEY_SCHED_UL_LIMIT, 100 );   /* 2x the other limit */
-
-    pref_flag_set_default   ( PREF_KEY_OPTIONS_PROMPT, TRUE );
-
-    pref_int_set_default    ( PREF_KEY_MAIN_WINDOW_HEIGHT, 500 );
-    pref_int_set_default    ( PREF_KEY_MAIN_WINDOW_WIDTH, 300 );
-    pref_int_set_default    ( PREF_KEY_MAIN_WINDOW_X, 50 );
-    pref_int_set_default    ( PREF_KEY_MAIN_WINDOW_Y, 50 );
-    pref_string_set_default ( PREF_KEY_MAIN_WINDOW_LAYOUT_ORDER, "menu,toolbar,filter,list,statusbar" );
-
-    str = NULL;
-#if GLIB_CHECK_VERSION( 2, 14, 0 )
-    if( !str ) str = g_get_user_special_dir( G_USER_DIRECTORY_DOWNLOAD );
-#endif
-    if( !str ) str = tr_getDefaultDownloadDir( );
-    pref_string_set_default ( TR_PREFS_KEY_DOWNLOAD_DIR, str );
-
-    pref_flag_set_default   ( PREF_KEY_ASKQUIT, TRUE );
-
-    pref_string_set_default ( PREF_KEY_SORT_MODE, "sort-by-name" );
-    pref_flag_set_default   ( PREF_KEY_SORT_REVERSED, FALSE );
-    pref_flag_set_default   ( PREF_KEY_MINIMAL_VIEW, FALSE );
-
-    pref_flag_set_default   ( PREF_KEY_START, TRUE );
-    pref_flag_set_default   ( PREF_KEY_TRASH_ORIGINAL, FALSE );
-}
-
-/**
 ***
 **/
 
