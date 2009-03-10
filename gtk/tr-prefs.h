@@ -50,6 +50,4 @@ GtkWidget * tr_prefs_dialog_new( GObject *   core,
 #define PREF_KEY_MAIN_WINDOW_X              "main-window-x"
 #define PREF_KEY_MAIN_WINDOW_Y              "main-window-y"
 
-void tr_prefs_init_defaults( void );
-
 #endif

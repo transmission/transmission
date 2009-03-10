@@ -406,7 +406,6 @@ main( int     argc,
 
     tr_notify_init( );
     didinit = cf_init( configDir, NULL ); /* must come before actions_init */
-    tr_prefs_init_defaults( );
 
     myUIManager = gtk_ui_manager_new ( );
     actions_init ( myUIManager, cbdata );
