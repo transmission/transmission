@@ -1,13 +1,13 @@
 /*!
- * jQuery JavaScript Library v1.3.1
+ * jQuery JavaScript Library v1.3.2
  * http://jquery.com/
  *
  * Copyright (c) 2009 John Resig
  * Dual licensed under the MIT and GPL licenses.
  * http://docs.jquery.com/License
  *
- * Date: 2009-01-21 20:42:16 -0500 (Wed, 21 Jan 2009)
- * Revision: 6158
+ * Date: 2009-02-19 17:34:21 -0500 (Thu, 19 Feb 2009)
+ * Revision: 6246
  */
 (function(){
 
@@ -88,14 +88,16 @@ jQuery.fn = jQuery.prototype = {
 			this.context = selector.context;
 		}
 
-		return this.setArray(jQuery.makeArray(selector));
+		return this.setArray(jQuery.isArray( selector ) ?
+			selector :
+			jQuery.makeArray(selector));
 	},
 
 	// Start with an empty selector
 	selector: "",
 
 	// The current version of jQuery being used
-	jquery: "1.3.1",
+	jquery: "1.3.2",
 
 	// The number of elements contained in the matched element set
 	size: function() {
@@ -108,7 +110,7 @@ jQuery.fn = jQuery.prototype = {
 		return num === undefined ?
 
 			// Return a 'clean' array
-			jQuery.makeArray( this ) :
+			Array.prototype.slice.call( this ) :
 
 			// Return just the object
 			this[ num ];
@@ -278,23 +280,21 @@ jQuery.fn = jQuery.prototype = {
 	},
 
 	// For internal use only.
-	// Behaves like an Array's .push method, not like a jQuery method.
+	// Behaves like an Array's method, not like a jQuery method.
 	push: [].push,
+	sort: [].sort,
+	splice: [].splice,
 
 	find: function( selector ) {
-		if ( this.length === 1 && !/,/.test(selector) ) {
+		if ( this.length === 1 ) {
 			var ret = this.pushStack( [], "find", selector );
 			ret.length = 0;
 			jQuery.find( selector, this[0], ret );
 			return ret;
 		} else {
-			var elems = jQuery.map(this, function(elem){
+			return this.pushStack( jQuery.unique(jQuery.map(this, function(elem){
 				return jQuery.find( selector, elem );
-			});
-
-			return this.pushStack( /[^+>] [^+>]/.test( selector ) ?
-				jQuery.unique( elems ) :
-				elems, "find", selector );
+			})), "find", selector );
 		}
 	},
 
@@ -310,33 +310,37 @@ jQuery.fn = jQuery.prototype = {
 				// attributes in IE that are actually only stored
 				// as properties will not be copied (such as the
 				// the name attribute on an input).
-				var clone = this.cloneNode(true),
-					container = document.createElement("div");
-				container.appendChild(clone);
-				return jQuery.clean([container.innerHTML])[0];
+				var html = this.outerHTML;
+				if ( !html ) {
+					var div = this.ownerDocument.createElement("div");
+					div.appendChild( this.cloneNode(true) );
+					html = div.innerHTML;
+				}
+
+				return jQuery.clean([html.replace(/ jQuery\d+="(?:\d+|null)"/g, "").replace(/^\s*/, "")])[0];
 			} else
 				return this.cloneNode(true);
 		});
 
-		// Need to set the expando to null on the cloned set if it exists
-		// removeData doesn't work here, IE removes it from the original as well
-		// this is primarily for IE but the data expando shouldn't be copied over in any browser
-		var clone = ret.find("*").andSelf().each(function(){
-			if ( this[ expando ] !== undefined )
-				this[ expando ] = null;
-		});
-
 		// Copy the events from the original to the clone
-		if ( events === true )
-			this.find("*").andSelf().each(function(i){
-				if (this.nodeType == 3)
-					return;
-				var events = jQuery.data( this, "events" );
+		if ( events === true ) {
+			var orig = this.find("*").andSelf(), i = 0;
 
-				for ( var type in events )
-					for ( var handler in events[ type ] )
-						jQuery.event.add( clone[ i ], type, events[ type ][ handler ], events[ type ][ handler ].data );
+			ret.find("*").andSelf().each(function(){
+				if ( this.nodeName !== orig[i].nodeName )
+					return;
+
+				var events = jQuery.data( orig[i], "events" );
+
+				for ( var type in events ) {
+					for ( var handler in events[ type ] ) {
+						jQuery.event.add( this, type, events[ type ][ handler ], events[ type ][ handler ].data );
+					}
+				}
+
+				i++;
 			});
+		}
 
 		// Return the cloned set
 		return ret;
@@ -355,14 +359,18 @@ jQuery.fn = jQuery.prototype = {
 	},
 
 	closest: function( selector ) {
-		var pos = jQuery.expr.match.POS.test( selector ) ? jQuery(selector) : null;
+		var pos = jQuery.expr.match.POS.test( selector ) ? jQuery(selector) : null,
+			closer = 0;
 
 		return this.map(function(){
 			var cur = this;
 			while ( cur && cur.ownerDocument ) {
-				if ( pos ? pos.index(cur) > -1 : jQuery(cur).is(selector) )
+				if ( pos ? pos.index(cur) > -1 : jQuery(cur).is(selector) ) {
+					jQuery.data(cur, "closest", closer);
 					return cur;
+				}
 				cur = cur.parentNode;
+				closer++;
 			}
 		});
 	},
@@ -475,7 +483,7 @@ jQuery.fn = jQuery.prototype = {
 	html: function( value ) {
 		return value === undefined ?
 			(this[0] ?
-				this[0].innerHTML :
+				this[0].innerHTML.replace(/ jQuery\d+="(?:\d+|null)"/g, "") :
 				null) :
 			this.empty().append( value );
 	},
@@ -507,13 +515,13 @@ jQuery.fn = jQuery.prototype = {
 		if ( this[0] ) {
 			var fragment = (this[0].ownerDocument || this[0]).createDocumentFragment(),
 				scripts = jQuery.clean( args, (this[0].ownerDocument || this[0]), fragment ),
-				first = fragment.firstChild,
-				extra = this.length > 1 ? fragment.cloneNode(true) : fragment;
+				first = fragment.firstChild;
 
 			if ( first )
 				for ( var i = 0, l = this.length; i < l; i++ )
-					callback.call( root(this[i], first), i > 0 ? extra.cloneNode(true) : fragment );
-			
+					callback.call( root(this[i], first), this.length > 1 || i > 0 ?
+							fragment.cloneNode(true) : fragment );
+		
 			if ( scripts )
 				jQuery.each( scripts, evalScript );
 		}
@@ -636,9 +644,7 @@ jQuery.extend({
 
 	// Evalulates a script in a global context
 	globalEval: function( data ) {
-		data = jQuery.trim( data );
-
-		if ( data ) {
+		if ( data && /\S/.test(data) ) {
 			// Inspired by code by Andrea Giammarchi
 			// http://webreflection.blogspot.com/2007/08/global-scope-evaluation-and-dom.html
 			var head = document.getElementsByTagName("head")[0] || document.documentElement,
@@ -741,26 +747,32 @@ jQuery.extend({
 			elem.style[ name ] = old[ name ];
 	},
 
-	css: function( elem, name, force ) {
+	css: function( elem, name, force, extra ) {
 		if ( name == "width" || name == "height" ) {
 			var val, props = { position: "absolute", visibility: "hidden", display:"block" }, which = name == "width" ? [ "Left", "Right" ] : [ "Top", "Bottom" ];
 
 			function getWH() {
 				val = name == "width" ? elem.offsetWidth : elem.offsetHeight;
-				var padding = 0, border = 0;
+
+				if ( extra === "border" )
+					return;
+
 				jQuery.each( which, function() {
-					padding += parseFloat(jQuery.curCSS( elem, "padding" + this, true)) || 0;
-					border += parseFloat(jQuery.curCSS( elem, "border" + this + "Width", true)) || 0;
+					if ( !extra )
+						val -= parseFloat(jQuery.curCSS( elem, "padding" + this, true)) || 0;
+					if ( extra === "margin" )
+						val += parseFloat(jQuery.curCSS( elem, "margin" + this, true)) || 0;
+					else
+						val -= parseFloat(jQuery.curCSS( elem, "border" + this + "Width", true)) || 0;
 				});
-				val -= Math.round(padding + border);
 			}
 
-			if ( jQuery(elem).is(":visible") )
+			if ( elem.offsetWidth !== 0 )
 				getWH();
 			else
 				jQuery.swap( elem, props, getWH );
 
-			return Math.max(0, val);
+			return Math.max(0, Math.round(val));
 		}
 
 		return jQuery.curCSS( elem, name, force );
@@ -866,7 +878,7 @@ jQuery.extend({
 				});
 
 				// Trim whitespace, otherwise indexOf won't work as expected
-				var tags = jQuery.trim( elem ).toLowerCase();
+				var tags = elem.replace(/^\s+/, "").substring(0, 10).toLowerCase();
 
 				var wrap =
 					// option or optgroup
@@ -906,11 +918,12 @@ jQuery.extend({
 				if ( !jQuery.support.tbody ) {
 
 					// String was a <table>, *may* have spurious <tbody>
-					var tbody = !tags.indexOf("<table") && tags.indexOf("<tbody") < 0 ?
-						div.firstChild && div.firstChild.childNodes :
+					var hasBody = /<tbody/i.test(elem),
+						tbody = !tags.indexOf("<table") && !hasBody ?
+							div.firstChild && div.firstChild.childNodes :
 
 						// String was a bare <thead> or <tfoot>
-						wrap[1] == "<table>" && tags.indexOf("<tbody") < 0 ?
+						wrap[1] == "<table>" && !hasBody ?
 							div.childNodes :
 							[];
 
@@ -1189,13 +1202,16 @@ jQuery.each({
 	insertAfter: "after",
 	replaceAll: "replaceWith"
 }, function(name, original){
-	jQuery.fn[ name ] = function() {
-		var args = arguments;
+	jQuery.fn[ name ] = function( selector ) {
+		var ret = [], insert = jQuery( selector );
 
-		return this.each(function(){
-			for ( var i = 0, length = args.length; i < length; i++ )
-				jQuery( args[ i ] )[ original ]( this );
-		});
+		for ( var i = 0, l = insert.length; i < l; i++ ) {
+			var elems = (i > 0 ? this.clone(true) : this).get();
+			jQuery.fn[ original ].apply( jQuery(insert[i]), elems );
+			ret = ret.concat( elems );
+		}
+
+		return this.pushStack( ret, name, selector );
 	};
 });
 
@@ -1234,7 +1250,7 @@ jQuery.each({
 
 	empty: function() {
 		// Remove element nodes and prevent memory leaks
-		jQuery( ">*", this ).remove();
+		jQuery(this).children().remove();
 
 		// Remove any remaining nodes
 		while ( this.firstChild )
@@ -1402,7 +1418,7 @@ jQuery.fn.extend({
  */
 (function(){
 
-var chunker = /((?:\((?:\([^()]+\)|[^()]+)+\)|\[(?:\[[^[\]]*\]|['"][^'"]+['"]|[^[\]'"]+)+\]|\\.|[^ >+~,(\[]+)+|[>+~])(\s*,\s*)?/g,
+var chunker = /((?:\((?:\([^()]+\)|[^()]+)+\)|\[(?:\[[^[\]]*\]|['"][^'"]*['"]|[^[\]'"]+)+\]|\\.|[^ >+~,(\[\\]+)+|[>+~])(\s*,\s*)?/g,
 	done = 0,
 	toString = Object.prototype.toString;
 
@@ -1507,6 +1523,19 @@ var Sizzle = function(selector, context, results, seed) {
 
 	if ( extra ) {
 		Sizzle( extra, context, results, seed );
+
+		if ( sortOrder ) {
+			hasDuplicate = false;
+			results.sort(sortOrder);
+
+			if ( hasDuplicate ) {
+				for ( var i = 1; i < results.length; i++ ) {
+					if ( results[i] === results[i-1] ) {
+						results.splice(i--, 1);
+					}
+				}
+			}
+		}
 	}
 
 	return results;
@@ -1548,7 +1577,8 @@ Sizzle.find = function(expr, context, isXML){
 };
 
 Sizzle.filter = function(expr, set, inplace, not){
-	var old = expr, result = [], curLoop = set, match, anyFound;
+	var old = expr, result = [], curLoop = set, match, anyFound,
+		isXMLFilter = set && set[0] && isXML(set[0]);
 
 	while ( expr && set.length ) {
 		for ( var type in Expr.filter ) {
@@ -1561,7 +1591,7 @@ Sizzle.filter = function(expr, set, inplace, not){
 				}
 
 				if ( Expr.preFilter[ type ] ) {
-					match = Expr.preFilter[ type ]( match, curLoop, inplace, result, not );
+					match = Expr.preFilter[ type ]( match, curLoop, inplace, result, not, isXMLFilter );
 
 					if ( !match ) {
 						anyFound = found = true;
@@ -1606,8 +1636,6 @@ Sizzle.filter = function(expr, set, inplace, not){
 			}
 		}
 
-		expr = expr.replace(/\s*,\s*/, "");
-
 		// Improper expression
 		if ( expr == old ) {
 			if ( anyFound == null ) {
@@ -1645,26 +1673,33 @@ var Expr = Sizzle.selectors = {
 		}
 	},
 	relative: {
-		"+": function(checkSet, part){
-			for ( var i = 0, l = checkSet.length; i < l; i++ ) {
-				var elem = checkSet[i];
-				if ( elem ) {
-					var cur = elem.previousSibling;
-					while ( cur && cur.nodeType !== 1 ) {
-						cur = cur.previousSibling;
-					}
-					checkSet[i] = typeof part === "string" ?
-						cur || false :
-						cur === part;
+		"+": function(checkSet, part, isXML){
+			var isPartStr = typeof part === "string",
+				isTag = isPartStr && !/\W/.test(part),
+				isPartStrNotTag = isPartStr && !isTag;
+
+			if ( isTag && !isXML ) {
+				part = part.toUpperCase();
+			}
+
+			for ( var i = 0, l = checkSet.length, elem; i < l; i++ ) {
+				if ( (elem = checkSet[i]) ) {
+					while ( (elem = elem.previousSibling) && elem.nodeType !== 1 ) {}
+
+					checkSet[i] = isPartStrNotTag || elem && elem.nodeName === part ?
+						elem || false :
+						elem === part;
 				}
 			}
 
-			if ( typeof part === "string" ) {
+			if ( isPartStrNotTag ) {
 				Sizzle.filter( part, checkSet, true );
 			}
 		},
 		">": function(checkSet, part, isXML){
-			if ( typeof part === "string" && !/\W/.test(part) ) {
+			var isPartStr = typeof part === "string";
+
+			if ( isPartStr && !/\W/.test(part) ) {
 				part = isXML ? part : part.toUpperCase();
 
 				for ( var i = 0, l = checkSet.length; i < l; i++ ) {
@@ -1678,19 +1713,19 @@ var Expr = Sizzle.selectors = {
 				for ( var i = 0, l = checkSet.length; i < l; i++ ) {
 					var elem = checkSet[i];
 					if ( elem ) {
-						checkSet[i] = typeof part === "string" ?
+						checkSet[i] = isPartStr ?
 							elem.parentNode :
 							elem.parentNode === part;
 					}
 				}
 
-				if ( typeof part === "string" ) {
+				if ( isPartStr ) {
 					Sizzle.filter( part, checkSet, true );
 				}
 			}
 		},
 		"": function(checkSet, part, isXML){
-			var doneName = "done" + (done++), checkFn = dirCheck;
+			var doneName = done++, checkFn = dirCheck;
 
 			if ( !part.match(/\W/) ) {
 				var nodeCheck = part = isXML ? part : part.toUpperCase();
@@ -1700,7 +1735,7 @@ var Expr = Sizzle.selectors = {
 			checkFn("parentNode", part, doneName, checkSet, nodeCheck, isXML);
 		},
 		"~": function(checkSet, part, isXML){
-			var doneName = "done" + (done++), checkFn = dirCheck;
+			var doneName = done++, checkFn = dirCheck;
 
 			if ( typeof part === "string" && !part.match(/\W/) ) {
 				var nodeCheck = part = isXML ? part : part.toUpperCase();
@@ -1718,8 +1753,16 @@ var Expr = Sizzle.selectors = {
 			}
 		},
 		NAME: function(match, context, isXML){
-			if ( typeof context.getElementsByName !== "undefined" && !isXML ) {
-				return context.getElementsByName(match[1]);
+			if ( typeof context.getElementsByName !== "undefined" ) {
+				var ret = [], results = context.getElementsByName(match[1]);
+
+				for ( var i = 0, l = results.length; i < l; i++ ) {
+					if ( results[i].getAttribute("name") === match[1] ) {
+						ret.push( results[i] );
+					}
+				}
+
+				return ret.length === 0 ? null : ret;
 			}
 		},
 		TAG: function(match, context){
@@ -1727,13 +1770,16 @@ var Expr = Sizzle.selectors = {
 		}
 	},
 	preFilter: {
-		CLASS: function(match, curLoop, inplace, result, not){
+		CLASS: function(match, curLoop, inplace, result, not, isXML){
 			match = " " + match[1].replace(/\\/g, "") + " ";
 
-			var elem;
-			for ( var i = 0; (elem = curLoop[i]) != null; i++ ) {
+			if ( isXML ) {
+				return match;
+			}
+
+			for ( var i = 0, elem; (elem = curLoop[i]) != null; i++ ) {
 				if ( elem ) {
-					if ( not ^ (" " + elem.className + " ").indexOf(match) >= 0 ) {
+					if ( not ^ (elem.className && (" " + elem.className + " ").indexOf(match) >= 0) ) {
 						if ( !inplace )
 							result.push( elem );
 					} else if ( inplace ) {
@@ -1764,14 +1810,14 @@ var Expr = Sizzle.selectors = {
 			}
 
 			// TODO: Move to normal caching system
-			match[0] = "done" + (done++);
+			match[0] = done++;
 
 			return match;
 		},
-		ATTR: function(match){
+		ATTR: function(match, curLoop, inplace, result, not, isXML){
 			var name = match[1].replace(/\\/g, "");
 			
-			if ( Expr.attrMap[name] ) {
+			if ( !isXML && Expr.attrMap[name] ) {
 				match[1] = Expr.attrMap[name];
 			}
 
@@ -1784,7 +1830,7 @@ var Expr = Sizzle.selectors = {
 		PSEUDO: function(match, curLoop, inplace, result, not){
 			if ( match[1] === "not" ) {
 				// If we're dealing with a complex expression, or a simple one
-				if ( match[3].match(chunker).length > 1 ) {
+				if ( match[3].match(chunker).length > 1 || /^\w/.test(match[3]) ) {
 					match[3] = Sizzle(match[3], null, null, curLoop);
 				} else {
 					var ret = Sizzle.filter(match[3], curLoop, inplace, true ^ not);
@@ -1793,7 +1839,7 @@ var Expr = Sizzle.selectors = {
 					}
 					return false;
 				}
-			} else if ( Expr.match.POS.test( match[0] ) ) {
+			} else if ( Expr.match.POS.test( match[0] ) || Expr.match.CHILD.test( match[0] ) ) {
 				return true;
 			}
 			
@@ -1890,47 +1936,6 @@ var Expr = Sizzle.selectors = {
 		}
 	},
 	filter: {
-		CHILD: function(elem, match){
-			var type = match[1], parent = elem.parentNode;
-
-			var doneName = match[0];
-			
-			if ( parent && (!parent[ doneName ] || !elem.nodeIndex) ) {
-				var count = 1;
-
-				for ( var node = parent.firstChild; node; node = node.nextSibling ) {
-					if ( node.nodeType == 1 ) {
-						node.nodeIndex = count++;
-					}
-				}
-
-				parent[ doneName ] = count - 1;
-			}
-
-			if ( type == "first" ) {
-				return elem.nodeIndex == 1;
-			} else if ( type == "last" ) {
-				return elem.nodeIndex == parent[ doneName ];
-			} else if ( type == "only" ) {
-				return parent[ doneName ] == 1;
-			} else if ( type == "nth" ) {
-				var add = false, first = match[2], last = match[3];
-
-				if ( first == 1 && last == 0 ) {
-					return true;
-				}
-
-				if ( first == 0 ) {
-					if ( elem.nodeIndex == last ) {
-						add = true;
-					}
-				} else if ( (elem.nodeIndex - last) % first == 0 && (elem.nodeIndex - last) / first >= 0 ) {
-					add = true;
-				}
-
-				return add;
-			}
-		},
 		PSEUDO: function(elem, match, i, array){
 			var name = match[1], filter = Expr.filters[ name ];
 
@@ -1950,6 +1955,49 @@ var Expr = Sizzle.selectors = {
 				return true;
 			}
 		},
+		CHILD: function(elem, match){
+			var type = match[1], node = elem;
+			switch (type) {
+				case 'only':
+				case 'first':
+					while (node = node.previousSibling)  {
+						if ( node.nodeType === 1 ) return false;
+					}
+					if ( type == 'first') return true;
+					node = elem;
+				case 'last':
+					while (node = node.nextSibling)  {
+						if ( node.nodeType === 1 ) return false;
+					}
+					return true;
+				case 'nth':
+					var first = match[2], last = match[3];
+
+					if ( first == 1 && last == 0 ) {
+						return true;
+					}
+					
+					var doneName = match[0],
+						parent = elem.parentNode;
+	
+					if ( parent && (parent.sizcache !== doneName || !elem.nodeIndex) ) {
+						var count = 0;
+						for ( node = parent.firstChild; node; node = node.nextSibling ) {
+							if ( node.nodeType === 1 ) {
+								node.nodeIndex = ++count;
+							}
+						} 
+						parent.sizcache = doneName;
+					}
+					
+					var diff = elem.nodeIndex - last;
+					if ( first == 0 ) {
+						return diff == 0;
+					} else {
+						return ( diff % first == 0 && diff / first >= 0 );
+					}
+			}
+		},
 		ID: function(elem, match){
 			return elem.nodeType === 1 && elem.getAttribute("id") === match;
 		},
@@ -1957,10 +2005,20 @@ var Expr = Sizzle.selectors = {
 			return (match === "*" && elem.nodeType === 1) || elem.nodeName === match;
 		},
 		CLASS: function(elem, match){
-			return match.test( elem.className );
+			return (" " + (elem.className || elem.getAttribute("class")) + " ")
+				.indexOf( match ) > -1;
 		},
 		ATTR: function(elem, match){
-			var result = Expr.attrHandle[ match[1] ] ? Expr.attrHandle[ match[1] ]( elem ) : elem[ match[1] ] || elem.getAttribute( match[1] ), value = result + "", type = match[2], check = match[4];
+			var name = match[1],
+				result = Expr.attrHandle[ name ] ?
+					Expr.attrHandle[ name ]( elem ) :
+					elem[ name ] != null ?
+						elem[ name ] :
+						elem.getAttribute( name ),
+				value = result + "",
+				type = match[2],
+				check = match[4];
+
 			return result == null ?
 				type === "!=" :
 				type === "=" ?
@@ -1969,8 +2027,8 @@ var Expr = Sizzle.selectors = {
 				value.indexOf(check) >= 0 :
 				type === "~=" ?
 				(" " + value + " ").indexOf(check) >= 0 :
-				!match[4] ?
-				result :
+				!check ?
+				value && result !== false :
 				type === "!=" ?
 				value != check :
 				type === "^=" ?
@@ -2032,6 +2090,39 @@ try {
 			}
 		}
 
+		return ret;
+	};
+}
+
+var sortOrder;
+
+if ( document.documentElement.compareDocumentPosition ) {
+	sortOrder = function( a, b ) {
+		var ret = a.compareDocumentPosition(b) & 4 ? -1 : a === b ? 0 : 1;
+		if ( ret === 0 ) {
+			hasDuplicate = true;
+		}
+		return ret;
+	};
+} else if ( "sourceIndex" in document.documentElement ) {
+	sortOrder = function( a, b ) {
+		var ret = a.sourceIndex - b.sourceIndex;
+		if ( ret === 0 ) {
+			hasDuplicate = true;
+		}
+		return ret;
+	};
+} else if ( document.createRange ) {
+	sortOrder = function( a, b ) {
+		var aRange = a.ownerDocument.createRange(), bRange = b.ownerDocument.createRange();
+		aRange.selectNode(a);
+		aRange.collapse(true);
+		bRange.selectNode(b);
+		bRange.collapse(true);
+		var ret = aRange.compareBoundaryPoints(Range.START_TO_END, bRange);
+		if ( ret === 0 ) {
+			hasDuplicate = true;
+		}
 		return ret;
 	};
 }
@@ -2099,7 +2190,8 @@ try {
 
 	// Check to see if an attribute returns normalized href attributes
 	div.innerHTML = "<a href='#'></a>";
-	if ( div.firstChild && div.firstChild.getAttribute("href") !== "#" ) {
+	if ( div.firstChild && typeof div.firstChild.getAttribute !== "undefined" &&
+			div.firstChild.getAttribute("href") !== "#" ) {
 		Expr.attrHandle.href = function(elem){
 			return elem.getAttribute("href", 2);
 		};
@@ -2136,29 +2228,50 @@ if ( document.querySelectorAll ) (function(){
 	Sizzle.matches = oldSizzle.matches;
 })();
 
-if ( document.getElementsByClassName && document.documentElement.getElementsByClassName ) {
+if ( document.getElementsByClassName && document.documentElement.getElementsByClassName ) (function(){
+	var div = document.createElement("div");
+	div.innerHTML = "<div class='test e'></div><div class='test'></div>";
+
+	// Opera can't find a second classname (in 9.6)
+	if ( div.getElementsByClassName("e").length === 0 )
+		return;
+
+	// Safari caches class attributes, doesn't catch changes (in 3.2)
+	div.lastChild.className = "e";
+
+	if ( div.getElementsByClassName("e").length === 1 )
+		return;
+
 	Expr.order.splice(1, 0, "CLASS");
-	Expr.find.CLASS = function(match, context) {
-		return context.getElementsByClassName(match[1]);
+	Expr.find.CLASS = function(match, context, isXML) {
+		if ( typeof context.getElementsByClassName !== "undefined" && !isXML ) {
+			return context.getElementsByClassName(match[1]);
+		}
 	};
-}
+})();
 
 function dirNodeCheck( dir, cur, doneName, checkSet, nodeCheck, isXML ) {
+	var sibDir = dir == "previousSibling" && !isXML;
 	for ( var i = 0, l = checkSet.length; i < l; i++ ) {
 		var elem = checkSet[i];
 		if ( elem ) {
+			if ( sibDir && elem.nodeType === 1 ){
+				elem.sizcache = doneName;
+				elem.sizset = i;
+			}
 			elem = elem[dir];
 			var match = false;
 
-			while ( elem && elem.nodeType ) {
-				var done = elem[doneName];
-				if ( done ) {
-					match = checkSet[ done ];
+			while ( elem ) {
+				if ( elem.sizcache === doneName ) {
+					match = checkSet[elem.sizset];
 					break;
 				}
 
-				if ( elem.nodeType === 1 && !isXML )
-					elem[doneName] = i;
+				if ( elem.nodeType === 1 && !isXML ){
+					elem.sizcache = doneName;
+					elem.sizset = i;
+				}
 
 				if ( elem.nodeName === cur ) {
 					match = elem;
@@ -2174,22 +2287,28 @@ function dirNodeCheck( dir, cur, doneName, checkSet, nodeCheck, isXML ) {
 }
 
 function dirCheck( dir, cur, doneName, checkSet, nodeCheck, isXML ) {
+	var sibDir = dir == "previousSibling" && !isXML;
 	for ( var i = 0, l = checkSet.length; i < l; i++ ) {
 		var elem = checkSet[i];
 		if ( elem ) {
+			if ( sibDir && elem.nodeType === 1 ) {
+				elem.sizcache = doneName;
+				elem.sizset = i;
+			}
 			elem = elem[dir];
 			var match = false;
 
-			while ( elem && elem.nodeType ) {
-				if ( elem[doneName] ) {
-					match = checkSet[ elem[doneName] ];
+			while ( elem ) {
+				if ( elem.sizcache === doneName ) {
+					match = checkSet[elem.sizset];
 					break;
 				}
 
 				if ( elem.nodeType === 1 ) {
-					if ( !isXML )
-						elem[doneName] = i;
-
+					if ( !isXML ) {
+						elem.sizcache = doneName;
+						elem.sizset = i;
+					}
 					if ( typeof cur !== "string" ) {
 						if ( elem === cur ) {
 							match = true;
@@ -2248,15 +2367,11 @@ jQuery.expr = Sizzle.selectors;
 jQuery.expr[":"] = jQuery.expr.filters;
 
 Sizzle.selectors.filters.hidden = function(elem){
-	return "hidden" === elem.type ||
-		jQuery.css(elem, "display") === "none" ||
-		jQuery.css(elem, "visibility") === "hidden";
+	return elem.offsetWidth === 0 || elem.offsetHeight === 0;
 };
 
 Sizzle.selectors.filters.visible = function(elem){
-	return "hidden" !== elem.type &&
-		jQuery.css(elem, "display") !== "none" &&
-		jQuery.css(elem, "visibility") !== "hidden";
+	return elem.offsetWidth > 0 || elem.offsetHeight > 0;
 };
 
 Sizzle.selectors.filters.animated = function(elem){
@@ -2552,7 +2667,8 @@ jQuery.event = {
 		var all, handlers;
 
 		event = arguments[0] = jQuery.event.fix( event || window.event );
-
+		event.currentTarget = this;
+		
 		// Namespaced event handlers
 		var namespaces = event.type.split(".");
 		event.type = namespaces.shift();
@@ -2883,9 +2999,13 @@ function liveHandler( event ){
 		}
 	});
 
+	elems.sort(function(a,b) {
+		return jQuery.data(a.elem, "closest") - jQuery.data(b.elem, "closest");
+	});
+	
 	jQuery.each(elems, function(){
 		if ( this.fn.call(this.elem, event, this.fn.data) === false )
-			stop = false;
+			return (stop = false);
 	});
 
 	return stop;
@@ -2949,7 +3069,7 @@ function bindReady(){
 
 		// If IE and not an iframe
 		// continually check to see if the document is ready
-		if ( document.documentElement.doScroll && typeof window.frameElement === "undefined" ) (function(){
+		if ( document.documentElement.doScroll && window == window.top ) (function(){
 			if ( jQuery.isReady ) return;
 
 			try {
@@ -3079,12 +3199,11 @@ jQuery( window ).bind( 'unload', function(){
 	// document.body must exist before we can do this
 	jQuery(function(){
 		var div = document.createElement("div");
-		div.style.width = "1px";
-		div.style.paddingLeft = "1px";
+		div.style.width = div.style.paddingLeft = "1px";
 
 		document.body.appendChild( div );
 		jQuery.boxModel = jQuery.support.boxModel = div.offsetWidth === 2;
-		document.body.removeChild( div );
+		document.body.removeChild( div ).style.display = 'none';
 	});
 })();
 
@@ -3175,7 +3294,7 @@ jQuery.fn.extend({
 		.filter(function(){
 			return this.name && !this.disabled &&
 				(this.checked || /select|textarea/i.test(this.nodeName) ||
-					/text|hidden|password/i.test(this.type));
+					/text|hidden|password|search/i.test(this.type));
 		})
 		.map(function(i, elem){
 			var val = jQuery(this).val();
@@ -3371,6 +3490,9 @@ jQuery.extend({
 						done = true;
 						success();
 						complete();
+
+						// Handle memory leak in IE
+						script.onload = script.onreadystatechange = null;
 						head.removeChild( script );
 					}
 				};
@@ -3686,8 +3808,14 @@ jQuery.fn.extend({
 						elemdisplay[ tagName ] = display;
 					}
 					
-					this[i].style.display = jQuery.data(this[i], "olddisplay", display);
+					jQuery.data(this[i], "olddisplay", display);
 				}
+			}
+
+			// Set the display of the elements in a second loop
+			// to avoid the constant reflow
+			for ( var i = 0, l = this.length; i < l; i++ ){
+				this[i].style.display = jQuery.data(this[i], "olddisplay") || "";
 			}
 			
 			return this;
@@ -3702,8 +3830,14 @@ jQuery.fn.extend({
 				var old = jQuery.data(this[i], "olddisplay");
 				if ( !old && old !== "none" )
 					jQuery.data(this[i], "olddisplay", jQuery.css(this[i], "display"));
+			}
+
+			// Set the display of the elements in a second loop
+			// to avoid the constant reflow
+			for ( var i = 0, l = this.length; i < l; i++ ){
 				this[i].style.display = "none";
 			}
+
 			return this;
 		}
 	},
@@ -3915,7 +4049,7 @@ jQuery.fx.prototype = {
 
 		t.elem = this.elem;
 
-		if ( t() && jQuery.timers.push(t) == 1 ) {
+		if ( t() && jQuery.timers.push(t) && !timerId ) {
 			timerId = setInterval(function(){
 				var timers = jQuery.timers;
 
@@ -3925,6 +4059,7 @@ jQuery.fx.prototype = {
 
 				if ( !timers.length ) {
 					clearInterval( timerId );
+					timerId = undefined;
 				}
 			}, 13);
 		}
@@ -4193,22 +4328,21 @@ jQuery.each( ['Left', 'Top'], function(i, name) {
 jQuery.each([ "Height", "Width" ], function(i, name){
 
 	var tl = i ? "Left"  : "Top",  // top or left
-		br = i ? "Right" : "Bottom"; // bottom or right
+		br = i ? "Right" : "Bottom", // bottom or right
+		lower = name.toLowerCase();
 
 	// innerHeight and innerWidth
 	jQuery.fn["inner" + name] = function(){
-		return this[ name.toLowerCase() ]() +
-			num(this, "padding" + tl) +
-			num(this, "padding" + br);
+		return this[0] ?
+			jQuery.css( this[0], lower, false, "padding" ) :
+			null;
 	};
 
 	// outerHeight and outerWidth
 	jQuery.fn["outer" + name] = function(margin) {
-		return this["inner" + name]() +
-			num(this, "border" + tl + "Width") +
-			num(this, "border" + br + "Width") +
-			(margin ?
-				num(this, "margin" + tl) + num(this, "margin" + br) : 0);
+		return this[0] ?
+			jQuery.css( this[0], lower, false, margin ? "margin" : "border" ) :
+			null;
 	};
 	
 	var type = name.toLowerCase();
@@ -4238,4 +4372,5 @@ jQuery.each([ "Height", "Width" ], function(i, name){
 					this.css( type, typeof size === "string" ? size : size + "px" );
 	};
 
-});})();
+});
+})();
