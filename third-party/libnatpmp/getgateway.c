@@ -1,4 +1,4 @@
-/* $Id: getgateway.c,v 1.12 2008/10/06 10:04:16 nanard Exp $ */
+/* $Id: getgateway.c,v 1.13 2009/03/10 10:15:31 nanard Exp $ */
 /* libnatpmp
  * Copyright (c) 2007-2008, Thomas BERNARD <miniupnp@free.fr>
  *
@@ -374,6 +374,20 @@ int getdefaultgateway(in_addr_t * addr)
 						gatewayValueLength = MAX_VALUE_LENGTH;
 						if(ERROR_SUCCESS == RegQueryValueEx(interfaceKey,         // Open registry key
 						                                    "DhcpDefaultGateway", // Name of key to query
+						                                    NULL,                 // Reserved - must be NULL
+						                                    &gatewayValueType,    // Receives value type
+						                                    gatewayValue,         // Receives value
+						                                    &gatewayValueLength)) // Receives value length in bytes
+						{
+							// Check to make sure it's a string
+							if(gatewayValueType == REG_MULTI_SZ || gatewayValueType == REG_SZ)
+							{
+								//printf("gatewayValue: %s\n", gatewayValue);
+								done = 1;
+							}
+						}
+						else if(ERROR_SUCCESS == RegQueryValueEx(interfaceKey,         // Open registry key
+						                                    "DefaultGateway", // Name of key to query
 						                                    NULL,                 // Reserved - must be NULL
 						                                    &gatewayValueType,    // Receives value type
 						                                    gatewayValue,         // Receives value

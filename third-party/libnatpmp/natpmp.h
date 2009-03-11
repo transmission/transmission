@@ -1,4 +1,4 @@
-/* $Id: natpmp.h,v 1.10 2008/07/02 22:33:06 nanard Exp $ */
+/* $Id: natpmp.h,v 1.11 2009/02/27 22:38:05 nanard Exp $ */
 /* libnatpmp
  * Copyright (c) 2007-2008, Thomas BERNARD <miniupnp@free.fr>
  * http://miniupnp.free.fr/libnatpmp.html
@@ -26,10 +26,11 @@
 #include <winsock2.h>
 #include <stdint.h>
 #define in_addr_t uint32_t
+#include "declspec.h"
 #else
+#define LIBSPEC
 #include <netinet/in.h>
 #endif
-#include "declspec.h"
 
 typedef struct {
 	int s;	/* socket */

@@ -79,7 +79,7 @@ int closenatpmp(natpmp_t * p)
 	return 0;
 }
 
-int sendpendingrequest(natpmp_t * p)
+static int sendpendingrequest(natpmp_t * p)
 {
 	int r;
 /*	struct sockaddr_in addr;*/
@@ -95,7 +95,7 @@ int sendpendingrequest(natpmp_t * p)
 	return (r<0) ? NATPMP_ERR_SENDERR : r;
 }
 
-int sendnatpmprequest(natpmp_t * p)
+static int sendnatpmprequest(natpmp_t * p)
 {
 	int n;
 	if(!p)
@@ -160,7 +160,7 @@ int sendnewportmappingrequest(natpmp_t * p, int protocol,
 	return sendnatpmprequest(p);
 }
 
-int readnatpmpresponse(natpmp_t * p, natpmpresp_t * response)
+static int readnatpmpresponse(natpmp_t * p, natpmpresp_t * response)
 {
 	unsigned char buf[16];
 	struct sockaddr_in addr;
