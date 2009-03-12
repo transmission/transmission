@@ -658,6 +658,7 @@ div.dialog_container div.dialog_window {
 	position: relative;
 	-webkit-box-shadow: 0 3px 6px rgba(0,0,0,0.7);
 	top: 50%;
+	padding-bottom: 20px;
 }
 @media screen and (-webkit-min-device-pixel-ratio:0) {
 	div.dialog_container div.dialog_window {
@@ -691,6 +692,7 @@ div.dialog_container div.dialog_window div.dialog_message {
 	float: left;
 	padding-left: 3px;
 	margin-left: -3px;
+	margin-bottom: 10px;
 	width: 305px;
 	height: 55px;
 	overflow: hidden;
@@ -699,7 +701,7 @@ div.dialog_container div.dialog_window div.dialog_message {
 div.dialog_container div.dialog_window a {
 	display: block;
 	float: right;
-	margin: 10px 20px 0 -8px;
+	margin: 0px 20px 0px -8px;
 	padding: 5px;
 	background-color: #EEE;
 	border: 1px solid #787878;
@@ -932,11 +934,13 @@ div#prefs_container div#pref_error {
 	background: transparent;
 	border: 1px solid rgba(0,0,0,0.1);
 	-webkit-border-radius: 5px;
+	min-width: 210px;
 }
 
 .trans_menu div.inner {
 	left: 0;
 	margin: 0;
+	min-width: 210px;
 }
 
 .trans_menu li.main {
@@ -947,7 +951,7 @@ div#prefs_container div#pref_error {
 
 .trans_menu li.main li {
 	z-index: 2;
-	min-width: 78px;
+	min-width: 180px;
 }
 
 .trans_menu li.main.active {
