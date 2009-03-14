@@ -26,6 +26,8 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 - Web Client
    + Support for Internet Explorer
    + Layout fixes when viewed on an iPhone/iPod touch
+- Web Client 
+   + File selection and prioritization
 
 1.50 (2009/02/13)
 <http://trac.transmissionbt.com/query?milestone=1.50&group=component&groupdesc=1&order=severity>
