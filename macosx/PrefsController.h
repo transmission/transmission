@@ -60,6 +60,7 @@
     IBOutlet NSTableView * fRPCWhitelistTable;
     NSMutableArray * fRPCWhitelistArray;
     IBOutlet NSSegmentedControl * fRPCAddRemoveControl;
+    NSString * fRPCPassword;
 }
 
 + (void) setHandle: (tr_session *) handle;

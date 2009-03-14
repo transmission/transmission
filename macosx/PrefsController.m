@@ -169,6 +169,8 @@ tr_session * fHandle;
     
     [fRPCWhitelistArray release];
     
+    [fRPCPassword release];
+    
     [super dealloc];
 }
 
@@ -247,10 +249,9 @@ tr_session * fHandle;
     //set rpc port
     [fRPCPortField setIntValue: [fDefaults integerForKey: @"RPCPort"]];
     
-    //set rpc password - has to be released
-    char * rpcPassword = tr_sessionGetRPCPassword(fHandle);
-    [fRPCPasswordField setStringValue: [NSString stringWithUTF8String: rpcPassword]];
-    tr_free(rpcPassword);
+    //set rpc password
+    if (fRPCPassword)
+        [fRPCPasswordField setStringValue: fRPCPassword];
 }
 
 - (NSToolbarItem *) toolbar: (NSToolbar *) toolbar itemForItemIdentifier: (NSString *) ident willBeInsertedIntoToolbar: (BOOL) flag
@@ -869,6 +870,9 @@ tr_session * fHandle;
 
 - (void) setRPCPassword: (id) sender
 {
+    [fRPCPassword release];
+    fRPCPassword = [[sender stringValue] copy];
+    
     const char * password = [[sender stringValue] UTF8String];
     [self setKeychainPassword: password forService: RPC_KEYCHAIN_SERVICE username: RPC_KEYCHAIN_NAME];
     
@@ -882,6 +886,7 @@ tr_session * fHandle;
     SecKeychainFindGenericPassword(NULL, strlen(RPC_KEYCHAIN_SERVICE), RPC_KEYCHAIN_SERVICE,
         strlen(RPC_KEYCHAIN_NAME), RPC_KEYCHAIN_NAME, &passwordLength, (void **)&password, NULL);
     
+    [fRPCPassword release];
     if (password != NULL)
     {
         char fullPassword[passwordLength+1];
@@ -890,8 +895,12 @@ tr_session * fHandle;
         SecKeychainItemFreeContent(NULL, (void *)password);
         
         tr_sessionSetRPCPassword(fHandle, fullPassword);
-        [fRPCPasswordField setStringValue: [NSString stringWithUTF8String: fullPassword]];
+        
+        fRPCPassword = [[NSString alloc] initWithUTF8String: fullPassword];
+        [fRPCPasswordField setStringValue: fRPCPassword];
     }
+    else
+        fRPCPassword = nil;
 }
 
 - (void) setRPCPort: (id) sender
