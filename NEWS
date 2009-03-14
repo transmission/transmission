@@ -12,6 +12,8 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Bonjour support for the web interface
    + File filter field in the inspector
    + Option to include beta releases when auto-updating (using modified Sparkle 1.5)
+- Web Client 
+   + File selection and prioritization
 
 1.51 (2009/02/26)
 <http://trac.transmissionbt.com/query?milestone=1.51&group=component&groupdesc=1&order=severity>
@@ -26,8 +28,6 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 - Web Client
    + Support for Internet Explorer
    + Layout fixes when viewed on an iPhone/iPod touch
-- Web Client 
-   + File selection and prioritization
 
 1.50 (2009/02/13)
 <http://trac.transmissionbt.com/query?milestone=1.50&group=component&groupdesc=1&order=severity>
