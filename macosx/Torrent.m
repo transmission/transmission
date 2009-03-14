@@ -935,7 +935,7 @@ int trashDataFile(const char * filename)
 
 - (BOOL) allDownloaded
 {
-    return [self progressDone] >= 1.0;
+    return [self sizeLeft] > 0;
 }
 
 - (BOOL) isComplete
