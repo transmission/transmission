@@ -454,7 +454,8 @@
         {
             NSArray * groupTorrents = [item torrents];
             [torrents addObjectsFromArray: groupTorrents];
-            i += [groupTorrents count];
+            if ([self isItemExpanded: item])
+                i +=[groupTorrents count];
         }
     }
     
