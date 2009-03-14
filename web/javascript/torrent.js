@@ -23,8 +23,7 @@ Torrent.prototype =
 	/*
 	 * Constructor
 	 */
-	initialize: function(controller,data)
-	{
+	initialize: function(controller, data) {
 		// Create a new <li> element
 		var element = $('<li/>');
 		element.addClass('torrent');
@@ -77,7 +76,7 @@ Torrent.prototype =
 		e.addClass('torrent_peer_details');
 		element.append( e );
 		element._peer_details_container = e;
-			
+		
 		// Set the torrent click observer
 		element.bind('click', {element: element}, this.clickTorrent);
 		if (!iPhone) element.bind('contextmenu', {element: element}, this.rightClickTorrent);		
@@ -89,12 +88,39 @@ Torrent.prototype =
 		
 		// insert the element
 		$('#torrent_list').append(this._element);
+		this.initializeTorrentFilesInspectorGroup();
+		
+		for (var i = 0; i < data.files.length; i++) {
+			var file = data.files[i];
+			file.index    = i;
+			file.torrent  = this;
+			file.priority = data.priorities[i];
+			file.wanted   = data.wanted[i];
+			var torrentFile = new TorrentFile(file); 
+			this._files.push(torrentFile);
+			this._fileList.append(
+				torrentFile.element().addClass(i % 2 ? 'even' : 'odd').addClass('inspector_torrent_file_list_entry')
+			);
+		}
 		
 		// Update all the labels etc
 		this.refresh(data);
 	},
-
-
+	
+	initializeTorrentFilesInspectorGroup: function() {
+		this._files = [];
+		this._fileList = $('<ul/>').addClass('inspector_torrent_file_list').addClass('inspector_group').hide().
+			append($('<li/>').addClass('inspector_group_label').append(
+				$('<div/>').append(this.name())
+			)
+		);
+		$('#inspector_file_list').append(this._fileList);
+	},
+	
+	fileList: function() {
+		return this._fileList;
+	},
+	
 	/*--------------------------------------------
 	 * 
 	 *  S E T T E R S   /   G E T T E R S
@@ -131,8 +157,7 @@ Torrent.prototype =
 	getPercentDone: function() {
 		if( !this._sizeWhenDone ) return 1.0;
 		if( !this._leftUntilDone ) return 1.0;
-		return ( this._sizeWhenDone - this._leftUntilDone )
-		       / this._sizeWhenDone;
+		return ( this._sizeWhenDone - this._leftUntilDone ) / this._sizeWhenDone;
 	},
 	getPercentDoneStr: function() {
 		return Math.ratio( 100 * ( this._sizeWhenDone - this._leftUntilDone ),
@@ -155,7 +180,9 @@ Torrent.prototype =
 	totalSeeders: function() { return this._total_seeders; },
 	uploadSpeed: function() { return this._upload_speed; },
 	uploadTotal: function() { return this._upload_total; },
-
+	showFileList: function() { if (this.fileList()) return this.fileList().show(); },
+	hideFileList: function() { if (this.fileList()) return this.fileList().hide(); },
+	
 	/*--------------------------------------------
 	 * 
 	 *  E V E N T   F U N C T I O N S
@@ -252,8 +279,7 @@ Torrent.prototype =
 	/*
 	 * Refresh display
 	 */
-	refreshData: function(data)
-	{
+	refreshData: function(data) {
 		// These variables never change after the inital load
 		if (data.isPrivate)     this._is_private    = data.isPrivate;
 		if (data.hashString)    this._hashString    = data.hashString;
@@ -263,8 +289,8 @@ Torrent.prototype =
 		if (data.comment)       this._comment       = data.comment;
 		if (data.creator)       this._creator       = data.creator;
 		if (data.dateCreated)   this._creator_date  = data.dateCreated;
-                if (data.leftUntilDone) this._leftUntilDone = data.leftUntilDone;
-                if (data.sizeWhenDone)  this._sizeWhenDone  = data.sizeWhenDone;
+		if (data.leftUntilDone) this._leftUntilDone = data.leftUntilDone;
+		if (data.sizeWhenDone)  this._sizeWhenDone  = data.sizeWhenDone;
 		if (data.path)          this._torrent_file  = data.path;//FIXME
 		if (data.name) {
 			this._name = data.name;
@@ -289,10 +315,18 @@ Torrent.prototype =
 		this._total_leechers        = Math.max( 0, data.leechers );
 		this._total_seeders         = Math.max( 0, data.seeders );
 		this._state                 = data.status;
+		
+		if (data.files) {
+			for (var i = 0; i < data.files.length; i++) {
+				var file_data      = data.files[i];
+				if (data.priorities) { file_data.priority = data.priorities[i]; }
+				if (data.wanted)     { file_data.wanted   = data.wanted[i]; }
+				this._files[i].readAttributes(file_data);
+			}
+		}
 	},
 
-	refreshHTML: function()
-	{
+	refreshHTML: function() {
 		var progress_details;
 		var peer_details;
 		var root = this._element;
@@ -426,6 +460,12 @@ Torrent.prototype =
 		}
 		
 		setInnerHTML( root._peer_details_container[0], peer_details );
+		
+		// Update individual files within a torrent
+		jQuery.each(this._files, function () {
+			this.refreshHTML();
+		} );
+
 	},
 
 	/*
@@ -586,4 +626,128 @@ Torrent.lookup = function( torrents, id )
 {
 	var pos = Torrent.indexOf( torrents, id );
 	return pos >= 0 ? torrents[pos] : null;
+};
+
+function TorrentFile(file_data) {
+	this.initialize(file_data);
+}
+
+TorrentFile.prototype = {
+	initialize: function(file_data) {
+		this._torrent = file_data.torrent;
+		var pos = file_data.name.indexOf('/');
+		if (pos >= 0)
+			this.name = file_data.name.substring(pos + 1);
+		else
+			this.name = file_data.name;
+		this.readAttributes(file_data);
+		
+		this._element = $('<li/>').append(
+			$('<div/>').addClass('file_wanted_control').
+			bind('click', { file: this }, this.fileWantedControlClicked)
+			
+		).append(
+			this._priority_control = $('<div/>').addClass('file_priority_control').
+			bind('click', { file: this }, this.filePriorityControlClicked)
+			
+		).append(
+			$('<div/>').addClass('inspector_torrent_file_list_entry_name').
+			append(this.name)
+			
+		).append(
+			this._progress = $('<div/>').addClass('inspector_torrent_file_list_entry_progress')
+		)
+	},
+	
+	readAttributes: function(file_data) {
+		if (undefined != file_data.index)          this._index  = file_data.index;
+		if (undefined != file_data.bytesCompleted) this._done   = file_data.bytesCompleted;
+		if (undefined != file_data.length)         this._size   = file_data.length;
+		if (undefined != file_data.priority)       this._prio   = file_data.priority;
+		if (undefined != file_data.wanted)         this._wanted = file_data.wanted;
+	},
+	
+	element: function() {
+		return this._element;
+	},
+	
+	setPriority: function(priority) {
+		var priority_level = { high: 1, normal: 0, low: -1 }[priority];
+		if (this._prio == priority_level) { return; }
+		this._prio = priority_level;
+		this._torrent._controller.changeFileCommand("priority-" + priority, this._torrent, this);
+		this.refreshPriorityHTML();
+	},
+	
+	setWanted: function(wanted) {
+		this._wanted = wanted;
+		var command;
+		
+		if (wanted) {
+			this.element().removeClass('skip');
+			command = 'files-wanted'
+		} else {
+			this.element().addClass('skip');
+			command = 'files-unwanted';
+		}
+		this._torrent._controller.changeFileCommand(command, this._torrent, this);
+	},
+	
+	toggleWanted: function() {
+		this.setWanted(!this._wanted);
+	},
+	
+	refreshHTML: function() {
+		this.refreshProgressHTML();
+		this.refreshWantedHTML();
+		this.refreshPriorityHTML();
+	},
+	
+	refreshProgressHTML: function() {
+		progress_details = Math.formatBytes(this._done) + ' of ' +
+							Math.formatBytes(this._size) + ' (' +
+							Math.ratio(100 * this._done, this._size) + '%)';
+		setInnerHTML(this._progress[0], progress_details);
+	},
+	
+	refreshWantedHTML: function() {
+		var element = this.element();
+		if (this._wanted && element.hasClass('skip'))
+			this.element().removeClass('skip');
+		else if (!this._wanted && !element.hasClass('skip'))
+			this.element().addClass('skip');
+		
+		if (this._done < this._size && this.element().hasClass('complete'))
+			this.element().removeClass('complete');
+		else if (!this.element().hasClass('complete'))
+			this.element().addClass('complete');
+	},
+	
+	refreshPriorityHTML: function() {
+		if (this['_last_refreshed_prio'] == this._prio) { return; }
+		var priority = { '1': 'high', '0': 'normal', '-1': 'low' }[new String(this._prio)];
+		var off_priorities = [ 'high', 'normal', 'low' ].sort(function(a,b) { return (a == priority) ? 1 : -1; } );
+		this._priority_control.addClass(priority).
+			removeClass(off_priorities[0]).
+			removeClass(off_priorities[1]);
+		this._last_refreshed_prio = this._prio;
+	},
+	
+	fileWantedControlClicked: function(event) {
+		event.data.file.toggleWanted();
+	},
+	
+	filePriorityControlClicked: function(event) {
+		var x = event.pageX;
+		var target = this;
+		while (target != null) {
+			x = x - target.offsetLeft;
+			target = target.offsetParent;
+		}
+		var file = event.data.file;
+		if (x < 8) { file.setPriority('low'); }
+		else if (x < 16) { file.setPriority('normal'); }
+		else { file.setPriority('high'); }
+	}
+	
 };

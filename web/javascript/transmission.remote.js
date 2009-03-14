@@ -55,63 +55,92 @@ TransmissionRemote.prototype =
 			'Dismiss');
 		transmission.togglePeriodicRefresh(false);
 	},
-
-	sendRequest: function( url, data, success, contentType )
-	{
-		var o = { };
-		o.cache = false;
-		o.contentType = contentType;
-		o.data = data;
-		o.dataType = 'json';
-		o.error = this.ajaxError;
-		o.success = success;
-		o.type = 'POST';
-		o.url = url;
-		$.ajax( o );
+	
+	sendRequest: function( data, success ) {
+		$.ajax( {
+			url: RPC._Root,
+			type: 'POST',
+			contentType: 'json',
+			dataType: 'json',
+			cache: false,
+			data: $.toJSON(data),
+			error: this.ajaxError,
+			success: success
+		} );
 	},
 
 	loadDaemonPrefs: function() {
 		var tr = this._controller;
-		var o = { };
-		o.method = 'session-get';
-		this.sendRequest( RPC._Root, $.toJSON(o), function(data) {
+		var o = { method: 'session-get' };
+		this.sendRequest( o, function(data) {
 			var o = data.arguments;
 			Prefs.getClutchPrefs( o );
 			tr.updatePrefs( o );
-		}, "json" );
+		} );
 	},
 
-	loadTorrents: function() {
+	loadTorrents: function(update_files) {
 		var tr = this._controller;
-		var o = { };
-		o.method = 'torrent-get'
-		o.arguments = { };
-		o.arguments.fields = [
-			'addedDate', 'announceURL', 'comment', 'creator',
-			'dateCreated', 'downloadedEver', 'error', 'errorString',
-			'eta', 'hashString', 'haveUnchecked', 'haveValid', 'id',
-			'isPrivate', 'leechers', 'leftUntilDone', 'name',
-			'peersConnected', 'peersGettingFromUs', 'peersSendingToUs',
-			'rateDownload', 'rateUpload', 'seeders', 'sizeWhenDone',
-			'status', 'swarmSpeed', 'totalSize', 'uploadedEver' ];
-		this.sendRequest( RPC._Root, $.toJSON(o), function(data) {
-			tr.updateTorrents( data.arguments.torrents );
-		}, "json" );
+		var o = {
+			method: 'torrent-get',
+			arguments: { fields: [
+				'addedDate', 'announceURL', 'comment', 'creator',
+				'dateCreated', 'downloadedEver', 'error', 'errorString',
+				'eta', 'hashString', 'haveUnchecked', 'haveValid', 'id',
+				'isPrivate', 'leechers', 'leftUntilDone', 'name',
+				'peersConnected', 'peersGettingFromUs', 'peersSendingToUs',
+				'rateDownload', 'rateUpload', 'seeders', 'sizeWhenDone',
+				'status', 'swarmSpeed', 'totalSize', 'uploadedEver' ]
+			}
+		};
+		if (update_files) {
+			o.arguments.fields.push('files');
+			o.arguments.fields.push('wanted');
+			o.arguments.fields.push('priorities');
+		}
+		this.sendRequest( o, function(data) {
+			tr.updateAllTorrents( data.arguments.torrents );
+		} );
 	},
-
+	
+	loadTorrentFiles: function( torrent_ids ) {
+		var tr = this._controller;
+		this.sendRequest( {
+			method: 'torrent-get',
+			arguments: { fields: [ 'files', 'wanted', 'priorities'] },
+			ids: torrent_ids
+		}, function(data) {
+			tr.updateTorrentsData( data.arguments.torrents );
+		} );
+	},
+	
+	changeFileCommand: function( command, torrent, file ) {
+		var remote = this;
+		var torrent_ids = [ torrent.id() ];
+		var o = {
+			method: 'torrent-set',
+			arguments: { ids: torrent_ids }
+		};
+		o.arguments[command] = [ file._index ];
+		this.sendRequest( o, function( ) {
+			remote.loadTorrentFiles( torrent_ids );
+		} );
+	},
+	
 	sendTorrentCommand: function( method, torrents ) {
 		var remote = this;
-		var o = { };
-		o.method = method;
-		o.arguments = { };
-		o.arguments.ids = [ ];
+		var o = {
+			method: method,
+			arguments: { ids: [ ] }
+		};
 		if( torrents != null )
 			for( var i=0, len=torrents.length; i<len; ++i )
 				o.arguments.ids.push( torrents[i].id() );
-		this.sendRequest( RPC._Root, $.toJSON(o), function( ) {
+		this.sendRequest( o, function( ) {
 			remote.loadTorrents();
-		}, "json" );
+		} );
 	},
+	
 	startTorrents: function( torrents ) {
 		this.sendTorrentCommand( 'torrent-start', torrents );
 	},
@@ -149,11 +178,12 @@ TransmissionRemote.prototype =
 	},
 	savePrefs: function( args ) {
 		var remote = this;
-		var o = { };
-		o.method = 'session-set';
-		o.arguments = args;
-		this.sendRequest( RPC._Root, $.toJSON(o), function(){
+		var o = {
+			method: 'session-set',
+			arguments: args
+		};
+		this.sendRequest( o, function() {
 			remote.loadDaemonPrefs();
-		}, "json" );
+		} );
 	}
 };

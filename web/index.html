@@ -14,6 +14,7 @@
 		<link media="screen and (min-device-width: 481px)" href="./stylesheets/common.css" type="text/css" rel="stylesheet" />
 		<script type="text/javascript" src="./javascript/jquery/jquery.transmenu.min.js"></script>
 		<script type="text/javascript" src="./javascript/jquery/jquery.contextmenu.min.js"></script>
+		<script type="text/javascript" src="./javascript/jquery/jquery.tinysort.min.js"></script>
 		<script type="text/javascript" src="./javascript/menu.js"></script>
 		<script type="text/javascript" src="./javascript/jquery/jquery.form.min.js"></script>
 		<script type="text/javascript" src="./javascript/jquery/json.min.js"></script>
@@ -61,6 +62,7 @@
 			<div id="inspector_tabs">
 				<div class="inspector_tab selected" id="inspector_tab_info"><a href="#info"><img src="images/buttons/info_general.png" alt="Information"/></a></div>
 				<div class="inspector_tab" id="inspector_tab_activity"><a href="#activity"><img src="images/buttons/info_activity.png" alt="Activity"/></a></div>
+				<div class="inspector_tab" id="inspector_tab_files"><a href="#files"><img src="images/buttons/info_files.png" alt="Files"/></a></div>
 			</div>
 			
 			<div id="inspector_header">
@@ -168,6 +170,11 @@
 					</div>
 				</div><!-- class="inspector_group"-->
 			</div><!-- id="inspector_tab_activity_container" -->
+
+			<div style="display:none;" class="inspector_container" id="inspector_tab_files_container">
+				<span id="inspector_file_list"></span>
+			</div><!-- id="inspector_tab_files_container" -->
+
 		</div>
 		
 		<div id="torrent_container">

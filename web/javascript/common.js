@@ -42,11 +42,6 @@ $(document).ready( function() {
 	transmission = new Transmission();
 
 	if ($.browser.safari) {
-		
-		// Fix div height problem - causes scrollbar flash in
-		// firefox so have to be safari-specific
-		$('#torrent_inspector').css('height', '100%');
-		
 		// Move search field's margin down for the styled input
 		$('#torrent_search').css('margin-top', 3);		
 	}
@@ -88,7 +83,7 @@ Array.prototype.clone = function () {
 /**
  * "innerHTML = html" is pretty slow in FF.  Happily a lot of our innerHTML
  * changes are triggered by periodic refreshes on torrents whose state hasn't
- * changed sine the last update, so even this simple test helps a lot.
+ * changed since the last update, so even this simple test helps a lot.
  */
 function setInnerHTML( e, html )
 {

@@ -514,6 +514,7 @@ div#torrent_inspector {
 	border-left: 1px solid #888;
 	z-index: 2;
 	text-align: left;
+	overflow: auto;
 }
 div#torrent_inspector #torrent_inspector_name {
 	margin: 0;
@@ -532,9 +533,9 @@ div#inspector_header {
 	padding-right: 10px;
 }
 div#inspector_tabs {
+	width: 189px;
 	margin: 0 auto;
 	padding-top: 10px;
-	width: 140px;
 }
 .inspector_tab {
 	float: left;
@@ -548,8 +549,8 @@ div#inspector_tabs {
 	background-position: left -26px; /* the highlighted part of the image */
 }
 .inspector_container {
-	margin: 10px;
-	width: 330px; /* inspector_width==350 - ((margin==10)*2) */
+	margin: 3%;
+	width: 96%;
 }
 .inspector_group {
 	display: table;
@@ -574,6 +575,109 @@ div#inspector_tabs {
 	padding-top: 10px;
 	width: 230px; /* inspector_container_width==330 - inspector_label_width==100 */
 }
+
+/* Files Inspector Tab */
+#inspector_file_list {
+	padding: 0 0 0 0;
+	margin: 0 0 0 0;
+	text-align: left;
+	cursor: default;
+	overflow: hidden;
+}
+ul.inspector_torrent_file_list {
+	width: 100%;
+	margin: 0  0 0 0;
+	padding-bottom: 10px;
+	text-align: left;
+	display: block;
+	cursor: default;
+	list-style-type: none;
+	list-style: none;
+	list-style-image: none;
+}
+li.inspector_torrent_file_list_entry {
+	padding: 3px 0 3px 2px;
+	display: block;
+}
+
+li.inspector_torrent_file_list_entry.skip {
+	color: #666;
+}
+
+li.inspector_torrent_file_list_entry.even {
+	background-color: #EEEEEE;
+}
+div.inspector_torrent_file_list_entry_name {
+	font-size: 1.2em;
+	font-weight: bold;
+	color: #222;
+	margin-left: 20px;
+}
+li.inspector_torrent_file_list_entry.skip>.inspector_torrent_file_list_entry_name {
+	color: #666;
+}
+li.inspector_torrent_file_list_entry.even {
+	background-color: #EEEEEE;
+}
+div.inspector_torrent_file_list_entry_progress {
+	font-size: 1em;
+	color: #666;
+	margin-left: 20px;
+} 
+div.file_wanted_control {
+	background-position: left -16px;
+	float: left;
+	position: absolute;
+	cursor: pointer;
+	margin: 0 0 0 0;
+	width: 16px;
+	height: 16px;
+	background-image: url('../images/buttons/file_wanted_buttons.png');
+	background-repeat: no-repeat;
+	background-color: transparent;
+}
+
+li.inspector_torrent_file_list_entry.skip>.file_wanted_control {
+	background-position: left 0px;
+}
+
+li.inspector_torrent_file_list_entry.complete>.file_wanted_control {
+	background-position: -16px -16px;
+}
+
+li.inspector_torrent_file_list_entry.complete.skip>.file_wanted_control {
+	background-position: -16px 0px;
+}
+
+div.file_priority_control {
+	float: right;
+	margin: 0 0 0 0;
+	width: 24px;
+	height: 12px;
+	background-image: url('../images/buttons/file_priority_buttons.png');
+	background-repeat: no-repeat;
+	background-color: transparent;
+	cursor: pointer;
+}
+div.file_priority_control.high {
+	background-position: left -12px;
+}
+div.file_priority_control.high:hover {
+	background-position: right -12px;
+}
+div.file_priority_control.normal {
+	background-position: left -24px;
+}
+div.file_priority_control.normal:hover {
+	background-position: right -24px;
+}
+div.file_priority_control.low {
+	background-position: left 0px;
+}
+div.file_priority_control.low:hover {
+	background-position: right 0px;
+}
+
 
 /*--------------------------------------
  *
