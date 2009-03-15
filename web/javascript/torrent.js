@@ -694,6 +694,8 @@ TorrentFile.prototype = {
 	},
 	
 	toggleWanted: function() {
+		if(this.element().hasClass('complete'))
+		  return;
 		this.setWanted(!this._wanted);
 	},
 	

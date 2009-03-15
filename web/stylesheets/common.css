@@ -625,28 +625,29 @@ div.inspector_torrent_file_list_entry_progress {
 	margin-left: 20px;
 } 
 div.file_wanted_control {
-	background-position: left -16px;
+	background-position: left -19px;
 	float: left;
 	position: absolute;
 	cursor: pointer;
-	margin: 0 0 0 0;
-	width: 16px;
-	height: 16px;
+	margin: 3px 0 0 0;
+	width: 19px;
+	height: 19px;
 	background-image: url('../images/buttons/file_wanted_buttons.png');
 	background-repeat: no-repeat;
 	background-color: transparent;
 }
 
 li.inspector_torrent_file_list_entry.skip>.file_wanted_control {
-	background-position: left 0px;
+	background-position: left top;
 }
 
 li.inspector_torrent_file_list_entry.complete>.file_wanted_control {
-	background-position: -16px -16px;
+	background-position: left -19px;
 }
 
-li.inspector_torrent_file_list_entry.complete.skip>.file_wanted_control {
-	background-position: -16px 0px;
+li.inspector_torrent_file_list_entry.complete>.file_wanted_control {
+	background-position: left -38px;
+	cursor: default;
 }
 
 div.file_priority_control {
