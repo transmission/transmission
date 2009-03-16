@@ -652,33 +652,37 @@ li.inspector_torrent_file_list_entry.complete>.file_wanted_control {
 
 div.file_priority_control {
 	float: right;
-	margin: 0 0 0 0;
-	width: 24px;
-	height: 12px;
+	margin: 4px 0 0 0;
+	width: 35px;
+	height: 19px;
 	background-image: url('../images/buttons/file_priority_buttons.png');
 	background-repeat: no-repeat;
 	background-color: transparent;
 	cursor: pointer;
 }
-div.file_priority_control.high {
-	background-position: left -12px;
-}
-div.file_priority_control.high:hover {
-	background-position: right -12px;
-}
 div.file_priority_control.normal {
-	background-position: left -24px;
+	background-position: left top;
 }
 div.file_priority_control.normal:hover {
-	background-position: right -24px;
+	background-position: right top;
+}
+div.file_priority_control.high {
+	background-position: left -19px;
+}
+div.file_priority_control.high:hover {
+	background-position: right -19px;
 }
 div.file_priority_control.low {
-	background-position: left 0px;
+	background-position: left -38px;
 }
 div.file_priority_control.low:hover {
-	background-position: right 0px;
+	background-position: right -38px;
 }
-
+li.inspector_torrent_file_list_entry.complete div.file_priority_control,
+li.inspector_torrent_file_list_entry.complete div.file_priority_control:hover {
+  background-position: left -57px;
+  cursor: default;
+}
 
 /*--------------------------------------
  *

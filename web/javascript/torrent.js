@@ -672,6 +672,8 @@ TorrentFile.prototype = {
 	},
 	
 	setPriority: function(priority) {
+		if(this.element().hasClass('complete'))
+		  return;
 		var priority_level = { high: 1, normal: 0, low: -1 }[priority];
 		if (this._prio == priority_level) { return; }
 		this._prio = priority_level;
@@ -747,8 +749,8 @@ TorrentFile.prototype = {
 			target = target.offsetParent;
 		}
 		var file = event.data.file;
-		if (x < 8) { file.setPriority('low'); }
-		else if (x < 16) { file.setPriority('normal'); }
+		if (x < 12) { file.setPriority('low'); }
+		else if (x < 23) { file.setPriority('normal'); }
 		else { file.setPriority('high'); }
 	}
 	
