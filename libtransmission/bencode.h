@@ -80,6 +80,8 @@ char*     tr_bencSave( const tr_benc * val, int * len );
 
 char*     tr_bencSaveAsJSON( const tr_benc * top, struct evbuffer * out );
 
+char*     tr_bencToJSON( const tr_benc * top );
+
 int       tr_bencSaveFile( const char * filename, const tr_benc * );
 
 int       tr_bencSaveJSONFile( const char * filename, const tr_benc * );

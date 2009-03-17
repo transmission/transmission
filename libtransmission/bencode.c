@@ -1331,6 +1331,17 @@ tr_bencSaveAsJSON( const tr_benc * top, struct evbuffer * out )
     return (char*) EVBUFFER_DATA( out );
 }
 
+char*
+tr_bencToJSON( const tr_benc * top )
+{
+    char * ret;
+    struct evbuffer * buf = evbuffer_new( );
+    tr_bencSaveAsJSON( top, buf );
+    ret = tr_strndup( EVBUFFER_DATA( buf ), EVBUFFER_LENGTH( buf ) );
+    evbuffer_free( buf );
+    return ret;
+}
+
 /***
 ****
 ***/
