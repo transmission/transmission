@@ -29,6 +29,7 @@
 
 #include "transmission.h"
 #include "bencode.h"
+#include "crypto.h"
 #include "list.h"
 #include "platform.h"
 #include "rpcimpl.h"
@@ -313,7 +314,7 @@ serve_file( struct evhttp_request * req,
 
         if( errno )
         {
-            send_simple_response( req, HTTP_NOTFOUND, NULL );
+            send_simple_response( req, HTTP_NOTFOUND, filename );
         }
         else
         {
@@ -464,6 +465,7 @@ handle_request( struct evhttp_request * req,
             {
                 user = p;
                 *pass++ = '\0';
+                pass = tr_crypt( pass );
             }
         }
 
@@ -506,9 +508,10 @@ handle_request( struct evhttp_request * req,
         }
         else
         {
-            send_simple_response( req, HTTP_NOTFOUND, NULL );
+            send_simple_response( req, HTTP_NOTFOUND, req->uri );
         }
 
+        tr_free( pass );
         tr_free( user );
     }
 }
@@ -668,7 +671,7 @@ tr_rpcSetPassword( tr_rpc_server * server,
                    const char *    password )
 {
     tr_free( server->password );
-    server->password = tr_strdup( password );
+    server->password = tr_crypt( password );
     dbgmsg( "setting our Password to [%s]", server->password );
 }
 

@@ -19,6 +19,7 @@
 #include <stdarg.h>
 
 #include <openssl/bn.h>
+#include <openssl/des.h>
 #include <openssl/dh.h>
 #include <openssl/err.h>
 #include <openssl/rc4.h>
@@ -349,3 +350,26 @@ tr_cryptoRandBuf( unsigned char *buf,
         logErrorFromSSL( );
 }
 
+/***
+****
+***/
+
+char*
+tr_crypt( const void * plaintext )
+{
+    static const char * salter = "0123456789"
+                                 "abcdefghijklmnopqrstuvwxyz"
+                                 "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                 "./";
+    static const size_t salter_len = 64;
+
+    int i;
+    char salt[12];
+
+    memcpy( salt, "$1$", 3 );
+    for( i=0; i<8; ++i )
+        salt[3+i] = salter[ tr_cryptoRandInt( salter_len ) ];
+    salt[11] = '\0';
+
+    return tr_strdup( DES_crypt( plaintext, salt ) );
+}

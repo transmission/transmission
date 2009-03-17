@@ -95,4 +95,7 @@ int            tr_cryptoWeakRandInt( int n );
 void           tr_cryptoRandBuf( unsigned char *buf,
                                  size_t         len );
 
+char*          tr_crypt( const void * plaintext );
+
+
 #endif
