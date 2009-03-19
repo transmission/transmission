@@ -88,7 +88,7 @@ Torrent.prototype =
 		
 		// insert the element
 		$('#torrent_list').append(this._element);
-		this.initializeTorrentFilesInspectorGroup();
+		this.initializeTorrentFilesInspectorGroup(data.files.length);
 		
 		for (var i = 0; i < data.files.length; i++) {
 			var file = data.files[i];
@@ -107,14 +107,12 @@ Torrent.prototype =
 		this.refresh(data);
 	},
 	
-	initializeTorrentFilesInspectorGroup: function() {
+	initializeTorrentFilesInspectorGroup: function(length) {
 		this._files = [];
-		this._fileList = $('<ul/>').addClass('inspector_torrent_file_list').addClass('inspector_group').hide().
-			append($('<li/>').addClass('inspector_group_label').append(
-				$('<div/>').append(this.name())
-			)
-		);
-		$('#inspector_file_list').append(this._fileList);
+        this._fileList = $('<ul/>').addClass('inspector_torrent_file_list').addClass('inspector_group').hide();
+        if(length == 1) 
+            this._fileList.addClass('single_file');
+        $('#inspector_file_list').append(this._fileList);
 	},
 	
 	fileList: function() {
@@ -672,7 +670,7 @@ TorrentFile.prototype = {
 	},
 	
 	setPriority: function(priority) {
-		if(this.element().hasClass('complete'))
+		if(this.element().hasClass('complete') || this._torrent._files.length == 1)
 		  return;
 		var priority_level = { high: 1, normal: 0, low: -1 }[priority];
 		if (this._prio == priority_level) { return; }
@@ -696,7 +694,7 @@ TorrentFile.prototype = {
 	},
 	
 	toggleWanted: function() {
-		if(this.element().hasClass('complete'))
+		if(this.element().hasClass('complete') || this._torrent._files.length == 1)
 		  return;
 		this.setWanted(!this._wanted);
 	},

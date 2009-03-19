@@ -645,6 +645,7 @@ li.inspector_torrent_file_list_entry.complete>.file_wanted_control {
 	background-position: left -19px;
 }
 
+ul.single_file li.inspector_torrent_file_list_entry>.file_wanted_control,
 li.inspector_torrent_file_list_entry.complete>.file_wanted_control {
 	background-position: left -38px;
 	cursor: default;
@@ -678,8 +679,8 @@ div.file_priority_control.low {
 div.file_priority_control.low:hover {
 	background-position: right -38px;
 }
-li.inspector_torrent_file_list_entry.complete div.file_priority_control,
-li.inspector_torrent_file_list_entry.complete div.file_priority_control:hover {
+ul.single_file li.inspector_torrent_file_list_entry>.file_priority_control,
+li.inspector_torrent_file_list_entry.complete div.file_priority_control {
   background-position: left -57px;
   cursor: default;
 }
