@@ -79,10 +79,12 @@
    "torrent-stop"      | tr_torrentStop
    "torrent-verify"    | tr_torrentVerify
 
-   Request arguments: "ids", a list of torrent id numbers, sha1 hash strings,
-                      or both.  These are the torrents that the request will
-                      be applied to.  If "ids" is ommitted, the request is
-                      applied to all torrents.
+   Request arguments: "ids", which specifies which torrents to use.
+                      All torrents are used if the "ids" argument is omitted.
+                      "ids" should be one of the following:
+                      (1) an integer referring to a torrent id
+                      (2) a list of torrent id numbers, sha1 hash strings, or both
+                      (3) a string, "recently-active", for recently-active torrents
 
    Response arguments: none
 
@@ -432,6 +434,7 @@
          |         | yes       | torrent-get    | new arg "speed-limit-up" 
          |         | yes       | torrent-get    | new arg "speed-limit-up-enabled" 
          |         | yes       | torrent-get    | new arg "speed-limit-up-global-enabled" 
+         |         | yes       | torrent-get    | new ids option "recently-active"
          |         |        NO | torrent-get    | removed arg "downloadLimit"
          |         |        NO | torrent-get    | removed arg "downloadLimitMode"
          |         |        NO | torrent-get    | removed arg "uploadLimit"

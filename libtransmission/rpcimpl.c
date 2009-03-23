@@ -111,6 +111,7 @@ getTorrents( tr_session * session,
     int64_t       id;
     tr_torrent ** torrents = NULL;
     tr_benc *     ids;
+    const char * str;
 
     if( tr_bencDictFindList( args, "ids", &ids ) )
     {
@@ -139,6 +140,25 @@ getTorrents( tr_session * session,
         torrents = tr_new0( tr_torrent *, 1 );
         if( ( tor = tr_torrentFindFromId( session, id ) ) )
             torrents[torrentCount++] = tor;
+    }
+    else if( tr_bencDictFindStr( args, "ids", &str ) )
+    {
+        if( !strcmp( str, "recently-active" ) )
+        {
+            tr_torrent * tor = NULL;
+            const time_t now = time( NULL );
+            const time_t window = 120;
+            const int n = tr_sessionCountTorrents( session );
+            torrents = tr_new0( tr_torrent *, n );
+            while( ( tor = tr_torrentNext( session, tor ) ) ) {
+                time_t a = tor->activityDate;
+                a = MAX( a, tor->addedDate );
+                a = MAX( a, tor->doneDate );
+                a = MAX( a, tor->startDate );
+                if( a >= now - window )
+                    torrents[torrentCount++] = tor;
+            }
+        }
     }
     else /* all of them */
     {
