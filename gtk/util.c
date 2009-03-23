@@ -110,11 +110,11 @@ tr_strlspeed( char * buf,
     if( speed < 1000.0 )  /* 0.0 KB to 999.9 KB */
         g_snprintf( buf, buflen, _( "%'.1f KB/s" ), speed );
     else if( speed < 102400.0 ) /* 0.98 MB to 99.99 MB */
-        g_snprintf( buf, buflen, _( "%'.2f MB/s" ), ( speed / 1024 ) );
+        g_snprintf( buf, buflen, _( "%'.2f MB/s" ), ( speed / KILOBYTE_FACTOR ) );
     else if( speed < 1024000.0 ) /* 100.0 MB to 999.9 MB */
-        g_snprintf( buf, buflen, _( "%'.1f MB/s" ), ( speed / 1024 ) );
+        g_snprintf( buf, buflen, _( "%'.1f MB/s" ), ( speed / MEGABYTE_FACTOR ) );
     else /* insane speeds */
-        g_snprintf( buf, buflen, _( "%'.2f GB/s" ), ( speed / 1048576 ) );
+        g_snprintf( buf, buflen, _( "%'.2f GB/s" ), ( speed / GIGABYTE_FACTOR ) );
 
     return buf;
 }
