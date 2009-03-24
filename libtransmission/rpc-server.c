@@ -465,7 +465,6 @@ handle_request( struct evhttp_request * req,
             {
                 user = p;
                 *pass++ = '\0';
-                pass = tr_crypt( pass );
             }
         }
 
@@ -479,7 +478,8 @@ handle_request( struct evhttp_request * req,
         }
         else if( server->isPasswordEnabled
                  && ( !pass || !user || strcmp( server->username, user )
-                                     || strcmp( server->password, pass ) ) )
+                                     || !tr_ssha1_matches( server->password,
+                                                           pass ) ) )
         {
             evhttp_add_header( req->output_headers,
                                "WWW-Authenticate",
@@ -511,7 +511,6 @@ handle_request( struct evhttp_request * req,
             send_simple_response( req, HTTP_NOTFOUND, req->uri );
         }
 
-        tr_free( pass );
         tr_free( user );
     }
 }
@@ -671,7 +670,10 @@ tr_rpcSetPassword( tr_rpc_server * server,
                    const char *    password )
 {
     tr_free( server->password );
-    server->password = tr_crypt( password );
+    if( *password != '{' )
+        server->password = tr_ssha1( password );
+    else
+        server->password = strdup( password );
     dbgmsg( "setting our Password to [%s]", server->password );
 }
 
@@ -762,7 +764,10 @@ tr_rpcInit( tr_session  * session,
 
     found = tr_bencDictFindStr( settings, TR_PREFS_KEY_RPC_PASSWORD, &str );
     assert( found );
-    s->password = tr_strdup( str );
+    if( *str != '{' )
+        s->password = tr_ssha1( str );
+    else
+        s->password = strdup( str );
 
 #ifdef HAVE_ZLIB
     s->stream.zalloc = (alloc_func) Z_NULL;

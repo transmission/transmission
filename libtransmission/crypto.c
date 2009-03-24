@@ -355,21 +355,59 @@ tr_cryptoRandBuf( unsigned char *buf,
 ***/
 
 char*
-tr_crypt( const void * plaintext )
+tr_ssha1( const void * plaintext )
 {
     static const char * salter = "0123456789"
                                  "abcdefghijklmnopqrstuvwxyz"
                                  "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                  "./";
     static const size_t salter_len = 64;
+    static const size_t saltval_len = 8;
 
     int i;
-    char salt[12];
+    char salt[saltval_len];
+    char sha[SHA_DIGEST_LENGTH];
+    char buf[2*SHA_DIGEST_LENGTH + saltval_len + 2];
 
-    memcpy( salt, "$1$", 3 );
-    for( i=0; i<8; ++i )
-        salt[3+i] = salter[ tr_cryptoRandInt( salter_len ) ];
-    salt[11] = '\0';
+    for( i=0; i<=saltval_len; ++i )
+        salt[i] = salter[ tr_cryptoRandInt( salter_len ) ];
 
-    return tr_strdup( DES_crypt( plaintext, salt ) );
+    tr_sha1( sha, plaintext, strlen( plaintext ), salt, saltval_len, NULL );
+    tr_sha1_to_hex( &buf[1], &sha );
+    memcpy( &buf[1+2*SHA_DIGEST_LENGTH], &salt, saltval_len );
+    buf[1+2*SHA_DIGEST_LENGTH + saltval_len] = '\0';
+    buf[0] = '{'; /* signal that this is a hash. this makes saving/restoring
+                     easier */
+
+    return tr_strdup( &buf );
+}
+
+tr_bool
+tr_ssha1_matches( const char * source, const char * pass )
+{
+    char * salt;
+    size_t saltlen;
+    char * hashed;
+    char buf[SHA_DIGEST_LENGTH];
+    tr_bool result;
+
+    /* extract the salt */
+    saltlen = strlen( source ) - 2*SHA_DIGEST_LENGTH-1;
+    salt = tr_malloc( saltlen );
+    memcpy( salt, source + 2*SHA_DIGEST_LENGTH+1, saltlen );
+
+    /* hash pass + salt */
+    hashed = tr_malloc( 2*SHA_DIGEST_LENGTH + saltlen + 2 );
+    tr_sha1( &buf, pass, strlen( pass ), salt, saltlen, NULL );
+    tr_sha1_to_hex( &hashed[1], &buf );
+    memcpy( hashed + 1+2*SHA_DIGEST_LENGTH, salt, saltlen );
+    hashed[1+2*SHA_DIGEST_LENGTH + saltlen] = '\0';
+    hashed[0] = '{';
+
+    result = strcmp( source, hashed ) == 0 ? TRUE : FALSE;
+
+    tr_free( hashed );
+    tr_free( salt );
+    
+    return result;
 }

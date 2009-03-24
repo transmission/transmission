@@ -95,7 +95,8 @@ int            tr_cryptoWeakRandInt( int n );
 void           tr_cryptoRandBuf( unsigned char *buf,
                                  size_t         len );
 
-char*          tr_crypt( const void * plaintext );
+char*          tr_ssha1( const void * plaintext );
 
+tr_bool        tr_ssha1_matches( const char * source, const char * pass );
 
 #endif
