@@ -490,9 +490,13 @@ handle_request( struct evhttp_request * req,
                || !strcmp( req->uri, "/transmission/clutch" )
                || !strcmp( req->uri, "/" ) )
         {
-            evhttp_add_header( req->output_headers, "Location",
-                               "/transmission/web/" );
+            const char * protocol = "http";
+            const char * host = evhttp_find_header( req->input_headers, "Host" );
+            const char * uri = "transmission/web/";
+            char * location = tr_strdup_printf( "%s://%s/%s", protocol, host, uri );
+            evhttp_add_header( req->output_headers, "Location", location );
             send_simple_response( req, HTTP_MOVEPERM, NULL );
+            tr_free( location );
         }
         else if( !strncmp( req->uri, "/transmission/web/", 18 ) )
         {
