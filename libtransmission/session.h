@@ -131,7 +131,7 @@ struct tr_session
     struct tr_metainfo_lookup *  metainfoLookup;
     int                          metainfoLookupCount;
 
-    struct tr_timer            * bandwidthTimer;
+    struct event               * altTimer;
 
     /* the size of the output buffer for peer connections */
     int so_sndbuf;

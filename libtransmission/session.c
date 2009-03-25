@@ -20,6 +20,8 @@
 #include <unistd.h> /* stat */
 #include <dirent.h> /* opendir */
 
+#include <event.h>
+
 #include "transmission.h"
 #include "session.h"
 #include "bandwidth.h"
@@ -379,7 +381,24 @@ tr_sessionSaveSettings( tr_session * session, const char * configDir, tr_benc * 
 
 static void metainfoLookupRescan( tr_session * );
 static void tr_sessionInitImpl( void * );
-static int onBandwidthTimer( void * );
+static void onAltTimer( int, short, void* );
+
+/* set the alt-speed timer to go off at the top of the minute */
+static void
+setAltTimer( tr_session * session )
+{
+    const time_t now = time( NULL );
+    struct tm tm;
+    struct timeval tv;
+
+    assert( tr_isSession( session ) );
+    assert( session->altTimer != NULL );
+
+    tr_localtime_r( &now, &tm );
+    tv.tv_sec = 60 - tm.tm_sec;
+    tv.tv_usec = 0;
+    evtimer_add( session->altTimer, &tv );
+}
 
 struct init_data
 {
@@ -618,7 +637,9 @@ tr_sessionInitImpl( void * vdata )
 
     assert( tr_isSession( session ) );
 
-    session->bandwidthTimer = tr_timerNew( session, onBandwidthTimer, session, 60000 );
+    session->altTimer = tr_new0( struct event, 1 );
+    evtimer_set( session->altTimer, onAltTimer, session );
+    setAltTimer( session );
 
     /* first %s is the application name
        second %s is the version number */
@@ -860,11 +881,11 @@ updateBandwidth( tr_session * session, tr_direction dir )
 /* this is called once a minute to:
  * (1) update session->isAltTime
  * (2) alter the speed limits when the alt limits go on and off */
-static int
-onBandwidthTimer( void * vsession )
+static void
+onAltTimer( int foo UNUSED, short bar UNUSED, void * vsession )
 {
-    tr_session * session = vsession;
     tr_bool wasAltTime;
+    tr_session * session = vsession;
 
     assert( tr_isSession( session ) );
 
@@ -880,7 +901,7 @@ onBandwidthTimer( void * vsession )
             (*session->altCallback)( session, session->isAltTime, session->altCallbackUserData );
     }
 
-    return TRUE; /* invoke again when another minute's passed */
+    setAltTimer( session );
 }
 
 void
@@ -933,6 +954,12 @@ tr_sessionIsAltSpeedLimitTime( const tr_session  * session )
     return session->isAltTime;
 }
 
+static void
+checkAltTime( void * session )
+{
+    onAltTimer( 0, 0, session );
+}
+
 void
 tr_sessionSetAltSpeedLimitEnabled( tr_session   * session,
                                    tr_bool        isEnabled )
@@ -942,7 +969,7 @@ tr_sessionSetAltSpeedLimitEnabled( tr_session   * session,
 
     session->isAltSpeedLimited = isEnabled;
 
-    onBandwidthTimer( session );
+    tr_runInEventThread( session, checkAltTime, session );
 }
 
 tr_bool
@@ -963,6 +990,7 @@ tr_sessionSetAltSpeedLimit( tr_session        * session,
     assert( desiredSpeed >= 0 );
 
     session->altSpeedLimit[dir] = desiredSpeed;
+
     updateBandwidth( session, dir );
 }
 
@@ -982,6 +1010,8 @@ tr_sessionSetAltSpeedLimitBegin( tr_session * session, int minutesSinceMidnight 
     assert( tr_isSession( session ) );
 
     session->altSpeedBeginTime = minutesSinceMidnight;
+
+    tr_runInEventThread( session, checkAltTime, session );
 }
 
 int
@@ -998,6 +1028,8 @@ tr_sessionSetAltSpeedLimitEnd( tr_session * session, int minutesSinceMidnight )
     assert( tr_isSession( session ) );
 
     session->altSpeedEndTime = minutesSinceMidnight;
+
+    tr_runInEventThread( session, checkAltTime, session );
 }
 
 int
@@ -1108,7 +1140,10 @@ tr_closeAllConnections( void * vsession )
 
     assert( tr_isSession( session ) );
 
-    tr_timerFree( &session->bandwidthTimer );
+    evtimer_del( session->altTimer );
+    tr_free( session->altTimer );
+    session->altTimer = NULL;
+
     tr_statsClose( session );
     tr_sharedShuttingDown( session->shared );
     tr_rpcClose( &session->rpcServer );
