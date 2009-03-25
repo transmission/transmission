@@ -178,8 +178,8 @@ tr_freeMessageList( tr_msg_list * list )
 ***
 **/
 
-static struct tm *
-tr_localtime_r( time_t *_clock, struct tm *_result )
+struct tm *
+tr_localtime_r( const time_t *_clock, struct tm *_result )
 {
 #ifdef HAVE_LOCALTIME_R
     return localtime_r( _clock, _result );

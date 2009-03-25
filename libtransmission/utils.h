@@ -466,6 +466,9 @@ void* tr_int2ptr( int );
  */
 char* tr_strratio( char * buf, size_t buflen, double ratio, const char * infinity );
 
+struct tm * tr_localtime_r( const time_t *_clock, struct tm *_result );
+
+
 
 #ifdef __cplusplus
 }
