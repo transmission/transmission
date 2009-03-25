@@ -416,7 +416,7 @@ readargs( int           argc,
 
             case 'p':
                 tr_bencDictAddStr( &top, "method", "session-set" );
-                tr_bencDictAddInt( args, "port", numarg( optarg ) );
+                tr_bencDictAddInt( args, TR_PREFS_KEY_PEER_PORT, numarg( optarg ) );
                 break;
 
             case 'r':
@@ -469,19 +469,19 @@ readargs( int           argc,
             case 'w': {
                 char * path = absolutify( optarg );
                 tr_bencDictAddStr( &top, "method", "session-set" );
-                tr_bencDictAddStr( args, "download-dir", path );
+                tr_bencDictAddStr( args, TR_PREFS_KEY_DOWNLOAD_DIR, path );
                 tr_free( path );
                 break;
             }
 
             case 'x':
                 tr_bencDictAddStr( &top, "method", "session-set" );
-                tr_bencDictAddInt( args, "pex-allowed", 1 );
+                tr_bencDictAddInt( args, TR_PREFS_KEY_PEX_ENABLED, 1 );
                 break;
 
             case 'X':
                 tr_bencDictAddStr( &top, "method", "session-set" );
-                tr_bencDictAddInt( args, "pex-allowed", 0 );
+                tr_bencDictAddInt( args, TR_PREFS_KEY_PEX_ENABLED, 0 );
                 break;
 
             case 900:
@@ -504,17 +504,17 @@ readargs( int           argc,
 
             case 910:
                 tr_bencDictAddStr( &top, "method", "session-set" );
-                tr_bencDictAddStr( args, "encryption", "required" );
+                tr_bencDictAddStr( args, TR_PREFS_KEY_ENCRYPTION, "required" );
                 break;
 
             case 911:
                 tr_bencDictAddStr( &top, "method", "session-set" );
-                tr_bencDictAddStr( args, "encryption", "preferred" );
+                tr_bencDictAddStr( args, TR_PREFS_KEY_ENCRYPTION, "preferred" );
                 break;
 
             case 912:
                 tr_bencDictAddStr( &top, "method", "session-set" );
-                tr_bencDictAddStr( args, "encryption", "tolerated" );
+                tr_bencDictAddStr( args, TR_PREFS_KEY_ENCRYPTION, "tolerated" );
                 break;
 
             case 920:
@@ -530,7 +530,7 @@ readargs( int           argc,
 
             case 931:
                 tr_bencDictAddStr( &top, "method", "session-set" );
-                tr_bencDictAddInt( args, "peer-limit", atoi(optarg) );
+                tr_bencDictAddInt( args, TR_PREFS_KEY_PEER_LIMIT_GLOBAL, atoi(optarg) );
                 break;
 
             case 940:
@@ -811,7 +811,7 @@ printSession( tr_benc * top )
         printf( "\n" );
 
         printf( "LIMITS\n" );
-        if( tr_bencDictFindInt( args, "peer-limit", &i ) )
+        if( tr_bencDictFindInt( args, TR_PREFS_KEY_PEER_LIMIT_GLOBAL, &i ) )
             printf( "  Peer limit: %" PRId64 "\n", i );
         if( tr_bencDictFindInt( args, "speed-limit-down-enabled", &i ) )
             printf( "  Downloadlimit enabled: %s\n", ( i ? "Yes" : "No" ) );

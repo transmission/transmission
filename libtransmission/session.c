@@ -219,7 +219,7 @@ tr_sessionGetDefaultSettings( tr_benc * d )
 {
     assert( tr_bencIsDict( d ) );
 
-    tr_bencDictReserve( d, 30 );
+    tr_bencDictReserve( d, 35 );
     tr_bencDictAddInt( d, TR_PREFS_KEY_BLOCKLIST_ENABLED,        FALSE );
     tr_bencDictAddStr( d, TR_PREFS_KEY_DOWNLOAD_DIR,             tr_getDefaultDownloadDir( ) );
     tr_bencDictAddInt( d, TR_PREFS_KEY_DSPEED,                   100 );
@@ -254,6 +254,11 @@ tr_sessionGetDefaultSettings( tr_benc * d )
     tr_bencDictAddStr( d, TR_PREFS_KEY_RPC_WHITELIST,            TR_DEFAULT_RPC_WHITELIST );
     tr_bencDictAddInt( d, TR_PREFS_KEY_RPC_WHITELIST_ENABLED,    TRUE );
     tr_bencDictAddInt( d, TR_PREFS_KEY_RPC_PORT,                 atoi( TR_DEFAULT_RPC_PORT_STR ) );
+    tr_bencDictAddInt( d, TR_PREFS_KEY_ALT_LIMIT_ENABLED,        FALSE );
+    tr_bencDictAddInt( d, TR_PREFS_KEY_ALT_BEGIN,                1320 ); /* 10pm */
+    tr_bencDictAddInt( d, TR_PREFS_KEY_ALT_END,                  300 ); /* 5am */
+    tr_bencDictAddInt( d, TR_PREFS_KEY_ALT_DL_LIMIT,             200 ); /* double the regular default */
+    tr_bencDictAddInt( d, TR_PREFS_KEY_ALT_UL_LIMIT,             200 ); /* double the regular default */
     tr_bencDictAddInt( d, TR_PREFS_KEY_USPEED,                   100 );
     tr_bencDictAddInt( d, TR_PREFS_KEY_USPEED_ENABLED,           0 );
     tr_bencDictAddInt( d, TR_PREFS_KEY_UPLOAD_SLOTS_PER_TORRENT, 14 );
@@ -302,6 +307,11 @@ tr_sessionGetSettings( tr_session * s, struct tr_benc * d )
     tr_bencDictAddStr( d, TR_PREFS_KEY_RPC_USERNAME,             freeme[n++] = tr_sessionGetRPCUsername( s ) );
     tr_bencDictAddStr( d, TR_PREFS_KEY_RPC_WHITELIST,            freeme[n++] = tr_sessionGetRPCWhitelist( s ) );
     tr_bencDictAddInt( d, TR_PREFS_KEY_RPC_WHITELIST_ENABLED,    tr_sessionGetRPCWhitelistEnabled( s ) );
+    tr_bencDictAddInt( d, TR_PREFS_KEY_ALT_LIMIT_ENABLED,        tr_sessionIsAltSpeedLimitEnabled( s ) );
+    tr_bencDictAddInt( d, TR_PREFS_KEY_ALT_BEGIN,                tr_sessionGetAltSpeedLimitBegin( s ) );
+    tr_bencDictAddInt( d, TR_PREFS_KEY_ALT_END,                  tr_sessionGetAltSpeedLimitEnd( s ) );
+    tr_bencDictAddInt( d, TR_PREFS_KEY_ALT_DL_LIMIT,             tr_sessionGetAltSpeedLimit( s, TR_DOWN ) );
+    tr_bencDictAddInt( d, TR_PREFS_KEY_ALT_UL_LIMIT,             tr_sessionGetAltSpeedLimit( s, TR_UP ) );
     tr_bencDictAddInt( d, TR_PREFS_KEY_USPEED,                   tr_sessionGetSpeedLimit( s, TR_UP ) );
     tr_bencDictAddInt( d, TR_PREFS_KEY_USPEED_ENABLED,           tr_sessionIsSpeedLimitEnabled( s, TR_UP ) );
     tr_bencDictAddInt( d, TR_PREFS_KEY_UPLOAD_SLOTS_PER_TORRENT, s->uploadSlotsPerTorrent );
@@ -369,6 +379,7 @@ tr_sessionSaveSettings( tr_session * session, const char * configDir, tr_benc * 
 
 static void metainfoLookupRescan( tr_session * );
 static void tr_sessionInitImpl( void * );
+static int onBandwidthTimer( void * );
 
 struct init_data
 {
@@ -573,6 +584,25 @@ tr_sessionInitImpl( void * vdata )
     tr_sessionSetRatioLimit( session, d );
     tr_sessionSetRatioLimited( session, j );
 
+    /**
+    ***  Alternate speed limits for off-peak hours
+    **/
+    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_ALT_LIMIT_ENABLED, &i );
+    assert( found );
+    session->isAltSpeedLimited = i != 0;
+
+    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_ALT_BEGIN, &i )
+         && tr_bencDictFindInt( &settings, TR_PREFS_KEY_ALT_END, &j );
+    assert( found );
+    session->altSpeedBeginTime = i;
+    session->altSpeedEndTime = j;
+
+    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_ALT_DL_LIMIT, &i )
+         && tr_bencDictFindInt( &settings, TR_PREFS_KEY_ALT_UL_LIMIT, &j );
+    assert( found );
+    session->altSpeedLimit[TR_DOWN] = i;
+    session->altSpeedLimit[TR_UP] = j;
+
     /* initialize the blocklist */
     filename = tr_buildPath( session->configDir, "blocklists", NULL );
     tr_mkdirp( filename, 0777 );
@@ -587,6 +617,8 @@ tr_sessionInitImpl( void * vdata )
     tr_bencFree( &settings );
 
     assert( tr_isSession( session ) );
+
+    session->bandwidthTimer = tr_timerNew( session, onBandwidthTimer, session, 60000 );
 
     /* first %s is the application name
        second %s is the version number */
@@ -776,18 +808,79 @@ tr_sessionGetRatioLimit( const tr_session * session )
 ****
 ***/
 
+static tr_bool
+isAltTime( const tr_session * session )
+{
+    const time_t now = time( NULL );
+    struct tm tm;
+    int minutes;
+
+    tr_localtime_r( &now, &tm );
+    minutes = tm.tm_hour*60 + tm.tm_min;
+
+    if( session->altSpeedBeginTime <= session->altSpeedEndTime )
+    {
+        return ( session->altSpeedBeginTime <= minutes )
+            && ( minutes < session->altSpeedEndTime );
+    }
+    else /* goes past midnight */
+    {
+        return ( minutes >= session->altSpeedBeginTime )
+            || ( minutes < session->altSpeedEndTime );
+    }
+}
+
+static int
+getActiveSpeedLimit( const tr_session * session, tr_direction dir )
+{
+    int val;
+
+    if( tr_sessionIsAltSpeedLimitEnabled( session ) && session->isAltTime )
+        val = tr_sessionGetAltSpeedLimit( session, dir );
+    else if( tr_sessionIsSpeedLimitEnabled( session, dir ) )
+        val = tr_sessionGetSpeedLimit( session, dir );
+    else
+        val = -1;
+
+    return val;
+}
+
 static void
 updateBandwidth( tr_session * session, tr_direction dir )
 {
-    tr_bool zeroCase;
+    const int limit = getActiveSpeedLimit( session, dir );
+    const tr_bool isLimited = limit >= 0;
+    const tr_bool zeroCase = isLimited && !limit;
+
+    tr_bandwidthSetLimited( session->bandwidth, dir, isLimited && !zeroCase );
+
+    tr_bandwidthSetDesiredSpeed( session->bandwidth, dir, limit );
+}
+
+/* this is called once a minute to:
+ * (1) update session->isAltTime
+ * (2) alter the speed limits when the alt limits go on and off */
+static int
+onBandwidthTimer( void * vsession )
+{
+    tr_session * session = vsession;
+    tr_bool wasAltTime;
 
     assert( tr_isSession( session ) );
 
-    zeroCase = session->speedLimit[dir] < 1 && session->isSpeedLimited[dir];
+    wasAltTime = session->isAltTime;
+    session->isAltTime = isAltTime( session );
 
-    tr_bandwidthSetLimited( session->bandwidth, dir, session->isSpeedLimited[dir] && !zeroCase );
+    if( tr_sessionIsAltSpeedLimitEnabled( session ) && ( wasAltTime != session->isAltTime ) )
+    {
+        updateBandwidth( session, TR_UP );
+        updateBandwidth( session, TR_DOWN );
 
-    tr_bandwidthSetDesiredSpeed( session->bandwidth, dir, session->speedLimit[dir] );
+        if( session->altCallback != NULL )
+            (*session->altCallback)( session, session->isAltTime, session->altCallbackUserData );
+    }
+
+    return TRUE; /* invoke again when another minute's passed */
 }
 
 void
@@ -831,6 +924,107 @@ tr_sessionGetSpeedLimit( const tr_session * session, tr_direction dir )
 
     return session->speedLimit[dir];
 }
+
+tr_bool
+tr_sessionIsAltSpeedLimitTime( const tr_session  * session )
+{
+    assert( tr_isSession( session ) );
+
+    return session->isAltTime;
+}
+
+void
+tr_sessionSetAltSpeedLimitEnabled( tr_session   * session,
+                                   tr_bool        isEnabled )
+{
+    assert( tr_isSession( session ) );
+    assert( tr_isBool( isEnabled ) );
+
+    session->isAltSpeedLimited = isEnabled;
+
+    onBandwidthTimer( session );
+}
+
+tr_bool
+tr_sessionIsAltSpeedLimitEnabled( const tr_session  * session )
+{
+    assert( tr_isSession( session ) );
+
+    return session->isAltSpeedLimited;
+}
+
+void
+tr_sessionSetAltSpeedLimit( tr_session        * session,
+                            tr_direction        dir,
+                            int                 desiredSpeed )
+{
+    assert( tr_isSession( session ) );
+    assert( tr_isDirection( dir ) );
+    assert( desiredSpeed >= 0 );
+
+    session->altSpeedLimit[dir] = desiredSpeed;
+    updateBandwidth( session, dir );
+}
+
+int
+tr_sessionGetAltSpeedLimit( const tr_session  * session,
+                            tr_direction        dir )
+{
+    assert( tr_isSession( session ) );
+    assert( tr_isDirection( dir ) );
+
+    return session->altSpeedLimit[dir];
+}
+
+void
+tr_sessionSetAltSpeedLimitBegin( tr_session * session, int minutesSinceMidnight )
+{
+    assert( tr_isSession( session ) );
+
+    session->altSpeedBeginTime = minutesSinceMidnight;
+}
+
+int
+tr_sessionGetAltSpeedLimitBegin( const tr_session * session )
+{
+    assert( tr_isSession( session ) );
+
+    return session->altSpeedBeginTime;
+}
+
+void
+tr_sessionSetAltSpeedLimitEnd( tr_session * session, int minutesSinceMidnight )
+{
+    assert( tr_isSession( session ) );
+
+    session->altSpeedEndTime = minutesSinceMidnight;
+}
+
+int
+tr_sessionGetAltSpeedLimitEnd( const tr_session * session )
+{
+    assert( tr_isSession( session ) );
+
+    return session->altSpeedEndTime;
+}
+
+void
+tr_sessionSetAltSpeedCallback( tr_session         * session,
+                               tr_alt_speed_func    func,
+                               void               * userData )
+{
+    assert( tr_isSession( session ) );
+
+    session->altCallback = func;
+    session->altCallbackUserData = userData;
+}
+
+void
+tr_sessionClearAltSpeedCallback( tr_session * session )
+{
+    tr_sessionSetAltSpeedCallback( session, NULL, NULL );
+}
+
 
 /***
 ****
@@ -914,6 +1108,7 @@ tr_closeAllConnections( void * vsession )
 
     assert( tr_isSession( session ) );
 
+    tr_timerFree( &session->bandwidthTimer );
     tr_statsClose( session );
     tr_sharedShuttingDown( session->shared );
     tr_rpcClose( &session->rpcServer );

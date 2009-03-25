@@ -842,15 +842,29 @@ sessionSet( tr_session               * session,
 
     assert( idle_data == NULL );
 
-    if( tr_bencDictFindStr( args_in, "download-dir", &str ) )
+    if( tr_bencDictFindInt( args_in, TR_PREFS_KEY_ALT_LIMIT_ENABLED, &i ) )
+        tr_sessionSetAltSpeedLimitEnabled( session, i!=0 );
+    if( tr_bencDictFindInt( args_in, TR_PREFS_KEY_ALT_BEGIN, &i ) )
+        tr_sessionSetAltSpeedLimitBegin( session, i );
+    if( tr_bencDictFindInt( args_in, TR_PREFS_KEY_ALT_END, &i ) )
+        tr_sessionSetAltSpeedLimitEnd( session, i );
+    if( tr_bencDictFindInt( args_in, TR_PREFS_KEY_ALT_DL_LIMIT, &i ) )
+        tr_sessionSetAltSpeedLimit( session, TR_DOWN, i );
+    if( tr_bencDictFindInt( args_in, TR_PREFS_KEY_ALT_UL_LIMIT, &i ) )
+        tr_sessionSetAltSpeedLimit( session, TR_UP, i );
+    if( tr_bencDictFindInt( args_in, TR_PREFS_KEY_BLOCKLIST_ENABLED, &i ) )
+        tr_blocklistSetEnabled( session, i!=0 );
+    if( tr_bencDictFindStr( args_in, TR_PREFS_KEY_DOWNLOAD_DIR, &str ) )
         tr_sessionSetDownloadDir( session, str );
-    if( tr_bencDictFindInt( args_in, "peer-limit", &i ) )
+    if( tr_bencDictFindInt( args_in, TR_PREFS_KEY_PEER_LIMIT_GLOBAL, &i ) )
         tr_sessionSetPeerLimit( session, i );
-    if( tr_bencDictFindInt( args_in, "pex-allowed", &i ) )
+    if( tr_bencDictFindInt( args_in, TR_PREFS_KEY_PEER_LIMIT_TORRENT, &i ) )
+        tr_sessionSetPeerLimitPerTorrent( session, i );
+    if( tr_bencDictFindInt( args_in, TR_PREFS_KEY_PEX_ENABLED, &i ) )
         tr_sessionSetPexEnabled( session, i );
-    if( tr_bencDictFindInt( args_in, "port", &i ) )
+    if( tr_bencDictFindInt( args_in, TR_PREFS_KEY_PEER_PORT, &i ) )
         tr_sessionSetPeerPort( session, i );
-    if( tr_bencDictFindInt( args_in, "port-forwarding-enabled", &i ) )
+    if( tr_bencDictFindInt( args_in, TR_PREFS_KEY_PORT_FORWARDING, &i ) )
         tr_sessionSetPortForwardingEnabled( session, i );
     if( tr_bencDictFindInt( args_in, "speed-limit-down", &i ) )
         tr_sessionSetSpeedLimit( session, TR_DOWN, i );
@@ -927,7 +941,7 @@ sessionStats( tr_session               * session,
 }
 
 static const char*
-sessionGet( tr_session               * session,
+sessionGet( tr_session               * s,
             tr_benc                  * args_in UNUSED,
             tr_benc                  * args_out,
             struct tr_rpc_idle_data  * idle_data )
@@ -936,22 +950,28 @@ sessionGet( tr_session               * session,
     tr_benc *    d = args_out;
 
     assert( idle_data == NULL );
-
-    tr_bencDictAddStr( d, "download-dir", tr_sessionGetDownloadDir( session ) );
-    tr_bencDictAddInt( d, "peer-limit", tr_sessionGetPeerLimit( session ) );
-    tr_bencDictAddInt( d, "pex-allowed", tr_sessionIsPexEnabled( session ) );
-    tr_bencDictAddInt( d, "port", tr_sessionGetPeerPort( session ) );
-    tr_bencDictAddInt( d, "port-forwarding-enabled", tr_sessionIsPortForwardingEnabled( session ) );
+    tr_bencDictAddInt( d, TR_PREFS_KEY_ALT_LIMIT_ENABLED, tr_sessionIsAltSpeedLimitEnabled( s ) );
+    tr_bencDictAddInt( d, TR_PREFS_KEY_ALT_UL_LIMIT, tr_sessionGetAltSpeedLimit( s, TR_UP ) );
+    tr_bencDictAddInt( d, TR_PREFS_KEY_ALT_DL_LIMIT, tr_sessionGetAltSpeedLimit( s, TR_DOWN ) );
+    tr_bencDictAddInt( d, TR_PREFS_KEY_ALT_BEGIN, tr_sessionGetAltSpeedLimitBegin( s ) );
+    tr_bencDictAddInt( d, TR_PREFS_KEY_ALT_END, tr_sessionGetAltSpeedLimitEnd( s ) );
+    tr_bencDictAddInt( d, TR_PREFS_KEY_BLOCKLIST_ENABLED, tr_blocklistIsEnabled( s ) );
+    tr_bencDictAddStr( d, TR_PREFS_KEY_DOWNLOAD_DIR, tr_sessionGetDownloadDir( s ) );
+    tr_bencDictAddInt( d, TR_PREFS_KEY_PEER_LIMIT_GLOBAL, tr_sessionGetPeerLimit( s ) );
+    tr_bencDictAddInt( d, TR_PREFS_KEY_PEER_LIMIT_TORRENT, tr_sessionGetPeerLimitPerTorrent( s ) );
+    tr_bencDictAddInt( d, TR_PREFS_KEY_PEX_ENABLED, tr_sessionIsPexEnabled( s ) );
+    tr_bencDictAddInt( d, TR_PREFS_KEY_PEER_PORT, tr_sessionGetPeerPort( s ) );
+    tr_bencDictAddInt( d, TR_PREFS_KEY_PORT_FORWARDING, tr_sessionIsPortForwardingEnabled( s ) );
     tr_bencDictAddInt( d, "rpc-version", 4 );
     tr_bencDictAddInt( d, "rpc-version-minimum", 1 );
-    tr_bencDictAddInt( d, "speed-limit-up", tr_sessionGetSpeedLimit( session, TR_UP ) );
-    tr_bencDictAddInt( d, "speed-limit-up-enabled", tr_sessionIsSpeedLimitEnabled( session, TR_UP ) );
-    tr_bencDictAddInt( d, "speed-limit-down", tr_sessionGetSpeedLimit( session, TR_DOWN ) );
-    tr_bencDictAddInt( d, "speed-limit-down-enabled", tr_sessionIsSpeedLimitEnabled( session, TR_DOWN ) );
-    tr_bencDictAddDouble( d, "ratio-limit", tr_sessionGetRatioLimit( session ) );
-    tr_bencDictAddInt( d, "ratio-limit-enabled", tr_sessionIsRatioLimited( session ) );
+    tr_bencDictAddInt( d, "speed-limit-up", tr_sessionGetSpeedLimit( s, TR_UP ) );
+    tr_bencDictAddInt( d, "speed-limit-up-enabled", tr_sessionIsSpeedLimitEnabled( s, TR_UP ) );
+    tr_bencDictAddInt( d, "speed-limit-down", tr_sessionGetSpeedLimit( s, TR_DOWN ) );
+    tr_bencDictAddInt( d, "speed-limit-down-enabled", tr_sessionIsSpeedLimitEnabled( s, TR_DOWN ) );
+    tr_bencDictAddDouble( d, "ratio-limit", tr_sessionGetRatioLimit( s ) );
+    tr_bencDictAddInt( d, "ratio-limit-enabled", tr_sessionIsRatioLimited( s ) );
     tr_bencDictAddStr( d, "version", LONG_VERSION_STRING );
-    switch( tr_sessionGetEncryption( session ) ) {
+    switch( tr_sessionGetEncryption( s ) ) {
         case TR_CLEAR_PREFERRED: str = "tolerated"; break;
         case TR_ENCRYPTION_REQUIRED: str = "required"; break; 
         default: str = "preferred"; break;

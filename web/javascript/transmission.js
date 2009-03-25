@@ -723,8 +723,8 @@ Transmission.prototype =
 		var up_limit      = prefs[RPC._UpSpeedLimit];
 		var up_limited    = prefs[RPC._UpSpeedLimited];
 		
-		$('div.download_location input')[0].value = prefs['download-dir'];
-		$('div.port input')[0].value              = prefs['port'];
+		$('div.download_location input')[0].value = prefs[RPC._DownloadDir];
+		$('div.port input')[0].value              = prefs[RPC._PeerPort];
 		$('div.auto_start input')[0].checked      = prefs[Prefs._AutoStart];
 		$('input#limit_download')[0].checked      = down_limited == 1;
 		$('input#download_rate')[0].value         = down_limit;

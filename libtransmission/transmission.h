@@ -151,6 +151,11 @@ static TR_INLINE tr_bool tr_isEncryptionMode( tr_encryption_mode m )
 #define TR_DEFAULT_PEER_LIMIT_GLOBAL_STR "240"
 #define TR_DEFAULT_PEER_LIMIT_TORRENT_STR "60"
 
+#define TR_PREFS_KEY_ALT_LIMIT_ENABLED          "alt-speed-limit-enabled"
+#define TR_PREFS_KEY_ALT_BEGIN                  "alt-speed-limit-begin"
+#define TR_PREFS_KEY_ALT_DL_LIMIT               "alt-speed-limit-down"
+#define TR_PREFS_KEY_ALT_END                    "alt-speed-limit-end"
+#define TR_PREFS_KEY_ALT_UL_LIMIT               "alt-speed-limit-up"
 #define TR_PREFS_KEY_BLOCKLIST_ENABLED          "blocklist-enabled"
 #define TR_PREFS_KEY_DOWNLOAD_DIR               "download-dir"
 #define TR_PREFS_KEY_DSPEED                     "download-limit"
@@ -230,9 +235,9 @@ void tr_sessionGetSettings( tr_session *, struct tr_benc * dictionary );
  *
  * FIXME: this belongs in libtransmissionapp
  *
+ * @param dictionary pointer to an uninitialized tr_benc
  * @param configDir the configuration directory to find settings.json
- * @param initme pointer to an uninitialized tr_benc
- * @param appName examples: Transmission, transmission-daemon
+ * @param appName if configDir is empty, appName is used to get the default config dir.
  * @see tr_sessionGetDefaultSettings()
  * @see tr_sessionInit()
  * @see tr_sessionSaveSettings()
@@ -548,6 +553,10 @@ typedef enum
 }
 tr_direction;
 
+/***
+****
+***/
+
 void       tr_sessionSetSpeedLimitEnabled ( tr_session        * session,
                                             tr_direction        direction,
                                             tr_bool             isEnabled );
@@ -561,6 +570,58 @@ void       tr_sessionSetSpeedLimit        ( tr_session        * session,
 
 int        tr_sessionGetSpeedLimit        ( const tr_session  * session,
                                             tr_direction        direction );
+
+/***
+****
+***/
+
+typedef void ( tr_alt_speed_func )( tr_session * session,
+                                    tr_bool      isAltActive,
+                                    void       * userData );
+
+/**
+ * Register to be notified whenever the alternate speed limits go on and off.
+ *
+ * func is invoked FROM LIBTRANSMISSION'S THREAD!
+ * This means func must be fast (to avoid blocking peers),
+ * shouldn't call libtransmission functions (to avoid deadlock),
+ * and shouldn't modify client-level memory without using a mutex!
+ */
+void tr_sessionSetAltSpeedCallback( tr_session         * session,
+                                    tr_alt_speed_func    func,
+                                    void               * userData );
+
+void tr_sessionClearAltSpeedCallback( tr_session * session );
+
+
+void       tr_sessionSetAltSpeedLimitEnabled( tr_session   * session,
+                                              tr_bool        isEnabled );
+
+tr_bool    tr_sessionIsAltSpeedLimitEnabled( const tr_session  * session );
+
+/** @return true if the current time is between the alt begin and end times */
+tr_bool    tr_sessionIsAltSpeedLimitTime( const tr_session  * session );
+
+void       tr_sessionSetAltSpeedLimitBegin( tr_session * session,
+                                            int          minutesSinceMidnight );
+
+int        tr_sessionGetAltSpeedLimitBegin( const tr_session * session );
+
+void       tr_sessionSetAltSpeedLimitEnd( tr_session * session,
+                                          int          minutesSinceMidnight );
+
+int        tr_sessionGetAltSpeedLimitEnd( const tr_session * session );
+
+void       tr_sessionSetAltSpeedLimit( tr_session        * session,
+                                       tr_direction        direction,
+                                       int                 KiB_sec );
+
+int        tr_sessionGetAltSpeedLimit( const tr_session  * session,
+                                       tr_direction        direction );
+
+/***
+****
+***/
 
 void       tr_sessionSetRatioLimited      ( tr_session        * session,
                                             tr_bool             isEnabled );

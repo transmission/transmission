@@ -990,8 +990,7 @@ static void
 refreshSchedSensitivity( struct BandwidthPage * p )
 {
     GSList *       l;
-    const gboolean sched_enabled = pref_flag_get(
-        PREF_KEY_SCHED_LIMIT_ENABLED );
+    const gboolean sched_enabled = pref_flag_get( TR_PREFS_KEY_ALT_LIMIT_ENABLED );
 
     for( l = p->sched_widgets; l != NULL; l = l->next )
         gtk_widget_set_sensitive( GTK_WIDGET( l->data ), sched_enabled );
@@ -1111,27 +1110,27 @@ bandwidthPage( GObject * core )
     hig_workarea_add_section_title( t, &row, _( "Scheduled Limits" ) );
 
     h = gtk_hbox_new( FALSE, 0 );
-    w2 = new_time_combo( core, PREF_KEY_SCHED_BEGIN );
+    w2 = new_time_combo( core, TR_PREFS_KEY_ALT_BEGIN );
     page->sched_widgets = g_slist_append( page->sched_widgets, w2 );
     gtk_box_pack_start( GTK_BOX( h ), w2, FALSE, FALSE, 0 );
     w2 = gtk_label_new ( _( " and " ) );
     page->sched_widgets = g_slist_append( page->sched_widgets, w2 );
     gtk_box_pack_start( GTK_BOX( h ), w2, FALSE, FALSE, 0 );
-    w2 = new_time_combo( core, PREF_KEY_SCHED_END );
+    w2 = new_time_combo( core, TR_PREFS_KEY_ALT_END );
     page->sched_widgets = g_slist_append( page->sched_widgets, w2 );
     gtk_box_pack_start( GTK_BOX( h ), w2, FALSE, FALSE, 0 );
 
     s = _( "_Limit bandwidth between" );
-    w = new_check_button( s, PREF_KEY_SCHED_LIMIT_ENABLED, core );
+    w = new_check_button( s, TR_PREFS_KEY_ALT_LIMIT_ENABLED, core );
     g_signal_connect( w, "toggled", G_CALLBACK( onSchedToggled ), page );
     hig_workarea_add_row_w( t, &row, w, h, NULL );
 
-    w = new_spin_button( PREF_KEY_SCHED_DL_LIMIT, core, 0, INT_MAX, 5 );
+    w = new_spin_button( TR_PREFS_KEY_ALT_DL_LIMIT, core, 0, INT_MAX, 5 );
     page->sched_widgets = g_slist_append( page->sched_widgets, w );
     l = hig_workarea_add_row( t, &row, _( "Limit d_ownload speed (KB/s):" ), w, NULL );
     page->sched_widgets = g_slist_append( page->sched_widgets, l );
 
-    w = new_spin_button( PREF_KEY_SCHED_UL_LIMIT, core, 0, INT_MAX, 5 );
+    w = new_spin_button( TR_PREFS_KEY_ALT_UL_LIMIT, core, 0, INT_MAX, 5 );
     page->sched_widgets = g_slist_append( page->sched_widgets, w );
     l = hig_workarea_add_row( t, &row, _( "Limit u_pload speed (KB/s):" ), w, NULL );
     page->sched_widgets = g_slist_append( page->sched_widgets, l );

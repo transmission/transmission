@@ -21,11 +21,6 @@ GtkWidget * tr_prefs_dialog_new( GObject *   core,
 /* if you add a key here,  you /must/ add its
  * default in tr_prefs_init_defaults( void ) */
 
-#define PREF_KEY_SCHED_LIMIT_ENABLED        "sched-limit-enabled"
-#define PREF_KEY_SCHED_BEGIN                "sched-begin"
-#define PREF_KEY_SCHED_END                  "sched-end"
-#define PREF_KEY_SCHED_DL_LIMIT             "sched-download-limit"
-#define PREF_KEY_SCHED_UL_LIMIT             "sched-upload-limit"
 #define PREF_KEY_OPTIONS_PROMPT             "show-options-window"
 #define PREF_KEY_OPEN_DIALOG_FOLDER         "open-dialog-dir"
 #define PREF_KEY_INHIBIT_HIBERNATION        "inhibit-desktop-hibernation"

@@ -178,12 +178,6 @@ tr_prefs_init_defaults( tr_benc * d )
     tr_bencDictAddInt( d, PREF_KEY_SHOW_DESKTOP_NOTIFICATION, TRUE );
     tr_bencDictAddStr( d, PREF_KEY_STATUSBAR_STATS, "total-ratio" );
 
-    tr_bencDictAddInt( d, PREF_KEY_SCHED_LIMIT_ENABLED, FALSE );
-    tr_bencDictAddInt( d, PREF_KEY_SCHED_BEGIN,    60 * 23 ); /* 11pm */
-    tr_bencDictAddInt( d, PREF_KEY_SCHED_END,      60 * 7 );  /* 7am */
-    tr_bencDictAddInt( d, PREF_KEY_SCHED_DL_LIMIT, 200 );   /* 2x the other limit */
-    tr_bencDictAddInt( d, PREF_KEY_SCHED_UL_LIMIT, 100 );   /* 2x the other limit */
-
     tr_bencDictAddInt( d, PREF_KEY_OPTIONS_PROMPT, TRUE );
 
     tr_bencDictAddInt( d, PREF_KEY_MAIN_WINDOW_HEIGHT, 500 );

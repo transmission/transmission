@@ -336,11 +336,18 @@
 
    string                     | value type & description
    ---------------------------+-------------------------------------------------
+   "alt-speed-limit-enabled"  | 'boolean'  true means enabled
+   "alt-speed-limit-up"       | number     max global upload speed (in K/s)
+   "alt-speed-limit-down"     | number     max global download speed (in K/s)
+   "alt-speed-limit-begin"    | number     minutes after midnight. (ex: 60 means starting at 1 am)
+   "alt-speed-limit-end"      | number     minutes after midnight. (ex: 300 means ending at 5 am)
+   "blocklist-enabled"        | 'boolean'  true means enabled
    "encryption"               | string     "required", "preferred", "tolerated"
    "download-dir"             | string     default path to download torrents
-   "peer-limit"               | number     maximum global number of peers
-   "pex-allowed"              | 'boolean'  true means allow pex in public torrents
-   "port"                     | number     port number
+   "peer-limit-global"        | number     maximum global number of peers
+   "peer-limit-per-torrent"   | number     maximum global number of peers
+   "pex-enabled"              | 'boolean'  true means allow pex in public torrents
+   "peer-port"                | number     port number
    "port-forwarding-enabled"  | 'boolean'  true means enabled
    "speed-limit-down"         | number     max global download speed (in K/s)
    "speed-limit-down-enabled" | 'boolean'  true means enabled
@@ -435,10 +442,20 @@
          |         | yes       | torrent-get    | new arg "speed-limit-up-enabled" 
          |         | yes       | torrent-get    | new arg "speed-limit-up-global-enabled" 
          |         | yes       | torrent-get    | new ids option "recently-active"
+         |         | yes       | session-get    | new arg "alt-speed-limit-enabled"
+         |         | yes       | session-get    | new arg "alt-speed-limit-up"
+         |         | yes       | session-get    | new arg "alt-speed-limit-down"
+         |         | yes       | session-get    | new arg "alt-speed-limit-begin"
+         |         | yes       | session-get    | new arg "alt-speed-limit-end"
+         |         | yes       | session-get    | new arg "blocklist-enabled"
+         |         | yes       | session-get    | new arg "peer-limit-per-torrent"
          |         |        NO | torrent-get    | removed arg "downloadLimit"
          |         |        NO | torrent-get    | removed arg "downloadLimitMode"
          |         |        NO | torrent-get    | removed arg "uploadLimit"
          |         |        NO | torrent-get    | removed arg "uploadLimitMode"
+         |         |        NO | session-get    | renamed "pex-allowed" to "pex-enabled"
+         |         |        NO | session-get    | renamed "port" to "peer-port"
+         |         |        NO | session-get    | renamed "peer-limit" to "peer-limit-global"
    ------+---------+-----------+----------------+-------------------------------
 
 

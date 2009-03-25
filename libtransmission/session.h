@@ -70,6 +70,15 @@ struct tr_session
 
     tr_bool                      isSpeedLimited[2];
     int                          speedLimit[2];
+    tr_bool                      isAltSpeedLimited;
+    int                          altSpeedBeginTime;
+    int                          altSpeedEndTime;
+    int                          altSpeedLimit[2];
+    tr_bool                      isAltTime;
+    tr_alt_speed_func          * altCallback;
+    void                       * altCallbackUserData;
+
+
     int                          magicNumber;
 
     tr_encryption_mode           encryptionMode;
@@ -121,6 +130,8 @@ struct tr_session
 
     struct tr_metainfo_lookup *  metainfoLookup;
     int                          metainfoLookupCount;
+
+    struct tr_timer            * bandwidthTimer;
 
     /* the size of the output buffer for peer connections */
     int so_sndbuf;

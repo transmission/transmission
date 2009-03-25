@@ -17,7 +17,7 @@ RPC._EncryptionRequired     = 'required';
 RPC._UpSpeedLimit           = 'speed-limit-up';
 RPC._DownSpeedLimit         = 'speed-limit-down';
 RPC._DownloadDir            = 'download-dir';
-RPC._PeerPort               = 'port';
+RPC._PeerPort               = 'peer-port';
 RPC._UpSpeedLimited         = 'speed-limit-up-enabled';
 RPC._DownSpeedLimited       = 'speed-limit-down-enabled';
 
