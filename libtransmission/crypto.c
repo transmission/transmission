@@ -19,7 +19,6 @@
 #include <stdarg.h>
 
 #include <openssl/bn.h>
-#include <openssl/des.h>
 #include <openssl/dh.h>
 #include <openssl/err.h>
 #include <openssl/rc4.h>

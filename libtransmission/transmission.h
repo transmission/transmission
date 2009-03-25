@@ -370,6 +370,12 @@ void  tr_sessionSetRPCPassword( tr_session * session,
 void  tr_sessionSetRPCUsername( tr_session * session,
                                 const char * username );
 
+/** @brief get the password used to restrict RPC requests.
+    @return the password string. tr_free() when done.
+    @see tr_sessionInit()
+    @see tr_sessionSetRPCPassword() */
+char* tr_sessionGetRPCPassword( const tr_session * session );
+
 char* tr_sessionGetRPCUsername( const tr_session * session  );
 
 void  tr_sessionSetRPCPasswordEnabled( tr_session * session,
