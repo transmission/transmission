@@ -147,17 +147,12 @@ getTorrents( tr_session * session,
         {
             tr_torrent * tor = NULL;
             const time_t now = time( NULL );
-            const time_t window = 120;
+            const time_t window = 60;
             const int n = tr_sessionCountTorrents( session );
             torrents = tr_new0( tr_torrent *, n );
-            while( ( tor = tr_torrentNext( session, tor ) ) ) {
-                time_t a = tor->activityDate;
-                a = MAX( a, tor->addedDate );
-                a = MAX( a, tor->doneDate );
-                a = MAX( a, tor->startDate );
-                if( a >= now - window )
+            while( ( tor = tr_torrentNext( session, tor ) ) )
+                if( tor->anyDate >= now - window )
                     torrents[torrentCount++] = tor;
-            }
         }
     }
     else /* all of them */
@@ -236,6 +231,31 @@ torrentRemove( tr_session               * session,
             tr_torrentDeleteLocalData( tor, NULL );
         if( !( status & TR_RPC_NOREMOVE ) )
             tr_torrentRemove( tor );
+    }
+
+    tr_free( torrents );
+    return NULL;
+}
+
+static const char*
+torrentReannounce( tr_session               * session,
+                   tr_benc                  * args_in,
+                   tr_benc                  * args_out UNUSED,
+                   struct tr_rpc_idle_data  * idle_data )
+{
+    int i, torrentCount;
+    tr_torrent ** torrents = getTorrents( session, args_in, &torrentCount );
+
+    assert( idle_data == NULL );
+
+    for( i=0; i<torrentCount; ++i )
+    {
+        tr_torrent * tor = torrents[i];
+        if( tr_torrentCanManualUpdate( tor ) )
+        {
+            tr_torrentManualUpdate( tor );
+            notify( session, TR_RPC_TORRENT_CHANGED, tor );
+        }
     }
 
     tr_free( torrents );
@@ -956,6 +976,7 @@ sessionGet( tr_session               * s,
     tr_bencDictAddInt( d, TR_PREFS_KEY_ALT_BEGIN, tr_sessionGetAltSpeedLimitBegin( s ) );
     tr_bencDictAddInt( d, TR_PREFS_KEY_ALT_END, tr_sessionGetAltSpeedLimitEnd( s ) );
     tr_bencDictAddInt( d, TR_PREFS_KEY_BLOCKLIST_ENABLED, tr_blocklistIsEnabled( s ) );
+    tr_bencDictAddInt( d, "blocklist-size", tr_blocklistGetRuleCount( s ) );
     tr_bencDictAddStr( d, TR_PREFS_KEY_DOWNLOAD_DIR, tr_sessionGetDownloadDir( s ) );
     tr_bencDictAddInt( d, TR_PREFS_KEY_PEER_LIMIT_GLOBAL, tr_sessionGetPeerLimit( s ) );
     tr_bencDictAddInt( d, TR_PREFS_KEY_PEER_LIMIT_TORRENT, tr_sessionGetPeerLimitPerTorrent( s ) );
@@ -995,16 +1016,17 @@ static struct method
 }
 methods[] =
 {
-    { "session-get",    TRUE,  sessionGet          },
-    { "session-set",    TRUE,  sessionSet          },
-    { "session-stats",  TRUE,  sessionStats        },
-    { "torrent-add",    FALSE, torrentAdd          },
-    { "torrent-get",    TRUE,  torrentGet          },
-    { "torrent-remove", TRUE,  torrentRemove       },
-    { "torrent-set",    TRUE,  torrentSet          },
-    { "torrent-start",  TRUE,  torrentStart        },
-    { "torrent-stop",   TRUE,  torrentStop         },
-    { "torrent-verify", TRUE,  torrentVerify       }
+    { "session-get",        TRUE,  sessionGet          },
+    { "session-set",        TRUE,  sessionSet          },
+    { "session-stats",      TRUE,  sessionStats        },
+    { "torrent-add",        FALSE, torrentAdd          },
+    { "torrent-get",        TRUE,  torrentGet          },
+    { "torrent-remove",     TRUE,  torrentRemove       },
+    { "torrent-set",        TRUE,  torrentSet          },
+    { "torrent-start",      TRUE,  torrentStart        },
+    { "torrent-stop",       TRUE,  torrentStop         },
+    { "torrent-verify",     TRUE,  torrentVerify       },
+    { "torrent-reannounce", TRUE,  torrentReannounce   }
 };
 
 static void

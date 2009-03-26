@@ -757,7 +757,7 @@ tr_torrentManualUpdate( tr_torrent * tor )
     tr_runInEventThread( tor->session, tr_torrentManualUpdateImpl, tor );
 }
 
-int
+tr_bool
 tr_torrentCanManualUpdate( const tr_torrent * tor )
 {
     return ( tr_isTorrent( tor  ) )
@@ -779,6 +779,16 @@ tr_torrentStatCached( tr_torrent * tor )
     return tr_isTorrent( tor ) && ( now == tor->lastStatTime )
          ? &tor->stats
          : tr_torrentStat( tor );
+}
+
+void
+tr_torrentSetVerifyState( tr_torrent * tor, tr_verify_state state )
+{
+    assert( tr_isTorrent( tor ) );
+    assert( state==TR_VERIFY_NONE || state==TR_VERIFY_WAIT || state==TR_VERIFY_NOW );
+
+    tor->verifyState = state;
+    tor->anyDate = time( NULL );
 }
 
 tr_torrent_activity
@@ -1180,7 +1190,7 @@ checkAndStartImpl( void * vtor )
     tr_torrentResetTransferStats( tor );
     tor->completeness = tr_cpGetStatus( &tor->completion );
     tr_torrentSaveResume( tor );
-    tor->startDate = time( NULL );
+    tor->startDate = tor->anyDate = time( NULL );
     tr_trackerStart( tor->tracker );
     tr_peerMgrStartTorrent( tor );
     tr_torrentCheckSeedRatio( tor );
@@ -1455,7 +1465,7 @@ tr_torrentRecheckCompleteness( tr_torrent * tor )
         {
             tr_trackerCompleted( tor->tracker );
 
-            tor->doneDate = time( NULL );
+            tor->doneDate = tor->anyDate = time( NULL );
         }
 
         tr_torrentSaveResume( tor );
@@ -1917,6 +1927,9 @@ tr_torrentSetActivityDate( tr_torrent * tor,
     assert( tr_isTorrent( tor ) );
 
     tor->activityDate = t;
+
+    if( tor->anyDate < tor->activityDate )
+        tor->anyDate = tor->activityDate;
 }
 
 /** @deprecated this method will be removed in 1.40 */
@@ -1927,6 +1940,9 @@ tr_torrentSetDoneDate( tr_torrent * tor,
     assert( tr_isTorrent( tor ) );
 
     tor->doneDate = t;
+
+    if( tor->anyDate < tor->doneDate )
+        tor->anyDate = tor->doneDate;
 }
 
 /**

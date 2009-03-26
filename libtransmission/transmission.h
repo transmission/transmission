@@ -1135,7 +1135,7 @@ void tr_torrentClearRatioLimitHitCallback( tr_torrent * torrent );
 
 void tr_torrentManualUpdate( tr_torrent * torrent );
 
-int  tr_torrentCanManualUpdate( const tr_torrent * torrent );
+tr_bool tr_torrentCanManualUpdate( const tr_torrent * torrent );
 
 /***********************************************************************
 * tr_torrentPeers

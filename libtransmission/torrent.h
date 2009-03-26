@@ -127,6 +127,9 @@ typedef enum
 }
 tr_verify_state;
 
+void             tr_torrentSetVerifyState( tr_torrent      * tor,
+                                           tr_verify_state   state );
+
 struct tr_torrent
 {
     tr_session *             session;
@@ -182,6 +185,7 @@ struct tr_torrent
     time_t                     activityDate;
     time_t                     doneDate;
     time_t                     startDate;
+    time_t                     anyDate;
 
     tr_torrent_completeness_func *   completeness_func;
     void *                     completeness_func_user_data;

@@ -73,11 +73,12 @@
 
 3.1.  Torrent Action Requests
 
-   Method name         | libtransmission function
-   --------------------+-------------------------------------------------
-   "torrent-start"     | tr_torrentStart
-   "torrent-stop"      | tr_torrentStop
-   "torrent-verify"    | tr_torrentVerify
+   Method name          | libtransmission function
+   ---------------------+-------------------------------------------------
+   "torrent-start"      | tr_torrentStart
+   "torrent-stop"       | tr_torrentStop
+   "torrent-verify"     | tr_torrentVerify
+   "torrent-reannounce" | tr_torrentManualUpdate ("ask tracker for more peers")
 
    Request arguments: "ids", which specifies which torrents to use.
                       All torrents are used if the "ids" argument is omitted.
@@ -342,6 +343,7 @@
    "alt-speed-limit-begin"    | number     minutes after midnight. (ex: 60 means starting at 1 am)
    "alt-speed-limit-end"      | number     minutes after midnight. (ex: 300 means ending at 5 am)
    "blocklist-enabled"        | 'boolean'  true means enabled
+   "blocklist-size"           | number     number of rules in the blocklist
    "encryption"               | string     "required", "preferred", "tolerated"
    "download-dir"             | string     default path to download torrents
    "peer-limit-global"        | number     maximum global number of peers
@@ -349,13 +351,13 @@
    "pex-enabled"              | 'boolean'  true means allow pex in public torrents
    "peer-port"                | number     port number
    "port-forwarding-enabled"  | 'boolean'  true means enabled
+   "rpc-version"              | number     the current RPC API version
+   "rpc-version-minimum"      | number     the minimum RPC API version supported
    "speed-limit-down"         | number     max global download speed (in K/s)
    "speed-limit-down-enabled" | 'boolean'  true means enabled
    "speed-limit-up"           | number     max global upload speed (in K/s)
    "speed-limit-up-enabled"   | 'boolean'  true means enabled
    "version"                  | string     long version string "$version ($revision)"
-   "rpc-version"              | number     the current RPC API version
-   "rpc-version-minimum"      | number     the minimum RPC API version supported
 
    "rpc-version" indicates the RPC interface version supported by the RPC server.
    It is incremented when a new version of Transmission changes the RPC interface.
@@ -368,7 +370,8 @@
 4.1.1.  Mutators
 
    Method name: "session-set"
-   Request arguments: one or more of 4.1's arguments, except "version"
+   Request arguments: one or more of 4.1's arguments, except: "blocklist-size",
+                      "rpc-version", "rpc-version-minimum", and "version"
    Response arguments: none
 
 4.1.2.  Accessors
@@ -448,7 +451,9 @@
          |         | yes       | session-get    | new arg "alt-speed-limit-begin"
          |         | yes       | session-get    | new arg "alt-speed-limit-end"
          |         | yes       | session-get    | new arg "blocklist-enabled"
+         |         | yes       | session-get    | new arg "blocklist-size"
          |         | yes       | session-get    | new arg "peer-limit-per-torrent"
+         |         | yes       |                | new method "torrent-reannounce"
          |         |        NO | torrent-get    | removed arg "downloadLimit"
          |         |        NO | torrent-get    | removed arg "downloadLimitMode"
          |         |        NO | torrent-get    | removed arg "uploadLimit"

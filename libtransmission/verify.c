@@ -142,13 +142,12 @@ verifyThreadFunc( void * unused UNUSED )
         tr_lockUnlock( getVerifyLock( ) );
 
         tr_torinf( tor, _( "Verifying torrent" ) );
-        assert( tr_isTorrent( tor ) );
-        tor->verifyState = TR_VERIFY_NOW;
+        tr_torrentSetVerifyState( tor, TR_VERIFY_NOW );
         buffer = tr_new( uint8_t, tor->info.pieceSize );
         for( i = 0; i < tor->info.fileCount && !stopCurrent; ++i )
             changed |= checkFile( tor, buffer, tor->info.pieceSize, i, &stopCurrent );
         tr_free( buffer );
-        tor->verifyState = TR_VERIFY_NONE;
+        tr_torrentSetVerifyState( tor, TR_VERIFY_NONE );
         assert( tr_isTorrent( tor ) );
 
         if( !stopCurrent )
@@ -187,7 +186,7 @@ tr_verifyAdd( tr_torrent *      tor,
         node->verify_done_cb = verify_done_cb;
 
         tr_lockLock( getVerifyLock( ) );
-        tor->verifyState = verifyList ? TR_VERIFY_WAIT : TR_VERIFY_NOW;
+        tr_torrentSetVerifyState( tor, verifyList ? TR_VERIFY_WAIT : TR_VERIFY_NOW );
         tr_list_append( &verifyList, node );
         if( verifyThread == NULL )
             verifyThread = tr_threadNew( verifyThreadFunc, NULL );
