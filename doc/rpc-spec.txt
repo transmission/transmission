@@ -97,6 +97,9 @@
 
    string                            | value type & description
    ----------------------------------+-------------------------------------------------
+   "downloadLimit"                   | number     maximum download speed (in K/s)
+   "downloadLimitHonored"            | 'boolean'  true if "downloadLimit" is honored
+   "downloadGlobalHonored"           | 'boolean'  true if global speed limit is honored
    "files-wanted"                    | array      indices of file(s) to download
    "files-unwanted"                  | array      indices of file(s) to not download
    "ids"                             | array      torrent list, as described in 3.1
@@ -104,12 +107,9 @@
    "priority-high"                   | array      indices of high-priority file(s)
    "priority-low"                    | array      indices of low-priority file(s)
    "priority-normal"                 | array      indices of normal-priority file(s)
-   "speed-limit-down"                | number     maximum download speed (in K/s)
-   "speed-limit-down-enabled"        | 'boolean'  true if the download speed is limited
-   "speed-limit-down-global-enabled" | 'boolean'  true if the download speed is limited by session
-   "speed-limit-up"                  | number     maximum upload speed (in K/s)
-   "speed-limit-up-enabled"          | 'boolean'  true if the upload speed is limited
-   "speed-limit-up-global-enabled"   | 'boolean'  true if the upload speed is limited by session
+   "uploadLimit"                     | number     maximum upload speed (in K/s)
+   "uploadLimitHonored"              | 'boolean'  true if "uploadLimit" is honored
+   "uploadGlobalHonored"             | 'boolean'  true if global speed limit is honored
 
    Just as an empty "ids" value is shorthand for "all ids", using an empty array
    for "files-wanted", "files-unwanted", "priority-high", "priority-low", or
@@ -146,6 +146,9 @@
    downloadDir                     | string                      | tr_torrent
    downloadedEver                  | number                      | tr_stat
    downloaders                     | number                      | tr_stat
+   downloadLimit                   | number                      | tr_torrent
+   downloadHonorsLimit             | 'boolean'                   | tr_torrent
+   downloadHonorsGlobalLimit       | 'boolean'                   | tr_torrent
    error                           | number                      | tr_stat
    errorString                     | number                      | tr_stat
    eta                             | number                      | tr_stat
@@ -174,6 +177,7 @@
    pieceCount                      | tnumber                     | tr_info
    pieceSize                       | tnumber                     | tr_info
    priorities                      | array (see below)           | n/a
+   ratio                           | 'double'                    | tr_stat
    rateDownload (B/s)              | number                      | tr_stat
    rateUpload (B/s)                | number                      | tr_stat
    recheckProgress                 | 'double'                    | tr_stat
@@ -181,12 +185,6 @@
    scrapeURL                       | string                      | tr_stat
    seeders                         | number                      | tr_stat
    sizeWhenDone                    | number                      | tr_stat
-   speed-limit-down                | number                      | tr_torrent
-   speed-limit-down-enabled        | 'boolean'                   | tr_torrent
-   speed-limit-down-global-enabled | 'boolean'                   | tr_torrent
-   speed-limit-up                  | number                      | tr_torrent
-   speed-limit-up-enabled          | 'boolean'                   | tr_torrent
-   speed-limit-up-global-enabled   | 'boolean'                   | tr_torrent
    startDate                       | number                      | tr_stat
    status                          | number                      | tr_stat
    swarmSpeed (K/s)                | number                      | tr_stat
@@ -194,8 +192,9 @@
    trackers                        | array (see below)           | n/a
    totalSize                       | number                      | tr_info
    uploadedEver                    | number                      | tr_stat
-   uploadLimitMode                 | number                      | tr_torrent
    uploadLimit                     | number                      | tr_torrent
+   uploadHonorsLimit               | 'boolean'                   | tr_torrent
+   uploadHonorsGlobalLimit         | 'boolean'                   | tr_torrent
    uploadRatio                     | 'double'                    | tr_stat
    wanted                          | array (see below)           | n/a
    webseeds                        | array (see below)           | n/a
@@ -436,14 +435,11 @@
          |         | yes       | torrent-get    | new arg "downloadDir"
    ------+---------+-----------+----------------+-------------------------------
    6     | 1.60    | yes       | torrent-get    | new arg "pieces"
-         |         | yes       | torrent-set    | new arg "speed-limit-down-global-enabled" 
-         |         | yes       | torrent-set    | new arg "speed-limit-up-global-enabled"
-         |         | yes       | torrent-get    | new arg "speed-limit-down" 
-         |         | yes       | torrent-get    | new arg "speed-limit-down-enabled" 
-         |         | yes       | torrent-get    | new arg "speed-limit-down-global-enabled" 
-         |         | yes       | torrent-get    | new arg "speed-limit-up" 
-         |         | yes       | torrent-get    | new arg "speed-limit-up-enabled" 
-         |         | yes       | torrent-get    | new arg "speed-limit-up-global-enabled" 
+         |         | yes       | torrent-set    | new arg "ratio"
+         |         | yes       | torrent-set    | new arg "downloadHonorsLimit"
+         |         | yes       | torrent-set    | new arg "downloadHonorsGlobalLimit"
+         |         | yes       | torrent-set    | new arg "uploadHonorsLimit"
+         |         | yes       | torrent-set    | new arg "uploadHonorsGlobalLimit"
          |         | yes       | torrent-get    | new ids option "recently-active"
          |         | yes       | session-get    | new arg "alt-speed-limit-enabled"
          |         | yes       | session-get    | new arg "alt-speed-limit-up"
@@ -454,9 +450,7 @@
          |         | yes       | session-get    | new arg "blocklist-size"
          |         | yes       | session-get    | new arg "peer-limit-per-torrent"
          |         | yes       |                | new method "torrent-reannounce"
-         |         |        NO | torrent-get    | removed arg "downloadLimit"
          |         |        NO | torrent-get    | removed arg "downloadLimitMode"
-         |         |        NO | torrent-get    | removed arg "uploadLimit"
          |         |        NO | torrent-get    | removed arg "uploadLimitMode"
          |         |        NO | session-get    | renamed "pex-allowed" to "pex-enabled"
          |         |        NO | session-get    | renamed "port" to "peer-port"
