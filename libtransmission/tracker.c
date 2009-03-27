@@ -259,7 +259,6 @@ publishNewPeersCompact( tr_tracker * t,
     {
         memcpy( &addr.addr.addr4, compactWalk, 4 );
         memcpy( &port, compactWalk + 4, 2 );
-        tr_suspectAddress( &addr, "compact" );
         
         memcpy( walk, &addr, sizeof( addr ) );
         memcpy( walk + sizeof( addr ), &port, 2 );
@@ -292,7 +291,6 @@ publishNewPeersCompact6( tr_tracker * t,
         memcpy( &addr.addr.addr6, compactWalk, 16 );
         memcpy( &port, compactWalk + 16, 2 );
         compactWalk += 18;
-        tr_suspectAddress( &addr, "compact6" );
         
         memcpy( walk, &addr, sizeof( addr ) );
         memcpy( walk + sizeof( addr ), &port, 2 );
@@ -368,7 +366,6 @@ parseOldPeers( tr_benc * bePeers,
             continue;
 
         memcpy( walk, &addr, sizeof( tr_address ) );
-        tr_suspectAddress( &addr, "old tracker" );
         port = htons( itmp );
         memcpy( walk + sizeof( tr_address ), &port, 2 );
         walk += sizeof( tr_address ) + 2;

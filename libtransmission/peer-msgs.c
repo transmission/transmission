@@ -1987,7 +1987,6 @@ sendPex( tr_peermsgs * msgs )
             tmp = walk = tr_new( uint8_t, diffs.addedCount * 6 );
             for( i = 0; i < diffs.addedCount; ++i )
             {
-                tr_suspectAddress( &diffs.added[i].addr, "pex" );
                 memcpy( walk, &diffs.added[i].addr.addr, 4 ); walk += 4;
                 memcpy( walk, &diffs.added[i].port, 2 ); walk += 2;
             }
@@ -2018,7 +2017,6 @@ sendPex( tr_peermsgs * msgs )
             tmp = walk = tr_new( uint8_t, diffs6.addedCount * 18 );
             for( i = 0; i < diffs6.addedCount; ++i )
             {
-                tr_suspectAddress( &diffs6.added[i].addr, "pex6" );
                 memcpy( walk, &diffs6.added[i].addr.addr.addr6.s6_addr, 16 );
                 walk += 16;
                 memcpy( walk, &diffs6.added[i].port, 2 );
