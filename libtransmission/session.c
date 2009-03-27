@@ -836,6 +836,9 @@ isAltTime( const tr_session * session )
     struct tm tm;
     int minutes;
 
+    if( !tr_sessionIsAltSpeedLimitEnabled( session ) )
+        return FALSE;
+
     tr_localtime_r( &now, &tm );
     minutes = tm.tm_hour*60 + tm.tm_min;
 
@@ -892,7 +895,7 @@ onAltTimer( int foo UNUSED, short bar UNUSED, void * vsession )
     wasAltTime = session->isAltTime;
     session->isAltTime = isAltTime( session );
 
-    if( tr_sessionIsAltSpeedLimitEnabled( session ) && ( wasAltTime != session->isAltTime ) )
+    if( wasAltTime != session->isAltTime )
     {
         updateBandwidth( session, TR_UP );
         updateBandwidth( session, TR_DOWN );
@@ -944,14 +947,6 @@ tr_sessionGetSpeedLimit( const tr_session * session, tr_direction dir )
     assert( tr_isDirection( dir ) );
 
     return session->speedLimit[dir];
-}
-
-tr_bool
-tr_sessionIsAltSpeedLimitTime( const tr_session  * session )
-{
-    assert( tr_isSession( session ) );
-
-    return session->isAltTime;
 }
 
 static void

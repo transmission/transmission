@@ -599,9 +599,6 @@ void       tr_sessionSetAltSpeedLimitEnabled( tr_session   * session,
 
 tr_bool    tr_sessionIsAltSpeedLimitEnabled( const tr_session  * session );
 
-/** @return true if the current time is between the alt begin and end times */
-tr_bool    tr_sessionIsAltSpeedLimitTime( const tr_session  * session );
-
 void       tr_sessionSetAltSpeedLimitBegin( tr_session * session,
                                             int          minutesSinceMidnight );
 
