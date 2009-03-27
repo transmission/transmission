@@ -86,7 +86,6 @@ tr_address *tr_pton( const char * src,
                      tr_address * dst );
 int tr_compareAddresses( const tr_address * a,
                          const tr_address * b);
-void tr_normalizeV4Mapped( tr_address * const addr );
 
 tr_bool tr_isValidPeerAddress( const tr_address * addr, tr_port port );
 

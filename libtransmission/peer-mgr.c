@@ -1830,11 +1830,8 @@ tr_peerMgrPeerStats( const tr_torrent    * tor,
         const tr_peer *          peer = peers[i];
         const struct peer_atom * atom = getExistingAtom( t, &peer->addr );
         tr_peer_stat *           stat = ret + i;
-        tr_address               norm_addr;
 
-        norm_addr = peer->addr;
-        tr_normalizeV4Mapped( &norm_addr );
-        tr_ntop( &norm_addr, stat->addr, sizeof( stat->addr ) );
+        tr_ntop( &peer->addr, stat->addr, sizeof( stat->addr ) );
         tr_strlcpy( stat->client, ( peer->client ? peer->client : "" ),
                    sizeof( stat->client ) );
         stat->port               = ntohs( peer->port );
