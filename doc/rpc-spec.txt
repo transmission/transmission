@@ -167,6 +167,7 @@
    name                            | string                      | tr_info
    nextAnnounceTime                | number                      | tr_stat
    nextScrapeTime                  | number                      | tr_stat
+   peer-limit                      | number                      | tr_torrent
    peers                           | array (see below)           | n/a
    peersConnected                  | number                      | tr_stat
    peersFrom                       | object (see below)          | n/a

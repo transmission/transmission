@@ -448,6 +448,8 @@ addField( const tr_torrent * tor,
         tr_bencDictAddInt( d, key, st->nextAnnounceTime );
     else if( !strcmp( key, "nextScrapeTime" ) )
         tr_bencDictAddInt( d, key, st->nextScrapeTime );
+    else if( !strcmp( key, "peer-limit" ) )
+        tr_bencDictAddInt( d, key, tr_torrentGetPeerLimit( tor ) );
     else if( !strcmp( key, "peers" ) )
         addPeers( tor, tr_bencDictAdd( d, key ) );
     else if( !strcmp( key, "peersConnected" ) )
