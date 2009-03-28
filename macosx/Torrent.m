@@ -394,7 +394,7 @@ int trashDataFile(const char * filename)
 
 - (BOOL) usesSpeedLimit: (BOOL) upload
 {
-    return tr_torrentIsUsingSpeedLimit(fHandle, upload ? TR_UP : TR_DOWN);
+    return tr_torrentUsesSpeedLimit(fHandle, upload ? TR_UP : TR_DOWN);
 }
 
 - (void) setUseSpeedLimit: (BOOL) use upload: (BOOL) upload
@@ -414,16 +414,12 @@ int trashDataFile(const char * filename)
 
 - (BOOL) usesGlobalSpeedLimit
 {
-    const BOOL up = tr_torrentIsUsingGlobalSpeedLimit(fHandle, TR_UP);
-    const BOOL down = tr_torrentIsUsingGlobalSpeedLimit(fHandle, TR_DOWN);
-    NSAssert(up == down, @"upload and download global limit settings should have the same value");
-    return up;
+    return tr_torrentUsesSessionLimits(fHandle);
 }
 
 - (void) setUseGlobalSpeedLimit: (BOOL) use
 {
-    tr_torrentUseGlobalSpeedLimit(fHandle, TR_UP, use);
-    tr_torrentUseGlobalSpeedLimit(fHandle, TR_DOWN, use);
+    tr_torrentUseSessionLimits(fHandle, use);
 }
 
 - (void) setMaxPeerConnect: (uint16_t) count

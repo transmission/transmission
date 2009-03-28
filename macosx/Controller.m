@@ -143,6 +143,12 @@ typedef enum
 #define TRAC_URL   @"http://trac.transmissionbt.com/"
 #define DONATE_URL  @"http://www.transmissionbt.com/donate.php"
 
+static void altSpeedToggledCallback(tr_session * handle UNUSED, tr_bool active, void * controller)
+{
+    [(Controller *)controller performSelectorOnMainThread: @selector(altSpeedToggledCallbackIsLimited:)
+        withObject: [[NSNumber alloc] initWithBool: active] waitUntilDone: NO];
+}
+
 static tr_rpc_callback_status rpcCallback(tr_session * handle UNUSED, tr_rpc_callback_type type, struct tr_torrent * torrentStruct, void * controller)
 {
     [(Controller *)controller rpcCallback: type forTorrentStruct: torrentStruct];
@@ -200,9 +206,39 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     {
         fDefaults = [NSUserDefaults standardUserDefaults];
         
+        //checks for old version speeds of -1
+        if ([fDefaults integerForKey: @"UploadLimit"] < 0)
+        {
+            [fDefaults removeObjectForKey: @"UploadLimit"];
+            [fDefaults setBool: NO forKey: @"CheckUpload"];
+        }
+        if ([fDefaults integerForKey: @"DownloadLimit"] < 0)
+        {
+            [fDefaults removeObjectForKey: @"DownloadLimit"];
+            [fDefaults setBool: NO forKey: @"CheckDownload"];
+        }
+        
         tr_benc settings;
-        tr_bencInitDict(&settings, 22);
+        tr_bencInitDict(&settings, 28);
         tr_sessionGetDefaultSettings(&settings);
+        
+        #warning how to work with schedule?
+        if (![fDefaults boolForKey: @"SpeedLimitAuto"])
+            tr_bencDictAddInt(&settings, TR_PREFS_KEY_ALT_SPEED_ENABLED, [fDefaults boolForKey: @"SpeedLimit"]);
+        
+        tr_bencDictAddInt(&settings, TR_PREFS_KEY_ALT_SPEED_UP, [fDefaults integerForKey: @"SpeedLimitUploadLimit"]);
+        tr_bencDictAddInt(&settings, TR_PREFS_KEY_ALT_SPEED_DOWN, [fDefaults integerForKey: @"SpeedLimitDownloadLimit"]);
+        
+        tr_bencDictAddInt(&settings, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED, [fDefaults boolForKey: @"SpeedLimitAuto"]);
+        tr_bencDictAddInt(&settings, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN, [PrefsController dateToTimeSum:
+                                                                            [fDefaults objectForKey: @"SpeedLimitAutoOnDate"]]);
+        tr_bencDictAddInt(&settings, TR_PREFS_KEY_ALT_SPEED_TIME_END, [PrefsController dateToTimeSum:
+                                                                            [fDefaults objectForKey: @"SpeedLimitAutoOffDate"]]);
+        
+        tr_bencDictAddInt(&settings, TR_PREFS_KEY_DSPEED, [fDefaults integerForKey: @"DownloadLimit"]);
+        tr_bencDictAddInt(&settings, TR_PREFS_KEY_DSPEED_ENABLED, [fDefaults boolForKey: @"CheckDownload"]);
+        tr_bencDictAddInt(&settings, TR_PREFS_KEY_USPEED, [fDefaults integerForKey: @"UploadLimit"]);
+        tr_bencDictAddInt(&settings, TR_PREFS_KEY_USPEED_ENABLED, [fDefaults boolForKey: @"CheckUpload"]);
         
         tr_bencDictAddInt(&settings, TR_PREFS_KEY_BLOCKLIST_ENABLED, [fDefaults boolForKey: @"Blocklist"]);
         
@@ -255,6 +291,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [QuickLookController quickLookControllerInitializeWithController: self infoController: fInfoController];
         
         fSoundPlaying = NO;
+        
+        #warning needs to set before init
+        tr_sessionSetAltSpeedFunc(fLib, altSpeedToggledCallback, self);
         
         tr_sessionSetRPCCallback(fLib, rpcCallback, self);
         
@@ -423,9 +462,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [nc addObserver: self selector: @selector(torrentTableViewSelectionDidChange:)
                     name: NSOutlineViewSelectionDidChangeNotification object: fTableView];
     
-    [nc addObserver: self selector: @selector(autoSpeedLimitChange:)
-                    name: @"AutoSpeedLimitChange" object: nil];
-    
     [nc addObserver: self selector: @selector(changeAutoImport)
                     name: @"AutoImportSettingChange" object: nil];
     
@@ -474,9 +510,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     if ([fDefaults boolForKey: @"InfoVisible"])
         [self showInfo: nil];
-    
-    //set up the speed limit
-    [self autoSpeedLimitChange: nil];
 }
 
 - (void) applicationDidFinishLaunching: (NSNotification *) notification
@@ -552,7 +585,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     
     [fTimer invalidate];
-    [fSpeedLimitTimer invalidate];
     
     if (fAutoImportTimer)
     {   
@@ -2284,96 +2316,26 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) speedLimitChanged: (id) sender
 {
-    [fPrefsController applySpeedSettings: nil];
+    tr_sessionUseAltSpeed(fLib, [fDefaults boolForKey: @"SpeedLimit"]);
+    [self updateSpeedFieldsToolTips];
 }
 
-- (void) autoSpeedLimitChange: (NSNotification *) notification
+//limited has been retained
+- (void) altSpeedToggledCallbackIsLimited: (NSNumber *) limited
 {
-    //clear timer here in case it's not being reset
-    [fSpeedLimitTimer invalidate];
-    fSpeedLimitTimer = nil;
-    
-    if (![fDefaults boolForKey: @"SpeedLimitAuto"])
-        return;
-    
-    NSCalendar * calendar = [NSCalendar currentCalendar];
-    NSDateComponents * nowComponents = [calendar components: NSHourCalendarUnit | NSMinuteCalendarUnit fromDate: [NSDate date]],
-                    * onComponents = [calendar components: NSHourCalendarUnit | NSMinuteCalendarUnit
-                                        fromDate: [fDefaults objectForKey: @"SpeedLimitAutoOnDate"]],
-                    * offComponents = [calendar components: NSHourCalendarUnit | NSMinuteCalendarUnit
-                                        fromDate: [fDefaults objectForKey: @"SpeedLimitAutoOffDate"]];
-    
-    //check if should be on if within range
-    NSInteger onTime = [onComponents hour] * 60 + [onComponents minute],
-        offTime = [offComponents hour] * 60 + [offComponents minute],
-        nowTime = [nowComponents hour] * 60 + [nowComponents minute];
-    
-    BOOL shouldBeOn = NO;
-    if (onTime < offTime)
-        shouldBeOn = onTime <= nowTime && nowTime < offTime;
-    else if (onTime > offTime)
-        shouldBeOn = onTime <= nowTime || nowTime < offTime;
-    else;
-    
-    if ([fDefaults boolForKey: @"SpeedLimit"] != shouldBeOn)
-        [self toggleSpeedLimit: nil];
-    
-    //no need to set the timer if both times are equal
-    if (onTime == offTime)
-        return;
-    
-    [self setAutoSpeedLimitTimer: !shouldBeOn];
-}
+    const BOOL isLimited = [limited boolValue];
 
-//only called by fSpeedLimitTimer
-- (void) autoSpeedLimit: (NSTimer *) timer
-{
-    BOOL shouldLimit = [[timer userInfo] boolValue];
+    [fDefaults setBool: isLimited forKey: @"SpeedLimit"];
+    [self updateSpeedFieldsToolTips];
     
-    if ([fDefaults boolForKey: @"SpeedLimit"] != shouldLimit)
-    {
-        [self toggleSpeedLimit: nil];
-        
-        [GrowlApplicationBridge notifyWithTitle: [fDefaults boolForKey: @"SpeedLimit"]
-                ? NSLocalizedString(@"Speed Limit Auto Enabled", "Growl notification title")
-                : NSLocalizedString(@"Speed Limit Auto Disabled", "Growl notification title")
-            description: NSLocalizedString(@"Bandwidth settings changed", "Growl notification description")
-            notificationName: GROWL_AUTO_SPEED_LIMIT iconData: nil priority: 0 isSticky: NO clickContext: nil];
-    }
+    #warning don't show on startup or on manual changed
+    [GrowlApplicationBridge notifyWithTitle: isLimited
+            ? NSLocalizedString(@"Speed Limit Auto Enabled", "Growl notification title")
+            : NSLocalizedString(@"Speed Limit Auto Disabled", "Growl notification title")
+        description: NSLocalizedString(@"Bandwidth settings changed", "Growl notification description")
+        notificationName: GROWL_AUTO_SPEED_LIMIT iconData: nil priority: 0 isSticky: NO clickContext: nil];
     
-    [self setAutoSpeedLimitTimer: !shouldLimit];
-}
-
-- (void) setAutoSpeedLimitTimer: (BOOL) nextIsLimit
-{
-    NSDate * timerDate = [fDefaults objectForKey: nextIsLimit ? @"SpeedLimitAutoOnDate" : @"SpeedLimitAutoOffDate"];
-    
-    //create date with combination of the current date and the date to go off
-    NSCalendar * calendar = [NSCalendar currentCalendar];
-    NSDateComponents * nowComponents = [calendar components: NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit
-                                        | NSHourCalendarUnit | NSMinuteCalendarUnit fromDate: [NSDate date]],
-                    * timerComponents = [calendar components: NSHourCalendarUnit | NSMinuteCalendarUnit fromDate: timerDate];
-    
-    //check if should be the next day
-    NSInteger nowTime = [nowComponents hour] * 60 + [nowComponents minute],
-        timerTime = [timerComponents hour] * 60 + [timerComponents minute];
-    if (timerTime < nowTime)
-        [nowComponents setDay: [nowComponents day] + 1]; //properly goes to next month when appropriate
-    
-    [nowComponents setHour: [timerComponents hour]];
-    [nowComponents setMinute: [timerComponents minute]];
-    [nowComponents setSecond: 0];
-    
-    NSDate * dateToUse = [calendar dateFromComponents: nowComponents];
-    
-    fSpeedLimitTimer = [[NSTimer alloc] initWithFireDate: dateToUse interval: 0 target: self selector: @selector(autoSpeedLimit:)
-                        userInfo: [NSNumber numberWithBool: nextIsLimit] repeats: NO];
-    
-    NSRunLoop * loop = [NSRunLoop mainRunLoop];
-    [loop addTimer: fSpeedLimitTimer forMode: NSDefaultRunLoopMode];
-    [loop addTimer: fSpeedLimitTimer forMode: NSModalPanelRunLoopMode];
-    [loop addTimer: fSpeedLimitTimer forMode: NSEventTrackingRunLoopMode];
-    [fSpeedLimitTimer release];
+    [limited release];
 }
 
 - (void) setLimitGlobalEnabled: (id) sender
@@ -3774,7 +3736,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         case kIOMessageSystemHasPoweredOn:
             //resume sleeping transfers after we wake up
             [fTorrents makeObjectsPerformSelector: @selector(wakeUp)];
-            [self autoSpeedLimitChange: nil];
+            #warning check speed limit timer?
+            //[self autoSpeedLimitChange: nil];
             break;
     }
 }

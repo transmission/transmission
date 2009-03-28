@@ -2207,6 +2207,7 @@
 				INFOPLIST_PREFIX_HEADER = "$(SRCROOT)/libtransmission/version.h";
 				INFOPLIST_PREPROCESS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "";
 				PREBINDING = NO;

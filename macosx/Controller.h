@@ -101,8 +101,6 @@ typedef enum
     Badger                          * fBadger;
     IBOutlet NSMenu                 * fDockMenu;
     
-    NSTimer                         * fSpeedLimitTimer;
-    
     NSMutableArray                  * fAutoImportedNames;
     NSTimer                         * fAutoImportTimer;
     
@@ -213,9 +211,7 @@ typedef enum
 
 - (void) toggleSpeedLimit: (id) sender;
 - (void) speedLimitChanged: (id) sender;
-- (void) autoSpeedLimitChange: (NSNotification *) notification;
-- (void) autoSpeedLimit: (NSTimer *) timer;
-- (void) setAutoSpeedLimitTimer: (BOOL) nextIsLimit;
+- (void) altSpeedToggledCallbackIsLimited: (NSNumber *) limited;
 
 - (void) setLimitGlobalEnabled: (id) sender;
 - (void) setQuickLimitGlobal: (id) sender;

@@ -90,18 +90,6 @@ tr_session * fHandle;
     {
         fDefaults = [NSUserDefaults standardUserDefaults];
         
-        //checks for old version speeds of -1
-        if ([fDefaults integerForKey: @"UploadLimit"] < 0)
-        {
-            [fDefaults removeObjectForKey: @"UploadLimit"];
-            [fDefaults setBool: NO forKey: @"CheckUpload"];
-        }
-        if ([fDefaults integerForKey: @"DownloadLimit"] < 0)
-        {
-            [fDefaults removeObjectForKey: @"DownloadLimit"];
-            [fDefaults setBool: NO forKey: @"CheckDownload"];
-        }
-        
         //check for old version download location (before 1.1)
         NSString * choice;
         if ((choice = [fDefaults stringForKey: @"DownloadChoice"]))
@@ -126,9 +114,6 @@ tr_session * fHandle;
         
         //set encryption
         [self setEncryptionMode: nil];
-        
-        //actually set bandwidth limits
-        [self applySpeedSettings: nil];
         
         //set proxy type
         [self updateProxyType];
@@ -547,23 +532,20 @@ tr_session * fHandle;
 
 - (void) applySpeedSettings: (id) sender
 {
-    if ([fDefaults boolForKey: @"SpeedLimit"])
-    {
-        tr_sessionSetSpeedLimitEnabled(fHandle, TR_UP, 1);
-        tr_sessionSetSpeedLimit(fHandle, TR_UP, [fDefaults integerForKey: @"SpeedLimitUploadLimit"]);
-        
-        tr_sessionSetSpeedLimitEnabled(fHandle, TR_DOWN, 1);
-        tr_sessionSetSpeedLimit(fHandle, TR_DOWN, [fDefaults integerForKey: @"SpeedLimitDownloadLimit"]);
-    }
-    else
-    {
-        tr_sessionSetSpeedLimitEnabled(fHandle, TR_UP, [fDefaults boolForKey: @"CheckUpload"]);
-        tr_sessionSetSpeedLimit(fHandle, TR_UP, [fDefaults integerForKey: @"UploadLimit"]);
-        
-        tr_sessionSetSpeedLimitEnabled(fHandle, TR_DOWN, [fDefaults boolForKey: @"CheckDownload"]);
-        tr_sessionSetSpeedLimit(fHandle, TR_DOWN, [fDefaults integerForKey: @"DownloadLimit"]);
-    }
+    tr_sessionLimitSpeed(fHandle, TR_UP, [fDefaults boolForKey: @"CheckUpload"]);
+    tr_sessionSetSpeedLimit(fHandle, TR_UP, [fDefaults integerForKey: @"UploadLimit"]);
     
+    tr_sessionLimitSpeed(fHandle, TR_DOWN, [fDefaults boolForKey: @"CheckDownload"]);
+    tr_sessionSetSpeedLimit(fHandle, TR_DOWN, [fDefaults integerForKey: @"DownloadLimit"]);
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"SpeedLimitUpdate" object: nil];
+}
+
+- (void) applyAltSpeedSettings
+{
+    tr_sessionSetAltSpeed(fHandle, TR_UP, [fDefaults integerForKey: @"SpeedLimitUploadLimit"]);
+    tr_sessionSetAltSpeed(fHandle, TR_DOWN, [fDefaults integerForKey: @"SpeedLimitDownloadLimit"]);
+        
     [[NSNotificationCenter defaultCenter] postNotificationName: @"SpeedLimitUpdate" object: nil];
 }
 
@@ -608,12 +590,25 @@ tr_session * fHandle;
 {
     [fDefaults setInteger: [sender intValue] forKey: sender == fSpeedLimitUploadField
                                                         ? @"SpeedLimitUploadLimit" : @"SpeedLimitDownloadLimit"];
-    [self applySpeedSettings: self];
+    [self applyAltSpeedSettings];
 }
 
 - (void) setAutoSpeedLimit: (id) sender
 {
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"AutoSpeedLimitChange" object: self];
+    tr_sessionUseAltSpeedTime(fHandle, [fDefaults boolForKey: @"SpeedLimitAuto"]);
+}
+
+- (void) setAutoSpeedLimitTime: (id) sender
+{
+    tr_sessionSetAltSpeedBegin(fHandle, [PrefsController dateToTimeSum: [fDefaults objectForKey: @"SpeedLimitAutoOnDate"]]);
+    tr_sessionSetAltSpeedEnd(fHandle, [PrefsController dateToTimeSum: [fDefaults objectForKey: @"SpeedLimitAutoOffDate"]]);
+}
+
++ (NSInteger) dateToTimeSum: (NSDate *) date
+{
+    NSCalendar * calendar = [NSCalendar currentCalendar];
+    NSDateComponents * components = [calendar components: NSHourCalendarUnit | NSMinuteCalendarUnit fromDate: date];
+    return [components hour] * 60 + [components minute];
 }
 
 - (BOOL) control: (NSControl *) control textShouldBeginEditing: (NSText *) fieldEditor
@@ -1048,6 +1043,7 @@ tr_session * fHandle;
         inBook: [[NSBundle mainBundle] objectForInfoDictionaryKey: @"CFBundleHelpBookName"]];
 }
 
+#warning probably needs to be updated
 - (void) rpcUpdatePrefs
 {
     //encryption
@@ -1079,14 +1075,14 @@ tr_session * fHandle;
     [self updatePortStatus];
     
     //speed limit - down
-    BOOL downLimitEnabled = tr_sessionIsSpeedLimitEnabled(fHandle, TR_DOWN);
+    BOOL downLimitEnabled = tr_sessionIsSpeedLimited(fHandle, TR_DOWN);
     [fDefaults setBool: downLimitEnabled forKey: @"CheckDownload"];
     
     int downLimit = tr_sessionGetSpeedLimit(fHandle, TR_DOWN);
     [fDefaults setInteger: downLimit forKey: @"DownloadLimit"];
     
     //speed limit - up
-    BOOL upLimitEnabled = tr_sessionIsSpeedLimitEnabled(fHandle, TR_UP);
+    BOOL upLimitEnabled = tr_sessionIsSpeedLimited(fHandle, TR_UP);
     [fDefaults setBool: upLimitEnabled forKey: @"CheckUpload"];
     
     int upLimit = tr_sessionGetSpeedLimit(fHandle, TR_UP);

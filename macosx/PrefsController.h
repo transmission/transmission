@@ -107,12 +107,15 @@
 - (void) setRatioStop: (id) sender;
 
 - (void) applySpeedSettings: (id) sender;
+- (void) applyAltSpeedSettings;
 
 - (void) updateLimitFields;
 - (void) setGlobalLimit: (id) sender;
 
 - (void) setSpeedLimit: (id) sender;
 - (void) setAutoSpeedLimit: (id) sender;
+- (void) setAutoSpeedLimitTime: (id) sender;
++ (NSInteger) dateToTimeSum: (NSDate *) date;
 
 - (void) setAutoImport: (id) sender;
 - (void) importFolderSheetShow: (id) sender;
