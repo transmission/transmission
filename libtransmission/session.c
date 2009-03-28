@@ -1038,8 +1038,9 @@ tr_sessionUseAltSpeedTime( tr_session * s, tr_bool b )
     {
         s->altSpeedTimeEnabled = b;
 
-        if( isAltTime( s ) )
-            tr_sessionUseAltSpeed( s, b );
+        const tr_bool isAlt = isAltTime( s );
+        if( b && s->altSpeedEnabled != isAlt )
+            tr_sessionUseAltSpeed( s, isAlt );
     }
 }
 
