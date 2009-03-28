@@ -630,12 +630,15 @@ tr_sessionInitImpl( void * vdata )
 
     found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED, &i );
     assert( found );
-    tr_sessionUseAltSpeedTime( session, i!=0 );
+    tr_bool useAltSpeedTime = i!=0;
+    tr_sessionUseAltSpeedTime( session, useAltSpeedTime );
 
-    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_ALT_SPEED_ENABLED, &i );
-    assert( found );
-    tr_sessionUseAltSpeed( session, i!=0 );
-
+    if( !useAltSpeedTime )
+    {
+        found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_ALT_SPEED_ENABLED, &i );
+        assert( found );
+        tr_sessionUseAltSpeed( session, i!=0 );
+    }
 
     /**
     ***  Blocklist
