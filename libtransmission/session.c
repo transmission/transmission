@@ -206,6 +206,27 @@ loadBlocklists( tr_session * session )
     tr_free( dirname );
 }
 
+static tr_bool
+isAltTime( const tr_session * s )
+{
+    tr_bool is;
+    int minutes;
+    struct tm tm;
+    const time_t now = time( NULL );
+    const int begin = s->altSpeedTimeBegin;
+    const int end = s->altSpeedTimeEnd;
+
+    tr_localtime_r( &now, &tm );
+    minutes = tm.tm_hour*60 + tm.tm_min;
+
+    if( begin <= end )
+        is = ( begin <= minutes ) && ( minutes < end );
+    else /* goes past midnight */
+        is = ( begin <= minutes ) || ( minutes < end );
+
+    return is;
+}
+
 /***
 ****
 ***/
@@ -639,6 +660,8 @@ tr_sessionInitImpl( void * vdata )
         assert( found );
         tr_sessionUseAltSpeed( session, i!=0 );
     }
+    else
+        tr_sessionUseAltSpeed( session, isAltTime( session ) );
 
     /**
     ***  Blocklist
@@ -863,27 +886,6 @@ tr_sessionGetActiveSpeedLimit( const tr_session * session, tr_direction dir, int
         isLimited = FALSE;
 
     return isLimited;
-}
-
-static tr_bool
-isAltTime( const tr_session * s )
-{
-    tr_bool is;
-    int minutes;
-    struct tm tm;
-    const time_t now = time( NULL );
-    const int begin = s->altSpeedTimeBegin;
-    const int end = s->altSpeedTimeEnd;
-
-    tr_localtime_r( &now, &tm );
-    minutes = tm.tm_hour*60 + tm.tm_min;
-
-    if( begin <= end )
-        is = ( begin <= minutes ) && ( minutes < end );
-    else /* goes past midnight */
-        is = ( begin <= minutes ) || ( minutes < end );
-
-    return is;
 }
 
 static void
