@@ -878,8 +878,7 @@ global_speed_toggled_cb( GtkToggleButton * tb, gpointer gtor )
     tr_torrent * tor = tr_torrent_handle( gtor );
     const gboolean b = gtk_toggle_button_get_active( tb );
 
-    tr_torrentUseGlobalSpeedLimit( tor, TR_UP, b );
-    tr_torrentUseGlobalSpeedLimit( tor, TR_DOWN, b );
+    tr_torrentUseSessionLimits( tor, b );
 }
 
 #define RATIO_MODE_KEY "ratio-mode"
@@ -985,12 +984,12 @@ options_page_new( struct ResponseData * data )
     t = hig_workarea_create( );
     hig_workarea_add_section_title( t, &row, _( "Speed Limits" ) );
 
-        b = tr_torrentIsUsingGlobalSpeedLimit( tor, TR_UP );
+        b = tr_torrentUsesSessionLimits( tor );
         tb = hig_workarea_add_wide_checkbutton( t, &row, _( "Honor global _limits" ), b );
         g_signal_connect( tb, "toggled", G_CALLBACK( global_speed_toggled_cb ), gtor );
 
         tb = gtk_check_button_new_with_mnemonic( _( "Limit _download speed (KB/s):" ) );
-        b = tr_torrentIsUsingSpeedLimit( tor, TR_DOWN );
+        b = tr_torrentUsesSpeedLimit( tor, TR_DOWN );
         gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( tb ), b );
         g_signal_connect( tb, "toggled", G_CALLBACK( down_speed_toggled_cb ), gtor );
 
@@ -1003,7 +1002,7 @@ options_page_new( struct ResponseData * data )
         hig_workarea_add_row_w( t, &row, tb, w, NULL );
 
         tb = gtk_check_button_new_with_mnemonic( _( "Limit _upload speed (KB/s):" ) );
-        b = tr_torrentIsUsingSpeedLimit( tor, TR_UP );
+        b = tr_torrentUsesSpeedLimit( tor, TR_UP );
         gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( tb ), b );
         g_signal_connect( tb, "toggled", G_CALLBACK( up_speed_toggled_cb ), gtor );
 

@@ -68,14 +68,18 @@ struct tr_session
     tr_bool                      useLazyBitfield;
     tr_bool                      isRatioLimited;
 
-    tr_bool                      isSpeedLimited[2];
+    
     int                          speedLimit[2];
-    tr_bool                      isAltSpeedLimited;
-    int                          altSpeedBeginTime;
-    int                          altSpeedEndTime;
-    int                          altSpeedLimit[2];
-    tr_bool                      isAltTime;
-    tr_alt_speed_func          * altCallback;
+    tr_bool                      speedLimitEnabled[2];
+
+    int                          altSpeed[2];
+    tr_bool                      altSpeedEnabled;
+
+    int                          altSpeedTimeBegin;
+    int                          altSpeedTimeEnd;
+    tr_bool                      altSpeedTimeEnabled;
+
+    tr_altSpeedFunc            * altCallback;
     void                       * altCallbackUserData;
 
 
@@ -144,6 +148,10 @@ struct tr_session
 
     double                       desiredRatio;
 };
+
+tr_bool      tr_sessionGetActiveSpeedLimit( const tr_session  * session,
+                                            tr_direction        dir,
+                                            int               * setme );
 
 const char * tr_sessionFindTorrentFile( const tr_session * session,
                                         const char *       hashString );

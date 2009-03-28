@@ -652,3 +652,15 @@ gtr_timeout_add_seconds( guint seconds, GSourceFunc function, gpointer data )
     return g_timeout_add( seconds*1000, function, data );
 #endif
 }
+
+
+void
+gtr_widget_set_tooltip_text( GtkWidget * w, const char * tip )
+{
+#if GTK_CHECK_VERSION( 2,12,0 )
+    gtk_widget_set_tooltip_text( w, tip );
+#else
+    /* FIXME */
+#endif
+}
+

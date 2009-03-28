@@ -1027,7 +1027,7 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
             const time_t now = time( NULL );
             tr_torrent * tor = t->tor;
 
-            tor->activityDate = now;
+            tr_torrentSetActivityDate( tor, now );
 
             if( e->wasPieceData )
                 tor->uploadedCur += e->length;
@@ -1062,7 +1062,8 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
         {
             const time_t now = time( NULL );
             tr_torrent * tor = t->tor;
-            tor->activityDate = now;
+
+            tr_torrentSetActivityDate( tor, now );
 
             /* only add this to downloadedCur if we got it from a peer --
              * webseeds shouldn't count against our ratio.  As one tracker

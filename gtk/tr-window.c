@@ -83,6 +83,8 @@ typedef struct
     GtkWidget *           dl_lb;
     GtkWidget *           stats_lb;
     GtkWidget *           gutter_lb;
+    GtkWidget *           alt_speed_image[2]; /* 0==off, 1==on */
+    GtkWidget *           alt_speed_button;
     GtkTreeSelection *    selection;
     GtkCellRenderer *     renderer;
     GtkTreeViewColumn *   column;
@@ -193,6 +195,8 @@ makeview( PrivateData * p,
     return view;
 }
 
+static void syncAltSpeedButton( PrivateData * p );
+
 static void
 prefsChanged( TrCore * core UNUSED,
               const char *  key,
@@ -226,6 +230,10 @@ prefsChanged( TrCore * core UNUSED,
     else if( !strcmp( key, PREF_KEY_STATUSBAR_STATS ) )
     {
         tr_window_update( (TrWindow*)wind );
+    }
+    else if( !strcmp( key, TR_PREFS_KEY_ALT_SPEED_ENABLED ) )
+    {
+        syncAltSpeedButton( p );
     }
 }
 
@@ -276,6 +284,30 @@ status_menu_toggled_cb( GtkCheckMenuItem * menu_item,
     }
 }
 
+static void
+syncAltSpeedButton( PrivateData * p )
+{
+    const char * tip;
+    const gboolean b = pref_flag_get( TR_PREFS_KEY_ALT_SPEED_ENABLED );
+    GtkWidget * w = p->alt_speed_button;
+
+    gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( w ), b );
+
+    gtk_button_set_image( GTK_BUTTON( w ), p->alt_speed_image[b?1:0] );
+
+    tip = b ? _( "Click to disable Speed Limit Mode" )
+            : _( "Click to enable Speed Limit Mode" );
+    gtr_widget_set_tooltip_text( w, tip );
+}
+
+static void
+alt_speed_toggled_cb( GtkToggleButton * button, gpointer vprivate )
+{
+    PrivateData * p = vprivate;
+    const gboolean b = gtk_toggle_button_get_active( button );
+    tr_core_set_pref_bool( p->core, TR_PREFS_KEY_ALT_SPEED_ENABLED,  b );
+}
+    
 /***
 ****  FILTER
 ***/
@@ -500,6 +532,22 @@ onAskTrackerQueryTooltip( GtkWidget *            widget UNUSED,
 
 #endif
 
+static gboolean
+onAltSpeedToggledIdle( gpointer vp )
+{
+    PrivateData * p = vp;
+    gboolean b = tr_sessionUsesAltSpeed( tr_core_session( p->core ) );
+    tr_core_set_pref_bool( p->core, TR_PREFS_KEY_ALT_SPEED_ENABLED, b );
+
+    return FALSE;
+}
+
+static void
+onAltSpeedToggled( tr_session * s UNUSED, tr_bool b UNUSED, void * p )
+{
+    g_idle_add( onAltSpeedToggledIdle, p );
+}
+
 /***
 ****  PUBLIC
 ***/
@@ -619,9 +667,17 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
 
     /* status */
     h = status = p->status = gtk_hbox_new( FALSE, GUI_PAD );
-    gtk_container_set_border_width( GTK_CONTAINER( h ), GUI_PAD );
-    w = p->gutter_lb = gtk_label_new( "N Torrents" );
+    gtk_container_set_border_width( GTK_CONTAINER( h ), GUI_PAD_SMALL );
+    p->alt_speed_image[0] = gtk_image_new_from_stock( "alt-speed-off", -1 );
+    p->alt_speed_image[1]  = gtk_image_new_from_stock( "alt-speed-on", -1 );
+    w = p->alt_speed_button = gtk_toggle_button_new( );
+    gtk_button_set_relief( GTK_BUTTON( w ), GTK_RELIEF_NONE );
+    g_object_ref( G_OBJECT( p->alt_speed_image[0] ) );
+    g_object_ref( G_OBJECT( p->alt_speed_image[1] ) );
+    g_signal_connect( w, "toggled", G_CALLBACK(alt_speed_toggled_cb ), p );
     gtk_box_pack_start( GTK_BOX( h ), w, 0, 0, 0 );
+    w = p->gutter_lb = gtk_label_new( "N Torrents" );
+    gtk_box_pack_start( GTK_BOX( h ), w, 1, 1, GUI_PAD_BIG );
     w = p->ul_lb = gtk_label_new( NULL );
     gtk_box_pack_end( GTK_BOX( h ), w, FALSE, FALSE, 0 );
     w = gtk_image_new_from_stock( GTK_STOCK_GO_UP, GTK_ICON_SIZE_MENU );
@@ -704,8 +760,11 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
     prefsChanged( core, PREF_KEY_STATUSBAR, self );
     prefsChanged( core, PREF_KEY_STATUSBAR_STATS, self );
     prefsChanged( core, PREF_KEY_TOOLBAR, self );
+    prefsChanged( core, TR_PREFS_KEY_ALT_SPEED_ENABLED, self );
     p->pref_handler_id = g_signal_connect( core, "prefs-changed",
                                            G_CALLBACK( prefsChanged ), self );
+
+    tr_sessionSetAltSpeedFunc( tr_core_session( core ), onAltSpeedToggled, p );
 
     filter_entry_changed( GTK_EDITABLE( s ), p );
     return self;

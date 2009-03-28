@@ -20,6 +20,7 @@
 #include "tr-prefs.h"
 #include "lock.h"
 #include "logo.h"
+#include "turtles.h"
 
 #define UNUSED G_GNUC_UNUSED
 
@@ -69,10 +70,8 @@ sort_changed_cb( GtkAction            * action UNUSED,
 
 static GtkToggleActionEntry show_toggle_entries[] =
 {
-    { "toggle-main-window", NULL,
-      N_( "_Main Window" ), NULL, NULL, G_CALLBACK( action_cb ), TRUE },
-    { "toggle-message-log", NULL,
-      N_( "Message _Log" ), NULL, NULL, G_CALLBACK( action_cb ), FALSE }
+    { "toggle-main-window", NULL, N_( "_Main Window" ), NULL, NULL, G_CALLBACK( action_cb ), TRUE },
+    { "toggle-message-log", NULL, N_( "Message _Log" ), NULL, NULL, G_CALLBACK( action_cb ), FALSE }
 };
 
 static void
@@ -141,7 +140,9 @@ BuiltinIconInfo;
 static const BuiltinIconInfo my_fallback_icons[] =
 {
     { tr_icon_logo, "transmission"      },
-    { tr_icon_lock, "transmission-lock" }
+    { tr_icon_lock, "transmission-lock" },
+    { blue_turtle,  "alt-speed-on"      },
+    { grey_turtle,  "alt-speed-off"     }
 };
 
 static void

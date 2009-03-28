@@ -98,18 +98,17 @@
    string                            | value type & description
    ----------------------------------+-------------------------------------------------
    "downloadLimit"                   | number     maximum download speed (in K/s)
-   "downloadLimitHonored"            | 'boolean'  true if "downloadLimit" is honored
-   "downloadGlobalHonored"           | 'boolean'  true if global speed limit is honored
+   "downloadLimited"                 | 'boolean'  true if "downloadLimit" is honored
    "files-wanted"                    | array      indices of file(s) to download
    "files-unwanted"                  | array      indices of file(s) to not download
+   "honorsSessionLimits"             | 'boolean'  true if session upload limits are honored
    "ids"                             | array      torrent list, as described in 3.1
    "peer-limit"                      | number     maximum number of peers
    "priority-high"                   | array      indices of high-priority file(s)
    "priority-low"                    | array      indices of low-priority file(s)
    "priority-normal"                 | array      indices of normal-priority file(s)
    "uploadLimit"                     | number     maximum upload speed (in K/s)
-   "uploadLimitHonored"              | 'boolean'  true if "uploadLimit" is honored
-   "uploadGlobalHonored"             | 'boolean'  true if global speed limit is honored
+   "uploadLimited"                   | 'boolean'  true if "uploadLimit" is honored
 
    Just as an empty "ids" value is shorthand for "all ids", using an empty array
    for "files-wanted", "files-unwanted", "priority-high", "priority-low", or
@@ -147,8 +146,7 @@
    downloadedEver                  | number                      | tr_stat
    downloaders                     | number                      | tr_stat
    downloadLimit                   | number                      | tr_torrent
-   downloadHonorsLimit             | 'boolean'                   | tr_torrent
-   downloadHonorsGlobalLimit       | 'boolean'                   | tr_torrent
+   downloadLimited                 | 'boolean'                   | tr_torrent
    error                           | number                      | tr_stat
    errorString                     | number                      | tr_stat
    eta                             | number                      | tr_stat
@@ -156,6 +154,7 @@
    hashString                      | string                      | tr_info
    haveUnchecked                   | number                      | tr_stat
    haveValid                       | number                      | tr_stat
+   honorsSessionLimits             | 'boolean'                   | tr_torrent
    id                              | number                      | tr_torrent
    isPrivate                       | 'boolean'                   | tr_torrent
    lastAnnounceTime                | number                      | tr_stat
@@ -194,8 +193,7 @@
    totalSize                       | number                      | tr_info
    uploadedEver                    | number                      | tr_stat
    uploadLimit                     | number                      | tr_torrent
-   uploadHonorsLimit               | 'boolean'                   | tr_torrent
-   uploadHonorsGlobalLimit         | 'boolean'                   | tr_torrent
+   uploadLimited                   | 'boolean'                   | tr_torrent
    uploadRatio                     | 'double'                    | tr_stat
    wanted                          | array (see below)           | n/a
    webseeds                        | array (see below)           | n/a
@@ -337,11 +335,12 @@
 
    string                     | value type & description
    ---------------------------+-------------------------------------------------
-   "alt-speed-limit-enabled"  | 'boolean'  true means enabled
-   "alt-speed-limit-up"       | number     max global upload speed (in K/s)
-   "alt-speed-limit-down"     | number     max global download speed (in K/s)
-   "alt-speed-limit-begin"    | number     minutes after midnight. (ex: 60 means starting at 1 am)
-   "alt-speed-limit-end"      | number     minutes after midnight. (ex: 300 means ending at 5 am)
+   "alt-speed-down"           | number     max global download speed (in K/s)
+   "alt-speed-enabled"        | 'boolean'  true means use the alt speeds
+   "alt-speed-time-begin"     | number     when to turn on alt speeds (units: minutes after midnight)
+   "alt-speed-time-enabled"   | 'boolean'  true means the scheduled on/off times are used
+   "alt-speed-time-end"       | number     when to turn off alt speeds (units: same)
+   "alt-speed-up"             | number     max global upload speed (in K/s)
    "blocklist-enabled"        | 'boolean'  true means enabled
    "blocklist-size"           | number     number of rules in the blocklist
    "encryption"               | string     "required", "preferred", "tolerated"
@@ -437,19 +436,19 @@
    ------+---------+-----------+----------------+-------------------------------
    6     | 1.60    | yes       | torrent-get    | new arg "pieces"
          |         | yes       | torrent-set    | new arg "ratio"
-         |         | yes       | torrent-set    | new arg "downloadHonorsLimit"
-         |         | yes       | torrent-set    | new arg "downloadHonorsGlobalLimit"
-         |         | yes       | torrent-set    | new arg "uploadHonorsLimit"
-         |         | yes       | torrent-set    | new arg "uploadHonorsGlobalLimit"
-         |         | yes       | torrent-get    | new ids option "recently-active"
-         |         | yes       | session-get    | new arg "alt-speed-limit-enabled"
-         |         | yes       | session-get    | new arg "alt-speed-limit-up"
-         |         | yes       | session-get    | new arg "alt-speed-limit-down"
-         |         | yes       | session-get    | new arg "alt-speed-limit-begin"
-         |         | yes       | session-get    | new arg "alt-speed-limit-end"
+         |         | yes       | torrent-set    | new arg "downloadLimited"
+         |         | yes       | torrent-set    | new arg "uploadLimited"
+         |         | yes       | torrent-set    | new arg "honorsSessionLImits"
+         |         | yes       | session-get    | new arg "alt-speed-enabled"
+         |         | yes       | session-get    | new arg "alt-speed-time-enabled"
+         |         | yes       | session-get    | new arg "alt-speed-up"
+         |         | yes       | session-get    | new arg "alt-speed-down"
+         |         | yes       | session-get    | new arg "alt-speed-begin"
+         |         | yes       | session-get    | new arg "alt-speed-end"
          |         | yes       | session-get    | new arg "blocklist-enabled"
          |         | yes       | session-get    | new arg "blocklist-size"
          |         | yes       | session-get    | new arg "peer-limit-per-torrent"
+         |         | yes       | torrent-get    | new ids option "recently-active"
          |         | yes       |                | new method "torrent-reannounce"
          |         |        NO | torrent-get    | removed arg "downloadLimitMode"
          |         |        NO | torrent-get    | removed arg "uploadLimitMode"

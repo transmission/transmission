@@ -271,6 +271,7 @@ torrentPage( GObject * core )
     const char * s;
     GtkWidget *  t;
     GtkWidget *  w;
+    GtkWidget *  w2;
 
 #ifdef HAVE_GIO
     GtkWidget *  l;
@@ -303,6 +304,16 @@ torrentPage( GObject * core )
 
     w = new_path_chooser_button( TR_PREFS_KEY_DOWNLOAD_DIR, core );
     hig_workarea_add_row( t, &row, _( "_Destination folder:" ), w, NULL );
+
+    hig_workarea_add_section_divider( t, &row );
+    hig_workarea_add_section_title( t, &row, _( "Limits" ) );
+
+    s = _( "_Stop seeding torrents at ratio:" );
+    w = new_check_button( s, TR_PREFS_KEY_RATIO_ENABLED, core );
+    w2 = new_spin_button_double( TR_PREFS_KEY_RATIO, core, .5, INT_MAX, .05 );
+    gtk_widget_set_sensitive( GTK_WIDGET( w2 ), pref_flag_get( TR_PREFS_KEY_RATIO_ENABLED ) );
+    g_signal_connect( w, "toggled", G_CALLBACK( target_cb ), w2 );
+    hig_workarea_add_row_w( t, &row, w, w2, NULL );
 
     hig_workarea_finish( t, &row );
     return t;
@@ -778,10 +789,7 @@ webPage( GObject * core )
 
         page->whitelist_widgets = g_slist_append( page->whitelist_widgets, w );
         v = page->view = GTK_TREE_VIEW( w );
-#if GTK_CHECK_VERSION( 2,12,0 )
-        gtk_widget_set_tooltip_text( w,
-                  _( "IP addresses may use wildcards, such as 192.168.*.*" ) );
-#endif
+        gtr_widget_set_tooltip_text( w, _( "IP addresses may use wildcards, such as 192.168.*.*" ) );
         sel = gtk_tree_view_get_selection( v );
         g_signal_connect( sel, "changed",
                           G_CALLBACK( onWhitelistSelectionChanged ), page );
@@ -990,7 +998,7 @@ static void
 refreshSchedSensitivity( struct BandwidthPage * p )
 {
     GSList *       l;
-    const gboolean sched_enabled = pref_flag_get( TR_PREFS_KEY_ALT_LIMIT_ENABLED );
+    const gboolean sched_enabled = pref_flag_get( TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED );
 
     for( l = p->sched_widgets; l != NULL; l = l->next )
         gtk_widget_set_sensitive( GTK_WIDGET( l->data ), sched_enabled );
@@ -1077,63 +1085,68 @@ bandwidthPage( GObject * core )
     int                    row = 0;
     const char *           s;
     GtkWidget *            t;
-    GtkWidget *            w, * w2, * h, * l;
+    GtkWidget *            w, * w2, * h;
+    char buf[512];
     struct BandwidthPage * page = tr_new0( struct BandwidthPage, 1 );
 
     page->core = TR_CORE( core );
 
     t = hig_workarea_create( );
-    hig_workarea_add_section_title( t, &row, _( "Limits" ) );
+    hig_workarea_add_section_title( t, &row, _( "Global Bandwidth Limits" ) );
 
-    s = _( "Limit _download speed (KB/s):" );
-    w = new_check_button( s, TR_PREFS_KEY_DSPEED_ENABLED, core );
-    w2 = new_spin_button( TR_PREFS_KEY_DSPEED, core, 0, INT_MAX, 5 );
-    gtk_widget_set_sensitive( GTK_WIDGET( w2 ), pref_flag_get( TR_PREFS_KEY_DSPEED_ENABLED ) );
-    g_signal_connect( w, "toggled", G_CALLBACK( target_cb ), w2 );
-    hig_workarea_add_row_w( t, &row, w, w2, NULL );
+        s = _( "Limit _download speed (KB/s):" );
+        w = new_check_button( s, TR_PREFS_KEY_DSPEED_ENABLED, core );
+        w2 = new_spin_button( TR_PREFS_KEY_DSPEED, core, 0, INT_MAX, 5 );
+        gtk_widget_set_sensitive( GTK_WIDGET( w2 ), pref_flag_get( TR_PREFS_KEY_DSPEED_ENABLED ) );
+        g_signal_connect( w, "toggled", G_CALLBACK( target_cb ), w2 );
+        hig_workarea_add_row_w( t, &row, w, w2, NULL );
 
-    s = _( "Limit _upload speed (KB/s):" );
-    w = new_check_button( s, TR_PREFS_KEY_USPEED_ENABLED, core );
-    w2 = new_spin_button( TR_PREFS_KEY_USPEED, core, 0, INT_MAX, 5 );
-    gtk_widget_set_sensitive( GTK_WIDGET( w2 ), pref_flag_get( TR_PREFS_KEY_USPEED_ENABLED ) );
-    g_signal_connect( w, "toggled", G_CALLBACK( target_cb ), w2 );
-    hig_workarea_add_row_w( t, &row, w, w2, NULL );
-
-    s = _( "_Stop seeding when a torrent's ratio reaches:" );
-    w = new_check_button( s, TR_PREFS_KEY_RATIO_ENABLED, core );
-    w2 = new_spin_button_double( TR_PREFS_KEY_RATIO, core, .5, INT_MAX, .05 );
-    gtk_widget_set_sensitive( GTK_WIDGET( w2 ), pref_flag_get( TR_PREFS_KEY_RATIO_ENABLED ) );
-    g_signal_connect( w, "toggled", G_CALLBACK( target_cb ), w2 );
-    hig_workarea_add_row_w( t, &row, w, w2, NULL );
+        s = _( "Limit _upload speed (KB/s):" );
+        w = new_check_button( s, TR_PREFS_KEY_USPEED_ENABLED, core );
+        w2 = new_spin_button( TR_PREFS_KEY_USPEED, core, 0, INT_MAX, 5 );
+        gtk_widget_set_sensitive( GTK_WIDGET( w2 ), pref_flag_get( TR_PREFS_KEY_USPEED_ENABLED ) );
+        g_signal_connect( w, "toggled", G_CALLBACK( target_cb ), w2 );
+        hig_workarea_add_row_w( t, &row, w, w2, NULL );
 
     hig_workarea_add_section_divider( t, &row );
-    hig_workarea_add_section_title( t, &row, _( "Scheduled Limits" ) );
+    h = gtk_hbox_new( FALSE, GUI_PAD );
+    w = gtk_image_new_from_stock( "alt-speed-off", GTK_ICON_SIZE_BUTTON );
+    gtk_box_pack_start( GTK_BOX( h ), w, FALSE, FALSE, 0 );
+    g_snprintf( buf, sizeof( buf ), "<b>%s</b>", _( "Speed Limit Mode" ) );
+    w = gtk_label_new( buf );
+    gtk_misc_set_alignment( GTK_MISC( w ), 0.0f, 0.5f );
+    gtk_label_set_use_markup( GTK_LABEL( w ), TRUE );
+    gtk_box_pack_start( GTK_BOX( h ), w, FALSE, FALSE, 0 );
+    hig_workarea_add_section_title_widget( t, &row, h );
 
-    h = gtk_hbox_new( FALSE, 0 );
-    w2 = new_time_combo( core, TR_PREFS_KEY_ALT_BEGIN );
-    page->sched_widgets = g_slist_append( page->sched_widgets, w2 );
-    gtk_box_pack_start( GTK_BOX( h ), w2, FALSE, FALSE, 0 );
-    w2 = gtk_label_new ( _( " and " ) );
-    page->sched_widgets = g_slist_append( page->sched_widgets, w2 );
-    gtk_box_pack_start( GTK_BOX( h ), w2, FALSE, FALSE, 0 );
-    w2 = new_time_combo( core, TR_PREFS_KEY_ALT_END );
-    page->sched_widgets = g_slist_append( page->sched_widgets, w2 );
-    gtk_box_pack_start( GTK_BOX( h ), w2, FALSE, FALSE, 0 );
+        s = _( "Limit do_wnload speed (KB/s):" );
+        w = new_spin_button( TR_PREFS_KEY_ALT_SPEED_DOWN, core, 0, INT_MAX, 5 );
+        hig_workarea_add_row( t, &row, s, w, NULL );
 
-    s = _( "_Limit bandwidth between" );
-    w = new_check_button( s, TR_PREFS_KEY_ALT_LIMIT_ENABLED, core );
-    g_signal_connect( w, "toggled", G_CALLBACK( onSchedToggled ), page );
-    hig_workarea_add_row_w( t, &row, w, h, NULL );
+        s = _( "Limit u_pload speed (KB/s):" );
+        w = new_spin_button( TR_PREFS_KEY_ALT_SPEED_UP, core, 0, INT_MAX, 5 );
+        hig_workarea_add_row( t, &row, s, w, NULL );
 
-    w = new_spin_button( TR_PREFS_KEY_ALT_DL_LIMIT, core, 0, INT_MAX, 5 );
-    page->sched_widgets = g_slist_append( page->sched_widgets, w );
-    l = hig_workarea_add_row( t, &row, _( "Limit d_ownload speed (KB/s):" ), w, NULL );
-    page->sched_widgets = g_slist_append( page->sched_widgets, l );
+        s = _( "Use Speed Limit Mode between:" ); 
+        h = gtk_hbox_new( FALSE, 0 );
+        w2 = new_time_combo( core, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN );
+        page->sched_widgets = g_slist_append( page->sched_widgets, w2 );
+        gtk_box_pack_start( GTK_BOX( h ), w2, TRUE, TRUE, 0 );
+        w2 = gtk_label_new ( _( " and " ) );
+        page->sched_widgets = g_slist_append( page->sched_widgets, w2 );
+        gtk_box_pack_start( GTK_BOX( h ), w2, FALSE, FALSE, 0 );
+        w2 = new_time_combo( core, TR_PREFS_KEY_ALT_SPEED_TIME_END );
+        page->sched_widgets = g_slist_append( page->sched_widgets, w2 );
+        gtk_box_pack_start( GTK_BOX( h ), w2, TRUE, TRUE, 0 );
+        w = new_check_button( s, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED, core );
+        g_signal_connect( w, "toggled", G_CALLBACK( onSchedToggled ), page );
+        hig_workarea_add_row_w( t, &row, w, h, NULL );
 
-    w = new_spin_button( TR_PREFS_KEY_ALT_UL_LIMIT, core, 0, INT_MAX, 5 );
-    page->sched_widgets = g_slist_append( page->sched_widgets, w );
-    l = hig_workarea_add_row( t, &row, _( "Limit u_pload speed (KB/s):" ), w, NULL );
-    page->sched_widgets = g_slist_append( page->sched_widgets, l );
+        g_snprintf( buf, sizeof( buf ), "<small>%s</small>", _( "When enabled, Speed Limit Mode overrides the Global Bandwidth Limits" ) );
+        w = gtk_label_new( buf );
+        gtk_label_set_use_markup( GTK_LABEL( w ), TRUE );
+        gtk_misc_set_alignment( GTK_MISC( w ), 0.5f, 0.5f );
+        hig_workarea_add_wide_control( t, &row, w );
 
     hig_workarea_finish( t, &row );
     g_object_set_data_full( G_OBJECT( t ), "page", page, bandwidthPageFree );

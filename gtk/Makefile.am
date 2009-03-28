@@ -60,6 +60,7 @@ noinst_HEADERS = \
     tr-prefs.h \
     tr-torrent.h \
     tr-window.h \
+    turtles.h \
     ui.h \
     util.h
 

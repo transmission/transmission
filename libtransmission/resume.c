@@ -252,8 +252,8 @@ saveSingleSpeedLimit( tr_benc * d, const tr_torrent * tor, tr_direction dir )
 {
     tr_bencDictReserve( d, 3 );
     tr_bencDictAddInt( d, KEY_SPEED, tr_torrentGetSpeedLimit( tor, dir ) );
-    tr_bencDictAddInt( d, KEY_USE_GLOBAL_SPEED_LIMIT, tr_torrentIsUsingGlobalSpeedLimit( tor, dir ) );
-    tr_bencDictAddInt( d, KEY_USE_SPEED_LIMIT, tr_torrentIsUsingSpeedLimit( tor, dir ) );
+    tr_bencDictAddInt( d, KEY_USE_GLOBAL_SPEED_LIMIT, tr_torrentUsesSessionLimits( tor ) );
+    tr_bencDictAddInt( d, KEY_USE_SPEED_LIMIT, tr_torrentUsesSpeedLimit( tor, dir ) );
 }
 
 static void
@@ -283,7 +283,7 @@ loadSingleSpeedLimit( tr_benc * d, tr_direction dir, tr_torrent * tor )
     if( tr_bencDictFindInt( d, KEY_USE_SPEED_LIMIT, &i ) )
         tr_torrentUseSpeedLimit( tor, dir, i!=0 );
     if( tr_bencDictFindInt( d, KEY_USE_GLOBAL_SPEED_LIMIT, &i ) )
-        tr_torrentUseGlobalSpeedLimit( tor, dir, i!=0 );
+        tr_torrentUseSessionLimits( tor, i!=0 );
 }
 
 enum old_speed_modes
@@ -317,14 +317,14 @@ loadSpeedLimits( tr_benc * dict, tr_torrent * tor )
         if( tr_bencDictFindInt( d, KEY_SPEEDLIMIT_DOWN_SPEED, &i ) )
             tr_torrentSetSpeedLimit( tor, TR_DOWN, i );
         if( tr_bencDictFindInt( d, KEY_SPEEDLIMIT_DOWN_MODE, &i ) ) {
-            tr_torrentUseSpeedLimit ( tor, TR_DOWN, i==TR_SPEEDLIMIT_SINGLE );
-            tr_torrentUseGlobalSpeedLimit( tor, TR_DOWN, i==TR_SPEEDLIMIT_GLOBAL );
+            tr_torrentUseSpeedLimit( tor, TR_DOWN, i==TR_SPEEDLIMIT_SINGLE );
+            tr_torrentUseSessionLimits( tor, i==TR_SPEEDLIMIT_GLOBAL );
          }
         if( tr_bencDictFindInt( d, KEY_SPEEDLIMIT_UP_SPEED, &i ) )
             tr_torrentSetSpeedLimit( tor, TR_UP, i );
         if( tr_bencDictFindInt( d, KEY_SPEEDLIMIT_UP_MODE, &i ) ) {
-            tr_torrentUseSpeedLimit ( tor, TR_UP, i==TR_SPEEDLIMIT_SINGLE );
-            tr_torrentUseGlobalSpeedLimit( tor, TR_UP, i==TR_SPEEDLIMIT_GLOBAL );
+            tr_torrentUseSpeedLimit( tor, TR_UP, i==TR_SPEEDLIMIT_SINGLE );
+            tr_torrentUseSessionLimits( tor, i==TR_SPEEDLIMIT_GLOBAL );
         }
         ret = TR_FR_SPEEDLIMIT;
     }
@@ -609,7 +609,7 @@ loadFromFile( tr_torrent * tor,
     if( ( fieldsToLoad & TR_FR_ACTIVITY_DATE )
       && tr_bencDictFindInt( &top, KEY_ACTIVITY_DATE, &i ) )
     {
-        tor->activityDate = i;
+        tr_torrentSetActivityDate( tor, i );
         fieldsLoaded |= TR_FR_ACTIVITY_DATE;
     }
 

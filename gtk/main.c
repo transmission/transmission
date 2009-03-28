@@ -436,6 +436,7 @@ main( int     argc,
 
         /* initialize the libtransmission session */
         session = tr_sessionInit( "gtk", configDir, TRUE, pref_get_all( ) );
+        pref_flag_set( TR_PREFS_KEY_ALT_SPEED_ENABLED, tr_sessionUsesAltSpeed( session ) );
         cbdata->core = tr_core_new( session );
 
         /* create main window now to be a parent to any error dialogs */
@@ -944,54 +945,45 @@ prefschanged( TrCore * core UNUSED,
     }
     else if( !strcmp( key, TR_PREFS_KEY_PEER_PORT ) )
     {
-        const int port = pref_int_get( key );
-        tr_sessionSetPeerPort( tr, port );
+        tr_sessionSetPeerPort( tr, pref_int_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_BLOCKLIST_ENABLED ) )
     {
-        const gboolean flag = pref_flag_get( key );
-        tr_blocklistSetEnabled( tr, flag );
+        tr_blocklistSetEnabled( tr, pref_flag_get( key ) );
     }
     else if( !strcmp( key, PREF_KEY_SHOW_TRAY_ICON ) )
     {
         const int show = pref_flag_get( key );
         if( show && !cbdata->icon )
             cbdata->icon = tr_icon_new( cbdata->core );
-        else if( !show && cbdata->icon )
-        {
+        else if( !show && cbdata->icon ) {
             g_object_unref( cbdata->icon );
             cbdata->icon = NULL;
         }
     }
     else if( !strcmp( key, TR_PREFS_KEY_DSPEED_ENABLED ) )
     {
-        const gboolean b = pref_flag_get( key );
-        tr_sessionSetSpeedLimitEnabled( tr, TR_DOWN, b );
+        tr_sessionLimitSpeed( tr, TR_DOWN, pref_flag_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_DSPEED ) )
     {
-        const int limit = pref_int_get( key );
-        tr_sessionSetSpeedLimit( tr, TR_DOWN, limit );
+        tr_sessionSetSpeedLimit( tr, TR_DOWN, pref_int_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_USPEED_ENABLED ) )
     {
-        const gboolean b = pref_flag_get( key );
-        tr_sessionSetSpeedLimitEnabled( tr, TR_UP, b );
+        tr_sessionLimitSpeed( tr, TR_UP, pref_flag_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_USPEED ) )
     {
-        const int limit = pref_int_get( key );
-        tr_sessionSetSpeedLimit( tr, TR_UP, limit );
+        tr_sessionSetSpeedLimit( tr, TR_UP, pref_int_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_RATIO_ENABLED ) )
     {
-        const gboolean b = pref_flag_get( key );
-        tr_sessionSetRatioLimited( tr, b );
+        tr_sessionSetRatioLimited( tr, pref_flag_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_RATIO ) )
     {
-        const double limit = pref_double_get( key );
-        tr_sessionSetRatioLimit( tr, limit );
+        tr_sessionSetRatioLimit( tr, pref_double_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_PORT_FORWARDING ) )
     {
@@ -1011,8 +1003,7 @@ prefschanged( TrCore * core UNUSED,
     }
     else if( !strcmp( key, TR_PREFS_KEY_RPC_WHITELIST ) )
     {
-        const char * s = pref_string_get( key );
-        tr_sessionSetRPCWhitelist( tr, s );
+        tr_sessionSetRPCWhitelist( tr, pref_string_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_RPC_WHITELIST_ENABLED ) )
     {
@@ -1020,82 +1011,67 @@ prefschanged( TrCore * core UNUSED,
     }
     else if( !strcmp( key, TR_PREFS_KEY_RPC_USERNAME ) )
     {
-        const char * s = pref_string_get( key );
-        tr_sessionSetRPCUsername( tr, s );
+        tr_sessionSetRPCUsername( tr, pref_string_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_RPC_PASSWORD ) )
     {
-        const char * s = pref_string_get( key );
-        tr_sessionSetRPCPassword( tr, s );
+        tr_sessionSetRPCPassword( tr, pref_string_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_RPC_AUTH_REQUIRED ) )
     {
-        const gboolean enabled = pref_flag_get( key );
-        tr_sessionSetRPCPasswordEnabled( tr, enabled );
+        tr_sessionSetRPCPasswordEnabled( tr, pref_flag_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_PROXY ) )
     {
-        const char * s = pref_string_get( key );
-        tr_sessionSetProxy( tr, s );
+        tr_sessionSetProxy( tr, pref_string_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_PROXY_TYPE ) )
     {
-        const int i = pref_int_get( key );
-        tr_sessionSetProxyType( tr, i );
+        tr_sessionSetProxyType( tr, pref_int_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_PROXY_ENABLED ) )
     {
-        const gboolean enabled = pref_flag_get( key );
-        tr_sessionSetProxyEnabled( tr, enabled );
+        tr_sessionSetProxyEnabled( tr, pref_flag_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_PROXY_AUTH_ENABLED ) )
     {
-        const gboolean enabled = pref_flag_get( key );
-        tr_sessionSetProxyAuthEnabled( tr, enabled );
+        tr_sessionSetProxyAuthEnabled( tr, pref_flag_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_PROXY_USERNAME ) )
     {
-        const char * s = pref_string_get( key );
-        tr_sessionSetProxyUsername( tr, s );
+        tr_sessionSetProxyUsername( tr, pref_string_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_PROXY_PASSWORD ) )
     {
-        const char * s = pref_string_get( key );
-        tr_sessionSetProxyPassword( tr, s );
+        tr_sessionSetProxyPassword( tr, pref_string_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_PROXY_PORT ) )
     {
         tr_sessionSetProxyPort( tr, pref_int_get( key ) );
     }
-    else if( !strcmp( key, TR_PREFS_KEY_RPC_PASSWORD ) )
+    else if( !strcmp( key, TR_PREFS_KEY_ALT_SPEED_UP ) )
     {
-        const char * s = pref_string_get( key );
-        tr_sessionSetProxyPassword( tr, s );
+        tr_sessionSetAltSpeed( tr, TR_UP, pref_int_get( key ) );
     }
-    else if( !strcmp( key, TR_PREFS_KEY_ALT_LIMIT_ENABLED ) )
+    else if( !strcmp( key, TR_PREFS_KEY_ALT_SPEED_DOWN ) )
     {
-        const gboolean enabled = pref_flag_get( key );
-        tr_sessionSetAltSpeedLimitEnabled( tr, enabled );
+        tr_sessionSetAltSpeed( tr, TR_DOWN, pref_int_get( key ) );
     }
-    else if( !strcmp( key, TR_PREFS_KEY_ALT_BEGIN ) )
+    else if( !strcmp( key, TR_PREFS_KEY_ALT_SPEED_ENABLED ) )
     {
-        const int minutes = pref_int_get( key );
-        tr_sessionSetAltSpeedLimitBegin( tr, minutes );
+        tr_sessionUseAltSpeed( tr, pref_flag_get( key ) );
     }
-    else if( !strcmp( key, TR_PREFS_KEY_ALT_DL_LIMIT ) )
+    else if( !strcmp( key, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN ) )
     {
-        const int speed = pref_int_get( key );
-        tr_sessionSetAltSpeedLimit( tr, TR_DOWN, speed );
+        tr_sessionSetAltSpeedBegin( tr, pref_int_get( key ) );
     }
-    else if( !strcmp( key, TR_PREFS_KEY_ALT_END ) )
+    else if( !strcmp( key, TR_PREFS_KEY_ALT_SPEED_TIME_END ) )
     {
-        const int minutes = pref_int_get( key );
-        tr_sessionSetAltSpeedLimitEnd( tr, minutes );
+        tr_sessionSetAltSpeedEnd( tr, pref_int_get( key ) );
     }
-    else if( !strcmp( key, TR_PREFS_KEY_ALT_UL_LIMIT ) )
+    else if( !strcmp( key, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED ) )
     {
-        const int speed = pref_int_get( key );
-        tr_sessionSetAltSpeedLimit( tr, TR_UP, speed );
+        tr_sessionUseAltSpeedTime( tr, pref_flag_get( key ) );
     }
 }
 

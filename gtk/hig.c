@@ -87,8 +87,7 @@ hig_workarea_add_wide_control( GtkWidget * t,
 {
     GtkWidget * r = rowNew( w );
 
-    gtk_table_attach( GTK_TABLE(
-                          t ), r, 0, 2, *row, *row + 1, GTK_FILL, 0, 0, 0 );
+    gtk_table_attach( GTK_TABLE( t ), r, 0, 2, *row, *row + 1, GTK_FILL, 0, 0, 0 );
     ++ * row;
 }
 

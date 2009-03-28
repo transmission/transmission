@@ -136,7 +136,7 @@ tr_torrentUseSpeedLimit( tr_torrent * tor, tr_direction dir, tr_bool do_use )
 }
 
 tr_bool
-tr_torrentIsUsingSpeedLimit( const tr_torrent * tor, tr_direction dir )
+tr_torrentUsesSpeedLimit( const tr_torrent * tor, tr_direction dir )
 {
     assert( tr_isTorrent( tor ) );
     assert( tr_isDirection( dir ) );
@@ -145,21 +145,20 @@ tr_torrentIsUsingSpeedLimit( const tr_torrent * tor, tr_direction dir )
 }
 
 void
-tr_torrentUseGlobalSpeedLimit( tr_torrent * tor, tr_direction dir, tr_bool do_use )
+tr_torrentUseSessionLimits( tr_torrent * tor, tr_bool doUse )
 {
     assert( tr_isTorrent( tor ) );
-    assert( tr_isDirection( dir ) );
 
-    tr_bandwidthHonorParentLimits( tor->bandwidth, dir, do_use );
+    tr_bandwidthHonorParentLimits( tor->bandwidth, TR_UP, doUse );
+    tr_bandwidthHonorParentLimits( tor->bandwidth, TR_DOWN, doUse );
 }
 
 tr_bool
-tr_torrentIsUsingGlobalSpeedLimit( const tr_torrent * tor, tr_direction dir )
+tr_torrentUsesSessionLimits( const tr_torrent * tor )
 {
     assert( tr_isTorrent( tor ) );
-    assert( tr_isDirection( dir ) );
 
-    return tr_bandwidthAreParentLimitsHonored( tor->bandwidth, dir );
+    return tr_bandwidthAreParentLimitsHonored( tor->bandwidth, TR_UP );
 }
 
 /***
@@ -208,15 +207,16 @@ tr_bool
 tr_torrentIsPieceTransferAllowed( const tr_torrent  * tor,
                                   tr_direction        direction )
 {
+    int limit;
     tr_bool allowed = TRUE;
 
-    if( tr_torrentIsUsingSpeedLimit( tor, direction ) )
+    if( tr_torrentUsesSpeedLimit( tor, direction ) )
         if( tr_torrentGetSpeedLimit( tor, direction ) <= 0 )
             allowed = FALSE;
 
-    if( tr_torrentIsUsingGlobalSpeedLimit( tor, direction ) )
-        if( tr_sessionIsSpeedLimitEnabled( tor->session, direction ) )
-            if( tr_sessionGetSpeedLimit( tor->session, direction ) <= 0 )
+    if( tr_torrentUsesSessionLimits( tor ) )
+        if( tr_sessionGetActiveSpeedLimit( tor->session, direction, &limit ) )
+            if( limit <= 0 )
                 allowed = FALSE;
 
     return allowed;
@@ -594,10 +594,9 @@ torrentRealInit( tr_session      * session,
 
     if( !( loaded & TR_FR_SPEEDLIMIT ) )
     {
-        tr_torrentSetSpeedLimit( tor, TR_UP,
-                                tr_sessionGetSpeedLimit( tor->session, TR_UP ) );
-        tr_torrentSetSpeedLimit( tor, TR_DOWN,
-                                tr_sessionGetSpeedLimit( tor->session, TR_DOWN ) );
+        tr_torrentUseSpeedLimit( tor, TR_UP, FALSE );
+        tr_torrentUseSpeedLimit( tor, TR_DOWN, FALSE );
+        tr_torrentUseSessionLimits( tor, TRUE );
     }
 
     if( !( loaded & TR_FR_RATIOLIMIT ) )
