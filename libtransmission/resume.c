@@ -502,7 +502,7 @@ tr_torrentSaveResume( const tr_torrent * tor )
                        tor->uploadedPrev + tor->uploadedCur );
     tr_bencDictAddInt( &top, KEY_MAX_PEERS,
                        tor->maxConnectedPeers );
-    tr_bencDictAddBool( &top, KEY_PAUSED, tor->isRunning!=0 );
+    tr_bencDictAddBool( &top, KEY_PAUSED, !tor->isRunning );
     savePeers( &top, tor );
     savePriorities( &top, tor );
     saveDND( &top, tor );
