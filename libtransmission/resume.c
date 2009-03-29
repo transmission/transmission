@@ -252,8 +252,8 @@ saveSingleSpeedLimit( tr_benc * d, const tr_torrent * tor, tr_direction dir )
 {
     tr_bencDictReserve( d, 3 );
     tr_bencDictAddInt( d, KEY_SPEED, tr_torrentGetSpeedLimit( tor, dir ) );
-    tr_bencDictAddInt( d, KEY_USE_GLOBAL_SPEED_LIMIT, tr_torrentUsesSessionLimits( tor ) );
-    tr_bencDictAddInt( d, KEY_USE_SPEED_LIMIT, tr_torrentUsesSpeedLimit( tor, dir ) );
+    tr_bencDictAddBool( d, KEY_USE_GLOBAL_SPEED_LIMIT, tr_torrentUsesSessionLimits( tor ) );
+    tr_bencDictAddBool( d, KEY_USE_SPEED_LIMIT, tr_torrentUsesSpeedLimit( tor, dir ) );
 }
 
 static void
@@ -266,24 +266,25 @@ saveSpeedLimits( tr_benc * dict, const tr_torrent * tor )
 static void
 saveRatioLimits( tr_benc * dict, const tr_torrent * tor )
 {
-    tr_benc * d = tr_bencDictAddDict( dict, KEY_RATIOLIMIT, 4 );
-
-    tr_bencDictAddDouble( d, KEY_RATIOLIMIT_RATIO,
-                      tr_torrentGetRatioLimit( tor ) );
-    tr_bencDictAddInt( d, KEY_RATIOLIMIT_MODE,
-                      tr_torrentGetRatioMode( tor ) );
+    tr_benc * d = tr_bencDictAddDict( dict, KEY_RATIOLIMIT, 2 );
+    tr_bencDictAddReal( d, KEY_RATIOLIMIT_RATIO, tr_torrentGetRatioLimit( tor ) );
+    tr_bencDictAddInt( d, KEY_RATIOLIMIT_MODE, tr_torrentGetRatioMode( tor ) );
 }
 
 static void
 loadSingleSpeedLimit( tr_benc * d, tr_direction dir, tr_torrent * tor )
 {
     int64_t i;
+    tr_bool boolVal;
+
     if( tr_bencDictFindInt( d, KEY_SPEED, &i ) )
         tr_torrentSetSpeedLimit( tor, dir, i );
-    if( tr_bencDictFindInt( d, KEY_USE_SPEED_LIMIT, &i ) )
-        tr_torrentUseSpeedLimit( tor, dir, i!=0 );
-    if( tr_bencDictFindInt( d, KEY_USE_GLOBAL_SPEED_LIMIT, &i ) )
-        tr_torrentUseSessionLimits( tor, i!=0 );
+
+    if( tr_bencDictFindBool( d, KEY_USE_SPEED_LIMIT, &boolVal ) )
+        tr_torrentUseSpeedLimit( tor, dir, boolVal );
+
+    if( tr_bencDictFindBool( d, KEY_USE_GLOBAL_SPEED_LIMIT, &boolVal ) )
+        tr_torrentUseSessionLimits( tor, boolVal );
 }
 
 enum old_speed_modes
@@ -343,7 +344,7 @@ loadRatioLimits( tr_benc *    dict,
     {
         int64_t i;
         double dratio;
-          if( tr_bencDictFindDouble( d, KEY_RATIOLIMIT_RATIO, &dratio ) )
+        if( tr_bencDictFindReal( d, KEY_RATIOLIMIT_RATIO, &dratio ) )
             tr_torrentSetRatioLimit( tor, dratio );
         if( tr_bencDictFindInt( d, KEY_RATIOLIMIT_MODE, &i ) )
             tr_torrentSetRatioMode( tor, i );
@@ -501,8 +502,7 @@ tr_torrentSaveResume( const tr_torrent * tor )
                        tor->uploadedPrev + tor->uploadedCur );
     tr_bencDictAddInt( &top, KEY_MAX_PEERS,
                        tor->maxConnectedPeers );
-    tr_bencDictAddInt( &top, KEY_PAUSED,
-                       tor->isRunning ? 0 : 1 );
+    tr_bencDictAddBool( &top, KEY_PAUSED, tor->isRunning!=0 );
     savePeers( &top, tor );
     savePriorities( &top, tor );
     saveDND( &top, tor );
@@ -526,6 +526,7 @@ loadFromFile( tr_torrent * tor,
     uint64_t     fieldsLoaded = 0;
     char *       filename;
     tr_benc      top;
+    tr_bool      boolVal;
 
     filename = getResumeFilename( tor );
 
@@ -586,9 +587,9 @@ loadFromFile( tr_torrent * tor,
     }
 
     if( ( fieldsToLoad & TR_FR_RUN )
-      && tr_bencDictFindInt( &top, KEY_PAUSED, &i ) )
+      && tr_bencDictFindBool( &top, KEY_PAUSED, &boolVal ) )
     {
-        tor->isRunning = i ? 0 : 1;
+        tor->isRunning = !boolVal;
         fieldsLoaded |= TR_FR_RUN;
     }
 

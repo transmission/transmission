@@ -126,7 +126,7 @@ int       tr_bencDictRemove( tr_benc *, const char * key );
 
 tr_benc * tr_bencDictAdd( tr_benc *, const char * key );
 
-tr_benc * tr_bencDictAddDouble( tr_benc *, const char * key, double );
+tr_benc * tr_bencDictAddReal( tr_benc *, const char * key, double );
 
 tr_benc * tr_bencDictAddInt( tr_benc *, const char * key, int64_t );
 
@@ -149,7 +149,7 @@ tr_bool   tr_bencDictFindDict( tr_benc *, const char * key, tr_benc ** setme );
 
 tr_bool   tr_bencDictFindInt( tr_benc *, const char * key, int64_t * setme );
 
-tr_bool   tr_bencDictFindDouble( tr_benc *, const char * key, double * setme );
+tr_bool   tr_bencDictFindReal( tr_benc *, const char * key, double * setme );
 
 tr_bool   tr_bencDictFindBool( tr_benc *, const char * key, tr_bool * setme );
 

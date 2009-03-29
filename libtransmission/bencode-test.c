@@ -452,6 +452,39 @@ testStackSmash( int depth )
     return 0;
 }
 
+static int
+testBool( void )
+{
+    tr_benc top;
+    int64_t intVal;
+    tr_bool boolVal;
+
+    tr_bencInitDict( &top, 0 );
+
+    tr_bencDictAddBool( &top, "key1", FALSE );
+    tr_bencDictAddBool( &top, "key2", 0 );
+    tr_bencDictAddInt ( &top, "key3", TRUE );
+    tr_bencDictAddInt ( &top, "key4", 1 );
+    check( tr_bencDictFindBool( &top, "key1", &boolVal ) )
+    check( !boolVal )
+    check( tr_bencDictFindBool( &top, "key2", &boolVal ) )
+    check( !boolVal )
+    check( tr_bencDictFindBool( &top, "key3", &boolVal ) )
+    check( boolVal )
+    check( tr_bencDictFindBool( &top, "key4", &boolVal ) )
+    check( boolVal )
+    check( tr_bencDictFindInt( &top, "key1", &intVal ) )
+    check( !intVal)
+    check( tr_bencDictFindInt( &top, "key2", &intVal ) )
+    check( !intVal )
+    check( tr_bencDictFindInt( &top, "key3", &intVal ) )
+    check( intVal )
+    check( tr_bencDictFindInt( &top, "key4", &intVal ) )
+    check( intVal )
+
+    return 0;
+}
+
 int
 main( void )
 {
@@ -470,6 +503,9 @@ main( void )
         return i;
 
     if(( i = testMerge( )))
+        return i;
+
+    if(( i = testBool( )))
         return i;
 
 #ifndef WIN32

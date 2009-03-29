@@ -163,22 +163,22 @@ tr_prefs_init_defaults( tr_benc * d )
     if( !str ) str = g_get_user_special_dir( G_USER_DIRECTORY_DESKTOP );
     if( !str ) str = tr_getDefaultDownloadDir( );
     tr_bencDictAddStr( d, PREF_KEY_DIR_WATCH, str );
-    tr_bencDictAddInt( d, PREF_KEY_DIR_WATCH_ENABLED, FALSE );
+    tr_bencDictAddBool( d, PREF_KEY_DIR_WATCH_ENABLED, FALSE );
 #endif
 
-    tr_bencDictAddInt( d, PREF_KEY_INHIBIT_HIBERNATION, FALSE );
-    tr_bencDictAddInt( d, PREF_KEY_BLOCKLIST_UPDATES_ENABLED, TRUE );
+    tr_bencDictAddBool( d, PREF_KEY_INHIBIT_HIBERNATION, FALSE );
+    tr_bencDictAddBool( d, PREF_KEY_BLOCKLIST_UPDATES_ENABLED, TRUE );
 
     tr_bencDictAddStr( d, PREF_KEY_OPEN_DIALOG_FOLDER, g_get_home_dir( ) );
 
-    tr_bencDictAddInt( d, PREF_KEY_TOOLBAR, TRUE );
-    tr_bencDictAddInt( d, PREF_KEY_FILTERBAR, TRUE );
-    tr_bencDictAddInt( d, PREF_KEY_STATUSBAR, TRUE );
-    tr_bencDictAddInt( d, PREF_KEY_SHOW_TRAY_ICON, FALSE );
-    tr_bencDictAddInt( d, PREF_KEY_SHOW_DESKTOP_NOTIFICATION, TRUE );
+    tr_bencDictAddBool( d, PREF_KEY_TOOLBAR, TRUE );
+    tr_bencDictAddBool( d, PREF_KEY_FILTERBAR, TRUE );
+    tr_bencDictAddBool( d, PREF_KEY_STATUSBAR, TRUE );
+    tr_bencDictAddBool( d, PREF_KEY_SHOW_TRAY_ICON, FALSE );
+    tr_bencDictAddBool( d, PREF_KEY_SHOW_DESKTOP_NOTIFICATION, TRUE );
     tr_bencDictAddStr( d, PREF_KEY_STATUSBAR_STATS, "total-ratio" );
 
-    tr_bencDictAddInt( d, PREF_KEY_OPTIONS_PROMPT, TRUE );
+    tr_bencDictAddBool( d, PREF_KEY_OPTIONS_PROMPT, TRUE );
 
     tr_bencDictAddInt( d, PREF_KEY_MAIN_WINDOW_HEIGHT, 500 );
     tr_bencDictAddInt( d, PREF_KEY_MAIN_WINDOW_WIDTH, 300 );
@@ -193,14 +193,14 @@ tr_prefs_init_defaults( tr_benc * d )
     if( !str ) str = tr_getDefaultDownloadDir( );
     tr_bencDictAddStr( d, TR_PREFS_KEY_DOWNLOAD_DIR, str );
 
-    tr_bencDictAddInt( d, PREF_KEY_ASKQUIT, TRUE );
+    tr_bencDictAddBool( d, PREF_KEY_ASKQUIT, TRUE );
 
     tr_bencDictAddStr( d, PREF_KEY_SORT_MODE, "sort-by-name" );
-    tr_bencDictAddInt( d, PREF_KEY_SORT_REVERSED, FALSE );
-    tr_bencDictAddInt( d, PREF_KEY_MINIMAL_VIEW, FALSE );
+    tr_bencDictAddBool( d, PREF_KEY_SORT_REVERSED, FALSE );
+    tr_bencDictAddBool( d, PREF_KEY_MINIMAL_VIEW, FALSE );
 
-    tr_bencDictAddInt( d, PREF_KEY_START, TRUE );
-    tr_bencDictAddInt( d, PREF_KEY_TRASH_ORIGINAL, FALSE );
+    tr_bencDictAddBool( d, PREF_KEY_START, TRUE );
+    tr_bencDictAddBool( d, PREF_KEY_TRASH_ORIGINAL, FALSE );
 }
 
 static char*
@@ -258,7 +258,7 @@ pref_double_get( const char * key )
 {
     double d = 0.0;
 
-    tr_bencDictFindDouble( getPrefs( ), key, &d );
+    tr_bencDictFindReal( getPrefs( ), key, &d );
     return d;
 }
 
@@ -266,7 +266,7 @@ void
 pref_double_set( const char * key,
                  double       value )
 {
-    tr_bencDictAddDouble( getPrefs( ), key, value );
+    tr_bencDictAddReal( getPrefs( ), key, value );
 }
 
 /***

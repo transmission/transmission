@@ -491,16 +491,16 @@ parseCommandLine( tr_benc * d, int argc, const char ** argv )
             case 'a':
                 announce = optarg; break;
 
-            case 'b': tr_bencDictAddInt( d, TR_PREFS_KEY_BLOCKLIST_ENABLED, 1 );
+            case 'b': tr_bencDictAddBool( d, TR_PREFS_KEY_BLOCKLIST_ENABLED, TRUE );
                       break;
-            case 'B': tr_bencDictAddInt( d, TR_PREFS_KEY_BLOCKLIST_ENABLED, 0 );
+            case 'B': tr_bencDictAddBool( d, TR_PREFS_KEY_BLOCKLIST_ENABLED, FALSE );
                       break;
             case 'c': comment = optarg;
                       break;
-            case 'd': tr_bencDictAddInt( d, TR_PREFS_KEY_DSPEED, atoi( optarg ) );
-                      tr_bencDictAddInt( d, TR_PREFS_KEY_DSPEED_ENABLED, 1 );
+            case 'd': tr_bencDictAddInt ( d, TR_PREFS_KEY_DSPEED, atoi( optarg ) );
+                      tr_bencDictAddBool( d, TR_PREFS_KEY_DSPEED_ENABLED, TRUE );
                       break;
-            case 'D': tr_bencDictAddInt( d, TR_PREFS_KEY_DSPEED_ENABLED, 0 );
+            case 'D': tr_bencDictAddBool( d, TR_PREFS_KEY_DSPEED_ENABLED, FALSE );
                       break;
             case 'f': finishCall = optarg;
                       break;
@@ -508,9 +508,9 @@ parseCommandLine( tr_benc * d, int argc, const char ** argv )
                       break;
             case 'i': showInfo = 1;
                       break;
-            case 'm': tr_bencDictAddInt( d, TR_PREFS_KEY_PORT_FORWARDING, 1 );
+            case 'm': tr_bencDictAddBool( d, TR_PREFS_KEY_PORT_FORWARDING, TRUE );
                       break;
-            case 'M': tr_bencDictAddInt( d, TR_PREFS_KEY_PORT_FORWARDING, 0 );
+            case 'M': tr_bencDictAddBool( d, TR_PREFS_KEY_PORT_FORWARDING, FALSE );
                       break;
             case 'n': sourceFile = optarg; break;
             case 'p': tr_bencDictAddInt( d, TR_PREFS_KEY_PEER_PORT, atoi( optarg ) );
@@ -522,9 +522,9 @@ parseCommandLine( tr_benc * d, int argc, const char ** argv )
             case 't': tr_bencDictAddInt( d, TR_PREFS_KEY_PEER_SOCKET_TOS, atoi( optarg ) );
                       break;
             case 'u': tr_bencDictAddInt( d, TR_PREFS_KEY_USPEED, atoi( optarg ) );
-                      tr_bencDictAddInt( d, TR_PREFS_KEY_USPEED_ENABLED, 1 );
+                      tr_bencDictAddBool( d, TR_PREFS_KEY_USPEED_ENABLED, TRUE );
                       break;
-            case 'U': tr_bencDictAddInt( d, TR_PREFS_KEY_USPEED_ENABLED, 0 );
+            case 'U': tr_bencDictAddBool( d, TR_PREFS_KEY_USPEED_ENABLED, FALSE );
                       break;
             case 'v': verify = 1;
                       break;

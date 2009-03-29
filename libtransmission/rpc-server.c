@@ -172,7 +172,7 @@ handle_upload( struct evhttp_request * req,
                         tr_bencDictAddStr( &top, "method", "torrent-add" );
                         b64 = tr_base64_encode( body, body_len, NULL );
                         tr_bencDictAddStr( args, "metainfo", b64 );
-                        tr_bencDictAddInt( args, "paused", paused );
+                        tr_bencDictAddBool( args, "paused", paused );
                         tr_bencSaveAsJSON( &top, json );
                         tr_rpc_request_exec_json( server->session,
                                                   EVBUFFER_DATA( json ),
@@ -736,27 +736,28 @@ tr_rpcInit( tr_session  * session,
 {
     tr_rpc_server * s;
     tr_bool found;
+    tr_bool boolVal;
     int64_t i;
     const char *str;
 
     s = tr_new0( tr_rpc_server, 1 );
     s->session = session;
 
-    found = tr_bencDictFindInt( settings, TR_PREFS_KEY_RPC_ENABLED, &i );
+    found = tr_bencDictFindBool( settings, TR_PREFS_KEY_RPC_ENABLED, &boolVal );
     assert( found );
-    s->isEnabled = i != 0;
+    s->isEnabled = boolVal;
 
     found = tr_bencDictFindInt( settings, TR_PREFS_KEY_RPC_PORT, &i );
     assert( found );
     s->port = i;
 
-    found = tr_bencDictFindInt( settings, TR_PREFS_KEY_RPC_WHITELIST_ENABLED, &i );
+    found = tr_bencDictFindBool( settings, TR_PREFS_KEY_RPC_WHITELIST_ENABLED, &boolVal );
     assert( found );
-    s->isWhitelistEnabled = i != 0;
+    s->isWhitelistEnabled = boolVal;
 
-    found = tr_bencDictFindInt( settings, TR_PREFS_KEY_RPC_AUTH_REQUIRED, &i );
+    found = tr_bencDictFindBool( settings, TR_PREFS_KEY_RPC_AUTH_REQUIRED, &boolVal );
     assert( found );
-    s->isPasswordEnabled = i != 0;
+    s->isPasswordEnabled = boolVal;
 
     found = tr_bencDictFindStr( settings, TR_PREFS_KEY_RPC_WHITELIST, &str );
     assert( found );

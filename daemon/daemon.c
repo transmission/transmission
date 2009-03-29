@@ -201,9 +201,9 @@ int
 main( int argc, char ** argv )
 {
     int c;
-    int64_t i;
     const char * optarg;
     tr_benc settings;
+    tr_bool boolVal;
     tr_bool foreground = FALSE;
     tr_bool dumpSettings = FALSE;
     const char * configDir = NULL;
@@ -221,23 +221,23 @@ main( int argc, char ** argv )
     tr_bencInitDict( &settings, 0 );
     configDir = getConfigDir( argc, (const char**)argv );
     tr_sessionLoadSettings( &settings, configDir, MY_NAME );
-    tr_bencDictAddInt( &settings, TR_PREFS_KEY_RPC_ENABLED, 1 );
+    tr_bencDictAddBool( &settings, TR_PREFS_KEY_RPC_ENABLED, TRUE );
 
     /* overwrite settings from the comamndline */
     tr_optind = 1;
     while(( c = tr_getopt( getUsage(), argc, (const char**)argv, options, &optarg ))) {
         switch( c ) {
             case 'a': tr_bencDictAddStr( &settings, TR_PREFS_KEY_RPC_WHITELIST, optarg );
-                      tr_bencDictAddInt( &settings, TR_PREFS_KEY_RPC_WHITELIST_ENABLED, 1 );
+                      tr_bencDictAddBool( &settings, TR_PREFS_KEY_RPC_WHITELIST_ENABLED, TRUE );
                       break;
-            case 'b': tr_bencDictAddInt( &settings, TR_PREFS_KEY_BLOCKLIST_ENABLED, 1 );
+            case 'b': tr_bencDictAddBool( &settings, TR_PREFS_KEY_BLOCKLIST_ENABLED, TRUE );
                       break;
-            case 'B': tr_bencDictAddInt( &settings, TR_PREFS_KEY_BLOCKLIST_ENABLED, 0 );
+            case 'B': tr_bencDictAddBool( &settings, TR_PREFS_KEY_BLOCKLIST_ENABLED, FALSE );
                       break;
             case 'c': tr_bencDictAddStr( &settings, PREF_KEY_DIR_WATCH, optarg );
-                      tr_bencDictAddInt( &settings, PREF_KEY_DIR_WATCH_ENABLED, 1 );
+                      tr_bencDictAddBool( &settings, PREF_KEY_DIR_WATCH_ENABLED, TRUE );
                       break;
-            case 'C': tr_bencDictAddInt( &settings, PREF_KEY_DIR_WATCH_ENABLED, 0 );
+            case 'C': tr_bencDictAddBool( &settings, PREF_KEY_DIR_WATCH_ENABLED, FALSE );
                       break;
             case 'd': dumpSettings = TRUE;
                       break;
@@ -250,9 +250,9 @@ main( int argc, char ** argv )
 		      exit( 0 );
             case 'p': tr_bencDictAddInt( &settings, TR_PREFS_KEY_RPC_PORT, atoi( optarg ) );
                       break;
-            case 't': tr_bencDictAddInt( &settings, TR_PREFS_KEY_RPC_AUTH_REQUIRED, 1 );
+            case 't': tr_bencDictAddBool( &settings, TR_PREFS_KEY_RPC_AUTH_REQUIRED, TRUE );
                       break;
-            case 'T': tr_bencDictAddInt( &settings, TR_PREFS_KEY_RPC_AUTH_REQUIRED, 0 );
+            case 'T': tr_bencDictAddBool( &settings, TR_PREFS_KEY_RPC_AUTH_REQUIRED, FALSE );
                       break;
             case 'u': tr_bencDictAddStr( &settings, TR_PREFS_KEY_RPC_USERNAME, optarg );
                       break;
@@ -262,9 +262,9 @@ main( int argc, char ** argv )
                       break;
             case 'P': tr_bencDictAddInt( &settings, TR_PREFS_KEY_PEER_PORT, atoi( optarg ) );
                       break;
-            case 'm': tr_bencDictAddInt( &settings, TR_PREFS_KEY_PORT_FORWARDING, 1 );
+            case 'm': tr_bencDictAddBool( &settings, TR_PREFS_KEY_PORT_FORWARDING, TRUE );
                       break;
-            case 'M': tr_bencDictAddInt( &settings, TR_PREFS_KEY_PORT_FORWARDING, 0 );
+            case 'M': tr_bencDictAddBool( &settings, TR_PREFS_KEY_PORT_FORWARDING, FALSE );
                       break;
             case 'L': tr_bencDictAddInt( &settings, TR_PREFS_KEY_PEER_LIMIT_GLOBAL, atoi( optarg ) );
                       break;
@@ -301,16 +301,15 @@ main( int argc, char ** argv )
     /* start the session */
     mySession = tr_sessionInit( "daemon", configDir, FALSE, &settings );
 
-    if( tr_bencDictFindInt( &settings, TR_PREFS_KEY_RPC_AUTH_REQUIRED, &i ) && i!=0 )
+    if( tr_bencDictFindBool( &settings, TR_PREFS_KEY_RPC_AUTH_REQUIRED, &boolVal ) && boolVal )
         tr_ninf( MY_NAME, "requiring authentication" );
 
     /* maybe add a watchdir */
     {
-        int64_t doWatch;
         const char * dir;
 
-        if( tr_bencDictFindInt( &settings, PREF_KEY_DIR_WATCH_ENABLED, &doWatch )
-            && doWatch
+        if( tr_bencDictFindBool( &settings, PREF_KEY_DIR_WATCH_ENABLED, &boolVal )
+            && boolVal
             && tr_bencDictFindStr( &settings, PREF_KEY_DIR_WATCH, &dir )
             && dir
             && *dir )
