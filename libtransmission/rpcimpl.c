@@ -500,6 +500,10 @@ addField( const tr_torrent * tor,
         tr_bencDictAddStr( d, key, st->scrapeURL );
     else if( !strcmp( key, "seeders" ) )
         tr_bencDictAddInt( d, key, st->seeders );
+    else if( !strcmp( key, "seedRatioLimit" ) )
+        tr_bencDictAddDouble( d, key, tr_torrentGetRatioLimit( tor ) );
+    else if( !strcmp( key, "seedRatioMode" ) )
+        tr_bencDictAddInt( d, key, tr_torrentGetRatioMode( tor ) );
     else if( !strcmp( key, "sizeWhenDone" ) )
         tr_bencDictAddInt( d, key, st->sizeWhenDone );
     else if( !strcmp( key, "startDate" ) )
@@ -699,6 +703,10 @@ torrentSet( tr_session               * session,
             tr_torrentSetRatioLimit( tor, d );
         if( tr_bencDictFindInt( args_in, "ratio-limit-mode", &tmp ) )
             tr_torrentSetRatioMode( tor, tmp );
+        if( tr_bencDictFindDouble( args_in, "seedRatioLimit", &d ) )
+            tr_torrentSetRatioLimit( tor, d );
+        if( tr_bencDictFindInt( args_in, "seedRatioMode", &tmp ) )
+            tr_torrentSetRatioMode( tor, tmp );
         notify( session, TR_RPC_TORRENT_CHANGED, tor );
     }
 
@@ -854,6 +862,7 @@ sessionSet( tr_session               * session,
             tr_benc                  * args_out UNUSED,
             struct tr_rpc_idle_data  * idle_data )
 {
+    tr_bool      b;
     int64_t      i;
     double       d;
     const char * str;
@@ -886,6 +895,10 @@ sessionSet( tr_session               * session,
         tr_sessionSetPeerPort( session, i );
     if( tr_bencDictFindInt( args_in, TR_PREFS_KEY_PORT_FORWARDING, &i ) )
         tr_sessionSetPortForwardingEnabled( session, i );
+    if( tr_bencDictFindDouble( args_in, "seedRatioLimit", &d ) )
+        tr_sessionSetRatioLimit( session, d );
+    if( tr_bencDictFindBool( args_in, "seedRatioLimited", &b ) )
+        tr_sessionSetRatioLimited( session, b );
     if( tr_bencDictFindInt( args_in, "speed-limit-down", &i ) )
         tr_sessionSetSpeedLimit( session, TR_DOWN, i );
     if( tr_bencDictFindInt( args_in, "speed-limit-down-enabled", &i ) )
@@ -986,6 +999,8 @@ sessionGet( tr_session               * s,
     tr_bencDictAddInt( d, TR_PREFS_KEY_PORT_FORWARDING, tr_sessionIsPortForwardingEnabled( s ) );
     tr_bencDictAddInt( d, "rpc-version", 4 );
     tr_bencDictAddInt( d, "rpc-version-minimum", 1 );
+    tr_bencDictAddDouble( d, "seedRatioLimit", tr_sessionGetRatioLimit( s ) );
+    tr_bencDictAddBool( d, "seedRatioLimited", tr_sessionIsRatioLimited( s ) );
     tr_bencDictAddInt( d, "speed-limit-up", tr_sessionGetSpeedLimit( s, TR_UP ) );
     tr_bencDictAddInt( d, "speed-limit-up-enabled", tr_sessionIsSpeedLimited( s, TR_UP ) );
     tr_bencDictAddInt( d, "speed-limit-down", tr_sessionGetSpeedLimit( s, TR_DOWN ) );

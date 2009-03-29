@@ -107,6 +107,8 @@
    "priority-high"                   | array      indices of high-priority file(s)
    "priority-low"                    | array      indices of low-priority file(s)
    "priority-normal"                 | array      indices of normal-priority file(s)
+   "seedRatioLimit"                  | 'double'   session seeding ratio
+   "seedRatioLimited"                | 'boolean'  true if "seedRatioLimit" is honored
    "uploadLimit"                     | number     maximum upload speed (in K/s)
    "uploadLimited"                   | 'boolean'  true if "uploadLimit" is honored
 
@@ -184,6 +186,8 @@
    scrapeResponse                  | string                      | tr_stat
    scrapeURL                       | string                      | tr_stat
    seeders                         | number                      | tr_stat
+   seedRatioLimit                  | 'double'                    | tr_torrent
+   seedRatioMode                   | number                      | tr_ratiolimit
    sizeWhenDone                    | number                      | tr_stat
    startDate                       | number                      | tr_stat
    status                          | number                      | tr_stat
@@ -438,7 +442,9 @@
          |         | yes       | torrent-set    | new arg "ratio"
          |         | yes       | torrent-set    | new arg "downloadLimited"
          |         | yes       | torrent-set    | new arg "uploadLimited"
-         |         | yes       | torrent-set    | new arg "honorsSessionLImits"
+         |         | yes       | torrent-set    | new arg "honorsSessionLimits"
+         |         | yes       | session-get    | new arg "seedRatioLimit"
+         |         | yes       | session-get    | new arg "seedRatioLimited"
          |         | yes       | session-get    | new arg "alt-speed-enabled"
          |         | yes       | session-get    | new arg "alt-speed-time-enabled"
          |         | yes       | session-get    | new arg "alt-speed-up"
@@ -448,6 +454,8 @@
          |         | yes       | session-get    | new arg "blocklist-enabled"
          |         | yes       | session-get    | new arg "blocklist-size"
          |         | yes       | session-get    | new arg "peer-limit-per-torrent"
+         |         | yes       | torrent-get    | new arg "seedRatioLimit"
+         |         | yes       | torrent-get    | new arg "seedRatioMode"
          |         | yes       | torrent-get    | new ids option "recently-active"
          |         | yes       |                | new method "torrent-reannounce"
          |         |        NO | torrent-get    | removed arg "downloadLimitMode"

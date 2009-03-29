@@ -446,6 +446,15 @@ tr_bencDictFindInt( tr_benc * dict, const char * key, int64_t * setme )
 }
 
 tr_bool
+tr_bencDictFindBool( tr_benc * dict, const char * key, tr_bool * setme )
+{
+    int64_t i = 0;
+    const tr_bool found = tr_bencDictFindInt( dict, key, &i ); 
+    *setme = i!=0;
+    return found;
+}
+
+tr_bool
 tr_bencDictFindDouble( tr_benc * dict, const char * key, double * setme )
 {
     const char * str;
@@ -697,6 +706,14 @@ tr_bencDictAddInt( tr_benc *    dict,
     tr_bencInitInt( child, val );
 
     return child;
+}
+
+tr_benc*
+tr_bencDictAddBool( tr_benc * dict, const char * key, tr_bool val )
+{
+    assert( tr_isBool( val ) );
+
+    return tr_bencDictAddInt( dict, key, val );
 }
 
 tr_benc*
