@@ -476,6 +476,7 @@ tr_sessionInitImpl( void * vdata )
     int64_t i;
     int64_t j;
     double  d;
+    tr_bool useAltSpeedTime;
     tr_bool found;
     const char * str;
     tr_benc settings;
@@ -651,7 +652,7 @@ tr_sessionInitImpl( void * vdata )
 
     found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED, &i );
     assert( found );
-    tr_bool useAltSpeedTime = i!=0;
+    useAltSpeedTime = i!=0;
     tr_sessionUseAltSpeedTime( session, useAltSpeedTime );
 
     if( !useAltSpeedTime )
@@ -1041,9 +1042,10 @@ tr_sessionUseAltSpeedTime( tr_session * s, tr_bool b )
 
     if( s->altSpeedTimeEnabled != b )
     {
+        const tr_bool isAlt = isAltTime( s );
+
         s->altSpeedTimeEnabled = b;
 
-        const tr_bool isAlt = isAltTime( s );
         if( b && s->altSpeedEnabled != isAlt )
             tr_sessionUseAltSpeed( s, isAlt );
     }
