@@ -219,28 +219,29 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         }
         
         tr_benc settings;
-        tr_bencInitDict(&settings, 28);
+        tr_bencInitDict(&settings, 32);
         tr_sessionGetDefaultSettings(&settings);
         
         #warning how to work with schedule?
-        if (![fDefaults boolForKey: @"SpeedLimitAuto"])
-            tr_bencDictAddInt(&settings, TR_PREFS_KEY_ALT_SPEED_ENABLED, [fDefaults boolForKey: @"SpeedLimit"]);
+        const BOOL usesSpeedLimitSched = [fDefaults boolForKey: @"SpeedLimitAuto"];
+        if (!usesSpeedLimitSched)
+            tr_bencDictAddBool(&settings, TR_PREFS_KEY_ALT_SPEED_ENABLED, [fDefaults boolForKey: @"SpeedLimit"]);
         
         tr_bencDictAddInt(&settings, TR_PREFS_KEY_ALT_SPEED_UP, [fDefaults integerForKey: @"SpeedLimitUploadLimit"]);
         tr_bencDictAddInt(&settings, TR_PREFS_KEY_ALT_SPEED_DOWN, [fDefaults integerForKey: @"SpeedLimitDownloadLimit"]);
         
-        tr_bencDictAddInt(&settings, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED, [fDefaults boolForKey: @"SpeedLimitAuto"]);
+        tr_bencDictAddBool(&settings, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED, [fDefaults boolForKey: @"SpeedLimitAuto"]);
         tr_bencDictAddInt(&settings, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN, [PrefsController dateToTimeSum:
                                                                             [fDefaults objectForKey: @"SpeedLimitAutoOnDate"]]);
         tr_bencDictAddInt(&settings, TR_PREFS_KEY_ALT_SPEED_TIME_END, [PrefsController dateToTimeSum:
                                                                             [fDefaults objectForKey: @"SpeedLimitAutoOffDate"]]);
         
         tr_bencDictAddInt(&settings, TR_PREFS_KEY_DSPEED, [fDefaults integerForKey: @"DownloadLimit"]);
-        tr_bencDictAddInt(&settings, TR_PREFS_KEY_DSPEED_ENABLED, [fDefaults boolForKey: @"CheckDownload"]);
+        tr_bencDictAddBool(&settings, TR_PREFS_KEY_DSPEED_ENABLED, [fDefaults boolForKey: @"CheckDownload"]);
         tr_bencDictAddInt(&settings, TR_PREFS_KEY_USPEED, [fDefaults integerForKey: @"UploadLimit"]);
-        tr_bencDictAddInt(&settings, TR_PREFS_KEY_USPEED_ENABLED, [fDefaults boolForKey: @"CheckUpload"]);
+        tr_bencDictAddBool(&settings, TR_PREFS_KEY_USPEED_ENABLED, [fDefaults boolForKey: @"CheckUpload"]);
         
-        tr_bencDictAddInt(&settings, TR_PREFS_KEY_BLOCKLIST_ENABLED, [fDefaults boolForKey: @"Blocklist"]);
+        tr_bencDictAddBool(&settings, TR_PREFS_KEY_BLOCKLIST_ENABLED, [fDefaults boolForKey: @"Blocklist"]);
         
         #warning update when changing in prefs
         tr_bencDictAddStr(&settings, TR_PREFS_KEY_DOWNLOAD_DIR, [[[fDefaults stringForKey: @"DownloadFolder"]
@@ -251,7 +252,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         tr_bencDictAddInt(&settings, TR_PREFS_KEY_PEER_LIMIT_TORRENT, [fDefaults integerForKey: @"PeersTorrent"]);
         
         const BOOL randomPort = [fDefaults boolForKey: @"RandomPort"];
-        tr_bencDictAddInt(&settings, TR_PREFS_KEY_PEER_PORT_RANDOM_ENABLED, randomPort);
+        tr_bencDictAddBool(&settings, TR_PREFS_KEY_PEER_PORT_RANDOM_ENABLED, randomPort);
         if (!randomPort)
             tr_bencDictAddInt(&settings, TR_PREFS_KEY_PEER_PORT, [fDefaults integerForKey: @"BindPort"]);
         
@@ -259,20 +260,20 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         if ([fDefaults objectForKey: @"PeerSocketTOS"])
             tr_bencDictAddInt(&settings, TR_PREFS_KEY_PEER_SOCKET_TOS, [fDefaults integerForKey: @"PeerSocketTOS"]);
         
-        tr_bencDictAddInt(&settings, TR_PREFS_KEY_PEX_ENABLED, [fDefaults boolForKey: @"PEXGlobal"]);
-        tr_bencDictAddInt(&settings, TR_PREFS_KEY_PORT_FORWARDING, [fDefaults boolForKey: @"NatTraversal"]);
-        tr_bencDictAddInt(&settings, TR_PREFS_KEY_PROXY_AUTH_ENABLED, [fDefaults boolForKey: @"ProxyAuthorize"]);
-        tr_bencDictAddInt(&settings, TR_PREFS_KEY_PROXY_ENABLED, [fDefaults boolForKey: @"Proxy"]);
+        tr_bencDictAddBool(&settings, TR_PREFS_KEY_PEX_ENABLED, [fDefaults boolForKey: @"PEXGlobal"]);
+        tr_bencDictAddBool(&settings, TR_PREFS_KEY_PORT_FORWARDING, [fDefaults boolForKey: @"NatTraversal"]);
+        tr_bencDictAddBool(&settings, TR_PREFS_KEY_PROXY_AUTH_ENABLED, [fDefaults boolForKey: @"ProxyAuthorize"]);
+        tr_bencDictAddBool(&settings, TR_PREFS_KEY_PROXY_ENABLED, [fDefaults boolForKey: @"Proxy"]);
         tr_bencDictAddInt(&settings, TR_PREFS_KEY_PROXY_PORT, [fDefaults integerForKey: @"ProxyPort"]);
         tr_bencDictAddStr(&settings, TR_PREFS_KEY_PROXY, [[fDefaults stringForKey: @"ProxyAddress"] UTF8String]);
         tr_bencDictAddStr(&settings, TR_PREFS_KEY_PROXY_USERNAME,  [[fDefaults stringForKey: @"ProxyUsername"] UTF8String]);
-        tr_bencDictAddInt(&settings, TR_PREFS_KEY_RPC_AUTH_REQUIRED,  [fDefaults boolForKey: @"RPCAuthorize"]);
-        tr_bencDictAddDouble(&settings, TR_PREFS_KEY_RATIO, [fDefaults floatForKey: @"RatioLimit"]);
-        tr_bencDictAddInt(&settings, TR_PREFS_KEY_RATIO_ENABLED, [fDefaults boolForKey: @"RatioCheck"]);
-        tr_bencDictAddInt(&settings, TR_PREFS_KEY_RPC_ENABLED,  [fDefaults boolForKey: @"RPC"]);
+        tr_bencDictAddBool(&settings, TR_PREFS_KEY_RPC_AUTH_REQUIRED,  [fDefaults boolForKey: @"RPCAuthorize"]);
+        tr_bencDictAddReal(&settings, TR_PREFS_KEY_RATIO, [fDefaults floatForKey: @"RatioLimit"]);
+        tr_bencDictAddBool(&settings, TR_PREFS_KEY_RATIO_ENABLED, [fDefaults boolForKey: @"RatioCheck"]);
+        tr_bencDictAddBool(&settings, TR_PREFS_KEY_RPC_ENABLED,  [fDefaults boolForKey: @"RPC"]);
         tr_bencDictAddInt(&settings, TR_PREFS_KEY_RPC_PORT,  [fDefaults integerForKey: @"RPCPort"]);
         tr_bencDictAddStr(&settings, TR_PREFS_KEY_RPC_USERNAME,  [[fDefaults stringForKey: @"RPCUsername"] UTF8String]);
-        tr_bencDictAddInt(&settings, TR_PREFS_KEY_RPC_WHITELIST_ENABLED,  [fDefaults boolForKey: @"RPCUseWhitelist"]);
+        tr_bencDictAddBool(&settings, TR_PREFS_KEY_RPC_WHITELIST_ENABLED,  [fDefaults boolForKey: @"RPCUseWhitelist"]);
         
         fLib = tr_sessionInit("macosx", tr_getDefaultConfigDir("Transmission"), YES, &settings);
         tr_bencFree(&settings);
@@ -292,8 +293,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         fSoundPlaying = NO;
         
-        #warning needs to set before init
         tr_sessionSetAltSpeedFunc(fLib, altSpeedToggledCallback, self);
+        if (usesSpeedLimitSched)
+            [fDefaults setBool: tr_sessionUsesAltSpeed(fLib) forKey: @"SpeedLimit"];
         
         tr_sessionSetRPCCallback(fLib, rpcCallback, self);
         
