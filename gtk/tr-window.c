@@ -671,7 +671,7 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
     p->alt_speed_image[0] = gtk_image_new_from_stock( "alt-speed-off", -1 );
     p->alt_speed_image[1]  = gtk_image_new_from_stock( "alt-speed-on", -1 );
     w = p->alt_speed_button = gtk_toggle_button_new( );
-    gtk_button_set_relief( GTK_BUTTON( w ), GTK_RELIEF_NONE );
+    /*gtk_button_set_relief( GTK_BUTTON( w ), GTK_RELIEF_NONE );*/
     g_object_ref( G_OBJECT( p->alt_speed_image[0] ) );
     g_object_ref( G_OBJECT( p->alt_speed_image[1] ) );
     g_signal_connect( w, "toggled", G_CALLBACK(alt_speed_toggled_cb ), p );
