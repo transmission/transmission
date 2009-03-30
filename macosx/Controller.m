@@ -145,8 +145,10 @@ typedef enum
 
 static void altSpeedToggledCallback(tr_session * handle UNUSED, tr_bool active, tr_bool byUser, void * controller)
 {
+    NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys: [[NSNumber alloc] initWithBool: active], @"Active",
+                                [[NSNumber alloc] initWithBool: byUser], @"ByUser", nil];
     [(Controller *)controller performSelectorOnMainThread: @selector(altSpeedToggledCallbackIsLimited:)
-        withObject: [[NSNumber alloc] initWithBool: active] waitUntilDone: NO];
+        withObject: dict waitUntilDone: NO];
 }
 
 static tr_rpc_callback_status rpcCallback(tr_session * handle UNUSED, tr_rpc_callback_type type, struct tr_torrent * torrentStruct, void * controller)
@@ -2322,22 +2324,22 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [self updateSpeedFieldsToolTips];
 }
 
-//limited has been retained
-- (void) altSpeedToggledCallbackIsLimited: (NSNumber *) limited
+//dict has been retained
+- (void) altSpeedToggledCallbackIsLimited: (NSDictionary *) dict
 {
-    const BOOL isLimited = [limited boolValue];
+    const BOOL isLimited = [[dict objectForKey: @"Active"] boolValue];
 
     [fDefaults setBool: isLimited forKey: @"SpeedLimit"];
     [self updateSpeedFieldsToolTips];
     
-    #warning don't show on startup or on manual changed
-    [GrowlApplicationBridge notifyWithTitle: isLimited
-            ? NSLocalizedString(@"Speed Limit Auto Enabled", "Growl notification title")
-            : NSLocalizedString(@"Speed Limit Auto Disabled", "Growl notification title")
-        description: NSLocalizedString(@"Bandwidth settings changed", "Growl notification description")
-        notificationName: GROWL_AUTO_SPEED_LIMIT iconData: nil priority: 0 isSticky: NO clickContext: nil];
+    if (![[dict objectForKey: @"ByUser"] boolValue])
+        [GrowlApplicationBridge notifyWithTitle: isLimited
+                ? NSLocalizedString(@"Speed Limit Auto Enabled", "Growl notification title")
+                : NSLocalizedString(@"Speed Limit Auto Disabled", "Growl notification title")
+            description: NSLocalizedString(@"Bandwidth settings changed", "Growl notification description")
+            notificationName: GROWL_AUTO_SPEED_LIMIT iconData: nil priority: 0 isSticky: NO clickContext: nil];
     
-    [limited release];
+    [dict release];
 }
 
 - (void) setLimitGlobalEnabled: (id) sender

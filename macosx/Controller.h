@@ -211,7 +211,7 @@ typedef enum
 
 - (void) toggleSpeedLimit: (id) sender;
 - (void) speedLimitChanged: (id) sender;
-- (void) altSpeedToggledCallbackIsLimited: (NSNumber *) limited;
+- (void) altSpeedToggledCallbackIsLimited: (NSDictionary *) dict;
 
 - (void) setLimitGlobalEnabled: (id) sender;
 - (void) setQuickLimitGlobal: (id) sender;
