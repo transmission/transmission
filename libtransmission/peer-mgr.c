@@ -995,6 +995,13 @@ peerSuggestedPiece( Torrent            * t UNUSED,
 #endif
 }
 
+static int
+checkRatioIdle( void * tor )
+{
+    tr_torrentCheckSeedRatio( tor );
+    return 0; /* one-shot timer */
+}
+
 static void
 peerCallbackFunc( void * vpeer, void * vevent, void * vt )
 {
@@ -1043,7 +1050,11 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
                     a->piece_data_time = now;
             }
 
-            tr_torrentCheckSeedRatio( tor );
+            /* we can't check the stop ratio here because the code calling
+             * this function requires that the torrent not be stopped.
+             * so instead, add an idle timer to check the ratio as soon
+             * as the calling code is done.  (ticket #1894) */
+            tr_timerNew( tor->session, checkRatioIdle, tor, 1 );
 
             break;
         }
