@@ -163,8 +163,9 @@ tr_bool   tr_bencDictFindRaw( tr_benc *, const char * key,
 ***/
 
 tr_bool   tr_bencGetInt( const tr_benc * val, int64_t * setme );
-
 tr_bool   tr_bencGetStr( const tr_benc * val, const char ** setme );
+tr_bool   tr_bencGetBool( const tr_benc * val, tr_bool * setme );
+tr_bool   tr_bencGetReal( const tr_benc * val, double * setme );
 
 static TR_INLINE tr_bool tr_bencIsType  ( const tr_benc * b, int type ) { return ( b != NULL ) && ( b->type == type ); }
 static TR_INLINE tr_bool tr_bencIsInt   ( const tr_benc * b ) { return tr_bencIsType( b, TYPE_INT ); }

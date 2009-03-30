@@ -414,7 +414,7 @@ tr_bool
 tr_bencGetInt( const tr_benc * val,
                int64_t *       setme )
 {
-    const int success = tr_bencIsInt( val );
+    const tr_bool success = tr_bencIsInt( val );
 
     if( success && setme )
         *setme = val->val.i;
@@ -430,43 +430,64 @@ tr_bencGetStr( const tr_benc * val,
 
     if( success )
         *setme = val->val.s.s;
+
+    return success;
+}
+
+tr_bool
+tr_bencGetBool( const tr_benc * val, tr_bool * setme )
+{
+    tr_bool success = FALSE;
+
+    if( !success && tr_bencIsInt( val ) )
+        if(( success = ( val->val.i==0 || val->val.i==1 ) ))
+            *setme = val->val.i!=0;
+
+    if( !success && tr_bencIsString( val ) )
+        if(( success = ( !strcmp(val->val.s.s,"true") || !strcmp(val->val.s.s,"false"))))
+            *setme = !strcmp(val->val.s.s,"true");
+
+    return success;
+}
+
+tr_bool
+tr_bencGetReal( const tr_benc * val, double * setme )
+{
+    tr_bool success = FALSE;
+
+    if( !success && tr_bencIsString(val) )
+    {
+        char * endptr;
+        const double d = strtod( val->val.s.s, &endptr );
+        if(( success = ( val->val.s.s != endptr ) && !*endptr ))
+            *setme = d;
+    }
+
+    if( !success && tr_bencIsInt(val) )
+    {
+        success = TRUE;
+        *setme = val->val.i;
+    }
+
     return success;
 }
 
 tr_bool
 tr_bencDictFindInt( tr_benc * dict, const char * key, int64_t * setme )
 {
-    tr_bool found = FALSE;
-    tr_benc * child = tr_bencDictFindType( dict, key, TYPE_INT );
-
-    if( child )
-        found = tr_bencGetInt( child, setme );
-
-    return found;
+    return tr_bencGetInt( tr_bencDictFind( dict, key ), setme );
 }
 
 tr_bool
 tr_bencDictFindBool( tr_benc * dict, const char * key, tr_bool * setme )
 {
-    int64_t i = -1;
-    const tr_bool found = tr_bencDictFindInt( dict, key, &i ); 
-    if( found ) {
-        assert( i==0 || i==1 );
-        *setme = i!=0;
-    }
-    return found;
+    return tr_bencGetBool( tr_bencDictFind( dict, key ), setme );
 }
 
 tr_bool
 tr_bencDictFindReal( tr_benc * dict, const char * key, double * setme )
 {
-    const char * str;
-    const tr_bool success = tr_bencDictFindStr( dict, key, &str );
-
-    if( success && setme )
-        *setme = strtod( str, NULL );
-
-    return success;
+    return tr_bencGetReal( tr_bencDictFind( dict, key ), setme );
 }
 
 tr_bool
