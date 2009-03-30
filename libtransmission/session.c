@@ -470,13 +470,15 @@ tr_sessionInit( const char  * tag,
     return session;
 }
 
+static void useAltSpeed( tr_session * session, tr_bool enabled, tr_bool byUser );
+static void useAltSpeedTime( tr_session * session, tr_bool enabled, tr_bool byUser );
+
 static void
 tr_sessionInitImpl( void * vdata )
 {
     int64_t i;
     int64_t j;
     double  d;
-    tr_bool useAltSpeedTime;
     tr_bool found;
     tr_bool boolVal;
     const char * str;
@@ -653,17 +655,16 @@ tr_sessionInitImpl( void * vdata )
 
     found = tr_bencDictFindBool( &settings, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED, &boolVal );
     assert( found );
-    useAltSpeedTime = boolVal;
-    tr_sessionUseAltSpeedTime( session, useAltSpeedTime );
+    useAltSpeedTime( session, boolVal, FALSE );
 
-    if( !useAltSpeedTime )
+    if( !boolVal )
     {
         found = tr_bencDictFindBool( &settings, TR_PREFS_KEY_ALT_SPEED_ENABLED, &boolVal );
         assert( found );
-        tr_sessionUseAltSpeed( session, boolVal );
+        useAltSpeed( session, boolVal, FALSE );
     }
     else
-        tr_sessionUseAltSpeed( session, isAltTime( session ) );
+        useAltSpeed( session, isAltTime( session ), FALSE );
 
     /**
     ***  Blocklist
@@ -913,7 +914,7 @@ altSpeedToggled( void * vsession )
     updateBandwidth( session, TR_DOWN );
 
     if( session->altCallback != NULL )
-        (*session->altCallback)( session, session->altSpeedEnabled, session->altCallbackUserData );
+        (*session->altCallback)( session, session->altSpeedEnabled, session->altSpeedChangedByUser, session->altCallbackUserData );
 }
 
 /* tell the alt speed limit timer to fire again at the top of the minute */
@@ -953,11 +954,11 @@ onAltTimer( int foo UNUSED, short bar UNUSED, void * vsession )
 
         if( currentMinute == session->altSpeedTimeBegin )
         {
-            tr_sessionUseAltSpeed( session, TRUE );
+            useAltSpeed( session, TRUE, FALSE );
         }
         else if( currentMinute == session->altSpeedTimeEnd )
         {
-            tr_sessionUseAltSpeed( session, FALSE );
+            useAltSpeed( session, FALSE, FALSE );
         }
     }
 
@@ -1036,20 +1037,26 @@ tr_sessionGetAltSpeed( const tr_session * s, tr_direction d )
 }
 
 void
+useAltSpeedTime( tr_session * session, tr_bool enabled, tr_bool byUser )
+{
+    assert( tr_isSession( session ) );
+    assert( tr_isBool( enabled ) );
+    assert( tr_isBool( byUser ) );
+
+    if( session->altSpeedTimeEnabled != enabled )
+    {
+        const tr_bool isAlt = isAltTime( session );
+
+        session->altSpeedTimeEnabled = enabled;
+
+        if( enabled && session->altSpeedEnabled != isAlt )
+            useAltSpeed( session, isAlt, byUser );
+    }
+}
+void
 tr_sessionUseAltSpeedTime( tr_session * s, tr_bool b )
 {
-    assert( tr_isSession( s ) );
-    assert( tr_isBool( b ) );
-
-    if( s->altSpeedTimeEnabled != b )
-    {
-        const tr_bool isAlt = isAltTime( s );
-
-        s->altSpeedTimeEnabled = b;
-
-        if( b && s->altSpeedEnabled != isAlt )
-            tr_sessionUseAltSpeed( s, isAlt );
-    }
+    useAltSpeedTime( s, b, TRUE );
 }
 
 tr_bool
@@ -1071,7 +1078,7 @@ tr_sessionSetAltSpeedBegin( tr_session * s, int minutes )
         s->altSpeedTimeBegin = minutes;
 
         if( tr_sessionUsesAltSpeedTime( s ) )
-            tr_sessionUseAltSpeed( s, isAltTime( s ) );
+            useAltSpeed( s, isAltTime( s ), TRUE );
     }
 }
 
@@ -1094,7 +1101,7 @@ tr_sessionSetAltSpeedEnd( tr_session * s, int minutes )
         s->altSpeedTimeEnd = minutes;
 
         if( tr_sessionUsesAltSpeedTime( s ) )
-            tr_sessionUseAltSpeed( s, isAltTime( s ) );
+            useAltSpeed( s, isAltTime( s ), TRUE );
     }
 }
 
@@ -1107,17 +1114,24 @@ tr_sessionGetAltSpeedEnd( const tr_session * s )
 }
 
 void
-tr_sessionUseAltSpeed( tr_session * s, tr_bool b )
+useAltSpeed( tr_session * s, tr_bool enabled, tr_bool byUser )
 {
     assert( tr_isSession( s ) );
-    assert( tr_isBool( b ) );
+    assert( tr_isBool( enabled ) );
+    assert( tr_isBool( byUser ) );
 
-    if( s->altSpeedEnabled != b)
+    if( s->altSpeedEnabled != enabled)
     {
-        s->altSpeedEnabled = b;
+        s->altSpeedEnabled = enabled;
+        s->altSpeedChangedByUser = byUser;
     
         tr_runInEventThread( s, altSpeedToggled, s );
     }
+}
+void
+tr_sessionUseAltSpeed( tr_session * session, tr_bool enabled )
+{
+    useAltSpeed( session, enabled, TRUE );
 }
 
 tr_bool

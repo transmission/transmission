@@ -78,6 +78,7 @@ struct tr_session
     int                          altSpeedTimeBegin;
     int                          altSpeedTimeEnd;
     tr_bool                      altSpeedTimeEnabled;
+    tr_bool                      altSpeedChangedByUser;
 
     tr_altSpeedFunc            * altCallback;
     void                       * altCallbackUserData;

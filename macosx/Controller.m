@@ -143,7 +143,7 @@ typedef enum
 #define TRAC_URL   @"http://trac.transmissionbt.com/"
 #define DONATE_URL  @"http://www.transmissionbt.com/donate.php"
 
-static void altSpeedToggledCallback(tr_session * handle UNUSED, tr_bool active, void * controller)
+static void altSpeedToggledCallback(tr_session * handle UNUSED, tr_bool active, tr_bool byUser, void * controller)
 {
     [(Controller *)controller performSelectorOnMainThread: @selector(altSpeedToggledCallbackIsLimited:)
         withObject: [[NSNumber alloc] initWithBool: active] waitUntilDone: NO];

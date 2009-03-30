@@ -588,7 +588,7 @@ int      tr_sessionGetAltSpeedBegin   ( const tr_session * );
 void     tr_sessionSetAltSpeedEnd     ( tr_session *, int minsSinceMidnight );
 int      tr_sessionGetAltSpeedEnd     ( const tr_session * );
 
-typedef void ( tr_altSpeedFunc )      ( tr_session *, tr_bool active, void * );
+typedef void ( tr_altSpeedFunc )      ( tr_session *, tr_bool active, tr_bool userDriven, void * );
 void     tr_sessionClearAltSpeedFunc  ( tr_session * );
 void     tr_sessionSetAltSpeedFunc    ( tr_session *, tr_altSpeedFunc *, void * );
 
