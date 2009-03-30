@@ -171,13 +171,18 @@ TransmissionRemote.prototype =
 		this.sendTorrentCommand( 'torrent-verify', torrents );
 	},
 	addTorrentByUrl: function( url, options ) {
-		this.sendRequest( RPC._Root, $.toJSON({
+		var remote = this;
+		var o = {
 			method: 'torrent-add',
 			arguments: {
 				paused: (options.paused ? 'true' : 'false'),
 				filename: url
 			}
-		}) );
+		};
+		
+		this.sendRequest(o, function() {
+			remote.loadTorrents();
+		} );
 	},
 	savePrefs: function( args ) {
 		var remote = this;
