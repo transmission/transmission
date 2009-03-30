@@ -458,7 +458,16 @@ tr_bencGetReal( const tr_benc * val, double * setme )
     if( !success && tr_bencIsString(val) )
     {
         char * endptr;
-        const double d = strtod( val->val.s.s, &endptr );
+        char * locale; 
+        double d;
+
+        /* the json spec requires a '.' decimal point regardless of locale */
+        locale = tr_strdup( setlocale ( LC_NUMERIC, NULL ) );
+        setlocale( LC_NUMERIC, "POSIX" );
+        d  = strtod( val->val.s.s, &endptr );
+        setlocale( LC_NUMERIC, locale );
+        tr_free( locale );
+
         if(( success = ( val->val.s.s != endptr ) && !*endptr ))
             *setme = d;
     }
