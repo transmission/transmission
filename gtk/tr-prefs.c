@@ -1349,11 +1349,11 @@ tr_prefs_dialog_new( GObject *   core,
                               networkPage( core ),
                               gtk_label_new ( _( "Network" ) ) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ),
+                              bandwidthPage( core ),
+                              gtk_label_new ( _( "Speed" ) ) );
+    gtk_notebook_append_page( GTK_NOTEBOOK( n ),
                               desktopPage( core ),
                               gtk_label_new ( _( "Desktop" ) ) );
-    gtk_notebook_append_page( GTK_NOTEBOOK( n ),
-                              bandwidthPage( core ),
-                              gtk_label_new ( _( "Bandwidth" ) ) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ),
                               webPage( core ),
                               gtk_label_new ( _( "Web" ) ) );
