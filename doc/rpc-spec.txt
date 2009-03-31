@@ -153,6 +153,7 @@
    errorString                     | number                      | tr_stat
    eta                             | number                      | tr_stat
    files                           | array (see below)           | n/a
+   fileStats                       | array (see below)           | n/a
    hashString                      | string                      | tr_info
    haveUnchecked                   | number                      | tr_stat
    haveValid                       | number                      | tr_stat
@@ -212,6 +213,14 @@
                           | bytesCompleted          | number     | tr_torrent
                           | length                  | number     | tr_info
                           | name                    | string     | tr_info
+   -----------------------+--------------------------------------+
+   fileStats              | a file's non-constant properties.    |
+                          | array of tr_info.filecount objects,  |
+                          | each containing:                     |
+                          +-------------------------+------------+
+                          | bytesCompleted          | number     | tr_torrent
+                          | wanted                  | 'boolean'  | tr_info
+                          | priority                | number     | tr_info
    -----------------------+--------------------------------------+
    peers                  | array of objects, each containing:   |
                           +-------------------------+------------+
@@ -440,6 +449,7 @@
          |         | yes       | torrent-get    | new arg "downloadDir"
    ------+---------+-----------+----------------+-------------------------------
    6     | 1.60    | yes       | torrent-get    | new arg "pieces"
+         |         | yes       | torrent-get    | new arg "fileStats"
          |         | yes       | torrent-set    | new arg "ratio"
          |         | yes       | torrent-set    | new arg "downloadLimited"
          |         | yes       | torrent-set    | new arg "uploadLimited"

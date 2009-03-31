@@ -289,6 +289,26 @@ torrentVerify( tr_session               * session,
 ***/
 
 static void
+addFileStats( const tr_torrent * tor, tr_benc * list )
+{
+    tr_file_index_t i;
+    tr_file_index_t n;
+    const tr_info * info = tr_torrentInfo( tor );
+    tr_file_stat * files = tr_torrentFiles( tor, &n );
+
+    for( i = 0; i < info->fileCount; ++i )
+    {
+        const tr_file * file = &info->files[i];
+        tr_benc * d = tr_bencListAddDict( list, 3 );
+        tr_bencDictAddInt( d, "bytesCompleted", files[i].bytesCompleted );
+        tr_bencDictAddInt( d, "priority", file->priority );
+        tr_bencDictAddBool( d, "wanted", !file->dnd );
+    }
+
+    tr_torrentFilesFree( files, n );
+}
+
+static void
 addFiles( const tr_torrent * tor,
           tr_benc *          list )
 {
@@ -415,6 +435,8 @@ addField( const tr_torrent * tor,
         tr_bencDictAddInt( d, key, st->eta );
     else if( !strcmp( key, "files" ) )
         addFiles( tor, tr_bencDictAddList( d, key, inf->fileCount ) );
+    else if( !strcmp( key, "fileStats" ) )
+        addFileStats( tor, tr_bencDictAddList( d, key, inf->fileCount ) );
     else if( !strcmp( key, "hashString" ) )
         tr_bencDictAddStr( d, key, tor->info.hashString );
     else if( !strcmp( key, "haveUnchecked" ) )
