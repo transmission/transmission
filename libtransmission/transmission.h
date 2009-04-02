@@ -65,6 +65,15 @@ typedef uint64_t tr_block_index_t;
 typedef uint16_t tr_port;
 typedef uint8_t tr_bool;
 
+enum
+{
+    TR_PRI_LOW    = -1,
+    TR_PRI_NORMAL =  0, /* since NORMAL is 0, memset initializes nicely */
+    TR_PRI_HIGH   =  1
+};
+
+typedef int8_t tr_priority_t;
+
 /**
  * @brief returns Transmission's default configuration file directory.
  *
@@ -792,6 +801,17 @@ void        tr_ctorSetPaused( tr_ctor      * ctor,
                               tr_ctorMode    mode,
                               tr_bool        isPaused );
 
+void        tr_ctorSetFilePriorities( tr_ctor                * ctor,
+                                      const tr_file_index_t  * files,
+                                      tr_file_index_t          fileCount,
+                                      tr_priority_t            priority );
+
+void        tr_ctorSetFilesWanted( tr_ctor                * ctor,
+                                   const tr_file_index_t  * fileIndices,
+                                   tr_file_index_t          fileCount,
+                                   tr_bool                  wanted );
+
+
 int         tr_ctorGetPeerLimit( const tr_ctor * ctor,
                                  tr_ctorMode     mode,
                                  uint16_t *      setmeCount );
@@ -947,14 +967,6 @@ uint16_t      tr_torrentGetPeerLimit( const tr_torrent * tor );
 *****  File Priorities
 ****/
 
-enum
-{
-    TR_PRI_LOW    = -1,
-    TR_PRI_NORMAL =  0, /* since NORMAL is 0, memset initializes nicely */
-    TR_PRI_HIGH   =  1
-};
-
-typedef int8_t tr_priority_t;
 
 /**
  * @brief Set a batch of files to a particular priority.

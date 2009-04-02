@@ -581,6 +581,10 @@ torrentRealInit( tr_torrent * tor, const tr_ctor * ctor )
     assert( !tor->downloadedCur );
     assert( !tor->uploadedCur );
 
+    tr_ctorInitTorrentPriorities( ctor, tor );
+
+    tr_ctorInitTorrentWanted( ctor, tor );
+
     tor->error   = 0;
 
     tr_bitfieldConstruct( &tor->checkedPieces, tor->info.pieceCount );

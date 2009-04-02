@@ -321,6 +321,11 @@
    "metainfo"         | string      base64-encoded .torrent content
    "paused"           | 'boolean'   if true, don't start the torrent
    "peer-limit"       | number      maximum number of peers
+   "files-wanted"     | array       indices of file(s) to download
+   "files-unwanted"   | array       indices of file(s) to not download
+   "priority-high"    | array       indices of high-priority file(s)
+   "priority-low"     | array       indices of low-priority file(s)
+   "priority-normal"  | array       indices of normal-priority file(s)
 
    Either "filename" OR "metainfo" MUST be included.
    All other arguments are optional.
@@ -454,6 +459,11 @@
          |         | yes       | torrent-set    | new arg "downloadLimited"
          |         | yes       | torrent-set    | new arg "uploadLimited"
          |         | yes       | torrent-set    | new arg "honorsSessionLimits"
+         |         | yes       | torrent-add    | new arg "files-wanted"
+         |         | yes       | torrent-add    | new arg "files-unwanted"
+         |         | yes       | torrent-add    | new arg "priority-high"
+         |         | yes       | torrent-add    | new arg "priority-low"
+         |         | yes       | torrent-add    | new arg "priority-normal"
          |         | yes       | session-get    | new arg "seedRatioLimit"
          |         | yes       | session-get    | new arg "seedRatioLimited"
          |         | yes       | session-get    | new arg "alt-speed-enabled"

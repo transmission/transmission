@@ -16,7 +16,7 @@
 #include "platform.h"
 #include "session.h" /* tr_sessionFindTorrentFile() */
 #include "torrent.h" /* tr_ctorGetSave() */
-#include "utils.h"
+#include "utils.h" /* tr_new0 */
 
 struct optional_args
 {
@@ -43,6 +43,17 @@ struct tr_ctor
     char *                  sourceFile;
 
     struct optional_args    optionalArgs[2];
+
+    tr_file_index_t       * want;
+    tr_file_index_t         wantSize;
+    tr_file_index_t       * notWant;
+    tr_file_index_t         notWantSize;
+    tr_file_index_t       * low;
+    tr_file_index_t         lowSize;
+    tr_file_index_t       * normal;
+    tr_file_index_t         normalSize;
+    tr_file_index_t       * high;
+    tr_file_index_t         highSize;
 };
 
 /***
@@ -144,6 +155,66 @@ tr_ctorSetMetainfoFromHash( tr_ctor *    ctor,
         err = tr_ctorSetMetainfoFromFile( ctor, filename );
 
     return err;
+}
+
+/***
+****
+***/
+
+void
+tr_ctorSetFilePriorities( tr_ctor                * ctor,
+                          const tr_file_index_t  * files,
+                          tr_file_index_t          fileCount,
+                          tr_priority_t            priority )
+{
+    tr_file_index_t ** myfiles;
+    tr_file_index_t * mycount;
+
+    switch( priority ) {
+        case TR_PRI_NORMAL: myfiles = &ctor->normal; mycount = &ctor->normalSize; break;
+        case TR_PRI_LOW: myfiles = &ctor->low; mycount = &ctor->lowSize; break;
+        case TR_PRI_HIGH: myfiles = &ctor->high; mycount = &ctor->highSize; break;
+    }
+
+    tr_free( *myfiles );
+    *myfiles = tr_memdup( files, sizeof(tr_file_index_t)*fileCount );
+    *mycount = fileCount;
+}
+
+void
+tr_ctorInitTorrentPriorities( const tr_ctor * ctor, tr_torrent * tor )
+{
+    tr_file_index_t i;
+
+    for( i=0; i<ctor->lowSize; ++i )
+        tr_torrentInitFilePriority( tor, ctor->low[i], TR_PRI_LOW );
+    for( i=0; i<ctor->normalSize; ++i )
+        tr_torrentInitFilePriority( tor, ctor->normal[i], TR_PRI_NORMAL );
+    for( i=0; i<ctor->highSize; ++i )
+        tr_torrentInitFilePriority( tor, ctor->high[i], TR_PRI_HIGH );
+}
+
+void
+tr_ctorSetFilesWanted( tr_ctor                * ctor,
+                       const tr_file_index_t  * files,
+                       tr_file_index_t          fileCount,
+                       tr_bool                  wanted )
+{
+    tr_file_index_t ** myfiles = wanted ? &ctor->want : &ctor->notWant;
+    tr_file_index_t * mycount = wanted ? &ctor->wantSize : &ctor->notWantSize;
+
+    tr_free( *myfiles );
+    *myfiles = tr_memdup( files, sizeof(tr_file_index_t)*fileCount );
+    *mycount = fileCount;
+}
+
+void
+tr_ctorInitTorrentWanted( const tr_ctor * ctor, tr_torrent * tor )
+{
+    if( ctor->notWantSize )
+        tr_torrentInitFileDLs( tor, ctor->notWant, ctor->notWantSize, FALSE );
+    if( ctor->wantSize )
+        tr_torrentInitFileDLs( tor, ctor->notWant, ctor->wantSize, TRUE );
 }
 
 /***
@@ -322,5 +393,10 @@ tr_ctorFree( tr_ctor * ctor )
     clearMetainfo( ctor );
     tr_free( ctor->optionalArgs[1].downloadDir );
     tr_free( ctor->optionalArgs[0].downloadDir );
+    tr_free( ctor->want );
+    tr_free( ctor->notWant );
+    tr_free( ctor->low );
+    tr_free( ctor->high );
+    tr_free( ctor->normal );
     tr_free( ctor );
 }

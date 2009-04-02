@@ -818,6 +818,24 @@ isCurlURL( const char * filename )
         || ( strstr( filename, "https://" ) != NULL );
 }
 
+static tr_file_index_t*
+fileListFromList( tr_benc * list, tr_file_index_t * setmeCount )
+{
+    size_t i;
+    const size_t childCount = tr_bencListSize( list );
+    tr_file_index_t n = 0;
+    tr_file_index_t * files = tr_new0( tr_file_index_t, childCount );
+
+    for( i=0; i<childCount; ++i ) {
+        int64_t intVal;
+        if( tr_bencGetInt( tr_bencListChild( list, i ), &intVal ) )
+            files[n++] = (tr_file_index_t)intVal;
+    }
+
+    *setmeCount = n;
+    return files;
+}
+
 static const char*
 torrentAdd( tr_session               * session,
             tr_benc                  * args_in,
@@ -838,15 +856,51 @@ torrentAdd( tr_session               * session,
         int64_t      i;
         tr_bool      boolVal;
         const char * str;
+        tr_benc    * l;
         tr_ctor    * ctor = tr_ctorNew( session );
 
         /* set the optional arguments */
+
         if( tr_bencDictFindStr( args_in, "download-dir", &str ) )
             tr_ctorSetDownloadDir( ctor, TR_FORCE, str );
+
         if( tr_bencDictFindBool( args_in, "paused", &boolVal ) )
             tr_ctorSetPaused( ctor, TR_FORCE, boolVal );
+
         if( tr_bencDictFindInt( args_in, "peer-limit", &i ) )
             tr_ctorSetPeerLimit( ctor, TR_FORCE, i );
+
+        if( tr_bencDictFindList( args_in, "files-unwanted", &l ) ) {
+            tr_file_index_t fileCount;
+            tr_file_index_t * files = fileListFromList( l, &fileCount );
+            tr_ctorSetFilesWanted( ctor, files, fileCount, FALSE );
+            tr_free( files );
+        }
+        if( tr_bencDictFindList( args_in, "files-wanted", &l ) ) {
+            tr_file_index_t fileCount;
+            tr_file_index_t * files = fileListFromList( l, &fileCount );
+            tr_ctorSetFilesWanted( ctor, files, fileCount, TRUE );
+            tr_free( files );
+        }
+
+        if( tr_bencDictFindList( args_in, "priority-low", &l ) ) {
+            tr_file_index_t fileCount;
+            tr_file_index_t * files = fileListFromList( l, &fileCount );
+            tr_ctorSetFilePriorities( ctor, files, fileCount, TR_PRI_LOW );
+            tr_free( files );
+        }
+        if( tr_bencDictFindList( args_in, "priority-normal", &l ) ) {
+            tr_file_index_t fileCount;
+            tr_file_index_t * files = fileListFromList( l, &fileCount );
+            tr_ctorSetFilePriorities( ctor, files, fileCount, TR_PRI_NORMAL );
+            tr_free( files );
+        }
+        if( tr_bencDictFindList( args_in, "priority-high", &l ) ) {
+            tr_file_index_t fileCount;
+            tr_file_index_t * files = fileListFromList( l, &fileCount );
+            tr_ctorSetFilePriorities( ctor, files, fileCount, TR_PRI_HIGH );
+            tr_free( files );
+        }
 
         dbgmsg( "torrentAdd: filename is \"%s\"", filename );
 
