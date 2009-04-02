@@ -590,8 +590,9 @@ torrentRealInit( tr_torrent * tor, const tr_ctor * ctor )
     tr_bitfieldConstruct( &tor->checkedPieces, tor->info.pieceCount );
     tr_torrentUncheck( tor );
 
-    tor->addedDate = time( NULL ); /* this is a default value to be
-                                      overwritten by the resume file */
+    tr_torrentSetAddedDate( tor, time( NULL ) ); /* this is a default value to be
+                                                    overwritten by the resume file */
+
     loaded = tr_torrentLoadResume( tor, ~0, ctor );
 
     doStart = tor->isRunning;
@@ -1915,7 +1916,6 @@ tr_torrentSetAnnounceList( tr_torrent *            tor,
 ***
 **/
 
-/** @deprecated this method will be removed in 1.40 */
 void
 tr_torrentSetAddedDate( tr_torrent * tor,
                         time_t       t )
@@ -1923,9 +1923,9 @@ tr_torrentSetAddedDate( tr_torrent * tor,
     assert( tr_isTorrent( tor ) );
 
     tor->addedDate = t;
+    tor->anyDate = MAX( tor->anyDate, tor->addedDate );
 }
 
-/** @deprecated this method will be removed in 1.40 */
 void
 tr_torrentSetActivityDate( tr_torrent * tor,
                            time_t       t )
@@ -1933,12 +1933,9 @@ tr_torrentSetActivityDate( tr_torrent * tor,
     assert( tr_isTorrent( tor ) );
 
     tor->activityDate = t;
-
-    if( tor->anyDate < tor->activityDate )
-        tor->anyDate = tor->activityDate;
+    tor->anyDate = MAX( tor->anyDate, tor->activityDate );
 }
 
-/** @deprecated this method will be removed in 1.40 */
 void
 tr_torrentSetDoneDate( tr_torrent * tor,
                        time_t       t )
@@ -1946,9 +1943,7 @@ tr_torrentSetDoneDate( tr_torrent * tor,
     assert( tr_isTorrent( tor ) );
 
     tor->doneDate = t;
-
-    if( tor->anyDate < tor->doneDate )
-        tor->anyDate = tor->doneDate;
+    tor->anyDate = MAX( tor->anyDate, tor->doneDate );
 }
 
 /**

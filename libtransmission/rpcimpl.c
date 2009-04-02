@@ -537,6 +537,8 @@ addField( const tr_torrent * tor,
         tr_bencDictAddInt( d, key, st->timesCompleted );
     else if( !strcmp( key, "trackers" ) )
         addTrackers( inf, tr_bencDictAddList( d, key, inf->trackerCount ) );
+    else if( !strcmp( key, "torrentFile" ) )
+        tr_bencDictAddStr( d, key, inf->torrent );
     else if( !strcmp( key, "totalSize" ) )
         tr_bencDictAddInt( d, key, inf->totalSize );
     else if( !strcmp( key, "uploadedEver" ) )

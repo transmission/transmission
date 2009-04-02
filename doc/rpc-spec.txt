@@ -197,6 +197,7 @@
    timesCompleted                  | number                      | tr_stat
    trackers                        | array (see below)           | n/a
    totalSize                       | number                      | tr_info
+   torrentFile                     | string                      | tr_info
    uploadedEver                    | number                      | tr_stat
    uploadLimit                     | number                      | tr_torrent
    uploadLimited                   | 'boolean'                   | tr_torrent
@@ -477,6 +478,7 @@
          |         | yes       | session-get    | new arg "peer-limit-per-torrent"
          |         | yes       | torrent-get    | new arg "seedRatioLimit"
          |         | yes       | torrent-get    | new arg "seedRatioMode"
+         |         | yes       | torrent-get    | new arg "torrentFile"
          |         | yes       | torrent-get    | new ids option "recently-active"
          |         | yes       | torrent-get    | new ids option "percentDone"
          |         | yes       |                | new method "torrent-reannounce"
