@@ -1368,7 +1368,7 @@ tr_sessionLoadTorrents( tr_session * session,
                 tr_torrent * tor;
                 char * path = tr_buildPath( dirname, d->d_name, NULL );
                 tr_ctorSetMetainfoFromFile( ctor, path );
-                if(( tor = tr_torrentNew( session, ctor, NULL )))
+                if(( tor = tr_torrentNew( ctor, NULL )))
                 {
                     tr_list_append( &list, tor );
                     ++n;
@@ -1619,7 +1619,7 @@ metainfoLookupRescan( tr_session * session )
                 tr_info inf;
                 char * path = tr_buildPath( dirname, d->d_name, NULL );
                 tr_ctorSetMetainfoFromFile( ctor, path );
-                if( !tr_torrentParse( session, ctor, &inf ) )
+                if( !tr_torrentParse( ctor, &inf ) )
                 {
                     tr_list_append( &list, tr_strdup( inf.hashString ) );
                     tr_list_append( &list, tr_strdup( path ) );

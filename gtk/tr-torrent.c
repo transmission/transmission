@@ -198,7 +198,7 @@ tr_torrent_new_ctor( tr_session   * session,
      * doesn't have any concept of the glib trash API */
     tr_ctorGetDeleteSource( ctor, &doTrash );
     tr_ctorSetDeleteSource( ctor, FALSE );
-    tor = tr_torrentNew( session, ctor, errcode );
+    tor = tr_torrentNew( ctor, errcode );
 
     if( tor && doTrash )
     {

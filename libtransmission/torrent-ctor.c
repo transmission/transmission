@@ -291,6 +291,12 @@ tr_ctorGetMetainfo( const tr_ctor *  ctor,
     return err;
 }
 
+tr_session*
+tr_ctorGetSession( const tr_ctor * ctor )
+{
+    return (tr_session*) ctor->session;
+}
+
 /***
 ****
 ***/
@@ -301,9 +307,11 @@ tr_ctorNew( const tr_session * session )
     tr_ctor * ctor = tr_new0( struct tr_ctor, 1 );
 
     ctor->session = session;
-    tr_ctorSetPeerLimit( ctor, TR_FALLBACK, session->peerLimitPerTorrent );
     tr_ctorSetPaused( ctor, TR_FALLBACK, FALSE );
-    tr_ctorSetDownloadDir( ctor, TR_FALLBACK, session->downloadDir );
+    if( session != NULL ) {
+        tr_ctorSetPeerLimit( ctor, TR_FALLBACK, session->peerLimitPerTorrent );
+        tr_ctorSetDownloadDir( ctor, TR_FALLBACK, session->downloadDir );
+    }
     tr_ctorSetSave( ctor, TRUE );
     return ctor;
 }
@@ -316,4 +324,3 @@ tr_ctorFree( tr_ctor * ctor )
     tr_free( ctor->optionalArgs[0].downloadDir );
     tr_free( ctor );
 }
-

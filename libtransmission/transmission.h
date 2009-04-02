@@ -754,7 +754,9 @@ tr_ctorMode;
 
 struct tr_benc;
 
-tr_ctor*    tr_ctorNew( const tr_session * session );
+/* it's okay to use NULL here if you're only parsing the torrent.
+ * @see tr_torrentParse() */
+tr_ctor*    tr_ctorNew( const tr_session * session_or_NULL );
 
 void        tr_ctorFree( tr_ctor * ctor );
 
@@ -808,6 +810,8 @@ int         tr_ctorGetMetainfo( const tr_ctor         * ctor,
 int         tr_ctorGetDeleteSource( const tr_ctor  * ctor,
                                     tr_bool        * setmeDoDelete );
 
+tr_session* tr_ctorGetSession( const tr_ctor * ctor );
+
 /* returns NULL if tr_ctorSetMetainfoFromFile() wasn't used */
 const char* tr_ctorGetSourceFile( const tr_ctor * ctor );
 
@@ -825,10 +829,12 @@ const char* tr_ctorGetSourceFile( const tr_ctor * ctor );
  * (that is, if TR_EINVALID is not returned), then the parsed
  * metainfo is stored in setme_info and should be freed by the
  * caller via tr_metainfoFree().
+ *
+ * If the constructor's session variable is NULL,
+ * info.torrent will be NULL and the duplicate check will not be performed.
  */
-int tr_torrentParse( const tr_session  * session,
-                     const tr_ctor     * ctor,
-                     tr_info           * setme_info_or_NULL );
+int tr_torrentParse( const tr_ctor * ctor,
+                     tr_info       * setme_info_or_NULL );
 
 /** @brief free a metainfo
     @see tr_torrentParse */
@@ -839,8 +845,7 @@ void tr_metainfoFree( tr_info * inf );
     @return 0 on success,
             TR_EINVALID if the torrent couldn't be parsed, or
             TR_EDUPLICATE if there's already a matching torrent object. */
-tr_torrent * tr_torrentNew( tr_session      * session,
-                            const tr_ctor   * ctor,
+tr_torrent * tr_torrentNew( const tr_ctor   * ctor,
                             int             * setmeError );
 
 /** @} */

@@ -190,7 +190,7 @@ onFileAdded( tr_session * session, const char * dir, const char * file )
 
         int err = tr_ctorSetMetainfoFromFile( ctor, filename );
         if( !err )
-            tr_torrentNew( session, ctor, &err );
+            tr_torrentNew( ctor, &err );
 
         tr_ctorFree( ctor );
         tr_free( filename );

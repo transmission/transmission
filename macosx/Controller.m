@@ -793,7 +793,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         //ensure torrent doesn't already exist
         tr_ctor * ctor = tr_ctorNew(fLib);
         tr_ctorSetMetainfoFromFile(ctor, [torrentPath UTF8String]);
-        int result = tr_torrentParse(fLib, ctor, &info);
+        int result = tr_torrentParse(ctor, &info);
         if (result != TR_OK)
         {
             if (result == TR_EDUPLICATE)
@@ -2457,7 +2457,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         tr_ctor * ctor = tr_ctorNew(fLib);
         tr_ctorSetMetainfoFromFile(ctor, [file UTF8String]);
         
-        switch (tr_torrentParse(fLib, ctor, NULL))
+        switch (tr_torrentParse(ctor, NULL))
         {
             case TR_OK:
                 [self openFiles: [NSArray arrayWithObject: file] addType: ADD_AUTO forcePath: nil];
@@ -2697,7 +2697,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             {
                 tr_ctor * ctor = tr_ctorNew(fLib);
                 tr_ctorSetMetainfoFromFile(ctor, [file UTF8String]);
-                switch (tr_torrentParse(fLib, ctor, NULL))
+                switch (tr_torrentParse(ctor, NULL))
                 {
                     case TR_OK:
                         if (!fOverlayWindow)
@@ -2761,7 +2761,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             {
                 tr_ctor * ctor = tr_ctorNew(fLib);
                 tr_ctorSetMetainfoFromFile(ctor, [file UTF8String]);
-                switch (tr_torrentParse(fLib, ctor, NULL))
+                switch (tr_torrentParse(ctor, NULL))
                 {
                     case TR_OK:
                         [filesToOpen addObject: file];

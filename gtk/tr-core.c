@@ -927,7 +927,7 @@ add_filename( TrCore *     core,
         else
         {
             tr_info inf;
-            int err = tr_torrentParse( session, ctor, &inf );
+            int err = tr_torrentParse( ctor, &inf );
 
             switch( err )
             {

@@ -443,7 +443,7 @@ tr_fdFileReturn( int fd )
             TrCloseFile( i );
         else if( o->syncAt <= time( NULL ) ) {
             dbgmsg( "fsync()ing file '%s' in slot #%d", o->filename, i );
-            fsync( o->fd );
+            //fsync( o->fd );
 #ifdef HAVE_POSIX_FADVISE
             /* TODO: test performance with and without this */
             posix_fadvise( o->fd, 0, 0, POSIX_FADV_DONTNEED );

@@ -171,7 +171,6 @@ sourceChanged( GtkFileChooserButton * b,
         int          err = 0;
         int          new_file = 0;
         tr_torrent * torrent;
-        tr_session * session = tr_core_session( data->core );
 
         if( filename
           && ( !data->filename || strcmp( filename, data->filename ) ) )
@@ -186,7 +185,7 @@ sourceChanged( GtkFileChooserButton * b,
         tr_ctorSetPaused( data->ctor, TR_FORCE, TRUE );
         tr_ctorSetDeleteSource( data->ctor, FALSE );
 
-        if( ( torrent = tr_torrentNew( session, data->ctor, &err ) ) )
+        if( ( torrent = tr_torrentNew( data->ctor, &err ) ) )
         {
             removeOldTorrent( data );
             data->gtor = tr_torrent_new_preexisting( torrent );

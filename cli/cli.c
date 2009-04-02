@@ -355,7 +355,7 @@ main( int     argc,
     {
         tr_info info;
 
-        if( !tr_torrentParse( h, ctor, &info ) )
+        if( !tr_torrentParse( ctor, &info ) )
         {
             int          i;
             const time_t start = time( NULL );
@@ -391,7 +391,7 @@ main( int     argc,
     {
         tr_info info;
 
-        if( !tr_torrentParse( h, ctor, &info ) )
+        if( !tr_torrentParse( ctor, &info ) )
         {
             dumpInfo( stdout, &info );
             tr_metainfoFree( &info );
@@ -401,7 +401,7 @@ main( int     argc,
         goto cleanup;
     }
 
-    tor = tr_torrentNew( h, ctor, &error );
+    tor = tr_torrentNew( ctor, &error );
     tr_ctorFree( ctor );
     if( !tor )
     {

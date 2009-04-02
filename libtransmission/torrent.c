@@ -503,9 +503,7 @@ getBlockSize( uint32_t pieceSize )
 }
 
 static void
-torrentRealInit( tr_session      * session,
-                 tr_torrent      * tor,
-                 const tr_ctor   * ctor )
+torrentRealInit( tr_torrent * tor, const tr_ctor * ctor )
 {
     int          doStart;
     uint64_t     loaded;
@@ -513,6 +511,9 @@ torrentRealInit( tr_session      * session,
     const char * dir;
     static int   nextUniqueId = 1;
     tr_info    * info = &tor->info;
+    tr_session * session = tr_ctorGetSession( ctor );
+
+    assert( session != NULL );
 
     tr_globalLock( session );
 
@@ -647,14 +648,14 @@ torrentRealInit( tr_session      * session,
 }
 
 int
-tr_torrentParse( const tr_session  * session,
-                 const tr_ctor     * ctor,
+tr_torrentParse( const tr_ctor     * ctor,
                  tr_info           * setmeInfo )
 {
     int             err = 0;
     int             doFree;
     tr_info         tmp;
     const tr_benc * metainfo;
+    tr_session    * session = tr_ctorGetSession( ctor );
 
     if( setmeInfo == NULL )
         setmeInfo = &tmp;
@@ -669,7 +670,7 @@ tr_torrentParse( const tr_session  * session,
     if( !err && !getBlockSize( setmeInfo->pieceSize ) )
         err = TR_EINVALID;
 
-    if( !err && tr_torrentExists( session, setmeInfo->hash ) )
+    if( !err && session && tr_torrentExists( session, setmeInfo->hash ) )
         err = TR_EDUPLICATE;
 
     if( doFree )
@@ -679,20 +680,22 @@ tr_torrentParse( const tr_session  * session,
 }
 
 tr_torrent *
-tr_torrentNew( tr_session     * session,
-               const tr_ctor  * ctor,
+tr_torrentNew( const tr_ctor  * ctor,
                int            * setmeError )
 {
     int          err;
     tr_info      tmpInfo;
     tr_torrent * tor = NULL;
 
-    err = tr_torrentParse( session, ctor, &tmpInfo );
+    assert( ctor != NULL );
+    assert( tr_isSession( tr_ctorGetSession( ctor ) ) );
+
+    err = tr_torrentParse( ctor, &tmpInfo );
     if( !err )
     {
         tor = tr_new0( tr_torrent, 1 );
         tor->info = tmpInfo;
-        torrentRealInit( session, tor, ctor );
+        torrentRealInit( tor, ctor );
     }
     else if( setmeError )
     {

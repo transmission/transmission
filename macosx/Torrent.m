@@ -1623,26 +1623,26 @@ int trashDataFile(const char * filename)
         if (hashString)
         {
             tr_ctorSetMetainfoFromHash(ctor, [hashString UTF8String]);
-            if (tr_torrentParse(lib, ctor, &info) == TR_OK)
+            if (tr_torrentParse(ctor, &info) == TR_OK)
             {
                 NSString * currentDownloadFolder = [self shouldUseIncompleteFolderForName: [NSString stringWithUTF8String: info.name]]
                                                     ? fIncompleteFolder : fDownloadFolder;
                 tr_ctorSetDownloadDir(ctor, TR_FORCE, [currentDownloadFolder UTF8String]);
                 
-                fHandle = tr_torrentNew(lib, ctor, NULL);
+                fHandle = tr_torrentNew(ctor, NULL);
             }
             tr_metainfoFree(&info);
         }
         if (!fHandle && path)
         {
             tr_ctorSetMetainfoFromFile(ctor, [path UTF8String]);
-            if (tr_torrentParse(lib, ctor, &info) == TR_OK)
+            if (tr_torrentParse(ctor, &info) == TR_OK)
             {
                 NSString * currentDownloadFolder = [self shouldUseIncompleteFolderForName: [NSString stringWithUTF8String: info.name]]
                                                     ? fIncompleteFolder : fDownloadFolder;
                 tr_ctorSetDownloadDir(ctor, TR_FORCE, [currentDownloadFolder UTF8String]);
                 
-                fHandle = tr_torrentNew(lib, ctor, NULL);
+                fHandle = tr_torrentNew(ctor, NULL);
             }
             tr_metainfoFree(&info);
         }

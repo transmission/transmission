@@ -745,7 +745,7 @@ addTorrentImpl( struct tr_rpc_idle_data * data, tr_ctor * ctor )
 {
     int err = 0;
     const char * result = NULL;
-    tr_torrent * tor = tr_torrentNew( data->session, ctor, &err );
+    tr_torrent * tor = tr_torrentNew( ctor, &err );
 
     tr_ctorFree( ctor );
 
