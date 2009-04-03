@@ -369,6 +369,7 @@
    "peer-limit-per-torrent"   | number     maximum global number of peers
    "pex-enabled"              | 'boolean'  true means allow pex in public torrents
    "peer-port"                | number     port number
+   "peer-port-random-enabled" | 'boolean'  true means pick a random peer port on launch
    "port-forwarding-enabled"  | 'boolean'  true means enabled
    "rpc-version"              | number     the current RPC API version
    "rpc-version-minimum"      | number     the minimum RPC API version supported
