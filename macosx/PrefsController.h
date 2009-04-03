@@ -70,6 +70,7 @@
 
 - (void) setPort: (id) sender;
 - (void) randomPort: (id) sender;
+- (void) setRandomPortOnStart: (id) sender;
 - (void) setNat: (id) sender;
 - (void) updatePortStatus;
 - (void) portCheckerDidFinishProbing: (PortChecker *) portChecker;

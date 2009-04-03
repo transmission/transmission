@@ -177,7 +177,7 @@ static TR_INLINE tr_bool tr_isEncryptionMode( tr_encryption_mode m )
 #define TR_PREFS_KEY_PEER_LIMIT_GLOBAL          "peer-limit-global"
 #define TR_PREFS_KEY_PEER_LIMIT_TORRENT         "peer-limit-per-torrent"
 #define TR_PREFS_KEY_PEER_PORT                  "peer-port"
-#define TR_PREFS_KEY_PEER_PORT_RANDOM_ENABLED   "peer-port-random-enabled"
+#define TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START  "peer-port-random-on-start"
 #define TR_PREFS_KEY_PEER_PORT_RANDOM_LOW       "peer-port-random-low"
 #define TR_PREFS_KEY_PEER_PORT_RANDOM_HIGH      "peer-port-random-high"
 #define TR_PREFS_KEY_PEER_SOCKET_TOS            "peer-socket-tos"
@@ -538,9 +538,14 @@ tr_bool tr_sessionIsPortForwardingEnabled( const tr_session  * session );
 void  tr_sessionSetPeerPort( tr_session  * session,
                              tr_port       port);
 
+tr_port tr_sessionGetPeerPort( const tr_session * session );
+
 tr_port tr_sessionSetPeerPortRandom( tr_session  * session );
 
-tr_port tr_sessionGetPeerPort( const tr_session * session );
+void  tr_sessionSetPeerPortRandomOnStart( tr_session * session,
+                                          tr_bool random );
+
+tr_bool  tr_sessionGetPeerPortRandomOnStart( tr_session * session );
 
 typedef enum
 {

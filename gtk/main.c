@@ -939,7 +939,7 @@ prefschanged( TrCore * core UNUSED,
     {
         tr_setMessageLevel( pref_int_get( key ) );
     }
-    else if( !strcmp( key, TR_PREFS_KEY_PEER_PORT_RANDOM_ENABLED ) )
+    else if( !strcmp( key, TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START ) )
     {
         /* FIXME */
     }

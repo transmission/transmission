@@ -970,9 +970,9 @@ sessionSet( tr_session               * session,
         tr_sessionSetPeerLimitPerTorrent( session, i );
     if( tr_bencDictFindBool( args_in, TR_PREFS_KEY_PEX_ENABLED, &boolVal ) )
         tr_sessionSetPexEnabled( session, boolVal );
-    if( tr_bencDictFindBool( args_in, TR_PREFS_KEY_PEER_PORT_RANDOM_ENABLED, &boolVal ) && boolVal )
-        tr_sessionSetPeerPortRandom( session );
-    else if( tr_bencDictFindInt( args_in, TR_PREFS_KEY_PEER_PORT, &i ) )
+    if( tr_bencDictFindBool( args_in, TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START, &boolVal ) )
+        tr_sessionSetPeerPortRandomOnStart( session, boolVal );
+    if( tr_bencDictFindInt( args_in, TR_PREFS_KEY_PEER_PORT, &i ) )
         tr_sessionSetPeerPort( session, i );
     if( tr_bencDictFindBool( args_in, TR_PREFS_KEY_PORT_FORWARDING, &boolVal ) )
         tr_sessionSetPortForwardingEnabled( session, boolVal );
@@ -1076,6 +1076,7 @@ sessionGet( tr_session               * s,
     tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_LIMIT_TORRENT, tr_sessionGetPeerLimitPerTorrent( s ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_PEX_ENABLED, tr_sessionIsPexEnabled( s ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_PORT, tr_sessionGetPeerPort( s ) );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START, tr_sessionGetPeerPortRandomOnStart( s ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_PORT_FORWARDING, tr_sessionIsPortForwardingEnabled( s ) );
     tr_bencDictAddInt ( d, "rpc-version", 4 );
     tr_bencDictAddInt ( d, "rpc-version-minimum", 1 );

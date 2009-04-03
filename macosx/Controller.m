@@ -224,7 +224,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         tr_bencInitDict(&settings, 32);
         tr_sessionGetDefaultSettings(&settings);
         
-        #warning how to work with schedule?
         const BOOL usesSpeedLimitSched = [fDefaults boolForKey: @"SpeedLimitAuto"];
         if (!usesSpeedLimitSched)
             tr_bencDictAddBool(&settings, TR_PREFS_KEY_ALT_SPEED_ENABLED, [fDefaults boolForKey: @"SpeedLimit"]);
@@ -254,7 +253,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         tr_bencDictAddInt(&settings, TR_PREFS_KEY_PEER_LIMIT_TORRENT, [fDefaults integerForKey: @"PeersTorrent"]);
         
         const BOOL randomPort = [fDefaults boolForKey: @"RandomPort"];
-        tr_bencDictAddBool(&settings, TR_PREFS_KEY_PEER_PORT_RANDOM_ENABLED, randomPort);
+        tr_bencDictAddBool(&settings, TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START, randomPort);
         if (!randomPort)
             tr_bencDictAddInt(&settings, TR_PREFS_KEY_PEER_PORT, [fDefaults integerForKey: @"BindPort"]);
         

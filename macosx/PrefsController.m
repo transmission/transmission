@@ -353,6 +353,11 @@ tr_session * fHandle;
     [self setPort: fPortField];
 }
 
+- (void) setRandomPortOnStart: (id) sender
+{
+    tr_sessionSetPeerPortRandomOnStart(fHandle, [sender state] == NSOnState);
+}
+
 - (void) setNat: (id) sender
 {
     tr_sessionSetPortForwardingEnabled(fHandle, [fDefaults boolForKey: @"NatTraversal"]);

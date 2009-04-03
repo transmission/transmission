@@ -422,7 +422,7 @@ readargs( int           argc,
 
             case 'P':
                 tr_bencDictAddStr( &top, "method", "session-set" );
-                tr_bencDictAddBool( args, TR_PREFS_KEY_PEER_PORT_RANDOM_ENABLED, TRUE);
+                tr_bencDictAddBool( args, TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START, TRUE);
                 break;
 
             case 'r':

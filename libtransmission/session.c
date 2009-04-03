@@ -254,7 +254,7 @@ tr_sessionGetDefaultSettings( tr_benc * d )
     tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_LIMIT_GLOBAL,        atoi( TR_DEFAULT_PEER_LIMIT_GLOBAL_STR ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_LIMIT_TORRENT,       atoi( TR_DEFAULT_PEER_LIMIT_TORRENT_STR ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_PORT,                atoi( TR_DEFAULT_PEER_PORT_STR ) );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_PEER_PORT_RANDOM_ENABLED, FALSE );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START, FALSE );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_PORT_RANDOM_LOW,     1024 );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_PORT_RANDOM_HIGH,    65535 );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_SOCKET_TOS,          atoi( TR_DEFAULT_PEER_SOCKET_TOS_STR ) );
@@ -308,7 +308,7 @@ tr_sessionGetSettings( tr_session * s, struct tr_benc * d )
     tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_LIMIT_GLOBAL,        tr_sessionGetPeerLimit( s ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_LIMIT_TORRENT,       s->peerLimitPerTorrent );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_PORT,                tr_sessionGetPeerPort( s ) );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_PEER_PORT_RANDOM_ENABLED, s->isPortRandom );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START, s->isPortRandom );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_PORT_RANDOM_LOW,     s->randomPortLow );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_PORT_RANDOM_HIGH,    s->randomPortHigh );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_SOCKET_TOS,          s->peerSocketTOS );
@@ -589,7 +589,7 @@ tr_sessionInitImpl( void * vdata )
     *** random port
     **/
 
-    found = tr_bencDictFindBool( &settings, TR_PREFS_KEY_PEER_PORT_RANDOM_ENABLED, &boolVal );
+    found = tr_bencDictFindBool( &settings, TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START, &boolVal );
     assert( found );
     session->isPortRandom = boolVal;
 
@@ -793,20 +793,8 @@ tr_sessionSetPeerPort( tr_session * session,
 {
     assert( tr_isSession( session ) );
 
-    session->isPortRandom = FALSE;
     session->peerPort = port;
     setPortImpl( session, session->peerPort );
-}
-
-tr_port
-tr_sessionSetPeerPortRandom( tr_session * session )
-{
-    assert( tr_isSession( session ) );
-
-    session->isPortRandom = TRUE;
-    session->peerPort = getRandomPort( session );
-    setPortImpl( session, session->peerPort );
-    return session->peerPort;
 }
 
 tr_port
@@ -815,6 +803,33 @@ tr_sessionGetPeerPort( const tr_session * session )
     assert( tr_isSession( session ) );
 
     return session->peerPort;
+}
+
+tr_port
+tr_sessionSetPeerPortRandom( tr_session * session )
+{
+    assert( tr_isSession( session ) );
+
+    session->peerPort = getRandomPort( session );
+    setPortImpl( session, session->peerPort );
+    return session->peerPort;
+}
+
+void
+tr_sessionSetPeerPortRandomOnStart( tr_session * session,
+                                    tr_bool random )
+{
+    assert( tr_isSession( session ) );
+
+    session->isPortRandom = TRUE;
+}
+
+tr_bool
+tr_sessionGetPeerPortRandomOnStart( tr_session * session )
+{
+    assert( tr_isSession( session ) );
+
+    return session->isPortRandom;
 }
 
 tr_port_forwarding
