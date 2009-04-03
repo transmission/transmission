@@ -431,6 +431,12 @@
                               | filesAdded       | number     | tr_session_stats
                               | sessionCount     | number     | tr_session_stats
                               | secondsActive    | number     | tr_session_stats
+
+4.3.  Blocklist
+
+   Method name: "blocklist-update"
+   Request arguments: none
+   Response arguments: "blocklist-size"
    
 
 5.0.  Protocol Versions
@@ -483,6 +489,7 @@
          |         | yes       | torrent-get    | new ids option "recently-active"
          |         | yes       | torrent-get    | new ids option "percentDone"
          |         | yes       |                | new method "torrent-reannounce"
+         |         | yes       |                | new method "blocklist-update"
          |         |        NO | torrent-get    | removed arg "downloadLimitMode"
          |         |        NO | torrent-get    | removed arg "uploadLimitMode"
          |         |        NO | session-get    | renamed "pex-allowed" to "pex-enabled"

@@ -14,6 +14,7 @@
 #include <ctype.h> /* isdigit */
 #include <stdlib.h> /* strtol */
 #include <string.h> /* strcmp */
+#include <unistd.h> /* unlink */
 
 #include <event.h> /* evbuffer */
 
@@ -743,6 +744,64 @@ torrentSet( tr_session               * session,
 ***/
 
 static void
+gotNewBlocklist( tr_session       * session,
+                 long               response_code,
+                 const void       * response,
+                 size_t             response_byte_count,
+                 void             * user_data )
+{
+    char result[1024];
+    struct tr_rpc_idle_data * data = user_data;
+
+    if( response_code != 200 )
+    {
+        tr_snprintf( result, sizeof( result ), "http error %ld: %s",
+                     response_code, tr_webGetResponseStr( response_code ) );
+    }
+    else /* success */
+    {
+        int ruleCount;
+        char * filename = tr_buildPath( tr_sessionGetConfigDir( session ), "blocklist.tmp", NULL );
+        FILE * fp;
+
+        /* download a new blocklist */
+        fp = fopen( filename, "w+" );
+        fwrite( response, 1, response_byte_count, fp );
+        fclose( fp );
+
+        /* feed it to the session */
+        ruleCount = tr_blocklistSetContent( session, filename );
+
+        /* give the client a response */
+        tr_bencDictAddInt( data->args_out, "blocklist-size", ruleCount );
+        tr_snprintf( result, sizeof( result ), "success" );
+
+        /* cleanup */
+        unlink( filename );
+        tr_free( filename );
+    }
+
+    tr_idle_function_done( data, result );
+}
+
+static const char*
+blocklistUpdate( tr_session               * session,
+                 tr_benc                  * args_in UNUSED,
+                 tr_benc                  * args_out UNUSED,
+                 struct tr_rpc_idle_data  * idle_data )
+{
+    /* FIXME: use this url after the website's updated */
+    /* const char * url = "http://update.transmissionbt.com/level1"; */
+    const char * url = "http://download.m0k.org/transmission/files/level1";
+    tr_webRun( session, url, NULL, gotNewBlocklist, idle_data );
+    return NULL;
+}
+
+/***
+****
+***/
+
+static void
 addTorrentImpl( struct tr_rpc_idle_data * data, tr_ctor * ctor )
 {
     int err = 0;
@@ -1113,6 +1172,7 @@ static struct method
 }
 methods[] =
 {
+    { "blocklist-update",   FALSE, blocklistUpdate     },
     { "session-get",        TRUE,  sessionGet          },
     { "session-set",        TRUE,  sessionSet          },
     { "session-stats",      TRUE,  sessionStats        },
