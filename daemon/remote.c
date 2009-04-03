@@ -78,6 +78,7 @@ static tr_option opts[] =
     { 'n', "auth",                 "Set authentication info", "n",  1, "<username:password>" },
     { 'N', "netrc",                "Set authentication info from a .netrc file", "N",  1, "<filename>" },
     { 'p', "port",                 "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "p", 1, "<port>" },
+    { 'P', "random-port",          "Random port for incomping peers", "P", 1, NULL },
     { 900, "priority-high",        "Set the files' priorities as high", "ph", 1, "<files>" },
     { 901, "priority-normal",      "Set the files' priorities as normal", "pn", 1, "<files>" },
     { 902, "priority-low",         "Set the files' priorities as low", "pl", 1, "<files>" },
@@ -417,6 +418,11 @@ readargs( int           argc,
             case 'p':
                 tr_bencDictAddStr( &top, "method", "session-set" );
                 tr_bencDictAddInt( args, TR_PREFS_KEY_PEER_PORT, numarg( optarg ) );
+                break;
+
+            case 'P':
+                tr_bencDictAddStr( &top, "method", "session-set" );
+                tr_bencDictAddBool( args, TR_PREFS_KEY_PEER_PORT_RANDOM_ENABLED, TRUE);
                 break;
 
             case 'r':
