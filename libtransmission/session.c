@@ -821,7 +821,7 @@ tr_sessionSetPeerPortRandomOnStart( tr_session * session,
 {
     assert( tr_isSession( session ) );
 
-    session->isPortRandom = TRUE;
+    session->isPortRandom = random;
 }
 
 tr_bool
