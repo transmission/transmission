@@ -610,8 +610,8 @@ typedef enum
     TR_SCHED_TUES     = (1<<2),
     TR_SCHED_WED      = (1<<3),
     TR_SCHED_THURS    = (1<<4),
-    TR_SCHED_FRI      = (1<<4),
-    TR_SCHED_SAT      = (1<<5),
+    TR_SCHED_FRI      = (1<<5),
+    TR_SCHED_SAT      = (1<<6),
     TR_SCHED_WEEKDAY  = (TR_SCHED_MON|TR_SCHED_TUES|TR_SCHED_WED|TR_SCHED_THURS|TR_SCHED_FRI),
     TR_SCHED_WEEKEND  = (TR_SCHED_SUN|TR_SCHED_SAT),
     TR_SCHED_ALL      = (TR_SCHED_WEEKDAY|TR_SCHED_WEEKEND)
