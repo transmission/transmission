@@ -131,6 +131,9 @@
 
    (1) A "torrents" array of objects, each of which contains
        the key/value pairs matching the request's "fields" argument.
+   (2) If the request's "ids" field was "recently-active",
+       a "removed" array of torrent-id numbers of recently-removed
+       torrents.
 
    key                             | type                        | source 
    --------------------------------+-----------------------------+---------

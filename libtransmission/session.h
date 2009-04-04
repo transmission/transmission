@@ -39,6 +39,7 @@
  #endif
 #endif
 
+#include "bencode.h"
 
 typedef enum { TR_NET_OK, TR_NET_ERROR, TR_NET_WAIT } tr_tristate_t;
 
@@ -68,6 +69,7 @@ struct tr_session
     tr_bool                      useLazyBitfield;
     tr_bool                      isRatioLimited;
 
+    tr_benc                      removedTorrents;
     
     int                          speedLimit[2];
     tr_bool                      speedLimitEnabled[2];

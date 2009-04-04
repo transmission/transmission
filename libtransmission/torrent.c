@@ -1330,9 +1330,14 @@ tr_torrentStop( tr_torrent * tor )
 static void
 closeTorrent( void * vtor )
 {
+    tr_benc * d;
     tr_torrent * tor = vtor;
 
     assert( tr_isTorrent( tor ) );
+
+    d = tr_bencListAddDict( &tor->session->removedTorrents, 2 );
+    tr_bencDictAddInt( d, "id", tor->uniqueId );
+    tr_bencDictAddInt( d, "date", time( NULL ) );
 
     tr_torrentSaveResume( tor );
     tor->isRunning = 0;

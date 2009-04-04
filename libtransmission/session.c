@@ -231,15 +231,8 @@ isAltTime( const tr_session * s )
     
     if( toNextDay && (minutes < end) )
         day = (day - 1) % 7;
-    
-    if( s->altSpeedTimeDay == TR_SCHED_ALL )
-        return TRUE;
-    else if( s->altSpeedTimeDay == TR_SCHED_WEEKDAY )
-        return (day != 0) && day != 6;
-    else if( s->altSpeedTimeDay == TR_SCHED_WEEKEND )
-        return (day == 0) || (day == 6);
-    else
-        return day == s->altSpeedTimeDay;
+
+    return ((1<<day) & s->altSpeedTimeDay) != 0;
 }
 
 /***
@@ -468,6 +461,7 @@ tr_sessionInit( const char  * tag,
     session->lock = tr_lockNew( );
     session->tag = tr_strdup( tag );
     session->magicNumber = SESSION_MAGIC_NUMBER;
+    tr_bencInitList( &session->removedTorrents, 0 );
 
     /* start the libtransmission thread */
     tr_netInit( ); /* must go before tr_eventInit */
@@ -998,14 +992,7 @@ onAltTimer( int foo UNUSED, short bar UNUSED, void * vsession )
             if( isEndTime && !isBeginTime && session->altSpeedTimeEnd < session->altSpeedTimeBegin )
                 day = (day - 1) % 7;
             
-            if( session->altSpeedTimeDay == TR_SCHED_ALL )
-                isDay = TRUE;
-            else if( session->altSpeedTimeDay == TR_SCHED_WEEKDAY )
-                isDay = (day != 0) && (day != 6);
-            else if( session->altSpeedTimeDay == TR_SCHED_WEEKEND )
-                isDay = (day == 0) || (day == 6);
-            else
-                isDay = day == session->altSpeedTimeDay;
+            isDay = ((1<<day) & session->altSpeedTimeDay) != 0;
 
             if( isDay )
                 useAltSpeed( session, isBeginTime, FALSE );
@@ -1395,6 +1382,7 @@ tr_sessionClose( tr_session * session )
     }
 
     /* free the session memory */
+    tr_bencFree( &session->removedTorrents );
     tr_bandwidthFree( session->bandwidth );
     tr_lockFree( session->lock );
     for( i = 0; i < session->metainfoLookupCount; ++i )

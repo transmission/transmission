@@ -29,6 +29,8 @@
 #include "utils.h"
 #include "web.h"
 
+#define RECENTLY_ACTIVE_SECONDS 60
+
 #define TR_N_ELEMENTS( ary ) ( sizeof( ary ) / sizeof( *ary ) )
 
 #if 0
@@ -148,7 +150,7 @@ getTorrents( tr_session * session,
         {
             tr_torrent * tor = NULL;
             const time_t now = time( NULL );
-            const time_t window = 60;
+            const time_t window = RECENTLY_ACTIVE_SECONDS;
             const int n = tr_sessionCountTorrents( session );
             torrents = tr_new0( tr_torrent *, n );
             while( ( tor = tr_torrentNext( session, tor ) ) )
@@ -590,8 +592,24 @@ torrentGet( tr_session               * session,
     tr_benc *     list = tr_bencDictAddList( args_out, "torrents", torrentCount );
     tr_benc *     fields;
     const char *  msg = NULL;
+    const char *  strVal;
 
     assert( idle_data == NULL );
+
+    if( tr_bencDictFindStr( args_in, "ids", &strVal ) && !strcmp( strVal, "recently-active" ) ) {
+        int n = 0;
+        tr_benc * d;
+        const time_t now = time( NULL );
+        const int interval = RECENTLY_ACTIVE_SECONDS;
+        tr_benc * removed_out = tr_bencDictAddList( args_out, "removed", 0 );
+        while(( d = tr_bencListChild( &session->removedTorrents, n++ ))) {
+            int64_t intVal;
+            if( tr_bencDictFindInt( d, "date", &intVal ) && ( intVal >= now - interval ) ) {
+                tr_bencDictFindInt( d, "id", &intVal );
+                tr_bencListAddInt( removed_out, intVal );
+            }
+        }
+    }
 
     if( !tr_bencDictFindList( args_in, "fields", &fields ) )
         msg = "no fields specified";
