@@ -162,6 +162,8 @@
 	<date>2000-01-01T13:00:00Z</date>
 	<key>SpeedLimitAutoOnDate</key>
 	<date>2000-01-01T03:00:00Z</date>
+	<key>SpeedLimitAutoDay</key>
+	<string>ALL</string>
 	<key>SpeedLimitDownloadLimit</key>
 	<integer>10</integer>
 	<key>SpeedLimitUploadLimit</key>

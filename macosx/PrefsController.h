@@ -41,6 +41,7 @@
 
     IBOutlet NSTextField * fUploadField, * fDownloadField,
                         * fSpeedLimitUploadField, * fSpeedLimitDownloadField;
+    IBOutlet NSPopUpButton * fAutoSpeedDayTypePopUp;
     
     IBOutlet NSTextField * fPeersGlobalField, * fPeersTorrentField, * fBlocklistMessageField, * fBlocklistDateField;
     IBOutlet NSButton * fBlocklistEnableCheck;
@@ -116,6 +117,8 @@
 - (void) setSpeedLimit: (id) sender;
 - (void) setAutoSpeedLimit: (id) sender;
 - (void) setAutoSpeedLimitTime: (id) sender;
+- (void) setAutoSpeedLimitDay: (id) sender;
+- (void) updateAutoSpeedLimitDay;
 + (NSInteger) dateToTimeSum: (NSDate *) date;
 
 - (void) setAutoImport: (id) sender;

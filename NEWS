@@ -9,6 +9,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Requires Mac OS X 10.5 Leopard or newer
    + Groups (moved to preferences) can be auto-assigned to transfers when adding based on multiple criteria
    + Groups can have a default location when adding transfers
+   + The speed limit scheduler can now be applied to only specific days
    + Bonjour support for the web interface
    + File filter field in the inspector
    + Option to include beta releases when auto-updating (using modified Sparkle 1.5)
