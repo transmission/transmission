@@ -77,6 +77,7 @@ struct tr_session
 
     int                          altSpeedTimeBegin;
     int                          altSpeedTimeEnd;
+    tr_sched_day                 altSpeedTimeDay;
     tr_bool                      altSpeedTimeEnabled;
     tr_bool                      altSpeedChangedByUser;
 

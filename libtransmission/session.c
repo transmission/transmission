@@ -209,22 +209,37 @@ loadBlocklists( tr_session * session )
 static tr_bool
 isAltTime( const tr_session * s )
 {
-    tr_bool is;
-    int minutes;
+    int minutes, day;
+    tr_bool withinTime;
     struct tm tm;
     const time_t now = time( NULL );
     const int begin = s->altSpeedTimeBegin;
     const int end = s->altSpeedTimeEnd;
+    const tr_bool toNextDay = begin > end;
 
     tr_localtime_r( &now, &tm );
     minutes = tm.tm_hour*60 + tm.tm_min;
-
-    if( begin <= end )
-        is = ( begin <= minutes ) && ( minutes < end );
+    day = tm.tm_wday;
+    
+    if( !toNextDay )
+        withinTime = ( begin <= minutes ) && ( minutes < end );
     else /* goes past midnight */
-        is = ( begin <= minutes ) || ( minutes < end );
-
-    return is;
+        withinTime = ( begin <= minutes ) || ( minutes < end );
+    
+    if( !withinTime )
+        return FALSE;
+    
+    if( toNextDay && (minutes < end) )
+        day = (day - 1) % 7;
+    
+    if( s->altSpeedTimeDay == TR_SCHED_ALL )
+        return TRUE;
+    else if( s->altSpeedTimeDay == TR_SCHED_WEEKDAY )
+        return (day != 0) && day != 6;
+    else if( s->altSpeedTimeDay == TR_SCHED_WEEKEND )
+        return (day == 0) || (day == 6);
+    else
+        return day == s->altSpeedTimeDay;
 }
 
 /***
@@ -283,6 +298,7 @@ tr_sessionGetDefaultSettings( tr_benc * d )
     tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN,     540 ); /* 9am */
     tr_bencDictAddBool( d, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED,   FALSE );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_TIME_END,       1020 ); /* 5pm */
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_TIME_DAY,       TR_SCHED_ALL );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_USPEED,                   100 );
     tr_bencDictAddBool( d, TR_PREFS_KEY_USPEED_ENABLED,           FALSE );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_UPLOAD_SLOTS_PER_TORRENT, 14 );
@@ -337,6 +353,7 @@ tr_sessionGetSettings( tr_session * s, struct tr_benc * d )
     tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN,     tr_sessionGetAltSpeedBegin( s ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED,   tr_sessionUsesAltSpeedTime( s ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_TIME_END,       tr_sessionGetAltSpeedEnd( s ) );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_TIME_DAY,       tr_sessionGetAltSpeedDay( s ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_USPEED,                   tr_sessionGetSpeedLimit( s, TR_UP ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_USPEED_ENABLED,           tr_sessionIsSpeedLimited( s, TR_UP ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_UPLOAD_SLOTS_PER_TORRENT, s->uploadSlotsPerTorrent );
@@ -606,7 +623,7 @@ tr_sessionInitImpl( void * vdata )
     assert( found );
     session->peerPort = session->isPortRandom ? getRandomPort( session ) : j;
     session->shared = tr_sharedInit( session, boolVal, session->peerPort );
-    session->isPortSet = session->isPortRandom || j>0;
+    session->isPortSet = session->peerPort > 0;
 
     /**
     **/
@@ -652,6 +669,10 @@ tr_sessionInitImpl( void * vdata )
     found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_ALT_SPEED_TIME_END, &i );
     assert( found );
     session->altSpeedTimeEnd = i;
+    
+    found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_ALT_SPEED_TIME_DAY, &i );
+    assert( found );
+    session->altSpeedTimeDay = i;
 
     found = tr_bencDictFindBool( &settings, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED, &boolVal );
     assert( found );
@@ -963,17 +984,31 @@ onAltTimer( int foo UNUSED, short bar UNUSED, void * vsession )
     {
         const time_t now = time( NULL );
         struct tm tm;
-        int currentMinute;
+        int currentMinute, day;
+        tr_bool isBeginTime, isEndTime, isDay;
         tr_localtime_r( &now, &tm );
         currentMinute = tm.tm_hour*60 + tm.tm_min;
+        day = tm.tm_wday;
+        
+        isBeginTime = currentMinute == session->altSpeedTimeBegin;
+        isEndTime = currentMinute == session->altSpeedTimeEnd;
+        if( isBeginTime || isEndTime )
+        {
+            /* if looking at the end date, look at the next day if end time is before begin time */
+            if( isEndTime && !isBeginTime && session->altSpeedTimeEnd < session->altSpeedTimeBegin )
+                day = (day - 1) % 7;
+            
+            if( session->altSpeedTimeDay == TR_SCHED_ALL )
+                isDay = TRUE;
+            else if( session->altSpeedTimeDay == TR_SCHED_WEEKDAY )
+                isDay = (day != 0) && (day != 6);
+            else if( session->altSpeedTimeDay == TR_SCHED_WEEKEND )
+                isDay = (day == 0) || (day == 6);
+            else
+                isDay = day == session->altSpeedTimeDay;
 
-        if( currentMinute == session->altSpeedTimeBegin )
-        {
-            useAltSpeed( session, TRUE, FALSE );
-        }
-        else if( currentMinute == session->altSpeedTimeEnd )
-        {
-            useAltSpeed( session, FALSE, FALSE );
+            if( isDay )
+                useAltSpeed( session, isBeginTime, FALSE );
         }
     }
 
@@ -1126,6 +1161,28 @@ tr_sessionGetAltSpeedEnd( const tr_session * s )
     assert( tr_isSession( s ) );
 
     return s->altSpeedTimeEnd;
+}
+
+void
+tr_sessionSetAltSpeedDay( tr_session * s, tr_sched_day day )
+{
+    assert( tr_isSession( s ) );
+
+    if( s->altSpeedTimeDay != day )
+    {
+        s->altSpeedTimeDay = day;
+
+        if( tr_sessionUsesAltSpeedTime( s ) )
+            useAltSpeed( s, isAltTime( s ), TRUE );
+    }
+}
+
+tr_sched_day
+tr_sessionGetAltSpeedDay( const tr_session * s )
+{
+    assert( tr_isSession( s ) );
+
+    return s->altSpeedTimeDay;
 }
 
 void

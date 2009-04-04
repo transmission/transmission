@@ -1017,6 +1017,8 @@ sessionSet( tr_session               * session,
         tr_sessionSetAltSpeedBegin( session, i );
     if( tr_bencDictFindInt( args_in, TR_PREFS_KEY_ALT_SPEED_TIME_END, &i ) )
         tr_sessionSetAltSpeedEnd( session, i );
+    if( tr_bencDictFindInt( args_in, TR_PREFS_KEY_ALT_SPEED_TIME_DAY, &i ) )
+        tr_sessionSetAltSpeedDay( session, i );
     if( tr_bencDictFindBool( args_in, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED, &boolVal ) )
         tr_sessionUseAltSpeedTime( session, boolVal );
     if( tr_bencDictFindBool( args_in, TR_PREFS_KEY_BLOCKLIST_ENABLED, &boolVal ) )
@@ -1127,6 +1129,7 @@ sessionGet( tr_session               * s,
     tr_bencDictAddBool( d, TR_PREFS_KEY_ALT_SPEED_ENABLED, tr_sessionUsesAltSpeed(s) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN, tr_sessionGetAltSpeedBegin(s) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_TIME_END,tr_sessionGetAltSpeedEnd(s) );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_TIME_DAY,tr_sessionGetAltSpeedDay(s) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED, tr_sessionUsesAltSpeedTime(s) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_BLOCKLIST_ENABLED, tr_blocklistIsEnabled( s ) );
     tr_bencDictAddInt ( d, "blocklist-size", tr_blocklistGetRuleCount( s ) );
