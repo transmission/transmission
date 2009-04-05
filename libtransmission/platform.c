@@ -40,6 +40,7 @@
 #include <unistd.h> /* getuid getpid close */
 
 #include "transmission.h"
+#include "ggets.h"
 #include "session.h"
 #include "list.h"
 #include "platform.h"
@@ -443,15 +444,68 @@ tr_getDefaultConfigDir( const char * appname )
     return s;
 }
 
+/* This was stolen from gthumb, though it probably originates from
+ * xdg-user-dirs's xdg-user-dir-lookup.c. See:
+ * http://www.redhat.com/archives/fedora-devel-list/2007-March/msg00677.html
+ */
 const char*
 tr_getDefaultDownloadDir( void )
 {
-    static char * s = NULL;
+    static char * user_dir = NULL;
 
-    if( s == NULL )
-        s = tr_buildPath( getHomeDir( ), "Downloads", NULL );
+#ifdef SYS_DARWIN
 
-    return s;
+    user_dir = tr_buildPath( getHomeDir( ), "Downloads", NULL );
+
+#else
+
+    if( user_dir == NULL )
+    {
+        const char * config_home;
+        char * config_file;
+        char * content;
+        size_t content_len;
+
+        /* figure out where to look for user-dirs.dirs */
+        config_home = getenv( "XDG_CONFIG_HOME" );
+        if( config_home && *config_home )
+            config_file = tr_buildPath( config_home, "user-dirs.dirs", NULL );
+        else
+            config_file = tr_buildPath( getHomeDir( ), ".config", "user-dirs.dirs", NULL );
+
+        /* read in user-dirs.dirs and look for the download dir entry */
+        content = (char *) tr_loadFile( config_file, &content_len );
+        if( content && content_len>0 )
+        {
+            const char * key = "XDG_DOWNLOAD_DIR=\"";
+            char * line = strstr( content, key );
+            if( line != NULL )
+            {
+                char * value = line + strlen( key );
+                char * end = strchr( value, '"' );
+
+                if( end )
+                {
+                    *end = '\0';
+
+                    if( !memcmp( value, "$HOME/", 6 ) )
+                        user_dir = tr_buildPath( getHomeDir( ), value+6, NULL );
+                    else
+                        user_dir = tr_strdup( value );
+                }
+            }
+        }
+
+        if( user_dir == NULL )
+            user_dir = tr_buildPath( getHomeDir( ), "Downloads", NULL );
+
+        tr_free( content );
+        tr_free( config_file );
+    }
+
+#endif
+
+    return user_dir;
 }
 
 /***
