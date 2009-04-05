@@ -13,15 +13,6 @@
 
 2.  Message Format
 
-   Messages are formatted in a subset of JSON easily represented
-   as bencoded data.  Arrays, objects, strings, and whole numbers
-   all have one-to-one mappings between JSON and benc.
-
-   Booleans and floating-point numbers are also used in the JSON messages.
-   Those two types aren't native to benc, so they're encoded this way:
-   Booleans are encoded as numbers where 0 is false and 1 is true.
-   Floating-point numbers are represented as strings.
-
    Messages are formatted as objects.  There are two types:
    requests (described in 2.1) and responses (described in 2.2).
 
@@ -98,19 +89,19 @@
    string                            | value type & description
    ----------------------------------+-------------------------------------------------
    "downloadLimit"                   | number     maximum download speed (in K/s)
-   "downloadLimited"                 | 'boolean'  true if "downloadLimit" is honored
+   "downloadLimited"                 | boolean    true if "downloadLimit" is honored
    "files-wanted"                    | array      indices of file(s) to download
    "files-unwanted"                  | array      indices of file(s) to not download
-   "honorsSessionLimits"             | 'boolean'  true if session upload limits are honored
+   "honorsSessionLimits"             | boolean    true if session upload limits are honored
    "ids"                             | array      torrent list, as described in 3.1
    "peer-limit"                      | number     maximum number of peers
    "priority-high"                   | array      indices of high-priority file(s)
    "priority-low"                    | array      indices of low-priority file(s)
    "priority-normal"                 | array      indices of normal-priority file(s)
-   "seedRatioLimit"                  | 'double'   session seeding ratio
+   "seedRatioLimit"                  | double     session seeding ratio
    "seedRatioMode"                   | number     which ratio to use.  See tr_ratiolimit
    "uploadLimit"                     | number     maximum upload speed (in K/s)
-   "uploadLimited"                   | 'boolean'  true if "uploadLimit" is honored
+   "uploadLimited"                   | boolean    true if "uploadLimit" is honored
 
    Just as an empty "ids" value is shorthand for "all ids", using an empty array
    for "files-wanted", "files-unwanted", "priority-high", "priority-low", or
@@ -151,7 +142,7 @@
    downloadedEver                  | number                      | tr_stat
    downloaders                     | number                      | tr_stat
    downloadLimit                   | number                      | tr_torrent
-   downloadLimited                 | 'boolean'                   | tr_torrent
+   downloadLimited                 | boolean                     | tr_torrent
    error                           | number                      | tr_stat
    errorString                     | number                      | tr_stat
    eta                             | number                      | tr_stat
@@ -160,9 +151,9 @@
    hashString                      | string                      | tr_info
    haveUnchecked                   | number                      | tr_stat
    haveValid                       | number                      | tr_stat
-   honorsSessionLimits             | 'boolean'                   | tr_torrent
+   honorsSessionLimits             | boolean                     | tr_torrent
    id                              | number                      | tr_torrent
-   isPrivate                       | 'boolean'                   | tr_torrent
+   isPrivate                       | boolean                     | tr_torrent
    lastAnnounceTime                | number                      | tr_stat
    lastScrapeTime                  | number                      | tr_stat
    leechers                        | number                      | tr_stat
@@ -179,19 +170,19 @@
    peersGettingFromUs              | number                      | tr_stat
    peersKnown                      | number                      | tr_stat
    peersSendingToUs                | number                      | tr_stat
-   percentDone                     | 'double'                    | tr_stat
+   percentDone                     | double                      | tr_stat
    pieces                          | string (see below)          | tr_torrent
    pieceCount                      | tnumber                     | tr_info
    pieceSize                       | tnumber                     | tr_info
    priorities                      | array (see below)           | n/a
-   ratio                           | 'double'                    | tr_stat
+   ratio                           | double                      | tr_stat
    rateDownload (B/s)              | number                      | tr_stat
    rateUpload (B/s)                | number                      | tr_stat
-   recheckProgress                 | 'double'                    | tr_stat
+   recheckProgress                 | double                      | tr_stat
    scrapeResponse                  | string                      | tr_stat
    scrapeURL                       | string                      | tr_stat
    seeders                         | number                      | tr_stat
-   seedRatioLimit                  | 'double'                    | tr_torrent
+   seedRatioLimit                  | double                      | tr_torrent
    seedRatioMode                   | number                      | tr_ratiolimit
    sizeWhenDone                    | number                      | tr_stat
    startDate                       | number                      | tr_stat
@@ -203,8 +194,8 @@
    torrentFile                     | string                      | tr_info
    uploadedEver                    | number                      | tr_stat
    uploadLimit                     | number                      | tr_torrent
-   uploadLimited                   | 'boolean'                   | tr_torrent
-   uploadRatio                     | 'double'                    | tr_stat
+   uploadLimited                   | boolean                     | tr_torrent
+   uploadRatio                     | double                      | tr_stat
    wanted                          | array (see below)           | n/a
    webseeds                        | array (see below)           | n/a
    webseedsSendingToUs             | number                      | tr_stat
@@ -223,23 +214,23 @@
                           | each containing:                     |
                           +-------------------------+------------+
                           | bytesCompleted          | number     | tr_torrent
-                          | wanted                  | 'boolean'  | tr_info
+                          | wanted                  | boolean    | tr_info
                           | priority                | number     | tr_info
    -----------------------+--------------------------------------+
    peers                  | array of objects, each containing:   |
                           +-------------------------+------------+
                           | address                 | string     | tr_peer_stat
                           | clientName              | string     | tr_peer_stat
-                          | clientIsChoked          | 'boolean'  | tr_peer_stat
-                          | clientIsInterested      | 'boolean'  | tr_peer_stat
-                          | isDownloadingFrom       | 'boolean'  | tr_peer_stat
-                          | isEncrypted             | 'boolean'  | tr_peer_stat
-                          | isIncoming              | 'boolean'  | tr_peer_stat
-                          | isUploadingTo           | 'boolean'  | tr_peer_stat
-                          | peerIsChoked            | 'boolean'  | tr_peer_stat
-                          | peerIsInterested        | 'boolean'  | tr_peer_stat
+                          | clientIsChoked          | boolean    | tr_peer_stat
+                          | clientIsInterested      | boolean    | tr_peer_stat
+                          | isDownloadingFrom       | boolean    | tr_peer_stat
+                          | isEncrypted             | boolean    | tr_peer_stat
+                          | isIncoming              | boolean    | tr_peer_stat
+                          | isUploadingTo           | boolean    | tr_peer_stat
+                          | peerIsChoked            | boolean    | tr_peer_stat
+                          | peerIsInterested        | boolean    | tr_peer_stat
                           | port                    | number     | tr_peer_stat
-                          | progress                | 'double'   | tr_peer_stat
+                          | progress                | double     | tr_peer_stat
                           | rateToClient (B/s)      | number     | tr_peer_stat
                           | rateToPeer (B/s)        | number     | tr_peer_stat
    -----------------------+--------------------------------------+
@@ -323,7 +314,7 @@
    "download-dir"     | string      path to download the torrent to
    "filename"         | string      filename or URL of the .torrent file
    "metainfo"         | string      base64-encoded .torrent content
-   "paused"           | 'boolean'   if true, don't start the torrent
+   "paused"           | boolean     if true, don't start the torrent
    "peer-limit"       | number      maximum number of peers
    "files-wanted"     | array       indices of file(s) to download
    "files-unwanted"   | array       indices of file(s) to not download
@@ -347,7 +338,7 @@
    string                     | value type & description
    ---------------------------+-------------------------------------------------
    "ids"                      | array      torrent list, as described in 3.1
-   "delete-local-data"        | 'boolean'  delete local data. (default: false)
+   "delete-local-data"        | boolean    delete local data. (default: false)
 
    Response arguments: none
 
@@ -359,30 +350,30 @@
    string                     | value type & description
    ---------------------------+-------------------------------------------------
    "alt-speed-down"           | number     max global download speed (in K/s)
-   "alt-speed-enabled"        | 'boolean'  true means use the alt speeds
+   "alt-speed-enabled"        | boolean    true means use the alt speeds
    "alt-speed-time-begin"     | number     when to turn on alt speeds (units: minutes after midnight)
-   "alt-speed-time-enabled"   | 'boolean'  true means the scheduled on/off times are used
+   "alt-speed-time-enabled"   | boolean    true means the scheduled on/off times are used
    "alt-speed-time-end"       | number     when to turn off alt speeds (units: same)
    "alt-speed-time-day"       | number     what day(s) to turn on alt speeds (look at tr_sched_day)
    "alt-speed-up"             | number     max global upload speed (in K/s)
-   "blocklist-enabled"        | 'boolean'  true means enabled
+   "blocklist-enabled"        | boolean    true means enabled
    "blocklist-size"           | number     number of rules in the blocklist
    "encryption"               | string     "required", "preferred", "tolerated"
    "download-dir"             | string     default path to download torrents
    "peer-limit-global"        | number     maximum global number of peers
    "peer-limit-per-torrent"   | number     maximum global number of peers
-   "pex-enabled"              | 'boolean'  true means allow pex in public torrents
+   "pex-enabled"              | boolean    true means allow pex in public torrents
    "peer-port"                | number     port number
-   "peer-port-random-on-start"| 'boolean'  true means pick a random peer port on launch
-   "port-forwarding-enabled"  | 'boolean'  true means enabled
+   "peer-port-random-on-start"| boolean    true means pick a random peer port on launch
+   "port-forwarding-enabled"  | boolean    true means enabled
    "rpc-version"              | number     the current RPC API version
    "rpc-version-minimum"      | number     the minimum RPC API version supported
-   "seedRatioLimit"           | 'double'   the default seed ratio for torrents to use
-   "seedRatioLimited"         | 'boolean'  true if seedRatioLimit is honored by default
+   "seedRatioLimit"           | double     the default seed ratio for torrents to use
+   "seedRatioLimited"         | boolean    true if seedRatioLimit is honored by default
    "speed-limit-down"         | number     max global download speed (in K/s)
-   "speed-limit-down-enabled" | 'boolean'  true means enabled
+   "speed-limit-down-enabled" | boolean    true means enabled
    "speed-limit-up"           | number     max global upload speed (in K/s)
-   "speed-limit-up-enabled"   | 'boolean'  true means enabled
+   "speed-limit-up-enabled"   | boolean    true means enabled
    "version"                  | string     long version string "$version ($revision)"
 
    "rpc-version" indicates the RPC interface version supported by the RPC server.
