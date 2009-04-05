@@ -24,12 +24,6 @@
  #include <zlib.h>
 #endif
 
-#ifdef HAVE_AVAHI
- #include <avahi-common/simple-watch.h>
- #include <avahi-client/client.h>
- #include <avahi-client/publish.h>
-#endif
-
 #include <libevent/event.h>
 #include <libevent/evhttp.h>
 
@@ -67,11 +61,6 @@ struct tr_rpc_server
 
 #ifdef HAVE_ZLIB
     z_stream           stream;
-#endif
-#ifdef HAVE_AVAHI
-    AvahiSimplePoll   *poll;
-    AvahiClient       *client;
-    AvahiEntryGroup   *group;
 #endif
 };
 
@@ -530,35 +519,6 @@ handle_request( struct evhttp_request * req,
     }
 }
 
-#ifdef HAVE_AVAHI
-static void
-entry_group_callback( AvahiEntryGroup *g, AvahiEntryGroupState state, void *userdata )
-{
-	/* No-op */
-}
-
-static void
-client_callback( AvahiClient *c, AvahiClientState state, void * vserver )
-{
-	tr_rpc_server * server  = vserver;
-
-	if( state != AVAHI_CLIENT_S_RUNNING )
-	{
-		avahi_client_free( server->client );
-		server->client = NULL;
-		avahi_simple_poll_free( server->poll );
-		server->poll = NULL;
-		return;
-	}
-
-	server->group = avahi_entry_group_new( c, entry_group_callback, NULL );
-	avahi_entry_group_add_service( server->group, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC,
-				       0, "Transmission Web Interface", "_http._tcp", NULL, NULL, server->port,
-				       "path=/transmission/web", NULL );
-	avahi_entry_group_commit( server->group );
-}
-#endif /* HAVE_AVAHI */
-
 static void
 startServer( void * vserver )
 {
@@ -570,10 +530,6 @@ startServer( void * vserver )
         evhttp_bind_socket( server->httpd, "0.0.0.0", server->port );
         evhttp_set_gencb( server->httpd, handle_request, server );
 
-#ifdef HAVE_AVAHI
-	server->poll = avahi_simple_poll_new();
-	server->client = avahi_client_new( avahi_simple_poll_get( server->poll ), 0, client_callback, server, NULL );
-#endif
     }
 }
 
@@ -584,15 +540,6 @@ stopServer( tr_rpc_server * server )
     {
         evhttp_free( server->httpd );
         server->httpd = NULL;
-
-#ifdef HAVE_AVAHI
-	avahi_client_free( server->client );
-	server->client = NULL;
-	avahi_entry_group_free( server->group );
-	server->group = NULL;
-	avahi_simple_poll_free( server->poll );
-	server->poll = NULL;
-#endif
     }
 }
 
