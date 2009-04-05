@@ -40,7 +40,6 @@
 #include <unistd.h> /* getuid getpid close */
 
 #include "transmission.h"
-#include "ggets.h"
 #include "session.h"
 #include "list.h"
 #include "platform.h"
@@ -444,23 +443,18 @@ tr_getDefaultConfigDir( const char * appname )
     return s;
 }
 
-/* This was stolen from gthumb, though it probably originates from
- * xdg-user-dirs's xdg-user-dir-lookup.c. See:
- * http://www.redhat.com/archives/fedora-devel-list/2007-March/msg00677.html
- */
 const char*
 tr_getDefaultDownloadDir( void )
 {
     static char * user_dir = NULL;
 
-#ifdef SYS_DARWIN
-
-    user_dir = tr_buildPath( getHomeDir( ), "Downloads", NULL );
-
-#else
-
     if( user_dir == NULL )
     {
+#ifndef SYS_DARWIN
+
+        user_dir = tr_buildPath( getHomeDir( ), "Downloads", NULL );
+
+#else
         const char * config_home;
         char * config_file;
         char * content;
@@ -501,9 +495,8 @@ tr_getDefaultDownloadDir( void )
 
         tr_free( content );
         tr_free( config_file );
-    }
-
 #endif
+    }
 
     return user_dir;
 }
