@@ -249,9 +249,9 @@ void tr_sessionLoadSettings( struct tr_benc  * dictionary,
  * @param dictionary
  * @see tr_sessionLoadSettings()
  */
-void tr_sessionSaveSettings( tr_session     * session,
-                             const char     * configDir,
-                             struct tr_benc * dictonary );
+void tr_sessionSaveSettings( tr_session             * session,
+                             const char             * configDir,
+                             const struct tr_benc *   dictonary );
 
 /**
  * Initialize a libtransmission session.

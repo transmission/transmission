@@ -340,27 +340,46 @@ tr_sessionLoadSettings( tr_benc * d, const char * configDir, const char * appNam
 }
 
 void
-tr_sessionSaveSettings( tr_session * session, const char * configDir, tr_benc * settings )
+tr_sessionSaveSettings( tr_session    * session,
+                        const char    * configDir,
+                        const tr_benc * clientSettings )
 {
-    tr_benc fileSettings;
-    char * filename;
+    tr_benc settings;
+    char * filename = tr_buildPath( configDir, "settings.json", NULL );
 
-    assert( tr_bencIsDict( settings ) );
- 
-    filename = tr_buildPath( configDir, "settings.json", NULL );
+    assert( tr_bencIsDict( clientSettings ) );
 
-    tr_sessionGetSettings( session, settings );
+    tr_bencInitDict( &settings, 0 );
 
-    if( tr_bencLoadJSONFile( filename, &fileSettings ) ) {
-        tr_bencSaveJSONFile( filename, settings );
-    } else {
-        tr_bencMergeDicts( &fileSettings, settings );
-        tr_bencSaveJSONFile( filename, &fileSettings );
-        tr_bencFree( &fileSettings );
+    /* the existing file settings are the fallback values */
+    {
+        tr_benc fileSettings;
+        if( !tr_bencLoadJSONFile( filename, &fileSettings ) )
+        {
+            tr_bencMergeDicts( &settings, &fileSettings );
+            tr_bencFree( &fileSettings );
+        }
     }
 
+    /* the client's settings override the file settings */
+    tr_bencMergeDicts( &settings, clientSettings );
+
+    /* the session's true values override the file & client settings */
+    {
+        tr_benc sessionSettings;
+        tr_bencInitDict( &sessionSettings, 0 );
+        tr_sessionGetSettings( session, &sessionSettings );
+        tr_bencMergeDicts( &settings, &sessionSettings );
+        tr_bencFree( &sessionSettings );
+    }
+
+    /* save the result */
+    tr_bencSaveJSONFile( filename, &settings );
     tr_inf( "Saved \"%s\"", filename );
+
+    /* cleanup */
     tr_free( filename );
+    tr_bencFree( &settings );
 }
 
 static void metainfoLookupRescan( tr_session * );
