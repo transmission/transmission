@@ -742,10 +742,6 @@ torrentSet( tr_session               * session,
             tr_torrentSetSpeedLimit( tor, TR_UP, tmp );
         if( tr_bencDictFindBool( args_in, "uploadLimited", &boolVal ) )
             tr_torrentUseSpeedLimit( tor, TR_UP, boolVal );
-        if( tr_bencDictFindReal( args_in, "ratio-limit", &d ) )
-            tr_torrentSetRatioLimit( tor, d );
-        if( tr_bencDictFindInt( args_in, "ratio-limit-mode", &tmp ) )
-            tr_torrentSetRatioMode( tor, tmp );
         if( tr_bencDictFindReal( args_in, "seedRatioLimit", &d ) )
             tr_torrentSetRatioLimit( tor, d );
         if( tr_bencDictFindInt( args_in, "seedRatioMode", &tmp ) )
@@ -1067,10 +1063,6 @@ sessionSet( tr_session               * session,
         tr_sessionSetSpeedLimit( session, TR_UP, i );
     if( tr_bencDictFindBool( args_in, "speed-limit-up-enabled", &boolVal ) )
         tr_sessionLimitSpeed( session, TR_UP, boolVal );
-    if( tr_bencDictFindReal( args_in, "ratio-limit", &d ) )
-        tr_sessionSetRatioLimit( session, d );
-    if( tr_bencDictFindBool( args_in, "ratio-limit-enabled", &boolVal ) )
-        tr_sessionSetRatioLimited( session, boolVal );
     if( tr_bencDictFindStr( args_in, "encryption", &str ) ) {
         if( !strcmp( str, "required" ) )
             tr_sessionSetEncryption( session, TR_ENCRYPTION_REQUIRED );
@@ -1166,8 +1158,6 @@ sessionGet( tr_session               * s,
     tr_bencDictAddBool( d, "speed-limit-up-enabled", tr_sessionIsSpeedLimited( s, TR_UP ) );
     tr_bencDictAddInt ( d, "speed-limit-down", tr_sessionGetSpeedLimit( s, TR_DOWN ) );
     tr_bencDictAddBool( d, "speed-limit-down-enabled", tr_sessionIsSpeedLimited( s, TR_DOWN ) );
-    tr_bencDictAddReal( d, "ratio-limit", tr_sessionGetRatioLimit( s ) );
-    tr_bencDictAddBool( d, "ratio-limit-enabled", tr_sessionIsRatioLimited( s ) );
     tr_bencDictAddStr ( d, "version", LONG_VERSION_STRING );
     switch( tr_sessionGetEncryption( s ) ) {
         case TR_CLEAR_PREFERRED: str = "tolerated"; break;

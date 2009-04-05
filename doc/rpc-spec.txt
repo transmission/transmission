@@ -377,6 +377,8 @@
    "port-forwarding-enabled"  | 'boolean'  true means enabled
    "rpc-version"              | number     the current RPC API version
    "rpc-version-minimum"      | number     the minimum RPC API version supported
+   "seedRatioLimit"           | 'double'   the default seed ratio for torrents to use
+   "seedRatioLimited"         | 'boolean'  true if seedRatioLimit is honored by default
    "speed-limit-down"         | number     max global download speed (in K/s)
    "speed-limit-down-enabled" | 'boolean'  true means enabled
    "speed-limit-up"           | number     max global upload speed (in K/s)
