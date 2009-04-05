@@ -7,6 +7,7 @@ AM_CFLAGS = \
     $(LIBCURL_CFLAGS) \
     $(OPENSSL_CFLAGS) \
     $(PTHREAD_CFLAGS) \
+    $(AVAHI_CFLAGS)   \
     $(ZLIB_CFLAGS)
 
 noinst_LIBRARIES = libtransmission.a
@@ -128,6 +129,7 @@ apps_ldadd = \
     $(LIBCURL_LIBS) \
     $(OPENSSL_LIBS) \
     $(PTHREAD_LIBS) \
+    $(AVAHI_LIBS) \
     $(ZLIB_LIBS) \
     -lm
 

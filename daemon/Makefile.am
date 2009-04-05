@@ -25,6 +25,7 @@ LDADD = \
     $(INTLLIBS) \
     $(LIBCURL_LIBS) \
     $(ZLIB_LIBS) \
+    $(AVAHI_LIBS) \
     $(OPENSSL_LIBS) \
     $(PTHREAD_LIBS) -lm
 

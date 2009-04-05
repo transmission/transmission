@@ -252,6 +252,21 @@ if test "x$build_gtk" = "xyes"; then
     fi
 fi
 
+PKG_CHECK_MODULES([AVAHI],
+                  [avahi-client],
+                  [have_avahi=yes],
+                  [have_avahi=no])
+AC_ARG_ENABLE([avahi], 
+              AS_HELP_STRING([--enable-avahi],[enable mDNS advertising for the web interface]),, 
+              [enable_avahi=yes]) 
+use_avahi=no
+if test "x$enable_avahi" = "xyes" ; then
+    if test "x$have_avahi" = "xyes"; then
+        use_avahi=yes
+        AC_DEFINE([HAVE_AVAHI], 1) 
+    fi
+fi
+
 AC_ARG_ENABLE([nls], 
               AS_HELP_STRING([--enable-nls],[enable native language support]),,
               [enable_nls=yes])
@@ -375,6 +390,7 @@ Configuration:
           ... gio support:          ${use_gio}
           ... dbus-glib support:    ${use_dbus_glib}
           ... libnotify support:    ${use_libnotify}
+          ... avahi support:        ${use_avahi}
         Build OS X client:          ${build_mac}
 
 "

@@ -109,6 +109,7 @@ transmission_LDADD = \
     $(OPENSSL_LIBS) \
     $(LIBCURL_LIBS) \
     $(ZLIB_LIBS) \
+    $(AVAHI_LIBS) \
     $(PTHREAD_LIBS) -lm
 
 DESKTOP_IN_FILES=transmission.desktop.in
