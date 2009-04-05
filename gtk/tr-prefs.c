@@ -736,10 +736,7 @@ webPage( GObject * core )
 
         page->whitelist_widgets = g_slist_append( page->whitelist_widgets, w );
         v = page->view = GTK_TREE_VIEW( w );
-#if GTK_CHECK_VERSION( 2,12,0 )
-        gtk_widget_set_tooltip_text( w,
-                  _( "IP addresses may use wildcards, such as 192.168.*.*" ) );
-#endif
+        gtr_widget_set_tooltip_text( w, _( "IP addresses may use wildcards, such as 192.168.*.*" ) );
         sel = gtk_tree_view_get_selection( v );
         g_signal_connect( sel, "changed",
                           G_CALLBACK( onWhitelistSelectionChanged ), page );

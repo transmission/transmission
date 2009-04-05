@@ -666,3 +666,16 @@ gtr_timeout_add_seconds( guint        interval,
     return g_timeout_add( interval*1000, function, data );
 #endif
 }
+
+void
+gtr_widget_set_tooltip_text( GtkWidget * w, const char * tip )
+{
+#if GTK_CHECK_VERSION( 2,12,0 )
+    gtk_widget_set_tooltip_text( w, tip );
+#else
+    static GtkTooltips * tips = NULL;
+    if( tips == NULL )
+        tips = gtk_tooltips_new( );
+    gtk_tooltips_set_tip( tips, w, tip, NULL );
+#endif
+}
