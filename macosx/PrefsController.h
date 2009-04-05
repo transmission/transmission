@@ -120,6 +120,7 @@
 - (void) setAutoSpeedLimitDay: (id) sender;
 - (void) updateAutoSpeedLimitDay;
 + (NSInteger) dateToTimeSum: (NSDate *) date;
++ (NSDate *) timeSumToDate: (NSInteger) sum;
 
 - (void) setAutoImport: (id) sender;
 - (void) importFolderSheetShow: (id) sender;

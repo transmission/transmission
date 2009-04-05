@@ -743,6 +743,15 @@ tr_session * fHandle;
     return [components hour] * 60 + [components minute];
 }
 
++ (NSDate *) timeSumToDate: (NSInteger) sum
+{
+    NSDateComponents * comps = [[[NSDateComponents alloc] init] autorelease];
+    [comps setHour: sum / 60];
+    [comps setMinute: sum % 60];
+    
+    return [[NSCalendar currentCalendar] dateFromComponents: comps];
+}
+
 - (BOOL) control: (NSControl *) control textShouldBeginEditing: (NSText *) fieldEditor
 {
     [fInitialString release];
@@ -1228,8 +1237,8 @@ tr_session * fHandle;
     
     #warning fix
     //alt speed limit enabled
-    /*const BOOL useAltSpeed = tr_sessionUsesAltSpeed(fHandle);
-    [fDefaults setBool: useAltSpeed forKey: @"SpeedLimit"];*/
+    const BOOL useAltSpeed = tr_sessionUsesAltSpeed(fHandle);
+    [fDefaults setBool: useAltSpeed forKey: @"SpeedLimit"];
     
     //alt speed limit - down
     const int downLimitAlt = tr_sessionGetAltSpeed(fHandle, TR_DOWN);
@@ -1243,16 +1252,13 @@ tr_session * fHandle;
     const BOOL useAltSpeedSched = tr_sessionUsesAltSpeedTime(fHandle);
     [fDefaults setBool: useAltSpeedSched forKey: @"SpeedLimitAuto"];
     
-    #warning refactor schedule date?
-    /*NSDate * limitStartDate = [PrefsController timeSumToDate: tr_sessionGetAltSpeedBegin(fHandle)];
+    NSDate * limitStartDate = [PrefsController timeSumToDate: tr_sessionGetAltSpeedBegin(fHandle)];
     [fDefaults setObject: limitStartDate forKey: @"SpeedLimitAutoOnDate"];
     
     NSDate * limitEndDate = [PrefsController timeSumToDate: tr_sessionGetAltSpeedEnd(fHandle)];
-    [fDefaults setObject: limitEndDate forKey: @"SpeedLimitAutoOffDate"];*/
+    [fDefaults setObject: limitEndDate forKey: @"SpeedLimitAutoOffDate"];
     
     #warning refactor how to work with schedule day
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"SpeedLimitUpdate" object: nil];
     
     //blocklist
     const BOOL blocklist = tr_blocklistIsEnabled(fHandle);
@@ -1302,6 +1308,8 @@ tr_session * fHandle;
         //ratio limit enabled handled by bindings
         [fRatioStopField setFloatValue: ratioLimit];
     }
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"SpeedLimitUpdate" object: nil];
 }
 
 @end
