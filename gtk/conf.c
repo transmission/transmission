@@ -257,7 +257,6 @@ double
 pref_double_get( const char * key )
 {
     double d = 0.0;
-
     tr_bencDictFindReal( getPrefs( ), key, &d );
     return d;
 }
@@ -276,10 +275,9 @@ pref_double_set( const char * key,
 gboolean
 pref_flag_get( const char * key )
 {
-    int64_t i;
-
-    tr_bencDictFindInt( getPrefs( ), key, &i );
-    return i != 0;
+    tr_bool boolVal;
+    tr_bencDictFindBool( getPrefs( ), key, &boolVal );
+    return boolVal != 0;
 }
 
 gboolean
@@ -303,7 +301,7 @@ void
 pref_flag_set( const char * key,
                gboolean     value )
 {
-    pref_int_set( key, value != 0 );
+    tr_bencDictAddBool( getPrefs( ), key, value );
 }
 
 /***

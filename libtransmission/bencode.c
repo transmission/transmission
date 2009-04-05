@@ -413,6 +413,12 @@ tr_bencListChild( tr_benc * val,
     return ret;
 }
 
+static void
+tr_benc_warning( const char * err )
+{
+    fprintf( stderr, "warning: %s\n", err );
+}
+
 tr_bool
 tr_bencGetInt( const tr_benc * val,
                int64_t *       setme )
@@ -424,7 +430,7 @@ tr_bencGetInt( const tr_benc * val,
             *setme = val->val.i;
 
     if( !success && (( success = tr_bencIsBool( val )))) {
-        fprintf( stderr, "warning: reading bool as an int\n" );
+        tr_benc_warning( "reading bool as an int" );
         if( setme )
             *setme = val->val.b ? 1 : 0;
     }
@@ -452,9 +458,12 @@ tr_bencGetBool( const tr_benc * val, tr_bool * setme )
     if(( success = tr_bencIsBool( val )))
         *setme = val->val.b;
 
-    if( !success && tr_bencIsInt( val ) )
-        if(( success = ( val->val.i==0 || val->val.i==1 ) ))
+    if( !success && tr_bencIsInt( val ) ) {
+        if(( success = ( val->val.i==0 || val->val.i==1 ) )) {
+            tr_benc_warning( "warning: reading bool as an int\n" );
             *setme = val->val.i!=0;
+        }
+    }
 
     if( !success && tr_bencIsString( val ) )
         if(( success = ( !strcmp(val->val.s.s,"true") || !strcmp(val->val.s.s,"false"))))
@@ -1541,22 +1550,33 @@ tr_bencMergeDicts( tr_benc * target, const tr_benc * source )
     {
         const char * key;
         const tr_benc * val;
+        tr_benc * t;
 
         if( tr_bencDictChild( source, i, &key, &val ) )
         {
-            int64_t i64;
-            const char * str;
-            tr_benc * t;
-
-            if( tr_bencGetInt( val, &i64 ) )
+            if( tr_bencIsBool( val ) )
             {
-                tr_bencDictRemove( target, key );
-                tr_bencDictAddInt( target, key, i64 );
+                tr_bool boolVal;
+                tr_bencGetBool( val, &boolVal );
+                tr_bencDictAddBool( target, key, boolVal );
             }
-            else if( tr_bencGetStr( val, &str ) )
+            else if( tr_bencIsReal( val ) )
             {
-                tr_bencDictRemove( target, key );
-                tr_bencDictAddStr( target, key, str );
+                double realVal;
+                tr_bencGetReal( val, &realVal );
+                tr_bencDictAddReal( target, key, realVal );
+            }
+            else if( tr_bencIsInt( val ) )
+            {
+                int64_t intVal;
+                tr_bencGetInt( val, &intVal );
+                tr_bencDictAddInt( target, key, intVal );
+            }
+            else if( tr_bencIsString( val ) )
+            {
+                const char * strVal;
+                tr_bencGetStr( val, &strVal );
+                tr_bencDictAddStr( target, key, strVal );
             }
             else if( tr_bencIsDict( val ) && tr_bencDictFindDict( target, key, &t ) )
             {
@@ -1564,7 +1584,6 @@ tr_bencMergeDicts( tr_benc * target, const tr_benc * source )
             }
             else
             {
-            
                 tr_dbg( "tr_bencMergeDicts skipping \"%s\"", key );
             }
         }

@@ -92,14 +92,9 @@ callback( void *             vdata,
             break;
 
         case JSON_T_FLOAT:
-        {
-            char buf[128];
-            tr_snprintf( buf, sizeof( buf ), "%f",
-                         (double)value->vu.float_value );
-            tr_bencInitStr( getNode( data ), buf, -1 );
             data->hasContent = TRUE;
+            tr_bencInitReal( getNode( data ), (double)value->vu.float_value );
             break;
-        }
 
         case JSON_T_NULL:
             data->hasContent = TRUE;
@@ -113,12 +108,12 @@ callback( void *             vdata,
 
         case JSON_T_TRUE:
             data->hasContent = TRUE;
-            tr_bencInitInt( getNode( data ), 1 );
+            tr_bencInitBool( getNode( data ), 1 );
             break;
 
         case JSON_T_FALSE:
             data->hasContent = TRUE;
-            tr_bencInitInt( getNode( data ), 0 );
+            tr_bencInitBool( getNode( data ), 0 );
             break;
 
         case JSON_T_STRING:
