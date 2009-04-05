@@ -387,7 +387,7 @@ tr_session * fHandle;
 
 - (void) setPort: (id) sender
 {
-    int port = [sender intValue];
+    const int port = [sender intValue];
     [fDefaults setInteger: port forKey: @"BindPort"];
     tr_sessionSetPeerPort(fHandle, port);
     
@@ -397,7 +397,7 @@ tr_session * fHandle;
 
 - (void) randomPort: (id) sender
 {
-    tr_port port = tr_sessionSetPeerPortRandom(fHandle);
+    const tr_port port = tr_sessionSetPeerPortRandom(fHandle);
     
     [fPortField setIntValue: port];
     [self setPort: fPortField];
@@ -542,7 +542,7 @@ tr_session * fHandle;
 
 - (void) updateBlocklistFields
 {
-    BOOL exists = tr_blocklistExists(fHandle);
+    const BOOL exists = tr_blocklistExists(fHandle);
     
     if (exists)
     {
@@ -1179,7 +1179,7 @@ tr_session * fHandle;
 - (void) rpcUpdatePrefs
 {
     //encryption
-    tr_encryption_mode encryptionMode = tr_sessionGetEncryption(fHandle);
+    const tr_encryption_mode encryptionMode = tr_sessionGetEncryption(fHandle);
     [fDefaults setBool: encryptionMode != TR_CLEAR_PREFERRED forKey: @"EncryptionPrefer"];
     [fDefaults setBool: encryptionMode == TR_ENCRYPTION_REQUIRED forKey: @"EncryptionRequire"];
     
@@ -1188,39 +1188,82 @@ tr_session * fHandle;
     [fDefaults setObject: downloadLocation forKey: @"DownloadFolder"];
     
     //peers
-    uint16_t peersTotal = tr_sessionGetPeerLimit(fHandle);
+    const uint16_t peersTotal = tr_sessionGetPeerLimit(fHandle);
     [fDefaults setInteger: peersTotal forKey: @"PeersTotal"];
     
+    const uint16_t peersTorrent = tr_sessionGetPeerLimitPerTorrent(fHandle);
+    [fDefaults setInteger: peersTotal forKey: @"PeersTorrent"];
+    
     //pex
-    BOOL pex = tr_sessionIsPexEnabled(fHandle);
+    const BOOL pex = tr_sessionIsPexEnabled(fHandle);
     [fDefaults setBool: pex forKey: @"PEXGlobal"];
     
     //port
-    tr_port port = tr_sessionGetPeerPort(fHandle);
+    const tr_port port = tr_sessionGetPeerPort(fHandle);
     [fDefaults setInteger: port forKey: @"BindPort"];
     
-    BOOL nat = tr_sessionIsPortForwardingEnabled(fHandle);
+    const BOOL nat = tr_sessionIsPortForwardingEnabled(fHandle);
     [fDefaults setBool: nat forKey: @"NatTraversal"];
     
     fPeerPort = -1;
     fNatStatus = -1;
     [self updatePortStatus];
     
+    const BOOL randomPort = tr_sessionGetPeerPortRandomOnStart(fHandle);
+    [fDefaults setBool: randomPort forKey: @"RandomPort"];
+    
     //speed limit - down
-    BOOL downLimitEnabled = tr_sessionIsSpeedLimited(fHandle, TR_DOWN);
+    const BOOL downLimitEnabled = tr_sessionIsSpeedLimited(fHandle, TR_DOWN);
     [fDefaults setBool: downLimitEnabled forKey: @"CheckDownload"];
     
-    int downLimit = tr_sessionGetSpeedLimit(fHandle, TR_DOWN);
+    const int downLimit = tr_sessionGetSpeedLimit(fHandle, TR_DOWN);
     [fDefaults setInteger: downLimit forKey: @"DownloadLimit"];
     
     //speed limit - up
-    BOOL upLimitEnabled = tr_sessionIsSpeedLimited(fHandle, TR_UP);
+    const BOOL upLimitEnabled = tr_sessionIsSpeedLimited(fHandle, TR_UP);
     [fDefaults setBool: upLimitEnabled forKey: @"CheckUpload"];
     
-    int upLimit = tr_sessionGetSpeedLimit(fHandle, TR_UP);
+    const int upLimit = tr_sessionGetSpeedLimit(fHandle, TR_UP);
     [fDefaults setInteger: upLimit forKey: @"UploadLimit"];
     
+    #warning fix
+    //alt speed limit enabled
+    /*const BOOL useAltSpeed = tr_sessionUsesAltSpeed(fHandle);
+    [fDefaults setBool: useAltSpeed forKey: @"SpeedLimit"];*/
+    
+    //alt speed limit - down
+    const int downLimitAlt = tr_sessionGetAltSpeed(fHandle, TR_DOWN);
+    [fDefaults setInteger: downLimit forKey: @"SpeedLimitDownloadLimit"];
+    
+    //alt speed limit - up
+    const int upLimitAlt = tr_sessionGetAltSpeed(fHandle, TR_UP);
+    [fDefaults setInteger: upLimitAlt forKey: @"SpeedLimitDownloadLimit"];
+    
+    //alt speed limit schedule
+    const BOOL useAltSpeedSched = tr_sessionUsesAltSpeedTime(fHandle);
+    [fDefaults setBool: useAltSpeedSched forKey: @"SpeedLimitAuto"];
+    
+    #warning refactor schedule date?
+    /*NSDate * limitStartDate = [PrefsController timeSumToDate: tr_sessionGetAltSpeedBegin(fHandle)];
+    [fDefaults setObject: limitStartDate forKey: @"SpeedLimitAutoOnDate"];
+    
+    NSDate * limitEndDate = [PrefsController timeSumToDate: tr_sessionGetAltSpeedEnd(fHandle)];
+    [fDefaults setObject: limitEndDate forKey: @"SpeedLimitAutoOffDate"];*/
+    
+    #warning refactor how to work with schedule day
+    
     [[NSNotificationCenter defaultCenter] postNotificationName: @"SpeedLimitUpdate" object: nil];
+    
+    //blocklist
+    const BOOL blocklist = tr_blocklistIsEnabled(fHandle);
+    [fDefaults setBool: blocklist forKey: @"Blocklist"];
+    
+    //seed ratio
+    const BOOL ratioLimited = tr_sessionIsRatioLimited(fHandle);
+    [fDefaults setBool: ratioLimited forKey: @"RatioCheck"];
+    
+    const float ratioLimit = tr_sessionGetRatioLimit(fHandle);
+    [fDefaults setFloat: ratioLimit forKey: @"RatioLimit"];
     
     //update gui if loaded
     if (fHasLoaded)
@@ -1230,17 +1273,34 @@ tr_session * fHandle;
         //download directory handled by bindings
         
         [fPeersGlobalField setIntValue: peersTotal];
+        [fPeersTorrentField setIntValue: peersTorrent];
         
         //pex handled by bindings
         
         [fPortField setIntValue: port];
         //port forwarding (nat) handled by bindings
+        //random port handled by bindings
         
         //limit check handled by bindings
         [fDownloadField setIntValue: downLimit];
         
         //limit check handled by bindings
         [fUploadField setIntValue: upLimit];
+        
+        [fSpeedLimitDownloadField setIntValue: downLimitAlt];
+        
+        [fSpeedLimitUploadField setIntValue: upLimitAlt];
+        
+        //speed limit schedule handled by bindings
+        
+        //speed limit schedule times handled by bindings
+        
+        #warning need to set schedule day
+        
+        [self updateBlocklistFields];
+        
+        //ratio limit enabled handled by bindings
+        [fRatioStopField setFloatValue: ratioLimit];
     }
 }
 
