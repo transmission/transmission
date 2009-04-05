@@ -1073,6 +1073,10 @@ prefschanged( TrCore * core UNUSED,
     {
         tr_sessionUseAltSpeedTime( tr, pref_flag_get( key ) );
     }
+    else if( !strcmp( key, TR_PREFS_KEY_ALT_SPEED_TIME_DAY ) )
+    {
+        tr_sessionSetAltSpeedDay( tr, pref_int_get( key ) );
+    }
 }
 
 static gboolean

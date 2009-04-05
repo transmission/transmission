@@ -1071,6 +1071,71 @@ new_time_combo( GObject *    core,
 }
 
 static void
+onWeekComboChanged( GtkComboBox * w, gpointer core )
+{
+    GtkTreeIter iter;
+
+    if( gtk_combo_box_get_active_iter( w, &iter ) )
+    {
+        int val = 0;
+        const char * key = g_object_get_data( G_OBJECT( w ), PREF_KEY );
+        gtk_tree_model_get( gtk_combo_box_get_model( w ), &iter, 0, &val, -1 );
+        tr_core_set_pref_int( TR_CORE( core ), key, val );
+    }
+}
+
+static GtkWidget*
+new_week_combo( GObject * core, const char * key )
+{
+    int i;
+    int selIndex;
+    GtkWidget * w;
+    GtkCellRenderer * r;
+    GtkListStore * store;
+    const int currentValue = pref_int_get( key );
+    const struct {
+        int value;
+        const char * text;
+    } items[] = {
+        { TR_SCHED_ALL,     N_( "Every Day" ) },
+        { TR_SCHED_WEEKDAY, N_( "Weekdays" ) },
+        { TR_SCHED_WEEKEND, N_( "Weekends" ) },
+        { TR_SCHED_SUN,     N_( "Sunday" ) },
+        { TR_SCHED_MON,     N_( "Monday" ) },
+        { TR_SCHED_TUES,    N_( "Tuesday" ) },
+        { TR_SCHED_WED,     N_( "Wednesday" ) },
+        { TR_SCHED_THURS,   N_( "Thursday" ) },
+        { TR_SCHED_FRI,     N_( "Friday" ) },
+        { TR_SCHED_SAT,     N_( "Saturday" ) }
+    };
+
+    /* build a store for the days of the week */
+    selIndex = -1;
+    store = gtk_list_store_new( 2, G_TYPE_INT, G_TYPE_STRING );
+    for( i=0; i<(int)G_N_ELEMENTS(items); ++i ) {
+        GtkTreeIter iter;
+        gtk_list_store_append( store, &iter );
+        gtk_list_store_set( store, &iter, 0, items[i].value, 1, _( items[i].text ), -1 );
+        if( items[i].value == currentValue )
+            selIndex = i;
+    }
+
+    /* build the widget */
+    w = gtk_combo_box_new_with_model( GTK_TREE_MODEL( store ) );
+    r = gtk_cell_renderer_text_new( );
+    gtk_cell_layout_pack_start( GTK_CELL_LAYOUT( w ), r, TRUE );
+    gtk_cell_layout_set_attributes( GTK_CELL_LAYOUT( w ), r, "text", 1, NULL );
+    g_object_set_data_full( G_OBJECT( w ), PREF_KEY, tr_strdup( key ), g_free );
+    if( selIndex >= 0 )
+        gtk_combo_box_set_active( GTK_COMBO_BOX( w ), selIndex );
+    g_signal_connect( w, "changed", G_CALLBACK( onWeekComboChanged ), core );
+
+    /* cleanup */
+    g_object_unref( G_OBJECT( store ) );
+    return w;
+}
+
+static void
 bandwidthPageFree( gpointer gpage )
 {
     struct BandwidthPage * page = gpage;
@@ -1127,6 +1192,12 @@ bandwidthPage( GObject * core )
         w = new_spin_button( TR_PREFS_KEY_ALT_SPEED_UP, core, 0, INT_MAX, 5 );
         hig_workarea_add_row( t, &row, s, w, NULL );
 
+        g_snprintf( buf, sizeof( buf ), "<small>%s</small>", _( "When enabled, Speed Limit Mode overrides the Global Bandwidth Limits" ) );
+        w = gtk_label_new( buf );
+        gtk_label_set_use_markup( GTK_LABEL( w ), TRUE );
+        gtk_misc_set_alignment( GTK_MISC( w ), 0.5f, 0.5f );
+        hig_workarea_add_wide_control( t, &row, w );
+
         s = _( "Use Speed Limit Mode between:" ); 
         h = gtk_hbox_new( FALSE, 0 );
         w2 = new_time_combo( core, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN );
@@ -1142,11 +1213,11 @@ bandwidthPage( GObject * core )
         g_signal_connect( w, "toggled", G_CALLBACK( onSchedToggled ), page );
         hig_workarea_add_row_w( t, &row, w, h, NULL );
 
-        g_snprintf( buf, sizeof( buf ), "<small>%s</small>", _( "When enabled, Speed Limit Mode overrides the Global Bandwidth Limits" ) );
-        w = gtk_label_new( buf );
-        gtk_label_set_use_markup( GTK_LABEL( w ), TRUE );
-        gtk_misc_set_alignment( GTK_MISC( w ), 0.5f, 0.5f );
-        hig_workarea_add_wide_control( t, &row, w );
+        s = _( "_On days:" );
+        w = new_week_combo( core, TR_PREFS_KEY_ALT_SPEED_TIME_DAY );
+        page->sched_widgets = g_slist_append( page->sched_widgets, w );
+        w = hig_workarea_add_row( t, &row, s, w, NULL );
+        page->sched_widgets = g_slist_append( page->sched_widgets, w );
 
     hig_workarea_finish( t, &row );
     g_object_set_data_full( G_OBJECT( t ), "page", page, bandwidthPageFree );
