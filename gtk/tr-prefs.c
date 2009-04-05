@@ -1375,6 +1375,9 @@ networkPage( GObject * core )
                                  G_CALLBACK( onCorePrefsChanged ), data );
     onCorePrefsChanged( NULL, TR_PREFS_KEY_PEER_PORT, data );
 
+    s = _( "Randomize the port every launch" );
+    w = new_check_button( s, TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START, core );
+
     s = _( "Use UPnP or NAT-PMP port _forwarding from my router" );
     w = new_check_button( s, TR_PREFS_KEY_PORT_FORWARDING, core );
     hig_workarea_add_wide_control( t, &row, w );

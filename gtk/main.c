@@ -1077,6 +1077,10 @@ prefschanged( TrCore * core UNUSED,
     {
         tr_sessionSetAltSpeedDay( tr, pref_int_get( key ) );
     }
+    else if( !strcmp( key, TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START ) )
+    {
+        tr_sessionSetPeerPortRandomOnStart( tr, pref_flag_get( key ) );
+    }
 }
 
 static gboolean
