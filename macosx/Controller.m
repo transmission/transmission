@@ -221,7 +221,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         }
         
         tr_benc settings;
-        tr_bencInitDict(&settings, 32);
+        tr_bencInitDict(&settings, 33);
         tr_sessionGetDefaultSettings(&settings);
         
         const BOOL usesSpeedLimitSched = [fDefaults boolForKey: @"SpeedLimitAuto"];
@@ -236,6 +236,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                                                                             [fDefaults objectForKey: @"SpeedLimitAutoOnDate"]]);
         tr_bencDictAddInt(&settings, TR_PREFS_KEY_ALT_SPEED_TIME_END, [PrefsController dateToTimeSum:
                                                                             [fDefaults objectForKey: @"SpeedLimitAutoOffDate"]]);
+        tr_bencDictAddInt(&settings, TR_PREFS_KEY_ALT_SPEED_TIME_DAY, [fDefaults integerForKey: @"SpeedLimitAutoDay"]);
         
         tr_bencDictAddInt(&settings, TR_PREFS_KEY_DSPEED, [fDefaults integerForKey: @"DownloadLimit"]);
         tr_bencDictAddBool(&settings, TR_PREFS_KEY_DSPEED_ENABLED, [fDefaults boolForKey: @"CheckDownload"]);

@@ -36,17 +36,6 @@
 #define DOWNLOAD_FOLDER     0
 #define DOWNLOAD_TORRENT    2
 
-#define SCHED_ALL_TAG       0
-#define SCHED_WEEKDAY_TAG   1
-#define SCHED_WEEKEND_TAG   2
-#define SCHED_MON_TAG       3
-#define SCHED_TUES_TAG      4
-#define SCHED_WED_TAG       5
-#define SCHED_THURS_TAG     6
-#define SCHED_FRI_TAG       7
-#define SCHED_SAT_TAG       8
-#define SCHED_SUN_TAG       9
-
 #define PROXY_HTTP      0
 #define PROXY_SOCKS4    1
 #define PROXY_SOCKS5    2
@@ -110,9 +99,6 @@ tr_session * fHandle;
             
             [fDefaults removeObjectForKey: @"DownloadChoice"];
         }
-        
-        //set auto speed limit day
-        [self updateAutoSpeedLimitDay];
         
         //save a new random port
         if ([fDefaults boolForKey: @"RandomPort"])
@@ -200,42 +186,6 @@ tr_session * fHandle;
     //set speed limit
     [fSpeedLimitUploadField setIntValue: [fDefaults integerForKey: @"SpeedLimitUploadLimit"]];
     [fSpeedLimitDownloadField setIntValue: [fDefaults integerForKey: @"SpeedLimitDownloadLimit"]];
-    
-    int schedDay;
-    switch (tr_sessionGetAltSpeedDay(fHandle))
-    {
-        case TR_SCHED_ALL:
-            schedDay = SCHED_ALL_TAG;
-            break;
-        case TR_SCHED_WEEKDAY:
-            schedDay = SCHED_WEEKDAY_TAG;
-            break;
-        case TR_SCHED_WEEKEND:
-            schedDay = SCHED_WEEKEND_TAG;
-            break;
-        case TR_SCHED_MON:
-            schedDay = SCHED_MON_TAG;
-            break;
-        case TR_SCHED_TUES:
-            schedDay = SCHED_TUES_TAG;
-            break;
-        case TR_SCHED_WED:
-            schedDay = SCHED_WED_TAG;
-            break;
-        case TR_SCHED_THURS:
-            schedDay = SCHED_THURS_TAG;
-            break;
-        case TR_SCHED_FRI:
-            schedDay = SCHED_FRI_TAG;
-            break;
-        case TR_SCHED_SAT:
-            schedDay = SCHED_SAT_TAG;
-            break;
-        case TR_SCHED_SUN:
-            schedDay = SCHED_SUN_TAG;
-            break;
-    }
-    [fAutoSpeedDayTypePopUp selectItemWithTag: schedDay];
     
     //set port
     [fPortField setIntValue: [fDefaults integerForKey: @"BindPort"]];
@@ -661,79 +611,7 @@ tr_session * fHandle;
 
 - (void) setAutoSpeedLimitDay: (id) sender
 {
-    NSString * day;
-    switch ([[sender selectedItem] tag])
-    {
-        case SCHED_ALL_TAG:
-            day = @"ALL";
-            break;
-        case SCHED_WEEKDAY_TAG:
-            day = @"WEEKDAY";
-            break;
-        case SCHED_WEEKEND_TAG:
-            day = @"WEEKEND";
-            break;
-        case SCHED_MON_TAG:
-            day = @"MON";
-            break;
-        case SCHED_TUES_TAG:
-            day = @"TUES";
-            break;
-        case SCHED_WED_TAG:
-            day = @"WED";
-            break;
-        case SCHED_THURS_TAG:
-            day = @"THURS";
-            break;
-        case SCHED_FRI_TAG:
-            day = @"FRI";
-            break;
-        case SCHED_SAT_TAG:
-            day = @"SAT";
-            break;
-        case SCHED_SUN_TAG:
-            day = @"SUN";
-            break;
-    }
-    
-    [fDefaults setObject: day forKey: @"SpeedLimitAutoDay"];
-    [self updateAutoSpeedLimitDay];
-}
-
-- (void) updateAutoSpeedLimitDay
-{
-    NSString * dayString = [fDefaults stringForKey: @"SpeedLimitAutoDay"];
-    tr_sched_day day;
-    if ([dayString isEqualToString: @"WEEKDAY"])
-        day = TR_SCHED_WEEKDAY;
-    else if ([dayString isEqualToString: @"WEEKEND"])
-        day = TR_SCHED_WEEKEND;
-    else if ([dayString isEqualToString: @"MON"])
-        day = TR_SCHED_MON;
-    else if ([dayString isEqualToString: @"TUES"])
-        day = TR_SCHED_TUES;
-    else if ([dayString isEqualToString: @"WED"])
-        day = TR_SCHED_WED;
-    else if ([dayString isEqualToString: @"THURS"])
-        day = TR_SCHED_THURS;
-    else if ([dayString isEqualToString: @"FRI"])
-        day = TR_SCHED_FRI;
-    else if ([dayString isEqualToString: @"SAT"])
-        day = TR_SCHED_SAT;
-    else if ([dayString isEqualToString: @"SUN"])
-        day = TR_SCHED_SUN;
-    else
-    {
-        //safety
-        if (![dayString isEqualToString: @"ALL"])
-        {
-            dayString = @"ALL";
-            [fDefaults setObject: dayString forKey: @"SpeedLimitAutoDay"];
-        }
-        day = TR_SCHED_ALL;
-    }
-    
-    tr_sessionSetAltSpeedDay(fHandle, day);
+    tr_sessionSetAltSpeedDay(fHandle, [[sender selectedItem] tag]);
 }
 
 + (NSInteger) dateToTimeSum: (NSDate *) date
@@ -1184,7 +1062,6 @@ tr_session * fHandle;
         inBook: [[NSBundle mainBundle] objectForInfoDictionaryKey: @"CFBundleHelpBookName"]];
 }
 
-#warning probably needs to be updated
 - (void) rpcUpdatePrefs
 {
     //encryption
@@ -1257,7 +1134,8 @@ tr_session * fHandle;
     NSDate * limitEndDate = [PrefsController timeSumToDate: tr_sessionGetAltSpeedEnd(fHandle)];
     [fDefaults setObject: limitEndDate forKey: @"SpeedLimitAutoOffDate"];
     
-    #warning refactor how to work with schedule day
+    const int limitDay = tr_sessionGetAltSpeedDay(fHandle);
+    [fDefaults setInteger: limitDay forKey: @"SpeedLimitAutoDay"];
     
     //blocklist
     const BOOL blocklist = tr_blocklistIsEnabled(fHandle);
@@ -1298,9 +1176,7 @@ tr_session * fHandle;
         
         //speed limit schedule handled by bindings
         
-        //speed limit schedule times handled by bindings
-        
-        #warning need to set schedule day
+        //speed limit schedule times and day handled by bindings
         
         [self updateBlocklistFields];
         

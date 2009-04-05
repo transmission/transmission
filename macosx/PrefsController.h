@@ -118,7 +118,6 @@
 - (void) setAutoSpeedLimit: (id) sender;
 - (void) setAutoSpeedLimitTime: (id) sender;
 - (void) setAutoSpeedLimitDay: (id) sender;
-- (void) updateAutoSpeedLimitDay;
 + (NSInteger) dateToTimeSum: (NSDate *) date;
 + (NSDate *) timeSumToDate: (NSInteger) sum;
 
