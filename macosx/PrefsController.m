@@ -1235,7 +1235,6 @@ tr_session * fHandle;
     const int upLimit = tr_sessionGetSpeedLimit(fHandle, TR_UP);
     [fDefaults setInteger: upLimit forKey: @"UploadLimit"];
     
-    #warning fix
     //alt speed limit enabled
     const BOOL useAltSpeed = tr_sessionUsesAltSpeed(fHandle);
     [fDefaults setBool: useAltSpeed forKey: @"SpeedLimit"];
@@ -1383,8 +1382,12 @@ tr_session * fHandle;
     if (code == NSOKButton)
     {
         [fFolderPopUp selectItemAtIndex: DOWNLOAD_FOLDER];
-        [fDefaults setObject: [[openPanel filenames] objectAtIndex: 0] forKey: @"DownloadFolder"];
+        
+        NSString * folder = [[openPanel filenames] objectAtIndex: 0];
+        [fDefaults setObject: folder forKey: @"DownloadFolder"];
         [fDefaults setObject: @"Constant" forKey: @"DownloadChoice"];
+        
+        tr_sessionSetDownloadDir(fHandle, [folder UTF8String]);
     }
     else
     {
