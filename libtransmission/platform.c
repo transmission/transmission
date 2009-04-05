@@ -18,7 +18,7 @@
   #include <CoreFoundation/CoreFoundation.h>
  #endif
 
- #define _XOPEN_SOURCE 500  /* needed for recursive locks. */
+ #define _XOPEN_SOURCE 600  /* needed for recursive locks. */
  #ifndef __USE_UNIX98
   #define __USE_UNIX98 /* some older Linuxes need it spelt out for them */
  #endif
