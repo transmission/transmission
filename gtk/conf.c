@@ -411,7 +411,7 @@ translate_08_to_09( const char* oldfile,
 
     if( g_file_get_contents( oldfile, &contents, &contents_len, NULL )
       && !tr_bencLoad( contents, contents_len, &top, NULL )
-      && top.type == TYPE_DICT )
+      && tr_bencIsDict( &top ) )
     {
         unsigned int i;
         g_string_append( out, "\n[general]\n" );

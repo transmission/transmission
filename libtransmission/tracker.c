@@ -344,7 +344,7 @@ parseOldPeers( tr_benc * bePeers,
     uint8_t * array, *walk;
     const int peerCount = bePeers->val.l.count;
 
-    assert( bePeers->type == TYPE_LIST );
+    assert( tr_bencIsList( bePeers ) );
 
     array = tr_new( uint8_t, peerCount * ( sizeof( tr_address ) + 2 ) );
 
@@ -481,12 +481,12 @@ onTrackerResponse( tr_session * session,
             {
                 const int allAreSeeds = incomplete == 0;
 
-                if( tmp->type == TYPE_STR ) /* "compact" extension */
+                if( tr_bencIsString( tmp ) ) /* "compact" extension */
                 {
                     publishNewPeersCompact( t, allAreSeeds, tmp->val.s.s,
                                             tmp->val.s.i );
                 }
-                else if( tmp->type == TYPE_LIST ) /* original protocol */
+                else if( tr_bencIsList( tmp ) ) /* original protocol */
                 {
                     size_t    byteCount = 0;
                     uint8_t * array = parseOldPeers( tmp, &byteCount );
@@ -499,7 +499,7 @@ onTrackerResponse( tr_session * session,
             {
                 const int allAreSeeds = incomplete == 0;
                 
-                if( tmp->type == TYPE_STR ) /* "compact" extension */
+                if( tmp->type == TR_TYPE_STR ) /* "compact" extension */
                 {
                     publishNewPeersCompact6( t, allAreSeeds, tmp->val.s.s,
                                              tmp->val.s.i );

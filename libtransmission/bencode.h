@@ -23,12 +23,12 @@ struct evbuffer;
 
 enum
 {
-    TYPE_INT  = 1,
-    TYPE_STR  = 2,
-    TYPE_LIST = 4,
-    TYPE_DICT = 8,
-    TYPE_BOOL = 16,
-    TYPE_REAL = 32
+    TR_TYPE_INT  = 1,
+    TR_TYPE_STR  = 2,
+    TR_TYPE_LIST = 4,
+    TR_TYPE_DICT = 8,
+    TR_TYPE_BOOL = 16,
+    TR_TYPE_REAL = 32
 };
 
 typedef struct tr_benc
@@ -180,12 +180,12 @@ tr_bool   tr_bencGetBool( const tr_benc * val, tr_bool * setme );
 tr_bool   tr_bencGetReal( const tr_benc * val, double * setme );
 
 static TR_INLINE tr_bool tr_bencIsType  ( const tr_benc * b, int type ) { return ( b != NULL ) && ( b->type == type ); }
-static TR_INLINE tr_bool tr_bencIsInt   ( const tr_benc * b ) { return tr_bencIsType( b, TYPE_INT ); }
-static TR_INLINE tr_bool tr_bencIsDict  ( const tr_benc * b ) { return tr_bencIsType( b, TYPE_DICT ); }
-static TR_INLINE tr_bool tr_bencIsList  ( const tr_benc * b ) { return tr_bencIsType( b, TYPE_LIST ); }
-static TR_INLINE tr_bool tr_bencIsString( const tr_benc * b ) { return tr_bencIsType( b, TYPE_STR ); }
-static TR_INLINE tr_bool tr_bencIsBool  ( const tr_benc * b ) { return tr_bencIsType( b, TYPE_BOOL ); }
-static TR_INLINE tr_bool tr_bencIsReal  ( const tr_benc * b ) { return tr_bencIsType( b, TYPE_REAL ); }
+static TR_INLINE tr_bool tr_bencIsInt   ( const tr_benc * b ) { return tr_bencIsType( b, TR_TYPE_INT ); }
+static TR_INLINE tr_bool tr_bencIsDict  ( const tr_benc * b ) { return tr_bencIsType( b, TR_TYPE_DICT ); }
+static TR_INLINE tr_bool tr_bencIsList  ( const tr_benc * b ) { return tr_bencIsType( b, TR_TYPE_LIST ); }
+static TR_INLINE tr_bool tr_bencIsString( const tr_benc * b ) { return tr_bencIsType( b, TR_TYPE_STR ); }
+static TR_INLINE tr_bool tr_bencIsBool  ( const tr_benc * b ) { return tr_bencIsType( b, TR_TYPE_BOOL ); }
+static TR_INLINE tr_bool tr_bencIsReal  ( const tr_benc * b ) { return tr_bencIsType( b, TR_TYPE_REAL ); }
 
 /**
 ***  Treat these as private -- they're only made public here

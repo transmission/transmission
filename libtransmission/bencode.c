@@ -157,7 +157,7 @@ static int
 makeroom( tr_benc * val,
           size_t    count )
 {
-    assert( TYPE_LIST == val->type || TYPE_DICT == val->type );
+    assert( TR_TYPE_LIST == val->type || TR_TYPE_DICT == val->type );
 
     if( val->val.l.count + count > val->val.l.alloc )
     {
@@ -193,8 +193,8 @@ getNode( tr_benc *     top,
     assert( parent );
 
     /* dictionary keys must be strings */
-    if( ( parent->type == TYPE_DICT )
-      && ( type != TYPE_STR )
+    if( ( parent->type == TR_TYPE_DICT )
+      && ( type != TR_TYPE_STR )
       && ( !( parent->val.l.count % 2 ) ) )
         return NULL;
 
@@ -234,7 +234,7 @@ tr_bencParseImpl( const void *     buf_in,
             if( ( err = tr_bencParseInt( buf, bufend, &end, &val ) ) )
                 return err;
 
-            node = getNode( top, parentStack, TYPE_INT );
+            node = getNode( top, parentStack, TR_TYPE_INT );
             if( !node )
                 return EILSEQ;
 
@@ -246,19 +246,19 @@ tr_bencParseImpl( const void *     buf_in,
         }
         else if( *buf == 'l' ) /* list */
         {
-            tr_benc * node = getNode( top, parentStack, TYPE_LIST );
+            tr_benc * node = getNode( top, parentStack, TR_TYPE_LIST );
             if( !node )
                 return EILSEQ;
-            tr_bencInit( node, TYPE_LIST );
+            tr_bencInit( node, TR_TYPE_LIST );
             tr_ptrArrayAppend( parentStack, node );
             ++buf;
         }
         else if( *buf == 'd' ) /* dict */
         {
-            tr_benc * node = getNode( top, parentStack, TYPE_DICT );
+            tr_benc * node = getNode( top, parentStack, TR_TYPE_DICT );
             if( !node )
                 return EILSEQ;
-            tr_bencInit( node, TYPE_DICT );
+            tr_bencInit( node, TR_TYPE_DICT );
             tr_ptrArrayAppend( parentStack, node );
             ++buf;
         }
@@ -291,7 +291,7 @@ tr_bencParseImpl( const void *     buf_in,
             if( ( err = tr_bencParseStr( buf, bufend, &end, &str, &str_len ) ) )
                 return err;
 
-            node = getNode( top, parentStack, TYPE_STR );
+            node = getNode( top, parentStack, TR_TYPE_STR );
             if( !node )
                 return EILSEQ;
 
@@ -365,7 +365,7 @@ dictIndexOf( const tr_benc * val,
         {
             const tr_benc * child = val->val.l.vals + i;
 
-            if( ( child->type == TYPE_STR )
+            if( ( child->type == TR_TYPE_STR )
               && ( child->val.s.i == len )
               && !memcmp( child->val.s.s, key, len ) )
                 return i;
@@ -514,7 +514,7 @@ tr_bool
 tr_bencDictFindList( tr_benc * dict, const char * key, tr_benc ** setme )
 {
     tr_bool found = FALSE;
-    tr_benc * child = tr_bencDictFindType( dict, key, TYPE_LIST );
+    tr_benc * child = tr_bencDictFindType( dict, key, TR_TYPE_LIST );
 
     if( child )
     {
@@ -530,7 +530,7 @@ tr_bool
 tr_bencDictFindDict( tr_benc * dict, const char * key, tr_benc ** setme )
 {
     tr_bool found = FALSE;
-    tr_benc * child = tr_bencDictFindType( dict, key, TYPE_DICT );
+    tr_benc * child = tr_bencDictFindType( dict, key, TR_TYPE_DICT );
 
     if( child )
     {
@@ -546,7 +546,7 @@ tr_bool
 tr_bencDictFindStr( tr_benc *  dict, const char *  key, const char ** setme )
 {
     tr_bool found = FALSE;
-    tr_benc * child = tr_bencDictFindType( dict, key, TYPE_STR );
+    tr_benc * child = tr_bencDictFindType( dict, key, TR_TYPE_STR );
 
     if( child )
     {
@@ -565,7 +565,7 @@ tr_bencDictFindRaw( tr_benc         * dict,
                     size_t          * setme_len )
 {
     tr_bool found = FALSE;
-    tr_benc * child = tr_bencDictFindType( dict, key, TYPE_STR );
+    tr_benc * child = tr_bencDictFindType( dict, key, TR_TYPE_STR );
 
     if( child )
     {
@@ -586,7 +586,7 @@ tr_bencInitRaw( tr_benc *    val,
                 const void * src,
                 size_t       byteCount )
 {
-    tr_bencInit( val, TYPE_STR );
+    tr_bencInit( val, TR_TYPE_STR );
     val->val.s.i = byteCount;
     val->val.s.s = tr_memdup( src, byteCount );
 }
@@ -596,7 +596,7 @@ tr_bencInitStr( tr_benc *    val,
                 const void * str,
                 int          len )
 {
-    tr_bencInit( val, TYPE_STR );
+    tr_bencInit( val, TR_TYPE_STR );
 
     val->val.s.s = tr_strndup( str, len );
 
@@ -611,28 +611,28 @@ tr_bencInitStr( tr_benc *    val,
 void
 tr_bencInitBool( tr_benc * b, int value )
 {
-    tr_bencInit( b, TYPE_BOOL );
+    tr_bencInit( b, TR_TYPE_BOOL );
     b->val.b = value != 0;
 }
 
 void
 tr_bencInitReal( tr_benc * b, double value )
 {
-    tr_bencInit( b, TYPE_REAL );
+    tr_bencInit( b, TR_TYPE_REAL );
     b->val.d = value;
 }
 
 void
 tr_bencInitInt( tr_benc * b, int64_t value )
 {
-    tr_bencInit( b, TYPE_INT );
+    tr_bencInit( b, TR_TYPE_INT );
     b->val.i = value;
 }
 
 int
 tr_bencInitList( tr_benc * b, size_t reserveCount )
 {
-    tr_bencInit( b, TYPE_LIST );
+    tr_bencInit( b, TR_TYPE_LIST );
     return tr_bencListReserve( b, reserveCount );
 }
 
@@ -646,7 +646,7 @@ tr_bencListReserve( tr_benc * b, size_t count )
 int
 tr_bencInitDict( tr_benc * b, size_t reserveCount )
 {
-    tr_bencInit( b, TYPE_DICT );
+    tr_bencInit( b, TR_TYPE_DICT );
     return tr_bencDictReserve( b, reserveCount );
 }
 
@@ -671,7 +671,7 @@ tr_bencListAdd( tr_benc * list )
 
     item = &list->val.l.vals[list->val.l.count];
     list->val.l.count++;
-    tr_bencInit( item, TYPE_INT );
+    tr_bencInit( item, TR_TYPE_INT );
 
     return item;
 }
@@ -731,7 +731,7 @@ tr_bencDictAdd( tr_benc *    dict,
     tr_bencInitStr( keyval, key, -1 );
 
     itemval = dict->val.l.vals + dict->val.l.count++;
-    tr_bencInit( itemval, TYPE_INT );
+    tr_bencInit( itemval, TR_TYPE_INT );
 
     return itemval;
 }
@@ -761,7 +761,7 @@ tr_bencDictAddInt( tr_benc *    dict,
                    const char * key,
                    int64_t      val )
 {
-    tr_benc * child = dictFindOrAdd( dict, key, TYPE_INT );
+    tr_benc * child = dictFindOrAdd( dict, key, TR_TYPE_INT );
     tr_bencInitInt( child, val );
     return child;
 }
@@ -769,7 +769,7 @@ tr_bencDictAddInt( tr_benc *    dict,
 tr_benc*
 tr_bencDictAddBool( tr_benc * dict, const char * key, tr_bool val )
 {
-    tr_benc * child = dictFindOrAdd( dict, key, TYPE_BOOL );
+    tr_benc * child = dictFindOrAdd( dict, key, TR_TYPE_BOOL );
     tr_bencInitBool( child, val );
     return child;
 }
@@ -777,7 +777,7 @@ tr_bencDictAddBool( tr_benc * dict, const char * key, tr_bool val )
 tr_benc*
 tr_bencDictAddReal( tr_benc * dict, const char * key, double val )
 {
-    tr_benc * child = dictFindOrAdd( dict, key, TYPE_REAL );
+    tr_benc * child = dictFindOrAdd( dict, key, TR_TYPE_REAL );
     tr_bencInitReal( child, val );
     return child;
 }
@@ -1045,30 +1045,30 @@ bencWalk( const tr_benc *    top,
 
         if( val ) switch( val->type )
             {
-                case TYPE_INT:
+                case TR_TYPE_INT:
                     walkFuncs->intFunc( val, user_data );
                     break;
 
-                case TYPE_BOOL:
+                case TR_TYPE_BOOL:
                     walkFuncs->boolFunc( val, user_data );
                     break;
 
-                case TYPE_REAL:
+                case TR_TYPE_REAL:
                     walkFuncs->realFunc( val, user_data );
                     break;
 
-                case TYPE_STR:
+                case TR_TYPE_STR:
                     walkFuncs->stringFunc( val, user_data );
                     break;
 
-                case TYPE_LIST:
+                case TR_TYPE_LIST:
                     if( val != node->val )
                         tr_ptrArrayAppend( &stack, nodeNew( val ) );
                     else
                         walkFuncs->listBeginFunc( val, user_data );
                     break;
 
-                case TYPE_DICT:
+                case TR_TYPE_DICT:
                     if( val != node->val )
                         tr_ptrArrayAppend( &stack, nodeNew( val ) );
                     else
@@ -1255,7 +1255,7 @@ jsonChildFunc( struct jsonWalk * data )
 
         switch( parentState->bencType )
         {
-            case TYPE_DICT:
+            case TR_TYPE_DICT:
             {
                 const int i = parentState->childIndex++;
                 if( !( i % 2 ) )
@@ -1268,7 +1268,7 @@ jsonChildFunc( struct jsonWalk * data )
                 break;
             }
 
-            case TYPE_LIST:
+            case TR_TYPE_LIST:
             {
                 ++parentState->childIndex;
                 evbuffer_add_printf( data->out, ", " );
