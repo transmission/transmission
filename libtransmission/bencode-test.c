@@ -485,6 +485,46 @@ testBool( void )
     return 0;
 }
 
+static int
+testParse2( void )
+{
+    tr_benc top;
+    tr_benc top2;
+    int64_t intVal;
+    const char * strVal;
+    double realVal;
+    tr_bool boolVal;
+    int len;
+    char * benc;
+    const uint8_t * end;
+
+    tr_bencInitDict( &top, 0 );
+    tr_bencDictAddBool( &top, "this-is-a-bool", TRUE );
+    tr_bencDictAddInt( &top, "this-is-an-int", 1234 );
+    tr_bencDictAddReal( &top, "this-is-a-real", 0.5 );
+    tr_bencDictAddStr( &top, "this-is-a-string", "this-is-a-string" );
+
+    benc = tr_bencSave( &top, &len );
+    check( !strcmp( benc, "d14:this-is-a-booli1e14:this-is-a-real8:0.50000016:this-is-a-string16:this-is-a-string14:this-is-an-inti1234ee" ) )
+    check( !tr_bencParse( benc, benc+len, &top2, &end ) )
+    check( (char*)end == benc + len )
+    check( tr_bencIsDict( &top2 ) )
+    check( tr_bencDictFindInt( &top, "this-is-an-int", &intVal ) )
+    check( intVal == 1234 )
+    check( tr_bencDictFindBool( &top, "this-is-a-bool", &boolVal ) )
+    check( boolVal == TRUE )
+    check( tr_bencDictFindStr( &top, "this-is-a-string", &strVal ) )
+    check( !strcmp( strVal, "this-is-a-string" ) )
+    check( tr_bencDictFindReal( &top, "this-is-a-real", &realVal ) )
+    check( (int)(realVal*100) == 50 )
+
+    tr_bencFree( &top2 );
+    tr_free( benc );
+    tr_bencFree( &top );
+
+    return 0;
+}
+
 int
 main( void )
 {
@@ -506,6 +546,9 @@ main( void )
         return i;
 
     if(( i = testBool( )))
+        return i;
+
+    if(( i = testParse2( )))
         return i;
 
 #ifndef WIN32

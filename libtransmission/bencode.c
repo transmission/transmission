@@ -1120,7 +1120,7 @@ saveRealFunc( const tr_benc * val, void * evbuf )
     tr_free( locale );
 
     len = strlen( buf );
-    evbuffer_add_printf( evbuf, "%lu:", (unsigned long)buf );
+    evbuffer_add_printf( evbuf, "%lu:", (unsigned long)len );
     evbuffer_add( evbuf, buf, len );
 }
 
