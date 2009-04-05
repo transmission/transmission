@@ -47,7 +47,10 @@ isContainer( const tr_benc * val )
 static tr_bool
 isSomething( const tr_benc * val )
 {
-    return isContainer( val ) || tr_bencIsInt( val ) || tr_bencIsString( val );
+    return isContainer( val ) || tr_bencIsInt( val )
+                              || tr_bencIsString( val )
+                              || tr_bencIsReal( val )
+                              || tr_bencIsBool( val );
 }
 
 static void
