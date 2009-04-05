@@ -146,6 +146,8 @@ if test "x$want_kqueue" = "xyes" ; then
     fi 
 fi 
 
+AC_CHECK_HEADERS([xfs/xfs.h])
+
 
 dnl ----------------------------------------------------------------------------
 dnl
