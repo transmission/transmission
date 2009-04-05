@@ -108,7 +108,7 @@
    "priority-low"                    | array      indices of low-priority file(s)
    "priority-normal"                 | array      indices of normal-priority file(s)
    "seedRatioLimit"                  | 'double'   session seeding ratio
-   "seedRatioLimited"                | 'boolean'  true if "seedRatioLimit" is honored
+   "seedRatioMode"                   | number     which ratio to use.  See tr_ratiolimit
    "uploadLimit"                     | number     maximum upload speed (in K/s)
    "uploadLimited"                   | 'boolean'  true if "uploadLimit" is honored
 
