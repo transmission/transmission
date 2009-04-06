@@ -758,6 +758,48 @@ torrentSet( tr_session               * session,
 ***/
 
 static void
+portTested( tr_session       * session UNUSED,
+            long               response_code,
+            const void       * response,
+            size_t             response_byte_count,
+            void             * user_data )
+{
+    char result[1024];
+    struct tr_rpc_idle_data * data = user_data;
+
+    if( response_code != 200 )
+    {
+        tr_snprintf( result, sizeof( result ), "http error %ld: %s",
+                     response_code, tr_webGetResponseStr( response_code ) );
+    }
+    else /* success */
+    {
+        const tr_bool isOpen = response_byte_count && *(char*)response == '1';
+        tr_bencDictAddBool( data->args_out, "port-is-open", isOpen );
+        tr_snprintf( result, sizeof( result ), "success" );
+    }
+
+    tr_idle_function_done( data, result );
+}
+
+static const char*
+portTest( tr_session               * session,
+          tr_benc                  * args_in UNUSED,
+          tr_benc                  * args_out UNUSED,
+          struct tr_rpc_idle_data  * idle_data )
+{
+    const int port = tr_sessionGetPeerPort( session );
+    char * url = tr_strdup_printf( "http://portcheck.transmissionbt.com/%d", port );
+    tr_webRun( session, url, NULL, portTest, idle_data );
+    tr_free( url );
+    return NULL;
+}
+
+/***
+****
+***/
+
+static void
 gotNewBlocklist( tr_session       * session,
                  long               response_code,
                  const void       * response,
@@ -1183,6 +1225,7 @@ static struct method
 }
 methods[] =
 {
+    { "port-test",          FALSE, portTest            },
     { "blocklist-update",   FALSE, blocklistUpdate     },
     { "session-get",        TRUE,  sessionGet          },
     { "session-set",        TRUE,  sessionSet          },
