@@ -13,6 +13,12 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Bonjour support for the web interface
    + File filter field in the inspector
    + Option to include beta releases when auto-updating (using modified Sparkle 1.5)
+- GTK+
+   + Speed Limit: Second set of bandwidth limits that can be toggled or scheduled
+   + Show the file icon in the list
+   + Allow sorting of the torrent list by size and by ETA
+- Daemon
+   + Watch folder for auto-adding torrents
 - Web Client 
    + File selection and prioritization
 
@@ -581,7 +587,7 @@ http://trac.transmissionbt.com/query?group=component&milestone=1.20
    + Reworked interface
    + Rate limits can be changed directly from the main window
    + Ability to automatically stop seeding at a given ratio
-   + Allows sorting of the tranfers list
+   + Allows sorting of the transfers list
    + Extended Info Inspector
    + Automatic updating with Sparkle
  - GTK+:
