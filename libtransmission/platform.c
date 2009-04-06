@@ -450,11 +450,6 @@ tr_getDefaultDownloadDir( void )
 
     if( user_dir == NULL )
     {
-#ifndef SYS_DARWIN
-
-        user_dir = tr_buildPath( getHomeDir( ), "Downloads", NULL );
-
-#else
         const char * config_home;
         char * config_file;
         char * content;
@@ -495,7 +490,6 @@ tr_getDefaultDownloadDir( void )
 
         tr_free( content );
         tr_free( config_file );
-#endif
     }
 
     return user_dir;
