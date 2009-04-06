@@ -458,12 +458,9 @@ tr_bencGetBool( const tr_benc * val, tr_bool * setme )
     if(( success = tr_bencIsBool( val )))
         *setme = val->val.b;
 
-    if( !success && tr_bencIsInt( val ) ) {
-        if(( success = ( val->val.i==0 || val->val.i==1 ) )) {
-            tr_benc_warning( "warning: reading bool as an int\n" );
+    if( !success && tr_bencIsInt( val ) )
+        if(( success = ( val->val.i==0 || val->val.i==1 ) ))
             *setme = val->val.i!=0;
-        }
-    }
 
     if( !success && tr_bencIsString( val ) )
         if(( success = ( !strcmp(val->val.s.s,"true") || !strcmp(val->val.s.s,"false"))))
