@@ -790,7 +790,7 @@ portTest( tr_session               * session,
 {
     const int port = tr_sessionGetPeerPort( session );
     char * url = tr_strdup_printf( "http://portcheck.transmissionbt.com/%d", port );
-    tr_webRun( session, url, NULL, portTest, idle_data );
+    tr_webRun( session, url, NULL, portTested, idle_data );
     tr_free( url );
     return NULL;
 }
