@@ -13,6 +13,8 @@
 #include <unistd.h> /* S_ISREG */
 #include <sys/stat.h>
 
+#include <openssl/sha.h>
+
 #include "transmission.h"
 #include "completion.h"
 #include "resume.h" /* tr_torrentSaveResume() */
@@ -23,9 +25,129 @@
 #include "utils.h" /* tr_buildPath */
 #include "verify.h"
 
-/**
-***
-**/
+
+/***
+****
+***/
+
+/* #define STOPWATCH */
+
+static tr_bool
+verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
+{
+    SHA_CTX sha;
+    FILE * fp = NULL;
+    size_t filePos = 0;
+    tr_bool changed = 0;
+    tr_bool hadPiece = 0;
+    uint32_t piecePos = 0;
+    tr_file_index_t fileIndex = 0;
+    tr_piece_index_t pieceIndex = 0;
+    const int64_t buflen = tor->info.pieceSize;
+    uint8_t * buffer = tr_new( uint8_t, buflen );
+#ifdef STOPWATCH
+    time_t now = time( NULL );
+#endif
+
+    SHA1_Init( &sha );
+
+    while( !*stopFlag && ( pieceIndex < tor->info.pieceCount ) )
+    {
+        int64_t leftInPiece;
+        int64_t leftInFile;
+        int64_t bytesThisPass;
+        const tr_file * file = &tor->info.files[fileIndex];
+
+        /* if we're starting a new piece... */
+        if( piecePos == 0 )
+        {
+            hadPiece = tr_cpPieceIsComplete( &tor->completion, pieceIndex );
+            /* fprintf( stderr, "starting piece %d of %d\n", (int)pieceIndex, (int)tor->info.pieceCount ); */
+        }
+
+        /* if we're starting a new file... */
+        if( !filePos && !fp )
+        {
+            char * filename = tr_buildPath( tor->downloadDir, file->name, NULL );
+            fp = fopen( filename, "rb" );
+            /* fprintf( stderr, "opening file #%d (%s) -- %p\n", fileIndex, filename, fp ); */
+            tr_free( filename );
+        }
+
+        /* figure out how much we can read this pass */
+        leftInPiece = tr_torPieceCountBytes( tor, pieceIndex ) - piecePos;
+        leftInFile = file->length - filePos;
+        bytesThisPass = MIN( leftInFile, leftInPiece );
+        bytesThisPass = MIN( bytesThisPass, buflen );
+        /* fprintf( stderr, "reading this pass: %d\n", (int)bytesThisPass ); */
+
+        /* read a bit */
+        if( fp && !fseek( fp, filePos, SEEK_SET ) ) {
+            const int64_t numRead = fread( buffer, 1, bytesThisPass, fp );
+            if( numRead == bytesThisPass )
+                SHA1_Update( &sha, buffer, numRead );
+        }
+
+        /* move our offsets */
+        leftInPiece -= bytesThisPass;
+        leftInFile -= bytesThisPass;
+        piecePos += bytesThisPass;
+        filePos += bytesThisPass;
+
+        /* if we're finishing a piece... */
+        if( leftInPiece == 0 )
+        {
+            tr_bool hasPiece;
+            uint8_t hash[SHA_DIGEST_LENGTH];
+
+            SHA1_Final( hash, &sha );
+            hasPiece = !memcmp( hash, tor->info.pieces[pieceIndex].hash, SHA_DIGEST_LENGTH );
+            /* fprintf( stderr, "do the hashes match? %s\n", (hasPiece?"yes":"no") ); */
+
+            if( hasPiece ) {
+                tr_torrentSetHasPiece( tor, pieceIndex, TRUE );
+                if( !hadPiece )
+                    changed = TRUE;
+            } else if( hadPiece ) {
+                tr_torrentSetHasPiece( tor, pieceIndex, FALSE );
+                changed = TRUE;
+            }
+            tr_torrentSetPieceChecked( tor, pieceIndex, TRUE );
+
+            SHA1_Init( &sha );
+            ++pieceIndex;
+            piecePos = 0;
+        }
+
+        /* if we're finishing a file... */
+        if( leftInFile == 0 )
+        {
+            /* fprintf( stderr, "closing file\n" ); */
+            if( fp != NULL ) { fclose( fp ); fp = NULL; }
+            ++fileIndex;
+            filePos = 0;
+        }
+    }
+
+    /* cleanup */
+    if( fp != NULL )
+        fclose( fp );
+    tr_free( buffer );
+
+#ifdef STOPWATCH
+{
+    time_t now2 = time( NULL );
+    fprintf( stderr, "it took %d seconds to verify %"PRIu64" bytes (%"PRIu64" bytes per second)\n",
+             (int)(now2-now), tor->info.totalSize, (uint64_t)(tor->info.totalSize/(1+(now2-now))) );
+}
+#endif
+
+    return changed;
+}
+
+/***
+****
+***/
 
 struct verify_node
 {
@@ -45,7 +167,7 @@ fireCheckDone( tr_torrent * tor, tr_verify_done_cb verify_done_cb )
 static struct verify_node currentNode;
 static tr_list * verifyList = NULL;
 static tr_thread * verifyThread = NULL;
-static int stopCurrent = FALSE;
+static tr_bool stopCurrent = FALSE;
 
 static tr_lock*
 getVerifyLock( void )
@@ -57,74 +179,14 @@ getVerifyLock( void )
     return lock;
 }
 
-static int
-checkFile( tr_torrent      * tor,
-           void            * buffer,
-           size_t            buflen,
-           tr_file_index_t   fileIndex,
-           int             * abortFlag )
-{
-    tr_piece_index_t i;
-    int              changed = FALSE;
-    int              nofile;
-    struct stat      sb;
-    char           * path;
-    const tr_file  * file = &tor->info.files[fileIndex];
-
-    path = tr_buildPath( tor->downloadDir, file->name, NULL );
-    nofile = stat( path, &sb ) || !S_ISREG( sb.st_mode );
-
-    for( i = file->firstPiece;
-         i <= file->lastPiece && i < tor->info.pieceCount && ( !*abortFlag );
-         ++i )
-    {
-        if( nofile )
-        {
-            tr_torrentSetHasPiece( tor, i, 0 );
-        }
-        else if( !tr_torrentIsPieceChecked( tor, i ) )
-        {
-            const int wasComplete = tr_cpPieceIsComplete( &tor->completion, i );
-
-            if( tr_ioTestPiece( tor, i, buffer, buflen ) ) /* yay */
-            {
-                tr_torrentSetHasPiece( tor, i, TRUE );
-                if( !wasComplete )
-                    changed = TRUE;
-            }
-            else
-            {
-                /* if we were wrong about it being complete,
-                 * reset and start again.  if we were right about
-                 * it being incomplete, do nothing -- we don't
-                 * want to lose blocks in those incomplete pieces */
-
-                if( wasComplete )
-                {
-                    tr_torrentSetHasPiece( tor, i, FALSE );
-                    changed = TRUE;
-                }
-            }
-        }
-
-        tr_torrentSetPieceChecked( tor, i, TRUE );
-    }
-
-    tr_free( path );
-
-    return changed;
-}
-
 static void
 verifyThreadFunc( void * unused UNUSED )
 {
     for( ;; )
     {
         int                  changed = 0;
-        tr_file_index_t      i;
         tr_torrent         * tor;
         struct verify_node * node;
-        void               * buffer;
 
         tr_lockLock( getVerifyLock( ) );
         stopCurrent = FALSE;
@@ -143,10 +205,7 @@ verifyThreadFunc( void * unused UNUSED )
 
         tr_torinf( tor, _( "Verifying torrent" ) );
         tr_torrentSetVerifyState( tor, TR_VERIFY_NOW );
-        buffer = tr_new( uint8_t, tor->info.pieceSize );
-        for( i = 0; i < tor->info.fileCount && !stopCurrent; ++i )
-            changed |= checkFile( tor, buffer, tor->info.pieceSize, i, &stopCurrent );
-        tr_free( buffer );
+        changed = verifyTorrent( tor, &stopCurrent );
         tr_torrentSetVerifyState( tor, TR_VERIFY_NONE );
         assert( tr_isTorrent( tor ) );
 
