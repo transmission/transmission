@@ -21,10 +21,6 @@ extern "C" {
 ****  RPC processing
 ***/
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 struct tr_benc;
 
 typedef void( *tr_rpc_response_func )( tr_session      * session,
@@ -48,10 +44,6 @@ void tr_rpc_request_exec_uri( tr_session           * session,
 void tr_rpc_parse_list_str( struct tr_benc * setme,
                             const char     * list_str,
                             int              list_str_len );
-
-#ifdef __cplusplus
-}
-#endif
 
 #ifdef __cplusplus
 }
