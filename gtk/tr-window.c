@@ -294,6 +294,7 @@ syncAltSpeedButton( PrivateData * p )
     gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( w ), b );
 
     gtk_button_set_image( GTK_BUTTON( w ), p->alt_speed_image[b?1:0] );
+    gtk_button_set_alignment( GTK_BUTTON( w ), 0.5, 0.5 );
 
     tip = b ? _( "Click to disable Speed Limit Mode" )
             : _( "Click to enable Speed Limit Mode" );

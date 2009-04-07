@@ -1175,7 +1175,7 @@ bandwidthPage( GObject * core )
 
     hig_workarea_add_section_divider( t, &row );
     h = gtk_hbox_new( FALSE, GUI_PAD );
-    w = gtk_image_new_from_stock( "alt-speed-off", GTK_ICON_SIZE_BUTTON );
+    w = gtk_image_new_from_stock( "alt-speed-off", -1 );
     gtk_box_pack_start( GTK_BOX( h ), w, FALSE, FALSE, 0 );
     g_snprintf( buf, sizeof( buf ), "<b>%s</b>", _( "Speed Limit Mode" ) );
     w = gtk_label_new( buf );
