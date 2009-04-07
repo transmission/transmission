@@ -71,34 +71,6 @@ struct TrCorePrivate
     tr_session *    session;
 };
 
-static void
-tr_core_marshal_err( GClosure *     closure,
-                     GValue * ret   UNUSED,
-                     guint          count,
-                     const GValue * vals,
-                     gpointer hint  UNUSED,
-                     gpointer       marshal )
-{
-    typedef void ( *TRMarshalErr )
-                                ( gpointer, enum tr_core_err, const char *,
-                                gpointer );
-    TRMarshalErr     callback;
-    GCClosure *      cclosure = (GCClosure*) closure;
-    enum tr_core_err errcode;
-    const char *     errstr;
-    gpointer         inst, gdata;
-
-    g_return_if_fail( count == 3 );
-
-    inst    = g_value_peek_pointer( vals );
-    errcode = g_value_get_int( vals + 1 );
-    errstr  = g_value_get_string( vals + 2 );
-    gdata   = closure->data;
-
-    callback = (TRMarshalErr)( marshal ? marshal : cclosure->callback );
-    callback( inst, errcode, errstr, gdata );
-}
-
 static int
 isDisposed( const TrCore * core )
 {
@@ -155,9 +127,9 @@ tr_core_class_init( gpointer              g_class,
                                G_TYPE_FROM_CLASS( g_class ),
                                G_SIGNAL_RUN_LAST,
                                0, NULL, NULL,
-                               tr_core_marshal_err,
+                               g_cclosure_marshal_VOID__UINT_POINTER,
                                G_TYPE_NONE,
-                               2, G_TYPE_INT, G_TYPE_STRING );
+                               2, G_TYPE_UINT, G_TYPE_POINTER );
 
     cc->promptsig = g_signal_new( "add-torrent-prompt",
                                   G_TYPE_FROM_CLASS( g_class ),

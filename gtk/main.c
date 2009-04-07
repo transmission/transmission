@@ -139,10 +139,7 @@ static void           gotdrag( GtkWidget *       widget,
                                guint             time,
                                gpointer          gdata );
 
-static void           coreerr( TrCore *         core,
-                               enum tr_core_err code,
-                               const char *     msg,
-                               gpointer         gdata );
+static void coreerr( TrCore *, guint, const char *, struct cbdata * );
 
 static void           onAddTorrent( TrCore *,
                                     tr_ctor *,
@@ -861,13 +858,8 @@ showTorrentErrors( struct cbdata * cbdata )
 }
 
 static void
-coreerr( TrCore * core    UNUSED,
-         enum tr_core_err code,
-         const char *     msg,
-         gpointer         gdata )
+coreerr( TrCore * core UNUSED, guint code, const char * msg, struct cbdata * c )
 {
-    struct cbdata * c = gdata;
-
     switch( code )
     {
         case TR_EINVALID:
