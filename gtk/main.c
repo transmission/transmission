@@ -437,6 +437,7 @@ main( int     argc,
         /* initialize the libtransmission session */
         session = tr_sessionInit( "gtk", configDir, TRUE, pref_get_all( ) );
         pref_flag_set( TR_PREFS_KEY_ALT_SPEED_ENABLED, tr_sessionUsesAltSpeed( session ) );
+        pref_int_set( TR_PREFS_KEY_PEER_PORT, tr_sessionGetPeerPort( session ) );
         cbdata->core = tr_core_new( session );
 
         /* create main window now to be a parent to any error dialogs */
@@ -938,10 +939,6 @@ prefschanged( TrCore * core UNUSED,
     else if( !strcmp( key, TR_PREFS_KEY_MSGLEVEL ) )
     {
         tr_setMessageLevel( pref_int_get( key ) );
-    }
-    else if( !strcmp( key, TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START ) )
-    {
-        /* FIXME */
     }
     else if( !strcmp( key, TR_PREFS_KEY_PEER_PORT ) )
     {
