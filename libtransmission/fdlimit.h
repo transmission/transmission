@@ -32,6 +32,8 @@
 void tr_fdInit( size_t openFileLimit,
                 size_t globalPeerLimit );
 
+FILE* tr_open_file_for_reading( const char * filename, tr_bool sequential );
+
 /**
  * Returns an fd to the specified filename.
  *

@@ -22,6 +22,7 @@
 
 #include "transmission.h"
 #include "completion.h"
+#include "fdlimit.h"
 #include "resume.h" /* tr_torrentSaveResume() */
 #include "inout.h"
 #include "list.h"
@@ -74,11 +75,7 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
         if( !filePos && !fp )
         {
             char * filename = tr_buildPath( tor->downloadDir, file->name, NULL );
-            fp = fopen( filename, "rb" );
-#ifdef HAVE_POSIX_FADVISE
-            if( fp != NULL )
-                posix_fadvise( fileno( fp ), 0, 0, POSIX_FADV_SEQUENTIAL );
-#endif
+            fp = tr_open_file_for_reading( filename, TRUE );
             /* fprintf( stderr, "opening file #%d (%s) -- %p\n", fileIndex, filename, fp ); */
             tr_free( filename );
         }

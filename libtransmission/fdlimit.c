@@ -205,6 +205,42 @@ preallocateFileFull( const char * filename, uint64_t length )
     return success;
 }
 
+FILE*
+tr_open_file_for_reading( const char * filename, tr_bool sequential )
+{
+    int fd;
+    int flags;
+
+    /* build the flags */
+    flags = O_RDONLY;
+#ifdef O_SEQUENTIAL
+    if( sequential ) flags |= O_SEQUENTIAL;
+#endif
+#ifdef O_RANDOM
+    if( !sequential ) flags |= O_RANDOM
+#endif
+#ifdef O_BINARY
+    flags |= O_BINARY;
+#endif
+#ifdef O_LARGEFILE
+    flags |= O_LARGEFILE;
+#endif
+
+    /* open the file */
+    fd = open( filename, flags, 0666 );
+    if( fd < 0 )
+        return NULL;
+
+#if defined( SYS_DARWIN )
+    fcntl( fd, F_NOCACHE, 1 );
+    fcntl( fd, F_RDAHEAD, sequential );
+#elif defined( HAVE_POSIX_FADVISE )
+    posix_fadvise( fd, 0, 0, sequential ? POSIX_FADV_SEQUENTIAL : POSIX_FADV_RANDOM );
+#endif
+
+    return fdopen( fd, "r" );
+}
+
 /**
  * returns 0 on success, or an errno value on failure.
  * errno values include ENOENT if the parent folder doesn't exist,
