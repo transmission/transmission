@@ -846,9 +846,7 @@ blocklistUpdate( tr_session               * session,
                  tr_benc                  * args_out UNUSED,
                  struct tr_rpc_idle_data  * idle_data )
 {
-    /* FIXME: use this url after the website's updated */
-    /* const char * url = "http://update.transmissionbt.com/level1"; */
-    const char * url = "http://download.m0k.org/transmission/files/level1";
+    const char * url = "http://update.transmissionbt.com/level1";
     tr_webRun( session, url, NULL, gotNewBlocklist, idle_data );
     return NULL;
 }
