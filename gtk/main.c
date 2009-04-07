@@ -42,7 +42,6 @@
 
 #include "actions.h"
 #include "add-dialog.h"
-#include "blocklist.h"
 #include "conf.h"
 #include "details.h"
 #include "dialogs.h"
@@ -446,7 +445,11 @@ main( int     argc,
 
         appsetup( win, argfiles, cbdata, startpaused, startminimized );
         tr_sessionSetRPCCallback( session, onRPCChanged, cbdata );
-        gtr_blocklist_maybe_autoupdate( cbdata->core );
+
+        /* on startup, check & see if it's time to update the blocklist */
+        if( pref_flag_get( PREF_KEY_BLOCKLIST_UPDATES_ENABLED )
+            && ( time( NULL ) - pref_int_get( "blocklist-date" ) > ( 60 * 60 * 24 * 7 ) ) )
+                tr_core_blocklist_update( cbdata->core );
 
         gtk_main( );
     }

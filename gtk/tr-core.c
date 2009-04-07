@@ -34,6 +34,9 @@
 #endif
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/bencode.h>
+#include <libtransmission/rpcimpl.h>
+#include <libtransmission/json.h>
 #include <libtransmission/utils.h> /* tr_free */
 
 #include "conf.h"
@@ -96,58 +99,6 @@ tr_core_marshal_err( GClosure *     closure,
     callback( inst, errcode, errstr, gdata );
 }
 
-static void
-tr_core_marshal_blocklist( GClosure *     closure,
-                           GValue * ret   UNUSED,
-                           guint          count,
-                           const GValue * vals,
-                           gpointer hint  UNUSED,
-                           gpointer       marshal )
-{
-    typedef void ( *TRMarshalErr )
-                                ( gpointer, enum tr_core_err, const char *,
-                                gpointer );
-    TRMarshalErr callback;
-    GCClosure *  cclosure = (GCClosure*) closure;
-    gboolean     flag;
-    const char * str;
-    gpointer     inst, gdata;
-
-    g_return_if_fail( count == 3 );
-
-    inst    = g_value_peek_pointer( vals );
-    flag    = g_value_get_boolean( vals + 1 );
-    str     = g_value_get_string( vals + 2 );
-    gdata   = closure->data;
-
-    callback = (TRMarshalErr)( marshal ? marshal : cclosure->callback );
-    callback( inst, flag, str, gdata );
-}
-
-static void
-tr_core_marshal_prompt( GClosure *     closure,
-                        GValue * ret   UNUSED,
-                        guint          count,
-                        const GValue * vals,
-                        gpointer hint  UNUSED,
-                        gpointer       marshal )
-{
-    typedef void ( *TRMarshalPrompt )( gpointer, tr_ctor *, gpointer );
-    TRMarshalPrompt callback;
-    GCClosure *     cclosure = (GCClosure*) closure;
-    gpointer        ctor;
-    gpointer        inst, gdata;
-
-    g_return_if_fail( count == 2 );
-
-    inst      = g_value_peek_pointer( vals );
-    ctor      = g_value_peek_pointer( vals + 1 );
-    gdata     = closure->data;
-
-    callback = (TRMarshalPrompt)( marshal ? marshal : cclosure->callback );
-    callback( inst, ctor, gdata );
-}
-
 static int
 isDisposed( const TrCore * core )
 {
@@ -175,42 +126,62 @@ tr_core_class_init( gpointer              g_class,
                     gpointer g_class_data UNUSED )
 {
     GObjectClass * gobject_class;
-    TrCoreClass *  core_class;
+    TrCoreClass *  cc;
 
     g_type_class_add_private( g_class, sizeof( struct TrCorePrivate ) );
 
     gobject_class = G_OBJECT_CLASS( g_class );
     gobject_class->dispose = tr_core_dispose;
 
+    cc = TR_CORE_CLASS( g_class );
 
-    core_class = TR_CORE_CLASS( g_class );
-    core_class->blocksig = g_signal_new( "blocklist-status",
-                                         G_TYPE_FROM_CLASS(
-                                             g_class ),
-                                         G_SIGNAL_RUN_LAST, 0, NULL, NULL,
-                                         tr_core_marshal_blocklist,
-                                         G_TYPE_NONE,
-                                         2, G_TYPE_BOOLEAN, G_TYPE_STRING );
-    core_class->errsig = g_signal_new( "error", G_TYPE_FROM_CLASS( g_class ),
-                                       G_SIGNAL_RUN_LAST, 0, NULL, NULL,
-                                       tr_core_marshal_err, G_TYPE_NONE,
-                                       2, G_TYPE_INT, G_TYPE_STRING );
-    core_class->promptsig = g_signal_new( "add-torrent-prompt",
-                                          G_TYPE_FROM_CLASS(
-                                              g_class ),
-                                          G_SIGNAL_RUN_LAST, 0, NULL, NULL,
-                                          tr_core_marshal_prompt,
-                                          G_TYPE_NONE,
-                                          1, G_TYPE_POINTER );
-    core_class->quitsig = g_signal_new( "quit", G_TYPE_FROM_CLASS( g_class ),
-                                        G_SIGNAL_RUN_LAST, 0, NULL, NULL,
-                                        g_cclosure_marshal_VOID__VOID,
-                                        G_TYPE_NONE, 0 );
-    core_class->prefsig = g_signal_new( "prefs-changed",
-                                        G_TYPE_FROM_CLASS( g_class ),
-                                        G_SIGNAL_RUN_LAST, 0, NULL, NULL,
-                                        g_cclosure_marshal_VOID__STRING,
-                                        G_TYPE_NONE, 1, G_TYPE_STRING );
+    cc->blocklistSignal = g_signal_new( "blocklist-updated",          /* name */
+                                        G_TYPE_FROM_CLASS( g_class ), /* applies to TrCore */
+                                        G_SIGNAL_RUN_FIRST,           /* when to invoke */
+                                        0, NULL, NULL,                /* accumulator */
+                                        g_cclosure_marshal_VOID__INT, /* marshaler */
+                                        G_TYPE_NONE,                  /* return type */
+                                        1, G_TYPE_INT );              /* signal arguments */
+
+    cc->portSignal = g_signal_new( "port-tested",
+                                   G_TYPE_FROM_CLASS( g_class ),
+                                   G_SIGNAL_RUN_LAST,
+                                   0, NULL, NULL,
+                                   g_cclosure_marshal_VOID__BOOLEAN,
+                                   G_TYPE_NONE,
+                                   1, G_TYPE_BOOLEAN );
+
+    cc->errsig = g_signal_new( "error",
+                               G_TYPE_FROM_CLASS( g_class ),
+                               G_SIGNAL_RUN_LAST,
+                               0, NULL, NULL,
+                               tr_core_marshal_err,
+                               G_TYPE_NONE,
+                               2, G_TYPE_INT, G_TYPE_STRING );
+
+    cc->promptsig = g_signal_new( "add-torrent-prompt",
+                                  G_TYPE_FROM_CLASS( g_class ),
+                                  G_SIGNAL_RUN_LAST,
+                                  0, NULL, NULL,
+                                  g_cclosure_marshal_VOID__POINTER,
+                                  G_TYPE_NONE,
+                                  1, G_TYPE_POINTER );
+
+    cc->quitsig = g_signal_new( "quit",
+                                G_TYPE_FROM_CLASS( g_class ),
+                                G_SIGNAL_RUN_LAST,
+                                0, NULL, NULL,
+                                g_cclosure_marshal_VOID__VOID,
+                                G_TYPE_NONE,
+                                0 );
+
+    cc->prefsig = g_signal_new( "prefs-changed",
+                                G_TYPE_FROM_CLASS( g_class ),
+                                G_SIGNAL_RUN_LAST,
+                                0, NULL, NULL,
+                                g_cclosure_marshal_VOID__STRING,
+                                G_TYPE_NONE,
+                                1, G_TYPE_STRING );
 
 #ifdef HAVE_DBUS_GLIB
     {
@@ -886,13 +857,16 @@ tr_core_load( TrCore * self,
     return count;
 }
 
-void
-tr_core_blocksig( TrCore *     core,
-                  gboolean     isDone,
-                  const char * status )
+static void
+emitBlocklistUpdated( TrCore * core, int ruleCount )
 {
-    g_signal_emit( core, TR_CORE_GET_CLASS(
-                       core )->blocksig, 0, isDone, status );
+    g_signal_emit( core, TR_CORE_GET_CLASS( core )->blocklistSignal, 0, ruleCount );
+}
+
+static void
+emitPortTested( TrCore * core, gboolean isOpen )
+{
+    g_signal_emit( core, TR_CORE_GET_CLASS( core )->portSignal, 0, isOpen );
 }
 
 static void
@@ -1039,7 +1013,7 @@ tr_core_torrent_destroyed( TrCore * core,
 
     if( findTorrentInModel( core, id, &iter ) )
     {
-        TrTorrent *    gtor;
+        TrTorrent * gtor;
         GtkTreeModel * model = tr_core_model( core );
         gtk_tree_model_get( model, &iter, MC_TORRENT, &gtor, -1 );
         tr_torrent_clear( gtor );
@@ -1336,3 +1310,149 @@ tr_core_set_pref_double( TrCore *     self,
     }
 }
 
+/***
+****
+****  RPC Interface
+****
+***/
+
+/* #define DEBUG_RPC */
+
+static int nextTag = 1;
+
+typedef void ( server_response_func )( TrCore * core, tr_benc * response, gpointer user_data );
+
+struct pending_request_data
+{
+    int tag;
+    TrCore * core;
+    server_response_func * responseFunc;
+    gpointer responseFuncUserData;
+};
+
+static GHashTable * pendingRequests = NULL;
+
+static gboolean
+readResponseIdle( void * vresponse )
+{
+    GByteArray * response;
+    tr_benc top;
+    int64_t intVal;
+    int tag;
+    struct pending_request_data * data;
+
+    response = vresponse;
+    tr_jsonParse( response->data, response->len, &top, NULL );
+    tr_bencDictFindInt( &top, "tag", &intVal );
+    tag = (int)intVal;
+
+    data = g_hash_table_lookup( pendingRequests, &tag );
+    if( data )
+        (*data->responseFunc)(data->core, &top, data->responseFuncUserData );
+
+    tr_bencFree( &top );
+    g_hash_table_remove( pendingRequests, &tag );
+    g_byte_array_free( response, TRUE );
+    return FALSE;
+}
+
+static void
+readResponse( tr_session  * session UNUSED,
+              const char  * response,
+              size_t        response_len,
+              void        * unused UNUSED )
+{
+    GByteArray * bytes = g_byte_array_new( );
+#ifdef DEBUG_RPC
+    g_message( "response: [%*.*s]", (int)response_len, (int)response_len, response );
+#endif
+    g_byte_array_append( bytes, (const uint8_t*)response, response_len );
+    g_idle_add( readResponseIdle, bytes );
+}
+
+static void
+sendRequest( TrCore * core, const char * json, int tag,
+             server_response_func * responseFunc, void * responseFuncUserData )
+{
+    tr_session * session = tr_core_session( core );
+
+    if( pendingRequests == NULL )
+    {
+        pendingRequests = g_hash_table_new_full( g_int_hash, g_int_equal, NULL, g_free );
+    }
+
+    if( session == NULL )
+    {
+        g_error( "GTK+ client doesn't support connections to remote servers yet." );
+    }
+    else
+    {
+        /* remember this request */
+        struct pending_request_data * data;
+        data = g_new0( struct pending_request_data, 1 );
+        data->core = core;
+        data->tag = tag;
+        data->responseFunc = responseFunc;
+        data->responseFuncUserData = responseFuncUserData;
+        g_hash_table_insert( pendingRequests, &data->tag, data );
+
+        /* make the request */
+#ifdef DEBUG_RPC
+        g_message( "request: [%s]", json );
+#endif
+        tr_rpc_request_exec_json( session, json, strlen( json ), readResponse, GINT_TO_POINTER(tag) );
+    }
+}
+
+/***
+****  Sending a test-port request via RPC
+***/
+
+static void
+portTestResponseFunc( TrCore * core, tr_benc * response, gpointer userData UNUSED )
+{
+    tr_benc * args;
+    tr_bool isOpen = FALSE;
+
+    if( tr_bencDictFindDict( response, "arguments", &args ) )
+        tr_bencDictFindBool( args, "port-is-open", &isOpen );
+
+    emitPortTested( core, isOpen );
+}
+
+void
+tr_core_port_test( TrCore * core )
+{
+    char buf[128];
+    const int tag = nextTag++;
+    g_snprintf( buf, sizeof( buf ), "{ \"method\": \"port-test\", \"tag\": %d }", tag );
+    sendRequest( core, buf, tag, portTestResponseFunc, NULL );
+}
+
+/***
+****  Updating a blocklist via RPC
+***/
+
+static void
+blocklistResponseFunc( TrCore * core, tr_benc * response, gpointer userData UNUSED )
+{
+    tr_benc * args;
+    int64_t ruleCount = 0;
+
+    if( tr_bencDictFindDict( response, "arguments", &args ) )
+        tr_bencDictFindInt( args, "blocklist-size", &ruleCount );
+
+    if( ruleCount > 0 )
+        pref_int_set( "blocklist-date", time( NULL ) );
+
+    emitBlocklistUpdated( core, ruleCount );
+}
+
+void
+tr_core_blocklist_update( TrCore * core )
+{
+    char buf[128];
+    const int tag = nextTag++;
+    g_snprintf( buf, sizeof( buf ), "{ \"method\": \"blocklist-update\", \"tag\": %d }", tag );
+    sendRequest( core, buf, tag, blocklistResponseFunc, NULL );
+}

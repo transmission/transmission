@@ -37,7 +37,6 @@ AM_LDFLAGS = \
 noinst_HEADERS = \
     actions.h \
     add-dialog.h \
-    blocklist.h \
     conf.h \
     details.h \
     dialogs.h \
@@ -71,7 +70,6 @@ dbus_generated_sources = tr-core-dbus.h
 transmission_SOURCES = \
     actions.c \
     add-dialog.c \
-    blocklist.c \
     conf.c \
     details.c \
     dialogs.c \

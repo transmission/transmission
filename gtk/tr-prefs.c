@@ -13,6 +13,7 @@
 #include <ctype.h> /* isspace */
 #include <errno.h>
 #include <stdarg.h>
+#include <limits.h> /* USHRT_MAX */
 #include <stdlib.h> /* free() */
 #include <unistd.h>
 #include <glib/gi18n.h>
@@ -21,7 +22,6 @@
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
 #include <libtransmission/web.h>
-#include "blocklist.h"
 #include "conf.h"
 #include "hig.h"
 #include "tr-core.h"
@@ -356,91 +356,76 @@ desktopPage( GObject * core )
 
 struct blocklist_data
 {
-    GtkWidget *  check;
-    GtkWidget *  dialog;
-    TrCore *     core;
-    gulong       id;
-    int          abortFlag;
-    char         secondary[256];
+    gulong      updateBlocklistTag;
+    GtkWidget * updateBlocklistButton;
+    GtkWidget * updateBlocklistDialog;
+    GtkWidget * check;
+    TrCore    * core;
 };
 
 static void
-updateBlocklistText( GtkWidget * w,
-                     TrCore *    core )
+updateBlocklistText( GtkWidget * w, TrCore * core )
 {
     const int n = tr_blocklistGetRuleCount( tr_core_session( core ) );
     char      buf[512];
-
     g_snprintf( buf, sizeof( buf ),
                 ngettext( "Enable _blocklist (contains %'d rule)",
                           "Enable _blocklist (contains %'d rules)", n ), n );
     gtk_button_set_label( GTK_BUTTON( w ), buf );
 }
 
+/* prefs dialog is being destroyed, so stop listening to blocklist updates */
 static void
-onBlocklistDialogResponse( GtkDialog *  d,
-                           int response UNUSED,
-                           gpointer     gdata )
+peerPageDestroyed( gpointer gdata, GObject * dead UNUSED )
 {
     struct blocklist_data * data = gdata;
-
-    g_signal_handler_disconnect( data->core, data->id );
-    gtk_widget_destroy( GTK_WIDGET( d ) );
+    if( data->updateBlocklistTag > 0 )
+        g_signal_handler_disconnect( data->core, data->updateBlocklistTag );
+    g_free( data );
 }
 
+/* user hit "close" in the blocklist-update dialog */
 static void
-onBlocklistStatus( TrCore * core UNUSED,
-                   gboolean      isDone,
-                   const char *  status,
-                   gpointer      gdata )
+onBlocklistUpdateResponse( GtkDialog * dialog, gint response UNUSED, gpointer gdata )
 {
     struct blocklist_data * data = gdata;
-
-    gdk_threads_enter( );
-    gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG( data-> dialog ),
-                                              "%s", status );
-    gtk_dialog_set_response_sensitive( GTK_DIALOG( data->dialog ),
-                                       GTK_RESPONSE_CANCEL, !isDone );
-    gtk_dialog_set_response_sensitive( GTK_DIALOG( data->dialog ),
-                                       GTK_RESPONSE_CLOSE, isDone );
-    if( isDone )
-        updateBlocklistText( data->check, core );
-    gdk_threads_leave( );
+    gtk_widget_destroy( GTK_WIDGET( dialog ) );
+    gtk_widget_set_sensitive( data->updateBlocklistButton, TRUE );
+    data->updateBlocklistDialog = NULL;
+    g_signal_handler_disconnect( data->core, data->updateBlocklistTag );
 }
 
+/* core says the blocklist was updated */
 static void
-onUpdateBlocklistCB( GtkButton * w,
-                     gpointer    gdata )
+onBlocklistUpdated( TrCore * core, int n, gpointer gdata )
 {
-    GtkWidget *             d;
+    const char * s = ngettext( "Blocklist now has %'d rule.", "Blocklist now has %'d rules.", n );
     struct blocklist_data * data = gdata;
+    GtkMessageDialog * d = GTK_MESSAGE_DIALOG( data->updateBlocklistDialog );
+    gtk_widget_set_sensitive( data->updateBlocklistButton, TRUE );
+    gtk_message_dialog_set_markup( d, _( "<b>Update succeeded!</b>" ) );
+    gtk_message_dialog_format_secondary_text( d, s, n );
+    updateBlocklistText( data->check, core );
+}
 
-    d =
-        gtk_message_dialog_new( GTK_WINDOW( gtk_widget_get_toplevel( 
-                                                                    GTK_WIDGET(
-                                                                        w ) ) ),
-                               GTK_DIALOG_DESTROY_WITH_PARENT,
-                               GTK_MESSAGE_INFO,
-                               GTK_BUTTONS_NONE,
-                               _( "Updating Blocklist" ) );
-
-    data->dialog = d;
-    data->id =
-        g_signal_connect( data->core, "blocklist-status", G_CALLBACK(
-                              onBlocklistStatus ), data );
-
-    gtk_dialog_add_buttons( GTK_DIALOG( d ),
-                            GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-                            GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
-                            NULL );
-    gtk_dialog_set_response_sensitive( GTK_DIALOG(
-                                           d ), GTK_RESPONSE_CLOSE, FALSE );
-
-    g_signal_connect( d, "response", G_CALLBACK(
-                          onBlocklistDialogResponse ), data );
+/* user pushed a button to update the blocklist */
+static void
+onBlocklistUpdate( GtkButton * w, gpointer gdata )
+{
+    GtkWidget * d;
+    struct blocklist_data * data = gdata;
+    d = gtk_message_dialog_new( GTK_WINDOW( gtk_widget_get_toplevel( GTK_WIDGET( w ) ) ),
+                                GTK_DIALOG_DESTROY_WITH_PARENT,
+                                GTK_MESSAGE_INFO,
+                                GTK_BUTTONS_CLOSE,
+                               _( "Update Blocklist" ) );
+    gtk_widget_set_sensitive( data->updateBlocklistButton, FALSE );
+    gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG( d ), _( "Getting new blocklist..." ) );
+    data->updateBlocklistDialog = d;
+    g_signal_connect( d, "response", G_CALLBACK(onBlocklistUpdateResponse), data );
     gtk_widget_show( d );
-
-    gtr_blocklist_update( data->core );
+    tr_core_blocklist_update( data->core );
+    data->updateBlocklistTag = g_signal_connect( data->core, "blocklist-updated", G_CALLBACK( onBlocklistUpdated ), data );
 }
 
 static void
@@ -448,9 +433,8 @@ onEncryptionToggled( GtkToggleButton * w,
                      gpointer          core )
 {
     const int val = gtk_toggle_button_get_active( w )
-                    ? TR_ENCRYPTION_REQUIRED
-                    : TR_ENCRYPTION_PREFERRED;
-
+                  ? TR_ENCRYPTION_REQUIRED
+                  : TR_ENCRYPTION_PREFERRED;
     tr_core_set_pref_int( TR_CORE( core ), TR_PREFS_KEY_ENCRYPTION, val );
 }
 
@@ -475,11 +459,11 @@ peerPage( GObject * core )
     updateBlocklistText( w, TR_CORE( core ) );
     h = gtk_hbox_new( FALSE, GUI_PAD_BIG );
     gtk_box_pack_start( GTK_BOX( h ), w, TRUE, TRUE, 0 );
-    b = gtr_button_new_from_stock( GTK_STOCK_REFRESH, _( "_Update" ) );
+    b = data->updateBlocklistButton = gtr_button_new_from_stock( GTK_STOCK_REFRESH, _( "_Update" ) );
     data->check = w;
     g_object_set_data( G_OBJECT( b ), "session",
                       tr_core_session( TR_CORE( core ) ) );
-    g_signal_connect( b, "clicked", G_CALLBACK( onUpdateBlocklistCB ), data );
+    g_signal_connect( b, "clicked", G_CALLBACK( onBlocklistUpdate ), data );
     gtk_box_pack_start( GTK_BOX( h ), b, FALSE, FALSE, 0 );
     g_signal_connect( w, "toggled", G_CALLBACK( target_cb ), b );
     target_cb( w, b );
@@ -515,6 +499,7 @@ peerPage( GObject * core )
     hig_workarea_add_wide_control( t, &row, w );
 
     hig_workarea_finish( t, &row );
+    g_object_weak_ref( G_OBJECT( t ), peerPageDestroyed, data );
     return t;
 }
 
@@ -735,7 +720,7 @@ webPage( GObject * core )
     hig_workarea_add_wide_control( t, &row, h );
 
     /* port */
-    w = new_spin_button( TR_PREFS_KEY_RPC_PORT, core, 0, 65535, 1 );
+    w = new_spin_button( TR_PREFS_KEY_RPC_PORT, core, 0, USHRT_MAX, 1 );
     page->widgets = g_slist_append( page->widgets, w );
     w = hig_workarea_add_row( t, &row, _( "Listening _port:" ), w, NULL );
     page->widgets = g_slist_append( page->widgets, w );
@@ -940,7 +925,7 @@ trackerPage( GObject * core )
     w = hig_workarea_add_row( t, &row, s, w, NULL );
     page->proxy_widgets = g_slist_append( page->proxy_widgets, w );
 
-    w = new_spin_button( TR_PREFS_KEY_PROXY_PORT, core, 0, 65535, 1 );
+    w = new_spin_button( TR_PREFS_KEY_PROXY_PORT, core, 0, USHRT_MAX, 1 );
     page->proxy_widgets = g_slist_append( page->proxy_widgets, w );
     w = hig_workarea_add_row( t, &row, _( "Proxy _port:" ), w, NULL );
     page->proxy_widgets = g_slist_append( page->proxy_widgets, w );
@@ -1230,107 +1215,58 @@ bandwidthPage( GObject * core )
 *****  Network Tab
 ****/
 
-struct test_port_data
-{
-    GtkWidget *  label;
-    gboolean *   alive;
-    char text[128];
-};
-
-/* this is invoked in the gtk main loop's thread */
-static gboolean
-testing_port_done_idle( gpointer gdata )
-{
-    struct test_port_data * data = gdata;
-
-    if( *data->alive )
-    {
-        gdk_threads_enter( );
-        gtk_label_set_markup( GTK_LABEL( data->label ), data->text );
-        gdk_threads_leave( );
-    }
-
-    return FALSE;
-}
-
-/* this is invoked in the libtransmission thread */
-static void
-testing_port_done( tr_session * session        UNUSED,
-                   long          response_code UNUSED,
-                   const void *                response,
-                   size_t                      response_len,
-                   void *                      gdata )
-{
-    struct test_port_data * data = gdata;
-
-    if( *data->alive )
-    {
-        const int isOpen = response_len && *(char*)response == '1';
-        g_snprintf( data->text, sizeof( data->text ), isOpen 
-                    ? _( "Port is <b>open</b>" )
-                    : _( "Port is <b>closed</b>" ) );
-        g_idle_add( testing_port_done_idle, data );
-    }
-}
-
-static gboolean
-testing_port_begin( gpointer gdata )
-{
-    struct test_port_data * data = gdata;
-
-    if( *data->alive )
-    {
-        char            url[256];
-        GObject       * o       = G_OBJECT( data->label );
-        GtkSpinButton * spin    = g_object_get_data( o, "tr-port-spin" );
-        tr_session    * session = g_object_get_data( o, "session" );
-        const int       port    = gtk_spin_button_get_value_as_int( spin );
-        g_snprintf( url, sizeof( url ),
-                    "http://portcheck.transmissionbt.com/%d",
-                    port );
-        tr_webRun( session, url, NULL, testing_port_done, data );
-    }
-    return FALSE;
-}
-
 struct network_page_data
 {
-    gboolean *   alive;
-    GtkWidget *  label;
-    guint        id;
-    TrCore *     core;
+    TrCore     * core;
+    GtkWidget  * portLabel;
+    GtkWidget  * portButton;
+    GtkWidget  * portSpin;
+    gulong       portTag;
+    gulong       prefsTag;
 };
 
 static void
-onCorePrefsChanged( TrCore * core UNUSED,
-                    const char *  key,
-                    gpointer      gdata )
+onCorePrefsChanged( TrCore * core UNUSED, const char *  key, gpointer gdata )
 {
     if( !strcmp( key, TR_PREFS_KEY_PEER_PORT ) )
     {
-        struct network_page_data * ndata = gdata;
-        struct test_port_data *    data;
-
-        gtk_label_set_markup( GTK_LABEL( ndata->label ),
-                             _( "<i>Testing port...</i>" ) );
-
-        /* wait three seconds to give the port forwarding time to kick in */
-        data = g_new0( struct test_port_data, 1 );
-        data->label = ndata->label;
-        data->alive = ndata->alive;
-        gtr_timeout_add_seconds( 3, testing_port_begin, data );
+        struct network_page_data * data = gdata;
+        gtk_label_set_text( GTK_LABEL( data->portLabel ), _( "Status unknown" ) );
+        gtk_widget_set_sensitive( data->portButton, TRUE );
+        gtk_widget_set_sensitive( data->portSpin, TRUE );
     }
 }
 
 static void
-networkPageDestroyed( gpointer       gdata,
-                      GObject * dead UNUSED )
+networkPageDestroyed( gpointer gdata, GObject * dead UNUSED )
 {
     struct network_page_data * data = gdata;
-
-    *data->alive = FALSE;
-    g_signal_handler_disconnect( data->core, data->id );
+    if( data->prefsTag > 0 )
+        g_signal_handler_disconnect( data->core, data->prefsTag );
+    if( data->portTag > 0 )
+        g_signal_handler_disconnect( data->core, data->portTag );
     g_free( data );
+}
+
+static void
+onPortTested( TrCore * core UNUSED, gboolean isOpen, gpointer vdata )
+{
+    struct network_page_data * data = vdata;
+    const char * markup = isOpen ? _( "Port is <b>open</b>" ) : _( "Port is <b>closed</b>" );
+    gtk_label_set_markup( GTK_LABEL( data->portLabel ), markup );
+    gtk_widget_set_sensitive( data->portButton, TRUE );
+    gtk_widget_set_sensitive( data->portSpin, TRUE );
+}
+
+static void
+onPortTest( GtkButton * button UNUSED, gpointer vdata )
+{
+    struct network_page_data * data = vdata;
+    gtk_widget_set_sensitive( data->portButton, FALSE );
+    gtk_widget_set_sensitive( data->portSpin, FALSE );
+    gtk_label_set_markup( GTK_LABEL( data->portLabel ), _( "<i>Testing...</i>" ) );
+    data->portTag = g_signal_connect( data->core, "port-tested", G_CALLBACK(onPortTested), data );
+    tr_core_port_test( data->core );
 }
 
 static GtkWidget*
@@ -1340,40 +1276,32 @@ networkPage( GObject * core )
     const char *               s;
     GtkWidget *                t;
     GtkWidget *                w;
-    GtkWidget *                w2;
     GtkWidget *                h;
     GtkWidget *                l;
     struct network_page_data * data;
 
-    /* register to stop listening to core prefs changes when the page is
-      destroyed */
+    /* register to stop listening to core prefs changes when the page is destroyed */
     data = g_new0( struct network_page_data, 1 );
     data->core = TR_CORE( core );
-
-    /* we leak this gboolean* s.t. we know it will still be alive when the port
-       check is done, whether the dialog was destroyed or not.  kind of
-       clumsy... */
-    data->alive = g_new( gboolean, 1 );
-    *data->alive = TRUE;
 
     /* build the page */
     t = hig_workarea_create( );
     hig_workarea_add_section_title( t, &row, _( "Incoming Peers" ) );
 
-    h = gtk_hbox_new( FALSE, GUI_PAD_BIG );
-    w2 = new_spin_button( TR_PREFS_KEY_PEER_PORT, core, 1, 65535, 1 );
-    gtk_box_pack_start( GTK_BOX( h ), w2, FALSE, FALSE, 0 );
-    data->label = l = gtk_label_new( NULL );
-    gtk_misc_set_alignment( GTK_MISC( l ), 0.0f, 0.5f );
-    gtk_box_pack_start( GTK_BOX( h ), l, FALSE, FALSE, 0 );
-    hig_workarea_add_row( t, &row, _( "Listening _port:" ), h, w2 );
+    s = _( "_Port for incoming connections:" );
+    w = data->portSpin = new_spin_button( TR_PREFS_KEY_PEER_PORT, core, 1, USHRT_MAX, 1 );
+    hig_workarea_add_row( t, &row, s, w, NULL );
 
-    g_object_set_data( G_OBJECT( l ), "tr-port-spin", w2 );
-    g_object_set_data( G_OBJECT( l ), "session",
-                      tr_core_session( TR_CORE( core ) ) );
-    data->id = g_signal_connect( TR_CORE( core ), "prefs-changed",
-                                 G_CALLBACK( onCorePrefsChanged ), data );
-    onCorePrefsChanged( NULL, TR_PREFS_KEY_PEER_PORT, data );
+    h = gtk_hbox_new( FALSE, GUI_PAD_BIG );
+    l = data->portLabel = gtk_label_new( _( "Status unknown" ) );
+    gtk_misc_set_alignment( GTK_MISC( l ), 0.0f, 0.5f );
+    gtk_box_pack_start_defaults( GTK_BOX( h ), l );
+    w = data->portButton = gtk_button_new_with_mnemonic( _( "_Test Port" ) );
+    gtk_box_pack_end( GTK_BOX( h ), w, FALSE, FALSE, 0 );
+    g_signal_connect( w, "clicked", G_CALLBACK(onPortTest), data );
+    hig_workarea_add_row( t, &row, NULL, h, NULL );
+    data->prefsTag = g_signal_connect( TR_CORE( core ), "prefs-changed", G_CALLBACK( onCorePrefsChanged ), data );
+    g_object_weak_ref( G_OBJECT( t ), networkPageDestroyed, data );
 
     s = _( "Randomize the port every launch" );
     w = new_check_button( s, TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START, core );
@@ -1384,8 +1312,6 @@ networkPage( GObject * core )
     hig_workarea_add_wide_control( t, &row, w );
 
     hig_workarea_finish( t, &row );
-    g_object_weak_ref( G_OBJECT( t ), networkPageDestroyed, data );
-
     return t;
 }
 
@@ -1421,11 +1347,11 @@ tr_prefs_dialog_new( GObject *   core,
                               peerPage( core ),
                               gtk_label_new ( _( "Peers" ) ) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ),
-                              networkPage( core ),
-                              gtk_label_new ( _( "Network" ) ) );
-    gtk_notebook_append_page( GTK_NOTEBOOK( n ),
                               bandwidthPage( core ),
                               gtk_label_new ( _( "Speed" ) ) );
+    gtk_notebook_append_page( GTK_NOTEBOOK( n ),
+                              networkPage( core ),
+                              gtk_label_new ( _( "Network" ) ) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ),
                               desktopPage( core ),
                               gtk_label_new ( _( "Desktop" ) ) );
