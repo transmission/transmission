@@ -76,7 +76,8 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
             char * filename = tr_buildPath( tor->downloadDir, file->name, NULL );
             fp = fopen( filename, "rb" );
 #ifdef HAVE_POSIX_FADVISE
-            posix_fadvise( fileno( fp ), 0, 0, POSIX_FADV_SEQUENTIAL );
+            if( fp != NULL )
+                posix_fadvise( fileno( fp ), 0, 0, POSIX_FADV_SEQUENTIAL );
 #endif
             /* fprintf( stderr, "opening file #%d (%s) -- %p\n", fileIndex, filename, fp ); */
             tr_free( filename );
