@@ -1016,21 +1016,21 @@ static void
 saveDictBeginFunc( const tr_benc * val UNUSED,
                    void *              evbuf )
 {
-    evbuffer_add_printf( evbuf, "d" );
+    evbuffer_add( evbuf, "d", 1 );
 }
 
 static void
 saveListBeginFunc( const tr_benc * val UNUSED,
                    void *              evbuf )
 {
-    evbuffer_add_printf( evbuf, "l" );
+    evbuffer_add( evbuf, "l", 1 );
 }
 
 static void
 saveContainerEndFunc( const tr_benc * val UNUSED,
                       void *              evbuf )
 {
-    evbuffer_add_printf( evbuf, "e" );
+    evbuffer_add( evbuf, "e", 1 );
 }
 
 char*
@@ -1118,9 +1118,12 @@ struct jsonWalk
 static void
 jsonIndent( struct jsonWalk * data )
 {
+    char buf[1024];
     const int width = tr_list_size( data->parents ) * 4;
 
-    evbuffer_add_printf( data->out, "\n%*.*s", width, width, " " );
+    buf[0] = '\n';
+    memset( buf+1, ' ', width );
+    evbuffer_add( data->out, buf, 1+width );
 }
 
 static void
@@ -1136,10 +1139,10 @@ jsonChildFunc( struct jsonWalk * data )
             {
                 const int i = parentState->childIndex++;
                 if( !( i % 2 ) )
-                    evbuffer_add_printf( data->out, ": " );
+                    evbuffer_add( data->out, ": ", 2 );
                 else
                 {
-                    evbuffer_add_printf( data->out, ", " );
+                    evbuffer_add( data->out, ", ", 2 );
                     jsonIndent( data );
                 }
                 break;
@@ -1148,7 +1151,7 @@ jsonChildFunc( struct jsonWalk * data )
             case TYPE_LIST:
             {
                 ++parentState->childIndex;
-                evbuffer_add_printf( data->out, ", " );
+                evbuffer_add( data->out, ", ", 2 );
                 jsonIndent( data );
                 break;
             }
@@ -1194,41 +1197,30 @@ jsonStringFunc( const tr_benc * val,
     struct jsonWalk *    data = vdata;
     const unsigned char *it, *end;
 
-    evbuffer_add_printf( data->out, "\"" );
+    evbuffer_add( data->out, "\"", 1 );
     for( it = (const unsigned char*)val->val.s.s, end = it + val->val.s.i;
          it != end; ++it )
     {
         switch( *it )
         {
             case '/':
-                evbuffer_add_printf( data->out, "\\/" ); break;
-
             case '\b':
-                evbuffer_add_printf( data->out, "\\b" ); break;
-
             case '\f':
-                evbuffer_add_printf( data->out, "\\f" ); break;
-
             case '\n':
-                evbuffer_add_printf( data->out, "\\n" ); break;
-
             case '\r':
-                evbuffer_add_printf( data->out, "\\r" ); break;
-
             case '\t':
-                evbuffer_add_printf( data->out, "\\t" ); break;
-
             case '"':
-                evbuffer_add_printf( data->out, "\\\"" ); break;
-
-            case '\\':
-                evbuffer_add_printf( data->out, "\\\\" ); break;
+            case '\\': {
+                char buf[2] = { '\\', *it };
+                evbuffer_add( data->out, buf, 2 );
+                break;
+            }
 
             default:
                 if( isascii( *it ) )
                 {
                     /*fprintf( stderr, "[%c]\n", *it );*/
-                    evbuffer_add_printf( data->out, "%c", *it );
+                    evbuffer_add( data->out, it, 1 );
                 }
                 else
                 {
@@ -1246,7 +1238,7 @@ jsonStringFunc( const tr_benc * val,
                 }
         }
     }
-    evbuffer_add_printf( data->out, "\"" );
+    evbuffer_add( data->out, "\"", 1 );
     jsonChildFunc( data );
 }
 
@@ -1257,7 +1249,7 @@ jsonDictBeginFunc( const tr_benc * val,
     struct jsonWalk * data = vdata;
 
     jsonPushParent( data, val );
-    evbuffer_add_printf( data->out, "{" );
+    evbuffer_add( data->out, "{", 1 );
     if( val->val.l.count )
         jsonIndent( data );
 }
@@ -1270,7 +1262,7 @@ jsonListBeginFunc( const tr_benc * val,
     struct jsonWalk * data = vdata;
 
     jsonPushParent( data, val );
-    evbuffer_add_printf( data->out, "[" );
+    evbuffer_add( data->out, "[", 1 );
     if( nChildren )
         jsonIndent( data );
 }
@@ -1300,9 +1292,9 @@ jsonContainerEndFunc( const tr_benc * val,
     if( !emptyContainer )
         jsonIndent( data );
     if( tr_bencIsDict( val ) )
-        evbuffer_add_printf( data->out, "}" );
+        evbuffer_add( data->out, "}", 1 );
     else /* list */
-        evbuffer_add_printf( data->out, "]" );
+        evbuffer_add( data->out, "]", 1 );
     jsonChildFunc( data );
 }
 
