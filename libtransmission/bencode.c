@@ -1234,15 +1234,12 @@ struct jsonWalk
 static void
 jsonIndent( struct jsonWalk * data )
 {
-    int i;
-    char buf[1024], *pch=buf;
+    char buf[1024];
     const int width = tr_list_size( data->parents ) * 4;
 
-    *pch++ = '\n';
-    for( i=0; i<width; ++i )
-        *pch++ = ' ';
-
-    evbuffer_add( data->out, buf, pch-buf );
+    buf[0] = '\n';
+    memset( buf+1, ' ', width );
+    evbuffer_add( data->out, buf, 1+width );
 }
 
 static void
@@ -1342,22 +1339,18 @@ static void
 jsonStringFunc( const tr_benc * val, void * vdata )
 {
     struct jsonWalk * data = vdata;
-    const unsigned char *it, *end;
+    const unsigned char * it = (const unsigned char *) val->val.s.s;
+    const unsigned char * end = it + val->val.s.i;
 
+    evbuffer_expand( data->out, val->val.s.i + 2 );
     evbuffer_add( data->out, "\"", 1 );
-    for( it = (const unsigned char*)val->val.s.s, end = it + val->val.s.i;
-         it != end; ++it )
+
+    for( ; it!=end; ++it )
     {
         switch( *it )
         {
-            case '"':
-            case '\\':
-            case '/':
-            case '\b':
-            case '\f':
-            case '\n':
-            case '\r':
-            case '\t': {
+            case '"': case '\\': case '/': case '\b':
+            case '\f': case '\n': case '\r': case '\t': {
                 char buf[2] = { '\\', *it };
                 evbuffer_add( data->out, buf, 2 );
                 break;
@@ -1365,12 +1358,8 @@ jsonStringFunc( const tr_benc * val, void * vdata )
 
             default:
                 if( isascii( *it ) )
-                {
-                    /*fprintf( stderr, "[%c]\n", *it );*/
                     evbuffer_add( data->out, it, 1 );
-                }
-                else
-                {
+                else {
                     const UTF8 * tmp = it;
                     UTF32        buf = 0;
                     UTF32 *      u32 = &buf;
@@ -1381,7 +1370,6 @@ jsonStringFunc( const tr_benc * val, void * vdata )
                         evbuffer_add_printf( data->out, "\\u%04x", (unsigned int)buf );
                         it = tmp - 1;
                     }
-                    /*fprintf( stderr, "[\\u%04x]\n", buf );*/
                 }
         }
     }

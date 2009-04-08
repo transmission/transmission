@@ -331,7 +331,7 @@ main( int     argc,
     if( sourceFile && *sourceFile ) /* creating a torrent */
     {
         int                   err;
-        tr_metainfo_builder * b = tr_metaInfoBuilderCreate( h, sourceFile );
+        tr_metainfo_builder * b = tr_metaInfoBuilderCreate( sourceFile );
         tr_tracker_info       ti;
         ti.tier = 0;
         ti.announce = (char*) announce;

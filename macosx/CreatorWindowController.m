@@ -68,7 +68,7 @@
         fStarted = NO;
         
         fPath = [path retain];
-        fInfo = tr_metaInfoBuilderCreate(handle, [fPath UTF8String]);
+        fInfo = tr_metaInfoBuilderCreate([fPath UTF8String]);
         
         if (fInfo->fileCount == 0)
         {

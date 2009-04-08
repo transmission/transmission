@@ -45,7 +45,6 @@ typedef struct tr_metainfo_builder
     uint32_t                    pieceSize;
     uint32_t                    pieceCount;
     int                         isSingleFile;
-    tr_session *                handle;
 
     /**
     ***  These are set inside tr_makeMetaInfo()
@@ -87,8 +86,7 @@ typedef struct tr_metainfo_builder
 tr_metainfo_builder;
 
 
-tr_metainfo_builder*tr_metaInfoBuilderCreate( tr_session * session,
-                                              const char * topFile );
+tr_metainfo_builder*tr_metaInfoBuilderCreate( const char * topFile );
 
 void                tr_metaInfoBuilderFree( tr_metainfo_builder* );
 

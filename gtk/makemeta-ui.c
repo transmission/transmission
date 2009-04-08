@@ -303,7 +303,7 @@ onSourceActivated( GtkEditable * editable,
 
     if( ui->builder )
         tr_metaInfoBuilderFree( ui->builder );
-    ui->builder = tr_metaInfoBuilderCreate( ui->session, filename );
+    ui->builder = tr_metaInfoBuilderCreate( filename );
     refreshFromBuilder( ui );
 }
 
