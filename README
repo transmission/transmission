@@ -4,7 +4,7 @@ README for Transmission
 Transmission is a fast, easy, and free BitTorrent client.
 
 It runs on Mac OS X (Cocoa interface) and
-Linux/NetBSD/FreeBSD/OpenBSD (GTK+ interface).
+Linux/NetBSD/FreeBSD/OpenBSD (GTK+ and Qt interfaces).
 
 Visit http://www.transmissionbt.com/ for more information.
 
