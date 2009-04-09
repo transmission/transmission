@@ -1295,7 +1295,7 @@ networkPage( GObject * core )
     h = gtk_hbox_new( FALSE, GUI_PAD_BIG );
     l = data->portLabel = gtk_label_new( _( "Status unknown" ) );
     gtk_misc_set_alignment( GTK_MISC( l ), 0.0f, 0.5f );
-    gtk_box_pack_start_defaults( GTK_BOX( h ), l );
+    gtk_box_pack_start( GTK_BOX( h ), l, TRUE, TRUE, 0 );
     w = data->portButton = gtk_button_new_with_mnemonic( _( "_Test Port" ) );
     gtk_box_pack_end( GTK_BOX( h ), w, FALSE, FALSE, 0 );
     g_signal_connect( w, "clicked", G_CALLBACK(onPortTest), data );
