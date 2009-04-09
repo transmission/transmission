@@ -444,7 +444,7 @@ PrefsDialog :: createPeersTab( const Session& session )
     QPushButton * w = new QPushButton( i, tr( "&Update blocklist" ) );
     connect( w, SIGNAL(clicked(bool)), this, SLOT(onUpdateBlocklistClicked()));
     myBlockWidgets << w;
-    QWidget * l = checkBoxNew( tr( "Enable &blocklist (contains %Ln rule(s))", 0, session.blocklistSize( ) ), Prefs::BLOCKLIST_ENABLED );
+    QWidget * l = checkBoxNew( "", Prefs::BLOCKLIST_ENABLED );
     h->addWidget( l );
     h->addStretch( 1 );
     h->addWidget( w );
@@ -471,7 +471,7 @@ PrefsDialog :: createPeersTab( const Session& session )
     hig->addWideControl( checkBoxNew( tr( "Use peer e&xchange" ), Prefs::PEX_ENABLED ) );
 
     hig->finish( );
-    myUnsupportedWhenRemote << myBlockWidgets;
+    updateBlocklistCheckBox( );
     return hig;
 }
 
@@ -618,8 +618,18 @@ PrefsDialog :: ~PrefsDialog( )
 void
 PrefsDialog :: sessionUpdated( )
 {
+    updateBlocklistCheckBox( );
+}
+
+void
+PrefsDialog :: updateBlocklistCheckBox( )
+{
     QCheckBox * box = qobject_cast<QCheckBox*>( myWidgets[Prefs::BLOCKLIST_ENABLED] );
-    box->setText( tr( "Enable &blocklist (%Ln rules)", 0, mySession.blocklistSize( ) ) );
+    const int n = mySession.blocklistSize( );
+    if( n < 0 ) // unknown
+        box->setText( tr( "Enable &blocklist" ) );
+    else
+        box->setText( tr( "Enable &blocklist (%Ln rules)", 0, n ) );
 }
 
 void
@@ -656,6 +666,7 @@ PrefsDialog :: updatePref( int key )
 
         case Prefs :: BLOCKLIST_ENABLED: {
             const bool enabled = myPrefs.getBool( key );
+            std::cerr << " setting " << myBlockWidgets.size() << " block widgets to " << enabled << std::endl;
             foreach( QWidget * w, myBlockWidgets ) w->setEnabled( enabled );
             break;
         }

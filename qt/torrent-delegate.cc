@@ -218,10 +218,9 @@ TorrentDelegate :: statusString( const Torrent& tor ) const
             break;
     }
 
-    if( !tor.isChecking( ) && !tor.isPaused( ) )
+    if( tor.isReadyToTransfer( ) )
         str += tr( " - " ) + shortTransferString( tor );
 
-    //str += "asdfasdf";
     return str;
 }
 

@@ -372,7 +372,9 @@ checkFilterMode( filter_mode_t filter_mode,
         case FILTER_MODE_ACTIVE:
         {
             const tr_stat * s = tr_torrentStatCached( tor );
-            ret = s->peersSendingToUs > 0 || s->peersGettingFromUs > 0;
+            ret = s->peersSendingToUs > 0
+               || s->peersGettingFromUs > 0
+               || tr_torrentGetActivity( tor ) == TR_STATUS_CHECK;
             break;
         }
 

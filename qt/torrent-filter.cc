@@ -80,7 +80,7 @@ TorrentFilter :: filterAcceptsRow( int sourceRow, const QModelIndex& sourceParen
             accepts = true;
             break;
         case SHOW_ACTIVE:
-            accepts = tor->peersWeAreUploadingTo( ) > 0 || tor->peersWeAreDownloadingFrom( ) > 0;
+            accepts = tor->peersWeAreUploadingTo( ) > 0 || tor->peersWeAreDownloadingFrom( ) > 0 || tor->isVerifying( );
             break;
         case SHOW_DOWNLOADING:
             accepts = activity == TR_STATUS_DOWNLOAD;

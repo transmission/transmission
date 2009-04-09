@@ -271,8 +271,9 @@ class Torrent: public QObject
         QString activityString( ) const;
         tr_torrent_activity getActivity( ) const { return (tr_torrent_activity) getInt( ACTIVITY ); }
         bool isPaused( ) const { return getActivity( ) == TR_STATUS_STOPPED; }
-        bool isChecking( ) const { return getActivity( ) == TR_STATUS_CHECK || getActivity( ) == TR_STATUS_CHECK_WAIT; }
+        bool isVerifying( ) const { return getActivity( ) == TR_STATUS_CHECK; }
         bool isDownloading( ) const { return getActivity( ) == TR_STATUS_DOWNLOAD; }
+        bool isReadyToTransfer( ) const { return getActivity()==TR_STATUS_DOWNLOAD || getActivity()==TR_STATUS_SEED; }
         void notifyComplete( ) const;
 
     public:

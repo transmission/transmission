@@ -174,7 +174,7 @@ std::cerr << "setting whitelist" << std::endl;
 ***/
 
 Session :: Session( const char * configDir, Prefs& prefs, const char * url, bool paused ):
-    myBlocklistSize( ),
+    myBlocklistSize( -1 ),
     myPrefs( prefs ),
     mySession( 0 ),
     myUrl( url )
