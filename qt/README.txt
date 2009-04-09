@@ -39,4 +39,5 @@ BUILDING
    2. Build Transmission as normal
    3. In the qt/ directory, type "qmake-qt4 qtransmission.pro"
    4. In the qt/ directory, type "make"
+   5. In the qt/ directory, as root, type "make install"
 
