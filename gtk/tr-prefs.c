@@ -484,7 +484,7 @@ peerPage( GObject * core )
     hig_workarea_add_row( t, &row, _( "Maximum peers per _torrent:" ), w, NULL );
 
     hig_workarea_add_section_divider( t, &row );
-    hig_workarea_add_section_title ( t, &row, _( "Options" ) );
+    hig_workarea_add_section_title ( t, &row, _( "Privacy" ) );
 
     s = _( "_Ignore unencrypted peers" );
     w = gtk_check_button_new_with_mnemonic( s );
