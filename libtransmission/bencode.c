@@ -386,14 +386,10 @@ tr_bencDictFind( tr_benc * val, const char * key )
     return i < 0 ? NULL : &val->val.l.vals[i + 1];
 }
 
-static tr_benc*
-tr_bencDictFindType( tr_benc *    val,
-                     const char * key,
-                     int          type )
+static tr_bool
+tr_bencDictFindType( tr_benc * dict, const char * key, int type, tr_benc ** setme )
 {
-    tr_benc * ret = tr_bencDictFind( val, key );
-
-    return ( ret && ( ret->type == type ) ) ? ret : NULL;
+    return tr_bencIsType( *setme = tr_bencDictFind( dict, key ), type );
 }
 
 size_t
@@ -520,51 +516,21 @@ tr_bencDictFindReal( tr_benc * dict, const char * key, double * setme )
 }
 
 tr_bool
+tr_bencDictFindStr( tr_benc *  dict, const char *  key, const char ** setme )
+{
+    return tr_bencGetStr( tr_bencDictFind( dict, key ), setme );
+}
+
+tr_bool
 tr_bencDictFindList( tr_benc * dict, const char * key, tr_benc ** setme )
 {
-    tr_bool found = FALSE;
-    tr_benc * child = tr_bencDictFindType( dict, key, TR_TYPE_LIST );
-
-    if( child )
-    {
-        if( setme != NULL )
-            *setme = child;
-        found = TRUE;
-    }
-
-    return found;
+    return tr_bencDictFindType( dict, key, TR_TYPE_LIST, setme );
 }
 
 tr_bool
 tr_bencDictFindDict( tr_benc * dict, const char * key, tr_benc ** setme )
 {
-    tr_bool found = FALSE;
-    tr_benc * child = tr_bencDictFindType( dict, key, TR_TYPE_DICT );
-
-    if( child )
-    {
-        if( setme != NULL )
-            *setme = child;
-        found = TRUE;
-    }
-
-    return found;
-}
-
-tr_bool
-tr_bencDictFindStr( tr_benc *  dict, const char *  key, const char ** setme )
-{
-    tr_bool found = FALSE;
-    tr_benc * child = tr_bencDictFindType( dict, key, TR_TYPE_STR );
-
-    if( child )
-    {
-        if( setme )
-            *setme = child->val.s.s;
-        found = TRUE;
-    }
-
-    return found;
+    return tr_bencDictFindType( dict, key, TR_TYPE_DICT, setme );
 }
 
 tr_bool
@@ -573,14 +539,12 @@ tr_bencDictFindRaw( tr_benc         * dict,
                     const uint8_t  ** setme_raw,
                     size_t          * setme_len )
 {
-    tr_bool found = FALSE;
-    tr_benc * child = tr_bencDictFindType( dict, key, TR_TYPE_STR );
+    tr_benc * child;
+    const tr_bool found = tr_bencDictFindType( dict, key, TR_TYPE_STR, &child );
 
-    if( child )
-    {
+    if( found ) {
         *setme_raw = (uint8_t*) child->val.s.s;
         *setme_len = child->val.s.i;
-        found = TRUE;
     }
 
     return found;
@@ -1349,12 +1313,14 @@ jsonStringFunc( const tr_benc * val, void * vdata )
     {
         switch( *it )
         {
-            case '"': case '\\': case '/': case '\b':
-            case '\f': case '\n': case '\r': case '\t': {
-                char buf[2] = { '\\', *it };
-                evbuffer_add( data->out, buf, 2 );
-                break;
-            }
+            case '/': evbuffer_add( data->out, "\\/", 2 ); break;
+            case '\b': evbuffer_add( data->out, "\\b", 2 ); break;
+            case '\f': evbuffer_add( data->out, "\\f", 2 ); break;
+            case '\n': evbuffer_add( data->out, "\\n", 2 ); break;
+            case '\r': evbuffer_add( data->out, "\\r", 2 ); break;
+            case '\t': evbuffer_add( data->out, "\\t", 2 ); break;
+            case '"': evbuffer_add( data->out, "\\\"", 2 ); break;
+            case '\\': evbuffer_add( data->out, "\\\\", 2 ); break;
 
             default:
                 if( isascii( *it ) )
