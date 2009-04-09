@@ -199,6 +199,7 @@ struct tr_torrent
 
     tr_bool                    isRunning;
     tr_bool                    isDeleting;
+    tr_bool                    needsSeedRatioCheck;
 
     uint16_t                   maxConnectedPeers;
 

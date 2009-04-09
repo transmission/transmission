@@ -865,7 +865,7 @@ updateSeedRatio( tr_session * session )
     tr_torrent * tor = NULL;
 
     while(( tor = tr_torrentNext( session, tor )))
-        tr_torrentCheckSeedRatio( tor );
+        tor->needsSeedRatioCheck = TRUE;
 }
 
 void

@@ -169,8 +169,6 @@ static TR_INLINE tr_bool tr_isEncryptionMode( tr_encryption_mode m )
 #define TR_PREFS_KEY_ALT_SPEED_TIME_DAY         "alt-speed-time-day"
 #define TR_PREFS_KEY_BLOCKLIST_ENABLED          "blocklist-enabled"
 #define TR_PREFS_KEY_DOWNLOAD_DIR               "download-dir"
-#define TR_PREFS_KEY_DSPEED                     "download-limit"
-#define TR_PREFS_KEY_DSPEED_ENABLED             "download-limit-enabled"
 #define TR_PREFS_KEY_ENCRYPTION                 "encryption"
 #define TR_PREFS_KEY_LAZY_BITFIELD              "lazy-bitfield-enabled"
 #define TR_PREFS_KEY_MSGLEVEL                   "message-level"
@@ -201,8 +199,10 @@ static TR_INLINE tr_bool tr_isEncryptionMode( tr_encryption_mode m )
 #define TR_PREFS_KEY_RPC_USERNAME               "rpc-username"
 #define TR_PREFS_KEY_RPC_WHITELIST_ENABLED      "rpc-whitelist-enabled"
 #define TR_PREFS_KEY_RPC_WHITELIST              "rpc-whitelist"
-#define TR_PREFS_KEY_USPEED_ENABLED             "upload-limit-enabled"
-#define TR_PREFS_KEY_USPEED                     "upload-limit"
+#define TR_PREFS_KEY_DSPEED                     "speed-limit-down"
+#define TR_PREFS_KEY_DSPEED_ENABLED             "speed-limit-down-enabled"
+#define TR_PREFS_KEY_USPEED_ENABLED             "speed-limit-up-enabled"
+#define TR_PREFS_KEY_USPEED                     "speed-limit-up"
 #define TR_PREFS_KEY_UPLOAD_SLOTS_PER_TORRENT   "upload-slots-per-torrent"
 
 struct tr_benc;

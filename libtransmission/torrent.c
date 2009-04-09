@@ -172,8 +172,7 @@ tr_torrentSetRatioMode( tr_torrent *  tor, tr_ratiolimit mode )
     assert( mode==TR_RATIOLIMIT_GLOBAL || mode==TR_RATIOLIMIT_SINGLE || mode==TR_RATIOLIMIT_UNLIMITED  );
 
     tor->ratioLimitMode = mode;
-
-    tr_torrentCheckSeedRatio( tor );
+    tor->needsSeedRatioCheck = TRUE;
 }
 
 tr_ratiolimit
@@ -185,14 +184,13 @@ tr_torrentGetRatioMode( const tr_torrent * tor )
 }
 
 void
-tr_torrentSetRatioLimit( tr_torrent * tor,
-                         double       desiredRatio )
+tr_torrentSetRatioLimit( tr_torrent * tor, double desiredRatio )
 {
     assert( tr_isTorrent( tor ) );
 
     tor->desiredRatio = desiredRatio;
 
-    tr_torrentCheckSeedRatio( tor );
+    tor->needsSeedRatioCheck = TRUE;
 }
 
 double
@@ -1192,7 +1190,8 @@ checkAndStartImpl( void * vtor )
 
     tr_globalLock( tor->session );
 
-    tor->isRunning = 1;
+    tor->isRunning = TRUE;
+    tor->needsSeedRatioCheck = TRUE;
     *tor->errorString = '\0';
     tr_torrentResetTransferStats( tor );
     tor->completeness = tr_cpGetStatus( &tor->completion );
@@ -1200,7 +1199,6 @@ checkAndStartImpl( void * vtor )
     tor->startDate = tor->anyDate = time( NULL );
     tr_trackerStart( tor->tracker );
     tr_peerMgrStartTorrent( tor );
-    tr_torrentCheckSeedRatio( tor );
 
     tr_globalUnlock( tor->session );
 }
@@ -1470,6 +1468,7 @@ tr_torrentRecheckCompleteness( tr_torrent * tor )
         }
 
         tor->completeness = completeness;
+        tor->needsSeedRatioCheck = TRUE;
         tr_torrentCloseLocalFiles( tor );
         fireCompletenessChange( tor, completeness );
 
@@ -1481,7 +1480,6 @@ tr_torrentRecheckCompleteness( tr_torrent * tor )
         }
 
         tr_torrentSaveResume( tor );
-        tr_torrentCheckSeedRatio( tor );
     }
 
     tr_torrentUnlock( tor );
@@ -1654,7 +1652,7 @@ tr_torrentInitFileDLs( tr_torrent      * tor,
     for( i=0; i<fileCount; ++i )
         setFileDND( tor, files[i], doDownload );
     tr_cpInvalidateDND( &tor->completion );
-    tr_torrentCheckSeedRatio( tor );
+    tor->needsSeedRatioCheck = TRUE;
 
     tr_torrentUnlock( tor );
 }
