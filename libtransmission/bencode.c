@@ -383,14 +383,10 @@ tr_bencDictFind( tr_benc * val, const char * key )
     return i < 0 ? NULL : &val->val.l.vals[i + 1];
 }
 
-static tr_benc*
-tr_bencDictFindType( tr_benc *    val,
-                     const char * key,
-                     int          type )
+static tr_bool
+tr_bencDictFindType( tr_benc * dict, const char * key, int type, tr_benc ** setme )
 {
-    tr_benc * ret = tr_bencDictFind( val, key );
-
-    return ( ret && ( ret->type == type ) ) ? ret : NULL;
+    return tr_bencIsType( *setme = tr_bencDictFind( dict, key ), type );
 }
 
 size_t
@@ -436,13 +432,7 @@ tr_bencGetStr( const tr_benc * val,
 tr_bool
 tr_bencDictFindInt( tr_benc * dict, const char * key, int64_t * setme )
 {
-    tr_bool found = FALSE;
-    tr_benc * child = tr_bencDictFindType( dict, key, TYPE_INT );
-
-    if( child )
-        found = tr_bencGetInt( child, setme );
-
-    return found;
+    return tr_bencGetInt( tr_bencDictFind( dict, key ), setme );
 }
 
 tr_bool
@@ -460,49 +450,19 @@ tr_bencDictFindDouble( tr_benc * dict, const char * key, double * setme )
 tr_bool
 tr_bencDictFindList( tr_benc * dict, const char * key, tr_benc ** setme )
 {
-    tr_bool found = FALSE;
-    tr_benc * child = tr_bencDictFindType( dict, key, TYPE_LIST );
-
-    if( child )
-    {
-        if( setme != NULL )
-            *setme = child;
-        found = TRUE;
-    }
-
-    return found;
+    return tr_bencDictFindType( dict, key, TYPE_LIST, setme );
 }
 
 tr_bool
 tr_bencDictFindDict( tr_benc * dict, const char * key, tr_benc ** setme )
 {
-    tr_bool found = FALSE;
-    tr_benc * child = tr_bencDictFindType( dict, key, TYPE_DICT );
-
-    if( child )
-    {
-        if( setme != NULL )
-            *setme = child;
-        found = TRUE;
-    }
-
-    return found;
+    return tr_bencDictFindType( dict, key, TYPE_DICT, setme );
 }
 
 tr_bool
 tr_bencDictFindStr( tr_benc *  dict, const char *  key, const char ** setme )
 {
-    tr_bool found = FALSE;
-    tr_benc * child = tr_bencDictFindType( dict, key, TYPE_STR );
-
-    if( child )
-    {
-        if( setme )
-            *setme = child->val.s.s;
-        found = TRUE;
-    }
-
-    return found;
+    return tr_bencGetStr( tr_bencDictFind( dict, key ), setme );
 }
 
 tr_bool
@@ -511,14 +471,12 @@ tr_bencDictFindRaw( tr_benc         * dict,
                     const uint8_t  ** setme_raw,
                     size_t          * setme_len )
 {
-    tr_bool found = FALSE;
-    tr_benc * child = tr_bencDictFindType( dict, key, TYPE_STR );
+    tr_benc * child;
+    const tr_bool found = tr_bencDictFindType( dict, key, TYPE_STR, &child );
 
-    if( child )
-    {
+    if( found ) {
         *setme_raw = (uint8_t*) child->val.s.s;
         *setme_len = child->val.s.i;
-        found = TRUE;
     }
 
     return found;
@@ -1203,27 +1161,19 @@ jsonStringFunc( const tr_benc * val,
     {
         switch( *it )
         {
-            case '/':
-            case '\b':
-            case '\f':
-            case '\n':
-            case '\r':
-            case '\t':
-            case '"':
-            case '\\': {
-                char buf[2] = { '\\', *it };
-                evbuffer_add( data->out, buf, 2 );
-                break;
-            }
+            case '/': evbuffer_add( data->out, "\\/", 2 ); break;
+            case '\b': evbuffer_add( data->out, "\\b", 2 ); break;
+            case '\f': evbuffer_add( data->out, "\\f", 2 ); break;
+            case '\n': evbuffer_add( data->out, "\\n", 2 ); break;
+            case '\r': evbuffer_add( data->out, "\\r", 2 ); break;
+            case '\t': evbuffer_add( data->out, "\\t", 2 ); break;
+            case '"': evbuffer_add( data->out, "\\\"", 2 ); break;
+            case '\\': evbuffer_add( data->out, "\\\\", 2 ); break;
 
             default:
                 if( isascii( *it ) )
-                {
-                    /*fprintf( stderr, "[%c]\n", *it );*/
                     evbuffer_add( data->out, it, 1 );
-                }
-                else
-                {
+                else {
                     const UTF8 * tmp = it;
                     UTF32        buf = 0;
                     UTF32 *      u32 = &buf;
@@ -1234,7 +1184,6 @@ jsonStringFunc( const tr_benc * val,
                         evbuffer_add_printf( data->out, "\\u%04x", (unsigned int)buf );
                         it = tmp - 1;
                     }
-                    /*fprintf( stderr, "[\\u%04x]\n", buf );*/
                 }
         }
     }
