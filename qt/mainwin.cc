@@ -285,6 +285,7 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
              << Prefs :: SHOW_TRAY_ICON
              << Prefs :: SORT_REVERSED
              << Prefs :: SORT_MODE
+             << Prefs :: FILTER_MODE
              << Prefs :: FILTERBAR
              << Prefs :: STATUSBAR
              << Prefs :: STATUSBAR_STATS
@@ -513,11 +514,11 @@ TrMainWindow :: reannounceSelected( )
 void
 TrMainWindow :: setShowMode( TorrentFilter :: ShowMode mode )
 {
-    ui.filterAll->setChecked( mode == TorrentFilter::SHOW_ALL );
-    ui.filterActive->setChecked( mode == TorrentFilter::SHOW_ACTIVE );
-    ui.filterDownloading->setChecked( mode == TorrentFilter::SHOW_DOWNLOADING );
-    ui.filterSeeding->setChecked( mode == TorrentFilter::SHOW_SEEDING );
-    ui.filterPaused->setChecked( mode == TorrentFilter::SHOW_PAUSED );
+    ui.filterAll->setChecked         ( mode == TorrentFilter :: SHOW_ALL );
+    ui.filterActive->setChecked      ( mode == TorrentFilter :: SHOW_ACTIVE );
+    ui.filterDownloading->setChecked ( mode == TorrentFilter :: SHOW_DOWNLOADING );
+    ui.filterSeeding->setChecked     ( mode == TorrentFilter :: SHOW_SEEDING );
+    ui.filterPaused->setChecked      ( mode == TorrentFilter :: SHOW_PAUSED );
 
     myFilterModel.setShowMode( mode );
 }
@@ -610,6 +611,7 @@ void
 TrMainWindow :: refreshPref( int key )
 {
     bool b;
+    int i;
     QString str;
 
     switch( key )
@@ -628,17 +630,27 @@ TrMainWindow :: refreshPref( int key )
             break;
 
         case Prefs::SORT_MODE:
-            str = myPrefs.getString( key );
-            ui.action_SortByActivity->setChecked ( str == "sort-by-activity" );
-            ui.action_SortByAge->setChecked      ( str == "sort-by-age" );
-            ui.action_SortByETA->setChecked      ( str == "sort-by-eta" );
-            ui.action_SortByName->setChecked     ( str == "sort-by-name" );
-            ui.action_SortByProgress->setChecked ( str == "sort-by-progress" );
-            ui.action_SortByRatio->setChecked    ( str == "sort-by-ratio" );
-            ui.action_SortBySize->setChecked     ( str == "sort-by-size" );
-            ui.action_SortByState->setChecked    ( str == "sort-by-state" );
-            ui.action_SortByTracker->setChecked  ( str == "sort-by-tracker" );
+            i = myFilterModel.getSortModeFromName( myPrefs.getString( key ) );
+            ui.action_SortByActivity->setChecked ( i == TorrentFilter::SORT_BY_ACTIVITY );
+            ui.action_SortByAge->setChecked      ( i == TorrentFilter::SORT_BY_AGE );
+            ui.action_SortByETA->setChecked      ( i == TorrentFilter::SORT_BY_ETA );
+            ui.action_SortByName->setChecked     ( i == TorrentFilter::SORT_BY_NAME );
+            ui.action_SortByProgress->setChecked ( i == TorrentFilter::SORT_BY_PROGRESS );
+            ui.action_SortByRatio->setChecked    ( i == TorrentFilter::SORT_BY_RATIO );
+            ui.action_SortBySize->setChecked     ( i == TorrentFilter::SORT_BY_SIZE );
+            ui.action_SortByState->setChecked    ( i == TorrentFilter::SORT_BY_STATE );
+            ui.action_SortByTracker->setChecked  ( i == TorrentFilter::SORT_BY_TRACKER );
             break;
+
+        case Prefs::FILTER_MODE:
+            i = myFilterModel.getShowModeFromName( myPrefs.getString( key ) );
+            ui.filterAll->setChecked         ( i == TorrentFilter::SHOW_ALL );
+            ui.filterActive->setChecked      ( i == TorrentFilter::SHOW_ACTIVE );
+            ui.filterDownloading->setChecked ( i == TorrentFilter::SHOW_DOWNLOADING );
+            ui.filterSeeding->setChecked     ( i == TorrentFilter::SHOW_SEEDING );
+            ui.filterPaused->setChecked      ( i == TorrentFilter::SHOW_PAUSED );
+            break;
+
 
         case Prefs::FILTERBAR:
             b = myPrefs.getBool( key );

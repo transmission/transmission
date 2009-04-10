@@ -16,6 +16,7 @@
 #include <QSortFilterProxyModel>
 
 struct Prefs;
+struct QString;
 
 class TorrentFilter: public QSortFilterProxyModel
 {
@@ -28,6 +29,8 @@ class TorrentFilter: public QSortFilterProxyModel
     public:
         enum ShowMode { SHOW_ALL, SHOW_ACTIVE, SHOW_DOWNLOADING, SHOW_SEEDING, SHOW_PAUSED };
         ShowMode getShowMode( ) const { return myShowMode; }
+        ShowMode getShowModeFromName( const QString& name ) const;
+        const char * getShowName( int mode=-1 ) const;
 
         enum TextMode { FILTER_BY_NAME, FILTER_BY_FILES, FILTER_BY_TRACKER };
         TextMode getTextMode( ) const { return myTextMode; }
@@ -35,8 +38,9 @@ class TorrentFilter: public QSortFilterProxyModel
         enum SortMode{ SORT_BY_ACTIVITY, SORT_BY_AGE, SORT_BY_ETA, SORT_BY_NAME,
                        SORT_BY_PROGRESS, SORT_BY_RATIO, SORT_BY_SIZE,
                        SORT_BY_STATE, SORT_BY_TRACKER, SORT_BY_ID };
-        const char * getSortKey( int mode=-1 );
         SortMode getSortMode( ) const { return mySortMode; }
+        SortMode getSortModeFromName( const QString& name) const;
+        const char * getSortName( int mode=-1 ) const;
 
         bool isAscending( ) const { return myIsAscending; }
 

@@ -54,6 +54,7 @@ class Prefs: public QObject
             MAIN_WINDOW_WIDTH,
             MAIN_WINDOW_X,
             MAIN_WINDOW_Y,
+            FILTER_MODE,
 
             /* core prefs */
             FIRST_CORE_PREF,

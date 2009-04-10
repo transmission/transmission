@@ -19,10 +19,10 @@
 
 TorrentFilter :: TorrentFilter( Prefs& prefs ):
     myPrefs( prefs ),
-    myShowMode( SHOW_ALL ),
+    myShowMode( getShowModeFromName( prefs.getString( Prefs::FILTER_MODE ) ) ),
     myTextMode( FILTER_BY_NAME ),
-    mySortMode( SORT_BY_ID ),
-    myIsAscending( FALSE )
+    mySortMode( getSortModeFromName( prefs.getString( Prefs::SORT_MODE ) ) ),
+    myIsAscending( prefs.getBool( Prefs::SORT_REVERSED ) )
 {
 }
 
@@ -39,6 +39,7 @@ TorrentFilter :: setShowMode( int showMode )
 {
     if( myShowMode != showMode )
     {
+        myPrefs.set( Prefs :: FILTER_MODE, getShowName( showMode ) );
         myShowMode = ShowMode( showMode );
         invalidateFilter( );
     }
@@ -113,22 +114,84 @@ TorrentFilter :: filterAcceptsRow( int sourceRow, const QModelIndex& sourceParen
 ****
 ***/
 
-const char*
-TorrentFilter :: getSortKey( int modeIn )
+namespace
 {
-    switch( modeIn < 0 ? getSortMode( ) : SortMode( modeIn ) )
+    struct NameAndNum
     {
-        case SORT_BY_ACTIVITY: return "sort-by-activity";
-        case SORT_BY_AGE:      return "sort-by-age";
-        case SORT_BY_ETA:      return "sort-by-eta";
-        case SORT_BY_PROGRESS: return "sort-by-progress";
-        case SORT_BY_RATIO:    return "sort-by-ratio";
-        case SORT_BY_SIZE:     return "sort-by-size";
-        case SORT_BY_STATE:    return "sort-by-state";
-        case SORT_BY_TRACKER:  return "sort-by-tracker";
-        default:               return "sort-by-name";
+        const char * name;
+        int num;
+    };
+
+    const struct NameAndNum showModes[] = {
+        { "show-all",         TorrentFilter::SHOW_ALL },
+        { "show-active",      TorrentFilter::SHOW_ACTIVE },
+        { "show-downloading", TorrentFilter::SHOW_DOWNLOADING },
+        { "show-seeding",     TorrentFilter::SHOW_SEEDING },
+        { "show-paused",      TorrentFilter::SHOW_PAUSED }
+    };
+
+    const int showModeCount = sizeof(showModes) / sizeof(showModes[0]);
+
+    const struct NameAndNum sortModes[] = {
+        { "sort-by-name",     TorrentFilter::SORT_BY_NAME },
+        { "sort-by-activity", TorrentFilter::SORT_BY_ACTIVITY },
+        { "sort-by-age",      TorrentFilter::SORT_BY_AGE },
+        { "sort-by-eta",      TorrentFilter::SORT_BY_ETA },
+        { "sort-by-progress", TorrentFilter::SORT_BY_PROGRESS },
+        { "sort-by-ratio",    TorrentFilter::SORT_BY_RATIO },
+        { "sort-by-size",     TorrentFilter::SORT_BY_SIZE },
+        { "sort-by-state",    TorrentFilter::SORT_BY_STATE },
+        { "sort-by-tracker",  TorrentFilter::SORT_BY_TRACKER }
+    };
+
+    const int sortModeCount = sizeof(sortModes) / sizeof(sortModes[0]);
+
+    int getNum( const struct NameAndNum * rows, int numRows, const QString& name )
+    {
+        for( int i=0; i<numRows; ++i )
+            if( name == rows[i].name )
+                return rows[i].num;
+        return rows[0].num; // fallback value
+    }
+
+    const char* getName( const struct NameAndNum * rows, int numRows, int num )
+    {
+        for( int i=0; i<numRows; ++i )
+            if( num == rows[i].num )
+                return rows[i].name;
+        return rows[0].name; // fallback value
     }
 }
+
+TorrentFilter :: ShowMode
+TorrentFilter :: getShowModeFromName( const QString& key ) const
+{
+    return ShowMode( getNum( showModes, showModeCount, key ) );
+}
+
+const char*
+TorrentFilter :: getShowName( int mode ) const
+{
+    if( mode < 0 ) mode = getShowMode( );
+    return getName( showModes, showModeCount, mode );
+}
+
+TorrentFilter :: SortMode
+TorrentFilter :: getSortModeFromName( const QString& key ) const
+{
+    return SortMode( getNum( sortModes, sortModeCount, key ) );
+}
+
+const char*
+TorrentFilter :: getSortName( int mode ) const
+{
+    if( mode < 0 ) mode = getSortMode( );
+    return getName( sortModes, sortModeCount, mode );
+}
+
+/***
+****
+***/
 
 void
 TorrentFilter :: resort( )
@@ -152,7 +215,7 @@ TorrentFilter :: setSortMode( int sortMode )
 {
     if( mySortMode != sortMode )
     {
-        myPrefs.set( Prefs :: SORT_MODE, getSortKey( sortMode ) );
+        myPrefs.set( Prefs :: SORT_MODE, getSortName( sortMode ) );
         mySortMode = SortMode( sortMode );
         setDynamicSortFilter ( true );
         resort( );

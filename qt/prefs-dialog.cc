@@ -666,7 +666,6 @@ PrefsDialog :: updatePref( int key )
 
         case Prefs :: BLOCKLIST_ENABLED: {
             const bool enabled = myPrefs.getBool( key );
-            std::cerr << " setting " << myBlockWidgets.size() << " block widgets to " << enabled << std::endl;
             foreach( QWidget * w, myBlockWidgets ) w->setEnabled( enabled );
             break;
         }

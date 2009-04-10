@@ -54,6 +54,7 @@ Prefs::PrefItem Prefs::myItems[] =
     { MAIN_WINDOW_WIDTH, "main-window-width", QVariant::Int },
     { MAIN_WINDOW_X, "main-window-x", QVariant::Int },
     { MAIN_WINDOW_Y, "main-window-y", QVariant::Int },
+    { FILTER_MODE, "filter-mode", QVariant::String },
 
     /* libtransmission settings */
     { ALT_SPEED_LIMIT_UP, TR_PREFS_KEY_ALT_SPEED_UP, QVariant::Int },
@@ -231,6 +232,7 @@ Prefs :: initDefaults( tr_benc * d )
     tr_bencDictAddInt( d, keyStr(MAIN_WINDOW_WIDTH), 300 );
     tr_bencDictAddInt( d, keyStr(MAIN_WINDOW_X), 50 );
     tr_bencDictAddInt( d, keyStr(MAIN_WINDOW_Y), 50 );
+    tr_bencDictAddStr( d, keyStr(FILTER_MODE), "all" );
     tr_bencDictAddStr( d, keyStr(MAIN_WINDOW_LAYOUT_ORDER), "menu,toolbar,filter,list,statusbar" );
     tr_bencDictAddStr( d, keyStr(DOWNLOAD_DIR), tr_getDefaultDownloadDir( ) );
     tr_bencDictAddInt( d, keyStr(ASKQUIT), true );
