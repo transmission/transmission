@@ -262,10 +262,7 @@ TrOpenFile( int                      i,
     if( doWrite && !alreadyExisted && ( preallocationMode == TR_PREALLOCATE_SPARSE ) )
         preallocateFileSparse( file->fd, desiredFileSize );
 
-#if defined( SYS_DARWIN )
-    fcntl( file->fd, F_NOCACHE, 1 );
-    fcntl( file->fd, F_RDAHEAD, 0 );
-#elif defined( HAVE_POSIX_FADVISE )
+#ifdef HAVE_POSIX_FADVISE
     posix_fadvise( file->fd, 0, 0, POSIX_FADV_RANDOM );
 #endif
 
