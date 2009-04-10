@@ -356,20 +356,25 @@ handle_clutch( struct evhttp_request * req,
     {
         char * pch;
         char * subpath;
-        char * filename;
 
         subpath = tr_strdup( req->uri + 18 );
         if(( pch = strchr( subpath, '?' )))
             *pch = '\0';
 
-        filename = tr_strdup_printf( "%s%s%s",
-                       clutchDir,
-                       TR_PATH_DELIMITER_STR,
-                       subpath && *subpath ? subpath : "index.html" );
+        if( strstr( subpath, ".." ) )
+        {
+            send_simple_response( req, HTTP_NOTFOUND, "<p>Tsk, tsk.</p>" );
+        }
+        else
+        {
+            char * filename = tr_strdup_printf( "%s%s%s",
+                                 clutchDir,
+                                 TR_PATH_DELIMITER_STR,
+                                 subpath && *subpath ? subpath : "index.html" );
+            serve_file( req, server, filename );
+            tr_free( filename );
+        }
 
-        serve_file( req, server, filename );
-
-        tr_free( filename );
         tr_free( subpath );
     }
 }
