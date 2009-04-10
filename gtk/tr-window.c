@@ -92,14 +92,13 @@ typedef struct
     filter_mode_t         filter_mode;
     filter_text_mode_t    filter_text_mode;
     char *                filter_text;
+    GtkToggleButton     * filter_toggles[FILTER_MODE_QTY];
 }
 PrivateData;
 
 #define PRIVATE_DATA_KEY "private-data"
 
-#define FILTER_MODE_KEY "tr-filter-mode"
 #define FILTER_TEXT_MODE_KEY "tr-filter-text-mode"
-#define FILTER_TOGGLES_KEY "tr-filter-toggles"
 
 static PrivateData*
 get_private_data( TrWindow * w )
@@ -339,7 +338,9 @@ checkFilterMode( filter_mode_t filter_mode,
         case FILTER_MODE_ACTIVE:
         {
             const tr_stat * s = tr_torrentStatCached( tor );
-            ret = s->peersSendingToUs > 0 || s->peersGettingFromUs > 0;
+            ret = s->peersSendingToUs > 0
+               || s->peersGettingFromUs > 0
+               || tr_torrentGetActivity( tor ) == TR_STATUS_CHECK;
             break;
         }
 
@@ -392,34 +393,23 @@ static void
 filter_toggled_cb( GtkToggleButton * toggle,
                    gpointer          vprivate )
 {
-    PrivateData *       p = vprivate;
-    GSList *            l;
-    GSList *            toggles = g_object_get_data( G_OBJECT(
-                                                         toggle ),
-                                                     FILTER_TOGGLES_KEY );
-    const gboolean      isActive = gtk_toggle_button_get_active( toggle );
-    const filter_mode_t mode =
-        GPOINTER_TO_UINT( g_object_get_data( G_OBJECT( toggle ),
-                                             FILTER_MODE_KEY ) );
+    int mode = -1;
+    PrivateData * p = vprivate;
 
-    /* update the filter */
-    if( isActive )
+    if( gtk_toggle_button_get_active( toggle ) )
     {
+        int i;
+        for( i=0; i<FILTER_MODE_QTY; ++i )
+            if( p->filter_toggles[i] == toggle )
+                mode = i;
+            else
+                gtk_toggle_button_set_active( p->filter_toggles[i], FALSE );
+    }
+
+    if( mode >= 0 ) {
         p->filter_mode = mode;
         refilter( p );
     }
-
-    /* deactivate the other toggles */
-    for( l = toggles; l != NULL; l = l->next )
-    {
-        GtkToggleButton * walk = GTK_TOGGLE_BUTTON( l->data );
-        if( isActive && ( toggle != walk ) )
-            gtk_toggle_button_set_active( walk, FALSE );
-    }
-
-    /* at least one button must always be set */
-    if( !isActive && ( p->filter_mode == mode ) )
-        gtk_toggle_button_set_active( toggle, TRUE );
 }
 
 static void
@@ -514,7 +504,6 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
     GtkWidget *   vbox, *w, *self, *h, *c, *s, *image, *menu;
     GtkWindow *   win;
     GSList *      l;
-    GSList *      toggles;
 
     const char *  filter_names[FILTER_MODE_QTY] = {
         /* show all torrents */
@@ -567,33 +556,23 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
     w = toolbar = p->toolbar = action_get_widget( "/main-window-toolbar" );
 
     /* filter */
-    toggles = NULL;
     h = filter = p->filter = gtk_hbox_new( FALSE, 0 );
     gtk_container_set_border_width( GTK_CONTAINER( h ), GUI_PAD_SMALL );
     for( i = 0; i < FILTER_MODE_QTY; ++i )
     {
         const char * mnemonic = _( filter_names[i] );
         w = gtk_toggle_button_new_with_mnemonic( mnemonic );
-        g_object_set_data( G_OBJECT( w ), FILTER_MODE_KEY,
-                          GINT_TO_POINTER( i ) );
         gtk_button_set_relief( GTK_BUTTON( w ), GTK_RELIEF_NONE );
-        gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(
-                                          w ), i == FILTER_MODE_ALL );
-        toggles = g_slist_prepend( toggles, w );
+        gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( w ), i == FILTER_MODE_ALL );
+        p->filter_toggles[i] = GTK_TOGGLE_BUTTON( w );
         g_signal_connect( w, "toggled", G_CALLBACK( filter_toggled_cb ), p );
         gtk_box_pack_start( GTK_BOX( h ), w, FALSE, FALSE, 0 );
     }
-    for( l = toggles; l != NULL; l = l->next )
-        g_object_set_data( G_OBJECT( l->data ), FILTER_TOGGLES_KEY, toggles );
     s = sexy_icon_entry_new( );
     sexy_icon_entry_add_clear_button( SEXY_ICON_ENTRY( s ) );
     image = gtk_image_new_from_stock( GTK_STOCK_FIND, GTK_ICON_SIZE_MENU );
-    sexy_icon_entry_set_icon( SEXY_ICON_ENTRY(
-                                 s ), SEXY_ICON_ENTRY_PRIMARY,
-                             GTK_IMAGE( image ) );
-    sexy_icon_entry_set_icon_highlight( SEXY_ICON_ENTRY(
-                                            s ), SEXY_ICON_ENTRY_PRIMARY,
-                                        TRUE );
+    sexy_icon_entry_set_icon( SEXY_ICON_ENTRY( s ), SEXY_ICON_ENTRY_PRIMARY, GTK_IMAGE( image ) );
+    sexy_icon_entry_set_icon_highlight( SEXY_ICON_ENTRY( s ), SEXY_ICON_ENTRY_PRIMARY, TRUE );
     gtk_box_pack_end( GTK_BOX( h ), s, FALSE, FALSE, 0 );
     g_signal_connect( s, "changed", G_CALLBACK( filter_entry_changed ), p );
 

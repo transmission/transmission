@@ -44,20 +44,13 @@ action_cb( GtkAction * a,
 
 static GtkRadioActionEntry sort_radio_entries[] =
 {
-    { "sort-by-activity", NULL,      N_( "Sort by _Activity" ),        NULL,
-      NULL, 0 },
-    { "sort-by-name",     NULL,        N_( "Sort by _Name" ),     NULL,
-      NULL, 1 },
-    { "sort-by-progress", NULL,        N_( "Sort by _Progress" ), NULL,
-      NULL, 2 },
-    { "sort-by-ratio",    NULL,        N_( "Sort by _Ratio" ),    NULL,
-      NULL, 3 },
-    { "sort-by-state",    NULL,        N_( "Sort by _State" ),    NULL,
-      NULL, 4 },
-    { "sort-by-tracker",  NULL,        N_( "Sort by _Tracker" ),  NULL,
-      NULL, 5 },
-    { "sort-by-age",      NULL,        N_( "Sort by A_ge" ),      NULL,
-      NULL, 6 }
+    { "sort-by-activity", NULL, N_( "Sort by _Activity" ), NULL, NULL, 0 },
+    { "sort-by-name",     NULL, N_( "Sort by _Name" ),     NULL, NULL, 1 },
+    { "sort-by-progress", NULL, N_( "Sort by _Progress" ), NULL, NULL, 2 },
+    { "sort-by-ratio",    NULL, N_( "Sort by _Ratio" ),    NULL, NULL, 3 },
+    { "sort-by-state",    NULL, N_( "Sort by _State" ),    NULL, NULL, 4 },
+    { "sort-by-tracker",  NULL, N_( "Sort by _Tracker" ),  NULL, NULL, 5 },
+    { "sort-by-age",      NULL, N_( "Sort by A_ge" ),      NULL, NULL, 6 }
 };
 
 static void
@@ -74,10 +67,8 @@ sort_changed_cb( GtkAction            * action UNUSED,
 
 static GtkToggleActionEntry show_toggle_entries[] =
 {
-    { "toggle-main-window", NULL,
-      N_( "_Main Window" ), NULL, NULL, G_CALLBACK( action_cb ), TRUE },
-    { "toggle-message-log", NULL,
-      N_( "Message _Log" ), NULL, NULL, G_CALLBACK( action_cb ), FALSE }
+    { "toggle-main-window", NULL, N_( "_Main Window" ), NULL, NULL, G_CALLBACK( action_cb ), TRUE },
+    { "toggle-message-log", NULL, N_( "Message _Log" ), NULL, NULL, G_CALLBACK( action_cb ), FALSE }
 };
 
 static void

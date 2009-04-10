@@ -35,12 +35,6 @@
 #include <glib/gi18n.h>
 #include <glib/gstdio.h>
 
-#include <gdk/gdk.h>
-#ifdef GDK_WINDOWING_X11
- #include <X11/Xatom.h>
- #include <gdk/gdkx.h>
-#endif
-
 #include <libtransmission/transmission.h>
 #include <libtransmission/rpcimpl.h>
 #include <libtransmission/utils.h>
@@ -352,7 +346,7 @@ main( int     argc,
     gboolean            showversion = FALSE;
     gboolean            startpaused = FALSE;
     gboolean            startminimized = FALSE;
-    char *              domain = MY_NAME;
+    const char *        domain = MY_NAME;
     char *              configDir = NULL;
     tr_lockfile_state_t tr_state;
 
@@ -388,7 +382,7 @@ main( int     argc,
 
     gerr = NULL;
     if( !gtk_init_with_args( &argc, &argv, _( "[torrent files]" ), entries,
-                             domain, &gerr ) )
+                             (char*)domain, &gerr ) )
     {
         fprintf( stderr, "%s\n", gerr->message );
         g_clear_error( &gerr );
@@ -899,9 +893,9 @@ setupdrag( GtkWidget *    widget,
            struct cbdata *data )
 {
     GtkTargetEntry targets[] = {
-        { "STRING",          0, 0 },
-        { "text/plain",      0, 0 },
-        { "text/uri-list",   0, 0 },
+        { (char*)"STRING",          0, 0 },
+        { (char*)"text/plain",      0, 0 },
+        { (char*)"text/uri-list",   0, 0 },
     };
 
     g_signal_connect( widget, "drag_data_received", G_CALLBACK(
@@ -1051,44 +1045,37 @@ prefschanged( TrCore * core UNUSED,
     }
     else if( !strcmp( key, TR_PREFS_KEY_PEER_PORT ) )
     {
-        const int port = pref_int_get( key );
-        tr_sessionSetPeerPort( tr, port );
+        tr_sessionSetPeerPort( tr, pref_int_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_BLOCKLIST_ENABLED ) )
     {
-        const gboolean flag = pref_flag_get( key );
-        tr_blocklistSetEnabled( tr, flag );
+        tr_blocklistSetEnabled( tr, pref_flag_get( key ) );
     }
     else if( !strcmp( key, PREF_KEY_SHOW_TRAY_ICON ) )
     {
         const int show = pref_flag_get( key );
         if( show && !cbdata->icon )
             cbdata->icon = tr_icon_new( cbdata->core );
-        else if( !show && cbdata->icon )
-        {
+        else if( !show && cbdata->icon ) {
             g_object_unref( cbdata->icon );
             cbdata->icon = NULL;
         }
     }
     else if( !strcmp( key, TR_PREFS_KEY_DSPEED_ENABLED ) )
     {
-        const gboolean b = pref_flag_get( key );
-        tr_sessionSetSpeedLimitEnabled( tr, TR_DOWN, b );
+        tr_sessionSetSpeedLimitEnabled( tr, TR_DOWN, pref_flag_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_DSPEED ) )
     {
-        const int limit = pref_int_get( key );
-        tr_sessionSetSpeedLimit( tr, TR_DOWN, limit );
+        tr_sessionSetSpeedLimit( tr, TR_DOWN, pref_int_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_USPEED_ENABLED ) )
     {
-        const gboolean b = pref_flag_get( key );
-        tr_sessionSetSpeedLimitEnabled( tr, TR_UP, b );
+        tr_sessionSetSpeedLimitEnabled( tr, TR_UP, pref_flag_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_USPEED ) )
     {
-        const int limit = pref_int_get( key );
-        tr_sessionSetSpeedLimit( tr, TR_UP, limit );
+        tr_sessionSetSpeedLimit( tr, TR_UP, pref_int_get( key ) );
     }
     else if( !strncmp( key, "sched-", 6 ) )
     {
@@ -1112,8 +1099,7 @@ prefschanged( TrCore * core UNUSED,
     }
     else if( !strcmp( key, TR_PREFS_KEY_RPC_WHITELIST ) )
     {
-        const char * s = pref_string_get( key );
-        tr_sessionSetRPCWhitelist( tr, s );
+        tr_sessionSetRPCWhitelist( tr, pref_string_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_RPC_WHITELIST_ENABLED ) )
     {
@@ -1121,48 +1107,39 @@ prefschanged( TrCore * core UNUSED,
     }
     else if( !strcmp( key, TR_PREFS_KEY_RPC_USERNAME ) )
     {
-        const char * s = pref_string_get( key );
-        tr_sessionSetRPCUsername( tr, s );
+        tr_sessionSetRPCUsername( tr, pref_string_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_RPC_PASSWORD ) )
     {
-        const char * s = pref_string_get( key );
-        tr_sessionSetRPCPassword( tr, s );
+        tr_sessionSetRPCPassword( tr, pref_string_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_RPC_AUTH_REQUIRED ) )
     {
-        const gboolean enabled = pref_flag_get( key );
-        tr_sessionSetRPCPasswordEnabled( tr, enabled );
+        tr_sessionSetRPCPasswordEnabled( tr, pref_flag_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_PROXY ) )
     {
-        const char * s = pref_string_get( key );
-        tr_sessionSetProxy( tr, s );
+        tr_sessionSetProxy( tr, pref_string_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_PROXY_TYPE ) )
     {
-        const int i = pref_int_get( key );
-        tr_sessionSetProxyType( tr, i );
+        tr_sessionSetProxyType( tr, pref_int_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_PROXY_ENABLED ) )
     {
-        const gboolean enabled = pref_flag_get( key );
-        tr_sessionSetProxyEnabled( tr, enabled );
+        tr_sessionSetProxyEnabled( tr, pref_flag_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_PROXY_AUTH_ENABLED ) )
     {
-        const gboolean enabled = pref_flag_get( key );
-        tr_sessionSetProxyAuthEnabled( tr, enabled );
+        tr_sessionSetProxyAuthEnabled( tr, pref_flag_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_PROXY_USERNAME ) )
     {
-        const char * s = pref_string_get( key );
-        tr_sessionSetProxyUsername( tr, s );
+        tr_sessionSetProxyUsername( tr, pref_string_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_PROXY_PASSWORD ) )
     {
-        const char * s = pref_string_get( key );
-        tr_sessionSetProxyPassword( tr, s );
+        tr_sessionSetProxyPassword( tr, pref_string_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_PROXY_PORT ) )
     {
@@ -1170,8 +1147,7 @@ prefschanged( TrCore * core UNUSED,
     }
     else if( !strcmp( key, TR_PREFS_KEY_RPC_PASSWORD ) )
     {
-        const char * s = pref_string_get( key );
-        tr_sessionSetProxyPassword( tr, s );
+        tr_sessionSetProxyPassword( tr, pref_string_get( key ) );
     }
 }
 

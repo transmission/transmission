@@ -124,30 +124,6 @@ tr_core_marshal_blocklist( GClosure *     closure,
     callback( inst, flag, str, gdata );
 }
 
-static void
-tr_core_marshal_prompt( GClosure *     closure,
-                        GValue * ret   UNUSED,
-                        guint          count,
-                        const GValue * vals,
-                        gpointer hint  UNUSED,
-                        gpointer       marshal )
-{
-    typedef void ( *TRMarshalPrompt )( gpointer, tr_ctor *, gpointer );
-    TRMarshalPrompt callback;
-    GCClosure *     cclosure = (GCClosure*) closure;
-    gpointer        ctor;
-    gpointer        inst, gdata;
-
-    g_return_if_fail( count == 2 );
-
-    inst      = g_value_peek_pointer( vals );
-    ctor      = g_value_peek_pointer( vals + 1 );
-    gdata     = closure->data;
-
-    callback = (TRMarshalPrompt)( marshal ? marshal : cclosure->callback );
-    callback( inst, ctor, gdata );
-}
-
 static int
 isDisposed( const TrCore * core )
 {
@@ -184,28 +160,33 @@ tr_core_class_init( gpointer              g_class,
 
 
     core_class = TR_CORE_CLASS( g_class );
+
     core_class->blocksig = g_signal_new( "blocklist-status",
-                                         G_TYPE_FROM_CLASS(
-                                             g_class ),
+                                         G_TYPE_FROM_CLASS( g_class ),
                                          G_SIGNAL_RUN_LAST, 0, NULL, NULL,
                                          tr_core_marshal_blocklist,
                                          G_TYPE_NONE,
                                          2, G_TYPE_BOOLEAN, G_TYPE_STRING );
-    core_class->errsig = g_signal_new( "error", G_TYPE_FROM_CLASS( g_class ),
+
+    core_class->errsig = g_signal_new( "error",
+                                       G_TYPE_FROM_CLASS( g_class ),
                                        G_SIGNAL_RUN_LAST, 0, NULL, NULL,
                                        tr_core_marshal_err, G_TYPE_NONE,
                                        2, G_TYPE_INT, G_TYPE_STRING );
+
     core_class->promptsig = g_signal_new( "add-torrent-prompt",
-                                          G_TYPE_FROM_CLASS(
-                                              g_class ),
+                                          G_TYPE_FROM_CLASS( g_class ),
                                           G_SIGNAL_RUN_LAST, 0, NULL, NULL,
-                                          tr_core_marshal_prompt,
+                                          g_cclosure_marshal_VOID__POINTER,
                                           G_TYPE_NONE,
                                           1, G_TYPE_POINTER );
-    core_class->quitsig = g_signal_new( "quit", G_TYPE_FROM_CLASS( g_class ),
+
+    core_class->quitsig = g_signal_new( "quit",
+                                        G_TYPE_FROM_CLASS( g_class ),
                                         G_SIGNAL_RUN_LAST, 0, NULL, NULL,
                                         g_cclosure_marshal_VOID__VOID,
                                         G_TYPE_NONE, 0 );
+
     core_class->prefsig = g_signal_new( "prefs-changed",
                                         G_TYPE_FROM_CLASS( g_class ),
                                         G_SIGNAL_RUN_LAST, 0, NULL, NULL,
@@ -246,8 +227,7 @@ tr_core_class_init( gpointer              g_class,
 ***/
 
 static int
-compareDouble( double a,
-               double b )
+compareDouble( double a, double b )
 {
     if( a < b ) return -1;
     if( a > b ) return 1;
@@ -255,8 +235,7 @@ compareDouble( double a,
 }
 
 static int
-compareRatio( double a,
-              double b )
+compareRatio( double a, double b )
 {
     if( (int)a == TR_RATIO_INF && (int)b == TR_RATIO_INF ) return 0;
     if( (int)a == TR_RATIO_INF ) return 1;
@@ -265,8 +244,7 @@ compareRatio( double a,
 }
 
 static int
-compareTime( time_t a,
-             time_t b )
+compareTime( time_t a, time_t b )
 {
     if( a < b ) return -1;
     if( a > b ) return 1;
@@ -274,9 +252,9 @@ compareTime( time_t a,
 }
 
 static int
-compareByRatio( GtkTreeModel *           model,
-                GtkTreeIter *            a,
-                GtkTreeIter *            b,
+compareByRatio( GtkTreeModel * model,
+                GtkTreeIter  * a,
+                GtkTreeIter  * b,
                 gpointer       user_data UNUSED )
 {
     tr_torrent *   ta, *tb;
@@ -292,9 +270,9 @@ compareByRatio( GtkTreeModel *           model,
 }
 
 static int
-compareByActivity( GtkTreeModel *           model,
-                   GtkTreeIter *            a,
-                   GtkTreeIter *            b,
+compareByActivity( GtkTreeModel * model,
+                   GtkTreeIter  * a,
+                   GtkTreeIter  * b,
                    gpointer       user_data UNUSED )
 {
     int            i;
@@ -389,10 +367,10 @@ compareByState( GtkTreeModel * model,
 }
 
 static int
-compareByTracker( GtkTreeModel *             model,
-                  GtkTreeIter *              a,
-                  GtkTreeIter *              b,
-                  gpointer         user_data UNUSED )
+compareByTracker( GtkTreeModel * model,
+                  GtkTreeIter  * a,
+                  GtkTreeIter  * b,
+                  gpointer       user_data UNUSED )
 {
     const tr_torrent *ta, *tb;
 
@@ -987,7 +965,7 @@ tr_core_torrent_destroyed( TrCore * core,
 
     if( findTorrentInModel( core, id, &iter ) )
     {
-        TrTorrent *    gtor;
+        TrTorrent * gtor;
         GtkTreeModel * model = tr_core_model( core );
         gtk_tree_model_get( model, &iter, MC_TORRENT, &gtor, -1 );
         tr_torrent_clear( gtor );

@@ -569,7 +569,7 @@ gtr_open_file( const char * path )
 #endif
         if( !opened )
         {
-            char * argv[] = { "xdg-open", (char*)path, NULL };
+            char * argv[] = { (char*)"xdg-open", (char*)path, NULL };
             g_spawn_async( NULL, argv, NULL, G_SPAWN_SEARCH_PATH,
                            NULL, NULL, NULL, NULL );
         }
@@ -656,14 +656,12 @@ gtr_button_new_from_stock( const char * stock,
 ***/
 
 guint
-gtr_timeout_add_seconds( guint        interval,
-                         GSourceFunc  function,
-                         gpointer     data )
+gtr_timeout_add_seconds( guint seconds, GSourceFunc function, gpointer data )
 {
 #if GLIB_CHECK_VERSION( 2,14,0 )
-    return g_timeout_add_seconds( interval, function, data );
+    return g_timeout_add_seconds( seconds, function, data );
 #else
-    return g_timeout_add( interval*1000, function, data );
+    return g_timeout_add( seconds*1000, function, data );
 #endif
 }
 
