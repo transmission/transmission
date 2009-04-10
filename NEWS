@@ -1,9 +1,9 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
-1.52 (2009/mm/dd)
+1.52 (2009/04/dd)
 <http://trac.transmissionbt.com/query?milestone=1.52&group=component&groupdesc=1&order=severity>
 - Mac
-   + Better detection of where the Web UI files are located
+   + Improve interface responsiveness when downloading
 - GTK+ and Daemon
    + Always honor the XDG setting for the download directory
 - GTK+
@@ -15,6 +15,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + On the server, faster json serialization
    + Fix "Remove Data" bug
    + Fix minor web client 301 redirect error
+   + Better Internet Explorer support
 
 1.51 (2009/02/26)
 <http://trac.transmissionbt.com/query?milestone=1.51&group=component&groupdesc=1&order=severity>
