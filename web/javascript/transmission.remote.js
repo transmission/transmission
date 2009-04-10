@@ -122,7 +122,7 @@ TransmissionRemote.prototype =
 		this.sendTorrentCommand( 'torrent-remove', torrents );
 	},
 	removeTorrentsAndData: function( torrents ) {
-		var remote = this,
+		var remote = this;
 		var o = {
 			method: 'torrent-remove',
 			arguments: {
