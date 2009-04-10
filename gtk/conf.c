@@ -195,6 +195,7 @@ tr_prefs_init_defaults( tr_benc * d )
 
     tr_bencDictAddBool( d, PREF_KEY_ASKQUIT, TRUE );
 
+    tr_bencDictAddStr( d, PREF_KEY_FILTER_MODE, "show-all" );
     tr_bencDictAddStr( d, PREF_KEY_SORT_MODE, "sort-by-name" );
     tr_bencDictAddBool( d, PREF_KEY_SORT_REVERSED, FALSE );
     tr_bencDictAddBool( d, PREF_KEY_MINIMAL_VIEW, FALSE );

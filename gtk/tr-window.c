@@ -94,14 +94,35 @@ typedef struct
     filter_mode_t         filter_mode;
     filter_text_mode_t    filter_text_mode;
     char *                filter_text;
+    GtkToggleButton     * filter_toggles[FILTER_MODE_QTY];
 }
 PrivateData;
 
-#define PRIVATE_DATA_KEY "private-data"
+static const char*
+getFilterName( int mode )
+{
+    switch( mode )
+    {
+        case FILTER_MODE_ACTIVE:      return "show-active";
+        case FILTER_MODE_DOWNLOADING: return "show-downloading";
+        case FILTER_MODE_SEEDING:     return "show-seeding";
+        case FILTER_MODE_PAUSED:      return "show-paused";
+        default:                      return "show-active"; /* the fallback */
+    }
+}
+static int
+getFilterModeFromName( const char * name )
+{
+    if( !strcmp( name, "show-active"      ) ) return FILTER_MODE_ACTIVE;
+    if( !strcmp( name, "show-downloading" ) ) return FILTER_MODE_DOWNLOADING;
+    if( !strcmp( name, "show-seeding"     ) ) return FILTER_MODE_SEEDING;
+    if( !strcmp( name, "show-paused"      ) ) return FILTER_MODE_PAUSED;
+    return FILTER_MODE_ALL; /* the fallback */
+}
 
+#define PRIVATE_DATA_KEY "private-data"
 #define FILTER_MODE_KEY "tr-filter-mode"
 #define FILTER_TEXT_MODE_KEY "tr-filter-text-mode"
-#define FILTER_TOGGLES_KEY "tr-filter-toggles"
 
 static PrivateData*
 get_private_data( TrWindow * w )
@@ -196,6 +217,7 @@ makeview( PrivateData * p,
 }
 
 static void syncAltSpeedButton( PrivateData * p );
+static void setFilter( PrivateData * p, int mode );
 
 static void
 prefsChanged( TrCore * core UNUSED,
@@ -211,6 +233,10 @@ prefsChanged( TrCore * core UNUSED,
          * its fixed-height mode values.  Unfortunately there's not an API call
          * for that, but it *does* revalidate when it thinks the style's been tweaked */
         g_signal_emit_by_name( p->view, "style-set", NULL, NULL );
+    }
+    else if( !strcmp( key, PREF_KEY_FILTER_MODE ) )
+    {
+        setFilter( p, getFilterModeFromName( pref_string_get( key ) ) );
     }
     else if( !strcmp( key, PREF_KEY_STATUSBAR ) )
     {
@@ -424,37 +450,35 @@ filter_text_toggled_cb( GtkCheckMenuItem * menu_item,
 }
 
 static void
-filter_toggled_cb( GtkToggleButton * toggle,
-                   gpointer          vprivate )
+setFilter( PrivateData * p, int mode )
 {
-    PrivateData *       p = vprivate;
-    GSList *            l;
-    GSList *            toggles = g_object_get_data( G_OBJECT(
-                                                         toggle ),
-                                                     FILTER_TOGGLES_KEY );
-    const gboolean      isActive = gtk_toggle_button_get_active( toggle );
-    const filter_mode_t mode =
-        GPOINTER_TO_UINT( g_object_get_data( G_OBJECT( toggle ),
-                                             FILTER_MODE_KEY ) );
-
-    /* update the filter */
-    if( isActive )
+    if( mode != (int)p->filter_mode )
     {
+        int i;
+
+        /* refilter */
         p->filter_mode = mode;
         refilter( p );
-    }
 
-    /* deactivate the other toggles */
-    for( l = toggles; l != NULL; l = l->next )
+        /* update the prefs */
+        tr_core_set_pref( p->core, PREF_KEY_FILTER_MODE, getFilterName( mode ) );
+
+        /* update the togglebuttons */
+        for( i=0; i<FILTER_MODE_QTY; ++i )
+            gtk_toggle_button_set_active( p->filter_toggles[i], i==mode );
+    }
+}
+  
+
+static void
+filter_toggled_cb( GtkToggleButton * toggle, gpointer vprivate )
+{
+    if( gtk_toggle_button_get_active( toggle ) )
     {
-        GtkToggleButton * walk = GTK_TOGGLE_BUTTON( l->data );
-        if( isActive && ( toggle != walk ) )
-            gtk_toggle_button_set_active( walk, FALSE );
+        PrivateData * p = vprivate;
+        const int mode = GPOINTER_TO_UINT( g_object_get_data( G_OBJECT( toggle ), FILTER_MODE_KEY ) );
+        setFilter( p, mode );
     }
-
-    /* at least one button must always be set */
-    if( !isActive && ( p->filter_mode == mode ) )
-        gtk_toggle_button_set_active( toggle, TRUE );
 }
 
 static void
@@ -565,7 +589,6 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
     GtkWidget *   vbox, *w, *self, *h, *c, *s, *image, *menu;
     GtkWindow *   win;
     GSList *      l;
-    GSList *      toggles;
 
     const char *  filter_names[FILTER_MODE_QTY] = {
         /* show all torrents */
@@ -584,7 +607,6 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
     };
 
     p = g_new0( PrivateData, 1 );
-    p->filter_mode = FILTER_MODE_ALL;
     p->filter_text_mode = FILTER_TEXT_MODE_NAME;
     p->filter_text = NULL;
 
@@ -618,24 +640,20 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
     w = toolbar = p->toolbar = action_get_widget( "/main-window-toolbar" );
 
     /* filter */
-    toggles = NULL;
     h = filter = p->filter = gtk_hbox_new( FALSE, 0 );
     gtk_container_set_border_width( GTK_CONTAINER( h ), GUI_PAD_SMALL );
     for( i = 0; i < FILTER_MODE_QTY; ++i )
     {
         const char * mnemonic = _( filter_names[i] );
         w = gtk_toggle_button_new_with_mnemonic( mnemonic );
-        g_object_set_data( G_OBJECT( w ), FILTER_MODE_KEY,
-                          GINT_TO_POINTER( i ) );
+        g_object_set_data( G_OBJECT( w ), FILTER_MODE_KEY, GINT_TO_POINTER( i ) );
         gtk_button_set_relief( GTK_BUTTON( w ), GTK_RELIEF_NONE );
-        gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(
-                                          w ), i == FILTER_MODE_ALL );
-        toggles = g_slist_prepend( toggles, w );
+        gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( w ), i == FILTER_MODE_ALL );
+        p->filter_toggles[i] = GTK_TOGGLE_BUTTON( w );
         g_signal_connect( w, "toggled", G_CALLBACK( filter_toggled_cb ), p );
         gtk_box_pack_start( GTK_BOX( h ), w, FALSE, FALSE, 0 );
     }
-    for( l = toggles; l != NULL; l = l->next )
-        g_object_set_data( G_OBJECT( l->data ), FILTER_TOGGLES_KEY, toggles );
+
     s = sexy_icon_entry_new( );
     sexy_icon_entry_add_clear_button( SEXY_ICON_ENTRY( s ) );
     image = gtk_image_new_from_stock( GTK_STOCK_FIND, GTK_ICON_SIZE_MENU );
@@ -763,6 +781,7 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
     prefsChanged( core, PREF_KEY_STATUSBAR, self );
     prefsChanged( core, PREF_KEY_STATUSBAR_STATS, self );
     prefsChanged( core, PREF_KEY_TOOLBAR, self );
+    prefsChanged( core, PREF_KEY_FILTER_MODE, self );
     prefsChanged( core, TR_PREFS_KEY_ALT_SPEED_ENABLED, self );
     p->pref_handler_id = g_signal_connect( core, "prefs-changed",
                                            G_CALLBACK( prefsChanged ), self );
