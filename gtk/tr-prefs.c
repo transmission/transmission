@@ -310,7 +310,7 @@ torrentPage( GObject * core )
 
     s = _( "_Stop seeding torrents at ratio:" );
     w = new_check_button( s, TR_PREFS_KEY_RATIO_ENABLED, core );
-    w2 = new_spin_button_double( TR_PREFS_KEY_RATIO, core, .5, INT_MAX, .05 );
+    w2 = new_spin_button_double( TR_PREFS_KEY_RATIO, core, 0, INT_MAX, .05 );
     gtk_widget_set_sensitive( GTK_WIDGET( w2 ), pref_flag_get( TR_PREFS_KEY_RATIO_ENABLED ) );
     g_signal_connect( w, "toggled", G_CALLBACK( target_cb ), w2 );
     hig_workarea_add_row_w( t, &row, w, w2, NULL );

@@ -548,7 +548,7 @@ PrefsDialog :: createTorrentsTab( )
     hig->addSectionTitle( tr( "Limits" ) );
 
         l = checkBoxNew( tr( "&Stop seeding torrents at ratio:" ), Prefs::RATIO_ENABLED );
-        r = doubleSpinBoxNew( Prefs::RATIO, 0.5, INT_MAX, 0.5, 2 );
+        r = doubleSpinBoxNew( Prefs::RATIO, 0, INT_MAX, 0.5, 2 );
         hig->addRow( l, r );
         enableBuddyWhenChecked( qobject_cast<QCheckBox*>(l), r );
 

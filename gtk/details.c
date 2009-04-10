@@ -378,7 +378,7 @@ onPeerViewQueryTooltip( GtkWidget *            widget,
             switch( *pch )
             {
                 case 'O': txt = _( "Optimistic unchoke" ); break;
-                case 'D': txt = _( "Downloading from this peer" ); break; 
+                case 'D': txt = _( "Downloading from this peer" ); break;
                 case 'd': txt = _( "We would download from this peer if they would let us" ); break;
                 case 'U': txt = _( "Uploading to peer" ); break; 
                 case 'u': txt = _( "We would upload to this peer if they asked" ); break;
@@ -755,7 +755,7 @@ refresh_activity( GtkWidget * top )
     g_free( pch );
 
     i = (int) ceil( verifiedPieceCount );
-    tr_strlsize( buf1,  stat->haveValid + stat->haveUnchecked, sizeof( buf1 ) );
+    tr_strlsize( buf1, stat->haveValid + stat->haveUnchecked, sizeof( buf1 ) );
     tr_strlsize( buf2, stat->haveValid, sizeof( buf2 ) );
     /* %1$s is total size of what we've saved to disk
      * %2$s is how much of it's passed the checksum test

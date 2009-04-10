@@ -150,12 +150,12 @@ parsepath( GtkWidget         * w,
     {
         priority = tr_torrentGetFilePriority( tor, index );
         enabled  = tr_torrentGetFileDL( tor, index );
-	mime_type = get_mime_type_from_filename( file );
+        mime_type = get_mime_type_from_filename( file );
     }
     else
     {
         size  = 0;
-	mime_type = DIRECTORY_MIME_TYPE; 
+        mime_type = DIRECTORY_MIME_TYPE; 
     }
 
     icon = get_mime_type_icon( mime_type, GTK_ICON_SIZE_MENU, w ); 
@@ -184,7 +184,7 @@ parsepath( GtkWidget         * w,
 #endif
 
     if( icon != NULL )
-	g_object_unref( icon );
+        g_object_unref( icon );
 
 done:
     g_free( mykey );
@@ -455,7 +455,7 @@ file_list_set_torrent( GtkWidget * w,
 
     /* instantiate the model */
     store = gtk_tree_store_new ( N_FILE_COLS,
-    				 GDK_TYPE_PIXBUF,  /* icon */
+                                 GDK_TYPE_PIXBUF,  /* icon */
                                  G_TYPE_STRING,    /* label */
                                  G_TYPE_INT,       /* prog [0..100] */
                                  G_TYPE_STRING,    /* key */
