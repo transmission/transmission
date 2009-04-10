@@ -13,6 +13,10 @@
 #ifndef TR_MAKEMETA_H
 #define TR_MAKEMETA_H 1
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct tr_metainfo_builder_file
 {
     char *      filename;
@@ -116,5 +120,9 @@ void tr_makeMetaInfo( tr_metainfo_builder *   builder,
                       const char *            comment,
                       int                     isPrivate );
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

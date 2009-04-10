@@ -127,40 +127,6 @@ tr_netInit( void )
     }
 }
 
-void
-tr_suspectAddress( const tr_address * a UNUSED, const char * source UNUSED )
-{
-/* this is overkill for a production environment,
- * but useful in the nightly builds, so only compile it into the nightlies */
-#ifdef TR_UNSTABLE
-    /* be really aggressive in what we report */
-    if( a->type == TR_AF_INET && !( ntohl( a->addr.addr4.s_addr ) & 0xff000000 ) )
-        tr_err(  "Funny looking address %s from %s", tr_ntop_non_ts( a ), source );
-    /* /16s taken from ipv6 rib on 21 dec, 2008 */
-    /* this is really, really ugly. expedience over quality */
-    if( a->type == TR_AF_INET6 )
-    {
-        uint16_t slash16;
-        uint16_t valid[] = { 0x339, 0x2002, 0x2003, 0x2400, 0x2401, 0x2402,
-            0x2403, 0x2404, 0x2405, 0x2406, 0x2407, 0x2600, 0x2607, 0x2610,
-            0x2620, 0x2800, 0x2801, 0x2a00, 0x2a01, 0x0a02, 0x2001, 0x0000 };
-        uint16_t *p;
-        tr_bool good = FALSE;
-        p = valid;
-        memcpy( &slash16, &a->addr, 2 );
-        slash16 = ntohs( slash16 );
-        while( *p )
-        {
-            if( slash16 == *p )
-                good = TRUE;
-            p++;
-        }
-        if( !good && !IN6_IS_ADDR_V4MAPPED( &a->addr.addr6 ) )
-            tr_err(  "Funny looking address %s from %s", tr_ntop_non_ts( a ), source );
-    }
-#endif
-}
-
 const char * 
 tr_ntop( const tr_address * src, char * dst, int size ) 
 {
@@ -202,18 +168,6 @@ tr_pton( const char * src, tr_address * dst )
         return NULL; 
     dst->type = TR_AF_INET6; 
     return dst; 
-}
-
-void
-tr_normalizeV4Mapped( tr_address * const addr )
-{
-    assert( tr_isAddress( addr ) );
-
-    if( addr->type == TR_AF_INET6 && IN6_IS_ADDR_V4MAPPED( &addr->addr.addr6 ) )
-    {
-        addr->type = TR_AF_INET;
-        memcpy( &addr->addr.addr4.s_addr, addr->addr.addr6.s6_addr + 12, 4 );
-    }
 }
 
 /* 
@@ -463,10 +417,22 @@ isMulticastAddress( const tr_address * addr )
 }
 
 static TR_INLINE tr_bool
+isIPv4MappedOrCompatAddress( const tr_address * addr )
+{
+    if( addr->type == TR_AF_INET6 )
+    {
+        if( IN6_IS_ADDR_V4MAPPED( &addr->addr.addr6 ) ||
+            IN6_IS_ADDR_V4COMPAT( &addr->addr.addr6 ) )
+            return TRUE;
+    }
+    return FALSE;
+}
+
+static TR_INLINE tr_bool
 isIPv6LinkLocalAddress( const tr_address * addr )
 {
     if( addr->type == TR_AF_INET6 &&
-            IN6_IS_ADDR_LINKLOCAL( &addr->addr.addr6 ))
+        IN6_IS_ADDR_LINKLOCAL( &addr->addr.addr6 ) )
         return TRUE;
     return FALSE;
 }
@@ -474,7 +440,8 @@ isIPv6LinkLocalAddress( const tr_address * addr )
 tr_bool
 tr_isValidPeerAddress( const tr_address * addr, tr_port port )
 {
-    if( isMulticastAddress( addr ) || isIPv6LinkLocalAddress( addr ) )
+    if( isMulticastAddress( addr ) || isIPv6LinkLocalAddress( addr ) ||
+        isIPv4MappedOrCompatAddress( addr ) )
         return FALSE;
 
     if( port == 0 )
@@ -495,7 +462,7 @@ tr_netOpenTCP( tr_session        * session,
 
     assert( tr_isAddress( addr ) );
 
-    if( isMulticastAddress( addr ) || isIPv6LinkLocalAddress( addr ))
+    if( isMulticastAddress( addr ) || isIPv6LinkLocalAddress( addr ) )
         return -EINVAL;
 
     if( ( s = createSocket( ( addr->type == TR_AF_INET ? AF_INET : AF_INET6 ), type ) ) < 0 )

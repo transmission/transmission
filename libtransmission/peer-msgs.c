@@ -587,7 +587,7 @@ updateFastSet( tr_peermsgs * msgs UNUSED )
 ***  INTEREST
 **/
 
-static int
+static tr_bool
 isPieceInteresting( const tr_peermsgs * msgs,
                     tr_piece_index_t    piece )
 {
@@ -599,7 +599,7 @@ isPieceInteresting( const tr_peermsgs * msgs,
 }
 
 /* "interested" means we'll ask for piece data if they unchoke us */
-static int
+static tr_bool
 isPeerInteresting( const tr_peermsgs * msgs )
 {
     tr_piece_index_t    i;
@@ -657,7 +657,7 @@ updateInterest( tr_peermsgs * msgs )
         fireNeedReq( msgs );
 }
 
-static int
+static tr_bool
 popNextRequest( tr_peermsgs *         msgs,
                 struct peer_request * setme )
 {
@@ -718,7 +718,7 @@ tr_peerMsgsHave( tr_peermsgs * msgs,
 ***
 **/
 
-static int
+static tr_bool
 reqIsValid( const tr_peermsgs * peer,
             uint32_t            index,
             uint32_t            offset,
@@ -727,7 +727,7 @@ reqIsValid( const tr_peermsgs * peer,
     return tr_torrentReqIsValid( peer->torrent, index, offset, length );
 }
 
-static int
+static tr_bool
 requestIsValid( const tr_peermsgs * msgs, const struct peer_request * req )
 {
     return reqIsValid( msgs, req->index, req->offset, req->length );
@@ -824,7 +824,7 @@ pumpRequestQueue( tr_peermsgs * msgs, const time_t now )
         fireNeedReq( msgs );
 }
 
-static TR_INLINE int
+static TR_INLINE tr_bool
 requestQueueIsFull( const tr_peermsgs * msgs )
 {
     const int req_max = msgs->maxActiveRequests;
@@ -841,7 +841,6 @@ tr_peerMsgsAddRequest( tr_peermsgs *    msgs,
 
     assert( msgs );
     assert( msgs->torrent );
-    assert( reqIsValid( msgs, index, offset, length ) );
 
     /**
     ***  Reasons to decline the request
@@ -853,15 +852,15 @@ tr_peerMsgsAddRequest( tr_peermsgs *    msgs,
         return TR_ADDREQ_CLIENT_CHOKED;
     }
 
-    /* peer doesn't have this piece */
-    if( !tr_bitfieldHas( msgs->peer->have, index ) )
-        return TR_ADDREQ_MISSING;
-
     /* peer's queue is full */
     if( requestQueueIsFull( msgs ) ) {
         dbgmsg( msgs, "declining request because we're full" );
         return TR_ADDREQ_FULL;
     }
+
+    /* peer doesn't have this piece */
+    if( !tr_bitfieldHas( msgs->peer->have, index ) )
+        return TR_ADDREQ_MISSING;
 
     /* have we already asked for this piece? */
     req.index = index;
@@ -1223,7 +1222,7 @@ peerMadeRequest( tr_peermsgs *               msgs,
         protocolSendReject( msgs, req );
 }
 
-static int
+static tr_bool
 messageLengthIsCorrect( const tr_peermsgs * msg, uint8_t id, uint32_t len )
 {
     switch( id )
@@ -1596,7 +1595,9 @@ didWrite( tr_peerIo * io UNUSED, size_t bytesWritten, int wasPieceData, void * v
 {
     tr_peermsgs * msgs = vmsgs;
     firePeerGotData( msgs, bytesWritten, wasPieceData );
-    peerPulse( msgs );
+
+    if ( tr_isPeerIo( io ) && io->userData )
+        peerPulse( msgs );
 }
 
 static ReadState
@@ -1986,7 +1987,6 @@ sendPex( tr_peermsgs * msgs )
             tmp = walk = tr_new( uint8_t, diffs.addedCount * 6 );
             for( i = 0; i < diffs.addedCount; ++i )
             {
-                tr_suspectAddress( &diffs.added[i].addr, "pex" );
                 memcpy( walk, &diffs.added[i].addr.addr, 4 ); walk += 4;
                 memcpy( walk, &diffs.added[i].port, 2 ); walk += 2;
             }
@@ -2017,7 +2017,6 @@ sendPex( tr_peermsgs * msgs )
             tmp = walk = tr_new( uint8_t, diffs6.addedCount * 18 );
             for( i = 0; i < diffs6.addedCount; ++i )
             {
-                tr_suspectAddress( &diffs6.added[i].addr, "pex6" );
                 memcpy( walk, &diffs6.added[i].addr.addr.addr6.s6_addr, 16 );
                 walk += 16;
                 memcpy( walk, &diffs6.added[i].port, 2 );

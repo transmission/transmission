@@ -12,9 +12,17 @@
 
 #ifndef TR_JSON_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int tr_jsonParse( const void *     vbuf,
                   size_t           len,
                   struct tr_benc * setme_benc,
                   const uint8_t ** setme_end );
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -529,7 +529,7 @@ tr_getClutchDir( const tr_session * session UNUSED )
         else
         {
 
-#ifdef SYS_DARWIN
+#ifdef SYS_DARWIN /* on Mac, look in the app package first, then the Application Support folder (for daemon, etc) */
 
             CFURLRef appURL = CFBundleCopyBundleURL( CFBundleGetMainBundle( ) );
             CFStringRef appRef = CFURLCopyFileSystemPath( appURL,
@@ -540,6 +540,17 @@ tr_getClutchDir( const tr_session * session UNUSED )
             CFRelease( appRef );
 
             s = tr_buildPath( appString, "Contents", "Resources", "web", NULL );
+            
+            if( !isClutchDir( s ) ) {
+                tr_free( s );
+                
+                /* Fallback to the Application Support folder */
+                s = tr_buildPath( tr_sessionGetConfigDir( session ), "web", NULL );
+                if( !isClutchDir( s ) ) {
+                    tr_free( s );
+                    s = NULL;
+                }
+            }
 
 #elif defined( WIN32 )
 

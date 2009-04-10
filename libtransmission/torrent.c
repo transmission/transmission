@@ -58,7 +58,7 @@ tr_torrentFindFromId( tr_session * session, int id )
 {
     tr_torrent * tor = NULL;
 
-    while( ( tor = tr_torrentNext( session, tor ) ) )
+    while(( tor = tr_torrentNext( session, tor )))
         if( tor->uniqueId == id )
             return tor;
 
@@ -70,8 +70,8 @@ tr_torrentFindFromHashString( tr_session *  session, const char * str )
 {
     tr_torrent * tor = NULL;
 
-    while( ( tor = tr_torrentNext( session, tor ) ) )
-        if( !strcmp( str, tor->info.hashString ) )
+    while(( tor = tr_torrentNext( session, tor )))
+        if( !strcmp( str, tor->info.hashString ))
             return tor;
 
     return NULL;
@@ -82,7 +82,7 @@ tr_torrentFindFromHash( tr_session * session, const uint8_t * torrentHash )
 {
     tr_torrent * tor = NULL;
 
-    while( ( tor = tr_torrentNext( session, tor ) ) )
+    while(( tor = tr_torrentNext( session, tor )))
         if( *tor->info.hash == *torrentHash )
             if( !memcmp( tor->info.hash, torrentHash, SHA_DIGEST_LENGTH ) )
                 return tor;
@@ -96,7 +96,7 @@ tr_torrentFindFromObfuscatedHash( tr_session * session,
 {
     tr_torrent * tor = NULL;
 
-    while( ( tor = tr_torrentNext( session, tor ) ) )
+    while(( tor = tr_torrentNext( session, tor )))
         if( !memcmp( tor->obfuscatedHash, obfuscatedTorrentHash,
                      SHA_DIGEST_LENGTH ) )
             return tor;
@@ -113,7 +113,7 @@ tr_torrentSetSpeedMode( tr_torrent *  tor,
                         tr_direction  dir,
                         tr_speedlimit mode )
 {
-    assert( tor != NULL );
+    assert( tr_isTorrent( tor ) );
     assert( tr_isDirection( dir ) );
     assert( mode==TR_SPEEDLIMIT_GLOBAL || mode==TR_SPEEDLIMIT_SINGLE || mode==TR_SPEEDLIMIT_UNLIMITED  );
 
@@ -127,7 +127,7 @@ tr_speedlimit
 tr_torrentGetSpeedMode( const tr_torrent * tor,
                         tr_direction       dir )
 {
-    assert( tor != NULL );
+    assert( tr_isTorrent( tor ) );
     assert( tr_isDirection( dir ) );
 
     return tor->speedLimitMode[dir];
@@ -1070,7 +1070,7 @@ checkAndStartImpl( void * vtor )
 
     tr_globalLock( tor->session );
 
-    tor->isRunning = 1;
+    tor->isRunning = TRUE;
     *tor->errorString = '\0';
     tr_torrentResetTransferStats( tor );
     tor->completeness = tr_cpGetStatus( &tor->completion );
@@ -1439,9 +1439,7 @@ tr_torrentGetFileDL( const tr_torrent * tor,
 }
 
 static void
-setFileDND( tr_torrent *    tor,
-            tr_file_index_t fileIndex,
-            int             doDownload )
+setFileDND( tr_torrent * tor, tr_file_index_t fileIndex, int doDownload )
 {
     tr_file *        file;
     const int        dnd = !doDownload;
@@ -1496,7 +1494,7 @@ setFileDND( tr_torrent *    tor,
 }
 
 void
-tr_torrentInitFileDLs( tr_torrent *      tor,
+tr_torrentInitFileDLs( tr_torrent      * tor,
                        tr_file_index_t * files,
                        tr_file_index_t   fileCount,
                        tr_bool           doDownload )
@@ -1507,7 +1505,7 @@ tr_torrentInitFileDLs( tr_torrent *      tor,
 
     tr_torrentLock( tor );
 
-    for( i = 0; i < fileCount; ++i )
+    for( i=0; i<fileCount; ++i )
         setFileDND( tor, files[i], doDownload );
     tr_cpInvalidateDND ( &tor->completion );
 
@@ -1643,9 +1641,9 @@ tr_torrentSetFileChecked( tr_torrent *    tor,
     assert( tr_isTorrent( tor ) );
 
     if( isChecked )
-        tr_bitfieldAddRange ( &tor->checkedPieces, begin, end );
+        tr_bitfieldAddRange( &tor->checkedPieces, begin, end );
     else
-        tr_bitfieldRemRange ( &tor->checkedPieces, begin, end );
+        tr_bitfieldRemRange( &tor->checkedPieces, begin, end );
 }
 
 tr_bool
@@ -1776,7 +1774,6 @@ tr_torrentSetAnnounceList( tr_torrent *            tor,
 ***
 **/
 
-/** @deprecated this method will be removed in 1.40 */
 void
 tr_torrentSetAddedDate( tr_torrent * tor,
                         time_t       t )
@@ -1786,7 +1783,6 @@ tr_torrentSetAddedDate( tr_torrent * tor,
     tor->addedDate = t;
 }
 
-/** @deprecated this method will be removed in 1.40 */
 void
 tr_torrentSetActivityDate( tr_torrent * tor,
                            time_t       t )
@@ -1796,7 +1792,6 @@ tr_torrentSetActivityDate( tr_torrent * tor,
     tor->activityDate = t;
 }
 
-/** @deprecated this method will be removed in 1.40 */
 void
 tr_torrentSetDoneDate( tr_torrent * tor,
                        time_t       t )

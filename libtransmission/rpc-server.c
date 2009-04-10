@@ -313,7 +313,7 @@ serve_file( struct evhttp_request * req,
 
         if( errno )
         {
-            send_simple_response( req, HTTP_NOTFOUND, NULL );
+            send_simple_response( req, HTTP_NOTFOUND, filename );
         }
         else
         {
@@ -515,7 +515,7 @@ handle_request( struct evhttp_request * req,
         }
         else
         {
-            send_simple_response( req, HTTP_NOTFOUND, NULL );
+            send_simple_response( req, HTTP_NOTFOUND, req->uri );
         }
 
         tr_free( user );

@@ -259,7 +259,6 @@ publishNewPeersCompact( tr_tracker * t,
     {
         memcpy( &addr.addr.addr4, compactWalk, 4 );
         memcpy( &port, compactWalk + 4, 2 );
-        tr_suspectAddress( &addr, "compact" );
         
         memcpy( walk, &addr, sizeof( addr ) );
         memcpy( walk + sizeof( addr ), &port, 2 );
@@ -292,7 +291,6 @@ publishNewPeersCompact6( tr_tracker * t,
         memcpy( &addr.addr.addr6, compactWalk, 16 );
         memcpy( &port, compactWalk + 16, 2 );
         compactWalk += 18;
-        tr_suspectAddress( &addr, "compact6" );
         
         memcpy( walk, &addr, sizeof( addr ) );
         memcpy( walk + sizeof( addr ), &port, 2 );
@@ -346,7 +344,7 @@ parseOldPeers( tr_benc * bePeers,
     uint8_t * array, *walk;
     const int peerCount = bePeers->val.l.count;
 
-    assert( bePeers->type == TYPE_LIST );
+    assert( tr_bencIsList( bePeers ) );
 
     array = tr_new( uint8_t, peerCount * ( sizeof( tr_address ) + 2 ) );
 
@@ -368,7 +366,6 @@ parseOldPeers( tr_benc * bePeers,
             continue;
 
         memcpy( walk, &addr, sizeof( tr_address ) );
-        tr_suspectAddress( &addr, "old tracker" );
         port = htons( itmp );
         memcpy( walk + sizeof( tr_address ), &port, 2 );
         walk += sizeof( tr_address ) + 2;
@@ -484,12 +481,12 @@ onTrackerResponse( tr_session * session,
             {
                 const int allAreSeeds = incomplete == 0;
 
-                if( tmp->type == TYPE_STR ) /* "compact" extension */
+                if( tr_bencIsString( tmp ) ) /* "compact" extension */
                 {
                     publishNewPeersCompact( t, allAreSeeds, tmp->val.s.s,
                                             tmp->val.s.i );
                 }
-                else if( tmp->type == TYPE_LIST ) /* original protocol */
+                else if( tr_bencIsList( tmp ) ) /* original protocol */
                 {
                     size_t    byteCount = 0;
                     uint8_t * array = parseOldPeers( tmp, &byteCount );
@@ -502,7 +499,7 @@ onTrackerResponse( tr_session * session,
             {
                 const int allAreSeeds = incomplete == 0;
                 
-                if( tmp->type == TYPE_STR ) /* "compact" extension */
+                if( tr_bencIsString( tmp ) ) /* "compact" extension */
                 {
                     publishNewPeersCompact6( t, allAreSeeds, tmp->val.s.s,
                                              tmp->val.s.i );

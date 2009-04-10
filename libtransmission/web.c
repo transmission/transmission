@@ -72,6 +72,7 @@ struct tr_web
     CURLM * multi;
     tr_session * session;
     struct event timer_event;
+    tr_list * easy_queue;
     tr_list * fds;
 };
 
@@ -214,7 +215,10 @@ addTask( void * vtask )
         else /* don't set encoding on webseeds; it messes up binary data */
             curl_easy_setopt( easy, CURLOPT_ENCODING, "" );
 
-        {
+        if( web->still_running >= MAX_CONCURRENT_TASKS ) {
+            tr_list_append( &web->easy_queue, easy );
+            dbgmsg( ">> enqueueing a task... size is now %d", tr_list_size( web->easy_queue ) );
+        } else {
             const CURLMcode mcode = curl_multi_add_handle( web->multi, easy );
             tr_assert( mcode == CURLM_OK, "curl_multi_add_handle() failed: %d (%s)", mcode, curl_multi_strerror( mcode ) );
             if( mcode == CURLM_OK )
@@ -325,6 +329,27 @@ restart_timer( tr_web * g )
 }
 
 static void
+add_tasks_from_queue( tr_web * g )
+{
+    while( ( g->still_running < MAX_CONCURRENT_TASKS ) 
+        && ( tr_list_size( g->easy_queue ) > 0 ) )
+    {
+        CURL * easy = tr_list_pop_front( &g->easy_queue );
+        if( easy )
+        {
+            const CURLMcode rc = curl_multi_add_handle( g->multi, easy );
+            if( rc != CURLM_OK )
+                tr_err( "%s", curl_multi_strerror( rc ) );
+            else {
+                dbgmsg( "pumped the task queue, %d remain",
+                        tr_list_size( g->easy_queue ) );
+                ++g->still_running;
+            }
+        }
+    }
+}
+
+static void
 web_close( tr_web * g )
 {
     CURLMcode mcode;
@@ -371,6 +396,8 @@ tr_multi_perform( tr_web * g, int fd )
         tr_err( "%s", curl_multi_strerror( mcode ) );
 
     remove_finished_tasks( g );
+
+    add_tasks_from_queue( g );
 
     if( !g->still_running ) {
         assert( tr_list_size( g->fds ) == 0 );

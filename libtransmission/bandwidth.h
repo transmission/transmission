@@ -167,8 +167,8 @@ tr_bandwidthGetDesiredSpeed( const tr_bandwidth  * bandwidth,
  * @brief Set whether or not this bandwidth should throttle its peer-io's speeds
  */
 static TR_INLINE void tr_bandwidthSetLimited( tr_bandwidth        * bandwidth,
-                                           tr_direction          dir,
-                                           tr_bool               isLimited )
+                                              tr_direction          dir,
+                                              tr_bool               isLimited )
 {
     bandwidth->band[dir].isLimited = isLimited;
 }
@@ -177,7 +177,7 @@ static TR_INLINE void tr_bandwidthSetLimited( tr_bandwidth        * bandwidth,
  * @return nonzero if this bandwidth throttles its peer-ios speeds
  */
 static TR_INLINE tr_bool tr_bandwidthIsLimited( const tr_bandwidth  * bandwidth,
-                                             tr_direction          dir )
+                                                tr_direction          dir )
 {
     return bandwidth->band[dir].isLimited;
 }
@@ -233,8 +233,8 @@ void    tr_bandwidthSetParent         ( tr_bandwidth        * bandwidth,
  * in that particular case we want to ignore the global speed limit...
  */
 static TR_INLINE void tr_bandwidthHonorParentLimits ( tr_bandwidth        * bandwidth,
-                                                   tr_direction          direction,
-                                                   tr_bool               isEnabled )
+                                                      tr_direction          direction,
+                                                      tr_bool               isEnabled )
 {
     assert( tr_isBandwidth( bandwidth ) );
     assert( tr_isDirection( direction ) );

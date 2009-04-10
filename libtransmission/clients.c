@@ -324,6 +324,7 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
     else if( !memcmp( id, "10-------", 9 ) ) no_version( buf, buflen, "JVtorrent" );
     else if( !memcmp( id, "346-", 4 ) )      no_version( buf, buflen, "TorrentTopia" );
     else if( !memcmp( id, "eX", 2 ) )        no_version( buf, buflen, "eXeem" );
+    else if( !memcmp( id, "-aria2-", 7 ) )   no_version( buf, buflen, "aria2" );
     else if( !memcmp( id, "-FG", 3 ) )       two_major_two_minor( buf, buflen, "FlashGet", id+3 );
    
     /* Everything else */ 

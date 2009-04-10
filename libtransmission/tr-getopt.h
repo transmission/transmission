@@ -25,15 +25,19 @@
 #ifndef TR_GETOPT_H
 #define TR_GETOPT_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern int tr_optind;
 
 typedef struct tr_option
 {
-    int     val;          /* the value to return from tr_getopt() */
+    int           val;          /* the value to return from tr_getopt() */
     const char *  longName;     /* --long-form */
     const char *  description;  /* option's description for tr_getopt_usage() */
     const char *  shortName;    /* short form */
-    int     has_arg;      /* 0 for no argument, 1 for argument */
+    int           has_arg;      /* 0 for no argument, 1 for argument */
     const char *  argName;      /* argument's description for tr_getopt_usage() */
 }
 tr_option;
@@ -64,5 +68,9 @@ int  tr_getopt( const char *      summary,
 void tr_getopt_usage( const char *      appName,
                       const char *      description,
                       const tr_option * opts );
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
 #endif /* TR_GETOPT_H */

@@ -216,4 +216,3 @@ tr_getopt( const char *      usage,
     *setme_optarg = argv[tr_optind++];
     return o->val;
 }
-

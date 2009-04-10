@@ -86,11 +86,8 @@ tr_address *tr_pton( const char * src,
                      tr_address * dst );
 int tr_compareAddresses( const tr_address * a,
                          const tr_address * b);
-void tr_normalizeV4Mapped( tr_address * const addr );
 
 tr_bool tr_isValidPeerAddress( const tr_address * addr, tr_port port );
-
-void tr_suspectAddress( const tr_address * a, const char * source );
 
 static TR_INLINE tr_bool tr_isAddress( const tr_address * a ) { return ( a != NULL ) && ( a->type==TR_AF_INET || a->type==TR_AF_INET6 ); }
 
