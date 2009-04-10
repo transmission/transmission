@@ -86,7 +86,6 @@ Session :: sessionSet( const char * key, const QVariant& value )
         case QVariant::String: tr_bencDictAddStr  ( args, key, value.toString().toUtf8() ); break;
         default: assert( "unknown type" );
     }
-std::cerr << "request: " << tr_bencToJSON(&top) << std::endl;
     exec( &top );
     tr_bencFree( &top );
 }
@@ -99,7 +98,6 @@ Session :: portTest( )
     tr_bencDictAddStr( &top, "method", "port-test" );
     tr_bencDictAddInt( &top, "tag", TAG_PORT_TEST );
     exec( &top );
-std::cerr << "request: " << tr_bencToJSON(&top) << std::endl;
     tr_bencFree( &top );
 }
 
@@ -154,12 +152,10 @@ Session :: updatePref( int key )
                 tr_sessionSetRPCUsername( mySession, myPrefs.getString(key).toUtf8().constData() );
             break;
         case Prefs :: RPC_WHITELIST_ENABLED:
-std::cerr << "setting whitelist enabled" << std::endl;
             if( mySession )
                 tr_sessionSetRPCWhitelistEnabled( mySession, myPrefs.getBool(key) );
             break;
         case Prefs :: RPC_WHITELIST:
-std::cerr << "setting whitelist" << std::endl;
             if( mySession )
                 tr_sessionSetRPCWhitelist( mySession, myPrefs.getString(key).toUtf8().constData() );
             break;
@@ -560,7 +556,6 @@ Session :: parseResponse( const char * json, size_t jsonLength )
                 }
 
                 case TAG_PORT_TEST: {
-std::cerr << "response: " << json << std::endl;
                     tr_bool isOpen = 0;
                     if( tr_bencDictFindDict( &top, "arguments", &args ) )
                         tr_bencDictFindBool( args, "port-is-open", &isOpen );
