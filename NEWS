@@ -24,6 +24,21 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 - Web Client 
    + File selection and prioritization
 
+1.52 (2009/mm/dd)
+<http://trac.transmissionbt.com/query?milestone=1.52&group=component&groupdesc=1&order=severity>
+- GTK+, Daemon, and CLI:
+   + Always honor the XDG setting for the download directory
+- GTK+
+   + Fix formatting error when showing speeds measured in MB/s
+   + Fix bug that caused some scheduled speed limit time settings to be lost
+   + Use the new blocklist URL when updating the blocklist
+- Web Client
+   + Add Internet Explorer support
+   + On the server, better filtering of bad URLs
+   + On the server, faster json serialization
+   + Added "Verify Local Data" button
+   + Fix minor web client 301 redirect error
+
 1.51 (2009/02/26)
 <http://trac.transmissionbt.com/query?milestone=1.51&group=component&groupdesc=1&order=severity>
 - All Platforms
