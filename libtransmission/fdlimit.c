@@ -227,10 +227,7 @@ tr_open_file_for_reading( const char * filename, tr_bool sequential )
     if( fd < 0 )
         return NULL;
 
-#if defined( SYS_DARWIN )
-    fcntl( fd, F_NOCACHE, 1 );
-    fcntl( fd, F_RDAHEAD, sequential );
-#elif defined( HAVE_POSIX_FADVISE )
+#ifdef HAVE_POSIX_FADVISE
     posix_fadvise( fd, 0, 0, sequential ? POSIX_FADV_SEQUENTIAL : POSIX_FADV_RANDOM );
 #endif
 
@@ -307,10 +304,7 @@ TrOpenFile( int                      i,
     if( doWrite && !alreadyExisted && ( preallocationMode == TR_PREALLOCATE_SPARSE ) )
         preallocateFileSparse( file->fd, desiredFileSize );
 
-#if defined( SYS_DARWIN )
-    fcntl( file->fd, F_NOCACHE, 1 );
-    fcntl( file->fd, F_RDAHEAD, 0 );
-#elif defined( HAVE_POSIX_FADVISE )
+#ifdef HAVE_POSIX_FADVISE
     posix_fadvise( file->fd, 0, 0, POSIX_FADV_RANDOM );
 #endif
 
