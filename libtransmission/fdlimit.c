@@ -83,9 +83,6 @@ enum
 {
     NOFILE_BUFFER = 512, /* the process' number of open files is
                             globalMaxPeers + NOFILE_BUFFER */
-
-    SYNC_INTERVAL = 15   /* (arbitrary number) how many seconds to go
-                            between fsync calls for files in heavy use */
 };
 
 struct tr_openfile
@@ -96,7 +93,6 @@ struct tr_openfile
     char       filename[MAX_PATH_LENGTH];
     int        fd;
     uint64_t   date;
-    time_t     syncAt;
 };
 
 struct tr_fd_s
@@ -462,7 +458,6 @@ tr_fdFileCheckout( const char             * folder,
                 doWrite ? 'y' : 'n' );
         tr_strlcpy( o->filename, filename, sizeof( o->filename ) );
         o->isWritable = doWrite;
-        o->syncAt = time( NULL ) + SYNC_INTERVAL;
     }
 
     dbgmsg( "checking out '%s' in slot %d", filename, winner );
@@ -490,15 +485,6 @@ tr_fdFileReturn( int fd )
         o->isCheckedOut = 0;
         if( o->closeWhenDone )
             TrCloseFile( i );
-        else if( o->syncAt <= time( NULL ) ) {
-            dbgmsg( "fsync()ing file '%s' in slot #%d", o->filename, i );
-            //fsync( o->fd );
-#ifdef HAVE_POSIX_FADVISE
-            /* TODO: test performance with and without this */
-            posix_fadvise( o->fd, 0, 0, POSIX_FADV_DONTNEED );
-#endif
-            o->syncAt = time( NULL ) + SYNC_INTERVAL;
-        }
 
         break;
     }
