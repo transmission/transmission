@@ -49,7 +49,7 @@ Prefs::PrefItem Prefs::myItems[] =
     { TOOLBAR, "show-toolbar" , QVariant::Bool },
     { BLOCKLIST_DATE, "blocklist-date", QVariant::DateTime },
     { BLOCKLIST_UPDATES_ENABLED, "blocklist-updates-enabled" , QVariant::Bool },
-    { MAIN_WINDOW_LAYOUT_ORDER, "main-window-layout-order", QVariant::Int },
+    { MAIN_WINDOW_LAYOUT_ORDER, "main-window-layout-order", QVariant::String },
     { MAIN_WINDOW_HEIGHT, "main-window-height", QVariant::Int },
     { MAIN_WINDOW_WIDTH, "main-window-width", QVariant::Int },
     { MAIN_WINDOW_X, "main-window-x", QVariant::Int },
