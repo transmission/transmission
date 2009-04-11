@@ -403,11 +403,10 @@ tr_torrentInitFilePieces( tr_torrent * tor )
     /* build the array of first-file hints to give calculatePiecePriority */
     firstFiles = tr_new( int, inf->pieceCount );
     for( p=f=0; p<inf->pieceCount; ++p ) {
-        if( inf->files[f].lastPiece < p )
+        while( inf->files[f].lastPiece < p )
             ++f;
         firstFiles[p] = f;
     }
-
 
 #if 0
     /* test to confirm the first-file hints are correct */
@@ -417,6 +416,10 @@ tr_torrentInitFilePieces( tr_torrent * tor )
         assert( inf->files[f].lastPiece >= p );
         if( f > 0 )
             assert( inf->files[f-1].lastPiece < p );
+        for( f=0; f<inf->fileCount; ++f )
+            if( pieceHasFile( p, &inf->files[f] ) )
+                break;
+        assert( (int)f == firstFiles[p] );
     }
 #endif
 
