@@ -907,7 +907,7 @@ tr_torrentStat( tr_torrent * tor )
         tr_bitfield *    peerPieces = tr_peerMgrGetAvailable( tor );
         s->desiredAvailable = 0;
         for( i = 0; i < tor->info.pieceCount; ++i )
-            if( !tor->info.pieces[i].dnd && tr_bitfieldHas( peerPieces, i ) )
+            if( !tor->info.pieces[i].dnd && tr_bitfieldHasFast( peerPieces, i ) )
                 s->desiredAvailable += tr_cpMissingBlocksInPiece( &tor->completion, i );
         s->desiredAvailable *= tor->blockSize;
         tr_bitfieldFree( peerPieces );
@@ -992,21 +992,21 @@ fileBytesCompleted( const tr_torrent * tor,
 
     if( firstBlock == lastBlock )
     {
-        if( tr_cpBlockIsComplete( &tor->completion, firstBlock ) )
+        if( tr_cpBlockIsCompleteFast( &tor->completion, firstBlock ) )
             haveBytes += lastBlockOffset + 1 - firstBlockOffset;
     }
     else
     {
         tr_block_index_t i;
 
-        if( tr_cpBlockIsComplete( &tor->completion, firstBlock ) )
+        if( tr_cpBlockIsCompleteFast( &tor->completion, firstBlock ) )
             haveBytes += tor->blockSize - firstBlockOffset;
 
         for( i = firstBlock + 1; i < lastBlock; ++i )
-            if( tr_cpBlockIsComplete( &tor->completion, i ) )
+            if( tr_cpBlockIsCompleteFast( &tor->completion, i ) )
                 haveBytes += tor->blockSize;
 
-        if( tr_cpBlockIsComplete( &tor->completion, lastBlock ) )
+        if( tr_cpBlockIsCompleteFast( &tor->completion, lastBlock ) )
             haveBytes += lastBlockOffset + 1;
     }
 

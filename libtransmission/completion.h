@@ -135,7 +135,13 @@ tr_bool tr_cpFileIsComplete( const tr_completion * cp, tr_file_index_t );
 *** Blocks
 **/
 
-static TR_INLINE tr_bool tr_cpBlockIsComplete( const tr_completion * cp, tr_block_index_t block ) {
+static TR_INLINE tr_bool tr_cpBlockIsCompleteFast( const tr_completion * cp, tr_block_index_t block )
+{
+    return tr_bitfieldHasFast( &cp->blockBitfield, block );
+}
+
+static TR_INLINE tr_bool tr_cpBlockIsComplete( const tr_completion * cp, tr_block_index_t block )
+{
     return tr_bitfieldHas( &cp->blockBitfield, block );
 }
 

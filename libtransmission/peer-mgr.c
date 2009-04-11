@@ -693,7 +693,7 @@ blockIteratorNext( struct tr_blockIterator * i, tr_block_index_t * setme )
         i->blockCount = 0;
         i->blockIndex = 0;
         for( block=b; block!=e; ++block )
-            if( !tr_cpBlockIsComplete( &tor->completion, block ) )
+            if( !tr_cpBlockIsCompleteFast( &tor->completion, block ) )
                 i->blocks[i->blockCount++] = block;
     }
 
