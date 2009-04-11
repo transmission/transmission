@@ -24,6 +24,7 @@ TorrentFilter :: TorrentFilter( Prefs& prefs ):
     mySortMode( getSortModeFromName( prefs.getString( Prefs::SORT_MODE ) ) ),
     myIsAscending( prefs.getBool( Prefs::SORT_REVERSED ) )
 {
+    resort( );
 }
 
 TorrentFilter :: ~TorrentFilter( )
