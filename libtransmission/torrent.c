@@ -352,14 +352,11 @@ calculatePiecePriority( const tr_torrent * tor,
     int             priority = TR_PRI_LOW;
 
     /* find the first file that has data in this piece */
-    if( fileHint >= 0 )
-    {
+    if( fileHint >= 0 ) {
         i = fileHint;
         while( i > 0 && pieceHasFile( piece, &tor->info.files[i - 1] ) )
             --i;
-    }
-    else
-    {
+    } else {
         for( i = 0; i < tor->info.fileCount; ++i )
             if( pieceHasFile( piece, &tor->info.files[i] ) )
                 break;
@@ -390,22 +387,43 @@ calculatePiecePriority( const tr_torrent * tor,
 static void
 tr_torrentInitFilePieces( tr_torrent * tor )
 {
-    tr_file_index_t  ff;
-    tr_piece_index_t pp;
-    uint64_t         offset = 0;
-    tr_info *        inf = &tor->info;
+    tr_file_index_t  f;
+    tr_piece_index_t p;
+    uint64_t offset = 0;
+    tr_info * inf = &tor->info;
+    int * firstFiles;
 
-    assert( inf );
-
-    for( ff = 0; ff < inf->fileCount; ++ff )
-    {
-        inf->files[ff].offset = offset;
-        offset += inf->files[ff].length;
-        initFilePieces( inf, ff );
+    /* assign the file offsets */
+    for( f=0; f<inf->fileCount; ++f ) {
+        inf->files[f].offset = offset;
+        offset += inf->files[f].length;
+        initFilePieces( inf, f );
     }
 
-    for( pp = 0; pp < inf->pieceCount; ++pp )
-        inf->pieces[pp].priority = calculatePiecePriority( tor, pp, -1 );
+    /* build the array of first-file hints to give calculatePiecePriority */
+    firstFiles = tr_new( int, inf->pieceCount );
+    for( p=f=0; p<inf->pieceCount; ++p ) {
+        if( inf->files[f].lastPiece < p )
+            ++f;
+        firstFiles[p] = f;
+    }
+
+
+#if 0
+    /* test to confirm the first-file hints are correct */
+    for( p=0; p<inf->pieceCount; ++p ) {
+        f = firstFiles[p];
+        assert( inf->files[f].firstPiece <= p );
+        assert( inf->files[f].lastPiece >= p );
+        if( f > 0 )
+            assert( inf->files[f-1].lastPiece < p );
+    }
+#endif
+
+    for( p=0; p<inf->pieceCount; ++p )
+        inf->pieces[p].priority = calculatePiecePriority( tor, p, firstFiles[p] );
+
+    tr_free( firstFiles );
 }
 
 int
@@ -1504,8 +1522,7 @@ tr_torrentInitFilePriority( tr_torrent *    tor,
     file = &tor->info.files[fileIndex];
     file->priority = priority;
     for( i = file->firstPiece; i <= file->lastPiece; ++i )
-        tor->info.pieces[i].priority = calculatePiecePriority( tor, i,
-                                                               fileIndex );
+        tor->info.pieces[i].priority = calculatePiecePriority( tor, i, fileIndex );
 }
 
 void
