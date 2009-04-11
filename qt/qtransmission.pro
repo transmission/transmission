@@ -20,6 +20,7 @@ HEADERS += about.h \
            app.h \
            details.h \
            file-tree.h \
+           filters.h \
            hig.h \
            mainwin.h \
            make-dialog.h \
@@ -44,6 +45,7 @@ SOURCES += about.cc \
            app.cc \
            details.cc \
            file-tree.cc \
+           filters.cc \
            hig.cc \
            mainwin.cc \
            make-dialog.cc \

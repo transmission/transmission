@@ -21,6 +21,8 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/bencode.h>
 
+#include "filters.h"
+
 class Prefs: public QObject
 {
         Q_OBJECT;
@@ -114,7 +116,7 @@ class Prefs: public QObject
         struct PrefItem {
             int id;
             const char * key;
-            QVariant::Type type;
+            int type;
         };
 
         static PrefItem myItems[];
@@ -128,7 +130,7 @@ class Prefs: public QObject
         bool isCore( int key ) const { return FIRST_CORE_PREF<=key && key<=LAST_CORE_PREF; }
         bool isClient( int key ) const { return !isCore( key ); }
         const char * keyStr( int i ) const { return myItems[i].key; }
-        QVariant::Type type( int i ) const { return myItems[i].type; }
+        int type( int i ) const { return myItems[i].type; }
         const QVariant& variant( int i ) const { return myValues[i]; }
 
         Prefs( const char * configDir );
@@ -140,9 +142,16 @@ class Prefs: public QObject
         double getDouble( int key) const;
         QDateTime getDateTime( int key ) const;
 
+        template<typename T> T get( int key ) const {
+            return myValues[key].value<T>();
+        }
+
+        void set( int key, char * value ) { set( key, QString::fromUtf8(value) ); }
+        void set( int key, const char * value ) { set( key, QString::fromUtf8(value) ); }
+
         template<typename T> void set( int key, const T& value ) {
             QVariant& v( myValues[key] );
-            const QVariant tmp( value );
+            const QVariant tmp = QVariant::fromValue(value);
             if( v.isNull() || (v!=tmp) ) {
                 v = tmp;
                 emit changed( key );

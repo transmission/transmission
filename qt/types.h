@@ -22,7 +22,9 @@ class TrTypes
         enum
         {
             PeerList = QVariant::UserType,
-            FileList
+            FileList,
+            FilterModeType,
+            SortModeType
         };
 };
 

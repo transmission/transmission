@@ -68,7 +68,7 @@ class TrMainWindow: public QMainWindow
         QIcon getStockIcon( const QString&, int fallback=-1 );
 
     private:
-        void setShowMode( TorrentFilter::ShowMode );
+        void setShowMode( int );
         QSet<int> getSelectedTorrents( ) const;
         void updateNetworkIcon( );
         QWidgetList myHidden;
@@ -100,6 +100,20 @@ class TrMainWindow: public QMainWindow
         void dataReadProgress( );
         void dataSendProgress( );
         void toggleWindows( );
+
+     private slots:
+        void setSortPref( int );
+        void setSortAscendingPref( bool );
+        void onSortByActivityToggled ( bool b );
+        void onSortByAgeToggled      ( bool b );
+        void onSortByETAToggled      ( bool b );
+        void onSortByNameToggled     ( bool b );
+        void onSortByProgressToggled ( bool b );
+        void onSortByRatioToggled    ( bool b );
+        void onSortBySizeToggled     ( bool b );
+        void onSortByStateToggled    ( bool b );
+        void onSortByTrackerToggled  ( bool b );
+
 
      public slots:
         void startAll( );

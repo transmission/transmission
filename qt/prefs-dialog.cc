@@ -171,7 +171,7 @@ void
 PrefsDialog :: textChanged( const QString& text )
 {
     const int key( sender()->property( PREF_KEY ).toInt( ) );
-    myPrefs.set( key, qPrintable(text) );
+    myPrefs.set( key, text );
 }
 
 QLineEdit*

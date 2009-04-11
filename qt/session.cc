@@ -657,6 +657,8 @@ Session :: updateInfo( tr_benc * d )
                     myPrefs.set( i, (bool)val );
                 break;
             }
+            case TrTypes :: FilterModeType:
+            case TrTypes :: SortModeType:
             case QVariant :: String: {
                 const char * val;
                 if( tr_bencGetStr( b, &val ) )

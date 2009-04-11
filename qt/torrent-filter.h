@@ -14,6 +14,9 @@
 #define QTR_TORRENT_FILTER_H
 
 #include <QSortFilterProxyModel>
+#include <QMetaType>
+#include <QVariant>
+
 
 struct Prefs;
 struct QString;
@@ -27,43 +30,16 @@ class TorrentFilter: public QSortFilterProxyModel
         virtual ~TorrentFilter( );
 
     public:
-        enum ShowMode { SHOW_ALL, SHOW_ACTIVE, SHOW_DOWNLOADING, SHOW_SEEDING, SHOW_PAUSED };
-        ShowMode getShowMode( ) const { return myShowMode; }
-        ShowMode getShowModeFromName( const QString& name ) const;
-        const char * getShowName( int mode=-1 ) const;
-
         enum TextMode { FILTER_BY_NAME, FILTER_BY_FILES, FILTER_BY_TRACKER };
         TextMode getTextMode( ) const { return myTextMode; }
-
-        enum SortMode{ SORT_BY_ACTIVITY, SORT_BY_AGE, SORT_BY_ETA, SORT_BY_NAME,
-                       SORT_BY_PROGRESS, SORT_BY_RATIO, SORT_BY_SIZE,
-                       SORT_BY_STATE, SORT_BY_TRACKER, SORT_BY_ID };
-        SortMode getSortMode( ) const { return mySortMode; }
-        SortMode getSortModeFromName( const QString& name) const;
-        const char * getSortName( int mode=-1 ) const;
-
-        bool isAscending( ) const { return myIsAscending; }
-
         int hiddenRowCount( ) const;
 
-
     public slots:
-        void setShowMode( int showMode );
         void setTextMode( int textMode );
-        void setSortMode( int sortMode );
         void setText( QString );
-        void sortByActivity( );
-        void sortByAge( );
-        void sortByETA( );
-        void sortById( );
-        void sortByName( );
-        void sortByProgress( );
-        void sortByRatio( );
-        void sortBySize( );
-        void sortByState( );
-        void sortByTracker( );
-        void setAscending( bool );
-        void resort( );
+
+    private slots:
+        void refreshPref( int key );
 
     protected:
         virtual bool filterAcceptsRow( int, const QModelIndex& ) const;
@@ -71,10 +47,7 @@ class TorrentFilter: public QSortFilterProxyModel
 
     private:
         Prefs& myPrefs;
-        ShowMode myShowMode;
         TextMode myTextMode;
-        SortMode mySortMode;
-        bool myIsAscending;
         QString myText;
 };
 

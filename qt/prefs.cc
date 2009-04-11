@@ -22,6 +22,7 @@
 #include <libtransmission/json.h>
 #include <libtransmission/utils.h>
 #include "prefs.h"
+#include "types.h"
 
 /***
 ****
@@ -40,7 +41,7 @@ Prefs::PrefItem Prefs::myItems[] =
     { START, "start-added-torrents", QVariant::Bool },
     { TRASH_ORIGINAL, "trash-original-torrent-files", QVariant::Bool },
     { ASKQUIT, "prompt-before-exit", QVariant::Bool },
-    { SORT_MODE, "sort-mode", QVariant::String },
+    { SORT_MODE, "sort-mode", TrTypes::SortModeType },
     { SORT_REVERSED, "sort-reversed", QVariant::Bool },
     { MINIMAL_VIEW, "minimal-view", QVariant::Bool },
     { FILTERBAR, "show-filterbar", QVariant::Bool },
@@ -54,7 +55,7 @@ Prefs::PrefItem Prefs::myItems[] =
     { MAIN_WINDOW_WIDTH, "main-window-width", QVariant::Int },
     { MAIN_WINDOW_X, "main-window-x", QVariant::Int },
     { MAIN_WINDOW_Y, "main-window-y", QVariant::Int },
-    { FILTER_MODE, "filter-mode", QVariant::String },
+    { FILTER_MODE, "filter-mode", TrTypes::FilterModeType },
 
     /* libtransmission settings */
     { ALT_SPEED_LIMIT_UP, TR_PREFS_KEY_ALT_SPEED_UP, QVariant::Int },
@@ -134,6 +135,14 @@ Prefs :: Prefs( const char * configDir ):
                 if( tr_bencGetInt( b, &intVal ) )
                     myValues[i].setValue( qlonglong(intVal) );
                 break;
+            case TrTypes::SortModeType:
+                if( tr_bencGetStr( b, &str ) )
+                    myValues[i] = QVariant::fromValue( SortMode( str ) );
+                break;
+            case TrTypes::FilterModeType:
+                if( tr_bencGetStr( b, &str ) )
+                    myValues[i] = QVariant::fromValue( FilterMode( str ) );
+                break;
             case QVariant::String:
                 if( tr_bencGetStr( b, &str ) )
                     myValues[i].setValue( QString::fromUtf8(str) );
@@ -178,6 +187,12 @@ Prefs :: ~Prefs( )
         switch( myItems[i].type ) {
             case QVariant::Int:
                 tr_bencDictAddInt( &top, key, val.toInt() );
+                break;
+            case TrTypes::SortModeType:
+                tr_bencDictAddStr( &top, key, val.value<SortMode>().name().toUtf8().constData() );
+                break;
+            case TrTypes::FilterModeType:
+                tr_bencDictAddStr( &top, key, val.value<FilterMode>().name().toUtf8().constData() );
                 break;
             case QVariant::String:
                 tr_bencDictAddStr( &top, key, val.toString().toUtf8().constData() );

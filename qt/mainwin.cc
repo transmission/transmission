@@ -21,9 +21,11 @@
 #include <QHBoxLayout>
 #include <QSystemTrayIcon>
 #include <QUrl>
+#include <QSignalMapper>
 
 #include "about.h"
 #include "details.h"
+#include "filters.h"
 #include "mainwin.h"
 #include "make-dialog.h"
 #include "options.h"
@@ -139,22 +141,21 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     ui.filterEntryClearButton->setIcon( getStockIcon( "edit-clear", QStyle::SP_DialogCloseButton ) );
 
     // ui signals
-    // ccc
     connect( ui.action_Toolbar, SIGNAL(toggled(bool)), this, SLOT(setToolbarVisible(bool)));
     connect( ui.action_TrayIcon, SIGNAL(toggled(bool)), this, SLOT(setTrayIconVisible(bool)));
     connect( ui.action_Filterbar, SIGNAL(toggled(bool)), this, SLOT(setFilterbarVisible(bool)));
     connect( ui.action_Statusbar, SIGNAL(toggled(bool)), this, SLOT(setStatusbarVisible(bool)));
     connect( ui.action_MinimalView, SIGNAL(toggled(bool)), this, SLOT(setMinimalView(bool)));
-    connect( ui.action_SortByActivity, SIGNAL(toggled(bool)), &myFilterModel, SLOT(sortByActivity()) );
-    connect( ui.action_SortByAge, SIGNAL(toggled(bool)), &myFilterModel, SLOT(sortByAge()) );
-    connect( ui.action_SortByETA, SIGNAL(toggled(bool)), &myFilterModel, SLOT(sortByETA()));
-    connect( ui.action_SortByName, SIGNAL(toggled(bool)), &myFilterModel, SLOT(sortByName()));
-    connect( ui.action_SortByProgress, SIGNAL(toggled(bool)), &myFilterModel, SLOT(sortByProgress()));
-    connect( ui.action_SortByRatio, SIGNAL(toggled(bool)), &myFilterModel, SLOT(sortByRatio()));
-    connect( ui.action_SortBySize, SIGNAL(toggled(bool)), &myFilterModel, SLOT(sortBySize()));
-    connect( ui.action_SortByState, SIGNAL(toggled(bool)), &myFilterModel, SLOT(sortByState()));
-    connect( ui.action_SortByTracker, SIGNAL(toggled(bool)), &myFilterModel, SLOT(sortByTracker()));
-    connect( ui.action_ReverseSortOrder, SIGNAL(toggled(bool)), &myFilterModel, SLOT(setAscending(bool)));
+    connect( ui.action_SortByActivity, SIGNAL(toggled(bool)), this, SLOT(onSortByActivityToggled(bool)));
+    connect( ui.action_SortByAge,      SIGNAL(toggled(bool)), this, SLOT(onSortByAgeToggled(bool)));
+    connect( ui.action_SortByETA,      SIGNAL(toggled(bool)), this, SLOT(onSortByETAToggled(bool)));
+    connect( ui.action_SortByName,     SIGNAL(toggled(bool)), this, SLOT(onSortByNameToggled(bool)));
+    connect( ui.action_SortByProgress, SIGNAL(toggled(bool)), this, SLOT(onSortByProgressToggled(bool)));
+    connect( ui.action_SortByRatio,    SIGNAL(toggled(bool)), this, SLOT(onSortByRatioToggled(bool)));
+    connect( ui.action_SortBySize,     SIGNAL(toggled(bool)), this, SLOT(onSortBySizeToggled(bool)));
+    connect( ui.action_SortByState,    SIGNAL(toggled(bool)), this, SLOT(onSortByStateToggled(bool)));
+    connect( ui.action_SortByTracker,  SIGNAL(toggled(bool)), this, SLOT(onSortByTrackerToggled(bool)));
+    connect( ui.action_ReverseSortOrder, SIGNAL(toggled(bool)), this, SLOT(setSortAscendingPref(bool)));
     connect( ui.action_Start, SIGNAL(triggered()), this, SLOT(startSelected()));
     connect( ui.action_Pause, SIGNAL(triggered()), this, SLOT(pauseSelected()));
     connect( ui.action_Remove, SIGNAL(triggered()), this, SLOT(removeSelected()));
@@ -204,7 +205,6 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     setTextButtonSizeHint( ui.filterDownloading );
     setTextButtonSizeHint( ui.filterSeeding );
     setTextButtonSizeHint( ui.filterPaused );
-    setShowMode( myFilterModel.getShowMode( ) );
 
     connect( &myFilterModel, SIGNAL(rowsInserted(const QModelIndex&,int,int)), this, SLOT(refreshVisibleCount()));
     connect( &myFilterModel, SIGNAL(rowsRemoved(const QModelIndex&,int,int)), this, SLOT(refreshVisibleCount()));
@@ -313,6 +313,31 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
 
 TrMainWindow :: ~TrMainWindow( )
 {
+}
+
+/****
+*****
+****/
+
+void
+TrMainWindow :: setSortPref( int i )
+{
+    myPrefs.set( Prefs::SORT_MODE, SortMode( i ) );
+}
+void TrMainWindow :: onSortByActivityToggled ( bool b ) { if( b ) setSortPref( SortMode::SORT_BY_ACTIVITY ); }
+void TrMainWindow :: onSortByAgeToggled      ( bool b ) { if( b ) setSortPref( SortMode::SORT_BY_AGE );      }
+void TrMainWindow :: onSortByETAToggled      ( bool b ) { if( b ) setSortPref( SortMode::SORT_BY_ETA );      }
+void TrMainWindow :: onSortByNameToggled     ( bool b ) { if( b ) setSortPref( SortMode::SORT_BY_NAME );     }
+void TrMainWindow :: onSortByProgressToggled ( bool b ) { if( b ) setSortPref( SortMode::SORT_BY_PROGRESS ); }
+void TrMainWindow :: onSortByRatioToggled    ( bool b ) { if( b ) setSortPref( SortMode::SORT_BY_RATIO );    }
+void TrMainWindow :: onSortBySizeToggled     ( bool b ) { if( b ) setSortPref( SortMode::SORT_BY_SIZE );     }
+void TrMainWindow :: onSortByStateToggled    ( bool b ) { if( b ) setSortPref( SortMode::SORT_BY_STATE );    }
+void TrMainWindow :: onSortByTrackerToggled  ( bool b ) { if( b ) setSortPref( SortMode::SORT_BY_TRACKER );  }
+
+void
+TrMainWindow :: setSortAscendingPref( bool b )
+{
+    myPrefs.set( Prefs::SORT_REVERSED, b );
 }
 
 /****
@@ -511,48 +536,21 @@ TrMainWindow :: reannounceSelected( )
 ***
 **/
 
-void
-TrMainWindow :: setShowMode( TorrentFilter :: ShowMode mode )
-{
-    ui.filterAll->setChecked         ( mode == TorrentFilter :: SHOW_ALL );
-    ui.filterActive->setChecked      ( mode == TorrentFilter :: SHOW_ACTIVE );
-    ui.filterDownloading->setChecked ( mode == TorrentFilter :: SHOW_DOWNLOADING );
-    ui.filterSeeding->setChecked     ( mode == TorrentFilter :: SHOW_SEEDING );
-    ui.filterPaused->setChecked      ( mode == TorrentFilter :: SHOW_PAUSED );
-
-    myFilterModel.setShowMode( mode );
-}
-
-void TrMainWindow :: showAll         ( ) { setShowMode( TorrentFilter :: SHOW_ALL ); }
-void TrMainWindow :: showActive      ( ) { setShowMode( TorrentFilter :: SHOW_ACTIVE ); }
-void TrMainWindow :: showDownloading ( ) { setShowMode( TorrentFilter :: SHOW_DOWNLOADING ); }
-void TrMainWindow :: showSeeding     ( ) { setShowMode( TorrentFilter :: SHOW_SEEDING ); }
-void TrMainWindow :: showPaused      ( ) { setShowMode( TorrentFilter :: SHOW_PAUSED ); }
+void TrMainWindow :: setShowMode     ( int i ) { myPrefs.set( Prefs::FILTER_MODE, FilterMode( i ) ); }
+void TrMainWindow :: showAll         ( ) { setShowMode( FilterMode :: SHOW_ALL ); }
+void TrMainWindow :: showActive      ( ) { setShowMode( FilterMode :: SHOW_ACTIVE ); }
+void TrMainWindow :: showDownloading ( ) { setShowMode( FilterMode :: SHOW_DOWNLOADING ); }
+void TrMainWindow :: showSeeding     ( ) { setShowMode( FilterMode :: SHOW_SEEDING ); }
+void TrMainWindow :: showPaused      ( ) { setShowMode( FilterMode :: SHOW_PAUSED ); }
 
 void TrMainWindow :: filterByName    ( ) { myFilterModel.setTextMode( TorrentFilter :: FILTER_BY_NAME ); }
 void TrMainWindow :: filterByTracker ( ) { myFilterModel.setTextMode( TorrentFilter :: FILTER_BY_TRACKER ); }
 void TrMainWindow :: filterByFiles   ( ) { myFilterModel.setTextMode( TorrentFilter :: FILTER_BY_FILES ); }
 
-void
-TrMainWindow :: showTotalRatio( )
-{
-    myPrefs.set( Prefs::STATUSBAR_STATS, "total-ratio" );
-}
-void
-TrMainWindow :: showTotalTransfer( )
-{
-    myPrefs.set( Prefs::STATUSBAR_STATS, "total-transfer" );
-}
-void
-TrMainWindow :: showSessionRatio( )
-{
-    myPrefs.set( Prefs::STATUSBAR_STATS, "session-ratio" );
-}
-void
-TrMainWindow :: showSessionTransfer( )
-{
-    myPrefs.set( Prefs::STATUSBAR_STATS, "session-transfer" );
-}
+void TrMainWindow :: showTotalRatio      ( ) { myPrefs.set( Prefs::STATUSBAR_STATS, "total-ratio"); }
+void TrMainWindow :: showTotalTransfer   ( ) { myPrefs.set( Prefs::STATUSBAR_STATS, "total-transfer"); }
+void TrMainWindow :: showSessionRatio    ( ) { myPrefs.set( Prefs::STATUSBAR_STATS, "session-ratio"); }
+void TrMainWindow :: showSessionTransfer ( ) { myPrefs.set( Prefs::STATUSBAR_STATS, "session-transfer"); }
 
 /**
 ***
@@ -630,27 +628,26 @@ TrMainWindow :: refreshPref( int key )
             break;
 
         case Prefs::SORT_MODE:
-            i = myFilterModel.getSortModeFromName( myPrefs.getString( key ) );
-            ui.action_SortByActivity->setChecked ( i == TorrentFilter::SORT_BY_ACTIVITY );
-            ui.action_SortByAge->setChecked      ( i == TorrentFilter::SORT_BY_AGE );
-            ui.action_SortByETA->setChecked      ( i == TorrentFilter::SORT_BY_ETA );
-            ui.action_SortByName->setChecked     ( i == TorrentFilter::SORT_BY_NAME );
-            ui.action_SortByProgress->setChecked ( i == TorrentFilter::SORT_BY_PROGRESS );
-            ui.action_SortByRatio->setChecked    ( i == TorrentFilter::SORT_BY_RATIO );
-            ui.action_SortBySize->setChecked     ( i == TorrentFilter::SORT_BY_SIZE );
-            ui.action_SortByState->setChecked    ( i == TorrentFilter::SORT_BY_STATE );
-            ui.action_SortByTracker->setChecked  ( i == TorrentFilter::SORT_BY_TRACKER );
+            i = myPrefs.get<SortMode>(key).mode( );
+            ui.action_SortByActivity->setChecked ( i == SortMode::SORT_BY_ACTIVITY );
+            ui.action_SortByAge->setChecked      ( i == SortMode::SORT_BY_AGE );
+            ui.action_SortByETA->setChecked      ( i == SortMode::SORT_BY_ETA );
+            ui.action_SortByName->setChecked     ( i == SortMode::SORT_BY_NAME );
+            ui.action_SortByProgress->setChecked ( i == SortMode::SORT_BY_PROGRESS );
+            ui.action_SortByRatio->setChecked    ( i == SortMode::SORT_BY_RATIO );
+            ui.action_SortBySize->setChecked     ( i == SortMode::SORT_BY_SIZE );
+            ui.action_SortByState->setChecked    ( i == SortMode::SORT_BY_STATE );
+            ui.action_SortByTracker->setChecked  ( i == SortMode::SORT_BY_TRACKER );
             break;
 
         case Prefs::FILTER_MODE:
-            i = myFilterModel.getShowModeFromName( myPrefs.getString( key ) );
-            ui.filterAll->setChecked         ( i == TorrentFilter::SHOW_ALL );
-            ui.filterActive->setChecked      ( i == TorrentFilter::SHOW_ACTIVE );
-            ui.filterDownloading->setChecked ( i == TorrentFilter::SHOW_DOWNLOADING );
-            ui.filterSeeding->setChecked     ( i == TorrentFilter::SHOW_SEEDING );
-            ui.filterPaused->setChecked      ( i == TorrentFilter::SHOW_PAUSED );
+            i = myPrefs.get<FilterMode>(key).mode( );
+            ui.filterAll->setChecked         ( i == FilterMode::SHOW_ALL );
+            ui.filterActive->setChecked      ( i == FilterMode::SHOW_ACTIVE );
+            ui.filterDownloading->setChecked ( i == FilterMode::SHOW_DOWNLOADING );
+            ui.filterSeeding->setChecked     ( i == FilterMode::SHOW_SEEDING );
+            ui.filterPaused->setChecked      ( i == FilterMode::SHOW_PAUSED );
             break;
-
 
         case Prefs::FILTERBAR:
             b = myPrefs.getBool( key );
