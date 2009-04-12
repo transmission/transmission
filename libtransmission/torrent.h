@@ -276,7 +276,7 @@ static TR_INLINE tr_bool tr_torrentAllowsPex( const tr_torrent * tor )
 
 static TR_INLINE tr_bool tr_torrentIsPieceChecked( const tr_torrent  * tor, tr_piece_index_t i )
 {
-    return tr_bitfieldHas( &tor->checkedPieces, i );
+    return tr_bitfieldHasFast( &tor->checkedPieces, i );
 }
 
 /***

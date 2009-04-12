@@ -82,11 +82,10 @@ tr_cpSizeWhenDone( const tr_completion * ccp )
             {
                 /* we have part of the piece... */
                 const tr_block_index_t b = tr_torPieceFirstBlock( tor, i );
-                const tr_block_index_t e = b + tr_torPieceCountBlocks( tor,
-                                                                       i );
-                tr_block_index_t       j;
+                const tr_block_index_t e = b + tr_torPieceCountBlocks( tor, i );
+                tr_block_index_t j;
                 for( j = b; j < e; ++j )
-                    if( tr_cpBlockIsComplete( cp, j ) )
+                    if( tr_cpBlockIsCompleteFast( cp, j ) )
                         size += tr_torBlockCountBytes( tor, j );
             }
         }
@@ -129,7 +128,7 @@ tr_cpPieceRem( tr_completion *  cp,
     assert( end <= tor->blockCount );
 
     for( block = start; block < end; ++block )
-        if( tr_cpBlockIsComplete( cp, block ) )
+        if( tr_cpBlockIsCompleteFast( cp, block ) )
             cp->sizeNow -= tr_torBlockCountBytes( tor, block );
 
     cp->sizeWhenDoneIsDirty = 1;
@@ -343,7 +342,7 @@ tr_cpFileIsComplete( const tr_completion * cp, tr_file_index_t fileIndex )
                firstBlock, lastBlock );
 
     for( block=firstBlock; block<=lastBlock; ++block )
-        if( !tr_cpBlockIsComplete( cp, block ) )
+        if( !tr_cpBlockIsCompleteFast( cp, block ) )
             return FALSE;
 
     return TRUE;

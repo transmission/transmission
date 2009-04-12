@@ -320,22 +320,46 @@ calculatePiecePriority( const tr_torrent * tor,
 static void
 tr_torrentInitFilePieces( tr_torrent * tor )
 {
-    tr_file_index_t  ff;
-    tr_piece_index_t pp;
-    uint64_t         offset = 0;
-    tr_info *        inf = &tor->info;
+    tr_file_index_t  f;
+    tr_piece_index_t p;
+    uint64_t offset = 0;
+    tr_info * inf = &tor->info;
+    int * firstFiles;
 
-    assert( inf );
-
-    for( ff = 0; ff < inf->fileCount; ++ff )
-    {
-        inf->files[ff].offset = offset;
-        offset += inf->files[ff].length;
-        initFilePieces( inf, ff );
+    /* assign the file offsets */
+    for( f=0; f<inf->fileCount; ++f ) {
+        inf->files[f].offset = offset;
+        offset += inf->files[f].length;
+        initFilePieces( inf, f );
     }
 
-    for( pp = 0; pp < inf->pieceCount; ++pp )
-        inf->pieces[pp].priority = calculatePiecePriority( tor, pp, -1 );
+    /* build the array of first-file hints to give calculatePiecePriority */
+    firstFiles = tr_new( int, inf->pieceCount );
+    for( p=f=0; p<inf->pieceCount; ++p ) {
+        while( inf->files[f].lastPiece < p )
+            ++f;
+        firstFiles[p] = f;
+    }
+
+#if 0
+    /* test to confirm the first-file hints are correct */
+    for( p=0; p<inf->pieceCount; ++p ) {
+        f = firstFiles[p];
+        assert( inf->files[f].firstPiece <= p );
+        assert( inf->files[f].lastPiece >= p );
+        if( f > 0 )
+            assert( inf->files[f-1].lastPiece < p );
+        for( f=0; f<inf->fileCount; ++f )
+            if( pieceHasFile( p, &inf->files[f] ) )
+                break;
+        assert( (int)f == firstFiles[p] );
+    }
+#endif
+
+    for( p=0; p<inf->pieceCount; ++p )
+        inf->pieces[p].priority = calculatePiecePriority( tor, p, firstFiles[p] );
+
+    tr_free( firstFiles );
 }
 
 int
@@ -815,7 +839,7 @@ tr_torrentStat( tr_torrent * tor )
         tr_bitfield *    peerPieces = tr_peerMgrGetAvailable( tor );
         s->desiredAvailable = 0;
         for( i = 0; i < tor->info.pieceCount; ++i )
-            if( !tor->info.pieces[i].dnd && tr_bitfieldHas( peerPieces, i ) )
+            if( !tor->info.pieces[i].dnd && tr_bitfieldHasFast( peerPieces, i ) )
                 s->desiredAvailable += tr_cpMissingBlocksInPiece( &tor->completion, i );
         s->desiredAvailable *= tor->blockSize;
         tr_bitfieldFree( peerPieces );
@@ -872,21 +896,21 @@ fileBytesCompleted( const tr_torrent * tor,
 
     if( firstBlock == lastBlock )
     {
-        if( tr_cpBlockIsComplete( &tor->completion, firstBlock ) )
+        if( tr_cpBlockIsCompleteFast( &tor->completion, firstBlock ) )
             haveBytes += lastBlockOffset + 1 - firstBlockOffset;
     }
     else
     {
         tr_block_index_t i;
 
-        if( tr_cpBlockIsComplete( &tor->completion, firstBlock ) )
+        if( tr_cpBlockIsCompleteFast( &tor->completion, firstBlock ) )
             haveBytes += tor->blockSize - firstBlockOffset;
 
         for( i = firstBlock + 1; i < lastBlock; ++i )
-            if( tr_cpBlockIsComplete( &tor->completion, i ) )
+            if( tr_cpBlockIsCompleteFast( &tor->completion, i ) )
                 haveBytes += tor->blockSize;
 
-        if( tr_cpBlockIsComplete( &tor->completion, lastBlock ) )
+        if( tr_cpBlockIsCompleteFast( &tor->completion, lastBlock ) )
             haveBytes += lastBlockOffset + 1;
     }
 

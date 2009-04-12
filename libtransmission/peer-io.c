@@ -740,8 +740,8 @@ tr_peerIoReadBytes( tr_peerIo       * io,
             break;
 
         case PEER_ENCRYPTION_RC4:
-            evbuffer_remove( inbuf, bytes, byteCount );
-            tr_cryptoDecrypt( io->crypto, byteCount, bytes, bytes );
+            tr_cryptoDecrypt( io->crypto, byteCount, EVBUFFER_DATA(inbuf), bytes );
+            evbuffer_drain(inbuf, byteCount );
             break;
 
         default:

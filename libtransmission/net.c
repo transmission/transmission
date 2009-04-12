@@ -180,7 +180,7 @@ tr_pton( const char * src, tr_address * dst )
 int
 tr_compareAddresses( const tr_address * a, const tr_address * b)
 {
-    int addrlen;
+    static const int sizes[2] = { sizeof(struct in_addr), sizeof(struct in6_addr) };
 
     assert( tr_isAddress( a ) );
     assert( tr_isAddress( b ) );
@@ -189,11 +189,7 @@ tr_compareAddresses( const tr_address * a, const tr_address * b)
     if( a->type != b->type )
         return a->type == TR_AF_INET ? 1 : -1;
 
-    if( a->type == TR_AF_INET ) 
-        addrlen = sizeof( struct in_addr ); 
-    else 
-        addrlen = sizeof( struct in6_addr ); 
-    return memcmp( &a->addr, &b->addr, addrlen );
+    return memcmp( &a->addr, &b->addr, sizes[a->type] );
 } 
 
 tr_bool
