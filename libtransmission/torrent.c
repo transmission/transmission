@@ -925,12 +925,13 @@ tr_torrentFiles( const tr_torrent * tor,
     const tr_file_index_t n = tor->info.fileCount;
     tr_file_stat *        files = tr_new0( tr_file_stat, n );
     tr_file_stat *        walk = files;
+    const tr_bool         isSeed = tor->completeness == TR_SEED;
 
     assert( tr_isTorrent( tor ) );
 
     for( i = 0; i < n; ++i, ++walk )
     {
-        const uint64_t b = fileBytesCompleted( tor, i );
+        const uint64_t b = isSeed ? tor->info.files[i].length : fileBytesCompleted( tor, i );
         walk->bytesCompleted = b;
         walk->progress = tr_getRatio( b, tor->info.files[i].length );
     }
