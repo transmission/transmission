@@ -56,7 +56,7 @@ class Session;
 
 namespace
 {
-    const int REFRESH_INTERVAL_MSEC = 3500;
+    const int REFRESH_INTERVAL_MSEC = 4000;
 
     enum // peer columns
     {
@@ -243,25 +243,12 @@ Details :: onTorrentChanged( )
     mySeedersLabel->setText( locale.toString( myTorrent.seeders( ) ) );
     myLeechersLabel->setText( locale.toString( myTorrent.leechers( ) ) );
     myTimesCompletedLabel->setText( locale.toString( myTorrent.timesCompleted( ) ) );
-    //const PeerList peers( myTorrent.peers( ) );
-    PeerList peers( myTorrent.peers( ) );
-#if 0
-static double progress = 0.01;
-{
-Peer peer;
-peer.address = "127.0.0.1";
-peer.isEncrypted = true;
-peer.progress = progress;
-peer.rateToPeer = Speed::fromKbps(20);
-peers << peer;
-progress += 0.01;
-}
-#endif
+    const PeerList peers( myTorrent.peers( ) );
     QMap<QString,QTreeWidgetItem*> peers2;
     QList<QTreeWidgetItem*> newItems;
     static const QIcon myEncryptionIcon( ":/icons/encrypted.png" );
     static const QIcon myEmptyIcon;
-    foreach( Peer peer, peers )
+    foreach( const Peer& peer, peers )
     {
         PeerItem * item = (PeerItem*) myPeers.value( peer.address, 0 );
         if( item == 0 ) { // new peer has connected
@@ -372,9 +359,50 @@ Details :: createActivityTab( )
 ***/
 
 void
-Details :: onSessionLimitsToggled( bool b )
+Details :: onHonorsSessionLimitsToggled( bool val )
 {
-    mySession.torrentSet( myTorrent.id(), "honorsSessionLimits", b );
+    mySession.torrentSet( myTorrent.id(), "honorsSessionLimits", val );
+}
+void
+Details :: onDownloadLimitedToggled( bool val )
+{
+    mySession.torrentSet( myTorrent.id(), "downloadLimited", val );
+}
+void
+Details :: onDownloadLimitChanged( int val )
+{
+    mySession.torrentSet( myTorrent.id(), "downloadLimit", val );
+}
+void
+Details :: onUploadLimitedToggled( bool val )
+{
+    mySession.torrentSet( myTorrent.id(), "uploadLimited", val );
+}
+void
+Details :: onUploadLimitChanged( int val )
+{
+    mySession.torrentSet( myTorrent.id(), "uploadLimit", val );
+}
+
+#define RATIO_KEY "seedRatioMode"
+
+void
+Details :: onSeedUntilChanged( bool b )
+{
+    if( b )
+        mySession.torrentSet( myTorrent.id(), RATIO_KEY, sender()->property(RATIO_KEY).toInt() );
+}
+
+void
+Details :: onSeedRatioLimitChanged( double val )
+{
+    mySession.torrentSet( myTorrent.id(), "seedRatioLimit", val );
+}
+
+void
+Details :: onMaxPeersChanged( int val )
+{
+    mySession.torrentSet( myTorrent.id(), "peer-limit", val );
 }
 
 QWidget *
@@ -393,7 +421,7 @@ Details :: createOptionsTab( )
     c = new QCheckBox( tr( "Honor global &limits" ) );
     mySessionLimitCheck = c;
     hig->addWideControl( c );
-    connect( c, SIGNAL(toggled(bool)), this, SLOT(onSessionLimitsToggled(bool)) );
+    connect( c, SIGNAL(toggled(bool)), this, SLOT(onHonorsSessionLimitsToggled(bool)) );
 
     c = new QCheckBox( tr( "Limit &download speed (KB/s)" ) );
     mySingleDownCheck = c;
@@ -402,6 +430,8 @@ Details :: createOptionsTab( )
     s->setRange( 0, INT_MAX );
     hig->addRow( c, s );
     enableWhenChecked( c, s );
+    connect( c, SIGNAL(toggled(bool)), this, SLOT(onDownloadLimitedToggled(bool)) );
+    connect( s, SIGNAL(valueChanged(int)), this, SLOT(onDownloadLimitChanged(int)));
 
     c = new QCheckBox( tr( "Limit &upload speed (KB/s)" ) );
     mySingleUpCheck = c;
@@ -410,25 +440,34 @@ Details :: createOptionsTab( )
     s->setRange( 0, INT_MAX );
     hig->addRow( c, s );
     enableWhenChecked( c, s );
+    connect( c, SIGNAL(toggled(bool)), this, SLOT(onUploadLimitedToggled(bool)) );
+    connect( s, SIGNAL(valueChanged(int)), this, SLOT(onUploadLimitChanged(int)));
 
     hig->addSectionDivider( );
     hig->addSectionTitle( tr( "Seed-Until Ratio" ) );
 
     r = new QRadioButton( tr( "Use &global setting" ) );
+    r->setProperty( RATIO_KEY, TR_RATIOLIMIT_GLOBAL );
+    connect( r, SIGNAL(toggled(bool)), this, SLOT(onSeedUntilChanged(bool)));
     mySeedGlobalRadio = r;
     hig->addWideControl( r );
 
     r = new QRadioButton( tr( "Seed &regardless of ratio" ) );
+    r->setProperty( RATIO_KEY, TR_RATIOLIMIT_UNLIMITED );
+    connect( r, SIGNAL(toggled(bool)), this, SLOT(onSeedUntilChanged(bool)));
     mySeedForeverRadio = r;
     hig->addWideControl( r );
 
     h = new QHBoxLayout( );
     h->setSpacing( HIG :: PAD );
     r = new QRadioButton( tr( "&Stop seeding when a torrent's ratio reaches" ) );
+    r->setProperty( RATIO_KEY, TR_RATIOLIMIT_SINGLE );
+    connect( r, SIGNAL(toggled(bool)), this, SLOT(onSeedUntilChanged(bool)));
     mySeedCustomRadio = r;
     h->addWidget( r );
     ds = new QDoubleSpinBox( );
     ds->setRange( 0.5, INT_MAX );
+    connect( ds, SIGNAL(valueChanged(double)), this, SLOT(onSeedRatioLimitChanged(double)));
     mySeedCustomSpin = ds;
     h->addWidget( ds );
     hig->addWideControl( h );
@@ -438,6 +477,7 @@ Details :: createOptionsTab( )
 
     s = new QSpinBox( );
     s->setRange( 1, 300 );
+    connect( s, SIGNAL(valueChanged(int)), this, SLOT(onMaxPeersChanged(int)));
     myPeerLimitSpin = s;
     hig->addRow( tr( "&Maximum Peers" ), s );
 

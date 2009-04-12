@@ -25,6 +25,8 @@ TorrentFilter :: TorrentFilter( Prefs& prefs ):
     // listen for changes to the preferences to know when to refilter / resort
     connect( &myPrefs, SIGNAL(changed(int)), this, SLOT(refreshPref(int)));
 
+    setDynamicSortFilter( true );
+
     // initialize our state from the current prefs
     QList<int> initKeys;
     initKeys << Prefs :: SORT_MODE

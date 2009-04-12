@@ -114,11 +114,16 @@ class Details: public QDialog
         FileTreeView * myFileTreeView;
 
     private slots:
-        void onSessionLimitsToggled( bool );
         void onFilePriorityChanged( const QSet<int>& fileIndices, int );
         void onFileWantedChanged( const QSet<int>& fileIndices, bool );
-
-
+        void onHonorsSessionLimitsToggled( bool );
+        void onDownloadLimitedToggled( bool );
+        void onDownloadLimitChanged( int );
+        void onUploadLimitedToggled( bool );
+        void onUploadLimitChanged( int );
+        void onSeedUntilChanged( bool );
+        void onSeedRatioLimitChanged( double );
+        void onMaxPeersChanged( int );
 };
 
 #endif

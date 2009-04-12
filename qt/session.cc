@@ -20,6 +20,7 @@
 #include <QMessageBox>
 #include <QSet>
 #include <QStyle>
+#include <QTextStream>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/bencode.h>
@@ -86,6 +87,7 @@ Session :: sessionSet( const char * key, const QVariant& value )
         case QVariant::String: tr_bencDictAddStr  ( args, key, value.toString().toUtf8() ); break;
         default: assert( "unknown type" );
     }
+std::cerr << tr_bencToJSON(&top) << std::endl;
     exec( &top );
     tr_bencFree( &top );
 }
@@ -275,16 +277,33 @@ namespace
 const int Session :: ADD_TORRENT_TAG = TAG_ADD_TORRENT;
 
 void
+Session :: torrentSet( int id, const QString& key, double value )
+{
+    QString s;
+    QTextStream( &s ) << "{ \"method\": \"torrent-set\", \"arguments\": { \"ids\": "<<id<<", \""<<key<<"\": "<<value<<" } }";
+std::cerr << qPrintable(s) << std::endl;
+    exec( s.toUtf8().constData() );
+    refreshExtraStats( id );
+}
+
+void
+Session :: torrentSet( int id, const QString& key, int value )
+{
+    QString s;
+    QTextStream( &s ) << "{ \"method\": \"torrent-set\", \"arguments\": { \"ids\": "<<id<<", \""<<key<<"\": "<<value<<" } }";
+std::cerr << qPrintable(s) << std::endl;
+    exec( s.toUtf8().constData() );
+    refreshExtraStats( id );
+}
+
+void
 Session :: torrentSet( int id, const QString& key, bool value )
 {
-    tr_benc top;
-    tr_bencInitDict( &top, 2 );
-    tr_bencDictAddStr( &top, "method", "torrent-set" );
-    tr_benc * args( tr_bencDictAddDict( &top, "arguments", 2 ) );
-    tr_bencDictAddInt( args, key.toUtf8(), value );
-    tr_bencListAddInt( tr_bencDictAddList( args, "ids", 1 ), id );
-    exec( &top );
-    tr_bencFree( &top );
+    QString s;
+    QTextStream( &s ) << "{ \"method\": \"torrent-set\", \"arguments\": { \"ids\": "<<id<<", \""<<key<<"\": "<<(value?"true":"false")<<" } }";
+std::cerr << qPrintable(s) << std::endl;
+    exec( s.toUtf8().constData() );
+    refreshExtraStats( id );
 }
 
 void
@@ -295,11 +314,12 @@ Session :: torrentSet( int id, const QString& key, const QList<int>& value )
     tr_bencDictAddStr( &top, "method", "torrent-set" );
     tr_benc * args( tr_bencDictAddDict( &top, "arguments", 2 ) );
     tr_bencListAddInt( tr_bencDictAddList( args, "ids", 1 ), id );
-    tr_benc * list( tr_bencDictAddList( args, key.toUtf8(), value.size( ) ) );
+    tr_benc * list( tr_bencDictAddList( args, key.toUtf8().constData(), value.size( ) ) );
     foreach( int i, value )
         tr_bencListAddInt( list, i );
     exec( &top );
     tr_bencFree( &top );
+    refreshExtraStats( id );
 }
 
 

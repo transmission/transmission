@@ -74,6 +74,8 @@ class Session: public QObject
 
     public:
         void torrentSet( int id, const QString& key, bool val );
+        void torrentSet( int id, const QString& key, int val );
+        void torrentSet( int id, const QString& key, double val );
         void torrentSet( int id, const QString& key, const QList<int>& val );
 
     public slots:
