@@ -435,7 +435,7 @@ PrefsDialog :: encryptionEdited( int i )
 }
 
 QWidget *
-PrefsDialog :: createPeersTab( const Session& session )
+PrefsDialog :: createPeersTab( )
 {
     HIG * hig = new HIG( this );
     hig->addSectionTitle( tr( "Blocklist" ) );
@@ -571,7 +571,7 @@ PrefsDialog :: PrefsDialog( Session& session, Prefs& prefs, QWidget * parent ):
 
     QTabWidget * t = new QTabWidget( this );
     t->addTab( createTorrentsTab( ),       tr( "Torrents" ) );
-    t->addTab( createPeersTab( session ),  tr( "Peers" ) );
+    t->addTab( createPeersTab( ),          tr( "Peers" ) );
     t->addTab( createBandwidthTab( ),      tr( "Speed" ) );
     t->addTab( createNetworkTab( ),        tr( "Network" ) );
     t->addTab( createWebTab( session ),    tr( "Web" ) );

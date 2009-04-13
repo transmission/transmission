@@ -78,7 +78,7 @@ class PrefsDialog: public QDialog
     private:
         bool isAllowed( int key ) const;
         QWidget * createTorrentsTab( );
-        QWidget * createPeersTab( const Session& session );
+        QWidget * createPeersTab( );
         QWidget * createNetworkTab( );
         QWidget * createBandwidthTab( );
         QWidget * createWebTab( Session& );
