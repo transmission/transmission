@@ -20,13 +20,14 @@
 
 #include "transmission.h"
 #include "bencode.h"
-#include "rpcimpl.h"
+#include "completion.h"
 #include "json.h"
+#include "rpcimpl.h"
 #include "session.h"
 #include "stats.h"
 #include "torrent.h"
-#include "completion.h"
 #include "utils.h"
+#include "version.h"
 #include "web.h"
 
 #define RECENTLY_ACTIVE_SECONDS 60

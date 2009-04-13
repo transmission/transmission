@@ -33,6 +33,7 @@
 #include <libtransmission/makemeta.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h> /* tr_wait */
+#include <libtransmission/version.h>
 #include <libtransmission/web.h> /* tr_webRun */
 
 #define LINEWIDTH 80

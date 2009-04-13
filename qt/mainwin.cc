@@ -23,6 +23,8 @@
 #include <QUrl>
 #include <QSignalMapper>
 
+#include <libtransmission/version.h>
+
 #include "about.h"
 #include "details.h"
 #include "filters.h"

@@ -36,8 +36,6 @@
 extern "C" {
 #endif
 
-#include "version.h"
-
 #include <inttypes.h> /* uintN_t */
 #ifndef PRId64
  #define PRId64 "lld"

@@ -42,6 +42,7 @@
 
 #include <libtransmission/transmission.h> /* TR_RATIO_NA, TR_RATIO_INF */
 #include <libtransmission/utils.h> /* tr_inf */
+#include <libtransmission/version.h> /* tr_inf */
 
 #include "conf.h"
 #include "hig.h"

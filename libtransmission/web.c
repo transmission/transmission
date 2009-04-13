@@ -24,6 +24,7 @@
 #include "net.h" /* socklen_t */
 #include "trevent.h"
 #include "utils.h"
+#include "version.h"
 #include "web.h"
 
 /* Use curl_multi_socket_action() instead of curl_multi_perform()

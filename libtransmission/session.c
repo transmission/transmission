@@ -27,6 +27,7 @@
 #include "bandwidth.h"
 #include "bencode.h"
 #include "blocklist.h"
+#include "crypto.h"
 #include "fdlimit.h"
 #include "list.h"
 #include "metainfo.h" /* tr_metainfoFree */
@@ -40,8 +41,8 @@
 #include "tracker.h"
 #include "trevent.h"
 #include "utils.h"
+#include "version.h"
 #include "web.h"
-#include "crypto.h"
 
 #define dbgmsg( ... ) \
     do { \

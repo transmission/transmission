@@ -21,6 +21,7 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/tr-getopt.h>
+#include <libtransmission/version.h>
 
 #include "app.h"
 #include "mainwin.h"
