@@ -1,6 +1,6 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
-1.52 (2009/04/dd)
+1.52 (2009/04/12)
 <http://trac.transmissionbt.com/query?milestone=1.52&group=component&groupdesc=1&order=severity>
 - Mac
    + Improve interface responsiveness when downloading
