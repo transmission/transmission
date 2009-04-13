@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2009-02-23 17:50-0600\n"
-"PO-Revision-Date: 2009-01-26 04:29+0000\n"
+"PO-Revision-Date: 2009-02-28 12:54+0000\n"
 "Last-Translator: Hew McLachlan <hew.mclachlan@gmail.com>\n"
 "Language-Team: English (Australia) <en_AU@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2009-02-26 18:32+0000\n"
+"X-Launchpad-Export-Date: 2009-04-13 01:48+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -136,11 +136,11 @@ msgstr "Pause all torrents"
 
 #: ../gtk/actions.c:123
 msgid "_Start All"
-msgstr ""
+msgstr "_Start All"
 
 #: ../gtk/actions.c:123
 msgid "Start all torrents"
-msgstr ""
+msgstr "Start all torrents"
 
 #: ../gtk/actions.c:124
 msgid "Remove torrent"
@@ -1130,7 +1130,7 @@ msgstr "_Enable web interface"
 
 #: ../gtk/tr-prefs.c:740
 msgid "_Open web interface"
-msgstr ""
+msgstr "_Open web interface"
 
 #: ../gtk/tr-prefs.c:749 ../gtk/tr-prefs.c:1299
 msgid "Listening _port:"
@@ -1454,7 +1454,7 @@ msgstr "Couldn't read resume file"
 #: ../libtransmission/fdlimit.c:217
 #, c-format
 msgid "Couldn't create \"%1$s\": parent folder \"%2$s\" does not exist"
-msgstr ""
+msgstr "Couldn't create \"%1$s\": parent folder \"%2$s\" does not exist"
 
 #: ../libtransmission/fdlimit.c:240
 #, c-format

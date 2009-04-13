@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2009-02-23 17:50-0600\n"
-"PO-Revision-Date: 2009-01-23 17:16+0000\n"
+"PO-Revision-Date: 2009-03-08 06:39+0000\n"
 "Last-Translator: khanh_coltech <phantrongkhanh87@gmail.com>\n"
 "Language-Team: Vietnamese <vi@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2009-02-26 18:33+0000\n"
+"X-Launchpad-Export-Date: 2009-04-13 01:49+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -136,11 +136,11 @@ msgstr "Dừng tất cả torrent"
 
 #: ../gtk/actions.c:123
 msgid "_Start All"
-msgstr ""
+msgstr "_Chạy tất cả"
 
 #: ../gtk/actions.c:123
 msgid "Start all torrents"
-msgstr ""
+msgstr "Khởi động tất cả torrent"
 
 #: ../gtk/actions.c:124
 msgid "Remove torrent"
@@ -487,7 +487,7 @@ msgstr "Tỷ lệ:"
 
 #: ../gtk/details.c:1110
 msgid "Swarm rate:"
-msgstr ""
+msgstr "Tốc độ cả nhóm:"
 
 #: ../gtk/details.c:1113
 msgid "Error:"
@@ -1092,15 +1092,15 @@ msgstr "_Bật tự động cập nhật"
 
 #: ../gtk/tr-prefs.c:507
 msgid "Maximum peers _overall:"
-msgstr ""
+msgstr "_Tổng số người ngang hàng lớn nhất:"
 
 #: ../gtk/tr-prefs.c:509
 msgid "Maximum peers per _torrent:"
-msgstr ""
+msgstr "_Số người ngang hàng lớn nhất mỗi torrent:"
 
 #: ../gtk/tr-prefs.c:514
 msgid "_Ignore unencrypted peers"
-msgstr ""
+msgstr "_Bỏ qua người ngang hàng không mã hóa"
 
 #: ../gtk/tr-prefs.c:522
 msgid "Use peer e_xchange"
@@ -1108,30 +1108,30 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:731
 msgid "Web Interface"
-msgstr ""
+msgstr "Giao diện Web"
 
 #. "enabled" checkbutton
 #: ../gtk/tr-prefs.c:734
 msgid "_Enable web interface"
-msgstr ""
+msgstr "_Bật giao diện Web"
 
 #: ../gtk/tr-prefs.c:740
 msgid "_Open web interface"
-msgstr ""
+msgstr "_Mở giao diện web"
 
 #: ../gtk/tr-prefs.c:749 ../gtk/tr-prefs.c:1299
 msgid "Listening _port:"
-msgstr ""
+msgstr "Lắng nghe _cổng:"
 
 #. require authentication
 #: ../gtk/tr-prefs.c:753
 msgid "_Require username"
-msgstr ""
+msgstr "_Yêu cầu tên người dùng"
 
 #. username
 #: ../gtk/tr-prefs.c:761 ../gtk/tr-prefs.c:979
 msgid "_Username:"
-msgstr ""
+msgstr "_Tên người dùng:"
 
 #. password
 #: ../gtk/tr-prefs.c:768 ../gtk/tr-prefs.c:985

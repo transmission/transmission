@@ -14,14 +14,14 @@ msgstr ""
 "Project-Id-Version: Transmission\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-02-23 17:50-0600\n"
-"PO-Revision-Date: 2008-10-23 07:08+0000\n"
-"Last-Translator: Jonathan Ernst <jonathan@ernstfamily.ch>\n"
+"PO-Revision-Date: 2009-03-30 15:00+0000\n"
+"Last-Translator: Damien Haïkal <Unknown>\n"
 "Language-Team: GNOME French Team <gnomefr@traduc.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2009-02-26 18:33+0000\n"
+"X-Launchpad-Export-Date: 2009-04-13 01:48+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -134,19 +134,19 @@ msgstr "Suspendre ce torrent"
 
 #: ../gtk/actions.c:122
 msgid "_Pause All"
-msgstr ""
+msgstr "_Suspendre tout"
 
 #: ../gtk/actions.c:122
 msgid "Pause all torrents"
-msgstr ""
+msgstr "Suspendre tous les torrents"
 
 #: ../gtk/actions.c:123
 msgid "_Start All"
-msgstr ""
+msgstr "Démarrer tou_s"
 
 #: ../gtk/actions.c:123
 msgid "Start all torrents"
-msgstr ""
+msgstr "Démarrer tous les torrents"
 
 #: ../gtk/actions.c:124
 msgid "Remove torrent"
@@ -178,7 +178,7 @@ msgstr "Tout désé_lectionner"
 
 #: ../gtk/actions.c:131
 msgid "Torrent properties"
-msgstr ""
+msgstr "Propriétés du torrent"
 
 #: ../gtk/actions.c:132
 msgid "_Open Folder"
@@ -282,7 +282,7 @@ msgstr "%s est déjà en cours d'exécution."
 
 #: ../gtk/details.c:274
 msgid "Web Seeds"
-msgstr ""
+msgstr "Partages Web"
 
 #. 'download speed' column header. terse to keep the column narrow.
 #: ../gtk/details.c:276 ../gtk/details.c:318
@@ -455,7 +455,7 @@ msgstr "%1$.1f %% (%2$.1f %% sélectionné)"
 #: ../gtk/details.c:1042
 #, c-format
 msgid "%1$s (%2$s verified in %3$d pieces)"
-msgstr ""
+msgstr "%1$s (%2$s vérifiés sur %3$d pièces)"
 
 #: ../gtk/details.c:1062 ../gtk/util.c:57 ../gtk/util.c:79
 msgid "None"
@@ -592,7 +592,7 @@ msgstr "Maintenant"
 #: ../gtk/details.c:1489
 #, c-format
 msgid "%s Properties"
-msgstr ""
+msgstr "Propriétés de %s"
 
 #: ../gtk/details.c:1507
 msgid "Activity"
@@ -641,26 +641,26 @@ msgstr[1] "Supprimer les fichiers réceptionnés de ces torrents ?"
 #: ../gtk/dialogs.c:254
 msgid "This torrent has not finished downloading."
 msgid_plural "These torrents have not finished downloading."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Ce torrent n'a pas fini d'être téléchargé."
+msgstr[1] "Ces torrents n'ont pas fini d'être téléchargés."
 
 #: ../gtk/dialogs.c:260
 msgid "This torrent is connected to peers."
 msgid_plural "These torrents are connected to peers."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Ce torrent est connecté à des pairs."
+msgstr[1] "Ces torrents sont connectés à des pairs."
 
 #: ../gtk/dialogs.c:267
 msgid "One of these torrents is connected to peers."
 msgid_plural "Some of these torrents are connected to peers."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Un de ces torrents est connecté à des pairs."
+msgstr[1] "Plusieurs de ces torrents sont connectés à des pairs."
 
 #: ../gtk/dialogs.c:274
 msgid "One of these torrents has not finished downloading."
 msgid_plural "Some of these torrents have not finished downloading."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Un de ces torrents n'a pas fini d'être téléchargé."
+msgstr[1] "Plusieurs de ces torrents n'ont pas fini d'être téléchargés."
 
 #: ../gtk/file-list.c:622
 msgid "High"
@@ -680,7 +680,7 @@ msgstr "Mixte"
 
 #: ../gtk/file-list.c:664 ../gtk/file-list.c:814
 msgid "Download"
-msgstr ""
+msgstr "Téléchargement"
 
 #: ../gtk/file-list.c:665 ../gtk/file-list.c:821
 msgid "Priority"
@@ -688,7 +688,7 @@ msgstr "Priorité"
 
 #: ../gtk/file-list.c:793
 msgid "File"
-msgstr ""
+msgstr "Fichier"
 
 #: ../gtk/file-list.c:807
 msgid "Progress"
@@ -700,7 +700,7 @@ msgstr "Démarrer avec tous les torrents suspendus"
 
 #: ../gtk/main.c:363
 msgid "Show version number and exit"
-msgstr ""
+msgstr "Afficher le numéro de version et quitter"
 
 #: ../gtk/main.c:367
 msgid "Start minimized in system tray"
@@ -756,7 +756,7 @@ msgstr "Un client BitTorrent simple et rapide"
 
 #: ../gtk/main.c:1227
 msgid "Copyright 2005-2009 The Transmission Project"
-msgstr ""
+msgstr "Copyright 2005-2009 The Transmission Project"
 
 #. Translators: translate "translator-credits" as
 #. your name
@@ -781,6 +781,7 @@ msgstr ""
 "  Claude Gagné https://launchpad.net/~miltiad\n"
 "  Clément DREHER https://launchpad.net/~cdreher\n"
 "  Cyril GRAGEON https://launchpad.net/~cyril-g\n"
+"  Damien Haïkal https://launchpad.net/~damien-haikal\n"
 "  Eric https://launchpad.net/~1eric\n"
 "  Francis Careau https://launchpad.net/~francis-careau\n"
 "  Francois Magimel https://launchpad.net/~linkid\n"
@@ -800,7 +801,6 @@ msgstr ""
 "  Vincent Batoufflet https://launchpad.net/~santx\n"
 "  Vincent Garibal https://launchpad.net/~vincent-garibal\n"
 "  billux13 https://launchpad.net/~romain-dessort\n"
-"  damien-haikal https://launchpad.net/~damien-haikal\n"
 "  lp.descamps https://launchpad.net/~lp-descamps\n"
 "  ooliver27 https://launchpad.net/~ooliver27\n"
 "  royto https://launchpad.net/~royto\n"
@@ -1117,15 +1117,15 @@ msgstr "Me_ttre les fichiers source dans la corbeille"
 
 #: ../gtk/tr-prefs.c:346
 msgid "Inhibit desktop _hibernation when torrents are active"
-msgstr ""
+msgstr "Désactiver l'_hibernation du bureau lorsque des torrents sont actifs"
 
 #: ../gtk/tr-prefs.c:350
 msgid "Show _icon in the desktop Notification Area"
-msgstr ""
+msgstr "Afficher l'_icône dans la zone de notification du bureau"
 
 #: ../gtk/tr-prefs.c:354
 msgid "Show desktop _notifications"
-msgstr ""
+msgstr "Afficher les _notifications du bureau"
 
 #: ../gtk/tr-prefs.c:384
 #, c-format
@@ -1177,7 +1177,7 @@ msgstr "_Activer l'interface web"
 
 #: ../gtk/tr-prefs.c:740
 msgid "_Open web interface"
-msgstr ""
+msgstr "_Ouvrir l'interface Web"
 
 #: ../gtk/tr-prefs.c:749 ../gtk/tr-prefs.c:1299
 msgid "Listening _port:"
@@ -1201,7 +1201,7 @@ msgstr "Mot de passe :"
 #. require authentication
 #: ../gtk/tr-prefs.c:776
 msgid "Only allow the following IP _addresses to connect:"
-msgstr ""
+msgstr "Autoriser uniquement les _adresses IP suivantes à se connecter :"
 
 #: ../gtk/tr-prefs.c:803
 msgid "IP addresses may use wildcards, such as 192.168.*.*"
@@ -1209,7 +1209,7 @@ msgstr "Les adresses IP peuvent utiliser des jokers, comme 192.168.*.*"
 
 #: ../gtk/tr-prefs.c:826
 msgid "Addresses:"
-msgstr ""
+msgstr "Adresses :"
 
 #: ../gtk/tr-prefs.c:942
 msgid "Tracker Proxy"
@@ -1292,7 +1292,7 @@ msgstr "Réseau"
 
 #: ../gtk/tr-prefs.c:1354
 msgid "Desktop"
-msgstr ""
+msgstr "Bureau"
 
 #: ../gtk/tr-prefs.c:1357
 msgid "Bandwidth"
@@ -1311,7 +1311,7 @@ msgstr "Attente de vérification des données locales (%.1f %% testé)"
 #: ../gtk/tr-torrent.c:253
 #, c-format
 msgid "%1$s remaining"
-msgstr ""
+msgstr "%1$s restantes"
 
 #: ../gtk/tr-torrent.c:266 ../libtransmission/port-forwarding.c:200
 msgid "Stopped"
@@ -1487,7 +1487,7 @@ msgstr "Métadonnées non valides"
 #: ../libtransmission/blocklist.c:110
 #, c-format
 msgid "Blocklist \"%s\" contains %'zu entries"
-msgstr ""
+msgstr "La liste de blocage « %s » contient %'zu entrées"
 
 #: ../libtransmission/blocklist.c:303
 #, c-format
@@ -1503,11 +1503,12 @@ msgstr "Impossible de lire le fichier de reprise"
 #, c-format
 msgid "Couldn't create \"%1$s\": parent folder \"%2$s\" does not exist"
 msgstr ""
+"Impossible de créer « %1$s » : le dossier parent « %2$s » n'existe pas"
 
 #: ../libtransmission/fdlimit.c:240
 #, c-format
 msgid "Preallocated file \"%s\""
-msgstr ""
+msgstr "Fichier pré-alloué « %s »"
 
 #: ../libtransmission/fdlimit.c:517 ../libtransmission/net.c:391
 #, c-format
@@ -1557,7 +1558,7 @@ msgstr ""
 #: ../libtransmission/net.c:572
 #, c-format
 msgid "Couldn't bind port %d on %s: %s"
-msgstr ""
+msgstr "Impossible se connecter au port %d sur %s : %s"
 
 #: ../libtransmission/port-forwarding.c:32
 msgid "Port Forwarding"
@@ -1587,12 +1588,13 @@ msgstr "État modifié de « %1$s » en « %2$s »"
 #: ../libtransmission/port-forwarding.c:115
 #, c-format
 msgid "Closing port %d on %s"
-msgstr ""
+msgstr "Fermeture du port %d sur %s"
 
 #: ../libtransmission/port-forwarding.c:152
 #, c-format
 msgid "Opened port %d on %s to listen for incoming peer connections"
 msgstr ""
+"Port %d sur %s ouvert pour l'écoute des connexions entrantes de pairs"
 
 #: ../libtransmission/port-forwarding.c:160
 #, c-format
@@ -1600,6 +1602,8 @@ msgid ""
 "Couldn't open port %d on %s to listen for incoming peer connections (errno "
 "%d - %s)"
 msgstr ""
+"Impossible d'ouvrir le port %d sur %s pour l'écoute des connexions entrantes "
+"de pairs (erreur numéro %d - %s)"
 
 #. first %s is the application name
 #. second %s is the version number

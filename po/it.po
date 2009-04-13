@@ -2,7 +2,7 @@
 # Copyright (C) 2007
 # This file is distributed under the same license as the Transmission package.
 # Calorì Alessandro <axelgenus@gmail.com>, 2007.
-# Milo Casagrande <milo_casagrande@yahoo.it>, 2007-2008
+# Milo Casagrande <milo@ubuntu.com>, 2007-2009
 #
 # Piccolo glossario:
 #
@@ -19,14 +19,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-02-23 17:50-0600\n"
-"PO-Revision-Date: 2009-02-19 18:06+0000\n"
+"PO-Revision-Date: 2009-03-31 20:18+0000\n"
 "Last-Translator: Milo Casagrande <milo@milo.name>\n"
 "Language-Team: Italian <tp@lists.linux.it>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2009-02-26 18:32+0000\n"
+"X-Launchpad-Export-Date: 2009-04-13 01:48+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -148,11 +148,11 @@ msgstr "Mette in pausa tutti i torrent"
 
 #: ../gtk/actions.c:123
 msgid "_Start All"
-msgstr ""
+msgstr "Avvia _tutti"
 
 #: ../gtk/actions.c:123
 msgid "Start all torrents"
-msgstr ""
+msgstr "Avvia tutti i torrent"
 
 #: ../gtk/actions.c:124
 msgid "Remove torrent"
@@ -781,7 +781,6 @@ msgstr ""
 "  Alessandro Ranaldi https://launchpad.net/~ciaolo\n"
 "  Antonio Piccinno https://launchpad.net/~acquarica\n"
 "  Damiano Di Carlo https://launchpad.net/~dldc\n"
-"  Davide Larenza https://launchpad.net/~linuxisfreedom\n"
 "  Francesco Baldini https://launchpad.net/~francesco-baldini\n"
 "  Guybrush88 https://launchpad.net/~erpizzo\n"
 "  Luca Ferretti https://launchpad.net/~elle.uca\n"
@@ -790,7 +789,23 @@ msgstr ""
 "  Nicola S. https://launchpad.net/~strambinico\n"
 "  domenico https://launchpad.net/~cioffo88\n"
 "  ftaurino https://launchpad.net/~francesco-taurino\n"
-"  gdevitis https://launchpad.net/~gdevitis123"
+"  gdevitis https://launchpad.net/~gdevitis123\n"
+"  linuxenos https://launchpad.net/~linuxenos\n"
+"\n"
+"Launchpad Contributions:\n"
+"  Alessandro Ranaldi https://launchpad.net/~ciaolo\n"
+"  Antonio Piccinno https://launchpad.net/~acquarica\n"
+"  Damiano Di Carlo https://launchpad.net/~dldc\n"
+"  Francesco Baldini https://launchpad.net/~francesco-baldini\n"
+"  Guybrush88 https://launchpad.net/~erpizzo\n"
+"  Luca Ferretti https://launchpad.net/~elle.uca\n"
+"  Matteo Settenvini https://launchpad.net/~tchernobog\n"
+"  Milo Casagrande https://launchpad.net/~milo\n"
+"  Nicola S. https://launchpad.net/~strambinico\n"
+"  domenico https://launchpad.net/~cioffo88\n"
+"  ftaurino https://launchpad.net/~francesco-taurino\n"
+"  gdevitis https://launchpad.net/~gdevitis123\n"
+"  linuxenos https://launchpad.net/~linuxenos"
 
 #: ../gtk/makemeta-ui.c:111
 msgid "Torrent created!"
@@ -1167,7 +1182,7 @@ msgstr "A_bilitare l'interfaccia web"
 
 #: ../gtk/tr-prefs.c:740
 msgid "_Open web interface"
-msgstr ""
+msgstr "Apri interfaccia _web"
 
 #: ../gtk/tr-prefs.c:749 ../gtk/tr-prefs.c:1299
 msgid "Listening _port:"
@@ -1498,7 +1513,7 @@ msgstr "Impossibile leggere il file di ripristino"
 #: ../libtransmission/fdlimit.c:217
 #, c-format
 msgid "Couldn't create \"%1$s\": parent folder \"%2$s\" does not exist"
-msgstr ""
+msgstr "Impossibile creare «%1$s»: cartella superiore «%2$s» inesistente"
 
 #: ../libtransmission/fdlimit.c:240
 #, c-format

@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-02-23 17:50-0600\n"
-"PO-Revision-Date: 2009-02-17 11:57+0000\n"
-"Last-Translator: Djavan Fagundes <dnoway@gmail.com>\n"
+"PO-Revision-Date: 2009-03-05 21:34+0000\n"
+"Last-Translator: André Gondim <andregondim@ubuntu.com>\n"
 "Language-Team: Brazilian Portuguese <gnome-l10n-br@listas.cipsga.org.br>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2009-02-26 18:32+0000\n"
+"X-Launchpad-Export-Date: 2009-04-13 01:49+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -32,11 +32,11 @@ msgstr "Ordenar por _progresso"
 
 #: ../gtk/actions.c:53
 msgid "Sort by _Ratio"
-msgstr "Ordenar por _proporção"
+msgstr "Ordenar por Propo_rção"
 
 #: ../gtk/actions.c:55
 msgid "Sort by _State"
-msgstr "Ordenar por _status"
+msgstr "Ordenar por e_stado"
 
 #: ../gtk/actions.c:57
 msgid "Sort by _Tracker"
@@ -44,7 +44,7 @@ msgstr "Ordenar por _tracker"
 
 #: ../gtk/actions.c:59
 msgid "Sort by A_ge"
-msgstr "Ordenar por i_dade"
+msgstr "Ordenar por _idade"
 
 #: ../gtk/actions.c:78
 msgid "_Main Window"
@@ -52,7 +52,7 @@ msgstr "_Janela principal"
 
 #: ../gtk/actions.c:80
 msgid "Message _Log"
-msgstr "Mensagem de _registro"
+msgstr "Registro de mensagens"
 
 #: ../gtk/actions.c:96
 msgid "_Minimal View"
@@ -60,7 +60,7 @@ msgstr "Visão _mínima"
 
 #: ../gtk/actions.c:99
 msgid "_Reverse Sort Order"
-msgstr "_Inverter ordem da ordenação"
+msgstr "Inve_rter Ordem da Ordenação"
 
 #: ../gtk/actions.c:102
 msgid "_Filterbar"
@@ -68,11 +68,11 @@ msgstr "Barra de _filtros"
 
 #: ../gtk/actions.c:104
 msgid "_Statusbar"
-msgstr "Barra de _status"
+msgstr "Barra de e_stado"
 
 #: ../gtk/actions.c:106
 msgid "_Toolbar"
-msgstr "_Barra de ferramentas"
+msgstr "Barra de ferramen_tas"
 
 #: ../gtk/actions.c:111
 msgid "_Torrent"
@@ -80,11 +80,11 @@ msgstr "_Torrent"
 
 #: ../gtk/actions.c:112
 msgid "_View"
-msgstr "_Exibir"
+msgstr "_Ver"
 
 #: ../gtk/actions.c:113
 msgid "_Sort Torrents By"
-msgstr "_Ordenar torrents por"
+msgstr "Ordenar torrent_s por"
 
 #: ../gtk/actions.c:114
 msgid "_Edit"
@@ -112,7 +112,7 @@ msgstr "Iniciar torrent"
 
 #: ../gtk/actions.c:119
 msgid "_Statistics"
-msgstr "_Estatísticas"
+msgstr "E_statísticas"
 
 #: ../gtk/actions.c:120 ../gtk/add-dialog.c:364
 msgid "_Verify Local Data"
@@ -136,11 +136,11 @@ msgstr "Pausar todos os torrents"
 
 #: ../gtk/actions.c:123
 msgid "_Start All"
-msgstr ""
+msgstr "Iniciar todo_s"
 
 #: ../gtk/actions.c:123
 msgid "Start all torrents"
-msgstr ""
+msgstr "Iniciar todos torrents"
 
 #: ../gtk/actions.c:124
 msgid "Remove torrent"
@@ -176,7 +176,7 @@ msgstr "Propriedades dos torrents"
 
 #: ../gtk/actions.c:132
 msgid "_Open Folder"
-msgstr "_Abrir pasta"
+msgstr "_Abrir diretório"
 
 #: ../gtk/actions.c:134
 msgid "_Contents"
@@ -184,7 +184,7 @@ msgstr "S_umário"
 
 #: ../gtk/actions.c:135
 msgid "Ask Tracker for _More Peers"
-msgstr "Perguntar tracker por _mais peers"
+msgstr "Perguntar Tracker por _mais peers"
 
 #: ../gtk/add-dialog.c:241
 msgid "Torrent files"
@@ -232,7 +232,7 @@ msgstr "Exibir diálogo de _opções"
 
 #: ../gtk/blocklist.c:90
 msgid "Retrieving blocklist..."
-msgstr "Recuperando lista de bloqueios..."
+msgstr "Recuperando lista de bloqueados..."
 
 #: ../gtk/blocklist.c:100
 #, c-format
@@ -560,7 +560,7 @@ msgstr "Tracker:"
 
 #: ../gtk/details.c:1357
 msgid "Last announce at:"
-msgstr "Último anúncio:"
+msgstr "Último anúncio em:"
 
 #: ../gtk/details.c:1367
 msgid "Next announce in:"
@@ -700,7 +700,7 @@ msgstr "Iniciar minimizado na bandeja do sistema"
 
 #: ../gtk/main.c:370
 msgid "Where to look for configuration files"
-msgstr "Onde procurar por arquivos de configuração."
+msgstr "Onde olhar para arquivos de configuração"
 
 #: ../gtk/main.c:383
 msgid "Transmission"
@@ -813,7 +813,7 @@ msgstr "Nenhuma fonte selecionada"
 msgid "<i>%1$s; %2$'d File</i>"
 msgid_plural "<i>%1$s; %2$'d Files</i>"
 msgstr[0] "<i>%1$s; %2$'d arquivo</i>"
-msgstr[1] "<i>%1$s; %2$'d arquivos</i>"
+msgstr[1] "<i>%1$s; %2$'d Arquivos</i>"
 
 #: ../gtk/makemeta-ui.c:354
 msgid "Choose Directory"
@@ -1148,7 +1148,7 @@ msgstr "Hab_ilitar a interface web"
 
 #: ../gtk/tr-prefs.c:740
 msgid "_Open web interface"
-msgstr ""
+msgstr "_Abrir interface web"
 
 #: ../gtk/tr-prefs.c:749 ../gtk/tr-prefs.c:1299
 msgid "Listening _port:"
@@ -1472,7 +1472,7 @@ msgstr "Não foi possível ler o arquivo de reinício"
 #: ../libtransmission/fdlimit.c:217
 #, c-format
 msgid "Couldn't create \"%1$s\": parent folder \"%2$s\" does not exist"
-msgstr ""
+msgstr "Não foi possível criar \"%1$s\": pasta pai  \"%2$s\" não existe"
 
 #: ../libtransmission/fdlimit.c:240
 #, c-format
@@ -1663,7 +1663,7 @@ msgstr "Verificando torrent"
 
 #: ../libtransmission/verify.c:183
 msgid "Queued for verification"
-msgstr "Aguardando para verificação"
+msgstr "Na fila para verificação"
 
 #~ msgid "_Details"
 #~ msgstr "_Detalhes"

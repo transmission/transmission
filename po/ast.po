@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2009-02-23 17:50-0600\n"
-"PO-Revision-Date: 2009-02-21 15:09+0000\n"
-"Last-Translator: Astur <malditoastur@gmail.com>\n"
+"PO-Revision-Date: 2009-04-09 09:25+0000\n"
+"Last-Translator: Xuacu <xuacusk8@gmail.com>\n"
 "Language-Team: Asturian <ast@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2009-02-26 18:33+0000\n"
+"X-Launchpad-Export-Date: 2009-04-13 01:49+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -136,11 +136,11 @@ msgstr "Posar tolos torrents"
 
 #: ../gtk/actions.c:123
 msgid "_Start All"
-msgstr ""
+msgstr "Entamar too_s"
 
 #: ../gtk/actions.c:123
 msgid "Start all torrents"
-msgstr ""
+msgstr "Entamar tolos torrents"
 
 #: ../gtk/actions.c:124
 msgid "Remove torrent"
@@ -335,7 +335,7 @@ msgstr "Desafogaríamos a esti veceru, pero nun ta interesáu"
 
 #: ../gtk/details.c:647
 msgid "Encrypted connection"
-msgstr "Conesión encriptada"
+msgstr "Conexón encriptada"
 
 #: ../gtk/details.c:651
 msgid "Peer was discovered through Peer Exchange (PEX)"
@@ -343,7 +343,7 @@ msgstr "El par descubrióse per aciu del intercambéu de Pares (PEX)"
 
 #: ../gtk/details.c:655
 msgid "Peer is an incoming connection"
-msgstr "Peer ye una conesión entrante"
+msgstr "Peer ye una conexón entrante"
 
 #: ../gtk/details.c:846
 msgid "<b>Seeders:</b>"
@@ -524,7 +524,7 @@ msgstr "Llimitar velocidá xubida (KB/s):"
 
 #: ../gtk/details.c:1267
 msgid "Peer Connections"
-msgstr "Conesiones Peer"
+msgstr "Conexones Peer"
 
 #: ../gtk/details.c:1272
 msgid "_Maximum peers:"
@@ -720,7 +720,7 @@ msgstr "Finar l'usu previstu de los llímites d'anchu de banda"
 
 #: ../gtk/main.c:778
 msgid "<b>Closing Connections</b>"
-msgstr "<b>Zarrando Conesiones</b>"
+msgstr "<b>Zarrando Conexones</b>"
 
 #: ../gtk/main.c:782
 msgid "Sending upload/download totals to tracker..."
@@ -759,7 +759,8 @@ msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
 "  Astur https://launchpad.net/~malditoastur\n"
-"  Marcos https://launchpad.net/~marcos.alvarez.costales"
+"  Marcos https://launchpad.net/~marcos.alvarez.costales\n"
+"  Xuacu https://launchpad.net/~xuacusk8"
 
 #: ../gtk/makemeta-ui.c:111
 msgid "Torrent created!"
@@ -993,8 +994,8 @@ msgstr "Ratiu: %s"
 #, c-format
 msgid "Downloading from %1$'d of %2$'d connected peer"
 msgid_plural "Downloading from %1$'d of %2$'d connected peers"
-msgstr[0] "Baxando dende %1$'d de %2$'d peer conectada"
-msgstr[1] "Baxando dende %1$'d de %2$'d peers conectaes"
+msgstr[0] "Baxando dende %1$'d de %2$'d par conectau"
+msgstr[1] "Baxando dende %1$'d de %2$'d pares conectaos"
 
 #: ../gtk/torrent-cell-renderer.c:216 ../gtk/tr-torrent.c:259
 #, c-format
@@ -1131,7 +1132,7 @@ msgstr "_Activar Interface Web"
 
 #: ../gtk/tr-prefs.c:740
 msgid "_Open web interface"
-msgstr ""
+msgstr "_Abrir interfaz web"
 
 #: ../gtk/tr-prefs.c:749 ../gtk/tr-prefs.c:1299
 msgid "Listening _port:"
@@ -1455,7 +1456,7 @@ msgstr "Nun puede lleese ficheru de resume"
 #: ../libtransmission/fdlimit.c:217
 #, c-format
 msgid "Couldn't create \"%1$s\": parent folder \"%2$s\" does not exist"
-msgstr ""
+msgstr "Nun pudo criase \"%1$s\": el direutoriu pá \"%2$s\" nun esiste"
 
 #: ../libtransmission/fdlimit.c:240
 #, c-format

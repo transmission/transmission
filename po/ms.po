@@ -8,51 +8,51 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2009-02-23 17:50-0600\n"
-"PO-Revision-Date: 2008-08-07 12:35+0000\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"PO-Revision-Date: 2009-04-02 05:29+0000\n"
+"Last-Translator: melayubuntu <zul.malc@gmail.com>\n"
 "Language-Team: Malay <ms@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2009-02-26 18:32+0000\n"
+"X-Launchpad-Export-Date: 2009-04-13 01:49+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
 msgid "Sort by _Activity"
-msgstr ""
+msgstr "Susun mengikut _Aktiviti"
 
 #: ../gtk/actions.c:49
 msgid "Sort by _Name"
-msgstr ""
+msgstr "Susun mengikut _Nama"
 
 #: ../gtk/actions.c:51
 msgid "Sort by _Progress"
-msgstr ""
+msgstr "Susun mengikut_kemajuan"
 
 #: ../gtk/actions.c:53
 msgid "Sort by _Ratio"
-msgstr ""
+msgstr "Susun mengikut _Nisbah"
 
 #: ../gtk/actions.c:55
 msgid "Sort by _State"
-msgstr ""
+msgstr "Susun mengikut_keadaan"
 
 #: ../gtk/actions.c:57
 msgid "Sort by _Tracker"
-msgstr ""
+msgstr "Susun mengikut_tracker"
 
 #: ../gtk/actions.c:59
 msgid "Sort by A_ge"
-msgstr ""
+msgstr "Susun mengikut u_mur"
 
 #: ../gtk/actions.c:78
 msgid "_Main Window"
-msgstr ""
+msgstr "Tetingkap _Utama"
 
 #: ../gtk/actions.c:80
 msgid "Message _Log"
-msgstr ""
+msgstr "_Log mesej"
 
 #: ../gtk/actions.c:96
 msgid "_Minimal View"
@@ -68,43 +68,43 @@ msgstr ""
 
 #: ../gtk/actions.c:104
 msgid "_Statusbar"
-msgstr ""
+msgstr "Bar _Status"
 
 #: ../gtk/actions.c:106
 msgid "_Toolbar"
-msgstr ""
+msgstr "_Toolbar"
 
 #: ../gtk/actions.c:111
 msgid "_Torrent"
-msgstr ""
+msgstr "_Torrent"
 
 #: ../gtk/actions.c:112
 msgid "_View"
-msgstr ""
+msgstr "_Lihat"
 
 #: ../gtk/actions.c:113
 msgid "_Sort Torrents By"
-msgstr ""
+msgstr "_Susun Torrent Mengikut"
 
 #: ../gtk/actions.c:114
 msgid "_Edit"
-msgstr ""
+msgstr "_Sunting"
 
 #: ../gtk/actions.c:115
 msgid "_Help"
-msgstr ""
+msgstr "_Bantuan"
 
 #: ../gtk/actions.c:116 ../gtk/actions.c:117
 msgid "Add a torrent"
-msgstr ""
+msgstr "Tambahkan satu torrent"
 
 #: ../gtk/actions.c:117
 msgid "_Add..."
-msgstr ""
+msgstr "_Tambah..."
 
 #: ../gtk/actions.c:118
 msgid "_Start"
-msgstr ""
+msgstr "_Mula"
 
 #: ../gtk/actions.c:118
 msgid "Start torrent"
@@ -112,7 +112,7 @@ msgstr ""
 
 #: ../gtk/actions.c:119
 msgid "_Statistics"
-msgstr ""
+msgstr "_Statistik"
 
 #: ../gtk/actions.c:120 ../gtk/add-dialog.c:364
 msgid "_Verify Local Data"
@@ -136,15 +136,15 @@ msgstr ""
 
 #: ../gtk/actions.c:123
 msgid "_Start All"
-msgstr ""
+msgstr "_Mulakan Semua"
 
 #: ../gtk/actions.c:123
 msgid "Start all torrents"
-msgstr ""
+msgstr "Mulakan semua torrent"
 
 #: ../gtk/actions.c:124
 msgid "Remove torrent"
-msgstr ""
+msgstr "Buang torrent"
 
 #: ../gtk/actions.c:125
 msgid "_Delete Files and Remove"
@@ -152,23 +152,23 @@ msgstr ""
 
 #: ../gtk/actions.c:126
 msgid "_New..."
-msgstr ""
+msgstr "Ba_ru..."
 
 #: ../gtk/actions.c:126
 msgid "Create a torrent"
-msgstr ""
+msgstr "Binakan satu torrent"
 
 #: ../gtk/actions.c:127
 msgid "_Quit"
-msgstr ""
+msgstr "_Keluar"
 
 #: ../gtk/actions.c:128
 msgid "Select _All"
-msgstr ""
+msgstr "Pilih _Semua"
 
 #: ../gtk/actions.c:129
 msgid "Dese_lect All"
-msgstr ""
+msgstr "_Nyahpilih Semua"
 
 #: ../gtk/actions.c:131
 msgid "Torrent properties"
@@ -176,55 +176,55 @@ msgstr ""
 
 #: ../gtk/actions.c:132
 msgid "_Open Folder"
-msgstr ""
+msgstr "_Buka Folder"
 
 #: ../gtk/actions.c:134
 msgid "_Contents"
-msgstr ""
+msgstr "_Kandungan"
 
 #: ../gtk/actions.c:135
 msgid "Ask Tracker for _More Peers"
-msgstr ""
+msgstr "Mintak Tracker untuk _membanyakkan Peer"
 
 #: ../gtk/add-dialog.c:241
 msgid "Torrent files"
-msgstr ""
+msgstr "Fail torrent"
 
 #: ../gtk/add-dialog.c:246
 msgid "All files"
-msgstr ""
+msgstr "Semua fail"
 
 #: ../gtk/add-dialog.c:274
 msgid "Torrent Options"
-msgstr ""
+msgstr "Opsyen torrent"
 
 #: ../gtk/add-dialog.c:298
 msgid "_Move source file to Trash"
-msgstr ""
+msgstr "_Pindahkan fail sumber ke tong sampah"
 
 #: ../gtk/add-dialog.c:300 ../gtk/tr-prefs.c:316
 msgid "_Start when added"
-msgstr ""
+msgstr "_Mulakan apabila ditambah"
 
 #: ../gtk/add-dialog.c:311
 msgid "_Torrent file:"
-msgstr ""
+msgstr "_Fail torrent:"
 
 #: ../gtk/add-dialog.c:317
 msgid "Select Source File"
-msgstr ""
+msgstr "Pilih fail sumber"
 
 #: ../gtk/add-dialog.c:332 ../gtk/tr-prefs.c:325
 msgid "_Destination folder:"
-msgstr ""
+msgstr "_Folder destinasi:"
 
 #: ../gtk/add-dialog.c:339
 msgid "Select Destination Folder"
-msgstr ""
+msgstr "Pilih folder destinasi"
 
 #: ../gtk/add-dialog.c:437
 msgid "Add a Torrent"
-msgstr ""
+msgstr "Tambah Torrent"
 
 #: ../gtk/add-dialog.c:454 ../gtk/tr-prefs.c:312
 msgid "Display _options dialog"
@@ -261,13 +261,13 @@ msgstr ""
 #: ../libtransmission/utils.c:600
 #, c-format
 msgid "Couldn't create \"%1$s\": %2$s"
-msgstr ""
+msgstr "Tak boleh bina \"%1$s\": %2$s"
 
 #: ../gtk/conf.c:88 ../libtransmission/bencode.c:1427
 #: ../libtransmission/fdlimit.c:257
 #, c-format
 msgid "Couldn't open \"%1$s\": %2$s"
-msgstr ""
+msgstr "Tak boleh buka \"%1$s\": %2$s"
 
 #: ../gtk/conf.c:93
 #, c-format
@@ -285,7 +285,7 @@ msgstr ""
 
 #: ../gtk/details.c:316
 msgid "Address"
-msgstr ""
+msgstr "Alamat"
 
 #. 'upload speed' column header.  terse to keep the column narrow.
 #: ../gtk/details.c:320
@@ -294,16 +294,16 @@ msgstr ""
 
 #: ../gtk/details.c:321
 msgid "Client"
-msgstr ""
+msgstr "Klien"
 
 #. 'percent done' column header. terse to keep the column narrow.
 #: ../gtk/details.c:323
 msgid "%"
-msgstr ""
+msgstr "%"
 
 #: ../gtk/details.c:325
 msgid "Status"
-msgstr ""
+msgstr "Status"
 
 #: ../gtk/details.c:619
 msgid "Optimistic unchoke"
@@ -319,7 +319,7 @@ msgstr ""
 
 #: ../gtk/details.c:630
 msgid "Uploading to peer"
-msgstr ""
+msgstr "Muatnaik ke peer"
 
 #: ../gtk/details.c:633
 msgid "We would upload to this peer if they asked"
@@ -347,7 +347,7 @@ msgstr ""
 
 #: ../gtk/details.c:846
 msgid "<b>Seeders:</b>"
-msgstr ""
+msgstr "<b>Seeder:</b>"
 
 #: ../gtk/details.c:854
 msgid "<b>Leechers:</b>"
@@ -359,18 +359,18 @@ msgstr ""
 
 #: ../gtk/details.c:884 ../gtk/details.c:1423 ../gtk/details.c:1434
 msgid "Never"
-msgstr ""
+msgstr "Tidak sekali"
 
 #: ../gtk/details.c:909
 msgid "Details"
-msgstr ""
+msgstr "Perincian"
 
 #: ../gtk/details.c:912 ../gtk/makemeta-ui.c:284
 #, c-format
 msgid "%'d Piece"
 msgid_plural "%'d Pieces"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%'d Cebisan"
+msgstr[1] "%'d Cebisan"
 
 #. %1$s is number of pieces;
 #. %2$s is how big each piece is
@@ -381,7 +381,7 @@ msgstr ""
 
 #: ../gtk/details.c:922
 msgid "Pieces:"
-msgstr ""
+msgstr "Cebisan:"
 
 #: ../gtk/details.c:930
 msgid "Hash:"
@@ -393,48 +393,48 @@ msgstr ""
 
 #: ../gtk/details.c:934
 msgid "Public torrent"
-msgstr ""
+msgstr "Torrent awam"
 
 #: ../gtk/details.c:936
 msgid "Privacy:"
-msgstr ""
+msgstr "Persendirian:"
 
 #: ../gtk/details.c:948
 msgid "Comment:"
-msgstr ""
+msgstr "Komen:"
 
 #: ../gtk/details.c:952
 msgid "Origins"
-msgstr ""
+msgstr "Asalan"
 
 #: ../gtk/details.c:954
 msgid "Unknown"
-msgstr ""
+msgstr "Tidak diketahui"
 
 #: ../gtk/details.c:956
 msgid "Creator:"
-msgstr ""
+msgstr "Pembina:"
 
 #: ../gtk/details.c:960
 msgid "Date:"
-msgstr ""
+msgstr "Tarikh:"
 
 #: ../gtk/details.c:963
 msgid "Location"
-msgstr ""
+msgstr "Lokasi"
 
 #: ../gtk/details.c:969
 msgid "Destination folder:"
-msgstr ""
+msgstr "Folder destinasi:"
 
 #: ../gtk/details.c:976
 msgid "Torrent file:"
-msgstr ""
+msgstr "Fail torrent:"
 
 #: ../gtk/details.c:1024
 #, c-format
 msgid "%.1f%%"
-msgstr ""
+msgstr "%.1f%%"
 
 #: ../gtk/details.c:1030
 #, c-format
@@ -451,19 +451,19 @@ msgstr ""
 
 #: ../gtk/details.c:1062 ../gtk/util.c:57 ../gtk/util.c:79
 msgid "None"
-msgstr ""
+msgstr "Tiada"
 
 #: ../gtk/details.c:1084
 msgid "Transfer"
-msgstr ""
+msgstr "Pemindahan"
 
 #: ../gtk/details.c:1087
 msgid "State:"
-msgstr ""
+msgstr "Keadaan:"
 
 #: ../gtk/details.c:1090
 msgid "Progress:"
-msgstr ""
+msgstr "Kemajuan:"
 
 #. "Have" refers to how much of the torrent we have
 #: ../gtk/details.c:1094
@@ -472,11 +472,11 @@ msgstr ""
 
 #: ../gtk/details.c:1097 ../gtk/stats.c:149 ../gtk/stats.c:161
 msgid "Downloaded:"
-msgstr ""
+msgstr "Telah Dimuat turun:"
 
 #: ../gtk/details.c:1100 ../gtk/stats.c:147 ../gtk/stats.c:159
 msgid "Uploaded:"
-msgstr ""
+msgstr "Telah dimuatnaik"
 
 #: ../gtk/details.c:1104
 msgid "Failed DL:"
@@ -484,7 +484,7 @@ msgstr ""
 
 #: ../gtk/details.c:1107 ../gtk/stats.c:151 ../gtk/stats.c:163
 msgid "Ratio:"
-msgstr ""
+msgstr "Nisbah:"
 
 #: ../gtk/details.c:1110
 msgid "Swarm rate:"
@@ -492,19 +492,19 @@ msgstr ""
 
 #: ../gtk/details.c:1113
 msgid "Error:"
-msgstr ""
+msgstr "Ralat:"
 
 #: ../gtk/details.c:1117
 msgid "Completion"
-msgstr ""
+msgstr "Pelengkapan"
 
 #: ../gtk/details.c:1129
 msgid "Dates"
-msgstr ""
+msgstr "Haribulan"
 
 #: ../gtk/details.c:1132
 msgid "Started at:"
-msgstr ""
+msgstr "Dimulakan pada:"
 
 #: ../gtk/details.c:1135
 msgid "Last activity at:"
@@ -512,7 +512,7 @@ msgstr ""
 
 #: ../gtk/details.c:1226 ../gtk/tr-prefs.c:504 ../gtk/tr-prefs.c:1107
 msgid "Limits"
-msgstr ""
+msgstr "Had"
 
 #: ../gtk/details.c:1230 ../gtk/tr-prefs.c:1109
 msgid "Limit _download speed (KB/s):"
@@ -528,11 +528,11 @@ msgstr ""
 
 #: ../gtk/details.c:1272
 msgid "_Maximum peers:"
-msgstr ""
+msgstr "_Peer Maksima:"
 
 #: ../gtk/details.c:1327 ../gtk/makemeta-ui.c:427 ../gtk/tr-prefs.c:1363
 msgid "Trackers"
-msgstr ""
+msgstr "Tracker"
 
 #: ../gtk/details.c:1333
 msgid "Scrape"
@@ -552,11 +552,11 @@ msgstr ""
 
 #: ../gtk/details.c:1351
 msgid "Announce"
-msgstr ""
+msgstr "Mengumumkan"
 
 #: ../gtk/details.c:1355
 msgid "Tracker:"
-msgstr ""
+msgstr "Tracker:"
 
 #: ../gtk/details.c:1357
 msgid "Last announce at:"
@@ -578,37 +578,37 @@ msgstr ""
 
 #: ../gtk/details.c:1438
 msgid "Now"
-msgstr ""
+msgstr "Sekarang"
 
 #. create the dialog
 #: ../gtk/details.c:1489
 #, c-format
 msgid "%s Properties"
-msgstr ""
+msgstr "Ciri-ciri %s"
 
 #: ../gtk/details.c:1507
 msgid "Activity"
-msgstr ""
+msgstr "Aktiviti"
 
 #: ../gtk/details.c:1512 ../gtk/tr-prefs.c:1348
 msgid "Peers"
-msgstr ""
+msgstr "Peer"
 
 #: ../gtk/details.c:1517 ../gtk/tr-window.c:525
 msgid "Tracker"
-msgstr ""
+msgstr "Tracker"
 
 #: ../gtk/details.c:1521 ../gtk/msgwin.c:193
 msgid "Information"
-msgstr ""
+msgstr "Informasi"
 
 #: ../gtk/details.c:1527 ../gtk/tr-window.c:525
 msgid "Files"
-msgstr ""
+msgstr "Fail"
 
 #: ../gtk/details.c:1532 ../gtk/tr-prefs.c:344 ../gtk/tr-prefs.c:512
 msgid "Options"
-msgstr ""
+msgstr "Pilihan"
 
 #: ../gtk/dialogs.c:120
 msgid "<big><b>Quit Transmission?</b></big>"
@@ -656,35 +656,35 @@ msgstr[1] ""
 
 #: ../gtk/file-list.c:622
 msgid "High"
-msgstr ""
+msgstr "Tinggi"
 
 #: ../gtk/file-list.c:626
 msgid "Normal"
-msgstr ""
+msgstr "Normal"
 
 #: ../gtk/file-list.c:630
 msgid "Low"
-msgstr ""
+msgstr "Rendah"
 
 #: ../gtk/file-list.c:634
 msgid "Mixed"
-msgstr ""
+msgstr "Campuran"
 
 #: ../gtk/file-list.c:664 ../gtk/file-list.c:814
 msgid "Download"
-msgstr ""
+msgstr "Muatturun"
 
 #: ../gtk/file-list.c:665 ../gtk/file-list.c:821
 msgid "Priority"
-msgstr ""
+msgstr "Prioriti"
 
 #: ../gtk/file-list.c:793
 msgid "File"
-msgstr ""
+msgstr "Fail"
 
 #: ../gtk/file-list.c:807
 msgid "Progress"
-msgstr ""
+msgstr "Perkembangan"
 
 #: ../gtk/main.c:361
 msgid "Start with all torrents paused"
@@ -704,7 +704,7 @@ msgstr ""
 
 #: ../gtk/main.c:383
 msgid "Transmission"
-msgstr ""
+msgstr "Transmission"
 
 #: ../gtk/main.c:390
 msgid "[torrent files]"
@@ -728,7 +728,7 @@ msgstr ""
 
 #: ../gtk/main.c:787
 msgid "_Quit Now"
-msgstr ""
+msgstr "_Tutup sekarang"
 
 #: ../gtk/main.c:946
 msgid "Couldn't add corrupt torrent"
@@ -758,7 +758,8 @@ msgstr ""
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
-"  Muhammad Zul 'Izzi M.Z https://launchpad.net/~babylon2233"
+"  Muhammad Zul 'Izzi M.Z https://launchpad.net/~babylon2233\n"
+"  melayubuntu https://launchpad.net/~zul-malc"
 
 #: ../gtk/makemeta-ui.c:111
 msgid "Torrent created!"

@@ -9,14 +9,14 @@ msgstr ""
 "Project-Id-Version: transmission 1.06\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2009-02-23 17:50-0600\n"
-"PO-Revision-Date: 2009-02-01 20:37+0000\n"
+"PO-Revision-Date: 2009-03-07 15:18+0000\n"
 "Last-Translator: Geir Hauge <Unknown>\n"
 "Language-Team: Norwegian <en@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2009-02-26 18:32+0000\n"
+"X-Launchpad-Export-Date: 2009-04-13 01:49+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -137,11 +137,11 @@ msgstr "Stopp alle torrentene"
 
 #: ../gtk/actions.c:123
 msgid "_Start All"
-msgstr ""
+msgstr "_Start alle"
 
 #: ../gtk/actions.c:123
 msgid "Start all torrents"
-msgstr ""
+msgstr "Start alle torrentene"
 
 #: ../gtk/actions.c:124
 msgid "Remove torrent"
@@ -1137,7 +1137,7 @@ msgstr "_Aktiver vevgrensesnitt"
 
 #: ../gtk/tr-prefs.c:740
 msgid "_Open web interface"
-msgstr ""
+msgstr "_Åpne vevgrensesnitt"
 
 #: ../gtk/tr-prefs.c:749 ../gtk/tr-prefs.c:1299
 msgid "Listening _port:"
@@ -1461,7 +1461,7 @@ msgstr "Klarte ikke å lese gjennopptakingsfila"
 #: ../libtransmission/fdlimit.c:217
 #, c-format
 msgid "Couldn't create \"%1$s\": parent folder \"%2$s\" does not exist"
-msgstr ""
+msgstr "Klarte ikke å opprette «%1$s»: foreldermappen «%2$s» eksisterer ikke"
 
 #: ../libtransmission/fdlimit.c:240
 #, c-format

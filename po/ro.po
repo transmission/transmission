@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-02-23 17:50-0600\n"
-"PO-Revision-Date: 2009-01-31 12:12+0000\n"
+"PO-Revision-Date: 2009-03-01 07:01+0000\n"
 "Last-Translator: Manuel R. Ciosici <manuelciosici@yahoo.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n == 1 ? 0: (((n % 100 > 19) || ((n % 100 "
 "== 0) && (n != 0))) ? 2: 1));\n"
-"X-Launchpad-Export-Date: 2009-02-26 18:33+0000\n"
+"X-Launchpad-Export-Date: 2009-04-13 01:48+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -51,7 +51,7 @@ msgstr "Sortare după _vechime"
 
 #: ../gtk/actions.c:78
 msgid "_Main Window"
-msgstr "Fereastra _principală"
+msgstr "Fereastră _Principală"
 
 #: ../gtk/actions.c:80
 msgid "Message _Log"
@@ -87,7 +87,7 @@ msgstr "_Vizualizare"
 
 #: ../gtk/actions.c:113
 msgid "_Sort Torrents By"
-msgstr "_Sortează torrent-ele după"
+msgstr "_Sortează torrentele după"
 
 #: ../gtk/actions.c:114
 msgid "_Edit"
@@ -111,7 +111,7 @@ msgstr "_Start"
 
 #: ../gtk/actions.c:118
 msgid "Start torrent"
-msgstr "Pornește torrent"
+msgstr "Porneşte torrentul"
 
 #: ../gtk/actions.c:119
 msgid "_Statistics"
@@ -139,19 +139,19 @@ msgstr "Pauză toate torrentele"
 
 #: ../gtk/actions.c:123
 msgid "_Start All"
-msgstr ""
+msgstr "Pornire _toate"
 
 #: ../gtk/actions.c:123
 msgid "Start all torrents"
-msgstr ""
+msgstr "Pornește toate torentele"
 
 #: ../gtk/actions.c:124
 msgid "Remove torrent"
-msgstr "Elimină torrent-ul"
+msgstr "Elimină torrentul"
 
 #: ../gtk/actions.c:125
 msgid "_Delete Files and Remove"
-msgstr "Şterge_ fişierele şi elimină"
+msgstr "Şterge_ fişierele şi elimină-le"
 
 #: ../gtk/actions.c:126
 msgid "_New..."
@@ -223,7 +223,7 @@ msgstr "Dosar _destinație:"
 
 #: ../gtk/add-dialog.c:339
 msgid "Select Destination Folder"
-msgstr "Alege dosarul de destinaţie"
+msgstr "Alegeți dosarul de destinaţie"
 
 #: ../gtk/add-dialog.c:437
 msgid "Add a Torrent"
@@ -248,7 +248,7 @@ msgstr "Nu s-a putut obține lista de blocare"
 
 #: ../gtk/blocklist.c:132
 msgid "Uncompressing blocklist..."
-msgstr "Se dezarhivez lista celor blocați..."
+msgstr "Se dezarhivează lista celor blocați..."
 
 #: ../gtk/blocklist.c:142
 msgid "Parsing blocklist..."
@@ -385,7 +385,7 @@ msgstr "%1$s de câte %2$s"
 
 #: ../gtk/details.c:922
 msgid "Pieces:"
-msgstr "Părţi:"
+msgstr "Bucăţi"
 
 #: ../gtk/details.c:930
 msgid "Hash:"
@@ -393,11 +393,11 @@ msgstr "Hash:"
 
 #: ../gtk/details.c:933
 msgid "Private to this tracker -- PEX disabled"
-msgstr "Privat pentru acest tracker -- PEX dezabilitat"
+msgstr "Privat pentru acest tracker -- PEX dezactivat"
 
 #: ../gtk/details.c:934
 msgid "Public torrent"
-msgstr "Publică torent"
+msgstr "Torrent public"
 
 #: ../gtk/details.c:936
 msgid "Privacy:"
@@ -429,7 +429,7 @@ msgstr "Locație"
 
 #: ../gtk/details.c:969
 msgid "Destination folder:"
-msgstr "Director destinație:"
+msgstr "Dosarul destinație:"
 
 #: ../gtk/details.c:976
 msgid "Torrent file:"
@@ -472,7 +472,7 @@ msgstr "Avansare:"
 #. "Have" refers to how much of the torrent we have
 #: ../gtk/details.c:1094
 msgid "Have:"
-msgstr "Obţinuţi:"
+msgstr "Obţinut:"
 
 #: ../gtk/details.c:1097 ../gtk/stats.c:149 ../gtk/stats.c:161
 msgid "Downloaded:"
@@ -620,7 +620,7 @@ msgstr "<big><b>Închid Transmission?</b></big>"
 
 #: ../gtk/dialogs.c:133
 msgid "_Don't ask me again"
-msgstr "Nu întreba _din nou"
+msgstr "_Nu mă întreba din nou"
 
 #: ../gtk/dialogs.c:235
 msgid "Remove torrent?"
@@ -774,6 +774,7 @@ msgstr ""
 "  Adrian Harabulă https://launchpad.net/~opensoft\n"
 "  Bogdan Bădic-Spătariu https://launchpad.net/~thelad33\n"
 "  Cris G https://launchpad.net/~krig-tiscali\n"
+"  George Enea https://launchpad.net/~premamotion\n"
 "  Ionuț Jula https://launchpad.net/~ionutjula\n"
 "  Lucian Adrian Grijincu https://launchpad.net/~lucian.grijincu\n"
 "  MBogdan https://launchpad.net/~m-for-mike\n"
@@ -787,7 +788,7 @@ msgstr "Torrent creat!"
 #: ../gtk/makemeta-ui.c:116 ../gtk/makemeta-ui.c:132 ../gtk/makemeta-ui.c:146
 #, c-format
 msgid "Torrent creation failed: %s"
-msgstr "Creare torrent eșuată: %s"
+msgstr "Crearea torrentului a eșuat: %s"
 
 #: ../gtk/makemeta-ui.c:117
 msgid "Invalid URL"
@@ -820,11 +821,11 @@ msgstr[2] "<i>%1$s; %2$'d de fișiere</i>"
 
 #: ../gtk/makemeta-ui.c:354
 msgid "Choose Directory"
-msgstr "Alege director"
+msgstr "Alegeți directorul"
 
 #: ../gtk/makemeta-ui.c:363
 msgid "Choose File"
-msgstr "Alege fişier"
+msgstr "Alegeți fișierul"
 
 #: ../gtk/makemeta-ui.c:379
 msgid "New Torrent"
@@ -866,7 +867,7 @@ msgstr "Fișierul „%1$s\": %2$s nu a putut fi salvat"
 
 #: ../gtk/msgwin.c:149
 msgid "Save Log"
-msgstr "Salvează istoricul"
+msgstr "Salvează jurnalul"
 
 #: ../gtk/msgwin.c:192
 msgid "Error"
@@ -993,7 +994,7 @@ msgstr "Inactiv"
 
 #: ../gtk/torrent-cell-renderer.c:142
 msgid "Paused"
-msgstr "Pauză"
+msgstr "Suspendat"
 
 #: ../gtk/torrent-cell-renderer.c:146
 msgid "Waiting to verify local data"
@@ -1082,7 +1083,7 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:300
 msgid "Adding Torrents"
-msgstr "Se adaugă torrent-e"
+msgstr "Se adaugă torrentele"
 
 #: ../gtk/tr-prefs.c:303
 msgid "Automatically _add torrents from:"
@@ -1155,7 +1156,7 @@ msgstr "_Activează interfața web"
 
 #: ../gtk/tr-prefs.c:740
 msgid "_Open web interface"
-msgstr ""
+msgstr "Deschide interfața _web"
 
 #: ../gtk/tr-prefs.c:749 ../gtk/tr-prefs.c:1299
 msgid "Listening _port:"
@@ -1487,7 +1488,7 @@ msgstr "Nu s-a putut citi fișierul de reluare"
 #: ../libtransmission/fdlimit.c:217
 #, c-format
 msgid "Couldn't create \"%1$s\": parent folder \"%2$s\" does not exist"
-msgstr ""
+msgstr "Nu s-a putut crea \"%1$s\": dosarul părinte \"%2$s\" nu există"
 
 #: ../libtransmission/fdlimit.c:240
 #, c-format

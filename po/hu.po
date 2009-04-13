@@ -9,14 +9,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-02-23 17:50-0600\n"
-"PO-Revision-Date: 2008-11-23 22:03+0000\n"
+"PO-Revision-Date: 2009-04-03 10:03+0000\n"
 "Last-Translator: Gabor Kelemen <kelemeng@gnome.hu>\n"
 "Language-Team: <hu@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2009-02-26 18:32+0000\n"
+"X-Launchpad-Export-Date: 2009-04-13 01:48+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -129,19 +129,19 @@ msgstr "Torrent megállítása"
 
 #: ../gtk/actions.c:122
 msgid "_Pause All"
-msgstr ""
+msgstr "Összes f_elfüggesztése"
 
 #: ../gtk/actions.c:122
 msgid "Pause all torrents"
-msgstr ""
+msgstr "Minden torrent felfüggesztése"
 
 #: ../gtk/actions.c:123
 msgid "_Start All"
-msgstr ""
+msgstr "Összes i_ndítása"
 
 #: ../gtk/actions.c:123
 msgid "Start all torrents"
-msgstr ""
+msgstr "Minden torrent elindítása"
 
 #: ../gtk/actions.c:124
 msgid "Remove torrent"
@@ -173,7 +173,7 @@ msgstr "Kije_lölések megszüntetése"
 
 #: ../gtk/actions.c:131
 msgid "Torrent properties"
-msgstr ""
+msgstr "Torrent tulajdonságai"
 
 #: ../gtk/actions.c:132
 msgid "_Open Folder"
@@ -448,7 +448,7 @@ msgstr "%1$.1f %% (%2$.1f %% kiválasztva)"
 #: ../gtk/details.c:1042
 #, c-format
 msgid "%1$s (%2$s verified in %3$d pieces)"
-msgstr ""
+msgstr "%1$s (%3$d darabból %2$s ellenőrizve)"
 
 #: ../gtk/details.c:1062 ../gtk/util.c:57 ../gtk/util.c:79
 msgid "None"
@@ -585,7 +585,7 @@ msgstr "Most"
 #: ../gtk/details.c:1489
 #, c-format
 msgid "%s Properties"
-msgstr ""
+msgstr "%s tulajdonságai"
 
 #: ../gtk/details.c:1507
 msgid "Activity"
@@ -634,26 +634,26 @@ msgstr[1] "Törli a torrentek letöltött fájljait?"
 #: ../gtk/dialogs.c:254
 msgid "This torrent has not finished downloading."
 msgid_plural "These torrents have not finished downloading."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "A torrent letöltése még nem fejeződött be."
+msgstr[1] "A torrentek letöltése még nem fejeződött be."
 
 #: ../gtk/dialogs.c:260
 msgid "This torrent is connected to peers."
 msgid_plural "These torrents are connected to peers."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Ez a torrent partnerekhez csatlakozik."
+msgstr[1] "Ezek a torrentek partnerekhez csatlakoznak."
 
 #: ../gtk/dialogs.c:267
 msgid "One of these torrents is connected to peers."
 msgid_plural "Some of these torrents are connected to peers."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "A torrentek egyike partnerekhez csatlakozik."
+msgstr[1] "Néhány torrent partnerekhez csatlakozik."
 
 #: ../gtk/dialogs.c:274
 msgid "One of these torrents has not finished downloading."
 msgid_plural "Some of these torrents have not finished downloading."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Egy torrent letöltése még nem fejeződött be."
+msgstr[1] "Néhány torrent letöltése még nem fejeződött be."
 
 #: ../gtk/file-list.c:622
 msgid "High"
@@ -673,7 +673,7 @@ msgstr "Vegyes"
 
 #: ../gtk/file-list.c:664 ../gtk/file-list.c:814
 msgid "Download"
-msgstr ""
+msgstr "Letöltés"
 
 #: ../gtk/file-list.c:665 ../gtk/file-list.c:821
 msgid "Priority"
@@ -681,7 +681,7 @@ msgstr "Prioritás"
 
 #: ../gtk/file-list.c:793
 msgid "File"
-msgstr ""
+msgstr "Fájl"
 
 #: ../gtk/file-list.c:807
 msgid "Progress"
@@ -749,7 +749,7 @@ msgstr "Gyors és egyszerű  BitTorrent kliens"
 
 #: ../gtk/main.c:1227
 msgid "Copyright 2005-2009 The Transmission Project"
-msgstr ""
+msgstr "Copyright 2005-2009 The Transmission Project"
 
 #. Translators: translate "translator-credits" as
 #. your name
@@ -769,6 +769,7 @@ msgstr ""
 "  Incze GASPAR https://launchpad.net/~inczegaspar\n"
 "  Messó https://launchpad.net/~redhat24\n"
 "  Pittmann Tamás https://launchpad.net/~zaivaldi\n"
+"  Úr Balázs https://launchpad.net/~urbalazs\n"
 "  Γριφεγ https://launchpad.net/~grfgguvf"
 
 #: ../gtk/makemeta-ui.c:111
@@ -1081,7 +1082,7 @@ msgstr "Forrásfájlok át_helyezése a Kukába"
 
 #: ../gtk/tr-prefs.c:346
 msgid "Inhibit desktop _hibernation when torrents are active"
-msgstr ""
+msgstr "Számítógép _hibernálásának tiltása, ha vannak aktív torrentek"
 
 #: ../gtk/tr-prefs.c:350
 msgid "Show _icon in the desktop Notification Area"
@@ -1089,7 +1090,7 @@ msgstr "_Ikon megjelenítése az értesítési területen"
 
 #: ../gtk/tr-prefs.c:354
 msgid "Show desktop _notifications"
-msgstr ""
+msgstr "Asztali értesítések megjelenítése"
 
 #: ../gtk/tr-prefs.c:384
 #, c-format
@@ -1141,7 +1142,7 @@ msgstr "_Webes felület engedélyezése"
 
 #: ../gtk/tr-prefs.c:740
 msgid "_Open web interface"
-msgstr ""
+msgstr "_Webes felület megnyitása"
 
 #: ../gtk/tr-prefs.c:749 ../gtk/tr-prefs.c:1299
 msgid "Listening _port:"
@@ -1466,7 +1467,7 @@ msgstr "A folytatáshoz szükséges adatok nem olvashatók"
 #: ../libtransmission/fdlimit.c:217
 #, c-format
 msgid "Couldn't create \"%1$s\": parent folder \"%2$s\" does not exist"
-msgstr ""
+msgstr "A(z) „%1$s” nem hozható létre: a szülőmappa („%2$s”) nem létezik."
 
 #: ../libtransmission/fdlimit.c:240
 #, c-format
@@ -1522,7 +1523,7 @@ msgstr ""
 #: ../libtransmission/net.c:572
 #, c-format
 msgid "Couldn't bind port %d on %s: %s"
-msgstr ""
+msgstr "Nem lehet csatlakoztatni a portot (%d) ezen: %s: %s"
 
 #: ../libtransmission/port-forwarding.c:32
 msgid "Port Forwarding"
@@ -1552,12 +1553,13 @@ msgstr "Az állapot megváltoztatva: „%1$s” -> „%2$s”"
 #: ../libtransmission/port-forwarding.c:115
 #, c-format
 msgid "Closing port %d on %s"
-msgstr ""
+msgstr "A port (%d) bezárása a következőn: %s"
 
 #: ../libtransmission/port-forwarding.c:152
 #, c-format
 msgid "Opened port %d on %s to listen for incoming peer connections"
 msgstr ""
+"A bejövő kapcsolatok figyelésére szolgáló port (%d) kinyitva a következőn: %s"
 
 #: ../libtransmission/port-forwarding.c:160
 #, c-format
@@ -1565,6 +1567,8 @@ msgid ""
 "Couldn't open port %d on %s to listen for incoming peer connections (errno "
 "%d - %s)"
 msgstr ""
+"Nem lehet megnyitni a portot (%d) a következőn: %s a bejövő "
+"partnerkapcsolatok figyelésére (hibaszám: %d - %s)"
 
 #. first %s is the application name
 #. second %s is the version number

@@ -16,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n % 100 >= "
 "3 && n % 100 <= 10 ? 3 : n % 100 >= 11 && n % 100 <= 99 ? 4 : 5;\n"
-"X-Launchpad-Export-Date: 2009-02-26 18:32+0000\n"
+"X-Launchpad-Export-Date: 2009-04-13 01:49+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -771,10 +771,10 @@ msgstr ""
 "  Alamoudi https://launchpad.net/~alamoudei\n"
 "  Benjamin Geer https://launchpad.net/~benjamin-geer\n"
 "  Khaled Hosny https://launchpad.net/~khaledhosny\n"
-"  Mohammad Alhobayyeb https://launchpad.net/~mih1406\n"
 "  Mohammed Adnène Trojette https://launchpad.net/~adn+ubuntu\n"
 "  r00t020 https://launchpad.net/~r00t020\n"
-"  صقر بن عبدالله https://launchpad.net/~agari"
+"  صقر بن عبدالله https://launchpad.net/~agari\n"
+"  محمد إبراهيم الحبيِّب https://launchpad.net/~mih1406"
 
 #: ../gtk/makemeta-ui.c:111
 msgid "Torrent created!"

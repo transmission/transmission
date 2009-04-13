@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-02-23 17:50-0600\n"
-"PO-Revision-Date: 2009-01-20 14:16+0000\n"
+"PO-Revision-Date: 2009-03-19 23:50+0000\n"
 "Last-Translator: Daniel Nylander <yeager@ubuntu.com>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2009-02-26 18:33+0000\n"
+"X-Launchpad-Export-Date: 2009-04-13 01:49+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -128,7 +128,7 @@ msgstr "Pausa torrentfil"
 
 #: ../gtk/actions.c:122
 msgid "_Pause All"
-msgstr "_Pausa alla"
+msgstr "Pausa a_lla"
 
 #: ../gtk/actions.c:122
 msgid "Pause all torrents"
@@ -136,11 +136,11 @@ msgstr "Pausa alla torrentfiler"
 
 #: ../gtk/actions.c:123
 msgid "_Start All"
-msgstr ""
+msgstr "_Starta alla"
 
 #: ../gtk/actions.c:123
 msgid "Start all torrents"
-msgstr ""
+msgstr "Starta alla torrentfiler"
 
 #: ../gtk/actions.c:124
 msgid "Remove torrent"
@@ -1139,7 +1139,7 @@ msgstr "_Aktivera webbgränssnitt"
 
 #: ../gtk/tr-prefs.c:740
 msgid "_Open web interface"
-msgstr ""
+msgstr "_Öppna webbgränssnitt"
 
 #: ../gtk/tr-prefs.c:749 ../gtk/tr-prefs.c:1299
 msgid "Listening _port:"
@@ -1464,7 +1464,7 @@ msgstr "Kunde inte läsa återupptagningsfil"
 #: ../libtransmission/fdlimit.c:217
 #, c-format
 msgid "Couldn't create \"%1$s\": parent folder \"%2$s\" does not exist"
-msgstr ""
+msgstr "Kunde inte skapa \"%1$s\": föräldramappen \"%2$s\" finns inte"
 
 #: ../libtransmission/fdlimit.c:240
 #, c-format

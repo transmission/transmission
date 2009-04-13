@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2009-02-23 17:50-0600\n"
-"PO-Revision-Date: 2009-01-20 10:39+0000\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"PO-Revision-Date: 2009-03-16 05:29+0000\n"
+"Last-Translator: Shin Hungjae <f9mbfxzcdve8@gmail.com>\n"
 "Language-Team: Korean <ko@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2009-02-26 18:33+0000\n"
+"X-Launchpad-Export-Date: 2009-04-13 01:49+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -24,43 +24,43 @@ msgstr ""
 
 #: ../gtk/actions.c:49
 msgid "Sort by _Name"
-msgstr ""
+msgstr "이름으로 정렬(_N)"
 
 #: ../gtk/actions.c:51
 msgid "Sort by _Progress"
-msgstr ""
+msgstr "프로그레스바로 정렬(_P)"
 
 #: ../gtk/actions.c:53
 msgid "Sort by _Ratio"
-msgstr ""
+msgstr "비율로 정렬(_R)"
 
 #: ../gtk/actions.c:55
 msgid "Sort by _State"
-msgstr ""
+msgstr "상태로 정렬(_S)"
 
 #: ../gtk/actions.c:57
 msgid "Sort by _Tracker"
-msgstr ""
+msgstr "트랙으로 정렬(_T)"
 
 #: ../gtk/actions.c:59
 msgid "Sort by A_ge"
-msgstr ""
+msgstr "오래된 순서로 정렬(_A)"
 
 #: ../gtk/actions.c:78
 msgid "_Main Window"
-msgstr ""
+msgstr "주 창(_M)"
 
 #: ../gtk/actions.c:80
 msgid "Message _Log"
-msgstr ""
+msgstr "메세지 로그(_L)"
 
 #: ../gtk/actions.c:96
 msgid "_Minimal View"
-msgstr ""
+msgstr "작은 화면(_M)"
 
 #: ../gtk/actions.c:99
 msgid "_Reverse Sort Order"
-msgstr ""
+msgstr "정렬 순서 반전(_R)"
 
 #: ../gtk/actions.c:102
 msgid "_Filterbar"
@@ -68,19 +68,19 @@ msgstr ""
 
 #: ../gtk/actions.c:104
 msgid "_Statusbar"
-msgstr ""
+msgstr "상태바(_S)"
 
 #: ../gtk/actions.c:106
 msgid "_Toolbar"
-msgstr ""
+msgstr "툴바(_T)"
 
 #: ../gtk/actions.c:111
 msgid "_Torrent"
-msgstr ""
+msgstr "토런트(_T)"
 
 #: ../gtk/actions.c:112
 msgid "_View"
-msgstr ""
+msgstr "보기(_V)"
 
 #: ../gtk/actions.c:113
 msgid "_Sort Torrents By"
@@ -88,99 +88,99 @@ msgstr ""
 
 #: ../gtk/actions.c:114
 msgid "_Edit"
-msgstr ""
+msgstr "편집(_E)"
 
 #: ../gtk/actions.c:115
 msgid "_Help"
-msgstr ""
+msgstr "도움말(_H)"
 
 #: ../gtk/actions.c:116 ../gtk/actions.c:117
 msgid "Add a torrent"
-msgstr ""
+msgstr "토런트 추가"
 
 #: ../gtk/actions.c:117
 msgid "_Add..."
-msgstr ""
+msgstr "추가(_A)..."
 
 #: ../gtk/actions.c:118
 msgid "_Start"
-msgstr ""
+msgstr "시작(_S)"
 
 #: ../gtk/actions.c:118
 msgid "Start torrent"
-msgstr ""
+msgstr "토런트 시작"
 
 #: ../gtk/actions.c:119
 msgid "_Statistics"
-msgstr ""
+msgstr "통계(_S)"
 
 #: ../gtk/actions.c:120 ../gtk/add-dialog.c:364
 msgid "_Verify Local Data"
-msgstr ""
+msgstr "지역 데이터 검사(_V)"
 
 #: ../gtk/actions.c:121
 msgid "_Pause"
-msgstr ""
+msgstr "중지(_P)"
 
 #: ../gtk/actions.c:121
 msgid "Pause torrent"
-msgstr ""
+msgstr "토런트 중지"
 
 #: ../gtk/actions.c:122
 msgid "_Pause All"
-msgstr ""
+msgstr "전체 중지(_P)"
 
 #: ../gtk/actions.c:122
 msgid "Pause all torrents"
-msgstr ""
+msgstr "모든 토런트 중지"
 
 #: ../gtk/actions.c:123
 msgid "_Start All"
-msgstr ""
+msgstr "모두 시작(_S)"
 
 #: ../gtk/actions.c:123
 msgid "Start all torrents"
-msgstr ""
+msgstr "모든 토런트 시작"
 
 #: ../gtk/actions.c:124
 msgid "Remove torrent"
-msgstr ""
+msgstr "토런트 삭제"
 
 #: ../gtk/actions.c:125
 msgid "_Delete Files and Remove"
-msgstr ""
+msgstr "파일을 삭제하고 제거(_D)"
 
 #: ../gtk/actions.c:126
 msgid "_New..."
-msgstr ""
+msgstr "새(_N)..."
 
 #: ../gtk/actions.c:126
 msgid "Create a torrent"
-msgstr ""
+msgstr "토런트 만들기"
 
 #: ../gtk/actions.c:127
 msgid "_Quit"
-msgstr ""
+msgstr "종료(_Q)"
 
 #: ../gtk/actions.c:128
 msgid "Select _All"
-msgstr ""
+msgstr "모두 선택(_A)"
 
 #: ../gtk/actions.c:129
 msgid "Dese_lect All"
-msgstr ""
+msgstr "모두 선택하지 않음(_l)"
 
 #: ../gtk/actions.c:131
 msgid "Torrent properties"
-msgstr ""
+msgstr "토런트 속성"
 
 #: ../gtk/actions.c:132
 msgid "_Open Folder"
-msgstr ""
+msgstr "폴더 열기(_O)"
 
 #: ../gtk/actions.c:134
 msgid "_Contents"
-msgstr ""
+msgstr "내용(_C)"
 
 #: ../gtk/actions.c:135
 msgid "Ask Tracker for _More Peers"
@@ -188,60 +188,60 @@ msgstr ""
 
 #: ../gtk/add-dialog.c:241
 msgid "Torrent files"
-msgstr ""
+msgstr "토런트 파일"
 
 #: ../gtk/add-dialog.c:246
 msgid "All files"
-msgstr ""
+msgstr "모든 파일"
 
 #: ../gtk/add-dialog.c:274
 msgid "Torrent Options"
-msgstr ""
+msgstr "토런트 옵션"
 
 #: ../gtk/add-dialog.c:298
 msgid "_Move source file to Trash"
-msgstr ""
+msgstr "소스파일을 쓰레기통으로 버리기"
 
 #: ../gtk/add-dialog.c:300 ../gtk/tr-prefs.c:316
 msgid "_Start when added"
-msgstr ""
+msgstr "추가시 시작하기(_S)"
 
 #: ../gtk/add-dialog.c:311
 msgid "_Torrent file:"
-msgstr ""
+msgstr "토런트 파일(_T):"
 
 #: ../gtk/add-dialog.c:317
 msgid "Select Source File"
-msgstr ""
+msgstr "선택된 소프 파일"
 
 #: ../gtk/add-dialog.c:332 ../gtk/tr-prefs.c:325
 msgid "_Destination folder:"
-msgstr ""
+msgstr "대상 폴더(_D):"
 
 #: ../gtk/add-dialog.c:339
 msgid "Select Destination Folder"
-msgstr ""
+msgstr "대상 폴더 선택"
 
 #: ../gtk/add-dialog.c:437
 msgid "Add a Torrent"
-msgstr ""
+msgstr "토런트 추가"
 
 #: ../gtk/add-dialog.c:454 ../gtk/tr-prefs.c:312
 msgid "Display _options dialog"
-msgstr ""
+msgstr "옵션대화상자 보이기(o)"
 
 #: ../gtk/blocklist.c:90
 msgid "Retrieving blocklist..."
-msgstr ""
+msgstr "차단목록 받는중..."
 
 #: ../gtk/blocklist.c:100
 #, c-format
 msgid "Unable to get blocklist: %s"
-msgstr ""
+msgstr "차단목록을 받을 수 없음: %s"
 
 #: ../gtk/blocklist.c:126
 msgid "Unable to get blocklist."
-msgstr ""
+msgstr "차단목록을 받을 수 없음."
 
 #: ../gtk/blocklist.c:132
 msgid "Uncompressing blocklist..."
@@ -249,30 +249,30 @@ msgstr ""
 
 #: ../gtk/blocklist.c:142
 msgid "Parsing blocklist..."
-msgstr ""
+msgstr "차단목록 해석중..."
 
 #: ../gtk/blocklist.c:149
 #, c-format
 msgid "Blocklist updated with %'d entries"
-msgstr ""
+msgstr "%'d 전체를 포함한 차단목록 갱신됨."
 
 #: ../gtk/conf.c:63 ../gtk/makemeta-ui.c:142 ../libtransmission/fdlimit.c:228
 #: ../libtransmission/metainfo.c:98 ../libtransmission/utils.c:589
 #: ../libtransmission/utils.c:600
 #, c-format
 msgid "Couldn't create \"%1$s\": %2$s"
-msgstr ""
+msgstr "\"%1$s\"를 만들수 없음. %2$s"
 
 #: ../gtk/conf.c:88 ../libtransmission/bencode.c:1427
 #: ../libtransmission/fdlimit.c:257
 #, c-format
 msgid "Couldn't open \"%1$s\": %2$s"
-msgstr ""
+msgstr "\"%1$s\"를 열 수 없음. %2$s"
 
 #: ../gtk/conf.c:93
 #, c-format
 msgid "%s is already running."
-msgstr ""
+msgstr "%s는 이미 실행중임."
 
 #: ../gtk/details.c:274
 msgid "Web Seeds"
@@ -281,29 +281,29 @@ msgstr ""
 #. 'download speed' column header. terse to keep the column narrow.
 #: ../gtk/details.c:276 ../gtk/details.c:318
 msgid "Down"
-msgstr ""
+msgstr "받기"
 
 #: ../gtk/details.c:316
 msgid "Address"
-msgstr ""
+msgstr "주소"
 
 #. 'upload speed' column header.  terse to keep the column narrow.
 #: ../gtk/details.c:320
 msgid "Up"
-msgstr ""
+msgstr "올리기"
 
 #: ../gtk/details.c:321
 msgid "Client"
-msgstr ""
+msgstr "클라이언트"
 
 #. 'percent done' column header. terse to keep the column narrow.
 #: ../gtk/details.c:323
 msgid "%"
-msgstr ""
+msgstr "%"
 
 #: ../gtk/details.c:325
 msgid "Status"
-msgstr ""
+msgstr "상태"
 
 #: ../gtk/details.c:619
 msgid "Optimistic unchoke"
@@ -758,7 +758,8 @@ msgstr ""
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
-"  Exsecrabilus https://launchpad.net/~exsecrabilus"
+"  Exsecrabilus https://launchpad.net/~exsecrabilus\n"
+"  Shin Hungjae https://launchpad.net/~fplive"
 
 #: ../gtk/makemeta-ui.c:111
 msgid "Torrent created!"

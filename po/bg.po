@@ -9,14 +9,14 @@ msgstr ""
 "Project-Id-Version: Transmission HEAD\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-02-23 17:50-0600\n"
-"PO-Revision-Date: 2009-02-21 14:25+0000\n"
-"Last-Translator: Lachezar Dobrev <Unknown>\n"
+"PO-Revision-Date: 2009-04-03 17:50+0000\n"
+"Last-Translator: Krasimir Chonov <mk2616@abv.bg>\n"
 "Language-Team: Bulgarian <bg@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2009-02-26 18:33+0000\n"
+"X-Launchpad-Export-Date: 2009-04-13 01:49+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:47
@@ -137,11 +137,11 @@ msgstr "Пауза на всички торенти"
 
 #: ../gtk/actions.c:123
 msgid "_Start All"
-msgstr ""
+msgstr "_Стартиране на всички"
 
 #: ../gtk/actions.c:123
 msgid "Start all torrents"
-msgstr ""
+msgstr "Стартиране на всички торенти"
 
 #: ../gtk/actions.c:124
 msgid "Remove torrent"
@@ -765,6 +765,7 @@ msgstr ""
 "  Krasimir Chonov https://launchpad.net/~kchonov\n"
 "  Lachezar Dobrev https://launchpad.net/~lachezar\n"
 "  Lubomir Marinov https://launchpad.net/~lubomir-marinov\n"
+"  Pavlin Grucov https://launchpad.net/~pavlin-grucov\n"
 "  Sabry https://launchpad.net/~sabryhomeit\n"
 "  Siyan Panayotov https://launchpad.net/~xsisqox\n"
 "  avioli https://launchpad.net/~avioli"
@@ -1139,7 +1140,7 @@ msgstr "_Разрешаване на уеб интерфейс"
 
 #: ../gtk/tr-prefs.c:740
 msgid "_Open web interface"
-msgstr ""
+msgstr "_Отваряне на уеб интерфейс"
 
 #: ../gtk/tr-prefs.c:749 ../gtk/tr-prefs.c:1299
 msgid "Listening _port:"
@@ -1465,6 +1466,7 @@ msgstr "Не може да се продължи файла"
 #, c-format
 msgid "Couldn't create \"%1$s\": parent folder \"%2$s\" does not exist"
 msgstr ""
+"Не може да се създаде \"%1$s\": родителската папка \"%2$s\" не съществува"
 
 #: ../libtransmission/fdlimit.c:240
 #, c-format

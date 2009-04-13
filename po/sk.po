@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: Transmission\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-02-23 17:50-0600\n"
-"PO-Revision-Date: 2009-02-01 11:09+0000\n"
-"Last-Translator: mirek <Unknown>\n"
+"PO-Revision-Date: 2009-04-08 14:22+0000\n"
+"Last-Translator: Pavol Klačanský <pavol@klacansky.com>\n"
 "Language-Team: Slovak <sk-i18n@lists.linux.sk>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 1 : (n>=2 && n<=4) ? 2 : 0;\n"
-"X-Launchpad-Export-Date: 2009-02-26 18:33+0000\n"
+"X-Launchpad-Export-Date: 2009-04-13 01:49+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Country: SLOVAKIA\n"
 "X-Poedit-Language: Slovak\n"
@@ -139,11 +139,11 @@ msgstr "Pozastaviť všetky torrenty"
 
 #: ../gtk/actions.c:123
 msgid "_Start All"
-msgstr ""
+msgstr "_Spustiť všetky"
 
 #: ../gtk/actions.c:123
 msgid "Start all torrents"
-msgstr ""
+msgstr "Spustiť všetky torrenty"
 
 #: ../gtk/actions.c:124
 msgid "Remove torrent"
@@ -455,7 +455,7 @@ msgstr "%1$s (%2$s overených z %3$d častí)"
 
 #: ../gtk/details.c:1062 ../gtk/util.c:57 ../gtk/util.c:79
 msgid "None"
-msgstr "Nič"
+msgstr "Žiadny"
 
 #: ../gtk/details.c:1084
 msgid "Transfer"
@@ -775,6 +775,7 @@ msgstr ""
 "\n"
 "Launchpad Contributions:\n"
 "  Matej Krajčovič https://launchpad.net/~elbarto512\n"
+"  helix84 https://launchpad.net/~helix84\n"
 "  mirek https://launchpad.net/~bletvaska"
 
 #: ../gtk/makemeta-ui.c:111
@@ -1152,7 +1153,7 @@ msgstr "_Povoliť webové rozhranie"
 
 #: ../gtk/tr-prefs.c:740
 msgid "_Open web interface"
-msgstr ""
+msgstr "_Otvoriť webové rozhranie"
 
 #: ../gtk/tr-prefs.c:749 ../gtk/tr-prefs.c:1299
 msgid "Listening _port:"
