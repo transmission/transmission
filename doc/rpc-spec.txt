@@ -466,7 +466,7 @@
          |         | yes       | session-stats  | added "current-stats"
          |         | yes       | torrent-get    | new arg "downloadDir"
    ------+---------+-----------+----------------+-------------------------------
-   6     | 1.60    | yes       | torrent-get    | new arg "pieces"
+   5     | 1.60    | yes       | torrent-get    | new arg "pieces"
          |         | yes       | torrent-get    | new arg "fileStats"
          |         | yes       | torrent-set    | new arg "ratio"
          |         | yes       | torrent-set    | new arg "downloadLimited"
