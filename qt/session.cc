@@ -24,6 +24,7 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/bencode.h>
+#include <libtransmission/json.h>
 #include <libtransmission/rpcimpl.h>
 #include <libtransmission/utils.h> /* tr_free */
 #include <libtransmission/version.h> /* LONG_VERSION */

@@ -25,8 +25,6 @@
 #include <QFile>
 #include <QTimer>
 
-#include <libtransmission/transmission.h>
-
 #include "file-tree.h"
 
 class FileTreeView;

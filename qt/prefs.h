@@ -18,10 +18,12 @@
 #include <QString>
 #include <QVariant>
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/bencode.h>
-
 #include "filters.h"
+
+extern "C"
+{
+    struct tr_benc;
+}
 
 class Prefs: public QObject
 {
@@ -124,7 +126,7 @@ class Prefs: public QObject
     private:
         QString myConfigDir;
         QVariant myValues[PREFS_COUNT];
-        void initDefaults( tr_benc* );
+        void initDefaults( struct tr_benc* );
 
     public:
         bool isCore( int key ) const { return FIRST_CORE_PREF<=key && key<=LAST_CORE_PREF; }

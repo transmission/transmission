@@ -39,6 +39,8 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 
+#include <libtransmission/transmission.h>
+
 #include "details.h"
 #include "file-tree.h"
 #include "hig.h"

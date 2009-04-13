@@ -230,7 +230,7 @@ class Torrent: public QObject
         int compareTracker( const Torrent& ) const;
         int compareRatio( const Torrent& ) const;
         int compareETA( const Torrent& ) const;
-        tr_bool hasETA( ) const { return getETA( ) >= 0; }
+        bool hasETA( ) const { return getETA( ) >= 0; }
         int getETA( ) const { return getInt( ETA ); }
         QDateTime lastActivity( ) const { return getDateTime( DATE_ACTIVITY ); }
         QDateTime lastStarted( ) const { return getDateTime( DATE_STARTED ); }
