@@ -549,32 +549,32 @@ readargs( int           argc,
 
             case 950:
                 tr_bencDictAddStr( &top, "method", "torrent-set" );
-                tr_bencDictAddReal( args, "ratio-limit", atof(optarg) );
-                tr_bencDictAddInt( args, "ratio-limit-mode", TR_RATIOLIMIT_SINGLE );
+                tr_bencDictAddReal( args, "seedRatioLimit", atof(optarg) );
+                tr_bencDictAddInt( args, "seedRatioMode", TR_RATIOLIMIT_SINGLE );
                 addIdArg( args, id );
                 break;
 
             case 951:
                 tr_bencDictAddStr( &top, "method", "torrent-set" );
-                tr_bencDictAddInt( args, "ratio-limit-mode", TR_RATIOLIMIT_GLOBAL );
+                tr_bencDictAddInt( args, "seedRatioMode", TR_RATIOLIMIT_GLOBAL );
                 addIdArg( args, id );
                 break;
 
             case 952:
                 tr_bencDictAddStr( &top, "method", "torrent-set" );
-                tr_bencDictAddInt( args, "ratio-limit-mode", TR_RATIOLIMIT_UNLIMITED );
+                tr_bencDictAddInt( args, "seedRatioMode", TR_RATIOLIMIT_UNLIMITED );
                 addIdArg( args, id );
                 break;
 
             case 953:
                 tr_bencDictAddStr( &top, "method", "session-set" );
-                tr_bencDictAddReal( args, "ratio-limit", atof(optarg) );
-                tr_bencDictAddBool( args, "ratio-limit-enabled", TRUE );
+                tr_bencDictAddReal( args, "seedRatioLimit", atof(optarg) );
+                tr_bencDictAddBool( args, "seedRatioLimited", TRUE );
                 break;
 
             case 954:
                 tr_bencDictAddStr( &top, "method", "session-set" );
-                tr_bencDictAddBool( args, "ratio-limit-enabled", FALSE );
+                tr_bencDictAddBool( args, "seedRatioLimited", FALSE );
                 break;
 
             case TR_OPT_ERR:
