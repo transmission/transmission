@@ -36,6 +36,8 @@ class Session;
 class TorrentDelegate;
 class TorrentDelegateMin;
 class TorrentModel;
+class QAction;
+class QMenu;
 class QModelIndex;
 class QSortFilterProxyModel;
 
@@ -63,6 +65,12 @@ class TrMainWindow: public QMainWindow
         time_t myLastSendTime;
         time_t myLastReadTime;
         QTimer myNetworkTimer;
+        QAction * myDlimitOffAction;
+        QAction * myDlimitOnAction;
+        QAction * myUlimitOffAction;
+        QAction * myUlimitOnAction;
+        QAction * myRatioOffAction;
+        QAction * myRatioOnAction;
 
     private:
         QIcon getStockIcon( const QString&, int fallback=-1 );
@@ -100,22 +108,26 @@ class TrMainWindow: public QMainWindow
         void dataReadProgress( );
         void dataSendProgress( );
         void toggleWindows( );
+        void onSetPrefs( );
+        void onSetPrefs( bool );
 
-     private slots:
-        void setSortPref( int );
-        void setSortAscendingPref( bool );
-        void onSortByActivityToggled ( bool b );
-        void onSortByAgeToggled      ( bool b );
-        void onSortByETAToggled      ( bool b );
-        void onSortByNameToggled     ( bool b );
-        void onSortByProgressToggled ( bool b );
-        void onSortByRatioToggled    ( bool b );
-        void onSortBySizeToggled     ( bool b );
-        void onSortByStateToggled    ( bool b );
-        void onSortByTrackerToggled  ( bool b );
+    private slots:
+        void setSortPref             ( int );
+        void setSortAscendingPref    ( bool );
+        void onSortByActivityToggled ( bool );
+        void onSortByAgeToggled      ( bool );
+        void onSortByETAToggled      ( bool );
+        void onSortByNameToggled     ( bool );
+        void onSortByProgressToggled ( bool );
+        void onSortByRatioToggled    ( bool );
+        void onSortBySizeToggled     ( bool );
+        void onSortByStateToggled    ( bool );
+        void onSortByTrackerToggled  ( bool );
 
+    private:
+        QMenu* createOptionsMenu( void );
 
-     public slots:
+    public slots:
         void startAll( );
         void startSelected( );
         void pauseAll( );

@@ -9,5 +9,6 @@
     <file alias="alt-limit-on.png">icons/turtle-blue.png</file>
     <file alias="encrypted.png">icons/lock.png</file>
     <file alias="dance.gif">icons/dance.gif</file>
+    <file alias="options.png">icons/info-options.png</file>
   </qresource>
 </RCC>

@@ -1,157 +1,158 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow" >
-  <property name="geometry" >
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>792</width>
-    <height>393</height>
+    <height>390</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Transmission</string>
   </property>
-  <widget class="QWidget" name="centralwidget" >
-   <layout class="QVBoxLayout" name="verticalLayout" >
-    <property name="spacing" >
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <property name="spacing">
      <number>0</number>
     </property>
-    <property name="margin" >
+    <property name="margin">
      <number>0</number>
     </property>
     <item>
-     <widget class="QWidget" native="1" name="filterbar" >
-      <property name="sizePolicy" >
-       <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
+     <widget class="QWidget" name="filterbar" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_2" >
-       <property name="spacing" >
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <property name="spacing">
         <number>3</number>
        </property>
-       <property name="sizeConstraint" >
+       <property name="sizeConstraint">
         <enum>QLayout::SetDefaultConstraint</enum>
        </property>
-       <property name="margin" >
+       <property name="margin">
         <number>2</number>
        </property>
        <item>
-        <widget class="QPushButton" name="filterAll" >
-         <property name="toolTip" >
+        <widget class="QPushButton" name="filterAll">
+         <property name="toolTip">
           <string>Show all torrents</string>
          </property>
-         <property name="text" >
+         <property name="text">
           <string>A&amp;ll</string>
          </property>
-         <property name="checkable" >
+         <property name="checkable">
           <bool>true</bool>
          </property>
-         <property name="flat" >
+         <property name="flat">
           <bool>true</bool>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="filterActive" >
-         <property name="sizePolicy" >
-          <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+        <widget class="QPushButton" name="filterActive">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="toolTip" >
+         <property name="toolTip">
           <string>Show active torrents</string>
          </property>
-         <property name="text" >
+         <property name="text">
           <string>&amp;Active</string>
          </property>
-         <property name="checkable" >
+         <property name="checkable">
           <bool>true</bool>
          </property>
-         <property name="flat" >
+         <property name="flat">
           <bool>true</bool>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="filterDownloading" >
-         <property name="sizePolicy" >
-          <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+        <widget class="QPushButton" name="filterDownloading">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="baseSize" >
+         <property name="baseSize">
           <size>
            <width>0</width>
            <height>0</height>
           </size>
          </property>
-         <property name="toolTip" >
+         <property name="toolTip">
           <string>Show torrents being downloaded</string>
          </property>
-         <property name="text" >
+         <property name="text">
           <string>&amp;Downloading</string>
          </property>
-         <property name="checkable" >
+         <property name="checkable">
           <bool>true</bool>
          </property>
-         <property name="flat" >
+         <property name="flat">
           <bool>true</bool>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="filterSeeding" >
-         <property name="sizePolicy" >
-          <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+        <widget class="QPushButton" name="filterSeeding">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="toolTip" >
+         <property name="toolTip">
           <string>Show torrents being seeded</string>
          </property>
-         <property name="text" >
+         <property name="text">
           <string>&amp;Seeding</string>
          </property>
-         <property name="checkable" >
+         <property name="checkable">
           <bool>true</bool>
          </property>
-         <property name="flat" >
+         <property name="flat">
           <bool>true</bool>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="filterPaused" >
-         <property name="sizePolicy" >
-          <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+        <widget class="QPushButton" name="filterPaused">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="toolTip" >
+         <property name="toolTip">
           <string>Show paused torrents</string>
          </property>
-         <property name="text" >
+         <property name="text">
           <string>&amp;Paused</string>
          </property>
-         <property name="checkable" >
+         <property name="checkable">
           <bool>true</bool>
          </property>
-         <property name="flat" >
+         <property name="flat">
           <bool>true</bool>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QWidget" native="1" name="filterBarSpacer" >
-         <property name="sizePolicy" >
-          <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+        <widget class="QWidget" name="filterBarSpacer" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
            <horstretch>1</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -159,46 +160,46 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="filterEntryModeButton" >
-         <property name="sizePolicy" >
-          <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+        <widget class="QPushButton" name="filterEntryModeButton">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="toolTip" >
+         <property name="toolTip">
           <string>Set text filter mode</string>
          </property>
-         <property name="text" >
+         <property name="text">
           <string/>
          </property>
-         <property name="flat" >
+         <property name="flat">
           <bool>true</bool>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="filterEntry" >
-         <property name="sizePolicy" >
-          <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+        <widget class="QLineEdit" name="filterEntry">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>3</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="toolTip" >
+         <property name="toolTip">
           <string>Show torrents matching this text</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="filterEntryClearButton" >
-         <property name="toolTip" >
+        <widget class="QPushButton" name="filterEntryClearButton">
+         <property name="toolTip">
           <string>Clear the filter text</string>
          </property>
-         <property name="text" >
+         <property name="text">
           <string/>
          </property>
-         <property name="flat" >
+         <property name="flat">
           <bool>true</bool>
          </property>
         </widget>
@@ -216,74 +217,104 @@
      </widget>
     </item>
     <item>
-     <widget class="QListView" name="listView" >
-      <property name="sizePolicy" >
-       <sizepolicy vsizetype="Expanding" hsizetype="Preferred" >
+     <widget class="QListView" name="listView">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
-      <property name="horizontalScrollBarPolicy" >
+      <property name="horizontalScrollBarPolicy">
        <enum>Qt::ScrollBarAlwaysOff</enum>
       </property>
-      <property name="alternatingRowColors" >
+      <property name="alternatingRowColors">
        <bool>true</bool>
       </property>
-      <property name="selectionMode" >
+      <property name="selectionMode">
        <enum>QAbstractItemView::ExtendedSelection</enum>
       </property>
-      <property name="uniformItemSizes" >
+      <property name="uniformItemSizes">
        <bool>false</bool>
       </property>
      </widget>
     </item>
     <item>
-     <widget class="QWidget" native="1" name="statusbar" >
-      <property name="sizePolicy" >
-       <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+     <widget class="QWidget" name="statusbar" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
-      <layout class="QHBoxLayout" name="horizontalLayout" >
-       <property name="spacing" >
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <property name="spacing">
         <number>3</number>
        </property>
-       <property name="margin" >
+       <property name="margin">
         <number>3</number>
        </property>
        <item>
-        <widget class="QPushButton" name="speedLimitModeButton" >
-         <property name="flat" >
+        <widget class="QPushButton" name="speedLimitModeButton">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>30</width>
+           <height>24</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>24</width>
+           <height>50</height>
+          </size>
+         </property>
+         <property name="flat">
           <bool>true</bool>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="networkLabel" >
-         <property name="minimumSize" >
+        <widget class="QPushButton" name="optionsButton">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
           <size>
-           <width>16</width>
-           <height>16</height>
+           <width>30</width>
+           <height>28</height>
           </size>
          </property>
-         <property name="text" >
-          <string/>
+         <property name="maximumSize">
+          <size>
+           <width>1000</width>
+           <height>1000</height>
+          </size>
          </property>
-         <property name="textFormat" >
-          <enum>Qt::PlainText</enum>
+         <property name="text">
+          <string notr="true">Options</string>
+         </property>
+         <property name="flat">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
        <item>
-        <spacer name="horizontalSpacer_4" >
-         <property name="orientation" >
+        <spacer name="horizontalSpacer_4">
+         <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizeType" >
+         <property name="sizeType">
           <enum>QSizePolicy::Expanding</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>1</width>
            <height>1</height>
@@ -292,21 +323,21 @@
         </spacer>
        </item>
        <item>
-        <widget class="QLabel" name="visibleCountLabel" >
-         <property name="text" >
+        <widget class="QLabel" name="visibleCountLabel">
+         <property name="text">
           <string>TextLabel</string>
          </property>
         </widget>
        </item>
        <item>
-        <spacer name="horizontalSpacer" >
-         <property name="orientation" >
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizeType" >
+         <property name="sizeType">
           <enum>QSizePolicy::Expanding</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>1</width>
            <height>1</height>
@@ -315,37 +346,37 @@
         </spacer>
        </item>
        <item>
-        <widget class="QPushButton" name="statusbarStatsButton" >
-         <property name="text" >
+        <widget class="QPushButton" name="statusbarStatsButton">
+         <property name="text">
           <string/>
          </property>
-         <property name="iconSize" >
+         <property name="iconSize">
           <size>
            <width>16</width>
            <height>16</height>
           </size>
          </property>
-         <property name="flat" >
+         <property name="flat">
           <bool>true</bool>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="statusbarStatsLabel" >
-         <property name="text" >
+        <widget class="QLabel" name="statusbarStatsLabel">
+         <property name="text">
           <string>TextLabel</string>
          </property>
         </widget>
        </item>
        <item>
-        <spacer name="horizontalSpacer_3" >
-         <property name="orientation" >
+        <spacer name="horizontalSpacer_3">
+         <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizeType" >
+         <property name="sizeType">
           <enum>QSizePolicy::Fixed</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
            <height>0</height>
@@ -354,31 +385,31 @@
         </spacer>
        </item>
        <item>
-        <widget class="QLabel" name="downloadIconLabel" >
-         <property name="text" >
+        <widget class="QLabel" name="downloadIconLabel">
+         <property name="text">
           <string>TextLabel</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="downloadTextLabel" >
-         <property name="toolTip" >
+        <widget class="QLabel" name="downloadTextLabel">
+         <property name="toolTip">
           <string>Overall download speed</string>
          </property>
-         <property name="text" >
+         <property name="text">
           <string>TextLabel</string>
          </property>
         </widget>
        </item>
        <item>
-        <spacer name="horizontalSpacer_2" >
-         <property name="orientation" >
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizeType" >
+         <property name="sizeType">
           <enum>QSizePolicy::Fixed</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
            <height>0</height>
@@ -387,19 +418,51 @@
         </spacer>
        </item>
        <item>
-        <widget class="QLabel" name="uploadIconLabel" >
-         <property name="text" >
+        <widget class="QLabel" name="uploadIconLabel">
+         <property name="text">
           <string>TextLabel</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="uploadTextLabel" >
-         <property name="toolTip" >
+        <widget class="QLabel" name="uploadTextLabel">
+         <property name="toolTip">
           <string>Overall upload speed</string>
          </property>
-         <property name="text" >
+         <property name="text">
           <string>TextLabel</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_5">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>10</width>
+           <height>0</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLabel" name="networkLabel">
+         <property name="minimumSize">
+          <size>
+           <width>16</width>
+           <height>16</height>
+          </size>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::PlainText</enum>
          </property>
         </widget>
        </item>
@@ -411,8 +474,8 @@
    <zorder>statusbar</zorder>
    <zorder>filterbar</zorder>
   </widget>
-  <widget class="QMenuBar" name="menubar" >
-   <property name="geometry" >
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
@@ -420,475 +483,475 @@
      <height>25</height>
     </rect>
    </property>
-   <property name="sizePolicy" >
-    <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
      <horstretch>0</horstretch>
      <verstretch>0</verstretch>
     </sizepolicy>
    </property>
-   <widget class="QMenu" name="menuTorrent" >
-    <property name="title" >
+   <widget class="QMenu" name="menuTorrent">
+    <property name="title">
      <string>&amp;Torrent</string>
     </property>
-    <addaction name="action_Add" />
-    <addaction name="action_New" />
-    <addaction name="separator" />
-    <addaction name="action_Properties" />
-    <addaction name="action_OpenFolder" />
-    <addaction name="separator" />
-    <addaction name="action_Start" />
-    <addaction name="action_Announce" />
-    <addaction name="action_Pause" />
-    <addaction name="action_Verify" />
-    <addaction name="action_Remove" />
-    <addaction name="action_Delete" />
-    <addaction name="separator" />
-    <addaction name="action_StartAll" />
-    <addaction name="action_PauseAll" />
-    <addaction name="separator" />
-    <addaction name="action_Quit" />
+    <addaction name="action_Add"/>
+    <addaction name="action_New"/>
+    <addaction name="separator"/>
+    <addaction name="action_Properties"/>
+    <addaction name="action_OpenFolder"/>
+    <addaction name="separator"/>
+    <addaction name="action_Start"/>
+    <addaction name="action_Announce"/>
+    <addaction name="action_Pause"/>
+    <addaction name="action_Verify"/>
+    <addaction name="action_Remove"/>
+    <addaction name="action_Delete"/>
+    <addaction name="separator"/>
+    <addaction name="action_StartAll"/>
+    <addaction name="action_PauseAll"/>
+    <addaction name="separator"/>
+    <addaction name="action_Quit"/>
    </widget>
-   <widget class="QMenu" name="menuEdit" >
-    <property name="title" >
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
      <string>&amp;Edit</string>
     </property>
-    <addaction name="action_SelectAll" />
-    <addaction name="action_DeselectAll" />
-    <addaction name="separator" />
-    <addaction name="action_Preferences" />
+    <addaction name="action_SelectAll"/>
+    <addaction name="action_DeselectAll"/>
+    <addaction name="separator"/>
+    <addaction name="action_Preferences"/>
    </widget>
-   <widget class="QMenu" name="menu_Help" >
-    <property name="title" >
+   <widget class="QMenu" name="menu_Help">
+    <property name="title">
      <string>&amp;Help</string>
     </property>
-    <addaction name="action_ShowMessageLog" />
-    <addaction name="action_Statistics" />
-    <addaction name="separator" />
-    <addaction name="action_Contents" />
-    <addaction name="action_About" />
+    <addaction name="action_ShowMessageLog"/>
+    <addaction name="action_Statistics"/>
+    <addaction name="separator"/>
+    <addaction name="action_Contents"/>
+    <addaction name="action_About"/>
    </widget>
-   <widget class="QMenu" name="menu_View" >
-    <property name="title" >
+   <widget class="QMenu" name="menu_View">
+    <property name="title">
      <string>&amp;View</string>
     </property>
-    <addaction name="action_MinimalView" />
-    <addaction name="separator" />
-    <addaction name="action_Toolbar" />
-    <addaction name="action_Filterbar" />
-    <addaction name="action_Statusbar" />
-    <addaction name="action_TrayIcon" />
-    <addaction name="separator" />
-    <addaction name="action_SortByActivity" />
-    <addaction name="action_SortByAge" />
-    <addaction name="action_SortByETA" />
-    <addaction name="action_SortByName" />
-    <addaction name="action_SortByProgress" />
-    <addaction name="action_SortByRatio" />
-    <addaction name="action_SortBySize" />
-    <addaction name="action_SortByState" />
-    <addaction name="action_SortByTracker" />
-    <addaction name="separator" />
-    <addaction name="action_ReverseSortOrder" />
+    <addaction name="action_MinimalView"/>
+    <addaction name="separator"/>
+    <addaction name="action_Toolbar"/>
+    <addaction name="action_Filterbar"/>
+    <addaction name="action_Statusbar"/>
+    <addaction name="action_TrayIcon"/>
+    <addaction name="separator"/>
+    <addaction name="action_SortByActivity"/>
+    <addaction name="action_SortByAge"/>
+    <addaction name="action_SortByETA"/>
+    <addaction name="action_SortByName"/>
+    <addaction name="action_SortByProgress"/>
+    <addaction name="action_SortByRatio"/>
+    <addaction name="action_SortBySize"/>
+    <addaction name="action_SortByState"/>
+    <addaction name="action_SortByTracker"/>
+    <addaction name="separator"/>
+    <addaction name="action_ReverseSortOrder"/>
    </widget>
-   <addaction name="menuTorrent" />
-   <addaction name="menuEdit" />
-   <addaction name="menu_View" />
-   <addaction name="menu_Help" />
+   <addaction name="menuTorrent"/>
+   <addaction name="menuEdit"/>
+   <addaction name="menu_View"/>
+   <addaction name="menu_Help"/>
   </widget>
-  <widget class="QToolBar" name="toolBar" >
-   <property name="windowTitle" >
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
     <string>toolBar</string>
    </property>
-   <property name="movable" >
+   <property name="movable">
     <bool>false</bool>
    </property>
-   <property name="allowedAreas" >
+   <property name="allowedAreas">
     <set>Qt::TopToolBarArea</set>
    </property>
-   <property name="iconSize" >
+   <property name="iconSize">
     <size>
      <width>24</width>
      <height>24</height>
     </size>
    </property>
-   <property name="toolButtonStyle" >
+   <property name="toolButtonStyle">
     <enum>Qt::ToolButtonTextUnderIcon</enum>
    </property>
-   <property name="floatable" >
+   <property name="floatable">
     <bool>false</bool>
    </property>
-   <attribute name="toolBarArea" >
+   <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
    </attribute>
-   <attribute name="toolBarBreak" >
+   <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="action_Add" />
-   <addaction name="action_Start" />
-   <addaction name="action_Pause" />
-   <addaction name="action_Remove" />
-   <addaction name="separator" />
-   <addaction name="action_Properties" />
+   <addaction name="action_Add"/>
+   <addaction name="action_Start"/>
+   <addaction name="action_Pause"/>
+   <addaction name="action_Remove"/>
+   <addaction name="separator"/>
+   <addaction name="action_Properties"/>
   </widget>
-  <action name="action_Add" >
-   <property name="text" >
+  <action name="action_Add">
+   <property name="text">
     <string>&amp;Add...</string>
    </property>
-   <property name="toolTip" >
+   <property name="toolTip">
     <string>Add a torrent</string>
    </property>
-   <property name="shortcut" >
+   <property name="shortcut">
     <string>Ctrl+D</string>
    </property>
   </action>
-  <action name="action_New" >
-   <property name="text" >
+  <action name="action_New">
+   <property name="text">
     <string>&amp;New...</string>
    </property>
-   <property name="toolTip" >
+   <property name="toolTip">
     <string>Create a new torrent</string>
    </property>
-   <property name="shortcut" >
+   <property name="shortcut">
     <string>Ctrl+N</string>
    </property>
   </action>
-  <action name="action_Properties" >
-   <property name="text" >
+  <action name="action_Properties">
+   <property name="text">
     <string>&amp;Properties</string>
    </property>
-   <property name="toolTip" >
+   <property name="toolTip">
     <string>Show torrent properties</string>
    </property>
-   <property name="shortcut" >
+   <property name="shortcut">
     <string>Alt+Enter</string>
    </property>
   </action>
-  <action name="action_OpenFolder" >
-   <property name="text" >
+  <action name="action_OpenFolder">
+   <property name="text">
     <string>&amp;Open Folder</string>
    </property>
-   <property name="toolTip" >
+   <property name="toolTip">
     <string>Open the torrent's folder</string>
    </property>
-   <property name="shortcut" >
+   <property name="shortcut">
     <string>Ctrl+O</string>
    </property>
   </action>
-  <action name="action_Start" >
-   <property name="text" >
+  <action name="action_Start">
+   <property name="text">
     <string>&amp;Start</string>
    </property>
-   <property name="toolTip" >
+   <property name="toolTip">
     <string>Start torrent</string>
    </property>
-   <property name="shortcut" >
+   <property name="shortcut">
     <string>Ctrl+S</string>
    </property>
   </action>
-  <action name="action_Announce" >
-   <property name="text" >
+  <action name="action_Announce">
+   <property name="text">
     <string>Ask Tracker for &amp;More Peers</string>
    </property>
-   <property name="toolTip" >
+   <property name="toolTip">
     <string>Ask tracker for more peers</string>
    </property>
   </action>
-  <action name="action_Pause" >
-   <property name="text" >
+  <action name="action_Pause">
+   <property name="text">
     <string>&amp;Pause</string>
    </property>
-   <property name="toolTip" >
+   <property name="toolTip">
     <string>Pause torrent</string>
    </property>
-   <property name="shortcut" >
+   <property name="shortcut">
     <string>Ctrl+P</string>
    </property>
   </action>
-  <action name="action_Verify" >
-   <property name="text" >
+  <action name="action_Verify">
+   <property name="text">
     <string>&amp;Verify Local Data</string>
    </property>
-   <property name="toolTip" >
+   <property name="toolTip">
     <string>Verify local data</string>
    </property>
   </action>
-  <action name="action_Remove" >
-   <property name="text" >
+  <action name="action_Remove">
+   <property name="text">
     <string>&amp;Remove</string>
    </property>
-   <property name="toolTip" >
+   <property name="toolTip">
     <string>Remove torrent</string>
    </property>
-   <property name="shortcut" >
+   <property name="shortcut">
     <string>Del</string>
    </property>
   </action>
-  <action name="action_Delete" >
-   <property name="text" >
+  <action name="action_Delete">
+   <property name="text">
     <string>&amp;Delete Files and Remove</string>
    </property>
-   <property name="toolTip" >
+   <property name="toolTip">
     <string>Remove torrent and delete its files</string>
    </property>
-   <property name="shortcut" >
+   <property name="shortcut">
     <string>Shift+Del</string>
    </property>
   </action>
-  <action name="action_StartAll" >
-   <property name="text" >
+  <action name="action_StartAll">
+   <property name="text">
     <string>&amp;Start All</string>
    </property>
   </action>
-  <action name="action_PauseAll" >
-   <property name="text" >
+  <action name="action_PauseAll">
+   <property name="text">
     <string>&amp;Pause All</string>
    </property>
   </action>
-  <action name="action_Quit" >
-   <property name="text" >
+  <action name="action_Quit">
+   <property name="text">
     <string>&amp;Quit</string>
    </property>
-   <property name="shortcut" >
+   <property name="shortcut">
     <string>Ctrl+Q</string>
    </property>
   </action>
-  <action name="action_SelectAll" >
-   <property name="text" >
+  <action name="action_SelectAll">
+   <property name="text">
     <string>&amp;Select All</string>
    </property>
-   <property name="shortcut" >
+   <property name="shortcut">
     <string>Ctrl+A</string>
    </property>
   </action>
-  <action name="action_DeselectAll" >
-   <property name="text" >
+  <action name="action_DeselectAll">
+   <property name="text">
     <string>&amp;Deselect All</string>
    </property>
-   <property name="shortcut" >
+   <property name="shortcut">
     <string>Ctrl+Shift+A</string>
    </property>
   </action>
-  <action name="action_Preferences" >
-   <property name="text" >
+  <action name="action_Preferences">
+   <property name="text">
     <string>&amp;Preferences</string>
    </property>
   </action>
-  <action name="action_MinimalView" >
-   <property name="checkable" >
+  <action name="action_MinimalView">
+   <property name="checkable">
     <bool>true</bool>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>&amp;Minimal View</string>
    </property>
-   <property name="shortcut" >
+   <property name="shortcut">
     <string>Alt+M</string>
    </property>
   </action>
-  <action name="action_Toolbar" >
-   <property name="checkable" >
+  <action name="action_Toolbar">
+   <property name="checkable">
     <bool>true</bool>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>&amp;Toolbar</string>
    </property>
   </action>
-  <action name="action_Filterbar" >
-   <property name="checkable" >
+  <action name="action_Filterbar">
+   <property name="checkable">
     <bool>true</bool>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>&amp;Filterbar</string>
    </property>
   </action>
-  <action name="action_Statusbar" >
-   <property name="checkable" >
+  <action name="action_Statusbar">
+   <property name="checkable">
     <bool>true</bool>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>&amp;Statusbar</string>
    </property>
   </action>
-  <action name="action_SortByActivity" >
-   <property name="checkable" >
+  <action name="action_SortByActivity">
+   <property name="checkable">
     <bool>true</bool>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>Sort by &amp;Activity</string>
    </property>
   </action>
-  <action name="action_SortByAge" >
-   <property name="checkable" >
+  <action name="action_SortByAge">
+   <property name="checkable">
     <bool>true</bool>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>Sort by A&amp;ge</string>
    </property>
   </action>
-  <action name="action_SortByETA" >
-   <property name="checkable" >
+  <action name="action_SortByETA">
+   <property name="checkable">
     <bool>true</bool>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>Sort by &amp;ETA</string>
    </property>
   </action>
-  <action name="action_SortByName" >
-   <property name="checkable" >
+  <action name="action_SortByName">
+   <property name="checkable">
     <bool>true</bool>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>Sort by &amp;Name</string>
    </property>
   </action>
-  <action name="action_SortByProgress" >
-   <property name="checkable" >
+  <action name="action_SortByProgress">
+   <property name="checkable">
     <bool>true</bool>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>Sort by &amp;Progress</string>
    </property>
   </action>
-  <action name="action_SortByRatio" >
-   <property name="checkable" >
+  <action name="action_SortByRatio">
+   <property name="checkable">
     <bool>true</bool>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>Sort by &amp;Ratio</string>
    </property>
   </action>
-  <action name="action_SortBySize" >
-   <property name="checkable" >
+  <action name="action_SortBySize">
+   <property name="checkable">
     <bool>true</bool>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>Sort by Si&amp;ze</string>
    </property>
   </action>
-  <action name="action_SortByState" >
-   <property name="checkable" >
+  <action name="action_SortByState">
+   <property name="checkable">
     <bool>true</bool>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>Sort by &amp;State</string>
    </property>
   </action>
-  <action name="action_SortByTracker" >
-   <property name="checkable" >
+  <action name="action_SortByTracker">
+   <property name="checkable">
     <bool>true</bool>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>Sort by &amp;Tracker</string>
    </property>
   </action>
-  <action name="action_ShowMessageLog" >
-   <property name="checkable" >
+  <action name="action_ShowMessageLog">
+   <property name="checkable">
     <bool>false</bool>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>Message &amp;Log</string>
    </property>
   </action>
-  <action name="action_Statistics" >
-   <property name="checkable" >
+  <action name="action_Statistics">
+   <property name="checkable">
     <bool>false</bool>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>&amp;Statistics</string>
    </property>
   </action>
-  <action name="action_Contents" >
-   <property name="text" >
+  <action name="action_Contents">
+   <property name="text">
     <string>&amp;Contents</string>
    </property>
   </action>
-  <action name="action_About" >
-   <property name="text" >
+  <action name="action_About">
+   <property name="text">
     <string>&amp;About</string>
    </property>
   </action>
-  <action name="action_ReverseSortOrder" >
-   <property name="checkable" >
+  <action name="action_ReverseSortOrder">
+   <property name="checkable">
     <bool>true</bool>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>&amp;Reverse Sort Order</string>
    </property>
   </action>
-  <action name="action_FilterByName" >
-   <property name="checkable" >
+  <action name="action_FilterByName">
+   <property name="checkable">
     <bool>true</bool>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>&amp;Name</string>
    </property>
   </action>
-  <action name="action_FilterByFiles" >
-   <property name="checkable" >
+  <action name="action_FilterByFiles">
+   <property name="checkable">
     <bool>true</bool>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>&amp;Files</string>
    </property>
   </action>
-  <action name="action_FilterByTracker" >
-   <property name="checkable" >
+  <action name="action_FilterByTracker">
+   <property name="checkable">
     <bool>true</bool>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>&amp;Tracker</string>
    </property>
   </action>
-  <action name="action_TotalRatio" >
-   <property name="checkable" >
+  <action name="action_TotalRatio">
+   <property name="checkable">
     <bool>true</bool>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>Total Ratio</string>
    </property>
   </action>
-  <action name="action_SessionRatio" >
-   <property name="checkable" >
+  <action name="action_SessionRatio">
+   <property name="checkable">
     <bool>true</bool>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>Session Ratio</string>
    </property>
   </action>
-  <action name="action_TotalTransfer" >
-   <property name="checkable" >
+  <action name="action_TotalTransfer">
+   <property name="checkable">
     <bool>true</bool>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>Total Transfer</string>
    </property>
   </action>
-  <action name="action_SessionTransfer" >
-   <property name="checkable" >
+  <action name="action_SessionTransfer">
+   <property name="checkable">
     <bool>true</bool>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>Session Transfer</string>
    </property>
   </action>
-  <action name="action_ShowMainWindow" >
-   <property name="checkable" >
+  <action name="action_ShowMainWindow">
+   <property name="checkable">
     <bool>true</bool>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>&amp;Main Window</string>
    </property>
   </action>
-  <action name="action_TrayIcon" >
-   <property name="checkable" >
+  <action name="action_TrayIcon">
+   <property name="checkable">
     <bool>true</bool>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>Tray &amp;Icon</string>
    </property>
   </action>
  </widget>
  <resources>
-  <include location="application.qrc" />
+  <include location="application.qrc"/>
  </resources>
  <connections/>
 </ui>

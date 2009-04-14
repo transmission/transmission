@@ -275,9 +275,12 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     myTrayIcon.setContextMenu( menu );
     myTrayIcon.setIcon( QApplication::windowIcon( ) );
 
-    connect( ui.action_ShowMainWindow, SIGNAL(toggled(bool)), this, SLOT(toggleWindows()));
-    connect( &myTrayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(trayActivated(QSystemTrayIcon::ActivationReason)));
+    ui.optionsButton->setMenu( createOptionsMenu( ) );
+
     connect( &myPrefs, SIGNAL(changed(int)), this, SLOT(refreshPref(int)) );
+    connect( ui.action_ShowMainWindow, SIGNAL(toggled(bool)), this, SLOT(toggleWindows()));
+    connect( &myTrayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
+             this, SLOT(trayActivated(QSystemTrayIcon::ActivationReason)));
 
     ui.action_ShowMainWindow->setChecked( !minimized );
     ui.action_TrayIcon->setChecked( minimized || prefs.getBool( Prefs::SHOW_TRAY_ICON ) );
@@ -293,7 +296,13 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
              << Prefs :: STATUSBAR_STATS
              << Prefs :: TOOLBAR
              << Prefs :: ALT_SPEED_LIMIT_ENABLED
-             << Prefs :: MINIMAL_VIEW;
+             << Prefs :: MINIMAL_VIEW
+             << Prefs :: DSPEED
+             << Prefs :: DSPEED_ENABLED
+             << Prefs :: USPEED
+             << Prefs :: USPEED_ENABLED
+             << Prefs :: RATIO
+             << Prefs :: RATIO_ENABLED;
     foreach( int key, initKeys )
         refreshPref( key );
 
@@ -315,6 +324,107 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
 
 TrMainWindow :: ~TrMainWindow( )
 {
+}
+
+/****
+*****
+****/
+
+#define PREF_VARIANTS_KEY "pref-variants-list"
+
+void
+TrMainWindow :: onSetPrefs( )
+{
+    const QVariantList p = sender()->property( PREF_VARIANTS_KEY ).toList( );
+    assert( ( p.size( ) % 2 ) == 0 );
+    for( int i=0, n=p.size(); i<n; i+=2 )
+        myPrefs.set( p[i].toInt(), p[i+1] );
+}
+
+void
+TrMainWindow :: onSetPrefs( bool isChecked )
+{
+    if( isChecked )
+        onSetPrefs( );
+}
+
+QMenu *
+TrMainWindow :: createOptionsMenu( )
+{
+    QMenu * menu;
+    QMenu * sub;
+    QAction * a;
+    QActionGroup * g;
+
+    QList<int> stockSpeeds;
+    stockSpeeds << 5 << 10 << 20 << 30 << 40 << 50 << 75 << 100 << 150 << 200 << 250 << 500 << 750;
+    QList<double> stockRatios;
+    stockRatios << 0.25 << 0.50 << 0.75 << 1 << 1.5 << 2 << 3;
+
+    menu = new QMenu;
+    sub = menu->addMenu( tr( "Limit Download Speed" ) );
+        int currentVal = myPrefs.get<int>( Prefs::DSPEED );
+        g = new QActionGroup( this );
+        a = myDlimitOffAction = sub->addAction( tr( "Unlimited" ) );
+        a->setCheckable( true );
+        a->setProperty( PREF_VARIANTS_KEY, QVariantList() << Prefs::DSPEED_ENABLED << false );
+        g->addAction( a );
+        connect( a, SIGNAL(triggered(bool)), this, SLOT(onSetPrefs(bool)) );
+        a = myDlimitOnAction = sub->addAction( tr( "Limited at %1" ).arg( Utils::speedToString( Speed::fromKbps( currentVal ) ) ) );
+        a->setCheckable( true );
+        a->setProperty( PREF_VARIANTS_KEY, QVariantList() << Prefs::DSPEED << currentVal << Prefs::DSPEED_ENABLED << true );
+        g->addAction( a );
+        connect( a, SIGNAL(triggered(bool)), this, SLOT(onSetPrefs(bool)) );
+        sub->addSeparator( );
+        foreach( int i, stockSpeeds ) {
+            a = sub->addAction( Utils::speedToString( Speed::fromKbps(i) ) );
+            a->setProperty( PREF_VARIANTS_KEY, QVariantList() << Prefs::DSPEED << i << Prefs::DSPEED_ENABLED << true );
+            connect( a, SIGNAL(triggered(bool)), this, SLOT(onSetPrefs()));
+        }
+
+    sub = menu->addMenu( tr( "Limit Upload Speed" ) );
+        currentVal = myPrefs.get<int>( Prefs::USPEED );
+        g = new QActionGroup( this );
+        a = myUlimitOffAction = sub->addAction( tr( "Unlimited" ) );
+        a->setCheckable( true );
+        a->setProperty( PREF_VARIANTS_KEY, QVariantList() << Prefs::USPEED_ENABLED << false );
+        g->addAction( a );
+        connect( a, SIGNAL(triggered(bool)), this, SLOT(onSetPrefs(bool)) );
+        a = myUlimitOnAction = sub->addAction( tr( "Limited at %1" ).arg( Utils::speedToString( Speed::fromKbps( currentVal ) ) ) );
+        a->setCheckable( true );
+        a->setProperty( PREF_VARIANTS_KEY, QVariantList() << Prefs::USPEED << currentVal << Prefs::USPEED_ENABLED << true );
+        g->addAction( a );
+        connect( a, SIGNAL(triggered(bool)), this, SLOT(onSetPrefs(bool)) );
+        sub->addSeparator( );
+        foreach( int i, stockSpeeds ) {
+            a = sub->addAction( Utils::speedToString( Speed::fromKbps(i) ) );
+            a->setProperty( PREF_VARIANTS_KEY, QVariantList() << Prefs::USPEED << i << Prefs::USPEED_ENABLED << true );
+            connect( a, SIGNAL(triggered(bool)), this, SLOT(onSetPrefs()));
+        }
+
+    menu->addSeparator( );
+    sub = menu->addMenu( tr( "Stop Seeding at Ratio" ) );
+
+        double d = myPrefs.get<double>( Prefs::RATIO );
+        g = new QActionGroup( this );
+        a = myRatioOffAction = sub->addAction( tr( "Seed Forever" ) );
+        a->setCheckable( true );
+        a->setProperty( PREF_VARIANTS_KEY, QVariantList() << Prefs::RATIO_ENABLED << false );
+        g->addAction( a );
+        connect( a, SIGNAL(triggered(bool)), this, SLOT(onSetPrefs(bool)) );
+        a = myRatioOnAction = sub->addAction( tr( "Stop at Ratio (%1)" ).arg( Utils::ratioToString( d ) ) );
+        a->setCheckable( true );
+        a->setProperty( PREF_VARIANTS_KEY, QVariantList() << Prefs::RATIO << d << Prefs::RATIO_ENABLED << true );
+        g->addAction( a );
+        connect( a, SIGNAL(triggered(bool)), this, SLOT(onSetPrefs(bool)) );
+        sub->addSeparator( );
+        foreach( double i, stockRatios ) {
+            a = sub->addAction( Utils::ratioToString( i ) );
+            a->setProperty( PREF_VARIANTS_KEY, QVariantList() << Prefs::RATIO << i << Prefs::RATIO_ENABLED << true );
+            connect( a, SIGNAL(triggered(bool)), this, SLOT(onSetPrefs()));
+        }
+
+    return menu;
 }
 
 /****
@@ -640,6 +750,30 @@ TrMainWindow :: refreshPref( int key )
             ui.action_SortBySize->setChecked     ( i == SortMode::SORT_BY_SIZE );
             ui.action_SortByState->setChecked    ( i == SortMode::SORT_BY_STATE );
             ui.action_SortByTracker->setChecked  ( i == SortMode::SORT_BY_TRACKER );
+            break;
+
+        case Prefs::DSPEED_ENABLED:
+            (myPrefs.get<bool>(key) ? myDlimitOnAction : myDlimitOffAction)->setChecked( true );
+            break;
+     
+        case Prefs::DSPEED:
+            myDlimitOnAction->setText( tr( "Limited at %1" ).arg( Utils::speedToString( Speed::fromKbps( myPrefs.get<int>(key) ) ) ) );
+            break;
+
+        case Prefs::USPEED_ENABLED:
+            (myPrefs.get<bool>(key) ? myUlimitOnAction : myUlimitOffAction)->setChecked( true );
+            break;
+     
+        case Prefs::USPEED:
+            myUlimitOnAction->setText( tr( "Limited at %1" ).arg( Utils::speedToString( Speed::fromKbps( myPrefs.get<int>(key) ) ) ) );
+            break;
+
+        case Prefs::RATIO_ENABLED:
+            (myPrefs.get<bool>(key) ? myRatioOnAction : myRatioOffAction)->setChecked( true );
+            break;
+
+        case Prefs::RATIO:
+            myRatioOnAction->setText( tr( "Stop at Ratio (%1)" ).arg( Utils::ratioToString( myPrefs.get<double>(key) ) ) );
             break;
 
         case Prefs::FILTER_MODE:
