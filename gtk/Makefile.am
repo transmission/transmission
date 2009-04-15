@@ -48,6 +48,7 @@ noinst_HEADERS = \
     makemeta-ui.h \
     msgwin.h \
     notify.h \
+    options-icon.h \
     stats.h \
     sexy-icon-entry.h \
     sexy-marshal.h \
