@@ -73,12 +73,10 @@ filter_mode_t;
 
 typedef struct
 {
+    GtkWidget *           speedlimit_on_item[2];
+    GtkWidget *           speedlimit_off_item[2];
     GtkWidget *           ratio_on_item;
     GtkWidget *           ratio_off_item;
-    GtkWidget *           downlimit_on_item;
-    GtkWidget *           downlimit_off_item;
-    GtkWidget *           uplimit_on_item;
-    GtkWidget *           uplimit_off_item;
     GtkWidget *           scroll;
     GtkWidget *           view;
     GtkWidget *           toolbar;
@@ -582,185 +580,174 @@ onAltSpeedToggled( tr_session * s UNUSED, tr_bool isEnabled UNUSED, tr_bool byUs
     g_idle_add( onAltSpeedToggledIdle, p );
 }
 
+/***
+****  Speed limit menu
+***/
+
+#define DIRECTION_KEY "direction-key"
 #define ENABLED_KEY "enabled-key"
 #define SPEED_KEY "speed-key"
 
 static void
-onSpeedLimitToggled( GtkCheckMenuItem * check, tr_direction direction, gpointer vp ) 
+onSpeedToggled( GtkCheckMenuItem * check, gpointer vp ) 
 {
     PrivateData * p = vp;
+    GObject * o = G_OBJECT( check );
+    gboolean isEnabled = g_object_get_data( o, ENABLED_KEY ) != 0;
+    tr_direction dir = GPOINTER_TO_INT( g_object_get_data( o, DIRECTION_KEY ) );
+    const char * key = dir == TR_UP ? TR_PREFS_KEY_USPEED_ENABLED
+                                    : TR_PREFS_KEY_DSPEED_ENABLED;
+
     if( gtk_check_menu_item_get_active( check ) )
-    {
-        const gboolean isEnabled = g_object_get_data( G_OBJECT( check ), ENABLED_KEY ) != 0;
-        const char * key = direction == TR_UP ? TR_PREFS_KEY_USPEED_ENABLED : TR_PREFS_KEY_DSPEED_ENABLED;
         tr_core_set_pref_bool( p->core, key, isEnabled );
+}
+
+static void
+onSpeedSet( GtkCheckMenuItem * check, gpointer vp ) 
+{
+    const char * key;
+    PrivateData * p = vp;
+    GObject * o = G_OBJECT( check );
+    const int speed = GPOINTER_TO_INT( g_object_get_data( o, SPEED_KEY ) );
+    tr_direction dir = GPOINTER_TO_INT( g_object_get_data( o, DIRECTION_KEY ) );
+
+    key = dir==TR_UP ? TR_PREFS_KEY_USPEED : TR_PREFS_KEY_DSPEED;
+    tr_core_set_pref_int( p->core, key, speed );
+
+    key = dir==TR_UP ? TR_PREFS_KEY_USPEED_ENABLED : TR_PREFS_KEY_DSPEED_ENABLED;
+    tr_core_set_pref_bool( p->core, key, TRUE );
+}
+
+static GtkWidget*
+createSpeedMenu( PrivateData * p, tr_direction dir )
+{
+    int i, n;
+    GtkWidget *w, *m;
+    const int speeds[] = { 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750 };
+
+    m = gtk_menu_new( );
+
+    w = gtk_radio_menu_item_new_with_label( NULL, _( "Unlimited" ) );
+    p->speedlimit_off_item[dir] = w;
+    g_object_set_data( G_OBJECT( w ), DIRECTION_KEY, GINT_TO_POINTER( dir ) );
+    g_object_set_data( G_OBJECT( w ), ENABLED_KEY, GINT_TO_POINTER( FALSE ) );
+    g_signal_connect( w, "toggled", G_CALLBACK(onSpeedToggled), p );
+    gtk_menu_shell_append( GTK_MENU_SHELL( m ), w );
+
+    w = gtk_radio_menu_item_new_with_label_from_widget( GTK_RADIO_MENU_ITEM( w ), "" );
+    p->speedlimit_on_item[dir] = w;
+    g_object_set_data( G_OBJECT( w ), DIRECTION_KEY, GINT_TO_POINTER( dir ) );
+    g_object_set_data( G_OBJECT( w ), ENABLED_KEY, GINT_TO_POINTER( TRUE ) );
+    g_signal_connect( w, "toggled", G_CALLBACK(onSpeedToggled), p );
+    gtk_menu_shell_append( GTK_MENU_SHELL( m ), w );
+
+    w = gtk_separator_menu_item_new( );
+    gtk_menu_shell_append( GTK_MENU_SHELL( m ), w );
+
+    for( i=0, n=G_N_ELEMENTS(speeds); i<n; ++i )
+    {
+        char buf[128];
+        tr_strlspeed( buf, speeds[i], sizeof( buf ) );
+        w = gtk_menu_item_new_with_label( buf );
+        g_object_set_data( G_OBJECT( w ), DIRECTION_KEY, GINT_TO_POINTER( dir ) );
+        g_object_set_data( G_OBJECT( w ), SPEED_KEY, GINT_TO_POINTER( speeds[i] ) );
+        g_signal_connect( w, "activate", G_CALLBACK(onSpeedSet), p );
+        gtk_menu_shell_append( GTK_MENU_SHELL( m ), w );
     }
+
+    return m;
 }
-static void
-onSpeedLimitSet( GtkCheckMenuItem * check, tr_direction direction, gpointer vp ) 
-{
-    PrivateData * p = vp;
-    gpointer d = g_object_get_data( G_OBJECT( check ), SPEED_KEY );
-    const int kb = GPOINTER_TO_INT( d );
-    const char * key = direction == TR_UP ? TR_PREFS_KEY_USPEED : TR_PREFS_KEY_DSPEED;
-    tr_core_set_pref_int( p->core, key, kb );
-}
-static void
-onUploadLimitedToggled( GtkCheckMenuItem * check, gpointer p ) 
-{
-    onSpeedLimitToggled( check, TR_UP, p );
-}
-static void
-onUploadLimitSet( GtkCheckMenuItem * check, gpointer vp ) 
-{
-    PrivateData * p = vp;
-    onSpeedLimitSet( check, TR_UP, p );
-    tr_core_set_pref_bool( p->core, TR_PREFS_KEY_USPEED_ENABLED, TRUE );
-}
-static void
-onDownloadLimitedToggled( GtkCheckMenuItem * check, gpointer p ) 
-{
-    onSpeedLimitToggled( check, TR_DOWN, p );
-}
-static void
-onDownloadLimitSet( GtkCheckMenuItem * check, gpointer vp ) 
-{
-    PrivateData * p = vp;
-    onSpeedLimitSet( check, TR_DOWN, p );
-    tr_core_set_pref_bool( p->core, TR_PREFS_KEY_DSPEED_ENABLED, TRUE );
-}
+
+/***
+****  Speed limit menu
+***/
+
+#define RATIO_KEY "stock-ratio-index"
+
+static const double stockRatios[] = { 0.25, 0.5, 0.75, 1, 1.5, 2, 3 };
+
 static void
 onRatioToggled( GtkCheckMenuItem * check, gpointer vp ) 
 {
     PrivateData * p = vp;
     if( gtk_check_menu_item_get_active( check ) )
     {
-        const gboolean isEnabled = g_object_get_data( G_OBJECT( check ), ENABLED_KEY ) != 0;
-        tr_core_set_pref_bool( p->core, TR_PREFS_KEY_RATIO_ENABLED, isEnabled );
+        gboolean f = g_object_get_data( G_OBJECT( check ), ENABLED_KEY ) != 0;
+        tr_core_set_pref_bool( p->core, TR_PREFS_KEY_RATIO_ENABLED, f );
     }
 }
 static void
 onRatioSet( GtkCheckMenuItem * check, gpointer vp ) 
 {
     PrivateData * p = vp;
-    gpointer d = g_object_get_data( G_OBJECT( check ), SPEED_KEY );
-    const int ratio = GPOINTER_TO_INT( d );
-    tr_core_set_pref_double( p->core, TR_PREFS_KEY_RATIO, ratio/100.0 );
+    int i = GPOINTER_TO_INT( g_object_get_data( G_OBJECT( check ), RATIO_KEY ) );
+    const double ratio = stockRatios[i];
+    tr_core_set_pref_double( p->core, TR_PREFS_KEY_RATIO, ratio );
+    tr_core_set_pref_bool  ( p->core, TR_PREFS_KEY_RATIO_ENABLED, TRUE );
 }
+
+static GtkWidget*
+createRatioMenu( PrivateData * p )
+{
+    int i, n;
+    GtkWidget *m, *w;
+
+    m = gtk_menu_new( );
+
+    w = gtk_radio_menu_item_new_with_label( NULL, _( "Seed Forever" ) );
+    p->ratio_off_item = w;
+    g_object_set_data( G_OBJECT( w ), ENABLED_KEY, GINT_TO_POINTER( FALSE ) );
+    g_signal_connect( w, "toggled", G_CALLBACK(onRatioToggled), p );
+    gtk_menu_shell_append( GTK_MENU_SHELL( m ), w );
+
+    w = gtk_radio_menu_item_new_with_label_from_widget( GTK_RADIO_MENU_ITEM( w ), "" );
+    p->ratio_on_item = w;
+    g_object_set_data( G_OBJECT( w ), ENABLED_KEY, GINT_TO_POINTER( TRUE ) );
+    g_signal_connect( w, "toggled", G_CALLBACK(onRatioToggled), p );
+    gtk_menu_shell_append( GTK_MENU_SHELL( m ), w );
+
+    w = gtk_separator_menu_item_new( );
+    gtk_menu_shell_append( GTK_MENU_SHELL( m ), w );
+
+    for( i=0, n=G_N_ELEMENTS(stockRatios); i<n; ++i )
+    {
+        char buf[128];
+        tr_strlratio( buf, stockRatios[i], sizeof( buf ) );
+        w = gtk_menu_item_new_with_label( buf );
+        g_object_set_data( G_OBJECT( w ), RATIO_KEY, GINT_TO_POINTER( i ) );
+        g_signal_connect( w, "activate", G_CALLBACK(onRatioSet), p );
+        gtk_menu_shell_append( GTK_MENU_SHELL( m ), w );
+    }
+
+    return m;
+}
+
+/***
+****  Option menu
+***/
 
 static GtkWidget*
 createOptionsMenu( PrivateData * p )
 {
-    int i, n;
-    GtkWidget *sub, *w, *up, *down;
+    GtkWidget * m;
     GtkWidget * top = gtk_menu_new( );
-    const int stockSpeeds[] = { 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750 };
-    const int stockRatios[] = { 25, 50, 75, 100, 150, 200, 300 };
 
-    down = gtk_menu_item_new_with_label( _( "Limit Download Speed" ) );
-    gtk_menu_shell_append( GTK_MENU_SHELL( top ), down );
-    gtk_widget_show( down );
+    m = gtk_menu_item_new_with_label( _( "Limit Download Speed" ) );
+    gtk_menu_item_set_submenu( GTK_MENU_ITEM( m ), createSpeedMenu( p, TR_DOWN ) );
+    gtk_menu_shell_append( GTK_MENU_SHELL( top ), m );
 
-    sub = gtk_menu_new( );
+    m = gtk_menu_item_new_with_label( _( "Limit Upload Speed" ) );
+    gtk_menu_item_set_submenu( GTK_MENU_ITEM( m ), createSpeedMenu( p, TR_UP ) );
+    gtk_menu_shell_append( GTK_MENU_SHELL( top ), m );
 
-    w = p->downlimit_off_item = gtk_radio_menu_item_new_with_label( NULL, _( "Unlimited" ) );
-    gtk_menu_shell_append( GTK_MENU_SHELL( sub ), w );
-    gtk_widget_show( w );
-    g_object_set_data( G_OBJECT( w ), ENABLED_KEY, GINT_TO_POINTER( 0 ) );
-    g_signal_connect( w, "toggled", G_CALLBACK(onDownloadLimitedToggled), p );
+    m = gtk_separator_menu_item_new( );
+    gtk_menu_shell_append( GTK_MENU_SHELL( top ), m );
 
-    w = p->downlimit_on_item = gtk_radio_menu_item_new_with_label_from_widget( GTK_RADIO_MENU_ITEM( w ), _( "Limit at XXX" ) );
-    gtk_menu_shell_append( GTK_MENU_SHELL( sub ), w );
-    gtk_widget_show( w );
-    g_object_set_data( G_OBJECT( w ), ENABLED_KEY, GINT_TO_POINTER( 1 ) );
-    g_signal_connect( w, "toggled", G_CALLBACK(onDownloadLimitedToggled), p );
+    m = gtk_menu_item_new_with_label( _( "Stop Seeding at Ratio" ) );
+    gtk_menu_item_set_submenu( GTK_MENU_ITEM( m ), createRatioMenu( p ) );
+    gtk_menu_shell_append( GTK_MENU_SHELL( top ), m );
 
-    w = gtk_separator_menu_item_new( );
-    gtk_menu_shell_append( GTK_MENU_SHELL( sub ), w );
-    gtk_widget_show( w );
-
-    for( i=0, n=G_N_ELEMENTS(stockSpeeds); i<n; ++i ) {
-        char buf[128];
-        tr_strlspeed( buf, stockSpeeds[i], sizeof( buf ) );
-        w = gtk_menu_item_new_with_label( buf );
-        gtk_menu_shell_append( GTK_MENU_SHELL( sub ), w );
-        gtk_widget_show( w );
-        g_object_set_data( G_OBJECT( w ), SPEED_KEY, GINT_TO_POINTER( stockSpeeds[i] ) );
-        g_signal_connect( w, "activate", G_CALLBACK(onDownloadLimitSet), p );
-    }
-
-    gtk_menu_item_set_submenu( GTK_MENU_ITEM( down ), sub );
-
-    up = gtk_menu_item_new_with_label( _( "Limit Upload Speed" ) );
-    gtk_menu_shell_append( GTK_MENU_SHELL( top ), up );
-    gtk_widget_show( up );
-
-    sub = gtk_menu_new( );
-
-    w = p->uplimit_off_item = gtk_radio_menu_item_new_with_label( NULL, _( "Unlimited" ) );
-    gtk_menu_shell_append( GTK_MENU_SHELL( sub ), w );
-    gtk_widget_show( w );
-    g_object_set_data( G_OBJECT( w ), ENABLED_KEY, GINT_TO_POINTER( 0 ) );
-    g_signal_connect( w, "toggled", G_CALLBACK(onUploadLimitedToggled), p );
-
-    w = p->uplimit_on_item = gtk_radio_menu_item_new_with_label_from_widget( GTK_RADIO_MENU_ITEM( w ), _( "Limit at XXX" ) );
-    gtk_menu_shell_append( GTK_MENU_SHELL( sub ), w );
-    gtk_widget_show( w );
-    g_object_set_data( G_OBJECT( w ), ENABLED_KEY, GINT_TO_POINTER( 1 ) );
-    g_signal_connect( w, "toggled", G_CALLBACK(onUploadLimitedToggled), p );
-
-    w = gtk_separator_menu_item_new( );
-    gtk_menu_shell_append( GTK_MENU_SHELL( sub ), w );
-    gtk_widget_show( w );
-
-    for( i=0, n=G_N_ELEMENTS(stockSpeeds); i<n; ++i ) {
-        char buf[128];
-        tr_strlspeed( buf, stockSpeeds[i], sizeof( buf ) );
-        w = gtk_menu_item_new_with_label( buf );
-        gtk_menu_shell_append( GTK_MENU_SHELL( sub ), w );
-        gtk_widget_show( w );
-        g_object_set_data( G_OBJECT( w ), SPEED_KEY, GINT_TO_POINTER( stockSpeeds[i] ) );
-        g_signal_connect( w, "activate", G_CALLBACK(onUploadLimitSet), p );
-    }
-    gtk_menu_item_set_submenu( GTK_MENU_ITEM( up ), sub );
-
-    w = gtk_separator_menu_item_new( );
-    gtk_menu_shell_append( GTK_MENU_SHELL( top ), w );
-    gtk_widget_show( w );
-
-    up = gtk_menu_item_new_with_label( _( "Stop Seeding at Ratio" ) );
-    gtk_menu_shell_append( GTK_MENU_SHELL( top ), up );
-    gtk_widget_show( up );
-
-    sub = gtk_menu_new( );
-
-    w = p->ratio_off_item = gtk_radio_menu_item_new_with_label( NULL, _( "Seed Forever" ) );
-    gtk_menu_shell_append( GTK_MENU_SHELL( sub ), w );
-    gtk_widget_show( w );
-    g_object_set_data( G_OBJECT( w ), ENABLED_KEY, GINT_TO_POINTER( 0 ) );
-    g_signal_connect( w, "toggled", G_CALLBACK(onRatioToggled), p );
-
-    w = p->ratio_on_item = gtk_radio_menu_item_new_with_label_from_widget( GTK_RADIO_MENU_ITEM( w ), _( "Stop at Ratio (XXX)" ) );
-    gtk_menu_shell_append( GTK_MENU_SHELL( sub ), w );
-    gtk_widget_show( w );
-    g_object_set_data( G_OBJECT( w ), ENABLED_KEY, GINT_TO_POINTER( 1 ) );
-    g_signal_connect( w, "toggled", G_CALLBACK(onRatioToggled), p );
-
-    w = gtk_separator_menu_item_new( );
-    gtk_menu_shell_append( GTK_MENU_SHELL( sub ), w );
-    gtk_widget_show( w );
-
-    for( i=0, n=G_N_ELEMENTS(stockRatios); i<n; ++i ) {
-        char buf[128];
-        tr_strlratio( buf, stockRatios[i]/100.0, sizeof( buf ) );
-        w = gtk_menu_item_new_with_label( buf );
-        gtk_menu_shell_append( GTK_MENU_SHELL( sub ), w );
-        gtk_widget_show( w );
-        g_object_set_data( G_OBJECT( w ), SPEED_KEY, GINT_TO_POINTER( stockRatios[i] ) );
-        g_signal_connect( w, "activate", G_CALLBACK(onRatioSet), p );
-    }
-    gtk_menu_item_set_submenu( GTK_MENU_ITEM( up ), sub );
-
+    gtk_widget_show_all( top );
     return top;
 }
 
@@ -770,21 +757,24 @@ onOptionsClicked( GtkButton * button UNUSED, gpointer vp )
     char buf1[512];
     char buf2[512];
     gboolean b;
+    GtkWidget * w;
     PrivateData * p = vp;
 
+    w = p->speedlimit_on_item[TR_DOWN];
     tr_strlspeed( buf1, pref_int_get( TR_PREFS_KEY_DSPEED ), sizeof( buf1 ) );
-    g_snprintf( buf2, sizeof( buf2 ), _( "Limited to %s" ), buf1 );
-    gtk_label_set_text( GTK_LABEL( gtk_bin_get_child( GTK_BIN( p->downlimit_on_item ) ) ), buf2 );
+    gtk_label_set_text( GTK_LABEL( gtk_bin_get_child( GTK_BIN( w ) ) ), buf1 );
 
     b = pref_flag_get( TR_PREFS_KEY_DSPEED_ENABLED );
-    gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM( b ? p->downlimit_on_item : p->downlimit_off_item ), TRUE );
+    w = b ? p->speedlimit_on_item[TR_DOWN] : p->speedlimit_off_item[TR_DOWN];
+    gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM( w ), TRUE );
 
+    w = p->speedlimit_on_item[TR_UP];
     tr_strlspeed( buf1, pref_int_get( TR_PREFS_KEY_USPEED ), sizeof( buf1 ) );
-    g_snprintf( buf2, sizeof( buf2 ), _( "Limited to %s" ), buf1 );
-    gtk_label_set_text( GTK_LABEL( gtk_bin_get_child( GTK_BIN( p->uplimit_on_item ) ) ), buf2 );
+    gtk_label_set_text( GTK_LABEL( gtk_bin_get_child( GTK_BIN( w ) ) ), buf1 );
 
     b = pref_flag_get( TR_PREFS_KEY_USPEED_ENABLED );
-    gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM( b ? p->uplimit_on_item : p->uplimit_off_item ), TRUE );
+    w = b ? p->speedlimit_on_item[TR_UP] : p->speedlimit_off_item[TR_UP];
+    gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM( w ), TRUE );
 
     tr_strlratio( buf1, pref_double_get( TR_PREFS_KEY_RATIO ), sizeof( buf1 ) );
     g_snprintf( buf2, sizeof( buf2 ), _( "Stop at Ratio (%s)" ), buf1 );
