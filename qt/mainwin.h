@@ -16,8 +16,10 @@
 #include <ctime>
 #include <QCheckBox>
 #include <QFileDialog>
+#include <QLineEdit>
 #include <QIcon>
 #include <QMainWindow>
+#include <QMap>
 #include <QSet>
 #include <QSystemTrayIcon>
 #include <QTimer>
@@ -27,6 +29,7 @@ extern "C" {
     struct tr_benc;
 };
 
+#include "filters.h"
 #include "torrent-filter.h"
 #include "ui_mainwin.h"
 
@@ -37,6 +40,7 @@ class TorrentDelegate;
 class TorrentDelegateMin;
 class TorrentModel;
 class QAction;
+class QLabel;
 class QMenu;
 class QModelIndex;
 class QSortFilterProxyModel;
@@ -82,6 +86,7 @@ class TrMainWindow: public QMainWindow
         QWidgetList myHidden;
 
     private slots:
+        void onShowModeClicked( );
         void showAll( );
         void showActive( );
         void showDownloading( );
@@ -125,7 +130,24 @@ class TrMainWindow: public QMainWindow
         void onSortByTrackerToggled  ( bool );
 
     private:
-        QMenu* createOptionsMenu( void );
+        QWidget * createFilterBar( void );
+        QWidget * myFilterBar;
+        QPushButton * myFilterButtons[FilterMode::NUM_MODES];
+        QPushButton * myFilterTextButton;
+        QLineEdit * myFilterTextLineEdit;
+
+    private:
+        QMenu * createOptionsMenu( void );
+        QWidget * createStatusBar( void );
+        QWidget * myStatusBar;
+        QPushButton * myAltSpeedButton;
+        QPushButton * myOptionsButton;
+        QLabel * myVisibleCountLabel;
+        QPushButton * myStatsModeButton;
+        QLabel * myStatsLabel;
+        QLabel * myDownloadSpeedLabel;
+        QLabel * myUploadSpeedLabel;
+        QLabel * myNetworkLabel;
 
     public slots:
         void startAll( );

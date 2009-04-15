@@ -28,6 +28,7 @@
 #include "about.h"
 #include "details.h"
 #include "filters.h"
+#include "hig.h"
 #include "mainwin.h"
 #include "make-dialog.h"
 #include "options.h"
@@ -40,6 +41,7 @@
 #include "torrent-delegate-min.h"
 #include "torrent-filter.h"
 #include "torrent-model.h"
+#include "triconpushbutton.h"
 #include "ui_mainwin.h"
 #include "utils.h"
 #include "qticonloader.h"
@@ -69,17 +71,6 @@ namespace
         QFontMetrics fm = button->fontMetrics( );
         QSize sz = fm.size( Qt::TextShowMnemonic, s );
         return button->style()->sizeFromContents( QStyle::CT_PushButton, &opt, sz, button ).expandedTo( QApplication::globalStrut( ) );
-    }
-
-    void setTextButtonSizeHint( QPushButton * button )
-    {
-        /* this is kind of a hack, possibly coming from my being new to Qt.
-         * Qt 4.4's sizeHint calculations for QPushButton have it include
-         * space for an icon, even if no icon is used.  because of this,
-         * default pushbuttons look way too wide in the filterbar...
-         * so this routine recalculates the sizeHint without icons.
-         * If there's a Right Way to do this that I've missed, let me know */
-        button->setMaximumSize( calculateTextButtonSizeHint( button ) );
     }
 }
 
@@ -136,11 +127,6 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     ui.action_Preferences->setIcon( getStockIcon( "preferences-system" ) );
     ui.action_Contents->setIcon( getStockIcon( "help-contents", QStyle::SP_DialogHelpButton ) );
     ui.action_About->setIcon( getStockIcon( "help-about" ) );
-    ui.statusbarStatsButton->setIcon( getStockIcon( "view-refresh", QStyle::SP_BrowserReload ) );
-    ui.downloadIconLabel->setPixmap( getStockIcon( "go-down", QStyle::SP_ArrowDown ).pixmap( smallIconSize ) );
-    ui.uploadIconLabel->setPixmap( getStockIcon( "go-up", QStyle::SP_ArrowUp ).pixmap( smallIconSize ) );
-    ui.filterEntryModeButton->setIcon( getStockIcon( "edit-find", QStyle::SP_ArrowForward ) );
-    ui.filterEntryClearButton->setIcon( getStockIcon( "edit-clear", QStyle::SP_DialogCloseButton ) );
 
     // ui signals
     connect( ui.action_Toolbar, SIGNAL(toggled(bool)), this, SLOT(setToolbarVisible(bool)));
@@ -192,21 +178,8 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     setContextMenuPolicy( Qt::ActionsContextMenu );
 
     // signals
-    connect( ui.speedLimitModeButton, SIGNAL(clicked()), this, SLOT(toggleSpeedMode()));
-    connect( ui.filterAll, SIGNAL(clicked()), this, SLOT(showAll()));
-    connect( ui.filterActive, SIGNAL(clicked()), this, SLOT(showActive()));
-    connect( ui.filterDownloading, SIGNAL(clicked()), this, SLOT(showDownloading()));
-    connect( ui.filterSeeding, SIGNAL(clicked()), this, SLOT(showSeeding()));
-    connect( ui.filterPaused, SIGNAL(clicked()), this, SLOT(showPaused()));
-    connect( ui.filterEntryClearButton, SIGNAL(clicked()), ui.filterEntry, SLOT(clear()));
-    connect( ui.filterEntry, SIGNAL(textChanged(QString)), &myFilterModel, SLOT(setText(QString)));
     connect( ui.action_SelectAll, SIGNAL(triggered()), ui.listView, SLOT(selectAll()));
     connect( ui.action_DeselectAll, SIGNAL(triggered()), ui.listView, SLOT(clearSelection()));
-    setTextButtonSizeHint( ui.filterAll );
-    setTextButtonSizeHint( ui.filterActive );
-    setTextButtonSizeHint( ui.filterDownloading );
-    setTextButtonSizeHint( ui.filterSeeding );
-    setTextButtonSizeHint( ui.filterPaused );
 
     connect( &myFilterModel, SIGNAL(rowsInserted(const QModelIndex&,int,int)), this, SLOT(refreshVisibleCount()));
     connect( &myFilterModel, SIGNAL(rowsRemoved(const QModelIndex&,int,int)), this, SLOT(refreshVisibleCount()));
@@ -221,36 +194,6 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     connect( ui.listView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&,const QItemSelection&)), this, SLOT(refreshActionSensitivity()));
 
     QActionGroup * actionGroup = new QActionGroup( this );
-    actionGroup->addAction( ui.action_FilterByName );
-    actionGroup->addAction( ui.action_FilterByFiles );
-    actionGroup->addAction( ui.action_FilterByTracker );
-    QMenu * menu = new QMenu( );
-    menu->addAction( ui.action_FilterByName );
-    menu->addAction( ui.action_FilterByFiles );
-    menu->addAction( ui.action_FilterByTracker );
-    ui.filterEntryModeButton->setMenu( menu );
-    connect( ui.action_FilterByName, SIGNAL(triggered()), this, SLOT(filterByName()));
-    connect( ui.action_FilterByFiles, SIGNAL(triggered()), this, SLOT(filterByFiles()));
-    connect( ui.action_FilterByTracker, SIGNAL(triggered()), this, SLOT(filterByTracker()));
-    ui.action_FilterByName->setChecked( true );
-
-    actionGroup = new QActionGroup( this );
-    actionGroup->addAction( ui.action_TotalRatio );
-    actionGroup->addAction( ui.action_TotalTransfer );
-    actionGroup->addAction( ui.action_SessionRatio );
-    actionGroup->addAction( ui.action_SessionTransfer );
-    menu = new QMenu( );
-    menu->addAction( ui.action_TotalRatio );
-    menu->addAction( ui.action_TotalTransfer );
-    menu->addAction( ui.action_SessionRatio );
-    menu->addAction( ui.action_SessionTransfer );
-    connect( ui.action_TotalRatio, SIGNAL(triggered()), this, SLOT(showTotalRatio()));
-    connect( ui.action_TotalTransfer, SIGNAL(triggered()), this, SLOT(showTotalTransfer()));
-    connect( ui.action_SessionRatio, SIGNAL(triggered()), this, SLOT(showSessionRatio()));
-    connect( ui.action_SessionTransfer, SIGNAL(triggered()), this, SLOT(showSessionTransfer()));
-    ui.statusbarStatsButton->setMenu( menu );
-
-    actionGroup = new QActionGroup( this );
     actionGroup->addAction( ui.action_SortByActivity );
     actionGroup->addAction( ui.action_SortByAge );
     actionGroup->addAction( ui.action_SortByETA );
@@ -261,7 +204,7 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     actionGroup->addAction( ui.action_SortByState );
     actionGroup->addAction( ui.action_SortByTracker );
 
-    menu = new QMenu( );
+    QMenu * menu = new QMenu( );
     menu->addAction( ui.action_Add );
     menu->addSeparator( );
     menu->addAction( ui.action_ShowMainWindow );
@@ -275,8 +218,6 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     myTrayIcon.setContextMenu( menu );
     myTrayIcon.setIcon( QApplication::windowIcon( ) );
 
-    ui.optionsButton->setMenu( createOptionsMenu( ) );
-
     connect( &myPrefs, SIGNAL(changed(int)), this, SLOT(refreshPref(int)) );
     connect( ui.action_ShowMainWindow, SIGNAL(toggled(bool)), this, SLOT(toggleWindows()));
     connect( &myTrayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
@@ -284,6 +225,9 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
 
     ui.action_ShowMainWindow->setChecked( !minimized );
     ui.action_TrayIcon->setChecked( minimized || prefs.getBool( Prefs::SHOW_TRAY_ICON ) );
+
+    ui.verticalLayout->addWidget( createStatusBar( ) );
+    ui.verticalLayout->insertWidget( 0, createFilterBar( ) );
 
     QList<int> initKeys;
     initKeys << Prefs :: MAIN_WINDOW_X
@@ -311,7 +255,7 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     connect( &mySession, SIGNAL(dataSendProgress()), this, SLOT(dataSendProgress()) );
 
     if( mySession.isServer( ) )
-        ui.networkLabel->hide( );
+        myNetworkLabel->hide( );
     else {
         connect( &myNetworkTimer, SIGNAL(timeout()), this, SLOT(onNetworkTimer()));
         myNetworkTimer.start( 1000 );
@@ -346,6 +290,155 @@ TrMainWindow :: onSetPrefs( bool isChecked )
 {
     if( isChecked )
         onSetPrefs( );
+}
+
+#define SHOW_KEY "show-mode"
+
+void
+TrMainWindow :: onShowModeClicked( )
+{
+    setShowMode( sender()->property(SHOW_KEY).toInt() );
+}
+
+QWidget *
+TrMainWindow :: createFilterBar( )
+{
+    int i;
+    QMenu * m;
+    QLineEdit * e;
+    QPushButton * p;
+    QHBoxLayout * h;
+    QActionGroup * a;
+    const int smallSize = style( )->pixelMetric( QStyle::PM_SmallIconSize, 0, this );
+    const QSize smallIconSize( smallSize, smallSize );
+
+    QWidget * top = myFilterBar = new QWidget;
+    h = new QHBoxLayout( top );
+    h->setContentsMargins( HIG::PAD_SMALL, HIG::PAD_SMALL, HIG::PAD_SMALL, HIG::PAD_SMALL );
+    h->setSpacing( HIG::PAD_SMALL );
+
+        QList<QString> titles;
+        titles << tr( "A&ll" ) << tr( "&Active" ) << tr( "&Downloading" ) << tr( "&Seeding" ) << tr( "&Paused" );
+        for( i=0; i<titles.size(); ++i ) {
+            p = myFilterButtons[i] = new QPushButton( titles[i] );
+            p->setProperty( SHOW_KEY, i );
+            p->setFlat( true );
+            p->setCheckable( true );
+            p->setMaximumSize( calculateTextButtonSizeHint( p ) );
+            connect( p, SIGNAL(clicked()), this, SLOT(onShowModeClicked()));
+            h->addWidget( p );
+        }
+
+    h->addStretch( 1 );
+
+        a = new QActionGroup( this );
+        a->addAction( ui.action_FilterByName );
+        a->addAction( ui.action_FilterByFiles );
+        a->addAction( ui.action_FilterByTracker );
+        m = new QMenu( );
+        m->addAction( ui.action_FilterByName );
+        m->addAction( ui.action_FilterByFiles );
+        m->addAction( ui.action_FilterByTracker );
+        connect( ui.action_FilterByName, SIGNAL(triggered()), this, SLOT(filterByName()));
+        connect( ui.action_FilterByFiles, SIGNAL(triggered()), this, SLOT(filterByFiles()));
+        connect( ui.action_FilterByTracker, SIGNAL(triggered()), this, SLOT(filterByTracker()));
+        ui.action_FilterByName->setChecked( true );
+        p = myFilterTextButton = new TrIconPushButton;
+        p->setIcon( getStockIcon( "edit-find", QStyle::SP_ArrowForward ) );
+        p->setFlat( true );
+        p->setMenu( m );
+        h->addWidget( p );
+
+        e = myFilterTextLineEdit = new QLineEdit;
+        connect( e, SIGNAL(textChanged(QString)), &myFilterModel, SLOT(setText(QString)));
+        h->addWidget( e );
+
+        p = myFilterTextButton = new TrIconPushButton;
+        p->setIcon( getStockIcon( "edit-clear", QStyle::SP_DialogCloseButton ) );
+        p->setFlat( true );
+        connect( p, SIGNAL(clicked()), myFilterTextLineEdit, SLOT(clear()));
+        h->addWidget( p );
+
+    return top;
+}
+
+QWidget *
+TrMainWindow :: createStatusBar( )
+{
+    QMenu * m;
+    QLabel * l;
+    QHBoxLayout * h;
+    QPushButton * p;
+    QActionGroup * a;
+    const int i = style( )->pixelMetric( QStyle::PM_SmallIconSize, 0, this );
+    const QSize smallIconSize( i, i );
+
+    QWidget * top = myStatusBar = new QWidget;
+    h = new QHBoxLayout( top );
+    h->setContentsMargins( HIG::PAD_SMALL, HIG::PAD_SMALL, HIG::PAD_SMALL, HIG::PAD_SMALL );
+
+        p = myOptionsButton = new TrIconPushButton( this );
+        p->setIcon( QIcon( ":/icons/options.png" ) );
+        p->setFlat( true );
+        p->setMenu( createOptionsMenu( ) );
+        h->addWidget( p );
+
+        p = myAltSpeedButton = new TrIconPushButton( this );
+        p->setIcon( myPrefs.get<bool>(Prefs::ALT_SPEED_LIMIT_ENABLED) ? mySpeedModeOnIcon : mySpeedModeOffIcon );
+        p->setFlat( true );
+        h->addWidget( p );
+        connect( p, SIGNAL(clicked()), this, SLOT(toggleSpeedMode()));
+
+        l = myNetworkLabel = new QLabel;
+        h->addWidget( l );
+
+    h->addStretch( 1 );
+
+        l = myVisibleCountLabel = new QLabel( this );
+        h->addWidget( l );
+
+    h->addStretch( 1 );
+  
+        a = new QActionGroup( this );
+        a->addAction( ui.action_TotalRatio );
+        a->addAction( ui.action_TotalTransfer );
+        a->addAction( ui.action_SessionRatio );
+        a->addAction( ui.action_SessionTransfer );
+        m = new QMenu( );
+        m->addAction( ui.action_TotalRatio );
+        m->addAction( ui.action_TotalTransfer );
+        m->addAction( ui.action_SessionRatio );
+        m->addAction( ui.action_SessionTransfer );
+        connect( ui.action_TotalRatio, SIGNAL(triggered()), this, SLOT(showTotalRatio()));
+        connect( ui.action_TotalTransfer, SIGNAL(triggered()), this, SLOT(showTotalTransfer()));
+        connect( ui.action_SessionRatio, SIGNAL(triggered()), this, SLOT(showSessionRatio()));
+        connect( ui.action_SessionTransfer, SIGNAL(triggered()), this, SLOT(showSessionTransfer()));
+        p = myStatsModeButton = new TrIconPushButton( this );
+        p->setIcon( getStockIcon( "view-refresh", QStyle::SP_BrowserReload ) );
+        p->setFlat( true );
+        p->setMenu( m );
+        h->addWidget( p );  
+        h->addSpacing( HIG :: PAD_SMALL );
+        l = myStatsLabel = new QLabel( this );
+        h->addWidget( l );  
+   
+    h->addStretch( 1 );
+
+        l = new QLabel( this );
+        l->setPixmap( getStockIcon( "go-down", QStyle::SP_ArrowDown ).pixmap( smallIconSize ) );
+        h->addWidget( l );
+        l = myDownloadSpeedLabel = new QLabel( this );
+        h->addWidget( l );
+
+    h->addSpacing( HIG :: PAD_BIG );
+
+        l = new QLabel;
+        l->setPixmap( getStockIcon( "go-up", QStyle::SP_ArrowUp ).pixmap( smallIconSize ) );
+        h->addWidget( l );
+        l = myUploadSpeedLabel = new QLabel;
+        h->addWidget( l );
+
+    return top;
 }
 
 QMenu *
@@ -496,7 +589,7 @@ TrMainWindow :: refreshVisibleCount( )
         str = tr( "%Ln Torrent(s)", 0, totalCount );
     else
         str = tr( "%L1 of %Ln Torrent(s)", 0, totalCount ).arg( visibleCount );
-    ui.visibleCountLabel->setText( str );
+    myVisibleCountLabel->setText( str );
 }
 
 void
@@ -504,8 +597,8 @@ TrMainWindow :: refreshStatusBar( )
 {
     const Speed up( myModel.getUploadSpeed( ) );
     const Speed down( myModel.getDownloadSpeed( ) );
-    ui.uploadTextLabel->setText( Utils :: speedToString( up ) );
-    ui.downloadTextLabel->setText( Utils :: speedToString( down ) );
+    myUploadSpeedLabel->setText( Utils :: speedToString( up ) );
+    myDownloadSpeedLabel->setText( Utils :: speedToString( down ) );
     const QString mode( myPrefs.getString( Prefs::STATUSBAR_STATS ) );
     QString str;
 
@@ -530,7 +623,7 @@ TrMainWindow :: refreshStatusBar( )
         str = tr( "Ratio: %1" ).arg( Utils :: ratioToString( mySession.getCumulativeStats().ratio ) );
     }
 
-    ui.statusbarStatsLabel->setText( str );
+    myStatsLabel->setText( str );
 }
 
 void
@@ -778,22 +871,19 @@ TrMainWindow :: refreshPref( int key )
 
         case Prefs::FILTER_MODE:
             i = myPrefs.get<FilterMode>(key).mode( );
-            ui.filterAll->setChecked         ( i == FilterMode::SHOW_ALL );
-            ui.filterActive->setChecked      ( i == FilterMode::SHOW_ACTIVE );
-            ui.filterDownloading->setChecked ( i == FilterMode::SHOW_DOWNLOADING );
-            ui.filterSeeding->setChecked     ( i == FilterMode::SHOW_SEEDING );
-            ui.filterPaused->setChecked      ( i == FilterMode::SHOW_PAUSED );
+            for( int j=0; j<FilterMode::NUM_MODES; ++j )
+                myFilterButtons[j]->setChecked( i==j );
             break;
 
         case Prefs::FILTERBAR:
             b = myPrefs.getBool( key );
-            ui.filterbar->setVisible( b );
+            myFilterBar->setVisible( b );
             ui.action_Filterbar->setChecked( b );
             break;
 
         case Prefs::STATUSBAR:
             b = myPrefs.getBool( key );
-            ui.statusbar->setVisible( b );
+            myStatusBar->setVisible( b );
             ui.action_Statusbar->setChecked( b );
             break;
 
@@ -828,10 +918,10 @@ TrMainWindow :: refreshPref( int key )
 
         case Prefs :: ALT_SPEED_LIMIT_ENABLED:
             b = myPrefs.getBool( key );
-            ui.speedLimitModeButton->setChecked( b );
-            ui.speedLimitModeButton->setIcon( b ? mySpeedModeOnIcon : mySpeedModeOffIcon );
-            ui.speedLimitModeButton->setToolTip( b ? tr( "Click to disable Speed Limit Mode" )
-                                                   : tr( "Click to enable Speed Limit Mode" ) );
+            myAltSpeedButton->setChecked( b );
+            myAltSpeedButton->setIcon( b ? mySpeedModeOnIcon : mySpeedModeOffIcon );
+            myAltSpeedButton->setToolTip( b ? tr( "Click to disable Speed Limit Mode" )
+                                            : tr( "Click to enable Speed Limit Mode" ) );
             break;
 
         default:
@@ -918,8 +1008,8 @@ TrMainWindow :: updateNetworkIcon( )
 
     QIcon icon = getStockIcon( key, QStyle::SP_DriveNetIcon );
     QPixmap pixmap = icon.pixmap ( 16, 16 );
-    ui.networkLabel->setPixmap( pixmap );
-    ui.networkLabel->setToolTip( isSending || isReading
+    myNetworkLabel->setPixmap( pixmap );
+    myNetworkLabel->setToolTip( isSending || isReading
         ? tr( "Transmission server is responding" )
         : tr( "Last response from server was %1 ago" ).arg( Utils::timeToString( now-std::max(myLastReadTime,myLastSendTime))));
 }
