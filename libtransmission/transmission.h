@@ -150,6 +150,8 @@ static TR_INLINE tr_bool tr_isEncryptionMode( tr_encryption_mode m )
 }
 
 
+#define TR_DEFAULT_BIND_ADDRESS_IPV4 "0.0.0.0"
+#define TR_DEFAULT_BIND_ADDRESS_IPV6 "::"
 #define TR_DEFAULT_OPEN_FILE_LIMIT_STR "32"
 #define TR_DEFAULT_RPC_WHITELIST "127.0.0.1"
 #define TR_DEFAULT_RPC_PORT_STR "9091"
@@ -165,6 +167,8 @@ static TR_INLINE tr_bool tr_isEncryptionMode( tr_encryption_mode m )
 #define TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED     "alt-speed-time-enabled"
 #define TR_PREFS_KEY_ALT_SPEED_TIME_END         "alt-speed-time-end"
 #define TR_PREFS_KEY_ALT_SPEED_TIME_DAY         "alt-speed-time-day"
+#define TR_PREFS_KEY_BIND_ADDRESS_IPV4          "bind-address-ipv4"
+#define TR_PREFS_KEY_BIND_ADDRESS_IPV6          "bind-address-ipv6"
 #define TR_PREFS_KEY_BLOCKLIST_ENABLED          "blocklist-enabled"
 #define TR_PREFS_KEY_DOWNLOAD_DIR               "download-dir"
 #define TR_PREFS_KEY_ENCRYPTION                 "encryption"
@@ -191,6 +195,7 @@ static TR_INLINE tr_bool tr_isEncryptionMode( tr_encryption_mode m )
 #define TR_PREFS_KEY_RATIO                      "ratio-limit"
 #define TR_PREFS_KEY_RATIO_ENABLED              "ratio-limit-enabled"
 #define TR_PREFS_KEY_RPC_AUTH_REQUIRED          "rpc-authentication-required"
+#define TR_PREFS_KEY_RPC_BIND_ADDRESS           "rpc-bind-address"
 #define TR_PREFS_KEY_RPC_ENABLED                "rpc-enabled"
 #define TR_PREFS_KEY_RPC_PASSWORD               "rpc-password"
 #define TR_PREFS_KEY_RPC_PORT                   "rpc-port"
@@ -396,6 +401,8 @@ void  tr_sessionSetRPCPasswordEnabled( tr_session * session,
                                        tr_bool      isEnabled );
 
 tr_bool tr_sessionIsRPCPasswordEnabled( const tr_session * session );
+
+const char* tr_sessionGetRPCBindAddress( const tr_session * session );
 
 
 typedef enum

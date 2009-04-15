@@ -112,6 +112,8 @@ void tr_socketListForEach( tr_socketList * const head,
                                            tr_address * const,
                                            void * const ),
                            void * const userData);
+const tr_address *tr_socketListGetType( const tr_socketList * const el,
+                                        tr_address_type type );
 
 /***********************************************************************
  * Sockets

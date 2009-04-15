@@ -171,8 +171,6 @@ void         tr_globalLock( tr_session * );
 
 void         tr_globalUnlock( tr_session * );
 
-tr_bool      tr_globalIsLocked( const tr_session * );
-
 enum
 {
     SESSION_MAGIC_NUMBER = 3845

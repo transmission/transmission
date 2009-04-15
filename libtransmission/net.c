@@ -154,6 +154,7 @@ tr_address *
 tr_pton( const char * src, tr_address * dst ) 
 { 
     int retval = inet_pton( AF_INET, src, &dst->addr ); 
+    assert( dst );
     if( retval < 0 ) 
         return NULL; 
     else if( retval == 0 ) 
@@ -316,6 +317,19 @@ tr_socketListForEach( tr_socketList * const head,
         cb( &tmp->socket, &tmp->addr, userData );
 }
 
+const tr_address *
+tr_socketListGetType( const tr_socketList * const el, tr_address_type type )
+{
+    const tr_socketList * tmp = el;
+    while( tmp )
+    {
+        if( tmp->addr.type == type )
+            return &tmp->addr;
+        tmp = tmp->next;
+    }
+    return NULL;
+}
+
 /***********************************************************************
  * TCP sockets
  **********************************************************************/
@@ -446,6 +460,8 @@ tr_isValidPeerAddress( const tr_address * addr, tr_port port )
     return TRUE;
 }
 
+const tr_socketList * tr_getSessionBindSockets( const tr_session * session );
+
 int
 tr_netOpenTCP( tr_session        * session,
                const tr_address  * addr,
@@ -455,6 +471,9 @@ tr_netOpenTCP( tr_session        * session,
     struct sockaddr_storage sock;
     const int               type = SOCK_STREAM;
     socklen_t               addrlen;
+    const tr_address      * source_addr;
+    socklen_t               sourcelen;
+    struct sockaddr_storage source_sock;
 
     assert( tr_isAddress( addr ) );
 
@@ -467,6 +486,18 @@ tr_netOpenTCP( tr_session        * session,
     setSndBuf( session, s );
 
     addrlen = setup_sockaddr( addr, port, &sock );
+    
+    /* set source address */
+    source_addr = tr_socketListGetType( tr_getSessionBindSockets( session ),
+                                        addr->type );
+    assert( source_addr );
+    sourcelen = setup_sockaddr( source_addr, 0, &source_sock );
+    if( bind( s, ( struct sockaddr * ) &source_sock, sourcelen ) )
+    {
+        tr_err( _( "Couldn't set source address %s on %d: %s" ),
+                tr_ntop_non_ts( source_addr ), s, tr_strerror( errno ) );
+        return -errno;
+    }
 
     if( ( connect( s, (struct sockaddr *) &sock,
                   addrlen ) < 0 )

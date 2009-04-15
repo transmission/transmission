@@ -63,5 +63,6 @@ void            tr_rpcSetPasswordEnabled( tr_rpc_server * server,
 
 tr_bool         tr_rpcIsPasswordEnabled( const tr_rpc_server * session );
 
+const char*     tr_rpcGetBindAddress( const tr_rpc_server * server );
 
 #endif

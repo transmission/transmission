@@ -215,32 +215,18 @@ sharedPulse( void * vshared )
 ****
 ***/
 
-static tr_socketList *
-setupBindSockets( tr_port port )
-{
-    tr_bool hasIPv6 = tr_net_hasIPv6( port );
-    tr_socketList * socks = NULL;
-    if( hasIPv6 )
-        socks = tr_socketListNew( &tr_in6addr_any );
-
-    if( socks )
-        tr_socketListAppend( socks, &tr_inaddr_any );
-    else
-        socks = tr_socketListNew( &tr_inaddr_any );
-    return socks; /* Because the dryer gremlins won't */
-}
-
 tr_shared *
 tr_sharedInit( tr_session  * session,
                tr_bool       isEnabled,
-               tr_port       publicPort )
+               tr_port       publicPort,
+               tr_socketList * socks )
 {
     tr_shared * s = tr_new0( tr_shared, 1 );
 
     s->session      = session;
     s->publicPort   = publicPort;
     s->shouldChange = TRUE;
-    s->bindSockets  = setupBindSockets( publicPort );
+    s->bindSockets  = socks;
     s->shouldChange = TRUE;
     s->natpmp       = tr_natpmpInit( );
     s->upnp         = tr_upnpInit( );
@@ -294,3 +280,8 @@ tr_sharedTraversalStatus( const tr_shared * s )
     return MAX( s->natpmpStatus, s->upnpStatus );
 }
 
+const tr_socketList *
+tr_sharedGetBindSockets( const tr_shared * shared )
+{
+    return shared->bindSockets;
+}

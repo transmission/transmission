@@ -74,6 +74,13 @@ Prefer unencrypted peer connections.
 .It Fl h Fl -help
 Print command-line option descriptions.
 
+.It Fl i Fl -bind-address-ipv4
+Listen for IPv4 BitTorrent connections on a specific address. Only one IPv4 listening address is allowed. Default: 0.0.0.0 (All addresses)
+.It Fl I Fl -bind-address-ipv6
+Listen for IPv6 BitTorrent connections on a specific address. Only one IPv6 listening address is allowed. Default: :: (All addresses)
+.It Fl r Fl -rpc-bind-address
+Listen for RPC connections on a specific address. This must be an IPv4 address. Only one RPC listening address is allowed. Default: 0.0.0.0 (All addresses)
+
 .It Fl L Fl -peerlimit-global Ar limit
 Overall peer limit. Useful on embedded systems where the default might be unsuitable. Default: 240
 .It Fl l Fl -peerlimit-torrent Ar limit
