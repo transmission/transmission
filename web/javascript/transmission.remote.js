@@ -126,7 +126,7 @@ TransmissionRemote.prototype =
 		var o = {
 			method: 'torrent-remove',
 			arguments: {
-				'delete-local-data': true,
+				'delete-local-data': 'true',
 				ids: [ ]
 			}
 		};
@@ -134,9 +134,10 @@ TransmissionRemote.prototype =
 		if( torrents != null )
 			for( var i=0, len=torrents.length; i<len; ++i )
 				o.arguments.ids.push( torrents[i].id() );
-		this.sendRequest( o, function( ) {
+
+		this.sendRequest( RPC._Root, $.toJSON(o), function( ) {
 			remote.loadTorrents();
-		} );
+		}, "json" );
 	},
 	addTorrentByUrl: function( url, options ) {
 		this.sendRequest( RPC._Root, $.toJSON({
