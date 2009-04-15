@@ -23,6 +23,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Watch folder for auto-adding torrents
 - Web Client 
    + File selection and prioritization
+   + Fix "Remove Data" bug
 
 1.52 (2009/04/12)
 <http://trac.transmissionbt.com/query?milestone=1.52&group=component&groupdesc=1&order=severity>
@@ -37,7 +38,6 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 - Web Client
    + On the server, better filtering of bad URLs
    + On the server, faster json serialization
-   + Fix "Remove Data" bug
    + Fix minor web client 301 redirect error
    + Better Internet Explorer support
 
