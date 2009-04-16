@@ -964,9 +964,9 @@ struct WalkFuncs
  * attack via maliciously-crafted bencoded data. (#667)
  */
 static void
-bencWalk( const tr_benc *    top,
-          struct WalkFuncs * walkFuncs,
-          void *             user_data )
+bencWalk( const tr_benc          * top,
+          const struct WalkFuncs * walkFuncs,
+          void                   * user_data )
 {
     tr_ptrArray stack = TR_PTR_ARRAY_INIT;
 
@@ -1044,8 +1044,7 @@ bencWalk( const tr_benc *    top,
 ****/
 
 static void
-saveIntFunc( const tr_benc * val,
-             void *          evbuf )
+saveIntFunc( const tr_benc * val, void * evbuf )
 {
     evbuffer_add_printf( evbuf, "i%" PRId64 "e", val->val.i );
 }
@@ -1079,52 +1078,46 @@ saveRealFunc( const tr_benc * val, void * evbuf )
 }
 
 static void
-saveStringFunc( const tr_benc * val,
-                void *          vevbuf )
+saveStringFunc( const tr_benc * val, void * evbuf )
 {
-    struct evbuffer * evbuf = vevbuf;
-
     evbuffer_add_printf( evbuf, "%lu:", (unsigned long)val->val.s.i );
     evbuffer_add( evbuf, val->val.s.s, val->val.s.i );
 }
 
 static void
-saveDictBeginFunc( const tr_benc * val UNUSED,
-                   void *              evbuf )
+saveDictBeginFunc( const tr_benc * val UNUSED, void * evbuf )
 {
     evbuffer_add( evbuf, "d", 1 );
 }
 
 static void
-saveListBeginFunc( const tr_benc * val UNUSED,
-                   void *              evbuf )
+saveListBeginFunc( const tr_benc * val UNUSED, void * evbuf )
 {
     evbuffer_add( evbuf, "l", 1 );
 }
 
 static void
-saveContainerEndFunc( const tr_benc * val UNUSED,
-                      void *              evbuf )
+saveContainerEndFunc( const tr_benc * val UNUSED, void * evbuf )
 {
     evbuffer_add( evbuf, "e", 1 );
 }
+
+static const struct WalkFuncs saveFuncs = { saveIntFunc,
+                                            saveBoolFunc,
+                                            saveRealFunc,
+                                            saveStringFunc,
+                                            saveDictBeginFunc,
+                                            saveListBeginFunc,
+                                            saveContainerEndFunc };
 
 char*
 tr_bencSave( const tr_benc * top,
              int *           len )
 {
-    char *            ret;
-    struct WalkFuncs  walkFuncs;
+    char * ret;
     struct evbuffer * out = tr_getBuffer( );
 
-    walkFuncs.intFunc = saveIntFunc;
-    walkFuncs.boolFunc = saveBoolFunc;
-    walkFuncs.realFunc = saveRealFunc;
-    walkFuncs.stringFunc = saveStringFunc;
-    walkFuncs.dictBeginFunc = saveDictBeginFunc;
-    walkFuncs.listBeginFunc = saveListBeginFunc;
-    walkFuncs.containerEndFunc = saveContainerEndFunc;
-    bencWalk( top, &walkFuncs, out );
+    bencWalk( top, &saveFuncs, out );
 
     if( len )
         *len = EVBUFFER_LENGTH( out );
@@ -1157,23 +1150,21 @@ freeContainerBeginFunc( const tr_benc * val,
     tr_ptrArrayAppend( freeme, val->val.l.vals );
 }
 
+static const struct WalkFuncs freeWalkFuncs = { freeDummyFunc,
+                                                freeDummyFunc,
+                                                freeDummyFunc,
+                                                freeStringFunc,
+                                                freeContainerBeginFunc,
+                                                freeContainerBeginFunc,
+                                                freeDummyFunc };
+
 void
 tr_bencFree( tr_benc * val )
 {
-    if( val && val->type )
+    if( isSomething( val ) )
     {
         tr_ptrArray a = TR_PTR_ARRAY_INIT;
-        struct WalkFuncs walkFuncs;
-
-        walkFuncs.intFunc = freeDummyFunc;
-        walkFuncs.boolFunc = freeDummyFunc;
-        walkFuncs.realFunc = freeDummyFunc;
-        walkFuncs.stringFunc = freeStringFunc;
-        walkFuncs.dictBeginFunc = freeContainerBeginFunc;
-        walkFuncs.listBeginFunc = freeContainerBeginFunc;
-        walkFuncs.containerEndFunc = freeDummyFunc;
-        bencWalk( val, &walkFuncs, &a );
-
+        bencWalk( val, &freeWalkFuncs, &a );
         tr_ptrArrayDestruct( &a, tr_free );
     }
 }
@@ -1399,26 +1390,25 @@ jsonContainerEndFunc( const tr_benc * val,
     jsonChildFunc( data );
 }
 
+static const struct WalkFuncs jsonWalkFuncs = { jsonIntFunc,
+                                                jsonBoolFunc,
+                                                jsonRealFunc,
+                                                jsonStringFunc,
+                                                jsonDictBeginFunc,
+                                                jsonListBeginFunc,
+                                                jsonContainerEndFunc };
+                                            
 char*
 tr_bencSaveAsJSON( const tr_benc * top, struct evbuffer * out )
 {
-    struct WalkFuncs walkFuncs;
-    struct jsonWalk  data;
+    struct jsonWalk data;
 
     evbuffer_drain( out, EVBUFFER_LENGTH( out ) );
 
     data.out = out;
     data.parents = NULL;
 
-    walkFuncs.intFunc = jsonIntFunc;
-    walkFuncs.boolFunc = jsonBoolFunc;
-    walkFuncs.realFunc = jsonRealFunc;
-    walkFuncs.stringFunc = jsonStringFunc;
-    walkFuncs.dictBeginFunc = jsonDictBeginFunc;
-    walkFuncs.listBeginFunc = jsonListBeginFunc;
-    walkFuncs.containerEndFunc = jsonContainerEndFunc;
-
-    bencWalk( top, &walkFuncs, &data );
+    bencWalk( top, &jsonWalkFuncs, &data );
 
     if( EVBUFFER_LENGTH( out ) )
         evbuffer_add_printf( out, "\n" );
