@@ -80,16 +80,8 @@ namespace
 class PeerItem: public QTreeWidgetItem
 {
         Peer peer;
-        int quads[4];
+        QString collatedAddress;
         QString status;
-
-        bool quadsLessThan( const PeerItem * that ) const {
-            for( int i=0; i<4; ++i ) {
-                if( quads[i] < that->quads[i] ) return true;
-                if( quads[i] > that->quads[i] ) return false;
-            }
-            return false;
-        }
 
     public:
         PeerItem( ) { }
@@ -101,9 +93,11 @@ class PeerItem: public QTreeWidgetItem
         }
         void setPeer( const Peer& p ) {
             peer = p;
-            const QStringList tokens( p.address.split(".") );
-            for( int i=0; i<4; ++i )
-                quads[i] = tokens.at(i).toInt();
+            int quads[4];
+            if( sscanf( p.address.toUtf8().constData(), "%d.%d.%d.%d", quads+0, quads+1, quads+2, quads+3 ) == 4 )
+                collatedAddress.sprintf( "%03d.%03d.%03d.%03d", quads[0], quads[1], quads[2], quads[3] );
+            else
+                collatedAddress = p.address;
         }
         virtual bool operator< ( const QTreeWidgetItem & other ) const {
             const PeerItem * that = dynamic_cast<const PeerItem*>(&other);
@@ -114,7 +108,7 @@ class PeerItem: public QTreeWidgetItem
                 case COL_DOWN: return peer.rateToClient < that->peer.rateToClient;
                 case COL_PERCENT: return peer.progress < that->peer.progress;
                 case COL_STATUS: return status < that->status;
-                case COL_ADDRESS: return quadsLessThan( that );
+                case COL_ADDRESS: return collatedAddress < that->collatedAddress;
                 case COL_CLIENT: return peer.clientName < that->peer.clientName;
                 default: /*COL_LOCK*/ return peer.isEncrypted && !that->peer.isEncrypted;
             }

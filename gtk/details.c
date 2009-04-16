@@ -83,6 +83,7 @@ webseed_model_new( const tr_torrent * tor )
 enum
 {
     PEER_COL_ADDRESS,
+    PEER_COL_ADDRESS_COLLATED,
     PEER_COL_DOWNLOAD_RATE,
     PEER_COL_UPLOAD_RATE,
     PEER_COL_CLIENT,
@@ -128,13 +129,21 @@ peer_row_set( GtkListStore        * store,
               GtkTreeIter         * iter,
               const tr_peer_stat  * peer )
 {
+    int quads[4];
+    char buf[128];
     const char * client = peer->client;
 
     if( !client || !strcmp( client, "Unknown Client" ) )
         client = " ";
 
+    if( sscanf( peer->addr, "%d.%d.%d.%d", quads, quads+1, quads+2, quads+3 ) == 4 )
+        g_snprintf( buf, sizeof( buf ), "%03d.%03d.%03d.%03d", quads[0], quads[1], quads[2], quads[3] );
+    else
+        g_strlcpy( buf, peer->addr, sizeof( buf ) );
+
     gtk_list_store_set( store, iter,
                         PEER_COL_ADDRESS, peer->addr,
+                        PEER_COL_ADDRESS_COLLATED, buf,
                         PEER_COL_CLIENT, client,
                         PEER_COL_IS_ENCRYPTED, peer->isEncrypted,
                         PEER_COL_PROGRESS, (int)( 100.0 * peer->progress ),
@@ -163,12 +172,13 @@ static GtkTreeModel*
 peer_model_new( tr_torrent * tor )
 {
     GtkListStore * m = gtk_list_store_new( N_PEER_COLS,
-                                           G_TYPE_STRING, /* addr */
-                                           G_TYPE_FLOAT, /* downloadFromRate */
-                                           G_TYPE_FLOAT, /* uploadToRate */
-                                           G_TYPE_STRING, /* client */
-                                           G_TYPE_INT,   /* progress [0..100] */
-                                           G_TYPE_BOOLEAN, /* isEncrypted */
+                                           G_TYPE_STRING,   /* address */
+                                           G_TYPE_STRING,   /* collated address */
+                                           G_TYPE_FLOAT,    /* downloadFromRate */
+                                           G_TYPE_FLOAT,    /* uploadToRate */
+                                           G_TYPE_STRING,   /* client */
+                                           G_TYPE_INT,      /* progress [0..100] */
+                                           G_TYPE_BOOLEAN,  /* isEncrypted */
                                            G_TYPE_STRING ); /* flagString */
 
     int            n_peers = 0;
@@ -485,6 +495,7 @@ peer_page_new( TrTorrent * gtor )
     for( i = 0; i < G_N_ELEMENTS( view_columns ); ++i )
     {
         const int           col = view_columns[i];
+        int                 sort_col = col;
         const char *        t = _( peer_column_names[col] );
         GtkTreeViewColumn * c;
         GtkCellRenderer *   r;
@@ -494,6 +505,7 @@ peer_page_new( TrTorrent * gtor )
             case PEER_COL_ADDRESS:
                 r = gtk_cell_renderer_text_new( );
                 c = gtk_tree_view_column_new_with_attributes( t, r, "text", col, NULL );
+                sort_col = PEER_COL_ADDRESS_COLLATED;
                 break;
 
             case PEER_COL_CLIENT:
@@ -537,7 +549,7 @@ peer_page_new( TrTorrent * gtor )
         }
 
         gtk_tree_view_column_set_resizable( c, FALSE );
-        gtk_tree_view_column_set_sort_column_id( c, col );
+        gtk_tree_view_column_set_sort_column_id( c, sort_col );
         gtk_tree_view_append_column( GTK_TREE_VIEW( v ), c );
     }
 
