@@ -373,10 +373,10 @@ void   tr_sessionSetRPCWhitelist( tr_session * session,
                                   const char * whitelist );
 
 /** @brief get the Access Control List for allowing/denying RPC requests.
-    @return a comma-separated string of whitelist domains.  tr_free() when done.
+    @return a comma-separated string of whitelist domains.
     @see tr_sessionInit
     @see tr_sessionSetRPCWhitelist */
-char* tr_sessionGetRPCWhitelist( const tr_session * );
+const char* tr_sessionGetRPCWhitelist( const tr_session * );
 
 void  tr_sessionSetRPCWhitelistEnabled( tr_session * session,
                                         tr_bool      isEnabled );
@@ -390,12 +390,12 @@ void  tr_sessionSetRPCUsername( tr_session * session,
                                 const char * username );
 
 /** @brief get the password used to restrict RPC requests.
-    @return the password string. tr_free() when done.
+    @return the password string.
     @see tr_sessionInit()
     @see tr_sessionSetRPCPassword() */
-char* tr_sessionGetRPCPassword( const tr_session * session );
+const char* tr_sessionGetRPCPassword( const tr_session * session );
 
-char* tr_sessionGetRPCUsername( const tr_session * session  );
+const char* tr_sessionGetRPCUsername( const tr_session * session  );
 
 void  tr_sessionSetRPCPasswordEnabled( tr_session * session,
                                        tr_bool      isEnabled );

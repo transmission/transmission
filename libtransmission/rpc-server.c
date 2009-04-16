@@ -643,10 +643,10 @@ tr_rpcSetWhitelist( tr_rpc_server * server,
     }
 }
 
-char*
+const char*
 tr_rpcGetWhitelist( const tr_rpc_server * server )
 {
-    return tr_strdup( server->whitelistStr ? server->whitelistStr : "" );
+    return server->whitelistStr ? server->whitelistStr : "";
 }
 
 void
@@ -675,10 +675,10 @@ tr_rpcSetUsername( tr_rpc_server * server,
     dbgmsg( "setting our Username to [%s]", server->username );
 }
 
-char*
+const char*
 tr_rpcGetUsername( const tr_rpc_server * server )
 {
-    return tr_strdup( server->username ? server->username : "" );
+    return server->username ? server->username : "";
 }
 
 void
@@ -693,10 +693,10 @@ tr_rpcSetPassword( tr_rpc_server * server,
     dbgmsg( "setting our Password to [%s]", server->password );
 }
 
-char*
+const char*
 tr_rpcGetPassword( const tr_rpc_server * server )
 {
-    return tr_strdup( server->password ? server->password : "" );
+    return server->password ? server->password : "" ;
 }
 
 void

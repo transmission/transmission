@@ -46,17 +46,17 @@ tr_bool         tr_rpcGetWhitelistEnabled( const tr_rpc_server * server );
 void            tr_rpcSetWhitelist( tr_rpc_server * server,
                                     const char *    whitelist );
 
-char*           tr_rpcGetWhitelist( const tr_rpc_server * server );
+const char*     tr_rpcGetWhitelist( const tr_rpc_server * server );
 
 void            tr_rpcSetPassword( tr_rpc_server * server,
                                    const char *    password );
 
-char*           tr_rpcGetPassword( const tr_rpc_server * server );
+const char*     tr_rpcGetPassword( const tr_rpc_server * server );
 
 void            tr_rpcSetUsername( tr_rpc_server * server,
                                    const char *    username );
 
-char*           tr_rpcGetUsername( const tr_rpc_server * server );
+const char*     tr_rpcGetUsername( const tr_rpc_server * server );
 
 void            tr_rpcSetPasswordEnabled( tr_rpc_server * server,
                                           tr_bool         isEnabled );

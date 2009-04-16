@@ -308,9 +308,6 @@ const tr_socketList * tr_getSessionBindSockets( const tr_session * session );
 void
 tr_sessionGetSettings( tr_session * s, struct tr_benc * d )
 {
-    int i, n=0;
-    char * freeme[16];
-
     assert( tr_bencIsDict( d ) );
 
     tr_bencDictReserve( d, 30 );
@@ -344,10 +341,10 @@ tr_sessionGetSettings( tr_session * s, struct tr_benc * d )
     tr_bencDictAddBool( d, TR_PREFS_KEY_RPC_AUTH_REQUIRED,        tr_sessionIsRPCPasswordEnabled( s ) );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_RPC_BIND_ADDRESS,         tr_sessionGetRPCBindAddress( s ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_RPC_ENABLED,              tr_sessionIsRPCEnabled( s ) );
-    tr_bencDictAddStr ( d, TR_PREFS_KEY_RPC_PASSWORD,             freeme[n++] = tr_sessionGetRPCPassword( s ) );
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_RPC_PASSWORD,             tr_sessionGetRPCPassword( s ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_RPC_PORT,                 tr_sessionGetRPCPort( s ) );
-    tr_bencDictAddStr ( d, TR_PREFS_KEY_RPC_USERNAME,             freeme[n++] = tr_sessionGetRPCUsername( s ) );
-    tr_bencDictAddStr ( d, TR_PREFS_KEY_RPC_WHITELIST,            freeme[n++] = tr_sessionGetRPCWhitelist( s ) );
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_RPC_USERNAME,             tr_sessionGetRPCUsername( s ) );
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_RPC_WHITELIST,            tr_sessionGetRPCWhitelist( s ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_RPC_WHITELIST_ENABLED,    tr_sessionGetRPCWhitelistEnabled( s ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_ALT_SPEED_ENABLED,        tr_sessionUsesAltSpeed( s ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_UP,             tr_sessionGetAltSpeed( s, TR_UP ) );
@@ -363,9 +360,6 @@ tr_sessionGetSettings( tr_session * s, struct tr_benc * d )
                         tr_ntop_non_ts( tr_socketListGetType( tr_getSessionBindSockets( s ), TR_AF_INET ) ) );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_BIND_ADDRESS_IPV6,
                         tr_ntop_non_ts( tr_socketListGetType( tr_getSessionBindSockets( s ), TR_AF_INET6 ) ) );
-
-    for( i=0; i<n; ++i )
-        tr_free( freeme[i] );
 }
 
 void
@@ -1858,7 +1852,7 @@ tr_sessionSetRPCWhitelist( tr_session * session,
     tr_rpcSetWhitelist( session->rpcServer, whitelist );
 }
 
-char*
+const char*
 tr_sessionGetRPCWhitelist( const tr_session * session )
 {
     assert( tr_isSession( session ) );
@@ -1893,7 +1887,7 @@ tr_sessionSetRPCPassword( tr_session * session,
     tr_rpcSetPassword( session->rpcServer, password );
 }
 
-char*
+const char*
 tr_sessionGetRPCPassword( const tr_session * session )
 {
     assert( tr_isSession( session ) );
@@ -1910,7 +1904,7 @@ tr_sessionSetRPCUsername( tr_session * session,
     tr_rpcSetUsername( session->rpcServer, username );
 }
 
-char*
+const char*
 tr_sessionGetRPCUsername( const tr_session * session )
 {
     assert( tr_isSession( session ) );
