@@ -42,6 +42,7 @@
 #include "trevent.h"
 #include "utils.h"
 #include "version.h"
+#include "verify.h"
 #include "web.h"
 
 #define dbgmsg( ... ) \
@@ -1350,6 +1351,7 @@ tr_closeAllConnections( void * vsession )
     tr_free( session->altTimer );
     session->altTimer = NULL;
 
+    tr_verifyClose( session );
     tr_statsClose( session );
     tr_sharedShuttingDown( session->shared );
     tr_rpcClose( &session->rpcServer );

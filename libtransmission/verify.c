@@ -269,10 +269,10 @@ compareVerifyByTorrent( const void * va,
     return a->torrent - b;
 }
 
-int
+tr_bool
 tr_verifyInProgress( const tr_torrent * tor )
 {
-    int found = FALSE;
+    tr_bool found = FALSE;
     tr_lock * lock = getVerifyLock( );
     tr_lockLock( lock );
 
@@ -312,3 +312,13 @@ tr_verifyRemove( tr_torrent * tor )
     tr_lockUnlock( lock );
 }
 
+void
+tr_verifyClose( tr_session * session UNUSED )
+{
+    tr_lockLock( getVerifyLock( ) );
+
+    stopCurrent = TRUE;
+    tr_list_free( &verifyList, tr_free );
+
+    tr_lockUnlock( getVerifyLock( ) );
+}

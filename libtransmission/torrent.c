@@ -1244,7 +1244,7 @@ torrentStart( tr_torrent * tor,
 
     if( !tor->isRunning )
     {
-        const int isVerifying = tr_verifyInProgress( tor );
+        const tr_bool isVerifying = tr_verifyInProgress( tor );
 
         if( !isVerifying && reloadProgress )
             tr_torrentLoadResume( tor, TR_FR_PROGRESS, NULL );
