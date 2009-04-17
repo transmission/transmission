@@ -171,10 +171,10 @@ accumulateStatusForeach( GtkTreeModel *      model,
 
     gtk_tree_model_get( model, iter, MC_ACTIVITY, &activity, -1 );
 
-    if( TR_STATUS_IS_ACTIVE( activity ) )
-        ++counts->activeCount;
-    else
+    if( activity == TR_STATUS_STOPPED )
         ++counts->inactiveCount;
+    else
+        ++counts->activeCount;
 }
 
 static void

@@ -1308,8 +1308,6 @@ tr_torrent_activity;
 
 tr_torrent_activity tr_torrentGetActivity( tr_torrent * );
 
-#define TR_STATUS_IS_ACTIVE( s ) ( ( s ) != TR_STATUS_STOPPED )
-
 typedef enum
 {
     TR_LOCKFILE_SUCCESS = 0,
