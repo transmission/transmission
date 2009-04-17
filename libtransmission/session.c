@@ -308,6 +308,9 @@ const tr_socketList * tr_getSessionBindSockets( const tr_session * session );
 void
 tr_sessionGetSettings( tr_session * s, struct tr_benc * d )
 {
+    const char * val;
+    const tr_address * addr;
+
     assert( tr_bencIsDict( d ) );
 
     tr_bencDictReserve( d, 30 );
@@ -356,10 +359,14 @@ tr_sessionGetSettings( tr_session * s, struct tr_benc * d )
     tr_bencDictAddInt ( d, TR_PREFS_KEY_USPEED,                   tr_sessionGetSpeedLimit( s, TR_UP ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_USPEED_ENABLED,           tr_sessionIsSpeedLimited( s, TR_UP ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_UPLOAD_SLOTS_PER_TORRENT, s->uploadSlotsPerTorrent );
-    tr_bencDictAddStr ( d, TR_PREFS_KEY_BIND_ADDRESS_IPV4,
-                        tr_ntop_non_ts( tr_socketListGetType( tr_getSessionBindSockets( s ), TR_AF_INET ) ) );
-    tr_bencDictAddStr ( d, TR_PREFS_KEY_BIND_ADDRESS_IPV6,
-                        tr_ntop_non_ts( tr_socketListGetType( tr_getSessionBindSockets( s ), TR_AF_INET6 ) ) );
+
+    addr = tr_socketListGetType( tr_getSessionBindSockets( s ), TR_AF_INET );
+    val = addr ? tr_ntop_non_ts( addr ) : TR_DEFAULT_BIND_ADDRESS_IPV4;
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_BIND_ADDRESS_IPV4, val );
+
+    addr = tr_socketListGetType( tr_getSessionBindSockets( s ), TR_AF_INET6 );
+    val = addr ? tr_ntop_non_ts( addr ) : TR_DEFAULT_BIND_ADDRESS_IPV6;
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_BIND_ADDRESS_IPV6, val );
 }
 
 void
