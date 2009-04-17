@@ -96,6 +96,7 @@ enum
 static const char* peer_column_names[N_PEER_COLS] =
 {
     N_( "Address" ),
+    "",
     /* 'download speed' column header. terse to keep the column narrow. */
     N_( "Down" ),
     /* 'upload speed' column header.  terse to keep the column narrow. */
