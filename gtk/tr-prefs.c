@@ -429,13 +429,61 @@ onBlocklistUpdate( GtkButton * w, gpointer gdata )
 }
 
 static void
-onEncryptionToggled( GtkToggleButton * w,
-                     gpointer          core )
+onIntComboChanged( GtkComboBox * w, gpointer core )
 {
-    const int val = gtk_toggle_button_get_active( w )
-                  ? TR_ENCRYPTION_REQUIRED
-                  : TR_ENCRYPTION_PREFERRED;
-    tr_core_set_pref_int( TR_CORE( core ), TR_PREFS_KEY_ENCRYPTION, val );
+    GtkTreeIter iter;
+
+    if( gtk_combo_box_get_active_iter( w, &iter ) )
+    {
+        int val = 0;
+        const char * key = g_object_get_data( G_OBJECT( w ), PREF_KEY );
+        gtk_tree_model_get( gtk_combo_box_get_model( w ), &iter, 0, &val, -1 );
+        tr_core_set_pref_int( TR_CORE( core ), key, val );
+    }
+}
+
+static GtkWidget*
+new_encryption_combo( GObject * core, const char * key )
+{
+    int i;
+    int selIndex;
+    GtkWidget * w;
+    GtkCellRenderer * r;
+    GtkListStore * store;
+    const int currentValue = pref_int_get( key );
+    const struct {
+        int value;
+        const char * text;
+    } items[] = {
+        { TR_CLEAR_PREFERRED,      N_( "Plaintext Preferred" )  },
+        { TR_ENCRYPTION_PREFERRED, N_( "Encryption Preferred" ) },
+        { TR_ENCRYPTION_REQUIRED,  N_( "Encryption Required" )  }
+    };
+
+    /* build a store for encryption */
+    selIndex = -1;
+    store = gtk_list_store_new( 2, G_TYPE_INT, G_TYPE_STRING );
+    for( i=0; i<(int)G_N_ELEMENTS(items); ++i ) {
+        GtkTreeIter iter;
+        gtk_list_store_append( store, &iter );
+        gtk_list_store_set( store, &iter, 0, items[i].value, 1, _( items[i].text ), -1 );
+        if( items[i].value == currentValue )
+            selIndex = i;
+    }
+
+    /* build the widget */
+    w = gtk_combo_box_new_with_model( GTK_TREE_MODEL( store ) );
+    r = gtk_cell_renderer_text_new( );
+    gtk_cell_layout_pack_start( GTK_CELL_LAYOUT( w ), r, TRUE );
+    gtk_cell_layout_set_attributes( GTK_CELL_LAYOUT( w ), r, "text", 1, NULL );
+    g_object_set_data_full( G_OBJECT( w ), PREF_KEY, tr_strdup( key ), g_free );
+    if( selIndex >= 0 )
+        gtk_combo_box_set_active( GTK_COMBO_BOX( w ), selIndex );
+    g_signal_connect( w, "changed", G_CALLBACK( onIntComboChanged ), core );
+
+    /* cleanup */
+    g_object_unref( G_OBJECT( store ) );
+    return w;
 }
 
 static GtkWidget*
@@ -486,13 +534,9 @@ peerPage( GObject * core )
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title ( t, &row, _( "Privacy" ) );
 
-    s = _( "_Ignore unencrypted peers" );
-    w = gtk_check_button_new_with_mnemonic( s );
-    gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( w ),
-                                  pref_int_get( TR_PREFS_KEY_ENCRYPTION ) ==
-                                  TR_ENCRYPTION_REQUIRED );
-    g_signal_connect( w, "toggled", G_CALLBACK( onEncryptionToggled ), core );
-    hig_workarea_add_wide_control( t, &row, w );
+    s = _( "_Encryption mode" );
+    w = new_encryption_combo( core, "encryption" );
+    hig_workarea_add_row( t, &row, s, w, NULL );
 
     s = _( "Use peer e_xchange" );
     w = new_check_button( s, TR_PREFS_KEY_PEX_ENABLED, core );
@@ -1055,20 +1099,6 @@ new_time_combo( GObject *    core,
     return w;
 }
 
-static void
-onWeekComboChanged( GtkComboBox * w, gpointer core )
-{
-    GtkTreeIter iter;
-
-    if( gtk_combo_box_get_active_iter( w, &iter ) )
-    {
-        int val = 0;
-        const char * key = g_object_get_data( G_OBJECT( w ), PREF_KEY );
-        gtk_tree_model_get( gtk_combo_box_get_model( w ), &iter, 0, &val, -1 );
-        tr_core_set_pref_int( TR_CORE( core ), key, val );
-    }
-}
-
 static GtkWidget*
 new_week_combo( GObject * core, const char * key )
 {
@@ -1113,7 +1143,7 @@ new_week_combo( GObject * core, const char * key )
     g_object_set_data_full( G_OBJECT( w ), PREF_KEY, tr_strdup( key ), g_free );
     if( selIndex >= 0 )
         gtk_combo_box_set_active( GTK_COMBO_BOX( w ), selIndex );
-    g_signal_connect( w, "changed", G_CALLBACK( onWeekComboChanged ), core );
+    g_signal_connect( w, "changed", G_CALLBACK( onIntComboChanged ), core );
 
     /* cleanup */
     g_object_unref( G_OBJECT( store ) );
