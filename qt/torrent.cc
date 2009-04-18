@@ -108,7 +108,8 @@ Torrent :: myProperties[] =
     { LEECHERS, "leechers", QVariant::Int, STAT_EXTRA },
     { TIMES_COMPLETED, "timesCompleted", QVariant::Int, STAT_EXTRA },
     { PEERS, "peers", TrTypes::PeerList, STAT_EXTRA },
-    { TORRENT_FILE, "torrentFile", QVariant::String, STAT_EXTRA }
+    { TORRENT_FILE, "torrentFile", QVariant::String, STAT_EXTRA },
+    { BANDWIDTH_PRIORITY, "bandwidthPriority", QVariant::Int, STAT_EXTRA }
 };
 
 Torrent :: KeyList

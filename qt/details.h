@@ -18,11 +18,13 @@
 #include <QMap>
 #include <QSet>
 #include <QTimer>
+#include <QWidgetList>
 
 #include "prefs.h"
 
 class FileTreeView;
 class QTreeView;
+class QComboBox;
 class QCheckBox;
 class QDoubleSpinBox;
 class QLabel;
@@ -33,6 +35,7 @@ class QTreeWidget;
 class QTreeWidgetItem;
 class Session;
 class Torrent;
+class TorrentModel;
 
 class Details: public QDialog
 {
@@ -43,8 +46,9 @@ class Details: public QDialog
         void onTimer( );
 
     public:
-        Details( Session&, Torrent&, QWidget * parent = 0 );
+        Details( Session&, TorrentModel&, QWidget * parent = 0 );
         ~Details( );
+        void setIds( const QSet<int>& ids );
 
     private:
         QWidget * createActivityTab( );
@@ -61,8 +65,10 @@ class Details: public QDialog
     private:
 
         Session& mySession;
-        Torrent& myTorrent;
+        TorrentModel& myModel; 
+        QSet<int> myIds;
         QTimer myTimer;
+        bool myHavePendingRefresh;
 
         QLabel * myStateLabel;
         QLabel * myProgressLabel;
@@ -86,6 +92,7 @@ class Details: public QDialog
         QRadioButton * mySeedCustomRadio;
         QDoubleSpinBox * mySeedCustomSpin;
         QSpinBox * myPeerLimitSpin;
+        QComboBox * myBandwidthPriorityCombo;
 
         QLabel * myPiecesLabel;
         QLabel * myHashLabel;
@@ -110,10 +117,12 @@ class Details: public QDialog
         QLabel * myTimesCompletedLabel;
         QTreeWidget * myPeerTree;
         QMap<QString,QTreeWidgetItem*> myPeers;
+        QWidgetList myWidgets;
 
         FileTreeView * myFileTreeView;
 
     private slots:
+        void onBandwidthPriorityChanged( int );
         void onFilePriorityChanged( const QSet<int>& fileIndices, int );
         void onFileWantedChanged( const QSet<int>& fileIndices, bool );
         void onHonorsSessionLimitsToggled( bool );
@@ -124,6 +133,7 @@ class Details: public QDialog
         void onSeedUntilChanged( bool );
         void onSeedRatioLimitChanged( double );
         void onMaxPeersChanged( int );
+        void refresh( );
 };
 
 #endif

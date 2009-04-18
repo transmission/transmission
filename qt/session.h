@@ -77,10 +77,11 @@ class Session: public QObject
         void refreshTorrents( const QSet<int>& torrentIds );
 
     public:
-        void torrentSet( int id, const QString& key, bool val );
-        void torrentSet( int id, const QString& key, int val );
-        void torrentSet( int id, const QString& key, double val );
-        void torrentSet( int id, const QString& key, const QList<int>& val );
+        void torrentSet( const QSet<int>& ids, const QString& key, bool val );
+        void torrentSet( const QSet<int>& ids, const QString& key, int val );
+        void torrentSet( const QSet<int>& ids, const QString& key, double val );
+        void torrentSet( const QSet<int>& ids, const QString& key, const QList<int>& val );
+
 
     public slots:
         void pause( const QSet<int>& torrentIds = QSet<int>() );
@@ -98,7 +99,7 @@ class Session: public QObject
         void updatePref( int key );
 
         /** request a refresh for statistics, including the ones only used by the properties dialog, for a specific torrent */
-        void refreshExtraStats( int torrent );
+        void refreshExtraStats( const QSet<int>& ids );
 
     private slots:
         void onRequestStarted( int id );

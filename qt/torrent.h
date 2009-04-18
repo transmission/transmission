@@ -139,6 +139,7 @@ class Torrent: public QObject
             TIMES_COMPLETED,
             PEERS,
             TORRENT_FILE,
+            BANDWIDTH_PRIORITY,
 
             PROPERTY_COUNT
         };
@@ -200,6 +201,7 @@ class Torrent: public QObject
         bool setDateTime   ( int key, const QDateTime& );
 
     public:
+        int getBandwidthPriority( ) const { return getInt( BANDWIDTH_PRIORITY ); }
         int id( ) const { return getInt( ID ); }
         QString name( ) const { return getString( NAME ); }
         QString creator( ) const { return getString( CREATOR ); }

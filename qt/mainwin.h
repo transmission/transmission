@@ -35,6 +35,7 @@ extern "C" {
 
 class ActionDelegator;
 class Prefs;
+class Details;
 class Session;
 class TorrentDelegate;
 class TorrentDelegateMin;
@@ -54,6 +55,7 @@ class TrMainWindow: public QMainWindow
         QDialog * myPrefsDialog;
         QDialog * myAboutDialog;
         QDialog * myStatsDialog;
+        Details * myDetailsDialog;
         QFileDialog * myFileDialog;
         QCheckBox * myFileDialogOptionsCheck;
         QSystemTrayIcon myTrayIcon;
@@ -86,6 +88,7 @@ class TrMainWindow: public QMainWindow
         QWidgetList myHidden;
 
     private slots:
+        void onDetailsDestroyed( );
         void onShowModeClicked( );
         void showAll( );
         void showActive( );

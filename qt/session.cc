@@ -280,49 +280,61 @@ namespace
 const int Session :: ADD_TORRENT_TAG = TAG_ADD_TORRENT;
 
 void
-Session :: torrentSet( int id, const QString& key, double value )
+Session :: torrentSet( const QSet<int>& ids, const QString& key, double value )
 {
-    QString s;
-    QTextStream( &s ) << "{ \"method\": \"torrent-set\", \"arguments\": { \"ids\": "<<id<<", \""<<key<<"\": "<<value<<" } }";
-std::cerr << qPrintable(s) << std::endl;
-    exec( s.toUtf8().constData() );
-    refreshExtraStats( id );
+    tr_benc top;
+    tr_bencInitDict( &top, 2 );
+    tr_bencDictAddStr( &top, "method", "torrent-set" );
+    tr_benc * args = tr_bencDictAddDict( &top, "arguments", 2 );
+    tr_bencDictAddReal( args, key.toUtf8().constData(), value );
+    addOptionalIds( args, ids );
+    std::cerr << tr_bencToJSON(&top) << std::endl;
+    exec( &top );
+    tr_bencFree( &top );
 }
 
 void
-Session :: torrentSet( int id, const QString& key, int value )
+Session :: torrentSet( const QSet<int>& ids, const QString& key, int value )
 {
-    QString s;
-    QTextStream( &s ) << "{ \"method\": \"torrent-set\", \"arguments\": { \"ids\": "<<id<<", \""<<key<<"\": "<<value<<" } }";
-std::cerr << qPrintable(s) << std::endl;
-    exec( s.toUtf8().constData() );
-    refreshExtraStats( id );
+    tr_benc top;
+    tr_bencInitDict( &top, 2 );
+    tr_bencDictAddStr( &top, "method", "torrent-set" );
+    tr_benc * args = tr_bencDictAddDict( &top, "arguments", 2 );
+    tr_bencDictAddInt( args, key.toUtf8().constData(), value );
+    addOptionalIds( args, ids );
+    std::cerr << tr_bencToJSON(&top) << std::endl;
+    exec( &top );
+    tr_bencFree( &top );
 }
 
 void
-Session :: torrentSet( int id, const QString& key, bool value )
+Session :: torrentSet( const QSet<int>& ids, const QString& key, bool value )
 {
-    QString s;
-    QTextStream( &s ) << "{ \"method\": \"torrent-set\", \"arguments\": { \"ids\": "<<id<<", \""<<key<<"\": "<<(value?"true":"false")<<" } }";
-std::cerr << qPrintable(s) << std::endl;
-    exec( s.toUtf8().constData() );
-    refreshExtraStats( id );
+    tr_benc top;
+    tr_bencInitDict( &top, 2 );
+    tr_bencDictAddStr( &top, "method", "torrent-set" );
+    tr_benc * args = tr_bencDictAddDict( &top, "arguments", 2 );
+    tr_bencDictAddBool( args, key.toUtf8().constData(), value );
+    addOptionalIds( args, ids );
+    std::cerr << tr_bencToJSON(&top) << std::endl;
+    exec( &top );
+    tr_bencFree( &top );
 }
 
 void
-Session :: torrentSet( int id, const QString& key, const QList<int>& value )
+Session :: torrentSet( const QSet<int>& ids, const QString& key, const QList<int>& value )
 {
     tr_benc top;
     tr_bencInitDict( &top, 2 );
     tr_bencDictAddStr( &top, "method", "torrent-set" );
     tr_benc * args( tr_bencDictAddDict( &top, "arguments", 2 ) );
-    tr_bencListAddInt( tr_bencDictAddList( args, "ids", 1 ), id );
+    addOptionalIds( args, ids );
     tr_benc * list( tr_bencDictAddList( args, key.toUtf8().constData(), value.size( ) ) );
     foreach( int i, value )
         tr_bencListAddInt( list, i );
+    std::cerr << tr_bencToJSON(&top) << std::endl;
     exec( &top );
     tr_bencFree( &top );
-    refreshExtraStats( id );
 }
 
 
@@ -348,14 +360,14 @@ Session :: refreshTorrents( const QSet<int>& ids )
 }
 
 void
-Session :: refreshExtraStats( int id )
+Session :: refreshExtraStats( const QSet<int>& ids )
 {
     tr_benc top;
     tr_bencInitDict( &top, 3 );
     tr_bencDictAddStr( &top, "method", "torrent-get" );
     tr_bencDictAddInt( &top, "tag", TAG_SOME_TORRENTS );
     tr_benc * args( tr_bencDictAddDict( &top, "arguments", 2 ) );
-    tr_bencListAddInt( tr_bencDictAddList( args, "ids", 1 ), id );
+    addOptionalIds( args, ids );
     addList( tr_bencDictAddList( args, "fields", 0 ), getStatKeys( ) + getExtraStatKeys( ));
     exec( &top );
     tr_bencFree( &top );

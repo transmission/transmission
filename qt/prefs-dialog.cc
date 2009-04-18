@@ -297,6 +297,9 @@ PrefsDialog :: createBandwidthTab( )
         r = spinBoxNew( Prefs :: ALT_SPEED_LIMIT_UP, 0, INT_MAX, 5 );
         hig->addRow( s, r );
 
+        s = tr( "<small>When enabled, Speed Limit Mode overrides the Global Bandwidth Limits</small>" );
+        hig->addWideControl( new QLabel( s ) );
+
         QCheckBox * c = checkBoxNew( tr( "Use Speed Limit Mode &between" ), Prefs::ALT_SPEED_LIMIT_TIME_ENABLED );
         h = new QHBoxLayout( );
         h->setSpacing( HIG::PAD );

@@ -15,6 +15,7 @@
 #include <iostream>
 
 #include <QCheckBox>
+#include <QComboBox>
 #include <QEvent>
 #include <QHeaderView>
 #include <QResizeEvent>
@@ -47,6 +48,7 @@
 #include "session.h"
 #include "squeezelabel.h"
 #include "torrent.h"
+#include "torrent-model.h"
 #include "utils.h"
 
 class Prefs;
@@ -119,30 +121,36 @@ class PeerItem: public QTreeWidgetItem
 ****
 ***/
 
-Details :: Details( Session& session, Torrent& torrent, QWidget * parent ):
+Details :: Details( Session& session, TorrentModel& model, QWidget * parent ):
     QDialog( parent, Qt::Dialog ),
     mySession( session ),
-    myTorrent( torrent )
+    myModel( model ),
+    myHavePendingRefresh( false )
 {
     QVBoxLayout * layout = new QVBoxLayout( this );
 
-    setWindowTitle( tr( "%1 Properties" ).arg( torrent.name( ) ) );
+    setWindowTitle( tr( "Torrent Properties" ) );
 
     QTabWidget * t = new QTabWidget( this );
-    t->addTab( createActivityTab( ),  tr( "Activity" ) );
-    t->addTab( createPeersTab( ),     tr( "Peers" ) );
-    t->addTab( createTrackerTab( ),   tr( "Tracker" ) );
-    t->addTab( createInfoTab( ),      tr( "Information" ) );
-    t->addTab( createFilesTab( ),     tr( "Files" ) );
-    t->addTab( createOptionsTab( ),   tr( "Options" ) );
+    QWidget * w;
+    t->addTab( w = createActivityTab( ),  tr( "Activity" ) );
+    myWidgets << w;
+    t->addTab( w = createPeersTab( ),     tr( "Peers" ) );
+    myWidgets << w;
+    t->addTab( w = createTrackerTab( ),   tr( "Tracker" ) );
+    myWidgets << w;
+    t->addTab( w = createInfoTab( ),      tr( "Information" ) );
+    myWidgets << w;
+    t->addTab( w = createFilesTab( ),     tr( "Files" ) );
+    myWidgets << w;
+    t->addTab( w = createOptionsTab( ),   tr( "Options" ) );
+    myWidgets << w;
     layout->addWidget( t );
 
     QDialogButtonBox * buttons = new QDialogButtonBox( QDialogButtonBox::Close, Qt::Horizontal, this );
     connect( buttons, SIGNAL(rejected()), this, SLOT(deleteLater()) ); // "close" triggers rejected
     layout->addWidget( buttons );
 
-    connect( &myTorrent, SIGNAL(torrentChanged(int)), this, SLOT(onTorrentChanged()) );
-    connect( &myTorrent, SIGNAL(destroyed(QObject*)), this, SLOT(deleteLater()) );
     connect( &myTimer, SIGNAL(timeout()), this, SLOT(onTimer()) );
 
     onTimer( );
@@ -154,6 +162,34 @@ Details :: ~Details( )
 {
 }
 
+void
+Details :: setIds( const QSet<int>& ids )
+{
+    if( ids == myIds )
+        return;
+
+    // stop listening to the old torrents
+    foreach( int id, myIds ) {
+        const Torrent * tor = myModel.getTorrentFromId( id );
+        if( tor )
+            disconnect( tor, SIGNAL(torrentChanged(int)), this, SLOT(onTorrentChanged()) );
+    }
+
+    myIds = ids;
+
+    // listen to the new torrents
+    foreach( int id, myIds ) {
+        const Torrent * tor = myModel.getTorrentFromId( id );
+        if( tor )
+            connect( tor, SIGNAL(torrentChanged(int)), this, SLOT(onTorrentChanged()) );
+    }
+
+    foreach( QWidget * w, myWidgets )
+        w->setEnabled( false );
+    
+    onTimer( );
+}
+
 /***
 ****
 ***/
@@ -161,85 +197,292 @@ Details :: ~Details( )
 void
 Details :: onTimer( )
 {
-    mySession.refreshExtraStats( myTorrent.id( ) );
+    if( !myIds.empty( ) )
+        mySession.refreshExtraStats( myIds );
 }
 
 void
 Details :: onTorrentChanged( )
 {
-    QLocale locale;
-    const QFontMetrics fm( fontMetrics( ) );
-
-    // activity tab 
-    myStateLabel->setText( myTorrent.activityString( ) );
-    myProgressLabel->setText( locale.toString( myTorrent.percentDone( )*100.0, 'f', 2 ) );
-    myHaveLabel->setText( tr( "%1 (%2 verified in %L3 pieces)" )
-                            .arg( Utils::sizeToString( myTorrent.haveTotal( ) ) )
-                            .arg( Utils::sizeToString( myTorrent.haveVerified( ) ) )
-                            .arg( myTorrent.haveVerified()/myTorrent.pieceSize() ) );
-    myDownloadedLabel->setText( Utils::sizeToString( myTorrent.downloadedEver( ) ) );
-    myUploadedLabel->setText( Utils::sizeToString( myTorrent.uploadedEver( ) ) );
-    myFailedLabel->setText( Utils::sizeToString( myTorrent.failedEver( ) ) );
-    myRatioLabel->setText( Utils :: ratioToString( myTorrent.ratio( ) ) );
-    mySwarmSpeedLabel->setText( Utils::speedToString( myTorrent.swarmSpeed( ) ) );
-    myAddedDateLabel->setText( myTorrent.dateAdded().toString() );
-
-    QDateTime dt = myTorrent.lastActivity( );
-    myActivityLabel->setText( dt.isNull() ? tr("Never") : dt.toString() );
-    QString s = myTorrent.getError( );
-    myErrorLabel->setText( s.isEmpty() ? tr("None") : s );
-
-    // information tab
-    myPiecesLabel->setText( tr( "%L1 Pieces @ %2" ).arg( myTorrent.pieceCount() )
-                                                   .arg( Utils::sizeToString(myTorrent.pieceSize()) ) );
-    myHashLabel->setText( myTorrent.hashString( ) );
-
-    myPrivacyLabel->setText( myTorrent.isPrivate( ) ? tr( "Private to this tracker -- PEX disabled" )
-                                                    : tr( "Public torrent" ) );
-    myCommentBrowser->setText( myTorrent.comment( ) );
-    QString str = myTorrent.creator( );
-    if( str.isEmpty( ) )
-        str = tr( "Unknown" );
-    myCreatorLabel->setText( str );
-    myDateCreatedLabel->setText( myTorrent.dateCreated( ).toString( ) );
-    myDestinationLabel->setText( myTorrent.getPath( ) );
-    myTorrentFileLabel->setText( myTorrent.torrentFile( ) );
-
-    // options tab
-    mySessionLimitCheck->setChecked( myTorrent.honorsSessionLimits( ) );
-    mySingleDownCheck->setChecked( myTorrent.downloadIsLimited( ) );
-    mySingleUpCheck->setChecked( myTorrent.uploadIsLimited( ) );
-    mySingleDownSpin->setValue( (int)myTorrent.downloadLimit().kbps() );
-    mySingleUpSpin->setValue( (int)myTorrent.uploadLimit().kbps() );
-    myPeerLimitSpin->setValue( myTorrent.peerLimit( ) );
-
-    QRadioButton * rb;
-    switch( myTorrent.seedRatioMode( ) ) {
-        case TR_RATIOLIMIT_GLOBAL:    rb = mySeedGlobalRadio; break;
-        case TR_RATIOLIMIT_SINGLE:    rb = mySeedCustomRadio; break;
-        case TR_RATIOLIMIT_UNLIMITED: rb = mySeedForeverRadio; break;
+    if( !myHavePendingRefresh ) {
+        myHavePendingRefresh = true;
+        QTimer::singleShot( 100, this, SLOT(refresh()));
     }
-    rb->setChecked( true );
-    mySeedCustomSpin->setValue( myTorrent.seedRatioLimit( ) );
+}
 
+
+void
+Details :: refresh( )
+{
+    int i;
+    QLocale locale;
+    const int n = myIds.size( );
+    const bool single = n == 1;
+    const QString blank;
+    const QFontMetrics fm( fontMetrics( ) );
+    QSet<const Torrent*> torrents;
+    const Torrent * tor;
+    QSet<QString> strings;
+    QString string;
+
+    // build a list of torrents
+    foreach( int id, myIds ) {
+        const Torrent * tor = myModel.getTorrentFromId( id );
+        if( tor )
+            torrents << tor;
+    }
+
+    ///
+    ///  activity tab 
+    ///
+
+    // myStateLabel
+    if( torrents.empty( ) )
+        string = tr( "None" );
+    else {
+        strings.clear( );
+        foreach( tor, torrents ) strings.insert( tor->activityString( ) );
+        string = strings.size()==1 ? *strings.begin() : blank;
+    }
+    myStateLabel->setText( string );
+
+    // myProgressLabel
+    if( torrents.empty( ) )
+        string = tr( "None" );
+    else {
+        double sizeWhenDone = 0;
+        double leftUntilDone = 0;
+        foreach( tor, torrents ) {
+            sizeWhenDone += tor->sizeWhenDone( );
+            leftUntilDone += tor->leftUntilDone( );
+        }
+        string = locale.toString( 100.0*((sizeWhenDone-leftUntilDone)/sizeWhenDone), 'f', 2 );
+    }
+    myProgressLabel->setText( string );
+
+    // myHaveLabel
+    int64_t haveTotal = 0;
+    int64_t haveVerified = 0;
+    int64_t verifiedPieces = 0;
+    foreach( tor, torrents ) {
+        haveTotal += tor->haveTotal( );
+        haveVerified += tor->haveVerified( );
+        verifiedPieces += tor->haveVerified( ) / tor->pieceSize( );
+    }
+    myHaveLabel->setText( tr( "%1 (%2 verified in %L3 pieces)" )
+                            .arg( Utils::sizeToString( haveTotal ) )
+                            .arg( Utils::sizeToString( haveVerified ) )
+                            .arg( verifiedPieces ) );
+
+    int64_t num = 0;
+    foreach( tor, torrents ) num += tor->downloadedEver( );
+    myDownloadedLabel->setText( Utils::sizeToString( num ) );
+
+    num = 0;
+    foreach( tor, torrents ) num += tor->uploadedEver( );
+    myUploadedLabel->setText( Utils::sizeToString( num ) );
+
+    num = 0;
+    foreach( tor, torrents ) num += tor->failedEver( );
+    myFailedLabel->setText( Utils::sizeToString( num ) );
+
+    double d = 0;
+    foreach( tor, torrents ) d += tor->ratio( );
+    myRatioLabel->setText( Utils :: ratioToString( d / n ) );
+
+    Speed speed;
+    foreach( tor, torrents ) speed += tor->swarmSpeed( );
+    mySwarmSpeedLabel->setText( Utils::speedToString( speed ) );
+
+    strings.clear( );
+    foreach( tor, torrents ) strings.insert( tor->dateAdded().toString() );
+    string = strings.size()==1 ? *strings.begin() : blank;
+    myAddedDateLabel->setText( string );
+
+    strings.clear( );
+    foreach( tor, torrents ) {
+        QDateTime dt = tor->lastActivity( );
+        strings.insert( dt.isNull() ? tr("Never") : dt.toString() );
+    }
+    string = strings.size()==1 ? *strings.begin() : blank;
+    myActivityLabel->setText( string );
+
+    if( torrents.empty( ) )
+        string = tr( "None" );
+    else {
+        strings.clear( );
+        foreach( tor, torrents ) strings.insert( tor->getError( ) );
+        string = strings.size()==1 ? *strings.begin() : blank;
+    }
+    myErrorLabel->setText( string );
+
+    ///
+    /// information tab
+    ///
+
+    // myPiecesLabel
+    int64_t pieceCount = 0;
+    int64_t pieceSize = 0;
+    foreach( tor, torrents ) {
+        pieceCount += tor->pieceCount( );
+        pieceSize += tor->pieceSize( );
+    }
+    myPiecesLabel->setText( tr( "%L1 Pieces @ %2" ).arg( pieceCount )
+                                                   .arg( Utils::sizeToString( pieceSize ) ) );
+
+    // myHashLabel
+    strings.clear( );
+    foreach( tor, torrents ) strings.insert( tor->hashString( ) );
+    string = strings.size()==1 ? *strings.begin() : blank;
+    myHashLabel->setText( string );
+
+    // myPrivacyLabel
+    strings.clear( );
+    foreach( tor, torrents )
+        strings.insert( tor->isPrivate( ) ? tr( "Private to this tracker -- PEX disabled" )
+                                          : tr( "Public torrent" ) );
+    string = strings.size()==1 ? *strings.begin() : blank;
+    myPrivacyLabel->setText( string );
+
+    // myCommentBrowser
+    strings.clear( );
+    foreach( tor, torrents ) strings.insert( tor->comment( ) );
+    string = strings.size()==1 ? *strings.begin() : blank;
+    myCommentBrowser->setText( string );
+
+    // myCreatorLabel
+    strings.clear( );
+    foreach( tor, torrents ) strings.insert( tor->creator().isEmpty() ? tr( "Unknown" ) : tor->creator() );
+    string = strings.size()==1 ? *strings.begin() : blank;
+    myCreatorLabel->setText( string );
+
+    // myDateCreatedLabel
+    strings.clear( );
+    foreach( tor, torrents ) strings.insert( tor->dateCreated().toString() );
+    string = strings.size()==1 ? *strings.begin() : blank;
+    myDateCreatedLabel->setText( string );
+
+    // myDestinationLabel
+    strings.clear( );
+    foreach( tor, torrents ) strings.insert( tor->getPath( ) );
+    string = strings.size()==1 ? *strings.begin() : blank;
+    myDestinationLabel->setText( string );
+
+    // myTorrentFileLabel
+    strings.clear( );
+    foreach( tor, torrents ) strings.insert( tor->torrentFile( ) );
+    string = strings.size()==1 ? *strings.begin() : blank;
+    myTorrentFileLabel->setText( string );
+
+    ///
+    ///  Options Tab
+    ///
+
+    if( !torrents.empty( ) )
+    {
+        int i;
+        const Torrent * baseline = *torrents.begin();
+        bool uniform;
+        bool baselineFlag;
+        int baselineInt;
+
+        // mySessionLimitCheck
+        uniform = true;
+        baselineFlag = baseline->honorsSessionLimits( );
+        foreach( tor, torrents ) if( baselineFlag != tor->honorsSessionLimits( ) ) { uniform = false; break; }
+        mySessionLimitCheck->setChecked( uniform && baselineFlag );
+
+        // mySingleDownCheck
+        uniform = true;
+        baselineFlag = baseline->downloadIsLimited( );
+        foreach( tor, torrents ) if( baselineFlag != tor->downloadIsLimited( ) ) { uniform = false; break; }
+        mySingleDownCheck->setChecked( uniform && baselineFlag );
+
+        // mySingleUpCheck
+        uniform = true;
+        baselineFlag = baseline->uploadIsLimited( );
+        foreach( tor, torrents ) if( baselineFlag != tor->uploadIsLimited( ) ) { uniform = false; break; }
+        mySingleUpCheck->setChecked( uniform && baselineFlag );
+
+        // myBandwidthPriorityCombo
+        uniform = true;
+        baselineInt = baseline->getBandwidthPriority( );
+        foreach( tor, torrents ) if ( baselineInt != tor->getBandwidthPriority( ) ) { uniform = false; break; }
+        if( uniform )
+            i = myBandwidthPriorityCombo->findData( baselineInt );
+        else
+            i = -1;
+        myBandwidthPriorityCombo->blockSignals( true );
+        myBandwidthPriorityCombo->setCurrentIndex( i );
+        myBandwidthPriorityCombo->blockSignals( false );
+
+        mySingleDownSpin->blockSignals( true );
+        mySingleDownSpin->setValue( tor->downloadLimit().kbps() );
+        mySingleDownSpin->blockSignals( false );
+
+        mySingleUpSpin->blockSignals( true );
+        mySingleUpSpin->setValue( tor->uploadLimit().kbps() );
+        mySingleUpSpin->blockSignals( false );
+
+        myPeerLimitSpin->blockSignals( true );
+        myPeerLimitSpin->setValue( tor->peerLimit() );
+        myPeerLimitSpin->blockSignals( false );
+
+        // ratio radios
+        uniform = true;
+        baselineInt = tor->seedRatioMode( );
+        foreach( tor, torrents ) if( baselineInt != tor->seedRatioMode( ) ) { uniform = false; break; }
+        if( !uniform ) {
+            mySeedGlobalRadio->setChecked( false );
+            mySeedCustomRadio->setChecked( false );
+            mySeedForeverRadio->setChecked( false );
+        } else {
+            QRadioButton * rb;
+            switch( baselineInt ) {
+                case TR_RATIOLIMIT_GLOBAL:    rb = mySeedGlobalRadio; break;
+                case TR_RATIOLIMIT_SINGLE:    rb = mySeedCustomRadio; break;
+                case TR_RATIOLIMIT_UNLIMITED: rb = mySeedForeverRadio; break;
+            }
+            rb->setChecked( true );
+        }
+
+        mySeedCustomSpin->setValue( tor->seedRatioLimit( ) );
+    }
 
     // tracker tab
     const time_t now( time( 0 ) );
-    myScrapeTimePrevLabel->setText( myTorrent.lastScrapeTime().toString() );
-    myScrapeResponseLabel->setText( myTorrent.scrapeResponse() );
-    myScrapeTimeNextLabel->setText( Utils :: timeToString( myTorrent.nextScrapeTime().toTime_t() - now ) );
-    myAnnounceTimePrevLabel->setText( myTorrent.lastScrapeTime().toString() );
-    myAnnounceTimeNextLabel->setText( Utils :: timeToString( myTorrent.nextAnnounceTime().toTime_t() - now ) );
-    myAnnounceManualLabel->setText( Utils :: timeToString( myTorrent.manualAnnounceTime().toTime_t() - now ) );
-    myAnnounceResponseLabel->setText( myTorrent.announceResponse( ) );
-    const QUrl url( myTorrent.announceUrl( ) );
-    myTrackerLabel->setText( url.host( ) );
+    myScrapeTimePrevLabel->setText( tor ? tor->lastScrapeTime().toString() : blank );
+    myScrapeResponseLabel->setText( tor ? tor->scrapeResponse() : blank );
+    myScrapeTimeNextLabel->setText( Utils :: timeToString( tor ? tor->nextScrapeTime().toTime_t() - now : 0 ) );
+    myAnnounceTimePrevLabel->setText( tor ? tor->lastScrapeTime().toString() : blank );
+    myAnnounceTimeNextLabel->setText( Utils :: timeToString( tor ? tor->nextAnnounceTime().toTime_t() - now : 0  ) );
+    myAnnounceManualLabel->setText( Utils :: timeToString( tor ? tor->manualAnnounceTime().toTime_t() - now : 0 ) );
+    myAnnounceResponseLabel->setText( tor ? tor->announceResponse( ) : blank );
 
-    // peers tab
-    mySeedersLabel->setText( locale.toString( myTorrent.seeders( ) ) );
-    myLeechersLabel->setText( locale.toString( myTorrent.leechers( ) ) );
-    myTimesCompletedLabel->setText( locale.toString( myTorrent.timesCompleted( ) ) );
-    const PeerList peers( myTorrent.peers( ) );
+    // myTrackerLabel
+    strings.clear( );
+    foreach( tor, torrents ) strings.insert( QUrl(tor->announceUrl()).host() );
+    string = strings.size()==1 ? *strings.begin() : blank;
+    myTrackerLabel->setText( string );
+
+    ///
+    ///  Peers tab
+    ///
+
+    i = 0;
+    foreach( tor, torrents ) i += tor->seeders( );
+    mySeedersLabel->setText( locale.toString( i ) );
+
+    i = 0;
+    foreach( tor, torrents ) i += tor->leechers( );
+    myLeechersLabel->setText( locale.toString( i ) );
+
+    i = 0;
+    foreach( tor, torrents ) i += tor->timesCompleted( );
+    myTimesCompletedLabel->setText( locale.toString( i ) );
+
+    PeerList peers;
+    foreach( tor, torrents ) peers << tor->peers( );
     QMap<QString,QTreeWidgetItem*> peers2;
     QList<QTreeWidgetItem*> newItems;
     static const QIcon myEncryptionIcon( ":/icons/encrypted.png" );
@@ -310,7 +553,16 @@ Details :: onTorrentChanged( )
     }
     myPeers = peers2;
 
-    myFileTreeView->update( myTorrent.files( ) );
+    if( single ) {
+        tor = *torrents.begin();
+        myFileTreeView->update( tor->files( ) );
+    } else { 
+        myFileTreeView->clear( );
+    }
+
+    myHavePendingRefresh = false;
+    foreach( QWidget * w, myWidgets )
+        w->setEnabled( true );
 }
 
 void
@@ -357,27 +609,28 @@ Details :: createActivityTab( )
 void
 Details :: onHonorsSessionLimitsToggled( bool val )
 {
-    mySession.torrentSet( myTorrent.id(), "honorsSessionLimits", val );
+std::cerr << " honorsSessionLimits clicked to " << val << std::endl;
+    mySession.torrentSet( myIds, "honorsSessionLimits", val );
 }
 void
 Details :: onDownloadLimitedToggled( bool val )
 {
-    mySession.torrentSet( myTorrent.id(), "downloadLimited", val );
+    mySession.torrentSet( myIds, "downloadLimited", val );
 }
 void
 Details :: onDownloadLimitChanged( int val )
 {
-    mySession.torrentSet( myTorrent.id(), "downloadLimit", val );
+    mySession.torrentSet( myIds, "downloadLimit", val );
 }
 void
 Details :: onUploadLimitedToggled( bool val )
 {
-    mySession.torrentSet( myTorrent.id(), "uploadLimited", val );
+    mySession.torrentSet( myIds, "uploadLimited", val );
 }
 void
 Details :: onUploadLimitChanged( int val )
 {
-    mySession.torrentSet( myTorrent.id(), "uploadLimit", val );
+    mySession.torrentSet( myIds, "uploadLimit", val );
 }
 
 #define RATIO_KEY "seedRatioMode"
@@ -386,19 +639,29 @@ void
 Details :: onSeedUntilChanged( bool b )
 {
     if( b )
-        mySession.torrentSet( myTorrent.id(), RATIO_KEY, sender()->property(RATIO_KEY).toInt() );
+        mySession.torrentSet( myIds, RATIO_KEY, sender()->property(RATIO_KEY).toInt() );
 }
 
 void
 Details :: onSeedRatioLimitChanged( double val )
 {
-    mySession.torrentSet( myTorrent.id(), "seedRatioLimit", val );
+    mySession.torrentSet( myIds, "seedRatioLimit", val );
 }
 
 void
 Details :: onMaxPeersChanged( int val )
 {
-    mySession.torrentSet( myTorrent.id(), "peer-limit", val );
+    mySession.torrentSet( myIds, "peer-limit", val );
+}
+
+void
+Details :: onBandwidthPriorityChanged( int index )
+{
+    if( index != -1 )
+    {
+        const int priority = myBandwidthPriorityCombo->itemData(index).toInt( );
+        mySession.torrentSet( myIds, "bandwidthPriority", priority );
+    }
 }
 
 QWidget *
@@ -407,17 +670,18 @@ Details :: createOptionsTab( )
     //QWidget * l;
     QSpinBox * s;
     QCheckBox * c;
+    QComboBox * m;
     QHBoxLayout * h;
     QRadioButton * r;
     QDoubleSpinBox * ds;
 
     HIG * hig = new HIG( this );
-    hig->addSectionTitle( tr( "Speed Limits" ) );
+    hig->addSectionTitle( tr( "Speed" ) );
 
     c = new QCheckBox( tr( "Honor global &limits" ) );
     mySessionLimitCheck = c;
     hig->addWideControl( c );
-    connect( c, SIGNAL(toggled(bool)), this, SLOT(onHonorsSessionLimitsToggled(bool)) );
+    connect( c, SIGNAL(clicked(bool)), this, SLOT(onHonorsSessionLimitsToggled(bool)) );
 
     c = new QCheckBox( tr( "Limit &download speed (KB/s)" ) );
     mySingleDownCheck = c;
@@ -426,7 +690,7 @@ Details :: createOptionsTab( )
     s->setRange( 0, INT_MAX );
     hig->addRow( c, s );
     enableWhenChecked( c, s );
-    connect( c, SIGNAL(toggled(bool)), this, SLOT(onDownloadLimitedToggled(bool)) );
+    connect( c, SIGNAL(clicked(bool)), this, SLOT(onDownloadLimitedToggled(bool)) );
     connect( s, SIGNAL(valueChanged(int)), this, SLOT(onDownloadLimitChanged(int)));
 
     c = new QCheckBox( tr( "Limit &upload speed (KB/s)" ) );
@@ -436,21 +700,30 @@ Details :: createOptionsTab( )
     s->setRange( 0, INT_MAX );
     hig->addRow( c, s );
     enableWhenChecked( c, s );
-    connect( c, SIGNAL(toggled(bool)), this, SLOT(onUploadLimitedToggled(bool)) );
+    connect( c, SIGNAL(clicked(bool)), this, SLOT(onUploadLimitedToggled(bool)) );
     connect( s, SIGNAL(valueChanged(int)), this, SLOT(onUploadLimitChanged(int)));
+
+    m = new QComboBox;
+    m->addItem( tr( "Low" ),    TR_PRI_LOW );
+    m->addItem( tr( "Normal" ), TR_PRI_NORMAL );
+    m->addItem( tr( "High" ),   TR_PRI_HIGH );
+    connect( m, SIGNAL(currentIndexChanged(int)), this, SLOT(onBandwidthPriorityChanged(int)));
+    hig->addRow( tr( "Bandwidth priority:" ), m );
+    myBandwidthPriorityCombo = m;
+    
 
     hig->addSectionDivider( );
     hig->addSectionTitle( tr( "Seed-Until Ratio" ) );
 
     r = new QRadioButton( tr( "Use &global setting" ) );
     r->setProperty( RATIO_KEY, TR_RATIOLIMIT_GLOBAL );
-    connect( r, SIGNAL(toggled(bool)), this, SLOT(onSeedUntilChanged(bool)));
+    connect( r, SIGNAL(clicked(bool)), this, SLOT(onSeedUntilChanged(bool)));
     mySeedGlobalRadio = r;
     hig->addWideControl( r );
 
     r = new QRadioButton( tr( "Seed &regardless of ratio" ) );
     r->setProperty( RATIO_KEY, TR_RATIOLIMIT_UNLIMITED );
-    connect( r, SIGNAL(toggled(bool)), this, SLOT(onSeedUntilChanged(bool)));
+    connect( r, SIGNAL(clicked(bool)), this, SLOT(onSeedUntilChanged(bool)));
     mySeedForeverRadio = r;
     hig->addWideControl( r );
 
@@ -458,7 +731,7 @@ Details :: createOptionsTab( )
     h->setSpacing( HIG :: PAD );
     r = new QRadioButton( tr( "&Stop seeding when a torrent's ratio reaches" ) );
     r->setProperty( RATIO_KEY, TR_RATIOLIMIT_SINGLE );
-    connect( r, SIGNAL(toggled(bool)), this, SLOT(onSeedUntilChanged(bool)));
+    connect( r, SIGNAL(clicked(bool)), this, SLOT(onSeedUntilChanged(bool)));
     mySeedCustomRadio = r;
     h->addWidget( r );
     ds = new QDoubleSpinBox( );
@@ -633,12 +906,12 @@ Details :: onFilePriorityChanged( const QSet<int>& indices, int priority )
         case TR_PRI_HIGH:  key = "priority-high"; break;
         default:           key = "priority-normal"; break;
     }
-    mySession.torrentSet( myTorrent.id( ), key, indices.toList( ) );
+    mySession.torrentSet( myIds, key, indices.toList( ) );
 }
 
 void
 Details :: onFileWantedChanged( const QSet<int>& indices, bool wanted )
 {
     QString key( wanted ? "files-wanted" : "files-unwanted" );
-    mySession.torrentSet( myTorrent.id( ), key, indices.toList( ) );
+    mySession.torrentSet( myIds, key, indices.toList( ) );
 }

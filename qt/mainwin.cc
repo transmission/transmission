@@ -80,6 +80,7 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     myPrefsDialog( new PrefsDialog( session, prefs, this ) ),
     myAboutDialog( new AboutDialog( this ) ),
     myStatsDialog( new StatsDialog( session, this ) ),
+    myDetailsDialog( 0 ),
     myFileDialog( 0 ),
     myFilterModel( prefs ),
     myTorrentDelegate( new TorrentDelegate( this ) ),
@@ -550,13 +551,21 @@ TrMainWindow :: setSortAscendingPref( bool b )
 ****/
 
 void
+TrMainWindow :: onDetailsDestroyed( )
+{
+    myDetailsDialog = 0;
+}
+
+void
 TrMainWindow :: openProperties( )
 {
-    const int id( *getSelectedTorrents().begin() );
-    Torrent * torrent( myModel.getTorrentFromId( id ) );
-    assert( torrent != 0 );
-    QDialog * d( new Details( mySession, *torrent, this ) );
-    d->show( );
+    if( myDetailsDialog == 0 ) {
+        myDetailsDialog = new Details( mySession, myModel, this );
+        connect( myDetailsDialog, SIGNAL(destroyed(QObject*)), this, SLOT(onDetailsDestroyed()));
+    }
+
+    myDetailsDialog->setIds( getSelectedTorrents( ) );
+    myDetailsDialog->show( );
 }
 
 void
@@ -658,10 +667,10 @@ TrMainWindow :: refreshActionSensitivity( )
     ui.action_Verify->setEnabled( haveSelection );
     ui.action_Remove->setEnabled( haveSelection );
     ui.action_Delete->setEnabled( haveSelection );
+    ui.action_Properties->setEnabled( haveSelection );
     ui.action_DeselectAll->setEnabled( haveSelection );
 
     const bool oneSelection( selected == 1 );
-    ui.action_Properties->setEnabled( oneSelection );
     ui.action_OpenFolder->setEnabled( oneSelection );
 
     ui.action_SelectAll->setEnabled( selected < rowCount );
@@ -670,6 +679,9 @@ TrMainWindow :: refreshActionSensitivity( )
     ui.action_Start->setEnabled( selectedAndPaused > 0 );
     ui.action_Pause->setEnabled( selectedAndPaused < selected );
     ui.action_Announce->setEnabled( selected > 0 && ( canAnnounce == selected ) );
+
+    if( myDetailsDialog )
+        myDetailsDialog->setIds( getSelectedTorrents( ) );
 }
 
 /**
