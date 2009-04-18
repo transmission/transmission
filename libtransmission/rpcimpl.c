@@ -409,6 +409,8 @@ addField( const tr_torrent * tor,
         tr_bencDictAddStr( d, key, st->announceResponse );
     else if( !strcmp( key, "announceURL" ) )
         tr_bencDictAddStr( d, key, st->announceURL );
+    else if( !strcmp( key, "bandwidthPriority" ) )
+        tr_bencDictAddInt( d, key, tr_torrentGetPriority( tor ) );
     else if( !strcmp( key, "comment" ) )
         tr_bencDictAddStr( d, key, inf->comment ? inf->comment : "" );
     else if( !strcmp( key, "corruptEver" ) )
@@ -721,6 +723,9 @@ torrentSet( tr_session               * session,
         tr_bool      boolVal;
         tr_torrent * tor = torrents[i];
 
+        if( tr_bencDictFindInt( args_in, "bandwidthPriority", &tmp ) )
+            if( tr_isPriority( tmp ) )
+                tr_torrentSetPriority( tor, tmp );
         if( tr_bencDictFindList( args_in, "files-unwanted", &files ) )
             setFileDLs( tor, FALSE, files );
         if( tr_bencDictFindList( args_in, "files-wanted", &files ) )

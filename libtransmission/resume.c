@@ -25,24 +25,25 @@
 #include "torrent.h"
 #include "utils.h" /* tr_buildPath */
 
-#define KEY_ACTIVITY_DATE   "activity-date"
-#define KEY_ADDED_DATE      "added-date"
-#define KEY_CORRUPT         "corrupt"
-#define KEY_DONE_DATE       "done-date"
-#define KEY_DOWNLOAD_DIR    "destination"
-#define KEY_DND             "dnd"
-#define KEY_DOWNLOADED      "downloaded"
-#define KEY_MAX_PEERS       "max-peers"
-#define KEY_PAUSED          "paused"
-#define KEY_PEERS           "peers"
-#define KEY_PEERS6          "peers6"
-#define KEY_PRIORITY        "priority"
-#define KEY_PROGRESS        "progress"
-#define KEY_SPEEDLIMIT_OLD  "speed-limit"
-#define KEY_SPEEDLIMIT_UP   "speed-limit-up"
-#define KEY_SPEEDLIMIT_DOWN "speed-limit-down"
-#define KEY_RATIOLIMIT      "ratio-limit"
-#define KEY_UPLOADED        "uploaded"
+#define KEY_ACTIVITY_DATE       "activity-date"
+#define KEY_ADDED_DATE          "added-date"
+#define KEY_CORRUPT             "corrupt"
+#define KEY_DONE_DATE           "done-date"
+#define KEY_DOWNLOAD_DIR        "destination"
+#define KEY_DND                 "dnd"
+#define KEY_DOWNLOADED          "downloaded"
+#define KEY_MAX_PEERS           "max-peers"
+#define KEY_PAUSED              "paused"
+#define KEY_PEERS               "peers"
+#define KEY_PEERS6              "peers6"
+#define KEY_FILE_PRIORITIES     "priority"
+#define KEY_BANDWIDTH_PRIORITY  "bandwidth-priority"
+#define KEY_PROGRESS            "progress"
+#define KEY_SPEEDLIMIT_OLD      "speed-limit"
+#define KEY_SPEEDLIMIT_UP       "speed-limit-up"
+#define KEY_SPEEDLIMIT_DOWN     "speed-limit-down"
+#define KEY_RATIOLIMIT          "ratio-limit"
+#define KEY_UPLOADED            "uploaded"
 
 #define KEY_SPEED                  "speed"
 #define KEY_USE_GLOBAL_SPEED_LIMIT "use-global-speed-limit"
@@ -189,7 +190,7 @@ loadDND( tr_benc *    dict,
 
         tr_free( dnd );
         tr_free( dl );
-        ret = TR_FR_PRIORITY;
+        ret = TR_FR_DND;
     }
     else
     {
@@ -207,29 +208,27 @@ loadDND( tr_benc *    dict,
 ***/
 
 static void
-savePriorities( tr_benc *          dict,
-                const tr_torrent * tor )
+saveFilePriorities( tr_benc * dict, const tr_torrent * tor )
 {
     const tr_info *       inf = tr_torrentInfo( tor );
     const tr_file_index_t n = inf->fileCount;
     tr_file_index_t       i;
     tr_benc *             list;
 
-    list = tr_bencDictAddList( dict, KEY_PRIORITY, n );
+    list = tr_bencDictAddList( dict, KEY_FILE_PRIORITIES, n );
     for( i = 0; i < n; ++i )
         tr_bencListAddInt( list, inf->files[i].priority );
 }
 
 static uint64_t
-loadPriorities( tr_benc *    dict,
-                tr_torrent * tor )
+loadFilePriorities( tr_benc * dict, tr_torrent * tor )
 {
     uint64_t              ret = 0;
     tr_info *             inf = &tor->info;
     const tr_file_index_t n = inf->fileCount;
     tr_benc *             list;
 
-    if( tr_bencDictFindList( dict, KEY_PRIORITY, &list )
+    if( tr_bencDictFindList( dict, KEY_FILE_PRIORITIES, &list )
       && ( tr_bencListSize( list ) == n ) )
     {
         int64_t priority;
@@ -237,7 +236,7 @@ loadPriorities( tr_benc *    dict,
         for( i = 0; i < n; ++i )
             if( tr_bencGetInt( tr_bencListChild( list, i ), &priority ) )
                 tr_torrentInitFilePriority( tor, i, priority );
-        ret = TR_FR_PRIORITY;
+        ret = TR_FR_FILE_PRIORITIES;
     }
 
     return ret;
@@ -502,9 +501,11 @@ tr_torrentSaveResume( const tr_torrent * tor )
                        tor->uploadedPrev + tor->uploadedCur );
     tr_bencDictAddInt( &top, KEY_MAX_PEERS,
                        tor->maxConnectedPeers );
+    tr_bencDictAddInt( &top, KEY_BANDWIDTH_PRIORITY,
+                       tr_torrentGetPriority( tor ) );
     tr_bencDictAddBool( &top, KEY_PAUSED, !tor->isRunning );
     savePeers( &top, tor );
-    savePriorities( &top, tor );
+    saveFilePriorities( &top, tor );
     saveDND( &top, tor );
     saveProgress( &top, tor );
     saveSpeedLimits( &top, tor );
@@ -614,11 +615,19 @@ loadFromFile( tr_torrent * tor,
         fieldsLoaded |= TR_FR_ACTIVITY_DATE;
     }
 
+    if( ( fieldsToLoad & TR_FR_BANDWIDTH_PRIORITY )
+      && tr_bencDictFindInt( &top, KEY_BANDWIDTH_PRIORITY, &i )
+      && tr_isPriority( i ) )
+    {
+        tr_torrentSetPriority( tor, i );
+        fieldsLoaded |= TR_FR_BANDWIDTH_PRIORITY;
+    }
+
     if( fieldsToLoad & TR_FR_PEERS )
         fieldsLoaded |= loadPeers( &top, tor );
 
-    if( fieldsToLoad & TR_FR_PRIORITY )
-        fieldsLoaded |= loadPriorities( &top, tor );
+    if( fieldsToLoad & TR_FR_FILE_PRIORITIES )
+        fieldsLoaded |= loadFilePriorities( &top, tor );
 
     if( fieldsToLoad & TR_FR_PROGRESS )
         fieldsLoaded |= loadProgress( &top, tor );

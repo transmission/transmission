@@ -181,7 +181,7 @@ internalIdToPublicBitfield( uint8_t id )
             ret = TR_FR_PROGRESS;      break;
 
         case FR_ID_PRIORITY:
-            ret = TR_FR_PRIORITY;      break;
+            ret = TR_FR_FILE_PRIORITIES; break;
 
         case FR_ID_SPEED:
             ret = TR_FR_SPEEDLIMIT;    break;
@@ -366,7 +366,7 @@ parsePriorities( tr_torrent *    tor,
         tr_free( dnd );
         tr_free( dl );
 
-        ret = TR_FR_PRIORITY;
+        ret = TR_FR_FILE_PRIORITIES;
     }
 
     return ret;

@@ -100,6 +100,7 @@ typedef struct tr_bandwidth
 
     struct tr_band band[2];
     struct tr_bandwidth * parent;
+    tr_priority_t priority;
     int magicNumber;
     tr_session * session;
     tr_ptrArray children; /* struct tr_bandwidth */

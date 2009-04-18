@@ -1521,7 +1521,7 @@ tr_torrentInitFilePriority( tr_torrent *    tor,
 
     assert( tr_isTorrent( tor ) );
     assert( fileIndex < tor->info.fileCount );
-    assert( priority == TR_PRI_LOW || priority == TR_PRI_NORMAL || priority == TR_PRI_HIGH );
+    assert( tr_isPriority( priority ) );
 
     file = &tor->info.files[fileIndex];
     file->priority = priority;
@@ -1690,6 +1690,27 @@ tr_torrentSetFileDLs( tr_torrent *      tor,
     tr_torrentInitFileDLs( tor, files, fileCount, doDownload );
     tr_torrentSaveResume( tor );
     tr_torrentUnlock( tor );
+}
+
+/***
+****
+***/
+
+tr_priority_t
+tr_torrentGetPriority( const tr_torrent * tor )
+{
+    assert( tr_isTorrent( tor ) );
+
+    return tor->bandwidth->priority;
+}
+
+void
+tr_torrentSetPriority( tr_torrent * tor, tr_priority_t priority )
+{
+    assert( tr_isTorrent( tor ) );
+    assert( tr_isPriority( priority ) );
+
+    tor->bandwidth->priority = priority;
 }
 
 /***

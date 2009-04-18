@@ -148,10 +148,13 @@ tr_bandwidthSetParent( tr_bandwidth  * b,
 
 static void
 allocateBandwidth( tr_bandwidth  * b,
+                   tr_priority_t   parent_priority,
                    tr_direction    dir,
                    int             period_msec,
                    tr_ptrArray   * peer_pool )
 {
+    tr_priority_t priority;
+
     assert( tr_isBandwidth( b ) );
     assert( tr_isDirection( dir ) );
 
@@ -170,9 +173,13 @@ allocateBandwidth( tr_bandwidth  * b,
 #endif
     }
 
+    priority = MAX( parent_priority, b->priority );
+
     /* add this bandwidth's peer, if any, to the peer pool */
-    if( b->peer != NULL )
+    if( b->peer != NULL ) {
+        b->peer->priority = priority;
         tr_ptrArrayAppend( peer_pool, b->peer );
+    }
 
 #ifdef DEBUG_DIRECTION
 if( ( dir == DEBUG_DIRECTION ) && ( n > 1 ) )
@@ -185,28 +192,16 @@ fprintf( stderr, "bandwidth %p has %d peers\n", b, n );
         struct tr_bandwidth ** children = (struct tr_bandwidth**) tr_ptrArrayBase( &b->children );
         const int n = tr_ptrArraySize( &b->children );
         for( i=0; i<n; ++i )
-            allocateBandwidth( children[i], dir, period_msec, peer_pool );
+            allocateBandwidth( children[i], priority, dir, period_msec, peer_pool );
     }
 }
 
-void
-tr_bandwidthAllocate( tr_bandwidth  * b,
-                      tr_direction    dir,
-                      int             period_msec )
+static void
+phaseOne( tr_ptrArray * peerArray, tr_direction dir )
 {
-    int i, n, peerCount;
-    tr_ptrArray tmp = TR_PTR_ARRAY_INIT;
-    struct tr_peerIo ** peers;
-
-    /* allocateBandwidth() is a helper function with two purposes:
-     * 1. allocate bandwidth to b and its subtree
-     * 2. accumulate an array of all the peerIos from b and its subtree. */
-    allocateBandwidth( b, dir, period_msec, &tmp );
-    peers = (struct tr_peerIo**) tr_ptrArrayBase( &tmp );
-    peerCount = tr_ptrArraySize( &tmp );
-
-    for( i=0; i<peerCount; ++i )
-        tr_peerIoRef( peers[i] );
+    int i, n;
+    int peerCount = tr_ptrArraySize( peerArray );
+    struct tr_peerIo ** peers = (struct tr_peerIo**) tr_ptrArrayBase( peerArray );
 
     /* First phase of IO.  Tries to distribute bandwidth fairly to keep faster
      * peers from starving the others.  Loop through the peers, giving each a
@@ -235,6 +230,43 @@ tr_bandwidthAllocate( tr_bandwidth  * b,
         if( i == n )
             i = 0;
     }
+}
+
+void
+tr_bandwidthAllocate( tr_bandwidth  * b,
+                      tr_direction    dir,
+                      int             period_msec )
+{
+    int i, peerCount;
+    tr_ptrArray tmp = TR_PTR_ARRAY_INIT;
+    tr_ptrArray low = TR_PTR_ARRAY_INIT;
+    tr_ptrArray high = TR_PTR_ARRAY_INIT;
+    tr_ptrArray normal = TR_PTR_ARRAY_INIT;
+    struct tr_peerIo ** peers;
+
+    /* allocateBandwidth() is a helper function with two purposes:
+     * 1. allocate bandwidth to b and its subtree
+     * 2. accumulate an array of all the peerIos from b and its subtree. */
+    allocateBandwidth( b, TR_PRI_LOW, dir, period_msec, &tmp );
+    peers = (struct tr_peerIo**) tr_ptrArrayBase( &tmp );
+    peerCount = tr_ptrArraySize( &tmp );
+
+    for( i=0; i<peerCount; ++i ) {
+        tr_peerIoRef( peers[i] );
+        switch( peers[i]->priority ) {
+            case TR_PRI_HIGH: tr_ptrArrayAppend( &high,   peers[i] ); break;
+            case TR_PRI_LOW:  tr_ptrArrayAppend( &low,    peers[i] ); break;
+            default:          tr_ptrArrayAppend( &normal, peers[i] ); break;
+        }
+    }
+
+    /* First phase of IO.  Tries to distribute bandwidth fairly to keep faster
+     * peers from starving the others.  Loop through the peers, giving each a
+     * small chunk of bandwidth.  Keep looping until we run out of bandwidth
+     * and/or peers that can use it */
+    phaseOne( &high, dir );
+    phaseOne( &normal, dir );
+    phaseOne( &low, dir );
 
     /* Second phase of IO.  To help us scale in high bandwidth situations,
      * enable on-demand IO for peers with bandwidth left to burn.
@@ -247,6 +279,9 @@ tr_bandwidthAllocate( tr_bandwidth  * b,
         tr_peerIoUnref( peers[i] );
 
     /* cleanup */
+    tr_ptrArrayDestruct( &normal, NULL );
+    tr_ptrArrayDestruct( &high, NULL );
+    tr_ptrArrayDestruct( &low, NULL );
     tr_ptrArrayDestruct( &tmp, NULL );
 }
 

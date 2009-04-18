@@ -88,6 +88,7 @@
 
    string                            | value type & description
    ----------------------------------+-------------------------------------------------
+   "bandwidthPriority"               | number     this torrent's bandwidth tr_priority_t
    "downloadLimit"                   | number     maximum download speed (in K/s)
    "downloadLimited"                 | boolean    true if "downloadLimit" is honored
    "files-wanted"                    | array      indices of file(s) to download
@@ -132,6 +133,7 @@
    addedDate                       | number                      | tr_stat
    announceResponse                | string                      | tr_stat
    announceURL                     | string                      | tr_stat
+   bandwidthPriority               | number                      | tr_priority_t
    comment                         | string                      | tr_info
    corruptEver                     | number                      | tr_stat
    creator                         | string                      | tr_info
@@ -469,6 +471,8 @@
    5     | 1.60    | yes       | torrent-get    | new arg "pieces"
          |         | yes       | torrent-get    | new arg "fileStats"
          |         | yes       | torrent-set    | new arg "ratio"
+         |         | yes       | torrent-get    | new arg "bandwidthPriority"
+         |         | yes       | torrent-set    | new arg "bandwidthPriority"
          |         | yes       | torrent-set    | new arg "downloadLimited"
          |         | yes       | torrent-set    | new arg "uploadLimited"
          |         | yes       | torrent-set    | new arg "honorsSessionLimits"

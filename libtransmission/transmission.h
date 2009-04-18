@@ -72,6 +72,13 @@ enum
 
 typedef int8_t tr_priority_t;
 
+static TR_INLINE tr_bool tr_isPriority( tr_priority_t p )
+{
+    return ( p == TR_PRI_LOW )
+        || ( p == TR_PRI_NORMAL )
+        || ( p == TR_PRI_HIGH );
+}
+
 /**
  * @brief returns Transmission's default configuration file directory.
  *
@@ -649,6 +656,9 @@ uint16_t   tr_sessionGetPeerLimit( const tr_session * );
 
 void       tr_sessionSetPeerLimitPerTorrent( tr_session *, uint16_t maxGlobalPeers );
 uint16_t   tr_sessionGetPeerLimitPerTorrent( const tr_session * );
+
+tr_priority_t   tr_torrentGetPriority( const tr_torrent * );
+void            tr_torrentSetPriority( tr_torrent *, tr_priority_t );
 
 
 /**
