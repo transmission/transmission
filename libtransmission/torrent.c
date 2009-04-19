@@ -1334,6 +1334,8 @@ stopTorrent( void * vtor )
 void
 tr_torrentStop( tr_torrent * tor )
 {
+    assert( tr_isTorrent( tor ) );
+
     if( tr_isTorrent( tor ) )
     {
         tr_globalLock( tor->session );
