@@ -78,7 +78,7 @@ Torrent :: myProperties[] =
     { DATE_CREATED, "dateCreated", QVariant::DateTime, INFO },
     { PEERS_CONNECTED, "peersConnected", QVariant::Int, STAT },
     { ETA, "eta", QVariant::Int, STAT },
-    { RATIO, "ratio", QVariant::Double, STAT },
+    { RATIO, "uploadRatio", QVariant::Double, STAT },
     { DOWNLOADED_EVER, "downloadedEver", QVariant::ULongLong, STAT_EXTRA },
     { UPLOADED_EVER, "uploadedEver", QVariant::ULongLong, STAT_EXTRA },
     { FAILED_EVER, "corruptEver", QVariant::ULongLong, STAT_EXTRA },

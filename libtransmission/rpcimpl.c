@@ -517,8 +517,6 @@ addField( const tr_torrent * tor,
         tr_bencDictAddInt( d, key, (int)( st->pieceDownloadSpeed * 1024 ) );
     else if( !strcmp( key, "rateUpload" ) )
         tr_bencDictAddInt( d, key, (int)( st->pieceUploadSpeed * 1024 ) );
-    else if( !strcmp( key, "ratio" ) )
-        tr_bencDictAddReal( d, key, st->ratio );
     else if( !strcmp( key, "recheckProgress" ) )
         tr_bencDictAddReal( d, key, st->recheckProgress );
     else if( !strcmp( key, "scrapeResponse" ) )
@@ -549,12 +547,12 @@ addField( const tr_torrent * tor,
         tr_bencDictAddInt( d, key, inf->totalSize );
     else if( !strcmp( key, "uploadedEver" ) )
         tr_bencDictAddInt( d, key, st->uploadedEver );
-    else if( !strcmp( key, "uploadRatio" ) )
-        tr_bencDictAddReal( d, key, tr_getRatio( st->uploadedEver, st->downloadedEver ) );
     else if( !strcmp( key, "uploadLimit" ) )
         tr_bencDictAddInt( d, key, tr_torrentGetSpeedLimit( tor, TR_UP ) );
     else if( !strcmp( key, "uploadLimited" ) )
         tr_bencDictAddBool( d, key, tr_torrentUsesSpeedLimit( tor, TR_UP ) );
+    else if( !strcmp( key, "uploadRatio" ) )
+        tr_bencDictAddReal( d, key, st->ratio );
     else if( !strcmp( key, "wanted" ) )
     {
         tr_file_index_t i;

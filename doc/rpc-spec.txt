@@ -177,7 +177,6 @@
    pieceCount                      | tnumber                     | tr_info
    pieceSize                       | tnumber                     | tr_info
    priorities                      | array (see below)           | n/a
-   ratio                           | double                      | tr_stat
    rateDownload (B/s)              | number                      | tr_stat
    rateUpload (B/s)                | number                      | tr_stat
    recheckProgress                 | double                      | tr_stat
@@ -468,43 +467,51 @@
          |         | yes       | session-stats  | added "current-stats"
          |         | yes       | torrent-get    | new arg "downloadDir"
    ------+---------+-----------+----------------+-------------------------------
-   5     | 1.60    | yes       | torrent-get    | new arg "pieces"
-         |         | yes       | torrent-get    | new arg "fileStats"
-         |         | yes       | torrent-set    | new arg "ratio"
-         |         | yes       | torrent-get    | new arg "bandwidthPriority"
-         |         | yes       | torrent-set    | new arg "bandwidthPriority"
-         |         | yes       | torrent-set    | new arg "downloadLimited"
-         |         | yes       | torrent-set    | new arg "uploadLimited"
-         |         | yes       | torrent-set    | new arg "honorsSessionLimits"
-         |         | yes       | torrent-add    | new arg "files-wanted"
-         |         | yes       | torrent-add    | new arg "files-unwanted"
-         |         | yes       | torrent-add    | new arg "priority-high"
-         |         | yes       | torrent-add    | new arg "priority-low"
-         |         | yes       | torrent-add    | new arg "priority-normal"
-         |         | yes       | session-get    | new arg "seedRatioLimit"
-         |         | yes       | session-get    | new arg "seedRatioLimited"
+   5     | 1.60    | yes       |                | new method "torrent-reannounce"
+         |         | yes       |                | new method "blocklist-update"
+         |         | yes       |                | new method "port-test"
+         |         |           |                |
+         |         | yes       | session-get    | new arg "alt-speed-begin"
+         |         | yes       | session-get    | new arg "alt-speed-down"
          |         | yes       | session-get    | new arg "alt-speed-enabled"
+         |         | yes       | session-get    | new arg "alt-speed-end"
          |         | yes       | session-get    | new arg "alt-speed-time-enabled"
          |         | yes       | session-get    | new arg "alt-speed-up"
-         |         | yes       | session-get    | new arg "alt-speed-down"
-         |         | yes       | session-get    | new arg "alt-speed-begin"
-         |         | yes       | session-get    | new arg "alt-speed-end"
          |         | yes       | session-get    | new arg "blocklist-enabled"
          |         | yes       | session-get    | new arg "blocklist-size"
          |         | yes       | session-get    | new arg "peer-limit-per-torrent"
+         |         | yes       | session-get    | new arg "seedRatioLimit"
+         |         | yes       | session-get    | new arg "seedRatioLimited"
+         |         |        NO | session-get    | renamed "pex-allowed" to "pex-enabled"
+         |         |        NO | session-get    | renamed "port" to "peer-port"
+         |         |        NO | session-get    | renamed "peer-limit" to "peer-limit-global"
+         |         |           |                |
+         |         | yes       | torrent-add    | new arg "files-unwanted"
+         |         | yes       | torrent-add    | new arg "files-wanted"
+         |         | yes       | torrent-add    | new arg "priority-high"
+         |         | yes       | torrent-add    | new arg "priority-low"
+         |         | yes       | torrent-add    | new arg "priority-normal"
+         |         |           |                |
+         |         | yes       | torrent-set    | new arg "bandwidthPriority"
+         |         | yes       | torrent-set    | new arg "honorsSessionLimits"
+         |         | yes       | torrent-set    | new arg "seedRatioLimit" 
+         |         | yes       | torrent-set    | new arg "seedRatioLimited" 
+         |         |        NO | torrent-set    | renamed "speed-limit-down" to "downloadLimit" 
+         |         |        NO | torrent-set    | renamed "speed-limit-down-enabled" to "downloadLimited" 
+         |         |        NO | torrent-set    | renamed "speed-limit-up" to "uploadLimit" 
+         |         |        NO | torrent-set    | renamed "speed-limit-up-enabled" to "uploadLimited" 
+         |         |           |                |
+         |         | yes       | torrent-get    | new arg "bandwidthPriority"
+         |         | yes       | torrent-get    | new arg "fileStats"
+         |         | yes       | torrent-get    | new arg "honorsSessionLimits"
+         |         | yes       | torrent-get    | new arg "percentDone"
+         |         | yes       | torrent-get    | new arg "pieces"
          |         | yes       | torrent-get    | new arg "seedRatioLimit"
          |         | yes       | torrent-get    | new arg "seedRatioMode"
          |         | yes       | torrent-get    | new arg "torrentFile"
          |         | yes       | torrent-get    | new ids option "recently-active"
-         |         | yes       | torrent-get    | new ids option "percentDone"
-         |         | yes       |                | new method "torrent-reannounce"
-         |         | yes       |                | new method "blocklist-update"
-         |         | yes       |                | new method "port-test"
          |         |        NO | torrent-get    | removed arg "downloadLimitMode"
          |         |        NO | torrent-get    | removed arg "uploadLimitMode"
-         |         |        NO | session-get    | renamed "pex-allowed" to "pex-enabled"
-         |         |        NO | session-get    | renamed "port" to "peer-port"
-         |         |        NO | session-get    | renamed "peer-limit" to "peer-limit-global"
    ------+---------+-----------+----------------+-------------------------------
 
 
