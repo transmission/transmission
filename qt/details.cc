@@ -446,7 +446,9 @@ Details :: refresh( )
             rb->setChecked( true );
         }
 
+        mySeedCustomSpin->blockSignals( true );
         mySeedCustomSpin->setValue( tor->seedRatioLimit( ) );
+        mySeedCustomSpin->blockSignals( false );
     }
 
     // tracker tab
@@ -645,7 +647,16 @@ Details :: onSeedUntilChanged( bool b )
 void
 Details :: onSeedRatioLimitChanged( double val )
 {
-    mySession.torrentSet( myIds, "seedRatioLimit", val );
+    QSet<int> ids;
+
+    foreach( int id, myIds ) {
+        const Torrent * tor = myModel.getTorrentFromId( id );
+        if( tor && tor->seedRatioLimit( ) )
+            ids.insert( id );
+    }
+
+    if( !ids.empty( ) )
+        mySession.torrentSet( ids, "seedRatioLimit", val );
 }
 
 void
@@ -708,7 +719,7 @@ Details :: createOptionsTab( )
     m->addItem( tr( "Normal" ), TR_PRI_NORMAL );
     m->addItem( tr( "High" ),   TR_PRI_HIGH );
     connect( m, SIGNAL(currentIndexChanged(int)), this, SLOT(onBandwidthPriorityChanged(int)));
-    hig->addRow( tr( "Bandwidth priority:" ), m );
+    hig->addRow( tr( "&Bandwidth priority:" ), m );
     myBandwidthPriorityCombo = m;
     
 
