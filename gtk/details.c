@@ -978,6 +978,63 @@ prefsChanged( TrCore * core UNUSED, const char *  key, gpointer rb )
     }
 }
 
+static void
+onIntComboChanged( GtkComboBox * w, tr_torrent * tor )
+{
+    GtkTreeIter iter;
+
+    if( gtk_combo_box_get_active_iter( w, &iter ) )
+    {
+        int val = 0;
+        gtk_tree_model_get( gtk_combo_box_get_model( w ), &iter, 0, &val, -1 );
+        tr_torrentSetPriority( tor, val );
+    }
+}
+
+static GtkWidget*
+new_bandwidth_combo( tr_torrent * tor )
+{
+    int i;
+    int selIndex;
+    GtkWidget * w;
+    GtkCellRenderer * r;
+    GtkListStore * store;
+    const tr_priority_t currentValue = tr_torrentGetPriority( tor );
+    const struct {
+        int value;
+        const char * text;
+    } items[] = {
+        { TR_PRI_LOW,    N_( "Low" )  },
+        { TR_PRI_NORMAL, N_( "Normal" ) },
+        { TR_PRI_HIGH,   N_( "High" )  }
+    };
+
+    /* build a store for encryption */
+    selIndex = -1;
+    store = gtk_list_store_new( 2, G_TYPE_INT, G_TYPE_STRING );
+    for( i=0; i<(int)G_N_ELEMENTS(items); ++i ) {
+        GtkTreeIter iter;
+        gtk_list_store_append( store, &iter );
+        gtk_list_store_set( store, &iter, 0, items[i].value, 1, _( items[i].text ), -1 );
+        if( items[i].value == currentValue )
+            selIndex = i;
+    }
+
+    /* build the widget */
+    w = gtk_combo_box_new_with_model( GTK_TREE_MODEL( store ) );
+    r = gtk_cell_renderer_text_new( );
+    gtk_cell_layout_pack_start( GTK_CELL_LAYOUT( w ), r, TRUE );
+    gtk_cell_layout_set_attributes( GTK_CELL_LAYOUT( w ), r, "text", 1, NULL );
+    if( selIndex >= 0 )
+        gtk_combo_box_set_active( GTK_COMBO_BOX( w ), selIndex );
+    g_signal_connect( w, "changed", G_CALLBACK( onIntComboChanged ), tor );
+
+    /* cleanup */
+    g_object_unref( G_OBJECT( store ) );
+    return w;
+}
+
+
 static GtkWidget*
 options_page_new( struct ResponseData * data )
 {
@@ -1026,6 +1083,9 @@ options_page_new( struct ResponseData * data )
         g_signal_connect( tb, "toggled", G_CALLBACK( sensitize_from_check_cb ), w );
         sensitize_from_check_cb( GTK_TOGGLE_BUTTON( tb ), w );
         hig_workarea_add_row_w( t, &row, tb, w, NULL );
+
+        w = new_bandwidth_combo( tor );
+        hig_workarea_add_row( t, &row, _( "_Bandwidth priority:" ), w, NULL );
 
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title( t, &row, _( "Seed-Until Ratio" ) );
