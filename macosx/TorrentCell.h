@@ -32,6 +32,8 @@
     BOOL fTracking, fMouseDownControlButton, fMouseDownRevealButton, fMouseDownActionButton,
             fHoverControl, fHoverReveal, fHoverAction;
     
+    NSImage * fHighPriorityImage, * fLowPriorityImage;
+    
     NSColor * fBarBorderColor, * fBluePieceColor;
 }
 

@@ -287,7 +287,7 @@ typedef enum
 
 - (void) setPriority: (id) sender
 {
-    NSInteger priority;
+    tr_priority_t priority;
     switch ([sender tag])
     {
         case FILE_PRIORITY_HIGH_TAG:
@@ -374,7 +374,7 @@ typedef enum
         
         //determine which priorities are checked
         NSIndexSet * indexSet = [fOutline selectedRowIndexes];
-        NSInteger priority;
+        tr_priority_t priority;
         switch ([menuItem tag])
         {
             case FILE_PRIORITY_HIGH_TAG:

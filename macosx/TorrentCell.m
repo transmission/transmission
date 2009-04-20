@@ -36,6 +36,9 @@
 #define NORMAL_BUTTON_WIDTH 14.0f
 #define ACTION_BUTTON_WIDTH 16.0f
 
+#define PRIORITY_ICON_WIDTH 14.0f
+#define PRIORITY_ICON_HEIGHT 14.0f
+
 //ends up being larger than font height
 #define HEIGHT_TITLE 16.0f
 #define HEIGHT_STATUS 12.0f
@@ -43,6 +46,7 @@
 #define PADDING_HORIZONTAL 3.0f
 #define PADDING_BETWEEN_IMAGE_AND_TITLE 5.0f
 #define PADDING_BETWEEN_IMAGE_AND_BAR 7.0f
+#define PADDING_BETWEEN_TITLE_AND_PRIORITY 4.0f
 #define PADDING_ABOVE_TITLE 4.0f
 #define PADDING_ABOVE_MIN_STATUS 4.0f
 #define PADDING_BETWEEN_TITLE_AND_MIN_STATUS 2.0f
@@ -98,6 +102,12 @@
         
         fBluePieceColor = [[NSColor colorWithCalibratedRed: 0.0f green: 0.4f blue: 0.8f alpha: 1.0f] retain];
         fBarBorderColor = [[NSColor colorWithCalibratedWhite: 0.0f alpha: 0.2f] retain];
+        
+        fHighPriorityImage = [[NSImage imageNamed: @"PriorityHigh.png"] copy];
+        [fHighPriorityImage setFlipped: YES];
+        
+        fLowPriorityImage = [[NSImage imageNamed: @"PriorityLow.png"] copy];
+        [fLowPriorityImage setFlipped: YES];
     }
 	return self;
 }
@@ -455,6 +465,17 @@
     NSRect titleRect = [self rectForTitleWithString: titleString basedOnMinimalStatusRect: minimalStatusRect inBounds: cellFrame];
     [titleString drawInRect: titleRect];
     
+    //priority icon
+    if ([torrent priority] != TR_PRI_NORMAL)
+    {
+        NSImage * priorityImage = [torrent priority] == TR_PRI_HIGH ? fHighPriorityImage : fLowPriorityImage;
+        
+        NSRect priorityRect = NSMakeRect(NSMaxX(titleRect) + PADDING_BETWEEN_TITLE_AND_PRIORITY,
+                                titleRect.origin.y - (PRIORITY_ICON_HEIGHT - titleRect.size.height) / 2.0,
+                                PRIORITY_ICON_WIDTH, PRIORITY_ICON_HEIGHT);
+        [priorityImage drawInRect: priorityRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
+    }
+    
     //progress
     if (!minimal)
     {
@@ -718,7 +739,7 @@
 - (NSRect) rectForTitleWithString: (NSAttributedString *) string basedOnMinimalStatusRect: (NSRect) statusRect
             inBounds: (NSRect) bounds
 {
-    BOOL minimal = [fDefaults boolForKey: @"SmallView"];
+    const BOOL minimal = [fDefaults boolForKey: @"SmallView"];
     
     NSRect result = bounds;
     result.origin.y += PADDING_ABOVE_TITLE;
@@ -726,7 +747,8 @@
     
     result.size = [string size];
     result.size.width = MIN(result.size.width, NSMaxX(bounds) - result.origin.x - PADDING_HORIZONTAL
-                            - (minimal ? PADDING_BETWEEN_TITLE_AND_MIN_STATUS + statusRect.size.width : 0));
+                - (minimal ? PADDING_BETWEEN_TITLE_AND_MIN_STATUS + statusRect.size.width : 0.0)
+                - ([[self representedObject] priority] != TR_PRI_NORMAL ? PRIORITY_ICON_WIDTH + PADDING_BETWEEN_TITLE_AND_PRIORITY: 0.0));
     
     return result;
 }

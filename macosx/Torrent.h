@@ -123,6 +123,9 @@ typedef enum
 - (void) setWaitToStart: (BOOL) wait;
 - (BOOL) waitingToStart;
 
+- (tr_priority_t) priority;
+- (void) setPriority: (tr_priority_t) priority;
+
 - (void) revealData;
 - (void) revealPublicTorrent;
 - (void) trashData;
@@ -243,8 +246,8 @@ typedef enum
 - (BOOL) canChangeDownloadCheckForFiles: (NSIndexSet *) indexSet;
 - (NSInteger) checkForFiles: (NSIndexSet *) indexSet;
 - (void) setFileCheckState: (NSInteger) state forIndexes: (NSIndexSet *) indexSet;
-- (void) setFilePriority: (NSInteger) priority forIndexes: (NSIndexSet *) indexSet;
-- (BOOL) hasFilePriority: (NSInteger) priority forIndexes: (NSIndexSet *) indexSet;
+- (void) setFilePriority: (tr_priority_t) priority forIndexes: (NSIndexSet *) indexSet;
+- (BOOL) hasFilePriority: (tr_priority_t) priority forIndexes: (NSIndexSet *) indexSet;
 - (NSSet *) filePrioritiesForIndexes: (NSIndexSet *) indexSet;
 
 - (NSDate *) dateAdded;
