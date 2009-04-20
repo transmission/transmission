@@ -70,7 +70,7 @@
     IBOutlet FileOutlineController * fFileController;
     IBOutlet NSSearchField * fFileFilterField;
     
-    IBOutlet NSPopUpButton * fRatioPopUp;
+    IBOutlet NSPopUpButton * fPriorityPopUp, * fRatioPopUp;
     IBOutlet NSButton * fUploadLimitCheck, * fDownloadLimitCheck, * fGlobalLimitCheck;
     IBOutlet NSTextField * fUploadLimitField, * fDownloadLimitField, * fRatioLimitField,
                         * fUploadLimitLabel, * fDownloadLimitLabel, * fPeersConnectLabel,
@@ -109,6 +109,8 @@
 
 - (void) setRatioSetting: (id) sender;
 - (void) setRatioLimit: (id) sender;
+
+- (void) setPriority: (id) sender;
 
 - (void) setPeersConnectLimit: (id) sender;
 

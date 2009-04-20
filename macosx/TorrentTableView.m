@@ -35,6 +35,10 @@
 #define ACTION_MENU_UNLIMITED_TAG 102
 #define ACTION_MENU_LIMIT_TAG 103
 
+#define ACTION_MENU_PRIORITY_HIGH_TAG 101
+#define ACTION_MENU_PRIORITY_NORMAL_TAG 102
+#define ACTION_MENU_PRIORITY_LOW_TAG 103
+
 #define GROUP_SPEED_IMAGE_COLUMN_WIDTH 8.0f
 #define GROUP_RATIO_IMAGE_COLUMN_WIDTH 10.0f
 
@@ -546,11 +550,11 @@
 
 - (void) displayTorrentMenuForEvent: (NSEvent *) event
 {
-    NSInteger row = [self rowAtPoint: [self convertPoint: [event locationInWindow] fromView: nil]];
+    const NSInteger row = [self rowAtPoint: [self convertPoint: [event locationInWindow] fromView: nil]];
     if (row < 0)
         return;
     
-    NSInteger numberOfNonFileItems = [fActionMenu numberOfItems];
+    const NSInteger numberOfNonFileItems = [fActionMenu numberOfItems];
     
     //update file action menu
     fMenuTorrent = [[self itemAtRow: row] retain];
@@ -644,6 +648,19 @@
         
         item = [menu itemWithTag: ACTION_MENU_GLOBAL_TAG];
         [item setState: mode == TR_RATIOLIMIT_GLOBAL ? NSOnState : NSOffState];
+    }
+    else if (menu == fPriorityMenu)
+    {
+        const tr_priority_t priority = [fMenuTorrent priority];
+        
+        NSMenuItem * item = [menu itemWithTag: ACTION_MENU_PRIORITY_HIGH_TAG];
+        [item setState: priority == TR_PRI_HIGH ? NSOnState : NSOffState];
+        
+        item = [menu itemWithTag: ACTION_MENU_PRIORITY_NORMAL_TAG];
+        [item setState: priority == TR_PRI_NORMAL ? NSOnState : NSOffState];
+        
+        item = [menu itemWithTag: ACTION_MENU_PRIORITY_LOW_TAG];
+        [item setState: priority == TR_PRI_LOW ? NSOnState : NSOffState];
     }
     else //assume the menu is part of the file list
     {
@@ -774,6 +791,29 @@
     [fMenuTorrent setRatioLimit: [[sender representedObject] floatValue]];
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptions" object: nil];
+}
+
+- (void) setPriority: (id) sender
+{
+    tr_priority_t priority;
+    switch ([sender tag])
+    {
+        case ACTION_MENU_PRIORITY_HIGH_TAG:
+            priority = TR_PRI_HIGH;
+            break;
+        case ACTION_MENU_PRIORITY_NORMAL_TAG:
+            priority = TR_PRI_NORMAL;
+            break;
+        case ACTION_MENU_PRIORITY_LOW_TAG:
+            priority = TR_PRI_LOW;
+            break;
+        default:
+            return;
+    }
+    
+    [fMenuTorrent setPriority: priority];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil];
 }
 
 - (void) checkFile: (id) sender

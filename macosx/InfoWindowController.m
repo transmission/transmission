@@ -51,6 +51,10 @@
 #define OPTION_POPUP_NO_LIMIT 1
 #define OPTION_POPUP_LIMIT 2
 
+#define OPTION_POPUP_PRIORITY_HIGH 0
+#define OPTION_POPUP_PRIORITY_NORMAL 1
+#define OPTION_POPUP_PRIORITY_LOW 2
+
 #define INVALID -99
 
 #define TRACKER_ADD_TAG 0
@@ -288,6 +292,9 @@ typedef enum
             
             [fGlobalLimitCheck setEnabled: NO];
             [fGlobalLimitCheck setState: NSOffState];
+            
+            [fPriorityPopUp setEnabled: NO];
+            [fPriorityPopUp selectItemAtIndex: -1];
             
             [fRatioPopUp setEnabled: NO];
             [fRatioPopUp selectItemAtIndex: -1];
@@ -590,7 +597,7 @@ typedef enum
     NSInteger checkRatio = [torrent ratioSetting];
     CGFloat ratioLimit = [torrent ratioLimit];
     
-    while ((torrent = [enumerator nextObject]) && (checkRatio != INVALID || checkRatio != INVALID))
+    while ((torrent = [enumerator nextObject]) && (checkRatio != INVALID || ratioLimit != INVALID))
     {
         if (checkRatio != INVALID && checkRatio != [torrent ratioSetting])
             checkRatio = INVALID;
@@ -617,6 +624,30 @@ typedef enum
         [fRatioLimitField setFloatValue: ratioLimit];
     else
         [fRatioLimitField setStringValue: @""];
+    
+    //get priority info
+    enumerator = [fTorrents objectEnumerator];
+    torrent = [enumerator nextObject]; //first torrent
+    
+    NSInteger priority = [torrent priority];
+    
+    while ((torrent = [enumerator nextObject]) && priority != INVALID)
+    {
+        if (priority != INVALID && priority != [torrent priority])
+            priority = INVALID;
+    }
+    
+    //set priority view
+    if (priority == TR_PRI_HIGH)
+        index = OPTION_POPUP_PRIORITY_HIGH;
+    else if (priority == TR_PRI_NORMAL)
+        index = OPTION_POPUP_PRIORITY_NORMAL;
+    else if (priority == TR_PRI_LOW)
+        index = OPTION_POPUP_PRIORITY_LOW;
+    else
+        index = -1;
+    [fPriorityPopUp selectItemAtIndex: index];
+    [fPriorityPopUp setEnabled: YES];
     
     //get peer info
     enumerator = [fTorrents objectEnumerator];
@@ -1258,6 +1289,30 @@ typedef enum
         [torrent setRatioLimit: limit];
 }
 
+- (void) setPriority: (id) sender
+{
+    tr_priority_t priority;
+    switch ([sender indexOfSelectedItem])
+    {
+        case OPTION_POPUP_PRIORITY_HIGH:
+            priority = TR_PRI_HIGH;
+            break;
+        case OPTION_POPUP_PRIORITY_NORMAL:
+            priority = TR_PRI_NORMAL;
+            break;
+        case OPTION_POPUP_PRIORITY_LOW:
+            priority = TR_PRI_LOW;
+            break;
+        default:
+            return;
+    }
+    
+    for (Torrent * torrent in fTorrents)
+        [torrent setPriority: priority];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil];
+}
+
 - (void) setPeersConnectLimit: (id) sender
 {
     NSInteger limit = [sender intValue];
@@ -1265,7 +1320,6 @@ typedef enum
     for (Torrent * torrent in fTorrents)
         [torrent setMaxPeerConnect: limit];
 }
-
 
 - (BOOL) control: (NSControl *) control textShouldBeginEditing: (NSText *) fieldEditor
 {

@@ -4,6 +4,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 <http://trac.transmissionbt.com/query?milestone=1.60&group=component&groupdesc=1&order=severity>
 - All Platforms
    + Random port, with optional randomization on startup
+   + Transfer prioritization
    + Option for transfers to specify if they are included in the global bandwidth limits
 - Mac
    + Requires Mac OS X 10.5 Leopard or newer

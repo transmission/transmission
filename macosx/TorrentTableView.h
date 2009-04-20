@@ -45,7 +45,7 @@
     NSInteger fMouseControlRow, fMouseRevealRow, fMouseActionRow, fActionPushedRow;
     NSArray * fSelectedValues;
     
-    IBOutlet NSMenu * fActionMenu, * fUploadMenu, * fDownloadMenu, * fRatioMenu;
+    IBOutlet NSMenu * fActionMenu, * fUploadMenu, * fDownloadMenu, * fRatioMenu, * fPriorityMenu;
     IBOutlet NSMenuItem * fGlobalLimitItem;
     Torrent * fMenuTorrent;
     
@@ -81,6 +81,8 @@
 
 - (void) setQuickRatioMode: (id) sender;
 - (void) setQuickRatio: (id) sender;
+
+- (void) setPriority: (id) sender;
 
 - (void) checkFile: (id) sender;
 - (void) moveDataFile: (id) sender;
