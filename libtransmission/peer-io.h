@@ -380,6 +380,8 @@ int       tr_peerIoFlush( tr_peerIo     * io,
                           tr_direction    dir,
                           size_t          byteLimit );
 
+int       tr_peerIoFlushOutgoingProtocolMsgs( tr_peerIo * io );
+
 /**
 ***
 **/

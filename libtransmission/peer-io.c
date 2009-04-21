@@ -39,7 +39,7 @@
 #define MAGIC_NUMBER 206745
 
 static size_t
-getPacketOverhead( size_t d )
+guessPacketOverhead( size_t d )
 {
     /**
      * http://sd.wareonearth.com/~phil/net/overhead/
@@ -90,7 +90,7 @@ didWriteWrapper( tr_peerIo * io, size_t bytes_transferred )
      {
         struct tr_datatype * next = __tr_list_entry( io->outbuf_datatypes.next, struct tr_datatype, head );
         const size_t payload = MIN( next->length, bytes_transferred );
-        const size_t overhead = getPacketOverhead( payload );
+        const size_t overhead = guessPacketOverhead( payload );
 
         tr_bandwidthUsed( &io->bandwidth, TR_UP, payload, next->isPieceData );
 
@@ -846,6 +846,26 @@ tr_peerIoFlush( tr_peerIo  * io, tr_direction dir, size_t limit )
     dbgmsg( io, "flushing peer-io, hasFinishedConnecting %d, direction %d, limit %zu, bytesUsed %d", (int)io->hasFinishedConnecting, (int)dir, limit, bytesUsed );
     return bytesUsed;
 }
+
+int
+tr_peerIoFlushOutgoingProtocolMsgs( tr_peerIo * io )
+{
+    size_t byteCount = 0;
+    struct __tr_list * walk;
+    struct __tr_list * fencepost = &io->outbuf_datatypes;
+
+    /* count up how many bytes are used by non-piece-data messages
+       at the front of our outbound queue */
+    for( walk=fencepost->next; walk!=fencepost; walk=walk->next ) {
+        struct tr_datatype * d = __tr_list_entry( walk, struct tr_datatype, head );
+        if( d->isPieceData )
+            break;
+        byteCount += d->length;
+    }
+
+    return tr_peerIoFlush( io, TR_UP, byteCount );
+}
+
 
 /***
 ****

@@ -251,12 +251,17 @@ tr_bandwidthAllocate( tr_bandwidth  * b,
     peers = (struct tr_peerIo**) tr_ptrArrayBase( &tmp );
     peerCount = tr_ptrArraySize( &tmp );
 
-    for( i=0; i<peerCount; ++i ) {
-        tr_peerIoRef( peers[i] );
-        switch( peers[i]->priority ) {
-            case TR_PRI_HIGH: tr_ptrArrayAppend( &high,   peers[i] ); break;
-            case TR_PRI_LOW:  tr_ptrArrayAppend( &low,    peers[i] ); break;
-            default:          tr_ptrArrayAppend( &normal, peers[i] ); break;
+    for( i=0; i<peerCount; ++i )
+    {
+        tr_peerIo * io = peers[i];
+        tr_peerIoRef( io );
+
+        tr_peerIoFlushOutgoingProtocolMsgs( io );
+
+        switch( io->priority ) {
+            case TR_PRI_HIGH: tr_ptrArrayAppend( &high,   io ); break;
+            case TR_PRI_LOW:  tr_ptrArrayAppend( &low,    io ); break;
+            default:          tr_ptrArrayAppend( &normal, io ); break;
         }
     }
 
