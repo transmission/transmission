@@ -1,7 +1,7 @@
-/* $Id: upnpcommands.c,v 1.22 2008/12/18 17:45:18 nanard Exp $ */
+/* $Id: upnpcommands.c,v 1.24 2009/04/17 21:21:19 nanard Exp $ */
 /* Project : miniupnp
  * Author : Thomas Bernard
- * Copyright (c) 2005-2008 Thomas Bernard
+ * Copyright (c) 2005-2009 Thomas Bernard
  * This software is subject to the conditions detailed in the
  * LICENCE file provided in this distribution.
  * */
@@ -11,15 +11,15 @@
 #include "upnpcommands.h"
 #include "miniupnpc.h"
 
-static unsigned int
+static UNSIGNED_INTEGER
 my_atoui(const char * s)
 {
-	return s ? ((unsigned int)strtoul(s, NULL, 0)) : 0;
+	return s ? ((UNSIGNED_INTEGER)STRTOUI(s, NULL, 0)) : 0;
 }
 
 /*
  * */
-unsigned int
+UNSIGNED_INTEGER
 UPNP_GetTotalBytesSent(const char * controlURL,
 					const char * servicetype)
 {
@@ -39,7 +39,7 @@ UPNP_GetTotalBytesSent(const char * controlURL,
 
 /*
  * */
-unsigned int
+UNSIGNED_INTEGER
 UPNP_GetTotalBytesReceived(const char * controlURL,
 						const char * servicetype)
 {
@@ -59,7 +59,7 @@ UPNP_GetTotalBytesReceived(const char * controlURL,
 
 /*
  * */
-unsigned int
+UNSIGNED_INTEGER
 UPNP_GetTotalPacketsSent(const char * controlURL,
 						const char * servicetype)
 {
@@ -79,7 +79,7 @@ UPNP_GetTotalPacketsSent(const char * controlURL,
 
 /*
  * */
-unsigned int
+UNSIGNED_INTEGER
 UPNP_GetTotalPacketsReceived(const char * controlURL,
 						const char * servicetype)
 {

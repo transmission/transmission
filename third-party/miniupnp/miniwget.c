@@ -1,4 +1,4 @@
-/* $Id: miniwget.c,v 1.21 2008/12/18 17:45:18 nanard Exp $ */
+/* $Id: miniwget.c,v 1.22 2009/02/28 10:36:35 nanard Exp $ */
 /* Project : miniupnp
  * Author : Thomas Bernard
  * Copyright (c) 2005 Thomas Bernard
@@ -26,9 +26,8 @@
 #include <arpa/inet.h>
 #define closesocket close
 #endif
-/* for MIN() macro : */
 #if defined(__sun) || defined(sun)
-#include <utility.h>
+#define MIN(x,y) (((x)<(y))?(x):(y))
 #endif
 
 #include "miniupnpcstrings.h"

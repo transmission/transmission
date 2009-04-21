@@ -1,4 +1,4 @@
-/* $Id: upnpcommands.h,v 1.16 2008/10/14 18:05:28 nanard Exp $ */
+/* $Id: upnpcommands.h,v 1.17 2009/04/17 21:21:19 nanard Exp $ */
 /* Miniupnp project : http://miniupnp.free.fr/
  * Author : Thomas Bernard
  * Copyright (c) 2005-2008 Thomas Bernard
@@ -19,19 +19,27 @@
 extern "C" {
 #endif
 
-LIBSPEC unsigned int
+#if (defined __STDC_VERSION__ && __STDC_VERSION__ >= 199901L)
+#define UNSIGNED_INTEGER unsigned long long
+#define STRTOUI	strtoull
+#else
+#define UNSIGNED_INTEGER unsigned int
+#define STRTOUI	strtoul
+#endif
+
+LIBSPEC UNSIGNED_INTEGER
 UPNP_GetTotalBytesSent(const char * controlURL,
 					const char * servicetype);
 
-LIBSPEC unsigned int
+LIBSPEC UNSIGNED_INTEGER
 UPNP_GetTotalBytesReceived(const char * controlURL,
 						const char * servicetype);
 
-LIBSPEC unsigned int
+LIBSPEC UNSIGNED_INTEGER
 UPNP_GetTotalPacketsSent(const char * controlURL,
 					const char * servicetype);
 
-LIBSPEC unsigned int
+LIBSPEC UNSIGNED_INTEGER
 UPNP_GetTotalPacketsReceived(const char * controlURL,
 					const char * servicetype);
 
