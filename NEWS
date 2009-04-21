@@ -5,7 +5,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 - All Platforms
    + Random port, with optional randomization on startup
    + Transfer prioritization
-   + Option for transfers to specify if they are included in the global bandwidth limits
+   + Option to specify if transfers are included in the global bandwidth limits
    + Updated UPnP code to miniupnpc-1.3
 - Mac
    + Requires Mac OS X 10.5 Leopard or newer
@@ -25,6 +25,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Watch folder for auto-adding torrents
 - Web Client 
    + File selection and prioritization
+   + Add option to verify local data
    + Fix "Remove Data" bug
 
 1.52 (2009/04/12)
