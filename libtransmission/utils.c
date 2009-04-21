@@ -1352,35 +1352,44 @@ tr_lowerBound( const void * key,
 char*
 tr_utf8clean( const char * str, int max_len, tr_bool * err )
 {
-    const char zero = '\0';
     char * ret;
-    struct evbuffer * buf = evbuffer_new( );
     const char * end;
-
-    if( err != NULL )
-        *err = FALSE;
 
     if( max_len < 0 )
         max_len = (int) strlen( str );
 
-    while( !tr_utf8_validate ( str, max_len, &end ) )
+    if( err != NULL )
+        *err = FALSE;
+
+    if( tr_utf8_validate( str, max_len, &end  ) )
     {
-        const int good_len = end - str;
+        ret = tr_strndup( str, max_len );
+    }
+    else
+    {
+        const char zero = '\0';
+        struct evbuffer * buf = evbuffer_new( );
 
-        evbuffer_add( buf, str, good_len );
-        max_len -= ( good_len + 1 );
-        str += ( good_len + 1 );
-        evbuffer_add( buf, "?", 1 );
+        while( !tr_utf8_validate ( str, max_len, &end ) )
+        {
+            const int good_len = end - str;
 
-        if( err != NULL )
-            *err = TRUE;
+            evbuffer_add( buf, str, good_len );
+            max_len -= ( good_len + 1 );
+            str += ( good_len + 1 );
+            evbuffer_add( buf, "?", 1 );
+
+            if( err != NULL )
+                *err = TRUE;
+        }
+
+        evbuffer_add( buf, str, max_len );
+        evbuffer_add( buf, &zero, 1 );
+        ret = tr_memdup( EVBUFFER_DATA( buf ), EVBUFFER_LENGTH( buf ) );
+        evbuffer_free( buf );
     }
 
-    evbuffer_add( buf, str, max_len );
-    evbuffer_add( buf, &zero, 1 );
-    ret = tr_memdup( EVBUFFER_DATA( buf ), EVBUFFER_LENGTH( buf ) );
     assert( tr_utf8_validate( ret, -1, NULL ) );
-    evbuffer_free( buf );
     return ret;
 }
 
