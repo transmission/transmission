@@ -488,7 +488,6 @@ peer_page_new( TrTorrent * gtor )
     g_signal_connect( v, "query-tooltip",
                       G_CALLBACK( onPeerViewQueryTooltip ), NULL );
 #endif
-    gtk_widget_set_size_request( v, 550, 0 );
     g_object_unref( G_OBJECT( m ) );
     g_signal_connect( v, "button-release-event",
                       G_CALLBACK( on_tree_view_button_released ), NULL );
@@ -1052,7 +1051,7 @@ options_page_new( struct ResponseData * data )
 
     row = 0;
     t = hig_workarea_create( );
-    hig_workarea_add_section_title( t, &row, _( "Speed Limits" ) );
+    hig_workarea_add_section_title( t, &row, _( "Speed" ) );
 
         b = tr_torrentUsesSessionLimits( tor );
         tb = hig_workarea_add_wide_checkbutton( t, &row, _( "Honor global _limits" ), b );

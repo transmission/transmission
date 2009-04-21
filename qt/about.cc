@@ -10,37 +10,58 @@
  * $Id:$
  */
 
-#include <QAbstractButton>
-#include <QMovie>
+#include <QDialogButtonBox>
+#include <QFont>
+#include <QLabel>
+#include <QPixmap>
+#include <QVBoxLayout>
+#include <QWidget>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/version.h>
 
 #include "about.h"
 
-namespace
-{
-    QMovie * movie;
-}
-
 AboutDialog :: AboutDialog( QWidget * parent ):
     QDialog( parent, Qt::Dialog )
 {
-    ui.setupUi( this );
+    QLabel * l;
+    QVBoxLayout * v = new QVBoxLayout( this );
+    setWindowTitle( tr( "About Transmission" ) );
 
-    ui.label->setText( "Transmission " LONG_VERSION_STRING );
-    connect( ui.buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(hide()));
-    movie = new QMovie( ":/icons/dance.gif" );
-    connect( movie, SIGNAL(frameChanged(int)), this, SLOT(onFrameChanged()));
-    movie->start( );
-}
+    l = new QLabel;
+    l->setPixmap( QPixmap( ":/icons/transmission-48.png" ) );
+    l->setAlignment( Qt::AlignCenter );
+    v->addWidget( l );
 
-AboutDialog :: ~AboutDialog( )
-{
-}
+    QFont f( font( ) );
+    f.setWeight( QFont::Bold );
+    f.setPointSize( int( f.pointSize( ) * 1.2 ) );
+    l = new QLabel( "<big>Transmission " LONG_VERSION_STRING "</big>" );
+    l->setAlignment( Qt::AlignCenter );
+    l->setFont( f );
+    l->setMargin( 8 );
+    v->addWidget( l );
 
-void
-AboutDialog :: onFrameChanged( )
-{
-    ui.aboutLogo->setPixmap( movie->currentPixmap( ) );
+    l = new QLabel( tr( "A fast and easy BitTorrent client" ) );
+    l->setStyleSheet( "text-align: center" );
+    l->setAlignment( Qt::AlignCenter );
+    v->addWidget( l );
+
+    l = new QLabel( tr( "Copyright 2005-2009, the Transmission project" ) );
+    l->setAlignment( Qt::AlignCenter );
+    v->addWidget( l );
+
+    l = new QLabel( "<a href=\"http://www.transmissionbt.com/\">http://www.transmissionbt.com/</a>" );
+    l->setOpenExternalLinks( true );
+    l->setAlignment( Qt::AlignCenter );
+    v->addWidget( l );
+
+    v->addSpacing( 10 );
+
+    QDialogButtonBox * box = new QDialogButtonBox;
+    box->addButton( QDialogButtonBox::Close );
+    box->setCenterButtons( true );
+    v->addWidget( box );
+    connect( box, SIGNAL(rejected()), this, SLOT(hide()) );
 }

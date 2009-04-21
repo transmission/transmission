@@ -13,25 +13,15 @@
 #ifndef ABOUT_DIALOG_H
 #define ABOUT_DIALOG_H
 
-class QAbstractButton;
-class QIcon;
 #include <QDialog>
-
-#include "ui_about.h"
 
 class AboutDialog: public QDialog
 {
         Q_OBJECT
 
-    private:
-        Ui_AboutDialog ui;
-
-    private slots: 
-        void onFrameChanged( );
-
     public:
         AboutDialog( QWidget * parent = 0 );
-        ~AboutDialog( );
+        ~AboutDialog( ) { }
 
 };
 

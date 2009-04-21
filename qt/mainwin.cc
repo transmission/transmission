@@ -16,6 +16,7 @@
 #include <QCheckBox>
 #include <QDesktopServices>
 #include <QFileDialog>
+#include <QLabel>
 #include <QSize>
 #include <QStyle>
 #include <QHBoxLayout>

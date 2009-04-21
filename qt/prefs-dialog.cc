@@ -470,7 +470,7 @@ PrefsDialog :: createPeersTab( )
 
     hig->addSectionDivider( );
     hig->addSectionTitle( tr( "Privacy" ) );
-    hig->addRow( tr( "Encryption &mode:" ), box );
+    hig->addRow( tr( "&Encryption mode:" ), box );
     hig->addWideControl( checkBoxNew( tr( "Use peer e&xchange" ), Prefs::PEX_ENABLED ) );
 
     hig->finish( );

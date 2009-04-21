@@ -20,7 +20,7 @@ LIBS += $${TRANSMISSION_TOP}/third-party/libevent/.libs/libevent.a
 
 TRANSLATIONS += transmission_en.ts
 
-FORMS += mainwin.ui about.ui
+FORMS += mainwin.ui
 RESOURCES += application.qrc
 SOURCES += about.cc app.cc details.cc file-tree.cc filters.cc hig.cc \
            mainwin.cc make-dialog.cc options.cc prefs.cc prefs-dialog.cc \
