@@ -205,8 +205,11 @@ tr_bandwidthAllocate( tr_bandwidth  * b,
     peers = (struct tr_peerIo**) tr_ptrArrayBase( &tmp );
     peerCount = tr_ptrArraySize( &tmp );
 
-    for( i=0; i<peerCount; ++i )
-        tr_peerIoRef( peers[i] );
+    for( i=0; i<peerCount; ++i ) {
+        tr_peerIo * io = peers[i];
+        tr_peerIoRef( io );
+        tr_peerIoFlushOutgoingProtocolMsgs( io );
+    }
 
     /* First phase of IO.  Tries to distribute bandwidth fairly to keep faster
      * peers from starving the others.  Loop through the peers, giving each a
