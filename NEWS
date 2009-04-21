@@ -15,6 +15,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Bonjour support for the web interface
    + File filter field in the inspector
    + Option to include beta releases when auto-updating (using modified Sparkle 1.5)
+   + Portuguese localization
 - GTK+
    + Speed Limit: Second set of bandwidth limits that can be toggled or scheduled
    + Show the file icon in the list
