@@ -499,7 +499,7 @@ onTrackerResponse( tr_session * session,
             {
                 const int allAreSeeds = incomplete == 0;
                 
-                if( tmp->type == TR_TYPE_STR ) /* "compact" extension */
+                if( tr_bencIsString( tmp ) ) /* "compact" extension */
                 {
                     publishNewPeersCompact6( t, allAreSeeds, tmp->val.s.s,
                                              tmp->val.s.i );

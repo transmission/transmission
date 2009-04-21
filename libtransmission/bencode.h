@@ -21,6 +21,8 @@ extern "C" {
 
 struct evbuffer;
 
+/* these are PRIVATE IMPLEMENTATION details that should not be touched.
+ * it's included in the header for inlining and composition */
 enum
 {
     TR_TYPE_INT  = 1,
@@ -30,10 +32,13 @@ enum
     TR_TYPE_BOOL = 16,
     TR_TYPE_REAL = 32
 };
-
+   
+/* these are PRIVATE IMPLEMENTATION details that should not be touched.
+ * it's included in the header for inlining and composition */
 typedef struct tr_benc
 {
-    char    type;
+    char type;
+
     union
     {
         uint8_t b; /* bool type */
@@ -44,15 +49,15 @@ typedef struct tr_benc
 
         struct /* string type */
         {
-            size_t i;
-            char * s;
+            size_t i; /* the string length */
+            char * s; /* the string */
         } s;
 
         struct /* list & dict types */
         {
-            size_t alloc;
-            size_t count;
-            struct tr_benc * vals;
+            size_t alloc; /* nodes allocated */
+            size_t count; /* nodes used */
+            struct tr_benc * vals; /* nodes */
         } l;
     } val;
 } tr_benc;
@@ -61,26 +66,19 @@ typedef struct tr_benc
 ****
 ***/
 
-int       tr_bencParse( const void *     buf,
-                        const void *     bufend,
-                        tr_benc *        setme_benc,
+int       tr_bencParse( const void     * buf,
+                        const void     * bufend,
+                        tr_benc        * setme_benc,
                         const uint8_t ** setme_end );
 
-int       tr_bencLoad( const void * buf,
-                       size_t       buflen,
-                       tr_benc *    setme_benc,
-                       char **      setme_end );
+int       tr_bencLoad( const void   * buf,
+                       size_t         buflen,
+                       tr_benc      * setme_benc,
+                       char        ** setme_end );
 
-int       tr_bencLoadFile( const char * filename,
-                                        tr_benc * );
+int       tr_bencLoadFile( const char * filename, tr_benc * setme );
 
-int       tr_bencLoadJSONFile( const char * filename,
-                                            tr_benc * );
-
-#if 0
-void      tr_bencPrint( const tr_benc * );
-
-#endif
+int       tr_bencLoadJSONFile( const char * filename, tr_benc * setme );
 
 void      tr_bencFree( tr_benc * );
 
