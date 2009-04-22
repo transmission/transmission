@@ -11,6 +11,7 @@
  */
 
 #include <errno.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h> /* strcmp */
@@ -707,7 +708,7 @@ getStatusString( tr_benc * t, char * buf, size_t buflen )
                              : "Verifying";
             double percent;
             if( tr_bencDictFindDouble( t, "recheckProgress", &percent ) )
-                tr_snprintf( buf, buflen, "%s (%.0f%%)", str, percent*100.0 );
+                tr_snprintf( buf, buflen, "%s (%.0f%%)", str, floor(percent*100.0) );
             else
                 tr_strlcpy( buf, str, buflen );
 
@@ -1032,7 +1033,7 @@ printFileList( tr_benc * top )
                         }
                         printf( "%3d: %3.0f%% %-8s %-3s %9s  %s\n",
                                 j,
-                                ( 100.0 * percent ),
+                                floor( 100.0 * percent ),
                                 pristr,
                                 ( wanted ? "Yes" : "No" ),
                                 sizestr,
