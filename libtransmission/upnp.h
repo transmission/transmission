@@ -25,6 +25,6 @@ void      tr_upnpClose( tr_upnp * );
 
 int       tr_upnpPulse(         tr_upnp *,
                             int port,
-                            int isEnabled );
-
+                            int isEnabled,
+                            int doPortCheck );
 #endif

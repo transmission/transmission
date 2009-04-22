@@ -80,7 +80,8 @@ tr_upnpClose( tr_upnp * handle )
 int
 tr_upnpPulse( tr_upnp * handle,
               int       port,
-              int       isEnabled )
+              int       isEnabled,
+              int       doPortCheck )
 {
     int ret;
 
@@ -125,6 +126,24 @@ tr_upnpPulse( tr_upnp * handle,
     {
         if( handle->isMapped && ( !isEnabled || ( handle->port != port ) ) )
             handle->state = TR_UPNP_UNMAP;
+    }
+
+    if( isEnabled && handle->isMapped && doPortCheck )
+    {
+        char portStr[8];
+        char intPort[8];
+        char intClient[16];
+        int i;
+
+        tr_snprintf( portStr, sizeof( portStr ), "%d", handle->port );
+        i = UPNP_GetSpecificPortMappingEntry( handle->urls.controlURL,
+                                              handle->data.servicetype, portStr,
+                                              "TCP", intClient, intPort );
+        if( i != UPNPCOMMAND_SUCCESS )
+        {
+            tr_ninf( getKey( ), _( "Port %d isn't forwarded" ), handle->port );
+            handle->isMapped = FALSE;
+        }
     }
 
     if( handle->state == TR_UPNP_UNMAP )
