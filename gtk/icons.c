@@ -282,7 +282,10 @@ const char *
 get_mime_type_from_filename( const char * file G_GNUC_UNUSED )
 {
 #ifdef HAVE_GIO
-    return get_static_string( g_content_type_guess( file, NULL, 0, NULL ));
+    char * tmp = g_content_type_guess( file, NULL, 0, NULL );
+    const char * ret = get_static_string( tmp );
+    g_free( tmp );
+    return ret;
 #else
     return "uncertain";
 #endif
