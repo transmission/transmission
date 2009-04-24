@@ -20,6 +20,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Speed Limit: Second set of bandwidth limits that can be toggled or scheduled
    + Show the file icon in the list
    + Allow sorting of the torrent list by size and by ETA
+   + Properties dialog now lets you edit/view multiple torrents at once
 - Qt
    + New beta Qt client
 - Daemon

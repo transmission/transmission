@@ -18,7 +18,9 @@
 #include "tr-torrent.h"
 
 GtkWidget* torrent_inspector_new( GtkWindow * parent,
-                                  TrCore    * core,
-                                  TrTorrent * tor );
+                                  TrCore    * core );
+
+void torrent_inspector_set_torrents( GtkWidget * widgets,
+                                     GSList    * torrent_ids );
 
 #endif /* TG_PREFS_H */

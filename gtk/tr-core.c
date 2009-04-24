@@ -1428,3 +1428,22 @@ tr_core_blocklist_update( TrCore * core )
     g_snprintf( buf, sizeof( buf ), "{ \"method\": \"blocklist-update\", \"tag\": %d }", tag );
     sendRequest( core, buf, tag, blocklistResponseFunc, NULL );
 }
+
+/***
+****
+***/
+
+void
+tr_core_exec_json( TrCore * core, const char * json )
+{
+    g_message( "executing %s", json );
+    sendRequest( core, json, 0, NULL, NULL );
+}
+
+void
+tr_core_exec( TrCore * core, const tr_benc * top )
+{
+    char * json = tr_bencToJSON( top );
+    tr_core_exec_json( core, json );
+    tr_free( json );
+}

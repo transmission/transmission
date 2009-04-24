@@ -426,7 +426,7 @@ make_meta_ui( GtkWindow  * parent,
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title( t, &row, _( "Trackers" ) );
 
-    w = tracker_list_new( NULL );
+    w = tracker_list_new( session, -1, TRUE );
 
     n = pref_int_get( ANNOUNCE_KEY"-count" );
     if( n > 0 )

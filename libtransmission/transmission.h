@@ -953,6 +953,9 @@ uint64_t tr_torrentGetBytesLeftToAllocate( const tr_torrent * torrent );
  */
 int tr_torrentId( const tr_torrent * torrent );
 
+tr_torrent* tr_torrentFindFromId( tr_session * session, int id );
+
+
 /***
 ****  Torrent speed limits
 ****

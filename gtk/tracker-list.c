@@ -32,7 +32,10 @@
 
 struct tracker_page
 {
-    TrTorrent *         gtor;
+    gboolean            isNew;
+
+    tr_session        * session;
+    int                 torrentId;
 
     GtkTreeView *       view;
     GtkListStore *      store;
@@ -59,6 +62,11 @@ enum
     TR_COL_ANNOUNCE,
     TR_N_COLS
 };
+
+static tr_torrent * getTorrent( struct tracker_page * page )
+{
+    return tr_torrentFindFromId( page->session, page->torrentId );
+}
 
 static void
 setTrackerChangeState( struct tracker_page * page,
@@ -105,14 +113,13 @@ onTrackerSelectionChanged( GtkTreeSelection * sel,
     const gboolean has_selection =
         gtk_tree_selection_count_selected_rows( sel ) > 0;
     GtkTreeModel * model = GTK_TREE_MODEL( page->store );
-    const int trackerCount = gtk_tree_model_iter_n_children( model, NULL );
-    const gboolean ok_to_remove = !page->gtor || ( trackerCount > 1 );
+    const int trackerCount = model ? gtk_tree_model_iter_n_children( model, NULL ) : 0;
+    const gboolean ok_to_remove = page->isNew || ( trackerCount > 1 );
     gtk_widget_set_sensitive( page->remove_button, has_selection && ok_to_remove );
 }
 
 static void
-onTrackerRemoveClicked( GtkButton * w UNUSED,
-                        gpointer      gpage )
+onTrackerRemoveClicked( GtkButton * w UNUSED, gpointer gpage )
 {
     struct tracker_page * page = gpage;
     GtkTreeModel * model;
@@ -143,8 +150,7 @@ onTrackerRemoveClicked( GtkButton * w UNUSED,
 }
 
 static void
-onTrackerAddClicked( GtkButton * w UNUSED,
-                     gpointer      gpage )
+onTrackerAddClicked( GtkButton * w UNUSED, gpointer gpage )
 {
     GtkTreeIter           iter;
     struct tracker_page * page = gpage;
@@ -193,9 +199,7 @@ onTrackerSaveClicked( GtkButton * w UNUSED,
         g_assert( i == n );
 
         /* set the tracker list */
-        tr_torrentSetAnnounceList( tr_torrent_handle( page->gtor ),
-                                   trackers, n );
-
+        tr_torrentSetAnnounceList( getTorrent( page ), trackers, n );
 
         setTrackerChangeState( page, FALSE );
 
@@ -211,12 +215,13 @@ onTrackerRevertClicked( GtkButton * w UNUSED,
                         gpointer      gpage )
 {
     struct tracker_page * page = gpage;
-    GtkTreeModel *        model =
-        tracker_model_new( tr_torrent_handle( page->gtor ) );
+    GtkTreeModel * model;
 
+    model = tracker_model_new( getTorrent( page ) );
     gtk_tree_view_set_model( page->view, model );
     page->store = GTK_LIST_STORE( model );
     g_object_unref( G_OBJECT( model ) );
+
     setTrackerChangeState( page, FALSE );
 }
 
@@ -291,71 +296,74 @@ onTierEdited( GtkCellRendererText  * renderer UNUSED,
     gtk_tree_path_free( path );
 }
 
+void
+tracker_list_set_torrent( GtkWidget * w, int torrentId )
+{
+    struct tracker_page * page = g_object_get_data( G_OBJECT( w ), PAGE_KEY );
+    GtkTreeModel * m;
+
+    m = tracker_model_new( tr_torrentFindFromId( page->session, torrentId ) );
+    page->torrentId = torrentId;
+    page->store = GTK_LIST_STORE( m );
+    gtk_tree_view_set_model( GTK_TREE_VIEW( page->view ), m );
+    g_object_unref( m );
+}
+
+void
+tracker_list_clear( GtkWidget * w )
+{
+    tracker_list_set_torrent( w, -1 );
+}
+
 GtkWidget*
-tracker_list_new( TrTorrent * gtor )
+tracker_list_new( tr_session * session, int torrentId, gboolean isNew )
 {
     GtkWidget *           w;
     GtkWidget *           buttons;
     GtkWidget *           box;
     GtkWidget *           top;
     GtkWidget *           fr;
-    GtkTreeModel *        m;
     GtkCellRenderer *     r;
     GtkTreeViewColumn *   c;
     GtkTreeSelection *    sel;
     struct tracker_page * page = g_new0( struct tracker_page, 1 );
 
-    page->gtor = gtor;
+    page->session = session;
 
     top = gtk_hbox_new( FALSE, GUI_PAD );
     box = gtk_vbox_new( FALSE, GUI_PAD );
     buttons = gtk_vbox_new( TRUE, GUI_PAD );
 
-    m = tracker_model_new( tr_torrent_handle( gtor ) );
-    page->store = GTK_LIST_STORE( m );
-    w = gtk_tree_view_new_with_model( m );
+    //m = tracker_model_new( tr_torrent_handle( gtor ) );
+    //page->store = GTK_LIST_STORE( m );
+    w = gtk_tree_view_new( );
     g_signal_connect( w, "button-release-event",
                       G_CALLBACK( on_tree_view_button_released ), NULL );
     page->view = GTK_TREE_VIEW( w );
     gtk_tree_view_set_enable_search( page->view, FALSE );
     r = gtk_cell_renderer_text_new( );
-    g_object_set( G_OBJECT( r ),
-                  "editable", TRUE,
-                  NULL );
-    g_signal_connect( r, "edited",
-                      G_CALLBACK( onTierEdited ), page );
-    c = gtk_tree_view_column_new_with_attributes( _( "Tier" ), r,
-                                                  "text", TR_COL_TIER,
-                                                  NULL );
+    g_object_set( G_OBJECT( r ), "editable", TRUE, NULL );
+    g_signal_connect( r, "edited", G_CALLBACK( onTierEdited ), page );
+    c = gtk_tree_view_column_new_with_attributes( _( "Tier" ), r, "text", TR_COL_TIER, NULL );
     gtk_tree_view_column_set_sort_column_id( c, TR_COL_TIER );
     gtk_tree_view_append_column( page->view, c );
     r = gtk_cell_renderer_text_new( );
-    g_object_set( G_OBJECT( r ),
-                  "editable", TRUE,
-                  "ellipsize", PANGO_ELLIPSIZE_END,
-                  NULL );
-    g_signal_connect( r, "edited",
-                      G_CALLBACK( onAnnounceEdited ), page );
-    c = gtk_tree_view_column_new_with_attributes( _( "Announce URL" ), r,
-                                                  "text", TR_COL_ANNOUNCE,
-                                                  NULL );
+    g_object_set( G_OBJECT( r ), "editable", TRUE, "ellipsize", PANGO_ELLIPSIZE_END, NULL );
+    g_signal_connect( r, "edited", G_CALLBACK( onAnnounceEdited ), page );
+    c = gtk_tree_view_column_new_with_attributes( _( "Announce URL" ), r, "text", TR_COL_ANNOUNCE, NULL );
     gtk_tree_view_column_set_sort_column_id( c, TR_COL_ANNOUNCE );
     gtk_tree_view_append_column( page->view, c );
     w = gtk_scrolled_window_new( NULL, NULL );
-    gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( w ),
-                                    GTK_POLICY_NEVER,
-                                    GTK_POLICY_AUTOMATIC );
+    gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( w ), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC );
     sel = gtk_tree_view_get_selection( page->view );
     page->sel = sel;
-    g_signal_connect( sel, "changed",
-                      G_CALLBACK( onTrackerSelectionChanged ), page );
+    g_signal_connect( sel, "changed", G_CALLBACK( onTrackerSelectionChanged ), page );
     gtk_tree_selection_set_mode( sel, GTK_SELECTION_MULTIPLE );
     gtk_container_add( GTK_CONTAINER( w ), GTK_WIDGET( page->view ) );
     gtk_widget_set_size_request( w, -1, 133 );
     fr = gtk_frame_new( NULL );
     gtk_frame_set_shadow_type( GTK_FRAME( fr ), GTK_SHADOW_IN );
     gtk_container_add( GTK_CONTAINER( fr ), w );
-    g_object_unref( G_OBJECT( m ) );
 
     w = gtk_button_new_from_stock( GTK_STOCK_ADD );
     g_signal_connect( w, "clicked", G_CALLBACK( onTrackerAddClicked ), page );
@@ -366,7 +374,8 @@ tracker_list_new( TrTorrent * gtor )
                           onTrackerRemoveClicked ), page );
     gtk_box_pack_start( GTK_BOX( buttons ), w, TRUE, TRUE, 0 );
     page->remove_button = w;
-    if( gtor )
+
+    if( !isNew )
     {
         w = gtk_button_new_from_stock( GTK_STOCK_SAVE );
         g_signal_connect( w, "clicked", G_CALLBACK(
@@ -390,6 +399,7 @@ tracker_list_new( TrTorrent * gtor )
     onTrackerSelectionChanged( sel, page );
 
     g_object_set_data_full( G_OBJECT( top ), PAGE_KEY, page, g_free );
+    tracker_list_set_torrent( top, torrentId );
     return top;
 }
 

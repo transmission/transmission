@@ -26,12 +26,12 @@
 #define GTK_TORRENT_FILE_LIST_H
 
 #include <gtk/gtk.h>
-#include "tr-torrent.h"
+#include "tr-core.h"
 
-/* create a new file list */
-GtkWidget * file_list_new( TrTorrent * );
+GtkWidget * file_list_new( TrCore *, int torrentId );
 
-void        file_list_set_torrent( GtkWidget *,
-                                   TrTorrent * );
+void        file_list_clear( GtkWidget * );
+
+void        file_list_set_torrent( GtkWidget *, int torrentId );
 
 #endif

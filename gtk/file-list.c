@@ -41,8 +41,7 @@ enum
     SUB_STATE_HIGH          = ( 1 << 0 ),
     SUB_STATE_NORMAL        = ( 1 << 1 ),
     SUB_STATE_LOW           = ( 1 << 2 ),
-    SUB_STATE_PRIORITY_MASK =
-        ( SUB_STATE_HIGH | SUB_STATE_NORMAL | SUB_STATE_LOW ),
+    SUB_STATE_PRIORITY_MASK = ( SUB_STATE_HIGH | SUB_STATE_NORMAL | SUB_STATE_LOW ),
     SUB_STATE_DOWNLOAD      = ( 1 << 4 ),
     SUB_STATE_IGNORE        = ( 1 << 5 ),
     SUB_STATE_DOWNLOAD_MASK = ( SUB_STATE_DOWNLOAD | SUB_STATE_IGNORE )
@@ -68,7 +67,9 @@ enum
 
 typedef struct
 {
-    TrTorrent *     gtor;
+    int             torrentId;
+    TrCore *        core;
+    tr_torrent    * tor;
     GtkWidget *     top;
     GtkWidget *     view;
     GtkTreeModel *  model; /* same object as store, but recast */
@@ -81,10 +82,9 @@ FileData;
 static void
 clearData( FileData * data )
 {
-    data->gtor = NULL;
+    data->torrentId = -1;
 
-    if( data->timeout_tag )
-    {
+    if( data->timeout_tag ) {
         g_source_remove( data->timeout_tag );
         data->timeout_tag = 0;
     }
@@ -199,21 +199,22 @@ done:
 ***/
 
 static gboolean
-refreshFilesForeach( GtkTreeModel *       model,
-                     GtkTreePath   * path UNUSED,
-                     GtkTreeIter *        iter,
-                     gpointer             gdata )
+refreshFilesForeach( GtkTreeModel * model,
+                     GtkTreePath  * path UNUSED,
+                     GtkTreeIter  * iter,
+                     gpointer       gdata )
 {
     FileData *   data = gdata;
     gboolean     is_file;
     unsigned int index;
 
-    gtk_tree_model_get( model, iter, FC_IS_FILE, &is_file, FC_INDEX, &index,
-                        -1  );
+    gtk_tree_model_get( model, iter, FC_IS_FILE, &is_file,
+                                     FC_INDEX, &index,
+                                     -1  );
     if( is_file )
     {
         GtkTreeStore * store = GTK_TREE_STORE( model );
-        tr_torrent *   tor = tr_torrent_handle( data->gtor );
+        tr_torrent *   tor = data->tor;
         int            download = tr_torrentGetFileDL( tor, index );
         int            priority = tr_torrentGetFilePriority( tor, index );
         uint64_t       have = data->refresh_file_stat[index].bytesCompleted;
@@ -299,17 +300,29 @@ addSubForeach( GtkTreeModel *        model,
 static void
 refresh( FileData * data )
 {
-    tr_file_index_t fileCount;
-    tr_torrent *    tor = tr_torrent_handle( data->gtor );
+    tr_torrent * tor = tr_torrentFindFromId( tr_core_session( data->core ), data->torrentId );
 
-    data->refresh_file_stat = tr_torrentFiles( tor, &fileCount );
+    if( tor == NULL )
+    {
+        file_list_clear( data->top );
+    }
+    else
+    {
+        tr_file_index_t fileCount;
 
-    gtk_tree_model_foreach( data->model, refreshFilesForeach, data );
-    gtk_tree_model_foreach( data->model, resetSubForeach, data );
-    gtk_tree_model_foreach( data->model, addSubForeach, data );
+        /* initialize the temporary variables */
+        data->tor = tr_torrentFindFromId( tr_core_session( data->core ), data->torrentId );
+        data->refresh_file_stat = tr_torrentFiles( tor, &fileCount );
 
-    tr_torrentFilesFree( data->refresh_file_stat, fileCount );
-    data->refresh_file_stat = NULL;
+        gtk_tree_model_foreach( data->model, refreshFilesForeach, data );
+        gtk_tree_model_foreach( data->model, resetSubForeach, data );
+        gtk_tree_model_foreach( data->model, addSubForeach, data );
+
+        /* clean up the temporary variables */
+        data->refresh_file_stat = NULL;
+        tr_torrentFilesFree( data->refresh_file_stat, fileCount );
+        data->tor = NULL;
+    }
 }
 
 static gboolean
@@ -442,13 +455,16 @@ getActiveFilesForPath( GtkTreeView * view,
 ***/
 
 void
-file_list_set_torrent( GtkWidget * w,
-                       TrTorrent * gtor )
+file_list_clear( GtkWidget * w )
+{
+    file_list_set_torrent( w, -1 );
+}
+
+void
+file_list_set_torrent( GtkWidget * w, int torrentId )
 {
     GtkTreeStore * store;
-    FileData *     data;
-
-    data = g_object_get_data( G_OBJECT( w ), "file-data" );
+    FileData * data = g_object_get_data( G_OBJECT( w ), "file-data" );
 
     /* unset the old fields */
     clearData( data );
@@ -468,34 +484,34 @@ file_list_set_torrent( GtkWidget * w,
                                  G_TYPE_UINT64,    /* sub size */
                                  G_TYPE_UINT64,    /* sub have */
                                  G_TYPE_INT );     /* sub state */
+
     data->store = store;
     data->model = GTK_TREE_MODEL( store );
-    data->gtor = gtor;
-
+    data->torrentId = torrentId;
 
     /* populate the model */
-    if( gtor )
+    if( torrentId > 0 )
     {
-        tr_file_index_t i;
-        const tr_info * inf = tr_torrent_info( gtor );
-        tr_torrent *    tor = tr_torrent_handle( gtor );
-
-        for( i = 0; inf && i < inf->fileCount; ++i )
+        tr_session * session = tr_core_session( data->core );
+        tr_torrent * tor = tr_torrentFindFromId( session, torrentId );
+        if( tor != NULL )
         {
-            const char * path = inf->files[i].name;
-            const char * base =
-                g_path_is_absolute( path ) ? g_path_skip_root( path ) :
-                path;
-            parsepath( w, tor, store, NULL, base, i, inf->files[i].length );
+            tr_file_index_t i;
+            const tr_info * inf = tr_torrentInfo( tor );
+
+            for( i=0; i<inf->fileCount; ++i )
+            {
+                const char * path = inf->files[i].name;
+                const char * base = g_path_is_absolute( path ) ? g_path_skip_root( path ) : path;
+                parsepath( w, tor, store, NULL, base, i, inf->files[i].length );
+            }
         }
 
         refresh( data );
-
         data->timeout_tag = gtr_timeout_add_seconds( 2, refreshModel, data );
     }
 
-    gtk_tree_view_set_model( GTK_TREE_VIEW( data->view ),
-                            GTK_TREE_MODEL( store ) );
+    gtk_tree_view_set_model( GTK_TREE_VIEW( data->view ), GTK_TREE_MODEL( store ) );
     gtk_tree_view_expand_all( GTK_TREE_VIEW( data->view ) );
 }
 
@@ -656,6 +672,10 @@ onViewButtonPressed( GtkWidget *      w,
 {
     FileData * data = gdata;
     gboolean   handled = FALSE;
+    tr_torrent * tor = tr_torrentFindFromId( tr_core_session( data->core ), data->torrentId );
+
+    if( tor == NULL )
+        return handled;
 
     if( ( event->type == GDK_BUTTON_PRESS ) && ( event->button == 1 )
       && !( event->state & ( GDK_SHIFT_MASK | GDK_CONTROL_MASK ) ) )
@@ -720,8 +740,7 @@ onViewButtonPressed( GtkWidget *      w,
                         }
 
                     /* apply that new state to the active files */
-                    tr_torrentSetFilePriorities( tr_torrent_handle( data->
-                                                                    gtor ),
+                    tr_torrentSetFilePriorities( tor,
                                                  (tr_file_index_t*)a->data,
                                                  (tr_file_index_t)a->len,
                                                  priority );
@@ -744,7 +763,7 @@ onViewButtonPressed( GtkWidget *      w,
                         enabled = ( sub_state & SUB_STATE_IGNORE ) ? 1 : 0;
 
                     /* apply that new state to the active files */
-                    tr_torrentSetFileDLs( tr_torrent_handle( data->gtor ),
+                    tr_torrentSetFileDLs( tor,
                                           (tr_file_index_t*)a->data,
                                           (tr_file_index_t)a->len,
                                           enabled );
@@ -769,7 +788,7 @@ onViewButtonPressed( GtkWidget *      w,
 }
 
 GtkWidget *
-file_list_new( TrTorrent * gtor )
+file_list_new( TrCore * core, int torrentId )
 {
     GtkWidget *         ret;
     GtkWidget *         view, * scroll;
@@ -777,6 +796,8 @@ file_list_new( TrTorrent * gtor )
     GtkTreeViewColumn * col;
     GtkTreeSelection *  sel;
     FileData *          data = g_new0( FileData, 1 );
+
+    data->core = core;
 
     /* create the view */
     view = gtk_tree_view_new( );
@@ -845,7 +866,7 @@ file_list_new( TrTorrent * gtor )
     data->view = view;
     data->top = scroll;
     g_object_set_data_full( G_OBJECT( ret ), "file-data", data, freeData );
-    file_list_set_torrent( ret, gtor );
+    file_list_set_torrent( ret, torrentId );
 
     return ret;
 }

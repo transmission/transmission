@@ -189,6 +189,11 @@ void tr_core_port_test( TrCore * core );
 
 void tr_core_blocklist_update( TrCore * core );
 
+void tr_core_exec( TrCore * core, const tr_benc * benc );
+
+void tr_core_exec_json( TrCore * core, const char * json );
+
+
 /**
 ***
 **/

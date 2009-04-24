@@ -98,8 +98,7 @@ removeOldTorrent( struct AddData * data )
 {
     if( data->gtor )
     {
-        file_list_set_torrent( data->list, NULL );
-
+        file_list_clear( data->list );
         tr_torrent_set_remove_flag( data->gtor, TRUE );
         g_object_unref( G_OBJECT( data->gtor ) );
         data->gtor = NULL;
@@ -143,11 +142,13 @@ addResponseCB( GtkDialog * dialog,
 static void
 updateTorrent( struct AddData * o )
 {
-    if( o->gtor )
-        tr_torrentSetDownloadDir( tr_torrent_handle(
-                                      o->gtor ), o->downloadDir );
-
-    file_list_set_torrent( o->list, o->gtor );
+    if( !o->gtor )
+        file_list_clear( o->list );
+    else {
+        tr_torrent * tor = tr_torrent_handle( o->gtor );
+        tr_torrentSetDownloadDir( tor, o->downloadDir );
+        file_list_set_torrent( o->list, tr_torrentId( tor ) );
+    }
 }
 
 /**
@@ -292,7 +293,7 @@ addSingleTorrentDialog( GtkWindow * parent,
     data->ctor = ctor;
     data->filename = g_strdup( tr_ctorGetSourceFile( ctor ) );
     data->downloadDir = g_strdup( str );
-    data->list = file_list_new( NULL );
+    data->list = file_list_new( core, 0 );
     data->trash_check =
         gtk_check_button_new_with_mnemonic( _( "_Move source file to Trash" ) );
     data->run_check =
