@@ -319,8 +319,8 @@ refresh( FileData * data )
         gtk_tree_model_foreach( data->model, addSubForeach, data );
 
         /* clean up the temporary variables */
-        data->refresh_file_stat = NULL;
         tr_torrentFilesFree( data->refresh_file_stat, fileCount );
+        data->refresh_file_stat = NULL;
         data->tor = NULL;
     }
 }

@@ -24,7 +24,6 @@
 #include "details.h"
 #include "file-list.h"
 #include "tracker-list.h"
-#include "tr-torrent.h"
 #include "hig.h"
 #include "util.h"
 
@@ -334,8 +333,6 @@ tracker_list_new( tr_session * session, int torrentId, gboolean isNew )
     box = gtk_vbox_new( FALSE, GUI_PAD );
     buttons = gtk_vbox_new( TRUE, GUI_PAD );
 
-    //m = tracker_model_new( tr_torrent_handle( gtor ) );
-    //page->store = GTK_LIST_STORE( m );
     w = gtk_tree_view_new( );
     g_signal_connect( w, "button-release-event",
                       G_CALLBACK( on_tree_view_button_released ), NULL );
