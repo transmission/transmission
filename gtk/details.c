@@ -176,11 +176,11 @@ set_double_spin_if_different( GtkWidget * w, guint tag, double value )
 static void
 set_int_combo_if_different( GtkWidget * w, guint tag, int column, int value )
 {
-    GtkComboBox * combobox = GTK_COMBO_BOX( w );
-    GtkTreeModel * model = gtk_combo_box_get_model( combobox );
-    GtkTreeIter iter;
     int i;
     int currentValue;
+    GtkTreeIter iter;
+    GtkComboBox * combobox = GTK_COMBO_BOX( w );
+    GtkTreeModel * model = gtk_combo_box_get_model( combobox );
 
     /* do the value and current value match? */
     if( gtk_combo_box_get_active_iter( combobox, &iter ) ) {
@@ -221,7 +221,7 @@ refreshOptions( struct DetailsImpl * di, tr_torrent ** torrents, int n )
 
     /* honorLimitsCheck */
     if( n ) {
-        const gboolean baseline = tr_torrentUsesSessionLimits( torrents[0] );
+        const tr_bool baseline = tr_torrentUsesSessionLimits( torrents[0] );
         int i;
         for( i=1; i<n; ++i )
             if( baseline != tr_torrentUsesSessionLimits( torrents[i] ) )
@@ -233,7 +233,7 @@ refreshOptions( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     
     /* downLimitedCheck */
     if( n ) {
-        const gboolean baseline = tr_torrentUsesSpeedLimit( torrents[0], TR_DOWN );
+        const tr_bool baseline = tr_torrentUsesSpeedLimit( torrents[0], TR_DOWN );
         int i;
         for( i=1; i<n; ++i )
             if( baseline != tr_torrentUsesSpeedLimit( torrents[i], TR_DOWN ) )
@@ -257,7 +257,7 @@ refreshOptions( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     
     /* upLimitedCheck */
     if( n ) {
-        const gboolean baseline = tr_torrentUsesSpeedLimit( torrents[0], TR_UP );
+        const tr_bool baseline = tr_torrentUsesSpeedLimit( torrents[0], TR_UP );
         int i;
         for( i=1; i<n; ++i )
             if( baseline != tr_torrentUsesSpeedLimit( torrents[i], TR_UP ) )
@@ -297,7 +297,7 @@ refreshOptions( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     /* seedForeverRadio */
     /* seedCustomRadio */
     if( n ) {
-        guint tag;
+        guint t;
         const int baseline = tr_torrentGetRatioMode( torrents[0] );
         int i;
         for( i=1; i<n; ++i )
@@ -306,11 +306,14 @@ refreshOptions( struct DetailsImpl * di, tr_torrent ** torrents, int n )
         if( i == n ) {
             GtkWidget * w;
             switch( baseline ) {
-                case TR_RATIOLIMIT_SINGLE: w = di->seedCustomRadio; tag = di->seedCustomRadioTag; break;
-                case TR_RATIOLIMIT_GLOBAL: w = di->seedGlobalRadio; tag = di->seedGlobalRadioTag; break;
-                case TR_RATIOLIMIT_UNLIMITED: w = di->seedForeverRadio; tag = di->seedForeverRadioTag; break;
+                case TR_RATIOLIMIT_SINGLE: w = di->seedCustomRadio;
+                                           t = di->seedCustomRadioTag; break;
+                case TR_RATIOLIMIT_GLOBAL: w = di->seedGlobalRadio;
+                                           t = di->seedGlobalRadioTag; break;
+                case TR_RATIOLIMIT_UNLIMITED: w = di->seedForeverRadio;
+                                              t = di->seedForeverRadioTag; break;
             }
-            set_togglebutton_if_different( w, tag, TRUE );
+            set_togglebutton_if_different( w, t, TRUE );
         }
     }
 
@@ -464,7 +467,7 @@ prefsChanged( TrCore * core UNUSED, const char *  key, gpointer rb )
 }
 
 static void
-onPriorityComboChanged( GtkComboBox * w, struct DetailsImpl * di )
+onPriorityChanged( GtkComboBox * w, struct DetailsImpl * di )
 {
     GtkTreeIter iter;
 
@@ -480,7 +483,6 @@ static GtkWidget*
 new_priority_combo( struct DetailsImpl * di )
 {
     int i;
-    int selIndex;
     guint tag;
     GtkWidget * w;
     GtkCellRenderer * r;
@@ -494,8 +496,6 @@ new_priority_combo( struct DetailsImpl * di )
         { TR_PRI_HIGH,   N_( "High" )  }
     };
 
-    /* build a store for encryption */
-    selIndex = -1;
     store = gtk_list_store_new( 2, G_TYPE_INT, G_TYPE_STRING );
     for( i=0; i<(int)G_N_ELEMENTS(items); ++i ) {
         GtkTreeIter iter;
@@ -505,12 +505,11 @@ new_priority_combo( struct DetailsImpl * di )
                                          -1 );
     }
 
-    /* build the widget */
     w = gtk_combo_box_new_with_model( GTK_TREE_MODEL( store ) );
     r = gtk_cell_renderer_text_new( );
     gtk_cell_layout_pack_start( GTK_CELL_LAYOUT( w ), r, TRUE );
     gtk_cell_layout_set_attributes( GTK_CELL_LAYOUT( w ), r, "text", 1, NULL );
-    tag = g_signal_connect( w, "changed", G_CALLBACK( onPriorityComboChanged ), di );
+    tag = g_signal_connect( w, "changed", G_CALLBACK( onPriorityChanged ), di );
     di->bandwidthComboTag = tag;
 
     /* cleanup */
@@ -532,7 +531,7 @@ options_page_new( struct DetailsImpl * d )
     t = hig_workarea_create( );
     hig_workarea_add_section_title( t, &row, _( "Speed" ) );
 
-    tb = hig_workarea_add_wide_checkbutton( t, &row, _( "Honor global _limits" ), FALSE );
+    tb = hig_workarea_add_wide_checkbutton( t, &row, _( "Honor global _limits" ), 0 );
     d->honorLimitsCheck = tb;
     tag = g_signal_connect( tb, "toggled", G_CALLBACK( global_speed_toggled_cb ), d );
     d->honorLimitsCheckTag = tag;
@@ -598,7 +597,7 @@ options_page_new( struct DetailsImpl * d )
     d->seedCustomRadioTag = tag;
     group = gtk_radio_button_get_group( GTK_RADIO_BUTTON( w ) );
     gtk_box_pack_start( GTK_BOX( h ), w, FALSE, FALSE, 0 );
-    w = gtk_spin_button_new_with_range( 0.5, INT_MAX, .05 );
+    w = gtk_spin_button_new_with_range( 0, INT_MAX, .05 );
     gtk_spin_button_set_digits( GTK_SPIN_BUTTON( w ), 2 );
     tag = g_signal_connect( w, "value-changed", G_CALLBACK( ratio_spun_cb ), d );
     gtk_box_pack_start( GTK_BOX( h ), w, FALSE, FALSE, 0 );
@@ -658,7 +657,10 @@ refreshActivity( struct DetailsImpl * di, tr_torrent ** torrents, int n )
         for( i=1; i<n; ++i )
             if( baseline != (int)stats[i]->activity )
                 break;
-        str = i==n ? activityString(baseline) : _( "Mixed" );
+        if( i==n )
+            str = activityString( baseline );
+        else
+            str = mixed;
     }
     gtk_label_set_text( GTK_LABEL( di->state_lb ), str );
 
@@ -689,9 +691,10 @@ refreshActivity( struct DetailsImpl * di, tr_torrent ** torrents, int n )
         double haveValid = 0;
         double verifiedPieces = 0;
         for( i=0; i<n; ++i ) {
+            const double v = stats[i]->haveValid;
             haveUnchecked += stats[i]->haveUnchecked;
-            haveValid += stats[i]->haveValid;
-            verifiedPieces += stats[i]->haveValid / tr_torrentInfo(torrents[i])->pieceSize;
+            haveValid += v;
+            verifiedPieces += v / tr_torrentInfo(torrents[i])->pieceSize;
         }
         tr_strlsize( buf1, haveValid + haveUnchecked, sizeof( buf1 ) );
         tr_strlsize( buf2, haveValid, sizeof( buf2 ) );
@@ -711,8 +714,7 @@ refreshActivity( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     else {
         uint64_t sum = 0;
         for( i=0; i<n; ++i ) sum += stats[i]->downloadedEver;
-        tr_strlsize( buf, sum, sizeof( buf ) );
-        str = buf;
+        str = tr_strlsize( buf, sum, sizeof( buf ) );
     }
     gtk_label_set_text( GTK_LABEL( di->dl_lb ), str );
 
@@ -723,8 +725,7 @@ refreshActivity( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     else {
         uint64_t sum = 0;
         for( i=0; i<n; ++i ) sum += stats[i]->uploadedEver;
-        tr_strlsize( buf, sum, sizeof( buf ) );
-        str = buf;
+        str = tr_strlsize( buf, sum, sizeof( buf ) );
     }
     gtk_label_set_text( GTK_LABEL( di->ul_lb ), str );
 
@@ -735,8 +736,7 @@ refreshActivity( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     else {
         uint64_t sum = 0;
         for( i=0; i<n; ++i ) sum += stats[i]->corruptEver;
-        tr_strlsize( buf, sum, sizeof( buf ) );
-        str = buf;
+        str = tr_strlsize( buf, sum, sizeof( buf ) );
     }
     gtk_label_set_text( GTK_LABEL( di->failed_lb ), str );
 
@@ -751,8 +751,7 @@ refreshActivity( struct DetailsImpl * di, tr_torrent ** torrents, int n )
             up += stats[i]->uploadedEver;
             down += stats[i]->downloadedEver;
         }
-        tr_strlratio( buf, tr_getRatio( up, down ), sizeof( buf ) );
-        str = buf;
+        str = tr_strlratio( buf, tr_getRatio( up, down ), sizeof( buf ) );
     }
     gtk_label_set_text( GTK_LABEL( di->ratio_lb ), str );
 
@@ -764,8 +763,7 @@ refreshActivity( struct DetailsImpl * di, tr_torrent ** torrents, int n )
         double swarmSpeed = 0;
         for( i=0; i<n; ++i )
             swarmSpeed += stats[i]->swarmSpeed;
-        tr_strlspeed( buf, swarmSpeed, sizeof( buf ) );
-        str = buf;
+        str = tr_strlspeed( buf, swarmSpeed, sizeof( buf ) );
     }
     gtk_label_set_text( GTK_LABEL( di->swarm_lb ), str );
 
@@ -778,7 +776,10 @@ refreshActivity( struct DetailsImpl * di, tr_torrent ** torrents, int n )
         for( i=1; i<n; ++i )
             if( strcmp( baseline, stats[i]->errorString ) )
                 break;
-        str = i==n ? baseline : mixed;
+        if( i==n )
+            str = baseline;
+        else
+            str = mixed;
     }
     if( !str || !*str )
         str = none;
@@ -793,14 +794,10 @@ refreshActivity( struct DetailsImpl * di, tr_torrent ** torrents, int n )
         for( i=1; i<n; ++i )
             if( baseline != stats[i]->addedDate )
                 break;
-        if( i==n ) {
-            char * tmp = gtr_localtime( baseline );
-            g_strlcpy( buf, tmp, sizeof( buf ) );
-            g_free( tmp );
-            str = buf;
-        } else {
+        if( i==n )
+            str = gtr_localtime2( buf, baseline, sizeof( buf ) );
+        else
             str = mixed;
-        }
     }
     gtk_label_set_text( GTK_LABEL( di->date_added_lb ), str );
 
@@ -813,14 +810,10 @@ refreshActivity( struct DetailsImpl * di, tr_torrent ** torrents, int n )
         for( i=1; i<n; ++i )
             if( baseline != stats[i]->activityDate )
                 break;
-        if( i!=n )
+        if( i==n )
+            str = gtr_localtime2( buf, baseline, sizeof( buf ) );
+        else
             str = mixed;
-        else {
-            char * tmp = gtr_localtime( baseline );
-            g_strlcpy( buf, tmp, sizeof( buf ) );
-            str = buf;
-            tr_free( tmp );
-        }
     }
     gtk_label_set_text( GTK_LABEL( di->last_activity_lb ), str );
 
@@ -860,7 +853,7 @@ activity_page_new( struct DetailsImpl * di )
     hig_workarea_add_row( t, &row, _( "Ratio:" ), l, NULL );
 
     l = di->swarm_lb = gtk_label_new( NULL );
-    hig_workarea_add_row( t, &row, _( "Swarm rate:" ), l, NULL );
+    hig_workarea_add_row( t, &row, _( "Swarm speed:" ), l, NULL );
 
     l = di->error_lb = gtk_label_new( NULL );
     hig_workarea_add_row( t, &row, _( "Error:" ), l, NULL );
@@ -893,6 +886,7 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     const char * str;
     const char * none = _( "None" );
     const char * mixed = _( "Mixed" );
+    const char * unknown = _( "Unknown" );
     const tr_info ** infos = g_new( const tr_info*, n );
 
     /* info */
@@ -907,14 +901,15 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
         const int baseline = infos[0]->pieceSize;
         for( i=0; i<n; ++i )
             sum += infos[i]->pieceCount;
-        g_snprintf( buf, sizeof( buf ), ngettext( "%'d Piece", "%'d Pieces", sum ), sum );
+        g_snprintf( buf, sizeof( buf ),
+                    ngettext( "%'d Piece", "%'d Pieces", sum ), sum );
         for( i=1; i<n; ++i )
             if( baseline != (int)infos[i]->pieceSize )
                 break;
         if( i==n ) {
             char tmp1[64];
             char tmp2[64];
-            tr_strlcpy( tmp1, buf, sizeof( tmp1 ) );
+            g_strlcpy( tmp1, buf, sizeof( tmp1 ) );
             tr_strlsize( tmp2, baseline, sizeof( tmp2 ) );
             g_snprintf( buf, sizeof( buf ), _( "%1$s @ %2$s" ), tmp1, tmp2 );
         }
@@ -981,7 +976,7 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
             str = mixed;
     }
     if( !str || !*str )
-        str = _( "Unknown" );
+        str = unknown;
     gtk_label_set_text( GTK_LABEL( di->creator_lb ), str );
 
 
@@ -993,14 +988,10 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
         for( i=1; i<n; ++i )
             if( baseline != infos[i]->dateCreated )
                 break;
-        if( i!=n )
+        if( i==n )
+            str = gtr_localtime2( buf, baseline, sizeof( buf ) );
+        else
             str = mixed;
-        else {
-            char * tmp = gtr_localtime( baseline );
-            tr_strlcpy( buf, tmp, sizeof( buf ) );
-            str = buf;
-            g_free( tmp );
-        }
     }
     gtk_label_set_text( GTK_LABEL( di->date_created_lb ), str );
     
@@ -1189,10 +1180,10 @@ peer_store_new( void )
 }
 
 static void
-init_peer( GtkListStore        * store,
-           GtkTreeIter         * iter,
-           const char          * key,
-           const tr_peer_stat  * peer )
+initPeerRow( GtkListStore        * store,
+             GtkTreeIter         * iter,
+             const char          * key,
+             const tr_peer_stat  * peer )
 {
     int q[4];
     char up_speed[128];
@@ -1295,16 +1286,15 @@ refreshPeerList( struct DetailsImpl * di, tr_torrent ** torrents, int n )
         for( j=0; j<peerCount[i]; ++j ) {
             const tr_peer_stat * s = &peers[i][j];
             char key[128];
-            g_snprintf( key, sizeof( key ), "%d.%s", tr_torrentId(tor), s->addr );
+            g_snprintf( key, sizeof(key), "%d.%s", tr_torrentId(tor), s->addr );
             if( g_hash_table_lookup( hash, key ) == NULL ) {
-                GtkTreePath * path;
+                GtkTreePath * p;
                 gtk_list_store_append( store, &iter );
-                init_peer( store, &iter, key, s );
-                /* fprintf( stderr, "adding peer key %s\n", key ); */
-                path = gtk_tree_model_get_path( model, &iter );
+                initPeerRow( store, &iter, key, s );
+                p = gtk_tree_model_get_path( model, &iter );
                 g_hash_table_insert( hash, g_strdup( key ),
-                                     gtk_tree_row_reference_new( model, path ) );
-                gtk_tree_path_free( path );
+                                     gtk_tree_row_reference_new( model, p ) );
+                gtk_tree_path_free( p );
             }
         }
     }
@@ -1317,15 +1307,13 @@ refreshPeerList( struct DetailsImpl * di, tr_torrent ** torrents, int n )
             const tr_peer_stat * s = &peers[i][j];
             char key[128];
             GtkTreeRowReference * ref;
-            GtkTreePath * path;
-            g_snprintf( key, sizeof( key ), "%d.%s", tr_torrentId(tor), s->addr );
+            GtkTreePath * p;
+            g_snprintf( key, sizeof(key), "%d.%s", tr_torrentId(tor), s->addr );
             ref = g_hash_table_lookup( hash, key );
-            assert( ref != NULL );
-            path = gtk_tree_row_reference_get_path( ref );
-            assert( path );
-            gtk_tree_model_get_iter( model, &iter, path );
+            p = gtk_tree_row_reference_get_path( ref );
+            gtk_tree_model_get_iter( model, &iter, p );
             refreshPeerRow( store, &iter, s );
-            gtk_tree_path_free( path );
+            gtk_tree_path_free( p );
         }
     }
 
@@ -1341,7 +1329,6 @@ refreshPeerList( struct DetailsImpl * di, tr_torrent ** torrents, int n )
             else {
                 char * key;
                 gtk_tree_model_get( model, &iter, PEER_COL_KEY, &key, -1 );
-                /* fprintf( stderr, "removing key %s\n", key ); */
                 g_hash_table_remove( hash, key );
                 more = gtk_list_store_remove( store, &iter );
                 g_free( key );
@@ -1381,15 +1368,15 @@ refreshWebseedList( struct DetailsImpl * di, tr_torrent ** torrents, int n )
         for( j=0; j<inf->webseedCount; ++j ) {
             char key[256];
             const char * url = inf->webseeds[j];
-            g_snprintf( key, sizeof( key ), "%d.%s", tr_torrentId( tor ), url );
+            g_snprintf( key, sizeof(key), "%d.%s", tr_torrentId( tor ), url );
             if( g_hash_table_lookup( hash, key ) == NULL ) {
-                GtkTreePath * path;
+                GtkTreePath * p;
                 gtk_list_store_append( store, &iter );
                 gtk_list_store_set( store, &iter, WEBSEED_COL_URL, url, -1 );
-                path = gtk_tree_model_get_path( model, &iter );
+                p = gtk_tree_model_get_path( model, &iter );
                 g_hash_table_insert( hash, g_strdup( key ),
-                                     gtk_tree_row_reference_new( model, path ) );
-                gtk_tree_path_free( path );
+                                     gtk_tree_row_reference_new( model, p ) );
+                gtk_tree_path_free( p );
             }
         }
     }
@@ -1403,14 +1390,14 @@ refreshWebseedList( struct DetailsImpl * di, tr_torrent ** torrents, int n )
         for( j=0; j<inf->webseedCount; ++j ) {
             char key[256];
             const char * url = inf->webseeds[j];
-            GtkTreePath * path;
+            GtkTreePath * p;
             GtkTreeRowReference * ref;
-            g_snprintf( key, sizeof( key ), "%d.%s", tr_torrentId( tor ), url );
+            g_snprintf( key, sizeof(key), "%d.%s", tr_torrentId( tor ), url );
             ref = g_hash_table_lookup( hash, key );
-            path = gtk_tree_row_reference_get_path( ref );
-            gtk_tree_model_get_iter( model, &iter, path );
-            gtk_list_store_set( store, &iter, WEBSEED_COL_DOWNLOAD_RATE, (int)(100.0*speeds[j]), -1 );
-            gtk_tree_path_free( path );
+            p = gtk_tree_row_reference_get_path( ref );
+            gtk_tree_model_get_iter( model, &iter, p );
+            gtk_list_store_set( store, &iter, WEBSEED_COL_DOWNLOAD_RATE, (int)speeds[j], -1 );
+            gtk_tree_path_free( p );
         }
         tr_free( speeds );
     }
@@ -1433,6 +1420,8 @@ refreshWebseedList( struct DetailsImpl * di, tr_torrent ** torrents, int n )
         }
     }
 
+    /* most of the time there are no webseeds...
+       if that's the case, don't waste space showing an empty list */
     if( total > 0 )
         gtk_widget_show( di->webseed_view );
     else
@@ -1498,22 +1487,22 @@ onPeerViewQueryTooltip( GtkWidget   * widget,
         gtk_tree_model_get( model, &iter, PEER_COL_STATUS, &str, -1 );
         for( pch = str; pch && *pch; ++pch )
         {
-            const char * txt = NULL;
+            const char * s = NULL;
             switch( *pch )
             {
-                case 'O': txt = _( "Optimistic unchoke" ); break;
-                case 'D': txt = _( "Downloading from this peer" ); break;
-                case 'd': txt = _( "We would download from this peer if they would let us" ); break;
-                case 'U': txt = _( "Uploading to peer" ); break; 
-                case 'u': txt = _( "We would upload to this peer if they asked" ); break;
-                case 'K': txt = _( "Peer has unchoked us, but we're not interested" ); break;
-                case '?': txt = _( "We unchoked this peer, but they're not interested" ); break;
-                case 'E': txt = _( "Encrypted connection" ); break; 
-                case 'X': txt = _( "Peer was discovered through Peer Exchange (PEX)" ); break;
-                case 'I': txt = _( "Peer is an incoming connection" ); break;
+                case 'O': s = _( "Optimistic unchoke" ); break;
+                case 'D': s = _( "Downloading from this peer" ); break;
+                case 'd': s = _( "We would download from this peer if they would let us" ); break;
+                case 'U': s = _( "Uploading to peer" ); break; 
+                case 'u': s = _( "We would upload to this peer if they asked" ); break;
+                case 'K': s = _( "Peer has unchoked us, but we're not interested" ); break;
+                case '?': s = _( "We unchoked this peer, but they're not interested" ); break;
+                case 'E': s = _( "Encrypted connection" ); break; 
+                case 'X': s = _( "Peer was discovered through Peer Exchange (PEX)" ); break;
+                case 'I': s = _( "Peer is an incoming connection" ); break;
             }
-            if( txt )
-                g_string_append_printf( gstr, "%c: %s\n", *pch, txt );
+            if( s )
+                g_string_append_printf( gstr, "%c: %s\n", *pch, s );
         }
         if( gstr->len ) /* remove the last linefeed */
             g_string_set_size( gstr, gstr->len - 1 );
@@ -1600,9 +1589,9 @@ peer_page_new( struct DetailsImpl * di )
 
     for( i=0; i<G_N_ELEMENTS( view_columns ); ++i )
     {
-        const int           col = view_columns[i];
-        const char *        t = getPeerColumnName( col );
-        int                 sort_col = col;
+        const int col = view_columns[i];
+        const char * t = getPeerColumnName( col );
+        int sort_col = col;
 
         switch( col )
         {
@@ -1679,14 +1668,10 @@ peer_page_new( struct DetailsImpl * di )
     vbox = gtk_vbox_new( FALSE, GUI_PAD );
     gtk_container_set_border_width( GTK_CONTAINER( vbox ), GUI_PAD_BIG );
 
-    if( webtree == NULL )
-        gtk_box_pack_start( GTK_BOX( vbox ), sw, TRUE, TRUE, 0 );
-    else {
-        GtkWidget * vpaned = gtk_vpaned_new( );
-        gtk_paned_pack1( GTK_PANED( vpaned ), webtree, FALSE, TRUE );
-        gtk_paned_pack2( GTK_PANED( vpaned ), sw, TRUE, TRUE );
-        gtk_box_pack_start( GTK_BOX( vbox ), vpaned, TRUE, TRUE, 0 );
-    }
+    v = gtk_vpaned_new( );
+    gtk_paned_pack1( GTK_PANED( v ), webtree, FALSE, TRUE );
+    gtk_paned_pack2( GTK_PANED( v ), sw, TRUE, TRUE );
+    gtk_box_pack_start( GTK_BOX( vbox ), v, TRUE, TRUE, 0 );
 
     hbox = gtk_hbox_new( FALSE, GUI_PAD );
     l = gtk_label_new( NULL );
@@ -1762,12 +1747,8 @@ refreshTracker( struct DetailsImpl * di, tr_torrent ** torrents, int n )
             str = mixed;
         else if( baseline==0 )
             str = noneSent;
-        else {
-            char * tmp = gtr_localtime( baseline );
-            g_strlcpy( buf, tmp, sizeof( buf ) );
-            g_free( tmp );
-            str = buf;
-        }
+        else
+            str = gtr_localtime2( buf, baseline, sizeof( buf ) );
     }
     gtk_label_set_text( GTK_LABEL( di->last_scrape_time_lb ), str );
 
@@ -1818,12 +1799,8 @@ refreshTracker( struct DetailsImpl * di, tr_torrent ** torrents, int n )
             str = mixed;
         else if( baseline==0 )
             str = noneSent;
-        else {
-            char * tmp = gtr_localtime( baseline );
-            g_strlcpy( buf, tmp, sizeof( buf ) );
-            g_free( tmp );
-            str = buf;
-        }
+        else
+            str = gtr_localtime2( buf, baseline, sizeof( buf ) );
     }
     gtk_label_set_text( GTK_LABEL( di->last_announce_time_lb ), str );
 
@@ -2000,13 +1977,11 @@ response_cb( GtkDialog * dialog, int a UNUSED, gpointer b UNUSED )
 GtkWidget*
 torrent_inspector_new( GtkWindow * parent, TrCore * core )
 {
-    guint tag;
-    struct DetailsImpl * data;
     GtkWidget * d, * n, * w, * l;
+    struct DetailsImpl * di = g_new0( struct DetailsImpl, 1 );
 
     /* create the dialog */
-    data = g_new0( struct DetailsImpl, 1 );
-    data->core = core;
+    di->core = core;
     d = gtk_dialog_new_with_buttons( NULL, parent, 0,
                                      GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
                                      NULL );
@@ -2014,42 +1989,42 @@ torrent_inspector_new( GtkWindow * parent, TrCore * core )
     g_signal_connect( d, "response", G_CALLBACK( response_cb ), NULL );
     gtk_dialog_set_has_separator( GTK_DIALOG( d ), FALSE );
     gtk_container_set_border_width( GTK_CONTAINER( d ), GUI_PAD );
-    g_object_set_data_full( G_OBJECT( d ), DETAILS_KEY, data, details_free );
+    g_object_set_data_full( G_OBJECT( d ), DETAILS_KEY, di, details_free );
 
     n = gtk_notebook_new( );
     gtk_container_set_border_width( GTK_CONTAINER( n ), GUI_PAD );
 
-    w = activity_page_new( data );
+    w = activity_page_new( di );
     l = gtk_label_new( _( "Activity" ) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ), w, l );
 
-    w = peer_page_new( data );
+    w = peer_page_new( di );
     l = gtk_label_new( _( "Peers" ) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ),  w, l );
 
-    w = tracker_page_new( data );
+    w = tracker_page_new( di );
     l = gtk_label_new( _( "Tracker" ) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ), w, l );
 
-    w = info_page_new( data );
+    w = info_page_new( di );
     l = gtk_label_new( _( "Information" ) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ), w, l );
 
-    w = file_list_new( data->core, 0 );
+    w = file_list_new( core, 0 );
     gtk_container_set_border_width( GTK_CONTAINER( w ), GUI_PAD_BIG );
     l = gtk_label_new( _( "Files" ) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ), w, l );
-    data->file_list = w;
+    di->file_list = w;
 
-    w = options_page_new( data );
+    w = options_page_new( di );
     l = gtk_label_new( _( "Options" ) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ), w, l );
 
     gtk_box_pack_start( GTK_BOX( GTK_DIALOG( d )->vbox ), n, TRUE, TRUE, 0 );
 
-    tag = gtr_timeout_add_seconds( UPDATE_INTERVAL_SECONDS, periodic_refresh, data );
-    data->periodic_refresh_tag = tag;
-    periodic_refresh( data );
+    di->periodic_refresh_tag = gtr_timeout_add_seconds( UPDATE_INTERVAL_SECONDS,
+                                                        periodic_refresh, di );
+    periodic_refresh( di );
     gtk_widget_show_all( GTK_DIALOG( d )->vbox );
     return d;
 }
@@ -2057,33 +2032,33 @@ torrent_inspector_new( GtkWindow * parent, TrCore * core )
 void
 torrent_inspector_set_torrents( GtkWidget * w, GSList * ids )
 {
-    struct DetailsImpl * data = g_object_get_data( G_OBJECT( w ), DETAILS_KEY );
+    struct DetailsImpl * di = g_object_get_data( G_OBJECT( w ), DETAILS_KEY );
     const int len = g_slist_length( ids );
     char title[256];
 
-    g_slist_free( data->ids );
-    data->ids = g_slist_copy( ids );
+    g_slist_free( di->ids );
+    di->ids = g_slist_copy( ids );
 
     if( len == 1 )
     {
         const int id = GPOINTER_TO_INT( ids->data );
-        tr_session * session = tr_core_session( data->core );
+        tr_session * session = tr_core_session( di->core );
         tr_torrent * tor = tr_torrentFindFromId( session, id );
         const tr_info * inf = tr_torrentInfo( tor );
         g_snprintf( title, sizeof( title ), _( "%s Properties" ), inf->name );
 
-        file_list_set_torrent( data->file_list, id );
-        tracker_list_set_torrent( data->tracker_list, id );
+        file_list_set_torrent( di->file_list, id );
+        tracker_list_set_torrent( di->tracker_list, id );
         
     }
    else
    {
-        file_list_clear( data->file_list );
-        tracker_list_clear( data->tracker_list );
+        file_list_clear( di->file_list );
+        tracker_list_clear( di->tracker_list );
         g_snprintf( title, sizeof( title ), _( "%'d Torrent Properties" ), len );
     }
 
     gtk_window_set_title( GTK_WINDOW( w ), title );
 
-    refresh( data );
+    refresh( di );
 }

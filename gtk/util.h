@@ -61,6 +61,8 @@ char*       tr_strltime( char * buf,
 
 char*       gtr_localtime( time_t time );
 
+char*       gtr_localtime2( char * buf, time_t time, size_t buflen );
+
 /* create a directory and any missing parent directories */
 int         mkdir_p( const char *name,
                      mode_t      mode );

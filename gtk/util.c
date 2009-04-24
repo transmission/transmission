@@ -199,6 +199,15 @@ gtr_localtime( time_t time )
     return g_locale_to_utf8( buf, -1, NULL, NULL, NULL );
 }
 
+char *
+gtr_localtime2( char * buf, time_t time, size_t buflen )
+{
+    char * tmp = gtr_localtime( time );
+    g_strlcpy( buf, tmp, sizeof( buflen ) );
+    g_free( tmp );
+    return buf;
+}
+
 int
 mkdir_p( const char * path,
          mode_t       mode )
