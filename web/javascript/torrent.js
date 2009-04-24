@@ -158,8 +158,8 @@ Torrent.prototype =
 		return ( this._sizeWhenDone - this._leftUntilDone ) / this._sizeWhenDone;
 	},
 	getPercentDoneStr: function() {
-		return Math.ratio( 10000 * ( this._sizeWhenDone - this._leftUntilDone ),
-		                             this._sizeWhenDone ) / 100.0;
+		return Math.floor(100 * Math.ratio( 100 * ( this._sizeWhenDone - this._leftUntilDone ),
+		                           this._sizeWhenDone )) / 100;
 	},
 	size: function() { return this._size; },
 	state: function() { return this._state; },

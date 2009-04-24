@@ -206,7 +206,7 @@ Math.roundWithPrecision = function(floatnum, precision) {
  */
 Math.ratio = function( numerator, denominator )
 {
-	var result = Math.roundWithPrecision((numerator / denominator), 2);
+	var result = Math.floor(100 * numerator / denominator) / 100;
 
 	// check for special cases
 	if (isNaN(result)) result = 0;
