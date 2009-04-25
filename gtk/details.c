@@ -1729,6 +1729,7 @@ refreshTracker( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     char buf[256];
     const char * str;
     const char * none = _("None" );
+    const char * nowStr = _("Now" );
     const char * mixed = _( "Mixed" );
     const char * noneSent = _( "None sent" );
     const char * inProgress = _( "In progress" );
@@ -1738,7 +1739,6 @@ refreshTracker( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     stats = g_new( const tr_stat*, n );
     for( i=0; i<n; ++i )
         stats[i] = tr_torrentStatCached( torrents[i] );
-
 
     /* last_scrape_time_lb */
     if( n<1 )
@@ -1859,7 +1859,7 @@ refreshTracker( struct DetailsImpl * di, tr_torrent ** torrents, int n )
         else if( baseline<1 )
             str = none;
         else if( baseline<=now )
-            str = inProgress;
+            str = nowStr;
         else
             str = tr_strltime( buf, baseline - now, sizeof( buf ) );
     }
