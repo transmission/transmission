@@ -54,7 +54,9 @@
 /* Inspector -> Peers tab -> peers */
 "%d incoming" = "%d in arrivo";
 
-/* Action menu -> upload/download limit */
+/* Status Bar -> speed tooltip
+   Action menu -> upload/download limit */
+
 "%d KB/s" = "%d KB/s";
 
 /* Status bar transfer count */
@@ -169,8 +171,8 @@
 /* Groups -> Button */
 "All Groups" = "Tutti i gruppi";
 
-/* Torrent disk space alert -> button */
-"Always Download" = "Scarica sempre";
+/* Create torrent -> failed -> warning */
+"An unknown error has occurred." = "Si è verificato un errore sconosciuto.";
 
 /* All toolbar item -> label */
 "Apply All" = "Applica tutti";
@@ -262,9 +264,6 @@
 /* Message window -> save button */
 "Clear" = "Pulisci";
 
-/* Groups -> color button */
-"Color" = "Colore";
-
 /* Blocklist -> message */
 "Connecting to site" = "Connessione al sito";
 
@@ -285,13 +284,13 @@
 /* Drag overlay -> file */
 "Create a Torrent File" = "Crea un file torrent";
 
+/* Create toolbar item -> tooltip */
+"Create torrent file" = "Crea file torrent";
+
 /* Create torrent -> select file
    Create toolbar item -> palette label */
 
 "Create Torrent File" = "Crea file torrent";
-
-/* Create toolbar item -> tooltip */
-"Create torrent file" = "Crea file torrent";
 
 /* Create torrent -> failed -> title */
 "Creation of \"%@\" failed." = "Creazione di \"%@\" fallita.";
@@ -317,17 +316,6 @@
 
 /* Torrent disk space alert -> button */
 "Do not check disk space again" = "Non controllare nuovamente lo spazio su disco";
-
-/* Open duplicate alert -> button
-   Create torrent -> blank address -> button
-   Remove built-in tracker alert -> button
-   Add torrent -> same name -> button
-   Stats reset -> button */
-
-
-
-
-"Don't Alert Again" = "Non avvisare nuovamente";
 
 /* files tab -> tooltip */
 "Don't Download" = "Non scaricare";
@@ -359,7 +347,7 @@
 "Downloading" = "In download";
 
 /* Blocklist -> message */
-"Downloading blocklist" = "Download della blocklist";
+"Downloading blocklist" = "Download della blocklist...";
 
 /* Torrent -> status string */
 "Downloading from %d of %d peers" = "In download da %1$d su %2$d peer";
@@ -423,7 +411,7 @@
 /* Groups -> Button */
 "Group" = "Gruppo";
 
-/* Groups -> window title */
+/* Preferences -> toolbar item title */
 "Groups" = "Gruppi";
 
 /* View menu -> Filter Bar */
@@ -591,6 +579,9 @@
 /* Groups -> Name */
 "Orange" = "Arancione";
 
+/* Inspector -> Peers tab -> table row tooltip */
+"Partial Seed" = "Seed parziale";
+
 /* All toolbar item -> palette label */
 "Pause / Resume All" = "Pausa / Riprendi tutti";
 
@@ -653,7 +644,7 @@
 "Process" = "Processo";
 
 /* Blocklist -> message */
-"Processing blocklist" = "Elaborazione della blocklist";
+"Processing blocklist" = "Elaborazione della blocklist...";
 
 /* Stats window -> label */
 "Program Started" = "Programma avviato";
@@ -679,9 +670,7 @@
 
 "Quit" = "Esci";
 
-/* Dock Badger -> quit message
-   Dock Badger -> quit */
-
+/* Dock Badger -> quit */
 "Quitting" = "Chiusura";
 
 /* Stats window -> label
@@ -756,11 +745,11 @@
 /* Torrent -> status string */
 "Seeding" = "In seed";
 
-/* Growl notification title */
-"Seeding Complete" = "Seeding completato";
-
 /* Torrent -> status string */
 "Seeding complete" = "Seeding completato";
+
+/* Growl notification title */
+"Seeding Complete" = "Seeding completato";
 
 /* Torrent -> status string */
 "Seeding to %d of %d peers" = "In seed verso %1$d su %2$d peer";
@@ -813,6 +802,9 @@
 
 /* View menu -> Status Bar */
 "Show Status Bar" = "Mostra la barra di stato";
+
+/* Status Bar -> speed tooltip */
+"Speed Limit" = "Limite velocità";
 
 /* Growl notification title */
 "Speed Limit Auto Disabled" = "Limite di velocità disabilitato automaticamente";
@@ -953,13 +945,13 @@
 "Torrent Inspector" = "Visualizzatore torrent";
 
 /* Status Bar -> speed tooltip */
-"Total download speed" = "Velocità complessiva download";
+"Total download rate" = "Velocità totale download";
 
 /* stats total */
 "Total N/A" = "Totale N/D";
 
 /* Status Bar -> speed tooltip */
-"Total upload speed" = "Velocità complessiva upload";
+"Total upload rate" = "Velocità totale upload";
 
 /* Inspector -> title */
 "Tracker" = "Tracker";
@@ -970,9 +962,6 @@
 /* Transmission already running alert -> title */
 "Transmission is already running." = "Transmission è già in esecuzione.";
 
-/* Inspector -> torrent location */
-"Transmission Support Folder" = "Cartella di supporto di Transmission";
-
 /* Torrent -> status string
    status bar -> status label */
 
@@ -980,6 +969,9 @@
 
 /* File Outline -> Menu */
 "Uncheck Selected" = "Non spuntare selezionati";
+
+/* Status Bar -> speed tooltip */
+"unlimited" = "non limitata";
 
 /* Torrent -> error string unreadable */
 "unreadable error" = "errore illeggibile";
