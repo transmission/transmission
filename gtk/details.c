@@ -1417,7 +1417,8 @@ refreshWebseedList( struct DetailsImpl * di, tr_torrent ** torrents, int n )
             else {
                 char * key;
                 gtk_tree_model_get( model, &iter, WEBSEED_COL_KEY, &key, -1 );
-                g_hash_table_remove( hash, key );
+                if( key != NULL )
+                    g_hash_table_remove( hash, key );
                 more = gtk_list_store_remove( store, &iter );
                 g_free( key );
             }
