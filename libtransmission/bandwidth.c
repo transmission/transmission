@@ -217,7 +217,7 @@ phaseOne( tr_ptrArray * peerArray, tr_direction dir )
 
         dbgmsg( "peer #%d of %d used %d bytes in this pass", i, n, bytesUsed );
 
-        if( bytesUsed == (int)increment )
+        if( bytesUsed > 0 )
             ++i;
         else {
             /* peer is done writing for now; move it to the end of the list */
