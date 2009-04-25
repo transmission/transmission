@@ -112,7 +112,7 @@ getFilterName( int mode )
         case FILTER_MODE_DOWNLOADING: return "show-downloading";
         case FILTER_MODE_SEEDING:     return "show-seeding";
         case FILTER_MODE_PAUSED:      return "show-paused";
-        default:                      return "show-active"; /* the fallback */
+        default:                      return "show-all"; /* the fallback */
     }
 }
 static int

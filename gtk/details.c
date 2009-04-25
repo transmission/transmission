@@ -516,7 +516,7 @@ new_priority_combo( struct DetailsImpl * di )
     di->bandwidthComboTag = tag;
 
     /* cleanup */
-    g_object_unref( G_OBJECT( store ) );
+    g_object_unref( store );
     return w;
 }
 
@@ -1545,7 +1545,7 @@ peer_page_new( struct DetailsImpl * di )
     v = gtk_tree_view_new_with_model( GTK_TREE_MODEL( store ) );
     g_signal_connect( v, "button-release-event", G_CALLBACK( on_tree_view_button_released ), NULL );
     gtk_tree_view_set_rules_hint( GTK_TREE_VIEW( v ), TRUE );
-    g_object_unref( G_OBJECT( store ) );
+    g_object_unref( store );
 
     str = getWebseedColumnNames( WEBSEED_COL_URL );
     r = gtk_cell_renderer_text_new( );
@@ -1587,7 +1587,7 @@ peer_page_new( struct DetailsImpl * di )
     g_signal_connect( v, "query-tooltip",
                       G_CALLBACK( onPeerViewQueryTooltip ), NULL );
 #endif
-    g_object_unref( G_OBJECT( store ) );
+    g_object_unref( store );
     g_signal_connect( v, "button-release-event",
                       G_CALLBACK( on_tree_view_button_released ), NULL );
 
