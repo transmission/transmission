@@ -60,6 +60,7 @@ struct DetailsImpl
     guint seedGlobalRadioTag;
     guint seedCustomRadioTag;
     guint seedCustomSpinTag;
+    guint maxPeersSpinTag;
 
     GtkWidget * state_lb;
     GtkWidget * progress_lb;
@@ -320,13 +321,15 @@ refreshOptions( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     /* seedCustomSpin */
     if( n ) {
         const double baseline = tr_torrentGetRatioLimit( torrents[0] );
-        int i;
-        for( i=1; i<n; ++i )
-            if( (int)(100*baseline) != (int)(100*tr_torrentGetRatioLimit(torrents[i])) )
-                break;
-        if( i == n )
-            set_double_spin_if_different( di->seedCustomSpin,
-                                          di->seedCustomSpinTag, baseline );
+        set_double_spin_if_different( di->seedCustomSpin,
+                                      di->seedCustomSpinTag, baseline );
+    }
+
+    /* maxPeersSpin */
+    if( n ) {
+        const int baseline = tr_torrentGetPeerLimit( torrents[0] );
+        set_int_spin_if_different( di->maxPeersSpin,
+                                   di->maxPeersSpinTag, baseline );
     }
 }
 
@@ -610,8 +613,9 @@ options_page_new( struct DetailsImpl * d )
 
     w = gtk_spin_button_new_with_range( 1, 3000, 5 );
     hig_workarea_add_row( t, &row, _( "_Maximum peers:" ), w, w );
-    g_signal_connect( w, "value-changed", G_CALLBACK( max_peers_spun_cb ), d );
+    tag = g_signal_connect( w, "value-changed", G_CALLBACK( max_peers_spun_cb ), d );
     d->maxPeersSpin = w;
+    d->maxPeersSpinTag = tag;
 
     hig_workarea_finish( t, &row );
     return t;

@@ -204,7 +204,6 @@ refreshActions( struct cbdata * data )
     action_sensitize( "delete-torrent", counts.totalCount != 0 );
     action_sensitize( "verify-torrent", counts.totalCount != 0 );
     action_sensitize( "open-torrent-folder", counts.totalCount == 1 );
-    action_sensitize( "show-torrent-properties", counts.totalCount != 0 );
 
     canUpdate = 0;
     gtk_tree_selection_selected_foreach( s, accumulateCanUpdateForeach, &canUpdate );
@@ -637,9 +636,32 @@ winsetup( struct cbdata * cbdata,
 }
 
 static gpointer
-quitThreadFunc( gpointer core )
+quitThreadFunc( gpointer gdata )
 {
-    tr_core_close( core );
+    struct cbdata * cbdata = gdata;
+
+    tr_core_close( cbdata->core );
+
+    /* shutdown the gui */
+    if( cbdata->details )
+        gtk_widget_destroy( GTK_WIDGET( cbdata->details ) );
+    if( cbdata->prefs )
+        gtk_widget_destroy( GTK_WIDGET( cbdata->prefs ) );
+    if( cbdata->wind )
+        gtk_widget_destroy( GTK_WIDGET( cbdata->wind ) );
+    g_object_unref( cbdata->core );
+    if( cbdata->icon )
+        g_object_unref( cbdata->icon );
+    if( cbdata->errqueue ) {
+        g_slist_foreach( cbdata->errqueue, (GFunc)g_free, NULL );
+        g_slist_free( cbdata->errqueue );
+    }
+    if( cbdata->dupqueue ) {
+        g_slist_foreach( cbdata->dupqueue, (GFunc)g_free, NULL );
+        g_slist_free( cbdata->dupqueue );
+    }
+    g_free( cbdata );
+
     gtk_main_quit( );
     return NULL;
 }
@@ -654,7 +676,6 @@ do_exit_cb( GtkWidget *w  UNUSED,
 static void
 wannaquit( void * vdata )
 {
-    TrCore * core;
     GtkWidget *r, *p, *b, *w, *c;
     struct cbdata *cbdata = vdata;
 
@@ -698,29 +719,8 @@ wannaquit( void * vdata )
     /* clear the UI */
     gtk_list_store_clear( GTK_LIST_STORE( tr_core_model( cbdata->core ) ) );
 
-    /* shutdown the gui */
-    core = cbdata->core;
-    if( cbdata->details )
-        gtk_widget_destroy( GTK_WIDGET( cbdata->details ) );
-    if( cbdata->prefs )
-        gtk_widget_destroy( GTK_WIDGET( cbdata->prefs ) );
-    if( cbdata->wind )
-        gtk_widget_destroy( GTK_WIDGET( cbdata->wind ) );
-    g_object_unref( cbdata->core );
-    if( cbdata->icon )
-        g_object_unref( cbdata->icon );
-    if( cbdata->errqueue ) {
-        g_slist_foreach( cbdata->errqueue, (GFunc)g_free, NULL );
-        g_slist_free( cbdata->errqueue );
-    }
-    if( cbdata->dupqueue ) {
-        g_slist_foreach( cbdata->dupqueue, (GFunc)g_free, NULL );
-        g_slist_free( cbdata->dupqueue );
-    }
-    g_free( cbdata );
-
     /* shut down libT */
-    g_thread_create( quitThreadFunc, core, TRUE, NULL );
+    g_thread_create( quitThreadFunc, vdata, TRUE, NULL );
 }
 
 static void

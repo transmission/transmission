@@ -54,9 +54,7 @@ enum
 	LAST_SIGNAL
 };
 
-static void sexy_icon_entry_class_init(SexyIconEntryClass *klass);
 static void sexy_icon_entry_editable_init(GtkEditableClass *iface);
-static void sexy_icon_entry_init(SexyIconEntry *entry);
 static void sexy_icon_entry_finalize(GObject *obj);
 static void sexy_icon_entry_destroy(GtkObject *obj);
 static void sexy_icon_entry_map(GtkWidget *widget);

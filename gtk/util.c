@@ -203,7 +203,7 @@ char *
 gtr_localtime2( char * buf, time_t time, size_t buflen )
 {
     char * tmp = gtr_localtime( time );
-    g_strlcpy( buf, tmp, sizeof( buflen ) );
+    g_strlcpy( buf, tmp, buflen );
     g_free( tmp );
     return buf;
 }
