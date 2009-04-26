@@ -201,7 +201,7 @@ preallocateFileFull( const char * filename, uint64_t length )
     return success;
 }
 
-FILE*
+int
 tr_open_file_for_scanning( const char * filename )
 {
     int fd;
@@ -224,33 +224,27 @@ tr_open_file_for_scanning( const char * filename )
 
     /* open the file */
     fd = open( filename, flags, 0666 );
-    if( fd < 0 )
-        return NULL;
-
+    if( fd >= 0 )
+    {
 #ifdef HAVE_POSIX_FADVISE
-    posix_fadvise( fd, 0, 0, POSIX_FADV_SEQUENTIAL );
+        posix_fadvise( fd, 0, 0, POSIX_FADV_SEQUENTIAL );
 #endif
 #ifdef SYS_DARWIN
-    fcntl( fd, F_NOCACHE, 1 );
-    fcntl( fd, F_RDAHEAD, 1 );
+        fcntl( fd, F_NOCACHE, 1 );
+        fcntl( fd, F_RDAHEAD, 1 );
 #endif
+    }
 
-    return fdopen( fd, "r" );
+    return fd;
 }
 
-static void
-flush_before_closing( int fd )
+void
+tr_close_file( int fd )
 {
 #if defined(HAVE_POSIX_FADVISE)
     posix_fadvise( fd, 0, 0, POSIX_FADV_DONTNEED );
 #endif
-}
-
-void
-tr_close_file( FILE * fp )
-{
-    flush_before_closing( fileno( fp ) );
-    fclose( fp );
+    close( fd );
 }
 
 /**
@@ -346,7 +340,7 @@ TrCloseFile( int i )
     assert( i < gFd->openFileLimit );
     assert( fileIsOpen( o ) );
 
-    flush_before_closing( o->fd );
+    tr_close_file( o->fd );
     close( o->fd );
     o->fd = -1;
     o->isCheckedOut = 0;
