@@ -75,7 +75,7 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
         if( !filePos && !fp )
         {
             char * filename = tr_buildPath( tor->downloadDir, file->name, NULL );
-            fp = tr_open_file_for_reading( filename, TRUE );
+            fp = tr_open_file_for_scanning( filename );
             /* fprintf( stderr, "opening file #%d (%s) -- %p\n", fileIndex, filename, fp ); */
             tr_free( filename );
         }
@@ -129,7 +129,7 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
         if( leftInFile == 0 )
         {
             /* fprintf( stderr, "closing file\n" ); */
-            if( fp != NULL ) { fclose( fp ); fp = NULL; }
+            if( fp != NULL ) { tr_close_file( fp ); fp = NULL; }
             ++fileIndex;
             filePos = 0;
         }
@@ -137,7 +137,7 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
 
     /* cleanup */
     if( fp != NULL )
-        fclose( fp );
+        tr_close_file( fp );
     tr_free( buffer );
 
 #ifdef STOPWATCH
