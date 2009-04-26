@@ -230,6 +230,10 @@ tr_open_file_for_scanning( const char * filename )
 #ifdef HAVE_POSIX_FADVISE
     posix_fadvise( fd, 0, 0, POSIX_FADV_SEQUENTIAL );
 #endif
+#ifdef SYS_DARWIN
+    fcntl( fd, F_NOCACHE, 1 );
+    fcntl( fd, F_RDAHEAD, 1 );
+#endif
 
     return fdopen( fd, "r" );
 }
@@ -239,8 +243,6 @@ flush_before_closing( int fd )
 {
 #if defined(HAVE_POSIX_FADVISE)
     posix_fadvise( fd, 0, 0, POSIX_FADV_DONTNEED );
-#elif defined(SYS_DARWIN)
-    fcntl( fd, F_NOCACHE, 1 );
 #endif
 }
 
