@@ -1143,7 +1143,7 @@ enum
     PEER_COL_UPLOAD_RATE_STRING,
     PEER_COL_CLIENT,
     PEER_COL_PROGRESS,
-    PEER_COL_IS_ENCRYPTED,
+    PEER_COL_ENCRYPTION_STOCK_ID,
     PEER_COL_STATUS,
     N_PEER_COLS
 };
@@ -1179,7 +1179,7 @@ peer_store_new( void )
                                G_TYPE_STRING,   /* upload speed string  */
                                G_TYPE_STRING,   /* client */
                                G_TYPE_INT,      /* progress [0..100] */
-                               G_TYPE_BOOLEAN,  /* isEncrypted */
+                               G_TYPE_STRING,   /* encryption stock id */
                                G_TYPE_STRING);  /* flagString */
 }
 
@@ -1210,25 +1210,9 @@ initPeerRow( GtkListStore        * store,
                         PEER_COL_ADDRESS, peer->addr,
                         PEER_COL_ADDRESS_COLLATED, collated_name,
                         PEER_COL_CLIENT, client,
-                        PEER_COL_IS_ENCRYPTED, peer->isEncrypted,
+                        PEER_COL_ENCRYPTION_STOCK_ID, peer->isEncrypted ? "transmission-lock" : NULL,
                         PEER_COL_KEY, key,
                         -1 );
-}
-
-static void
-render_encrypted( GtkTreeViewColumn  * column UNUSED,
-                  GtkCellRenderer    * renderer,
-                  GtkTreeModel       * tree_model,
-                  GtkTreeIter        * iter,
-                  gpointer             data   UNUSED )
-{
-    gboolean b = FALSE;
-
-    gtk_tree_model_get( tree_model, iter, PEER_COL_IS_ENCRYPTED, &b, -1 );
-    g_object_set( renderer, "xalign", (gfloat)0.0,
-                            "yalign", (gfloat)0.5,
-                            "stock-id", ( b ? "transmission-lock" : NULL ),
-                            NULL );
 }
 
 static void
@@ -1531,7 +1515,7 @@ peer_page_new( struct DetailsImpl * di )
     GtkWidget *webtree = NULL;
     GtkTreeViewColumn * c;
     GtkCellRenderer *   r;
-    int view_columns[] = { PEER_COL_IS_ENCRYPTED,
+    int view_columns[] = { PEER_COL_ENCRYPTION_STOCK_ID,
                            PEER_COL_UPLOAD_RATE_STRING,
                            PEER_COL_DOWNLOAD_RATE_STRING,
                            PEER_COL_PROGRESS,
@@ -1616,12 +1600,14 @@ peer_page_new( struct DetailsImpl * di )
                 c = gtk_tree_view_column_new_with_attributes( t, r, "value", PEER_COL_PROGRESS, NULL );
                 break;
 
-            case PEER_COL_IS_ENCRYPTED:
+            case PEER_COL_ENCRYPTION_STOCK_ID:
                 r = gtk_cell_renderer_pixbuf_new( );
-                c = gtk_tree_view_column_new_with_attributes( t, r, NULL );
+                g_object_set( r, "xalign", (gfloat)0.0,
+                                 "yalign", (gfloat)0.5,
+                                 NULL );
+                c = gtk_tree_view_column_new_with_attributes( t, r, "stock-id", PEER_COL_ENCRYPTION_STOCK_ID, NULL );
                 gtk_tree_view_column_set_sizing( c, GTK_TREE_VIEW_COLUMN_FIXED );
                 gtk_tree_view_column_set_fixed_width( c, 20 );
-                gtk_tree_view_column_set_cell_data_func( c, r, render_encrypted, NULL, NULL );
                 break;
 
             case PEER_COL_DOWNLOAD_RATE_STRING:
