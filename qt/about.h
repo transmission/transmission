@@ -22,6 +22,13 @@ class AboutDialog: public QDialog
     public:
         AboutDialog( QWidget * parent = 0 );
         ~AboutDialog( ) { }
+        QWidget * createAboutTab( );
+        QWidget * createAuthorsTab( );
+        QWidget * createLicenseTab( );
+
+    public slots:
+        void showCredits( );
+        void showLicense( );
 
 };
 
