@@ -36,6 +36,8 @@ FILE* tr_open_file_for_scanning( const char * filename );
 
 void tr_close_file( FILE * fp );
 
+int64_t tr_lseek( int fd, int64_t offset, int whence );
+
 
 /**
  * Returns an fd to the specified filename.

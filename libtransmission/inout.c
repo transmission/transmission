@@ -48,7 +48,7 @@
 
 enum { TR_IO_READ, TR_IO_WRITE };
 
-static int64_t
+int64_t
 tr_lseek( int fd, int64_t offset, int whence )
 {
 #if defined(_LARGEFILE_SOURCE)

@@ -43,7 +43,7 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
 {
     SHA_CTX sha;
     FILE * fp = NULL;
-    size_t filePos = 0;
+    int64_t filePos = 0;
     tr_bool changed = 0;
     tr_bool hadPiece = 0;
     uint32_t piecePos = 0;
@@ -88,7 +88,7 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
         /* fprintf( stderr, "reading this pass: %d\n", (int)bytesThisPass ); */
 
         /* read a bit */
-        if( fp && !fseek( fp, filePos, SEEK_SET ) ) {
+        if( fp && tr_lseek( fileno(fp), filePos, SEEK_SET ) != -1 ) {
             const int64_t numRead = fread( buffer, 1, bytesThisPass, fp );
             if( numRead == bytesThisPass )
                 SHA1_Update( &sha, buffer, numRead );
