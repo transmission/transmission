@@ -1261,8 +1261,6 @@ request_exec( tr_session             * session,
     tr_benc * args_in = tr_bencDictFind( request, "arguments" );
     const char * result = NULL;
 
-fprintf( stderr, "got RPC request [%s]\n", tr_bencToJSON(request) );
-
     if( callback == NULL )
         callback = noop_response_callback;
 
