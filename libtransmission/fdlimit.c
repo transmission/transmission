@@ -341,7 +341,6 @@ TrCloseFile( int i )
     assert( fileIsOpen( o ) );
 
     tr_close_file( o->fd );
-    close( o->fd );
     o->fd = -1;
     o->isCheckedOut = 0;
 }
