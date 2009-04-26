@@ -32,6 +32,7 @@
 #endif
 
 #include "transmission.h"
+#include "fdlimit.h"
 #include "ConvertUTF.h"
 #include "list.h"
 #include "utils.h"
@@ -488,7 +489,7 @@ tr_loadFile( const char * path,
     }
 
     /* Load the torrent file into our buffer */
-    file = fopen( path, "rb" );
+    file = tr_open_file_for_scanning( path );
     if( !file )
     {
         const int err = errno;
@@ -501,7 +502,7 @@ tr_loadFile( const char * path,
     {
         const int err = errno;
         tr_err( err_fmt, path, _( "Memory allocation failed" ) );
-        fclose( file );
+        tr_close_file( file );
         errno = err;
         return NULL;
     }
@@ -509,13 +510,13 @@ tr_loadFile( const char * path,
     {
         const int err = errno;
         tr_err( err_fmt, path, tr_strerror( errno ) );
-        fclose( file );
+        tr_close_file( file );
         free( buf );
         errno = err;
         return NULL;
     }
 
-    fclose( file );
+    tr_close_file( file );
     *size = sb.st_size;
     return buf;
 }
