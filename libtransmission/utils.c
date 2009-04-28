@@ -497,7 +497,7 @@ tr_loadFile( const char * path,
         errno = err;
         return NULL;
     }
-    buf = malloc( sb.st_size );
+    buf = malloc( sb.st_size + 1 );
     if( !buf )
     {
         const int err = errno;
@@ -517,6 +517,7 @@ tr_loadFile( const char * path,
     }
 
     tr_close_file( fd );
+    buf[ sb.st_size ] = '\0';
     *size = sb.st_size;
     return buf;
 }
