@@ -717,8 +717,6 @@ TorrentFile.prototype = {
 			this.refreshProgressHTML();
 			this.refreshWantedHTML();
 			this.refreshPriorityHTML();
-		} else {
-			console.log( "skipping because not dirty" );
 		}
 	},
 	
