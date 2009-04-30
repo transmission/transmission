@@ -27,6 +27,7 @@ SUBDIRS = \
 
 EXTRA_DIST = \
   web \
+  qt \
   NEWS \
   AUTHORS \
   COPYING \
