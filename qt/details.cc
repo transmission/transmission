@@ -509,11 +509,11 @@ Details :: refresh( )
         myBandwidthPriorityCombo->blockSignals( false );
 
         mySingleDownSpin->blockSignals( true );
-        mySingleDownSpin->setValue( tor->downloadLimit().kbps() );
+        mySingleDownSpin->setValue( int(tor->downloadLimit().kbps()) );
         mySingleDownSpin->blockSignals( false );
 
         mySingleUpSpin->blockSignals( true );
-        mySingleUpSpin->setValue( tor->uploadLimit().kbps() );
+        mySingleUpSpin->setValue( int(tor->uploadLimit().kbps()) );
         mySingleUpSpin->blockSignals( false );
 
         myPeerLimitSpin->blockSignals( true );
