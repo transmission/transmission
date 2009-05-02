@@ -1331,8 +1331,10 @@ doAction( const char * action_name, gpointer user_data )
     }
     else if( !strcmp( action_name, "show-torrent-properties" ) )
     {
-        if( data->details == NULL )
+        if( data->details == NULL ) {
             data->details = torrent_inspector_new( GTK_WINDOW( data->wind ), data->core );
+            g_object_add_weak_pointer( G_OBJECT( data->details ), (gpointer*)&data->details );
+        }
         refreshDetailsDialog( data );
         gtk_widget_show( data->details );
     }
