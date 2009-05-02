@@ -175,6 +175,8 @@ Details :: setIds( const QSet<int>& ids )
             disconnect( tor, SIGNAL(torrentChanged(int)), this, SLOT(onTorrentChanged()) );
     }
 
+    myFileTreeView->clear( );
+
     myIds = ids;
 
     // listen to the new torrents
