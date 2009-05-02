@@ -1,12 +1,14 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
-1.60 (2009/mm/dd)
+1.60 (2009/05/dd)
 <http://trac.transmissionbt.com/query?milestone=1.60&group=component&groupdesc=1&order=severity>
 - All Platforms
-   + Random port, with optional randomization on startup
+   + Seed ratio limiting
    + Transfer prioritization
    + Option to specify if transfers are included in the global bandwidth limits
-   + Updated UPnP code to miniupnpc-1.3
+   + Random port, with optional randomization on startup
+   + Improvements to UPnP port forwarding
+   + Support for file preallocation on XFS filesystems
 - Mac
    + Requires Mac OS X 10.5 Leopard or newer
    + Groups (moved to preferences) can be auto-assigned to transfers when adding based on multiple criteria
@@ -18,13 +20,15 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Portuguese localization
 - GTK+
    + Speed Limit: Second set of bandwidth limits that can be toggled or scheduled
-   + Show the file icon in the list
-   + Allow sorting of the torrent list by size and by ETA
    + Properties dialog now lets you edit/view multiple torrents at once
+   + Allow sorting of the torrent list by size and by ETA
+   + Show the file icon in the list
 - Qt
    + New beta Qt client
 - Daemon
    + Watch folder for auto-adding torrents
+   + Many new features in the RPC/JSON interface
+   + Allow users to specify a specific address when listening for peers
 - Web Client 
    + File selection and prioritization
    + Add option to verify local data
