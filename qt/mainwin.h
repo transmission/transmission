@@ -143,6 +143,8 @@ class TrMainWindow: public QMainWindow
         QMenu * createOptionsMenu( void );
         QWidget * createStatusBar( void );
         QWidget * myStatusBar;
+        QWidgetList myUpStatusWidgets;
+        QWidgetList myDownStatusWidgets;
         QPushButton * myAltSpeedButton;
         QPushButton * myOptionsButton;
         QLabel * myVisibleCountLabel;

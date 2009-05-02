@@ -368,7 +368,8 @@ QWidget *
 TrMainWindow :: createStatusBar( )
 {
     QMenu * m;
-    QLabel * l;
+    QLabel *l, *l2;
+    QWidget *w;
     QHBoxLayout * h;
     QPushButton * p;
     QActionGroup * a;
@@ -378,6 +379,7 @@ TrMainWindow :: createStatusBar( )
     QWidget * top = myStatusBar = new QWidget;
     h = new QHBoxLayout( top );
     h->setContentsMargins( HIG::PAD_SMALL, HIG::PAD_SMALL, HIG::PAD_SMALL, HIG::PAD_SMALL );
+    h->setSpacing( HIG::PAD_SMALL );
 
         p = myOptionsButton = new TrIconPushButton( this );
         p->setIcon( QIcon( ":/icons/options.png" ) );
@@ -420,25 +422,30 @@ TrMainWindow :: createStatusBar( )
         p->setFlat( true );
         p->setMenu( m );
         h->addWidget( p );  
-        h->addSpacing( HIG :: PAD_SMALL );
         l = myStatsLabel = new QLabel( this );
         h->addWidget( l );  
    
-    h->addStretch( 1 );
-
+        w = new QWidget( this );
+        w->setMinimumSize( HIG::PAD_BIG, 1 );
+        w->setMaximumSize( HIG::PAD_BIG, 1 );
+        h->addWidget( w );
         l = new QLabel( this );
         l->setPixmap( getStockIcon( "go-down", QStyle::SP_ArrowDown ).pixmap( smallIconSize ) );
         h->addWidget( l );
-        l = myDownloadSpeedLabel = new QLabel( this );
-        h->addWidget( l );
+        l2 = myDownloadSpeedLabel = new QLabel( this );
+        h->addWidget( l2 );
+        myDownStatusWidgets << w << l << l2;
 
-    h->addSpacing( HIG :: PAD_BIG );
-
+        w = new QWidget( this );
+        w->setMinimumSize( HIG::PAD_BIG, 1 );
+        w->setMaximumSize( HIG::PAD_BIG, 1 );
+        h->addWidget( w );
         l = new QLabel;
         l->setPixmap( getStockIcon( "go-up", QStyle::SP_ArrowUp ).pixmap( smallIconSize ) );
         h->addWidget( l );
-        l = myUploadSpeedLabel = new QLabel;
-        h->addWidget( l );
+        l2 = myUploadSpeedLabel = new QLabel;
+        h->addWidget( l2 );
+        myUpStatusWidgets << w << l << l2;
 
     return top;
 }
@@ -600,6 +607,7 @@ TrMainWindow :: refreshVisibleCount( )
     else
         str = tr( "%L1 of %Ln Torrent(s)", 0, totalCount ).arg( visibleCount );
     myVisibleCountLabel->setText( str );
+    myVisibleCountLabel->setVisible( totalCount > 0 );
 }
 
 void
@@ -609,6 +617,9 @@ TrMainWindow :: refreshStatusBar( )
     const Speed down( myModel.getDownloadSpeed( ) );
     myUploadSpeedLabel->setText( Utils :: speedToString( up ) );
     myDownloadSpeedLabel->setText( Utils :: speedToString( down ) );
+    foreach( QWidget * w, myUpStatusWidgets ) w->setVisible( !up.isZero( ) );
+    foreach( QWidget * w, myDownStatusWidgets ) w->setVisible( !down.isZero( ) );
+
     const QString mode( myPrefs.getString( Prefs::STATUSBAR_STATS ) );
     QString str;
 
