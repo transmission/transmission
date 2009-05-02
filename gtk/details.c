@@ -1106,7 +1106,8 @@ enum
     WEBSEED_COL_KEY,
     WEBSEED_COL_WAS_UPDATED,
     WEBSEED_COL_URL,
-    WEBSEED_COL_DOWNLOAD_RATE,
+    WEBSEED_COL_DOWNLOAD_RATE_DOUBLE,
+    WEBSEED_COL_DOWNLOAD_RATE_STRING,
     N_WEBSEED_COLS
 };
 
@@ -1116,7 +1117,8 @@ getWebseedColumnNames( int column )
     switch( column )
     {
         case WEBSEED_COL_URL: return _( "Webseeds" );
-        case WEBSEED_COL_DOWNLOAD_RATE: return _( "Down" );
+        case WEBSEED_COL_DOWNLOAD_RATE_DOUBLE:
+        case WEBSEED_COL_DOWNLOAD_RATE_STRING: return _( "Down" );
         default: return "";
     }
 }
@@ -1128,7 +1130,8 @@ webseed_model_new( void )
                                G_TYPE_STRING,   /* key */
                                G_TYPE_BOOLEAN,  /* was-updated */
                                G_TYPE_STRING,   /* url */
-                               G_TYPE_FLOAT);   /* download rate */
+                               G_TYPE_DOUBLE,   /* download rate double */
+                               G_TYPE_STRING ); /* download rate string */
 }
 
 enum
@@ -1341,7 +1344,6 @@ refreshWebseedList( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     GtkListStore * store = di->webseed_store;
     GtkTreeModel * model = GTK_TREE_MODEL( store );
     
-
     /* step 1: mark all webseeds as not-updated */
     if( gtk_tree_model_get_iter_first( model, &iter ) ) do
         gtk_list_store_set( store, &iter, WEBSEED_COL_WAS_UPDATED, FALSE, -1 );
@@ -1360,7 +1362,9 @@ refreshWebseedList( struct DetailsImpl * di, tr_torrent ** torrents, int n )
             if( g_hash_table_lookup( hash, key ) == NULL ) {
                 GtkTreePath * p;
                 gtk_list_store_append( store, &iter );
-                gtk_list_store_set( store, &iter, WEBSEED_COL_URL, url, -1 );
+                gtk_list_store_set( store, &iter, WEBSEED_COL_URL, url,
+                                                  WEBSEED_COL_KEY, key,
+                                                  -1 );
                 p = gtk_tree_model_get_path( model, &iter );
                 g_hash_table_insert( hash, g_strdup( key ),
                                      gtk_tree_row_reference_new( model, p ) );
@@ -1376,6 +1380,7 @@ refreshWebseedList( struct DetailsImpl * di, tr_torrent ** torrents, int n )
         const tr_info * inf = tr_torrentInfo( tor );
         float * speeds = tr_torrentWebSpeeds( tor );
         for( j=0; j<inf->webseedCount; ++j ) {
+            char buf[128];
             char key[256];
             const char * url = inf->webseeds[j];
             GtkTreePath * p;
@@ -1384,7 +1389,14 @@ refreshWebseedList( struct DetailsImpl * di, tr_torrent ** torrents, int n )
             ref = g_hash_table_lookup( hash, key );
             p = gtk_tree_row_reference_get_path( ref );
             gtk_tree_model_get_iter( model, &iter, p );
-            gtk_list_store_set( store, &iter, WEBSEED_COL_DOWNLOAD_RATE, (int)speeds[j], -1 );
+            if( speeds[j] > 0.01 )
+                tr_strlspeed( buf, speeds[j], sizeof( buf ) );
+            else
+                *buf = '\0';
+            gtk_list_store_set( store, &iter, WEBSEED_COL_DOWNLOAD_RATE_DOUBLE, (double)speeds[j],
+                                              WEBSEED_COL_DOWNLOAD_RATE_STRING, buf,
+                                              WEBSEED_COL_WAS_UPDATED, TRUE,
+                                              -1 );
             gtk_tree_path_free( p );
         }
         tr_free( speeds );
@@ -1540,10 +1552,10 @@ peer_page_new( struct DetailsImpl * di )
     gtk_tree_view_column_set_sort_column_id( c, WEBSEED_COL_URL );
     gtk_tree_view_append_column( GTK_TREE_VIEW( v ), c );
 
-    str = getWebseedColumnNames( WEBSEED_COL_DOWNLOAD_RATE );
+    str = getWebseedColumnNames( WEBSEED_COL_DOWNLOAD_RATE_STRING );
     r = gtk_cell_renderer_text_new( );
-    c = gtk_tree_view_column_new_with_attributes( str, r, "text", WEBSEED_COL_DOWNLOAD_RATE, NULL );
-    gtk_tree_view_column_set_sort_column_id( c, WEBSEED_COL_DOWNLOAD_RATE );
+    c = gtk_tree_view_column_new_with_attributes( str, r, "text", WEBSEED_COL_DOWNLOAD_RATE_STRING, NULL );
+    gtk_tree_view_column_set_sort_column_id( c, WEBSEED_COL_DOWNLOAD_RATE_DOUBLE );
     gtk_tree_view_append_column( GTK_TREE_VIEW( v ), c );
 
     w = gtk_scrolled_window_new( NULL, NULL );
