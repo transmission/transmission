@@ -86,9 +86,7 @@ typedef struct
     GtkWidget *           ul_hbox;
     GtkWidget *           dl_hbox;
     GtkWidget *           ul_lb;
-    GtkWidget *           ul_image;
     GtkWidget *           dl_lb;
-    GtkWidget *           dl_image;
     GtkWidget *           stats_lb;
     GtkWidget *           gutter_lb;
     GtkWidget *           alt_speed_image[2]; /* 0==off, 1==on */
@@ -924,23 +922,23 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
         w = p->gutter_lb = gtk_label_new( "N Torrents" );
         gtk_box_pack_start( GTK_BOX( h ), w, 1, 1, GUI_PAD_BIG );
 
-        hbox = p->dl_hbox = gtk_hbox_new( FALSE, GUI_PAD_SMALL );
-            w = gtk_alignment_new( 0.0f, 0.0f, 0.0f, 0.0f );
-            gtk_widget_set_size_request( w, GUI_PAD, 0u );
-            gtk_box_pack_start( GTK_BOX( hbox ), w, FALSE, FALSE, 0 );
-            w = p->dl_image = gtk_image_new_from_stock( GTK_STOCK_GO_DOWN, GTK_ICON_SIZE_MENU );
-            gtk_box_pack_start( GTK_BOX( hbox ), w, FALSE, FALSE, 0 );
-            w = p->dl_lb = gtk_label_new( NULL );
-            gtk_box_pack_start( GTK_BOX( hbox ), w, FALSE, FALSE, 0 ); 
-        gtk_box_pack_end( GTK_BOX( h ), hbox, FALSE, FALSE, 0 );
-
         hbox = p->ul_hbox = gtk_hbox_new( FALSE, GUI_PAD_SMALL );
             w = gtk_alignment_new( 0.0f, 0.0f, 0.0f, 0.0f );
             gtk_widget_set_size_request( w, GUI_PAD, 0u );
             gtk_box_pack_start( GTK_BOX( hbox ), w, FALSE, FALSE, 0 );
-            w = p->ul_image = gtk_image_new_from_stock( GTK_STOCK_GO_UP, GTK_ICON_SIZE_MENU );
+            w = gtk_image_new_from_stock( GTK_STOCK_GO_UP, GTK_ICON_SIZE_MENU );
             gtk_box_pack_start( GTK_BOX( hbox ), w, FALSE, FALSE, 0 );
             w = p->ul_lb = gtk_label_new( NULL );
+            gtk_box_pack_start( GTK_BOX( hbox ), w, FALSE, FALSE, 0 ); 
+        gtk_box_pack_end( GTK_BOX( h ), hbox, FALSE, FALSE, 0 );
+
+        hbox = p->dl_hbox = gtk_hbox_new( FALSE, GUI_PAD_SMALL );
+            w = gtk_alignment_new( 0.0f, 0.0f, 0.0f, 0.0f );
+            gtk_widget_set_size_request( w, GUI_PAD, 0u );
+            gtk_box_pack_start( GTK_BOX( hbox ), w, FALSE, FALSE, 0 );
+            w = gtk_image_new_from_stock( GTK_STOCK_GO_DOWN, GTK_ICON_SIZE_MENU );
+            gtk_box_pack_start( GTK_BOX( hbox ), w, FALSE, FALSE, 0 );
+            w = p->dl_lb = gtk_label_new( NULL );
             gtk_box_pack_start( GTK_BOX( hbox ), w, FALSE, FALSE, 0 ); 
         gtk_box_pack_end( GTK_BOX( h ), hbox, FALSE, FALSE, 0 );
 
