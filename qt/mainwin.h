@@ -121,6 +121,7 @@ class TrMainWindow: public QMainWindow
         void onSetPrefs( );
         void onSetPrefs( bool );
         void onSessionSourceChanged( );
+        void onModelReset( );
 
     private slots:
         void setSortPref             ( int );

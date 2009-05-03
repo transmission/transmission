@@ -204,7 +204,6 @@ TorrentModel :: removeTorrent( int id )
     if( row >= 0 )
     {
         Torrent * tor = myIdToTorrent.value( id, 0 );
-        std::cerr << "removing torrent " << id << std::endl;
 
         beginRemoveRows( QModelIndex(), row, row );
         myIdToRow.remove( id );

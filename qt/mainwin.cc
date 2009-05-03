@@ -188,6 +188,9 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
 
     // torrent view
     myFilterModel.setSourceModel( &myModel );
+    connect( &myModel, SIGNAL(modelReset()), this, SLOT(onModelReset()));
+    connect( &myModel, SIGNAL(rowsRemoved(const QModelIndex&,int,int)), this, SLOT(onModelReset()));
+    connect( &myModel, SIGNAL(rowsInserted(const QModelIndex&,int,int)), this, SLOT(onModelReset()));
     ui.listView->setModel( &myFilterModel );
     connect( ui.listView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&,const QItemSelection&)), this, SLOT(refreshActionSensitivity()));
 
@@ -278,6 +281,11 @@ void
 TrMainWindow :: onSessionSourceChanged( )
 {
     myModel.clear( );
+}
+
+void
+TrMainWindow :: onModelReset( )
+{
     refreshTitle( );
     refreshVisibleCount( );
     refreshActionSensitivity( );
