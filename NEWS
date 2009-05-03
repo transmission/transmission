@@ -18,13 +18,13 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + File filter field in the inspector
    + Option to include beta releases when auto-updating (using modified Sparkle 1.5)
    + Portuguese localization
+- Qt
+   + New beta Qt client!
 - GTK+
    + Speed Limit: Second set of bandwidth limits that can be toggled or scheduled
    + Properties dialog now lets you edit/view multiple torrents at once
    + Allow sorting of the torrent list by size and by ETA
    + Show the file icon in the list
-- Qt
-   + New beta Qt client
 - Daemon
    + Watch folder for auto-adding torrents
    + Many new features in the RPC/JSON interface

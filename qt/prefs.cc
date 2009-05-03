@@ -263,7 +263,7 @@ Prefs :: initDefaults( tr_benc * d )
     tr_bencDictAddInt( d, keyStr(START), true );
     tr_bencDictAddInt( d, keyStr(TRASH_ORIGINAL), false );
     tr_bencDictAddStr( d, keyStr(SESSION_REMOTE_HOST), "localhost" );
-    tr_bencDictAddInt( d, keyStr(SESSION_REMOTE_PORT), 9091 );
+    tr_bencDictAddInt( d, keyStr(SESSION_REMOTE_PORT), atoi(TR_DEFAULT_RPC_PORT_STR) );
     tr_bencDictAddBool( d, keyStr(SESSION_IS_REMOTE), false );
     tr_bencDictAddBool( d, keyStr(SESSION_REMOTE_AUTH), false );
 }
