@@ -36,6 +36,7 @@
 #include "prefs.h"
 #include "prefs-dialog.h"
 #include "session.h"
+#include "session-dialog.h"
 #include "speed.h"
 #include "stats-dialog.h"
 #include "torrent-delegate.h"
@@ -100,12 +101,6 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
 
     ui.setupUi( this );
 
-    QString title( "Transmission" );
-    const QUrl remoteUrl( session.getRemoteUrl( ) );
-    if( !remoteUrl.isEmpty( ) )
-        title += tr( " - %1" ).arg( remoteUrl.toString(QUrl::RemoveUserInfo) );
-    setWindowTitle( title );
-
     QStyle * style = this->style();
 
     int i = style->pixelMetric( QStyle::PM_SmallIconSize, 0, this );
@@ -162,6 +157,7 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     connect( ui.action_Contents, SIGNAL(triggered()), this, SLOT(openHelp()));
     connect( ui.action_OpenFolder, SIGNAL(triggered()), this, SLOT(openFolder()));
     connect( ui.action_Properties, SIGNAL(triggered()), this, SLOT(openProperties()));
+    connect( ui.action_SessionDialog, SIGNAL(triggered()), this, SLOT(openSessionDialog()));
     connect( ui.listView, SIGNAL(activated(const QModelIndex&)), ui.action_Properties, SLOT(trigger()));
 
     // context menu
@@ -252,6 +248,7 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     foreach( int key, initKeys )
         refreshPref( key );
 
+    connect( &mySession, SIGNAL(sourceChanged()), this, SLOT(onSessionSourceChanged()) );
     connect( &mySession, SIGNAL(statsUpdated()), this, SLOT(refreshStatusBar()) );
     connect( &mySession, SIGNAL(dataReadProgress()), this, SLOT(dataReadProgress()) );
     connect( &mySession, SIGNAL(dataSendProgress()), this, SLOT(dataSendProgress()) );
@@ -265,11 +262,26 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
 
     refreshActionSensitivity( );
     refreshStatusBar( );
+    refreshTitle( );
     refreshVisibleCount( );
 }
 
 TrMainWindow :: ~TrMainWindow( )
 {
+}
+
+/****
+*****
+****/
+
+void
+TrMainWindow :: onSessionSourceChanged( )
+{
+    myModel.clear( );
+    refreshTitle( );
+    refreshVisibleCount( );
+    refreshActionSensitivity( );
+    refreshStatusBar( );
 }
 
 /****
@@ -577,6 +589,13 @@ TrMainWindow :: openProperties( )
 }
 
 void
+TrMainWindow :: openSessionDialog( )
+{
+    SessionDialog * d = new SessionDialog( mySession, myPrefs, this );
+    d->show( );
+}
+
+void
 TrMainWindow :: openFolder( )
 {
     const int torrentId( *getSelectedTorrents().begin() );
@@ -594,6 +613,16 @@ TrMainWindow :: openHelp( )
     char url[128];
     snprintf( url, sizeof( url ), fmt, major, minor/10 );
     QDesktopServices :: openUrl( QUrl( QString( url ) ) );
+}
+
+void
+TrMainWindow :: refreshTitle( )
+{
+    QString title( "Transmission" );
+    const QUrl url( mySession.getRemoteUrl( ) );
+    if( !url.isEmpty() )
+        title += tr( " - %1" ).arg( url.toString(QUrl::RemoveUserInfo) );
+    setWindowTitle( title );
 }
 
 void
@@ -723,22 +752,22 @@ TrMainWindow :: getSelectedTorrents( ) const
 void
 TrMainWindow :: startSelected( )
 {
-    mySession.start( getSelectedTorrents( ) );
+    mySession.startTorrents( getSelectedTorrents( ) );
 }
 void
 TrMainWindow :: pauseSelected( )
 {
-    mySession.pause( getSelectedTorrents( ) );
+    mySession.pauseTorrents( getSelectedTorrents( ) );
 }
 void
 TrMainWindow :: startAll( )
 {
-    mySession.start( );
+    mySession.startTorrents( );
 }
 void
 TrMainWindow :: pauseAll( )
 {
-    mySession.pause( );
+    mySession.pauseTorrents( );
 }
 void
 TrMainWindow :: removeSelected( )

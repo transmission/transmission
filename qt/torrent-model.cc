@@ -19,6 +19,16 @@
 #include "torrent-delegate.h"
 #include "torrent-model.h"
 
+void
+TorrentModel :: clear( )
+{
+    myIdToRow.clear( );
+    myIdToTorrent.clear( );
+    foreach( Torrent * tor, myTorrents ) delete tor;
+    myTorrents.clear( );
+    reset( );
+}
+
 int
 TorrentModel :: rowCount( const QModelIndex& parent ) const
 {
@@ -78,9 +88,7 @@ TorrentModel :: TorrentModel( Prefs& prefs ):
 
 TorrentModel :: ~TorrentModel( )
 {
-    foreach( Torrent * tor, myTorrents )
-        delete tor;
-    myTorrents.clear( );
+    clear( );
 }
 
 /***

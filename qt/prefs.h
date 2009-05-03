@@ -59,6 +59,12 @@ class Prefs: public QObject
             MAIN_WINDOW_X,
             MAIN_WINDOW_Y,
             FILTER_MODE,
+            SESSION_IS_REMOTE,
+            SESSION_REMOTE_HOST,
+            SESSION_REMOTE_PORT,
+            SESSION_REMOTE_AUTH,
+            SESSION_REMOTE_USERNAME,
+            SESSION_REMOTE_PASSWORD,
 
             /* core prefs */
             FIRST_CORE_PREF,

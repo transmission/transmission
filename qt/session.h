@@ -37,10 +37,17 @@ class Session: public QObject
         Q_OBJECT
 
     public:
-        Session( const char * configDir, Prefs& prefs, const char * remoteUrl, bool paused );
+        Session( const char * configDir, Prefs& prefs );
         ~Session( );
 
         static const int ADD_TORRENT_TAG;
+
+    public:
+        void stop( );
+        void restart( );
+
+    private:
+        void start( );
 
     public:
         const QUrl& getRemoteUrl( ) const { return myUrl; }
@@ -84,8 +91,8 @@ class Session: public QObject
 
 
     public slots:
-        void pause( const QSet<int>& torrentIds = QSet<int>() );
-        void start( const QSet<int>& torrentIds = QSet<int>() );
+        void pauseTorrents( const QSet<int>& torrentIds = QSet<int>() );
+        void startTorrents( const QSet<int>& torrentIds = QSet<int>() );
         void refreshSessionInfo( );
         void refreshSessionStats( );
         void refreshActiveTorrents( );
@@ -106,6 +113,7 @@ class Session: public QObject
         void onRequestFinished( int id, bool error );
 
     signals:
+        void sourceChanged( );
         void portTested( bool isOpen );
         void statsUpdated( );
         void sessionUpdated( );
@@ -119,6 +127,7 @@ class Session: public QObject
         int64_t myBlocklistSize;
         Prefs& myPrefs;
         tr_session * mySession;
+        QString myConfigDir;
         QUrl myUrl;
         QBuffer myBuffer;
         QHttp myHttp;

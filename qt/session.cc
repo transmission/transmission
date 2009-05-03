@@ -32,6 +32,7 @@
 #include "prefs.h"
 #include "qticonloader.h"
 #include "session.h"
+#include "session-dialog.h"
 #include "torrent.h"
 
 // #define DEBUG_HTTP
@@ -174,11 +175,11 @@ Session :: updatePref( int key )
 ****
 ***/
 
-Session :: Session( const char * configDir, Prefs& prefs, const char * url, bool paused ):
+Session :: Session( const char * configDir, Prefs& prefs ):
     myBlocklistSize( -1 ),
     myPrefs( prefs ),
     mySession( 0 ),
-    myUrl( url )
+    myConfigDir( configDir )
 {
     myStats.ratio = TR_RATIO_NA;
     myStats.uploadedBytes = 0;
@@ -188,44 +189,85 @@ Session :: Session( const char * configDir, Prefs& prefs, const char * url, bool
     myStats.secondsActive = 0;
     myCumulativeStats = myStats;
 
-    if( url != 0 )
-    {
-        connect( &myHttp, SIGNAL(requestStarted(int)), this, SLOT(onRequestStarted(int)));
-        connect( &myHttp, SIGNAL(requestFinished(int,bool)), this, SLOT(onRequestFinished(int,bool)));
-        connect( &myHttp, SIGNAL(dataReadProgress(int,int)), this, SIGNAL(dataReadProgress()));
-        connect( &myHttp, SIGNAL(dataSendProgress(int,int)), this, SIGNAL(dataSendProgress()));
-        myHttp.setHost( myUrl.host( ), myUrl.port( ) );
-        myHttp.setUser( myUrl.userName( ), myUrl.password( ) );
-        myBuffer.open( QIODevice::ReadWrite );
+    connect( &myHttp, SIGNAL(requestStarted(int)), this, SLOT(onRequestStarted(int)));
+    connect( &myHttp, SIGNAL(requestFinished(int,bool)), this, SLOT(onRequestFinished(int,bool)));
+    connect( &myHttp, SIGNAL(dataReadProgress(int,int)), this, SIGNAL(dataReadProgress()));
+    connect( &myHttp, SIGNAL(dataSendProgress(int,int)), this, SIGNAL(dataSendProgress()));
+    connect( &myPrefs, SIGNAL(changed(int)), this, SLOT(updatePref(int)) );
 
-        if( paused )
-            exec( "{ \"method\": \"torrent-stop\" }" );
+    myBuffer.open( QIODevice::ReadWrite );
+}
+
+Session :: ~Session( )
+{
+    stop( );
+}
+
+/***
+****
+***/
+
+void
+Session :: stop( )
+{
+    myHttp.abort( );
+    myUrl.clear( );
+
+    if( mySession )
+    {
+        tr_sessionClose( mySession );
+        mySession = 0;
+    }
+}
+
+void
+Session :: restart( )
+{
+    stop( );
+    start( );
+}
+
+void
+Session :: start( )
+{
+    if( myPrefs.get<bool>(Prefs::SESSION_IS_REMOTE) )
+    {
+        const int port( myPrefs.get<int>(Prefs::SESSION_REMOTE_PORT) );
+        const bool auth( myPrefs.get<bool>(Prefs::SESSION_REMOTE_AUTH) );
+        const QString host( myPrefs.get<QString>(Prefs::SESSION_REMOTE_HOST) );
+        const QString user( myPrefs.get<QString>(Prefs::SESSION_REMOTE_USERNAME) );
+        const QString pass( myPrefs.get<QString>(Prefs::SESSION_REMOTE_PASSWORD) );
+
+        QUrl url;
+        url.setScheme( "http" );
+        url.setHost( host );
+        url.setPort( port );
+        if( auth ) {
+            url.setUserName( user );
+            url.setPassword( pass );
+        }
+        myUrl = url;
+
+        myHttp.setHost( host, port );
+        myHttp.setUser( user, pass );
     }
     else
     {
         tr_benc settings;
         tr_bencInitDict( &settings, 0 );
         tr_sessionGetDefaultSettings( &settings );
-        tr_sessionLoadSettings( &settings, configDir, "qt" );
-        mySession = tr_sessionInit( "qt", configDir, true, &settings );
+        tr_sessionLoadSettings( &settings, myConfigDir.toUtf8().constData(), "qt" );
+        mySession = tr_sessionInit( "qt", myConfigDir.toUtf8().constData(), true, &settings );
         tr_bencFree( &settings );
 
         tr_ctor * ctor = tr_ctorNew( mySession );
-        if( paused )
-            tr_ctorSetPaused( ctor, TR_FORCE, TRUE );
         int torrentCount;
         tr_torrent ** torrents = tr_sessionLoadTorrents( mySession, ctor, &torrentCount );
         tr_free( torrents );
         tr_ctorFree( ctor );
     }
 
-    connect( &myPrefs, SIGNAL(changed(int)), this, SLOT(updatePref(int)) );
-}
-
-Session :: ~Session( )
-{
-    if( mySession )
-        tr_sessionClose( mySession );
+    emit sourceChanged( );
 }
 
 bool
@@ -386,13 +428,13 @@ Session :: sendTorrentRequest( const char * request, const QSet<int>& ids )
 }
 
 void
-Session :: pause( const QSet<int>& ids )
+Session :: pauseTorrents( const QSet<int>& ids )
 {
     sendTorrentRequest( "torrent-stop", ids );
 }
 
 void
-Session :: start( const QSet<int>& ids )
+Session :: startTorrents( const QSet<int>& ids )
 {
     sendTorrentRequest( "torrent-start", ids );
 }
@@ -496,7 +538,7 @@ Session :: exec( const char * request )
     {
         tr_rpc_request_exec_json( mySession, request, strlen( request ), localSessionCallback, this );
     }
-    else
+    else if( !myUrl.isEmpty( ) )
     {
         const QByteArray data( request, strlen( request ) );
         static const QString path( "/transmission/rpc" );
@@ -537,7 +579,7 @@ Session :: onRequestFinished( int id, bool error )
         const QByteArray& response( myBuffer.buffer( ) );
         const char * json( response.constData( ) );
         int jsonLength( response.size( ) );
-        if( json[jsonLength-1] == '\n' ) --jsonLength;
+        if( jsonLength>0 && json[jsonLength-1] == '\n' ) --jsonLength;
 
         parseResponse( json, jsonLength );
     }
@@ -742,7 +784,7 @@ Session :: addTorrent( QString filename )
 {
     QFile file( filename );
     file.open( QIODevice::ReadOnly );
-    QByteArray raw( file.readAll( ) );
+    const QByteArray raw( file.readAll( ) );
     file.close( );
 
     if( !raw.isEmpty( ) )

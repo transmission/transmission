@@ -42,6 +42,7 @@ class TorrentModel: public QAbstractListModel
         Prefs& myPrefs;
 
     public:
+        void clear( );
         bool hasTorrent( const QString& hashString ) const;
         virtual int rowCount( const QModelIndex& parent = QModelIndex() ) const;
         virtual QVariant data( const QModelIndex& index, int role = Qt::DisplayRole ) const;

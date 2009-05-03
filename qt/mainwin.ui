@@ -64,6 +64,7 @@
     <property name="title">
      <string>&amp;Torrent</string>
     </property>
+    <addaction name="separator"/>
     <addaction name="action_Add"/>
     <addaction name="action_New"/>
     <addaction name="separator"/>
@@ -88,6 +89,8 @@
     </property>
     <addaction name="action_SelectAll"/>
     <addaction name="action_DeselectAll"/>
+    <addaction name="separator"/>
+    <addaction name="action_SessionDialog"/>
     <addaction name="separator"/>
     <addaction name="action_Preferences"/>
    </widget>
@@ -518,6 +521,14 @@
    </property>
    <property name="text">
     <string>Tray &amp;Icon</string>
+   </property>
+  </action>
+  <action name="action_SessionDialog">
+   <property name="text">
+    <string>&amp;Change Session...</string>
+   </property>
+   <property name="toolTip">
+    <string extracomment="Start a local session or connect to a running session">Choose Session</string>
    </property>
   </action>
  </widget>

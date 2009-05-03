@@ -27,8 +27,9 @@
 #include "mainwin.h"
 #include "options.h"
 #include "prefs.h"
-#include "torrent-model.h"
 #include "session.h"
+#include "session-dialog.h"
+#include "torrent-model.h"
 #include "utils.h"
 #include "watchdir.h"
 
@@ -40,8 +41,6 @@ namespace
     {
         { 'g', "config-dir", "Where to look for configuration files", "g", 1, "<path>" },
         { 'm', "minimized",  "Start minimized in system tray", "m", 0, NULL },
-        { 'p', "paused",  "Pause all torrents on sartup", "p", 0, NULL },
-        { 'r', "remote",  "Remotely control a pre-existing session", "r", 1, "<URL>" },
         { 'v', "version", "Show version number and exit", "v", 0, NULL },
         { 0, NULL, NULL, NULL, 0, NULL }
     };
@@ -96,17 +95,13 @@ MyApp :: MyApp( int& argc, char ** argv ):
 
     // parse the command-line arguments
     int c;
-    bool paused = false;
     bool minimized = false;
     const char * optarg;
     const char * configDir = 0;
-    const char * url = 0;
     while( ( c = tr_getopt( getUsage( ), argc, (const char**)argv, opts, &optarg ) ) ) {
         switch( c ) {
             case 'g': configDir = optarg; break;
             case 'm': minimized = true; break;
-            case 'p': paused = true; break;
-            case 'r': url = optarg; break;
             case 'v':        Utils::toStderr( QObject::tr( "transmission %1" ).arg( LONG_VERSION_STRING ) ); exit( 0 ); break;
             case TR_OPT_ERR: Utils::toStderr( QObject::tr( "Invalid option" ) ); showUsage( ); break;
             default:         Utils::toStderr( QObject::tr( "Got opt %1" ).arg((int)c) ); showUsage( ); break;
@@ -117,26 +112,29 @@ MyApp :: MyApp( int& argc, char ** argv ):
     if( configDir == 0 )
         configDir = tr_getDefaultConfigDir( MY_NAME );
 
+    // is this the first time we've run transmission?
+    const bool firstTime = !QFile(QDir(configDir).absoluteFilePath("settings.json")).exists();
+
     myPrefs = new Prefs ( configDir );
-    mySession = new Session( configDir, *myPrefs, url, paused );
+    mySession = new Session( configDir, *myPrefs );
     myModel = new TorrentModel( *myPrefs );
     myWindow = new TrMainWindow( *mySession, *myPrefs, *myModel, minimized );
     myWatchDir = new WatchDir( *myModel );
 
-    /* when the session gets torrent info, update the model */
+    // when the session gets torrent info, update the model
     connect( mySession, SIGNAL(torrentsUpdated(tr_benc*,bool)), myModel, SLOT(updateTorrents(tr_benc*,bool)) );
     connect( mySession, SIGNAL(torrentsUpdated(tr_benc*,bool)), myWindow, SLOT(refreshActionSensitivity()) );
     connect( mySession, SIGNAL(torrentsRemoved(tr_benc*)), myModel, SLOT(removeTorrents(tr_benc*)) );
-    /* when the model sees a torrent for the first time, ask the session for full info on it */
+    // when the model sees a torrent for the first time, ask the session for full info on it
     connect( myModel, SIGNAL(torrentsAdded(QSet<int>)), mySession, SLOT(initTorrents(QSet<int>)) );
 
     mySession->initTorrents( );
     mySession->refreshSessionStats( );
 
-    /* when torrents are added to the watch directory, tell the session */
+    // when torrents are added to the watch directory, tell the session
     connect( myWatchDir, SIGNAL(torrentFileAdded(QString)), this, SLOT(addTorrent(QString)) );
 
-    /* init from preferences */
+    // init from preferences
     QList<int> initKeys;
     initKeys << Prefs::DIR_WATCH;
     foreach( int key, initKeys )
@@ -162,6 +160,13 @@ MyApp :: MyApp( int& argc, char ** argv ):
     timer->start( );
 
     maybeUpdateBlocklist( );
+
+    if( !firstTime )
+        mySession->restart( );
+    else {
+        QDialog * d = new SessionDialog( *mySession, *myPrefs, myWindow );
+        d->show( );
+    }
 }
 
 MyApp :: ~MyApp( )

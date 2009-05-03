@@ -103,6 +103,7 @@ class TrMainWindow: public QMainWindow
         void showSessionRatio( );
         void showSessionTransfer( );
         void refreshVisibleCount( );
+        void refreshTitle( );
         void refreshStatusBar( );
         void openTorrent( );
         void newTorrent( );
@@ -112,12 +113,14 @@ class TrMainWindow: public QMainWindow
         void openHelp( );
         void openFolder( );
         void openProperties( );
+        void openSessionDialog( );
         void toggleSpeedMode( );
         void dataReadProgress( );
         void dataSendProgress( );
         void toggleWindows( );
         void onSetPrefs( );
         void onSetPrefs( bool );
+        void onSessionSourceChanged( );
 
     private slots:
         void setSortPref             ( int );

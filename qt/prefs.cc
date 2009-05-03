@@ -56,6 +56,12 @@ Prefs::PrefItem Prefs::myItems[] =
     { MAIN_WINDOW_X, "main-window-x", QVariant::Int },
     { MAIN_WINDOW_Y, "main-window-y", QVariant::Int },
     { FILTER_MODE, "filter-mode", TrTypes::FilterModeType },
+    { SESSION_IS_REMOTE, "remote-session-enabled", QVariant::Bool },
+    { SESSION_REMOTE_HOST, "remote-session-host", QVariant::String },
+    { SESSION_REMOTE_PORT, "remote-session-port", QVariant::Int },
+    { SESSION_REMOTE_AUTH, "remote-session-requres-authentication", QVariant::Bool },
+    { SESSION_REMOTE_USERNAME, "remote-session-username", QVariant::String },
+    { SESSION_REMOTE_PASSWORD, "remote-session-password", QVariant::String },
 
     /* libtransmission settings */
     { ALT_SPEED_LIMIT_UP, TR_PREFS_KEY_ALT_SPEED_UP, QVariant::Int },
@@ -256,6 +262,10 @@ Prefs :: initDefaults( tr_benc * d )
     tr_bencDictAddInt( d, keyStr(MINIMAL_VIEW), false );
     tr_bencDictAddInt( d, keyStr(START), true );
     tr_bencDictAddInt( d, keyStr(TRASH_ORIGINAL), false );
+    tr_bencDictAddStr( d, keyStr(SESSION_REMOTE_HOST), "localhost" );
+    tr_bencDictAddInt( d, keyStr(SESSION_REMOTE_PORT), 9091 );
+    tr_bencDictAddBool( d, keyStr(SESSION_IS_REMOTE), false );
+    tr_bencDictAddBool( d, keyStr(SESSION_REMOTE_AUTH), false );
 }
 
 /***
