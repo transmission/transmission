@@ -52,6 +52,7 @@ class TrMainWindow: public QMainWindow
 
     private:
         time_t myLastFullUpdateTime;
+        QDialog * mySessionDialog;
         QDialog * myPrefsDialog;
         QDialog * myAboutDialog;
         QDialog * myStatsDialog;
@@ -113,7 +114,6 @@ class TrMainWindow: public QMainWindow
         void openHelp( );
         void openFolder( );
         void openProperties( );
-        void openSessionDialog( );
         void toggleSpeedMode( );
         void dataReadProgress( );
         void dataSendProgress( );
@@ -180,6 +180,7 @@ class TrMainWindow: public QMainWindow
         void setTrayIconVisible( bool );
         void setMinimalView( bool );
         void refreshActionSensitivity( );
+        void wrongAuthentication( );
 
     public:
         TrMainWindow( Session&, Prefs&, TorrentModel&, bool minized );

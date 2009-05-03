@@ -122,6 +122,7 @@ class Session: public QObject
         void torrentsRemoved( struct tr_benc * torrentList );
         void dataReadProgress( );
         void dataSendProgress( );
+        void httpAuthenticationRequired( );
 
     private:
         int64_t myBlocklistSize;

@@ -193,6 +193,7 @@ Session :: Session( const char * configDir, Prefs& prefs ):
     connect( &myHttp, SIGNAL(requestFinished(int,bool)), this, SLOT(onRequestFinished(int,bool)));
     connect( &myHttp, SIGNAL(dataReadProgress(int,int)), this, SIGNAL(dataReadProgress()));
     connect( &myHttp, SIGNAL(dataSendProgress(int,int)), this, SIGNAL(dataSendProgress()));
+    connect( &myHttp, SIGNAL(authenticationRequired(QString, quint16, QAuthenticator*)), this, SIGNAL(httpAuthenticationRequired()) );
     connect( &myPrefs, SIGNAL(changed(int)), this, SLOT(updatePref(int)) );
 
     myBuffer.open( QIODevice::ReadWrite );

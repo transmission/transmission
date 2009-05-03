@@ -79,6 +79,7 @@ namespace
 
 TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& model, bool minimized ):
     myLastFullUpdateTime( 0 ),
+    mySessionDialog( new SessionDialog( session, prefs, this ) ),
     myPrefsDialog( new PrefsDialog( session, prefs, this ) ),
     myAboutDialog( new AboutDialog( this ) ),
     myStatsDialog( new StatsDialog( session, this ) ),
@@ -157,7 +158,7 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     connect( ui.action_Contents, SIGNAL(triggered()), this, SLOT(openHelp()));
     connect( ui.action_OpenFolder, SIGNAL(triggered()), this, SLOT(openFolder()));
     connect( ui.action_Properties, SIGNAL(triggered()), this, SLOT(openProperties()));
-    connect( ui.action_SessionDialog, SIGNAL(triggered()), this, SLOT(openSessionDialog()));
+    connect( ui.action_SessionDialog, SIGNAL(triggered()), mySessionDialog, SLOT(show()));
     connect( ui.listView, SIGNAL(activated(const QModelIndex&)), ui.action_Properties, SLOT(trigger()));
 
     // context menu
@@ -255,6 +256,7 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     connect( &mySession, SIGNAL(statsUpdated()), this, SLOT(refreshStatusBar()) );
     connect( &mySession, SIGNAL(dataReadProgress()), this, SLOT(dataReadProgress()) );
     connect( &mySession, SIGNAL(dataSendProgress()), this, SLOT(dataSendProgress()) );
+    connect( &mySession, SIGNAL(httpAuthenticationRequired()), this, SLOT(wrongAuthentication()) );
 
     if( mySession.isServer( ) )
         myNetworkLabel->hide( );
@@ -594,13 +596,6 @@ TrMainWindow :: openProperties( )
 
     myDetailsDialog->setIds( getSelectedTorrents( ) );
     myDetailsDialog->show( );
-}
-
-void
-TrMainWindow :: openSessionDialog( )
-{
-    SessionDialog * d = new SessionDialog( mySession, myPrefs, this );
-    d->show( );
 }
 
 void
@@ -1093,4 +1088,11 @@ TrMainWindow :: dataSendProgress( )
 {
     myLastSendTime = time( NULL );
     updateNetworkIcon( );
+}
+
+void
+TrMainWindow :: wrongAuthentication( )
+{
+    mySession.stop( );
+    mySessionDialog->show( );
 }

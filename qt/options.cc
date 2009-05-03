@@ -125,7 +125,9 @@ Options :: Options( Session& session, const Prefs& prefs, const QString& filenam
 
     connect( myTree, SIGNAL(priorityChanged(const QSet<int>&,int)), this, SLOT(onPriorityChanged(const QSet<int>&,int)));
     connect( myTree, SIGNAL(wantedChanged(const QSet<int>&,bool)), this, SLOT(onWantedChanged(const QSet<int>&,bool)));
-    connect( myVerifyButton, SIGNAL(clicked(bool)), this, SLOT(onVerify()));
+    if( session.isLocal( ) )
+        connect( myVerifyButton, SIGNAL(clicked(bool)), this, SLOT(onVerify()));
+
     connect( &myVerifyTimer, SIGNAL(timeout()), this, SLOT(onTimeout()));
 
     reload( );

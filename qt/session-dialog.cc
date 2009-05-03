@@ -37,7 +37,7 @@ SessionDialog :: onAccepted( )
     myPrefs.set( Prefs::SESSION_REMOTE_USERNAME, myUsernameLineEdit->text( ) );
     myPrefs.set( Prefs::SESSION_REMOTE_PASSWORD, myPasswordLineEdit->text( ) );
     mySession.restart( );
-    deleteLater( );
+    hide( );
 }
 
 void
@@ -111,7 +111,7 @@ SessionDialog :: SessionDialog( Session& session, Prefs& prefs, QWidget * parent
     resensitize( );
 
     QDialogButtonBox * buttons = new QDialogButtonBox( QDialogButtonBox::Cancel|QDialogButtonBox::Ok );
-    connect( buttons, SIGNAL(rejected()), this, SLOT(deleteLater()));
+    connect( buttons, SIGNAL(rejected()), this, SLOT(hide()));
     connect( buttons, SIGNAL(accepted()), this, SLOT(onAccepted()));
     top->addWidget( buttons, 0 );
 } 
