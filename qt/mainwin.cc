@@ -103,7 +103,7 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     QString title( "Transmission" );
     const QUrl remoteUrl( session.getRemoteUrl( ) );
     if( !remoteUrl.isEmpty( ) )
-        title += tr( " - %1" ).arg( remoteUrl.toString() );
+        title += tr( " - %1" ).arg( remoteUrl.toString(QUrl::RemoveUserInfo) );
     setWindowTitle( title );
 
     QStyle * style = this->style();
