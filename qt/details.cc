@@ -86,14 +86,8 @@ class PeerItem: public QTreeWidgetItem
         QString status;
 
     public:
-        PeerItem( ) { }
         virtual ~PeerItem( ) { }
-
-    public:
-        void setStatus( const QString& s ) {
-            status = s;
-        }
-        void setPeer( const Peer& p ) {
+        PeerItem( const Peer& p ) {
             peer = p;
             int q[4];
             if( sscanf( p.address.toUtf8().constData(), "%d.%d.%d.%d", q+0, q+1, q+2, q+3 ) == 4 )
@@ -101,6 +95,9 @@ class PeerItem: public QTreeWidgetItem
             else
                 collatedAddress = p.address;
         }
+    public:
+        void refresh( const Peer& p ) { peer = p; }
+        void setStatus( const QString& s ) { status = s; }
         virtual bool operator< ( const QTreeWidgetItem & other ) const {
             const PeerItem * i = dynamic_cast<const PeerItem*>(&other);
             QTreeWidget * tw( treeWidget( ) );
@@ -680,67 +677,75 @@ Details :: refresh( )
     foreach( const Torrent * t, torrents ) i += t->timesCompleted( );
     myTimesCompletedLabel->setText( locale.toString( i ) );
 
-    PeerList peers;
-    foreach( const Torrent * t, torrents ) peers << t->peers( );
     QMap<QString,QTreeWidgetItem*> peers2;
     QList<QTreeWidgetItem*> newItems;
-    static const QIcon myEncryptionIcon( ":/icons/encrypted.png" );
-    static const QIcon myEmptyIcon;
-    foreach( const Peer& peer, peers )
+    foreach( const Torrent * t, torrents )
     {
-        PeerItem * item = (PeerItem*) myPeers.value( peer.address, 0 );
-        if( item == 0 ) { // new peer has connected
-            item = new PeerItem;
-            item->setTextAlignment( COL_UP, Qt::AlignRight );
-            item->setTextAlignment( COL_DOWN, Qt::AlignRight );
-            item->setTextAlignment( COL_PERCENT, Qt::AlignRight );
-            newItems << item;
-        }
+        const QString idStr( QString::number( t->id( ) ) );
+        PeerList peers = t->peers( );
 
-        QString code;
-        if( peer.isDownloadingFrom )                           { code += 'D'; }
-        else if( peer.clientIsInterested )                     { code += 'd'; }
-        if( peer.isUploadingTo )                               { code += 'U'; }
-        else if( peer.peerIsInterested )                       { code += 'u'; }
-        if( !peer.clientIsChoked && !peer.clientIsInterested ) { code += 'K'; }
-        if( !peer.peerIsChoked && !peer.peerIsInterested )     { code += '?'; }
-        if( peer.isEncrypted )                                 { code += 'E'; }
-        if( peer.isIncoming )                                  { code += 'I'; }
+        foreach( const Peer& peer, peers )
+        {
+            const QString key = idStr + ":" + peer.address;
+            PeerItem * item = (PeerItem*) myPeers.value( key, 0 );
 
-        item->setPeer( peer );
-        item->setStatus( code );
-
-        QString codeTip;
-        foreach( QChar ch, code ) {
-            QString txt;
-            switch( ch.toAscii() ) {
-                case 'O': txt = tr( "Optimistic unchoke" ); break;
-                case 'D': txt = tr( "Downloading from this peer" ); break;
-                case 'd': txt = tr( "We would download from this peer if they would let us" ); break;
-                case 'U': txt = tr( "Uploading to peer" ); break;
-                case 'u': txt = tr( "We would upload to this peer if they asked" ); break;
-                case 'K': txt = tr( "Peer has unchoked us, but we're not interested" ); break;
-                case '?': txt = tr( "We unchoked this peer, but they're not interested" ); break;
-                case 'E': txt = tr( "Encrypted connection" ); break;
-                case 'X': txt = tr( "Peer was discovered through Peer Exchange (PEX)" ); break;
-                case 'I': txt = tr( "Peer is an incoming connection" ); break;
+            if( item == 0 ) // new peer has connected
+            {
+                static const QIcon myEncryptionIcon( ":/icons/encrypted.png" );
+                static const QIcon myEmptyIcon;
+                item = new PeerItem( peer );
+                item->setTextAlignment( COL_UP, Qt::AlignRight );
+                item->setTextAlignment( COL_DOWN, Qt::AlignRight );
+                item->setTextAlignment( COL_PERCENT, Qt::AlignRight );
+                item->setIcon( COL_LOCK, peer.isEncrypted ? myEncryptionIcon : myEmptyIcon );
+                item->setToolTip( COL_LOCK, peer.isEncrypted ? tr( "Encrypted connection" ) : "" );
+                item->setText( COL_ADDRESS, peer.address );
+                item->setText( COL_CLIENT, peer.clientName );
+                newItems << item;
             }
-            if( !txt.isEmpty( ) )
-                codeTip += QString("%1: %2\n").arg(ch).arg(txt);
-        }
-        if( !codeTip.isEmpty() )
-            codeTip.resize( codeTip.size()-1 ); // eat the trailing linefeed
 
-        item->setIcon( COL_LOCK, peer.isEncrypted ? myEncryptionIcon : myEmptyIcon );
-        item->setToolTip( COL_LOCK, peer.isEncrypted ? tr( "Encrypted connection" ) : "" );
-        item->setText( COL_UP, peer.rateToPeer.isZero() ? "" : Utils::speedToString( peer.rateToPeer ) );
-        item->setText( COL_DOWN, peer.rateToClient.isZero() ? "" : Utils::speedToString( peer.rateToClient ) );
-        item->setText( COL_PERCENT, peer.progress > 0 ? QString( "%1%" ).arg( locale.toString((int)(peer.progress*100.0))) : "" );
-        item->setText( COL_STATUS, code );
-        item->setToolTip( COL_STATUS, codeTip );
-        item->setText( COL_ADDRESS, peer.address );
-        item->setText( COL_CLIENT, peer.clientName );
-        peers2.insert( peer.address, item );
+            QString code;
+            if( peer.isDownloadingFrom )                           { code += 'D'; }
+            else if( peer.clientIsInterested )                     { code += 'd'; }
+            if( peer.isUploadingTo )                               { code += 'U'; }
+            else if( peer.peerIsInterested )                       { code += 'u'; }
+            if( !peer.clientIsChoked && !peer.clientIsInterested ) { code += 'K'; }
+            if( !peer.peerIsChoked && !peer.peerIsInterested )     { code += '?'; }
+            if( peer.isEncrypted )                                 { code += 'E'; }
+            if( peer.isIncoming )                                  { code += 'I'; }
+            item->setStatus( code );
+            item->refresh( peer );
+
+            QString codeTip;
+            foreach( QChar ch, code ) {
+                QString txt;
+                switch( ch.toAscii() ) {
+                    case 'O': txt = tr( "Optimistic unchoke" ); break;
+                    case 'D': txt = tr( "Downloading from this peer" ); break;
+                    case 'd': txt = tr( "We would download from this peer if they would let us" ); break;
+                    case 'U': txt = tr( "Uploading to peer" ); break;
+                    case 'u': txt = tr( "We would upload to this peer if they asked" ); break;
+                    case 'K': txt = tr( "Peer has unchoked us, but we're not interested" ); break;
+                    case '?': txt = tr( "We unchoked this peer, but they're not interested" ); break;
+                    case 'E': txt = tr( "Encrypted connection" ); break;
+                    case 'X': txt = tr( "Peer was discovered through Peer Exchange (PEX)" ); break;
+                    case 'I': txt = tr( "Peer is an incoming connection" ); break;
+                }
+                if( !txt.isEmpty( ) )
+                    codeTip += QString("%1: %2\n").arg(ch).arg(txt);
+            }
+
+            if( !codeTip.isEmpty() )
+                codeTip.resize( codeTip.size()-1 ); // eat the trailing linefeed
+
+            item->setText( COL_UP, peer.rateToPeer.isZero() ? "" : Utils::speedToString( peer.rateToPeer ) );
+            item->setText( COL_DOWN, peer.rateToClient.isZero() ? "" : Utils::speedToString( peer.rateToClient ) );
+            item->setText( COL_PERCENT, peer.progress > 0 ? QString( "%1%" ).arg( locale.toString((int)(peer.progress*100.0))) : "" );
+            item->setText( COL_STATUS, code );
+            item->setToolTip( COL_STATUS, codeTip );
+
+            peers2.insert( key, item );
+        }
     }
     myPeerTree->addTopLevelItems( newItems );
     foreach( QString key, myPeers.keys() ) {
