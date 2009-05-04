@@ -862,6 +862,5 @@ Session :: launchWebInterface( )
         url.setHost( "localhost" );
         url.setPort( myPrefs.getInt( Prefs::RPC_PORT ) );
     }
-    std::cerr << qPrintable(url.toString()) << std::endl;
     QDesktopServices :: openUrl( url );
 }
