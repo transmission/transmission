@@ -533,7 +533,7 @@ FileTreeDelegate :: paint( QPainter                    * painter,
     else if( column == COL_PROGRESS )
     {
         QStyleOptionProgressBar p;
-        p.state = QStyle::State_Enabled;
+        p.state = option.state | QStyle::State_Small;
         p.direction = QApplication::layoutDirection();
         p.rect = option.rect;
         p.rect.setSize( QSize( option.rect.width()-2, option.rect.height()-2 ) );
@@ -550,7 +550,7 @@ FileTreeDelegate :: paint( QPainter                    * painter,
     else if( column == COL_WANTED )
     {
         QStyleOptionButton o;
-        o.state = QStyle::State_Enabled;
+        o.state = option.state;
         o.direction = QApplication::layoutDirection();
         o.rect.setSize( QSize( 20, option.rect.height( ) ) );
         o.rect.moveCenter( option.rect.center( ) );
