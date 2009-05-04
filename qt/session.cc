@@ -89,7 +89,6 @@ Session :: sessionSet( const char * key, const QVariant& value )
         case QVariant::String: tr_bencDictAddStr  ( args, key, value.toString().toUtf8() ); break;
         default: assert( "unknown type" );
     }
-std::cerr << tr_bencToJSON(&top) << std::endl;
     exec( &top );
     tr_bencFree( &top );
 }
@@ -331,7 +330,6 @@ Session :: torrentSet( const QSet<int>& ids, const QString& key, double value )
     tr_benc * args = tr_bencDictAddDict( &top, "arguments", 2 );
     tr_bencDictAddReal( args, key.toUtf8().constData(), value );
     addOptionalIds( args, ids );
-    std::cerr << tr_bencToJSON(&top) << std::endl;
     exec( &top );
     tr_bencFree( &top );
 }
@@ -345,7 +343,6 @@ Session :: torrentSet( const QSet<int>& ids, const QString& key, int value )
     tr_benc * args = tr_bencDictAddDict( &top, "arguments", 2 );
     tr_bencDictAddInt( args, key.toUtf8().constData(), value );
     addOptionalIds( args, ids );
-    std::cerr << tr_bencToJSON(&top) << std::endl;
     exec( &top );
     tr_bencFree( &top );
 }
@@ -359,7 +356,6 @@ Session :: torrentSet( const QSet<int>& ids, const QString& key, bool value )
     tr_benc * args = tr_bencDictAddDict( &top, "arguments", 2 );
     tr_bencDictAddBool( args, key.toUtf8().constData(), value );
     addOptionalIds( args, ids );
-    std::cerr << tr_bencToJSON(&top) << std::endl;
     exec( &top );
     tr_bencFree( &top );
 }
@@ -375,7 +371,6 @@ Session :: torrentSet( const QSet<int>& ids, const QString& key, const QList<int
     tr_benc * list( tr_bencDictAddList( args, key.toUtf8().constData(), value.size( ) ) );
     foreach( int i, value )
         tr_bencListAddInt( list, i );
-    std::cerr << tr_bencToJSON(&top) << std::endl;
     exec( &top );
     tr_bencFree( &top );
 }
