@@ -23,6 +23,7 @@
 #include <QSystemTrayIcon>
 #include <QUrl>
 #include <QSignalMapper>
+#include <QTabBar>
 
 #include <libtransmission/version.h>
 
@@ -60,22 +61,6 @@ TrMainWindow :: getStockIcon( const QString& freedesktop_name, int fallback )
 
     return QtIconLoader::icon( freedesktop_name, fallbackIcon );
 }
-
-namespace
-{
-    QSize calculateTextButtonSizeHint( QPushButton * button )
-    {
-        QStyleOptionButton opt;
-        opt.initFrom( button );
-        QString s( button->text( ) );
-        if( s.isEmpty( ) )
-            s = QString::fromLatin1( "XXXX" );
-        QFontMetrics fm = button->fontMetrics( );
-        QSize sz = fm.size( Qt::TextShowMnemonic, s );
-        return button->style()->sizeFromContents( QStyle::CT_PushButton, &opt, sz, button ).expandedTo( QApplication::globalStrut( ) );
-    }
-}
-
 
 TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& model, bool minimized ):
     myLastFullUpdateTime( 0 ),
@@ -316,18 +301,9 @@ TrMainWindow :: onSetPrefs( bool isChecked )
         onSetPrefs( );
 }
 
-#define SHOW_KEY "show-mode"
-
-void
-TrMainWindow :: onShowModeClicked( )
-{
-    setShowMode( sender()->property(SHOW_KEY).toInt() );
-}
-
 QWidget *
 TrMainWindow :: createFilterBar( )
 {
-    int i;
     QMenu * m;
     QLineEdit * e;
     QPushButton * p;
@@ -337,22 +313,21 @@ TrMainWindow :: createFilterBar( )
     const QSize smallIconSize( smallSize, smallSize );
 
     QWidget * top = myFilterBar = new QWidget;
+    
     h = new QHBoxLayout( top );
-    h->setContentsMargins( HIG::PAD_SMALL, HIG::PAD_SMALL, HIG::PAD_SMALL, HIG::PAD_SMALL );
+    h->setContentsMargins( HIG::PAD_SMALL, HIG::PAD_SMALL, HIG::PAD_SMALL, 0 );
     h->setSpacing( HIG::PAD_SMALL );
 
-        QList<QString> titles;
-        titles << tr( "A&ll" ) << tr( "&Active" ) << tr( "&Downloading" ) << tr( "&Seeding" ) << tr( "&Paused" );
-        for( i=0; i<titles.size(); ++i ) {
-            p = myFilterButtons[i] = new QPushButton( titles[i] );
-            p->setProperty( SHOW_KEY, i );
-            p->setFlat( true );
-            p->setCheckable( true );
-            p->setMaximumSize( calculateTextButtonSizeHint( p ) );
-            connect( p, SIGNAL(clicked()), this, SLOT(onShowModeClicked()));
-            h->addWidget( p );
-        }
+        QTabBar * tabBar = myFilterTabs = new QTabBar( this );
+        tabBar->addTab( tr( "A&ll" ) );
+        tabBar->addTab( tr( "&Active" ) );
+        tabBar->addTab( tr( "&Downloading" ) );
+        tabBar->addTab( tr( "&Seeding" ) );
+        tabBar->addTab( tr( "&Paused" ) );
+        connect( tabBar, SIGNAL(currentChanged(int)), this, SLOT(setShowMode(int)));
+        h->addWidget( tabBar );
 
+    h->addSpacing( HIG::PAD_BIG );
     h->addStretch( 1 );
 
         a = new QActionGroup( this );
@@ -798,11 +773,6 @@ TrMainWindow :: reannounceSelected( )
 **/
 
 void TrMainWindow :: setShowMode     ( int i ) { myPrefs.set( Prefs::FILTER_MODE, FilterMode( i ) ); }
-void TrMainWindow :: showAll         ( ) { setShowMode( FilterMode :: SHOW_ALL ); }
-void TrMainWindow :: showActive      ( ) { setShowMode( FilterMode :: SHOW_ACTIVE ); }
-void TrMainWindow :: showDownloading ( ) { setShowMode( FilterMode :: SHOW_DOWNLOADING ); }
-void TrMainWindow :: showSeeding     ( ) { setShowMode( FilterMode :: SHOW_SEEDING ); }
-void TrMainWindow :: showPaused      ( ) { setShowMode( FilterMode :: SHOW_PAUSED ); }
 
 void TrMainWindow :: filterByName    ( ) { myFilterModel.setTextMode( TorrentFilter :: FILTER_BY_NAME ); }
 void TrMainWindow :: filterByTracker ( ) { myFilterModel.setTextMode( TorrentFilter :: FILTER_BY_TRACKER ); }
@@ -926,9 +896,7 @@ TrMainWindow :: refreshPref( int key )
             break;
 
         case Prefs::FILTER_MODE:
-            i = myPrefs.get<FilterMode>(key).mode( );
-            for( int j=0; j<FilterMode::NUM_MODES; ++j )
-                myFilterButtons[j]->setChecked( i==j );
+            myFilterTabs->setCurrentIndex( myPrefs.get<FilterMode>(key).mode( ) );
             break;
 
         case Prefs::FILTERBAR:
