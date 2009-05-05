@@ -316,7 +316,9 @@ serve_file( struct evhttp_request * req,
 
         if( errno )
         {
-            send_simple_response( req, HTTP_NOTFOUND, filename );
+            char * tmp = tr_strdup_printf( "%s (%s)", filename, tr_strerror( errno ) );
+            send_simple_response( req, HTTP_NOTFOUND, tmp );
+            tr_free( tmp );
         }
         else
         {
