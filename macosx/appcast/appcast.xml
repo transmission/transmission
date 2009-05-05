@@ -5,11 +5,26 @@
     <link>http://www.transmissionbt.com/appcast.xml</link>
     <description>Most recent version available.</description>
     <language>en</language>
-    <pubDate>Sun, 12 Apr 2009 21:31:00 -0400</pubDate>
+    <pubDate>Mon, 4 May 2009 20:06:00 -0400</pubDate>
+
 
 	<item>
-		<title>Transmission 1.52</title>
+		<title>Transmission 1.60</title>
 		<sparkle:releaseNotesLink>http://www.transmissionbt.com/appcast/releasenotes.html</sparkle:releaseNotesLink>
+      	<pubDate>Mon, 4 May 2009 20:06:00 -0400</pubDate>
+      	<enclosure
+      	url="http://mirrors.m0k.org/transmission/files/Transmission-1.60.dmg" 
+      	sparkle:version="8308"
+      	sparkle:shortVersionString="1.60"
+      	sparkle:dsaSignature="MCwCFHMKInrfMR8dkHwW2GzPlb+ZziNRAhRi0RTQmtVHaIp9Pz9jmW/Quhx6+g=="
+      	length="4829378"
+      	type="application/octet-stream"/>
+      	<sparkle:minimumSystemVersion>10.5.0</sparkle:minimumSystemVersion>
+    </item>
+    
+	<item>
+		<title>Transmission 1.52</title>
+		<sparkle:releaseNotesLink>http://www.transmissionbt.com/appcast/releasenotes104.html</sparkle:releaseNotesLink>
       	<pubDate>Sun, 12 Apr 2009 21:31:00 -0400</pubDate>
       	<enclosure
       	url="http://mirrors.m0k.org/transmission/files/Transmission-1.52.dmg" 
