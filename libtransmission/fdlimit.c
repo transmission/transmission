@@ -223,6 +223,9 @@ tr_open_file_for_scanning( const char * filename )
     fd = open( filename, flags, 0666 );
     if( fd >= 0 )
     {
+        /* Set hints about the lookahead buffer and caching. It's okay
+           for these to fail silently, so don't let them affect errno */
+        const int err = errno;
 #ifdef HAVE_POSIX_FADVISE
         posix_fadvise( fd, 0, 0, POSIX_FADV_SEQUENTIAL );
 #endif
@@ -230,6 +233,7 @@ tr_open_file_for_scanning( const char * filename )
         fcntl( fd, F_NOCACHE, 1 );
         fcntl( fd, F_RDAHEAD, 1 );
 #endif
+        errno = err;
     }
 
     return fd;
