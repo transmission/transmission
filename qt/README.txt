@@ -26,7 +26,7 @@ ABOUT QTRANSMISSION
    from a remote site, then transmission-remote and the web and Qt clients
    are a good match.
 
-   To use the Qt client as a remote: "qtr -r http://host:port/"
+   To use the Qt client as a remote, in the menu go to Edit > Change Session
 
    The Qt client is also the most likely to wind up running on Windows,
    though that's not a high priority at the moment...
