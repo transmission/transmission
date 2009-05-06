@@ -210,10 +210,7 @@ tr_open_file_for_scanning( const char * filename )
     /* build the flags */
     flags = O_RDONLY;
 #ifdef O_SEQUENTIAL
-    if( sequential ) flags |= O_SEQUENTIAL;
-#endif
-#ifdef O_RANDOM
-    if( !sequential ) flags |= O_RANDOM
+    flags |= O_SEQUENTIAL;
 #endif
 #ifdef O_BINARY
     flags |= O_BINARY;
