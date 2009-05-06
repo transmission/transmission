@@ -667,6 +667,8 @@ TrMainWindow :: refreshStatusBar( )
     foreach( QWidget * w, myUpStatusWidgets ) w->setVisible( !up.isZero( ) );
     foreach( QWidget * w, myDownStatusWidgets ) w->setVisible( !down.isZero( ) );
 
+    myNetworkLabel->setVisible( !mySession.isServer( ) );
+
     const QString mode( myPrefs.getString( Prefs::STATUSBAR_STATS ) );
     QString str;
 
