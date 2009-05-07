@@ -469,6 +469,7 @@ tr_loadFile( const char * path,
     uint8_t * buf;
     struct stat  sb;
     int fd;
+    ssize_t n;
     const char * err_fmt = _( "Couldn't read \"%1$s\": %2$s" );
 
     /* try to stat the file */
@@ -480,6 +481,7 @@ tr_loadFile( const char * path,
         errno = err;
         return NULL;
     }
+    tr_inf( "at the end of stat(%s), errno is %d", path, errno );
 
     if( ( sb.st_mode & S_IFMT ) != S_IFREG )
     {
@@ -487,6 +489,7 @@ tr_loadFile( const char * path,
         errno = EISDIR;
         return NULL;
     }
+    tr_inf( "looks like %s is a regular file... now we'll try to read it", path );
 
     /* Load the torrent file into our buffer */
     fd = tr_open_file_for_scanning( path );
@@ -497,6 +500,7 @@ tr_loadFile( const char * path,
         errno = err;
         return NULL;
     }
+    tr_inf( "after trying to open the file for reading, fd is %d and errno is %d", fd, errno );
     buf = malloc( sb.st_size + 1 );
     if( !buf )
     {
@@ -506,7 +510,9 @@ tr_loadFile( const char * path,
         errno = err;
         return NULL;
     }
-    if( read( fd, buf, sb.st_size ) != sb.st_size )
+    n = read( fd, buf, sb.st_size );
+    tr_inf( "file size is %"PRId64"; read is %"PRId64", errno is %d", (int64_t)sb.st_size, (int64_t)n, errno );
+    if( n == -1 )
     {
         const int err = errno;
         tr_err( err_fmt, path, tr_strerror( errno ) );
@@ -516,6 +522,7 @@ tr_loadFile( const char * path,
         return NULL;
     }
 
+    tr_inf( "nearing the end, and errno is %d", errno );
     tr_close_file( fd );
     buf[ sb.st_size ] = '\0';
     *size = sb.st_size;
