@@ -309,7 +309,7 @@ add_time_header( struct evkeyvalq * headers, const char * key, time_t value )
 {
     /* According to RFC 2616 this must follow RFC 1123's date format,
        so use gmtime instead of localtime... */
-    char buf[1024];
+    char buf[128];
     struct tm tm = *gmtime( &value );
     strftime( buf, sizeof( buf ), "%a, %d %b %Y %H:%M:%S GMT", &tm );
     evhttp_add_header( headers, key, buf );
