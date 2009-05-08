@@ -305,6 +305,17 @@ add_response( struct evhttp_request * req,
 }
 
 static void
+add_time_header( struct evkeyvalq * headers, const char * key, time_t value )
+{
+    /* According to RFC 2616 this must follow RFC 1123's date format,
+       so use gmtime instead of localtime... */
+    char buf[1024];
+    struct tm tm = *gmtime( &value );
+    strftime( buf, sizeof( buf ), "%a, %d %b %Y %H:%M:%S GMT", &tm );
+    evhttp_add_header( headers, key, buf );
+}
+
+static void
 serve_file( struct evhttp_request * req,
             struct tr_rpc_server *  server,
             const char *            filename )
@@ -333,11 +344,13 @@ serve_file( struct evhttp_request * req,
         else
         {
             struct evbuffer * out;
+            const time_t now = time( NULL );
 
             errno = error;
             out = tr_getBuffer( );
-            evhttp_add_header( req->output_headers, "Content-Type",
-                               mimetype_guess( filename ) );
+            evhttp_add_header( req->output_headers, "Content-Type", mimetype_guess( filename ) );
+            add_time_header( req->output_headers, "Date", now );
+            add_time_header( req->output_headers, "Expires", now+(24*60*60) );
             add_response( req, server, out, content, content_len );
             evhttp_send_reply( req, HTTP_OK, "OK", out );
 
