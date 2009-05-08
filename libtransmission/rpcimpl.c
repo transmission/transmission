@@ -158,6 +158,13 @@ getTorrents( tr_session * session,
                 if( tor->anyDate >= now - window )
                     torrents[torrentCount++] = tor;
         }
+        else
+        {
+            tr_torrent * tor;
+            torrents = tr_new0( tr_torrent *, 1 );
+            if(( tor = tr_torrentFindFromHashString( session, str )))
+                torrents[torrentCount++] = tor;
+        }
     }
     else /* all of them */
     {

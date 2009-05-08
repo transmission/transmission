@@ -192,8 +192,16 @@ addIdArg( tr_benc *    args,
     }
     if( strcmp( id, "all" ) )
     {
-        tr_rpc_parse_list_str( tr_bencDictAdd( args,
-                                               "ids" ), id, strlen( id ) );
+        const char * pch;
+        tr_bool isList = strchr(id,',') || strchr(id,'-');
+        tr_bool isNum = TRUE;
+        for( pch=id; isNum && *pch; ++pch )
+            if( !isdigit( *pch ) )
+                isNum = FALSE;
+        if( isNum || isList )
+            tr_rpc_parse_list_str( tr_bencDictAdd( args, "ids" ), id, strlen( id ) );
+        else
+            tr_bencDictAddStr( args, "ids", id ); /* it's a torrent sha hash */
     }
 }
 
