@@ -35,13 +35,23 @@ TransmissionRemote.prototype =
 	initialize: function(controller) {
 		this._controller = controller;
 		this._error = '';
+		this._token = '';
 	},
 
 	/*
 	 * Display an error if an ajax request fails, and stop sending requests
+	 * or on a 409, globally set the X-Transmission-Session-Id and resend
 	 */
-	ajaxError: function(request, error_string, exception) {
+	ajaxError: function(request, error_string, exception, ajaxObject) {
 		remote = this;
+
+		// set the Transmission-Session-Id on a 409
+		if(request.status == 409 && (token = request.getResponseHeader('X-Transmission-Session-Id'))){
+			remote._token = token;
+			$.ajax(ajaxObject);
+			return;
+		}
+
 		remote._error = request.responseText
 					? request.responseText.trim().replace(/(<([^>]+)>)/ig,"")
 					: "";
@@ -56,7 +66,11 @@ TransmissionRemote.prototype =
 			'Dismiss');
 		remote._controller.togglePeriodicRefresh(false);
 	},
-	
+
+	appendSessionId: function(XHR) {
+		XHR.setRequestHeader('X-Transmission-Session-Id', this._token);
+	},
+
 	sendRequest: function( data, success ) {
 		remote = this;
 		$.ajax( {
@@ -66,7 +80,8 @@ TransmissionRemote.prototype =
 			dataType: 'json',
 			cache: false,
 			data: $.toJSON(data),
-			error: function(request, error_string, exception){ remote.ajaxError(request, error_string, exception) },
+			beforeSend: function(XHR){ remote.appendSessionId(XHR) },
+			error: function(request, error_string, exception){ remote.ajaxError(request, error_string, exception, this) },
 			success: success
 		} );
 	},
