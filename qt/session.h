@@ -132,6 +132,7 @@ class Session: public QObject
         Prefs& myPrefs;
         tr_session * mySession;
         QString myConfigDir;
+        QString mySessionId;
         QUrl myUrl;
         QBuffer myBuffer;
         QHttp myHttp;

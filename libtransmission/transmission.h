@@ -57,6 +57,8 @@ extern "C" {
 #define SHA_DIGEST_LENGTH 20
 #define TR_INET6_ADDRSTRLEN 46
 
+#define TR_RPC_SESSION_ID_HEADER "X-Transmission-Session-Id"
+
 typedef uint32_t tr_file_index_t;
 typedef uint32_t tr_piece_index_t;
 typedef uint64_t tr_block_index_t;
