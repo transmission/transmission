@@ -878,9 +878,10 @@ void
 Session :: launchWebInterface( )
 {
     QUrl url;
-    if( !mySession) // remote session
+    if( !mySession ) // remote session
         url = myUrl;
     else { // local session
+        url.setScheme( "http" );
         url.setHost( "localhost" );
         url.setPort( myPrefs.getInt( Prefs::RPC_PORT ) );
     }
