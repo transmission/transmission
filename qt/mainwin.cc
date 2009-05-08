@@ -732,7 +732,7 @@ TrMainWindow :: refreshActionSensitivity( )
     ui.action_DeselectAll->setEnabled( haveSelection );
 
     const bool oneSelection( selected == 1 );
-    ui.action_OpenFolder->setEnabled( oneSelection );
+    ui.action_OpenFolder->setEnabled( oneSelection && mySession.isLocal( ) );
 
     ui.action_SelectAll->setEnabled( selected < rowCount );
     ui.action_StartAll->setEnabled( paused > 0 );
