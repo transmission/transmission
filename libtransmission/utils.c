@@ -289,13 +289,11 @@ tr_msgLoggingIsActive( int level )
 }
 
 void
-tr_msg( const char * file,
-        int          line,
-        int          level,
-        const char * name,
-        const char * fmt,
-        ... )
+tr_msg( const char * file, int line,
+        int level, const char * name,
+        const char * fmt, ... )
 {
+    const int err = errno; /* message logging shouldn't affect errno */
     FILE * fp;
     tr_msgInit( );
     tr_lockLock( messageLock );
@@ -350,6 +348,7 @@ tr_msg( const char * file,
     }
 
     tr_lockUnlock( messageLock );
+    errno = err;
 }
 
 /***

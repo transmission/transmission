@@ -335,7 +335,13 @@ serve_file( struct evhttp_request * req,
         content_len = 0;
         content = tr_loadFile( filename, &content_len );
 
-        if( content )
+        if( errno )
+        {
+            char * tmp = tr_strdup_printf( "%s (%s)", filename, tr_strerror( errno ) );
+            send_simple_response( req, HTTP_NOTFOUND, tmp );
+            tr_free( tmp );
+        }
+        else
         {
             struct evbuffer * out;
             const time_t now = time( NULL );
@@ -350,12 +356,6 @@ serve_file( struct evhttp_request * req,
 
             tr_releaseBuffer( out );
             tr_free( content );
-        }
-        else
-        {
-            char * tmp = tr_strdup_printf( "%s (%s)", filename, tr_strerror( errno ) );
-            send_simple_response( req, HTTP_NOTFOUND, tmp );
-            tr_free( tmp );
         }
     }
 }
@@ -583,8 +583,7 @@ handle_request( struct evhttp_request * req, void * arg )
                 "<p style=\"padding-left: 20pt;\">This requirement has been added to make "
                 "<a href=\"http://en.wikipedia.org/wiki/Cross-site_request_forgery\">CSRF</a>"
                 " attacks more difficult.</p>",
-                TR_RPC_SESSION_ID_HEADER, sessionId,
-                TR_RPC_SESSION_ID_HEADER );
+                TR_RPC_SESSION_ID_HEADER, sessionId );
             evhttp_add_header( req->output_headers, TR_RPC_SESSION_ID_HEADER, sessionId );
             send_simple_response( req, 409, tmp );
             tr_free( tmp );
