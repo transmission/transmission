@@ -126,6 +126,7 @@ static int    reqCount = 0;
 static int    debug = 0;
 static char * auth = NULL;
 static char * netrc = NULL;
+static char * cookies = NULL;
 
 static char*
 tr_getcwd( void )
@@ -1222,56 +1223,108 @@ processResponse( const char * host,
     }
 }
 
+/* very basic handling of cookies: when we get Set-Cookie, throw out all
+ * the previous cookies...  T only uses one cookie (session_id) */
+static size_t
+parseResponseHeader( void *ptr, size_t size, size_t nmemb, void * stream UNUSED )
+{
+    const char * line = ptr;
+    const size_t linelen = size * nmemb;
+    const char * lineend = line + linelen;
+    const char * key = "Set-Cookie: ";
+    const size_t keylen = strlen( key );
+    if( ( linelen >= keylen ) && !memcmp( line, key, keylen ) ) {
+        const char * begin = line + keylen;
+        const char * end = begin;
+        while(( end!=lineend ) && !strchr("\r\n",*end))
+            ++end;
+        tr_free( cookies );
+        cookies = tr_strndup( begin, end-begin );
+    }
+
+    return linelen;
+}
+
+static CURL*
+tr_curl_easy_init( struct evbuffer * writebuf )
+{
+    CURL * curl = curl_easy_init( );
+    curl_easy_setopt( curl, CURLOPT_USERAGENT, MY_NAME "/" LONG_VERSION_STRING );
+    curl_easy_setopt( curl, CURLOPT_WRITEFUNCTION, writeFunc );
+    curl_easy_setopt( curl, CURLOPT_WRITEDATA, writebuf );
+    curl_easy_setopt( curl, CURLOPT_HEADERFUNCTION, parseResponseHeader );
+    curl_easy_setopt( curl, CURLOPT_POST, 1 );
+    curl_easy_setopt( curl, CURLOPT_NETRC, CURL_NETRC_OPTIONAL );
+    curl_easy_setopt( curl, CURLOPT_HTTPAUTH, CURLAUTH_ANY );
+    curl_easy_setopt( curl, CURLOPT_TIMEOUT, 60L );
+    curl_easy_setopt( curl, CURLOPT_VERBOSE, debug );
+#ifdef HAVE_ZLIB
+    curl_easy_setopt( curl, CURLOPT_ENCODING, "deflate" );
+#endif
+    if( cookies )
+        curl_easy_setopt( curl, CURLOPT_COOKIE, cookies );
+    if( netrc )
+        curl_easy_setopt( curl, CURLOPT_NETRC_FILE, netrc );
+    if( auth )
+        curl_easy_setopt( curl, CURLOPT_USERPWD, auth );
+    return curl;
+}
+
 static void
 processRequests( const char *  host,
                  int           port,
                  const char ** reqs,
                  int           reqCount )
 {
-    int               i;
-    CURL *            curl;
+    int i;
+    CURL * curl = NULL;
     struct evbuffer * buf = evbuffer_new( );
-    char *            url = tr_strdup_printf(
-        "http://%s:%d/transmission/rpc", host, port );
+    char * url = tr_strdup_printf( "http://%s:%d/transmission/rpc", host, port );
 
-    curl = curl_easy_init( );
-    curl_easy_setopt( curl, CURLOPT_VERBOSE, debug );
-#ifdef HAVE_LIBZ
-    curl_easy_setopt( curl, CURLOPT_ENCODING, "deflate" );
-#endif
-    curl_easy_setopt( curl, CURLOPT_USERAGENT, MY_NAME "/" LONG_VERSION_STRING );
-    curl_easy_setopt( curl, CURLOPT_WRITEFUNCTION, writeFunc );
-    curl_easy_setopt( curl, CURLOPT_WRITEDATA, buf );
-    curl_easy_setopt( curl, CURLOPT_POST, 1 );
-    curl_easy_setopt( curl, CURLOPT_URL, url );
-    curl_easy_setopt( curl, CURLOPT_NETRC, CURL_NETRC_OPTIONAL );
-    curl_easy_setopt( curl, CURLOPT_HTTPAUTH, CURLAUTH_ANY );
-    curl_easy_setopt( curl, CURLOPT_TIMEOUT, 60L );
-    if( netrc )
-        curl_easy_setopt( curl, CURLOPT_NETRC_FILE, netrc );
-    if( auth )
-        curl_easy_setopt( curl, CURLOPT_USERPWD, auth );
-
-    for( i = 0; i < reqCount; ++i )
+    for( i=0; i<reqCount; ++i )
     {
         CURLcode res;
+        evbuffer_drain( buf, EVBUFFER_LENGTH( buf ) );
+
+        if( curl == NULL )
+        {
+            curl = tr_curl_easy_init( buf );
+            curl_easy_setopt( curl, CURLOPT_URL, url );
+        }
+
         curl_easy_setopt( curl, CURLOPT_POSTFIELDS, reqs[i] );
+
         if( debug )
             fprintf( stderr, "posting:\n--------\n%s\n--------\n", reqs[i] );
         if( ( res = curl_easy_perform( curl ) ) )
-            tr_nerr( MY_NAME, "(%s:%d) %s", host, port,
-                    curl_easy_strerror( res ) );
-        else
-            processResponse( host, port, EVBUFFER_DATA(
-                                buf ), EVBUFFER_LENGTH( buf ) );
-
-        evbuffer_drain( buf, EVBUFFER_LENGTH( buf ) );
+            tr_nerr( MY_NAME, "(%s:%d) %s", host, port, curl_easy_strerror( res ) );
+        else {
+            long response;
+            curl_easy_getinfo( curl, CURLINFO_RESPONSE_CODE, &response );
+            switch( response ) {
+                case 200:
+                    processResponse( host, port, EVBUFFER_DATA(buf), EVBUFFER_LENGTH(buf) );
+                    break;
+                case 409:
+                    /* session_id cookie expired.  by the time we reach line this our
+                     * curl header func has already found the new session_id, so make
+                     * a new CURL* and try again... */
+                    curl_easy_cleanup( curl );
+                    curl = NULL;
+                    --i;
+                    break;
+                default:
+                    fprintf( stderr, "Unexpected response: %s\n", (char*)EVBUFFER_DATA(buf) );
+                    break;
+            }
+        }
     }
 
     /* cleanup */
     tr_free( url );
     evbuffer_free( buf );
-    curl_easy_cleanup( curl );
+    if( curl != NULL )
+        curl_easy_cleanup( curl );
 }
 
 int
