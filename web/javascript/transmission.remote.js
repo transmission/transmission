@@ -41,22 +41,24 @@ TransmissionRemote.prototype =
 	 * Display an error if an ajax request fails, and stop sending requests
 	 */
 	ajaxError: function(request, error_string, exception) {
-		this._error = request.responseText
-		            ? request.responseText.trim().replace(/(<([^>]+)>)/ig,"")
-		            : "";
-		if( !this._error.length )
-			this._error = 'Server not responding';
+		remote = this;
+		remote._error = request.responseText
+					? request.responseText.trim().replace(/(<([^>]+)>)/ig,"")
+					: "";
+		if( !remote._error.length )
+			remote._error = 'Server not responding';
 		
 		dialog.confirm('Connection Failed', 
 			'Could not connect to the server. You may need to reload the page to reconnect.', 
 			'Details',
-			'alert(transmission.remote._error);',
+			'alert(remote._error);',
 			null,
 			'Dismiss');
-		transmission.togglePeriodicRefresh(false);
+		remote._controller.togglePeriodicRefresh(false);
 	},
 	
 	sendRequest: function( data, success ) {
+		remote = this;
 		$.ajax( {
 			url: RPC._Root,
 			type: 'POST',
@@ -64,7 +66,7 @@ TransmissionRemote.prototype =
 			dataType: 'json',
 			cache: false,
 			data: $.toJSON(data),
-			error: this.ajaxError,
+			error: function(request, error_string, exception){ remote.ajaxError(request, error_string, exception) },
 			success: success
 		} );
 	},
