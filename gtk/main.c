@@ -65,8 +65,7 @@
 #if GTK_CHECK_VERSION( 2, 8, 0 )
  #define SHOW_LICENSE
 static const char * LICENSE =
-    "The Transmission binaries and most of its source code is distributed "
-    "license. "
+    "Most of Transmission is covered by the MIT license."
     "\n\n"
     "Some files are copyrighted by Charles Kerr and are covered by "
     "the GPL version 2.  Works owned by the Transmission project "

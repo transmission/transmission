@@ -10,28 +10,20 @@
  * $Id:$
  */
 
-#ifndef ABOUT_DIALOG_H
-#define ABOUT_DIALOG_H
+#ifndef LICENSE_DIALOG_H
+#define LICENSE_DIALOG_H
 
 #include <QDialog>
 
-class AboutDialog: public QDialog
+class LicenseDialog: public QDialog
 {
         Q_OBJECT
 
-    private:
-        QDialog * myLicenseDialog;
-
     public:
-        AboutDialog( QWidget * parent = 0 );
-        ~AboutDialog( ) { }
-        QWidget * createAboutTab( );
-        QWidget * createAuthorsTab( );
-        QWidget * createLicenseTab( );
-
-    public slots:
-        void showCredits( );
+        LicenseDialog( QWidget * parent = 0 );
+        ~LicenseDialog( ) { }
 
 };
 
 #endif
+
