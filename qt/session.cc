@@ -541,11 +541,7 @@ Session :: exec( const char * request )
         QHttpRequestHeader header( "POST", path );
         header.setValue( "User-Agent", QCoreApplication::instance()->applicationName() + "/" + LONG_VERSION_STRING );
         header.setValue( "Content-Type", "application/json; charset=UTF-8" );
-        if( !myCookies.isEmpty( ) )
-            header.setValue( "Cookie", myCookies );
-        QBuffer * buf = new QBuffer;
-        buf->setData( data );
-        myHttp.request( header, buf, &myBuffer );
+        myHttp.request( header, data, &myBuffer );
 #ifdef DEBUG_HTTP
         std::cerr << "sending " << qPrintable(header.toString()) << "\nBody:\n" << request << std::endl;
 #endif
@@ -565,9 +561,6 @@ Session :: onRequestFinished( int id, bool error )
 {
     Q_UNUSED( id );
 
-    QHttpResponseHeader response = myHttp.lastResponse();
-    QIODevice * sourceDevice = myHttp.currentSourceDevice( );
-
 #ifdef DEBUG_HTTP
     std::cerr << "http request " << id << " ended.. response header: "
               << qPrintable( myHttp.lastResponse().toString() )
@@ -576,32 +569,17 @@ Session :: onRequestFinished( int id, bool error )
               << std::endl;
 #endif
 
-    // very basic handling of cookies: when we get Set-Cookie, throw out all
-    // the previous cookies...  T only uses one cookie (session_id)
-    const QString responseCookies = response.value( "Set-Cookie" );
-    if( !responseCookies.isEmpty( ) )
-        myCookies = responseCookies;
-        
-    if( response.statusCode() == 409 )
-    {
-        // we got a 409 telling us our session cookie has expired.
-        // now that we've updated our cookie, try again.
-        exec( qobject_cast<QBuffer*>(sourceDevice)->buffer().constData( ) );
-    }
-    else if( error )
-    {
+    if( error )
         std::cerr << "http error: " << qPrintable(myHttp.errorString()) << std::endl;
-    }
-    else
-    {
+    else {
         const QByteArray& response( myBuffer.buffer( ) );
         const char * json( response.constData( ) );
         int jsonLength( response.size( ) );
         if( jsonLength>0 && json[jsonLength-1] == '\n' ) --jsonLength;
+
         parseResponse( json, jsonLength );
     }
 
-    delete sourceDevice;
     myBuffer.buffer( ).clear( );
     myBuffer.reset( );
     assert( myBuffer.bytesAvailable( ) < 1 );

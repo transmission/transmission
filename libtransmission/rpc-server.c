@@ -56,7 +56,6 @@ struct tr_rpc_server
     struct in_addr     bindAddress;
     struct evhttp *    httpd;
     tr_session *       session;
-    char *             sessionId;
     char *             username;
     char *             password;
     char *             whitelistStr;
@@ -451,48 +450,22 @@ isAddressAllowed( const tr_rpc_server * server,
     return FALSE;
 }
 
-static char*
-session_id_new( void )
-{
-    int i;
-    const int n = 48;
-    const char * pool = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const size_t pool_size = strlen( pool );
-    char * buf = tr_new( char, n+1 );
-    for( i=0; i<n; ++i )
-        buf[i] = pool[ tr_cryptoRandInt( pool_size ) ];
-    buf[n] = '\0';
-    return buf;
-}
-
-static tr_bool
-test_session_id( struct tr_rpc_server * server, struct evhttp_request * req )
-{
-    char * needle = tr_strdup_printf( "session_id=%s", server->sessionId );
-    const char * haystack = evhttp_find_header( req->input_headers, "Cookie" );
-    const tr_bool success = (haystack!=NULL) && (strstr(haystack,needle)!=NULL);
-    tr_free( needle );
-    return success;
-}
-
 static void
-handle_request( struct evhttp_request * req, void * arg )
+handle_request( struct evhttp_request * req,
+                void *                  arg )
 {
     struct tr_rpc_server * server = arg;
 
     if( req && req->evcon )
     {
         const char * auth;
-        char * user = NULL;
-        char * pass = NULL;
-        char * cookie;
+        char *       user = NULL;
+        char *       pass = NULL;
 
         evhttp_add_header( req->output_headers, "Server", MY_REALM );
-        cookie = tr_strdup_printf( "session_id=%s;Path=/;Discard", server->sessionId );
-        evhttp_add_header( req->output_headers, "Set-Cookie", cookie );
-        tr_free( cookie );
 
         auth = evhttp_find_header( req->input_headers, "Authorization" );
+
         if( auth && !strncasecmp( auth, "basic ", 6 ) )
         {
             int    plen;
@@ -506,7 +479,7 @@ handle_request( struct evhttp_request * req, void * arg )
 
         if( !isAddressAllowed( server, req->remote_host ) )
         {
-            send_simple_response( req, 403,
+            send_simple_response( req, 401,
                 "<p>Unauthorized IP Address.</p>"
                 "<p>Either disable the IP address whitelist or add your address to it.</p>"
                 "<p>If you're editing settings.json, see the 'rpc-whitelist' and 'rpc-whitelist-enabled' entries.</p>"
@@ -537,10 +510,6 @@ handle_request( struct evhttp_request * req, void * arg )
         else if( !strncmp( req->uri, "/transmission/web/", 18 ) )
         {
             handle_clutch( req, server );
-        }
-        else if( !test_session_id( server, req ) )
-        {
-            send_simple_response( req, 409, "<p>Invalid session_id cookie.</p>" );
         }
         else if( !strncmp( req->uri, "/transmission/rpc", 17 ) )
         {
@@ -797,7 +766,6 @@ tr_rpcInit( tr_session  * session,
 
     s = tr_new0( tr_rpc_server, 1 );
     s->session = session;
-    s->sessionId = session_id_new( );
 
     found = tr_bencDictFindBool( settings, TR_PREFS_KEY_RPC_ENABLED, &boolVal );
     assert( found );
