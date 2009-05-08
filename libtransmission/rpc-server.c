@@ -335,13 +335,7 @@ serve_file( struct evhttp_request * req,
         content_len = 0;
         content = tr_loadFile( filename, &content_len );
 
-        if( errno )
-        {
-            char * tmp = tr_strdup_printf( "%s (%s)", filename, tr_strerror( errno ) );
-            send_simple_response( req, HTTP_NOTFOUND, tmp );
-            tr_free( tmp );
-        }
-        else
+        if( content )
         {
             struct evbuffer * out;
             const time_t now = time( NULL );
@@ -356,6 +350,12 @@ serve_file( struct evhttp_request * req,
 
             tr_releaseBuffer( out );
             tr_free( content );
+        }
+        else
+        {
+            char * tmp = tr_strdup_printf( "%s (%s)", filename, tr_strerror( errno ) );
+            send_simple_response( req, HTTP_NOTFOUND, tmp );
+            tr_free( tmp );
         }
     }
 }
