@@ -60,6 +60,9 @@ enum
     ENCRYPTION_PREFERENCE_NO
 };
 
+/* opaque forward declaration */
+struct peer_atom;
+
 /**
  * State information about a connected peer.
  *
@@ -81,6 +84,7 @@ typedef struct tr_peer
     tr_port                  port;
     tr_address               addr;
     struct tr_peerIo       * io;
+    struct peer_atom       * atom;
 
     struct tr_bitfield     * blame;
     struct tr_bitfield     * have;
