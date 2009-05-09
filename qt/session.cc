@@ -543,9 +543,8 @@ Session :: exec( const char * request )
         header.setValue( "Content-Type", "application/json; charset=UTF-8" );
         if( !mySessionId.isEmpty( ) )
             header.setValue( TR_RPC_SESSION_ID_HEADER, mySessionId );
-        QBuffer * buf = new QBuffer;
-        buf->setData( data );
-        myHttp.request( header, buf, &myBuffer );
+        myHttp.setProperty( "current-request", data );
+        myHttp.request( header, data, &myBuffer );
 #ifdef DEBUG_HTTP
         std::cerr << "sending " << qPrintable(header.toString()) << "\nBody:\n" << request << std::endl;
 #endif
@@ -566,7 +565,6 @@ Session :: onRequestFinished( int id, bool error )
     Q_UNUSED( id );
 
     QHttpResponseHeader response = myHttp.lastResponse();
-    QIODevice * sourceDevice = myHttp.currentSourceDevice( );
 
 #ifdef DEBUG_HTTP
     std::cerr << "http request " << id << " ended.. response header: "
@@ -576,12 +574,12 @@ Session :: onRequestFinished( int id, bool error )
               << std::endl;
 #endif
 
-    if( ( response.statusCode() == 409 ) && response.hasKey( TR_RPC_SESSION_ID_HEADER ) )
+    if( ( response.statusCode() == 409 ) && ( myBuffer.buffer().indexOf("invalid session-id") != -1 ) )
     {
         // we got a 409 telling us our session id has expired.
         // update it and resubmit the request.
         mySessionId = response.value( TR_RPC_SESSION_ID_HEADER );
-        exec( qobject_cast<QBuffer*>(sourceDevice)->buffer().constData( ) );
+        exec( myHttp.property("current-request").toByteArray().constData() );
     }
     else if( error )
     {
@@ -596,7 +594,6 @@ Session :: onRequestFinished( int id, bool error )
         parseResponse( json, jsonLength );
     }
 
-    delete sourceDevice;
     myBuffer.buffer( ).clear( );
     myBuffer.reset( );
     assert( myBuffer.bytesAvailable( ) < 1 );
