@@ -479,15 +479,14 @@ tr_bencGetReal( const tr_benc * val, double * setme )
     if( !success && tr_bencIsString(val) )
     {
         char * endptr;
-        char * locale; 
+        char locale[128];
         double d;
 
         /* the json spec requires a '.' decimal point regardless of locale */
-        locale = tr_strdup( setlocale ( LC_NUMERIC, NULL ) );
+        tr_strlcpy( locale, setlocale( LC_NUMERIC, NULL ), sizeof( locale ) );
         setlocale( LC_NUMERIC, "POSIX" );
         d  = strtod( val->val.s.s, &endptr );
         setlocale( LC_NUMERIC, locale );
-        tr_free( locale );
 
         if(( success = ( val->val.s.s != endptr ) && !*endptr ))
             *setme = d;
@@ -1062,15 +1061,14 @@ static void
 saveRealFunc( const tr_benc * val, void * evbuf )
 {
     char buf[128];
-    char * locale;
+    char locale[128];
     size_t len;
 
     /* always use a '.' decimal point s.t. locale-hopping doesn't bite us */
-    locale = tr_strdup( setlocale ( LC_NUMERIC, NULL ) );
+    tr_strlcpy( locale, setlocale( LC_NUMERIC, NULL ), sizeof( locale ) );
     setlocale( LC_NUMERIC, "POSIX" );
     tr_snprintf( buf, sizeof( buf ), "%f", val->val.d );
     setlocale( LC_NUMERIC, locale );
-    tr_free( locale );
 
     len = strlen( buf );
     evbuffer_add_printf( evbuf, "%lu:", (unsigned long)len );
@@ -1278,14 +1276,13 @@ static void
 jsonRealFunc( const tr_benc * val, void * vdata )
 {
     struct jsonWalk * data = vdata;
-    char * locale;
+    char locale[128];
 
     /* json requires a '.' decimal point regardless of locale */
-    locale = tr_strdup( setlocale ( LC_NUMERIC, NULL ) );
+    tr_strlcpy( locale, setlocale( LC_NUMERIC, NULL ), sizeof( locale ) );
     setlocale( LC_NUMERIC, "POSIX" );
     evbuffer_add_printf( data->out, "%f", val->val.d );
     setlocale( LC_NUMERIC, locale );
-    tr_free( locale );
 
     jsonChildFunc( data );
 }
