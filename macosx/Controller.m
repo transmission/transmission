@@ -1690,6 +1690,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         if (![fWindow isMainWindow])
             [fBadger incrementCompleted];
         
+        //bounce download stack
+        [[NSDistributedNotificationCenter defaultCenter] postNotificationName: @"com.apple.DownloadFileFinished"
+            object: [[torrent downloadFolder] stringByAppendingPathComponent: [torrent name]]];
+        
         if ([fDefaults boolForKey: @"QueueSeed"] && [self numToStartFromQueue: NO] <= 0)
         {
             [torrent stopTransfer];
