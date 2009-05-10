@@ -171,18 +171,7 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
     /* Azureus-style */
     if( id[0] == '-' && id[7] == '-' )
     {
-        if( !memcmp( id+1, "UT", 2 ) )
-        {
-            tr_snprintf( buf, buflen, "\xc2\xb5Torrent %d.%d.%d%s",
-                         strint(id+3,1), strint(id+4,1), strint(id+5,1), getMnemonicEnd(id[6]) );
-        }
-        if( !memcmp( id+1, "UM", 2 ) )
-        {
-            tr_snprintf( buf, buflen, "\xc2\xb5Torrent Mac %d.%d.%d%s",
-                         strint(id+3,1), strint(id+4,1), strint(id+5,1), getMnemonicEnd(id[6]) );
-        }
-
-        else if( !memcmp( id+1, "TR", 2 ) )
+        if( !memcmp( id+1, "TR", 2 ) )
         {
             if( !memcmp( id+3, "000", 3 ) ) /* very old client style: -TR0006- is 0.6 */
                 tr_snprintf( buf, buflen, "Transmission 0.%c", id[6] );
@@ -191,6 +180,17 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
             else /* current client style: -TR111Z- is 1.11+ */
                 tr_snprintf( buf, buflen, "Transmission %d.%02d%s", strint(id+3,1), strint(id+4,2),
                           id[6]=='Z' || id[6]=='X' ? "+" : "" );
+        }
+        
+        else if( !memcmp( id+1, "UT", 2 ) )
+        {
+            tr_snprintf( buf, buflen, "\xc2\xb5Torrent %d.%d.%d%s",
+                         strint(id+3,1), strint(id+4,1), strint(id+5,1), getMnemonicEnd(id[6]) );
+        }
+        else if( !memcmp( id+1, "UM", 2 ) )
+        {
+            tr_snprintf( buf, buflen, "\xc2\xb5Torrent Mac %d.%d.%d%s",
+                         strint(id+3,1), strint(id+4,1), strint(id+5,1), getMnemonicEnd(id[6]) );
         }
         
         else if( !memcmp( id+1, "AZ", 2 ) )
