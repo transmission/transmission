@@ -54,6 +54,7 @@ SOFTWARE.
 #include <assert.h>
 #include <ctype.h>
 #include <float.h>
+#include <locale.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -476,7 +477,13 @@ static int parse_parse_buffer(JSON_parser jc)
                         value.vu.str.value = jc->parse_buffer;
                         value.vu.str.length = jc->parse_buffer_count;
                     } else { 
+                        /* the json spec requires a '.' decimal point regardless of locale */
+                        char numeric[128];
+                        snprintf(numeric, sizeof(numeric), "%s", setlocale(LC_NUMERIC, NULL));
+                        setlocale(LC_NUMERIC, "POSIX" );
                         sscanf(jc->parse_buffer, "%Lf", &value.vu.float_value);
+                        value.vu.float_value = strtod(jc->parse_buffer, NULL);
+                        setlocale(LC_NUMERIC, numeric);
                     }
                     break;
                 case JSON_T_INTEGER:
