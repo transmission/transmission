@@ -1,5 +1,23 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
+1.61 (2009/05/11)
+<http://trac.transmissionbt.com/query?milestone=1.61&group=component&groupdesc=1&order=severity>
+- All Platforms
+   + Close potential CSRF security hole for Web Client users
+   + Fix locale error in the JSON parser
+- Qt
+   + Various small bugfixes to the beta Qt client
+- Daemon
+   + transmission-remote was unable to select torrents by their SHA1 hash
+- Web Client
+   + Fix 1.60 error that failed to serve Web Client files on some embedded platforms
+   + Add response header that allows static files to be cached on the client side
+
+1.53 (2009/05/11)
+- All Platforms
+   + Close potential CSRF security hole for Web Client users
+   + Fix locale error in the JSON parser
+
 1.60 (2009/05/04)
 <http://trac.transmissionbt.com/query?milestone=1.60&group=component&groupdesc=1&order=severity>
 - All Platforms
