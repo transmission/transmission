@@ -539,7 +539,7 @@ PrefsDialog :: createTorrentsTab( )
 
         hig->addWideControl( checkBoxNew( tr( "Display &options dialog" ), Prefs::OPTIONS_PROMPT ) );
         hig->addWideControl( checkBoxNew( tr( "&Start when added" ), Prefs::START ) );
-        hig->addWideControl( checkBoxNew( tr( "Mo&ve source files to Trash" ), Prefs::TRASH_ORIGINAL ) );
+        hig->addWideControl( checkBoxNew( tr( "&Delete source files" ), Prefs::TRASH_ORIGINAL ) );
 
         b = myDestinationButton = new QPushButton;
         b->setIcon( folderPixmap );
