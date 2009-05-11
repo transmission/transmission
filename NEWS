@@ -7,11 +7,11 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Fix locale error in the JSON parser
 - Qt
    + Various small bugfixes to the beta Qt client
-- Daemon
-   + transmission-remote was unable to select torrents by their SHA1 hash
 - Web Client
    + Fix 1.60 error that failed to serve Web Client files on some embedded platforms
    + Add response header that allows static files to be cached on the client side
+- Daemon
+   + transmission-remote was unable to select torrents by their SHA1 hash
 
 1.53 (2009/05/11)
 - All Platforms

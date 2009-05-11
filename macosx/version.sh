@@ -7,8 +7,8 @@
 #         "Z" for unsupported trunk builds,
 #         "0" for stable, supported releases
 # these should be the only two lines you need to change
-PEERID_PREFIX="-TR160Z-"
-USERAGENT_PREFIX="1.60+"
+PEERID_PREFIX="-TR1610-"
+USERAGENT_PREFIX="1.61"
 
 SVN_REVISION=`find -E ./libtransmission ./macosx                     \
                   -regex ".*\.([chmp]|cpp|po|sh)"                    \
