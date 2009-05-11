@@ -15,14 +15,14 @@ msgstr ""
 "Project-Id-Version: Transmission 1.40b1 (7032)\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-04-25 17:53-0500\n"
-"PO-Revision-Date: 2009-05-04 20:26+0000\n"
+"PO-Revision-Date: 2009-05-05 18:52+0000\n"
 "Last-Translator: Arnout Lok <Unknown>\n"
 "Language-Team: vertaling@vrijschrift.org\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2009-05-05 00:28+0000\n"
+"X-Launchpad-Export-Date: 2009-05-11 18:20+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:49
@@ -43,7 +43,7 @@ msgstr "Sorteren op _ratio"
 
 #: ../gtk/actions.c:53
 msgid "Sort by _State"
-msgstr "Sorteren op _status"
+msgstr "Sorteren op stat_us"
 
 #: ../gtk/actions.c:54
 msgid "Sort by _Tracker"
@@ -211,7 +211,7 @@ msgstr "Bronbestand in de _prullenbak gooien"
 
 #: ../gtk/add-dialog.c:300 ../gtk/tr-prefs.c:297
 msgid "_Start when added"
-msgstr "_Starten na toevoegen"
+msgstr "_Starten na het toevoegen"
 
 #: ../gtk/add-dialog.c:311
 msgid "_Torrent file:"
@@ -1591,7 +1591,7 @@ msgstr "Sorteren op _grootte"
 #: ../gtk/conf.c:513 ../gtk/conf.c:518 ../gtk/conf.c:525
 #, c-format
 msgid "Importing \"%s\""
-msgstr ""
+msgstr "\\\"%s\\\" importeren"
 
 #: ../gtk/details.c:453
 #, c-format
@@ -1599,10 +1599,12 @@ msgid ""
 "Use _Global setting  (currently: stop seeding when a torrent's ratio reaches "
 "%.2f)"
 msgstr ""
+"_Globale instelling gebruiken (momenteel: stoppen met seeden van een torrent "
+"bij een ratio van %.2f)"
 
 #: ../gtk/details.c:455
 msgid "Use _Global setting  (currently: seed regardless of ratio)"
-msgstr ""
+msgstr "_Globale instelling gebruiken (momenteel: seeden ongeacht ratio)"
 
 #: ../gtk/details.c:535 ../gtk/tr-prefs.c:1381
 msgid "Speed"
@@ -1610,23 +1612,23 @@ msgstr "Snelheid"
 
 #: ../gtk/details.c:537
 msgid "Honor global _limits"
-msgstr ""
+msgstr "Globale _limieten aanhouden"
 
 #: ../gtk/details.c:568
 msgid "_Bandwidth priority:"
-msgstr ""
+msgstr "_Bandbreedteprioriteit:"
 
 #: ../gtk/details.c:572
 msgid "Seed-Until Ratio"
-msgstr ""
+msgstr "Seeden tot ratio"
 
 #: ../gtk/details.c:587
 msgid "Seed _regardless of ratio"
-msgstr ""
+msgstr "Seeden ongeacht _ratio"
 
 #: ../gtk/details.c:596
 msgid "_Stop seeding when a torrent's ratio reaches"
-msgstr ""
+msgstr "_Stoppen met seeden van een torrent bij een ratio van"
 
 #: ../gtk/details.c:635
 msgid "Verifying local data"
@@ -1657,7 +1659,7 @@ msgstr "Web-seeds"
 
 #: ../gtk/details.c:1734
 msgid "None sent"
-msgstr ""
+msgstr "Geen verzonden"
 
 #: ../gtk/details.c:2063
 #, c-format
@@ -1675,7 +1677,7 @@ msgstr "%1$s, %2$s geüpload (ratio: %3$s doel: %4$s)"
 
 #: ../gtk/tr-prefs.c:311
 msgid "_Stop seeding torrents at ratio:"
-msgstr ""
+msgstr "S_top met het seeden van torrents bij ratio:"
 
 #: ../gtk/tr-prefs.c:402
 #, c-format
@@ -1762,15 +1764,17 @@ msgstr "Globale bandbreedtelimieten"
 
 #: ../gtk/tr-prefs.c:1195
 msgid "Speed Limit Mode"
-msgstr ""
+msgstr "Snelheidslimietmodus"
 
 #: ../gtk/tr-prefs.c:1202
 msgid "Limit do_wnload speed (KB/s):"
-msgstr "_Downloadsnelheid limiteren (KB/s):"
+msgstr "Do_wnloadsnelheid limiteren (KB/s):"
 
 #: ../gtk/tr-prefs.c:1210
 msgid "When enabled, Speed Limit Mode overrides the Global Bandwidth Limits"
 msgstr ""
+"Wanneer ingeschakeld, heeft de snelheidslimietmodus voorrang op de globale "
+"bandbreedtelimieten"
 
 #: ../gtk/tr-prefs.c:1216
 msgid "Use Speed Limit Mode between:"
@@ -1778,7 +1782,7 @@ msgstr "Snelheidslimietmodus gebruiken tussen:"
 
 #: ../gtk/tr-prefs.c:1231
 msgid "_On days:"
-msgstr "_Op de dagen:"
+msgstr "Op de d_agen:"
 
 #: ../gtk/tr-prefs.c:1264 ../gtk/tr-prefs.c:1326
 msgid "Status unknown"
@@ -1802,11 +1806,11 @@ msgstr "Een willekeurige poort kiezen bij het opstarten"
 
 #: ../gtk/tr-window.c:330
 msgid "Click to disable Speed Limit Mode"
-msgstr ""
+msgstr "Klik om de snelheidslimietmodus uit te schakelen"
 
 #: ../gtk/tr-window.c:331
 msgid "Click to enable Speed Limit Mode"
-msgstr ""
+msgstr "Klik om de snelheidslimietmodus in te schakelen"
 
 #: ../gtk/tr-window.c:630
 msgid "Unlimited"
@@ -1814,7 +1818,7 @@ msgstr "Onbeperkt"
 
 #: ../gtk/tr-window.c:697
 msgid "Seed Forever"
-msgstr ""
+msgstr "Oneindig seeden"
 
 #: ../gtk/tr-window.c:735
 msgid "Limit Download Speed"
@@ -1836,7 +1840,7 @@ msgstr "Stop bij ratio (%s)"
 #: ../libtransmission/net.c:497
 #, c-format
 msgid "Couldn't set source address %s on %d: %s"
-msgstr ""
+msgstr "Kon bronadres %s op %d niet instellen: %s"
 
 #: ../libtransmission/port-forwarding.c:222
 #, c-format

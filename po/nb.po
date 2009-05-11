@@ -9,14 +9,14 @@ msgstr ""
 "Project-Id-Version: transmission 1.06\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2009-04-25 17:53-0500\n"
-"PO-Revision-Date: 2009-03-07 15:18+0000\n"
+"PO-Revision-Date: 2009-05-07 19:47+0000\n"
 "Last-Translator: Geir Hauge <Unknown>\n"
 "Language-Team: Norwegian <en@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2009-05-05 00:28+0000\n"
+"X-Launchpad-Export-Date: 2009-05-11 18:20+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:49
@@ -1040,7 +1040,7 @@ msgstr "Aktiver _automatisk oppdatering"
 
 #: ../gtk/tr-prefs.c:530
 msgid "Maximum peers _overall:"
-msgstr "Maksimalt _antall nedlastere totalt:"
+msgstr "_Maksimalt antall nedlastere totalt:"
 
 #: ../gtk/tr-prefs.c:532
 msgid "Maximum peers per _torrent:"
@@ -1556,16 +1556,16 @@ msgstr "Køet for verifisering"
 
 #: ../gtk/actions.c:56
 msgid "Sort by _ETA"
-msgstr ""
+msgstr "Sorter etter _ETA"
 
 #: ../gtk/actions.c:57
 msgid "Sort by Si_ze"
-msgstr ""
+msgstr "Sorter etter St_ørrelse"
 
 #: ../gtk/conf.c:513 ../gtk/conf.c:518 ../gtk/conf.c:525
 #, c-format
 msgid "Importing \"%s\""
-msgstr ""
+msgstr "Importerer «%s»"
 
 #: ../gtk/details.c:453
 #, c-format
@@ -1573,74 +1573,78 @@ msgid ""
 "Use _Global setting  (currently: stop seeding when a torrent's ratio reaches "
 "%.2f)"
 msgstr ""
+"Bruk _globale innstillinger (for øyeblikket: slutt å dele når delingsraten "
+"på torrenten når %.2f)"
 
 #: ../gtk/details.c:455
 msgid "Use _Global setting  (currently: seed regardless of ratio)"
 msgstr ""
+"Bruk _globale instillinger (for øyeblikket: del torrenten uansett hva "
+"delingsraten er)"
 
 #: ../gtk/details.c:535 ../gtk/tr-prefs.c:1381
 msgid "Speed"
-msgstr ""
+msgstr "Hastighet"
 
 #: ../gtk/details.c:537
 msgid "Honor global _limits"
-msgstr ""
+msgstr "_Ikke overskrid globale begrensninger"
 
 #: ../gtk/details.c:568
 msgid "_Bandwidth priority:"
-msgstr ""
+msgstr "_Båndbreddeprioritet"
 
 #: ../gtk/details.c:572
 msgid "Seed-Until Ratio"
-msgstr ""
+msgstr "Del til delingsraten er ..."
 
 #: ../gtk/details.c:587
 msgid "Seed _regardless of ratio"
-msgstr ""
+msgstr "Del torrenten _uansett hva delingsraten er"
 
 #: ../gtk/details.c:596
 msgid "_Stop seeding when a torrent's ratio reaches"
-msgstr ""
+msgstr "_Slutt å dele når delingsraten på torrenten når"
 
 #: ../gtk/details.c:635
 msgid "Verifying local data"
-msgstr ""
+msgstr "Verifiserer lokal data"
 
 #: ../gtk/details.c:636
 msgid "Downloading"
-msgstr ""
+msgstr "Laster ned"
 
 #: ../gtk/details.c:637
 msgid "Seeding"
-msgstr ""
+msgstr "Deler"
 
 #: ../gtk/details.c:706
 #, c-format
 msgid "%1$s (%2$s verified in %3$d piece)"
 msgid_plural "%1$s (%2$s verified in %3$d pieces)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s (%2$s verifisert i %3$d bruddstykke)"
+msgstr[1] "%1$s (%2$s verifisert i %3$d bruddstykker)"
 
 #: ../gtk/details.c:860
 msgid "Swarm speed:"
-msgstr ""
+msgstr "Svermhastighet:"
 
 #: ../gtk/details.c:1085
 msgid "Destination:"
-msgstr ""
+msgstr "Mål:"
 
 #: ../gtk/details.c:1118
 msgid "Webseeds"
-msgstr ""
+msgstr "Vevdelere"
 
 #: ../gtk/details.c:1734
 msgid "None sent"
-msgstr ""
+msgstr "Ingen sendt"
 
 #: ../gtk/details.c:2063
 #, c-format
 msgid "%'d Torrent Properties"
-msgstr ""
+msgstr "Egenskaper for %'d torrenter"
 
 #. %1$s is the torrent's total size,
 #. %2$s is how much we've uploaded,
@@ -1649,30 +1653,30 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:88
 #, c-format
 msgid "%1$s, uploaded %2$s (Ratio: %3$s Goal: %4$s)"
-msgstr ""
+msgstr "%1$s, %2$s lastet opp (delingsrate: %3$s, mål: %4$s)"
 
 #: ../gtk/tr-prefs.c:311
 msgid "_Stop seeding torrents at ratio:"
-msgstr ""
+msgstr "Slutt å _dele torrenter når delingsraten er:"
 
 #: ../gtk/tr-prefs.c:402
 #, c-format
 msgid "Blocklist now has %'d rule."
 msgid_plural "Blocklist now has %'d rules."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Blokkeringsliste inneholder nå %'d regel."
+msgstr[1] "Blokkeringsliste inneholder nå %'d regler."
 
 #: ../gtk/tr-prefs.c:406
 msgid "<b>Update succeeded!</b>"
-msgstr ""
+msgstr "<b>Oppdateringen var vellykket!</b>"
 
 #: ../gtk/tr-prefs.c:421
 msgid "Update Blocklist"
-msgstr ""
+msgstr "Oppdatering av blokkeringsliste"
 
 #: ../gtk/tr-prefs.c:423
 msgid "Getting new blocklist..."
-msgstr ""
+msgstr "Henter ny blokkeringsliste ..."
 
 #: ../gtk/tr-prefs.c:458
 msgid "Plaintext Preferred"
@@ -1680,75 +1684,77 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:459
 msgid "Encryption Preferred"
-msgstr ""
+msgstr "Kryptering er foretrukket"
 
 #: ../gtk/tr-prefs.c:460
 msgid "Encryption Required"
-msgstr ""
+msgstr "Kryptering er nødvendig"
 
 #: ../gtk/tr-prefs.c:535
 msgid "Privacy"
-msgstr ""
+msgstr "Personvern"
 
 #: ../gtk/tr-prefs.c:537
 msgid "_Encryption mode"
-msgstr ""
+msgstr "_Krypteringsmodus"
 
 #: ../gtk/tr-prefs.c:1115
 msgid "Every Day"
-msgstr ""
+msgstr "Hver dag"
 
 #: ../gtk/tr-prefs.c:1116
 msgid "Weekdays"
-msgstr ""
+msgstr "Ukedager"
 
 #: ../gtk/tr-prefs.c:1117
 msgid "Weekends"
-msgstr ""
+msgstr "Helger"
 
 #: ../gtk/tr-prefs.c:1118
 msgid "Sunday"
-msgstr ""
+msgstr "Søndag"
 
 #: ../gtk/tr-prefs.c:1119
 msgid "Monday"
-msgstr ""
+msgstr "Mandag"
 
 #: ../gtk/tr-prefs.c:1120
 msgid "Tuesday"
-msgstr ""
+msgstr "Tirsdag"
 
 #: ../gtk/tr-prefs.c:1121
 msgid "Wednesday"
-msgstr ""
+msgstr "Onsdag"
 
 #: ../gtk/tr-prefs.c:1122
 msgid "Thursday"
-msgstr ""
+msgstr "Torsdag"
 
 #: ../gtk/tr-prefs.c:1123
 msgid "Friday"
-msgstr ""
+msgstr "Fredag"
 
 #: ../gtk/tr-prefs.c:1124
 msgid "Saturday"
-msgstr ""
+msgstr "Lørdag"
 
 #: ../gtk/tr-prefs.c:1175
 msgid "Global Bandwidth Limits"
-msgstr ""
+msgstr "Globale båndbreddebegrensninger"
 
 #: ../gtk/tr-prefs.c:1195
 msgid "Speed Limit Mode"
-msgstr ""
+msgstr "Tidsbasert hastighetbegrensning"
 
 #: ../gtk/tr-prefs.c:1202
 msgid "Limit do_wnload speed (KB/s):"
-msgstr ""
+msgstr "Begrens ne_dlastingshastighet (KiB/s):"
 
 #: ../gtk/tr-prefs.c:1210
 msgid "When enabled, Speed Limit Mode overrides the Global Bandwidth Limits"
 msgstr ""
+"Når tidsbasert hastighetbegrensning er i effekt, vil den overstyre de "
+"globale båndbreddebegrensningene"
 
 #: ../gtk/tr-prefs.c:1216
 msgid "Use Speed Limit Mode between:"

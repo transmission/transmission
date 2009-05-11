@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2009-05-05 00:28+0000\n"
+"X-Launchpad-Export-Date: 2009-05-11 18:20+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:49
@@ -708,6 +708,7 @@ msgstr ""
 "  Incze GASPAR https://launchpad.net/~inczegaspar\n"
 "  Messó https://launchpad.net/~redhat24\n"
 "  Pittmann Tamás https://launchpad.net/~zaivaldi\n"
+"  ifj. Kalman Tarnay https://launchpad.net/~kalmisoft\n"
 "  Úr Balázs https://launchpad.net/~urbalazs\n"
 "  Γριφεγ https://launchpad.net/~grfgguvf"
 

@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2009-04-25 17:53-0500\n"
-"PO-Revision-Date: 2009-05-04 17:30+0000\n"
-"Last-Translator: Adrian Guniš <andygun696@gmail.com>\n"
+"PO-Revision-Date: 2009-05-10 11:34+0000\n"
+"Last-Translator: Kamil Páral <ripper42@gmail.com>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2009-05-05 00:28+0000\n"
+"X-Launchpad-Export-Date: 2009-05-11 18:21+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:49
@@ -505,7 +505,7 @@ msgstr "Trackery"
 
 #: ../gtk/details.c:1887
 msgid "Scrape"
-msgstr "Scrape"
+msgstr "Scrape (získávání statistik o počtu poskytujících a protějšků)"
 
 #: ../gtk/details.c:1889
 msgid "Last scrape at:"
@@ -908,7 +908,7 @@ msgstr "Nečinný"
 #: ../gtk/torrent-cell-renderer.c:179 ../gtk/tr-torrent.c:240
 #, c-format
 msgid "Verifying local data (%.1f%% tested)"
-msgstr "Ověřování místních dat (%.1f%% ověřeno)"
+msgstr "Ověřování místních dat (ověřeno %.1f%%)"
 
 #: ../gtk/torrent-cell-renderer.c:190 ../gtk/tr-window.c:1058
 #: ../gtk/tr-window.c:1086
@@ -1012,7 +1012,7 @@ msgstr "Zobrazit _ikonu v oznamovací oblasti"
 
 #: ../gtk/tr-prefs.c:345
 msgid "Show desktop _notifications"
-msgstr "Zobrazovat upozor_nění"
+msgstr "Zobrazovat u_pozornění"
 
 #: ../gtk/tr-prefs.c:372
 #, c-format
@@ -1061,7 +1061,7 @@ msgstr "_Otevřít webové rozhraní"
 
 #: ../gtk/tr-prefs.c:769
 msgid "Listening _port:"
-msgstr "Naslouchání na _portu:"
+msgstr "Naslouchání na po_rtu:"
 
 #. require authentication
 #: ../gtk/tr-prefs.c:773
@@ -1157,12 +1157,12 @@ msgstr "Pracovní prostředí"
 
 #: ../gtk/tr-prefs.c:1390
 msgid "Web"
-msgstr "WWW"
+msgstr "Web"
 
 #: ../gtk/tr-torrent.c:233
 #, c-format
 msgid "Waiting to verify local data (%.1f%% tested)"
-msgstr "Čekání na ověření místních dat (%.1f%% ověřeno)"
+msgstr "Čekání na ověření místních dat (ověřeno %.1f%%)"
 
 #. %s is # of minutes
 #: ../gtk/tr-torrent.c:253
@@ -1590,11 +1590,11 @@ msgstr "Rychlost"
 
 #: ../gtk/details.c:537
 msgid "Honor global _limits"
-msgstr "Dodržovat globální _omezení"
+msgstr "_Dodržovat globální omezení"
 
 #: ../gtk/details.c:568
 msgid "_Bandwidth priority:"
-msgstr ""
+msgstr "_Priorita šířky pásma:"
 
 #: ../gtk/details.c:572
 msgid "Seed-Until Ratio"
@@ -1606,7 +1606,7 @@ msgstr "Sdílet _bez ohledu na poměr"
 
 #: ../gtk/details.c:596
 msgid "_Stop seeding when a torrent's ratio reaches"
-msgstr "_Zastavit sdílení torrentu při dosažení poměru"
+msgstr "Z_astavit sdílení torrentu při dosažení poměru"
 
 #: ../gtk/details.c:635
 msgid "Verifying local data"
@@ -1624,29 +1624,30 @@ msgstr "Sdílení"
 #, c-format
 msgid "%1$s (%2$s verified in %3$d piece)"
 msgid_plural "%1$s (%2$s verified in %3$d pieces)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s (ověřeno %2$s v %3$d části)"
+msgstr[1] "%1$s (ověřeno %2$s ve %3$d částech)"
+msgstr[2] "%1$s (ověřeno %2$s v %3$d částech)"
 
 #: ../gtk/details.c:860
 msgid "Swarm speed:"
-msgstr ""
+msgstr "Rychlost skupiny uživatelů:"
 
 #: ../gtk/details.c:1085
 msgid "Destination:"
-msgstr ""
+msgstr "Cíl:"
 
 #: ../gtk/details.c:1118
 msgid "Webseeds"
-msgstr ""
+msgstr "Sdílení přes webové servery"
 
 #: ../gtk/details.c:1734
 msgid "None sent"
-msgstr ""
+msgstr "Nic neposláno"
 
 #: ../gtk/details.c:2063
 #, c-format
 msgid "%'d Torrent Properties"
-msgstr ""
+msgstr "Vlastnosti torrentu %'d"
 
 #. Translators: translate "translator-credits" as
 #. your name
@@ -1667,198 +1668,201 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:88
 #, c-format
 msgid "%1$s, uploaded %2$s (Ratio: %3$s Goal: %4$s)"
-msgstr ""
+msgstr "%1$s, odesláno %2$s (Poměr: %3$s, Cíl: %4$s)"
 
 #: ../gtk/tr-prefs.c:311
 msgid "_Stop seeding torrents at ratio:"
-msgstr ""
+msgstr "Z_astavit sdílení torrentů při poměru:"
 
 #: ../gtk/tr-prefs.c:402
 #, c-format
 msgid "Blocklist now has %'d rule."
 msgid_plural "Blocklist now has %'d rules."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Seznam blokovaných má nyní %'d údaj."
+msgstr[1] "Seznam blokovaných má nyní %'d údaje."
+msgstr[2] "Seznam blokovaných má nyní %'d údajů."
 
 #: ../gtk/tr-prefs.c:406
 msgid "<b>Update succeeded!</b>"
-msgstr ""
+msgstr "<b>Aktualizace proběhla úspěšně!</b>"
 
 #: ../gtk/tr-prefs.c:421
 msgid "Update Blocklist"
-msgstr ""
+msgstr "Aktualizovat seznam blokovaných"
 
 #: ../gtk/tr-prefs.c:423
 msgid "Getting new blocklist..."
-msgstr ""
+msgstr "Získává se nový seznam blokovaných..."
 
 #: ../gtk/tr-prefs.c:458
 msgid "Plaintext Preferred"
-msgstr ""
+msgstr "preferovat čistý text"
 
 #: ../gtk/tr-prefs.c:459
 msgid "Encryption Preferred"
-msgstr ""
+msgstr "preferovat šifrovaný"
 
 #: ../gtk/tr-prefs.c:460
 msgid "Encryption Required"
-msgstr ""
+msgstr "požadovat šifrováný"
 
 #: ../gtk/tr-prefs.c:535
 msgid "Privacy"
-msgstr ""
+msgstr "Soukromí"
 
 #: ../gtk/tr-prefs.c:537
 msgid "_Encryption mode"
-msgstr ""
+msgstr "_Režim šifrování"
 
 #: ../gtk/tr-prefs.c:1115
 msgid "Every Day"
-msgstr ""
+msgstr "Každý den"
 
 #: ../gtk/tr-prefs.c:1116
 msgid "Weekdays"
-msgstr ""
+msgstr "Pracovní dny"
 
 #: ../gtk/tr-prefs.c:1117
 msgid "Weekends"
-msgstr ""
+msgstr "Víkendy"
 
 #: ../gtk/tr-prefs.c:1118
 msgid "Sunday"
-msgstr ""
+msgstr "Neděle"
 
 #: ../gtk/tr-prefs.c:1119
 msgid "Monday"
-msgstr ""
+msgstr "Pondělí"
 
 #: ../gtk/tr-prefs.c:1120
 msgid "Tuesday"
-msgstr ""
+msgstr "Úterý"
 
 #: ../gtk/tr-prefs.c:1121
 msgid "Wednesday"
-msgstr ""
+msgstr "Středa"
 
 #: ../gtk/tr-prefs.c:1122
 msgid "Thursday"
-msgstr ""
+msgstr "Čtvrtek"
 
 #: ../gtk/tr-prefs.c:1123
 msgid "Friday"
-msgstr ""
+msgstr "Pátek"
 
 #: ../gtk/tr-prefs.c:1124
 msgid "Saturday"
-msgstr ""
+msgstr "Sobota"
 
 #: ../gtk/tr-prefs.c:1175
 msgid "Global Bandwidth Limits"
-msgstr ""
+msgstr "Globální omezení šírky pásma"
 
 #: ../gtk/tr-prefs.c:1195
 msgid "Speed Limit Mode"
-msgstr ""
+msgstr "Režim omezení rychlosti"
 
 #: ../gtk/tr-prefs.c:1202
 msgid "Limit do_wnload speed (KB/s):"
-msgstr ""
+msgstr "Max. rychlost s_tahování (KB/s):"
 
 #: ../gtk/tr-prefs.c:1210
 msgid "When enabled, Speed Limit Mode overrides the Global Bandwidth Limits"
 msgstr ""
+"Když je povoleno, režim omezení rychlosti překročí globální omezení šířky "
+"pásma"
 
 #: ../gtk/tr-prefs.c:1216
 msgid "Use Speed Limit Mode between:"
-msgstr ""
+msgstr "Použít režim omezení rychlosti mezi:"
 
 #: ../gtk/tr-prefs.c:1231
 msgid "_On days:"
-msgstr ""
+msgstr "_Ve dnech:"
 
 #: ../gtk/tr-prefs.c:1264 ../gtk/tr-prefs.c:1326
 msgid "Status unknown"
-msgstr ""
+msgstr "Neznámý stav"
 
 #: ../gtk/tr-prefs.c:1297
 msgid "<i>Testing...</i>"
-msgstr ""
+msgstr "<i>Testuje se...</i>"
 
 #: ../gtk/tr-prefs.c:1321
 msgid "_Port for incoming connections:"
-msgstr ""
+msgstr "_Port pro příchozí spojení:"
 
 #: ../gtk/tr-prefs.c:1329
 msgid "_Test Port"
-msgstr ""
+msgstr "O_testovat port"
 
 #: ../gtk/tr-prefs.c:1336
 msgid "Randomize the port every launch"
-msgstr ""
+msgstr "Nastavit náhodný port při každém spuštění"
 
 #: ../gtk/tr-window.c:330
 msgid "Click to disable Speed Limit Mode"
-msgstr ""
+msgstr "Klikněte pro zakázání režimu omezení rychlosti"
 
 #: ../gtk/tr-window.c:331
 msgid "Click to enable Speed Limit Mode"
-msgstr ""
+msgstr "Klikněte pro povolení režimu omezení rychlosti"
 
 #: ../gtk/tr-window.c:630
 msgid "Unlimited"
-msgstr ""
+msgstr "Neomezená"
 
 #: ../gtk/tr-window.c:697
 msgid "Seed Forever"
-msgstr ""
+msgstr "Sdílet pořád"
 
 #: ../gtk/tr-window.c:735
 msgid "Limit Download Speed"
-msgstr ""
+msgstr "Max. rychlost stahování"
 
 #: ../gtk/tr-window.c:739
 msgid "Limit Upload Speed"
-msgstr ""
+msgstr "Max. rychlost odesílání"
 
 #: ../gtk/tr-window.c:746
 msgid "Stop Seeding at Ratio"
-msgstr ""
+msgstr "Zastavit sdílení při poměru"
 
 #: ../gtk/tr-window.c:780
 #, c-format
 msgid "Stop at Ratio (%s)"
-msgstr ""
+msgstr "Zastavit při poměru (%s)"
 
 #: ../libtransmission/net.c:497
 #, c-format
 msgid "Couldn't set source address %s on %d: %s"
-msgstr ""
+msgstr "Nelze nastavit zdrojovou adresu %s na %d: %s"
 
 #: ../libtransmission/port-forwarding.c:222
 #, c-format
 msgid "Checking to see if port %d is still open"
-msgstr ""
+msgstr "Ověřování, zda je port %d stále otevřen"
 
 #: ../libtransmission/session.c:642 ../libtransmission/session.c:654
 #, c-format
 msgid "%s is not a valid address"
-msgstr ""
+msgstr "%s není platná adresa"
 
 #: ../libtransmission/session.c:645
 #, c-format
 msgid "%s is not an IPv4 address"
-msgstr ""
+msgstr "%s není adresa IPv4"
 
 #: ../libtransmission/session.c:657
 #, c-format
 msgid "%s is not an IPv6 address"
-msgstr ""
+msgstr "%s není adresa IPv6"
 
 #: ../libtransmission/session.c:663
 msgid "System does not seem to support IPv6. Not listening onan IPv6 address"
-msgstr ""
+msgstr "Zdá se, že systém nepodporuje IPv6. Nenaslouchá se na adrese IPv6"
 
 #: ../libtransmission/upnp.c:144
 #, c-format
 msgid "Port %d isn't forwarded"
-msgstr ""
+msgstr "Port %d není přesměrován"
