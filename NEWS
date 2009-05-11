@@ -8,8 +8,8 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 - Qt
    + Various small bugfixes to the beta Qt client
 - Web Client
-   + Fix 1.60 error that failed to serve Web Client files on some embedded platforms
-   + Add response header that allows static files to be cached on the client side
+   + Fix 1.60 error when serving Web Client files on some embedded platforms
+   + Add response header to allow clients to cache static files
 - Daemon
    + transmission-remote was unable to select torrents by their SHA1 hash
 
