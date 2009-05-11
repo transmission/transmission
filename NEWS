@@ -1,5 +1,11 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
+1.53 (2009/05/11)
+This 1.5x maintenance release backports two bugfixes from 1.61.
+- All Platforms
+   + Close potential CSRF security hole for Web Client users
+   + Fix locale error in the JSON parser
+
 1.52 (2009/04/12)
 <http://trac.transmissionbt.com/query?milestone=1.52&group=component&groupdesc=1&order=severity>
 - Mac
