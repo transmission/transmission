@@ -29,6 +29,7 @@
 
 #include "transmission.h"
 #include "bencode.h"
+#include "crypto.h"
 #include "list.h"
 #include "platform.h"
 #include "rpcimpl.h"
@@ -36,6 +37,13 @@
 #include "trevent.h"
 #include "utils.h"
 #include "web.h"
+
+/* session-id is used to make cross-site request forgery attacks difficult.
+ * Don't disable this feature unless you really know what you're doing!
+ * http://en.wikipedia.org/wiki/Cross-site_request_forgery
+ * http://shiflett.org/articles/cross-site-request-forgeries
+ * http://www.webappsec.org/lists/websecurity/archive/2008-04/msg00037.html */
+#define REQUIRE_SESSION_ID
 
 #define MY_NAME "RPC Server"
 #define MY_REALM "Transmission"
@@ -57,6 +65,9 @@ struct tr_rpc_server
     char *             password;
     char *             whitelistStr;
     tr_list *          whitelist;
+
+    char *             sessionId;
+    time_t             sessionIdExpiresAt;
 
 #ifdef HAVE_ZLIB
     z_stream           stream;
@@ -445,22 +456,55 @@ isAddressAllowed( const tr_rpc_server * server,
     return FALSE;
 }
 
+static char*
+get_current_session_id( struct tr_rpc_server * server )
+{
+    const time_t now = time( NULL );
+
+    if( !server->sessionId || ( now >= server->sessionIdExpiresAt ) )
+    {
+        int i;
+        const int n = 48;
+        const char * pool = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        const size_t pool_size = strlen( pool );
+        char * buf = tr_new( char, n+1 );
+
+        for( i=0; i<n; ++i )
+            buf[i] = pool[ tr_cryptoRandInt( pool_size ) ];
+        buf[n] = '\0';
+
+        tr_free( server->sessionId );
+        server->sessionId = buf;
+        server->sessionIdExpiresAt = now + (60*60); /* expire in an hour */
+    }
+
+    return server->sessionId;
+}
+
+
+static tr_bool
+test_session_id( struct tr_rpc_server * server, struct evhttp_request * req )
+{
+    const char * ours = get_current_session_id( server );
+    const char * theirs = evhttp_find_header( req->input_headers, TR_RPC_SESSION_ID_HEADER );
+    const tr_bool success =  theirs && !strcmp( theirs, ours );
+    return success;
+}
+
 static void
-handle_request( struct evhttp_request * req,
-                void *                  arg )
+handle_request( struct evhttp_request * req, void * arg )
 {
     struct tr_rpc_server * server = arg;
 
     if( req && req->evcon )
     {
         const char * auth;
-        char *       user = NULL;
-        char *       pass = NULL;
+        char * user = NULL;
+        char * pass = NULL;
 
         evhttp_add_header( req->output_headers, "Server", MY_REALM );
 
         auth = evhttp_find_header( req->input_headers, "Authorization" );
-
         if( auth && !strncasecmp( auth, "basic ", 6 ) )
         {
             int    plen;
@@ -474,7 +518,7 @@ handle_request( struct evhttp_request * req,
 
         if( !isAddressAllowed( server, req->remote_host ) )
         {
-            send_simple_response( req, 401,
+            send_simple_response( req, 403,
                 "<p>Unauthorized IP Address.</p>"
                 "<p>Either disable the IP address whitelist or add your address to it.</p>"
                 "<p>If you're editing settings.json, see the 'rpc-whitelist' and 'rpc-whitelist-enabled' entries.</p>"
@@ -505,6 +549,22 @@ handle_request( struct evhttp_request * req,
         {
             handle_clutch( req, server );
         }
+#ifdef REQUIRE_SESSION_ID
+        else if( !test_session_id( server, req ) )
+        {
+            const char * sessionId = get_current_session_id( server );
+            char * tmp = tr_strdup_printf(
+                "<p>Please add this header to your requests:</p>"
+                "<p><code>%s: %s</code></p>"
+                "<p>This requirement is to make "
+                "<a href=\"http://en.wikipedia.org/wiki/Cross-site_request_forgery\">CSRF</a>"
+                " attacks more difficult.</p>",
+                TR_RPC_SESSION_ID_HEADER, sessionId );
+            evhttp_add_header( req->output_headers, TR_RPC_SESSION_ID_HEADER, sessionId );
+            send_simple_response( req, 409, tmp );
+            tr_free( tmp );
+        }
+#endif
         else if( !strncmp( req->uri, "/transmission/rpc", 17 ) )
         {
             handle_rpc( req, server );

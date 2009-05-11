@@ -1223,7 +1223,7 @@ getMaxPeerCount( const tr_torrent * tor )
 static int
 getPeerCount( const Torrent * t )
 {
-    return tr_ptrArraySize( &t->peers );// + tr_ptrArraySize( &t->outgoingHandshakes );
+    return tr_ptrArraySize( &t->peers );/* + tr_ptrArraySize( &t->outgoingHandshakes ); */
 }
 
 /* FIXME: this is kind of a mess. */

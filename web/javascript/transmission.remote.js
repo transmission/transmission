@@ -35,17 +35,29 @@ TransmissionRemote.prototype =
 	initialize: function(controller) {
 		this._controller = controller;
 		this._error = '';
+		this._token = '';
 	},
 
 	/*
 	 * Display an error if an ajax request fails, and stop sending requests
+	 * or, on a 409, globally set the X-Transmission-Session-Id and resend
 	 */
-	ajaxError: function(request, error_string, exception) {
-		this._error = request.responseText
-		            ? request.responseText.trim().replace(/(<([^>]+)>)/ig,"")
-		            : "";
-		if( !this._error.length )
-			this._error = 'Server not responding';
+	ajaxError: function(request, error_string, exception, ajaxObject) {
+		remote = this;
+
+
+		// set the Transmission-Session-Id on a 409 
+		if(request.status == 409 && (token = request.getResponseHeader('X-Transmission-Session-Id'))){ 
+			remote._token = token; 
+			$.ajax(ajaxObject); 
+			return; 
+		} 
+
+		remote._error = request.responseText
+			? request.responseText.trim().replace(/(<([^>]+)>)/ig,"")
+			: "";
+		if( !remote._error.length )
+			remote._error = 'Server not responding';
 		
 		dialog.confirm('Connection Failed', 
 			'Could not connect to the server. You may need to reload the page to reconnect.', 
@@ -56,61 +68,68 @@ TransmissionRemote.prototype =
 		transmission.togglePeriodicRefresh(false);
 	},
 
-	sendRequest: function( url, data, success, contentType )
+
+	appendSessionId: function(XHR) { 
+		XHR.setRequestHeader('X-Transmission-Session-Id', this._token); 
+	}, 
+
+	sendRequest: function( data, success )
 	{
-		var o = { };
-		o.cache = false;
-		o.contentType = contentType;
-		o.data = data;
-		o.dataType = 'json';
-		o.error = this.ajaxError;
-		o.success = success;
-		o.type = 'POST';
-		o.url = url;
-		$.ajax( o );
+		remote = this;
+		$.ajax( {
+			url: RPC._Root,
+			type: 'POST',
+			contentType: 'json',
+			dataType: 'json',
+			cache: false,
+			data: $.toJSON(data),
+			beforeSend: function(XHR){ remote.appendSessionId(XHR) },
+			error: function(request, error_string, exception){ remote.ajaxError(request, error_string, exception, this) },
+			success: success
+		} );
 	},
 
 	loadDaemonPrefs: function() {
 		var tr = this._controller;
-		var o = { };
-		o.method = 'session-get';
-		this.sendRequest( RPC._Root, $.toJSON(o), function(data) {
+		var o = { method: 'session-get' };
+		this.sendRequest( o, function(data) {
 			var o = data.arguments;
 			Prefs.getClutchPrefs( o );
 			tr.updatePrefs( o );
-		}, "json" );
+		} );
 	},
 
 	loadTorrents: function() {
 		var tr = this._controller;
-		var o = { };
-		o.method = 'torrent-get'
-		o.arguments = { };
-		o.arguments.fields = [
-			'addedDate', 'announceURL', 'comment', 'creator',
-			'dateCreated', 'downloadedEver', 'error', 'errorString',
-			'eta', 'hashString', 'haveUnchecked', 'haveValid', 'id',
-			'isPrivate', 'leechers', 'leftUntilDone', 'name',
-			'peersConnected', 'peersGettingFromUs', 'peersSendingToUs',
-			'rateDownload', 'rateUpload', 'seeders', 'sizeWhenDone',
-			'status', 'swarmSpeed', 'totalSize', 'uploadedEver' ];
-		this.sendRequest( RPC._Root, $.toJSON(o), function(data) {
+		var o = {
+			method: 'torrent-get',
+			arguments: { fields: [
+				'addedDate', 'announceURL', 'comment', 'creator',
+				'dateCreated', 'downloadedEver', 'error', 'errorString',
+				'eta', 'hashString', 'haveUnchecked', 'haveValid', 'id',
+				'isPrivate', 'leechers', 'leftUntilDone', 'name',
+				'peersConnected', 'peersGettingFromUs', 'peersSendingToUs',
+				'rateDownload', 'rateUpload', 'seeders', 'sizeWhenDone',
+				'status', 'swarmSpeed', 'totalSize', 'uploadedEver' ]
+			}
+		};
+		this.sendRequest( o, function(data) {
 			tr.updateTorrents( data.arguments.torrents );
 		}, "json" );
 	},
 
 	sendTorrentCommand: function( method, torrents ) {
 		var remote = this;
-		var o = { };
-		o.method = method;
-		o.arguments = { };
-		o.arguments.ids = [ ];
+		var o = {
+			method: method,
+			arguments: { ids: [ ] }
+		};
 		if( torrents != null )
 			for( var i=0, len=torrents.length; i<len; ++i )
 				o.arguments.ids.push( torrents[i].id() );
-		this.sendRequest( RPC._Root, $.toJSON(o), function( ) {
+		this.sendRequest( o, function( ) {
 			remote.loadTorrents();
-		}, "json" );
+		} );
 	},
 	startTorrents: function( torrents ) {
 		this.sendTorrentCommand( 'torrent-start', torrents );
@@ -135,26 +154,21 @@ TransmissionRemote.prototype =
 			for( var i=0, len=torrents.length; i<len; ++i )
 				o.arguments.ids.push( torrents[i].id() );
 
-		this.sendRequest( RPC._Root, $.toJSON(o), function( ) {
+		this.sendRequest( o, function( ) {
 			remote.loadTorrents();
-		}, "json" );
+		} );
 	},
 	addTorrentByUrl: function( url, options ) {
-		this.sendRequest( RPC._Root, $.toJSON({
+		var remote = this;
+		var o = {
 			method: 'torrent-add',
 			arguments: {
 				paused: (options.paused ? 'true' : 'false'),
 				filename: url
 			}
-		}) );
-	},
-	savePrefs: function( args ) {
-		var remote = this;
-		var o = { };
-		o.method = 'session-set';
-		o.arguments = args;
-		this.sendRequest( RPC._Root, $.toJSON(o), function(){
+		};
+		remote.sendRequest(o, function() {
 			remote.loadDaemonPrefs();
-		}, "json" );
+		} );
 	}
 };

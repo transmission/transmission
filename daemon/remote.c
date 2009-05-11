@@ -10,6 +10,7 @@
  * $Id$
  */
 
+#include <ctype.h> /* isspace */
 #include <errno.h>
 #include <math.h>
 #include <stdio.h>
@@ -126,6 +127,7 @@ static int    reqCount = 0;
 static int    debug = 0;
 static char * auth = NULL;
 static char * netrc = NULL;
+static char * sessionId = NULL;
 
 static char*
 tr_getcwd( void )
@@ -1222,56 +1224,113 @@ processResponse( const char * host,
     }
 }
 
+/* look for a session id in the header in case the server gives back a 409 */
+static size_t
+parseResponseHeader( void *ptr, size_t size, size_t nmemb, void * stream UNUSED )
+{
+    const char * line = ptr;
+    const size_t line_len = size * nmemb;
+    const char * key = TR_RPC_SESSION_ID_HEADER ": ";
+    const size_t key_len = strlen( key );
+
+    if( ( line_len >= key_len ) && !memcmp( line, key, key_len ) )
+    {
+        const char * begin = line + key_len;
+        const char * end = begin;
+        while( !isspace( *end ) )
+            ++end;
+        tr_free( sessionId );
+        sessionId = tr_strndup( begin, end-begin );
+    }
+
+    return line_len;
+}
+
+static CURL*
+tr_curl_easy_init( struct evbuffer * writebuf )
+{
+    CURL * curl = curl_easy_init( );
+    curl_easy_setopt( curl, CURLOPT_USERAGENT, MY_NAME "/" LONG_VERSION_STRING );
+    curl_easy_setopt( curl, CURLOPT_WRITEFUNCTION, writeFunc );
+    curl_easy_setopt( curl, CURLOPT_WRITEDATA, writebuf );
+    curl_easy_setopt( curl, CURLOPT_HEADERFUNCTION, parseResponseHeader );
+    curl_easy_setopt( curl, CURLOPT_POST, 1 );
+    curl_easy_setopt( curl, CURLOPT_NETRC, CURL_NETRC_OPTIONAL );
+    curl_easy_setopt( curl, CURLOPT_HTTPAUTH, CURLAUTH_ANY );
+    curl_easy_setopt( curl, CURLOPT_TIMEOUT, 60L );
+    curl_easy_setopt( curl, CURLOPT_VERBOSE, debug );
+#ifdef HAVE_ZLIB
+    curl_easy_setopt( curl, CURLOPT_ENCODING, "deflate" );
+#endif
+    if( netrc )
+        curl_easy_setopt( curl, CURLOPT_NETRC_FILE, netrc );
+    if( auth )
+        curl_easy_setopt( curl, CURLOPT_USERPWD, auth );
+    if( sessionId ) {
+        char * h = tr_strdup_printf( "%s: %s", TR_RPC_SESSION_ID_HEADER, sessionId );
+        struct curl_slist * custom_headers = curl_slist_append( NULL, h );
+        curl_easy_setopt( curl, CURLOPT_HTTPHEADER, custom_headers );
+        /* fixme: leaks */
+    }
+    return curl;
+}
+    
+
 static void
 processRequests( const char *  host,
                  int           port,
                  const char ** reqs,
                  int           reqCount )
 {
-    int               i;
-    CURL *            curl;
+    int i;
+    CURL * curl = NULL;
     struct evbuffer * buf = evbuffer_new( );
-    char *            url = tr_strdup_printf(
-        "http://%s:%d/transmission/rpc", host, port );
+    char * url = tr_strdup_printf( "http://%s:%d/transmission/rpc", host, port );
 
-    curl = curl_easy_init( );
-    curl_easy_setopt( curl, CURLOPT_VERBOSE, debug );
-#ifdef HAVE_LIBZ
-    curl_easy_setopt( curl, CURLOPT_ENCODING, "deflate" );
-#endif
-    curl_easy_setopt( curl, CURLOPT_USERAGENT, MY_NAME "/" LONG_VERSION_STRING );
-    curl_easy_setopt( curl, CURLOPT_WRITEFUNCTION, writeFunc );
-    curl_easy_setopt( curl, CURLOPT_WRITEDATA, buf );
-    curl_easy_setopt( curl, CURLOPT_POST, 1 );
-    curl_easy_setopt( curl, CURLOPT_URL, url );
-    curl_easy_setopt( curl, CURLOPT_NETRC, CURL_NETRC_OPTIONAL );
-    curl_easy_setopt( curl, CURLOPT_HTTPAUTH, CURLAUTH_ANY );
-    curl_easy_setopt( curl, CURLOPT_TIMEOUT, 60L );
-    if( netrc )
-        curl_easy_setopt( curl, CURLOPT_NETRC_FILE, netrc );
-    if( auth )
-        curl_easy_setopt( curl, CURLOPT_USERPWD, auth );
-
-    for( i = 0; i < reqCount; ++i )
+    for( i=0; i<reqCount; ++i )
     {
         CURLcode res;
+        evbuffer_drain( buf, EVBUFFER_LENGTH( buf ) );
+
+        if( curl == NULL )
+        {
+            curl = tr_curl_easy_init( buf );
+            curl_easy_setopt( curl, CURLOPT_URL, url );
+        }
+
         curl_easy_setopt( curl, CURLOPT_POSTFIELDS, reqs[i] );
+
         if( debug )
             fprintf( stderr, "posting:\n--------\n%s\n--------\n", reqs[i] );
         if( ( res = curl_easy_perform( curl ) ) )
-            tr_nerr( MY_NAME, "(%s:%d) %s", host, port,
-                    curl_easy_strerror( res ) );
-        else
-            processResponse( host, port, EVBUFFER_DATA(
-                                buf ), EVBUFFER_LENGTH( buf ) );
-
-        evbuffer_drain( buf, EVBUFFER_LENGTH( buf ) );
+            tr_nerr( MY_NAME, "(%s:%d) %s", host, port, curl_easy_strerror( res ) );
+        else {
+            long response;
+            curl_easy_getinfo( curl, CURLINFO_RESPONSE_CODE, &response );
+            switch( response ) {
+                case 200:
+                    processResponse( host, port, EVBUFFER_DATA(buf), EVBUFFER_LENGTH(buf) );
+                    break;
+                case 409:
+                    /* session id failed.  our curl header func has already
+                     * pulled the new session id from this response's headers,
+                     * build a new CURL* and try again */
+                    curl_easy_cleanup( curl );
+                    curl = NULL;
+                    --i;
+                    break;
+                default:
+                    fprintf( stderr, "Unexpected response: %s\n", (char*)EVBUFFER_DATA(buf) );
+                    break;
+            }
+        }
     }
 
     /* cleanup */
     tr_free( url );
     evbuffer_free( buf );
-    curl_easy_cleanup( curl );
+    if( curl != NULL )
+        curl_easy_cleanup( curl );
 }
 
 int
