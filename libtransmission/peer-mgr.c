@@ -364,7 +364,6 @@ removePeer( Torrent * t, tr_peer * peer )
 {
     tr_peer * removed;
     struct peer_atom * atom = peer->atom;
-assert( atom == getExistingAtom( t, &peer->addr ) );
 
     assert( torrentIsLocked( t ) );
     assert( atom );
@@ -919,7 +918,6 @@ addStrike( Torrent * t, tr_peer * peer )
     if( ++peer->strikes >= MAX_BAD_PIECES_PER_PEER )
     {
         struct peer_atom * atom = peer->atom;
-assert( atom == getExistingAtom( t, &peer->addr ) );
         atom->myflags |= MYFLAG_BANNED;
         peer->doPurge = 1;
         tordbg( t, "banning peer %s", tr_peerIoAddrStr( &atom->addr, atom->port ) );
@@ -1007,10 +1005,8 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
     {
         case TR_PEER_UPLOAD_ONLY:
             /* update our atom */
-            if( peer ) {
-assert( peer->atom == getExistingAtom( t, &peer->addr ) );
+            if( peer )
                 peer->atom->uploadOnly = e->uploadOnly ? UPLOAD_ONLY_YES : UPLOAD_ONLY_NO;
-            }
             break;
 
         case TR_PEER_NEED_REQ:
@@ -1036,10 +1032,8 @@ assert( peer->atom == getExistingAtom( t, &peer->addr ) );
                 tr_statsAddUploaded( tor->session, e->length );
 
             /* update our atom */
-            if( peer && e->wasPieceData ) {
-assert( peer->atom == getExistingAtom( t, &peer->addr ) );
+            if( peer && e->wasPieceData )
                 peer->atom->piece_data_time = now;
-            }
 
             tor->needsSeedRatioCheck = TRUE;
 
@@ -1077,10 +1071,8 @@ assert( peer->atom == getExistingAtom( t, &peer->addr ) );
                 tr_statsAddDownloaded( tor->session, e->length );
 
             /* update our atom */
-            if( peer && e->wasPieceData ) {
-assert( peer->atom == getExistingAtom( t, &peer->addr ) );
+            if( peer && e->wasPieceData )
                 peer->atom->piece_data_time = now;
-            }
 
             break;
         }
@@ -1091,7 +1083,6 @@ assert( peer->atom == getExistingAtom( t, &peer->addr ) );
             {
                 struct peer_atom * atom = peer->atom;
                 const int peerIsSeed = e->progress >= 1.0;
-assert( peer->atom == getExistingAtom( t, &peer->addr ) );
                 if( peerIsSeed ) {
                     tordbg( t, "marking peer %s as a seed", tr_peerIoAddrStr( &atom->addr, atom->port ) );
                     atom->flags |= ADDED_F_SEED_FLAG;
@@ -1554,7 +1545,6 @@ tr_peerMgrGetPeers( tr_torrent      * tor,
             if( peer->addr.type == af )
             {
                 const struct peer_atom * atom = peer->atom;
-assert( atom == getExistingAtom( t, &peer->addr ) );
 
                 assert( tr_isAddress( &peer->addr ) );
                 walk->addr = peer->addr;
@@ -1746,7 +1736,6 @@ tr_peerMgrTorrentStats( tr_torrent       * tor,
     {
         const tr_peer * peer = peers[i];
         const struct peer_atom * atom = peer->atom;
-assert( atom == getExistingAtom( t, &peer->addr ) );
 
         if( peer->io == NULL ) /* not connected */
             continue;
@@ -1832,7 +1821,6 @@ tr_peerMgrPeerStats( const tr_torrent    * tor,
         const tr_peer *          peer = peers[i];
         const struct peer_atom * atom = peer->atom;
         tr_peer_stat *           stat = ret + i;
-assert( atom == getExistingAtom( t, &peer->addr ) );
 
         tr_ntop( &peer->addr, stat->addr, sizeof( stat->addr ) );
         tr_strlcpy( stat->client, ( peer->client ? peer->client : "" ),
@@ -1935,7 +1923,6 @@ rechokeTorrent( Torrent * t )
     {
         tr_peer * peer = peers[i];
         struct peer_atom * atom = peer->atom;
-assert( atom == getExistingAtom( t, &peer->addr ) );
 
         if( peer->progress >= 1.0 ) /* choke all seeds */
         {
@@ -2055,7 +2042,6 @@ shouldPeerBeClosed( const Torrent    * t,
     const tr_torrent *       tor = t->tor;
     const time_t             now = time( NULL );
     const struct peer_atom * atom = peer->atom;
-assert( atom == getExistingAtom( t, &peer->addr ) );
 
     /* if it's marked for purging, close it */
     if( peer->doPurge )
@@ -2260,7 +2246,6 @@ closePeer( Torrent * t, tr_peer * peer )
     assert( peer != NULL );
 
     atom = peer->atom;
-assert( atom == getExistingAtom( t, &peer->addr ) );
 
     /* if we transferred piece data, then they might be good peers,
        so reset their `numFails' weight to zero.  otherwise we connected
