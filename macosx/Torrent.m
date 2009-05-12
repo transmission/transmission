@@ -116,7 +116,7 @@ int trashDataFile(const char * filename)
     return self;
 }
 
-- (id) initWithHistory: (NSDictionary *) history lib: (tr_session *) lib
+- (id) initWithHistory: (NSDictionary *) history lib: (tr_session *) lib forcePause: (BOOL) pause
 {
     self = [self initWithHash: [history objectForKey: @"TorrentHash"]
                 path: [history objectForKey: @"TorrentPath"] torrentStruct: NULL lib: lib
@@ -132,7 +132,7 @@ int trashDataFile(const char * filename)
     {
         //start transfer
         NSNumber * active;
-        if ((active = [history objectForKey: @"Active"]) && [active boolValue])
+        if (!pause && (active = [history objectForKey: @"Active"]) && [active boolValue])
         {
             fStat = tr_torrentStat(fHandle);
             [self startTransfer];
