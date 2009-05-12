@@ -309,10 +309,10 @@ refreshOptions( struct DetailsImpl * di, tr_torrent ** torrents, int n )
             switch( baseline ) {
                 case TR_RATIOLIMIT_SINGLE: w = di->seedCustomRadio;
                                            t = di->seedCustomRadioTag; break;
-                case TR_RATIOLIMIT_GLOBAL: w = di->seedGlobalRadio;
-                                           t = di->seedGlobalRadioTag; break;
                 case TR_RATIOLIMIT_UNLIMITED: w = di->seedForeverRadio;
                                               t = di->seedForeverRadioTag; break;
+                default /*TR_RATIOLIMIT_GLOBAL*/: w = di->seedGlobalRadio;
+                                                  t = di->seedGlobalRadioTag; break;
             }
             set_togglebutton_if_different( w, t, TRUE );
         }
@@ -525,7 +525,7 @@ static GtkWidget*
 options_page_new( struct DetailsImpl * d )
 {
     guint tag;
-    int i, row;
+    int row;
     char *s;
     GSList *group;
     GtkWidget *t, *w, *tb, *h;
@@ -546,7 +546,6 @@ options_page_new( struct DetailsImpl * d )
     d->downLimitedCheckTag = tag;
 
     w = gtk_spin_button_new_with_range( 1, INT_MAX, 5 );
-    gtk_spin_button_set_value( GTK_SPIN_BUTTON( w ), i );
     tag = g_signal_connect( w, "value-changed", G_CALLBACK( down_speed_spun_cb ), d );
     d->downLimitSpinTag = tag;
     hig_workarea_add_row_w( t, &row, tb, w, NULL );
@@ -558,7 +557,6 @@ options_page_new( struct DetailsImpl * d )
     d->upLimitedCheckTag = tag;
 
     w = gtk_spin_button_new_with_range( 1, INT_MAX, 5 );
-    gtk_spin_button_set_value( GTK_SPIN_BUTTON( w ), i );
     tag = g_signal_connect( w, "value-changed", G_CALLBACK( up_speed_spun_cb ), d );
     d->upLimitSpinTag = tag;
     hig_workarea_add_row_w( t, &row, tb, w, NULL );
