@@ -661,7 +661,7 @@ tr_sessionInitImpl( void * vdata )
         tr_socketListAppend( socketList, &address );
     else
         tr_inf( _( "System does not seem to support IPv6. Not listening on"
-                   "an IPv6 address" ) );
+                   " an IPv6 address" ) );
 
     session->shared = tr_sharedInit( session, boolVal, session->peerPort,
                                      socketList );
