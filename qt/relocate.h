@@ -14,6 +14,7 @@
 #define RELOCATE_DIALOG_H
 
 #include <QDialog>
+#include <QSet>
 #include <QString>
 
 class QPushButton;
@@ -30,7 +31,7 @@ class RelocateDialog: public QDialog
 
     private:
         Session & mySession;
-        const int myTorrentId;
+        QSet<int> myIds;
         QPushButton * myDirButton;
         QRadioButton * myMoveRadio;
 
@@ -41,7 +42,7 @@ class RelocateDialog: public QDialog
         void onMoveToggled( bool );
 
     public:
-        RelocateDialog( Session&, int torrentId, QWidget * parent = 0 );
+        RelocateDialog( Session&, const QSet<int>& ids, QWidget * parent = 0 );
         ~RelocateDialog( ) { }
 };
 

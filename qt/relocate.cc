@@ -19,10 +19,13 @@
 #include <QSet>
 #include <QDialogButtonBox>
 #include <QWidget>
+#include <QApplication>
+#include <QStyle>
 
 #include "hig.h"
 #include "relocate.h"
 #include "session.h"
+#include "qticonloader.h"
 
 QString RelocateDialog :: myPath;
 
@@ -31,9 +34,7 @@ bool RelocateDialog :: myMoveFlag = true;
 void
 RelocateDialog :: onSetLocation( )
 {
-    QSet<int> ids;
-    ids << myTorrentId;
-    mySession.torrentSetLocation( ids, myPath, myMoveFlag );
+    mySession.torrentSetLocation( myIds, myPath, myMoveFlag );
     deleteLater( );
 }
 
@@ -60,11 +61,15 @@ RelocateDialog :: onMoveToggled( bool b )
     myMoveFlag = b;
 }
 
-RelocateDialog :: RelocateDialog( Session& session, int torrentId, QWidget * parent ):
+RelocateDialog :: RelocateDialog( Session& session, const QSet<int>& ids, QWidget * parent ):
     QDialog( parent ),
     mySession( session ),
-    myTorrentId( torrentId )
+    myIds( ids )
 {
+    const int iconSize( style( )->pixelMetric( QStyle :: PM_SmallIconSize ) );
+    const QIcon folderIcon = QtIconLoader :: icon( "folder", style()->standardIcon( QStyle::SP_DirIcon ) );
+    const QPixmap folderPixmap = folderIcon.pixmap( iconSize );
+
     QRadioButton * find_rb;
     setWindowTitle( tr( "Set Torrent Location" ) );
 
@@ -72,8 +77,8 @@ RelocateDialog :: RelocateDialog( Session& session, int torrentId, QWidget * par
         myPath = QDir::homePath( );
 
     HIG * hig = new HIG( );
-    hig->addSectionTitle( tr( "Location" ) );
-    hig->addRow( tr( "Torrent &location:" ), myDirButton = new QPushButton( myPath ) );
+    hig->addSectionTitle( tr( "Set Location" ) );
+    hig->addRow( tr( "New &location:" ), myDirButton = new QPushButton( folderPixmap, myPath ) );
     hig->addWideControl( myMoveRadio = new QRadioButton( tr( "&Move from the current folder" ), this ) );
     hig->addWideControl( find_rb = new QRadioButton( tr( "Local data is &already there" ), this ) );
     hig->finish( );

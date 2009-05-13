@@ -622,8 +622,7 @@ TrMainWindow :: openProperties( )
 void
 TrMainWindow :: setLocation( )
 {
-    const int torrentId( *getSelectedTorrents().begin() );
-    QDialog * d = new RelocateDialog( mySession, torrentId, this );
+    QDialog * d = new RelocateDialog( mySession, getSelectedTorrents(), this );
     d->show( );
 }
 
@@ -744,10 +743,10 @@ TrMainWindow :: refreshActionSensitivity( )
     ui.action_Delete->setEnabled( haveSelection );
     ui.action_Properties->setEnabled( haveSelection );
     ui.action_DeselectAll->setEnabled( haveSelection );
+    ui.action_SetLocation->setEnabled( haveSelection );
 
     const bool oneSelection( selected == 1 );
     ui.action_OpenFolder->setEnabled( oneSelection && mySession.isLocal( ) );
-    ui.action_SetLocation->setEnabled( oneSelection );
 
     ui.action_SelectAll->setEnabled( selected < rowCount );
     ui.action_StartAll->setEnabled( paused > 0 );
