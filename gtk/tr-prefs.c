@@ -1213,7 +1213,7 @@ bandwidthPage( GObject * core )
         gtk_misc_set_alignment( GTK_MISC( w ), 0.5f, 0.5f );
         hig_workarea_add_wide_control( t, &row, w );
 
-        s = _( "Use Speed Limit Mode between:" ); 
+        s = _( "Use Speed Limit Mode &between:" ); 
         h = gtk_hbox_new( FALSE, 0 );
         w2 = new_time_combo( core, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN );
         page->sched_widgets = g_slist_append( page->sched_widgets, w2 );
