@@ -41,7 +41,7 @@ enum
     HTTP_OK = 200,
 
     /* seconds between tracker pulses */
-    PULSE_INTERVAL_MSEC = 1000,
+    PULSE_INTERVAL_MSEC = 1500,
 
     /* unless the tracker says otherwise, rescrape this frequently */
     DEFAULT_SCRAPE_INTERVAL_SEC = ( 60 * 15 ),
