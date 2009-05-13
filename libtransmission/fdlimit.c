@@ -201,6 +201,25 @@ preallocateFileFull( const char * filename, uint64_t length )
     return success;
 }
 
+tr_bool
+tr_preallocate_file( const char * filename, uint64_t length )
+{
+    return preallocateFileFull( filename, length );
+}
+
+int
+tr_open_file_for_writing( const char * filename )
+{
+    int flags = O_WRONLY | O_CREAT;
+#ifdef O_BINARY
+    flags |= O_BINARY;
+#endif
+#ifdef O_LARGEFILE
+    flags |= O_LARGEFILE;
+#endif
+    return open( filename, flags, 0666 );
+}
+
 int
 tr_open_file_for_scanning( const char * filename )
 {

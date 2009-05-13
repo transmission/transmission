@@ -469,6 +469,9 @@ char* tr_strratio( char * buf, size_t buflen, double ratio, const char * infinit
 struct tm * tr_localtime_r( const time_t *_clock, struct tm *_result );
 
 
+/** on success, return 0.  on failure, return -1 and set errno */
+int tr_moveFile( const char * oldpath, const char * newpath );
+
 
 #ifdef __cplusplus
 }

@@ -262,13 +262,13 @@ get_mime_type_icon( const char   * mime_type,
     int n;
     
     switch ( icon_size ) {
-        case GTK_ICON_SIZE_INVALID:       n = 0; break;
-        case GTK_ICON_SIZE_MENU:          n = 1; break;
-        case GTK_ICON_SIZE_SMALL_TOOLBAR: n = 2; break;
-        case GTK_ICON_SIZE_LARGE_TOOLBAR: n = 3; break;
-        case GTK_ICON_SIZE_BUTTON:        n = 4; break;
-        case GTK_ICON_SIZE_DND:           n = 5; break;
-        case GTK_ICON_SIZE_DIALOG:        n = 6; break; 
+        case GTK_ICON_SIZE_MENU:            n = 1; break;
+        case GTK_ICON_SIZE_SMALL_TOOLBAR:   n = 2; break;
+        case GTK_ICON_SIZE_LARGE_TOOLBAR:   n = 3; break;
+        case GTK_ICON_SIZE_BUTTON:          n = 4; break;
+        case GTK_ICON_SIZE_DND:             n = 5; break;
+        case GTK_ICON_SIZE_DIALOG:          n = 6; break; 
+        default /*GTK_ICON_SIZE_INVALID*/:  n = 0; break;
     }	
 
     if( icon_cache[n] == NULL )

@@ -34,7 +34,11 @@ void tr_fdInit( size_t openFileLimit,
 
 int tr_open_file_for_scanning( const char * filename );
 
+int tr_open_file_for_writing( const char * filename );
+
 void tr_close_file( int fd );
+
+tr_bool tr_preallocate_file( const char * filename, uint64_t length );
 
 int64_t tr_lseek( int fd, int64_t offset, int whence );
 

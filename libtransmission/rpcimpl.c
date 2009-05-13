@@ -764,6 +764,42 @@ torrentSet( tr_session               * session,
     return errmsg;
 }
 
+static const char*
+torrentSetLocation( tr_session               * session,
+                    tr_benc                  * args_in,
+                    tr_benc                  * args_out UNUSED,
+                    struct tr_rpc_idle_data  * idle_data )
+{
+    const char * errmsg = NULL;
+    const char * location = NULL;
+
+    assert( idle_data == NULL );
+
+    if( !tr_bencDictFindStr( args_in, "location", &location ) )
+    {
+        errmsg = "no location";
+    }
+    else
+    {
+        tr_bool move = FALSE;
+        int i, torrentCount;
+        tr_torrent ** torrents = getTorrents( session, args_in, &torrentCount );
+
+        tr_bencDictFindBool( args_in, "move", &move );
+
+        for( i=0; i<torrentCount; ++i )
+        {
+            tr_torrent * tor = torrents[i];
+            tr_torrentSetLocation( tor, location, move, NULL );
+            notify( session, TR_RPC_TORRENT_CHANGED, tor );
+        }
+
+        tr_free( torrents );
+    }
+
+    return errmsg;
+}
+
 /***
 ****
 ***/
@@ -1201,7 +1237,7 @@ sessionGet( tr_session               * s,
     tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_PORT, tr_sessionGetPeerPort( s ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START, tr_sessionGetPeerPortRandomOnStart( s ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_PORT_FORWARDING, tr_sessionIsPortForwardingEnabled( s ) );
-    tr_bencDictAddInt ( d, "rpc-version", 5 );
+    tr_bencDictAddInt ( d, "rpc-version", 6 );
     tr_bencDictAddInt ( d, "rpc-version-minimum", 1 );
     tr_bencDictAddReal( d, "seedRatioLimit", tr_sessionGetRatioLimit( s ) );
     tr_bencDictAddBool( d, "seedRatioLimited", tr_sessionIsRatioLimited( s ) );
@@ -1234,19 +1270,20 @@ static struct method
 }
 methods[] =
 {
-    { "port-test",          FALSE, portTest            },
-    { "blocklist-update",   FALSE, blocklistUpdate     },
-    { "session-get",        TRUE,  sessionGet          },
-    { "session-set",        TRUE,  sessionSet          },
-    { "session-stats",      TRUE,  sessionStats        },
-    { "torrent-add",        FALSE, torrentAdd          },
-    { "torrent-get",        TRUE,  torrentGet          },
-    { "torrent-remove",     TRUE,  torrentRemove       },
-    { "torrent-set",        TRUE,  torrentSet          },
-    { "torrent-start",      TRUE,  torrentStart        },
-    { "torrent-stop",       TRUE,  torrentStop         },
-    { "torrent-verify",     TRUE,  torrentVerify       },
-    { "torrent-reannounce", TRUE,  torrentReannounce   }
+    { "port-test",             FALSE, portTest            },
+    { "blocklist-update",      FALSE, blocklistUpdate     },
+    { "session-get",           TRUE,  sessionGet          },
+    { "session-set",           TRUE,  sessionSet          },
+    { "session-stats",         TRUE,  sessionStats        },
+    { "torrent-add",           FALSE, torrentAdd          },
+    { "torrent-get",           TRUE,  torrentGet          },
+    { "torrent-remove",        TRUE,  torrentRemove       },
+    { "torrent-set",           TRUE,  torrentSet          },
+    { "torrent-set-location",  TRUE,  torrentSetLocation  },
+    { "torrent-start",         TRUE,  torrentStart        },
+    { "torrent-stop",          TRUE,  torrentStop         },
+    { "torrent-verify",        TRUE,  torrentVerify       },
+    { "torrent-reannounce",    TRUE,  torrentReannounce   }
 };
 
 static void

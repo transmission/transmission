@@ -935,6 +935,12 @@ void tr_torrentStop( tr_torrent * torrent );
 
 typedef int tr_fileFunc( const char * filename );
 
+/** @brief Tell transmsision where to find this torrent's local data */
+void tr_torrentSetLocation( tr_torrent  * torrent,
+                            const char  * location,
+                            tr_bool       move_from_previous_location,
+                            tr_bool     * setme_done );
+
 /**
  * @brief Deletes the torrent's local data.
  * @param torrent
@@ -1054,8 +1060,10 @@ void            tr_torrentSetFileDLs( tr_torrent       * torrent,
 
 const tr_info * tr_torrentInfo( const tr_torrent * torrent );
 
-void tr_torrentSetDownloadDir( tr_torrent  * torrent,
-                               const char  * path );
+/* Raw function to change the torrent's downloadDir field.
+   This should only be used by libtransmission or to bootstrap
+   a newly-instantiated tr_torrent object. */
+void tr_torrentSetDownloadDir( tr_torrent  * torrent, const char * path );
 
 const char * tr_torrentGetDownloadDir( const tr_torrent * torrent );
 

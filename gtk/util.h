@@ -99,7 +99,7 @@ void        gtr_widget_set_tooltip_text( GtkWidget * w, const char * tip );
 GtkWidget * gtr_button_new_from_stock( const char * stock,
                                        const char * mnemonic );
 
-guint       gtr_timeout_add_seconds( guint       interval,
+guint       gtr_timeout_add_seconds( guint       seconds,
                                      GSourceFunc function,
                                      gpointer    data );
 

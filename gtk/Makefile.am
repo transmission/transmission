@@ -49,6 +49,7 @@ noinst_HEADERS = \
     msgwin.h \
     notify.h \
     options-icon.h \
+    relocate.h \
     stats.h \
     sexy-icon-entry.h \
     sexy-marshal.h \
@@ -81,6 +82,7 @@ transmission_SOURCES = \
     makemeta-ui.c \
     msgwin.c \
     notify.c \
+    relocate.c \
     sexy-icon-entry.c \
     sexy-marshal.c \
     stats.c \

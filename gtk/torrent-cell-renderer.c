@@ -50,7 +50,7 @@ getProgressString( const tr_torrent * tor,
     char           buf1[32], buf2[32], buf3[32], buf4[32];
     char *         str;
     double         seedRatio; 
-    gboolean       hasSeedRatio;
+    gboolean       hasSeedRatio = FALSE;
 
     if( !isDone )
     {

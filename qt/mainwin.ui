@@ -51,7 +51,7 @@
      <x>0</x>
      <y>0</y>
      <width>792</width>
-     <height>23</height>
+     <height>25</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -68,8 +68,9 @@
     <addaction name="action_Add"/>
     <addaction name="action_New"/>
     <addaction name="separator"/>
-    <addaction name="action_Properties"/>
     <addaction name="action_OpenFolder"/>
+    <addaction name="action_Properties"/>
+    <addaction name="action_SetLocation"/>
     <addaction name="separator"/>
     <addaction name="action_Start"/>
     <addaction name="action_Announce"/>
@@ -529,6 +530,11 @@
    </property>
    <property name="toolTip">
     <string extracomment="Start a local session or connect to a running session">Choose Session</string>
+   </property>
+  </action>
+  <action name="action_SetLocation">
+   <property name="text">
+    <string>Set &amp;Location...</string>
    </property>
   </action>
  </widget>

@@ -75,6 +75,8 @@ static tr_option opts[] =
     { 'i', "info",                 "Show the current torrent(s)' details", "i",  0, NULL },
     { 920, "session-info",         "Show the session's details", "si", 0, NULL },
     { 'l', "list",                 "List all torrents", "l",  0, NULL },
+    { 960, "move",                 "Move current torrent's data to a new folder", NULL, 1, "<path>" },
+    { 961, "find",                 "Tell Transmission where to find a torrent's data", NULL, 1, "<path>" },
     { 'm', "portmap",              "Enable portmapping via NAT-PMP or UPnP", "m",  0, NULL },
     { 'M', "no-portmap",           "Disable portmapping", "M",  0, NULL },
     { 'n', "auth",                 "Set authentication info", "n",  1, "<username:password>" },
@@ -586,6 +588,20 @@ readargs( int           argc,
             case 954:
                 tr_bencDictAddStr( &top, "method", "session-set" );
                 tr_bencDictAddBool( args, "seedRatioLimited", FALSE );
+                break;
+
+            case 960:
+                tr_bencDictAddStr( &top, "method", "torrent-set-location" );
+                tr_bencDictAddStr( args, "location", optarg );
+                tr_bencDictAddBool( args, "move", TRUE );
+                addIdArg( args, id );
+                break;
+
+            case 961:
+                tr_bencDictAddStr( &top, "method", "torrent-set-location" );
+                tr_bencDictAddStr( args, "location", optarg );
+                tr_bencDictAddBool( args, "move", FALSE );
+                addIdArg( args, id );
                 break;
 
             case TR_OPT_ERR:

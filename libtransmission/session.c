@@ -972,7 +972,7 @@ tr_sessionGetActiveSpeedLimit( const tr_session * session, tr_direction dir, int
 static void
 updateBandwidth( tr_session * session, tr_direction dir )
 {
-    int limit;
+    int limit = 0;
     const tr_bool isLimited = tr_sessionGetActiveSpeedLimit( session, dir, &limit );
     const tr_bool zeroCase = isLimited && !limit;
 
