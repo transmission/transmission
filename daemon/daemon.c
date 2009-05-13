@@ -38,7 +38,7 @@
 #define PREF_KEY_DIR_WATCH          "watch-dir"
 #define PREF_KEY_DIR_WATCH_ENABLED  "watch-dir-enabled"
 
-
+static tr_bool paused = FALSE;
 static tr_bool closing = FALSE;
 static tr_session * mySession = NULL;
 
@@ -76,6 +76,7 @@ static const struct tr_option options[] =
     { 'v', "password", "Set password for authentication", "v", 1, "<password>" },
     { 'V', "version", "Show version number and exit", "V", 0, NULL },
     { 'w', "download-dir", "Where to save downloaded data", "w", 1, "<path>" },
+    { 800, "paused", "Pause all torrents on startup", NULL, 0, NULL },
     { 'P', "peerport", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "P", 1, "<port>" },
     { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", 0, NULL },
     { 'M', "no-portmap", "Disable portmapping", "M", 0, NULL },
@@ -273,6 +274,8 @@ main( int argc, char ** argv )
                       break;
             case 'l': tr_bencDictAddInt( &settings, TR_PREFS_KEY_PEER_LIMIT_TORRENT, atoi( optarg ) );
                       break;
+            case 800: paused = TRUE;
+                      break;
             case 910: tr_bencDictAddInt( &settings, TR_PREFS_KEY_ENCRYPTION, TR_ENCRYPTION_REQUIRED );
                       break;
             case 911: tr_bencDictAddInt( &settings, TR_PREFS_KEY_ENCRYPTION, TR_ENCRYPTION_PREFERRED );
@@ -333,8 +336,11 @@ main( int argc, char ** argv )
 
     /* load the torrents */
     {
+        tr_torrent ** torrents;
         tr_ctor * ctor = tr_ctorNew( mySession );
-        tr_torrent ** torrents = tr_sessionLoadTorrents( mySession, ctor, NULL );
+        if( paused )
+            tr_ctorSetPaused( ctor, TR_FORCE, TRUE );
+        torrents = tr_sessionLoadTorrents( mySession, ctor, NULL );
         tr_free( torrents );
         tr_ctorFree( ctor );
     }

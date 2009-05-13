@@ -81,6 +81,9 @@ Listen for IPv6 BitTorrent connections on a specific address. Only one IPv6 list
 .It Fl r Fl -rpc-bind-address
 Listen for RPC connections on a specific address. This must be an IPv4 address. Only one RPC listening address is allowed. Default: 0.0.0.0 (All addresses)
 
+.It Fl -paused
+Pause all torrents on startup
+
 .It Fl L Fl -peerlimit-global Ar limit
 Overall peer limit. Useful on embedded systems where the default might be unsuitable. Default: 240
 .It Fl l Fl -peerlimit-torrent Ar limit
