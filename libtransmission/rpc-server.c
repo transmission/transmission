@@ -818,6 +818,7 @@ closeServer( void * vserver )
 #ifdef HAVE_ZLIB
     deflateEnd( &s->stream );
 #endif
+    tr_free( s->sessionId );
     tr_free( s->whitelistStr );
     tr_free( s->username );
     tr_free( s->password );

@@ -519,15 +519,18 @@ scanWatchDir( TrCore * core )
 
     if( isEnabled )
     {
-        const char * dirname = pref_string_get( PREF_KEY_DIR_WATCH );
-        GDir *       dir = g_dir_open( dirname, 0, NULL );
         const char * basename;
-        while( ( basename = g_dir_read_name( dir ) ) )
+        const char * dirname = pref_string_get( PREF_KEY_DIR_WATCH );
+        GDir * dir = g_dir_open( dirname, 0, NULL );
+
+        while(( basename = g_dir_read_name( dir )))
         {
             char * filename = g_build_filename( dirname, basename, NULL );
             maybeAddTorrent( core, filename );
             g_free( filename );
         }
+
+        g_dir_close( dir );
     }
 }
 
@@ -859,16 +862,13 @@ add_filename( TrCore *     core,
 
     if( filename && session )
     {
-        tr_ctor * ctor;
-
-        ctor = tr_ctorNew( session );
+        tr_ctor * ctor = tr_ctorNew( session );
         tr_core_apply_defaults( ctor );
         tr_ctorSetPaused( ctor, TR_FORCE, !doStart );
 
         if( tr_ctorSetMetainfoFromFile( ctor, filename ) )
         {
             tr_core_errsig( core, TR_EINVALID, filename );
-            tr_ctorFree( ctor );
         }
         else
         {
@@ -904,6 +904,8 @@ add_filename( TrCore *     core,
                     break;
             }
         }
+
+        tr_ctorFree( ctor );
     }
 }
 
