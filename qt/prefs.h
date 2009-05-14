@@ -109,8 +109,6 @@ class Prefs: public QObject
             RPC_USERNAME,
             RPC_WHITELIST_ENABLED,
             RPC_WHITELIST,
-            SEED_RATIO_LIMIT,
-            SEED_RATIO_LIMITED,
             USPEED_ENABLED,
             USPEED,
             UPLOAD_SLOTS_PER_TORRENT,

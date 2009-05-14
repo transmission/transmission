@@ -121,8 +121,6 @@ Session :: updatePref( int key )
         case Prefs :: DOWNLOAD_DIR:
         case Prefs :: PEER_LIMIT_GLOBAL:
         case Prefs :: PEER_LIMIT_TORRENT:
-        case Prefs :: SEED_RATIO_LIMIT:
-        case Prefs :: SEED_RATIO_LIMITED:
         case Prefs :: USPEED_ENABLED:
         case Prefs :: USPEED:
         case Prefs :: DSPEED_ENABLED:
@@ -131,9 +129,14 @@ Session :: updatePref( int key )
         case Prefs :: PORT_FORWARDING:
         case Prefs :: PEER_PORT:
         case Prefs :: PEER_PORT_RANDOM_ON_START:
-        case Prefs :: RATIO:
-        case Prefs :: RATIO_ENABLED:
             sessionSet( myPrefs.keyStr(key), myPrefs.variant(key) );
+            break;
+
+        case Prefs :: RATIO:
+            sessionSet( "seedRatioLimit", myPrefs.variant(key) );           
+            break;           
+        case Prefs :: RATIO_ENABLED:
+            sessionSet( "seedRatioLimited", myPrefs.variant(key) );
             break;
 
         case Prefs :: RPC_AUTH_REQUIRED:
