@@ -869,6 +869,7 @@ add_filename( TrCore *     core,
         if( tr_ctorSetMetainfoFromFile( ctor, filename ) )
         {
             tr_core_errsig( core, TR_EINVALID, filename );
+            tr_ctorFree( ctor );
         }
         else
         {
@@ -904,8 +905,6 @@ add_filename( TrCore *     core,
                     break;
             }
         }
-
-        tr_ctorFree( ctor );
     }
 }
 
