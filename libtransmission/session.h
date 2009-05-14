@@ -55,10 +55,10 @@ struct tr_metainfo_lookup
 
 struct tr_address;
 struct tr_bandwidth;
+struct tr_bindsockets;
 
 struct tr_session
 {
-    tr_bool                      isPortSet;
     tr_bool                      isPortRandom;
     tr_bool                      isPexEnabled;
     tr_bool                      isBlocklistEnabled;
@@ -151,6 +151,9 @@ struct tr_session
     struct tr_bandwidth        * bandwidth;
 
     double                       desiredRatio;
+
+    struct tr_bindinfo         * public_ipv4;
+    struct tr_bindinfo         * public_ipv6;
 };
 
 tr_bool      tr_sessionGetActiveSpeedLimit( const tr_session  * session,
@@ -172,6 +175,10 @@ void         tr_globalLock( tr_session * );
 void         tr_globalUnlock( tr_session * );
 
 tr_bool      tr_globalIsLocked( const tr_session * );
+
+const struct tr_address*  tr_sessionGetPublicAddress( const tr_session *, int tr_af_type );
+
+struct tr_bindsockets * tr_sessionGetBindSockets( tr_session * );
 
 enum
 {

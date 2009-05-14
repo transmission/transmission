@@ -596,7 +596,6 @@ torrentRealInit( tr_torrent * tor, const tr_ctor * ctor )
 
     tr_peerMgrAddTorrent( session->peerMgr, tor );
 
-    assert( session->isPortSet );
     assert( !tor->downloadedCur );
     assert( !tor->uploadedCur );
 

@@ -38,6 +38,7 @@
  #include <netdb.h>
  #include <fcntl.h>
 #endif
+#include <unistd.h>
 
 #include <evutil.h>
 
@@ -47,6 +48,7 @@
 #include "net.h"
 #include "peer-io.h"
 #include "platform.h"
+#include "session.h"
 #include "utils.h"
 
 #ifndef IN_MULTICAST
@@ -54,31 +56,30 @@
 #endif
 
 const tr_address tr_in6addr_any = { TR_AF_INET6, { IN6ADDR_ANY_INIT } }; 
-const tr_address tr_inaddr_any = { TR_AF_INET, 
-    { { { { INADDR_ANY, 0x00, 0x00, 0x00 } } } } }; 
+const tr_address tr_inaddr_any = { TR_AF_INET, { { { { INADDR_ANY, 0x00, 0x00, 0x00 } } } } }; 
 
 #ifdef WIN32
 static const char *
-inet_ntop(int af, const void *src, char *dst, socklen_t cnt)
+inet_ntop( int af, const void *src, char *dst, socklen_t cnt )
 {
     if (af == AF_INET)
     {
         struct sockaddr_in in;
-        memset(&in, 0, sizeof(in));
+        memset( &in, 0, sizeof( in ) );
         in.sin_family = AF_INET;
-        memcpy(&in.sin_addr, src, sizeof(struct in_addr));
-        getnameinfo((struct sockaddr *)&in, sizeof(struct
-            sockaddr_in), dst, cnt, NULL, 0, NI_NUMERICHOST);
+        memcpy( &in.sin_addr, src, sizeof( struct in_addr ) );
+        getnameinfo((struct sockaddr *)&in, sizeof(struct sockaddr_in),
+                    dst, cnt, NULL, 0, NI_NUMERICHOST);
         return dst;
     }
     else if (af == AF_INET6)
     {
         struct sockaddr_in6 in;
-        memset(&in, 0, sizeof(in));
+        memset( &in, 0, sizeof( in ) );
         in.sin6_family = AF_INET6;
-        memcpy(&in.sin6_addr, src, sizeof(struct in_addr6));
-        getnameinfo((struct sockaddr *)&in, sizeof(struct
-            sockaddr_in6), dst, cnt, NULL, 0, NI_NUMERICHOST);
+        memcpy( &in.sin6_addr, src, sizeof( struct in_addr6 ) );
+        getnameinfo((struct sockaddr *)&in, sizeof(struct sockaddr_in6),
+                    dst, cnt, NULL, 0, NI_NUMERICHOST);
         return dst;
     }
     return NULL;
@@ -196,138 +197,20 @@ tr_compareAddresses( const tr_address * a, const tr_address * b)
 tr_bool
 tr_net_hasIPv6( tr_port port )
 {
+    static tr_bool result = FALSE;
     static tr_bool alreadyDone = FALSE;
-    static tr_bool result      = FALSE;
-    int s;
-    if( alreadyDone )
-        return result;
-    s = tr_netBindTCP( &tr_in6addr_any, port, TRUE );
-    if( s >= 0 || -s != EAFNOSUPPORT ) /* we support ipv6 */
+
+    if( !alreadyDone )
     {
-        result = TRUE;
-        tr_netClose( s );
+        int fd = tr_netBindTCP( &tr_in6addr_any, port, TRUE );
+        if( fd >= 0 || -fd != EAFNOSUPPORT ) /* we support ipv6 */
+            result = TRUE;
+        if( fd >= 0 )
+            EVUTIL_CLOSESOCKET( fd );
+        alreadyDone = TRUE;
     }
-    alreadyDone = TRUE;
+
     return result;
-}
-
-/***********************************************************************
- * Socket list housekeeping
- **********************************************************************/
-struct tr_socketList
-{
-    int             socket;
-    tr_address      addr;
-    tr_socketList * next;
-};
-
-tr_socketList *
-tr_socketListAppend( tr_socketList * const head,
-                     const tr_address * const addr )
-{
-    tr_socketList * tmp;
-
-    assert( head );
-    assert( tr_isAddress( addr ) );
-
-    for( tmp = head; tmp->next; tmp = tmp->next );
-    tmp->next = tr_socketListNew( addr );
-    return tmp->next;
-}
-
-tr_socketList *
-tr_socketListNew( const tr_address * const addr )
-{
-    tr_socketList * tmp;
-
-    assert( tr_isAddress( addr ) );
-
-    tmp = tr_new( tr_socketList, 1 );
-    tmp->socket = -1;
-    tmp->addr = *addr;
-    tmp->next = NULL;
-    return tmp;
-}
-
-void
-tr_socketListFree( tr_socketList * const head )
-{
-    assert( head );
-
-    if( head->next )
-        tr_socketListFree( head->next );
-    tr_free( head );
-}
-
-void
-tr_socketListRemove( tr_socketList * const head,
-                     tr_socketList * const el)
-{
-    tr_socketList * tmp;
-
-    assert( head );
-    assert( el );
-
-    for( tmp = head; tmp->next && tmp->next != el; tmp = tmp->next );
-    tmp->next = el->next;
-    el->next = NULL;
-    tr_socketListFree(el);
-}
-
-void
-tr_socketListTruncate( tr_socketList * const head,
-                       tr_socketList * const start )
-{
-    tr_socketList * tmp;
-
-    assert( head );
-    assert( start );
-
-    for( tmp = head; tmp->next && tmp->next != start; tmp = tmp->next );
-    tr_socketListFree( start );
-    tmp->next = NULL;
-}
-
-#if 0
-int
-tr_socketListGetSocket( const tr_socketList * const el )
-{
-    assert( el );
-
-    return el->socket;
-}
-
-const tr_address *
-tr_socketListGetAddress( const tr_socketList * const el )
-{
-    assert( el );
-    return &el->addr;
-}
-#endif
-
-void
-tr_socketListForEach( tr_socketList * const head,
-                      void ( * cb ) ( int * const,
-                                      tr_address * const,
-                                      void * const),
-                      void * const userData )
-{
-    tr_socketList * tmp;
-    for( tmp = head; tmp; tmp = tmp->next )
-        cb( &tmp->socket, &tmp->addr, userData );
-}
-
-const tr_address *
-tr_socketListGetType( const tr_socketList * const el, tr_address_type type )
-{
-    const tr_socketList * tmp = el;
-    while( tmp )
-    {
-        if( tmp->addr.type == type )
-            return &tmp->addr;
-        tmp = tmp->next;
-    }
-    return NULL;
 }
 
 /***********************************************************************
@@ -344,57 +227,16 @@ tr_netSetTOS( int s, int tos )
 #endif
 }
 
-static int
-makeSocketNonBlocking( int fd )
-{
-    if( fd >= 0 )
-    {
-        if( evutil_make_socket_nonblocking( fd ) )
-        {
-            int tmperrno;
-            tr_err( _( "Couldn't create socket: %s" ),
-                   tr_strerror( sockerrno ) );
-            tmperrno = sockerrno;
-            tr_netClose( fd );
-            fd = -tmperrno;
-        }
-    }
-
-    return fd;
-}
-
-static int
-createSocket( int domain, int type )
-{
-    return makeSocketNonBlocking( tr_fdSocketCreate( domain, type ) );
-}
-
-static void
-setSndBuf( tr_session * session UNUSED, int fd UNUSED )
-{
-#if 0
-    if( fd >= 0 )
-    {
-        const int sndbuf = session->so_sndbuf;
-        const int rcvbuf = session->so_rcvbuf;
-        setsockopt( fd, SOL_SOCKET, SO_SNDBUF, &sndbuf, sizeof( sndbuf ) );
-        setsockopt( fd, SOL_SOCKET, SO_RCVBUF, &rcvbuf, sizeof( rcvbuf ) );
-    }
-#endif
-}
-
 static socklen_t
 setup_sockaddr( const tr_address        * addr,
                 tr_port                   port,
                 struct sockaddr_storage * sockaddr)
 {
-    struct sockaddr_in  sock4;
-    struct sockaddr_in6 sock6;
-
     assert( tr_isAddress( addr ) );
 
     if( addr->type == TR_AF_INET )
     {
+        struct sockaddr_in  sock4;
         memset( &sock4, 0, sizeof( sock4 ) );
         sock4.sin_family      = AF_INET;
         sock4.sin_addr.s_addr = addr->addr.addr4.s_addr;
@@ -404,11 +246,12 @@ setup_sockaddr( const tr_address        * addr,
     }
     else
     {
+        struct sockaddr_in6 sock6;
         memset( &sock6, 0, sizeof( sock6 ) );
-        sock6.sin6_family = AF_INET6;
-        sock6.sin6_port = port;
+        sock6.sin6_family   = AF_INET6;
+        sock6.sin6_port     = port;
         sock6.sin6_flowinfo = 0;
-        sock6.sin6_addr = addr->addr.addr6;
+        sock6.sin6_addr     = addr->addr.addr6;
         memcpy( sockaddr, &sock6, sizeof( sock6 ) );
         return sizeof( struct sockaddr_in6 );
     }
@@ -460,16 +303,14 @@ tr_isValidPeerAddress( const tr_address * addr, tr_port port )
     return TRUE;
 }
 
-const tr_socketList * tr_getSessionBindSockets( const tr_session * session );
-
 int
 tr_netOpenTCP( tr_session        * session,
                const tr_address  * addr,
                tr_port             port )
 {
+    static const int domains[NUM_TR_AF_INET_TYPES] = { AF_INET, AF_INET6 };
     int                     s;
     struct sockaddr_storage sock;
-    const int               type = SOCK_STREAM;
     socklen_t               addrlen;
     const tr_address      * source_addr;
     socklen_t               sourcelen;
@@ -480,16 +321,19 @@ tr_netOpenTCP( tr_session        * session,
     if( isMulticastAddress( addr ) || isIPv6LinkLocalAddress( addr ) )
         return -EINVAL;
 
-    if( ( s = createSocket( ( addr->type == TR_AF_INET ? AF_INET : AF_INET6 ), type ) ) < 0 )
-        return s;
+    s = tr_fdSocketCreate( domains[addr->type], SOCK_STREAM );
+    if( s < 0 )
+        return -1;
 
-    setSndBuf( session, s );
+    if( evutil_make_socket_nonblocking( s ) < 0 ) {
+        EVUTIL_CLOSESOCKET( s );
+        return -1;
+    }
 
     addrlen = setup_sockaddr( addr, port, &sock );
     
     /* set source address */
-    source_addr = tr_socketListGetType( tr_getSessionBindSockets( session ),
-                                        addr->type );
+    source_addr = tr_sessionGetPublicAddress( session, addr->type );
     assert( source_addr );
     sourcelen = setup_sockaddr( source_addr, 0, &source_sock );
     if( bind( s, ( struct sockaddr * ) &source_sock, sourcelen ) )
@@ -526,64 +370,68 @@ tr_netOpenTCP( tr_session        * session,
 int
 tr_netBindTCP( const tr_address * addr, tr_port port, tr_bool suppressMsgs )
 {
-    int                     s;
+    static const int domains[NUM_TR_AF_INET_TYPES] = { AF_INET, AF_INET6 };
     struct sockaddr_storage sock;
-    const int               type = SOCK_STREAM;
-    int                     addrlen;
-
-#if defined( SO_REUSEADDR ) || defined( SO_REUSEPORT ) || defined( IPV6_V6ONLY )
-    int                optval = 1;
-#endif
+    int fd;
+    int addrlen;
+    int optval;
 
     assert( tr_isAddress( addr ) );
 
-    if( ( s = createSocket( ( addr->type == TR_AF_INET ? AF_INET : AF_INET6 ),
-                            type ) ) < 0 )
-        return s;
+    fd = socket( domains[addr->type], SOCK_STREAM, 0 );
+    if( fd < 0 )
+        return -1;
 
-#ifdef SO_REUSEADDR
-    setsockopt( s, SOL_SOCKET, SO_REUSEADDR, (char*)&optval, sizeof( optval ) );
-#endif
+    if( evutil_make_socket_nonblocking( fd ) < 0 ) {
+        EVUTIL_CLOSESOCKET( fd );
+        return -1;
+    }
+
+    optval = 1;
+    setsockopt( fd, SOL_SOCKET, SO_KEEPALIVE, &optval, sizeof(optval) );
+    setsockopt( fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval) );
 
 #ifdef IPV6_V6ONLY
-    if( addr->type == TR_AF_INET6 && 
-        setsockopt( s, IPPROTO_IPV6, IPV6_V6ONLY, &optval,
-                             sizeof( optval ) ) == -1 ) {
-        /* the kernel may not support this. if not, ignore it */
-        if( errno != ENOPROTOOPT )
-            return -errno;
-    }
+    if( addr->type == TR_AF_INET6 )
+        if( setsockopt( fd, IPPROTO_IPV6, IPV6_V6ONLY, &optval, sizeof( optval ) ) == -1 )
+            if( EVUTIL_SOCKET_ERROR( ) != ENOPROTOOPT ) /* if the kernel doesn't support it, ignore it */
+                return -EVUTIL_SOCKET_ERROR( );
 #endif
 
     addrlen = setup_sockaddr( addr, htons( port ), &sock );
-
-    if( bind( s, (struct sockaddr *) &sock,
-             addrlen ) )
-    {
-        int tmperrno;
+    if( bind( fd, (struct sockaddr *) &sock, addrlen ) ) {
+        const int err = EVUTIL_SOCKET_ERROR( );
         if( !suppressMsgs )
-            tr_err( _( "Couldn't bind port %d on %s: %s" ), port,
-                    tr_ntop_non_ts( addr ), tr_strerror( sockerrno ) );
-        tmperrno = sockerrno;
-        tr_netClose( s );
-        return -tmperrno;
+            tr_err( _( "Couldn't bind port %d on %s: %s" ),
+                    port, tr_ntop_non_ts( addr ), tr_strerror( err ) );
+        tr_netClose( fd );
+        return -err;
     }
+
     if( !suppressMsgs )
-        tr_dbg(  "Bound socket %d to port %d on %s",
-                 s, port, tr_ntop_non_ts( addr ) );
-    return s;
+        tr_dbg( "Bound socket %d to port %d on %s", fd, port, tr_ntop_non_ts( addr ) );
+
+    if( listen( fd, 128 ) == -1 ) {
+        EVUTIL_CLOSESOCKET( fd );
+        return -EVUTIL_SOCKET_ERROR( );
+    }
+
+    return fd;
 }
 
 int
-tr_netAccept( tr_session  * session,
+tr_netAccept( tr_session  * session UNUSED,
               int           b,
               tr_address  * addr,
               tr_port     * port )
 {
-    int fd;
+    int fd = tr_fdSocketAccept( b, addr, port );
 
-    fd = makeSocketNonBlocking( tr_fdSocketAccept( b, addr, port ) );
-    setSndBuf( session, fd );
+    if( fd>=0 && evutil_make_socket_nonblocking(fd)<0 ) {
+        EVUTIL_CLOSESOCKET( fd );
+        fd = -1;
+    }
+
     return fd;
 }
 

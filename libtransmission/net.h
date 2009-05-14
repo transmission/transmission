@@ -61,8 +61,10 @@ struct tr_session;
 typedef enum tr_address_type
 {
     TR_AF_INET,
-    TR_AF_INET6
-} tr_address_type;
+    TR_AF_INET6,
+    NUM_TR_AF_INET_TYPES
+}
+tr_address_type;
 
 typedef struct tr_address
 {
@@ -92,28 +94,6 @@ tr_bool tr_isValidPeerAddress( const tr_address * addr, tr_port port );
 static TR_INLINE tr_bool tr_isAddress( const tr_address * a ) { return ( a != NULL ) && ( a->type==TR_AF_INET || a->type==TR_AF_INET6 ); }
 
 tr_bool tr_net_hasIPv6( tr_port );
-
-/***********************************************************************
- * Socket list housekeeping
- **********************************************************************/
-typedef struct tr_socketList tr_socketList;
-tr_socketList *tr_socketListAppend( tr_socketList * const head,
-                                    const tr_address * const addr );
-tr_socketList *tr_socketListNew( const tr_address * const addr );
-void tr_socketListFree( tr_socketList * const head );
-void tr_socketListRemove( tr_socketList * const head,
-                          tr_socketList * const el);
-void tr_socketListTruncate( tr_socketList * const head,
-                            tr_socketList * const start );
-int tr_socketListGetSocket( const tr_socketList * const el );
-const tr_address *tr_socketListGetAddress( const tr_socketList * const el );
-void tr_socketListForEach( tr_socketList * const head,
-                           void ( * cb ) ( int * const,
-                                           tr_address * const,
-                                           void * const ),
-                           void * const userData);
-const tr_address *tr_socketListGetType( const tr_socketList * const el,
-                                        tr_address_type type );
 
 /***********************************************************************
  * Sockets
