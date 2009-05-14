@@ -404,7 +404,7 @@ tr_netBindTCP( const tr_address * addr, tr_port port, tr_bool suppressMsgs )
         if( !suppressMsgs )
             tr_err( _( "Couldn't bind port %d on %s: %s" ),
                     port, tr_ntop_non_ts( addr ), tr_strerror( err ) );
-        tr_netClose( fd );
+        EVUTIL_CLOSESOCKET( fd );
         return -err;
     }
 
