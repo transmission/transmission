@@ -1247,6 +1247,7 @@ Transmission.prototype =
 			} else {
 				args.url = '/transmission/upload?paused=' + (this[Prefs._AutoStart] ? 'false' : 'true');
 				args.type = 'POST';
+				args.data = { 'X-Transmission-Session-Id' : tr.remote._token };
 				args.dataType = 'xml';
 				args.iframe = true;
 				args.success = function( data ) {
