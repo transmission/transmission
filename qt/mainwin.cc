@@ -168,8 +168,8 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
 
     // context menu
     QList<QAction*> actions;
-    actions << ui.action_OpenFolder
-            << ui.action_Properties
+    actions << ui.action_Properties
+            << ui.action_OpenFolder
             << ui.action_SetLocation
             << sep2
             << ui.action_Start

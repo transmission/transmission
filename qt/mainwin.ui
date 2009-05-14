@@ -51,7 +51,7 @@
      <x>0</x>
      <y>0</y>
      <width>792</width>
-     <height>25</height>
+     <height>23</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -68,8 +68,8 @@
     <addaction name="action_Add"/>
     <addaction name="action_New"/>
     <addaction name="separator"/>
-    <addaction name="action_OpenFolder"/>
     <addaction name="action_Properties"/>
+    <addaction name="action_OpenFolder"/>
     <addaction name="action_SetLocation"/>
     <addaction name="separator"/>
     <addaction name="action_Start"/>
