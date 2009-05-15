@@ -27,26 +27,30 @@ SOFTWARE.
 */
 
 /*
-    Callbacks, comments, Unicode handling by Jean Gressmann (jean@0x42.de), 2007-2008.
+    Callbacks, comments, Unicode handling by Jean Gressmann (jean@0x42.de), 2007-2009.
     
     For the added features the license above applies also.
     
     Changelog:
-        2008/10/14 
-            - Renamed states.IN to states.IT to avoid name clash which IN macro
-              defined in windef.h (alexey.pelykh@gmail.com)
+        2009-05-14 
+            Fixed float parsing bug related to a locale being set that didn't
+            use '.' as decimal point character (charles@transmissionbt.com).
             
-        2008/07/19 
-            - Removed some duplicate code & debugging variable (Charles.Kerr@noaa.gov)
+        2008-10-14 
+            Renamed states.IN to states.IT to avoid name clash which IN macro
+            defined in windef.h (alexey.pelykh@gmail.com)
+            
+        2008-07-19 
+            Removed some duplicate code & debugging variable (charles@transmissionbt.com)
         
-        2008/05/28 
-            - Made JSON_value structure ansi C compliant. This bug was report by 
-              trisk@acm.jhu.edu
+        2008-05-28 
+            Made JSON_value structure ansi C compliant. This bug was report by 
+            trisk@acm.jhu.edu
         
-        2008/05/20 
-            - Fixed bug reported by Charles.Kerr@noaa.gov where the switching 
-              from static to dynamic parse buffer did not copy the static parse 
-              buffer's content.
+        2008-05-20 
+            Fixed bug reported by charles@transmissionbt.com where the switching 
+            from static to dynamic parse buffer did not copy the static parse 
+            buffer's content.
 */
 
 
@@ -54,19 +58,19 @@ SOFTWARE.
 #include <assert.h>
 #include <ctype.h>
 #include <float.h>
-#include <locale.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <locale.h>
 
 #include "JSON_parser.h"
 #include "ConvertUTF.h"
 
 #ifdef _MSC_VER
- #if _MSC_VER >= 1400 /* Visual Studio 2005 and up */
-  #pragma warning(disable:4996) /* unsecure sscanf */
- #endif
+#   if _MSC_VER >= 1400 /* Visual Studio 2005 and up */
+#      pragma warning(disable:4996) // unsecure sscanf
+#   endif
 #endif
 
 
@@ -84,7 +88,7 @@ SOFTWARE.
 #endif
 
 
-typedef struct JSON_parser_struct {
+struct JSON_parser_struct {
     JSON_parser_callback callback;
     void* ctx;
     signed char state, before_comment_state, type, escaped, comment, allow_comments, handle_floats_manually;
@@ -93,18 +97,19 @@ typedef struct JSON_parser_struct {
     long top;
     signed char* stack;
     long stack_capacity;
-    signed char static_stack[JSON_PARSER_STACK_SIZE];
+    char decimal_point;
     char* parse_buffer;
     size_t parse_buffer_capacity;
     size_t parse_buffer_count;
     size_t comment_begin_offset;
+    signed char static_stack[JSON_PARSER_STACK_SIZE];
     char static_parse_buffer[JSON_PARSER_PARSE_BUFFER_SIZE];
-} * JSON_parser;
+};
 
 #define COUNTOF(x) (sizeof(x)/sizeof(x[0])) 
 
 /*
-    Characters are mapped into these 31 character classes. This allows for
+    Characters are mapped into these character classes. This allows for
     a significant reduction in the size of the state transition table.
 */
 
@@ -432,6 +437,10 @@ new_JSON_parser(JSON_config* config)
     jc->ctx = config->callback_ctx;
     jc->allow_comments = config->allow_comments != 0;
     jc->handle_floats_manually = config->handle_floats_manually != 0;
+    
+    /* set up decimal point */
+    jc->decimal_point = *localeconv()->decimal_point;
+    
     return jc;
 }
 
@@ -455,6 +464,15 @@ static void grow_parse_buffer(JSON_parser jc)
         jc->parse_buffer[jc->parse_buffer_count]   = 0;\
     } while (0)
 
+#define assert_is_non_container_type(jc) \
+    assert( \
+        jc->type == JSON_T_NULL || \
+        jc->type == JSON_T_FALSE || \
+        jc->type == JSON_T_TRUE || \
+        jc->type == JSON_T_FLOAT || \
+        jc->type == JSON_T_INTEGER || \
+        jc->type == JSON_T_STRING)
+    
 
 static int parse_parse_buffer(JSON_parser jc)
 {
@@ -462,13 +480,7 @@ static int parse_parse_buffer(JSON_parser jc)
         JSON_value value, *arg = NULL;
         
         if (jc->type != JSON_T_NONE) {
-            assert(
-                jc->type == JSON_T_NULL ||
-                jc->type == JSON_T_FALSE ||
-                jc->type == JSON_T_TRUE ||
-                jc->type == JSON_T_FLOAT ||
-                jc->type == JSON_T_INTEGER ||
-                jc->type == JSON_T_STRING);
+            assert_is_non_container_type(jc);
         
             switch(jc->type) {
                 case JSON_T_FLOAT:
@@ -477,13 +489,10 @@ static int parse_parse_buffer(JSON_parser jc)
                         value.vu.str.value = jc->parse_buffer;
                         value.vu.str.length = jc->parse_buffer_count;
                     } else { 
-                        /* the json spec requires a '.' decimal point regardless of locale */
-                        char numeric[128];
-                        snprintf(numeric, sizeof(numeric), "%s", setlocale(LC_NUMERIC, NULL));
-                        setlocale(LC_NUMERIC, "POSIX" );
-                        sscanf(jc->parse_buffer, "%Lf", &value.vu.float_value);
-                        value.vu.float_value = strtod(jc->parse_buffer, NULL);
-                        setlocale(LC_NUMERIC, numeric);
+                        /*sscanf(jc->parse_buffer, "%Lf", &value.vu.float_value);*/
+                        
+                        /* not checking with end pointer b/c there may be trailing ws */
+                        value.vu.float_value = strtold(jc->parse_buffer, NULL);
                     }
                     break;
                 case JSON_T_INTEGER:
@@ -576,38 +585,12 @@ static int decode_unicode_char(JSON_parser jc)
     return true;
 }
 
-
-int
-JSON_parser_char(JSON_parser jc, int next_char)
+static int add_escaped_char_to_parse_buffer(JSON_parser jc, int next_char)
 {
-/*
-    After calling new_JSON_parser, call this function for each character (or
-    partial character) in your JSON text. It can accept UTF-8, UTF-16, or
-    UTF-32. It returns true if things are looking ok so far. If it rejects the
-    text, it returns false.
-*/
-    int next_class, next_state;
-    
-/*
-    Determine the character's class.
-*/
-    if (next_char < 0) {
-        return false;
-    }
-    if (next_char >= 128) {
-        next_class = C_ETC;
-    } else {
-        next_class = ascii_class[next_char];
-        if (next_class <= __) {
-            return false;
-        }
-    }
-    
-    if (jc->escaped) {
-        jc->escaped = 0;
-        /* remove the backslash */
-        parse_buffer_pop_back_char(jc);
-        switch(next_char) {
+    jc->escaped = 0;
+    /* remove the backslash */
+    parse_buffer_pop_back_char(jc);
+    switch(next_char) {
         case 'b':
             parse_buffer_push_back_char(jc, '\b');
             break;
@@ -638,14 +621,58 @@ JSON_parser_char(JSON_parser jc, int next_char)
             break;
         default:
             return false;
-        }
-    } else if (!jc->comment) { 
-        if (jc->type != JSON_T_NONE || !(next_class == C_SPACE || next_class == C_WHITE) /* non-white-space */) {
-            parse_buffer_push_back_char(jc, (char)next_char);
+    }
+
+    return true;
+}
+
+#define add_char_to_parse_buffer(jc, next_char, next_class) \
+    do { \
+        if (jc->escaped) { \
+            if (!add_escaped_char_to_parse_buffer(jc, next_char)) \
+                return false; \
+        } else if (!jc->comment) { \
+            if ((jc->type != JSON_T_NONE) | !((next_class == C_SPACE) | (next_class == C_WHITE)) /* non-white-space */) { \
+                parse_buffer_push_back_char(jc, (char)next_char); \
+            } \
+        } \
+    } while (0)
+    
+
+#define assert_type_isnt_string_null_or_bool(jc) \
+    assert(jc->type != JSON_T_FALSE); \
+    assert(jc->type != JSON_T_TRUE); \
+    assert(jc->type != JSON_T_NULL); \
+    assert(jc->type != JSON_T_STRING)
+
+
+int
+JSON_parser_char(JSON_parser jc, int next_char)
+{
+/*
+    After calling new_JSON_parser, call this function for each character (or
+    partial character) in your JSON text. It can accept UTF-8, UTF-16, or
+    UTF-32. It returns true if things are looking ok so far. If it rejects the
+    text, it returns false.
+*/
+    int next_class, next_state;
+    
+/*
+    Determine the character's class.
+*/
+    if (next_char < 0) {
+        return false;
+    }
+    if (next_char >= 128) {
+        next_class = C_ETC;
+    } else {
+        next_class = ascii_class[next_char];
+        if (next_class <= __) {
+            return false;
         }
     }
     
-    
+    add_char_to_parse_buffer(jc, next_char, next_class);
     
 /*
     Get the next state from the state transition table.
@@ -696,20 +723,22 @@ JSON_parser_char(JSON_parser jc, int next_char)
             
 /* floating point number detected by exponent*/
         case DE:
-            assert(jc->type != JSON_T_FALSE);
-            assert(jc->type != JSON_T_TRUE);
-            assert(jc->type != JSON_T_NULL);
-            assert(jc->type != JSON_T_STRING);
+            assert_type_isnt_string_null_or_bool(jc);
             jc->type = JSON_T_FLOAT;
             jc->state = E1;
             break;   
         
 /* floating point number detected by fraction */
         case DF:
-            assert(jc->type != JSON_T_FALSE);
-            assert(jc->type != JSON_T_TRUE);
-            assert(jc->type != JSON_T_NULL);
-            assert(jc->type != JSON_T_STRING);
+            assert_type_isnt_string_null_or_bool(jc);
+            if (!jc->handle_floats_manually) {
+/*
+    Some versions of strtod (which underlies sscanf) don't support converting 
+    C-locale formated floating point values.
+*/           
+                assert(jc->parse_buffer[jc->parse_buffer_count-1] == '.');
+                jc->parse_buffer[jc->parse_buffer_count-1] = jc->decimal_point;
+            }            
             jc->type = JSON_T_FLOAT;
             jc->state = FX;
             break;   

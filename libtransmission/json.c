@@ -144,7 +144,7 @@ tr_jsonParse( const void     * vbuf,
     int                         err = 0;
     const unsigned char       * buf = vbuf;
     const void                * bufend = buf + len;
-    struct JSON_config_struct   config;
+    JSON_config                 config;
     struct JSON_parser_struct * checker;
     struct json_benc_data       data;
 
