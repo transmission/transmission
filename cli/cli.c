@@ -48,9 +48,12 @@ static sig_atomic_t manualUpdate     = 0;
 
 static const char * torrentPath  = NULL;
 static const char * finishCall   = NULL;
-static const char * announce     = NULL;
 static const char * sourceFile   = NULL;
 static const char * comment      = NULL;
+
+#define MAX_ANNOUNCE 128
+static tr_tracker_info announce[MAX_ANNOUNCE];
+static int announceCount = 0;
 
 static const struct tr_option options[] =
 {
@@ -333,10 +336,7 @@ main( int     argc,
     {
         int                   err;
         tr_metainfo_builder * b = tr_metaInfoBuilderCreate( sourceFile );
-        tr_tracker_info       ti;
-        ti.tier = 0;
-        ti.announce = (char*) announce;
-        tr_makeMetaInfo( b, torrentPath, &ti, 1, comment, isPrivate );
+        tr_makeMetaInfo( b, torrentPath, announce, announceCount, comment, isPrivate );
         while( !b->isDone )
         {
             tr_wait( 1000 );
@@ -489,9 +489,12 @@ parseCommandLine( tr_benc * d, int argc, const char ** argv )
     {
         switch( c )
         {
-            case 'a':
-                announce = optarg; break;
-
+            case 'a': if( announceCount + 1 < MAX_ANNOUNCE ) {
+                          announce[announceCount].tier = announceCount;
+                          announce[announceCount].announce = (char*) optarg;
+                          ++announceCount;
+                      }
+                      break;
             case 'b': tr_bencDictAddBool( d, TR_PREFS_KEY_BLOCKLIST_ENABLED, TRUE );
                       break;
             case 'B': tr_bencDictAddBool( d, TR_PREFS_KEY_BLOCKLIST_ENABLED, FALSE );
