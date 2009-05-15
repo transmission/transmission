@@ -394,13 +394,13 @@ tr_netBindTCP( const tr_address * addr, tr_port port, tr_bool suppressMsgs )
 #ifdef IPV6_V6ONLY
     if( addr->type == TR_AF_INET6 )
         if( setsockopt( fd, IPPROTO_IPV6, IPV6_V6ONLY, &optval, sizeof( optval ) ) == -1 )
-            if( sockerr != ENOPROTOOPT ) /* if the kernel doesn't support it, ignore it */
-                return -sockerr;
+            if( sockerrno != ENOPROTOOPT ) /* if the kernel doesn't support it, ignore it */
+                return -sockerrno;
 #endif
 
     addrlen = setup_sockaddr( addr, htons( port ), &sock );
     if( bind( fd, (struct sockaddr *) &sock, addrlen ) ) {
-        const int err = sockerr;
+        const int err = sockerrno;
         if( !suppressMsgs )
             tr_err( _( "Couldn't bind port %d on %s: %s" ),
                     port, tr_ntop_non_ts( addr ), tr_strerror( err ) );
@@ -413,7 +413,7 @@ tr_netBindTCP( const tr_address * addr, tr_port port, tr_bool suppressMsgs )
 
     if( listen( fd, 128 ) == -1 ) {
         EVUTIL_CLOSESOCKET( fd );
-        return -sockerr;
+        return -sockerrno;
     }
 
     return fd;
