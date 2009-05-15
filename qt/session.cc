@@ -47,7 +47,9 @@ namespace
         TAG_SESSION_INFO,
         TAG_BLOCKLIST_UPDATE,
         TAG_ADD_TORRENT,
-        TAG_PORT_TEST
+        TAG_PORT_TEST,
+
+        FIRST_UNIQUE_TAG
     };
 }
 
@@ -178,6 +180,7 @@ Session :: updatePref( int key )
 ***/
 
 Session :: Session( const char * configDir, Prefs& prefs ):
+    nextUniqueTag( FIRST_UNIQUE_TAG ),
     myBlocklistSize( -1 ),
     myPrefs( prefs ),
     mySession( 0 ),
@@ -321,8 +324,6 @@ namespace
         }
     }
 }
-
-const int Session :: ADD_TORRENT_TAG = TAG_ADD_TORRENT;
 
 void
 Session :: torrentSet( const QSet<int>& ids, const QString& key, double value )
@@ -624,9 +625,19 @@ Session :: parseResponse( const char * json, size_t jsonLength )
     const int err( tr_jsonParse( json, jsonLength, &top, &end ) );
     if( !err )
     {
-        int64_t tag;
+        int64_t tag = -1;
+        const char * result = NULL;
+        tr_benc * args = NULL;
+
+        tr_bencDictFindInt ( &top, "tag", &tag );
+        tr_bencDictFindStr ( &top, "result", &result );
+        tr_bencDictFindDict( &top, "arguments", &args );
+
+        emit executed( tag, result, args );
+
+        tr_benc * torrents;
         const char * str;
-        tr_benc *args, *torrents;
+
         if( tr_bencDictFindInt( &top, "tag", &tag ) )
         {
             switch( tag )
