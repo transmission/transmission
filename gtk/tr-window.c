@@ -799,7 +799,7 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
     const char *  pch;
     PrivateData * p;
     GtkWidget   *mainmenu, *toolbar, *filter, *list, *status;
-    GtkWidget *   vbox, *w, *self, *h, *c, *s, *hbox, *image, *menu;
+    GtkWidget *   vbox, *w, *self, *h, *s, *hbox, *image, *menu;
     GtkWindow *   win;
     GSList *      l;
 

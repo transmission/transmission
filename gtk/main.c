@@ -108,7 +108,7 @@ struct cbdata
     GSList            * errqueue;
     GSList            * dupqueue;
     GtkTreeSelection  * sel;
-    GtkWidget         * details;
+    gpointer            details;
 };
 
 #define CBDATA_PTR "callback-data-pointer"
@@ -250,7 +250,7 @@ refreshDetailsDialog( struct cbdata * data )
         }
     }
 
-    torrent_inspector_set_torrents( data->details, ids );
+    torrent_inspector_set_torrents( GTK_WIDGET( data->details ), ids );
 
     /* cleanup */
     g_slist_free( ids );
@@ -1362,10 +1362,10 @@ doAction( const char * action_name, gpointer user_data )
     {
         if( data->details == NULL ) {
             data->details = torrent_inspector_new( GTK_WINDOW( data->wind ), data->core );
-            g_object_add_weak_pointer( G_OBJECT( data->details ), (gpointer*)&data->details );
+            g_object_add_weak_pointer( G_OBJECT( data->details ), &data->details );
         }
         refreshDetailsDialog( data );
-        gtk_widget_show( data->details );
+        gtk_widget_show( GTK_WIDGET( data->details ) );
     }
     else if( !strcmp( action_name, "update-tracker" ) )
     {
