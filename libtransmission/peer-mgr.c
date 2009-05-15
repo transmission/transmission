@@ -461,13 +461,13 @@ deleteTimers( struct tr_peerMgr * m )
     if( m->bandwidthTimer )
         tr_timerFree( &m->bandwidthTimer );
 
-    if( m->rechokeTimer == NULL )
+    if( m->rechokeTimer )
         tr_timerFree( &m->rechokeTimer );
 
-    if( m->reconnectTimer == NULL )
+    if( m->reconnectTimer )
         tr_timerFree( &m->reconnectTimer );
 
-    if( m->refillUpkeepTimer == NULL )
+    if( m->refillUpkeepTimer )
         tr_timerFree( &m->refillUpkeepTimer );
 }
 
