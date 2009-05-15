@@ -326,7 +326,7 @@ tr_netOpenTCP( tr_session        * session,
         return -1;
 
     if( evutil_make_socket_nonblocking( s ) < 0 ) {
-        EVUTIL_CLOSESOCKET( s );
+        tr_netClose( s );
         return -1;
     }
 
@@ -394,13 +394,13 @@ tr_netBindTCP( const tr_address * addr, tr_port port, tr_bool suppressMsgs )
 #ifdef IPV6_V6ONLY
     if( addr->type == TR_AF_INET6 )
         if( setsockopt( fd, IPPROTO_IPV6, IPV6_V6ONLY, &optval, sizeof( optval ) ) == -1 )
-            if( EVUTIL_SOCKET_ERROR( ) != ENOPROTOOPT ) /* if the kernel doesn't support it, ignore it */
-                return -EVUTIL_SOCKET_ERROR( );
+            if( sockerr != ENOPROTOOPT ) /* if the kernel doesn't support it, ignore it */
+                return -sockerr;
 #endif
 
     addrlen = setup_sockaddr( addr, htons( port ), &sock );
     if( bind( fd, (struct sockaddr *) &sock, addrlen ) ) {
-        const int err = EVUTIL_SOCKET_ERROR( );
+        const int err = sockerr;
         if( !suppressMsgs )
             tr_err( _( "Couldn't bind port %d on %s: %s" ),
                     port, tr_ntop_non_ts( addr ), tr_strerror( err ) );
@@ -413,7 +413,7 @@ tr_netBindTCP( const tr_address * addr, tr_port port, tr_bool suppressMsgs )
 
     if( listen( fd, 128 ) == -1 ) {
         EVUTIL_CLOSESOCKET( fd );
-        return -EVUTIL_SOCKET_ERROR( );
+        return -sockerr;
     }
 
     return fd;
@@ -428,7 +428,7 @@ tr_netAccept( tr_session  * session UNUSED,
     int fd = tr_fdSocketAccept( b, addr, port );
 
     if( fd>=0 && evutil_make_socket_nonblocking(fd)<0 ) {
-        EVUTIL_CLOSESOCKET( fd );
+        tr_netClose( fd );
         fd = -1;
     }
 
