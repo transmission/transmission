@@ -281,15 +281,13 @@ privateFree( gpointer vprivate )
 }
 
 static void
-onYinYangReleased( GtkWidget * w           UNUSED,
-                   GdkEventButton * button UNUSED,
-                   gpointer                vprivate )
+onYinYangReleased( GtkWidget * w UNUSED, gpointer vprivate )
 {
     PrivateData * p = vprivate;
 
-    gtk_menu_popup( GTK_MENU(
-                       p->status_menu ), NULL, NULL, NULL, NULL, 0,
-                   gtk_get_current_event_time( ) );
+    gtk_menu_popup( GTK_MENU( p->status_menu ),
+                    NULL, NULL, NULL, NULL, 0,
+                    gtk_get_current_event_time( ) );
 }
 
 #define STATS_MODE "stats-mode"
