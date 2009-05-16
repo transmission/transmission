@@ -13,6 +13,7 @@
 #include <assert.h>
 #include <ctype.h> /* isdigit, isprint, isspace */
 #include <errno.h>
+#include <math.h> /* fabs */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1212,10 +1213,10 @@ jsonChildFunc( struct jsonWalk * data )
             {
                 const int i = parentState->childIndex++;
                 if( !( i % 2 ) )
-                    evbuffer_add( data->out, ": ", 2 );
+                    evbuffer_add( data->out, ": ", data->doIndent ? 2 : 1 );
                 else
                 {
-                    evbuffer_add( data->out, ", ", 2 );
+                    evbuffer_add( data->out, ", ", data->doIndent ? 2 : 1 );
                     jsonIndent( data );
                 }
                 break;
@@ -1224,7 +1225,7 @@ jsonChildFunc( struct jsonWalk * data )
             case TR_TYPE_LIST:
             {
                 ++parentState->childIndex;
-                evbuffer_add( data->out, ", ", 2 );
+                evbuffer_add( data->out, ", ", data->doIndent ? 2 : 1 );
                 jsonIndent( data );
                 break;
             }
@@ -1282,11 +1283,15 @@ jsonRealFunc( const tr_benc * val, void * vdata )
     struct jsonWalk * data = vdata;
     char locale[128];
 
-    /* json requires a '.' decimal point regardless of locale */
-    tr_strlcpy( locale, setlocale( LC_NUMERIC, NULL ), sizeof( locale ) );
-    setlocale( LC_NUMERIC, "POSIX" );
-    evbuffer_add_printf( data->out, "%f", val->val.d );
-    setlocale( LC_NUMERIC, locale );
+    if( fabs( val->val.d ) < 0.00001 )
+        evbuffer_add( data->out, "0", 1 );
+    else {
+        /* json requires a '.' decimal point regardless of locale */
+        tr_strlcpy( locale, setlocale( LC_NUMERIC, NULL ), sizeof( locale ) );
+        setlocale( LC_NUMERIC, "POSIX" );
+        evbuffer_add_printf( data->out, "%.4f", val->val.d );
+        setlocale( LC_NUMERIC, locale );
+    }
 
     jsonChildFunc( data );
 }
