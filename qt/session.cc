@@ -531,7 +531,7 @@ Session :: updateBlocklist( )
 void
 Session :: exec( const tr_benc * request )
 {
-    char * str( tr_bencToJSON( request ) );
+    char * str( tr_bencToJSON( request, FALSE ) );
     exec( str );
     tr_free( str );
 }

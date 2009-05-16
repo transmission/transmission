@@ -92,7 +92,7 @@ tr_idle_function_done( struct tr_rpc_idle_data * data, const char * result )
         result = "success";
     tr_bencDictAddStr( data->response, "result", result );
 
-    tr_bencSaveAsJSON( data->response, buf );
+    tr_bencSaveAsJSON( data->response, buf, FALSE );
     (*data->callback)( data->session, (const char*)EVBUFFER_DATA(buf),
                        EVBUFFER_LENGTH(buf), data->callback_user_data );
 
@@ -1336,7 +1336,7 @@ request_exec( tr_session             * session,
         tr_bencDictAddStr( &response, "result", result );
         if( tr_bencDictFindInt( request, "tag", &tag ) )
             tr_bencDictAddInt( &response, "tag", tag );
-        tr_bencSaveAsJSON( &response, buf );
+        tr_bencSaveAsJSON( &response, buf, FALSE );
         (*callback)( session, (const char*)EVBUFFER_DATA(buf),
                      EVBUFFER_LENGTH( buf ), callback_user_data );
 
@@ -1358,7 +1358,7 @@ request_exec( tr_session             * session,
         tr_bencDictAddStr( &response, "result", result );
         if( tr_bencDictFindInt( request, "tag", &tag ) )
             tr_bencDictAddInt( &response, "tag", tag );
-        tr_bencSaveAsJSON( &response, buf );
+        tr_bencSaveAsJSON( &response, buf, FALSE );
         (*callback)( session, (const char*)EVBUFFER_DATA(buf),
                      EVBUFFER_LENGTH(buf), callback_user_data );
 

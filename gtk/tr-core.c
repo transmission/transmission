@@ -1444,7 +1444,7 @@ tr_core_exec_json( TrCore * core, const char * json )
 void
 tr_core_exec( TrCore * core, const tr_benc * top )
 {
-    char * json = tr_bencToJSON( top );
+    char * json = tr_bencToJSON( top, FALSE );
     tr_core_exec_json( core, json );
     tr_free( json );
 }

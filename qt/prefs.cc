@@ -217,7 +217,7 @@ Prefs :: ~Prefs( )
     }
 
     /* write back out the serialized preferences */
-    char * json = tr_bencToJSON( &top );
+    char * json = tr_bencToJSON( &top, TRUE );
     if( json && *json ) {
         file.open( QIODevice::WriteOnly | QIODevice::Text );
         file.write( json );

@@ -269,7 +269,7 @@ handle_upload( struct evhttp_request * req,
                 b64 = tr_base64_encode( body, body_len, NULL );
                 tr_bencDictAddStr( args, "metainfo", b64 );
                 tr_bencDictAddBool( args, "paused", paused );
-                tr_bencSaveAsJSON( &top, json );
+                tr_bencSaveAsJSON( &top, json, FALSE );
                 tr_rpc_request_exec_json( server->session,
                                           EVBUFFER_DATA( json ),
                                           EVBUFFER_LENGTH( json ),

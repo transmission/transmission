@@ -1064,28 +1064,30 @@ fileBytesCompleted( const tr_torrent * tor, tr_file_index_t index )
         }
         else
         {
-            const tr_block_index_t firstBlockOfLastPiece = tr_torPieceFirstBlock( tor, f->lastPiece );
-            const tr_block_index_t lastBlockOfFirstPiece = tr_torPieceFirstBlock( tor, f->firstPiece )
-                                                         + tr_torPieceCountBlocks( tor, f->firstPiece )
-                                                         - 1;
+            int64_t b = 0;
+            const tr_block_index_t firstBlockOfLastPiece
+                       = tr_torPieceFirstBlock( tor, f->lastPiece );
+            const tr_block_index_t lastBlockOfFirstPiece
+                       = tr_torPieceFirstBlock( tor, f->firstPiece )
+                         + tr_torPieceCountBlocks( tor, f->firstPiece ) - 1;
+
             /* the rest of the first piece */
             for( i=firstBlock+1; i<lastBlock && i<=lastBlockOfFirstPiece; ++i )
                 if( tr_cpBlockIsCompleteFast( &tor->completion, i ) )
-                    total += tor->blockSize;
+                    ++b;
 
             /* the middle pieces */
-            if( f->firstPiece + 1 < f->lastPiece ) {
-                uint64_t b = tor->blockCountInPiece * ( f->lastPiece - ( f->firstPiece + 1 ) );
+            if( f->firstPiece + 1 < f->lastPiece )
                 for( i=f->firstPiece+1; i<f->lastPiece; ++i )
-                    b -= tr_cpMissingBlocksInPiece( &tor->completion, i );
-                b *= tor->blockSize;
-                total += b;
-            }
+                    b += tor->blockCountInPiece - tr_cpMissingBlocksInPiece( &tor->completion, i );
 
             /* the rest of the last piece */
             for( i=firstBlockOfLastPiece; i<lastBlock; ++i )
                 if( tr_cpBlockIsCompleteFast( &tor->completion, i ) )
-                    total += tor->blockSize;
+                    ++b;
+
+            b *= tor->blockSize;
+            total += b;
         }
 
         /* the last block */
