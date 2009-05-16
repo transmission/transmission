@@ -1075,7 +1075,9 @@ prefschanged( TrCore * core UNUSED,
     }
     else if( !strcmp( key, TR_PREFS_KEY_ALT_SPEED_ENABLED ) )
     {
-        tr_sessionUseAltSpeed( tr, pref_flag_get( key ) );
+        const gboolean b = pref_flag_get( key );
+        tr_sessionUseAltSpeed( tr, b );
+        action_toggle( key, b );
     }
     else if( !strcmp( key, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN ) )
     {
