@@ -260,7 +260,7 @@ QIconTheme QtIconLoaderImplementation::parseIndexFile(const QString &themeName) 
         }
 
         // Parent themes provide fallbacks for missing icons
-        parents = indexReader.value(QLatin1String("Icon Theme/Inherits")).toString().split(QLatin1Char(','));
+        parents = indexReader.value(QLatin1String("Icon Theme/Inherits")).toStringList();
     }
 
     if (kdeVersion() >= 3) {
