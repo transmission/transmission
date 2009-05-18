@@ -8,6 +8,7 @@
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
+			<integer value="1539"/>
 			<integer value="3197"/>
 			<integer value="3088"/>
 		</object>
@@ -2724,7 +2725,7 @@ zTTNVc11zYbNps3HzefOCM4ozknOac6KzqrOus7bzvvPHM88z13Pfc+ez77P38/v0ADQINBB0GHQgtCi
 								</object>
 								<object class="NSMenuItem" id="910530743">
 									<reference key="NSMenu" ref="335948734"/>
-									<string key="NSTitle">Reveal Data File in Finder</string>
+									<string key="NSTitle">Show in Finder</string>
 									<string key="NSKeyEquiv">r</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -3186,7 +3187,7 @@ zTTNVc11zYbNps3HzefOCM4ozknOac6KzqrOus7bzvvPHM88z13Pfc+ez77P38/v0ADQINBB0GHQgtCi
 					</object>
 					<object class="NSMenuItem" id="780056445">
 						<reference key="NSMenu" ref="434296936"/>
-						<string key="NSTitle">Reveal Data File in Finder</string>
+						<string key="NSTitle">Show in Finder</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSKeyEquivModMask">1048576</int>
 						<int key="NSMnemonicLoc">2147483647</int>
@@ -9131,7 +9132,7 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
-					<string>{{282, 713}, {172, 123}}</string>
+					<string>{{282, 677}, {172, 123}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -9533,7 +9534,7 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
-					<string>{{240, 742}, {294, 213}}</string>
+					<string>{{240, 587}, {294, 213}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>{{597, 705}, {294, 183}}</string>

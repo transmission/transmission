@@ -478,7 +478,7 @@ typedef enum
     [menu addItem: [NSMenuItem separatorItem]];
     
     //reveal in finder
-    item = [[NSMenuItem alloc] initWithTitle: NSLocalizedString(@"Reveal in Finder", "File Outline -> Menu")
+    item = [[NSMenuItem alloc] initWithTitle: NSLocalizedString(@"Show in Finder", "File Outline -> Menu")
             action: @selector(revealFile:) keyEquivalent: @""];
     [item setTarget: self];
     [menu addItem: item];
