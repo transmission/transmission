@@ -307,11 +307,6 @@ tr_dhtAddNode(tr_session *ss, tr_address *address, tr_port port, tr_bool bootstr
             return 0;
     }
 
-    {
-        char buf[50];
-        inet_ntop(AF_INET, &address->addr.addr4, buf, 50);
-    }
-        
     memset(&sin, 0, sizeof(sin));
     sin.sin_family = AF_INET;
     memcpy(&sin.sin_addr, &address->addr.addr4, 4);
@@ -322,10 +317,9 @@ tr_dhtAddNode(tr_session *ss, tr_address *address, tr_port port, tr_bool bootstr
 }
 
 static void
-callback(void *ignore, int event,
+callback(void *ignore UNUSED, int event,
          unsigned char *info_hash, void *data, size_t data_len)
 {
-    (void)ignore;               /* sigh */
     if(event == DHT_EVENT_VALUES) {
         tr_torrent *tor;
         tr_pex *pex;
@@ -364,14 +358,11 @@ tr_dhtAnnounce(tr_torrent *tor, tr_bool announce)
 }
 
 static void
-event_callback(int s, short type, void *ignore)
+event_callback(int s, short type, void *ignore UNUSED )
 {
     int rc;
     time_t tosleep;
-    struct timeval now, tv;
-    (void)ignore;
-
-    gettimeofday(&now, NULL);
+    struct timeval tv;
 
     rc = dht_periodic(s, type == EV_READ, &tosleep, callback, NULL);
     if(rc < 0) {
