@@ -153,8 +153,7 @@ static int send_bucket_nodes(int s, struct sockaddr *sa, int salen,
                              const unsigned char *token, int token_len);
 static int send_get_peers(int s, struct sockaddr *sa, int salen,
                           unsigned char *tid, int tid_len,
-                          unsigned char *infohash, unsigned short port,
-                          int confirm);
+                          unsigned char *infohash, int confirm);
 static int send_announce_peer(int s, struct sockaddr *sa, int salen,
                               unsigned char *tid, int tid_len,
                               unsigned char *infohas, unsigned short port,
@@ -193,6 +192,8 @@ static time_t confirm_nodes_time;
 static time_t rotate_secrets_time;
 
 static unsigned char myid[20];
+static int have_v = 0;
+static unsigned char my_v[9];
 static unsigned char secret[8];
 static unsigned char oldsecret[8];
 
@@ -793,8 +794,7 @@ search_send_get_peers(int s, struct search *sr, struct search_node *n)
     debugf("Sending get_peers.\n");
     make_tid(tid, "gp", sr->tid);
     send_get_peers(s, (struct sockaddr*)&n->sin,
-                   sizeof(struct sockaddr_in),
-                   tid, 4, sr->id, sr->tid,
+                   sizeof(struct sockaddr_in), tid, 4, sr->id,
                    n->reply_time >= now.tv_sec - 15);
     n->pinged++;
     n->request_time = now.tv_sec;
@@ -1022,8 +1022,8 @@ storage_store(const unsigned char *id, const unsigned char *ip,
         struct peer *p;
         if(i >= st->maxpeers) {
             /* Need to expand the array. */
-            int n;
             struct peer *new_peers;
+            int n;
             if(st->maxpeers > DHT_MAX_PEERS / 2)
                 return 0;
             n = st->maxpeers == 0 ? 2 : 2 * st->maxpeers;
@@ -1042,7 +1042,7 @@ storage_store(const unsigned char *id, const unsigned char *ip,
 }
 
 static int
-expire_storage( void )
+expire_storage(void)
 {
     struct storage *st = storage, *previous = NULL;
     while(st) {
@@ -1106,23 +1106,18 @@ broken_node(int s, const unsigned char *id, struct sockaddr_in *sin)
 }
 
 static int
-rotate_secrets( void )
+rotate_secrets(void)
 {
-    int fd;
-    unsigned seed;
+    int rc;
 
-    fd = open("/dev/urandom", O_RDONLY);
-    if(fd < 0)
-        return -1;
+    rotate_secrets_time = now.tv_sec + 900 + random() % 1800;
 
     memcpy(oldsecret, secret, sizeof(secret));
-    read(fd, secret, sizeof(secret));
+    rc = dht_random_bytes(secret, sizeof(secret));
 
-    read(fd, &seed, sizeof(seed));
-    srandom(seed);
+    if(rc < 0)
+        return -1;
 
-    close(fd);
-    rotate_secrets_time = now.tv_sec + 900 + random() % 1800;
     return 1;
 }
 
@@ -1270,7 +1265,7 @@ dht_dump_tables(FILE *f)
 }
 
 int
-dht_init(int s, const unsigned char *id)
+dht_init(int s, const unsigned char *id, const unsigned char *v)
 {
     int rc;
 
@@ -1289,13 +1284,20 @@ dht_init(int s, const unsigned char *id)
 
     rc = fcntl(s, F_GETFL, 0);
     if(rc < 0)
-        return -1;
+        goto fail;
 
     rc = fcntl(s, F_SETFL, (rc | O_NONBLOCK));
     if(rc < 0)
-        return -1;
+        goto fail;
 
     memcpy(myid, id, 20);
+    if(v) {
+        memcpy(my_v, "1:v4:", 5);
+        memcpy(my_v + 5, v, 4);
+        have_v = 1;
+    } else {
+        have_v = 0;
+    }
 
     gettimeofday(&now, NULL);
 
@@ -1311,10 +1313,18 @@ dht_init(int s, const unsigned char *id)
     leaky_bucket_tokens = MAX_LEAKY_BUCKET_TOKENS;
 
     memset(secret, 0, sizeof(secret));
-    rotate_secrets();
+    rc = rotate_secrets();
+    if(rc < 0)
+        goto fail;
+
     expire_buckets(s);
 
     return 1;
+
+ fail:
+    free(buckets);
+    buckets = NULL;
+    return -1;
 }
 
 int
@@ -1347,7 +1357,7 @@ dht_uninit(int s, int dofree)
 /* Rate control for requests we receive. */
 
 static int
-leaky_bucket( void )
+leaky_bucket(void)
 {
     if(leaky_bucket_tokens == 0) {
         leaky_bucket_tokens = MIN(MAX_LEAKY_BUCKET_TOKENS,
@@ -1824,6 +1834,11 @@ dht_ping_node(int s, struct sockaddr_in *sin)
     memcpy(buf + offset, src, delta);                   \
     i += delta;
 
+#define ADD_V(buf, offset, size)                        \
+    if(have_v) {                                        \
+        COPY(buf, offset, my_v, sizeof(my_v), size);    \
+    }
+
 int
 send_ping(int s, struct sockaddr *sa, int salen,
           const unsigned char *tid, int tid_len)
@@ -1835,6 +1850,7 @@ send_ping(int s, struct sockaddr *sa, int salen,
     rc = snprintf(buf + i, 512 - i, "e1:q4:ping1:t%d:", tid_len);
     INC(i, rc, 512);
     COPY(buf, i, tid, tid_len, 512);
+    ADD_V(buf, i, 512);
     rc = snprintf(buf + i, 512 - i, "1:y1:qe"); INC(i, rc, 512);
     return sendto(s, buf, i, 0, sa, salen);
 
@@ -1853,6 +1869,7 @@ send_pong(int s, struct sockaddr *sa, int salen,
     COPY(buf, i, myid, 20, 512);
     rc = snprintf(buf + i, 512 - i, "e1:t%d:", tid_len); INC(i, rc, 512);
     COPY(buf, i, tid, tid_len, 512);
+    ADD_V(buf, i, 512);
     rc = snprintf(buf + i, 512 - i, "1:y1:re"); INC(i, rc, 512);
     return sendto(s, buf, i, 0, sa, salen);
 
@@ -1875,6 +1892,7 @@ send_find_node(int s, struct sockaddr *sa, int salen,
     rc = snprintf(buf + i, 512 - i, "e1:q9:find_node1:t%d:", tid_len);
     INC(i, rc, 512);
     COPY(buf, i, tid, tid_len, 512);
+    ADD_V(buf, i, 512);
     rc = snprintf(buf + i, 512 - i, "1:y1:qe"); INC(i, rc, 512);
     return sendto(s, buf, i, confirm ? MSG_CONFIRM : 0, sa, salen);
 
@@ -1905,6 +1923,7 @@ send_found_nodes(int s, struct sockaddr *sa, int salen,
     }
     rc = snprintf(buf + i, 2048 - i, "e1:t%d:", tid_len); INC(i, rc, 2048);
     COPY(buf, i, tid, tid_len, 2048);
+    ADD_V(buf, i, 2048);
     rc = snprintf(buf + i, 2048 - i, "1:y1:re"); INC(i, rc, 2048);
 
     return sendto(s, buf, i, 0, sa, salen);
@@ -1948,8 +1967,8 @@ send_bucket_nodes(int s, struct sockaddr *sa, int salen,
 
 int
 send_get_peers(int s, struct sockaddr *sa, int salen,
-               unsigned char *tid, int tid_len,
-               unsigned char *infohash, unsigned short port, int confirm)
+               unsigned char *tid, int tid_len, unsigned char *infohash,
+               int confirm)
 {
     char buf[512];
     int i = 0, rc;
@@ -1961,6 +1980,7 @@ send_get_peers(int s, struct sockaddr *sa, int salen,
     rc = snprintf(buf + i, 512 - i, "e1:q9:get_peers1:t%d:", tid_len);
     INC(i, rc, 512);
     COPY(buf, i, tid, tid_len, 512);
+    ADD_V(buf, i, 512);
     rc = snprintf(buf + i, 512 - i, "1:y1:qe"); INC(i, rc, 512);
     return sendto(s, buf, i, confirm ? MSG_CONFIRM : 0, sa, salen);
 
@@ -1989,6 +2009,7 @@ send_announce_peer(int s, struct sockaddr *sa, int salen,
     rc = snprintf(buf + i, 512 - i, "e1:q13:announce_peer1:t%d:", tid_len);
     INC(i, rc, 512);
     COPY(buf, i, tid, tid_len, 512);
+    ADD_V(buf, i, 512);
     rc = snprintf(buf + i, 512 - i, "1:y1:qe"); INC(i, rc, 512);
 
     return sendto(s, buf, i, confirm ? 0 : MSG_CONFIRM, sa, salen);
@@ -2028,6 +2049,7 @@ send_peers_found(int s, struct sockaddr *sa, int salen,
     rc = snprintf(buf + i, 1400 - i, "ee1:t%d:", tid_len);
     INC(i, rc, 1400);
     COPY(buf, i, tid, tid_len, 1400);
+    ADD_V(buf, i, 512);
     rc = snprintf(buf + i, 2048 - i, "1:y1:re"); INC(i, rc, 2048);
     return sendto(s, buf, i, 0, sa, salen);
 
@@ -2048,6 +2070,7 @@ send_peer_announced(int s, struct sockaddr *sa, int salen,
     rc = snprintf(buf + i, 512 - i, "e1:t%d:", tid_len);
     INC(i, rc, 512);
     COPY(buf, i, tid, tid_len, 512);
+    ADD_V(buf, i, 2048);
     rc = snprintf(buf + i, 2048 - i, "1:y1:re"); INC(i, rc, 2048);
     return sendto(s, buf, i, 0, sa, salen);
 

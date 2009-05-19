@@ -31,7 +31,7 @@ dht_callback(void *closure, int event,
 
 extern FILE *dht_debug;
 
-int dht_init(int s, const unsigned char *id);
+int dht_init(int s, const unsigned char *id, const unsigned char *v);
 int dht_insert_node(int s, const unsigned char *id, struct sockaddr_in *sin);
 int dht_ping_node(int s, struct sockaddr_in *sin);
 int dht_periodic(int s, int available, time_t *tosleep,
@@ -49,3 +49,4 @@ void dht_hash(void *hash_return, int hash_size,
               const void *v1, int len1,
               const void *v2, int len2,
               const void *v3, int len3);
+int dht_random_bytes(void *buf, size_t size);

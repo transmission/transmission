@@ -200,7 +200,7 @@ main(int argc, char **argv)
     }
 
     /* Init the dht.  This sets the socket into non-blocking mode. */
-    rc = dht_init(s, myid);
+    rc = dht_init(s, myid, NULL);
     if(rc < 0) {
         perror("dht_init");
         exit(1);
@@ -327,3 +327,21 @@ dht_hash(void *hash_return, int hash_size,
     strncpy(hash_return, crypt(key, "jc"), hash_size);
 }
 #endif
+
+int
+dht_random_bytes(void *buf, size_t size)
+{
+    int fd, rc, save;
+
+    fd = open("/dev/urandom", O_RDONLY);
+    if(fd < 0)
+        return -1;
+
+    rc = read(fd, buf, size);
+
+    save = errno;
+    close(fd);
+    errno = save;
+
+    return rc;
+}

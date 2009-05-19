@@ -162,6 +162,10 @@ This should compute a reasonably strong cryptographic hash of the passed
 values.  It should map cleanly to your favourite crypto toolkit's MD5 or
 SHA-1 function.
 
+* dht_random_bytes
+
+This should fill the supplied buffer with true random bytes.
+
 Final notes
 ***********
 
