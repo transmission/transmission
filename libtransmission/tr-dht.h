@@ -29,7 +29,7 @@ THE SOFTWARE.
 int tr_dhtInit(tr_session *ss);
 void tr_dhtUninit(tr_session *ss);
 tr_bool tr_dhtEnabled(tr_session *ss);
-int tr_dhtStatus(tr_session *ss);
+int tr_dhtStatus(tr_session *ss, int * setme_nodeCount );
 tr_port tr_dhtPort(tr_session *ss);
 int tr_dhtAddNode(tr_session *ss, tr_address *address, tr_port port, tr_bool bootstrap);
 int tr_dhtAnnounce(tr_torrent *tor, tr_bool announce);

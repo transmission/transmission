@@ -84,7 +84,7 @@ dht_bootstrap(void *closure)
         port = ntohs(port);
         /* There's no race here -- if we uninit between the test and the
            AddNode, the AddNode will be ignored. */
-        status = tr_dhtStatus(cl->session);
+        status = tr_dhtStatus(cl->session, NULL);
         if(status == TR_DHT_STOPPED || status >= TR_DHT_FIREWALLED)
             break;
         tr_dhtAddNode(cl->session, &addr, port, 1);
@@ -207,7 +207,7 @@ tr_dhtUninit(tr_session *ss)
 
     /* Since we only save known good nodes, avoid erasing older data if we
        don't know enough nodes. */
-    if(tr_dhtStatus(ss) >= TR_DHT_FIREWALLED) {
+    if(tr_dhtStatus(ss, NULL) >= TR_DHT_FIREWALLED) {
         tr_benc benc;
         struct sockaddr_in sins[300];
         char compact[300 * 6];
@@ -236,39 +236,51 @@ tr_dhtUninit(tr_session *ss)
 tr_bool
 tr_dhtEnabled(tr_session *ss)
 {
-    return (ss && session == ss);
+    return ss && ss == session;
 }
+
+struct getstatus_closure
+{
+    sig_atomic_t status;
+    sig_atomic_t count;
+};
 
 static void
 getstatus(void *closure)
 {
-    sig_atomic_t *ret = (sig_atomic_t*)closure;
+    struct getstatus_closure *ret = (struct getstatus_closure*)closure;
     int good, dubious, incoming;
 
     dht_nodes(&good, &dubious, NULL, &incoming);
-    if(good < 4 || good + dubious <= 8)
-        *ret = TR_DHT_BROKEN;
-    else if(good < 40)
-        *ret = TR_DHT_POOR;
-    else if(incoming < 8)
-        *ret = TR_DHT_FIREWALLED;
+
+    if( good < 4 || good + dubious <= 8 )
+        ret->status = TR_DHT_BROKEN;
+    else if( good < 40 )
+        ret->status = TR_DHT_POOR;
+    else if( incoming < 8 )
+        ret->status = TR_DHT_FIREWALLED;
     else
-        *ret = TR_DHT_GOOD;
+        ret->status = TR_DHT_GOOD;
+
+    ret->count = good + dubious;
 }
 
 int
-tr_dhtStatus(tr_session *ss)
+tr_dhtStatus(tr_session *ss, int *nodes_return )
 {
-    sig_atomic_t ret = -1;
+    struct getstatus_closure ret = { -1, - 1 };
 
-    if(!tr_dhtEnabled(ss))
+    if( !tr_dhtEnabled( ss ) )
         return TR_DHT_STOPPED;
 
-    tr_runInEventThread(ss, getstatus, &ret);
-    while( ret < 0 )
-        tr_wait( 1 /* msec */ );
+    tr_runInEventThread( ss, getstatus, &ret );
+    while( ret.status < 0 )
+        tr_wait( 10 /*msec*/ );
 
-    return ret;
+    if( nodes_return )
+        *nodes_return = ret.count;
+
+    return ret.status;
 }
 
 tr_port
@@ -282,16 +294,16 @@ tr_dhtAddNode(tr_session *ss, tr_address *address, tr_port port, tr_bool bootstr
 {
     struct sockaddr_in sin;
 
-    if(!tr_dhtEnabled(ss))
+    if( !tr_dhtEnabled( ss ) )
         return 0;
 
-    if(address->type != TR_AF_INET)
+    if( address->type != TR_AF_INET )
         return 0;
 
     /* Since we don't want to abuse our bootstrap nodes, we don't ping them
        if the DHT is in a good state. */
     if(bootstrap) {
-        if(tr_dhtStatus(ss) >= TR_DHT_FIREWALLED)
+        if(tr_dhtStatus(ss, NULL) >= TR_DHT_FIREWALLED)
             return 0;
     }
 
@@ -328,8 +340,7 @@ callback(void *ignore, int event,
         tr_globalUnlock(session);
         tr_free(pex);
     } else if(event == DHT_EVENT_SEARCH_DONE) {
-        tr_torrent *tor;
-        tor = tr_torrentFindFromHash(session, info_hash);
+        tr_torrent * tor = tr_torrentFindFromHash( session, info_hash );
         if(tor)
             tor->dhtAnnounceInProgress = 0;
     }
@@ -338,18 +349,17 @@ callback(void *ignore, int event,
 int
 tr_dhtAnnounce(tr_torrent *tor, tr_bool announce)
 {
-    if(!tr_torrentAllowsDHT(tor))
+    if( !tr_torrentAllowsDHT( tor ) )
         return -1;
 
-    if(tr_dhtStatus(tor->session) < TR_DHT_POOR)
+    if( tr_dhtStatus( tor->session, NULL ) < TR_DHT_POOR )
         return 0;
 
-    dht_search(dht_socket, tor->info.hash,
-               announce ? tr_sessionGetPeerPort(session) : 0,
-               callback, NULL);
+    dht_search( dht_socket, tor->info.hash,
+                announce ? tr_sessionGetPeerPort(session) : 0,
+                callback, NULL);
 
-    tor->dhtAnnounceInProgress = 1;
-
+    tor->dhtAnnounceInProgress = TRUE;
     return 1;
 }
 
