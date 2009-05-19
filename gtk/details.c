@@ -941,7 +941,7 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
         if( i!=n )
             str = mixed;
         else if( baseline )
-            str = _( "Private to this tracker -- PEX disabled" );
+            str = _( "Private to this tracker -- DHT and PEX disabled" );
         else
             str = _( "Public torrent" );
     }
@@ -1503,6 +1503,7 @@ onPeerViewQueryTooltip( GtkWidget   * widget,
                 case '?': s = _( "We unchoked this peer, but they're not interested" ); break;
                 case 'E': s = _( "Encrypted connection" ); break; 
                 case 'X': s = _( "Peer was discovered through Peer Exchange (PEX)" ); break;
+                case 'H': s = _( "Peer was discovered through DHT" ); break;
                 case 'I': s = _( "Peer is an incoming connection" ); break;
             }
             if( s )

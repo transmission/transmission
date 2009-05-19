@@ -1271,20 +1271,23 @@ freeTorrent( tr_torrent * tor )
 static void
 checkAndStartImpl( void * vtor )
 {
+    time_t now;
     tr_torrent * tor = vtor;
 
     assert( tr_isTorrent( tor ) );
 
     tr_globalLock( tor->session );
 
+    now = time( NULL );
     tor->isRunning = TRUE;
     tor->needsSeedRatioCheck = TRUE;
     *tor->errorString = '\0';
     tr_torrentResetTransferStats( tor );
     tor->completeness = tr_cpGetStatus( &tor->completion );
     tr_torrentSaveResume( tor );
-    tor->startDate = tor->anyDate = time( NULL );
+    tor->startDate = tor->anyDate = now;
     tr_trackerStart( tor->tracker );
+    tor->dhtAnnounceAt = now + tr_cryptoWeakRandInt( 20 );
     tr_peerMgrStartTorrent( tor );
 
     tr_globalUnlock( tor->session );

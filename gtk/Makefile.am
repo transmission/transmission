@@ -103,6 +103,7 @@ transmission_LDADD = \
     $(top_builddir)/third-party/libevent/libevent.la \
     $(top_builddir)/third-party/miniupnp/libminiupnp.a \
     $(top_builddir)/third-party/libnatpmp/libnatpmp.a \
+    $(top_builddir)/third-party/dht/libdht.a \
     $(GTK_LIBS) \
     $(GIO_LIBS) \
     $(LIBNOTIFY_LIBS) \

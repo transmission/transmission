@@ -36,6 +36,7 @@
 #include "request-list.h"
 #include "stats.h"
 #include "torrent.h"
+#include "tr-dht.h"
 #include "trevent.h"
 #include "utils.h"
 #include "version.h"
@@ -304,6 +305,18 @@ protocolSendCancel( tr_peermsgs               * msgs,
     dbgmsg( msgs, "cancelling %u:%u->%u...", req->index, req->offset, req->length );
     dbgOutMessageLen( msgs );
     pokeBatchPeriod( msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS );
+}
+
+static void
+protocolSendPort(tr_peermsgs *msgs, uint16_t port)
+{
+    tr_peerIo       * io  = msgs->peer->io;
+    struct evbuffer * out = msgs->outMessages;
+
+    dbgmsg( msgs, "sending Port %u", port);
+    tr_peerIoWriteUint32( io, out, 3 );
+    tr_peerIoWriteUint8 ( io, out, BT_PORT );
+    tr_peerIoWriteUint16( io, out, port);
 }
 
 static void
@@ -2122,6 +2135,9 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
 
     if( tr_peerIoSupportsLTEP( peer->io ) )
         sendLtepHandshake( m );
+
+    if(tr_peerIoSupportsDHT(peer->io))
+        protocolSendPort(m, tr_dhtPort(torrent->session));
 
     tellPeerWhatWeHave( m );
 

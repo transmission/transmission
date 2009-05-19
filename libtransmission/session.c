@@ -45,6 +45,7 @@
 #include "version.h"
 #include "verify.h"
 #include "web.h"
+#include "tr-dht.h"
 
 #define dbgmsg( ... ) \
     do { \
@@ -621,6 +622,8 @@ tr_sessionInitImpl( void * vdata )
     found = tr_bencDictFindBool( &settings, TR_PREFS_KEY_PEX_ENABLED, &boolVal );
     assert( found );
     session->isPexEnabled = boolVal;
+    /* This really ought to be a separate preference. */
+    session->isDHTEnabled = boolVal;
 
     found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_ENCRYPTION, &i );
     assert( found );
@@ -830,6 +833,9 @@ tr_sessionInitImpl( void * vdata )
     metainfoLookupRescan( session );
     session->isWaiting = FALSE;
     dbgmsg( "returning session %p; session->tracker is %p", session, session->tracker );
+
+    if( session->isDHTEnabled )
+        tr_dhtInit(session);
 }
 
 /***
@@ -1392,7 +1398,7 @@ compareTorrentByCur( const void * va, const void * vb )
 }
 
 static void
-tr_closeAllConnections( void * vsession )
+sessionCloseImpl( void * vsession )
 {
     tr_session *  session = vsession;
     tr_torrent *  tor;
@@ -1402,6 +1408,9 @@ tr_closeAllConnections( void * vsession )
     assert( tr_isSession( session ) );
 
     free_incoming_peer_port( session );
+
+    if( session->isDHTEnabled )
+        tr_dhtUninit( session );
 
     evtimer_del( session->altTimer );
     tr_free( session->altTimer );
@@ -1455,7 +1464,7 @@ tr_sessionClose( tr_session * session )
     dbgmsg( "shutting down transmission session %p", session );
 
     /* close the session */
-    tr_runInEventThread( session, tr_closeAllConnections, session );
+    tr_runInEventThread( session, sessionCloseImpl, session );
     while( !session->isClosed && !deadlineReached( deadline ) )
     {
         dbgmsg(
@@ -1577,6 +1586,14 @@ tr_sessionIsPexEnabled( const tr_session * session )
     assert( tr_isSession( session ) );
 
     return session->isPexEnabled;
+}
+
+tr_bool
+tr_sessionIsDHTEnabled( const tr_session * session )
+{
+    assert( tr_isSession( session ) );
+
+    return session->isDHTEnabled;
 }
 
 /***

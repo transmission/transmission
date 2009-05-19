@@ -63,6 +63,7 @@ typedef struct tr_peerIo
     tr_bool               peerIdIsSet;
     tr_bool               extendedProtocolSupported;
     tr_bool               fastExtensionSupported;
+    tr_bool               dhtSupported;
 
     /* we create the socket in a nonblocking way, so this flag is initially
      * false and then set to true when libevent says that the socket is ready
@@ -157,6 +158,15 @@ static TR_INLINE tr_bool tr_peerIoSupportsFEXT( const tr_peerIo * io )
     assert( tr_isPeerIo( io ) );
 
     return io->fastExtensionSupported;
+}
+
+void        tr_peerIoEnableDHT( tr_peerIo * io, tr_bool flag );
+
+static TR_INLINE tr_bool tr_peerIoSupportsDHT( const tr_peerIo * io )
+{
+    assert( tr_isPeerIo( io ) );
+
+    return io->dhtSupported;
 }
 
 /**

@@ -26,6 +26,7 @@
 #include "resume.h"
 #include "torrent.h"
 #include "tracker.h"
+#include "tr-dht.h"
 #include "trevent.h"
 #include "utils.h"
 #include "web.h"
@@ -976,6 +977,18 @@ trackerPulse( void * vsession )
             t->reannounceAt = TR_TRACKER_BUSY;
             t->manualAnnounceAllowedAt = TR_TRACKER_BUSY;
             enqueueRequest( session, t, TR_REQ_REANNOUNCE );
+        }
+
+        if( tor->dhtAnnounceAt <= now ) {
+            int rc = 1;
+            if( tr_torrentAllowsDHT(tor) )
+                rc = tr_dhtAnnounce(tor, 1);
+            if(rc == 0)
+                /* The DHT is not ready yet.  Try again soon. */
+                tor->dhtAnnounceAt = now + 5 + tr_cryptoWeakRandInt( 5 );
+            else
+                /* We should announce at least once every 30 minutes. */
+                tor->dhtAnnounceAt = now + 25 * 60 + tr_cryptoWeakRandInt( 3 * 60 );
         }
     }
 

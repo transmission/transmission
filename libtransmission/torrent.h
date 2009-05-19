@@ -175,6 +175,9 @@ struct tr_torrent
     struct tr_tracker *        tracker;
     struct tr_publisher_tag *  trackerSubscription;
 
+    time_t                     dhtAnnounceAt;
+    tr_bool                    dhtAnnounceInProgress;
+
     uint64_t                   downloadedCur;
     uint64_t                   downloadedPrev;
     uint64_t                   uploadedCur;
@@ -286,6 +289,11 @@ static TR_INLINE tr_bool tr_torrentIsPrivate( const tr_torrent * tor )
 static TR_INLINE tr_bool tr_torrentAllowsPex( const tr_torrent * tor )
 {
     return ( tor != NULL  ) && tor->session->isPexEnabled && !tr_torrentIsPrivate( tor );
+}
+
+static TR_INLINE tr_bool tr_torrentAllowsDHT( const tr_torrent * tor )
+{
+    return ( tor != NULL  ) && tor->session->isDHTEnabled && !tr_torrentIsPrivate( tor );
 }
 
 static TR_INLINE tr_bool tr_torrentIsPieceChecked( const tr_torrent  * tor, tr_piece_index_t i )

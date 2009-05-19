@@ -617,6 +617,16 @@ tr_peerIoEnableLTEP( tr_peerIo  * io,
     io->extendedProtocolSupported = flag;
 }
 
+void
+tr_peerIoEnableDHT( tr_peerIo * io, tr_bool flag )
+{
+    assert( tr_isPeerIo( io ) );
+    assert( tr_isBool( flag ) );
+
+    dbgmsg( io, "setting DHT support flag to %d", (flag!=0) );
+    io->dhtSupported = flag;
+}
+
 /**
 ***
 **/

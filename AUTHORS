@@ -7,6 +7,7 @@ Lead Developers <dev@transmissionbt.com>
 
 Project Contributors
   Tomas Carnecky  (Profiling, patches, and detection of sneaky bugs)
+  Juliusz Chroboczek  (DHT)
   John Clay  (Website maintenance and troubleshooting)
   Rashid Eissing  (Mac OS X Transfers preferences icon)
   Hugo van Heuven, madebysofa  (Main icon design)

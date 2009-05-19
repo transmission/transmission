@@ -28,6 +28,7 @@
 #include "peer-io.h"
 #include "peer-mgr.h"
 #include "torrent.h"
+#include "tr-dht.h"
 #include "trevent.h"
 #include "utils.h"
 
@@ -35,6 +36,8 @@
 #define ENABLE_LTEP * /
 /* fast extensions */
 #define ENABLE_FAST * /
+/* DHT */
+#define ENABLE_DHT * /
 
 /***
 ****
@@ -80,6 +83,14 @@ enum
 #else 
  #define HANDSHAKE_HAS_FASTEXT( bits ) ( 0 ) 
  #define HANDSHAKE_SET_FASTEXT( bits ) ( (void)0 ) 
+#endif 
+
+#ifdef ENABLE_DHT
+ #define HANDSHAKE_HAS_DHT( bits ) ( ( ( bits )[7] & 0x01 ) ? 1 : 0 )
+ #define HANDSHAKE_SET_DHT( bits ) ( ( bits )[7] |= 0x01 )
+#else
+ #define HANDSHAKE_HAS_DHT( bits ) ( 0 )
+ #define HANDSHAKE_SET_DHT( bits ) ( (void)0 )
 #endif 
 
 /* http://www.azureuswiki.com/index.php/Extension_negotiation_protocol
@@ -219,6 +230,12 @@ buildHandshakeMessage( tr_handshake * handshake,
     HANDSHAKE_SET_LTEP( walk );
     HANDSHAKE_SET_FASTEXT( walk );
 
+    /* Note that this doesn't depend on whether the torrent is private.  We
+       don't accept DHT peers for a private torrent, but we participate in
+       the DHT regardless. */
+    if(tr_dhtEnabled(handshake->session))
+        HANDSHAKE_SET_DHT( walk );
+
     walk += HANDSHAKE_FLAGS_LEN;
     memcpy( walk, torrentHash, SHA_DIGEST_LENGTH );
     walk += SHA_DIGEST_LENGTH;
@@ -302,6 +319,10 @@ parseHandshake( tr_handshake *    handshake,
     tr_peerIoEnableLTEP( handshake->io, HANDSHAKE_HAS_LTEP( reserved ) );
 
     tr_peerIoEnableFEXT( handshake->io, HANDSHAKE_HAS_FASTEXT( reserved ) );
+
+    /* This doesn't depend on whether the torrent is private. */
+    if( tor->session->isDHTEnabled )
+        tr_peerIoEnableDHT( handshake->io, HANDSHAKE_HAS_DHT( reserved ) );
 
     return HANDSHAKE_OK;
 }
