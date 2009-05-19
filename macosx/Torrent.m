@@ -1286,6 +1286,11 @@ int trashDataFile(const char * filename)
     return fStat->peersFrom[TR_PEER_FROM_PEX];
 }
 
+- (NSInteger) totalPeersDHT
+{
+    return fStat->peersFrom[TR_PEER_FROM_DHT];
+}
+
 - (NSInteger) totalPeersKnown
 {
     return fStat->peersKnown;

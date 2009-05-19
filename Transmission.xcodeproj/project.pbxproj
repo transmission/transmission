@@ -87,6 +87,12 @@
 		A226FDAC0D0CDF20005A7F71 /* libnatpmp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C7A118D0D0B2EB800B5701F /* libnatpmp.a */; };
 		A22A8D560AEEAFA5007E9CB9 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A22A8D540AEEAFA5007E9CB9 /* Localizable.strings */; };
 		A22CFB820FB66EF30009BD3E /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A22CFB810FB66EF30009BD3E /* Carbon.framework */; };
+		A22CFCA80FC24ED80009BD3E /* tr-dht.c in Sources */ = {isa = PBXBuildFile; fileRef = A22CFCA60FC24ED80009BD3E /* tr-dht.c */; };
+		A22CFCA90FC24ED80009BD3E /* tr-dht.h in Headers */ = {isa = PBXBuildFile; fileRef = A22CFCA70FC24ED80009BD3E /* tr-dht.h */; };
+		A22CFCC20FC24F890009BD3E /* dht.h in Headers */ = {isa = PBXBuildFile; fileRef = A22CFCC00FC24F890009BD3E /* dht.h */; };
+		A22CFCC30FC24F890009BD3E /* dht.c in Sources */ = {isa = PBXBuildFile; fileRef = A22CFCC10FC24F890009BD3E /* dht.c */; };
+		A22CFCCB0FC24FDA0009BD3E /* libdht.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A22CFCBA0FC24F710009BD3E /* libdht.a */; };
+		A22CFCCD0FC250480009BD3E /* libevent.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BE75C3490C729E9500DBEFE0 /* libevent.a */; };
 		A22D3AA60D00D1790079CFED /* TurtleTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = A22D3AA30D00D1790079CFED /* TurtleTemplate.png */; };
 		A22E59A70DC11A1D00F4BE15 /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A29EBE700DC06068006CEE80 /* libcurl.dylib */; };
 		A22E59A80DC11A1F00F4BE15 /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A29EBE700DC06068006CEE80 /* libcurl.dylib */; };
@@ -320,6 +326,20 @@
 			remoteGlobalIDString = 3C7A118C0D0B2EB800B5701F;
 			remoteInfo = natpmp;
 		};
+		A22CFCBE0FC24F780009BD3E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BE75C3480C729E9500DBEFE0 /* event */;
+			remoteInfo = event;
+		};
+		A22CFCC60FC24F990009BD3E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A22CFCB90FC24F710009BD3E /* DHT */;
+			remoteInfo = DHT;
+		};
 		BE1183750CE161040002D0F3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -485,6 +505,11 @@
 		A22CF7CF0FA6750E0009BD3E /* tr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = tr; path = macosx/tr.lproj/GroupRules.xib; sourceTree = "<group>"; };
 		A22CF7D10FA6A19B0009BD3E /* ru */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ru; path = macosx/ru.lproj/GroupRules.xib; sourceTree = "<group>"; };
 		A22CFB810FB66EF30009BD3E /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
+		A22CFCA60FC24ED80009BD3E /* tr-dht.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "tr-dht.c"; path = "libtransmission/tr-dht.c"; sourceTree = "<group>"; };
+		A22CFCA70FC24ED80009BD3E /* tr-dht.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "tr-dht.h"; path = "libtransmission/tr-dht.h"; sourceTree = "<group>"; };
+		A22CFCBA0FC24F710009BD3E /* libdht.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libdht.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		A22CFCC00FC24F890009BD3E /* dht.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dht.h; path = "third-party/dht/dht.h"; sourceTree = "<group>"; };
+		A22CFCC10FC24F890009BD3E /* dht.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dht.c; path = "third-party/dht/dht.c"; sourceTree = "<group>"; };
 		A22D3AA30D00D1790079CFED /* TurtleTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = TurtleTemplate.png; path = macosx/Images/TurtleTemplate.png; sourceTree = "<group>"; };
 		A22F1E540E7DA8030065DB9D /* sparkle_dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = sparkle_dsa_pub.pem; path = macosx/sparkle_dsa_pub.pem; sourceTree = "<group>"; };
 		A231274B0D11D0B7003F9AFF /* AboutWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = AboutWindow.xib; path = macosx/AboutWindow.xib; sourceTree = "<group>"; };
@@ -807,6 +832,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A22CFCB80FC24F710009BD3E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A22CFCCD0FC250480009BD3E /* libevent.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		BE1183460CE160960002D0F3 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -825,6 +858,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A22CFCCB0FC24FDA0009BD3E /* libdht.a in Frameworks */,
 				BE75C38A0C72A1ED00DBEFE0 /* libevent.a in Frameworks */,
 				BE1183780CE161390002D0F3 /* libminiupnp.a in Frameworks */,
 				A226FDAC0D0CDF20005A7F71 /* libnatpmp.a in Frameworks */,
@@ -941,6 +975,7 @@
 				BE75C3490C729E9500DBEFE0 /* libevent.a */,
 				BE1183480CE160960002D0F3 /* libminiupnp.a */,
 				3C7A118D0D0B2EB800B5701F /* libnatpmp.a */,
+				A22CFCBA0FC24F710009BD3E /* libdht.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -953,6 +988,7 @@
 				4DDBB71F09E16BFE00284745 /* CLI */,
 				BEFC1C0B0C07754700B0BB3C /* daemon */,
 				4DDBB71509E16B3F00284745 /* Libraries */,
+				A22CFCB50FC24F630009BD3E /* dht */,
 				BE75C3570C72A0D600DBEFE0 /* libevent */,
 				BE1183410CE15DF00002D0F3 /* libminiupnp */,
 				3C7A11880D0B2E6700B5701F /* libnatpmp */,
@@ -1086,6 +1122,8 @@
 		4D1838DC09DEC04A0047D688 /* libtransmission */ = {
 			isa = PBXGroup;
 			children = (
+				A22CFCA60FC24ED80009BD3E /* tr-dht.c */,
+				A22CFCA70FC24ED80009BD3E /* tr-dht.h */,
 				A2AAB65B0DE0CF6200E04DDA /* rpcimpl.c */,
 				A2AAB6590DE0CF6200E04DDA /* rpcimpl.h */,
 				A2AAB6580DE0CF6200E04DDA /* rpc-server.c */,
@@ -1204,6 +1242,15 @@
 				A2B3FB450E5901E700FF78FB /* cli.c */,
 			);
 			name = CLI;
+			sourceTree = "<group>";
+		};
+		A22CFCB50FC24F630009BD3E /* dht */ = {
+			isa = PBXGroup;
+			children = (
+				A22CFCC00FC24F890009BD3E /* dht.h */,
+				A22CFCC10FC24F890009BD3E /* dht.c */,
+			);
+			name = dht;
 			sourceTree = "<group>";
 		};
 		A234D0D40C79FB6000A82373 /* Additions */ = {
@@ -1407,6 +1454,15 @@
 				A25E03E20E4015380086C225 /* tr-getopt.h in Headers */,
 				A21FBBAB0EDA78C300BC3C51 /* bandwidth.h in Headers */,
 				A263E0740F111B8A008D09D6 /* request-list.h in Headers */,
+				A22CFCA90FC24ED80009BD3E /* tr-dht.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A22CFCB60FC24F710009BD3E /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A22CFCC20FC24F890009BD3E /* dht.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1471,6 +1527,7 @@
 				A226FDB10D0CDF6E005A7F71 /* PBXTargetDependency */,
 				BE1183760CE161040002D0F3 /* PBXTargetDependency */,
 				BE75C34F0C729ED300DBEFE0 /* PBXTargetDependency */,
+				A22CFCC70FC24F990009BD3E /* PBXTargetDependency */,
 			);
 			name = libtransmission;
 			productName = transmission;
@@ -1513,6 +1570,24 @@
 			productName = Transmission;
 			productReference = 8D1107320486CEB800E47090 /* Transmission.app */;
 			productType = "com.apple.product-type.application";
+		};
+		A22CFCB90FC24F710009BD3E /* dht */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A22CFCC40FC24F8A0009BD3E /* Build configuration list for PBXNativeTarget "dht" */;
+			buildPhases = (
+				A22CFCB60FC24F710009BD3E /* Headers */,
+				A22CFCB70FC24F710009BD3E /* Sources */,
+				A22CFCB80FC24F710009BD3E /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A22CFCBF0FC24F780009BD3E /* PBXTargetDependency */,
+			);
+			name = dht;
+			productName = DHT;
+			productReference = A22CFCBA0FC24F710009BD3E /* libdht.a */;
+			productType = "com.apple.product-type.library.static";
 		};
 		BE1183470CE160960002D0F3 /* miniupnp */ = {
 			isa = PBXNativeTarget;
@@ -1625,6 +1700,7 @@
 				4DDBB71809E16BAE00284745 /* transmissioncli */,
 				BEFC1BFF0C07750000B0BB3C /* transmission-daemon */,
 				BEFC1CEA0C07822400B0BB3C /* transmission-remote */,
+				A22CFCB90FC24F710009BD3E /* dht */,
 				BE75C3480C729E9500DBEFE0 /* event */,
 				BE1183470CE160960002D0F3 /* miniupnp */,
 				3C7A118C0D0B2EB800B5701F /* natpmp */,
@@ -1816,6 +1892,7 @@
 				4DB74F080E8CD75100AEB1A8 /* wildmat.c in Sources */,
 				A21FBBAC0EDA78C300BC3C51 /* bandwidth.c in Sources */,
 				A263E0730F111B89008D09D6 /* request-list.c in Sources */,
+				A22CFCA80FC24ED80009BD3E /* tr-dht.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1885,6 +1962,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A22CFCB70FC24F710009BD3E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A22CFCC30FC24F890009BD3E /* dht.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		BE1183450CE160960002D0F3 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1951,6 +2036,16 @@
 			isa = PBXTargetDependency;
 			target = 3C7A118C0D0B2EB800B5701F /* natpmp */;
 			targetProxy = A226FDB00D0CDF6E005A7F71 /* PBXContainerItemProxy */;
+		};
+		A22CFCBF0FC24F780009BD3E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BE75C3480C729E9500DBEFE0 /* event */;
+			targetProxy = A22CFCBE0FC24F780009BD3E /* PBXContainerItemProxy */;
+		};
+		A22CFCC70FC24F990009BD3E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A22CFCB90FC24F710009BD3E /* dht */;
+			targetProxy = A22CFCC60FC24F990009BD3E /* PBXContainerItemProxy */;
 		};
 		BE1183760CE161040002D0F3 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -2130,6 +2225,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/build/Development\"",
+					"\"$(SRCROOT)/build/Debug\"",
 				);
 				OTHER_CFLAGS = (
 					"-DSYS_DARWIN",
@@ -2309,6 +2405,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/build/Development\"",
+					"\"$(SRCROOT)/build/Debug\"",
 				);
 				OTHER_CFLAGS = (
 					"-DSYS_DARWIN",
@@ -2384,6 +2481,57 @@
 				OTHER_LDFLAGS = "";
 				PREBINDING = NO;
 				SDKROOT = macosx10.5;
+			};
+			name = Release;
+		};
+		A22CFCBB0FC24F720009BD3E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "";
+				INSTALL_PATH = /usr/local/lib;
+				OTHER_LDFLAGS = "";
+				PREBINDING = NO;
+				PRODUCT_NAME = dht;
+			};
+			name = Debug;
+		};
+		A22CFCBC0FC24F720009BD3E /* Release - Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "";
+				INSTALL_PATH = /usr/local/lib;
+				OTHER_LDFLAGS = "";
+				PREBINDING = NO;
+				PRODUCT_NAME = dht;
+			};
+			name = "Release - Debug";
+		};
+		A22CFCBD0FC24F720009BD3E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "";
+				INSTALL_PATH = /usr/local/lib;
+				OTHER_LDFLAGS = "";
+				PREBINDING = NO;
+				PRODUCT_NAME = dht;
+				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
@@ -2464,6 +2612,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/build/Development\"",
+					"\"$(SRCROOT)/build/Debug\"",
 				);
 				OTHER_CFLAGS = (
 					"-DSYS_DARWIN",
@@ -2666,6 +2815,16 @@
 				0053D3DA0C86774200545606 /* Debug */,
 				A250CFEB0CDA19680068B4B6 /* Release - Debug */,
 				4DF0C59D089918A300DD8943 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		A22CFCC40FC24F8A0009BD3E /* Build configuration list for PBXNativeTarget "dht" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A22CFCBB0FC24F720009BD3E /* Debug */,
+				A22CFCBC0FC24F720009BD3E /* Release - Debug */,
+				A22CFCBD0FC24F720009BD3E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

@@ -430,7 +430,7 @@ typedef enum
         [fHashField setStringValue: hashString];
         [fHashField setToolTip: hashString];
         [fSecureField setStringValue: [torrent privateTorrent]
-                        ? NSLocalizedString(@"Private Torrent, PEX automatically disabled", "Inspector -> private torrent")
+                        ? NSLocalizedString(@"Private Torrent, PEX and DHT automatically disabled", "Inspector -> private torrent")
                         : NSLocalizedString(@"Public Torrent", "Inspector -> private torrent")];
         
         NSString * commentString = [torrent comment];
@@ -1034,6 +1034,9 @@ typedef enum
             case TR_PEER_FROM_PEX:
                 [components addObject: NSLocalizedString(@"From: peer exchange", "Inspector -> Peers tab -> table row tooltip")];
                 break;
+            case TR_PEER_FROM_DHT:
+                [components addObject: NSLocalizedString(@"From: distributed hash table", "Inspector -> Peers tab -> table row tooltip")];
+                break;
         }
         
         //determing status strings from flags 
@@ -1522,7 +1525,7 @@ typedef enum
         
         if (total > 0)
         {
-            NSMutableArray * components = [NSMutableArray arrayWithCapacity: 4];
+            NSMutableArray * components = [NSMutableArray arrayWithCapacity: 5];
             NSInteger count;
             if ((count = [torrent totalPeersTracker]) > 0)
                 [components addObject: [NSString stringWithFormat:
@@ -1530,12 +1533,15 @@ typedef enum
             if ((count = [torrent totalPeersIncoming]) > 0)
                 [components addObject: [NSString stringWithFormat:
                                         NSLocalizedString(@"%d incoming", "Inspector -> Peers tab -> peers"), count]];
-            if ((count = [torrent totalPeersPex]) > 0)
-                [components addObject: [NSString stringWithFormat:
-                                        NSLocalizedString(@"%d PEX", "Inspector -> Peers tab -> peers"), count]];
             if ((count = [torrent totalPeersCache]) > 0)
                 [components addObject: [NSString stringWithFormat:
                                         NSLocalizedString(@"%d cache", "Inspector -> Peers tab -> peers"), count]];
+            if ((count = [torrent totalPeersPex]) > 0)
+                [components addObject: [NSString stringWithFormat:
+                                        NSLocalizedString(@"%d PEX", "Inspector -> Peers tab -> peers"), count]];
+            if ((count = [torrent totalPeersDHT]) > 0)
+                [components addObject: [NSString stringWithFormat:
+                                        NSLocalizedString(@"%d DHT", "Inspector -> Peers tab -> peers"), count]];
             
             connected = [connected stringByAppendingFormat: @": %@", [components componentsJoinedByString: @", "]];
         }

@@ -214,6 +214,7 @@ typedef enum
 - (NSInteger) totalPeersIncoming;
 - (NSInteger) totalPeersCache;
 - (NSInteger) totalPeersPex;
+- (NSInteger) totalPeersDHT;
 - (NSInteger) totalPeersKnown;
 
 - (NSInteger) peersSendingToUs;
