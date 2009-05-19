@@ -360,24 +360,22 @@ tr_dhtAnnounce(tr_torrent *tor, tr_bool announce)
 static void
 event_callback(int s, short type, void *ignore UNUSED )
 {
-    int rc;
     time_t tosleep;
     struct timeval tv;
 
-    rc = dht_periodic(s, type == EV_READ, &tosleep, callback, NULL);
-    if(rc < 0) {
+    if( dht_periodic(s, type == EV_READ, &tosleep, callback, NULL) < 0 ) {
         if(errno == EINTR) {
             tosleep = 0;
         } else {
             perror("dht_periodic");
-            if(rc == EINVAL || rc == EFAULT)
+            if(errno == EINVAL || errno == EFAULT)
                     abort();
             tosleep = 1;
         }
     }
 
-    /* Being slightly late is fine, and has the added benefit of adding
-       some jitter. */
+    /* Being slightly late is fine,
+       and has the added benefit of adding some jitter. */
     tv.tv_sec = tosleep;
     tv.tv_usec = tr_cryptoWeakRandInt( 1000000 );
     event_add(&dht_event, &tv);
