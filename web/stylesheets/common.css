@@ -780,7 +780,6 @@ div.dialog_container div.dialog_window {
 div#prefs_container div.dialog_window {
 	width: 410px;
 	padding: 0 15px;
-	line-height: 14pt;
 }
 
 div.dialog_container div.dialog_window img {
@@ -813,6 +812,7 @@ div.dialog_container div.dialog_window a {
 	background-color: #EEE;
 	border: 1px solid #787878;
 	width: 50px;
+	height: 15px;
 	text-align: center;
 	font-weight: bold;
 	text-decoration: none;
@@ -824,7 +824,7 @@ div.dialog_container div.dialog_window a {
 
 div.dialog_container div.dialog_window a:hover,
 div.dialog_container div.dialog_window a:active {
-	background: #C0C8D6 url('../images/graphics/filter_bar_bg.png') repeat-x;
+	background: #C0C8D6 url('../images/graphics/filter_bar.png') bottom repeat-x;
 }
 
 div#upload_container div.dialog_window div.dialog_message label {
