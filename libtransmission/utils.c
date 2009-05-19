@@ -683,6 +683,25 @@ tr_strndup( const void * in, int len )
     return out;
 }
 
+const char*
+tr_memmem( const char * s1, size_t l1, /* haystack */
+           const char * s2, size_t l2 ) /* needle */
+{
+#ifdef HAVE_MEMMEM
+    return memmem( s1, l1, s2, l2 );
+#else
+    if( !l2 ) return s1;
+    while( l1 >= l2 )
+    {
+        l1--;
+        if( !memcmp( s1, s2, l2 ) )
+            return s1;
+        s1++;
+    }
+    return NULL;
+#endif
+}
+
 char*
 tr_strdup_printf( const char * fmt, ... )
 {

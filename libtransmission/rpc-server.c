@@ -134,22 +134,6 @@ send_simple_response( struct evhttp_request * req,
     tr_releaseBuffer( body );
 }
 
-static const char*
-tr_memmem( const char * s1, size_t l1, /* haystack */
-           const char * s2, size_t l2 ) /* needle */
-{
-    if( !l2 ) return s1;
-    while( l1 >= l2 )
-    {
-        l1--;
-        if( !memcmp( s1, s2, l2 ) )
-            return s1;
-        s1++;
-    }
-
-    return NULL;
-}
-
 struct tr_mimepart
 {
     char * headers;

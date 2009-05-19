@@ -350,6 +350,9 @@ const char* tr_strerror( int );
 
 char*       tr_strstrip( char * str );
 
+const char* tr_memmem( const char * haystack, size_t haystack_len,
+                       const char * needle, size_t needle_len );
+
 /***
 ****
 ***/
