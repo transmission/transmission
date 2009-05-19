@@ -10,13 +10,17 @@
  * $Id$
  */
 
+#ifdef HAVE_MEMMEM
+ #define _GNU_SOURCE /* glibc's string.h needs this to pick up memmem */
+#endif
+
 #include <assert.h>
 #include <ctype.h> /* isalpha, tolower */
 #include <errno.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h> /* strerror, memset */
+#include <string.h> /* strerror, memset, memmem */
 
 #include <libgen.h> /* basename */
 #include <sys/time.h>
