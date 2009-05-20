@@ -297,7 +297,7 @@ main( int argc, char ** argv )
     {
         struct evbuffer * buf = tr_getBuffer( );
 
-        tr_bencSaveAsJSON( &settings, buf );
+        tr_bencSaveAsJSON( &settings, buf, TRUE );
         fprintf( stderr, "%s", (char*)EVBUFFER_DATA(buf) );
 
         tr_releaseBuffer( buf );

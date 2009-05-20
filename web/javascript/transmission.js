@@ -987,7 +987,7 @@ Transmission.prototype =
 		var ti = '#torrent_inspector_';
 		setInnerHTML( $(ti+'name')[0], name );
 		setInnerHTML( $(ti+'size')[0], torrents.length ? Math.formatBytes( total_size ) : 'N/A' );
-		setInnerHTML( $(ti+'tracker')[0], total_tracker );
+		setInnerHTML( $(ti+'tracker')[0], total_tracker.replace(/\//g, '/&#8203;') ); 
 		setInnerHTML( $(ti+'hash')[0], hash );
 		setInnerHTML( $(ti+'state')[0], total_state );
 		setInnerHTML( $(ti+'download_speed')[0], torrents.length ? Math.formatBytes( total_download_speed ) + '/s' : 'N/A' );
@@ -1004,7 +1004,7 @@ Transmission.prototype =
 		setInnerHTML( $(ti+'secure')[0], private_string );
 		setInnerHTML( $(ti+'creator_date')[0], date_created );
 		setInnerHTML( $(ti+'progress')[0], torrents.length ? Math.ratio( sizeDone*100, sizeWhenDone ) + '%' : 'N/A' );
-		setInnerHTML( $(ti+'comment')[0], comment );
+		setInnerHTML( $(ti+'comment')[0], comment.replace(/\//g, '/&#8203;') ); 
 		setInnerHTML( $(ti+'creator')[0], creator );
 		setInnerHTML( $(ti+'error')[0], error );
 		
@@ -1243,10 +1243,11 @@ Transmission.prototype =
 			var tr = this;
 			var args = { };
 			if ('' != $('#torrent_upload_url').val()) {
-				tr.remote.addTorrentByUrl($('#torrent_upload_url').val(), { paused: !this[Prefs._Autostart] });
+				tr.remote.addTorrentByUrl($('#torrent_upload_url').val(), { paused: !this[Prefs._AutoStart] });
 			} else {
 				args.url = '/transmission/upload?paused=' + (this[Prefs._AutoStart] ? 'false' : 'true');
 				args.type = 'POST';
+				args.data = { 'X-Transmission-Session-Id' : tr.remote._token };
 				args.dataType = 'xml';
 				args.iframe = true;
 				args.success = function( data ) {

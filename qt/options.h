@@ -32,6 +32,29 @@ class Prefs;
 class QCheckBox;
 class Session;
 
+extern "C" { struct tr_benc; };
+
+class FileAdded: public QObject
+{
+        Q_OBJECT
+        const int64_t myTag;
+        QString myDelFile;
+
+    public:
+        FileAdded( int tag, const QString file ): myTag(tag), myDelFile(file) { }
+        ~FileAdded( ) { }
+
+    public slots:
+        void executed( int64_t tag, const QString& result, struct tr_benc * arguments ) {
+            Q_UNUSED( arguments );
+            if( tag == myTag ) {
+                if( result == "success" )
+                    QFile( myDelFile ).remove( );
+                deleteLater();
+            }
+        }
+};
+
 class Options: public QDialog
 {
         Q_OBJECT

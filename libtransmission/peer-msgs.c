@@ -1429,7 +1429,7 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
 
         case BT_PORT:
             dbgmsg( msgs, "Got a BT_PORT" );
-            tr_peerIoReadUint16( msgs->peer->io, inbuf, &msgs->peer->port );
+            tr_peerIoReadUint16( msgs->peer->io, inbuf, &msgs->peer->dht_port );
             break;
 
         case BT_FEXT_SUGGEST:

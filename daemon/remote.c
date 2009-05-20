@@ -602,7 +602,7 @@ readargs( int           argc,
         if( addArg )
         {
             struct evbuffer * buf = tr_getBuffer( );
-            reqs[reqCount++] = tr_strdup( tr_bencSaveAsJSON( &top, buf ) );
+            reqs[reqCount++] = tr_strdup( tr_bencSaveAsJSON( &top, buf, FALSE ) );
             tr_releaseBuffer( buf );
         }
 
@@ -1245,8 +1245,8 @@ processResponse( const char * host,
     tr_benc top;
 
     if( debug )
-        fprintf( stderr, "got response:\n--------\n%*.*s\n--------\n",
-                 (int)len, (int)len, (const char*) response );
+        fprintf( stderr, "got response (len %d):\n--------\n%*.*s\n--------\n",
+                 (int)len, (int)len, (int)len, (const char*) response );
 
     if( tr_jsonParse( response, len, &top, NULL ) )
         tr_nerr( MY_NAME, "Unable to parse response \"%*.*s\"", (int)len,

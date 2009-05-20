@@ -251,10 +251,11 @@ Options :: onAccepted( )
 {
     // rpc spec section 3.4 "adding a torrent"
 
+    const int64_t tag = mySession.getUniqueTag( );
     tr_benc top;
     tr_bencInitDict( &top, 3 );
     tr_bencDictAddStr( &top, "method", "torrent-add" );
-    tr_bencDictAddInt( &top, "tag", Session::ADD_TORRENT_TAG );
+    tr_bencDictAddInt( &top, "tag", tag );
     tr_benc * args( tr_bencDictAddDict( &top, "arguments", 10 ) );
 
     // "download-dir"
@@ -301,14 +302,17 @@ Options :: onAccepted( )
                 tr_bencListAddInt( l, i );
     }
 
+    // maybe delete the source .torrent
+    if( myTrashCheck->isChecked( ) ) {
+        FileAdded * fileAdded = new FileAdded( tag, myFile );
+        connect( &mySession, SIGNAL(executed(int64_t,const QString&, struct tr_benc*)),
+                 fileAdded, SLOT(executed(int64_t,const QString&, struct tr_benc*)));
+    }
+
     mySession.exec( &top );
 
     tr_bencFree( &top );
     deleteLater( );
-
-    // maybe the source .torrent
-    if( myTrashCheck->isChecked( ) )
-        QFile(myFile).remove( );
 }
 
 void

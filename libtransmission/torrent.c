@@ -239,7 +239,7 @@ tr_torrentGetSeedRatio( const tr_torrent * tor, double * ratio )
                 *ratio = tr_sessionGetRatioLimit( tor->session );
             break;
 
-        case TR_RATIOLIMIT_UNLIMITED:
+        default: /* TR_RATIOLIMIT_UNLIMITED */
             isLimited = FALSE;
             break;
     }
@@ -844,7 +844,7 @@ tr_torrentStat( tr_torrent * tor )
     const tr_tracker_info * ti;
     int                     usableSeeds = 0;
     uint64_t                now;
-    double                  downloadedForRatio, seedRatio;
+    double                  downloadedForRatio, seedRatio=0;
     tr_bool                 checkSeedRatio;
 
     if( !tor )
@@ -1286,11 +1286,18 @@ void
 tr_torrentVerify( tr_torrent * tor )
 {
     assert( tr_isTorrent( tor ) );
-
-    tr_verifyRemove( tor );
-
     tr_globalLock( tor->session );
 
+    /* if the torrent's already being verified, stop it */
+    tr_verifyRemove( tor );
+
+    /* if the torrent's running, stop it & set the restart-after-verify flag */
+    if( tor->isRunning ) {
+        tr_torrentStop( tor );
+        tor->startAfterVerify = TRUE;
+    }
+
+    /* add the torrent to the recheck queue */
     tr_torrentUncheck( tor );
     tr_verifyAdd( tor, torrentRecheckDoneCB );
 

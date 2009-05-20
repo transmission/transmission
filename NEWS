@@ -1,5 +1,29 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
+1.62 (2009/xx/yy)
+<http://trac.transmissionbt.com/query?milestone=1.62&group=component&groupdesc=1&order=severity>
+- All Platforms
+   + fix bug that could forget which port to use when connecting to some peers
+   + pause torrent when verifying
+   + JSON RPC messages can be 84% shorter, saving bandwidth and CPU
+   + phantom 'verifying' appears if another verify in progress
+   + fix small memory leaks and remove dead code
+- Web Client
+   + fix 1.61 bug that broke adding torrents via the web client
+   + torrents added by URL were always paused, regardless of preferences
+   + comments and announce address are cut off in the inspector
+   + toolbar z-index should be less than menus, dialogs
+   + the "data remaining" field wasn't updated when the number reached 0
+   + use the correct filterbar image and style it properly
+- GTK+
+   + fix intltool build problem 
+   + make it clearer that the statusbar's ratio mode button is a button
+   + torrent comment box does not scroll, so long comments are partially hidden
+- Qt
+   + initial torrent list was sometimes incorrect
+   + add-torrent-and-delete-source deletes the source even if there's an error
+   + prefs dialog didn't show or modify "Stop seeding torrents at ratio"
+
 1.61 (2009/05/11)
 <http://trac.transmissionbt.com/query?milestone=1.61&group=component&groupdesc=1&order=severity>
 - All Platforms
@@ -12,6 +36,22 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Add response header to allow clients to cache static files
 - Daemon
    + transmission-remote was unable to select torrents by their SHA1 hash
+
+1.54 (2009/xx/yy)
+- All Platforms
+   + fix bug that could forget which port to use when connecting to some peers
+   + phantom 'verifying' appears if another verify in progress
+   + fix small memory leaks and remove dead code
+- Web Client
+   + fix 1.53 bug that broke adding new torrents in the web client
+   + torrents added by URL were always paused, regardless of preferences
+   + in the inspector, comments and announce address were cut off
+   + toolbar z-index should be less than menus, dialogs
+   + the "data remaining" field wasn't updated when the number reached 0
+- GTK+
+   + Fix intltool build error
+   + Make it clearer that the statusbar's ratio mode button is a button
+   + Torrent comment box does not scroll, so long comments are partially hidden
 
 1.53 (2009/05/11)
 - All Platforms

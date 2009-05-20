@@ -340,8 +340,8 @@ Torrent :: getSeedRatio( double& ratio ) const
             break;
 
         case TR_RATIOLIMIT_GLOBAL:
-            if(( isLimited = myPrefs.getBool( Prefs :: SEED_RATIO_LIMITED )))
-                ratio = myPrefs.getDouble( Prefs :: SEED_RATIO_LIMIT );
+            if(( isLimited = myPrefs.getBool( Prefs :: RATIO_ENABLED )))
+                ratio = myPrefs.getDouble( Prefs :: RATIO );
             break;
 
         case TR_RATIOLIMIT_UNLIMITED:

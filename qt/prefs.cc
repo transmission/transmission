@@ -105,8 +105,6 @@ Prefs::PrefItem Prefs::myItems[] =
     { RPC_USERNAME, TR_PREFS_KEY_RPC_USERNAME, QVariant::String },
     { RPC_WHITELIST_ENABLED, TR_PREFS_KEY_RPC_WHITELIST_ENABLED, QVariant::Bool },
     { RPC_WHITELIST, TR_PREFS_KEY_RPC_WHITELIST, QVariant::String },
-    { SEED_RATIO_LIMIT, TR_PREFS_KEY_RATIO, QVariant::Double },
-    { SEED_RATIO_LIMITED, TR_PREFS_KEY_RATIO_ENABLED, QVariant::Bool },
     { USPEED_ENABLED, TR_PREFS_KEY_USPEED_ENABLED, QVariant::Bool },
     { USPEED, TR_PREFS_KEY_USPEED, QVariant::Int },
     { UPLOAD_SLOTS_PER_TORRENT, TR_PREFS_KEY_UPLOAD_SLOTS_PER_TORRENT, QVariant::Int }
@@ -219,7 +217,7 @@ Prefs :: ~Prefs( )
     }
 
     /* write back out the serialized preferences */
-    char * json = tr_bencToJSON( &top );
+    char * json = tr_bencToJSON( &top, TRUE );
     if( json && *json ) {
         file.open( QIODevice::WriteOnly | QIODevice::Text );
         file.write( json );

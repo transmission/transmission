@@ -525,7 +525,7 @@ static GtkWidget*
 options_page_new( struct DetailsImpl * d )
 {
     guint tag;
-    int i, row;
+    int row;
     char *s;
     GSList *group;
     GtkWidget *t, *w, *tb, *h;
@@ -546,7 +546,6 @@ options_page_new( struct DetailsImpl * d )
     d->downLimitedCheckTag = tag;
 
     w = gtk_spin_button_new_with_range( 1, INT_MAX, 5 );
-    gtk_spin_button_set_value( GTK_SPIN_BUTTON( w ), i );
     tag = g_signal_connect( w, "value-changed", G_CALLBACK( down_speed_spun_cb ), d );
     d->downLimitSpinTag = tag;
     hig_workarea_add_row_w( t, &row, tb, w, NULL );
@@ -558,7 +557,6 @@ options_page_new( struct DetailsImpl * d )
     d->upLimitedCheckTag = tag;
 
     w = gtk_spin_button_new_with_range( 1, INT_MAX, 5 );
-    gtk_spin_button_set_value( GTK_SPIN_BUTTON( w ), i );
     tag = g_signal_connect( w, "value-changed", G_CALLBACK( up_speed_spun_cb ), d );
     d->upLimitSpinTag = tag;
     hig_workarea_add_row_w( t, &row, tb, w, NULL );
@@ -1033,7 +1031,7 @@ info_page_new( struct DetailsImpl * di )
 {
     int row = 0;
     GtkTextBuffer * b;
-    GtkWidget *l, *w, *fr;
+    GtkWidget *l, *w, *fr, *sw;
     GtkWidget *t = hig_workarea_create( );
 
     hig_workarea_add_section_title( t, &row, _( "Details" ) );
@@ -1060,9 +1058,14 @@ info_page_new( struct DetailsImpl * di )
         gtk_widget_set_size_request( w, 0u, 100u );
         gtk_text_view_set_wrap_mode( GTK_TEXT_VIEW( w ), GTK_WRAP_WORD );
         gtk_text_view_set_editable( GTK_TEXT_VIEW( w ), FALSE );
+        sw = gtk_scrolled_window_new( NULL, NULL );
+        gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( sw ),
+                                        GTK_POLICY_AUTOMATIC,
+                                        GTK_POLICY_AUTOMATIC );
+        gtk_container_add( GTK_CONTAINER( sw ), w );
         fr = gtk_frame_new( NULL );
         gtk_frame_set_shadow_type( GTK_FRAME( fr ), GTK_SHADOW_IN );
-        gtk_container_add( GTK_CONTAINER( fr ), w );
+        gtk_container_add( GTK_CONTAINER( fr ), sw );
         w = hig_workarea_add_row( t, &row, _( "Comment:" ), fr, NULL );
         gtk_misc_set_alignment( GTK_MISC( w ), 0.0f, 0.0f );
 

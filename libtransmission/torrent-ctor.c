@@ -171,9 +171,9 @@ tr_ctorSetFilePriorities( tr_ctor                * ctor,
     tr_file_index_t * mycount;
 
     switch( priority ) {
-        case TR_PRI_NORMAL: myfiles = &ctor->normal; mycount = &ctor->normalSize; break;
         case TR_PRI_LOW: myfiles = &ctor->low; mycount = &ctor->lowSize; break;
         case TR_PRI_HIGH: myfiles = &ctor->high; mycount = &ctor->highSize; break;
+        default /*TR_PRI_NORMAL*/: myfiles = &ctor->normal; mycount = &ctor->normalSize; break;
     }
 
     tr_free( *myfiles );

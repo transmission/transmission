@@ -84,7 +84,7 @@ struct tr_web
 static struct tr_web_sockinfo *
 getSockinfo( tr_web * web, int fd, tr_bool createIfMissing )
 {
-    tr_list * l = web->fds;
+    tr_list * l;
 
     for( l=web->fds; l!=NULL; l=l->next ) {
         struct tr_web_sockinfo * s =  l->data;
