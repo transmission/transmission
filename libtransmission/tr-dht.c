@@ -111,7 +111,7 @@ tr_dhtInit(tr_session *ss)
     size_t len;
     char v[5];
 
-    if(session)
+    if( session ) /* already initialized */
         return -1;
 
     dht_socket = socket(PF_INET, SOCK_DGRAM, 0);
@@ -129,36 +129,23 @@ tr_dhtInit(tr_session *ss)
     if(rc < 0)
         goto fail;
 
-#ifdef DEBUG_DHT
-    dht_debug = stdout;
-#endif
+    if( getenv( "TR_DHT_VERBOSE" ) != NULL )
+        dht_debug = stderr;
 
     dat_file = tr_buildPath( ss->configDir, "dht.dat", NULL );
     rc = tr_bencLoadFile(dat_file, &benc);
     tr_free( dat_file );
     if(rc == 0) {
-        if(tr_bencDictFindRaw(&benc, "id", &raw, &len)) {
-            if(raw && len == 20) {
-                memcpy(myid, raw, len);
-                have_id = TRUE;
-            }
-        }
-        if(tr_bencDictFindRaw(&benc, "nodes", &raw, &len)) {
-            if(len % 6 == 2) {
-                /* This hack allows reading of uTorrent files, which I find
-                   convenient. */
-                len -= 2;
-            }
-            nodes = tr_new( uint8_t, len );
-            memcpy( nodes, raw, len );
-        }
-        tr_bencFree(&benc);
+        if(( have_id = tr_bencDictFindRaw( &benc, "id", &raw, &len ) && len==20 ))
+            memcpy( myid, raw, len );
+        if( tr_bencDictFindRaw( &benc, "nodes", &raw, &len ) && !(len%6) )
+            nodes = tr_memdup( raw, len );
+        tr_bencFree( &benc );
     }
 
     if(!have_id) {
-        /* Note that you cannot just use your BT id -- DHT ids need to be
-           distributed uniformly, so it should either be the SHA-1 of
-           something, or truly random. */
+        /* Note that DHT ids need to be distributed uniformly,
+         * so it should be something truly random. */
         tr_cryptoRandBuf( myid, 20 );
         have_id = TRUE;
     }
@@ -175,15 +162,12 @@ tr_dhtInit(tr_session *ss)
 
     if(nodes) {
         struct bootstrap_closure * cl = tr_new( struct bootstrap_closure, 1 );
-        if( !cl )
-            tr_free( nodes );
-        else {
-            cl->session = session;
-            cl->nodes = nodes;
-            cl->len = len;
-            tr_threadNew( dht_bootstrap, cl );
-        }
+        cl->session = session;
+        cl->nodes = nodes;
+        cl->len = len;
+        tr_threadNew( dht_bootstrap, cl );
     }
+
     tv.tv_sec = 0;
     tv.tv_usec = tr_cryptoWeakRandInt( 1000000 );
     event_set( &dht_event, dht_socket, EV_READ, event_callback, NULL );
@@ -234,7 +218,8 @@ tr_dhtUninit(tr_session *ss)
         tr_free( dat_file );
     }
 
-    dht_uninit(dht_socket, 0);
+    dht_uninit( dht_socket, 0 );
+    EVUTIL_CLOSESOCKET( dht_socket );
 
     session = NULL;
 }
@@ -254,10 +239,12 @@ struct getstatus_closure
 static void
 getstatus(void *closure)
 {
-    struct getstatus_closure *ret = (struct getstatus_closure*)closure;
+    struct getstatus_closure * ret = closure;
     int good, dubious, incoming;
 
-    dht_nodes(&good, &dubious, NULL, &incoming);
+    dht_nodes( &good, &dubious, NULL, &incoming );
+
+    ret->count = good + dubious;
 
     if( good < 4 || good + dubious <= 8 )
         ret->status = TR_DHT_BROKEN;
@@ -267,8 +254,6 @@ getstatus(void *closure)
         ret->status = TR_DHT_FIREWALLED;
     else
         ret->status = TR_DHT_GOOD;
-
-    ret->count = good + dubious;
 }
 
 int
@@ -306,8 +291,8 @@ tr_dhtAddNode(tr_session *ss, tr_address *address, tr_port port, tr_bool bootstr
     if( address->type != TR_AF_INET )
         return 0;
 
-    /* Since we don't want to abuse our bootstrap nodes, we don't ping them
-       if the DHT is in a good state. */
+    /* Since we don't want to abuse our bootstrap nodes,
+     * we don't ping them if the DHT is in a good state. */
     if(bootstrap) {
         if(tr_dhtStatus(ss, NULL) >= TR_DHT_FIREWALLED)
             return 0;
@@ -323,25 +308,28 @@ tr_dhtAddNode(tr_session *ss, tr_address *address, tr_port port, tr_bool bootstr
 }
 
 static void
-callback(void *ignore UNUSED, int event,
-         unsigned char *info_hash, void *data, size_t data_len)
+callback( void *ignore UNUSED, int event,
+          unsigned char *info_hash, void *data, size_t data_len )
 {
-    if(event == DHT_EVENT_VALUES) {
+    if( event == DHT_EVENT_VALUES )
+    {
         tr_torrent *tor;
-        tr_pex *pex;
-        size_t i, n;
-        pex = tr_peerMgrCompactToPex(data, data_len, NULL, 0, &n);
-        tr_globalLock(session);
-        tor = tr_torrentFindFromHash(session, info_hash);
-        if(tor && tr_torrentAllowsDHT(tor)) {
-            for(i = 0; i < n; i++)
-                tr_peerMgrAddPex(tor, TR_PEER_FROM_DHT, pex + i);
+        tr_globalLock( session );
+        tor = tr_torrentFindFromHash( session, info_hash );
+        if( tor && tr_torrentAllowsDHT( tor ))
+        {
+            size_t i, n;
+            tr_pex * pex = tr_peerMgrCompactToPex(data, data_len, NULL, 0, &n);
+            for( i=0; i<n; ++i )
+                tr_peerMgrAddPex( tor, TR_PEER_FROM_DHT, pex+i );
+            tr_free(pex);
         }
-        tr_globalUnlock(session);
-        tr_free(pex);
-    } else if(event == DHT_EVENT_SEARCH_DONE) {
+        tr_globalUnlock( session );
+    }
+    else if( event == DHT_EVENT_SEARCH_DONE )
+    {
         tr_torrent * tor = tr_torrentFindFromHash( session, info_hash );
-        if(tor)
+        if( tor )
             tor->dhtAnnounceInProgress = 0;
     }
 }
@@ -393,12 +381,10 @@ dht_hash(void *hash_return, int hash_size,
          const void *v2, int len2,
          const void *v3, int len3)
 {
-    unsigned char sha1[20];
-    tr_sha1(sha1, v1, len1, v2, len2, v3, len3, NULL);
-    if(hash_size > 20) {
-        memset((char*)hash_return + 20, 0, hash_size - 20);
-    }
-    memcpy(hash_return, sha1, hash_size > 20 ? 20 : hash_size);
+    unsigned char sha1[SHA_DIGEST_LENGTH];
+    tr_sha1( sha1, v1, len1, v2, len2, v3, len3, NULL );
+    memset( hash_return, 0, hash_size );
+    memcpy( hash_return, sha1, MIN( hash_size, SHA_DIGEST_LENGTH ) );
 }
 
 int
