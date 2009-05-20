@@ -36,7 +36,6 @@ cat > libtransmission/version.h.new << EOF
 #define LONG_VERSION_STRING       "$USERAGENT_PREFIX ($SVN_REVISION)"
 
 #define VERSION_STRING_INFOPLIST  $USERAGENT_PREFIX
-#define BUNDLE_VERSION_INFOPLIST  $SVN_REVISION
 EOF
 
 # Add a release definition
