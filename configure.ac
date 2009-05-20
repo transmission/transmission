@@ -200,7 +200,7 @@ fi
 use_nls=no
 if test "x$enable_nls" = "xyes" ; then
     use_nls=yes
-    IT_PROG_INTLTOOL([0.23],[no-xml])
+    IT_PROG_INTLTOOL([0.40.0],[no-xml])
     AC_CHECK_HEADERS([libintl.h])
     GETTEXT_PACKAGE=transmission
     AC_SUBST(GETTEXT_PACKAGE)

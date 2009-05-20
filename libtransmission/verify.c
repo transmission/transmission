@@ -187,7 +187,7 @@ tr_verifyAdd( tr_torrent *      tor,
         node->verify_done_cb = verify_done_cb;
 
         tr_lockLock( getVerifyLock( ) );
-        tor->verifyState = verifyList ? TR_VERIFY_WAIT : TR_VERIFY_NOW;
+        tor->verifyState = TR_VERIFY_WAIT;
         tr_list_append( &verifyList, node );
         if( verifyThread == NULL )
             verifyThread = tr_threadNew( verifyThreadFunc, NULL );

@@ -511,6 +511,7 @@ scanWatchDir( TrCore * core )
             maybeAddTorrent( core, filename );
             g_free( filename );
         }
+        g_dir_close( dir );
     }
 }
 

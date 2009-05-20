@@ -36,10 +36,7 @@ EXTRA_DIST = \
   COPYING \
   README \
   autogen.sh \
-  Transmission.xcodeproj/project.pbxproj \
-  intltool-extract.in \
-  intltool-merge.in \
-  intltool-update.in
+  Transmission.xcodeproj/project.pbxproj
 
 clutchdir = $(datadir)/transmission/web
 clutch_DATA = \

@@ -619,7 +619,7 @@ info_page_new( tr_torrent * tor )
 {
     int             row = 0;
     GtkWidget *     t = hig_workarea_create( );
-    GtkWidget *     l, *w, *fr;
+    GtkWidget *     l, *w, *fr, *sw;
     char *          pch;
     char            sizeStr[128];
     char            countStr[128];
@@ -661,9 +661,14 @@ info_page_new( tr_torrent * tor )
     gtk_widget_set_size_request( w, 0u, 100u );
     gtk_text_view_set_wrap_mode( GTK_TEXT_VIEW( w ), GTK_WRAP_WORD );
     gtk_text_view_set_editable( GTK_TEXT_VIEW( w ), FALSE );
+    sw = gtk_scrolled_window_new( NULL, NULL ); 
+    gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( sw ), 
+                                    GTK_POLICY_AUTOMATIC, 
+                                    GTK_POLICY_AUTOMATIC ); 
+    gtk_container_add( GTK_CONTAINER( sw ), w ); 
     fr = gtk_frame_new( NULL );
     gtk_frame_set_shadow_type( GTK_FRAME( fr ), GTK_SHADOW_IN );
-    gtk_container_add( GTK_CONTAINER( fr ), w );
+    gtk_container_add( GTK_CONTAINER( fr ), sw );
     w = hig_workarea_add_row( t, &row, _( "Comment:" ), fr, NULL );
     gtk_misc_set_alignment( GTK_MISC( w ), 0.0f, 0.0f );
 

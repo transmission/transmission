@@ -263,7 +263,6 @@ Torrent.prototype =
 		if (data.comment)       this._comment       = data.comment;
 		if (data.creator)       this._creator       = data.creator;
 		if (data.dateCreated)   this._creator_date  = data.dateCreated;
-                if (data.leftUntilDone) this._leftUntilDone = data.leftUntilDone;
                 if (data.sizeWhenDone)  this._sizeWhenDone  = data.sizeWhenDone;
 		if (data.path)          this._torrent_file  = data.path;//FIXME
 		if (data.name) {
@@ -275,6 +274,7 @@ Torrent.prototype =
 		this._id                    = data.id;
 		this._completed             = data.haveUnchecked + data.haveValid;
 		this._verified              = data.haveValid;
+                this._leftUntilDone         = data.leftUntilDone;
 		this._download_total        = data.downloadedEver;
 		this._upload_total          = data.uploadedEver;
 		this._download_speed        = data.rateDownload;

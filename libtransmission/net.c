@@ -499,7 +499,6 @@ tr_netBindTCP( const tr_address * addr, tr_port port, tr_bool suppressMsgs )
     struct sockaddr_storage sock;
     const int               type = SOCK_STREAM;
     int                     addrlen;
-    int                     retval;
 
 #if defined( SO_REUSEADDR ) || defined( SO_REUSEPORT ) || defined( IPV6_V6ONLY )
     int                optval = 1;
@@ -517,7 +516,7 @@ tr_netBindTCP( const tr_address * addr, tr_port port, tr_bool suppressMsgs )
 
 #ifdef IPV6_V6ONLY
     if( addr->type == TR_AF_INET6 && 
-        ( retval = setsockopt( s, IPPROTO_IPV6, IPV6_V6ONLY, &optval,
+        ( setsockopt( s, IPPROTO_IPV6, IPV6_V6ONLY, &optval,
                              sizeof( optval ) ) ) == -1 ) {
         /* the kernel may not support this. if not, ignore it */
         if( errno != ENOPROTOOPT )

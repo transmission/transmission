@@ -79,6 +79,7 @@ typedef struct tr_peer
 
     uint8_t                  encryption_preference;
     tr_port                  port;
+    tr_port                  dht_port;
     tr_address               addr;
     struct tr_peerIo       * io;
 

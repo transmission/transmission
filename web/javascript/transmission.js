@@ -951,28 +951,29 @@ Transmission.prototype =
 		else if( have_public ) private_string = 'Public Torrent';	
 
 		var ti = '#torrent_inspector_';
-		$(ti+'name')[0].innerHTML            = name;
-		$(ti+'size')[0].innerHTML            = torrents.length ? Math.formatBytes( total_size ) : 'N/A';
-		$(ti+'tracker')[0].innerHTML         = total_tracker;
-		$(ti+'hash')[0].innerHTML            = hash;
-		$(ti+'state')[0].innerHTML           = total_state;
-		$(ti+'download_speed')[0].innerHTML  = torrents.length ? Math.formatBytes( total_download_speed ) + '/s' : 'N/A';
-		$(ti+'upload_speed')[0].innerHTML    = torrents.length ? Math.formatBytes( total_upload_speed ) + '/s' : 'N/A';
-		$(ti+'uploaded')[0].innerHTML        = torrents.length ? Math.formatBytes( total_upload ) : 'N/A';
-		$(ti+'downloaded')[0].innerHTML      = torrents.length ? Math.formatBytes( total_download ) : 'N/A';
-		$(ti+'ratio')[0].innerHTML           = torrents.length ? Math.ratio( total_upload, total_download ) : 'N/A';
-		$(ti+'total_seeders')[0].innerHTML   = torrents.length ? total_seeders : 'N/A';
-		$(ti+'total_leechers')[0].innerHTML  = torrents.length ? total_leechers : 'N/A';
-		$(ti+'swarm_speed')[0].innerHTML     = torrents.length ? Math.formatBytes(total_swarm_speed) + '/s' : 'N/A';
-		$(ti+'have')[0].innerHTML            = torrents.length ? Math.formatBytes(total_completed) + ' (' + Math.formatBytes(total_verified) + ' verified)' : 'N/A';
-		$(ti+'upload_to')[0].innerHTML       = torrents.length ? total_upload_peers : 'N/A';
-		$(ti+'download_from')[0].innerHTML   = torrents.length ? total_download_peers : 'N/A';
-		$(ti+'secure')[0].innerHTML          = private_string;
-		$(ti+'creator_date')[0].innerHTML    = date_created;
-		$(ti+'progress')[0].innerHTML        = torrents.length ? Math.ratio( sizeDone*100, sizeWhenDone ) + '%' : 'N/A';
-		$(ti+'comment')[0].innerHTML         = comment;
-		$(ti+'creator')[0].innerHTML         = creator;
-		$(ti+'error')[0].innerHTML           = error;
+		setInnerHTML( $(ti+'name')[0], name );
+		setInnerHTML( $(ti+'size')[0], torrents.length ? Math.formatBytes( total_size ) : 'N/A' );
+                setInnerHTML( $(ti+'tracker')[0], total_tracker.replace(/\//g, '/&#8203;') );
+		setInnerHTML( $(ti+'hash')[0], hash );
+		setInnerHTML( $(ti+'state')[0], total_state );
+		setInnerHTML( $(ti+'download_speed')[0], torrents.length ? Math.formatBytes( total_download_speed ) + '/s' : 'N/A' );
+		setInnerHTML( $(ti+'upload_speed')[0], torrents.length ? Math.formatBytes( total_upload_speed ) + '/s' : 'N/A' );
+		setInnerHTML( $(ti+'uploaded')[0], torrents.length ? Math.formatBytes( total_upload ) : 'N/A' );
+		setInnerHTML( $(ti+'downloaded')[0], torrents.length ? Math.formatBytes( total_download ) : 'N/A' );
+		setInnerHTML( $(ti+'ratio')[0], torrents.length ? Math.ratio( total_upload, total_download ) : 'N/A' );
+		setInnerHTML( $(ti+'total_seeders')[0], torrents.length ? total_seeders : 'N/A' );
+		setInnerHTML( $(ti+'total_leechers')[0], torrents.length ? total_leechers : 'N/A' );
+		setInnerHTML( $(ti+'swarm_speed')[0], torrents.length ? Math.formatBytes(total_swarm_speed) + '/s' : 'N/A' );
+		setInnerHTML( $(ti+'have')[0], torrents.length ? Math.formatBytes(total_completed) + ' (' + Math.formatBytes(total_verified) + ' verified)' : 'N/A' );
+		setInnerHTML( $(ti+'upload_to')[0], torrents.length ? total_upload_peers : 'N/A' );
+		setInnerHTML( $(ti+'download_from')[0], torrents.length ? total_download_peers : 'N/A' );
+		setInnerHTML( $(ti+'secure')[0], private_string );
+		setInnerHTML( $(ti+'creator_date')[0], date_created );
+		setInnerHTML( $(ti+'progress')[0], torrents.length ? Math.ratio( sizeDone*100, sizeWhenDone ) + '%' : 'N/A' );
+		setInnerHTML( $(ti+'comment')[0], comment );
+                setInnerHTML( $(ti+'tracker')[0], total_tracker.replace(/\//g, '/&#8203;') );
+		setInnerHTML( $(ti+'creator')[0], creator );
+		setInnerHTML( $(ti+'error')[0], error );
 		
 		$(".inspector_row > div:contains('N/A')").css('color', '#666');
 	},
@@ -1181,10 +1182,11 @@ Transmission.prototype =
 			var tr = this;
 			var args = { };
 			if ('' != $('#torrent_upload_url').val()) {
-				tr.remote.addTorrentByUrl($('#torrent_upload_url').val(), { paused: !this[Prefs._Autostart] });
+				tr.remote.addTorrentByUrl($('#torrent_upload_url').val(), { paused: !this[Prefs._AutoStart] });
 			} else {
 				args.url = '/transmission/upload?paused=' + (this[Prefs._AutoStart] ? 'false' : 'true');
 				args.type = 'POST';
+				args.data = { 'X-Transmission-Session-Id' : tr.remote._token };
 				args.dataType = 'xml';
 				args.iframe = true;
 				args.success = function( data ) {

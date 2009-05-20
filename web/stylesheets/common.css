@@ -592,7 +592,7 @@ div.torrent_footer {
 	left: 0px;
 	right: 0px;
 	bottom: 0;
-	z-index: 2;
+	z-index: 3;
 	color: #000;
 	text-shadow: 0 1px 0 #ccc;
 }
@@ -639,7 +639,6 @@ div.dialog_container {
 	margin: 0px;
 	width: 100%;
 	height: 100%;
-	z-index: 2;
 	text-align: center;
 	color: black;
 	font-size: 1.1em;
@@ -647,23 +646,25 @@ div.dialog_container {
 
 div.dialog_container div.dialog_window {
 	background-color: #eee;
-	margin: -210px auto 0;
+	margin: 0 auto;
 	filter: alpha(opacity=95);
 	-moz-opacity: .95;
 	opacity: .95;
 	border-top: none;
 	text-align: left;
 	width: 420px;
+	z-index: 4;
 	height: 145px;
 	position: relative;
 	-webkit-box-shadow: 0 3px 6px rgba(0,0,0,0.7);
-	top: 50%;
+	top: 80px;
 	padding-bottom: 20px;
 }
 @media screen and (-webkit-min-device-pixel-ratio:0) {
 	div.dialog_container div.dialog_window {
 		top: 0;
 		margin-top: 71px;
+		z-index: 2
 	}
 } 
 
@@ -671,7 +672,6 @@ div#prefs_container div.dialog_window {
 	width: 410px;
 	height: 420px;
 	padding: 0 15px;
-	line-height: 14pt;
 }
 
 div.dialog_container div.dialog_window img {
@@ -706,6 +706,7 @@ div.dialog_container div.dialog_window a {
 	background-color: #EEE;
 	border: 1px solid #787878;
 	width: 50px;
+	height: 15px;
 	text-align: center;
 	font-weight: bold;
 	text-decoration: none;
@@ -717,16 +718,7 @@ div.dialog_container div.dialog_window a {
 
 div.dialog_container div.dialog_window a:hover,
 div.dialog_container div.dialog_window a:active {
-	background: #C0C8D6 url('../images/graphics/filter_bar_bg.png') repeat-x;
-}
-
-div#upload_container div.dialog_window {
-	height: 200px !important;
-	position: relative;
-}
-
-div#upload_container div.dialog_window div.dialog_message {
-	height: 110px;
+	background: #C0C8D6 url('../images/graphics/filter_bar.png') repeat-x;
 }
 
 div#upload_container div.dialog_window div.dialog_message label {

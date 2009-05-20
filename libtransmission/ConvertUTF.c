@@ -353,7 +353,7 @@ Boolean
 tr_utf8_validate( const char * str, int max_len, const char ** end )
 {
     const UTF8* source = (const UTF8*) str;
-    const UTF8* sourceEnd = source;
+    const UTF8* sourceEnd;
 
     if( max_len == 0 )
         return true;
