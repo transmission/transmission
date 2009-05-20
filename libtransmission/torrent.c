@@ -1272,6 +1272,12 @@ torrentRecheckDoneImpl( void * vtor )
 
     assert( tr_isTorrent( tor ) );
     tr_torrentRecheckCompleteness( tor );
+
+    if( tor->startAfterVerify )
+    {
+        tor->startAfterVerify = FALSE;
+        tr_torrentStart( tor );
+    }
 }
 
 static void
