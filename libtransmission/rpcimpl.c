@@ -794,7 +794,7 @@ torrentSetLocation( tr_session               * session,
         for( i=0; i<torrentCount; ++i )
         {
             tr_torrent * tor = torrents[i];
-            tr_torrentSetLocation( tor, location, move, NULL );
+            tr_torrentSetLocation( tor, location, move, NULL, NULL );
             notify( session, TR_RPC_TORRENT_CHANGED, tor );
         }
 

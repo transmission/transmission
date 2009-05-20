@@ -36,7 +36,7 @@ onTimer( gpointer gdata )
     struct UpdateData * data = gdata;
     const tr_bool done = data->done;
 
-    if( done )
+    if( done != TR_LOC_MOVING )
     {
         gtk_widget_destroy( GTK_WIDGET( data->dialog ) );
         g_free( data );
@@ -75,7 +75,7 @@ onResponse( GtkDialog * dialog, int response, gpointer unused UNUSED )
         updateData = g_new( struct UpdateData, 1 );
         updateData->dialog = dialog;
         updateData->done = FALSE;
-        tr_torrentSetLocation( tor, location, do_move, &updateData->done );
+        tr_torrentSetLocation( tor, location, do_move, NULL, &updateData->done );
         gtr_timeout_add_seconds( 1, onTimer, updateData );
 
         /* remember this location so that it can be the default next time */

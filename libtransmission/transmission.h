@@ -937,11 +937,19 @@ void tr_torrentStop( tr_torrent * torrent );
 
 typedef int tr_fileFunc( const char * filename );
 
+enum
+{
+    TR_LOC_MOVING,
+    TR_LOC_DONE,
+    TR_LOC_ERROR
+};
+
 /** @brief Tell transmsision where to find this torrent's local data */
 void tr_torrentSetLocation( tr_torrent  * torrent,
                             const char  * location,
                             tr_bool       move_from_previous_location,
-                            tr_bool     * setme_done );
+                            double      * setme_progress,
+                            int         * setme_state );
 
 /**
  * @brief Deletes the torrent's local data.

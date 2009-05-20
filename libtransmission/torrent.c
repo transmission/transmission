@@ -2280,7 +2280,8 @@ tr_torrentDeleteLocalData( tr_torrent * tor, tr_fileFunc fileFunc )
 struct LocationData
 {
     tr_bool move_from_old_location;
-    tr_bool * setme_done;
+    int * setme_state;
+    double * setme_progress;
     char * location;
     tr_torrent * tor;
 };
@@ -2288,10 +2289,12 @@ struct LocationData
 static void
 setLocation( void * vdata )
 {
+    int err = 0;
     struct LocationData * data = vdata;
     tr_torrent * tor = data->tor;
     const tr_bool do_move = data->move_from_old_location;
     const char * location = data->location;
+    double bytesHandled = 0;
 
     assert( tr_isTorrent( tor ) );
 
@@ -2313,37 +2316,51 @@ setLocation( void * vdata )
         /* try to move the files.
          * FIXME: there are still all kinds of nasty cases, like what
          * if the target directory runs out of space halfway through... */
-        for( i=0; i<tor->info.fileCount; ++i )
+        for( i=0; !err && i<tor->info.fileCount; ++i )
         {
             struct stat sb;
-            char * oldpath = tr_buildPath( tor->downloadDir, tor->info.files[i].name, NULL );
-            char * newpath = tr_buildPath( location, tor->info.files[i].name, NULL );
-
+            const tr_file * f = &tor->info.files[i];
+            char * oldpath = tr_buildPath( tor->downloadDir, f->name, NULL );
+            char * newpath = tr_buildPath( location, f->name, NULL );
             
-            if( do_move && !stat( oldpath, &sb ) )
+            if( do_move )
             {
-                tr_moveFile( oldpath, newpath );
+                errno = 0;
                 tr_torinf( tor, "moving \"%s\" to \"%s\"", oldpath, newpath );
+                if( tr_moveFile( oldpath, newpath ) ) {
+                    err = 1;
+                    tr_torerr( tor, "error moving \"%s\" to \"%s\": %s",
+                                    oldpath, newpath, tr_strerror( errno ) );
+                }
             }
             else if( !stat( newpath, &sb ) )
             {
                 tr_torinf( tor, "found \"%s\"", newpath );
             }
 
+            if( data->setme_progress )
+            {
+                bytesHandled += f->length;
+                *data->setme_progress = bytesHandled / tor->info.totalSize;
+            }
+
             tr_free( newpath );
             tr_free( oldpath );
         }
 
-        /* blow away the leftover subdirectories in the old location */
-        tr_torrentDeleteLocalData( tor, unlink );
+        if( !err )
+        {
+            /* blow away the leftover subdirectories in the old location */
+            tr_torrentDeleteLocalData( tor, unlink );
 
-        /* set the new location and reverify */
-        tr_torrentSetDownloadDir( tor, location );
-        tr_torrentVerify( tor );
+            /* set the new location and reverify */
+            tr_torrentSetDownloadDir( tor, location );
+            tr_torrentVerify( tor );
+        }
     }
 
-    if( data->setme_done )
-        *data->setme_done = TRUE;
+    if( data->setme_state )
+        *data->setme_state = err ? TR_LOC_ERROR : TR_LOC_DONE;
 
     /* cleanup */
     tr_free( data->location );
@@ -2351,24 +2368,28 @@ setLocation( void * vdata )
 }
 
 void
-tr_torrentSetLocation( tr_torrent * tor,
-                       const char * location,
-                       tr_bool      move_from_old_location,
-                       tr_bool    * setme_done )
+tr_torrentSetLocation( tr_torrent  * tor,
+                       const char  * location,
+                       tr_bool       move_from_old_location,
+                       double      * setme_progress,
+                       int         * setme_state )
 {
     struct LocationData * data;
 
     assert( tr_isTorrent( tor ) );
 
-    if( setme_done )
-        *setme_done = FALSE;
+    if( setme_state )
+        *setme_state = TR_LOC_MOVING;
+    if( setme_progress )
+        *setme_progress = 0;
 
     /* run this in the libtransmission thread */
     data = tr_new( struct LocationData, 1 );
     data->tor = tor;
     data->location = tr_strdup( location );
     data->move_from_old_location = move_from_old_location;
-    data->setme_done = setme_done;
+    data->setme_state = setme_state;
+    data->setme_progress = setme_progress;
     tr_runInEventThread( tor->session, setLocation, data );
 }
 
