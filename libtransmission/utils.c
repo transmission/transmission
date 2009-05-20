@@ -694,14 +694,10 @@ tr_memmem( const char * haystack, size_t haystacklen,
 #ifdef HAVE_MEMMEM
     return memmem( haystack, haystacklen, needle, needlelen );
 #else
-    const char *h = haystack;
-    const char *n = needle;
     size_t i;
-
     for( i=0; i<haystacklen-needlelen; ++i )
-        if( !memcmp( h+i, n, needlelen ) )
-            return h+i;
-
+        if( !memcmp( haystack+i, needle, needlelen ) )
+            return haystack+i;
     return NULL;
 #endif
 }
