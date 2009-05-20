@@ -688,20 +688,20 @@ tr_strndup( const void * in, int len )
 }
 
 const char*
-tr_memmem( const char * s1, size_t l1, /* haystack */
-           const char * s2, size_t l2 ) /* needle */
+tr_memmem( const char * haystack, size_t haystacklen,
+           const char * needle, size_t needlelen )
 {
 #ifdef HAVE_MEMMEM
-    return memmem( s1, l1, s2, l2 );
+    return memmem( haystack, haystacklen, needle, needlelen );
 #else
-    if( !l2 ) return s1;
-    while( l1 >= l2 )
-    {
-        l1--;
-        if( !memcmp( s1, s2, l2 ) )
-            return s1;
-        s1++;
-    }
+    const char *h = haystack;
+    const char *n = needle;
+    size_t i;
+
+    for( i=0; i<haystacklen-needlelen; ++i )
+        if( !memcmp( h+i, n, needlelen ) )
+            return h+i;
+
     return NULL;
 #endif
 }
