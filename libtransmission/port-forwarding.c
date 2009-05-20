@@ -125,14 +125,6 @@ onTimer( int fd UNUSED, short what UNUSED, void * vshared )
 ****
 ***/
 
-static void
-start_timer( tr_shared * s )
-{
-    s->timer = tr_new0( struct event, 1 );
-    evtimer_set( s->timer, onTimer, s );
-    onTimer( 0, 0, s );
-}
-
 tr_shared *
 tr_sharedInit( tr_session  * session, tr_bool isEnabled )
 {
@@ -146,7 +138,14 @@ tr_sharedInit( tr_session  * session, tr_bool isEnabled )
     s->natpmpStatus = TR_PORT_UNMAPPED;
 
     if( isEnabled )
-        start_timer( s );
+    {
+        struct timeval timeval;
+        timeval.tv_sec = 0;
+        timeval.tv_usec = 333000;
+        s->timer = tr_new0( struct event, 1 );
+        evtimer_set( s->timer, onTimer, s );
+        evtimer_add( s->timer, &timeval );
+    }
 
     return s;
 }
@@ -181,6 +180,14 @@ tr_sharedClose( tr_session * session )
     stop_forwarding( s );
     s->session->shared = NULL;
     tr_free( s );
+}
+
+static void
+start_timer( tr_shared * s )
+{
+    s->timer = tr_new0( struct event, 1 );
+    evtimer_set( s->timer, onTimer, s );
+    onTimer( 0, 0, s );
 }
 
 void
