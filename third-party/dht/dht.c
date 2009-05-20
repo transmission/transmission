@@ -45,6 +45,10 @@ THE SOFTWARE.
 
 #include "dht.h"
 
+#ifdef __GLIBC__ 
+#define HAVE_MEMMEM 
+#endif 
+
 #ifndef MSG_CONFIRM
 #define MSG_CONFIRM 0
 #endif
@@ -2078,6 +2082,23 @@ send_peer_announced(int s, struct sockaddr *sa, int salen,
     errno = ENOSPC;
     return -1;
 }
+
+#ifndef HAVE_MEMMEM 
+static void * 
+memmem(const void *haystack, size_t haystacklen, 
+       const void *needle, size_t needlelen) 
+{ 
+    const char *h = haystack; 
+    const char *n = needle; 
+    size_t i; 
+
+    for(i = 0; i < haystacklen - needlelen; i++) { 
+        if(memcmp(h + i, n, needlelen) == 0) 
+            return h + i; 
+    } 
+    return NULL; 
+} 
+#endif 
 
 static int
 parse_message(const unsigned char *buf, int buflen,
