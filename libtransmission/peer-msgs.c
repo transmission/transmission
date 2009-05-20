@@ -1443,6 +1443,8 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
         case BT_PORT:
             dbgmsg( msgs, "Got a BT_PORT" );
             tr_peerIoReadUint16( msgs->peer->io, inbuf, &msgs->peer->dht_port );
+            if( msgs->peer->port > 0 )
+                tr_dhtAddNode( msgs->session, &msgs->peer->addr, msgs->peer->dht_port, 0 );
             break;
 
         case BT_FEXT_SUGGEST:

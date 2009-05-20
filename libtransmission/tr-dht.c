@@ -46,6 +46,7 @@ THE SOFTWARE.
 #include "trevent.h"
 #include "tr-dht.h"
 #include "utils.h"
+#include "version.h"
 
 static int dht_socket;
 static struct event dht_event;
@@ -108,6 +109,7 @@ tr_dhtInit(tr_session *ss)
     uint8_t * nodes = NULL;
     const uint8_t * raw;
     size_t len;
+    char v[5];
 
     if(session)
         return -1;
@@ -161,7 +163,8 @@ tr_dhtInit(tr_session *ss)
         have_id = TRUE;
     }
 
-    rc = dht_init(dht_socket, myid);
+    tr_snprintf( v, sizeof( v ), "TR%02x", SVN_REVISION_NUM );
+    rc = dht_init( dht_socket, myid, (const unsigned char*)v );
     if(rc < 0)
         goto fail;
 
@@ -393,4 +396,11 @@ dht_hash(void *hash_return, int hash_size,
         memset((char*)hash_return + 20, 0, hash_size - 20);
     }
     memcpy(hash_return, sha1, hash_size > 20 ? 20 : hash_size);
+}
+
+int
+dht_random_bytes( void * buf, size_t size )
+{
+    tr_cryptoRandBuf( buf, size );
+    return size;
 }
