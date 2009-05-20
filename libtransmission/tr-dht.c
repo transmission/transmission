@@ -20,31 +20,33 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+/* ansi */
 #include <errno.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <fcntl.h>
+
+/* posix */
+#include <netinet/in.h> /* sockaddr_in */
+#include <signal.h> /* sig_atomic_t */
 #include <sys/time.h>
-#include <sys/signal.h>
-#include <arpa/inet.h>
 #include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
+#include <sys/socket.h> /* socket(), bind() */
+#include <unistd.h> /* close() */
 
+/* third party */
 #include <event.h>
-
 #include <dht/dht.h>
 
+/* libT */
 #include "transmission.h"
+#include "bencode.h"
 #include "crypto.h"
-#include "peer-mgr.h"
-#include "platform.h"
+#include "net.h"
+#include "peer-mgr.h" /* tr_peerMgrCompactToPex() */
+#include "platform.h" /* tr_threadNew() */
 #include "session.h"
-#include "torrent.h"
-#include "trevent.h"
+#include "torrent.h" /* tr_torrentFindFromHash() */
 #include "tr-dht.h"
+#include "trevent.h" /* tr_runInEventThread() */
 #include "utils.h"
 #include "version.h"
 
@@ -202,17 +204,17 @@ tr_dhtUninit(tr_session *ss)
         struct sockaddr_in sins[300];
         char compact[300 * 6];
         char *dat_file;
-        int n, i, j;
-        n = dht_get_nodes(sins, 300);
-        j = 0;
-        for(i = 0; i < n; i++) {
-            memcpy(compact + j, &sins[i].sin_addr, 4);
-            memcpy(compact + j + 4, &sins[i].sin_port, 2);
+        int i;
+        int n = dht_get_nodes(sins, 300);
+        int j = 0;
+        for( i=0; i<n; ++i ) {
+            memcpy( compact + j, &sins[i].sin_addr, 4 );
+            memcpy( compact + j + 4, &sins[i].sin_port, 2 );
             j += 6;
         }
-        tr_bencInitDict(&benc, 2);
-        tr_bencDictAddRaw(&benc, "id", myid, 20);
-        tr_bencDictAddRaw(&benc, "nodes", compact, j);
+        tr_bencInitDict( &benc, 2 );
+        tr_bencDictAddRaw( &benc, "id", myid, 20 );
+        tr_bencDictAddRaw( &benc, "nodes", compact, j );
         dat_file = tr_buildPath( ss->configDir, "dht.dat", NULL );
         tr_bencSaveFile( dat_file, &benc );
         tr_free( dat_file );
@@ -225,9 +227,9 @@ tr_dhtUninit(tr_session *ss)
 }
 
 tr_bool
-tr_dhtEnabled(tr_session *ss)
+tr_dhtEnabled( const tr_session * ss )
 {
-    return ss && ss == session;
+    return ss && ( ss == session );
 }
 
 struct getstatus_closure
@@ -237,7 +239,7 @@ struct getstatus_closure
 };
 
 static void
-getstatus(void *closure)
+getstatus( void * closure )
 {
     struct getstatus_closure * ret = closure;
     int good, dubious, incoming;
@@ -257,7 +259,7 @@ getstatus(void *closure)
 }
 
 int
-tr_dhtStatus(tr_session *ss, int *nodes_return )
+tr_dhtStatus( tr_session * ss, int * nodes_return )
 {
     struct getstatus_closure ret = { -1, - 1 };
 
@@ -275,7 +277,7 @@ tr_dhtStatus(tr_session *ss, int *nodes_return )
 }
 
 tr_port
-tr_dhtPort(tr_session *ss)
+tr_dhtPort( const tr_session *ss )
 {
     return tr_dhtEnabled( ss ) ? dht_port : 0;
 }

@@ -26,10 +26,10 @@ THE SOFTWARE.
 #define TR_DHT_FIREWALLED 3
 #define TR_DHT_GOOD 4
 
-int tr_dhtInit(tr_session *ss);
-void tr_dhtUninit(tr_session *ss);
-tr_bool tr_dhtEnabled(tr_session *ss);
-int tr_dhtStatus(tr_session *ss, int * setme_nodeCount );
-tr_port tr_dhtPort(tr_session *ss);
-int tr_dhtAddNode(tr_session *ss, tr_address *address, tr_port port, tr_bool bootstrap);
-int tr_dhtAnnounce(tr_torrent *tor, tr_bool announce);
+int  tr_dhtInit( tr_session * );
+void tr_dhtUninit( tr_session * );
+tr_bool tr_dhtEnabled( const tr_session * );
+tr_port tr_dhtPort ( const tr_session * );
+int tr_dhtStatus( tr_session *, int * setme_nodeCount );
+int tr_dhtAddNode( tr_session *, tr_address *, tr_port, tr_bool bootstrap );
+int tr_dhtAnnounce( tr_torrent *, tr_bool announce );
