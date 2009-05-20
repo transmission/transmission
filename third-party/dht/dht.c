@@ -45,8 +45,10 @@ THE SOFTWARE.
 
 #include "dht.h"
 
+#ifndef HAVE_MEMMEM 
 #ifdef __GLIBC__ 
 #define HAVE_MEMMEM 
+#endif 
 #endif 
 
 #ifndef MSG_CONFIRM
@@ -2094,7 +2096,7 @@ memmem(const void *haystack, size_t haystacklen,
 
     for(i = 0; i < haystacklen - needlelen; i++) { 
         if(memcmp(h + i, n, needlelen) == 0) 
-            return h + i; 
+            return (void*)(h + i);
     } 
     return NULL; 
 } 
