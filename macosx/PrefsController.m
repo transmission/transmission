@@ -464,6 +464,11 @@ tr_session * fHandle;
     tr_sessionSetPexEnabled(fHandle, [fDefaults boolForKey: @"PEXGlobal"]);
 }
 
+- (void) setDHT: (id) sender
+{
+    tr_sessionSetDHTEnabled(fHandle, [fDefaults boolForKey: @"DHTGlobal"]);
+}
+
 - (void) setEncryptionMode: (id) sender
 {
     const tr_encryption_mode mode = [fDefaults boolForKey: @"EncryptionPrefer"] ? 
@@ -1084,6 +1089,10 @@ tr_session * fHandle;
     const BOOL pex = tr_sessionIsPexEnabled(fHandle);
     [fDefaults setBool: pex forKey: @"PEXGlobal"];
     
+    //dht
+    const BOOL dht = tr_sessionIsDHTEnabled(fHandle);
+    [fDefaults setBool: dht forKey: @"DHTGlobal"];
+    
     //port
     const tr_port port = tr_sessionGetPeerPort(fHandle);
     [fDefaults setInteger: port forKey: @"BindPort"];
@@ -1159,6 +1168,8 @@ tr_session * fHandle;
         [fPeersTorrentField setIntValue: peersTorrent];
         
         //pex handled by bindings
+        
+        //dht handled by bindings
         
         [fPortField setIntValue: port];
         //port forwarding (nat) handled by bindings

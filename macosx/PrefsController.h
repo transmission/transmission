@@ -83,6 +83,7 @@
 - (void) setPeersTorrent: (id) sender;
 
 - (void) setPEX: (id) sender;
+- (void) setDHT: (id) sender;
 
 - (void) setEncryptionMode: (id) sender;
 

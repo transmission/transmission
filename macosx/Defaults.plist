@@ -38,6 +38,8 @@
 	<string>~/Desktop</string>
 	<key>DeleteOriginalTorrent</key>
 	<false/>
+	<key>DHTGlobal</key>
+	<true/>
 	<key>DisplayGroupRowRatio</key>
 	<false/>
 	<key>DisplayPeerProgressBarNumber</key>

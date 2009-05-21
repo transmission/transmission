@@ -1757,6 +1757,7 @@ typedef enum
         }
     }
     
+    #warning show warning and allow?
     if ([fTrackers count] == [indexes count])
     {
         NSBeep();

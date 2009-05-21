@@ -3,6 +3,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 1.70 (2009/mm/dd)
 <http://trac.transmissionbt.com/query?milestone=1.70&group=component&groupdesc=1&order=severity>
 - All Platforms
+   + Distributed hash table (DHT) support
    + Add ability to move a torrent's data and/or tell Transmission where to look for it
 - Mac
    + Hold down the option key on launch to pause all transfers
