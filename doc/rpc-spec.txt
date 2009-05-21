@@ -354,7 +354,9 @@
    string                     | value type & description
    ---------------------------+-------------------------------------------------
    "ids"                      | array      torrent list, as described in 3.1
-   "move"                     | boolean    if true, move from previous location
+   "location"                 | string     the new torrent location
+   "move"                     | boolean    if true, move from previous location.
+                              |            otherwise, search "location" for files
 
    Response arguments: none
 
