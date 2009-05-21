@@ -1118,9 +1118,9 @@ fprintf( stderr, " old size   is %"PRIu64"\n", (uint64_t)oldFileBytesCompleted( 
 fprintf( stderr, "first piece is %"PRIu64"\n", (uint64_t)f->firstPiece );
 fprintf( stderr, "last piece  is %"PRIu64"\n", (uint64_t)f->lastPiece );
 fprintf( stderr, " new size   is %"PRIu64"\n", (uint64_t)total );
+abort( );
     }
 
-    assert( total == oldFileBytesCompleted( tor, index ) );
     return total;
 }
 
