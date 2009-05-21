@@ -74,6 +74,7 @@ getOldTorrentFilename( const tr_session * session,
     return ret;
 }
 
+/* this is for really old versions of T and will probably be removed someday */
 void
 tr_metainfoMigrate( tr_session * session,
                     tr_info *   inf )
