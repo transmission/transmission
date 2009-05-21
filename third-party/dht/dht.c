@@ -45,11 +45,11 @@ THE SOFTWARE.
 
 #include "dht.h"
 
-#ifndef HAVE_MEMMEM 
-#ifdef __GLIBC__ 
-#define HAVE_MEMMEM 
-#endif 
-#endif 
+#ifndef HAVE_MEMMEM
+#ifdef __GLIBC__
+#define HAVE_MEMMEM
+#endif
+#endif
 
 #ifndef MSG_CONFIRM
 #define MSG_CONFIRM 0
@@ -1367,7 +1367,7 @@ leaky_bucket(void)
 {
     if(leaky_bucket_tokens == 0) {
         leaky_bucket_tokens = MIN(MAX_LEAKY_BUCKET_TOKENS,
-                                  2 * (now.tv_sec - leaky_bucket_time));
+                                  4 * (now.tv_sec - leaky_bucket_time));
         leaky_bucket_time = now.tv_sec;
     }
 
@@ -1387,7 +1387,7 @@ dht_periodic(int s, int available, time_t *tosleep,
     if(available) {
         int rc, i, message;
         unsigned char tid[16], id[20], info_hash[20], target[20];
-        unsigned char buf[1024], nodes[256], token[128];
+        unsigned char buf[1536], nodes[256], token[128];
         int tid_len = 16, token_len = 128;
         int nodes_len = 256;
         unsigned short port;
@@ -1397,7 +1397,7 @@ dht_periodic(int s, int available, time_t *tosleep,
         socklen_t source_len = sizeof(struct sockaddr_in);
         unsigned short ttid;
 
-        rc = recvfrom(s, buf, 1024, 0,
+        rc = recvfrom(s, buf, 1536, 0,
                       (struct sockaddr*)&source, &source_len);
         if(rc < 0) {
             if(errno == EAGAIN)
@@ -1419,6 +1419,17 @@ dht_periodic(int s, int available, time_t *tosleep,
                 debugf("Received packet from blacklisted node.\n");
                 goto dontread;
             }
+        }
+
+        /* There's a bug in parse_message -- it will happily overflow the
+           buffer if it's not NUL-terminated.  For now, put a NUL at the
+           end of buffers. */
+
+        if(rc < 1536) {
+            buf[rc] = '\0';
+        } else {
+            debugf("Overlong message.\n");
+            goto dontread;
         }
 
         message = parse_message(buf, rc, tid, &tid_len, id, info_hash,
@@ -2085,22 +2096,27 @@ send_peer_announced(int s, struct sockaddr *sa, int salen,
     return -1;
 }
 
-#ifndef HAVE_MEMMEM 
-static void * 
-memmem(const void *haystack, size_t haystacklen, 
-       const void *needle, size_t needlelen) 
-{ 
-    const char *h = haystack; 
-    const char *n = needle; 
-    size_t i; 
+#undef CHECK
+#undef INC
+#undef COPY
+#undef ADD_V
 
-    for(i = 0; i < haystacklen - needlelen; i++) { 
-        if(memcmp(h + i, n, needlelen) == 0) 
+#ifndef HAVE_MEMMEM
+static void *
+memmem(const void *haystack, size_t haystacklen,
+       const void *needle, size_t needlelen)
+{
+    const char *h = haystack;
+    const char *n = needle;
+    size_t i;
+
+    for(i = 0; i < haystacklen - needlelen; i++) {
+        if(memcmp(h + i, n, needlelen) == 0)
             return (void*)(h + i);
-    } 
-    return NULL; 
-} 
-#endif 
+    }
+    return NULL;
+}
+#endif
 
 static int
 parse_message(const unsigned char *buf, int buflen,
@@ -2113,6 +2129,9 @@ parse_message(const unsigned char *buf, int buflen,
 {
     const unsigned char *p;
 
+#define CHECK(ptr, len)                                                 \
+    if(((unsigned char*)ptr) + (len) > (buf) + (buflen)) goto overflow;
+
     if(tid_return) {
         p = memmem(buf, buflen, "1:t", 3);
         if(p) {
@@ -2120,6 +2139,7 @@ parse_message(const unsigned char *buf, int buflen,
             char *q;
             l = strtol((char*)p + 3, &q, 10);
             if(q && *q == ':' && l > 0 && l < *tid_len) {
+                CHECK(q + 1, l);
                 memcpy(tid_return, q + 1, l);
                 *tid_len = l;
             } else
@@ -2129,6 +2149,7 @@ parse_message(const unsigned char *buf, int buflen,
     if(id_return) {
         p = memmem(buf, buflen, "2:id20:", 7);
         if(p) {
+            CHECK(p + 7, 20);
             memcpy(id_return, p + 7, 20);
         } else {
             memset(id_return, 0, 20);
@@ -2137,6 +2158,7 @@ parse_message(const unsigned char *buf, int buflen,
     if(info_hash_return) {
         p = memmem(buf, buflen, "9:info_hash20:", 14);
         if(p) {
+            CHECK(p + 14, 20);
             memcpy(info_hash_return, p + 14, 20);
         } else {
             memset(info_hash_return, 0, 20);
@@ -2158,6 +2180,7 @@ parse_message(const unsigned char *buf, int buflen,
     if(target_return) {
         p = memmem(buf, buflen, "6:target20:", 11);
         if(p) {
+            CHECK(p + 11, 20);
             memcpy(target_return, p + 11, 20);
         } else {
             memset(target_return, 0, 20);
@@ -2170,6 +2193,7 @@ parse_message(const unsigned char *buf, int buflen,
             char *q;
             l = strtol((char*)p + 7, &q, 10);
             if(q && *q == ':' && l > 0 && l < *token_len) {
+                CHECK(q + 1, l);
                 memcpy(token_return, q + 1, l);
                 *token_len = l;
             } else
@@ -2185,6 +2209,7 @@ parse_message(const unsigned char *buf, int buflen,
             char *q;
             l = strtol((char*)p + 7, &q, 10);
             if(q && *q == ':' && l > 0 && l < *nodes_len) {
+                CHECK(q + 1, l);
                 memcpy(nodes_return, q + 1, l);
                 *nodes_len = l;
             } else
@@ -2201,17 +2226,20 @@ parse_message(const unsigned char *buf, int buflen,
             while(buf[i] == '6' && buf[i + 1] == ':' && i + 8 < buflen) {
                 if(j + 6 > *values_len)
                     break;
+                CHECK(buf + i + 2, 6);
                 memcpy((char*)values_return + j, buf + i + 2, 6);
                 i += 8;
                 j += 6;
             }
-            if(buf[i] != 'e')
-                debugf("Eek... unexpected end for values.\n");
+            if(i >= buflen || buf[i] != 'e')
+                debugf("eek... unexpected end for values.\n");
             *values_len = j;
         } else {
             *values_len = 0;
         }
     }
+
+#undef CHECK
                 
     if(memmem(buf, buflen, "1:y1:r", 6))
         return REPLY;
@@ -2225,5 +2253,9 @@ parse_message(const unsigned char *buf, int buflen,
         return GET_PEERS;
     if(memmem(buf, buflen, "1:q13:announce_peer", 19))
        return ANNOUNCE_PEER;
+    return -1;
+
+ overflow:
+    debugf("Truncated message.\n");
     return -1;
 }
