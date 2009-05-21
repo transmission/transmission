@@ -27,6 +27,7 @@ and
 .Op Fl m | M
 .Op Fl n Ar user:pass
 .Op Fl N Ar netrc
+.Op Fl o | O
 .Op Fl p Ar port
 .Op Fl ph Ar files
 .Op Fl pl Ar files
@@ -133,6 +134,11 @@ for authentication
 Set the authentication information from a
 .Ar netrc file.
 See netrc(5) for more information.
+
+.It Fl o Fl -dht
+Enable distributed hash table (DHT).
+.It Fl O Fl -no-dht
+Disable distribued hash table (DHT).
 
 .It Fl p Fl -port Ar port
 Set the

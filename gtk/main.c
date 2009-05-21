@@ -1009,6 +1009,10 @@ prefschanged( TrCore * core UNUSED,
     {
         tr_sessionSetPexEnabled( tr, pref_flag_get( key ) );
     }
+    else if( !strcmp( key, TR_PREFS_KEY_DHT_ENABLED ) )
+    {
+        tr_sessionSetDHTEnabled( tr, pref_flag_get( key ) );
+    }
     else if( !strcmp( key, TR_PREFS_KEY_RPC_PORT ) )
     {
         tr_sessionSetRPCPort( tr, pref_int_get( key ) );

@@ -347,6 +347,7 @@ tr_sessionGetDefaultSettings( tr_benc * d )
 
     tr_bencDictReserve( d, 35 );
     tr_bencDictAddBool( d, TR_PREFS_KEY_BLOCKLIST_ENABLED,        FALSE );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_DHT_ENABLED,              TRUE );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_DOWNLOAD_DIR,             tr_getDefaultDownloadDir( ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_DSPEED,                   100 );
     tr_bencDictAddBool( d, TR_PREFS_KEY_DSPEED_ENABLED,           FALSE );
@@ -403,6 +404,7 @@ tr_sessionGetSettings( tr_session * s, struct tr_benc * d )
 
     tr_bencDictReserve( d, 30 );
     tr_bencDictAddBool( d, TR_PREFS_KEY_BLOCKLIST_ENABLED,        tr_blocklistIsEnabled( s ) );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_DHT_ENABLED,              s->isDHTEnabled );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_DOWNLOAD_DIR,             s->downloadDir );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_DSPEED,                   tr_sessionGetSpeedLimit( s, TR_DOWN ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_DSPEED_ENABLED,           tr_sessionIsSpeedLimited( s, TR_DOWN ) );
@@ -622,7 +624,9 @@ tr_sessionInitImpl( void * vdata )
     found = tr_bencDictFindBool( &settings, TR_PREFS_KEY_PEX_ENABLED, &boolVal );
     assert( found );
     session->isPexEnabled = boolVal;
-    /* This really ought to be a separate preference. */
+
+    found = tr_bencDictFindBool( &settings, TR_PREFS_KEY_DHT_ENABLED, &boolVal );
+    assert( found );
     session->isDHTEnabled = boolVal;
 
     found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_ENCRYPTION, &i );
@@ -1594,6 +1598,23 @@ tr_sessionIsDHTEnabled( const tr_session * session )
     assert( tr_isSession( session ) );
 
     return session->isDHTEnabled;
+}
+
+void
+tr_sessionSetDHTEnabled( tr_session * session, tr_bool enabled )
+{
+    assert( tr_isSession( session ) );
+
+    if( ( enabled!=0 ) != (session->isDHTEnabled!=0) )
+    {
+        if( session->isDHTEnabled )
+            tr_dhtUninit( session );
+
+        session->isDHTEnabled = enabled!=0;
+
+        if( session->isDHTEnabled )
+            tr_dhtInit( session );
+    }
 }
 
 /***

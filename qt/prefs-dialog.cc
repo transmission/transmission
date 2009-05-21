@@ -471,7 +471,8 @@ PrefsDialog :: createPeersTab( )
     hig->addSectionDivider( );
     hig->addSectionTitle( tr( "Privacy" ) );
     hig->addRow( tr( "&Encryption mode:" ), box );
-    hig->addWideControl( checkBoxNew( tr( "Use peer e&xchange" ), Prefs::PEX_ENABLED ) );
+    hig->addWideControl( checkBoxNew( tr( "Use peer e&xchange (PEX)" ), Prefs::PEX_ENABLED ) );
+    hig->addWideControl( checkBoxNew( tr( "Use &distributed hash table (DHT)" ), Prefs::PEX_ENABLED ) );
 
     hig->finish( );
     updateBlocklistCheckBox( );

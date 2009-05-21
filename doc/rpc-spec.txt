@@ -374,6 +374,7 @@
    "alt-speed-up"             | number     max global upload speed (in K/s)
    "blocklist-enabled"        | boolean    true means enabled
    "blocklist-size"           | number     number of rules in the blocklist
+   "dht-enabled"              | boolean    true means allow dht in public torrents
    "encryption"               | string     "required", "preferred", "tolerated"
    "download-dir"             | string     default path to download torrents
    "peer-limit-global"        | number     maximum global number of peers

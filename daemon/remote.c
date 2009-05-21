@@ -81,6 +81,8 @@ static tr_option opts[] =
     { 'M', "no-portmap",           "Disable portmapping", "M",  0, NULL },
     { 'n', "auth",                 "Set authentication info", "n",  1, "<username:password>" },
     { 'N', "netrc",                "Set authentication info from a .netrc file", "N",  1, "<filename>" },
+    { 'o', "dht",                  "Enable distributed hash tables (DHT)", "o", 0, NULL },
+    { 'O', "no-dht",               "Disable distributed hash tables (DHT)", "O", 0, NULL },
     { 'p', "port",                 "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "p", 1, "<port>" },
     { 'P', "random-port",          "Random port for incomping peers", "P", 0, NULL },
     { 900, "priority-high",        "Set the files' priorities as high", "ph", 1, "<files>" },
@@ -494,6 +496,16 @@ readargs( int           argc,
                 tr_free( path );
                 break;
             }
+
+            case 'o':
+                tr_bencDictAddStr( &top, "method", "session-set" );
+                tr_bencDictAddBool( args, TR_PREFS_KEY_DHT_ENABLED, TRUE );
+                break;
+
+            case 'O':
+                tr_bencDictAddStr( &top, "method", "session-set" );
+                tr_bencDictAddBool( args, TR_PREFS_KEY_DHT_ENABLED, FALSE );
+                break;
 
             case 'x':
                 tr_bencDictAddStr( &top, "method", "session-set" );

@@ -538,8 +538,12 @@ peerPage( GObject * core )
     w = new_encryption_combo( core, "encryption" );
     hig_workarea_add_row( t, &row, s, w, NULL );
 
-    s = _( "Use peer e_xchange" );
+    s = _( "Use peer e_xchange (PEX)" );
     w = new_check_button( s, TR_PREFS_KEY_PEX_ENABLED, core );
+    hig_workarea_add_wide_control( t, &row, w );
+
+    s = _( "Use _distributed hash table (DHT)" );
+    w = new_check_button( s, TR_PREFS_KEY_DHT_ENABLED, core );
     hig_workarea_add_wide_control( t, &row, w );
 
     hig_workarea_finish( t, &row );

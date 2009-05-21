@@ -1136,6 +1136,8 @@ sessionSet( tr_session               * session,
         tr_sessionSetPeerLimitPerTorrent( session, i );
     if( tr_bencDictFindBool( args_in, TR_PREFS_KEY_PEX_ENABLED, &boolVal ) )
         tr_sessionSetPexEnabled( session, boolVal );
+    if( tr_bencDictFindBool( args_in, TR_PREFS_KEY_DHT_ENABLED, &boolVal ) )
+        tr_sessionSetDHTEnabled( session, boolVal );
     if( tr_bencDictFindBool( args_in, TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START, &boolVal ) )
         tr_sessionSetPeerPortRandomOnStart( session, boolVal );
     if( tr_bencDictFindInt( args_in, TR_PREFS_KEY_PEER_PORT, &i ) )
@@ -1238,6 +1240,7 @@ sessionGet( tr_session               * s,
     tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_LIMIT_GLOBAL, tr_sessionGetPeerLimit( s ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_LIMIT_TORRENT, tr_sessionGetPeerLimitPerTorrent( s ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_PEX_ENABLED, tr_sessionIsPexEnabled( s ) );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_DHT_ENABLED, tr_sessionIsDHTEnabled( s ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_PORT, tr_sessionGetPeerPort( s ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START, tr_sessionGetPeerPortRandomOnStart( s ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_PORT_FORWARDING, tr_sessionIsPortForwardingEnabled( s ) );

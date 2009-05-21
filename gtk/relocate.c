@@ -25,7 +25,7 @@ static char * previousLocation = NULL;
 struct UpdateData
 {
     GtkDialog * dialog;
-    tr_bool done;
+    int done;
 };
 
 /* every once in awhile, check to see if the move is done.

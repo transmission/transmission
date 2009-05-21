@@ -91,6 +91,7 @@ class Prefs: public QObject
             PEER_PORT_RANDOM_HIGH,
             SOCKET_TOS,
             PEX_ENABLED,
+            DHT_ENABLED,
             PORT_FORWARDING,
             PROXY_AUTH_ENABLED,
             PREALLOCATION,

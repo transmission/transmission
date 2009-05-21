@@ -120,6 +120,7 @@ Session :: updatePref( int key )
         case Prefs :: ALT_SPEED_LIMIT_TIME_DAY:
         case Prefs :: BLOCKLIST_ENABLED:
         case Prefs :: BLOCKLIST_DATE:
+        case Prefs :: DHT_ENABLED:
         case Prefs :: DOWNLOAD_DIR:
         case Prefs :: PEER_LIMIT_GLOBAL:
         case Prefs :: PEER_LIMIT_TORRENT:

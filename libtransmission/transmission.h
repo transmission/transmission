@@ -179,6 +179,7 @@ static TR_INLINE tr_bool tr_isEncryptionMode( tr_encryption_mode m )
 #define TR_PREFS_KEY_BIND_ADDRESS_IPV4          "bind-address-ipv4"
 #define TR_PREFS_KEY_BIND_ADDRESS_IPV6          "bind-address-ipv6"
 #define TR_PREFS_KEY_BLOCKLIST_ENABLED          "blocklist-enabled"
+#define TR_PREFS_KEY_DHT_ENABLED                "dht-enabled"
 #define TR_PREFS_KEY_DOWNLOAD_DIR               "download-dir"
 #define TR_PREFS_KEY_ENCRYPTION                 "encryption"
 #define TR_PREFS_KEY_LAZY_BITFIELD              "lazy-bitfield-enabled"
@@ -531,6 +532,8 @@ void               tr_sessionSetPexEnabled( tr_session  * session,
 tr_bool            tr_sessionIsPexEnabled( const tr_session * session );
 
 tr_bool            tr_sessionIsDHTEnabled( const tr_session * session );
+
+void               tr_sessionSetDHTEnabled( tr_session * session, tr_bool );
 
 void               tr_sessionSetLazyBitfieldEnabled( tr_session * session,
                                                      tr_bool       enabled );
