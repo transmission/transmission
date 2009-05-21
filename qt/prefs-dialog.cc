@@ -377,7 +377,7 @@ PrefsDialog :: createNetworkTab( )
 
         hig->addRow( tr( "&Port for incoming connections:" ), s );
         hig->addRow( "", h, 0 );
-        hig->addWideControl( checkBoxNew( tr( "Randomize the port every launch" ), Prefs :: PEER_PORT_RANDOM_ON_START ) );
+        hig->addWideControl( checkBoxNew( tr( "&Randomize the port every launch" ), Prefs :: PEER_PORT_RANDOM_ON_START ) );
         hig->addWideControl( checkBoxNew( tr( "Use UPnP or NAT-PMP port &forwarding from my router" ), Prefs::PORT_FORWARDING ) );
 
     hig->finish( );

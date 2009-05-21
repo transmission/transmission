@@ -1337,7 +1337,7 @@ networkPage( GObject * core )
     data->prefsTag = g_signal_connect( TR_CORE( core ), "prefs-changed", G_CALLBACK( onCorePrefsChanged ), data );
     g_object_weak_ref( G_OBJECT( t ), networkPageDestroyed, data );
 
-    s = _( "Randomize the port every launch" );
+    s = _( "_Randomize the port every launch" );
     w = new_check_button( s, TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START, core );
     hig_workarea_add_wide_control( t, &row, w );
 
