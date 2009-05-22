@@ -51,6 +51,12 @@
             tr_deepLog( __FILE__, __LINE__, NULL, __VA_ARGS__ ); \
     } while( 0 )
 
+struct tr_metainfo_lookup
+{
+    char    hashString[2 * SHA_DIGEST_LENGTH + 1]; 
+    char *  filename;
+};
+
 static tr_port
 getRandomPort( tr_session * s )
 {
@@ -445,7 +451,6 @@ tr_sessionSaveSettings( tr_session    * session,
     tr_bencFree( &settings );
 }
 
-static void metainfoLookupRescan( tr_session * );
 static void tr_sessionInitImpl( void * );
 static void onAltTimer( int, short, void* );
 static void setAltTimer( tr_session * session );
@@ -756,7 +761,6 @@ tr_sessionInitImpl( void * vdata )
 
     tr_statsInit( session );
     session->web = tr_webInit( session );
-    metainfoLookupRescan( session );
     session->isWaiting = FALSE;
     dbgmsg( "returning session %p; session->tracker is %p", session, session->tracker );
 }
@@ -1687,19 +1691,6 @@ compareHashStringToLookupEntry( const void * va, const void * vb )
     return strcmp( a, b->hashString );
 }
 
-const char*
-tr_sessionFindTorrentFile( const tr_session * session,
-                           const char       * hashStr )
-{
-    struct tr_metainfo_lookup * l = bsearch( hashStr,
-                                             session->metainfoLookup,
-                                             session->metainfoLookupCount,
-                                             sizeof( struct tr_metainfo_lookup ),
-                                             compareHashStringToLookupEntry );
-
-    return l ? l->filename : NULL;
-}
-
 static void
 metainfoLookupRescan( tr_session * session )
 {
@@ -1758,17 +1749,46 @@ metainfoLookupRescan( tr_session * session )
     tr_dbg( "Found %d torrents in \"%s\"", n, dirname );
 }
 
+static struct tr_metainfo_lookup *
+metainfoLookup( const tr_session * session, const char * hashString )
+{
+    /* because only the mac client uses metainfoLookup, and because building
+     * the lookup is expensive, we hold off on building it until the client
+     * actually asks to look up a hash... */
+    if( !session->metainfoLookupCount )
+        metainfoLookupRescan( (tr_session*)session );
+
+    return bsearch( hashString,
+                    session->metainfoLookup,
+                    session->metainfoLookupCount,
+                    sizeof( struct tr_metainfo_lookup ),
+                    compareHashStringToLookupEntry );
+}
+
+const char*
+tr_sessionFindTorrentFile( const tr_session  * session,
+                           const char        * hashString )
+{
+    const struct tr_metainfo_lookup * l = metainfoLookup( session, hashString );
+
+    return l ? l->filename : NULL;
+}
+
 void
 tr_sessionSetTorrentFile( tr_session * session,
                           const char * hashString,
                           const char * filename )
 {
-    struct tr_metainfo_lookup * l = bsearch( hashString,
-                                             session->metainfoLookup,
-                                             session->metainfoLookupCount,
-                                             sizeof( struct tr_metainfo_lookup ),
-                                             compareHashStringToLookupEntry );
+    struct tr_metainfo_lookup * l;
 
+    /* since we walk session->configDir/torrents/ to build the lookup table,
+     * and tr_sessionSetTorrentFile() is just to tell us there's a new file
+     * in that same directory, we don't need to do anything here if the
+     * lookup table hasn't been built yet */
+    if( session->metainfoLookup == NULL )
+        return;
+
+    l = metainfoLookup( session, hashString );
     if( l )
     {
         if( l->filename != filename )
@@ -1942,20 +1962,6 @@ tr_sessionGetRPCBindAddress( const tr_session * session )
 
     return tr_rpcGetBindAddress( session->rpcServer );
 }
-
-/***
-****
-***/
-
-tr_bool
-tr_sessionIsProxyEnabled( const tr_session * session )
-{
-    assert( tr_isSession( session ) );
-
-    return session->isProxyEnabled;
-}
-
-void
 tr_sessionSetProxyEnabled( tr_session * session,
                            tr_bool      isEnabled )
 {
