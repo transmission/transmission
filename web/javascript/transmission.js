@@ -1110,7 +1110,8 @@ Transmission.prototype =
 		    new_torrent_ids.push(this.id);
 		} );
 
-		tr.remote.loadTorrentFiles( refresh_files_for );
+		if(refresh_files_for.length > 0)
+			tr.remote.loadTorrentFiles( refresh_files_for );
 
 		if(new_torrent_ids.length > 0)
 			tr.remote.getInitialDataFor(new_torrent_ids, function(torrents){ tr.addTorrents(torrents) } );
