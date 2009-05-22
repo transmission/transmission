@@ -666,14 +666,6 @@ torrentRealInit( tr_torrent * tor, const tr_ctor * ctor )
 
     tr_metainfoMigrate( session, &tor->info );
 
-{
-    /* exercise the new tr_torrentFiles() code in the nightly builds...
-       maybe this will make rolcol stay in-channel */
-    tr_file_index_t tmpCount;
-    tr_file_stat * tmp = tr_torrentFiles( tor, &tmpCount );
-    tr_torrentFilesFree( tmp, tmpCount );
-}
-
     if( doStart )
         torrentStart( tor, FALSE );
 }
@@ -990,57 +982,6 @@ tr_torrentStat( tr_torrent * tor )
 ***/
 
 static uint64_t
-oldFileBytesCompleted( const tr_torrent * tor,
-                    tr_file_index_t    fileIndex )
-{
-    const tr_file *        file     =  &tor->info.files[fileIndex];
-    const tr_block_index_t firstBlock       =  file->offset /
-                                              tor->blockSize;
-    const uint64_t         firstBlockOffset =  file->offset %
-                                              tor->blockSize;
-    const uint64_t         lastOffset       =
-        file->length ? ( file->length - 1 ) : 0;
-    const tr_block_index_t lastBlock        =
-        ( file->offset + lastOffset ) / tor->blockSize;
-    const uint64_t         lastBlockOffset  =
-        ( file->offset + lastOffset ) % tor->blockSize;
-    uint64_t               haveBytes = 0;
-
-    assert( tr_isTorrent( tor ) );
-    assert( fileIndex < tor->info.fileCount );
-    assert( file->offset + file->length <= tor->info.totalSize );
-    assert( ( firstBlock < tor->blockCount )
-          || ( !file->length && file->offset == tor->info.totalSize ) );
-    assert( ( lastBlock < tor->blockCount )
-          || ( !file->length && file->offset == tor->info.totalSize ) );
-    assert( firstBlock <= lastBlock );
-    assert( tr_torBlockPiece( tor, firstBlock ) == file->firstPiece );
-    assert( tr_torBlockPiece( tor, lastBlock ) == file->lastPiece );
-
-    if( firstBlock == lastBlock )
-    {
-        if( tr_cpBlockIsCompleteFast( &tor->completion, firstBlock ) )
-            haveBytes += lastBlockOffset + 1 - firstBlockOffset;
-    }
-    else
-    {
-        tr_block_index_t i;
-
-        if( tr_cpBlockIsCompleteFast( &tor->completion, firstBlock ) )
-            haveBytes += tor->blockSize - firstBlockOffset;
-
-        for( i = firstBlock + 1; i < lastBlock; ++i )
-            if( tr_cpBlockIsCompleteFast( &tor->completion, i ) )
-                haveBytes += tor->blockSize;
-
-        if( tr_cpBlockIsCompleteFast( &tor->completion, lastBlock ) )
-            haveBytes += lastBlockOffset + 1;
-    }
-
-    return haveBytes;
-}
-
-static uint64_t
 fileBytesCompleted( const tr_torrent * tor, tr_file_index_t index )
 {
     uint64_t total = 0;
@@ -1104,21 +1045,6 @@ fileBytesCompleted( const tr_torrent * tor, tr_file_index_t index )
             if( tr_cpBlockIsCompleteFast( &tor->completion, lastBlock ) )
                 total += ( f->offset + f->length ) - ( tor->blockSize * lastBlock );
         }
-    }
-
-    if ( total != oldFileBytesCompleted( tor, index ) )
-    {
-fprintf( stderr, "torrent is [%s], file #%d\n", tor->info.name, (int)index );
-fprintf( stderr, "total size  is %"PRIu64"\n", (uint64_t)tor->info.totalSize );
-fprintf( stderr, "block size  is %"PRIu64"\n", (uint64_t)tor->blockSize );
-fprintf( stderr, "piece size  is %"PRIu64"\n", (uint64_t)tor->info.pieceSize );
-fprintf( stderr, "file offset is %"PRIu64"\n", (uint64_t)f->offset );
-fprintf( stderr, "file size   is %"PRIu64"\n", (uint64_t)f->length );
-fprintf( stderr, " old size   is %"PRIu64"\n", (uint64_t)oldFileBytesCompleted( tor, index ) );
-fprintf( stderr, "first piece is %"PRIu64"\n", (uint64_t)f->firstPiece );
-fprintf( stderr, "last piece  is %"PRIu64"\n", (uint64_t)f->lastPiece );
-fprintf( stderr, " new size   is %"PRIu64"\n", (uint64_t)total );
-abort( );
     }
 
     return total;
