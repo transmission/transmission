@@ -1637,32 +1637,28 @@ int trashDataFile(const char * filename)
         tr_ctorSetPeerLimit(ctor, TR_FALLBACK, [fDefaults integerForKey: @"PeersTorrent"]);
         
         tr_info info;
+        int result = TR_EINVALID;
         if (path)
         {
             tr_ctorSetMetainfoFromFile(ctor, [path UTF8String]);
-            if (tr_torrentParse(ctor, &info) == TR_OK)
-            {
-                NSString * currentDownloadFolder = [self shouldUseIncompleteFolderForName: [NSString stringWithUTF8String: info.name]]
-                                                    ? fIncompleteFolder : fDownloadFolder;
-                tr_ctorSetDownloadDir(ctor, TR_FORCE, [currentDownloadFolder UTF8String]);
-                
-                fHandle = tr_torrentNew(ctor, NULL);
-            }
-            tr_metainfoFree(&info);
+            result = tr_torrentParse(ctor, &info);
         }
-        if (!fHandle && hashString) //backup - shouldn't be needed after upgrade to 1.70
+        if (result != TR_OK && hashString) //backup - shouldn't be needed after upgrade to 1.70
         {
             tr_ctorSetMetainfoFromHash(ctor, [hashString UTF8String]);
-            if (tr_torrentParse(ctor, &info) == TR_OK)
-            {
-                NSString * currentDownloadFolder = [self shouldUseIncompleteFolderForName: [NSString stringWithUTF8String: info.name]]
-                                                    ? fIncompleteFolder : fDownloadFolder;
-                tr_ctorSetDownloadDir(ctor, TR_FORCE, [currentDownloadFolder UTF8String]);
-                
-                fHandle = tr_torrentNew(ctor, NULL);
-            }
-            tr_metainfoFree(&info);
+            result = tr_torrentParse(ctor, &info);
         }
+        
+        if (result == TR_OK)
+        {
+            NSString * currentDownloadFolder = [self shouldUseIncompleteFolderForName: [NSString stringWithUTF8String: info.name]]
+                                                ? fIncompleteFolder : fDownloadFolder;
+            tr_ctorSetDownloadDir(ctor, TR_FORCE, [currentDownloadFolder UTF8String]);
+            
+            fHandle = tr_torrentNew(ctor, NULL);
+        }
+        if (result != TR_EINVALID)
+            tr_metainfoFree(&info);
         
         tr_ctorFree(ctor);
         
