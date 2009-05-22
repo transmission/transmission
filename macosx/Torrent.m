@@ -1641,7 +1641,7 @@ int trashDataFile(const char * filename)
         
         //backup - shouldn't be needed after upgrade to 1.62
         if (result != TR_OK && hashString)
-            tr_ctorSetMetainfoFromHash(ctor, [hashString UTF8String]);
+            result = tr_ctorSetMetainfoFromHash(ctor, [hashString UTF8String]);
         
         if (result == TR_OK)
         {
