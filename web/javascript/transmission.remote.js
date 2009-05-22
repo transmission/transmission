@@ -96,38 +96,49 @@ TransmissionRemote.prototype =
 		} );
 	},
 
-	loadTorrents: function(update_files) {
-		var tr = this._controller;
+	getInitialDataFor: function(torrent_ids, callback) {
 		var o = {
 			method: 'torrent-get',
-			arguments: { fields: [
-				'addedDate', 'announceURL', 'comment', 'creator',
+			arguments: {
+			fields: [ 'addedDate', 'announceURL', 'comment', 'creator',
 				'dateCreated', 'downloadedEver', 'error', 'errorString',
 				'eta', 'hashString', 'haveUnchecked', 'haveValid', 'id',
 				'isPrivate', 'leechers', 'leftUntilDone', 'name',
 				'peersConnected', 'peersGettingFromUs', 'peersSendingToUs',
 				'rateDownload', 'rateUpload', 'seeders', 'sizeWhenDone',
-				'status', 'swarmSpeed', 'totalSize', 'uploadedEver' ]
+				'status', 'swarmSpeed', 'totalSize', 'uploadedEver', 'files', 'fileStats' ]
 			}
 		};
-		if (update_files) {
-			o.arguments.fields.push('files');
-			o.arguments.fields.push('wanted');
-			o.arguments.fields.push('priorities');
-		}
-		this.sendRequest( o, function(data) {
-			tr.updateAllTorrents( data.arguments.torrents );
-		} );
+
+		if(torrent_ids)
+			o.arguments.ids = torrent_ids;
+
+		this.sendRequest( o, function(data){ callback(data.arguments.torrents)} );
 	},
-	
+
+	getUpdatedDataFor: function(torrent_ids, callback) {
+		var o = {
+			method: 'torrent-get',
+			arguments: {
+				'ids': torrent_ids,
+				fields: [  'id', 'downloadedEver', 'error', 'errorString',
+					'eta', 'haveUnchecked', 'haveValid', 'leechers', 'leftUntilDone',
+					'peersConnected', 'peersGettingFromUs', 'peersSendingToUs',
+					'rateDownload', 'rateUpload', 'seeders',
+					'status', 'swarmSpeed', 'uploadedEver' ]
+			}
+		};
+
+		this.sendRequest( o, function(data){ callback(data.arguments.torrents, data.arguments.removed)} );
+	},
+
 	loadTorrentFiles: function( torrent_ids ) {
 		var tr = this._controller;
 		this.sendRequest( {
 			method: 'torrent-get',
-			arguments: { fields: [ 'files', 'wanted', 'priorities'] },
-			ids: torrent_ids
+			arguments: { fields: [ 'id', 'fileStats'], ids: torrent_ids },
 		}, function(data) {
-			tr.updateTorrentsData( data.arguments.torrents );
+			tr.updateTorrentsFileData( data.arguments.torrents );
 		} );
 	},
 	
@@ -154,7 +165,7 @@ TransmissionRemote.prototype =
 			for( var i=0, len=torrents.length; i<len; ++i )
 				o.arguments.ids.push( torrents[i].id() );
 		this.sendRequest( o, function( ) {
-			remote.loadTorrents();
+			remote._controller.refreshTorrents();
 		} );
 	},
 	
@@ -181,7 +192,7 @@ TransmissionRemote.prototype =
 			for( var i=0, len=torrents.length; i<len; ++i )
 				o.arguments.ids.push( torrents[i].id() );
 		this.sendRequest( o, function( ) {
-			remote.loadTorrents();
+			remote._controller.refreshTorrents();
 		} );
 	},
 	verifyTorrents: function( torrents ) {
@@ -198,7 +209,7 @@ TransmissionRemote.prototype =
 		};
 		
 		this.sendRequest(o, function() {
-			remote.loadTorrents();
+			remote._controller.refreshTorrents();
 		} );
 	},
 	savePrefs: function( args ) {

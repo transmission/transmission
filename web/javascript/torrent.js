@@ -24,6 +24,20 @@ Torrent.prototype =
 	 * Constructor
 	 */
 	initialize: function(controller, data) {
+		this._id            = data.id;
+		this._is_private    = data.isPrivate;
+		this._hashString    = data.hashString;
+		this._date          = data.addedDate;
+		this._size          = data.totalSize;
+		this._tracker       = data.announceURL;
+		this._comment       = data.comment;
+		this._creator       = data.creator;
+		this._creator_date  = data.dateCreated;
+		this._sizeWhenDone  = data.sizeWhenDone;
+		this._name          = data.name;
+		this._name_lc       = this._name.toLowerCase( );
+
+
 		// Create a new <li> element
 		var element = $('<li/>');
 		element.addClass('torrent');
@@ -88,30 +102,32 @@ Torrent.prototype =
 		
 		// insert the element
 		$('#torrent_list').append(this._element);
-		this.initializeTorrentFilesInspectorGroup(data.files.length);
-		
-		for (var i = 0; i < data.files.length; i++) {
-			var file = data.files[i];
-			file.index    = i;
-			file.torrent  = this;
-			file.priority = data.priorities[i];
-			file.wanted   = data.wanted[i];
-			var torrentFile = new TorrentFile(file); 
-			this._files.push(torrentFile);
-			this._fileList.append(
-				torrentFile.element().addClass(i % 2 ? 'even' : 'odd').addClass('inspector_torrent_file_list_entry')
-			);
+
+		this._files = [];
+		this.initializeTorrentFilesInspectorGroup();
+		if(data.files){
+			if(data.files.length == 1)
+				this._fileList.addClass('single_file');
+			for (var i = 0; i < data.files.length; i++) {
+				var file = data.files[i];
+				file.index      = i;
+				file.torrent    = this;
+				file.priority   = data.fileStats[i].priority;
+				file.wanted     = data.fileStats[i].wanted;
+				var torrentFile = new TorrentFile(file);
+				this._files.push(torrentFile);
+				this._fileList.append(
+					torrentFile.element().addClass(i % 2 ? 'even' : 'odd').addClass('inspector_torrent_file_list_entry')
+				);
+			}
 		}
-		
+
 		// Update all the labels etc
 		this.refresh(data);
 	},
 	
 	initializeTorrentFilesInspectorGroup: function(length) {
-		this._files = [];
         this._fileList = $('<ul/>').addClass('inspector_torrent_file_list').addClass('inspector_group').hide();
-        if(length == 1) 
-            this._fileList.addClass('single_file');
         $('#inspector_file_list').append(this._fileList);
 	},
 	
@@ -278,24 +294,6 @@ Torrent.prototype =
 	 * Refresh display
 	 */
 	refreshData: function(data) {
-		// These variables never change after the inital load
-		if (data.isPrivate)     this._is_private    = data.isPrivate;
-		if (data.hashString)    this._hashString    = data.hashString;
-		if (data.addedDate)     this._date          = data.addedDate;
-		if (data.totalSize)     this._size          = data.totalSize;
-		if (data.announceURL)   this._tracker       = data.announceURL;
-		if (data.comment)       this._comment       = data.comment;
-		if (data.creator)       this._creator       = data.creator;
-		if (data.dateCreated)   this._creator_date  = data.dateCreated;
-		if (data.sizeWhenDone)  this._sizeWhenDone  = data.sizeWhenDone;
-		if (data.path)          this._torrent_file  = data.path;//FIXME
-		if (data.name) {
-			this._name = data.name;
-			this._name_lc = this._name.toLowerCase( );
-		}
-		
-		// Set the regularly-changing torrent variables
-		this._id                    = data.id;
 		this._completed             = data.haveUnchecked + data.haveValid;
 		this._verified              = data.haveValid;
 		this._leftUntilDone         = data.leftUntilDone;
@@ -314,13 +312,25 @@ Torrent.prototype =
 		this._total_seeders         = Math.max( 0, data.seeders );
 		this._state                 = data.status;
 		
-		if (data.files) {
-			for (var i = 0; i < data.files.length; i++) {
-				var file_data      = data.files[i];
-				if (data.priorities) { file_data.priority = data.priorities[i]; }
-				if (data.wanted)     { file_data.wanted   = data.wanted[i]; }
+		if (data.fileStats) {
+			for (var i = 0; i < data.fileStats.length; i++) {
+				var file_data      = {};
+				file_data.priority = data.fileStats[i].priority;
+				file_data.wanted   = data.fileStats[i].wanted;
+				file_data.bytesCompleted = data.fileStats[i].bytesCompleted;
 				this._files[i].readAttributes(file_data);
 			}
+		}
+	},
+
+	refreshFileData: function(data) {
+		for (var i = 0; i < data.fileStats.length; i++) {
+			var file_data      = {};
+			file_data.priority = data.fileStats[i].priority;
+			file_data.wanted   = data.fileStats[i].wanted;
+			file_data.bytesCompleted = data.fileStats[i].bytesCompleted;
+			this._files[i].readAttributes(file_data);
+			this._files[i].refreshHTML();
 		}
 	},
 

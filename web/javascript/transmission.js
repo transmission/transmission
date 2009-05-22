@@ -44,7 +44,8 @@ Transmission.prototype =
 		this.preloadImages();
 		
 		// Set up user events
-		$('#pause_all_link').bind('click', this.stopAllClicked );
+		var tr = this;
+		$('#pause_all_link').bind('click', function(){ tr.stopAllClicked(); });
 		$('#resume_all_link').bind('click', this.startAllClicked);
 		$('#pause_selected_link').bind('click', this.stopSelectedClicked );
 		$('#resume_selected_link').bind('click', this.startSelectedClicked);
@@ -64,7 +65,7 @@ Transmission.prototype =
 			$('#preferences_link').bind('click', this.releaseClutchPreferencesButton);
 		} else {
 			$(document).bind('keydown',  this.keyDown);
-			$('#torrent_container').bind('click', this.deselectAll);
+			$('#torrent_container').bind('click', function(){ tr.deselectAll( true ); });
 			$('#open_link').bind('click', this.openTorrentClicked);
 			$('#filter_toggle_link').bind('click', this.toggleFilterClicked);
 			$('#inspector_link').bind('click', this.toggleInspectorClicked);
@@ -83,8 +84,10 @@ Transmission.prototype =
 		this.initializeSettings( );
 		
 		// Get preferences & torrents from the daemon
+		var tr = this;
 		this.remote.loadDaemonPrefs( );
-		this.remote.loadTorrents( true );
+		this.initalizeAllTorrents();
+
 		this.togglePeriodicRefresh( true );
 	},
 
@@ -656,24 +659,17 @@ Transmission.prototype =
 	 * Turn the periodic ajax-refresh on & off
 	 */
 	togglePeriodicRefresh: function(state) {
+		var tr = this;
 		if (state && this._periodic_refresh == null) {
 			// sanity check
 			if( !this[Prefs._RefreshRate] )
 			     this[Prefs._RefreshRate] = 5;
 			remote = this.remote;
-			this._periodic_refresh = setInterval(this.periodicRefresh, this[Prefs._RefreshRate] * 1000 );
+			this._periodic_refresh = setInterval(function(){ tr.refreshTorrents(); }, this[Prefs._RefreshRate] * 1000 );
 		} else {
 			clearInterval(this._periodic_refresh);
 			this._periodic_refresh = null;
 		}
-	},
-	
-	periodicRefresh: function() {
-		// Note: 'this' != 'transmission instance' since it is being called by setInterval
-		if (!transmission._periodicRefreshIterations)
-			transmission._periodicRefreshIterations = 0;
-		
-		remote.loadTorrents(transmission._periodicRefreshIterations++ % 10 == 0);
 	},
 	
 	scheduleFileRefresh: function() {
@@ -1094,87 +1090,91 @@ Transmission.prototype =
 		this.setFilter( Prefs._FilterAll );
 	},
 
-	updateTorrentsData: function( torrent_list ) {
+	refreshTorrents: function() {
 		var tr = this;
-		jQuery.each( torrent_list, function() {
+		this.remote.getUpdatedDataFor('recently-active', function(active, removed){ tr.updateTorrentsData(active, removed); });
+	},
+
+	updateTorrentsData: function( active, removed_ids ) {
+		var tr = this;
+		var new_torrent_ids = [];
+		var refresh_files_for = [];
+		jQuery.each( active, function() {
 			var t = Torrent.lookup(tr._torrents, this.id);
-			if (t) t.refresh(this);
+			if (t){
+		    t.refresh(this);
+		    if(t.isSelected())
+		      refresh_files_for.push(t.id());
+		  }
+		  else
+		    new_torrent_ids.push(this.id);
+		} );
+
+		tr.remote.loadTorrentFiles( refresh_files_for );
+
+		if(new_torrent_ids.length > 0)
+			tr.remote.getInitialDataFor(new_torrent_ids, function(torrents){ tr.addTorrents(torrents) } );
+
+		var removedAny = tr.deleteTorrents(removed_ids);
+
+		if( ( new_torrent_ids.length != 0 ) || removedAny ) {
+			tr.hideiPhoneAddressbar();
+			tr.deselectAll( true );
+		}
+
+		this.refilter();
+	},
+
+	updateTorrentsFileData: function( torrents ){
+		var tr = this;
+		jQuery.each( torrents, function() {
+			var t = Torrent.lookup(tr._torrents, this.id);
+			if (t)
+		    t.refreshFileData(this);
 		} );
 	},
-	
-	/*
-	 * Process got some new torrent data from the server
-	 */
-	updateAllTorrents: function( torrent_list ) {
-		var torrent_data;
-		var new_torrents = [];
-		var torrent_ids = [];
-		var handled = [];
-		
-		// refresh existing torrents
-		this.updateTorrentsData( torrent_list );
-		
-		// partition existing and new torrents
-		
-		for( var i=0, len=torrent_list.length; i<len; ++i ) {
-			var data = torrent_list[i];
-			var t = Torrent.lookup( this._torrents, data.id );
-			if( !t )
-				new_torrents.push( data );
-			else {
-				handled.push( t );
-			}
-		}
-		
-		// Add any torrents that aren't already being displayed
-		// if file data is available
-		if( new_torrents.length ) {
-			if (data.files) {
-				for( var i=0, len=new_torrents.length; i<len; ++i ) {
-					var t = new Torrent( this, new_torrents[i] );
-					this._torrents.push( t );
-					handled.push( t );
-				}
-				this._torrents.sort( Torrent.compareById );
-			} else {
-				// There are new torrents available
-				// pick them up on the next refresh
-				this.scheduleFileRefresh();
-			}
-		}
-		
-		// Remove any torrents that weren't in the refresh list
+
+	initalizeAllTorrents: function(){
+		var tr = this;
+		this.remote.getInitialDataFor( null ,function(torrents) { tr.addTorrents(torrents); } );
+	},
+
+	addTorrents: function( new_torrents ){
+		var tr = this;
+
+		$.each( new_torrents, function(){
+			var torrent = this;
+			tr._torrents.push( new Torrent( tr, torrent ) );
+		});
+
+		this.refilter();
+	},
+
+	deleteTorrents: function(torrent_ids){
+		if(typeof torrent_ids == 'undefined')
+			return false;
+		var tr = this;
 		var removedAny = false;
-		handled.sort( Torrent.compareById ); // for Torrent.indexOf
-		var allTorrents = this._torrents.clone();
-		for( var i=0, len=allTorrents.length; i<len; ++i ) {
-			var t = allTorrents[i];
-			if( Torrent.indexOf( handled, t.id() ) == -1 ) {
-				var pos = Torrent.indexOf( this._torrents, t.id( ) );
-				var e = this._torrents[pos].element();
-				if( e ) {
-					delete e._torrent;
-					e.hide( );
-				}
-				t.hideFileList();
-				this._torrents.splice( pos, 1 );
+		$.each( torrent_ids, function(index, id){
+			var torrent = Torrent.lookup(tr._torrents, id);
+
+			if(torrent) {
 				removedAny = true;
+				var e = torrent.element();
+				if( e ) {
+					var row_index = tr.getTorrentIndex(tr._rows, torrent);
+					delete e._torrent; //remove circular refernce to help IE garbage collect
+					tr._rows.splice(row_index, 1)
+					e.remove();
+				}
+
+				var pos = Torrent.indexOf( tr._torrents, torrent.id( ) );
+				torrent.hideFileList();
+				tr._torrents.splice( pos, 1 );
 			}
-		}
-		
-		if( ( new_torrents.length != 0 ) || removedAny ) {
-			this.hideiPhoneAddressbar();
-			this.deselectAll( true );
-		}
-		
-		// FIXME: not sure if this is possible in RPC
-		// Update the disk space remaining
-		//var disk_space_msg = 'Free Space: '
-		//+ Math.formatBytes(data.free_space_bytes)
-		//+ ' (' + data.free_space_percent + '% )';
-		//setInnerHTML( $('div#disk_space_container')[0], disk_space_msg );
-		
-		this.refilter( );
+		});
+
+		return removedAny;
 	},
 
 	/*
@@ -1251,7 +1251,7 @@ Transmission.prototype =
 				args.dataType = 'xml';
 				args.iframe = true;
 				args.success = function( data ) {
-					tr.remote.loadTorrents( true );
+					tr.refreshTorrents();
 					tr.togglePeriodicRefresh( true );
 				};
 				tr.togglePeriodicRefresh( false );
