@@ -163,7 +163,8 @@ int trashDataFile(const char * filename)
                     [NSNumber numberWithBool: fWaitToStart], @"WaitToStart",
                     [NSNumber numberWithInt: fOrderValue], @"OrderValue",
                     [NSNumber numberWithInt: fGroupValue], @"GroupValue",
-                    [NSNumber numberWithBool: fAddedTrackers], @"AddedTrackers", nil];
+                    [NSNumber numberWithBool: fAddedTrackers], @"AddedTrackers",
+                    [self torrentLocation], @"InternalTorrentPath", nil];
     
     if (fIncompleteFolder)
         [history setObject: fIncompleteFolder forKey: @"IncompleteFolder"];
