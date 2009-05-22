@@ -155,6 +155,8 @@ main(int argc, char **argv)
         }
 
         i++;
+        if(i >= argc)
+            goto usage;
 
         infop = info;
         while(infop) {
@@ -171,9 +173,6 @@ main(int argc, char **argv)
 
         i++;
     }
-
-    if(i < argc)
-        goto usage;
 
     /* If you set dht_debug to a stream, every action taken by the DHT will
        be logged. */

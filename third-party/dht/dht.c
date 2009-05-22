@@ -109,7 +109,7 @@ struct search_node {
 };
 
 /* When performing a search, we search for up to SEARCH_NODES closest nodes
-   to the destinatin, and use the additional ones to backtrack if any of
+   to the destination, and use the additional ones to backtrack if any of
    the target 8 turn out to be dead. */
 #define SEARCH_NODES 14
 
@@ -153,10 +153,10 @@ static int send_found_nodes(int s, struct sockaddr *sa, int salen,
                             const unsigned char *tid, int tid_len,
                             const unsigned char *nodes, int nodes_len,
                             const unsigned char *token, int token_len);
-static int send_bucket_nodes(int s, struct sockaddr *sa, int salen,
-                             const unsigned char *tid, int tid_len,
-                             struct bucket *b,
-                             const unsigned char *token, int token_len);
+static int send_closest_nodes(int s, struct sockaddr *sa, int salen,
+                              const unsigned char *tid, int tid_len,
+                              const unsigned char *id,
+                              const unsigned char *token, int token_len);
 static int send_get_peers(int s, struct sockaddr *sa, int salen,
                           unsigned char *tid, int tid_len,
                           unsigned char *infohash, int confirm);
@@ -317,6 +317,26 @@ common_bits(const unsigned char *id1, const unsigned char *id2)
     }
 
     return 8 * i + j;
+}
+
+/* Determine whether id1 or id2 is closer to ref */
+int
+xorcmp(const unsigned char *id1, const unsigned char *id2,
+       const unsigned char *ref)
+{
+    int i;
+    for(i = 0; i < 20; i++) {
+        unsigned char xor1, xor2;
+        if(id1[i] == id2[i])
+            continue;
+        xor1 = id1[i] ^ ref[i];
+        xor2 = id2[i] ^ ref[i];
+        if(xor1 < xor2)
+            return -1;
+        else
+            return 1;
+    }
+    return 0;
 }
 
 /* We keep buckets in a sorted linked list.  A bucket b ranges from
@@ -583,7 +603,7 @@ new_node(int s, const unsigned char *id, struct sockaddr_in *sin,
     /* New node.  First, try to get rid of a known-bad node. */
     n = b->nodes;
     while(n) {
-        if(n->pinged >= 3) {
+        if(n->pinged >= 3 && n->pinged_time < now.tv_sec - 15) {
             memcpy(n->id, id, 20);
             n->sin = *sin;
             n->time = confirm ? now.tv_sec : 0;
@@ -604,7 +624,8 @@ new_node(int s, const unsigned char *id, struct sockaddr_in *sin,
         while(n) {
             /* Pick the first dubious node that we haven't pinged in the
                last 15 seconds.  This gives nodes the time to reply, but
-               tends to concentrate on the same nodes. */
+               tends to concentrate on the same nodes, so that we get rid
+               of bad nodes fast. */
             if(!node_good(n)) {
                 dubious = 1;
                 if(n->pinged_time < now.tv_sec - 15) {
@@ -719,7 +740,6 @@ insert_search_node(unsigned char *id, struct sockaddr_in *sin,
                    struct search *sr, int replied,
                    unsigned char *token, int token_len)
 {
-    int bits = common_bits(id, sr->id);
     struct search_node *n;
     int i, j;
 
@@ -728,7 +748,7 @@ insert_search_node(unsigned char *id, struct sockaddr_in *sin,
             n = &sr->nodes[i];
             goto found;
         }
-        if(common_bits(sr->id, sr->nodes[i].id) < bits)
+        if(xorcmp(id, sr->nodes[i].id, sr->id) < 0)
             break;
     }
 
@@ -1557,16 +1577,9 @@ dht_periodic(int s, int available, time_t *tosleep,
         case FIND_NODE:
             debugf("Find node!\n");
             new_node(s, id, &source, 1);
-            {
-                struct bucket *b = find_bucket(target);
-                if(b) {
-                    debugf("Sending nodes from bucket.\n");
-                    send_bucket_nodes(s,
-                                      (struct sockaddr*)&source,
-                                      sizeof(source),
-                                      tid, tid_len, b, NULL, 0);
-                }
-            }
+            debugf("Sending closest nodes.\n");
+            send_closest_nodes(s, (struct sockaddr*)&source, sizeof(source),
+                               tid, tid_len, target, NULL, 0);
             break;
         case GET_PEERS:
             debugf("Get_peers!\n");
@@ -1596,18 +1609,15 @@ dht_periodic(int s, int available, time_t *tosleep,
                                      token, TOKEN_SIZE);
 
                 } else {
-                    struct bucket *b = find_bucket(info_hash);
-                    if(b) {
-                        unsigned char token[TOKEN_SIZE];
-                        make_token((unsigned char*)&source.sin_addr,
-                                   ntohs(source.sin_port),
-                                   0, token);
-                        debugf("Sending nodes for get_peers.\n");
-                        send_bucket_nodes(s, (struct sockaddr*)&source,
-                                          sizeof(source),
-                                          tid, tid_len, b,
-                                          token, TOKEN_SIZE);
-                    }
+                    unsigned char token[TOKEN_SIZE];
+                    make_token((unsigned char*)&source.sin_addr,
+                               ntohs(source.sin_port),
+                               0, token);
+                    debugf("Sending nodes for get_peers.\n");
+                    send_closest_nodes(s, (struct sockaddr*)&source,
+                                       sizeof(source),
+                                       tid, tid_len, info_hash,
+                                       token, TOKEN_SIZE);
                 }
             }
             break;
@@ -1951,34 +1961,66 @@ send_found_nodes(int s, struct sockaddr *sa, int salen,
 }
 
 static int
-buffer_bucket(unsigned char *buf, int bufsize, struct bucket *b)
+insert_closest_node(unsigned char *nodes, int numnodes,
+                    const unsigned char *id, struct node *n)
 {
-    int i = 0;
+    int i;
+    for(i = 0; i< numnodes; i++) {
+        if(id_cmp(nodes + 26 * i, id) == 0)
+            return numnodes;
+        if(xorcmp(n->id, nodes + 26 * i, id) < 0)
+            break;
+    }
+
+    if(i == 8)
+        return numnodes;
+
+    if(numnodes < 8)
+        numnodes++;
+
+    if(i < numnodes - 1)
+        memmove(nodes + 26 * (i + 1), nodes + 26 * i, 26 * (numnodes - i - 1));
+
+    memcpy(nodes + 26 * i, n->id, 20);
+    memcpy(nodes + 26 * i + 20, &n->sin.sin_addr, 4);
+    memcpy(nodes + 26 * i + 24, &n->sin.sin_port, 2);
+
+    return numnodes;
+}
+
+static int
+buffer_closest_nodes(unsigned char *nodes, int numnodes,
+                     const unsigned char *id, struct bucket *b)
+{
     struct node *n = b->nodes;
-    while(n && i < bufsize - 26) {
-        if(node_good(n)) {
-            memcpy(buf + i, n->id, 20);
-            memcpy(buf + i + 20, &n->sin.sin_addr, 4);
-            memcpy(buf + i + 24, &n->sin.sin_port, 2);
-            i += 26;
-        }
+    while(n) {
+        if(node_good(n))
+            numnodes = insert_closest_node(nodes, numnodes, id, n);
         n = n->next;
     }
-    return i;
+    return numnodes;
 }
 
 int
-send_bucket_nodes(int s, struct sockaddr *sa, int salen,
-                  const unsigned char *tid, int tid_len,
-                  struct bucket *b,
-                  const unsigned char *token, int token_len)
+send_closest_nodes(int s, struct sockaddr *sa, int salen,
+                   const unsigned char *tid, int tid_len,
+                   const unsigned char *id,
+                   const unsigned char *token, int token_len)
 {
     unsigned char nodes[8 * 26];
-    int nodeslen = 0;
+    int numnodes = 0;
+    struct bucket *b;
 
-    nodeslen = buffer_bucket(nodes, 8 * 26, b);
+    b = find_bucket(id);
+    numnodes = buffer_closest_nodes(nodes, numnodes, id, b);
+    if(b->next)
+        numnodes = buffer_closest_nodes(nodes, numnodes, id, b->next);
+    b = previous_bucket(b);
+    if(b)
+        numnodes = buffer_closest_nodes(nodes, numnodes, id, b);
+
     return send_found_nodes(s, sa, salen, tid, tid_len,
-                            nodes, nodeslen,
+                            nodes, numnodes * 26,
                             token, token_len);
 }
 
@@ -2110,6 +2152,7 @@ memmem(const void *haystack, size_t haystacklen,
     const char *n = needle;
     size_t i;
 
+    /* size_t is unsigned */
     if(needlelen > haystacklen)
         return NULL;
 
