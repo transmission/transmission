@@ -349,14 +349,11 @@ bandwidthUsedImpl( tr_bandwidth  * b,
                    uint64_t        now )
 {
     struct tr_band * band;
-    size_t oldBytesLeft;
 
     assert( tr_isBandwidth( b ) );
     assert( tr_isDirection( dir ) );
 
     band = &b->band[dir];
-
-    oldBytesLeft = band->bytesLeft;
 
     if( band->isLimited && isPieceData )
         band->bytesLeft -= MIN( band->bytesLeft, byteCount );

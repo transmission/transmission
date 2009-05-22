@@ -149,7 +149,6 @@ tr_dhtInit(tr_session *ss)
         /* Note that DHT ids need to be distributed uniformly,
          * so it should be something truly random. */
         tr_cryptoRandBuf( myid, 20 );
-        have_id = TRUE;
     }
 
     v[0] = 'T';
