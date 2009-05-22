@@ -225,6 +225,22 @@ test_numbers( void )
     return 0;
 }
 
+static int
+test_memmem( void )
+{
+    char const haystack[12] = "abcabcabcabc";
+    char const needle[3] = "cab";
+
+    check( tr_memmem( haystack, sizeof haystack, haystack, sizeof haystack) == haystack )
+    check( tr_memmem( haystack, sizeof haystack, needle, sizeof needle) == haystack + 2 )
+    check( tr_memmem( needle, sizeof needle, haystack, sizeof haystack) == NULL )
+    check( tr_memmem( haystack, sizeof haystack, "", 0) == haystack )
+    check( tr_memmem( haystack, sizeof haystack, NULL, 0) == haystack )
+    check( tr_memmem( haystack, 0, "", 0) == haystack )
+
+    return 0;
+}
+
 int
 main( void )
 {
@@ -252,6 +268,8 @@ main( void )
     if( ( i = test_utf8( ) ) )
         return i;
     if( ( i = test_numbers( ) ) )
+        return i;
+    if( ( i = test_memmem( ) ) )
         return i;
 
     /* test that tr_cryptoRandInt() stays in-bounds */
