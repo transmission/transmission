@@ -758,21 +758,21 @@ TorrentFile.prototype = {
 	
 	refreshWantedHTML: function() {
 		var element = this.element();
-		var class = element[0].className.replace(/ skip| complete/g, '').split(' ');
+		var c = element[0].className.replace(/ skip| complete/g, '').split(' ');
 
 		if(!this._wanted)
-			class.push('skip');
+			c.push('skip');
 		if(this._done>=this._size)
-			class.push('complete');
+			c.push('complete');
 
-		element[0].className = class.join(' ');
+		element[0].className = c.join(' ');
 	},
 	
 	refreshPriorityHTML: function() {
 		var priority = { '1': 'high', '0': 'normal', '-1': 'low' }[new String(this._prio)];
-		var class = this._priority_control[0].className.replace(/ high| normal| low/g, '').split(' ');
+		var c = this._priority_control[0].className.replace(/ high| normal| low/g, '').split(' ');
 
-		class.push(priority)
+		c.push(priority)
 		this._priority_control[0].className = class.join(' ');
 	},
 	
