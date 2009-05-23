@@ -45,32 +45,32 @@ Transmission.prototype =
 		
 		// Set up user events
 		var tr = this;
-		$('#pause_all_link').bind('click', function(){ tr.stopAllClicked(); });
-		$('#resume_all_link').bind('click', this.startAllClicked);
-		$('#pause_selected_link').bind('click', this.stopSelectedClicked );
-		$('#resume_selected_link').bind('click', this.startSelectedClicked);
-		$('#remove_link').bind('click',  this.removeClicked);
-		$('#removedata_link').bind('click',  this.removeDataClicked);
-		$('#filter_all_link').parent().bind('click', this.showAllClicked);
-		$('#filter_downloading_link').parent().bind('click', this.showDownloadingClicked);
-		$('#filter_seeding_link').parent().bind('click', this.showSeedingClicked);
-		$('#filter_paused_link').parent().bind('click', this.showPausedClicked);
-		$('#prefs_save_button').bind('click', this.savePrefsClicked);
-		$('#prefs_cancel_button').bind('click', this.cancelPrefsClicked);
-		$('#inspector_tab_info').bind('click', this.inspectorTabClicked);
-		$('#inspector_tab_activity').bind('click', this.inspectorTabClicked);
-		$('#inspector_tab_files').bind('click', this.inspectorTabClicked);
+		$('#pause_all_link').bind('click', function(e){ tr.stopAllClicked(e); });
+		$('#resume_all_link').bind('click', function(e){ tr.startAllClicked(e); });
+		$('#pause_selected_link').bind('click', function(e){ tr.stopSelectedClicked(e); } );
+		$('#resume_selected_link').bind('click', function(e){ tr.startSelectedClicked(e); });
+		$('#remove_link').bind('click',  function(e){ tr.removeClicked(e); });
+		$('#removedata_link').bind('click',  function(e){ tr.removeDataClicked(e); });
+		$('#filter_all_link').parent().bind('click', function(e){ tr.showAllClicked(e); });
+		$('#filter_downloading_link').parent().bind('click', function(e){ tr.showDownloadingClicked(e); });
+		$('#filter_seeding_link').parent().bind('click', function(e){ tr.showSeedingClicked(e); });
+		$('#filter_paused_link').parent().bind('click', function(e){ tr.showPausedClicked(e); });
+		$('#prefs_save_button').bind('click', function(e) { tr.savePrefsClicked(e); return false;});
+		$('#prefs_cancel_button').bind('click', function(e){ tr.cancelPrefsClicked(e); return false; });
+		$('#inspector_tab_info').bind('click', function(e){ tr.inspectorTabClicked(e); });
+		$('#inspector_tab_activity').bind('click', function(e){ tr.inspectorTabClicked(e); });
+		$('#inspector_tab_files').bind('click', function(e){ tr.inspectorTabClicked(e); });
 		if (iPhone) {
-			$('#torrent_inspector').bind('click', this.hideInspector);
-			$('#preferences_link').bind('click', this.releaseClutchPreferencesButton);
+			$('#torrent_inspector').bind('click', function(e){ tr.hideInspector(); });
+			$('#preferences_link').bind('click', function(e){ tr.releaseClutchPreferencesButton(e); });
 		} else {
-			$(document).bind('keydown',  this.keyDown);
-			$('#torrent_container').bind('click', function(){ tr.deselectAll( true ); });
-			$('#open_link').bind('click', this.openTorrentClicked);
-			$('#filter_toggle_link').bind('click', this.toggleFilterClicked);
-			$('#inspector_link').bind('click', this.toggleInspectorClicked);
-			$('#upload_confirm_button').bind('click', this.confirmUploadClicked);
-			$('#upload_cancel_button').bind('click', this.cancelUploadClicked);
+			$(document).bind('keydown',  function(e){ tr.keyDown(e); });
+			$('#torrent_container').bind('click', function(e){ tr.deselectAll( true ); });
+			$('#open_link').bind('click', function(e){ tr.openTorrentClicked(e); });
+			$('#filter_toggle_link').bind('click', function(e){ tr.toggleFilterClicked(e); });
+			$('#inspector_link').bind('click', function(e){ tr.toggleInspectorClicked(e); });
+			$('#upload_confirm_button').bind('click', function(e){ tr.confirmUploadClicked(e); return false;});
+			$('#upload_cancel_button').bind('click', function(e){ tr.cancelUploadClicked(e); return false; });
 		
 			this.setupSearchBox();
 			this.createContextMenu();
@@ -200,44 +200,44 @@ Transmission.prototype =
 	},
 
 	contextStopSelected: function( ) {
-		transmission.stopSelectedTorrents( );
+		this.stopSelectedTorrents( );
 	},
 	contextStartSelected: function( ) {
-		transmission.startSelectedTorrents( );
+		this.startSelectedTorrents( );
 	},
 	contextRemoveSelected: function( ) {
-		transmission.removeSelectedTorrents( );
+		this.removeSelectedTorrents( );
 	},
 	contextRemoveDataSelected: function( ) {
-		transmission.removeSelectedTorrentsAndData( );
+		this.removeSelectedTorrentsAndData( );
 	},
 	contextVerifySelected: function( ) {
-		transmission.verifySelectedTorrents( );
+		this.verifySelectedTorrents( );
 	},
 	contextToggleInspector: function( ) {
-		transmission.toggleInspector( );
+		this.toggleInspector( );
 	},
 	contextSelectAll: function( ) {
-		transmission.selectAll( true );
+		this.selectAll( true );
 	},
 	contextDeselectAll: function( ) {
-		transmission.deselectAll( true );
+		this.deselectAll( true );
 	},
     
 	/*
 	 * Create the torrent right-click menu
 	 */
 	createContextMenu: function() {
-		
+		var tr = this;
 		var bindings = {
-			context_pause_selected:    this.contextStopSelected,
-			context_resume_selected:   this.contextStartSelected,
-			context_remove:            this.contextRemoveSelected,
-			context_removedata:        this.contextRemoveDataSelected,
-			context_verify:            this.contextVerifySelected,
-			context_toggle_inspector:  this.contextToggleInspector,
-			context_select_all:        this.contextSelectAll,
-			context_deselect_all:      this.contextDeselectAll
+			context_pause_selected:    function(e){ tr.contextStopSelected(e); },
+			context_resume_selected:   function(e){ tr.contextStartSelected(e); },
+			context_remove:            function(e){ tr.contextRemoveSelected(e); },
+			context_removedata:        function(e){ tr.contextRemoveDataSelected(e); },
+			context_verify:            function(e){ tr.contextVerifySelected(e); },
+			context_toggle_inspector:  function(e){ tr.contextToggleInspector(e); },
+			context_select_all:        function(e){ tr.contextSelectAll(e); },
+			context_deselect_all:      function(e){ tr.contextDeselectAll(e); }
 		};
 		
 		// Setup the context menu
@@ -258,10 +258,11 @@ Transmission.prototype =
 	 * Create the footer settings menu
 	 */
 	createSettingsMenu: function() {
+		var tr = this;
 		$('#settings_menu').transMenu({
 			selected_char: '&#x2714;',
 			direction: 'up',
-			onClick: this.processSettingsMenuEvent
+			onClick: function(e){ tr.processSettingsMenuEvent(e); }
 		});
 		
 		$('#unlimited_download_rate').selectMenuItem();
@@ -389,14 +390,14 @@ Transmission.prototype =
 	},
 
 	selectAll: function( doUpdate ) {
-		var tr = transmission;
+		var tr = this;
 		for( var i=0, len=tr._rows.length; i<len; ++i )
 			tr.selectElement( tr._rows[i] );
 		if( doUpdate )
 			tr.selectionChanged();
 	},
 	deselectAll: function( doUpdate ) {
-		var tr = transmission;
+		var tr = this;
 		for( var i=0, len=tr._rows.length; i<len; ++i )
 			tr.deselectElement( tr._rows[i] );
 		tr._last_torrent_clicked = null;
@@ -445,7 +446,7 @@ Transmission.prototype =
 	 */
 	keyDown: function(event)
 	{
-		var tr = transmission;
+		var tr = this;
 		var sel = tr.getSelectedTorrents( );
 		var rows = tr.getVisibleRows( );
 		var i = -1;
@@ -477,7 +478,7 @@ Transmission.prototype =
 	},
 
 	stopAllClicked: function( event ) {
-		var tr = transmission;
+		var tr = this;
 		if( tr.isButtonEnabled( event ) ) {
 			tr.stopAllTorrents( );
 			tr.hideiPhoneAddressbar( );
@@ -485,7 +486,7 @@ Transmission.prototype =
 	},
 
 	stopSelectedClicked: function( event ) {
-		var tr = transmission;
+		var tr = this;
 		if( tr.isButtonEnabled( event ) ) {
 			tr.stopSelectedTorrents( );
 			tr.hideiPhoneAddressbar( );
@@ -493,7 +494,7 @@ Transmission.prototype =
 	},
 
 	startAllClicked: function( event ) {
-		var tr = transmission;
+		var tr = this;
 		if( tr.isButtonEnabled( event ) ) {
 			tr.startAllTorrents( );
 			tr.hideiPhoneAddressbar( );
@@ -501,7 +502,7 @@ Transmission.prototype =
 	},
 
 	startSelectedClicked: function( event ) {
-		var tr = transmission;
+		var tr = this;
 		if( tr.isButtonEnabled( event ) ) {
 			tr.startSelectedTorrents( );
 			tr.hideiPhoneAddressbar( );
@@ -509,7 +510,7 @@ Transmission.prototype =
 	},
 
 	openTorrentClicked: function( event ) {
-		var tr = transmission;
+		var tr = this;
 		if( tr.isButtonEnabled( event ) ) {
 			$('body').addClass('open_showing');
 			tr.uploadTorrentFile( );
@@ -525,26 +526,26 @@ Transmission.prototype =
 		} else {
 			$('#upload_container').hide();
 		}
-		transmission.updateButtonStates();
+		this.updateButtonStates();
 	},
 
 	cancelUploadClicked: function(event) {
-		transmission.hideUploadDialog( );
+		this.hideUploadDialog( );
 	},
 
 	confirmUploadClicked: function(event) {
-		transmission.uploadTorrentFile( true );
-		transmission.hideUploadDialog( );
+		this.uploadTorrentFile( true );
+		this.hideUploadDialog( );
 	},
 
 	cancelPrefsClicked: function(event) {
-		transmission.hidePrefsDialog( );
+		this.hidePrefsDialog( );
 	},
 
 	savePrefsClicked: function(event)
 	{
 		// handle the clutch prefs locally
-		var tr = transmission;
+		var tr = this;
 		tr.setPref( Prefs._AutoStart, $('#prefs_form #auto_start')[0].checked );
 		var rate = parseInt( $('#prefs_form #refresh_rate')[0].value );
 		if( rate != tr[Prefs._RefreshRate] ) {
@@ -570,7 +571,7 @@ Transmission.prototype =
 	},
 
 	removeClicked: function( event ) {	
-		var tr = transmission;
+		var tr = this;
 		if( tr.isButtonEnabled( event ) ) {
 			tr.removeSelectedTorrents( );
 			tr.hideiPhoneAddressbar( );
@@ -578,7 +579,7 @@ Transmission.prototype =
 	},
 
 	removeDataClicked: function( event ) {	
-		var tr = transmission;
+		var tr = this;
 		if( tr.isButtonEnabled( event ) ) {
 			tr.removeSelectedTorrentsAndData( );
 			tr.hideiPhoneAddressbar( );
@@ -586,7 +587,7 @@ Transmission.prototype =
 	},
 
 	toggleInspectorClicked: function( event ) {
-		var tr = transmission;
+		var tr = this;
 		if( tr.isButtonEnabled( event ) )
 			tr.toggleInspector( );
 	},
@@ -609,12 +610,12 @@ Transmission.prototype =
 				$('#' + tab_ids[i] + '_container').hide();
 			}
 		}
-		transmission.hideiPhoneAddressbar();
+		this.hideiPhoneAddressbar();
 	},
 	
 	toggleFilterClicked: function(event) {
-		if (transmission.isButtonEnabled(event))
-			transmission.toggleFilter();
+		if (this.isButtonEnabled(event))
+			this.toggleFilter();
 	},
 	setFilter: function( mode )
 	{
@@ -634,16 +635,16 @@ Transmission.prototype =
 		this.refilter( );
 	},
 	showAllClicked: function( event ) {	
-		transmission.setFilter( Prefs._FilterAll );
+		this.setFilter( Prefs._FilterAll );
 	},
 	showDownloadingClicked: function( event ) {
-		transmission.setFilter( Prefs._FilterDownloading );
+		this.setFilter( Prefs._FilterDownloading );
 	},
 	showSeedingClicked: function(event) {	
-		transmission.setFilter( Prefs._FilterSeeding );
+		this.setFilter( Prefs._FilterSeeding );
 	},
 	showPausedClicked: function(event) {
-		transmission.setFilter( Prefs._FilterPaused );
+		this.setFilter( Prefs._FilterPaused );
 	},
 
 	/*
@@ -685,7 +686,7 @@ Transmission.prototype =
 	showPrefsDialog: function( ) {
 		$('body').addClass('prefs_showing');
 		$('#prefs_container').show();
-		transmission.hideiPhoneAddressbar();
+		this.hideiPhoneAddressbar();
 		if( Safari3 )
 			setTimeout("$('div#prefs_container div.dialog_window').css('top', '0px');",10);
 		this.updateButtonStates( );
@@ -695,7 +696,7 @@ Transmission.prototype =
 	{
 		$('body.prefs_showing').removeClass('prefs_showing');
 		if (iPhone) {
-			transmission.hideiPhoneAddressbar();
+			this.hideiPhoneAddressbar();
 			$('#prefs_container').hide();
 		} else if (Safari3) {
 			$('div#prefs_container div.dialog_window').css('top', '-425px');
@@ -762,27 +763,27 @@ Transmission.prototype =
 	 * Process an event in the footer-menu
 	 */
 	processSettingsMenuEvent: function(event) {
-		// Don't use 'this' in the function to avoid confusion (this != transmission instance)
-		var element = this;
+		var tr = this;
+		var $element = $(event.target);
 		
 		// Figure out which menu has been clicked
-		switch ($(element).parent()[0].id) {
+		switch ($element.parent()[0].id) {
 			
 			// Display the preferences dialog
 			case 'footer_super_menu':
-				if ($(element)[0].id == 'preferences') {
+				if ($element[0].id == 'preferences') {
 					$('div#prefs_container div#pref_error').hide();
 					$('div#prefs_container h2.dialog_heading').show();
-					transmission.showPrefsDialog( );
+					tr.showPrefsDialog( );
 				}
 				break;
 			
 			// Limit the download rate
 			case 'footer_download_rate_menu':
 				var args = { };
-				var rate = (this.innerHTML).replace(/[^0-9]/ig, '');
-				if ($(this).is('#unlimited_download_rate')) {
-					$(this).deselectMenuSiblings().selectMenuItem();
+				var rate = ($element[0].innerHTML).replace(/[^0-9]/ig, '');
+				if ($element.is('#unlimited_download_rate')) {
+					$element.deselectMenuSiblings().selectMenuItem();
 					args[RPC._DownSpeedLimited] = false;
 				} else {
 					setInnerHTML( $('#limited_download_rate')[0], 'Limit (' + rate + ' KB/s)' );
@@ -792,15 +793,15 @@ Transmission.prototype =
 					args[RPC._DownSpeedLimited] = true;
 				}
 				$('div.preference input#limit_download')[0].checked = args[RPC._DownSpeedLimited];
-				transmission.remote.savePrefs( args );
+				tr.remote.savePrefs( args );
 				break;
 			
 			// Limit the upload rate
 			case 'footer_upload_rate_menu':
 				var args = { };
-				var rate = (this.innerHTML).replace(/[^0-9]/ig, '');
-				if ($(this).is('#unlimited_upload_rate')) {
-					$(this).deselectMenuSiblings().selectMenuItem();
+				var rate = ($element[0].innerHTML).replace(/[^0-9]/ig, '');
+				if ($element.is('#unlimited_upload_rate')) {
+					$element.deselectMenuSiblings().selectMenuItem();
 					args[RPC._UpSpeedLimited] = false;
 				} else {
 					setInnerHTML( $('#limited_upload_rate')[0], 'Limit (' + rate + ' KB/s)' );
@@ -810,34 +811,34 @@ Transmission.prototype =
 					args[RPC._UpSpeedLimited] = true;
 				}
 				$('div.preference input#limit_upload')[0].checked = args[RPC._UpSpeedLimited];
-				transmission.remote.savePrefs( args );
+				tr.remote.savePrefs( args );
 				break;
 			
 			// Sort the torrent list 
 			case 'footer_sort_menu':
 
 				// The 'reverse sort' option state can be toggled independently of the other options
-				if ($(this).is('#reverse_sort_order')) {
+				if ($element.is('#reverse_sort_order')) {
 					var dir;
-					if ($(this).menuItemIsSelected()) {
-						$(this).deselectMenuItem();
+					if ($element.menuItemIsSelected()) {
+						$element.deselectMenuItem();
 						dir = Prefs._SortAscending;
 					} else {
-						$(this).selectMenuItem();
+						$element.selectMenuItem();
 						dir = Prefs._SortDescending;
 					}
-					transmission.setSortDirection( dir );
+					tr.setSortDirection( dir );
 
 				// Otherwise, deselect all other options (except reverse-sort) and select this one
 				} else {
-					$(this).parent().find('span.selected').each( function() {
-						if (! $(this).parent().is('#reverse_sort_order')) {
-							$(this).parent().deselectMenuItem();
+					$element.parent().find('span.selected').each( function() {
+						if (! $element.parent().is('#reverse_sort_order')) {
+							$element.parent().deselectMenuItem();
 						}
 					});
-					$(this).selectMenuItem();
-					var method = $(this)[0].id.replace(/sort_by_/, '');
-					transmission.setSortMethod( method );
+					$element.selectMenuItem();
+					var method = $element[0].id.replace(/sort_by_/, '');
+					tr.setSortMethod( method );
 				}
 				break;
 		}
@@ -858,7 +859,7 @@ Transmission.prototype =
 
 		var torrents = this.getSelectedTorrents( );
 		if( !torrents.length && iPhone ) {
-			transmission.hideInspector();
+			this.hideInspector();
 			return;
 		}
 
@@ -1054,7 +1055,7 @@ Transmission.prototype =
 		if (iPhone) {
 			transmsision.deselectAll( );
 			$('body.inspector_showing').removeClass('inspector_showing');
-			transmission.hideiPhoneAddressbar();
+			this.hideiPhoneAddressbar();
 		} else {
 			$('#torrent_filter_bar')[0].style.right = '0px';
 			$('#torrent_container')[0].style.right = '0px';
