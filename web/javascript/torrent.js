@@ -652,22 +652,33 @@ TorrentFile.prototype = {
 		else
 			this.name = file_data.name;
 		this.readAttributes(file_data);
+
+		var li = document.createElement('li');
+
+		var wanted_div = document.createElement('div');
+		wanted_div.className = "file_wanted_control";
+
+		var pri_div = document.createElement('div');
+		pri_div.className = "file_priority_control";
+
+		var file_div = document.createElement('div');
+		file_div.className = "inspector_torrent_file_list_entry_name";
+		file_div.textContent = this.name;
+
+		var prog_div = document.createElement('div');
+		prog_div.className = "inspector_torrent_file_list_entry_progress";
+
+		li.appendChild(wanted_div);
+		li.appendChild(pri_div);
+		li.appendChild(file_div);
+		li.appendChild(prog_div);
 		
-		this._element = $('<li/>').append(
-			$('<div/>').addClass('file_wanted_control').
-			bind('click', { file: this }, this.fileWantedControlClicked)
-			
-		).append(
-			this._priority_control = $('<div/>').addClass('file_priority_control').
-			bind('click', { file: this }, this.filePriorityControlClicked)
-			
-		).append(
-			$('<div/>').addClass('inspector_torrent_file_list_entry_name').
-			append(this.name)
-			
-		).append(
-			this._progress = $('<div/>').addClass('inspector_torrent_file_list_entry_progress')
-		)
+		this._element = $(li);
+		this._priority_control = $(pri_div);
+		this._progress = $(prog_div);
+
+		$(wanted_div).bind('click', { file: this }, this.fileWantedControlClicked);
+		this._priority_control.bind('click', { file: this }, this.filePriorityControlClicked);
 	},
 	
 	readAttributes: function(file_data) {
