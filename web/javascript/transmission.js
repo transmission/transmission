@@ -57,9 +57,7 @@ Transmission.prototype =
 		$('#filter_paused_link').parent().bind('click', function(e){ tr.showPausedClicked(e); });
 		$('#prefs_save_button').bind('click', function(e) { tr.savePrefsClicked(e); return false;});
 		$('#prefs_cancel_button').bind('click', function(e){ tr.cancelPrefsClicked(e); return false; });
-		$('#inspector_tab_info').bind('click', function(e){ tr.inspectorTabClicked(e); });
-		$('#inspector_tab_activity').bind('click', function(e){ tr.inspectorTabClicked(e); });
-		$('#inspector_tab_files').bind('click', function(e){ tr.inspectorTabClicked(e); });
+		$('.inspector_tab').bind('click', function(e){ tr.inspectorTabClicked(e, this); });
 		if (iPhone) {
 			$('#torrent_inspector').bind('click', function(e){ tr.hideInspector(); });
 			$('#preferences_link').bind('click', function(e){ tr.releaseClutchPreferencesButton(e); });
@@ -592,17 +590,16 @@ Transmission.prototype =
 			tr.toggleInspector( );
 	},
 
-	inspectorTabClicked: function(event) {
-	
+	inspectorTabClicked: function(event, tab) {
 		if (iPhone) event.stopPropagation();
 		
 		// Select the clicked tab, unselect the others,
 		// and display the appropriate info
-		var tab_ids = $(this).parent('#inspector_tabs').find('.inspector_tab').map(
+		var tab_ids = $(tab).parent('#inspector_tabs').find('.inspector_tab').map(
 			function() { return $(this).attr('id'); } 
 		);
 		for( var i=0; i<tab_ids.length; ++i ) {
-			if (this.id == tab_ids[i]) {
+			if (tab.id == tab_ids[i]) {
 				$('#' + tab_ids[i]).addClass('selected');
 				$('#' + tab_ids[i] + '_container').show();
 			} else {
