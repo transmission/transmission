@@ -613,9 +613,15 @@ handle_request( struct evhttp_request * req, void * arg )
         {
             const char * sessionId = get_current_session_id( server );
             char * tmp = tr_strdup_printf(
-                "<p>Please add this header to your requests:</p>"
-                "<p><code>%s: %s</code></p>"
-                "<p>This requirement is to make "
+                "<p>Please add this header to your HTTP requests:</p>"
+                "<p style=\"padding-left: 20pt;\"><code>%s: %s</code></p>"
+                "<p><b>RPC Application Developers:</b></p>"
+                "<p style=\"padding-left: 20pt;\">As of Transmission 1.53 and 1.61, RPC clients "
+                "need to look for this 409 response containing the phrase \"invalid session-id\".  "
+                "It occurs when the request's "TR_RPC_SESSION_ID_HEADER" header was missing "
+                "(such as during bootstrapping) or expired. "
+                "Either way, you can parse this response's headers for the new session-id.</p>"
+                "<p style=\"padding-left: 20pt;\">This requirement has been added to make "
                 "<a href=\"http://en.wikipedia.org/wiki/Cross-site_request_forgery\">CSRF</a>"
                 " attacks more difficult.</p>",
                 TR_RPC_SESSION_ID_HEADER, sessionId );
