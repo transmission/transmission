@@ -74,6 +74,9 @@ Transmission.prototype =
 			this.createContextMenu();
 			this.createSettingsMenu();
 		}
+
+		this._torrent_list = $('#torrent_list')[0];
+		this._inspector_file_list = $('#inspector_file_list')[0];
 		
 		// Setup the preference box
 		this.setupPrefConstraints();

@@ -39,9 +39,10 @@ Torrent.prototype =
 
 
 		// Create a new <li> element
-		var element = $('<li/>');
-		element.addClass('torrent');
-		element[0].id = 'torrent_' + data.id;
+		var top_e = document.createElement( 'li' );
+		top_e.className = 'torrent';
+		top_e.id = 'torrent_' + data.id;
+		var element = $(top_e);
 		element._torrent = this;
 		this._element = element;
 		this._controller = controller;
@@ -50,27 +51,27 @@ Torrent.prototype =
 		// Create the 'name' <div>
 		var e = document.createElement( 'div' );
 		e.className = 'torrent_name';
-		element[0].appendChild( e );
+		top_e.appendChild( e );
 		element._name_container = e;
 		
 		// Create the 'progress details' <div>
 		e = document.createElement( 'div' );
 		e.className = 'torrent_progress_details';
-		element[0].appendChild( e );
+		top_e.appendChild( e );
 		element._progress_details_container = e;
 
 		// Create the 'in progress' bar
 		e = document.createElement( 'div' );
 		e.className = 'torrent_progress_bar incomplete';
 		e.style.width = '0%';
-		element[0].appendChild( e );
+		top_e.appendChild( e );
 		element._progress_complete_container = e;
 			
 		// Create the 'incomplete' bar (initially hidden)
 		e = document.createElement( 'div' );
 		e.className = 'torrent_progress_bar incomplete';
 		e.style.display = 'none';
-		element[0].appendChild( e );
+		top_e.appendChild( e );
 		element._progress_incomplete_container = e;
 		
 		// Add the pause/resume button - don't specify the
@@ -80,7 +81,7 @@ Torrent.prototype =
 		image.className = 'torrent_pause';
 		e = document.createElement( 'a' );
 		e.appendChild( image );
-		element[0].appendChild( e );
+		top_e.appendChild( e );
 		element._pause_resume_button_image = image;
 		//element._pause_resume_button = e;
 		if (!iPhone) $(e).bind('click', {element: element}, this.clickPauseResumeButton);
@@ -88,7 +89,7 @@ Torrent.prototype =
 		// Create the 'peer details' <div>
 		e = document.createElement( 'div' );
 		e.className = 'torrent_peer_details';
-		element[0].appendChild( e );
+		top_e.appendChild( e );
 		element._peer_details_container = e;
 		
 		// Set the torrent click observer
@@ -101,13 +102,13 @@ Torrent.prototype =
 			this._element.css('margin-top', '7px');
 		
 		// insert the element
-		$('#torrent_list').append(this._element);
+		this._controller._torrent_list.appendChild( top_e );
 
 		this._files = [];
 		this.initializeTorrentFilesInspectorGroup();
 		if(data.files){
 			if(data.files.length == 1)
-				this._fileList.addClass('single_file');
+				this._fileList.className += ' single_file';
 			for (var i = 0; i < data.files.length; i++) {
 				var file = data.files[i];
 				file.index      = i;
@@ -116,9 +117,9 @@ Torrent.prototype =
 				file.wanted     = data.fileStats[i].wanted;
 				var torrentFile = new TorrentFile(file);
 				this._files.push(torrentFile);
-				var class = (i % 2 ? 'even' : 'odd') + ' inspector_torrent_file_list_entry';
-				torrentFile.element()[0].className = class;
-				this._fileList[0].appendChild(torrentFile.element()[0]);
+				var e = torrentFile.domElement();
+				e.className = (i % 2 ? 'even' : 'odd') + ' inspector_torrent_file_list_entry'; 
+				this._fileList.appendChild( e );
 			}
 		}
 
@@ -127,12 +128,15 @@ Torrent.prototype =
 	},
 	
 	initializeTorrentFilesInspectorGroup: function(length) {
-        this._fileList = $('<ul/>').addClass('inspector_torrent_file_list').addClass('inspector_group').hide();
-        $('#inspector_file_list').append(this._fileList);
+		var e = document.createElement( 'ul' );
+		e.className = 'inspector_torrent_file_list inspector_group';
+		e.style.display = 'none';
+		this._controller._inspector_file_list.appendChild( e );
+		this._fileList = e;
 	},
 	
 	fileList: function() {
-		return this._fileList;
+		return $(this._fileList);
 	},
 	
 	/*--------------------------------------------
@@ -478,8 +482,7 @@ Torrent.prototype =
 	 * Return true if this torrent is selected
 	 */
 	isSelected: function() {
-		var e = this.element( );
-		return e && $.className.has( e[0], 'selected' );
+		return this.element()[0].className.indexOf('selected') != -1;
 	},
 
 	/**
@@ -669,7 +672,7 @@ TorrentFile.prototype = {
 		li.appendChild(file_div);
 		li.appendChild(prog_div);
 		
-		this._element = $(li);
+		this._element = li;
 		this._priority_control = $(pri_div);
 		this._progress = $(prog_div);
 
@@ -701,6 +704,10 @@ TorrentFile.prototype = {
 	},
 	
 	element: function() {
+		return $(this._element);
+	},
+	
+	domElement: function() {
 		return this._element;
 	},
 	
