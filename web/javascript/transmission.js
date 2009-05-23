@@ -262,7 +262,7 @@ Transmission.prototype =
 		$('#settings_menu').transMenu({
 			selected_char: '&#x2714;',
 			direction: 'up',
-			onClick: function(e){ tr.processSettingsMenuEvent(e); }
+			onClick: function(e){ return tr.processSettingsMenuEvent(e); }
 		});
 		
 		$('#unlimited_download_rate').selectMenuItem();
@@ -842,6 +842,8 @@ Transmission.prototype =
 				}
 				break;
 		}
+		$('#settings_menu').trigger('closemenu');
+		return false; // to prevent the event from bubbling up
 	},
 
 	setLastTorrentClicked: function( torrent )
