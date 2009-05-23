@@ -116,9 +116,9 @@ Torrent.prototype =
 				file.wanted     = data.fileStats[i].wanted;
 				var torrentFile = new TorrentFile(file);
 				this._files.push(torrentFile);
-				this._fileList.append(
-					torrentFile.element().addClass(i % 2 ? 'even' : 'odd').addClass('inspector_torrent_file_list_entry')
-				);
+				var class = (i % 2 ? 'even' : 'odd') + ' inspector_torrent_file_list_entry';
+				torrentFile.element()[0].className = class;
+				this._fileList[0].appendChild(torrentFile.element()[0]);
 			}
 		}
 
