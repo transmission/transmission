@@ -753,16 +753,22 @@ TorrentFile.prototype = {
 	
 	refreshWantedHTML: function() {
 		var element = this.element();
-		this.element().toggleClass('skip', !this._wanted);
-		this.element().toggleClass('complete', this._done>=this._size );
+		var class = element[0].className.replace(/ skip| complete/g, '').split(' ');
+
+		if(!this._wanted)
+			class.push('skip');
+		if(this._done>=this._size)
+			class.push('complete');
+
+		element[0].className = class.join(' ');
 	},
 	
 	refreshPriorityHTML: function() {
 		var priority = { '1': 'high', '0': 'normal', '-1': 'low' }[new String(this._prio)];
-		var off_priorities = [ 'high', 'normal', 'low' ].sort(function(a,b) { return (a == priority) ? 1 : -1; } );
-		this._priority_control.addClass(priority).
-			removeClass(off_priorities[0]).
-			removeClass(off_priorities[1]);
+		var class = this._priority_control[0].className.replace(/ high| normal| low/g, '').split(' ');
+
+		class.push(priority)
+		this._priority_control[0].className = class.join(' ');
 	},
 	
 	fileWantedControlClicked: function(event) {
