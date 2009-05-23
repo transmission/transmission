@@ -48,47 +48,47 @@ Torrent.prototype =
 		controller._rows.push( element );
 		
 		// Create the 'name' <div>
-		var e = $('<div/>');
-		e.addClass('torrent_name');
-		element.append( e );
+		var e = document.createElement( 'div' );
+		e.className = 'torrent_name';
+		element[0].appendChild( e );
 		element._name_container = e;
 		
 		// Create the 'progress details' <div>
-		e = $('<div/>');
-		e.addClass('torrent_progress_details');
-		element.append(e);
+		e = document.createElement( 'div' );
+		e.className = 'torrent_progress_details';
+		element[0].appendChild( e );
 		element._progress_details_container = e;
 
 		// Create the 'in progress' bar
-		e = $('<div/>');
-		e.addClass('torrent_progress_bar incomplete');
-		e.css('width', '0%');
-		element.append( e );
+		e = document.createElement( 'div' );
+		e.className = 'torrent_progress_bar incomplete';
+		e.style.width = '0%';
+		element[0].appendChild( e );
 		element._progress_complete_container = e;
 			
 		// Create the 'incomplete' bar (initially hidden)
-		e = $('<div/>');
-		e.addClass('torrent_progress_bar incomplete');
-		e.hide();
-		element.append( e );
+		e = document.createElement( 'div' );
+		e.className = 'torrent_progress_bar incomplete';
+		e.style.display = 'none';
+		element[0].appendChild( e );
 		element._progress_incomplete_container = e;
 		
 		// Add the pause/resume button - don't specify the
 		// image or alt text until the 'refresh()' function
 		// (depends on torrent state)
-		var image = $('<div/>');
-		image.addClass('torrent_pause');
-		e = $('<a/>');
-		e.append( image );
-		element.append( e );
+		var image = document.createElement( 'div' );
+		image.className = 'torrent_pause';
+		e = document.createElement( 'a' );
+		e.appendChild( image );
+		element[0].appendChild( e );
 		element._pause_resume_button_image = image;
-		element._pause_resume_button = e;
-		if (!iPhone) e.bind('click', {element: element}, this.clickPauseResumeButton);
+		//element._pause_resume_button = e;
+		if (!iPhone) $(e).bind('click', {element: element}, this.clickPauseResumeButton);
 		
 		// Create the 'peer details' <div>
-		e = $('<div/>');
-		e.addClass('torrent_peer_details');
-		element.append( e );
+		e = document.createElement( 'div' );
+		e.className = 'torrent_peer_details';
+		element[0].appendChild( e );
 		element._peer_details_container = e;
 		
 		// Set the torrent click observer
@@ -340,7 +340,7 @@ Torrent.prototype =
 		var root = this._element;
 		var MaxBarWidth = 100; // reduce this to make the progress bar shorter (%)
 		
-		setInnerHTML( root._name_container[0], this._name );
+		setInnerHTML( root._name_container, this._name );
 		
 		// Add the progress bar
                 var notDone = this._leftUntilDone > 0;
@@ -379,20 +379,17 @@ Torrent.prototype =
 			// Update the 'in progress' bar
 			var class_name = this.isActive() ? 'in_progress' : 'incomplete_stopped';
 			var e = root._progress_complete_container;
-			e.removeClass( );
-			e.addClass( 'torrent_progress_bar' );
-			e.addClass( class_name );
-			e.css( 'width', css_completed_width + '%' );
-			if(css_completed_width == 0) { e.addClass( 'empty' ); }
+			var str = 'torrent_progress_bar ' + class_name;
+			if(css_completed_width == 0) { str += ' empty'; }
+			e.className = str;
+			e.style.width = css_completed_width + '%';
 			
 			// Update the 'incomplete' bar
 			e = root._progress_incomplete_container;
-			if( !e.is('.incomplete')) {
-				e.removeClass();
-				e.addClass('torrent_progress_bar in_progress');
-			}
-			e.css('width', (MaxBarWidth - css_completed_width) + '%');
-			e.show();
+			if( e.className.indexOf( 'incomplete' ) == -1 )
+				e.className = 'torrent_progress_bar in_progress';
+			e.style.width =  (MaxBarWidth - css_completed_width) + '%';
+			e.style.display = 'block';
 			
 			// Create the 'peer details' label
 			// Eg: 'Downloading from 36 of 40 peers - DL: 60.2 KB/s UL: 4.3 KB/s'
@@ -416,8 +413,7 @@ Torrent.prototype =
 			// Update the 'in progress' bar
 			var class_name = (this.isActive()) ? 'complete' : 'complete_stopped';
 			var e = root._progress_complete_container;
-			e.removeClass();
-			e.addClass('torrent_progress_bar ' + class_name );
+			e.className = 'torrent_progress_bar ' + class_name;
 			
 			// Create the 'progress details' label
 			// Eg: '698.05 MB, uploaded 8.59 GB (Ratio: 12.3)'
@@ -429,10 +425,10 @@ Torrent.prototype =
 			                 + ')';
 			
 			// Hide the 'incomplete' bar
-			root._progress_incomplete_container.hide();
+			root._progress_incomplete_container.style.display = 'none';
 			
 			// Set progress to maximum
-			root._progress_complete_container.css('width', MaxBarWidth + '%');
+			root._progress_complete_container.style.width =  MaxBarWidth + '%';
 			
 			// Create the 'peer details' label
 			// Eg: 'Seeding to 13 of 22 peers - UL: 36.2 KB/s'
@@ -449,10 +445,10 @@ Torrent.prototype =
 		}
 		
 		// Update the progress details
-		setInnerHTML( root._progress_details_container[0], progress_details );
+		setInnerHTML( root._progress_details_container, progress_details );
 		
 		// Update the peer details and pause/resume button
-		e = root._pause_resume_button_image[0];
+		e = root._pause_resume_button_image;
 		if ( this.state() == Torrent._StatusPaused ) {
 			e.alt = 'Resume';
 			e.className = "torrent_resume";
@@ -467,7 +463,7 @@ Torrent.prototype =
 			peer_details = this._error_message;
 		}
 		
-		setInnerHTML( root._peer_details_container[0], peer_details );
+		setInnerHTML( root._peer_details_container, peer_details );
 	
 		this.refreshFiles( );	
 	},

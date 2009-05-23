@@ -1184,11 +1184,16 @@ Transmission.prototype =
 	setTorrentBgColors: function( )
 	{
 		var rows = this.getVisibleRows( );
-		for( var i=0, len=rows.length; i<len; ++i )
-			if ((i+1) % 2 == 0)
-				$.className.add( rows[i][0], 'even' );
-			else
-				$.className.remove( rows[i][0], 'even' );
+		for( var i=0, len=rows.length; i<len; ++i ) {
+			var wasEven = rows[i][0].className.indexOf('even') != -1;
+			var isEven = ((i+1) % 2 == 0);
+			if( wasEven != isEven ) {
+				if( wasEven )
+					rows[i].removeClass('even');
+				else
+					rows[i].addClass('even');
+			}
+		}
 	},
     
 	updateStatusbar: function()
