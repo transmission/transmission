@@ -2447,6 +2447,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [newNames removeObjectsInArray: fAutoImportedNames];
     else
         fAutoImportedNames = [[NSMutableArray alloc] init];
+    [fAutoImportedNames setArray: importedNames];
     
     for (NSInteger i = [newNames count] - 1; i >= 0; i--)
     {
