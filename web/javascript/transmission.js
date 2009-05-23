@@ -77,6 +77,7 @@ Transmission.prototype =
 
 		this._torrent_list = $('#torrent_list')[0];
 		this._inspector_file_list = $('#inspector_file_list')[0];
+		this._inspector_tab_files = $('#inspector_tab_files')[0];
 		
 		// Setup the preference box
 		this.setupPrefConstraints();
@@ -611,6 +612,8 @@ Transmission.prototype =
 			}
 		}
 		this.hideiPhoneAddressbar();
+	
+		this.updateVisibleFileLists();
 	},
 	
 	toggleFilterClicked: function(event) {
@@ -1010,14 +1013,16 @@ Transmission.prototype =
 		$(".inspector_row > div:contains('N/A')").css('color', '#666');
 		this.updateVisibleFileLists();
 	},
+
+	fileListIsVisible: function() {
+		return this._inspector_tab_files.className.indexOf('selected') != -1;
+	},
 	
 	updateVisibleFileLists: function() {
-		jQuery.each( this.getSelectedTorrents(), function() {
-			this.showFileList();
-		} );
-		jQuery.each( this.getDeselectedTorrents(), function() {
-			this.hideFileList();
-		} );
+		if( this.fileListIsVisible( ) === true ) {
+			jQuery.each( this.getSelectedTorrents(), function() { this.showFileList(); } );
+			jQuery.each( this.getDeselectedTorrents(), function() { this.hideFileList(); } );
+		}
 	},
     
 	/*
@@ -1131,10 +1136,14 @@ Transmission.prototype =
 
 	updateTorrentsFileData: function( torrents ){
 		var tr = this;
+		var listIsVisible = tr.fileListIsVisible( );
 		jQuery.each( torrents, function() {
 			var t = Torrent.lookup(tr._torrents, this.id);
-			if (t)
-		    t.refreshFileData(this);
+			if (t) {
+				t.refreshFileModel(this);
+				if( listIsVisible && t.isSelected())
+					t.refreshFileView();
+			}
 		} );
 	},
 

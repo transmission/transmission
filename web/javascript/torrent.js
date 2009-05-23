@@ -36,7 +36,8 @@ Torrent.prototype =
 		this._sizeWhenDone  = data.sizeWhenDone;
 		this._name          = data.name;
 		this._name_lc       = this._name.toLowerCase( );
-
+		this._file_model    = [ ];
+		this._file_view     = [ ];
 
 		// Create a new <li> element
 		var top_e = document.createElement( 'li' );
@@ -104,23 +105,17 @@ Torrent.prototype =
 		// insert the element
 		this._controller._torrent_list.appendChild( top_e );
 
-		this._files = [];
 		this.initializeTorrentFilesInspectorGroup();
-		if(data.files){
-			if(data.files.length == 1)
-				this._fileList.className += ' single_file';
-			for (var i = 0; i < data.files.length; i++) {
-				var file = data.files[i];
-				file.index      = i;
-				file.torrent    = this;
-				file.priority   = data.fileStats[i].priority;
-				file.wanted     = data.fileStats[i].wanted;
-				var torrentFile = new TorrentFile(file);
-				this._files.push(torrentFile);
-				var e = torrentFile.domElement();
-				e.className = (i % 2 ? 'even' : 'odd') + ' inspector_torrent_file_list_entry'; 
-				this._fileList.appendChild( e );
-			}
+
+		for( var i=0; data.files!=null && i<data.files.length; ++i ) {
+			var src = data.files[i];
+			var tgt = this._file_model[i];
+			if( !tgt )
+				tgt = this._file_model[i] = { };
+			tgt.index = i;
+			tgt.torrent = this;
+			tgt.length = src.length;
+			tgt.name = src.name;
 		}
 
 		// Update all the labels etc
@@ -198,7 +193,7 @@ Torrent.prototype =
 	totalSeeders: function() { return this._total_seeders; },
 	uploadSpeed: function() { return this._upload_speed; },
 	uploadTotal: function() { return this._upload_total; },
-	showFileList: function() { this.refreshFiles(); this.fileList().show(); },
+	showFileList: function() { this.ensureFileListExists(); this.refreshFileView(); this.fileList().show(); },
 	hideFileList: function() { this.fileList().hide(); },
 	
 	/*--------------------------------------------
@@ -315,26 +310,20 @@ Torrent.prototype =
 		this._total_leechers        = Math.max( 0, data.leechers );
 		this._total_seeders         = Math.max( 0, data.seeders );
 		this._state                 = data.status;
-		
-		if (data.fileStats) {
-			for (var i = 0; i < data.fileStats.length; i++) {
-				var file_data      = {};
-				file_data.priority = data.fileStats[i].priority;
-				file_data.wanted   = data.fileStats[i].wanted;
-				file_data.bytesCompleted = data.fileStats[i].bytesCompleted;
-				this._files[i].readAttributes(file_data);
-			}
-		}
+
+		if (data.fileStats)
+			this.refreshFileModel( data );
 	},
 
-	refreshFileData: function(data) {
-		for (var i = 0; i < data.fileStats.length; i++) {
-			var file_data      = {};
-			file_data.priority = data.fileStats[i].priority;
-			file_data.wanted   = data.fileStats[i].wanted;
-			file_data.bytesCompleted = data.fileStats[i].bytesCompleted;
-			this._files[i].readAttributes(file_data);
-			this._files[i].refreshHTML();
+	refreshFileModel: function(data) {
+		for( var i=0; i<data.fileStats.length; ++i ) {
+			var src = data.fileStats[i];
+			var tgt = this._file_model[i];
+			if( !tgt )
+				tgt = this._file_model[i] = { };
+			tgt.wanted = src.wanted;
+			tgt.priority = src.priority;
+			tgt.bytesCompleted = src.bytesCompleted;
 		}
 	},
 
@@ -469,13 +458,25 @@ Torrent.prototype =
 		
 		setInnerHTML( root._peer_details_container, peer_details );
 	
-		this.refreshFiles( );	
+		this.refreshFileView( );	
 	},
 
-	refreshFiles: function() {
-		jQuery.each(this._files, function () {
-			this.refreshHTML();
-		} );
+	refreshFileView: function() {
+		if( this._file_view.length )
+			for( var i=0; i<this._file_model.length; ++i )
+				this._file_view[i].update( this._file_model[i] );
+	},
+
+	ensureFileListExists: function() {
+		if( this._file_view.length == 0 ) {
+			for( var i=0; i<this._file_model.length; ++i ) {
+				var v = new TorrentFile( this._file_model[i] );
+				this._file_view[i] = v;
+				var e = v.domElement( );
+				e.className = (i % 2 ? 'even' : 'odd') + ' inspector_torrent_file_list_entry';
+				this._fileList.appendChild( e );
+			}
+		}
 	},
 
 	/*
@@ -643,6 +644,7 @@ function TorrentFile(file_data) {
 
 TorrentFile.prototype = {
 	initialize: function(file_data) {
+		//console.log( 'new TorrentFile ' + file_data.name );
 		this._dirty = true;
 		this._torrent = file_data.torrent;
 		var pos = file_data.name.indexOf('/');
@@ -679,6 +681,11 @@ TorrentFile.prototype = {
 		$(wanted_div).bind('click', { file: this }, this.fileWantedControlClicked);
 		this._priority_control.bind('click', { file: this }, this.filePriorityControlClicked);
 	},
+
+	update: function(file_data) {
+		this.readAttributes(file_data);
+		this.refreshHTML();
+	},
 	
 	readAttributes: function(file_data) {
 		if( file_data.index != undefined && file_data.index != this._index ) {
@@ -712,7 +719,7 @@ TorrentFile.prototype = {
 	},
 	
 	setPriority: function(priority) {
-		if(this.element().hasClass('complete') || this._torrent._files.length == 1)
+		if(this.element().hasClass('complete') || this._torrent._file_model.length == 1)
 		  return;
 		var priority_level = { high: 1, normal: 0, low: -1 }[priority];
 		if (this._prio == priority_level) { return; }
@@ -730,7 +737,7 @@ TorrentFile.prototype = {
 	},
 	
 	toggleWanted: function() {
-		if(this.element().hasClass('complete') || this._torrent._files.length == 1)
+		if(this.element().hasClass('complete') || this._torrent._file_model.length == 1)
 		  return;
 		this.setWanted(!this._wanted);
 	},
