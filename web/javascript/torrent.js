@@ -84,7 +84,6 @@ Torrent.prototype =
 		e.appendChild( image );
 		top_e.appendChild( e );
 		element._pause_resume_button_image = image;
-		//element._pause_resume_button = e;
 		if (!iPhone) $(e).bind('click', {element: element}, this.clickPauseResumeButton);
 		
 		// Create the 'peer details' <div>
@@ -109,13 +108,12 @@ Torrent.prototype =
 
 		for( var i=0; data.files!=null && i<data.files.length; ++i ) {
 			var src = data.files[i];
-			var tgt = this._file_model[i];
-			if( !tgt )
-				tgt = this._file_model[i] = { };
-			tgt.index = i;
-			tgt.torrent = this;
-			tgt.length = src.length;
-			tgt.name = src.name;
+			this._file_model[i] = {
+				'index': i,
+				'torrent': this,
+				'length': src.length,
+				'name': src.name
+			};
 		}
 
 		// Update all the labels etc
