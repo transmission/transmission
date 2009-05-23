@@ -78,6 +78,7 @@ Transmission.prototype =
 		this._torrent_list = $('#torrent_list')[0];
 		this._inspector_file_list = $('#inspector_file_list')[0];
 		this._inspector_tab_files = $('#inspector_tab_files')[0];
+		this._toolbar_buttons = $('#torrent_global_menu ul li');
 		
 		// Setup the preference box
 		this.setupPrefConstraints();
@@ -1443,11 +1444,9 @@ Transmission.prototype =
 	updateButtonStates: function()
 	{
 		var showing_dialog = new RegExp("(prefs_showing|dialog_showing|open_showing)").test(document.body.className);
-		if (showing_dialog)
-		{
-			$('.torrent_global_menu ul li').addClass('disabled');
-		}
-		else
+		this._toolbar_buttons.toggleClass( 'disabled', showing_dialog );
+
+		if (!showing_dialog)
 		{
 			var torrents = this.getVisibleTorrents( );
 			var haveSelection = false;
@@ -1465,8 +1464,6 @@ Transmission.prototype =
 				if( isSelected && isActive ) haveActiveSelection = true;
 				if( isSelected && !isActive ) havePausedSelection = true;
 			}
-
-			$('.torrent_global_menu ul li.disabled').removeClass('disabled');
 
 			this.setEnabled( 'li#pause_selected', haveActiveSelection );
 			this.setEnabled( 'li.context_pause_selected', haveActiveSelection );
