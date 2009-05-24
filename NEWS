@@ -5,8 +5,43 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 - All Platforms
    + Distributed hash table (DHT) support
    + Add ability to move a torrent's data and/or tell Transmission where to look for it
+   + JSON RPC messages can be ~85% shorter, saving bandwidth and CPU
+   + Fix bug that could forget which port to use when connecting to some peers
+   + Automatically pause torrents when verifying
+   + Fix phantom "verifying" that appears with another verify in progress
+   + Fix small memory leaks
 - Mac
    + Hold down the option key on launch to pause all transfers
+- Web Client
+   + Fix 1.61 bug that broke adding torrents via the web client
+   + Torrents added by URL were always paused, regardless of preferences
+   + Comments and announce addresses were cut off in the inspector
+   + The "data remaining" field wasn't updated when the number reached 0
+   + Smaller design adjustments
+- GTK+
+   + Fix intltool build problem 
+   + Make it clearer that the statusbar's ratio mode button is a button
+   + Torrent comment box did not scroll, so long comments are partially hidden
+- Qt
+   + Initial torrent list was sometimes incorrect
+   + Add-torrent-and-delete-source deleted the source even if there was an error
+   + Prefs dialog didn't show or modify "Stop seeding torrents at ratio"
+
+1.54 (2009/xx/yy)
+- All Platforms
+   + Fix bug that could forget which port to use when connecting to some peers
+   + Fix phantom "verifying" that appeared with another verify in progress
+   + Fix small memory leaks
+- Web Client
+   + Fix 1.53 bug that broke adding torrents via the web client
+   + Torrents added by URL were always paused, regardless of preferences
+   + Comments and announce addresses were cut off in the inspector
+   + The "data remaining" field wasn't updated when the number reached 0
+   + Smaller design adjustments
+- GTK+
+   + Fix intltool build error
+   + Make it clearer that the statusbar's ratio mode button is a button
+   + Torrent comment box did not scroll, so long comments are partially hidden
 
 1.61 (2009/05/11)
 <http://trac.transmissionbt.com/query?milestone=1.61&group=component&groupdesc=1&order=severity>
