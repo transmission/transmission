@@ -132,9 +132,8 @@ Transmission.prototype =
 		}
 	},
 	loadImages: function() {
-		for(var i = 0; i<arguments.length; i++) {
-			jQuery("<img>").attr("src", arguments[i]);
-		}
+		for( var i=0, row; row=arguments[i]; ++i )
+			jQuery("<img>").attr("src", row);
 	},
     
 	/*
@@ -610,13 +609,13 @@ Transmission.prototype =
 		var tab_ids = $(tab).parent('#inspector_tabs').find('.inspector_tab').map(
 			function() { return $(this).attr('id'); } 
 		);
-		for( var i=0; i<tab_ids.length; ++i ) {
-			if (tab.id == tab_ids[i]) {
-				$('#' + tab_ids[i]).addClass('selected');
-				$('#' + tab_ids[i] + '_container').show();
+		for( var i=0, row; row=tab_ids[i]; ++i ) {
+			if (tab.id == row) {
+				$('#'+row).addClass('selected');
+				$('#'+row+'_container').show();
 			} else {
-				$('#' + tab_ids[i]).removeClass('selected');
-				$('#' + tab_ids[i] + '_container').hide();
+				$('#'+row).removeClass('selected');
+				$('#'+row+'_container').hide();
 			}
 		}
 		this.hideiPhoneAddressbar();
@@ -1394,11 +1393,9 @@ Transmission.prototype =
 		// decide which torrents to keep showing
 		var allTorrents = this.getAllTorrents( );
 		var keep = [ ];
-		for( var i=0, len=allTorrents.length; i<len; ++i ) {
-			var t = allTorrents[i];
+		for( var i=0, t; t=allTorrents[i]; ++i )
 			if( t.test( this[Prefs._FilterMode], this._current_search ) )
 				keep.push( t );
-		}
 
 		// sort the keepers
 		Torrent.sortTorrents( keep, this[Prefs._SortMethod],
@@ -1409,8 +1406,7 @@ Transmission.prototype =
 		this.deselectAll( );
 
 		// hide the ones we're not keeping
-		for( var i=keep.length; i<this._rows.length; ++i ) {
-			var e = this._rows[i];
+		for( var i=keep.length, e; e=this._rows[i]; ++i ) {
 			delete e._torrent;
 			e[0].style.display = 'none';
 		}

@@ -655,7 +655,7 @@ TorrentFile.prototype = {
 		this.readAttributes(file_data);
 
 		var li = document.createElement('li');
-		li.classNameConst = 'inspector_torrent_file_list_entry ' + ((this._index%2)?'odd':'event');
+		li.classNameConst = 'inspector_torrent_file_list_entry ' + ((this._index%2)?'odd':'even');
 		li.className = li.classNameConst;
 
 		var wanted_div = document.createElement('div');
