@@ -4,6 +4,7 @@ http://www.transmissionbt.com/
 Lead Developers <dev@transmissionbt.com>
   Charles Kerr <charles@transmissionbt.com>  (Daemon, Backend, GTK+ client)
   Mitchell Livingston <livings124@transmissionbt.com>  (Mac OS X client)
+  Kevin Glowacz <kjg@transmissionbt.com> (Web client)
 
 Project Contributors
   Tomas Carnecky  (Profiling, patches, and detection of sneaky bugs)
