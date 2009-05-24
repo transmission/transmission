@@ -3,7 +3,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 1.54 (2009/xx/yy)
 - All Platforms
    + Fix bug that could forget which port to use when connecting to some peers
-   + Fix phantom 'verifying' that appears if another verify in progress
+   + Fix phantom "verifying" that appeared with another verify in progress
    + Fix small memory leaks and remove dead code
 - Web Client
    + Fix 1.53 bug that broke adding torrents via the web client
