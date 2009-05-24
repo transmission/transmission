@@ -645,6 +645,7 @@ TorrentFile.prototype = {
 		//console.log( 'new TorrentFile ' + file_data.name );
 		this._dirty = true;
 		this._torrent = file_data.torrent;
+		this._index = file_data.index;
 		var pos = file_data.name.indexOf('/');
 		if (pos >= 0)
 			this.name = file_data.name.substring(pos + 1);
@@ -653,12 +654,15 @@ TorrentFile.prototype = {
 		this.readAttributes(file_data);
 
 		var li = document.createElement('li');
+		li.classNameConst = 'inspector_torrent_file_list_entry ' + ((this._index%2)?'odd':'event');
+		li.className = li.classNameConst;
 
 		var wanted_div = document.createElement('div');
 		wanted_div.className = "file_wanted_control";
 
 		var pri_div = document.createElement('div');
-		pri_div.className = "file_priority_control";
+		pri_div.classNameConst = "file_priority_control";
+		pri_div.className = pri_div.classNameConst;
 
 		var file_div = document.createElement('div');
 		file_div.className = "inspector_torrent_file_list_entry_name";
@@ -673,11 +677,11 @@ TorrentFile.prototype = {
 		li.appendChild(prog_div);
 		
 		this._element = li;
-		this._priority_control = $(pri_div);
+		this._priority_control = pri_div;
 		this._progress = $(prog_div);
 
 		$(wanted_div).bind('click', { file: this }, this.fileWantedControlClicked);
-		this._priority_control.bind('click', { file: this }, this.filePriorityControlClicked);
+		$(pri_div).bind('click', { file: this }, this.filePriorityControlClicked);
 	},
 
 	update: function(file_data) {
@@ -757,23 +761,22 @@ TorrentFile.prototype = {
 	},
 	
 	refreshWantedHTML: function() {
-		var element = this.element();
-		var c = element[0].className.replace(/ skip| complete/g, '').split(' ');
-
-		if(!this._wanted)
-			c.push('skip');
-		if(this._done>=this._size)
-			c.push('complete');
-
-		element[0].className = c.join(' ');
+		var e = this.element()[0];
+		var c = e.classNameConst;
+		if(!this._wanted) c += ' skip';
+		if(this._done>=this._size) c += ' complete';
+		e.className = c;
 	},
 	
 	refreshPriorityHTML: function() {
-		var priority = { '1': 'high', '0': 'normal', '-1': 'low' }[new String(this._prio)];
-		var c = this._priority_control[0].className.replace(/ high| normal| low/g, '').split(' ');
-
-		c.push(priority)
-		this._priority_control[0].className = class.join(' ');
+		var e = this._priority_control;
+		var c = e.classNameConst;
+		switch( this._prio ) {
+			case 1: c += ' high'; break;
+			case -1: c += ' low'; break;
+			default: c += ' normal'; break;
+		}
+		e.className = c;
 	},
 	
 	fileWantedControlClicked: function(event) {
