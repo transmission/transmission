@@ -1154,14 +1154,11 @@ Transmission.prototype =
 	},
 
 	addTorrents: function( new_torrents ){
-		var tr = this;
-
-		$.each( new_torrents, function(){
-			var torrent = this;
-			tr._torrents.push( new Torrent( tr, torrent ) );
-		});
-
-		this.refilter();
+		var fragment = document.createDocumentFragment( );
+		for( var i=0, row; row=new_torrents[i]; ++i )
+			this._torrents.push( new Torrent( fragment, this, row ) );
+		this._torrent_list.appendChild( fragment );
+		this.refilter( );
 	},
 
 	deleteTorrents: function(torrent_ids){

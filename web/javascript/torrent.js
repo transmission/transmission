@@ -6,8 +6,8 @@
  *	Class Torrent
  */
 
-function Torrent(controller,data) {
-    this.initialize(controller,data);
+function Torrent(domParent,controller,data) {
+    this.initialize(domParent,controller,data);
 } 
 
 // Constants
@@ -23,7 +23,7 @@ Torrent.prototype =
 	/*
 	 * Constructor
 	 */
-	initialize: function(controller, data) {
+	initialize: function(domParent,controller, data) {
 		this._id            = data.id;
 		this._is_private    = data.isPrivate;
 		this._hashString    = data.hashString;
@@ -102,7 +102,7 @@ Torrent.prototype =
 			this._element.css('margin-top', '7px');
 		
 		// insert the element
-		this._controller._torrent_list.appendChild( top_e );
+		domParent.appendChild(top_e);
 
 		this.initializeTorrentFilesInspectorGroup();
 
