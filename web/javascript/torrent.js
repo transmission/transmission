@@ -100,24 +100,25 @@ Torrent.prototype =
 		// using <li>'s in straight html, but adding through the DOM gets a bit odd.
 		if ($.browser.safari)
 			this._element.css('margin-top', '7px');
-		
-		// insert the element
-		domParent.appendChild(top_e);
 
 		this.initializeTorrentFilesInspectorGroup();
 
-		for( var i=0; data.files!=null && i<data.files.length; ++i ) {
-			var src = data.files[i];
-			this._file_model[i] = {
-				'index': i,
-				'torrent': this,
-				'length': src.length,
-				'name': src.name
-			};
+		if( data.files ) {
+			for( var i=0, row; row=data.files[i]; ++i ) {
+				this._file_model[i] = {
+					'index': i,
+					'torrent': this,
+					'length': row.length,
+					'name': row.name
+				};
+			}
 		}
 
 		// Update all the labels etc
 		this.refresh(data);
+		
+		// insert the element
+		domParent.appendChild(top_e);
 	},
 	
 	initializeTorrentFilesInspectorGroup: function(length) {
