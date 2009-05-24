@@ -21,7 +21,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 - GTK+
    + Fix intltool build problem 
    + Make it clearer that the statusbar's ratio mode button is a button
-   + Torrent comment box did not scroll, so long comments are partially hidden
+   + Torrent comment box did not scroll, so long comments were partially hidden
 - Qt
    + Initial torrent list was sometimes incorrect
    + Add-torrent-and-delete-source deleted the source even if there was an error
@@ -41,7 +41,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 - GTK+
    + Fix intltool build error
    + Make it clearer that the statusbar's ratio mode button is a button
-   + Torrent comment box did not scroll, so long comments are partially hidden
+   + Torrent comment box did not scroll, so long comments were partially hidden
 
 1.61 (2009/05/11)
 <http://trac.transmissionbt.com/query?milestone=1.61&group=component&groupdesc=1&order=severity>
