@@ -6,8 +6,8 @@
  *	Class Torrent
  */
 
-function Torrent(domParent,controller,data) {
-    this.initialize(domParent,controller,data);
+function Torrent( transferListParent, fileListParent, controller, data) {
+    this.initialize( transferListParent, fileListParent, controller, data);
 } 
 
 // Constants
@@ -23,7 +23,7 @@ Torrent.prototype =
 	/*
 	 * Constructor
 	 */
-	initialize: function(domParent,controller, data) {
+	initialize: function( transferListParent, fileListParent, controller, data) {
 		this._id            = data.id;
 		this._is_private    = data.isPrivate;
 		this._hashString    = data.hashString;
@@ -101,7 +101,7 @@ Torrent.prototype =
 		if ($.browser.safari)
 			this._element.css('margin-top', '7px');
 
-		this.initializeTorrentFilesInspectorGroup();
+		this.initializeTorrentFilesInspectorGroup( fileListParent );
 
 		if( data.files ) {
 			for( var i=0, row; row=data.files[i]; ++i ) {
@@ -118,14 +118,14 @@ Torrent.prototype =
 		this.refresh(data);
 		
 		// insert the element
-		domParent.appendChild(top_e);
+		transferListParent.appendChild(top_e);
 	},
 	
-	initializeTorrentFilesInspectorGroup: function(length) {
+	initializeTorrentFilesInspectorGroup: function( fileListParent ) {
 		var e = document.createElement( 'ul' );
 		e.className = 'inspector_torrent_file_list inspector_group';
 		e.style.display = 'none';
-		this._controller._inspector_file_list.appendChild( e );
+		fileListParent.appendChild( e );
 		this._fileList = e;
 	},
 	

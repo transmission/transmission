@@ -1183,11 +1183,17 @@ Transmission.prototype =
 		this.remote.getInitialDataFor( null ,function(torrents) { tr.addTorrents(torrents); } );
 	},
 
-	addTorrents: function( new_torrents ){
-		var fragment = document.createDocumentFragment( );
+	addTorrents: function( new_torrents )
+	{
+		var transferFragment = document.createDocumentFragment( );
+		var fileFragment = document.createDocumentFragment( );
+
 		for( var i=0, row; row=new_torrents[i]; ++i )
-			this._torrents.push( new Torrent( fragment, this, row ) );
-		this._torrent_list.appendChild( fragment );
+			this._torrents.push( new Torrent( transferFragment, fileFragment, this, row ) );
+
+                this._inspector_file_list.appendChild( fileFragment );
+                this._torrent_list.appendChild( transferFragment );
+
 		this.refilter( );
 	},
 
