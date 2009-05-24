@@ -667,7 +667,7 @@ TorrentFile.prototype = {
 
 		var file_div = document.createElement('div');
 		file_div.className = "inspector_torrent_file_list_entry_name";
-		file_div.textContent = this.name;
+		file_div.innerHTML = this.name.replace(/([\/_\.])/g, "$1&#8203;");
 
 		var prog_div = document.createElement('div');
 		prog_div.className = "inspector_torrent_file_list_entry_progress";
