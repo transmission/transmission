@@ -2693,7 +2693,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     NSPasteboard * pasteboard = [info draggingPasteboard];
     if ([[pasteboard types] containsObject: NSFilenamesPboardType])
     {
-        #warning simplify
         //check if any torrent files can be added
         BOOL torrent = NO;
         NSArray * files = [pasteboard propertyListForType: NSFilenamesPboardType];
@@ -2701,19 +2700,16 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         {
             if ([[[NSWorkspace sharedWorkspace] typeOfFile: file error: NULL] isEqualToString: @"org.bittorrent.torrent"])
             {
+                torrent = YES;
                 tr_ctor * ctor = tr_ctorNew(fLib);
                 tr_ctorSetMetainfoFromFile(ctor, [file UTF8String]);
-                switch (tr_torrentParse(ctor, NULL))
+                if (tr_torrentParse(ctor, NULL) == TR_OK)
                 {
-                    case TR_OK:
-                        if (!fOverlayWindow)
-                            fOverlayWindow = [[DragOverlayWindow alloc] initWithLib: fLib forWindow: fWindow];
-                        [fOverlayWindow setTorrents: files];
-                        
-                        return NSDragOperationCopy;
+                    if (!fOverlayWindow)
+                        fOverlayWindow = [[DragOverlayWindow alloc] initWithLib: fLib forWindow: fWindow];
+                    [fOverlayWindow setTorrents: files];
                     
-                    case TR_EDUPLICATE:
-                        torrent = YES;
+                    return NSDragOperationCopy;
                 }
                 tr_ctorFree(ctor);
             }
@@ -2759,24 +2755,17 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         BOOL torrent = NO, accept = YES;
         
         //create an array of files that can be opened
-        NSMutableArray * filesToOpen = [[NSMutableArray alloc] init];
         NSArray * files = [pasteboard propertyListForType: NSFilenamesPboardType];
+        NSMutableArray * filesToOpen = [NSMutableArray arrayWithCapacity: [files count]];
         for (NSString * file in files)
         {
             if ([[[NSWorkspace sharedWorkspace] typeOfFile: file error: NULL] isEqualToString: @"org.bittorrent.torrent"])
             {
+                torrent = YES;
                 tr_ctor * ctor = tr_ctorNew(fLib);
                 tr_ctorSetMetainfoFromFile(ctor, [file UTF8String]);
-                switch (tr_torrentParse(ctor, NULL))
-                {
-                    case TR_OK:
-                        [filesToOpen addObject: file];
-                        torrent = YES;
-                        break;
-                        
-                    case TR_EDUPLICATE:
-                        torrent = YES;
-                }
+                if (tr_torrentParse(ctor, NULL) == TR_OK)
+                    [filesToOpen addObject: file];
                 tr_ctorFree(ctor);
             }
         }
@@ -2790,7 +2779,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             else
                 accept = NO;
         }
-        [filesToOpen release];
         
         return accept;
     }
