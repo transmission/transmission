@@ -15,6 +15,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 - Web Client
    + Massive speed improvements that should make the web client more responsive when managing a large number of torrents
    + Fix 1.61 bug that broke adding torrents via the web client
+   + Allow multiple torrent files to be uploaded at a time in browsers that support "multiple" on file inputs
    + Torrents added by URL were always paused, regardless of preferences
    + Comments and announce addresses were cut off in the inspector
    + The "data remaining" field wasn't updated when the number reached 0
