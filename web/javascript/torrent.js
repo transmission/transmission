@@ -192,7 +192,13 @@ Torrent.prototype =
 	totalSeeders: function() { return this._total_seeders; },
 	uploadSpeed: function() { return this._upload_speed; },
 	uploadTotal: function() { return this._upload_total; },
-	showFileList: function() { this.ensureFileListExists(); this.refreshFileView(); this.fileList().show(); },
+	showFileList: function() {
+		if(this.fileList().is(':visible'))
+			return;
+		this.ensureFileListExists();
+		this.refreshFileView();
+		this.fileList().show();
+	},
 	hideFileList: function() { this.fileList().hide(); },
 	
 	/*--------------------------------------------
