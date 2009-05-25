@@ -288,7 +288,11 @@ Transmission.prototype =
 			shadow:            false,
 			boundingElement:   $('div#torrent_container'),
 			boundingRightPad:  20,
-			boundingBottomPad: 5
+			boundingBottomPad: 5,
+			onContextMenu:     function(e) { 
+				tr.setSelectedTorrent( $(e.target).closest('.torrent')[0]._torrent, true ); 
+				return true; 
+			}
 		});
 	},
     

@@ -43,6 +43,7 @@ Torrent.prototype =
 		var top_e = document.createElement( 'li' );
 		top_e.className = 'torrent';
 		top_e.id = 'torrent_' + data.id;
+		top_e._torrent = this;
 		var element = $(top_e);
 		element._torrent = this;
 		this._element = element;
@@ -94,7 +95,6 @@ Torrent.prototype =
 		
 		// Set the torrent click observer
 		element.bind('click', {element: element}, this.clickTorrent);
-		if (!iPhone) element.bind('contextmenu', {element: element}, this.rightClickTorrent);		
 		
 		// Safari hack - first torrent needs to be moved down for some reason. Seems to be ok when
 		// using <li>'s in straight html, but adding through the DOM gets a bit odd.
@@ -147,6 +147,7 @@ Torrent.prototype =
 	setElement: function( element ) {
 		this._element = element;
 		element._torrent = this;
+		element[0]._torrent = this;
 		this.refreshHTML( );
 	},
 
@@ -206,18 +207,6 @@ Torrent.prototype =
 	 *  E V E N T   F U N C T I O N S
 	 * 
 	 *--------------------------------------------*/
-	
-	/*
-	 * Process a right-click event on this torrent
-	 */
-	rightClickTorrent: function(event)
-	{
-		// don't stop the event! need it for the right-click menu
-		
-		var t = event.data.element._torrent;
-		if ( !t.isSelected( ) )
-			t._controller.setSelectedTorrent( t );
-	},
 	
 	/*
 	 * Process a click event on this torrent
