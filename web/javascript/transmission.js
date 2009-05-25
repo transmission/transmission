@@ -60,12 +60,15 @@ Transmission.prototype =
 		$('.inspector_tab').bind('click', function(e){ tr.inspectorTabClicked(e, this); });
 		$('.file_wanted_control').live('click', function(e){ tr.fileWantedClicked(e, this); });
 		$('.file_priority_control').live('click', function(e){ tr.filePriorityClicked(e, this); });
+		$('.torrent_list > .torrent').live('click', function(e){ tr.torrentClicked(e, this); });
 		if (iPhone) {
 			$('#torrent_inspector').bind('click', function(e){ tr.hideInspector(); });
 			$('#preferences_link').bind('click', function(e){ tr.releaseClutchPreferencesButton(e); });
 		} else {
+			$('.torrent_resume').live('click', function(e){ tr.torrentResumeClicked(e, this); });
+			$('.torrent_pause').live('click', function(e){ tr.torrentPauseClicked(e, this); });
 			$(document).bind('keydown',  function(e){ tr.keyDown(e); });
-			$('#torrent_container').bind('click', function(e){ tr.deselectAll( true ); });
+			//$('#torrent_container').bind('click', function(e){ tr.deselectAll( true ); });
 			$('#open_link').bind('click', function(e){ tr.openTorrentClicked(e); });
 			$('#filter_toggle_link').bind('click', function(e){ tr.toggleFilterClicked(e); });
 			$('#inspector_link').bind('click', function(e){ tr.toggleInspectorClicked(e); });
@@ -288,7 +291,11 @@ Transmission.prototype =
 			shadow:            false,
 			boundingElement:   $('div#torrent_container'),
 			boundingRightPad:  20,
-			boundingBottomPad: 5
+			boundingBottomPad: 5,
+			onContextMenu:     function(e) {
+				tr.setSelectedElement( $(e.target).closest('.torrent')[0], true );
+				return true;
+			}
 		});
 	},
     
@@ -323,7 +330,7 @@ Transmission.prototype =
 	{
 		var torrents = [ ];
 		for( var i=0, row; row=this._rows[i]; ++i )
-			if( row._torrent && ( row[0].style.display != 'none' ) )
+			if( row._torrent && ( row.style.display != 'none' ) )
 				torrents.push( row._torrent );
 		return torrents;
 	},
@@ -353,7 +360,7 @@ Transmission.prototype =
 	{
 		var rows = [ ];
 		for( var i=0, row; row=this._rows[i]; ++i )
-			if( row[0].style.display != 'none' )
+			if( row.style.display != 'none' )
 				rows.push( row );
 		return rows;
 	},
@@ -374,20 +381,20 @@ Transmission.prototype =
 
 	scrollToElement: function( e )
 	{
-		if( iPhone )
-			return;
+		if( !iPhone )
+		{
+			var container = $('#torrent_container');
+			var scrollTop = container.scrollTop( );
+			var innerHeight = container.innerHeight( );
 
-		var container = $('#torrent_container');
-		var scrollTop = container.scrollTop( );
-		var innerHeight = container.innerHeight( );
+			var offsetTop = e.offsetTop;
+			var offsetHeight = $(e).outerHeight( );
 
-		var offsetTop = e[0].offsetTop;
-		var offsetHeight = e.outerHeight( );
-
-		if( offsetTop < scrollTop )
-			container.scrollTop( offsetTop );
-		else if( innerHeight + scrollTop < offsetTop + offsetHeight )
-			container.scrollTop( offsetTop + offsetHeight - innerHeight );
+			if( offsetTop < scrollTop )
+				container.scrollTop( offsetTop );
+			else if( innerHeight + scrollTop < offsetTop + offsetHeight )
+				container.scrollTop( offsetTop + offsetHeight - innerHeight );
+		}
 	},
 
 	/*--------------------------------------------
@@ -396,34 +403,22 @@ Transmission.prototype =
 	 * 
 	 *--------------------------------------------*/
 
-	setSelectedTorrent: function( torrent, doUpdate ) {
+	setSelectedElement: function( element, doUpdate ) {
 		this.deselectAll( );
-		this.selectTorrent( torrent, doUpdate );
+		this.selectElement( element, doUpdate );
 	},
 
 	selectElement: function( e, doUpdate ) {
-		$.className.add( e[0], 'selected' );
 		this.scrollToElement( e );
+		$.className.add( e, 'selected' );
 		if( doUpdate )
 			this.selectionChanged( );
-		$.className.add( e[0], 'selected' );
-	},
-	selectRow: function( rowIndex, doUpdate ) {
-		this.selectElement( this._rows[rowIndex], doUpdate );
-	},
-	selectTorrent: function( torrent, doUpdate ) {
-		if( torrent._element )
-			this.selectElement( torrent._element, doUpdate );
 	},
 
 	deselectElement: function( e, doUpdate ) {
-		$.className.remove( e[0], 'selected' );
+		$.className.remove( e, 'selected' );
 		if( doUpdate )
 			this.selectionChanged( );
-	},
-	deselectTorrent: function( torrent, doUpdate ) {
-		if( torrent._element )
-			this.deselectElement( torrent._element, doUpdate );
 	},
 
 	selectAll: function( doUpdate ) {
@@ -437,7 +432,7 @@ Transmission.prototype =
 		var tr = this;
 		for( var i=0, row; row=tr._rows[i]; ++i )
 			tr.deselectElement( row );
-		tr._last_torrent_clicked = null;
+		tr._last_element_clicked = null;
 		if( doUpdate )
 			tr.selectionChanged( );
 	},
@@ -445,21 +440,17 @@ Transmission.prototype =
 	/*
 	 * Select a range from this torrent to the last clicked torrent
 	 */
-	selectRange: function( torrent, doUpdate )
+	selectRange: function( element, doUpdate )
 	{
-		if( !this._last_torrent_clicked )
-		{
-			this.selectTorrent( torrent );
-		}
-		else // select the range between the prevous & current
-		{
-			var rows = this.getVisibleRows( );
-			var i = this.getTorrentIndex( rows, this._last_torrent_clicked );
-			var end = this.getTorrentIndex( rows, torrent );
-			var step = i < end ? 1 : -1;
-			for( ; i!=end; i+=step )
-				this.selectRow( i );
-			this.selectRow( i );
+		if( !this._last_element_clicked )
+			this.selectElement( element );
+		else { // select the range between the prevous & current
+			var a = this._rows.indexOf( this._last_element_clicked );
+			var b = this._rows.indexOf( element );
+			var begin = a < b ? a : b;
+			var end = a > b ? a : b;
+			for( var i=begin; i<=end; ++i )
+				this.selectElement( this._rows[i] );
 		}
 
 		if( doUpdate )
@@ -503,10 +494,8 @@ Transmission.prototype =
 				i = rows.length - 1;
 		}
 
-		if( 0<=i && i<rows.length ) {
-			tr.deselectAll( );
-			tr.selectRow( i, true );
-		}
+		if( 0<=i && i<rows.length )
+			this.setSelectedElement (this._rows[i]);
 	},
     
 	isButtonEnabled: function(e) {
@@ -649,6 +638,61 @@ Transmission.prototype =
 		this.hideiPhoneAddressbar();
 	
 		this.updateVisibleFileLists();
+	},
+
+	torrentClicked: function(event, element)
+	{
+		var torrent = element._torrent;
+                var isSelected = element.className.indexOf('selected') != -1;
+
+	
+//console.log ('torrent clicked. meta ' + event.metaKey + ' ctrl ' + event.ctrlKey + ' shift ' + event.shiftKey );	
+		// 'Apple' button emulation on PC:
+		// TODO: Need settable meta-key and ctrl-key variables for mac emulation
+		var meta_key = event.metaKey;
+		var ctrl_key = event.ctrlKey;
+		if (event.ctrlKey && navigator.appVersion.toLowerCase().indexOf("mac") == -1) {
+			meta_key = true;
+			ctrl_key = false;
+		}
+		
+		// Shift-Click - Highlight a range between this torrent and the last-clicked torrent
+		if (iPhone) {
+			this.setSelectedElement( element, true );
+		} else if (event.shiftKey) {
+			this.selectRange( element, true );
+			// Need to deselect any selected text
+			window.focus();
+		
+		} else if (!isSelected && meta_key) { // Apple-Click, not selected
+			this.selectElement( element, true );
+		} else if (!isSelected) { // Regular Click, not selected
+			this.setSelectedElement( element, true );
+		} else if (isSelected && meta_key) { // Apple-Click, selected	
+			this.deselectElement( element, true );
+		} else if (isSelected) { // Regular Click, selected
+			this.setSelectedElement( element, true );
+		}
+		
+		this._last_element_clicked = element;
+
+		// Prevents click carrying to parent element
+		// which deselects all on click
+		event.stopPropagation();
+	},
+
+	torrentPauseClicked: function (event, element) {
+		var row = element.parentNode.parentNode;
+		console.log ('pause clicked');
+		this.stopTorrent (row._torrent);
+		event.stopPropagation ();
+	},
+
+	torrentResumeClicked: function (event, element) {
+		var row = element.parentNode.parentNode;
+		console.log ('resume clicked');
+		this.startTorrent (row._torrent);
+		event.stopPropagation ();
 	},
 
 	fileWantedClicked: function(event, element){
@@ -900,11 +944,6 @@ Transmission.prototype =
 		return false; // to prevent the event from bubbling up
 	},
 
-	setLastTorrentClicked: function( torrent )
-	{
-		this._last_torrent_clicked = torrent;
-	},
-    
 	/*
 	 * Update the inspector with the latest data for the selected torrents
 	 */
@@ -1249,10 +1288,10 @@ Transmission.prototype =
 	{
 		var rows = this.getVisibleRows( );
 		for( var i=0, row; row=rows[i]; ++i ) {
-			var wasEven = row[0].className.indexOf('even') != -1;
+			var wasEven = row.className.indexOf('even') != -1;
 			var isEven = ((i+1) % 2 == 0);
 			if( wasEven != isEven )
-				row.toggleClass('even', isEven);
+				$(row).toggleClass('even', isEven);
 		}
 	},
     
@@ -1457,14 +1496,14 @@ Transmission.prototype =
 		// hide the ones we're not keeping
 		for( var i=keep.length, e; e=this._rows[i]; ++i ) {
 			delete e._torrent;
-			e[0].style.display = 'none';
+			e.style.display = 'none';
 		}
 
 		// show the ones we're keeping
 		sel.sort( Torrent.compareById );
 		for( var i=0, len=keep.length; i<len; ++i ) {
 			var e = this._rows[i];
-			e[0].style.display = 'block';
+			e.style.display = 'block';
 			var t = keep[i];
 			t.setElement( e );
 			if( Torrent.indexOf( sel, t.id() ) != -1 )

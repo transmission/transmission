@@ -40,10 +40,9 @@ Torrent.prototype =
 		this._file_view     = [ ];
 
 		// Create a new <li> element
-		var top_e = document.createElement( 'li' );
-		top_e.className = 'torrent';
-		top_e.id = 'torrent_' + data.id;
-		var element = $(top_e);
+		var element = document.createElement( 'li' );
+		element.className = 'torrent';
+		element.id = 'torrent_' + data.id;
 		element._torrent = this;
 		this._element = element;
 		this._controller = controller;
@@ -52,27 +51,27 @@ Torrent.prototype =
 		// Create the 'name' <div>
 		var e = document.createElement( 'div' );
 		e.className = 'torrent_name';
-		top_e.appendChild( e );
+		element.appendChild( e );
 		element._name_container = e;
 		
 		// Create the 'progress details' <div>
 		e = document.createElement( 'div' );
 		e.className = 'torrent_progress_details';
-		top_e.appendChild( e );
+		element.appendChild( e );
 		element._progress_details_container = e;
 
 		// Create the 'in progress' bar
 		e = document.createElement( 'div' );
 		e.className = 'torrent_progress_bar incomplete';
 		e.style.width = '0%';
-		top_e.appendChild( e );
+		element.appendChild( e );
 		element._progress_complete_container = e;
 			
 		// Create the 'incomplete' bar (initially hidden)
 		e = document.createElement( 'div' );
 		e.className = 'torrent_progress_bar incomplete';
 		e.style.display = 'none';
-		top_e.appendChild( e );
+		element.appendChild( e );
 		element._progress_incomplete_container = e;
 		
 		// Add the pause/resume button - don't specify the
@@ -82,19 +81,14 @@ Torrent.prototype =
 		image.className = 'torrent_pause';
 		e = document.createElement( 'a' );
 		e.appendChild( image );
-		top_e.appendChild( e );
+		element.appendChild( e );
 		element._pause_resume_button_image = image;
-		if (!iPhone) $(e).bind('click', {element: element}, this.clickPauseResumeButton);
 		
 		// Create the 'peer details' <div>
 		e = document.createElement( 'div' );
 		e.className = 'torrent_peer_details';
-		top_e.appendChild( e );
+		element.appendChild( e );
 		element._peer_details_container = e;
-		
-		// Set the torrent click observer
-		element.bind('click', {element: element}, this.clickTorrent);
-		if (!iPhone) element.bind('contextmenu', {element: element}, this.rightClickTorrent);		
 		
 		// Safari hack - first torrent needs to be moved down for some reason. Seems to be ok when
 		// using <li>'s in straight html, but adding through the DOM gets a bit odd.
@@ -118,7 +112,7 @@ Torrent.prototype =
 		this.refresh(data);
 		
 		// insert the element
-		transferListParent.appendChild(top_e);
+		transferListParent.appendChild(element);
 	},
 	
 	initializeTorrentFilesInspectorGroup: function( fileListParent ) {
@@ -201,88 +195,6 @@ Torrent.prototype =
 	},
 	hideFileList: function() { this.fileList().hide(); },
 	
-	/*--------------------------------------------
-	 * 
-	 *  E V E N T   F U N C T I O N S
-	 * 
-	 *--------------------------------------------*/
-	
-	/*
-	 * Process a right-click event on this torrent
-	 */
-	rightClickTorrent: function(event)
-	{
-		// don't stop the event! need it for the right-click menu
-		
-		var t = event.data.element._torrent;
-		if ( !t.isSelected( ) )
-			t._controller.setSelectedTorrent( t );
-	},
-	
-	/*
-	 * Process a click event on this torrent
-	 */
-	clickTorrent: function( event )
-	{
-		// Prevents click carrying to parent element
-		// which deselects all on click
-		event.stopPropagation();
-		var torrent = event.data.element._torrent;
-		
-		// 'Apple' button emulation on PC :
-		// Need settable meta-key and ctrl-key variables for mac emulation
-		var meta_key = event.metaKey;
-		var ctrl_key = event.ctrlKey;
-		if (event.ctrlKey && navigator.appVersion.toLowerCase().indexOf("mac") == -1) {
-			meta_key = true;
-			ctrl_key = false;
-		}
-		
-		// Shift-Click - Highlight a range between this torrent and the last-clicked torrent
-		if (iPhone) {
-			torrent._controller.setSelectedTorrent( torrent, true );
-		
-		} else if (event.shiftKey) {
-			torrent._controller.selectRange( torrent, true );
-			// Need to deselect any selected text
-			window.focus();
-		
-		// Apple-Click, not selected
-		} else if (!torrent.isSelected() && meta_key) {
-			torrent._controller.selectTorrent( torrent, true );
-			
-		// Regular Click, not selected
-		} else if (!torrent.isSelected()) {
-			torrent._controller.setSelectedTorrent( torrent, true );
-		
-		// Apple-Click, selected	
-		} else if (torrent.isSelected() && meta_key) {
-			torrent._controller.deselectTorrent( torrent, true );
-			
-		// Regular Click, selected
-		} else if (torrent.isSelected()) {
-			torrent._controller.setSelectedTorrent( torrent, true );
-		}
-		
-		torrent._controller.setLastTorrentClicked(torrent);
-	},
-
-	/*
-	 * Process a click event on the pause/resume button
-	 */
-	clickPauseResumeButton: function( event )
-	{
-		// prevent click event resulting in selection of torrent
-		event.stopPropagation();
-
-		// either stop or start the torrent
-		var torrent = event.data.element._torrent;
-		if( torrent.isActive( ) )
-			torrent._controller.stopTorrent( torrent );
-		else
-			torrent._controller.startTorrent( torrent );
-	},
-
 	/*--------------------------------------------
 	 * 
 	 *  I N T E R F A C E   F U N C T I O N S
@@ -499,7 +411,7 @@ Torrent.prototype =
 	 * Return true if this torrent is selected
 	 */
 	isSelected: function() {
-		return this.element()[0].className.indexOf('selected') != -1;
+		return this.element().className.indexOf('selected') != -1;
 	},
 
 	/**
