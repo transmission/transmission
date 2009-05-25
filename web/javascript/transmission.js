@@ -58,6 +58,8 @@ Transmission.prototype =
 		$('#prefs_save_button').bind('click', function(e) { tr.savePrefsClicked(e); return false;});
 		$('#prefs_cancel_button').bind('click', function(e){ tr.cancelPrefsClicked(e); return false; });
 		$('.inspector_tab').bind('click', function(e){ tr.inspectorTabClicked(e, this); });
+		$('.file_wanted_control').live('click', function(e){ tr.fileWantedClicked(e, this); });
+		$('.file_priority_control').live('click', function(e){ tr.filePriorityClicked(e, this); });
 		if (iPhone) {
 			$('#torrent_inspector').bind('click', function(e){ tr.hideInspector(); });
 			$('#preferences_link').bind('click', function(e){ tr.releaseClutchPreferencesButton(e); });
@@ -648,7 +650,23 @@ Transmission.prototype =
 	
 		this.updateVisibleFileLists();
 	},
-	
+
+	fileWantedClicked: function(event, element){
+		this.extractFileFromElement(element).fileWantedControlClicked(event);
+	},
+
+	filePriorityClicked: function(event, element){
+		this.extractFileFromElement(element).filePriorityControlClicked(event, element);
+	},
+
+	extractFileFromElement: function(element) {
+		var match = $(element).closest('.inspector_torrent_file_list_entry').attr('id').match(/^t(\d+)f(\d+)$/);
+		var torrent_id = match[1];
+		var file_id = match[2];
+		var torrent = Torrent.lookup( this._torrents, torrent_id );
+		return torrent._file_view[file_id];
+	},
+
 	toggleFilterClicked: function(event) {
 		if (this.isButtonEnabled(event))
 			this.toggleFilter();
@@ -1400,7 +1418,7 @@ Transmission.prototype =
 	changeFileCommand: function(command, torrent, file) {
 		this.remote.changeFileCommand(command, torrent, file)
 	},
-    
+
 	hideiPhoneAddressbar: function(timeInSeconds) {
 		if( iPhone ) {
 			var delayLength = timeInSeconds ? timeInSeconds*1000 : 150;

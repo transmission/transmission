@@ -663,6 +663,7 @@ TorrentFile.prototype = {
 		this.readAttributes(file_data);
 
 		var li = document.createElement('li');
+		li.id = 't' + this._torrent.id() + 'f' + this._index;
 		li.classNameConst = 'inspector_torrent_file_list_entry ' + ((this._index%2)?'odd':'even');
 		li.className = li.classNameConst;
 
@@ -688,9 +689,6 @@ TorrentFile.prototype = {
 		this._element = li;
 		this._priority_control = pri_div;
 		this._progress = $(prog_div);
-
-		$(wanted_div).bind('click', { file: this }, this.fileWantedControlClicked);
-		$(pri_div).bind('click', { file: this }, this.filePriorityControlClicked);
 	},
 
 	update: function(file_data) {
@@ -803,21 +801,20 @@ TorrentFile.prototype = {
 	},
 	
 	fileWantedControlClicked: function(event) {
-		event.data.file.toggleWanted();
+		this.toggleWanted();
 	},
 	
-	filePriorityControlClicked: function(event) {
+	filePriorityControlClicked: function(event, element) {
 		var x = event.pageX;
-		var target = this;
-		while (target !== null) {
-			x = x - target.offsetLeft;
-			target = target.offsetParent;
+		while (element !== null) {
+			x = x - element.offsetLeft;
+			element = element.offsetParent;
 		}
-		var file = event.data.file
+
 		var prio;
 		if( x < 12 ) prio = -1;
 		else if( x < 23 ) prio = 0;
 		else prio = 1;
-		file.setPriority( prio );
+		this.setPriority( prio );
 	}
 };
