@@ -13,6 +13,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 - Mac
    + Hold down the option key on launch to pause all transfers
 - Web Client
+   + Massive speed improvements that should make the web client more responsive when managing a large number of torrents
    + Fix 1.61 bug that broke adding torrents via the web client
    + Torrents added by URL were always paused, regardless of preferences
    + Comments and announce addresses were cut off in the inspector
