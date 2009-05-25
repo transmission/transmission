@@ -813,6 +813,7 @@ TorrentFile.prototype = {
 			x = x - target.offsetLeft;
 			target = target.offsetParent;
 		}
+		var file = event.data.file
 		var prio;
 		if( x < 12 ) prio = -1;
 		else if( x < 23 ) prio = 0;
