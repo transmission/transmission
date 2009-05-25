@@ -482,6 +482,8 @@ Torrent.prototype =
 
 	ensureFileListExists: function() {
 		if( this._file_view.length == 0 ) {
+			if(this._file_model.length == 1)
+				this._fileList.className += ' single_file';
 			var v, e;
 			for( var i=0; i<this._file_model.length; ++i ) {
 				v = new TorrentFile( this._file_model[i] );
