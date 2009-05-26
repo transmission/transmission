@@ -22,6 +22,7 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#import "InfoWindowController.h"
 #import "FileOutlineView.h"
 #import "FileNameCell.h"
 #import "FilePriorityCell.h"
@@ -86,8 +87,10 @@
 
 - (void) keyDown: (NSEvent *) event
 {
-    unichar firstChar = [[event charactersIgnoringModifiers] characterAtIndex: 0];
-    if (firstChar == ' ')
+    const unichar firstChar = [[event charactersIgnoringModifiers] characterAtIndex: 0];
+    
+    //don't allow quick look on add window
+    if (firstChar == ' ' && [[[self window] windowController] isKindOfClass: [InfoWindowController class]])
         [[QuickLookController quickLook] toggleQuickLook];
     else if (firstChar == NSRightArrowFunctionKey)
         [[QuickLookController quickLook] pressRight];
