@@ -137,7 +137,7 @@ TransmissionRemote.prototype =
 		var tr = this._controller;
 		this.sendRequest( {
 			method: 'torrent-get',
-			arguments: { fields: [ 'id', 'fileStats'], ids: torrent_ids },
+			arguments: { fields: [ 'id', 'fileStats'], ids: torrent_ids }
 		}, function(data) {
 			tr.updateTorrentsFileData( data.arguments.torrents );
 		} );
