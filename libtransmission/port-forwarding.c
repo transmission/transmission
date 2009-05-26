@@ -72,6 +72,11 @@ natPulse( tr_shared * s, tr_bool doPortCheck )
     int oldStatus;
     int newStatus;
 
+    if( s->natpmp == NULL )
+        s->natpmp = tr_natpmpInit( );
+    if( s->upnp == NULL )
+        s->upnp = tr_upnpInit( );
+
     oldStatus = tr_sharedTraversalStatus( s );
     s->natpmpStatus = tr_natpmpPulse( s->natpmp, port, isEnabled );
     s->upnpStatus = tr_upnpPulse( s->upnp, port, isEnabled, doPortCheck );
@@ -131,8 +136,6 @@ tr_sharedInit( tr_session  * session, tr_bool isEnabled )
     tr_shared * s = tr_new0( tr_shared, 1 );
 
     s->session      = session;
-    s->natpmp       = tr_natpmpInit( );
-    s->upnp         = tr_upnpInit( );
     s->isEnabled    = isEnabled;
     s->upnpStatus   = TR_PORT_UNMAPPED;
     s->natpmpStatus = TR_PORT_UNMAPPED;
@@ -167,7 +170,9 @@ stop_forwarding( tr_shared * s )
     tr_ninf( getKey( ), _( "Stopped" ) );
     natPulse( s, FALSE );
     tr_natpmpClose( s->natpmp );
+    s->natpmp = NULL;
     tr_upnpClose( s->upnp );
+    s->upnp = NULL;
     stop_timer( s );
 }
 
