@@ -3,19 +3,17 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 1.70 (2009/mm/dd)
 <http://trac.transmissionbt.com/query?milestone=1.70&group=component&groupdesc=1&order=severity>
 - All Platforms
-   + Distributed hash table (DHT) support
-   + Add ability to move a torrent's data and/or tell Transmission where to look for it
+   + Distributed hash table (DHT) support by Juliusz Chroboczek
+   + Add option to move a torrent's data on the disk
    + JSON RPC messages can be ~85% shorter, saving bandwidth and CPU
-   + Fix bug that could forget which port to use when connecting to some peers
    + Automatically pause torrents when verifying
-   + Fix phantom "verifying" that appears with another verify in progress
    + Fix small memory leaks
 - Mac
    + Hold down the option key on launch to pause all transfers
 - Web Client
-   + Massive speed improvements that should make the web client more responsive when managing a large number of torrents
+   + Big speed improvements, especially with big torrents
    + Fix 1.61 bug that broke adding torrents via the web client
-   + Allow multiple torrent files to be uploaded at a time in browsers that support "multiple" on file inputs
+   + Support uploading more than one torrent at a time
    + Torrents added by URL were always paused, regardless of preferences
    + Comments and announce addresses were cut off in the inspector
    + The "data remaining" field wasn't updated when the number reached 0
