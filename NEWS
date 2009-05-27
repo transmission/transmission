@@ -3,11 +3,11 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 1.70 (2009/mm/dd)
 <http://trac.transmissionbt.com/query?milestone=1.70&group=component&groupdesc=1&order=severity>
 - All Platforms
-   + Distributed hash table (DHT) support by Juliusz Chroboczek
+   + Distributed hash table (DHT) support
    + Add option to move a torrent's data on the disk
    + JSON RPC messages can be ~85% shorter, saving bandwidth and CPU
    + Automatically pause torrents when verifying
-   + Fix small memory leaks
+   + Fix small bugs and memory leaks
 - Mac
    + Hold down the option key on launch to pause all transfers
 - Web Client
@@ -19,8 +19,8 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + The "data remaining" field wasn't updated when the number reached 0
    + Smaller design adjustments
 - GTK+
-   + Fix intltool build problem 
-   + Make it clearer that the statusbar's ratio mode button is a button
+   + Fix intltool build problem
+   + Make it clearer that the status bar's ratio mode button is a button
    + Torrent comment box did not scroll, so long comments were partially hidden
 - Qt
    + Initial torrent list was sometimes incorrect
@@ -29,7 +29,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 
 1.54 (2009/xx/yy)
 - All Platforms
-   + Fix small memory leaks
+   + Fix small bugs and memory leaks
 - Web Client
    + Fix 1.53 bug that broke adding torrents via the web client
    + Torrents added by URL were always paused, regardless of preferences
@@ -38,7 +38,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Smaller design adjustments
 - GTK+
    + Fix intltool build error
-   + Make it clearer that the statusbar's ratio mode button is a button
+   + Make it clearer that the status bar's ratio mode button is a button
    + Torrent comment box did not scroll, so long comments were partially hidden
 
 1.61 (2009/05/11)
