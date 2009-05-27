@@ -484,6 +484,11 @@ Torrent.prototype =
 		}
 	},
 
+	deleteFiles: function(){
+		if (this._fileList)
+			$(this._fileList).remove();
+	},
+
 	/*
 	 * Return true if this torrent is selected
 	 */

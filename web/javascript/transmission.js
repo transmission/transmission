@@ -1239,6 +1239,7 @@ Transmission.prototype =
 
 				var pos = Torrent.indexOf( tr._torrents, torrent.id( ) );
 				torrent.hideFileList();
+				torrent.deleteFiles();
 				tr._torrents.splice( pos, 1 );
 			}
 		});
