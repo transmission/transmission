@@ -2,7 +2,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 
 1.54 (2009/xx/yy)
 - All Platforms
-   + Fix small memory leaks and remove dead code
+   + Fix small bugs and memory leaks
 - Web Client
    + Fix 1.53 bug that broke adding torrents via the web client
    + Torrents added by URL were always paused, regardless of preferences
@@ -11,8 +11,8 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Smaller design adjustments
 - GTK+
    + Fix intltool build error
-   + Make it clearer that the statusbar's ratio mode button is a button
-   + Torrent comment box did not scroll, so long comments are partially hidden
+   + Make it clearer that the status bar's ratio mode button is a button
+   + Torrent comment box did not scroll, so long comments were partially hidden
 
 1.53 (2009/05/11)
 This 1.5x maintenance release backports two bugfixes from 1.61.
