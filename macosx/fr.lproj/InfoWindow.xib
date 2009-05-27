@@ -2,13 +2,12 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.03">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">9G55</string>
+		<string key="IBDocument.SystemVersion">9J61</string>
 		<string key="IBDocument.InterfaceBuilderVersion">677</string>
-		<string key="IBDocument.AppKitVersion">949.43</string>
+		<string key="IBDocument.AppKitVersion">949.46</string>
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="1066"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -4283,7 +4282,7 @@ zijOSc5pzorOqs66ztvO+88czzzPXc99z57Pvs/fz+/QANAg0EHQYdCC0KLQw9Dj0PPRFNE00VXRddGW
 													<reference key="NSControlView" ref="40458268"/>
 													<int key="NSButtonFlags">1211912703</int>
 													<int key="NSButtonFlags2">2</int>
-													<object class="NSCustomResource" key="NSNormalImage" id="501497152">
+													<object class="NSCustomResource" key="NSNormalImage" id="766455788">
 														<string key="NSClassName">NSImage</string>
 														<string key="NSResourceName">NSSwitch</string>
 													</object>
@@ -4458,7 +4457,7 @@ zijOSc5pzorOqs66ztvO+88czzzPXc99z57Pvs/fz+/QANAg0EHQYdCC0KLQw9Dj0PPRFNE00VXRddGW
 				<string key="NSExtension">NSResponder</string>
 			</object>
 			<object class="NSCustomView" id="1005910882">
-				<reference key="NSNextResponder"/>
+				<nil key="NSNextResponder"/>
 				<int key="NSvFlags">258</int>
 				<object class="NSMutableArray" key="NSSubviews">
 					<bool key="EncodedWithXMLCoder">YES</bool>
@@ -4989,7 +4988,7 @@ zijOSc5pzorOqs66ztvO+88czzzPXc99z57Pvs/fz+/QANAg0EHQYdCC0KLQw9Dj0PPRFNE00VXRddGW
 							<reference key="NSControlView" ref="810746719"/>
 							<int key="NSButtonFlags">1211912703</int>
 							<int key="NSButtonFlags2">130</int>
-							<reference key="NSNormalImage" ref="501497152"/>
+							<reference key="NSNormalImage" ref="766455788"/>
 							<reference key="NSAlternateImage" ref="68311299"/>
 							<string key="NSAlternateContents"/>
 							<string key="NSKeyEquivalent"/>
@@ -5011,7 +5010,7 @@ zijOSc5pzorOqs66ztvO+88czzzPXc99z57Pvs/fz+/QANAg0EHQYdCC0KLQw9Dj0PPRFNE00VXRddGW
 							<reference key="NSControlView" ref="768062986"/>
 							<int key="NSButtonFlags">1211912703</int>
 							<int key="NSButtonFlags2">130</int>
-							<reference key="NSNormalImage" ref="501497152"/>
+							<reference key="NSNormalImage" ref="766455788"/>
 							<reference key="NSAlternateImage" ref="68311299"/>
 							<string key="NSAlternateContents"/>
 							<string key="NSKeyEquivalent"/>
@@ -5033,7 +5032,7 @@ zijOSc5pzorOqs66ztvO+88czzzPXc99z57Pvs/fz+/QANAg0EHQYdCC0KLQw9Dj0PPRFNE00VXRddGW
 							<reference key="NSControlView" ref="1068855235"/>
 							<int key="NSButtonFlags">1211912703</int>
 							<int key="NSButtonFlags2">130</int>
-							<reference key="NSNormalImage" ref="501497152"/>
+							<reference key="NSNormalImage" ref="766455788"/>
 							<reference key="NSAlternateImage" ref="68311299"/>
 							<string key="NSAlternateContents"/>
 							<string key="NSKeyEquivalent"/>
@@ -5054,10 +5053,11 @@ zijOSc5pzorOqs66ztvO+88czzzPXc99z57Pvs/fz+/QANAg0EHQYdCC0KLQw9Dj0PPRFNE00VXRddGW
 							<reference key="NSControlView" ref="1072112665"/>
 							<int key="NSButtonFlags">109199615</int>
 							<int key="NSButtonFlags2">129</int>
-							<object class="NSCustomResource" key="NSNormalImage" id="96088129">
+							<object class="NSCustomResource" key="NSNormalImage" id="917002598">
 								<string key="NSClassName">NSImage</string>
 								<string key="NSResourceName">PriorityHigh</string>
 							</object>
+							<reference key="NSAlternateImage" ref="26"/>
 							<string key="NSAlternateContents"/>
 							<string key="NSKeyEquivalent"/>
 							<int key="NSPeriodicDelay">400</int>
@@ -5090,7 +5090,7 @@ zijOSc5pzorOqs66ztvO+88czzzPXc99z57Pvs/fz+/QANAg0EHQYdCC0KLQw9Dj0PPRFNE00VXRddGW
 										<string key="NSKeyEquiv"/>
 										<int key="NSKeyEquivModMask">1048576</int>
 										<int key="NSMnemonicLoc">2147483647</int>
-										<reference key="NSImage" ref="96088129"/>
+										<reference key="NSImage" ref="917002598"/>
 										<reference key="NSOnImage" ref="1056605581"/>
 										<reference key="NSMixedImage" ref="1011917088"/>
 										<string key="NSAction">_popUpItemAction:</string>
@@ -5124,7 +5124,6 @@ zijOSc5pzorOqs66ztvO+88czzzPXc99z57Pvs/fz+/QANAg0EHQYdCC0KLQw9Dj0PPRFNE00VXRddGW
 					</object>
 				</object>
 				<string key="NSFrameSize">{351, 216}</string>
-				<reference key="NSSuperview"/>
 				<object class="NSMutableString" key="NSClassName">
 					<characters key="NS.bytes">NSView</characters>
 				</object>
@@ -6946,17 +6945,17 @@ zijOSc5pzorOqs66ztvO+88czzzPXc99z57Pvs/fz+/QANAg0EHQYdCC0KLQw9Dj0PPRFNE00VXRddGW
 							<reference ref="812134257"/>
 							<reference ref="409725024"/>
 							<reference ref="336556993"/>
+							<reference ref="903981168"/>
+							<reference ref="79835260"/>
 							<reference ref="51607095"/>
 							<reference ref="924921889"/>
 							<reference ref="535987563"/>
 							<reference ref="810746719"/>
 							<reference ref="1068855235"/>
 							<reference ref="768062986"/>
+							<reference ref="605860012"/>
 							<reference ref="533755866"/>
 							<reference ref="1072112665"/>
-							<reference ref="605860012"/>
-							<reference ref="903981168"/>
-							<reference ref="79835260"/>
 						</object>
 						<reference key="parent" ref="261172737"/>
 						<string key="objectName">Options</string>
@@ -8899,7 +8898,7 @@ zijOSc5pzorOqs66ztvO+88czzzPXc99z57Pvs/fz+/QANAg0EHQYdCC0KLQw9Dj0PPRFNE00VXRddGW
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
-					<string>{{445, 480}, {340, 347}}</string>
+					<string>{{445, 480}, {340, 365}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>{{0, 648}, {340, 347}}</string>
@@ -8916,7 +8915,7 @@ zijOSc5pzorOqs66ztvO+88czzzPXc99z57Pvs/fz+/QANAg0EHQYdCC0KLQw9Dj0PPRFNE00VXRddGW
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
-					<string>{{259, 371}, {351, 216}}</string>
+					<string>{{256, 611}, {351, 219}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>{{519, 803}, {351, 160}}</string>
@@ -8938,7 +8937,7 @@ zijOSc5pzorOqs66ztvO+88czzzPXc99z57Pvs/fz+/QANAg0EHQYdCC0KLQw9Dj0PPRFNE00VXRddGW
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
-					<string>{{373, 393}, {142, 54}}</string>
+					<string>{{334, 634}, {138, 54}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -9075,7 +9074,7 @@ zijOSc5pzorOqs66ztvO+88czzzPXc99z57Pvs/fz+/QANAg0EHQYdCC0KLQw9Dj0PPRFNE00VXRddGW
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{415, 366}, {382, 352}}</string>
+					<string>{{464, 366}, {382, 352}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>{{476, 437}, {380, 275}}</string>
@@ -9199,8 +9198,8 @@ zijOSc5pzorOqs66ztvO+88czzzPXc99z57Pvs/fz+/QANAg0EHQYdCC0KLQw9Dj0PPRFNE00VXRddGW
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
-					<string>{{0, 787}, {350, 75}}</string>
-					<string>{{0, 787}, {350, 75}}</string>
+					<string>{{0, 926}, {350, 75}}</string>
+					<string>{{0, 926}, {350, 75}}</string>
 					<reference ref="9"/>
 					<string>{{687, 827}, {350, 75}}</string>
 					<boolean value="NO"/>
@@ -9226,7 +9225,7 @@ zijOSc5pzorOqs66ztvO+88czzzPXc99z57Pvs/fz+/QANAg0EHQYdCC0KLQw9Dj0PPRFNE00VXRddGW
 					<string>InfoTabButtonCell</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
-					<string>{{0, 588}, {350, 268}}</string>
+					<string>{{0, 727}, {350, 268}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>{{519, 533}, {350, 268}}</string>
@@ -9284,7 +9283,7 @@ zijOSc5pzorOqs66ztvO+88czzzPXc99z57Pvs/fz+/QANAg0EHQYdCC0KLQw9Dj0PPRFNE00VXRddGW
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
-					<string>{{409, 566}, {360, 290}}</string>
+					<string>{{409, 632}, {360, 290}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>{{274, 636}, {360, 290}}</string>

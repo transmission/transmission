@@ -38,6 +38,9 @@
 /* Inspector -> Peers tab -> peers */
 "%d Connected" = "%d Connecté";
 
+/* Inspector -> Peers tab -> peers */
+"%d DHT" = "%d DHT";
+
 /* Dock item - Downloading */
 "%d Downloading" = "%d Téléchargements";
 
@@ -383,6 +386,9 @@
 "From: cache" = "De: cache";
 
 /* Inspector -> Peers tab -> table row tooltip */
+"From: distributed hash table" = "From: distributed hash table";
+
+/* Inspector -> Peers tab -> table row tooltip */
 "From: incoming connection" = "De: connexion entrante";
 
 /* Inspector -> Peers tab -> table row tooltip */
@@ -635,7 +641,7 @@
 "Priority Not Available" = "Priorité non disponible";
 
 /* Inspector -> private torrent */
-"Private Torrent, PEX automatically disabled" = "Torrent Privé, PEX désactivé automatiquement";
+"Private Torrent, PEX and DHT automatically disabled" = "Private Torrent, PEX and DHT automatically disabled";
 
 /* Message window -> table column */
 "Process" = "Processus";
@@ -728,9 +734,6 @@
 /* Torrent cell -> button info */
 "Resume the transfer right away" = "Reprend le transfert immédiatement.";
 
-/* File Outline -> Menu */
-"Reveal in Finder" = "Révéler dans le Finder";
-
 /* Torrent cell -> button info */
 "Reveal the data file in Finder" = "Révéler les données dans le Finder.";
 
@@ -743,11 +746,11 @@
 /* Torrent -> status string */
 "Seeding" = "Envoi";
 
-/* Torrent -> status string */
-"Seeding complete" = "Envoi terminé";
-
 /* Growl notification title */
 "Seeding Complete" = "Envoi terminé";
+
+/* Torrent -> status string */
+"Seeding complete" = "Envoi terminé";
 
 /* Torrent -> status string */
 "Seeding to %d of %d peers" = "Envoi à %1$d sur %2$d peers";
@@ -794,6 +797,9 @@
 
 /* View menu -> Filter Bar */
 "Show Filter Bar" = "Afficher la barre de filtre";
+
+/* File Outline -> Menu */
+"Show in Finder" = "Show in Finder";
 
 /* View menu -> Inspector */
 "Show Inspector" = "Afficher l'inspecteur";

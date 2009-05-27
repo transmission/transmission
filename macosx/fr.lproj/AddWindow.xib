@@ -2,9 +2,9 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.03">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">9G55</string>
+		<string key="IBDocument.SystemVersion">9J61</string>
 		<string key="IBDocument.InterfaceBuilderVersion">677</string>
-		<string key="IBDocument.AppKitVersion">949.43</string>
+		<string key="IBDocument.AppKitVersion">949.46</string>
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -242,7 +242,7 @@
 								<reference key="NSControlView" ref="999003967"/>
 								<int key="NSButtonFlags">1211912703</int>
 								<int key="NSButtonFlags2">2</int>
-								<object class="NSCustomResource" key="NSNormalImage" id="728328495">
+								<object class="NSCustomResource" key="NSNormalImage" id="579943977">
 									<string key="NSClassName">NSImage</string>
 									<string key="NSResourceName">NSSwitch</string>
 								</object>
@@ -453,7 +453,7 @@
 														<reference key="NSControlView" ref="591175582"/>
 														<int key="NSButtonFlags">1211912703</int>
 														<int key="NSButtonFlags2">2</int>
-														<reference key="NSNormalImage" ref="728328495"/>
+														<reference key="NSNormalImage" ref="579943977"/>
 														<reference key="NSAlternateImage" ref="240636852"/>
 														<string key="NSAlternateContents"/>
 														<string key="NSKeyEquivalent"/>
@@ -574,7 +574,7 @@
 								<reference key="NSControlView" ref="46983627"/>
 								<int key="NSButtonFlags">1211912703</int>
 								<int key="NSButtonFlags2">2</int>
-								<reference key="NSNormalImage" ref="728328495"/>
+								<reference key="NSNormalImage" ref="579943977"/>
 								<reference key="NSAlternateImage" ref="240636852"/>
 								<string key="NSAlternateContents"/>
 								<string key="NSKeyEquivalent"/>
@@ -810,7 +810,6 @@
 							<reference ref="887781818"/>
 							<reference ref="382094510"/>
 							<reference ref="471778487"/>
-							<reference ref="1065995789"/>
 							<reference ref="1059202456"/>
 							<reference ref="726814345"/>
 							<reference ref="698797028"/>
@@ -818,10 +817,11 @@
 							<reference ref="636183414"/>
 							<reference ref="533609783"/>
 							<reference ref="711151157"/>
-							<reference ref="224369214"/>
-							<reference ref="399642967"/>
 							<reference ref="46983627"/>
 							<reference ref="38073450"/>
+							<reference ref="399642967"/>
+							<reference ref="224369214"/>
+							<reference ref="1065995789"/>
 						</object>
 						<reference key="parent" ref="1005"/>
 					</object>
@@ -1243,7 +1243,7 @@
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{333, 417}, {173, 4}}</string>
+					<string>{{333, 415}, {122, 6}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>{{465, 481}, {173, 33}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
