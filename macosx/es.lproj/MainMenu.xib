@@ -2,9 +2,9 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.03">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">9G55</string>
+		<string key="IBDocument.SystemVersion">9J61</string>
 		<string key="IBDocument.InterfaceBuilderVersion">677</string>
-		<string key="IBDocument.AppKitVersion">949.43</string>
+		<string key="IBDocument.AppKitVersion">949.46</string>
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -752,7 +752,7 @@ AAAAAAAAAAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOQA</bytes>
 								</object>
 								<object class="NSMenuItem" id="234596448">
 									<reference key="NSMenu" ref="152009435"/>
-									<string key="NSTitle">Ocultar otros</string>
+									<string key="NSTitle">Ocultar Otros</string>
 									<string key="NSKeyEquiv">h</string>
 									<int key="NSKeyEquivModMask">1572864</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -761,7 +761,7 @@ AAAAAAAAAAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOQA</bytes>
 								</object>
 								<object class="NSMenuItem" id="58855747">
 									<reference key="NSMenu" ref="152009435"/>
-									<string key="NSTitle">Mostrar todos</string>
+									<string key="NSTitle">Mostrar Todos</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -1421,7 +1421,7 @@ AAAAAAAAAAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOQA</bytes>
 								</object>
 								<object class="NSMenuItem" id="522160989">
 									<reference key="NSMenu" ref="335948734"/>
-									<string key="NSTitle">Reanudar seleccionados ya</string>
+									<string key="NSTitle">Reanudar seleccionados</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -1540,7 +1540,7 @@ AAAAAAAAAAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOQA</bytes>
 								</object>
 								<object class="NSMenuItem" id="4006285">
 									<reference key="NSMenu" ref="986610193"/>
-									<string type="base64-UTF8" key="NSTitle">U2lndWllbnRlIHBlc3Rhw7FhIGRlbCBJbnNwZWN0b3I</string>
+									<string type="base64-UTF8" key="NSTitle">UGVzdGHDsWEgc2lndWllbnRlIGRlbCBJbnNwZWN0b3I</string>
 									<string type="base64-UTF8" key="NSKeyEquiv">75yDA</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -1549,7 +1549,7 @@ AAAAAAAAAAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOQA</bytes>
 								</object>
 								<object class="NSMenuItem" id="309590487">
 									<reference key="NSMenu" ref="986610193"/>
-									<string type="base64-UTF8" key="NSTitle">QW50ZXJpb3IgcGVzdGHDsWEgZGVsIEluc3BlY3Rvcg</string>
+									<string type="base64-UTF8" key="NSTitle">UGVzdGHDsWEgYW50ZXJpb3IgZGVsIEluc3BlY3Rvcg</string>
 									<string type="base64-UTF8" key="NSKeyEquiv">75yCA</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -1569,7 +1569,7 @@ AAAAAAAAAAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOQA</bytes>
 								</object>
 								<object class="NSMenuItem" id="942756568">
 									<reference key="NSMenu" ref="986610193"/>
-									<string type="base64-UTF8" key="NSTitle">U2lndWllbnRlIGNhbXBvIGRlIGLDunNxdWVkYQ</string>
+									<string type="base64-UTF8" key="NSTitle">Q2FtcG8gZGUgYsO6c3F1ZWRhIHNpZ3VpZW50ZQ</string>
 									<string type="base64-UTF8" key="NSKeyEquiv">75yDA</string>
 									<int key="NSKeyEquivModMask">1572864</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -1578,7 +1578,7 @@ AAAAAAAAAAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOQA</bytes>
 								</object>
 								<object class="NSMenuItem" id="505888664">
 									<reference key="NSMenu" ref="986610193"/>
-									<string type="base64-UTF8" key="NSTitle">QW50ZXJpb3IgY2FtcG8gZGUgYsO6c3F1ZWRhA</string>
+									<string type="base64-UTF8" key="NSTitle">Q2FtcG8gZGUgYsO6c3F1ZWRhIGFudGVyaW9yA</string>
 									<string type="base64-UTF8" key="NSKeyEquiv">75yCA</string>
 									<int key="NSKeyEquivModMask">1572864</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -1700,7 +1700,7 @@ AAAAAAAAAAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOQA</bytes>
 								</object>
 								<object class="NSMenuItem" id="86328102">
 									<reference key="NSMenu" ref="393698794"/>
-									<string key="NSTitle">Transmission Wiki y Desarrollo</string>
+									<string key="NSTitle">Wiki y Desarrollo de Transmission</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>

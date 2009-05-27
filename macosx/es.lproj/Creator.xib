@@ -2,9 +2,9 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.03">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">9G55</string>
+		<string key="IBDocument.SystemVersion">9J61</string>
 		<string key="IBDocument.InterfaceBuilderVersion">677</string>
-		<string key="IBDocument.AppKitVersion">949.43</string>
+		<string key="IBDocument.AppKitVersion">949.46</string>
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -38,7 +38,7 @@
 				<int key="NSWindowBacking">2</int>
 				<string key="NSWindowRect">{{432, 524}, {488, 392}}</string>
 				<int key="NSWTFlags">1881669632</int>
-				<string key="NSWindowTitle">Creador de torrents</string>
+				<string key="NSWindowTitle">Crear torrent</string>
 				<string key="NSWindowClass">NSWindow</string>
 				<object class="NSMutableString" key="NSViewClass">
 					<characters key="NS.bytes">View</characters>
@@ -522,7 +522,7 @@
 							<object class="NSTextFieldCell" key="NSCell" id="937588090">
 								<int key="NSCellFlags">67239424</int>
 								<int key="NSCellFlags2">71303168</int>
-								<string type="base64-UTF8" key="NSContents">aW5mb3JtYWNpw7NuIGRlIHBhcnRlcw</string>
+								<string type="base64-UTF8" key="NSContents">KEluZm9ybWFjacOzbiBzb2JyZSBwYXJ0ZXMpA</string>
 								<reference key="NSSupport" ref="364179855"/>
 								<reference key="NSControlView" ref="644564296"/>
 								<reference key="NSBackgroundColor" ref="119700158"/>
@@ -538,7 +538,7 @@
 							<object class="NSButtonCell" key="NSCell" id="813600242">
 								<int key="NSCellFlags">-2080244224</int>
 								<int key="NSCellFlags2">0</int>
-								<string key="NSContents">Abrir cuando sean creados</string>
+								<string type="base64-UTF8" key="NSContents">QWJyaXIgZGVzcHXDqXMgZGUgY3JlYXI</string>
 								<reference key="NSSupport" ref="364179855"/>
 								<reference key="NSControlView" ref="631380462"/>
 								<int key="NSButtonFlags">1211912703</int>

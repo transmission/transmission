@@ -2,9 +2,9 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.03">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">9G55</string>
+		<string key="IBDocument.SystemVersion">9J61</string>
 		<string key="IBDocument.InterfaceBuilderVersion">677</string>
-		<string key="IBDocument.AppKitVersion">949.43</string>
+		<string key="IBDocument.AppKitVersion">949.46</string>
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1910,7 +1910,7 @@
 						<object class="NSTextFieldCell" key="NSCell" id="446880501">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">272629760</int>
-							<string key="NSContents">Raspado</string>
+							<string key="NSContents">Descartes</string>
 							<reference key="NSSupport" ref="27"/>
 							<reference key="NSControlView" ref="755457391"/>
 							<reference key="NSBackgroundColor" ref="339856346"/>
@@ -1926,7 +1926,7 @@
 						<object class="NSTextFieldCell" key="NSCell" id="143050398">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">71303168</int>
-							<string type="base64-UTF8" key="NSContents">UHLDs3hpbW8gcmFzcGFkbzo</string>
+							<string type="base64-UTF8" key="NSContents">UHLDs3hpbW8gZGVzY2FydGU6A</string>
 							<reference key="NSSupport" ref="26"/>
 							<reference key="NSControlView" ref="528006672"/>
 							<reference key="NSBackgroundColor" ref="339856346"/>
@@ -1942,7 +1942,7 @@
 						<object class="NSTextFieldCell" key="NSCell" id="435725474">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">71303168</int>
-							<string type="base64-UTF8" key="NSContents">w5psdGltbyByYXNwYWRvOg</string>
+							<string type="base64-UTF8" key="NSContents">w5psdGltbyBkZXNjYXJ0ZTo</string>
 							<reference key="NSSupport" ref="26"/>
 							<reference key="NSControlView" ref="618198612"/>
 							<reference key="NSBackgroundColor" ref="339856346"/>
@@ -2669,7 +2669,7 @@ Q29weXJpZ2h0IEFwcGxlLCBJbmMuLCAyMDA5AA</bytes>
 						<object class="NSTextFieldCell" key="NSCell" id="816557032">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">71303168</int>
-							<string key="NSContents">Total Leechers:</string>
+							<string key="NSContents">Total leechers:</string>
 							<reference key="NSSupport" ref="26"/>
 							<reference key="NSControlView" ref="625925861"/>
 							<reference key="NSBackgroundColor" ref="339856346"/>
@@ -2685,7 +2685,7 @@ Q29weXJpZ2h0IEFwcGxlLCBJbmMuLCAyMDA5AA</bytes>
 						<object class="NSTextFieldCell" key="NSCell" id="771127591">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">71303168</int>
-							<string key="NSContents">Total Seeders:</string>
+							<string key="NSContents">Total seeders:</string>
 							<reference key="NSSupport" ref="26"/>
 							<reference key="NSControlView" ref="399586545"/>
 							<reference key="NSBackgroundColor" ref="339856346"/>
@@ -3655,7 +3655,7 @@ Q29weXJpZ2h0IEFwcGxlLCBJbmMuLCAyMDA5AA</bytes>
 						<object class="NSButtonCell" key="NSCell" id="44864906">
 							<int key="NSCellFlags">-2080244224</int>
 							<int key="NSCellFlags2">16908288</int>
-							<string type="base64-UTF8" key="NSContents">UXVlZGFyc2UgZGVudHJvIGRlIGxvcyBsw61taXRlcyBnbG9iYWxlcyBkZSBhbmNobyBkZSBiYW5kYQ</string>
+							<string type="base64-UTF8" key="NSContents">T2JlZGVjZXIgbMOtbWl0ZXMgZ2xvYmFsZXMgZGUgYW5jaG8gZGUgYmFuZGE</string>
 							<reference key="NSSupport" ref="26"/>
 							<reference key="NSControlView" ref="768062986"/>
 							<int key="NSButtonFlags">1211912703</int>
