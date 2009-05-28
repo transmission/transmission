@@ -31,7 +31,7 @@
 @interface Torrent (Private)
 
 - (id) initWithPath: (NSString *) path hash: (NSString *) hashString torrentStruct: (tr_torrent *) torrentStruct lib: (tr_session *) lib
-        publicTorrent: (NSNumber *) publicTorrent
+        publicTorrent: (NSNumber *) publicTorrent publicTorrentLocation: (NSString *) publicTorrentLoc
         downloadFolder: (NSString *) downloadFolder
         useIncompleteFolder: (NSNumber *) useIncompleteFolder incompleteFolder: (NSString *) incompleteFolder
         waitToStart: (NSNumber *) waitToStart
@@ -85,6 +85,7 @@ int trashDataFile(const char * filename)
 {
     self = [self initWithPath: path hash: nil torrentStruct: NULL lib: lib
             publicTorrent: torrentDelete != TORRENT_FILE_DEFAULT ? [NSNumber numberWithBool: torrentDelete == TORRENT_FILE_SAVE] : nil
+            publicTorrentLocation: path
             downloadFolder: location
             useIncompleteFolder: nil incompleteFolder: nil
             waitToStart: nil groupValue: nil addedTrackers: nil];
@@ -108,7 +109,7 @@ int trashDataFile(const char * filename)
 - (id) initWithTorrentStruct: (tr_torrent *) torrentStruct location: (NSString *) location lib: (tr_session *) lib
 {
     self = [self initWithPath: nil hash: nil torrentStruct: torrentStruct lib: lib
-            publicTorrent: [NSNumber numberWithBool: NO]
+            publicTorrent: [NSNumber numberWithBool: NO] publicTorrentLocation: nil
             downloadFolder: location
             useIncompleteFolder: nil incompleteFolder: nil
             waitToStart: nil groupValue: nil addedTrackers: nil];
@@ -122,6 +123,7 @@ int trashDataFile(const char * filename)
                 hash: [history objectForKey: @"TorrentHash"]
                 torrentStruct: NULL lib: lib
                 publicTorrent: [history objectForKey: @"PublicCopy"]
+                publicTorrentLocation: [history objectForKey: @"TorrentPath"]
                 downloadFolder: [history objectForKey: @"DownloadFolder"]
                 useIncompleteFolder: [history objectForKey: @"UseIncompleteFolder"]
                 incompleteFolder: [history objectForKey: @"IncompleteFolder"]
@@ -1593,7 +1595,7 @@ int trashDataFile(const char * filename)
 @implementation Torrent (Private)
 
 - (id) initWithPath: (NSString *) path hash: (NSString *) hashString torrentStruct: (tr_torrent *) torrentStruct lib: (tr_session *) lib
-        publicTorrent: (NSNumber *) publicTorrent
+        publicTorrent: (NSNumber *) publicTorrent publicTorrentLocation: (NSString *) publicTorrentLoc
         downloadFolder: (NSString *) downloadFolder
         useIncompleteFolder: (NSNumber *) useIncompleteFolder incompleteFolder: (NSString *) incompleteFolder
         waitToStart: (NSNumber *) waitToStart
@@ -1604,9 +1606,9 @@ int trashDataFile(const char * filename)
     
     fDefaults = [NSUserDefaults standardUserDefaults];
 
-    fPublicTorrent = path && (publicTorrent ? [publicTorrent boolValue] : ![fDefaults boolForKey: @"DeleteOriginalTorrent"]);
+    fPublicTorrent = publicTorrentLoc && (publicTorrent ? [publicTorrent boolValue] : ![fDefaults boolForKey: @"DeleteOriginalTorrent"]);
     if (fPublicTorrent)
-        fPublicTorrentLocation = [path retain];
+        fPublicTorrentLocation = [publicTorrentLoc retain];
     
     fDownloadFolder = downloadFolder ? downloadFolder : [fDefaults stringForKey: @"DownloadFolder"];
     fDownloadFolder = [[fDownloadFolder stringByExpandingTildeInPath] retain];
