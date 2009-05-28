@@ -5,12 +5,14 @@ dnl         "0" for stable, supported releases
 dnl these should be the only two lines you need to change
 m4_define([user_agent_prefix],[1.61+])
 m4_define([peer_id_prefix],[-TR161Z-])
+m4_define([svn_revision], esyscmd([sh -c "svnversion | sed -r 's/([0-9]+).*/\1/'"]))
 
 AC_INIT([transmission],
         [user_agent_prefix],
         [http://trac.transmissionbt.com/newticket])
 AC_SUBST(USERAGENT_PREFIX,[user_agent_prefix])
 AC_SUBST(PEERID_PREFIX,[peer_id_prefix])
+AC_SUBST(SVN_REVISION,[svn_revision])
 
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -352,6 +354,7 @@ AC_CONFIG_FILES([Makefile
                  daemon/Makefile
                  doc/Makefile
                  libtransmission/Makefile
+                 libtransmission/version.h
                  third-party/Makefile
                  third-party/miniupnp/Makefile
                  third-party/libnatpmp/Makefile

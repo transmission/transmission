@@ -102,6 +102,7 @@ noinst_HEADERS = \
     upnp.h \
     utils.h \
     verify.h \
+    version.h \
     web.h \
     webseed.h
 
@@ -169,22 +170,3 @@ peer_msgs_test_LDFLAGS = ${apps_ldflags}
 utils_test_SOURCES = utils-test.c
 utils_test_LDADD = ${apps_ldadd}
 utils_test_LDFLAGS = ${apps_ldflags}
-
-
-
-clean-local:
-	if test -d .svn; then if test -e version.h; then rm version.h; fi; fi;
-
-EXTRA_libtransmission_a_SOURCES = \
-    version.h
-
-BUILT_SOURCES = \
-    version.h
-
-version.h:
-	echo '#define PEERID_PREFIX         "'@PEERID_PREFIX@'"' > version.h
-	echo '#define USERAGENT_PREFIX      "'@USERAGENT_PREFIX@'"' >> version.h
-	echo '#define SVN_REVISION          "'`svnversion | sed -r 's/([0-9]+).*/\1/'`'"' >> version.h
-	echo '#define SVN_REVISION_NUM      '`svnversion | sed -r 's/([0-9]+).*/\1/'`'' >> version.h
-	echo '#define SHORT_VERSION_STRING  "'@USERAGENT_PREFIX@'"' >> version.h
-	echo '#define LONG_VERSION_STRING   "'@USERAGENT_PREFIX@' ('`svnversion | sed -r 's/([0-9]+).*/\1/'`')"' >> version.h
