@@ -94,8 +94,13 @@ callback( void *             vdata,
         case JSON_T_FLOAT:
         {
             char buf[128];
-            tr_snprintf( buf, sizeof( buf ), "%f",
-                         (double)value->vu.float_value );
+            char locale[128];
+
+            tr_strlcpy( locale, setlocale( LC_NUMERIC, NULL ), sizeof( locale ) );
+            setlocale( LC_NUMERIC, "POSIX" );
+            tr_snprintf( buf, sizeof( buf ), "%f", (double)value->vu.float_value );
+            setlocale( LC_NUMERIC, locale );
+
             tr_bencInitStr( getNode( data ), buf, -1 );
             data->hasContent = TRUE;
             break;
