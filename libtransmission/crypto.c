@@ -375,7 +375,7 @@ tr_ssha1( const void * plaintext )
     uint8_t sha[SHA_DIGEST_LENGTH];
     char buf[2*SHA_DIGEST_LENGTH + saltval_len + 2];
 
-    for( i=0; i<=saltval_len; ++i )
+    for( i=0; i<saltval_len; ++i )
         salt[i] = salter[ tr_cryptoRandInt( salter_len ) ];
 
     tr_sha1( sha, plaintext, strlen( plaintext ), salt, saltval_len, NULL );
