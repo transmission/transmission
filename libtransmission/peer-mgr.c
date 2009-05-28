@@ -1787,6 +1787,25 @@ tr_peerMgrTorrentStats( tr_torrent       * tor,
     managerUnlock( t->manager );
 }
 
+float
+tr_peerMgrGetWebseedSpeed( const tr_torrent * tor, uint64_t now )
+{
+    int i;
+    float tmp;
+    float ret = 0;
+
+    const Torrent * t = tor->torrentPeers;
+    const int n = tr_ptrArraySize( &t->webseeds );
+    const tr_webseed ** webseeds = (const tr_webseed**) tr_ptrArrayBase( &t->webseeds );
+
+    for( i=0; i<n; ++i )
+        if( tr_webseedGetSpeed( webseeds[i], now, &tmp ) )
+            ret += tmp;
+
+    return ret;
+}
+
+
 float*
 tr_peerMgrWebSpeeds( const tr_torrent * tor )
 {

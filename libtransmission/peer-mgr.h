@@ -173,6 +173,8 @@ void tr_peerMgrTorrentStats( tr_torrent * tor,
 struct tr_peer_stat* tr_peerMgrPeerStats( const tr_torrent * tor,
                                           int              * setmeCount );
 
+float tr_peerMgrGetWebseedSpeed( const tr_torrent * tor, uint64_t now );
+
 float* tr_peerMgrWebSpeeds( const tr_torrent * tor );
 
 
