@@ -170,10 +170,13 @@ AC_TRY_LINK([#include <stdarg.h>], [va_list ap1, ap2; va_copy(ap1, ap2);],
 dnl ----------------------------------------------------------------------------
 dnl
 dnl  libevent fun
+dnl
+dnl  we have to add the builddir into the include path because event-config.h
+dnl  is generated when libevent is build
 
 AC_CONFIG_SUBDIRS([third-party/libevent])
 AC_MSG_NOTICE([invoking libevent's configure script])
-LIBEVENT_CPPFLAGS="-I\$(top_srcdir)/third-party/libevent"
+LIBEVENT_CPPFLAGS="-I\$(top_srcdir)/third-party/libevent -I\$(top_builddir)/third-party/libevent"
 AC_SUBST(LIBEVENT_CPPFLAGS)
 
 
