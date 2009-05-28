@@ -619,7 +619,9 @@ torrentRealInit( tr_torrent * tor, const tr_ctor * ctor )
     if( !( loaded & TR_FR_SPEEDLIMIT ) )
     {
         tr_torrentUseSpeedLimit( tor, TR_UP, FALSE );
+        tr_torrentSetSpeedLimit( tor, TR_UP, tr_sessionGetSpeedLimit( tor->session, TR_UP ) );
         tr_torrentUseSpeedLimit( tor, TR_DOWN, FALSE );
+        tr_torrentSetSpeedLimit( tor, TR_DOWN, tr_sessionGetSpeedLimit( tor->session, TR_DOWN ) );
         tr_torrentUseSessionLimits( tor, TRUE );
     }
 
