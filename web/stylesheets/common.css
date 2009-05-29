@@ -545,7 +545,7 @@ div#inspector_tabs {
 	padding: 3px 15px; /* 3px == ((bg image height - fg image height) / 2) */
 	cursor: pointer;
 }
-#inspector_tabs > .selected {
+#inspector_tabs .selected {
 	background-position: left -26px; /* the highlighted part of the image */
 }
 .inspector_container {

@@ -1,5 +1,5 @@
 div.torrent_global_menu ul li {
-	width: 100px;
+	width: 87px;
 }
 div#torrent_container {
 	overflow-x: hidden;
@@ -7,9 +7,12 @@ div#torrent_container {
 div#torrent_container ul li {
 	padding-right: 40px;
 }
+li.torrent .torrent_progress_bar.incomplete{
+  margin-right: 0 !important;
+}
 li.torrent a div {
-	right: -2px;
-	top: -12px;
+	right: -5px;
+	top: 2px;
 }
 
 div.torrent_footer ul#settings_menu li#button:active,
@@ -54,4 +57,7 @@ div.torrent_footer ul#settings_menu li#button:hover {
 .trans_menu li .innerBox .outerbox {
 	top: auto !important;
 	bottom: 0px !important;
+}
+.dialog_container{
+  z-index: 4
 }
