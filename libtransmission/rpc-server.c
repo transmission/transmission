@@ -438,7 +438,7 @@ handle_clutch( struct evhttp_request * req,
         send_simple_response( req, HTTP_NOTFOUND,
             "<p>Couldn't find Transmission's web interface files!</p>"
             "<p>Users: to tell Transmission where to look, "
-            "set the TRANSMISSION_WEB_HOME environmental "
+            "set the TRANSMISSION_WEB_HOME environment "
             "variable to the folder where the web interface's "
             "index.html is located.</p>"
             "<p>Package Builders: to set a custom default at compile time, "

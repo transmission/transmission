@@ -17,6 +17,11 @@
 #ifndef TR_VERIFY_H
 #define TR_VERIFY_H 1
 
+/**
+ * @addtogroup file_io File IO
+ * @{
+ */
+
 typedef void ( *tr_verify_done_cb )( tr_torrent * tor );
 
 void tr_verifyAdd( tr_torrent *      tor,
@@ -27,5 +32,7 @@ void tr_verifyRemove( tr_torrent * tor );
 tr_bool tr_verifyInProgress( const tr_torrent * tor );
 
 void tr_verifyClose( tr_session * );
+
+/* @} */
 
 #endif

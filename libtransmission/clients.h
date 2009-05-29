@@ -10,6 +10,9 @@
  * $Id$
  */
 
+/**
+ * @ingroup utils
+ */
 void tr_clientForId( char       * buf,
                      size_t       buflen,
                      const void * peer_id );

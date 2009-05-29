@@ -412,16 +412,17 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
     /* No match */
     if( !*buf )
     {
-        struct evbuffer * out = tr_getBuffer( );
+        char out[32], *walk=out;
         const char *in, *in_end;
         for( in=(const char*)id, in_end=in+8; in!=in_end; ++in ) {
             if( isprint( *in ) )
-                evbuffer_add_printf( out, "%c", *in );
-            else
-                evbuffer_add_printf( out, "%%%02X", (unsigned int)*in );
+                *walk++ = *in;
+            else {
+                tr_snprintf( walk, out+sizeof(out)-walk, "%%%02X", (unsigned int)*in );
+                walk += 3;
+            }
         }
-
-        tr_strlcpy( buf, EVBUFFER_DATA( out ), buflen );
-        tr_releaseBuffer( out );
+        *walk = '\0';
+        tr_strlcpy( buf, out, buflen );
     }
 }

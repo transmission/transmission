@@ -18,6 +18,11 @@
 #define TR_PEER_H
 
 /**
+ * @addtogroup peers Peers
+ * @{
+ */
+
+/**
 *** Fields common to webseed and bittorrent peers
 **/
 
@@ -68,5 +73,7 @@ tr_peer_event;
 #ifdef WIN32
  #define EMSGSIZE WSAEMSGSIZE 
 #endif
+
+/** @} */
 
 #endif

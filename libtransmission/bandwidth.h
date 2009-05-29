@@ -23,6 +23,11 @@
 
 struct tr_peerIo;
 
+/**
+ * @addtogroup networked_io Networked IO
+ * @{
+ */
+
 /* these are PRIVATE IMPLEMENTATION details that should not be touched.
  * it's included in the header for inlining and composition. */
 enum
@@ -259,4 +264,5 @@ static TR_INLINE tr_bool tr_bandwidthAreParentLimitsHonored( tr_bandwidth  * ban
 void tr_bandwidthSetPeer( tr_bandwidth        * bandwidth,
                           struct tr_peerIo    * peerIo );
 
+/* @} */
 #endif

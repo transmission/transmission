@@ -32,6 +32,11 @@
 #include "transmission.h"
 
 /**
+ * @addtogroup utils Utilities
+ * @{
+ */
+
+/**
  * A simple pointer array that resizes itself dynamically.
  */
 typedef struct tr_ptrArray
@@ -110,4 +115,5 @@ void*         tr_ptrArrayFindSorted( tr_ptrArray * array,
                                      const void  * key,
                                      int compare(const void*, const void*) );
 
+/* @} */
 #endif

@@ -17,6 +17,11 @@
 #ifndef TR_NATPMP_H
 #define TR_NATPMP_H 1
 
+/** 
+ * @addtogroup port_forwarding Port Forwarding
+ * @{
+ */
+
 typedef struct tr_natpmp tr_natpmp;
 
 tr_natpmp * tr_natpmpInit( void );
@@ -27,4 +32,5 @@ int         tr_natpmpPulse(         tr_natpmp *,
                                 int port,
                                 int isEnabled );
 
+/* @} */
 #endif

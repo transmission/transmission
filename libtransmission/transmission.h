@@ -25,9 +25,8 @@
 /*
  * This file defines the public API for the libtransmission library.
  *
- * Other headers suitable for public consumption are bencode.h
- * and utils.h.  Most of the remaining headers in libtransmission
- * should be considered private to libtransmission.
+ * Other headers with a public API are bencode.h and utils.h.
+ * Most of the remaining headers in libtransmission are private.
  */
 #ifndef TR_TRANSMISSION_H
 #define TR_TRANSMISSION_H 1
@@ -36,7 +35,15 @@
 extern "C" {
 #endif
 
+/***
+****
+****  Basic Types
+****
+***/
+
 #include <inttypes.h> /* uintN_t */
+#include <time.h> /* time_t */
+
 #ifndef PRId64
  #define PRId64 "lld"
 #endif
@@ -46,9 +53,8 @@ extern "C" {
 #ifndef PRIu32
  #define PRIu32 "lu"
 #endif
-#include <time.h> /* time_t */
 
-#if defined( WIN32 ) && defined(_MSC_VER)
+#if defined(WIN32) && defined(_MSC_VER)
  #define TR_INLINE __inline
 #else
  #define TR_INLINE inline
@@ -57,68 +63,22 @@ extern "C" {
 #define SHA_DIGEST_LENGTH 20
 #define TR_INET6_ADDRSTRLEN 46
 
-#define TR_RPC_SESSION_ID_HEADER "X-Transmission-Session-Id"
-
 typedef uint32_t tr_file_index_t;
 typedef uint32_t tr_piece_index_t;
 typedef uint64_t tr_block_index_t;
 typedef uint16_t tr_port;
 typedef uint8_t tr_bool;
 
-enum
-{
-    TR_PRI_LOW    = -1,
-    TR_PRI_NORMAL =  0, /* since NORMAL is 0, memset initializes nicely */
-    TR_PRI_HIGH   =  1
-};
-
-typedef int8_t tr_priority_t;
-
-static TR_INLINE tr_bool tr_isPriority( tr_priority_t p )
-{
-    return ( p == TR_PRI_LOW )
-        || ( p == TR_PRI_NORMAL )
-        || ( p == TR_PRI_HIGH );
-}
-
-/**
- * @brief returns Transmission's default configuration file directory.
- *
- * The default configuration directory is determined this way:
- * 1. If the TRANSMISSION_HOME environmental variable is set, its value is used.
- * 2. On Darwin, "${HOME}/Library/Application Support/${appname}" is used.
- * 3. On Windows, "${CSIDL_APPDATA}/${appname}" is used.
- * 4. If XDG_CONFIG_HOME is set, "${XDG_CONFIG_HOME}/${appname}" is used.
- * 5. ${HOME}/.config/${appname}" is used as a last resort.
- */
-const char* tr_getDefaultConfigDir( const char * appname );
-
-/**
- * @brief returns Transmisson's default download directory.
- *
- * The default download directory is determined this way:
- * 1. If the HOME environmental variable is set, "${HOME}/Downloads" is used.
- * 2. On Windows, "${CSIDL_MYDOCUMENTS}/Downloads" is used.
- * 3. Otherwise, getpwuid(getuid())->pw_dir + "/Downloads" is used.
- */
-const char* tr_getDefaultDownloadDir( void );
-
 typedef struct tr_ctor tr_ctor;
 typedef struct tr_info tr_info;
 typedef struct tr_torrent tr_torrent;
 typedef struct tr_session tr_session;
 
+struct tr_benc;
 
-/**
- * @addtogroup tr_session Session
- *
- * A libtransmission session is created by calling tr_sessionInit().
- * libtransmission creates a thread for itself so that it can operate
- * independently of the caller's event loop.  The session will continue
- * until tr_sessionClose() is called.
- *
- * @{
- */
+typedef int8_t tr_priority_t;
+
+#define TR_RPC_SESSION_ID_HEADER "X-Transmission-Session-Id"
 
 typedef enum
 {
@@ -127,13 +87,6 @@ typedef enum
     TR_PREALLOCATE_FULL   = 2
 }
 tr_preallocation_mode;
-
-static TR_INLINE tr_bool tr_isPreallocationMode( tr_preallocation_mode m  )
-{
-    return ( m == TR_PREALLOCATE_NONE )
-        || ( m == TR_PREALLOCATE_SPARSE )
-        || ( m == TR_PREALLOCATE_FULL );
-}
 
 typedef enum
 {
@@ -151,23 +104,56 @@ typedef enum
 }
 tr_encryption_mode;
 
-static TR_INLINE tr_bool tr_isEncryptionMode( tr_encryption_mode m )
-{
-    return ( m == TR_CLEAR_PREFERRED )
-        || ( m == TR_ENCRYPTION_PREFERRED )
-        || ( m == TR_ENCRYPTION_REQUIRED );
-}
+
+/***
+****
+****  Startup & Shutdown
+****
+***/
+
+/**
+ * @addtogroup tr_session Session
+ *
+ * A libtransmission session is created by calling tr_sessionInit().
+ * libtransmission creates a thread for itself so that it can operate
+ * independently of the caller's event loop.  The session will continue
+ * until tr_sessionClose() is called.
+ *
+ * @{
+ */
+
+/**
+ * @brief returns Transmission's default configuration file directory.
+ *
+ * The default configuration directory is determined this way:
+ * -# If the TRANSMISSION_HOME environment variable is set, its value is used.
+ * -# On Darwin, "${HOME}/Library/Application Support/${appname}" is used.
+ * -# On Windows, "${CSIDL_APPDATA}/${appname}" is used.
+ * -# If XDG_CONFIG_HOME is set, "${XDG_CONFIG_HOME}/${appname}" is used.
+ * -# ${HOME}/.config/${appname}" is used as a last resort.
+ */
+const char* tr_getDefaultConfigDir( const char * appname );
+
+/**
+ * @brief returns Transmisson's default download directory.
+ *
+ * The default download directory is determined this way:
+ * -# If the HOME environment variable is set, "${HOME}/Downloads" is used.
+ * -# On Windows, "${CSIDL_MYDOCUMENTS}/Downloads" is used.
+ * -# Otherwise, getpwuid(getuid())->pw_dir + "/Downloads" is used.
+ */
+const char* tr_getDefaultDownloadDir( void );
 
 
-#define TR_DEFAULT_BIND_ADDRESS_IPV4 "0.0.0.0"
-#define TR_DEFAULT_BIND_ADDRESS_IPV6 "::"
-#define TR_DEFAULT_OPEN_FILE_LIMIT_STR "32"
-#define TR_DEFAULT_RPC_WHITELIST "127.0.0.1"
-#define TR_DEFAULT_RPC_PORT_STR "9091"
-#define TR_DEFAULT_PEER_PORT_STR "51413"
-#define TR_DEFAULT_PEER_SOCKET_TOS_STR "0"
-#define TR_DEFAULT_PEER_LIMIT_GLOBAL_STR "240"
-#define TR_DEFAULT_PEER_LIMIT_TORRENT_STR "60"
+#define TR_DEFAULT_BIND_ADDRESS_IPV4       "0.0.0.0"
+#define TR_DEFAULT_BIND_ADDRESS_IPV6            "::"
+#define TR_DEFAULT_OPEN_FILE_LIMIT_STR          "32"
+#define TR_DEFAULT_RPC_WHITELIST         "127.0.0.1"
+#define TR_DEFAULT_RPC_PORT_STR               "9091"
+#define TR_DEFAULT_PEER_PORT_STR             "51413"
+#define TR_DEFAULT_PEER_SOCKET_TOS_STR           "0"
+#define TR_DEFAULT_PEER_LIMIT_GLOBAL_STR       "240"
+#define TR_DEFAULT_PEER_LIMIT_TORRENT_STR       "60"
 
 #define TR_PREFS_KEY_ALT_SPEED_ENABLED          "alt-speed-enabled"
 #define TR_PREFS_KEY_ALT_SPEED_UP               "alt-speed-up"
@@ -218,7 +204,6 @@ static TR_INLINE tr_bool tr_isEncryptionMode( tr_encryption_mode m )
 #define TR_PREFS_KEY_USPEED                     "speed-limit-up"
 #define TR_PREFS_KEY_UPLOAD_SLOTS_PER_TORRENT   "upload-slots-per-torrent"
 
-struct tr_benc;
 
 /**
  * Add libtransmission's default settings to the benc dictionary.
@@ -243,7 +228,7 @@ struct tr_benc;
 void tr_sessionGetDefaultSettings( struct tr_benc * dictionary );
 
 /**
- * Add the session's configuration settings to the benc dictionary.
+ * Add the session's current configuration settings to the benc dictionary.
  *
  * FIXME: this probably belongs in libtransmissionapp
  *
@@ -261,7 +246,7 @@ void tr_sessionGetSettings( tr_session *, struct tr_benc * dictionary );
  *
  * @param dictionary pointer to an uninitialized tr_benc
  * @param configDir the configuration directory to find settings.json
- * @param appName if configDir is empty, appName is used to get the default config dir.
+ * @param appName if configDir is empty, appName is used to find the default dir.
  * @see tr_sessionGetDefaultSettings()
  * @see tr_sessionInit()
  * @see tr_sessionSaveSettings()
@@ -285,7 +270,7 @@ void tr_sessionSaveSettings( tr_session           * session,
                              const struct tr_benc * dictonary );
 
 /**
- * Initialize a libtransmission session.
+ * @brief Initialize a libtransmission session.
  *
  * For example, this will instantiate a session with all the default values:
  * @code
@@ -299,7 +284,7 @@ void tr_sessionSaveSettings( tr_session           * session,
  *     session = tr_sessionInit( "mac", configDir, true, &settings );
  *
  *     tr_bencFree( &settings );
- * @encode
+ * @endcode
  *
  * @param tag "gtk", "macosx", "daemon", etc... this is only for pre-1.30 resume files
  * @param configDir where Transmission will look for resume files, blocklists, etc.
@@ -319,10 +304,11 @@ tr_session * tr_sessionInit( const char     * tag,
 void tr_sessionClose( tr_session * );
 
 /**
- * @brief Return the session's configuration directory
+ * @brief Return the session's configuration directory.
  *
  * This is where transmission stores its .torrent files, .resume files,
- * blocklists, etc.
+ * blocklists, etc.  It's set in tr_transmissionInit() and is immutable
+ * during the session.
  */
 const char * tr_sessionGetConfigDir( const tr_session * );
 
@@ -332,8 +318,7 @@ const char * tr_sessionGetConfigDir( const tr_session * );
  * @see tr_sessionGetDownloadDir()
  * @see tr_ctorSetDownloadDir()
  */
-void tr_sessionSetDownloadDir( tr_session  * session,
-                               const char  * downloadDir );
+void tr_sessionSetDownloadDir( tr_session * session, const char * downloadDir );
 
 /**
  * @brief Get the default download folder for new torrents.
@@ -771,7 +756,7 @@ void    tr_blocklistSetEnabled   ( tr_session       * session,
 /** @} */
 
 
-/** @addtogroup tr_ctor Torrent Instantiation
+/** @addtogroup tr_ctor Torrent Constructors
     @{
 
     Instantiating a tr_torrent had gotten more complicated as features were
@@ -1030,6 +1015,12 @@ uint16_t      tr_torrentGetPeerLimit( const tr_torrent * tor );
 *****  File Priorities
 ****/
 
+enum
+{
+    TR_PRI_LOW    = -1,
+    TR_PRI_NORMAL =  0, /* since NORMAL is 0, memset initializes nicely */
+    TR_PRI_HIGH   =  1
+};
 
 /**
  * @brief Set a batch of files to a particular priority.
@@ -1084,6 +1075,7 @@ const char * tr_torrentGetDownloadDir( const tr_torrent * torrent );
 ***
 **/
 
+/** @brief a part of tr_info that represents a single tracker */
 typedef struct tr_tracker_info
 {
     int     tier;
@@ -1265,6 +1257,7 @@ void tr_torrentVerify( tr_torrent * torrent );
  * tr_info
  **********************************************************************/
 
+/** @brief a part of tr_info that represents a single file of the torrent's content */
 typedef struct tr_file
 {
     uint64_t            length;    /* Length of the file, in bytes */
@@ -1278,6 +1271,7 @@ typedef struct tr_file
 }
 tr_file;
 
+/** @brief a part of tr_info that represents a single piece of the torrent's content */
 typedef struct tr_piece
 {
     uint8_t    hash[SHA_DIGEST_LENGTH]; /* pieces hash */
@@ -1287,6 +1281,7 @@ typedef struct tr_piece
 }
 tr_piece;
 
+/** @brief information about a torrent that comes from its metainfo file */
 struct tr_info
 {
     /* Flags */
@@ -1581,25 +1576,24 @@ const tr_stat * tr_torrentStat( tr_torrent * torrent );
     reduce the CPU load if you're calling tr_torrentStat() frequently. */
 const tr_stat * tr_torrentStatCached( tr_torrent * torrent );
 
-/** @deprecated this method will be removed in 1.40 */
+/** @deprecated */
 void tr_torrentSetAddedDate( tr_torrent * torrent,
                              time_t       addedDate );
 
-/** @deprecated this method will be removed in 1.40 */
+/** @deprecated */
 void tr_torrentSetActivityDate( tr_torrent * torrent,
                                 time_t       activityDate );
 
-/** @deprecated this method will be removed in 1.40 */
-void tr_torrentSetDoneDate( tr_torrent  * torrent,
-                            time_t        doneDate );
+/** @deprecated */
+void tr_torrentSetDoneDate( tr_torrent * torrent, time_t doneDate );
+
+/** @} */
 
 /** @brief Sanity checker to test that the direction is TR_UP or TR_DOWN */
 static TR_INLINE tr_bool tr_isDirection( tr_direction d ) { return d==TR_UP || d==TR_DOWN; }
 
 /** @brief Sanity checker to test that a bool is TRUE or FALSE */
 static TR_INLINE tr_bool tr_isBool( tr_bool b ) { return b==1 || b==0; }
-
-/** @} */
 
 #ifdef __cplusplus
 }

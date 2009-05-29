@@ -29,6 +29,11 @@
 #include "transmission.h"
 #include "net.h"
 
+/**
+ * @addtogroup file_io File IO
+ * @{
+ */
+
 void tr_fdInit( size_t openFileLimit,
                 size_t globalPeerLimit );
 
@@ -111,3 +116,4 @@ void     tr_fdSetPeerLimit( uint16_t n );
 
 uint16_t tr_fdGetPeerLimit( void );
 
+/* @} */

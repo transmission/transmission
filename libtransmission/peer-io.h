@@ -35,6 +35,11 @@ struct tr_bandwidth;
 struct tr_crypto;
 struct tr_peerIo;
 
+/**
+ * @addtogroup networked_io Networked IO
+ * @{
+ */
+
 typedef enum
 {
     READ_NOW,
@@ -401,5 +406,6 @@ static TR_INLINE struct evbuffer * tr_peerIoGetReadBuffer( tr_peerIo * io )
     return io->inbuf;
 }
 
+/* @} */
 
 #endif

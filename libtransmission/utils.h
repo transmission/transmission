@@ -31,6 +31,11 @@ extern "C" {
 ****
 ***/
 
+/**
+ * @addtogroup utils Utilities
+ * @{ 
+ */
+
 #ifndef FALSE
  #define FALSE 0
 #endif
@@ -192,13 +197,15 @@ char*          tr_getLogTimeStr( char * buf,
 int            tr_wildmat( const char * text,
                            const char * pattern );
 
-/** a portability wrapper for basename(). */
-char*          tr_basename( const char * path ) TR_GNUC_MALLOC;
+/** @brief Portability wrapper for basename() that uses the system implementation if available */
+char* tr_basename( const char * path ) TR_GNUC_MALLOC;
 
-/** a portability wrapper for dirname(). */
-char*          tr_dirname( const char * path ) TR_GNUC_MALLOC;
+/** @brief Portability wrapper for dirname() that uses the system implementation if available */
+char* tr_dirname( const char * path ) TR_GNUC_MALLOC;
 
 /**
+ * @brief Portability wrapper for mkdir()
+ *
  * a portability wrapper around mkdir().
  * On WIN32, the `permissions' argument is unused.
  *
@@ -214,39 +221,39 @@ int            tr_mkdir( const char * path,
  * @return zero on success, or -1 if an error occurred
  * (in which case errno is set appropriately).
  */
-int            tr_mkdirp( const char * path,
-                          int          permissions );
+int tr_mkdirp( const char * path, int permissions );
 
 
 /**
- * Loads a file and returns its contents.
+ * @brief Loads a file and returns its contents.
  * On failure, NULL is returned and errno is set.
  */
-uint8_t*       tr_loadFile( const char * filename,
-                            size_t *     size ) TR_GNUC_MALLOC;
+uint8_t* tr_loadFile( const char * filename, size_t * size ) TR_GNUC_MALLOC;
 
 
-/* creates a filename from a series of elements using the
-   correct separator for filenames. */
-char*          tr_buildPath( const char * first_element, ... )
-                                              TR_GNUC_NULL_TERMINATED
-                                              TR_GNUC_MALLOC;
+/** @brief build a filename from a series of elements using the
+           platform's correct directory separator. */
+char* tr_buildPath( const char * first_element, ... ) TR_GNUC_NULL_TERMINATED
+                                                      TR_GNUC_MALLOC;
 
 struct timeval;
 
-void tr_timevalMsec( uint64_t           milliseconds,
-                     struct timeval   * setme );
+void tr_timevalMsec( uint64_t milliseconds, struct timeval   * setme );
 
 
-/* return the current date in milliseconds */
+/** @brief return the current date in milliseconds */
 uint64_t       tr_date( void );
 
-/* wait the specified number of milliseconds */
+/** @brief wait the specified number of milliseconds */
 void           tr_wait( uint64_t delay_milliseconds );
 
-char*          tr_utf8clean( const char  * str,
-                             int           max_len,
-                             tr_bool     * err );
+/**
+ * @brief make a copy of 'str' whose non-utf8 content has been corrected or stripped
+ * @param str the string to make a clean copy of
+ * @param len the length of the string to copy.  If -1, the entire string is used.
+ * @param err if an error occurs and err is non-NULL, it's set to TRUE.
+ */
+char* tr_utf8clean( const char * str, int len, tr_bool * err ) TR_GNUC_MALLOC;
 
 
 /***
@@ -268,8 +275,8 @@ void tr_releaseBuffer( struct evbuffer * buf );
 ****
 ***/
 
-/* Sometimes the system defines MAX/MIN, sometimes not. In the latter
-   case, define those here since we will use them */
+/* Sometimes the system defines MAX/MIN, sometimes not.
+   In the latter case, define those here since we will use them */
 #ifndef MAX
  #define MAX( a, b ) ( ( a ) > ( b ) ? ( a ) : ( b ) )
 #endif
@@ -337,19 +344,20 @@ char*       tr_base64_decode( const void * input,
                               int          inlen,
                               int *        outlen ) TR_GNUC_MALLOC;
 
-size_t      tr_strlcpy( char *       dst,
-                        const void * src,
-                        size_t       siz );
+/** @brief Portability wrapper for strlcpy() that uses the system implementation if available */
+size_t tr_strlcpy( char * dst, const void * src, size_t siz );
 
-int         tr_snprintf( char *       buf,
-                         size_t       buflen,
-                         const char * fmt,
-                         ... ) TR_GNUC_PRINTF( 3, 4 );
+/** @brief Portability wrapper for snprintf() that uses the system implementation if available */
+int tr_snprintf( char * buf, size_t buflen,
+                 const char * fmt, ... ) TR_GNUC_PRINTF( 3, 4 );
 
 const char* tr_strerror( int );
 
-char*       tr_strstrip( char * str );
+/** @brief strips leading and trailing whitspace from a string
+    @return the stripped string */
+char* tr_strstrip( char * str );
 
+/** @brief Portability wrapper for memmem() that uses the system implementation if available */
 const char* tr_memmem( const char * haystack, size_t haystack_len,
                        const char * needle, size_t needle_len );
 
@@ -454,7 +462,7 @@ static TR_INLINE tr_bool tr_bitfieldHas( const tr_bitfield * b, size_t nth )
 
 double tr_getRatio( double numerator, double denominator );
 
-int* tr_parseNumberRange( const char * str, int str_len, int * setmeCount );
+int* tr_parseNumberRange( const char * str, int str_len, int * setmeCount ) TR_GNUC_MALLOC;
 
 
 int tr_ptr2int( void* );
@@ -469,6 +477,7 @@ void* tr_int2ptr( int );
  */
 char* tr_strratio( char * buf, size_t buflen, double ratio, const char * infinity );
 
+/** @brief Portability wrapper for localtime_r() that uses the system implementation if available */
 struct tm * tr_localtime_r( const time_t *_clock, struct tm *_result );
 
 
@@ -479,5 +488,7 @@ int tr_moveFile( const char * oldpath, const char * newpath );
 #ifdef __cplusplus
 }
 #endif
+
+/** @} */
 
 #endif

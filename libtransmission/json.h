@@ -16,6 +16,7 @@
 extern "C" {
 #endif
 
+/** @ingroup tr_benc */
 int tr_jsonParse( const void *     vbuf,
                   size_t           len,
                   struct tr_benc * setme_benc,

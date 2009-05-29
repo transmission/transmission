@@ -20,6 +20,11 @@
 struct tr_torrent;
 
 /**
+ * @addtogroup file_io File IO
+ * @{
+ */
+
+/**
  * Reads the block specified by the piece index, offset, and length.
  * @return 0 on success, or an errno value on failure.
  */
@@ -62,4 +67,5 @@ void     tr_ioFindFileLocation( const tr_torrent * tor,
                                 uint64_t *         fileOffset );
 
 
+/* @} */
 #endif

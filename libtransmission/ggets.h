@@ -39,8 +39,8 @@
 extern "C" {
 #endif
 
-int fggets( char* *ln,
-            FILE * f );
+/** @ingroup utils */
+int fggets( char* *ln, FILE * f );
 
 #define ggets( ln ) fggets( ln, stdin )
 

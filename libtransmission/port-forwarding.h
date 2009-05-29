@@ -32,6 +32,11 @@
 #include "transmission.h"
 #include "net.h"
 
+/** 
+ * @addtogroup port_forwarding Port Forwarding
+ * @{
+ */
+
 struct tr_bindsockets;
 
 typedef struct tr_shared tr_shared;
@@ -50,4 +55,5 @@ tr_bool    tr_sharedTraversalIsEnabled( const tr_shared * s );
 
 int        tr_sharedTraversalStatus( const tr_shared * );
 
+/** @} */
 #endif

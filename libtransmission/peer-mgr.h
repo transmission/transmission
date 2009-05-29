@@ -26,6 +26,11 @@
 #include "net.h"
 #include "publish.h" /* tr_publisher_tag */
 
+/**
+ * @addtogroup peers Peers
+ * @{
+ */
+
 struct tr_peer_stat;
 struct tr_torrent;
 typedef struct tr_peerMgr tr_peerMgr;
@@ -181,5 +186,7 @@ float* tr_peerMgrWebSpeeds( const tr_torrent * tor );
 double tr_peerGetPieceSpeed( const tr_peer    * peer,
                              uint64_t           now,
                              tr_direction       direction );
+
+/* @} */
 
 #endif

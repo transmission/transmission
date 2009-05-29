@@ -21,6 +21,18 @@ extern "C" {
 
 struct evbuffer;
 
+/**
+ * @addtogroup tr_benc Variant
+ *
+ * An object that acts like a union for
+ * integers, strings, lists, dictionaries, booleans, and floating-point numbers.
+ * The structure is named tr_benc due to the historical reason that it was 
+ * originally tightly coupled with bencoded data.  It currently supports
+ * being parsed from, and serialized to, both bencoded notation and json notation.
+ *
+ * @{
+ */
+
 /* these are PRIVATE IMPLEMENTATION details that should not be touched.
  * it's included in the header for inlining and composition */
 enum
@@ -206,6 +218,8 @@ int tr_bencParseStr( const uint8_t *  buf,
 **/
 
 void  tr_bencMergeDicts( tr_benc * target, const tr_benc * source );
+
+/* @} */
 
 #ifdef __cplusplus
 }

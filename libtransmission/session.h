@@ -186,9 +186,30 @@ enum
     SESSION_MAGIC_NUMBER = 3845
 };
 
-static inline tr_bool tr_isSession( const tr_session * session )
+static TR_INLINE tr_bool tr_isSession( const tr_session * session )
 {
     return ( session != NULL ) && ( session->magicNumber == SESSION_MAGIC_NUMBER );
+}
+
+static TR_INLINE tr_bool tr_isPreallocationMode( tr_preallocation_mode m  )
+{
+    return ( m == TR_PREALLOCATE_NONE )
+        || ( m == TR_PREALLOCATE_SPARSE )
+        || ( m == TR_PREALLOCATE_FULL );
+}
+
+static TR_INLINE tr_bool tr_isEncryptionMode( tr_encryption_mode m )
+{
+    return ( m == TR_CLEAR_PREFERRED )
+        || ( m == TR_ENCRYPTION_PREFERRED )
+        || ( m == TR_ENCRYPTION_REQUIRED );
+}
+
+static TR_INLINE tr_bool tr_isPriority( tr_priority_t p )
+{
+    return ( p == TR_PRI_LOW )
+        || ( p == TR_PRI_NORMAL )
+        || ( p == TR_PRI_HIGH );
 }
 
 #endif

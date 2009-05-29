@@ -26,6 +26,12 @@
 **/
 
 struct evbuffer;
+
+/**
+ * @addtogroup utils Utilities
+ * @{ 
+ */
+
 typedef struct tr_crypto tr_crypto;
 
 /**
@@ -98,5 +104,7 @@ void           tr_cryptoRandBuf( unsigned char *buf,
 char*          tr_ssha1( const void * plaintext );
 
 tr_bool        tr_ssha1_matches( const char * source, const char * pass );
+
+/* @} */
 
 #endif

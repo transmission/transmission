@@ -20,7 +20,13 @@
 #include "transmission.h"
 #include "net.h"
 
+/** @addtogroup peers Peers
+    @{ */
+
 struct tr_peerIo;
+
+/** @brief opaque struct holding hanshake state information.
+           freed when the handshake is completed. */
 typedef struct tr_handshake tr_handshake;
 
 /* returns true on success, false on error */
@@ -30,6 +36,7 @@ typedef tr_bool ( *handshakeDoneCB )( struct tr_handshake * handshake,
                                       const uint8_t *       peerId,
                                       void *                userData );
 
+/** @brief instantiate a new handshake */
 tr_handshake *         tr_handshakeNew( struct tr_peerIo * io,
                                         tr_encryption_mode encryptionMode,
                                         handshakeDoneCB    doneCB,
@@ -45,4 +52,5 @@ struct tr_peerIo*      tr_handshakeGetIO( tr_handshake * handshake );
 struct tr_peerIo*      tr_handshakeStealIO( tr_handshake * handshake );
 
 
+/** @} */
 #endif

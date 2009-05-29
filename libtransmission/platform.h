@@ -30,6 +30,11 @@
 
 #define MAX_STACK_ARRAY_SIZE 7168
 
+/**
+ * @addtogroup utils Utilities
+ * @{ 
+ */
+
 typedef struct tr_lock   tr_lock;
 typedef struct tr_thread tr_thread;
 
@@ -72,5 +77,7 @@ long                munmap( void *ptr,
                             long  size );
 
 #endif
+
+/* @} */
 
 #endif
