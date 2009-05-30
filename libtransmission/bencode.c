@@ -19,6 +19,7 @@
 #include <string.h>
 
 #include <locale.h>
+#include <unistd.h> /* close() */
 
 #include <event.h> /* evbuffer */
 
@@ -26,6 +27,7 @@
 
 #include "transmission.h"
 #include "bencode.h"
+#include "fdlimit.h" /* tr_open_file_for_writing() */
 #include "json.h"
 #include "list.h"
 #include "ptrarray.h"
