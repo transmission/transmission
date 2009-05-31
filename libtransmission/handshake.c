@@ -744,7 +744,7 @@ readPeerId( tr_handshake    * handshake,
     /* if we've somehow connected to ourselves, don't keep the connection */
     tor = tr_torrentFindFromHash( handshake->session, tr_peerIoGetTorrentHash( handshake->io ) );
     tor_peer_id = tor && tor->peer_id ? tor->peer_id : tr_getPeerId( );
-    peerIsGood = memcmp( peer_id, tor->peer_id, PEER_ID_LEN ) != 0;
+    peerIsGood = memcmp( peer_id, tor_peer_id, PEER_ID_LEN ) != 0;
     dbgmsg( handshake, "isPeerGood == %d", peerIsGood );
     return tr_handshakeDone( handshake, peerIsGood );
 }
