@@ -33,13 +33,19 @@ function testSafari3()
 };
 
 $(document).ready( function() {
-	// Initialise a torrent controller to handle events
-	
 	// Initialise the dialog controller
 	dialog = new Dialog();
 	
 	// Initialise the main Transmission controller
 	transmission = new Transmission();
+
+	// IE specific fixes here
+	if ($.browser.msie) {
+		try {
+		  document.execCommand("BackgroundImageCache", false, true);
+		} catch(err) {}
+		$('.dialog_container').css('height',$(window).height()+'px');
+	}
 
 	if ($.browser.safari) {
 		// Move search field's margin down for the styled input

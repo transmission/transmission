@@ -20,16 +20,6 @@ Transmission.prototype =
 
 	initialize: function()
 	{
-		// IE specific fixes here
-		if ($.browser.msie) {
-			try {
-			  document.execCommand("BackgroundImageCache", false, true);
-			} catch(err) {}
-			$('head').append('<link media="screen" href="./stylesheets/common.css" type="text/css" rel="stylesheet" />');
-			$('head').append('<link media="screen" href="./stylesheets/ie'+$.browser.version.substr(0,1)+'.css" type="text/css" rel="stylesheet" />');
-			$('.dialog_container').css('height',$(window).height()+'px');
-		}
-		
 		// Initialize the helper classes
 		this.remote = new TransmissionRemote(this);
 
