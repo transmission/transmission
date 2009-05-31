@@ -539,6 +539,7 @@ div#inspector_tabs {
 }
 .inspector_tab {
 	float: left;
+	height: 17px;
 	background: transparent url('../images/buttons/tab_backgrounds.png') left -1px repeat-x;
 	border: 1px solid #888;
 	margin: 0px 1px;
