@@ -8,7 +8,7 @@ else
     svn_revision=`grep -oh '\$Id: [^ ]\+ [0-9]\+' */*\.cc */*\.cpp */*\.[chm] | cut -d ' ' -f 3 | sort | tail -n 1 -`
 fi
 
-cat > libtransmission/version.h.new << EOF
+cat > libtransmission/version.h << EOF
 #define PEERID_PREFIX         "${peer_id_prefix}"
 #define USERAGENT_PREFIX      "${user_agent_prefix}"
 #define SVN_REVISION          "${svn_revision}"
@@ -16,14 +16,3 @@ cat > libtransmission/version.h.new << EOF
 #define SHORT_VERSION_STRING  "${user_agent_prefix}"
 #define LONG_VERSION_STRING   "${user_agent_prefix} (${svn_revision})"
 EOF
-
-cmp -s libtransmission/version.h.new libtransmission/version.h
-cat libtransmission/version.h.new
-if [ $? -eq 0 ] # test exit status of "cmp" command.
-then
-  echo "no update needed to version.h"
-  rm libtransmission/version.h.new
-else  
-  echo "updated version.h"
-  mv libtransmission/version.h.new libtransmission/version.h
-fi

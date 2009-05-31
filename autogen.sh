@@ -22,7 +22,7 @@ then
 fi
 export LIBTOOLIZE
 
-update-version-h.sh
+./update-version-h.sh
 
 autoreconf -fi -I m4
 
