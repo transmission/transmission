@@ -320,8 +320,8 @@ TrOpenFile( int                      i,
     
     /* open the file */
     flags = doWrite ? ( O_RDWR | O_CREAT ) : O_RDONLY;
-#ifdef O_RANDOM
-    flags |= O_RANDOM
+#ifdef O_SEQUENTIAL
+    flags |= O_SEQUENTIAL;
 #endif
 #ifdef O_LARGEFILE
     flags |= O_LARGEFILE;
@@ -342,7 +342,7 @@ TrOpenFile( int                      i,
         preallocateFileSparse( file->fd, desiredFileSize );
 
 #ifdef HAVE_POSIX_FADVISE
-    posix_fadvise( file->fd, 0, 0, POSIX_FADV_RANDOM );
+    posix_fadvise( file->fd, 0, 0, POSIX_FADV_SEQUENTIAL );
 #endif
 
     tr_free( filename );
