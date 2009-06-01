@@ -357,14 +357,6 @@ tr_file_set_contents( const char *   filename,
 #endif
 
 static char*
-getCompat080PrefsFilename( void )
-{
-    assert( gl_confdir != NULL );
-
-    return g_build_filename( g_get_home_dir( ), ".transmission", "gtk", "prefs", NULL );
-}
-
-static char*
 getCompat090PrefsFilename( void )
 {
     assert( gl_confdir != NULL );
@@ -376,63 +368,6 @@ static char*
 getCompat121PrefsFilename( void )
 {
     return g_build_filename( g_get_user_config_dir( ), "transmission", "gtk", "prefs.ini", NULL );
-}
-
-static void
-translate_08_to_09( const char* oldfile,
-                    const char* newfile )
-{
-    static struct pref_entry {
-        const char*   oldkey;
-        const char*   newkey;
-    } pref_table[] = {
-        { "add-behavior-ipc",       "add-behavior-ipc"               },
-        { "add-behavior-standard",  "add-behavior-standard"          },
-        { "download-directory",     "default-download-directory"     },
-        { "download-limit",         "download-limit"                 },
-        { "use-download-limit",     "download-limit-enabled"         },
-        { "listening-port",         "listening-port"                 },
-        { "use-nat-traversal",      "nat-traversal-enabled"          },
-        { "use-peer-exchange",      "pex-enabled"                    },
-        { "ask-quit",               "prompt-before-exit"             },
-        { "ask-download-directory", "prompt-for-download-directory"  },
-        { "use-tray-icon",          "system-tray-icon-enabled"       },
-        { "upload-limit",           "upload-limit"                   },
-        { "use-upload-limit",       "upload-limit-enabled"           }
-    };
-
-    GString * out = g_string_new( NULL );
-    gchar *   contents = NULL;
-    gsize     contents_len = 0;
-    tr_benc   top;
-
-    memset( &top, 0, sizeof( tr_benc ) );
-
-    if( g_file_get_contents( oldfile, &contents, &contents_len, NULL )
-      && !tr_bencLoad( contents, contents_len, &top, NULL )
-      && tr_bencIsDict( &top ) )
-    {
-        unsigned int i;
-        g_string_append( out, "\n[general]\n" );
-        for( i = 0; i < G_N_ELEMENTS( pref_table ); ++i )
-        {
-            const tr_benc * val = tr_bencDictFind( &top,
-                                                   pref_table[i].oldkey );
-            if( val != NULL )
-            {
-                const char * valstr = val->val.s.s;
-                if( !strcmp( valstr, "yes" ) ) valstr = "true";
-                if( !strcmp( valstr, "no" ) ) valstr = "false";
-                g_string_append_printf( out, "%s=%s\n",
-                                        pref_table[i].newkey,
-                                        valstr );
-            }
-        }
-    }
-
-    g_file_set_contents( newfile, out->str, out->len, NULL );
-    g_string_free( out, TRUE );
-    g_free( contents );
 }
 
 static void
@@ -506,7 +441,6 @@ cf_check_older_configs( void )
     {
         char * key1 = getCompat121PrefsFilename( );
         char * key2 = getCompat090PrefsFilename( );
-        char * benc = getCompat080PrefsFilename( );
 
         if( g_file_test( key1, G_FILE_TEST_IS_REGULAR ) )
         {
@@ -518,18 +452,7 @@ cf_check_older_configs( void )
             g_message( _( "Importing \"%s\"" ), key2 );
             translate_keyfile_to_json( key2, filename );
         }
-        else if( g_file_test( benc, G_FILE_TEST_IS_REGULAR ) )
-        {
-            char * tmpfile;
-            int    fd = g_file_open_tmp( "transmission-prefs-XXXXXX", &tmpfile, NULL );
-            g_message( _( "Importing \"%s\"" ), benc );
-            if( fd != -1 ) close( fd );
-            translate_08_to_09( benc, tmpfile );
-            translate_keyfile_to_json( tmpfile, filename );
-            unlink( tmpfile );
-        }
 
-        g_free( benc );
         g_free( key2 );
         g_free( key1 );
     }
