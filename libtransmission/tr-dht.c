@@ -338,17 +338,21 @@ callback( void *ignore UNUSED, int event,
 int
 tr_dhtAnnounce(tr_torrent *tor, tr_bool announce)
 {
+    int rc;
+
     if( !tr_torrentAllowsDHT( tor ) )
         return -1;
 
     if( tr_dhtStatus( tor->session, NULL ) < TR_DHT_POOR )
         return 0;
 
-    dht_search( dht_socket, tor->info.hash,
-                announce ? tr_sessionGetPeerPort(session) : 0,
-                callback, NULL);
+    rc = dht_search( dht_socket, tor->info.hash,
+                     announce ? tr_sessionGetPeerPort(session) : 0,
+                     callback, NULL);
 
-    tor->dhtAnnounceInProgress = TRUE;
+    if( rc >= 1 )
+        tor->dhtAnnounceInProgress = TRUE;
+
     return 1;
 }
 
