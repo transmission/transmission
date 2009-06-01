@@ -1315,7 +1315,7 @@ readResponseIdle( void * vresponse )
     struct pending_request_data * data;
 
     response = vresponse;
-    tr_jsonParse( response->data, response->len, &top, NULL );
+    tr_jsonParse( NULL, response->data, response->len, &top, NULL );
     tr_bencDictFindInt( &top, "tag", &intVal );
     tag = (int)intVal;
 

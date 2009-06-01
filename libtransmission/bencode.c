@@ -1616,7 +1616,7 @@ tr_bencLoadJSONFile( const char * filename, tr_benc * b )
     else if( !content )
         err = ENODATA;
     else
-        err = tr_jsonParse( content, contentLen, b, NULL );
+        err = tr_jsonParse( filename, content, contentLen, b, NULL );
 
     tr_free( content );
     return err;

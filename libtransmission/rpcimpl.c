@@ -1397,7 +1397,7 @@ tr_rpc_request_exec_json( tr_session            * session,
     if( request_len < 0 )
         request_len = strlen( request_json );
 
-    have_content = !tr_jsonParse( request_json, request_len, &top, NULL );
+    have_content = !tr_jsonParse( "rpc", request_json, request_len, &top, NULL );
     request_exec( session, have_content ? &top : NULL, callback, callback_user_data );
 
     if( have_content )

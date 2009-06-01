@@ -624,7 +624,7 @@ Session :: parseResponse( const char * json, size_t jsonLength )
 {
     tr_benc top;
     const uint8_t * end( 0 );
-    const int err( tr_jsonParse( json, jsonLength, &top, &end ) );
+    const int err( tr_jsonParse( "rpc", json, jsonLength, &top, &end ) );
     if( !err )
     {
         int64_t tag = -1;

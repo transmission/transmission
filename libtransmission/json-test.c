@@ -43,7 +43,7 @@ test_utf8( void )
     int               err;
     struct evbuffer * buf = tr_getBuffer( );
 
-    err = tr_jsonParse( in, strlen( in ), &top, NULL );
+    err = tr_jsonParse( NULL, in, strlen( in ), &top, NULL );
     check( !err );
     check( tr_bencIsDict( &top ) );
     check( tr_bencDictFindStr( &top, "key", &str ) );
@@ -52,7 +52,7 @@ test_utf8( void )
         tr_bencFree( &top );
 
     in = "{ \"key\": \"\\u005C\" }";
-    err = tr_jsonParse( in, strlen( in ), &top, NULL );
+    err = tr_jsonParse( NULL, in, strlen( in ), &top, NULL );
     check( !err );
     check( tr_bencIsDict( &top ) );
     check( tr_bencDictFindStr( &top, "key", &str ) );
@@ -69,7 +69,7 @@ test_utf8( void )
      * 6. Confirm that the result is UTF-8.
      */
     in = "{ \"key\": \"Let\\u00f6lt\\u00e9sek\" }";
-    err = tr_jsonParse( in, strlen( in ), &top, NULL );
+    err = tr_jsonParse( NULL, in, strlen( in ), &top, NULL );
     check( !err );
     check( tr_bencIsDict( &top ) );
     check( tr_bencDictFindStr( &top, "key", &str ) );
@@ -80,7 +80,7 @@ test_utf8( void )
     check( json );
     check( strstr( json, "\\u00f6" ) != NULL );
     check( strstr( json, "\\u00e9" ) != NULL );
-    err = tr_jsonParse( json, strlen( json ), &top, NULL );
+    err = tr_jsonParse( NULL, json, strlen( json ), &top, NULL );
     check( !err );
     check( tr_bencIsDict( &top ) );
     check( tr_bencDictFindStr( &top, "key", &str ) );
@@ -112,7 +112,7 @@ test1( void )
     tr_benc      top, *headers, *body, *args, *ids;
     const char * str;
     int64_t      i;
-    const int    err = tr_jsonParse( in, strlen( in ), &top, NULL );
+    const int    err = tr_jsonParse( NULL, in, strlen( in ), &top, NULL );
 
     check( !err );
     check( tr_bencIsDict( &top ) );
@@ -147,7 +147,7 @@ test2( void )
     int err;
 
     top.type = 0;
-    err = tr_jsonParse( in, strlen( in ), &top, NULL );
+    err = tr_jsonParse( NULL, in, strlen( in ), &top, NULL );
 
     check( err );
     check( !tr_bencIsDict( &top ) );

@@ -1282,7 +1282,7 @@ processResponse( const char * host,
         fprintf( stderr, "got response (len %d):\n--------\n%*.*s\n--------\n",
                  (int)len, (int)len, (int)len, (const char*) response );
 
-    if( tr_jsonParse( response, len, &top, NULL ) )
+    if( tr_jsonParse( NULL, response, len, &top, NULL ) )
     {
         tr_nerr( MY_NAME, "Unable to parse response \"%*.*s\"", (int)len,
                  (int)len, (char*)response );

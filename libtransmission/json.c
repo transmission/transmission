@@ -134,7 +134,8 @@ callback( void *             vdata,
 }
 
 int
-tr_jsonParse( const void     * vbuf,
+tr_jsonParse( const char     * source,
+              const void     * vbuf,
               size_t           len,
               tr_benc        * setme_benc,
               const uint8_t ** setme_end )
@@ -170,7 +171,10 @@ tr_jsonParse( const void     * vbuf,
     }
 
     if( buf != bufend ) {
-        tr_err( "JSON parser failed at line %d, column %d: \"%.16s\"", line, column, buf );
+        if( source )
+            tr_err( "JSON parser failed in %s at line %d, column %d: \"%.16s\"", source, line, column, buf );
+        else
+            tr_err( "JSON parser failed at line %d, column %d: \"%.16s\"", line, column, buf );
         err = EILSEQ;
     }
 
