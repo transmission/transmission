@@ -3,7 +3,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 1.70 (2009/mm/dd)
 <http://trac.transmissionbt.com/query?milestone=1.70&group=component&groupdesc=1&order=severity>
 - All Platforms
-   + Distributed hash table (DHT) support
+   + Distributed hash table (DHT) support for public torrents
    + Add option to move a torrent's data on the disk
    + JSON RPC messages can be ~85% shorter, saving bandwidth and CPU
    + Automatically pause torrents when verifying
