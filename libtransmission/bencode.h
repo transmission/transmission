@@ -49,8 +49,6 @@ enum
  * it's included in the header for inlining and composition */
 typedef struct tr_benc
 {
-    char type;
-
     union
     {
         uint8_t b; /* bool type */
@@ -61,17 +59,22 @@ typedef struct tr_benc
 
         struct /* string type */
         {
-            size_t i; /* the string length */
-            char * s; /* the string */
+            size_t len; /* the string length */
+            union {
+                char buf[16]; /* a local buffer */
+                char * ptr; /* alloc'ed string */
+            } str;
         } s;
 
         struct /* list & dict types */
         {
+            struct tr_benc * vals; /* nodes */
             size_t alloc; /* nodes allocated */
             size_t count; /* nodes used */
-            struct tr_benc * vals; /* nodes */
         } l;
     } val;
+
+    char type;
 } tr_benc;
 
 /***
