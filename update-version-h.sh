@@ -7,7 +7,7 @@ peer_id_prefix=`grep m4_define configure.ac | sed "s/[][)(]/,/g" | grep peer_id_
 if [ -d .svn ]; then
     svn_revision=`svnversion -n | cut -d: -f1 | cut -dM -f1 | cut -dS -f1`
 else
-    svn_revision=`grep -oh '\$Id: [^ ]\+ [0-9]\+' */*\.cc */*\.[chm] | cut -d ' ' -f 3 | sort | tail -n 1 -`
+    svn_revision=`awk '/\$Id: /{ if ($4>i) i=$4 } END {print i}' */*.{cc,[chm]}`
 fi
 
 cat > libtransmission/version.h << EOF
