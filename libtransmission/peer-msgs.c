@@ -1734,6 +1734,7 @@ fillOutputBuffer( tr_peermsgs * msgs, time_t now )
                 tr_peerIoWriteUint8 ( io, out, BT_PIECE );
                 tr_peerIoWriteUint32( io, out, req.index );
                 tr_peerIoWriteUint32( io, out, req.offset );
+                /* FIXME(libevent2): use evbuffer_add_reference() */
                 tr_peerIoWriteBytes ( io, out, buf, req.length );
                 tr_peerIoWriteBuf( io, out, TRUE );
                 bytesWritten += EVBUFFER_LENGTH( out );
@@ -1843,6 +1844,7 @@ sendBitfield( tr_peermsgs * msgs )
     tr_peerIoWriteUint32( msgs->peer->io, out,
                           sizeof( uint8_t ) + field->byteCount );
     tr_peerIoWriteUint8 ( msgs->peer->io, out, BT_BITFIELD );
+    /* FIXME(libevent2): use evbuffer_add_reference() */
     tr_peerIoWriteBytes ( msgs->peer->io, out, field->bits, field->byteCount );
     dbgmsg( msgs, "sending bitfield... outMessage size is now %zu",
             EVBUFFER_LENGTH( out ) );

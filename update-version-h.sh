@@ -1,9 +1,11 @@
+echo "creating libtransmission/version.h"
+
 user_agent_prefix=`grep m4_define configure.ac | sed "s/[][)(]/,/g" | grep user_agent_prefix  | cut -d , -f 6`
 
 peer_id_prefix=`grep m4_define configure.ac | sed "s/[][)(]/,/g" | grep peer_id_prefix  | cut -d , -f 6`
 
 if [ -d .svn ]; then
-    svn_revision=`svnversion | sed -r 's/([0-9]+).*/\1/' `
+    svn_revision=`svnversion -n | cut -d: -f1 | cut -dM -f1 | cut -dS -f1`
 else
     svn_revision=`grep -oh '\$Id: [^ ]\+ [0-9]\+' */*\.cc */*\.[chm] | cut -d ' ' -f 3 | sort | tail -n 1 -`
 fi
