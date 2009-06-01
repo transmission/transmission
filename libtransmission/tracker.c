@@ -650,7 +650,7 @@ onScrapeResponse( tr_session * session,
 
                 if( tr_bencDictFindDict( tordict, "flags", &flags ) )
                     if( ( tr_bencDictFindInt( flags, "min_request_interval", &itmp ) ) )
-                        t->scrapeIntervalSec = i;
+                        t->scrapeIntervalSec = itmp;
 
                 /* as per ticket #1045, safeguard against trackers returning
                  * a very low min_request_interval... */
