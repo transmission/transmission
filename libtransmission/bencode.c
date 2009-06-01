@@ -1456,8 +1456,8 @@ tr_bencDictSize( const tr_benc * dict )
     return count;
 }
 
-static tr_bool
-tr_bencDictChild( const tr_benc * dict, size_t n, const char ** key, const tr_benc ** val )
+tr_bool
+tr_bencDictChild( tr_benc * dict, size_t n, const char ** key, tr_benc ** val )
 {
     tr_bool success = 0;
 
@@ -1486,10 +1486,10 @@ tr_bencMergeDicts( tr_benc * target, const tr_benc * source )
     for( i=0; i<sourceCount; ++i )
     {
         const char * key;
-        const tr_benc * val;
+        tr_benc * val;
         tr_benc * t;
 
-        if( tr_bencDictChild( source, i, &key, &val ) )
+        if( tr_bencDictChild( (tr_benc*)source, i, &key, &val ) )
         {
             if( tr_bencIsBool( val ) )
             {

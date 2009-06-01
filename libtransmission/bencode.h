@@ -163,6 +163,8 @@ tr_benc * tr_bencDictAddDict( tr_benc *, const char * key, size_t reserve );
 tr_benc * tr_bencDictAddRaw( tr_benc *, const char * key,
                              const void * raw, size_t rawlen );
 
+tr_bool   tr_bencDictChild( tr_benc *, size_t i, const char ** key, tr_benc ** val );
+
 tr_benc*  tr_bencDictFind( tr_benc *, const char * key );
 
 tr_bool   tr_bencDictFindList( tr_benc *, const char * key, tr_benc ** setme );
