@@ -613,6 +613,7 @@ Session :: onRequestFinished( int id, bool error )
         parseResponse( json, jsonLength );
     }
 
+    delete sourceDevice;
     myBuffer.buffer( ).clear( );
     myBuffer.reset( );
     assert( myBuffer.bytesAvailable( ) < 1 );
