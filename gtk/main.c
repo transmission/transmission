@@ -1142,9 +1142,7 @@ about( GtkWindow * parent )
     {
         "Charles Kerr (Backend; GTK+)",
         "Mitchell Livingston (Backend; OS X)",
-        "Eric Petit (Backend; OS X)",
-        "Josh Elsasser (Daemon; Backend; GTK+)",
-        "Bryan Varner (BeOS)",
+        "Kevin Glowacz (Web client)"
         NULL
     };
 
