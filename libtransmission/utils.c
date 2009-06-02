@@ -270,8 +270,9 @@ tr_deepLog( const char  * file,
         evbuffer_add_vprintf( buf, fmt, args );
         va_end( args );
         evbuffer_add_printf( buf, " (%s:%d)\n", base, line );
+        /* FIXME(libevent2) ifdef this out for nonwindows platforms */
         OutputDebugString( EVBUFFER_DATA( buf ) );
-        if(fp)
+        if(fp) /* FIXME(libevent2) tr_getLog() should return an fd, then use evbuffer_write() here ) */
             (void) fwrite( EVBUFFER_DATA( buf ), 1, EVBUFFER_LENGTH( buf ), fp );
 
         tr_free( base );

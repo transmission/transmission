@@ -1339,6 +1339,11 @@ tr_torrentCloseLocalFiles( const tr_torrent * tor )
 
     assert( tr_isTorrent( tor ) );
 
+    /* FIXME(libevent2) we're just using the evbuffer to build a key here anyway.
+       so we do (tor->info.fileCount * fd.openFileLimit) strcmps for these keys. :/
+       it would be more efficient to remove this code altogether and
+       add "int torrentId;" to "struct tr_openfile", and a new function
+       tr_fdCloseTorrentFiles( tr_session*, int torrentId ) */
     for( i=0; i<tor->info.fileCount; ++i )
     {
         const tr_file * file = &tor->info.files[i];

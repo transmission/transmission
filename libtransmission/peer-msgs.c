@@ -219,6 +219,7 @@ myDebug( const char * file, int line,
         evbuffer_add_vprintf( buf, fmt, args );
         va_end( args );
         evbuffer_add_printf( buf, " (%s:%d)\n", base, line );
+        /* FIXME(libevent2) tr_getLog() should return an fd, then use evbuffer_write() here */
         fwrite( EVBUFFER_DATA( buf ), 1, EVBUFFER_LENGTH( buf ), fp );
 
         tr_free( base );
@@ -1718,6 +1719,7 @@ fillOutputBuffer( tr_peermsgs * msgs, time_t now )
         if( requestIsValid( msgs, &req )
             && tr_cpPieceIsComplete( &msgs->torrent->completion, req.index ) )
         {
+            /* FIXME(libevent2): we can eliminate "buf" and an extra memcpy if we create an evbuffer here, add the message header, then use evbuffer_reserve_space() + tr_ioRead() + evbuffer_commit_space() */
             int err;
             static uint8_t buf[MAX_BLOCK_SIZE];
 
@@ -1734,7 +1736,6 @@ fillOutputBuffer( tr_peermsgs * msgs, time_t now )
                 tr_peerIoWriteUint8 ( io, out, BT_PIECE );
                 tr_peerIoWriteUint32( io, out, req.index );
                 tr_peerIoWriteUint32( io, out, req.offset );
-                /* FIXME(libevent2): use evbuffer_add_reference() */
                 tr_peerIoWriteBytes ( io, out, buf, req.length );
                 tr_peerIoWriteBuf( io, out, TRUE );
                 bytesWritten += EVBUFFER_LENGTH( out );

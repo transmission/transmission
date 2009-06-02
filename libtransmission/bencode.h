@@ -34,6 +34,7 @@ struct evbuffer;
  */
 
 /* these are PRIVATE IMPLEMENTATION details that should not be touched.
+ * I'll probably change them just to break your code! HA HA HA!
  * it's included in the header for inlining and composition */
 enum
 {
@@ -45,7 +46,8 @@ enum
     TR_TYPE_REAL = 32
 };
    
-/* these are PRIVATE IMPLEMENTATION details that should not be touched.
+/* These are PRIVATE IMPLEMENTATION details that should not be touched.
+ * I'll probably change them just to break your code! HA HA HA!
  * it's included in the header for inlining and composition */
 typedef struct tr_benc
 {
@@ -61,8 +63,8 @@ typedef struct tr_benc
         {
             size_t len; /* the string length */
             union {
-                char buf[16]; /* a local buffer */
-                char * ptr; /* alloc'ed string */
+                char buf[16]; /* local buffer for short strings */
+                char * ptr; /* alloc'ed pointer for long strings */
             } str;
         } s;
 
@@ -108,7 +110,7 @@ void      tr_bencInitBool( tr_benc *, int value );
 void      tr_bencInitReal( tr_benc *, double value );
 
 /***
-****
+****  Serialization / Deserialization
 ***/
 
 typedef enum
@@ -123,7 +125,7 @@ int tr_bencToFile( const tr_benc *, tr_fmt_mode, const char * filename );
 
 char* tr_bencToStr( const tr_benc *, tr_fmt_mode, int * len );
 
-void  tr_bencToBuf( const tr_benc *, tr_fmt_mode, struct evbuffer * );
+void tr_bencToBuf( const tr_benc *, tr_fmt_mode, struct evbuffer * );
 
 /* TR_FMT_JSON_LEAN and TR_FMT_JSON are equivalent in this function. */
 int tr_bencLoadFile( tr_benc * setme, tr_fmt_mode, const char * filename );
@@ -229,6 +231,7 @@ int tr_bencParseStr( const uint8_t *  buf,
 ***
 **/
 
+/* this is only quasi-supported.  don't rely on it too heavily outside of libT */
 void  tr_bencMergeDicts( tr_benc * target, const tr_benc * source );
 
 /* @} */

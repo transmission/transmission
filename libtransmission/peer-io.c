@@ -683,6 +683,7 @@ tr_peerIoWrite( tr_peerIo   * io,
                 size_t        byteCount,
                 tr_bool       isPieceData )
 {
+    /* FIXME(libevent2): this implementation snould be moved to tr_peerIoWriteBuf.   This function should be implemented as evbuffer_new() + evbuffer_add_reference() + a call to tr_peerIoWriteBuf() + evbuffer_free() */
     struct tr_datatype * datatype;
 
     assert( tr_amInEventThread( io->session ) );
@@ -699,6 +700,7 @@ tr_peerIoWrite( tr_peerIo   * io,
     {
         case PEER_ENCRYPTION_RC4:
         {
+            /* FIXME(libevent2): use evbuffer_reserve_space() and evbuffer_commit_space() instead of tmp */
             uint8_t tmp[MAX_STACK_ARRAY_SIZE];
             const uint8_t * walk = bytes;
             evbuffer_expand( io->outbuf, byteCount );
@@ -728,6 +730,7 @@ tr_peerIoWriteBuf( tr_peerIo         * io,
                    struct evbuffer   * buf,
                    tr_bool             isPieceData )
 {
+    /* FIXME(libevent2): loop through calls to evbuffer_get_contiguous_space() + evbuffer_drain() */
     const size_t n = EVBUFFER_LENGTH( buf );
     tr_peerIoWrite( io, EVBUFFER_DATA( buf ), n, isPieceData );
     evbuffer_drain( buf, n );
@@ -744,6 +747,7 @@ tr_peerIoReadBytes( tr_peerIo       * io,
                     size_t            byteCount )
 {
     assert( tr_isPeerIo( io ) );
+    /* FIXME(libevent2): use evbuffer_get_length() */
     assert( EVBUFFER_LENGTH( inbuf ) >= byteCount );
 
     switch( io->encryptionMode )
@@ -753,6 +757,7 @@ tr_peerIoReadBytes( tr_peerIo       * io,
             break;
 
         case PEER_ENCRYPTION_RC4:
+            /* FIXME(libevent2): loop through calls to evbuffer_get_contiguous_space() + evbuffer_drain() */
             tr_cryptoDecrypt( io->crypto, byteCount, EVBUFFER_DATA(inbuf), bytes );
             evbuffer_drain(inbuf, byteCount );
             break;

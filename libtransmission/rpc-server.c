@@ -324,6 +324,9 @@ add_response( struct evhttp_request * req,
     {
         int state;
 
+        /* FIXME(libevent2): this won't compile under libevent2.
+           but we can use evbuffer_reserve_space() + evbuffer_commit_space() instead */
+
         server->stream.next_in = (Bytef*) content;
         server->stream.avail_in = content_len;
 
@@ -478,6 +481,7 @@ struct rpc_response_data
     struct tr_rpc_server  * server;
 };
 
+/* FIXME(libevent2): make "response" an evbuffer and remove response_len */
 static void
 rpc_response_func( tr_session      * session UNUSED,
                    const char      * response,
