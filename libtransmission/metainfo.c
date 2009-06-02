@@ -366,8 +366,8 @@ tr_metainfoParseImpl( const tr_session * session,
         return "info";
     else
     {
-        int    len;
-        char * bstr = tr_bencSave( beInfo, &len );
+        int len;
+        char * bstr = tr_bencToStr( beInfo, TR_FMT_BENC, &len );
         tr_sha1( inf->hash, bstr, len, NULL );
         tr_sha1_to_hex( inf->hashString, inf->hash );
         tr_free( bstr );

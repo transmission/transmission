@@ -632,9 +632,7 @@ readargs( int           argc,
 
         if( addArg )
         {
-            struct evbuffer * buf = tr_getBuffer( );
-            reqs[reqCount++] = tr_strdup( tr_bencSaveAsJSON( &top, buf, FALSE ) );
-            tr_releaseBuffer( buf );
+            reqs[reqCount++] = tr_bencToStr( &top, TR_FMT_JSON_LEAN, NULL );
         }
 
         tr_bencFree( &top );

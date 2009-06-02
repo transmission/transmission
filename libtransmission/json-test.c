@@ -41,7 +41,6 @@ test_utf8( void )
     const char      * str;
     char            * json;
     int               err;
-    struct evbuffer * buf = tr_getBuffer( );
 
     err = tr_jsonParse( NULL, in, strlen( in ), &top, NULL );
     check( !err );
@@ -74,7 +73,7 @@ test_utf8( void )
     check( tr_bencIsDict( &top ) );
     check( tr_bencDictFindStr( &top, "key", &str ) );
     check( !strcmp( str, "Letöltések" ) );
-    json = tr_bencSaveAsJSON( &top, buf, TRUE );
+    json = tr_bencToStr( &top, TR_FMT_JSON, NULL );
     if( !err )
         tr_bencFree( &top );
     check( json );
@@ -89,7 +88,6 @@ test_utf8( void )
         tr_bencFree( &top );
     tr_free( json );
 
-    tr_releaseBuffer( buf );
     return 0;
 }
 

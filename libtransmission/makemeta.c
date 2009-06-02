@@ -417,7 +417,7 @@ tr_realMakeMetaInfo( tr_metainfo_builder * builder )
     /* save the file */
     if( !builder->result && !builder->abortFlag )
     {
-        if( tr_bencSaveFile( builder->outputFile, &top ) )
+        if( tr_bencToFile( &top, TR_FMT_BENC, builder->outputFile ) )
         {
             builder->my_errno = errno;
             tr_strlcpy( builder->errfile, builder->outputFile,

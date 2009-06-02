@@ -991,7 +991,7 @@ sendLtepHandshake( tr_peermsgs * msgs )
     m  = tr_bencDictAddDict( &val, "m", 1 );
     if( pex )
         tr_bencDictAddInt( m, "ut_pex", TR_LTEP_PEX );
-    buf = tr_bencSave( &val, &len );
+    buf = tr_bencToStr( &val, TR_FMT_BENC, &len );
 
     tr_peerIoWriteUint32( msgs->peer->io, out, 2 * sizeof( uint8_t ) + len );
     tr_peerIoWriteUint8 ( msgs->peer->io, out, BT_LTEP );
@@ -2066,7 +2066,7 @@ sendPex( tr_peermsgs * msgs )
             tr_free( tmp );
 
             /* write the pex message */
-            benc = tr_bencSave( &val, &bencLen );
+            benc = tr_bencToStr( &val, TR_FMT_BENC, &bencLen );
             tr_peerIoWriteUint32( io, out, 2 * sizeof( uint8_t ) + bencLen );
             tr_peerIoWriteUint8 ( io, out, BT_LTEP );
             tr_peerIoWriteUint8 ( io, out, msgs->ut_pex_id );

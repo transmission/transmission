@@ -51,13 +51,13 @@ loadCumulativeStats( const tr_session * session,
     tr_benc top;
 
     filename = getFilename( session );
-    loaded = !tr_bencLoadJSONFile( filename, &top );
+    loaded = !tr_bencLoadFile( &top, TR_FMT_JSON, filename );
     tr_free( filename );
 
     if( !loaded )
     {
         filename = getOldFilename( session );
-        loaded = !tr_bencLoadFile( filename, &top );
+        loaded = !tr_bencLoadFile( &top, TR_FMT_BENC, filename );
         tr_free( filename );
     }
 
@@ -96,7 +96,7 @@ saveCumulativeStats( const tr_session * session,
 
     filename = getFilename( session );
     tr_deepLog( __FILE__, __LINE__, NULL, "Saving stats to \"%s\"", filename );
-    tr_bencSaveJSONFile( filename, &top );
+    tr_bencToFile( &top, TR_FMT_JSON, filename );
 
     tr_free( filename );
     tr_bencFree( &top );

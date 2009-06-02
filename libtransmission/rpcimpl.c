@@ -86,17 +86,17 @@ struct tr_rpc_idle_data
 static void
 tr_idle_function_done( struct tr_rpc_idle_data * data, const char * result )
 {
-    struct evbuffer * buf = tr_getBuffer( );
+    struct evbuffer * buf = evbuffer_new( );
 
     if( result == NULL )
         result = "success";
     tr_bencDictAddStr( data->response, "result", result );
 
-    tr_bencSaveAsJSON( data->response, buf, FALSE );
+    tr_bencToBuf( data->response, TR_FMT_JSON_LEAN, buf );
     (*data->callback)( data->session, (const char*)EVBUFFER_DATA(buf),
                        EVBUFFER_LENGTH(buf), data->callback_user_data );
 
-    tr_releaseBuffer( buf );
+    evbuffer_free( buf );
     tr_bencFree( data->response );
     tr_free( data->response );
     tr_free( data );
@@ -1332,18 +1332,18 @@ request_exec( tr_session             * session,
     {
         int64_t tag;
         tr_benc response;
-        struct evbuffer * buf = tr_getBuffer( );
+        struct evbuffer * buf = evbuffer_new( );
 
         tr_bencInitDict( &response, 3 );
         tr_bencDictAddDict( &response, "arguments", 0 );
         tr_bencDictAddStr( &response, "result", result );
         if( tr_bencDictFindInt( request, "tag", &tag ) )
             tr_bencDictAddInt( &response, "tag", tag );
-        tr_bencSaveAsJSON( &response, buf, FALSE );
+        tr_bencToBuf( &response, TR_FMT_JSON_LEAN, buf );
         (*callback)( session, (const char*)EVBUFFER_DATA(buf),
                      EVBUFFER_LENGTH( buf ), callback_user_data );
 
-        tr_releaseBuffer( buf );
+        evbuffer_free( buf );
         tr_bencFree( &response );
     }
     else if( methods[i].immediate )
@@ -1361,7 +1361,7 @@ request_exec( tr_session             * session,
         tr_bencDictAddStr( &response, "result", result );
         if( tr_bencDictFindInt( request, "tag", &tag ) )
             tr_bencDictAddInt( &response, "tag", tag );
-        tr_bencSaveAsJSON( &response, buf, FALSE );
+        tr_bencToBuf( &response, TR_FMT_JSON_LEAN, buf );
         (*callback)( session, (const char*)EVBUFFER_DATA(buf),
                      EVBUFFER_LENGTH(buf), callback_user_data );
 

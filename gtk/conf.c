@@ -428,7 +428,7 @@ translate_keyfile_to_json( const char * old_file,
     }
 
     g_key_file_free( keyfile );
-    tr_bencSaveJSONFile( new_file, &dict );
+    tr_bencToFile( &dict, TR_FMT_JSON, new_file );
     tr_bencFree( &dict );
 }
 

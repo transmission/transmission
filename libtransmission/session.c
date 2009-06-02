@@ -476,7 +476,7 @@ tr_sessionLoadSettings( tr_benc * d, const char * configDir, const char * appNam
 
     /* file settings override the defaults */
     filename = tr_buildPath( configDir, "settings.json", NULL );
-    if( !tr_bencLoadJSONFile( filename, &fileSettings ) ) {
+    if( !tr_bencLoadFile( &fileSettings, TR_FMT_JSON, filename ) ) {
         tr_bencMergeDicts( d, &fileSettings );
         tr_bencFree( &fileSettings );
     }
@@ -501,7 +501,7 @@ tr_sessionSaveSettings( tr_session    * session,
     /* the existing file settings are the fallback values */
     {
         tr_benc fileSettings;
-        if( !tr_bencLoadJSONFile( filename, &fileSettings ) )
+        if( !tr_bencLoadFile( &fileSettings, TR_FMT_JSON, filename ) )
         {
             tr_bencMergeDicts( &settings, &fileSettings );
             tr_bencFree( &fileSettings );
@@ -521,7 +521,7 @@ tr_sessionSaveSettings( tr_session    * session,
     }
 
     /* save the result */
-    tr_bencSaveJSONFile( filename, &settings );
+    tr_bencToFile( &settings, TR_FMT_JSON, filename );
     tr_inf( "Saved \"%s\"", filename );
 
     /* cleanup */

@@ -173,7 +173,7 @@ testString( const char * str,
         fprintf( stderr, "out:\n%s", tr_bencSaveAsJSON( &val, NULL ) );
 #endif
         check( end == (const uint8_t*)str + len );
-        saved = tr_bencSave( &val, &savedLen );
+        saved = tr_bencToStr( &val, TR_FMT_BENC, &savedLen );
         check( !strcmp( saved, str ) );
         check( len == (size_t)savedLen );
         tr_free( saved );
@@ -214,7 +214,7 @@ testParse( void )
     check( i == 32 );
     check( tr_bencGetInt( &val.val.l.vals[2], &i ) );
     check( i == 16 );
-    saved = tr_bencSave( &val, &len );
+    saved = tr_bencToStr( &val, TR_FMT_BENC, &len );
     check( !strcmp( saved, (char*)buf ) );
     tr_free( saved );
     tr_bencFree( &val );
@@ -230,7 +230,7 @@ testParse( void )
     err = tr_bencParse( buf, buf + sizeof( buf ), &val, &end );
     check( !err );
     check( end == buf + 2 );
-    saved = tr_bencSave( &val, &len );
+    saved = tr_bencToStr( &val, TR_FMT_BENC, &len );
     check( !strcmp( saved, "le" ) );
     tr_free( saved );
     tr_bencFree( &val );
@@ -273,7 +273,7 @@ testParse( void )
     check( end == buf + strlen( (const char*)buf ) );
     check( ( child = tr_bencListChild( &val, 0 ) ) );
     check( ( child2 = tr_bencListChild( child, 0 ) ) );
-    saved = tr_bencSave( &val, &len );
+    saved = tr_bencToStr( &val, TR_FMT_BENC, &len );
     check( !strcmp( saved, "lld1:ai64e1:bi32eeee" ) );
     tr_free( saved );
     tr_bencFree( &val );
@@ -284,7 +284,7 @@ testParse( void )
     err = tr_bencParse( buf, buf + sizeof( buf ), &val, &end );
     check( !err );
     check( end == buf + 2 );
-    saved = tr_bencSave( &val, &len );
+    saved = tr_bencToStr( &val, TR_FMT_BENC, &len );
     check( !strcmp( saved, "le" ) );
     tr_free( saved );
     tr_bencFree( &val );
@@ -324,7 +324,8 @@ testJSONSnippet( const char * benc_str,
     char * serialized;
 
     tr_bencLoad( benc_str, strlen( benc_str ), &top, NULL );
-    serialized = tr_bencSaveAsJSON( &top, buf, TRUE );
+    tr_bencToBuf( &top, TR_FMT_JSON, buf );
+    serialized = (char*) EVBUFFER_DATA( buf );
     stripWhitespace( serialized );
 #if 0
     fprintf( stderr, "benc: %s\n", benc_str );
@@ -443,7 +444,7 @@ testStackSmash( int depth )
     err = tr_bencParse( in, in + ( depth * 2 ), &val, &end );
     check( !err );
     check( end == in + ( depth * 2 ) );
-    saved = tr_bencSave( &val, &len );
+    saved = tr_bencToStr( &val, TR_FMT_BENC, &len );
     check( !strcmp( saved, (char*)in ) );
     tr_free( in );
     tr_free( saved );
@@ -504,7 +505,7 @@ testParse2( void )
     tr_bencDictAddReal( &top, "this-is-a-real", 0.5 );
     tr_bencDictAddStr( &top, "this-is-a-string", "this-is-a-string" );
 
-    benc = tr_bencSave( &top, &len );
+    benc = tr_bencToStr( &top, TR_FMT_BENC, &len );
     check( !strcmp( benc, "d14:this-is-a-booli1e14:this-is-a-real8:0.50000016:this-is-a-string16:this-is-a-string14:this-is-an-inti1234ee" ) )
     check( !tr_bencParse( benc, benc+len, &top2, &end ) )
     check( (char*)end == benc + len )

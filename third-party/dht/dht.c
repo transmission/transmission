@@ -320,7 +320,7 @@ common_bits(const unsigned char *id1, const unsigned char *id2)
 }
 
 /* Determine whether id1 or id2 is closer to ref */
-int
+static int
 xorcmp(const unsigned char *id1, const unsigned char *id2,
        const unsigned char *ref)
 {

@@ -91,21 +91,7 @@ int       tr_bencLoad( const void   * buf,
                        tr_benc      * setme_benc,
                        char        ** setme_end );
 
-int       tr_bencLoadFile( const char * filename, tr_benc * setme );
-
-int       tr_bencLoadJSONFile( const char * filename, tr_benc * setme );
-
 void      tr_bencFree( tr_benc * );
-
-char*     tr_bencSave( const tr_benc * val, int * len );
-
-char*     tr_bencSaveAsJSON( const tr_benc * top, struct evbuffer * out, tr_bool doIndent );
-
-char*     tr_bencToJSON( const tr_benc * top, tr_bool doIndent );
-
-int       tr_bencSaveFile( const char * filename, const tr_benc * );
-
-int       tr_bencSaveJSONFile( const char * filename, const tr_benc * );
 
 void      tr_bencInitStr( tr_benc *, const void * str, int str_len );
 
@@ -125,7 +111,28 @@ void      tr_bencInitReal( tr_benc *, double value );
 ****
 ***/
 
-int       tr_bencListReserve( tr_benc *, size_t reserveCount );
+typedef enum
+{
+    TR_FMT_BENC,
+    TR_FMT_JSON,
+    TR_FMT_JSON_LEAN /* saves bandwidth by omitting all whitespace. */
+}
+tr_fmt_mode;
+
+int tr_bencToFile( const tr_benc *, tr_fmt_mode, const char * filename );
+
+char* tr_bencToStr( const tr_benc *, tr_fmt_mode, int * len );
+
+void  tr_bencToBuf( const tr_benc *, tr_fmt_mode, struct evbuffer * );
+
+/* TR_FMT_JSON_LEAN and TR_FMT_JSON are equivalent in this function. */
+int tr_bencLoadFile( tr_benc * setme, tr_fmt_mode, const char * filename );
+
+/***
+****
+***/
+
+int tr_bencListReserve( tr_benc *, size_t reserveCount );
 
 tr_benc * tr_bencListAdd( tr_benc * );
 

@@ -512,7 +512,7 @@ tr_torrentSaveResume( const tr_torrent * tor )
     saveRatioLimits( &top, tor );
 
     filename = getResumeFilename( tor );
-    tr_bencSaveFile( filename, &top );
+    tr_bencToFile( &top, TR_FMT_BENC, filename );
     tr_free( filename );
 
     tr_bencFree( &top );
@@ -531,7 +531,7 @@ loadFromFile( tr_torrent * tor,
 
     filename = getResumeFilename( tor );
 
-    if( tr_bencLoadFile( filename, &top ) )
+    if( tr_bencLoadFile( &top, TR_FMT_BENC, filename ) )
     {
         tr_tordbg( tor, "Couldn't read \"%s\"; trying old format.",
                    filename );

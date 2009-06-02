@@ -298,12 +298,9 @@ main( int argc, char ** argv )
 
     if( dumpSettings )
     {
-        struct evbuffer * buf = tr_getBuffer( );
-
-        tr_bencSaveAsJSON( &settings, buf, TRUE );
-        fprintf( stderr, "%s", (char*)EVBUFFER_DATA(buf) );
-
-        tr_releaseBuffer( buf );
+        char * str = tr_bencToStr( &settings, TR_FMT_JSON, NULL );
+        fprintf( stderr, "%s", str );
+        tr_free( str );
         return 0;
     }
 

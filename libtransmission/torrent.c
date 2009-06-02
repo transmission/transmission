@@ -660,9 +660,8 @@ torrentRealInit( tr_torrent * tor, const tr_ctor * ctor )
         if( !tr_ctorGetMetainfo( ctor, &val ) )
         {
             const char * filename = tor->info.torrent;
-            tr_bencSaveFile( filename, val );
-            tr_sessionSetTorrentFile( tor->session, tor->info.hashString,
-                                      filename );
+            tr_bencToFile( val, TR_FMT_BENC, filename );
+            tr_sessionSetTorrentFile( tor->session, tor->info.hashString, filename );
         }
     }
 
@@ -1947,7 +1946,7 @@ tr_torrentSetAnnounceList( tr_torrent *            tor,
     assert( tr_isTorrent( tor ) );
 
     /* save to the .torrent file */
-    if( !tr_bencLoadFile( tor->info.torrent, &metainfo ) )
+    if( !tr_bencLoadFile( &metainfo, TR_FMT_BENC, tor->info.torrent ) )
     {
         int       i;
         int       prevTier = -1;
@@ -1985,7 +1984,7 @@ tr_torrentSetAnnounceList( tr_torrent *            tor,
             tmpInfo.trackerCount = swap.trackerCount;
 
             tr_metainfoFree( &tmpInfo );
-            tr_bencSaveFile( tor->info.torrent, &metainfo );
+            tr_bencToFile( &metainfo, TR_FMT_BENC, tor->info.torrent );
         }
 
         /* cleanup */

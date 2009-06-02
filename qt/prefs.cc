@@ -218,13 +218,7 @@ Prefs :: ~Prefs( )
     }
 
     /* write back out the serialized preferences */
-    char * json = tr_bencToJSON( &top, TRUE );
-    if( json && *json ) {
-        file.open( QIODevice::WriteOnly | QIODevice::Text );
-        file.write( json );
-        file.close( );
-    }
-    tr_free( json );
+    tr_bencToFile( &top, TR_FMT_JSON, file.fileName().toUtf8().constData() );
     tr_bencFree( &top );
 }
 
