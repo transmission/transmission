@@ -1,3 +1,4 @@
+#!/bin/bash
 echo "creating libtransmission/version.h"
 
 user_agent_prefix=`grep m4_define configure.ac | sed "s/[][)(]/,/g" | grep user_agent_prefix  | cut -d , -f 6`
@@ -7,7 +8,7 @@ peer_id_prefix=`grep m4_define configure.ac | sed "s/[][)(]/,/g" | grep peer_id_
 if [ -d .svn ]; then
     svn_revision=`svnversion -n | cut -d: -f1 | cut -dM -f1 | cut -dS -f1`
 else
-    svn_revision=`awk '/\$Id: /{ if ($4>i) i=$4 } END {print i}' */*.{cc,[chm]}`
+    svn_revision=$(awk '/\$Id: /{ if ($4>i) i=$4 } END {print i}' */*.{cc,[chm]})
 fi
 
 cat > libtransmission/version.h << EOF
