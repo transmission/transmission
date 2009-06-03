@@ -145,7 +145,7 @@ struct tr_peermsgs
     tr_bool         peerSupportsPex;
     tr_bool         clientSentLtepHandshake;
     tr_bool         peerSentLtepHandshake;
-    tr_bool         haveFastSet;
+    /*tr_bool         haveFastSet;*/
 
     uint8_t         state;
     uint8_t         ut_pex_id;
@@ -153,8 +153,10 @@ struct tr_peermsgs
     uint16_t        pexCount6;
     uint16_t        maxActiveRequests;
 
+#if 0
     size_t                 fastsetSize;
     tr_piece_index_t       fastset[MAX_FAST_SET_SIZE];
+#endif
 
     /* how long the outMessages batch should be allowed to grow before
      * it's flushed -- some messages (like requests >:) should be sent
@@ -178,7 +180,7 @@ struct tr_peermsgs
     tr_pex               * pex;
     tr_pex               * pex6;
 
-    time_t                 clientSentPexAt;
+    /*time_t                 clientSentPexAt;*/
     time_t                 clientSentAnythingAt;
 
     /* when we started batching the outMessages */
@@ -2088,7 +2090,7 @@ sendPex( tr_peermsgs * msgs )
         tr_free( diffs6.dropped );
         tr_free( newPex6 );
 
-        msgs->clientSentPexAt = time( NULL );
+        /*msgs->clientSentPexAt = time( NULL );*/
     }
 }
 
