@@ -1,65 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
 <TS version="2.0" language="en">
-<defaultcodec></defaultcodec>
 <context>
     <name>AboutDialog</name>
     <message>
-        <location filename="about.ui" line="20"/>
+        <location filename="about.cc" line="35"/>
         <source>About Transmission</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="about.ui" line="46"/>
-        <source>Transmission 1.60</source>
-        <translation></translation>
+        <location filename="about.cc" line="58"/>
+        <source>Copyright 2005-2009 The Transmission Project</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="about.ui" line="72"/>
+        <location filename="about.cc" line="72"/>
+        <source>C&amp;redits</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="about.cc" line="76"/>
+        <source>&amp;License</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="about.cc" line="89"/>
+        <source>Credits</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="about.cc" line="53"/>
         <source>A fast and easy BitTorrent client</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="about.ui" line="82"/>
-        <source>Copyright 2005-2009 by the Transmission Project</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="about.ui" line="531"/>
-        <source>&lt;a href=&quot;http://www.transmissionbt.com&quot;&gt;http://www.transmissionbt.com/&lt;/a&gt;</source>
         <translation></translation>
     </message>
 </context>
 <context>
     <name>Details</name>
     <message>
-        <location filename="details.cc" line="136"/>
+        <location filename="details.cc" line="133"/>
         <source>Activity</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="137"/>
+        <location filename="details.cc" line="135"/>
         <source>Peers</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="138"/>
+        <location filename="details.cc" line="137"/>
         <source>Tracker</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="140"/>
+        <location filename="details.cc" line="141"/>
         <source>Files</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="141"/>
+        <location filename="details.cc" line="143"/>
         <source>Options</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="details.cc" line="133"/>
-        <source>%1 Properties</source>
         <translation></translation>
     </message>
     <message>
@@ -68,330 +67,366 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="180"/>
+        <location filename="details.cc" line="277"/>
         <source>%1 (%2 verified in %L3 pieces)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="194"/>
+        <location filename="details.cc" line="224"/>
+        <location filename="details.cc" line="255"/>
         <source>None</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="197"/>
+        <location filename="details.cc" line="129"/>
+        <source>Torrent Properties</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="details.cc" line="225"/>
+        <source>Mixed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="details.cc" line="360"/>
+        <source>%L1 Pieces</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="details.cc" line="362"/>
         <source>%L1 Pieces @ %2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="201"/>
+        <location filename="details.cc" line="386"/>
         <source>Private to this tracker -- PEX disabled</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="202"/>
+        <location filename="details.cc" line="387"/>
         <source>Public torrent</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="350"/>
+        <location filename="details.cc" line="630"/>
+        <source>Now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="details.cc" line="787"/>
         <source>Transfer</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="351"/>
+        <location filename="details.cc" line="788"/>
         <source>State:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="352"/>
+        <location filename="details.cc" line="789"/>
         <source>Progress:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="353"/>
+        <location filename="details.cc" line="790"/>
         <source>Have:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="354"/>
+        <location filename="details.cc" line="791"/>
         <source>Downloaded:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="355"/>
+        <location filename="details.cc" line="792"/>
         <source>Uploaded:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="356"/>
+        <location filename="details.cc" line="793"/>
         <source>Failed DL:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="357"/>
+        <location filename="details.cc" line="794"/>
         <source>Ratio:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="358"/>
+        <location filename="details.cc" line="795"/>
         <source>Swarm Rate:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="359"/>
+        <location filename="details.cc" line="796"/>
         <source>Error:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="362"/>
+        <location filename="details.cc" line="799"/>
         <source>Dates</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="391"/>
-        <source>Speed Limits</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="details.cc" line="393"/>
+        <location filename="details.cc" line="891"/>
         <source>Honor global &amp;limits</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="398"/>
+        <location filename="details.cc" line="896"/>
         <source>Limit &amp;download speed (KB/s)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="406"/>
+        <location filename="details.cc" line="906"/>
         <source>Limit &amp;upload speed (KB/s)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="415"/>
+        <location filename="details.cc" line="917"/>
+        <source>Low</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="details.cc" line="918"/>
+        <source>Normal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="details.cc" line="919"/>
+        <source>High</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="details.cc" line="921"/>
+        <source>&amp;Bandwidth priority:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="details.cc" line="926"/>
         <source>Seed-Until Ratio</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="417"/>
+        <location filename="details.cc" line="928"/>
         <source>Use &amp;global setting</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="421"/>
+        <location filename="details.cc" line="934"/>
         <source>Seed &amp;regardless of ratio</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="427"/>
+        <location filename="details.cc" line="942"/>
         <source>&amp;Stop seeding when a torrent&apos;s ratio reaches</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="437"/>
+        <location filename="details.cc" line="955"/>
         <source>Peer Connections</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="442"/>
+        <location filename="details.cc" line="961"/>
         <source>&amp;Maximum Peers</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="457"/>
+        <location filename="details.cc" line="976"/>
         <source>Details</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="458"/>
+        <location filename="details.cc" line="977"/>
         <source>Pieces:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="459"/>
+        <location filename="details.cc" line="978"/>
         <source>Hash:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="460"/>
+        <location filename="details.cc" line="979"/>
         <source>Privacy:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="461"/>
+        <location filename="details.cc" line="980"/>
         <source>Comment:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="463"/>
-        <location filename="details.cc" line="467"/>
+        <location filename="details.cc" line="982"/>
+        <location filename="details.cc" line="986"/>
         <source>Origins</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="464"/>
+        <location filename="details.cc" line="983"/>
         <source>Creator:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="465"/>
+        <location filename="details.cc" line="984"/>
         <source>Date:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="468"/>
+        <location filename="details.cc" line="987"/>
         <source>Destination folder:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="469"/>
+        <location filename="details.cc" line="988"/>
         <source>Torrent file:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="490"/>
+        <location filename="details.cc" line="1009"/>
         <source>Scrape</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="491"/>
+        <location filename="details.cc" line="1010"/>
         <source>Last scrape at:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="492"/>
-        <location filename="details.cc" line="498"/>
+        <location filename="details.cc" line="1011"/>
+        <location filename="details.cc" line="1017"/>
         <source>Tracker responded:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="493"/>
+        <location filename="details.cc" line="1012"/>
         <source>Next scrape in:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="495"/>
+        <location filename="details.cc" line="1014"/>
         <source>Announce</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="496"/>
+        <location filename="details.cc" line="1015"/>
         <source>Tracker:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="497"/>
+        <location filename="details.cc" line="1016"/>
         <source>Last announce at:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="499"/>
+        <location filename="details.cc" line="1018"/>
         <source>Next announce in:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="500"/>
+        <location filename="details.cc" line="1019"/>
         <source>Manual announce allowed in:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="192"/>
-        <source>Never</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="details.cc" line="206"/>
+        <location filename="details.cc" line="226"/>
         <source>Unknown</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="292"/>
+        <location filename="details.cc" line="723"/>
         <source>Optimistic unchoke</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="293"/>
+        <location filename="details.cc" line="724"/>
         <source>Downloading from this peer</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="294"/>
+        <location filename="details.cc" line="725"/>
         <source>We would download from this peer if they would let us</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="295"/>
+        <location filename="details.cc" line="726"/>
         <source>Uploading to peer</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="296"/>
+        <location filename="details.cc" line="727"/>
         <source>We would upload to this peer if they asked</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="297"/>
+        <location filename="details.cc" line="728"/>
         <source>Peer has unchoked us, but we&apos;re not interested</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="298"/>
+        <location filename="details.cc" line="729"/>
         <source>We unchoked this peer, but they&apos;re not interested</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="299"/>
-        <location filename="details.cc" line="310"/>
+        <location filename="details.cc" line="701"/>
+        <location filename="details.cc" line="730"/>
         <source>Encrypted connection</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="300"/>
+        <location filename="details.cc" line="731"/>
         <source>Peer was discovered through Peer Exchange (PEX)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="301"/>
+        <location filename="details.cc" line="732"/>
         <source>Peer is an incoming connection</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="363"/>
+        <location filename="details.cc" line="800"/>
         <source>Added on:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="364"/>
+        <location filename="details.cc" line="801"/>
         <source>Last activity on:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="521"/>
+        <location filename="details.cc" line="889"/>
+        <source>Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="details.cc" line="1040"/>
         <source>Up</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="521"/>
+        <location filename="details.cc" line="1040"/>
         <source>Down</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="521"/>
+        <location filename="details.cc" line="1040"/>
         <source>%</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="521"/>
+        <location filename="details.cc" line="1040"/>
         <source>Status</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="521"/>
+        <location filename="details.cc" line="1040"/>
         <source>Address</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="details.cc" line="521"/>
+        <location filename="details.cc" line="1040"/>
         <source>Client</source>
         <translation></translation>
     </message>
@@ -443,444 +478,382 @@
     </message>
 </context>
 <context>
+    <name>LicenseDialog</name>
+    <message>
+        <location filename="license.cc" line="22"/>
+        <source>License</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MainWindow</name>
     <message>
-        <location filename="mainwin.ui" line="13"/>
+        <location filename="mainwin.ui" line="14"/>
         <source>Transmission</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="44"/>
-        <source>Show all torrents</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="mainwin.ui" line="47"/>
-        <source>A&amp;ll</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="mainwin.ui" line="66"/>
-        <source>Show active torrents</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="mainwin.ui" line="69"/>
-        <source>&amp;Active</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="mainwin.ui" line="94"/>
-        <source>Show torrents being downloaded</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="mainwin.ui" line="97"/>
-        <source>&amp;Downloading</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="mainwin.ui" line="116"/>
-        <source>Show torrents being seeded</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="mainwin.ui" line="119"/>
-        <source>&amp;Seeding</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="mainwin.ui" line="138"/>
-        <source>Show paused torrents</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="mainwin.ui" line="141"/>
-        <source>&amp;Paused</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="mainwin.ui" line="170"/>
-        <source>Set text filter mode</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="mainwin.ui" line="189"/>
-        <source>Show torrents matching this text</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="mainwin.ui" line="196"/>
-        <source>Clear the filter text</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="mainwin.ui" line="297"/>
-        <location filename="mainwin.ui" line="336"/>
-        <location filename="mainwin.ui" line="359"/>
-        <location filename="mainwin.ui" line="369"/>
-        <location filename="mainwin.ui" line="392"/>
-        <location filename="mainwin.ui" line="402"/>
-        <source>TextLabel</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="mainwin.ui" line="366"/>
-        <source>Overall download speed</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="mainwin.ui" line="399"/>
-        <source>Overall upload speed</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="mainwin.ui" line="431"/>
+        <location filename="mainwin.ui" line="65"/>
         <source>&amp;Torrent</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="453"/>
+        <location filename="mainwin.ui" line="89"/>
         <source>&amp;Edit</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="462"/>
+        <location filename="mainwin.ui" line="100"/>
         <source>&amp;Help</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="472"/>
+        <location filename="mainwin.ui" line="110"/>
         <source>&amp;View</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="500"/>
+        <location filename="mainwin.ui" line="138"/>
         <source>toolBar</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="535"/>
+        <location filename="mainwin.ui" line="173"/>
         <source>&amp;Add...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="538"/>
+        <location filename="mainwin.ui" line="176"/>
         <source>Add a torrent</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="541"/>
+        <location filename="mainwin.ui" line="179"/>
         <source>Ctrl+D</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="546"/>
+        <location filename="mainwin.ui" line="184"/>
         <source>&amp;New...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="549"/>
+        <location filename="mainwin.ui" line="187"/>
         <source>Create a new torrent</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="552"/>
+        <location filename="mainwin.ui" line="190"/>
         <source>Ctrl+N</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="557"/>
+        <location filename="mainwin.ui" line="195"/>
         <source>&amp;Properties</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="560"/>
+        <location filename="mainwin.ui" line="198"/>
         <source>Show torrent properties</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="563"/>
+        <location filename="mainwin.ui" line="201"/>
         <source>Alt+Enter</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="568"/>
+        <location filename="mainwin.ui" line="206"/>
         <source>&amp;Open Folder</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="571"/>
+        <location filename="mainwin.ui" line="209"/>
         <source>Open the torrent&apos;s folder</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="574"/>
+        <location filename="mainwin.ui" line="212"/>
         <source>Ctrl+O</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="579"/>
+        <location filename="mainwin.ui" line="217"/>
         <source>&amp;Start</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="582"/>
+        <location filename="mainwin.ui" line="220"/>
         <source>Start torrent</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="585"/>
+        <location filename="mainwin.ui" line="223"/>
         <source>Ctrl+S</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="590"/>
+        <location filename="mainwin.ui" line="228"/>
         <source>Ask Tracker for &amp;More Peers</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="593"/>
+        <location filename="mainwin.ui" line="231"/>
         <source>Ask tracker for more peers</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="598"/>
+        <location filename="mainwin.ui" line="236"/>
         <source>&amp;Pause</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="601"/>
+        <location filename="mainwin.ui" line="239"/>
         <source>Pause torrent</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="604"/>
+        <location filename="mainwin.ui" line="242"/>
         <source>Ctrl+P</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="609"/>
+        <location filename="mainwin.ui" line="247"/>
         <source>&amp;Verify Local Data</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="612"/>
+        <location filename="mainwin.ui" line="250"/>
         <source>Verify local data</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="617"/>
+        <location filename="mainwin.ui" line="255"/>
         <source>&amp;Remove</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="620"/>
+        <location filename="mainwin.ui" line="258"/>
         <source>Remove torrent</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="623"/>
+        <location filename="mainwin.ui" line="261"/>
         <source>Del</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="628"/>
+        <location filename="mainwin.ui" line="266"/>
         <source>&amp;Delete Files and Remove</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="631"/>
+        <location filename="mainwin.ui" line="269"/>
         <source>Remove torrent and delete its files</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="634"/>
+        <location filename="mainwin.ui" line="272"/>
         <source>Shift+Del</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="639"/>
+        <location filename="mainwin.ui" line="277"/>
         <source>&amp;Start All</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="644"/>
+        <location filename="mainwin.ui" line="282"/>
         <source>&amp;Pause All</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="649"/>
+        <location filename="mainwin.ui" line="287"/>
         <source>&amp;Quit</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="652"/>
+        <location filename="mainwin.ui" line="290"/>
         <source>Ctrl+Q</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="657"/>
+        <location filename="mainwin.ui" line="295"/>
         <source>&amp;Select All</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="660"/>
+        <location filename="mainwin.ui" line="298"/>
         <source>Ctrl+A</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="665"/>
+        <location filename="mainwin.ui" line="303"/>
         <source>&amp;Deselect All</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="668"/>
+        <location filename="mainwin.ui" line="306"/>
         <source>Ctrl+Shift+A</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="673"/>
+        <location filename="mainwin.ui" line="311"/>
         <source>&amp;Preferences</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="681"/>
+        <location filename="mainwin.ui" line="319"/>
         <source>&amp;Minimal View</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="684"/>
+        <location filename="mainwin.ui" line="322"/>
         <source>Alt+M</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="692"/>
+        <location filename="mainwin.ui" line="330"/>
         <source>&amp;Toolbar</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="700"/>
+        <location filename="mainwin.ui" line="338"/>
         <source>&amp;Filterbar</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="708"/>
+        <location filename="mainwin.ui" line="346"/>
         <source>&amp;Statusbar</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="716"/>
+        <location filename="mainwin.ui" line="354"/>
         <source>Sort by &amp;Activity</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="724"/>
+        <location filename="mainwin.ui" line="362"/>
         <source>Sort by A&amp;ge</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="732"/>
+        <location filename="mainwin.ui" line="370"/>
         <source>Sort by &amp;ETA</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="740"/>
+        <location filename="mainwin.ui" line="378"/>
         <source>Sort by &amp;Name</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="748"/>
+        <location filename="mainwin.ui" line="386"/>
         <source>Sort by &amp;Progress</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="756"/>
+        <location filename="mainwin.ui" line="394"/>
         <source>Sort by &amp;Ratio</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="764"/>
+        <location filename="mainwin.ui" line="402"/>
         <source>Sort by Si&amp;ze</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="772"/>
+        <location filename="mainwin.ui" line="410"/>
         <source>Sort by &amp;State</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="780"/>
+        <location filename="mainwin.ui" line="418"/>
         <source>Sort by &amp;Tracker</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="788"/>
+        <location filename="mainwin.ui" line="426"/>
         <source>Message &amp;Log</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="878"/>
+        <location filename="mainwin.ui" line="516"/>
         <source>&amp;Main Window</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="796"/>
+        <location filename="mainwin.ui" line="529"/>
+        <source>&amp;Change Session...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwin.ui" line="532"/>
+        <source>Choose Session</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwin.ui" line="537"/>
+        <source>Set &amp;Location...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwin.ui" line="434"/>
         <source>&amp;Statistics</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="801"/>
+        <location filename="mainwin.ui" line="439"/>
         <source>&amp;Contents</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="806"/>
+        <location filename="mainwin.ui" line="444"/>
         <source>&amp;About</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="814"/>
+        <location filename="mainwin.ui" line="452"/>
         <source>&amp;Reverse Sort Order</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="822"/>
+        <location filename="mainwin.ui" line="460"/>
         <source>&amp;Name</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="830"/>
+        <location filename="mainwin.ui" line="468"/>
         <source>&amp;Files</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="838"/>
+        <location filename="mainwin.ui" line="476"/>
         <source>&amp;Tracker</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="846"/>
+        <location filename="mainwin.ui" line="484"/>
         <source>Total Ratio</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="854"/>
+        <location filename="mainwin.ui" line="492"/>
         <source>Session Ratio</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="862"/>
+        <location filename="mainwin.ui" line="500"/>
         <source>Total Transfer</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="870"/>
+        <location filename="mainwin.ui" line="508"/>
         <source>Session Transfer</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.ui" line="886"/>
+        <location filename="mainwin.ui" line="524"/>
         <source>Tray &amp;Icon</source>
         <translation></translation>
     </message>
@@ -1019,7 +992,7 @@
     <name>Options</name>
     <message>
         <location filename="options.cc" line="57"/>
-        <location filename="options.cc" line="316"/>
+        <location filename="options.cc" line="322"/>
         <source>Add Torrent</source>
         <translation></translation>
     </message>
@@ -1045,16 +1018,17 @@
     </message>
     <message>
         <location filename="options.cc" line="113"/>
-        <source>&amp;Move source file to Trash</source>
-        <translation></translation>
+        <source>&amp;Delete source file</source>
+        <oldsource>&amp;Move source file to Trash</oldsource>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="options.cc" line="318"/>
+        <location filename="options.cc" line="324"/>
         <source>Torrent Files (*.torrent);;All Files (*.*)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="options.cc" line="339"/>
+        <location filename="options.cc" line="345"/>
         <source>Select Destination</source>
         <translation></translation>
     </message>
@@ -1134,8 +1108,13 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="457"/>
-        <location filename="prefs-dialog.cc" line="548"/>
+        <location filename="prefs-dialog.cc" line="380"/>
+        <source>&amp;Randomize the port every launch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="prefs-dialog.cc" line="460"/>
+        <location filename="prefs-dialog.cc" line="552"/>
         <source>Limits</source>
         <translation></translation>
     </message>
@@ -1155,131 +1134,130 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="362"/>
+        <location filename="prefs-dialog.cc" line="365"/>
         <source>Incoming Peers</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="378"/>
+        <location filename="prefs-dialog.cc" line="381"/>
         <source>Use UPnP or NAT-PMP port &amp;forwarding from my router</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="441"/>
+        <location filename="prefs-dialog.cc" line="444"/>
         <source>Blocklist</source>
         <translation></translation>
     </message>
     <message numerus="yes">
-        <location filename="prefs-dialog.cc" line="447"/>
         <source>Enable &amp;blocklist (contains %Ln rule(s))</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>Enable &amp;blocklist (contains 1 rule)</numerusform>
             <numerusform>Enable &amp;blocklist (contains %Ln rules)</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="604"/>
+        <location filename="prefs-dialog.cc" line="608"/>
         <source>Not supported by remote sessions</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="444"/>
+        <location filename="prefs-dialog.cc" line="447"/>
         <source>&amp;Update blocklist</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="314"/>
+        <location filename="prefs-dialog.cc" line="300"/>
+        <source>&lt;small&gt;When enabled, Speed Limit Mode overrides the Global Bandwidth Limits&lt;/small&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="prefs-dialog.cc" line="317"/>
         <source>&amp;On days:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="317"/>
+        <location filename="prefs-dialog.cc" line="320"/>
         <source>Every Day</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="318"/>
+        <location filename="prefs-dialog.cc" line="321"/>
         <source>Weekdays</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="319"/>
+        <location filename="prefs-dialog.cc" line="322"/>
         <source>Weekends</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="320"/>
+        <location filename="prefs-dialog.cc" line="323"/>
         <source>Sunday</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="321"/>
+        <location filename="prefs-dialog.cc" line="324"/>
         <source>Monday</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="322"/>
+        <location filename="prefs-dialog.cc" line="325"/>
         <source>Tuesday</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="323"/>
+        <location filename="prefs-dialog.cc" line="326"/>
         <source>Wednesday</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="324"/>
+        <location filename="prefs-dialog.cc" line="327"/>
         <source>Thursday</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="325"/>
+        <location filename="prefs-dialog.cc" line="328"/>
         <source>Friday</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="326"/>
+        <location filename="prefs-dialog.cc" line="329"/>
         <source>Saturday</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="345"/>
+        <location filename="prefs-dialog.cc" line="348"/>
         <source>Port is &lt;b&gt;open&lt;/b&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="346"/>
+        <location filename="prefs-dialog.cc" line="349"/>
         <source>Port is &lt;b&gt;closed&lt;/b&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="352"/>
+        <location filename="prefs-dialog.cc" line="355"/>
         <source>Testing...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="366"/>
+        <location filename="prefs-dialog.cc" line="369"/>
         <source>&amp;Test Port</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="367"/>
-        <location filename="prefs-dialog.cc" line="668"/>
+        <location filename="prefs-dialog.cc" line="370"/>
+        <location filename="prefs-dialog.cc" line="682"/>
         <source>Status unknown</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="375"/>
+        <location filename="prefs-dialog.cc" line="378"/>
         <source>&amp;Port for incoming connections:</source>
         <translation></translation>
     </message>
-    <message>
-        <location filename="prefs-dialog.cc" line="377"/>
-        <source>Randomize the port every launch</source>
-        <translation></translation>
-    </message>
     <message numerus="yes">
-        <location filename="prefs-dialog.cc" line="406"/>
+        <location filename="prefs-dialog.cc" line="409"/>
         <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rules.</source>
         <translation>
             <numerusform></numerusform>
@@ -1287,122 +1265,112 @@
         </translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="415"/>
+        <location filename="prefs-dialog.cc" line="418"/>
         <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="452"/>
+        <location filename="prefs-dialog.cc" line="455"/>
         <source>Enable &amp;automatic updates</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="458"/>
+        <location filename="prefs-dialog.cc" line="461"/>
         <source>Maximum peers &amp;overall:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="459"/>
+        <location filename="prefs-dialog.cc" line="462"/>
         <source>Maximum peers per &amp;torrent:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="462"/>
+        <location filename="prefs-dialog.cc" line="465"/>
         <source>Plaintext Preferred</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="463"/>
+        <location filename="prefs-dialog.cc" line="466"/>
         <source>Encryption Preferred</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="464"/>
+        <location filename="prefs-dialog.cc" line="467"/>
         <source>Encryption Required</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="469"/>
+        <location filename="prefs-dialog.cc" line="472"/>
         <source>Privacy</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="470"/>
-        <source>Encryption &amp;mode:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="prefs-dialog.cc" line="471"/>
-        <source>Use peer e&amp;xchange</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="prefs-dialog.cc" line="486"/>
+        <location filename="prefs-dialog.cc" line="490"/>
         <source>Select Watch Directory</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="504"/>
+        <location filename="prefs-dialog.cc" line="508"/>
         <source>Select Destination</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="527"/>
+        <location filename="prefs-dialog.cc" line="531"/>
         <source>Adding Torrents</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="529"/>
+        <location filename="prefs-dialog.cc" line="533"/>
         <source>Automatically &amp;add torrents from:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="537"/>
+        <location filename="prefs-dialog.cc" line="541"/>
         <source>Display &amp;options dialog</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="538"/>
+        <location filename="prefs-dialog.cc" line="542"/>
         <source>&amp;Start when added</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="539"/>
-        <source>Mo&amp;ve source files to Trash</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="prefs-dialog.cc" line="545"/>
+        <location filename="prefs-dialog.cc" line="549"/>
         <source>&amp;Destination folder:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="570"/>
+        <location filename="prefs-dialog.cc" line="574"/>
         <source>Transmission Preferences</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="573"/>
+        <location filename="prefs-dialog.cc" line="577"/>
         <source>Torrents</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="574"/>
+        <location filename="prefs-dialog.cc" line="578"/>
         <source>Peers</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="576"/>
+        <location filename="prefs-dialog.cc" line="580"/>
         <source>Network</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="577"/>
+        <location filename="prefs-dialog.cc" line="581"/>
         <source>Web</source>
         <translation></translation>
     </message>
+    <message>
+        <location filename="prefs-dialog.cc" line="634"/>
+        <source>Enable &amp;blocklist</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message numerus="yes">
-        <location filename="prefs-dialog.cc" line="622"/>
+        <location filename="prefs-dialog.cc" line="636"/>
         <source>Enable &amp;blocklist (%Ln rules)</source>
         <translation>
             <numerusform>Enable &amp;blocklist (%Ln rule)</numerusform>
@@ -1420,17 +1388,37 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="300"/>
+        <location filename="prefs-dialog.cc" line="303"/>
         <source>Use Speed Limit Mode &amp;between</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="550"/>
+        <location filename="prefs-dialog.cc" line="473"/>
+        <source>&amp;Encryption mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="prefs-dialog.cc" line="474"/>
+        <source>Use peer e&amp;xchange (PEX)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="prefs-dialog.cc" line="475"/>
+        <source>Use &amp;distributed hash table (DHT)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="prefs-dialog.cc" line="543"/>
+        <source>&amp;Delete source files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="prefs-dialog.cc" line="554"/>
         <source>&amp;Stop seeding torrents at ratio:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="575"/>
+        <location filename="prefs-dialog.cc" line="579"/>
         <source>Speed</source>
         <translation></translation>
     </message>
@@ -1450,27 +1438,103 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="app.cc" line="109"/>
+        <location filename="app.cc" line="105"/>
         <source>transmission %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="app.cc" line="110"/>
+        <location filename="app.cc" line="106"/>
         <source>Invalid option</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="app.cc" line="111"/>
+        <location filename="app.cc" line="107"/>
         <source>Got opt %1</source>
         <translation></translation>
     </message>
 </context>
 <context>
+    <name>RelocateDialog</name>
+    <message>
+        <location filename="relocate.cc" line="74"/>
+        <source>Set Torrent Location</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="relocate.cc" line="80"/>
+        <source>Set Location</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="relocate.cc" line="81"/>
+        <source>New &amp;location:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="relocate.cc" line="82"/>
+        <source>&amp;Move from the current folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="relocate.cc" line="83"/>
+        <source>Local data is &amp;already there</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Session</name>
     <message>
-        <location filename="session.cc" line="574"/>
+        <location filename="session.cc" line="686"/>
         <source>Add Torrent</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>SessionDialog</name>
+    <message>
+        <location filename="session-dialog.cc" line="71"/>
+        <source>Change Session</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="session-dialog.cc" line="77"/>
+        <source>Source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="session-dialog.cc" line="78"/>
+        <source>Start &amp;Local Session</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="session-dialog.cc" line="82"/>
+        <source>Connect to &amp;Remote Session</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="session-dialog.cc" line="88"/>
+        <source>&amp;Host:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="session-dialog.cc" line="93"/>
+        <source>&amp;Port:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="session-dialog.cc" line="95"/>
+        <source>&amp;Authentication required</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="session-dialog.cc" line="102"/>
+        <source>&amp;Username:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="session-dialog.cc" line="107"/>
+        <source>Pass&amp;word:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1527,27 +1591,27 @@
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="torrent.cc" line="613"/>
+        <location filename="torrent.cc" line="614"/>
         <source>Waiting to verify local data</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="torrent.cc" line="614"/>
+        <location filename="torrent.cc" line="615"/>
         <source>Verifying local data</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="torrent.cc" line="615"/>
+        <location filename="torrent.cc" line="616"/>
         <source>Downloading</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="torrent.cc" line="616"/>
+        <location filename="torrent.cc" line="617"/>
         <source>Seeding</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="torrent.cc" line="617"/>
+        <location filename="torrent.cc" line="618"/>
         <source>Paused</source>
         <translation></translation>
     </message>
@@ -1650,12 +1714,12 @@
 <context>
     <name>TrMainWindow</name>
     <message>
-        <location filename="mainwin.cc" line="109"/>
+        <location filename="mainwin.cc" line="654"/>
         <source> - %1</source>
         <translation></translation>
     </message>
     <message numerus="yes">
-        <location filename="mainwin.cc" line="358"/>
+        <location filename="mainwin.cc" line="665"/>
         <source>%Ln Torrent(s)</source>
         <translation>
             <numerusform>%Ln Torrent</numerusform>
@@ -1670,7 +1734,7 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="mainwin.cc" line="360"/>
+        <location filename="mainwin.cc" line="667"/>
         <source>%L1 of %Ln Torrent(s)</source>
         <translation>
             <numerusform>%L1 of %Ln Torrent</numerusform>
@@ -1678,49 +1742,114 @@
         </translation>
     </message>
     <message>
-        <location filename="mainwin.cc" line="376"/>
-        <location filename="mainwin.cc" line="392"/>
+        <location filename="mainwin.cc" line="689"/>
+        <location filename="mainwin.cc" line="705"/>
         <source>Ratio: %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.cc" line="381"/>
-        <location filename="mainwin.cc" line="387"/>
+        <location filename="mainwin.cc" line="694"/>
+        <location filename="mainwin.cc" line="700"/>
         <source>Down: %1, Up: %2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.cc" line="714"/>
+        <location filename="mainwin.cc" line="1035"/>
         <source>Add Torrent</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.cc" line="716"/>
+        <location filename="mainwin.cc" line="1037"/>
         <source>Torrent Files (*.torrent);;All Files (*.*)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.cc" line="720"/>
+        <location filename="mainwin.cc" line="1041"/>
         <source>Display &amp;options dialog</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.cc" line="778"/>
+        <location filename="mainwin.cc" line="1099"/>
         <source>Transmission server is responding</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.cc" line="779"/>
+        <location filename="mainwin.cc" line="1100"/>
         <source>Last response from server was %1 ago</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.cc" line="688"/>
+        <location filename="mainwin.cc" line="1009"/>
         <source>Click to disable Speed Limit Mode</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwin.cc" line="689"/>
+        <location filename="mainwin.cc" line="365"/>
+        <source>A&amp;ll</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwin.cc" line="365"/>
+        <source>&amp;Active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwin.cc" line="365"/>
+        <source>&amp;Downloading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwin.cc" line="365"/>
+        <source>&amp;Seeding</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwin.cc" line="365"/>
+        <source>&amp;Paused</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwin.cc" line="509"/>
+        <source>Limit Download Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwin.cc" line="512"/>
+        <location filename="mainwin.cc" line="532"/>
+        <source>Unlimited</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwin.cc" line="517"/>
+        <location filename="mainwin.cc" line="537"/>
+        <location filename="mainwin.cc" line="939"/>
+        <location filename="mainwin.cc" line="947"/>
+        <source>Limited at %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwin.cc" line="529"/>
+        <source>Limit Upload Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwin.cc" line="550"/>
+        <source>Stop Seeding at Ratio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwin.cc" line="554"/>
+        <source>Seed Forever</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwin.cc" line="559"/>
+        <location filename="mainwin.cc" line="955"/>
+        <source>Stop at Ratio (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwin.cc" line="1010"/>
         <source>Click to enable Speed Limit Mode</source>
         <translation></translation>
     </message>
@@ -1782,7 +1911,7 @@
     </message>
     <message numerus="yes">
         <location filename="utils.cc" line="109"/>
-        <source>%Ln seconds(s)</source>
+        <source>%Ln second(s)</source>
         <translation>
             <numerusform>%Ln second</numerusform>
             <numerusform>%Ln seconds</numerusform>

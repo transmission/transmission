@@ -106,7 +106,7 @@ Utils :: timeToString( int seconds )
     d = tr( "%Ln day(s)", 0, days );
     h = tr( "%Ln hour(s)", 0, hours );
     m = tr( "%Ln minute(s)", 0, minutes );
-    s = tr( "%Ln seconds(s)", 0, seconds );
+    s = tr( "%Ln second(s)", 0, seconds );
 
     if( days )
     {
