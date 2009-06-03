@@ -856,17 +856,65 @@ printSession( tr_benc * top )
             printf( "  Encryption: %s\n", str );
         printf( "\n" );
 
-        printf( "LIMITS\n" );
-        if( tr_bencDictFindInt( args, TR_PREFS_KEY_PEER_LIMIT_GLOBAL, &i ) )
-            printf( "  Peer limit: %" PRId64 "\n", i );
-        if( tr_bencDictFindBool( args, "speed-limit-down-enabled", &boolVal ) )
-            printf( "  Downloadlimit enabled: %s\n", ( boolVal ? "Yes" : "No" ) );
-        if( tr_bencDictFindInt( args, "speed-limit-down", &i ) )
-            printf( "  Downloadlimit: %6" PRId64 " KB/sec\n", i );
-        if( tr_bencDictFindBool( args, "speed-limit-up-enabled", &boolVal ) )
-            printf( "  Uploadlimit enabled:   %s\n", ( boolVal ? "Yes" : "No" ) );
-        if( tr_bencDictFindInt( args, "speed-limit-up", &i ) )
-            printf( "  Uploadlimit:   %6" PRId64 " KB/sec\n", i );
+        {
+            tr_bool altEnabled, altTimeEnabled, upEnabled, downEnabled;
+            int64_t altDown, altUp, altBegin, altEnd, altDay, upLimit, downLimit, peerLimit;
+
+            if( tr_bencDictFindInt ( args, "alt-speed-down", &altDown ) &&
+                tr_bencDictFindBool( args, "alt-speed-enabled", &altEnabled ) &&
+                tr_bencDictFindInt ( args, "alt-speed-time-begin", &altBegin ) &&
+                tr_bencDictFindBool( args, "alt-speed-time-enabled", &altTimeEnabled ) &&
+                tr_bencDictFindInt ( args, "alt-speed-time-end", &altEnd ) &&
+                tr_bencDictFindInt ( args, "alt-speed-time-day", &altDay ) &&
+                tr_bencDictFindInt ( args, "alt-speed-up", &altUp ) &&
+                tr_bencDictFindInt ( args, "peer-limit-global", &peerLimit ) &&
+                tr_bencDictFindInt ( args, "speed-limit-down", &downLimit ) &&
+                tr_bencDictFindBool( args, "speed-limit-down-enabled", &downEnabled ) &&
+                tr_bencDictFindInt ( args, "speed-limit-up", &upLimit ) &&
+                tr_bencDictFindBool( args, "speed-limit-up-enabled", &upEnabled ) )
+            {
+                char buf[128];
+
+                printf( "LIMITS\n" );
+                printf( "  Peer limit: %" PRId64 "\n", i );
+
+                if( altEnabled )
+                    tr_snprintf( buf, sizeof( buf ), "%"PRId64" KB/s", altUp );
+                else if( upEnabled )
+                    tr_snprintf( buf, sizeof( buf ), "%"PRId64" KB/s", upLimit );
+                else
+                    tr_strlcpy( buf, "Unlimited", sizeof( buf ) );
+                printf( "  Upload speed limit: %s  (%s limit: %"PRId64" KB/s; %s turtle limit: %"PRId64" KB/s)\n",
+                        buf,
+                        (upEnabled?"Enabled":"Disabled"), upLimit,
+                        (altEnabled?"Enabled":"Disabled"), altUp );
+
+                if( altEnabled )
+                    tr_snprintf( buf, sizeof( buf ), "%"PRId64" KB/s", altDown );
+                else if( downEnabled )
+                    tr_snprintf( buf, sizeof( buf ), "%"PRId64" KB/s", downLimit );
+                else
+                    tr_strlcpy( buf, "unlimited", sizeof( buf ) );
+                printf( "  Download speed limit: %s  (%s limit: %"PRId64" KB/s; %s turtle limit: %"PRId64" KB/s)\n",
+                        buf,
+                        (downEnabled?"Enabled":"Disabled"), downLimit,
+                        (altEnabled?"Enabled":"Disabled"), altDown );
+
+                if( altTimeEnabled ) {
+                    printf( "  Turtle schedule: %02d:%02d - %02d:%02d  ",
+                            (int)(altBegin/60), (int)(altBegin%60),
+                            (int)(altEnd/60), (int)(altEnd%60) );
+                    if( altDay & TR_SCHED_SUN )   printf( "Sun " );
+                    if( altDay & TR_SCHED_MON )   printf( "Mon " );
+                    if( altDay & TR_SCHED_TUES )  printf( "Tue " );
+                    if( altDay & TR_SCHED_WED )   printf( "Wed " );
+                    if( altDay & TR_SCHED_THURS ) printf( "Thu " );
+                    if( altDay & TR_SCHED_FRI )   printf( "Fri " );
+                    if( altDay & TR_SCHED_SAT )   printf( "Sat " );
+                    printf( "\n" );
+                }
+            }
+        }
     }
 }
 
