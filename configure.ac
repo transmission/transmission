@@ -171,12 +171,11 @@ AC_CHECK_HEADER([event-config.h],
                  LIBEVENT_CPPFLAGS=""
                  LIBEVENT_LIBS="-levent"],
                 [libevent_source=bundled
+                 AC_MSG_NOTICE([couldn't find event-config.h, so using our own copy of libevent from third-party/libevent/.])
+                 AC_MSG_NOTICE([if you are cross-compiling this is probably NOT what you want.])
                  AC_CONFIG_SUBDIRS([third-party/libevent])
-                 AC_MSG_NOTICE([libevent not found on system, so we'll build our own from third-party/libevent/.])
-                 AC_MSG_NOTICE([if you are cross-compiling this is probably not what you want.])
                  LIBEVENT_CPPFLAGS="-I\$(top_srcdir)/third-party/libevent -I\$(top_builddir)/third-party/libevent"
-                 LIBEVENT_LIBS="\$(top_builddir)/third-party/libevent/.libs/libevent.a"
-                 AC_SUBST(LIBEVENT_CPPFLAGS)])
+                 LIBEVENT_LIBS="\$(top_builddir)/third-party/libevent/.libs/libevent.a"])
 AM_CONDITIONAL([BUILD_LIBEVENT], [test x$libevent_source = xbundled])
 AC_SUBST(LIBEVENT_CPPFLAGS)
 AC_SUBST(LIBEVENT_LIBS)
