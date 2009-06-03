@@ -216,6 +216,7 @@ tr_dhtUninit(tr_session *ss)
         tr_bencDictAddRaw( &benc, "nodes", compact, j );
         dat_file = tr_buildPath( ss->configDir, "dht.dat", NULL );
         tr_bencToFile( &benc, TR_FMT_BENC, dat_file );
+        tr_bencFree( &benc );
         tr_free( dat_file );
     }
 

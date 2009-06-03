@@ -1351,7 +1351,7 @@ request_exec( tr_session             * session,
         int64_t tag;
         tr_benc response;
         tr_benc * args_out;
-        struct evbuffer * buf = tr_getBuffer( );
+        struct evbuffer * buf = evbuffer_new( );
 
         tr_bencInitDict( &response, 3 );
         args_out = tr_bencDictAddDict( &response, "arguments", 0 );
@@ -1365,7 +1365,7 @@ request_exec( tr_session             * session,
         (*callback)( session, (const char*)EVBUFFER_DATA(buf),
                      EVBUFFER_LENGTH(buf), callback_user_data );
 
-        tr_releaseBuffer( buf );
+        evbuffer_free( buf );
         tr_bencFree( &response );
     }
     else
