@@ -18,6 +18,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <sys/types.h> /* open() */
+#include <sys/stat.h> /* open() */
+#include <fcntl.h> /* open() */
 #include <locale.h>
 #include <unistd.h> /* close() */
 
@@ -27,7 +30,6 @@
 
 #include "transmission.h"
 #include "bencode.h"
-#include "fdlimit.h" /* tr_open_file_for_writing() */
 #include "json.h"
 #include "list.h"
 #include "ptrarray.h"
@@ -35,6 +37,10 @@
 
 #ifndef ENODATA
  #define ENODATA EIO
+#endif
+
+#ifndef O_BINARY
+ #define O_BINARY 0
 #endif
 
 /**
@@ -1535,7 +1541,7 @@ int
 tr_bencToFile( const tr_benc * top, tr_fmt_mode mode, const char * filename )
 {
     int err = 0;
-    int fd = tr_open_file_for_writing( filename );
+    int fd = open( filename, O_CREAT|O_WRONLY|O_TRUNC|O_BINARY );
 
     if( fd < 0 )
     {
@@ -1547,15 +1553,20 @@ tr_bencToFile( const tr_benc * top, tr_fmt_mode mode, const char * filename )
     {
         struct evbuffer * buf = evbuffer_new( );
         tr_bencToBuf( top, mode, buf );
-        if( evbuffer_write( buf, fd ) == -1 )
+
+        while( !err && EVBUFFER_LENGTH( buf ) )
         {
-            err = errno;
-            tr_err( _( "Couldn't save file \"%1$s\": %2$s" ),
-                   filename, tr_strerror( errno ) );
+            if( evbuffer_write( buf, fd ) == -1 )
+            {
+                err = errno;
+                tr_err( _( "Couldn't save file \"%1$s\": %2$s" ),
+                       filename, tr_strerror( errno ) );
+            }
         }
 
         if( !err )
             tr_dbg( "tr_bencToFile saved \"%s\"", filename );
+        evbuffer_free( buf );
         close( fd );
     }
 
