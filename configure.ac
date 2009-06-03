@@ -166,21 +166,19 @@ AC_TRY_LINK([#include <stdarg.h>], [va_list ap1, ap2; va_copy(ap1, ap2);],
 ])
 
 
-dnl let's try using the system's libevent now
-dnl
-dnl ----------------------------------------------------------------------------
-dnl
-dnl  libevent fun
-dnl
-dnl  we have to add the builddir into the include path because event-config.h
-dnl  is generated when libevent is build
-dnl 
-dnl AC_CONFIG_SUBDIRS([third-party/libevent])
-dnl AC_MSG_NOTICE([invoking libevent's configure script])
-dnl LIBEVENT_CPPFLAGS="-I\$(top_srcdir)/third-party/libevent -I\$(top_builddir)/third-party/libevent"
-dnl AC_SUBST(LIBEVENT_CPPFLAGS)
-
-LIBEVENT_LIBS="-levent"
+AC_CHECK_HEADER([event-config.h],
+                [libevent_source=system
+                 LIBEVENT_CPPFLAGS=""
+                 LIBEVENT_LIBS="-levent"],
+                [libevent_source=bundled
+                 AC_CONFIG_SUBDIRS([third-party/libevent])
+                 AC_MSG_NOTICE([libevent not found on system, so we'll build our own from third-party/libevent/.])
+                 AC_MSG_NOTICE([if you are cross-compiling this is probably not what you want.])
+                 LIBEVENT_CPPFLAGS="-I\$(top_srcdir)/third-party/libevent -I\$(top_builddir)/third-party/libevent"
+                 LIBEVENT_LIBS="\$(top_builddir)/third-party/libevent/.libs/libevent.a"
+                 AC_SUBST(LIBEVENT_CPPFLAGS)])
+AM_CONDITIONAL([BUILD_LIBEVENT], [test x$libevent_source = xbundled])
+AC_SUBST(LIBEVENT_CPPFLAGS)
 AC_SUBST(LIBEVENT_LIBS)
 
 
@@ -377,14 +375,16 @@ echo "
 
 Configuration:
 
-        Source code location:       ${srcdir}
-        Compiler:                   ${CXX}
-        Build Command-Line client:  ${build_cli}
-        Build Daemon:               ${build_daemon}
-        Build GTK+ client:          ${build_gtk}
-          ... gio support:          ${use_gio}
-          ... dbus-glib support:    ${use_dbus_glib}
-          ... libnotify support:    ${use_libnotify}
-        Build OS X client:          ${build_mac}
+        Source code location:          ${srcdir}
+        Compiler:                      ${CXX}
+        System or bundled libevent:    ${libevent_source}
+
+        Build OS X client:             ${build_mac}
+        Build GTK+ client:             ${build_gtk}
+          ... with gio support:        ${use_gio}
+          ... with dbus-glib support:  ${use_dbus_glib}
+          ... with libnotify support:  ${use_libnotify}
+        Build Command-Line client:     ${build_cli}
+        Build Daemon:                  ${build_daemon}
 
 "
