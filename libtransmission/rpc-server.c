@@ -24,8 +24,8 @@
  #include <zlib.h>
 #endif
 
-#include <libevent/event.h>
-#include <libevent/evhttp.h>
+#include <event.h>
+#include <evhttp.h>
 
 #include "transmission.h"
 #include "bencode.h"

@@ -38,7 +38,7 @@
  #include <dbus/dbus-glib.h>
 #endif
 
-#include <libevent/evhttp.h>
+#include <evhttp.h>
 
 #include <libtransmission/transmission.h> /* TR_RATIO_NA, TR_RATIO_INF */
 #include <libtransmission/utils.h> /* tr_inf */

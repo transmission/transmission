@@ -40,6 +40,7 @@
 #endif
 #include <unistd.h>
 
+#include <stdarg.h> /* 1.4.x versions of evutil.h need this */
 #include <evutil.h>
 
 #include "transmission.h"

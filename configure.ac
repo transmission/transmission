@@ -45,17 +45,17 @@ CURL_MINIMUM=7.16.3
 GIO_MINIMUM=2.15.5
 GLIB_MINIMUM=2.6.0
 GTK_MINIMUM=2.6.0
-WX_MINIMUM=2.6.0
 LIBNOTIFY_MINIMUM=0.4.3
 DBUS_GLIB_MINIMUM=0.70
+LIBEVENT_MINIMUM=1.4.5
 AC_SUBST(OPENSSL_MINIMUM)
 AC_SUBST(CURL_MINIMUM)
 AC_SUBST(GIO_MINIMUM)
 AC_SUBST(GLIB_MINIMUM)
 AC_SUBST(GTK_MINIMUM)
-AC_SUBST(WX_MINIMUM)
 AC_SUBST(LIBNOTIFY_MINIMUM)
 AC_SUBST(DBUS_GLIB_MINIMUM)
+AC_SUBST(LIBEVENT_MINIUM)
 
 AC_PROG_CC
 AC_PROG_CXX
@@ -165,17 +165,23 @@ AC_TRY_LINK([#include <stdarg.h>], [va_list ap1, ap2; va_copy(ap1, ap2);],
     )
 ])
 
+
+dnl let's try using the system's libevent now
+dnl
 dnl ----------------------------------------------------------------------------
 dnl
 dnl  libevent fun
 dnl
 dnl  we have to add the builddir into the include path because event-config.h
 dnl  is generated when libevent is build
+dnl 
+dnl AC_CONFIG_SUBDIRS([third-party/libevent])
+dnl AC_MSG_NOTICE([invoking libevent's configure script])
+dnl LIBEVENT_CPPFLAGS="-I\$(top_srcdir)/third-party/libevent -I\$(top_builddir)/third-party/libevent"
+dnl AC_SUBST(LIBEVENT_CPPFLAGS)
 
-AC_CONFIG_SUBDIRS([third-party/libevent])
-AC_MSG_NOTICE([invoking libevent's configure script])
-LIBEVENT_CPPFLAGS="-I\$(top_srcdir)/third-party/libevent -I\$(top_builddir)/third-party/libevent"
-AC_SUBST(LIBEVENT_CPPFLAGS)
+LIBEVENT_LIBS="-levent"
+AC_SUBST(LIBEVENT_LIBS)
 
 
 dnl ----------------------------------------------------------------------------

@@ -17,7 +17,7 @@
 #include <stdlib.h> /* strtol */
 #include <string.h>
 
-#include <libevent/event.h> /* evbuffer */
+#include <event.h> /* evbuffer */
 
 #include "transmission.h"
 #include "clients.h"

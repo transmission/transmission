@@ -23,7 +23,7 @@
  #include <unistd.h> /* getcwd */
 #endif
 
-#include <libevent/event.h>
+#include <event.h>
 
 #define CURL_DISABLE_TYPECHECK /* otherwise -Wunreachable-code goes insane */
 #include <curl/curl.h>
