@@ -22,8 +22,8 @@ AC_PROG_LIBTOOL
 if test m4_substr(peer_id_prefix,6,1) = "0"; then
   supported_build=yes
   if test "x$GCC" = "xyes" ; then
-    CFLAGS="$CFLAGS -g -O3 -funroll-loops "
-    CXXFLAGS="$CXXFLAGS -g -O3 -funroll-loops "
+    CFLAGS="$CFLAGS -g -O3 "
+    CXXFLAGS="$CXXFLAGS -g -O3 "
   fi
   AC_DEFINE(TR_STABLE_RELEASE, 1, [Define to 1 if this is a stable release of Transmission])
 else
