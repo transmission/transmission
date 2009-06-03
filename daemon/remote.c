@@ -876,7 +876,7 @@ printSession( tr_benc * top )
                 char buf[128];
 
                 printf( "LIMITS\n" );
-                printf( "  Peer limit: %" PRId64 "\n", i );
+                printf( "  Peer limit: %" PRId64 "\n", peerLimit );
 
                 if( altEnabled )
                     tr_snprintf( buf, sizeof( buf ), "%"PRId64" KB/s", altUp );
