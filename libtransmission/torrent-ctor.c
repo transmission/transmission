@@ -214,7 +214,7 @@ tr_ctorInitTorrentWanted( const tr_ctor * ctor, tr_torrent * tor )
     if( ctor->notWantSize )
         tr_torrentInitFileDLs( tor, ctor->notWant, ctor->notWantSize, FALSE );
     if( ctor->wantSize )
-        tr_torrentInitFileDLs( tor, ctor->notWant, ctor->wantSize, TRUE );
+        tr_torrentInitFileDLs( tor, ctor->want, ctor->wantSize, TRUE );
 }
 
 /***
