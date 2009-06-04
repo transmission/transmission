@@ -15,6 +15,7 @@
 #include <errno.h>
 #include <string.h>
 #include <stdio.h> /* printf */
+#include <locale.h>
 
 #include <event.h> /* evbuffer */
 
