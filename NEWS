@@ -4,16 +4,17 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 <http://trac.transmissionbt.com/query?milestone=1.70&group=component&groupdesc=1&order=severity>
 - All Platforms
    + Distributed hash table (DHT) support for public torrents
-   + Add option to move a torrent's data on the disk
+   + Add option for moving and finding a torrent's data on the disk
    + JSON RPC messages can be ~85% shorter, saving bandwidth and CPU
+   + When available, use the system's copy of libevent instead of building one
    + Automatically pause torrents when verifying
    + Fix small bugs and memory leaks
 - Mac
-   + Hold down the option key on launch to pause all transfers
+   + Holding down the option key on launch will pause all transfers
 - Web Client
-   + Big speed improvements, especially with big torrents
+   + Big speed improvements, especially with large torrents
    + Fix 1.61 bug that broke adding torrents via the web client
-   + Support uploading more than one torrent at a time
+   + Add the ability to upload multiple torrents at once
    + Torrents added by URL were always paused, regardless of preferences
    + Comments and announce addresses were cut off in the inspector
    + The "data remaining" field wasn't updated when the number reached 0
