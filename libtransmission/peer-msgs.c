@@ -1742,6 +1742,7 @@ fillOutputBuffer( tr_peermsgs * msgs, time_t now )
             }
             else
             {
+                dbgmsg( msgs, "sending block %u:%u->%u", req.index, req.offset, req.length ); 
                 EVBUFFER_LENGTH(out) += req.length;
                 assert( EVBUFFER_LENGTH( out ) == msglen );
                 tr_peerIoWriteBuf( io, out, TRUE );
