@@ -166,6 +166,11 @@ AC_TRY_LINK([#include <stdarg.h>], [va_list ap1, ap2; va_copy(ap1, ap2);],
 ])
 
 
+dnl build our copy of libevent whether we use it or not,
+dnl because "make dist" needs its Makefiles to exist, and
+dnl AM_CONDITIONAL + AC_CONFIG_SUBDIRS don't seem to play nice
+AC_CONFIG_SUBDIRS([third-party/libevent])
+
 AC_CHECK_HEADER([event-config.h],
                 [libevent_source=system
                  LIBEVENT_CPPFLAGS=""
@@ -173,10 +178,8 @@ AC_CHECK_HEADER([event-config.h],
                 [libevent_source=bundled
                  AC_MSG_NOTICE([couldn't find event-config.h, so using our own copy of libevent from third-party/libevent/.])
                  AC_MSG_NOTICE([if you are cross-compiling this is probably NOT what you want.])
-                 AC_CONFIG_SUBDIRS([third-party/libevent])
                  LIBEVENT_CPPFLAGS="-I\$(top_srcdir)/third-party/libevent -I\$(top_builddir)/third-party/libevent"
                  LIBEVENT_LIBS="\$(top_builddir)/third-party/libevent/libevent.la"])
-AM_CONDITIONAL([BUILD_LIBEVENT], [test x$libevent_source = xbundled])
 AC_SUBST(LIBEVENT_CPPFLAGS)
 AC_SUBST(LIBEVENT_LIBS)
 
