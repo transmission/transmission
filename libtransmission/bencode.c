@@ -18,9 +18,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <sys/types.h> /* open() */
-#include <sys/stat.h> /* open() */
-#include <fcntl.h> /* open() */
 #include <locale.h>
 #include <unistd.h> /* close() */
 
@@ -37,10 +34,6 @@
 
 #ifndef ENODATA
  #define ENODATA EIO
-#endif
-
-#ifndef O_BINARY
- #define O_BINARY 0
 #endif
 
 /**
@@ -1541,9 +1534,9 @@ int
 tr_bencToFile( const tr_benc * top, tr_fmt_mode mode, const char * filename )
 {
     int err = 0;
-    int fd = open( filename, O_CREAT|O_WRONLY|O_TRUNC|O_BINARY );
+    FILE * fp = fopen( filename, "wb+" );
 
-    if( fd < 0 )
+    if( fp == NULL )
     {
         err = errno;
         tr_err( _( "Couldn't open \"%1$s\": %2$s" ),
@@ -1556,7 +1549,7 @@ tr_bencToFile( const tr_benc * top, tr_fmt_mode mode, const char * filename )
 
         while( !err && EVBUFFER_LENGTH( buf ) )
         {
-            if( evbuffer_write( buf, fd ) == -1 )
+            if( evbuffer_write( buf, fileno(fp) ) == -1 )
             {
                 err = errno;
                 tr_err( _( "Couldn't save file \"%1$s\": %2$s" ),
@@ -1567,7 +1560,7 @@ tr_bencToFile( const tr_benc * top, tr_fmt_mode mode, const char * filename )
         if( !err )
             tr_dbg( "tr_bencToFile saved \"%s\"", filename );
         evbuffer_free( buf );
-        close( fd );
+        fclose( fp );
     }
 
     return err;
