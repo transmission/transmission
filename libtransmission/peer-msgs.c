@@ -1721,28 +1721,41 @@ fillOutputBuffer( tr_peermsgs * msgs, time_t now )
         if( requestIsValid( msgs, &req )
             && tr_cpPieceIsComplete( &msgs->torrent->completion, req.index ) )
         {
-            /* FIXME(libevent2): we can eliminate "buf" and an extra memcpy if we create an evbuffer here, add the message header, then use evbuffer_reserve_space() + tr_ioRead() + evbuffer_commit_space() */
+            /* FIXME(libevent2) use evbuffer_reserve_space() + evbuffer_commit_space() */
             int err;
-            static uint8_t buf[MAX_BLOCK_SIZE];
+            const uint32_t msglen = 4 + 1 + 4 + 4 + req.length;
+            struct evbuffer * out;
+            tr_peerIo * io = msgs->peer->io;
 
-            /* send a block */
-            if(( err = tr_ioRead( msgs->torrent, req.index, req.offset, req.length, buf ))) {
-                fireError( msgs, err );
-                bytesWritten = 0;
-                msgs = NULL;
-            } else {
-                tr_peerIo * io = msgs->peer->io;
-                struct evbuffer * out = tr_getBuffer( );
-                dbgmsg( msgs, "sending block %u:%u->%u", req.index, req.offset, req.length );
-                tr_peerIoWriteUint32( io, out, sizeof( uint8_t ) + 2 * sizeof( uint32_t ) + req.length );
-                tr_peerIoWriteUint8 ( io, out, BT_PIECE );
-                tr_peerIoWriteUint32( io, out, req.index );
-                tr_peerIoWriteUint32( io, out, req.offset );
-                tr_peerIoWriteBytes ( io, out, buf, req.length );
+            out = evbuffer_new( );
+            evbuffer_expand( out, msglen );
+
+            tr_peerIoWriteUint32( io, out, sizeof( uint8_t ) + 2 * sizeof( uint32_t ) + req.length );
+            tr_peerIoWriteUint8 ( io, out, BT_PIECE );
+            tr_peerIoWriteUint32( io, out, req.index );
+            tr_peerIoWriteUint32( io, out, req.offset );
+
+            err = tr_ioRead( msgs->torrent, req.index, req.offset, req.length, EVBUFFER_DATA(out)+EVBUFFER_LENGTH(out) );
+            if( err ) /* peer needs a reject message */
+            {
+                protocolSendReject( msgs, &req );
+            }
+            else
+            {
+                EVBUFFER_LENGTH(out) += req.length;
+                assert( EVBUFFER_LENGTH( out ) == msglen );
                 tr_peerIoWriteBuf( io, out, TRUE );
                 bytesWritten += EVBUFFER_LENGTH( out );
                 msgs->clientSentAnythingAt = now;
-                tr_releaseBuffer( out );
+            }
+
+            evbuffer_free( out );
+
+            if( err )
+            {
+                fireError( msgs, err );
+                bytesWritten = 0;
+                msgs = NULL;
             }
         }
         else if( fext ) /* peer needs a reject message */
