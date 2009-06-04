@@ -33,6 +33,7 @@ EXTRA_DIST = \
   COPYING \
   README \
   autogen.sh \
+  update-version-h.sh \
   Transmission.xcodeproj/project.pbxproj
 
 clutchdir = $(datadir)/transmission/web
