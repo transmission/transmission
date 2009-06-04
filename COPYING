@@ -1,16 +1,19 @@
-Most of Transmission is covered by the MIT license.
-
-Some files are copyrighted by Charles Kerr and are covered by
-the GPL version 2.  Works owned by the Transmission project
-are granted a special exemption to clause 2(b) so that the bulk
-of its code can remain under the MIT license.  This exemption does
-not extend to original or derived works not owned by the
-Transmission project.
-
-The remainder of this text pertains only to the MIT-licensed
-portions of Transmission.
-
 Copyright 2005-2009. All code is copyrighted by the respective authors.
+
+The OS X client, CLI client, and parts of libtransmission are licensed
+under the terms of the MIT license.
+
+The Transmission daemon, GTK+ client, Qt client, Web client, and most of
+libtransmission are licensed under the terms of the GNU GPL version 2,
+with two special exceptions:
+
+  1. The MIT-licensed portions of Transmission listed above are exempt
+     from GPLv2 clause 2(b) and may retain their MIT license.
+
+  2. Permission is granted to link the code in this release with the
+     OpenSSL project's 'OpenSSL' library and to distribute the linked
+     executables.  Works derived from Transmission may, at their authors'
+     discretion, keep or delete this exception.
 
 MIT LICENSE:
 
