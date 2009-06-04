@@ -1,6 +1,6 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
-1.70 (2009/mm/dd)
+1.70 (2009/06/04)
 <http://trac.transmissionbt.com/query?milestone=1.70&group=component&groupdesc=1&order=severity>
 - All Platforms
    + Distributed hash table (DHT) support for public torrents
@@ -28,7 +28,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Add-torrent-and-delete-source deleted the source even if there was an error
    + Prefs dialog didn't show or modify "Stop seeding torrents at ratio"
 
-1.54 (2009/xx/yy)
+1.54 (2009/06/04)
 - All Platforms
    + Fix small bugs and memory leaks
 - Web Client
