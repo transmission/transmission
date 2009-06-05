@@ -8,44 +8,21 @@
 	</head>
 
 	<body>
-		<br />
-			<table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0" summary="Two column table with heading">
-				<tr>
-					<td class="blue">
-						<h3>1.61 Changes</h3>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<ul>
-						<li>Close potential CSRF security hole for Web Client users</li>
-						<li>Fix locale error in the JSON parser</li>
-						</ul>
-						<p>For a full list of changes, <a href="http://trac.transmissionbt.com/query?milestone=1.61&group=component&groupdesc=1&order=severity">click here</a>.</p>
-					</td>
-				</tr>
-			</table>
 			<br>
 			<table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0" summary="Two column table with heading">
 				<tr>
 					<td class="blue">
-						<h3>1.60 Changes</h3>
+						<h3>Application Changes</h3>
 					</td>
 				</tr>
 				<tr>
 					<td>
 						<ul>
-						<li>Transfer prioritization</li>
-						<li>Option to specify if transfers are included in the global bandwidth limits</li>
-						<li>Random port, with optional randomization on startup</li>
-						<li>Groups (moved to preferences) can be auto-assigned to transfers when adding based on multiple criteria</li>
-						<li>Groups can have a default location when adding transfers</li>
-						<li>The speed limit scheduler can now be applied to only specific days</li>
-						<li>Bonjour support for the web interface</li>
-						<li>File filter field in the inspector</li>
-						<li>Option to include beta releases when auto-updating (using modified Sparkle 1.5)</li>
-						<li>Portuguese localization</li>
-						<li>Improvements to UPnP port forwarding</li>
+						<li>Distributed hash table (DHT) support for public torrents</li>
+						<li>Holding down the option key on launch will pause all transfers</li>
+						<li>JSON RPC messages can be ~85% shorter, saving bandwidth and CPU</li>
+						<li>Automatically pause torrents when verifying</li>
+						<li>Fix small bugs and memory leaks</li>
 						</ul>
 					</td>
 				</tr>
@@ -60,14 +37,18 @@
 				<tr>
 					<td>
 						<ul>
-						<li>File selection and prioritization</li>
-						<li>Add option to verify local data</li>
-						<li>Fix "Remove Data" bug</li>
+						<li>Big speed improvements, especially with large torrents</li>
+						<li>Fix 1.61 bug that broke adding torrents via the web client</li>
+						<li>Add the ability to upload multiple torrents at once</li>
+						<li>Torrents added by URL were always paused, regardless of preferences</li>
+						<li>Comments and announce addresses were cut off in the inspector</li>
+						<li>The "data remaining" field wasn't updated when the number reached 0</li>
+						<li>Smaller design adjustments</li>
 						</ul>
 					</td>
 				</tr>
 			</table>
-			<p>For a full list of changes, <a href="http://trac.transmissionbt.com/query?milestone=1.60&group=component&groupdesc=1&order=severity">click here</a>.</p>
+			<p>For a full list of changes, <a href="http://trac.transmissionbt.com/query?milestone=1.70&group=component&groupdesc=1&order=severity">click here</a>.</p>
 			<table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0" summary="Two column table with heading">
 				<tr>
 					<td class="red">

@@ -5,33 +5,33 @@
     <link>http://www.transmissionbt.com/appcast.xml</link>
     <description>Most recent version available.</description>
     <language>en</language>
-    <pubDate>Mon, 11 May 2009 17:46:00 -0400</pubDate>
+    <pubDate>Thu, 04 June 2009 20:00:00 -0400</pubDate>
 
 
 	<item>
-		<title>Transmission 1.61</title>
+		<title>Transmission 1.70</title>
 		<sparkle:releaseNotesLink>http://www.transmissionbt.com/appcast/releasenotes.html</sparkle:releaseNotesLink>
-      	<pubDate>Mon, 11 May 2009 17:46:00 -0400</pubDate>
+      	<pubDate>Thu, 04 June 2009 20:00:00 -0400</pubDate>
       	<enclosure
-      	url="http://mirrors.m0k.org/transmission/files/Transmission-1.61.dmg" 
-      	sparkle:version="8382"
-      	sparkle:shortVersionString="1.61"
-      	sparkle:dsaSignature="MCwCFCnY0AUn09+cLGa8CbnIQDmz6gIRAhQeggUe5t9ZSD8mo4LePSrM0QqYBQ=="
-      	length="4329592"
+      	url="http://mirrors.m0k.org/transmission/files/Transmission-1.70.dmg" 
+      	sparkle:version="8614"
+      	sparkle:shortVersionString="1.70"
+      	sparkle:dsaSignature="MC0CFQCVn3aBDDLK8AwHzmFr6DbhrVCKMAIUb+swMorpEihh/62/TqjOhm0Zy+s="
+      	length="4534200"
       	type="application/octet-stream"/>
       	<sparkle:minimumSystemVersion>10.5.0</sparkle:minimumSystemVersion>
     </item>
     
 	<item>
-		<title>Transmission 1.53</title>
+		<title>Transmission 1.54</title>
 		<sparkle:releaseNotesLink>http://www.transmissionbt.com/appcast/releasenotes104.html</sparkle:releaseNotesLink>
-      	<pubDate>Mon, 11 May 2009 17:46:00 -0400</pubDate>
+      	<pubDate>Thu, 04 June 2009 20:00:00 -0400</pubDate>
       	<enclosure
-      	url="http://mirrors.m0k.org/transmission/files/Transmission-1.53.dmg" 
-      	sparkle:version="8379"
-      	sparkle:shortVersionString="1.53"
-      	sparkle:dsaSignature="MCwCFGzWUcd+59u24hL9yZDg/hq5HUzBAhRBrYfBgmEkIwi35zcnYyT9w8W2fw=="
-      	length="3826970"
+      	url="http://mirrors.m0k.org/transmission/files/Transmission-1.54.dmg" 
+      	sparkle:version="8615	"
+      	sparkle:shortVersionString="1.54"
+      	sparkle:dsaSignature="MC0CFEeFfx7tm6gf7RD67A9V1m9imQZ5AhUAg/VwCkRKtcYIyH6660/evpd0JI8="
+      	length="4101543"
       	type="application/octet-stream"/>
       	<sparkle:minimumSystemVersion>10.4.11</sparkle:minimumSystemVersion>
     </item>
