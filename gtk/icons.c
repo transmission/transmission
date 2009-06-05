@@ -151,7 +151,8 @@ get_themed_icon_pixbuf( GThemedIcon  *icon,
 
     pixbuf = gtk_icon_info_load_icon( icon_info, &error );
     if ( pixbuf == NULL ) {
-        g_warning( "could not load icon pixbuf: %s\n", error->message );
+        if( error && error->message )
+            g_warning( "could not load icon pixbuf: %s\n", error->message );
         g_clear_error( &error );
     }
 
