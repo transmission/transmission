@@ -10,7 +10,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id:$
+ * $Id$
  */
 
 typedef struct dtr_watchdir dtr_watchdir;

@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id:$
+ * $Id$
  */
 #ifdef WITH_INOTIFY
   #include <sys/inotify.h>
