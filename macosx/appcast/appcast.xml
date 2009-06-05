@@ -28,10 +28,10 @@
       	<pubDate>Thu, 04 June 2009 20:00:00 -0400</pubDate>
       	<enclosure
       	url="http://mirrors.m0k.org/transmission/files/Transmission-1.54.dmg" 
-      	sparkle:version="8615	"
+      	sparkle:version="8615"
       	sparkle:shortVersionString="1.54"
-      	sparkle:dsaSignature="MC0CFEeFfx7tm6gf7RD67A9V1m9imQZ5AhUAg/VwCkRKtcYIyH6660/evpd0JI8="
-      	length="4101543"
+      	sparkle:dsaSignature="MCwCFCfR8NXqspNkW4xCtFWXLLE8OegiAhR28nofs7rwHU5gSNRZzg40PBvJYw=="
+      	length="3832592"
       	type="application/octet-stream"/>
       	<sparkle:minimumSystemVersion>10.4.11</sparkle:minimumSystemVersion>
     </item>
