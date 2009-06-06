@@ -599,20 +599,24 @@ tr_fdSocketAccept( int           b,
                    tr_address  * addr,
                    tr_port     * port )
 {
-    int                s = -1;
-    unsigned int       len;
+    int s;
+    unsigned int len;
     struct sockaddr_storage sock;
+    tr_lockLock( gFd->lock );
 
     assert( addr );
     assert( port );
 
-    tr_lockLock( gFd->lock );
-    if( gFd->socketCount < getSocketMax( gFd ) )
+    len = sizeof( struct sockaddr_storage );
+    s = accept( b, (struct sockaddr *) &sock, &len );
+
+    if( ( s >= 0 ) && gFd->socketCount < getSocketMax( gFd ) )
     {
-        len = sizeof( struct sockaddr_storage );
-        s = accept( b, (struct sockaddr *) &sock, &len );
+        EVUTIL_CLOSESOCKET( s );
+        s = -1;
     }
-    if( s > -1 )
+
+    if( s >= 0 )
     {
         /* "The ss_family field of the sockaddr_storage structure will always 
          * align with the family field of any protocol-specific structure." */ 
@@ -632,8 +636,8 @@ tr_fdSocketAccept( int           b,
         } 
         ++gFd->socketCount;
     }
-    tr_lockUnlock( gFd->lock );
 
+    tr_lockUnlock( gFd->lock );
     return s;
 }
 
