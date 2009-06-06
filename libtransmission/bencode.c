@@ -1544,22 +1544,17 @@ tr_bencToFile( const tr_benc * top, tr_fmt_mode mode, const char * filename )
     }
     else
     {
-        struct evbuffer * buf = evbuffer_new( );
-        tr_bencToBuf( top, mode, buf );
+        int len;
+        char * str = tr_bencToStr( top, mode, &len );
 
-        while( !err && EVBUFFER_LENGTH( buf ) )
-        {
-            if( evbuffer_write( buf, fileno(fp) ) == -1 )
-            {
-                err = errno;
-                tr_err( _( "Couldn't save file \"%1$s\": %2$s" ),
-                       filename, tr_strerror( errno ) );
-            }
+        if( fwrite( str, 1, len, fp ) == (size_t)len )
+            tr_dbg( "tr_bencToFile saved \"%s\"", filename );
+        else {
+            err = errno;
+            tr_err( _( "Couldn't save file \"%1$s\": %2$s" ), filename, tr_strerror( errno ) );
         }
 
-        if( !err )
-            tr_dbg( "tr_bencToFile saved \"%s\"", filename );
-        evbuffer_free( buf );
+        tr_free( str );
         fclose( fp );
     }
 
