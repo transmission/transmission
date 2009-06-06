@@ -642,8 +642,9 @@ Torrent.indexOf = function( torrents, id )
  */
 Torrent.lookup = function( torrents, id )
 {
-	var pos = Torrent.indexOf( torrents, id );
-	return pos >= 0 ? torrents[pos] : null;
+	var immutable_array = torrents.slice();
+	var pos = Torrent.indexOf( immutable_array, id );
+	return pos >= 0 ? immutable_array[pos] : null;
 };
 
 function TorrentFile(file_data) {
