@@ -1437,7 +1437,6 @@ tr_core_blocklist_update( TrCore * core )
 void
 tr_core_exec_json( TrCore * core, const char * json )
 {
-    g_message( "executing %s", json );
     sendRequest( core, json, 0, NULL, NULL );
 }
 
