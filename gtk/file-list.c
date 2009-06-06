@@ -54,14 +54,14 @@ enum
 
 typedef struct
 {
-    int             torrentId;
-    TrCore *        core;
+    TrCore        * core;
     tr_torrent    * tor;
-    GtkWidget *     top;
-    GtkWidget *     view;
-    GtkTreeModel *  model; /* same object as store, but recast */
-    GtkTreeStore *  store; /* same object as model, but recast */
-    tr_file_stat *  refresh_file_stat;
+    GtkWidget     * top;
+    GtkWidget     * view;
+    GtkTreeModel  * model; /* same object as store, but recast */
+    GtkTreeStore  * store; /* same object as model, but recast */
+    tr_file_stat  * refresh_file_stat;
+    int             torrentId;
     guint           timeout_tag;
 }
 FileData;
@@ -78,10 +78,8 @@ clearData( FileData * data )
 }
 
 static void
-freeData( gpointer gdata )
+freeData( gpointer data )
 {
-    FileData * data = gdata;
-
     clearData( data );
     g_free( data );
 }
@@ -119,7 +117,7 @@ refreshFilesForeach( GtkTreeModel * model,
                                      FC_SUB_HAVE, &old_sub_have,
                                      FC_PROG, &old_prog,
                                      -1  );
-//g_message ( "is_file {%d} index {%d} name {%s}", (int)is_file, (int)index, name );
+
     if( is_file )
     {
         int sub_state;
@@ -166,7 +164,7 @@ refreshFilesForeach( GtkTreeModel * model,
             gtk_tree_model_get( model, &child, FC_SUB_SIZE, &child_size,
                                                FC_SUB_HAVE, &child_have,
                                                FC_SUB_STATE, &child_state,
-                                                -1 );
+                                               -1 );
             size += child_size;
             have += child_have;
             state |= child_state;
@@ -225,16 +223,11 @@ refresh( FileData * data )
     else
     {
         tr_file_index_t fileCount;
-
-        /* initialize the temporary variables */
         data->tor = tr_torrentFindFromId( tr_core_session( data->core ), data->torrentId );
         data->refresh_file_stat = tr_torrentFiles( tor, &fileCount );
 
         gtr_tree_model_foreach_postorder( data->model, refreshFilesForeach, data );
-        //gtk_tree_model_foreach( data->model, refreshFilesForeach, data );
-        //gtk_tree_model_foreach( data->model, addSubForeach, data );
 
-        /* clean up the temporary variables */
         tr_torrentFilesFree( data->refresh_file_stat, fileCount );
         data->refresh_file_stat = NULL;
         data->tor = NULL;
@@ -254,15 +247,15 @@ refreshModel( gpointer file_data )
 
 struct ActiveData
 {
-    GtkTreeSelection *  sel;
-    GArray *            array;
+    GtkTreeSelection  * sel;
+    GArray            * array;
 };
 
 static gboolean
-getSelectedFilesForeach( GtkTreeModel *       model,
-                         GtkTreePath   * path UNUSED,
-                         GtkTreeIter *        iter,
-                         gpointer             gdata )
+getSelectedFilesForeach( GtkTreeModel * model,
+                         GtkTreePath  * path UNUSED,
+                         GtkTreeIter  * iter,
+                         gpointer       gdata )
 {
     struct ActiveData * data = gdata;
     unsigned int        i;
@@ -270,7 +263,9 @@ getSelectedFilesForeach( GtkTreeModel *       model,
     gboolean            is_active = FALSE;
 
     /* active == if it's selected, or any ancestor is selected */
-    gtk_tree_model_get( model, iter, FC_IS_FILE, &is_file, FC_INDEX, &i, -1 );
+    gtk_tree_model_get( model, iter, FC_IS_FILE, &is_file,
+                                     FC_INDEX, &i,
+                                     -1 );
     if( is_file )
     {
         is_active = gtk_tree_selection_iter_is_selected( data->sel, iter );
@@ -278,11 +273,9 @@ getSelectedFilesForeach( GtkTreeModel *       model,
         {
             GtkTreeIter walk = *iter;
             GtkTreeIter parent;
-            while( !is_active
-                 && gtk_tree_model_iter_parent( model, &parent, &walk ) )
+            while( !is_active && gtk_tree_model_iter_parent( model, &parent, &walk ) )
             {
-                is_active = gtk_tree_selection_iter_is_selected( data->sel,
-                                                                 &parent );
+                is_active = gtk_tree_selection_iter_is_selected( data->sel, &parent );
                 walk = parent;
             }
         }
@@ -295,8 +288,7 @@ getSelectedFilesForeach( GtkTreeModel *       model,
 }
 
 static void
-getSelectedFilesAndDescendants( GtkTreeView * view,
-                                GArray *      indices )
+getSelectedFilesAndDescendants( GtkTreeView * view, GArray * indices )
 {
     struct ActiveData data;
 
@@ -308,8 +300,8 @@ getSelectedFilesAndDescendants( GtkTreeView * view,
 
 struct SubtreeForeachData
 {
-    GArray * array;
-    GtkTreePath * path;
+    GArray       * array;
+    GtkTreePath  * path;
 };
 
 static gboolean
@@ -322,9 +314,9 @@ getSubtreeForeach( GtkTreeModel   * model,
     unsigned int i;
     gboolean is_file = FALSE;
 
-    gtk_tree_model_get( model, iter,
-                        FC_IS_FILE, &is_file,
-                        FC_INDEX, &i, -1 );
+    gtk_tree_model_get( model, iter, FC_IS_FILE, &is_file,
+                                     FC_INDEX, &i,
+                                     -1 );
     if( is_file )
         if( !gtk_tree_path_compare( path, data->path ) || gtk_tree_path_is_descendant( path, data->path ) )
             g_array_append_val( data->array, i );
@@ -346,8 +338,7 @@ getSubtree( GtkTreeView * view, GtkTreePath * path, GArray * indices )
  * this is for toggling all the selected rows' states in a batch.
  */
 static GArray*
-getActiveFilesForPath( GtkTreeView * view,
-                       GtkTreePath * path )
+getActiveFilesForPath( GtkTreeView * view, GtkTreePath * path )
 {
     GtkTreeSelection * sel = gtk_tree_view_get_selection( view );
     GArray * indices = g_array_new( FALSE, FALSE, sizeof( tr_file_index_t ) );
@@ -378,17 +369,17 @@ file_list_clear( GtkWidget * w )
 
 struct build_data
 {
-    GtkWidget * w;
-    tr_torrent * tor;
-    GtkTreeIter * iter;
+    GtkWidget    * w;
+    tr_torrent   * tor;
+    GtkTreeIter  * iter;
     GtkTreeStore * store;
 };
 
 struct row_struct
 {
-    char * name;
-    int index;
-    uint64_t length;
+    uint64_t    length;
+    char      * name;
+    int         index;
 };
 
 static void
@@ -539,7 +530,7 @@ file_list_set_torrent( GtkWidget * w, int torrentId )
         data->timeout_tag = gtr_timeout_add_seconds( 2, refreshModel, data );
     }
 
-    gtk_tree_view_set_model( GTK_TREE_VIEW( data->view ), GTK_TREE_MODEL( store ) );
+    gtk_tree_view_set_model( GTK_TREE_VIEW( data->view ), data->model );
     gtk_tree_view_expand_all( GTK_TREE_VIEW( data->view ) );
 }
 
@@ -552,7 +543,7 @@ renderFilename( GtkTreeViewColumn  * column UNUSED,
                 GtkCellRenderer    * renderer,
                 GtkTreeModel       * model,
                 GtkTreeIter        * iter,
-                gpointer             data   UNUSED )
+                gpointer             data UNUSED )
 {
     char *   filename;
     char *   str;
@@ -576,7 +567,7 @@ renderDownload( GtkTreeViewColumn  * column UNUSED,
                 GtkTreeIter        * iter,
                 gpointer             data   UNUSED )
 {
-    int      sub_state;
+    int sub_state;
     gboolean enabled;
     gboolean active = FALSE;
     gboolean inconsistent = FALSE;
@@ -586,25 +577,20 @@ renderDownload( GtkTreeViewColumn  * column UNUSED,
                                      FC_ENABLED, &enabled,
                                      FC_SUB_STATE, &sub_state,
                                      -1 );
+
     if( is_file && enabled )
         active = TRUE;
     else if( is_file )
         active = FALSE;
-    else switch( sub_state & SUB_STATE_DOWNLOAD_MASK )
-        {
-            case SUB_STATE_DOWNLOAD:
-                active = TRUE; break;
-
-            case SUB_STATE_IGNORE:
-                active = FALSE; break;
-
-            default:
-                inconsistent = TRUE; break;
-        }
+    else switch( sub_state & SUB_STATE_DOWNLOAD_MASK ) {
+        case SUB_STATE_DOWNLOAD: active = TRUE; break;
+        case SUB_STATE_IGNORE: active = FALSE; break;
+        default: inconsistent = TRUE; break;
+    }
 
     g_object_set( renderer, "inconsistent", inconsistent,
-                  "active", active,
-                  NULL );
+                            "active", active,
+                            NULL );
 }
 
 static void
@@ -623,6 +609,7 @@ renderPriority( GtkTreeViewColumn  * column UNUSED,
                                      FC_PRIORITY, &priority,
                                      FC_SUB_STATE, &sub_state,
                                      -1 );
+
     if( !is_file ) {
         switch( sub_state & SUB_STATE_PRIORITY_MASK ) {
             case SUB_STATE_HIGH: priority = TR_PRI_HIGH; break; 
@@ -646,9 +633,7 @@ renderPriority( GtkTreeViewColumn  * column UNUSED,
 }
 
 static gboolean
-onViewButtonPressed( GtkWidget      * w,
-                     GdkEventButton * event,
-                     gpointer         gdata )
+onViewButtonPressed( GtkWidget * w, GdkEventButton * event, gpointer gdata )
 {
     FileData * data = gdata;
     gboolean   handled = FALSE;
@@ -673,12 +658,11 @@ onViewButtonPressed( GtkWidget      * w,
             const gboolean priorityColumn = !strcmp( column_title, _( "Priority" ) );
             if( downloadColumn || priorityColumn )
             {
-                GArray *           a = getActiveFilesForPath( view, path );
+                GArray * a = getActiveFilesForPath( view, path );
                 GtkTreeSelection * sel = gtk_tree_view_get_selection( view );
-                const gboolean     isSelected =
-                    gtk_tree_selection_path_is_selected( sel, path );
-                GtkTreeModel *     model = gtk_tree_view_get_model( view );
-                GtkTreeIter        iter;
+                const gboolean isSelected = gtk_tree_selection_path_is_selected( sel, path );
+                GtkTreeModel * model = data->model;
+                GtkTreeIter iter;
 
                 gtk_tree_model_get_iter( model, &iter, path );
 
@@ -695,28 +679,15 @@ onViewButtonPressed( GtkWidget      * w,
                                                       -1 );
 
                     /* twiddle it to the next state */
-                    if( !is_file ) switch( sub_state & SUB_STATE_PRIORITY_MASK )
-                        {
-                            case SUB_STATE_NORMAL:
-                                priority = TR_PRI_HIGH; break;
-
-                            case SUB_STATE_HIGH:
-                                priority = TR_PRI_LOW; break;
-
-                            default:
-                                priority = TR_PRI_NORMAL; break;
-                        }
-                    else switch( priority )
-                        {
-                            case TR_PRI_LOW:
-                                priority = TR_PRI_NORMAL; break;
-
-                            case TR_PRI_NORMAL:
-                                priority = TR_PRI_HIGH; break;
-
-                            case TR_PRI_HIGH:
-                                priority = TR_PRI_LOW; break;
-                        }
+                    if( !is_file ) switch( sub_state & SUB_STATE_PRIORITY_MASK ) {
+                        case SUB_STATE_NORMAL: priority = TR_PRI_HIGH; break; 
+                        case SUB_STATE_HIGH: priority = TR_PRI_LOW; break;
+                        default: priority = TR_PRI_NORMAL; break;
+                    } else switch( priority ) {
+                        case TR_PRI_LOW: priority = TR_PRI_NORMAL; break;
+                        case TR_PRI_NORMAL: priority = TR_PRI_HIGH; break;
+                        case TR_PRI_HIGH: priority = TR_PRI_LOW; break;
+                    }
 
                     /* apply that new state to the active files */
                     tr_torrentSetFilePriorities( tor,
@@ -769,22 +740,25 @@ onViewButtonPressed( GtkWidget      * w,
 GtkWidget *
 file_list_new( TrCore * core, int torrentId )
 {
-    const char * title;
-    PangoLayout  * pango_layout;
     int width;
-    GtkWidget *         ret;
-    GtkWidget *         view, * scroll;
-    GtkCellRenderer *   rend;
+    GtkWidget * ret;
+    GtkWidget * view;
+    GtkWidget * scroll;
+    GtkCellRenderer * rend;
+    GtkTreeSelection * sel;
     GtkTreeViewColumn * col;
-    GtkTreeSelection *  sel;
-    FileData *          data = g_new0( FileData, 1 );
+    GtkTreeView * tree_view;
+    const char * title;
+    PangoLayout * pango_layout;
+    FileData * data = g_new0( FileData, 1 );
 
     data->core = core;
 
     /* create the view */
     view = gtk_tree_view_new( );
-    gtk_tree_view_set_fixed_height_mode( GTK_TREE_VIEW( view ), TRUE );
-    gtk_tree_view_set_rules_hint( GTK_TREE_VIEW( view ), TRUE );
+    tree_view = GTK_TREE_VIEW( view );
+    gtk_tree_view_set_fixed_height_mode( tree_view, TRUE );
+    gtk_tree_view_set_rules_hint( tree_view, TRUE );
     gtk_container_set_border_width( GTK_CONTAINER( view ), GUI_PAD_BIG );
     g_signal_connect( view, "button-press-event",
                       G_CALLBACK( onViewButtonPressed ), data );
@@ -793,10 +767,10 @@ file_list_new( TrCore * core, int torrentId )
 
 
     /* set up view */
-    sel = gtk_tree_view_get_selection( GTK_TREE_VIEW( view ) );
+    sel = gtk_tree_view_get_selection( tree_view );
     gtk_tree_selection_set_mode( sel, GTK_SELECTION_MULTIPLE );
-    gtk_tree_view_expand_all( GTK_TREE_VIEW( view ) );
-    gtk_tree_view_set_search_column( GTK_TREE_VIEW( view ), FC_LABEL );
+    gtk_tree_view_expand_all( tree_view );
+    gtk_tree_view_set_search_column( tree_view, FC_LABEL );
 
     /* add file column */
 
@@ -813,7 +787,7 @@ file_list_new( TrCore * core, int torrentId )
     g_object_set( rend, "ellipsize", PANGO_ELLIPSIZE_END, NULL );
     gtk_tree_view_column_pack_start( col, rend, TRUE );
     gtk_tree_view_column_set_cell_data_func( col, rend, renderFilename, NULL, NULL );
-    gtk_tree_view_append_column( GTK_TREE_VIEW( view ), col );
+    gtk_tree_view_append_column( tree_view, col );
 
     /* add "progress" column */
     title = _( "Progress" );
@@ -826,7 +800,7 @@ file_list_new( TrCore * core, int torrentId )
     gtk_tree_view_column_set_fixed_width( col, width );
     gtk_tree_view_column_set_sizing( col, GTK_TREE_VIEW_COLUMN_FIXED );
     //gtk_tree_view_column_set_cell_data_func( col, rend, renderProgress, NULL, NULL );
-    gtk_tree_view_append_column ( GTK_TREE_VIEW( view ), col );
+    gtk_tree_view_append_column ( tree_view, col );
 
     /* add "enabled" column */
     title = _( "Download" );
@@ -839,7 +813,7 @@ file_list_new( TrCore * core, int torrentId )
     gtk_tree_view_column_set_fixed_width( col, width );
     gtk_tree_view_column_set_sizing( col, GTK_TREE_VIEW_COLUMN_FIXED );
     gtk_tree_view_column_set_cell_data_func( col, rend, renderDownload, NULL, NULL );
-    gtk_tree_view_append_column ( GTK_TREE_VIEW( view ), col );
+    gtk_tree_view_append_column ( tree_view, col );
 
     /* add priority column */
     title = _( "Priority" );
@@ -852,7 +826,7 @@ file_list_new( TrCore * core, int torrentId )
     gtk_tree_view_column_set_fixed_width( col, width );
     gtk_tree_view_column_set_sizing( col, GTK_TREE_VIEW_COLUMN_FIXED );
     gtk_tree_view_column_set_cell_data_func( col, rend, renderPriority, NULL, NULL );
-    gtk_tree_view_append_column ( GTK_TREE_VIEW( view ), col );
+    gtk_tree_view_append_column ( tree_view, col );
 
     /* create the scrolled window and stick the view in it */
     scroll = gtk_scrolled_window_new( NULL, NULL );
