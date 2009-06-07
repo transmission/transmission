@@ -6,7 +6,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Fix 1.70 bug that caused high CPU use in high-peer swarms
    + Fix 1.70 build problems with DHT and libevent
 - Daemon
-   + Fix watchdir issue on OS's that don't have inotify
+   + Fix watchdir issue on OSes that don't have inotify
 - GTK+
    + Fix 1.70 intltool build problem
    + Fix crash when the OS's stock mime-type icons are misconfigured 
