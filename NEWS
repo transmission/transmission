@@ -1,5 +1,19 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
+1.71 (2009/06/07)
+<http://trac.transmissionbt.com/query?milestone=1.71&group=component&groupdesc=1&order=severity>
+- All Platforms
+   + Fix 1.70 bug that caused high CPU use in high-peer swarms
+   + Fix 1.70 build problems with DHT and libevent
+- Daemon
+   + Fix watchdir issue on OSes that don't have inotify
+- GTK+
+   + Fix 1.70 intltool build problem
+   + Fix crash when the OS's stock mime-type icons are misconfigured 
+   + The torrent file list now handles very long file lists faster
+- Web Client
+   + Fix 1.70 bug where added torrents were sometimes not shownj
+
 1.70 (2009/06/04)
 <http://trac.transmissionbt.com/query?milestone=1.70&group=component&groupdesc=1&order=severity>
 - All Platforms
@@ -20,7 +34,6 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + The "data remaining" field wasn't updated when the number reached 0
    + Smaller design adjustments
 - GTK+
-   + Fix intltool build problem
    + Make it clearer that the status bar's ratio mode button is a button
    + Torrent comment box did not scroll, so long comments were partially hidden
 - Qt
