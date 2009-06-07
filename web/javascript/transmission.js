@@ -1103,7 +1103,7 @@ Transmission.prototype =
 		$('#torrent_inspector').hide();
 		
 		if (iPhone) {
-			transmsision.deselectAll( );
+			this.deselectAll( );
 			$('body.inspector_showing').removeClass('inspector_showing');
 			this.hideiPhoneAddressbar();
 		} else {
@@ -1415,11 +1415,12 @@ Transmission.prototype =
 	},
 
 	hideiPhoneAddressbar: function(timeInSeconds) {
+		var tr = this;
 		if( iPhone ) {
 			var delayLength = timeInSeconds ? timeInSeconds*1000 : 150;
 			// not currently supported on iPhone
 			if(/*document.body.scrollTop!=1 && */scroll_timeout==null) {
-				scroll_timeout = setTimeout("transmission.doToolbarHide()", delayLength);
+				scroll_timeout = setTimeout(function(){ tr.doToolbarHide(); }, delayLength);
 			}
 		}
 	},
