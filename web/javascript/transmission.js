@@ -25,7 +25,7 @@ Transmission.prototype =
 
 		// Initialize the implementation fields
 		this._current_search         = '';
-		this._torrents               = [ ];
+		this._torrents               = { };
 		this._rows                   = [ ];
 	
 		// Initialize the clutch preferences
@@ -310,7 +310,10 @@ Transmission.prototype =
 
 	getAllTorrents: function()
 	{
-		return this._torrents;
+		var torrents = [];
+		for(var key in this._torrents)
+		  torrents.push(this._torrents[key]);
+		return torrents;
 	},
 
 	getVisibleTorrents: function()
@@ -657,7 +660,7 @@ Transmission.prototype =
 		var match = $(element).closest('.inspector_torrent_file_list_entry').attr('id').match(/^t(\d+)f(\d+)$/);
 		var torrent_id = match[1];
 		var file_id = match[2];
-		var torrent = Torrent.lookup( this._torrents, torrent_id );
+		var torrent = this._torrents[torrent_id];
 		return torrent._file_view[file_id];
 	},
 
@@ -1151,7 +1154,7 @@ Transmission.prototype =
 		var new_torrent_ids = [];
 		var refresh_files_for = [];
 		jQuery.each( active, function() {
-			var t = Torrent.lookup(tr._torrents, this.id);
+			var t = tr._torrents[this.id];
 			if (t){
 		    t.refresh(this);
 		    if(t.isSelected())
@@ -1181,7 +1184,7 @@ Transmission.prototype =
 		var tr = this;
 		var listIsVisible = tr.fileListIsVisible( );
 		jQuery.each( torrents, function() {
-			var t = Torrent.lookup(tr._torrents, this.id);
+			var t = tr._torrents[this.id];
 			if (t) {
 				t.refreshFileModel(this);
 				if( listIsVisible && t.isSelected())
@@ -1200,8 +1203,10 @@ Transmission.prototype =
 		var transferFragment = document.createDocumentFragment( );
 		var fileFragment = document.createDocumentFragment( );
 
-		for( var i=0, row; row=new_torrents[i]; ++i )
-			this._torrents.push( new Torrent( transferFragment, fileFragment, this, row ) );
+		for( var i=0, row; row=new_torrents[i]; ++i ) {
+			var new_torrent = new Torrent( transferFragment, fileFragment, this, row );
+			this._torrents[new_torrent.id()] = new_torrent;
+		}
 
                 this._inspector_file_list.appendChild( fileFragment );
                 this._torrent_list.appendChild( transferFragment );
@@ -1215,7 +1220,7 @@ Transmission.prototype =
 		var tr = this;
 		var removedAny = false;
 		$.each( torrent_ids, function(index, id){
-			var torrent = Torrent.lookup(tr._torrents, id);
+			var torrent = tr._torrents[id];
 
 			if(torrent) {
 				removedAny = true;
@@ -1227,10 +1232,9 @@ Transmission.prototype =
 					e.remove();
 				}
 
-				var pos = Torrent.indexOf( tr._torrents, torrent.id( ) );
 				torrent.hideFileList();
 				torrent.deleteFiles();
-				tr._torrents.splice( pos, 1 );
+				delete tr._torrents[torrent.id()];
 			}
 		});
 
