@@ -12,7 +12,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Fix crash when the OS's stock mime-type icons are misconfigured 
    + Handle very long torrent file lists faster
 - Web Client
-   + Fix 1.70 bug where added torrents were sometimes not shown
+   + Fix 1.70 bug where some torrents appeared to be duplicates
 
 1.70 (2009/06/04)
 <http://trac.transmissionbt.com/query?milestone=1.70&group=component&groupdesc=1&order=severity>
