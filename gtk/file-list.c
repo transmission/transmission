@@ -143,7 +143,7 @@ refreshFilesForeach( GtkTreeModel * model,
                                                    FC_HAVE, have,
                                                    FC_SUB_STATE, sub_state,
                                                    FC_SUB_HAVE, have,
-                                                   FC_PROG, (int)((100.0*have)/size),
+                                                   FC_PROG, prog,
                                                    -1 );
     }
     else
@@ -704,7 +704,8 @@ onViewButtonPressed( GtkWidget * w, GdkEventButton * event, gpointer gdata )
                     /* get the `enabled' state of the clicked row */
                     gtk_tree_model_get( model, &iter, FC_IS_FILE, &is_file,
                                                       FC_ENABLED, &enabled,
-                                                      FC_SUB_STATE, &sub_state, -1 );
+                                                      FC_SUB_STATE, &sub_state,
+                                                      -1 );
 
                     /* twiddle it to the next state */
                     if( is_file )
@@ -799,7 +800,6 @@ file_list_new( TrCore * core, int torrentId )
     col = gtk_tree_view_column_new_with_attributes( title, rend, "value", FC_PROG, NULL );
     gtk_tree_view_column_set_fixed_width( col, width );
     gtk_tree_view_column_set_sizing( col, GTK_TREE_VIEW_COLUMN_FIXED );
-    //gtk_tree_view_column_set_cell_data_func( col, rend, renderProgress, NULL, NULL );
     gtk_tree_view_append_column ( tree_view, col );
 
     /* add "enabled" column */
