@@ -156,7 +156,7 @@ tr_bencParseStr( const uint8_t *  buf,
 }
 
 /* set to 1 to help expose bugs with tr_bencListAdd and tr_bencDictAdd */
-#define LIST_SIZE 8 /* number of items to increment list/dict buffer by */
+#define LIST_SIZE 4 /* number of items to increment list/dict buffer by */
 
 static int
 makeroom( tr_benc * val,
