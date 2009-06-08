@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2009-05-28 18:17-0500\n"
-"PO-Revision-Date: 2009-05-12 12:51+0000\n"
+"PO-Revision-Date: 2009-06-06 07:43+0000\n"
 "Last-Translator: Hew McLachlan <hew.mclachlan@gmail.com>\n"
 "Language-Team: English (Australia) <en_AU@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2009-06-04 20:21+0000\n"
+"X-Launchpad-Export-Date: 2009-06-08 01:28+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:49
@@ -1519,11 +1519,11 @@ msgstr "Sort by Si_ze"
 
 #: ../gtk/actions.c:90
 msgid "Speed _Limit Mode"
-msgstr ""
+msgstr "Speed _Limit Mode"
 
 #: ../gtk/actions.c:113
 msgid "Set _Location"
-msgstr ""
+msgstr "Set _Location"
 
 #: ../gtk/conf.c:513 ../gtk/conf.c:518 ../gtk/conf.c:525
 #, c-format
@@ -1592,7 +1592,7 @@ msgstr "Swarm speed:"
 
 #: ../gtk/details.c:944
 msgid "Private to this tracker -- DHT and PEX disabled"
-msgstr ""
+msgstr "Private to this tracker -- DHT and PEX disabled"
 
 #: ../gtk/details.c:1088
 msgid "Destination:"
@@ -1604,7 +1604,7 @@ msgstr "Webseeds"
 
 #: ../gtk/details.c:1506
 msgid "Peer was discovered through DHT"
-msgstr ""
+msgstr "Peer was discovered through DHT"
 
 #: ../gtk/details.c:1736
 msgid "None sent"
@@ -1679,11 +1679,11 @@ msgstr "_Encryption mode"
 
 #: ../gtk/tr-prefs.c:541
 msgid "Use peer e_xchange (PEX)"
-msgstr ""
+msgstr "Use peer e_xchange (PEX)"
 
 #: ../gtk/tr-prefs.c:545
 msgid "Use _distributed hash table (DHT)"
-msgstr ""
+msgstr "Use _distributed hash table (DHT)"
 
 #: ../gtk/tr-prefs.c:1119
 msgid "Every Day"
@@ -1743,7 +1743,7 @@ msgstr "When enabled, Speed Limit Mode overrides the Global Bandwidth Limits"
 
 #: ../gtk/tr-prefs.c:1220
 msgid "Use Speed Limit Mode _between:"
-msgstr ""
+msgstr "Use Speed Limit Mode _between:"
 
 #: ../gtk/tr-prefs.c:1235
 msgid "_On days:"
@@ -1767,7 +1767,7 @@ msgstr "_Test Port"
 
 #: ../gtk/tr-prefs.c:1340
 msgid "_Randomize the port every launch"
-msgstr ""
+msgstr "_Randomise the port every launch"
 
 #: ../gtk/tr-window.c:330
 msgid "Click to disable Speed Limit Mode"

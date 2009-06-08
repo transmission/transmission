@@ -3,14 +3,14 @@ msgstr ""
 "Project-Id-Version: Transmission 0.81\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-05-28 18:17-0500\n"
-"PO-Revision-Date: 2009-05-09 21:54+0000\n"
+"PO-Revision-Date: 2009-06-07 18:37+0000\n"
 "Last-Translator: Daniel Schury <Surst@gmx.net>\n"
 "Language-Team: Michael Färber <0102@gmx.at>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2009-06-04 20:20+0000\n"
+"X-Launchpad-Export-Date: 2009-06-08 01:28+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:49
@@ -159,7 +159,7 @@ msgstr "_Inhalte"
 
 #: ../gtk/actions.c:125
 msgid "Ask Tracker for _More Peers"
-msgstr "Tracker nach _mehr Peers fragen"
+msgstr "Tracker um _mehr Peers bitten"
 
 #: ../gtk/add-dialog.c:241
 msgid "Torrent files"
@@ -237,15 +237,15 @@ msgstr "Hoch"
 
 #: ../gtk/details.c:542 ../gtk/tr-prefs.c:1181
 msgid "Limit _download speed (KB/s):"
-msgstr "_Geschwindigkeit des Herunterladens beschränken (KB/s):"
+msgstr "Empfangsgeschwindigkeit beschränken (KB/s):"
 
 #: ../gtk/details.c:554 ../gtk/tr-prefs.c:1188
 msgid "Limit _upload speed (KB/s):"
-msgstr "_Upload-Geschwindigkeit beschränken (KB/s):"
+msgstr "Sendegeschwindigkeit beschränken (KB/s):"
 
 #: ../gtk/details.c:610
 msgid "Peer Connections"
-msgstr "Peer Verbindungen"
+msgstr "Peer-Verbindungen"
 
 #: ../gtk/details.c:613
 msgid "_Maximum peers:"
@@ -253,7 +253,7 @@ msgstr "Maximale Anzahl Peers:"
 
 #: ../gtk/details.c:632 ../gtk/torrent-cell-renderer.c:173
 msgid "Waiting to verify local data"
-msgstr "Warte um vorhandene Dateien zu prüfen"
+msgstr "Warte, um vorhandene Dateien zu prüfen"
 
 #: ../gtk/details.c:634
 msgid "Downloading"
@@ -343,7 +343,7 @@ msgstr[1] "%'d Teile"
 #: ../gtk/details.c:916 ../gtk/makemeta-ui.c:290
 #, c-format
 msgid "%1$s @ %2$s"
-msgstr "%1$s mit je %2$s"
+msgstr "%1s zu je %2s"
 
 #: ../gtk/details.c:946
 msgid "Public torrent"
@@ -435,7 +435,8 @@ msgstr "Wir würden zu diesem Peer hochladen, wenn er uns fragen würde"
 
 #: ../gtk/details.c:1502
 msgid "Peer has unchoked us, but we're not interested"
-msgstr "Der Peer hat uns gedrosselt, aber wir sind daran nicht interessiert."
+msgstr ""
+"Der Peer hat uns entdrosselt, aber wir sind daran nicht interessiert."
 
 #: ../gtk/details.c:1503
 msgid "We unchoked this peer, but they're not interested"
@@ -854,24 +855,24 @@ msgstr "%s verbleibend"
 #: ../gtk/torrent-cell-renderer.c:147
 #, c-format
 msgid "speed|Down: %1$s, Up: %2$s"
-msgstr "Geschwindigkeit|Runter: %1$s, Hoch: %2$s"
+msgstr "Empfangen: %1$s, Senden: %2$s"
 
 #. download speed
 #: ../gtk/torrent-cell-renderer.c:150
 #, c-format
 msgid "Down: %s"
-msgstr "Empfange: %s"
+msgstr "Empfangen: %s"
 
 #. upload speed
 #: ../gtk/torrent-cell-renderer.c:153
 #, c-format
 msgid "Up: %s"
-msgstr "Sende: %s"
+msgstr "Senden: %s"
 
 #. the torrent isn't uploading or downloading
 #: ../gtk/torrent-cell-renderer.c:156
 msgid "Idle"
-msgstr "Bereit"
+msgstr "Untätig"
 
 #: ../gtk/torrent-cell-renderer.c:179 ../gtk/tr-torrent.c:240
 #, c-format
@@ -912,23 +913,23 @@ msgstr "BitTorrent-Client"
 
 #: ../gtk/transmission.desktop.in.h:2
 msgid "Download and share files over BitTorrent"
-msgstr "Dateien über BitTorrent herunterladen und tauschen"
+msgstr "Dateien über BitTorrent herunterladen und verteilen"
 
 #: ../gtk/transmission.desktop.in.h:3
 msgid "Transmission BitTorrent Client"
-msgstr "Transmission BitTorrent Client"
+msgstr "Transmission BitTorrent-Client"
 
 #: ../gtk/tr-core.c:1123
 msgid "Transmission Bittorrent Client"
-msgstr "Transmission Bittorrent Client"
+msgstr "Transmission Bittorrent-Client"
 
 #: ../gtk/tr-core.c:1124
 msgid "BitTorrent Activity"
-msgstr "BitTorrent Aktivität"
+msgstr "BitTorrent-Aktivität"
 
 #: ../gtk/tr-core.c:1132
 msgid "Disallowing desktop hibernation"
-msgstr "Desktop Ruhezustand verbieten"
+msgstr "Desktop-Ruhezustand verbieten"
 
 #: ../gtk/tr-core.c:1136
 #, c-format
@@ -937,7 +938,7 @@ msgstr "Konnte Ruhezustand nicht deaktivieren: %s"
 
 #: ../gtk/tr-core.c:1160
 msgid "Allowing desktop hibernation"
-msgstr "Desktop Ruhezustand erlauben"
+msgstr "Desktop-Ruhezustand erlauben"
 
 #. %1$'d is the number of torrents we're seeding,
 #. %2$'d is the number of torrents we're downloading,
@@ -949,8 +950,8 @@ msgid ""
 "%1$'d Seeding, %2$'d Downloading\n"
 "Down: %3$s, Up: %4$s"
 msgstr ""
-"An %1$'d wird gesendet, von %2$'d wird heruntergeladen\n"
-"Empfangen: %3$s, Senden: %4$s"
+"An %1$'d wird hochgeladen, von %2$'d wird heruntergeladen\n"
+"Senden: %4$s, Empfangen: %3$s"
 
 #: ../gtk/tr-prefs.c:281
 msgid "Adding Torrents"
@@ -997,7 +998,7 @@ msgstr "Maximale Peers _gesamt:"
 
 #: ../gtk/tr-prefs.c:532
 msgid "Maximum peers per _torrent:"
-msgstr "Maximale Peers pro Torrent:"
+msgstr "Maximale Peers pro _Torrent:"
 
 #: ../gtk/tr-prefs.c:755
 msgid "Web Interface"
@@ -1066,7 +1067,7 @@ msgstr "_Authentifizierung notwendig"
 
 #: ../gtk/tr-prefs.c:1210
 msgid "Limit u_pload speed (KB/s):"
-msgstr "Hochladegeschwindigkeit begrenzen (KB/s):"
+msgstr "_Hochladegeschwindigkeit begrenzen (KB/s):"
 
 #: ../gtk/tr-prefs.c:1225
 msgid " and "
@@ -1151,7 +1152,7 @@ msgstr "Tracker wird Anfragen erlauben in %s"
 #. show all torrents
 #: ../gtk/tr-window.c:806
 msgid "A_ll"
-msgstr "_Alle"
+msgstr "A_lle"
 
 #. show only torrents that have connected peers
 #: ../gtk/tr-window.c:808
@@ -1166,12 +1167,12 @@ msgstr "_Herunterladende"
 #. show only torrents that are trying to upload
 #: ../gtk/tr-window.c:812
 msgid "_Seeding"
-msgstr "Sendende"
+msgstr "H_ochladende"
 
 #. show only torrents that are paused
 #: ../gtk/tr-window.c:814
 msgid "_Paused"
-msgstr "Angehaltene"
+msgstr "An_gehaltene"
 
 #: ../gtk/tr-window.c:1041
 #, c-format
@@ -1190,7 +1191,7 @@ msgstr[1] "Torrent"
 #: ../gtk/tr-window.c:1078 ../gtk/tr-window.c:1089
 #, c-format
 msgid "size|Down: %1$s, Up: %2$s"
-msgstr "Größe|Runter: %1$s, Hoch: %2$s"
+msgstr "Runter: %1$s, Hoch: %2$s"
 
 #: ../gtk/util.c:79
 #, c-format
@@ -1318,7 +1319,7 @@ msgstr "Konnte Socket nicht erstellen: %s"
 #: ../libtransmission/makemeta.c:60
 #, c-format
 msgid "Torrent Creator is skipping file \"%s\": %s"
-msgstr "Torrent Ersteller überspringt Datei \"%s\": %s"
+msgstr "Torrent-Ersteller überspringt Datei \"%s\": %s"
 
 #: ../libtransmission/metainfo.c:458
 #, c-format
@@ -1480,7 +1481,7 @@ msgstr "Nach _Größe sortieren"
 
 #: ../gtk/actions.c:90
 msgid "Speed _Limit Mode"
-msgstr ""
+msgstr "Geschwindigkeits_begrenzungs-Modus"
 
 #: ../gtk/actions.c:111
 msgid "_Pause All"
@@ -1500,7 +1501,7 @@ msgstr "Alle Torrents starten"
 
 #: ../gtk/actions.c:113
 msgid "Set _Location"
-msgstr ""
+msgstr "_Ort wählen"
 
 #: ../gtk/actions.c:121
 msgid "Torrent properties"
@@ -1548,7 +1549,7 @@ msgstr "_Unabhängig vom Verhältnis verteilen"
 
 #: ../gtk/details.c:594
 msgid "_Stop seeding when a torrent's ratio reaches"
-msgstr "Verteilen _stoppen, wenn das Verhältnis eines Torrents erreicht"
+msgstr "Verteilen _stoppen, wenn Verhältnis eines Torrents erreicht"
 
 #: ../gtk/details.c:633
 msgid "Verifying local data"
@@ -1571,7 +1572,7 @@ msgstr "Schwarmrate"
 
 #: ../gtk/details.c:944
 msgid "Private to this tracker -- DHT and PEX disabled"
-msgstr ""
+msgstr "Für diesen Tracker privat - DHT und PEX deaktiviert"
 
 #: ../gtk/details.c:1088
 msgid "Destination:"
@@ -1583,7 +1584,7 @@ msgstr "Webseeds"
 
 #: ../gtk/details.c:1506
 msgid "Peer was discovered through DHT"
-msgstr ""
+msgstr "Peer wurde durch DHT gefunden"
 
 #: ../gtk/details.c:1736
 msgid "None sent"
@@ -1597,7 +1598,7 @@ msgstr "Eigenschaften von %s"
 #: ../gtk/details.c:2065
 #, c-format
 msgid "%'d Torrent Properties"
-msgstr "%'d Torrent Eigenschaften"
+msgstr "%'d Torrenteigenschaften"
 
 #: ../gtk/dialogs.c:254
 msgid "This torrent has not finished downloading."
@@ -1652,7 +1653,7 @@ msgstr "_Stoppe Torrent-Verteilung wenn Verhältnis bei:"
 
 #: ../gtk/tr-prefs.c:337
 msgid "Inhibit desktop _hibernation when torrents are active"
-msgstr "_Ruhezustand verhindern wenn Torrents aktiv sind"
+msgstr "_Ruhezustand verhindern, wenn Torrents aktiv sind"
 
 #: ../gtk/tr-prefs.c:345
 msgid "Show desktop _notifications"
@@ -1699,15 +1700,15 @@ msgstr "_Verschlüsselungsmodus"
 
 #: ../gtk/tr-prefs.c:541
 msgid "Use peer e_xchange (PEX)"
-msgstr ""
+msgstr "Peer-Austausch verwenden (PE_X)"
 
 #: ../gtk/tr-prefs.c:545
 msgid "Use _distributed hash table (DHT)"
-msgstr ""
+msgstr "Verteilte Hash-Tabelle verwenden (_DHT)"
 
 #: ../gtk/tr-prefs.c:764
 msgid "_Open web interface"
-msgstr "_Webinterface öffnen"
+msgstr "_Weboberfläche öffnen"
 
 #: ../gtk/tr-prefs.c:1119
 msgid "Every Day"
@@ -1759,7 +1760,7 @@ msgstr "Geschwindigkeitsbegrenzungs-Modus"
 
 #: ../gtk/tr-prefs.c:1206
 msgid "Limit do_wnload speed (KB/s):"
-msgstr "Beschränke Empfangs-_Geschwindigkeit (KB/s):"
+msgstr "Empfangs-_Geschwindigkeit beschränken (KB/s):"
 
 #: ../gtk/tr-prefs.c:1214
 msgid "When enabled, Speed Limit Mode overrides the Global Bandwidth Limits"
@@ -1769,7 +1770,7 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:1220
 msgid "Use Speed Limit Mode _between:"
-msgstr ""
+msgstr "Benutze Geschwindigkeitsbegrenzungs-Modus _zwischen:"
 
 #: ../gtk/tr-prefs.c:1235
 msgid "_On days:"
@@ -1789,11 +1790,11 @@ msgstr "_Port für ankommende Verbindungen:"
 
 #: ../gtk/tr-prefs.c:1333
 msgid "_Test Port"
-msgstr "Port wird ge_testet"
+msgstr "Port _testen"
 
 #: ../gtk/tr-prefs.c:1340
 msgid "_Randomize the port every launch"
-msgstr ""
+msgstr "Bei jedem Start einen _zufälligen Port verwenden"
 
 #: ../gtk/tr-window.c:330
 msgid "Click to disable Speed Limit Mode"
@@ -1813,11 +1814,11 @@ msgstr "Für immer verteilen"
 
 #: ../gtk/tr-window.c:735
 msgid "Limit Download Speed"
-msgstr "Empfangs-Geschwindigkeit beschränken"
+msgstr "Empfangsgeschwindigkeit beschränken"
 
 #: ../gtk/tr-window.c:739
 msgid "Limit Upload Speed"
-msgstr "Verteilungs-Geschwindigkeit beschränken"
+msgstr "Verteilungsgeschwindigkeit beschränken"
 
 #: ../gtk/tr-window.c:746
 msgid "Stop Seeding at Ratio"
