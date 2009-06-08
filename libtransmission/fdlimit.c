@@ -610,7 +610,7 @@ tr_fdSocketAccept( int           b,
     len = sizeof( struct sockaddr_storage );
     s = accept( b, (struct sockaddr *) &sock, &len );
 
-    if( ( s >= 0 ) && gFd->socketCount < getSocketMax( gFd ) )
+    if( ( s >= 0 ) && gFd->socketCount > getSocketMax( gFd ) )
     {
         EVUTIL_CLOSESOCKET( s );
         s = -1;
