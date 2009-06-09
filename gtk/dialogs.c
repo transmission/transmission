@@ -84,6 +84,7 @@ askquit( TrCore *       core,
          void *         cbdata )
 {
     struct quitdata * stuff;
+    GtkWidget *       w;
     GtkWidget *       wind;
     GtkWidget *       dontask;
     GtkTreeModel *    model;
@@ -119,17 +120,16 @@ askquit( TrCore *       core,
         _(
             "<big><b>Quit Transmission?</b></big>" ) );
 
-    gtk_dialog_add_buttons( GTK_DIALOG( wind ),
-                            GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-                            GTK_STOCK_QUIT, GTK_RESPONSE_ACCEPT,
-                            NULL );
+    gtk_dialog_add_button( GTK_DIALOG( wind ), GTK_STOCK_CANCEL,
+                                               GTK_RESPONSE_CANCEL );
+    w = gtk_dialog_add_button( GTK_DIALOG( wind ), GTK_STOCK_QUIT,
+                                                   GTK_RESPONSE_ACCEPT );
     gtk_dialog_set_default_response( GTK_DIALOG( wind ),
                                      GTK_RESPONSE_ACCEPT );
     gtk_dialog_set_alternative_button_order( GTK_DIALOG( wind ),
                                              GTK_RESPONSE_ACCEPT,
                                              GTK_RESPONSE_CANCEL,
                                              -1 );
-
     dontask = gtk_check_button_new_with_mnemonic( _( "_Don't ask me again" ) );
     stuff->dontask = dontask;
 
@@ -139,6 +139,7 @@ askquit( TrCore *       core,
 
     g_signal_connect( G_OBJECT( wind ), "response",
                       G_CALLBACK( quitresp ), stuff );
+    gtk_widget_grab_focus( w );
 
     gtk_widget_show_all( wind );
 }

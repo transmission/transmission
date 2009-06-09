@@ -693,6 +693,7 @@ wannaquit( void * vdata )
     gtk_table_attach( GTK_TABLE( p ), b, 1, 2, 2, 3, GTK_FILL, GTK_FILL, 0, 10 );
 
     gtk_widget_show_all( r );
+    gtk_widget_grab_focus( w );
 
     /* clear the UI */
     gtk_list_store_clear( GTK_LIST_STORE( tr_core_model( cbdata->core ) ) );
