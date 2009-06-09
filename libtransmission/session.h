@@ -35,12 +35,6 @@ uint8_t*       tr_peerIdNew( void );
 
 const uint8_t* tr_getPeerId( void );
 
-struct tr_metainfo_lookup
-{
-    char    hashString[2 * SHA_DIGEST_LENGTH + 1];
-    char *  filename;
-};
-
 struct tr_address;
 struct tr_bandwidth;
 struct tr_bindsockets;
