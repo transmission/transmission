@@ -366,7 +366,7 @@ tracker_list_new( tr_session * session, int torrentId, gboolean isNew )
     g_signal_connect( w, "clicked", G_CALLBACK( onTrackerAddClicked ), page );
     gtk_box_pack_start( GTK_BOX( buttons ), w, TRUE, TRUE, 0 );
     page->add_button = w;
-    w = gtk_button_new_from_stock( GTK_STOCK_REMOVE );
+    w = gtk_button_new_from_stock( GTK_STOCK_DELETE );
     g_signal_connect( w, "clicked", G_CALLBACK(
                           onTrackerRemoveClicked ), page );
     gtk_box_pack_start( GTK_BOX( buttons ), w, TRUE, TRUE, 0 );
