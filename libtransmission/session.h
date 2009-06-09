@@ -122,11 +122,10 @@ struct tr_session
     tr_rpc_func                  rpc_func;
     void *                       rpc_func_user_data;
 
-    struct tr_stats_handle *     sessionStats;
-    struct tr_tracker_handle *   tracker;
+    struct tr_stats_handle     * sessionStats;
+    struct tr_tracker_handle   * tracker;
 
-    struct tr_metainfo_lookup *  metainfoLookup;
-    int                          metainfoLookupCount;
+    tr_benc                    * metainfoLookup;
 
     struct event               * altTimer;
 

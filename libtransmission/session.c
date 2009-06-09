@@ -1457,7 +1457,6 @@ deadlineReached( const uint64_t deadline )
 void
 tr_sessionClose( tr_session * session )
 {
-    int            i;
     const int      maxwait_msec = SHUTDOWN_MAX_SECONDS * 1000;
     const uint64_t deadline = tr_date( ) + maxwait_msec;
 
@@ -1500,9 +1499,10 @@ tr_sessionClose( tr_session * session )
     tr_bencFree( &session->removedTorrents );
     tr_bandwidthFree( session->bandwidth );
     tr_lockFree( session->lock );
-    for( i = 0; i < session->metainfoLookupCount; ++i )
-        tr_free( session->metainfoLookup[i].filename );
-    tr_free( session->metainfoLookup );
+    if( session->metainfoLookup ) {
+        tr_bencFree( session->metainfoLookup );
+        tr_free( session->metainfoLookup );
+    }
     tr_free( session->tag );
     tr_free( session->configDir );
     tr_free( session->resumeDir );
@@ -1750,67 +1750,37 @@ tr_sessionIsAddressBlocked( const tr_session * session,
 ****
 ***/
 
-static int
-compareLookupEntries( const void * va, const void * vb )
-{
-    const struct tr_metainfo_lookup * a = va;
-    const struct tr_metainfo_lookup * b = vb;
-
-    return strcmp( a->hashString, b->hashString );
-}
-
 static void
-metainfoLookupResort( tr_session * session )
+metainfoLookupInit( tr_session * session )
 {
-    assert( tr_isSession( session ) );
-
-    qsort( session->metainfoLookup,
-           session->metainfoLookupCount,
-           sizeof( struct tr_metainfo_lookup ),
-           compareLookupEntries );
-}
-
-static int
-compareHashStringToLookupEntry( const void * va, const void * vb )
-{
-    const char *                      a = va;
-    const struct tr_metainfo_lookup * b = vb;
-
-    return strcmp( a, b->hashString );
-}
-
-static void
-metainfoLookupRescan( tr_session * session )
-{
-    int          i;
-    int          n;
     struct stat  sb;
     const char * dirname = tr_getTorrentDir( session );
     DIR *        odir = NULL;
     tr_ctor *    ctor = NULL;
-    tr_list *    list = NULL;
+    tr_benc * lookup;
+    int n = 0;
 
     assert( tr_isSession( session ) );
 
     /* walk through the directory and find the mappings */
+    lookup = tr_new0( tr_benc, 1 );
+    tr_bencInitDict( lookup, 0 );
     ctor = tr_ctorNew( session );
     tr_ctorSetSave( ctor, FALSE ); /* since we already have them */
     if( !stat( dirname, &sb ) && S_ISDIR( sb.st_mode ) && ( ( odir = opendir( dirname ) ) ) )
     {
         struct dirent *d;
-        for( d = readdir( odir ); d != NULL; d = readdir( odir ) )
+        while(( d = readdir( odir )))
         {
-            if( d->d_name && d->d_name[0] != '.' ) /* skip dotfiles, ., and ..
-                                                     */
+            if( d->d_name && d->d_name[0] != '.' )
             {
                 tr_info inf;
                 char * path = tr_buildPath( dirname, d->d_name, NULL );
                 tr_ctorSetMetainfoFromFile( ctor, path );
                 if( !tr_torrentParse( ctor, &inf ) )
                 {
-                    tr_list_append( &list, tr_strdup( inf.hashString ) );
-                    tr_list_append( &list, tr_strdup( path ) );
-                    tr_metainfoFree( &inf );
+                    ++n;
+                    tr_bencDictAddStr( lookup, inf.hashString, path );
                 }
                 tr_free( path );
             }
@@ -1819,47 +1789,19 @@ metainfoLookupRescan( tr_session * session )
     }
     tr_ctorFree( ctor );
 
-    n = tr_list_size( list ) / 2;
-    session->metainfoLookup = tr_new0( struct tr_metainfo_lookup, n );
-    session->metainfoLookupCount = n;
-    for( i = 0; i < n; ++i )
-    {
-        char * hashString = tr_list_pop_front( &list );
-        char * filename = tr_list_pop_front( &list );
-
-        memcpy( session->metainfoLookup[i].hashString, hashString,
-                2 * SHA_DIGEST_LENGTH + 1 );
-        tr_free( hashString );
-        session->metainfoLookup[i].filename = filename;
-    }
-
-    metainfoLookupResort( session );
+    session->metainfoLookup = lookup;
     tr_dbg( "Found %d torrents in \"%s\"", n, dirname );
 }
 
-static struct tr_metainfo_lookup *
-metainfoLookup( const tr_session * session, const char * hashString )
-{
-    /* because only the mac client uses metainfoLookup, and because building
-     * the lookup is expensive, we hold off on building it until the client
-     * actually asks to look up a hash... */
-    if( !session->metainfoLookupCount )
-        metainfoLookupRescan( (tr_session*)session );
-
-    return bsearch( hashString,
-                    session->metainfoLookup,
-                    session->metainfoLookupCount,
-                    sizeof( struct tr_metainfo_lookup ),
-                    compareHashStringToLookupEntry );
-}
-
 const char*
-tr_sessionFindTorrentFile( const tr_session  * session,
-                           const char        * hashString )
+tr_sessionFindTorrentFile( const tr_session * session,
+                           const char       * hashString )
 {
-    const struct tr_metainfo_lookup * l = metainfoLookup( session, hashString );
-
-    return l ? l->filename : NULL;
+    const char * filename = NULL;
+    if( !session->metainfoLookup )
+        metainfoLookupInit( (tr_session*)session );
+    tr_bencDictFindStr( session->metainfoLookup, hashString, &filename );
+    return filename;
 }
 
 void
@@ -1867,36 +1809,12 @@ tr_sessionSetTorrentFile( tr_session * session,
                           const char * hashString,
                           const char * filename )
 {
-    struct tr_metainfo_lookup * l;
-
     /* since we walk session->configDir/torrents/ to build the lookup table,
      * and tr_sessionSetTorrentFile() is just to tell us there's a new file
      * in that same directory, we don't need to do anything here if the
      * lookup table hasn't been built yet */
-    if( session->metainfoLookup == NULL )
-        return;
-
-    l = metainfoLookup( session, hashString );
-    if( l )
-    {
-        if( l->filename != filename )
-        {
-            tr_free( l->filename );
-            l->filename = tr_strdup( filename );
-        }
-    }
-    else
-    {
-        const int n = session->metainfoLookupCount++;
-        struct tr_metainfo_lookup * node;
-        session->metainfoLookup = tr_renew( struct tr_metainfo_lookup,
-                                            session->metainfoLookup,
-                                            session->metainfoLookupCount );
-        node = session->metainfoLookup + n;
-        memcpy( node->hashString, hashString, 2 * SHA_DIGEST_LENGTH + 1 );
-        node->filename = tr_strdup( filename );
-        metainfoLookupResort( session );
-    }
+    if( session->metainfoLookup )
+        tr_bencDictAddStr( session->metainfoLookup, hashString, filename );
 }
 
 tr_torrent*
