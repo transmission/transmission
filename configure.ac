@@ -185,8 +185,8 @@ if test "x$libevent_found" = "xyes" ; then
     fi
 fi
 if test "x$libevent_source" = "xbundled"; then
-    AC_MSG_NOTICE([using our own libevent from third-party/libevent/])
-    AC_MSG_NOTICE([if you are cross-compiling this is probably NOT what you want.])
+    AC_MSG_WARN([using our own libevent from third-party/libevent/])
+    AC_MSG_WARN([if you are cross-compiling this is probably NOT what you want.])
     LIBEVENT_CPPFLAGS="-I\$(top_srcdir)/third-party/libevent -I\$(top_builddir)/third-party/libevent"
     LIBEVENT_LIBS="\$(top_builddir)/third-party/libevent/libevent.la"
 else
