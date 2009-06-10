@@ -84,8 +84,8 @@ struct cbdata
     GtkWidget         * prefs;
     GSList            * errqueue;
     GSList            * dupqueue;
+    GSList            * details;
     GtkTreeSelection  * sel;
-    gpointer            details;
 };
 
 #define CBDATA_PTR "callback-data-pointer"
@@ -205,16 +205,13 @@ refreshActions( struct cbdata * data )
 }
 
 static void
-refreshDetailsDialog( struct cbdata * data )
+refreshDetailsDialog( struct cbdata * data, GtkWidget * details )
 {
     GtkTreeSelection * s = tr_window_get_selection( data->wind );
     GtkTreeModel * model;
     GSList * ids = NULL;
     GList * selrows = NULL;
     GList * l;
-
-    if( data->details == NULL )
-        return;
 
     /* build a list of the selected torrents' ids */
     s = tr_window_get_selection( data->wind );
@@ -227,7 +224,7 @@ refreshDetailsDialog( struct cbdata * data )
         }
     }
 
-    torrent_inspector_set_torrents( GTK_WIDGET( data->details ), ids );
+    torrent_inspector_set_torrents( details, ids );
 
     /* cleanup */
     g_slist_free( ids );
@@ -239,7 +236,6 @@ static void
 selectionChangedCB( GtkTreeSelection * s UNUSED, gpointer data )
 {
     refreshActions( data );
-    refreshDetailsDialog( data );
 }
 
 static void
@@ -621,8 +617,10 @@ quitThreadFunc( gpointer gdata )
     tr_core_close( cbdata->core );
 
     /* shutdown the gui */
-    if( cbdata->details )
-        gtk_widget_destroy( GTK_WIDGET( cbdata->details ) );
+    if( cbdata->details ) {
+        g_slist_foreach( cbdata->details, (GFunc)gtk_widget_destroy, NULL );
+        g_slist_free( cbdata->details );
+    }
     if( cbdata->prefs )
         gtk_widget_destroy( GTK_WIDGET( cbdata->prefs ) );
     if( cbdata->wind )
@@ -925,9 +923,7 @@ prefschanged( TrCore * core UNUSED,
 
     if( !strcmp( key, TR_PREFS_KEY_ENCRYPTION ) )
     {
-        const int encryption = pref_int_get( key );
-        g_message( "setting encryption to %d", encryption );
-        tr_sessionSetEncryption( tr, encryption );
+        tr_sessionSetEncryption( tr, pref_int_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_DOWNLOAD_DIR ) )
     {
@@ -1283,6 +1279,13 @@ getFirstSelectedTorrent( struct cbdata * data )
     return tor;
 }
 
+static void
+detailsClosed( gpointer gdata, GObject * dead )
+{
+    struct cbdata * data = gdata;
+    data->details = g_slist_remove( data->details, dead );
+}
+
 void
 doAction( const char * action_name, gpointer user_data )
 {
@@ -1342,12 +1345,11 @@ doAction( const char * action_name, gpointer user_data )
     }
     else if( !strcmp( action_name, "show-torrent-properties" ) )
     {
-        if( data->details == NULL ) {
-            data->details = torrent_inspector_new( GTK_WINDOW( data->wind ), data->core );
-            g_object_add_weak_pointer( G_OBJECT( data->details ), &data->details );
-        }
-        refreshDetailsDialog( data );
-        gtk_widget_show( GTK_WIDGET( data->details ) );
+        GtkWidget * w = torrent_inspector_new( GTK_WINDOW( data->wind ), data->core );
+        data->details = g_slist_prepend( data->details, w );
+        g_object_weak_ref( G_OBJECT( w ), detailsClosed, data );
+        refreshDetailsDialog( data, w );
+        gtk_widget_show( w );
     }
     else if( !strcmp( action_name, "update-tracker" ) )
     {

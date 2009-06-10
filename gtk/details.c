@@ -1978,7 +1978,7 @@ response_cb( GtkDialog * dialog, int a UNUSED, gpointer b UNUSED )
 {
     GtkWidget * w = GTK_WIDGET( dialog );
     torrent_inspector_set_torrents( w, NULL );
-    gtk_widget_hide( w );
+    gtk_widget_destroy( w );
 }
 
 GtkWidget*
