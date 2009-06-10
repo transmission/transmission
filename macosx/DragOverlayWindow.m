@@ -83,7 +83,8 @@
     
     for (NSString * file in files)
     {
-        if ([[[NSWorkspace sharedWorkspace] typeOfFile: file error: NULL] isEqualToString: @"org.bittorrent.torrent"])
+        if ([[[NSWorkspace sharedWorkspace] typeOfFile: file error: NULL] isEqualToString: @"org.bittorrent.torrent"]
+            || [[file pathExtension] caseInsensitiveCompare: @"torrent"] == NSOrderedSame)
         {
             tr_ctor * ctor = tr_ctorNew(fLib);
             tr_ctorSetMetainfoFromFile(ctor, [file UTF8String]);

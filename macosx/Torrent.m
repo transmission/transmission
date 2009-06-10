@@ -1641,7 +1641,7 @@ int trashDataFile(const char * filename)
         if (path)
             result = tr_ctorSetMetainfoFromFile(ctor, [path UTF8String]);
         
-        //backup - shouldn't be needed after upgrade to 1.62
+        //backup - shouldn't be needed after upgrade to 1.70
         if (result != TR_OK && hashString)
             result = tr_ctorSetMetainfoFromHash(ctor, [hashString UTF8String]);
         
