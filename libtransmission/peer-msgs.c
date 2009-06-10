@@ -1736,9 +1736,10 @@ fillOutputBuffer( tr_peermsgs * msgs, time_t now )
             tr_peerIoWriteUint32( io, out, req.offset );
 
             err = tr_ioRead( msgs->torrent, req.index, req.offset, req.length, EVBUFFER_DATA(out)+EVBUFFER_LENGTH(out) );
-            if( err ) /* peer needs a reject message */
+            if( err )
             {
-                protocolSendReject( msgs, &req );
+                if( fext )
+                    protocolSendReject( msgs, &req );
             }
             else
             {
