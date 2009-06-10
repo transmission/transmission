@@ -26,13 +26,10 @@
 
 enum
 {
-    SUB_STATE_HIGH          = ( 1 << 0 ),
-    SUB_STATE_NORMAL        = ( 1 << 1 ),
-    SUB_STATE_LOW           = ( 1 << 2 ),
-    SUB_STATE_PRIORITY_MASK = ( SUB_STATE_HIGH | SUB_STATE_NORMAL | SUB_STATE_LOW ),
-    SUB_STATE_DOWNLOAD      = ( 1 << 4 ),
-    SUB_STATE_IGNORE        = ( 1 << 5 ),
-    SUB_STATE_DOWNLOAD_MASK = ( SUB_STATE_DOWNLOAD | SUB_STATE_IGNORE )
+    /* these two fields could be any number at all so long as they're not
+     * TR_PRI_LOW, TR_PRI_NORMAL, TR_PRI_HIGH, TRUE, or FALSE */
+    NOT_SET = 1000,
+    MIXED = 1001
 };
 
 enum
@@ -46,9 +43,6 @@ enum
     FC_PRIORITY,
     FC_ENABLED,
     FC_IS_FILE,
-    FC_SUB_SIZE,
-    FC_SUB_HAVE,
-    FC_SUB_STATE,
     N_FILE_COLS
 };
 
@@ -96,89 +90,86 @@ refreshFilesForeach( GtkTreeModel * model,
 {
     FileData * data = gdata;
     gboolean is_file;
-    gboolean is_enabled;
     unsigned int index;
     uint64_t size;
     uint64_t old_have;
-    int old_sub_state = 0;
-    int64_t old_sub_size = 0;
-    int64_t old_sub_have = 0;
     int old_prog;
     int old_priority;
+    int old_enabled;
 
     gtk_tree_model_get( model, iter, FC_IS_FILE, &is_file,
-                                     FC_ENABLED, &is_enabled,
+                                     FC_ENABLED, &old_enabled,
                                      FC_PRIORITY, &old_priority,
                                      FC_INDEX, &index,
                                      FC_HAVE, &old_have,
                                      FC_SIZE, &size,
-                                     FC_SUB_STATE, &old_sub_state,
-                                     FC_SUB_SIZE, &old_sub_size,
-                                     FC_SUB_HAVE, &old_sub_have,
                                      FC_PROG, &old_prog,
                                      -1  );
 
     if( is_file )
     {
-        int sub_state;
         tr_torrent * tor = data->tor;
-        const int download = tr_torrentGetFileDL( tor, index );
+        const int enabled = tr_torrentGetFileDL( tor, index );
         const int priority = tr_torrentGetFilePriority( tor, index );
         const uint64_t have = data->refresh_file_stat[index].bytesCompleted;
         const int prog = (int)((100.0*have)/size);
 
-        switch( priority ) {
-            case TR_PRI_HIGH:   sub_state = SUB_STATE_HIGH;   break;
-            case TR_PRI_NORMAL: sub_state = SUB_STATE_NORMAL; break;
-            case TR_PRI_LOW:    sub_state = SUB_STATE_LOW;    break;
-        }
-        sub_state |= ( is_enabled ? SUB_STATE_DOWNLOAD : SUB_STATE_IGNORE );
-
-        if( (priority!=old_priority) || (download!=is_enabled)
-                                     || (have!=old_have)
-                                     || (sub_state!=old_sub_state)
-                                     || (prog!=old_prog) )
+        if( (priority!=old_priority) || (enabled!=old_enabled) || (have!=old_have) || (prog!=old_prog) )
             gtk_tree_store_set( data->store, iter, FC_PRIORITY, priority,
-                                                   FC_ENABLED, download,
+                                                   FC_ENABLED, enabled,
                                                    FC_HAVE, have,
-                                                   FC_SUB_STATE, sub_state,
-                                                   FC_SUB_HAVE, have,
                                                    FC_PROG, prog,
                                                    -1 );
     }
     else
     {
         GtkTreeIter child;
-        int state = 0;
-        int64_t size = 0;
-        int64_t have = 0;
+        uint64_t sub_size = 0;
+        uint64_t have = 0;
         int prog;
+        int enabled = NOT_SET;
+        int priority = NOT_SET;
 
         /* since gtk_tree_model_foreach() is depth-first, we can
          * get the `sub' info by walking the immediate children */
 
         if( gtk_tree_model_iter_children( model, &child, iter ) ) do
         {
-            int child_state;
+            int child_enabled;
+            int child_priority;
             int64_t child_have, child_size;
-            gtk_tree_model_get( model, &child, FC_SUB_SIZE, &child_size,
-                                               FC_SUB_HAVE, &child_have,
-                                               FC_SUB_STATE, &child_state,
+
+            gtk_tree_model_get( model, &child, FC_SIZE, &child_size,
+                                               FC_HAVE, &child_have,
+                                               FC_PRIORITY, &child_priority,
+                                               FC_ENABLED, &child_enabled,
                                                -1 );
-            size += child_size;
+
+            sub_size += child_size;
             have += child_have;
-            state |= child_state;
+
+            if( enabled == NOT_SET )
+                enabled = child_enabled;
+            else if( enabled != child_enabled )
+                enabled = MIXED;
+
+            if( priority == NOT_SET )
+                priority = child_priority;
+            else if( priority != child_priority )
+                priority = MIXED;
         }
         while( gtk_tree_model_iter_next( model, &child ) );
 
-        prog = (int)((100.0*have)/size);
+        prog = (int)((100.0*have)/sub_size);
 
-        if( (have!=old_sub_have) || (size!=old_sub_size)
-                                 || (state!=old_sub_state)
-                                 || (prog!=old_prog) )
-            gtk_tree_store_set( data->store, iter, FC_SUB_SIZE, size,
-                                                   FC_SUB_HAVE, have,
-                                                   FC_SUB_STATE, state,
+        if( (size!=sub_size) || (have!=old_have)
+                             || (priority!=old_priority)
+                             || (enabled!=old_enabled)
+                             || (prog!=old_prog) )
+            gtk_tree_store_set( data->store, iter, FC_SIZE, sub_size,
+                                                   FC_HAVE, have,
+                                                   FC_PRIORITY, priority,
+                                                   FC_ENABLED, enabled,
                                                    FC_PROG, prog,
                                                    -1 );
     }
@@ -399,7 +390,6 @@ buildTree( GNode * node, gpointer gdata )
                                        FC_INDEX, child_data->index,
                                        FC_LABEL, child_data->name,
                                        FC_SIZE, child_data->length,
-                                       FC_SUB_SIZE, child_data->length,
                                        FC_ICON, icon,
                                        FC_PRIORITY, priority,
                                        FC_ENABLED, enabled,
@@ -463,7 +453,7 @@ file_list_set_torrent( GtkWidget * w, int torrentId )
                                  G_TYPE_UINT64,    /* size */
                                  G_TYPE_UINT64,    /* have */
                                  G_TYPE_INT,       /* priority */
-                                 G_TYPE_BOOLEAN,   /* dl enabled */
+                                 G_TYPE_INT,       /* dl enabled */
                                  G_TYPE_BOOLEAN,   /* is file */
                                  G_TYPE_UINT64,    /* sub size */
                                  G_TYPE_UINT64,    /* sub have */
@@ -547,13 +537,13 @@ renderFilename( GtkTreeViewColumn  * column UNUSED,
 {
     char *   filename;
     char *   str;
-    int64_t  subsize;
+    int64_t  size;
     char     buf[64];
 
     gtk_tree_model_get( model, iter, FC_LABEL, &filename,
-                                     FC_SUB_SIZE, &subsize,
+                                     FC_SIZE, &size,
                                      -1 );
-    tr_strlsize( buf, subsize, sizeof( buf ) );
+    tr_strlsize( buf, size, sizeof( buf ) );
     str = g_markup_printf_escaped( "<small>%s (%s)</small>", filename, buf );
     g_object_set( renderer, "markup", str, NULL );
     g_free( str );
@@ -567,29 +557,10 @@ renderDownload( GtkTreeViewColumn  * column UNUSED,
                 GtkTreeIter        * iter,
                 gpointer             data   UNUSED )
 {
-    int sub_state;
     gboolean enabled;
-    gboolean active = FALSE;
-    gboolean inconsistent = FALSE;
-    gboolean is_file = FALSE;
-
-    gtk_tree_model_get( model, iter, FC_IS_FILE, &is_file,
-                                     FC_ENABLED, &enabled,
-                                     FC_SUB_STATE, &sub_state,
-                                     -1 );
-
-    if( is_file && enabled )
-        active = TRUE;
-    else if( is_file )
-        active = FALSE;
-    else switch( sub_state & SUB_STATE_DOWNLOAD_MASK ) {
-        case SUB_STATE_DOWNLOAD: active = TRUE; break;
-        case SUB_STATE_IGNORE: active = FALSE; break;
-        default: inconsistent = TRUE; break;
-    }
-
-    g_object_set( renderer, "inconsistent", inconsistent,
-                            "active", active,
+    gtk_tree_model_get( model, iter, FC_ENABLED, &enabled, -1 );
+    g_object_set( renderer, "inconsistent", (enabled==MIXED),
+                            "active", (enabled==TRUE),
                             NULL );
 }
 
@@ -600,36 +571,16 @@ renderPriority( GtkTreeViewColumn  * column UNUSED,
                 GtkTreeIter        * iter,
                 gpointer             data   UNUSED )
 {
-    int          priority;
-    int          sub_state;
-    gboolean     is_file = FALSE;
-    const char * text = "";
-
-    gtk_tree_model_get( model, iter, FC_IS_FILE, &is_file,
-                                     FC_PRIORITY, &priority,
-                                     FC_SUB_STATE, &sub_state,
-                                     -1 );
-
-    if( !is_file ) {
-        switch( sub_state & SUB_STATE_PRIORITY_MASK ) {
-            case SUB_STATE_HIGH: priority = TR_PRI_HIGH; break; 
-            case SUB_STATE_NORMAL: priority = TR_PRI_NORMAL; break; 
-            case SUB_STATE_LOW: priority = TR_PRI_LOW; break; 
-            default: priority = 666; break;
-        }
-    }
-
+    int priority;
+    const char * text;
+    gtk_tree_model_get( model, iter, FC_PRIORITY, &priority, -1 );
     switch( priority ) {
-        case TR_PRI_HIGH: text = _( "High" ); break;
+        case TR_PRI_HIGH:   text = _( "High" ); break;
         case TR_PRI_NORMAL: text = _( "Normal" ); break;
-        case TR_PRI_LOW: text = _( "Low" ); break;
-        default: text = _( "Mixed" ); break;
+        case TR_PRI_LOW:    text = _( "Low" ); break;
+        default:            text = _( "Mixed" ); break;
     }
-
-    g_object_set( renderer, "text", text,
-                            "xalign", (gfloat)0.5,
-                            "yalign", (gfloat)0.5,
-                            NULL );
+    g_object_set( renderer, "text", text, NULL );
 }
 
 static gboolean
@@ -668,25 +619,16 @@ onViewButtonPressed( GtkWidget * w, GdkEventButton * event, gpointer gdata )
 
                 if( priorityColumn )
                 {
-                    gboolean is_file;
-                    int      sub_state;
-                    int      priority;
+                    int priority;
 
                     /* get the `priority' state of the clicked row */
-                    gtk_tree_model_get( model, &iter, FC_IS_FILE, &is_file,
-                                                      FC_PRIORITY, &priority,
-                                                      FC_SUB_STATE, &sub_state,
-                                                      -1 );
+                    gtk_tree_model_get( model, &iter, FC_PRIORITY, &priority, -1 );
 
                     /* twiddle it to the next state */
-                    if( !is_file ) switch( sub_state & SUB_STATE_PRIORITY_MASK ) {
-                        case SUB_STATE_NORMAL: priority = TR_PRI_HIGH; break; 
-                        case SUB_STATE_HIGH: priority = TR_PRI_LOW; break;
-                        default: priority = TR_PRI_NORMAL; break;
-                    } else switch( priority ) {
-                        case TR_PRI_LOW: priority = TR_PRI_NORMAL; break;
+                    switch( priority ) {
                         case TR_PRI_NORMAL: priority = TR_PRI_HIGH; break;
-                        case TR_PRI_HIGH: priority = TR_PRI_LOW; break;
+                        case TR_PRI_HIGH:   priority = TR_PRI_LOW; break;
+                        default:            priority = TR_PRI_NORMAL; break;
                     }
 
                     /* apply that new state to the active files */
@@ -697,21 +639,13 @@ onViewButtonPressed( GtkWidget * w, GdkEventButton * event, gpointer gdata )
                 }
                 else if( downloadColumn )
                 {
-                    gboolean is_file;
-                    int      sub_state;
-                    gboolean enabled;
+                    int enabled;
 
                     /* get the `enabled' state of the clicked row */
-                    gtk_tree_model_get( model, &iter, FC_IS_FILE, &is_file,
-                                                      FC_ENABLED, &enabled,
-                                                      FC_SUB_STATE, &sub_state,
-                                                      -1 );
+                    gtk_tree_model_get( model, &iter, FC_ENABLED, &enabled, -1 );
 
                     /* twiddle it to the next state */
-                    if( is_file )
-                        enabled = !enabled;
-                    else
-                        enabled = ( sub_state & SUB_STATE_IGNORE ) ? 1 : 0;
+                    enabled = !enabled;
 
                     /* apply that new state to the active files */
                     tr_torrentSetFileDLs( tor,
@@ -788,6 +722,7 @@ file_list_new( TrCore * core, int torrentId )
     g_object_set( rend, "ellipsize", PANGO_ELLIPSIZE_END, NULL );
     gtk_tree_view_column_pack_start( col, rend, TRUE );
     gtk_tree_view_column_set_cell_data_func( col, rend, renderFilename, NULL, NULL );
+    gtk_tree_view_column_set_sort_column_id( col, FC_LABEL );
     gtk_tree_view_append_column( tree_view, col );
 
     /* add "progress" column */
@@ -800,6 +735,7 @@ file_list_new( TrCore * core, int torrentId )
     col = gtk_tree_view_column_new_with_attributes( title, rend, "value", FC_PROG, NULL );
     gtk_tree_view_column_set_fixed_width( col, width );
     gtk_tree_view_column_set_sizing( col, GTK_TREE_VIEW_COLUMN_FIXED );
+    gtk_tree_view_column_set_sort_column_id( col, FC_PROG );
     gtk_tree_view_append_column ( tree_view, col );
 
     /* add "enabled" column */
@@ -813,6 +749,7 @@ file_list_new( TrCore * core, int torrentId )
     gtk_tree_view_column_set_fixed_width( col, width );
     gtk_tree_view_column_set_sizing( col, GTK_TREE_VIEW_COLUMN_FIXED );
     gtk_tree_view_column_set_cell_data_func( col, rend, renderDownload, NULL, NULL );
+    gtk_tree_view_column_set_sort_column_id( col, FC_ENABLED );
     gtk_tree_view_append_column ( tree_view, col );
 
     /* add priority column */
@@ -822,9 +759,11 @@ file_list_new( TrCore * core, int torrentId )
     width += GUI_PAD * 2;
     g_object_unref( G_OBJECT( pango_layout ) );
     rend = gtk_cell_renderer_text_new( );
+    g_object_set( rend, "xalign", (gfloat)0.5, "yalign", (gfloat)0.5, NULL );
     col = gtk_tree_view_column_new_with_attributes( title, rend, NULL );
     gtk_tree_view_column_set_fixed_width( col, width );
     gtk_tree_view_column_set_sizing( col, GTK_TREE_VIEW_COLUMN_FIXED );
+    gtk_tree_view_column_set_sort_column_id( col, FC_PRIORITY );
     gtk_tree_view_column_set_cell_data_func( col, rend, renderPriority, NULL, NULL );
     gtk_tree_view_append_column ( tree_view, col );
 
