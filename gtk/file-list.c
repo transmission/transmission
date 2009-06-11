@@ -513,6 +513,7 @@ file_list_set_torrent( GtkWidget * w, int torrentId )
 
             /* cleanup */
             g_node_destroy( root );
+            g_free( root_data->name );
             g_free( root_data );
         }
 

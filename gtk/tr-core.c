@@ -1297,7 +1297,6 @@ typedef void ( server_response_func )( TrCore * core, tr_benc * response, gpoint
 
 struct pending_request_data
 {
-    int tag;
     TrCore * core;
     server_response_func * responseFunc;
     gpointer responseFuncUserData;
@@ -1351,7 +1350,7 @@ sendRequest( TrCore * core, const char * json, int tag,
 
     if( pendingRequests == NULL )
     {
-        pendingRequests = g_hash_table_new_full( g_int_hash, g_int_equal, NULL, g_free );
+        pendingRequests = g_hash_table_new_full( g_int_hash, g_int_equal, g_free, g_free );
     }
 
     if( session == NULL )
@@ -1364,10 +1363,9 @@ sendRequest( TrCore * core, const char * json, int tag,
         struct pending_request_data * data;
         data = g_new0( struct pending_request_data, 1 );
         data->core = core;
-        data->tag = tag;
         data->responseFunc = responseFunc;
         data->responseFuncUserData = responseFuncUserData;
-        g_hash_table_insert( pendingRequests, &data->tag, data );
+        g_hash_table_insert( pendingRequests, g_memdup( &tag, sizeof( int ) ), data );
 
         /* make the request */
 #ifdef DEBUG_RPC
