@@ -852,73 +852,101 @@ tr_core_errsig( TrCore *         core,
     g_signal_emit( core, TR_CORE_GET_CLASS( core )->errsig, 0, type, msg );
 }
 
-static void
-add_filename( TrCore *     core,
-              const char * filename,
-              gboolean     doStart,
-              gboolean     doPrompt )
+static int
+add_ctor( TrCore * core, tr_ctor * ctor, gboolean doPrompt )
+{
+    tr_info inf;
+    int err = tr_torrentParse( ctor, &inf );
+
+    switch( err )
+    {
+        case TR_EINVALID:
+            break;
+
+        case TR_EDUPLICATE:
+            g_message( "it's a duplicate" );
+            /* don't complain about .torrent files in the watch directory
+             * that have already been added... that gets annoying and we
+             * don't want to be nagging users to clean up their watch dirs */
+            if( !tr_ctorGetSourceFile(ctor) || !core->priv->adding_from_watch_dir )
+                tr_core_errsig( core, err, inf.name );
+            tr_metainfoFree( &inf );
+            break;
+
+        default:
+            if( doPrompt )
+                g_signal_emit( core, TR_CORE_GET_CLASS( core )->promptsig, 0, ctor );
+            else {
+                tr_session * session = tr_core_session( core );
+                TrTorrent * gtor = tr_torrent_new_ctor( session, ctor, &err );
+                g_message( "creating a gtorrent" );
+                if( !err )
+                    tr_core_add_torrent( core, gtor );
+            }
+            tr_metainfoFree( &inf );
+            break;
+    }
+
+    return err;
+}
+
+/* invoked remotely via dbus. */
+gboolean
+tr_core_add_metainfo( TrCore      * core,
+                      const char  * base64_metainfo,
+                      gboolean    * setme_success,
+                      GError     ** gerr UNUSED )
 {
     tr_session * session = tr_core_session( core );
 
+    if( !session )
+    {
+        *setme_success = FALSE;
+    }
+    else
+    {
+        int err;
+        int file_length;
+        tr_ctor * ctor;
+        char * file_contents;
+        gboolean do_prompt = pref_flag_get( PREF_KEY_OPTIONS_PROMPT );
+
+        ctor = tr_ctorNew( session );
+        tr_core_apply_defaults( ctor );
+
+        file_contents = tr_base64_decode( base64_metainfo, -1, &file_length );
+        err = tr_ctorSetMetainfo( ctor, (const uint8_t*)file_contents, file_length );
+
+        if( !err )
+            err = add_ctor( core, ctor, do_prompt );
+
+        tr_free( file_contents );
+        tr_core_torrents_added( core );
+        *setme_success = TRUE;
+    }
+
+    return TRUE;
+}
+
+static void
+add_filename( TrCore      * core,
+              const char  * filename,
+              gboolean      doStart,
+              gboolean      doPrompt )
+{
+    tr_session * session = tr_core_session( core );
     if( filename && session )
     {
+        int err;
         tr_ctor * ctor = tr_ctorNew( session );
         tr_core_apply_defaults( ctor );
         tr_ctorSetPaused( ctor, TR_FORCE, !doStart );
+        tr_ctorSetMetainfoFromFile( ctor, filename );
 
-        if( tr_ctorSetMetainfoFromFile( ctor, filename ) )
-        {
+        err = add_ctor( core, ctor, doPrompt );
+        if( err == TR_EINVALID )
             tr_core_errsig( core, TR_EINVALID, filename );
-            tr_ctorFree( ctor );
-        }
-        else
-        {
-            tr_info inf;
-            int err = tr_torrentParse( ctor, &inf );
-
-            switch( err )
-            {
-                case TR_EINVALID:
-                    tr_core_errsig( core, err, filename );
-                    break;
-
-                case TR_EDUPLICATE:
-                    /* don't complain about .torrent files in the watch directory
-                     * that have already been added... that gets annoying and we
-                     * don't want to be naggign users to clean up their watch dirs */
-                    if( !core->priv->adding_from_watch_dir )
-                        tr_core_errsig( core, err, inf.name );
-                    tr_metainfoFree( &inf );
-                    break;
-
-                default:
-                    if( doPrompt )
-                        g_signal_emit( core, TR_CORE_GET_CLASS( core )->promptsig, 0, ctor );
-                    else {
-                        TrTorrent * gtor = tr_torrent_new_ctor( session, ctor, &err );
-                        if( err )
-                            tr_core_errsig( core, err, filename );
-                        else
-                            tr_core_add_torrent( core, gtor );
-                    }
-                    tr_metainfoFree( &inf );
-                    break;
-            }
-        }
     }
-}
-
-gboolean
-tr_core_add_file( TrCore *          core,
-                  const char *      filename,
-                  gboolean *        success,
-                  GError     ** err UNUSED )
-{
-    add_filename( core, filename,
-                  pref_flag_get( PREF_KEY_START ),
-                  pref_flag_get( PREF_KEY_OPTIONS_PROMPT ) );
-    *success = TRUE;
-    return TRUE;
 }
 
 gboolean

@@ -264,6 +264,7 @@ addSingleTorrentDialog( GtkWindow * parent,
     GtkWidget *      d;
     GtkWidget *      t;
     GtkWidget *      l;
+    GtkWidget *      source_chooser;
     struct AddData * data;
     uint8_t          flag;
     GSList *         list;
@@ -316,14 +317,11 @@ addSingleTorrentDialog( GtkWindow * parent,
     ++col;
     w = gtk_file_chooser_button_new( _( "Select Source File" ),
                                      GTK_FILE_CHOOSER_ACTION_OPEN );
+    source_chooser = w;
     gtk_table_attach( GTK_TABLE(
                           t ), w, col, col + 1, row, row + 1, ~0, 0, 0, 0 );
     gtk_label_set_mnemonic_widget( GTK_LABEL( l ), w );
     addTorrentFilters( GTK_FILE_CHOOSER( w ) );
-    if( data->filename )
-        if( !gtk_file_chooser_set_filename( GTK_FILE_CHOOSER( w ),
-                                            data->filename ) )
-            g_warning( "couldn't select '%s'", data->filename );
     g_signal_connect( w, "selection-changed",
                       G_CALLBACK( sourceChanged ), data );
 
@@ -386,6 +384,14 @@ addSingleTorrentDialog( GtkWindow * parent,
     gtk_table_attach( GTK_TABLE(
                           t ), w, col, col + 2, row, row + 1, GTK_FILL, 0,
                       0, 0 );
+
+    /* trigger sourceChanged, either directly or indirectly,
+     * so that it creates the tor/gtor objects */
+    w = source_chooser;
+    if( data->filename )
+        gtk_file_chooser_set_filename( GTK_FILE_CHOOSER( w ), data->filename );
+    else
+        sourceChanged( GTK_FILE_CHOOSER_BUTTON( w ), data );
 
     gtk_box_pack_start( GTK_BOX( GTK_DIALOG( d )->vbox ), t, TRUE, TRUE, 0 );
     gtk_widget_show_all( d );

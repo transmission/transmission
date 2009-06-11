@@ -140,8 +140,12 @@ void     tr_core_add_list( TrCore *    self,
     tr_core_add_list( c, l, PREF_FLAG_DEFAULT, PREF_FLAG_DEFAULT )
 
 
-/** Add a torrent. */
-gboolean tr_core_add_file( TrCore*, const char * filename, gboolean * setme_success, GError **    err );
+/** @brief Add a torrent. */
+gboolean tr_core_add_metainfo( TrCore      * core,
+                               const char  * base64_metainfo,
+                               gboolean    * setme_success,
+                               GError     ** err );
+
 /** Add a torrent. */
 void tr_core_add_torrent( TrCore*, TrTorrent* );
 

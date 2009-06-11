@@ -581,29 +581,43 @@ gtr_open_file( const char * path )
 gboolean
 gtr_dbus_add_torrent( const char * filename )
 {
-    static gboolean   success = FALSE;
-
+    /* FIXME: why is this static? */
+    static gboolean success = FALSE;
 #ifdef HAVE_DBUS_GLIB
-    DBusGProxy *      proxy = NULL;
-    GError *          err = NULL;
+    DBusGProxy * proxy = NULL;
+    GError * err = NULL;
     DBusGConnection * conn;
-    if( ( conn = dbus_g_bus_get( DBUS_BUS_SESSION, &err ) ) )
-        proxy = dbus_g_proxy_new_for_name ( conn, VALUE_SERVICE_NAME,
-                                            VALUE_SERVICE_OBJECT_PATH,
-                                            VALUE_SERVICE_INTERFACE );
-    else if( err )
-        g_message( "err: %s", err->message );
-    if( proxy )
-        dbus_g_proxy_call( proxy, "AddFile", &err,
-                           G_TYPE_STRING, filename,
-                           G_TYPE_INVALID,
-                           G_TYPE_BOOLEAN, &success,
-                           G_TYPE_INVALID );
-    if( err )
-        g_message( "err: %s", err->message );
+    char * file_contents;
+    gsize file_length;
 
-    g_object_unref( proxy );
-    dbus_g_connection_unref( conn );
+    if( g_file_get_contents( filename, &file_contents, &file_length, NULL ) )
+    {
+        char * b64 = tr_base64_encode( file_contents, file_length, NULL );
+        if(( conn = dbus_g_bus_get( DBUS_BUS_SESSION, &err )))
+            proxy = dbus_g_proxy_new_for_name (conn, VALUE_SERVICE_NAME,
+                                                     VALUE_SERVICE_OBJECT_PATH,
+                                                     VALUE_SERVICE_INTERFACE );
+        else if( err )
+           g_message( "err: %s", err->message );
+        if( proxy )
+            dbus_g_proxy_call( proxy, "AddMetainfo", &err,
+                               G_TYPE_STRING, b64,
+                               G_TYPE_INVALID,
+                               G_TYPE_BOOLEAN, &success,
+                               G_TYPE_INVALID );
+        if( err )
+           g_message( "err: %s", err->message );
+
+        if( proxy )
+            g_object_unref( proxy );
+        if( conn )
+            dbus_g_connection_unref( conn );
+
+        tr_free( b64 );
+        g_free( file_contents );
+    }
+    else g_message( "couldn't read %s", filename );
+
 #endif
     return success;
 }

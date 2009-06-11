@@ -331,7 +331,6 @@ main( int     argc,
       char ** argv )
 {
     char *              err = NULL;
-    struct cbdata *     cbdata;
     GSList *            argfiles;
     GError *            gerr;
     gboolean            didinit = FALSE;
@@ -357,8 +356,6 @@ main( int     argc,
           _( "Where to look for configuration files" ), NULL },
         { NULL, 0,   0, 0, NULL, NULL, NULL }
     };
-
-    cbdata = g_new0( struct cbdata, 1 );
 
     /* bind the gettext domain */
     setlocale( LC_ALL, "" );
@@ -392,39 +389,51 @@ main( int     argc,
     tr_notify_init( );
     didinit = cf_init( configDir, NULL ); /* must come before actions_init */
 
-    myUIManager = gtk_ui_manager_new ( );
-    actions_init ( myUIManager, cbdata );
-    gtk_ui_manager_add_ui_from_string ( myUIManager, fallback_ui_file, -1, NULL );
-    gtk_ui_manager_ensure_update ( myUIManager );
-    gtk_window_set_default_icon_name ( MY_NAME );
-
     setupsighandlers( ); /* set up handlers for fatal signals */
 
-    /* either get a lockfile s.t. this is the one instance of
-     * transmission that's running, OR if there are files to
-     * be added, delegate that to the running instance via dbus */
     didlock = cf_lock( &tr_state, &err );
     argfiles = checkfilenames( argc - 1, argv + 1 );
+
     if( !didlock && argfiles )
     {
+        /* We have torrents to add but there's another copy of Transmsision
+         * running... chances are we've been invoked from a browser, etc.
+         * So send the files over to the "real" copy of Transmission, and
+         * if that goes well, then our work is done. */
         GSList * l;
         gboolean delegated = FALSE;
+
         for( l = argfiles; l; l = l->next )
             delegated |= gtr_dbus_add_torrent( l->data );
-        if( delegated )
-            err = NULL;
+
+        if( delegated ) {
+            g_slist_foreach( argfiles, (GFunc)g_free, NULL );
+            g_slist_free( argfiles );
+            argfiles = NULL;
+
+            if( err ) {
+                g_free( err );
+                err = NULL;
+            }
+        }
     }
     else if( ( !didlock ) && ( tr_state == TR_LOCKFILE_ELOCK ) )
     {
+        /* There's already another copy of Transmission running,
+         * so tell it to present its window to the user */
         gtr_dbus_present_window( );
         err = NULL;
     }
 
     if( didlock && ( didinit || cf_init( configDir, &err ) ) )
     {
+        /* No other copy of Transmission running...
+         * so we're going to be the primary. */
+
         const char * str;
         GtkWindow * win;
         tr_session * session;
+        struct cbdata * cbdata = g_new0( struct cbdata, 1 );
 
         /* ensure the directories are created */
        if(( str = pref_string_get( PREF_KEY_DIR_WATCH )))
@@ -437,6 +446,13 @@ main( int     argc,
         pref_flag_set( TR_PREFS_KEY_ALT_SPEED_ENABLED, tr_sessionUsesAltSpeed( session ) );
         pref_int_set( TR_PREFS_KEY_PEER_PORT, tr_sessionGetPeerPort( session ) );
         cbdata->core = tr_core_new( session );
+
+        /* init the ui manager */
+        myUIManager = gtk_ui_manager_new ( );
+        actions_init ( myUIManager, cbdata );
+        gtk_ui_manager_add_ui_from_string ( myUIManager, fallback_ui_file, -1, NULL );
+        gtk_ui_manager_ensure_update ( myUIManager );
+        gtk_window_set_default_icon_name ( MY_NAME );
 
         /* create main window now to be a parent to any error dialogs */
         win = GTK_WINDOW( tr_window_new( myUIManager, cbdata->core ) );
@@ -893,7 +909,8 @@ on_main_window_focus_in( GtkWidget      * widget UNUSED,
 {
     struct cbdata * cbdata = gdata;
 
-    gtk_window_set_urgency_hint( GTK_WINDOW( cbdata->wind ), FALSE );
+    if( cbdata->wind )
+        gtk_window_set_urgency_hint( GTK_WINDOW( cbdata->wind ), FALSE );
 }
 
 #endif
@@ -909,7 +926,8 @@ onAddTorrent( TrCore *  core,
 #if GTK_CHECK_VERSION( 2, 8, 0 )
     g_signal_connect( w, "focus-in-event",
                       G_CALLBACK( on_main_window_focus_in ),  cbdata );
-    gtk_window_set_urgency_hint( cbdata->wind, TRUE );
+    if( cbdata->wind )
+        gtk_window_set_urgency_hint( cbdata->wind, TRUE );
 #endif
 }
 
