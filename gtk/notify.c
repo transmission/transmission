@@ -49,13 +49,15 @@ notifyCallback( NotifyNotification * n UNUSED,
     }
     else if( !strcmp( action, "file" ) )
     {
-        tr_torrent *    tor = tr_torrent_handle( gtor );
+        tr_torrent * tor = tr_torrent_handle( gtor );
         const tr_info * info = tr_torrent_info( gtor );
-        char *          path =
-            g_build_filename( tr_torrentGetDownloadDir(
-                                  tor ), info->files[0].name, NULL );
-        gtr_open_file( path );
-        g_free( path );
+        if( tor && info )
+        {
+            const char * dir = tr_torrentGetDownloadDir( tor );
+            char * path = g_build_filename( dir, info->files[0].name, NULL );
+            gtr_open_file( path );
+            g_free( path );
+        }
     }
 }
 
