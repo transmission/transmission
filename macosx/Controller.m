@@ -2456,8 +2456,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         NSString * fullFile = [path stringByAppendingPathComponent: file];
         
-        if (![[[NSWorkspace sharedWorkspace] typeOfFile: fullFile error: NULL] isEqualToString: @"org.bittorrent.torrent"]
-            || [[fullFile pathExtension] caseInsensitiveCompare: @"torrent"] == NSOrderedSame)
+        if (!([[[NSWorkspace sharedWorkspace] typeOfFile: fullFile error: NULL] isEqualToString: @"org.bittorrent.torrent"]
+                || [[fullFile pathExtension] caseInsensitiveCompare: @"torrent"] == NSOrderedSame))
             continue;
         
         tr_ctor * ctor = tr_ctorNew(fLib);
