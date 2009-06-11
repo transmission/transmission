@@ -979,7 +979,7 @@ trackerPulse( void * vsession )
 
         if( tor->dhtAnnounceAt <= now ) {
             int rc = 1;
-            if( tr_torrentAllowsDHT(tor) )
+            if( tor->isRunning && tr_torrentAllowsDHT(tor) )
                 rc = tr_dhtAnnounce(tor, 1);
             if(rc == 0)
                 /* The DHT is not ready yet.  Try again soon. */

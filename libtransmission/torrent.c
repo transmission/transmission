@@ -1274,6 +1274,8 @@ torrentStart( tr_torrent * tor, int reloadProgress )
 
         if( !isVerifying )
             tr_verifyAdd( tor, checkAndStartCB );
+
+        tor->dhtAnnounceAt = time( NULL ) tr_cryptoWeakRandInt( 20 );
     }
 
     tr_globalUnlock( tor->session );
