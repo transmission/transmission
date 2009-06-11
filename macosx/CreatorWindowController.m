@@ -213,7 +213,7 @@
     [panel setMessage: NSLocalizedString(@"Select the name and location for the torrent file.",
                                         "Create torrent -> location sheet -> message")]; 
     
-    [panel setRequiredFileType: @"org.bittorrent.torrent"];
+    [panel setAllowedFileTypes: [NSArray arrayWithObjects: @"org.bittorrent.torrent", @"torrent", nil]];
     [panel setCanSelectHiddenExtension: YES];
     
     [panel beginSheetForDirectory: [fLocation stringByDeletingLastPathComponent] file: [fLocation lastPathComponent]
