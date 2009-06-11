@@ -247,6 +247,8 @@ onMainWindowSizeAllocated( GtkWidget *            window,
                             && ( gdk_window_get_state( window->window )
                                  & GDK_WINDOW_STATE_MAXIMIZED );
 
+    pref_int_set( PREF_KEY_MAIN_WINDOW_IS_MAXIMIZED, isMaximized );
+
     if( !isMaximized )
     {
         int x, y, w, h;
@@ -710,6 +712,14 @@ wannaquit( void * vdata )
 
     /* clear the UI */
     gtk_list_store_clear( GTK_LIST_STORE( tr_core_model( cbdata->core ) ) );
+
+    /* ensure the window is in its previous position & size.
+     * this seems to be necessary because changing the main window's
+     * child seems to unset the size */
+    gtk_window_resize( cbdata->wind, pref_int_get( PREF_KEY_MAIN_WINDOW_WIDTH ),
+                                     pref_int_get( PREF_KEY_MAIN_WINDOW_HEIGHT ) );
+    gtk_window_move( cbdata->wind, pref_int_get( PREF_KEY_MAIN_WINDOW_X ),
+                                   pref_int_get( PREF_KEY_MAIN_WINDOW_Y ) );
 
     /* shut down libT */
     g_thread_create( quitThreadFunc, vdata, TRUE, NULL );

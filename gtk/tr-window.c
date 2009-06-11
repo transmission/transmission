@@ -832,7 +832,9 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
                                  pref_int_get( PREF_KEY_MAIN_WINDOW_WIDTH ),
                                  pref_int_get( PREF_KEY_MAIN_WINDOW_HEIGHT ) );
     gtk_window_move( win, pref_int_get( PREF_KEY_MAIN_WINDOW_X ),
-                     pref_int_get( PREF_KEY_MAIN_WINDOW_Y ) );
+                          pref_int_get( PREF_KEY_MAIN_WINDOW_Y ) );
+    if( pref_flag_get( PREF_KEY_MAIN_WINDOW_IS_MAXIMIZED ) )
+        gtk_window_maximize( win );
     gtk_window_add_accel_group( win, gtk_ui_manager_get_accel_group( ui_mgr ) );
 
     /* window's main container */
