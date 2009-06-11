@@ -40,6 +40,7 @@
 #include <libtransmission/utils.h> /* tr_free */
 
 #include "conf.h"
+#include "notify.h"
 #include "tr-core.h"
 #ifdef HAVE_DBUS_GLIB
  #include "tr-core-dbus.h"
@@ -469,7 +470,7 @@ watchFolderIdle( gpointer gcore )
     TrCore * core = TR_CORE( gcore );
 
     core->priv->adding_from_watch_dir = TRUE;
-    tr_core_add_list_defaults( core, core->priv->monitor_files );
+    tr_core_add_list_defaults( core, core->priv->monitor_files, TRUE );
     core->priv->adding_from_watch_dir = FALSE;
 
     /* cleanup */
@@ -784,8 +785,9 @@ doCollate( const char * in )
 }
 
 void
-tr_core_add_torrent( TrCore *    self,
-                     TrTorrent * gtor )
+tr_core_add_torrent( TrCore     * self,
+                     TrTorrent  * gtor,
+                     gboolean     doNotify )
 {
     const tr_info * inf = tr_torrent_info( gtor );
     const tr_stat * torStat = tr_torrent_stat( gtor );
@@ -801,6 +803,9 @@ tr_core_add_torrent( TrCore *    self,
                                        MC_TORRENT_RAW,   tor,
                                        MC_ACTIVITY,      torStat->activity,
                                        -1 );
+
+    if( doNotify )
+        tr_notify_added( inf->name );
 
     /* cleanup */
     g_object_unref( G_OBJECT( gtor ) );
@@ -824,7 +829,7 @@ tr_core_load( TrCore * self,
 
     torrents = tr_sessionLoadTorrents ( tr_core_session( self ), ctor, &count );
     for( i = 0; i < count; ++i )
-        tr_core_add_torrent( self, tr_torrent_new_preexisting( torrents[i] ) );
+        tr_core_add_torrent( self, tr_torrent_new_preexisting( torrents[i] ), FALSE );
 
     tr_free( torrents );
     tr_ctorFree( ctor );
@@ -853,7 +858,7 @@ tr_core_errsig( TrCore *         core,
 }
 
 static int
-add_ctor( TrCore * core, tr_ctor * ctor, gboolean doPrompt )
+add_ctor( TrCore * core, tr_ctor * ctor, gboolean doPrompt, gboolean doNotify )
 {
     tr_info inf;
     int err = tr_torrentParse( ctor, &inf );
@@ -879,9 +884,8 @@ add_ctor( TrCore * core, tr_ctor * ctor, gboolean doPrompt )
             else {
                 tr_session * session = tr_core_session( core );
                 TrTorrent * gtor = tr_torrent_new_ctor( session, ctor, &err );
-                g_message( "creating a gtorrent" );
                 if( !err )
-                    tr_core_add_torrent( core, gtor );
+                    tr_core_add_torrent( core, gtor, doNotify );
             }
             tr_metainfoFree( &inf );
             break;
@@ -918,7 +922,7 @@ tr_core_add_metainfo( TrCore      * core,
         err = tr_ctorSetMetainfo( ctor, (const uint8_t*)file_contents, file_length );
 
         if( !err )
-            err = add_ctor( core, ctor, do_prompt );
+            err = add_ctor( core, ctor, do_prompt, TRUE );
 
         tr_free( file_contents );
         tr_core_torrents_added( core );
@@ -932,7 +936,8 @@ static void
 add_filename( TrCore      * core,
               const char  * filename,
               gboolean      doStart,
-              gboolean      doPrompt )
+              gboolean      doPrompt,
+              gboolean      doNotify )
 {
     tr_session * session = tr_core_session( core );
     if( filename && session )
@@ -943,7 +948,7 @@ add_filename( TrCore      * core,
         tr_ctorSetPaused( ctor, TR_FORCE, !doStart );
         tr_ctorSetMetainfoFromFile( ctor, filename );
 
-        err = add_ctor( core, ctor, doPrompt );
+        err = add_ctor( core, ctor, doPrompt, doNotify );
         if( err == TR_EINVALID )
             tr_core_errsig( core, TR_EINVALID, filename );
     }
@@ -960,17 +965,18 @@ tr_core_present_window( TrCore      * core UNUSED,
 }
 
 void
-tr_core_add_list( TrCore *    core,
-                  GSList *    torrentFiles,
-                  pref_flag_t start,
-                  pref_flag_t prompt )
+tr_core_add_list( TrCore       * core,
+                  GSList       * torrentFiles,
+                  pref_flag_t    start,
+                  pref_flag_t    prompt,
+                  gboolean       doNotify )
 {
     const gboolean doStart = pref_flag_eval( start, PREF_KEY_START );
     const gboolean doPrompt = pref_flag_eval( prompt, PREF_KEY_OPTIONS_PROMPT );
     GSList * l;
 
     for( l = torrentFiles; l != NULL; l = l->next )
-        add_filename( core, l->data, doStart, doPrompt );
+        add_filename( core, l->data, doStart, doPrompt, doNotify );
 
     tr_core_torrents_added( core );
     freestrlist( torrentFiles );

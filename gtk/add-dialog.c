@@ -123,7 +123,7 @@ addResponseCB( GtkDialog * dialog,
             if( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( data->run_check ) ) )
                 tr_torrentStart( tr_torrent_handle( data->gtor ) );
 
-            tr_core_add_torrent( data->core, data->gtor );
+            tr_core_add_torrent( data->core, data->gtor, FALSE );
 
             if( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( data->trash_check ) ) )
 
@@ -426,7 +426,7 @@ onAddDialogResponse( GtkDialog * dialog,
                                  : PREF_FLAG_FALSE;
         GSList * l = gtk_file_chooser_get_filenames( chooser );
 
-        tr_core_add_list( core, l, start, prompt );
+        tr_core_add_list( core, l, start, prompt, FALSE );
     }
 
     gtk_widget_destroy( GTK_WIDGET( dialog ) );

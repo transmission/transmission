@@ -300,8 +300,7 @@ onRPCChanged( tr_session            * session UNUSED,
     switch( type )
     {
         case TR_RPC_TORRENT_ADDED:
-            tr_core_add_torrent( cbdata->core,
-                                 tr_torrent_new_preexisting( tor ) );
+            tr_core_add_torrent( cbdata->core, tr_torrent_new_preexisting( tor ), TRUE );
             break;
 
         case TR_RPC_TORRENT_STARTED:
@@ -517,7 +516,7 @@ appsetup( TrWindow *      wind,
 
     /* add torrents from command-line and saved state */
     tr_core_load( cbdata->core, forcepause );
-    tr_core_add_list( cbdata->core, torrentFiles, start, prompt );
+    tr_core_add_list( cbdata->core, torrentFiles, start, prompt, TRUE );
     torrentFiles = NULL;
     tr_core_torrents_added( cbdata->core );
 
@@ -793,7 +792,7 @@ gotdrag( GtkWidget         * widget UNUSED,
         if( paths )
         {
             paths = g_slist_reverse( paths );
-            tr_core_add_list_defaults( data->core, paths );
+            tr_core_add_list_defaults( data->core, paths, TRUE );
             tr_core_torrents_added( data->core );
         }
 

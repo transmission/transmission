@@ -19,4 +19,6 @@ void tr_notify_init( void );
 
 void tr_notify_send( TrTorrent * tor );
 
+void tr_notify_added( const char * name );
+
 #endif

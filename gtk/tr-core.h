@@ -134,10 +134,11 @@ int      tr_core_load( TrCore * self,
 void     tr_core_add_list( TrCore *    self,
                            GSList *    torrentFiles,
                            pref_flag_t start,
-                           pref_flag_t prompt );
+                           pref_flag_t prompt,
+                           gboolean    doNotify );
 
-#define tr_core_add_list_defaults( c, l ) \
-    tr_core_add_list( c, l, PREF_FLAG_DEFAULT, PREF_FLAG_DEFAULT )
+#define tr_core_add_list_defaults( c, l, doNotify ) \
+    tr_core_add_list( c, l, PREF_FLAG_DEFAULT, PREF_FLAG_DEFAULT, doNotify )
 
 
 /** @brief Add a torrent. */
@@ -147,7 +148,7 @@ gboolean tr_core_add_metainfo( TrCore      * core,
                                GError     ** err );
 
 /** Add a torrent. */
-void tr_core_add_torrent( TrCore*, TrTorrent* );
+void tr_core_add_torrent( TrCore*, TrTorrent*, gboolean doNotify );
 
 /** Present the main window */
 gboolean tr_core_present_window( TrCore*, gboolean * setme_success, GError ** err ); 

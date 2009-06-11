@@ -538,12 +538,16 @@ peerPage( GObject * core )
     w = new_encryption_combo( core, "encryption" );
     hig_workarea_add_row( t, &row, s, w, NULL );
 
-    s = _( "Use peer e_xchange (PEX)" );
+    s = _( "Use PE_X to find more peers" );
     w = new_check_button( s, TR_PREFS_KEY_PEX_ENABLED, core );
+    s = _( "PEX is a tool for exchanging peer lists with the peers you're connected to." );
+    gtr_widget_set_tooltip_text( w, s );
     hig_workarea_add_wide_control( t, &row, w );
 
-    s = _( "Use _distributed hash table (DHT)" );
+    s = _( "Use _DHT to find more peers" );
     w = new_check_button( s, TR_PREFS_KEY_DHT_ENABLED, core );
+    s = _( "DHT is a tool for finding peers without a tracker." );
+    gtr_widget_set_tooltip_text( w, s );
     hig_workarea_add_wide_control( t, &row, w );
 
     hig_workarea_finish( t, &row );

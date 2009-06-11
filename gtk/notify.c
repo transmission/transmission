@@ -22,10 +22,9 @@
 
 #ifndef HAVE_LIBNOTIFY
 
-void
-tr_notify_init( void ) { }
-void
-tr_notify_send( TrTorrent * tor UNUSED ) { }
+void tr_notify_init( void ) { }
+void tr_notify_send( TrTorrent * tor UNUSED ) { }
+void tr_notify_added( const char * name UNUSED ) { }
 
 #else
  #include <libnotify/notify.h>
@@ -109,6 +108,18 @@ tr_notify_send( TrTorrent *tor )
                 NOTIFY_ACTION_CALLBACK( notifyCallback ), tor, NULL );
         }
 
+        notify_notification_show( n, NULL );
+    }
+}
+
+void
+tr_notify_added( const char * name )
+{
+    if( pref_flag_get( PREF_KEY_SHOW_DESKTOP_NOTIFICATION ) )
+    {
+        NotifyNotification * n = notify_notification_new(
+            _( "Torrent Added" ), name, "transmission", NULL );
+        notify_notification_set_timeout( n, NOTIFY_EXPIRES_DEFAULT );
         notify_notification_show( n, NULL );
     }
 }
