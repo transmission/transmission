@@ -1,5 +1,10 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
+1.72 (2009/06/dd)
+<http://trac.transmissionbt.com/query?milestone=1.72&group=component&groupdesc=1&order=severity>
+- Mac
+   + Fix problem where a small set of users could not add torrents
+
 1.71 (2009/06/07)
 <http://trac.transmissionbt.com/query?milestone=1.71&group=component&groupdesc=1&order=severity>
 - All Platforms
