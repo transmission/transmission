@@ -238,7 +238,11 @@ char* tr_buildPath( const char * first_element, ... ) TR_GNUC_NULL_TERMINATED
 
 struct timeval;
 
-void tr_timevalMsec( uint64_t milliseconds, struct timeval   * setme );
+tr_bool tr_isTimeval( const struct timeval * tv );
+
+void tr_timevalMsec( uint64_t milliseconds, struct timeval * setme );
+
+void tr_timevalSet( struct timeval * setme, int seconds, int microseconds );
 
 
 /** @brief return the current date in milliseconds */

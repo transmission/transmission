@@ -303,10 +303,12 @@ timerCallback( int    fd UNUSED,
     more = ( *timer->func )( timer->user_data );
     timer->inCallback = 0;
 
-    if( more )
-        evtimer_add( &timer->event, &timer->tv );
-    else
+    if( !more )
         tr_timerFree( &timer );
+    else {
+        assert( tr_isTimeval( &timer->tv ) );
+        evtimer_add( &timer->event, &timer->tv );
+    }
 }
 
 void

@@ -457,6 +457,14 @@ tr_strip_positional_args( const char* str )
 ***
 **/
 
+tr_bool
+tr_isTimeval( const struct timeval * tv )
+{
+    return tv && ( tv->tv_sec >= 0 )
+              && ( tv->tv_usec >= 0 )
+              && ( tv->tv_usec < 1000000 );
+}
+
 void
 tr_timevalMsec( uint64_t milliseconds, struct timeval * setme )
 {
@@ -464,7 +472,21 @@ tr_timevalMsec( uint64_t milliseconds, struct timeval * setme )
     assert( setme != NULL );
     setme->tv_sec  = microseconds / 1000000;
     setme->tv_usec = microseconds % 1000000;
+    assert( tr_isTimeval( setme ) );
 }
+
+void
+tr_timevalSet( struct timeval * setme, int seconds, int microseconds )
+{
+    setme->tv_sec = seconds;
+    setme->tv_usec = microseconds;
+    assert( tr_isTimeval( setme ) );
+}
+
+
+/**
+***
+**/
 
 uint8_t *
 tr_loadFile( const char * path,

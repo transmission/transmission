@@ -108,21 +108,21 @@ onTimer( int fd UNUSED, short what UNUSED, void * vshared )
             /* if we're mapped, everything is fine... check back in 20 minutes
              * to renew the port forwarding if it's expired */
             s->doPortCheck = TRUE;
-            interval.tv_sec = 60*20;
+            tr_timevalSet( &interval, 60*20, 0 );
             break;
 
         case TR_PORT_ERROR:
             /* some kind of an error.  wait 60 seconds and retry */
-            interval.tv_sec = 60;
+            tr_timevalSet( &interval, 60, 0 );
             break;
 
         default:
             /* in progress.  pulse frequently. */
-            interval.tv_sec = 0;
-            interval.tv_usec = 333000;
+            tr_timevalSet( &interval, 0, 333000 );
             break;
     }
 
+    assert( tr_isTimeval( &interval ) );
     evtimer_add( s->timer, &interval );
 }
 
@@ -143,10 +143,10 @@ tr_sharedInit( tr_session  * session, tr_bool isEnabled )
     if( isEnabled )
     {
         struct timeval timeval;
-        timeval.tv_sec = 0;
-        timeval.tv_usec = 333000;
+
         s->timer = tr_new0( struct event, 1 );
         evtimer_set( s->timer, onTimer, s );
+        tr_timevalSet( &timeval, 0, 333000 );
         evtimer_add( s->timer, &timeval );
     }
 

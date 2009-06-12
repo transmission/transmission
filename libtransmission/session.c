@@ -1068,8 +1068,7 @@ setAltTimer( tr_session * session )
     assert( session->altTimer != NULL );
 
     tr_localtime_r( &now, &tm );
-    tv.tv_sec = 60 - tm.tm_sec;
-    tv.tv_usec = 0;
+    tr_timevalSet( &tv, 60-tm.tm_sec, 0 );
     evtimer_add( session->altTimer, &tv );
 }
 
