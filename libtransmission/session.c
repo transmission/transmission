@@ -1598,21 +1598,29 @@ tr_sessionIsDHTEnabled( const tr_session * session )
     return session->isDHTEnabled;
 }
 
+static void
+toggleDHTImpl(  void * data )
+{
+    tr_session * session = data;
+    assert( tr_isSession( session ) );
+
+    if( session->isDHTEnabled )
+        tr_dhtUninit( session );
+
+    session->isDHTEnabled = !session->isDHTEnabled;
+
+    if( session->isDHTEnabled )
+        tr_dhtInit( session );
+}
+
 void
 tr_sessionSetDHTEnabled( tr_session * session, tr_bool enabled )
 {
     assert( tr_isSession( session ) );
+    assert( tr_isBool( enabled ) );
 
-    if( ( enabled!=0 ) != (session->isDHTEnabled!=0) )
-    {
-        if( session->isDHTEnabled )
-            tr_dhtUninit( session );
-
-        session->isDHTEnabled = enabled!=0;
-
-        if( session->isDHTEnabled )
-            tr_dhtInit( session );
-    }
+    if( ( enabled != 0 ) != ( session->isDHTEnabled != 0 ) )
+        tr_runInEventThread( session, toggleDHTImpl, session );
 }
 
 /***
