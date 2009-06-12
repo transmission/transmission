@@ -572,7 +572,7 @@ addField( const tr_torrent * tor, tr_benc * d, const char * key )
             tr_bencListAddInt( w, inf->files[i].dnd ? 0 : 1 );
     }
     else if( tr_streq( key, keylen, "webseeds" ) )
-        addWebseeds( inf, tr_bencDictAddList( d, key, inf->trackerCount ) );
+        addWebseeds( inf, tr_bencDictAddList( d, key, inf->webseedCount ) );
     else if( tr_streq( key, keylen, "webseedsSendingToUs" ) )
         tr_bencDictAddInt( d, key, st->webseedsSendingToUs );
 }
