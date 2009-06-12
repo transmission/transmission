@@ -2,8 +2,19 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 
 1.72 (2009/06/dd)
 <http://trac.transmissionbt.com/query?milestone=1.72&group=component&groupdesc=1&order=severity>
+- All Platforms
+   + Fix 1.71 assertion failure
+   + Better DHT announce management
 - Mac
    + Fix problem where a small set of users could not add torrents
+- GTK+
+   + Fix a crash in the Properties dialog
+   + Can now sort the file list by priority, download, and completeness
+   + Adding a torrent from a browser sometimes didn't work.
+   + Fix a rare crash in desktop notifications
+   + Various usability improvements
+- Daemon
+   + remote didn't always send the right Encoding header in requests
 
 1.71 (2009/06/07)
 <http://trac.transmissionbt.com/query?milestone=1.71&group=component&groupdesc=1&order=severity>
