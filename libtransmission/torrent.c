@@ -1265,17 +1265,13 @@ torrentStart( tr_torrent * tor, int reloadProgress )
 
     if( !tor->isRunning )
     {
-        const tr_bool isVerifying = tr_verifyInProgress( tor );
+        tr_verifyRemove( tor );
 
-        if( !isVerifying && reloadProgress )
+        if( reloadProgress )
             tr_torrentLoadResume( tor, TR_FR_PROGRESS, NULL );
 
         tor->isRunning = 1;
-
-        if( !isVerifying )
-            tr_verifyAdd( tor, checkAndStartCB );
-
-        tor->dhtAnnounceAt = time( NULL ) + tr_cryptoWeakRandInt( 20 );
+        tr_verifyAdd( tor, checkAndStartCB );
     }
 
     tr_globalUnlock( tor->session );
