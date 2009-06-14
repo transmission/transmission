@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-05-28 18:17-0500\n"
-"PO-Revision-Date: 2009-06-03 20:24+0000\n"
-"Last-Translator: Mert Bozkurt <Unknown>\n"
+"PO-Revision-Date: 2009-06-10 18:56+0000\n"
+"Last-Translator: Attila C. YILMAZLAR <attilayilmazlar@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2009-06-08 01:28+0000\n"
+"X-Launchpad-Export-Date: 2009-06-13 22:32+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:49
@@ -683,6 +683,7 @@ msgstr ""
 "Can Duruk\n"
 "\n"
 "Launchpad Contributions:\n"
+"  Attila C. YILMAZLAR https://launchpad.net/~attilayilmazlar\n"
 "  Hasan Yılmaz https://launchpad.net/~hasanyilmaz\n"
 "  Mert Bozkurt https://launchpad.net/~aquacultural\n"
 "  Osman Tosun https://launchpad.net/~rainman-neu\n"
@@ -1550,11 +1551,11 @@ msgstr "_Kalan zamana göre sırala"
 
 #: ../gtk/actions.c:90
 msgid "Speed _Limit Mode"
-msgstr ""
+msgstr "Hız_Sınırlı Biçim"
 
 #: ../gtk/actions.c:113
 msgid "Set _Location"
-msgstr ""
+msgstr "Konumunuzu_Belirleyin"
 
 #: ../gtk/details.c:453
 #, c-format
@@ -1593,7 +1594,7 @@ msgstr "Yerel veriyi doğrula"
 
 #: ../gtk/details.c:635
 msgid "Seeding"
-msgstr ""
+msgstr "Dağıtım"
 
 #: ../gtk/details.c:704
 #, c-format
@@ -1708,7 +1709,7 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:1220
 msgid "Use Speed Limit Mode _between:"
-msgstr ""
+msgstr "Aramızda Hız Sınırlı Durumu Kullan:"
 
 #: ../gtk/tr-prefs.c:1235
 msgid "_On days:"
