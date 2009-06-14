@@ -243,7 +243,7 @@ announceToScrape( const char * announce )
         memcpy( walk, "scrape", 6 );        walk += 6;
         memcpy( walk, suffix, suffix_len ); walk += suffix_len;
         *walk++ = '\0';
-        assert( walk - scrape == alloc_len );
+        assert( walk - scrape == (int)alloc_len );
     }
 
     return scrape;

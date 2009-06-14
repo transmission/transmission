@@ -349,10 +349,9 @@ tr_cryptoWeakRandInt( int upperBound )
 }
 
 void
-tr_cryptoRandBuf( unsigned char *buf,
-                  size_t         len )
+tr_cryptoRandBuf( void * buf, size_t len )
 {
-    if( RAND_pseudo_bytes ( buf, len ) != 1 )
+    if( RAND_pseudo_bytes ( (unsigned char*)buf, len ) != 1 )
         logErrorFromSSL( );
 }
 

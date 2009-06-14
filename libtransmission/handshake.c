@@ -332,26 +332,23 @@ sendYa( tr_handshake * handshake )
 {
     int               len;
     const uint8_t *   public_key;
-    struct evbuffer * outbuf = evbuffer_new( );
-    uint8_t           pad_a[PadA_MAXLEN];
+    char              outbuf[ KEY_LEN + PadA_MAXLEN ], *walk=outbuf;
 
     /* add our public key (Ya) */
     public_key = tr_cryptoGetMyPublicKey( handshake->crypto, &len );
     assert( len == KEY_LEN );
     assert( public_key );
-    evbuffer_add( outbuf, public_key, len );
+    memcpy( walk, public_key, len );
+    walk += len;
 
     /* add some bullshit padding */
     len = tr_cryptoRandInt( PadA_MAXLEN );
-    tr_cryptoRandBuf( pad_a, len );
-    evbuffer_add( outbuf, pad_a, len );
+    tr_cryptoRandBuf( walk, len );
+    walk += len;
 
     /* send it */
     setReadState( handshake, AWAITING_YB );
-    tr_peerIoWriteBuf( handshake->io, outbuf, FALSE );
-
-    /* cleanup */
-    evbuffer_free( outbuf );
+    tr_peerIoWrite( handshake->io, outbuf, walk-outbuf, FALSE );
 }
 
 static uint32_t
