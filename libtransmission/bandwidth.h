@@ -17,6 +17,8 @@
 #ifndef TR_BANDWIDTH_H
 #define TR_BANDWIDTH_H
 
+#include <assert.h>
+
 #include "transmission.h"
 #include "ptrarray.h"
 #include "utils.h" /* tr_new(), tr_free() */
@@ -34,7 +36,7 @@ enum
 {
     HISTORY_MSEC = 2000,
     INTERVAL_MSEC = HISTORY_MSEC,
-    GRANULARITY_MSEC = 50,
+    GRANULARITY_MSEC = 200,
     HISTORY_SIZE = ( INTERVAL_MSEC / GRANULARITY_MSEC ),
     MAGIC_NUMBER = 43143
 };
@@ -152,8 +154,8 @@ static TR_INLINE tr_bool tr_isBandwidth( const tr_bandwidth  * b )
  * @see tr_bandwidthGetDesiredSpeed
  */
 static TR_INLINE void tr_bandwidthSetDesiredSpeed( tr_bandwidth        * bandwidth,
-                                                tr_direction          dir,
-                                                double                desiredSpeed )
+                                                   tr_direction          dir,
+                                                   double                desiredSpeed )
 {
     bandwidth->band[dir].desiredSpeed = desiredSpeed;
 }
@@ -238,9 +240,10 @@ void    tr_bandwidthSetParent         ( tr_bandwidth        * bandwidth,
  * But when we set a torrent's speed mode to TR_SPEEDLIMIT_UNLIMITED, then
  * in that particular case we want to ignore the global speed limit...
  */
-static TR_INLINE void tr_bandwidthHonorParentLimits ( tr_bandwidth        * bandwidth,
-                                                      tr_direction          direction,
-                                                      tr_bool               isEnabled )
+static TR_INLINE void
+tr_bandwidthHonorParentLimits( tr_bandwidth  * bandwidth,
+                               tr_direction    direction,
+                               tr_bool         isEnabled )
 {
     assert( tr_isBandwidth( bandwidth ) );
     assert( tr_isDirection( direction ) );
@@ -248,8 +251,9 @@ static TR_INLINE void tr_bandwidthHonorParentLimits ( tr_bandwidth        * band
     bandwidth->band[direction].honorParentLimits = isEnabled;
 }
 
-static TR_INLINE tr_bool tr_bandwidthAreParentLimitsHonored( tr_bandwidth  * bandwidth,
-                                                             tr_direction    direction )
+static TR_INLINE tr_bool
+tr_bandwidthAreParentLimitsHonored( const tr_bandwidth  * bandwidth,
+                                    tr_direction          direction )
 {
     assert( tr_isBandwidth( bandwidth ) );
     assert( tr_isDirection( direction ) );

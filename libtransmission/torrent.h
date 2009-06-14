@@ -17,6 +17,7 @@
 #ifndef TR_TORRENT_H
 #define TR_TORRENT_H 1
 
+#include "bandwidth.h" /* tr_bandwidth */
 #include "completion.h" /* tr_completion */
 #include "ratecontrol.h" /* tr_ratecontrol */
 #include "session.h" /* tr_globalLock(), tr_globalUnlock() */
@@ -172,6 +173,8 @@ struct tr_torrent
     struct tr_bitfield         checkedPieces;
     tr_completeness            completeness;
 
+    struct tr_bandwidth        bandwidth;
+
     struct tr_tracker *        tracker;
     struct tr_publisher_tag *  trackerSubscription;
 
@@ -212,8 +215,6 @@ struct tr_torrent
     tr_torrent *               next;
 
     int                        uniqueId;
-
-    struct tr_bandwidth      * bandwidth;
 
     struct tr_torrent_peers  * torrentPeers;
 
