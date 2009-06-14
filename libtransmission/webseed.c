@@ -99,7 +99,7 @@ makeURL( tr_webseed *    w,
          const tr_file * file )
 {
     char *            ret;
-    struct evbuffer * out = tr_getBuffer( );
+    struct evbuffer * out = evbuffer_new( );
     const char *      url = w->url;
     const size_t      url_len = strlen( url );
 
@@ -140,7 +140,7 @@ makeURL( tr_webseed *    w,
     }
 
     ret = tr_strndup( EVBUFFER_DATA( out ), EVBUFFER_LENGTH( out ) );
-    tr_releaseBuffer( out );
+    evbuffer_free( out );
     return ret;
 }
 

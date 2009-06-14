@@ -259,7 +259,7 @@ tr_deepLog( const char  * file,
     {
         va_list           args;
         char              timestr[64];
-        struct evbuffer * buf = tr_getBuffer( );
+        struct evbuffer * buf = evbuffer_new( );
         char *            base = tr_basename( file );
 
         evbuffer_add_printf( buf, "[%s] ",
@@ -276,7 +276,7 @@ tr_deepLog( const char  * file,
             (void) fwrite( EVBUFFER_DATA( buf ), 1, EVBUFFER_LENGTH( buf ), fp );
 
         tr_free( base );
-        tr_releaseBuffer( buf );
+        evbuffer_free( buf );
     }
 }
 
@@ -736,14 +736,14 @@ tr_strdup_printf( const char * fmt, ... )
     struct evbuffer * buf;
     va_list           ap;
 
-    buf = tr_getBuffer( );
+    buf = evbuffer_new( );
     va_start( ap, fmt );
 
     if( evbuffer_add_vprintf( buf, fmt, ap ) != -1 )
         ret = tr_strdup( EVBUFFER_DATA( buf ) );
 
     va_end( ap );
-    tr_releaseBuffer( buf );
+    evbuffer_free( buf );
     return ret;
 }
 
@@ -1305,49 +1305,6 @@ void*
 tr_int2ptr( int i )
 {
     return (void*)(intptr_t)i;
-}
-
-/***
-****
-***/
-
-static tr_list * _bufferList = NULL;
-
-static tr_lock *
-getBufferLock( void )
-{
-    static tr_lock * lock = NULL;
-    if( lock == NULL )
-        lock = tr_lockNew( );
-    return lock;
-}
-
-struct evbuffer*
-tr_getBuffer( void )
-{
-    struct evbuffer * buf;
-    tr_lock * l = getBufferLock( );
-    tr_lockLock( l );
-
-    buf = tr_list_pop_front( &_bufferList );
-    if( buf == NULL )
-        buf = evbuffer_new( );
-
-    tr_lockUnlock( l );
-    return buf;
-}
-
-void
-tr_releaseBuffer( struct evbuffer * buf )
-{
-    tr_lock * l = getBufferLock( );
-    tr_lockLock( l );
-
-    evbuffer_drain( buf, EVBUFFER_LENGTH( buf ) );
-    assert( EVBUFFER_LENGTH( buf ) == 0 );
-    tr_list_prepend( &_bufferList, buf );
-
-    tr_lockUnlock( l );
 }
 
 /***

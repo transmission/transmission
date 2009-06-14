@@ -320,7 +320,7 @@ testJSONSnippet( const char * benc_str,
                  const char * expected )
 {
     tr_benc top;
-    struct evbuffer * buf = tr_getBuffer( );
+    struct evbuffer * buf = evbuffer_new( );
     char * serialized;
 
     tr_bencLoad( benc_str, strlen( benc_str ), &top, NULL );
@@ -334,7 +334,7 @@ testJSONSnippet( const char * benc_str,
 #endif
     check( !strcmp( serialized, expected ) );
     tr_bencFree( &top );
-    tr_releaseBuffer( buf );
+    evbuffer_free( buf );
     return 0;
 }
 

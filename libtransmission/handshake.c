@@ -332,7 +332,7 @@ sendYa( tr_handshake * handshake )
 {
     int               len;
     const uint8_t *   public_key;
-    struct evbuffer * outbuf = tr_getBuffer( );
+    struct evbuffer * outbuf = evbuffer_new( );
     uint8_t           pad_a[PadA_MAXLEN];
 
     /* add our public key (Ya) */
@@ -351,7 +351,7 @@ sendYa( tr_handshake * handshake )
     tr_peerIoWriteBuf( handshake->io, outbuf, FALSE );
 
     /* cleanup */
-    tr_releaseBuffer( outbuf );
+    evbuffer_free( outbuf );
 }
 
 static uint32_t
@@ -444,7 +444,7 @@ readYb( tr_handshake *    handshake,
 
     /* now send these: HASH('req1', S), HASH('req2', SKEY) xor HASH('req3', S),
      * ENCRYPT(VC, crypto_provide, len(PadC), PadC, len(IA)), ENCRYPT(IA) */
-    outbuf = tr_getBuffer( );
+    outbuf = evbuffer_new( );
 
     /* HASH('req1', S) */
     {
@@ -501,7 +501,7 @@ readYb( tr_handshake *    handshake,
     tr_peerIoWriteBuf( handshake->io, outbuf, FALSE );
 
     /* cleanup */
-    tr_releaseBuffer( outbuf );
+    evbuffer_free( outbuf );
     return READ_LATER;
 }
 
@@ -935,7 +935,7 @@ readIA( tr_handshake *    handshake,
     **/
 
     tr_cryptoEncryptInit( handshake->crypto );
-    outbuf = tr_getBuffer( );
+    outbuf = evbuffer_new( );
 
     dbgmsg( handshake, "sending vc" );
     /* send VC */
@@ -955,7 +955,7 @@ readIA( tr_handshake *    handshake,
     else
     {
         dbgmsg( handshake, "peer didn't offer an encryption mode we like." );
-        tr_releaseBuffer( outbuf );
+        evbuffer_free( outbuf );
         return tr_handshakeDone( handshake, FALSE );
     }
 
@@ -987,7 +987,7 @@ readIA( tr_handshake *    handshake,
 
     /* send it out */
     tr_peerIoWriteBuf( handshake->io, outbuf, FALSE );
-    tr_releaseBuffer( outbuf );
+    evbuffer_free( outbuf );
 
     /* now await the handshake */
     setState( handshake, AWAITING_PAYLOAD_STREAM );

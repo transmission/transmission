@@ -264,21 +264,6 @@ char* tr_utf8clean( const char * str, int len, tr_bool * err ) TR_GNUC_MALLOC;
 ****
 ***/
 
-struct evbuffer;
-
-/** @brief pool of reusable buffers
-    @see tr_releaseBuffer() */
-struct evbuffer * tr_getBuffer( void );
-
-/** @brief return a buffer to the pool
-    @see tr_getBuffer() */
-void tr_releaseBuffer( struct evbuffer * buf );
-
-
-/***
-****
-***/
-
 /* Sometimes the system defines MAX/MIN, sometimes not.
    In the latter case, define those here since we will use them */
 #ifndef MAX

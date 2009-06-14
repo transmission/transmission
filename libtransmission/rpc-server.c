@@ -124,14 +124,14 @@ send_simple_response( struct evhttp_request * req,
                       const char *            text )
 {
     const char *      code_text = tr_webGetResponseStr( code );
-    struct evbuffer * body = tr_getBuffer( );
+    struct evbuffer * body = evbuffer_new( );
 
     evbuffer_add_printf( body, "<h1>%d: %s</h1>", code, code_text );
     if( text )
         evbuffer_add_printf( body, "%s", text );
     evhttp_send_reply( req, code, code_text, body );
 
-    tr_releaseBuffer( body );
+    evbuffer_free( body );
 }
 
 struct tr_mimepart
@@ -415,14 +415,14 @@ serve_file( struct evhttp_request * req,
             const time_t now = time( NULL );
 
             errno = error;
-            out = tr_getBuffer( );
+            out = evbuffer_new( );
             evhttp_add_header( req->output_headers, "Content-Type", mimetype_guess( filename ) );
             add_time_header( req->output_headers, "Date", now );
             add_time_header( req->output_headers, "Expires", now+(24*60*60) );
             add_response( req, server, out, content, content_len );
             evhttp_send_reply( req, HTTP_OK, "OK", out );
 
-            tr_releaseBuffer( out );
+            evbuffer_free( out );
             tr_free( content );
         }
     }
@@ -489,14 +489,14 @@ rpc_response_func( tr_session      * session UNUSED,
                    void            * user_data )
 {
     struct rpc_response_data * data = user_data;
-    struct evbuffer * buf = tr_getBuffer( );
+    struct evbuffer * buf = evbuffer_new( );
 
     add_response( data->req, data->server, buf, response, response_len );
     evhttp_add_header( data->req->output_headers,
                            "Content-Type", "application/json; charset=UTF-8" );
     evhttp_send_reply( data->req, HTTP_OK, "OK", buf );
 
-    tr_releaseBuffer( buf );
+    evbuffer_free( buf );
     tr_free( data );
 }
 
