@@ -43,10 +43,6 @@
  #include <fcntl.h>
 #endif
 
-#ifdef HAVE_FALLOCATE
- #include <linux/falloc.h>
-#endif
-
 #ifdef HAVE_XFS_XFS_H
  #include <xfs/xfs.h>
 #endif
@@ -178,12 +174,6 @@ preallocateFileFull( const char * filename, uint64_t length )
             fst.fst_length = length;
             fst.fst_bytesalloc = 0;
             success = !fcntl( fd, F_PREALLOCATE, &fst );
-        }
-# endif
-# ifdef HAVE_FALLOCATE
-        if( !success )
-        {
-            success = !fallocate( fd, FALLOC_FL_KEEP_SIZE, 0, length );
         }
 # endif
 # ifdef HAVE_POSIX_FALLOCATE
