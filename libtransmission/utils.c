@@ -732,18 +732,23 @@ tr_memmem( const char * haystack, size_t haystacklen,
 char*
 tr_strdup_printf( const char * fmt, ... )
 {
-    char *            ret = NULL;
-    struct evbuffer * buf;
-    va_list           ap;
+    va_list ap;
+    char * ret;
+    size_t len;
+    char statbuf[2048];
 
-    buf = evbuffer_new( );
     va_start( ap, fmt );
-
-    if( evbuffer_add_vprintf( buf, fmt, ap ) != -1 )
-        ret = tr_strdup( EVBUFFER_DATA( buf ) );
-
+    len = evutil_vsnprintf( statbuf, sizeof( statbuf ), fmt, ap );
     va_end( ap );
-    evbuffer_free( buf );
+    if( len < sizeof( statbuf ) )
+        ret = tr_strndup( statbuf, len );
+    else {
+        ret = tr_new( char, len + 1 );
+        va_start( ap, fmt );
+        evutil_vsnprintf( ret, len + 1, fmt, ap );
+        va_end( ap );
+    }
+
     return ret;
 }
 
