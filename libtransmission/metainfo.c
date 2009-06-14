@@ -231,15 +231,19 @@ announceToScrape( const char * announce )
      * it will be taken as a sign that that tracker doesn't support
      * the scrape convention. If it does, substitute 'scrape' for
      * 'announce' to find the scrape page.  */
-    if( ( ( s =
-               strrchr( announce, '/' ) ) ) && !strncmp( ++s, "announce", 8 ) )
+    if( ( ( s = strrchr( announce, '/' ) ) ) && !strncmp( ++s, "announce", 8 ) )
     {
-        struct evbuffer * buf = evbuffer_new( );
-        evbuffer_add( buf, announce, s - announce );
-        evbuffer_add( buf, "scrape", 6 );
-        evbuffer_add_printf( buf, "%s", s + 8 );
-        scrape = tr_strdup( EVBUFFER_DATA( buf ) );
-        evbuffer_free( buf );
+        const char * prefix = announce;
+        const size_t prefix_len = s - announce;
+        const char * suffix = s + 8;
+        const size_t suffix_len = strlen( suffix );
+        const size_t alloc_len = prefix_len + 6 + suffix_len + 1;
+        char * walk = scrape = tr_new( char, alloc_len );
+        memcpy( walk, prefix, prefix_len ); walk += prefix_len;
+        memcpy( walk, "scrape", 6 );        walk += 6;
+        memcpy( walk, suffix, suffix_len ); walk += suffix_len;
+        *walk++ = '\0';
+        assert( walk - scrape == alloc_len );
     }
 
     return scrape;
