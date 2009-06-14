@@ -543,12 +543,16 @@ tr_generateAllowedSet( tr_piece_index_t * setmePieces,
 
     if( addr->type == TR_AF_INET )
     {
-        uint8_t w[SHA_DIGEST_LENGTH + 4];
+        uint8_t w[SHA_DIGEST_LENGTH + 4], *walk=w;
         uint8_t x[SHA_DIGEST_LENGTH];
 
-        *(uint32_t*)w = ntohl( htonl( addr->addr.addr4.s_addr ) & 0xffffff00 );   /* (1) */
-        memcpy( w + 4, infohash, SHA_DIGEST_LENGTH );                /* (2) */
-        tr_sha1( x, w, sizeof( w ), NULL );                          /* (3) */
+        uint32_t ui32 = ntohl( htonl( addr->addr.addr4.s_addr ) & 0xffffff00 );   /* (1) */
+        memcpy( w, &ui32, sizeof( uint32_t ) );
+        walk += sizeof( uint32_t );
+        memcpy( walk, infohash, SHA_DIGEST_LENGTH );                 /* (2) */
+        walk += SHA_DIGEST_LENGTH;
+        tr_sha1( x, w, walk-w, NULL );                               /* (3) */
+        assert( sizeof( w ) == walk-w );
 
         while( setSize<desiredSetSize )
         {
