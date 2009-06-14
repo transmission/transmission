@@ -16,12 +16,11 @@ sexy-marshal.c:	marshal.list
 
 AM_CPPFLAGS = \
     -I$(top_srcdir) \
-    -I$(top_srcdir)/third-party/ \
-    $(LIBEVENT_CPPFLAGS) \
     -DTRANSMISSIONLOCALEDIR=\""$(transmissionlocaledir)"\" \
     $(GTK_EXTRA_CPPFLAGS)
 
 AM_CFLAGS = \
+    $(LIBEVENT_CFLAGS) \
     $(GTK_CFLAGS) \
     $(LIBCURL_CFLAGS) \
     $(GIO_CFLAGS) \

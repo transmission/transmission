@@ -187,13 +187,13 @@ fi
 if test "x$libevent_source" = "xbundled"; then
     AC_MSG_WARN([using our own libevent from third-party/libevent/])
     AC_MSG_WARN([if you are cross-compiling this is probably NOT what you want.])
-    LIBEVENT_CPPFLAGS="-I\$(top_srcdir)/third-party/libevent -I\$(top_builddir)/third-party/libevent"
+    LIBEVENT_CFLAGS="-I\$(top_srcdir)/third-party/libevent -I\$(top_builddir)/third-party/libevent"
     LIBEVENT_LIBS="\$(top_builddir)/third-party/libevent/libevent.la"
 else
-    LIBEVENT_CPPFLAGS=""
+    LIBEVENT_CFLAGS=""
     LIBEVENT_LIBS="-levent -lrt"
 fi
-AC_SUBST(LIBEVENT_CPPFLAGS)
+AC_SUBST(LIBEVENT_CFLAGS)
 AC_SUBST(LIBEVENT_LIBS)
 
 
