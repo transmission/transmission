@@ -1,6 +1,6 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
-1.72 (2009/06/dd)
+1.72 (2009/06/15)
 <http://trac.transmissionbt.com/query?milestone=1.72&group=component&groupdesc=1&order=severity>
 - All Platforms
    + Fix 1.70 crash with assertion "tv->tv_usec >= 0"
