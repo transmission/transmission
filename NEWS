@@ -6,7 +6,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Fix 1.70 crash with assertion "tv->tv_usec >= 0"
    + Fix 1.70 crash with assertion "tr_peerIoSupportsFEXT( msgs->peer->io )"
    + Better DHT announce management
-   + fix error in reporting webseed counts via RPC
+   + Fix error in reporting webseed counts via RPC
 - Mac
    + Fix problem where a small set of users could not add torrents
 - GTK+
@@ -16,7 +16,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Adding a torrent from a browser sometimes didn't work.
    + Various usability improvements
 - Daemon
-   + remote didn't always send the right Encoding header in requests
+   + Remote didn't always send the right Encoding header in requests
 
 1.71 (2009/06/07)
 <http://trac.transmissionbt.com/query?milestone=1.71&group=component&groupdesc=1&order=severity>
