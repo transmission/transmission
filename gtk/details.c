@@ -1975,6 +1975,7 @@ details_free( gpointer gdata )
     struct DetailsImpl * data = gdata;
     g_signal_handler_disconnect( data->core, data->prefs_changed_tag );
     g_source_remove( data->periodic_refresh_tag );
+    g_hash_table_destroy( data->webseed_hash );
     g_slist_free( data->ids );
     g_free( data );
 }
