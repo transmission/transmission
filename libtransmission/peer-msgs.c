@@ -37,7 +37,6 @@
 #include "stats.h"
 #include "torrent.h"
 #include "tr-dht.h"
-#include "trevent.h"
 #include "utils.h"
 #include "version.h"
 
@@ -77,7 +76,7 @@ enum
     /* idle seconds before we send a keepalive */
     KEEPALIVE_INTERVAL_SECS = 100,
 
-    PEX_INTERVAL            = ( 90 * 1000 ), /* msec between sendPex() calls */
+    PEX_INTERVAL_SECS       = 90, /* sec between sendPex() calls */
 
 
     MAX_BLOCK_SIZE          = ( 1024 * 16 ),
@@ -176,7 +175,6 @@ struct tr_peermsgs
     struct request_list    clientAskedFor;
     struct request_list    clientWillAskFor;
 
-    tr_timer             * pexTimer;
     tr_pex               * pex;
     tr_pex               * pex6;
 
@@ -192,6 +190,8 @@ struct tr_peermsgs
        supplied a reqq argument, it's stored here.  otherwise the
        value is zero and should be ignored. */
     int64_t               reqq;
+
+    struct event          pexTimer;
 };
 
 /**
@@ -2113,11 +2113,16 @@ sendPex( tr_peermsgs * msgs )
     }
 }
 
-static TR_INLINE int
-pexPulse( void * vpeer )
+static void
+pexPulse( int foo UNUSED, short bar UNUSED, void * vmsgs )
 {
-    sendPex( vpeer );
-    return TRUE;
+    struct timeval tv;
+    struct tr_peermsgs * msgs = vmsgs;
+
+    sendPex( msgs );
+
+    tr_timevalSet( &tv, PEX_INTERVAL_SECS, 0 );
+    evtimer_add( &msgs->pexTimer, &tv );
 }
 
 /**
@@ -2132,6 +2137,7 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
                 tr_publisher_tag  * setme )
 {
     tr_peermsgs * m;
+    struct timeval tv;
 
     assert( peer );
     assert( peer->io );
@@ -2147,7 +2153,6 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
     m->peer->peerIsInterested = 0;
     m->peer->have = tr_bitfieldNew( torrent->info.pieceCount );
     m->state = AWAITING_BT_LENGTH;
-    m->pexTimer = tr_timerNew( m->session, pexPulse, m, PEX_INTERVAL );
     m->outMessages = evbuffer_new( );
     m->outMessagesBatchedAt = 0;
     m->outMessagesBatchPeriod = LOW_PRIORITY_INTERVAL_SECS;
@@ -2155,6 +2160,9 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
     m->peerAskedFor = REQUEST_LIST_INIT;
     m->clientAskedFor = REQUEST_LIST_INIT;
     m->clientWillAskFor = REQUEST_LIST_INIT;
+    tr_timevalSet( &tv, PEX_INTERVAL_SECS, 0 );
+    evtimer_set( &m->pexTimer, pexPulse, m );
+    evtimer_add( &m->pexTimer, &tv );
     peer->msgs = m;
 
     *setme = tr_publisherSubscribe( &m->publisher, func, userData );
@@ -2178,7 +2186,7 @@ tr_peerMsgsFree( tr_peermsgs* msgs )
 {
     if( msgs )
     {
-        tr_timerFree( &msgs->pexTimer );
+        evtimer_del( &msgs->pexTimer );
         tr_publisherDestruct( &msgs->publisher );
         reqListClear( &msgs->clientWillAskFor );
         reqListClear( &msgs->clientAskedFor );

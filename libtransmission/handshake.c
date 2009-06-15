@@ -29,7 +29,6 @@
 #include "peer-mgr.h"
 #include "torrent.h"
 #include "tr-dht.h"
-#include "trevent.h"
 #include "utils.h"
 
 /* enable LibTransmission extension protocol */
@@ -65,7 +64,7 @@ enum
     CRYPTO_PROVIDE_CRYPTO          = 2,
 
     /* how long to wait before giving up on a handshake */
-    HANDSHAKE_TIMEOUT_MSEC         = 60 * 1000
+    HANDSHAKE_TIMEOUT_SEC          = 60
 };
 
 
@@ -118,7 +117,7 @@ struct tr_handshake
     uint8_t               myReq1[SHA_DIGEST_LENGTH];
     handshakeDoneCB       doneCB;
     void *                doneUserData;
-    tr_timer *            timeout;
+    struct event          timeout_timer;
 };
 
 /**
@@ -1112,7 +1111,7 @@ tr_handshakeFree( tr_handshake * handshake )
     if( handshake->io )
         tr_peerIoUnref( handshake->io ); /* balanced by the ref in tr_handshakeNew */
 
-    tr_timerFree( &handshake->timeout );
+    evtimer_del( &handshake->timeout_timer );
 
     tr_free( handshake );
 }
@@ -1174,11 +1173,10 @@ gotError( tr_peerIo  * io UNUSED,
 ***
 **/
 
-static int
-handshakeTimeout( void * handshake )
+static void
+handshakeTimeout( int foo UNUSED, short bar UNUSED, void * handshake )
 {
     tr_handshakeAbort( handshake );
-    return FALSE;
 }
 
 tr_handshake*
@@ -1187,6 +1185,7 @@ tr_handshakeNew( tr_peerIo *        io,
                  handshakeDoneCB    doneCB,
                  void *             doneUserData )
 {
+    struct timeval tv;
     tr_handshake * handshake;
 
     handshake = tr_new0( tr_handshake, 1 );
@@ -1196,7 +1195,10 @@ tr_handshakeNew( tr_peerIo *        io,
     handshake->doneCB = doneCB;
     handshake->doneUserData = doneUserData;
     handshake->session = tr_peerIoGetSession( io );
-    handshake->timeout = tr_timerNew( handshake->session, handshakeTimeout, handshake, HANDSHAKE_TIMEOUT_MSEC );
+
+    tr_timevalSet( &tv, HANDSHAKE_TIMEOUT_SEC, 0 );
+    evtimer_set( &handshake->timeout_timer, handshakeTimeout, handshake );
+    evtimer_add( &handshake->timeout_timer, &tv );
 
     tr_peerIoRef( io ); /* balanced by the unref in tr_handshakeFree */
     tr_peerIoSetIOFuncs( handshake->io, canRead, NULL, gotError, handshake );
