@@ -23,8 +23,10 @@
  #include <winsock2.h> /* struct in_addr */
 #endif
 
+#include "bitfield.h"
 #include "net.h"
 #include "publish.h" /* tr_publisher_tag */
+#include "utils.h"
 
 /**
  * @addtogroup peers Peers
@@ -54,7 +56,6 @@ tr_pex;
 
 
 struct tr_bandwidth;
-struct tr_bitfield;
 struct tr_peerIo;
 struct tr_peermsgs;
 

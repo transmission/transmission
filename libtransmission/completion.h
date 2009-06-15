@@ -20,6 +20,7 @@
 #include <assert.h>
 
 #include "transmission.h"
+#include "bitfield.h"
 #include "utils.h" /* tr_bitfield */
 
 typedef struct tr_completion

@@ -12,6 +12,7 @@ noinst_LIBRARIES = libtransmission.a
 libtransmission_a_SOURCES = \
     bandwidth.c \
     bencode.c \
+    bitfield.c \
     blocklist.c \
     clients.c \
     completion.c \
@@ -59,6 +60,7 @@ libtransmission_a_SOURCES = \
 noinst_HEADERS = \
     bandwidth.h \
     bencode.h \
+    bitfield.h \
     blocklist.h \
     clients.h \
     ConvertUTF.h \
