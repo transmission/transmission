@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		002C9EE60C19CD2500C2F6F4 /* fastresume.c in Sources */ = {isa = PBXBuildFile; fileRef = 002C9EE50C19CD2500C2F6F4 /* fastresume.c */; };
+		0A6169A70FE5C9A200C66CE6 /* bitfield.c in Sources */ = {isa = PBXBuildFile; fileRef = 0A6169A50FE5C9A200C66CE6 /* bitfield.c */; };
+		0A6169A80FE5C9A200C66CE6 /* bitfield.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A6169A60FE5C9A200C66CE6 /* bitfield.h */; };
 		35B038130AC5B6EB00A10FDF /* ResumeNoWaitOn.png in Resources */ = {isa = PBXBuildFile; fileRef = 35B037F90AC5B53800A10FDF /* ResumeNoWaitOn.png */; };
 		35B038140AC5B6EC00A10FDF /* ResumeNoWaitOff.png in Resources */ = {isa = PBXBuildFile; fileRef = 35B037FA0AC5B53800A10FDF /* ResumeNoWaitOff.png */; };
 		35F373030C2DA89000DAA8F2 /* FilePriorityCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 35F373010C2DA88F00DAA8F2 /* FilePriorityCell.m */; };
@@ -386,6 +388,8 @@
 
 /* Begin PBXFileReference section */
 		002C9EE50C19CD2500C2F6F4 /* fastresume.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = fastresume.c; path = libtransmission/fastresume.c; sourceTree = "<group>"; };
+		0A6169A50FE5C9A200C66CE6 /* bitfield.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bitfield.c; path = libtransmission/bitfield.c; sourceTree = "<group>"; };
+		0A6169A60FE5C9A200C66CE6 /* bitfield.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bitfield.h; path = libtransmission/bitfield.h; sourceTree = "<group>"; };
 		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = macosx/main.m; sourceTree = "<group>"; };
@@ -1122,6 +1126,8 @@
 		4D1838DC09DEC04A0047D688 /* libtransmission */ = {
 			isa = PBXGroup;
 			children = (
+				0A6169A50FE5C9A200C66CE6 /* bitfield.c */,
+				0A6169A60FE5C9A200C66CE6 /* bitfield.h */,
 				A22CFCA60FC24ED80009BD3E /* tr-dht.c */,
 				A22CFCA70FC24ED80009BD3E /* tr-dht.h */,
 				A2AAB65B0DE0CF6200E04DDA /* rpcimpl.c */,
@@ -1455,6 +1461,7 @@
 				A21FBBAB0EDA78C300BC3C51 /* bandwidth.h in Headers */,
 				A263E0740F111B8A008D09D6 /* request-list.h in Headers */,
 				A22CFCA90FC24ED80009BD3E /* tr-dht.h in Headers */,
+				0A6169A80FE5C9A200C66CE6 /* bitfield.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1893,6 +1900,7 @@
 				A21FBBAC0EDA78C300BC3C51 /* bandwidth.c in Sources */,
 				A263E0730F111B89008D09D6 /* request-list.c in Sources */,
 				A22CFCA80FC24ED80009BD3E /* tr-dht.c in Sources */,
+				0A6169A70FE5C9A200C66CE6 /* bitfield.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
