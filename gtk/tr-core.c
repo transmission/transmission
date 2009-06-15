@@ -1353,7 +1353,7 @@ readResponseIdle( void * vresponse )
     tag = (int)intVal;
 
     data = g_hash_table_lookup( pendingRequests, &tag );
-    if( data )
+    if( data && data->responseFunc )
         (*data->responseFunc)(data->core, &top, data->responseFuncUserData );
 
     tr_bencFree( &top );
@@ -1469,7 +1469,8 @@ tr_core_blocklist_update( TrCore * core )
 void
 tr_core_exec_json( TrCore * core, const char * json )
 {
-    sendRequest( core, json, 0, NULL, NULL );
+    const int tag = nextTag++;
+    sendRequest( core, json, tag, NULL, NULL );
 }
 
 void
