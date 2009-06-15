@@ -2116,13 +2116,11 @@ sendPex( tr_peermsgs * msgs )
 static void
 pexPulse( int foo UNUSED, short bar UNUSED, void * vmsgs )
 {
-    struct timeval tv;
     struct tr_peermsgs * msgs = vmsgs;
 
     sendPex( msgs );
 
-    tr_timevalSet( &tv, PEX_INTERVAL_SECS, 0 );
-    evtimer_add( &msgs->pexTimer, &tv );
+    tr_timerAdd( &msgs->pexTimer, PEX_INTERVAL_SECS, 0 );
 }
 
 /**
@@ -2137,7 +2135,6 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
                 tr_publisher_tag  * setme )
 {
     tr_peermsgs * m;
-    struct timeval tv;
 
     assert( peer );
     assert( peer->io );
@@ -2160,9 +2157,8 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
     m->peerAskedFor = REQUEST_LIST_INIT;
     m->clientAskedFor = REQUEST_LIST_INIT;
     m->clientWillAskFor = REQUEST_LIST_INIT;
-    tr_timevalSet( &tv, PEX_INTERVAL_SECS, 0 );
     evtimer_set( &m->pexTimer, pexPulse, m );
-    evtimer_add( &m->pexTimer, &tv );
+    tr_timerAdd( &m->pexTimer, PEX_INTERVAL_SECS, 0 );
     peer->msgs = m;
 
     *setme = tr_publisherSubscribe( &m->publisher, func, userData );

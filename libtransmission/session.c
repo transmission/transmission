@@ -1062,14 +1062,12 @@ setAltTimer( tr_session * session )
 {
     const time_t now = time( NULL );
     struct tm tm;
-    struct timeval tv;
 
     assert( tr_isSession( session ) );
     assert( session->altTimer != NULL );
 
     tr_localtime_r( &now, &tm );
-    tr_timevalSet( &tv, 60-tm.tm_sec, 0 );
-    evtimer_add( session->altTimer, &tv );
+    tr_timerAdd( session->altTimer, 60-tm.tm_sec, 0 );
 }
 
 /* this is called once a minute to:

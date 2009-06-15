@@ -91,8 +91,8 @@ natPulse( tr_shared * s, tr_bool doPortCheck )
 static void
 onTimer( int fd UNUSED, short what UNUSED, void * vshared )
 {
+    int sec=0, msec=0;
     tr_shared * s = vshared;
-    struct timeval interval;
 
     assert( s );
     assert( s->timer );
@@ -108,22 +108,21 @@ onTimer( int fd UNUSED, short what UNUSED, void * vshared )
             /* if we're mapped, everything is fine... check back in 20 minutes
              * to renew the port forwarding if it's expired */
             s->doPortCheck = TRUE;
-            tr_timevalSet( &interval, 60*20, 0 );
+            sec = 60 * 20;
             break;
 
         case TR_PORT_ERROR:
             /* some kind of an error.  wait 60 seconds and retry */
-            tr_timevalSet( &interval, 60, 0 );
+            sec = 60;
             break;
 
         default:
             /* in progress.  pulse frequently. */
-            tr_timevalSet( &interval, 0, 333000 );
+            msec = 333000;
             break;
     }
 
-    assert( tr_isTimeval( &interval ) );
-    evtimer_add( s->timer, &interval );
+    tr_timerAdd( s->timer, sec, msec );
 }
 
 /***
@@ -142,12 +141,9 @@ tr_sharedInit( tr_session  * session, tr_bool isEnabled )
 
     if( isEnabled )
     {
-        struct timeval timeval;
-
         s->timer = tr_new0( struct event, 1 );
         evtimer_set( s->timer, onTimer, s );
-        tr_timevalSet( &timeval, 0, 333000 );
-        evtimer_add( s->timer, &timeval );
+        tr_timerAdd( s->timer, 0, 333000 );
     }
 
     return s;

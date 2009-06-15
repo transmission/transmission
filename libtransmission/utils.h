@@ -244,6 +244,10 @@ void tr_timevalMsec( uint64_t milliseconds, struct timeval * setme );
 
 void tr_timevalSet( struct timeval * setme, int seconds, int microseconds );
 
+struct event;
+
+void tr_timerAdd( struct event * timer, int seconds, int milliseconds );
+
 
 /** @brief return the current date in milliseconds */
 uint64_t       tr_date( void );

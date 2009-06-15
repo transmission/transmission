@@ -1185,7 +1185,6 @@ tr_handshakeNew( tr_peerIo *        io,
                  handshakeDoneCB    doneCB,
                  void *             doneUserData )
 {
-    struct timeval tv;
     tr_handshake * handshake;
 
     handshake = tr_new0( tr_handshake, 1 );
@@ -1196,9 +1195,8 @@ tr_handshakeNew( tr_peerIo *        io,
     handshake->doneUserData = doneUserData;
     handshake->session = tr_peerIoGetSession( io );
 
-    tr_timevalSet( &tv, HANDSHAKE_TIMEOUT_SEC, 0 );
     evtimer_set( &handshake->timeout_timer, handshakeTimeout, handshake );
-    evtimer_add( &handshake->timeout_timer, &tv );
+    tr_timerAdd( &handshake->timeout_timer, HANDSHAKE_TIMEOUT_SEC, 0 );
 
     tr_peerIoRef( io ); /* balanced by the unref in tr_handshakeFree */
     tr_peerIoSetIOFuncs( handshake->io, canRead, NULL, gotError, handshake );

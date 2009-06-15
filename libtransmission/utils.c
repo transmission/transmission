@@ -483,6 +483,13 @@ tr_timevalSet( struct timeval * setme, int seconds, int microseconds )
     assert( tr_isTimeval( setme ) );
 }
 
+void
+tr_timerAdd( struct event * timer, int seconds, int milliseconds )
+{
+    struct timeval tv;
+    tr_timevalSet( &tv, seconds, milliseconds );
+    event_add( timer, &tv );
+}
 
 /**
 ***
