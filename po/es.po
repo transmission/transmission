@@ -12,14 +12,14 @@ msgstr ""
 "Project-Id-Version: es\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-05-28 18:17-0500\n"
-"PO-Revision-Date: 2009-03-10 19:20+0000\n"
-"Last-Translator: Julián Alarcón <alarconj@gmail.com>\n"
+"PO-Revision-Date: 2009-06-14 17:51+0000\n"
+"Last-Translator: Paco Molinero <paco@byasl.com>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2009-06-13 22:32+0000\n"
+"X-Launchpad-Export-Date: 2009-06-15 03:48+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Country: SPAIN\n"
 "X-Poedit-Language: Spanish\n"
@@ -1597,24 +1597,24 @@ msgstr "En cola para verificación"
 
 #: ../gtk/actions.c:56
 msgid "Sort by _ETA"
-msgstr ""
+msgstr "Ordenar por _ETA"
 
 #: ../gtk/actions.c:57
 msgid "Sort by Si_ze"
-msgstr ""
+msgstr "Ordenar por _tamaño"
 
 #: ../gtk/actions.c:90
 msgid "Speed _Limit Mode"
-msgstr ""
+msgstr "Modo de _límite de velocidad"
 
 #: ../gtk/actions.c:113
 msgid "Set _Location"
-msgstr ""
+msgstr "Definir _ubicación"
 
 #: ../gtk/conf.c:513 ../gtk/conf.c:518 ../gtk/conf.c:525
 #, c-format
 msgid "Importing \"%s\""
-msgstr ""
+msgstr "Importando «%s»"
 
 #: ../gtk/details.c:453
 #, c-format
@@ -1622,82 +1622,86 @@ msgid ""
 "Use _Global setting  (currently: stop seeding when a torrent's ratio reaches "
 "%.2f)"
 msgstr ""
+"Usar configuración _Global (actualmente: dejar de compartir cuando la "
+"proporción del torrent alcance %.2f)"
 
 #: ../gtk/details.c:455
 msgid "Use _Global setting  (currently: seed regardless of ratio)"
 msgstr ""
+"Usar configuración _Global (actualmente: compartir sin importar la "
+"proporción)"
 
 #: ../gtk/details.c:535 ../gtk/tr-prefs.c:1385
 msgid "Speed"
-msgstr ""
+msgstr "Velocidad"
 
 #: ../gtk/details.c:537
 msgid "Honor global _limits"
-msgstr ""
+msgstr "Satisfacer _límites globales"
 
 #: ../gtk/details.c:566
 msgid "_Bandwidth priority:"
-msgstr ""
+msgstr "Prioridad de ancho de _banda:"
 
 #: ../gtk/details.c:570
 msgid "Seed-Until Ratio"
-msgstr ""
+msgstr "Compartir hasta proporción"
 
 #: ../gtk/details.c:585
 msgid "Seed _regardless of ratio"
-msgstr ""
+msgstr "Compartir _sin importar la proporción"
 
 #: ../gtk/details.c:594
 msgid "_Stop seeding when a torrent's ratio reaches"
-msgstr ""
+msgstr "_Dejar de compartir cuando la proporción de un torrent alcanza"
 
 #: ../gtk/details.c:633
 msgid "Verifying local data"
-msgstr ""
+msgstr "Verificar datos locales"
 
 #: ../gtk/details.c:634
 msgid "Downloading"
-msgstr ""
+msgstr "Descargando"
 
 #: ../gtk/details.c:635
 msgid "Seeding"
-msgstr ""
+msgstr "Compartiendo"
 
 #: ../gtk/details.c:704
 #, c-format
 msgid "%1$s (%2$s verified in %3$d piece)"
 msgid_plural "%1$s (%2$s verified in %3$d pieces)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s (%2$s verificado en %3$d parte)"
+msgstr[1] "%1$s (%2$s verificado en %3$d partes)"
 
 #: ../gtk/details.c:858
 msgid "Swarm speed:"
-msgstr ""
+msgstr "Velocidad del enjambre:"
 
 #: ../gtk/details.c:944
 msgid "Private to this tracker -- DHT and PEX disabled"
-msgstr ""
+msgstr "Privado para este tracker -- DHT y PEX desactivados"
 
 #: ../gtk/details.c:1088
 msgid "Destination:"
-msgstr ""
+msgstr "Destino:"
 
 #: ../gtk/details.c:1122
 msgid "Webseeds"
-msgstr ""
+msgstr "Semillas Web"
 
 #: ../gtk/details.c:1506
 msgid "Peer was discovered through DHT"
-msgstr ""
+msgstr "Par descubierto a través de DHT"
 
 #: ../gtk/details.c:1736
 msgid "None sent"
-msgstr ""
+msgstr "Ninguno enviado"
 
 #: ../gtk/details.c:2065
 #, c-format
 msgid "%'d Torrent Properties"
-msgstr ""
+msgstr "%'d Propiedades del torrent"
 
 #. %1$s is the torrent's total size,
 #. %2$s is how much we've uploaded,
@@ -1706,182 +1710,184 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:88
 #, c-format
 msgid "%1$s, uploaded %2$s (Ratio: %3$s Goal: %4$s)"
-msgstr ""
+msgstr "%1$s, subido %2$s (Proporción: %3$s Meta: %4$s)"
 
 #: ../gtk/tr-prefs.c:311
 msgid "_Stop seeding torrents at ratio:"
-msgstr ""
+msgstr "_Dejar de compartir torrentes con proporción:"
 
 #: ../gtk/tr-prefs.c:402
 #, c-format
 msgid "Blocklist now has %'d rule."
 msgid_plural "Blocklist now has %'d rules."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "La lista de bloqueo tiene ahora %'d regla."
+msgstr[1] "La lista de bloqueo tiene ahora %'d reglas."
 
 #: ../gtk/tr-prefs.c:406
 msgid "<b>Update succeeded!</b>"
-msgstr ""
+msgstr "<b>¡Actualización correcta!</b>"
 
 #: ../gtk/tr-prefs.c:421
 msgid "Update Blocklist"
-msgstr ""
+msgstr "Actualizar lista de bloqueo"
 
 #: ../gtk/tr-prefs.c:423
 msgid "Getting new blocklist..."
-msgstr ""
+msgstr "Obteniendo nueva lista de bloqueo..."
 
 #: ../gtk/tr-prefs.c:458
 msgid "Plaintext Preferred"
-msgstr ""
+msgstr "Preferible texto plano"
 
 #: ../gtk/tr-prefs.c:459
 msgid "Encryption Preferred"
-msgstr ""
+msgstr "Preferible cifrado"
 
 #: ../gtk/tr-prefs.c:460
 msgid "Encryption Required"
-msgstr ""
+msgstr "Cifrado requerido"
 
 #: ../gtk/tr-prefs.c:535
 msgid "Privacy"
-msgstr ""
+msgstr "Privacidad"
 
 #: ../gtk/tr-prefs.c:537
 msgid "_Encryption mode"
-msgstr ""
+msgstr "Modo de _cifrado"
 
 #: ../gtk/tr-prefs.c:541
 msgid "Use peer e_xchange (PEX)"
-msgstr ""
+msgstr "Usar _intercambio de pares (PEX)"
 
 #: ../gtk/tr-prefs.c:545
 msgid "Use _distributed hash table (DHT)"
-msgstr ""
+msgstr "Usar tabla de hash _distribuida (DHT)"
 
 #: ../gtk/tr-prefs.c:1119
 msgid "Every Day"
-msgstr ""
+msgstr "Todos los días"
 
 #: ../gtk/tr-prefs.c:1120
 msgid "Weekdays"
-msgstr ""
+msgstr "Entre semana"
 
 #: ../gtk/tr-prefs.c:1121
 msgid "Weekends"
-msgstr ""
+msgstr "Fines de semana"
 
 #: ../gtk/tr-prefs.c:1122
 msgid "Sunday"
-msgstr ""
+msgstr "Domingo"
 
 #: ../gtk/tr-prefs.c:1123
 msgid "Monday"
-msgstr ""
+msgstr "Lunes"
 
 #: ../gtk/tr-prefs.c:1124
 msgid "Tuesday"
-msgstr ""
+msgstr "Martes"
 
 #: ../gtk/tr-prefs.c:1125
 msgid "Wednesday"
-msgstr ""
+msgstr "Miércoles"
 
 #: ../gtk/tr-prefs.c:1126
 msgid "Thursday"
-msgstr ""
+msgstr "Jueves"
 
 #: ../gtk/tr-prefs.c:1127
 msgid "Friday"
-msgstr ""
+msgstr "Viernes"
 
 #: ../gtk/tr-prefs.c:1128
 msgid "Saturday"
-msgstr ""
+msgstr "Sábado"
 
 #: ../gtk/tr-prefs.c:1179
 msgid "Global Bandwidth Limits"
-msgstr ""
+msgstr "Límites globales de ancho de banda"
 
 #: ../gtk/tr-prefs.c:1199
 msgid "Speed Limit Mode"
-msgstr ""
+msgstr "Modo de límite de velocidad"
 
 #: ../gtk/tr-prefs.c:1206
 msgid "Limit do_wnload speed (KB/s):"
-msgstr ""
+msgstr "Limitar velocidad de _descarga (KB/s):"
 
 #: ../gtk/tr-prefs.c:1214
 msgid "When enabled, Speed Limit Mode overrides the Global Bandwidth Limits"
 msgstr ""
+"Cuando está activado, el Modo de limitación de velocidad anula los Límites "
+"globales de ancho de banda"
 
 #: ../gtk/tr-prefs.c:1220
 msgid "Use Speed Limit Mode _between:"
-msgstr ""
+msgstr "Usar modo de limitación de velocidad entre:"
 
 #: ../gtk/tr-prefs.c:1235
 msgid "_On days:"
-msgstr ""
+msgstr "L_os días:"
 
 #: ../gtk/tr-prefs.c:1268 ../gtk/tr-prefs.c:1330
 msgid "Status unknown"
-msgstr ""
+msgstr "Estado desconocido"
 
 #: ../gtk/tr-prefs.c:1301
 msgid "<i>Testing...</i>"
-msgstr ""
+msgstr "<i>Probando...</i>"
 
 #: ../gtk/tr-prefs.c:1325
 msgid "_Port for incoming connections:"
-msgstr ""
+msgstr "_Puerto para conexiones entrantes:"
 
 #: ../gtk/tr-prefs.c:1333
 msgid "_Test Port"
-msgstr ""
+msgstr "Probar puer_to"
 
 #: ../gtk/tr-prefs.c:1340
 msgid "_Randomize the port every launch"
-msgstr ""
+msgstr "Puerto _aleatorio al lanzar"
 
 #: ../gtk/tr-window.c:330
 msgid "Click to disable Speed Limit Mode"
-msgstr ""
+msgstr "Pulsar para desactivar el modo de limitación de velocidad"
 
 #: ../gtk/tr-window.c:331
 msgid "Click to enable Speed Limit Mode"
-msgstr ""
+msgstr "Pulsar para activar el modo de limitación de velocidad"
 
 #: ../gtk/tr-window.c:630
 msgid "Unlimited"
-msgstr ""
+msgstr "Ilimitado"
 
 #: ../gtk/tr-window.c:697
 msgid "Seed Forever"
-msgstr ""
+msgstr "Compartir para siempre"
 
 #: ../gtk/tr-window.c:735
 msgid "Limit Download Speed"
-msgstr ""
+msgstr "Limitar velocidad de bajada"
 
 #: ../gtk/tr-window.c:739
 msgid "Limit Upload Speed"
-msgstr ""
+msgstr "Limitar velocidad de subida"
 
 #: ../gtk/tr-window.c:746
 msgid "Stop Seeding at Ratio"
-msgstr ""
+msgstr "Dejar de compartir al alcanzar la proporción"
 
 #: ../gtk/tr-window.c:780
 #, c-format
 msgid "Stop at Ratio (%s)"
-msgstr ""
+msgstr "Detener en la proporción (%s)"
 
 #: ../libtransmission/net.c:341
 #, c-format
 msgid "Couldn't set source address %s on %d: %s"
-msgstr ""
+msgstr "No se pudo establecer la dirección de la fuente %s en %d: %s"
 
 #: ../libtransmission/upnp.c:144
 #, c-format
 msgid "Port %d isn't forwarded"
-msgstr ""
+msgstr "El puerto %d no está siendo redirigido"
