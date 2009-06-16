@@ -1535,6 +1535,7 @@ peer_page_new( struct DetailsImpl * di )
     GtkListStore *store;
     GtkWidget *v, *w, *ret, *sw, *l, *vbox, *hbox;
     GtkWidget *webtree = NULL;
+    GtkTreeModel * m;
     GtkTreeViewColumn * c;
     GtkCellRenderer *   r;
     int view_columns[] = { PEER_COL_ENCRYPTION_STOCK_ID,
@@ -1582,8 +1583,12 @@ peer_page_new( struct DetailsImpl * di )
     /* peers */
 
     store  = di->peer_store = peer_store_new( );
+    m = gtk_tree_model_sort_new_with_model( GTK_TREE_MODEL( store ) );
+    gtk_tree_sortable_set_sort_column_id( GTK_TREE_SORTABLE( m ),
+                                          PEER_COL_PROGRESS,
+                                          GTK_SORT_DESCENDING );
     v = GTK_WIDGET( g_object_new( GTK_TYPE_TREE_VIEW,
-                                  "model",  gtk_tree_model_sort_new_with_model( GTK_TREE_MODEL( store ) ),
+                                  "model",  m,
                                   "rules-hint", TRUE,
 #if GTK_CHECK_VERSION( 2,12,0 )
                                   "has-tooltip", TRUE,
@@ -1719,7 +1724,6 @@ peer_page_new( struct DetailsImpl * di )
                                               g_str_equal,
                                               (GDestroyNotify)g_free,
                                               (GDestroyNotify)gtk_tree_row_reference_free );
-                           
     ret = vbox;
     return ret;
 }
