@@ -12,60 +12,24 @@
 			<table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0" summary="Two column table with heading">
 				<tr>
 					<td class="blue">
-						<h3>1.71 Changes</h3>
+						<h3>1.72 Changes</h3>
 					</td>
 				</tr>
 				<tr>
 					<td>
 						<ul>
-						<li>Fix 1.70 bug that caused high CPU use in high-peer swarms</li>
-						<li>Fix 1.70 web client bug where some torrents appeared to be duplicates</li>
+						<li>Fix problem where a small set of users could not add torrents</li>
+						<li>Fix 1.70 crash with assertion "tv->tv_usec >= 0"</li>
+						<li>Fix 1.70 crash with assertion "tr_peerIoSupportsFEXT( msgs->peer->io )"</li>
+						<li>Better DHT announce management</li>
+						<li>Fix error in reporting webseed counts via RPC</li>
 						</ul>
 					</td>
 				</tr>
 			</table>
-			<p>For a full list of changes, <a href="http://trac.transmissionbt.com/query?milestone=1.71&group=component&groupdesc=1&order=severity">click here</a>.</p>
-			<br>
-			<table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0" summary="Two column table with heading">
-				<tr>
-					<td class="blue">
-						<h3>1.70 Application Changes</h3>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<ul>
-						<li>Distributed hash table (DHT) support for public torrents</li>
-						<li>Holding down the option key on launch will pause all transfers</li>
-						<li>JSON RPC messages can be ~85% shorter, saving bandwidth and CPU</li>
-						<li>Automatically pause torrents when verifying</li>
-						<li>Fix small bugs and memory leaks</li>
-						</ul>
-					</td>
-				</tr>
-			</table>
-			<br>
-			<table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0" summary="Two column table with heading">
-				<tr>
-					<td class="blue">
-						<h3>1.70 Web Client Changes</h3>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<ul>
-						<li>Big speed improvements, especially with large torrents</li>
-						<li>Fix 1.61 bug that broke adding torrents via the web client</li>
-						<li>Add the ability to upload multiple torrents at once</li>
-						<li>Torrents added by URL were always paused, regardless of preferences</li>
-						<li>Comments and announce addresses were cut off in the inspector</li>
-						<li>The "data remaining" field wasn't updated when the number reached 0</li>
-						<li>Smaller design adjustments</li>
-						</ul>
-					</td>
-				</tr>
-			</table>
-			<p>For a full list of changes, <a href="http://trac.transmissionbt.com/query?milestone=1.70&group=component&groupdesc=1&order=severity">click here</a>.</p>
+			
+			<p>For a full list of changes, <a href="http://trac.transmissionbt.com/query?milestone=1.72&group=component&groupdesc=1&order=severity">click here</a>.</p>
+
 			<table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0" summary="Two column table with heading">
 				<tr>
 					<td class="red">
