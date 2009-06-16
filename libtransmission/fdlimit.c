@@ -183,6 +183,19 @@ preallocateFileFull( const char * filename, uint64_t length )
         }
 # endif
 
+        if( !success ) /* if nothing else works, do it the old-fashioned way */
+        {
+            uint8_t buf[ 4096 ]; 
+            memset( buf, 0, sizeof( buf ) ); 
+            success = TRUE; 
+            while ( success && ( length > 0 ) ) 
+            { 
+                const int thisPass = MIN( length, sizeof( buf ) ); 
+                success = write( fd, buf, thisPass ) == thisPass; 
+                length -= thisPass; 
+            } 
+        }
+
         close( fd );
     }
 
