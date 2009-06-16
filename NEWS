@@ -1,12 +1,13 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
-1.72 (2009/06/15)
+1.72 (2009/06/16)
 <http://trac.transmissionbt.com/query?milestone=1.72&group=component&groupdesc=1&order=severity>
 - All Platforms
    + Fix 1.70 crash with assertion "tv->tv_usec >= 0"
    + Fix 1.70 crash with assertion "tr_peerIoSupportsFEXT( msgs->peer->io )"
    + Better DHT announce management
    + Fix error in reporting webseed counts via RPC
+   + Better file preallocation on embedded systems
 - Mac
    + Fix problem where a small set of users could not add torrents
 - GTK+
