@@ -1314,7 +1314,7 @@ myHandshakeDoneCB( tr_handshake  * handshake,
                 peer->atom = atom;
                 peer->io = tr_handshakeStealIO( handshake ); /* this steals its refcount too, which is
                                                                 balanced by our unref in peerDestructor()  */
-                tr_peerIoSetParent( peer->io, &t->tor->bandwidth );
+                tr_peerIoSetParent( peer->io, t->tor->bandwidth );
                 tr_peerMsgsNew( t->tor, peer, peerCallbackFunc, t, &peer->msgsTag );
 
                 success = TRUE;
