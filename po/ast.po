@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2009-05-28 18:17-0500\n"
-"PO-Revision-Date: 2009-05-18 01:41+0000\n"
+"PO-Revision-Date: 2009-06-15 21:02+0000\n"
 "Last-Translator: Xuacu <xuacusk8@gmail.com>\n"
 "Language-Team: Asturian <ast@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2009-06-15 03:48+0000\n"
+"X-Launchpad-Export-Date: 2009-06-16 23:24+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:49
@@ -1520,11 +1520,11 @@ msgstr "Ordenar por Tama_ñu"
 
 #: ../gtk/actions.c:90
 msgid "Speed _Limit Mode"
-msgstr ""
+msgstr "Mou de _llende de velocidá"
 
 #: ../gtk/actions.c:113
 msgid "Set _Location"
-msgstr ""
+msgstr "Afitar a_llugamientu"
 
 #: ../gtk/conf.c:513 ../gtk/conf.c:518 ../gtk/conf.c:525
 #, c-format
@@ -1593,7 +1593,7 @@ msgstr "Velocidá d'ensame:"
 
 #: ../gtk/details.c:944
 msgid "Private to this tracker -- DHT and PEX disabled"
-msgstr ""
+msgstr "Priváu pa esti tracker -- DHT y PEX desactivaos"
 
 #: ../gtk/details.c:1088
 msgid "Destination:"
@@ -1605,7 +1605,7 @@ msgstr "Semes Web"
 
 #: ../gtk/details.c:1506
 msgid "Peer was discovered through DHT"
-msgstr ""
+msgstr "Par descubiertu per DHT"
 
 #: ../gtk/details.c:1736
 msgid "None sent"
@@ -1683,11 +1683,11 @@ msgstr "Mou d'_encriptación"
 
 #: ../gtk/tr-prefs.c:541
 msgid "Use peer e_xchange (PEX)"
-msgstr ""
+msgstr "Usar _intercambéu de pares (PEX)"
 
 #: ../gtk/tr-prefs.c:545
 msgid "Use _distributed hash table (DHT)"
-msgstr ""
+msgstr "Usar tabla de hash _distribuyía (DHT)"
 
 #: ../gtk/tr-prefs.c:1119
 msgid "Every Day"
@@ -1749,7 +1749,7 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:1220
 msgid "Use Speed Limit Mode _between:"
-msgstr ""
+msgstr "Usar mou de llende de velocidá ente:"
 
 #: ../gtk/tr-prefs.c:1235
 msgid "_On days:"
@@ -1773,7 +1773,7 @@ msgstr "Probar puer_tu"
 
 #: ../gtk/tr-prefs.c:1340
 msgid "_Randomize the port every launch"
-msgstr ""
+msgstr "Pue_rtu al débalu en cada arranque"
 
 #: ../gtk/tr-window.c:330
 msgid "Click to disable Speed Limit Mode"
