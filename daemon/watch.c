@@ -141,7 +141,7 @@ is_file_in_list( struct evbuffer * buf, const char * filename, size_t len )
     tr_bool in_list;
     struct evbuffer * test = evbuffer_new( );
     add_file_to_list( test, filename, len );
-    in_list = evbuffer_find( buf, EVBUFFER_DATA( test ), EVBUFFER_LENGTH( test ) );
+    in_list = evbuffer_find( buf, EVBUFFER_DATA( test ), EVBUFFER_LENGTH( test ) ) != NULL;
     evbuffer_free( test );
     return in_list;
 }
