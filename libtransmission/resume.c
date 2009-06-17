@@ -484,7 +484,7 @@ tr_torrentSaveResume( const tr_torrent * tor )
     if( !tor )
         return;
 
-    tr_bencInitDict( &top, 14 );
+    tr_bencInitDict( &top, 32 ); /* arbitrary "big enough" number */
     tr_bencDictAddInt( &top, KEY_ACTIVITY_DATE,
                        tor->activityDate );
     tr_bencDictAddInt( &top, KEY_ADDED_DATE,
