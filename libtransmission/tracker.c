@@ -754,6 +754,7 @@ buildTrackerRequestURI( tr_tracker *       t,
                               "&corrupt=%" PRIu64
                               "&left=%" PRIu64
                               "&compact=1"
+                              "&supportcrypto=1"
                               "&numwant=%d"
                               "&key=%s",
                               strchr( ann, '?' ) ? '&' : '?',
@@ -766,6 +767,9 @@ buildTrackerRequestURI( tr_tracker *       t,
                               tr_cpLeftUntilComplete( &torrent->completion ),
                               numwant,
                               t->key_param );
+
+    if( t->session->encryptionMode == TR_ENCRYPTION_REQUIRED )
+        evbuffer_add_printf( buf, "&requirecrypto=1" );
 
     if( eventName && *eventName )
         evbuffer_add_printf( buf, "&event=%s", eventName );
