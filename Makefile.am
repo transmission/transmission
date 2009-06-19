@@ -21,7 +21,6 @@ SUBDIRS = \
   libtransmission \
   $(DAEMON_DIR) \
   $(CLI_DIR) \
-  $(BEOS_DIR) \
   $(GTK_DIR) \
   $(MAC_DIR)
 

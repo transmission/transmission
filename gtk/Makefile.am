@@ -101,7 +101,7 @@ transmission_LDADD = \
     $(top_builddir)/libtransmission/libtransmission.a \
     $(top_builddir)/third-party/miniupnp/libminiupnp.a \
     $(top_builddir)/third-party/libnatpmp/libnatpmp.a \
-    $(top_builddir)/third-party/dht/libdht.a \
+    $(DHT_LIBS) \
     $(GTK_LIBS) \
     $(GIO_LIBS) \
     $(LIBNOTIFY_LIBS) \

@@ -1,6 +1,7 @@
 AM_CPPFLAGS = -I. -I$(top_srcdir) -I$(top_srcdir)/third-party/ -D__TRANSMISSION__ -DPACKAGE_DATA_DIR=\""$(datadir)"\"
 
 AM_CFLAGS = \
+    $(DHT_CFLAGS) \
     $(LIBEVENT_CFLAGS) \
     $(LIBCURL_CFLAGS) \
     $(OPENSSL_CFLAGS) \
@@ -126,8 +127,8 @@ apps_ldadd = \
     ./libtransmission.a  \
     $(top_builddir)/third-party/miniupnp/libminiupnp.a \
     $(top_builddir)/third-party/libnatpmp/libnatpmp.a \
-    $(top_builddir)/third-party/dht/libdht.a \
     $(INTLLIBS) \
+    $(DHT_LIBS) \
     $(LIBEVENT_LIBS) \
     $(LIBCURL_LIBS) \
     $(OPENSSL_LIBS) \

@@ -20,7 +20,7 @@ transmissioncli_LDADD = \
     $(top_builddir)/libtransmission/libtransmission.a \
     $(top_builddir)/third-party/libnatpmp/libnatpmp.a \
     $(top_builddir)/third-party/miniupnp/libminiupnp.a \
-    $(top_builddir)/third-party/dht/libdht.a \
+    $(DHT_LIBS) \
     $(LIBEVENT_LIBS) \
     $(INTLLIBS) \
     $(LIBCURL_LIBS) \
