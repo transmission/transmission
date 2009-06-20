@@ -296,13 +296,18 @@ getFileInfo( const char *                     topFile,
              tr_benc *                        uninitialized_path )
 {
     const char * pch, *prev;
-    const size_t topLen = strlen( topFile ) + 1; /* +1 for '/' */
+    size_t       topLen;
     int          n;
 
     /* get the file size */
     tr_bencInitInt( uninitialized_length, file->size );
 
-    /* the path list */
+    /* how much of file->filename to walk past */
+    topLen = strlen( topFile );
+    if( topLen>0 && topFile[topLen-1]!=TR_PATH_DELIMITER )
+        ++topLen; /* +1 for the path delimiter */
+
+    /* build the path list */
     n = 1;
     for( pch = file->filename + topLen; *pch; ++pch )
         if( *pch == TR_PATH_DELIMITER )
