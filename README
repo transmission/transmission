@@ -26,6 +26,14 @@ Building a Transmission release from the command line:
     $ su (if necessary for the next line)
     $ make install
 
+Building Transmission from the nightly builds:
+
+    Download a tarball from http://build.transmissionbt.com/job/trunk-linux-inc/
+    and follow the steps from the previous section.
+
+    If you're new to building programs from source code, this is typically 
+    easier than building from SVN.
+
 Building Transmission from SVN (First Time):
 
     $ svn co svn://svn.m0k.org/Transmission/trunk Transmission
@@ -39,6 +47,7 @@ Building Transmission from SVN (Updating):
     $ cd Transmission
     $ make clean
     $ svn up
+    $ ./update-version-h.sh 
     $ make -s
     $ su (if necessary for the next line)
     $ make install
