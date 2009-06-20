@@ -298,8 +298,10 @@ main( int     argc,
     tr_session  * h;
     tr_ctor     * ctor;
     tr_torrent  * tor = NULL;
-    tr_benc settings;
-    const char * configDir;
+    tr_benc       settings;
+    const char  * configDir;
+    tr_bool       haveSource; 
+    tr_bool       haveAnnounce; 
 
     printf( "Transmission %s - http://www.transmissionbt.com/\n",
             LONG_VERSION_STRING );
@@ -332,10 +334,19 @@ main( int     argc,
 
     h = tr_sessionInit( "cli", configDir, FALSE, &settings );
 
-    if( sourceFile && *sourceFile ) /* creating a torrent */
+    haveSource = sourceFile && *sourceFile;
+    haveAnnounce = announceCount > 0;
+
+    if( haveSource && !haveAnnounce )
+        fprintf( stderr, "Did you mean to create a torrent without a tracker's announce URL?\n" );
+
+    if( haveSource ) /* creating a torrent */
     {
-        int                   err;
-        tr_metainfo_builder * b = tr_metaInfoBuilderCreate( sourceFile );
+        int err;
+        tr_metainfo_builder * b;
+        fprintf( stderr, "creating torrent \"%s\"\n", torrentPath );
+
+        b = tr_metaInfoBuilderCreate( sourceFile );
         tr_makeMetaInfo( b, torrentPath, announce, announceCount, comment, isPrivate );
         while( !b->isDone )
         {
