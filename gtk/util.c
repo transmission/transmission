@@ -689,3 +689,14 @@ gtr_widget_set_tooltip_text( GtkWidget * w, const char * tip )
     gtk_tooltips_set_tip( tips, w, tip, NULL );
 #endif
 }
+
+void
+gtr_toolbar_set_orientation( GtkToolbar      * toolbar,
+                             GtkOrientation    orientation )
+{
+#if GTK_CHECK_VERSION( 2,16,0 )
+    gtk_orientable_set_orientation( GTK_ORIENTABLE( toolbar ), orientation );
+#else
+    gtk_toolbar_set_orientation( toolbar, orientation );
+#endif
+}

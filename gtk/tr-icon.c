@@ -70,7 +70,11 @@ refresh_tooltip_cb( gpointer data )
                 stats.seedingCount,
                 stats.downloadCount,
                 downStr, upStr );
+#if GTK_CHECK_VERSION( 2,16,0 )
+    gtk_status_icon_set_tooltip_text( GTK_STATUS_ICON( icon ), tip );
+#else
     gtk_status_icon_set_tooltip( GTK_STATUS_ICON( icon ), tip );
+#endif
 
     return TRUE;
 }

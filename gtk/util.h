@@ -94,6 +94,9 @@ char*       gtr_get_help_url( void );
 
 #ifdef GTK_MAJOR_VERSION
 
+void        gtr_toolbar_set_orientation( GtkToolbar      * toolbar,
+                                         GtkOrientation    orientation );
+
 void        gtr_widget_set_tooltip_text( GtkWidget * w, const char * tip );
 
 GtkWidget * gtr_button_new_from_stock( const char * stock,
