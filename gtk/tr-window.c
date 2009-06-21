@@ -27,12 +27,18 @@
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
 
+#if !GTK_CHECK_VERSION( 2,16,0 )
+ /* FIXME: when 2.16 has been out long enough, it would be really nice to
+  * get rid of this libsexy usage because of its makefile strangeness */
+ #define USE_SEXY
+ #include "sexy-icon-entry.h"
+#endif
+
 #include <libtransmission/transmission.h>
 
 #include "actions.h"
 #include "conf.h"
 #include "hig.h"
-#include "sexy-icon-entry.h"
 #include "torrent-cell-renderer.h"
 #include "tr-prefs.h"
 #include "tr-torrent.h"
@@ -500,17 +506,33 @@ filter_entry_changed( GtkEditable * e,
     g_free( pch );
 }
 
+
+#ifdef USE_SEXY
 static void
-entry_icon_released( SexyIconEntry         * entry  UNUSED,
-                     SexyIconEntryPosition          icon_pos,
-                     int                     button UNUSED,
-                     gpointer                       menu )
+entry_icon_released( SexyIconEntry           * entry  UNUSED,
+                     SexyIconEntryPosition     icon_pos,
+                     int                       button UNUSED,
+                     gpointer                  menu )
 {
     if( icon_pos == SEXY_ICON_ENTRY_PRIMARY )
-        gtk_menu_popup ( GTK_MENU(
-                            menu ), NULL, NULL, NULL, NULL, 0,
+        gtk_menu_popup( GTK_MENU( menu ), NULL, NULL, NULL, NULL, 0,
                         gtk_get_current_event_time( ) );
 }
+#else
+static void
+entry_icon_release( GtkEntry              * entry  UNUSED,
+                    GtkEntryIconPosition    icon_pos,
+                    GdkEventButton        * event  UNUSED,
+                    gpointer                menu )
+{
+    if( icon_pos == GTK_ENTRY_ICON_SECONDARY )
+        gtk_entry_set_text( entry, "" );
+
+    if( icon_pos == GTK_ENTRY_ICON_PRIMARY )
+        gtk_menu_popup( GTK_MENU( menu ), NULL, NULL, NULL, NULL, 0,
+                        gtk_get_current_event_time( ) );
+}
+#endif
 
 #if GTK_CHECK_VERSION( 2, 12, 0 )
 
@@ -794,12 +816,12 @@ GtkWidget *
 tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
 {
     int           i, n;
-    const char *  pch;
+    const char  * pch;
     PrivateData * p;
-    GtkWidget   *mainmenu, *toolbar, *filter, *list, *status;
-    GtkWidget *   vbox, *w, *self, *h, *s, *hbox, *image, *menu;
-    GtkWindow *   win;
-    GSList *      l;
+    GtkWidget   * mainmenu, *toolbar, *filter, *list, *status;
+    GtkWidget   * vbox, *w, *self, *h, *s, *hbox, *menu;
+    GtkWindow   * win;
+    GSList      * l;
 
     const char *  filter_names[FILTER_MODE_QTY] = {
         /* show all torrents */
@@ -867,15 +889,24 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
         gtk_box_pack_start( GTK_BOX( h ), w, FALSE, FALSE, 0 );
     }
 
+#ifdef USE_SEXY
     s = sexy_icon_entry_new( );
     sexy_icon_entry_add_clear_button( SEXY_ICON_ENTRY( s ) );
-    image = gtk_image_new_from_stock( GTK_STOCK_FIND, GTK_ICON_SIZE_MENU );
-    sexy_icon_entry_set_icon( SEXY_ICON_ENTRY(
-                                 s ), SEXY_ICON_ENTRY_PRIMARY,
-                             GTK_IMAGE( image ) );
-    sexy_icon_entry_set_icon_highlight( SEXY_ICON_ENTRY(
-                                            s ), SEXY_ICON_ENTRY_PRIMARY,
-                                        TRUE );
+    w = gtk_image_new_from_stock( GTK_STOCK_FIND, GTK_ICON_SIZE_MENU );
+    sexy_icon_entry_set_icon( SEXY_ICON_ENTRY( s ),
+                              SEXY_ICON_ENTRY_PRIMARY,
+                              GTK_IMAGE( w ) );
+    sexy_icon_entry_set_icon_highlight( SEXY_ICON_ENTRY( s ),
+                                        SEXY_ICON_ENTRY_PRIMARY, TRUE );
+#else
+    s = gtk_entry_new( );
+    gtk_entry_set_icon_from_stock( GTK_ENTRY( s ),
+                                   GTK_ENTRY_ICON_PRIMARY,
+                                   GTK_STOCK_FIND);
+   gtk_entry_set_icon_from_stock( GTK_ENTRY( s ),
+                                  GTK_ENTRY_ICON_SECONDARY,
+                                  GTK_STOCK_CLEAR );
+#endif
     gtk_box_pack_end( GTK_BOX( h ), s, FALSE, FALSE, 0 );
     g_signal_connect( s, "changed", G_CALLBACK( filter_entry_changed ), p );
 
@@ -958,7 +989,7 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
 
     menu = gtk_menu_new( );
     l = NULL;
-    for( i = 0; i < FILTER_TEXT_MODE_QTY; ++i )
+    for( i=0; i<FILTER_TEXT_MODE_QTY; ++i )
     {
         const char * name = _( filter_text_names[i] );
         GtkWidget *  w = gtk_radio_menu_item_new_with_label ( l, name );
@@ -970,8 +1001,13 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
         gtk_menu_shell_append( GTK_MENU_SHELL( menu ), w );
         gtk_widget_show( w );
     }
-    g_signal_connect( s, "icon-released",
-                      G_CALLBACK( entry_icon_released ), menu );
+
+#ifdef USE_SEXY
+    g_signal_connect( s, "icon-released", G_CALLBACK( entry_icon_released ), menu );
+#else
+    g_signal_connect( s, "icon-release", G_CALLBACK( entry_icon_release ), menu );
+
+#endif
 
     /* workarea */
     p->view = makeview( p, core );

@@ -18,9 +18,10 @@
  * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA  02111-1307, USA.
  */
-#include <string.h>
 #include <gtk/gtk.h>
+#if !GTK_CHECK_VERSION( 2,16,0 ) /* these features were added to GtkEntry in 2.16 */
 
+#include <string.h>
 #include "sexy-icon-entry.h"
 #include "sexy-marshal.h"
 
@@ -974,3 +975,5 @@ sexy_icon_entry_add_clear_button(SexyIconEntry *icon_entry)
 		g_signal_connect(G_OBJECT(icon_entry), "icon_released",
 						 G_CALLBACK(clear_button_clicked_cb), NULL);
 }
+
+#endif /* #if !GTK_CHECK_VERSION( 2,16,0 ) */
