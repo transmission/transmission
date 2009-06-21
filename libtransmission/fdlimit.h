@@ -67,7 +67,8 @@ int64_t tr_lseek( int fd, int64_t offset, int whence );
  * @see tr_fdFileReturn
  * @see tr_fdFileClose
  */
-int  tr_fdFileCheckout( const char             * folder,
+int  tr_fdFileCheckout( int                      torrentId,
+                        const char             * folder,
                         const char             * torrentFile,
                         tr_bool                  doWrite,
                         tr_preallocation_mode    preallocationMode,
@@ -91,6 +92,12 @@ void tr_fdFileReturn( int file );
  * @see tr_fdFileReturn
  */
 void     tr_fdFileClose( const char * filename );
+
+
+/**
+ * Closes all the files associated with a given torrent id
+ */
+void tr_fdTorrentClose( int torrentId );
 
 
 /***********************************************************************

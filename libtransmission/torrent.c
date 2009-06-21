@@ -1330,30 +1330,6 @@ tr_torrentVerify( tr_torrent * tor )
 }
 
 static void
-tr_torrentCloseLocalFiles( const tr_torrent * tor )
-{
-    tr_file_index_t i;
-    struct evbuffer * buf = evbuffer_new( );
-
-    assert( tr_isTorrent( tor ) );
-
-    /* FIXME(libevent2) we're just using the evbuffer to build a key here anyway.
-       so we do (tor->info.fileCount * fd.openFileLimit) strcmps for these keys. :/
-       it would be more efficient to remove this code altogether and
-       add "int torrentId;" to "struct tr_openfile", and a new function
-       tr_fdCloseTorrentFiles( tr_session*, int torrentId ) */
-    for( i=0; i<tor->info.fileCount; ++i )
-    {
-        const tr_file * file = &tor->info.files[i];
-        evbuffer_drain( buf, EVBUFFER_LENGTH( buf ) );
-        evbuffer_add_printf( buf, "%s%s%s", tor->downloadDir, TR_PATH_DELIMITER_STR, file->name );
-        tr_fdFileClose( (const char*) EVBUFFER_DATA( buf ) );
-    }
-
-    evbuffer_free( buf );
-}
-
-static void
 stopTorrent( void * vtor )
 {
     tr_torrent * tor = vtor;
@@ -1364,7 +1340,7 @@ stopTorrent( void * vtor )
     tr_peerMgrStopTorrent( tor );
     tr_trackerStop( tor->tracker );
 
-    tr_torrentCloseLocalFiles( tor );
+    tr_fdTorrentClose( tor->uniqueId );
 }
 
 void
@@ -1529,7 +1505,7 @@ tr_torrentRecheckCompleteness( tr_torrent * tor )
 
         tor->completeness = completeness;
         tor->needsSeedRatioCheck = TRUE;
-        tr_torrentCloseLocalFiles( tor );
+        tr_fdTorrentClose( tor->uniqueId );
         fireCompletenessChange( tor, completeness );
 
         if( recentChange && ( completeness == TR_SEED ) )
@@ -2218,7 +2194,7 @@ tr_torrentDeleteLocalData( tr_torrent * tor, tr_fileFunc fileFunc )
         fileFunc = remove;
 
     /* close all the files because we're about to delete them */
-    tr_torrentCloseLocalFiles( tor );
+    tr_fdTorrentClose( tor->uniqueId );
 
     if( tor->info.fileCount > 1 )
         deleteLocalData( tor, fileFunc );

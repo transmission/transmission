@@ -101,7 +101,7 @@ readOrWriteBytes( const tr_torrent * tor,
 
     if( ( ioMode == TR_IO_READ ) && !fileExists ) /* does file exist? */
         err = errno;
-    else if( ( fd = tr_fdFileCheckout ( tor->downloadDir, file->name, ioMode == TR_IO_WRITE, preallocationMode, file->length ) ) < 0 )
+    else if( ( fd = tr_fdFileCheckout ( tor->uniqueId, tor->downloadDir, file->name, ioMode == TR_IO_WRITE, preallocationMode, file->length ) ) < 0 )
         err = errno;
     else if( tr_lseek( fd, (int64_t)fileOffset, SEEK_SET ) == -1 )
         err = errno;

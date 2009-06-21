@@ -86,6 +86,7 @@ struct tr_openfile
     tr_bool    isCheckedOut;
     tr_bool    isWritable;
     tr_bool    closeWhenDone;
+    int        torrentId;
     char       filename[MAX_PATH_LENGTH];
     int        fd;
     uint64_t   date;
@@ -380,7 +381,8 @@ fileIsCheckedOut( const struct tr_openfile * o )
 
 /* returns an fd on success, or a -1 on failure and sets errno */
 int
-tr_fdFileCheckout( const char             * folder,
+tr_fdFileCheckout( int                      torrentId,
+                   const char             * folder,
                    const char             * torrentFile,
                    tr_bool                  doWrite,
                    tr_preallocation_mode    preallocationMode,
@@ -390,6 +392,7 @@ tr_fdFileCheckout( const char             * folder,
     struct tr_openfile * o;
     char filename[MAX_PATH_LENGTH];
 
+    assert( torrentId > 0 );
     assert( folder && *folder );
     assert( torrentFile && *torrentFile );
     assert( doWrite == 0 || doWrite == 1 );
@@ -399,14 +402,15 @@ tr_fdFileCheckout( const char             * folder,
 
     tr_lockLock( gFd->lock );
 
-    /* Is it already open? */
-    for( i = 0; i < gFd->openFileLimit; ++i )
+    /* is it already open? */
+    for( i=0; i<gFd->openFileLimit; ++i )
     {
         o = &gFd->openFiles[i];
 
         if( !fileIsOpen( o ) )
             continue;
-
+        if( torrentId != o->torrentId )
+            continue;
         if( strcmp( filename, o->filename ) )
             continue;
 
@@ -422,8 +426,7 @@ tr_fdFileCheckout( const char             * folder,
 
         if( doWrite && !o->isWritable )
         {
-            dbgmsg(
-                "found it!  it's open and available, but isn't writable. closing..." );
+            dbgmsg( "found it!  it's open and available, but isn't writable. closing..." );
             TrCloseFile( i );
             break;
         }
@@ -433,14 +436,13 @@ tr_fdFileCheckout( const char             * folder,
         break;
     }
 
-    dbgmsg(
-        "it's not already open.  looking for an open slot or an old file." );
+    dbgmsg( "it's not already open.  looking for an open slot or an old file." );
     while( winner < 0 )
     {
         uint64_t date = tr_date( ) + 1;
 
         /* look for the file that's been open longest */
-        for( i = 0; i < gFd->openFileLimit; ++i )
+        for( i=0; i<gFd->openFileLimit; ++i )
         {
             o = &gFd->openFiles[i];
 
@@ -495,6 +497,7 @@ tr_fdFileCheckout( const char             * folder,
     }
 
     dbgmsg( "checking out '%s' in slot %d", filename, winner );
+    o->torrentId = torrentId;
     o->isCheckedOut = 1;
     o->closeWhenDone = 0;
     o->date = tr_date( );
@@ -530,10 +533,9 @@ void
 tr_fdFileClose( const char * filename )
 {
     int i;
-
     tr_lockLock( gFd->lock );
 
-    for( i = 0; i < gFd->openFileLimit; ++i )
+    for( i=0; i<gFd->openFileLimit; ++i )
     {
         struct tr_openfile * o = &gFd->openFiles[i];
         if( !fileIsOpen( o ) || strcmp( filename, o->filename ) )
@@ -541,22 +543,33 @@ tr_fdFileClose( const char * filename )
 
         dbgmsg( "tr_fdFileClose closing '%s'", filename );
 
-        if( !o->isCheckedOut )
-        {
-            dbgmsg( "not checked out, so closing it now... '%s'", filename );
-            TrCloseFile( i );
-        }
-        else
-        {
-            dbgmsg(
-                "flagging file '%s', slot #%d to be closed when checked in",
-                gFd->openFiles[i].filename, i );
-            o->closeWhenDone = 1;
-        }
+        assert( !o->isCheckedOut && "this is a test assertion... I *think* this is always true now" );
+
+        TrCloseFile( i );
     }
 
     tr_lockUnlock( gFd->lock );
 }
+
+void
+tr_fdTorrentClose( int torrentId )
+{
+    int i;
+    tr_lockLock( gFd->lock );
+
+    for( i=0; i<gFd->openFileLimit; ++i )
+    {
+        struct tr_openfile * o = &gFd->openFiles[i];
+
+        assert( !o->isCheckedOut && "this is a test assertion... I *think* this is always true now" );
+
+        if( fileIsOpen( o ) && o->torrentId == torrentId )
+            TrCloseFile( i );
+    }
+
+    tr_lockUnlock( gFd->lock );
+}
+
 
 /***
 ****
@@ -736,4 +749,3 @@ tr_fdGetPeerLimit( void )
 {
     return gFd ? gFd->socketLimit : -1;
 }
-
