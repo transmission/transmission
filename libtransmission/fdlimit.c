@@ -342,6 +342,15 @@ TrOpenFile( int                      i,
         return err;
     }
 
+    /* If the file already exists and it's too large, truncate it.
+     * This is a fringe case that happens if a torrent's been updated
+     * and one of the updated torrent's files is smaller.
+     * http://trac.transmissionbt.com/ticket/2228
+     * https://bugs.launchpad.net/ubuntu/+source/transmission/+bug/318249
+     */
+    if( alreadyExisted && ( desiredFileSize < (uint64_t)sb.st_size ) )
+        ftruncate( file->fd, desiredFileSize );
+
     if( doWrite && !alreadyExisted && ( preallocationMode == TR_PREALLOCATE_SPARSE ) )
         preallocateFileSparse( file->fd, desiredFileSize );
 
