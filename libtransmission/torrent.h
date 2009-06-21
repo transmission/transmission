@@ -288,15 +288,20 @@ static TR_INLINE tr_bool tr_torrentIsPrivate( const tr_torrent * tor )
 
 static TR_INLINE tr_bool tr_torrentAllowsPex( const tr_torrent * tor )
 {
-    return ( tor != NULL  ) && tor->session->isPexEnabled && !tr_torrentIsPrivate( tor );
+    return ( tor != NULL )
+        && ( tor->session->isPexEnabled )
+        && ( !tr_torrentIsPrivate( tor ) );
 }
 
 static TR_INLINE tr_bool tr_torrentAllowsDHT( const tr_torrent * tor )
 {
-    return ( tor != NULL  ) && tor->session->isDHTEnabled && !tr_torrentIsPrivate( tor );
+    return ( tor != NULL )
+        && ( tr_sessionAllowsDHT( tor->session ) )
+        && ( !tr_torrentIsPrivate( tor ) );
 }
 
-static TR_INLINE tr_bool tr_torrentIsPieceChecked( const tr_torrent  * tor, tr_piece_index_t i )
+static TR_INLINE tr_bool tr_torrentIsPieceChecked( const tr_torrent  * tor,
+                                                   tr_piece_index_t    i )
 {
     return tr_bitfieldHasFast( &tor->checkedPieces, i );
 }

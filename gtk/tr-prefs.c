@@ -544,11 +544,13 @@ peerPage( GObject * core )
     gtr_widget_set_tooltip_text( w, s );
     hig_workarea_add_wide_control( t, &row, w );
 
+#ifndef WITHOUT_DHT
     s = _( "Use _DHT to find more peers" );
     w = new_check_button( s, TR_PREFS_KEY_DHT_ENABLED, core );
     s = _( "DHT is a tool for finding peers without a tracker." );
     gtr_widget_set_tooltip_text( w, s );
     hig_workarea_add_wide_control( t, &row, w );
+#endif
 
     hig_workarea_finish( t, &row );
     g_object_weak_ref( G_OBJECT( t ), peerPageDestroyed, data );

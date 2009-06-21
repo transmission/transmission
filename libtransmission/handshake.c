@@ -313,7 +313,7 @@ parseHandshake( tr_handshake *    handshake,
     tr_peerIoEnableFEXT( handshake->io, HANDSHAKE_HAS_FASTEXT( reserved ) );
 
     /* This doesn't depend on whether the torrent is private. */
-    if( tor && tor->session->isDHTEnabled )
+    if( tor && tr_sessionAllowsDHT( tor->session ) )
         tr_peerIoEnableDHT( handshake->io, HANDSHAKE_HAS_DHT( reserved ) );
 
     return HANDSHAKE_OK;

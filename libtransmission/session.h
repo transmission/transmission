@@ -138,6 +138,8 @@ struct tr_session
     struct tr_bindinfo         * public_ipv6;
 };
 
+tr_bool      tr_sessionAllowsDHT( const tr_session * session );
+
 tr_bool      tr_sessionGetActiveSpeedLimit( const tr_session  * session,
                                             tr_direction        dir,
                                             int               * setme );
