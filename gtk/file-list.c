@@ -730,20 +730,20 @@ file_list_new( TrCore * core, int torrentId )
     title = _( "Progress" );
     pango_layout = gtk_widget_create_pango_layout( view, title );
     pango_layout_get_pixel_size( pango_layout, &width, NULL );
-    width += GUI_PAD * 2;
+    width += 30; /* room for the sort indicator */
     g_object_unref( G_OBJECT( pango_layout ) );
     rend = gtk_cell_renderer_progress_new( );
     col = gtk_tree_view_column_new_with_attributes( title, rend, "value", FC_PROG, NULL );
     gtk_tree_view_column_set_fixed_width( col, width );
     gtk_tree_view_column_set_sizing( col, GTK_TREE_VIEW_COLUMN_FIXED );
     gtk_tree_view_column_set_sort_column_id( col, FC_PROG );
-    gtk_tree_view_append_column ( tree_view, col );
+    gtk_tree_view_append_column( tree_view, col );
 
     /* add "enabled" column */
     title = _( "Download" );
     pango_layout = gtk_widget_create_pango_layout( view, title );
     pango_layout_get_pixel_size( pango_layout, &width, NULL );
-    width += GUI_PAD * 2;
+    width += 30; /* room for the sort indicator */
     g_object_unref( G_OBJECT( pango_layout ) );
     rend = gtk_cell_renderer_toggle_new( );
     col = gtk_tree_view_column_new_with_attributes( title, rend, NULL );
@@ -751,13 +751,13 @@ file_list_new( TrCore * core, int torrentId )
     gtk_tree_view_column_set_sizing( col, GTK_TREE_VIEW_COLUMN_FIXED );
     gtk_tree_view_column_set_cell_data_func( col, rend, renderDownload, NULL, NULL );
     gtk_tree_view_column_set_sort_column_id( col, FC_ENABLED );
-    gtk_tree_view_append_column ( tree_view, col );
+    gtk_tree_view_append_column( tree_view, col );
 
     /* add priority column */
     title = _( "Priority" );
     pango_layout = gtk_widget_create_pango_layout( view, title );
     pango_layout_get_pixel_size( pango_layout, &width, NULL );
-    width += GUI_PAD * 2;
+    width += 30; /* room for the sort indicator */
     g_object_unref( G_OBJECT( pango_layout ) );
     rend = gtk_cell_renderer_text_new( );
     g_object_set( rend, "xalign", (gfloat)0.5, "yalign", (gfloat)0.5, NULL );
@@ -766,7 +766,7 @@ file_list_new( TrCore * core, int torrentId )
     gtk_tree_view_column_set_sizing( col, GTK_TREE_VIEW_COLUMN_FIXED );
     gtk_tree_view_column_set_sort_column_id( col, FC_PRIORITY );
     gtk_tree_view_column_set_cell_data_func( col, rend, renderPriority, NULL, NULL );
-    gtk_tree_view_append_column ( tree_view, col );
+    gtk_tree_view_append_column( tree_view, col );
 
     /* create the scrolled window and stick the view in it */
     scroll = gtk_scrolled_window_new( NULL, NULL );

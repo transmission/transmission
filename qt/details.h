@@ -51,7 +51,6 @@ class Details: public QDialog
         void setIds( const QSet<int>& ids );
 
     private:
-        QWidget * createActivityTab( );
         QWidget * createPeersTab( );
         QWidget * createTrackerTab( );
         QWidget * createInfoTab( );
@@ -71,16 +70,13 @@ class Details: public QDialog
         bool myHavePendingRefresh;
 
         QLabel * myStateLabel;
-        QLabel * myProgressLabel;
         QLabel * myHaveLabel;
         QLabel * myDownloadedLabel;
         QLabel * myUploadedLabel;
-        QLabel * myFailedLabel;
         QLabel * myRatioLabel;
-        QLabel * mySwarmSpeedLabel;
         QLabel * myErrorLabel;
-        QLabel * myAddedDateLabel;
-        QLabel * myActivityLabel;
+        QLabel * myRunTimeLabel;
+        QLabel * myLastActivityLabel;
 
         QCheckBox * mySessionLimitCheck;
         QCheckBox * mySingleDownCheck;
@@ -94,13 +90,11 @@ class Details: public QDialog
         QSpinBox * myPeerLimitSpin;
         QComboBox * myBandwidthPriorityCombo;
 
-        QLabel * myPiecesLabel;
+        QLabel * mySizeLabel;
         QLabel * myHashLabel;
         QLabel * myPrivacyLabel;
-        QLabel * myCreatorLabel;
-        QLabel * myDateCreatedLabel;
-        QLabel * myDestinationLabel;
-        QLabel * myTorrentFileLabel;
+        QLabel * myOriginLabel;
+        QLabel * myLocationLabel;
         QTextBrowser * myCommentBrowser;
 
         QLabel * myTrackerLabel;

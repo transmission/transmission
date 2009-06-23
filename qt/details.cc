@@ -130,13 +130,11 @@ Details :: Details( Session& session, TorrentModel& model, QWidget * parent ):
 
     QTabWidget * t = new QTabWidget( this );
     QWidget * w;
-    t->addTab( w = createActivityTab( ),  tr( "Activity" ) );
+    t->addTab( w = createInfoTab( ),      tr( "Information" ) );
     myWidgets << w;
     t->addTab( w = createPeersTab( ),     tr( "Peers" ) );
     myWidgets << w;
     t->addTab( w = createTrackerTab( ),   tr( "Tracker" ) );
-    myWidgets << w;
-    t->addTab( w = createInfoTab( ),      tr( "Information" ) );
     myWidgets << w;
     t->addTab( w = createFilesTab( ),     tr( "Files" ) );
     myWidgets << w;
@@ -250,69 +248,89 @@ Details :: refresh( )
     }
     myStateLabel->setText( string );
 
-    // myProgressLabel
-    if( torrents.empty( ) )
-        string = tr( "None" );
-    else {
-        double sizeWhenDone = 0;
-        double leftUntilDone = 0;
-        foreach( const Torrent * t, torrents ) {
-            sizeWhenDone += t->sizeWhenDone( );
-            leftUntilDone += t->leftUntilDone( );
-        }
-        string = locale.toString( 100.0*((sizeWhenDone-leftUntilDone)/sizeWhenDone), 'f', 2 );
-    }
-    myProgressLabel->setText( string );
-
     // myHaveLabel
+    double sizeWhenDone = 0;
+    double leftUntilDone = 0;
     int64_t haveTotal = 0;
     int64_t haveVerified = 0;
+    int64_t haveUnverified = 0;
     int64_t verifiedPieces = 0;
     foreach( const Torrent * t, torrents ) {
         haveTotal += t->haveTotal( );
+        haveUnverified += t->haveUnverified( );
         const uint64_t v = t->haveVerified( );
         haveVerified += v;
         verifiedPieces += v / t->pieceSize( );
+        sizeWhenDone += t->sizeWhenDone( );
+        leftUntilDone += t->leftUntilDone( );
     }
-    myHaveLabel->setText( tr( "%1 (%2 verified in %L3 pieces)" )
-                            .arg( Utils::sizeToString( haveTotal ) )
-                            .arg( Utils::sizeToString( haveVerified ) )
-                            .arg( verifiedPieces ) );
+    if( !haveVerified && !haveUnverified )
+        string = none;
+    else {
+        QString pct = locale.toString( 100.0*((sizeWhenDone-leftUntilDone)/sizeWhenDone), 'f', 2 );
+        if( !haveUnverified )
+            string = tr( "%1 (%2 verified)" )
+                     .arg( pct )
+                     .arg( Utils :: sizeToString( haveVerified ) );
+        else
+            string = tr( "%1 (%2 verified, %3 unverified)" )
+                     .arg( pct )
+                     .arg( Utils :: sizeToString( haveVerified ) )
+                     .arg( Utils :: sizeToString( haveUnverified ) );
+    }
+    myHaveLabel->setText( string );
 
-    int64_t sum = 0;
-    foreach( const Torrent * t, torrents ) sum += t->downloadedEver( );
-    myDownloadedLabel->setText( Utils::sizeToString( sum ) );
+    // myDownloadedLabel
+    if( torrents.empty( ) )
+        string = none;
+    else {
+        uint64_t d=0, f=0;
+        foreach( const Torrent * t, torrents ) {
+            d += t->downloadedEver( );
+            f += t->failedEver( );
+        }
+        const QString dstr = Utils::sizeToString( d );
+        const QString fstr = Utils::sizeToString( f );
+        if( f )
+            string = tr( "%1 (+%2s corrupt)" ).arg( dstr ).arg( fstr );
+        else
+            string = dstr;
+    }
+    myDownloadedLabel->setText( string );
 
-    sum = 0;
+    uint64_t sum = 0;
     foreach( const Torrent * t, torrents ) sum += t->uploadedEver( );
     myUploadedLabel->setText( Utils::sizeToString( sum ) );
-
-    sum = 0;
-    foreach( const Torrent *t, torrents ) sum += t->failedEver( );
-    myFailedLabel->setText( Utils::sizeToString( sum ) );
 
     double d = 0;
     foreach( const Torrent *t, torrents ) d += t->ratio( );
     myRatioLabel->setText( Utils :: ratioToString( d / n ) );
 
-    Speed speed;
-    foreach( const Torrent *t, torrents ) speed += t->swarmSpeed( );
-    mySwarmSpeedLabel->setText( Utils::speedToString( speed ) );
+    const QDateTime qdt_now = QDateTime::currentDateTime( );
 
+    // myRunTimeLabel
     if( torrents.empty( ) )
         string = none;
     else {
-        string = torrents[0]->dateAdded().toString();
+        bool allPaused = true;
+        QDateTime baseline = torrents[0]->lastStarted( );
         foreach( const Torrent * t, torrents ) {
-            if( string != t->dateAdded().toString() ) {
-                string = mixed;
-                break;
-            }
+            if( baseline != t->lastStarted( ) )
+                baseline = QDateTime( );
+            if( !t->isPaused( ) )
+                allPaused = false;
         }
+        if( allPaused )
+            string = tr( "Stopped" );
+        else if( baseline.isNull( ) )
+            string = mixed;
+        else
+            string = Utils::timeToString( baseline.secsTo( qdt_now ) );
     }
-    myAddedDateLabel->setText( string );
+    myRunTimeLabel->setText( string );
 
 
+    // myLastActivityLabel
     if( torrents.empty( ) )
         string = none;
     else {
@@ -322,9 +340,13 @@ Details :: refresh( )
             if( latest < dt )
                 latest = dt;
         }
-        string = latest.toString( );
+        const int seconds = latest.secsTo( qdt_now );
+        if( seconds < 5 )
+            string = tr( "Active now" );
+        else
+            string = tr( "%1 ago" ).arg( Utils::timeToString( seconds ) );
     }
-    myActivityLabel->setText( string );
+    myLastActivityLabel->setText( string );
 
 
     if( torrents.empty( ) )
@@ -338,6 +360,8 @@ Details :: refresh( )
             }
         }
     }
+    if( string.isEmpty( ) )
+        string = none;
     myErrorLabel->setText( string );
 
 
@@ -345,24 +369,30 @@ Details :: refresh( )
     /// information tab
     ///
 
-    // myPiecesLabel
+    // mySizeLabel
     if( torrents.empty( ) )
         string = none;
     else {
-        int64_t pieceCount = 0;
-        uint64_t baseSize = torrents[0]->pieceSize( );
+        int pieces = 0;
+        uint64_t size = 0;
+        uint32_t pieceSize = torrents[0]->pieceSize( );
         foreach( const Torrent * t, torrents ) {
-            pieceCount += t->pieceCount( );
-            if( baseSize != t->pieceSize( ) )
-                baseSize = 0;
+            pieces += t->pieceCount( );
+            size += t->totalSize( );
+            if( pieceSize != t->pieceSize( ) )
+                pieceSize = 0;
         }
-        if( !baseSize ) // mixed piece size
-            string = tr( "%L1 Pieces" ).arg( pieceCount );
+        if( !size )
+            string = none;
+        else if( pieceSize > 0 )
+            string = tr( "%1 (%Ln pieces @ %2)", "", pieces )
+                     .arg( Utils::sizeToString( size ) )
+                     .arg( Utils::sizeToString( pieceSize ) );
         else
-            string = tr( "%L1 Pieces @ %2" ).arg( pieceCount )
-                                            .arg( Utils::sizeToString( baseSize ) );
+            string = tr( "%1 (%Ln pieces)", "", pieces )
+                     .arg( Utils::sizeToString( size ) );
     }
-    myPiecesLabel->setText( string );
+    mySizeLabel->setText( string );
 
     // myHashLabel
     if( torrents.empty( ) )
@@ -383,7 +413,7 @@ Details :: refresh( )
         string = none;
     else {
         bool b = torrents[0]->isPrivate( );
-        string = b ? tr( "Private to this tracker -- PEX disabled" )
+        string = b ? tr( "Private to this tracker -- DHT and PEX disabled" )
                    : tr( "Public torrent" );
         foreach( const Torrent * t, torrents ) {
             if( b != t->isPrivate( ) ) {
@@ -408,35 +438,30 @@ Details :: refresh( )
     }
     myCommentBrowser->setText( string );
 
-    // myCreatorLabel
+    // myOriginLabel
     if( torrents.empty( ) )
         string = none;
     else {
-        string = torrents[0]->creator( );
+        bool mixed_creator=false, mixed_date=false;
+        const QString creator = torrents[0]->creator();
+        const QString date = torrents[0]->dateCreated().toString();
         foreach( const Torrent * t, torrents ) {
-            if( string != t->creator( ) ) {
-                string = mixed;
-                break;
-            }
+            mixed_creator |= ( creator != t->creator() );
+            mixed_date |=  ( date != t->dateCreated().toString() );
         }
+        if( mixed_creator && mixed_date )
+            string = mixed;
+        else if( mixed_date )
+            string = tr( "Created by %1" ).arg( creator );
+        else if( mixed_creator || creator.isEmpty( ) )
+            string = tr( "Created on %1" ).arg( date );
+        else
+            string = tr( "Created by %1 on %2" ).arg( creator ).arg( date );
     }
-    myCreatorLabel->setText( string.isEmpty() ? unknown : string );
-
-    // myDateCreatedLabel
-    if( torrents.empty( ) )
-        string = none;
-    else {
-        string = torrents[0]->dateCreated().toString();
-        foreach( const Torrent * t, torrents ) {
-            if( string != t->dateCreated().toString() ) {
-                string = mixed;
-                break;
-            }
-        }
-    }
-    myDateCreatedLabel->setText( string );
-
-    // myDestinationLabel
+    myOriginLabel->setText( string );
+    
+    
+    // myLocationLabel
     if( torrents.empty( ) )
         string = none;
     else {
@@ -448,21 +473,8 @@ Details :: refresh( )
             }
         }
     }
-    myDestinationLabel->setText( string );
+    myLocationLabel->setText( string );
 
-    // myTorrentFileLabel
-    if( torrents.empty( ) )
-        string = none;
-    else {
-        string = torrents[0]->torrentFile( );
-        foreach( const Torrent * t, torrents ) {
-            if( string != t->torrentFile( ) ) {
-                string = mixed;
-                break;
-            }
-        }
-    }
-    myTorrentFileLabel->setText( string );
 
     ///
     ///  Options Tab
@@ -780,25 +792,33 @@ Details :: enableWhenChecked( QCheckBox * box, QWidget * w )
 ***/
 
 QWidget *
-Details :: createActivityTab( )
+Details :: createInfoTab( )
 {
     HIG * hig = new HIG( this );
 
     hig->addSectionTitle( tr( "Transfer" ) );
-    hig->addRow( tr( "State:" ), myStateLabel = new SqueezeLabel );
-    hig->addRow( tr( "Progress:" ), myProgressLabel = new SqueezeLabel );
+    hig->addRow( tr( "Torrent size:" ), mySizeLabel = new SqueezeLabel );
     hig->addRow( tr( "Have:" ), myHaveLabel = new SqueezeLabel );
     hig->addRow( tr( "Downloaded:" ), myDownloadedLabel = new SqueezeLabel );
     hig->addRow( tr( "Uploaded:" ), myUploadedLabel = new SqueezeLabel );
-    hig->addRow( tr( "Failed DL:" ), myFailedLabel = new SqueezeLabel );
     hig->addRow( tr( "Ratio:" ), myRatioLabel = new SqueezeLabel );
-    hig->addRow( tr( "Swarm Rate:" ), mySwarmSpeedLabel = new SqueezeLabel );
+    hig->addRow( tr( "State:" ), myStateLabel = new SqueezeLabel );
+    hig->addRow( tr( "Running time:" ), myRunTimeLabel = new SqueezeLabel );
+    hig->addRow( tr( "Last activity:" ), myLastActivityLabel = new SqueezeLabel );
     hig->addRow( tr( "Error:" ), myErrorLabel = new SqueezeLabel );
     hig->addSectionDivider( );
 
-    hig->addSectionTitle( tr( "Dates" ) );
-    hig->addRow( tr( "Added on:" ), myAddedDateLabel = new SqueezeLabel );
-    hig->addRow( tr( "Last activity on:" ), myActivityLabel = new SqueezeLabel );
+    hig->addSectionDivider( );
+    hig->addSectionTitle( tr( "Details" ) );
+    hig->addRow( tr( "Location:" ), myLocationLabel = new SqueezeLabel );
+    hig->addRow( tr( "Hash:" ), myHashLabel = new SqueezeLabel );
+    hig->addRow( tr( "Privacy:" ), myPrivacyLabel = new SqueezeLabel );
+    hig->addRow( tr( "Origin:" ), myOriginLabel = new SqueezeLabel );
+    hig->addRow( tr( "Comment:" ), myCommentBrowser = new QTextBrowser );
+    const int h = QFontMetrics(myCommentBrowser->font()).lineSpacing() * 4;
+    myCommentBrowser->setMinimumHeight( h );
+    myCommentBrowser->setMaximumHeight( h );
+
     hig->finish( );
 
     return hig;
@@ -918,7 +938,7 @@ Details :: createOptionsTab( )
     m->addItem( tr( "Normal" ), TR_PRI_NORMAL );
     m->addItem( tr( "High" ),   TR_PRI_HIGH );
     connect( m, SIGNAL(currentIndexChanged(int)), this, SLOT(onBandwidthPriorityChanged(int)));
-    hig->addRow( tr( "&Bandwidth priority:" ), m );
+    hig->addRow( tr( "Torrent &priority:" ), m );
     myBandwidthPriorityCombo = m;
     
 
@@ -939,7 +959,7 @@ Details :: createOptionsTab( )
 
     h = new QHBoxLayout( );
     h->setSpacing( HIG :: PAD );
-    r = new QRadioButton( tr( "&Stop seeding when a torrent's ratio reaches" ) );
+    r = new QRadioButton( tr( "&Seed torrent until its ratio reaches:" ) );
     r->setProperty( RATIO_KEY, TR_RATIOLIMIT_SINGLE );
     connect( r, SIGNAL(clicked(bool)), this, SLOT(onSeedUntilChanged(bool)));
     mySeedCustomRadio = r;
@@ -962,38 +982,6 @@ Details :: createOptionsTab( )
 
     hig->finish( );
 
-    return hig;
-}
-
-/***
-****
-***/
-
-QWidget *
-Details :: createInfoTab( )
-{
-    HIG * hig = new HIG( );
-    hig->addSectionTitle( tr( "Details" ) );
-    hig->addRow( tr( "Pieces:" ), myPiecesLabel = new SqueezeLabel );
-    hig->addRow( tr( "Hash:" ), myHashLabel = new SqueezeLabel );
-    hig->addRow( tr( "Privacy:" ), myPrivacyLabel = new SqueezeLabel );
-    hig->addRow( tr( "Comment:" ), myCommentBrowser = new QTextBrowser );
-    hig->addSectionDivider( );
-    hig->addSectionTitle( tr( "Origins" ) );
-    hig->addRow( tr( "Creator:" ), myCreatorLabel = new SqueezeLabel );
-    hig->addRow( tr( "Date:" ), myDateCreatedLabel = new SqueezeLabel );
-    hig->addSectionDivider( );
-    hig->addSectionTitle( tr( "Origins" ) );
-    hig->addRow( tr( "Destination folder:" ), myDestinationLabel = new SqueezeLabel );
-    hig->addRow( tr( "Torrent file:" ), myTorrentFileLabel = new SqueezeLabel );
-    const int h = QFontMetrics(myCommentBrowser->font()).lineSpacing() * 4;
-    myTorrentFileLabel->setMinimumWidth( 300 );
-    myTorrentFileLabel->setSizePolicy ( QSizePolicy::Expanding, QSizePolicy::Preferred );
-
-    myCommentBrowser->setMinimumHeight( h );
-    myCommentBrowser->setMaximumHeight( h );
-
-    hig->finish( );
     return hig;
 }
 

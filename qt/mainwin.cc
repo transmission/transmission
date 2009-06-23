@@ -1006,8 +1006,8 @@ TrMainWindow :: refreshPref( int key )
             b = myPrefs.getBool( key );
             myAltSpeedButton->setChecked( b );
             myAltSpeedButton->setIcon( b ? mySpeedModeOnIcon : mySpeedModeOffIcon );
-            myAltSpeedButton->setToolTip( b ? tr( "Click to disable Speed Limit Mode" )
-                                            : tr( "Click to enable Speed Limit Mode" ) );
+            myAltSpeedButton->setToolTip( b ? tr( "Click to disable Temporary Speed Limits" )
+                                            : tr( "Click to enable Temporary Speed Limits" ) );
             break;
 
         default:

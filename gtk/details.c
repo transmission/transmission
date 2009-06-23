@@ -62,25 +62,20 @@ struct DetailsImpl
     guint seedCustomSpinTag;
     guint maxPeersSpinTag;
 
+    GtkWidget * size_lb;
     GtkWidget * state_lb;
-    GtkWidget * progress_lb;
     GtkWidget * have_lb;
     GtkWidget * dl_lb;
     GtkWidget * ul_lb;
-    GtkWidget * failed_lb;
     GtkWidget * ratio_lb;
     GtkWidget * error_lb;
-    GtkWidget * swarm_lb;
-    GtkWidget * date_added_lb;
+    GtkWidget * date_started_lb;
     GtkWidget * last_activity_lb;
 
-    GtkWidget * pieces_lb;
     GtkWidget * hash_lb;
     GtkWidget * privacy_lb;
-    GtkWidget * creator_lb;
-    GtkWidget * date_created_lb;
+    GtkWidget * origin_lb;
     GtkWidget * destination_lb;
-    GtkWidget * torrentfile_lb;
     GtkTextBuffer * comment_buffer;
 
     GHashTable * peer_hash;
@@ -106,7 +101,6 @@ struct DetailsImpl
     GSList * ids;
     TrCore * core;
     guint periodic_refresh_tag;
-    guint prefs_changed_tag;
 };
 
 static tr_torrent**
@@ -448,33 +442,6 @@ max_peers_spun_cb( GtkSpinButton * s, struct DetailsImpl * di )
     torrent_set_int( di, "peer-limit", gtk_spin_button_get_value( s ) );
 }
 
-static char*
-get_global_ratio_radiobutton_string( void )
-{
-    char * s;
-    const gboolean b = pref_flag_get( TR_PREFS_KEY_RATIO_ENABLED );
-    const double d = pref_double_get( TR_PREFS_KEY_RATIO );
-
-    if( b )
-        s = g_strdup_printf( _( "Use _Global setting  (currently: stop seeding when a torrent's ratio reaches %.2f)" ), d );
-    else
-        s = g_strdup( _( "Use _Global setting  (currently: seed regardless of ratio)" ) );
-
-    return s;
-}
-
-static void
-prefsChanged( TrCore * core UNUSED, const char *  key, gpointer rb )
-{
-    if( !strcmp( key, TR_PREFS_KEY_RATIO_ENABLED ) ||
-        !strcmp( key, TR_PREFS_KEY_RATIO ) )
-    {
-        char * s = get_global_ratio_radiobutton_string( );
-        gtk_button_set_label( GTK_BUTTON( rb ), s );
-        g_free( s );
-    }
-}
-
 static void
 onPriorityChanged( GtkComboBox * w, struct DetailsImpl * di )
 {
@@ -569,20 +536,17 @@ options_page_new( struct DetailsImpl * d )
     d->upLimitSpin = w;
 
     w = new_priority_combo( d );
-    hig_workarea_add_row( t, &row, _( "_Bandwidth priority:" ), w, NULL );
+    hig_workarea_add_row( t, &row, _( "Torrent _priority:" ), w, NULL );
     d->bandwidthCombo = w;
 
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title( t, &row, _( "Seed-Until Ratio" ) );
 
     group = NULL;
-    s = get_global_ratio_radiobutton_string( );
+    s = _( "Use _global setting" );
     w = gtk_radio_button_new_with_mnemonic( group, s );
-    tag = g_signal_connect( d->core, "prefs-changed", G_CALLBACK( prefsChanged ), w );
-    d->prefs_changed_tag = tag;
     group = gtk_radio_button_get_group( GTK_RADIO_BUTTON( w ) );
     hig_workarea_add_wide_control( t, &row, w );
-    g_free( s );
     g_object_set_data( G_OBJECT( w ), RATIO_KEY, GINT_TO_POINTER( TR_RATIOLIMIT_GLOBAL ) );
     tag = g_signal_connect( w, "toggled", G_CALLBACK( ratio_mode_changed_cb ), d );
     d->seedGlobalRadio = w;
@@ -597,7 +561,8 @@ options_page_new( struct DetailsImpl * d )
     d->seedForeverRadioTag = tag;
 
     h = gtk_hbox_new( FALSE, GUI_PAD );
-    w = gtk_radio_button_new_with_mnemonic( group, _( "_Stop seeding when a torrent's ratio reaches" ) );
+    s = _( "_Seed torrent until its ratio reaches:" );
+    w = gtk_radio_button_new_with_mnemonic( group, s );
     d->seedCustomRadio = w;
     g_object_set_data( G_OBJECT( w ), RATIO_KEY, GINT_TO_POINTER( TR_RATIOLIMIT_SINGLE ) );
     tag = g_signal_connect( w, "toggled", G_CALLBACK( ratio_mode_changed_cb ), d );
@@ -627,7 +592,7 @@ options_page_new( struct DetailsImpl * d )
 
 /****
 *****
-*****  ACTIVITY TAB
+*****  INFO TAB
 *****
 ****/
 
@@ -646,7 +611,7 @@ static const char * activityString( int activity )
 }
 
 static void
-refreshActivity( struct DetailsImpl * di, tr_torrent ** torrents, int n )
+refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
 {
     int i;
     const char * str;
@@ -654,287 +619,11 @@ refreshActivity( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     const char * mixed = _( "Mixed" );
     char buf[512];
     const tr_stat ** stats = g_new( const tr_stat*, n );
-    for( i=0; i<n; ++i )
-        stats[i] = tr_torrentStatCached( torrents[i] );
-
-    /* state_lb */
-    if( n <= 0 )
-        str = none;
-    else {
-        const int baseline = stats[0]->activity;
-        for( i=1; i<n; ++i )
-            if( baseline != (int)stats[i]->activity )
-                break;
-        if( i==n )
-            str = activityString( baseline );
-        else
-            str = mixed;
-    }
-    gtk_label_set_text( GTK_LABEL( di->state_lb ), str );
-
-
-    /* progress_lb */
-    if( n <= 0 )
-        str = none;
-    else {
-        double sizeWhenDone = 0;
-        double leftUntilDone = 0;
-        for( i=0; i<n; ++i ) {
-            sizeWhenDone += stats[i]->sizeWhenDone;
-            leftUntilDone += stats[i]->leftUntilDone;
-        }
-        g_snprintf( buf, sizeof( buf ), _( "%.1f%%" ), 100.0*((sizeWhenDone-leftUntilDone)/sizeWhenDone) );
-        str = buf;
-    }
-    gtk_label_set_text( GTK_LABEL( di->progress_lb ), str );
-
-
-    /* have_lb */
-    if( n <= 0 )
-        str = none;
-    else {
-        char buf1[128];
-        char buf2[128];
-        double haveUnchecked = 0;
-        double haveValid = 0;
-        double verifiedPieces = 0;
-        for( i=0; i<n; ++i ) {
-            const double v = stats[i]->haveValid;
-            haveUnchecked += stats[i]->haveUnchecked;
-            haveValid += v;
-            verifiedPieces += v / tr_torrentInfo(torrents[i])->pieceSize;
-        }
-        tr_strlsize( buf1, haveValid + haveUnchecked, sizeof( buf1 ) );
-        tr_strlsize( buf2, haveValid, sizeof( buf2 ) );
-        i = (int) ceil( verifiedPieces );
-        g_snprintf( buf, sizeof( buf ), ngettext( "%1$s (%2$s verified in %3$d piece)",
-                                                  "%1$s (%2$s verified in %3$d pieces)",
-                                                  verifiedPieces ),
-                                        buf1, buf2, i );
-        str = buf;
-    }
-    gtk_label_set_text( GTK_LABEL( di->have_lb ), str );
-
-    
-    /* dl_lb */
-    if( n <= 0 )
-        str = none;
-    else {
-        uint64_t sum = 0;
-        for( i=0; i<n; ++i ) sum += stats[i]->downloadedEver;
-        str = tr_strlsize( buf, sum, sizeof( buf ) );
-    }
-    gtk_label_set_text( GTK_LABEL( di->dl_lb ), str );
-
-    
-    /* ul_lb */
-    if( n <= 0 )
-        str = none;
-    else {
-        uint64_t sum = 0;
-        for( i=0; i<n; ++i ) sum += stats[i]->uploadedEver;
-        str = tr_strlsize( buf, sum, sizeof( buf ) );
-    }
-    gtk_label_set_text( GTK_LABEL( di->ul_lb ), str );
-
-
-    /* corrupt ever */
-    if( n <= 0 )
-        str = none;
-    else {
-        uint64_t sum = 0;
-        for( i=0; i<n; ++i ) sum += stats[i]->corruptEver;
-        str = tr_strlsize( buf, sum, sizeof( buf ) );
-    }
-    gtk_label_set_text( GTK_LABEL( di->failed_lb ), str );
-
-
-    /* ratio */
-    if( n <= 0 )
-        str = none;
-    else {
-        uint64_t up = 0;
-        uint64_t down = 0;
-        for( i=0; i<n; ++i ) {
-            up += stats[i]->uploadedEver;
-            down += stats[i]->downloadedEver;
-        }
-        str = tr_strlratio( buf, tr_getRatio( up, down ), sizeof( buf ) );
-    }
-    gtk_label_set_text( GTK_LABEL( di->ratio_lb ), str );
-
-
-    /* swarmspeed */
-    if( n <= 0 )
-        str = none;
-    else {
-        double swarmSpeed = 0;
-        for( i=0; i<n; ++i )
-            swarmSpeed += stats[i]->swarmSpeed;
-        str = tr_strlspeed( buf, swarmSpeed, sizeof( buf ) );
-    }
-    gtk_label_set_text( GTK_LABEL( di->swarm_lb ), str );
-
-
-    /* error */
-    if( n <= 0 )
-        str = none;
-    else {
-        const char * baseline = stats[0]->errorString;
-        for( i=1; i<n; ++i )
-            if( strcmp( baseline, stats[i]->errorString ) )
-                break;
-        if( i==n )
-            str = baseline;
-        else
-            str = mixed;
-    }
-    if( !str || !*str )
-        str = none;
-    gtk_label_set_text( GTK_LABEL( di->error_lb ), str );
-
-
-    /* date added */
-    if( n <= 0 )
-        str = none;
-    else {
-        const time_t baseline = stats[0]->addedDate;
-        for( i=1; i<n; ++i )
-            if( baseline != stats[i]->addedDate )
-                break;
-        if( i==n )
-            str = gtr_localtime2( buf, baseline, sizeof( buf ) );
-        else
-            str = mixed;
-    }
-    gtk_label_set_text( GTK_LABEL( di->date_added_lb ), str );
-
-
-    /* activity date */
-    if( n <= 0 )
-        str = none;
-    else {
-        const time_t baseline = stats[0]->activityDate;
-        for( i=1; i<n; ++i )
-            if( baseline != stats[i]->activityDate )
-                break;
-        if( i==n )
-            str = gtr_localtime2( buf, baseline, sizeof( buf ) );
-        else
-            str = mixed;
-    }
-    gtk_label_set_text( GTK_LABEL( di->last_activity_lb ), str );
-
-    g_free( stats );
-}
-
-static GtkWidget*
-activity_page_new( struct DetailsImpl * di )
-{
-    int  row = 0;
-    GtkWidget * l;
-    GtkWidget * t = hig_workarea_create( );
-
-    hig_workarea_add_section_title( t, &row, _( "Transfer" ) );
-
-    l = di->state_lb = gtk_label_new( NULL );
-    hig_workarea_add_row( t, &row, _( "State:" ), l, NULL );
-
-    l = di->progress_lb = gtk_label_new( NULL );
-    hig_workarea_add_row( t, &row, _( "Progress:" ), l, NULL );
-
-    l = di->have_lb = gtk_label_new( NULL );
-    /* "Have" refers to how much of the torrent we have */
-    hig_workarea_add_row( t, &row, _( "Have:" ), l, NULL );
-
-    l = di->dl_lb = gtk_label_new( NULL );
-    hig_workarea_add_row( t, &row, _( "Downloaded:" ), l, NULL );
-
-    l = di->ul_lb = gtk_label_new( NULL );
-    hig_workarea_add_row( t, &row, _( "Uploaded:" ), l, NULL );
-
-    /* how much downloaded data was corrupt */
-    l = di->failed_lb = gtk_label_new( NULL );
-    hig_workarea_add_row( t, &row, _( "Failed DL:" ), l, NULL );
-
-    l = di->ratio_lb = gtk_label_new( NULL );
-    hig_workarea_add_row( t, &row, _( "Ratio:" ), l, NULL );
-
-    l = di->swarm_lb = gtk_label_new( NULL );
-    hig_workarea_add_row( t, &row, _( "Swarm speed:" ), l, NULL );
-
-    l = di->error_lb = gtk_label_new( NULL );
-    hig_workarea_add_row( t, &row, _( "Error:" ), l, NULL );
-
-    hig_workarea_add_section_divider( t, &row );
-    hig_workarea_add_section_title( t, &row, _( "Dates" ) );
-
-    l = di->date_added_lb = gtk_label_new( NULL );
-    hig_workarea_add_row( t, &row, _( "Started at:" ), l, NULL );
-
-    l = di->last_activity_lb = gtk_label_new( NULL );
-    hig_workarea_add_row( t, &row, _( "Last activity at:" ), l, NULL );
-
-    hig_workarea_add_section_divider( t, &row );
-    hig_workarea_finish( t, &row );
-    return t;
-}
-
-/****
-*****
-*****  INFO TAB
-*****
-****/
-
-static void
-refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
-{
-    int i;
-    char buf[128];
-    const char * str;
-    const char * none = _( "None" );
-    const char * mixed = _( "Mixed" );
-    const char * unknown = _( "Unknown" );
     const tr_info ** infos = g_new( const tr_info*, n );
-
-    /* info */
-    for( i=0; i<n; ++i )
+    for( i=0; i<n; ++i ) {
+        stats[i] = tr_torrentStatCached( torrents[i] );
         infos[i] = tr_torrentInfo( torrents[i] );
-
-    /* pieces_lb */
-    if( n <= 0 )
-        str = none;
-    else {
-        int sum = 0;
-        const int baseline = infos[0]->pieceSize;
-        for( i=0; i<n; ++i )
-            sum += infos[i]->pieceCount;
-        g_snprintf( buf, sizeof( buf ),
-                    ngettext( "%'d Piece", "%'d Pieces", sum ), sum );
-        for( i=1; i<n; ++i )
-            if( baseline != (int)infos[i]->pieceSize )
-                break;
-        if( i==n ) {
-            char tmp1[64];
-            char tmp2[64];
-            g_strlcpy( tmp1, buf, sizeof( tmp1 ) );
-            tr_strlsize( tmp2, baseline, sizeof( tmp2 ) );
-            g_snprintf( buf, sizeof( buf ), _( "%1$s @ %2$s" ), tmp1, tmp2 );
-        }
-        str = buf;
     }
-    gtk_label_set_text( GTK_LABEL( di->pieces_lb ), str );
-   
-
-    /* hash_lb */
-    if( n<=0 )
-        str = none;
-    else if ( n==1 )
-        str = infos[0]->hashString; 
-    else
-        str = mixed;
-    gtk_label_set_text( GTK_LABEL( di->hash_lb ), str );
-
 
     /* privacy_lb */
     if( n<=0 )
@@ -954,6 +643,33 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     gtk_label_set_text( GTK_LABEL( di->privacy_lb ), str );
 
 
+    /* origin_lb */
+    if( n<=0 )
+        str = none;
+    else {
+        char datestr[64];
+        const char * creator = infos[0]->creator ? infos[0]->creator : "";
+        const time_t date = infos[0]->dateCreated;
+        gboolean mixed_creator = FALSE;
+        gboolean mixed_date = FALSE;
+        gtr_localtime2( datestr, date, sizeof( datestr ) );
+        for( i=1; i<n; ++i ) {
+            mixed_creator |= strcmp( creator, infos[i]->creator ? infos[i]->creator : "" );
+            mixed_date |= ( date != infos[i]->dateCreated );
+        }
+        if( mixed_date && mixed_creator )
+            str = mixed;
+        else if( mixed_date )
+            g_snprintf( buf, sizeof( buf ), _( "Created by %1$s" ), creator );
+        else if( mixed_creator || !*creator )
+            g_snprintf( buf, sizeof( buf ), _( "Created on %1$s" ), datestr );
+        else
+            g_snprintf( buf, sizeof( buf ), _( "Created by %1$s on %2$s" ), creator, datestr );
+        str = buf;
+    }
+    gtk_label_set_text( GTK_LABEL( di->origin_lb ), str );
+
+
     /* comment_buffer */
     if( n<=0 )
         str = "";
@@ -968,41 +684,6 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
             str = mixed;
     }
     gtk_text_buffer_set_text( di->comment_buffer, str, -1 );
-
-
-    /* creator_lb */
-    if( n<=0 )
-        str = none;
-    else {
-        const char * baseline = infos[0]->creator ? infos[0]->creator : "";
-        for( i=1; i<n; ++i )
-            if( strcmp( baseline, infos[i]->creator ? infos[i]->creator : "" ) )
-                break;
-        if( i==n )
-            str = baseline;
-        else
-            str = mixed;
-    }
-    if( !str || !*str )
-        str = unknown;
-    gtk_label_set_text( GTK_LABEL( di->creator_lb ), str );
-
-
-    /* date_created_lb */
-    if( n<=0 )
-        str = none;
-    else {
-        const time_t baseline = infos[0]->dateCreated;
-        for( i=1; i<n; ++i )
-            if( baseline != infos[i]->dateCreated )
-                break;
-        if( i==n )
-            str = gtr_localtime2( buf, baseline, sizeof( buf ) );
-        else
-            str = mixed;
-    }
-    gtk_label_set_text( GTK_LABEL( di->date_created_lb ), str );
-    
 
     /* destination_lb */        
     if( n<=0 )
@@ -1019,16 +700,211 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     }
     gtk_label_set_text( GTK_LABEL( di->destination_lb ), str );
 
+    /* state_lb */
+    if( n <= 0 )
+        str = none;
+    else {
+        const int baseline = stats[0]->activity;
+        for( i=1; i<n; ++i )
+            if( baseline != (int)stats[i]->activity )
+                break;
+        if( i==n )
+            str = activityString( baseline );
+        else
+            str = mixed;
+    }
+    gtk_label_set_text( GTK_LABEL( di->state_lb ), str );
 
-    /* torrentfile_lb */
+
+    /* date started */
+    if( n <= 0 )
+        str = none;
+    else {
+        const time_t baseline = stats[0]->startDate;
+        for( i=1; i<n; ++i )
+            if( baseline != stats[i]->startDate )
+                break;
+        if( i!=n )
+            str = mixed;
+        else if( ( baseline<=0 ) || ( stats[0]->activity == TR_STATUS_STOPPED ) )
+            str = activityString( TR_STATUS_STOPPED );
+        else
+            str = tr_strltime( buf, time(NULL)-baseline, sizeof( buf ) );
+    }
+    gtk_label_set_text( GTK_LABEL( di->date_started_lb ), str );
+
+
+    /* size_lb */
+    {
+        char sizebuf[128];
+        uint64_t size = 0;
+        int pieces = 0;
+        int32_t pieceSize = 0;
+        for( i=0; i<n; ++i ) {
+            size += infos[i]->totalSize;
+            pieces += infos[i]->pieceCount;
+            if( !pieceSize )
+                pieceSize = infos[i]->pieceSize;
+            else if( pieceSize != (int)infos[i]->pieceSize )
+                pieceSize = -1;
+        }
+        tr_strlsize( sizebuf, size, sizeof( sizebuf ) );
+        if( !size )
+            str = none;
+        else if( pieceSize >= 0 ) {
+            char piecebuf[128];
+            tr_strlsize( piecebuf, (uint64_t)pieceSize, sizeof( piecebuf ) );
+            g_snprintf( buf, sizeof( buf ),
+                        ngettext( "%1$s (%2$'d piece @ %3$s)",
+                                  "%1$s (%2$'d pieces @ %3$s)", pieces ),
+                        sizebuf, pieces, piecebuf );
+            str = buf;
+        } else {
+            g_snprintf( buf, sizeof( buf ),
+                        ngettext( "%1$s (%2$'d piece)",
+                                  "%1$s (%2$'d pieces)", pieces ),
+                        sizebuf, pieces );
+            str = buf;
+        }
+        gtk_label_set_text( GTK_LABEL( di->size_lb ), str );
+    }
+
+
+    /* have_lb */
+    if( n <= 0 )
+        str = none;
+    else {
+        double sizeWhenDone = 0;
+        double leftUntilDone = 0;
+        double haveUnchecked = 0;
+        double haveValid = 0;
+        double verifiedPieces = 0;
+        for( i=0; i<n; ++i ) {
+            const double v = stats[i]->haveValid;
+            haveUnchecked += stats[i]->haveUnchecked;
+            haveValid += v;
+            verifiedPieces += v / tr_torrentInfo(torrents[i])->pieceSize;
+            sizeWhenDone += stats[i]->sizeWhenDone;
+            leftUntilDone += stats[i]->leftUntilDone;
+        }
+        if( !haveValid && !haveUnchecked )
+            str = none;
+        else {
+            char pct[16], ver[64];
+            double n = 100.0 * ( sizeWhenDone - leftUntilDone );
+            g_snprintf( pct, sizeof( pct ), _( "%.1f%%" ), n/sizeWhenDone );
+            tr_strlsize( ver, haveValid, sizeof( ver ) );
+            if( !haveUnchecked )
+                g_snprintf( buf, sizeof(buf), _( "%1$s (%2$s verified)" ), pct, ver );
+            else {
+                char u[64];
+                tr_strlsize( u, haveUnchecked, sizeof( u ) );
+                g_snprintf( buf, sizeof(buf), _( "%1$s (%2$s verified, %3$s unverified)" ), pct, ver, u );
+            }
+            str = buf;
+        }
+    }
+    gtk_label_set_text( GTK_LABEL( di->have_lb ), str );
+
+    
+    /* dl_lb */
+    if( n <= 0 )
+        str = none;
+    else {
+        char dbuf[64], fbuf[64];
+        uint64_t d=0, f=0;
+        for( i=0; i<n; ++i ) {
+            d += stats[i]->downloadedEver;
+            f += stats[i]->corruptEver;
+        }
+        tr_strlsize( dbuf, d, sizeof( dbuf ) );
+        tr_strlsize( fbuf, f, sizeof( fbuf ) );
+        if( f )
+            g_snprintf( buf, sizeof( buf ), _( "%1$s (+%2$s corrupt)" ), dbuf, fbuf );
+        else
+            tr_strlcpy( buf, dbuf, sizeof( buf ) );
+        str = buf;
+    }
+    gtk_label_set_text( GTK_LABEL( di->dl_lb ), str );
+
+    
+    /* ul_lb */
+    if( n <= 0 )
+        str = none;
+    else {
+        uint64_t sum = 0;
+        for( i=0; i<n; ++i ) sum += stats[i]->uploadedEver;
+        str = tr_strlsize( buf, sum, sizeof( buf ) );
+    }
+    gtk_label_set_text( GTK_LABEL( di->ul_lb ), str );
+
+
+    /* ratio */
+    if( n <= 0 )
+        str = none;
+    else {
+        uint64_t up = 0;
+        uint64_t down = 0;
+        for( i=0; i<n; ++i ) {
+            up += stats[i]->uploadedEver;
+            down += stats[i]->downloadedEver;
+        }
+        str = tr_strlratio( buf, tr_getRatio( up, down ), sizeof( buf ) );
+    }
+    gtk_label_set_text( GTK_LABEL( di->ratio_lb ), str );
+
+    /* hash_lb */
     if( n<=0 )
         str = none;
-    else if( n==1 )
-        str = infos[0]->torrent;
+    else if ( n==1 )
+        str = infos[0]->hashString; 
     else
         str = mixed;
-    gtk_label_set_text( GTK_LABEL( di->torrentfile_lb ), str );
+    gtk_label_set_text( GTK_LABEL( di->hash_lb ), str );
 
+    /* error */
+    if( n <= 0 )
+        str = none;
+    else {
+        const char * baseline = stats[0]->errorString;
+        for( i=1; i<n; ++i )
+            if( strcmp( baseline, stats[i]->errorString ) )
+                break;
+        if( i==n )
+            str = baseline;
+        else
+            str = mixed;
+    }
+    if( !str || !*str )
+        str = none;
+    gtk_label_set_text( GTK_LABEL( di->error_lb ), str );
+
+
+    /* activity date */
+    if( n <= 0 )
+        str = none;
+    else {
+        time_t latest = 0;
+        for( i=0; i<n; ++i )
+            if( latest < stats[i]->activityDate )
+                latest = stats[i]->activityDate;
+        if( latest <= 0 )
+            str = none;
+        else {
+            const int period = time( NULL ) - latest;
+            if( period < 5 )
+                tr_strlcpy( buf, _( "Active now" ), sizeof( buf ) );
+            else {
+                char tbuf[128];
+                tr_strltime( tbuf, period, sizeof( tbuf ) );
+                g_snprintf( buf, sizeof( buf ), _( "%1$s ago" ), tbuf );
+            }
+            str = buf;
+        }
+    }
+    gtk_label_set_text( GTK_LABEL( di->last_activity_lb ), str );
+
+    g_free( stats );
     g_free( infos );
 }
 
@@ -1040,11 +916,54 @@ info_page_new( struct DetailsImpl * di )
     GtkWidget *l, *w, *fr, *sw;
     GtkWidget *t = hig_workarea_create( );
 
+    hig_workarea_add_section_title( t, &row, _( "Activity" ) );
+
+        /* size */
+        l = di->size_lb = gtk_label_new( NULL );
+        hig_workarea_add_row( t, &row, _( "Torrent size:" ), l, NULL );
+
+        /* have */
+        l = di->have_lb = gtk_label_new( NULL );
+        hig_workarea_add_row( t, &row, _( "Have:" ), l, NULL );
+
+        /* downloaded */
+        l = di->dl_lb = gtk_label_new( NULL );
+        hig_workarea_add_row( t, &row, _( "Downloaded:" ), l, NULL );
+
+        /* uploaded */
+        l = di->ul_lb = gtk_label_new( NULL );
+        hig_workarea_add_row( t, &row, _( "Uploaded:" ), l, NULL );
+
+        /* ratio */
+        l = di->ratio_lb = gtk_label_new( NULL );
+        hig_workarea_add_row( t, &row, _( "Ratio:" ), l, NULL );
+
+        /* state */
+        l = di->state_lb = gtk_label_new( NULL );
+        hig_workarea_add_row( t, &row, _( "State:" ), l, NULL );
+
+        /* running for */
+        l = di->date_started_lb = gtk_label_new( NULL );
+        hig_workarea_add_row( t, &row, _( "Running time:" ), l, NULL );
+
+        /* last activity */
+        l = di->last_activity_lb = gtk_label_new( NULL );
+        hig_workarea_add_row( t, &row, _( "Last activity:" ), l, NULL );
+
+        /* error */
+        l = di->error_lb = gtk_label_new( NULL );
+        hig_workarea_add_row( t, &row, _( "Error:" ), l, NULL );
+
+
+    hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title( t, &row, _( "Details" ) );
 
-        /* pieces */
-        l = di->pieces_lb = gtk_label_new( NULL );
-        hig_workarea_add_row( t, &row, _( "Pieces:" ), l, NULL );
+        /* destination */
+        l = g_object_new( GTK_TYPE_LABEL, "selectable", TRUE,
+                                          "ellipsize", PANGO_ELLIPSIZE_END,
+                                          NULL );
+        hig_workarea_add_row( t, &row, _( "Location:" ), l, NULL );
+        di->destination_lb = l;
 
         /* hash */
         l = g_object_new( GTK_TYPE_LABEL, "selectable", TRUE,
@@ -1058,10 +977,15 @@ info_page_new( struct DetailsImpl * di )
         hig_workarea_add_row( t, &row, _( "Privacy:" ), l, NULL );
         di->privacy_lb = l;
 
+        /* origins */
+        l = gtk_label_new( NULL );
+        hig_workarea_add_row( t, &row, _( "Origin:" ), l, NULL );
+        di->origin_lb = l;
+
         /* comment */
         b = di->comment_buffer = gtk_text_buffer_new( NULL );
         w = gtk_text_view_new_with_buffer( b );
-        gtk_widget_set_size_request( w, 0u, 100u );
+        gtk_widget_set_size_request( w, 350u, 50u );
         gtk_text_view_set_wrap_mode( GTK_TEXT_VIEW( w ), GTK_WRAP_WORD );
         gtk_text_view_set_editable( GTK_TEXT_VIEW( w ), FALSE );
         sw = gtk_scrolled_window_new( NULL, NULL );
@@ -1076,29 +1000,8 @@ info_page_new( struct DetailsImpl * di )
         gtk_misc_set_alignment( GTK_MISC( w ), 0.0f, 0.0f );
 
     hig_workarea_add_section_divider( t, &row );
-    hig_workarea_add_section_title( t, &row, _( "Origins" ) );
-
-        l = di->creator_lb = gtk_label_new( NULL );
-        gtk_label_set_ellipsize( GTK_LABEL( l ), PANGO_ELLIPSIZE_END );
-        hig_workarea_add_row( t, &row, _( "Creator:" ), l, NULL );
-
-        l = di->date_created_lb = gtk_label_new( NULL );
-        hig_workarea_add_row( t, &row, _( "Date:" ), l, NULL );
-
-    hig_workarea_add_section_divider( t, &row );
-    hig_workarea_add_section_title( t, &row, _( "Location" ) );
-
-        l = g_object_new( GTK_TYPE_LABEL, "selectable", TRUE,
-                                          "ellipsize", PANGO_ELLIPSIZE_END,
-                                          NULL );
-        hig_workarea_add_row( t, &row, _( "Destination:" ), l, NULL );
-        di->destination_lb = l;
-
-        l = g_object_new( GTK_TYPE_LABEL, "selectable", TRUE,
-                                          "ellipsize", PANGO_ELLIPSIZE_END,
-                                          NULL );
-        hig_workarea_add_row( t, &row, _( "Torrent file:" ), l, NULL );
-        di->torrentfile_lb = l;
+    hig_workarea_finish( t, &row );
+    return t;
 
     hig_workarea_finish( t, &row );
     return t;
@@ -1961,7 +1864,6 @@ refresh( struct DetailsImpl * di )
     refreshPeers( di, torrents, n );
     refreshTracker( di, torrents, n );
     refreshOptions( di, torrents, n );
-    refreshActivity( di, torrents, n );
 
     g_free( torrents );
 }
@@ -1977,7 +1879,6 @@ static void
 details_free( gpointer gdata )
 {
     struct DetailsImpl * data = gdata;
-    g_signal_handler_disconnect( data->core, data->prefs_changed_tag );
     g_source_remove( data->periodic_refresh_tag );
     g_hash_table_destroy( data->webseed_hash );
     g_slist_free( data->ids );
@@ -2012,8 +1913,8 @@ torrent_inspector_new( GtkWindow * parent, TrCore * core )
     n = gtk_notebook_new( );
     gtk_container_set_border_width( GTK_CONTAINER( n ), GUI_PAD );
 
-    w = activity_page_new( di );
-    l = gtk_label_new( _( "Activity" ) );
+    w = info_page_new( di );
+    l = gtk_label_new( _( "Information" ) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ), w, l );
 
     w = peer_page_new( di );
@@ -2022,10 +1923,6 @@ torrent_inspector_new( GtkWindow * parent, TrCore * core )
 
     w = tracker_page_new( di );
     l = gtk_label_new( _( "Tracker" ) );
-    gtk_notebook_append_page( GTK_NOTEBOOK( n ), w, l );
-
-    w = info_page_new( di );
-    l = gtk_label_new( _( "Information" ) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ), w, l );
 
     w = file_list_new( core, 0 );

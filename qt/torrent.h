@@ -215,11 +215,13 @@ class Torrent: public QObject
         QString torrentFile( ) const { return getString( TORRENT_FILE ); }
         bool hasError( ) const { return !getError( ).isEmpty( ); }
         bool isDone( ) const { return getSize( LEFT_UNTIL_DONE ) == 0; }
-        bool isSeed( ) const { return haveVerified() >= getSize( TOTAL_SIZE ); }
+        bool isSeed( ) const { return haveVerified() >= totalSize(); }
         bool isPrivate( ) const { return getBool( IS_PRIVATE ); }
         bool getSeedRatio( double& setme ) const;
         uint64_t haveVerified( ) const { return getSize( HAVE_VERIFIED ); }
-        uint64_t haveTotal( ) const { return haveVerified( ) + getSize( HAVE_UNCHECKED ); }
+        uint64_t haveUnverified( ) const { return getSize( HAVE_UNCHECKED ); }
+        uint64_t haveTotal( ) const { return haveVerified( ) + haveUnverified(); }
+        uint64_t totalSize( ) const { return getSize( TOTAL_SIZE ); }
         uint64_t sizeWhenDone( ) const { return getSize( SIZE_WHEN_DONE ); }
         uint64_t leftUntilDone( ) const { return getSize( LEFT_UNTIL_DONE ); }
         uint64_t pieceSize( ) const { return getSize( PIECE_SIZE ); }

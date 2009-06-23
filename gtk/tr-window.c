@@ -333,8 +333,8 @@ syncAltSpeedButton( PrivateData * p )
     gtk_button_set_image( GTK_BUTTON( w ), p->alt_speed_image[b?1:0] );
     gtk_button_set_alignment( GTK_BUTTON( w ), 0.5, 0.5 );
 
-    tip = b ? _( "Click to disable Speed Limit Mode" )
-            : _( "Click to enable Speed Limit Mode" );
+    tip = b ? _( "Click to disable Temporary Speed Limits" )
+            : _( "Click to enable Temporary Speed Limits" );
     gtr_widget_set_tooltip_text( w, tip );
 }
 
