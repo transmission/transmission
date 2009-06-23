@@ -796,7 +796,7 @@ Details :: createInfoTab( )
 {
     HIG * hig = new HIG( this );
 
-    hig->addSectionTitle( tr( "Transfer" ) );
+    hig->addSectionTitle( tr( "Activity" ) );
     hig->addRow( tr( "Torrent size:" ), mySizeLabel = new SqueezeLabel );
     hig->addRow( tr( "Have:" ), myHaveLabel = new SqueezeLabel );
     hig->addRow( tr( "Downloaded:" ), myDownloadedLabel = new SqueezeLabel );
@@ -913,7 +913,7 @@ Details :: createOptionsTab( )
     hig->addWideControl( c );
     connect( c, SIGNAL(clicked(bool)), this, SLOT(onHonorsSessionLimitsToggled(bool)) );
 
-    c = new QCheckBox( tr( "Limit &download speed (KB/s)" ) );
+    c = new QCheckBox( tr( "Limit &download speed (KB/s):" ) );
     mySingleDownCheck = c;
     s = new QSpinBox( );
     mySingleDownSpin = s;
@@ -923,7 +923,7 @@ Details :: createOptionsTab( )
     connect( c, SIGNAL(clicked(bool)), this, SLOT(onDownloadLimitedToggled(bool)) );
     connect( s, SIGNAL(valueChanged(int)), this, SLOT(onDownloadLimitChanged(int)));
 
-    c = new QCheckBox( tr( "Limit &upload speed (KB/s)" ) );
+    c = new QCheckBox( tr( "Limit &upload speed (KB/s):" ) );
     mySingleUpCheck = c;
     s = new QSpinBox( );
     mySingleUpSpin = s;
@@ -978,7 +978,7 @@ Details :: createOptionsTab( )
     s->setRange( 1, 300 );
     connect( s, SIGNAL(valueChanged(int)), this, SLOT(onMaxPeersChanged(int)));
     myPeerLimitSpin = s;
-    hig->addRow( tr( "&Maximum Peers" ), s );
+    hig->addRow( tr( "&Maximum peers:" ), s );
 
     hig->finish( );
 
