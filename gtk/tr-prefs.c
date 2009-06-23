@@ -303,7 +303,7 @@ torrentPage( GObject * core )
     hig_workarea_add_wide_control( t, &row, w );
 
     w = new_path_chooser_button( TR_PREFS_KEY_DOWNLOAD_DIR, core );
-    hig_workarea_add_row( t, &row, _( "_Destination folder:" ), w, NULL );
+    hig_workarea_add_row( t, &row, _( "Save to _Location:" ), w, NULL );
 
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title( t, &row, _( "Limits" ) );
@@ -526,7 +526,7 @@ peerPage( GObject * core )
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title ( t, &row, _( "Privacy" ) );
 
-    s = _( "_Encryption mode" );
+    s = _( "_Encryption mode:" );
     w = new_encryption_combo( core, "encryption" );
     hig_workarea_add_row( t, &row, s, w, NULL );
 
@@ -803,7 +803,7 @@ webPage( GObject * core )
     page->auth_widgets = g_slist_append( page->auth_widgets, w );
 
     /* require authentication */
-    s = _( "Only allow these IP _addresses to connect:" );
+    s = _( "Only allow these IP addresses to _connect:" );
     w = new_check_button( s, TR_PREFS_KEY_RPC_WHITELIST_ENABLED, core );
     hig_workarea_add_wide_control( t, &row, w );
     page->whitelist_tb = GTK_TOGGLE_BUTTON( w );
@@ -1172,10 +1172,11 @@ bandwidthPageFree( gpointer gpage )
 static GtkWidget*
 bandwidthPage( GObject * core )
 {
-    int                    row = 0;
-    const char *           s;
-    GtkWidget *            t;
-    GtkWidget *            w, * w2, * h;
+    int row = 0;
+    const char * s;
+    GtkWidget * t;
+    GtkWidget * l;
+    GtkWidget * w, * w2, * h;
     char buf[512];
     struct BandwidthPage * page = tr_new0( struct BandwidthPage, 1 );
 
@@ -1224,15 +1225,16 @@ bandwidthPage( GObject * core )
         w = new_spin_button( TR_PREFS_KEY_ALT_SPEED_UP, core, 0, INT_MAX, 5 );
         hig_workarea_add_row( t, &row, s, w, NULL );
 
-        s = _( "_Scheduled use:" ); 
+        s = _( "_Scheduled times:" ); 
         h = gtk_hbox_new( FALSE, 0 );
         w2 = new_time_combo( core, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN );
         page->sched_widgets = g_slist_append( page->sched_widgets, w2 );
         gtk_box_pack_start( GTK_BOX( h ), w2, TRUE, TRUE, 0 );
-        w2 = gtk_label_new ( _( " and " ) );
+        w2 = l = gtk_label_new_with_mnemonic ( _( " _and " ) );
         page->sched_widgets = g_slist_append( page->sched_widgets, w2 );
         gtk_box_pack_start( GTK_BOX( h ), w2, FALSE, FALSE, 0 );
         w2 = new_time_combo( core, TR_PREFS_KEY_ALT_SPEED_TIME_END );
+        gtk_label_set_mnemonic_widget( GTK_LABEL( l ), w2 );
         page->sched_widgets = g_slist_append( page->sched_widgets, w2 );
         gtk_box_pack_start( GTK_BOX( h ), w2, TRUE, TRUE, 0 );
         w = new_check_button( s, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED, core );

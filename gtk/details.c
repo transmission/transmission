@@ -543,7 +543,7 @@ options_page_new( struct DetailsImpl * d )
     hig_workarea_add_section_title( t, &row, _( "Seed-Until Ratio" ) );
 
     group = NULL;
-    s = _( "Use _global setting" );
+    s = _( "Use _global settings" );
     w = gtk_radio_button_new_with_mnemonic( group, s );
     group = gtk_radio_button_get_group( GTK_RADIO_BUTTON( w ) );
     hig_workarea_add_wide_control( t, &row, w );

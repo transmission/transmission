@@ -945,7 +945,7 @@ Details :: createOptionsTab( )
     hig->addSectionDivider( );
     hig->addSectionTitle( tr( "Seed-Until Ratio" ) );
 
-    r = new QRadioButton( tr( "Use &global setting" ) );
+    r = new QRadioButton( tr( "Use &global settings" ) );
     r->setProperty( RATIO_KEY, TR_RATIOLIMIT_GLOBAL );
     connect( r, SIGNAL(clicked(bool)), this, SLOT(onSeedUntilChanged(bool)));
     mySeedGlobalRadio = r;

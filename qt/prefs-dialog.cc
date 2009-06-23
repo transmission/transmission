@@ -238,9 +238,9 @@ PrefsDialog :: createWebTab( Session& session )
     myWebAuthWidgets << l << w;
     l = hig->addRow( tr( "Pass&word:" ), w = lineEditNew( Prefs::RPC_PASSWORD, QLineEdit::Password ) );
     myWebAuthWidgets << l << w;
-    hig->addWideControl( w = checkBoxNew( tr( "Only allow these IP &addresses to connect:" ), Prefs::RPC_WHITELIST_ENABLED ) );
+    hig->addWideControl( w = checkBoxNew( tr( "Only allow these IP addresses to &connect:" ), Prefs::RPC_WHITELIST_ENABLED ) );
     myWebWidgets << w;
-    l = hig->addRow( tr( "Addresses:" ), w = lineEditNew( Prefs::RPC_WHITELIST ) );
+    l = hig->addRow( tr( "A&ddresses:" ), w = lineEditNew( Prefs::RPC_WHITELIST ) );
     myWebWhitelistWidgets << l << w;
     myUnsupportedWhenRemote << myWebWidgets << myWebAuthWidgets << myWebWhitelistWidgets;
     hig->finish( );
@@ -300,16 +300,17 @@ PrefsDialog :: createBandwidthTab( )
         r = spinBoxNew( Prefs :: ALT_SPEED_LIMIT_UP, 0, INT_MAX, 5 );
         hig->addRow( s, r );
 
-        QCheckBox * c = checkBoxNew( tr( "&Scheduled use:" ), Prefs::ALT_SPEED_LIMIT_TIME_ENABLED );
+        QCheckBox * c = checkBoxNew( tr( "&Scheduled times:" ), Prefs::ALT_SPEED_LIMIT_TIME_ENABLED );
         h = new QHBoxLayout( );
         h->setSpacing( HIG::PAD );
         QWidget * w = timeEditNew( Prefs :: ALT_SPEED_LIMIT_TIME_BEGIN );
         h->addWidget( w, 1 );
         mySchedWidgets << w;
-        w = new QLabel( "and" );
-        h->addWidget( w );
-        mySchedWidgets << w;
+        QLabel * nd = new QLabel( "&and" );
+        h->addWidget( nd );
+        mySchedWidgets << nd;
         w = timeEditNew( Prefs :: ALT_SPEED_LIMIT_TIME_END );
+        nd->setBuddy( w );
         h->addWidget( w, 1 );
         mySchedWidgets << w;
         hig->addRow( c, h, 0 );
@@ -546,7 +547,7 @@ PrefsDialog :: createTorrentsTab( )
         b->setIcon( folderPixmap );
         b->setStyleSheet( "text-align: left; padding-left: 5; padding-right: 5" );
         connect( b, SIGNAL(clicked(bool)), this, SLOT(onDestinationClicked(void)) );
-        hig->addRow( tr( "&Destination folder:" ), b );
+        hig->addRow( tr( "Save to &Location:" ), b );
 
     hig->addSectionDivider( );
     hig->addSectionTitle( tr( "Limits" ) );
