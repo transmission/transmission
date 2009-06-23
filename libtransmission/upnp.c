@@ -194,7 +194,7 @@ tr_upnpPulse( tr_upnp * handle,
                  handle->lanaddr, port );
         if( handle->isMapped )
         {
-            tr_ninf( getKey( ), _( "Port forwarding successful!" ) );
+            tr_ninf( getKey( ), "%s", _( "Port forwarding successful!" ) );
             handle->port = port;
             handle->state = TR_UPNP_IDLE;
         }

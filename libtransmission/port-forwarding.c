@@ -163,7 +163,7 @@ stop_timer( tr_shared * s )
 static void
 stop_forwarding( tr_shared * s )
 {
-    tr_ninf( getKey( ), _( "Stopped" ) );
+    tr_ninf( getKey( ), "%s", _( "Stopped" ) );
     natPulse( s, FALSE );
     tr_natpmpClose( s->natpmp );
     s->natpmp = NULL;

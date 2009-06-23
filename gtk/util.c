@@ -393,7 +393,7 @@ addTorrentErrorDialog( GtkWidget *  child,
                                GTK_DIALOG_DESTROY_WITH_PARENT,
                                GTK_MESSAGE_ERROR,
                                GTK_BUTTONS_CLOSE,
-                               _( "Error opening torrent" ) );
+                               "%s", _( "Error opening torrent" ) );
     gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG( w ),
                                               "%s", secondary );
     g_signal_connect_swapped( w, "response",

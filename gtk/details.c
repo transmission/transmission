@@ -499,7 +499,7 @@ options_page_new( struct DetailsImpl * d )
 {
     guint tag;
     int row;
-    char *s;
+    const char *s;
     GSList *group;
     GtkWidget *t, *w, *tb, *h;
 

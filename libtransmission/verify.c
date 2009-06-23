@@ -209,7 +209,7 @@ verifyThreadFunc( void * unused UNUSED )
         tr_free( node );
         tr_lockUnlock( getVerifyLock( ) );
 
-        tr_torinf( tor, _( "Verifying torrent" ) );
+        tr_torinf( tor, "%s", _( "Verifying torrent" ) );
         tr_torrentSetVerifyState( tor, TR_VERIFY_NOW );
         changed = verifyTorrent( tor, &stopCurrent );
         tr_torrentSetVerifyState( tor, TR_VERIFY_NONE );
@@ -244,7 +244,7 @@ tr_verifyAdd( tr_torrent *      tor,
     {
         struct verify_node * node;
 
-        tr_torinf( tor, _( "Queued for verification" ) );
+        tr_torinf( tor, "%s", _( "Queued for verification" ) );
 
         node = tr_new( struct verify_node, 1 );
         node->torrent = tor;

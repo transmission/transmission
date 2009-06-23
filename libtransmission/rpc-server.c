@@ -945,10 +945,10 @@ tr_rpcInit( tr_session  * session,
         tr_runInEventThread( session, startServer, s );
 
         if( s->isWhitelistEnabled )
-            tr_ninf( MY_NAME, _( "Whitelist enabled" ) );
+            tr_ninf( MY_NAME, "%s", _( "Whitelist enabled" ) );
 
         if( s->isPasswordEnabled )
-            tr_ninf( MY_NAME, _( "Password required" ) );
+            tr_ninf( MY_NAME, "%s", _( "Password required" ) );
     }
 
     return s;

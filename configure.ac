@@ -298,6 +298,10 @@ if test "x$build_gtk" = "xyes" -a  "x$enable_nls" = "xno" ; then
     AC_MSG_ERROR("The gtk client cannot be built without nls support.  Try adding either --enable-nls or --disable-gtk" )
 fi
 
+dnl This section is only used for internationalization.
+dnl If you don't need translations and this section gives you trouble --
+dnl such as if you're building for a headless system --
+dnl it's okay to tear this section out and re-build the configure script.
 use_nls=no
 if test "x$enable_nls" = "xyes" ; then
     use_nls=yes

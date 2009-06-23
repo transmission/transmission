@@ -1055,7 +1055,7 @@ bencWalk( const tr_benc          * top,
 
                 default:
                     /* did caller give us an uninitialized val? */
-                    tr_err( _( "Invalid metadata" ) );
+                    tr_err( "%s", _( "Invalid metadata" ) );
                     break;
             }
     }

@@ -1163,11 +1163,10 @@ gtr_inhibit_hibernation( guint * cookie )
                                      G_TYPE_UINT, cookie,
                                      G_TYPE_INVALID );
         if( success )
-            tr_inf( _( "Disallowing desktop hibernation" ) );
+            tr_inf( "%s", _( "Disallowing desktop hibernation" ) );
         else
         {
-            tr_err( _(
-                        "Couldn't disable desktop hibernation: %s" ),
+            tr_err( _( "Couldn't disable desktop hibernation: %s" ),
                     error->message );
             g_error_free( error );
         }
@@ -1191,7 +1190,7 @@ gtr_uninhibit_hibernation( guint inhibit_cookie )
                                               G_TYPE_INVALID,
                                               G_TYPE_INVALID );
         if( success )
-            tr_inf( _( "Allowing desktop hibernation" ) );
+            tr_inf( "%s", _( "Allowing desktop hibernation" ) );
         else
         {
             g_warning( "Couldn't uninhibit the system from suspending: %s.",

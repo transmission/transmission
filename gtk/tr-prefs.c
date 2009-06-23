@@ -418,9 +418,9 @@ onBlocklistUpdate( GtkButton * w, gpointer gdata )
                                 GTK_DIALOG_DESTROY_WITH_PARENT,
                                 GTK_MESSAGE_INFO,
                                 GTK_BUTTONS_CLOSE,
-                               _( "Update Blocklist" ) );
+                                "%s", _( "Update Blocklist" ) );
     gtk_widget_set_sensitive( data->updateBlocklistButton, FALSE );
-    gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG( d ), _( "Getting new blocklist..." ) );
+    gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG( d ), "%s", _( "Getting new blocklist..." ) );
     data->updateBlocklistDialog = d;
     g_signal_connect( d, "response", G_CALLBACK(onBlocklistUpdateResponse), data );
     gtk_widget_show( d );

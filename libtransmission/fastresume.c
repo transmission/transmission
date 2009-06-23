@@ -550,7 +550,7 @@ fastResumeLoadImpl( tr_torrent * tor,
 
     if( !buf )
         /* %s is the torrent name */
-        tr_torinf( tor, _( "Couldn't read resume file" ) );
+        tr_torinf( tor, "%s", _( "Couldn't read resume file" ) );
     else
     {
         const uint8_t * walk = buf;
@@ -563,7 +563,7 @@ fastResumeLoadImpl( tr_torrent * tor,
                 ret |= parseVersion1 ( tor, walk, end, fieldsToLoad );
             else
                 /* %s is the torrent name */
-                tr_torinf( tor, _( "Couldn't read resume file" ) );
+                tr_torinf( tor, "%s", _( "Couldn't read resume file" ) );
         }
 
         tr_free( buf );

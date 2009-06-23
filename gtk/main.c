@@ -370,7 +370,7 @@ main( int     argc,
         g_thread_init( NULL );
 
     gerr = NULL;
-    if( !gtk_init_with_args( &argc, &argv, _( "[torrent files]" ), entries,
+    if( !gtk_init_with_args( &argc, &argv, (char*)_( "[torrent files]" ), entries,
                              (char*)domain, &gerr ) )
     {
         fprintf( stderr, "%s\n", gerr->message );
