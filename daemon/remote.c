@@ -894,7 +894,7 @@ printSession( tr_benc * top )
                 else if( downEnabled )
                     tr_snprintf( buf, sizeof( buf ), "%"PRId64" KB/s", downLimit );
                 else
-                    tr_strlcpy( buf, "unlimited", sizeof( buf ) );
+                    tr_strlcpy( buf, "Unlimited", sizeof( buf ) );
                 printf( "  Download speed limit: %s  (%s limit: %"PRId64" KB/s; %s turtle limit: %"PRId64" KB/s)\n",
                         buf,
                         (downEnabled?"Enabled":"Disabled"), downLimit,
