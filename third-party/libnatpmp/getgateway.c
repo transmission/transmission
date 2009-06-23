@@ -1,4 +1,4 @@
-/* $Id: getgateway.c,v 1.13 2009/03/10 10:15:31 nanard Exp $ */
+/* $Id: getgateway.c,v 1.14 2009/06/04 22:27:53 nanard Exp $ */
 /* libnatpmp
  * Copyright (c) 2007-2008, Thomas BERNARD <miniupnp@free.fr>
  *
@@ -55,6 +55,17 @@
 #undef USE_SYSCTL_NET_ROUTE
 #define USE_WIN32_CODE
 #endif
+
+#ifdef __CYGWIN__
+#undef USE_PROC_NET_ROUTE
+#undef USE_SOCKET_ROUTE
+#undef USE_SYSCTL_NET_ROUTE
+#define USE_WIN32_CODE
+#include <stdarg.h>
+#include <w32api/windef.h>
+#include <w32api/winbase.h>
+#include <w32api/winreg.h>
+#endif 
 
 #ifdef USE_SYSCTL_NET_ROUTE
 #include <stdlib.h>
@@ -261,7 +272,7 @@ int getdefaultgateway(in_addr_t *addr)
 #endif /* #ifdef USE_SOCKET_ROUTE */
 
 #ifdef USE_WIN32_CODE
-int getdefaultgateway(in_addr_t * addr)
+LIBSPEC int getdefaultgateway(in_addr_t * addr)
 {
 	HKEY networkCardsKey;
 	HKEY networkCardKey;
