@@ -758,16 +758,16 @@ webPage( GObject * core )
     t = hig_workarea_create( );
     g_object_set_data_full( G_OBJECT( t ), "page", page, g_free );
 
-    hig_workarea_add_section_title( t, &row, _( "Web Interface" ) );
+    hig_workarea_add_section_title( t, &row, _( "Web Client" ) );
 
     /* "enabled" checkbutton */
-    s = _( "_Enable web interface" );
+    s = _( "_Enable web client" );
     w = new_check_button( s, TR_PREFS_KEY_RPC_ENABLED, core );
     page->rpc_tb = GTK_TOGGLE_BUTTON( w );
     g_signal_connect( w, "clicked", G_CALLBACK( onRPCToggled ), page );
     h = gtk_hbox_new( FALSE, GUI_PAD_BIG );
     gtk_box_pack_start( GTK_BOX( h ), w, TRUE, TRUE, 0 );
-    w = gtr_button_new_from_stock( GTK_STOCK_OPEN, _( "_Open web interface" ) );
+    w = gtr_button_new_from_stock( GTK_STOCK_OPEN, _( "_Open web client" ) );
     page->widgets = g_slist_append( page->widgets, w );
     g_signal_connect( w, "clicked", G_CALLBACK( onLaunchClutchCB ), NULL );
     gtk_box_pack_start( GTK_BOX( h ), w, FALSE, FALSE, 0 );
@@ -803,7 +803,7 @@ webPage( GObject * core )
     page->auth_widgets = g_slist_append( page->auth_widgets, w );
 
     /* require authentication */
-    s = _( "Only allow these IP addresses to _connect:" );
+    s = _( "Only allow these IP a_ddresses to connect:" );
     w = new_check_button( s, TR_PREFS_KEY_RPC_WHITELIST_ENABLED, core );
     hig_workarea_add_wide_control( t, &row, w );
     page->whitelist_tb = GTK_TOGGLE_BUTTON( w );
@@ -1230,7 +1230,7 @@ bandwidthPage( GObject * core )
         w2 = new_time_combo( core, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN );
         page->sched_widgets = g_slist_append( page->sched_widgets, w2 );
         gtk_box_pack_start( GTK_BOX( h ), w2, TRUE, TRUE, 0 );
-        w2 = l = gtk_label_new_with_mnemonic ( _( " _and " ) );
+        w2 = l = gtk_label_new_with_mnemonic ( _( " _to " ) );
         page->sched_widgets = g_slist_append( page->sched_widgets, w2 );
         gtk_box_pack_start( GTK_BOX( h ), w2, FALSE, FALSE, 0 );
         w2 = new_time_combo( core, TR_PREFS_KEY_ALT_SPEED_TIME_END );

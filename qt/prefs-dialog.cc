@@ -220,14 +220,14 @@ QWidget *
 PrefsDialog :: createWebTab( Session& session )
 {
     HIG * hig = new HIG( this );
-    hig->addSectionTitle( tr( "Web Interface" ) );
+    hig->addSectionTitle( tr( "Web Client" ) );
     QWidget * w;
     QHBoxLayout * h = new QHBoxLayout( );
     QIcon i( style()->standardIcon( QStyle::StandardPixmap( QStyle::SP_DirOpenIcon ) ) );
-    QPushButton * b = new QPushButton( i, tr( "&Open web interface" ) );
+    QPushButton * b = new QPushButton( i, tr( "&Open web client" ) );
     connect( b, SIGNAL(clicked()), &session, SLOT(launchWebInterface()) );
     h->addWidget( b, 0, Qt::AlignRight );
-    QWidget * l = checkBoxNew( tr( "&Enable web interface" ), Prefs::RPC_ENABLED );
+    QWidget * l = checkBoxNew( tr( "&Enable web client" ), Prefs::RPC_ENABLED );
     myUnsupportedWhenRemote << l;
     hig->addRow( l, h, 0 );
     l = hig->addRow( tr( "Listening &port:" ), w = spinBoxNew( Prefs::RPC_PORT, 0, 65535, 1 ) );
@@ -238,9 +238,9 @@ PrefsDialog :: createWebTab( Session& session )
     myWebAuthWidgets << l << w;
     l = hig->addRow( tr( "Pass&word:" ), w = lineEditNew( Prefs::RPC_PASSWORD, QLineEdit::Password ) );
     myWebAuthWidgets << l << w;
-    hig->addWideControl( w = checkBoxNew( tr( "Only allow these IP addresses to &connect:" ), Prefs::RPC_WHITELIST_ENABLED ) );
+    hig->addWideControl( w = checkBoxNew( tr( "Only allow these IP a&ddresses to connect:" ), Prefs::RPC_WHITELIST_ENABLED ) );
     myWebWidgets << w;
-    l = hig->addRow( tr( "A&ddresses:" ), w = lineEditNew( Prefs::RPC_WHITELIST ) );
+    l = hig->addRow( tr( "Addresses:" ), w = lineEditNew( Prefs::RPC_WHITELIST ) );
     myWebWhitelistWidgets << l << w;
     myUnsupportedWhenRemote << myWebWidgets << myWebAuthWidgets << myWebWhitelistWidgets;
     hig->finish( );
@@ -306,7 +306,7 @@ PrefsDialog :: createBandwidthTab( )
         QWidget * w = timeEditNew( Prefs :: ALT_SPEED_LIMIT_TIME_BEGIN );
         h->addWidget( w, 1 );
         mySchedWidgets << w;
-        QLabel * nd = new QLabel( "&and" );
+        QLabel * nd = new QLabel( "&to" );
         h->addWidget( nd );
         mySchedWidgets << nd;
         w = timeEditNew( Prefs :: ALT_SPEED_LIMIT_TIME_END );
