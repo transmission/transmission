@@ -422,6 +422,7 @@ tr_set_compare( const void * va,
 const char*
 tr_strip_positional_args( const char* str )
 {
+    const char * in = str;
     static size_t bufsize = 0;
     static char * buf = NULL;
     const size_t  len = strlen( str );
@@ -448,7 +449,7 @@ tr_strip_positional_args( const char* str )
     }
     *out = '\0';
 
-    return buf;
+    return strcmp( buf, in ) ? buf : in;
 }
 
 #endif
