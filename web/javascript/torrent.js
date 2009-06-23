@@ -85,7 +85,7 @@ Torrent.prototype =
 		e.appendChild( image );
 		top_e.appendChild( e );
 		element._pause_resume_button_image = image;
-		if (!iPhone) $(e).bind('click', {element: element}, this.clickPauseResumeButton);
+		if (!iPhone) $(e).bind('click', function(e) { element._torrent.clickPauseResumeButton(e); });
 		
 		// Create the 'peer details' <div>
 		e = document.createElement( 'div' );
@@ -94,7 +94,7 @@ Torrent.prototype =
 		element._peer_details_container = e;
 		
 		// Set the torrent click observer
-		element.bind('click', {element: element}, this.clickTorrent);
+		element.bind('click', function(e){ element._torrent.clickTorrent(e) });
 		
 		// Safari hack - first torrent needs to be moved down for some reason. Seems to be ok when
 		// using <li>'s in straight html, but adding through the DOM gets a bit odd.
@@ -216,7 +216,7 @@ Torrent.prototype =
 		// Prevents click carrying to parent element
 		// which deselects all on click
 		event.stopPropagation();
-		var torrent = event.data.element._torrent;
+		var torrent = this;
 		
 		// 'Apple' button emulation on PC :
 		// Need settable meta-key and ctrl-key variables for mac emulation
@@ -229,6 +229,8 @@ Torrent.prototype =
 		
 		// Shift-Click - Highlight a range between this torrent and the last-clicked torrent
 		if (iPhone) {
+			if ( torrent.isSelected() )
+				torrent._controller.showInspector();
 			torrent._controller.setSelectedTorrent( torrent, true );
 		
 		} else if (event.shiftKey) {
@@ -265,7 +267,7 @@ Torrent.prototype =
 		event.stopPropagation();
 
 		// either stop or start the torrent
-		var torrent = event.data.element._torrent;
+		var torrent = this;
 		if( torrent.isActive( ) )
 			torrent._controller.stopTorrent( torrent );
 		else

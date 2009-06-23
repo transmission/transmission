@@ -51,7 +51,7 @@ Transmission.prototype =
 		$('.file_wanted_control').live('click', function(e){ tr.fileWantedClicked(e, this); });
 		$('.file_priority_control').live('click', function(e){ tr.filePriorityClicked(e, this); });
 		if (iPhone) {
-			$('#torrent_inspector').bind('click', function(e){ tr.hideInspector(); });
+			$('#inspector_close').bind('click', function(e){ tr.hideInspector(); });
 			$('#preferences_link').bind('click', function(e){ tr.releaseClutchPreferencesButton(e); });
 		} else {
 			$(document).bind('keydown',  function(e){ tr.keyDown(e); });
@@ -192,8 +192,8 @@ Transmission.prototype =
 		
 		if( this[Prefs._ShowFilter] )
 			this.showFilter( );
-		
-		if( this[Prefs._ShowInspector] )
+
+		if( !iPhone && this[Prefs._ShowInspector] )
 			this.showInspector( );
 
 	},
@@ -942,7 +942,7 @@ Transmission.prototype =
 		var total_upload_speed = 0;
 		var total_verified = 0;
 		var na = 'N/A';
-                var tab = this._inspector._info_tab;
+		var tab = this._inspector._info_tab;
 		
 		$("#torrent_inspector_size, .inspector_row div").css('color', '#222');
 		
@@ -1085,6 +1085,7 @@ Transmission.prototype =
 		$('#torrent_inspector').show();
 		if (iPhone) {
 			$('body').addClass('inspector_showing');
+			$('#inspector_close').show();
 			this.hideiPhoneAddressbar();
 		} else {
 			var w = $('#torrent_inspector').width() + 1 + 'px';
@@ -1108,6 +1109,7 @@ Transmission.prototype =
 		if (iPhone) {
 			this.deselectAll( );
 			$('body.inspector_showing').removeClass('inspector_showing');
+			$('#inspector_close').hide();
 			this.hideiPhoneAddressbar();
 		} else {
 			$('#torrent_filter_bar')[0].style.right = '0px';
