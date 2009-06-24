@@ -400,9 +400,9 @@ Torrent.prototype =
 			{
 				eta = ' - ';
 				if (this._eta < 0 || this._eta >= Torrent._InfiniteTimeRemaining )
-					eta = 'remaining time unknown';
+					eta += 'remaining time unknown';
 				else
-					eta = Math.formatSeconds(this._eta) + ' remaining';
+					eta += Math.formatSeconds(this._eta) + ' remaining';
 			}
 			
 			// Create the 'progress details' label
