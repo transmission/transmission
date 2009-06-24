@@ -125,8 +125,8 @@ TransmissionRemote.prototype =
 				fields: [  'id', 'downloadedEver', 'error', 'errorString',
 					'eta', 'haveUnchecked', 'haveValid', 'leechers', 'leftUntilDone',
 					'peersConnected', 'peersGettingFromUs', 'peersSendingToUs',
-					'rateDownload', 'rateUpload', 'seeders',
-					'status', 'swarmSpeed', 'uploadedEver' ]
+					'rateDownload', 'rateUpload', 'recheckProgress', 'seeders',
+					'sizeWhenDone', 'status', 'swarmSpeed', 'uploadedEver' ]
 			}
 		};
 

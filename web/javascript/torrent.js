@@ -7,7 +7,7 @@
  */
 
 function Torrent( transferListParent, fileListParent, controller, data) {
-    this.initialize( transferListParent, fileListParent, controller, data);
+	this.initialize( transferListParent, fileListParent, controller, data);
 } 
 
 // Constants
@@ -299,6 +299,8 @@ Torrent.prototype =
 		this._peers_connected       = data.peersConnected;
 		this._peers_getting_from_us = data.peersGettingFromUs;
 		this._peers_sending_to_us   = data.peersSendingToUs;
+		this._sizeWhenDone          = data.sizeWhenDone;
+		this._recheckProgress       = data.recheckProgress;
 		this._error                 = data.error;
 		this._error_message         = data.errorString;
 		this._eta                   = data.eta;
@@ -323,18 +325,67 @@ Torrent.prototype =
 		}
 	},
 
+	getPeerDetails: function()
+	{
+		if( this._error_message &&
+		    this._error_message !== '' &&
+		    this._error_message !== 'other' )
+			return this._error_message;
+
+		var c;
+		var st = this.state( );
+		switch( st )
+		{
+			case Torrent._StatusPaused:
+			case Torrent._StatusWaitingToCheck:
+				c = this.stateStr( );
+				break;
+
+			case Torrent._StatusDownloading:
+				// 'Downloading from 36 of 40 peers - DL: 60.2 KB/s UL: 4.3 KB/s'
+				c = 'Downloading from ';
+				c += this.peersSendingToUs();
+				c += ' of ';
+				c += this._peers_connected;
+				c += ' peers - DL: ';
+				c += Math.formatBytes(this._download_speed);
+				c += '/s UL: ';
+				c += Math.formatBytes(this._upload_speed);
+				c += '/s';
+				break;
+
+			case Torrent._StatusSeeding:
+				// 'Seeding to 13 of 22 peers - UL: 36.2 KB/s'
+				c = 'Seeding to ';
+				c += this.peersGettingFromUs();
+				c += ' of ';
+				c += this._peers_connected;
+				c += ' peers - UL: ';
+				c += Math.formatBytes(this._upload_speed);
+				c += '/s';
+				break;
+
+			case Torrent._StatusChecking:
+				// 'Verifying local data (40% tested)'
+				c = 'Verifying local data (';
+				c += Math.roundWithPrecision( 100.0 * this._recheckProgress, 0 );
+				c += '% tested)';
+				break;
+		}
+		return c;
+	},
+
 	refreshHTML: function() {
 		var c;
 		var e;
 		var progress_details;
-		var peer_details;
 		var root = this._element;
 		var MaxBarWidth = 100; // reduce this to make the progress bar shorter (%)
 		
 		setInnerHTML( root._name_container, this._name );
 		
 		// Add the progress bar
-                var notDone = this._leftUntilDone > 0;
+		var notDone = this._leftUntilDone > 0;
 
 		// Fix for situation
 		// when a verifying/downloading torrent gets state seeding
@@ -347,11 +398,11 @@ Torrent.prototype =
 			
 			if( this.isActive( ) )
 			{
-				eta = '-';
+				eta = ' - ';
 				if (this._eta < 0 || this._eta >= Torrent._InfiniteTimeRemaining )
-					eta += 'remaining time unknown';
+					eta = 'remaining time unknown';
 				else
-					eta += Math.formatSeconds(this._eta) + ' remaining';
+					eta = Math.formatSeconds(this._eta) + ' remaining';
 			}
 			
 			// Create the 'progress details' label
@@ -382,24 +433,6 @@ Torrent.prototype =
 				e.className = 'torrent_progress_bar in_progress';
 			e.style.width =  (MaxBarWidth - css_completed_width) + '%';
 			e.style.display = 'block';
-			
-			// Create the 'peer details' label
-			// Eg: 'Downloading from 36 of 40 peers - DL: 60.2 KB/s UL: 4.3 KB/s'
-			if( !this.isDownloading( ) )
-				c = this.stateStr( );
-			else {
-				c = 'Downloading from ';
-				c += this.peersSendingToUs();
-				c += ' of ';
-				c += this._peers_connected;
-				c += ' peers - DL: ';
-				c += Math.formatBytes(this._download_speed);
-				c += '/s UL: ';
-				c += Math.formatBytes(this._upload_speed);
-				c += '/s';
-			}
-			peer_details = c;
-			
 		}
 		else
 		{
@@ -424,21 +457,6 @@ Torrent.prototype =
 			
 			// Set progress to maximum
 			root._progress_complete_container.style.width =  MaxBarWidth + '%';
-			
-			// Create the 'peer details' label
-			// Eg: 'Seeding to 13 of 22 peers - UL: 36.2 KB/s'
-			if( !this.isSeeding( ) )
-				c = this.stateStr( );
-			else {
-				c = 'Seeding to ';
-				c += this.peersGettingFromUs();
-				c += ' of ';
-				c += this._peers_connected;
-				c += ' peers - UL: ';
-				c += Math.formatBytes(this._upload_speed);
-				c += '/s';
-			}
-			peer_details = c;
 		}
 		
 		// Update the progress details
@@ -454,13 +472,7 @@ Torrent.prototype =
 			e.className = "torrent_pause";
 		}
 		
-		if( this._error_message &&
-		    this._error_message !== '' &&
-		    this._error_message !== 'other' ) {
-			peer_details = this._error_message;
-		}
-		
-		setInnerHTML( root._peer_details_container, peer_details );
+		setInnerHTML( root._peer_details_container, this.getPeerDetails( ) );
 	
 		this.refreshFileView( );	
 	},
