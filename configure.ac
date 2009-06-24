@@ -302,6 +302,12 @@ dnl This section is only used for internationalization.
 dnl If you don't need translations and this section gives you trouble --
 dnl such as if you're building for a headless system --
 dnl it's okay to tear this section out and re-build the configure script.
+dnl
+dnl Note to packagers: the bump to intltool 0.40 was made to fix
+dnl a "make check" failure on some systems.  if upgrading to 0.40 is
+dnl a problem and the old version was working fine for you,
+dnl it should be safe to re-edit 0.40 back down to 0.23
+
 use_nls=no
 if test "x$enable_nls" = "xyes" ; then
     use_nls=yes
