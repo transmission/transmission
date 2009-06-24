@@ -1284,41 +1284,41 @@ tr_piece;
 /** @brief information about a torrent that comes from its metainfo file */
 struct tr_info
 {
-    /* Flags */
-    tr_bool            isPrivate;
-    tr_bool            isMultifile;
+    /* total size of the torrent, in bytes */
+    uint64_t           totalSize;
+
+    /* the torrent's name */
+    char             * name;
+
+    /* Path to torrent Transmission's internal copy of the .torrent file. */
+    char             * torrent;
+
+    char            ** webseeds;
+
+    char             * comment;
+    char             * creator;
+    tr_file          * files;
+    tr_piece         * pieces;
+
+    /* these trackers are sorted by tier */
+    tr_tracker_info  * trackers;
+
+    /* Torrent info */
+    time_t             dateCreated;
+
+    int                trackerCount;
+    int                webseedCount;
+    tr_file_index_t    fileCount;
+    uint32_t           pieceSize;
+    tr_piece_index_t   pieceCount;
 
     /* General info */
     uint8_t            hash[SHA_DIGEST_LENGTH];
     char               hashString[2 * SHA_DIGEST_LENGTH + 1];
-    char            *  name;
 
-    /* Path to torrent Transmission's internal copy of the .torrent file.
-       This field exists for compatability reasons in the Mac OS X client
-       and should not be used in new code. */
-    char            *  torrent;
-
-    /* these trackers are sorted by tier */
-    tr_tracker_info *  trackers;
-    int                trackerCount;
-
-    char           **  webseeds;
-    int                webseedCount;
-
-    /* Torrent info */
-    char             * comment;
-    char             * creator;
-    time_t             dateCreated;
-
-    /* Pieces info */
-    uint32_t           pieceSize;
-    tr_piece_index_t   pieceCount;
-    uint64_t           totalSize;
-    tr_piece *         pieces;
-
-    /* Files info */
-    tr_file_index_t    fileCount;
-    tr_file *          files;
+    /* Flags */
+    tr_bool            isPrivate;
+    tr_bool            isMultifile;
 };
 
 /**
