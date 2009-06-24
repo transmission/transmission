@@ -146,6 +146,11 @@ struct tr_peermsgs
     tr_bool         peerSentLtepHandshake;
     /*tr_bool         haveFastSet;*/
 
+    /* how long the outMessages batch should be allowed to grow before
+     * it's flushed -- some messages (like requests >:) should be sent
+     * very quickly; others aren't as urgent. */
+    int8_t          outMessagesBatchPeriod;
+
     uint8_t         state;
     uint8_t         ut_pex_id;
     uint16_t        pexCount;
@@ -157,14 +162,8 @@ struct tr_peermsgs
     tr_piece_index_t       fastset[MAX_FAST_SET_SIZE];
 #endif
 
-    /* how long the outMessages batch should be allowed to grow before
-     * it's flushed -- some messages (like requests >:) should be sent
-     * very quickly; others aren't as urgent. */
-    int                    outMessagesBatchPeriod;
-
     tr_peer *              peer;
 
-    tr_session *           session;
     tr_torrent *           torrent;
 
     tr_publisher           publisher;
@@ -193,6 +192,12 @@ struct tr_peermsgs
 
     struct event          pexTimer;
 };
+
+static TR_INLINE tr_session*
+getSession( struct tr_peermsgs * msgs )
+{
+    return msgs->torrent->session;
+}
 
 /**
 ***
@@ -991,8 +996,8 @@ sendLtepHandshake( tr_peermsgs * msgs )
         pex = 1;
 
     tr_bencInitDict( &val, 5 );
-    tr_bencDictAddInt( &val, "e", msgs->session->encryptionMode != TR_CLEAR_PREFERRED );
-    tr_bencDictAddInt( &val, "p", tr_sessionGetPeerPort( msgs->session ) );
+    tr_bencDictAddInt( &val, "e", getSession(msgs)->encryptionMode != TR_CLEAR_PREFERRED );
+    tr_bencDictAddInt( &val, "p", tr_sessionGetPeerPort( getSession(msgs) ) );
     tr_bencDictAddInt( &val, "upload_only", tr_torrentIsSeed( msgs->torrent ) );
     tr_bencDictAddStr( &val, "v", TR_NAME " " USERAGENT_PREFIX );
     m  = tr_bencDictAddDict( &val, "m", 1 );
@@ -1451,7 +1456,7 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
             dbgmsg( msgs, "Got a BT_PORT" );
             tr_peerIoReadUint16( msgs->peer->io, inbuf, &msgs->peer->dht_port );
             if( msgs->peer->dht_port > 0 )
-                tr_dhtAddNode( msgs->session, &msgs->peer->addr, msgs->peer->dht_port, 0 );
+                tr_dhtAddNode( getSession(msgs), &msgs->peer->addr, msgs->peer->dht_port, 0 );
             break;
 
         case BT_FEXT_SUGGEST:
@@ -1835,7 +1840,7 @@ sendBitfield( tr_peermsgs * msgs )
 
     field = tr_bitfieldDup( tr_cpPieceBitfield( &msgs->torrent->completion ) );
 
-    if( tr_sessionIsLazyBitfieldEnabled( msgs->session ) )
+    if( tr_sessionIsLazyBitfieldEnabled( getSession( msgs ) ) )
     {
         /** Lazy bitfields aren't a high priority or secure, so I'm opting for
             speed over a truly random sample -- let's limit the pool size to
@@ -2142,7 +2147,6 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
     m = tr_new0( tr_peermsgs, 1 );
     m->publisher = TR_PUBLISHER_INIT;
     m->peer = peer;
-    m->session = torrent->session;
     m->torrent = torrent;
     m->peer->clientIsChoked = 1;
     m->peer->peerIsChoked = 1;

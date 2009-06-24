@@ -801,8 +801,6 @@ refillPulse( int fd UNUSED, short type UNUSED, void * vtorrent )
     tr_torrent * tor = t->tor;
     tr_bool hasNext = TRUE;
 
-fprintf( stderr, "[%s] in refillPulse\n", t->tor->info.name );
-
     if( !t->isRunning )
         return;
     if( tr_torrentIsSeed( t->tor ) )
