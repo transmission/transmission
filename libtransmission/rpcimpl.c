@@ -1027,7 +1027,7 @@ torrentAdd( tr_session               * session,
 
         /* set the optional arguments */
 
-        if( tr_bencDictFindStr( args_in, "download-dir", &str ) )
+        if( tr_bencDictFindStr( args_in, TR_PREFS_KEY_DOWNLOAD_DIR, &str ) )
             tr_ctorSetDownloadDir( ctor, TR_FORCE, str );
 
         if( tr_bencDictFindBool( args_in, "paused", &boolVal ) )
@@ -1148,15 +1148,15 @@ sessionSet( tr_session               * session,
         tr_sessionSetRatioLimit( session, d );
     if( tr_bencDictFindBool( args_in, "seedRatioLimited", &boolVal ) )
         tr_sessionSetRatioLimited( session, boolVal );
-    if( tr_bencDictFindInt( args_in, "speed-limit-down", &i ) )
+    if( tr_bencDictFindInt( args_in, TR_PREFS_KEY_DSPEED, &i ) )
         tr_sessionSetSpeedLimit( session, TR_DOWN, i );
-    if( tr_bencDictFindBool( args_in, "speed-limit-down-enabled", &boolVal ) )
+    if( tr_bencDictFindBool( args_in, TR_PREFS_KEY_DSPEED_ENABLED, &boolVal ) )
         tr_sessionLimitSpeed( session, TR_DOWN, boolVal );
-    if( tr_bencDictFindInt( args_in, "speed-limit-up", &i ) )
+    if( tr_bencDictFindInt( args_in, TR_PREFS_KEY_USPEED, &i ) )
         tr_sessionSetSpeedLimit( session, TR_UP, i );
-    if( tr_bencDictFindBool( args_in, "speed-limit-up-enabled", &boolVal ) )
+    if( tr_bencDictFindBool( args_in, TR_PREFS_KEY_USPEED_ENABLED, &boolVal ) )
         tr_sessionLimitSpeed( session, TR_UP, boolVal );
-    if( tr_bencDictFindStr( args_in, "encryption", &str ) ) {
+    if( tr_bencDictFindStr( args_in, TR_PREFS_KEY_ENCRYPTION, &str ) ) {
         if( !strcmp( str, "required" ) )
             tr_sessionSetEncryption( session, TR_ENCRYPTION_REQUIRED );
         else if( !strcmp( str, "tolerated" ) )
@@ -1248,17 +1248,17 @@ sessionGet( tr_session               * s,
     tr_bencDictAddInt ( d, "rpc-version-minimum", 1 );
     tr_bencDictAddReal( d, "seedRatioLimit", tr_sessionGetRatioLimit( s ) );
     tr_bencDictAddBool( d, "seedRatioLimited", tr_sessionIsRatioLimited( s ) );
-    tr_bencDictAddInt ( d, "speed-limit-up", tr_sessionGetSpeedLimit( s, TR_UP ) );
-    tr_bencDictAddBool( d, "speed-limit-up-enabled", tr_sessionIsSpeedLimited( s, TR_UP ) );
-    tr_bencDictAddInt ( d, "speed-limit-down", tr_sessionGetSpeedLimit( s, TR_DOWN ) );
-    tr_bencDictAddBool( d, "speed-limit-down-enabled", tr_sessionIsSpeedLimited( s, TR_DOWN ) );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_USPEED, tr_sessionGetSpeedLimit( s, TR_UP ) );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_USPEED_ENABLED, tr_sessionIsSpeedLimited( s, TR_UP ) );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_DSPEED, tr_sessionGetSpeedLimit( s, TR_DOWN ) );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_DSPEED_ENABLED, tr_sessionIsSpeedLimited( s, TR_DOWN ) );
     tr_bencDictAddStr ( d, "version", LONG_VERSION_STRING );
     switch( tr_sessionGetEncryption( s ) ) {
         case TR_CLEAR_PREFERRED: str = "tolerated"; break;
         case TR_ENCRYPTION_REQUIRED: str = "required"; break; 
         default: str = "preferred"; break;
     }
-    tr_bencDictAddStr( d, "encryption", str );
+    tr_bencDictAddStr( d, TR_PREFS_KEY_ENCRYPTION, str );
 
     return NULL;
 }

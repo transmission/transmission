@@ -362,13 +362,13 @@ readargs( int           argc,
 
             case 'd':
                 tr_bencDictAddStr( &top, "method", "session-set" );
-                tr_bencDictAddInt( args, "speed-limit-down", numarg( optarg ) );
-                tr_bencDictAddBool( args, "speed-limit-down-enabled", TRUE );
+                tr_bencDictAddInt( args, TR_PREFS_KEY_DSPEED, numarg( optarg ) );
+                tr_bencDictAddBool( args, TR_PREFS_KEY_DSPEED_ENABLED, TRUE );
                 break;
 
             case 'D':
                 tr_bencDictAddStr( &top, "method", "session-set" );
-                tr_bencDictAddBool( args, "speed-limit-down-enabled", FALSE );
+                tr_bencDictAddBool( args, TR_PREFS_KEY_DSPEED_ENABLED, FALSE );
                 break;
 
             case 'f':
@@ -414,12 +414,12 @@ readargs( int           argc,
 
             case 'm':
                 tr_bencDictAddStr( &top, "method", "session-set" );
-                tr_bencDictAddBool( args, "port-forwarding-enabled", TRUE );
+                tr_bencDictAddBool( args, TR_PREFS_KEY_PORT_FORWARDING, TRUE );
                 break;
 
             case 'M':
                 tr_bencDictAddStr( &top, "method", "session-set" );
-                tr_bencDictAddBool( args, "port-forwarding-enabled", FALSE );
+                tr_bencDictAddBool( args, TR_PREFS_KEY_PORT_FORWARDING, FALSE );
                 break;
 
             case 'n':
@@ -470,13 +470,13 @@ readargs( int           argc,
 
             case 'u':
                 tr_bencDictAddStr( &top, "method", "session-set" );
-                tr_bencDictAddInt( args, "speed-limit-up", numarg( optarg ) );
-                tr_bencDictAddBool( args, "speed-limit-up-enabled", TRUE );
+                tr_bencDictAddInt( args, TR_PREFS_KEY_USPEED, numarg( optarg ) );
+                tr_bencDictAddBool( args, TR_PREFS_KEY_USPEED_ENABLED, TRUE );
                 break;
 
             case 'U':
                 tr_bencDictAddStr( &top, "method", "session-set" );
-                tr_bencDictAddBool( args, "speed-limit-up-enabled", FALSE );
+                tr_bencDictAddBool( args, TR_PREFS_KEY_USPEED_ENABLED, FALSE );
                 break;
 
             case 'v':
@@ -844,15 +844,15 @@ printSession( tr_benc * top )
         printf( "\n" );
 
         printf( "TRANSFER\n" );
-        if( tr_bencDictFindStr( args,  "download-dir", &str ) )
+        if( tr_bencDictFindStr( args,  TR_PREFS_KEY_DOWNLOAD_DIR, &str ) )
             printf( "  Download directory: %s\n", str );
-        if( tr_bencDictFindInt( args, "port", &i ) )
+        if( tr_bencDictFindInt( args, TR_PREFS_KEY_PEER_PORT, &i ) )
             printf( "  Listenport: %" PRId64 "\n", i );
-        if( tr_bencDictFindBool( args, "port-forwarding-enabled", &boolVal ) )
+        if( tr_bencDictFindBool( args, TR_PREFS_KEY_PORT_FORWARDING, &boolVal ) )
             printf( "  Portforwarding enabled: %s\n", ( boolVal ? "Yes" : "No" ) );
-        if( tr_bencDictFindBool( args, "pex-enabled", &boolVal ) )
+        if( tr_bencDictFindBool( args, TR_PREFS_KEY_PEX_ENABLED, &boolVal ) )
             printf( "  Peer exchange allowed: %s\n", ( boolVal ? "Yes" : "No" ) );
-        if( tr_bencDictFindStr( args,  "encryption", &str ) )
+        if( tr_bencDictFindStr( args,  TR_PREFS_KEY_ENCRYPTION, &str ) )
             printf( "  Encryption: %s\n", str );
         printf( "\n" );
 
@@ -860,18 +860,18 @@ printSession( tr_benc * top )
             tr_bool altEnabled, altTimeEnabled, upEnabled, downEnabled;
             int64_t altDown, altUp, altBegin, altEnd, altDay, upLimit, downLimit, peerLimit;
 
-            if( tr_bencDictFindInt ( args, "alt-speed-down", &altDown ) &&
-                tr_bencDictFindBool( args, "alt-speed-enabled", &altEnabled ) &&
-                tr_bencDictFindInt ( args, "alt-speed-time-begin", &altBegin ) &&
-                tr_bencDictFindBool( args, "alt-speed-time-enabled", &altTimeEnabled ) &&
-                tr_bencDictFindInt ( args, "alt-speed-time-end", &altEnd ) &&
-                tr_bencDictFindInt ( args, "alt-speed-time-day", &altDay ) &&
-                tr_bencDictFindInt ( args, "alt-speed-up", &altUp ) &&
-                tr_bencDictFindInt ( args, "peer-limit-global", &peerLimit ) &&
-                tr_bencDictFindInt ( args, "speed-limit-down", &downLimit ) &&
-                tr_bencDictFindBool( args, "speed-limit-down-enabled", &downEnabled ) &&
-                tr_bencDictFindInt ( args, "speed-limit-up", &upLimit ) &&
-                tr_bencDictFindBool( args, "speed-limit-up-enabled", &upEnabled ) )
+            if( tr_bencDictFindInt ( args, TR_PREFS_KEY_ALT_SPEED_DOWN, &altDown ) &&
+                tr_bencDictFindBool( args, TR_PREFS_KEY_ALT_SPEED_ENABLED, &altEnabled ) &&
+                tr_bencDictFindInt ( args, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN, &altBegin ) &&
+                tr_bencDictFindBool( args, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED, &altTimeEnabled ) &&
+                tr_bencDictFindInt ( args, TR_PREFS_KEY_ALT_SPEED_TIME_END, &altEnd ) &&
+                tr_bencDictFindInt ( args, TR_PREFS_KEY_ALT_SPEED_TIME_DAY, &altDay ) &&
+                tr_bencDictFindInt ( args, TR_PREFS_KEY_ALT_SPEED_UP, &altUp ) &&
+                tr_bencDictFindInt ( args, TR_PREFS_KEY_PEER_LIMIT_GLOBAL, &peerLimit ) &&
+                tr_bencDictFindInt ( args, TR_PREFS_KEY_DSPEED, &downLimit ) &&
+                tr_bencDictFindBool( args, TR_PREFS_KEY_DSPEED_ENABLED, &downEnabled ) &&
+                tr_bencDictFindInt ( args, TR_PREFS_KEY_USPEED, &upLimit ) &&
+                tr_bencDictFindBool( args, TR_PREFS_KEY_USPEED_ENABLED, &upEnabled ) )
             {
                 char buf[128];
 
