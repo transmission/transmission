@@ -1344,7 +1344,8 @@ readBtPiece( tr_peermsgs      * msgs,
         err = clientGotBlock( msgs, EVBUFFER_DATA( msgs->incoming.block ), req );
 
         /* cleanup */
-        evbuffer_drain( msgs->incoming.block, EVBUFFER_LENGTH( msgs->incoming.block ) );
+        evbuffer_free( msgs->incoming.block );
+        msgs->incoming.block = evbuffer_new( );
         req->length = 0;
         msgs->state = AWAITING_BT_LENGTH;
         if( !err )
