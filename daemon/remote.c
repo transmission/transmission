@@ -850,7 +850,7 @@ printSession( tr_benc * top )
             printf( "  Listenport: %" PRId64 "\n", i );
         if( tr_bencDictFindBool( args, "port-forwarding-enabled", &boolVal ) )
             printf( "  Portforwarding enabled: %s\n", ( boolVal ? "Yes" : "No" ) );
-        if( tr_bencDictFindBool( args, "pex-allowed", &boolVal ) )
+        if( tr_bencDictFindBool( args, "pex-enabled", &boolVal ) )
             printf( "  Peer exchange allowed: %s\n", ( boolVal ? "Yes" : "No" ) );
         if( tr_bencDictFindStr( args,  "encryption", &str ) )
             printf( "  Encryption: %s\n", str );
