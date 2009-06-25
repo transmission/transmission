@@ -165,6 +165,12 @@ canReadWrapper( tr_peerIo * io )
         tr_globalUnlock( session );
     }
 
+    /* keep the iobuf's excess capacity from growing too large */
+    if( EVBUFFER_LENGTH( io->inbuf ) == 0 ) {
+        evbuffer_free( io->inbuf );
+        io->inbuf = evbuffer_new( );
+    }
+
     tr_peerIoUnref( io );
 }
 
