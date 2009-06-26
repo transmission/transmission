@@ -308,6 +308,8 @@ Torrent.prototype =
 		this._total_leechers        = Math.max( 0, data.leechers );
 		this._total_seeders         = Math.max( 0, data.seeders );
 		this._state                 = data.status;
+		this._download_dir          = data.downloadDir;
+		this._torrent_file          = data.torrentFile;
 
 		if (data.fileStats)
 			this.refreshFileModel( data );
