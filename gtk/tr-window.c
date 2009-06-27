@@ -270,7 +270,9 @@ prefsChanged( TrCore * core UNUSED,
     {
         tr_window_update( (TrWindow*)wind );
     }
-    else if( !strcmp( key, TR_PREFS_KEY_ALT_SPEED_ENABLED ) )
+    else if( !strcmp( key, TR_PREFS_KEY_ALT_SPEED_ENABLED ) ||
+             !strcmp( key, TR_PREFS_KEY_ALT_SPEED_UP ) ||
+             !strcmp( key, TR_PREFS_KEY_ALT_SPEED_DOWN ) )
     {
         syncAltSpeedButton( p );
     }
@@ -324,18 +326,23 @@ status_menu_toggled_cb( GtkCheckMenuItem * menu_item,
 static void
 syncAltSpeedButton( PrivateData * p )
 {
-    const char * tip;
+    char u[32];
+    char d[32];
+    char buf[128];
+    const char * fmt;
     const gboolean b = pref_flag_get( TR_PREFS_KEY_ALT_SPEED_ENABLED );
     GtkWidget * w = p->alt_speed_button;
 
-    gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( w ), b );
+    tr_strlspeed( u, pref_int_get( TR_PREFS_KEY_ALT_SPEED_UP ), sizeof( u ) );
+    tr_strlspeed( d, pref_int_get( TR_PREFS_KEY_ALT_SPEED_DOWN ), sizeof( d ) );
+    fmt = b ? _( "Click to disable Temporary Speed Limits\n(%1$s down, %2$s up)" )
+            : _( "Click to enable Temporary Speed Limits\n(%1$s down, %2$s up)" );
+    g_snprintf( buf, sizeof( buf ), fmt, d, u );
 
+    gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( w ), b );
     gtk_button_set_image( GTK_BUTTON( w ), p->alt_speed_image[b?1:0] );
     gtk_button_set_alignment( GTK_BUTTON( w ), 0.5, 0.5 );
-
-    tip = b ? _( "Click to disable Temporary Speed Limits" )
-            : _( "Click to enable Temporary Speed Limits" );
-    gtr_widget_set_tooltip_text( w, tip );
+    gtr_widget_set_tooltip_text( w, buf );
 }
 
 static void

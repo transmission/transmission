@@ -376,7 +376,7 @@ updateBlocklistText( GtkWidget * w, TrCore * core )
 
 /* prefs dialog is being destroyed, so stop listening to blocklist updates */
 static void
-peerPageDestroyed( gpointer gdata, GObject * dead UNUSED )
+privacyPageDestroyed( gpointer gdata, GObject * dead UNUSED )
 {
     struct blocklist_data * data = gdata;
     if( data->updateBlocklistTag > 0 )
@@ -487,7 +487,7 @@ new_encryption_combo( GObject * core, const char * key )
 }
 
 static GtkWidget*
-peerPage( GObject * core )
+privacyPage( GObject * core )
 {
     int                     row = 0;
     const char *            s;
@@ -544,16 +544,8 @@ peerPage( GObject * core )
     hig_workarea_add_wide_control( t, &row, w );
 #endif
 
-    hig_workarea_add_section_divider( t, &row );
-    hig_workarea_add_section_title( t, &row, _( "Limits" ) );
-
-    w = new_spin_button( TR_PREFS_KEY_PEER_LIMIT_TORRENT, core, 1, 300, 5 );
-    hig_workarea_add_row( t, &row, _( "Maximum peers per _torrent:" ), w, NULL );
-    w = new_spin_button( TR_PREFS_KEY_PEER_LIMIT_GLOBAL, core, 1, 3000, 5 );
-    hig_workarea_add_row( t, &row, _( "Maximum peers _overall:" ), w, NULL );
-
     hig_workarea_finish( t, &row );
-    g_object_weak_ref( G_OBJECT( t ), peerPageDestroyed, data );
+    g_object_weak_ref( G_OBJECT( t ), privacyPageDestroyed, data );
     return t;
 }
 
@@ -1281,7 +1273,7 @@ onCorePrefsChanged( TrCore * core UNUSED, const char *  key, gpointer gdata )
 }
 
 static void
-networkPageDestroyed( gpointer gdata, GObject * dead UNUSED )
+peerPageDestroyed( gpointer gdata, GObject * dead UNUSED )
 {
     struct network_page_data * data = gdata;
     if( data->prefsTag > 0 )
@@ -1313,7 +1305,7 @@ onPortTest( GtkButton * button UNUSED, gpointer vdata )
 }
 
 static GtkWidget*
-networkPage( GObject * core )
+peerPage( GObject * core )
 {
     int                        row = 0;
     const char *               s;
@@ -1339,12 +1331,12 @@ networkPage( GObject * core )
     l = data->portLabel = gtk_label_new( _( "Status unknown" ) );
     gtk_misc_set_alignment( GTK_MISC( l ), 0.0f, 0.5f );
     gtk_box_pack_start( GTK_BOX( h ), l, TRUE, TRUE, 0 );
-    w = data->portButton = gtk_button_new_with_mnemonic( _( "_Test Port" ) );
+    w = data->portButton = gtk_button_new_with_mnemonic( _( "Te_st Port" ) );
     gtk_box_pack_end( GTK_BOX( h ), w, FALSE, FALSE, 0 );
     g_signal_connect( w, "clicked", G_CALLBACK(onPortTest), data );
     hig_workarea_add_row( t, &row, NULL, h, NULL );
     data->prefsTag = g_signal_connect( TR_CORE( core ), "prefs-changed", G_CALLBACK( onCorePrefsChanged ), data );
-    g_object_weak_ref( G_OBJECT( t ), networkPageDestroyed, data );
+    g_object_weak_ref( G_OBJECT( t ), peerPageDestroyed, data );
 
     s = _( "Use UPnP or NAT-PMP port _forwarding from my router" );
     w = new_check_button( s, TR_PREFS_KEY_PORT_FORWARDING, core );
@@ -1353,6 +1345,14 @@ networkPage( GObject * core )
     s = _( "Pick a _random port every time Transmission is started" );
     w = new_check_button( s, TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START, core );
     hig_workarea_add_wide_control( t, &row, w );
+
+    hig_workarea_add_section_divider( t, &row );
+    hig_workarea_add_section_title( t, &row, _( "Limits" ) );
+
+    w = new_spin_button( TR_PREFS_KEY_PEER_LIMIT_TORRENT, core, 1, 300, 5 );
+    hig_workarea_add_row( t, &row, _( "Maximum peers per _torrent:" ), w, NULL );
+    w = new_spin_button( TR_PREFS_KEY_PEER_LIMIT_GLOBAL, core, 1, 3000, 5 );
+    hig_workarea_add_row( t, &row, _( "Maximum peers _overall:" ), w, NULL );
 
     hig_workarea_finish( t, &row );
     return t;
@@ -1387,14 +1387,14 @@ tr_prefs_dialog_new( GObject *   core,
                               torrentPage( core ),
                               gtk_label_new ( _( "Torrents" ) ) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ),
-                              peerPage( core ),
-                              gtk_label_new ( _( "Peers" ) ) );
-    gtk_notebook_append_page( GTK_NOTEBOOK( n ),
                               bandwidthPage( core ),
                               gtk_label_new ( _( "Speed" ) ) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ),
-                              networkPage( core ),
-                              gtk_label_new ( _( "Network" ) ) );
+                              privacyPage( core ),
+                              gtk_label_new ( _( "Privacy" ) ) );
+    gtk_notebook_append_page( GTK_NOTEBOOK( n ),
+                              peerPage( core ),
+                              gtk_label_new ( _( "Peers" ) ) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ),
                               desktopPage( core ),
                               gtk_label_new ( _( "Desktop" ) ) );

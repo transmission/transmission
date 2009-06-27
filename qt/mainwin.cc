@@ -1003,12 +1003,19 @@ TrMainWindow :: refreshPref( int key )
             break;
 
         case Prefs :: ALT_SPEED_LIMIT_ENABLED:
+        case Prefs :: ALT_SPEED_LIMIT_UP:
+        case Prefs :: ALT_SPEED_LIMIT_DOWN: {
             b = myPrefs.getBool( key );
             myAltSpeedButton->setChecked( b );
             myAltSpeedButton->setIcon( b ? mySpeedModeOnIcon : mySpeedModeOffIcon );
-            myAltSpeedButton->setToolTip( b ? tr( "Click to disable Temporary Speed Limits" )
-                                            : tr( "Click to enable Temporary Speed Limits" ) );
+            const QString fmt = b ? tr( "Click to disable Temporary Speed Limits\n(%1 down, %2 up)" )
+                                  : tr( "Click to enable Temporary Speed Limits\n(%1 down, %2 up)" );
+            const Speed d = Speed::fromKbps( myPrefs.getInt( Prefs::ALT_SPEED_LIMIT_DOWN ) );
+            const Speed u = Speed::fromKbps( myPrefs.getInt( Prefs::ALT_SPEED_LIMIT_UP ) );
+            myAltSpeedButton->setToolTip( fmt.arg( Utils::speedToString( d ) )
+                                             .arg( Utils::speedToString( u ) ) );
             break;
+        }
 
         default:
             break;
