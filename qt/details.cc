@@ -269,14 +269,14 @@ Details :: refresh( )
     else {
         QString pct = locale.toString( 100.0*((sizeWhenDone-leftUntilDone)/sizeWhenDone), 'f', 2 );
         if( !haveUnverified )
-            string = tr( "%1 (%2 verified)" )
-                     .arg( pct )
-                     .arg( Utils :: sizeToString( haveVerified ) );
+            string = tr( "%1 (%2%)" )
+                         .arg( Utils :: sizeToString( haveVerified + haveUnverified ) )
+                         .arg( pct );
         else
-            string = tr( "%1 (%2 verified, %3 unverified)" )
-                     .arg( pct )
-                     .arg( Utils :: sizeToString( haveVerified ) )
-                     .arg( Utils :: sizeToString( haveUnverified ) );
+            string = tr( "%1 (%2%); %3 Unverified" )
+                         .arg( Utils :: sizeToString( haveVerified + haveUnverified ) )
+                         .arg( pct )
+                         .arg( Utils :: sizeToString( haveUnverified ) );
     }
     myHaveLabel->setText( string );
 
