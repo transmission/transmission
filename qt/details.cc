@@ -934,9 +934,9 @@ Details :: createOptionsTab( )
     connect( s, SIGNAL(valueChanged(int)), this, SLOT(onUploadLimitChanged(int)));
 
     m = new QComboBox;
-    m->addItem( tr( "Low" ),    TR_PRI_LOW );
-    m->addItem( tr( "Normal" ), TR_PRI_NORMAL );
     m->addItem( tr( "High" ),   TR_PRI_HIGH );
+    m->addItem( tr( "Normal" ), TR_PRI_NORMAL );
+    m->addItem( tr( "Low" ),    TR_PRI_LOW );
     connect( m, SIGNAL(currentIndexChanged(int)), this, SLOT(onBandwidthPriorityChanged(int)));
     hig->addRow( tr( "Torrent &priority:" ), m );
     myBandwidthPriorityCombo = m;

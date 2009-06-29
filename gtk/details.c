@@ -467,9 +467,9 @@ new_priority_combo( struct DetailsImpl * di )
         int value;
         const char * text;
     } items[] = {
-        { TR_PRI_LOW,    N_( "Low" )  },
+        { TR_PRI_HIGH,   N_( "High" )  },
         { TR_PRI_NORMAL, N_( "Normal" ) },
-        { TR_PRI_HIGH,   N_( "High" )  }
+        { TR_PRI_LOW,    N_( "Low" )  }
     };
 
     store = gtk_list_store_new( 2, G_TYPE_INT, G_TYPE_STRING );
