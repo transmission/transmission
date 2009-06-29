@@ -24,8 +24,6 @@
 #include "tracker-list.h"
 #include "util.h"
 
-#define UPDATE_INTERVAL_MSEC 200
-
 #define UI_KEY "ui"
 #define ANNOUNCE_KEY "recent-announce-url"
 
@@ -230,7 +228,7 @@ response_cb( GtkDialog* d,
                     gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( ui->
                                                                      private_check ) ) );
 
-    tag = g_timeout_add ( UPDATE_INTERVAL_MSEC, refresh_cb, ui );
+    tag = gtr_timeout_add_seconds( 1, refresh_cb, ui );
     g_object_set_data_full ( G_OBJECT( d ), "tag", GUINT_TO_POINTER(
                                  tag ), remove_tag );
 

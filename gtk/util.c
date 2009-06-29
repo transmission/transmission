@@ -667,16 +667,6 @@ gtr_button_new_from_stock( const char * stock,
 ****
 ***/
 
-guint
-gtr_timeout_add_seconds( guint seconds, GSourceFunc function, gpointer data )
-{
-#if GLIB_CHECK_VERSION( 2,14,0 )
-    return g_timeout_add_seconds( seconds, function, data );
-#else
-    return g_timeout_add( seconds*1000, function, data );
-#endif
-}
-
 void
 gtr_widget_set_tooltip_text( GtkWidget * w, const char * tip )
 {
@@ -698,5 +688,61 @@ gtr_toolbar_set_orientation( GtkToolbar      * toolbar,
     gtk_orientable_set_orientation( GTK_ORIENTABLE( toolbar ), orientation );
 #else
     gtk_toolbar_set_orientation( toolbar, orientation );
+#endif
+}
+
+/***
+****
+***/
+
+#if !GTK_CHECK_VERSION( 2,12,0 )
+struct gtr_func_data
+{
+    GSourceFunc function;
+    gpointer data;
+};
+
+static gboolean
+gtr_thread_func( gpointer data )
+{
+    struct gtr_func_data * idle_data = data;
+    gboolean more;
+
+    gdk_threads_enter( );
+    more = idle_data->function( idle_data->data );
+    gdk_threads_leave( );
+
+    if( !more )
+        g_free( data );
+
+    return more;
+}
+#endif
+
+void
+gtr_idle_add( GSourceFunc function, gpointer data )
+{
+#if GTK_CHECK_VERSION( 2,12,0 )
+    gdk_threads_add_idle( func, data );
+#else
+    struct gtr_func_data * d = g_new( struct gtr_func_data, 1 );
+    d->function = function;
+    d->data = data;
+    g_idle_add( gtr_thread_func, d );
+#endif
+}
+
+guint
+gtr_timeout_add_seconds( guint seconds, GSourceFunc function, gpointer data )
+{
+#if GTK_CHECK_VERSION( 2,14,0 )
+    return gdk_threads_add_timeout_seconds( seconds, function, data );
+#elif GTK_CHECK_VERSION( 2,12,0 )
+    return gdk_threads_add_timeout( seconds*1000, function, data );
+#else
+    struct gtr_func_data * d = g_new( struct gtr_func_data, 1 );
+    d->function = function;
+    d->data = data;
+    return g_timeout_add( seconds*1000, gtr_thread_func, d );
 #endif
 }

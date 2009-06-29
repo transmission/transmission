@@ -167,7 +167,7 @@ completenessChangedCallback( tr_torrent       * tor,
                              void *             user_data )
 {
     if( ( completeness != TR_LEECH ) && ( tr_torrentStat( tor )->sizeWhenDone != 0 ) )
-        g_idle_add( notifyInMainThread, user_data );
+        gtr_idle_add( notifyInMainThread, user_data );
 }
 
 static TrTorrent *

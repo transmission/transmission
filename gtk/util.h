@@ -94,6 +94,13 @@ char*       gtr_get_help_url( void );
 
 #ifdef GTK_MAJOR_VERSION
 
+guint       gtr_timeout_add_seconds( guint       seconds,
+                                     GSourceFunc function,
+                                     gpointer    data );
+
+void        gtr_idle_add( GSourceFunc  func, 
+                          gpointer     data );
+
 void        gtr_toolbar_set_orientation( GtkToolbar      * toolbar,
                                          GtkOrientation    orientation );
 
@@ -101,10 +108,6 @@ void        gtr_widget_set_tooltip_text( GtkWidget * w, const char * tip );
 
 GtkWidget * gtr_button_new_from_stock( const char * stock,
                                        const char * mnemonic );
-
-guint       gtr_timeout_add_seconds( guint       seconds,
-                                     GSourceFunc function,
-                                     gpointer    data );
 
 void        addTorrentErrorDialog( GtkWidget *  window_or_child,
                                    int          err,

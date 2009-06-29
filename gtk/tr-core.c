@@ -1372,7 +1372,7 @@ readResponse( tr_session  * session UNUSED,
     g_message( "response: [%*.*s]", (int)response_len, (int)response_len, response );
 #endif
     g_byte_array_append( bytes, (const uint8_t*)response, response_len );
-    g_idle_add( readResponseIdle, bytes );
+    gtr_idle_add( readResponseIdle, bytes );
 }
 
 static void
