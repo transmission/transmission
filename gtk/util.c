@@ -723,7 +723,7 @@ void
 gtr_idle_add( GSourceFunc function, gpointer data )
 {
 #if GTK_CHECK_VERSION( 2,12,0 )
-    gdk_threads_add_idle( func, data );
+    gdk_threads_add_idle( function, data );
 #else
     struct gtr_func_data * d = g_new( struct gtr_func_data, 1 );
     d->function = function;
