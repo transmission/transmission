@@ -1266,9 +1266,11 @@ onCorePrefsChanged( TrCore * core UNUSED, const char *  key, gpointer gdata )
     if( !strcmp( key, TR_PREFS_KEY_PEER_PORT ) )
     {
         struct network_page_data * data = gdata;
+        gdk_threads_enter();
         gtk_label_set_text( GTK_LABEL( data->portLabel ), _( "Status unknown" ) );
         gtk_widget_set_sensitive( data->portButton, TRUE );
         gtk_widget_set_sensitive( data->portSpin, TRUE );
+        gdk_threads_leave();
     }
 }
 
@@ -1288,9 +1290,11 @@ onPortTested( TrCore * core UNUSED, gboolean isOpen, gpointer vdata )
 {
     struct network_page_data * data = vdata;
     const char * markup = isOpen ? _( "Port is <b>open</b>" ) : _( "Port is <b>closed</b>" );
+    gdk_threads_enter();
     gtk_label_set_markup( GTK_LABEL( data->portLabel ), markup );
     gtk_widget_set_sensitive( data->portButton, TRUE );
     gtk_widget_set_sensitive( data->portSpin, TRUE );
+    gdk_threads_leave();
 }
 
 static void
