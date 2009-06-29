@@ -292,7 +292,7 @@ Details :: refresh( )
         const QString dstr = Utils::sizeToString( d );
         const QString fstr = Utils::sizeToString( f );
         if( f )
-            string = tr( "%1 (+%2s corrupt)" ).arg( dstr ).arg( fstr );
+            string = tr( "%1 (+%2 corrupt)" ).arg( dstr ).arg( fstr );
         else
             string = dstr;
     }
