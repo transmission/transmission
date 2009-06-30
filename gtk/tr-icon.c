@@ -51,25 +51,53 @@ popup( GtkStatusIcon *       self,
 static gboolean
 refresh_tooltip_cb( gpointer data )
 {
-    GtkStatusIcon *   icon = GTK_STATUS_ICON( data );
-    TrCore *          core = g_object_get_data( G_OBJECT( icon ), "tr-core" );
-    struct core_stats stats;
-    char              downStr[32], upStr[32];
-    char              tip[256];
+    double d;
+    int limit;
+    char up[64];
+    char upLimit[64];
+    char down[64];
+    char downLimit[64];
+    char tip[1024];
+    const char * idle = _( "Idle" );
+    GtkStatusIcon * icon = GTK_STATUS_ICON( data );
+    tr_session * session = tr_core_session( g_object_get_data( G_OBJECT( icon ), "tr-core" ) );
 
-    tr_core_get_stats( core, &stats );
+    /* up */
+    if(((d = tr_sessionGetRawSpeed( session, TR_UP ))) < 0.1 )
+        g_strlcpy( up, idle, sizeof( up ) );
+    else
+        tr_strlspeed( up, d, sizeof( up ) );
 
-    tr_strlspeed( downStr, stats.clientDownloadSpeed, sizeof( downStr ) );
-    tr_strlspeed( upStr, stats.clientUploadSpeed, sizeof( upStr ) );
-    g_snprintf( tip, sizeof( tip ),
-                /* %1$'d is the number of torrents we're seeding,
-                   %2$'d is the number of torrents we're downloading,
-                   %3$s is our download speed,
-                   %4$s is our upload speed */
-                _( "%1$'d Seeding, %2$'d Downloading\nDown: %3$s, Up: %4$s" ),
-                stats.seedingCount,
-                stats.downloadCount,
-                downStr, upStr );
+    /* up limit */
+    if( !tr_sessionGetActiveSpeedLimit( session, TR_UP, &limit ) )
+        *upLimit = '\0';
+    else {
+        char buf[64];
+        tr_strlspeed( buf, limit, sizeof( buf ) );
+        g_snprintf( upLimit, sizeof( upLimit ), _( "(Limit: %s)" ), buf );
+    }
+
+    /* down */
+    if(((d = tr_sessionGetRawSpeed( session, TR_DOWN ))) < 0.1 )
+        g_strlcpy( down, idle, sizeof( down ) );
+    else
+        tr_strlspeed( down, d, sizeof( down ) );
+
+    /* down limit */    
+    if( !tr_sessionGetActiveSpeedLimit( session, TR_DOWN, &limit ) )
+        *downLimit = '\0';
+    else {
+        char buf[64];
+        tr_strlspeed( buf, limit, sizeof( buf ) );
+        g_snprintf( downLimit, sizeof( downLimit ), _( "(Limit: %s)" ), buf );
+    }
+
+    /* %1$s: current upload speed
+     * %2$s: current upload limit, if any
+     * %3$s: current download speed
+     * %4$s: current download limit, if any */
+    g_snprintf( tip, sizeof( tip ), _( "Transmission\nUp: %1$s %2$s\nDown: %3$s %4$s" ), up, upLimit, down, downLimit );
+
 #if GTK_CHECK_VERSION( 2,16,0 )
     gtk_status_icon_set_tooltip_text( GTK_STATUS_ICON( icon ), tip );
 #else

@@ -360,7 +360,7 @@ PrefsDialog :: onPortTest( )
 }
 
 QWidget *
-PrefsDialog :: createPeersTab( )
+PrefsDialog :: createNetworkTab( )
 {
     HIG * hig = new HIG( this );
     hig->addSectionTitle( tr( "Incoming Peers" ) );
@@ -463,9 +463,9 @@ PrefsDialog :: createPrivacyTab( )
     hig->addWideControl( l );
 
     QComboBox * box = new QComboBox( );
-    box->addItem( tr( "Plaintext preferred" ), 0 );
-    box->addItem( tr( "Encryption preferred" ), 1 );
-    box->addItem( tr( "Encryption required" ), 2 );
+    box->addItem( tr( "Allow encryption" ), 0 );
+    box->addItem( tr( "Prefer encryption" ), 1 );
+    box->addItem( tr( "Require encryption" ), 2 );
     myWidgets.insert( Prefs :: ENCRYPTION, box );
     connect( box, SIGNAL(activated(int)), this, SLOT(encryptionEdited(int)));
 
@@ -578,7 +578,7 @@ PrefsDialog :: PrefsDialog( Session& session, Prefs& prefs, QWidget * parent ):
     t->addTab( createTorrentsTab( ),     tr( "Torrents" ) );
     t->addTab( createSpeedTab( ),        tr( "Speed" ) );
     t->addTab( createPrivacyTab( ),      tr( "Privacy" ) );
-    t->addTab( createPeersTab( ),        tr( "Peers" ) );
+    t->addTab( createNetworkTab( ),      tr( "Network" ) );
     t->addTab( createWebTab( session ),  tr( "Web" ) );
     //t->addTab( createTrackerTab( ),    tr( "Trackers" ) );
     myLayout->addWidget( t );

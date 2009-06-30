@@ -718,45 +718,6 @@ tr_core_session( TrCore * core )
     return isDisposed( core ) ? NULL : core->priv->session;
 }
 
-static gboolean
-statsForeach( GtkTreeModel * model,
-              GtkTreePath  * path UNUSED,
-              GtkTreeIter  * iter,
-              gpointer       gstats )
-{
-    tr_torrent *        tor;
-    struct core_stats * stats = gstats;
-    int                 activity;
-
-    gtk_tree_model_get( model, iter, MC_TORRENT_RAW, &tor, -1 );
-    activity = tr_torrentGetActivity( tor );
-
-    if( activity == TR_STATUS_DOWNLOAD )
-        ++stats->downloadCount;
-    else if( activity == TR_STATUS_SEED )
-        ++stats->seedingCount;
-
-    return FALSE;
-}
-
-void
-tr_core_get_stats( const TrCore *      core,
-                   struct core_stats * setme )
-{
-    memset( setme, 0, sizeof( struct core_stats ) );
-
-    if( !isDisposed( core ) )
-    {
-        tr_session * session = core->priv->session;
-
-        setme->clientDownloadSpeed = tr_sessionGetPieceSpeed( session, TR_DOWN );
-
-        setme->clientUploadSpeed = tr_sessionGetPieceSpeed( session, TR_UP );
-
-        gtk_tree_model_foreach( core->priv->model, statsForeach, setme );
-    }
-}
-
 static char*
 doCollate( const char * in )
 {

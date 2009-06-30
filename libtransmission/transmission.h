@@ -629,6 +629,12 @@ typedef void ( tr_altSpeedFunc )      ( tr_session *, tr_bool active, tr_bool us
 void     tr_sessionClearAltSpeedFunc  ( tr_session * );
 void     tr_sessionSetAltSpeedFunc    ( tr_session *, tr_altSpeedFunc *, void * );
 
+
+tr_bool      tr_sessionGetActiveSpeedLimit( const tr_session  * session,
+                                            tr_direction        dir,
+                                            int               * setme );
+
+
 /***
 ****
 ***/

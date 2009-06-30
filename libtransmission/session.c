@@ -1026,6 +1026,9 @@ tr_sessionGetActiveSpeedLimit( const tr_session * session, tr_direction dir, int
 {
     int isLimited = TRUE;
 
+    if( !tr_isSession( session ) )
+        return FALSE;
+
     if( tr_sessionUsesAltSpeed( session ) )
         *setme = tr_sessionGetAltSpeed( session, dir );
     else if( tr_sessionIsSpeedLimited( session, dir ) )

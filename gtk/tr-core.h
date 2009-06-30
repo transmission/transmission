@@ -45,14 +45,6 @@
                                                          TR_CORE_TYPE, \
                                                          TrCoreClass )
 
-struct core_stats
-{
-    int      downloadCount;
-    int      seedingCount;
-    float    clientDownloadSpeed;
-    float    clientUploadSpeed;
-};
-
 typedef struct TrCore
 {
     GObject    parent;
@@ -109,9 +101,6 @@ void           tr_core_close( TrCore* );
 GtkTreeModel * tr_core_model( TrCore * self );
 
 tr_session *   tr_core_session( TrCore * self );
-
-void           tr_core_get_stats( const TrCore *      core,
-                                  struct core_stats * setme );
 
 /******
 *******

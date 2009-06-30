@@ -284,6 +284,8 @@ privateFree( gpointer vprivate )
     PrivateData * p = vprivate;
 
     g_signal_handler_disconnect( p->core, p->pref_handler_id );
+    g_object_unref( G_OBJECT( p->alt_speed_image[1] ) );
+    g_object_unref( G_OBJECT( p->alt_speed_image[0] ) );
     g_free( p->filter_text );
     g_free( p );
 }
