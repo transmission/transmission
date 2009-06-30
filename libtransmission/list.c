@@ -165,12 +165,6 @@ tr_list_size( const tr_list * list )
  * insert/remove operations
  */
 
-void
-__tr_list_init( struct __tr_list * head )
-{
-    head->next = head;
-    head->prev = head;
-}
 
 void
 __tr_list_insert( struct __tr_list * list,
@@ -192,13 +186,6 @@ __tr_list_splice( struct __tr_list * prev,
 }
 
  
-void
-__tr_list_append( struct __tr_list * head,
-		  struct __tr_list * list)
-{
-    __tr_list_insert( list, head->prev, head );
-}
-
 void
 __tr_list_remove( struct __tr_list * head )
 {
