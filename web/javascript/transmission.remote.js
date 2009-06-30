@@ -154,7 +154,7 @@ TransmissionRemote.prototype =
 		};
 		o.arguments[command] = [ file._index ];
 		this.sendRequest( o, function( ) {
-			remote.loadTorrentFiles( torrent_ids );
+			remote._controller.refreshTorrents( torrent_ids );
 		} );
 	},
 	

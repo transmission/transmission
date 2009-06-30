@@ -1146,16 +1146,19 @@ Transmission.prototype =
 		this.setFilter( Prefs._FilterAll );
 	},
 
-	refreshTorrents: function() {
+	refreshTorrents: function(ids) {
 		var tr = this;
-		this.remote.getUpdatedDataFor('recently-active', function(active, removed){ tr.updateTorrentsData(active, removed); });
+		if (!ids)
+		  ids = 'recently-active';
+
+		this.remote.getUpdatedDataFor(ids, function(active, removed){ tr.updateTorrentsData(active, removed); });
 	},
 
-	updateTorrentsData: function( active, removed_ids ) {
+	updateTorrentsData: function( updated, removed_ids ) {
 		var tr = this;
 		var new_torrent_ids = [];
 		var refresh_files_for = [];
-		jQuery.each( active, function() {
+		jQuery.each( updated, function() {
 			var t = tr._torrents[this.id];
 			if (t){
 		    t.refresh(this);
