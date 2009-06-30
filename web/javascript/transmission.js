@@ -87,7 +87,6 @@ Transmission.prototype =
 		this._inspector._info_tab.creator_date = $(ti+'creator_date')[0];
 		this._inspector._info_tab.creator = $(ti+'creator')[0];
 		this._inspector._info_tab.download_dir = $(ti+'download_dir')[0];
-		this._inspector._info_tab.torrent_file = $(ti+'torrent_file')[0];
 		this._inspector._info_tab.downloaded = $(ti+'downloaded')[0];
 		this._inspector._info_tab.download_from = $(ti+'download_from')[0];
 		this._inspector._info_tab.download_speed = $(ti+'download_speed')[0];
@@ -921,7 +920,6 @@ Transmission.prototype =
 		var creator = 'N/A';
 		var comment = 'N/A';
 		var download_dir = 'N/A';
-		var torrent_file = 'N/A';
 		var date_created = 'N/A';
 		var error = '';
 		var hash = 'N/A';
@@ -994,8 +992,6 @@ Transmission.prototype =
 				creator = t._creator ;
 			if( t._download_dir)
 				download_dir = t._download_dir;
-			if( t._torrent_file )
-				torrent_file = t._torrent_file;
 
 			hash = t.hash();
 			date_created = Math.formatTimestamp( t._creator_date );
@@ -1058,7 +1054,6 @@ Transmission.prototype =
 		setInnerHTML( tab.comment, comment.replace(/\//g, '/&#8203;') );
 		setInnerHTML( tab.creator, creator );
 		setInnerHTML( tab.download_dir, download_dir.replace(/([\/_\.])/g, "$1&#8203;") );
-		setInnerHTML( tab.torrent_file, torrent_file.replace(/([\/_\.])/g, "$1&#8203;") );
 		setInnerHTML( tab.error, error );
 		
 		$(".inspector_row > div:contains('N/A')").css('color', '#666');

@@ -108,7 +108,7 @@ TransmissionRemote.prototype =
 				'peersConnected', 'peersGettingFromUs', 'peersSendingToUs',
 				'rateDownload', 'rateUpload', 'seeders', 'sizeWhenDone',
 				'status', 'swarmSpeed', 'totalSize', 'uploadedEver',
-				'downloadDir', 'torrentFile', 'files', 'fileStats' ]
+				'downloadDir', 'files', 'fileStats' ]
 			}
 		};
 
