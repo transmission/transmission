@@ -267,7 +267,8 @@ Details :: refresh( )
     if( !haveVerified && !haveUnverified )
         string = none;
     else {
-        QString pct = locale.toString( 100.0*((sizeWhenDone-leftUntilDone)/sizeWhenDone), 'f', 2 );
+        const double d = 100.0 * ( sizeWhenDone ? ( sizeWhenDone - leftUntilDone ) / sizeWhenDone : 1 );
+        QString pct = locale.toString( d, 'f', 2 );
         if( !haveUnverified )
             string = tr( "%1 (%2%)" )
                          .arg( Utils :: sizeToString( haveVerified + haveUnverified ) )

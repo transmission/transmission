@@ -791,7 +791,7 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
             str = none;
         else {
             char unver[64], total[64];
-            const double ratio = ( 100.0 * ( haveValid + haveUnchecked ) )  / leftUntilDone;
+            const double ratio = 100.0 * ( leftUntilDone ? ( haveValid + haveUnchecked ) / leftUntilDone : 1 );
             tr_strlsize( total, haveUnchecked + haveValid, sizeof( total ) );
             tr_strlsize( unver, haveUnchecked,             sizeof( unver ) );
             if( haveUnchecked )
