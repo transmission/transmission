@@ -630,6 +630,7 @@ static gpointer
 quitThreadFunc( gpointer gdata )
 {
     struct cbdata * cbdata = gdata;
+    gdk_threads_enter( );
 
     tr_core_close( cbdata->core );
 
@@ -656,6 +657,8 @@ quitThreadFunc( gpointer gdata )
     g_free( cbdata );
 
     gtk_main_quit( );
+    gdk_threads_leave( );
+
     return NULL;
 }
 
