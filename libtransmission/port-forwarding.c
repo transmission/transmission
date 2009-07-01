@@ -17,12 +17,12 @@
 #include <sys/types.h>
 
 #include "transmission.h"
-#include "session.h"
 #include "natpmp.h"
 #include "net.h"
 #include "peer-io.h"
 #include "peer-mgr.h"
 #include "port-forwarding.h"
+#include "session.h"
 #include "torrent.h"
 #include "trevent.h"
 #include "upnp.h"

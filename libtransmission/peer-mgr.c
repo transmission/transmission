@@ -19,7 +19,6 @@
 #include <event.h>
 
 #include "transmission.h"
-#include "session.h"
 #include "bandwidth.h"
 #include "bencode.h"
 #include "blocklist.h"
@@ -34,6 +33,7 @@
 #include "peer-mgr.h"
 #include "peer-msgs.h"
 #include "ptrarray.h"
+#include "session.h"
 #include "stats.h" /* tr_statsAddUploaded, tr_statsAddDownloaded */
 #include "torrent.h"
 #include "trevent.h"

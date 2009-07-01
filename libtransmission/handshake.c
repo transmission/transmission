@@ -20,13 +20,13 @@
 #include <event.h>
 
 #include "transmission.h"
-#include "session.h"
 #include "bencode.h"
 #include "clients.h"
 #include "crypto.h"
 #include "handshake.h"
 #include "peer-io.h"
 #include "peer-mgr.h"
+#include "session.h"
 #include "torrent.h"
 #include "tr-dht.h"
 #include "utils.h"

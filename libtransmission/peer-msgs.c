@@ -20,7 +20,6 @@
 #include <event.h>
 
 #include "transmission.h"
-#include "session.h"
 #include "bencode.h"
 #include "completion.h"
 #include "crypto.h"
@@ -34,6 +33,7 @@
 #include "platform.h" /* MAX_STACK_ARRAY_SIZE */
 #include "ratecontrol.h"
 #include "request-list.h"
+#include "session.h"
 #include "stats.h"
 #include "torrent.h"
 #include "tr-dht.h"

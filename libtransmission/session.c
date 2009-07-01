@@ -23,7 +23,6 @@
 #include <event.h>
 
 #include "transmission.h"
-#include "session.h"
 #include "bandwidth.h"
 #include "bencode.h"
 #include "blocklist.h"
@@ -37,15 +36,16 @@
 #include "platform.h" /* tr_lock */
 #include "port-forwarding.h"
 #include "rpc-server.h"
+#include "session.h"
 #include "stats.h"
 #include "torrent.h"
 #include "tracker.h"
+#include "tr-dht.h"
 #include "trevent.h"
 #include "utils.h"
-#include "version.h"
 #include "verify.h"
+#include "version.h"
 #include "web.h"
-#include "tr-dht.h"
 
 #define dbgmsg( ... ) \
     do { \

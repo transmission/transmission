@@ -17,13 +17,13 @@
 #include <event.h>
 
 #include "transmission.h"
-#include "session.h"
 #include "bencode.h"
-#include "crypto.h"
 #include "completion.h"
+#include "crypto.h"
 #include "net.h"
 #include "publish.h"
 #include "resume.h"
+#include "session.h"
 #include "torrent.h"
 #include "tracker.h"
 #include "tr-dht.h"

@@ -19,8 +19,8 @@
 #include "transmission.h"
 #include "port-forwarding.h"
 #include "session.h"
-#include "utils.h"
 #include "upnp.h"
+#include "utils.h"
 
 static const char *
 getKey( void ) { return _( "Port Forwarding (UPnP)" ); }

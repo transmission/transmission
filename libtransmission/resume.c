@@ -15,13 +15,13 @@
 #include <string.h>
 
 #include "transmission.h"
-#include "session.h"
 #include "bencode.h"
 #include "completion.h"
 #include "fastresume.h"
 #include "peer-mgr.h" /* pex */
 #include "platform.h" /* tr_getResumeDir */
 #include "resume.h"
+#include "session.h"
 #include "torrent.h"
 #include "utils.h" /* tr_buildPath */
 

@@ -31,6 +31,7 @@
 #include "bencode.h"
 #include "crypto.h"
 #include "list.h"
+#include "net.h"
 #include "platform.h"
 #include "ptrarray.h"
 #include "rpcimpl.h"
@@ -38,7 +39,6 @@
 #include "trevent.h"
 #include "utils.h"
 #include "web.h"
-#include "net.h"
 
 /* session-id is used to make cross-site request forgery attacks difficult.
  * Don't disable this feature unless you really know what you're doing!
