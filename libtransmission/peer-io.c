@@ -267,6 +267,14 @@ tr_evbuffer_write( tr_peerIo * io, int fd, size_t howmuch )
     if( n > 0 )
         evbuffer_drain( buffer, n );
 
+    /* keep the iobuf's excess capacity from growing too large */
+    if( buffer->totallen > ( EVBUFFER_LENGTH( buffer ) + 1024 ) ) {
+        struct evbuffer * swap = evbuffer_new( );
+        evbuffer_add( swap, EVBUFFER_DATA( buffer ), EVBUFFER_LENGTH( buffer ) );
+        evbuffer_free( buffer );
+        io->outbuf = swap;
+    }
+
     return n;
 }
 
