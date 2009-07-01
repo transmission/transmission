@@ -1005,7 +1005,7 @@ TrMainWindow :: refreshPref( int key )
         case Prefs :: ALT_SPEED_LIMIT_ENABLED:
         case Prefs :: ALT_SPEED_LIMIT_UP:
         case Prefs :: ALT_SPEED_LIMIT_DOWN: {
-            b = myPrefs.getBool( key );
+            b = myPrefs.getBool( Prefs :: ALT_SPEED_LIMIT_ENABLED );
             myAltSpeedButton->setChecked( b );
             myAltSpeedButton->setIcon( b ? mySpeedModeOnIcon : mySpeedModeOffIcon );
             const QString fmt = b ? tr( "Click to disable Temporary Speed Limits\n(%1 down, %2 up)" )
