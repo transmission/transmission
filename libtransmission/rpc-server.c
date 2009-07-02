@@ -73,6 +73,7 @@ struct tr_rpc_server
     time_t             sessionIdExpiresAt;
 
 #ifdef HAVE_ZLIB
+    tr_bool            isStreamInitialized;
     z_stream           stream;
 #endif
 };
@@ -326,6 +327,15 @@ add_response( struct evhttp_request * req,
 
         /* FIXME(libevent2): this won't compile under libevent2.
            but we can use evbuffer_reserve_space() + evbuffer_commit_space() instead */
+
+        if( !server->isStreamInitialized )
+        {
+            server->isStreamInitialized = TRUE;
+            server->stream.zalloc = (alloc_func) Z_NULL;
+            server->stream.zfree = (free_func) Z_NULL;
+            server->stream.opaque = (voidpf) Z_NULL;
+            deflateInit( &server->stream, Z_BEST_COMPRESSION );
+        }
 
         server->stream.next_in = (Bytef*) content;
         server->stream.avail_in = content_len;
@@ -859,7 +869,8 @@ closeServer( void * vserver )
     while(( tmp = tr_list_pop_front( &s->whitelist )))
         tr_free( tmp );
 #ifdef HAVE_ZLIB
-    deflateEnd( &s->stream );
+    if( s->isStreamInitialized )
+        deflateEnd( &s->stream );
 #endif
     tr_free( s->sessionId );
     tr_free( s->whitelistStr );
@@ -931,13 +942,6 @@ tr_rpcInit( tr_session  * session,
         address = tr_inaddr_any;
     }
     s->bindAddress = address.addr.addr4;
-
-#ifdef HAVE_ZLIB
-    s->stream.zalloc = (alloc_func) Z_NULL;
-    s->stream.zfree = (free_func) Z_NULL;
-    s->stream.opaque = (voidpf) Z_NULL;
-    deflateInit( &s->stream, Z_BEST_COMPRESSION );
-#endif
 
     if( s->isEnabled )
     {
