@@ -185,6 +185,9 @@ struct tr_torrent
     uint64_t                   corruptCur;
     uint64_t                   corruptPrev;
 
+    uint64_t                   etaSpeedCalculatedAt;
+    double                     etaSpeed;
+
     time_t                     addedDate;
     time_t                     activityDate;
     time_t                     doneDate;
