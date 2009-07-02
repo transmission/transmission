@@ -202,6 +202,7 @@ const char* tr_getDefaultDownloadDir( void );
 #define TR_PREFS_KEY_DSPEED_ENABLED             "speed-limit-down-enabled"
 #define TR_PREFS_KEY_USPEED_ENABLED             "speed-limit-up-enabled"
 #define TR_PREFS_KEY_USPEED                     "speed-limit-up"
+#define TR_PREFS_KEY_UMASK                      "umask"
 #define TR_PREFS_KEY_UPLOAD_SLOTS_PER_TORRENT   "upload-slots-per-torrent"
 
 
