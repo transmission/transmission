@@ -17,6 +17,7 @@
 
 #include <assert.h>
 #include <limits.h> /* INT_MAX */
+#include <math.h> /* fabs */
 #include <string.h> /* memcmp */
 #include <stdlib.h> /* qsort */
 
@@ -954,7 +955,7 @@ tr_torrentStat( tr_torrent * tor )
                  * to dampen the effect of fluctuations */
                 if( ( tor->etaSpeedCalculatedAt + 800 ) < now ) {
                     tor->etaSpeedCalculatedAt = now;
-                    tor->etaSpeed = fabs(tor->etaSpeed>0.001)
+                    tor->etaSpeed = (fabs(tor->etaSpeed)<0.0001)
                         ? s->pieceDownloadSpeed /* if no previous speed, no need to smooth */
                         : 0.8*tor->etaSpeed + 0.2*s->pieceDownloadSpeed; /* smooth across 5 readings */
                 }
