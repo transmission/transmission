@@ -118,12 +118,12 @@
     <addaction name="separator"/>
     <addaction name="action_SortByActivity"/>
     <addaction name="action_SortByAge"/>
-    <addaction name="action_SortByETA"/>
     <addaction name="action_SortByName"/>
     <addaction name="action_SortByProgress"/>
     <addaction name="action_SortByRatio"/>
     <addaction name="action_SortBySize"/>
     <addaction name="action_SortByState"/>
+    <addaction name="action_SortByETA"/>
     <addaction name="action_SortByTracker"/>
     <addaction name="separator"/>
     <addaction name="action_ReverseSortOrder"/>
@@ -367,7 +367,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Sort by &amp;ETA</string>
+    <string>Sort by Time &amp;Left</string>
    </property>
   </action>
   <action name="action_SortByName">
@@ -391,7 +391,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Sort by &amp;Ratio</string>
+    <string>Sort by Rati&amp;o</string>
    </property>
   </action>
   <action name="action_SortBySize">
@@ -407,7 +407,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Sort by &amp;State</string>
+    <string>Sort by Stat&amp;e</string>
    </property>
   </action>
   <action name="action_SortByTracker">
@@ -415,7 +415,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Sort by &amp;Tracker</string>
+    <string>Sort by T&amp;racker</string>
    </property>
   </action>
   <action name="action_ShowMessageLog">
@@ -449,7 +449,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>&amp;Reverse Sort Order</string>
+    <string>Re&amp;verse Sort Order</string>
    </property>
   </action>
   <action name="action_FilterByName">
