@@ -57,21 +57,27 @@ getTorrentFilename( const tr_session * session,
 }
 
 static char*
-getOldTorrentFilename( const tr_session * session,
-                       const tr_info *   inf )
+getOldTorrentFilename( const tr_session * session, const tr_info * inf )
 {
-    char *            ret;
-    struct evbuffer * buf = evbuffer_new( );
+    int i;
+    const char * tags[] = { "beos", "cli", "daemon", "gtk", "macosx", "wx" };
+    const int tagCount = 6;
+    char * path;
+    struct stat sb;
 
-    evbuffer_add_printf( buf, "%s%c%s", tr_getTorrentDir( session ),
-                         TR_PATH_DELIMITER,
-                         inf->hashString );
-    if( session->tag )
-        evbuffer_add_printf( buf, "-%s", session->tag );
+    for( i=0; i<tagCount; ++i ) {
+        path = tr_strdup_printf( "%s%c%s-%s", tr_getTorrentDir( session ), '/', inf->hashString, tags[i] );
+        if( !stat( path, &sb ) && ( ( sb.st_mode & S_IFMT ) == S_IFREG ) )
+            return path;
+        tr_free( path );
+    }
 
-    ret = tr_strndup( EVBUFFER_DATA( buf ), EVBUFFER_LENGTH( buf ) );
-    evbuffer_free( buf );
-    return ret;
+    path = tr_buildPath( tr_getTorrentDir( session ), inf->hashString, NULL );
+    if( !stat( path, &sb ) && ( ( sb.st_mode & S_IFMT ) == S_IFREG ) )
+        return path;
+    tr_free( path );
+
+    return NULL;
 }
 
 /* this is for really old versions of T and will probably be removed someday */
