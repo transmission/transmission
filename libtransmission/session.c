@@ -364,8 +364,7 @@ tr_sessionGetDefaultSettings( tr_benc * d )
     tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_SOCKET_TOS,          atoi( TR_DEFAULT_PEER_SOCKET_TOS_STR ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_PEX_ENABLED,              TRUE );
     tr_bencDictAddBool( d, TR_PREFS_KEY_PORT_FORWARDING,          TRUE );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_PREALLOCATION,            TR_PREALLOCATE_FULL );
-    /* tr_bencDictAddInt ( d, TR_PREFS_KEY_PREALLOCATION,            TR_PREALLOCATE_SPARSE ); */
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_PREALLOCATION,            TR_PREALLOCATE_SPARSE );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_PROXY,                    "" );
     tr_bencDictAddBool( d, TR_PREFS_KEY_PROXY_AUTH_ENABLED,       FALSE );
     tr_bencDictAddBool( d, TR_PREFS_KEY_PROXY_ENABLED,            FALSE );
