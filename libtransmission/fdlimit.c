@@ -85,7 +85,6 @@ struct tr_openfile
 {
     tr_bool    isCheckedOut;
     tr_bool    isWritable;
-    tr_bool    closeWhenDone;
     int        torrentId;
     char       filename[MAX_PATH_LENGTH];
     int        fd;
@@ -508,7 +507,6 @@ tr_fdFileCheckout( int                      torrentId,
     dbgmsg( "checking out '%s' in slot %d", filename, winner );
     o->torrentId = torrentId;
     o->isCheckedOut = 1;
-    o->closeWhenDone = 0;
     o->date = tr_date( );
     tr_lockUnlock( gFd->lock );
     return o->fd;
@@ -529,8 +527,6 @@ tr_fdFileReturn( int fd )
 
         dbgmsg( "releasing file '%s' in slot #%d", o->filename, i );
         o->isCheckedOut = 0;
-        if( o->closeWhenDone )
-            TrCloseFile( i );
 
         break;
     }
