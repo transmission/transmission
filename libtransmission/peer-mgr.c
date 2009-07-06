@@ -2158,8 +2158,7 @@ getPeersToClose( Torrent * t, tr_close_type_t closeType, int * setmeSize )
 }
 
 static int
-compareCandidates( const void * va,
-                   const void * vb )
+compareCandidates( const void * va, const void * vb )
 {
     const struct peer_atom * a = *(const struct peer_atom**) va;
     const struct peer_atom * b = *(const struct peer_atom**) vb;
@@ -2413,10 +2412,11 @@ reconnectTorrent( Torrent * t )
 struct peer_liveliness
 {
     tr_peer * peer;
-    int speed;
+    void * clientData;
     time_t pieceDataTime;
     time_t time;
-    void * clientData;
+    int speed;
+    tr_bool doPurge;
 };
 
 static int
@@ -2425,13 +2425,18 @@ comparePeerLiveliness( const void * va, const void * vb )
     const struct peer_liveliness * a = va;
     const struct peer_liveliness * b = vb;
 
+    if( a->doPurge != b->doPurge )
+        return a->doPurge ? 1 : -1;
+
     if( a->speed != b->speed ) /* faster goes first */
         return a->speed > b->speed ? -1 : 1;
 
-    if( a->pieceDataTime != b->pieceDataTime ) /* the one to give us data more recently goes first */
+    /* the one to give us data more recently goes first */
+    if( a->pieceDataTime != b->pieceDataTime )
         return a->pieceDataTime > b->pieceDataTime ? -1 : 1;
 
-    if( a->time != b->time ) /* the one we connected to most recently goes first */
+    /* the one we connected to most recently goes first */
+    if( a->time != b->time )
         return a->time > b->time ? -1 : 1;
 
     return 0;
@@ -2439,35 +2444,39 @@ comparePeerLiveliness( const void * va, const void * vb )
 
 /* FIXME: getPeersToClose() should use this */
 static void
-sortPeersFromBestToWorst( tr_peer ** peers, void** clientData, int n, uint64_t now )
+sortPeersByLiveliness( tr_peer ** peers, void** clientData, int n, uint64_t now )
 {
     int i;
-    struct peer_liveliness * l;
+    struct peer_liveliness *lives, *l;
 
     /* build a sortable array of peer + extra info */
-    l = tr_new0( struct peer_liveliness, n );
-    for( i=0; i<n; ++i ) {
+    lives = l = tr_new0( struct peer_liveliness, n );
+    for( i=0; i<n; ++i, ++l ) {
         tr_peer * p = peers[i];
-        l[i].peer = p;
-        l[i].speed = 1024.0 * (tr_peerGetPieceSpeed( p, now, TR_UP ) + tr_peerGetPieceSpeed( p, now, TR_DOWN ));
-        l[i].pieceDataTime = p->atom->piece_data_time;
-        l[i].time = p->atom->time;
+        l->peer = p;
+        l->doPurge = p->doPurge;
+        l->pieceDataTime = p->atom->piece_data_time;
+        l->time = p->atom->time;
+        l->speed = 1024.0 * (   tr_peerGetPieceSpeed( p, now, TR_UP )
+                              + tr_peerGetPieceSpeed( p, now, TR_DOWN ) );
         if( clientData )
-            l[i].clientData = clientData[i];
+            l->clientData = clientData[i];
     }
 
     /* sort 'em */
-    qsort( l, n, sizeof(struct peer_liveliness), comparePeerLiveliness );
+    assert( n == ( l - lives ) );
+    qsort( lives, n, sizeof( struct peer_liveliness ), comparePeerLiveliness );
 
     /* build the peer array */
-    for( i=0; i<n; ++i ) {
-        peers[i] = l[i].peer;
+    for( i=0, l=lives; i<n; ++i, ++l ) {
+        peers[i] = l->peer;
         if( clientData )
-            clientData[i] = l[i].clientData;
+            clientData[i] = l->clientData;
     }
+    assert( n == ( l - lives ) );
 
     /* cleanup */
-    tr_free( l );
+    tr_free( lives );
 }
 
 static void
@@ -2477,8 +2486,9 @@ enforceTorrentPeerLimit( Torrent * t, uint64_t now )
     const int max = tr_sessionGetPeerLimitPerTorrent( t->tor->session );
     if( n > max )
     {
-        tr_peer ** peers = tr_memdup( tr_ptrArrayBase( &t->peers ), n*sizeof(tr_peer*) );
-        sortPeersFromBestToWorst( peers, NULL, n, now );
+        void * base = tr_ptrArrayBase( &t->peers );
+        tr_peer ** peers = tr_memdup( base, n*sizeof( tr_peer* ) );
+        sortPeersByLiveliness( peers, NULL, n, now );
         while( n > max )
             closePeer( t, peers[--n] );
         tr_free( peers );
@@ -2488,24 +2498,22 @@ enforceTorrentPeerLimit( Torrent * t, uint64_t now )
 static void
 enforceSessionPeerLimit( tr_session * session, uint64_t now )
 {
-    int n;
-    tr_torrent * tor;
+    int n = 0;
+    tr_torrent * tor = NULL;
     const int max = tr_sessionGetPeerLimit( session );
 
     /* count the total number of peers */
-    n = 0;
-    tor = NULL;
     while(( tor = tr_torrentNext( session, tor )))
         n += tr_ptrArraySize( &tor->torrentPeers->peers );
 
     /* if there are too many, prune out the worst */ 
     if( n > max )
     {
-        int n = 0;
         tr_peer ** peers = tr_new( tr_peer*, n );
         Torrent ** torrents = tr_new( Torrent*, n );
 
         /* populate the peer array */
+        n = 0;
         tor = NULL;
         while(( tor = tr_torrentNext( session, tor ))) {
             int i;
@@ -2518,7 +2526,7 @@ enforceSessionPeerLimit( tr_session * session, uint64_t now )
         }
         
         /* sort 'em */
-        sortPeersFromBestToWorst( peers, (void**)torrents, n, now );
+        sortPeersByLiveliness( peers, (void**)torrents, n, now );
 
         /* cull out the crappiest */
         while( n-- > max )
