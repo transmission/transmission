@@ -752,7 +752,8 @@ TorrentFile.prototype = {
 	setWanted: function(wanted) {
 		this._dirty = true;
 		this._wanted = wanted;
-		this.element().toggleClass( 'skip', !wanted );
+		if(!iPhone)
+		  this.element().toggleClass( 'skip', !wanted );
 		var command = wanted ? 'files-wanted' : 'files-unwanted';
 		this._torrent._controller.changeFileCommand(command, this._torrent, this);
 	},
@@ -812,9 +813,18 @@ TorrentFile.prototype = {
 		}
 
 		var prio;
-		if( x < 12 ) prio = -1;
-		else if( x < 23 ) prio = 0;
-		else prio = 1;
+		if(iPhone)
+		{
+			if( x < 8 ) prio = -1;
+			else if( x < 27 ) prio = 0;
+			else prio = 1;
+		}
+		else
+		{
+			if( x < 12 ) prio = -1;
+			else if( x < 23 ) prio = 0;
+			else prio = 1;
+		}
 		this.setPriority( prio );
 	}
 };

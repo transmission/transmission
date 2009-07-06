@@ -722,21 +722,12 @@ div.file_priority_control {
 	cursor: pointer;
 }
 div.file_priority_control.normal {
-	background-position: left top;
-}
-div.file_priority_control.normal:hover {
 	background-position: right top;
 }
 div.file_priority_control.high {
-	background-position: left -19px;
-}
-div.file_priority_control.high:hover {
 	background-position: right -19px;
 }
 div.file_priority_control.low {
-	background-position: left -38px;
-}
-div.file_priority_control.low:hover {
 	background-position: right -38px;
 }
 ul.single_file li.inspector_torrent_file_list_entry>.file_priority_control, li.inspector_torrent_file_list_entry.complete div.file_priority_control {
