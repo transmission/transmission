@@ -122,7 +122,6 @@ struct search {
     int done;
     struct search_node nodes[SEARCH_NODES];
     int numnodes;
-    struct search *next;
 };
 
 struct peer {
@@ -134,16 +133,6 @@ struct peer {
 /* The maximum number of peers we store for a given hash. */
 #ifndef DHT_MAX_PEERS
 #define DHT_MAX_PEERS 2048
-#endif
-
-/* The maximum number of searches we keep data about. */
-#ifndef DHT_MAX_SEARCHES
-#define DHT_MAX_SEARCHES 1024
-#endif
-
-/* The time after which we consider a search to be expirable. */
-#ifndef DHT_SEARCH_EXPIRE_TIME
-#define DHT_SEARCH_EXPIRE_TIME (62 * 60)
 #endif
 
 struct storage {
@@ -218,7 +207,12 @@ static unsigned char oldsecret[8];
 static struct bucket *buckets = NULL;
 static struct storage *storage;
 
-static struct search *searches = NULL;
+/* The maximum number of concurrent searches. */
+#ifndef DHT_MAX_SEARCHES
+#define DHT_MAX_SEARCHES 20
+#endif
+
+static struct search searches[DHT_MAX_SEARCHES];
 static int numsearches;
 static unsigned short search_id;
 
@@ -730,11 +724,10 @@ expire_buckets(int s)
 static struct search *
 find_search(unsigned short tid)
 {
-    struct search *sr = searches;
-    while(sr) {
-        if(sr->tid == tid)
-            return sr;
-        sr = sr->next;
+    int i;
+    for(i = 0; i < numsearches; i++) {
+        if(searches[i].tid == tid)
+            return &searches[i];
     }
     return NULL;
 }
@@ -803,27 +796,6 @@ flush_search_node(struct search_node *n, struct search *sr)
     for(j = i; j < sr->numnodes - 1; j++)
         sr->nodes[j] = sr->nodes[j + 1];
     sr->numnodes--;
-}
-
-static void
-expire_searches(void)
-{
-    struct search *sr = searches, *previous = NULL;
-
-    while(sr) {
-        struct search *next = sr->next;
-        if(sr->step_time < now.tv_sec - DHT_SEARCH_EXPIRE_TIME) {
-            if(previous)
-                previous->next = next;
-            else
-                searches->next = next;
-            free(sr);
-            numsearches--;
-        } else {
-            previous = sr;
-        }
-        sr = next;
-    }
 }
 
 /* This must always return 0 or 1, never -1, not even on failure (see below). */
@@ -937,36 +909,20 @@ search_step(int s, struct search *sr, dht_callback *callback, void *closure)
 }
 
 static struct search *
-new_search(void)
+find_free_search_slot(void)
 {
-    struct search *sr, *oldest = NULL;
+    int i;
+    struct search *sr = NULL;
 
-    /* Find the oldest done search */
-    sr = searches;
-    while(sr) {
-        if(sr->done &&
-           (oldest == NULL || oldest->step_time > sr->step_time))
-            oldest = sr;
-        sr = sr->next;
+    if(numsearches < DHT_MAX_SEARCHES)
+        return &searches[numsearches++];
+
+    for(i = 0; i < numsearches; i++) {
+        if(searches[i].done &&
+           (sr == NULL || searches[i].step_time < sr->step_time))
+            sr = &searches[i];
     }
-
-    /* The oldest slot is expired. */
-    if(oldest && oldest->step_time < now.tv_sec - DHT_SEARCH_EXPIRE_TIME)
-        return oldest;
-
-    /* Allocate a new slot. */
-    if(numsearches < DHT_MAX_SEARCHES) {
-        sr = calloc(1, sizeof(struct search));
-        if(sr != NULL) {
-            sr->next = searches;
-            searches = sr;
-            numsearches++;
-            return sr;
-        }
-    }
-
-    /* Oh, well, never mind.  Reuse the oldest slot. */
-    return oldest;
+    return sr;
 }
 
 /* Insert the contents of a bucket into a search structure. */
@@ -989,23 +945,23 @@ dht_search(int s, const unsigned char *id, int port,
 {
     struct search *sr;
     struct bucket *b;
+    int i;
 
-    sr = searches;
-    while(sr) {
-        if(id_cmp(sr->id, id) == 0)
+    for(i = 0; i < numsearches; i++) {
+        if(id_cmp(searches[i].id, id) == 0)
             break;
-        sr = sr->next;
     }
 
-    if(sr) {
+    if(i < numsearches) {
         /* We're reusing data from an old search.  Reusing the same tid
            means that we can merge replies for both searches. */
-        int i;
+        int j;
+        sr = searches + i;
         sr->done = 0;
     again:
-        for(i = 0; i < sr->numnodes; i++) {
+        for(j = 0; j < sr->numnodes; j++) {
             struct search_node *n;
-            n = &sr->nodes[i];
+            n = &sr->nodes[j];
             /* Discard any doubtful nodes. */
             if(n->pinged >= 3 || n->reply_time < now.tv_sec - 7200) {
                 flush_search_node(n, sr);
@@ -1017,15 +973,14 @@ dht_search(int s, const unsigned char *id, int port,
             n->acked = 0;
         }
     } else {
-        sr = new_search();
+        sr = find_free_search_slot();
         if(sr == NULL) {
             errno = ENOSPC;
             return -1;
         }
+        memset(sr, 0, sizeof(struct search));
         sr->tid = search_id++;
-        sr->step_time = 0;
         memcpy(sr->id, id, 20);
-        sr->done = 0;
         sr->numnodes = 0;
     }
 
@@ -1152,26 +1107,24 @@ expire_storage(void)
 static void
 broken_node(int s, const unsigned char *id, struct sockaddr_in *sin)
 {
-    int i;
+    int i, j;
 
     debugf("Blacklisting broken node.\n");
 
     if(id) {
-        struct node *n;
-        struct search *sr;
         /* Make the node easy to discard. */
+        struct node *n;
         n = find_node(id);
         if(n) {
             n->pinged = 3;
             pinged(s, n, NULL);
         }
         /* Discard it from any searches in progress. */
-        sr = searches;
-        while(sr) {
-            for(i = 0; i < sr->numnodes; i++)
-                if(id_cmp(sr->nodes[i].id, id) == 0)
-                    flush_search_node(&sr->nodes[i], sr);
-            sr = sr->next;
+        for(i = 0; i < numsearches; i++) {
+            for(j = 0; j < searches[i].numnodes; j++)
+                if(id_cmp(searches[i].nodes[j].id, id) == 0)
+                    flush_search_node(&searches[i].nodes[j],
+                                      &searches[i]);
         }
     }
     /* And make sure we don't hear from it again. */
@@ -1261,10 +1214,9 @@ dht_nodes(int *good_return, int *dubious_return, int *cached_return,
 void
 dht_dump_tables(FILE *f)
 {
-    int i;
+    int i, j;
     struct bucket *b = buckets;
     struct storage *st = storage;
-    struct search *sr = searches;
 
     fprintf(f, "My id ");
     print_hex(f, myid, 20);
@@ -1298,14 +1250,15 @@ dht_dump_tables(FILE *f)
         }
         b = b->next;
     }
-    while(sr) {
-        fprintf(f, "\nSearch id ");
+    for(i = 0; i < numsearches; i++) {
+        struct search *sr = &searches[i];
+        fprintf(f, "\nSearch %d id ", i);
         print_hex(f, sr->id, 20);
         fprintf(f, " age %d%s\n", (int)(now.tv_sec - sr->step_time),
                sr->done ? " (done)" : "");
-        for(i = 0; i < sr->numnodes; i++) {
-            struct search_node *n = &sr->nodes[i];
-            fprintf(f, "Node %d id ", i);
+        for(j = 0; j < sr->numnodes; j++) {
+            struct search_node *n = &sr->nodes[j];
+            fprintf(f, "Node %d id ", j);
             print_hex(f, n->id, 20);
             fprintf(f, " bits %d age ", common_bits(sr->id, n->id));
             if(n->request_time)
@@ -1317,7 +1270,6 @@ dht_dump_tables(FILE *f)
                    find_node(n->id) ? " (known)" : "",
                    n->replied ? " (replied)" : "");
         }
-        sr = sr->next;
     }
 
     
@@ -1353,7 +1305,6 @@ dht_init(int s, const unsigned char *id, const unsigned char *v)
     if(buckets == NULL)
         return -1;
 
-    searches = NULL;
     numsearches = 0;
 
     storage = NULL;
@@ -1703,29 +1654,26 @@ dht_periodic(int s, int available, time_t *tosleep,
     if(now.tv_sec >= expire_stuff_time) {
         expire_buckets(s);
         expire_storage();
-        expire_searches();
     }
 
     if(search_time > 0 && now.tv_sec >= search_time) {
-        struct search *sr;
-        sr = searches;
-        while(sr) {
+        int i;
+        for(i = 0; i < numsearches; i++) {
+            struct search *sr = &searches[i];
             if(!sr->done && sr->step_time + 5 <= now.tv_sec) {
                 search_step(s, sr, callback, closure);
             }
-            sr = sr->next;
         }
                    
         search_time = 0;
-
-        sr = searches;
-        while(sr) {
+        
+        for(i = 0; i < numsearches; i++) {
+            struct search *sr = &searches[i];
             if(!sr->done) {
                 time_t tm = sr->step_time + 15 + random() % 10;
                 if(search_time == 0 || search_time > tm)
                     search_time = tm;
             }
-            sr = sr->next;
         }
     }
 
