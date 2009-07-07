@@ -70,14 +70,15 @@ $(document).ready( function() {
 		// different padding.
 		$('div.dialog_container div.dialog_window a').css('padding', '2px 10px 3px');
 	}
-    if (iPhone){
-			window.onload = function(){ setTimeout(function() { window.scrollTo(0,1); },500); };
-			window.onorientationchange = function(){ setTimeout( function() { window.scrollTo(0,1); },100); };
-        if(window.navigator.standalone)
-            // Fix min height for iPhone when run in full screen mode from home screen
-            // so the footer appears in the right place
-            $('body div#torrent_container').css('min-height', '338px');
-    }
+	if (iPhone){
+		window.onload = function(){ setTimeout(function() { window.scrollTo(0,1); },500); };
+		window.onorientationchange = function(){ setTimeout( function() { window.scrollTo(0,1); },100); };
+		if(window.navigator.standalone)
+			// Fix min height for iPhone when run in full screen mode from home screen
+			// so the footer appears in the right place
+			$('body div#torrent_container').css('min-height', '338px');
+		$("label[for=torrent_upload_url]").text("URL: ");
+	}
 });
 
 /*

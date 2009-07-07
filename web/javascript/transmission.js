@@ -49,17 +49,17 @@ Transmission.prototype =
 		$('.inspector_tab').bind('click', function(e){ tr.inspectorTabClicked(e, this); });
 		$('.file_wanted_control').live('click', function(e){ tr.fileWantedClicked(e, this); });
 		$('.file_priority_control').live('click', function(e){ tr.filePriorityClicked(e, this); });
+		$('#open_link').bind('click', function(e){ tr.openTorrentClicked(e); });
+		$('#upload_confirm_button').bind('click', function(e){ tr.confirmUploadClicked(e); return false;});
+		$('#upload_cancel_button').bind('click', function(e){ tr.cancelUploadClicked(e); return false; });
 		if (iPhone) {
 			$('#inspector_close').bind('click', function(e){ tr.hideInspector(); });
 			$('#preferences_link').bind('click', function(e){ tr.releaseClutchPreferencesButton(e); });
 		} else {
 			$(document).bind('keydown',  function(e){ tr.keyDown(e); });
 			$('#torrent_container').bind('click', function(e){ tr.deselectAll( true ); });
-			$('#open_link').bind('click', function(e){ tr.openTorrentClicked(e); });
 			$('#filter_toggle_link').bind('click', function(e){ tr.toggleFilterClicked(e); });
 			$('#inspector_link').bind('click', function(e){ tr.toggleInspectorClicked(e); });
-			$('#upload_confirm_button').bind('click', function(e){ tr.confirmUploadClicked(e); return false;});
-			$('#upload_cancel_button').bind('click', function(e){ tr.cancelUploadClicked(e); return false; });
 		
 			this.setupSearchBox();
 			this.createContextMenu();
