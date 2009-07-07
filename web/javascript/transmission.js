@@ -40,7 +40,6 @@ Transmission.prototype =
 		$('#pause_selected_link').bind('click', function(e){ tr.stopSelectedClicked(e); } );
 		$('#resume_selected_link').bind('click', function(e){ tr.startSelectedClicked(e); });
 		$('#remove_link').bind('click',  function(e){ tr.removeClicked(e); });
-		$('#removedata_link').bind('click',  function(e){ tr.removeDataClicked(e); });
 		$('#filter_all_link').parent().bind('click', function(e){ tr.showAllClicked(e); });
 		$('#filter_downloading_link').parent().bind('click', function(e){ tr.showDownloadingClicked(e); });
 		$('#filter_seeding_link').parent().bind('click', function(e){ tr.showSeedingClicked(e); });
@@ -76,7 +75,6 @@ Transmission.prototype =
 		this._toolbar_start_button     = $('li#resume_selected')[0];
 		this._toolbar_start_all_button = $('li#resume_all')[0];
 		this._toolbar_remove_button    = $('li#remove')[0];
-		this._toolbar_delete_button    = $('li#removedata')[0];
 		this._context_pause_button     = $('li#context_pause_selected')[0];
 		this._context_start_button     = $('li#context_resume_selected')[0];
 
@@ -609,14 +607,6 @@ Transmission.prototype =
 		var tr = this;
 		if( tr.isButtonEnabled( event ) ) {
 			tr.removeSelectedTorrents( );
-			tr.hideiPhoneAddressbar( );
-		}
-	},
-
-	removeDataClicked: function( event ) {	
-		var tr = this;
-		if( tr.isButtonEnabled( event ) ) {
-			tr.removeSelectedTorrentsAndData( );
 			tr.hideiPhoneAddressbar( );
 		}
 	},
@@ -1516,7 +1506,6 @@ Transmission.prototype =
 			this.setEnabled( this._toolbar_start_button, havePausedSelection );
 			this.setEnabled( this._context_start_button, havePausedSelection );
 			this.setEnabled( this._toolbar_remove_button, haveSelection );
-			this.setEnabled( this._toolbar_delete_button, haveSelection );
 			this.setEnabled( this._toolbar_pause_all_button, haveActive );
 			this.setEnabled( this._toolbar_start_all_button, havePaused );
 		}

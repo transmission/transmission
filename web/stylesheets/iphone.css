@@ -81,7 +81,7 @@ div.torrent_global_menu ul li {
 	display: inline-block;
 }
 
-li#remove, li#removedata {
+li#remove {
 	float: left;
 }
 
@@ -118,10 +118,6 @@ div.torrent_global_menu ul li div div.toolbar_image {
 }
 
 div.torrent_global_menu ul li#remove div div.toolbar_image {
-	background-position: left -32px;
-}
-
-div.torrent_global_menu ul li#removedata div div.toolbar_image {
 	background-position: left -32px;
 }
 
