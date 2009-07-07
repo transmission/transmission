@@ -7,7 +7,6 @@ EXTRA_DIST = \
     Defaults.plist \
     Info.plist \
     Transmission_Prefix.pch \
-    version.sh \
     Growl.framework \
     Sparkle.framework \
     sparkle_dsa_pub.pem \
