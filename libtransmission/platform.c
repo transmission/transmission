@@ -17,7 +17,9 @@
  #ifdef SYS_DARWIN
   #include <CoreFoundation/CoreFoundation.h>
  #endif
-
+ #ifdef __HAIKU__
+  #include <FindDirectory.h>
+ #endif
  #define _XOPEN_SOURCE 600  /* needed for recursive locks. */
  #ifndef __USE_UNIX98
   #define __USE_UNIX98 /* some older Linuxes need it spelt out for them */
@@ -271,6 +273,10 @@ getOldConfigDir( void )
         char appdata[MAX_PATH]; /* SHGetFolderPath() requires MAX_PATH */
         SHGetFolderPath( NULL, CSIDL_APPDATA, NULL, 0, appdata );
         path = tr_buildPath( appdata, "Transmission", NULL );
+#elif defined( __HAIKU__ )
+        char buf[MAX_PATH_LENGTH];
+        find_directory( B_USER_SETTINGS_DIRECTORY, -1, true, buf, sizeof(buf) );
+        path = tr_buildPath( buf, "Transmission", NULL );
 #else
         path = tr_buildPath( getHomeDir( ), ".transmission", NULL );
 #endif
@@ -431,6 +437,10 @@ tr_getDefaultConfigDir( const char * appname )
             char appdata[MAX_PATH]; /* SHGetFolderPath() requires MAX_PATH */
             SHGetFolderPath( NULL, CSIDL_APPDATA, NULL, 0, appdata );
             s = tr_buildPath( appdata, appname, NULL );
+#elif defined( __HAIKU__ )
+            char buf[MAX_PATH_LENGTH];
+            find_directory( B_USER_SETTINGS_DIRECTORY, -1, true, buf, sizeof(buf) );
+            s = tr_buildPath( buf, appname, NULL );
 #else
             if( ( s = getenv( "XDG_CONFIG_HOME" ) ) )
                 s = tr_buildPath( s, appname, NULL );
@@ -486,7 +496,11 @@ tr_getDefaultDownloadDir( void )
         }
 
         if( user_dir == NULL )
+#ifdef __HAIKU__
+            user_dir = tr_buildPath( getHomeDir( ), "Desktop", NULL );
+#else
             user_dir = tr_buildPath( getHomeDir( ), "Downloads", NULL );
+#endif
 
         tr_free( content );
         tr_free( config_file );
