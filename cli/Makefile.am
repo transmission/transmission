@@ -26,6 +26,5 @@ transmissioncli_LDADD = \
     $(LIBCURL_LIBS) \
     $(ZLIB_LIBS) \
     $(OPENSSL_LIBS) \
-    $(PTHREAD_LIBS) \
-    -lm
+    $(PTHREAD_LIBS)
 

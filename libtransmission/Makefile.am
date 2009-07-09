@@ -133,8 +133,7 @@ apps_ldadd = \
     $(LIBCURL_LIBS) \
     $(OPENSSL_LIBS) \
     $(PTHREAD_LIBS) \
-    $(ZLIB_LIBS) \
-    -lm
+    $(ZLIB_LIBS)
 
 bencode_test_SOURCES = bencode-test.c
 bencode_test_LDADD = ${apps_ldadd}

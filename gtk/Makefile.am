@@ -110,7 +110,7 @@ transmission_LDADD = \
     $(OPENSSL_LIBS) \
     $(LIBCURL_LIBS) \
     $(ZLIB_LIBS) \
-    $(PTHREAD_LIBS) -lm
+    $(PTHREAD_LIBS)
 
 DESKTOP_IN_FILES=transmission.desktop.in
 DESKTOP_FILES=$(DESKTOP_IN_FILES:.desktop.in=.desktop)

@@ -86,6 +86,7 @@ AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 ACX_PTHREAD
 
+AC_SEARCH_LIBS(cos, [m])
 AC_SEARCH_LIBS([socket], [socket net])
 AC_SEARCH_LIBS([gethostbyname], [nsl bind])
 PKG_CHECK_MODULES(OPENSSL, [openssl >= $OPENSSL_MINIMUM], , [CHECK_SSL()])
