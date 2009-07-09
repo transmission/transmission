@@ -195,25 +195,6 @@ tr_compareAddresses( const tr_address * a, const tr_address * b)
     return memcmp( &a->addr, &b->addr, sizes[a->type] );
 } 
 
-tr_bool
-tr_net_hasIPv6( tr_port port )
-{
-    static tr_bool result = FALSE;
-    static tr_bool alreadyDone = FALSE;
-
-    if( !alreadyDone )
-    {
-        int fd = tr_netBindTCP( &tr_in6addr_any, port, TRUE );
-        if( fd >= 0 || -fd != EAFNOSUPPORT ) /* we support ipv6 */
-            result = TRUE;
-        if( fd >= 0 )
-            EVUTIL_CLOSESOCKET( fd );
-        alreadyDone = TRUE;
-    }
-
-    return result;
-}
-
 /***********************************************************************
  * TCP sockets
  **********************************************************************/
@@ -368,8 +349,8 @@ tr_netOpenTCP( tr_session        * session,
     return s;
 }
 
-int
-tr_netBindTCP( const tr_address * addr, tr_port port, tr_bool suppressMsgs )
+static int
+tr_netBindTCPImpl( const tr_address * addr, tr_port port, tr_bool suppressMsgs, int * errOut )
 {
     static const int domains[NUM_TR_AF_INET_TYPES] = { AF_INET, AF_INET6 };
     struct sockaddr_storage sock;
@@ -380,10 +361,13 @@ tr_netBindTCP( const tr_address * addr, tr_port port, tr_bool suppressMsgs )
     assert( tr_isAddress( addr ) );
 
     fd = socket( domains[addr->type], SOCK_STREAM, 0 );
-    if( fd < 0 )
+    if( fd < 0 ) {
+        *errOut = sockerrno;
         return -1;
+    }
 
     if( evutil_make_socket_nonblocking( fd ) < 0 ) {
+        *errOut = sockerrno;
         EVUTIL_CLOSESOCKET( fd );
         return -1;
     }
@@ -395,8 +379,10 @@ tr_netBindTCP( const tr_address * addr, tr_port port, tr_bool suppressMsgs )
 #ifdef IPV6_V6ONLY
     if( addr->type == TR_AF_INET6 )
         if( setsockopt( fd, IPPROTO_IPV6, IPV6_V6ONLY, &optval, sizeof( optval ) ) == -1 )
-            if( sockerrno != ENOPROTOOPT ) /* if the kernel doesn't support it, ignore it */
-                return -sockerrno;
+            if( sockerrno != ENOPROTOOPT ) { /* if the kernel doesn't support it, ignore it */
+                *errOut = sockerrno;
+                return -1;
+            }
 #endif
 
     addrlen = setup_sockaddr( addr, htons( port ), &sock );
@@ -406,18 +392,47 @@ tr_netBindTCP( const tr_address * addr, tr_port port, tr_bool suppressMsgs )
             tr_err( _( "Couldn't bind port %d on %s: %s" ),
                     port, tr_ntop_non_ts( addr ), tr_strerror( err ) );
         EVUTIL_CLOSESOCKET( fd );
-        return -err;
+        *errOut = err;
+        return -1;
     }
 
     if( !suppressMsgs )
         tr_dbg( "Bound socket %d to port %d on %s", fd, port, tr_ntop_non_ts( addr ) );
 
     if( listen( fd, 128 ) == -1 ) {
+        *errOut = sockerrno;
         EVUTIL_CLOSESOCKET( fd );
-        return -sockerrno;
+        return -1;
     }
 
     return fd;
+}
+
+int
+tr_netBindTCP( const tr_address * addr, tr_port port, tr_bool suppressMsgs )
+{
+    int unused;
+    return tr_netBindTCPImpl( addr, port, suppressMsgs, &unused );
+}
+
+tr_bool
+tr_net_hasIPv6( tr_port port )
+{
+    static tr_bool result = FALSE;
+    static tr_bool alreadyDone = FALSE;
+
+    if( !alreadyDone )
+    {
+        int err;
+        int fd = tr_netBindTCPImpl( &tr_in6addr_any, port, TRUE, &err );
+        if( fd >= 0 || err != EAFNOSUPPORT ) /* we support ipv6 */
+            result = TRUE;
+        if( fd >= 0 )
+            EVUTIL_CLOSESOCKET( fd );
+        alreadyDone = TRUE;
+    }
+
+    return result;
 }
 
 int

@@ -556,7 +556,6 @@ tr_fdSocketCreate( int domain, int type )
 #endif
             tr_err( _( "Couldn't create socket: %s" ),
                    tr_strerror( sockerrno ) );
-            s = -sockerrno;
         }
 
     if( s > -1 )
