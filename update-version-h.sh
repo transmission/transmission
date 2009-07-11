@@ -1,4 +1,5 @@
 #!/bin/sh
+
 # Generate files to be included: only overwrite them if changed so make
 # won't rebuild everything unless necessary
 replace_if_differs ()
@@ -16,7 +17,6 @@ user_agent_prefix=`grep m4_define configure.ac | sed "s/[][)(]/,/g" | grep user_
 
 peer_id_prefix=`grep m4_define configure.ac | sed "s/[][)(]/,/g" | grep peer_id_prefix  | cut -d , -f 6`
 
-
 # If this is a svn tree, and svnversion is available in PATH, use it to
 # grab the version.
 if [ -d ".svn" ] && type svnversion >/dev/null 2>&1; then
@@ -27,12 +27,12 @@ else
 fi
 
 cat > libtransmission/version.h.new << EOF
-#define PEERID_PREFIX         "${peer_id_prefix}"
-#define USERAGENT_PREFIX      "${user_agent_prefix}"
-#define SVN_REVISION          "${svn_revision}"
-#define SVN_REVISION_NUM      ${svn_revision}
-#define SHORT_VERSION_STRING  "${user_agent_prefix}"
-#define LONG_VERSION_STRING   "${user_agent_prefix} (${svn_revision})"
+#define PEERID_PREFIX             "${peer_id_prefix}"
+#define USERAGENT_PREFIX          "${user_agent_prefix}"
+#define SVN_REVISION              "${svn_revision}"
+#define SVN_REVISION_NUM          ${svn_revision}
+#define SHORT_VERSION_STRING      "${user_agent_prefix}"
+#define LONG_VERSION_STRING       "${user_agent_prefix} (${svn_revision})"
 #define VERSION_STRING_INFOPLIST  ${user_agent_prefix}
 EOF
 
