@@ -1701,7 +1701,7 @@ typedef enum
     [[self window] makeKeyWindow];
     
     NSUInteger index = 1;
-    if ([[fTorrents objectAtIndex: 0] hasAddedTrackers])
+    if ([fTrackers size] > 0 && [[fTorrents objectAtIndex: 0] hasAddedTrackers])
     {
         for (; index < [fTrackers count]; index++)
             if ([[fTrackers objectAtIndex: index] isKindOfClass: [NSNumber class]])
@@ -1724,7 +1724,7 @@ typedef enum
     NSUInteger i = 0, numberBuiltIn = 0;
     while (i < [fTrackers count])
     {
-        BOOL builtIn = i != 0 || [[fTrackers objectAtIndex: i] intValue] != 0;
+        const BOOL builtIn = i != 0 || [[fTrackers objectAtIndex: i] intValue] != 0;
         
         //if a group is selected, remove all trackers in the group
         if ([indexes containsIndex: i])
