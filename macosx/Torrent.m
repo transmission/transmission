@@ -826,7 +826,7 @@ int trashDataFile(const char * filename)
 - (void) updateAllTrackersForRemove: (NSMutableArray *) trackers
 {
     //check if no user-added groups
-    if ([[trackers objectAtIndex: 0] intValue] != 0)
+    if ([trackers size] == 0 || [[trackers objectAtIndex: 0] intValue] != 0)
         fAddedTrackers = NO;
     
     [self updateAllTrackers: trackers];
