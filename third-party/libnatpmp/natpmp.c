@@ -80,7 +80,7 @@ LIBSPEC int closenatpmp(natpmp_t * p)
 	return 0;
 }
 
-int sendpendingrequest(natpmp_t * p)
+static int sendpendingrequest(natpmp_t * p)
 {
 	int r;
 /*	struct sockaddr_in addr;*/
@@ -96,7 +96,7 @@ int sendpendingrequest(natpmp_t * p)
 	return (r<0) ? NATPMP_ERR_SENDERR : r;
 }
 
-int sendnatpmprequest(natpmp_t * p)
+static int sendnatpmprequest(natpmp_t * p)
 {
 	int n;
 	if(!p)

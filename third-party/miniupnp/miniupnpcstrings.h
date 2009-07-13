@@ -1,4 +1,4 @@
-/* $Id: miniupnpcstrings.h,v 1.3 2009/06/04 09:05:56 nanard Exp $ */
+/* $Id: miniupnpcstrings.h.in,v 1.1 2009/07/09 16:13:31 nanard Exp $ */
 /* Project: miniupnp
  * http://miniupnp.free.fr/ or http://miniupnp.tuxfamily.org/
  * Author: Thomas Bernard
@@ -8,7 +8,7 @@
 #ifndef __MINIUPNPCSTRINGS_H__
 #define __MINIUPNPCSTRINGS_H__
 
-#define OS_STRING "OpenBSD/4.3"
+#define OS_STRING "RedHatEnterpriseClient/5.3"
 #define MINIUPNPC_VERSION_STRING "1.3"
 
 #endif

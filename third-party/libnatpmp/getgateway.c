@@ -1,4 +1,4 @@
-/* $Id: getgateway.c,v 1.14 2009/06/04 22:27:53 nanard Exp $ */
+/* $Id: getgateway.c,v 1.15 2009/07/13 08:36:02 nanard Exp $ */
 /* libnatpmp
  * Copyright (c) 2007-2008, Thomas BERNARD <miniupnp@free.fr>
  *
@@ -65,6 +65,14 @@
 #include <w32api/windef.h>
 #include <w32api/winbase.h>
 #include <w32api/winreg.h>
+#endif 
+
+#ifdef __HAIKU__
+#include <stdlib.h>
+#include <unistd.h>
+#include <net/if.h>
+#include <sys/sockio.h>
+#define USE_HAIKU_CODE
 #endif 
 
 #ifdef USE_SYSCTL_NET_ROUTE
@@ -431,4 +439,58 @@ LIBSPEC int getdefaultgateway(in_addr_t * addr)
 	return -1;
 }
 #endif /* #ifdef USE_WIN32_CODE */
+
+#ifdef USE_HAIKU_CODE
+int getdefaultgateway(in_addr_t *addr)
+{
+    int fd, ret = -1;
+    struct ifconf config;
+    void *buffer = NULL;
+    struct ifreq *interface;
+
+    if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+        return -1;
+    }
+    if (ioctl(fd, SIOCGRTSIZE, &config, sizeof(config)) != 0) {
+        goto fail;
+    }
+    if (config.ifc_value < 1) {
+        goto fail; /* No routes */
+    }
+    if ((buffer = malloc(config.ifc_value)) == NULL) {
+        goto fail;
+    }
+    config.ifc_len = config.ifc_value;
+    config.ifc_buf = buffer;
+    if (ioctl(fd, SIOCGRTTABLE, &config, sizeof(config)) != 0) {
+        goto fail;
+    }
+    for (interface = buffer;
+      (uint8_t *)interface < (uint8_t *)buffer + config.ifc_len; ) {
+        struct route_entry route = interface->ifr_route;
+        int intfSize;
+        if (route.flags & (RTF_GATEWAY | RTF_DEFAULT)) {
+            *addr = ((struct sockaddr_in *)route.gateway)->sin_addr.s_addr;
+            ret = 0;
+            break;
+        }
+        intfSize = sizeof(route) + IF_NAMESIZE;
+        if (route.destination != NULL) {
+            intfSize += route.destination->sa_len;
+        }
+        if (route.mask != NULL) {
+            intfSize += route.mask->sa_len;
+        }
+        if (route.gateway != NULL) {
+            intfSize += route.gateway->sa_len;
+        }
+        interface = (struct ifreq *)((uint8_t *)interface + intfSize);
+    }
+fail:
+    free(buffer);
+    close(fd);
+    return ret;
+}
+#endif /* #ifdef USE_HAIKU_CODE */
+
 

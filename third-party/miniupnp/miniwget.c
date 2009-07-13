@@ -31,6 +31,7 @@
 #endif
 
 #include "miniupnpcstrings.h"
+#include "miniwget.h"
 
 /* miniwget2() :
  * */

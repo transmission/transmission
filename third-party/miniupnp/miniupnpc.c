@@ -1,4 +1,4 @@
-/* $Id: miniupnpc.c,v 1.57 2008/12/18 17:46:36 nanard Exp $ */
+/* $Id: miniupnpc.c,v 1.58 2009/07/09 15:59:46 nanard Exp $ */
 /* Project : miniupnp
  * Author : Thomas BERNARD
  * copyright (c) 2005-2007 Thomas Bernard
@@ -10,7 +10,7 @@
 #ifdef WIN32
 /* Win32 Specific includes and defines */
 #include <winsock2.h>
-#include <Ws2tcpip.h>
+#include <ws2tcpip.h>
 #include <io.h>
 #define snprintf _snprintf
 #if defined(_MSC_VER) && (_MSC_VER >= 1400)
@@ -49,7 +49,7 @@
 #define SERVICEPREFIX2 'u'
 
 /* root description parsing */
-void parserootdesc(const char * buffer, int bufsize, struct IGDdatas * data)
+LIBSPEC void parserootdesc(const char * buffer, int bufsize, struct IGDdatas * data)
 {
 	struct xmlparser parser;
 	/* xmlparser object */
@@ -340,7 +340,7 @@ parseMSEARCHReply(const char * reply, int size,
  * no devices was found.
  * It is up to the caller to free the chained list
  * delay is in millisecond (poll) */
-struct UPNPDev * upnpDiscover(int delay, const char * multicastif,
+LIBSPEC struct UPNPDev * upnpDiscover(int delay, const char * multicastif,
                               const char * minissdpdsock, int sameport)
 {
 	struct UPNPDev * tmp;
@@ -489,7 +489,7 @@ struct UPNPDev * upnpDiscover(int delay, const char * multicastif,
 
 /* freeUPNPDevlist() should be used to
  * free the chained list returned by upnpDiscover() */
-void freeUPNPDevlist(struct UPNPDev * devlist)
+LIBSPEC void freeUPNPDevlist(struct UPNPDev * devlist)
 {
 	struct UPNPDev * next;
 	while(devlist)
@@ -525,7 +525,7 @@ url_cpy_or_cat(char * dst, const char * src, int n)
 
 /* Prepare the Urls for usage...
  */
-void GetUPNPUrls(struct UPNPUrls * urls, struct IGDdatas * data,
+LIBSPEC void GetUPNPUrls(struct UPNPUrls * urls, struct IGDdatas * data,
                  const char * descURL)
 {
 	char * p;
@@ -568,7 +568,7 @@ void GetUPNPUrls(struct UPNPUrls * urls, struct IGDdatas * data,
 #endif
 }
 
-void
+LIBSPEC void
 FreeUPNPUrls(struct UPNPUrls * urls)
 {
 	if(!urls)
@@ -626,7 +626,7 @@ int ReceiveData(int socket, char * data, int length, int timeout)
 	return n;
 }
 
-int
+static int
 UPNPIGD_IsConnected(struct UPNPUrls * urls, struct IGDdatas * data)
 {
 	char status[64];
@@ -655,7 +655,7 @@ UPNPIGD_IsConnected(struct UPNPUrls * urls, struct IGDdatas * data)
  * passed as parameters are set. Donc forget to call FreeUPNPUrls(urls) to
  * free allocated memory.
  */
-int
+LIBSPEC int
 UPNP_GetValidIGD(struct UPNPDev * devlist,
                  struct UPNPUrls * urls,
 				 struct IGDdatas * data,
