@@ -32,6 +32,9 @@ SOFTWARE.
     For the added features the license above applies also.
     
     Changelog:
+        2009-05-17 
+            Incorporated benrudiak@googlemail.com fix for UTF16 decoding.
+            
         2009-05-14 
             Fixed float parsing bug related to a locale being set that didn't
             use '.' as decimal point character (charles@transmissionbt.com).
@@ -65,7 +68,6 @@ SOFTWARE.
 #include <locale.h>
 
 #include "JSON_parser.h"
-#include "ConvertUTF.h"
 
 #ifdef _MSC_VER
 #   if _MSC_VER >= 1400 /* Visual Studio 2005 and up */
@@ -87,12 +89,13 @@ SOFTWARE.
 #   define JSON_PARSER_PARSE_BUFFER_SIZE 3500
 #endif
 
+typedef unsigned short UTF16;
 
 struct JSON_parser_struct {
     JSON_parser_callback callback;
     void* ctx;
     signed char state, before_comment_state, type, escaped, comment, allow_comments, handle_floats_manually;
-    UTF16 utf16_decode_buffer[2];
+    UTF16 utf16_high_surrogate;
     long depth;
     long top;
     signed char* stack;
@@ -236,7 +239,7 @@ enum actions
     ZX = -19, /* integer detected by zero */
     IX = -20, /* integer detected by 1-9 */
     EX = -21, /* next char is escaped */
-    UC = -22, /* Unicode character read */
+    UC = -22  /* Unicode character read */
 };
 
 
@@ -517,70 +520,76 @@ static int parse_parse_buffer(JSON_parser jc)
     return true;
 }
 
+#define IS_HIGH_SURROGATE(uc) (((uc) & 0xFC00) == 0xD800)
+#define IS_LOW_SURROGATE(uc)  (((uc) & 0xFC00) == 0xDC00)
+#define DECODE_SURROGATE_PAIR(hi,lo) ((((hi) & 0x3FF) << 10) + ((lo) & 0x3FF) + 0x10000)
+static unsigned char utf8_lead_bits[4] = { 0x00, 0xC0, 0xE0, 0xF0 };
+
 static int decode_unicode_char(JSON_parser jc)
 {
-    const unsigned chars = jc->utf16_decode_buffer[0] ? 2 : 1;
     int i;
-    UTF16 *uc = chars == 1 ? &jc->utf16_decode_buffer[0] : &jc->utf16_decode_buffer[1];
-    UTF16 x;
+    unsigned uc = 0;
     char* p;
+    int trail_bytes;
     
     assert(jc->parse_buffer_count >= 6);
     
     p = &jc->parse_buffer[jc->parse_buffer_count - 4];
     
-    for (i = 0; i < 4; ++i, ++p) {
-        x = *p;
+    for (i = 12; i >= 0; i -= 4, ++p) {
+        unsigned x = *p;
         
         if (x >= 'a') {
             x -= ('a' - 10);
         } else if (x >= 'A') {
             x -= ('A' - 10);
         } else {
-            x &= ~((UTF16) 0x30);
+            x &= ~0x30u;
         }
         
         assert(x < 16);
         
-        *uc |= x << ((3u - i) << 2);
+        uc |= x << i;
     }
     
-    /* clear UTF-16 char form buffer */
+    /* clear UTF-16 char from buffer */
     jc->parse_buffer_count -= 6;
     jc->parse_buffer[jc->parse_buffer_count] = 0;
     
     /* attempt decoding ... */
-    {
-        UTF8* dec_start = (UTF8*)&jc->parse_buffer[jc->parse_buffer_count];
-        UTF8* dec_start_dup = dec_start;
-        UTF8* dec_end = dec_start + 6;
-        
-        const UTF16* enc_start = &jc->utf16_decode_buffer[0];
-        const UTF16* enc_end = enc_start + chars;
-    
-        const ConversionResult result = ConvertUTF16toUTF8(
-            &enc_start, enc_end, &dec_start, dec_end, strictConversion);
-        
-        const size_t new_chars = dec_start - dec_start_dup;
-        
-        /* was it a surrogate UTF-16 char? */
-        if (chars == 1 && result == sourceExhausted) {
-            return true;
-        }
-        
-        if (result != conversionOK) {
+    if (jc->utf16_high_surrogate) {
+        if (IS_LOW_SURROGATE(uc)) {
+            uc = DECODE_SURROGATE_PAIR(jc->utf16_high_surrogate, uc);
+            trail_bytes = 3;
+            jc->utf16_high_surrogate = 0;
+        } else {
+            /* high surrogate without a following low surrogate */
             return false;
         }
-        
-        /* NOTE: clear decode buffer to resume string reading,
-           otherwise we continue to read UTF-16 */
-        jc->utf16_decode_buffer[0] = 0;
-        
-        assert(new_chars <= 6);
-        
-        jc->parse_buffer_count += new_chars;
-        jc->parse_buffer[jc->parse_buffer_count] = 0;
+    } else {
+        if (uc < 0x80) {
+            trail_bytes = 0;
+        } else if (uc < 0x800) {
+            trail_bytes = 1;
+        } else if (IS_HIGH_SURROGATE(uc)) {
+            /* save the high surrogate and wait for the low surrogate */
+            jc->utf16_high_surrogate = uc;
+            return true;
+        } else if (IS_LOW_SURROGATE(uc)) {
+            /* low surrogate without a preceding high surrogate */
+            return false;
+        } else {
+            trail_bytes = 2;
+        }
     }
+    
+    jc->parse_buffer[jc->parse_buffer_count++] = (char) ((uc >> (trail_bytes * 6)) | utf8_lead_bits[trail_bytes]);
+    
+    for (i = trail_bytes * 6 - 6; i >= 0; i -= 6) {
+        jc->parse_buffer[jc->parse_buffer_count++] = (char) (((uc >> i) & 0x3F) | 0x80);
+    }
+
+    jc->parse_buffer[jc->parse_buffer_count] = 0;
     
     return true;
 }
@@ -694,7 +703,7 @@ JSON_parser_char(JSON_parser jc, int next_char)
                 return false;
             }
             /* check if we need to read a second UTF-16 char */
-            if (jc->utf16_decode_buffer[0]) {
+            if (jc->utf16_high_surrogate) {
                 jc->state = D1;
             } else {
                 jc->state = ST;
