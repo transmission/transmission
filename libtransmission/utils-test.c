@@ -246,10 +246,17 @@ test_memmem( void )
 int
 main( void )
 {
+    char buf[32];
     char *in, *out;
     int   len;
     int   i;
     int   l;
+
+    /* tr_truncd */
+    tr_snprintf( buf, sizeof( buf ), "%.2f%%", 99.999 );
+    check( !strcmp( buf, "100.00%" ) );
+    tr_snprintf( buf, sizeof( buf ), "%.2f%%", tr_truncd( 99.999, 2 ) );
+    check( !strcmp( buf, "99.99%" ) );
 
     /* base64 */
     out = tr_base64_encode( "YOYO!", -1, &len );
