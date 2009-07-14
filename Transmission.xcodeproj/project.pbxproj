@@ -2367,6 +2367,7 @@
 				PRELINK_LIBS = "";
 				SDKROOT = macosx10.5;
 				STRIP_INSTALLED_PRODUCT = NO;
+				VALID_ARCHS = "i386 ppc ppc7400 ppc970 x86_64";
 			};
 			name = Debug;
 		};
@@ -2503,6 +2504,7 @@
 				OTHER_LDFLAGS = "";
 				PREBINDING = NO;
 				SDKROOT = macosx10.5;
+				VALID_ARCHS = "i386 ppc ppc7400 ppc970 x86_64";
 			};
 			name = Release;
 		};
@@ -2593,6 +2595,7 @@
 				PREBINDING = NO;
 				SDKROOT = macosx10.5;
 				STRIP_INSTALLED_PRODUCT = NO;
+				VALID_ARCHS = "i386 ppc ppc7400 ppc970 x86_64";
 			};
 			name = "Release - Debug";
 		};
