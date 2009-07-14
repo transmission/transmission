@@ -27,7 +27,7 @@ noinst_HEADERS = \
 
 EXTRA_DIST = \
     README \
-    LICENSE \
+    LICENCE \
     updateminiupnpcstrings.sh
 
 BUILT_SOURCES = \
