@@ -11,6 +11,6 @@ noinst_HEADERS = \
     getgateway.h \
     natpmp.h
 
-extra_DIST = \
+EXTRA_DIST = \
     README \
     LICENSE

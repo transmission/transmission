@@ -25,7 +25,7 @@ noinst_HEADERS = \
     upnpcommands.h \
     upnpreplyparse.h
 
-extra_DIST = \
+EXTRA_DIST = \
     README \
     LICENSE \
     updateminiupnpcstrings.sh
