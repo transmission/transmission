@@ -1701,7 +1701,7 @@ typedef enum
     [[self window] makeKeyWindow];
     
     NSUInteger index = 1;
-    if ([fTrackers size] > 0 && [[fTorrents objectAtIndex: 0] hasAddedTrackers])
+    if ([fTrackers count] > 0 && [[fTorrents objectAtIndex: 0] hasAddedTrackers])
     {
         for (; index < [fTrackers count]; index++)
             if ([[fTrackers objectAtIndex: index] isKindOfClass: [NSNumber class]])
