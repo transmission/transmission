@@ -392,6 +392,16 @@ int tr_ptr2int( void* );
 
 void* tr_int2ptr( int );
 
+/* truncate a double value at a given number of decimal places.
+   this can be used to prevent a printf() call from rounding up:
+   call with the decimal_places argument equal to the number of
+   decimal places in the printf()'s precision:
+   
+   - printf("%.2f%%",           99.999    ) ==> "100.00%"
+   - printf("%.2f%%", tr_truncd(99.999, 2)) ==>  "99.99%"
+*/
+double tr_truncd( double x, int decimal_places );
+
 /**
  * @param buf the buffer to write the string to
  * @param buflef buf's size

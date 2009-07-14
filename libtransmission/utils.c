@@ -17,6 +17,7 @@
 #include <assert.h>
 #include <ctype.h> /* isalpha, tolower */
 #include <errno.h>
+#include <math.h> /* pow */
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -1325,20 +1326,12 @@ tr_parseNumberRange( const char * str_in, int len, int * setmeCount )
 ****
 ***/
 
-static void
-printf_double_without_rounding( char * buf, int buflen, double d, int places )
+double
+tr_truncd( double x, int decimal_places )
 {
-    char * pch;
-    char tmp[128];
-    int len;
-    tr_snprintf( tmp, sizeof( tmp ), "%'.64f", d );
-    pch = tmp;
-    while( isdigit( *pch ) ) ++pch; /* walk to the decimal point */
-    ++pch; /* walk over the decimal point */
-    pch += places;
-    len = MIN( buflen - 1, pch - tmp );
-    memcpy( buf, tmp, len );
-    buf[len] = '\0';
+    const int i = (int) pow( 10, decimal_places );
+    double x2 = (int)(x*i);
+    return x2 / i;
 }
 
 char*
@@ -1349,9 +1342,9 @@ tr_strratio( char * buf, size_t buflen, double ratio, const char * infinity )
     else if( (int)ratio == TR_RATIO_INF )
         tr_strlcpy( buf, infinity, buflen );
     else if( ratio < 10.0 )
-        printf_double_without_rounding( buf, buflen, ratio, 2 );
+        tr_snprintf( buf, buflen, "%.2f", tr_truncd( ratio, 2 ) );
     else if( ratio < 100.0 )
-        printf_double_without_rounding( buf, buflen, ratio, 1 );
+        tr_snprintf( buf, buflen, "%.1f", tr_truncd( ratio, 1 ) );
     else
         tr_snprintf( buf, buflen, "%'.0f", ratio );
     return buf;

@@ -11,10 +11,11 @@
  */
 
 #include "assert.h"
-#include <string.h> /* strcmp */
+#include <string.h> /* strcmp() */
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
 #include <libtransmission/transmission.h>
+#include <libtransmission/utils.h> /* tr_truncd() */
 #include "hig.h"
 #include "icons.h"
 #include "torrent-cell-renderer.h"
@@ -61,7 +62,7 @@ getProgressString( const tr_torrent * tor,
             _( "%1$s of %2$s (%3$.2f%%)" ),
             tr_strlsize( buf1, haveTotal, sizeof( buf1 ) ),
             tr_strlsize( buf2, torStat->sizeWhenDone, sizeof( buf2 ) ),
-            torStat->percentDone * 100.0 );
+            tr_truncd( torStat->percentDone * 100.0, 2 ) );
     }
     else if( !isSeed )
     {
@@ -74,7 +75,7 @@ getProgressString( const tr_torrent * tor,
             _( "%1$s of %2$s (%3$.2f%%), uploaded %4$s (Ratio: %5$s)" ),
             tr_strlsize( buf1, haveTotal, sizeof( buf1 ) ),
             tr_strlsize( buf2, info->totalSize, sizeof( buf2 ) ),
-            torStat->percentComplete * 100.0,
+            tr_truncd( torStat->percentComplete * 100.0, 2 ),
             tr_strlsize( buf3, torStat->uploadedEver, sizeof( buf3 ) ),
             tr_strlratio( buf4, torStat->ratio, sizeof( buf4 ) ) );
     }
@@ -175,9 +176,8 @@ getShortStatusString( const tr_stat * torStat )
 
         case TR_STATUS_CHECK:
             g_string_append_printf( gstr,
-                                    _(
-                                        "Verifying local data (%.1f%% tested)" ),
-                                    torStat->recheckProgress * 100.0 );
+                                    _( "Verifying local data (%.1f%% tested)" ),
+                                    tr_truncd( torStat->recheckProgress * 100.0, 1 ) );
             break;
 
         case TR_STATUS_DOWNLOAD:

@@ -235,8 +235,8 @@ getStatusStr( const tr_stat * st,
     {
         tr_snprintf( buf, buflen,
                      "Verifying local files (%.2f%%, %.2f%% valid)",
-                     100 * st->recheckProgress,
-                     100.0 * st->percentDone );
+                     tr_truncd( 100 * st->recheckProgress, 2 ),
+                     tr_truncd( 100 * st->percentDone, 2 ) );
     }
     else if( st->activity & TR_STATUS_DOWNLOAD )
     {
@@ -246,7 +246,7 @@ getStatusStr( const tr_stat * st,
             buf, buflen,
             "Progress: %.1f%%, dl from %d of %d peers (%.0f KB/s), "
             "ul to %d (%.0f KB/s) [%s]",
-            st->percentDone * 100.0,
+            tr_truncd( 100 * st->percentDone, 1 ),
             st->peersSendingToUs,
             st->peersConnected,
             st->pieceDownloadSpeed,

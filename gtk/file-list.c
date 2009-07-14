@@ -18,7 +18,6 @@
 #include <gtk/gtk.h>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h> /* tr_getRatio */
 
 #include "file-list.h"
 #include "hig.h"

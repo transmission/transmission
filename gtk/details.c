@@ -795,9 +795,9 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
             tr_strlsize( total, haveUnchecked + haveValid, sizeof( total ) );
             tr_strlsize( unver, haveUnchecked,             sizeof( unver ) );
             if( haveUnchecked )
-                g_snprintf( buf, sizeof( buf ), _( "%1$s (%2$.1f%%); %3$s Unverified" ), total, ratio, unver );
+                g_snprintf( buf, sizeof( buf ), _( "%1$s (%2$.1f%%); %3$s Unverified" ), total, tr_truncd( ratio, 1 ), unver );
             else
-                g_snprintf( buf, sizeof( buf ), _( "%1$s (%2$.1f%%)" ), total, ratio );
+                g_snprintf( buf, sizeof( buf ), _( "%1$s (%2$.1f%%)" ), total, tr_truncd( ratio, 1 ) );
             str = buf;
         }
     }
