@@ -28,3 +28,9 @@ noinst_HEADERS = \
 extra_DIST = \
     README \
     LICENSE
+
+BUILT_SOURCES = \
+    miniupnpcstrings.h
+
+miniupnpcstrings.h: Makefile
+	./updateminiupnpcstrings.sh
