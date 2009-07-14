@@ -33,4 +33,4 @@ BUILT_SOURCES = \
     miniupnpcstrings.h
 
 miniupnpcstrings.h: Makefile
-	./updateminiupnpcstrings.sh
+	$(srcdir)/updateminiupnpcstrings.sh
