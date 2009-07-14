@@ -20,7 +20,6 @@ noinst_HEADERS = \
     minisoap.h \
     minissdpc.h \
     miniupnpc.h \
-    miniupnpcstrings.h \
     miniwget.h \
     minixml.h \
     upnpcommands.h \
