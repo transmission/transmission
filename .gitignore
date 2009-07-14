@@ -20,3 +20,4 @@ macosx/Transmission.app
 macosx/en.lproj/*~.nib
 po/*.mo
 /release
+third-party/miniupnp/miniupnpcstrings.h
