@@ -81,7 +81,7 @@ fi
 AC_HEADER_STDC
 AC_HEADER_TIME
 
-AC_CHECK_FUNCS([lrintf strlcpy daemon dirname basename daemon strcasecmp localtime_r posix_fallocate memmem])
+AC_CHECK_FUNCS([lrintf strlcpy daemon dirname basename strcasecmp localtime_r posix_fallocate memmem])
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 ACX_PTHREAD
