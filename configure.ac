@@ -25,17 +25,11 @@ if test m4_substr(peer_id_prefix,6,1) = "0"; then
     CFLAGS="$CFLAGS -g -O3 "
     CXXFLAGS="$CXXFLAGS -g -O3 "
   fi
-  AC_DEFINE(TR_STABLE_RELEASE, 1, [Define to 1 if this is a stable release of Transmission])
 else
   supported_build=no
   if test "x$GCC" = "xyes" ; then
     CFLAGS="$CFLAGS -g -O0"
     CXXFLAGS="$CXXFLAGS -g -O0"
-  fi
-  if test m4_substr(peer_id_prefix,6,1) = "X"; then
-    AC_DEFINE(TR_BETA_RELEASE, 1, [Define to 1 if this is a beta release of Transmission])
-  else
-    AC_DEFINE(TR_NIGHTLY_RELEASE, 1, [Define to 1 if this is a nightly release of Transmission])
   fi
 fi
 AM_CONDITIONAL(TR_UNSTABLE, test "x$supported_build" = "xno")

@@ -38,9 +38,9 @@ EOF
 
 # Add a release definition
 case "${peer_id_prefix}" in
-    *X-) echo '#define TR_BETA_RELEASE       "BETA"' ;;
-    *Z-) echo '#define TR_NIGHTLY_RELEASE    "NIGHTLY"' ;;
-    *)   echo '#define TR_STABLE_RELEASE     "STABLE"' ;;
+    *X-) echo '#define TR_BETA_RELEASE           1' ;;
+    *Z-) echo '#define TR_NIGHTLY_RELEASE        1' ;;
+    *)   echo '#define TR_STABLE_RELEASE         1' ;;
 esac >> "libtransmission/version.h.new"
 
 replace_if_differs libtransmission/version.h.new libtransmission/version.h
