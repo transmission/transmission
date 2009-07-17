@@ -398,7 +398,11 @@ void* tr_int2ptr( int );
    decimal places in the printf()'s precision:
    
    - printf("%.2f%%",           99.999    ) ==> "100.00%"
+
    - printf("%.2f%%", tr_truncd(99.999, 2)) ==>  "99.99%"
+               ^                        ^
+               |   These should match   |
+               +------------------------+
 */
 double tr_truncd( double x, int decimal_places );
 

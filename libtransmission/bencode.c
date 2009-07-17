@@ -1460,19 +1460,19 @@ tr_bencMergeDicts( tr_benc * target, const tr_benc * source )
             }
             else if( tr_bencIsReal( val ) )
             {
-                double realVal;
+                double realVal = 0;
                 tr_bencGetReal( val, &realVal );
                 tr_bencDictAddReal( target, key, realVal );
             }
             else if( tr_bencIsInt( val ) )
             {
-                int64_t intVal;
+                int64_t intVal = 0;
                 tr_bencGetInt( val, &intVal );
                 tr_bencDictAddInt( target, key, intVal );
             }
             else if( tr_bencIsString( val ) )
             {
-                const char * strVal;
+                const char * strVal = NULL;
                 tr_bencGetStr( val, &strVal );
                 tr_bencDictAddStr( target, key, strVal );
             }
