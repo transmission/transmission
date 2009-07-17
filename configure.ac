@@ -374,7 +374,7 @@ AC_ARG_ENABLE([cli],
 AM_CONDITIONAL([BUILD_CLI],[test "x$build_cli" = "xyes"])
 
 AC_ARG_ENABLE([mac],
-              [AS_HELP_STRING([--enable-mac],[build OS X client])],
+              [AS_HELP_STRING([--enable-mac],[build Mac client])],
               [build_mac=${enableval}],
               [build_mac=${have_darwin}])
 AM_CONDITIONAL([BUILD_MAC],[test "x$build_mac" = "xyes"])
@@ -425,7 +425,7 @@ Configuration:
         System or bundled libevent:    ${libevent_source}
         DHT support:                   ${enable_dht}
 
-        Build OS X client:             ${build_mac}
+        Build Mac client:             ${build_mac}
         Build GTK+ client:             ${build_gtk}
           ... with gio support:        ${use_gio}
           ... with dbus-glib support:  ${use_dbus_glib}
