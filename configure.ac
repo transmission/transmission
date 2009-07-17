@@ -351,14 +351,14 @@ case $host_os in
 
   *darwin*)
     have_darwin="yes"
-    # Make sure the Universal SDK is installed
-    if test ! -d /Developer/SDKs/MacOSX10.4u.sdk; then
+    # Make sure the proper Mac SDK is installed
+    if test ! -d /Developer/SDKs/MacOSX10.5.sdk; then
       cat << EOF
-You need to install the Universal SDK in order to build Transmission:
+You need to install the Mac OS X 10.5 SDK in order to build Transmission:
   Get your Xcode CD or package
   Restart the install
   When it gets to "Installation Type", select "Customize"
-  Select "Mac OS X 10.4 (Universal) SDK" under "Cross Development"
+  Select "Mac OS X 10.5 SDK" under "Cross Development"
   Finish the install.
 EOF
       exit 1
@@ -425,7 +425,7 @@ Configuration:
         System or bundled libevent:    ${libevent_source}
         DHT support:                   ${enable_dht}
 
-        Build Mac client:             ${build_mac}
+        Build Mac client:              ${build_mac}
         Build GTK+ client:             ${build_gtk}
           ... with gio support:        ${use_gio}
           ... with dbus-glib support:  ${use_dbus_glib}
