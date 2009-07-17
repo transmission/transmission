@@ -5,7 +5,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 - All Platforms
    + Fix bug where user-configured peer limits could be exceeded
    + Use less memory in some high-peer situations
-   + Better estimation on time left to download
+   + Better estimation of time left to download
    + Support supportcrypto and requirecrypto flags in http tracker announces
    + Update to newer snapshots of libnatpmp and miniupnpc
    + Make DHT a compile-time option
