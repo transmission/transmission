@@ -83,7 +83,6 @@ enum
 
 struct tr_openfile
 {
-    tr_bool    isCheckedOut;
     tr_bool    isWritable;
     int        torrentId;
     char       filename[MAX_PATH_LENGTH];
@@ -375,13 +374,6 @@ TrCloseFile( struct tr_openfile * o )
 
     tr_close_file( o->fd );
     o->fd = -1;
-    o->isCheckedOut = FALSE;
-}
-
-static int
-fileIsCheckedOut( const struct tr_openfile * o )
-{
-    return fileIsOpen( o ) && o->isCheckedOut;
 }
 
 /* returns an fd on success, or a -1 on failure and sets errno */
@@ -416,8 +408,6 @@ tr_fdFileCheckout( int                      torrentId,
             continue;
         if( strcmp( filename, o->filename ) )
             continue;
-
-        assert( !fileIsCheckedOut( o ) );
 
         if( doWrite && !o->isWritable )
         {
@@ -483,7 +473,6 @@ tr_fdFileCheckout( int                      torrentId,
 
     dbgmsg( "checking out '%s' in slot %d", filename, winner );
     o->torrentId = torrentId;
-    o->isCheckedOut = 1;
     o->date = tr_date( );
     return o->fd;
 }
@@ -499,7 +488,6 @@ tr_fdFileReturn( int fd )
         if( o->fd != fd )
             continue;
         dbgmsg( "releasing file \"%s\"", o->filename );
-        o->isCheckedOut = FALSE;
         break;
     }
 }
@@ -515,7 +503,6 @@ tr_fdFileClose( const char * filename )
         if( !fileIsOpen( o ) || strcmp( filename, o->filename ) )
             continue;
         dbgmsg( "tr_fdFileClose closing \"%s\"", filename );
-        assert( !o->isCheckedOut && "this is a test assertion... I *think* this is always true now" );
         TrCloseFile( o );
     }
 }
