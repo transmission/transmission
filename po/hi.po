@@ -1,80 +1,29 @@
-# Breton translation for transmission
-# Copyright (c) 2008 Rosetta Contributors and Canonical Ltd 2008
+# Hindi translation for transmission
+# Copyright (c) 2009 Rosetta Contributors and Canonical Ltd 2009
 # This file is distributed under the same license as the transmission package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2008.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2009.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2009-07-13 16:23-0500\n"
-"PO-Revision-Date: 2008-12-26 20:19+0000\n"
-"Last-Translator: Ronan Le Déroff <rldmv@laposte.net>\n"
-"Language-Team: Breton <br@li.org>\n"
+"PO-Revision-Date: 2009-07-08 11:30+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Hindi <hi@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2009-07-17 19:24+0000\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Launchpad-Export-Date: 2009-07-17 19:25+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
-
-#: ../gtk/actions.c:50
-msgid "Sort by _Name"
-msgstr "Rummañ dre _Anv"
-
-#: ../gtk/actions.c:55
-msgid "Sort by A_ge"
-msgstr "Rummañ dre _Oad"
-
-#: ../gtk/actions.c:74
-msgid "_Main Window"
-msgstr "Prenestr _Pennañ"
-
-#: ../gtk/actions.c:103
-msgid "_Edit"
-msgstr "_Aozañ"
-
-#: ../gtk/actions.c:104
-msgid "_Help"
-msgstr "_Skoazell"
-
-#: ../gtk/actions.c:106
-msgid "_Add..."
-msgstr "_Ouzhpennañ..."
-
-#: ../gtk/actions.c:116
-msgid "_New..."
-msgstr "_Nevez..."
-
-#: ../gtk/actions.c:117
-msgid "_Quit"
-msgstr "_Kuitaat"
-
-#: ../gtk/details.c:952
-msgid "Error:"
-msgstr "Fazi:"
-
-#: ../gtk/details.c:956
-msgid "Details"
-msgstr "Munudoù"
-
-#: ../gtk/details.c:1068
-msgid "Address"
-msgstr "Chomlec'h"
-
-#: ../gtk/details.c:1074
-msgid "%"
-msgstr "%"
-
-#. %1$s is number of pieces;
-#. %2$s is how big each piece is
-#: ../gtk/makemeta-ui.c:288
-#, c-format
-msgid "%1$s @ %2$s"
-msgstr "%1$s @ %2$s"
 
 #: ../gtk/actions.c:49
 msgid "Sort by _Activity"
+msgstr ""
+
+#: ../gtk/actions.c:50
+msgid "Sort by _Name"
 msgstr ""
 
 #: ../gtk/actions.c:51
@@ -93,12 +42,20 @@ msgstr ""
 msgid "Sort by T_racker"
 msgstr ""
 
+#: ../gtk/actions.c:55
+msgid "Sort by A_ge"
+msgstr ""
+
 #: ../gtk/actions.c:56
 msgid "Sort by Time _Left"
 msgstr ""
 
 #: ../gtk/actions.c:57
 msgid "Sort by Si_ze"
+msgstr ""
+
+#: ../gtk/actions.c:74
+msgid "_Main Window"
 msgstr ""
 
 #: ../gtk/actions.c:75
@@ -141,8 +98,20 @@ msgstr ""
 msgid "_Sort Torrents By"
 msgstr ""
 
+#: ../gtk/actions.c:103
+msgid "_Edit"
+msgstr ""
+
+#: ../gtk/actions.c:104
+msgid "_Help"
+msgstr ""
+
 #: ../gtk/actions.c:105 ../gtk/actions.c:106
 msgid "Add a torrent"
+msgstr ""
+
+#: ../gtk/actions.c:106
+msgid "_Add..."
 msgstr ""
 
 #: ../gtk/actions.c:107
@@ -198,7 +167,15 @@ msgid "_Delete Files and Remove"
 msgstr ""
 
 #: ../gtk/actions.c:116
+msgid "_New..."
+msgstr ""
+
+#: ../gtk/actions.c:116
 msgid "Create a torrent"
+msgstr ""
+
+#: ../gtk/actions.c:117
+msgid "_Quit"
 msgstr ""
 
 #: ../gtk/actions.c:118
@@ -474,6 +451,14 @@ msgstr ""
 msgid "Last activity:"
 msgstr ""
 
+#: ../gtk/details.c:952
+msgid "Error:"
+msgstr ""
+
+#: ../gtk/details.c:956
+msgid "Details"
+msgstr ""
+
 #: ../gtk/details.c:962
 msgid "Location:"
 msgstr ""
@@ -502,12 +487,20 @@ msgstr ""
 msgid "Down"
 msgstr ""
 
+#: ../gtk/details.c:1068
+msgid "Address"
+msgstr ""
+
 #: ../gtk/details.c:1072
 msgid "Up"
 msgstr ""
 
 #: ../gtk/details.c:1073
 msgid "Client"
+msgstr ""
+
+#: ../gtk/details.c:1074
+msgid "%"
 msgstr ""
 
 #: ../gtk/details.c:1075
@@ -781,7 +774,7 @@ msgstr ""
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
-"  Ronan Le Déroff https://launchpad.net/~rldmv"
+"  Abhinav Modi https://launchpad.net/~abhinavmodi"
 
 #: ../gtk/makemeta-ui.c:109
 msgid "Torrent created!"
@@ -825,6 +818,13 @@ msgid "%'d Piece"
 msgid_plural "%'d Pieces"
 msgstr[0] ""
 msgstr[1] ""
+
+#. %1$s is number of pieces;
+#. %2$s is how big each piece is
+#: ../gtk/makemeta-ui.c:288
+#, c-format
+msgid "%1$s @ %2$s"
+msgstr ""
 
 #: ../gtk/makemeta-ui.c:352
 msgid "Choose Directory"
