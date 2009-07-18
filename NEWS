@@ -1,6 +1,6 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
-1.73 (2009/07/17)
+1.73 (2009/07/18)
 <http://trac.transmissionbt.com/query?milestone=1.73&group=component&groupdesc=1&order=severity>
 - All Platforms
    + Fix bug where user-configured peer limits could be exceeded
