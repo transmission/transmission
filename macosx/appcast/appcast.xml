@@ -16,7 +16,7 @@
       	sparkle:version="8832"
       	sparkle:shortVersionString="1.73"
       	sparkle:dsaSignature="MC0CFQCNPFeMx5QKhkP3XXUhRHTb8c45BgIUUfUT+HjcXdNbVQvphxeQ0YrLBoI="
-      	length="4430103"
+      	length="9140218"
       	type="application/octet-stream"/>
       	<sparkle:minimumSystemVersion>10.5.0</sparkle:minimumSystemVersion>
     </item>
@@ -30,7 +30,7 @@
       	sparkle:version="8615"
       	sparkle:shortVersionString="1.54"
       	sparkle:dsaSignature="MCwCFCfR8NXqspNkW4xCtFWXLLE8OegiAhR28nofs7rwHU5gSNRZzg40PBvJYw=="
-      	length="3832592"
+      	length="7902366"
       	type="application/octet-stream"/>
       	<sparkle:minimumSystemVersion>10.4.11</sparkle:minimumSystemVersion>
     </item>
