@@ -2,15 +2,14 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.03">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">9G55</string>
+		<string key="IBDocument.SystemVersion">9J61</string>
 		<string key="IBDocument.InterfaceBuilderVersion">677</string>
-		<string key="IBDocument.AppKitVersion">949.43</string>
+		<string key="IBDocument.AppKitVersion">949.46</string>
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="1539"/>
-			<integer value="3197"/>
 			<integer value="3088"/>
+			<integer value="1533"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -2275,7 +2274,7 @@ zTTNVc11zYbNps3HzefOCM4ozknOac6KzqrOus7bzvvPHM88z13Pfc+ez77P38/v0ADQINBB0GHQgtCi
 								</object>
 								<object class="NSMenuItem" id="521960375">
 									<reference key="NSMenu" ref="455126894"/>
-									<string type="base64-UTF8" key="NSTitle">U2F2ZSBhIFRvcnJlbnQgQ29weSBBc+KApg</string>
+									<string type="base64-UTF8" key="NSTitle">U2F2ZSBUb3JyZW50IEZpbGUgQXPigKY</string>
 									<string key="NSKeyEquiv">s</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
