@@ -140,15 +140,12 @@ typedef enum
 - (void) stopAllTorrents:           (id) sender;
 - (void) stopTorrents:              (NSArray *) torrents;
 
-- (void) removeTorrents: (NSArray *) torrents
-        deleteData: (BOOL) deleteData deleteTorrent: (BOOL) deleteData;
+- (void) removeTorrents: (NSArray *) torrents deleteData: (BOOL) deleteData;
 - (void) removeSheetDidEnd: (NSWindow *) sheet returnCode: (NSInteger) returnCode
                         contextInfo: (NSDictionary *) dict;
-- (void) confirmRemoveTorrents: (NSArray *) torrents deleteData: (BOOL) deleteData deleteTorrent: (BOOL) deleteTorrent;
+- (void) confirmRemoveTorrents: (NSArray *) torrents deleteData: (BOOL) deleteData;
 - (void) removeNoDelete:                (id) sender;
 - (void) removeDeleteData:              (id) sender;
-- (void) removeDeleteTorrent:           (id) sender;
-- (void) removeDeleteDataAndTorrent:    (id) sender;
 
 - (void) moveDataFilesSelected: (id) sender;
 - (void) moveDataFiles: (NSArray *) torrents;
