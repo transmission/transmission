@@ -43,14 +43,14 @@
     IBOutlet NSTextField * fNameField, * fBasicInfoField;
     
     IBOutlet NSTextField * fTrackerField, * fPiecesField, * fHashField, * fSecureField,
-                        * fTorrentLocationField, * fDataLocationField,
+                        * fDataLocationField,
                         * fDateAddedField, * fDateCompletedField, * fDateActivityField,
                         * fCreatorField, * fDateCreatedField,
                         * fStateField, * fProgressField,
                         * fHaveField, * fDownloadedTotalField, * fUploadedTotalField, * fFailedHashField,
                         * fRatioField, * fSwarmSpeedField;
     IBOutlet NSTextView * fCommentView;
-    IBOutlet NSButton * fRevealDataButton, * fRevealTorrentButton;
+    IBOutlet NSButton * fRevealDataButton;
     
     IBOutlet TrackerTableView * fTrackerTable;
     IBOutlet NSSegmentedControl * fTrackerAddRemoveControl;
@@ -98,7 +98,6 @@
 - (void) setPiecesView: (id) sender;
 - (void) setPiecesViewForAvailable: (BOOL) available;
 
-- (void) revealTorrentFile: (id) sender;
 - (void) revealDataFile: (id) sender;
 
 - (void) setFileFilterText: (id) sender;

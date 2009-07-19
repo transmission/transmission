@@ -145,7 +145,7 @@ typedef enum
     [fTabMatrix selectCellWithTag: tag];
     [self setTab: nil];
     
-    //reset images for reveal buttons, since the images are also used in the main table
+    //reset images for reveal button, since the images are also used in the main table
     NSImage * revealOn = [[NSImage imageNamed: @"RevealOn.png"] copy],
             * revealOff = [[NSImage imageNamed: @"RevealOff.png"] copy];
     [revealOn setFlipped: NO];
@@ -153,8 +153,6 @@ typedef enum
     
     [fRevealDataButton setImage: revealOff];
     [fRevealDataButton setAlternateImage: revealOn];
-    [fRevealTorrentButton setImage: revealOff];
-    [fRevealTorrentButton setAlternateImage: revealOn];
     
     [revealOn release];
     [revealOff release];
@@ -321,19 +319,15 @@ typedef enum
         [fDateCreatedField setStringValue: @""];
         [fCommentView setSelectable: NO];
         
-        [fTorrentLocationField setStringValue: @""];
-        [fTorrentLocationField setToolTip: nil];
         [fDataLocationField setStringValue: @""];
         [fDataLocationField setToolTip: nil];
         
         [fRevealDataButton setHidden: YES];
-        [fRevealTorrentButton setHidden: YES];
         
         //don't allow empty fields to be selected
         [fTrackerField setSelectable: NO];
         [fHashField setSelectable: NO];
         [fCreatorField setSelectable: NO];
-        [fTorrentLocationField setSelectable: NO];
         [fDataLocationField setSelectable: NO];
         
         [fStateField setStringValue: @""];
@@ -440,29 +434,15 @@ typedef enum
         [fCreatorField setStringValue: creatorString];
         [fDateCreatedField setObjectValue: [torrent dateCreated]];
         
-        if ([torrent publicTorrent])
-        {
-            NSString * location = [torrent publicTorrentLocation];
-            [fTorrentLocationField setStringValue: [location stringByAbbreviatingWithTildeInPath]];
-            [fTorrentLocationField setToolTip: location];
-        }
-        else
-        {
-            [fTorrentLocationField setStringValue: @""];
-            [fTorrentLocationField setToolTip: nil];
-        }
-        
         [fDateAddedField setObjectValue: [torrent dateAdded]];
         
         [fRevealDataButton setHidden: NO];
-        [fRevealTorrentButton setHidden: ![torrent publicTorrent]];
         
         //allow these fields to be selected
         [fTrackerField setSelectable: YES];
         [fHashField setSelectable: YES];
         [fCommentView setSelectable: ![commentString isEqualToString: @""]];
         [fCreatorField setSelectable: ![creatorString isEqualToString: @""]];
-        [fTorrentLocationField setSelectable: YES];
         [fDataLocationField setSelectable: YES];
         [fAnnounceAddressField setSelectable: YES];
         [fScrapeAddressField setSelectable: YES];
@@ -1192,12 +1172,6 @@ typedef enum
     
     [[NSUserDefaults standardUserDefaults] setBool: available forKey: @"PiecesViewShowAvailability"];
     [fPiecesView updateView];
-}
-
-- (void) revealTorrentFile: (id) sender
-{
-    if ([fTorrents count] > 0)
-        [[fTorrents objectAtIndex: 0] revealPublicTorrent];
 }
 
 - (void) revealDataFile: (id) sender
