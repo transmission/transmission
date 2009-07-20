@@ -40,7 +40,7 @@
     Controller * fController;
     
     Torrent * fTorrent;
-    NSString * fDestination;
+    NSString * fDestination, * fTorrentFile;
     BOOL fLockDestination;
     
     BOOL fDeleteTorrent, fDeleteEnable;
@@ -50,7 +50,8 @@
 }
 
 - (id) initWithTorrent: (Torrent *) torrent destination: (NSString *) path lockDestination: (BOOL) lockDestination
-    controller: (Controller *) controller deleteTorrent: (torrentFileState) deleteTorrent;
+    controller: (Controller *) controller torrentFile: (NSString *) torrentFile
+    deleteTorrent: (BOOL) deleteTorrent canToggleDelete: (BOOL) canToggleDelete;
 
 - (Torrent *) torrent;
 

@@ -27,13 +27,6 @@
 
 @class FileListNode;
 
-typedef enum
-{
-    TORRENT_FILE_DELETE,
-    TORRENT_FILE_SAVE,
-    TORRENT_FILE_DEFAULT
-} torrentFileState;
-
 #define STAT_TIME_NONE -1
 #define STAT_TIME_NOW -2
 
@@ -47,9 +40,6 @@ typedef enum
     
     BOOL fUseIncompleteFolder;
     NSString * fDownloadFolder, * fIncompleteFolder;
-    
-    BOOL fPublicTorrent;
-    NSString * fPublicTorrentLocation;
 	
     NSUserDefaults * fDefaults;
 
@@ -72,7 +62,7 @@ typedef enum
     NSDictionary * fQuickPauseDict;
 }
 
-- (id) initWithPath: (NSString *) path location: (NSString *) location deleteTorrentFile: (torrentFileState) torrentDelete
+- (id) initWithPath: (NSString *) path location: (NSString *) location deleteTorrentFile: (BOOL) torrentDelete
         lib: (tr_session *) lib;
 - (id) initWithTorrentStruct: (tr_torrent *) torrentStruct location: (NSString *) location lib: (tr_session *) lib;
 - (id) initWithHistory: (NSDictionary *) history lib: (tr_session *) lib forcePause: (BOOL) pause;
@@ -127,9 +117,8 @@ typedef enum
 - (void) setPriority: (tr_priority_t) priority;
 
 - (void) revealData;
-- (void) revealPublicTorrent;
++ (void) trashFile: (NSString *) path;
 - (void) trashData;
-- (void) trashTorrent;
 - (void) moveTorrentDataFileTo: (NSString *) folder;
 - (void) copyTorrentFileTo: (NSString *) path;
 
@@ -170,10 +159,7 @@ typedef enum
 - (BOOL) privateTorrent;
 
 - (NSString *) torrentLocation;
-- (NSString *) publicTorrentLocation;
 - (NSString *) dataLocation;
-
-- (BOOL) publicTorrent;
 
 - (CGFloat) progress;
 - (CGFloat) progressDone;

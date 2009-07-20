@@ -776,17 +776,18 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         return;
     }
     
-    torrentFileState deleteTorrentFile;
+    BOOL deleteTorrentFile, canToggleDelete = NO;
     switch (type)
     {
         case ADD_CREATED:
-            deleteTorrentFile = TORRENT_FILE_SAVE;
+            deleteTorrentFile = NO;
             break;
         case ADD_URL:
-            deleteTorrentFile = TORRENT_FILE_DELETE;
+            deleteTorrentFile = YES;
             break;
         default:
-            deleteTorrentFile = TORRENT_FILE_DEFAULT;
+            deleteTorrentFile = [fDefaults boolForKey: @"DeleteOriginalTorrent"];
+            canToggleDelete = YES;
     }
     
     tr_info info;
@@ -838,7 +839,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         Torrent * torrent;
         if (!(torrent = [[Torrent alloc] initWithPath: torrentPath location: location
-                            deleteTorrentFile: showWindow ? TORRENT_FILE_SAVE : deleteTorrentFile lib: fLib]))
+                            deleteTorrentFile: showWindow ? NO : deleteTorrentFile lib: fLib]))
             continue;
         
         //change the location if the group calls for it (this has to wait until after the torrent is create)
@@ -859,7 +860,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         if (showWindow || !location)
         {
             AddWindowController * addController = [[AddWindowController alloc] initWithTorrent: torrent destination: location
-                                                    lockDestination: lockDestination controller: self deleteTorrent: deleteTorrentFile];
+                                                    lockDestination: lockDestination controller: self torrentFile: torrentPath
+                                                    deleteTorrent: deleteTorrentFile canToggleDelete: canToggleDelete];
             [addController showWindow: self];
         }
         else

@@ -31,7 +31,6 @@
 @interface Torrent (Private)
 
 - (id) initWithPath: (NSString *) path hash: (NSString *) hashString torrentStruct: (tr_torrent *) torrentStruct lib: (tr_session *) lib
-        publicTorrent: (NSNumber *) publicTorrent publicTorrentLocation: (NSString *) publicTorrentLoc
         downloadFolder: (NSString *) downloadFolder
         useIncompleteFolder: (NSNumber *) useIncompleteFolder incompleteFolder: (NSString *) incompleteFolder
         waitToStart: (NSNumber *) waitToStart
@@ -54,8 +53,6 @@
 - (NSString *) etaString;
 
 - (void) updateAllTrackers: (NSMutableArray *) trackers;
-
-+ (void) trashFile: (NSString *) path;
 
 - (void) setTimeMachineExclude: (BOOL) exclude forPath: (NSString *) path;
 
@@ -80,28 +77,18 @@ int trashDataFile(const char * filename)
 
 @implementation Torrent
 
-- (id) initWithPath: (NSString *) path location: (NSString *) location deleteTorrentFile: (torrentFileState) torrentDelete
+- (id) initWithPath: (NSString *) path location: (NSString *) location deleteTorrentFile: (BOOL) torrentDelete
         lib: (tr_session *) lib
 {
     self = [self initWithPath: path hash: nil torrentStruct: NULL lib: lib
-            publicTorrent: torrentDelete != TORRENT_FILE_DEFAULT ? [NSNumber numberWithBool: torrentDelete == TORRENT_FILE_SAVE] : nil
-            publicTorrentLocation: path
             downloadFolder: location
             useIncompleteFolder: nil incompleteFolder: nil
             waitToStart: nil groupValue: nil addedTrackers: nil];
     
     if (self)
     {
-        //if the public and private torrent files are the same, then there is no public torrent
-        if ([[self torrentLocation] isEqualToString: path])
-        {
-            fPublicTorrent = NO;
-            [fPublicTorrentLocation release];
-            fPublicTorrentLocation = nil;
-        }
-        else if (!fPublicTorrent)
+        if (torrentDelete && [[self torrentLocation] isEqualToString: path])
             [Torrent trashFile: path];
-        else;
     }
     return self;
 }
@@ -109,7 +96,6 @@ int trashDataFile(const char * filename)
 - (id) initWithTorrentStruct: (tr_torrent *) torrentStruct location: (NSString *) location lib: (tr_session *) lib
 {
     self = [self initWithPath: nil hash: nil torrentStruct: torrentStruct lib: lib
-            publicTorrent: [NSNumber numberWithBool: NO] publicTorrentLocation: nil
             downloadFolder: location
             useIncompleteFolder: nil incompleteFolder: nil
             waitToStart: nil groupValue: nil addedTrackers: nil];
@@ -122,8 +108,6 @@ int trashDataFile(const char * filename)
     self = [self initWithPath: [history objectForKey: @"InternalTorrentPath"]
                 hash: [history objectForKey: @"TorrentHash"]
                 torrentStruct: NULL lib: lib
-                publicTorrent: [history objectForKey: @"PublicCopy"]
-                publicTorrentLocation: [history objectForKey: @"TorrentPath"]
                 downloadFolder: [history objectForKey: @"DownloadFolder"]
                 useIncompleteFolder: [history objectForKey: @"UseIncompleteFolder"]
                 incompleteFolder: [history objectForKey: @"IncompleteFolder"]
@@ -173,7 +157,6 @@ int trashDataFile(const char * filename)
     NSMutableDictionary * history = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                     [self torrentLocation], @"InternalTorrentPath",
                     [self hashString], @"TorrentHash",
-                    [NSNumber numberWithBool: fPublicTorrent], @"PublicCopy",
                     fDownloadFolder, @"DownloadFolder",
                     [NSNumber numberWithBool: fUseIncompleteFolder], @"UseIncompleteFolder",
                     [NSNumber numberWithBool: [self isActive]], @"Active",
@@ -183,9 +166,6 @@ int trashDataFile(const char * filename)
     
     if (fIncompleteFolder)
         [history setObject: fIncompleteFolder forKey: @"IncompleteFolder"];
-
-    if (fPublicTorrent)
-        [history setObject: [self publicTorrentLocation] forKey: @"TorrentPath"];
 	
     return history;
 }
@@ -205,8 +185,6 @@ int trashDataFile(const char * filename)
     
     [fDownloadFolder release];
     [fIncompleteFolder release];
-    
-    [fPublicTorrentLocation release];
     
     [fIcon release];
     
@@ -463,27 +441,24 @@ int trashDataFile(const char * filename)
     [[NSWorkspace sharedWorkspace] selectFile: [self dataLocation] inFileViewerRootedAtPath: nil];
 }
 
-- (void) revealPublicTorrent
+#warning should be somewhere else?
++ (void) trashFile: (NSString *) path
 {
-    if (fPublicTorrent)
-        [[NSWorkspace sharedWorkspace] selectFile: fPublicTorrentLocation inFileViewerRootedAtPath: nil];
+    //attempt to move to trash
+    if (![[NSWorkspace sharedWorkspace] performFileOperation: NSWorkspaceRecycleOperation
+        source: [path stringByDeletingLastPathComponent] destination: @""
+        files: [NSArray arrayWithObject: [path lastPathComponent]] tag: nil])
+    {
+        //if cannot trash, just delete it (will work if it's on a remote volume)
+        NSError * error;
+        if (![[NSFileManager defaultManager] removeItemAtPath: path error: &error])
+            NSLog(@"Could not trash %@: %@", path, [error localizedDescription]);
+    }
 }
 
 - (void) trashData
 {
     tr_torrentDeleteLocalData(fHandle, trashDataFile);
-}
-
-- (void) trashTorrent
-{
-    if (fPublicTorrent)
-    {
-        [Torrent trashFile: fPublicTorrentLocation];
-        [fPublicTorrentLocation release];
-        fPublicTorrentLocation = nil;
-        
-        fPublicTorrent = NO;
-    }
 }
 
 - (void) moveTorrentDataFileTo: (NSString *) folder
@@ -878,19 +853,9 @@ int trashDataFile(const char * filename)
     return [NSString stringWithUTF8String: fInfo->torrent];
 }
 
-- (NSString *) publicTorrentLocation
-{
-    return fPublicTorrentLocation;
-}
-
 - (NSString *) dataLocation
 {
     return [[self downloadFolder] stringByAppendingPathComponent: [self name]];
-}
-
-- (BOOL) publicTorrent
-{
-    return fPublicTorrent;
 }
 
 - (CGFloat) progress
@@ -1595,7 +1560,6 @@ int trashDataFile(const char * filename)
 @implementation Torrent (Private)
 
 - (id) initWithPath: (NSString *) path hash: (NSString *) hashString torrentStruct: (tr_torrent *) torrentStruct lib: (tr_session *) lib
-        publicTorrent: (NSNumber *) publicTorrent publicTorrentLocation: (NSString *) publicTorrentLoc
         downloadFolder: (NSString *) downloadFolder
         useIncompleteFolder: (NSNumber *) useIncompleteFolder incompleteFolder: (NSString *) incompleteFolder
         waitToStart: (NSNumber *) waitToStart
@@ -1605,10 +1569,6 @@ int trashDataFile(const char * filename)
         return nil;
     
     fDefaults = [NSUserDefaults standardUserDefaults];
-
-    fPublicTorrent = publicTorrentLoc && (publicTorrent ? [publicTorrent boolValue] : ![fDefaults boolForKey: @"DeleteOriginalTorrent"]);
-    if (fPublicTorrent)
-        fPublicTorrentLocation = [publicTorrentLoc retain];
     
     fDownloadFolder = downloadFolder ? downloadFolder : [fDefaults stringForKey: @"DownloadFolder"];
     fDownloadFolder = [[fDownloadFolder stringByExpandingTildeInPath] retain];
@@ -1950,20 +1910,6 @@ int trashDataFile(const char * filename)
     
     tr_torrentSetAnnounceList(fHandle, trackerStructs, count);
     tr_free(trackerStructs);
-}
-
-+ (void) trashFile: (NSString *) path
-{
-    //attempt to move to trash
-    if (![[NSWorkspace sharedWorkspace] performFileOperation: NSWorkspaceRecycleOperation
-        source: [path stringByDeletingLastPathComponent] destination: @""
-        files: [NSArray arrayWithObject: [path lastPathComponent]] tag: nil])
-    {
-        //if cannot trash, just delete it (will work if it's on a remote volume)
-        NSError * error;
-        if (![[NSFileManager defaultManager] removeItemAtPath: path error: &error])
-            NSLog(@"Could not trash %@: %@", path, [error localizedDescription]);
-    }
 }
 
 - (void) setTimeMachineExclude: (BOOL) exclude forPath: (NSString *) path

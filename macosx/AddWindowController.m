@@ -49,20 +49,21 @@
 @implementation AddWindowController
 
 - (id) initWithTorrent: (Torrent *) torrent destination: (NSString *) path lockDestination: (BOOL) lockDestination
-    controller: (Controller *) controller deleteTorrent: (torrentFileState) deleteTorrent
+    controller: (Controller *) controller torrentFile: (NSString *) torrentFile
+    deleteTorrent: (BOOL) deleteTorrent canToggleDelete: (BOOL) canToggleDelete
 {
     if ((self = [super initWithWindowNibName: @"AddWindow"]))
     {
         fTorrent = torrent;
-        if (path)
-            fDestination = [[path stringByExpandingTildeInPath] retain];
+        fDestination = [[path stringByExpandingTildeInPath] retain];
         fLockDestination = lockDestination;
         
         fController = controller;
         
-        fDeleteTorrent = deleteTorrent == TORRENT_FILE_DELETE || (deleteTorrent == TORRENT_FILE_DEFAULT
-                            && [[NSUserDefaults standardUserDefaults] boolForKey: @"DeleteOriginalTorrent"]);
-        fDeleteEnable = deleteTorrent == TORRENT_FILE_DEFAULT;
+        fTorrentFile = [[torrentFile stringByExpandingTildeInPath] retain];
+        
+        fDeleteTorrent = deleteTorrent;
+        fDeleteEnable = canToggleDelete;
         
         fGroupValue = [torrent groupValue];
     }
@@ -238,8 +239,8 @@
     [fTorrent setWaitToStart: [fStartCheck state] == NSOnState];
     [fTorrent setGroupValue: fGroupValue];
     
-    if ([fDeleteCheck state] == NSOnState)
-        [fTorrent trashTorrent];
+    if (fTorrentFile && [fDeleteCheck state] == NSOnState)
+        [Torrent trashFile: fTorrentFile];
     
     [fFileController setTorrent: nil]; //avoid a crash when window tries to update
     
