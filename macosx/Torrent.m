@@ -87,7 +87,7 @@ int trashDataFile(const char * filename)
     
     if (self)
     {
-        if (torrentDelete && [[self torrentLocation] isEqualToString: path])
+        if (torrentDelete && ![[self torrentLocation] isEqualToString: path])
             [Torrent trashFile: path];
     }
     return self;
