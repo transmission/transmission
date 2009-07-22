@@ -1,26 +1,14 @@
-/******************************************************************************
- * $Id$
+/*
+ * This file Copyright (C) 2008-2009 Charles Kerr <charles@transmissionbt.com>
  *
- * Copyright (c) 2005-2008 Transmission authors and contributors
+ * This file is licensed by the GPL version 2.  Works owned by the
+ * Transmission project are granted a special exemption to clause 2(b)
+ * so that the bulk of its code can remain under the MIT license. 
+ * This exemption does not extend to derived works not owned by
+ * the Transmission project.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- *****************************************************************************/
+ * $Id:$
+ */
 
 #include <ctype.h> /* isxdigit() */
 #include <errno.h>
@@ -306,60 +294,6 @@ checkfilenames( int    argc,
     return g_slist_reverse( ret );
 }
 
-static void
-onErrorResponse( GtkWidget * dialog,
-                 int resp    UNUSED,
-                 gpointer    glist )
-{
-    GSList * list = glist;
-
-    if( list )
-    {
-        callbackfunc_t func = list->data;
-        gpointer       user_data = list->next->data;
-        func( user_data );
-        g_slist_free( list );
-    }
-
-    gtk_widget_destroy( dialog );
-}
-
-static GtkWidget *
-verrmsg_full( GtkWindow *    wind,
-              callbackfunc_t func,
-              void *         data,
-              const char *   format,
-              va_list        ap )
-{
-    GtkWidget *dialog;
-    char *     msg;
-    GSList *   funcdata = NULL;
-
-    msg = g_strdup_vprintf( format, ap );
-
-    if( NULL == wind )
-        dialog = gtk_message_dialog_new(
-            NULL, 0, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "%s", msg );
-    else
-        dialog = gtk_message_dialog_new(
-            wind,
-            GTK_DIALOG_MODAL |
-            GTK_DIALOG_DESTROY_WITH_PARENT,
-            GTK_MESSAGE_ERROR, GTK_BUTTONS_OK,
-            "%s", msg );
-
-    if( func )
-    {
-        funcdata = g_slist_append( funcdata, (gpointer)func );
-        funcdata = g_slist_append( funcdata, data );
-    }
-    g_signal_connect( dialog, "response", G_CALLBACK(
-                          onErrorResponse ), funcdata );
-    g_free( msg );
-
-    return dialog;
-}
-
 void
 addTorrentErrorDialog( GtkWidget *  child,
                        int          err,
@@ -401,47 +335,6 @@ addTorrentErrorDialog( GtkWidget *  child,
     gtk_widget_show_all( w );
     g_free( secondary );
 }
-
-void
-errmsg( GtkWindow *  wind,
-        const char * format,
-        ... )
-{
-    GtkWidget * dialog;
-    va_list     ap;
-
-    va_start( ap, format );
-    dialog = verrmsg_full( wind, NULL, NULL, format, ap );
-    va_end( ap );
-
-    if( NULL != wind && !GTK_WIDGET_MAPPED( GTK_WIDGET( wind ) ) )
-    {
-        g_signal_connect_swapped( wind, "map",
-                                  G_CALLBACK( gtk_widget_show ), dialog );
-    }
-    else
-    {
-        gtk_widget_show( dialog );
-    }
-}
-
-GtkWidget *
-errmsg_full( GtkWindow *    wind,
-             callbackfunc_t func,
-             void *         data,
-             const char *   format,
-             ... )
-{
-    GtkWidget * dialog;
-    va_list     ap;
-
-    va_start( ap, format );
-    dialog = verrmsg_full( wind, func, data, format, ap );
-    va_end( ap );
-
-    return dialog;
-}
-
 typedef void ( PopupFunc )( GtkWidget*, GdkEventButton* );
 
 /* pop up the context menu if a user right-clicks.

@@ -87,8 +87,7 @@ enum tr_core_err
 {
     TR_CORE_ERR_ADD_TORRENT_ERR  = TR_EINVALID,
     TR_CORE_ERR_ADD_TORRENT_DUP  = TR_EDUPLICATE,
-    TR_CORE_ERR_NO_MORE_TORRENTS,  /* finished adding a batch */
-    TR_CORE_ERR_SAVE_STATE         /* error saving state */
+    TR_CORE_ERR_NO_MORE_TORRENTS  /* finished adding a batch */
 };
 
 GType          tr_core_get_type( void );

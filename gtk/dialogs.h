@@ -29,15 +29,19 @@
 #include "tr-torrent.h"
 #include "util.h"
 
+
+/* used for a callback function with a data parameter */
+typedef void ( *callbackfunc_t )( gpointer );
+
 /* prompt if the user wants to quit, calls func with cbdata if they do */
-void askquit(                               TrCore*,
-                             GtkWindow*     parent,
-                             callbackfunc_t func,
-                             void*          cbdata );
+void askquit( TrCore          * core,
+              GtkWindow       * parent,
+              callbackfunc_t    func,
+              gpointer          cbdata );
 
 void confirmRemove( GtkWindow * parent,
-                    TrCore *    core,
-                    GSList *    gtorrents,
+                    TrCore    * core,
+                    GSList    * gtorrents,
                     gboolean    doDelete );
 
 #endif /* TG_PREFS_H */

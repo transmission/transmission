@@ -627,7 +627,7 @@ tr_core_init( GTypeInstance *  instance,
                                                   struct TrCorePrivate );
 
     /* create the model used to store torrent data */
-    g_assert( ALEN( types ) == MC_ROW_COUNT );
+    g_assert( G_N_ELEMENTS( types ) == MC_ROW_COUNT );
     store = gtk_list_store_newv( MC_ROW_COUNT, types );
 
     p->model    = GTK_TREE_MODEL( store );

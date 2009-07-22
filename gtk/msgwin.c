@@ -75,66 +75,53 @@ level_combo_changed_cb( GtkWidget * w,
 }
 
 static void
-doSave( GtkWindow *      parent,
-        struct MsgData * data,
-        const char *     filename )
+doSave( GtkWindow * parent, struct MsgData * data, const char * filename )
 {
     FILE * fp = fopen( filename, "w+" );
 
     if( !fp )
     {
-        errmsg( parent,
-               _( "Couldn't save file \"%1$s\": %2$s" ),
-               filename, g_strerror( errno ) );
+        GtkWidget * w = gtk_message_dialog_new( parent, 0, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, _( "Couldn't save \"%s\"" ), filename );
+        gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG( w ), "%s", g_strerror( errno ) );
+        g_signal_connect_swapped( w, "response", G_CALLBACK( gtk_widget_destroy ), w );
+        gtk_widget_show( w );
     }
     else
     {
-        GtkTreeIter    iter;
+        GtkTreeIter iter;
         GtkTreeModel * model = GTK_TREE_MODEL( data->sort );
         if( gtk_tree_model_iter_children( model, &iter, NULL ) ) do
-            {
-                char *                     date;
-                const char *               levelStr;
-                const struct tr_msg_list * node;
+        {
+            char * date;
+            const char * levelStr;
+            const struct tr_msg_list * node;
 
-                gtk_tree_model_get( model, &iter,
-                                    COL_TR_MSG, &node,
-                                    -1 );
-                date = gtr_localtime( node->when );
-                switch( node->level )
-                {
-                    case TR_MSG_DBG:
-                        levelStr = "debug"; break;
-
-                    case TR_MSG_ERR:
-                        levelStr = "error"; break;
-
-                    default:
-                        levelStr = "     "; break;
-                }
-                fprintf( fp, "%s\t%s\t%s\t%s\n", date, levelStr,
-                        ( node->name ? node->name : "" ),
-                        ( node->message ? node->message : "" ) );
-
-                g_free( date );
+            gtk_tree_model_get( model, &iter, COL_TR_MSG, &node, -1 );
+            date = gtr_localtime( node->when );
+            switch( node->level ) {
+                case TR_MSG_DBG: levelStr = "debug"; break;
+                case TR_MSG_ERR: levelStr = "error"; break;
+                default:         levelStr = "     "; break;
             }
-            while( gtk_tree_model_iter_next( model, &iter ) );
+            fprintf( fp, "%s\t%s\t%s\t%s\n", date, levelStr,
+                     ( node->name ? node->name : "" ),
+                     ( node->message ? node->message : "" ) );
+            g_free( date );
+        }
+        while( gtk_tree_model_iter_next( model, &iter ) );
 
         fclose( fp );
     }
 }
 
 static void
-onSaveDialogResponse( GtkWidget * d,
-                      int         response,
-                      gpointer    data )
+onSaveDialogResponse( GtkWidget * d, int response, gpointer data )
 {
     if( response == GTK_RESPONSE_ACCEPT )
     {
-        char * filename =
-            gtk_file_chooser_get_filename( GTK_FILE_CHOOSER( d ) );
-        doSave( GTK_WINDOW( d ), data, filename );
-        g_free( filename );
+        char * file = gtk_file_chooser_get_filename( GTK_FILE_CHOOSER( d ) );
+        doSave( GTK_WINDOW( d ), data, file );
+        g_free( file );
     }
 
     gtk_widget_destroy( d );
@@ -145,8 +132,7 @@ onSaveRequest( GtkWidget * w,
                gpointer    data )
 {
     GtkWindow * window = GTK_WINDOW( gtk_widget_get_toplevel( w ) );
-    GtkWidget * d = gtk_file_chooser_dialog_new( _(
-                                                     "Save Log" ), window,
+    GtkWidget * d = gtk_file_chooser_dialog_new( _( "Save Log" ), window,
                                                  GTK_FILE_CHOOSER_ACTION_SAVE,
                                                  GTK_STOCK_CANCEL,
                                                  GTK_RESPONSE_CANCEL,
