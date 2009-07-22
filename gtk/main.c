@@ -88,10 +88,6 @@ struct cbdata
     GtkTreeSelection  * sel;
 };
 
-#define CBDATA_PTR "callback-data-pointer"
-
-static GtkUIManager * myUIManager = NULL;
-
 static void           appsetup( TrWindow * wind,
                                 GSList *   args,
                                 struct     cbdata *,
@@ -433,6 +429,7 @@ main( int     argc,
 
         const char * str;
         GtkWindow * win;
+        GtkUIManager * myUIManager;
         tr_session * session;
         struct cbdata * cbdata = g_new0( struct cbdata, 1 );
 
