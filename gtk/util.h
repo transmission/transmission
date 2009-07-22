@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id:$
+ * $Id$
  */
 
 #ifndef GTR_UTIL_H
@@ -37,9 +37,6 @@ char* gtr_localtime( time_t time );
 
 /* similar to asctime, but is utf8-clean */
 char* gtr_localtime2( char * buf, time_t time, size_t buflen );
-
-/* create a directory and any missing parent directories */
-int mkdir_p( const char *name, mode_t mode );
 
 /***
 ****
@@ -78,6 +75,9 @@ char*       gtr_get_help_url( void );
 
 /* GTK-related utilities */
 #ifdef GTK_MAJOR_VERSION
+
+/* backwards-compatible wrapper around g_mkdir_with_parents() */
+int gtr_mkdir_with_parents( const char *name, int mode );
 
 /* backwards-compatible wrapper around gdk_threads_add_timeout_seconds() */
 guint gtr_timeout_add_seconds( guint seconds, GSourceFunc func, gpointer data );

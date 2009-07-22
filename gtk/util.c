@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id:$
+ * $Id$
  */
 
 #include <ctype.h> /* isxdigit() */
@@ -197,8 +197,7 @@ gtr_localtime2( char * buf, time_t time, size_t buflen )
 }
 
 int
-mkdir_p( const char * path,
-         mode_t       mode )
+gtr_mkdir_with_parents( const char * path, int mode )
 {
 #if GLIB_CHECK_VERSION( 2, 8, 0 )
     return !g_mkdir_with_parents( path, mode );

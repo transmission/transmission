@@ -57,7 +57,7 @@ cf_init( const char   * configDir,
 
     gl_confdir = g_strdup( configDir );
 
-    if( mkdir_p( gl_confdir, 0755 ) )
+    if( gtr_mkdir_with_parents( gl_confdir, 0755 ) )
         return TRUE;
 
     if( errstr != NULL )
