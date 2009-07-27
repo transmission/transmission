@@ -18,23 +18,15 @@
 static const char *
 get_static_string( const char *s )
 {
-    static GHashTable *static_strings = NULL;
-    const char *result;
+    static GStringChunk * static_strings = NULL;
 
-    if ( s == NULL )
-        return NULL;
+     if( s == NULL )
+         return NULL;
 
-    if ( static_strings == NULL )
-        static_strings = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
+     if( static_strings == NULL )
+         static_strings = g_string_chunk_new( 1024 );
 
-    if ( ! g_hash_table_lookup_extended( static_strings, s, (gpointer) &result, NULL )) {
-        result = g_strdup( s );
-        g_hash_table_insert( static_strings,
-                             (gpointer) result,
-                             GINT_TO_POINTER( 1 ));
-    }
-
-    return result;
+    return g_string_chunk_insert_const( static_strings, s );
 }
 #endif
 
@@ -215,9 +207,10 @@ icon_cache_get_mime_type_icon( IconCache  * icon_cache,
         g_object_ref( pixbuf );
         return pixbuf;
     }
-	
+
     pixbuf = _get_icon_pixbuf( icon, icon_cache->icon_size, icon_cache->icon_theme );
-    g_hash_table_insert( icon_cache->cache, (gpointer) key, g_object_ref( pixbuf ));
+    if( pixbuf != NULL )
+        g_hash_table_insert( icon_cache->cache, (gpointer) key, g_object_ref( pixbuf ) );
 	
     return pixbuf;
 }
