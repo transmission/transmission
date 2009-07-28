@@ -28,11 +28,11 @@ fi
 
 echo "Detected OS [$OS_NAME] version [$OS_VERSION]"
 
-EXPR="s/OS_STRING \".*\"/OS_STRING \"${OS_NAME}\/${OS_VERSION}\"/"
+EXPR="s|OS_STRING \".*\"|OS_STRING \"${OS_NAME}/${OS_VERSION}\"|"
 #echo $EXPR
 #echo "Backing up $OUTPUT_FILE to $OUTPUT_FILE.bak."
 #cp $OUTPUT_FILE $OUTPUT_FILE.bak
 test -f ${TEMPLATE_FILE}
 echo "setting OS_STRING macro value to ${OS_NAME}/${OS_VERSION} in $OUTPUT_FILE."
-cat ${TEMPLATE_FILE} | sed -e "$EXPR" > $OUTPUT_FILE
+sed "$EXPR" <"$TEMPLATE_FILE" >"$OUTPUT_FILE"
 
