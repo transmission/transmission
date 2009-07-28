@@ -427,6 +427,11 @@ ul.torrent_list li.torrent div.torrent_progress_bar.complete {
 	background-position: left -10px;
 	border: 1px solid #29AD35;
 }
+ul.torrent_list li.torrent div.torrent_progress_bar.complete.seeding {
+	background-position: left -40px;
+	border: 1px solid #269e30;
+	border-right: none;
+}
 
 ul.torrent_list li.torrent div.torrent_progress_bar.in_progress {
 	background-position: left 0px;
@@ -439,6 +444,11 @@ ul.torrent_list li.torrent div.torrent_progress_bar.incomplete {
 	background-position: left -20px;
 	border: 1px solid #C8CACD;
 	border-left: none;
+}
+
+ul.torrent_list li.torrent div.torrent_progress_bar.incomplete.seeding {
+	background-position: left -10px;
+	border: 1px solid #29AD35;
 }
 
 ul.torrent_list li.torrent div.torrent_progress_bar.incomplete_stopped {

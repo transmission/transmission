@@ -451,12 +451,6 @@ Torrent.prototype =
 		}
 		else
 		{
-			// Update the 'in progress' bar
-			e = root._progress_complete_container;
-			c = 'torrent_progress_bar';
-			c += (this.isActive()) ? ' complete' : ' complete_stopped';
-			e.className = c;
-			
 			// Create the 'progress details' label
 			// Eg: '698.05 MB, uploaded 8.59 GB (Ratio: 12.3)'
 			c = Math.formatBytes( this._size );
@@ -466,12 +460,34 @@ Torrent.prototype =
 			c += Math.round(this._upload_ratio*100)/100;
 			c += ')';
 			progress_details = c;
-			
-			// Hide the 'incomplete' bar
-			root._progress_incomplete_container.style.display = 'none';
-			
-			// Set progress to maximum
-			root._progress_complete_container.style.width =  MaxBarWidth + '%';
+
+			var status = this.isActive() ? 'complete' : 'complete_stopped';
+
+			if(this.isActive() && this.seedRatio() > 0){
+				status = 'complete seeding'
+				var seedRatioRatio = this._upload_ratio / this.seedRatio();
+				var seedRatioPercent = Math.round( seedRatioRatio * 100 * MaxBarWidth ) / 100;
+
+				root._progress_incomplete_container.className = 'torrent_progress_bar incomplete seeding'
+				root._progress_incomplete_container.style.display = 'block';
+				root._progress_incomplete_container.style.width = seedRatioPercent + '%';
+
+				// Set progress to maximum
+				root._progress_complete_container.style.width =	MaxBarWidth - seedRatioPercent	+ '%';
+			}
+			else
+			{
+				// Hide the 'incomplete' bar
+				root._progress_incomplete_container.className = 'torrent_progress_bar incomplete'
+				root._progress_incomplete_container.style.display = 'none';
+
+				// Set progress to maximum
+				root._progress_complete_container.style.width =	MaxBarWidth + '%';
+			}
+
+			// Update the 'in progress' bar
+			e = root._progress_complete_container;
+			e.className = 'torrent_progress_bar ' + status;
 		}
 		
 		// Update the progress details
