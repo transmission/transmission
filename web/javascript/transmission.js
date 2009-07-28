@@ -386,6 +386,13 @@ Transmission.prototype =
 			container.scrollTop( offsetTop + offsetHeight - innerHeight );
 	},
 
+	seedRatio: function(){
+		if(this._prefs && this._prefs['seedRatioLimited'])
+			return this._prefs['seedRatioLimit'];
+		else
+			return -1;
+	},
+
 	/*--------------------------------------------
 	 * 
 	 *  S E L E C T I O N
