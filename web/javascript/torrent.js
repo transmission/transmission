@@ -294,6 +294,7 @@ Torrent.prototype =
 		this._leftUntilDone         = data.leftUntilDone;
 		this._download_total        = data.downloadedEver;
 		this._upload_total          = data.uploadedEver;
+		this._upload_ratio          = data.uploadRatio
 		this._download_speed        = data.rateDownload;
 		this._upload_speed          = data.rateUpload;
 		this._peers_connected       = data.peersConnected;
@@ -449,7 +450,7 @@ Torrent.prototype =
 			c += ', uploaded ';
 			c += Math.formatBytes( this._upload_total );
 			c += ' (Ratio ';
-			c += Math.ratio( this._upload_total, this._download_total );
+			c += Math.round(this._upload_ratio*100)/100;
 			c += ')';
 			progress_details = c;
 			
