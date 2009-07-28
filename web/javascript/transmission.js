@@ -115,7 +115,7 @@ Transmission.prototype =
 		var tr = this;
 		var async = false;
 		this.loadDaemonPrefs( async );
-		this.initalizeAllTorrents();
+		this.initializeAllTorrents();
 
 		this.togglePeriodicRefresh( true );
 	},
@@ -1205,7 +1205,7 @@ Transmission.prototype =
 		} );
 	},
 
-	initalizeAllTorrents: function(){
+	initializeAllTorrents: function(){
 		var tr = this;
 		this.remote.getInitialDataFor( null ,function(torrents) { tr.addTorrents(torrents); } );
 	},
