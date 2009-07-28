@@ -18,6 +18,10 @@ Torrent._StatusSeeding         = 8;
 Torrent._StatusPaused          = 16;
 Torrent._InfiniteTimeRemaining = 215784000; // 999 Hours - may as well be infinite
 
+Torrent._RatioUseGlobal        = 0;
+Torrent._RatioUseLocal         = 1;
+Torrent._RatioUnlimited        = 2;
+
 Torrent.prototype =
 {
 	/*
@@ -201,6 +205,13 @@ Torrent.prototype =
 		this.fileList().show();
 	},
 	hideFileList: function() { this.fileList().hide(); },
+	seedRatio: function(){
+		switch( this._seed_ratio_mode ) {
+			case Torrent._RatioUseGlobal: return this._controller.seedRatio();
+			case Torrent._RatioUseLocal:  return this._seed_ratio_limit;
+			default:                      return -1;
+		}
+	},
 	
 	/*--------------------------------------------
 	 * 
@@ -294,7 +305,9 @@ Torrent.prototype =
 		this._leftUntilDone         = data.leftUntilDone;
 		this._download_total        = data.downloadedEver;
 		this._upload_total          = data.uploadedEver;
-		this._upload_ratio          = data.uploadRatio
+		this._upload_ratio          = data.uploadRatio;
+		this._seed_ratio_limit      = data.seedRatioLimit;
+		this._seed_ratio_mode       = data.seedRatioMode;
 		this._download_speed        = data.rateDownload;
 		this._upload_speed          = data.rateUpload;
 		this._peers_connected       = data.peersConnected;
