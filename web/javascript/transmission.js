@@ -396,7 +396,7 @@ Transmission.prototype =
 			container.scrollTop( offsetTop + offsetHeight - innerHeight );
 	},
 
-	seedRatio: function(){
+	seedRatioLimit: function(){
 		if(this._prefs && this._prefs['seedRatioLimited'])
 			return this._prefs['seedRatioLimit'];
 		else

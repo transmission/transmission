@@ -205,9 +205,9 @@ Torrent.prototype =
 		this.fileList().show();
 	},
 	hideFileList: function() { this.fileList().hide(); },
-	seedRatio: function(){
+	seedRatioLimit: function(){
 		switch( this._seed_ratio_mode ) {
-			case Torrent._RatioUseGlobal: return this._controller.seedRatio();
+			case Torrent._RatioUseGlobal: return this._controller.seedRatioLimit();
 			case Torrent._RatioUseLocal:  return this._seed_ratio_limit;
 			default:                      return -1;
 		}
@@ -463,9 +463,9 @@ Torrent.prototype =
 
 			var status = this.isActive() ? 'complete' : 'complete_stopped';
 
-			if(this.isActive() && this.seedRatio() > 0){
+			if(this.isActive() && this.seedRatioLimit() > 0){
 				status = 'complete seeding'
-				var seedRatioRatio = this._upload_ratio / this.seedRatio();
+				var seedRatioRatio = this._upload_ratio / this.seedRatioLimit();
 				var seedRatioPercent = Math.round( seedRatioRatio * 100 * MaxBarWidth ) / 100;
 
 				root._progress_incomplete_container.className = 'torrent_progress_bar incomplete seeding'
