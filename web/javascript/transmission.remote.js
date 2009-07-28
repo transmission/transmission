@@ -72,8 +72,11 @@ TransmissionRemote.prototype =
 		XHR.setRequestHeader('X-Transmission-Session-Id', this._token);
 	},
 
-	sendRequest: function( data, success ) {
+	sendRequest: function( data, success, async ) {
 		remote = this;
+		if( typeof async != 'boolean' )
+		  async = true;
+
 		$.ajax( {
 			url: RPC._Root,
 			type: 'POST',
@@ -83,14 +86,15 @@ TransmissionRemote.prototype =
 			data: $.toJSON(data),
 			beforeSend: function(XHR){ remote.appendSessionId(XHR) },
 			error: function(request, error_string, exception){ remote.ajaxError(request, error_string, exception, this) },
-			success: success
+			success: success,
+			async: async
 		} );
 	},
 
-	loadDaemonPrefs: function( callback ) {
+	loadDaemonPrefs: function( callback, async ) {
 		var tr = this._controller;
 		var o = { method: 'session-get' };
-		this.sendRequest( o, callback );
+		this.sendRequest( o, callback, async );
 	},
 
 	getInitialDataFor: function(torrent_ids, callback) {

@@ -113,19 +113,20 @@ Transmission.prototype =
 		
 		// Get preferences & torrents from the daemon
 		var tr = this;
-		this.loadDaemonPrefs( );
+		var async = false;
+		this.loadDaemonPrefs( async );
 		this.initalizeAllTorrents();
 
 		this.togglePeriodicRefresh( true );
 	},
 
-	loadDaemonPrefs: function(){
+	loadDaemonPrefs: function( async ){
 		var tr = this;
 		this.remote.loadDaemonPrefs( function(data){
 			var o = data.arguments;
 			Prefs.getClutchPrefs( o );
 			tr.updatePrefs( o );
-		});
+		}, async );
 	},
 
 	preloadImages: function() {
