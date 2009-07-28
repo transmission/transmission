@@ -87,14 +87,10 @@ TransmissionRemote.prototype =
 		} );
 	},
 
-	loadDaemonPrefs: function() {
+	loadDaemonPrefs: function( callback ) {
 		var tr = this._controller;
 		var o = { method: 'session-get' };
-		this.sendRequest( o, function(data) {
-			var o = data.arguments;
-			Prefs.getClutchPrefs( o );
-			tr.updatePrefs( o );
-		} );
+		this.sendRequest( o, callback );
 	},
 
 	getInitialDataFor: function(torrent_ids, callback) {
@@ -224,7 +220,7 @@ TransmissionRemote.prototype =
 			arguments: args
 		};
 		this.sendRequest( o, function() {
-			remote.loadDaemonPrefs();
+			remote._controller.loadDaemonPrefs();
 		} );
 	}
 };
