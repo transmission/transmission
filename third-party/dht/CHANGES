@@ -1,3 +1,14 @@
+28 July 2009: dht-0.8
+
+  * Fixed a crash when expiring the first search on the list.
+  * Fixed freeing of the search list when uniniting with dofree = 1.
+
+24 June 2009: dht-0.7
+
+  * Removed the fixed limit on the number of concurrent searches, we now
+    use a linked list.
+  * Fixed build on FreeBSD (thanks to Humihara and Charles Kerr).
+
 22 May 2009: dht-0.6
 
   * Fixed a buffer overflow (when reading) in parse_message.
