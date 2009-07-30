@@ -468,12 +468,13 @@ Torrent.prototype =
 				var seedRatioRatio = this._upload_ratio / this.seedRatioLimit();
 				var seedRatioPercent = Math.round( seedRatioRatio * 100 * MaxBarWidth ) / 100;
 
+				// Set progress to percent seeded
+				root._progress_complete_container.style.width =	seedRatioPercent + '%';
+
+				// Update the 'incomplete' bar
 				root._progress_incomplete_container.className = 'torrent_progress_bar incomplete seeding'
 				root._progress_incomplete_container.style.display = 'block';
-				root._progress_incomplete_container.style.width = seedRatioPercent + '%';
-
-				// Set progress to maximum
-				root._progress_complete_container.style.width =	MaxBarWidth - seedRatioPercent	+ '%';
+				root._progress_incomplete_container.style.width = MaxBarWidth - seedRatioPercent + '%';
 			}
 			else
 			{
