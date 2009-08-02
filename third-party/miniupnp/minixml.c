@@ -35,7 +35,7 @@ POSSIBILITY OF SUCH DAMAGE.
 /* parseatt : used to parse the argument list
  * return 0 (false) in case of success and -1 (true) if the end
  * of the xmlbuffer is reached. */
-static int parseatt(struct xmlparser * p)
+int parseatt(struct xmlparser * p)
 {
 	const char * attname;
 	int attnamelen;
@@ -106,7 +106,7 @@ static int parseatt(struct xmlparser * p)
 
 /* parseelt parse the xml stream and
  * call the callback functions when needed... */
-static void parseelt(struct xmlparser * p)
+void parseelt(struct xmlparser * p)
 {
 	int i;
 	const char * elementname;

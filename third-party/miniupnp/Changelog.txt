@@ -1,5 +1,13 @@
-$Id: Changelog.txt,v 1.82 2009/07/09 16:14:06 nanard Exp $
+$Id: Changelog.txt,v 1.86 2009/07/29 08:44:29 nanard Exp $
 miniUPnP client Changelog.
+
+2009/07/29:
+  fix in updateminiupnpcstrings.sh if OS name contains "/"
+  Sending a correct value for MX: field in SSDP request
+
+2009/07/20:
+  Change the Makefile to compile under Mac OS X
+  Fixed a stackoverflow in getDevicesFromMiniSSDPD()
 
 2009/07/09:
   Compile under Haiku
@@ -7,6 +15,8 @@ miniUPnP client Changelog.
 
 2009/06/04:
   patching to compile under CygWin and cross compile for minGW
+
+VERSION 1.3 :
 
 2009/04/17:
   updating python module

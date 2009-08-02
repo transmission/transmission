@@ -1,4 +1,4 @@
-/* $Id: miniupnpc.c,v 1.58 2009/07/09 15:59:46 nanard Exp $ */
+/* $Id: miniupnpc.c,v 1.59 2009/07/29 08:44:29 nanard Exp $ */
 /* Project : miniupnp
  * Author : Thomas BERNARD
  * copyright (c) 2005-2007 Thomas Bernard
@@ -351,7 +351,7 @@ LIBSPEC struct UPNPDev * upnpDiscover(int delay, const char * multicastif,
 	"HOST: " UPNP_MCAST_ADDR ":" XSTR(PORT) "\r\n"
 	"ST: %s\r\n"
 	"MAN: \"ssdp:discover\"\r\n"
-	"MX: 3\r\n"
+	"MX: %u\r\n"
 	"\r\n";
 	static const char * const deviceList[] = {
 		"urn:schemas-upnp-org:device:InternetGatewayDevice:1",
@@ -365,6 +365,7 @@ LIBSPEC struct UPNPDev * upnpDiscover(int delay, const char * multicastif,
 	int sudp;
 	int n;
 	struct sockaddr_in sockudp_r, sockudp_w;
+	unsigned int mx;
 
 #ifndef WIN32
 	/* first try to get infos from minissdpd ! */
@@ -432,6 +433,8 @@ LIBSPEC struct UPNPDev * upnpDiscover(int delay, const char * multicastif,
 		return NULL;
     }
 
+	/* Calculating maximum response time in seconds */
+	mx = ((unsigned int)delay) / 1000u;
 	/* receiving SSDP response packet */
 	for(n = 0;;)
 	{
@@ -439,7 +442,7 @@ LIBSPEC struct UPNPDev * upnpDiscover(int delay, const char * multicastif,
 	{
 		/* sending the SSDP M-SEARCH packet */
 		n = snprintf(bufr, sizeof(bufr),
-		             MSearchMsgFmt, deviceList[deviceIndex++]);
+		             MSearchMsgFmt, deviceList[deviceIndex++], mx);
 		/*printf("Sending %s", bufr);*/
 		n = sendto(sudp, bufr, n, 0,
 		           (struct sockaddr *)&sockudp_w, sizeof(struct sockaddr_in));
@@ -626,7 +629,7 @@ int ReceiveData(int socket, char * data, int length, int timeout)
 	return n;
 }
 
-static int
+int
 UPNPIGD_IsConnected(struct UPNPUrls * urls, struct IGDdatas * data)
 {
 	char status[64];

@@ -1,7 +1,7 @@
-/* $Id: minissdpc.c,v 1.7 2008/12/18 17:45:48 nanard Exp $ */
+/* $Id: minissdpc.c,v 1.9 2009/07/20 09:18:05 nanard Exp $ */
 /* Project : miniupnp
  * Author : Thomas BERNARD
- * copyright (c) 2005-2008 Thomas Bernard
+ * copyright (c) 2005-2009 Thomas Bernard
  * This software is subjet to the conditions detailed in the
  * provided LICENCE file. */
 /*#include <syslog.h>*/
@@ -12,8 +12,14 @@
 #include <sys/types.h>
 #ifdef WIN32
 #include <winsock2.h>
-#include <Ws2tcpip.h>
+#include <ws2tcpip.h>
 #include <io.h>
+/* Hack */
+#define UNIX_PATH_LEN   108
+struct sockaddr_un {
+  uint16_t sun_family;
+  char     sun_path[UNIX_PATH_LEN];
+};
 #else
 #include <sys/socket.h>
 #include <sys/un.h>
@@ -57,6 +63,12 @@ getDevicesFromMiniSSDPD(const char * devtype, const char * socketpath)
 	buffer[0] = 1; /* request type 1 : request devices/services by type */
 	p = buffer + 1;
 	l = stsize;	CODELENGTH(l, p);
+	if(p + stsize > buffer + sizeof(buffer))
+	{
+		/* devtype is too long ! */
+		close(s);
+		return NULL;
+	}
 	memcpy(p, devtype, stsize);
 	p += stsize;
 	if(write(s, buffer, p - buffer) < 0)
