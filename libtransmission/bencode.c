@@ -1301,7 +1301,7 @@ jsonRealFunc( const tr_benc * val, void * vdata )
         /* json requires a '.' decimal point regardless of locale */
         tr_strlcpy( locale, setlocale( LC_NUMERIC, NULL ), sizeof( locale ) );
         setlocale( LC_NUMERIC, "POSIX" );
-        evbuffer_add_printf( data->out, "%.4f", val->val.d );
+        evbuffer_add_printf( data->out, "%.4f", tr_truncd( val->val.d, 4 ) );
         setlocale( LC_NUMERIC, locale );
     }
 
