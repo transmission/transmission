@@ -30,7 +30,7 @@
 #include "completion.h"
 #include "crypto.h" /* for tr_sha1 */
 #include "resume.h"
-#include "fdlimit.h" /* tr_fdFileClose */
+#include "fdlimit.h" /* tr_fdTorrentClose */
 #include "metainfo.h"
 #include "peer-mgr.h"
 #include "platform.h" /* TR_PATH_DELIMITER_STR */

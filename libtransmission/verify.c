@@ -119,6 +119,7 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
                 changed = TRUE;
             }
             tr_torrentSetPieceChecked( tor, pieceIndex, TRUE );
+            tor->anyDate = time( NULL );
 
             SHA1_Init( &sha );
             ++pieceIndex;
@@ -306,7 +307,7 @@ tr_verifyRemove( tr_torrent * tor )
     else
     {
         tr_free( tr_list_remove( &verifyList, tor, compareVerifyByTorrent ) );
-        tor->verifyState = TR_VERIFY_NONE;
+        tr_torrentSetVerifyState( tor, TR_VERIFY_NONE );
     }
 
     tr_lockUnlock( lock );
