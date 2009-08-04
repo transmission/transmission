@@ -659,13 +659,15 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
         }
         if( mixed_date && mixed_creator )
             str = mixed;
-        else if( mixed_date )
-            g_snprintf( buf, sizeof( buf ), _( "Created by %1$s" ), creator );
-        else if( mixed_creator || !*creator )
-            g_snprintf( buf, sizeof( buf ), _( "Created on %1$s" ), datestr );
-        else
-            g_snprintf( buf, sizeof( buf ), _( "Created by %1$s on %2$s" ), creator, datestr );
-        str = buf;
+        else {
+            if( mixed_date )
+                g_snprintf( buf, sizeof( buf ), _( "Created by %1$s" ), creator );
+            else if( mixed_creator || !*creator )
+                g_snprintf( buf, sizeof( buf ), _( "Created on %1$s" ), datestr );
+            else
+                g_snprintf( buf, sizeof( buf ), _( "Created by %1$s on %2$s" ), creator, datestr );
+            str = buf;
+        }
     }
     gtk_label_set_text( GTK_LABEL( di->origin_lb ), str );
 
