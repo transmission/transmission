@@ -162,7 +162,7 @@ BlocklistDownloader * fDownloader = nil;
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"BlocklistUpdated" object: nil];
     
-    [pool release];
+    [pool drain];
     
     fDownloader = nil;
     [self release];

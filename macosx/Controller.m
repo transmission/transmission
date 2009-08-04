@@ -4065,7 +4065,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             [torrent release];
     }
     
-    [pool release];
+    [pool drain];
 }
 
 - (void) rpcAddTorrentStruct: (NSValue *) torrentStructPtr
