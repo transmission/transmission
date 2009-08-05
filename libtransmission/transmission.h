@@ -1364,8 +1364,14 @@ enum
     TR_PEER_FROM__MAX
 };
 
-/** Can be used as a mnemonic for "no error" errno */
-#define TR_OK 0
+typedef enum
+{
+    TR_STAT_OK               = 0,
+    TR_STAT_TRACKER_WARNING  = 1,
+    TR_STAT_TRACKER_ERROR    = 2,
+    TR_STAT_LOCAL_ERROR      = 3
+}
+tr_stat_errtype;
 
 /**
  * The current status of a torrent.
@@ -1392,11 +1398,13 @@ typedef struct tr_stat
         becomes unreachable. */
     char *  scrapeURL;
 
-    /** The errno status for this torrent.  0 means everything's fine. */
-    int     error;
+    /** Defines what kind of text is in errorString.
+        @see errorString */
+    tr_stat_errtype error;
 
-    /** Typically an error string returned from the tracker. */
-    char    errorString[128];
+    /** A warning or error message regarding the torrent.
+        @see error */
+    char errorString[128];
 
     /** When tr_stat.status is TR_STATUS_CHECK or TR_STATUS_CHECK_WAIT,
         this is the percentage of how much of the files has been

@@ -253,6 +253,7 @@ static const char * details_keys[] = {
     "doneDate",
     "downloadDir",
     "downloadedEver",
+    "error",
     "errorString",
     "eta",
     "hashString",
@@ -1005,9 +1006,16 @@ printDetails( tr_benc * top )
                 strlsize( buf, i, sizeof( buf ) );
                 printf( "  Corrupt DL: %s\n", buf );
             }
-            if( tr_bencDictFindStr( t, "errorString", &str ) && str && *str )
-                printf( "  Error: %s\n", str );
-
+            if( tr_bencDictFindStr( t, "errorString", &str ) && str && *str &&
+                tr_bencDictFindInt( t, "error", &i ) && i )
+            {
+                switch( i ) {
+                    case TR_STAT_TRACKER_WARNING: printf( "  Tracker returned a warning: %s\n", str ); break;
+                    case TR_STAT_TRACKER_ERROR:   printf( "  Tracker returned an error: %s\n", str ); break;
+                    case TR_STAT_LOCAL_ERROR:     printf( "  Error: %s\n", str ); break;
+                    default: break; /* no error */
+                }
+            }
             if( tr_bencDictFindInt( t, "peersConnected", &i )
               && tr_bencDictFindInt( t, "peersGettingFromUs", &j )
               && tr_bencDictFindInt( t, "peersSendingToUs", &k ) )

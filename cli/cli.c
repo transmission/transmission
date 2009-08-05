@@ -439,6 +439,9 @@ main( int     argc,
     {
         char            line[LINEWIDTH];
         const tr_stat * st;
+        const char * messageName[] = { NULL, "Tracker returned a warning:",
+                                             "Tracker returned an error:",
+                                             "Error:" };
 
         tr_wait( 200 );
 
@@ -470,8 +473,9 @@ main( int     argc,
 
         getStatusStr( st, line, sizeof( line ) );
         printf( "\r%-*s", LINEWIDTH, line );
-        if( st->error )
-            fprintf( stderr, "\n%s\n", st->errorString );
+
+        if( messageName[st->error] )
+            fprintf( stderr, "\n%s: %s\n", messageName[st->error], st->errorString );
     }
 
 cleanup:

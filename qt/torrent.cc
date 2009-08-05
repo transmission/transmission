@@ -59,7 +59,8 @@ Torrent :: myProperties[] =
     { DOWNLOAD_DIR, "downloadDir", QVariant::String, STAT },
     { ACTIVITY, "status", QVariant::Int, STAT },
     { NAME, "name", QVariant::String, INFO },
-    { ERROR, "errorString", QVariant::String, STAT },
+    { ERROR, "error", QVariant::Int, STAT },
+    { ERROR_STRING, "errorString", QVariant::String, STAT },
     { SIZE_WHEN_DONE, "sizeWhenDone", QVariant::ULongLong, STAT },
     { LEFT_UNTIL_DONE, "leftUntilDone", QVariant::ULongLong, STAT },
     { HAVE_UNCHECKED, "haveUnchecked", QVariant::ULongLong, STAT },
@@ -619,4 +620,20 @@ Torrent :: activityString( ) const
     }
 
     return str;
+}
+
+QString
+Torrent :: getError( ) const
+{
+    QString s = getString( ERROR_STRING );
+
+    switch( getInt( ERROR ) )
+    {
+        case TR_STAT_TRACKER_WARNING: s = tr( "Tracker returned a warning: %1" ).arg( s ); break;
+        case TR_STAT_TRACKER_ERROR: s = tr( "Tracker returned an error: %1" ).arg( s ); break;
+        case TR_STAT_LOCAL_ERROR: s = tr( "Error: %1" ).arg( s ); break;
+        default: s.clear(); break;
+    }
+
+    return s;
 }

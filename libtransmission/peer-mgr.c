@@ -1172,9 +1172,9 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
             }
             else /* a local error, such as an IO error */
             {
-                t->tor->error = e->err;
+                t->tor->error = TR_STAT_LOCAL_ERROR;
                 tr_strlcpy( t->tor->errorString,
-                            tr_strerror( t->tor->error ),
+                            tr_strerror( e->err ),
                             sizeof( t->tor->errorString ) );
                 tr_torrentStop( t->tor );
             }

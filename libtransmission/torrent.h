@@ -140,7 +140,7 @@ struct tr_torrent
 
     int                      magicNumber;
 
-    int                      error;
+    tr_stat_errtype          error;
     char                     errorString[128];
 
     uint8_t                  obfuscatedHash[SHA_DIGEST_LENGTH];

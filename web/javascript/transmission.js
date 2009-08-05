@@ -991,8 +991,9 @@ Transmission.prototype =
 		if( torrents.length == 1 )
 		{
 			var t = torrents[0];
-			if( t._error_message )
-				error = t._error_message ;
+			var err = t.getErrorMessage( );
+			if( err )
+				error = err;
 			if( t._comment)
 				comment = t._comment ;
 			if( t._creator )

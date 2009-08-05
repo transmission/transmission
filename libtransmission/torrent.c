@@ -285,20 +285,18 @@ onTrackerResponse( void * tracker UNUSED,
 
         case TR_TRACKER_WARNING:
             tr_torerr( tor, _( "Tracker warning: \"%s\"" ), event->text );
-            tor->error = -1;
-            tr_strlcpy( tor->errorString, event->text,
-                       sizeof( tor->errorString ) );
+            tor->error = TR_STAT_TRACKER_WARNING;
+            tr_strlcpy( tor->errorString, event->text, sizeof( tor->errorString ) );
             break;
 
         case TR_TRACKER_ERROR:
             tr_torerr( tor, _( "Tracker error: \"%s\"" ), event->text );
-            tor->error = -2;
-            tr_strlcpy( tor->errorString, event->text,
-                       sizeof( tor->errorString ) );
+            tor->error = TR_STAT_TRACKER_ERROR;
+            tr_strlcpy( tor->errorString, event->text, sizeof( tor->errorString ) );
             break;
 
         case TR_TRACKER_ERROR_CLEAR:
-            tor->error = 0;
+            tor->error = TR_STAT_OK;
             tor->errorString[0] = '\0';
             break;
     }
@@ -604,7 +602,7 @@ torrentRealInit( tr_torrent * tor, const tr_ctor * ctor )
 
     tr_ctorInitTorrentWanted( ctor, tor );
 
-    tor->error   = 0;
+    tor->error = TR_STAT_OK;
 
     tr_bitfieldConstruct( &tor->checkedPieces, tor->info.pieceCount );
     tr_torrentUncheck( tor );
@@ -859,9 +857,8 @@ tr_torrentStat( tr_torrent * tor )
     s = &tor->stats;
     s->id = tor->uniqueId;
     s->activity = tr_torrentGetActivity( tor );
-    s->error  = tor->error;
-    memcpy( s->errorString, tor->errorString,
-           sizeof( s->errorString ) );
+    s->error = tor->error;
+    memcpy( s->errorString, tor->errorString, sizeof( s->errorString ) );
 
     tc = tor->tracker;
     ti = tr_trackerGetAddress( tor->tracker, tor );
@@ -1247,7 +1244,8 @@ checkAndStartImpl( void * vtor )
     now = time( NULL );
     tor->isRunning = TRUE;
     tor->needsSeedRatioCheck = TRUE;
-    *tor->errorString = '\0';
+    tor->error = TR_STAT_OK;
+    tor->errorString[0] = '\0';
     tr_torrentResetTransferStats( tor );
     tor->completeness = tr_cpGetStatus( &tor->completion );
     tr_torrentSaveResume( tor );

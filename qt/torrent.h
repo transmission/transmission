@@ -90,6 +90,7 @@ class Torrent: public QObject
             ACTIVITY,
             NAME,
             ERROR,
+            ERROR_STRING,
             SIZE_WHEN_DONE,
             LEFT_UNTIL_DONE,
             HAVE_UNCHECKED,
@@ -207,7 +208,7 @@ class Torrent: public QObject
         QString creator( ) const { return getString( CREATOR ); }
         QString comment( ) const { return getString( COMMENT ); }
         QString getPath( ) const { return getString( DOWNLOAD_DIR ); }
-        QString getError( ) const { return getString( ERROR ); }
+        QString getError( ) const;
         QString hashString( ) const { return getString( HASH_STRING ); }
         QString scrapeResponse( ) const { return getString( SCRAPE_RESPONSE ); }
         QString announceResponse( ) const { return getString( ANNOUNCE_RESPONSE ); }

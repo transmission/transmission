@@ -22,6 +22,11 @@ Torrent._RatioUseGlobal        = 0;
 Torrent._RatioUseLocal         = 1;
 Torrent._RatioUnlimited        = 2;
 
+Torrent._ErrNone               = 0;
+Torrent._ErrTrackerWarning     = 1;
+Torrent._ErrTrackerError       = 2;
+Torrent._ErrLocalError         = 3;
+
 Torrent.prototype =
 {
 	/*
@@ -162,7 +167,6 @@ Torrent.prototype =
 	dateAdded: function() { return this._date; },
 	downloadSpeed: function() { return this._download_speed; },
 	downloadTotal: function() { return this._download_total; },
-	errorMessage: function() { return this._error_message; },
 	hash: function() { return this._hashString; },
 	id: function() { return this._id; },
 	isActive: function() { return this.state() != Torrent._StatusPaused; },
@@ -316,7 +320,7 @@ Torrent.prototype =
 		this._sizeWhenDone          = data.sizeWhenDone;
 		this._recheckProgress       = data.recheckProgress;
 		this._error                 = data.error;
-		this._error_message         = data.errorString;
+		this._error_string          = data.errorString;
 		this._eta                   = data.eta;
 		this._swarm_speed           = data.swarmSpeed;
 		this._total_leechers        = Math.max( 0, data.leechers );
@@ -340,14 +344,24 @@ Torrent.prototype =
 		}
 	},
 
+	getErrorMessage: function()
+	{
+		if( this._error  == Torrent._ErrTrackerWarning )
+			return 'Tracker returned a warning: ' + this._error_string;
+		if( this._error  == Torrent._ErrTrackerError )
+			return 'Tracker returned an error: ' + this._error_string;
+		if( this._error  == Torrent._ErrLocalError )
+			return 'Error: ' + this._error_string;
+		return null;
+	},
+
 	getPeerDetails: function()
 	{
-		if( this._error_message &&
-		    this._error_message !== '' &&
-		    this._error_message !== 'other' )
-			return this._error_message;
-
 		var c;
+
+		if(( c = this.getErrorMessage( )))
+			return c;
+
 		var st = this.state( );
 		switch( st )
 		{
