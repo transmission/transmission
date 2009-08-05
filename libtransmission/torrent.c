@@ -675,10 +675,10 @@ tr_torrentParse( const tr_ctor * ctor, tr_info * setmeInfo )
 {
     int             doFree;
     tr_bool         didParse;
-    tr_parse_result result;
     tr_info         tmp;
     const tr_benc * metainfo;
     tr_session    * session = tr_ctorGetSession( ctor );
+    tr_parse_result result = TR_PARSE_OK;
 
     if( setmeInfo == NULL )
         setmeInfo = &tmp;
