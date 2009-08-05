@@ -33,9 +33,9 @@
 
 struct tr_benc;
 
-int  tr_metainfoParse( const tr_session     * session,
-                       tr_info              * info,
-                       const struct tr_benc * benc );
+tr_bool  tr_metainfoParse( const tr_session     * session,
+                           tr_info              * info,
+                           const struct tr_benc * benc );
 
 void tr_metainfoRemoveSaved( const tr_session * session,
                              const tr_info    * info );

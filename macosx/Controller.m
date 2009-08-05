@@ -799,9 +799,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         int result = tr_torrentParse(ctor, &info);
         if (result != TR_OK)
         {
-            if (result == TR_EDUPLICATE)
+            if (result == TR_PARSE_DUPLICATE)
                 [self duplicateOpenAlert: [NSString stringWithUTF8String: info.name]];
-            else if (result == TR_EINVALID)
+            else if (result == TR_PARSE_ERR)
             {
                 if (type != ADD_AUTO)
                     [self invalidOpenAlert: [torrentPath lastPathComponent]];

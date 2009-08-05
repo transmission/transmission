@@ -85,9 +85,9 @@ TrCoreClass;
 
 enum tr_core_err
 {
-    TR_CORE_ERR_ADD_TORRENT_ERR  = TR_EINVALID,
-    TR_CORE_ERR_ADD_TORRENT_DUP  = TR_EDUPLICATE,
-    TR_CORE_ERR_NO_MORE_TORRENTS  /* finished adding a batch */
+    TR_CORE_ERR_ADD_TORRENT_ERR  = TR_PARSE_ERR,
+    TR_CORE_ERR_ADD_TORRENT_DUP  = TR_PARSE_DUPLICATE,
+    TR_CORE_ERR_NO_MORE_TORRENTS = 1000 /* finished adding a batch */
 };
 
 GType          tr_core_get_type( void );

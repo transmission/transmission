@@ -873,26 +873,36 @@ tr_session* tr_ctorGetSession( const tr_ctor * ctor );
 /* returns NULL if tr_ctorSetMetainfoFromFile() wasn't used */
 const char* tr_ctorGetSourceFile( const tr_ctor * ctor );
 
-#define TR_EINVALID     1
-#define TR_EDUPLICATE   2
+typedef enum
+{
+    TR_PARSE_OK,
+    TR_PARSE_ERR,
+    TR_PARSE_DUPLICATE
+}
+tr_parse_result;
 
 /**
- * Parses the specified metainfo.
- * Returns 0 if it parsed successfully and can be added to Transmission.
- * Returns TR_EINVALID if it couldn't be parsed.
- * Returns TR_EDUPLICATE if it parsed but can't be added.
- *     "download-dir" must be set to test for TR_EDUPLICATE.
+ * @brief Parses the specified metainfo
  *
- * If setme_info is non-NULL and parsing is successful
- * (that is, if TR_EINVALID is not returned), then the parsed
- * metainfo is stored in setme_info and should be freed by the
- * caller via tr_metainfoFree().
+ * @return TR_PARSE_ERR if parsing failed;
+ *         TR_PARSE_OK if parsing succeeded and it's not a duplicate;
+ *         TR_PARSE_DUPLICATE if parsing succeeded but it's a duplicate.
  *
- * If the constructor's session variable is NULL,
- * info.torrent will be NULL and the duplicate check will not be performed.
+ * @param setme_info If parsing is successful and setme_info is non-NULL,
+ *                   the parsed metainfo is stored there and sould be freed
+ *                   by calling tr_metainfoFree() when no longer needed.
+ *
+ * Notes:
+ *
+ * 1. tr_torrentParse() won't be able to check for duplicates -- and therefore
+ *    won't return TR_PARSE_DUPLICATE -- unless ctor's "download-dir" and
+ *    session variable is set.
+ *
+ * 2. setme_info->torrent's value can't be set unless ctor's session variable
+ *    is set.
  */
-int tr_torrentParse( const tr_ctor * ctor,
-                     tr_info       * setme_info_or_NULL );
+tr_parse_result  tr_torrentParse( const tr_ctor  * ctor,
+                                  tr_info        * setme_info_or_NULL );
 
 /** @brief free a metainfo
     @see tr_torrentParse */

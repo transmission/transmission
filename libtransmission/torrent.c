@@ -670,12 +670,12 @@ torrentRealInit( tr_torrent * tor, const tr_ctor * ctor )
         torrentStart( tor, FALSE );
 }
 
-int
-tr_torrentParse( const tr_ctor     * ctor,
-                 tr_info           * setmeInfo )
+tr_parse_result
+tr_torrentParse( const tr_ctor * ctor, tr_info * setmeInfo )
 {
-    int             err = 0;
     int             doFree;
+    tr_bool         didParse;
+    tr_parse_result result;
     tr_info         tmp;
     const tr_benc * metainfo;
     tr_session    * session = tr_ctorGetSession( ctor );
@@ -684,22 +684,22 @@ tr_torrentParse( const tr_ctor     * ctor,
         setmeInfo = &tmp;
     memset( setmeInfo, 0, sizeof( tr_info ) );
 
-    if( !err && tr_ctorGetMetainfo( ctor, &metainfo ) )
-        return TR_EINVALID;
+    if( tr_ctorGetMetainfo( ctor, &metainfo ) )
+        return TR_PARSE_ERR;
 
-    err = tr_metainfoParse( session, setmeInfo, metainfo );
-    doFree = !err && ( setmeInfo == &tmp );
+    didParse = tr_metainfoParse( session, setmeInfo, metainfo );
+    doFree = didParse && ( setmeInfo == &tmp );
 
-    if( !err && !getBlockSize( setmeInfo->pieceSize ) )
-        err = TR_EINVALID;
+    if( didParse && !getBlockSize( setmeInfo->pieceSize ) )
+        result = TR_PARSE_ERR;
 
-    if( !err && session && tr_torrentExists( session, setmeInfo->hash ) )
-        err = TR_EDUPLICATE;
+    if( didParse && session && tr_torrentExists( session, setmeInfo->hash ) )
+        result = TR_PARSE_DUPLICATE;
 
     if( doFree )
         tr_metainfoFree( setmeInfo );
 
-    return err;
+    return result;
 }
 
 tr_torrent *
@@ -1960,7 +1960,7 @@ tr_torrentSetAnnounceList( tr_torrent *            tor,
 
         /* try to parse it back again, to make sure it's good */
         memset( &tmpInfo, 0, sizeof( tr_info ) );
-        if( !tr_metainfoParse( tor->session, &tmpInfo, &metainfo ) )
+        if( tr_metainfoParse( tor->session, &tmpInfo, &metainfo ) )
         {
             /* it's good, so keep these new trackers and free the old ones */
 

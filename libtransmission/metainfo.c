@@ -135,18 +135,14 @@ tr_metainfoMigrate( tr_session * session,
 ****
 ***/
 
-static int
+static tr_bool
 getfile( char        ** setme,
          const char   * root,
          tr_benc      * path )
 {
-    int err;
+    tr_bool success = FALSE;
 
-    if( !tr_bencIsList( path ) )
-    {
-        err = TR_EINVALID;
-    }
-    else
+    if( tr_bencIsList( path ) )
     {
         struct evbuffer * buf = evbuffer_new( );
         int               n = tr_bencListSize( path );
@@ -167,10 +163,10 @@ getfile( char        ** setme,
         *setme = tr_utf8clean( (char*)EVBUFFER_DATA( buf ), EVBUFFER_LENGTH( buf ), NULL );
         /* fprintf( stderr, "[%s]\n", *setme ); */
         evbuffer_free( buf );
-        err = 0;
+        success = TRUE;
     }
 
-    return err;
+    return success;
 }
 
 static const char*
@@ -203,7 +199,7 @@ parseFiles( tr_info *       inf,
                 if( !tr_bencDictFindList( file, "path", &path ) )
                     return "path";
 
-            if( getfile( &inf->files[i].name, inf->name, path ) )
+            if( !getfile( &inf->files[i].name, inf->name, path ) )
                 return "path";
 
             if( !tr_bencDictFindInt( file, "length", &len ) )
@@ -461,20 +457,21 @@ tr_metainfoParseImpl( const tr_session * session,
     return NULL;
 }
 
-int
+tr_bool
 tr_metainfoParse( const tr_session * session,
-                  tr_info *         inf,
-                  const tr_benc *   meta_in )
+                  tr_info          * inf,
+                  const tr_benc    * meta_in )
 {
     const char * badTag = tr_metainfoParseImpl( session, inf, meta_in );
+    const tr_bool success = badTag == NULL;
 
     if( badTag )
     {
         tr_nerr( inf->name, _( "Invalid metadata entry \"%s\"" ), badTag );
         tr_metainfoFree( inf );
-        return TR_EINVALID;
     }
-    return 0;
+
+    return success;
 }
 
 void

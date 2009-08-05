@@ -926,11 +926,11 @@ addTorrentImpl( struct tr_rpc_idle_data * data, tr_ctor * ctor )
         notify( data->session, TR_RPC_TORRENT_ADDED, tor );
         tr_bencFree( &fields );
     }
-    else if( err == TR_EDUPLICATE )
+    else if( err == TR_PARSE_DUPLICATE )
     {
         result = "duplicate torrent";
     }
-    else if( err == TR_EINVALID )
+    else if( err == TR_PARSE_ERR )
     {
         result = "invalid or corrupt torrent file";
     }

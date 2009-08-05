@@ -305,17 +305,9 @@ addTorrentErrorDialog( GtkWidget *  child,
 
     switch( err )
     {
-        case TR_EINVALID:
-            fmt = _( "The torrent file \"%s\" contains invalid data." );
-            break;
-
-        case TR_EDUPLICATE:
-            fmt = _( "The torrent file \"%s\" is already in use." ); break;
-
-        default:
-            fmt = _(
-                "The torrent file \"%s\" encountered an unknown error." );
-            break;
+        case TR_PARSE_ERR: fmt = _( "The torrent file \"%s\" contains invalid data." ); break;
+        case TR_PARSE_DUPLICATE: fmt = _( "The torrent file \"%s\" is already in use." ); break;
+        default: fmt = _( "The torrent file \"%s\" encountered an unknown error." ); break;
     }
     secondary = g_strdup_printf( fmt, filename );
     win = ( !child || GTK_IS_WINDOW( child ) )
