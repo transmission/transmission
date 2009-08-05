@@ -920,12 +920,17 @@ int trashDataFile(const char * filename)
 
 - (BOOL) isError
 {
-    return fStat->error != TR_OK;
+    return fStat->error == TR_STAT_LOCAL_ERROR || fStat->error == TR_STAT_TRACKER_ERROR;
+}
+
+- (BOOL) isErrorOrWarning
+{
+    return fStat->error != TR_STAT_OK;
 }
 
 - (NSString *) errorMessage
 {
-    if (![self isError])
+    if (![self isErrorOrWarning])
         return @"";
     
     NSString * error;
@@ -1058,9 +1063,16 @@ int trashDataFile(const char * filename)
 {
     NSString * string;
     
-    if ([self isError])
+    if ([self isErrorOrWarning])
     {
-        string = NSLocalizedString(@"Error", "Torrent -> status string");
+        switch (fStat->error)
+        {
+            case TR_STAT_LOCAL_ERROR: string = NSLocalizedString(@"Error", "Torrent -> status string"); break;
+            case TR_STAT_TRACKER_ERROR: string = NSLocalizedString(@"Tracker returned an error", "Torrent -> status string"); break;
+            case TR_STAT_TRACKER_WARNING: string = NSLocalizedString(@"Tracker returned a warning", "Torrent -> status string"); break;
+            default: NSAssert(NO, @"unknown error state");
+        }
+        
         NSString * errorString = [self errorMessage];
         if (errorString && ![errorString isEqualToString: @""])
             string = [string stringByAppendingFormat: @": %@", errorString];

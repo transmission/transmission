@@ -419,7 +419,7 @@
     }
     
     //error image
-    const BOOL error = [torrent isError];
+    const BOOL error = [torrent isErrorOrWarning];
     if (error && !fErrorImage)
     {
         fErrorImage = [NSImage imageNamed: @"Error.png"];
