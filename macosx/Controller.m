@@ -797,7 +797,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         tr_ctor * ctor = tr_ctorNew(fLib);
         tr_ctorSetMetainfoFromFile(ctor, [torrentPath UTF8String]);
         int result = tr_torrentParse(ctor, &info);
-        if (result != TR_OK)
+        if (result != TR_PARSE_OK)
         {
             if (result == TR_PARSE_DUPLICATE)
                 [self duplicateOpenAlert: [NSString stringWithUTF8String: info.name]];
@@ -2437,7 +2437,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         switch (tr_torrentParse(ctor, NULL))
         {
-            case TR_OK:
+            case TR_PARSE_OK:
                 [self openFiles: [NSArray arrayWithObject: fullFile] addType: ADD_AUTO forcePath: nil];
                 
                 [GrowlApplicationBridge notifyWithTitle: NSLocalizedString(@"Torrent File Auto Added", "Growl notification title")
@@ -2445,7 +2445,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                     clickContext: nil];
                 break;
             
-            case TR_EINVALID:
+            case TR_PARSE_ERR:
                 [fAutoImportedNames removeObject: file];
         }
         
@@ -2677,7 +2677,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 torrent = YES;
                 tr_ctor * ctor = tr_ctorNew(fLib);
                 tr_ctorSetMetainfoFromFile(ctor, [file UTF8String]);
-                if (tr_torrentParse(ctor, NULL) == TR_OK)
+                if (tr_torrentParse(ctor, NULL) == TR_PARSE_OK)
                 {
                     if (!fOverlayWindow)
                         fOverlayWindow = [[DragOverlayWindow alloc] initWithLib: fLib forWindow: fWindow];
@@ -2739,7 +2739,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 torrent = YES;
                 tr_ctor * ctor = tr_ctorNew(fLib);
                 tr_ctorSetMetainfoFromFile(ctor, [file UTF8String]);
-                if (tr_torrentParse(ctor, NULL) == TR_OK)
+                if (tr_torrentParse(ctor, NULL) == TR_PARSE_OK)
                     [filesToOpen addObject: file];
                 tr_ctorFree(ctor);
             }

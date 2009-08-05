@@ -1609,20 +1609,20 @@ int trashDataFile(const char * filename)
         tr_ctorSetPaused(ctor, TR_FORCE, YES);
         tr_ctorSetPeerLimit(ctor, TR_FALLBACK, [fDefaults integerForKey: @"PeersTorrent"]);
         
-        int result = TR_EINVALID;
+        int result = TR_PARSE_ERR;
         if (path)
             result = tr_ctorSetMetainfoFromFile(ctor, [path UTF8String]);
         
         //backup - shouldn't be needed after upgrade to 1.70
-        if (result != TR_OK && hashString)
+        if (result != TR_PARSE_OK && hashString)
             result = tr_ctorSetMetainfoFromHash(ctor, [hashString UTF8String]);
         
-        if (result == TR_OK)
+        if (result == TR_PARSE_OK)
         {
             tr_info info;
             result = tr_torrentParse(ctor, &info);
             
-            if (result == TR_OK)
+            if (result == TR_PARSE_OK)
             {
                 NSString * currentDownloadFolder = [self shouldUseIncompleteFolderForName: [NSString stringWithUTF8String: info.name]]
                                                     ? fIncompleteFolder : fDownloadFolder;
@@ -1630,7 +1630,7 @@ int trashDataFile(const char * filename)
                 
                 fHandle = tr_torrentNew(ctor, NULL);
             }
-            if (result != TR_EINVALID)
+            if (result != TR_PARSE_ERR)
                 tr_metainfoFree(&info);
         }
         
