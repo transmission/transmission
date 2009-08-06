@@ -213,8 +213,8 @@ getStatusString( const tr_stat * torStat )
 
     if( torStat->error )
     {
-        const char * fmt[] = { NULL, N_( "Tracker returned a warning: \"%s\"" ),
-                                     N_( "Tracker returned an error: \"%s\"" ),
+        const char * fmt[] = { NULL, N_( "Tracker gave a warning: \"%s\"" ),
+                                     N_( "Tracker gave an error: \"%s\"" ),
                                      N_( "Error: \"%s\"" ) };
         g_string_append_printf( gstr, _( fmt[torStat->error] ), torStat->errorString );
     }

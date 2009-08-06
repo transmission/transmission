@@ -1010,8 +1010,8 @@ printDetails( tr_benc * top )
                 tr_bencDictFindInt( t, "error", &i ) && i )
             {
                 switch( i ) {
-                    case TR_STAT_TRACKER_WARNING: printf( "  Tracker returned a warning: %s\n", str ); break;
-                    case TR_STAT_TRACKER_ERROR:   printf( "  Tracker returned an error: %s\n", str ); break;
+                    case TR_STAT_TRACKER_WARNING: printf( "  Tracker gave a warning: %s\n", str ); break;
+                    case TR_STAT_TRACKER_ERROR:   printf( "  Tracker gave an error: %s\n", str ); break;
                     case TR_STAT_LOCAL_ERROR:     printf( "  Error: %s\n", str ); break;
                     default: break; /* no error */
                 }

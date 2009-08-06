@@ -439,8 +439,8 @@ main( int     argc,
     {
         char            line[LINEWIDTH];
         const tr_stat * st;
-        const char * messageName[] = { NULL, "Tracker returned a warning:",
-                                             "Tracker returned an error:",
+        const char * messageName[] = { NULL, "Tracker gave a warning:",
+                                             "Tracker gave an error:",
                                              "Error:" };
 
         tr_wait( 200 );

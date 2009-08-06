@@ -629,8 +629,8 @@ Torrent :: getError( ) const
 
     switch( getInt( ERROR ) )
     {
-        case TR_STAT_TRACKER_WARNING: s = tr( "Tracker returned a warning: %1" ).arg( s ); break;
-        case TR_STAT_TRACKER_ERROR: s = tr( "Tracker returned an error: %1" ).arg( s ); break;
+        case TR_STAT_TRACKER_WARNING: s = tr( "Tracker gave a warning: %1" ).arg( s ); break;
+        case TR_STAT_TRACKER_ERROR: s = tr( "Tracker gave an error: %1" ).arg( s ); break;
         case TR_STAT_LOCAL_ERROR: s = tr( "Error: %1" ).arg( s ); break;
         default: s.clear(); break;
     }
