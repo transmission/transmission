@@ -196,6 +196,8 @@ makeview( PrivateData * p,
     p->renderer = r = torrent_cell_renderer_new( );
     gtk_tree_view_column_pack_start( col, r, FALSE );
     gtk_tree_view_column_add_attribute( col, r, "torrent", MC_TORRENT_RAW );
+    gtk_tree_view_column_add_attribute( col, r, "piece-upload-speed", MC_SPEED_UP );
+    gtk_tree_view_column_add_attribute( col, r, "piece-download-speed", MC_SPEED_DOWN );
     
     gtk_tree_view_append_column( GTK_TREE_VIEW( view ), col );
     g_object_set( r, "xpad", GUI_PAD_SMALL, "ypad", GUI_PAD_SMALL, NULL );
@@ -1152,17 +1154,28 @@ updateSpeeds( PrivateData * p )
     if( session != NULL )
     {
         char buf[128];
-        double d;
+        int up=0, down=0;
+        GtkTreeIter iter;
+        GtkTreeModel * model = tr_core_model( p->core );
 
-        d = tr_sessionGetPieceSpeed( session, TR_DOWN );
-        tr_strlspeed( buf, d, sizeof( buf ) );
+        if( gtk_tree_model_get_iter_first( model, &iter ) ) do
+        {
+            int u, d;
+            gtk_tree_model_get( model, &iter, MC_SPEED_UP, &u,
+                                              MC_SPEED_DOWN, &d,
+                                              -1 );
+            up += u;
+            down += d;
+        }
+        while( gtk_tree_model_iter_next( model, &iter ) );
+
+        tr_strlspeed( buf, down, sizeof( buf ) );
         gtk_label_set_text( GTK_LABEL( p->dl_lb ), buf );
-        g_object_set( p->dl_hbox, "visible", d>=0.01, NULL );
+        g_object_set( p->dl_hbox, "visible", down>0, NULL );
 
-        d = tr_sessionGetPieceSpeed( session, TR_UP );
-        tr_strlspeed( buf, d, sizeof( buf ) );
+        tr_strlspeed( buf, up, sizeof( buf ) );
         gtk_label_set_text( GTK_LABEL( p->ul_lb ), buf );
-        g_object_set( p->ul_hbox, "visible", d>=0.01, NULL );
+        g_object_set( p->ul_hbox, "visible", up>0, NULL );
     }
 }
 
