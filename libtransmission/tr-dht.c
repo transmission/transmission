@@ -115,6 +115,7 @@ dht_bootstrap(void *closure)
     }
     tr_free( cl->nodes );
     tr_free( closure );
+    tr_ndbg( "DHT", "Finished bootstrapping" );
 }
 
 int
@@ -133,13 +134,15 @@ tr_dhtInit(tr_session *ss)
     if( session ) /* already initialized */
         return -1;
 
-    dht_socket = socket(PF_INET, SOCK_DGRAM, 0);
-    if(dht_socket < 0)
-        return -1;
-
     dht_port = tr_sessionGetPeerPort(ss);
     if(dht_port <= 0)
         return -1;
+
+    tr_ndbg( "DHT", "Initialising DHT" );
+
+    dht_socket = socket(PF_INET, SOCK_DGRAM, 0);
+    if(dht_socket < 0)
+        goto fail;
 
     memset(&sin, 0, sizeof(sin));
     sin.sin_family = AF_INET;
@@ -157,14 +160,19 @@ tr_dhtInit(tr_session *ss)
     if(rc == 0) {
         if(( have_id = tr_bencDictFindRaw( &benc, "id", &raw, &len ) && len==20 ))
             memcpy( myid, raw, len );
-        if( tr_bencDictFindRaw( &benc, "nodes", &raw, &len ) && !(len%6) )
+        if( tr_bencDictFindRaw( &benc, "nodes", &raw, &len ) && !(len%6) ) {
             nodes = tr_memdup( raw, len );
+            tr_ninf( "DHT", "Bootstrapping from %d old nodes", (int)(len/6) );
+        }
         tr_bencFree( &benc );
     }
 
-    if(!have_id) {
+    if( have_id )
+        tr_ninf( "DHT", "Reusing old id" );
+    else {
         /* Note that DHT ids need to be distributed uniformly,
          * so it should be something truly random. */
+        tr_ninf( "DHT", "Generating new id" );
         tr_cryptoRandBuf( myid, 20 );
     }
 
@@ -189,6 +197,8 @@ tr_dhtInit(tr_session *ss)
     event_set( &dht_event, dht_socket, EV_READ, event_callback, NULL );
     tr_timerAdd( &dht_event, 0, tr_cryptoWeakRandInt( 1000000 ) );
 
+    tr_ndbg( "DHT", "DHT initialised" );
+
     return 1;
 
     fail:
@@ -197,6 +207,7 @@ tr_dhtInit(tr_session *ss)
         close(dht_socket);
         dht_socket = -1;
         session = NULL;
+        tr_ndbg( "DHT", "DHT initialisation failed (errno = %d)", save );
         errno = save;
     }
 
@@ -209,11 +220,15 @@ tr_dhtUninit(tr_session *ss)
     if(session != ss)
         return;
 
+    tr_ndbg( "DHT", "Uninitialising DHT" );
+
     event_del(&dht_event);
 
     /* Since we only save known good nodes, avoid erasing older data if we
        don't know enough nodes. */
-    if(tr_dhtStatus(ss, NULL) >= TR_DHT_FIREWALLED) {
+    if(tr_dhtStatus(ss, NULL) < TR_DHT_FIREWALLED)
+        tr_ninf( "DHT", "Not saving nodes, DHT not ready" );
+    else {
         tr_benc benc;
         struct sockaddr_in sins[300];
         char compact[300 * 6];
@@ -221,6 +236,8 @@ tr_dhtUninit(tr_session *ss)
         int i;
         int n = dht_get_nodes(sins, 300);
         int j = 0;
+
+        tr_ninf( "DHT", "Saving %d nodes", n );
         for( i=0; i<n; ++i ) {
             memcpy( compact + j, &sins[i].sin_addr, 4 );
             memcpy( compact + j + 4, &sins[i].sin_port, 2 );
@@ -237,6 +254,8 @@ tr_dhtUninit(tr_session *ss)
 
     dht_uninit( dht_socket, 0 );
     EVUTIL_CLOSESOCKET( dht_socket );
+
+    tr_ndbg("DHT", "Done uninitialising DHT");
 
     session = NULL;
 }
@@ -298,7 +317,8 @@ tr_dhtPort( const tr_session *ss )
 }
 
 int
-tr_dhtAddNode(tr_session *ss, tr_address *address, tr_port port, tr_bool bootstrap)
+tr_dhtAddNode(tr_session *ss, tr_address *address, tr_port port,
+              tr_bool bootstrap)
 {
     struct sockaddr_in sin;
 
@@ -324,6 +344,19 @@ tr_dhtAddNode(tr_session *ss, tr_address *address, tr_port port, tr_bool bootstr
     return 1;
 }
 
+const char *
+tr_dhtPrintableStatus(int status)
+{
+    switch(status) {
+    case TR_DHT_STOPPED: return "stopped";
+    case TR_DHT_BROKEN: return "broken";
+    case TR_DHT_POOR: return "poor";
+    case TR_DHT_FIREWALLED: return "firewalled";
+    case TR_DHT_GOOD: return "good";
+    default: return "???";
+    }
+}
+
 static void
 callback( void *ignore UNUSED, int event,
           unsigned char *info_hash, void *data, size_t data_len )
@@ -340,34 +373,47 @@ callback( void *ignore UNUSED, int event,
             for( i=0; i<n; ++i )
                 tr_peerMgrAddPex( tor, TR_PEER_FROM_DHT, pex+i );
             tr_free(pex);
+            tr_torinf(tor, "Learned %d peers from DHT", (int)n);
         }
         tr_globalUnlock( session );
     }
     else if( event == DHT_EVENT_SEARCH_DONE )
     {
         tr_torrent * tor = tr_torrentFindFromHash( session, info_hash );
-        if( tor )
+        if( tor ) {
+            tr_torinf(tor, "DHT announce done");
             tor->dhtAnnounceInProgress = 0;
+        }
     }
 }
 
 int
 tr_dhtAnnounce(tr_torrent *tor, tr_bool announce)
 {
-    int rc;
+    int rc, status, numnodes;
 
     if( !tr_torrentAllowsDHT( tor ) )
         return -1;
 
-    if( tr_dhtStatus( tor->session, NULL ) < TR_DHT_POOR )
+    status = tr_dhtStatus( tor->session, &numnodes );
+    if(status < TR_DHT_POOR ) {
+        tr_tordbg(tor, "DHT not ready (%s, %d nodes)",
+                  tr_dhtPrintableStatus(status), numnodes);
         return 0;
+    }
 
     rc = dht_search( dht_socket, tor->info.hash,
                      announce ? tr_sessionGetPeerPort(session) : 0,
                      callback, NULL);
 
-    if( rc >= 1 )
+    if( rc >= 1 ) {
+        tr_torinf(tor, "Starting DHT announce (%s, %d nodes)",
+                  tr_dhtPrintableStatus(status), numnodes);
         tor->dhtAnnounceInProgress = TRUE;
+    } else {
+        tr_torerr(tor, "DHT announce failed, errno = %d (%s, %d nodes)",
+                  errno, tr_dhtPrintableStatus(status), numnodes);
+    }
 
     return 1;
 }
@@ -381,7 +427,7 @@ event_callback(int s, short type, void *ignore UNUSED )
         if(errno == EINTR) {
             tosleep = 0;
         } else {
-            perror("dht_periodic");
+            tr_nerr("DHT", "dht_periodic failed (errno = %d)", errno);
             if(errno == EINVAL || errno == EFAULT)
                     abort();
             tosleep = 1;
