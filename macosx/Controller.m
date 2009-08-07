@@ -2205,7 +2205,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         if ([menu numberOfItems] > 3)
             return;
         
-        const NSInteger speedLimitActionValue[] = { 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750, -1 };
+        const NSInteger speedLimitActionValue[] = { 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750, 1000, 1500, 2000, -1 };
         
         NSMenuItem * item;
         for (NSInteger i = 0; speedLimitActionValue[i] != -1; i++)
