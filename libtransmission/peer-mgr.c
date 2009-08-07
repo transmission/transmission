@@ -1537,7 +1537,7 @@ tr_peerMgrGetPeers( tr_torrent      * tor,
         const int peerCount = tr_ptrArraySize( &t->peers );
         /* for now, this will waste memory on torrents that have both
          * ipv6 and ipv4 peers */
-        tr_pex * pex = tr_new( tr_pex, peerCount );
+        tr_pex * pex = tr_new0( tr_pex, peerCount );
         tr_pex * walk = pex;
 
         for( i=0; i<peerCount; ++i )
