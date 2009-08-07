@@ -27,6 +27,14 @@ Torrent._ErrTrackerWarning     = 1;
 Torrent._ErrTrackerError       = 2;
 Torrent._ErrLocalError         = 3;
 
+Torrent._StaticFields = [ 'addedDate', 'announceURL', 'comment', 'creator',
+    'dateCreated', 'hashString', 'id', 'isPrivate', 'name', 'totalSize' ]
+Torrent._DynamicFields = [ 'downloadedEver', 'error', 'errorString', 'eta',
+    'haveUnchecked', 'haveValid', 'leechers', 'leftUntilDone', 'peersConnected',
+    'peersGettingFromUs', 'peersSendingToUs', 'rateDownload', 'rateUpload',
+    'recheckProgress', 'seeders', 'sizeWhenDone', 'status', 'swarmSpeed',
+    'uploadedEver', 'uploadRatio', 'seedRatioLimit', 'seedRatioMode', 'downloadDir' ]
+
 Torrent.prototype =
 {
 	/*

@@ -101,15 +101,7 @@ TransmissionRemote.prototype =
 		var o = {
 			method: 'torrent-get',
 			arguments: {
-			fields: [ 'addedDate', 'announceURL', 'comment', 'creator',
-				'dateCreated', 'downloadedEver', 'error', 'errorString',
-				'eta', 'hashString', 'haveUnchecked', 'haveValid', 'id',
-				'isPrivate', 'leechers', 'leftUntilDone', 'name',
-				'peersConnected', 'peersGettingFromUs', 'peersSendingToUs',
-				'rateDownload', 'rateUpload', 'seeders', 'sizeWhenDone',
-				'status', 'swarmSpeed', 'totalSize',
-				'uploadedEver', 'uploadRatio', 'seedRatioLimit', 'seedRatioMode',
-				'downloadDir', 'files', 'fileStats' ]
+			fields: Torrent._StaticFields.concat(Torrent._DynamicFields, [ 'files', 'fileStats' ])
 			}
 		};
 
@@ -124,13 +116,7 @@ TransmissionRemote.prototype =
 			method: 'torrent-get',
 			arguments: {
 				'ids': torrent_ids,
-				fields: [  'id', 'downloadedEver', 'error', 'errorString',
-					'eta', 'haveUnchecked', 'haveValid', 'leechers', 'leftUntilDone',
-					'peersConnected', 'peersGettingFromUs', 'peersSendingToUs',
-					'rateDownload', 'rateUpload', 'recheckProgress', 'seeders',
-					'sizeWhenDone', 'status', 'swarmSpeed',
-					'uploadedEver', 'uploadRatio', 'seedRatioLimit', 'seedRatioMode',
-					'downloadDir' ]
+				fields: [ 'id' ].concat(Torrent._DynamicFields)
 			}
 		};
 
