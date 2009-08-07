@@ -848,7 +848,7 @@ tr_sessionInitImpl( void * vdata )
 #ifdef WITHOUT_DHT
         tr_inf( "DHT disabled by packager." );
 #else
-        tr_dhtInit( session );
+        tr_dhtInit( session, &session->public_ipv4->addr );
 #endif
     }
 }
@@ -1633,7 +1633,7 @@ toggleDHTImpl(  void * data )
     session->isDHTEnabled = !session->isDHTEnabled;
 
     if( session->isDHTEnabled )
-        tr_dhtInit( session );
+        tr_dhtInit( session, &session->public_ipv4->addr );
 }
 
 void

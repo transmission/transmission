@@ -119,7 +119,7 @@ dht_bootstrap(void *closure)
 }
 
 int
-tr_dhtInit(tr_session *ss)
+tr_dhtInit(tr_session *ss, tr_address * tr_addr)
 {
     struct sockaddr_in sin;
     tr_benc benc;
@@ -146,6 +146,7 @@ tr_dhtInit(tr_session *ss)
 
     memset(&sin, 0, sizeof(sin));
     sin.sin_family = AF_INET;
+    memcpy(&(sin.sin_addr), &(tr_addr->addr.addr4), sizeof (struct in_addr));
     sin.sin_port = htons(dht_port);
     rc = bind(dht_socket, (struct sockaddr*)&sin, sizeof(sin));
     if(rc < 0)
