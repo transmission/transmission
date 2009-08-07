@@ -76,15 +76,14 @@ static void
 savePeers( tr_benc *          dict,
            const tr_torrent * tor )
 {
-    tr_pex * pex = NULL;
-    int count = tr_peerMgrGetPeers( (tr_torrent*) tor, &pex, TR_AF_INET );
+    int count;
+    tr_pex * pex;
 
+    count = tr_peerMgrGetPeers( (tr_torrent*) tor, &pex, TR_AF_INET );
     if( count > 0 )
         tr_bencDictAddRaw( dict, KEY_PEERS, pex, sizeof( tr_pex ) * count );
-
     tr_free( pex );
-    pex = NULL;
-    
+
     count = tr_peerMgrGetPeers( (tr_torrent*) tor, &pex, TR_AF_INET6 );
     if( count > 0 )
         tr_bencDictAddRaw( dict, KEY_PEERS6, pex, sizeof( tr_pex ) * count );
@@ -481,8 +480,10 @@ tr_torrentSaveResume( const tr_torrent * tor )
     tr_benc top;
     char *  filename;
 
-    if( !tor )
+    if( !tr_isTorrent( tor ) )
         return;
+
+    tr_tordbg( tor, "Saving .resume file for \"%s\"", tor->info.name );
 
     tr_bencInitDict( &top, 32 ); /* arbitrary "big enough" number */
     tr_bencDictAddInt( &top, KEY_ACTIVITY_DATE,

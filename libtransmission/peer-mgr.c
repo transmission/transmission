@@ -1025,8 +1025,10 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
 
             tr_torrentSetActivityDate( tor, now );
 
-            if( e->wasPieceData )
+            if( e->wasPieceData ) {
                 tor->uploadedCur += e->length;
+                tr_torrentSetDirty( tor );
+            }
 
             /* update the stats */
             if( e->wasPieceData )
@@ -1064,8 +1066,10 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
              * content distributor, not the peers, it is the tracker's job
              * to manage the swarms, not the web server and does not fit
              * into the jurisdiction of the tracker." */
-            if( peer && e->wasPieceData )
+            if( peer && e->wasPieceData ) {
                 tor->downloadedCur += e->length;
+                tr_torrentSetDirty( tor );
+            }
 
             /* update the stats */ 
             if( e->wasPieceData )
@@ -1102,6 +1106,7 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
             tr_block_index_t block = _tr_block( tor, e->pieceIndex, e->offset );
 
             tr_cpBlockAdd( &tor->completion, block );
+            tr_torrentSetDirty( tor );
             decrementPieceRequests( t, e->pieceIndex );
 
             broadcastGotBlock( t, e->pieceIndex, e->offset, e->length );

@@ -116,6 +116,8 @@ tr_torrentSetSpeedLimit( tr_torrent * tor, tr_direction dir, int KiB_sec )
     assert( tr_isDirection( dir ) );
 
     tr_bandwidthSetDesiredSpeed( tor->bandwidth, dir, KiB_sec );
+
+    tr_torrentSetDirty( tor );
 }
 
 int
@@ -134,6 +136,8 @@ tr_torrentUseSpeedLimit( tr_torrent * tor, tr_direction dir, tr_bool do_use )
     assert( tr_isDirection( dir ) );
 
     tr_bandwidthSetLimited( tor->bandwidth, dir, do_use );
+
+    tr_torrentSetDirty( tor );
 }
 
 tr_bool
@@ -152,6 +156,8 @@ tr_torrentUseSessionLimits( tr_torrent * tor, tr_bool doUse )
 
     tr_bandwidthHonorParentLimits( tor->bandwidth, TR_UP, doUse );
     tr_bandwidthHonorParentLimits( tor->bandwidth, TR_DOWN, doUse );
+
+    tr_torrentSetDirty( tor );
 }
 
 tr_bool
@@ -174,6 +180,8 @@ tr_torrentSetRatioMode( tr_torrent *  tor, tr_ratiolimit mode )
 
     tor->ratioLimitMode = mode;
     tor->needsSeedRatioCheck = TRUE;
+
+    tr_torrentSetDirty( tor );
 }
 
 tr_ratiolimit
@@ -192,6 +200,8 @@ tr_torrentSetRatioLimit( tr_torrent * tor, double desiredRatio )
     tor->desiredRatio = desiredRatio;
 
     tor->needsSeedRatioCheck = TRUE;
+
+    tr_torrentSetDirty( tor );
 }
 
 double
@@ -741,7 +751,7 @@ tr_torrentSetDownloadDir( tr_torrent * tor, const char * path )
     {
         tr_free( tor->downloadDir );
         tor->downloadDir = tr_strdup( path );
-        tr_torrentSaveResume( tor );
+        tr_torrentSetDirty( tor );
     }
 }
 
@@ -1159,6 +1169,8 @@ tr_torrentResetTransferStats( tr_torrent * tor )
     tor->corruptPrev    += tor->corruptCur;
     tor->corruptCur      = 0;
 
+    tr_torrentSetDirty( tor );
+
     tr_torrentUnlock( tor );
 }
 
@@ -1246,10 +1258,9 @@ checkAndStartImpl( void * vtor )
     tor->needsSeedRatioCheck = TRUE;
     tor->error = TR_STAT_OK;
     tor->errorString[0] = '\0';
-    tr_torrentResetTransferStats( tor );
     tor->completeness = tr_cpGetStatus( &tor->completion );
-    tr_torrentSaveResume( tor );
     tor->startDate = tor->anyDate = now;
+    tr_torrentResetTransferStats( tor );
     tr_trackerStart( tor->tracker );
     tor->dhtAnnounceAt = now + tr_cryptoWeakRandInt( 20 );
     tr_peerMgrStartTorrent( tor );
@@ -1351,6 +1362,12 @@ stopTorrent( void * vtor )
     tr_trackerStop( tor->tracker );
 
     tr_fdTorrentClose( tor->uniqueId );
+
+    if( tor->isDirty ) {
+        tor->isDirty = 0;
+        if( !tor->isDeleting )
+            tr_torrentSaveResume( tor );
+    }
 }
 
 void
@@ -1363,8 +1380,6 @@ tr_torrentStop( tr_torrent * tor )
         tr_globalLock( tor->session );
 
         tor->isRunning = 0;
-        if( !tor->isDeleting )
-            tr_torrentSaveResume( tor );
         tr_runInEventThread( tor->session, stopTorrent, tor );
 
         tr_globalUnlock( tor->session );
@@ -1383,7 +1398,6 @@ closeTorrent( void * vtor )
     tr_bencDictAddInt( d, "id", tor->uniqueId );
     tr_bencDictAddInt( d, "date", time( NULL ) );
 
-    tr_torrentSaveResume( tor );
     tor->isRunning = 0;
     stopTorrent( tor );
     if( tor->isDeleting )
@@ -1525,7 +1539,7 @@ tr_torrentRecheckCompleteness( tr_torrent * tor )
             tor->doneDate = tor->anyDate = time( NULL );
         }
 
-        tr_torrentSaveResume( tor );
+        tr_torrentSetDirty( tor );
     }
 
     tr_torrentUnlock( tor );
@@ -1568,7 +1582,7 @@ tr_torrentSetFilePriorities( tr_torrent *      tor,
     for( i = 0; i < fileCount; ++i )
         tr_torrentInitFilePriority( tor, files[i], priority );
 
-    tr_torrentSaveResume( tor );
+    tr_torrentSetDirty( tor );
     tr_torrentUnlock( tor );
 }
 
@@ -1712,7 +1726,7 @@ tr_torrentSetFileDLs( tr_torrent *      tor,
 
     tr_torrentLock( tor );
     tr_torrentInitFileDLs( tor, files, fileCount, doDownload );
-    tr_torrentSaveResume( tor );
+    tr_torrentSetDirty( tor );
     tr_torrentUnlock( tor );
 }
 
@@ -1735,6 +1749,8 @@ tr_torrentSetPriority( tr_torrent * tor, tr_priority_t priority )
     assert( tr_isPriority( priority ) );
 
     tor->bandwidth->priority = priority;
+
+    tr_torrentSetDirty( tor );
 }
 
 /***
@@ -2003,6 +2019,7 @@ tr_torrentSetActivityDate( tr_torrent * tor,
 
     tor->activityDate = t;
     tor->anyDate = MAX( tor->anyDate, tor->activityDate );
+    tr_torrentSetDirty( tor );
 }
 
 void

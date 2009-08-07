@@ -204,6 +204,7 @@ struct tr_torrent
     tr_bool                    isDeleting;
     tr_bool                    needsSeedRatioCheck;
     tr_bool                    startAfterVerify;
+    tr_bool                    isDirty;
 
     uint16_t                   maxConnectedPeers;
 
@@ -323,6 +324,15 @@ static inline tr_bool tr_isTorrent( const tr_torrent * tor )
     return ( tor != NULL )
         && ( tor->magicNumber == TORRENT_MAGIC_NUMBER )
         && ( tr_isSession( tor->session ) );
+}
+
+/* set a flag indicating that the torrent's .resume file
+ * needs to be saved when the torrent is closed */
+static inline void tr_torrentSetDirty( tr_torrent * tor )
+{
+    assert( tr_isTorrent( tor ) );
+
+    tor->isDirty = TRUE;
 }
 
 #endif

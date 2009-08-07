@@ -23,7 +23,6 @@
 #include "transmission.h"
 #include "completion.h"
 #include "fdlimit.h"
-#include "resume.h" /* tr_torrentSaveResume() */
 #include "inout.h"
 #include "list.h"
 #include "platform.h"
@@ -219,7 +218,7 @@ verifyThreadFunc( void * unused UNUSED )
         if( !stopCurrent )
         {
             if( changed )
-                tr_torrentSaveResume( tor );
+                tr_torrentSetDirty( tor );
             fireCheckDone( tor, currentNode.verify_done_cb );
         }
     }

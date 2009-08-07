@@ -553,10 +553,6 @@ onTrackerResponse( tr_session * session,
 
         t->reannounceAt = now + interval;
         t->manualAnnounceAllowedAt = now + t->announceMinIntervalSec;
-
-        /* #319: save the .resume file after an announce so that, in case
-         * of a crash, our stats still match up with the tracker's stats */
-        tr_torrentSaveResume( tr_torrentFindFromHash( t->session, t->hash ) );
     }
     else if( 300 <= responseCode && responseCode <= 399 )
     {
