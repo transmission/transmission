@@ -19,7 +19,7 @@ LIBS += $${TRANSMISSION_TOP}/third-party/miniupnp/libminiupnp.a
 LIBS += $${TRANSMISSION_TOP}/third-party/libnatpmp/libnatpmp.a
 LIBS += $${TRANSMISSION_TOP}/third-party/libevent/.libs/libevent.a
 
-TRANSLATIONS += transmission_en.ts
+TRANSLATIONS += transmission_en.ts transmission_ru.ts
 
 FORMS += mainwin.ui
 RESOURCES += application.qrc
