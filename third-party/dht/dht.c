@@ -1253,7 +1253,7 @@ dht_nodes(int *good_return, int *dubious_return, int *cached_return,
     if(cached_return)
         *cached_return = cached;
     if(incoming_return)
-        *incoming_return = cached;
+        *incoming_return = incoming;
     return good + dubious;
 }
                 

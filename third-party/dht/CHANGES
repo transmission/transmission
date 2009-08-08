@@ -1,3 +1,7 @@
+dht-0.9 (unreleased):
+
+  * Fixed a typo in dht_nodes.
+
 28 July 2009: dht-0.8
 
   * Fixed a crash when expiring the first search on the list.
