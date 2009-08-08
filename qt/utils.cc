@@ -156,7 +156,7 @@ Utils :: speedToString( const Speed& speed )
 void
 Utils :: toStderr( const QString& str )
 {
-    std::cerr << str.toLatin1().constData() << std::endl;
+    std::cerr << qPrintable(str) << std::endl;
 }
 
 const QIcon&
