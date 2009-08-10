@@ -3,7 +3,7 @@
  *
  * This file is licensed by the GPL version 2.  Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
- * so that the bulk of its code can remain under the MIT license. 
+ * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
@@ -332,7 +332,7 @@ restart_timer( tr_web * g )
 static void
 add_tasks_from_queue( tr_web * g )
 {
-    while( ( g->still_running < MAX_CONCURRENT_TASKS ) 
+    while( ( g->still_running < MAX_CONCURRENT_TASKS )
         && ( tr_list_size( g->easy_queue ) > 0 ) )
     {
         CURL * easy = tr_list_pop_front( &g->easy_queue );
@@ -524,13 +524,13 @@ tr_webInit( tr_session * session )
 
     /* call curl_global_init if we haven't done it already.
      * try to enable ssl for https support; but if that fails,
-     * try a plain vanilla init */ 
+     * try a plain vanilla init */
     if( curlInited == FALSE ) {
         curlInited = TRUE;
         if( curl_global_init( CURL_GLOBAL_SSL ) )
             curl_global_init( 0 );
     }
-   
+
     web = tr_new0( struct tr_web, 1 );
     web->multi = curl_multi_init( );
     web->session = session;
@@ -624,7 +624,7 @@ const char *
 tr_webGetResponseStr( long code )
 {
     struct http_msg * msg = bsearch( &code,
-                                     http_msg, 
+                                     http_msg,
                                      sizeof( http_msg ) / sizeof( http_msg[0] ),
                                      sizeof( http_msg[0] ),
                                      compareResponseCodes );

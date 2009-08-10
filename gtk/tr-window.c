@@ -187,7 +187,7 @@ makeview( PrivateData * p,
 
     p->selection = gtk_tree_view_get_selection( GTK_TREE_VIEW( view ) );
 
-    p->column = col = GTK_TREE_VIEW_COLUMN (g_object_new (GTK_TYPE_TREE_VIEW_COLUMN,		      
+    p->column = col = GTK_TREE_VIEW_COLUMN (g_object_new (GTK_TYPE_TREE_VIEW_COLUMN,
         "title", _("Torrent"),
         "resizable", TRUE,
         "sizing", GTK_TREE_VIEW_COLUMN_FIXED,
@@ -198,7 +198,7 @@ makeview( PrivateData * p,
     gtk_tree_view_column_add_attribute( col, r, "torrent", MC_TORRENT_RAW );
     gtk_tree_view_column_add_attribute( col, r, "piece-upload-speed", MC_SPEED_UP );
     gtk_tree_view_column_add_attribute( col, r, "piece-download-speed", MC_SPEED_DOWN );
-    
+
     gtk_tree_view_append_column( GTK_TREE_VIEW( view ), col );
     g_object_set( r, "xpad", GUI_PAD_SMALL, "ypad", GUI_PAD_SMALL, NULL );
 
@@ -356,7 +356,7 @@ alt_speed_toggled_cb( GtkToggleButton * button, gpointer vprivate )
     const gboolean b = gtk_toggle_button_get_active( button );
     tr_core_set_pref_bool( p->core, TR_PREFS_KEY_ALT_SPEED_ENABLED,  b );
 }
-    
+
 /***
 ****  FILTER
 ***/
@@ -490,7 +490,7 @@ setFilter( PrivateData * p, int mode )
             gtk_toggle_button_set_active( p->filter_toggles[i], i==mode );
     }
 }
-  
+
 
 static void
 filter_toggled_cb( GtkToggleButton * toggle, gpointer vprivate )
@@ -622,7 +622,7 @@ onAltSpeedToggled( tr_session * s UNUSED, tr_bool isEnabled UNUSED, tr_bool byUs
 #define SPEED_KEY "speed-key"
 
 static void
-onSpeedToggled( GtkCheckMenuItem * check, gpointer vp ) 
+onSpeedToggled( GtkCheckMenuItem * check, gpointer vp )
 {
     PrivateData * p = vp;
     GObject * o = G_OBJECT( check );
@@ -636,7 +636,7 @@ onSpeedToggled( GtkCheckMenuItem * check, gpointer vp )
 }
 
 static void
-onSpeedSet( GtkCheckMenuItem * check, gpointer vp ) 
+onSpeedSet( GtkCheckMenuItem * check, gpointer vp )
 {
     const char * key;
     PrivateData * p = vp;
@@ -700,7 +700,7 @@ createSpeedMenu( PrivateData * p, tr_direction dir )
 static const double stockRatios[] = { 0.25, 0.5, 0.75, 1, 1.5, 2, 3 };
 
 static void
-onRatioToggled( GtkCheckMenuItem * check, gpointer vp ) 
+onRatioToggled( GtkCheckMenuItem * check, gpointer vp )
 {
     PrivateData * p = vp;
     if( gtk_check_menu_item_get_active( check ) )
@@ -710,7 +710,7 @@ onRatioToggled( GtkCheckMenuItem * check, gpointer vp )
     }
 }
 static void
-onRatioSet( GtkCheckMenuItem * check, gpointer vp ) 
+onRatioSet( GtkCheckMenuItem * check, gpointer vp )
 {
     PrivateData * p = vp;
     int i = GPOINTER_TO_INT( g_object_get_data( G_OBJECT( check ), RATIO_KEY ) );
@@ -971,7 +971,7 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
             w = gtk_image_new_from_stock( GTK_STOCK_GO_UP, GTK_ICON_SIZE_MENU );
             gtk_box_pack_start( GTK_BOX( hbox ), w, FALSE, FALSE, 0 );
             w = p->ul_lb = gtk_label_new( NULL );
-            gtk_box_pack_start( GTK_BOX( hbox ), w, FALSE, FALSE, 0 ); 
+            gtk_box_pack_start( GTK_BOX( hbox ), w, FALSE, FALSE, 0 );
         gtk_box_pack_end( GTK_BOX( h ), hbox, FALSE, FALSE, 0 );
 
         hbox = p->dl_hbox = gtk_hbox_new( FALSE, GUI_PAD_SMALL );
@@ -981,7 +981,7 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
             w = gtk_image_new_from_stock( GTK_STOCK_GO_DOWN, GTK_ICON_SIZE_MENU );
             gtk_box_pack_start( GTK_BOX( hbox ), w, FALSE, FALSE, 0 );
             w = p->dl_lb = gtk_label_new( NULL );
-            gtk_box_pack_start( GTK_BOX( hbox ), w, FALSE, FALSE, 0 ); 
+            gtk_box_pack_start( GTK_BOX( hbox ), w, FALSE, FALSE, 0 );
         gtk_box_pack_end( GTK_BOX( h ), hbox, FALSE, FALSE, 0 );
 
         hbox = gtk_hbox_new( FALSE, GUI_PAD_SMALL );

@@ -788,23 +788,23 @@ getStatusString( tr_benc * t, char * buf, size_t buflen )
 
         case TR_STATUS_DOWNLOAD:
         case TR_STATUS_SEED: {
-	    int64_t fromUs = 0; 
-	    int64_t toUs = 0; 
- 	    tr_bencDictFindInt( t, "peersGettingFromUs", &fromUs ); 
- 	    tr_bencDictFindInt( t, "peersSendingToUs", &toUs ); 
- 	    if( fromUs && toUs ) 
- 	        tr_strlcpy( buf, "Up & Down", buflen ); 
- 	    else if( toUs ) 
- 	        tr_strlcpy( buf, "Downloading", buflen ); 
- 	    else if( fromUs ) { 
- 	        int64_t leftUntilDone = 0; 
- 	        tr_bencDictFindInt( t, "leftUntilDone", &leftUntilDone ); 
+	    int64_t fromUs = 0;
+	    int64_t toUs = 0;
+ 	    tr_bencDictFindInt( t, "peersGettingFromUs", &fromUs );
+ 	    tr_bencDictFindInt( t, "peersSendingToUs", &toUs );
+ 	    if( fromUs && toUs )
+ 	        tr_strlcpy( buf, "Up & Down", buflen );
+ 	    else if( toUs )
+ 	        tr_strlcpy( buf, "Downloading", buflen );
+ 	    else if( fromUs ) {
+ 	        int64_t leftUntilDone = 0;
+ 	        tr_bencDictFindInt( t, "leftUntilDone", &leftUntilDone );
  	        if( leftUntilDone > 0 )
- 	            tr_strlcpy( buf, "Uploading", buflen ); 
+ 	            tr_strlcpy( buf, "Uploading", buflen );
  	        else
- 	            tr_strlcpy( buf, "Seeding", buflen ); 
+ 	            tr_strlcpy( buf, "Seeding", buflen );
  	    } else {
- 	        tr_strlcpy( buf, "Idle", buflen ); 
+ 	        tr_strlcpy( buf, "Idle", buflen );
             }
             break;
         }
@@ -1429,7 +1429,7 @@ tr_curl_easy_init( struct evbuffer * writebuf )
     }
     return curl;
 }
-    
+
 
 static int
 processRequests( const char *  host,
@@ -1519,7 +1519,7 @@ main( int     argc,
         showUsage( );
         return EXIT_FAILURE;
     }
-        
+
 
     for( i=0; i<reqCount; ++i )
         tr_free( reqs[i] );

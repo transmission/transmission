@@ -991,7 +991,7 @@ tr_torrentStat( tr_torrent * tor )
         s->percentRatio = 1.0;
     else if( s->ratio == TR_RATIO_NA )
         s->percentRatio = 0.0;
-    else 
+    else
         s->percentRatio = s->ratio / seedRatio;
 
     tr_torrentUnlock( tor );
@@ -2282,7 +2282,7 @@ setLocation( void * vdata )
             const tr_file * f = &tor->info.files[i];
             char * oldpath = tr_buildPath( tor->downloadDir, f->name, NULL );
             char * newpath = tr_buildPath( location, f->name, NULL );
-            
+
             if( do_move )
             {
                 errno = 0;

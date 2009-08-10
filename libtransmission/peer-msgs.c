@@ -1100,7 +1100,7 @@ parseUtPex( tr_peermsgs * msgs, int msglen, struct evbuffer * inbuf )
                 tr_peerMgrAddPex( tor, TR_PEER_FROM_PEX, pex + i );
             tr_free( pex );
         }
-        
+
         if( tr_bencDictFindRaw( &val, "added6", &added, &added_len ) )
         {
             const uint8_t * added_f = NULL;
@@ -1115,7 +1115,6 @@ parseUtPex( tr_peermsgs * msgs, int msglen, struct evbuffer * inbuf )
                 tr_peerMgrAddPex( tor, TR_PEER_FROM_PEX, pex + i );
             tr_free( pex );
         }
-        
     }
 
     if( loaded )
@@ -1753,7 +1752,7 @@ fillOutputBuffer( tr_peermsgs * msgs, time_t now )
             }
             else
             {
-                dbgmsg( msgs, "sending block %u:%u->%u", req.index, req.offset, req.length ); 
+                dbgmsg( msgs, "sending block %u:%u->%u", req.index, req.offset, req.length );
                 EVBUFFER_LENGTH(out) += req.length;
                 assert( EVBUFFER_LENGTH( out ) == msglen );
                 tr_peerIoWriteBuf( io, out, TRUE );
@@ -2058,7 +2057,7 @@ sendPex( tr_peermsgs * msgs )
             assert( ( walk - tmp ) == diffs.droppedCount * 6 );
             tr_bencDictAddRaw( &val, "dropped", tmp, walk - tmp );
             tr_free( tmp );
-            
+
             /* "added6" */
             tmp = walk = tr_new( uint8_t, diffs6.addedCount * 18 );
             for( i = 0; i < diffs6.addedCount; ++i )
@@ -2071,7 +2070,7 @@ sendPex( tr_peermsgs * msgs )
             assert( ( walk - tmp ) == diffs6.addedCount * 18 );
             tr_bencDictAddRaw( &val, "added6", tmp, walk - tmp );
             tr_free( tmp );
-            
+
             /* "added6.f" */
             tmp = walk = tr_new( uint8_t, diffs6.addedCount );
             for( i = 0; i < diffs6.addedCount; ++i )
@@ -2079,7 +2078,7 @@ sendPex( tr_peermsgs * msgs )
             assert( ( walk - tmp ) == diffs6.addedCount );
             tr_bencDictAddRaw( &val, "added6.f", tmp, walk - tmp );
             tr_free( tmp );
-            
+
             /* "dropped6" */
             tmp = walk = tr_new( uint8_t, diffs6.droppedCount * 18 );
             for( i = 0; i < diffs6.droppedCount; ++i )

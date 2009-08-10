@@ -139,7 +139,7 @@ gboolean tr_core_add_metainfo( TrCore      * core,
 void tr_core_add_torrent( TrCore*, TrTorrent*, gboolean doNotify );
 
 /** Present the main window */
-gboolean tr_core_present_window( TrCore*, gboolean * setme_success, GError ** err ); 
+gboolean tr_core_present_window( TrCore*, gboolean * setme_success, GError ** err );
 
 
 /**

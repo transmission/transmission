@@ -253,7 +253,7 @@ publishNewPeersCompact( tr_tracker * t,
     const int arrayLen = peerCount * ( sizeof( tr_address ) + 2 );
     tr_address addr;
     tr_port port;
-    
+
     addr.type = TR_AF_INET;
     memset( &addr.addr, 0x00, sizeof( addr.addr ) );
     array = tr_new( uint8_t, arrayLen );
@@ -261,10 +261,10 @@ publishNewPeersCompact( tr_tracker * t,
     {
         memcpy( &addr.addr.addr4, compactWalk, 4 );
         memcpy( &port, compactWalk + 4, 2 );
-        
+
         memcpy( walk, &addr, sizeof( addr ) );
         memcpy( walk + sizeof( addr ), &port, 2 );
-        
+
         walk += sizeof( tr_address ) + 2;
         compactWalk += 6;
     }
@@ -285,7 +285,7 @@ publishNewPeersCompact6( tr_tracker * t,
     const int arrayLen = peerCount * ( sizeof( tr_address ) + 2 );
     tr_address addr;
     tr_port port;
-    
+
     addr.type = TR_AF_INET6;
     memset( &addr.addr, 0x00, sizeof( addr.addr ) );
     array = tr_new( uint8_t, arrayLen );
@@ -294,7 +294,7 @@ publishNewPeersCompact6( tr_tracker * t,
         memcpy( &addr.addr.addr6, compactWalk, 16 );
         memcpy( &port, compactWalk + 16, 2 );
         compactWalk += 18;
-        
+
         memcpy( walk, &addr, sizeof( addr ) );
         memcpy( walk + sizeof( addr ), &port, 2 );
         walk += sizeof( tr_address ) + 2;

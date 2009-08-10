@@ -69,7 +69,7 @@ reqListSortPos( const struct request_list * list,
     return tr_lowerBound( req,
                           list->sort,
                           list->len,
-                          sizeof( struct peer_request ), 
+                          sizeof( struct peer_request ),
                           (compareFunc)compareRequests,
                           exactMatch );
 }

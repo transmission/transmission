@@ -374,24 +374,24 @@ testJSON( void )
     return 0;
 }
 
-static int 
+static int
 testMerge( void )
-{ 
-    tr_benc dest, src; 
-    int64_t i; 
-    const char * s; 
+{
+    tr_benc dest, src;
+    int64_t i;
+    const char * s;
 
     /* initial dictionary (default values)  */
-    tr_bencInitDict( &dest, 10 ); 
-    tr_bencDictAddInt( &dest, "i1", 1 ); 
-    tr_bencDictAddInt( &dest, "i2", 2 ); 
+    tr_bencInitDict( &dest, 10 );
+    tr_bencDictAddInt( &dest, "i1", 1 );
+    tr_bencDictAddInt( &dest, "i2", 2 );
     tr_bencDictAddInt( &dest, "i4", -35 ); /* remains untouched */
-    tr_bencDictAddStr( &dest, "s5", "abc" ); 
-    tr_bencDictAddStr( &dest, "s6", "def" ); 
+    tr_bencDictAddStr( &dest, "s5", "abc" );
+    tr_bencDictAddStr( &dest, "s6", "def" );
     tr_bencDictAddStr( &dest, "s7", "127.0.0.1" ); /* remains untouched */
 
     /* new dictionary, will overwrite items in dest  */
-    tr_bencInitDict( &src, 10 ); 
+    tr_bencInitDict( &src, 10 );
     tr_bencDictAddInt( &src, "i1", 1 );     /* same value */
     tr_bencDictAddInt( &src, "i2", 4 );     /* new value */
     tr_bencDictAddInt( &src, "i3", 3 );     /* new key:value */
@@ -399,29 +399,29 @@ testMerge( void )
     tr_bencDictAddStr( &src, "s6", "xyz" ); /* new value */
     tr_bencDictAddStr( &src, "s8", "ghi" ); /* new key:value */
 
-    tr_bencMergeDicts( &dest, /*const*/ &src ); 
+    tr_bencMergeDicts( &dest, /*const*/ &src );
 
-    check( tr_bencDictFindInt( &dest, "i1", &i )); 
-    check( i == 1); 
-    check( tr_bencDictFindInt( &dest, "i2", &i )); 
-    check( i == 4); 
-    check( tr_bencDictFindInt( &dest, "i3", &i )); 
-    check( i == 3); 
-    check( tr_bencDictFindInt( &dest, "i4", &i )); 
-    check( i == -35); 
-    check( tr_bencDictFindStr( &dest, "s5", &s )); 
-    check( strcmp( "abc", s ) == 0 ); 
-    check( tr_bencDictFindStr( &dest, "s6", &s )); 
-    check( strcmp( "xyz", s ) == 0 ); 
-    check( tr_bencDictFindStr( &dest, "s7", &s )); 
-    check( strcmp( "127.0.0.1", s ) == 0 ); 
-    check( tr_bencDictFindStr( &dest, "s8", &s )); 
-    check( strcmp( "ghi", s ) == 0 ); 
+    check( tr_bencDictFindInt( &dest, "i1", &i ));
+    check( i == 1);
+    check( tr_bencDictFindInt( &dest, "i2", &i ));
+    check( i == 4);
+    check( tr_bencDictFindInt( &dest, "i3", &i ));
+    check( i == 3);
+    check( tr_bencDictFindInt( &dest, "i4", &i ));
+    check( i == -35);
+    check( tr_bencDictFindStr( &dest, "s5", &s ));
+    check( strcmp( "abc", s ) == 0 );
+    check( tr_bencDictFindStr( &dest, "s6", &s ));
+    check( strcmp( "xyz", s ) == 0 );
+    check( tr_bencDictFindStr( &dest, "s7", &s ));
+    check( strcmp( "127.0.0.1", s ) == 0 );
+    check( tr_bencDictFindStr( &dest, "s8", &s ));
+    check( strcmp( "ghi", s ) == 0 );
 
-    tr_bencFree( &dest ); 
-    tr_bencFree( &src ); 
-    return 0; 
-} 
+    tr_bencFree( &dest );
+    tr_bencFree( &src );
+    return 0;
+}
 
 static int
 testStackSmash( int depth )

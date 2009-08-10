@@ -23,23 +23,23 @@
 
 #ifdef WIN32
 
-#include <WinSock2.h> 
- 
-static int 
-pgpipe( int handles[2] ) 
+#include <WinSock2.h>
+
+static int
+pgpipe( int handles[2] )
 {
         SOCKET s;
         struct sockaddr_in serv_addr;
         int len = sizeof( serv_addr );
- 
+
         handles[0] = handles[1] = INVALID_SOCKET;
- 
+
         if ( ( s = socket( AF_INET, SOCK_STREAM, 0 ) ) == INVALID_SOCKET )
         {
 /*              ereport(LOG, (errmsg_internal("pgpipe failed to create socket: %ui", WSAGetLastError()))); */
                 return -1;
         }
- 
+
         memset( &serv_addr, 0, sizeof( serv_addr ) );
         serv_addr.sin_family = AF_INET;
         serv_addr.sin_port = htons(0);
@@ -68,7 +68,7 @@ pgpipe( int handles[2] )
                 closesocket(s);
                 return -1;
         }
- 
+
         if (connect(handles[1], (SOCKADDR *) & serv_addr, len) == SOCKET_ERROR)
         {
 /*              ereport(LOG, (errmsg_internal("pgpipe failed to connect socket: %ui", WSAGetLastError()))); */
@@ -86,27 +86,27 @@ pgpipe( int handles[2] )
         closesocket(s);
         return 0;
 }
- 
-static int 
-piperead( int s, char *buf, int len ) 
-{ 
-        int ret = recv(s, buf, len, 0); 
- 
-        if (ret < 0 && WSAGetLastError() == WSAECONNRESET) 
-                /* EOF on the pipe! (win32 socket based implementation) */ 
-                ret = 0; 
-        return ret; 
-} 
- 
-#define pipe(a) pgpipe(a) 
-#define pipewrite(a,b,c) send(a,(char*)b,c,0) 
+
+static int
+piperead( int s, char *buf, int len )
+{
+        int ret = recv(s, buf, len, 0);
+
+        if (ret < 0 && WSAGetLastError() == WSAECONNRESET)
+                /* EOF on the pipe! (win32 socket based implementation) */
+                ret = 0;
+        return ret;
+}
+
+#define pipe(a) pgpipe(a)
+#define pipewrite(a,b,c) send(a,(char*)b,c,0)
 
 #else
-#define piperead(a,b,c) read(a,b,c) 
-#define pipewrite(a,b,c) write(a,b,c) 
+#define piperead(a,b,c) read(a,b,c)
+#define pipewrite(a,b,c) write(a,b,c)
 #endif
 
-#include <unistd.h> 
+#include <unistd.h>
 
 #include <event.h>
 

@@ -52,7 +52,7 @@ getProgressString( const tr_torrent * tor,
     const int      isSeed = torStat->haveValid >= info->totalSize;
     char           buf1[32], buf2[32], buf3[32], buf4[32];
     char *         str;
-    double         seedRatio; 
+    double         seedRatio;
     gboolean       hasSeedRatio = FALSE;
 
     if( !isDone )
@@ -361,7 +361,7 @@ get_size_minimal( TorrentCellRenderer * cell,
     gtk_cell_renderer_get_size( text_renderer, widget, NULL, NULL, NULL, &w, &h );
     stat_area.width = w;
     stat_area.height = h;
-    
+
     /**
     *** LAYOUT
     **/
@@ -423,7 +423,7 @@ get_size_full( TorrentCellRenderer * cell,
     gtk_cell_renderer_get_size( text_renderer, widget, NULL, NULL, NULL, &w, &h );
     stat_area.width = w;
     stat_area.height = h;
-    
+
     /**
     *** LAYOUT
     **/
@@ -554,7 +554,7 @@ render_minimal( TorrentCellRenderer   * cell,
     /**
     *** RENDER
     **/
-   
+
     g_object_set( p->icon_renderer, "pixbuf", icon, "sensitive", active, NULL );
     gtk_cell_renderer_render( p->icon_renderer, window, widget, &icon_area, &icon_area, &icon_area, flags );
     g_object_set( text_renderer, "text", status, "scale", SMALL_SCALE, "sensitive", active, "ellipsize", PANGO_ELLIPSIZE_END, NULL );
@@ -621,7 +621,7 @@ render_full( TorrentCellRenderer   * cell,
     gtk_cell_renderer_get_size( text_renderer, widget, NULL, NULL, NULL, &w, &h );
     stat_area.width = w;
     stat_area.height = h;
-    
+
     /**
     *** LAYOUT
     **/
@@ -660,7 +660,7 @@ render_full( TorrentCellRenderer   * cell,
     /**
     *** RENDER
     **/
-   
+
     g_object_set( p->icon_renderer, "pixbuf", icon, "sensitive", active, NULL );
     gtk_cell_renderer_render( p->icon_renderer, window, widget, &icon_area, &icon_area, &icon_area, flags );
     g_object_set( text_renderer, "text", name, "scale", 1.0, "sensitive", active, "ellipsize", PANGO_ELLIPSIZE_END, "weight", PANGO_WEIGHT_BOLD, NULL );

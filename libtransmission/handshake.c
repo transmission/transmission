@@ -76,13 +76,13 @@ enum
  #define HANDSHAKE_SET_LTEP( bits ) ( (void)0 )
 #endif
 
-#ifdef ENABLE_FAST 
- #define HANDSHAKE_HAS_FASTEXT( bits ) ( ( ( bits )[7] & 0x04 ) ? 1 : 0 ) 
- #define HANDSHAKE_SET_FASTEXT( bits ) ( ( bits )[7] |= 0x04 ) 
-#else 
- #define HANDSHAKE_HAS_FASTEXT( bits ) ( 0 ) 
- #define HANDSHAKE_SET_FASTEXT( bits ) ( (void)0 ) 
-#endif 
+#ifdef ENABLE_FAST
+ #define HANDSHAKE_HAS_FASTEXT( bits ) ( ( ( bits )[7] & 0x04 ) ? 1 : 0 )
+ #define HANDSHAKE_SET_FASTEXT( bits ) ( ( bits )[7] |= 0x04 )
+#else
+ #define HANDSHAKE_HAS_FASTEXT( bits ) ( 0 )
+ #define HANDSHAKE_SET_FASTEXT( bits ) ( (void)0 )
+#endif
 
 #ifdef ENABLE_DHT
  #define HANDSHAKE_HAS_DHT( bits ) ( ( ( bits )[7] & 0x01 ) ? 1 : 0 )
@@ -90,7 +90,7 @@ enum
 #else
  #define HANDSHAKE_HAS_DHT( bits ) ( 0 )
  #define HANDSHAKE_SET_DHT( bits ) ( (void)0 )
-#endif 
+#endif
 
 /* http://www.azureuswiki.com/index.php/Extension_negotiation_protocol
    these macros are to be used if both extended messaging and the
@@ -1127,7 +1127,7 @@ tr_handshakeDone( tr_handshake * handshake,
 
     success = fireDoneFunc( handshake, isOK );
 
-    tr_handshakeFree( handshake );    
+    tr_handshakeFree( handshake );
 
     return success ? READ_LATER : READ_ERR;
 }

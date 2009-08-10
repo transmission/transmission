@@ -83,7 +83,7 @@ refresh_tooltip_cb( gpointer data )
     else
         tr_strlspeed( down, d, sizeof( down ) );
 
-    /* down limit */    
+    /* down limit */
     if( !tr_sessionGetActiveSpeedLimit( session, TR_DOWN, &limit ) )
         *downLimit = '\0';
     else {

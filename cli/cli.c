@@ -300,8 +300,8 @@ main( int     argc,
     tr_torrent  * tor = NULL;
     tr_benc       settings;
     const char  * configDir;
-    tr_bool       haveSource; 
-    tr_bool       haveAnnounce; 
+    tr_bool       haveSource;
+    tr_bool       haveAnnounce;
 
     printf( "Transmission %s - http://www.transmissionbt.com/\n",
             LONG_VERSION_STRING );

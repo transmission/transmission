@@ -231,7 +231,7 @@ refreshOptions( struct DetailsImpl * di, tr_torrent ** torrents, int n )
             set_togglebutton_if_different( di->honorLimitsCheck,
                                            di->honorLimitsCheckTag, baseline );
     }
-    
+
     /* downLimitedCheck */
     if( n ) {
         const tr_bool baseline = tr_torrentUsesSpeedLimit( torrents[0], TR_DOWN );
@@ -255,7 +255,7 @@ refreshOptions( struct DetailsImpl * di, tr_torrent ** torrents, int n )
             set_int_spin_if_different( di->downLimitSpin,
                                        di->downLimitSpinTag, baseline );
     }
-    
+
     /* upLimitedCheck */
     if( n ) {
         const tr_bool baseline = tr_torrentUsesSpeedLimit( torrents[0], TR_UP );
@@ -576,7 +576,7 @@ options_page_new( struct DetailsImpl * d )
     hig_workarea_add_wide_control( t, &row, h );
     d->seedCustomSpin = w;
     d->seedCustomSpinTag = tag;
-   
+
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title( t, &row, _( "Peer Connections" ) );
 
@@ -687,7 +687,7 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     }
     gtk_text_buffer_set_text( di->comment_buffer, str, -1 );
 
-    /* destination_lb */        
+    /* destination_lb */
     if( n<=0 )
         str = none;
     else {
@@ -805,7 +805,7 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     }
     gtk_label_set_text( GTK_LABEL( di->have_lb ), str );
 
-    
+
     /* dl_lb */
     if( n <= 0 )
         str = none;
@@ -826,7 +826,7 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     }
     gtk_label_set_text( GTK_LABEL( di->dl_lb ), str );
 
-    
+
     /* ul_lb */
     if( n <= 0 )
         str = none;
@@ -856,7 +856,7 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     if( n<=0 )
         str = none;
     else if ( n==1 )
-        str = infos[0]->hashString; 
+        str = infos[0]->hashString;
     else
         str = mixed;
     gtk_label_set_text( GTK_LABEL( di->hash_lb ), str );
@@ -1254,7 +1254,7 @@ refreshWebseedList( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     GHashTable * hash = di->webseed_hash;
     GtkListStore * store = di->webseed_store;
     GtkTreeModel * model = GTK_TREE_MODEL( store );
-    
+
     /* step 1: mark all webseeds as not-updated */
     if( gtk_tree_model_get_iter_first( model, &iter ) ) do
         gtk_list_store_set( store, &iter, WEBSEED_COL_WAS_UPDATED, FALSE, -1 );
@@ -1405,11 +1405,11 @@ onPeerViewQueryTooltip( GtkWidget   * widget,
                 case 'O': s = _( "Optimistic unchoke" ); break;
                 case 'D': s = _( "Downloading from this peer" ); break;
                 case 'd': s = _( "We would download from this peer if they would let us" ); break;
-                case 'U': s = _( "Uploading to peer" ); break; 
+                case 'U': s = _( "Uploading to peer" ); break;
                 case 'u': s = _( "We would upload to this peer if they asked" ); break;
                 case 'K': s = _( "Peer has unchoked us, but we're not interested" ); break;
                 case '?': s = _( "We unchoked this peer, but they're not interested" ); break;
-                case 'E': s = _( "Encrypted connection" ); break; 
+                case 'E': s = _( "Encrypted connection" ); break;
                 case 'X': s = _( "Peer was discovered through Peer Exchange (PEX)" ); break;
                 case 'H': s = _( "Peer was discovered through DHT" ); break;
                 case 'I': s = _( "Peer is an incoming connection" ); break;
@@ -1963,7 +1963,6 @@ torrent_inspector_set_torrents( GtkWidget * w, GSList * ids )
 
         file_list_set_torrent( di->file_list, id );
         tracker_list_set_torrent( di->tracker_list, id );
-        
     }
    else
    {

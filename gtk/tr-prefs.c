@@ -1217,7 +1217,7 @@ bandwidthPage( GObject * core )
         w = new_spin_button( TR_PREFS_KEY_ALT_SPEED_UP, core, 0, INT_MAX, 5 );
         hig_workarea_add_row( t, &row, s, w, NULL );
 
-        s = _( "_Scheduled times:" ); 
+        s = _( "_Scheduled times:" );
         h = gtk_hbox_new( FALSE, 0 );
         w2 = new_time_combo( core, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN );
         page->sched_widgets = g_slist_append( page->sched_widgets, w2 );

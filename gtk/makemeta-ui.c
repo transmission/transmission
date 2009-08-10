@@ -432,7 +432,7 @@ make_meta_ui( GtkWindow  * parent,
         int i;
         int trackerCount = 0;
         tr_tracker_info * trackers = g_new0( tr_tracker_info, n );
-         
+
         for( i=0; i<n; ++i )
         {
             char key[512];

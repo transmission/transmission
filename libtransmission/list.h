@@ -125,7 +125,7 @@ __tr_list_append( struct __tr_list * head,
 /**
  *    __tr_list_remove()
  *
- * Remove @head from the list it is in. 
+ * Remove @head from the list it is in.
  */
 void
 __tr_list_remove( struct __tr_list * head );

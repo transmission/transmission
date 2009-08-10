@@ -270,7 +270,7 @@ confirmRemove( GtkWindow * parent,
                                                        counts.connected ) );
         if( counts.connected && counts.incomplete )
             g_string_append( secondary_text, "\n" );
- 
+
         if( counts.incomplete )
             g_string_assign( secondary_text, ngettext( "One of these torrents has not finished downloading.",
                                                        "Some of these torrents have not finished downloading.",

@@ -56,8 +56,8 @@
 #define IN_MULTICAST( a ) ( ( ( a ) & 0xf0000000 ) == 0xe0000000 )
 #endif
 
-const tr_address tr_in6addr_any = { TR_AF_INET6, { IN6ADDR_ANY_INIT } }; 
-const tr_address tr_inaddr_any = { TR_AF_INET, { { { { INADDR_ANY, 0x00, 0x00, 0x00 } } } } }; 
+const tr_address tr_in6addr_any = { TR_AF_INET6, { IN6ADDR_ANY_INIT } };
+const tr_address tr_inaddr_any = { TR_AF_INET, { { { { INADDR_ANY, 0x00, 0x00, 0x00 } } } } };
 
 #ifdef WIN32
 static const char *
@@ -129,57 +129,57 @@ tr_netInit( void )
     }
 }
 
-const char * 
-tr_ntop( const tr_address * src, char * dst, int size ) 
+const char *
+tr_ntop( const tr_address * src, char * dst, int size )
 {
     assert( tr_isAddress( src ) );
 
-    if( src->type == TR_AF_INET ) 
-        return inet_ntop( AF_INET, &src->addr, dst, size ); 
-    else 
-        return inet_ntop( AF_INET6, &src->addr, dst, size ); 
-} 
-
-/* 
- * Non-threadsafe version of tr_ntop, which uses a static memory area for a buffer. 
- * This function is suitable to be called from libTransmission's networking code, 
- * which is single-threaded. 
- */ 
-const char * 
-tr_ntop_non_ts( const tr_address * src ) 
-{ 
-    static char buf[INET6_ADDRSTRLEN]; 
-    return tr_ntop( src, buf, sizeof( buf ) ); 
-} 
-
-tr_address * 
-tr_pton( const char * src, tr_address * dst ) 
-{ 
-    int retval = inet_pton( AF_INET, src, &dst->addr ); 
-    assert( dst );
-    if( retval < 0 ) 
-        return NULL; 
-    else if( retval == 0 ) 
-        retval = inet_pton( AF_INET6, src, &dst->addr ); 
+    if( src->type == TR_AF_INET )
+        return inet_ntop( AF_INET, &src->addr, dst, size );
     else
-    { 
-        dst->type = TR_AF_INET; 
-        return dst; 
-    } 
-
-    if( retval < 1 ) 
-        return NULL; 
-    dst->type = TR_AF_INET6; 
-    return dst; 
+        return inet_ntop( AF_INET6, &src->addr, dst, size );
 }
 
-/* 
- * Compare two tr_address structures. 
- * Returns: 
- * <0 if a < b 
- * >0 if a > b 
- * 0  if a == b 
- */ 
+/*
+ * Non-threadsafe version of tr_ntop, which uses a static memory area for a buffer.
+ * This function is suitable to be called from libTransmission's networking code,
+ * which is single-threaded.
+ */
+const char *
+tr_ntop_non_ts( const tr_address * src )
+{
+    static char buf[INET6_ADDRSTRLEN];
+    return tr_ntop( src, buf, sizeof( buf ) );
+}
+
+tr_address *
+tr_pton( const char * src, tr_address * dst )
+{
+    int retval = inet_pton( AF_INET, src, &dst->addr );
+    assert( dst );
+    if( retval < 0 )
+        return NULL;
+    else if( retval == 0 )
+        retval = inet_pton( AF_INET6, src, &dst->addr );
+    else
+    {
+        dst->type = TR_AF_INET;
+        return dst;
+    }
+
+    if( retval < 1 )
+        return NULL;
+    dst->type = TR_AF_INET6;
+    return dst;
+}
+
+/*
+ * Compare two tr_address structures.
+ * Returns:
+ * <0 if a < b
+ * >0 if a > b
+ * 0  if a == b
+ */
 int
 tr_compareAddresses( const tr_address * a, const tr_address * b)
 {
@@ -188,12 +188,12 @@ tr_compareAddresses( const tr_address * a, const tr_address * b)
     assert( tr_isAddress( a ) );
     assert( tr_isAddress( b ) );
 
-    /* IPv6 addresses are always "greater than" IPv4 */ 
+    /* IPv6 addresses are always "greater than" IPv4 */
     if( a->type != b->type )
         return a->type == TR_AF_INET ? 1 : -1;
 
     return memcmp( &a->addr, &b->addr, sizes[a->type] );
-} 
+}
 
 /***********************************************************************
  * TCP sockets
@@ -313,7 +313,7 @@ tr_netOpenTCP( tr_session        * session,
     }
 
     addrlen = setup_sockaddr( addr, port, &sock );
-    
+
     /* set source address */
     source_addr = tr_sessionGetPublicAddress( session, addr->type );
     assert( source_addr );

@@ -381,7 +381,7 @@ buildTree( GNode * node, gpointer gdata )
     const gboolean isLeaf = node->children == NULL;
 
     const char * mime_type = isLeaf ? get_mime_type_from_filename( child_data->name ) : DIRECTORY_MIME_TYPE;
-    GdkPixbuf * icon = get_mime_type_icon( mime_type, GTK_ICON_SIZE_MENU, build->w ); 
+    GdkPixbuf * icon = get_mime_type_icon( mime_type, GTK_ICON_SIZE_MENU, build->w );
     const int priority = isLeaf ? tr_torrentGetFilePriority( build->tor, child_data->index ) : 0;
     const gboolean enabled = isLeaf ? tr_torrentGetFileDL( build->tor, child_data->index ) : TRUE;
 #if GTK_CHECK_VERSION(2,10,0)
@@ -415,7 +415,7 @@ buildTree( GNode * node, gpointer gdata )
     }
 
     g_object_unref( icon );
- 
+
     /* we're done with this node */
     g_free( child_data->name );
     g_free( child_data );

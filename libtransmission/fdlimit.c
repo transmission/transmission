@@ -181,15 +181,15 @@ preallocateFileFull( const char * filename, uint64_t length )
 
         if( !success ) /* if nothing else works, do it the old-fashioned way */
         {
-            uint8_t buf[ 4096 ]; 
-            memset( buf, 0, sizeof( buf ) ); 
-            success = TRUE; 
-            while ( success && ( length > 0 ) ) 
-            { 
-                const int thisPass = MIN( length, sizeof( buf ) ); 
-                success = write( fd, buf, thisPass ) == thisPass; 
-                length -= thisPass; 
-            } 
+            uint8_t buf[ 4096 ];
+            memset( buf, 0, sizeof( buf ) );
+            success = TRUE;
+            while ( success && ( length > 0 ) )
+            {
+                const int thisPass = MIN( length, sizeof( buf ) );
+                success = write( fd, buf, thisPass ) == thisPass;
+                length -= thisPass;
+            }
         }
 
         close( fd );
@@ -316,7 +316,7 @@ TrOpenFile( int                      i,
     if( doWrite && !alreadyExisted && ( preallocationMode == TR_PREALLOCATE_FULL ) )
         if( preallocateFileFull( filename, desiredFileSize ) )
             tr_inf( _( "Preallocated file \"%s\"" ), filename );
-    
+
     /* open the file */
     flags = doWrite ? ( O_RDWR | O_CREAT ) : O_RDONLY;
 #ifdef O_SEQUENTIAL
@@ -446,7 +446,7 @@ tr_fdFileCheckout( int                      torrentId,
         }
 
         assert( winner >= 0 );
-       
+
         if( fileIsOpen( &gFd->openFiles[winner] ) )
         {
             dbgmsg( "closing file \"%s\"", gFd->openFiles[winner].filename );
@@ -576,28 +576,28 @@ tr_fdSocketAccept( int           b,
 
     if( s >= 0 )
     {
-        /* "The ss_family field of the sockaddr_storage structure will always 
-         * align with the family field of any protocol-specific structure." */ 
-        if( sock.ss_family == AF_INET ) 
+        /* "The ss_family field of the sockaddr_storage structure will always
+         * align with the family field of any protocol-specific structure." */
+        if( sock.ss_family == AF_INET )
         {
             struct sockaddr_in *si;
             union { struct sockaddr_storage dummy; struct sockaddr_in si; } s;
             s.dummy = sock;
             si = &s.si;
-            addr->type = TR_AF_INET; 
-            addr->addr.addr4.s_addr = si->sin_addr.s_addr; 
-            *port = si->sin_port; 
-        } 
-        else 
-        { 
+            addr->type = TR_AF_INET;
+            addr->addr.addr4.s_addr = si->sin_addr.s_addr;
+            *port = si->sin_port;
+        }
+        else
+        {
             struct sockaddr_in6 *si;
             union { struct sockaddr_storage dummy; struct sockaddr_in6 si; } s;
             s.dummy = sock;
             si = &s.si;
-            addr->type = TR_AF_INET6; 
+            addr->type = TR_AF_INET6;
             addr->addr.addr6 = si->sin6_addr;
-            *port = si->sin6_port; 
-        } 
+            *port = si->sin6_port;
+        }
         ++gFd->socketCount;
     }
 

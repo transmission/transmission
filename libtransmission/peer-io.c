@@ -99,7 +99,7 @@ didWriteWrapper( tr_peerIo * io, size_t bytes_transferred )
 
         if( io->didWrite )
             io->didWrite( io, payload, next->isPieceData, io->userData );
-        
+
         if( tr_isPeerIo( io ) )
         {
             bytes_transferred -= payload;
@@ -454,7 +454,7 @@ io_dtor( void * vio )
     tr_cryptoFree( io->crypto );
     __tr_list_destroy( &io->outbuf_datatypes, trDatatypeFree );
 
-    memset( io, ~0, sizeof( tr_peerIo ) ); 
+    memset( io, ~0, sizeof( tr_peerIo ) );
     tr_free( io );
 }
 
@@ -510,10 +510,10 @@ tr_peerIoAddrStr( const tr_address * addr, tr_port port )
 {
     static char buf[512];
 
-    if( addr->type == TR_AF_INET ) 
-        tr_snprintf( buf, sizeof( buf ), "%s:%u", tr_ntop_non_ts( addr ), ntohs( port ) ); 
-    else 
-        tr_snprintf( buf, sizeof( buf ), "[%s]:%u", tr_ntop_non_ts( addr ), ntohs( port ) ); 
+    if( addr->type == TR_AF_INET )
+        tr_snprintf( buf, sizeof( buf ), "%s:%u", tr_ntop_non_ts( addr ), ntohs( port ) );
+    else
+        tr_snprintf( buf, sizeof( buf ), "[%s]:%u", tr_ntop_non_ts( addr ), ntohs( port ) );
     return buf;
 }
 
@@ -546,7 +546,7 @@ tr_peerIoReconnect( tr_peerIo * io )
     if( io->socket >= 0 )
         tr_netClose( io->socket );
 
-    io->socket = tr_netOpenTCP( io->session, &io->addr, io->port ); 
+    io->socket = tr_netOpenTCP( io->session, &io->addr, io->port );
     if( io->socket >= 0 )
     {
         tr_netSetTOS( io->socket, io->session->peerSocketTOS );

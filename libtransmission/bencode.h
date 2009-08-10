@@ -26,7 +26,7 @@ struct evbuffer;
  *
  * An object that acts like a union for
  * integers, strings, lists, dictionaries, booleans, and floating-point numbers.
- * The structure is named tr_benc due to the historical reason that it was 
+ * The structure is named tr_benc due to the historical reason that it was
  * originally tightly coupled with bencoded data.  It currently supports
  * being parsed from, and serialized to, both bencoded notation and json notation.
  *
@@ -45,7 +45,7 @@ enum
     TR_TYPE_BOOL = 16,
     TR_TYPE_REAL = 32
 };
-   
+
 /* These are PRIVATE IMPLEMENTATION details that should not be touched.
  * I'll probably change them just to break your code! HA HA HA!
  * it's included in the header for inlining and composition */

@@ -315,15 +315,15 @@ isAltTime( const tr_session * s )
     tr_localtime_r( &now, &tm );
     minutes = tm.tm_hour*60 + tm.tm_min;
     day = tm.tm_wday;
-    
+
     if( !toNextDay )
         withinTime = ( begin <= minutes ) && ( minutes < end );
     else /* goes past midnight */
         withinTime = ( begin <= minutes ) || ( minutes < end );
-    
+
     if( !withinTime )
         return FALSE;
-    
+
     if( toNextDay && (minutes < end) )
         day = (day - 1) % 7;
 
@@ -794,7 +794,7 @@ tr_sessionInitImpl( void * vdata )
     found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_ALT_SPEED_TIME_END, &i );
     assert( found );
     session->altSpeedTimeEnd = i;
-    
+
     found = tr_bencDictFindInt( &settings, TR_PREFS_KEY_ALT_SPEED_TIME_DAY, &i );
     assert( found );
     session->altSpeedTimeDay = i;
@@ -1101,7 +1101,7 @@ onAltTimer( int foo UNUSED, short bar UNUSED, void * vsession )
         tr_localtime_r( &now, &tm );
         currentMinute = tm.tm_hour*60 + tm.tm_min;
         day = tm.tm_wday;
-        
+
         isBeginTime = currentMinute == session->altSpeedTimeBegin;
         isEndTime = currentMinute == session->altSpeedTimeEnd;
         if( isBeginTime || isEndTime )
@@ -1109,7 +1109,7 @@ onAltTimer( int foo UNUSED, short bar UNUSED, void * vsession )
             /* if looking at the end date, look at the next day if end time is before begin time */
             if( isEndTime && !isBeginTime && session->altSpeedTimeEnd < session->altSpeedTimeBegin )
                 day = (day - 1) % 7;
-            
+
             isDay = ((1<<day) & session->altSpeedTimeDay) != 0;
 
             if( isDay )
@@ -1167,7 +1167,7 @@ tr_sessionIsSpeedLimited( const tr_session * s, tr_direction d )
 }
 
 /***
-****  Alternative speed limits that are used during scheduled times 
+****  Alternative speed limits that are used during scheduled times
 ***/
 
 void
@@ -1188,7 +1188,7 @@ tr_sessionGetAltSpeed( const tr_session * s, tr_direction d )
     assert( tr_isSession( s ) );
     assert( tr_isDirection( d ) );
 
-    return s->altSpeed[d]; 
+    return s->altSpeed[d];
 }
 
 void
@@ -1301,7 +1301,7 @@ useAltSpeed( tr_session * s, tr_bool enabled, tr_bool byUser )
     {
         s->altSpeedEnabled = enabled;
         s->altSpeedChangedByUser = byUser;
-    
+
         tr_runInEventThread( s, altSpeedToggled, s );
     }
 }

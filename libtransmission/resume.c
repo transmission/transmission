@@ -87,7 +87,7 @@ savePeers( tr_benc *          dict,
     count = tr_peerMgrGetPeers( (tr_torrent*) tor, &pex, TR_AF_INET6 );
     if( count > 0 )
         tr_bencDictAddRaw( dict, KEY_PEERS6, pex, sizeof( tr_pex ) * count );
-    
+
     tr_free( pex );
 }
 
@@ -112,7 +112,7 @@ loadPeers( tr_benc *    dict,
         tr_tordbg( tor, "Loaded %d IPv4 peers from resume file", count );
         ret = TR_FR_PEERS;
     }
-    
+
     if( tr_bencDictFindRaw( dict, KEY_PEERS6, &str, &len ) )
     {
         int       i;
@@ -638,7 +638,7 @@ loadFromFile( tr_torrent * tor,
 
     if( fieldsToLoad & TR_FR_SPEEDLIMIT )
         fieldsLoaded |= loadSpeedLimits( &top, tor );
-    
+
     if( fieldsToLoad & TR_FR_RATIOLIMIT )
         fieldsLoaded |= loadRatioLimits( &top, tor );
 

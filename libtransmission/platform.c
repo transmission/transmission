@@ -522,7 +522,6 @@ isClutchDir( const char * path )
     tr_inf( _( "Searching for web interface file \"%s\"" ), tmp );
     tr_free( tmp );
     return ret;
-    
 }
 
 const char *
@@ -554,10 +553,10 @@ tr_getClutchDir( const tr_session * session UNUSED )
             CFRelease( appRef );
 
             s = tr_buildPath( appString, "Contents", "Resources", "web", NULL );
-            
+
             if( !isClutchDir( s ) ) {
                 tr_free( s );
-                
+
                 /* Fallback to the Application Support folder */
                 s = tr_buildPath( tr_sessionGetConfigDir( session ), "web", NULL );
                 if( !isClutchDir( s ) ) {
@@ -570,11 +569,11 @@ tr_getClutchDir( const tr_session * session UNUSED )
 
             /* SHGetFolderPath explicitly requires MAX_PATH length */
             char dir[MAX_PATH];
-            
+
             /* Generally, Web interface should be stored in a Web subdir of
              * calling executable dir. */
 
-            if( s == NULL ) { 
+            if( s == NULL ) {
                 /* First, we should check personal AppData/Transmission/Web */
                 SHGetFolderPath( NULL, CSIDL_COMMON_APPDATA, NULL, 0, dir );
                 s = tr_buildPath( dir, "Transmission", "Web", NULL );

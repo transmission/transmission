@@ -185,7 +185,6 @@ __tr_list_splice( struct __tr_list * prev,
     prev->next = next;
 }
 
- 
 void
 __tr_list_remove( struct __tr_list * head )
 {

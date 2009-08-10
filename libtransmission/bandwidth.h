@@ -76,7 +76,7 @@ struct tr_band
  *   tr_session also owns a tr_handshake's bandwidths, so that the handshake
  *   I/O can be counted in the global raw totals.  When the handshake is done,
  *   the bandwidth's ownership passes to a tr_peer.
- * 
+ *
  * MEASURING
  *
  *   When you ask a bandwidth object for its speed, it gives the speed of the
@@ -85,17 +85,17 @@ struct tr_band
  *   tr_torrent's bandwidth, and per-peer speeds by asking tr_peer's bandwidth.
  *
  * CONSTRAINING
- * 
+ *
  *   Call tr_bandwidthAllocate() periodically.  tr_bandwidth knows its current
  *   speed and will decide how many bytes to make available over the
  *   user-specified period to reach the user-specified desired speed.
  *   If appropriate, it notifies its peer-ios that new bandwidth is available.
- * 
- *   tr_bandwidthAllocate() operates on the tr_bandwidth subtree, so usually 
+ *
+ *   tr_bandwidthAllocate() operates on the tr_bandwidth subtree, so usually
  *   you'll only need to invoke it for the top-level tr_session bandwidth.
  *
  *   The peer-ios all have a pointer to their associated tr_bandwidth object,
- *   and call tr_bandwidthClamp() before performing I/O to see how much 
+ *   and call tr_bandwidthClamp() before performing I/O to see how much
  *   bandwidth they can safely use.
  */
 typedef struct tr_bandwidth

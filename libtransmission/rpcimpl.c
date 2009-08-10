@@ -1178,9 +1178,9 @@ sessionStats( tr_session               * session,
 {
     int running = 0;
     int total = 0;
-    tr_benc * d;  
-    tr_session_stats currentStats = { 0.0f, 0, 0, 0, 0, 0 }; 
-    tr_session_stats cumulativeStats = { 0.0f, 0, 0, 0, 0, 0 }; 
+    tr_benc * d;
+    tr_session_stats currentStats = { 0.0f, 0, 0, 0, 0, 0 };
+    tr_session_stats cumulativeStats = { 0.0f, 0, 0, 0, 0, 0 };
     tr_torrent * tor = NULL;
 
     assert( idle_data == NULL );
@@ -1191,8 +1191,8 @@ sessionStats( tr_session               * session,
             ++running;
     }
 
-    tr_sessionGetStats( session, &currentStats ); 
-    tr_sessionGetCumulativeStats( session, &cumulativeStats ); 
+    tr_sessionGetStats( session, &currentStats );
+    tr_sessionGetCumulativeStats( session, &cumulativeStats );
 
     tr_bencDictAddInt( args_out, "activeTorrentCount", running );
     tr_bencDictAddInt( args_out, "downloadSpeed", (int)( tr_sessionGetPieceSpeed( session, TR_DOWN ) * 1024 ) );
@@ -1200,19 +1200,19 @@ sessionStats( tr_session               * session,
     tr_bencDictAddInt( args_out, "torrentCount", total );
     tr_bencDictAddInt( args_out, "uploadSpeed", (int)( tr_sessionGetPieceSpeed( session, TR_UP ) * 1024 ) );
 
-    d = tr_bencDictAddDict( args_out, "cumulative-stats", 5 );  
-    tr_bencDictAddInt( d, "downloadedBytes", cumulativeStats.downloadedBytes ); 
-    tr_bencDictAddInt( d, "filesAdded", cumulativeStats.filesAdded ); 
-    tr_bencDictAddInt( d, "secondsActive", cumulativeStats.secondsActive ); 
-    tr_bencDictAddInt( d, "sessionCount", cumulativeStats.sessionCount ); 
-    tr_bencDictAddInt( d, "uploadedBytes", cumulativeStats.uploadedBytes ); 
+    d = tr_bencDictAddDict( args_out, "cumulative-stats", 5 );
+    tr_bencDictAddInt( d, "downloadedBytes", cumulativeStats.downloadedBytes );
+    tr_bencDictAddInt( d, "filesAdded", cumulativeStats.filesAdded );
+    tr_bencDictAddInt( d, "secondsActive", cumulativeStats.secondsActive );
+    tr_bencDictAddInt( d, "sessionCount", cumulativeStats.sessionCount );
+    tr_bencDictAddInt( d, "uploadedBytes", cumulativeStats.uploadedBytes );
 
-    d = tr_bencDictAddDict( args_out, "current-stats", 5 );  
-    tr_bencDictAddInt( d, "downloadedBytes", currentStats.downloadedBytes ); 
-    tr_bencDictAddInt( d, "filesAdded", currentStats.filesAdded ); 
-    tr_bencDictAddInt( d, "secondsActive", currentStats.secondsActive ); 
-    tr_bencDictAddInt( d, "sessionCount", currentStats.sessionCount ); 
-    tr_bencDictAddInt( d, "uploadedBytes", currentStats.uploadedBytes ); 
+    d = tr_bencDictAddDict( args_out, "current-stats", 5 );
+    tr_bencDictAddInt( d, "downloadedBytes", currentStats.downloadedBytes );
+    tr_bencDictAddInt( d, "filesAdded", currentStats.filesAdded );
+    tr_bencDictAddInt( d, "secondsActive", currentStats.secondsActive );
+    tr_bencDictAddInt( d, "sessionCount", currentStats.sessionCount );
+    tr_bencDictAddInt( d, "uploadedBytes", currentStats.uploadedBytes );
 
     return NULL;
 }
@@ -1255,7 +1255,7 @@ sessionGet( tr_session               * s,
     tr_bencDictAddStr ( d, "version", LONG_VERSION_STRING );
     switch( tr_sessionGetEncryption( s ) ) {
         case TR_CLEAR_PREFERRED: str = "tolerated"; break;
-        case TR_ENCRYPTION_REQUIRED: str = "required"; break; 
+        case TR_ENCRYPTION_REQUIRED: str = "required"; break;
         default: str = "preferred"; break;
     }
     tr_bencDictAddStr( d, TR_PREFS_KEY_ENCRYPTION, str );

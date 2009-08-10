@@ -295,13 +295,13 @@ getannounce( tr_info * inf,
                         t->tier = validTiers;
                         t->announce = tr_strdup( url );
                         t->scrape = announceToScrape( url );
-                        
+
                         anyAdded = TRUE;
                     }
                     tr_free( url );
                 }
             }
-            
+
             if( anyAdded )
                 ++validTiers;
         }

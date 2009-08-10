@@ -3,7 +3,7 @@
  *
  * This file is licensed by the GPL version 2.  Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
- * so that the bulk of its code can remain under the MIT license. 
+ * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
@@ -32,16 +32,16 @@ charint( char ch )
     return 0;
 }
 
-static int 
-getShadowInt( char ch, int * setme ) 
-{ 
-    const char * str = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-"; 
-    const char * pch = strchr( str, ch ); 
-    if( !pch ) 
-    return 0; 
-        *setme = pch - str; 
-    return 1; 
-} 
+static int
+getShadowInt( char ch, int * setme )
+{
+    const char * str = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-";
+    const char * pch = strchr( str, ch );
+    if( !pch )
+    return 0;
+        *setme = pch - str;
+    return 1;
+}
 
 static int
 strint( const void * pch, int span )
@@ -110,7 +110,7 @@ isMainlineStyle( const uint8_t * peer_id )
      * One of the following styles will be used:
      *   Mx-y-z--
      *   Mx-yy-z-
-     */ 
+     */
     return peer_id[2]=='-'
         && peer_id[7]=='-'
         && ( peer_id[4]=='-' || peer_id[5]=='-' );
@@ -181,7 +181,7 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
                 tr_snprintf( buf, buflen, "Transmission %d.%02d%s", strint(id+3,1), strint(id+4,2),
                           id[6]=='Z' || id[6]=='X' ? "+" : "" );
         }
-        
+
         else if( !memcmp( id+1, "UT", 2 ) )
         {
             tr_snprintf( buf, buflen, "\xc2\xb5Torrent %d.%d.%d%s",
@@ -192,7 +192,7 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
             tr_snprintf( buf, buflen, "\xc2\xb5Torrent Mac %d.%d.%d%s",
                          strint(id+3,1), strint(id+4,1), strint(id+5,1), getMnemonicEnd(id[6]) );
         }
-        
+
         else if( !memcmp( id+1, "AZ", 2 ) )
         {
             if( id[3] > '3' || ( id[3] == '3' && id[4] >= '1' ) ) /* Vuze starts at version 3.1.0.0 */
@@ -200,7 +200,7 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
             else
                 four_digits( buf, buflen, "Azureus", id+3 );
         }
-        
+
         else if( !memcmp( id+1, "KT", 2 ) )
         {
             if( id[5] == 'D' )
@@ -327,8 +327,8 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
     else if( !memcmp( id, "eX", 2 ) )        no_version( buf, buflen, "eXeem" );
     else if( !memcmp( id, "-aria2-", 7 ) )   no_version( buf, buflen, "aria2" );
     else if( !memcmp( id, "-FG", 3 ) )       two_major_two_minor( buf, buflen, "FlashGet", id+3 );
-   
-    /* Everything else */ 
+
+    /* Everything else */
     else if( !memcmp( id, "S3", 2 ) && id[2] == '-' && id[4] == '-' && id[6] == '-' )
     {
         tr_snprintf( buf, buflen, "Amazon S3 %c.%c.%c", id[3], id[5], id[7] );
