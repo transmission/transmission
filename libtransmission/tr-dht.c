@@ -50,25 +50,6 @@ THE SOFTWARE.
 #include "utils.h"
 #include "version.h"
 
-#ifdef WITHOUT_DHT
-
-  /* These are the stubs for when we're building without DHT support */
-  int tr_dhtInit( tr_session * session UNUSED ) { return TR_DHT_STOPPED; }
-  void tr_dhtUninit( tr_session * session UNUSED ) { }
-  tr_bool tr_dhtEnabled( const tr_session * session UNUSED ) { return FALSE; }
-  tr_port tr_dhtPort ( const tr_session * sesssion UNUSED ) { return 0; }
-  int tr_dhtStatus( tr_session * session     UNUSED,
-                    int        * setmeCount  UNUSED ) { return TR_DHT_STOPPED; }
-  int tr_dhtAddNode( tr_session * session    UNUSED,
-                     tr_address * addr       UNUSED,
-                     tr_port      port       UNUSED,
-                     tr_bool      bootstrap  UNUSED ) { return 0; }
-  int tr_dhtAnnounce( tr_torrent * session UNUSED,
-                      tr_bool announce UNUSED ) { return -1; }
-
-
-#else
-
 static int dht_socket;
 static struct event dht_event;
 static tr_port dht_port;
@@ -458,5 +439,3 @@ dht_random_bytes( void * buf, size_t size )
     tr_cryptoRandBuf( buf, size );
     return size;
 }
-
-#endif
