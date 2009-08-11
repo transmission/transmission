@@ -1529,15 +1529,17 @@ typedef struct tr_stat
         are moved to `corrupt' or `haveValid'. */
     uint64_t    haveUnchecked;
 
-    /** This is the unmodified string returned by the tracker in response
-        to the torrent's most recent scrape request.  If no request was
-        sent or there was no response, this string is empty. */
-    char    scrapeResponse[64];
+    /**
+     * This is a human-readable string with the last scrape's results. 
+     * 1. If an http error occurred, the response code and description is given.
+     * 2. If the tracker gave an error or warning messae, that is given.
+     * 3. If everything went fine, "Success" is given.
+     */
+    char    scrapeResponse[128];
 
-    /** The unmodified string returned by the tracker in response
-        to the torrent's most recent scrape request.  If no request was
-        sent or there was no response, this string is empty. */
-    char    announceResponse[64];
+    /** This is a human-readable string with the last announce's results.
+        Its contents have the same form as scrapeResponse. */
+    char    announceResponse[128];
 
     /** Time the most recent scrape request was sent,
         or zero if one hasn't been sent yet. */

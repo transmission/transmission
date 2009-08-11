@@ -48,7 +48,7 @@ enum
     DEFAULT_SCRAPE_INTERVAL_SEC = ( 60 * 15 ),
 
     /* unless the tracker says otherwise, this is the announce interval */
-    DEFAULT_ANNOUNCE_INTERVAL_SEC = ( 60 * 4 ),
+    DEFAULT_ANNOUNCE_INTERVAL_SEC = ( 60 * 10 ),
 
     /* unless the tracker says otherwise, this is the announce min_interval */
     DEFAULT_ANNOUNCE_MIN_INTERVAL_SEC = ( 60 * 2 ),
@@ -122,10 +122,10 @@ struct tr_tracker
     time_t    scrapeAt;
 
     time_t    lastScrapeTime;
-    long      lastScrapeResponse;
+    char      lastScrapeStr[128];
 
     time_t    lastAnnounceTime;
-    long      lastAnnounceResponse;
+    char      lastAnnounceStr[128];
 };
 
 #define dbgmsg( name, ... ) \
@@ -420,7 +420,7 @@ onTrackerResponse( tr_session * session,
 
     dbgmsg( t->name, "tracker response: %ld", responseCode );
     tr_ndbg( t->name, "tracker response: %ld", responseCode );
-    t->lastAnnounceResponse = responseCode;
+    t->lastAnnounceStr[0] = '\0';
 
     if( responseCode == HTTP_OK )
     {
@@ -442,12 +442,16 @@ onTrackerResponse( tr_session * session,
 
             if( tr_bencDictFindStr( &benc, "failure reason", &str ) )
             {
+                tr_strlcpy( t->lastAnnounceStr, str, sizeof( t->lastAnnounceStr ) );
                 publishMessage( t, str, TR_TRACKER_ERROR );
                 success = FALSE;
             }
 
             if( tr_bencDictFindStr( &benc, "warning message", &str ) )
+            {
+                tr_strlcpy( t->lastAnnounceStr, str, sizeof( t->lastAnnounceStr ) );
                 publishWarning( t, str );
+            }
 
             if( tr_bencDictFindInt( &benc, "interval", &i ) )
             {
@@ -504,6 +508,9 @@ onTrackerResponse( tr_session * session,
                 const int allAreSeeds = incomplete == 0;
                 publishNewPeersCompact6( t, allAreSeeds, raw, rawlen );
             }
+
+            if( !*t->lastAnnounceStr )
+                tr_strlcpy( t->lastAnnounceStr, _( "Success" ), sizeof( t->lastAnnounceStr ) );
         }
 
         if( bencLoaded )
@@ -513,11 +520,16 @@ onTrackerResponse( tr_session * session,
     {
         /* %1$ld - http status code, such as 404
          * %2$s - human-readable explanation of the http status code */
-        char * buf = tr_strdup_printf( _( "Tracker request failed.  Got HTTP Status Code %1$ld (%2$s)" ),
+        char * buf = tr_strdup_printf( _( "Announce failed: tracker gave HTTP Response Code %1$ld (%2$s)" ),
                                       responseCode,
                                       tr_webGetResponseStr( responseCode ) );
+        tr_strlcpy( t->lastAnnounceStr, buf, sizeof( t->lastAnnounceStr ) );
         publishWarning( t, buf );
         tr_free( buf );
+    }
+    else
+    {
+        tr_strlcpy( t->lastAnnounceStr, _( "Announce failed: tracker did not respond." ), sizeof( t->lastAnnounceStr ) );
     }
 
     retry = updateAddresses( t, success );
@@ -540,7 +552,6 @@ onTrackerResponse( tr_session * session,
         /* if the announce response was a superset of the scrape response,
            treat this as both a successful announce AND scrape. */
         if( scrapeFields >= 3 ) {
-            t->lastScrapeResponse = responseCode;
             t->lastScrapeTime = now;
             t->scrapeAt = now + t->scrapeIntervalSec + t->randOffset;
         }
@@ -609,7 +620,7 @@ onScrapeResponse( tr_session * session,
 
     dbgmsg( t->name, "scrape response: %ld\n", responseCode );
     tr_ndbg( t->name, "scrape response: %ld", responseCode );
-    t->lastScrapeResponse = responseCode;
+    t->lastScrapeStr[0] = '\0';
 
     if( responseCode == HTTP_OK )
     {
@@ -677,28 +688,36 @@ onScrapeResponse( tr_session * session,
     if( 200 <= responseCode && responseCode <= 299 )
     {
         const int interval = t->scrapeIntervalSec + t->randOffset;
-        dbgmsg( t->name, "Request succeeded. Rescraping in %d seconds",
-                interval );
-        tr_ndbg( t->name, "Request succeeded. Rescraping in %d seconds",
-                 interval );
         t->scrapeAt = time( NULL ) + interval;
+
+        tr_strlcpy( t->lastScrapeStr, _( "Success" ), sizeof( t->lastScrapeStr ) );
+        tr_ndbg( t->name, "Request succeeded. Rescraping in %d seconds", interval );
     }
     else if( 300 <= responseCode && responseCode <= 399 )
     {
         const int interval = 5;
-        dbgmsg( t->name, "Got a redirect. Retrying in %d seconds", interval );
         t->scrapeAt = time( NULL ) + interval;
+
+        tr_snprintf( t->lastScrapeStr, sizeof( t->lastScrapeStr ), "Got a redirect. Retrying in %d seconds", interval );
+        tr_ndbg( t->name, "%s", t->lastScrapeStr );
     }
     else
     {
         const int interval = t->retryScrapeIntervalSec + t->randOffset;
-        dbgmsg(
-            t->name,
-            "Tracker responded to scrape with %ld. Retrying in %d seconds.",
-            responseCode,  interval );
         t->retryScrapeIntervalSec *= 2;
         t->scrapeAt = time( NULL ) + interval;
+
+        /* %1$ld - http status code, such as 404
+         * %2$s - human-readable explanation of the http status code */
+        if( !responseCode )
+            tr_strlcpy( t->lastScrapeStr, _( "Scrape failed: tracker did not respond." ), sizeof( t->lastScrapeStr ) );
+        else
+            tr_snprintf( t->lastScrapeStr, sizeof( t->lastScrapeStr ),
+                         _( "Scrape failed: tracker gave HTTP Response Code %1$ld (%2$s)" ),
+                         responseCode, tr_webGetResponseStr( responseCode ) );
     }
+
+    dbgmsg( t->name, "%s", t->lastScrapeStr );
 }
 
 /***
@@ -1078,8 +1097,6 @@ tr_trackerNew( const tr_torrent * torrent )
     t->seederCount              = -1;
     t->downloaderCount          = -1;
     t->leecherCount             = -1;
-    t->lastAnnounceResponse     = -1;
-    t->lastScrapeResponse       = -1;
     t->manualAnnounceAllowedAt  = ~(time_t)0;
     t->name                     = tr_strdup( info->name );
     t->torrentId                = torrent->uniqueId;
@@ -1239,23 +1256,6 @@ tr_trackerStat( const tr_tracker * t,
     setme->lastAnnounceTime = t->lastAnnounceTime;
     setme->nextAnnounceTime = t->reannounceAt;
     setme->manualAnnounceTime = t->manualAnnounceAllowedAt;
-
-    if( t->lastScrapeResponse == -1 ) /* never been scraped */
-        *setme->scrapeResponse = '\0';
-    else
-        tr_snprintf( setme->scrapeResponse,
-                     sizeof( setme->scrapeResponse ),
-                     "%s (%ld)",
-                     tr_webGetResponseStr( t->lastScrapeResponse ),
-                     t->lastScrapeResponse );
-
-    if( t->lastAnnounceResponse == -1 ) /* never been announced */
-        *setme->announceResponse = '\0';
-    else
-        tr_snprintf( setme->announceResponse,
-                     sizeof( setme->announceResponse ),
-                     "%s (%ld)",
-                     tr_webGetResponseStr( t->lastAnnounceResponse ),
-                     t->lastAnnounceResponse );
+    tr_strlcpy( setme->scrapeResponse, t->lastScrapeStr, sizeof( setme->scrapeResponse ) );
+    tr_strlcpy( setme->announceResponse, t->lastAnnounceStr, sizeof( setme->announceResponse ) );
 }
-
