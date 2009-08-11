@@ -130,7 +130,7 @@ get_themed_icon_pixbuf( GThemedIcon  *icon,
 		        int           size,
 		        GtkIconTheme *icon_theme )
 {
-    char        ** icon_names;
+    char        ** icon_names = NULL;
     GtkIconInfo  * icon_info;
     GdkPixbuf    * pixbuf;
     GError       * error = NULL;
