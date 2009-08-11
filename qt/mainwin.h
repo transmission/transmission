@@ -118,7 +118,7 @@ class TrMainWindow: public QMainWindow
         void toggleSpeedMode( );
         void dataReadProgress( );
         void dataSendProgress( );
-        void toggleWindows( );
+        void toggleWindows( bool doShow );
         void onSetPrefs( );
         void onSetPrefs( bool );
         void onSessionSourceChanged( );

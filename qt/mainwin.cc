@@ -227,7 +227,7 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     myTrayIcon.setIcon( QApplication::windowIcon( ) );
 
     connect( &myPrefs, SIGNAL(changed(int)), this, SLOT(refreshPref(int)) );
-    connect( ui.action_ShowMainWindow, SIGNAL(toggled(bool)), this, SLOT(toggleWindows()));
+    connect( ui.action_ShowMainWindow, SIGNAL(toggled(bool)), this, SLOT(toggleWindows(bool)));
     connect( &myTrayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
              this, SLOT(trayActivated(QSystemTrayIcon::ActivationReason)));
 
@@ -883,16 +883,31 @@ TrMainWindow :: setStatusbarVisible( bool visible )
 **/
 
 void
-TrMainWindow :: toggleWindows( )
+TrMainWindow :: toggleWindows( bool doShow )
 {
-    setVisible( !isVisible( ) );
+    if( !doShow )
+    {
+        hide( );
+    }
+    else
+    {
+        if ( !isVisible( ) ) show( );
+        if ( isMinimized( ) ) showNormal( );
+        activateWindow( );
+        raise( );
+    }
 }
 
 void
 TrMainWindow :: trayActivated( QSystemTrayIcon::ActivationReason reason )
 {
     if( reason == QSystemTrayIcon::Trigger )
-        ui.action_ShowMainWindow->toggle( );
+    {
+        if( isMinimized ( ) )
+            toggleWindows( true );
+        else
+            ui.action_ShowMainWindow->toggle( );
+    }
 }
 
 
