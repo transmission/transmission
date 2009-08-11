@@ -166,7 +166,6 @@ tr_prefs_init_defaults( tr_benc * d )
     tr_bencDictAddBool( d, PREF_KEY_DIR_WATCH_ENABLED, FALSE );
 #endif
 
-    tr_bencDictAddBool( d, PREF_KEY_LEGAL_DIALOG_ON_STARTUP, TRUE );
     tr_bencDictAddBool( d, PREF_KEY_INHIBIT_HIBERNATION, FALSE );
     tr_bencDictAddBool( d, PREF_KEY_BLOCKLIST_UPDATES_ENABLED, TRUE );
 

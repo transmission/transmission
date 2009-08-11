@@ -542,26 +542,6 @@ appsetup( TrWindow *      wind,
         gtk_window_set_skip_taskbar_hint( cbdata->wind,
                                           cbdata->icon != NULL );
     }
-
-    if( pref_flag_get( PREF_KEY_LEGAL_DIALOG_ON_STARTUP ) )
-    {
-        /* show the legal dialog */
-        GtkWidget * w = gtk_message_dialog_new( GTK_WINDOW( wind ),
-                                                GTK_DIALOG_DESTROY_WITH_PARENT,
-                                                GTK_MESSAGE_INFO,
-                                                GTK_BUTTONS_OK,
-                                                "%s",
-                                                _( "Notice for first-time users" ) );
-        gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG( w ),
-                                                  "%s",
-                                                  _( "Transmission should only be used for legal file transfers.  "
-                                                     "Please respect other peoples' property." ) );
-        g_signal_connect_swapped( w, "response", G_CALLBACK( gtk_widget_destroy ), w );
-        gtk_widget_show( w );
-
-        /* only show it once */
-        pref_flag_set( PREF_KEY_LEGAL_DIALOG_ON_STARTUP, FALSE );
-    }
 }
 
 static void
