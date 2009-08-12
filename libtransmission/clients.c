@@ -286,7 +286,7 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
         {
             tr_snprintf( buf, buflen, "CTorrent %d.%d.%02d", charint(id[3]), charint(id[4]), strint(id+5,2) );
         }
-        else if( !memcmp( id+1, "XX", 2 ) )
+        else if( !memcmp( id+1, "XC", 2 ) || !memcmp( id+1, "XX", 2 ) )
         {
             tr_snprintf( buf, buflen, "Xtorrent %d.%d (%d)", charint(id[3]), charint(id[4]), strint(id+5,2) );
         }
