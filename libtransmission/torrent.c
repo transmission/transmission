@@ -509,8 +509,7 @@ randomizeTiers( tr_info * info )
     tr_free( r );
 }
 
-static void torrentStart( tr_torrent * tor,
-                          int          reloadProgress );
+static void torrentStart( tr_torrent * tor );
 
 /**
  * Decide on a block size.  constraints:
@@ -677,7 +676,7 @@ torrentRealInit( tr_torrent * tor, const tr_ctor * ctor )
     tr_metainfoMigrate( session, &tor->info );
 
     if( doStart )
-        torrentStart( tor, FALSE );
+        torrentStart( tor );
 }
 
 tr_parse_result
@@ -1278,7 +1277,7 @@ checkAndStartCB( tr_torrent * tor )
 }
 
 static void
-torrentStart( tr_torrent * tor, int reloadProgress )
+torrentStart( tr_torrent * tor )
 {
     assert( tr_isTorrent( tor ) );
 
@@ -1287,10 +1286,6 @@ torrentStart( tr_torrent * tor, int reloadProgress )
     if( !tor->isRunning )
     {
         tr_verifyRemove( tor );
-
-        if( reloadProgress )
-            tr_torrentLoadResume( tor, TR_FR_PROGRESS, NULL );
-
         tor->isRunning = 1;
         tr_verifyAdd( tor, checkAndStartCB );
     }
@@ -1302,7 +1297,7 @@ void
 tr_torrentStart( tr_torrent * tor )
 {
     if( tr_isTorrent( tor ) )
-        torrentStart( tor, TRUE );
+        torrentStart( tor );
 }
 
 static void
