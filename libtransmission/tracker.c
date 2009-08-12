@@ -983,8 +983,17 @@ trackerPulse( void * vsession )
           && ( t->scrapeAt <= now )
           && ( trackerSupportsScrape( t, tor ) ) )
         {
-            t->scrapeAt = TR_TRACKER_BUSY;
-            enqueueScrape( session, t );
+            if( ( tor->error == TR_STAT_TRACKER_ERROR ) || ( tor->error == TR_STAT_LOCAL_ERROR ) )
+            {
+                /* keep deferring the scrape until the errors are resolved.
+                   there's no point in wasting a round trip on this torrent until then. */
+                t->scrapeAt = now + t->scrapeIntervalSec + t->randOffset;
+            }
+            else
+            {
+                t->scrapeAt = TR_TRACKER_BUSY;
+                enqueueScrape( session, t );
+            }
         }
 
         if( ( t->reannounceAt > 1 )
