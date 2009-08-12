@@ -731,10 +731,6 @@ Transmission.prototype =
 			this._periodic_refresh = null;
 		}
 	},
-	
-	scheduleFileRefresh: function() {
-		this._periodicRefreshIterations = 0;
-	},
 
 	/*--------------------------------------------
 	 * 
