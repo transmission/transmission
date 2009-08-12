@@ -2,12 +2,13 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.03">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">9G3610</string>
+		<string key="IBDocument.SystemVersion">9J61</string>
 		<string key="IBDocument.InterfaceBuilderVersion">677</string>
-		<string key="IBDocument.AppKitVersion">949.43</string>
+		<string key="IBDocument.AppKitVersion">949.46</string>
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
+			<integer value="1400"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1948,6 +1949,7 @@ zTTNVc11zYbNps3HzefOCM4ozknOac6KzqrOus7bzvvPHM88z13Pfc+ez77P38/v0ADQINBB0GHQgtCi
 									</object>
 									<string key="NSFrameSize">{468, 173}</string>
 									<reference key="NSSuperview" ref="87647552"/>
+									<reference key="NSNextKeyView" ref="675318801"/>
 									<reference key="NSDocView" ref="675318801"/>
 									<reference key="NSBGColor" ref="139722115"/>
 									<int key="NScvFlags">2</int>
@@ -1974,6 +1976,7 @@ zTTNVc11zYbNps3HzefOCM4ozknOac6KzqrOus7bzvvPHM88z13Pfc+ez77P38/v0ADQINBB0GHQgtCi
 							</object>
 							<string key="NSFrame">{{0, 23}, {468, 173}}</string>
 							<reference key="NSSuperview" ref="303120456"/>
+							<reference key="NSNextKeyView" ref="306237956"/>
 							<int key="NSsFlags">528</int>
 							<reference key="NSVScroller" ref="1068338331"/>
 							<reference key="NSHScroller" ref="365285506"/>
@@ -2678,26 +2681,6 @@ zTTNVc11zYbNps3HzefOCM4ozknOac6KzqrOus7bzvvPHM88z13Pfc+ez77P38/v0ADQINBB0GHQgtCi
 									<reference key="NSMixedImage" ref="3851078"/>
 									<int key="NSTag">4</int>
 								</object>
-								<object class="NSMenuItem" id="529318312">
-									<reference key="NSMenu" ref="335948734"/>
-									<string key="NSTitle">Rimuovi file torrent</string>
-									<string key="NSKeyEquiv"/>
-									<int key="NSKeyEquivModMask">1572864</int>
-									<int key="NSMnemonicLoc">2147483647</int>
-									<reference key="NSOnImage" ref="322614661"/>
-									<reference key="NSMixedImage" ref="3851078"/>
-									<int key="NSTag">4</int>
-								</object>
-								<object class="NSMenuItem" id="535651621">
-									<reference key="NSMenu" ref="335948734"/>
-									<string key="NSTitle">Rimuovi tutti i file</string>
-									<string key="NSKeyEquiv"/>
-									<int key="NSKeyEquivModMask">1048576</int>
-									<int key="NSMnemonicLoc">2147483647</int>
-									<reference key="NSOnImage" ref="322614661"/>
-									<reference key="NSMixedImage" ref="3851078"/>
-									<int key="NSTag">4</int>
-								</object>
 								<object class="NSMenuItem" id="135816226">
 									<reference key="NSMenu" ref="335948734"/>
 									<bool key="NSIsDisabled">YES</bool>
@@ -3140,26 +3123,6 @@ zTTNVc11zYbNps3HzefOCM4ozknOac6KzqrOus7bzvvPHM88z13Pfc+ez77P38/v0ADQINBB0GHQgtCi
 						<reference key="NSMixedImage" ref="3851078"/>
 						<int key="NSTag">4</int>
 					</object>
-					<object class="NSMenuItem" id="1022418913">
-						<reference key="NSMenu" ref="434296936"/>
-						<string key="NSTitle">Rimuovi file torrent</string>
-						<string key="NSKeyEquiv"/>
-						<int key="NSKeyEquivModMask">1572864</int>
-						<int key="NSMnemonicLoc">2147483647</int>
-						<reference key="NSOnImage" ref="322614661"/>
-						<reference key="NSMixedImage" ref="3851078"/>
-						<int key="NSTag">4</int>
-					</object>
-					<object class="NSMenuItem" id="776874527">
-						<reference key="NSMenu" ref="434296936"/>
-						<string key="NSTitle">Rimuovi tutti i file</string>
-						<string key="NSKeyEquiv"/>
-						<int key="NSKeyEquivModMask">1048576</int>
-						<int key="NSMnemonicLoc">2147483647</int>
-						<reference key="NSOnImage" ref="322614661"/>
-						<reference key="NSMixedImage" ref="3851078"/>
-						<int key="NSTag">4</int>
-					</object>
 					<object class="NSMenuItem" id="763908271">
 						<reference key="NSMenu" ref="434296936"/>
 						<bool key="NSIsDisabled">YES</bool>
@@ -3542,7 +3505,7 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 				<string key="NSExtension">NSView</string>
 			</object>
 			<object class="NSCustomView" id="793806362">
-				<reference key="NSNextResponder"/>
+				<nil key="NSNextResponder"/>
 				<int key="NSvFlags">266</int>
 				<object class="NSMutableArray" key="NSSubviews">
 					<bool key="EncodedWithXMLCoder">YES</bool>
@@ -3551,7 +3514,6 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<int key="NSvFlags">257</int>
 						<string key="NSFrame">{{357, 4}, {95, 15}}</string>
 						<reference key="NSSuperview" ref="793806362"/>
-						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSSearchFieldCell" key="NSCell" id="186597542">
 							<int key="NSCellFlags">343014976</int>
@@ -3621,7 +3583,6 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<int key="NSvFlags">268</int>
 						<string key="NSFrame">{{42, 2}, {41, 17}}</string>
 						<reference key="NSSuperview" ref="793806362"/>
-						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="724632485">
 							<int key="NSCellFlags">67239488</int>
@@ -3646,7 +3607,6 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<int key="NSvFlags">268</int>
 						<string key="NSFrame">{{143, 2}, {81, 17}}</string>
 						<reference key="NSSuperview" ref="793806362"/>
-						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="494573874">
 							<int key="NSCellFlags">67239488</int>
@@ -3667,7 +3627,6 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<int key="NSvFlags">268</int>
 						<string key="NSFrame">{{225, 2}, {53, 17}}</string>
 						<reference key="NSSuperview" ref="793806362"/>
-						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="938004552">
 							<int key="NSCellFlags">67239488</int>
@@ -3688,7 +3647,6 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<int key="NSvFlags">268</int>
 						<string key="NSFrame">{{279, 2}, {60, 17}}</string>
 						<reference key="NSSuperview" ref="793806362"/>
-						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="371449771">
 							<int key="NSCellFlags">67239488</int>
@@ -3709,7 +3667,6 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<int key="NSvFlags">268</int>
 						<string key="NSFrame">{{34, 5}, {5, 12}}</string>
 						<reference key="NSSuperview" ref="793806362"/>
-						<reference key="NSWindow"/>
 						<string key="NSOffsets">{0, 0}</string>
 						<object class="NSTextFieldCell" key="NSTitleCell">
 							<int key="NSCellFlags">67239424</int>
@@ -3732,7 +3689,6 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<int key="NSvFlags">268</int>
 						<string key="NSFrame">{{5, 4}, {26, 14}}</string>
 						<reference key="NSSuperview" ref="793806362"/>
-						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSPopUpButtonCell" key="NSCell" id="189668006">
 							<int key="NSCellFlags">-2076049856</int>
@@ -3822,7 +3778,6 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<int key="NSvFlags">268</int>
 						<string key="NSFrame">{{84, 2}, {58, 17}}</string>
 						<reference key="NSSuperview" ref="793806362"/>
-						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="745428997">
 							<int key="NSCellFlags">67239488</int>
@@ -3840,8 +3795,6 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					</object>
 				</object>
 				<string key="NSFrameSize">{457, 23}</string>
-				<reference key="NSSuperview"/>
-				<reference key="NSWindow"/>
 				<string key="NSClassName">StatusBarView</string>
 				<string key="NSExtension">NSView</string>
 			</object>
@@ -4988,14 +4941,6 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">removeDeleteTorrent:</string>
-						<reference key="source" ref="30116300"/>
-						<reference key="destination" ref="529318312"/>
-					</object>
-					<int key="connectionID">1548</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
 						<string key="label">removeNoDelete:</string>
 						<reference key="source" ref="30116300"/>
 						<reference key="destination" ref="767449940"/>
@@ -5009,14 +4954,6 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<reference key="destination" ref="46144164"/>
 					</object>
 					<int key="connectionID">1555</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">removeDeleteTorrent:</string>
-						<reference key="source" ref="30116300"/>
-						<reference key="destination" ref="1022418913"/>
-					</object>
-					<int key="connectionID">1556</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
@@ -5073,22 +5010,6 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<reference key="destination" ref="941182211"/>
 					</object>
 					<int key="connectionID">1584</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">removeDeleteDataAndTorrent:</string>
-						<reference key="source" ref="30116300"/>
-						<reference key="destination" ref="535651621"/>
-					</object>
-					<int key="connectionID">1585</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">removeDeleteDataAndTorrent:</string>
-						<reference key="source" ref="30116300"/>
-						<reference key="destination" ref="776874527"/>
-					</object>
-					<int key="connectionID">1586</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -6823,8 +6744,6 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 							<reference ref="135816226"/>
 							<reference ref="910530743"/>
 							<reference ref="698258555"/>
-							<reference ref="529318312"/>
-							<reference ref="535651621"/>
 							<reference ref="200454823"/>
 							<reference ref="117698132"/>
 							<reference ref="522160989"/>
@@ -6886,16 +6805,6 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<object class="IBObjectRecord">
 						<int key="objectID">1541</int>
 						<reference key="object" ref="698258555"/>
-						<reference key="parent" ref="335948734"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">1544</int>
-						<reference key="object" ref="529318312"/>
-						<reference key="parent" ref="335948734"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">1545</int>
-						<reference key="object" ref="535651621"/>
 						<reference key="parent" ref="335948734"/>
 					</object>
 					<object class="IBObjectRecord">
@@ -7079,8 +6988,6 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 							<reference ref="274991158"/>
 							<reference ref="767449940"/>
 							<reference ref="46144164"/>
-							<reference ref="1022418913"/>
-							<reference ref="776874527"/>
 							<reference ref="572427220"/>
 							<reference ref="897097834"/>
 							<reference ref="813229434"/>
@@ -7130,16 +7037,6 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<object class="IBObjectRecord">
 						<int key="objectID">1551</int>
 						<reference key="object" ref="46144164"/>
-						<reference key="parent" ref="434296936"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">1552</int>
-						<reference key="object" ref="1022418913"/>
-						<reference key="parent" ref="434296936"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">1553</int>
-						<reference key="object" ref="776874527"/>
 						<reference key="parent" ref="434296936"/>
 					</object>
 					<object class="IBObjectRecord">
@@ -8440,18 +8337,10 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<string>1539.ImportedFromIB2</string>
 					<string>1541.IBPluginDependency</string>
 					<string>1541.ImportedFromIB2</string>
-					<string>1544.IBPluginDependency</string>
-					<string>1544.ImportedFromIB2</string>
-					<string>1545.IBPluginDependency</string>
-					<string>1545.ImportedFromIB2</string>
 					<string>1550.IBPluginDependency</string>
 					<string>1550.ImportedFromIB2</string>
 					<string>1551.IBPluginDependency</string>
 					<string>1551.ImportedFromIB2</string>
-					<string>1552.IBPluginDependency</string>
-					<string>1552.ImportedFromIB2</string>
-					<string>1553.IBPluginDependency</string>
-					<string>1553.ImportedFromIB2</string>
 					<string>1558.IBPluginDependency</string>
 					<string>1558.ImportedFromIB2</string>
 					<string>1559.IBPluginDependency</string>
@@ -9006,7 +8895,7 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
-					<string>{{376, 427}, {293, 373}}</string>
+					<string>{{482, 467}, {352, 333}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>{{446, 528}, {293, 373}}</string>
@@ -9030,14 +8919,6 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>{{0, 974}, {400, 21}}</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<reference ref="9"/>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<reference ref="9"/>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<reference ref="9"/>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -9489,7 +9370,7 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
-					<string>{{529, 336}, {336, 273}}</string>
+					<string>{{529, 376}, {336, 233}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -9587,8 +9468,6 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 							<string>openURLEndSheet:</string>
 							<string>openURLShowSheet:</string>
 							<string>removeDeleteData:</string>
-							<string>removeDeleteDataAndTorrent:</string>
-							<string>removeDeleteTorrent:</string>
 							<string>removeNoDelete:</string>
 							<string>resumeAllTorrents:</string>
 							<string>resumeSelectedTorrents:</string>
@@ -9631,8 +9510,6 @@ ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>id</string>
-							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
