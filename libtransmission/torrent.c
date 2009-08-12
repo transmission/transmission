@@ -1323,9 +1323,11 @@ torrentRecheckDoneCB( tr_torrent * tor )
     tr_runInEventThread( tor->session, torrentRecheckDoneImpl, tor );
 }
 
-void
-tr_torrentVerify( tr_torrent * tor )
+static void
+verifyTorrent( void * vtor )
 {
+    tr_torrent * tor = vtor;
+
     assert( tr_isTorrent( tor ) );
     tr_globalLock( tor->session );
 
@@ -1343,6 +1345,13 @@ tr_torrentVerify( tr_torrent * tor )
     tr_verifyAdd( tor, torrentRecheckDoneCB );
 
     tr_globalUnlock( tor->session );
+}
+
+void
+tr_torrentVerify( tr_torrent * tor )
+{
+    if( tr_isTorrent( tor ) )
+        tr_runInEventThread( tor->session, verifyTorrent, tor );
 }
 
 static void
