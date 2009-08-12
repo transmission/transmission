@@ -256,9 +256,10 @@ compareByActivity( GtkTreeModel *           model,
                    GtkTreeIter *            b,
                    gpointer       user_data UNUSED )
 {
-    int i, aUp, aDown, bUp, bDown;
+    int i;
     tr_torrent *ta, *tb;
     const tr_stat *sa, *sb;
+    double aUp, aDown, bUp, bDown;
 
     gtk_tree_model_get( model, a, MC_SPEED_UP, &aUp,
                                   MC_SPEED_DOWN, &aDown,
@@ -269,7 +270,7 @@ compareByActivity( GtkTreeModel *           model,
                                   MC_TORRENT_RAW, &tb,
                                   -1 );
 
-    if(( i = ((aUp+aDown)-(bUp+bDown)) ))
+    if(( i = compareDouble( sa->percentDone, sb->percentDone )))
         return i;
 
     sa = tr_torrentStatCached( ta );
@@ -622,8 +623,8 @@ tr_core_init( GTypeInstance *  instance,
                       G_TYPE_STRING,    /* collated name */
                       TR_TORRENT_TYPE,  /* TrTorrent object */
                       G_TYPE_POINTER,   /* tr_torrent* */
-                      G_TYPE_INT,       /* tr_stat.pieceUploadSpeed */
-                      G_TYPE_INT,       /* tr_stat.pieceDownloadSpeed */
+                      G_TYPE_DOUBLE,    /* tr_stat.pieceUploadSpeed */
+                      G_TYPE_DOUBLE,    /* tr_stat.pieceDownloadSpeed */
                       G_TYPE_INT };     /* tr_stat.status */
 
     p = self->priv = G_TYPE_INSTANCE_GET_PRIVATE( self,
@@ -766,8 +767,8 @@ tr_core_add_torrent( TrCore     * self,
                                        MC_NAME_COLLATED, collated,
                                        MC_TORRENT,       gtor,
                                        MC_TORRENT_RAW,   tor,
-                                       MC_SPEED_UP,      (int)st->pieceUploadSpeed,
-                                       MC_SPEED_DOWN,    (int)st->pieceDownloadSpeed,
+                                       MC_SPEED_UP,      st->pieceUploadSpeed,
+                                       MC_SPEED_DOWN,    st->pieceDownloadSpeed,
                                        MC_ACTIVITY,      st->activity,
                                        -1 );
 
@@ -1035,8 +1036,8 @@ update_foreach( GtkTreeModel * model,
                 gpointer       data UNUSED )
 {
     int oldActivity, newActivity;
-    int oldUpSpeed, newUpSpeed;
-    int oldDownSpeed, newDownSpeed;
+    double oldUpSpeed, newUpSpeed;
+    double oldDownSpeed, newDownSpeed;
     const tr_stat * st;
     TrTorrent * gtor;
 
@@ -1057,8 +1058,8 @@ update_foreach( GtkTreeModel * model,
     /* updating the model triggers off resort/refresh,
        so don't do it unless something's actually changed... */
     if( ( newActivity != oldActivity ) ||
-        ( newUpSpeed != oldUpSpeed ) ||
-        ( newDownSpeed != oldDownSpeed ) )
+        ( (int)(newUpSpeed*10.0) != (int)(oldUpSpeed*10.0) ) ||
+        ( (int)(newDownSpeed*10.0) != (int)(oldDownSpeed*10.0) ) )
     {
         gtk_list_store_set( GTK_LIST_STORE( model ), iter,
                             MC_ACTIVITY, newActivity,

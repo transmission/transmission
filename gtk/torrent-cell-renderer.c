@@ -288,10 +288,10 @@ struct TorrentCellRendererPrivate
        control when the speed displays get updated.  this is done to keep
        the individual torrents' speeds and the status bar's overall speed
        in sync even if they refresh at slightly different times */
-    int upload_speed;
+    double upload_speed;
 
     /* @see upload_speed */
-    int download_speed;
+    double download_speed;
 
     gboolean minimal;
 };
@@ -720,8 +720,8 @@ torrent_cell_renderer_set_property( GObject      * object,
     switch( property_id )
     {
         case P_TORRENT:        p->tor            = g_value_get_pointer( v ); break;
-        case P_UPLOAD_SPEED:   p->upload_speed   = g_value_get_int( v ); break;
-        case P_DOWNLOAD_SPEED: p->download_speed = g_value_get_int( v ); break;
+        case P_UPLOAD_SPEED:   p->upload_speed   = g_value_get_double( v ); break;
+        case P_DOWNLOAD_SPEED: p->download_speed = g_value_get_double( v ); break;
         case P_BAR_HEIGHT:     p->bar_height     = g_value_get_int( v ); break;
         case P_MINIMAL:        p->minimal        = g_value_get_boolean( v ); break;
         default: G_OBJECT_WARN_INVALID_PROPERTY_ID( object, property_id, pspec ); break;
@@ -740,8 +740,8 @@ torrent_cell_renderer_get_property( GObject     * object,
     switch( property_id )
     {
         case P_TORRENT:        g_value_set_pointer( v, p->tor ); break;
-        case P_UPLOAD_SPEED:   g_value_set_int( v, p->upload_speed ); break;
-        case P_DOWNLOAD_SPEED: g_value_set_int( v, p->download_speed ); break;
+        case P_UPLOAD_SPEED:   g_value_set_double( v, p->upload_speed ); break;
+        case P_DOWNLOAD_SPEED: g_value_set_double( v, p->download_speed ); break;
         case P_BAR_HEIGHT:     g_value_set_int( v, p->bar_height ); break;
         case P_MINIMAL:        g_value_set_boolean( v, p->minimal ); break;
         default: G_OBJECT_WARN_INVALID_PROPERTY_ID( object, property_id, pspec ); break;
@@ -790,16 +790,16 @@ torrent_cell_renderer_class_init( TorrentCellRendererClass * klass )
                                                           G_PARAM_READWRITE ) );
 
     g_object_class_install_property( gobject_class, P_UPLOAD_SPEED,
-                                    g_param_spec_int( "piece-upload-speed", NULL,
-                                                      "tr_stat.pieceUploadSpeed",
-                                                      0, INT_MAX, 0,
-                                                      G_PARAM_READWRITE ) );
+                                    g_param_spec_double( "piece-upload-speed", NULL,
+                                                         "tr_stat.pieceUploadSpeed",
+                                                         0, INT_MAX, 0,
+                                                         G_PARAM_READWRITE ) );
 
     g_object_class_install_property( gobject_class, P_DOWNLOAD_SPEED,
-                                    g_param_spec_int( "piece-download-speed", NULL,
-                                                      "tr_stat.pieceDownloadSpeed",
-                                                      0, INT_MAX, 0,
-                                                      G_PARAM_READWRITE ) );
+                                    g_param_spec_double( "piece-download-speed", NULL,
+                                                         "tr_stat.pieceDownloadSpeed",
+                                                         0, INT_MAX, 0,
+                                                         G_PARAM_READWRITE ) );
 
     g_object_class_install_property( gobject_class, P_BAR_HEIGHT,
                                     g_param_spec_int( "bar-height", NULL,

@@ -337,8 +337,8 @@ syncAltSpeedButton( PrivateData * p )
     const gboolean b = pref_flag_get( TR_PREFS_KEY_ALT_SPEED_ENABLED );
     GtkWidget * w = p->alt_speed_button;
 
-    tr_strlspeed( u, pref_int_get( TR_PREFS_KEY_ALT_SPEED_UP ), sizeof( u ) );
-    tr_strlspeed( d, pref_int_get( TR_PREFS_KEY_ALT_SPEED_DOWN ), sizeof( d ) );
+    tr_strlspeed( u, pref_double_get( TR_PREFS_KEY_ALT_SPEED_UP ), sizeof( u ) );
+    tr_strlspeed( d, pref_double_get( TR_PREFS_KEY_ALT_SPEED_DOWN ), sizeof( d ) );
     fmt = b ? _( "Click to disable Temporary Speed Limits\n(%1$s down, %2$s up)" )
             : _( "Click to enable Temporary Speed Limits\n(%1$s down, %2$s up)" );
     g_snprintf( buf, sizeof( buf ), fmt, d, u );
@@ -1154,13 +1154,13 @@ updateSpeeds( PrivateData * p )
     if( session != NULL )
     {
         char buf[128];
-        int up=0, down=0;
+        double up=0, down=0;
         GtkTreeIter iter;
         GtkTreeModel * model = tr_core_model( p->core );
 
         if( gtk_tree_model_get_iter_first( model, &iter ) ) do
         {
-            int u, d;
+            double u, d;
             gtk_tree_model_get( model, &iter, MC_SPEED_UP, &u,
                                               MC_SPEED_DOWN, &d,
                                               -1 );
