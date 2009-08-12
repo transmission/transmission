@@ -1335,7 +1335,7 @@ verifyTorrent( void * vtor )
     tr_verifyRemove( tor );
 
     /* if the torrent's running, stop it & set the restart-after-verify flag */
-    if( tor->isRunning ) {
+    if( tor->startAfterVerify || tor->isRunning ) {
         tr_torrentStop( tor );
         tor->startAfterVerify = TRUE;
     }
