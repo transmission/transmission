@@ -1381,7 +1381,9 @@ Transmission.prototype =
 	},
 
 	removeTorrents: function( torrents ) {
-		this.remote.removeTorrents( torrents );
+		var torrent_ids = jQuery.map(torrents, function(t) { return t.id(); } );
+		var tr = this;
+		this.remote.removeTorrents( torrent_ids, function(){ tr.refreshTorrents() } );
 	},
 
 	removeTorrentsAndData: function( torrents ) {
@@ -1402,13 +1404,17 @@ Transmission.prototype =
 		this.startTorrents( [ torrent ] );
 	},
 	startTorrents: function( torrents ) {
-		this.remote.startTorrents( torrents );
+		var torrent_ids = jQuery.map(torrents, function(t) { return t.id(); } );
+		var tr = this;
+		this.remote.startTorrents( torrent_ids, function(){ tr.refreshTorrents(torrent_ids) } );
 	},
 	verifyTorrent: function( torrent ) {
 		this.verifyTorrents( [ torrent ] );
 	},
 	verifyTorrents: function( torrents ) {
-		this.remote.verifyTorrents( torrents );
+		var torrent_ids = jQuery.map(torrents, function(t) { return t.id(); } );
+		var tr = this;
+		this.remote.verifyTorrents( torrent_ids, function(){ tr.refreshTorrents(torrent_ids) } );
 	},
     
 	stopSelectedTorrents: function( ) {
@@ -1421,7 +1427,9 @@ Transmission.prototype =
 		this.stopTorrents( [ torrent ] );
 	},
 	stopTorrents: function( torrents ) {
-		this.remote.stopTorrents( torrents );
+		var torrent_ids = jQuery.map(torrents, function(t) { return t.id(); } );
+		var tr = this;
+		this.remote.stopTorrents( torrent_ids,	function(){ tr.refreshTorrents(torrent_ids )} );
 	},
 	changeFileCommand: function(command, torrent, file) {
 		this.remote.changeFileCommand(command, torrent, file)

@@ -146,28 +146,25 @@ TransmissionRemote.prototype =
 		} );
 	},
 	
-	sendTorrentCommand: function( method, torrents ) {
-		var remote = this;
+	sendTorrentActionRequests: function( method, torrent_ids, callback ) {
 		var o = {
 			method: method,
-			arguments: { ids: [ ] }
+			arguments: { ids: torrent_ids }
 		};
-		if( torrents != null )
-			for( var i=0, len=torrents.length; i<len; ++i )
-				o.arguments.ids.push( torrents[i].id() );
-		this.sendRequest( o, function( ) {
-			remote._controller.refreshTorrents();
-		} );
+
+		this.sendRequest( o, function( data ) {
+			callback();
+		});
 	},
 	
-	startTorrents: function( torrents ) {
-		this.sendTorrentCommand( 'torrent-start', torrents );
+	startTorrents: function( torrent_ids, callback ) {
+		this.sendTorrentActionRequests( 'torrent-start', torrent_ids, callback );
 	},
-	stopTorrents: function( torrents ) {
-		this.sendTorrentCommand( 'torrent-stop', torrents );
+	stopTorrents: function( torrent_ids, callback ) {
+		this.sendTorrentActionRequests( 'torrent-stop', torrent_ids, callback );
 	},
-	removeTorrents: function( torrents ) {
-		this.sendTorrentCommand( 'torrent-remove', torrents );
+	removeTorrents: function( torrent_ids, callback ) {
+		this.sendTorrentActionRequests( 'torrent-remove', torrent_ids, callback );
 	},
 	removeTorrentsAndData: function( torrents ) {
 		var remote = this;
@@ -186,8 +183,8 @@ TransmissionRemote.prototype =
 			remote._controller.refreshTorrents();
 		} );
 	},
-	verifyTorrents: function( torrents ) {
-		this.sendTorrentCommand( 'torrent-verify', torrents );
+	verifyTorrents: function( torrent_ids, callback ) {
+		this.sendTorrentActionRequests( 'torrent-verify', torrent_ids, callback );
 	},
 	addTorrentByUrl: function( url, options ) {
 		var remote = this;
