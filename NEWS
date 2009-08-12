@@ -1,5 +1,25 @@
 NEWS file for Transmission <http://www.transmissionbt.com/>
 
+1.74 (2009/08/xx)
+<http://trac.transmissionbt.com/query?milestone=1.74&group=component&groupdesc=1&order=severity>
+- All Platforms
+   + Upgrade the DHT library to version 0.8
+   + Fix bug that kept some peers from being listed in the resume file and peer exchange
+   + More helpful display between HTTP errors, tracker errors, and tracker warnings
+   + DHT now honors the bind-address-ipv4 configuration option
+   + Fix cygwin build error
+- GTK+
+   + Fix rare bug that crashed Transmission when adding torrents on certain desktops
+   + Synchronize the main window's list's torrent speeds and the statusbar speed
+   + Fix display bug in the Properties dialog's "Origin" field when multiple torrents are selected
+- Qt
+   + New Russian Translation 
+   + When Transmission was minimized, clicking on its icon in the icon tray didn't raise it.
+- Web Client
+   + When verifying a torrent, "%nan" was displayed
+   + "Pause All" only appeared to pause torrents with peers until refresh
+
+
 1.73 (2009/07/18)
 <http://trac.transmissionbt.com/query?milestone=1.73&group=component&groupdesc=1&order=severity>
 - All Platforms
