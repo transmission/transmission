@@ -23,7 +23,7 @@ extern "C" {
 
 struct tr_benc;
 
-/* FIXME(libevent2): make "response" an evbuffer and remove response_len */ 
+/* FIXME(libevent2): make "response" an evbuffer and remove response_len */
 typedef void( *tr_rpc_response_func )( tr_session      * session,
                                        const char      * response,
                                        size_t            response_len,

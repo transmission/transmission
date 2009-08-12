@@ -59,8 +59,8 @@ TransmissionRemote.prototype =
 		if( !remote._error.length )
 			remote._error = 'Server not responding';
 		
-		dialog.confirm('Connection Failed', 
-			'Could not connect to the server. You may need to reload the page to reconnect.', 
+		dialog.confirm('Connection Failed',
+			'Could not connect to the server. You may need to reload the page to reconnect.',
 			'Details',
 			'alert(remote._error);',
 			null,

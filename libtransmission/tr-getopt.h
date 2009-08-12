@@ -19,7 +19,7 @@ extern "C" {
 
 /**
  * @addtogroup utils Utilities
- * @{ 
+ * @{
  */
 
 extern int tr_optind;

@@ -341,7 +341,6 @@ tr_cryptoWeakRandInt( int upperBound )
         init = TRUE;
     }
 
-    
     val = rand( ) % upperBound;
     assert( val >= 0 );
     assert( val < upperBound );
@@ -413,6 +412,6 @@ tr_ssha1_matches( const char * source, const char * pass )
 
     tr_free( hashed );
     tr_free( salt );
-    
+
     return result;
 }

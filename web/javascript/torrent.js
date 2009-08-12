@@ -8,7 +8,7 @@
 
 function Torrent( transferListParent, fileListParent, controller, data) {
 	this.initialize( transferListParent, fileListParent, controller, data);
-} 
+}
 
 // Constants
 Torrent._StatusWaitingToCheck  = 1;
@@ -151,9 +151,9 @@ Torrent.prototype =
 	},
 	
 	/*--------------------------------------------
-	 * 
+	 *
 	 *  S E T T E R S   /   G E T T E R S
-	 * 
+	 *
 	 *--------------------------------------------*/
 	
 	/* Return the DOM element for this torrent (a <LI> element) */
@@ -226,9 +226,9 @@ Torrent.prototype =
 	},
 	
 	/*--------------------------------------------
-	 * 
+	 *
 	 *  E V E N T   F U N C T I O N S
-	 * 
+	 *
 	 *--------------------------------------------*/
 	
 	/*
@@ -298,9 +298,9 @@ Torrent.prototype =
 	},
 
 	/*--------------------------------------------
-	 * 
+	 *
 	 *  I N T E R F A C E   F U N C T I O N S
-	 * 
+	 *
 	 *--------------------------------------------*/
 	
 	refresh: function(data) {

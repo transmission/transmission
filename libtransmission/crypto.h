@@ -29,7 +29,7 @@ struct evbuffer;
 
 /**
  * @addtogroup utils Utilities
- * @{ 
+ * @{
  */
 
 typedef struct tr_crypto tr_crypto;

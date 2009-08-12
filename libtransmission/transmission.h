@@ -590,7 +590,7 @@ tr_bool  tr_sessionIsSpeedLimited     ( const tr_session *, tr_direction );
 
 
 /***
-****  Alternative speed limits that are used during scheduled times 
+****  Alternative speed limits that are used during scheduled times
 ***/
 
 void     tr_sessionSetAltSpeed        ( tr_session *, tr_direction, int KB_s );
@@ -1432,7 +1432,7 @@ typedef struct tr_stat
         Range is [0..1]
         @see tr_stat.leftUntilDone */
     float    percentDone;
-    
+
     /** The percentage of the actual ratio to the seed ratio.  This will be
         equal to 1 if the ratio is reached or the torrent is set to seed forever.
         Range is [0..1] */
@@ -1530,7 +1530,7 @@ typedef struct tr_stat
     uint64_t    haveUnchecked;
 
     /**
-     * This is a human-readable string with the last scrape's results. 
+     * This is a human-readable string with the last scrape's results.
      * 1. If an http error occurred, the response code and description is given.
      * 2. If the tracker gave an error or warning messae, that is given.
      * 3. If everything went fine, "Success" is given.

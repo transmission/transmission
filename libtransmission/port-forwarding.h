@@ -20,7 +20,7 @@
 #include "transmission.h"
 #include "net.h"
 
-/** 
+/**
  * @addtogroup port_forwarding Port Forwarding
  * @{
  */

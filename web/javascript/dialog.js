@@ -9,7 +9,7 @@
 function Dialog(){
     this.initialize();
 }
- 
+
 Dialog.prototype = {
 
     /*
@@ -36,11 +36,11 @@ Dialog.prototype = {
 
 
 
-    
+
     /*--------------------------------------------
-     * 
+     *
      *  E V E N T   F U N C T I O N S
-     * 
+     *
      *--------------------------------------------*/
 
 	hideDialog: function( )
@@ -69,11 +69,11 @@ Dialog.prototype = {
 	},
 
     /*--------------------------------------------
-     * 
+     *
      *  I N T E R F A C E   F U N C T I O N S
-     * 
+     *
      *--------------------------------------------*/
-    
+
     /*
      * Display a confirm dialog
      */
@@ -102,7 +102,7 @@ Dialog.prototype = {
 			setTimeout("$('div#dialog_container div.dialog_window').css('top', '0px');",10);
 		}
 	},
-    
+ 
     /*
      * Display an alert dialog
      */

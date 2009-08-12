@@ -64,7 +64,7 @@ class Details: public QDialog
     private:
 
         Session& mySession;
-        TorrentModel& myModel; 
+        TorrentModel& myModel;
         QSet<int> myIds;
         QTimer myTimer;
         bool myHavePendingRefresh;

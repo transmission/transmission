@@ -1435,7 +1435,7 @@ tr_bencDictChild( tr_benc * dict, size_t n, const char ** key, tr_benc ** val )
     return success;
 }
 
-void 
+void
 tr_bencMergeDicts( tr_benc * target, const tr_benc * source )
 {
     size_t i;

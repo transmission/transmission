@@ -390,7 +390,7 @@ static TR_INLINE double tr_peerIoGetPieceSpeed( const tr_peerIo * io, uint64_t n
 void      tr_peerIoSetEnabled( tr_peerIo    * io,
                                tr_direction   dir,
                                tr_bool        isEnabled );
-                       
+
 int       tr_peerIoFlush( tr_peerIo     * io,
                           tr_direction    dir,
                           size_t          byteLimit );

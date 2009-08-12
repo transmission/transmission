@@ -160,8 +160,8 @@ tr_dhtInit(tr_session *ss, tr_address * tr_addr)
 
     v[0] = 'T';
     v[1] = 'R';
-    v[2] = (SVN_REVISION_NUM >> 8) & 0xFF; 
-    v[3] = SVN_REVISION_NUM & 0xFF; 
+    v[2] = (SVN_REVISION_NUM >> 8) & 0xFF;
+    v[3] = SVN_REVISION_NUM & 0xFF;
     rc = dht_init( dht_socket, myid, (const unsigned char*)v );
     if(rc < 0)
         goto fail;

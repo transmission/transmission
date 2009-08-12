@@ -53,7 +53,7 @@ struct tr_session
     tr_bool                      isRatioLimited;
 
     tr_benc                      removedTorrents;
-    
+
     int                          umask;
 
     int                          speedLimit[2];

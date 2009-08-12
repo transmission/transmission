@@ -519,7 +519,7 @@ handle_rpc( struct evhttp_request * req,
 
     data->req = req;
     data->server = server;
-    
+
     if( req->type == EVHTTP_REQ_GET )
     {
         const char * q;
@@ -769,7 +769,7 @@ tr_rpcSetWhitelist( tr_rpc_server * server,
             tr_ninf( MY_NAME, "Adding address to whitelist: %s (And it has a '+' or '-'!  Are you using an old ACL by mistake?)", token );
         else
             tr_ninf( MY_NAME, "Adding address to whitelist: %s", token );
-        
+
         if( walk[len]=='\0' )
             break;
         walk += len + 1;

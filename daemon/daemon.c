@@ -215,7 +215,7 @@ main( int argc, char ** argv )
 
     signal( SIGINT, gotsig );
     signal( SIGTERM, gotsig );
-#ifndef WIN32 
+#ifndef WIN32
     signal( SIGQUIT, gotsig );
     signal( SIGPIPE, SIG_IGN );
     signal( SIGHUP, SIG_IGN );

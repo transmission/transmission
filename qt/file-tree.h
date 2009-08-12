@@ -150,7 +150,6 @@ class FileTreeView: public QTreeView
     private:
         FileTreeModel myModel;
         FileTreeDelegate myDelegate;
-        
 };
 
 #endif

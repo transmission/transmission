@@ -31,7 +31,7 @@
  *  This older format is kept only for reading older resume files for users
  *  who upgrade from older versions of Transmission, and may be removed
  *  after more time has passed.
- */  
+ */
 
 /***********************************************************************
  * Fast resume

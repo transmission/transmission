@@ -17,7 +17,7 @@
 #ifndef TR_UPNP_H
 #define TR_UPNP_H 1
 
-/** 
+/**
  * @addtogroup port_forwarding Port Forwarding
  * @{
  */

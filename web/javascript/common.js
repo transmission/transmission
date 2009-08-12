@@ -25,7 +25,7 @@ function testSafari3()
         var toInt = parseInt(version[i]);
         var versionField = isNaN(toInt) ? 0 : toInt;
         var minimumField = minimum[i];
-        
+
         if (versionField > minimumField) return true;
         if (versionField < minimumField) return false;
     }
@@ -108,7 +108,7 @@ function setInnerHTML( e, html )
 };
 
 /*
- *   Converts file & folder byte size values to more  
+ *   Converts file & folder byte size values to more
  *   readable values (bytes, KB, MB, GB or TB).
  *
  *   @param integer bytes
@@ -117,24 +117,24 @@ function setInnerHTML( e, html )
 Math.formatBytes = function(bytes) {
     var size;
     var unit;
-    
+
     // Terabytes (TB).
-    if ( bytes >= 1099511627776 ) { 
+    if ( bytes >= 1099511627776 ) {
         size = bytes / 1099511627776;
-		unit = ' TB'; 
-    
+		unit = ' TB';
+
     // Gigabytes (GB).
-    } else if ( bytes >= 1073741824 ) { 
+    } else if ( bytes >= 1073741824 ) {
         size = bytes / 1073741824;
 		unit = ' GB';
 
     // Megabytes (MB).
-    } else if ( bytes >= 1048576 ) { 
+    } else if ( bytes >= 1048576 ) {
         size = bytes / 1048576;
 		unit = ' MB';
 
     // Kilobytes (KB).
-    } else if ( bytes >= 1024 ) { 
+    } else if ( bytes >= 1024 ) {
         size = bytes / 1024;
 		unit = ' KB';
 
@@ -145,12 +145,12 @@ Math.formatBytes = function(bytes) {
     }
 	
 	// Single-digit numbers have greater precision
-	var precision = 1; 
+	var precision = 1;
 	if (size < 10) {
 	    precision = 2;
 	}
 	size = Math.roundWithPrecision(size, precision);
-    
+
 	// Add the decimal if this is an integer
 	if ((size % 1) == 0 && unit != ' bytes') {
 		size = size + '.0';
@@ -172,14 +172,14 @@ Math.formatSeconds = function(seconds)
 	var days = Math.floor(seconds / 86400);
 	var hours = Math.floor((seconds % 86400) / 3600);
 	var minutes = Math.floor((seconds % 3600) / 60);
-	var seconds = Math.floor((seconds % 3600) % 60);    
+	var seconds = Math.floor((seconds % 3600) % 60);
 
 	if (days > 0 && hours == 0)
 		result = days + ' days';
 	else if (days > 0 && hours > 0)
 		result = days + ' days ' + hours + ' hr';
 	else if (hours > 0 && minutes == 0)
-		result = hours + ' hr';   
+		result = hours + ' hr';
 	else if (hours > 0 && minutes > 0)
 		result = hours + ' hr ' + minutes + ' min';
 	else if (minutes > 0 && seconds == 0)
@@ -187,7 +187,7 @@ Math.formatSeconds = function(seconds)
 	else if (minutes > 0 && seconds > 0)
 		result = minutes + ' min ' + seconds + ' seconds';
 	else
-		result = seconds + ' seconds';  
+		result = seconds + ' seconds';
 
 	return result;
 };
@@ -205,7 +205,7 @@ Math.formatTimestamp = function(seconds) {
 };
 
 /*
- *   Round a float to a specified number of decimal 
+ *   Round a float to a specified number of decimal
  *   places, stripping trailing zeroes
  *
  *   @param float floatnum

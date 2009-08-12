@@ -39,7 +39,7 @@
   #undef read
  #endif
  #define read  _read
- 
+
  #if defined(write)
   #undef write
  #endif

@@ -43,7 +43,7 @@
 
 #include <QtGui/QIcon>
 
-// This is the QtIconLoader 
+// This is the QtIconLoader
 // Version 0.1
 //
 
