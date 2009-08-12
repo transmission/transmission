@@ -375,7 +375,7 @@ void tr_sha1_to_hex( char *          out,
                      const uint8_t * sha1 );
 
 
-int  tr_httpIsValidURL( const char * url );
+tr_bool tr_httpIsValidURL( const char * url );
 
 int  tr_httpParseURL( const char * url,
                       int          url_len,

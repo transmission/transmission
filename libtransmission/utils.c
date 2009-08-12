@@ -923,10 +923,10 @@ tr_sha1_to_hex( char *          out,
 ****
 ***/
 
-int
+tr_bool
 tr_httpIsValidURL( const char * url )
 {
-    const char *        c;
+    const char * c;
     static const char * rfc2396_valid_chars =
         "abcdefghijklmnopqrstuvwxyz" /* lowalpha */
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ" /* upalpha */
@@ -943,7 +943,7 @@ tr_httpIsValidURL( const char * url )
         if( !strchr( rfc2396_valid_chars, *c ) )
             return FALSE;
 
-    return !tr_httpParseURL( url, -1, NULL, NULL, NULL );
+    return tr_httpParseURL( url, -1, NULL, NULL, NULL ) == 0;
 }
 
 int
