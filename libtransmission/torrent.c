@@ -1332,9 +1332,15 @@ torrentRecheckDoneImpl( void * vtor )
     assert( tr_isTorrent( tor ) );
     tr_torrentRecheckCompleteness( tor );
 
-    if( tor->startAfterVerify )
+    if( tor->preVerifyTotal && !tr_cpHaveTotal( &tor->completion ) )
+    {
+        tr_torrentSetLocalError( tor, _( "Can't find local data.  Try \"Set Location\" to find it, or restart the torrent to re-download." ) );
+        tr_torrentStop( tor );
+    }
+    else if( tor->startAfterVerify )
     {
         tor->startAfterVerify = FALSE;
+
         tr_torrentStart( tor );
     }
 }
@@ -1365,6 +1371,7 @@ verifyTorrent( void * vtor )
     }
 
     /* add the torrent to the recheck queue */
+    tor->preVerifyTotal = tr_cpHaveTotal( &tor->completion );
     tr_torrentUncheck( tor );
     tr_verifyAdd( tor, torrentRecheckDoneCB );
 
