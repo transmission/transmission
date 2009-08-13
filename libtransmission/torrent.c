@@ -1269,7 +1269,7 @@ checkAndStartImpl( void * vtor )
         stop the torrent and log an error. */
     if( tor->preVerifyTotal && !tr_cpHaveTotal( &tor->completion ) )
     {
-        tr_torrentSetLocalError( tor, "Can't find local data.  Try \"Set Location\" to find it, or restart the torrent to re-download." );
+        tr_torrentSetLocalError( tor, _( "Can't find local data.  Try \"Set Location\" to find it, or restart the torrent to re-download." ) );
         tr_torrentStop( tor );
     }
     else
