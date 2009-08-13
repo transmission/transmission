@@ -502,6 +502,7 @@ render_minimal( TorrentCellRenderer   * cell,
     const tr_stat * st = tr_torrentStatCached( (tr_torrent*)tor );
     const gboolean active = st->activity != TR_STATUS_STOPPED;
     const double percentDone = MAX( 0.0, st->percentDone );
+    const gboolean sensitive = active || st->error;
 
     icon = get_icon( tor, MINIMAL_ICON_SIZE, widget );
     name = tr_torrentInfo( tor )->name;
@@ -555,13 +556,13 @@ render_minimal( TorrentCellRenderer   * cell,
     *** RENDER
     **/
 
-    g_object_set( p->icon_renderer, "pixbuf", icon, "sensitive", active, NULL );
+    g_object_set( p->icon_renderer, "pixbuf", icon, "sensitive", sensitive, NULL );
     gtk_cell_renderer_render( p->icon_renderer, window, widget, &icon_area, &icon_area, &icon_area, flags );
-    g_object_set( text_renderer, "text", status, "scale", SMALL_SCALE, "sensitive", active, "ellipsize", PANGO_ELLIPSIZE_END, NULL );
+    g_object_set( text_renderer, "text", status, "scale", SMALL_SCALE, "sensitive", sensitive, "ellipsize", PANGO_ELLIPSIZE_END, NULL );
     gtk_cell_renderer_render( text_renderer, window, widget, &stat_area, &stat_area, &stat_area, flags );
     g_object_set( text_renderer, "text", name, "scale", 1.0, NULL );
     gtk_cell_renderer_render( text_renderer, window, widget, &name_area, &name_area, &name_area, flags );
-    g_object_set( p->progress_renderer, "value", (int)(percentDone*100.0), "text", "", "sensitive", active, NULL );
+    g_object_set( p->progress_renderer, "value", (int)(percentDone*100.0), "text", "", "sensitive", sensitive, NULL );
     gtk_cell_renderer_render( p->progress_renderer, window, widget, &prog_area, &prog_area, &prog_area, flags );
 
     /* cleanup */
@@ -597,6 +598,7 @@ render_full( TorrentCellRenderer   * cell,
     const tr_info * inf = tr_torrentInfo( tor );
     const gboolean active = st->activity != TR_STATUS_STOPPED;
     const double percentDone = MAX( 0.0, st->percentDone );
+    const gboolean sensitive = active || st->error;
 
     icon = get_icon( tor, FULL_ICON_SIZE, widget );
     name = inf->name;
@@ -661,13 +663,13 @@ render_full( TorrentCellRenderer   * cell,
     *** RENDER
     **/
 
-    g_object_set( p->icon_renderer, "pixbuf", icon, "sensitive", active, NULL );
+    g_object_set( p->icon_renderer, "pixbuf", icon, "sensitive", sensitive, NULL );
     gtk_cell_renderer_render( p->icon_renderer, window, widget, &icon_area, &icon_area, &icon_area, flags );
-    g_object_set( text_renderer, "text", name, "scale", 1.0, "sensitive", active, "ellipsize", PANGO_ELLIPSIZE_END, "weight", PANGO_WEIGHT_BOLD, NULL );
+    g_object_set( text_renderer, "text", name, "scale", 1.0, "sensitive", sensitive, "ellipsize", PANGO_ELLIPSIZE_END, "weight", PANGO_WEIGHT_BOLD, NULL );
     gtk_cell_renderer_render( text_renderer, window, widget, &name_area, &name_area, &name_area, flags );
     g_object_set( text_renderer, "text", progress, "scale", SMALL_SCALE, "weight", PANGO_WEIGHT_NORMAL, NULL );
     gtk_cell_renderer_render( text_renderer, window, widget, &prog_area, &prog_area, &prog_area, flags );
-    g_object_set( p->progress_renderer, "value", (int)(percentDone*100.0), "text", "", "sensitive", active, NULL );
+    g_object_set( p->progress_renderer, "value", (int)(percentDone*100.0), "text", "", "sensitive", sensitive, NULL );
     gtk_cell_renderer_render( p->progress_renderer, window, widget, &prct_area, &prct_area, &prct_area, flags );
     g_object_set( text_renderer, "text", status, NULL );
     gtk_cell_renderer_render( text_renderer, window, widget, &stat_area, &stat_area, &stat_area, flags );
