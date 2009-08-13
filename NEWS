@@ -3,8 +3,9 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 1.74 (2009/08/xx)
 <http://trac.transmissionbt.com/query?milestone=1.74&group=component&groupdesc=1&order=severity>
 - All Platforms
-   + If a downloaded file disappears, stop the torrent instead of redownloading it
-   + Fix bug that kept some peers from being listed in the resume file and peer exchange
+   + Better data recovery in the case of an OS or Transmission crash
+   + If a downloaded file is moved, stop the torrent instead of redownloading it
+   + Fix bug that kept some peers from being listed in the resume file and PEX
    + Make torrent error messages more descriptive and helpful
    + Upgrade the DHT library to version 0.8
    + DHT now honors the bind-address-ipv4 configuration option
@@ -14,12 +15,12 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Connections to original torrent files are no longer maintained
    + Queuing system will not exclude transfers with tracker warnings
 - GTK+
-   + Fix rare bug that crashed Transmission when adding torrents on certain desktops
-   + Synchronize the main window's list's torrent speeds and the statusbar speed
-   + Fix display bug in the Properties dialog's "Origin" field when multiple torrents are selected
+   + Fix rare crash that occurred when adding torrents on some desktops
+   + Synchronize the statusbar's and torrent list's speeds
+   + Fix the Properties dialog's "Origin" field for multiple torrents
 - Qt
    + New Russian Translation 
-   + When Transmission was minimized, clicking on its icon in the icon tray didn't raise it.
+   + If Transmission was minimized, clicking on it the icon tray didn't raise it
 - Web Client
    + Progress bar shows seeding progress
    + When verifying a torrent, "%nan" was displayed
