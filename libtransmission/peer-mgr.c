@@ -1164,27 +1164,16 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
         }
 
         case TR_PEER_ERROR:
-            if( e->err == EINVAL )
-            {
-                addStrike( t, peer );
-                peer->doPurge = 1;
-                tordbg( t, "setting %s doPurge flag because we got an EINVAL error", tr_peerIoAddrStr( &peer->addr, peer->port ) );
-            }
-            else if( ( e->err == ERANGE )
-                  || ( e->err == EMSGSIZE )
-                  || ( e->err == ENOTCONN ) )
+            if( ( e->err == ERANGE ) || ( e->err == EMSGSIZE ) || ( e->err == ENOTCONN ) )
             {
                 /* some protocol error from the peer */
                 peer->doPurge = 1;
-                tordbg( t, "setting %s doPurge flag because we got an ERANGE, EMSGSIZE, or ENOTCONN error", tr_peerIoAddrStr( &peer->addr, peer->port ) );
+                tordbg( t, "setting %s doPurge flag because we got an ERANGE, EMSGSIZE, or ENOTCONN error",
+                        tr_peerIoAddrStr( &peer->addr, peer->port ) );
             }
-            else /* a local error, such as an IO error */
+            else 
             {
-                t->tor->error = TR_STAT_LOCAL_ERROR;
-                tr_strlcpy( t->tor->errorString,
-                            tr_strerror( e->err ),
-                            sizeof( t->tor->errorString ) );
-                tr_torrentStop( t->tor );
+                tordbg( t, "unhandled error: %s", tr_strerror( e->err ) );
             }
             break;
 
@@ -2614,6 +2603,12 @@ bandwidthPulse( void * vmgr )
             tr_torrentCheckSeedRatio( tor );
         }
     }
+
+    /* possibly stop torrents that have an error */
+    tor = NULL;
+    while(( tor = tr_torrentNext( mgr->session, tor )))
+        if( tor->isRunning && (( tor->error == TR_STAT_TRACKER_ERROR ) || ( tor->error == TR_STAT_LOCAL_ERROR )))
+            tr_torrentStop( tor );
 
     managerUnlock( mgr );
     return TRUE;

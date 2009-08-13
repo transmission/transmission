@@ -20,7 +20,7 @@
 #include "completion.h" /* tr_completion */
 #include "ratecontrol.h" /* tr_ratecontrol */
 #include "session.h" /* tr_globalLock(), tr_globalUnlock() */
-#include "utils.h" /* tr_bitfield */
+#include "utils.h" /* TR_GNUC_PRINTF */
 
 struct tr_bandwidth;
 struct tr_ratecontrol;
@@ -120,6 +120,8 @@ void             tr_torrentCheckSeedRatio( tr_torrent * tor );
 
 /** save a torrent's .resume file if it's changed since the last time it was saved */
 void             tr_torrentSave( tr_torrent * tor );
+
+void             tr_torrentSetLocalError( tr_torrent * tor, const char * fmt, ... ) TR_GNUC_PRINTF( 2, 3 );
 
 
 

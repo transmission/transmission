@@ -1347,12 +1347,7 @@ readBtPiece( tr_peermsgs      * msgs,
         msgs->incoming.block = evbuffer_new( );
         req->length = 0;
         msgs->state = AWAITING_BT_LENGTH;
-        if( !err )
-            return READ_NOW;
-        else {
-            fireError( msgs, err );
-            return READ_ERR;
-        }
+        return err ? READ_ERR : READ_NOW;
     }
 }
 
@@ -1764,7 +1759,6 @@ fillOutputBuffer( tr_peermsgs * msgs, time_t now )
 
             if( err )
             {
-                fireError( msgs, err );
                 bytesWritten = 0;
                 msgs = NULL;
             }

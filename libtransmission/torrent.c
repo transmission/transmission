@@ -18,6 +18,7 @@
 #include <assert.h>
 #include <limits.h> /* INT_MAX */
 #include <math.h> /* fabs */
+#include <stdarg.h>
 #include <string.h> /* memcmp */
 #include <stdlib.h> /* qsort */
 
@@ -262,10 +263,23 @@ tr_torrentGetSeedRatio( const tr_torrent * tor, double * ratio )
 ****
 ***/
 
+void
+tr_torrentSetLocalError( tr_torrent * tor, const char * fmt, ... )
+{
+    va_list ap;
+
+    assert( tr_isTorrent( tor ) );
+
+    va_start( ap, fmt );
+    tor->error = TR_STAT_LOCAL_ERROR;
+    evutil_vsnprintf( tor->errorString, sizeof( tor->errorString ), fmt, ap );
+    va_end( ap );
+}
+
 static void
 onTrackerResponse( void * tracker UNUSED,
-                   void *         vevent,
-                   void *         user_data )
+                   void * vevent,
+                   void * user_data )
 {
     tr_torrent *       tor = user_data;
     tr_tracker_event * event = vevent;

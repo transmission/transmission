@@ -28,21 +28,21 @@ struct tr_torrent;
  * Reads the block specified by the piece index, offset, and length.
  * @return 0 on success, or an errno value on failure.
  */
-int tr_ioRead( const struct tr_torrent * tor,
-               tr_piece_index_t          pieceIndex,
-               uint32_t                  offset,
-               uint32_t                  len,
-               uint8_t *                 setme );
+int tr_ioRead( struct tr_torrent   * tor,
+               tr_piece_index_t      pieceIndex,
+               uint32_t              offset,
+               uint32_t              len,
+               uint8_t             * setme );
 
 /**
  * Writes the block specified by the piece index, offset, and length.
  * @return 0 on success, or an errno value on failure.
  */
-int tr_ioWrite( const struct tr_torrent * tor,
-                tr_piece_index_t          pieceIndex,
-                uint32_t                  offset,
-                uint32_t                  len,
-                const uint8_t *           writeme );
+int tr_ioWrite( struct tr_torrent  * tor,
+                tr_piece_index_t     pieceIndex,
+                uint32_t             offset,
+                uint32_t             len,
+                const uint8_t      * writeme );
 
 /**
  * @brief Test to see if the piece matches its metainfo's SHA1 checksum.
@@ -51,7 +51,7 @@ int tr_ioWrite( const struct tr_torrent * tor,
  *                       get best performance by providing a buffer with
  *                       tor->info.pieceSize bytes.
  */
-tr_bool tr_ioTestPiece( const tr_torrent * tor,
+tr_bool tr_ioTestPiece( tr_torrent       * tor,
                         tr_piece_index_t   piece,
                         void             * optionalBuffer,
                         size_t             optionalBufferLen );

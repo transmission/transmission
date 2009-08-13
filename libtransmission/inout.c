@@ -155,11 +155,11 @@ tr_ioFindFileLocation( const tr_torrent * tor,
 
 /* returns 0 on success, or an errno on failure */
 static int
-readOrWritePiece( const tr_torrent * tor,
+readOrWritePiece( tr_torrent       * tor,
                   int                ioMode,
                   tr_piece_index_t   pieceIndex,
                   uint32_t           pieceOffset,
-                  uint8_t *          buf,
+                  uint8_t          * buf,
                   size_t             buflen )
 {
     int             err = 0;
@@ -185,27 +185,33 @@ readOrWritePiece( const tr_torrent * tor,
         buflen -= bytesThisPass;
         ++fileIndex;
         fileOffset = 0;
+
+        if( err ) {
+            char * path = tr_buildPath( tor->downloadDir, file->name, NULL );
+            tr_torrentSetLocalError( tor, "%s (%s)", tr_strerror( err ), path );
+            tr_free( path );
+        }
     }
 
     return err;
 }
 
 int
-tr_ioRead( const tr_torrent * tor,
+tr_ioRead( tr_torrent       * tor,
            tr_piece_index_t   pieceIndex,
            uint32_t           begin,
            uint32_t           len,
-           uint8_t *          buf )
+           uint8_t          * buf )
 {
     return readOrWritePiece( tor, TR_IO_READ, pieceIndex, begin, buf, len );
 }
 
 int
-tr_ioWrite( const tr_torrent * tor,
+tr_ioWrite( tr_torrent       * tor,
             tr_piece_index_t   pieceIndex,
             uint32_t           begin,
             uint32_t           len,
-            const uint8_t *    buf )
+            const uint8_t    * buf )
 {
     return readOrWritePiece( tor, TR_IO_WRITE, pieceIndex, begin,
                              (uint8_t*)buf,
@@ -217,11 +223,11 @@ tr_ioWrite( const tr_torrent * tor,
 ****/
 
 static tr_bool
-recalculateHash( const tr_torrent * tor,
+recalculateHash( tr_torrent       * tor,
                  tr_piece_index_t   pieceIndex,
                  void             * buffer,
                  size_t             buflen,
-                 uint8_t *          setme )
+                 uint8_t          * setme )
 {
     size_t   bytesLeft;
     uint32_t offset = 0;
@@ -263,7 +269,7 @@ recalculateHash( const tr_torrent * tor,
 }
 
 tr_bool
-tr_ioTestPiece( const tr_torrent  * tor,
+tr_ioTestPiece( tr_torrent        * tor,
                 tr_piece_index_t    pieceIndex,
                 void              * buffer,
                 size_t              buflen )
