@@ -223,7 +223,7 @@ getStatusString( const tr_stat * torStat,
     {
         const char * fmt[] = { NULL, N_( "Tracker gave a warning: \"%s\"" ),
                                      N_( "Tracker gave an error: \"%s\"" ),
-                                     N_( "Error: \"%s\"" ) };
+                                     N_( "Error: %s" ) };
         g_string_append_printf( gstr, _( fmt[torStat->error] ), torStat->errorString );
     }
     else switch( torStat->activity )
