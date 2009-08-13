@@ -3,11 +3,14 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 1.74 (2009/08/xx)
 <http://trac.transmissionbt.com/query?milestone=1.74&group=component&groupdesc=1&order=severity>
 - All Platforms
-   + Upgrade the DHT library to version 0.8
+   + If a downloaded file disappears, stop the torrent instead of redownloading it
    + Fix bug that kept some peers from being listed in the resume file and peer exchange
-   + More helpful display between HTTP errors, tracker errors, and tracker warnings
+   + Make torrent error messages more descriptive and helpful
+   + Upgrade the DHT library to version 0.8
    + DHT now honors the bind-address-ipv4 configuration option
    + Fix cygwin build error
+- Mac
+   + Queuing system should distinguish between tracker errors and http warnings
 - GTK+
    + Fix rare bug that crashed Transmission when adding torrents on certain desktops
    + Synchronize the main window's list's torrent speeds and the statusbar speed
