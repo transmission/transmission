@@ -51,7 +51,7 @@
      <x>0</x>
      <y>0</y>
      <width>792</width>
-     <height>23</height>
+     <height>25</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -99,7 +99,6 @@
     <property name="title">
      <string>&amp;Help</string>
     </property>
-    <addaction name="action_ShowMessageLog"/>
     <addaction name="action_Statistics"/>
     <addaction name="separator"/>
     <addaction name="action_Contents"/>
