@@ -251,9 +251,9 @@ compareByRatio( GtkTreeModel  * model,
 }
 
 static int
-compareByActivity( GtkTreeModel *           model,
-                   GtkTreeIter *            a,
-                   GtkTreeIter *            b,
+compareByActivity( GtkTreeModel * model,
+                   GtkTreeIter  * a,
+                   GtkTreeIter  * b,
                    gpointer       user_data UNUSED )
 {
     int i;
@@ -270,7 +270,7 @@ compareByActivity( GtkTreeModel *           model,
                                   MC_TORRENT_RAW, &tb,
                                   -1 );
 
-    if(( i = compareDouble( sa->percentDone, sb->percentDone )))
+    if(( i = compareDouble( aUp+aDown, bUp+bDown )))
         return i;
 
     sa = tr_torrentStatCached( ta );
