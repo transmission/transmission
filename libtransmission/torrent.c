@@ -1259,24 +1259,33 @@ freeTorrent( tr_torrent * tor )
 static void
 checkAndStartImpl( void * vtor )
 {
-    time_t now;
     tr_torrent * tor = vtor;
 
     assert( tr_isTorrent( tor ) );
 
     tr_globalLock( tor->session );
 
-    now = time( NULL );
-    tor->isRunning = TRUE;
-    tor->needsSeedRatioCheck = TRUE;
-    tor->error = TR_STAT_OK;
-    tor->errorString[0] = '\0';
-    tor->completeness = tr_cpGetStatus( &tor->completion );
-    tor->startDate = tor->anyDate = now;
-    tr_torrentResetTransferStats( tor );
-    tr_trackerStart( tor->tracker );
-    tor->dhtAnnounceAt = now + tr_cryptoWeakRandInt( 20 );
-    tr_peerMgrStartTorrent( tor );
+    /** If we had local data before, but it's disappeared,
+        stop the torrent and log an error. */
+    if( tor->preVerifyTotal && !tr_cpHaveTotal( &tor->completion ) )
+    {
+        tr_torrentSetLocalError( tor, "Can't find local data.  Try \"Set Location\" to find it, or restart the torrent to re-download." );
+        tr_torrentStop( tor );
+    }
+    else
+    {
+        const time_t now = time( NULL );
+        tor->isRunning = TRUE;
+        tor->needsSeedRatioCheck = TRUE;
+        tor->error = TR_STAT_OK;
+        tor->errorString[0] = '\0';
+        tor->completeness = tr_cpGetStatus( &tor->completion );
+        tor->startDate = tor->anyDate = now;
+        tr_torrentResetTransferStats( tor );
+        tr_trackerStart( tor->tracker );
+        tor->dhtAnnounceAt = now + tr_cryptoWeakRandInt( 20 );
+        tr_peerMgrStartTorrent( tor );
+    }
 
     tr_globalUnlock( tor->session );
 }
@@ -1301,6 +1310,7 @@ torrentStart( tr_torrent * tor )
     {
         tr_verifyRemove( tor );
         tor->isRunning = 1;
+        tor->preVerifyTotal = tr_cpHaveTotal( &tor->completion );
         tr_verifyAdd( tor, checkAndStartCB );
     }
 

@@ -228,6 +228,8 @@ struct tr_torrent
 
     double                     desiredRatio;
     tr_ratiolimit              ratioLimitMode;
+
+    uint64_t                   preVerifyTotal;
 };
 
 /* get the index of this piece's first block */
