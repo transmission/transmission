@@ -47,6 +47,12 @@
 #include "version.h"
 #include "web.h"
 
+enum
+{
+    SAVE_INTERVAL_SECS = 120
+};
+
+
 #define dbgmsg( ... ) \
     do { \
         if( tr_deepLoggingIsActive( ) ) \
@@ -530,6 +536,31 @@ tr_sessionSaveSettings( tr_session    * session,
     tr_bencFree( &settings );
 }
 
+/***
+****
+***/
+
+/**
+ * Periodically save the .resume files of any torrents whose
+ * status has recently changed.  This prevents loss of metadata
+ * in the case of a crash, unclean shutdown, clumsy user, etc.
+ */
+static void
+onSaveTimer( int foo UNUSED, short bar UNUSED, void * vsession )
+{
+    tr_torrent * tor = NULL;
+    tr_session * session = vsession;
+
+    while(( tor = tr_torrentNext( session, tor )))
+        tr_torrentSave( tor );
+
+    tr_timerAdd( session->saveTimer, SAVE_INTERVAL_SECS, 0 );
+}
+
+/***
+****
+***/
+
 static void tr_sessionInitImpl( void * );
 static void onAltTimer( int, short, void* );
 static void setAltTimer( tr_session * session );
@@ -833,6 +864,10 @@ tr_sessionInitImpl( void * vdata )
     session->altTimer = tr_new0( struct event, 1 );
     evtimer_set( session->altTimer, onAltTimer, session );
     setAltTimer( session );
+
+    session->saveTimer = tr_new0( struct event, 1 );
+    evtimer_set( session->saveTimer, onSaveTimer, session );
+    tr_timerAdd( session->saveTimer, SAVE_INTERVAL_SECS, 0 );
 
     /* first %s is the application name
        second %s is the version number */
@@ -1422,6 +1457,10 @@ sessionCloseImpl( void * vsession )
 
     if( session->isDHTEnabled )
         tr_dhtUninit( session );
+
+    evtimer_del( session->saveTimer );
+    tr_free( session->saveTimer );
+    session->saveTimer = NULL;
 
     evtimer_del( session->altTimer );
     tr_free( session->altTimer );

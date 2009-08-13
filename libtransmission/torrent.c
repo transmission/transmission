@@ -1354,6 +1354,17 @@ tr_torrentVerify( tr_torrent * tor )
         tr_runInEventThread( tor->session, verifyTorrent, tor );
 }
 
+void
+tr_torrentSave( tr_torrent * tor )
+{
+    assert( tr_isTorrent( tor ) );
+
+    if( tor->isDirty ) {
+        tor->isDirty = FALSE;
+        tr_torrentSaveResume( tor );
+    }
+}
+
 static void
 stopTorrent( void * vtor )
 {
@@ -1367,11 +1378,8 @@ stopTorrent( void * vtor )
 
     tr_fdTorrentClose( tor->uniqueId );
 
-    if( tor->isDirty ) {
-        tor->isDirty = 0;
-        if( !tor->isDeleting )
-            tr_torrentSaveResume( tor );
-    }
+    if( !tor->isDeleting )
+        tr_torrentSave( tor );
 }
 
 void

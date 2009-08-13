@@ -118,6 +118,9 @@ tr_torrent*      tr_torrentNext( tr_session  * session,
 
 void             tr_torrentCheckSeedRatio( tr_torrent * tor );
 
+/** save a torrent's .resume file if it's changed since the last time it was saved */
+void             tr_torrentSave( tr_torrent * tor );
+
 
 
 typedef enum
