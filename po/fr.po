@@ -14,14 +14,14 @@ msgstr ""
 "Project-Id-Version: Transmission\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-07-13 16:23-0500\n"
-"PO-Revision-Date: 2009-07-10 22:49+0000\n"
+"PO-Revision-Date: 2009-08-02 20:17+0000\n"
 "Last-Translator: Damien Haïkal <Unknown>\n"
 "Language-Team: GNOME French Team <gnomefr@traduc.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2009-07-17 19:25+0000\n"
+"X-Launchpad-Export-Date: 2009-08-13 23:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:49
@@ -34,11 +34,11 @@ msgstr "Trier par _nom"
 
 #: ../gtk/actions.c:51
 msgid "Sort by _Progress"
-msgstr "Trier par a_vancement"
+msgstr "Trier par _progression"
 
 #: ../gtk/actions.c:55
 msgid "Sort by A_ge"
-msgstr "Trier par a_ge"
+msgstr "Trier par â_ge"
 
 #: ../gtk/actions.c:74
 msgid "_Main Window"
@@ -46,11 +46,11 @@ msgstr "Fenêtre _principale"
 
 #: ../gtk/actions.c:75
 msgid "Message _Log"
-msgstr "_Journal des messages"
+msgstr "Journa_l des messages"
 
 #: ../gtk/actions.c:91
 msgid "_Minimal View"
-msgstr "Affichage _compact"
+msgstr "Affichage co_mpact"
 
 #: ../gtk/actions.c:93
 msgid "_Filterbar"
@@ -62,7 +62,7 @@ msgstr "Barre d'é_tat"
 
 #: ../gtk/actions.c:95
 msgid "_Toolbar"
-msgstr "Barre d'_outils"
+msgstr "Barre d'ou_tils"
 
 #: ../gtk/actions.c:100
 msgid "_Torrent"
@@ -74,7 +74,7 @@ msgstr "_Affichage"
 
 #: ../gtk/actions.c:102
 msgid "_Sort Torrents By"
-msgstr "_Trier les torrents par"
+msgstr "Trier les torrent_s par"
 
 #: ../gtk/actions.c:103
 msgid "_Edit"
@@ -174,7 +174,7 @@ msgstr "_Sommaire"
 
 #: ../gtk/actions.c:125
 msgid "Ask Tracker for _More Peers"
-msgstr "Demander _plus de pairs au pisteur"
+msgstr "Demander _plus de pairs au traqueur"
 
 #: ../gtk/add-dialog.c:241
 msgid "Torrent files"
@@ -423,7 +423,7 @@ msgstr "En cours"
 
 #: ../gtk/details.c:1792 ../gtk/makemeta-ui.c:425
 msgid "Trackers"
-msgstr "Pisteurs"
+msgstr "Traqueurs"
 
 #: ../gtk/details.c:1799
 msgid "Scrape"
@@ -435,7 +435,7 @@ msgstr "Dernier scrape :"
 
 #: ../gtk/details.c:1806 ../gtk/details.c:1828
 msgid "Tracker responded:"
-msgstr "Réponse du pisteur :"
+msgstr "Réponse du traqueur :"
 
 #: ../gtk/details.c:1811
 msgid "Next scrape in:"
@@ -447,7 +447,7 @@ msgstr "Annonce"
 
 #: ../gtk/details.c:1821
 msgid "Tracker:"
-msgstr "Pisteur :"
+msgstr "Traqueur :"
 
 #: ../gtk/details.c:1823
 msgid "Last announce at:"
@@ -473,7 +473,7 @@ msgstr "Pairs"
 
 #: ../gtk/details.c:1922 ../gtk/tr-prefs.c:961 ../gtk/tr-window.c:848
 msgid "Tracker"
-msgstr "Pisteur"
+msgstr "Traqueur"
 
 #: ../gtk/details.c:1927 ../gtk/tr-window.c:848
 msgid "Files"
@@ -581,7 +581,7 @@ msgstr "<b>Fermeture des connexions</b>"
 
 #: ../gtk/main.c:703
 msgid "Sending upload/download totals to tracker..."
-msgstr "Envoi au pisteur des totaux d'émission et de réception..."
+msgstr "Envoi au traqueur des totaux d'émission et de réception..."
 
 #: ../gtk/main.c:708
 msgid "_Quit Now"
@@ -632,6 +632,8 @@ msgstr ""
 "  Clément DREHER https://launchpad.net/~cdreher\n"
 "  Cyril GRAGEON https://launchpad.net/~cyril-g\n"
 "  Damien Haïkal https://launchpad.net/~damien-haikal\n"
+"  Denis Jasselette https://launchpad.net/~denis-jasselette\n"
+"  Emilien Klein https://launchpad.net/~emilien-klein\n"
 "  Eric https://launchpad.net/~1eric\n"
 "  Francis Careau https://launchpad.net/~francis-careau\n"
 "  Francois Magimel https://launchpad.net/~linkid\n"
@@ -644,6 +646,7 @@ msgstr ""
 "  Loic Treyvaud https://launchpad.net/~loictreyvaud\n"
 "  MBuBuntu https://launchpad.net/~mbubuntu\n"
 "  Maijin https://launchpad.net/~maijin-live\n"
+"  Matthieu Martin https://launchpad.net/~matthieu-martin\n"
 "  NaSH https://launchpad.net/~lenashou\n"
 "  Pascal Lemazurier https://launchpad.net/~lemazurierpa56\n"
 "  Penegal https://launchpad.net/~penegal\n"
@@ -654,13 +657,12 @@ msgstr ""
 "  Rémy Loubet https://launchpad.net/~brxl\n"
 "  Stéphane Loeuillet https://launchpad.net/~leroutier\n"
 "  Thomas Grim https://launchpad.net/~thomas-grim\n"
-"  TuniX12 https://launchpad.net/~tunix12\n"
+"  TuniX12 https://launchpad.net/~tunix12-deactivatedaccount\n"
 "  Ulrich Etile https://launchpad.net/~chets\n"
 "  Vincent Batoufflet https://launchpad.net/~santx\n"
 "  Vincent C. https://launchpad.net/~vcoiffier\n"
 "  Vincent Garibal https://launchpad.net/~vincent-garibal\n"
 "  [MA]Pascal https://launchpad.net/~pborreli\n"
-"  anonymousguest https://launchpad.net/~denis-jasselette\n"
 "  billux13 https://launchpad.net/~romain-dessort\n"
 "  lann https://launchpad.net/~lann\n"
 "  lp.descamps https://launchpad.net/~lp-descamps\n"
@@ -1024,7 +1026,7 @@ msgstr "Adresses :"
 
 #: ../gtk/tr-prefs.c:963
 msgid "Connect to tracker via a pro_xy"
-msgstr "Se connecter au pisteur via un serveur _mandataire"
+msgstr "Se connecter au traqueur via un serveur _mandataire"
 
 #: ../gtk/tr-prefs.c:968
 msgid "Proxy _server:"
@@ -1121,7 +1123,7 @@ msgstr "Transfert de la session"
 #: ../gtk/tr-window.c:590
 #, c-format
 msgid "Tracker will allow requests in %s"
-msgstr "Le pisteur autorisera les requêtes dans %s"
+msgstr "Le traqueur autorisera les requêtes dans %s"
 
 #. show all torrents
 #: ../gtk/tr-window.c:837
@@ -1375,17 +1377,17 @@ msgstr "%d torrents chargés"
 #: ../libtransmission/torrent.c:273
 #, c-format
 msgid "Got %d peers from tracker"
-msgstr "%d pairs obtenus depuis le pisteur"
+msgstr "%d pairs obtenus depuis le traqueur"
 
 #: ../libtransmission/torrent.c:287
 #, c-format
 msgid "Tracker warning: \"%s\""
-msgstr "Avertissement du pisteur : « %s »"
+msgstr "Avertissement du traqueur : « %s »"
 
 #: ../libtransmission/torrent.c:294
 #, c-format
 msgid "Tracker error: \"%s\""
-msgstr "Erreur du pisteur : « %s »"
+msgstr "Erreur du traqueur : « %s »"
 
 #: ../libtransmission/torrent.c:1439
 msgid "Done"
@@ -1454,6 +1456,15 @@ msgstr "En attente de vérification"
 #~ msgid "_Reverse Sort Order"
 #~ msgstr "Ordre inve_rsé"
 
+#~ msgid "Transfer"
+#~ msgstr "Transfert"
+
+#~ msgid "Progress:"
+#~ msgstr "Avancement :"
+
+#~ msgid "Dates"
+#~ msgstr "Dates"
+
 #~ msgid "Pieces:"
 #~ msgstr "Pièces :"
 
@@ -1475,17 +1486,8 @@ msgstr "En attente de vérification"
 #~ msgid "Torrent file:"
 #~ msgstr "Fichier torrent :"
 
-#~ msgid "Transfer"
-#~ msgstr "Transfert"
-
-#~ msgid "Progress:"
-#~ msgstr "Avancement :"
-
 #~ msgid "Failed DL:"
 #~ msgstr "Réception échouée :"
-
-#~ msgid "Dates"
-#~ msgstr "Dates"
 
 #~ msgid "Started at:"
 #~ msgstr "Démarré le :"
@@ -1506,19 +1508,19 @@ msgstr "En attente de vérification"
 
 #: ../gtk/actions.c:52
 msgid "Sort by Rati_o"
-msgstr ""
+msgstr "Trier par rati_o"
 
 #: ../gtk/actions.c:53
 msgid "Sort by Stat_e"
-msgstr ""
+msgstr "Tri_er par état"
 
 #: ../gtk/actions.c:54
 msgid "Sort by T_racker"
-msgstr ""
+msgstr "Trier par t_raqueur"
 
 #: ../gtk/actions.c:56
 msgid "Sort by Time _Left"
-msgstr ""
+msgstr "Trier par te_mps restant"
 
 #: ../gtk/actions.c:57
 msgid "Sort by Si_ze"
@@ -1530,7 +1532,7 @@ msgstr "_Limites temporaires de vitesse"
 
 #: ../gtk/actions.c:92
 msgid "Re_verse Sort Order"
-msgstr ""
+msgstr "In_verser l'ordre de tri"
 
 #: ../gtk/actions.c:113
 msgid "Set _Location"
@@ -1579,7 +1581,7 @@ msgstr "Partage"
 
 #: ../gtk/details.c:639
 msgid "Private to this tracker -- DHT and PEX disabled"
-msgstr "Restreint à ce pisteur -- DHT et PEX désactivés"
+msgstr "Restreint à ce traqueur -- DHT et PEX désactivés"
 
 #: ../gtk/details.c:663
 #, c-format
@@ -1712,7 +1714,7 @@ msgstr "%1$s, envoyé %2$s (ratio : %3$s objectif : %4$s)"
 #: ../gtk/tr-icon.c:77 ../gtk/tr-icon.c:92
 #, c-format
 msgid "(Limit: %s)"
-msgstr ""
+msgstr "(Limite : %s)"
 
 #. %1$s: current upload speed
 #. * %2$s: current upload limit, if any
@@ -1725,6 +1727,9 @@ msgid ""
 "Up: %1$s %2$s\n"
 "Down: %3$s %4$s"
 msgstr ""
+"Transmission\n"
+"Émission : %1$s %2$s\n"
+"Réception : %3$s %4$s"
 
 #: ../gtk/tr-prefs.c:306
 msgid "Save to _Location:"
@@ -1800,7 +1805,7 @@ msgstr "Utiliser _DHT pour trouver plus de pairs"
 #: ../gtk/tr-prefs.c:542
 msgid "DHT is a tool for finding peers without a tracker."
 msgstr ""
-"DHT est un outil permettant de trouver des pairs en l'absence de pisteur."
+"DHT est un outil permettant de trouver des pairs en l'absence de traqueur."
 
 #: ../gtk/tr-prefs.c:753
 msgid "Web Client"
@@ -1888,7 +1893,7 @@ msgstr "Période_s :"
 
 #: ../gtk/tr-prefs.c:1225
 msgid " _to "
-msgstr ""
+msgstr " _vers "
 
 #: ../gtk/tr-prefs.c:1236
 msgid "_On days:"
@@ -1924,6 +1929,8 @@ msgid ""
 "Click to disable Temporary Speed Limits\n"
 "(%1$s down, %2$s up)"
 msgstr ""
+"Cliquer pour désactiver les limites de vitesse temporaires\n"
+"(%1$s réception, %2$s émission)"
 
 #: ../gtk/tr-window.c:341
 #, c-format
@@ -1931,6 +1938,8 @@ msgid ""
 "Click to enable Temporary Speed Limits\n"
 "(%1$s down, %2$s up)"
 msgstr ""
+"Cliquer pour activer les limites de vitesse temporaires\n"
+"(%1$s émission, %2$s réception)"
 
 #: ../gtk/tr-window.c:661
 msgid "Unlimited"
@@ -1960,7 +1969,7 @@ msgstr "Arrêter au ratio (%s)"
 #: ../libtransmission/fdlimit.c:296
 #, c-format
 msgid "Couldn't create \"%1$s\": \"%2$s\" is not a folder"
-msgstr ""
+msgstr "Impossible de créer « %1$s » : « %2$s » n'est pas un dossier"
 
 #: ../libtransmission/net.c:323
 #, c-format

@@ -15,14 +15,14 @@ msgstr ""
 "Project-Id-Version: Transmission 1.40b1 (7032)\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-07-13 16:23-0500\n"
-"PO-Revision-Date: 2009-06-30 20:25+0000\n"
+"PO-Revision-Date: 2009-07-30 12:15+0000\n"
 "Last-Translator: Arnout Lok <Unknown>\n"
 "Language-Team: vertaling@vrijschrift.org\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2009-07-17 19:24+0000\n"
+"X-Launchpad-Export-Date: 2009-08-13 23:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:49
@@ -1418,6 +1418,15 @@ msgstr "Torrent verifiëren"
 msgid "Queued for verification"
 msgstr "In de wachtrij voor verificatie"
 
+#~ msgid "Progress:"
+#~ msgstr "Voortgang:"
+
+#~ msgid "Failed DL:"
+#~ msgstr "Mislukte DL:"
+
+#~ msgid "Last activity at:"
+#~ msgstr "Laatste activiteit:"
+
 #~ msgid "Sort by _Tracker"
 #~ msgstr "Sorteren op _tracker"
 
@@ -1443,21 +1452,12 @@ msgstr "In de wachtrij voor verificatie"
 #~ msgid "Transfer"
 #~ msgstr "Overdracht"
 
-#~ msgid "Progress:"
-#~ msgstr "Voortgang:"
-
-#~ msgid "Failed DL:"
-#~ msgstr "Mislukte DL:"
-
 # 'Data' als meervoud van 'datum' is makkelijke te verwarren met computerdata. 'Datums' is volgens de vandale ook goed.
 #~ msgid "Dates"
 #~ msgstr "Datums"
 
 #~ msgid "Started at:"
 #~ msgstr "Gestart op:"
-
-#~ msgid "Last activity at:"
-#~ msgstr "Laatste activiteit:"
 
 #, c-format
 #~ msgid "%.1f%%"
@@ -1466,27 +1466,27 @@ msgstr "In de wachtrij voor verificatie"
 #~ msgid "Sort by _Ratio"
 #~ msgstr "Sorteren op _ratio"
 
-#~ msgid " and "
-#~ msgstr " en "
-
 #~ msgid "Show _icon in the desktop Notification Area"
 #~ msgstr "P_ictogram in het mededelingengebied tonen"
 
+#~ msgid " and "
+#~ msgstr " en "
+
 #: ../gtk/actions.c:52
 msgid "Sort by Rati_o"
-msgstr ""
+msgstr "Sorteren op rati_o"
 
 #: ../gtk/actions.c:53
 msgid "Sort by Stat_e"
-msgstr ""
+msgstr "Sorteren op stat_us"
 
 #: ../gtk/actions.c:54
 msgid "Sort by T_racker"
-msgstr ""
+msgstr "Sorteren op t_racker"
 
 #: ../gtk/actions.c:56
 msgid "Sort by Time _Left"
-msgstr ""
+msgstr "Sorteren op resterende _tijd"
 
 #: ../gtk/actions.c:57
 msgid "Sort by Si_ze"
@@ -1498,7 +1498,7 @@ msgstr "Tijdelijke snelheids_limieten"
 
 #: ../gtk/actions.c:92
 msgid "Re_verse Sort Order"
-msgstr ""
+msgstr "Omgekeerd sorteren"
 
 #: ../gtk/actions.c:113
 msgid "Set _Location"
@@ -1581,12 +1581,12 @@ msgstr[1] "%1$s (%2$'d delen)"
 #: ../gtk/details.c:798
 #, c-format
 msgid "%1$s (%2$.1f%%); %3$s Unverified"
-msgstr ""
+msgstr "%1$s (%2$.1f%%), %3$s ongeverifiëerd"
 
 #: ../gtk/details.c:800
 #, c-format
 msgid "%1$s (%2$.1f%%)"
-msgstr ""
+msgstr "%1$s (%2$.1f%%)"
 
 #: ../gtk/details.c:820
 #, c-format
@@ -1680,7 +1680,7 @@ msgstr "%1$s, %2$s geüpload (ratio: %3$s doel: %4$s)"
 #: ../gtk/tr-icon.c:77 ../gtk/tr-icon.c:92
 #, c-format
 msgid "(Limit: %s)"
-msgstr ""
+msgstr "(Limiet: %s)"
 
 #. %1$s: current upload speed
 #. * %2$s: current upload limit, if any
@@ -1693,6 +1693,9 @@ msgid ""
 "Up: %1$s %2$s\n"
 "Down: %3$s %4$s"
 msgstr ""
+"Overdracht\n"
+"Uploaden: %1$s%2$s\n"
+"Downloaden: %3$s%4$s"
 
 #: ../gtk/tr-prefs.c:306
 msgid "Save to _Location:"
@@ -1731,19 +1734,19 @@ msgstr "Nieuwe blokkadelijst ophalen…"
 
 #: ../gtk/tr-prefs.c:458
 msgid "Allow encryption"
-msgstr ""
+msgstr "Versleuteling toestaan"
 
 #: ../gtk/tr-prefs.c:459
 msgid "Prefer encryption"
-msgstr ""
+msgstr "Voorkeur geven aan versleuteling"
 
 #: ../gtk/tr-prefs.c:460
 msgid "Require encryption"
-msgstr ""
+msgstr "Versleuteling vereisen"
 
 #: ../gtk/tr-prefs.c:527 ../gtk/tr-prefs.c:1398
 msgid "Privacy"
-msgstr "Privacy:"
+msgstr "Privacy"
 
 #: ../gtk/tr-prefs.c:529
 msgid "_Encryption mode:"
@@ -1770,16 +1773,16 @@ msgstr "DHT wordt gebruikt om peers zonder tracker te vinden."
 
 #: ../gtk/tr-prefs.c:753
 msgid "Web Client"
-msgstr ""
+msgstr "Webcliént"
 
 #. "enabled" checkbutton
 #: ../gtk/tr-prefs.c:756
 msgid "_Enable web client"
-msgstr ""
+msgstr "Webcliënt inschkakelen"
 
 #: ../gtk/tr-prefs.c:762
 msgid "_Open web client"
-msgstr ""
+msgstr "Webcliént openen"
 
 #. require authentication
 #: ../gtk/tr-prefs.c:775 ../gtk/tr-prefs.c:992
@@ -1789,7 +1792,7 @@ msgstr "_Aanmelding vereist"
 #. require authentication
 #: ../gtk/tr-prefs.c:798
 msgid "Only allow these IP a_ddresses to connect:"
-msgstr ""
+msgstr "Alleen deze IP-_adressen toegang geven:"
 
 #: ../gtk/tr-prefs.c:1117
 msgid "Every Day"
@@ -1841,7 +1844,7 @@ msgstr "Tijdelijke snelheidslimieten"
 
 #: ../gtk/tr-prefs.c:1205
 msgid "Override normal speed limits manually or at scheduled times"
-msgstr ""
+msgstr "Normale snelheidslimieten handmatig of op geplande tijden negeren"
 
 #: ../gtk/tr-prefs.c:1212
 msgid "Limit do_wnload speed (KB/s):"
@@ -1853,7 +1856,7 @@ msgstr "Geplande tijd_stippen:"
 
 #: ../gtk/tr-prefs.c:1225
 msgid " _to "
-msgstr ""
+msgstr " _naar "
 
 #: ../gtk/tr-prefs.c:1236
 msgid "_On days:"
@@ -1873,7 +1876,7 @@ msgstr "_Poort voor inkomende verbindingen:"
 
 #: ../gtk/tr-prefs.c:1338
 msgid "Te_st Port"
-msgstr ""
+msgstr "Te_stpoort"
 
 #: ../gtk/tr-prefs.c:1349
 msgid "Pick a _random port every time Transmission is started"
@@ -1890,6 +1893,8 @@ msgid ""
 "Click to disable Temporary Speed Limits\n"
 "(%1$s down, %2$s up)"
 msgstr ""
+"Klik om tijdelijke snelheidslimieten uit te schakelen\n"
+"(%1$s download, %2$s upload)"
 
 #: ../gtk/tr-window.c:341
 #, c-format
@@ -1897,6 +1902,8 @@ msgid ""
 "Click to enable Temporary Speed Limits\n"
 "(%1$s down, %2$s up)"
 msgstr ""
+"Klik om tijdelijke snelheidslimieten in te schakelen\n"
+"(%1$s download, %2$s upload)"
 
 #: ../gtk/tr-window.c:661
 msgid "Unlimited"
@@ -1926,7 +1933,7 @@ msgstr "Stop bij ratio (%s)"
 #: ../libtransmission/fdlimit.c:296
 #, c-format
 msgid "Couldn't create \"%1$s\": \"%2$s\" is not a folder"
-msgstr ""
+msgstr "Kon ‘%1$s’ niet aanmaken: ‘%2$s’ is geen map."
 
 #: ../libtransmission/net.c:323
 #, c-format

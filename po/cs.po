@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2009-07-13 16:23-0500\n"
-"PO-Revision-Date: 2009-07-15 14:32+0000\n"
+"PO-Revision-Date: 2009-07-20 12:02+0000\n"
 "Last-Translator: Adrian Guniš <andygun696@gmail.com>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2009-07-17 19:25+0000\n"
+"X-Launchpad-Export-Date: 2009-08-13 23:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:49
@@ -1608,7 +1608,7 @@ msgstr "Přesunout z _aktuální složky"
 
 #: ../gtk/relocate.c:128
 msgid "Local data is _already there"
-msgstr ""
+msgstr "Místní data _jsou už tam"
 
 #. %1$s is the torrent's total size,
 #. %2$s is how much we've uploaded,
@@ -1796,11 +1796,11 @@ msgstr "Max. rychlost s_tahování (KB/s):"
 
 #: ../gtk/tr-prefs.c:1220
 msgid "_Scheduled times:"
-msgstr "N_aplánované časy:"
+msgstr "Na_plánované časy:"
 
 #: ../gtk/tr-prefs.c:1225
 msgid " _to "
-msgstr ""
+msgstr " _až "
 
 #: ../gtk/tr-prefs.c:1236
 msgid "_On days:"

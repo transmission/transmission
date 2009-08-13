@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 1 : (n>=2 && n<=4) ? 2 : 0;\n"
-"X-Launchpad-Export-Date: 2009-07-17 19:24+0000\n"
+"X-Launchpad-Export-Date: 2009-08-13 23:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Country: SLOVAKIA\n"
 "X-Poedit-Language: Slovak\n"
@@ -1887,6 +1887,15 @@ msgstr "Kontrola torrentu"
 msgid "Queued for verification"
 msgstr "Zaradený do fronty na kontrolu"
 
+#~ msgid "Transfer"
+#~ msgstr "Prenos"
+
+#~ msgid "Dates"
+#~ msgstr "Dátumy"
+
+#~ msgid "Unknown"
+#~ msgstr "Neznámy"
+
 #~ msgid "Sort by _State"
 #~ msgstr "Usporiadať podľa _stavu"
 
@@ -1905,9 +1914,6 @@ msgstr "Zaradený do fronty na kontrolu"
 #~ msgid "Origins"
 #~ msgstr "Pôvod"
 
-#~ msgid "Unknown"
-#~ msgstr "Neznámy"
-
 #~ msgid "Creator:"
 #~ msgstr "Vytvoril:"
 
@@ -1917,17 +1923,15 @@ msgstr "Zaradený do fronty na kontrolu"
 #~ msgid "Torrent file:"
 #~ msgstr "Súbor s torrentom:"
 
-#~ msgid "Transfer"
-#~ msgstr "Prenos"
+#, c-format
+#~ msgid "%.1f%%"
+#~ msgstr "%.1f%%"
 
 #~ msgid "Progress:"
 #~ msgstr "Priebeh:"
 
 #~ msgid "Failed DL:"
 #~ msgstr "Chybný DL:"
-
-#~ msgid "Dates"
-#~ msgstr "Dátumy"
 
 #~ msgid "Started at:"
 #~ msgstr "Spustené:"
@@ -1946,19 +1950,6 @@ msgstr "Zaradený do fronty na kontrolu"
 #~ msgid "Use peer e_xchange"
 #~ msgstr "Použiť peer e_xchange"
 
-#, c-format
-#~ msgid "%.1f%%"
-#~ msgstr "%.1f%%"
-
-#~ msgid "Sort by _Ratio"
-#~ msgstr "Usporiadať podľa po_meru"
-
-#~ msgid "Tracker Proxy"
-#~ msgstr "Proxy trackera"
-
-#~ msgid "_Authentication is required"
-#~ msgstr "_Vyžadovať autentifikáciu"
-
 #~ msgid "Web Interface"
 #~ msgstr "Webové rozhranie"
 
@@ -1968,8 +1959,11 @@ msgstr "Zaradený do fronty na kontrolu"
 #~ msgid "_Require username"
 #~ msgstr "_Vyžadovať prihlásenie"
 
-#~ msgid " and "
-#~ msgstr " a "
+#~ msgid "Tracker Proxy"
+#~ msgstr "Proxy trackera"
+
+#~ msgid "_Authentication is required"
+#~ msgstr "_Vyžadovať autentifikáciu"
 
 #~ msgid "Show _icon in the desktop Notification Area"
 #~ msgstr "Zobraziť _ikonu v oblasti upozornení"
@@ -1977,8 +1971,18 @@ msgstr "Zaradený do fronty na kontrolu"
 #~ msgid "Only allow the following IP _addresses to connect:"
 #~ msgstr "Povoliť pripojenie iba z týchto IP _adries:"
 
+#~ msgid " and "
+#~ msgstr " a "
+
 #~ msgid "Inhibit desktop _hibernation when torrents are active"
 #~ msgstr "Zabrániť _hibernácii počítača, keď sú torrenty aktívne"
+
+#~ msgid "Show desktop _notifications"
+#~ msgstr "Zobrazovať upozornenia na _ploche"
+
+#, c-format
+#~ msgid "Couldn't create \"%1$s\": parent folder \"%2$s\" does not exist"
+#~ msgstr "Nie je možné vytvoriť \"%1$s\": rodičovský priečinok %2$s neexistuje"
 
 #, c-format
 #~ msgid "Closing port %d on %s"
@@ -1996,22 +2000,14 @@ msgstr "Zaradený do fronty na kontrolu"
 #~ "Nie je možné otvoriť port %d na %s pre prichádzajúce spojenia od klientov "
 #~ "(chyba č. %d - %s)"
 
-#~ msgid "Show desktop _notifications"
-#~ msgstr "Zobrazovať upozornenia na _ploche"
+#~ msgid "Destination:"
+#~ msgstr "Cieľ:"
 
-#, c-format
-#~ msgid "Couldn't create \"%1$s\": parent folder \"%2$s\" does not exist"
-#~ msgstr "Nie je možné vytvoriť \"%1$s\": rodičovský priečinok %2$s neexistuje"
+#~ msgid "Sort by _Ratio"
+#~ msgstr "Usporiadať podľa po_meru"
 
 #~ msgid "Sort by _ETA"
 #~ msgstr "Usporiadať podľa _ETA"
-
-#, c-format
-#~ msgid "%1$s (%2$s verified in %3$d piece)"
-#~ msgid_plural "%1$s (%2$s verified in %3$d pieces)"
-#~ msgstr[0] "%1$s (%2$s skontrolovaných v %3$d častiach)"
-#~ msgstr[1] "%1$s (%2$s skontrolovaných v %3$d časti)"
-#~ msgstr[2] "%1$s (%2$s skontrolovaných v %3$d častiach)"
 
 #, c-format
 #~ msgid ""
@@ -2030,6 +2026,16 @@ msgstr "Zaradený do fronty na kontrolu"
 
 #~ msgid "_Stop seeding when a torrent's ratio reaches"
 #~ msgstr "_Zastaviť odosielanie torrentu pri dosiahnutí pomeru"
+
+#, c-format
+#~ msgid "%1$s (%2$s verified in %3$d piece)"
+#~ msgid_plural "%1$s (%2$s verified in %3$d pieces)"
+#~ msgstr[0] "%1$s (%2$s skontrolovaných v %3$d častiach)"
+#~ msgstr[1] "%1$s (%2$s skontrolovaných v %3$d časti)"
+#~ msgstr[2] "%1$s (%2$s skontrolovaných v %3$d častiach)"
+
+#~ msgid "Swarm speed:"
+#~ msgstr "Swarm rýchlosť:"
 
 #~ msgid "_Stop seeding torrents at ratio:"
 #~ msgstr "_Zastaviť odosielanie torrentov pri pomere:"
@@ -2073,6 +2079,10 @@ msgstr "Zaradený do fronty na kontrolu"
 #~ msgstr "Kliknite pre povolenie režimu obmedzenia rýchlosti"
 
 #, c-format
+#~ msgid "Checking to see if port %d is still open"
+#~ msgstr "Kontrola, či je port %d stále otvorený"
+
+#, c-format
 #~ msgid "%s is not a valid address"
 #~ msgstr "%s nie je platná adresa"
 
@@ -2086,16 +2096,6 @@ msgstr "Zaradený do fronty na kontrolu"
 
 #~ msgid "System does not seem to support IPv6. Not listening onan IPv6 address"
 #~ msgstr "Systém pravdepodobne nepodporuje IPv6. Nepočúva na IPv6 adrese."
-
-#~ msgid "Swarm speed:"
-#~ msgstr "Swarm rýchlosť:"
-
-#~ msgid "Destination:"
-#~ msgstr "Cieľ:"
-
-#, c-format
-#~ msgid "Checking to see if port %d is still open"
-#~ msgstr "Kontrola, či je port %d stále otvorený"
 
 #~ msgid "Unable to get blocklist: %s"
 #~ msgstr "Nepodarilo sa získať zoznam blokovaných: %s"

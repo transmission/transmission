@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-07-13 16:23-0500\n"
-"PO-Revision-Date: 2009-06-10 18:56+0000\n"
-"Last-Translator: Attila C. YILMAZLAR <attilayilmazlar@gmail.com>\n"
+"PO-Revision-Date: 2009-08-08 14:34+0000\n"
+"Last-Translator: ironic <Unknown>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2009-07-17 19:24+0000\n"
+"X-Launchpad-Export-Date: 2009-08-13 23:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:49
@@ -36,7 +36,7 @@ msgstr "_Tarihe göre Sırala"
 
 #: ../gtk/actions.c:57
 msgid "Sort by Si_ze"
-msgstr "Bo_yuta göre sırala"
+msgstr "Bo_yuta göre Sırala"
 
 #: ../gtk/actions.c:74
 msgid "_Main Window"
@@ -144,7 +144,7 @@ msgstr "_Yeni..."
 
 #: ../gtk/actions.c:116
 msgid "Create a torrent"
-msgstr "Bir torent oluştur"
+msgstr "Bir torrent oluştur"
 
 #: ../gtk/actions.c:117
 msgid "_Quit"
@@ -184,7 +184,7 @@ msgstr "Tüm dosyalar"
 
 #: ../gtk/add-dialog.c:275
 msgid "Torrent Options"
-msgstr "Torent Seçenekleri"
+msgstr "Torrent Seçenekleri"
 
 #: ../gtk/add-dialog.c:299
 msgid "_Move source file to Trash"
@@ -376,7 +376,7 @@ msgstr "Eğer bize izin verirse bu eşten indirebiliriz"
 
 #: ../gtk/details.c:1406
 msgid "Uploading to peer"
-msgstr "Eşe Gönderiliyor"
+msgstr "Eşe gönderiliyor"
 
 #: ../gtk/details.c:1407
 msgid "We would upload to this peer if they asked"
@@ -388,7 +388,7 @@ msgstr "Şifrelenmiş bağlantı"
 
 #: ../gtk/details.c:1411
 msgid "Peer was discovered through Peer Exchange (PEX)"
-msgstr "Eş değişimi (PEX) sayesinde yeni bir eş keşfedildi."
+msgstr "Eş değişimi (PEX) sayesinde yeni bir eş keşfedildi"
 
 #: ../gtk/details.c:1413
 msgid "Peer is an incoming connection"
@@ -479,7 +479,7 @@ msgstr "%s Özellikler"
 
 #: ../gtk/dialogs.c:121
 msgid "<big><b>Quit Transmission?</b></big>"
-msgstr "<big><b>Transmission'dan çık?</b></big>"
+msgstr "<big><b>Transmission' dan çık?</b></big>"
 
 #: ../gtk/dialogs.c:133
 msgid "_Don't ask me again"
@@ -488,12 +488,12 @@ msgstr "_Bir daha sorma"
 #: ../gtk/dialogs.c:236
 msgid "Remove torrent?"
 msgid_plural "Remove torrents?"
-msgstr[0] "Torenti kaldır?"
+msgstr[0] "Torrenti kaldır?"
 
 #: ../gtk/dialogs.c:242
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these torrents' downloaded files?"
-msgstr[0] "İndirilen torent dosyalarını sil?"
+msgstr[0] "İndirilen torrent dosyalarını sil?"
 
 #: ../gtk/dialogs.c:255
 msgid "This torrent has not finished downloading."
@@ -573,12 +573,12 @@ msgstr "_Şimdi Çık"
 #: ../gtk/main.c:875
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
-msgstr[0] "Bozuk torentler eklenemiyor"
+msgstr[0] "Bozuk torent(ler) eklenemiyor"
 
 #: ../gtk/main.c:882
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
-msgstr[0] "Çoğaltılmış torent eklenemiyor"
+msgstr[0] "Çoğaltılmış torent(ler) eklenemiyor"
 
 #: ../gtk/main.c:1160
 msgid "A fast and easy BitTorrent client"
@@ -600,6 +600,8 @@ msgstr ""
 "Launchpad Contributions:\n"
 "  Ali ARISOY https://launchpad.net/~e166110\n"
 "  Attila C. YILMAZLAR https://launchpad.net/~attilayilmazlar\n"
+"  Emre Ayca https://launchpad.net/~anatolica\n"
+"  Hasan Tayyar BEŞİK https://launchpad.net/~hasantayyar\n"
 "  Hasan Yılmaz https://launchpad.net/~hasanyilmaz\n"
 "  Mert Bozkurt https://launchpad.net/~aquacultural\n"
 "  Osman Tosun https://launchpad.net/~rainman-neu\n"
@@ -613,7 +615,7 @@ msgstr ""
 
 #: ../gtk/makemeta-ui.c:109
 msgid "Torrent created!"
-msgstr "Torent oluşturuldu!"
+msgstr "Torrent oluşturuldu!"
 
 #: ../gtk/makemeta-ui.c:114 ../gtk/makemeta-ui.c:130 ../gtk/makemeta-ui.c:144
 #, c-format
@@ -626,7 +628,7 @@ msgstr "Geçersiz Adres"
 
 #: ../gtk/makemeta-ui.c:119
 msgid "Torrent creation cancelled"
-msgstr "Torent oluşturmadan vazgeçildi"
+msgstr "Torrent oluşturma iptal edildi"
 
 #: ../gtk/makemeta-ui.c:126 ../libtransmission/blocklist.c:78
 #: ../libtransmission/blocklist.c:237 ../libtransmission/utils.c:507
@@ -669,7 +671,7 @@ msgstr "Dosya Seç"
 
 #: ../gtk/makemeta-ui.c:377
 msgid "New Torrent"
-msgstr "Yeni Torent"
+msgstr "Yeni Torrent"
 
 #: ../gtk/makemeta-ui.c:392
 msgid "Source"
@@ -689,7 +691,7 @@ msgstr "_Dosya"
 
 #: ../gtk/makemeta-ui.c:461
 msgid "<b>E_xtras</b>"
-msgstr "<b>İl_aveler</b>"
+msgstr "<b>E_klemeler</b>"
 
 #: ../gtk/makemeta-ui.c:469
 msgid "Commen_t:"
@@ -697,7 +699,7 @@ msgstr "Y_orum:"
 
 #: ../gtk/makemeta-ui.c:472
 msgid "_Private torrent"
-msgstr "_Özel torent"
+msgstr "_Özel torrent"
 
 #: ../gtk/msgwin.c:87 ../libtransmission/bencode.c:1554
 #: ../libtransmission/blocklist.c:293
@@ -719,7 +721,7 @@ msgstr "Hata Ayrıştırma"
 
 #: ../gtk/msgwin.c:268
 msgid "Time"
-msgstr "Zaman"
+msgstr "Süre"
 
 #: ../gtk/msgwin.c:272 ../gtk/tr-window.c:848
 msgid "Name"
@@ -735,7 +737,7 @@ msgstr "İleti Kayıtları"
 
 #: ../gtk/msgwin.c:486
 msgid "Level"
-msgstr "Düzey"
+msgstr "Seviye"
 
 #: ../gtk/notify.c:94
 msgid "Torrent Complete"
@@ -751,7 +753,7 @@ msgstr "Klasör Aç"
 
 #: ../gtk/relocate.c:117
 msgid "Location"
-msgstr "Yer"
+msgstr "Konum"
 
 #: ../gtk/stats.c:75 ../gtk/stats.c:156
 #, c-format
@@ -809,7 +811,7 @@ msgstr "Kalan süre bilinmiyor"
 #: ../gtk/torrent-cell-renderer.c:119
 #, c-format
 msgid "%s remaining"
-msgstr "%s kalan"
+msgstr "%s kaldı"
 
 #: ../gtk/torrent-cell-renderer.c:147
 #, c-format
@@ -870,7 +872,7 @@ msgstr "BitTorrent İstemcisi"
 
 #: ../gtk/transmission.desktop.in.h:2
 msgid "Download and share files over BitTorrent"
-msgstr "Dosyaları bittorrent üzerinden  indir ve paylaş"
+msgstr "Dosyaları BitTorrent üzerinden indir ve paylaş"
 
 #: ../gtk/transmission.desktop.in.h:3
 msgid "Transmission BitTorrent Client"
@@ -1063,7 +1065,7 @@ msgstr "Transmission Tercihler"
 
 #: ../gtk/tr-prefs.c:1392
 msgid "Torrents"
-msgstr "Torentler"
+msgstr "Torrentler"
 
 #: ../gtk/tr-prefs.c:1401
 msgid "Network"
@@ -1071,7 +1073,7 @@ msgstr "Ağ"
 
 #: ../gtk/tr-prefs.c:1407
 msgid "Web"
-msgstr "Ağ"
+msgstr "Web"
 
 #: ../gtk/tr-torrent.c:233
 #, c-format
@@ -1111,7 +1113,7 @@ msgstr "Oturum Aktarımı"
 #: ../gtk/tr-window.c:590
 #, c-format
 msgid "Tracker will allow requests in %s"
-msgstr "İzleyici %s içindeki isteklere izin verecek"
+msgstr "İzleyici %s dakika içinde isteklere izin verecek"
 
 #: ../gtk/tr-window.c:661
 msgid "Unlimited"
@@ -1146,13 +1148,13 @@ msgstr "_Durdurulmuş"
 #, c-format
 msgid "%1$'d of %2$'d Torrent"
 msgid_plural "%1$'d of %2$'d Torrents"
-msgstr[0] "%1$'d / %2$'d Torent"
+msgstr[0] "%1$'d / %2$'d Torrent"
 
 #: ../gtk/tr-window.c:1094
 #, c-format
 msgid "%'d Torrent"
 msgid_plural "%'d Torrents"
-msgstr[0] "%'d Torent"
+msgstr[0] "%'d Torrent"
 
 #: ../gtk/tr-window.c:1125 ../gtk/tr-window.c:1136
 #, c-format
@@ -1255,7 +1257,7 @@ msgstr "Geçersiz üstveri"
 #: ../libtransmission/blocklist.c:303
 #, c-format
 msgid "Blocklist \"%1$s\" updated with %2$'d entries"
-msgstr "\"%1$s\" engelli listesi %2$'d giriş ile güncellendi"
+msgstr "\"%1$s\" engelli listesi %2$'d girdi ile güncellendi"
 
 #. %s is the torrent name
 #: ../libtransmission/fastresume.c:553 ../libtransmission/fastresume.c:566
@@ -1279,12 +1281,12 @@ msgstr "Geçersiz \"%s\" üstveri girişi"
 
 #: ../libtransmission/natpmp.c:31
 msgid "Port Forwarding (NAT-PMP)"
-msgstr "Kapı yönlendirme (NAT-PMP)"
+msgstr "Kapı Yönlendirme (NAT-PMP)"
 
 #: ../libtransmission/natpmp.c:68
 #, c-format
 msgid "%s succeeded (%d)"
-msgstr "%s halledildi (%d)"
+msgstr "%s başarıldı (%d)"
 
 #: ../libtransmission/natpmp.c:136
 #, c-format
@@ -1312,7 +1314,7 @@ msgstr "Kapı Yönlendirme"
 
 #: ../libtransmission/port-forwarding.c:59
 msgid "Starting"
-msgstr "Başlayış"
+msgstr "Başlıyor"
 
 #: ../libtransmission/port-forwarding.c:60
 msgid "Forwarded"
@@ -1427,23 +1429,23 @@ msgstr "Doğrulama için kuyrukta"
 
 #: ../gtk/actions.c:52
 msgid "Sort by Rati_o"
-msgstr ""
+msgstr "O_rana göre Sırala"
 
 #: ../gtk/actions.c:53
 msgid "Sort by Stat_e"
-msgstr ""
+msgstr "D_uruma göre Sırala"
 
 #: ../gtk/actions.c:54
 msgid "Sort by T_racker"
-msgstr ""
+msgstr "İ_zleyiciye göre Sırala"
 
 #: ../gtk/actions.c:56
 msgid "Sort by Time _Left"
-msgstr ""
+msgstr "_Kalan süreye göre Sırala"
 
 #: ../gtk/actions.c:90
 msgid "Temporary  Speed _Limits"
-msgstr ""
+msgstr "Geçici Hız Sınırları"
 
 #: ../gtk/actions.c:92
 msgid "Re_verse Sort Order"
@@ -1451,7 +1453,7 @@ msgstr ""
 
 #: ../gtk/actions.c:113
 msgid "Set _Location"
-msgstr "Konumunuzu_Belirleyin"
+msgstr "Konum_Belirle"
 
 #: ../gtk/details.c:510
 msgid "Honor global _limits"
@@ -1459,7 +1461,7 @@ msgstr ""
 
 #: ../gtk/details.c:539
 msgid "Torrent _priority:"
-msgstr ""
+msgstr "Torrent_önceliği:"
 
 #: ../gtk/details.c:543
 msgid "Seed-Until Ratio"
@@ -1487,17 +1489,17 @@ msgstr "Dağıtım"
 
 #: ../gtk/details.c:639
 msgid "Private to this tracker -- DHT and PEX disabled"
-msgstr ""
+msgstr "Bu izleyiciye özel -- DHT ve PEX devredışı"
 
 #: ../gtk/details.c:663
 #, c-format
 msgid "Created by %1$s"
-msgstr ""
+msgstr "%1$s tarafından oluşturuldu"
 
 #: ../gtk/details.c:665
 #, c-format
 msgid "Created on %1$s"
-msgstr ""
+msgstr "%1$s tarihinde oluşturuldu."
 
 #: ../gtk/details.c:667
 #, c-format
@@ -1508,30 +1510,28 @@ msgstr ""
 #, c-format
 msgid "%1$s (%2$'d piece @ %3$s)"
 msgid_plural "%1$s (%2$'d pieces @ %3$s)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s (%2$'d parça @ %3$s)"
 
 #: ../gtk/details.c:764
 #, c-format
 msgid "%1$s (%2$'d piece)"
 msgid_plural "%1$s (%2$'d pieces)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s (%2$'d parça)"
 
 #: ../gtk/details.c:798
 #, c-format
 msgid "%1$s (%2$.1f%%); %3$s Unverified"
-msgstr ""
+msgstr "%1$s (%2$.1f%%); %3$s Doğrulanmamış"
 
 #: ../gtk/details.c:800
 #, c-format
 msgid "%1$s (%2$.1f%%)"
-msgstr ""
+msgstr "%1$s (%2$.1f%%)"
 
 #: ../gtk/details.c:820
 #, c-format
 msgid "%1$s (+%2$s corrupt)"
-msgstr ""
+msgstr "%1$s (+%2$s bozuk)"
 
 #: ../gtk/details.c:893
 msgid "Active now"
@@ -1540,27 +1540,27 @@ msgstr ""
 #: ../gtk/details.c:897
 #, c-format
 msgid "%1$s ago"
-msgstr ""
+msgstr "%1$s önce"
 
 #: ../gtk/details.c:920
 msgid "Torrent size:"
-msgstr ""
+msgstr "Torrent boyutu:"
 
 #: ../gtk/details.c:944
 msgid "Running time:"
-msgstr ""
+msgstr "Çalışma süresi:"
 
 #: ../gtk/details.c:948
 msgid "Last activity:"
-msgstr ""
+msgstr "Son etkinlik:"
 
 #: ../gtk/details.c:962
 msgid "Location:"
-msgstr ""
+msgstr "Konum:"
 
 #: ../gtk/details.c:979
 msgid "Origin:"
-msgstr ""
+msgstr "Kökeni:"
 
 #: ../gtk/details.c:1028
 msgid "Webseeds"
@@ -1597,24 +1597,24 @@ msgstr "%'d Torrent Özellikleri"
 
 #: ../gtk/notify.c:121
 msgid "Torrent Added"
-msgstr ""
+msgstr "Torrent Eklendi"
 
 #: ../gtk/relocate.c:68
 #, c-format
 msgid "Moving \"%s\""
-msgstr ""
+msgstr "\"%s\" taşınıyor"
 
 #: ../gtk/relocate.c:70
 msgid "This may take a moment..."
-msgstr ""
+msgstr "Bu işlem biraz zaman alabilir..."
 
 #: ../gtk/relocate.c:99 ../gtk/relocate.c:121
 msgid "Set Torrent Location"
-msgstr ""
+msgstr "Torrent Konumu  Ayarla"
 
 #: ../gtk/relocate.c:124
 msgid "Torrent _location:"
-msgstr ""
+msgstr "Torrent_konumu:"
 
 #: ../gtk/relocate.c:125
 msgid "_Move from the current folder"
@@ -1631,12 +1631,12 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:88
 #, c-format
 msgid "%1$s, uploaded %2$s (Ratio: %3$s Goal: %4$s)"
-msgstr ""
+msgstr "%1$s, gönderilen %2$s (Oran: %3$s Hedef: %4$s)"
 
 #: ../gtk/tr-icon.c:77 ../gtk/tr-icon.c:92
 #, c-format
 msgid "(Limit: %s)"
-msgstr ""
+msgstr "(Sınır: %s)"
 
 #. %1$s: current upload speed
 #. * %2$s: current upload limit, if any
@@ -1649,10 +1649,13 @@ msgid ""
 "Up: %1$s %2$s\n"
 "Down: %3$s %4$s"
 msgstr ""
+"Transmission\n"
+"Gön: %1$s %2$s\n"
+"İnd: %3$s %4$s"
 
 #: ../gtk/tr-prefs.c:306
 msgid "Save to _Location:"
-msgstr ""
+msgstr "Şu _konuma kaydet:"
 
 #: ../gtk/tr-prefs.c:337
 msgid "Inhibit _hibernation when torrents are active"
@@ -1660,11 +1663,11 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:341
 msgid "Show Transmission in the system _tray"
-msgstr ""
+msgstr "Transmission' u sistem _tepsisinde göster"
 
 #: ../gtk/tr-prefs.c:345
 msgid "Show popup _notifications"
-msgstr ""
+msgstr "_Bildirim pencereleri göster"
 
 #: ../gtk/tr-prefs.c:402
 #, c-format
@@ -1690,11 +1693,11 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:529
 msgid "_Encryption mode:"
-msgstr ""
+msgstr "_Şifreleme kipi:"
 
 #: ../gtk/tr-prefs.c:533
 msgid "Use PE_X to find more peers"
-msgstr ""
+msgstr "Daha fazla eş bulmak için PE_X kullan"
 
 #: ../gtk/tr-prefs.c:535
 msgid ""
@@ -1703,46 +1706,46 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:540
 msgid "Use _DHT to find more peers"
-msgstr ""
+msgstr "Daha fazla eş bulmak için _DHT kullan"
 
 #: ../gtk/tr-prefs.c:542
 msgid "DHT is a tool for finding peers without a tracker."
-msgstr ""
+msgstr "DHT, izleyiciye gereksinim olmadan eş bulma aracıdır."
 
 #: ../gtk/tr-prefs.c:753
 msgid "Web Client"
-msgstr ""
+msgstr "Web İstemcisi"
 
 #. "enabled" checkbutton
 #: ../gtk/tr-prefs.c:756
 msgid "_Enable web client"
-msgstr ""
+msgstr "Web istemicisini _etkinleştir"
 
 #: ../gtk/tr-prefs.c:762
 msgid "_Open web client"
-msgstr ""
+msgstr "Web istemcisini _Aç"
 
 #. require authentication
 #: ../gtk/tr-prefs.c:775 ../gtk/tr-prefs.c:992
 msgid "Use _authentication"
-msgstr ""
+msgstr "_Yetkilendirme kullan"
 
 #. require authentication
 #: ../gtk/tr-prefs.c:798
 msgid "Only allow these IP a_ddresses to connect:"
-msgstr ""
+msgstr "Sadece şu IP a_dreslerine bağlanma izni ver:"
 
 #: ../gtk/tr-prefs.c:1118
 msgid "Weekdays"
-msgstr ""
+msgstr "Hafta içi günler"
 
 #: ../gtk/tr-prefs.c:1178
 msgid "Speed Limits"
-msgstr ""
+msgstr "Hız Sınırları"
 
 #: ../gtk/tr-prefs.c:1198
 msgid "Temporary Speed Limits"
-msgstr ""
+msgstr "Geçici Hız Sınırları"
 
 #: ../gtk/tr-prefs.c:1205
 msgid "Override normal speed limits manually or at scheduled times"
@@ -1750,11 +1753,11 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:1212
 msgid "Limit do_wnload speed (KB/s):"
-msgstr "İndirme hızını sı_nırla (KB/s):"
+msgstr "İn_dirme hızı sınırı (KB/s):"
 
 #: ../gtk/tr-prefs.c:1220
 msgid "_Scheduled times:"
-msgstr ""
+msgstr "Planlanmış zamanlar:"
 
 #: ../gtk/tr-prefs.c:1225
 msgid " _to "
@@ -1762,23 +1765,23 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:1236
 msgid "_On days:"
-msgstr "Ş_u günlerde:"
+msgstr "_Şu günlerde:"
 
 #: ../gtk/tr-prefs.c:1330
 msgid "_Port for incoming connections:"
-msgstr ""
+msgstr "Gelen bağlantılar için bağlantı _kapısı:"
 
 #: ../gtk/tr-prefs.c:1338
 msgid "Te_st Port"
-msgstr ""
+msgstr "Portu Sı_na"
 
 #: ../gtk/tr-prefs.c:1349
 msgid "Pick a _random port every time Transmission is started"
-msgstr ""
+msgstr "Transmission her başlatıldığında _rastgele bir port seç."
 
 #: ../gtk/tr-prefs.c:1410
 msgid "Proxy"
-msgstr ""
+msgstr "Vekil Sunucu"
 
 #: ../gtk/tr-window.c:340
 #, c-format
@@ -1786,6 +1789,8 @@ msgid ""
 "Click to disable Temporary Speed Limits\n"
 "(%1$s down, %2$s up)"
 msgstr ""
+"Geçici Hız Sınırlarını devre dışı bırakmak için tıkla\n"
+"(indirme %1$s , gönderme %2$s )"
 
 #: ../gtk/tr-window.c:341
 #, c-format
@@ -1793,6 +1798,8 @@ msgid ""
 "Click to enable Temporary Speed Limits\n"
 "(%1$s down, %2$s up)"
 msgstr ""
+"Geçici Hız Sınırlarını etkinleştirmek için tıkla\n"
+"(indirme %1$s , gönderme %2$s)"
 
 #: ../gtk/tr-window.c:728
 msgid "Seed Forever"
@@ -1800,11 +1807,11 @@ msgstr ""
 
 #: ../gtk/tr-window.c:766
 msgid "Limit Download Speed"
-msgstr ""
+msgstr "İndirme Hızını Sınırla"
 
 #: ../gtk/tr-window.c:770
 msgid "Limit Upload Speed"
-msgstr "Gönderme hızını sınırla"
+msgstr "Gönderme Hızını Sınırla"
 
 #: ../gtk/tr-window.c:777
 msgid "Stop Seeding at Ratio"
@@ -1823,7 +1830,7 @@ msgstr "\"%s\" engelli listesinde %'zu girdi var"
 #: ../libtransmission/fdlimit.c:296
 #, c-format
 msgid "Couldn't create \"%1$s\": \"%2$s\" is not a folder"
-msgstr ""
+msgstr "\"%1$s\" oluşturulamadı: \"%2$s\" bir dosya değil"
 
 #: ../libtransmission/fdlimit.c:319
 #, c-format
@@ -1843,7 +1850,7 @@ msgstr ""
 #: ../libtransmission/upnp.c:144
 #, c-format
 msgid "Port %d isn't forwarded"
-msgstr ""
+msgstr "Kapı %d yönlendirilmedi"
 
 #: ../libtransmission/upnp.c:158
 #, c-format

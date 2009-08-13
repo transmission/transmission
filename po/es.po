@@ -19,7 +19,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2009-07-17 19:24+0000\n"
+"X-Launchpad-Export-Date: 2009-08-13 23:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Country: SPAIN\n"
 "X-Poedit-Language: Spanish\n"
@@ -626,6 +626,7 @@ msgstr ""
 "Launchpad Contributions:\n"
 "  Abel O'Rian https://launchpad.net/~abel-orian\n"
 "  Alain Bustamante https://launchpad.net/~webmaster-inkedcity\n"
+"  AlexMorphine https://launchpad.net/~alecapi1\n"
 "  Alfonso Moratalla https://launchpad.net/~vanhell\n"
 "  Alvaro.Godoy https://launchpad.net/~alvaro.godoy\n"
 "  Andres Quintero Arias https://launchpad.net/~anrras-deactivatedaccount\n"
@@ -644,6 +645,7 @@ msgstr ""
 "  Gabriel Ruiz https://launchpad.net/~anakron\n"
 "  Guillermo González Díez https://launchpad.net/~ibrotha-deactivatedaccount\n"
 "  Helmy Giacoman || Eos87 https://launchpad.net/~eos87\n"
+"  Humberto Oliveros Magaña https://launchpad.net/~holiveros\n"
 "  J Álvaro Fernández https://launchpad.net/~jalvarof\n"
 "  Javier Aravena Claramunt https://launchpad.net/~phrodo-00\n"
 "  Javier García Díaz https://launchpad.net/~shortname\n"
@@ -674,6 +676,7 @@ msgstr ""
 "  fosk https://launchpad.net/~oscarrdg\n"
 "  g.chavira https://launchpad.net/~g-chavira-p\n"
 "  jorge cob https://launchpad.net/~jorgecs10\n"
+"  kitzOgen https://launchpad.net/~kitzogen\n"
 "  maty1206 https://launchpad.net/~maty1206\n"
 "  pico.dev https://launchpad.net/~pico.dev"
 
@@ -1457,9 +1460,6 @@ msgstr "Verificando torrent"
 msgid "Queued for verification"
 msgstr "En cola para verificación"
 
-#~ msgid "Private to this tracker -- PEX disabled"
-#~ msgstr "Privado a este tracker -- PEX deshabilitado"
-
 #~ msgid "Origins"
 #~ msgstr "Orígenes"
 
@@ -1472,23 +1472,26 @@ msgstr "En cola para verificación"
 #~ msgid "Date:"
 #~ msgstr "Fecha:"
 
-#~ msgid "Torrent file:"
-#~ msgstr "Archivo torrent:"
-
 #~ msgid "Transfer"
 #~ msgstr "Transferencia"
 
 #~ msgid "Progress:"
 #~ msgstr "Progreso:"
 
-#~ msgid "Failed DL:"
-#~ msgstr "Descargas fallidas:"
-
 #~ msgid "Dates"
 #~ msgstr "Fechas"
 
 #~ msgid "Last activity at:"
 #~ msgstr "Última actividad:"
+
+#~ msgid "Private to this tracker -- PEX disabled"
+#~ msgstr "Privado a este tracker -- PEX deshabilitado"
+
+#~ msgid "Torrent file:"
+#~ msgstr "Archivo torrent:"
+
+#~ msgid "Failed DL:"
+#~ msgstr "Descargas fallidas:"
 
 #, c-format
 #~ msgid "%.1f%%"

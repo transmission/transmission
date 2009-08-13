@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2009-07-17 19:24+0000\n"
+"X-Launchpad-Export-Date: 2009-08-13 23:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Language: Hebrew\n"
 
@@ -506,6 +506,7 @@ msgstr ""
 "  Mark Krapivner https://launchpad.net/~mark125\n"
 "  Shahar Or https://launchpad.net/~dawnlight\n"
 "  Yaron https://launchpad.net/~sh-yaron\n"
+"  lielf https://launchpad.net/~lielft\n"
 "  nadavvadan https://launchpad.net/~nadavvadan"
 
 #: ../gtk/makemeta-ui.c:109

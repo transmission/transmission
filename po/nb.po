@@ -9,14 +9,14 @@ msgstr ""
 "Project-Id-Version: transmission 1.06\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2009-07-13 16:23-0500\n"
-"PO-Revision-Date: 2009-05-31 16:46+0000\n"
+"PO-Revision-Date: 2009-07-31 21:01+0000\n"
 "Last-Translator: Geir Hauge <Unknown>\n"
 "Language-Team: Norwegian <en@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2009-07-17 19:24+0000\n"
+"X-Launchpad-Export-Date: 2009-08-13 23:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:49
@@ -1406,6 +1406,10 @@ msgstr "Køet for verifisering"
 #~ msgid "Date:"
 #~ msgstr "Dato:"
 
+#, c-format
+#~ msgid "%.1f%%"
+#~ msgstr "%.1f%%"
+
 #~ msgid "Transfer"
 #~ msgstr "Overføring"
 
@@ -1415,25 +1419,21 @@ msgstr "Køet for verifisering"
 #~ msgid "Last activity at:"
 #~ msgstr "Sist aktivitet:"
 
-#, c-format
-#~ msgid "%.1f%%"
-#~ msgstr "%.1f%%"
-
 #: ../gtk/actions.c:52
 msgid "Sort by Rati_o"
-msgstr ""
+msgstr "Sorter etter f_orhold"
 
 #: ../gtk/actions.c:53
 msgid "Sort by Stat_e"
-msgstr ""
+msgstr "Sorter etter _tilstand"
 
 #: ../gtk/actions.c:54
 msgid "Sort by T_racker"
-msgstr ""
+msgstr "Sorter etter st_ifinner"
 
 #: ../gtk/actions.c:56
 msgid "Sort by Time _Left"
-msgstr ""
+msgstr "Sorter etter _gjenstående tid"
 
 #: ../gtk/actions.c:57
 msgid "Sort by Si_ze"
@@ -1441,11 +1441,11 @@ msgstr "Sorter etter st_ørrelse"
 
 #: ../gtk/actions.c:90
 msgid "Temporary  Speed _Limits"
-msgstr ""
+msgstr "_Midlertidige fartsgrenser"
 
 #: ../gtk/actions.c:92
 msgid "Re_verse Sort Order"
-msgstr ""
+msgstr "Sn_u sorteringsrekkefølgen"
 
 #: ../gtk/actions.c:113
 msgid "Set _Location"
@@ -1466,7 +1466,7 @@ msgstr "_Ikke overskrid globale begrensninger"
 
 #: ../gtk/details.c:539
 msgid "Torrent _priority:"
-msgstr ""
+msgstr "Torrent_prioritet:"
 
 #: ../gtk/details.c:543
 msgid "Seed-Until Ratio"
@@ -1474,7 +1474,7 @@ msgstr "Så til forhold er ..."
 
 #: ../gtk/details.c:546
 msgid "Use _global settings"
-msgstr ""
+msgstr "Bruk _globale innstillinger"
 
 #: ../gtk/details.c:555
 msgid "Seed _regardless of ratio"
@@ -1482,7 +1482,7 @@ msgstr "Så torrenten _uansett hva forholdet er"
 
 #: ../gtk/details.c:564 ../gtk/tr-prefs.c:311
 msgid "_Seed torrent until its ratio reaches:"
-msgstr ""
+msgstr "_Så torrent til forholdet når:"
 
 #: ../gtk/details.c:604
 msgid "Verifying local data"
@@ -1503,75 +1503,75 @@ msgstr "Kun for denne stifinneren -- DHT og PEX deaktivert"
 #: ../gtk/details.c:663
 #, c-format
 msgid "Created by %1$s"
-msgstr ""
+msgstr "Opprettet av %1$s"
 
 #: ../gtk/details.c:665
 #, c-format
 msgid "Created on %1$s"
-msgstr ""
+msgstr "Opprettet %1$s"
 
 #: ../gtk/details.c:667
 #, c-format
 msgid "Created by %1$s on %2$s"
-msgstr ""
+msgstr "Opprettet %2$s av %1$s"
 
 #: ../gtk/details.c:758
 #, c-format
 msgid "%1$s (%2$'d piece @ %3$s)"
 msgid_plural "%1$s (%2$'d pieces @ %3$s)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s (%2$'d bruddstykke på %3$s)"
+msgstr[1] "%1$s (%2$'d bruddstykker på %3$s)"
 
 #: ../gtk/details.c:764
 #, c-format
 msgid "%1$s (%2$'d piece)"
 msgid_plural "%1$s (%2$'d pieces)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s (%2$'d bruddstykke)"
+msgstr[1] "%1$s (%2$'d bruddstykker)"
 
 #: ../gtk/details.c:798
 #, c-format
 msgid "%1$s (%2$.1f%%); %3$s Unverified"
-msgstr ""
+msgstr "%1$s (%2$.1f%%); %3$s ikke verifisert"
 
 #: ../gtk/details.c:800
 #, c-format
 msgid "%1$s (%2$.1f%%)"
-msgstr ""
+msgstr "%1$s (%2$.1f%%)"
 
 #: ../gtk/details.c:820
 #, c-format
 msgid "%1$s (+%2$s corrupt)"
-msgstr ""
+msgstr "%1$s (+%2$s ødelagt)"
 
 #: ../gtk/details.c:893
 msgid "Active now"
-msgstr ""
+msgstr "Aktiv nå"
 
 #: ../gtk/details.c:897
 #, c-format
 msgid "%1$s ago"
-msgstr ""
+msgstr "%1$s siden"
 
 #: ../gtk/details.c:920
 msgid "Torrent size:"
-msgstr ""
+msgstr "Torrentstørrelse:"
 
 #: ../gtk/details.c:944
 msgid "Running time:"
-msgstr ""
+msgstr "Varighet:"
 
 #: ../gtk/details.c:948
 msgid "Last activity:"
-msgstr ""
+msgstr "Sist aktivitet:"
 
 #: ../gtk/details.c:962
 msgid "Location:"
-msgstr ""
+msgstr "Plassering:"
 
 #: ../gtk/details.c:979
 msgid "Origin:"
-msgstr ""
+msgstr "Opphav:"
 
 #: ../gtk/details.c:1028
 msgid "Webseeds"
@@ -1592,32 +1592,32 @@ msgstr "Egenskaper for %'d torrenter"
 
 #: ../gtk/notify.c:121
 msgid "Torrent Added"
-msgstr ""
+msgstr "Torrent lagt til"
 
 #: ../gtk/relocate.c:68
 #, c-format
 msgid "Moving \"%s\""
-msgstr ""
+msgstr "Flytter «%s»"
 
 #: ../gtk/relocate.c:70
 msgid "This may take a moment..."
-msgstr ""
+msgstr "Dette kan ta en stund ..."
 
 #: ../gtk/relocate.c:99 ../gtk/relocate.c:121
 msgid "Set Torrent Location"
-msgstr ""
+msgstr "Sett torrentplassering"
 
 #: ../gtk/relocate.c:124
 msgid "Torrent _location:"
-msgstr ""
+msgstr "Torrent_plassering:"
 
 #: ../gtk/relocate.c:125
 msgid "_Move from the current folder"
-msgstr ""
+msgstr "_Flytt fra den gjeldende mappen"
 
 #: ../gtk/relocate.c:128
 msgid "Local data is _already there"
-msgstr ""
+msgstr "_Lokal data er allerede flyttet der"
 
 #. %1$s is the torrent's total size,
 #. %2$s is how much we've uploaded,
@@ -1631,7 +1631,7 @@ msgstr "%1$s, lastet opp %2$s (forhold: %3$s, mål: %4$s)"
 #: ../gtk/tr-icon.c:77 ../gtk/tr-icon.c:92
 #, c-format
 msgid "(Limit: %s)"
-msgstr ""
+msgstr "(Begrensning: %s)"
 
 #. %1$s: current upload speed
 #. * %2$s: current upload limit, if any
@@ -1644,22 +1644,25 @@ msgid ""
 "Up: %1$s %2$s\n"
 "Down: %3$s %4$s"
 msgstr ""
+"Transmission\n"
+"Opp: %1$s %2$s\n"
+"Ned: %3$s %4$s"
 
 #: ../gtk/tr-prefs.c:306
 msgid "Save to _Location:"
-msgstr ""
+msgstr "Lagre _i:"
 
 #: ../gtk/tr-prefs.c:337
 msgid "Inhibit _hibernation when torrents are active"
-msgstr ""
+msgstr "Hindre _dvalemodus mens torrenter er aktive"
 
 #: ../gtk/tr-prefs.c:341
 msgid "Show Transmission in the system _tray"
-msgstr ""
+msgstr "Vis Transmission i _varslingsområdet"
 
 #: ../gtk/tr-prefs.c:345
 msgid "Show popup _notifications"
-msgstr ""
+msgstr "Vis _sprettoppmeldinger"
 
 #: ../gtk/tr-prefs.c:402
 #, c-format
@@ -1682,15 +1685,15 @@ msgstr "Henter ny blokkeringsliste ..."
 
 #: ../gtk/tr-prefs.c:458
 msgid "Allow encryption"
-msgstr ""
+msgstr "Tillat kryptering"
 
 #: ../gtk/tr-prefs.c:459
 msgid "Prefer encryption"
-msgstr ""
+msgstr "Foretrekk kryptering"
 
 #: ../gtk/tr-prefs.c:460
 msgid "Require encryption"
-msgstr ""
+msgstr "Krev kryptering"
 
 #: ../gtk/tr-prefs.c:527 ../gtk/tr-prefs.c:1398
 msgid "Privacy"
@@ -1698,47 +1701,49 @@ msgstr "Personvern"
 
 #: ../gtk/tr-prefs.c:529
 msgid "_Encryption mode:"
-msgstr ""
+msgstr "_Krypteringsmodus:"
 
 #: ../gtk/tr-prefs.c:533
 msgid "Use PE_X to find more peers"
-msgstr ""
+msgstr "Bruk PE_X for å finne flere likemenn"
 
 #: ../gtk/tr-prefs.c:535
 msgid ""
 "PEX is a tool for exchanging peer lists with the peers you're connected to."
 msgstr ""
+"PEX er et redskap for å utveksle lister over likemenn med de likemennene du "
+"er tilkoblet."
 
 #: ../gtk/tr-prefs.c:540
 msgid "Use _DHT to find more peers"
-msgstr ""
+msgstr "Bruk _DHT for å finne flere likemenn"
 
 #: ../gtk/tr-prefs.c:542
 msgid "DHT is a tool for finding peers without a tracker."
-msgstr ""
+msgstr "DHT er et redskap for å finne likemenn uten en stifinner."
 
 #: ../gtk/tr-prefs.c:753
 msgid "Web Client"
-msgstr ""
+msgstr "Vevgrensesnitt"
 
 #. "enabled" checkbutton
 #: ../gtk/tr-prefs.c:756
 msgid "_Enable web client"
-msgstr ""
+msgstr "Aktiver _vevgrensesnitt"
 
 #: ../gtk/tr-prefs.c:762
 msgid "_Open web client"
-msgstr ""
+msgstr "_Åpne vevgrensesnitt"
 
 #. require authentication
 #: ../gtk/tr-prefs.c:775 ../gtk/tr-prefs.c:992
 msgid "Use _authentication"
-msgstr ""
+msgstr "Bruk _autentisering"
 
 #. require authentication
 #: ../gtk/tr-prefs.c:798
 msgid "Only allow these IP a_ddresses to connect:"
-msgstr ""
+msgstr "Kun tillat tilkoblinger fra disse _IP-adressene:"
 
 #: ../gtk/tr-prefs.c:1117
 msgid "Every Day"
@@ -1782,15 +1787,15 @@ msgstr "Lørdag"
 
 #: ../gtk/tr-prefs.c:1178
 msgid "Speed Limits"
-msgstr ""
+msgstr "Fartsgrenser"
 
 #: ../gtk/tr-prefs.c:1198
 msgid "Temporary Speed Limits"
-msgstr ""
+msgstr "Midlertidige fartsgrenser"
 
 #: ../gtk/tr-prefs.c:1205
 msgid "Override normal speed limits manually or at scheduled times"
-msgstr ""
+msgstr "Overstyr normale fartsgrenser manuelt eller i planlagte tidsrom"
 
 #: ../gtk/tr-prefs.c:1212
 msgid "Limit do_wnload speed (KB/s):"
@@ -1798,11 +1803,11 @@ msgstr "Begrens ne_dlastingshastighet (KiB/s):"
 
 #: ../gtk/tr-prefs.c:1220
 msgid "_Scheduled times:"
-msgstr ""
+msgstr "Planlagte tids_rom:"
 
 #: ../gtk/tr-prefs.c:1225
 msgid " _to "
-msgstr ""
+msgstr " _til "
 
 #: ../gtk/tr-prefs.c:1236
 msgid "_On days:"
@@ -1822,15 +1827,15 @@ msgstr "_Port for innkommende tilkoblinger:"
 
 #: ../gtk/tr-prefs.c:1338
 msgid "Te_st Port"
-msgstr ""
+msgstr "Te_st port"
 
 #: ../gtk/tr-prefs.c:1349
 msgid "Pick a _random port every time Transmission is started"
-msgstr ""
+msgstr "V_elg en tilfeldig port hver gang Transmission startes"
 
 #: ../gtk/tr-prefs.c:1410
 msgid "Proxy"
-msgstr ""
+msgstr "Mellomtjener"
 
 #: ../gtk/tr-window.c:340
 #, c-format
@@ -1838,6 +1843,8 @@ msgid ""
 "Click to disable Temporary Speed Limits\n"
 "(%1$s down, %2$s up)"
 msgstr ""
+"Klikk for å deaktivere midlertidige fartsgrenser\n"
+"(%1$s ned, %2$s opp)"
 
 #: ../gtk/tr-window.c:341
 #, c-format
@@ -1845,6 +1852,8 @@ msgid ""
 "Click to enable Temporary Speed Limits\n"
 "(%1$s down, %2$s up)"
 msgstr ""
+"Klikk for å aktivere midlertidige fartsgrenser\n"
+"(%1$s ned, %2$s opp)"
 
 #: ../gtk/tr-window.c:661
 msgid "Unlimited"
@@ -1874,7 +1883,7 @@ msgstr "Slutt når forhold er (%s)"
 #: ../libtransmission/fdlimit.c:296
 #, c-format
 msgid "Couldn't create \"%1$s\": \"%2$s\" is not a folder"
-msgstr ""
+msgstr "Kunne ikke opprette «%1$s»: «%2$s» er ikke en mappe"
 
 #: ../libtransmission/net.c:323
 #, c-format

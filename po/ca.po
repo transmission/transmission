@@ -22,7 +22,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2009-07-17 19:24+0000\n"
+"X-Launchpad-Export-Date: 2009-08-13 23:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:49
@@ -1416,9 +1416,6 @@ msgstr "S'està encuant per a verificar-lo"
 #~ msgid "Date:"
 #~ msgstr "Data:"
 
-#~ msgid "Torrent file:"
-#~ msgstr "Fitxer torrent:"
-
 #~ msgid "Transfer"
 #~ msgstr "Transferència"
 
@@ -1437,6 +1434,12 @@ msgstr "S'està encuant per a verificar-lo"
 #~ msgid "Last activity at:"
 #~ msgstr "Última activitat a les:"
 
+#~ msgid "Use peer e_xchange"
+#~ msgstr "Utilitza l'int_ercanvi de clients"
+
+#~ msgid "Torrent file:"
+#~ msgstr "Fitxer torrent:"
+
 #, c-format
 #~ msgid ""
 #~ "%1$'d Seeding, %2$'d Downloading\n"
@@ -1444,9 +1447,6 @@ msgstr "S'està encuant per a verificar-lo"
 #~ msgstr ""
 #~ "%1$'d compartint, %2$'d baixant\n"
 #~ "Baixada: %3$s, pujada: %4$s"
-
-#~ msgid "Use peer e_xchange"
-#~ msgstr "Utilitza l'int_ercanvi de clients"
 
 #: ../gtk/actions.c:52
 msgid "Sort by Rati_o"
