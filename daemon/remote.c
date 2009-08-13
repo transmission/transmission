@@ -40,7 +40,7 @@
 #define DEFAULT_HOST "localhost"
 #define DEFAULT_PORT atoi(TR_DEFAULT_RPC_PORT_STR)
 
-enum { TAG_SESSION, TAG_LIST, TAG_DETAILS, TAG_FILES, TAG_PEERS };
+enum { TAG_SESSION, TAG_STATS, TAG_LIST, TAG_DETAILS, TAG_FILES, TAG_PEERS };
 
 static const char*
 getUsage( void )
@@ -74,6 +74,7 @@ static tr_option opts[] =
     { 'G', "no-get",               "Mark files for not downloading", "G",  1, "<files>" },
     { 'i', "info",                 "Show the current torrent(s)' details", "i",  0, NULL },
     { 920, "session-info",         "Show the session's details", "si", 0, NULL },
+    { 921, "session-stats",        "Show the session's statistics", "st", 0, NULL },
     { 'l', "list",                 "List all torrents", "l",  0, NULL },
     { 960, "move",                 "Move current torrent's data to a new folder", NULL, 1, "<path>" },
     { 961, "find",                 "Tell Transmission where to find a torrent's data", NULL, 1, "<path>" },
@@ -556,6 +557,11 @@ readargs( int           argc,
                 tr_bencDictAddInt( &top, "tag", TAG_SESSION );
                 break;
 
+            case 921:
+                tr_bencDictAddStr( &top, "method", "session-stats" );
+                tr_bencDictAddInt( &top, "tag", TAG_STATS );
+                break;
+                
             case 930:
                 tr_bencDictAddStr( &top, "method", "torrent-set" );
                 addIdArg( args, id );
@@ -684,20 +690,49 @@ writeFunc( void * ptr,
     return byteCount;
 }
 
-static void
-etaToString( char *  buf,
-             size_t  buflen,
-             int64_t eta )
+static char*
+tr_strltime( char * buf, int seconds, size_t buflen )
 {
-    if( eta < 0 ) tr_snprintf( buf, buflen, "Unknown" );
-    else if( eta < 60 ) tr_snprintf( buf, buflen, "%" PRId64 "sec", eta );
-    else if( eta <
-            ( 60 * 60 ) ) tr_snprintf( buf, buflen, "%" PRId64 " min",
-                                       eta / 60 );
-    else if( eta <
-            ( 60 * 60 * 24 ) ) tr_snprintf( buf, buflen, "%" PRId64 " hrs",
-                                           eta / ( 60 * 60 ) );
-    else tr_snprintf( buf, buflen, "%" PRId64 " days", eta / ( 60 * 60 * 24 ) );
+    int  days, hours, minutes;
+    char d[128], h[128], m[128], s[128];
+
+    if( seconds < 0 )
+        seconds = 0;
+
+    days = seconds / 86400;
+    hours = ( seconds % 86400 ) / 3600;
+    minutes = ( seconds % 3600 ) / 60;
+    seconds = ( seconds % 3600 ) % 60;
+
+    tr_snprintf( d, sizeof( d ), ngettext( "%'d day", "%'d days", days ), days );
+    tr_snprintf( h, sizeof( h ), ngettext( "%'d hour", "%'d hours", hours ), hours );
+    tr_snprintf( m, sizeof( m ), ngettext( "%'d minute", "%'d minutes", minutes ), minutes );
+    tr_snprintf( s, sizeof( s ), ngettext( "%'d second", "%'d seconds", seconds ), seconds );
+
+    if( days )
+    {
+        if( days >= 4 || !hours )
+            tr_strlcpy( buf, d, buflen );
+        else
+            tr_snprintf( buf, buflen, "%s, %s", d, h );
+    }
+    else if( hours )
+    {
+        if( hours >= 4 || !minutes )
+            tr_strlcpy( buf, h, buflen );
+        else
+            tr_snprintf( buf, buflen, "%s, %s", h, m );
+    }
+    else if( minutes )
+    {
+        if( minutes >= 4 || !seconds )
+            tr_strlcpy( buf, m, buflen );
+        else
+            tr_snprintf( buf, buflen, "%s, %s", m, s );
+    }
+    else tr_strlcpy( buf, s, buflen );
+
+    return buf;
 }
 
 #define KILOBYTE_FACTOR 1024.0
@@ -920,6 +955,43 @@ printSession( tr_benc * top )
 }
 
 static void
+printSessionStats( tr_benc * top )
+{
+    tr_benc *args, *d;
+    if( ( tr_bencDictFindDict( top, "arguments", &args ) ) )
+    {
+        char buf[512];
+        int64_t up, down, secs, sessions;
+
+        if( tr_bencDictFindDict( args, "current-stats", &d )
+            && tr_bencDictFindInt( d, "uploadedBytes", &up )
+            && tr_bencDictFindInt( d, "downloadedBytes", &down )
+            && tr_bencDictFindInt( d, "secondsActive", &secs ) )
+        {
+            printf( "\nCURRENT SESSION\n" );
+            printf( "  Uploaded:   %s\n", strlsize( buf, up, sizeof( buf ) ) );
+            printf( "  Downloaded: %s\n", strlsize( buf, down, sizeof( buf ) ) );
+            printf( "  Ratio:      %s\n", strlratio( buf, up, down, sizeof( buf ) ) );
+            printf( "  Duration:   %s\n", tr_strltime( buf, secs, sizeof( buf ) ) );
+        }
+
+        if( tr_bencDictFindDict( args, "cumulative-stats", &d )
+            && tr_bencDictFindInt( d, "sessionCount", &sessions )
+            && tr_bencDictFindInt( d, "uploadedBytes", &up )
+            && tr_bencDictFindInt( d, "downloadedBytes", &down )
+            && tr_bencDictFindInt( d, "secondsActive", &secs ) )
+        {
+            printf( "\nTOTAL\n" );
+            printf( "  Started %lu times\n", (unsigned long)sessions );
+            printf( "  Uploaded:   %s\n", strlsize( buf, up, sizeof( buf ) ) );
+            printf( "  Downloaded: %s\n", strlsize( buf, down, sizeof( buf ) ) );
+            printf( "  Ratio:      %s\n", strlratio( buf, up, down, sizeof( buf ) ) );
+            printf( "  Duration:   %s\n", tr_strltime( buf, secs, sizeof( buf ) ) );
+        }
+    }
+}
+
+static void
 printDetails( tr_benc * top )
 {
     tr_benc *args, *torrents;
@@ -968,10 +1040,7 @@ printDetails( tr_benc * top )
             }
 
             if( tr_bencDictFindInt( t, "eta", &i ) )
-            {
-                etaToString( buf, sizeof( buf ), i );
-                printf( "  ETA: %s\n", buf );
-            }
+                printf( "  ETA: %s\n", tr_strltime( buf, i, sizeof( buf ) ) );
             if( tr_bencDictFindInt( t, "rateDownload", &i ) )
                 printf( "  Download Speed: %.1f KB/s\n", i / 1024.0 );
             if( tr_bencDictFindInt( t, "rateUpload", &i ) )
@@ -1291,7 +1360,7 @@ printTorrentList( tr_benc * top )
                 strlsize( haveStr, sizeWhenDone - leftUntilDone, sizeof( haveStr ) );
 
                 if( leftUntilDone )
-                    etaToString( etaStr, sizeof( etaStr ), eta );
+                    tr_strltime( etaStr, eta, sizeof( etaStr ) );
                 else
                     tr_snprintf( etaStr, sizeof( etaStr ), "Done" );
                 if( tr_bencDictFindInt( d, "error", &error ) && error )
@@ -1352,6 +1421,9 @@ processResponse( const char * host,
         {
             case TAG_SESSION:
                 printSession( &top ); break;
+
+            case TAG_STATS:
+                printSessionStats( &top ); break;
 
             case TAG_FILES:
                 printFileList( &top ); break;
