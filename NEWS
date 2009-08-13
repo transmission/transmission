@@ -11,7 +11,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + Fix cygwin build error
 - Mac
    + 64-bit compatibility
-   + Original torrent files are no longer remembered
+   + Connections to original torrent files are no longer maintained
    + Queuing system will not exclude transfers with tracker warnings
 - GTK+
    + Fix rare bug that crashed Transmission when adding torrents on certain desktops
@@ -21,6 +21,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + New Russian Translation 
    + When Transmission was minimized, clicking on its icon in the icon tray didn't raise it.
 - Web Client
+   + Progress bar shows seeding progress
    + When verifying a torrent, "%nan" was displayed
    + "Pause All" only appeared to pause torrents with peers until refresh
 
