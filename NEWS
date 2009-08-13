@@ -10,7 +10,9 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + DHT now honors the bind-address-ipv4 configuration option
    + Fix cygwin build error
 - Mac
-   + Queuing system should distinguish between tracker errors and http warnings
+   + 64-bit compatibility
+   + Original torrent files are no longer remembered
+   + Queuing system will not exclude transfers with tracker warnings
 - GTK+
    + Fix rare bug that crashed Transmission when adding torrents on certain desktops
    + Synchronize the main window's list's torrent speeds and the statusbar speed
