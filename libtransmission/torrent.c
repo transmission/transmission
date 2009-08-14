@@ -116,9 +116,8 @@ tr_torrentSetSpeedLimit( tr_torrent * tor, tr_direction dir, int KiB_sec )
     assert( tr_isTorrent( tor ) );
     assert( tr_isDirection( dir ) );
 
-    tr_bandwidthSetDesiredSpeed( tor->bandwidth, dir, KiB_sec );
-
-    tr_torrentSetDirty( tor );
+    if( tr_bandwidthSetDesiredSpeed( tor->bandwidth, dir, KiB_sec ) )
+        tr_torrentSetDirty( tor );
 }
 
 int
@@ -136,9 +135,8 @@ tr_torrentUseSpeedLimit( tr_torrent * tor, tr_direction dir, tr_bool do_use )
     assert( tr_isTorrent( tor ) );
     assert( tr_isDirection( dir ) );
 
-    tr_bandwidthSetLimited( tor->bandwidth, dir, do_use );
-
-    tr_torrentSetDirty( tor );
+    if( tr_bandwidthSetLimited( tor->bandwidth, dir, do_use ) )
+        tr_torrentSetDirty( tor );
 }
 
 tr_bool
@@ -153,12 +151,15 @@ tr_torrentUsesSpeedLimit( const tr_torrent * tor, tr_direction dir )
 void
 tr_torrentUseSessionLimits( tr_torrent * tor, tr_bool doUse )
 {
+    tr_bool changed;
+
     assert( tr_isTorrent( tor ) );
 
-    tr_bandwidthHonorParentLimits( tor->bandwidth, TR_UP, doUse );
-    tr_bandwidthHonorParentLimits( tor->bandwidth, TR_DOWN, doUse );
+    changed = tr_bandwidthHonorParentLimits( tor->bandwidth, TR_UP, doUse );
+    changed |= tr_bandwidthHonorParentLimits( tor->bandwidth, TR_DOWN, doUse );
 
-    tr_torrentSetDirty( tor );
+    if( changed )
+        tr_torrentSetDirty( tor );
 }
 
 tr_bool
@@ -179,10 +180,13 @@ tr_torrentSetRatioMode( tr_torrent *  tor, tr_ratiolimit mode )
     assert( tr_isTorrent( tor ) );
     assert( mode==TR_RATIOLIMIT_GLOBAL || mode==TR_RATIOLIMIT_SINGLE || mode==TR_RATIOLIMIT_UNLIMITED  );
 
-    tor->ratioLimitMode = mode;
-    tor->needsSeedRatioCheck = TRUE;
+    if( mode != tor->ratioLimitMode )
+    {
+        tor->ratioLimitMode = mode;
+        tor->needsSeedRatioCheck = TRUE;
 
-    tr_torrentSetDirty( tor );
+        tr_torrentSetDirty( tor );
+    }
 }
 
 tr_ratiolimit
@@ -198,11 +202,14 @@ tr_torrentSetRatioLimit( tr_torrent * tor, double desiredRatio )
 {
     assert( tr_isTorrent( tor ) );
 
-    tor->desiredRatio = desiredRatio;
+    if( (int)(desiredRatio*100.0) != (int)(tor->desiredRatio*100.0) )
+    {
+        tor->desiredRatio = desiredRatio;
 
-    tor->needsSeedRatioCheck = TRUE;
+        tor->needsSeedRatioCheck = TRUE;
 
-    tr_torrentSetDirty( tor );
+        tr_torrentSetDirty( tor );
+    }
 }
 
 double
@@ -1791,9 +1798,12 @@ tr_torrentSetPriority( tr_torrent * tor, tr_priority_t priority )
     assert( tr_isTorrent( tor ) );
     assert( tr_isPriority( priority ) );
 
-    tor->bandwidth->priority = priority;
+    if( tor->bandwidth->priority != priority )
+    {
+        tor->bandwidth->priority = priority;
 
-    tr_torrentSetDirty( tor );
+        tr_torrentSetDirty( tor );
+    }
 }
 
 /***
@@ -2055,14 +2065,12 @@ tr_torrentSetAddedDate( tr_torrent * tor,
 }
 
 void
-tr_torrentSetActivityDate( tr_torrent * tor,
-                           time_t       t )
+tr_torrentSetActivityDate( tr_torrent * tor, time_t t )
 {
     assert( tr_isTorrent( tor ) );
 
     tor->activityDate = t;
     tor->anyDate = MAX( tor->anyDate, tor->activityDate );
-    tr_torrentSetDirty( tor );
 }
 
 void

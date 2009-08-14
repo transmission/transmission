@@ -523,12 +523,13 @@ static uint64_t
 loadFromFile( tr_torrent * tor,
               uint64_t     fieldsToLoad )
 {
-    int64_t      i;
+    int64_t  i;
     const char * str;
-    uint64_t     fieldsLoaded = 0;
-    char *       filename;
-    tr_benc      top;
-    tr_bool      boolVal;
+    uint64_t fieldsLoaded = 0;
+    char * filename;
+    tr_benc top;
+    tr_bool boolVal;
+    const tr_bool  wasDirty = tor->isDirty;
 
     filename = getResumeFilename( tor );
 
@@ -641,6 +642,11 @@ loadFromFile( tr_torrent * tor,
 
     if( fieldsToLoad & TR_FR_RATIOLIMIT )
         fieldsLoaded |= loadRatioLimits( &top, tor );
+
+    /* loading the resume file triggers of a lot of changes,
+     * but none of them needs to trigger a re-saving of the
+     * same resume information... */
+    tor->isDirty = wasDirty;
 
     tr_bencFree( &top );
     tr_free( filename );

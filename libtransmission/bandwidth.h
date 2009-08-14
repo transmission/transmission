@@ -151,11 +151,14 @@ static TR_INLINE tr_bool tr_isBandwidth( const tr_bandwidth  * b )
  * @see tr_bandwidthAllocate
  * @see tr_bandwidthGetDesiredSpeed
  */
-static TR_INLINE void tr_bandwidthSetDesiredSpeed( tr_bandwidth        * bandwidth,
-                                                tr_direction          dir,
-                                                double                desiredSpeed )
+static TR_INLINE tr_bool tr_bandwidthSetDesiredSpeed( tr_bandwidth        * bandwidth,
+                                                      tr_direction          dir,
+                                                      double                desiredSpeed )
 {
-    bandwidth->band[dir].desiredSpeed = desiredSpeed;
+    double * value = &bandwidth->band[dir].desiredSpeed;
+    const tr_bool didChange = (int)(desiredSpeed*1024.0) != (int)(*value*1024.0);
+    *value = desiredSpeed;
+    return didChange;
 }
 
 /**
@@ -172,11 +175,14 @@ tr_bandwidthGetDesiredSpeed( const tr_bandwidth  * bandwidth,
 /**
  * @brief Set whether or not this bandwidth should throttle its peer-io's speeds
  */
-static TR_INLINE void tr_bandwidthSetLimited( tr_bandwidth        * bandwidth,
-                                              tr_direction          dir,
-                                              tr_bool               isLimited )
+static TR_INLINE tr_bool tr_bandwidthSetLimited( tr_bandwidth        * bandwidth,
+                                                 tr_direction          dir,
+                                                 tr_bool               isLimited )
 {
-    bandwidth->band[dir].isLimited = isLimited;
+    tr_bool * value = &bandwidth->band[dir].isLimited;
+    const tr_bool didChange = isLimited != *value;
+    *value = isLimited;
+    return didChange;
 }
 
 /**
@@ -238,14 +244,14 @@ void    tr_bandwidthSetParent         ( tr_bandwidth        * bandwidth,
  * But when we set a torrent's speed mode to TR_SPEEDLIMIT_UNLIMITED, then
  * in that particular case we want to ignore the global speed limit...
  */
-static TR_INLINE void tr_bandwidthHonorParentLimits ( tr_bandwidth        * bandwidth,
-                                                      tr_direction          direction,
-                                                      tr_bool               isEnabled )
+static TR_INLINE tr_bool tr_bandwidthHonorParentLimits ( tr_bandwidth        * bandwidth,
+                                                         tr_direction          direction,
+                                                         tr_bool               isEnabled )
 {
-    assert( tr_isBandwidth( bandwidth ) );
-    assert( tr_isDirection( direction ) );
-
-    bandwidth->band[direction].honorParentLimits = isEnabled;
+    tr_bool * value = &bandwidth->band[direction].honorParentLimits;
+    const tr_bool didChange = isEnabled != *value;
+    *value = isEnabled;
+    return didChange;
 }
 
 static TR_INLINE tr_bool tr_bandwidthAreParentLimitsHonored( tr_bandwidth  * bandwidth,
