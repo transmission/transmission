@@ -27,6 +27,7 @@
 
 #include <inttypes.h>
 #include <libtransmission/transmission.h>
+#include "util.h" /* gtr_lockfile */
 
 int64_t          pref_int_get           ( const char * key );
 void             pref_int_set           ( const char * key, int64_t value );
@@ -67,7 +68,7 @@ gboolean pref_flag_eval( pref_flag_t  val,
 gboolean cf_init( const char *confdir,
                   char **     errstr );
 
-gboolean cf_lock( tr_lockfile_state_t *tr_state,
-                  char **              errstr );
+gboolean cf_lock( gtr_lockfile_state_t  * tr_state,
+                  char                 ** errstr );
 
 #endif /* TG_CONF_H */

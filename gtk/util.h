@@ -14,6 +14,7 @@
 #define GTR_UTIL_H
 
 #include <sys/types.h>
+#include <gtk/gtk.h>
 
 /* macro to shut up "unused parameter" warnings */
 #ifndef UNUSED
@@ -61,6 +62,20 @@ GSList * checkfilenames( int argc, char ** argv );
 ****
 ***/
 
+typedef enum
+{
+    GTR_LOCKFILE_SUCCESS = 0,
+    GTR_LOCKFILE_EOPEN,
+    GTR_LOCKFILE_ELOCK
+}
+gtr_lockfile_state_t;
+
+gtr_lockfile_state_t gtr_lockfile( const char * filename );
+
+/***
+****
+***/
+
 void        gtr_open_file( const char * path );
 
 gboolean    gtr_dbus_add_torrent( const char * filename );
@@ -72,9 +87,6 @@ char*       gtr_get_help_url( void );
 /***
 ****
 ***/
-
-/* GTK-related utilities */
-#ifdef GTK_MAJOR_VERSION
 
 /* backwards-compatible wrapper around g_mkdir_with_parents() */
 int gtr_mkdir_with_parents( const char *name, int mode );
@@ -120,7 +132,5 @@ gboolean on_tree_view_button_released( GtkWidget      * view,
 
 /* move a file to the trashcan if GIO is available; otherwise, delete it */
 int tr_file_trash_or_remove( const char * filename );
-
-#endif /* GTK_MAJOR_VERSION */
 
 #endif /* GTR_UTIL_H */

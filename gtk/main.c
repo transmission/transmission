@@ -325,20 +325,19 @@ onRPCChanged( tr_session            * session UNUSED,
 }
 
 int
-main( int     argc,
-      char ** argv )
+main( int argc, char ** argv )
 {
-    char *              err = NULL;
-    GSList *            argfiles;
-    GError *            gerr;
-    gboolean            didinit = FALSE;
-    gboolean            didlock = FALSE;
-    gboolean            showversion = FALSE;
-    gboolean            startpaused = FALSE;
-    gboolean            startminimized = FALSE;
-    const char *        domain = MY_NAME;
-    char *              configDir = NULL;
-    tr_lockfile_state_t tr_state;
+    char * err = NULL;
+    GSList * argfiles;
+    GError * gerr;
+    gboolean didinit = FALSE;
+    gboolean didlock = FALSE;
+    gboolean showversion = FALSE;
+    gboolean startpaused = FALSE;
+    gboolean startminimized = FALSE;
+    const char * domain = MY_NAME;
+    char * configDir = NULL;
+    gtr_lockfile_state_t tr_state;
 
     GOptionEntry entries[] = {
         { "paused",     'p', 0, G_OPTION_ARG_NONE,
@@ -415,7 +414,7 @@ main( int     argc,
             }
         }
     }
-    else if( ( !didlock ) && ( tr_state == TR_LOCKFILE_ELOCK ) )
+    else if( ( !didlock ) && ( tr_state == GTR_LOCKFILE_ELOCK ) )
     {
         /* There's already another copy of Transmission running,
          * so tell it to present its window to the user */

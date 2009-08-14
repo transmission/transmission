@@ -63,8 +63,6 @@ void                tr_lockUnlock( tr_lock * );
 
 int                 tr_lockHave( const tr_lock * );
 
-tr_lockfile_state_t tr_lockfile( const char * filename );
-
 #ifdef WIN32
 void *              mmap( void *ptr,
                           long  size,

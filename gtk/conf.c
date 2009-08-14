@@ -75,27 +75,27 @@ cf_init( const char   * configDir,
 
 /* errstr may be NULL, this might be called before GTK is initialized */
 static gboolean
-lockfile( const char *         filename,
-          tr_lockfile_state_t *tr_state,
-          char **              errstr )
+lockfile( const char             * filename,
+          gtr_lockfile_state_t   * tr_state,
+          char                  ** errstr )
 {
-    const tr_lockfile_state_t state = tr_lockfile( filename );
-    const gboolean            success = state == TR_LOCKFILE_SUCCESS;
+    const gtr_lockfile_state_t state = gtr_lockfile( filename );
+    const gboolean success = state == GTR_LOCKFILE_SUCCESS;
 
     if( errstr ) switch( state )
         {
-            case TR_LOCKFILE_EOPEN:
+            case GTR_LOCKFILE_EOPEN:
                 *errstr =
                     g_strdup_printf( _( "Couldn't open \"%1$s\": %2$s" ),
                                     filename, g_strerror( errno ) );
                 break;
 
-            case TR_LOCKFILE_ELOCK:
+            case GTR_LOCKFILE_ELOCK:
                 *errstr = g_strdup_printf( _( "%s is already running." ),
                                           g_get_application_name( ) );
                 break;
 
-            case TR_LOCKFILE_SUCCESS:
+            case GTR_LOCKFILE_SUCCESS:
                 *errstr = NULL;
                 break;
         }
@@ -125,8 +125,7 @@ cf_removelocks( void )
 
 /* errstr may be NULL, this might be called before GTK is initialized */
 gboolean
-cf_lock( tr_lockfile_state_t *tr_state,
-         char **              errstr )
+cf_lock( gtr_lockfile_state_t * tr_state, char ** errstr )
 {
     char *         path = getLockFilename( );
     const gboolean didLock = lockfile( path, tr_state, errstr );

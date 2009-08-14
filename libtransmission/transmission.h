@@ -1356,14 +1356,6 @@ tr_torrent_activity;
 
 tr_torrent_activity tr_torrentGetActivity( tr_torrent * );
 
-typedef enum
-{
-    TR_LOCKFILE_SUCCESS = 0,
-    TR_LOCKFILE_EOPEN,
-    TR_LOCKFILE_ELOCK
-}
-tr_lockfile_state_t;
-
 enum
 {
     TR_PEER_FROM_INCOMING  = 0,  /* connections made to the listening port */
