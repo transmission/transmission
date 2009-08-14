@@ -568,8 +568,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         if (donateResult == NSAlertFirstButtonReturn)
             [self linkDonate: self];
         
-        if ([[alert suppressionButton] state] == NSOnState)
-            [fDefaults setBool: NO forKey: @"WarningDonate"];
+        [fDefaults setBool: ([[alert suppressionButton] state] == NSOnState) forKey: @"WarningDonate"];
         
         [alert release];
         
