@@ -670,7 +670,6 @@ tr_session * fHandle;
     [fDefaults removeObjectForKey: @"WarningRemoveBuiltInTracker"];
     [fDefaults removeObjectForKey: @"WarningInvalidOpen"];
     [fDefaults removeObjectForKey: @"WarningDonate"];
-    WarningDonate
 }
 
 - (void) setQueue: (id) sender
