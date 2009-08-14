@@ -26,7 +26,6 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + When verifying a torrent, "%nan" was displayed
    + "Pause All" only appeared to pause torrents with peers until refresh
 
-
 1.73 (2009/07/18)
 <http://trac.transmissionbt.com/query?milestone=1.73&group=component&groupdesc=1&order=severity>
 - All Platforms
