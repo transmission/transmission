@@ -537,7 +537,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     //shamelessly ask for donations
     NSDate * lastDonateDate = [fDefaults objectForKey: @"DonateAskDate"];
-    if (YES)//[fDefaults boolForKey: @"WarningDonate"] && (!lastDonateDate || [lastDonateDate timeIntervalSinceNow] < -1 * DONATE_NAG_TIME))
+    if ([fDefaults boolForKey: @"WarningDonate"] && (!lastDonateDate || [lastDonateDate timeIntervalSinceNow] < -1 * DONATE_NAG_TIME))
     {
         if (lastDonateDate) //don't show on the first launch
         {
