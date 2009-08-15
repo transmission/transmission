@@ -4,27 +4,30 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 <http://trac.transmissionbt.com/query?milestone=1.74&group=component&groupdesc=1&order=severity>
 - All Platforms
    + Better data recovery in the case of an OS or Transmission crash
+   + Upgrade DHT to version 0.8
    + If a downloaded file is moved, stop the torrent instead of redownloading it
-   + Fix bug that kept some peers from being listed in the resume file and PEX
-   + Make torrent error messages more descriptive and helpful
-   + Upgrade the DHT library to version 0.8
+   + Fix bug that didn't list some peers in the resume file and in PEX
+   + Make torrent error messages more helpful
    + DHT now honors the bind-address-ipv4 configuration option
-   + Fix cygwin build error
+   + Fix Debian build error with miniupnpc
+   + Fix Cygwin build error with strtold
 - Mac
    + 64-bit compatibility
    + Connections to original torrent files are no longer maintained
    + Queuing system will not exclude transfers with tracker warnings
 - GTK+
-   + Fix rare crash that occurred when adding torrents on some desktops
+   + Fix crash that occurred when adding torrents on some desktops
    + Synchronize the statusbar's and torrent list's speeds
    + Fix the Properties dialog's "Origin" field for multiple torrents
+- Web Client
+   + Progress bar shows seeding progress
+   + Fix bug that displayed "%nan" when verifying a torrent
+   + "Pause All" only appeared to pause torrents with peers until refresh
 - Qt
    + New Russian Translation 
    + If Transmission was minimized, clicking on it the icon tray didn't raise it
-- Web Client
-   + Progress bar shows seeding progress
-   + When verifying a torrent, "%nan" was displayed
-   + "Pause All" only appeared to pause torrents with peers until refresh
+- Daemon
+   + Add a "session stats" readout to transmission-remote
 
 1.73 (2009/07/18)
 <http://trac.transmissionbt.com/query?milestone=1.73&group=component&groupdesc=1&order=severity>
