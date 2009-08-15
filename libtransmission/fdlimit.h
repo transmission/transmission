@@ -53,9 +53,7 @@ int64_t tr_lseek( int fd, int64_t offset, int whence );
  *
  * A small pool of open files is kept to avoid the overhead of
  * continually opening and closing the same files when downloading
- * piece data.    It's also used to ensure only one caller can
- * write to the file at a time.  Callers check out a file, use it,
- * and then check it back in via tr_fdFileReturn() when done.
+ * piece data.
  *
  * - if `folder' doesn't exist, errno is set to ENOENT.
  * - if doWrite is true, subfolders in torrentFile are created if necessary.
@@ -64,7 +62,6 @@ int64_t tr_lseek( int fd, int64_t offset, int whence );
  * on success, a file descriptor >= 0 is returned.
  * on failure, a -1 is returned and errno is set.
  *
- * @see tr_fdFileReturn
  * @see tr_fdFileClose
  */
 int  tr_fdFileCheckout( int                      torrentId,
@@ -75,21 +72,12 @@ int  tr_fdFileCheckout( int                      torrentId,
                         uint64_t                 desiredFileSize );
 
 /**
- * Returns an fd from tr_fdFileCheckout() so that other clients may borrow it.
- *
- * @see tr_fdFileCheckout
- * @see tr_fdFileClose
- */
-void tr_fdFileReturn( int file );
-
-/**
  * Closes a file that's being held by our file repository.
  *
  * If the file isn't checked out, it's closed immediately.
  * If the file is currently checked out, it will be closed upon its return.
  *
  * @see tr_fdFileCheckout
- * @see tr_fdFileReturn
  */
 void     tr_fdFileClose( const char * filename );
 

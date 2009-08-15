@@ -478,21 +478,6 @@ tr_fdFileCheckout( int                      torrentId,
 }
 
 void
-tr_fdFileReturn( int fd )
-{
-    struct tr_openfile * o;
-    const struct tr_openfile * end;
-
-    for( o=gFd->openFiles, end=o+gFd->openFileLimit; o!=end; ++o )
-    {
-        if( o->fd != fd )
-            continue;
-        dbgmsg( "releasing file \"%s\"", o->filename );
-        break;
-    }
-}
-
-void
 tr_fdFileClose( const char * filename )
 {
     struct tr_openfile * o;
