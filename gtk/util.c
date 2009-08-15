@@ -432,7 +432,6 @@ on_tree_view_button_released( GtkWidget *      view,
     {
         GtkTreeSelection * selection = gtk_tree_view_get_selection( tv );
         gtk_tree_selection_unselect_all ( selection );
-        return TRUE;
     }
 
     return FALSE;
