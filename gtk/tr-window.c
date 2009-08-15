@@ -337,8 +337,8 @@ syncAltSpeedButton( PrivateData * p )
     const gboolean b = pref_flag_get( TR_PREFS_KEY_ALT_SPEED_ENABLED );
     GtkWidget * w = p->alt_speed_button;
 
-    tr_strlspeed( u, pref_double_get( TR_PREFS_KEY_ALT_SPEED_UP ), sizeof( u ) );
-    tr_strlspeed( d, pref_double_get( TR_PREFS_KEY_ALT_SPEED_DOWN ), sizeof( d ) );
+    tr_strlspeed( u, pref_int_get( TR_PREFS_KEY_ALT_SPEED_UP ), sizeof( u ) );
+    tr_strlspeed( d, pref_int_get( TR_PREFS_KEY_ALT_SPEED_DOWN ), sizeof( d ) );
     fmt = b ? _( "Click to disable Temporary Speed Limits\n(%1$s down, %2$s up)" )
             : _( "Click to enable Temporary Speed Limits\n(%1$s down, %2$s up)" );
     g_snprintf( buf, sizeof( buf ), fmt, d, u );
