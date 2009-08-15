@@ -704,10 +704,10 @@ tr_strltime( char * buf, int seconds, size_t buflen )
     minutes = ( seconds % 3600 ) / 60;
     seconds = ( seconds % 3600 ) % 60;
 
-    tr_snprintf( d, sizeof( d ), ngettext( "%'d day", "%'d days", days ), days );
-    tr_snprintf( h, sizeof( h ), ngettext( "%'d hour", "%'d hours", hours ), hours );
-    tr_snprintf( m, sizeof( m ), ngettext( "%'d minute", "%'d minutes", minutes ), minutes );
-    tr_snprintf( s, sizeof( s ), ngettext( "%'d second", "%'d seconds", seconds ), seconds );
+    tr_snprintf( d, sizeof( d ), "%'d day%s", days, days==1?"":"s" );
+    tr_snprintf( h, sizeof( h ), "%'d hour%s", hours, hours==1?"":"s" );
+    tr_snprintf( m, sizeof( m ), "%'d minute%s", minutes, minutes==1?"":"s" );
+    tr_snprintf( s, sizeof( s ), "%'d second%s", seconds, seconds==1?"":"s" );
 
     if( days )
     {
