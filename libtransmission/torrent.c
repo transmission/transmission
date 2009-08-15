@@ -1448,13 +1448,15 @@ closeTorrent( void * vtor )
     tr_bencDictAddInt( d, "id", tor->uniqueId );
     tr_bencDictAddInt( d, "date", time( NULL ) );
 
-    tor->isRunning = 0;
     stopTorrent( tor );
+
     if( tor->isDeleting )
     {
         tr_metainfoRemoveSaved( tor->session, &tor->info );
         tr_torrentRemoveResume( tor );
     }
+
+    tor->isRunning = 0;
     freeTorrent( tor );
 }
 
