@@ -302,7 +302,10 @@ action_sensitize( const char * name,
 void
 action_set_important( const char * name, gboolean b )
 {
-    gtk_action_set_is_important( get_action( name ), b );
+    GtkAction * action = get_action( name );
+
+    g_assert( action != NULL );
+    g_object_set( action, "is-important", b, NULL );
 }
 
 void
