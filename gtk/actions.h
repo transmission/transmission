@@ -29,6 +29,9 @@ void       action_sensitize( const char * name,
 void       action_toggle( const char * name,
                           gboolean     b );
 
+void       action_set_important( const char * name, gboolean b );
+
+
 GtkWidget* action_get_widget( const char * path );
 
 void       doAction( const char * action_name,

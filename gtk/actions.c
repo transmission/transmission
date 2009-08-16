@@ -300,6 +300,12 @@ action_sensitize( const char * name,
 }
 
 void
+action_set_important( const char * name, gboolean b )
+{
+    gtk_action_set_is_important( get_action( name ), b );
+}
+
+void
 action_toggle( const char * name,
                gboolean     b )
 {

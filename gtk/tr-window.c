@@ -884,6 +884,8 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
 
     /* toolbar */
     w = toolbar = p->toolbar = action_get_widget( "/main-window-toolbar" );
+    action_set_important( "add-torrent-toolbar", TRUE );
+    action_set_important( "show-torrent-properties", TRUE );
 
     /* filter */
     h = filter = p->filter = gtk_hbox_new( FALSE, 0 );
