@@ -139,7 +139,7 @@
 "1 transfer" = "1 trasferimento";
 
 /* Move folder cannot be used alert -> message */
-"\"%@\" cannot be used. The file will remain in its current location." = "\"%@\" non può essere usato. Il file rimarrà nella sua attuale posizione.";
+"\"%@\" cannot be used. The file will remain in its current location." = "\"%@\" non può essere usato. Il file rimarrà nella sua posizione attuale.";
 
 /* Folder cannot be used alert -> message */
 "\"%@\" cannot be used. The transfer will be paused." = "\"%@\" non può essere usato. Il trasferimento sarà messo in pausa.";
@@ -163,7 +163,7 @@
 "A torrent file with this name and directory cannot be created." = "Impossibile creare un file torrent con questo nome e cartella.";
 
 /* Open duplicate alert -> title */
-"A transfer of \"%@\" already exists." = "Un trasferimento di \"%@\" già esiste.";
+"A transfer of \"%@\" already exists." = "Esiste già un trasferimento di \"%@\".";
 
 /* Inspector -> title */
 "Activity" = "Attività";
@@ -190,25 +190,13 @@
 "Are you sure you want to remove %d built-in trackers?" = "Vuoi veramente rimuovere %d tracker incorporati?";
 
 /* Removal confirm panel -> title */
-"Are you sure you want to remove %d transfers from the transfer list and trash both the data and torrent files?" = "Vuoi veramente rimuovere %d trasferimenti dalla lista e cestinare i dati ed il file torrent?";
-
-/* Removal confirm panel -> title */
-"Are you sure you want to remove %d transfers from the transfer list and trash the data file?" = "Vuoi veramente rimuovere %d trasferimenti dalla lista e cestinare i dati?";
-
-/* Removal confirm panel -> title */
-"Are you sure you want to remove %d transfers from the transfer list and trash the torrent file?" = "Vuoi veramente rimuovere %d trasferimenti dalla lista e cestinare il file torrent?";
+"Are you sure you want to remove %d transfers from the transfer list and trash the data files?" = "Vuoi veramente rimuovere %d trasferimenti dalla lista e cestinare i file?";
 
 /* Removal confirm panel -> title */
 "Are you sure you want to remove %d transfers from the transfer list?" = "Vuoi veramente rimuovere %d trasferimenti dalla lista?";
 
 /* Removal confirm panel -> title */
-"Are you sure you want to remove \"%@\" from the transfer list and trash both the data and torrent files?" = "Vuoi veramente rimuovere \"%@\" dalla lista e cestinare i dati ed il file torrent?";
-
-/* Removal confirm panel -> title */
-"Are you sure you want to remove \"%@\" from the transfer list and trash the data file?" = "Vuoi veramente rimuovere \"%@\" dalla lista e cestinare i dati?";
-
-/* Removal confirm panel -> title */
-"Are you sure you want to remove \"%@\" from the transfer list and trash the torrent file?" = "Vuoi veramente rimuovere \"%@\" dalla lista e cestinare il file torrent?";
+"Are you sure you want to remove \"%@\" from the transfer list and trash the data file?" = "Vuoi veramente rimuovere \"%@\" dalla lista e cestinare il file?";
 
 /* Removal confirm panel -> title */
 "Are you sure you want to remove \"%@\" from the transfer list?" = "Vuoi veramente rimuovere \"%@\" dalla lista?";
@@ -253,7 +241,7 @@
 "Cancel" = "Annulla";
 
 /* Torrent Table -> tooltip */
-"Change transfer settings" = "Cambia le impostazioni per il trasferimento";
+"Change transfer settings" = "Modifica le impostazioni per il trasferimento";
 
 /* File Outline -> Menu */
 "Check Selected" = "Spunta selezionati";
@@ -287,13 +275,13 @@
 /* Drag overlay -> file */
 "Create a Torrent File" = "Crea un file torrent";
 
-/* Create toolbar item -> tooltip */
-"Create torrent file" = "Crea file torrent";
-
 /* Create torrent -> select file
    Create toolbar item -> palette label */
 
 "Create Torrent File" = "Crea file torrent";
+
+/* Create toolbar item -> tooltip */
+"Create torrent file" = "Crea file torrent";
 
 /* Create torrent -> failed -> title */
 "Creation of \"%@\" failed." = "Creazione di \"%@\" fallita.";
@@ -320,8 +308,17 @@
 /* Torrent disk space alert -> button */
 "Do not check disk space again" = "Non controllare nuovamente lo spazio su disco";
 
+/* Donation beg -> button */
+"Don't bug me about this ever again." = "Non infastidirmi più con questa domanda.";
+
 /* files tab -> tooltip */
 "Don't Download" = "Non scaricare";
+
+/* Donation beg -> button */
+"Donate" = "Dona";
+
+/* Donation beg -> message */
+"Donate or not, there will be no difference to your torrenting experience." = "La scelta non comporterà alcuna differenza nell'esperienza d'uso del programma.";
 
 /* file table -> header tool tip
    files tab -> tooltip */
@@ -335,7 +332,7 @@
 "Download Complete" = "Download completato";
 
 /* Blocklist -> message */
-"Download of the blocklist failed." = "Fallito download della blocklist.";
+"Download of the blocklist failed." = "Il download della blocklist è fallito.";
 
 /* files tab -> tooltip */
 "Download Some" = "Scarica alcuni";
@@ -482,7 +479,7 @@
 "Message" = "Messaggio";
 
 /* Message window -> title */
-"Message Log" = "Log Messaggi";
+"Message Log" = "Log messaggi";
 
 /* files tab -> tooltip */
 "Multiple Priorities" = "Priorità multiple";
@@ -510,6 +507,9 @@
    Groups -> Button */
 
 "None" = "Nessuno";
+
+/* Donation beg -> button */
+"Nope" = "No";
 
 /* File Outline -> Priority Menu */
 "Normal" = "Normale";
@@ -748,11 +748,11 @@
 /* Torrent -> status string */
 "Seeding" = "In seed";
 
-/* Growl notification title */
-"Seeding Complete" = "Seeding completato";
-
 /* Torrent -> status string */
 "Seeding complete" = "Seeding completato";
+
+/* Growl notification title */
+"Seeding Complete" = "Seeding completato";
 
 /* Torrent -> status string */
 "Seeding to %d of %d peers" = "In seed verso %1$d su %2$d peer";
@@ -783,7 +783,7 @@
 /* Folder cannot be used alert -> select destination folder
    Add -> select destination folder */
 
-"Select the download folder for \"%@\"" = "Selezionare la cartella ove scaricare \"%@\"";
+"Select the download folder for \"%@\"" = "Selezionare la cartella in cui scaricare \"%@\"";
 
 /* Create torrent -> location sheet -> message */
 "Select the name and location for the torrent file." = "Selezionare nome e posizione per il file torrent.";
@@ -837,6 +837,9 @@
 
 /* Torrent cell -> button info */
 "Stop waiting to start" = "Stop in attesa di avvio";
+
+/* Donation beg -> title */
+"Support open-source indie software" = "Supporta il software open-source indipendente";
 
 /* File size - terabytes */
 "TB" = "TB";
@@ -962,8 +965,17 @@
 /* Inspector -> title */
 "Tracker" = "Tracker";
 
+/* Torrent -> status string */
+"Tracker returned a warning" = "Il tracker ha restituito un avvertimento";
+
+/* Torrent -> status string */
+"Tracker returned an error" = "Il tracker ha restituito un errore";
+
 /* Preferences -> toolbar item title */
 "Transfers" = "Trasferimenti";
+
+/* Donation beg -> message */
+"Transmission is a full-featured torrent application. A lot of time and effort have gone into development, coding, and refinement. If you enjoy using it, please consider showing your love with a donation." = "Transmission è una applicazione torrent ricca di funzionalità. Sviluppare, codificare e migliorare il programma ha richiesto molto tempo e molto impegno. Se ti piace usare questo software, per favore considera di mostrare il tuo gradimento tramite una donazione.  ";
 
 /* Transmission already running alert -> title */
 "Transmission is already running." = "Transmission è già in esecuzione.";
