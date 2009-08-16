@@ -975,7 +975,7 @@
 "Transfers" = "Trasferimenti";
 
 /* Donation beg -> message */
-"Transmission is a full-featured torrent application. A lot of time and effort have gone into development, coding, and refinement. If you enjoy using it, please consider showing your love with a donation." = "Transmission è una applicazione torrent ricca di funzionalità. Sviluppare, codificare e migliorare il programma ha richiesto molto tempo e molto impegno. Se ti piace usare questo software, per favore considera di mostrare il tuo gradimento tramite una donazione.  ";
+"Transmission is a full-featured torrent application. A lot of time and effort have gone into development, coding, and refinement. If you enjoy using it, please consider showing your love with a donation." = "Transmission è una applicazione torrent ricca di funzionalità. Sviluppare, codificare e migliorare il programma ha richiesto molto tempo e molto impegno. Se ti piace usare questo software, per favore considera di mostrare il tuo gradimento tramite una donazione.";
 
 /* Transmission already running alert -> title */
 "Transmission is already running." = "Transmission è già in esecuzione.";
