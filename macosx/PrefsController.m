@@ -1132,7 +1132,7 @@ tr_session * fHandle;
     
     //alt speed limit - up
     const int upLimitAlt = tr_sessionGetAltSpeed(fHandle, TR_UP);
-    [fDefaults setInteger: upLimitAlt forKey: @"SpeedLimitDownloadLimit"];
+    [fDefaults setInteger: upLimitAlt forKey: @"SpeedLimitUploadLimit"];
     
     //alt speed limit schedule
     const BOOL useAltSpeedSched = tr_sessionUsesAltSpeedTime(fHandle);
