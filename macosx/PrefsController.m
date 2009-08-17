@@ -1084,7 +1084,7 @@ tr_session * fHandle;
     [fDefaults setInteger: peersTotal forKey: @"PeersTotal"];
     
     const uint16_t peersTorrent = tr_sessionGetPeerLimitPerTorrent(fHandle);
-    [fDefaults setInteger: peersTotal forKey: @"PeersTorrent"];
+    [fDefaults setInteger: peersTorrent forKey: @"PeersTorrent"];
     
     //pex
     const BOOL pex = tr_sessionIsPexEnabled(fHandle);
