@@ -63,6 +63,15 @@ getUsage( void )
 static tr_option opts[] =
 {
     { 'a', "add",                  "Add torrent files by filename or URL", "a",  0, NULL },
+    { 970, "alt-speed",            "Use the alternate Limits", "as",  0, NULL },
+    { 971, "no-alt-speed",         "Don't use the alternate Limits", "AS",  0, NULL },
+    { 972, "alt-speed-downlimit",  "max alternate download speed (in KB/s)", "asd",  1, "<speed>" },
+    { 973, "alt-speed-uplimit",    "max alternate upload speed (in KB/s)", "asu",  1, "<speed>" },
+    { 974, "alt-speed-scheduler",  "Use the scheduled on/off times", "asc",  0, NULL },
+    { 975, "no-alt-speed-scheduler","Don't use the scheduled on/off times", "ASC",  0, NULL },
+    { 976, "alt-speed-time-begin", "Time to start using the alt speed limits (in hhmm)", NULL,  1, "<time>" },
+    { 977, "alt-speed-time-end",   "Time to stop using the alt speed limits (in hhmm)", NULL,  1, "<time>" },
+    { 978, "alt-speed-days",       "Numbers for any/all days of the week - eg. \"1-7\"", NULL,  1, "<days>" },
     { 'b', "debug",                "Print debugging information", "b",  0, NULL },
     { 'd', "downlimit",            "Set the maximum global download speed in KB/s", "d",  1, "<speed>" },
     { 'D', "no-downlimit",         "Don't limit the global download speed", "D",  0, NULL },
@@ -208,6 +217,58 @@ addIdArg( tr_benc *    args,
         else
             tr_bencDictAddStr( args, "ids", id ); /* it's a torrent sha hash */
     }
+}
+
+static void
+addTime( tr_benc * args, const char * key, const char * arg )
+{
+    int time;
+    tr_bool success = FALSE;
+
+    if( arg && ( strlen( arg ) == 4 ) )
+    {
+        const char hh[3] = { arg[0], arg[1], '\0' };
+        const char mm[3] = { arg[2], arg[3], '\0' };
+        const int hour = atoi( hh );
+        const int min = atoi( mm );
+
+        if( 0<=hour && hour<24 && 0<=min && min<60 )
+        {
+            time = min + ( hour * 60 );
+            success = TRUE;
+        }
+    }
+
+    if( success )
+        tr_bencDictAddInt( args, key, time );
+    else
+        fprintf( stderr, "Please specify the time of day in 'hhmm' format.\n" );
+}
+
+static void
+addDays( tr_benc * args, const char * key, const char * arg )
+{
+    int days = 0;
+
+    if( arg )
+    {
+        int i;
+        int valueCount;
+        int * values = tr_parseNumberRange( arg, -1, &valueCount );
+        for( i=0; i<valueCount; ++i )
+        {
+            if ( values[i] < 0 || values[i] > 7 ) continue;
+            if ( values[i] == 7 ) values[i] = 0;
+
+            days |= 1 << values[i];
+        }
+        tr_free( values );
+    }
+
+    if ( days )
+        tr_bencDictAddInt( args, key, days );
+    else
+        fprintf( stderr, "Please specify the days of the week in '1-3,4,7' format.\n" );
 }
 
 static void
@@ -371,6 +432,51 @@ readargs( int           argc,
             case 'D':
                 tr_bencDictAddStr( &top, "method", "session-set" );
                 tr_bencDictAddBool( args, TR_PREFS_KEY_DSPEED_ENABLED, FALSE );
+                break;
+
+            case 970:
+                tr_bencDictAddStr( &top, "method", "session-set" );
+                tr_bencDictAddBool( args, TR_PREFS_KEY_ALT_SPEED_ENABLED, TRUE );
+                break;
+
+            case 971:
+                tr_bencDictAddStr( &top, "method", "session-set" );
+                tr_bencDictAddBool( args, TR_PREFS_KEY_ALT_SPEED_ENABLED, FALSE );
+                break;
+
+            case 972:
+                tr_bencDictAddStr( &top, "method", "session-set" );
+                tr_bencDictAddInt( args, TR_PREFS_KEY_ALT_SPEED_DOWN, numarg( optarg ) );
+                break;
+
+            case 973:
+                tr_bencDictAddStr( &top, "method", "session-set" );
+                tr_bencDictAddInt( args, TR_PREFS_KEY_ALT_SPEED_UP, numarg( optarg ) );
+                break;
+
+            case 974:
+                tr_bencDictAddStr( &top, "method", "session-set" );
+                tr_bencDictAddBool( args, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED, TRUE );
+                break;
+
+            case 975:
+                tr_bencDictAddStr( &top, "method", "session-set" );
+                tr_bencDictAddBool( args, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED, FALSE );
+                break;
+
+            case 976:
+                tr_bencDictAddStr( &top, "method", "session-set" );
+                addTime( args, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN, optarg);
+                break;
+
+            case 977:
+                tr_bencDictAddStr( &top, "method", "session-set" );
+                addTime( args, TR_PREFS_KEY_ALT_SPEED_TIME_END, optarg);
+                break;
+
+            case 978:
+                tr_bencDictAddStr( &top, "method", "session-set" );
+                addDays( args, TR_PREFS_KEY_ALT_SPEED_TIME_DAY, optarg );
                 break;
 
             case 'f':

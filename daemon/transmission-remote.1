@@ -12,6 +12,12 @@ and
 .Nm
 .Op Ar host:port | host | port
 .Op Fl a Ar filenames-or-URLs
+.Op Fl as
+.Op Fl AS
+.Op Fl asd Ar number
+.Op Fl asu Ar number
+.Op Fl asc
+.Op Fl ASC
 .Op Fl b
 .Op Fl d Ar number | Fl D
 .Op Fl er | ep | et
@@ -40,6 +46,7 @@ and
 .Op Fl SR
 .Op Fl srd
 .Op Fl si
+.Op Fl st
 .Op Fl t Ar all | Ar id | Ar hash
 .Op Fl u Ar number | Fl U
 .Op Fl v
@@ -67,6 +74,41 @@ Add torrents to transmission.
 
 .It Fl b Fl -debug
 Enable debugging mode.
+
+.It Fl as Fl -alt-speed
+Use the alternate Limits.
+
+.It Fl AS Fl -no-alt-speed
+Don't use the alternate Limits.
+
+.It Fl asd Fl -alt-speed-downlimit Ar limit
+Limit the alternate download speed to
+.Ar limit
+kilobytes per second.
+
+.It Fl asu Fl -alt-speed-uplimit Ar limit
+Limit the alternate upload speed to
+.Ar limit
+kilobytes per second.
+
+.It Fl asc Fl -alt-speed-scheduler
+Use the scheduled on/off times.
+
+.It Fl ASC Fl -no-alt-speed-scheduler
+Don't use the scheduled on/off days and times.
+
+.It Fl -alt-speed-time-begin Ar time
+.Ar Time
+to start using the alt speed limits (in hhmm).
+
+.It Fl -alt-speed-time-end Ar time
+.Ar Time
+to stop using the alt speed limits (in hhmm).
+
+.It Fl -alt-speed-days Ar days
+Set the number of
+.Ar days
+on which to enable the speed scheduler, using a list such as "2,4-6".
 
 .It Fl d Fl -downlimit Ar limit
 Limit the global download speed to
@@ -248,10 +290,24 @@ In the `status' section of the list, the following shorthand is used:
 .El
 .Sh EXAMPLES
 
-Set download and upload limits to 100 KiB/sec and 20 KiB/sec:
+Set download and upload limits to 400 KiB/sec and 60 KiB/sec:
 .Bd -literal -offset indent
-$ transmission-remote -d100 -u20
-$ transmission-remote --downlimit=100 --uplimit=20
+$ transmission-remote -d400 -u60
+$ transmission-remote --downlimit=400 --uplimit=60
+.Ed
+
+Set alternate download and upload limits to 100 KiB/sec and 20 KiB/sec:
+.Bd -literal -offset indent
+$ transmission-remote -asd100 -asu20
+$ transmission-remote --alt-speed-downlimit=100 --alt-speed-uplimit=20
+.Ed
+
+Set the scheduler to use the alternate speed limits on weekdays between 10AM and 11PM
+.Bd -literal -offset indent
+$ transmission-remote --alt-speed-time-begin=1000
+$ transmission-remote --alt-speed-time-end=2300
+$ transmission-remote --alt-speed-days=1-5
+$ transmission-remote --alt-speed-scheduler
 .Ed
 
 List all torrents' IDs and states:
