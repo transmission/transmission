@@ -4103,7 +4103,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             break;
         
         default:
-            NSLog(@"Unknown RPC command received!");
+            NSLog(@"Unknown RPC command received (%d)", type);
             [torrent release];
     }
     
