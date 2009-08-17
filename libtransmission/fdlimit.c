@@ -523,11 +523,9 @@ tr_fdSocketCreate( int domain, int type )
     if( gFd->socketCount < getSocketMax( gFd ) )
         if( ( s = socket( domain, type, 0 ) ) < 0 )
         {
-#ifdef SYS_DARWIN
             if( sockerrno != EAFNOSUPPORT )
-#endif
-            tr_err( _( "Couldn't create socket: %s" ),
-                   tr_strerror( sockerrno ) );
+                tr_err( _( "Couldn't create socket: %s" ),
+                        tr_strerror( sockerrno ) );
         }
 
     if( s > -1 )
