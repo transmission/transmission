@@ -457,6 +457,7 @@ tr_session * fHandle;
 {
     const int count = [sender intValue];
     [fDefaults setInteger: count forKey: @"PeersTorrent"];
+    tr_sessionSetPeerLimitPerTorrent(fHandle, count);
 }
 
 - (void) setPEX: (id) sender
