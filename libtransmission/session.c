@@ -880,7 +880,11 @@ tr_sessionInitImpl( void * vdata )
 
     if( session->isDHTEnabled )
     {
+#ifdef WITHOUT_DHT
+        tr_inf( "DHT disabled by packager." );
+#else
         tr_dhtInit( session, &session->public_ipv4->addr );
+#endif
     }
 }
 
@@ -1641,7 +1645,11 @@ tr_sessionIsPexEnabled( const tr_session * session )
 tr_bool
 tr_sessionAllowsDHT( const tr_session * session UNUSED )
 {
+#ifdef WITHOUT_DHT
+    return 0;
+#else
     return tr_sessionIsDHTEnabled( session );
+#endif
 }
 
 tr_bool

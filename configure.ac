@@ -203,8 +203,20 @@ dnl ----------------------------------------------------------------------------
 dnl
 dnl  dht
 
-DHT_CFLAGS="-I\$(top_srcdir)/third-party/dht"
-DHT_LIBS="\$(top_builddir)/third-party/dht/libdht.a"
+
+AC_ARG_ENABLE([dht], 
+              AS_HELP_STRING([--disable-dht],[omit DHT support]), 
+              [enable_dht=${enableval}], 
+              [enable_dht=yes]) 
+if test "x$enable_dht" = "xno" ; then 
+    AC_DEFINE([WITHOUT_DHT], 1) 
+    DHT_CFLAGS=""
+    DHT_LIBS=""
+else
+    DHT_CFLAGS="-I\$(top_srcdir)/third-party/dht"
+    DHT_LIBS="\$(top_builddir)/third-party/dht/libdht.a"
+fi
+AM_CONDITIONAL(DHT, test "x$enable_dht" = "xyes") 
 AC_SUBST(DHT_CFLAGS)
 AC_SUBST(DHT_LIBS)
 
@@ -415,6 +427,7 @@ Configuration:
         Source code location:          ${srcdir}
         Compiler:                      ${CXX}
         System or bundled libevent:    ${libevent_source}
+        DHT support:                   ${enable_dht}
 
         Build Mac client:              ${build_mac}
         Build GTK+ client:             ${build_gtk}
