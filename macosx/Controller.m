@@ -561,14 +561,17 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         NSButton * noDonateButton = [alert addButtonWithTitle: NSLocalizedString(@"Nope", "Donation beg -> button")];
         [noDonateButton setKeyEquivalent: @"\e"]; //escape key
         
-        [alert setShowsSuppressionButton: YES];
-        [[alert suppressionButton] setTitle: NSLocalizedString(@"Don't bug me about this ever again.", "Donation beg -> button")];
+        const BOOL allowNeverAgain = lastDonateDate != nil; //hide the "don't show again" check the first time - give them a little time to try the app
+        [alert setShowsSuppressionButton: allowNeverAgain];
+        if (allowNeverAgain)
+            [[alert suppressionButton] setTitle: NSLocalizedString(@"Don't bug me about this ever again.", "Donation beg -> button")];
         
         const NSInteger donateResult = [alert runModal];
         if (donateResult == NSAlertFirstButtonReturn)
             [self linkDonate: self];
         
-        [fDefaults setBool: ([[alert suppressionButton] state] != NSOnState) forKey: @"WarningDonate"];
+        if (allowNeverAgain)
+            [fDefaults setBool: ([[alert suppressionButton] state] != NSOnState) forKey: @"WarningDonate"];
         
         [alert release];
         
