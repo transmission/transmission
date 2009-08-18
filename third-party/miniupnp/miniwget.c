@@ -1,7 +1,7 @@
-/* $Id: miniwget.c,v 1.22 2009/02/28 10:36:35 nanard Exp $ */
+/* $Id: miniwget.c,v 1.25 2009/08/07 14:44:51 nanard Exp $ */
 /* Project : miniupnp
  * Author : Thomas Bernard
- * Copyright (c) 2005 Thomas Bernard
+ * Copyright (c) 2005-2009 Thomas Bernard
  * This software is subject to the conditions detailed in the
  * LICENCE file provided in this distribution.
  * */
@@ -24,13 +24,16 @@
 #include <netdb.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <errno.h>
 #define closesocket close
+#define MINIUPNPC_IGNORE_EINTR
 #endif
 #if defined(__sun) || defined(sun)
 #define MIN(x,y) (((x)<(y))?(x):(y))
 #endif
 
 #include "miniupnpcstrings.h"
+#include "miniwget.h"
 
 /* miniwget2() :
  * */
@@ -43,6 +46,12 @@ miniwget2(const char * url, const char * host,
     int s;
 	struct sockaddr_in dest;
 	struct hostent *hp;
+	int n;
+	int len;
+	int sent;
+#ifdef MINIUPNPC_SET_SOCKET_TIMEOUT
+	struct timeval timeout;
+#endif
 	*size = 0;
 	hp = gethostbyname(host);
 	if(hp==NULL)
@@ -59,9 +68,31 @@ miniwget2(const char * url, const char * host,
 		perror("socket");
 		return NULL;
 	}
+#ifdef MINIUPNPC_SET_SOCKET_TIMEOUT
+	/* setting a 3 seconds timeout for the connect() call */
+	timeout.tv_sec = 3;
+	timeout.tv_usec = 0;
+	if(setsockopt(s, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(struct timeval)) < 0)
+	{
+		perror("setsockopt");
+	}
+	timeout.tv_sec = 3;
+	timeout.tv_usec = 0;
+	if(setsockopt(s, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(struct timeval)) < 0)
+	{
+		perror("setsockopt");
+	}
+#endif
 	dest.sin_family = AF_INET;
 	dest.sin_port = htons(port);
-	if(connect(s, (struct sockaddr *)&dest, sizeof(struct sockaddr_in))<0)
+#ifdef MINIUPNPC_IGNORE_EINTR
+	do {
+#endif
+		n = connect(s, (struct sockaddr *)&dest, sizeof(struct sockaddr_in));
+#ifdef MINIUPNPC_IGNORE_EINTR
+	} while(n < 0 && errno == EINTR);
+#endif
+	if(n<0)
 	{
 		perror("connect");
 		closesocket(s);
@@ -72,12 +103,17 @@ miniwget2(const char * url, const char * host,
 	if(addr_str)
 	{
 		struct sockaddr_in saddr;
-		socklen_t len;
+		socklen_t saddrlen;
 
-		len = sizeof(saddr);
-		getsockname(s, (struct sockaddr *)&saddr, &len);
+		saddrlen = sizeof(saddr);
+		if(getsockname(s, (struct sockaddr *)&saddr, &saddrlen) < 0)
+		{
+			perror("getsockname");
+		}
+		else
+		{
 #ifndef WIN32
-		inet_ntop(AF_INET, &saddr.sin_addr, addr_str, addr_str_len);
+			inet_ntop(AF_INET, &saddr.sin_addr, addr_str, addr_str_len);
 #else
 	/* using INT WINAPI WSAAddressToStringA(LPSOCKADDR, DWORD, LPWSAPROTOCOL_INFOA, LPSTR, LPDWORD);
      * But his function make a string with the port :  nn.nn.nn.nn:port */
@@ -86,14 +122,15 @@ miniwget2(const char * url, const char * host,
 		{
 		    printf("WSAAddressToStringA() failed : %d\n", WSAGetLastError());
 		}*/
-		strncpy(addr_str, inet_ntoa(saddr.sin_addr), addr_str_len);
+			strncpy(addr_str, inet_ntoa(saddr.sin_addr), addr_str_len);
 #endif
+		}
 #ifdef DEBUG
 		printf("address miniwget : %s\n", addr_str);
 #endif
 	}
 
-	snprintf(buf, sizeof(buf),
+	len = snprintf(buf, sizeof(buf),
                  "GET %s HTTP/1.1\r\n"
 			     "Host: %s:%d\r\n"
 				 "Connection: Close\r\n"
@@ -101,10 +138,24 @@ miniwget2(const char * url, const char * host,
 
 				 "\r\n",
 		    path, host, port);
-	/*write(s, buf, strlen(buf));*/
-	send(s, buf, strlen(buf), 0);
+	sent = 0;
+	/* sending the HTTP request */
+	while(sent < len)
 	{
-		int n, headers=1;
+		n = send(s, buf+sent, len-sent, 0);
+		if(n < 0)
+		{
+			perror("send");
+			closesocket(s);
+			return NULL;
+		}
+		else
+		{
+			sent += n;
+		}
+	}
+	{
+		int headers=1;
 		char * respbuffer = NULL;
 		int allreadyread = 0;
 		/*while((n = recv(s, buf, 2048, 0)) > 0)*/
@@ -115,12 +166,14 @@ miniwget2(const char * url, const char * host,
 				int i=0;
 				while(i<n-3)
 				{
+					/* searching for the end of the HTTP headers */
 					if(buf[i]=='\r' && buf[i+1]=='\n'
 					   && buf[i+2]=='\r' && buf[i+3]=='\n')
 					{
 						headers = 0;	/* end */
 						if(i<n-4)
 						{
+							/* Copy the content into respbuffet */
 							respbuffer = (char *)realloc((void *)respbuffer, 
 														 allreadyread+(n-i-4));
 							memcpy(respbuffer+allreadyread, buf + i + 4, n-i-4);

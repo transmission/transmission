@@ -1,11 +1,23 @@
-/* $Id: miniupnpc.c,v 1.59 2009/07/29 08:44:29 nanard Exp $ */
+/* $Id: miniupnpc.c,v 1.63 2009/08/07 14:44:50 nanard Exp $ */
 /* Project : miniupnp
  * Author : Thomas BERNARD
- * copyright (c) 2005-2007 Thomas Bernard
+ * copyright (c) 2005-2009 Thomas Bernard
  * This software is subjet to the conditions detailed in the
  * provided LICENCE file. */
-#include <stdio.h>
+#define __EXTENSIONS__ 1
+#ifndef MACOSX
+#if !defined(_XOPEN_SOURCE) && !defined(__OpenBSD__) && !defined(__NetBSD__)
+#ifndef __cplusplus
+#define _XOPEN_SOURCE 600
+#endif
+#endif
+#ifndef __BSD_VISIBLE
+#define __BSD_VISIBLE 1
+#endif
+#endif
+
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #ifdef WIN32
 /* Win32 Specific includes and defines */
@@ -29,7 +41,13 @@
 #include <arpa/inet.h>
 #include <poll.h>
 #include <netdb.h>
+#include <strings.h>
+#include <errno.h>
 #define closesocket close
+#define MINIUPNPC_IGNORE_EINTR
+#endif
+#ifdef MINIUPNPC_SET_SOCKET_TIMEOUT
+#include <sys/time.h>
 #endif
 #include "miniupnpc.h"
 #include "minissdpc.h"
@@ -149,6 +167,9 @@ int simpleUPnPcommand(int s, const char * url, const char * service,
 	int buffree;
     int n;
 	int contentlen, headerlen;	/* for the response */
+#ifdef MINIUPNPC_SET_SOCKET_TIMEOUT
+	struct timeval timeout;
+#endif
 	snprintf(soapact, sizeof(soapact), "%s#%s", service, action);
 	if(args==NULL)
 	{
@@ -224,11 +245,33 @@ int simpleUPnPcommand(int s, const char * url, const char * service,
 			*bufsize = 0;
 			return -1;
 		}
+#ifdef MINIUPNPC_SET_SOCKET_TIMEOUT
+		/* setting a 3 seconds timeout for the connect() call */
+		timeout.tv_sec = 3;
+		timeout.tv_usec = 0;
+		if(setsockopt(s, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(struct timeval)) < 0)
+		{
+			PRINT_SOCKET_ERROR("setsockopt");
+		}
+		timeout.tv_sec = 3;
+		timeout.tv_usec = 0;
+		if(setsockopt(s, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(struct timeval)) < 0)
+		{
+			PRINT_SOCKET_ERROR("setsockopt");
+		}
+#endif
 		dest.sin_family = AF_INET;
 		dest.sin_port = htons(port);
 		dest.sin_addr.s_addr = inet_addr(hostname);
-		if(connect(s, (struct sockaddr *)&dest, sizeof(struct sockaddr))<0)
-		{
+#ifdef MINIUPNPC_IGNORE_EINTR
+        do {
+#endif
+            n = connect(s, (struct sockaddr *)&dest, sizeof(struct sockaddr));
+#ifdef MINIUPNPC_IGNORE_EINTR
+        } while(n < 0 && errno == EINTR);
+#endif
+		if(n < 0)
+        {
 			PRINT_SOCKET_ERROR("connect");
 			closesocket(s);
 			*bufsize = 0;
@@ -590,9 +633,15 @@ int ReceiveData(int socket, char * data, int length, int timeout)
     int n;
 #ifndef WIN32
     struct pollfd fds[1]; /* for the poll */
-    fds[0].fd = socket;
-    fds[0].events = POLLIN;
-    n = poll(fds, 1, timeout);
+#ifdef MINIUPNPC_IGNORE_EINTR
+    do {
+#endif
+        fds[0].fd = socket;
+        fds[0].events = POLLIN;
+        n = poll(fds, 1, timeout);
+#ifdef MINIUPNPC_IGNORE_EINTR
+    } while(n < 0 && errno == EINTR);
+#endif
     if(n < 0)
     {
         PRINT_SOCKET_ERROR("poll");
@@ -609,7 +658,6 @@ int ReceiveData(int socket, char * data, int length, int timeout)
     FD_SET(socket, &socketSet);
     timeval.tv_sec = timeout / 1000;
     timeval.tv_usec = (timeout % 1000) * 1000;
-    /*n = select(0, &socketSet, NULL, NULL, &timeval);*/
     n = select(FD_SETSIZE, &socketSet, NULL, NULL, &timeval);
     if(n < 0)
     {
@@ -629,7 +677,7 @@ int ReceiveData(int socket, char * data, int length, int timeout)
 	return n;
 }
 
-int
+static int
 UPNPIGD_IsConnected(struct UPNPUrls * urls, struct IGDdatas * data)
 {
 	char status[64];

@@ -1,5 +1,14 @@
-$Id: Changelog.txt,v 1.86 2009/07/29 08:44:29 nanard Exp $
+$Id: Changelog.txt,v 1.90 2009/08/07 08:42:18 nanard Exp $
 miniUPnP client Changelog.
+
+2009/08/07:
+  Set socket timeout for connect()
+  Some cleanup in miniwget.c
+
+2009/08/04:
+  remove multiple redirections with -d in upnpc.c
+  Print textual error code in upnpc.c
+  Ignore EINTR during the connect() and poll() calls.
 
 2009/07/29:
   fix in updateminiupnpcstrings.sh if OS name contains "/"
