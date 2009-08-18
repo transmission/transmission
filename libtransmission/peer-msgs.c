@@ -1673,12 +1673,24 @@ canRead( tr_peerIo * io, void * vmsgs, size_t * piece )
 static int
 ratePulse( tr_peermsgs * msgs, uint64_t now )
 {
-    const double rateToClient = tr_peerGetPieceSpeed( msgs->peer, now, TR_PEER_TO_CLIENT );
-    const int seconds = 10;
+    int irate;
     const int floor = 8;
-    const int estimatedBlocksInPeriod = ( rateToClient * seconds * 1024 ) / msgs->torrent->blockSize;
+    const int seconds = 10;
+    double rate;
+    int estimatedBlocksInPeriod;
+    const tr_torrent * const torrent = msgs->torrent;
 
-    msgs->maxActiveRequests = floor + estimatedBlocksInPeriod;
+    /* Get the rate limit we should use.
+     * FIXME: this needs to consider all the other peers as well... */
+    rate = tr_peerGetPieceSpeed( msgs->peer, now, TR_PEER_TO_CLIENT );
+    if( tr_torrentUsesSpeedLimit( torrent, TR_PEER_TO_CLIENT ) )
+        rate = MIN( rate, tr_torrentGetSpeedLimit( torrent, TR_PEER_TO_CLIENT ) );
+    if( tr_torrentUsesSessionLimits( torrent ) )
+        if( tr_sessionGetActiveSpeedLimit( torrent->session, TR_PEER_TO_CLIENT, &irate ) )
+            rate = MIN( rate, irate );
+
+    estimatedBlocksInPeriod = ( rate * seconds * 1024 ) / torrent->blockSize;
+    msgs->maxActiveRequests = MAX( floor, estimatedBlocksInPeriod );
 
     if( msgs->reqq > 0 )
         msgs->maxActiveRequests = MIN( msgs->maxActiveRequests, msgs->reqq );
