@@ -11,6 +11,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + DHT now honors the bind-address-ipv4 configuration option
    + Fix Debian build error with miniupnpc
    + Fix Cygwin build error with strtold
+   + Update to a newer snapshot of miniupnpc
 - Mac
    + 64-bit compatibility
    + Queuing system will not exclude transfers with tracker warnings
