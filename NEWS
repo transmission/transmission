@@ -5,9 +5,9 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
 - All Platforms
    + Better data recovery in the case of an OS or Transmission crash
    + Upgrade DHT to version 0.8
-   + If a downloaded file is moved, stop the torrent instead of redownloading it
+   + If a data file is moved, stop the torrent instead of redownloading it
    + Fix bug that didn't list some peers in the resume file and in PEX
-   + Make torrent error messages more helpful
+   + More helpful torrent error messages
    + DHT now honors the bind-address-ipv4 configuration option
    + Fix Debian build error with miniupnpc
    + Fix Cygwin build error with strtold
