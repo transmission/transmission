@@ -536,46 +536,49 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [[BonjourController defaultController] startWithPort: [fDefaults integerForKey: @"RPCPort"]];
     
     //shamelessly ask for donations
-    tr_session_stats stats;
-    tr_sessionGetCumulativeStats(fLib, &stats);
-    const BOOL firstLaunch = stats.sessionCount <= 1;
-    
-    NSDate * lastDonateDate = [fDefaults objectForKey: @"DonateAskDate"];
-    const BOOL timePassed = !lastDonateDate || (-1 * [lastDonateDate timeIntervalSinceNow]) >= DONATE_NAG_TIME;
-    
-    if ([fDefaults boolForKey: @"WarningDonate"] && !firstLaunch && timePassed)
+    if ([fDefaults boolForKey: @"WarningDonate"])
     {
-        NSAlert * alert = [[NSAlert alloc] init];
-        [alert setMessageText: NSLocalizedString(@"Support open-source indie software", "Donation beg -> title")];
+        tr_session_stats stats;
+        tr_sessionGetCumulativeStats(fLib, &stats);
+        const BOOL firstLaunch = stats.sessionCount <= 1;
         
-        NSString * donateMessage = [NSString stringWithFormat: @"%@\n\n%@",
-            NSLocalizedString(@"Transmission is a full-featured torrent application."
-                " A lot of time and effort have gone into development, coding, and refinement."
-                " If you enjoy using it, please consider showing your love with a donation.", "Donation beg -> message"),
-            NSLocalizedString(@"Donate or not, there will be no difference to your torrenting experience.", "Donation beg -> message")];
+        NSDate * lastDonateDate = [fDefaults objectForKey: @"DonateAskDate"];
+        const BOOL timePassed = !lastDonateDate || (-1 * [lastDonateDate timeIntervalSinceNow]) >= DONATE_NAG_TIME;
         
-        [alert setInformativeText: donateMessage];
-        [alert setAlertStyle: NSInformationalAlertStyle];
-        
-        [alert addButtonWithTitle: [NSLocalizedString(@"Donate", "Donation beg -> button") stringByAppendingEllipsis]];
-        NSButton * noDonateButton = [alert addButtonWithTitle: NSLocalizedString(@"Nope", "Donation beg -> button")];
-        [noDonateButton setKeyEquivalent: @"\e"]; //escape key
-        
-        const BOOL allowNeverAgain = lastDonateDate != nil; //hide the "don't show again" check the first time - give them a little time to try the app
-        [alert setShowsSuppressionButton: allowNeverAgain];
-        if (allowNeverAgain)
-            [[alert suppressionButton] setTitle: NSLocalizedString(@"Don't bug me about this ever again.", "Donation beg -> button")];
-        
-        const NSInteger donateResult = [alert runModal];
-        if (donateResult == NSAlertFirstButtonReturn)
-            [self linkDonate: self];
-        
-        if (allowNeverAgain)
-            [fDefaults setBool: ([[alert suppressionButton] state] != NSOnState) forKey: @"WarningDonate"];
-        
-        [alert release];
-        
-        [fDefaults setObject: [NSDate date] forKey: @"DonateAskDate"];
+        if (!firstLaunch && timePassed)
+        {
+            NSAlert * alert = [[NSAlert alloc] init];
+            [alert setMessageText: NSLocalizedString(@"Support open-source indie software", "Donation beg -> title")];
+            
+            NSString * donateMessage = [NSString stringWithFormat: @"%@\n\n%@",
+                NSLocalizedString(@"Transmission is a full-featured torrent application."
+                    " A lot of time and effort have gone into development, coding, and refinement."
+                    " If you enjoy using it, please consider showing your love with a donation.", "Donation beg -> message"),
+                NSLocalizedString(@"Donate or not, there will be no difference to your torrenting experience.", "Donation beg -> message")];
+            
+            [alert setInformativeText: donateMessage];
+            [alert setAlertStyle: NSInformationalAlertStyle];
+            
+            [alert addButtonWithTitle: [NSLocalizedString(@"Donate", "Donation beg -> button") stringByAppendingEllipsis]];
+            NSButton * noDonateButton = [alert addButtonWithTitle: NSLocalizedString(@"Nope", "Donation beg -> button")];
+            [noDonateButton setKeyEquivalent: @"\e"]; //escape key
+            
+            const BOOL allowNeverAgain = lastDonateDate != nil; //hide the "don't show again" check the first time - give them time to try the app
+            [alert setShowsSuppressionButton: allowNeverAgain];
+            if (allowNeverAgain)
+                [[alert suppressionButton] setTitle: NSLocalizedString(@"Don't bug me about this ever again.", "Donation beg -> button")];
+            
+            const NSInteger donateResult = [alert runModal];
+            if (donateResult == NSAlertFirstButtonReturn)
+                [self linkDonate: self];
+            
+            if (allowNeverAgain)
+                [fDefaults setBool: ([[alert suppressionButton] state] != NSOnState) forKey: @"WarningDonate"];
+            
+            [alert release];
+            
+            [fDefaults setObject: [NSDate date] forKey: @"DonateAskDate"];
+        }
     }
 }
 
