@@ -15,7 +15,7 @@
       	<enclosure
       	url="http://mirrors.m0k.org/transmission/files/Transmission-1.74b1.dmg" 
       	sparkle:version="8969"
-      	sparkle:shortVersionString="1.74 beta 1"
+      	sparkle:shortVersionString="1.74b1"
       	sparkle:dsaSignature="MCwCFAaB9gZ9nnPDAJrzGIXN3OdC5z4TAhRdMThW9eLXTEfakWkOsdBgICaRKA=="
       	length="5658721"
       	type="application/octet-stream"/>
