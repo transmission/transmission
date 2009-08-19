@@ -8,6 +8,20 @@
 	</head>
 
 	<body>
+	
+	<table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0" summary="Two column table with heading">
+				<tr>
+					<td class="red">
+						<h3>Note</h3>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<p>This is a beta release.</p>
+					</td>
+				</tr>
+			</table>
+	
 			<br>
 			<table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0" summary="Two column table with heading">
 				<tr>
@@ -18,11 +32,17 @@
 				<tr>
 					<td>
 						<ul>
-						<li>Fix bug where user-configured peer limits could be exceeded</li>
-						<li>Use less memory in some high-peer situations</li>
-						<li>Better estimation of time left to download</li>
-						<li>Support supportcrypto and requirecrypto flags in http tracker announces</li>
-						<li>Update to newer snapshots of libnatpmp and miniupnpc</li>
+						<li>64-bit compatibility</li>
+						<li>Queuing system will not exclude transfers with tracker warnings</li>
+						<li>Connections to original torrent files are no longer maintained</li>
+						<li>Better data recovery in the case of an OS or Transmission crash</li>
+						<li>Upgrade DHT to version 0.8</li>
+						<li>If a data file is moved, stop the torrent instead of redownloading it</li>
+						<li>Fix bug that didn't list some peers in the resume file and in PEX</li>
+						<li>Fix bug where changing the global per-torrent peer connection limit did not affect the current session</li>
+						<li>Fix bug where changing settings through RPC would result in wrong values being saved for three fields</li>
+						<li>More helpful torrent error messages</li>
+						<li>Update to a newer snapshot of miniupnpc</li>
 						</ul>
 					</td>
 				</tr>
@@ -39,14 +59,15 @@
 				<tr>
 					<td>
 						<ul>
-						<li>Inspector and Add Torrent buttons for iPhone/iPod Touch</li>
-						<li>Add location field to inspector</li>
+						<li>Progress bar shows seeding progress</li>
+						<li>Fix bug that displayed "%nan" when verifying a torrent</li>
+						<li>"Pause All" only appeared to pause torrents with peers until refresh</li>
 						</ul>
 					</td>
 				</tr>
 			</table>
 			
-			<p>For a full list of changes, <a href="http://trac.transmissionbt.com/query?milestone=1.73&group=component&groupdesc=1&order=severity">click here</a>.</p>
+			<p>For a full list of changes, <a href="http://trac.transmissionbt.com/query?milestone=1.74&group=component&groupdesc=1&order=severity">click here</a>.</p>
 
 			<table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0" summary="Two column table with heading">
 				<tr>
