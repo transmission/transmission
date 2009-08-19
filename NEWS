@@ -26,6 +26,7 @@ NEWS file for Transmission <http://www.transmissionbt.com/>
    + New Russian Translation 
    + If Transmission was minimized, clicking on it the icon tray didn't raise it
 - Daemon
+   + Speed Limit mode support added to transmission-remote
    + Add a "session stats" readout to transmission-remote
 - Web Client
    + Progress bar shows seeding progress
