@@ -1,821 +1,822 @@
-NEWS file for Transmission <http://www.transmissionbt.com/>
+=== Transmission 1.74 beta 1 (2008/08/18) ===
+[http://trac.transmissionbt.com/query?milestone=1.74&group=component&groupdesc=1&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Better data recovery in the case of an OS or Transmission crash
+  * Upgrade DHT to version 0.8
+  * If a data file is moved, stop the torrent instead of redownloading it
+  * Fix bug that didn't list some peers in the resume file and in PEX
+  * More helpful torrent error messages
+  * DHT now honors the bind-address-ipv4 configuration option
+  * Fix Debian build error with miniupnpc
+  * Fix Cygwin build error with strtold
+  * Update to a newer snapshot of miniupnpc
+==== Mac ====
+  * 64-bit compatibility
+  * Queuing system will not exclude transfers with tracker warnings
+  * Connections to original torrent files are no longer maintained
+  * Fix bug where changing the global per-torrent peer connection limit did not affect the current session
+  * Fix bug where changing settings through RPC would result in wrong values being saved for three fields
+==== GTK+ ====
+  * Fix crash that occurred when adding torrents on some desktops
+  * Synchronize the statusbar's and torrent list's speeds
+  * Fix the Properties dialog's "Origin" field for multiple torrents
+==== Qt ====
+  * New Russian Translation 
+  * If Transmission was minimized, clicking on it the icon tray didn't raise it
+==== Daemon ====
+  * Speed Limit mode support added to transmission-remote
+  * Add a "session stats" readout to transmission-remote
+==== Web Client ====
+  * Progress bar shows seeding progress
+  * Fix bug that displayed "%nan" when verifying a torrent
+  * "Pause All" only appeared to pause torrents with peers until refresh
 
-1.74 (2009/08/xx)
-<http://trac.transmissionbt.com/query?milestone=1.74&group=component&groupdesc=1&order=severity>
-- All Platforms
-   + Better data recovery in the case of an OS or Transmission crash
-   + Upgrade DHT to version 0.8
-   + If a data file is moved, stop the torrent instead of redownloading it
-   + Fix bug that didn't list some peers in the resume file and in PEX
-   + More helpful torrent error messages
-   + DHT now honors the bind-address-ipv4 configuration option
-   + Fix Debian build error with miniupnpc
-   + Fix Cygwin build error with strtold
-   + Update to a newer snapshot of miniupnpc
-- Mac
-   + 64-bit compatibility
-   + Queuing system will not exclude transfers with tracker warnings
-   + Connections to original torrent files are no longer maintained
-   + Fix bug where changing the global per-torrent peer connection limit did not affect the current session
-   + Fix bug where changing settings through RPC would result in wrong values being saved for three fields
-- GTK+
-   + Fix crash that occurred when adding torrents on some desktops
-   + Synchronize the statusbar's and torrent list's speeds
-   + Fix the Properties dialog's "Origin" field for multiple torrents
-- Qt
-   + New Russian Translation 
-   + If Transmission was minimized, clicking on it the icon tray didn't raise it
-- Daemon
-   + Speed Limit mode support added to transmission-remote
-   + Add a "session stats" readout to transmission-remote
-- Web Client
-   + Progress bar shows seeding progress
-   + Fix bug that displayed "%nan" when verifying a torrent
-   + "Pause All" only appeared to pause torrents with peers until refresh
+=== Transmission 1.73 (2009/07/18) ===
+[http://trac.transmissionbt.com/query?milestone=1.73&group=component&groupdesc=1&order=severity All tickets closed by this release]
 
-1.73 (2009/07/18)
-<http://trac.transmissionbt.com/query?milestone=1.73&group=component&groupdesc=1&order=severity>
-- All Platforms
-   + Fix bug where user-configured peer limits could be exceeded
-   + Use less memory in some high-peer situations
-   + Better estimation of time left to download
-   + Support supportcrypto and requirecrypto flags in http tracker announces
-   + Update to newer snapshots of libnatpmp and miniupnpc
-   + Make DHT a compile-time option
-- GTK+
-   + Use GDK-safe versions of g_idle_add() and g_timeout_add*()
-   + Save some space in GTK+ >= 2.16.0 by not building SexyIconEntry
-- Qt
-   + Fix bug that crashed Qt client when setting alternative up/down speeds
-- Daemon
-   + Add umask support
-- Web Client
-   + Inspector and Add Torrent buttons for iPhone/iPod Touch
-   + Add location field to inspector
-- CLI
-   + Some torrent files created with transmission-cli were invalid
+==== All Platforms ====
+  * Fix bug where user-configured peer limits could be exceeded
+  * Use less memory in some high-peer situations
+  * Better estimation of time left to download
+  * Support supportcrypto and requirecrypto flags in http tracker announces
+  * Update to newer snapshots of libnatpmp and miniupnpc
+  * Make DHT a compile-time option
+==== GTK+ ====
+  * Use GDK-safe versions of g_idle_add() and g_timeout_add*()
+  * Save some space in GTK+ >= 2.16.0 by not building SexyIconEntry
+==== Qt ====
+  * Fix bug that crashed Qt client when setting alternative up/down speeds
+==== Daemon ====
+  * Add umask support
+==== Web Client ====
+  * Inspector and Add Torrent buttons for iPhone/iPod Touch
+  * Add location field to inspector
+==== CLI ====
+  * Some torrent files created with transmission-cli were invalid
 
-1.72 (2009/06/16)
-<http://trac.transmissionbt.com/query?milestone=1.72&group=component&groupdesc=1&order=severity>
-- All Platforms
-   + Fix 1.70 crash with assertion "tv->tv_usec >= 0"
-   + Fix 1.70 crash with assertion "tr_peerIoSupportsFEXT( msgs->peer->io )"
-   + Better DHT announce management
-   + Fix error in reporting webseed counts via RPC
-   + Better file preallocation on embedded systems
-- Mac
-   + Fix problem where a small set of users could not add torrents
-- GTK+
-   + Fix 1.70 crash when setting options in the Properties dialog
-   + Fix a rare crash in desktop notifications
-   + Can now sort the file list by priority, download, and completeness
-   + Adding a torrent from a browser sometimes didn't work.
-   + Various usability improvements
-- Daemon
-   + Remote didn't always send the right Encoding header in requests
+=== Transmission 1.72 (2009/06/16)
+[http://trac.transmissionbt.com/query?milestone=1.72&group=component&groupdesc=1&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Fix 1.70 crash with assertion "tv->tv_usec >= 0"
+  * Fix 1.70 crash with assertion "tr_peerIoSupportsFEXT( msgs->peer->io )"
+  * Better DHT announce management
+  * Fix error in reporting webseed counts via RPC
+  * Better file preallocation on embedded systems
+==== Mac ====
+  * Fix problem where a small set of users could not add torrents
+==== GTK+ ====
+  * Fix 1.70 crash when setting options in the Properties dialog
+  * Fix a rare crash in desktop notifications
+  * Can now sort the file list by priority, download, and completeness
+  * Adding a torrent from a browser sometimes didn't work.
+  * Various usability improvements
+==== Daemon ====
+  * Remote didn't always send the right Encoding header in requests
 
-1.71 (2009/06/07)
-<http://trac.transmissionbt.com/query?milestone=1.71&group=component&groupdesc=1&order=severity>
-- All Platforms
-   + Fix 1.70 bug that caused high CPU use in high-peer swarms
-   + Fix 1.70 build problems with DHT and libevent
-- Daemon
-   + Fix watchdir issue on OSes that don't have inotify
-- GTK+
-   + Fix 1.70 intltool build problem
-   + Fix crash when the OS's stock mime-type icons are misconfigured 
-   + Handle very long torrent file lists faster
-- Web Client
-   + Fix 1.70 bug where some torrents appeared to be duplicates
+=== Transmission 1.71 (2009/06/07)
+[http://trac.transmissionbt.com/query?milestone=1.71&group=component&groupdesc=1&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Fix 1.70 bug that caused high CPU use in high-peer swarms
+  * Fix 1.70 build problems with DHT and libevent
+==== Daemon ====
+  * Fix watchdir issue on OSes that don't have inotify
+==== GTK+ ====
+  * Fix 1.70 intltool build problem
+  * Fix crash when the OS's stock mime-type icons are misconfigured 
+  * Handle very long torrent file lists faster
+==== Web Client ====
+  * Fix 1.70 bug where some torrents appeared to be duplicates
 
-1.70 (2009/06/04)
-<http://trac.transmissionbt.com/query?milestone=1.70&group=component&groupdesc=1&order=severity>
-- All Platforms
-   + Distributed hash table (DHT) support for public torrents
-   + Add option for moving and finding a torrent's data on the disk
-   + JSON RPC messages can be ~85% shorter, saving bandwidth and CPU
-   + When available, use the system's copy of libevent instead of building one
-   + Automatically pause torrents when verifying
-   + Fix small bugs and memory leaks
-- Mac
-   + Holding down the option key on launch will pause all transfers
-- Web Client
-   + Big speed improvements, especially with large torrents
-   + Fix 1.61 bug that broke adding torrents via the web client
-   + Add the ability to upload multiple torrents at once
-   + Torrents added by URL were always paused, regardless of preferences
-   + Comments and announce addresses were cut off in the inspector
-   + The "data remaining" field wasn't updated when the number reached 0
-   + Smaller design adjustments
-- GTK+
-   + Make it clearer that the status bar's ratio mode button is a button
-   + Torrent comment box did not scroll, so long comments were partially hidden
-- Qt
-   + Initial torrent list was sometimes incorrect
-   + Add-torrent-and-delete-source deleted the source even if there was an error
-   + Prefs dialog didn't show or modify "Stop seeding torrents at ratio"
+=== Transmission 1.70 (2009/06/04)
+[http://trac.transmissionbt.com/query?milestone=1.70&group=component&groupdesc=1&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Distributed hash table (DHT) support for public torrents
+  * Add option for moving and finding a torrent's data on the disk
+  * JSON RPC messages can be ~85% shorter, saving bandwidth and CPU
+  * When available, use the system's copy of libevent instead of building one
+  * Automatically pause torrents when verifying
+  * Fix small bugs and memory leaks
+==== Mac ====
+  * Holding down the option key on launch will pause all transfers
+==== Web Client ====
+  * Big speed improvements, especially with large torrents
+  * Fix 1.61 bug that broke adding torrents via the web client
+  * Add the ability to upload multiple torrents at once
+  * Torrents added by URL were always paused, regardless of preferences
+  * Comments and announce addresses were cut off in the inspector
+  * The "data remaining" field wasn't updated when the number reached 0
+  * Smaller design adjustments
+==== GTK+ ====
+  * Make it clearer that the status bar's ratio mode button is a button
+  * Torrent comment box did not scroll, so long comments were partially hidden
+==== Qt ====
+  * Initial torrent list was sometimes incorrect
+  * Add-torrent-and-delete-source deleted the source even if there was an error
+  * Prefs dialog didn't show or modify "Stop seeding torrents at ratio"
 
-1.54 (2009/06/04)
-- All Platforms
-   + Fix small bugs and memory leaks
-- Web Client
-   + Fix 1.53 bug that broke adding torrents via the web client
-   + Torrents added by URL were always paused, regardless of preferences
-   + Comments and announce addresses were cut off in the inspector
-   + The "data remaining" field wasn't updated when the number reached 0
-   + Smaller design adjustments
-- GTK+
-   + Fix intltool build error
-   + Make it clearer that the status bar's ratio mode button is a button
-   + Torrent comment box did not scroll, so long comments were partially hidden
+=== Transmission 1.54 (2009/06/04) ===
+[http://trac.transmissionbt.com/query?milestone=1.54&group=component&groupdesc=1&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Fix small bugs and memory leaks
+==== Web Client ====
+  * Fix 1.53 bug that broke adding torrents via the web client
+  * Torrents added by URL were always paused, regardless of preferences
+  * Comments and announce addresses were cut off in the inspector
+  * The "data remaining" field wasn't updated when the number reached 0
+  * Smaller design adjustments
+==== GTK+ ====
+  * Fix intltool build error
+  * Make it clearer that the status bar's ratio mode button is a button
+  * Torrent comment box did not scroll, so long comments were partially hidden
 
-1.61 (2009/05/11)
-<http://trac.transmissionbt.com/query?milestone=1.61&group=component&groupdesc=1&order=severity>
-- All Platforms
-   + Close potential CSRF security hole for Web Client users
-   + Fix locale error in the JSON parser
-- Qt
-   + Various small bugfixes to the beta Qt client
-- Web Client
-   + Fix 1.60 error when serving Web Client files on some embedded platforms
-   + Add response header to allow clients to cache static files
-- Daemon
-   + transmission-remote was unable to select torrents by their SHA1 hash
+=== Transmission 1.61 (2009/05/11) ===
+[http://trac.transmissionbt.com/query?milestone=1.61&group=component&groupdesc=1&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Close potential CSRF security hole for Web Client users
+  * Fix locale error in the JSON parser
+==== Qt ====
+  * Various small bugfixes to the beta Qt client
+==== Web Client ====
+  * Fix 1.60 error when serving Web Client files on some embedded platforms
+  * Add response header to allow clients to cache static files
+==== Daemon ====
+  * transmission-remote was unable to select torrents by their SHA1 hash
 
-1.53 (2009/05/11)
-- All Platforms
-   + Close potential CSRF security hole for Web Client users
-   + Fix locale error in the JSON parser
+=== Transmission 1.53 (2009/05/11) ===
+[http://trac.transmissionbt.com/query?milestone=1.53&group=component&groupdesc=1&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Close potential CSRF security hole for Web Client users
+  * Fix locale error in the JSON parser
 
-1.60 (2009/05/04)
-<http://trac.transmissionbt.com/query?milestone=1.60&group=component&groupdesc=1&order=severity>
-- All Platforms
-   + Seed ratio limiting
-   + Transfer prioritization
-   + Option to specify if transfers are included in the global bandwidth limits
-   + Random port, with optional randomization on startup
-   + Improvements to UPnP port forwarding
-   + Support for file preallocation on XFS filesystems
-- Mac
-   + Requires Mac OS X 10.5 Leopard or newer
-   + Groups (moved to preferences) can be auto-assigned to transfers when adding based on multiple criteria
-   + Groups can have a default location when adding transfers
-   + The speed limit scheduler can now be applied to only specific days
-   + Bonjour support for the web interface
-   + File filter field in the inspector
-   + Option to include beta releases when auto-updating (using modified Sparkle 1.5)
-   + Portuguese localization
-- Qt
-   + New beta Qt client!
-- GTK+
-   + Speed Limit: Second set of bandwidth limits that can be toggled or scheduled
-   + Properties dialog now lets you edit/view multiple torrents at once
-   + Allow sorting of the torrent list by size and by ETA
-   + Show the file icon in the list
-- Daemon
-   + Watch folder for auto-adding torrents
-   + Many new features in the RPC/JSON interface
-   + Allow users to specify a specific address when listening for peers
-- Web Client 
-   + File selection and prioritization
-   + Add option to verify local data
-   + Fix "Remove Data" bug
+=== Transmission 1.60 (2009/05/04) ===
+[http://trac.transmissionbt.com/query?milestone=1.60&group=component&groupdesc=1&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Seed ratio limiting
+  * Transfer prioritization
+  * Option to specify if transfers are included in the global bandwidth limits
+  * Random port, with optional randomization on startup
+  * Improvements to UPnP port forwarding
+  * Support for file preallocation on XFS filesystems
+==== Mac ====
+  * Requires Mac OS X 10.5 Leopard or newer
+  * Groups (moved to preferences) can be auto-assigned to transfers when adding based on multiple criteria
+  * Groups can have a default location when adding transfers
+  * The speed limit scheduler can now be applied to only specific days
+  * Bonjour support for the web interface
+  * File filter field in the inspector
+  * Option to include beta releases when auto-updating (using modified Sparkle 1.5)
+  * Portuguese localization
+==== Qt ====
+  * New beta Qt client!
+==== GTK+ ====
+  * Speed Limit: Second set of bandwidth limits that can be toggled or scheduled
+  * Properties dialog now lets you edit/view multiple torrents at once
+  * Allow sorting of the torrent list by size and by ETA
+  * Show the file icon in the list
+==== Daemon ====
+  * Watch folder for auto-adding torrents
+  * Many new features in the RPC/JSON interface
+  * Allow users to specify a specific address when listening for peers
+==== Web Client ==== 
+  * File selection and prioritization
+  * Add option to verify local data
+  * Fix "Remove Data" bug
 
-1.52 (2009/04/12)
-<http://trac.transmissionbt.com/query?milestone=1.52&group=component&groupdesc=1&order=severity>
-- Mac
-   + Improve interface responsiveness when downloading
-- GTK+ and Daemon
-   + Always honor the XDG setting for the download directory
-- GTK+
-   + Fix formatting error when showing speeds measured in MB/s
-   + Fix bug that caused some scheduled speed limit time settings to be lost
-   + Use the new blocklist URL when updating the blocklist
-- Web Client
-   + On the server, better filtering of bad URLs
-   + On the server, faster json serialization
-   + Fix minor web client 301 redirect error
-   + Better Internet Explorer support
+=== Transmission 1.52 (2009/04/12) ===
+[http://trac.transmissionbt.com/query?milestone=1.52&group=component&groupdesc=1&order=severity All tickets closed by this release]
+==== Mac ====
+  * Improve interface responsiveness when downloading
+==== GTK+ ==== and Daemon
+  * Always honor the XDG setting for the download directory
+==== GTK+ ====
+  * Fix formatting error when showing speeds measured in MB/s
+  * Fix bug that caused some scheduled speed limit time settings to be lost
+  * Use the new blocklist URL when updating the blocklist
+==== Web Client ====
+  * On the server, better filtering of bad URLs
+  * On the server, faster json serialization
+  * Fix minor web client 301 redirect error
+  * Better Internet Explorer support
 
-1.51 (2009/02/26)
-<http://trac.transmissionbt.com/query?milestone=1.51&group=component&groupdesc=1&order=severity>
-- All Platforms
-   + Fix configure script issues with non-gcc compilers and user-defined CFLAGS environment variables 
-   + Decrease CPU usage in some situations
-   + Close a rare race condition on startup
-   + More efficient use of libcurl when curl 7.18.0 or newer is present
-- GTK+
-   + Play nicely with Ubuntu's new notification server
-   + Add Pause All and Resume All buttons
-- Web Client
-   + Support for Internet Explorer
-   + Layout fixes when viewed on an iPhone/iPod touch
+=== Transmission 1.51 (2009/02/26) ===
+[http://trac.transmissionbt.com/query?milestone=1.51&group=component&groupdesc=1&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Fix configure script issues with non-gcc compilers and user-defined CFLAGS environment variables 
+  * Decrease CPU usage in some situations
+  * Close a rare race condition on startup
+  * More efficient use of libcurl when curl 7.18.0 or newer is present
+==== GTK+ ====
+  * Play nicely with Ubuntu's new notification server
+  * Add Pause All and Resume All buttons
+==== Web Client ====
+  * Support for Internet Explorer
+  * Layout fixes when viewed on an iPhone/iPod touch
 
-1.50 (2009/02/13)
-<http://trac.transmissionbt.com/query?milestone=1.50&group=component&groupdesc=1&order=severity>
-- All Platforms
-   + IPv6 support for peers, and for trackers with explicit IPv6 addresses
-   + Improved connectivity for encrypted peers
-   + Fix 1.42 error that made tracker announces slower over time
-   + Fix a Mac-centric peer connection bug from 1.41
-   + Use less CPU cycles when managing very fast peers
-   + Better handling of non-UTF-8 torrent files 
-   + When removing local data, only remove data from the torrent
-   + Close potential DoS vulnerability in 1.41
-   + Many other bugfixes
-- GTK+
-   + Various usability improvements 
-   + Better Gnome HIG compliance in the statusbar, properties dialog, and more
-- Daemon
-   + Lots of new options added to transmission-remote
-   + Fix 1.42 whitelist bug
-   + Make i18n support optional for cli and daemon clients
-- CLI
-   + Support session.json settings, just as the Daemon and GTK+ clients do
-- Web Client 
-   + Torrents can now be added by URL
-   + Add the ability to "remove local data" from the web client
+=== Transmission 1.50 (2009/02/13) ===
+[http://trac.transmissionbt.com/query?milestone=1.50&group=component&groupdesc=1&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * IPv6 support for peers, and for trackers with explicit IPv6 addresses
+  * Improved connectivity for encrypted peers
+  * Fix 1.42 error that made tracker announces slower over time
+  * Fix a Mac-centric peer connection bug from 1.41
+  * Use less CPU cycles when managing very fast peers
+  * Better handling of non-UTF-8 torrent files 
+  * When removing local data, only remove data from the torrent
+  * Close potential DoS vulnerability in 1.41
+  * Many other bugfixes
+==== GTK+ ====
+  * Various usability improvements 
+  * Better Gnome HIG compliance in the statusbar, properties dialog, and more
+==== Daemon ====
+  * Lots of new options added to transmission-remote
+  * Fix 1.42 whitelist bug
+  * Make i18n support optional for cli and daemon clients
+==== CLI ====
+  * Support session.json settings, just as the Daemon and GTK+ clients do
+==== Web Client ==== 
+  * Torrents can now be added by URL
+  * Add the ability to "remove local data" from the web client
 
-1.42 (2008/12/24)
-<http://trac.transmissionbt.com/query?milestone=1.42&group=component&groupdesc=1&order=severity>
-- All Platforms
-   + Fix 1.41 lockup issue
+=== Transmission 1.42 (2008/12/24) ===
+[http://trac.transmissionbt.com/query?milestone=1.42&group=component&groupdesc=1&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Fix 1.41 lockup issue
 
-1.41 (2008/12/23)
-<http://trac.transmissionbt.com/query?milestone=1.41&group=component&groupdesc=1&order=severity>
-- All Platforms
-   + Better peer management in large swarms
-   + Support BitTorrent Enhancement Proposal (BEP) #21 "Extension for Partial Seeds"
-   + Partial support for BEP #6 "Fast Extension" (reject, have all/none)
-   + Honor the peer's BEP #10 reqq key, when available
-   + Fix 1.40 "Got HTTP Status Code: 0" error message
-   + Fix 1.40 "lazy bitfield" error
-   + Fix 1.40 "jumpy upload speed" bug
-   + Fix handshake peer_id error
-   + Corrrectly handle Windows-style newlines in Bluetack blocklists
-   + More accurate bandwidth measurement
-   + File selection & priority was reset when editing a torrent's tracker list
-   + Fix autoconf/automake build warnings
-- GTK+
-   + In the Details dialog's peer tabs, rows were sometimes duplicated
-   + Minor bugfixes, usability changes, and locale improvements
-   + Three new translations: Afrikaans, Asturian, Bosnian
-   + Sixteen updated translations
-- Daemon
-   + Fix 1.40 bug in handling IP whitelist
-   + Minor bugfixes and output cleanup
-   + Windows portability
-- CLI
-   + Fix minor free-memory-read bug
+=== Transmission 1.41 (2008/12/23) ===
+[http://trac.transmissionbt.com/query?milestone=1.41&group=component&groupdesc=1&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Better peer management in large swarms
+  * Support BitTorrent Enhancement Proposal (BEP) #21 "Extension for Partial Seeds"
+  * Partial support for BEP #6 "Fast Extension" (reject, have all/none)
+  * Honor the peer's BEP #10 reqq key, when available
+  * Fix 1.40 "Got HTTP Status Code: 0" error message
+  * Fix 1.40 "lazy bitfield" error
+  * Fix 1.40 "jumpy upload speed" bug
+  * Fix handshake peer_id error
+  * Corrrectly handle Windows-style newlines in Bluetack blocklists
+  * More accurate bandwidth measurement
+  * File selection & priority was reset when editing a torrent's tracker list
+  * Fix autoconf/automake build warnings
+==== GTK+ ====
+  * In the Details dialog's peer tabs, rows were sometimes duplicated
+  * Minor bugfixes, usability changes, and locale improvements
+  * Three new translations: Afrikaans, Asturian, Bosnian
+  * Sixteen updated translations
+==== Daemon ====
+  * Fix 1.40 bug in handling IP whitelist
+  * Minor bugfixes and output cleanup
+  * Windows portability
+==== CLI ====
+  * Fix minor free-memory-read bug
 
-1.40 (2008/11/09)
-<http://trac.transmissionbt.com/query?milestone=1.40&group=component&groupdesc=1&order=severity>
-- All Platforms
-   + Tracker communication uses fewer resources
-   + More accurate bandwidth limits
-   + Reduce disk fragmentation by preallocating files
-   + Stability, security, and performance improvements to the RPC/Web UI server
-   + Support compression when serving Web UI and RPC responses
-   + Simplify the RPC whitelist
-   + Fix bug that prevented handshakes with encrypted BitComet peers
-   + Fix 1.3x bug that could re-download some data unnecessarily
-   + Lazy bitfields
-- Mac
-   + Option to automatically update the blocklist weekly
-   + In the file inspector tab, show progress and size for folders
-   + Scrollbars correctly appear when the main window auto-resizes
-   + Sparkle updated to 1.5b6
-- GTK+
-   + Option to automatically update the blocklist weekly
-   + Added off-hour bandwidth scheduling
-   + Simplify file/priority selection in the details dialog
-   + Fix a couple of crashes
-   + 5 new translations: Australian, Basque, Kurdish, Kurdish (Sorani), Malay
-   + 43 updated translations
-- Web Client
-   + The Web Client is now out of beta
-   + Minor display fixes
-   + On iPhone/iPod touch, launching from the home screen hides the address bar
-- Daemon
-   + Added the ability to get detailed peer information on torrents
-   + Fix bug that didn't handle --config-dir and TRANSMISSION_HOME correctly
-   + Windows portability
+=== Transmission 1.40 (2008/11/09) ===
+[http://trac.transmissionbt.com/query?milestone=1.40&group=component&groupdesc=1&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Tracker communication uses fewer resources
+  * More accurate bandwidth limits
+  * Reduce disk fragmentation by preallocating files
+  * Stability, security, and performance improvements to the RPC/Web UI server
+  * Support compression when serving Web UI and RPC responses
+  * Simplify the RPC whitelist
+  * Fix bug that prevented handshakes with encrypted BitComet peers
+  * Fix 1.3x bug that could re-download some data unnecessarily
+  * Lazy bitfields
+==== Mac ====
+  * Option to automatically update the blocklist weekly
+  * In the file inspector tab, show progress and size for folders
+  * Scrollbars correctly appear when the main window auto-resizes
+  * Sparkle updated to 1.5b6
+==== GTK+ ====
+  * Option to automatically update the blocklist weekly
+  * Added off-hour bandwidth scheduling
+  * Simplify file/priority selection in the details dialog
+  * Fix a couple of crashes
+  * 5 new translations: Australian, Basque, Kurdish, Kurdish (Sorani), Malay
+  * 43 updated translations
+==== Web Client ====
+  * The Web Client is now out of beta
+  * Minor display fixes
+  * On iPhone/iPod touch, launching from the home screen hides the address bar
+==== Daemon ====
+  * Added the ability to get detailed peer information on torrents
+  * Fix bug that didn't handle --config-dir and TRANSMISSION_HOME correctly
+  * Windows portability
 
-1.34 (2008/09/16)
-<http://trac.transmissionbt.com/query?milestone=1.34&group=component&groupdesc=1&order=severity>
-- All Clients
-   + Don't reconnect too frequently to the same peer
-   + Webseed bugfix
-   + Fix bug that caused some transfers to not be scraped
-   + Fix BSD build issues
-   + Handle OpenTracker's `downloaded' key in announce responses
-- Mac
-   + Fix memory leak when updating blocklist
-   + Connect to the web interface when the application's path contains a space
-- GTK+
-   + Minor display fixes
-   + 15 updated translations + 1 new language
-- Daemon
-   + Minor display fixes
-- Web Client
-   + Minor display fixes
-- CLI:
-   + Fix crash when creating a torrent file
+=== Transmission 1.34 (2008/09/16) ===
+[http://trac.transmissionbt.com/query?milestone=1.34&group=component&groupdesc=1&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Don't reconnect too frequently to the same peer
+  * Webseed bugfix
+  * Fix bug that caused some transfers to not be scraped
+  * Fix BSD build issues
+  * Handle OpenTracker's `downloaded' key in announce responses
+==== Mac ====
+  * Fix memory leak when updating blocklist
+  * Connect to the web interface when the application's path contains a space
+==== GTK+ ====
+  * Minor display fixes
+  * 15 updated translations + 1 new language
+==== Daemon ====
+  * Minor display fixes
+==== Web Client ====
+  * Minor display fixes
+==== CLI ====:
+  * Fix crash when creating a torrent file
 
-1.33 (2008/08/30)
-http://trac.transmissionbt.com/query?group=component&milestone=1.33
-- All Platforms
-   + Fix crash from malicious torrent files with a piece size of zero
-   + When creating new torrent files, change behavior that caused 
-     "Multi tracker torrents are not allowed" warning on one tracker
-   + Fix Unicode handling in the JSON parser/generator
-   + Fix memory error when reading KTorrent's PEX messages
-   + Fix small memory leaks
-- Mac
-   + Rephrase "data not fully available" to "remaining time unknown"
-   + Fix bug where torrent file creation would fail because an extra blank tracker address was inserted
-- Daemon
-   + Fix crash when adding nonexistent torrents via transmission-remote
-- GTK+
-   + Fix crash from malicious torrent files with large creator fields
-   + Fix error where some torrents opened via a web browser didn't appear
+=== Transmission 1.33 (2008/08/30) ===
+[http://trac.transmissionbt.com/query?milestone=1.33&group=component&groupdesc=1&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Fix crash from malicious torrent files with a piece size of zero
+  * When creating new torrent files, change behavior that caused "Multi tracker torrents are not allowed" warning on one tracker
+  * Fix Unicode handling in the JSON parser/generator
+  * Fix memory error when reading KTorrent's PEX messages
+  * Fix small memory leaks
+==== Mac ====
+  * Rephrase "data not fully available" to "remaining time unknown"
+  * Fix bug where torrent file creation would fail because an extra blank tracker address was inserted
+==== Daemon ====
+  * Fix crash when adding nonexistent torrents via transmission-remote
+==== GTK+ ====
+  * Fix crash from malicious torrent files with large creator fields
+  * Fix error where some torrents opened via a web browser didn't appear
 
-1.32 (2008/08/08)
-http://trac.transmissionbt.com/query?group=component&milestone=1.32
-- All Platforms
-   + Fix bug introduced in 1.30 that caused poor tracker communication
-   + Creating torrent files for files >= 2 GB will result in 2 MB pieces
-- Mac
-   + Fix bug where the proxy type was changed from SOCKS5 to SOCKS4 on launch
+=== Transmission 1.32 (2008/08/08) ===
+[http://trac.transmissionbt.com/query?milestone=1.32&group=component&groupdesc=1&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Fix bug introduced in 1.30 that caused poor tracker communication
+  * Creating torrent files for files >= 2 GB will result in 2 MB pieces
+==== Mac ====
+  * Fix bug where the proxy type was changed from SOCKS5 to SOCKS4 on launch
 
-1.31 (2008/08/06)
-http://trac.transmissionbt.com/query?group=component&milestone=1.31
-- All Platforms
-   + Fix a crash caused by certain torrent files
+=== Transmission 1.31 (2008/08/06) ===
+[http://trac.transmissionbt.com/query?milestone=1.31&group=component&groupdesc=1&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Fix a crash caused by certain torrent files
 
-1.30 (2008/08/05)
-http://trac.transmissionbt.com/query?group=component&milestone=1.30
-- All Platforms
-   + The "Clutch" web interface is now bundled with Transmission (as a beta)
-   + Ability to add and remove tracker addresses
-   + Ability to create torrent files with multiple tracker addresses
-   + Added support for HTTP/FTP Seeding (GetRight style)
-   + Added proxy support for communicating with trackers
-   + Allow torrent creation with no tracker address (required by some trackers)
-   + New JSON-RPC protocol for clients to interact with the backend
-- Daemon
-   + transmission-daemon and transmission-remote were rewritten from scratch
-   + remote and daemon now support per-file priority & download flag settings
-- Mac
-   + Quick Look integration in the main window and inspector's file tab
-   + Transfers can be dragged to different groups
-   + Option to only show the add window when manually adding transfers
-   + Status strings are toggled from the action button (they are no longer clickable)
-   + Colors in pieces bar and pieces box more accurately reflect their corresponding values
-   + The port checker now uses our own portcheck.transmissionbt.com
-   + Turkish localization
-- GTK+
-   + Add options to inhibit hibernation and to toggle the tray icon
-   + Lots of small bug fixes and usability improvements 
-   + Dozens of updated translations
+=== Transmission 1.30 (2008/08/05) ===
+[http://trac.transmissionbt.com/query?milestone=1.30&group=component&groupdesc=1&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * The "Clutch" web interface is now bundled with Transmission (as a beta)
+  * Ability to add and remove tracker addresses
+  * Ability to create torrent files with multiple tracker addresses
+  * Added support for HTTP/FTP Seeding (GetRight style)
+  * Added proxy support for communicating with trackers
+  * Allow torrent creation with no tracker address (required by some trackers)
+  * New JSON-RPC protocol for clients to interact with the backend
+==== Daemon ====
+  * transmission-daemon and transmission-remote were rewritten from scratch
+  * remote and daemon now support per-file priority & download flag settings
+==== Mac ====
+  * Quick Look integration in the main window and inspector's file tab
+  * Transfers can be dragged to different groups
+  * Option to only show the add window when manually adding transfers
+  * Status strings are toggled from the action button (they are no longer clickable)
+  * Colors in pieces bar and pieces box more accurately reflect their corresponding values
+  * The port checker now uses our own portcheck.transmissionbt.com
+  * Turkish localization
+==== GTK+ ====
+  * Add options to inhibit hibernation and to toggle the tray icon
+  * Lots of small bug fixes and usability improvements 
+  * Dozens of updated translations
 
-1.22 (2008/06/13)
-http://trac.transmissionbt.com/query?group=component&milestone=1.22
-- All Platforms
-  + Fix two separate BitTorrent unchoke bugs that could affect performance
-  + Transmission now builds correctly on Sun Studio
-  + Minor man page fixes
-- Mac
-  + Fix bug where "Program Started" in the Statistics window would sometimes display as 0
-- GTK+
-  + Fix crash when quitting while the stats window is still up
-  + Added Latvian, Malayalam, Serbian, and Telugu translations
-  + Updated Czech, Spanish, Romanian, Russian, Dutch, Polish, Italian,
+=== Transmission 1.22 (2008/06/13) ===
+[http://trac.transmissionbt.com/query?milestone=1.22&group=component&groupdesc=1&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Fix two separate BitTorrent unchoke bugs that could affect performance
+  * Transmission now builds correctly on Sun Studio
+  * Minor man page fixes
+==== Mac ====
+  * Fix bug where "Program Started" in the Statistics window would sometimes display as 0
+==== GTK+ ====
+  * Fix crash when quitting while the stats window is still up
+  * Added Latvian, Malayalam, Serbian, and Telugu translations
+  * Updated Czech, Spanish, Romanian, Russian, Dutch, Polish, Italian,
     Portuguese, Catalan, Danish, German, Swedish, Traditional Chinese,
     Finnish, and Chinese (simplified) translations
-- CLI:
-  + Fix scraping torrents with the -s command-line argument
+==== CLI ====:
+  * Fix scraping torrents with the -s command-line argument
 
-1.21 (2008/05/21)
-http://trac.transmissionbt.com/query?group=component&milestone=1.21
-- All Platforms
-   + Fix rare crash-on-startup bug
-   + Handle corrupt announce URLs in torrent files more gracefully
-   + Fix minor memory leak when closing torrents
-- Mac
-   + Fix visual glitch with the pieces bar
-   + Italian localization included
-- GTK+
-   + Updated Catalan, Danish, German, Spanish, Finnish, Hebrew, Italian, Dutch,
+=== Transmission 1.21 (2008/05/21) ===
+[http://trac.transmissionbt.com/query?milestone=1.21&group=component&groupdesc=1&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Fix rare crash-on-startup bug
+  * Handle corrupt announce URLs in torrent files more gracefully
+  * Fix minor memory leak when closing torrents
+==== Mac ====
+  * Fix visual glitch with the pieces bar
+  * Italian localization included
+==== GTK+ ====
+  * Updated Catalan, Danish, German, Spanish, Finnish, Hebrew, Italian, Dutch,
      Polish, Romanian, Thai, Turkish, and Traditional Chinese translations
 
-1.20 (2008/05/09)
-http://trac.transmissionbt.com/query?group=component&milestone=1.20
-- All Platforms
-   + Support https tracker connections
-   + IP blocking using the Bluetack Level1 blocklist
-   + Better support of multitracker torrents
-   + Faster UPnP port mapping on startup
-   + Ability to reset global statistics
-   + Various bugfixes
-- Mac
-   + Display of decimal numbers matches system international settings
-   + Updated Dock badge images
-- GTK+
-   + Inhibit hibernation when downloading
-   + Use XDG basedir spec for configuration files
-   + Various bug fixes and usability improvements
-   + Vastly improved translations thanks to the Ubuntu translation team
+=== Transmission 1.20 (2008/05/09) ===
+[http://trac.transmissionbt.com/query?milestone=1.20&group=component&groupdesc=1&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Support https tracker connections
+  * IP blocking using the Bluetack Level1 blocklist
+  * Better support of multitracker torrents
+  * Faster UPnP port mapping on startup
+  * Ability to reset global statistics
+  * Various bugfixes
+==== Mac ====
+  * Display of decimal numbers matches system international settings
+  * Updated Dock badge images
+==== GTK+ ====
+  * Inhibit hibernation when downloading
+  * Use XDG basedir spec for configuration files
+  * Various bug fixes and usability improvements
+  * Vastly improved translations thanks to the Ubuntu translation team
 
-1.11 (2008/04/04)
-- Mac
-   + Fix scrape address visual glitch with the tracker inspector tab
-   + Only make the progress status string clickable on multi-file torrents
-   + Traditional Chinese localization, updated Russian localization
-- GTK+
-   + Fix a couple of minor display issues
+=== Transmission 1.11 (2008/04/04) ===
+[http://trac.transmissionbt.com/query?milestone=1.11&group=component&groupdesc=1&order=severity All tickets closed by this release]
+==== Mac ====
+  * Fix scrape address visual glitch with the tracker inspector tab
+  * Only make the progress status string clickable on multi-file torrents
+  * Traditional Chinese localization, updated Russian localization
+==== GTK+ ====
+  * Fix a couple of minor display issues
 
-1.10 (2008/03/28)
-- All Platforms
-   + Stop torrents when downloading and the disk becomes full
-   + Removing a torrent also removes it from the cache
-   + Smaller memory footprint per-torrent and per-peer
-   + Various backend bugfixes & improvements
-- Mac
-   + Window when adding torrents to select files and other settings
-   + Leopard: Collapsable group dividers
-   + Use the file icon as the per-torrent action button
-   + Tracker tab in the inspector
-   + Message log specifies the torrent/activity the message relates to
-   + Updated images in the inspector
-   + Optional display of remaining time while seeding in Minimal View
-   + Improved accuracy for displaying the remaining disk space warning
-- GTK+
-   + Window for selecting files & priorities when opening torrents
-   + Display a system tray popup when a torrent finishes downloading
-   + Watch folder for auto-adding torrents
-   + Improved preferences dialog and message log window
-   + Tracker tab in the Details window
-   + Dozens of usability, Gnome HIG, and i18n improvements
-   + Support KDE button ordering
-   + Option to delete a torrent and its downloaded files
-- Daemon
-   + Ability to force a "Verify Local Data" for a torrent
+=== Transmission 1.10 (2008/03/28) ===
+[http://trac.transmissionbt.com/query?milestone=1.10&group=component&groupdesc=1&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Stop torrents when downloading and the disk becomes full
+  * Removing a torrent also removes it from the cache
+  * Smaller memory footprint per-torrent and per-peer
+  * Various backend bugfixes & improvements
+==== Mac ====
+  * Window when adding torrents to select files and other settings
+  * Leopard: Collapsable group dividers
+  * Use the file icon as the per-torrent action button
+  * Tracker tab in the inspector
+  * Message log specifies the torrent/activity the message relates to
+  * Updated images in the inspector
+  * Optional display of remaining time while seeding in Minimal View
+  * Improved accuracy for displaying the remaining disk space warning
+==== GTK+ ====
+  * Window for selecting files & priorities when opening torrents
+  * Display a system tray popup when a torrent finishes downloading
+  * Watch folder for auto-adding torrents
+  * Improved preferences dialog and message log window
+  * Tracker tab in the Details window
+  * Dozens of usability, Gnome HIG, and i18n improvements
+  * Support KDE button ordering
+  * Option to delete a torrent and its downloaded files
+==== Daemon ====
+  * Ability to force a "Verify Local Data" for a torrent
 
-1.06 (2008/02/26)
-- All Platforms:
-   + Improvements and bugfixes to "Verify Local Data"
-   + Use less CPU
-   + Fix support for multitracker torrents
-   + Updated UPnP code to miniupnpc-1.0
-   + Fix two shutdown memory errors
-- GTK+
-   + Fix small memory leak
-   + GUI error when verifying local data
-- CLI:
-   + Torrent creation error on non-absolute pathnames
+=== Transmission 1.06 (2008/02/26) ===
+==== All Platforms ====
+  * Improvements and bugfixes to "Verify Local Data"
+  * Use less CPU
+  * Fix support for multitracker torrents
+  * Updated UPnP code to miniupnpc-1.0
+  * Fix two shutdown memory errors
+==== GTK+ ====
+  * Fix small memory leak
+  * GUI error when verifying local data
+==== CLI ====:
+  * Torrent creation error on non-absolute pathnames
 
-1.05 (2008/02/08)
-- All Platforms:
-   + Fix 1.04 crash when parsing bencoded data
-   + Packaging improvements
-- Mac
-   + Fix bug remembering reordered groups
-- GTK+
-   + Fix glitch that occurred when specifying which files to download
-   + Fix "Sort by Progress"
-   + Various interface and HIG improvements
-   + Updated Swedish, Italian translations
-- Daemon
-   + Fix "transmission-remote -x"
-   + Fix PEX enable/disable bug
+=== Transmission 1.05 (2008/02/08) ===
+==== All Platforms ====
+  * Fix 1.04 crash when parsing bencoded data
+  * Packaging improvements
+==== Mac ====
+  * Fix bug remembering reordered groups
+==== GTK+ ====
+  * Fix glitch that occurred when specifying which files to download
+  * Fix "Sort by Progress"
+  * Various interface and HIG improvements
+  * Updated Swedish, Italian translations
+==== Daemon ====
+  * Fix "transmission-remote -x"
+  * Fix PEX enable/disable bug
 
-1.04 (2008/01/31)
-- All Platforms:
-   + Fix (potential) remote crash bug with extension protocol
-   + Fix bug when verifying a torrent and pressing `pause'
+=== Transmission 1.04 (2008/01/31) ===
+==== All Platforms ====
+  * Fix (potential) remote crash bug with extension protocol
+  * Fix bug when verifying a torrent and pressing `pause'
 
-1.03 (2008/01/29)
-- All Platforms:
-   + Fix bug setting maximum peer limits
-   + Fix overflow issue with very large torrents
-   + Fix LTEP handshake bug
-   + Fix handshake bug with mainline BitTorrent
-   + Fix bug when talking to lighttpd-based trackers
-- GTK+
-   + Various packaging, HiG, and interface improvements
+=== Transmission 1.03 (2008/01/29) ===
+==== All Platforms ====
+  * Fix bug setting maximum peer limits
+  * Fix overflow issue with very large torrents
+  * Fix LTEP handshake bug
+  * Fix handshake bug with mainline BitTorrent
+  * Fix bug when talking to lighttpd-based trackers
+==== GTK+ ====
+  * Various packaging, HiG, and interface improvements
 
-1.02 (2008/01/22)
-- All Platforms:
-   + Fix 1.00 bug that choked some models of routers
-   + Fix 1.00 crash in peer handshake
-   + Fix 1.00 bug that sometimes froze the app for a long time
-   + Minor improvements to the command-line client
-- GTK+
-   + Fix crash when removing a torrent while its details window is open
-   + Better compliance with the Gnome interface guidelines
-   + I18N fixes
-   + Updated Dutch translation
-   + Various other interface additions and improvements
+=== Transmission 1.02 (2008/01/22) ===
+==== All Platforms ====
+  * Fix 1.00 bug that choked some models of routers
+  * Fix 1.00 crash in peer handshake
+  * Fix 1.00 bug that sometimes froze the app for a long time
+  * Minor improvements to the command-line client
+==== GTK+ ====
+  * Fix crash when removing a torrent while its details window is open
+  * Better compliance with the Gnome interface guidelines
+  * I18N fixes
+  * Updated Dutch translation
+  * Various other interface additions and improvements
 
-1.01 (2008/01/11)
-- All Platforms:
-   + Fix 1.00 freezing issue
-   + Fix 1.00 assertion failure
-   + Improve initial connection speed
-   + Added connection throttle to avoid router overload
-   + Improve reconnection to peers with imperfect network connections
-   + Fix crashes on architectures that require strict alignment
-- OS X:
-   + Leopard: Double-click icon to reveal in Finder, progress string to toggle selected and total, and anywhere else to toggle the inspector
-   + Leopard: Better behavior with Time Machine
-   + Fix bugs with Clutch support
-- GTK+:
-   + New Brazilian Portuguese, Chinese, Dutch, and Turkish translations
-   + Fix 1.00 desktop internationalization error
+=== Transmission 1.01 (2008/01/11) ===
+==== All Platforms ====
+  * Fix 1.00 freezing issue
+  * Fix 1.00 assertion failure
+  * Improve initial connection speed
+  * Added connection throttle to avoid router overload
+  * Improve reconnection to peers with imperfect network connections
+  * Fix crashes on architectures that require strict alignment
+==== Mac ====
+  * Leopard: Double-click icon to reveal in Finder, progress string to toggle selected and total, and anywhere else to toggle the inspector
+  * Leopard: Better behavior with Time Machine
+  * Fix bugs with Clutch support
+==== GTK+ ====
+  * New Brazilian Portuguese, Chinese, Dutch, and Turkish translations
+  * Fix 1.00 desktop internationalization error
 
-1.00 (2008/01/04)
-- All Platforms:
-   + Port forwarding now performed by MiniUPnP and libnatpmp
-   + Ability to set global and per-torrent number of connections
-   + Option to prefer not using encryption
-   + Fix tracker connection error
-   + PEX is now configured globally
-   + Updated icon
-- OS X:
-   + Redesigned Leopard-like look
-   + Group labeling, filtering, and sorting
-   + Statistics window
-   + Pieces Bar (return of Advanced Bar)
-   + Display "not available" overlay on the regular bar
-   + Display remaining time for seeding transfers
-   + Sort by total activity
-   + Connectable from the Clutch web interface
-   + Leopard: Time Machine will ignore incomplete downloads
-   + Leopard: Fix bug where text fields would reject localized decimal values
-   + Leopard: Fix bug where bandwidth rates chosen from the action menu would not apply the first time
-- GTK+:
-   + Redesigned main window interface
-   + Minimal Mode for showing more torrents in less desktop space
-   + Torrent filtering
-   + Port forwarding tester in Preferences
-   + Statistics window
-   + Sort by total activity, progress, state, and tracker
-   + Various other interface additions and improvements
-- CLI:
-   + Restore `scrape' feature
+=== Transmission 1.00 (2008/01/04) ===
+==== All Platforms ====
+  * Port forwarding now performed by MiniUPnP and libnatpmp
+  * Ability to set global and per-torrent number of connections
+  * Option to prefer not using encryption
+  * Fix tracker connection error
+  * PEX is now configured globally
+  * Updated icon
+==== Mac ====
+  * Redesigned Leopard-like look
+  * Group labeling, filtering, and sorting
+  * Statistics window
+  * Pieces Bar (return of Advanced Bar)
+  * Display "not available" overlay on the regular bar
+  * Display remaining time for seeding transfers
+  * Sort by total activity
+  * Connectable from the Clutch web interface
+  * Leopard: Time Machine will ignore incomplete downloads
+  * Leopard: Fix bug where text fields would reject localized decimal values
+  * Leopard: Fix bug where bandwidth rates chosen from the action menu would not apply the first time
+==== GTK+ ====
+  * Redesigned main window interface
+  * Minimal Mode for showing more torrents in less desktop space
+  * Torrent filtering
+  * Port forwarding tester in Preferences
+  * Statistics window
+  * Sort by total activity, progress, state, and tracker
+  * Various other interface additions and improvements
+==== CLI ====:
+  * Restore `scrape' feature
 
-0.96 (2007/12/10)
-- All Platforms:
-   + Fix 0.95 data corruption error
-   + Fix 0.95 bug that broke UPnP
-- OS X:
-   + Fix bug where dragging non-torrent files over the main window could result in excessive memory usage
+=== Transmission 0.96 (2007/12/10) ===
+==== All Platforms ====
+  * Fix 0.95 data corruption error
+  * Fix 0.95 bug that broke UPnP
+==== Mac ====
+  * Fix bug where dragging non-torrent files over the main window could result in excessive memory usage
 
-0.95 (2007/12/04)
-- All Platforms:
-   + Fix router errors caused by sending too many tracker requests at once
-   + Fix bug that let speed-limited torrents upload too quickly
-   + Faster average upload speeds
-   + Faster connection to peers after starting a torrent
-   + Fix memory corruption error
-   + Disable SWIFT for ratio-based trackers
-- OS X:
-   + Leopard: Fix for NAT-PMP port mapping
-- GTK:
-   + Fix Nokia 770 crash
+=== Transmission 0.95 (2007/12/04) ===
+==== All Platforms ====
+  * Fix router errors caused by sending too many tracker requests at once
+  * Fix bug that let speed-limited torrents upload too quickly
+  * Faster average upload speeds
+  * Faster connection to peers after starting a torrent
+  * Fix memory corruption error
+  * Disable SWIFT for ratio-based trackers
+==== Mac ====
+  * Leopard: Fix for NAT-PMP port mapping
+==== GTK+ ====
+  * Fix Nokia 770 crash
 
-0.94 (2007/11/25)
-- All Platforms:
-   + Faster average download speeds
-   + Automatically ban peers that send us too many corrupt pieces
-   + Fix a crash that occurred if a peer sent us an incomplete message
-   + Fix portmapping crash
-   + Fix bug that left files open after their torrents were stopped
-   + Fix 0.93 file permissions bug
-   + Fix tracker redirect error
-   + Fix LTEP PEX bug
+=== Transmission 0.94 (2007/11/25) ===
+==== All Platforms ====
+  * Faster average download speeds
+  * Automatically ban peers that send us too many corrupt pieces
+  * Fix a crash that occurred if a peer sent us an incomplete message
+  * Fix portmapping crash
+  * Fix bug that left files open after their torrents were stopped
+  * Fix 0.93 file permissions bug
+  * Fix tracker redirect error
+  * Fix LTEP PEX bug
 
-0.93 (2007/11/12)
-- All Platforms:
-   + Fix "router death" bug that impaired internet connectivity
-   + Fix bug that could cause good peer connections to be lost
-   + Tweak request queue code to improve download speeds
-   + Better handling of very large files on 32bit systems
-   + Consume less battery power on laptops
-   + Fix minor IPC parsing error
+=== Transmission 0.93 (2007/11/12) ===
+==== All Platforms ====
+  * Fix "router death" bug that impaired internet connectivity
+  * Fix bug that could cause good peer connections to be lost
+  * Tweak request queue code to improve download speeds
+  * Better handling of very large files on 32bit systems
+  * Consume less battery power on laptops
+  * Fix minor IPC parsing error
 
-0.92 (2007/11/05)
-- All Platforms:
-   + Fix 0.90 data corruption bugs
-   + Fix 0.90 possible delay when quitting
-   + Fix 0.90 small memory leaks
-- OS X:
-   + Leopard: Fix bug with typing values in Inspector->Options
-   + Leopard: Fix bug with toggling Minimal View
-- GTK:
-   + Better support for large files on some Linux systems
-   + Fix localization error in torrent inspector's dates
+=== Transmission 0.92 (2007/11/05) ===
+==== All Platforms ====
+  * Fix 0.90 data corruption bugs
+  * Fix 0.90 possible delay when quitting
+  * Fix 0.90 small memory leaks
+==== Mac ====
+  * Leopard: Fix bug with typing values in Inspector->Options
+  * Leopard: Fix bug with toggling Minimal View
+==== GTK+ ====
+  * Better support for large files on some Linux systems
+  * Fix localization error in torrent inspector's dates
 
-0.91 (2007/10/28)
-- All Platforms:
-   + Fix 0.90 speed limits
-   + Fix 0.90 problems announcing to some trackers
-   + Fix 0.90 socket connection leak
-   + Fix 0.90 IPC crash
-   + Fix 0.90 cache bug that could cause "verify local files" to fail
-   + Fix 0.90 build errors on OpenBSD and on older C compilers
-- OS X:
-   + Fix a crash caused by custom sound files
-   + Add Dutch localization, re-add Russian localization, fix Korean localization
-- GTK:
-   + Fix 0.90 packaging errors
-   + Fix 0.90 crash-on-start with assertion failure: "destination != (void*)0"
+=== Transmission 0.91 (2007/10/28) ===
+==== All Platforms ====
+  * Fix 0.90 speed limits
+  * Fix 0.90 problems announcing to some trackers
+  * Fix 0.90 socket connection leak
+  * Fix 0.90 IPC crash
+  * Fix 0.90 cache bug that could cause "verify local files" to fail
+  * Fix 0.90 build errors on OpenBSD and on older C compilers
+==== Mac ====
+  * Fix a crash caused by custom sound files
+  * Add Dutch localization, re-add Russian localization, fix Korean localization
+==== GTK+ ====
+  * Fix 0.90 packaging errors
+  * Fix 0.90 crash-on-start with assertion failure: "destination != (void*)0"
 
-0.90 (2007/10/23)
-- All Platforms:
-   + Encryption support, with option to ignore unencrypted peers
-   + Only report downloaded, verified good pieces in tracker `download' field
-   + Improved compliance with BitTorrent spec
-   + MSE Tracker Extension support
-   + Significant rewrite of the libtransmission back-end
-- OS X:
-   + Per-torrent action menu
-   + Redesigned inspector with additional statistics and ability to be resized vertically in Peers and Files tabs
-   + Redesigned message log
-   + Optimizations to decrease memory usage
-   + Sort and filter by tracker
-   + Icon enhanced to support size of 512 x 512
-   + Various smaller interface additions and improvements
-- GTK:
-   + Various interface improvements
-   + Better compliance with the Gnome interface guidelines
+=== Transmission 0.90 (2007/10/23) ===
+==== All Platforms ====
+  * Encryption support, with option to ignore unencrypted peers
+  * Only report downloaded, verified good pieces in tracker `download' field
+  * Improved compliance with BitTorrent spec
+  * MSE Tracker Extension support
+  * Significant rewrite of the libtransmission back-end
+==== Mac ====
+  * Per-torrent action menu
+  * Redesigned inspector with additional statistics and ability to be resized vertically in Peers and Files tabs
+  * Redesigned message log
+  * Optimizations to decrease memory usage
+  * Sort and filter by tracker
+  * Icon enhanced to support size of 512 x 512
+  * Various smaller interface additions and improvements
+==== GTK+ ====
+  * Various interface improvements
+  * Better compliance with the Gnome interface guidelines
 
-0.82 (2007/09/09)
-- All Platforms:
-   + Fixed bug that could limit transfer speeds
-   + Fixed bug that corrupted torrents > 4 GB
-   + Fixed bug that could allow bad peers to send too many pieces
-   + For peers supporting both Azureus' and LibTorrent's extensions, allow negotiation to decide which to use
-   +  Other minor fixes
+=== Transmission 0.82 (2007/09/09) ===
+==== All Platforms ====
+  * Fixed bug that could limit transfer speeds
+  * Fixed bug that corrupted torrents > 4 GB
+  * Fixed bug that could allow bad peers to send too many pieces
+  * For peers supporting both Azureus' and LibTorrent's extensions, allow negotiation to decide which to use
+  *  Other minor fixes
 
-0.81 (2007/08/22)
-- All Platforms:
-   + Fix 0.80 assertion crashes
-   + Fix a bug that miscounted how many peers Transmission wants connected
-   + Clarify misleading error messages
-   + Fix memory leaks
-- OS X:
-   + Multiple fixes to creating torrents and adding new torrents
-   + Updated Russian and Spanish translations
-- GTK:
-   + Updated Dutch, Portuguese, French, and Slovakian translations
-- CLI:
-   + Better support for cli-driven torrent creation
-   + Fix a bug that misparsed command-line arguments
+=== Transmission 0.81 (2007/08/22) ===
+==== All Platforms ====
+  * Fix 0.80 assertion crashes
+  * Fix a bug that miscounted how many peers Transmission wants connected
+  * Clarify misleading error messages
+  * Fix memory leaks
+==== Mac ====
+  * Multiple fixes to creating torrents and adding new torrents
+  * Updated Russian and Spanish translations
+==== GTK+ ====
+  * Updated Dutch, Portuguese, French, and Slovakian translations
+==== CLI ====:
+  * Better support for cli-driven torrent creation
+  * Fix a bug that misparsed command-line arguments
 
-0.80 (2007/08/07)
- - Ability to selectively download and prioritize files
- - Torrent file creation
- - Speed and CPU load improvements
- - Fix to UPnP
- - Rechecking torrents is now done one-at-a-time to avoid heavy disk load
- - Better rechecking of torrents that have many files
- - Many miscellaneous improvements and bugfixes
- - Partial licensing change -- see the LICENSE file for details
- - OS X:
-   + Overlay when dragging torrent files, URLs, and data files onto window
-   + Ability to set an amount of time to consider a transfer stalled
-   + More progress bar colors
-   + Various smaller interface improvements
-   + Italian, Korean, and Russian translations
- - GTK:
-   + Added Torrent Inspector dialog
-   + Added Update Tracker button
-   + Various smaller interface improvements
+=== Transmission 0.80 (2007/08/07) ===
+==== All Platforms ====
+  * Ability to selectively download and prioritize files
+  * Torrent file creation
+  * Speed and CPU load improvements
+  * Fix to UPnP
+  * Rechecking torrents is now done one-at-a-time to avoid heavy disk load
+  * Better rechecking of torrents that have many files
+  * Many miscellaneous improvements and bugfixes
+  * Partial licensing change -- see the LICENSE file for details
+==== Mac ====
+  * Overlay when dragging torrent files, URLs, and data files onto window
+  * Ability to set an amount of time to consider a transfer stalled
+  * More progress bar colors
+  * Various smaller interface improvements
+  * Italian, Korean, and Russian translations
+==== GTK+ ====
+  * Added Torrent Inspector dialog
+  * Added Update Tracker button
+  * Various smaller interface improvements
 
-0.72 (2007/04/30)
- - Reset download/upload amounts when sending "started"
- - Fix rare XML parsing bug
+=== Transmission 0.72 (2007/04/30) ===
+  * Reset download/upload amounts when sending "started"
+  * Fix rare XML parsing bug
 
-0.71 (2007/04/23)
- - Send port info when sending requests
- - Calculate ratio differently when seeding without ever downloading
- - Add additional error messages and debug info
- - Improved UPnP support
- - OS X:
-   + Fix error when using default incomplete folder
-   + Disable the stop ratio once it is reached (while seeding)
-   + Small interface adjustments
+=== Transmission 0.71 (2007/04/23) ===
+  * Send port info when sending requests
+  * Calculate ratio differently when seeding without ever downloading
+  * Add additional error messages and debug info
+  * Improved UPnP support
+  * OS X:
+  * Fix error when using default incomplete folder
+  * Disable the stop ratio once it is reached (while seeding)
+  * Small interface adjustments
 
-0.70 (2007/04/18)
- - New icon
- - Automatic port mapping (NAT-PMP and UPnP IGD)
- - Peer exchange (PEX) compatible with Azureus and uTorrent
- - Multitracker support
- - Better handling of tracker announce interval
- - Fixes bug where absurdly huge upload/download totals could be sent
- - Automatic tracker scraping
- - Cache connected peers
- - Many miscellaneous bugfixes and small improvements
- - OS X:
-   + Requires 10.4 Tiger or newer
-   + Download and seeding queues that can be user-ordered
-   + Speed Limit: Second set of bandwidth limits that can be toggled or 
-     scheduled
-   + Individual torrent bandwidth limits
-   + Separate complete and incomplete download folders
-   + Filter and search bar
-   + Expanded Inspector with many additional views and stats
-   + Fragment status view in Inspector shows downloaded or availability
-   + Watch folder to auto add torrent files
-   + Auto resizing of the main window
-   + Minimal view to take up less space
-   + Seeding bar shows progress in finishing seeding
-   + Sounds when downloading and seeding complete
-   + Warnings for directory unavailable and not enough space
-   + Message log window
-   + New toolbar icons
-   + Built-in help files
-   + French, Spanish, German, and Greek translations
- - GTK+:
-   + Adds Spanish, Polish, Russian, Bulgarian, Romanian, Swedish, and
-     Finnish translations
-   + Message window
-   + Better window manager integration
-   + Add file view to properties dialog
+=== Transmission 0.70 (2007/04/18) ===
+==== All Platforms ====
+  * New icon
+  * Automatic port mapping (NAT-PMP and UPnP IGD)
+  * Peer exchange (PEX) compatible with Azureus and uTorrent
+  * Multitracker support
+  * Better handling of tracker announce interval
+  * Fixes bug where absurdly huge upload/download totals could be sent
+  * Automatic tracker scraping
+  * Cache connected peers
+  * Many miscellaneous bugfixes and small improvements
+==== Mac ====
+  * Requires 10.4 Tiger or newer
+  * Download and seeding queues that can be user-ordered
+  * Speed Limit: Second set of bandwidth limits that can be toggled or scheduled
+  * Individual torrent bandwidth limits
+  * Separate complete and incomplete download folders
+  * Filter and search bar
+  * Expanded Inspector with many additional views and stats
+  * Fragment status view in Inspector shows downloaded or availability
+  * Watch folder to auto add torrent files
+  * Auto resizing of the main window
+  * Minimal view to take up less space
+  * Seeding bar shows progress in finishing seeding
+  * Sounds when downloading and seeding complete
+  * Warnings for directory unavailable and not enough space
+  * Message log window
+  * New toolbar icons
+  * Built-in help files
+  * French, Spanish, German, and Greek translations
+==== GTK+ ====
+  * New Spanish, Polish, Russian, Bulgarian, Romanian, Swedish, and Finnish translations
+  * Message window
+  * Better window manager integration
+  * Add file view to properties dialog
 
-0.6.1 (2006/06/25)
- - OS X:
-   + Fixes a bug in the updater that could cause repeated hits to the
-     appcast
- - GTK+:
-   + Fixes drag-and-drop
-   + Adds Italian and French translations
+=== Transmission 0.6.1 (2006/06/25) ===
+==== Mac ====
+  * Fixes a bug in the updater that could cause repeated hits to the appcast
+==== GTK+ ====
+  * Fixes drag-and-drop
+  * Adds Italian and French translations
 
-0.6 (2006/06/21)
- - Ability to limit download rate
- - Automatic banning of peers who send bad data
- - Can keep a copy of the torrent file so the original can be deleted
- - Many bugfixes
- - OS X:
-   + Reworked interface
-   + Rate limits can be changed directly from the main window
-   + Ability to automatically stop seeding at a given ratio
-   + Allows sorting of the transfers list
-   + Extended Info Inspector
-   + Automatic updating with Sparkle
- - GTK+:
-   + Add torrents via command line. If Transmission is already running,
-       add them to running copy
-   + Improved long filename handling
+=== Transmission 0.6 (2006/06/21) ===
+==== All Platforms ====
+  * Ability to limit download rate
+  * Automatic banning of peers who send bad data
+  * Can keep a copy of the torrent file so the original can be deleted
+  * Many bugfixes
+==== Mac ====
+  * Reworked interface
+  * Rate limits can be changed directly from the main window
+  * Ability to automatically stop seeding at a given ratio
+  * Allows sorting of the transfers list
+  * Extended Info Inspector
+  * Automatic updating with Sparkle
+==== GTK+ ====
+  * Add torrents via command line. If Transmission is already running, add them to running copy
+  * Improved long filename handling
 
-0.5 (2006/02/11)
- - Only uses one port for all torrents
- - Rewritten choking algorithm
- - Remembers download and upload sizes from one launch to another
- - New GTK+ interface
- - New BeOS interface
- - OS X: Dock badging
- - OS X: Shows the file icon in the list
- - OS X: Shows ratio once download is completed
- - OS X: Automatic check for update
- - OS X: Fixes a display bug on Intel Macs
+=== Transmission 0.5 (2006/02/11) ===
+  * Only uses one port for all torrents
+  * Rewritten choking algorithm
+  * Remembers download and upload sizes from one launch to another
+  * New GTK+ interface
+  * New BeOS interface
+  * OS X: Dock badging
+  * OS X: Shows the file icon in the list
+  * OS X: Shows ratio once download is completed
+  * OS X: Automatic check for update
+  * OS X: Fixes a display bug on Intel Macs
 
-0.4 (2005/11/18)
- - Uses less CPU downloading torrents with many pieces
- - The UI could freeze when the hard drive was having a hard time - fixed
- - Fixes for difficult trackers, which require a 'key' parameter or a
+=== Transmission 0.4 (2005/11/18) ===
+  * Uses less CPU downloading torrents with many pieces
+  * The UI could freeze when the hard drive was having a hard time - fixed
+  * Fixes for difficult trackers, which require a 'key' parameter or a
      User Agent field
- - OS X: Cleaner look, unified toolbar
- - OS X: Added a document icon for torrent files
- - OS X: Added a Pause/Resume button for each torrent, and a
+  * OS X: Cleaner look, unified toolbar
+  * OS X: Added a document icon for torrent files
+  * OS X: Added a Pause/Resume button for each torrent, and a
     "Reveal in Finder" button
- - OS X: Added a contextual menu
- - OS X: Sometimes torrents kept "Stopping..." forever - fixed
- - OS X: Several minor improvements or fixes: allows column reordering,
+  * OS X: Added a contextual menu
+  * OS X: Sometimes torrents kept "Stopping..." forever - fixed
+  * OS X: Several minor improvements or fixes: allows column reordering,
     fixed resizing on Panther, remember the position of the window,
     fixed display of Unicode filenames, added menubar items and
     keyboard shortcuts, made the simple progress bar switch to green
     when seeding
 
-0.3 (2005/10/19)
- - Fixed "Sometimes sends incorrect messages and looses peers"
- - Fixed "Crashes with many torrents or torrents with many files"
- - Enhancements in the "End game" mode
- - Is nicer to the trackers
- - Asks for the rarest pieces first
- - OS X: Universal binary for PPC and x86
- - OS X: Fixed "Progress increases every time I pause then resume"
- - OS X: Fixed "Sometimes crashes at exit"
- - OS X: Cleaner icon
- - OS X: Show all sizes in human readable form
- - OS X: Keep downloading in the background when the window is closed
- - Miscellaneous bugfixes and internal enhancements
+=== Transmission 0.3 (2005/10/19) ===
+  * Fixed "Sometimes sends incorrect messages and looses peers"
+  * Fixed "Crashes with many torrents or torrents with many files"
+  * Enhancements in the "End game" mode
+  * Is nicer to the trackers
+  * Asks for the rarest pieces first
+  * OS X: Universal binary for PPC and x86
+  * OS X: Fixed "Progress increases every time I pause then resume"
+  * OS X: Fixed "Sometimes crashes at exit"
+  * OS X: Cleaner icon
+  * OS X: Show all sizes in human readable form
+  * OS X: Keep downloading in the background when the window is closed
+  * Miscellaneous bugfixes and internal enhancements
 
-0.2 (2005/09/22)
- - Bugfixes
- - OS X: Users can now choose where the downloads are sent
+=== Transmission 0.2 (2005/09/22) ===
+  * Bugfixes
+  * OS X: Users can now choose where the downloads are sent
 
-0.1 (2005/09/15)
- - First version
+=== Transmission 0.1 (2005/09/15) ===
+  * First version
