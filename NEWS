@@ -13,7 +13,7 @@
 ==== Mac ====
   * 64-bit compatibility
   * Queuing system will not exclude transfers with tracker warnings
-  * Connections to original torrent files are no longer maintained
+  * Links to original torrent files are no longer maintained
   * Fix bug where changing the global per-torrent peer connection limit did not affect the current session
   * Fix bug where changing settings through RPC would result in wrong values being saved for three fields
 ==== GTK+ ====
