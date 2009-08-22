@@ -1465,7 +1465,7 @@ printTorrentList( tr_benc * top )
 
                 strlsize( haveStr, sizeWhenDone - leftUntilDone, sizeof( haveStr ) );
 
-                if( leftUntilDone )
+                if( leftUntilDone || eta != -1 )
                     tr_strltime( etaStr, eta, sizeof( etaStr ) );
                 else
                     tr_snprintf( etaStr, sizeof( etaStr ), "Done" );
