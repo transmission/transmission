@@ -197,6 +197,13 @@ addTask( void * vtask )
         curl_easy_setopt( easy, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4 );
         curl_easy_setopt( easy, CURLOPT_DNS_CACHE_TIMEOUT, 360L );
         curl_easy_setopt( easy, CURLOPT_CONNECTTIMEOUT, 60L );
+
+        /* set a time limit for announces & scrapes */
+        if( strstr( task->url, "announce" ) )
+            curl_easy_setopt( easy, CURLOPT_TIMEOUT, 120L );
+        else if( strstr( task->url, "scrape" ) )
+            curl_easy_setopt( easy, CURLOPT_TIMEOUT, 30L );
+
         curl_easy_setopt( easy, CURLOPT_FOLLOWLOCATION, 1L );
         curl_easy_setopt( easy, CURLOPT_FORBID_REUSE, 1L );
         curl_easy_setopt( easy, CURLOPT_MAXREDIRS, 16L );
