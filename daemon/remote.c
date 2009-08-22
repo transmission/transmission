@@ -796,6 +796,22 @@ writeFunc( void * ptr,
     return byteCount;
 }
 
+
+static void 
+etaToString( char *  buf, size_t  buflen, int64_t eta ) 
+{ 
+    if( eta < 0 )
+        tr_snprintf( buf, buflen, "Unknown" ); 
+    else if( eta < 60 )
+        tr_snprintf( buf, buflen, "%" PRId64 "sec", eta ); 
+    else if( eta < ( 60 * 60 ) )
+        tr_snprintf( buf, buflen, "%" PRId64 " min", eta / 60 ); 
+    else if( eta < ( 60 * 60 * 24 ) )
+        tr_snprintf( buf, buflen, "%" PRId64 " hrs", eta / ( 60 * 60 ) ); 
+    else
+        tr_snprintf( buf, buflen, "%" PRId64 " days", eta / ( 60 * 60 * 24 ) ); 
+} 
+
 static char*
 tr_strltime( char * buf, int seconds, size_t buflen )
 {
@@ -1466,7 +1482,7 @@ printTorrentList( tr_benc * top )
                 strlsize( haveStr, sizeWhenDone - leftUntilDone, sizeof( haveStr ) );
 
                 if( leftUntilDone || eta != -1 )
-                    tr_strltime( etaStr, eta, sizeof( etaStr ) );
+                    etaToString( etaStr, sizeof( etaStr ), eta );
                 else
                     tr_snprintf( etaStr, sizeof( etaStr ), "Done" );
                 if( tr_bencDictFindInt( d, "error", &error ) && error )
