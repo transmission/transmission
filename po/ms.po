@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2009-08-13 23:52+0000\n"
+"X-Launchpad-Export-Date: 2009-08-22 16:00+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:49
@@ -30,9 +30,29 @@ msgstr "Susun mengikut _Nama"
 msgid "Sort by _Progress"
 msgstr "Susun mengikut_kemajuan"
 
+#: ../gtk/actions.c:52
+msgid "Sort by Rati_o"
+msgstr ""
+
+#: ../gtk/actions.c:53
+msgid "Sort by Stat_e"
+msgstr ""
+
+#: ../gtk/actions.c:54
+msgid "Sort by T_racker"
+msgstr ""
+
 #: ../gtk/actions.c:55
 msgid "Sort by A_ge"
 msgstr "Susun mengikut u_mur"
+
+#: ../gtk/actions.c:56
+msgid "Sort by Time _Left"
+msgstr ""
+
+#: ../gtk/actions.c:57
+msgid "Sort by Si_ze"
+msgstr ""
 
 #: ../gtk/actions.c:74
 msgid "_Main Window"
@@ -41,6 +61,22 @@ msgstr "Tetingkap _Utama"
 #: ../gtk/actions.c:75
 msgid "Message _Log"
 msgstr "_Log mesej"
+
+#: ../gtk/actions.c:90
+msgid "Temporary  Speed _Limits"
+msgstr ""
+
+#: ../gtk/actions.c:91
+msgid "_Minimal View"
+msgstr ""
+
+#: ../gtk/actions.c:92
+msgid "Re_verse Sort Order"
+msgstr ""
+
+#: ../gtk/actions.c:93
+msgid "_Filterbar"
+msgstr ""
 
 #: ../gtk/actions.c:94
 msgid "_Statusbar"
@@ -82,9 +118,33 @@ msgstr "_Tambah..."
 msgid "_Start"
 msgstr "_Mula"
 
+#: ../gtk/actions.c:107
+msgid "Start torrent"
+msgstr ""
+
 #: ../gtk/actions.c:108
 msgid "_Statistics"
 msgstr "_Statistik"
+
+#: ../gtk/actions.c:109 ../gtk/add-dialog.c:362
+msgid "_Verify Local Data"
+msgstr ""
+
+#: ../gtk/actions.c:110
+msgid "_Pause"
+msgstr ""
+
+#: ../gtk/actions.c:110
+msgid "Pause torrent"
+msgstr ""
+
+#: ../gtk/actions.c:111
+msgid "_Pause All"
+msgstr ""
+
+#: ../gtk/actions.c:111
+msgid "Pause all torrents"
+msgstr ""
 
 #: ../gtk/actions.c:112
 msgid "_Start All"
@@ -94,9 +154,17 @@ msgstr "_Mulakan Semua"
 msgid "Start all torrents"
 msgstr "Mulakan semua torrent"
 
+#: ../gtk/actions.c:113
+msgid "Set _Location"
+msgstr ""
+
 #: ../gtk/actions.c:114
 msgid "Remove torrent"
 msgstr "Buang torrent"
+
+#: ../gtk/actions.c:115
+msgid "_Delete Files and Remove"
+msgstr ""
 
 #: ../gtk/actions.c:116
 msgid "_New..."
@@ -117,6 +185,10 @@ msgstr "Pilih _Semua"
 #: ../gtk/actions.c:119
 msgid "Dese_lect All"
 msgstr "_Nyahpilih Semua"
+
+#: ../gtk/actions.c:121
+msgid "Torrent properties"
+msgstr ""
 
 #: ../gtk/actions.c:122
 msgid "_Open Folder"
@@ -170,6 +242,10 @@ msgstr "Pilih folder destinasi"
 msgid "Add a Torrent"
 msgstr "Tambah Torrent"
 
+#: ../gtk/add-dialog.c:460 ../gtk/tr-prefs.c:293
+msgid "Display _options dialog"
+msgstr ""
+
 #: ../gtk/conf.c:64 ../gtk/makemeta-ui.c:140 ../libtransmission/fdlimit.c:307
 #: ../libtransmission/metainfo.c:110 ../libtransmission/utils.c:627
 #: ../libtransmission/utils.c:638
@@ -183,6 +259,16 @@ msgstr "Tak boleh bina \"%1$s\": %2$s"
 msgid "Couldn't open \"%1$s\": %2$s"
 msgstr "Tak boleh buka \"%1$s\": %2$s"
 
+#: ../gtk/conf.c:94
+#, c-format
+msgid "%s is already running."
+msgstr ""
+
+#: ../gtk/conf.c:448 ../gtk/conf.c:453
+#, c-format
+msgid "Importing \"%s\""
+msgstr ""
+
 #: ../gtk/details.c:470 ../gtk/file-list.c:579
 msgid "High"
 msgstr "Tinggi"
@@ -194,252 +280,6 @@ msgstr "Normal"
 #: ../gtk/details.c:472 ../gtk/file-list.c:581
 msgid "Low"
 msgstr "Rendah"
-
-#: ../gtk/details.c:584
-msgid "_Maximum peers:"
-msgstr "_Peer Maksima:"
-
-#: ../gtk/details.c:618 ../gtk/details.c:1346 ../gtk/details.c:1643
-#: ../gtk/util.c:68 ../libtransmission/utils.c:1348
-msgid "None"
-msgstr "Tiada"
-
-#: ../gtk/details.c:619 ../gtk/details.c:1645 ../gtk/file-list.c:582
-msgid "Mixed"
-msgstr "Campuran"
-
-#: ../gtk/details.c:641
-msgid "Public torrent"
-msgstr "Torrent awam"
-
-#: ../gtk/details.c:916
-msgid "Activity"
-msgstr "Aktiviti"
-
-#: ../gtk/details.c:928 ../gtk/stats.c:149 ../gtk/stats.c:161
-msgid "Downloaded:"
-msgstr "Telah Dimuat turun:"
-
-#: ../gtk/details.c:932 ../gtk/stats.c:147 ../gtk/stats.c:159
-msgid "Uploaded:"
-msgstr "Telah dimuatnaik"
-
-#: ../gtk/details.c:936 ../gtk/stats.c:151 ../gtk/stats.c:163
-msgid "Ratio:"
-msgstr "Nisbah:"
-
-#: ../gtk/details.c:940
-msgid "State:"
-msgstr "Keadaan:"
-
-#: ../gtk/details.c:952
-msgid "Error:"
-msgstr "Ralat:"
-
-#: ../gtk/details.c:956
-msgid "Details"
-msgstr "Perincian"
-
-#: ../gtk/details.c:974
-msgid "Privacy:"
-msgstr "Persendirian:"
-
-#: ../gtk/details.c:996
-msgid "Comment:"
-msgstr "Komen:"
-
-#: ../gtk/details.c:1068
-msgid "Address"
-msgstr "Alamat"
-
-#: ../gtk/details.c:1073
-msgid "Client"
-msgstr "Klien"
-
-#: ../gtk/details.c:1074
-msgid "%"
-msgstr "%"
-
-#: ../gtk/details.c:1075
-msgid "Status"
-msgstr "Status"
-
-#: ../gtk/details.c:1406
-msgid "Uploading to peer"
-msgstr "Muatnaik ke peer"
-
-#: ../gtk/details.c:1596
-msgid "<b>Seeders:</b>"
-msgstr "<b>Seeder:</b>"
-
-#: ../gtk/details.c:1644
-msgid "Now"
-msgstr "Sekarang"
-
-#: ../gtk/details.c:1792 ../gtk/makemeta-ui.c:425
-msgid "Trackers"
-msgstr "Tracker"
-
-#: ../gtk/details.c:1817
-msgid "Announce"
-msgstr "Mengumumkan"
-
-#: ../gtk/details.c:1821
-msgid "Tracker:"
-msgstr "Tracker:"
-
-#: ../gtk/details.c:1914 ../gtk/msgwin.c:193
-msgid "Information"
-msgstr "Informasi"
-
-#: ../gtk/details.c:1918
-msgid "Peers"
-msgstr "Peer"
-
-#: ../gtk/details.c:1922 ../gtk/tr-prefs.c:961 ../gtk/tr-window.c:848
-msgid "Tracker"
-msgstr "Tracker"
-
-#: ../gtk/details.c:1927 ../gtk/tr-window.c:848
-msgid "Files"
-msgstr "Fail"
-
-#: ../gtk/details.c:1932
-msgid "Options"
-msgstr "Pilihan"
-
-#: ../gtk/details.c:1960
-#, c-format
-msgid "%s Properties"
-msgstr "Ciri-ciri %s"
-
-#. add "enabled" column
-#: ../gtk/file-list.c:609 ../gtk/file-list.c:743
-msgid "Download"
-msgstr "Muatturun"
-
-#. add priority column
-#: ../gtk/file-list.c:610 ../gtk/file-list.c:757
-msgid "Priority"
-msgstr "Prioriti"
-
-#: ../gtk/file-list.c:715
-msgid "File"
-msgstr "Fail"
-
-#. add "progress" column
-#: ../gtk/file-list.c:730
-msgid "Progress"
-msgstr "Perkembangan"
-
-#: ../gtk/main.c:366
-msgid "Transmission"
-msgstr "Transmission"
-
-#: ../gtk/main.c:708
-msgid "_Quit Now"
-msgstr "_Tutup sekarang"
-
-#: ../gtk/makemeta-ui.c:282
-#, c-format
-msgid "%'d Piece"
-msgid_plural "%'d Pieces"
-msgstr[0] "%'d Cebisan"
-msgstr[1] "%'d Cebisan"
-
-#: ../gtk/relocate.c:117
-msgid "Location"
-msgstr "Lokasi"
-
-#: ../gtk/tr-prefs.c:309 ../gtk/tr-prefs.c:1354
-msgid "Limits"
-msgstr "Had"
-
-#: ../gtk/actions.c:52
-msgid "Sort by Rati_o"
-msgstr ""
-
-#: ../gtk/actions.c:53
-msgid "Sort by Stat_e"
-msgstr ""
-
-#: ../gtk/actions.c:54
-msgid "Sort by T_racker"
-msgstr ""
-
-#: ../gtk/actions.c:56
-msgid "Sort by Time _Left"
-msgstr ""
-
-#: ../gtk/actions.c:57
-msgid "Sort by Si_ze"
-msgstr ""
-
-#: ../gtk/actions.c:90
-msgid "Temporary  Speed _Limits"
-msgstr ""
-
-#: ../gtk/actions.c:91
-msgid "_Minimal View"
-msgstr ""
-
-#: ../gtk/actions.c:92
-msgid "Re_verse Sort Order"
-msgstr ""
-
-#: ../gtk/actions.c:93
-msgid "_Filterbar"
-msgstr ""
-
-#: ../gtk/actions.c:107
-msgid "Start torrent"
-msgstr ""
-
-#: ../gtk/actions.c:109 ../gtk/add-dialog.c:362
-msgid "_Verify Local Data"
-msgstr ""
-
-#: ../gtk/actions.c:110
-msgid "_Pause"
-msgstr ""
-
-#: ../gtk/actions.c:110
-msgid "Pause torrent"
-msgstr ""
-
-#: ../gtk/actions.c:111
-msgid "_Pause All"
-msgstr ""
-
-#: ../gtk/actions.c:111
-msgid "Pause all torrents"
-msgstr ""
-
-#: ../gtk/actions.c:113
-msgid "Set _Location"
-msgstr ""
-
-#: ../gtk/actions.c:115
-msgid "_Delete Files and Remove"
-msgstr ""
-
-#: ../gtk/actions.c:121
-msgid "Torrent properties"
-msgstr ""
-
-#: ../gtk/add-dialog.c:460 ../gtk/tr-prefs.c:293
-msgid "Display _options dialog"
-msgstr ""
-
-#: ../gtk/conf.c:94
-#, c-format
-msgid "%s is already running."
-msgstr ""
-
-#: ../gtk/conf.c:448 ../gtk/conf.c:453
-#, c-format
-msgid "Importing \"%s\""
-msgstr ""
 
 #: ../gtk/details.c:508 ../gtk/tr-prefs.c:1395
 msgid "Speed"
@@ -481,6 +321,10 @@ msgstr ""
 msgid "Peer Connections"
 msgstr ""
 
+#: ../gtk/details.c:584
+msgid "_Maximum peers:"
+msgstr "_Peer Maksima:"
+
 #: ../gtk/details.c:603 ../gtk/torrent-cell-renderer.c:173
 msgid "Waiting to verify local data"
 msgstr ""
@@ -501,9 +345,22 @@ msgstr ""
 msgid "Paused"
 msgstr ""
 
+#: ../gtk/details.c:618 ../gtk/details.c:1346 ../gtk/details.c:1643
+#: ../gtk/util.c:68 ../libtransmission/utils.c:1348
+msgid "None"
+msgstr "Tiada"
+
+#: ../gtk/details.c:619 ../gtk/details.c:1645 ../gtk/file-list.c:582
+msgid "Mixed"
+msgstr "Campuran"
+
 #: ../gtk/details.c:639
 msgid "Private to this tracker -- DHT and PEX disabled"
 msgstr ""
+
+#: ../gtk/details.c:641
+msgid "Public torrent"
+msgstr "Torrent awam"
 
 #: ../gtk/details.c:663
 #, c-format
@@ -558,6 +415,10 @@ msgstr ""
 msgid "%1$s ago"
 msgstr ""
 
+#: ../gtk/details.c:916
+msgid "Activity"
+msgstr "Aktiviti"
+
 #: ../gtk/details.c:920
 msgid "Torrent size:"
 msgstr ""
@@ -565,6 +426,22 @@ msgstr ""
 #: ../gtk/details.c:924
 msgid "Have:"
 msgstr ""
+
+#: ../gtk/details.c:928 ../gtk/stats.c:149 ../gtk/stats.c:161
+msgid "Downloaded:"
+msgstr "Telah Dimuat turun:"
+
+#: ../gtk/details.c:932 ../gtk/stats.c:147 ../gtk/stats.c:159
+msgid "Uploaded:"
+msgstr "Telah dimuatnaik"
+
+#: ../gtk/details.c:936 ../gtk/stats.c:151 ../gtk/stats.c:163
+msgid "Ratio:"
+msgstr "Nisbah:"
+
+#: ../gtk/details.c:940
+msgid "State:"
+msgstr "Keadaan:"
 
 #: ../gtk/details.c:944
 msgid "Running time:"
@@ -574,6 +451,14 @@ msgstr ""
 msgid "Last activity:"
 msgstr ""
 
+#: ../gtk/details.c:952
+msgid "Error:"
+msgstr "Ralat:"
+
+#: ../gtk/details.c:956
+msgid "Details"
+msgstr "Perincian"
+
 #: ../gtk/details.c:962
 msgid "Location:"
 msgstr ""
@@ -582,9 +467,17 @@ msgstr ""
 msgid "Hash:"
 msgstr ""
 
+#: ../gtk/details.c:974
+msgid "Privacy:"
+msgstr "Persendirian:"
+
 #: ../gtk/details.c:979
 msgid "Origin:"
 msgstr ""
+
+#: ../gtk/details.c:996
+msgid "Comment:"
+msgstr "Komen:"
 
 #: ../gtk/details.c:1028
 msgid "Webseeds"
@@ -594,9 +487,25 @@ msgstr ""
 msgid "Down"
 msgstr ""
 
+#: ../gtk/details.c:1068
+msgid "Address"
+msgstr "Alamat"
+
 #: ../gtk/details.c:1072
 msgid "Up"
 msgstr ""
+
+#: ../gtk/details.c:1073
+msgid "Client"
+msgstr "Klien"
+
+#: ../gtk/details.c:1074
+msgid "%"
+msgstr "%"
+
+#: ../gtk/details.c:1075
+msgid "Status"
+msgstr "Status"
 
 #: ../gtk/details.c:1403
 msgid "Optimistic unchoke"
@@ -609,6 +518,10 @@ msgstr ""
 #: ../gtk/details.c:1405
 msgid "We would download from this peer if they would let us"
 msgstr ""
+
+#: ../gtk/details.c:1406
+msgid "Uploading to peer"
+msgstr "Muatnaik ke peer"
 
 #: ../gtk/details.c:1407
 msgid "We would upload to this peer if they asked"
@@ -638,6 +551,10 @@ msgstr ""
 msgid "Peer is an incoming connection"
 msgstr ""
 
+#: ../gtk/details.c:1596
+msgid "<b>Seeders:</b>"
+msgstr "<b>Seeder:</b>"
+
 #: ../gtk/details.c:1603
 msgid "<b>Leechers:</b>"
 msgstr ""
@@ -646,6 +563,10 @@ msgstr ""
 msgid "<b>Times Completed:</b>"
 msgstr ""
 
+#: ../gtk/details.c:1644
+msgid "Now"
+msgstr "Sekarang"
+
 #: ../gtk/details.c:1646
 msgid "None sent"
 msgstr ""
@@ -653,6 +574,10 @@ msgstr ""
 #: ../gtk/details.c:1647
 msgid "In progress"
 msgstr ""
+
+#: ../gtk/details.c:1792 ../gtk/makemeta-ui.c:425
+msgid "Trackers"
+msgstr "Tracker"
 
 #: ../gtk/details.c:1799
 msgid "Scrape"
@@ -670,6 +595,14 @@ msgstr ""
 msgid "Next scrape in:"
 msgstr ""
 
+#: ../gtk/details.c:1817
+msgid "Announce"
+msgstr "Mengumumkan"
+
+#: ../gtk/details.c:1821
+msgid "Tracker:"
+msgstr "Tracker:"
+
 #: ../gtk/details.c:1823
 msgid "Last announce at:"
 msgstr ""
@@ -683,6 +616,31 @@ msgstr ""
 #: ../gtk/details.c:1840
 msgid "Manual announce allowed in:"
 msgstr ""
+
+#: ../gtk/details.c:1914 ../gtk/msgwin.c:193
+msgid "Information"
+msgstr "Informasi"
+
+#: ../gtk/details.c:1918
+msgid "Peers"
+msgstr "Peer"
+
+#: ../gtk/details.c:1922 ../gtk/tr-prefs.c:961 ../gtk/tr-window.c:848
+msgid "Tracker"
+msgstr "Tracker"
+
+#: ../gtk/details.c:1927 ../gtk/tr-window.c:848
+msgid "Files"
+msgstr "Fail"
+
+#: ../gtk/details.c:1932
+msgid "Options"
+msgstr "Pilihan"
+
+#: ../gtk/details.c:1960
+#, c-format
+msgid "%s Properties"
+msgstr "Ciri-ciri %s"
 
 #: ../gtk/details.c:1970
 #, c-format
@@ -733,6 +691,25 @@ msgid_plural "Some of these torrents have not finished downloading."
 msgstr[0] ""
 msgstr[1] ""
 
+#. add "enabled" column
+#: ../gtk/file-list.c:609 ../gtk/file-list.c:743
+msgid "Download"
+msgstr "Muatturun"
+
+#. add priority column
+#: ../gtk/file-list.c:610 ../gtk/file-list.c:757
+msgid "Priority"
+msgstr "Prioriti"
+
+#: ../gtk/file-list.c:715
+msgid "File"
+msgstr "Fail"
+
+#. add "progress" column
+#: ../gtk/file-list.c:730
+msgid "Progress"
+msgstr "Perkembangan"
+
 #: ../gtk/main.c:348
 msgid "Start with all torrents paused"
 msgstr ""
@@ -749,6 +726,10 @@ msgstr ""
 msgid "Where to look for configuration files"
 msgstr ""
 
+#: ../gtk/main.c:366
+msgid "Transmission"
+msgstr "Transmission"
+
 #: ../gtk/main.c:373
 msgid "[torrent files]"
 msgstr ""
@@ -760,6 +741,10 @@ msgstr ""
 #: ../gtk/main.c:703
 msgid "Sending upload/download totals to tracker..."
 msgstr ""
+
+#: ../gtk/main.c:708
+msgid "_Quit Now"
+msgstr "_Tutup sekarang"
 
 #: ../gtk/main.c:875
 msgid "Couldn't add corrupt torrent"
@@ -827,6 +812,13 @@ msgid "<i>%1$s; %2$'d File</i>"
 msgid_plural "<i>%1$s; %2$'d Files</i>"
 msgstr[0] ""
 msgstr[1] ""
+
+#: ../gtk/makemeta-ui.c:282
+#, c-format
+msgid "%'d Piece"
+msgid_plural "%'d Pieces"
+msgstr[0] "%'d Cebisan"
+msgstr[1] "%'d Cebisan"
 
 #. %1$s is number of pieces;
 #. %2$s is how big each piece is
@@ -941,6 +933,10 @@ msgstr ""
 #: ../gtk/relocate.c:99 ../gtk/relocate.c:121
 msgid "Set Torrent Location"
 msgstr ""
+
+#: ../gtk/relocate.c:117
+msgid "Location"
+msgstr "Lokasi"
 
 #: ../gtk/relocate.c:124
 msgid "Torrent _location:"
@@ -1142,6 +1138,10 @@ msgstr ""
 #: ../gtk/tr-prefs.c:306
 msgid "Save to _Location:"
 msgstr ""
+
+#: ../gtk/tr-prefs.c:309 ../gtk/tr-prefs.c:1354
+msgid "Limits"
+msgstr "Had"
 
 #: ../gtk/tr-prefs.c:335 ../gtk/tr-prefs.c:1404
 msgid "Desktop"

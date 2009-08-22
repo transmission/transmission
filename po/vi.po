@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2009-08-13 23:52+0000\n"
+"X-Launchpad-Export-Date: 2009-08-22 16:00+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:49
@@ -30,9 +30,29 @@ msgstr "Xếp theo _Tên"
 msgid "Sort by _Progress"
 msgstr "Xếp theo _Tiến trình"
 
+#: ../gtk/actions.c:52
+msgid "Sort by Rati_o"
+msgstr ""
+
+#: ../gtk/actions.c:53
+msgid "Sort by Stat_e"
+msgstr ""
+
+#: ../gtk/actions.c:54
+msgid "Sort by T_racker"
+msgstr ""
+
 #: ../gtk/actions.c:55
 msgid "Sort by A_ge"
 msgstr "Xếp theo Thời _gian"
+
+#: ../gtk/actions.c:56
+msgid "Sort by Time _Left"
+msgstr ""
+
+#: ../gtk/actions.c:57
+msgid "Sort by Si_ze"
+msgstr "Sắp xếp theo kích thước"
 
 #: ../gtk/actions.c:74
 msgid "_Main Window"
@@ -42,9 +62,17 @@ msgstr "_Cửa sổ chính"
 msgid "Message _Log"
 msgstr "_Bản ghi thông điệp"
 
+#: ../gtk/actions.c:90
+msgid "Temporary  Speed _Limits"
+msgstr ""
+
 #: ../gtk/actions.c:91
 msgid "_Minimal View"
 msgstr "Quan sát Tố_i thiểu"
+
+#: ../gtk/actions.c:92
+msgid "Re_verse Sort Order"
+msgstr ""
 
 #: ../gtk/actions.c:93
 msgid "_Filterbar"
@@ -125,6 +153,10 @@ msgstr "_Chạy tất cả"
 #: ../gtk/actions.c:112
 msgid "Start all torrents"
 msgstr "Khởi động tất cả torrent"
+
+#: ../gtk/actions.c:113
+msgid "Set _Location"
+msgstr ""
 
 #: ../gtk/actions.c:114
 msgid "Remove torrent"
@@ -232,6 +264,11 @@ msgstr "Không thể mở \"%1$s\": %2$s"
 msgid "%s is already running."
 msgstr "%s đang được chạy.."
 
+#: ../gtk/conf.c:448 ../gtk/conf.c:453
+#, c-format
+msgid "Importing \"%s\""
+msgstr "Nhập \"%s\""
+
 #: ../gtk/details.c:470 ../gtk/file-list.c:579
 msgid "High"
 msgstr "Cao"
@@ -244,6 +281,14 @@ msgstr "Bình thường"
 msgid "Low"
 msgstr "Thấp"
 
+#: ../gtk/details.c:508 ../gtk/tr-prefs.c:1395
+msgid "Speed"
+msgstr "Tốc độ"
+
+#: ../gtk/details.c:510
+msgid "Honor global _limits"
+msgstr ""
+
 #: ../gtk/details.c:515 ../gtk/tr-prefs.c:1180
 msgid "Limit _download speed (KB/s):"
 msgstr "_Giới hạn tốc độ tải về (KB/s):"
@@ -251,6 +296,26 @@ msgstr "_Giới hạn tốc độ tải về (KB/s):"
 #: ../gtk/details.c:527 ../gtk/tr-prefs.c:1187
 msgid "Limit _upload speed (KB/s):"
 msgstr "Giới hạn tốc độ tải lên (KB/s):"
+
+#: ../gtk/details.c:539
+msgid "Torrent _priority:"
+msgstr ""
+
+#: ../gtk/details.c:543
+msgid "Seed-Until Ratio"
+msgstr ""
+
+#: ../gtk/details.c:546
+msgid "Use _global settings"
+msgstr ""
+
+#: ../gtk/details.c:555
+msgid "Seed _regardless of ratio"
+msgstr ""
+
+#: ../gtk/details.c:564 ../gtk/tr-prefs.c:311
+msgid "_Seed torrent until its ratio reaches:"
+msgstr ""
 
 #: ../gtk/details.c:581
 msgid "Peer Connections"
@@ -263,6 +328,18 @@ msgstr "_Peer nhiều nhất:"
 #: ../gtk/details.c:603 ../gtk/torrent-cell-renderer.c:173
 msgid "Waiting to verify local data"
 msgstr "Đang chờ xác thực dữ liệu cục bộ"
+
+#: ../gtk/details.c:604
+msgid "Verifying local data"
+msgstr "Kiểm tra lại dữ liệu"
+
+#: ../gtk/details.c:605
+msgid "Downloading"
+msgstr "Đang tải về"
+
+#: ../gtk/details.c:606
+msgid "Seeding"
+msgstr "Đang chia sẻ"
 
 #: ../gtk/details.c:607 ../gtk/torrent-cell-renderer.c:169
 msgid "Paused"
@@ -277,13 +354,74 @@ msgstr "Không"
 msgid "Mixed"
 msgstr "Pha trộn"
 
+#: ../gtk/details.c:639
+msgid "Private to this tracker -- DHT and PEX disabled"
+msgstr ""
+
 #: ../gtk/details.c:641
 msgid "Public torrent"
 msgstr "Torrent công cộng"
 
+#: ../gtk/details.c:663
+#, c-format
+msgid "Created by %1$s"
+msgstr ""
+
+#: ../gtk/details.c:665
+#, c-format
+msgid "Created on %1$s"
+msgstr ""
+
+#: ../gtk/details.c:667
+#, c-format
+msgid "Created by %1$s on %2$s"
+msgstr ""
+
+#: ../gtk/details.c:758
+#, c-format
+msgid "%1$s (%2$'d piece @ %3$s)"
+msgid_plural "%1$s (%2$'d pieces @ %3$s)"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/details.c:764
+#, c-format
+msgid "%1$s (%2$'d piece)"
+msgid_plural "%1$s (%2$'d pieces)"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/details.c:798
+#, c-format
+msgid "%1$s (%2$.1f%%); %3$s Unverified"
+msgstr ""
+
+#: ../gtk/details.c:800
+#, c-format
+msgid "%1$s (%2$.1f%%)"
+msgstr ""
+
+#: ../gtk/details.c:820
+#, c-format
+msgid "%1$s (+%2$s corrupt)"
+msgstr ""
+
+#: ../gtk/details.c:893
+msgid "Active now"
+msgstr ""
+
+#: ../gtk/details.c:897
+#, c-format
+msgid "%1$s ago"
+msgstr ""
+
 #: ../gtk/details.c:916
 msgid "Activity"
 msgstr "Hoạt động"
+
+#: ../gtk/details.c:920
+msgid "Torrent size:"
+msgstr ""
 
 #: ../gtk/details.c:924
 msgid "Have:"
@@ -305,6 +443,14 @@ msgstr "Tỷ lệ:"
 msgid "State:"
 msgstr "Tình trạng:"
 
+#: ../gtk/details.c:944
+msgid "Running time:"
+msgstr ""
+
+#: ../gtk/details.c:948
+msgid "Last activity:"
+msgstr ""
+
 #: ../gtk/details.c:952
 msgid "Error:"
 msgstr "Lỗi:"
@@ -312,6 +458,10 @@ msgstr "Lỗi:"
 #: ../gtk/details.c:956
 msgid "Details"
 msgstr "Chi tiết"
+
+#: ../gtk/details.c:962
+msgid "Location:"
+msgstr ""
 
 #: ../gtk/details.c:969
 msgid "Hash:"
@@ -321,9 +471,17 @@ msgstr "Hash:"
 msgid "Privacy:"
 msgstr "Riêng tư:"
 
+#: ../gtk/details.c:979
+msgid "Origin:"
+msgstr ""
+
 #: ../gtk/details.c:996
 msgid "Comment:"
 msgstr "Ghi chú :"
+
+#: ../gtk/details.c:1028
+msgid "Webseeds"
+msgstr ""
 
 #: ../gtk/details.c:1030 ../gtk/details.c:1070
 msgid "Down"
@@ -385,6 +543,10 @@ msgstr "Mã hóa kết nối"
 msgid "Peer was discovered through Peer Exchange (PEX)"
 msgstr "Peer đã được tìm ra qua Peer Exchange (PEX)"
 
+#: ../gtk/details.c:1412
+msgid "Peer was discovered through DHT"
+msgstr ""
+
 #: ../gtk/details.c:1413
 msgid "Peer is an incoming connection"
 msgstr "Peer là một kết nối vào"
@@ -405,6 +567,10 @@ msgstr "<b>Thời gian hoàn thành:</b>"
 msgid "Now"
 msgstr "Bây giờ"
 
+#: ../gtk/details.c:1646
+msgid "None sent"
+msgstr "Không gửi"
+
 #: ../gtk/details.c:1647
 msgid "In progress"
 msgstr "Trong quá trình"
@@ -413,9 +579,21 @@ msgstr "Trong quá trình"
 msgid "Trackers"
 msgstr "Các tracker"
 
+#: ../gtk/details.c:1799
+msgid "Scrape"
+msgstr ""
+
+#: ../gtk/details.c:1801
+msgid "Last scrape at:"
+msgstr ""
+
 #: ../gtk/details.c:1806 ../gtk/details.c:1828
 msgid "Tracker responded:"
 msgstr "Tracker phản hồi:"
+
+#: ../gtk/details.c:1811
+msgid "Next scrape in:"
+msgstr ""
 
 #: ../gtk/details.c:1817
 msgid "Announce"
@@ -463,6 +641,11 @@ msgstr "Tùy chọn"
 #, c-format
 msgid "%s Properties"
 msgstr "Thuộc tính %s"
+
+#: ../gtk/details.c:1970
+#, c-format
+msgid "%'d Torrent Properties"
+msgstr ""
 
 #: ../gtk/dialogs.c:121
 msgid "<big><b>Quit Transmission?</b></big>"
@@ -574,6 +757,17 @@ msgstr "Trình khách BitTorrent nhanh và dễ sử dụng"
 #: ../gtk/main.c:1165
 msgid "Copyright 2005-2009 The Transmission Project"
 msgstr "Bản quyền 2005-2009 Dự án The Transmission"
+
+#. Translators: translate "translator-credits" as
+#. your name
+#. to have it appear in the credits in the "About"
+#. dialog
+#: ../gtk/main.c:1176
+msgid "translator-credits"
+msgstr ""
+"Launchpad Contributions:\n"
+"  Phan Trọng Khanh https://launchpad.net/~khanhpt\n"
+"  blackrises https://launchpad.net/~blackrises"
 
 #: ../gtk/makemeta-ui.c:109
 msgid "Torrent created!"
@@ -713,9 +907,38 @@ msgstr "Mở Tệp"
 msgid "Open Folder"
 msgstr "Mở thư mục"
 
+#: ../gtk/notify.c:121
+msgid "Torrent Added"
+msgstr ""
+
+#: ../gtk/relocate.c:68
+#, c-format
+msgid "Moving \"%s\""
+msgstr ""
+
+#: ../gtk/relocate.c:70
+msgid "This may take a moment..."
+msgstr ""
+
+#: ../gtk/relocate.c:99 ../gtk/relocate.c:121
+msgid "Set Torrent Location"
+msgstr ""
+
 #: ../gtk/relocate.c:117
 msgid "Location"
 msgstr "Vị trí"
+
+#: ../gtk/relocate.c:124
+msgid "Torrent _location:"
+msgstr ""
+
+#: ../gtk/relocate.c:125
+msgid "_Move from the current folder"
+msgstr ""
+
+#: ../gtk/relocate.c:128
+msgid "Local data is _already there"
+msgstr ""
 
 #: ../gtk/stats.c:75 ../gtk/stats.c:156
 #, c-format
@@ -756,6 +979,15 @@ msgstr "%1$s of %2$s (%3$.2f%%)"
 #, c-format
 msgid "%1$s of %2$s (%3$.2f%%), uploaded %4$s (Ratio: %5$s)"
 msgstr "%1$s of %2$s (%3$.2f%%), đã tải lên %4$s (Tỷ lệ: %5$s)"
+
+#. %1$s is the torrent's total size,
+#. %2$s is how much we've uploaded,
+#. %3$s is our upload-to-download ratio,
+#. $4$s is the ratio we want to reach before we stop uploading
+#: ../gtk/torrent-cell-renderer.c:88
+#, c-format
+msgid "%1$s, uploaded %2$s (Ratio: %3$s Goal: %4$s)"
+msgstr ""
 
 #. %1$s is the torrent's total size,
 #. %2$s is how much we've uploaded,
@@ -814,6 +1046,13 @@ msgid "Downloading from %1$'d of %2$'d connected peer"
 msgid_plural "Downloading from %1$'d of %2$'d connected peers"
 msgstr[0] "Đang tải về từ %1$'d of %2$'d peer đã kết nối"
 
+#: ../gtk/torrent-cell-renderer.c:243 ../gtk/tr-torrent.c:259
+#, c-format
+msgid "Seeding to %1$'d of %2$'d connected peer"
+msgid_plural "Seeding to %1$'d of %2$'d connected peers"
+msgstr[0] ""
+msgstr[1] ""
+
 #: ../gtk/tracker-list.c:344
 msgid "Tier"
 msgstr "Bậc"
@@ -838,6 +1077,10 @@ msgstr "Trình khách BitTorrent Transmission"
 msgid "Transmission Bittorrent Client"
 msgstr "Trình khách BitTorrent Transmission"
 
+#: ../gtk/tr-core.c:1119
+msgid "BitTorrent Activity"
+msgstr ""
+
 #: ../gtk/tr-core.c:1127
 msgid "Disallowing desktop hibernation"
 msgstr "Vô hiệu hóa ngủ đông"
@@ -851,6 +1094,23 @@ msgstr "Không thể vô hiệu ngủ đông: %s"
 msgid "Allowing desktop hibernation"
 msgstr "Cho phép máy tính ngủ đông"
 
+#: ../gtk/tr-icon.c:77 ../gtk/tr-icon.c:92
+#, c-format
+msgid "(Limit: %s)"
+msgstr ""
+
+#. %1$s: current upload speed
+#. * %2$s: current upload limit, if any
+#. * %3$s: current download speed
+#. * %4$s: current download limit, if any
+#: ../gtk/tr-icon.c:99
+#, c-format
+msgid ""
+"Transmission\n"
+"Up: %1$s %2$s\n"
+"Down: %3$s %4$s"
+msgstr ""
+
 #: ../gtk/tr-prefs.c:281
 msgid "Adding Torrents"
 msgstr "Thêm các Torrent"
@@ -863,6 +1123,10 @@ msgstr "Tự độn_g thêm các torrent từ:"
 msgid "Mo_ve source files to Trash"
 msgstr "Chuyển tệp nguồn _vào Thùng rác"
 
+#: ../gtk/tr-prefs.c:306
+msgid "Save to _Location:"
+msgstr ""
+
 #: ../gtk/tr-prefs.c:309 ../gtk/tr-prefs.c:1354
 msgid "Limits"
 msgstr "Giới hạn"
@@ -871,11 +1135,54 @@ msgstr "Giới hạn"
 msgid "Desktop"
 msgstr "Màn hình làm việc"
 
+#: ../gtk/tr-prefs.c:337
+msgid "Inhibit _hibernation when torrents are active"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:341
+msgid "Show Transmission in the system _tray"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:345
+msgid "Show popup _notifications"
+msgstr ""
+
 #: ../gtk/tr-prefs.c:372
 #, c-format
 msgid "Enable _blocklist (contains %'d rule)"
 msgid_plural "Enable _blocklist (contains %'d rules)"
 msgstr[0] "_Cho phép danh sách chặn (chứa %'d luật)"
+
+#: ../gtk/tr-prefs.c:402
+#, c-format
+msgid "Blocklist now has %'d rule."
+msgid_plural "Blocklist now has %'d rules."
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/tr-prefs.c:406
+msgid "<b>Update succeeded!</b>"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:421
+msgid "Update Blocklist"
+msgstr "Cập nhật danh sách cấm"
+
+#: ../gtk/tr-prefs.c:423
+msgid "Getting new blocklist..."
+msgstr "Thêm danh sách cấm mới"
+
+#: ../gtk/tr-prefs.c:458
+msgid "Allow encryption"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:459
+msgid "Prefer encryption"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:460
+msgid "Require encryption"
+msgstr ""
 
 #: ../gtk/tr-prefs.c:504
 msgid "Blocklist"
@@ -889,9 +1196,52 @@ msgstr "_Cập nhật"
 msgid "Enable _automatic updates"
 msgstr "_Bật tự động cập nhật"
 
+#: ../gtk/tr-prefs.c:527 ../gtk/tr-prefs.c:1398
+msgid "Privacy"
+msgstr "Riêng tư"
+
+#: ../gtk/tr-prefs.c:529
+msgid "_Encryption mode:"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:533
+msgid "Use PE_X to find more peers"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:535
+msgid ""
+"PEX is a tool for exchanging peer lists with the peers you're connected to."
+msgstr ""
+
+#: ../gtk/tr-prefs.c:540
+msgid "Use _DHT to find more peers"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:542
+msgid "DHT is a tool for finding peers without a tracker."
+msgstr ""
+
+#: ../gtk/tr-prefs.c:753
+msgid "Web Client"
+msgstr ""
+
+#. "enabled" checkbutton
+#: ../gtk/tr-prefs.c:756
+msgid "_Enable web client"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:762
+msgid "_Open web client"
+msgstr ""
+
 #: ../gtk/tr-prefs.c:771
 msgid "Listening _port:"
 msgstr "Lắng nghe _cổng:"
+
+#. require authentication
+#: ../gtk/tr-prefs.c:775 ../gtk/tr-prefs.c:992
+msgid "Use _authentication"
+msgstr ""
 
 #. username
 #: ../gtk/tr-prefs.c:783 ../gtk/tr-prefs.c:998
@@ -902,6 +1252,11 @@ msgstr "_Tên người dùng:"
 #: ../gtk/tr-prefs.c:790 ../gtk/tr-prefs.c:1004
 msgid "Pass_word:"
 msgstr "Mật _khẩu:"
+
+#. require authentication
+#: ../gtk/tr-prefs.c:798
+msgid "Only allow these IP a_ddresses to connect:"
+msgstr ""
 
 #: ../gtk/tr-prefs.c:823
 msgid "IP addresses may use wildcards, such as 192.168.*.*"
@@ -927,9 +1282,81 @@ msgstr "Cổng _Proxy:"
 msgid "Proxy _type:"
 msgstr "_Loại Proxy:"
 
+#: ../gtk/tr-prefs.c:1117
+msgid "Every Day"
+msgstr "Hàng ngày"
+
+#: ../gtk/tr-prefs.c:1118
+msgid "Weekdays"
+msgstr "Hàng tuần"
+
+#: ../gtk/tr-prefs.c:1119
+msgid "Weekends"
+msgstr "Cuối tuần"
+
+#: ../gtk/tr-prefs.c:1120
+msgid "Sunday"
+msgstr "Chủ nhật"
+
+#: ../gtk/tr-prefs.c:1121
+msgid "Monday"
+msgstr "Thứ hai"
+
+#: ../gtk/tr-prefs.c:1122
+msgid "Tuesday"
+msgstr "Thứ ba"
+
+#: ../gtk/tr-prefs.c:1123
+msgid "Wednesday"
+msgstr "Thứ tư"
+
+#: ../gtk/tr-prefs.c:1124
+msgid "Thursday"
+msgstr "Thứ năm"
+
+#: ../gtk/tr-prefs.c:1125
+msgid "Friday"
+msgstr "Thứ sáu"
+
+#: ../gtk/tr-prefs.c:1126
+msgid "Saturday"
+msgstr "Thứ bảy"
+
+#: ../gtk/tr-prefs.c:1178
+msgid "Speed Limits"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:1198
+msgid "Temporary Speed Limits"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:1205
+msgid "Override normal speed limits manually or at scheduled times"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:1212
+msgid "Limit do_wnload speed (KB/s):"
+msgstr "Giới hạn tốc độ tải về (KB/s)"
+
 #: ../gtk/tr-prefs.c:1216
 msgid "Limit u_pload speed (KB/s):"
 msgstr "Giới _hạn tốc độ tải lên (KB/s):"
+
+#: ../gtk/tr-prefs.c:1220
+msgid "_Scheduled times:"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:1225
+msgid " _to "
+msgstr ""
+
+#: ../gtk/tr-prefs.c:1236
+msgid "_On days:"
+msgstr "Trong ngày"
+
+#: ../gtk/tr-prefs.c:1270 ../gtk/tr-prefs.c:1335
+msgid "Status unknown"
+msgstr "Không rõ tình trạng"
 
 #: ../gtk/tr-prefs.c:1292
 msgid "Port is <b>open</b>"
@@ -939,9 +1366,29 @@ msgstr "Cổng đang được <b>mở</b>"
 msgid "Port is <b>closed</b>"
 msgstr "Cổng đang bị <b>đóng</b>"
 
+#: ../gtk/tr-prefs.c:1306
+msgid "<i>Testing...</i>"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:1328
+msgid "Incoming Peers"
+msgstr "Peers đang tới"
+
+#: ../gtk/tr-prefs.c:1330
+msgid "_Port for incoming connections:"
+msgstr "_ Cổng kết nối tới"
+
+#: ../gtk/tr-prefs.c:1338
+msgid "Te_st Port"
+msgstr ""
+
 #: ../gtk/tr-prefs.c:1345
 msgid "Use UPnP or NAT-PMP port _forwarding from my router"
 msgstr "Sử dụng UPnP hoặc NAT-PMP mở cổng từ router của tôi"
+
+#: ../gtk/tr-prefs.c:1349
+msgid "Pick a _random port every time Transmission is started"
+msgstr ""
 
 #: ../gtk/tr-prefs.c:1357
 msgid "Maximum peers per _torrent:"
@@ -966,6 +1413,10 @@ msgstr "Mạng"
 #: ../gtk/tr-prefs.c:1407
 msgid "Web"
 msgstr "Web"
+
+#: ../gtk/tr-prefs.c:1410
+msgid "Proxy"
+msgstr ""
 
 #: ../gtk/tr-torrent.c:233
 #, c-format
@@ -1001,6 +1452,50 @@ msgstr "Tổng dữ liệu đã truyền"
 #: ../gtk/tr-window.c:312
 msgid "Session Transfer"
 msgstr "Dữ liệu truyền phiên này"
+
+#: ../gtk/tr-window.c:340
+#, c-format
+msgid ""
+"Click to disable Temporary Speed Limits\n"
+"(%1$s down, %2$s up)"
+msgstr ""
+
+#: ../gtk/tr-window.c:341
+#, c-format
+msgid ""
+"Click to enable Temporary Speed Limits\n"
+"(%1$s down, %2$s up)"
+msgstr ""
+
+#: ../gtk/tr-window.c:590
+#, c-format
+msgid "Tracker will allow requests in %s"
+msgstr ""
+
+#: ../gtk/tr-window.c:661
+msgid "Unlimited"
+msgstr "Không giới hạn"
+
+#: ../gtk/tr-window.c:728
+msgid "Seed Forever"
+msgstr "Chia sẻ mãi mãi"
+
+#: ../gtk/tr-window.c:766
+msgid "Limit Download Speed"
+msgstr "Giới hạn tốc độ tải về"
+
+#: ../gtk/tr-window.c:770
+msgid "Limit Upload Speed"
+msgstr "Giới hạn tốc độ tải lên"
+
+#: ../gtk/tr-window.c:777
+msgid "Stop Seeding at Ratio"
+msgstr "Dừng chia sẻ tại Tỉ lệ"
+
+#: ../gtk/tr-window.c:811
+#, c-format
+msgid "Stop at Ratio (%s)"
+msgstr "Dừng tại Tỉ lệ (%s)"
 
 #. show all torrents
 #: ../gtk/tr-window.c:837
@@ -1152,6 +1647,16 @@ msgstr "Danh sách chặn \"%1$s\" đã cập nhật với %2$'d mục"
 msgid "Couldn't read resume file"
 msgstr "Không thể đọc để tiếp tục tệp"
 
+#: ../libtransmission/fdlimit.c:296
+#, c-format
+msgid "Couldn't create \"%1$s\": \"%2$s\" is not a folder"
+msgstr ""
+
+#: ../libtransmission/fdlimit.c:319
+#, c-format
+msgid "Preallocated file \"%s\""
+msgstr ""
+
 #: ../libtransmission/fdlimit.c:557
 #, c-format
 msgid "Couldn't create socket: %s"
@@ -1161,6 +1666,11 @@ msgstr "Không thể tạo socket: %s"
 #, c-format
 msgid "Torrent Creator is skipping file \"%s\": %s"
 msgstr "Bộ tạo Torrent đang bỏ qua tệp \"%s\": %s"
+
+#: ../libtransmission/metainfo.c:473
+#, c-format
+msgid "Invalid metadata entry \"%s\""
+msgstr ""
 
 #: ../libtransmission/natpmp.c:31
 msgid "Port Forwarding (NAT-PMP)"
@@ -1176,15 +1686,30 @@ msgstr "%s thành công (%d)"
 msgid "Found public address \"%s\""
 msgstr "Tìm thấy địa chỉ công cộng \"%s\""
 
+#: ../libtransmission/natpmp.c:171
+#, c-format
+msgid "no longer forwarding port %d"
+msgstr ""
+
 #: ../libtransmission/natpmp.c:218
 #, c-format
 msgid "Port %d forwarded successfully"
 msgstr "Cổng %d được mở thành công"
 
+#: ../libtransmission/net.c:323
+#, c-format
+msgid "Couldn't set source address %s on %d: %s"
+msgstr ""
+
 #: ../libtransmission/net.c:339
 #, c-format
 msgid "Couldn't connect socket %d to %s, port %d (errno %d - %s)"
 msgstr "Không thể kết nối socket %d tới %s, cổng %d (errno %d - %s)"
+
+#: ../libtransmission/net.c:392
+#, c-format
+msgid "Couldn't bind port %d on %s: %s"
+msgstr ""
 
 #: ../libtransmission/port-forwarding.c:32
 msgid "Port Forwarding"
@@ -1201,6 +1726,10 @@ msgstr "Đã mở"
 #: ../libtransmission/port-forwarding.c:61
 msgid "Stopping"
 msgstr "Đang ngừng"
+
+#: ../libtransmission/port-forwarding.c:62
+msgid "Not forwarded"
+msgstr ""
 
 #: ../libtransmission/port-forwarding.c:86 ../libtransmission/torrent.c:1513
 #, c-format
@@ -1219,6 +1748,21 @@ msgstr "%s %s đã chạy"
 msgid "Loaded %d torrents"
 msgstr "Tải %d torrents"
 
+#: ../libtransmission/torrent.c:273
+#, c-format
+msgid "Got %d peers from tracker"
+msgstr ""
+
+#: ../libtransmission/torrent.c:287
+#, c-format
+msgid "Tracker warning: \"%s\""
+msgstr ""
+
+#: ../libtransmission/torrent.c:294
+#, c-format
+msgid "Tracker error: \"%s\""
+msgstr ""
+
 #: ../libtransmission/torrent.c:1439
 msgid "Done"
 msgstr "Xong"
@@ -1235,575 +1779,15 @@ msgstr "Chưa hoàn thành"
 msgid "Port Forwarding (UPnP)"
 msgstr "Mở cổng (UPnP)"
 
-#: ../libtransmission/upnp.c:107
-#, c-format
-msgid "Local Address is \"%s\""
-msgstr "Địa chỉ cục bộ là \"%s\""
-
-#: ../libtransmission/upnp.c:197
-msgid "Port forwarding successful!"
-msgstr "Mở cổng thành công!"
-
-#: ../libtransmission/utils.c:521
-msgid "Not a regular file"
-msgstr "Không phải là một tập tin chuẩn"
-
-#: ../libtransmission/verify.c:212
-msgid "Verifying torrent"
-msgstr "Đang xác thực torrent"
-
-#: ../libtransmission/verify.c:247
-msgid "Queued for verification"
-msgstr "Đợi để xác thực"
-
-#: ../gtk/actions.c:52
-msgid "Sort by Rati_o"
-msgstr ""
-
-#: ../gtk/actions.c:53
-msgid "Sort by Stat_e"
-msgstr ""
-
-#: ../gtk/actions.c:54
-msgid "Sort by T_racker"
-msgstr ""
-
-#: ../gtk/actions.c:56
-msgid "Sort by Time _Left"
-msgstr ""
-
-#: ../gtk/actions.c:57
-msgid "Sort by Si_ze"
-msgstr "Sắp xếp theo kích thước"
-
-#: ../gtk/actions.c:90
-msgid "Temporary  Speed _Limits"
-msgstr ""
-
-#: ../gtk/actions.c:92
-msgid "Re_verse Sort Order"
-msgstr ""
-
-#: ../gtk/actions.c:113
-msgid "Set _Location"
-msgstr ""
-
-#: ../gtk/conf.c:448 ../gtk/conf.c:453
-#, c-format
-msgid "Importing \"%s\""
-msgstr "Nhập \"%s\""
-
-#: ../gtk/details.c:508 ../gtk/tr-prefs.c:1395
-msgid "Speed"
-msgstr "Tốc độ"
-
-#: ../gtk/details.c:510
-msgid "Honor global _limits"
-msgstr ""
-
-#: ../gtk/details.c:539
-msgid "Torrent _priority:"
-msgstr ""
-
-#: ../gtk/details.c:543
-msgid "Seed-Until Ratio"
-msgstr ""
-
-#: ../gtk/details.c:546
-msgid "Use _global settings"
-msgstr ""
-
-#: ../gtk/details.c:555
-msgid "Seed _regardless of ratio"
-msgstr ""
-
-#: ../gtk/details.c:564 ../gtk/tr-prefs.c:311
-msgid "_Seed torrent until its ratio reaches:"
-msgstr ""
-
-#: ../gtk/details.c:604
-msgid "Verifying local data"
-msgstr "Kiểm tra lại dữ liệu"
-
-#: ../gtk/details.c:605
-msgid "Downloading"
-msgstr "Đang tải về"
-
-#: ../gtk/details.c:606
-msgid "Seeding"
-msgstr "Đang chia sẻ"
-
-#: ../gtk/details.c:639
-msgid "Private to this tracker -- DHT and PEX disabled"
-msgstr ""
-
-#: ../gtk/details.c:663
-#, c-format
-msgid "Created by %1$s"
-msgstr ""
-
-#: ../gtk/details.c:665
-#, c-format
-msgid "Created on %1$s"
-msgstr ""
-
-#: ../gtk/details.c:667
-#, c-format
-msgid "Created by %1$s on %2$s"
-msgstr ""
-
-#: ../gtk/details.c:758
-#, c-format
-msgid "%1$s (%2$'d piece @ %3$s)"
-msgid_plural "%1$s (%2$'d pieces @ %3$s)"
-msgstr[0] ""
-msgstr[1] ""
-
-#: ../gtk/details.c:764
-#, c-format
-msgid "%1$s (%2$'d piece)"
-msgid_plural "%1$s (%2$'d pieces)"
-msgstr[0] ""
-msgstr[1] ""
-
-#: ../gtk/details.c:798
-#, c-format
-msgid "%1$s (%2$.1f%%); %3$s Unverified"
-msgstr ""
-
-#: ../gtk/details.c:800
-#, c-format
-msgid "%1$s (%2$.1f%%)"
-msgstr ""
-
-#: ../gtk/details.c:820
-#, c-format
-msgid "%1$s (+%2$s corrupt)"
-msgstr ""
-
-#: ../gtk/details.c:893
-msgid "Active now"
-msgstr ""
-
-#: ../gtk/details.c:897
-#, c-format
-msgid "%1$s ago"
-msgstr ""
-
-#: ../gtk/details.c:920
-msgid "Torrent size:"
-msgstr ""
-
-#: ../gtk/details.c:944
-msgid "Running time:"
-msgstr ""
-
-#: ../gtk/details.c:948
-msgid "Last activity:"
-msgstr ""
-
-#: ../gtk/details.c:962
-msgid "Location:"
-msgstr ""
-
-#: ../gtk/details.c:979
-msgid "Origin:"
-msgstr ""
-
-#: ../gtk/details.c:1028
-msgid "Webseeds"
-msgstr ""
-
-#: ../gtk/details.c:1412
-msgid "Peer was discovered through DHT"
-msgstr ""
-
-#: ../gtk/details.c:1646
-msgid "None sent"
-msgstr "Không gửi"
-
-#: ../gtk/details.c:1799
-msgid "Scrape"
-msgstr ""
-
-#: ../gtk/details.c:1801
-msgid "Last scrape at:"
-msgstr ""
-
-#: ../gtk/details.c:1811
-msgid "Next scrape in:"
-msgstr ""
-
-#: ../gtk/details.c:1970
-#, c-format
-msgid "%'d Torrent Properties"
-msgstr ""
-
-#. Translators: translate "translator-credits" as
-#. your name
-#. to have it appear in the credits in the "About"
-#. dialog
-#: ../gtk/main.c:1176
-msgid "translator-credits"
-msgstr ""
-"Launchpad Contributions:\n"
-"  Phan Trọng Khanh https://launchpad.net/~khanhpt\n"
-"  blackrises https://launchpad.net/~blackrises"
-
-#: ../gtk/notify.c:121
-msgid "Torrent Added"
-msgstr ""
-
-#: ../gtk/relocate.c:68
-#, c-format
-msgid "Moving \"%s\""
-msgstr ""
-
-#: ../gtk/relocate.c:70
-msgid "This may take a moment..."
-msgstr ""
-
-#: ../gtk/relocate.c:99 ../gtk/relocate.c:121
-msgid "Set Torrent Location"
-msgstr ""
-
-#: ../gtk/relocate.c:124
-msgid "Torrent _location:"
-msgstr ""
-
-#: ../gtk/relocate.c:125
-msgid "_Move from the current folder"
-msgstr ""
-
-#: ../gtk/relocate.c:128
-msgid "Local data is _already there"
-msgstr ""
-
-#. %1$s is the torrent's total size,
-#. %2$s is how much we've uploaded,
-#. %3$s is our upload-to-download ratio,
-#. $4$s is the ratio we want to reach before we stop uploading
-#: ../gtk/torrent-cell-renderer.c:88
-#, c-format
-msgid "%1$s, uploaded %2$s (Ratio: %3$s Goal: %4$s)"
-msgstr ""
-
-#: ../gtk/torrent-cell-renderer.c:243 ../gtk/tr-torrent.c:259
-#, c-format
-msgid "Seeding to %1$'d of %2$'d connected peer"
-msgid_plural "Seeding to %1$'d of %2$'d connected peers"
-msgstr[0] ""
-msgstr[1] ""
-
-#: ../gtk/tr-core.c:1119
-msgid "BitTorrent Activity"
-msgstr ""
-
-#: ../gtk/tr-icon.c:77 ../gtk/tr-icon.c:92
-#, c-format
-msgid "(Limit: %s)"
-msgstr ""
-
-#. %1$s: current upload speed
-#. * %2$s: current upload limit, if any
-#. * %3$s: current download speed
-#. * %4$s: current download limit, if any
-#: ../gtk/tr-icon.c:99
-#, c-format
-msgid ""
-"Transmission\n"
-"Up: %1$s %2$s\n"
-"Down: %3$s %4$s"
-msgstr ""
-
-#: ../gtk/tr-prefs.c:306
-msgid "Save to _Location:"
-msgstr ""
-
-#: ../gtk/tr-prefs.c:337
-msgid "Inhibit _hibernation when torrents are active"
-msgstr ""
-
-#: ../gtk/tr-prefs.c:341
-msgid "Show Transmission in the system _tray"
-msgstr ""
-
-#: ../gtk/tr-prefs.c:345
-msgid "Show popup _notifications"
-msgstr ""
-
-#: ../gtk/tr-prefs.c:402
-#, c-format
-msgid "Blocklist now has %'d rule."
-msgid_plural "Blocklist now has %'d rules."
-msgstr[0] ""
-msgstr[1] ""
-
-#: ../gtk/tr-prefs.c:406
-msgid "<b>Update succeeded!</b>"
-msgstr ""
-
-#: ../gtk/tr-prefs.c:421
-msgid "Update Blocklist"
-msgstr "Cập nhật danh sách cấm"
-
-#: ../gtk/tr-prefs.c:423
-msgid "Getting new blocklist..."
-msgstr "Thêm danh sách cấm mới"
-
-#: ../gtk/tr-prefs.c:458
-msgid "Allow encryption"
-msgstr ""
-
-#: ../gtk/tr-prefs.c:459
-msgid "Prefer encryption"
-msgstr ""
-
-#: ../gtk/tr-prefs.c:460
-msgid "Require encryption"
-msgstr ""
-
-#: ../gtk/tr-prefs.c:527 ../gtk/tr-prefs.c:1398
-msgid "Privacy"
-msgstr "Riêng tư"
-
-#: ../gtk/tr-prefs.c:529
-msgid "_Encryption mode:"
-msgstr ""
-
-#: ../gtk/tr-prefs.c:533
-msgid "Use PE_X to find more peers"
-msgstr ""
-
-#: ../gtk/tr-prefs.c:535
-msgid ""
-"PEX is a tool for exchanging peer lists with the peers you're connected to."
-msgstr ""
-
-#: ../gtk/tr-prefs.c:540
-msgid "Use _DHT to find more peers"
-msgstr ""
-
-#: ../gtk/tr-prefs.c:542
-msgid "DHT is a tool for finding peers without a tracker."
-msgstr ""
-
-#: ../gtk/tr-prefs.c:753
-msgid "Web Client"
-msgstr ""
-
-#. "enabled" checkbutton
-#: ../gtk/tr-prefs.c:756
-msgid "_Enable web client"
-msgstr ""
-
-#: ../gtk/tr-prefs.c:762
-msgid "_Open web client"
-msgstr ""
-
-#. require authentication
-#: ../gtk/tr-prefs.c:775 ../gtk/tr-prefs.c:992
-msgid "Use _authentication"
-msgstr ""
-
-#. require authentication
-#: ../gtk/tr-prefs.c:798
-msgid "Only allow these IP a_ddresses to connect:"
-msgstr ""
-
-#: ../gtk/tr-prefs.c:1117
-msgid "Every Day"
-msgstr "Hàng ngày"
-
-#: ../gtk/tr-prefs.c:1118
-msgid "Weekdays"
-msgstr "Hàng tuần"
-
-#: ../gtk/tr-prefs.c:1119
-msgid "Weekends"
-msgstr "Cuối tuần"
-
-#: ../gtk/tr-prefs.c:1120
-msgid "Sunday"
-msgstr "Chủ nhật"
-
-#: ../gtk/tr-prefs.c:1121
-msgid "Monday"
-msgstr "Thứ hai"
-
-#: ../gtk/tr-prefs.c:1122
-msgid "Tuesday"
-msgstr "Thứ ba"
-
-#: ../gtk/tr-prefs.c:1123
-msgid "Wednesday"
-msgstr "Thứ tư"
-
-#: ../gtk/tr-prefs.c:1124
-msgid "Thursday"
-msgstr "Thứ năm"
-
-#: ../gtk/tr-prefs.c:1125
-msgid "Friday"
-msgstr "Thứ sáu"
-
-#: ../gtk/tr-prefs.c:1126
-msgid "Saturday"
-msgstr "Thứ bảy"
-
-#: ../gtk/tr-prefs.c:1178
-msgid "Speed Limits"
-msgstr ""
-
-#: ../gtk/tr-prefs.c:1198
-msgid "Temporary Speed Limits"
-msgstr ""
-
-#: ../gtk/tr-prefs.c:1205
-msgid "Override normal speed limits manually or at scheduled times"
-msgstr ""
-
-#: ../gtk/tr-prefs.c:1212
-msgid "Limit do_wnload speed (KB/s):"
-msgstr "Giới hạn tốc độ tải về (KB/s)"
-
-#: ../gtk/tr-prefs.c:1220
-msgid "_Scheduled times:"
-msgstr ""
-
-#: ../gtk/tr-prefs.c:1225
-msgid " _to "
-msgstr ""
-
-#: ../gtk/tr-prefs.c:1236
-msgid "_On days:"
-msgstr "Trong ngày"
-
-#: ../gtk/tr-prefs.c:1270 ../gtk/tr-prefs.c:1335
-msgid "Status unknown"
-msgstr "Không rõ tình trạng"
-
-#: ../gtk/tr-prefs.c:1306
-msgid "<i>Testing...</i>"
-msgstr ""
-
-#: ../gtk/tr-prefs.c:1328
-msgid "Incoming Peers"
-msgstr "Peers đang tới"
-
-#: ../gtk/tr-prefs.c:1330
-msgid "_Port for incoming connections:"
-msgstr "_ Cổng kết nối tới"
-
-#: ../gtk/tr-prefs.c:1338
-msgid "Te_st Port"
-msgstr ""
-
-#: ../gtk/tr-prefs.c:1349
-msgid "Pick a _random port every time Transmission is started"
-msgstr ""
-
-#: ../gtk/tr-prefs.c:1410
-msgid "Proxy"
-msgstr ""
-
-#: ../gtk/tr-window.c:340
-#, c-format
-msgid ""
-"Click to disable Temporary Speed Limits\n"
-"(%1$s down, %2$s up)"
-msgstr ""
-
-#: ../gtk/tr-window.c:341
-#, c-format
-msgid ""
-"Click to enable Temporary Speed Limits\n"
-"(%1$s down, %2$s up)"
-msgstr ""
-
-#: ../gtk/tr-window.c:590
-#, c-format
-msgid "Tracker will allow requests in %s"
-msgstr ""
-
-#: ../gtk/tr-window.c:661
-msgid "Unlimited"
-msgstr "Không giới hạn"
-
-#: ../gtk/tr-window.c:728
-msgid "Seed Forever"
-msgstr "Chia sẻ mãi mãi"
-
-#: ../gtk/tr-window.c:766
-msgid "Limit Download Speed"
-msgstr "Giới hạn tốc độ tải về"
-
-#: ../gtk/tr-window.c:770
-msgid "Limit Upload Speed"
-msgstr "Giới hạn tốc độ tải lên"
-
-#: ../gtk/tr-window.c:777
-msgid "Stop Seeding at Ratio"
-msgstr "Dừng chia sẻ tại Tỉ lệ"
-
-#: ../gtk/tr-window.c:811
-#, c-format
-msgid "Stop at Ratio (%s)"
-msgstr "Dừng tại Tỉ lệ (%s)"
-
-#: ../libtransmission/fdlimit.c:296
-#, c-format
-msgid "Couldn't create \"%1$s\": \"%2$s\" is not a folder"
-msgstr ""
-
-#: ../libtransmission/fdlimit.c:319
-#, c-format
-msgid "Preallocated file \"%s\""
-msgstr ""
-
-#: ../libtransmission/metainfo.c:473
-#, c-format
-msgid "Invalid metadata entry \"%s\""
-msgstr ""
-
-#: ../libtransmission/natpmp.c:171
-#, c-format
-msgid "no longer forwarding port %d"
-msgstr ""
-
-#: ../libtransmission/net.c:323
-#, c-format
-msgid "Couldn't set source address %s on %d: %s"
-msgstr ""
-
-#: ../libtransmission/net.c:392
-#, c-format
-msgid "Couldn't bind port %d on %s: %s"
-msgstr ""
-
-#: ../libtransmission/port-forwarding.c:62
-msgid "Not forwarded"
-msgstr ""
-
-#: ../libtransmission/torrent.c:273
-#, c-format
-msgid "Got %d peers from tracker"
-msgstr ""
-
-#: ../libtransmission/torrent.c:287
-#, c-format
-msgid "Tracker warning: \"%s\""
-msgstr ""
-
-#: ../libtransmission/torrent.c:294
-#, c-format
-msgid "Tracker error: \"%s\""
-msgstr ""
-
 #: ../libtransmission/upnp.c:104
 #, c-format
 msgid "Found Internet Gateway Device \"%s\""
 msgstr ""
+
+#: ../libtransmission/upnp.c:107
+#, c-format
+msgid "Local Address is \"%s\""
+msgstr "Địa chỉ cục bộ là \"%s\""
 
 #: ../libtransmission/upnp.c:144
 #, c-format
@@ -1821,6 +1805,14 @@ msgid ""
 "Port forwarding through \"%s\", service \"%s\".  (local address: %s:%d)"
 msgstr ""
 
+#: ../libtransmission/upnp.c:197
+msgid "Port forwarding successful!"
+msgstr "Mở cổng thành công!"
+
+#: ../libtransmission/utils.c:521
+msgid "Not a regular file"
+msgstr "Không phải là một tập tin chuẩn"
+
 #: ../libtransmission/utils.c:539
 msgid "Memory allocation failed"
 msgstr ""
@@ -1830,3 +1822,11 @@ msgstr ""
 #, c-format
 msgid "File \"%s\" is in the way"
 msgstr ""
+
+#: ../libtransmission/verify.c:212
+msgid "Verifying torrent"
+msgstr "Đang xác thực torrent"
+
+#: ../libtransmission/verify.c:247
+msgid "Queued for verification"
+msgstr "Đợi để xác thực"

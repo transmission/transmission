@@ -15,27 +15,16 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 1 : (n>=2 && n<=4) ? 2 : 0;\n"
-"X-Launchpad-Export-Date: 2009-08-13 23:52+0000\n"
+"X-Launchpad-Export-Date: 2009-08-22 16:00+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Country: SLOVAKIA\n"
 "X-Poedit-Language: Slovak\n"
 "X-Poedit-SourceCharset: utf-8\n"
 
-#: ../gtk/actions.c:112
-msgid "_Start All"
-msgstr "_Spustiť všetko"
-
-#: ../gtk/actions.c:112
-msgid "Start all torrents"
-msgstr "Spustiť všetky torrenty"
-
 #: ../gtk/details.c:618 ../gtk/details.c:1346 ../gtk/details.c:1643
 #: ../gtk/util.c:68 ../libtransmission/utils.c:1348
 msgid "None"
 msgstr "Nič"
-
-#~ msgid "_Open web interface"
-#~ msgstr "_Otvoriť webové rozhranie"
 
 #: ../gtk/actions.c:49
 msgid "Sort by _Activity"
@@ -164,6 +153,14 @@ msgstr "Všetko pozastaviť"
 #: ../gtk/actions.c:111
 msgid "Pause all torrents"
 msgstr "Pozastaviť všetky torrenty"
+
+#: ../gtk/actions.c:112
+msgid "_Start All"
+msgstr "_Spustiť všetko"
+
+#: ../gtk/actions.c:112
+msgid "Start all torrents"
+msgstr "Spustiť všetky torrenty"
 
 #: ../gtk/actions.c:113
 msgid "Set _Location"
@@ -1999,6 +1996,9 @@ msgstr "Zaradený do fronty na kontrolu"
 #~ msgstr ""
 #~ "Nie je možné otvoriť port %d na %s pre prichádzajúce spojenia od klientov "
 #~ "(chyba č. %d - %s)"
+
+#~ msgid "_Open web interface"
+#~ msgstr "_Otvoriť webové rozhranie"
 
 #~ msgid "Destination:"
 #~ msgstr "Cieľ:"

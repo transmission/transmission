@@ -14,7 +14,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2009-08-13 23:52+0000\n"
+"X-Launchpad-Export-Date: 2009-08-22 16:00+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:49
@@ -28,271 +28,6 @@ msgstr "Ordenar por _Nome"
 #: ../gtk/actions.c:51
 msgid "Sort by _Progress"
 msgstr "Ordenar por _Progresso"
-
-#: ../gtk/actions.c:74
-msgid "_Main Window"
-msgstr "Janela Principal"
-
-#: ../gtk/actions.c:75
-msgid "Message _Log"
-msgstr "Registo de Mensagens"
-
-#: ../gtk/actions.c:100
-msgid "_Torrent"
-msgstr "_Torrent"
-
-#: ../gtk/actions.c:103
-msgid "_Edit"
-msgstr "_Editar"
-
-#: ../gtk/actions.c:104
-msgid "_Help"
-msgstr "_Ajuda"
-
-#: ../gtk/actions.c:105 ../gtk/actions.c:106
-msgid "Add a torrent"
-msgstr "Adicionar un torrent"
-
-#: ../gtk/actions.c:106
-msgid "_Add..."
-msgstr "_Adicionar..."
-
-#: ../gtk/actions.c:107
-msgid "_Start"
-msgstr "_Arrancar"
-
-#: ../gtk/actions.c:110
-msgid "Pause torrent"
-msgstr "Pausar Torrent"
-
-#: ../gtk/actions.c:114
-msgid "Remove torrent"
-msgstr "Remover torrent"
-
-#: ../gtk/actions.c:116
-msgid "_New..."
-msgstr "_Novo..."
-
-#: ../gtk/actions.c:116
-msgid "Create a torrent"
-msgstr "Criar um torrent"
-
-#: ../gtk/actions.c:117
-msgid "_Quit"
-msgstr "_Sair"
-
-#: ../gtk/actions.c:122
-msgid "_Open Folder"
-msgstr "Abrir Pasta"
-
-#: ../gtk/actions.c:124
-msgid "_Contents"
-msgstr "_Conteúdos"
-
-#: ../gtk/add-dialog.c:241
-msgid "Torrent files"
-msgstr "Ficheiros torrent"
-
-#: ../gtk/add-dialog.c:246
-msgid "All files"
-msgstr "Todos os ficheiros"
-
-#: ../gtk/add-dialog.c:337
-msgid "Select Destination Folder"
-msgstr "Seleccionar Pasta de Destino"
-
-#: ../gtk/add-dialog.c:443
-msgid "Add a Torrent"
-msgstr "Adicionar um Torrent"
-
-#: ../gtk/details.c:470 ../gtk/file-list.c:579
-msgid "High"
-msgstr "Alta"
-
-#: ../gtk/details.c:471 ../gtk/file-list.c:580
-msgid "Normal"
-msgstr "Normal"
-
-#: ../gtk/details.c:472 ../gtk/file-list.c:581
-msgid "Low"
-msgstr "Baixa"
-
-#: ../gtk/details.c:605
-msgid "Downloading"
-msgstr "A Transferir"
-
-#: ../gtk/details.c:618 ../gtk/details.c:1346 ../gtk/details.c:1643
-#: ../gtk/util.c:68 ../libtransmission/utils.c:1348
-msgid "None"
-msgstr "Nenhum"
-
-#: ../gtk/details.c:1068
-msgid "Address"
-msgstr "Endereço"
-
-#: ../gtk/details.c:1073
-msgid "Client"
-msgstr "Cliente"
-
-#: ../gtk/details.c:1074
-msgid "%"
-msgstr "%"
-
-#: ../gtk/details.c:1075
-msgid "Status"
-msgstr "Estado"
-
-#: ../gtk/details.c:1918
-msgid "Peers"
-msgstr "Pares"
-
-#: ../gtk/details.c:1922 ../gtk/tr-prefs.c:961 ../gtk/tr-window.c:848
-msgid "Tracker"
-msgstr "Tracker"
-
-#: ../gtk/details.c:1927 ../gtk/tr-window.c:848
-msgid "Files"
-msgstr "Ficheiros"
-
-#. add priority column
-#: ../gtk/file-list.c:610 ../gtk/file-list.c:757
-msgid "Priority"
-msgstr "Prioridade"
-
-#. add "progress" column
-#: ../gtk/file-list.c:730
-msgid "Progress"
-msgstr "Progresso"
-
-#: ../gtk/main.c:366
-msgid "Transmission"
-msgstr "Transmission"
-
-#. Translators: translate "translator-credits" as
-#. your name
-#. to have it appear in the credits in the "About"
-#. dialog
-#: ../gtk/main.c:1176
-msgid "translator-credits"
-msgstr ""
-"Luis Medinas <lmedinas@gmail.com>\n"
-"\n"
-"Launchpad Contributions:\n"
-"  Carl Roberson https://launchpad.net/~carlrobers\n"
-"  Filipe Gomes https://launchpad.net/~filipefgomes\n"
-"  Filipe Roque https://launchpad.net/~flip-roque\n"
-"  Fábio Domingos https://launchpad.net/~fabioandre-domingos\n"
-"  João Santos https://launchpad.net/~jmcs\n"
-"  Luís Neto https://launchpad.net/~luisneto3\n"
-"  Pedro Saraiva https://launchpad.net/~pdro-saraiva\n"
-"  Tiago Silva https://launchpad.net/~tiagosilva\n"
-"  Tony Manco https://launchpad.net/~trmanco\n"
-"  korsairtuga https://launchpad.net/~korsairtuga\n"
-"  nitrofurano https://launchpad.net/~nitrofurano-3t\n"
-"  tota https://launchpad.net/~antonio-tavares"
-
-#: ../gtk/makemeta-ui.c:418
-msgid "_File"
-msgstr "_Ficheiro"
-
-#: ../gtk/msgwin.c:192
-msgid "Error"
-msgstr "Erro"
-
-#: ../gtk/msgwin.c:194
-msgid "Debug"
-msgstr "Depurar"
-
-#: ../gtk/msgwin.c:272 ../gtk/tr-window.c:848
-msgid "Name"
-msgstr "Nome"
-
-#: ../gtk/relocate.c:117
-msgid "Location"
-msgstr "Localização"
-
-#: ../gtk/tr-window.c:191
-msgid "Torrent"
-msgstr "Torrent"
-
-#: ../gtk/util.c:79
-#, c-format
-msgid "%'u byte"
-msgid_plural "%'u bytes"
-msgstr[0] "%'u byte"
-
-#: ../gtk/util.c:87
-#, c-format
-msgid "%'.1f KB"
-msgstr "%'.1f KB"
-
-#: ../gtk/util.c:92
-#, c-format
-msgid "%'.1f MB"
-msgstr "%'.1f MB"
-
-#: ../gtk/util.c:97
-#, c-format
-msgid "%'.1f GB"
-msgstr "%'.1f GB"
-
-#. 0.0 KB to 999.9 KB
-#: ../gtk/util.c:112
-#, c-format
-msgid "%'.1f KB/s"
-msgstr "%'.1f KB/s"
-
-#. 0.98 MB to 99.99 MB
-#: ../gtk/util.c:114
-#, c-format
-msgid "%'.2f MB/s"
-msgstr "%'.2f MB/s"
-
-#. 100.0 MB to 999.9 MB
-#: ../gtk/util.c:116
-#, c-format
-msgid "%'.1f MB/s"
-msgstr "%'.1f MB/s"
-
-#. insane speeds
-#: ../gtk/util.c:118
-#, c-format
-msgid "%'.2f GB/s"
-msgstr "%'.2f GB/s"
-
-#: ../gtk/util.c:139
-#, c-format
-msgid "%'d day"
-msgid_plural "%'d days"
-msgstr[0] "%'d dia"
-msgstr[1] "%'d dias"
-
-#: ../gtk/util.c:141
-#, c-format
-msgid "%'d hour"
-msgid_plural "%'d hours"
-msgstr[0] "%'d hora"
-msgstr[1] "%'d horas"
-
-#: ../gtk/util.c:144
-#, c-format
-msgid "%'d minute"
-msgid_plural "%'d minutes"
-msgstr[0] "%'d minuto"
-msgstr[1] "%'d minutos"
-
-#: ../gtk/util.c:146
-#, c-format
-msgid "%'d second"
-msgid_plural "%'d seconds"
-msgstr[0] "%'d segundo"
-msgstr[1] "%'d segundos"
-
-#~ msgid "Transfer"
-#~ msgstr "Transferir"
-
-#~ msgid "Dates"
-#~ msgstr "Datas"
 
 #: ../gtk/actions.c:52
 msgid "Sort by Rati_o"
@@ -318,6 +53,14 @@ msgstr ""
 msgid "Sort by Si_ze"
 msgstr ""
 
+#: ../gtk/actions.c:74
+msgid "_Main Window"
+msgstr "Janela Principal"
+
+#: ../gtk/actions.c:75
+msgid "Message _Log"
+msgstr "Registo de Mensagens"
+
 #: ../gtk/actions.c:90
 msgid "Temporary  Speed _Limits"
 msgstr ""
@@ -342,6 +85,10 @@ msgstr ""
 msgid "_Toolbar"
 msgstr ""
 
+#: ../gtk/actions.c:100
+msgid "_Torrent"
+msgstr "_Torrent"
+
 #: ../gtk/actions.c:101
 msgid "_View"
 msgstr "_Ver"
@@ -349,6 +96,26 @@ msgstr "_Ver"
 #: ../gtk/actions.c:102
 msgid "_Sort Torrents By"
 msgstr ""
+
+#: ../gtk/actions.c:103
+msgid "_Edit"
+msgstr "_Editar"
+
+#: ../gtk/actions.c:104
+msgid "_Help"
+msgstr "_Ajuda"
+
+#: ../gtk/actions.c:105 ../gtk/actions.c:106
+msgid "Add a torrent"
+msgstr "Adicionar un torrent"
+
+#: ../gtk/actions.c:106
+msgid "_Add..."
+msgstr "_Adicionar..."
+
+#: ../gtk/actions.c:107
+msgid "_Start"
+msgstr "_Arrancar"
 
 #: ../gtk/actions.c:107
 msgid "Start torrent"
@@ -365,6 +132,10 @@ msgstr ""
 #: ../gtk/actions.c:110
 msgid "_Pause"
 msgstr "_Pausar"
+
+#: ../gtk/actions.c:110
+msgid "Pause torrent"
+msgstr "Pausar Torrent"
 
 #: ../gtk/actions.c:111
 msgid "_Pause All"
@@ -386,9 +157,25 @@ msgstr ""
 msgid "Set _Location"
 msgstr ""
 
+#: ../gtk/actions.c:114
+msgid "Remove torrent"
+msgstr "Remover torrent"
+
 #: ../gtk/actions.c:115
 msgid "_Delete Files and Remove"
 msgstr ""
+
+#: ../gtk/actions.c:116
+msgid "_New..."
+msgstr "_Novo..."
+
+#: ../gtk/actions.c:116
+msgid "Create a torrent"
+msgstr "Criar um torrent"
+
+#: ../gtk/actions.c:117
+msgid "_Quit"
+msgstr "_Sair"
 
 #: ../gtk/actions.c:118
 msgid "Select _All"
@@ -402,9 +189,25 @@ msgstr ""
 msgid "Torrent properties"
 msgstr ""
 
+#: ../gtk/actions.c:122
+msgid "_Open Folder"
+msgstr "Abrir Pasta"
+
+#: ../gtk/actions.c:124
+msgid "_Contents"
+msgstr "_Conteúdos"
+
 #: ../gtk/actions.c:125
 msgid "Ask Tracker for _More Peers"
 msgstr ""
+
+#: ../gtk/add-dialog.c:241
+msgid "Torrent files"
+msgstr "Ficheiros torrent"
+
+#: ../gtk/add-dialog.c:246
+msgid "All files"
+msgstr "Todos os ficheiros"
 
 #: ../gtk/add-dialog.c:275
 msgid "Torrent Options"
@@ -429,6 +232,14 @@ msgstr ""
 #: ../gtk/add-dialog.c:330
 msgid "_Destination folder:"
 msgstr ""
+
+#: ../gtk/add-dialog.c:337
+msgid "Select Destination Folder"
+msgstr "Seleccionar Pasta de Destino"
+
+#: ../gtk/add-dialog.c:443
+msgid "Add a Torrent"
+msgstr "Adicionar um Torrent"
 
 #: ../gtk/add-dialog.c:460 ../gtk/tr-prefs.c:293
 msgid "Display _options dialog"
@@ -456,6 +267,18 @@ msgstr ""
 #, c-format
 msgid "Importing \"%s\""
 msgstr "A importing \"%s\""
+
+#: ../gtk/details.c:470 ../gtk/file-list.c:579
+msgid "High"
+msgstr "Alta"
+
+#: ../gtk/details.c:471 ../gtk/file-list.c:580
+msgid "Normal"
+msgstr "Normal"
+
+#: ../gtk/details.c:472 ../gtk/file-list.c:581
+msgid "Low"
+msgstr "Baixa"
 
 #: ../gtk/details.c:508 ../gtk/tr-prefs.c:1395
 msgid "Speed"
@@ -509,6 +332,10 @@ msgstr ""
 msgid "Verifying local data"
 msgstr ""
 
+#: ../gtk/details.c:605
+msgid "Downloading"
+msgstr "A Transferir"
+
 #: ../gtk/details.c:606
 msgid "Seeding"
 msgstr ""
@@ -516,6 +343,11 @@ msgstr ""
 #: ../gtk/details.c:607 ../gtk/torrent-cell-renderer.c:169
 msgid "Paused"
 msgstr ""
+
+#: ../gtk/details.c:618 ../gtk/details.c:1346 ../gtk/details.c:1643
+#: ../gtk/util.c:68 ../libtransmission/utils.c:1348
+msgid "None"
+msgstr "Nenhum"
 
 #: ../gtk/details.c:619 ../gtk/details.c:1645 ../gtk/file-list.c:582
 msgid "Mixed"
@@ -654,9 +486,25 @@ msgstr ""
 msgid "Down"
 msgstr ""
 
+#: ../gtk/details.c:1068
+msgid "Address"
+msgstr "Endereço"
+
 #: ../gtk/details.c:1072
 msgid "Up"
 msgstr ""
+
+#: ../gtk/details.c:1073
+msgid "Client"
+msgstr "Cliente"
+
+#: ../gtk/details.c:1074
+msgid "%"
+msgstr "%"
+
+#: ../gtk/details.c:1075
+msgid "Status"
+msgstr "Estado"
 
 #: ../gtk/details.c:1403
 msgid "Optimistic unchoke"
@@ -772,6 +620,18 @@ msgstr ""
 msgid "Information"
 msgstr ""
 
+#: ../gtk/details.c:1918
+msgid "Peers"
+msgstr "Pares"
+
+#: ../gtk/details.c:1922 ../gtk/tr-prefs.c:961 ../gtk/tr-window.c:848
+msgid "Tracker"
+msgstr "Tracker"
+
+#: ../gtk/details.c:1927 ../gtk/tr-window.c:848
+msgid "Files"
+msgstr "Ficheiros"
+
 #: ../gtk/details.c:1932
 msgid "Options"
 msgstr ""
@@ -835,9 +695,19 @@ msgstr[1] ""
 msgid "Download"
 msgstr ""
 
+#. add priority column
+#: ../gtk/file-list.c:610 ../gtk/file-list.c:757
+msgid "Priority"
+msgstr "Prioridade"
+
 #: ../gtk/file-list.c:715
 msgid "File"
 msgstr ""
+
+#. add "progress" column
+#: ../gtk/file-list.c:730
+msgid "Progress"
+msgstr "Progresso"
 
 #: ../gtk/main.c:348
 msgid "Start with all torrents paused"
@@ -854,6 +724,10 @@ msgstr ""
 #: ../gtk/main.c:357
 msgid "Where to look for configuration files"
 msgstr ""
+
+#: ../gtk/main.c:366
+msgid "Transmission"
+msgstr "Transmission"
 
 #: ../gtk/main.c:373
 msgid "[torrent files]"
@@ -890,6 +764,29 @@ msgstr ""
 #: ../gtk/main.c:1165
 msgid "Copyright 2005-2009 The Transmission Project"
 msgstr ""
+
+#. Translators: translate "translator-credits" as
+#. your name
+#. to have it appear in the credits in the "About"
+#. dialog
+#: ../gtk/main.c:1176
+msgid "translator-credits"
+msgstr ""
+"Luis Medinas <lmedinas@gmail.com>\n"
+"\n"
+"Launchpad Contributions:\n"
+"  Carl Roberson https://launchpad.net/~carlrobers\n"
+"  Filipe Gomes https://launchpad.net/~filipefgomes\n"
+"  Filipe Roque https://launchpad.net/~flip-roque\n"
+"  Fábio Domingos https://launchpad.net/~fabioandre-domingos\n"
+"  João Santos https://launchpad.net/~jmcs\n"
+"  Luís Neto https://launchpad.net/~luisneto3\n"
+"  Pedro Saraiva https://launchpad.net/~pdro-saraiva\n"
+"  Tiago Silva https://launchpad.net/~tiagosilva\n"
+"  Tony Manco https://launchpad.net/~trmanco\n"
+"  korsairtuga https://launchpad.net/~korsairtuga\n"
+"  nitrofurano https://launchpad.net/~nitrofurano-3t\n"
+"  tota https://launchpad.net/~antonio-tavares"
 
 #: ../gtk/makemeta-ui.c:109
 msgid "Torrent created!"
@@ -965,6 +862,10 @@ msgstr ""
 msgid "F_older"
 msgstr ""
 
+#: ../gtk/makemeta-ui.c:418
+msgid "_File"
+msgstr "_Ficheiro"
+
 #: ../gtk/makemeta-ui.c:461
 msgid "<b>E_xtras</b>"
 msgstr ""
@@ -987,9 +888,21 @@ msgstr ""
 msgid "Save Log"
 msgstr ""
 
+#: ../gtk/msgwin.c:192
+msgid "Error"
+msgstr "Erro"
+
+#: ../gtk/msgwin.c:194
+msgid "Debug"
+msgstr "Depurar"
+
 #: ../gtk/msgwin.c:268
 msgid "Time"
 msgstr ""
+
+#: ../gtk/msgwin.c:272 ../gtk/tr-window.c:848
+msgid "Name"
+msgstr "Nome"
 
 #: ../gtk/msgwin.c:276
 msgid "Message"
@@ -1031,6 +944,10 @@ msgstr ""
 #: ../gtk/relocate.c:99 ../gtk/relocate.c:121
 msgid "Set Torrent Location"
 msgstr ""
+
+#: ../gtk/relocate.c:117
+msgid "Location"
+msgstr "Localização"
 
 #: ../gtk/relocate.c:124
 msgid "Torrent _location:"
@@ -1540,6 +1457,10 @@ msgstr ""
 msgid "Stopped"
 msgstr ""
 
+#: ../gtk/tr-window.c:191
+msgid "Torrent"
+msgstr "Torrent"
+
 #: ../gtk/tr-window.c:309
 msgid "Total Ratio"
 msgstr ""
@@ -1643,6 +1564,79 @@ msgstr[1] ""
 #, c-format
 msgid "size|Down: %1$s, Up: %2$s"
 msgstr ""
+
+#: ../gtk/util.c:79
+#, c-format
+msgid "%'u byte"
+msgid_plural "%'u bytes"
+msgstr[0] "%'u byte"
+
+#: ../gtk/util.c:87
+#, c-format
+msgid "%'.1f KB"
+msgstr "%'.1f KB"
+
+#: ../gtk/util.c:92
+#, c-format
+msgid "%'.1f MB"
+msgstr "%'.1f MB"
+
+#: ../gtk/util.c:97
+#, c-format
+msgid "%'.1f GB"
+msgstr "%'.1f GB"
+
+#. 0.0 KB to 999.9 KB
+#: ../gtk/util.c:112
+#, c-format
+msgid "%'.1f KB/s"
+msgstr "%'.1f KB/s"
+
+#. 0.98 MB to 99.99 MB
+#: ../gtk/util.c:114
+#, c-format
+msgid "%'.2f MB/s"
+msgstr "%'.2f MB/s"
+
+#. 100.0 MB to 999.9 MB
+#: ../gtk/util.c:116
+#, c-format
+msgid "%'.1f MB/s"
+msgstr "%'.1f MB/s"
+
+#. insane speeds
+#: ../gtk/util.c:118
+#, c-format
+msgid "%'.2f GB/s"
+msgstr "%'.2f GB/s"
+
+#: ../gtk/util.c:139
+#, c-format
+msgid "%'d day"
+msgid_plural "%'d days"
+msgstr[0] "%'d dia"
+msgstr[1] "%'d dias"
+
+#: ../gtk/util.c:141
+#, c-format
+msgid "%'d hour"
+msgid_plural "%'d hours"
+msgstr[0] "%'d hora"
+msgstr[1] "%'d horas"
+
+#: ../gtk/util.c:144
+#, c-format
+msgid "%'d minute"
+msgid_plural "%'d minutes"
+msgstr[0] "%'d minuto"
+msgstr[1] "%'d minutos"
+
+#: ../gtk/util.c:146
+#, c-format
+msgid "%'d second"
+msgid_plural "%'d seconds"
+msgstr[0] "%'d segundo"
+msgstr[1] "%'d segundos"
 
 #: ../gtk/util.c:376
 #, c-format
@@ -1866,3 +1860,9 @@ msgstr ""
 #: ../libtransmission/verify.c:247
 msgid "Queued for verification"
 msgstr ""
+
+#~ msgid "Transfer"
+#~ msgstr "Transferir"
+
+#~ msgid "Dates"
+#~ msgstr "Datas"

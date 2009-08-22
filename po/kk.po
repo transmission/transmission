@@ -15,40 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2009-08-13 23:52+0000\n"
+"X-Launchpad-Export-Date: 2009-08-22 16:00+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
-
-#: ../gtk/actions.c:104
-msgid "_Help"
-msgstr "_Анықтама"
-
-#: ../gtk/actions.c:105 ../gtk/actions.c:106
-msgid "Add a torrent"
-msgstr "Торрент қосу"
-
-#: ../gtk/add-dialog.c:246
-msgid "All files"
-msgstr "Барлық файлдар"
-
-#: ../gtk/details.c:1030 ../gtk/details.c:1070
-msgid "Down"
-msgstr "Төмен"
-
-#: ../gtk/details.c:1068
-msgid "Address"
-msgstr "Адрес"
-
-#: ../gtk/details.c:1072
-msgid "Up"
-msgstr "Жоғары"
-
-#: ../gtk/details.c:1073
-msgid "Client"
-msgstr "Клиент"
-
-#: ../gtk/details.c:1075
-msgid "Status"
-msgstr "Күй-жай"
 
 #: ../gtk/actions.c:49
 msgid "Sort by _Activity"
@@ -133,6 +101,14 @@ msgstr "Торрентерді _сұрыптау"
 #: ../gtk/actions.c:103
 msgid "_Edit"
 msgstr "Тү_зету"
+
+#: ../gtk/actions.c:104
+msgid "_Help"
+msgstr "_Анықтама"
+
+#: ../gtk/actions.c:105 ../gtk/actions.c:106
+msgid "Add a torrent"
+msgstr "Торрент қосу"
 
 #: ../gtk/actions.c:106
 msgid "_Add..."
@@ -229,6 +205,10 @@ msgstr "Тре_керден тағы тораптарды сұрау"
 #: ../gtk/add-dialog.c:241
 msgid "Torrent files"
 msgstr "Торрент файлдары"
+
+#: ../gtk/add-dialog.c:246
+msgid "All files"
+msgstr "Барлық файлдар"
 
 #: ../gtk/add-dialog.c:275
 msgid "Torrent Options"
@@ -501,9 +481,29 @@ msgstr "Түсініктемесі:"
 msgid "Webseeds"
 msgstr "Веб-сидерлер"
 
+#: ../gtk/details.c:1030 ../gtk/details.c:1070
+msgid "Down"
+msgstr "Төмен"
+
+#: ../gtk/details.c:1068
+msgid "Address"
+msgstr "Адрес"
+
+#: ../gtk/details.c:1072
+msgid "Up"
+msgstr "Жоғары"
+
+#: ../gtk/details.c:1073
+msgid "Client"
+msgstr "Клиент"
+
 #: ../gtk/details.c:1074
 msgid "%"
 msgstr "%"
+
+#: ../gtk/details.c:1075
+msgid "Status"
+msgstr "Күй-жай"
 
 #: ../gtk/details.c:1403
 msgid "Optimistic unchoke"

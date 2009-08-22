@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2009-08-13 23:52+0000\n"
+"X-Launchpad-Export-Date: 2009-08-22 16:00+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:49
@@ -30,17 +30,49 @@ msgstr "Li gor _navan rêz bike"
 msgid "Sort by _Progress"
 msgstr "Li gor beşa _qediyayî rêz bike"
 
+#: ../gtk/actions.c:52
+msgid "Sort by Rati_o"
+msgstr ""
+
+#: ../gtk/actions.c:53
+msgid "Sort by Stat_e"
+msgstr ""
+
+#: ../gtk/actions.c:54
+msgid "Sort by T_racker"
+msgstr ""
+
 #: ../gtk/actions.c:55
 msgid "Sort by A_ge"
 msgstr "Li gor te_men rêz bike"
+
+#: ../gtk/actions.c:56
+msgid "Sort by Time _Left"
+msgstr ""
+
+#: ../gtk/actions.c:57
+msgid "Sort by Si_ze"
+msgstr ""
 
 #: ../gtk/actions.c:74
 msgid "_Main Window"
 msgstr "_Paceya Bingehîn"
 
+#: ../gtk/actions.c:75
+msgid "Message _Log"
+msgstr ""
+
+#: ../gtk/actions.c:90
+msgid "Temporary  Speed _Limits"
+msgstr ""
+
 #: ../gtk/actions.c:91
 msgid "_Minimal View"
 msgstr "_Dîtina herî biçûk"
+
+#: ../gtk/actions.c:92
+msgid "Re_verse Sort Order"
+msgstr ""
 
 #: ../gtk/actions.c:93
 msgid "_Filterbar"
@@ -106,6 +138,26 @@ msgstr "_Rawestandin"
 msgid "Pause torrent"
 msgstr "Torrentê rawestîne"
 
+#: ../gtk/actions.c:111
+msgid "_Pause All"
+msgstr ""
+
+#: ../gtk/actions.c:111
+msgid "Pause all torrents"
+msgstr ""
+
+#: ../gtk/actions.c:112
+msgid "_Start All"
+msgstr ""
+
+#: ../gtk/actions.c:112
+msgid "Start all torrents"
+msgstr ""
+
+#: ../gtk/actions.c:113
+msgid "Set _Location"
+msgstr ""
+
 #: ../gtk/actions.c:114
 msgid "Remove torrent"
 msgstr "Torrentê rake"
@@ -134,6 +186,10 @@ msgstr "_Hemûyan Hilbijêre"
 msgid "Dese_lect All"
 msgstr "He_mû Hilbijartinan Rake"
 
+#: ../gtk/actions.c:121
+msgid "Torrent properties"
+msgstr ""
+
 #: ../gtk/actions.c:122
 msgid "_Open Folder"
 msgstr "_Peldank Veke"
@@ -141,6 +197,10 @@ msgstr "_Peldank Veke"
 #: ../gtk/actions.c:124
 msgid "_Contents"
 msgstr "_Naverok"
+
+#: ../gtk/actions.c:125
+msgid "Ask Tracker for _More Peers"
+msgstr ""
 
 #: ../gtk/add-dialog.c:241
 msgid "Torrent files"
@@ -204,6 +264,11 @@ msgstr "\"%1$s\": %2$s nayê vekirin"
 msgid "%s is already running."
 msgstr "%s jixwe dixebite"
 
+#: ../gtk/conf.c:448 ../gtk/conf.c:453
+#, c-format
+msgid "Importing \"%s\""
+msgstr ""
+
 #: ../gtk/details.c:470 ../gtk/file-list.c:579
 msgid "High"
 msgstr "Bilind"
@@ -216,530 +281,6 @@ msgstr "Asayî"
 msgid "Low"
 msgstr "Nizm"
 
-#: ../gtk/details.c:515 ../gtk/tr-prefs.c:1180
-msgid "Limit _download speed (KB/s):"
-msgstr "Sînora leza_daxistinê (KB/ç):"
-
-#: ../gtk/details.c:527 ../gtk/tr-prefs.c:1187
-msgid "Limit _upload speed (KB/s):"
-msgstr "Sînora leza_barkirinê (KB/ç):"
-
-#: ../gtk/details.c:603 ../gtk/torrent-cell-renderer.c:173
-msgid "Waiting to verify local data"
-msgstr "Li benda piştrastkirina daneya heremî ye"
-
-#: ../gtk/details.c:607 ../gtk/torrent-cell-renderer.c:169
-msgid "Paused"
-msgstr "Rawestiyayî"
-
-#: ../gtk/details.c:618 ../gtk/details.c:1346 ../gtk/details.c:1643
-#: ../gtk/util.c:68 ../libtransmission/utils.c:1348
-msgid "None"
-msgstr "Ne yek jî"
-
-#: ../gtk/details.c:619 ../gtk/details.c:1645 ../gtk/file-list.c:582
-msgid "Mixed"
-msgstr "Tevlihev"
-
-#: ../gtk/details.c:641
-msgid "Public torrent"
-msgstr "Torrenta Gelemperî"
-
-#: ../gtk/details.c:916
-msgid "Activity"
-msgstr "Çalakî"
-
-#: ../gtk/details.c:928 ../gtk/stats.c:149 ../gtk/stats.c:161
-msgid "Downloaded:"
-msgstr "Daxistî:"
-
-#: ../gtk/details.c:932 ../gtk/stats.c:147 ../gtk/stats.c:159
-msgid "Uploaded:"
-msgstr "Barkirî:"
-
-#: ../gtk/details.c:936 ../gtk/stats.c:151 ../gtk/stats.c:163
-msgid "Ratio:"
-msgstr "Rêje:"
-
-#: ../gtk/details.c:940
-msgid "State:"
-msgstr "Rewş:"
-
-#: ../gtk/details.c:952
-msgid "Error:"
-msgstr "Çewtî:"
-
-#: ../gtk/details.c:956
-msgid "Details"
-msgstr "Berfirehî"
-
-#: ../gtk/details.c:996
-msgid "Comment:"
-msgstr "Şîrove:"
-
-#: ../gtk/details.c:1030 ../gtk/details.c:1070
-msgid "Down"
-msgstr "Daxistin"
-
-#: ../gtk/details.c:1068
-msgid "Address"
-msgstr "Navnîşan"
-
-#: ../gtk/details.c:1072
-msgid "Up"
-msgstr "Barkirin"
-
-#: ../gtk/details.c:1073
-msgid "Client"
-msgstr "Daxwazker"
-
-#: ../gtk/details.c:1074
-msgid "%"
-msgstr "%"
-
-#: ../gtk/details.c:1075
-msgid "Status"
-msgstr "Rewş"
-
-#: ../gtk/details.c:1644
-msgid "Now"
-msgstr "Niha"
-
-#: ../gtk/details.c:1792 ../gtk/makemeta-ui.c:425
-msgid "Trackers"
-msgstr "Temaşeker"
-
-#: ../gtk/details.c:1799
-msgid "Scrape"
-msgstr "Scrape"
-
-#: ../gtk/details.c:1801
-msgid "Last scrape at:"
-msgstr "Srape a dawîn:"
-
-#: ../gtk/details.c:1806 ../gtk/details.c:1828
-msgid "Tracker responded:"
-msgstr "Temaşeker bersiv da:"
-
-#: ../gtk/details.c:1811
-msgid "Next scrape in:"
-msgstr "Scrape a pê re li:"
-
-#: ../gtk/details.c:1817
-msgid "Announce"
-msgstr "Daxuyanî"
-
-#: ../gtk/details.c:1821
-msgid "Tracker:"
-msgstr "Temaşeker:"
-
-#: ../gtk/details.c:1823
-msgid "Last announce at:"
-msgstr "Daxuyaniya Dawîn:"
-
-#: ../gtk/details.c:1833
-msgid "Next announce in:"
-msgstr "Daxuyaniya pê re:"
-
-#: ../gtk/details.c:1914 ../gtk/msgwin.c:193
-msgid "Information"
-msgstr "Agahî"
-
-#: ../gtk/details.c:1922 ../gtk/tr-prefs.c:961 ../gtk/tr-window.c:848
-msgid "Tracker"
-msgstr "Temaşeker"
-
-#: ../gtk/details.c:1927 ../gtk/tr-window.c:848
-msgid "Files"
-msgstr "Pel"
-
-#: ../gtk/details.c:1932
-msgid "Options"
-msgstr "Vebijêrk"
-
-#: ../gtk/dialogs.c:121
-msgid "<big><b>Quit Transmission?</b></big>"
-msgstr "<big><b>Ji Transmission Derkeve?</b></big>"
-
-#: ../gtk/dialogs.c:133
-msgid "_Don't ask me again"
-msgstr "Carek din_nepirse"
-
-#: ../gtk/dialogs.c:236
-msgid "Remove torrent?"
-msgid_plural "Remove torrents?"
-msgstr[0] "Torrentê rake?"
-msgstr[1] "Torrentan rake?"
-
-#: ../gtk/dialogs.c:242
-msgid "Delete this torrent's downloaded files?"
-msgid_plural "Delete these torrents' downloaded files?"
-msgstr[0] "Pelên daxistî yên vê torrentê jê bibe?"
-msgstr[1] "Pelê daxistî yên van torrentan jê bibe?"
-
-#. add priority column
-#: ../gtk/file-list.c:610 ../gtk/file-list.c:757
-msgid "Priority"
-msgstr "Girîngî"
-
-#: ../gtk/main.c:348
-msgid "Start with all torrents paused"
-msgstr "Hemû torrent rawestiyayî destpê bike"
-
-#: ../gtk/main.c:357
-msgid "Where to look for configuration files"
-msgstr "Cihê ji bo lêgerîna pelên mîhengan"
-
-#: ../gtk/main.c:366
-msgid "Transmission"
-msgstr "Transmission"
-
-#: ../gtk/main.c:373
-msgid "[torrent files]"
-msgstr "[pelên torrentê]"
-
-#: ../gtk/main.c:699
-msgid "<b>Closing Connections</b>"
-msgstr "<b>Girêdanan Digire</b>"
-
-#: ../gtk/main.c:703
-msgid "Sending upload/download totals to tracker..."
-msgstr "Giştiya daxistin/barkirinê dişîne temaşeker..."
-
-#: ../gtk/main.c:708
-msgid "_Quit Now"
-msgstr "Niha_Derkeve"
-
-#: ../gtk/main.c:875
-msgid "Couldn't add corrupt torrent"
-msgid_plural "Couldn't add corrupt torrents"
-msgstr[0] "Torrenta xerabe nehat barkirin"
-msgstr[1] "Torrentên xerabe nehatin barkirin"
-
-#: ../gtk/main.c:1160
-msgid "A fast and easy BitTorrent client"
-msgstr "Daxwazkerek lez û hêsan a Bitorrent"
-
-#: ../gtk/makemeta-ui.c:109
-msgid "Torrent created!"
-msgstr "Torrent hat afirandin!"
-
-#: ../gtk/makemeta-ui.c:114 ../gtk/makemeta-ui.c:130 ../gtk/makemeta-ui.c:144
-#, c-format
-msgid "Torrent creation failed: %s"
-msgstr "Afirandina torrentê têk çû: %s"
-
-#: ../gtk/makemeta-ui.c:115
-msgid "Invalid URL"
-msgstr "URLya çewt"
-
-#: ../gtk/makemeta-ui.c:119
-msgid "Torrent creation cancelled"
-msgstr "Afirandina torrentê hat betalkirin"
-
-#: ../gtk/makemeta-ui.c:126 ../libtransmission/blocklist.c:78
-#: ../libtransmission/blocklist.c:237 ../libtransmission/utils.c:507
-#, c-format
-msgid "Couldn't read \"%1$s\": %2$s"
-msgstr "Nehat xwendin \"%1$s\": %2$s"
-
-#: ../gtk/makemeta-ui.c:256 ../gtk/makemeta-ui.c:493
-msgid "No source selected"
-msgstr "Tu çavkanî nehat hilbijartin"
-
-#. %1$s is the torrent size
-#. %2$'d is its number of files
-#: ../gtk/makemeta-ui.c:270
-#, c-format
-msgid "<i>%1$s; %2$'d File</i>"
-msgid_plural "<i>%1$s; %2$'d Files</i>"
-msgstr[0] "<i>%1$s; %2$'d Pel</i>"
-msgstr[1] "<i>%1$s; %2$'d Pel</i>"
-
-#. %1$s is number of pieces;
-#. %2$s is how big each piece is
-#: ../gtk/makemeta-ui.c:288
-#, c-format
-msgid "%1$s @ %2$s"
-msgstr "%1$s @ %2$s"
-
-#: ../gtk/makemeta-ui.c:352
-msgid "Choose Directory"
-msgstr "Peldank Hilbijêre"
-
-#: ../gtk/makemeta-ui.c:361
-msgid "Choose File"
-msgstr "Pel Hilbijêre"
-
-#: ../gtk/makemeta-ui.c:377
-msgid "New Torrent"
-msgstr "Torrenteke Nû"
-
-#: ../gtk/makemeta-ui.c:392
-msgid "Source"
-msgstr "Çavkanî"
-
-#: ../gtk/makemeta-ui.c:403
-msgid "<i>No source selected</i>"
-msgstr "<i>Tu çavkanî nehat hilbijartin</i>"
-
-#: ../gtk/makemeta-ui.c:413
-msgid "F_older"
-msgstr "_Peldank"
-
-#: ../gtk/makemeta-ui.c:418
-msgid "_File"
-msgstr "_Pel"
-
-#: ../gtk/makemeta-ui.c:461
-msgid "<b>E_xtras</b>"
-msgstr "<b>E_kstra</b>"
-
-#: ../gtk/makemeta-ui.c:469
-msgid "Commen_t:"
-msgstr "Şî_rove:"
-
-#: ../gtk/makemeta-ui.c:472
-msgid "_Private torrent"
-msgstr "Torrenta_ taybet"
-
-#: ../gtk/msgwin.c:87 ../libtransmission/bencode.c:1554
-#: ../libtransmission/blocklist.c:293
-#, c-format
-msgid "Couldn't save file \"%1$s\": %2$s"
-msgstr "Nehat tomarkirin \"%1$s\": %2$s"
-
-#: ../gtk/msgwin.c:192
-msgid "Error"
-msgstr "Çewtî"
-
-#: ../gtk/msgwin.c:268
-msgid "Time"
-msgstr "Dem"
-
-#: ../gtk/msgwin.c:272 ../gtk/tr-window.c:848
-msgid "Name"
-msgstr "Nav"
-
-#: ../gtk/msgwin.c:276
-msgid "Message"
-msgstr "Peyam"
-
-#: ../gtk/msgwin.c:486
-msgid "Level"
-msgstr ""
-
-#: ../gtk/notify.c:94
-msgid "Torrent Complete"
-msgstr "Torrent Qediya"
-
-#: ../gtk/notify.c:102
-msgid "Open File"
-msgstr "Pelê Veke"
-
-#: ../gtk/notify.c:107
-msgid "Open Folder"
-msgstr "Peldankê veke"
-
-#: ../gtk/relocate.c:117
-msgid "Location"
-msgstr "Cih"
-
-#: ../gtk/stats.c:128
-msgid "Statistics"
-msgstr "Statîstîk"
-
-#: ../gtk/stats.c:145
-msgid "Current Session"
-msgstr "Danişîna Heyî"
-
-#: ../gtk/stats.c:153 ../gtk/stats.c:165
-msgid "Duration:"
-msgstr "Dem:"
-
-#: ../gtk/stats.c:155
-msgid "Total"
-msgstr "Bi Giştî"
-
-#. %1$s is how much we've got,
-#. %2$s is how much we'll have when done,
-#. %3$.2f%% is a percentage of the two
-#: ../gtk/torrent-cell-renderer.c:61
-#, c-format
-msgid "%1$s of %2$s (%3$.2f%%)"
-msgstr "%1$s ji %2$s (%3$.2f%%)"
-
-#. %1$s is how much we've got,
-#. %2$s is the torrent's total size,
-#. %3$.2f%% is a percentage of the two,
-#. %4$s is how much we've uploaded,
-#. %5$s is our upload-to-download ratio
-#: ../gtk/torrent-cell-renderer.c:74
-#, c-format
-msgid "%1$s of %2$s (%3$.2f%%), uploaded %4$s (Ratio: %5$s)"
-msgstr "%1$s ji %2$s (%3$.2f%%), hat barkirin %4$s (Rêje: %5$s)"
-
-#. %1$s is the torrent's total size,
-#. %2$s is how much we've uploaded,
-#. %3$s is our upload-to-download ratio
-#: ../gtk/torrent-cell-renderer.c:100
-#, c-format
-msgid "%1$s, uploaded %2$s (Ratio: %3$s)"
-msgstr "%1$s, %2$s hat barkirin  (Rêje: %3$s)"
-
-#. time remaining
-#: ../gtk/torrent-cell-renderer.c:119
-#, c-format
-msgid "%s remaining"
-msgstr "%s ma"
-
-#: ../gtk/torrent-cell-renderer.c:147
-#, c-format
-msgid "speed|Down: %1$s, Up: %2$s"
-msgstr "Daxistin: %1$s, Barkirin: %2$s"
-
-#. download speed
-#: ../gtk/torrent-cell-renderer.c:150
-#, c-format
-msgid "Down: %s"
-msgstr "Daxistin: %s"
-
-#. upload speed
-#: ../gtk/torrent-cell-renderer.c:153
-#, c-format
-msgid "Up: %s"
-msgstr "Barkirin: %s"
-
-#. the torrent isn't uploading or downloading
-#: ../gtk/torrent-cell-renderer.c:156 ../gtk/tr-icon.c:61
-msgid "Idle"
-msgstr "Betal"
-
-#: ../gtk/torrent-cell-renderer.c:179 ../gtk/tr-torrent.c:240
-#, c-format
-msgid "Verifying local data (%.1f%% tested)"
-msgstr "Daneya heremî piştrast dike (%.1f%% hat venihêrtin)"
-
-#: ../gtk/torrent-cell-renderer.c:190 ../gtk/tr-window.c:1114
-#: ../gtk/tr-window.c:1142
-#, c-format
-msgid "Ratio: %s"
-msgstr "Rêje: %s"
-
-#: ../gtk/transmission.desktop.in.h:1
-msgid "BitTorrent Client"
-msgstr "Daxwazkera BitTorrent"
-
-#: ../gtk/transmission.desktop.in.h:3
-msgid "Transmission BitTorrent Client"
-msgstr "Daxwazkera BitTorrent Transmission"
-
-#: ../gtk/tr-core.c:1118
-msgid "Transmission Bittorrent Client"
-msgstr "Daxwazkera BitTorrent Transmission"
-
-#: ../gtk/tr-core.c:1119
-msgid "BitTorrent Activity"
-msgstr "Çalakiya BitTorrent"
-
-#: ../libtransmission/port-forwarding.c:86 ../libtransmission/torrent.c:1513
-#, c-format
-msgid "State changed from \"%1$s\" to \"%2$s\""
-msgstr "Rewş hat guhertin ji \"%1$s\" li \"%2$s\""
-
-#. first %s is the application name
-#. second %s is the version number
-#: ../libtransmission/session.c:839
-#, c-format
-msgid "%s %s started"
-msgstr "%s %s destpê kir"
-
-#: ../libtransmission/torrent.c:294
-#, c-format
-msgid "Tracker error: \"%s\""
-msgstr "Çewtiya Temaşeker: \"%s\""
-
-#: ../libtransmission/torrent.c:1439
-msgid "Done"
-msgstr "Qediya"
-
-#: ../libtransmission/torrent.c:1442
-msgid "Complete"
-msgstr "Qediya"
-
-#: ../libtransmission/torrent.c:1445
-msgid "Incomplete"
-msgstr "Neqediya"
-
-#: ../libtransmission/verify.c:212
-msgid "Verifying torrent"
-msgstr "Torrentê piştrast dike"
-
-#: ../gtk/actions.c:52
-msgid "Sort by Rati_o"
-msgstr ""
-
-#: ../gtk/actions.c:53
-msgid "Sort by Stat_e"
-msgstr ""
-
-#: ../gtk/actions.c:54
-msgid "Sort by T_racker"
-msgstr ""
-
-#: ../gtk/actions.c:56
-msgid "Sort by Time _Left"
-msgstr ""
-
-#: ../gtk/actions.c:57
-msgid "Sort by Si_ze"
-msgstr ""
-
-#: ../gtk/actions.c:75
-msgid "Message _Log"
-msgstr ""
-
-#: ../gtk/actions.c:90
-msgid "Temporary  Speed _Limits"
-msgstr ""
-
-#: ../gtk/actions.c:92
-msgid "Re_verse Sort Order"
-msgstr ""
-
-#: ../gtk/actions.c:111
-msgid "_Pause All"
-msgstr ""
-
-#: ../gtk/actions.c:111
-msgid "Pause all torrents"
-msgstr ""
-
-#: ../gtk/actions.c:112
-msgid "_Start All"
-msgstr ""
-
-#: ../gtk/actions.c:112
-msgid "Start all torrents"
-msgstr ""
-
-#: ../gtk/actions.c:113
-msgid "Set _Location"
-msgstr ""
-
-#: ../gtk/actions.c:121
-msgid "Torrent properties"
-msgstr ""
-
-#: ../gtk/actions.c:125
-msgid "Ask Tracker for _More Peers"
-msgstr ""
-
-#: ../gtk/conf.c:448 ../gtk/conf.c:453
-#, c-format
-msgid "Importing \"%s\""
-msgstr ""
-
 #: ../gtk/details.c:508 ../gtk/tr-prefs.c:1395
 msgid "Speed"
 msgstr ""
@@ -747,6 +288,14 @@ msgstr ""
 #: ../gtk/details.c:510
 msgid "Honor global _limits"
 msgstr ""
+
+#: ../gtk/details.c:515 ../gtk/tr-prefs.c:1180
+msgid "Limit _download speed (KB/s):"
+msgstr "Sînora leza_daxistinê (KB/ç):"
+
+#: ../gtk/details.c:527 ../gtk/tr-prefs.c:1187
+msgid "Limit _upload speed (KB/s):"
+msgstr "Sînora leza_barkirinê (KB/ç):"
 
 #: ../gtk/details.c:539
 msgid "Torrent _priority:"
@@ -776,6 +325,10 @@ msgstr ""
 msgid "_Maximum peers:"
 msgstr ""
 
+#: ../gtk/details.c:603 ../gtk/torrent-cell-renderer.c:173
+msgid "Waiting to verify local data"
+msgstr "Li benda piştrastkirina daneya heremî ye"
+
 #: ../gtk/details.c:604
 msgid "Verifying local data"
 msgstr ""
@@ -788,9 +341,26 @@ msgstr ""
 msgid "Seeding"
 msgstr ""
 
+#: ../gtk/details.c:607 ../gtk/torrent-cell-renderer.c:169
+msgid "Paused"
+msgstr "Rawestiyayî"
+
+#: ../gtk/details.c:618 ../gtk/details.c:1346 ../gtk/details.c:1643
+#: ../gtk/util.c:68 ../libtransmission/utils.c:1348
+msgid "None"
+msgstr "Ne yek jî"
+
+#: ../gtk/details.c:619 ../gtk/details.c:1645 ../gtk/file-list.c:582
+msgid "Mixed"
+msgstr "Tevlihev"
+
 #: ../gtk/details.c:639
 msgid "Private to this tracker -- DHT and PEX disabled"
 msgstr ""
+
+#: ../gtk/details.c:641
+msgid "Public torrent"
+msgstr "Torrenta Gelemperî"
 
 #: ../gtk/details.c:663
 #, c-format
@@ -845,6 +415,10 @@ msgstr ""
 msgid "%1$s ago"
 msgstr ""
 
+#: ../gtk/details.c:916
+msgid "Activity"
+msgstr "Çalakî"
+
 #: ../gtk/details.c:920
 msgid "Torrent size:"
 msgstr ""
@@ -853,6 +427,22 @@ msgstr ""
 msgid "Have:"
 msgstr ""
 
+#: ../gtk/details.c:928 ../gtk/stats.c:149 ../gtk/stats.c:161
+msgid "Downloaded:"
+msgstr "Daxistî:"
+
+#: ../gtk/details.c:932 ../gtk/stats.c:147 ../gtk/stats.c:159
+msgid "Uploaded:"
+msgstr "Barkirî:"
+
+#: ../gtk/details.c:936 ../gtk/stats.c:151 ../gtk/stats.c:163
+msgid "Ratio:"
+msgstr "Rêje:"
+
+#: ../gtk/details.c:940
+msgid "State:"
+msgstr "Rewş:"
+
 #: ../gtk/details.c:944
 msgid "Running time:"
 msgstr ""
@@ -860,6 +450,14 @@ msgstr ""
 #: ../gtk/details.c:948
 msgid "Last activity:"
 msgstr ""
+
+#: ../gtk/details.c:952
+msgid "Error:"
+msgstr "Çewtî:"
+
+#: ../gtk/details.c:956
+msgid "Details"
+msgstr "Berfirehî"
 
 #: ../gtk/details.c:962
 msgid "Location:"
@@ -877,9 +475,37 @@ msgstr ""
 msgid "Origin:"
 msgstr ""
 
+#: ../gtk/details.c:996
+msgid "Comment:"
+msgstr "Şîrove:"
+
 #: ../gtk/details.c:1028
 msgid "Webseeds"
 msgstr ""
+
+#: ../gtk/details.c:1030 ../gtk/details.c:1070
+msgid "Down"
+msgstr "Daxistin"
+
+#: ../gtk/details.c:1068
+msgid "Address"
+msgstr "Navnîşan"
+
+#: ../gtk/details.c:1072
+msgid "Up"
+msgstr "Barkirin"
+
+#: ../gtk/details.c:1073
+msgid "Client"
+msgstr "Daxwazker"
+
+#: ../gtk/details.c:1074
+msgid "%"
+msgstr "%"
+
+#: ../gtk/details.c:1075
+msgid "Status"
+msgstr "Rewş"
 
 #: ../gtk/details.c:1403
 msgid "Optimistic unchoke"
@@ -937,6 +563,10 @@ msgstr ""
 msgid "<b>Times Completed:</b>"
 msgstr ""
 
+#: ../gtk/details.c:1644
+msgid "Now"
+msgstr "Niha"
+
 #: ../gtk/details.c:1646
 msgid "None sent"
 msgstr ""
@@ -945,15 +575,67 @@ msgstr ""
 msgid "In progress"
 msgstr ""
 
+#: ../gtk/details.c:1792 ../gtk/makemeta-ui.c:425
+msgid "Trackers"
+msgstr "Temaşeker"
+
+#: ../gtk/details.c:1799
+msgid "Scrape"
+msgstr "Scrape"
+
+#: ../gtk/details.c:1801
+msgid "Last scrape at:"
+msgstr "Srape a dawîn:"
+
+#: ../gtk/details.c:1806 ../gtk/details.c:1828
+msgid "Tracker responded:"
+msgstr "Temaşeker bersiv da:"
+
+#: ../gtk/details.c:1811
+msgid "Next scrape in:"
+msgstr "Scrape a pê re li:"
+
+#: ../gtk/details.c:1817
+msgid "Announce"
+msgstr "Daxuyanî"
+
+#: ../gtk/details.c:1821
+msgid "Tracker:"
+msgstr "Temaşeker:"
+
+#: ../gtk/details.c:1823
+msgid "Last announce at:"
+msgstr "Daxuyaniya Dawîn:"
+
+#: ../gtk/details.c:1833
+msgid "Next announce in:"
+msgstr "Daxuyaniya pê re:"
+
 #. how long until the tracker will honor user
 #. * pressing the "ask for more peers" button
 #: ../gtk/details.c:1840
 msgid "Manual announce allowed in:"
 msgstr ""
 
+#: ../gtk/details.c:1914 ../gtk/msgwin.c:193
+msgid "Information"
+msgstr "Agahî"
+
 #: ../gtk/details.c:1918
 msgid "Peers"
 msgstr ""
+
+#: ../gtk/details.c:1922 ../gtk/tr-prefs.c:961 ../gtk/tr-window.c:848
+msgid "Tracker"
+msgstr "Temaşeker"
+
+#: ../gtk/details.c:1927 ../gtk/tr-window.c:848
+msgid "Files"
+msgstr "Pel"
+
+#: ../gtk/details.c:1932
+msgid "Options"
+msgstr "Vebijêrk"
 
 #: ../gtk/details.c:1960
 #, c-format
@@ -964,6 +646,26 @@ msgstr ""
 #, c-format
 msgid "%'d Torrent Properties"
 msgstr ""
+
+#: ../gtk/dialogs.c:121
+msgid "<big><b>Quit Transmission?</b></big>"
+msgstr "<big><b>Ji Transmission Derkeve?</b></big>"
+
+#: ../gtk/dialogs.c:133
+msgid "_Don't ask me again"
+msgstr "Carek din_nepirse"
+
+#: ../gtk/dialogs.c:236
+msgid "Remove torrent?"
+msgid_plural "Remove torrents?"
+msgstr[0] "Torrentê rake?"
+msgstr[1] "Torrentan rake?"
+
+#: ../gtk/dialogs.c:242
+msgid "Delete this torrent's downloaded files?"
+msgid_plural "Delete these torrents' downloaded files?"
+msgstr[0] "Pelên daxistî yên vê torrentê jê bibe?"
+msgstr[1] "Pelê daxistî yên van torrentan jê bibe?"
 
 #: ../gtk/dialogs.c:255
 msgid "This torrent has not finished downloading."
@@ -994,6 +696,11 @@ msgstr[1] ""
 msgid "Download"
 msgstr ""
 
+#. add priority column
+#: ../gtk/file-list.c:610 ../gtk/file-list.c:757
+msgid "Priority"
+msgstr "Girîngî"
+
 #: ../gtk/file-list.c:715
 msgid "File"
 msgstr ""
@@ -1003,6 +710,10 @@ msgstr ""
 msgid "Progress"
 msgstr ""
 
+#: ../gtk/main.c:348
+msgid "Start with all torrents paused"
+msgstr "Hemû torrent rawestiyayî destpê bike"
+
 #: ../gtk/main.c:350
 msgid "Show version number and exit"
 msgstr ""
@@ -1011,11 +722,45 @@ msgstr ""
 msgid "Start minimized in system tray"
 msgstr ""
 
+#: ../gtk/main.c:357
+msgid "Where to look for configuration files"
+msgstr "Cihê ji bo lêgerîna pelên mîhengan"
+
+#: ../gtk/main.c:366
+msgid "Transmission"
+msgstr "Transmission"
+
+#: ../gtk/main.c:373
+msgid "[torrent files]"
+msgstr "[pelên torrentê]"
+
+#: ../gtk/main.c:699
+msgid "<b>Closing Connections</b>"
+msgstr "<b>Girêdanan Digire</b>"
+
+#: ../gtk/main.c:703
+msgid "Sending upload/download totals to tracker..."
+msgstr "Giştiya daxistin/barkirinê dişîne temaşeker..."
+
+#: ../gtk/main.c:708
+msgid "_Quit Now"
+msgstr "Niha_Derkeve"
+
+#: ../gtk/main.c:875
+msgid "Couldn't add corrupt torrent"
+msgid_plural "Couldn't add corrupt torrents"
+msgstr[0] "Torrenta xerabe nehat barkirin"
+msgstr[1] "Torrentên xerabe nehatin barkirin"
+
 #: ../gtk/main.c:882
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] ""
 msgstr[1] ""
+
+#: ../gtk/main.c:1160
+msgid "A fast and easy BitTorrent client"
+msgstr "Daxwazkerek lez û hêsan a Bitorrent"
 
 #: ../gtk/main.c:1165
 msgid "Copyright 2005-2009 The Transmission Project"
@@ -1032,6 +777,42 @@ msgstr ""
 "  Erdal Ronahi https://launchpad.net/~erdalronahi\n"
 "  simurg56 https://launchpad.net/~simurg56"
 
+#: ../gtk/makemeta-ui.c:109
+msgid "Torrent created!"
+msgstr "Torrent hat afirandin!"
+
+#: ../gtk/makemeta-ui.c:114 ../gtk/makemeta-ui.c:130 ../gtk/makemeta-ui.c:144
+#, c-format
+msgid "Torrent creation failed: %s"
+msgstr "Afirandina torrentê têk çû: %s"
+
+#: ../gtk/makemeta-ui.c:115
+msgid "Invalid URL"
+msgstr "URLya çewt"
+
+#: ../gtk/makemeta-ui.c:119
+msgid "Torrent creation cancelled"
+msgstr "Afirandina torrentê hat betalkirin"
+
+#: ../gtk/makemeta-ui.c:126 ../libtransmission/blocklist.c:78
+#: ../libtransmission/blocklist.c:237 ../libtransmission/utils.c:507
+#, c-format
+msgid "Couldn't read \"%1$s\": %2$s"
+msgstr "Nehat xwendin \"%1$s\": %2$s"
+
+#: ../gtk/makemeta-ui.c:256 ../gtk/makemeta-ui.c:493
+msgid "No source selected"
+msgstr "Tu çavkanî nehat hilbijartin"
+
+#. %1$s is the torrent size
+#. %2$'d is its number of files
+#: ../gtk/makemeta-ui.c:270
+#, c-format
+msgid "<i>%1$s; %2$'d File</i>"
+msgid_plural "<i>%1$s; %2$'d Files</i>"
+msgstr[0] "<i>%1$s; %2$'d Pel</i>"
+msgstr[1] "<i>%1$s; %2$'d Pel</i>"
+
 #: ../gtk/makemeta-ui.c:282
 #, c-format
 msgid "%'d Piece"
@@ -1039,17 +820,102 @@ msgid_plural "%'d Pieces"
 msgstr[0] ""
 msgstr[1] ""
 
+#. %1$s is number of pieces;
+#. %2$s is how big each piece is
+#: ../gtk/makemeta-ui.c:288
+#, c-format
+msgid "%1$s @ %2$s"
+msgstr "%1$s @ %2$s"
+
+#: ../gtk/makemeta-ui.c:352
+msgid "Choose Directory"
+msgstr "Peldank Hilbijêre"
+
+#: ../gtk/makemeta-ui.c:361
+msgid "Choose File"
+msgstr "Pel Hilbijêre"
+
+#: ../gtk/makemeta-ui.c:377
+msgid "New Torrent"
+msgstr "Torrenteke Nû"
+
+#: ../gtk/makemeta-ui.c:392
+msgid "Source"
+msgstr "Çavkanî"
+
+#: ../gtk/makemeta-ui.c:403
+msgid "<i>No source selected</i>"
+msgstr "<i>Tu çavkanî nehat hilbijartin</i>"
+
+#: ../gtk/makemeta-ui.c:413
+msgid "F_older"
+msgstr "_Peldank"
+
+#: ../gtk/makemeta-ui.c:418
+msgid "_File"
+msgstr "_Pel"
+
+#: ../gtk/makemeta-ui.c:461
+msgid "<b>E_xtras</b>"
+msgstr "<b>E_kstra</b>"
+
+#: ../gtk/makemeta-ui.c:469
+msgid "Commen_t:"
+msgstr "Şî_rove:"
+
+#: ../gtk/makemeta-ui.c:472
+msgid "_Private torrent"
+msgstr "Torrenta_ taybet"
+
+#: ../gtk/msgwin.c:87 ../libtransmission/bencode.c:1554
+#: ../libtransmission/blocklist.c:293
+#, c-format
+msgid "Couldn't save file \"%1$s\": %2$s"
+msgstr "Nehat tomarkirin \"%1$s\": %2$s"
+
 #: ../gtk/msgwin.c:149
 msgid "Save Log"
 msgstr ""
+
+#: ../gtk/msgwin.c:192
+msgid "Error"
+msgstr "Çewtî"
 
 #: ../gtk/msgwin.c:194
 msgid "Debug"
 msgstr ""
 
+#: ../gtk/msgwin.c:268
+msgid "Time"
+msgstr "Dem"
+
+#: ../gtk/msgwin.c:272 ../gtk/tr-window.c:848
+msgid "Name"
+msgstr "Nav"
+
+#: ../gtk/msgwin.c:276
+msgid "Message"
+msgstr "Peyam"
+
 #: ../gtk/msgwin.c:452
 msgid "Message Log"
 msgstr ""
+
+#: ../gtk/msgwin.c:486
+msgid "Level"
+msgstr ""
+
+#: ../gtk/notify.c:94
+msgid "Torrent Complete"
+msgstr "Torrent Qediya"
+
+#: ../gtk/notify.c:102
+msgid "Open File"
+msgstr "Pelê Veke"
+
+#: ../gtk/notify.c:107
+msgid "Open Folder"
+msgstr "Peldankê veke"
 
 #: ../gtk/notify.c:121
 msgid "Torrent Added"
@@ -1067,6 +933,10 @@ msgstr ""
 #: ../gtk/relocate.c:99 ../gtk/relocate.c:121
 msgid "Set Torrent Location"
 msgstr ""
+
+#: ../gtk/relocate.c:117
+msgid "Location"
+msgstr "Cih"
 
 #: ../gtk/relocate.c:124
 msgid "Torrent _location:"
@@ -1087,6 +957,40 @@ msgid_plural "Started %'d times"
 msgstr[0] ""
 msgstr[1] ""
 
+#: ../gtk/stats.c:128
+msgid "Statistics"
+msgstr "Statîstîk"
+
+#: ../gtk/stats.c:145
+msgid "Current Session"
+msgstr "Danişîna Heyî"
+
+#: ../gtk/stats.c:153 ../gtk/stats.c:165
+msgid "Duration:"
+msgstr "Dem:"
+
+#: ../gtk/stats.c:155
+msgid "Total"
+msgstr "Bi Giştî"
+
+#. %1$s is how much we've got,
+#. %2$s is how much we'll have when done,
+#. %3$.2f%% is a percentage of the two
+#: ../gtk/torrent-cell-renderer.c:61
+#, c-format
+msgid "%1$s of %2$s (%3$.2f%%)"
+msgstr "%1$s ji %2$s (%3$.2f%%)"
+
+#. %1$s is how much we've got,
+#. %2$s is the torrent's total size,
+#. %3$.2f%% is a percentage of the two,
+#. %4$s is how much we've uploaded,
+#. %5$s is our upload-to-download ratio
+#: ../gtk/torrent-cell-renderer.c:74
+#, c-format
+msgid "%1$s of %2$s (%3$.2f%%), uploaded %4$s (Ratio: %5$s)"
+msgstr "%1$s ji %2$s (%3$.2f%%), hat barkirin %4$s (Rêje: %5$s)"
+
 #. %1$s is the torrent's total size,
 #. %2$s is how much we've uploaded,
 #. %3$s is our upload-to-download ratio,
@@ -1096,9 +1000,56 @@ msgstr[1] ""
 msgid "%1$s, uploaded %2$s (Ratio: %3$s Goal: %4$s)"
 msgstr ""
 
+#. %1$s is the torrent's total size,
+#. %2$s is how much we've uploaded,
+#. %3$s is our upload-to-download ratio
+#: ../gtk/torrent-cell-renderer.c:100
+#, c-format
+msgid "%1$s, uploaded %2$s (Ratio: %3$s)"
+msgstr "%1$s, %2$s hat barkirin  (Rêje: %3$s)"
+
 #: ../gtk/torrent-cell-renderer.c:113 ../gtk/tr-torrent.c:247
 msgid "Remaining time unknown"
 msgstr ""
+
+#. time remaining
+#: ../gtk/torrent-cell-renderer.c:119
+#, c-format
+msgid "%s remaining"
+msgstr "%s ma"
+
+#: ../gtk/torrent-cell-renderer.c:147
+#, c-format
+msgid "speed|Down: %1$s, Up: %2$s"
+msgstr "Daxistin: %1$s, Barkirin: %2$s"
+
+#. download speed
+#: ../gtk/torrent-cell-renderer.c:150
+#, c-format
+msgid "Down: %s"
+msgstr "Daxistin: %s"
+
+#. upload speed
+#: ../gtk/torrent-cell-renderer.c:153
+#, c-format
+msgid "Up: %s"
+msgstr "Barkirin: %s"
+
+#. the torrent isn't uploading or downloading
+#: ../gtk/torrent-cell-renderer.c:156 ../gtk/tr-icon.c:61
+msgid "Idle"
+msgstr "Betal"
+
+#: ../gtk/torrent-cell-renderer.c:179 ../gtk/tr-torrent.c:240
+#, c-format
+msgid "Verifying local data (%.1f%% tested)"
+msgstr "Daneya heremî piştrast dike (%.1f%% hat venihêrtin)"
+
+#: ../gtk/torrent-cell-renderer.c:190 ../gtk/tr-window.c:1114
+#: ../gtk/tr-window.c:1142
+#, c-format
+msgid "Ratio: %s"
+msgstr "Rêje: %s"
 
 #: ../gtk/torrent-cell-renderer.c:232
 #, c-format
@@ -1122,9 +1073,25 @@ msgstr ""
 msgid "Announce URL"
 msgstr ""
 
+#: ../gtk/transmission.desktop.in.h:1
+msgid "BitTorrent Client"
+msgstr "Daxwazkera BitTorrent"
+
 #: ../gtk/transmission.desktop.in.h:2
 msgid "Download and share files over BitTorrent"
 msgstr ""
+
+#: ../gtk/transmission.desktop.in.h:3
+msgid "Transmission BitTorrent Client"
+msgstr "Daxwazkera BitTorrent Transmission"
+
+#: ../gtk/tr-core.c:1118
+msgid "Transmission Bittorrent Client"
+msgstr "Daxwazkera BitTorrent Transmission"
+
+#: ../gtk/tr-core.c:1119
+msgid "BitTorrent Activity"
+msgstr "Çalakiya BitTorrent"
 
 #: ../gtk/tr-core.c:1127
 msgid "Disallowing desktop hibernation"
@@ -1784,6 +1751,18 @@ msgstr ""
 msgid "Not forwarded"
 msgstr ""
 
+#: ../libtransmission/port-forwarding.c:86 ../libtransmission/torrent.c:1513
+#, c-format
+msgid "State changed from \"%1$s\" to \"%2$s\""
+msgstr "Rewş hat guhertin ji \"%1$s\" li \"%2$s\""
+
+#. first %s is the application name
+#. second %s is the version number
+#: ../libtransmission/session.c:839
+#, c-format
+msgid "%s %s started"
+msgstr "%s %s destpê kir"
+
 #: ../libtransmission/session.c:1578
 #, c-format
 msgid "Loaded %d torrents"
@@ -1798,6 +1777,23 @@ msgstr ""
 #, c-format
 msgid "Tracker warning: \"%s\""
 msgstr ""
+
+#: ../libtransmission/torrent.c:294
+#, c-format
+msgid "Tracker error: \"%s\""
+msgstr "Çewtiya Temaşeker: \"%s\""
+
+#: ../libtransmission/torrent.c:1439
+msgid "Done"
+msgstr "Qediya"
+
+#: ../libtransmission/torrent.c:1442
+msgid "Complete"
+msgstr "Qediya"
+
+#: ../libtransmission/torrent.c:1445
+msgid "Incomplete"
+msgstr "Neqediya"
 
 #: ../libtransmission/upnp.c:26
 msgid "Port Forwarding (UPnP)"
@@ -1846,6 +1842,10 @@ msgstr ""
 #, c-format
 msgid "File \"%s\" is in the way"
 msgstr ""
+
+#: ../libtransmission/verify.c:212
+msgid "Verifying torrent"
+msgstr "Torrentê piştrast dike"
 
 #: ../libtransmission/verify.c:247
 msgid "Queued for verification"

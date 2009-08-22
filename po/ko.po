@@ -15,8 +15,12 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2009-08-13 23:52+0000\n"
+"X-Launchpad-Export-Date: 2009-08-22 16:00+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
+
+#: ../gtk/actions.c:49
+msgid "Sort by _Activity"
+msgstr ""
 
 #: ../gtk/actions.c:50
 msgid "Sort by _Name"
@@ -26,9 +30,29 @@ msgstr "이름으로 정렬(_N)"
 msgid "Sort by _Progress"
 msgstr "프로그레스바로 정렬(_P)"
 
+#: ../gtk/actions.c:52
+msgid "Sort by Rati_o"
+msgstr ""
+
+#: ../gtk/actions.c:53
+msgid "Sort by Stat_e"
+msgstr ""
+
+#: ../gtk/actions.c:54
+msgid "Sort by T_racker"
+msgstr ""
+
 #: ../gtk/actions.c:55
 msgid "Sort by A_ge"
 msgstr "오래된 순서로 정렬(_A)"
+
+#: ../gtk/actions.c:56
+msgid "Sort by Time _Left"
+msgstr ""
+
+#: ../gtk/actions.c:57
+msgid "Sort by Si_ze"
+msgstr ""
 
 #: ../gtk/actions.c:74
 msgid "_Main Window"
@@ -38,9 +62,21 @@ msgstr "주 창(_M)"
 msgid "Message _Log"
 msgstr "메세지 로그(_L)"
 
+#: ../gtk/actions.c:90
+msgid "Temporary  Speed _Limits"
+msgstr ""
+
 #: ../gtk/actions.c:91
 msgid "_Minimal View"
 msgstr "작은 화면(_M)"
+
+#: ../gtk/actions.c:92
+msgid "Re_verse Sort Order"
+msgstr ""
+
+#: ../gtk/actions.c:93
+msgid "_Filterbar"
+msgstr ""
 
 #: ../gtk/actions.c:94
 msgid "_Statusbar"
@@ -57,6 +93,10 @@ msgstr "토런트(_T)"
 #: ../gtk/actions.c:101
 msgid "_View"
 msgstr "보기(_V)"
+
+#: ../gtk/actions.c:102
+msgid "_Sort Torrents By"
+msgstr ""
 
 #: ../gtk/actions.c:103
 msgid "_Edit"
@@ -114,6 +154,10 @@ msgstr "모두 시작(_S)"
 msgid "Start all torrents"
 msgstr "모든 토런트 시작"
 
+#: ../gtk/actions.c:113
+msgid "Set _Location"
+msgstr ""
+
 #: ../gtk/actions.c:114
 msgid "Remove torrent"
 msgstr "토런트 삭제"
@@ -153,6 +197,10 @@ msgstr "폴더 열기(_O)"
 #: ../gtk/actions.c:124
 msgid "_Contents"
 msgstr "내용(_C)"
+
+#: ../gtk/actions.c:125
+msgid "Ask Tracker for _More Peers"
+msgstr ""
 
 #: ../gtk/add-dialog.c:241
 msgid "Torrent files"
@@ -215,78 +263,6 @@ msgstr "\"%1$s\"를 열 수 없음. %2$s"
 #, c-format
 msgid "%s is already running."
 msgstr "%s는 이미 실행중임."
-
-#: ../gtk/details.c:1030 ../gtk/details.c:1070
-msgid "Down"
-msgstr "받기"
-
-#: ../gtk/details.c:1068
-msgid "Address"
-msgstr "주소"
-
-#: ../gtk/details.c:1072
-msgid "Up"
-msgstr "올리기"
-
-#: ../gtk/details.c:1073
-msgid "Client"
-msgstr "클라이언트"
-
-#: ../gtk/details.c:1074
-msgid "%"
-msgstr "%"
-
-#: ../gtk/details.c:1075
-msgid "Status"
-msgstr "상태"
-
-#: ../gtk/actions.c:49
-msgid "Sort by _Activity"
-msgstr ""
-
-#: ../gtk/actions.c:52
-msgid "Sort by Rati_o"
-msgstr ""
-
-#: ../gtk/actions.c:53
-msgid "Sort by Stat_e"
-msgstr ""
-
-#: ../gtk/actions.c:54
-msgid "Sort by T_racker"
-msgstr ""
-
-#: ../gtk/actions.c:56
-msgid "Sort by Time _Left"
-msgstr ""
-
-#: ../gtk/actions.c:57
-msgid "Sort by Si_ze"
-msgstr ""
-
-#: ../gtk/actions.c:90
-msgid "Temporary  Speed _Limits"
-msgstr ""
-
-#: ../gtk/actions.c:92
-msgid "Re_verse Sort Order"
-msgstr ""
-
-#: ../gtk/actions.c:93
-msgid "_Filterbar"
-msgstr ""
-
-#: ../gtk/actions.c:102
-msgid "_Sort Torrents By"
-msgstr ""
-
-#: ../gtk/actions.c:113
-msgid "Set _Location"
-msgstr ""
-
-#: ../gtk/actions.c:125
-msgid "Ask Tracker for _More Peers"
-msgstr ""
 
 #: ../gtk/conf.c:448 ../gtk/conf.c:453
 #, c-format
@@ -506,6 +482,30 @@ msgstr ""
 #: ../gtk/details.c:1028
 msgid "Webseeds"
 msgstr ""
+
+#: ../gtk/details.c:1030 ../gtk/details.c:1070
+msgid "Down"
+msgstr "받기"
+
+#: ../gtk/details.c:1068
+msgid "Address"
+msgstr "주소"
+
+#: ../gtk/details.c:1072
+msgid "Up"
+msgstr "올리기"
+
+#: ../gtk/details.c:1073
+msgid "Client"
+msgstr "클라이언트"
+
+#: ../gtk/details.c:1074
+msgid "%"
+msgstr "%"
+
+#: ../gtk/details.c:1075
+msgid "Status"
+msgstr "상태"
 
 #: ../gtk/details.c:1403
 msgid "Optimistic unchoke"

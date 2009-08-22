@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2009-08-13 23:52+0000\n"
+"X-Launchpad-Export-Date: 2009-08-22 16:00+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:49
@@ -31,9 +31,29 @@ msgstr "_Név szerinti rendezés"
 msgid "Sort by _Progress"
 msgstr "Előre_haladás szerinti rendezés"
 
+#: ../gtk/actions.c:52
+msgid "Sort by Rati_o"
+msgstr "Megosztási _arány szerinti rendezés"
+
+#: ../gtk/actions.c:53
+msgid "Sort by Stat_e"
+msgstr "Álla_pot szerinti rendezés"
+
+#: ../gtk/actions.c:54
+msgid "Sort by T_racker"
+msgstr "Köve_tő szerinti rendezés"
+
 #: ../gtk/actions.c:55
 msgid "Sort by A_ge"
 msgstr "_Kor szerinti rendezés"
+
+#: ../gtk/actions.c:56
+msgid "Sort by Time _Left"
+msgstr "Hátralévő _idő szerinti rendezés"
+
+#: ../gtk/actions.c:57
+msgid "Sort by Si_ze"
+msgstr "_Méret szerinti rendezés"
 
 #: ../gtk/actions.c:74
 msgid "_Main Window"
@@ -43,9 +63,17 @@ msgstr "_Főablak megjelenítése"
 msgid "Message _Log"
 msgstr "Ü_zenetnapló"
 
+#: ../gtk/actions.c:90
+msgid "Temporary  Speed _Limits"
+msgstr "Ideiglenes sebesség_korlátok"
+
 #: ../gtk/actions.c:91
 msgid "_Minimal View"
 msgstr "_Minimalizált nézet"
+
+#: ../gtk/actions.c:92
+msgid "Re_verse Sort Order"
+msgstr "_Fordított rendezés"
 
 #: ../gtk/actions.c:93
 msgid "_Filterbar"
@@ -126,6 +154,10 @@ msgstr "Összes in_dítása"
 #: ../gtk/actions.c:112
 msgid "Start all torrents"
 msgstr "Minden torrent elindítása"
+
+#: ../gtk/actions.c:113
+msgid "Set _Location"
+msgstr "_Hely beállítása"
 
 #: ../gtk/actions.c:114
 msgid "Remove torrent"
@@ -233,6 +265,11 @@ msgstr "„%1$s” nem nyitható meg: %2$s"
 msgid "%s is already running."
 msgstr "A(z) %s már fut."
 
+#: ../gtk/conf.c:448 ../gtk/conf.c:453
+#, c-format
+msgid "Importing \"%s\""
+msgstr "„%s” importálása"
+
 #: ../gtk/details.c:470 ../gtk/file-list.c:579
 msgid "High"
 msgstr "Magas"
@@ -245,6 +282,14 @@ msgstr "Közepes"
 msgid "Low"
 msgstr "Alacsony"
 
+#: ../gtk/details.c:508 ../gtk/tr-prefs.c:1395
+msgid "Speed"
+msgstr "Sebesség"
+
+#: ../gtk/details.c:510
+msgid "Honor global _limits"
+msgstr "Á_ltalános korlátok betartása"
+
 #: ../gtk/details.c:515 ../gtk/tr-prefs.c:1180
 msgid "Limit _download speed (KB/s):"
 msgstr "_Letöltési sebesség korlátozása (KB/s):"
@@ -252,6 +297,26 @@ msgstr "_Letöltési sebesség korlátozása (KB/s):"
 #: ../gtk/details.c:527 ../gtk/tr-prefs.c:1187
 msgid "Limit _upload speed (KB/s):"
 msgstr "_Feltöltési sebesség korlátozása (KB/s):"
+
+#: ../gtk/details.c:539
+msgid "Torrent _priority:"
+msgstr "Torrent p_rioritása:"
+
+#: ../gtk/details.c:543
+msgid "Seed-Until Ratio"
+msgstr "Megosztás arányig"
+
+#: ../gtk/details.c:546
+msgid "Use _global settings"
+msgstr "_Globális beállítás használata"
+
+#: ../gtk/details.c:555
+msgid "Seed _regardless of ratio"
+msgstr "Megosztás aránytól _függetlenül"
+
+#: ../gtk/details.c:564 ../gtk/tr-prefs.c:311
+msgid "_Seed torrent until its ratio reaches:"
+msgstr "_Megosztás eddig az arányig:"
 
 #: ../gtk/details.c:581
 msgid "Peer Connections"
@@ -265,9 +330,17 @@ msgstr "_Partnerszám maximum:"
 msgid "Waiting to verify local data"
 msgstr "Várakozás helyi adatok ellenőrzésére"
 
+#: ../gtk/details.c:604
+msgid "Verifying local data"
+msgstr "Helyi adatok ellenőrzése"
+
 #: ../gtk/details.c:605
 msgid "Downloading"
 msgstr "Letöltés"
+
+#: ../gtk/details.c:606
+msgid "Seeding"
+msgstr "Megosztás"
 
 #: ../gtk/details.c:607 ../gtk/torrent-cell-renderer.c:169
 msgid "Paused"
@@ -282,13 +355,74 @@ msgstr "Nincs"
 msgid "Mixed"
 msgstr "Vegyes"
 
+#: ../gtk/details.c:639
+msgid "Private to this tracker -- DHT and PEX disabled"
+msgstr "Privát torrent - DHT és PEX kikapcsolva"
+
 #: ../gtk/details.c:641
 msgid "Public torrent"
 msgstr "Publikus torrent"
 
+#: ../gtk/details.c:663
+#, c-format
+msgid "Created by %1$s"
+msgstr "Készítette: %1$s"
+
+#: ../gtk/details.c:665
+#, c-format
+msgid "Created on %1$s"
+msgstr "Létrehozva ekkor: %1$s"
+
+#: ../gtk/details.c:667
+#, c-format
+msgid "Created by %1$s on %2$s"
+msgstr "Késztette %1$s, ekkor: %2$s"
+
+#: ../gtk/details.c:758
+#, c-format
+msgid "%1$s (%2$'d piece @ %3$s)"
+msgid_plural "%1$s (%2$'d pieces @ %3$s)"
+msgstr[0] "%1$s (%2$'d szelet @ %3$s)"
+msgstr[1] "%1$s (%2$'d szelet @ %3$s)"
+
+#: ../gtk/details.c:764
+#, c-format
+msgid "%1$s (%2$'d piece)"
+msgid_plural "%1$s (%2$'d pieces)"
+msgstr[0] "%1$s (%2$'d szelet)"
+msgstr[1] "%1$s (%2$'d szelet)"
+
+#: ../gtk/details.c:798
+#, c-format
+msgid "%1$s (%2$.1f%%); %3$s Unverified"
+msgstr "%1$s (%2$.1f%%); %3$s ellenőrizetlen"
+
+#: ../gtk/details.c:800
+#, c-format
+msgid "%1$s (%2$.1f%%)"
+msgstr "%1$s (%2$.1f%%)"
+
+#: ../gtk/details.c:820
+#, c-format
+msgid "%1$s (+%2$s corrupt)"
+msgstr "%1$s (+%2$s sérült)"
+
+#: ../gtk/details.c:893
+msgid "Active now"
+msgstr "Most aktív"
+
+#: ../gtk/details.c:897
+#, c-format
+msgid "%1$s ago"
+msgstr ""
+
 #: ../gtk/details.c:916
 msgid "Activity"
 msgstr "Aktivitás"
+
+#: ../gtk/details.c:920
+msgid "Torrent size:"
+msgstr "Torrent mérete:"
 
 #: ../gtk/details.c:924
 msgid "Have:"
@@ -310,6 +444,14 @@ msgstr "Arány:"
 msgid "State:"
 msgstr "Állapot:"
 
+#: ../gtk/details.c:944
+msgid "Running time:"
+msgstr "Futási idő:"
+
+#: ../gtk/details.c:948
+msgid "Last activity:"
+msgstr "Utolsó esemény:"
+
 #: ../gtk/details.c:952
 msgid "Error:"
 msgstr "Hiba:"
@@ -317,6 +459,10 @@ msgstr "Hiba:"
 #: ../gtk/details.c:956
 msgid "Details"
 msgstr "Részletek"
+
+#: ../gtk/details.c:962
+msgid "Location:"
+msgstr "Hely:"
 
 #: ../gtk/details.c:969
 msgid "Hash:"
@@ -326,9 +472,17 @@ msgstr "Hash:"
 msgid "Privacy:"
 msgstr "Magánszféra:"
 
+#: ../gtk/details.c:979
+msgid "Origin:"
+msgstr "Forrás:"
+
 #: ../gtk/details.c:996
 msgid "Comment:"
 msgstr "Megjegyzés:"
+
+#: ../gtk/details.c:1028
+msgid "Webseeds"
+msgstr "Webes megosztások"
 
 #: ../gtk/details.c:1030 ../gtk/details.c:1070
 msgid "Down"
@@ -390,6 +544,10 @@ msgstr "Titkosított kapcsolat"
 msgid "Peer was discovered through Peer Exchange (PEX)"
 msgstr "Partnercserével (PEX) felfedezett partner"
 
+#: ../gtk/details.c:1412
+msgid "Peer was discovered through DHT"
+msgstr "A partner DHT-n keresztül lett felfedezve"
+
 #: ../gtk/details.c:1413
 msgid "Peer is an incoming connection"
 msgstr "A partner egy beérkező kapcsolat"
@@ -409,6 +567,10 @@ msgstr "<b>Befejezve ennyiszer:</b>"
 #: ../gtk/details.c:1644
 msgid "Now"
 msgstr "Most"
+
+#: ../gtk/details.c:1646
+msgid "None sent"
+msgstr "Nincs küldve"
 
 #: ../gtk/details.c:1647
 msgid "In progress"
@@ -480,6 +642,11 @@ msgstr "Beállítások"
 #, c-format
 msgid "%s Properties"
 msgstr "%s tulajdonságai"
+
+#: ../gtk/details.c:1970
+#, c-format
+msgid "%'d Torrent Properties"
+msgstr "%'d torrent tulajdonságai"
 
 #: ../gtk/dialogs.c:121
 msgid "<big><b>Quit Transmission?</b></big>"
@@ -765,9 +932,38 @@ msgstr "Fájl megnyitása"
 msgid "Open Folder"
 msgstr "Mappa megnyitása"
 
+#: ../gtk/notify.c:121
+msgid "Torrent Added"
+msgstr "Torrent hozzáadva"
+
+#: ../gtk/relocate.c:68
+#, c-format
+msgid "Moving \"%s\""
+msgstr "„%s” áthelyezése"
+
+#: ../gtk/relocate.c:70
+msgid "This may take a moment..."
+msgstr "Ez eltarthat egy ideig…"
+
+#: ../gtk/relocate.c:99 ../gtk/relocate.c:121
+msgid "Set Torrent Location"
+msgstr "Torrent helyének beálltása"
+
 #: ../gtk/relocate.c:117
 msgid "Location"
 msgstr "Hely"
+
+#: ../gtk/relocate.c:124
+msgid "Torrent _location:"
+msgstr "Torrent _helye:"
+
+#: ../gtk/relocate.c:125
+msgid "_Move from the current folder"
+msgstr "Áthelyezés a jelenlegi _mappából"
+
+#: ../gtk/relocate.c:128
+msgid "Local data is _already there"
+msgstr "A helyi adatok már _ott vannak"
 
 #: ../gtk/stats.c:75 ../gtk/stats.c:156
 #, c-format
@@ -809,6 +1005,15 @@ msgstr "%1$s, összesen %2$s (%3$.2f %%)"
 #, c-format
 msgid "%1$s of %2$s (%3$.2f%%), uploaded %4$s (Ratio: %5$s)"
 msgstr "%1$s, összesen %2$s (%3$.2f %%), feltöltve %4$s (Arány: %5$s)"
+
+#. %1$s is the torrent's total size,
+#. %2$s is how much we've uploaded,
+#. %3$s is our upload-to-download ratio,
+#. $4$s is the ratio we want to reach before we stop uploading
+#: ../gtk/torrent-cell-renderer.c:88
+#, c-format
+msgid "%1$s, uploaded %2$s (Ratio: %3$s Goal: %4$s)"
+msgstr "%1$s, feltöltve %2$s (Arány: %3$s Cél: %4$s)"
 
 #. %1$s is the torrent's total size,
 #. %2$s is how much we've uploaded,
@@ -916,6 +1121,26 @@ msgstr "Nem lehet letiltani a számítógép hibernálását: %s"
 msgid "Allowing desktop hibernation"
 msgstr "Számítógép hibernálásának engedélyezése"
 
+#: ../gtk/tr-icon.c:77 ../gtk/tr-icon.c:92
+#, c-format
+msgid "(Limit: %s)"
+msgstr "(Korlát: %s)"
+
+#. %1$s: current upload speed
+#. * %2$s: current upload limit, if any
+#. * %3$s: current download speed
+#. * %4$s: current download limit, if any
+#: ../gtk/tr-icon.c:99
+#, c-format
+msgid ""
+"Transmission\n"
+"Up: %1$s %2$s\n"
+"Down: %3$s %4$s"
+msgstr ""
+"Transmission\n"
+"Fel: %1$s %2$s\n"
+"Le: %3$s %4$s"
+
 #: ../gtk/tr-prefs.c:281
 msgid "Adding Torrents"
 msgstr "Torrentek hozzáadása"
@@ -928,6 +1153,10 @@ msgstr "Torrentek automatikus _hozzáadása innen:"
 msgid "Mo_ve source files to Trash"
 msgstr "Forrásfájlok át_helyezése a Kukába"
 
+#: ../gtk/tr-prefs.c:306
+msgid "Save to _Location:"
+msgstr "Mentés _helye:"
+
 #: ../gtk/tr-prefs.c:309 ../gtk/tr-prefs.c:1354
 msgid "Limits"
 msgstr "Korlátok"
@@ -936,12 +1165,55 @@ msgstr "Korlátok"
 msgid "Desktop"
 msgstr "Asztal"
 
+#: ../gtk/tr-prefs.c:337
+msgid "Inhibit _hibernation when torrents are active"
+msgstr "_Hibernáció tiltása, ha vannak aktív torrentek"
+
+#: ../gtk/tr-prefs.c:341
+msgid "Show Transmission in the system _tray"
+msgstr "Ikon megjelenítése az értesítési területen"
+
+#: ../gtk/tr-prefs.c:345
+msgid "Show popup _notifications"
+msgstr "Felbukkanó figyelmeztetések engedélyezése"
+
 #: ../gtk/tr-prefs.c:372
 #, c-format
 msgid "Enable _blocklist (contains %'d rule)"
 msgid_plural "Enable _blocklist (contains %'d rules)"
 msgstr[0] "Bl_okkolási lista engedélyezése (%'d szabályt tartalmaz)"
 msgstr[1] "Bl_okkolási lista engedélyezése (%'d szabályt tartalmaz)"
+
+#: ../gtk/tr-prefs.c:402
+#, c-format
+msgid "Blocklist now has %'d rule."
+msgid_plural "Blocklist now has %'d rules."
+msgstr[0] "A tiltólista %'d szabályt tartalmaz."
+msgstr[1] "A tiltólista %'d szabályt tartalmaz."
+
+#: ../gtk/tr-prefs.c:406
+msgid "<b>Update succeeded!</b>"
+msgstr "<b>Sikeres frissítés!</b>"
+
+#: ../gtk/tr-prefs.c:421
+msgid "Update Blocklist"
+msgstr "Tiltólista frissítése"
+
+#: ../gtk/tr-prefs.c:423
+msgid "Getting new blocklist..."
+msgstr "Új tiltólista lekérése…"
+
+#: ../gtk/tr-prefs.c:458
+msgid "Allow encryption"
+msgstr "Titkosítás engedélyezése"
+
+#: ../gtk/tr-prefs.c:459
+msgid "Prefer encryption"
+msgstr "Titkosítás előnyben részesítése"
+
+#: ../gtk/tr-prefs.c:460
+msgid "Require encryption"
+msgstr "Titkosítás megkövetelése"
 
 #: ../gtk/tr-prefs.c:504
 msgid "Blocklist"
@@ -955,9 +1227,53 @@ msgstr "_Frissítés"
 msgid "Enable _automatic updates"
 msgstr "_Automatikus frissítések engedélyezése"
 
+#: ../gtk/tr-prefs.c:527 ../gtk/tr-prefs.c:1398
+msgid "Privacy"
+msgstr "Adatvédelem"
+
+#: ../gtk/tr-prefs.c:529
+msgid "_Encryption mode:"
+msgstr "_Titkosítás módja:"
+
+#: ../gtk/tr-prefs.c:533
+msgid "Use PE_X to find more peers"
+msgstr "PE_X használata partnerek keresésére"
+
+#: ../gtk/tr-prefs.c:535
+msgid ""
+"PEX is a tool for exchanging peer lists with the peers you're connected to."
+msgstr ""
+"A PEX eszköz a partnerlisták cseréjére szolgál a csatlakozott partnerekkel."
+
+#: ../gtk/tr-prefs.c:540
+msgid "Use _DHT to find more peers"
+msgstr "_DHT használata partnerek keresésére"
+
+#: ../gtk/tr-prefs.c:542
+msgid "DHT is a tool for finding peers without a tracker."
+msgstr "A DHT eszköz partnerek követő nélküli keresésére szolgál."
+
+#: ../gtk/tr-prefs.c:753
+msgid "Web Client"
+msgstr "Webes felület"
+
+#. "enabled" checkbutton
+#: ../gtk/tr-prefs.c:756
+msgid "_Enable web client"
+msgstr "Webes felület _engedélyezése"
+
+#: ../gtk/tr-prefs.c:762
+msgid "_Open web client"
+msgstr "Webes felület _megnyitása"
+
 #: ../gtk/tr-prefs.c:771
 msgid "Listening _port:"
 msgstr "Figyelő_port:"
+
+#. require authentication
+#: ../gtk/tr-prefs.c:775 ../gtk/tr-prefs.c:992
+msgid "Use _authentication"
+msgstr "_Hitelesítés szükséges"
 
 #. username
 #: ../gtk/tr-prefs.c:783 ../gtk/tr-prefs.c:998
@@ -968,6 +1284,11 @@ msgstr "_Felhasználónév:"
 #: ../gtk/tr-prefs.c:790 ../gtk/tr-prefs.c:1004
 msgid "Pass_word:"
 msgstr "_Jelszó:"
+
+#. require authentication
+#: ../gtk/tr-prefs.c:798
+msgid "Only allow these IP a_ddresses to connect:"
+msgstr "_Csak a következő IP-címek csatlakozásának engedélyezése:"
 
 #: ../gtk/tr-prefs.c:823
 msgid "IP addresses may use wildcards, such as 192.168.*.*"
@@ -994,9 +1315,83 @@ msgstr "Proxy _port:"
 msgid "Proxy _type:"
 msgstr "Proxy _típusa:"
 
+#: ../gtk/tr-prefs.c:1117
+msgid "Every Day"
+msgstr "Minden nap"
+
+#: ../gtk/tr-prefs.c:1118
+msgid "Weekdays"
+msgstr "Hétköznap"
+
+#: ../gtk/tr-prefs.c:1119
+msgid "Weekends"
+msgstr "Hétvégén"
+
+#: ../gtk/tr-prefs.c:1120
+msgid "Sunday"
+msgstr "Vasárnap"
+
+#: ../gtk/tr-prefs.c:1121
+msgid "Monday"
+msgstr "Hétfő"
+
+#: ../gtk/tr-prefs.c:1122
+msgid "Tuesday"
+msgstr "Kedd"
+
+#: ../gtk/tr-prefs.c:1123
+msgid "Wednesday"
+msgstr "Szerda"
+
+#: ../gtk/tr-prefs.c:1124
+msgid "Thursday"
+msgstr "Csütörtök"
+
+#: ../gtk/tr-prefs.c:1125
+msgid "Friday"
+msgstr "Péntek"
+
+#: ../gtk/tr-prefs.c:1126
+msgid "Saturday"
+msgstr "Szombat"
+
+#: ../gtk/tr-prefs.c:1178
+msgid "Speed Limits"
+msgstr "Sebességkorlátok"
+
+#: ../gtk/tr-prefs.c:1198
+msgid "Temporary Speed Limits"
+msgstr "Ideiglenes sebességkorlátok"
+
+#: ../gtk/tr-prefs.c:1205
+msgid "Override normal speed limits manually or at scheduled times"
+msgstr ""
+"Általános sebességkorlátok figyelmen kívül hagyása kézileg, vagy ütemezett "
+"időben"
+
+#: ../gtk/tr-prefs.c:1212
+msgid "Limit do_wnload speed (KB/s):"
+msgstr "_Letöltési sebesség korlátozása (kB/s):"
+
 #: ../gtk/tr-prefs.c:1216
 msgid "Limit u_pload speed (KB/s):"
 msgstr "Feltöltési sebesség k_orlátozása (KB/s):"
+
+#: ../gtk/tr-prefs.c:1220
+msgid "_Scheduled times:"
+msgstr "Ütemezett i_dőszak:"
+
+#: ../gtk/tr-prefs.c:1225
+msgid " _to "
+msgstr " _eddig: "
+
+#: ../gtk/tr-prefs.c:1236
+msgid "_On days:"
+msgstr "Ezen _napokon:"
+
+#: ../gtk/tr-prefs.c:1270 ../gtk/tr-prefs.c:1335
+msgid "Status unknown"
+msgstr "Állapot ismeretlen"
 
 #: ../gtk/tr-prefs.c:1292
 msgid "Port is <b>open</b>"
@@ -1006,13 +1401,29 @@ msgstr "A port <b>nyitva</b>"
 msgid "Port is <b>closed</b>"
 msgstr "A port <b>zárva</b>"
 
+#: ../gtk/tr-prefs.c:1306
+msgid "<i>Testing...</i>"
+msgstr "<i>Tesztelés…</i>"
+
 #: ../gtk/tr-prefs.c:1328
 msgid "Incoming Peers"
 msgstr "Bejövő partnerek"
 
+#: ../gtk/tr-prefs.c:1330
+msgid "_Port for incoming connections:"
+msgstr "_Port a bejövő kapcsolatoknak:"
+
+#: ../gtk/tr-prefs.c:1338
+msgid "Te_st Port"
+msgstr "P_ort tesztelése"
+
 #: ../gtk/tr-prefs.c:1345
 msgid "Use UPnP or NAT-PMP port _forwarding from my router"
 msgstr "UPnP vagy _NAT-PMP portátirányítás használata a routeremről"
+
+#: ../gtk/tr-prefs.c:1349
+msgid "Pick a _random port every time Transmission is started"
+msgstr "Véletlenszerű port _választása minden indításkor"
 
 #: ../gtk/tr-prefs.c:1357
 msgid "Maximum peers per _torrent:"
@@ -1037,6 +1448,10 @@ msgstr "Hálózat"
 #: ../gtk/tr-prefs.c:1407
 msgid "Web"
 msgstr "Web"
+
+#: ../gtk/tr-prefs.c:1410
+msgid "Proxy"
+msgstr "Proxy"
 
 #: ../gtk/tr-torrent.c:233
 #, c-format
@@ -1073,10 +1488,53 @@ msgstr "Összes átvitel"
 msgid "Session Transfer"
 msgstr "Munkamenet átvitele"
 
+#: ../gtk/tr-window.c:340
+#, c-format
+msgid ""
+"Click to disable Temporary Speed Limits\n"
+"(%1$s down, %2$s up)"
+msgstr ""
+"Ideiglenes sebességkorlátozás kikapcsolása\n"
+"(%1$s le, %2$s fel)"
+
+#: ../gtk/tr-window.c:341
+#, c-format
+msgid ""
+"Click to enable Temporary Speed Limits\n"
+"(%1$s down, %2$s up)"
+msgstr ""
+"Ideiglenes sebességkorlátozás bekapcsolása\n"
+"(%1$s le, %2$s fel)"
+
 #: ../gtk/tr-window.c:590
 #, c-format
 msgid "Tracker will allow requests in %s"
 msgstr "A követő engedélyezi a kéréseket itt: %s"
+
+#: ../gtk/tr-window.c:661
+msgid "Unlimited"
+msgstr "Korlátlan"
+
+#: ../gtk/tr-window.c:728
+msgid "Seed Forever"
+msgstr "Megosztás folyamatosan"
+
+#: ../gtk/tr-window.c:766
+msgid "Limit Download Speed"
+msgstr "Letöltési sebesség korlátozása"
+
+#: ../gtk/tr-window.c:770
+msgid "Limit Upload Speed"
+msgstr "Feltöltési sebesség korlátozása"
+
+#: ../gtk/tr-window.c:777
+msgid "Stop Seeding at Ratio"
+msgstr "Megosztás megállítása ekkora aránynál"
+
+#: ../gtk/tr-window.c:811
+#, c-format
+msgid "Stop at Ratio (%s)"
+msgstr "Megállás %s aránynál"
 
 #. show all torrents
 #: ../gtk/tr-window.c:837
@@ -1235,6 +1693,11 @@ msgstr "A blokkolási lista („%1$s”) %2$'d bejegyzéssel frissítve"
 msgid "Couldn't read resume file"
 msgstr "A folytatáshoz szükséges adatok nem olvashatók"
 
+#: ../libtransmission/fdlimit.c:296
+#, c-format
+msgid "Couldn't create \"%1$s\": \"%2$s\" is not a folder"
+msgstr "„%1$s” nem hozható létre: „%2$s” nem könyvtár."
+
 #: ../libtransmission/fdlimit.c:319
 #, c-format
 msgid "Preallocated file \"%s\""
@@ -1278,6 +1741,11 @@ msgstr "a port (%d) már nincs átirányítva"
 #, c-format
 msgid "Port %d forwarded successfully"
 msgstr "A port (%d) sikeresen átirányítva"
+
+#: ../libtransmission/net.c:323
+#, c-format
+msgid "Couldn't set source address %s on %d: %s"
+msgstr "Nem állítható be a forráscím (%s) ezen: %d: %s"
 
 #: ../libtransmission/net.c:339
 #, c-format
@@ -1369,6 +1837,11 @@ msgstr "Megtalált internetátjáró-eszköz: „%s”"
 msgid "Local Address is \"%s\""
 msgstr "A helyi cím: „%s”"
 
+#: ../libtransmission/upnp.c:144
+#, c-format
+msgid "Port %d isn't forwarded"
+msgstr "A port (%d) nincs továbbítva"
+
 #: ../libtransmission/upnp.c:158
 #, c-format
 msgid "Stopping port forwarding through \"%s\", service \"%s\""
@@ -1424,476 +1897,3 @@ msgstr "Ellenőrzéshez sorba állítva"
 
 #~ msgid "Dates"
 #~ msgstr "Dátumok"
-
-#: ../gtk/actions.c:52
-msgid "Sort by Rati_o"
-msgstr "Megosztási _arány szerinti rendezés"
-
-#: ../gtk/actions.c:53
-msgid "Sort by Stat_e"
-msgstr "Álla_pot szerinti rendezés"
-
-#: ../gtk/actions.c:54
-msgid "Sort by T_racker"
-msgstr "Köve_tő szerinti rendezés"
-
-#: ../gtk/actions.c:56
-msgid "Sort by Time _Left"
-msgstr "Hátralévő _idő szerinti rendezés"
-
-#: ../gtk/actions.c:57
-msgid "Sort by Si_ze"
-msgstr "_Méret szerinti rendezés"
-
-#: ../gtk/actions.c:90
-msgid "Temporary  Speed _Limits"
-msgstr "Ideiglenes sebesség_korlátok"
-
-#: ../gtk/actions.c:92
-msgid "Re_verse Sort Order"
-msgstr "_Fordított rendezés"
-
-#: ../gtk/actions.c:113
-msgid "Set _Location"
-msgstr "_Hely beállítása"
-
-#: ../gtk/conf.c:448 ../gtk/conf.c:453
-#, c-format
-msgid "Importing \"%s\""
-msgstr "„%s” importálása"
-
-#: ../gtk/details.c:508 ../gtk/tr-prefs.c:1395
-msgid "Speed"
-msgstr "Sebesség"
-
-#: ../gtk/details.c:510
-msgid "Honor global _limits"
-msgstr "Á_ltalános korlátok betartása"
-
-#: ../gtk/details.c:539
-msgid "Torrent _priority:"
-msgstr "Torrent p_rioritása:"
-
-#: ../gtk/details.c:543
-msgid "Seed-Until Ratio"
-msgstr "Megosztás arányig"
-
-#: ../gtk/details.c:546
-msgid "Use _global settings"
-msgstr "_Globális beállítás használata"
-
-#: ../gtk/details.c:555
-msgid "Seed _regardless of ratio"
-msgstr "Megosztás aránytól _függetlenül"
-
-#: ../gtk/details.c:564 ../gtk/tr-prefs.c:311
-msgid "_Seed torrent until its ratio reaches:"
-msgstr "_Megosztás eddig az arányig:"
-
-#: ../gtk/details.c:604
-msgid "Verifying local data"
-msgstr "Helyi adatok ellenőrzése"
-
-#: ../gtk/details.c:606
-msgid "Seeding"
-msgstr "Megosztás"
-
-#: ../gtk/details.c:639
-msgid "Private to this tracker -- DHT and PEX disabled"
-msgstr "Privát torrent - DHT és PEX kikapcsolva"
-
-#: ../gtk/details.c:663
-#, c-format
-msgid "Created by %1$s"
-msgstr "Készítette: %1$s"
-
-#: ../gtk/details.c:665
-#, c-format
-msgid "Created on %1$s"
-msgstr "Létrehozva ekkor: %1$s"
-
-#: ../gtk/details.c:667
-#, c-format
-msgid "Created by %1$s on %2$s"
-msgstr "Késztette %1$s, ekkor: %2$s"
-
-#: ../gtk/details.c:758
-#, c-format
-msgid "%1$s (%2$'d piece @ %3$s)"
-msgid_plural "%1$s (%2$'d pieces @ %3$s)"
-msgstr[0] "%1$s (%2$'d szelet @ %3$s)"
-msgstr[1] "%1$s (%2$'d szelet @ %3$s)"
-
-#: ../gtk/details.c:764
-#, c-format
-msgid "%1$s (%2$'d piece)"
-msgid_plural "%1$s (%2$'d pieces)"
-msgstr[0] "%1$s (%2$'d szelet)"
-msgstr[1] "%1$s (%2$'d szelet)"
-
-#: ../gtk/details.c:798
-#, c-format
-msgid "%1$s (%2$.1f%%); %3$s Unverified"
-msgstr "%1$s (%2$.1f%%); %3$s ellenőrizetlen"
-
-#: ../gtk/details.c:800
-#, c-format
-msgid "%1$s (%2$.1f%%)"
-msgstr "%1$s (%2$.1f%%)"
-
-#: ../gtk/details.c:820
-#, c-format
-msgid "%1$s (+%2$s corrupt)"
-msgstr "%1$s (+%2$s sérült)"
-
-#: ../gtk/details.c:893
-msgid "Active now"
-msgstr "Most aktív"
-
-#: ../gtk/details.c:897
-#, c-format
-msgid "%1$s ago"
-msgstr ""
-
-#: ../gtk/details.c:920
-msgid "Torrent size:"
-msgstr "Torrent mérete:"
-
-#: ../gtk/details.c:944
-msgid "Running time:"
-msgstr "Futási idő:"
-
-#: ../gtk/details.c:948
-msgid "Last activity:"
-msgstr "Utolsó esemény:"
-
-#: ../gtk/details.c:962
-msgid "Location:"
-msgstr "Hely:"
-
-#: ../gtk/details.c:979
-msgid "Origin:"
-msgstr "Forrás:"
-
-#: ../gtk/details.c:1028
-msgid "Webseeds"
-msgstr "Webes megosztások"
-
-#: ../gtk/details.c:1412
-msgid "Peer was discovered through DHT"
-msgstr "A partner DHT-n keresztül lett felfedezve"
-
-#: ../gtk/details.c:1646
-msgid "None sent"
-msgstr "Nincs küldve"
-
-#: ../gtk/details.c:1970
-#, c-format
-msgid "%'d Torrent Properties"
-msgstr "%'d torrent tulajdonságai"
-
-#: ../gtk/notify.c:121
-msgid "Torrent Added"
-msgstr "Torrent hozzáadva"
-
-#: ../gtk/relocate.c:68
-#, c-format
-msgid "Moving \"%s\""
-msgstr "„%s” áthelyezése"
-
-#: ../gtk/relocate.c:70
-msgid "This may take a moment..."
-msgstr "Ez eltarthat egy ideig…"
-
-#: ../gtk/relocate.c:99 ../gtk/relocate.c:121
-msgid "Set Torrent Location"
-msgstr "Torrent helyének beálltása"
-
-#: ../gtk/relocate.c:124
-msgid "Torrent _location:"
-msgstr "Torrent _helye:"
-
-#: ../gtk/relocate.c:125
-msgid "_Move from the current folder"
-msgstr "Áthelyezés a jelenlegi _mappából"
-
-#: ../gtk/relocate.c:128
-msgid "Local data is _already there"
-msgstr "A helyi adatok már _ott vannak"
-
-#. %1$s is the torrent's total size,
-#. %2$s is how much we've uploaded,
-#. %3$s is our upload-to-download ratio,
-#. $4$s is the ratio we want to reach before we stop uploading
-#: ../gtk/torrent-cell-renderer.c:88
-#, c-format
-msgid "%1$s, uploaded %2$s (Ratio: %3$s Goal: %4$s)"
-msgstr "%1$s, feltöltve %2$s (Arány: %3$s Cél: %4$s)"
-
-#: ../gtk/tr-icon.c:77 ../gtk/tr-icon.c:92
-#, c-format
-msgid "(Limit: %s)"
-msgstr "(Korlát: %s)"
-
-#. %1$s: current upload speed
-#. * %2$s: current upload limit, if any
-#. * %3$s: current download speed
-#. * %4$s: current download limit, if any
-#: ../gtk/tr-icon.c:99
-#, c-format
-msgid ""
-"Transmission\n"
-"Up: %1$s %2$s\n"
-"Down: %3$s %4$s"
-msgstr ""
-"Transmission\n"
-"Fel: %1$s %2$s\n"
-"Le: %3$s %4$s"
-
-#: ../gtk/tr-prefs.c:306
-msgid "Save to _Location:"
-msgstr "Mentés _helye:"
-
-#: ../gtk/tr-prefs.c:337
-msgid "Inhibit _hibernation when torrents are active"
-msgstr "_Hibernáció tiltása, ha vannak aktív torrentek"
-
-#: ../gtk/tr-prefs.c:341
-msgid "Show Transmission in the system _tray"
-msgstr "Ikon megjelenítése az értesítési területen"
-
-#: ../gtk/tr-prefs.c:345
-msgid "Show popup _notifications"
-msgstr "Felbukkanó figyelmeztetések engedélyezése"
-
-#: ../gtk/tr-prefs.c:402
-#, c-format
-msgid "Blocklist now has %'d rule."
-msgid_plural "Blocklist now has %'d rules."
-msgstr[0] "A tiltólista %'d szabályt tartalmaz."
-msgstr[1] "A tiltólista %'d szabályt tartalmaz."
-
-#: ../gtk/tr-prefs.c:406
-msgid "<b>Update succeeded!</b>"
-msgstr "<b>Sikeres frissítés!</b>"
-
-#: ../gtk/tr-prefs.c:421
-msgid "Update Blocklist"
-msgstr "Tiltólista frissítése"
-
-#: ../gtk/tr-prefs.c:423
-msgid "Getting new blocklist..."
-msgstr "Új tiltólista lekérése…"
-
-#: ../gtk/tr-prefs.c:458
-msgid "Allow encryption"
-msgstr "Titkosítás engedélyezése"
-
-#: ../gtk/tr-prefs.c:459
-msgid "Prefer encryption"
-msgstr "Titkosítás előnyben részesítése"
-
-#: ../gtk/tr-prefs.c:460
-msgid "Require encryption"
-msgstr "Titkosítás megkövetelése"
-
-#: ../gtk/tr-prefs.c:527 ../gtk/tr-prefs.c:1398
-msgid "Privacy"
-msgstr "Adatvédelem"
-
-#: ../gtk/tr-prefs.c:529
-msgid "_Encryption mode:"
-msgstr "_Titkosítás módja:"
-
-#: ../gtk/tr-prefs.c:533
-msgid "Use PE_X to find more peers"
-msgstr "PE_X használata partnerek keresésére"
-
-#: ../gtk/tr-prefs.c:535
-msgid ""
-"PEX is a tool for exchanging peer lists with the peers you're connected to."
-msgstr ""
-"A PEX eszköz a partnerlisták cseréjére szolgál a csatlakozott partnerekkel."
-
-#: ../gtk/tr-prefs.c:540
-msgid "Use _DHT to find more peers"
-msgstr "_DHT használata partnerek keresésére"
-
-#: ../gtk/tr-prefs.c:542
-msgid "DHT is a tool for finding peers without a tracker."
-msgstr "A DHT eszköz partnerek követő nélküli keresésére szolgál."
-
-#: ../gtk/tr-prefs.c:753
-msgid "Web Client"
-msgstr "Webes felület"
-
-#. "enabled" checkbutton
-#: ../gtk/tr-prefs.c:756
-msgid "_Enable web client"
-msgstr "Webes felület _engedélyezése"
-
-#: ../gtk/tr-prefs.c:762
-msgid "_Open web client"
-msgstr "Webes felület _megnyitása"
-
-#. require authentication
-#: ../gtk/tr-prefs.c:775 ../gtk/tr-prefs.c:992
-msgid "Use _authentication"
-msgstr "_Hitelesítés szükséges"
-
-#. require authentication
-#: ../gtk/tr-prefs.c:798
-msgid "Only allow these IP a_ddresses to connect:"
-msgstr "_Csak a következő IP-címek csatlakozásának engedélyezése:"
-
-#: ../gtk/tr-prefs.c:1117
-msgid "Every Day"
-msgstr "Minden nap"
-
-#: ../gtk/tr-prefs.c:1118
-msgid "Weekdays"
-msgstr "Hétköznap"
-
-#: ../gtk/tr-prefs.c:1119
-msgid "Weekends"
-msgstr "Hétvégén"
-
-#: ../gtk/tr-prefs.c:1120
-msgid "Sunday"
-msgstr "Vasárnap"
-
-#: ../gtk/tr-prefs.c:1121
-msgid "Monday"
-msgstr "Hétfő"
-
-#: ../gtk/tr-prefs.c:1122
-msgid "Tuesday"
-msgstr "Kedd"
-
-#: ../gtk/tr-prefs.c:1123
-msgid "Wednesday"
-msgstr "Szerda"
-
-#: ../gtk/tr-prefs.c:1124
-msgid "Thursday"
-msgstr "Csütörtök"
-
-#: ../gtk/tr-prefs.c:1125
-msgid "Friday"
-msgstr "Péntek"
-
-#: ../gtk/tr-prefs.c:1126
-msgid "Saturday"
-msgstr "Szombat"
-
-#: ../gtk/tr-prefs.c:1178
-msgid "Speed Limits"
-msgstr "Sebességkorlátok"
-
-#: ../gtk/tr-prefs.c:1198
-msgid "Temporary Speed Limits"
-msgstr "Ideiglenes sebességkorlátok"
-
-#: ../gtk/tr-prefs.c:1205
-msgid "Override normal speed limits manually or at scheduled times"
-msgstr ""
-"Általános sebességkorlátok figyelmen kívül hagyása kézileg, vagy ütemezett "
-"időben"
-
-#: ../gtk/tr-prefs.c:1212
-msgid "Limit do_wnload speed (KB/s):"
-msgstr "_Letöltési sebesség korlátozása (kB/s):"
-
-#: ../gtk/tr-prefs.c:1220
-msgid "_Scheduled times:"
-msgstr "Ütemezett i_dőszak:"
-
-#: ../gtk/tr-prefs.c:1225
-msgid " _to "
-msgstr " _eddig: "
-
-#: ../gtk/tr-prefs.c:1236
-msgid "_On days:"
-msgstr "Ezen _napokon:"
-
-#: ../gtk/tr-prefs.c:1270 ../gtk/tr-prefs.c:1335
-msgid "Status unknown"
-msgstr "Állapot ismeretlen"
-
-#: ../gtk/tr-prefs.c:1306
-msgid "<i>Testing...</i>"
-msgstr "<i>Tesztelés…</i>"
-
-#: ../gtk/tr-prefs.c:1330
-msgid "_Port for incoming connections:"
-msgstr "_Port a bejövő kapcsolatoknak:"
-
-#: ../gtk/tr-prefs.c:1338
-msgid "Te_st Port"
-msgstr "P_ort tesztelése"
-
-#: ../gtk/tr-prefs.c:1349
-msgid "Pick a _random port every time Transmission is started"
-msgstr "Véletlenszerű port _választása minden indításkor"
-
-#: ../gtk/tr-prefs.c:1410
-msgid "Proxy"
-msgstr "Proxy"
-
-#: ../gtk/tr-window.c:340
-#, c-format
-msgid ""
-"Click to disable Temporary Speed Limits\n"
-"(%1$s down, %2$s up)"
-msgstr ""
-"Ideiglenes sebességkorlátozás kikapcsolása\n"
-"(%1$s le, %2$s fel)"
-
-#: ../gtk/tr-window.c:341
-#, c-format
-msgid ""
-"Click to enable Temporary Speed Limits\n"
-"(%1$s down, %2$s up)"
-msgstr ""
-"Ideiglenes sebességkorlátozás bekapcsolása\n"
-"(%1$s le, %2$s fel)"
-
-#: ../gtk/tr-window.c:661
-msgid "Unlimited"
-msgstr "Korlátlan"
-
-#: ../gtk/tr-window.c:728
-msgid "Seed Forever"
-msgstr "Megosztás folyamatosan"
-
-#: ../gtk/tr-window.c:766
-msgid "Limit Download Speed"
-msgstr "Letöltési sebesség korlátozása"
-
-#: ../gtk/tr-window.c:770
-msgid "Limit Upload Speed"
-msgstr "Feltöltési sebesség korlátozása"
-
-#: ../gtk/tr-window.c:777
-msgid "Stop Seeding at Ratio"
-msgstr "Megosztás megállítása ekkora aránynál"
-
-#: ../gtk/tr-window.c:811
-#, c-format
-msgid "Stop at Ratio (%s)"
-msgstr "Megállás %s aránynál"
-
-#: ../libtransmission/fdlimit.c:296
-#, c-format
-msgid "Couldn't create \"%1$s\": \"%2$s\" is not a folder"
-msgstr "„%1$s” nem hozható létre: „%2$s” nem könyvtár."
-
-#: ../libtransmission/net.c:323
-#, c-format
-msgid "Couldn't set source address %s on %d: %s"
-msgstr "Nem állítható be a forráscím (%s) ezen: %d: %s"
-
-#: ../libtransmission/upnp.c:144
-#, c-format
-msgid "Port %d isn't forwarded"
-msgstr "A port (%d) nincs továbbítva"

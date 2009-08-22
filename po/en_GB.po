@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2009-08-13 23:52+0000\n"
+"X-Launchpad-Export-Date: 2009-08-22 16:00+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:49
@@ -30,22 +30,6 @@ msgstr "Sort by _Name"
 msgid "Sort by _Progress"
 msgstr "Sort by _Progress"
 
-#: ../gtk/actions.c:55
-msgid "Sort by A_ge"
-msgstr "Sort by A_ge"
-
-#: ../gtk/actions.c:74
-msgid "_Main Window"
-msgstr "_Main Window"
-
-#: ../gtk/actions.c:75
-msgid "Message _Log"
-msgstr "Message _Log"
-
-#: ../gtk/actions.c:91
-msgid "_Minimal View"
-msgstr "_Minimal View"
-
 #: ../gtk/actions.c:52
 msgid "Sort by Rati_o"
 msgstr ""
@@ -58,6 +42,10 @@ msgstr ""
 msgid "Sort by T_racker"
 msgstr ""
 
+#: ../gtk/actions.c:55
+msgid "Sort by A_ge"
+msgstr "Sort by A_ge"
+
 #: ../gtk/actions.c:56
 msgid "Sort by Time _Left"
 msgstr ""
@@ -66,9 +54,21 @@ msgstr ""
 msgid "Sort by Si_ze"
 msgstr ""
 
+#: ../gtk/actions.c:74
+msgid "_Main Window"
+msgstr "_Main Window"
+
+#: ../gtk/actions.c:75
+msgid "Message _Log"
+msgstr "Message _Log"
+
 #: ../gtk/actions.c:90
 msgid "Temporary  Speed _Limits"
 msgstr ""
+
+#: ../gtk/actions.c:91
+msgid "_Minimal View"
+msgstr "_Minimal View"
 
 #: ../gtk/actions.c:92
 msgid "Re_verse Sort Order"

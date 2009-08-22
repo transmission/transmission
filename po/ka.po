@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2009-08-13 23:52+0000\n"
+"X-Launchpad-Export-Date: 2009-08-22 16:00+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:49
@@ -30,9 +30,29 @@ msgstr "დალაგება სახელის მიხედვით"
 msgid "Sort by _Progress"
 msgstr "დალაგება პროგრესის მიხედვით"
 
+#: ../gtk/actions.c:52
+msgid "Sort by Rati_o"
+msgstr ""
+
+#: ../gtk/actions.c:53
+msgid "Sort by Stat_e"
+msgstr ""
+
+#: ../gtk/actions.c:54
+msgid "Sort by T_racker"
+msgstr ""
+
 #: ../gtk/actions.c:55
 msgid "Sort by A_ge"
 msgstr "დალაგება ასაკის მიხედვით"
+
+#: ../gtk/actions.c:56
+msgid "Sort by Time _Left"
+msgstr ""
+
+#: ../gtk/actions.c:57
+msgid "Sort by Si_ze"
+msgstr ""
 
 #: ../gtk/actions.c:74
 msgid "_Main Window"
@@ -42,9 +62,17 @@ msgstr "მთავარი ფანჯარა"
 msgid "Message _Log"
 msgstr "შეტყობინებების ჟურნალი"
 
+#: ../gtk/actions.c:90
+msgid "Temporary  Speed _Limits"
+msgstr ""
+
 #: ../gtk/actions.c:91
 msgid "_Minimal View"
 msgstr "მინიმალური ხედი"
+
+#: ../gtk/actions.c:92
+msgid "Re_verse Sort Order"
+msgstr ""
 
 #: ../gtk/actions.c:93
 msgid "_Filterbar"
@@ -110,6 +138,26 @@ msgstr "_პაუზა"
 msgid "Pause torrent"
 msgstr "ტორენტის პაუზა"
 
+#: ../gtk/actions.c:111
+msgid "_Pause All"
+msgstr ""
+
+#: ../gtk/actions.c:111
+msgid "Pause all torrents"
+msgstr ""
+
+#: ../gtk/actions.c:112
+msgid "_Start All"
+msgstr ""
+
+#: ../gtk/actions.c:112
+msgid "Start all torrents"
+msgstr ""
+
+#: ../gtk/actions.c:113
+msgid "Set _Location"
+msgstr ""
+
 #: ../gtk/actions.c:114
 msgid "Remove torrent"
 msgstr "ტორენტის ამოგდება"
@@ -137,6 +185,10 @@ msgstr "ყ_ველას მონიშვნა"
 #: ../gtk/actions.c:119
 msgid "Dese_lect All"
 msgstr "ყველა _მონიშვნის მოხსნა"
+
+#: ../gtk/actions.c:121
+msgid "Torrent properties"
+msgstr ""
 
 #: ../gtk/actions.c:122
 msgid "_Open Folder"
@@ -212,6 +264,11 @@ msgstr "ვერ გავხსენი \"%1$s\": %2$s"
 msgid "%s is already running."
 msgstr "%s უკვე მუშაობს."
 
+#: ../gtk/conf.c:448 ../gtk/conf.c:453
+#, c-format
+msgid "Importing \"%s\""
+msgstr ""
+
 #: ../gtk/details.c:470 ../gtk/file-list.c:579
 msgid "High"
 msgstr "მაღალი"
@@ -224,6 +281,14 @@ msgstr "ჩვეულებრივი"
 msgid "Low"
 msgstr "დაბალი"
 
+#: ../gtk/details.c:508 ../gtk/tr-prefs.c:1395
+msgid "Speed"
+msgstr ""
+
+#: ../gtk/details.c:510
+msgid "Honor global _limits"
+msgstr ""
+
 #: ../gtk/details.c:515 ../gtk/tr-prefs.c:1180
 msgid "Limit _download speed (KB/s):"
 msgstr "ჩამოტვირთვის სიჩქარის ლიმიტი (კბ/წმ):"
@@ -232,6 +297,26 @@ msgstr "ჩამოტვირთვის სიჩქარის ლიმ�
 msgid "Limit _upload speed (KB/s):"
 msgstr "ატვირთვის სიჩქარის ლიმიტი (კბ/წმ):"
 
+#: ../gtk/details.c:539
+msgid "Torrent _priority:"
+msgstr ""
+
+#: ../gtk/details.c:543
+msgid "Seed-Until Ratio"
+msgstr ""
+
+#: ../gtk/details.c:546
+msgid "Use _global settings"
+msgstr ""
+
+#: ../gtk/details.c:555
+msgid "Seed _regardless of ratio"
+msgstr ""
+
+#: ../gtk/details.c:564 ../gtk/tr-prefs.c:311
+msgid "_Seed torrent until its ratio reaches:"
+msgstr ""
+
 #: ../gtk/details.c:581
 msgid "Peer Connections"
 msgstr "პირთა შეერთებები"
@@ -239,6 +324,26 @@ msgstr "პირთა შეერთებები"
 #: ../gtk/details.c:584
 msgid "_Maximum peers:"
 msgstr "მაქსიმუმი პირები:"
+
+#: ../gtk/details.c:603 ../gtk/torrent-cell-renderer.c:173
+msgid "Waiting to verify local data"
+msgstr ""
+
+#: ../gtk/details.c:604
+msgid "Verifying local data"
+msgstr ""
+
+#: ../gtk/details.c:605
+msgid "Downloading"
+msgstr ""
+
+#: ../gtk/details.c:606
+msgid "Seeding"
+msgstr ""
+
+#: ../gtk/details.c:607 ../gtk/torrent-cell-renderer.c:169
+msgid "Paused"
+msgstr ""
 
 #: ../gtk/details.c:618 ../gtk/details.c:1346 ../gtk/details.c:1643
 #: ../gtk/util.c:68 ../libtransmission/utils.c:1348
@@ -249,13 +354,74 @@ msgstr "არაფერი"
 msgid "Mixed"
 msgstr "შერეული"
 
+#: ../gtk/details.c:639
+msgid "Private to this tracker -- DHT and PEX disabled"
+msgstr ""
+
 #: ../gtk/details.c:641
 msgid "Public torrent"
 msgstr "საჯარო ტორენტი"
 
+#: ../gtk/details.c:663
+#, c-format
+msgid "Created by %1$s"
+msgstr ""
+
+#: ../gtk/details.c:665
+#, c-format
+msgid "Created on %1$s"
+msgstr ""
+
+#: ../gtk/details.c:667
+#, c-format
+msgid "Created by %1$s on %2$s"
+msgstr ""
+
+#: ../gtk/details.c:758
+#, c-format
+msgid "%1$s (%2$'d piece @ %3$s)"
+msgid_plural "%1$s (%2$'d pieces @ %3$s)"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/details.c:764
+#, c-format
+msgid "%1$s (%2$'d piece)"
+msgid_plural "%1$s (%2$'d pieces)"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/details.c:798
+#, c-format
+msgid "%1$s (%2$.1f%%); %3$s Unverified"
+msgstr ""
+
+#: ../gtk/details.c:800
+#, c-format
+msgid "%1$s (%2$.1f%%)"
+msgstr ""
+
+#: ../gtk/details.c:820
+#, c-format
+msgid "%1$s (+%2$s corrupt)"
+msgstr ""
+
+#: ../gtk/details.c:893
+msgid "Active now"
+msgstr ""
+
+#: ../gtk/details.c:897
+#, c-format
+msgid "%1$s ago"
+msgstr ""
+
 #: ../gtk/details.c:916
 msgid "Activity"
 msgstr "აქტივობა"
+
+#: ../gtk/details.c:920
+msgid "Torrent size:"
+msgstr ""
 
 #: ../gtk/details.c:924
 msgid "Have:"
@@ -277,6 +443,14 @@ msgstr "შეფარდება:"
 msgid "State:"
 msgstr "შტატი:"
 
+#: ../gtk/details.c:944
+msgid "Running time:"
+msgstr ""
+
+#: ../gtk/details.c:948
+msgid "Last activity:"
+msgstr ""
+
 #: ../gtk/details.c:952
 msgid "Error:"
 msgstr "შეცდომა:"
@@ -284,6 +458,10 @@ msgstr "შეცდომა:"
 #: ../gtk/details.c:956
 msgid "Details"
 msgstr "დაწვრილებით"
+
+#: ../gtk/details.c:962
+msgid "Location:"
+msgstr ""
 
 #: ../gtk/details.c:969
 msgid "Hash:"
@@ -293,9 +471,17 @@ msgstr "ჰეში:"
 msgid "Privacy:"
 msgstr "პრივატულობა:"
 
+#: ../gtk/details.c:979
+msgid "Origin:"
+msgstr ""
+
 #: ../gtk/details.c:996
 msgid "Comment:"
 msgstr "კომენტარი:"
+
+#: ../gtk/details.c:1028
+msgid "Webseeds"
+msgstr ""
 
 #: ../gtk/details.c:1030 ../gtk/details.c:1070
 msgid "Down"
@@ -357,6 +543,10 @@ msgstr "დაშიფრული შეერთება"
 msgid "Peer was discovered through Peer Exchange (PEX)"
 msgstr "პირი აღმოჩენილია პირთა გაცვლის სისტემის (PEX) საშუალებით"
 
+#: ../gtk/details.c:1412
+msgid "Peer was discovered through DHT"
+msgstr ""
+
 #: ../gtk/details.c:1413
 msgid "Peer is an incoming connection"
 msgstr "პირი არის შემომავალი შეერთება"
@@ -376,6 +566,14 @@ msgstr "<b>დასრულების დროები:</b>"
 #: ../gtk/details.c:1644
 msgid "Now"
 msgstr "ახლა"
+
+#: ../gtk/details.c:1646
+msgid "None sent"
+msgstr ""
+
+#: ../gtk/details.c:1647
+msgid "In progress"
+msgstr ""
 
 #: ../gtk/details.c:1792 ../gtk/makemeta-ui.c:425
 msgid "Trackers"
@@ -439,269 +637,6 @@ msgstr "ფაილები"
 msgid "Options"
 msgstr "პარამეტრები"
 
-#: ../gtk/dialogs.c:133
-msgid "_Don't ask me again"
-msgstr "ხელმეორედ არ მკითხო"
-
-#: ../gtk/dialogs.c:236
-msgid "Remove torrent?"
-msgid_plural "Remove torrents?"
-msgstr[0] "ტორენტის ამოღება"
-
-#: ../gtk/dialogs.c:242
-msgid "Delete this torrent's downloaded files?"
-msgid_plural "Delete these torrents' downloaded files?"
-msgstr[0] "წავშალო ამ ტორენტით ჩამოტვირთული ფაილები?"
-
-#. add priority column
-#: ../gtk/file-list.c:610 ../gtk/file-list.c:757
-msgid "Priority"
-msgstr "პრიორიტეტი"
-
-#: ../gtk/main.c:348
-msgid "Start with all torrents paused"
-msgstr "ყველა ტორენტის შეჩერება დაწყებისას"
-
-#: ../gtk/main.c:699
-msgid "<b>Closing Connections</b>"
-msgstr "<b>კავშირების გაწყვეტა</b>"
-
-#: ../gtk/main.c:703
-msgid "Sending upload/download totals to tracker..."
-msgstr "მეთვალყურეს მიეწოდება ჩამოტვირთვა/ატვირთვის სტატისტიკა..."
-
-#: ../gtk/main.c:708
-msgid "_Quit Now"
-msgstr "_დახურვა"
-
-#: ../gtk/main.c:882
-msgid "Couldn't add duplicate torrent"
-msgid_plural "Couldn't add duplicate torrents"
-msgstr[0] "ვერ ვამატებ ტორენტის დუბლიკატს"
-
-#: ../gtk/main.c:1160
-msgid "A fast and easy BitTorrent client"
-msgstr "სწრაფი და მარტივი ბიტტორენტ კლიენტი"
-
-#: ../gtk/makemeta-ui.c:109
-msgid "Torrent created!"
-msgstr "ტორენტი შეიქმნა!"
-
-#: ../gtk/makemeta-ui.c:282
-#, c-format
-msgid "%'d Piece"
-msgid_plural "%'d Pieces"
-msgstr[0] "%'d ნაჭერი"
-
-#. %1$s is number of pieces;
-#. %2$s is how big each piece is
-#: ../gtk/makemeta-ui.c:288
-#, c-format
-msgid "%1$s @ %2$s"
-msgstr "%1$s @ %2$s"
-
-#: ../gtk/relocate.c:117
-msgid "Location"
-msgstr "მისამართი"
-
-#: ../gtk/actions.c:52
-msgid "Sort by Rati_o"
-msgstr ""
-
-#: ../gtk/actions.c:53
-msgid "Sort by Stat_e"
-msgstr ""
-
-#: ../gtk/actions.c:54
-msgid "Sort by T_racker"
-msgstr ""
-
-#: ../gtk/actions.c:56
-msgid "Sort by Time _Left"
-msgstr ""
-
-#: ../gtk/actions.c:57
-msgid "Sort by Si_ze"
-msgstr ""
-
-#: ../gtk/actions.c:90
-msgid "Temporary  Speed _Limits"
-msgstr ""
-
-#: ../gtk/actions.c:92
-msgid "Re_verse Sort Order"
-msgstr ""
-
-#: ../gtk/actions.c:111
-msgid "_Pause All"
-msgstr ""
-
-#: ../gtk/actions.c:111
-msgid "Pause all torrents"
-msgstr ""
-
-#: ../gtk/actions.c:112
-msgid "_Start All"
-msgstr ""
-
-#: ../gtk/actions.c:112
-msgid "Start all torrents"
-msgstr ""
-
-#: ../gtk/actions.c:113
-msgid "Set _Location"
-msgstr ""
-
-#: ../gtk/actions.c:121
-msgid "Torrent properties"
-msgstr ""
-
-#: ../gtk/conf.c:448 ../gtk/conf.c:453
-#, c-format
-msgid "Importing \"%s\""
-msgstr ""
-
-#: ../gtk/details.c:508 ../gtk/tr-prefs.c:1395
-msgid "Speed"
-msgstr ""
-
-#: ../gtk/details.c:510
-msgid "Honor global _limits"
-msgstr ""
-
-#: ../gtk/details.c:539
-msgid "Torrent _priority:"
-msgstr ""
-
-#: ../gtk/details.c:543
-msgid "Seed-Until Ratio"
-msgstr ""
-
-#: ../gtk/details.c:546
-msgid "Use _global settings"
-msgstr ""
-
-#: ../gtk/details.c:555
-msgid "Seed _regardless of ratio"
-msgstr ""
-
-#: ../gtk/details.c:564 ../gtk/tr-prefs.c:311
-msgid "_Seed torrent until its ratio reaches:"
-msgstr ""
-
-#: ../gtk/details.c:603 ../gtk/torrent-cell-renderer.c:173
-msgid "Waiting to verify local data"
-msgstr ""
-
-#: ../gtk/details.c:604
-msgid "Verifying local data"
-msgstr ""
-
-#: ../gtk/details.c:605
-msgid "Downloading"
-msgstr ""
-
-#: ../gtk/details.c:606
-msgid "Seeding"
-msgstr ""
-
-#: ../gtk/details.c:607 ../gtk/torrent-cell-renderer.c:169
-msgid "Paused"
-msgstr ""
-
-#: ../gtk/details.c:639
-msgid "Private to this tracker -- DHT and PEX disabled"
-msgstr ""
-
-#: ../gtk/details.c:663
-#, c-format
-msgid "Created by %1$s"
-msgstr ""
-
-#: ../gtk/details.c:665
-#, c-format
-msgid "Created on %1$s"
-msgstr ""
-
-#: ../gtk/details.c:667
-#, c-format
-msgid "Created by %1$s on %2$s"
-msgstr ""
-
-#: ../gtk/details.c:758
-#, c-format
-msgid "%1$s (%2$'d piece @ %3$s)"
-msgid_plural "%1$s (%2$'d pieces @ %3$s)"
-msgstr[0] ""
-msgstr[1] ""
-
-#: ../gtk/details.c:764
-#, c-format
-msgid "%1$s (%2$'d piece)"
-msgid_plural "%1$s (%2$'d pieces)"
-msgstr[0] ""
-msgstr[1] ""
-
-#: ../gtk/details.c:798
-#, c-format
-msgid "%1$s (%2$.1f%%); %3$s Unverified"
-msgstr ""
-
-#: ../gtk/details.c:800
-#, c-format
-msgid "%1$s (%2$.1f%%)"
-msgstr ""
-
-#: ../gtk/details.c:820
-#, c-format
-msgid "%1$s (+%2$s corrupt)"
-msgstr ""
-
-#: ../gtk/details.c:893
-msgid "Active now"
-msgstr ""
-
-#: ../gtk/details.c:897
-#, c-format
-msgid "%1$s ago"
-msgstr ""
-
-#: ../gtk/details.c:920
-msgid "Torrent size:"
-msgstr ""
-
-#: ../gtk/details.c:944
-msgid "Running time:"
-msgstr ""
-
-#: ../gtk/details.c:948
-msgid "Last activity:"
-msgstr ""
-
-#: ../gtk/details.c:962
-msgid "Location:"
-msgstr ""
-
-#: ../gtk/details.c:979
-msgid "Origin:"
-msgstr ""
-
-#: ../gtk/details.c:1028
-msgid "Webseeds"
-msgstr ""
-
-#: ../gtk/details.c:1412
-msgid "Peer was discovered through DHT"
-msgstr ""
-
-#: ../gtk/details.c:1646
-msgid "None sent"
-msgstr ""
-
-#: ../gtk/details.c:1647
-msgid "In progress"
-msgstr ""
-
 #: ../gtk/details.c:1960
 #, c-format
 msgid "%s Properties"
@@ -715,6 +650,20 @@ msgstr ""
 #: ../gtk/dialogs.c:121
 msgid "<big><b>Quit Transmission?</b></big>"
 msgstr ""
+
+#: ../gtk/dialogs.c:133
+msgid "_Don't ask me again"
+msgstr "ხელმეორედ არ მკითხო"
+
+#: ../gtk/dialogs.c:236
+msgid "Remove torrent?"
+msgid_plural "Remove torrents?"
+msgstr[0] "ტორენტის ამოღება"
+
+#: ../gtk/dialogs.c:242
+msgid "Delete this torrent's downloaded files?"
+msgid_plural "Delete these torrents' downloaded files?"
+msgstr[0] "წავშალო ამ ტორენტით ჩამოტვირთული ფაილები?"
 
 #: ../gtk/dialogs.c:255
 msgid "This torrent has not finished downloading."
@@ -745,6 +694,11 @@ msgstr[1] ""
 msgid "Download"
 msgstr ""
 
+#. add priority column
+#: ../gtk/file-list.c:610 ../gtk/file-list.c:757
+msgid "Priority"
+msgstr "პრიორიტეტი"
+
 #: ../gtk/file-list.c:715
 msgid "File"
 msgstr ""
@@ -753,6 +707,10 @@ msgstr ""
 #: ../gtk/file-list.c:730
 msgid "Progress"
 msgstr ""
+
+#: ../gtk/main.c:348
+msgid "Start with all torrents paused"
+msgstr "ყველა ტორენტის შეჩერება დაწყებისას"
 
 #: ../gtk/main.c:350
 msgid "Show version number and exit"
@@ -774,11 +732,32 @@ msgstr ""
 msgid "[torrent files]"
 msgstr ""
 
+#: ../gtk/main.c:699
+msgid "<b>Closing Connections</b>"
+msgstr "<b>კავშირების გაწყვეტა</b>"
+
+#: ../gtk/main.c:703
+msgid "Sending upload/download totals to tracker..."
+msgstr "მეთვალყურეს მიეწოდება ჩამოტვირთვა/ატვირთვის სტატისტიკა..."
+
+#: ../gtk/main.c:708
+msgid "_Quit Now"
+msgstr "_დახურვა"
+
 #: ../gtk/main.c:875
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
 msgstr[0] ""
 msgstr[1] ""
+
+#: ../gtk/main.c:882
+msgid "Couldn't add duplicate torrent"
+msgid_plural "Couldn't add duplicate torrents"
+msgstr[0] "ვერ ვამატებ ტორენტის დუბლიკატს"
+
+#: ../gtk/main.c:1160
+msgid "A fast and easy BitTorrent client"
+msgstr "სწრაფი და მარტივი ბიტტორენტ კლიენტი"
 
 #: ../gtk/main.c:1165
 msgid "Copyright 2005-2009 The Transmission Project"
@@ -793,6 +772,10 @@ msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
 "  David Machakhelidze https://launchpad.net/~david-mac"
+
+#: ../gtk/makemeta-ui.c:109
+msgid "Torrent created!"
+msgstr "ტორენტი შეიქმნა!"
 
 #: ../gtk/makemeta-ui.c:114 ../gtk/makemeta-ui.c:130 ../gtk/makemeta-ui.c:144
 #, c-format
@@ -825,6 +808,19 @@ msgid "<i>%1$s; %2$'d File</i>"
 msgid_plural "<i>%1$s; %2$'d Files</i>"
 msgstr[0] ""
 msgstr[1] ""
+
+#: ../gtk/makemeta-ui.c:282
+#, c-format
+msgid "%'d Piece"
+msgid_plural "%'d Pieces"
+msgstr[0] "%'d ნაჭერი"
+
+#. %1$s is number of pieces;
+#. %2$s is how big each piece is
+#: ../gtk/makemeta-ui.c:288
+#, c-format
+msgid "%1$s @ %2$s"
+msgstr "%1$s @ %2$s"
 
 #: ../gtk/makemeta-ui.c:352
 msgid "Choose Directory"
@@ -932,6 +928,10 @@ msgstr ""
 #: ../gtk/relocate.c:99 ../gtk/relocate.c:121
 msgid "Set Torrent Location"
 msgstr ""
+
+#: ../gtk/relocate.c:117
+msgid "Location"
+msgstr "მისამართი"
 
 #: ../gtk/relocate.c:124
 msgid "Torrent _location:"

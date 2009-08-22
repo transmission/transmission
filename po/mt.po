@@ -16,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=4; plural=n == 1 ? 0 : (n == 0 || ((n % 100) >= 2 && "
 "(n % 100) <= 10) ) ? 1 : ((n % 100) >= 11 && (n % 100) <= 19 ) ? 2 : 3;\n"
-"X-Launchpad-Export-Date: 2009-08-13 23:52+0000\n"
+"X-Launchpad-Export-Date: 2009-08-22 16:00+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:49
@@ -30,38 +30,6 @@ msgstr "Agħżel bl-_Isem"
 #: ../gtk/actions.c:51
 msgid "Sort by _Progress"
 msgstr "Agħżel bill-_Progress"
-
-#: ../gtk/actions.c:91
-msgid "_Minimal View"
-msgstr "Dehra _Minima"
-
-#: ../gtk/actions.c:103
-msgid "_Edit"
-msgstr "_Editja"
-
-#: ../gtk/actions.c:104
-msgid "_Help"
-msgstr "_Għajnuna"
-
-#: ../gtk/actions.c:107
-msgid "_Start"
-msgstr "_Ibda"
-
-#: ../gtk/actions.c:108
-msgid "_Statistics"
-msgstr "_Statistiċi"
-
-#: ../gtk/actions.c:110
-msgid "_Pause"
-msgstr "_Pawża"
-
-#: ../gtk/actions.c:116
-msgid "Create a torrent"
-msgstr "Oħloq torrent"
-
-#: ../gtk/actions.c:117
-msgid "_Quit"
-msgstr "_Oħroġ"
 
 #: ../gtk/actions.c:52
 msgid "Sort by Rati_o"
@@ -99,6 +67,10 @@ msgstr ""
 msgid "Temporary  Speed _Limits"
 msgstr ""
 
+#: ../gtk/actions.c:91
+msgid "_Minimal View"
+msgstr "Dehra _Minima"
+
 #: ../gtk/actions.c:92
 msgid "Re_verse Sort Order"
 msgstr ""
@@ -127,6 +99,14 @@ msgstr ""
 msgid "_Sort Torrents By"
 msgstr ""
 
+#: ../gtk/actions.c:103
+msgid "_Edit"
+msgstr "_Editja"
+
+#: ../gtk/actions.c:104
+msgid "_Help"
+msgstr "_Għajnuna"
+
 #: ../gtk/actions.c:105 ../gtk/actions.c:106
 msgid "Add a torrent"
 msgstr ""
@@ -136,12 +116,24 @@ msgid "_Add..."
 msgstr ""
 
 #: ../gtk/actions.c:107
+msgid "_Start"
+msgstr "_Ibda"
+
+#: ../gtk/actions.c:107
 msgid "Start torrent"
 msgstr ""
+
+#: ../gtk/actions.c:108
+msgid "_Statistics"
+msgstr "_Statistiċi"
 
 #: ../gtk/actions.c:109 ../gtk/add-dialog.c:362
 msgid "_Verify Local Data"
 msgstr ""
+
+#: ../gtk/actions.c:110
+msgid "_Pause"
+msgstr "_Pawża"
 
 #: ../gtk/actions.c:110
 msgid "Pause torrent"
@@ -178,6 +170,14 @@ msgstr ""
 #: ../gtk/actions.c:116
 msgid "_New..."
 msgstr ""
+
+#: ../gtk/actions.c:116
+msgid "Create a torrent"
+msgstr "Oħloq torrent"
+
+#: ../gtk/actions.c:117
+msgid "_Quit"
+msgstr "_Oħroġ"
 
 #: ../gtk/actions.c:118
 msgid "Select _All"

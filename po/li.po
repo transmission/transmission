@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2009-08-13 23:52+0000\n"
+"X-Launchpad-Export-Date: 2009-08-22 16:00+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:49
@@ -30,9 +30,29 @@ msgstr "sorteer bie naam"
 msgid "Sort by _Progress"
 msgstr "sotteer bie veuroetgang"
 
+#: ../gtk/actions.c:52
+msgid "Sort by Rati_o"
+msgstr ""
+
+#: ../gtk/actions.c:53
+msgid "Sort by Stat_e"
+msgstr ""
+
+#: ../gtk/actions.c:54
+msgid "Sort by T_racker"
+msgstr ""
+
 #: ../gtk/actions.c:55
 msgid "Sort by A_ge"
 msgstr "sorteer bie leeftied"
+
+#: ../gtk/actions.c:56
+msgid "Sort by Time _Left"
+msgstr ""
+
+#: ../gtk/actions.c:57
+msgid "Sort by Si_ze"
+msgstr ""
 
 #: ../gtk/actions.c:74
 msgid "_Main Window"
@@ -42,9 +62,17 @@ msgstr "hoefdvenster"
 msgid "Message _Log"
 msgstr "boadschap biehalder"
 
+#: ../gtk/actions.c:90
+msgid "Temporary  Speed _Limits"
+msgstr ""
+
 #: ../gtk/actions.c:91
 msgid "_Minimal View"
 msgstr "zoa min meugelijk zeen"
+
+#: ../gtk/actions.c:92
+msgid "Re_verse Sort Order"
+msgstr ""
 
 #: ../gtk/actions.c:93
 msgid "_Filterbar"
@@ -117,6 +145,18 @@ msgstr "Alles _eve loate wachtte"
 #: ../gtk/actions.c:111
 msgid "Pause all torrents"
 msgstr "alle stortvloaden eve loate wachtte"
+
+#: ../gtk/actions.c:112
+msgid "_Start All"
+msgstr ""
+
+#: ../gtk/actions.c:112
+msgid "Start all torrents"
+msgstr ""
+
+#: ../gtk/actions.c:113
+msgid "Set _Location"
+msgstr ""
 
 #: ../gtk/actions.c:114
 msgid "Remove torrent"
@@ -224,6 +264,11 @@ msgstr "kan \"%1$s\": %2$s neet openen"
 msgid "%s is already running."
 msgstr "%s is al bezig"
 
+#: ../gtk/conf.c:448 ../gtk/conf.c:453
+#, c-format
+msgid "Importing \"%s\""
+msgstr ""
+
 #: ../gtk/details.c:470 ../gtk/file-list.c:579
 msgid "High"
 msgstr "hoeg"
@@ -236,6 +281,14 @@ msgstr "Gewoan"
 msgid "Low"
 msgstr "lieg"
 
+#: ../gtk/details.c:508 ../gtk/tr-prefs.c:1395
+msgid "Speed"
+msgstr ""
+
+#: ../gtk/details.c:510
+msgid "Honor global _limits"
+msgstr ""
+
 #: ../gtk/details.c:515 ../gtk/tr-prefs.c:1180
 msgid "Limit _download speed (KB/s):"
 msgstr "grens_binnehoal snelhied"
@@ -243,6 +296,26 @@ msgstr "grens_binnehoal snelhied"
 #: ../gtk/details.c:527 ../gtk/tr-prefs.c:1187
 msgid "Limit _upload speed (KB/s):"
 msgstr "grens_verzenje snelhied"
+
+#: ../gtk/details.c:539
+msgid "Torrent _priority:"
+msgstr ""
+
+#: ../gtk/details.c:543
+msgid "Seed-Until Ratio"
+msgstr ""
+
+#: ../gtk/details.c:546
+msgid "Use _global settings"
+msgstr ""
+
+#: ../gtk/details.c:555
+msgid "Seed _regardless of ratio"
+msgstr ""
+
+#: ../gtk/details.c:564 ../gtk/tr-prefs.c:311
+msgid "_Seed torrent until its ratio reaches:"
+msgstr ""
 
 #: ../gtk/details.c:581
 msgid "Peer Connections"
@@ -255,6 +328,18 @@ msgstr "_maximum miense:"
 #: ../gtk/details.c:603 ../gtk/torrent-cell-renderer.c:173
 msgid "Waiting to verify local data"
 msgstr "Wachte um lokale bestanje te controlere"
+
+#: ../gtk/details.c:604
+msgid "Verifying local data"
+msgstr ""
+
+#: ../gtk/details.c:605
+msgid "Downloading"
+msgstr ""
+
+#: ../gtk/details.c:606
+msgid "Seeding"
+msgstr ""
 
 #: ../gtk/details.c:607 ../gtk/torrent-cell-renderer.c:169
 msgid "Paused"
@@ -269,13 +354,74 @@ msgstr "gein"
 msgid "Mixed"
 msgstr "gemengdj"
 
+#: ../gtk/details.c:639
+msgid "Private to this tracker -- DHT and PEX disabled"
+msgstr ""
+
 #: ../gtk/details.c:641
 msgid "Public torrent"
 msgstr "publeeke stortvload"
 
+#: ../gtk/details.c:663
+#, c-format
+msgid "Created by %1$s"
+msgstr ""
+
+#: ../gtk/details.c:665
+#, c-format
+msgid "Created on %1$s"
+msgstr ""
+
+#: ../gtk/details.c:667
+#, c-format
+msgid "Created by %1$s on %2$s"
+msgstr ""
+
+#: ../gtk/details.c:758
+#, c-format
+msgid "%1$s (%2$'d piece @ %3$s)"
+msgid_plural "%1$s (%2$'d pieces @ %3$s)"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/details.c:764
+#, c-format
+msgid "%1$s (%2$'d piece)"
+msgid_plural "%1$s (%2$'d pieces)"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/details.c:798
+#, c-format
+msgid "%1$s (%2$.1f%%); %3$s Unverified"
+msgstr ""
+
+#: ../gtk/details.c:800
+#, c-format
+msgid "%1$s (%2$.1f%%)"
+msgstr ""
+
+#: ../gtk/details.c:820
+#, c-format
+msgid "%1$s (+%2$s corrupt)"
+msgstr ""
+
+#: ../gtk/details.c:893
+msgid "Active now"
+msgstr ""
+
+#: ../gtk/details.c:897
+#, c-format
+msgid "%1$s ago"
+msgstr ""
+
 #: ../gtk/details.c:916
 msgid "Activity"
 msgstr "Activiteit"
+
+#: ../gtk/details.c:920
+msgid "Torrent size:"
+msgstr ""
 
 #: ../gtk/details.c:924
 msgid "Have:"
@@ -297,6 +443,14 @@ msgstr "verhoajing"
 msgid "State:"
 msgstr "stoat"
 
+#: ../gtk/details.c:944
+msgid "Running time:"
+msgstr ""
+
+#: ../gtk/details.c:948
+msgid "Last activity:"
+msgstr ""
+
 #: ../gtk/details.c:952
 msgid "Error:"
 msgstr "probleem"
@@ -304,6 +458,10 @@ msgstr "probleem"
 #: ../gtk/details.c:956
 msgid "Details"
 msgstr "Detajs"
+
+#: ../gtk/details.c:962
+msgid "Location:"
+msgstr ""
 
 #: ../gtk/details.c:969
 msgid "Hash:"
@@ -313,9 +471,17 @@ msgstr "Hash:"
 msgid "Privacy:"
 msgstr "alleinrecht:"
 
+#: ../gtk/details.c:979
+msgid "Origin:"
+msgstr ""
+
 #: ../gtk/details.c:996
 msgid "Comment:"
 msgstr "Opmirking:"
+
+#: ../gtk/details.c:1028
+msgid "Webseeds"
+msgstr ""
 
 #: ../gtk/details.c:1030 ../gtk/details.c:1070
 msgid "Down"
@@ -377,6 +543,10 @@ msgstr "ontcyferde verbinding"
 msgid "Peer was discovered through Peer Exchange (PEX)"
 msgstr "mins waas ontdekt door de mins oetwisseling (PEX)"
 
+#: ../gtk/details.c:1412
+msgid "Peer was discovered through DHT"
+msgstr ""
+
 #: ../gtk/details.c:1413
 msgid "Peer is an incoming connection"
 msgstr "mins is eine binnekomende verbinding"
@@ -396,6 +566,10 @@ msgstr "<b> tieje gehoald </b>"
 #: ../gtk/details.c:1644
 msgid "Now"
 msgstr "Noe"
+
+#: ../gtk/details.c:1646
+msgid "None sent"
+msgstr ""
 
 #: ../gtk/details.c:1647
 msgid "In progress"
@@ -468,6 +642,11 @@ msgstr "meugelijkheden"
 msgid "%s Properties"
 msgstr "%s-eigenschappen"
 
+#: ../gtk/details.c:1970
+#, c-format
+msgid "%'d Torrent Properties"
+msgstr ""
+
 #: ../gtk/dialogs.c:121
 msgid "<big><b>Quit Transmission?</b></big>"
 msgstr "<big><b>Transmission aafsloete?</b></big>"
@@ -500,10 +679,36 @@ msgid_plural "These torrents are connected to peers."
 msgstr[0] "deze stortvload is nog verbonje met minse"
 msgstr[1] "deze stortvloaden zien nog verbonje met minse"
 
+#: ../gtk/dialogs.c:268
+msgid "One of these torrents is connected to peers."
+msgid_plural "Some of these torrents are connected to peers."
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/dialogs.c:275
+msgid "One of these torrents has not finished downloading."
+msgid_plural "Some of these torrents have not finished downloading."
+msgstr[0] ""
+msgstr[1] ""
+
+#. add "enabled" column
+#: ../gtk/file-list.c:609 ../gtk/file-list.c:743
+msgid "Download"
+msgstr ""
+
 #. add priority column
 #: ../gtk/file-list.c:610 ../gtk/file-list.c:757
 msgid "Priority"
 msgstr "veurrang"
+
+#: ../gtk/file-list.c:715
+msgid "File"
+msgstr ""
+
+#. add "progress" column
+#: ../gtk/file-list.c:730
+msgid "Progress"
+msgstr ""
 
 #: ../gtk/main.c:348
 msgid "Start with all torrents paused"
@@ -556,6 +761,20 @@ msgstr[1] "kon dubbele stortvloaden neet bievoegen"
 #: ../gtk/main.c:1160
 msgid "A fast and easy BitTorrent client"
 msgstr "eine mekkelijke en snelle BitTorrent-downloader"
+
+#: ../gtk/main.c:1165
+msgid "Copyright 2005-2009 The Transmission Project"
+msgstr ""
+
+#. Translators: translate "translator-credits" as
+#. your name
+#. to have it appear in the credits in the "About"
+#. dialog
+#: ../gtk/main.c:1176
+msgid "translator-credits"
+msgstr ""
+"Launchpad Contributions:\n"
+"  Omega-xis https://launchpad.net/~nieknooijens"
 
 #: ../gtk/makemeta-ui.c:109
 msgid "Torrent created!"
@@ -697,9 +916,38 @@ msgstr "Bestanj openen"
 msgid "Open Folder"
 msgstr "Map openen"
 
+#: ../gtk/notify.c:121
+msgid "Torrent Added"
+msgstr ""
+
+#: ../gtk/relocate.c:68
+#, c-format
+msgid "Moving \"%s\""
+msgstr ""
+
+#: ../gtk/relocate.c:70
+msgid "This may take a moment..."
+msgstr ""
+
+#: ../gtk/relocate.c:99 ../gtk/relocate.c:121
+msgid "Set Torrent Location"
+msgstr ""
+
 #: ../gtk/relocate.c:117
 msgid "Location"
 msgstr "ploats"
+
+#: ../gtk/relocate.c:124
+msgid "Torrent _location:"
+msgstr ""
+
+#: ../gtk/relocate.c:125
+msgid "_Move from the current folder"
+msgstr ""
+
+#: ../gtk/relocate.c:128
+msgid "Local data is _already there"
+msgstr ""
 
 #: ../gtk/stats.c:75 ../gtk/stats.c:156
 #, c-format
@@ -741,6 +989,15 @@ msgstr "%1$s van %2$s (%3$.2f%%)"
 #, c-format
 msgid "%1$s of %2$s (%3$.2f%%), uploaded %4$s (Ratio: %5$s)"
 msgstr "%1$s van %2$s (%3$.2f%%), %4$s verzonje (ratio: %5$s)"
+
+#. %1$s is the torrent's total size,
+#. %2$s is how much we've uploaded,
+#. %3$s is our upload-to-download ratio,
+#. $4$s is the ratio we want to reach before we stop uploading
+#: ../gtk/torrent-cell-renderer.c:88
+#, c-format
+msgid "%1$s, uploaded %2$s (Ratio: %3$s Goal: %4$s)"
+msgstr ""
 
 #. %1$s is the torrent's total size,
 #. %2$s is how much we've uploaded,
@@ -848,320 +1105,6 @@ msgstr "Kon sloapstandj neet verhinjere: %s"
 msgid "Allowing desktop hibernation"
 msgstr "sloapstandj van de computer toestoan"
 
-#: ../gtk/tr-prefs.c:281
-msgid "Adding Torrents"
-msgstr "stortvloaden bievoege"
-
-#: ../gtk/tr-prefs.c:284
-msgid "Automatically _add torrents from:"
-msgstr "_vanzelf stortvloaden bievoegen oet:"
-
-#: ../gtk/tr-prefs.c:301
-msgid "Mo_ve source files to Trash"
-msgstr "goei bonbesteng noa dreksbak"
-
-#: ../gtk/tr-prefs.c:309 ../gtk/tr-prefs.c:1354
-msgid "Limits"
-msgstr "grenze"
-
-#: ../gtk/tr-prefs.c:372
-#, c-format
-msgid "Enable _blocklist (contains %'d rule)"
-msgid_plural "Enable _blocklist (contains %'d rules)"
-msgstr[0] "Aanzette _blokkadeliest (heet %'d regel)"
-msgstr[1] "Aanzette _blokkadeliest (heet %'d regels)"
-
-#: ../gtk/tr-prefs.c:504
-msgid "Blocklist"
-msgstr "blokkadeliest"
-
-#: ../gtk/tr-prefs.c:510
-msgid "_Update"
-msgstr "biejwerken"
-
-#: ../gtk/tr-prefs.c:520
-msgid "Enable _automatic updates"
-msgstr "_vanzelf biewerke aanzette"
-
-#: ../gtk/tr-prefs.c:771
-msgid "Listening _port:"
-msgstr "Loestere op _poort:"
-
-#. username
-#: ../gtk/tr-prefs.c:783 ../gtk/tr-prefs.c:998
-msgid "_Username:"
-msgstr "_Gebroekersnaam"
-
-#. password
-#: ../gtk/tr-prefs.c:790 ../gtk/tr-prefs.c:1004
-msgid "Pass_word:"
-msgstr "_Wachtwoord:"
-
-#: ../gtk/tr-prefs.c:1357
-msgid "Maximum peers per _torrent:"
-msgstr "maximum aantal minse per stortvload"
-
-#: ../gtk/tr-prefs.c:1359
-msgid "Maximum peers _overall:"
-msgstr "maximum aantal minse globaal"
-
-#: ../gtk/actions.c:52
-msgid "Sort by Rati_o"
-msgstr ""
-
-#: ../gtk/actions.c:53
-msgid "Sort by Stat_e"
-msgstr ""
-
-#: ../gtk/actions.c:54
-msgid "Sort by T_racker"
-msgstr ""
-
-#: ../gtk/actions.c:56
-msgid "Sort by Time _Left"
-msgstr ""
-
-#: ../gtk/actions.c:57
-msgid "Sort by Si_ze"
-msgstr ""
-
-#: ../gtk/actions.c:90
-msgid "Temporary  Speed _Limits"
-msgstr ""
-
-#: ../gtk/actions.c:92
-msgid "Re_verse Sort Order"
-msgstr ""
-
-#: ../gtk/actions.c:112
-msgid "_Start All"
-msgstr ""
-
-#: ../gtk/actions.c:112
-msgid "Start all torrents"
-msgstr ""
-
-#: ../gtk/actions.c:113
-msgid "Set _Location"
-msgstr ""
-
-#: ../gtk/conf.c:448 ../gtk/conf.c:453
-#, c-format
-msgid "Importing \"%s\""
-msgstr ""
-
-#: ../gtk/details.c:508 ../gtk/tr-prefs.c:1395
-msgid "Speed"
-msgstr ""
-
-#: ../gtk/details.c:510
-msgid "Honor global _limits"
-msgstr ""
-
-#: ../gtk/details.c:539
-msgid "Torrent _priority:"
-msgstr ""
-
-#: ../gtk/details.c:543
-msgid "Seed-Until Ratio"
-msgstr ""
-
-#: ../gtk/details.c:546
-msgid "Use _global settings"
-msgstr ""
-
-#: ../gtk/details.c:555
-msgid "Seed _regardless of ratio"
-msgstr ""
-
-#: ../gtk/details.c:564 ../gtk/tr-prefs.c:311
-msgid "_Seed torrent until its ratio reaches:"
-msgstr ""
-
-#: ../gtk/details.c:604
-msgid "Verifying local data"
-msgstr ""
-
-#: ../gtk/details.c:605
-msgid "Downloading"
-msgstr ""
-
-#: ../gtk/details.c:606
-msgid "Seeding"
-msgstr ""
-
-#: ../gtk/details.c:639
-msgid "Private to this tracker -- DHT and PEX disabled"
-msgstr ""
-
-#: ../gtk/details.c:663
-#, c-format
-msgid "Created by %1$s"
-msgstr ""
-
-#: ../gtk/details.c:665
-#, c-format
-msgid "Created on %1$s"
-msgstr ""
-
-#: ../gtk/details.c:667
-#, c-format
-msgid "Created by %1$s on %2$s"
-msgstr ""
-
-#: ../gtk/details.c:758
-#, c-format
-msgid "%1$s (%2$'d piece @ %3$s)"
-msgid_plural "%1$s (%2$'d pieces @ %3$s)"
-msgstr[0] ""
-msgstr[1] ""
-
-#: ../gtk/details.c:764
-#, c-format
-msgid "%1$s (%2$'d piece)"
-msgid_plural "%1$s (%2$'d pieces)"
-msgstr[0] ""
-msgstr[1] ""
-
-#: ../gtk/details.c:798
-#, c-format
-msgid "%1$s (%2$.1f%%); %3$s Unverified"
-msgstr ""
-
-#: ../gtk/details.c:800
-#, c-format
-msgid "%1$s (%2$.1f%%)"
-msgstr ""
-
-#: ../gtk/details.c:820
-#, c-format
-msgid "%1$s (+%2$s corrupt)"
-msgstr ""
-
-#: ../gtk/details.c:893
-msgid "Active now"
-msgstr ""
-
-#: ../gtk/details.c:897
-#, c-format
-msgid "%1$s ago"
-msgstr ""
-
-#: ../gtk/details.c:920
-msgid "Torrent size:"
-msgstr ""
-
-#: ../gtk/details.c:944
-msgid "Running time:"
-msgstr ""
-
-#: ../gtk/details.c:948
-msgid "Last activity:"
-msgstr ""
-
-#: ../gtk/details.c:962
-msgid "Location:"
-msgstr ""
-
-#: ../gtk/details.c:979
-msgid "Origin:"
-msgstr ""
-
-#: ../gtk/details.c:1028
-msgid "Webseeds"
-msgstr ""
-
-#: ../gtk/details.c:1412
-msgid "Peer was discovered through DHT"
-msgstr ""
-
-#: ../gtk/details.c:1646
-msgid "None sent"
-msgstr ""
-
-#: ../gtk/details.c:1970
-#, c-format
-msgid "%'d Torrent Properties"
-msgstr ""
-
-#: ../gtk/dialogs.c:268
-msgid "One of these torrents is connected to peers."
-msgid_plural "Some of these torrents are connected to peers."
-msgstr[0] ""
-msgstr[1] ""
-
-#: ../gtk/dialogs.c:275
-msgid "One of these torrents has not finished downloading."
-msgid_plural "Some of these torrents have not finished downloading."
-msgstr[0] ""
-msgstr[1] ""
-
-#. add "enabled" column
-#: ../gtk/file-list.c:609 ../gtk/file-list.c:743
-msgid "Download"
-msgstr ""
-
-#: ../gtk/file-list.c:715
-msgid "File"
-msgstr ""
-
-#. add "progress" column
-#: ../gtk/file-list.c:730
-msgid "Progress"
-msgstr ""
-
-#: ../gtk/main.c:1165
-msgid "Copyright 2005-2009 The Transmission Project"
-msgstr ""
-
-#. Translators: translate "translator-credits" as
-#. your name
-#. to have it appear in the credits in the "About"
-#. dialog
-#: ../gtk/main.c:1176
-msgid "translator-credits"
-msgstr ""
-"Launchpad Contributions:\n"
-"  Omega-xis https://launchpad.net/~nieknooijens"
-
-#: ../gtk/notify.c:121
-msgid "Torrent Added"
-msgstr ""
-
-#: ../gtk/relocate.c:68
-#, c-format
-msgid "Moving \"%s\""
-msgstr ""
-
-#: ../gtk/relocate.c:70
-msgid "This may take a moment..."
-msgstr ""
-
-#: ../gtk/relocate.c:99 ../gtk/relocate.c:121
-msgid "Set Torrent Location"
-msgstr ""
-
-#: ../gtk/relocate.c:124
-msgid "Torrent _location:"
-msgstr ""
-
-#: ../gtk/relocate.c:125
-msgid "_Move from the current folder"
-msgstr ""
-
-#: ../gtk/relocate.c:128
-msgid "Local data is _already there"
-msgstr ""
-
-#. %1$s is the torrent's total size,
-#. %2$s is how much we've uploaded,
-#. %3$s is our upload-to-download ratio,
-#. $4$s is the ratio we want to reach before we stop uploading
-#: ../gtk/torrent-cell-renderer.c:88
-#, c-format
-msgid "%1$s, uploaded %2$s (Ratio: %3$s Goal: %4$s)"
-msgstr ""
-
 #: ../gtk/tr-icon.c:77 ../gtk/tr-icon.c:92
 #, c-format
 msgid "(Limit: %s)"
@@ -1179,9 +1122,25 @@ msgid ""
 "Down: %3$s %4$s"
 msgstr ""
 
+#: ../gtk/tr-prefs.c:281
+msgid "Adding Torrents"
+msgstr "stortvloaden bievoege"
+
+#: ../gtk/tr-prefs.c:284
+msgid "Automatically _add torrents from:"
+msgstr "_vanzelf stortvloaden bievoegen oet:"
+
+#: ../gtk/tr-prefs.c:301
+msgid "Mo_ve source files to Trash"
+msgstr "goei bonbesteng noa dreksbak"
+
 #: ../gtk/tr-prefs.c:306
 msgid "Save to _Location:"
 msgstr ""
+
+#: ../gtk/tr-prefs.c:309 ../gtk/tr-prefs.c:1354
+msgid "Limits"
+msgstr "grenze"
 
 #: ../gtk/tr-prefs.c:335 ../gtk/tr-prefs.c:1404
 msgid "Desktop"
@@ -1198,6 +1157,13 @@ msgstr ""
 #: ../gtk/tr-prefs.c:345
 msgid "Show popup _notifications"
 msgstr ""
+
+#: ../gtk/tr-prefs.c:372
+#, c-format
+msgid "Enable _blocklist (contains %'d rule)"
+msgid_plural "Enable _blocklist (contains %'d rules)"
+msgstr[0] "Aanzette _blokkadeliest (heet %'d regel)"
+msgstr[1] "Aanzette _blokkadeliest (heet %'d regels)"
 
 #: ../gtk/tr-prefs.c:402
 #, c-format
@@ -1229,6 +1195,18 @@ msgstr ""
 #: ../gtk/tr-prefs.c:460
 msgid "Require encryption"
 msgstr ""
+
+#: ../gtk/tr-prefs.c:504
+msgid "Blocklist"
+msgstr "blokkadeliest"
+
+#: ../gtk/tr-prefs.c:510
+msgid "_Update"
+msgstr "biejwerken"
+
+#: ../gtk/tr-prefs.c:520
+msgid "Enable _automatic updates"
+msgstr "_vanzelf biewerke aanzette"
 
 #: ../gtk/tr-prefs.c:527 ../gtk/tr-prefs.c:1398
 msgid "Privacy"
@@ -1268,10 +1246,24 @@ msgstr ""
 msgid "_Open web client"
 msgstr ""
 
+#: ../gtk/tr-prefs.c:771
+msgid "Listening _port:"
+msgstr "Loestere op _poort:"
+
 #. require authentication
 #: ../gtk/tr-prefs.c:775 ../gtk/tr-prefs.c:992
 msgid "Use _authentication"
 msgstr ""
+
+#. username
+#: ../gtk/tr-prefs.c:783 ../gtk/tr-prefs.c:998
+msgid "_Username:"
+msgstr "_Gebroekersnaam"
+
+#. password
+#: ../gtk/tr-prefs.c:790 ../gtk/tr-prefs.c:1004
+msgid "Pass_word:"
+msgstr "_Wachtwoord:"
 
 #. require authentication
 #: ../gtk/tr-prefs.c:798
@@ -1409,6 +1401,14 @@ msgstr ""
 #: ../gtk/tr-prefs.c:1349
 msgid "Pick a _random port every time Transmission is started"
 msgstr ""
+
+#: ../gtk/tr-prefs.c:1357
+msgid "Maximum peers per _torrent:"
+msgstr "maximum aantal minse per stortvload"
+
+#: ../gtk/tr-prefs.c:1359
+msgid "Maximum peers _overall:"
+msgstr "maximum aantal minse globaal"
 
 #: ../gtk/tr-prefs.c:1377
 msgid "Transmission Preferences"

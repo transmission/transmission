@@ -15,72 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : n==2 ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2009-08-13 23:52+0000\n"
+"X-Launchpad-Export-Date: 2009-08-22 16:00+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
-
-#: ../gtk/actions.c:100
-msgid "_Torrent"
-msgstr "_Torrent"
-
-#: ../gtk/actions.c:101
-msgid "_View"
-msgstr "_Amharc"
-
-#: ../gtk/actions.c:103
-msgid "_Edit"
-msgstr "_Eagar"
-
-#: ../gtk/actions.c:104
-msgid "_Help"
-msgstr "_Cabhair"
-
-#: ../gtk/actions.c:106
-msgid "_Add..."
-msgstr "_Cuir Leis..."
-
-#: ../gtk/actions.c:107
-msgid "_Start"
-msgstr "_Tosaigh"
-
-#: ../gtk/actions.c:110
-msgid "_Pause"
-msgstr "_"
-
-#: ../gtk/actions.c:116
-msgid "_New..."
-msgstr "_Nua..."
-
-#: ../gtk/actions.c:116
-msgid "Create a torrent"
-msgstr "Cruthaigh torrent"
-
-#: ../gtk/actions.c:117
-msgid "_Quit"
-msgstr "_Scoir"
-
-#: ../gtk/actions.c:118
-msgid "Select _All"
-msgstr "Roghnaigh _Uile"
-
-#: ../gtk/actions.c:119
-msgid "Dese_lect All"
-msgstr "_Díroghnaigh Gach Rud"
-
-#: ../gtk/add-dialog.c:241
-msgid "Torrent files"
-msgstr "Comhaid Torrent"
-
-#: ../gtk/add-dialog.c:246
-msgid "All files"
-msgstr "Gach comhad"
-
-#: ../gtk/add-dialog.c:275
-msgid "Torrent Options"
-msgstr "Roghanna Torrent"
-
-#: ../gtk/add-dialog.c:443
-msgid "Add a Torrent"
-msgstr "Cuir Torrent Leis"
 
 #: ../gtk/actions.c:49
 msgid "Sort by _Activity"
@@ -150,13 +86,37 @@ msgstr ""
 msgid "_Toolbar"
 msgstr ""
 
+#: ../gtk/actions.c:100
+msgid "_Torrent"
+msgstr "_Torrent"
+
+#: ../gtk/actions.c:101
+msgid "_View"
+msgstr "_Amharc"
+
 #: ../gtk/actions.c:102
 msgid "_Sort Torrents By"
 msgstr ""
 
+#: ../gtk/actions.c:103
+msgid "_Edit"
+msgstr "_Eagar"
+
+#: ../gtk/actions.c:104
+msgid "_Help"
+msgstr "_Cabhair"
+
 #: ../gtk/actions.c:105 ../gtk/actions.c:106
 msgid "Add a torrent"
 msgstr ""
+
+#: ../gtk/actions.c:106
+msgid "_Add..."
+msgstr "_Cuir Leis..."
+
+#: ../gtk/actions.c:107
+msgid "_Start"
+msgstr "_Tosaigh"
 
 #: ../gtk/actions.c:107
 msgid "Start torrent"
@@ -169,6 +129,10 @@ msgstr ""
 #: ../gtk/actions.c:109 ../gtk/add-dialog.c:362
 msgid "_Verify Local Data"
 msgstr ""
+
+#: ../gtk/actions.c:110
+msgid "_Pause"
+msgstr "_"
 
 #: ../gtk/actions.c:110
 msgid "Pause torrent"
@@ -202,6 +166,26 @@ msgstr ""
 msgid "_Delete Files and Remove"
 msgstr ""
 
+#: ../gtk/actions.c:116
+msgid "_New..."
+msgstr "_Nua..."
+
+#: ../gtk/actions.c:116
+msgid "Create a torrent"
+msgstr "Cruthaigh torrent"
+
+#: ../gtk/actions.c:117
+msgid "_Quit"
+msgstr "_Scoir"
+
+#: ../gtk/actions.c:118
+msgid "Select _All"
+msgstr "Roghnaigh _Uile"
+
+#: ../gtk/actions.c:119
+msgid "Dese_lect All"
+msgstr "_Díroghnaigh Gach Rud"
+
 #: ../gtk/actions.c:121
 msgid "Torrent properties"
 msgstr ""
@@ -217,6 +201,18 @@ msgstr ""
 #: ../gtk/actions.c:125
 msgid "Ask Tracker for _More Peers"
 msgstr ""
+
+#: ../gtk/add-dialog.c:241
+msgid "Torrent files"
+msgstr "Comhaid Torrent"
+
+#: ../gtk/add-dialog.c:246
+msgid "All files"
+msgstr "Gach comhad"
+
+#: ../gtk/add-dialog.c:275
+msgid "Torrent Options"
+msgstr "Roghanna Torrent"
 
 #: ../gtk/add-dialog.c:299
 msgid "_Move source file to Trash"
@@ -241,6 +237,10 @@ msgstr ""
 #: ../gtk/add-dialog.c:337
 msgid "Select Destination Folder"
 msgstr ""
+
+#: ../gtk/add-dialog.c:443
+msgid "Add a Torrent"
+msgstr "Cuir Torrent Leis"
 
 #: ../gtk/add-dialog.c:460 ../gtk/tr-prefs.c:293
 msgid "Display _options dialog"

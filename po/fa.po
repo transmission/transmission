@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2009-08-13 23:52+0000\n"
+"X-Launchpad-Export-Date: 2009-08-22 16:00+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:49
@@ -29,144 +29,6 @@ msgstr "جور کردن بر اساس نام"
 #: ../gtk/actions.c:51
 msgid "Sort by _Progress"
 msgstr "جور کردن بر اساس پیشروی"
-
-#: ../gtk/actions.c:74
-msgid "_Main Window"
-msgstr "پنجره‌ی اصلی"
-
-#: ../gtk/actions.c:101
-msgid "_View"
-msgstr "_نما"
-
-#: ../gtk/actions.c:102
-msgid "_Sort Torrents By"
-msgstr "ـجور کردن تورنت‌ها بر اساس"
-
-#: ../gtk/actions.c:103
-msgid "_Edit"
-msgstr "_ویرایش"
-
-#: ../gtk/actions.c:104
-msgid "_Help"
-msgstr "_راهنما"
-
-#: ../gtk/actions.c:105 ../gtk/actions.c:106
-msgid "Add a torrent"
-msgstr "افزودن یک تورنت"
-
-#: ../gtk/actions.c:107
-msgid "_Start"
-msgstr "شروع"
-
-#: ../gtk/actions.c:107
-msgid "Start torrent"
-msgstr "آغاز تورنت"
-
-#: ../gtk/actions.c:108
-msgid "_Statistics"
-msgstr "ـآمار"
-
-#: ../gtk/actions.c:110
-msgid "_Pause"
-msgstr "_مکث"
-
-#: ../gtk/actions.c:110
-msgid "Pause torrent"
-msgstr "توقف تورنت"
-
-#: ../gtk/actions.c:114
-msgid "Remove torrent"
-msgstr "حذف تورنت"
-
-#: ../gtk/actions.c:116
-msgid "_New..."
-msgstr "_جدید"
-
-#: ../gtk/actions.c:116
-msgid "Create a torrent"
-msgstr "ساختن تورنت"
-
-#: ../gtk/actions.c:117
-msgid "_Quit"
-msgstr "_خروج"
-
-#: ../gtk/actions.c:118
-msgid "Select _All"
-msgstr "انتخاب _همه"
-
-#: ../gtk/actions.c:122
-msgid "_Open Folder"
-msgstr "ـگشودن پوشه"
-
-#: ../gtk/add-dialog.c:241
-msgid "Torrent files"
-msgstr "پرونده‌های تورنت"
-
-#: ../gtk/add-dialog.c:275
-msgid "Torrent Options"
-msgstr "خصیصه‌های تورنت"
-
-#: ../gtk/add-dialog.c:318
-msgid "Select Source File"
-msgstr "انتخاب پرونده‌ی منبع"
-
-#: ../gtk/add-dialog.c:330
-msgid "_Destination folder:"
-msgstr "پوشه‌ی ـمقصد"
-
-#: ../gtk/add-dialog.c:337
-msgid "Select Destination Folder"
-msgstr "انتخاب پوشه‌ی مقصد"
-
-#: ../gtk/add-dialog.c:443
-msgid "Add a Torrent"
-msgstr "افزودن یک تورنت"
-
-#: ../gtk/conf.c:94
-#, c-format
-msgid "%s is already running."
-msgstr "%s در حال اجرا است."
-
-#: ../gtk/details.c:618 ../gtk/details.c:1346 ../gtk/details.c:1643
-#: ../gtk/util.c:68 ../libtransmission/utils.c:1348
-msgid "None"
-msgstr "هیچ‌کدام"
-
-#: ../gtk/details.c:940
-msgid "State:"
-msgstr "وضعیت:"
-
-#: ../gtk/details.c:952
-msgid "Error:"
-msgstr "خطا:"
-
-#: ../gtk/details.c:956
-msgid "Details"
-msgstr "جزئیات"
-
-#: ../gtk/details.c:996
-msgid "Comment:"
-msgstr "توضیح:"
-
-#: ../gtk/details.c:1030 ../gtk/details.c:1070
-msgid "Down"
-msgstr "پایین"
-
-#: ../gtk/details.c:1068
-msgid "Address"
-msgstr "نشانی"
-
-#: ../gtk/details.c:1074
-msgid "%"
-msgstr "%"
-
-#: ../gtk/details.c:1075
-msgid "Status"
-msgstr "وضعیت‌‌"
-
-#: ../gtk/relocate.c:117
-msgid "Location"
-msgstr "مکان"
 
 #: ../gtk/actions.c:52
 msgid "Sort by Rati_o"
@@ -191,6 +53,10 @@ msgstr ""
 #: ../gtk/actions.c:57
 msgid "Sort by Si_ze"
 msgstr ""
+
+#: ../gtk/actions.c:74
+msgid "_Main Window"
+msgstr "پنجره‌ی اصلی"
 
 #: ../gtk/actions.c:75
 msgid "Message _Log"
@@ -224,13 +90,53 @@ msgstr ""
 msgid "_Torrent"
 msgstr ""
 
+#: ../gtk/actions.c:101
+msgid "_View"
+msgstr "_نما"
+
+#: ../gtk/actions.c:102
+msgid "_Sort Torrents By"
+msgstr "ـجور کردن تورنت‌ها بر اساس"
+
+#: ../gtk/actions.c:103
+msgid "_Edit"
+msgstr "_ویرایش"
+
+#: ../gtk/actions.c:104
+msgid "_Help"
+msgstr "_راهنما"
+
+#: ../gtk/actions.c:105 ../gtk/actions.c:106
+msgid "Add a torrent"
+msgstr "افزودن یک تورنت"
+
 #: ../gtk/actions.c:106
 msgid "_Add..."
 msgstr ""
 
+#: ../gtk/actions.c:107
+msgid "_Start"
+msgstr "شروع"
+
+#: ../gtk/actions.c:107
+msgid "Start torrent"
+msgstr "آغاز تورنت"
+
+#: ../gtk/actions.c:108
+msgid "_Statistics"
+msgstr "ـآمار"
+
 #: ../gtk/actions.c:109 ../gtk/add-dialog.c:362
 msgid "_Verify Local Data"
 msgstr ""
+
+#: ../gtk/actions.c:110
+msgid "_Pause"
+msgstr "_مکث"
+
+#: ../gtk/actions.c:110
+msgid "Pause torrent"
+msgstr "توقف تورنت"
 
 #: ../gtk/actions.c:111
 msgid "_Pause All"
@@ -252,9 +158,29 @@ msgstr ""
 msgid "Set _Location"
 msgstr ""
 
+#: ../gtk/actions.c:114
+msgid "Remove torrent"
+msgstr "حذف تورنت"
+
 #: ../gtk/actions.c:115
 msgid "_Delete Files and Remove"
 msgstr ""
+
+#: ../gtk/actions.c:116
+msgid "_New..."
+msgstr "_جدید"
+
+#: ../gtk/actions.c:116
+msgid "Create a torrent"
+msgstr "ساختن تورنت"
+
+#: ../gtk/actions.c:117
+msgid "_Quit"
+msgstr "_خروج"
+
+#: ../gtk/actions.c:118
+msgid "Select _All"
+msgstr "انتخاب _همه"
 
 #: ../gtk/actions.c:119
 msgid "Dese_lect All"
@@ -264,6 +190,10 @@ msgstr ""
 msgid "Torrent properties"
 msgstr ""
 
+#: ../gtk/actions.c:122
+msgid "_Open Folder"
+msgstr "ـگشودن پوشه"
+
 #: ../gtk/actions.c:124
 msgid "_Contents"
 msgstr ""
@@ -272,9 +202,17 @@ msgstr ""
 msgid "Ask Tracker for _More Peers"
 msgstr ""
 
+#: ../gtk/add-dialog.c:241
+msgid "Torrent files"
+msgstr "پرونده‌های تورنت"
+
 #: ../gtk/add-dialog.c:246
 msgid "All files"
 msgstr ""
+
+#: ../gtk/add-dialog.c:275
+msgid "Torrent Options"
+msgstr "خصیصه‌های تورنت"
 
 #: ../gtk/add-dialog.c:299
 msgid "_Move source file to Trash"
@@ -287,6 +225,22 @@ msgstr ""
 #: ../gtk/add-dialog.c:312
 msgid "_Torrent file:"
 msgstr ""
+
+#: ../gtk/add-dialog.c:318
+msgid "Select Source File"
+msgstr "انتخاب پرونده‌ی منبع"
+
+#: ../gtk/add-dialog.c:330
+msgid "_Destination folder:"
+msgstr "پوشه‌ی ـمقصد"
+
+#: ../gtk/add-dialog.c:337
+msgid "Select Destination Folder"
+msgstr "انتخاب پوشه‌ی مقصد"
+
+#: ../gtk/add-dialog.c:443
+msgid "Add a Torrent"
+msgstr "افزودن یک تورنت"
 
 #: ../gtk/add-dialog.c:460 ../gtk/tr-prefs.c:293
 msgid "Display _options dialog"
@@ -304,6 +258,11 @@ msgstr ""
 #, c-format
 msgid "Couldn't open \"%1$s\": %2$s"
 msgstr ""
+
+#: ../gtk/conf.c:94
+#, c-format
+msgid "%s is already running."
+msgstr "%s در حال اجرا است."
 
 #: ../gtk/conf.c:448 ../gtk/conf.c:453
 #, c-format
@@ -385,6 +344,11 @@ msgstr ""
 #: ../gtk/details.c:607 ../gtk/torrent-cell-renderer.c:169
 msgid "Paused"
 msgstr ""
+
+#: ../gtk/details.c:618 ../gtk/details.c:1346 ../gtk/details.c:1643
+#: ../gtk/util.c:68 ../libtransmission/utils.c:1348
+msgid "None"
+msgstr "هیچ‌کدام"
 
 #: ../gtk/details.c:619 ../gtk/details.c:1645 ../gtk/file-list.c:582
 msgid "Mixed"
@@ -475,6 +439,10 @@ msgstr ""
 msgid "Ratio:"
 msgstr ""
 
+#: ../gtk/details.c:940
+msgid "State:"
+msgstr "وضعیت:"
+
 #: ../gtk/details.c:944
 msgid "Running time:"
 msgstr ""
@@ -482,6 +450,14 @@ msgstr ""
 #: ../gtk/details.c:948
 msgid "Last activity:"
 msgstr ""
+
+#: ../gtk/details.c:952
+msgid "Error:"
+msgstr "خطا:"
+
+#: ../gtk/details.c:956
+msgid "Details"
+msgstr "جزئیات"
 
 #: ../gtk/details.c:962
 msgid "Location:"
@@ -499,9 +475,21 @@ msgstr ""
 msgid "Origin:"
 msgstr ""
 
+#: ../gtk/details.c:996
+msgid "Comment:"
+msgstr "توضیح:"
+
 #: ../gtk/details.c:1028
 msgid "Webseeds"
 msgstr ""
+
+#: ../gtk/details.c:1030 ../gtk/details.c:1070
+msgid "Down"
+msgstr "پایین"
+
+#: ../gtk/details.c:1068
+msgid "Address"
+msgstr "نشانی"
 
 #: ../gtk/details.c:1072
 msgid "Up"
@@ -510,6 +498,14 @@ msgstr ""
 #: ../gtk/details.c:1073
 msgid "Client"
 msgstr ""
+
+#: ../gtk/details.c:1074
+msgid "%"
+msgstr "%"
+
+#: ../gtk/details.c:1075
+msgid "Status"
+msgstr "وضعیت‌‌"
 
 #: ../gtk/details.c:1403
 msgid "Optimistic unchoke"
@@ -937,6 +933,10 @@ msgstr ""
 #: ../gtk/relocate.c:99 ../gtk/relocate.c:121
 msgid "Set Torrent Location"
 msgstr ""
+
+#: ../gtk/relocate.c:117
+msgid "Location"
+msgstr "مکان"
 
 #: ../gtk/relocate.c:124
 msgid "Torrent _location:"

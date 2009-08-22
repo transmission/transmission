@@ -15,67 +15,16 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2009-08-13 23:52+0000\n"
+"X-Launchpad-Export-Date: 2009-08-22 16:00+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
-
-#: ../gtk/actions.c:50
-msgid "Sort by _Name"
-msgstr "Rummañ dre _Anv"
-
-#: ../gtk/actions.c:55
-msgid "Sort by A_ge"
-msgstr "Rummañ dre _Oad"
-
-#: ../gtk/actions.c:74
-msgid "_Main Window"
-msgstr "Prenestr _Pennañ"
-
-#: ../gtk/actions.c:103
-msgid "_Edit"
-msgstr "_Aozañ"
-
-#: ../gtk/actions.c:104
-msgid "_Help"
-msgstr "_Skoazell"
-
-#: ../gtk/actions.c:106
-msgid "_Add..."
-msgstr "_Ouzhpennañ..."
-
-#: ../gtk/actions.c:116
-msgid "_New..."
-msgstr "_Nevez..."
-
-#: ../gtk/actions.c:117
-msgid "_Quit"
-msgstr "_Kuitaat"
-
-#: ../gtk/details.c:952
-msgid "Error:"
-msgstr "Fazi:"
-
-#: ../gtk/details.c:956
-msgid "Details"
-msgstr "Munudoù"
-
-#: ../gtk/details.c:1068
-msgid "Address"
-msgstr "Chomlec'h"
-
-#: ../gtk/details.c:1074
-msgid "%"
-msgstr "%"
-
-#. %1$s is number of pieces;
-#. %2$s is how big each piece is
-#: ../gtk/makemeta-ui.c:288
-#, c-format
-msgid "%1$s @ %2$s"
-msgstr "%1$s @ %2$s"
 
 #: ../gtk/actions.c:49
 msgid "Sort by _Activity"
 msgstr ""
+
+#: ../gtk/actions.c:50
+msgid "Sort by _Name"
+msgstr "Rummañ dre _Anv"
 
 #: ../gtk/actions.c:51
 msgid "Sort by _Progress"
@@ -93,6 +42,10 @@ msgstr ""
 msgid "Sort by T_racker"
 msgstr ""
 
+#: ../gtk/actions.c:55
+msgid "Sort by A_ge"
+msgstr "Rummañ dre _Oad"
+
 #: ../gtk/actions.c:56
 msgid "Sort by Time _Left"
 msgstr ""
@@ -100,6 +53,10 @@ msgstr ""
 #: ../gtk/actions.c:57
 msgid "Sort by Si_ze"
 msgstr ""
+
+#: ../gtk/actions.c:74
+msgid "_Main Window"
+msgstr "Prenestr _Pennañ"
 
 #: ../gtk/actions.c:75
 msgid "Message _Log"
@@ -141,9 +98,21 @@ msgstr "G_welout"
 msgid "_Sort Torrents By"
 msgstr ""
 
+#: ../gtk/actions.c:103
+msgid "_Edit"
+msgstr "_Aozañ"
+
+#: ../gtk/actions.c:104
+msgid "_Help"
+msgstr "_Skoazell"
+
 #: ../gtk/actions.c:105 ../gtk/actions.c:106
 msgid "Add a torrent"
 msgstr ""
+
+#: ../gtk/actions.c:106
+msgid "_Add..."
+msgstr "_Ouzhpennañ..."
 
 #: ../gtk/actions.c:107
 msgid "_Start"
@@ -198,8 +167,16 @@ msgid "_Delete Files and Remove"
 msgstr ""
 
 #: ../gtk/actions.c:116
+msgid "_New..."
+msgstr "_Nevez..."
+
+#: ../gtk/actions.c:116
 msgid "Create a torrent"
 msgstr ""
+
+#: ../gtk/actions.c:117
+msgid "_Quit"
+msgstr "_Kuitaat"
 
 #: ../gtk/actions.c:118
 msgid "Select _All"
@@ -474,6 +451,14 @@ msgstr ""
 msgid "Last activity:"
 msgstr ""
 
+#: ../gtk/details.c:952
+msgid "Error:"
+msgstr "Fazi:"
+
+#: ../gtk/details.c:956
+msgid "Details"
+msgstr "Munudoù"
+
 #: ../gtk/details.c:962
 msgid "Location:"
 msgstr ""
@@ -502,6 +487,10 @@ msgstr ""
 msgid "Down"
 msgstr ""
 
+#: ../gtk/details.c:1068
+msgid "Address"
+msgstr "Chomlec'h"
+
 #: ../gtk/details.c:1072
 msgid "Up"
 msgstr ""
@@ -509,6 +498,10 @@ msgstr ""
 #: ../gtk/details.c:1073
 msgid "Client"
 msgstr ""
+
+#: ../gtk/details.c:1074
+msgid "%"
+msgstr "%"
 
 #: ../gtk/details.c:1075
 msgid "Status"
@@ -826,6 +819,13 @@ msgid "%'d Piece"
 msgid_plural "%'d Pieces"
 msgstr[0] ""
 msgstr[1] ""
+
+#. %1$s is number of pieces;
+#. %2$s is how big each piece is
+#: ../gtk/makemeta-ui.c:288
+#, c-format
+msgid "%1$s @ %2$s"
+msgstr "%1$s @ %2$s"
 
 #: ../gtk/makemeta-ui.c:352
 msgid "Choose Directory"
