@@ -115,7 +115,6 @@
   * Prefs dialog didn't show or modify "Stop seeding torrents at ratio"
 
 === Transmission 1.54 (2009/06/04) ===
-[http://trac.transmissionbt.com/query?milestone=1.54&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Fix small bugs and memory leaks
 ==== Web Client ====
@@ -143,7 +142,6 @@
   * transmission-remote was unable to select torrents by their SHA1 hash
 
 === Transmission 1.53 (2009/05/11) ===
-[http://trac.transmissionbt.com/query?milestone=1.53&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Close potential CSRF security hole for Web Client users
   * Fix locale error in the JSON parser
