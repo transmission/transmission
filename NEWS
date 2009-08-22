@@ -2,7 +2,6 @@
 [http://trac.transmissionbt.com/query?milestone=1.74&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Better data recovery in the case of an OS or Transmission crash
-  * Upgrade DHT to version 0.8
   * If a data file is moved, stop the torrent instead of redownloading it
   * Fix bug that didn't list some peers in the resume file and in PEX
   * More helpful torrent error messages
