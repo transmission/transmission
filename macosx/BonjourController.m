@@ -63,12 +63,12 @@ BonjourController * fDefaultController = nil;
 
 - (void) netService: (NSNetService *) sender didNotPublish: (NSDictionary *) errorDict
 {
-    NSLog(@"Failed to publish the web interface service on port: %d, with error: %@", [sender port], errorDict);
+    NSLog(@"Failed to publish the web interface service on port %d, with error: %@", [sender port], errorDict);
 }
 
 - (void) netService: (NSNetService *) sender didNotResolve: (NSDictionary *) errorDict
 {
-    NSLog(@"Failed to resolve the web interface service on port: %d, with error: %@", [sender port], errorDict);
+    NSLog(@"Failed to resolve the web interface service on port %d, with error: %@", [sender port], errorDict);
 }
 
 @end
