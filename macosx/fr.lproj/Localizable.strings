@@ -188,25 +188,13 @@
 "Are you sure you want to remove %d built-in trackers?" = "Êtes-vous sûr de vouloir supprimer %d trackeurs intégrés ?";
 
 /* Removal confirm panel -> title */
-"Are you sure you want to remove %d transfers from the transfer list and trash both the data and torrent files?" = "Êtes-vous sûr de vouloir enlever %d transferts de la liste et de supprimer les données et les torrents correspondants ?";
-
-/* Removal confirm panel -> title */
-"Are you sure you want to remove %d transfers from the transfer list and trash the data file?" = "Êtes-vous sûr de vouloir enlever %d transferts de la liste et de supprimer ses données ?";
-
-/* Removal confirm panel -> title */
-"Are you sure you want to remove %d transfers from the transfer list and trash the torrent file?" = "Êtes-vous sûr de vouloir enlever %d transferts de la liste et de supprimer les torrents correspondants ?";
+"Are you sure you want to remove %d transfers from the transfer list and trash the data files?" = "Êtes-vous sûr de vouloir enlever %d transferts de la liste et de supprimer leurs données ?";
 
 /* Removal confirm panel -> title */
 "Are you sure you want to remove %d transfers from the transfer list?" = "Êtes-vous sûr de vouloir enlever %d transferts de la liste ?";
 
 /* Removal confirm panel -> title */
-"Are you sure you want to remove \"%@\" from the transfer list and trash both the data and torrent files?" = "Êtes-vous sûr de vouloir enlever \"%@\" de la liste et de supprimer ses données et le torrent correspondant ?";
-
-/* Removal confirm panel -> title */
 "Are you sure you want to remove \"%@\" from the transfer list and trash the data file?" = "Êtes-vous sûr de vouloir enlever \"%@\" de la liste et de supprimer ses données ?";
-
-/* Removal confirm panel -> title */
-"Are you sure you want to remove \"%@\" from the transfer list and trash the torrent file?" = "Êtes-vous sûr de vouloir enlever \"%@\" de la liste et de supprimer le torrent correspondant ?";
 
 /* Removal confirm panel -> title */
 "Are you sure you want to remove \"%@\" from the transfer list?" = "Êtes-vous sûr de vouloir enlever \"%@\" de la liste ?";
@@ -285,13 +273,13 @@
 /* Drag overlay -> file */
 "Create a Torrent File" = "Créer un fichier torrent";
 
-/* Create toolbar item -> tooltip */
-"Create torrent file" = "Créer fichier torrent";
-
 /* Create torrent -> select file
    Create toolbar item -> palette label */
 
 "Create Torrent File" = "Créer Fichier Torrent";
+
+/* Create toolbar item -> tooltip */
+"Create torrent file" = "Créer fichier torrent";
 
 /* Create torrent -> failed -> title */
 "Creation of \"%@\" failed." = "La création de \"%@\" a échoué.";
@@ -318,8 +306,17 @@
 /* Torrent disk space alert -> button */
 "Do not check disk space again" = "Ne plus vérifier l'espace disque";
 
+/* Donation beg -> button */
+"Don't bug me about this ever again." = "Ne plus jamais me parler de ça.";
+
 /* files tab -> tooltip */
 "Don't Download" = "Ne pas télécharger";
+
+/* Donation beg -> button */
+"Donate" = "Donner";
+
+/* Donation beg -> message */
+"Donate or not, there will be no difference to your torrenting experience." = "Faites un don (ou pas), il n'y aura aucune différence sur votre expérience de \"torrentage\".";
 
 /* file table -> header tool tip
    files tab -> tooltip */
@@ -507,6 +504,9 @@
    Groups -> Button */
 
 "None" = "Aucun";
+
+/* Donation beg -> button */
+"Nope" = "Nan";
 
 /* File Outline -> Priority Menu */
 "Normal" = "Normale";
@@ -746,11 +746,11 @@
 /* Torrent -> status string */
 "Seeding" = "Envoi";
 
-/* Growl notification title */
-"Seeding Complete" = "Envoi terminé";
-
 /* Torrent -> status string */
 "Seeding complete" = "Envoi terminé";
+
+/* Growl notification title */
+"Seeding Complete" = "Envoi terminé";
 
 /* Torrent -> status string */
 "Seeding to %d of %d peers" = "Envoi à %1$d sur %2$d peers";
@@ -835,6 +835,9 @@
 
 /* Torrent cell -> button info */
 "Stop waiting to start" = "Arrêté, en attente";
+
+/* Donation beg -> title */
+"Support open-source indie software" = "Supporter les logiciels open-source indépendants";
 
 /* File size - terabytes */
 "TB" = "To";
@@ -960,8 +963,17 @@
 /* Inspector -> title */
 "Tracker" = "Trackeur";
 
+/* Torrent -> status string */
+"Tracker returned a warning" = "Le trackeur a renvoyé un avertissement";
+
+/* Torrent -> status string */
+"Tracker returned an error" = "Le trackeur a renvoyé une erreur";
+
 /* Preferences -> toolbar item title */
 "Transfers" = "Transferts";
+
+/* Donation beg -> message */
+"Transmission is a full-featured torrent application. A lot of time and effort have gone into development, coding, and refinement. If you enjoy using it, please consider showing your love with a donation." = "Transmission est une application Bittorrent complète. Beaucoup d'efforts et de temps ont étés nécessaires à son développement, sa programmation et son peaufinage. Si vous appréciez son utilisation, pensez à montrer votre amour par un don.";
 
 /* Transmission already running alert -> title */
 "Transmission is already running." = "Transmission est déja lancé.";
