@@ -1,4 +1,4 @@
-=== Transmission 1.74 beta 1 (2008/08/18) ===
+=== Transmission 1.74 (2008/08/24) ===
 [http://trac.transmissionbt.com/query?milestone=1.74&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Better data recovery in the case of an OS or Transmission crash
