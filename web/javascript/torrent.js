@@ -468,6 +468,9 @@ Torrent.prototype =
 			e = root._progress_incomplete_container;
 			if( e.className.indexOf( 'incomplete' ) === -1 )
 				e.className = 'torrent_progress_bar in_progress';
+			// Clear the 'seeding' tag 
+			if( e.className.indexOf( 'seeding' ) != -1 ) 
+				e.className = 'torrent_progress_bar incomplete';
 			e.style.width =  (MaxBarWidth - css_completed_width) + '%';
 			e.style.display = 'block';
 		}
