@@ -2,13 +2,13 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.03">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">9J61</string>
+		<string key="IBDocument.SystemVersion">9L31a</string>
 		<string key="IBDocument.InterfaceBuilderVersion">677</string>
-		<string key="IBDocument.AppKitVersion">949.46</string>
+		<string key="IBDocument.AppKitVersion">949.54</string>
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="1361"/>
+			<integer value="153"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -947,8 +947,8 @@
 														<bool key="NS.raise.underflow">YES</bool>
 														<bool key="NS.raise.dividebyzero">YES</bool>
 													</object>
-													<string key="NS.decimal">,</string>
-													<string type="base64-UTF8" key="NS.thousand">wqA</string>
+													<string key="NS.decimal">.</string>
+													<string key="NS.thousand">,</string>
 													<bool key="NS.hasthousands">NO</bool>
 													<bool key="NS.localized">YES</bool>
 													<bool key="NS.allowsfloats">NO</bool>
@@ -1083,8 +1083,8 @@
 														<bool key="NS.raise.underflow">YES</bool>
 														<bool key="NS.raise.dividebyzero">YES</bool>
 													</object>
-													<string key="NS.decimal">,</string>
-													<string type="base64-UTF8" key="NS.thousand">wqA</string>
+													<string key="NS.decimal">.</string>
+													<string key="NS.thousand">,</string>
 													<bool key="NS.hasthousands">NO</bool>
 													<bool key="NS.localized">YES</bool>
 													<bool key="NS.allowsfloats">YES</bool>
@@ -1215,8 +1215,8 @@ IGxhIHF1YW50aXTDqSBkZSBkb25uw6llcyB0w6lsw6ljaGFyZ8OpZXM</string>
 														<bool key="NS.raise.underflow">YES</bool>
 														<bool key="NS.raise.dividebyzero">YES</bool>
 													</object>
-													<string key="NS.decimal">,</string>
-													<string type="base64-UTF8" key="NS.thousand">wqA</string>
+													<string key="NS.decimal">.</string>
+													<string key="NS.thousand">,</string>
 													<bool key="NS.hasthousands">NO</bool>
 													<bool key="NS.localized">YES</bool>
 													<bool key="NS.allowsfloats">NO</bool>
@@ -1318,8 +1318,8 @@ IGxhIHF1YW50aXTDqSBkZSBkb25uw6llcyB0w6lsw6ljaGFyZ8OpZXM</string>
 														<bool key="NS.raise.underflow">YES</bool>
 														<bool key="NS.raise.dividebyzero">YES</bool>
 													</object>
-													<string key="NS.decimal">,</string>
-													<string type="base64-UTF8" key="NS.thousand">wqA</string>
+													<string key="NS.decimal">.</string>
+													<string key="NS.thousand">,</string>
 													<bool key="NS.hasthousands">NO</bool>
 													<bool key="NS.localized">YES</bool>
 													<bool key="NS.allowsfloats">NO</bool>
@@ -3366,7 +3366,7 @@ YWlyYSB0b3VzIGxlcyBjcml0w6hyZXM</string>
 				<string key="NSClassName">NSView</string>
 			</object>
 			<object class="NSCustomView" id="352903881">
-				<nil key="NSNextResponder"/>
+				<reference key="NSNextResponder"/>
 				<int key="NSvFlags">256</int>
 				<object class="NSMutableArray" key="NSSubviews">
 					<bool key="EncodedWithXMLCoder">YES</bool>
@@ -3396,7 +3396,7 @@ YWlyYSB0b3VzIGxlcyBjcml0w6hyZXM</string>
 										<bool key="EncodedWithXMLCoder">YES</bool>
 										<reference ref="8"/>
 										<reference ref="172630586"/>
-										<reference ref="723159675"/>
+										<real value="9.999900e+04" id="660714646"/>
 										<reference ref="8"/>
 										<reference ref="761722050"/>
 									</object>
@@ -3416,15 +3416,15 @@ YWlyYSB0b3VzIGxlcyBjcml0w6hyZXM</string>
 									<reference key="NSAttributes" ref="700878619"/>
 								</object>
 								<reference key="NS.min" ref="8"/>
-								<reference key="NS.max" ref="723159675"/>
+								<reference key="NS.max" ref="660714646"/>
 								<object class="NSDecimalNumberHandler" key="NS.rounding">
 									<int key="NS.roundingmode">3</int>
 									<bool key="NS.raise.overflow">YES</bool>
 									<bool key="NS.raise.underflow">YES</bool>
 									<bool key="NS.raise.dividebyzero">YES</bool>
 								</object>
-								<string key="NS.decimal">,</string>
-								<string type="base64-UTF8" key="NS.thousand">wqA</string>
+								<string key="NS.decimal">.</string>
+								<string key="NS.thousand">,</string>
 								<bool key="NS.hasthousands">NO</bool>
 								<bool key="NS.localized">YES</bool>
 								<bool key="NS.allowsfloats">NO</bool>
@@ -3483,7 +3483,7 @@ YWlyYSB0b3VzIGxlcyBjcml0w6hyZXM</string>
 										<bool key="EncodedWithXMLCoder">YES</bool>
 										<reference ref="8"/>
 										<reference ref="172630586"/>
-										<reference ref="723159675"/>
+										<real value="9.999900e+04" id="3125"/>
 										<reference ref="8"/>
 										<reference ref="761722050"/>
 									</object>
@@ -3503,15 +3503,15 @@ YWlyYSB0b3VzIGxlcyBjcml0w6hyZXM</string>
 									<reference key="NSAttributes" ref="700878619"/>
 								</object>
 								<reference key="NS.min" ref="8"/>
-								<reference key="NS.max" ref="723159675"/>
+								<reference key="NS.max" ref="3125"/>
 								<object class="NSDecimalNumberHandler" key="NS.rounding">
 									<int key="NS.roundingmode">3</int>
 									<bool key="NS.raise.overflow">YES</bool>
 									<bool key="NS.raise.underflow">YES</bool>
 									<bool key="NS.raise.dividebyzero">YES</bool>
 								</object>
-								<string key="NS.decimal">,</string>
-								<string type="base64-UTF8" key="NS.thousand">wqA</string>
+								<string key="NS.decimal">.</string>
+								<string key="NS.thousand">,</string>
 								<bool key="NS.hasthousands">NO</bool>
 								<bool key="NS.localized">YES</bool>
 								<bool key="NS.allowsfloats">NO</bool>
@@ -3618,7 +3618,7 @@ YWlyYSB0b3VzIGxlcyBjcml0w6hyZXM</string>
 										<bool key="EncodedWithXMLCoder">YES</bool>
 										<reference ref="8"/>
 										<reference ref="172630586"/>
-										<reference ref="723159675"/>
+										<real value="9.999900e+04" id="435209565"/>
 										<reference ref="8"/>
 										<reference ref="761722050"/>
 									</object>
@@ -3638,15 +3638,15 @@ YWlyYSB0b3VzIGxlcyBjcml0w6hyZXM</string>
 									<reference key="NSAttributes" ref="700878619"/>
 								</object>
 								<reference key="NS.min" ref="8"/>
-								<reference key="NS.max" ref="723159675"/>
+								<reference key="NS.max" ref="435209565"/>
 								<object class="NSDecimalNumberHandler" key="NS.rounding">
 									<int key="NS.roundingmode">3</int>
 									<bool key="NS.raise.overflow">YES</bool>
 									<bool key="NS.raise.underflow">YES</bool>
 									<bool key="NS.raise.dividebyzero">YES</bool>
 								</object>
-								<string key="NS.decimal">,</string>
-								<string type="base64-UTF8" key="NS.thousand">wqA</string>
+								<string key="NS.decimal">.</string>
+								<string key="NS.thousand">,</string>
 								<bool key="NS.hasthousands">NO</bool>
 								<bool key="NS.localized">YES</bool>
 								<bool key="NS.allowsfloats">NO</bool>
@@ -3683,7 +3683,7 @@ YWlyYSB0b3VzIGxlcyBjcml0w6hyZXM</string>
 										<bool key="EncodedWithXMLCoder">YES</bool>
 										<reference ref="8"/>
 										<reference ref="172630586"/>
-										<reference ref="723159675"/>
+										<real value="9.999900e+04" id="625244840"/>
 										<reference ref="8"/>
 										<reference ref="761722050"/>
 									</object>
@@ -3703,15 +3703,15 @@ YWlyYSB0b3VzIGxlcyBjcml0w6hyZXM</string>
 									<reference key="NSAttributes" ref="700878619"/>
 								</object>
 								<reference key="NS.min" ref="8"/>
-								<reference key="NS.max" ref="723159675"/>
+								<reference key="NS.max" ref="625244840"/>
 								<object class="NSDecimalNumberHandler" key="NS.rounding">
 									<int key="NS.roundingmode">3</int>
 									<bool key="NS.raise.overflow">YES</bool>
 									<bool key="NS.raise.underflow">YES</bool>
 									<bool key="NS.raise.dividebyzero">YES</bool>
 								</object>
-								<string key="NS.decimal">,</string>
-								<string type="base64-UTF8" key="NS.thousand">wqA</string>
+								<string key="NS.decimal">.</string>
+								<string key="NS.thousand">,</string>
 								<bool key="NS.hasthousands">NO</bool>
 								<bool key="NS.localized">YES</bool>
 								<bool key="NS.allowsfloats">NO</bool>
@@ -4127,11 +4127,12 @@ AAABAAAAAQ</bytes>
 					</object>
 				</object>
 				<string key="NSFrameSize">{580, 227}</string>
+				<reference key="NSSuperview"/>
 				<string key="NSClassName">NSView</string>
 				<string key="NSExtension">NSResponder</string>
 			</object>
 			<object class="NSCustomView" id="538122014">
-				<reference key="NSNextResponder"/>
+				<nil key="NSNextResponder"/>
 				<int key="NSvFlags">256</int>
 				<object class="NSMutableArray" key="NSSubviews">
 					<bool key="EncodedWithXMLCoder">YES</bool>
@@ -4282,8 +4283,8 @@ AAABAAAAAQ</bytes>
 									<bool key="NS.raise.underflow">YES</bool>
 									<bool key="NS.raise.dividebyzero">YES</bool>
 								</object>
-								<string key="NS.decimal">,</string>
-								<string type="base64-UTF8" key="NS.thousand">wqA</string>
+								<string key="NS.decimal">.</string>
+								<string key="NS.thousand">,</string>
 								<bool key="NS.hasthousands">NO</bool>
 								<bool key="NS.localized">YES</bool>
 								<bool key="NS.allowsfloats">NO</bool>
@@ -4381,8 +4382,8 @@ AAABAAAAAQ</bytes>
 									<bool key="NS.raise.underflow">YES</bool>
 									<bool key="NS.raise.dividebyzero">YES</bool>
 								</object>
-								<string key="NS.decimal">,</string>
-								<string type="base64-UTF8" key="NS.thousand">wqA</string>
+								<string key="NS.decimal">.</string>
+								<string key="NS.thousand">,</string>
 								<bool key="NS.hasthousands">NO</bool>
 								<bool key="NS.localized">YES</bool>
 								<bool key="NS.allowsfloats">NO</bool>
@@ -4612,7 +4613,6 @@ ZW50cyBwdWJsaWNzA</string>
 					</object>
 				</object>
 				<string key="NSFrameSize">{580, 298}</string>
-				<reference key="NSSuperview"/>
 				<string key="NSClassName">NSView</string>
 				<string key="NSExtension">NSResponder</string>
 			</object>
@@ -4860,8 +4860,8 @@ ZW50cyBwdWJsaWNzA</string>
 									<bool key="NS.raise.underflow">YES</bool>
 									<bool key="NS.raise.dividebyzero">YES</bool>
 								</object>
-								<string key="NS.decimal">,</string>
-								<string type="base64-UTF8" key="NS.thousand">wqA</string>
+								<string key="NS.decimal">.</string>
+								<string key="NS.thousand">,</string>
 								<bool key="NS.hasthousands">NO</bool>
 								<bool key="NS.localized">YES</bool>
 								<bool key="NS.allowsfloats">NO</bool>
@@ -4927,8 +4927,8 @@ ZW50cyBwdWJsaWNzA</string>
 									<bool key="NS.raise.underflow">YES</bool>
 									<bool key="NS.raise.dividebyzero">YES</bool>
 								</object>
-								<string key="NS.decimal">,</string>
-								<string type="base64-UTF8" key="NS.thousand">wqA</string>
+								<string key="NS.decimal">.</string>
+								<string key="NS.thousand">,</string>
 								<bool key="NS.hasthousands">NO</bool>
 								<bool key="NS.localized">YES</bool>
 								<bool key="NS.allowsfloats">NO</bool>
@@ -5362,8 +5362,8 @@ ZW50cyBwdWJsaWNzA</string>
 									<bool key="NS.raise.underflow">YES</bool>
 									<bool key="NS.raise.dividebyzero">YES</bool>
 								</object>
-								<string key="NS.decimal">,</string>
-								<string type="base64-UTF8" key="NS.thousand">wqA</string>
+								<string key="NS.decimal">.</string>
+								<string key="NS.thousand">,</string>
 								<bool key="NS.hasthousands">NO</bool>
 								<bool key="NS.localized">YES</bool>
 								<bool key="NS.allowsfloats">NO</bool>

@@ -1,17 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.02">
+<archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.03">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">9J61</string>
-		<string key="IBDocument.InterfaceBuilderVersion">672</string>
-		<string key="IBDocument.AppKitVersion">949.46</string>
+		<string key="IBDocument.SystemVersion">9L31a</string>
+		<string key="IBDocument.InterfaceBuilderVersion">677</string>
+		<string key="IBDocument.AppKitVersion">949.54</string>
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
+			<integer value="153"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+		</object>
+		<object class="NSMutableDictionary" key="IBDocument.Metadata">
+			<bool key="EncodedWithXMLCoder">YES</bool>
+			<object class="NSArray" key="dict.sortedKeys">
+				<bool key="EncodedWithXMLCoder">YES</bool>
+			</object>
+			<object class="NSMutableArray" key="dict.values">
+				<bool key="EncodedWithXMLCoder">YES</bool>
+			</object>
 		</object>
 		<object class="NSMutableArray" key="IBDocument.RootObjects" id="951209067">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -2065,7 +2075,7 @@ OQA</bytes>
 				<string key="NSClassName">NSView</string>
 			</object>
 			<object class="NSCustomView" id="352903881">
-				<nil key="NSNextResponder"/>
+				<reference key="NSNextResponder"/>
 				<int key="NSvFlags">256</int>
 				<object class="NSMutableArray" key="NSSubviews">
 					<bool key="EncodedWithXMLCoder">YES</bool>
@@ -2094,7 +2104,7 @@ OQA</bytes>
 										<bool key="EncodedWithXMLCoder">YES</bool>
 										<reference ref="8"/>
 										<reference ref="172630586"/>
-										<reference ref="723159675"/>
+										<real value="9.999900e+04" id="42826735"/>
 										<reference ref="8"/>
 										<reference ref="761722050"/>
 									</object>
@@ -2114,7 +2124,7 @@ OQA</bytes>
 									<reference key="NSAttributes" ref="700878619"/>
 								</object>
 								<reference key="NS.min" ref="8"/>
-								<reference key="NS.max" ref="723159675"/>
+								<reference key="NS.max" ref="42826735"/>
 								<object class="NSDecimalNumberHandler" key="NS.rounding">
 									<int key="NS.roundingmode">3</int>
 									<bool key="NS.raise.overflow">YES</bool>
@@ -2180,7 +2190,7 @@ OQA</bytes>
 										<bool key="EncodedWithXMLCoder">YES</bool>
 										<reference ref="8"/>
 										<reference ref="172630586"/>
-										<reference ref="723159675"/>
+										<real value="9.999900e+04" id="184106446"/>
 										<reference ref="8"/>
 										<reference ref="761722050"/>
 									</object>
@@ -2200,7 +2210,7 @@ OQA</bytes>
 									<reference key="NSAttributes" ref="700878619"/>
 								</object>
 								<reference key="NS.min" ref="8"/>
-								<reference key="NS.max" ref="723159675"/>
+								<reference key="NS.max" ref="184106446"/>
 								<object class="NSDecimalNumberHandler" key="NS.rounding">
 									<int key="NS.roundingmode">3</int>
 									<bool key="NS.raise.overflow">YES</bool>
@@ -2314,7 +2324,7 @@ OQA</bytes>
 										<bool key="EncodedWithXMLCoder">YES</bool>
 										<reference ref="8"/>
 										<reference ref="172630586"/>
-										<reference ref="723159675"/>
+										<real value="9.999900e+04" id="771843719"/>
 										<reference ref="8"/>
 										<reference ref="761722050"/>
 									</object>
@@ -2334,7 +2344,7 @@ OQA</bytes>
 									<reference key="NSAttributes" ref="700878619"/>
 								</object>
 								<reference key="NS.min" ref="8"/>
-								<reference key="NS.max" ref="723159675"/>
+								<reference key="NS.max" ref="771843719"/>
 								<object class="NSDecimalNumberHandler" key="NS.rounding">
 									<int key="NS.roundingmode">3</int>
 									<bool key="NS.raise.overflow">YES</bool>
@@ -2378,7 +2388,7 @@ OQA</bytes>
 										<bool key="EncodedWithXMLCoder">YES</bool>
 										<reference ref="8"/>
 										<reference ref="172630586"/>
-										<reference ref="723159675"/>
+										<real value="9.999900e+04" id="192922589"/>
 										<reference ref="8"/>
 										<reference ref="761722050"/>
 									</object>
@@ -2398,7 +2408,7 @@ OQA</bytes>
 									<reference key="NSAttributes" ref="700878619"/>
 								</object>
 								<reference key="NS.min" ref="8"/>
-								<reference key="NS.max" ref="723159675"/>
+								<reference key="NS.max" ref="192922589"/>
 								<object class="NSDecimalNumberHandler" key="NS.rounding">
 									<int key="NS.roundingmode">3</int>
 									<bool key="NS.raise.overflow">YES</bool>
@@ -2821,6 +2831,7 @@ AAABAAAAAQ</bytes>
 					</object>
 				</object>
 				<string key="NSFrameSize">{542, 227}</string>
+				<reference key="NSSuperview"/>
 				<string key="NSClassName">NSView</string>
 				<string key="NSExtension">NSResponder</string>
 			</object>
