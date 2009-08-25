@@ -53,7 +53,8 @@ THE SOFTWARE.
 #ifdef WITHOUT_DHT
 
   /* These are the stubs for when we're building without DHT support */
-  int tr_dhtInit( tr_session * session UNUSED ) { return TR_DHT_STOPPED; }
+  int tr_dhtInit( tr_session * session UNUSED,
+                  tr_address * address UNUSED ) { return TR_DHT_STOPPED; }
   void tr_dhtUninit( tr_session * session UNUSED ) { }
   tr_bool tr_dhtEnabled( const tr_session * session UNUSED ) { return FALSE; }
   tr_port tr_dhtPort ( const tr_session * sesssion UNUSED ) { return 0; }
