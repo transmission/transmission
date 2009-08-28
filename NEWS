@@ -1,4 +1,4 @@
-=== Transmission 1.74 (2008/08/24) ===
+=== Transmission 1.74 (2009/08/24) ===
 [http://trac.transmissionbt.com/query?milestone=1.74&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Better data recovery in the case of an OS or Transmission crash
@@ -32,7 +32,6 @@
 
 === Transmission 1.73 (2009/07/18) ===
 [http://trac.transmissionbt.com/query?milestone=1.73&group=component&groupdesc=1&order=severity All tickets closed by this release]
-
 ==== All Platforms ====
   * Fix bug where user-configured peer limits could be exceeded
   * Use less memory in some high-peer situations
