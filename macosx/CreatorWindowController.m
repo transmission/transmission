@@ -287,8 +287,8 @@
         [fTrackers addObject: @""];
         [fTrackerTable reloadData];
         
-        NSInteger row = [fTrackers count] - 1;
-        [fTrackerTable selectRow: row byExtendingSelection: NO];
+        const NSInteger row = [fTrackers count] - 1;
+        [fTrackerTable selectRowIndexes: [NSIndexSet indexSetWithIndex: row] byExtendingSelection: NO];
         [fTrackerTable editColumn: 0 row: row withEvent: nil select: YES];
     }
 }

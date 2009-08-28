@@ -493,8 +493,8 @@ int trashDataFile(const char * filename)
         [self quickPause];
         
         //allow if file can be moved or does not exist
-        if ([[NSFileManager defaultManager] movePath: [oldFolder stringByAppendingPathComponent: [self name]]
-                            toPath: [folder stringByAppendingPathComponent: [self name]] handler: nil]
+        if ([[NSFileManager defaultManager] moveItemAtPath: [oldFolder stringByAppendingPathComponent: [self name]]
+                            toPath: [folder stringByAppendingPathComponent: [self name]] error: NULL]
             || ![[NSFileManager defaultManager] fileExistsAtPath: [oldFolder stringByAppendingPathComponent: [self name]]])
         {
             //get rid of both incomplete folder and old download folder, even if move failed
@@ -529,7 +529,7 @@ int trashDataFile(const char * filename)
 
 - (void) copyTorrentFileTo: (NSString *) path
 {
-    [[NSFileManager defaultManager] copyPath: [self torrentLocation] toPath: path handler: nil];
+    [[NSFileManager defaultManager] copyItemAtPath: [self torrentLocation] toPath: path error: NULL];
 }
 
 - (BOOL) alertForRemainingDiskSpace
@@ -1807,8 +1807,8 @@ int trashDataFile(const char * filename)
             {
                 [self quickPause];
                 
-                if ([[NSFileManager defaultManager] movePath: [[self downloadFolder] stringByAppendingPathComponent: [self name]]
-                                        toPath: [fDownloadFolder stringByAppendingPathComponent: [self name]] handler: nil])
+                if ([[NSFileManager defaultManager] moveItemAtPath: [[self downloadFolder] stringByAppendingPathComponent: [self name]]
+                                        toPath: [fDownloadFolder stringByAppendingPathComponent: [self name]] error: NULL])
                     [self updateDownloadFolder];
                 else
                     canMove = NO;

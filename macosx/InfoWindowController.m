@@ -1686,7 +1686,7 @@ typedef enum
     
     [fTrackers insertObject: @"" atIndex: index];
     [fTrackerTable reloadData];
-    [fTrackerTable selectRow: index byExtendingSelection: NO];
+    [fTrackerTable selectRowIndexes: [NSIndexSet indexSetWithIndex: index] byExtendingSelection: NO];
     [fTrackerTable editColumn: 0 row: index withEvent: nil select: YES];
 }
 

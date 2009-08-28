@@ -133,7 +133,7 @@
             selectedRow++;
         else;
         
-        [fTableView selectRow: selectedRow byExtendingSelection: NO];
+        [fTableView selectRowIndexes: [NSIndexSet indexSetWithIndex: selectedRow] byExtendingSelection: NO];
         [fTableView reloadData];
     }
     
@@ -154,7 +154,7 @@
             [fTableView reloadData];
             
             row = [fTableView numberOfRows]-1;
-            [fTableView selectRow: row byExtendingSelection: NO];
+            [fTableView selectRowIndexes: [NSIndexSet indexSetWithIndex: row] byExtendingSelection: NO];
             [fTableView scrollRowToVisible: row];
             
             [[fSelectedColorNameField window] makeFirstResponder: fSelectedColorNameField];
