@@ -175,8 +175,8 @@
    peersSendingToUs                | number                      | tr_stat
    percentDone                     | double                      | tr_stat
    pieces                          | string (see below)          | tr_torrent
-   pieceCount                      | tnumber                     | tr_info
-   pieceSize                       | tnumber                     | tr_info
+   pieceCount                      | number                      | tr_info
+   pieceSize                       | number                      | tr_info
    priorities                      | array (see below)           | n/a
    rateDownload (B/s)              | number                      | tr_stat
    rateUpload (B/s)                | number                      | tr_stat
