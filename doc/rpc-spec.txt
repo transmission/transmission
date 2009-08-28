@@ -147,7 +147,7 @@
    downloadLimit                   | number                      | tr_torrent
    downloadLimited                 | boolean                     | tr_torrent
    error                           | number                      | tr_stat
-   errorString                     | number                      | tr_stat
+   errorString                     | string                      | tr_stat
    eta                             | number                      | tr_stat
    files                           | array (see below)           | n/a
    fileStats                       | array (see below)           | n/a
