@@ -425,7 +425,7 @@ tr_session * fHandle;
         BOOL isDirectory;
         if ([[NSFileManager defaultManager] fileExistsAtPath: directory isDirectory: &isDirectory] && isDirectory)
         {
-            NSArray * directoryContents = [[NSFileManager defaultManager] directoryContentsAtPath: directory];
+            NSArray * directoryContents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath: directory error: NULL];
             for (NSString * sound in directoryContents)
             {
                 sound = [sound stringByDeletingPathExtension];
