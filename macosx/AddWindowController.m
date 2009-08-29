@@ -84,10 +84,7 @@
     [[self window] setTitle: name];
     [fNameField setStringValue: name];
     
-    NSImage * icon = [[fTorrent icon] copy];
-    [icon setFlipped: NO];
-    [fIconView setImage: icon];
-    [icon release];
+    [fIconView setImage: [fTorrent icon]];
     
     [self updateStatusField: nil];
     
