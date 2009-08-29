@@ -25,7 +25,6 @@
 @interface TorrentCell : NSActionCell
 {
     NSUserDefaults * fDefaults;
-    NSImage * fErrorImage;
     
     NSMutableDictionary * fTitleAttributes, * fStatusAttributes;
     

@@ -394,10 +394,7 @@ typedef enum
         
         [fFileController setTorrent: torrent];
         
-        NSImage * icon = [[torrent icon] copy];
-        [icon setFlipped: NO];
-        [fImageView setImage: icon];
-        [icon release];
+        [fImageView setImage: [torrent icon]];
         
         NSString * name = [torrent name];
         [fNameField setStringValue: name];

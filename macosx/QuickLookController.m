@@ -26,6 +26,7 @@
 #import "QuickLook.h"
 #define QLPreviewPanel NSClassFromString(@"QLPreviewPanel")
 
+#import "NSApplicationAdditions.h"
 #import "Controller.h"
 #import "InfoWindowController.h"
 
@@ -147,8 +148,7 @@ QuickLookController * fQuickLookInstance = nil;
         //load the QuickLook framework and set the delegate
         //animation types: 0 = none; 1 = fade; 2 = zoom
         //disable on Snow Leopard for now
-        const NSInteger appKitVersionNumber10_5 = 949;
-        fQuickLookAvailable = floor(NSAppKitVersionNumber) <= appKitVersionNumber10_5
+        fQuickLookAvailable = ![NSApp isOnSnowLeopardOrBetter]
                                 && [[NSBundle bundleWithPath: @"/System/Library/PrivateFrameworks/QuickLookUI.framework"] load];
         if (fQuickLookAvailable)
             [[[QLPreviewPanel sharedPreviewPanel] windowController] setDelegate: self];

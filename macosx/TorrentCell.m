@@ -25,6 +25,7 @@
 #import "TorrentCell.h"
 #import "TorrentTableView.h"
 #import "GroupsController.h"
+#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "ProgressGradients.h"
 
@@ -77,6 +78,8 @@
 - (NSString *) buttonString;
 - (NSString *) statusString;
 - (NSString *) minimalStatusString;
+
+- (void) drawImage: (NSImage *) image inRect: (NSRect) rect; //use until 10.5 dropped
 
 @end
 
@@ -420,24 +423,20 @@
     
     //error image
     const BOOL error = [torrent isErrorOrWarning];
-    if (error && !fErrorImage)
-    {
-        fErrorImage = [NSImage imageNamed: @"Error.png"];
-        [fErrorImage setFlipped: YES];
-    }
+    NSImage * errorImage = error ? [NSImage imageNamed: @"Error.png"] : nil;
     
     //icon
     if (!minimal || !(!fTracking && fHoverAction)) //don't show in minimal mode when hovered over
     {
-        NSImage * icon = (minimal && error) ? fErrorImage : [torrent icon];
-        [icon drawInRect: iconRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0f];
+        NSImage * icon = (minimal && error) ? errorImage : [torrent icon];
+        [self drawImage: icon inRect: iconRect];
     }
     
     if (error && !minimal)
     {
         NSRect errorRect = NSMakeRect(NSMaxX(iconRect) - IMAGE_SIZE_MIN, NSMaxY(iconRect) - IMAGE_SIZE_MIN,
                                         IMAGE_SIZE_MIN, IMAGE_SIZE_MIN);
-        [fErrorImage drawInRect: errorRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0f];
+        [self drawImage: errorImage inRect: errorRect];
     }
     
     //text color
@@ -510,9 +509,7 @@
             controlImage = [NSImage imageNamed: [@"Resume" stringByAppendingString: controlImageSuffix]];
     }
     
-    [controlImage setFlipped: YES];
-    [controlImage drawInRect: [self controlButtonRectForBounds: cellFrame] fromRect: NSZeroRect operation: NSCompositeSourceOver
-        fraction: 1.0f];
+    [self drawImage: controlImage inRect: [self controlButtonRectForBounds: cellFrame]];
     
     //reveal button
     NSString * revealImageString;
@@ -524,9 +521,7 @@
         revealImageString = @"RevealOff.png";
     
     NSImage * revealImage = [NSImage imageNamed: revealImageString];
-    [revealImage setFlipped: YES];
-    [revealImage drawInRect: [self revealButtonRectForBounds: cellFrame] fromRect: NSZeroRect operation: NSCompositeSourceOver
-        fraction: 1.0f];
+    [self drawImage: revealImage inRect: [self revealButtonRectForBounds: cellFrame]];
     
     //action button
     NSString * actionImageString;
@@ -540,9 +535,7 @@
     if (actionImageString)
     {
         NSImage * actionImage = [NSImage imageNamed: actionImageString];
-        [actionImage setFlipped: YES];
-        [actionImage drawInRect: [self actionButtonRectForBounds: cellFrame] fromRect: NSZeroRect operation: NSCompositeSourceOver
-            fraction: 1.0f];
+        [self drawImage: actionImage inRect: [self actionButtonRectForBounds: cellFrame]];
     }
     
     //status
@@ -838,6 +831,17 @@
     {
         Torrent * torrent = [self representedObject];
         return [fDefaults boolForKey: @"DisplaySmallStatusRegular"] ? [torrent shortStatusString] : [torrent remainingTimeString];
+    }
+}
+
+- (void) drawImage: (NSImage *) image inRect: (NSRect) rect
+{
+    if ([NSApp isOnSnowLeopardOrBetter])
+        [image drawInRect: rect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0 respectFlipped: YES hints: nil];
+    else
+    {
+        [image setFlipped: YES];
+        [image drawInRect: rect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
     }
 }
 

@@ -653,11 +653,8 @@ int trashDataFile(const char * filename)
 - (NSImage *) icon
 {
     if (!fIcon)
-    {
         fIcon = [[[NSWorkspace sharedWorkspace] iconForFileType: [self isFolder] ? NSFileTypeForHFSTypeCode('fldr')
                                                 : [[self name] pathExtension]] retain];
-        [fIcon setFlipped: YES];
-    }
     return fIcon;
 }
 
