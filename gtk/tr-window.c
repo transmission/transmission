@@ -960,6 +960,7 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
         gtk_button_set_relief( GTK_BUTTON( w ), GTK_RELIEF_NONE );
         g_object_ref( G_OBJECT( p->alt_speed_image[0] ) );
         g_object_ref( G_OBJECT( p->alt_speed_image[1] ) );
+        gtk_container_add( GTK_CONTAINER( w ), p->alt_speed_image[0] );
         g_signal_connect( w, "toggled", G_CALLBACK(alt_speed_toggled_cb ), p );
         gtk_box_pack_start( GTK_BOX( h ), w, 0, 0, 0 );
 
