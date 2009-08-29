@@ -972,8 +972,8 @@ tr_session * fHandle;
         [fRPCWhitelistArray addObject: @""];
         [fRPCWhitelistTable reloadData];
         
-        int row = [fRPCWhitelistArray count] - 1;
-        [fRPCWhitelistTable selectRow: row byExtendingSelection: NO];
+        const int row = [fRPCWhitelistArray count] - 1;
+        [fRPCWhitelistTable selectRowIndexes: [NSIndexSet indexSetWithIndex: row] byExtendingSelection: NO];
         [fRPCWhitelistTable editColumn: 0 row: row withEvent: nil select: YES];
     }
 }

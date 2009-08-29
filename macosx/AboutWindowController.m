@@ -71,7 +71,9 @@ AboutWindowController * fAboutBoxInstance = nil;
 
 - (IBAction) showLicense: (id) sender
 {
-    [fLicenseView setString: [NSString stringWithContentsOfFile: [[NSBundle mainBundle] pathForResource: @"COPYING" ofType: nil]]];
+    NSString * licenseText = [NSString stringWithContentsOfFile: [[NSBundle mainBundle] pathForResource: @"COPYING" ofType: nil]
+                                usedEncoding: nil error: NULL];
+    [fLicenseView setString: licenseText];
     [fLicenseCloseButton setTitle: NSLocalizedString(@"OK", "About window -> license close button")];
 	
 	[NSApp beginSheet: fLicenseSheet modalForWindow: [self window] modalDelegate: nil didEndSelector: nil contextInfo: nil];
