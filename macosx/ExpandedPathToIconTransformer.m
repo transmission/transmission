@@ -49,8 +49,7 @@
     else
         icon = [[NSWorkspace sharedWorkspace] iconForFile: [value stringByExpandingTildeInPath]];
     
-    [icon setScalesWhenResized: YES];
-    [icon setSize: NSMakeSize(16.0f, 16.0f)];
+    [icon setSize: NSMakeSize(16.0, 16.0)];
     
     return icon;
 }

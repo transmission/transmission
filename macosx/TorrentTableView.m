@@ -932,7 +932,6 @@
         
         [item setRepresentedObject: node];
         
-        [icon setScalesWhenResized: YES];
         [icon setSize: NSMakeSize(16.0, 16.0)];
         [item setImage: icon];
         
