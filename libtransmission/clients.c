@@ -229,6 +229,7 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
         else if( !memcmp( id+1, "FT", 2 ) ) four_digits( buf, buflen, "FoxTorrent/RedSwoosh", id+3 );
         else if( !memcmp( id+1, "GR", 2 ) ) four_digits( buf, buflen, "GetRight", id+3 );
         else if( !memcmp( id+1, "HN", 2 ) ) four_digits( buf, buflen, "Hydranode", id+3 );
+        else if( !memcmp( id+1, "KG", 2 ) ) four_digits( buf, buflen, "KGet", id+3 );
         else if( !memcmp( id+1, "LC", 2 ) ) four_digits( buf, buflen, "LeechCraft", id+3 );
         else if( !memcmp( id+1, "LH", 2 ) ) four_digits( buf, buflen, "LH-ABC", id+3 );
         else if( !memcmp( id+1, "NX", 2 ) ) four_digits( buf, buflen, "Net Transport", id+3 );
@@ -241,7 +242,7 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
         else if( !memcmp( id+1, "RS", 2 ) ) four_digits( buf, buflen, "Rufus", id+3 );
         else if( !memcmp( id+1, "RT", 2 ) ) four_digits( buf, buflen, "Retriever", id+3 );
         else if( !memcmp( id+1, "RZ", 2 ) ) four_digits( buf, buflen, "RezTorrent", id+3 );
-        else if( !memcmp( id+1, "SD", 2 ) ) four_digits( buf, buflen, "Xunlei", id+3 );
+        else if( !memcmp( id+1, "SD", 2 ) ) four_digits( buf, buflen, "Thunder", id+3 );
         else if( !memcmp( id+1, "SS", 2 ) ) four_digits( buf, buflen, "SwarmScope", id+3 );
         else if( !memcmp( id+1, "SZ", 2 ) ) four_digits( buf, buflen, "Shareaza", id+3 );
         else if( !memcmp( id+1, "S~", 2 ) ) four_digits( buf, buflen, "Shareaza", id+3 );
