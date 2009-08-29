@@ -33,6 +33,7 @@
 
 #define IMAGE_SIZE_REG 32.0f
 #define IMAGE_SIZE_MIN 16.0f
+#define ERROR_IMAGE_SIZE 20.0f
 
 #define NORMAL_BUTTON_WIDTH 14.0f
 #define ACTION_BUTTON_WIDTH 16.0f
@@ -423,7 +424,7 @@
     
     //error image
     const BOOL error = [torrent isErrorOrWarning];
-    NSImage * errorImage = error ? [NSImage imageNamed: @"Error.png"] : nil;
+    NSImage * errorImage = error ? [NSImage imageNamed: [NSApp isOnSnowLeopardOrBetter] ? NSImageNameCaution : @"Error.png"] : nil;
     
     //icon
     if (!minimal || !(!fTracking && fHoverAction)) //don't show in minimal mode when hovered over
@@ -434,8 +435,8 @@
     
     if (error && !minimal)
     {
-        NSRect errorRect = NSMakeRect(NSMaxX(iconRect) - IMAGE_SIZE_MIN, NSMaxY(iconRect) - IMAGE_SIZE_MIN,
-                                        IMAGE_SIZE_MIN, IMAGE_SIZE_MIN);
+        NSRect errorRect = NSMakeRect(NSMaxX(iconRect) - ERROR_IMAGE_SIZE, NSMaxY(iconRect) - ERROR_IMAGE_SIZE,
+                                        ERROR_IMAGE_SIZE, ERROR_IMAGE_SIZE);
         [self drawImage: errorImage inRect: errorRect];
     }
     
