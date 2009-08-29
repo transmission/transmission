@@ -32,6 +32,7 @@
 #import "TrackerTableView.h"
 #import "PiecesView.h"
 #import "QuickLookController.h"
+#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #include "utils.h" //tr_getRatio()
 
@@ -148,8 +149,11 @@ typedef enum
     //reset images for reveal button, since the images are also used in the main table
     NSImage * revealOn = [[NSImage imageNamed: @"RevealOn.png"] copy],
             * revealOff = [[NSImage imageNamed: @"RevealOff.png"] copy];
-    [revealOn setFlipped: NO];
-    [revealOff setFlipped: NO];
+    if (![NSApp isOnSnowLeopardOrBetter])
+    {
+        [revealOn setFlipped: NO];
+        [revealOff setFlipped: NO];
+    }
     
     [fRevealDataButton setImage: revealOff];
     [fRevealDataButton setAlternateImage: revealOn];
