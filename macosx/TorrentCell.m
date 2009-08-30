@@ -301,7 +301,13 @@
         fMouseDownRevealButton = NO;
         [controlView setNeedsDisplayInRect: cellFrame];
         
-        [[self representedObject] revealData];
+        if ([NSApp isOnSnowLeopardOrBetter])
+        {
+            NSURL * file = [NSURL fileURLWithPath: [[self representedObject] dataLocation]];
+            [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs: [NSArray arrayWithObject: file]];
+        }
+        else
+            [[NSWorkspace sharedWorkspace] selectFile: [[self representedObject] dataLocation] inFileViewerRootedAtPath: nil];
     }
     else;
     
