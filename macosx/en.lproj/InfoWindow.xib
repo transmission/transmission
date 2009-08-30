@@ -718,18 +718,14 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSBDb21wdXRlciwgSW5jLiwgMjAwNQAAAAA</bytes>
 									<bool key="EncodedWithXMLCoder">YES</bool>
 									<object class="NSArray" key="dict.sortedKeys">
 										<bool key="EncodedWithXMLCoder">YES</bool>
-										<string>dateFormat_10_0</string>
 										<string>dateStyle</string>
 										<string>formatterBehavior</string>
-										<string>lenient</string>
 										<string>timeStyle</string>
 									</object>
 									<object class="NSMutableArray" key="dict.values">
 										<bool key="EncodedWithXMLCoder">YES</bool>
-										<string>%a %b %e, %Y %1I:%M %p</string>
 										<integer value="4"/>
 										<integer value="1040"/>
-										<integer value="0"/>
 										<integer value="1"/>
 									</object>
 								</object>
@@ -7551,6 +7547,7 @@ AAAAAAAAAAAAAAAAAAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOQA</bytes>
 					<string>984.ImportedFromIB2</string>
 					<string>985.IBPluginDependency</string>
 					<string>985.ImportedFromIB2</string>
+					<string>986.IBDateFormatterBehaviorMetadataKey</string>
 					<string>986.IBPluginDependency</string>
 					<string>986.ImportedFromIB2</string>
 					<string>987.IBPluginDependency</string>
@@ -8061,6 +8058,7 @@ AAAAAAAAAAAAAAAAAAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOQA</bytes>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
+					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -8383,6 +8381,13 @@ AAAAAAAAAAAAAAAAAAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOQA</bytes>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBUserSource</string>
 						<string key="minorKey"/>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSApplication</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">macosx/NSApplicationAdditions.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
