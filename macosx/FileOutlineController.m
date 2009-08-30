@@ -186,7 +186,7 @@ typedef enum
     if ([identifier isEqualToString: @"Check"])
     {
         NSIndexSet * indexSet;
-        if ([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask)
+        if (([NSApp isOnSnowLeopardOrBetter] ? [NSEvent modifierFlags] : [[NSApp currentEvent] modifierFlags]) & NSAlternateKeyMask)
             indexSet = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fTorrent fileCount])];
         else
             indexSet = [(FileListNode *)item indexes];

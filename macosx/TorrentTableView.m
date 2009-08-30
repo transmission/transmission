@@ -539,7 +539,7 @@
         [fController stopTorrents: [NSArray arrayWithObject: torrent]];
     else
     {
-        if ([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask)
+        if (([NSApp isOnSnowLeopardOrBetter] ? [NSEvent modifierFlags] : [[NSApp currentEvent] modifierFlags]) & NSAlternateKeyMask)
             [fController resumeTorrentsNoWait: [NSArray arrayWithObject: torrent]];
         else if ([torrent waitingToStart])
             [fController stopTorrents: [NSArray arrayWithObject: torrent]];
