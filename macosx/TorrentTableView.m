@@ -27,6 +27,7 @@
 #import "Torrent.h"
 #import "TorrentGroup.h"
 #import "FileListNode.h"
+#import "NSApplicationAdditions.h"
 #import "QuickLookController.h"
 
 #define MAX_GROUP 999999
