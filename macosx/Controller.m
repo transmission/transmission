@@ -43,6 +43,7 @@
 #import "StatusBarView.h"
 #import "FilterButton.h"
 #import "BonjourController.h"
+#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "ExpandedPathToPathTransformer.h"
 #import "ExpandedPathToIconTransformer.h"
@@ -1409,8 +1410,20 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) revealFile: (id) sender
 {
-    for (Torrent * torrent in [fTableView selectedTorrents])
-        [torrent revealData];
+    NSArray * selected = [fTableView selectedTorrents];
+    if ([NSApp isOnSnowLeopardOrBetter])
+    {
+        NSMutableArray * paths = [NSMutableArray arrayWithCapacity: [selected count]];
+        for (Torrent * torrent in [fTableView selectedTorrents])
+            [paths addObject: [NSURL fileURLWithPath: [torrent dataLocation]]];
+        
+        [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs: paths];
+    }
+    else
+    {
+        for (Torrent * torrent in selected)
+            [[NSWorkspace sharedWorkspace] selectFile: [torrent dataLocation] inFileViewerRootedAtPath: nil];
+    }
 }
 
 - (void) announceSelectedTorrents: (id) sender
@@ -4057,7 +4070,15 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     NSString * type = [clickContext objectForKey: @"Type"], * location;
     if (([type isEqualToString: GROWL_DOWNLOAD_COMPLETE] || [type isEqualToString: GROWL_SEEDING_COMPLETE])
             && (location = [clickContext objectForKey: @"Location"]))
-        [[NSWorkspace sharedWorkspace] selectFile: location inFileViewerRootedAtPath: nil];
+    {
+        if ([NSApp isOnSnowLeopardOrBetter])
+        {
+            NSURL * file = [NSURL fileURLWithPath: location];
+            [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs: [NSArray arrayWithObject: file]];
+        }
+        else
+            [[NSWorkspace sharedWorkspace] selectFile: location inFileViewerRootedAtPath: nil];
+    }
 }
 
 - (void) rpcCallback: (tr_rpc_callback_type) type forTorrentStruct: (struct tr_torrent *) torrentStruct

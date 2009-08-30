@@ -116,7 +116,6 @@
 - (tr_priority_t) priority;
 - (void) setPriority: (tr_priority_t) priority;
 
-- (void) revealData;
 + (void) trashFile: (NSString *) path;
 - (void) trashData;
 - (void) moveTorrentDataFileTo: (NSString *) folder;

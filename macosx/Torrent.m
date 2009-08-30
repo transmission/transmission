@@ -436,11 +436,6 @@ int trashDataFile(const char * filename)
     return tr_torrentSetPriority(fHandle, priority);
 }
 
-- (void) revealData
-{
-    [[NSWorkspace sharedWorkspace] selectFile: [self dataLocation] inFileViewerRootedAtPath: nil];
-}
-
 #warning should be somewhere else?
 + (void) trashFile: (NSString *) path
 {
