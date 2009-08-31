@@ -776,7 +776,8 @@ buildTrackerRequestURI( tr_tracker *       t,
                               "&compact=1"
                               "&supportcrypto=1"
                               "&numwant=%d"
-                              "&key=%s",
+                              "&key=%s"
+                              "&upload_only=%d", /* ticket #2357 */
                               strchr( ann, '?' ) ? '&' : '?',
                               t->escaped,
                               t->peer_id,
@@ -786,7 +787,8 @@ buildTrackerRequestURI( tr_tracker *       t,
                               torrent->corruptCur,
                               tr_cpLeftUntilComplete( &torrent->completion ),
                               numwant,
-                              t->key_param );
+                              t->key_param,
+                              tr_torrentIsSeed( torrent ) ? 1 : 0 );
 
     if( t->session->encryptionMode == TR_ENCRYPTION_REQUIRED )
         evbuffer_add_printf( buf, "&requirecrypto=1" );
