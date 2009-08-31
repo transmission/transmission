@@ -2474,7 +2474,7 @@ static void
 enforceTorrentPeerLimit( Torrent * t, uint64_t now )
 {
     int n = tr_ptrArraySize( &t->peers );
-    const int max = tr_sessionGetPeerLimitPerTorrent( t->tor->session );
+    const int max = tr_torrentGetPeerLimit( t->tor );
     if( n > max )
     {
         void * base = tr_ptrArrayBase( &t->peers );
