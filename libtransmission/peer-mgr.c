@@ -2607,7 +2607,7 @@ bandwidthPulse( void * vmgr )
     /* possibly stop torrents that have an error */
     tor = NULL;
     while(( tor = tr_torrentNext( mgr->session, tor )))
-        if( tor->isRunning && (( tor->error == TR_STAT_TRACKER_ERROR ) || ( tor->error == TR_STAT_LOCAL_ERROR )))
+        if( tor->isRunning && ( tor->error == TR_STAT_LOCAL_ERROR ))
             tr_torrentStop( tor );
 
     managerUnlock( mgr );
