@@ -24,13 +24,14 @@
 
 #import <Cocoa/Cocoa.h>
 #import <transmission.h>
+#import <Quartz/Quartz.h>
 
 @class Torrent;
 @class TrackerTableView;
 @class FileOutlineController;
 @class PiecesView;
 
-@interface InfoWindowController : NSWindowController
+@interface InfoWindowController : NSWindowController <QLPreviewPanelDataSource, QLPreviewPanelDelegate>
 {
     NSArray * fTorrents;
     NSMutableArray * fTrackers;
@@ -77,6 +78,8 @@
                         * fPeersConnectField;
     
     NSString * fInitialString;
+    
+    QLPreviewPanel * fPreviewPanel;
 }
 
 - (void) setInfoForTorrents: (NSArray *) torrents;
@@ -90,7 +93,6 @@
 
 - (void) addRemoveTracker: (id) sender;
 
-- (BOOL) shouldQuickLookFileView;
 - (NSArray *) quickLookURLs;
 - (BOOL) canQuickLook;
 - (NSRect) quickLookFrameWithURL: (NSURL*) url;

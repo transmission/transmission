@@ -247,10 +247,6 @@ typedef enum
 
 - (void) showMainWindow: (id) sender;
 
-- (NSArray *) quickLookURLs;
-- (BOOL) canQuickLook;
-- (BOOL) canQuickLookTorrent: (Torrent *) torrent;
-- (NSRect) quickLookFrameWithURL: (NSURL*) url;
 - (void) toggleQuickLook: (id) sender;
 
 - (void) linkHomepage: (id) sender;

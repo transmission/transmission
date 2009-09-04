@@ -211,7 +211,6 @@
 		A2DA362B0CBC674900C2ED41 /* InfoFiles.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DA36280CBC674900C2ED41 /* InfoFiles.png */; };
 		A2DA362C0CBC674900C2ED41 /* InfoPeers.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DA36290CBC674900C2ED41 /* InfoPeers.png */; };
 		A2DF37070C220D03006523C1 /* CreatorWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2DF37050C220D03006523C1 /* CreatorWindowController.m */; };
-		A2DF57740DE46A6A000795D5 /* QuickLookController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2DF57730DE46A6A000795D5 /* QuickLookController.m */; };
 		A2DF58580DE4B2B0000795D5 /* JSON_parser.c in Sources */ = {isa = PBXBuildFile; fileRef = A2DF576A0DE468C6000795D5 /* JSON_parser.c */; };
 		A2DF58590DE4B2B1000795D5 /* JSON_parser.h in Headers */ = {isa = PBXBuildFile; fileRef = A2DF576B0DE468C6000795D5 /* JSON_parser.h */; };
 		A2E23AC60CB5E1930002BB25 /* InfoTabButtonCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A2E23AC40CB5E1930002BB25 /* InfoTabButtonCell.m */; };
@@ -701,8 +700,6 @@
 		A2DF37050C220D03006523C1 /* CreatorWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CreatorWindowController.m; path = macosx/CreatorWindowController.m; sourceTree = "<group>"; };
 		A2DF576A0DE468C6000795D5 /* JSON_parser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = JSON_parser.c; path = libtransmission/JSON_parser.c; sourceTree = "<group>"; };
 		A2DF576B0DE468C6000795D5 /* JSON_parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JSON_parser.h; path = libtransmission/JSON_parser.h; sourceTree = "<group>"; };
-		A2DF57720DE46A6A000795D5 /* QuickLookController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = QuickLookController.h; path = macosx/QuickLookController.h; sourceTree = "<group>"; };
-		A2DF57730DE46A6A000795D5 /* QuickLookController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = QuickLookController.m; path = macosx/QuickLookController.m; sourceTree = "<group>"; };
 		A2E23AC30CB5E1930002BB25 /* InfoTabButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = InfoTabButtonCell.h; path = macosx/InfoTabButtonCell.h; sourceTree = "<group>"; };
 		A2E23AC40CB5E1930002BB25 /* InfoTabButtonCell.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = InfoTabButtonCell.m; path = macosx/InfoTabButtonCell.m; sourceTree = "<group>"; };
 		A2E2EA910EE321C200EB6308 /* Groups.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Groups.png; path = macosx/Images/Groups.png; sourceTree = "<group>"; };
@@ -968,8 +965,6 @@
 				A222E9860E6B21D9009FB003 /* BlocklistDownloaderViewController.m */,
 				A222EA790E6C32C4009FB003 /* BlocklistScheduler.h */,
 				A222EA7A0E6C32C4009FB003 /* BlocklistScheduler.m */,
-				A2DF57720DE46A6A000795D5 /* QuickLookController.h */,
-				A2DF57730DE46A6A000795D5 /* QuickLookController.m */,
 			);
 			name = Sources;
 			sourceTree = "<group>";
@@ -1982,7 +1977,6 @@
 				A26AF2840D2DC27C00FF7140 /* AddWindowController.m in Sources */,
 				A2FB701C0D95CAEA0001F331 /* GroupsController.m in Sources */,
 				A2D307A40D9EC6870051FD27 /* BlocklistDownloader.m in Sources */,
-				A2DF57740DE46A6A000795D5 /* QuickLookController.m in Sources */,
 				A2725B6E0DE5C4F5003445E7 /* FileListNode.m in Sources */,
 				A2725D5D0DE7507C003445E7 /* TrackerTableView.m in Sources */,
 				A28F4F770E085BDC003A3882 /* ColorTextField.m in Sources */,

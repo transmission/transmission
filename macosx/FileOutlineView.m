@@ -28,7 +28,6 @@
 #import "FilePriorityCell.h"
 #import "Torrent.h"
 #import "FileListNode.h"
-#import "QuickLookController.h"
 
 @implementation FileOutlineView
 
@@ -83,22 +82,6 @@
 {
     [[self window] makeKeyWindow];
     [super mouseDown: event];
-}
-
-- (void) keyDown: (NSEvent *) event
-{
-    const unichar firstChar = [[event charactersIgnoringModifiers] characterAtIndex: 0];
-    
-    //don't allow quick look on add window
-    if (firstChar == ' ' && [[[self window] windowController] isKindOfClass: [InfoWindowController class]])
-        [[QuickLookController quickLook] toggleQuickLook];
-    else if (firstChar == NSRightArrowFunctionKey)
-        [[QuickLookController quickLook] pressRight];
-    else if (firstChar == NSLeftArrowFunctionKey)
-        [[QuickLookController quickLook] pressLeft];
-    else;
-    
-    [super keyDown: event];  
 }
 
 - (NSMenu *) menuForEvent: (NSEvent *) event

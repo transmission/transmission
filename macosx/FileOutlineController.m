@@ -28,7 +28,7 @@
 #import "FilePriorityCell.h"
 #import "FileListNode.h"
 #import "NSApplicationAdditions.h"
-#import "QuickLookController.h"
+#import <Quartz/Quartz.h>
 
 #define ROW_SMALL_HEIGHT 18.0
 
@@ -132,7 +132,8 @@ typedef enum
 
 - (void) outlineViewSelectionDidChange: (NSNotification *) notification
 {
-    [[QuickLookController quickLook] updateQuickLook];
+    if ([QLPreviewPanel sharedPreviewPanelExists] && [[QLPreviewPanel sharedPreviewPanel] isVisible])
+        [[QLPreviewPanel sharedPreviewPanel] reloadData];
 }
 
 - (NSInteger) outlineView: (NSOutlineView *) outlineView numberOfChildrenOfItem: (id) item
