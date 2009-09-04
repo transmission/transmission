@@ -28,6 +28,7 @@
 #import "FilePriorityCell.h"
 #import "Torrent.h"
 #import "FileListNode.h"
+#import <Quartz/Quartz.h>
 
 @implementation FileOutlineView
 
@@ -82,6 +83,22 @@
 {
     [[self window] makeKeyWindow];
     [super mouseDown: event];
+}
+
+- (void) keyDown: (NSEvent *) event
+{
+    const unichar firstChar = [[event charactersIgnoringModifiers] characterAtIndex: 0];
+    
+    //don't allow quick look on add window
+    if (firstChar == ' ' && [[[self window] windowController] conformsToProtocol: @protocol(QLPreviewPanelDataSource)])
+    {
+        if ([QLPreviewPanel sharedPreviewPanelExists] && [[QLPreviewPanel sharedPreviewPanel] isVisible])
+            [[QLPreviewPanel sharedPreviewPanel] orderOut: nil];
+        else
+            [[QLPreviewPanel sharedPreviewPanel] makeKeyAndOrderFront: nil];
+    }
+    
+    [super keyDown: event];  
 }
 
 - (NSMenu *) menuForEvent: (NSEvent *) event
