@@ -820,9 +820,9 @@ typedef enum
     [[window contentView] addSubview: view];
     [view setHidden: NO];
     
-    if (fCurrentTabTag == TAB_FILES_TAG || oldTabTag == TAB_FILES_TAG
+    if ((fCurrentTabTag == TAB_FILES_TAG || oldTabTag == TAB_FILES_TAG)
         && ([QLPreviewPanel sharedPreviewPanelExists] && [[QLPreviewPanel sharedPreviewPanel] isVisible]))
-        [[QLPreviewPanel sharedPreviewPanel] reloadData];
+        [[QLPreviewPanel sharedPreviewPanel] updateController];
 }
 
 - (void) setNextTab
@@ -1109,7 +1109,7 @@ typedef enum
 
 - (BOOL) acceptsPreviewPanelControl: (QLPreviewPanel *) panel
 {
-    return fCurrentTabTag == TAB_FILES_TAG && [[fFileController outlineView] numberOfSelectedRows] > 0;
+    return fCurrentTabTag == TAB_FILES_TAG && [self canQuickLook];
 }
 
 - (void) beginPreviewPanelControl: (QLPreviewPanel *) panel
