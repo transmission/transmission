@@ -3251,6 +3251,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [item setImage: [NSImage imageNamed: NSImageNameQuickLookTemplate]];
         [item setTarget: self];
         [item setAction: @selector(toggleQuickLook:)];
+        [item setAutovalidates: NO];
         
         return item;
     }
@@ -3964,7 +3965,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) toggleQuickLook: (id) sender
 {
-    if ([QLPreviewPanel sharedPreviewPanelExists] && [[QLPreviewPanel sharedPreviewPanel] isVisible])
+    if ([[QLPreviewPanel sharedPreviewPanel] isVisible])
         [[QLPreviewPanel sharedPreviewPanel] orderOut: nil];
     else
         [[QLPreviewPanel sharedPreviewPanel] makeKeyAndOrderFront: nil];

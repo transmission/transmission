@@ -92,7 +92,7 @@
     //don't allow quick look on add window
     if (firstChar == ' ' && [[[self window] windowController] conformsToProtocol: @protocol(QLPreviewPanelDataSource)])
     {
-        if ([QLPreviewPanel sharedPreviewPanelExists] && [[QLPreviewPanel sharedPreviewPanel] isVisible])
+        if ([[QLPreviewPanel sharedPreviewPanel] isVisible])
             [[QLPreviewPanel sharedPreviewPanel] orderOut: nil];
         else
             [[QLPreviewPanel sharedPreviewPanel] makeKeyAndOrderFront: nil];
