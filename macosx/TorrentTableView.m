@@ -869,14 +869,6 @@
     return fPiecesBarPercent;
 }
 
-
-
-
-
-
-
-
-
 - (BOOL) acceptsPreviewPanelControl: (QLPreviewPanel *) panel
 {
     return YES;
@@ -928,11 +920,6 @@
     frame.origin.y -= frame.size.height;
     return frame;
 }
-
-
-
-
-
 
 @end
 

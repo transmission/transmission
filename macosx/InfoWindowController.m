@@ -82,6 +82,8 @@ typedef enum
 - (void) setWebSeedTableHidden: (BOOL) hide animate: (BOOL) animate;
 - (NSArray *) peerSortDescriptors;
 
+- (NSArray *) quickLookURLs;
+- (BOOL) canQuickLook;
 - (BOOL) canQuickLookFile: (FileListNode *) item;
 
 - (void) addTrackers;
@@ -1102,11 +1104,6 @@ typedef enum
     return [[fTrackers objectAtIndex: i] intValue] == 0;
 }
 
-
-
-
-
-
 - (BOOL) acceptsPreviewPanelControl: (QLPreviewPanel *) panel
 {
     return fCurrentTabTag == TAB_FILES_TAG && [self canQuickLook];
@@ -1159,45 +1156,6 @@ typedef enum
     frame.origin.y -= frame.size.height;
     return frame;
 }
-
-
-
-
-
-#warning private
-- (NSArray *) quickLookURLs
-{
-    FileOutlineView * fileOutlineView = [fFileController outlineView];
-    Torrent * torrent = [fTorrents objectAtIndex: 0];
-    NSString * folder = [torrent downloadFolder];
-    NSIndexSet * indexes = [fileOutlineView selectedRowIndexes];
-    NSMutableArray * urlArray = [NSMutableArray arrayWithCapacity: [indexes count]];
-    
-    for (NSUInteger i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
-    {
-        FileListNode * item = [fileOutlineView itemAtRow: i];
-        if ([self canQuickLookFile: item])
-            [urlArray addObject: [NSURL fileURLWithPath: [folder stringByAppendingPathComponent: [item fullPath]]]];
-    }
-    
-    return urlArray;
-}
-
-#warning need? private?
-- (BOOL) canQuickLook
-{
-    FileOutlineView * fileOutlineView = [fFileController outlineView];
-    NSIndexSet * indexes = [fileOutlineView selectedRowIndexes];
-    
-    for (NSUInteger i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
-        if ([self canQuickLookFile: [fileOutlineView itemAtRow: i]])
-            return YES;
-    
-    return NO;
-}
-
-
-
 
 - (void) setPiecesView: (id) sender
 {
@@ -1706,6 +1664,36 @@ typedef enum
     }
     
     return descriptors;
+}
+
+- (NSArray *) quickLookURLs
+{
+    FileOutlineView * fileOutlineView = [fFileController outlineView];
+    Torrent * torrent = [fTorrents objectAtIndex: 0];
+    NSString * folder = [torrent downloadFolder];
+    NSIndexSet * indexes = [fileOutlineView selectedRowIndexes];
+    NSMutableArray * urlArray = [NSMutableArray arrayWithCapacity: [indexes count]];
+    
+    for (NSUInteger i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
+    {
+        FileListNode * item = [fileOutlineView itemAtRow: i];
+        if ([self canQuickLookFile: item])
+            [urlArray addObject: [NSURL fileURLWithPath: [folder stringByAppendingPathComponent: [item fullPath]]]];
+    }
+    
+    return urlArray;
+}
+
+- (BOOL) canQuickLook
+{
+    FileOutlineView * fileOutlineView = [fFileController outlineView];
+    NSIndexSet * indexes = [fileOutlineView selectedRowIndexes];
+    
+    for (NSUInteger i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
+        if ([self canQuickLookFile: [fileOutlineView itemAtRow: i]])
+            return YES;
+    
+    return NO;
 }
 
 - (BOOL) canQuickLookFile: (FileListNode *) item
