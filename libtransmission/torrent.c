@@ -720,6 +720,9 @@ tr_torrentParse( const tr_ctor * ctor, tr_info * setmeInfo )
     didParse = tr_metainfoParse( session, setmeInfo, metainfo );
     doFree = didParse && ( setmeInfo == &tmp );
 
+    if( !didParse )
+        result = TR_PARSE_ERR;
+
     if( didParse && !getBlockSize( setmeInfo->pieceSize ) )
         result = TR_PARSE_ERR;
 
