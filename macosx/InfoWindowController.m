@@ -1143,18 +1143,28 @@ typedef enum
     return NO;
 }
 
-#warning fix!
 - (NSRect) previewPanel: (QLPreviewPanel *) panel sourceFrameOnScreenForPreviewItem: (id <QLPreviewItem>) item
 {
-    const NSInteger row = [[fFileController outlineView] rowForItem: item];
-    if (row == -1)
-        return NSZeroRect;
+    FileOutlineView * fileOutlineView = [fFileController outlineView];
     
-    NSRect frame = [[fFileController outlineView] iconRectForRow: row];
-    frame.origin = [[fFileController outlineView] convertPoint: frame.origin toView: nil];
-    frame.origin = [[self window] convertBaseToScreen: frame.origin];
-    frame.origin.y -= frame.size.height;
-    return frame;
+    NSString * fullPath = [(NSURL *) item path];
+    NSString * folder = [[fTorrents objectAtIndex: 0] downloadFolder];
+    NSRange visibleRows = [fileOutlineView rowsInRect: [fileOutlineView bounds]];
+    
+    for (NSUInteger row = visibleRows.location; row < NSMaxRange(visibleRows); row++)
+    {
+        FileListNode * rowItem = [fileOutlineView itemAtRow: row];
+        if ([[folder stringByAppendingPathComponent: [rowItem fullPath]] isEqualToString: fullPath])
+        {
+            NSRect frame = [fileOutlineView iconRectForRow: row];
+            frame.origin = [fileOutlineView convertPoint: frame.origin toView: nil];
+            frame.origin = [[self window] convertBaseToScreen: frame.origin];
+            frame.origin.y -= frame.size.height;
+            return frame;
+        }
+    }
+    
+    return NSZeroRect;
 }
 
 - (void) setPiecesView: (id) sender

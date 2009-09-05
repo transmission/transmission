@@ -1564,11 +1564,6 @@ int trashDataFile(const char * filename)
     return [NSURL fileURLWithPath: [self dataLocation]];
 }
 
-- (NSString *) previewItemTitle
-{
-    return [self name];
-}
-
 @end
 
 @implementation Torrent (Private)
