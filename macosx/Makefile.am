@@ -97,8 +97,6 @@ EXTRA_DIST = \
     PrefsWindow.m \
     ProgressGradients.h \
     ProgressGradients.m \
-    QuickLookController.h \
-    QuickLookController.m \
     QuickLook.h \
     StatsWindowController.h \
     StatsWindowController.m \
