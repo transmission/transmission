@@ -97,7 +97,6 @@ EXTRA_DIST = \
     PrefsWindow.m \
     ProgressGradients.h \
     ProgressGradients.m \
-    QuickLook.h \
     StatsWindowController.h \
     StatsWindowController.m \
     StatusBarView.h \
