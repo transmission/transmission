@@ -163,12 +163,11 @@
 
 - (CGFloat) progress;
 - (CGFloat) progressDone;
-- (CGFloat) progressLeft;
 - (CGFloat) checkingProgress;
 
 - (NSInteger) eta;
 
-- (CGFloat) notAvailableDesired;
+- (CGFloat) availableDesired;
 
 - (BOOL) isActive;
 - (BOOL) isSeeding;

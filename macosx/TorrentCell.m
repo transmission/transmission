@@ -585,100 +585,70 @@
 {
     Torrent * torrent = [self representedObject];
     
-    NSInteger leftWidth = barRect.size.width;
-    CGFloat progress = [torrent progress];
+    NSRect leftRect, rightRect;
+    NSDivideRect(barRect, &leftRect, &rightRect, [torrent progress] * NSWidth(barRect), NSMinXEdge);
     
-    if (progress < 1.0f)
+    //don't-have section
+    if (!NSIsEmptyRect(rightRect))
     {
-        CGFloat rightProgress = 1.0f - progress, progressLeft = [torrent progressLeft];
-        NSInteger rightWidth = leftWidth * rightProgress;
-        leftWidth -= rightWidth;
+        NSRect unwantedRect = rightRect;
         
-        if (progressLeft < rightProgress)
+        if (![torrent allDownloaded])
         {
-            NSInteger rightNoIncludeWidth = rightWidth * ((rightProgress - progressLeft) / rightProgress);
-            rightWidth -= rightNoIncludeWidth;
+            //the ratio of total progress to total width equals ratio of progress of amount wanted to wanted width
+            const CGFloat widthRemaining = NSWidth(barRect) * (1.0 - [torrent progressDone]) / [torrent progress];
             
-            NSRect noIncludeRect = barRect;
-            noIncludeRect.origin.x += barRect.size.width - rightNoIncludeWidth;
-            noIncludeRect.size.width = rightNoIncludeWidth;
+            NSRect wantedRect;
+            NSDivideRect(rightRect, &wantedRect, &unwantedRect, widthRemaining, NSMinXEdge);
             
-            [[ProgressGradients progressLightGrayGradient] drawInRect: noIncludeRect angle: 90];
-        }
-        
-        if (rightWidth > 0)
-        {
-            if ([torrent isActive] && ![torrent allDownloaded] && ![torrent isChecking]
-                && [fDefaults boolForKey: @"DisplayProgressBarAvailable"])
+            if (!NSIsEmptyRect(wantedRect))
             {
-                NSInteger notAvailableWidth = ceil(rightWidth * [torrent notAvailableDesired]);
-                if (notAvailableWidth > 0)
+                //not-available section
+                if ([torrent isActive] && ![torrent isChecking] && [fDefaults boolForKey: @"DisplayProgressBarAvailable"])
                 {
-                    rightWidth -= notAvailableWidth;
+                    NSRect unavailableRect;
+                    NSDivideRect(wantedRect, &wantedRect, &unavailableRect, [torrent availableDesired] * NSWidth(wantedRect), NSMinXEdge);
                     
-                    NSRect notAvailableRect = barRect;
-                    notAvailableRect.origin.x += leftWidth + rightWidth;
-                    notAvailableRect.size.width = notAvailableWidth;
-                    
-                    [[ProgressGradients progressRedGradient] drawInRect: notAvailableRect angle: 90];
+                    [[ProgressGradients progressRedGradient] drawInRect: unavailableRect angle: 90];
                 }
-            }
-            
-            if (rightWidth > 0)
-            {
-                NSRect includeRect = barRect;
-                includeRect.origin.x += leftWidth;
-                includeRect.size.width = rightWidth;
                 
-                [[ProgressGradients progressWhiteGradient] drawInRect: includeRect angle: 90];
+                //remaining section
+                [[ProgressGradients progressWhiteGradient] drawInRect: wantedRect angle: 90];
             }
         }
+        
+        //unwanted section
+        [[ProgressGradients progressLightGrayGradient] drawInRect: unwantedRect angle: 90];
     }
     
-    if (leftWidth > 0)
+    if (!NSIsEmptyRect(leftRect))
     {
-        NSRect completeRect = barRect;
-        completeRect.size.width = leftWidth;
-        
         if ([torrent isActive])
         {
             if ([torrent isChecking])
-                [[ProgressGradients progressYellowGradient] drawInRect: completeRect angle: 90];
+                [[ProgressGradients progressYellowGradient] drawInRect: leftRect angle: 90];
             else if ([torrent isSeeding])
             {
-                NSInteger ratioLeftWidth = leftWidth * (1.0f - [torrent progressStopRatio]);
-                leftWidth -= ratioLeftWidth;
+                NSRect ratioHaveRect, ratioRemainingRect;
+                NSDivideRect(leftRect, &ratioHaveRect, &ratioRemainingRect, [torrent progressStopRatio] * NSWidth(leftRect), NSMinXEdge);
                 
-                if (ratioLeftWidth > 0)
-                {
-                    NSRect ratioLeftRect = barRect;
-                    ratioLeftRect.origin.x += leftWidth;
-                    ratioLeftRect.size.width = ratioLeftWidth;
-                    
-                    [[ProgressGradients progressLightGreenGradient] drawInRect: ratioLeftRect angle: 90];
-                }
-                
-                if (leftWidth > 0)
-                {
-                    completeRect.size.width = leftWidth;
-                    
-                    [[ProgressGradients progressGreenGradient] drawInRect: completeRect angle: 90];
-                }
+                [[ProgressGradients progressGreenGradient] drawInRect: ratioHaveRect angle: 90];
+                [[ProgressGradients progressLightGreenGradient] drawInRect: ratioRemainingRect angle: 90];
             }
             else
-                [[ProgressGradients progressBlueGradient] drawInRect: completeRect angle: 90];
+                [[ProgressGradients progressBlueGradient] drawInRect: leftRect angle: 90];
         }
         else
         {
             if ([torrent waitingToStart])
             {
-                if ([torrent progressLeft] <= 0.0f)
-                    [[ProgressGradients progressDarkGreenGradient] drawInRect: completeRect angle: 90];
+                if ([torrent progressDone] == 0.0)
+                    [[ProgressGradients progressDarkGreenGradient] drawInRect: leftRect angle: 90];
                 else
-                    [[ProgressGradients progressDarkBlueGradient] drawInRect: completeRect angle: 90];
+                    [[ProgressGradients progressDarkBlueGradient] drawInRect: leftRect angle: 90];
             }
             else
-                [[ProgressGradients progressGrayGradient] drawInRect: completeRect angle: 90];
+                [[ProgressGradients progressGrayGradient] drawInRect: leftRect angle: 90];
         }
     }
 }

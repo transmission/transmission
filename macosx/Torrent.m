@@ -860,11 +860,6 @@ int trashDataFile(const char * filename)
     return fStat->percentDone;
 }
 
-- (CGFloat) progressLeft
-{
-    return (CGFloat)[self sizeLeft] / [self size];
-}
-
 - (CGFloat) checkingProgress
 {
     return fStat->recheckProgress;
@@ -875,7 +870,7 @@ int trashDataFile(const char * filename)
     return fStat->eta;
 }
 
-- (CGFloat) notAvailableDesired
+- (CGFloat) availableDesired
 {
     return 1.0 - (CGFloat)fStat->desiredAvailable / [self sizeLeft];
 }
