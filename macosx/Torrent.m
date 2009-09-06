@@ -872,7 +872,7 @@ int trashDataFile(const char * filename)
 
 - (CGFloat) availableDesired
 {
-    return 1.0 - (CGFloat)fStat->desiredAvailable / [self sizeLeft];
+    return (CGFloat)fStat->desiredAvailable / [self sizeLeft];
 }
 
 - (BOOL) isActive
