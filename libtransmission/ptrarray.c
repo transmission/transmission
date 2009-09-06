@@ -186,10 +186,12 @@ static void
 assertSortedAndUnique( const tr_ptrArray * t,
                         int compare(const void*, const void*) )
 {
+#ifndef NDEBUG
     int i;
 
     for( i = 0; i < t->n_items - 2; ++i )
         assert( compare( t->items[i], t->items[i + 1] ) <= 0 );
+#endif
 }
 
 int
