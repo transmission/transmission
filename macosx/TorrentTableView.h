@@ -88,7 +88,6 @@
 - (void) setPriority: (id) sender;
 
 - (void) checkFile: (id) sender;
-- (void) moveDataFile: (id) sender;
 
 - (void) togglePiecesBar;
 - (CGFloat) piecesBarPercent;

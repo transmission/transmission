@@ -12,9 +12,9 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
+			<integer value="81"/>
 			<integer value="1936"/>
 			<integer value="456"/>
-			<integer value="81"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -773,6 +773,7 @@ IDIwMDkAA</bytes>
 									</object>
 									<string key="NSFrameSize">{468, 173}</string>
 									<reference key="NSSuperview" ref="87647552"/>
+									<reference key="NSNextKeyView" ref="675318801"/>
 									<reference key="NSDocView" ref="675318801"/>
 									<reference key="NSBGColor" ref="139722115"/>
 									<int key="NScvFlags">2</int>
@@ -799,6 +800,7 @@ IDIwMDkAA</bytes>
 							</object>
 							<string key="NSFrame">{{0, 23}, {468, 173}}</string>
 							<reference key="NSSuperview" ref="303120456"/>
+							<reference key="NSNextKeyView" ref="306237956"/>
 							<int key="NSsFlags">528</int>
 							<reference key="NSVScroller" ref="1068338331"/>
 							<reference key="NSHScroller" ref="365285506"/>
@@ -4829,14 +4831,6 @@ IDIwMDkAA</bytes>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">moveDataFile:</string>
-						<reference key="source" ref="675318801"/>
-						<reference key="destination" ref="922629505"/>
-					</object>
-					<int key="connectionID">3152</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
 						<string key="label">moveDataFilesSelected:</string>
 						<reference key="source" ref="30116300"/>
 						<reference key="destination" ref="500522949"/>
@@ -4978,6 +4972,14 @@ IDIwMDkAA</bytes>
 						<reference key="destination" ref="953360563"/>
 					</object>
 					<int key="connectionID">3208</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">moveDataFilesSelected:</string>
+						<reference key="source" ref="30116300"/>
+						<reference key="destination" ref="922629505"/>
+					</object>
+					<int key="connectionID">3210</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -5799,11 +5801,11 @@ IDIwMDkAA</bytes>
 							<reference ref="485296611"/>
 							<reference ref="837869282"/>
 							<reference ref="953360563"/>
-							<reference ref="922629505"/>
 							<reference ref="763908271"/>
 							<reference ref="780056445"/>
 							<reference ref="274991158"/>
 							<reference ref="612287796"/>
+							<reference ref="922629505"/>
 						</object>
 						<reference key="parent" ref="0"/>
 						<string key="objectName">ContextRowMenu</string>
@@ -7011,13 +7013,13 @@ IDIwMDkAA</bytes>
 						<reference key="parent" ref="434296936"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">3149</int>
-						<reference key="object" ref="922629505"/>
+						<int key="objectID">3207</int>
+						<reference key="object" ref="953360563"/>
 						<reference key="parent" ref="434296936"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">3207</int>
-						<reference key="object" ref="953360563"/>
+						<int key="objectID">3209</int>
+						<reference key="object" ref="922629505"/>
 						<reference key="parent" ref="434296936"/>
 					</object>
 				</object>
@@ -7549,7 +7551,6 @@ IDIwMDkAA</bytes>
 					<string>3146.IBPluginDependency</string>
 					<string>3148.IBPluginDependency</string>
 					<string>3148.ImportedFromIB2</string>
-					<string>3149.IBPluginDependency</string>
 					<string>3163.IBPluginDependency</string>
 					<string>3163.ImportedFromIB2</string>
 					<string>3164.IBPluginDependency</string>
@@ -7576,6 +7577,8 @@ IDIwMDkAA</bytes>
 					<string>3206.ImportedFromIB2</string>
 					<string>3207.IBPluginDependency</string>
 					<string>3207.ImportedFromIB2</string>
+					<string>3209.IBPluginDependency</string>
+					<string>3209.ImportedFromIB2</string>
 					<string>418.IBPluginDependency</string>
 					<string>418.ImportedFromIB2</string>
 					<string>456.IBEditorWindowLastContentRect</string>
@@ -8154,7 +8157,6 @@ IDIwMDkAA</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
@@ -8176,6 +8178,8 @@ IDIwMDkAA</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -8249,7 +8253,7 @@ IDIwMDkAA</bytes>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">3208</int>
+			<int key="maxID">3210</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -8639,7 +8643,6 @@ IDIwMDkAA</bytes>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>checkFile:</string>
-							<string>moveDataFile:</string>
 							<string>paste:</string>
 							<string>setGlobalLimit:</string>
 							<string>setPriority:</string>
@@ -8650,7 +8653,6 @@ IDIwMDkAA</bytes>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
