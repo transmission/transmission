@@ -1474,7 +1474,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 {
     [fInfoController setInfoForTorrents: [fTableView selectedTorrents]];
     
-    if ([QLPreviewPanel sharedPreviewPanelExists] && [[QLPreviewPanel sharedPreviewPanel] isVisible])
+    if ([NSApp isOnSnowLeopardOrBetter] && [QLPreviewPanel sharedPreviewPanelExists] && [[QLPreviewPanel sharedPreviewPanel] isVisible])
         [[QLPreviewPanel sharedPreviewPanel] reloadData];
 }
 
@@ -3965,6 +3965,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) toggleQuickLook: (id) sender
 {
+    if (![NSApp isOnSnowLeopardOrBetter])
+        return;
+    
     if ([[QLPreviewPanel sharedPreviewPanel] isVisible])
         [[QLPreviewPanel sharedPreviewPanel] orderOut: nil];
     else

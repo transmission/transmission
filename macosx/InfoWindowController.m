@@ -822,7 +822,7 @@ typedef enum
     [[window contentView] addSubview: view];
     [view setHidden: NO];
     
-    if ((fCurrentTabTag == TAB_FILES_TAG || oldTabTag == TAB_FILES_TAG)
+    if ([NSApp isOnSnowLeopardOrBetter] && (fCurrentTabTag == TAB_FILES_TAG || oldTabTag == TAB_FILES_TAG)
         && ([QLPreviewPanel sharedPreviewPanelExists] && [[QLPreviewPanel sharedPreviewPanel] isVisible]))
         [[QLPreviewPanel sharedPreviewPanel] updateController];
 }
@@ -1696,6 +1696,9 @@ typedef enum
 
 - (BOOL) canQuickLook
 {
+    if (![NSApp isOnSnowLeopardOrBetter])
+        return NO;
+    
     FileOutlineView * fileOutlineView = [fFileController outlineView];
     NSIndexSet * indexes = [fileOutlineView selectedRowIndexes];
     
