@@ -37,7 +37,7 @@
 enum
 {
     /* arbitrary number */
-    MAX_CONCURRENT_TASKS = 100,
+    MAX_CONCURRENT_TASKS = 256,
 
     /* arbitrary number */
     DEFAULT_TIMER_MSEC = 2500
@@ -199,14 +199,17 @@ addTask( void * vtask )
         curl_easy_setopt( easy, CURLOPT_CONNECTTIMEOUT, 60L );
 
         /* set a time limit for announces & scrapes */
-        if( strstr( task->url, "announce" ) )
-            curl_easy_setopt( easy, CURLOPT_TIMEOUT, 120L );
-        else if( strstr( task->url, "scrape" ) )
+        if( strstr( task->url, "scrape" ) )
+            curl_easy_setopt( easy, CURLOPT_TIMEOUT, 15L );
+        else if( strstr( task->url, "announce" ) )
             curl_easy_setopt( easy, CURLOPT_TIMEOUT, 30L );
+        else
+            curl_easy_setopt( easy, CURLOPT_TIMEOUT, 240L );
 
         curl_easy_setopt( easy, CURLOPT_FOLLOWLOCATION, 1L );
+        curl_easy_setopt( easy, CURLOPT_AUTOREFERER, 1L );
         curl_easy_setopt( easy, CURLOPT_FORBID_REUSE, 1L );
-        curl_easy_setopt( easy, CURLOPT_MAXREDIRS, 16L );
+        curl_easy_setopt( easy, CURLOPT_MAXREDIRS, -1L );
         curl_easy_setopt( easy, CURLOPT_NOSIGNAL, 1L );
         curl_easy_setopt( easy, CURLOPT_PRIVATE, task );
         curl_easy_setopt( easy, CURLOPT_SSL_VERIFYHOST, 0L );
