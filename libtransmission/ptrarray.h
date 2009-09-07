@@ -65,10 +65,6 @@ static TR_INLINE int tr_ptrArrayAppend( tr_ptrArray * array, void * appendMe )
 
 void*         tr_ptrArrayPop( tr_ptrArray    * array );
 
-void          tr_ptrArrayErase( tr_ptrArray  * array,
-                                int            begin,
-                                int            end );
-
 static TR_INLINE void** tr_ptrArrayBase( const tr_ptrArray * a )
 {
     return a->items;

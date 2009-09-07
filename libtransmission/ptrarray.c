@@ -110,7 +110,7 @@ tr_ptrArrayPop( tr_ptrArray* t )
     return ret;
 }
 
-void
+static void
 tr_ptrArrayErase( tr_ptrArray * t,
                   int           begin,
                   int           end )
