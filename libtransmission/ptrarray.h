@@ -41,8 +41,6 @@ extern const tr_ptrArray TR_PTR_ARRAY_INIT;
 
 void          tr_ptrArrayDestruct( tr_ptrArray*, PtrArrayForeachFunc func );
 
-tr_ptrArray * tr_ptrArrayDup( tr_ptrArray* );
-
 void          tr_ptrArrayForeach( tr_ptrArray         * array,
                                   PtrArrayForeachFunc   func );
 
