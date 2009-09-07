@@ -3252,6 +3252,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [item setTarget: self];
         [item setAction: @selector(toggleQuickLook:)];
         [item setAutovalidates: NO];
+        [item setEnabled: [NSApp isOnSnowLeopardOrBetter]];
         
         return item;
     }
@@ -3715,6 +3716,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [menuItem setState: state ? NSOnState : NSOffState];
         return YES;
     }
+    
+    //quick look only works on 10.6
+    if (action == @selector(toggleQuickLook:))
+        return [NSApp isOnSnowLeopardOrBetter];
     
     return YES;
 }
