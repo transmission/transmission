@@ -585,71 +585,67 @@
 {
     Torrent * torrent = [self representedObject];
     
-    NSRect leftRect, rightRect;
-    NSDivideRect(barRect, &leftRect, &rightRect, [torrent progress] * NSWidth(barRect), NSMinXEdge);
+    NSRect haveRect, missingRect;
+    NSDivideRect(barRect, &haveRect, &missingRect, floorf([torrent progress] * NSWidth(barRect)), NSMinXEdge);
     
-    //don't-have section
-    if (!NSIsEmptyRect(rightRect))
-    {
-        NSRect unwantedRect = rightRect;
-        
-        if (![torrent allDownloaded])
-        {
-            //the ratio of total progress to total width equals ratio of progress of amount wanted to wanted width
-            const CGFloat widthRemaining = NSWidth(barRect) * (1.0 - [torrent progressDone]) / [torrent progress];
-            
-            NSRect wantedRect;
-            NSDivideRect(rightRect, &wantedRect, &unwantedRect, widthRemaining, NSMinXEdge);
-            
-            if (!NSIsEmptyRect(wantedRect))
-            {
-                //not-available section
-                if ([torrent isActive] && ![torrent isChecking] && [fDefaults boolForKey: @"DisplayProgressBarAvailable"])
-                {
-                    NSRect unavailableRect;
-                    NSDivideRect(wantedRect, &wantedRect, &unavailableRect, [torrent availableDesired] * NSWidth(wantedRect), NSMinXEdge);
-                    
-                    [[ProgressGradients progressRedGradient] drawInRect: unavailableRect angle: 90];
-                }
-                
-                //remaining section
-                [[ProgressGradients progressWhiteGradient] drawInRect: wantedRect angle: 90];
-            }
-        }
-        
-        //unwanted section
-        [[ProgressGradients progressLightGrayGradient] drawInRect: unwantedRect angle: 90];
-    }
-    
-    if (!NSIsEmptyRect(leftRect))
+    if (!NSIsEmptyRect(haveRect))
     {
         if ([torrent isActive])
         {
             if ([torrent isChecking])
-                [[ProgressGradients progressYellowGradient] drawInRect: leftRect angle: 90];
+                [[ProgressGradients progressYellowGradient] drawInRect: haveRect angle: 90];
             else if ([torrent isSeeding])
             {
                 NSRect ratioHaveRect, ratioRemainingRect;
-                NSDivideRect(leftRect, &ratioHaveRect, &ratioRemainingRect, [torrent progressStopRatio] * NSWidth(leftRect), NSMinXEdge);
+                NSDivideRect(haveRect, &ratioHaveRect, &ratioRemainingRect, floorf([torrent progressStopRatio] * NSWidth(haveRect)),
+                            NSMinXEdge);
                 
                 [[ProgressGradients progressGreenGradient] drawInRect: ratioHaveRect angle: 90];
                 [[ProgressGradients progressLightGreenGradient] drawInRect: ratioRemainingRect angle: 90];
             }
             else
-                [[ProgressGradients progressBlueGradient] drawInRect: leftRect angle: 90];
+                [[ProgressGradients progressBlueGradient] drawInRect: haveRect angle: 90];
         }
         else
         {
             if ([torrent waitingToStart])
             {
-                if ([torrent progressDone] == 0.0)
-                    [[ProgressGradients progressDarkGreenGradient] drawInRect: leftRect angle: 90];
+                if ([torrent allDownloaded])
+                    [[ProgressGradients progressDarkGreenGradient] drawInRect: haveRect angle: 90];
                 else
-                    [[ProgressGradients progressDarkBlueGradient] drawInRect: leftRect angle: 90];
+                    [[ProgressGradients progressDarkBlueGradient] drawInRect: haveRect angle: 90];
             }
             else
-                [[ProgressGradients progressGrayGradient] drawInRect: leftRect angle: 90];
+                [[ProgressGradients progressGrayGradient] drawInRect: haveRect angle: 90];
         }
+    }
+    
+    if (!NSIsEmptyRect(missingRect))
+    {
+        if (![torrent allDownloaded])
+        {
+            //the ratio of total progress to total width equals ratio of progress of amount wanted to wanted width
+            const CGFloat widthRemaining = floorf(NSWidth(barRect) * (1.0 - [torrent progressDone]) / [torrent progress]);
+            
+            NSRect wantedRect;
+            NSDivideRect(missingRect, &wantedRect, &missingRect, widthRemaining, NSMinXEdge);
+            
+            //not-available section
+            if ([torrent isActive] && ![torrent isChecking] && [fDefaults boolForKey: @"DisplayProgressBarAvailable"])
+            {
+                NSRect unavailableRect;
+                NSDivideRect(wantedRect, &wantedRect, &unavailableRect, floorf([torrent availableDesired] * NSWidth(wantedRect)),
+                            NSMinXEdge);
+                
+                [[ProgressGradients progressRedGradient] drawInRect: unavailableRect angle: 90];
+            }
+            
+            //remaining section
+            [[ProgressGradients progressWhiteGradient] drawInRect: wantedRect angle: 90];
+        }
+        
+        //unwanted section
+        [[ProgressGradients progressLightGrayGradient] drawInRect: missingRect angle: 90];
     }
 }
 
