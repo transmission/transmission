@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2009-07-13 16:23-0500\n"
-"PO-Revision-Date: 2009-04-20 11:47+0000\n"
-"Last-Translator: Roman M. Tuz <Unknown>\n"
+"PO-Revision-Date: 2009-09-03 06:54+0000\n"
+"Last-Translator: SkyManPHP <Unknown>\n"
 "Language-Team: Ukrainian <uk@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2009-08-24 23:12+0000\n"
+"X-Launchpad-Export-Date: 2009-09-07 22:24+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:49
@@ -786,6 +786,7 @@ msgstr ""
 "  Ailandar https://launchpad.net/~ailandar\n"
 "  Alexandr Shapoval https://launchpad.net/~rain534\n"
 "  Roman M. Tuz https://launchpad.net/~tuzr\n"
+"  SkyManPHP https://launchpad.net/~skymanphp\n"
 "  mikhalek https://launchpad.net/~mikhalek"
 
 #: ../gtk/makemeta-ui.c:109
@@ -1035,7 +1036,7 @@ msgstr "%s залишилось"
 #: ../gtk/torrent-cell-renderer.c:147
 #, c-format
 msgid "speed|Down: %1$s, Up: %2$s"
-msgstr "speed|Звант: %1$s, Вивант: %2$s"
+msgstr "швидкість|Завантаження: %1$s, Вивантаження: %2$s"
 
 #. download speed
 #: ../gtk/torrent-cell-renderer.c:150
@@ -1069,9 +1070,9 @@ msgstr "Рейтинг: %s"
 #, c-format
 msgid "Downloading from %1$'d of %2$'d connected peer"
 msgid_plural "Downloading from %1$'d of %2$'d connected peers"
-msgstr[0] "Звантаження від %1$'d з %2$'d підключеного вузла"
-msgstr[1] "Звантаження від %1$'d з %2$'d підключених вузлів"
-msgstr[2] "Звантаження від %1$'d з %2$'d підключених вузлів"
+msgstr[0] "Завантаження від %1$'d з %2$'d підключеного вузла"
+msgstr[1] "Завантаження від %1$'d з %2$'d підключених вузлів"
+msgstr[2] "Завантаження від %1$'d з %2$'d підключених вузлів"
 
 #: ../gtk/torrent-cell-renderer.c:243 ../gtk/tr-torrent.c:259
 #, c-format

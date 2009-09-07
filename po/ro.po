@@ -10,15 +10,15 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-07-13 16:23-0500\n"
-"PO-Revision-Date: 2009-03-01 07:01+0000\n"
-"Last-Translator: Manuel R. Ciosici <manuelciosici@yahoo.com>\n"
+"PO-Revision-Date: 2009-08-27 13:30+0000\n"
+"Last-Translator: Adi Roiban <adi@roiban.ro>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n == 1 ? 0: (((n % 100 > 19) || ((n % 100 "
 "== 0) && (n != 0))) ? 2: 1));\n"
-"X-Launchpad-Export-Date: 2009-08-24 23:12+0000\n"
+"X-Launchpad-Export-Date: 2009-09-07 22:24+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:49
@@ -326,7 +326,7 @@ msgstr "Conexiuni parteneri"
 
 #: ../gtk/details.c:584
 msgid "_Maximum peers:"
-msgstr "_Maximum parteneri:"
+msgstr "Număr _maxim de parteneri"
 
 #: ../gtk/details.c:603 ../gtk/torrent-cell-renderer.c:173
 msgid "Waiting to verify local data"
@@ -468,7 +468,7 @@ msgstr ""
 
 #: ../gtk/details.c:969
 msgid "Hash:"
-msgstr "Hash:"
+msgstr ""
 
 #: ../gtk/details.c:974
 msgid "Privacy:"
@@ -552,7 +552,7 @@ msgstr ""
 
 #: ../gtk/details.c:1413
 msgid "Peer is an incoming connection"
-msgstr ""
+msgstr "Partenerul este o conexiune de primire"
 
 #: ../gtk/details.c:1596
 msgid "<b>Seeders:</b>"
@@ -584,7 +584,7 @@ msgstr "Trackeri"
 
 #: ../gtk/details.c:1799
 msgid "Scrape"
-msgstr ""
+msgstr "Cerere"
 
 #: ../gtk/details.c:1801
 msgid "Last scrape at:"
@@ -1071,7 +1071,7 @@ msgstr "Se verifică datele locale (%.1f%% testate)"
 #: ../gtk/tr-window.c:1142
 #, c-format
 msgid "Ratio: %s"
-msgstr "Proporție: %s"
+msgstr "Raport: %s"
 
 #: ../gtk/torrent-cell-renderer.c:232
 #, c-format
@@ -1410,7 +1410,7 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:1328
 msgid "Incoming Peers"
-msgstr ""
+msgstr "Parteneri posibili"
 
 #: ../gtk/tr-prefs.c:1330
 msgid "_Port for incoming connections:"

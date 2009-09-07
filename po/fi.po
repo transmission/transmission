@@ -7,14 +7,14 @@ msgstr ""
 "Project-Id-Version: fi\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-07-13 16:23-0500\n"
-"PO-Revision-Date: 2009-08-14 10:31+0000\n"
+"PO-Revision-Date: 2009-09-05 18:51+0000\n"
 "Last-Translator: Elias Julkunen <elias.julkunen@gmail.com>\n"
 "Language-Team: -\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2009-08-24 23:12+0000\n"
+"X-Launchpad-Export-Date: 2009-09-07 22:24+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:49
@@ -199,7 +199,7 @@ msgstr "_Sisältö"
 
 #: ../gtk/actions.c:125
 msgid "Ask Tracker for _More Peers"
-msgstr "Pyydä seurantapalveli_melta lisää lähteitä"
+msgstr "Pyydä seurantapalveli_melta lisää vertaisia"
 
 #: ../gtk/add-dialog.c:241
 msgid "Torrent files"
@@ -322,7 +322,7 @@ msgstr "Vertaisyhteydet"
 
 #: ../gtk/details.c:584
 msgid "_Maximum peers:"
-msgstr "Suurin _määrä lähteitä:"
+msgstr "Suurin _määrä vertaisia:"
 
 #: ../gtk/details.c:603 ../gtk/torrent-cell-renderer.c:173
 msgid "Waiting to verify local data"
@@ -408,7 +408,7 @@ msgstr "%1$s (+%2$s tuhoutunut)"
 
 #: ../gtk/details.c:893
 msgid "Active now"
-msgstr "Aktivoi nyt"
+msgstr "Nyt aktiivinen"
 
 #: ../gtk/details.c:897
 #, c-format
@@ -445,7 +445,7 @@ msgstr "Tila:"
 
 #: ../gtk/details.c:944
 msgid "Running time:"
-msgstr "Kesto vielä:"
+msgstr "Käyntiaika:"
 
 #: ../gtk/details.c:948
 msgid "Last activity:"
@@ -541,15 +541,15 @@ msgstr "Salattu yhteys"
 
 #: ../gtk/details.c:1411
 msgid "Peer was discovered through Peer Exchange (PEX)"
-msgstr "Lähde löydettiin vertaisvaihdon (PEX) avulla"
+msgstr "Vertainen löydettiin vertaisvaihdon (PEX) avulla"
 
 #: ../gtk/details.c:1412
 msgid "Peer was discovered through DHT"
-msgstr "Lähde löydettiin DHT:n avulla"
+msgstr "Vertainen löydettiin DHT:n avulla"
 
 #: ../gtk/details.c:1413
 msgid "Peer is an incoming connection"
-msgstr "Lähde on saapuva yhteys"
+msgstr "Vertainen on saapuva yhteys"
 
 #: ../gtk/details.c:1596
 msgid "<b>Seeders:</b>"
@@ -623,7 +623,7 @@ msgstr "Tiedot"
 
 #: ../gtk/details.c:1918
 msgid "Peers"
-msgstr "Lähteet"
+msgstr "Vertaiset"
 
 #: ../gtk/details.c:1922 ../gtk/tr-prefs.c:961 ../gtk/tr-window.c:848
 msgid "Tracker"
@@ -1052,7 +1052,7 @@ msgstr "Jouten"
 #: ../gtk/torrent-cell-renderer.c:179 ../gtk/tr-torrent.c:240
 #, c-format
 msgid "Verifying local data (%.1f%% tested)"
-msgstr "Tarkistetaan paikallista dataa ((%.1f%% testattu)"
+msgstr "Tarkistetaan paikallista dataa (%.1f%% testattu)"
 
 #: ../gtk/torrent-cell-renderer.c:190 ../gtk/tr-window.c:1114
 #: ../gtk/tr-window.c:1142
@@ -1060,13 +1060,12 @@ msgstr "Tarkistetaan paikallista dataa ((%.1f%% testattu)"
 msgid "Ratio: %s"
 msgstr "Jakosuhde: %s"
 
-#fuzzy, c-format
 #: ../gtk/torrent-cell-renderer.c:232
 #, c-format
 msgid "Downloading from %1$'d of %2$'d connected peer"
 msgid_plural "Downloading from %1$'d of %2$'d connected peers"
-msgstr[0] "Ladataan, %i yhdistetty ( %i kaikkiaan )"
-msgstr[1] "Ladataan, %i yhdistetty ( %i kaikkiaan )"
+msgstr[0] "Ladataan %1$'d / %2$'d yhdistetyltä vertaiselta"
+msgstr[1] "Ladataan %1$'d / %2$'d yhdistetyltä vertaiselta"
 
 #: ../gtk/torrent-cell-renderer.c:243 ../gtk/tr-torrent.c:259
 #, c-format
@@ -1232,22 +1231,21 @@ msgstr "_Salaustila:"
 
 #: ../gtk/tr-prefs.c:533
 msgid "Use PE_X to find more peers"
-msgstr "Käytä _PEX:iä lähteiden löytämiseksi"
+msgstr "Käytä _PEX:iä vertaisten löytämiseksi"
 
 #: ../gtk/tr-prefs.c:535
 msgid ""
 "PEX is a tool for exchanging peer lists with the peers you're connected to."
 msgstr ""
-"PEX:n avulla voit vaihtaa lähteiden listoja lähteiden kanssa, joihin olet "
-"yhdistänyt."
+"PEX:n avulla voit vaihtaa vertaislistoja jo yhdistettyjen vertaisten kanssa."
 
 #: ../gtk/tr-prefs.c:540
 msgid "Use _DHT to find more peers"
-msgstr "Käytä _DHT:tä lähteiden löytämiseksi"
+msgstr "Käytä _DHT:tä vertaisten löytämiseksi"
 
 #: ../gtk/tr-prefs.c:542
 msgid "DHT is a tool for finding peers without a tracker."
-msgstr "DHT:n avulla voit löytää lähteitä ilman seurantapalvelinta"
+msgstr "DHT:n avulla voit löytää vertaisia ilman seurantapalvelinta"
 
 #: ../gtk/tr-prefs.c:753
 msgid "Web Client"
@@ -1373,7 +1371,7 @@ msgstr "Rajoita l_ähetysnopeutta (KB/s):"
 
 #: ../gtk/tr-prefs.c:1220
 msgid "_Scheduled times:"
-msgstr "_Ajastettuina aikoina:"
+msgstr "_Määriteltyinä aikoina:"
 
 #: ../gtk/tr-prefs.c:1225
 msgid " _to "
@@ -1401,7 +1399,7 @@ msgstr "<i>Kokeillaan...</i>"
 
 #: ../gtk/tr-prefs.c:1328
 msgid "Incoming Peers"
-msgstr "Saapuvat yhteydet"
+msgstr "Saapuvat vertaiset"
 
 #: ../gtk/tr-prefs.c:1330
 msgid "_Port for incoming connections:"
@@ -1409,7 +1407,7 @@ msgstr "_Portti saapuville yhteyksille:"
 
 #: ../gtk/tr-prefs.c:1338
 msgid "Te_st Port"
-msgstr "_Kokeile porttia:"
+msgstr "_Kokeile porttia"
 
 #: ../gtk/tr-prefs.c:1345
 msgid "Use UPnP or NAT-PMP port _forwarding from my router"
@@ -1421,11 +1419,11 @@ msgstr "Ota _satunnainen portti joka kerta, kun Transmission käynnistetään"
 
 #: ../gtk/tr-prefs.c:1357
 msgid "Maximum peers per _torrent:"
-msgstr "Enimmäismäärä lähteitä _torrenttia kohti:"
+msgstr "Enimmäismäärä vertaisia _torrenttia kohti:"
 
 #: ../gtk/tr-prefs.c:1359
 msgid "Maximum peers _overall:"
-msgstr "Enimmäismäärä _lähteille:"
+msgstr "Enimmäismäärä _vertaisille:"
 
 #: ../gtk/tr-prefs.c:1377
 msgid "Transmission Preferences"
@@ -1793,7 +1791,7 @@ msgstr "Ladattiin %d torrenttia"
 #: ../libtransmission/torrent.c:273
 #, c-format
 msgid "Got %d peers from tracker"
-msgstr "Saatiin %d lähdettä seurantapalvelimelta"
+msgstr "Saatiin %d vertaista seurantapalvelimelta"
 
 #: ../libtransmission/torrent.c:287
 #, c-format

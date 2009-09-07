@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2009-07-13 16:23-0500\n"
-"PO-Revision-Date: 2009-04-02 05:29+0000\n"
-"Last-Translator: melayubuntu <zul.malc@gmail.com>\n"
+"PO-Revision-Date: 2009-09-07 22:10+0000\n"
+"Last-Translator: Ibrahim Elias <imen802003@netscape.net>\n"
 "Language-Team: Malay <ms@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2009-08-24 23:12+0000\n"
+"X-Launchpad-Export-Date: 2009-09-07 22:24+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:49
@@ -32,15 +32,15 @@ msgstr "Susun mengikut_kemajuan"
 
 #: ../gtk/actions.c:52
 msgid "Sort by Rati_o"
-msgstr ""
+msgstr "Susun mengikut Rati_o"
 
 #: ../gtk/actions.c:53
 msgid "Sort by Stat_e"
-msgstr ""
+msgstr "Susun mengikut Stat_e"
 
 #: ../gtk/actions.c:54
 msgid "Sort by T_racker"
-msgstr ""
+msgstr "Susun mengikut P_enjejak"
 
 #: ../gtk/actions.c:55
 msgid "Sort by A_ge"
@@ -48,11 +48,11 @@ msgstr "Susun mengikut u_mur"
 
 #: ../gtk/actions.c:56
 msgid "Sort by Time _Left"
-msgstr ""
+msgstr "Susun mengikut Waktu _Tinggal"
 
 #: ../gtk/actions.c:57
 msgid "Sort by Si_ze"
-msgstr ""
+msgstr "Susun mengikut Sa_iz"
 
 #: ../gtk/actions.c:74
 msgid "_Main Window"
@@ -64,11 +64,11 @@ msgstr "_Log mesej"
 
 #: ../gtk/actions.c:90
 msgid "Temporary  Speed _Limits"
-msgstr ""
+msgstr "Had _Laju Sementara"
 
 #: ../gtk/actions.c:91
 msgid "_Minimal View"
-msgstr ""
+msgstr "_Paparan Minima"
 
 #: ../gtk/actions.c:92
 msgid "Re_verse Sort Order"
@@ -120,7 +120,7 @@ msgstr "_Mula"
 
 #: ../gtk/actions.c:107
 msgid "Start torrent"
-msgstr ""
+msgstr "Mula torrent"
 
 #: ../gtk/actions.c:108
 msgid "_Statistics"
@@ -128,23 +128,23 @@ msgstr "_Statistik"
 
 #: ../gtk/actions.c:109 ../gtk/add-dialog.c:362
 msgid "_Verify Local Data"
-msgstr ""
+msgstr "_Sahkan Data Tempatan"
 
 #: ../gtk/actions.c:110
 msgid "_Pause"
-msgstr ""
+msgstr "_Jeda"
 
 #: ../gtk/actions.c:110
 msgid "Pause torrent"
-msgstr ""
+msgstr "Jeda torrent"
 
 #: ../gtk/actions.c:111
 msgid "_Pause All"
-msgstr ""
+msgstr "_Jeda Semua"
 
 #: ../gtk/actions.c:111
 msgid "Pause all torrents"
-msgstr ""
+msgstr "Jeda semua torrent"
 
 #: ../gtk/actions.c:112
 msgid "_Start All"
@@ -156,7 +156,7 @@ msgstr "Mulakan semua torrent"
 
 #: ../gtk/actions.c:113
 msgid "Set _Location"
-msgstr ""
+msgstr "Set _Tempat"
 
 #: ../gtk/actions.c:114
 msgid "Remove torrent"
@@ -164,7 +164,7 @@ msgstr "Buang torrent"
 
 #: ../gtk/actions.c:115
 msgid "_Delete Files and Remove"
-msgstr ""
+msgstr "_Hapus Fail-fail dan Buang"
 
 #: ../gtk/actions.c:116
 msgid "_New..."
@@ -188,7 +188,7 @@ msgstr "_Nyahpilih Semua"
 
 #: ../gtk/actions.c:121
 msgid "Torrent properties"
-msgstr ""
+msgstr "Sifat Torrent"
 
 #: ../gtk/actions.c:122
 msgid "_Open Folder"
@@ -244,7 +244,7 @@ msgstr "Tambah Torrent"
 
 #: ../gtk/add-dialog.c:460 ../gtk/tr-prefs.c:293
 msgid "Display _options dialog"
-msgstr ""
+msgstr "Papar _dialog pilihan"
 
 #: ../gtk/conf.c:64 ../gtk/makemeta-ui.c:140 ../libtransmission/fdlimit.c:307
 #: ../libtransmission/metainfo.c:110 ../libtransmission/utils.c:627
@@ -262,12 +262,12 @@ msgstr "Tak boleh buka \"%1$s\": %2$s"
 #: ../gtk/conf.c:94
 #, c-format
 msgid "%s is already running."
-msgstr ""
+msgstr "%s telah berjalan."
 
 #: ../gtk/conf.c:448 ../gtk/conf.c:453
 #, c-format
 msgid "Importing \"%s\""
-msgstr ""
+msgstr "Mengimport \"%s\""
 
 #: ../gtk/details.c:470 ../gtk/file-list.c:579
 msgid "High"
@@ -283,7 +283,7 @@ msgstr "Rendah"
 
 #: ../gtk/details.c:508 ../gtk/tr-prefs.c:1395
 msgid "Speed"
-msgstr ""
+msgstr "Kelajuan"
 
 #: ../gtk/details.c:510
 msgid "Honor global _limits"
@@ -291,15 +291,15 @@ msgstr ""
 
 #: ../gtk/details.c:515 ../gtk/tr-prefs.c:1180
 msgid "Limit _download speed (KB/s):"
-msgstr ""
+msgstr "Had _kelajuan muatturun (KB/s):"
 
 #: ../gtk/details.c:527 ../gtk/tr-prefs.c:1187
 msgid "Limit _upload speed (KB/s):"
-msgstr ""
+msgstr "Had _kelajuan muatnaik (KB/s):"
 
 #: ../gtk/details.c:539
 msgid "Torrent _priority:"
-msgstr ""
+msgstr "Keutamaan _torrent:"
 
 #: ../gtk/details.c:543
 msgid "Seed-Until Ratio"
@@ -307,7 +307,7 @@ msgstr ""
 
 #: ../gtk/details.c:546
 msgid "Use _global settings"
-msgstr ""
+msgstr "Guna _penetapan global"
 
 #: ../gtk/details.c:555
 msgid "Seed _regardless of ratio"
@@ -315,7 +315,7 @@ msgstr ""
 
 #: ../gtk/details.c:564 ../gtk/tr-prefs.c:311
 msgid "_Seed torrent until its ratio reaches:"
-msgstr ""
+msgstr "_Semai torrent sehingga ratio sampai:"
 
 #: ../gtk/details.c:581
 msgid "Peer Connections"
@@ -327,23 +327,23 @@ msgstr "_Peer Maksima:"
 
 #: ../gtk/details.c:603 ../gtk/torrent-cell-renderer.c:173
 msgid "Waiting to verify local data"
-msgstr ""
+msgstr "Menunggu untuk mengesahkan data tempatan"
 
 #: ../gtk/details.c:604
 msgid "Verifying local data"
-msgstr ""
+msgstr "Mengesahkan data tempatan"
 
 #: ../gtk/details.c:605
 msgid "Downloading"
-msgstr ""
+msgstr "Sedang Dimuaturun"
 
 #: ../gtk/details.c:606
 msgid "Seeding"
-msgstr ""
+msgstr "Menyemai"
 
 #: ../gtk/details.c:607 ../gtk/torrent-cell-renderer.c:169
 msgid "Paused"
-msgstr ""
+msgstr "Dijeda"
 
 #: ../gtk/details.c:618 ../gtk/details.c:1346 ../gtk/details.c:1643
 #: ../gtk/util.c:68 ../libtransmission/utils.c:1348
@@ -365,17 +365,17 @@ msgstr "Torrent awam"
 #: ../gtk/details.c:663
 #, c-format
 msgid "Created by %1$s"
-msgstr ""
+msgstr "Dicipta oleh %1$s"
 
 #: ../gtk/details.c:665
 #, c-format
 msgid "Created on %1$s"
-msgstr ""
+msgstr "Dicipta pada %1$s"
 
 #: ../gtk/details.c:667
 #, c-format
 msgid "Created by %1$s on %2$s"
-msgstr ""
+msgstr "Dicipta oleh %1$s pada %2$s"
 
 #: ../gtk/details.c:758
 #, c-format
@@ -421,7 +421,7 @@ msgstr "Aktiviti"
 
 #: ../gtk/details.c:920
 msgid "Torrent size:"
-msgstr ""
+msgstr "Saiz torrent:"
 
 #: ../gtk/details.c:924
 msgid "Have:"
@@ -774,6 +774,7 @@ msgstr ""
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
+"  Ibrahim Elias https://launchpad.net/~imen802003-netscape\n"
 "  Muhammad Zul 'Izzi M.Z https://launchpad.net/~babylon2233\n"
 "  melayubuntu https://launchpad.net/~zul-malc"
 
