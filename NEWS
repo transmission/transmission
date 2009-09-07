@@ -1,14 +1,14 @@
 === Transmission 1.75 beta 1 (2009/09/07) ===
 [http://trac.transmissionbt.com/query?milestone=1.75&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== All Platforms ====
-  * adding corrupt/invalid torrents could crash Transmission
-  * fix a couple of high CPU problems with UTF-8 and with embedded machines
-  * fix 1.74 build error when compiling without DHT
-  * fix 1.74 bug that stopped some torrents after getting a tracker warning message
-  * handle HTTP redirects more gracefully
-  * faster verification for local data when torrents have a small piece size
+  * Adding corrupt/invalid torrents could crash Transmission
+  * Fix a couple of high CPU problems with UTF-8 and with embedded machines
+  * Fix 1.74 bug that stopped some torrents after getting a tracker warning message
+  * Handle HTTP redirects more gracefully
+  * Faster verification of local data for torrents with small piece size
+  * Fix 1.74 build error when compiling without DHT
 ==== GTK+ ====
-  * fix the turtle toggle button on old versions of GTK+
+  * Fix the turtle toggle button on old versions of GTK+
 
 === Transmission 1.74 (2009/08/24) ===
 [http://trac.transmissionbt.com/query?milestone=1.74&group=component&groupdesc=1&order=severity All tickets closed by this release]
