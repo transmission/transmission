@@ -2474,7 +2474,7 @@ static void
 enforceTorrentPeerLimit( Torrent * t, uint64_t now )
 {
     int n = tr_ptrArraySize( &t->peers );
-    const int max = tr_sessionGetPeerLimitPerTorrent( t->tor->session );
+    const int max = tr_torrentGetPeerLimit( t->tor );
     if( n > max )
     {
         void * base = tr_ptrArrayBase( &t->peers );
@@ -2607,7 +2607,7 @@ bandwidthPulse( void * vmgr )
     /* possibly stop torrents that have an error */
     tor = NULL;
     while(( tor = tr_torrentNext( mgr->session, tor )))
-        if( tor->isRunning && (( tor->error == TR_STAT_TRACKER_ERROR ) || ( tor->error == TR_STAT_LOCAL_ERROR )))
+        if( tor->isRunning && ( tor->error == TR_STAT_LOCAL_ERROR )) 
             tr_torrentStop( tor );
 
     managerUnlock( mgr );

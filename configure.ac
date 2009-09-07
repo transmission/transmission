@@ -25,6 +25,7 @@ if test m4_substr(peer_id_prefix,6,1) = "0"; then
     CFLAGS="$CFLAGS -g -O3 "
     CXXFLAGS="$CXXFLAGS -g -O3 "
   fi
+  CPPFLAGS="$CPPFLAGS -NDEBUG"
 else
   supported_build=no
   if test "x$GCC" = "xyes" ; then
