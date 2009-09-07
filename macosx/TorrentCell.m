@@ -559,13 +559,12 @@
 
 - (void) drawBar: (NSRect) barRect
 {
-    CGFloat piecesBarPercent = [(TorrentTableView *)[self controlView] piecesBarPercent];
-    if (piecesBarPercent > 0.0f)
+    const CGFloat piecesBarPercent = [(TorrentTableView *)[self controlView] piecesBarPercent];
+    if (piecesBarPercent > 0.0)
     {
-        NSRect regularBarRect = barRect, piecesBarRect = barRect;
-        piecesBarRect.size.height *= PIECES_TOTAL_PERCENT * piecesBarPercent;
-        regularBarRect.size.height -= piecesBarRect.size.height;
-        piecesBarRect.origin.y += regularBarRect.size.height;
+        NSRect piecesBarRect, regularBarRect;
+        NSDivideRect(barRect, &piecesBarRect, &regularBarRect, floorf(NSHeight(barRect) * PIECES_TOTAL_PERCENT * piecesBarPercent),
+                    NSMaxYEdge);
         
         [self drawRegularBar: regularBarRect];
         [self drawPiecesBar: piecesBarRect];
@@ -578,7 +577,7 @@
     }
     
     [fBarBorderColor set];
-    [NSBezierPath strokeRect: NSInsetRect(barRect, 0.5f, 0.5f)];
+    [NSBezierPath strokeRect: NSInsetRect(barRect, 0.5, 0.5)];
 }
 
 - (void) drawRegularBar: (NSRect) barRect
@@ -631,7 +630,8 @@
             NSDivideRect(missingRect, &wantedRect, &missingRect, widthRemaining, NSMinXEdge);
             
             //not-available section
-            if ([torrent isActive] && ![torrent isChecking] && [fDefaults boolForKey: @"DisplayProgressBarAvailable"])
+            if ([torrent isActive] && ![torrent isChecking] && [fDefaults boolForKey: @"DisplayProgressBarAvailable"]
+                && [torrent availableDesired] > 0.0)
             {
                 NSRect unavailableRect;
                 NSDivideRect(wantedRect, &wantedRect, &unavailableRect, floorf([torrent availableDesired] * NSWidth(wantedRect)),
