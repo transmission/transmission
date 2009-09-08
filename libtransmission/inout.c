@@ -100,13 +100,19 @@ readOrWriteBytes( const tr_torrent * tor,
         preallocationMode = tor->session->preallocationMode;
 
     if( ( ioMode == TR_IO_READ ) && !fileExists ) /* does file exist? */
+        err = ENOENT;
+    else if( ( fd = tr_fdFileCheckout( tor->uniqueId, tor->downloadDir, file->name, ioMode == TR_IO_WRITE, preallocationMode, file->length ) ) < 0 ) {
         err = errno;
-    else if( ( fd = tr_fdFileCheckout ( tor->uniqueId, tor->downloadDir, file->name, ioMode == TR_IO_WRITE, preallocationMode, file->length ) ) < 0 )
+        tr_torerr( tor, "tr_fdFileCheckout failed for \"%s\": %s", file->name, tr_strerror( err ) );
+    }
+    else if( tr_lseek( fd, (int64_t)fileOffset, SEEK_SET ) == -1 ) {
         err = errno;
-    else if( tr_lseek( fd, (int64_t)fileOffset, SEEK_SET ) == -1 )
+        tr_torerr( tor, "tr_lseek failed for \"%s\": %s", file->name, tr_strerror( err ) );
+    }
+    else if( func( fd, buf, buflen ) != buflen ) {
         err = errno;
-    else if( func( fd, buf, buflen ) != buflen )
-        err = errno;
+        tr_torerr( tor, "read/write failed for \"%s\": %s", file->name, tr_strerror( err ) );
+    }
     else
         err = 0;
 
@@ -175,7 +181,7 @@ readOrWritePiece( tr_torrent       * tor,
     while( buflen && !err )
     {
         const tr_file * file = &info->files[fileIndex];
-        const uint64_t  bytesThisPass = MIN( buflen, file->length - fileOffset );
+        const uint64_t bytesThisPass = MIN( buflen, file->length - fileOffset );
 
         err = readOrWriteBytes( tor, ioMode, fileIndex, fileOffset, buf, bytesThisPass );
         buf += bytesThisPass;
