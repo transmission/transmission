@@ -9,7 +9,7 @@
 
 	<item>
 		<title>Transmission 1.75b1</title>
-		<sparkle:releaseNotesLink>http://www.transmissionbt.com/appcast/releasenotes.html</sparkle:releaseNotesLink>
+		<sparkle:releaseNotesLink>http://www.transmissionbt.com/appcast/releasenotes_beta.html</sparkle:releaseNotesLink>
 		<sparkle:tag>beta</sparkle:tag>
       	<pubDate>Sun, 7 September 2009 20:30:00 -0400</pubDate>
       	<enclosure
