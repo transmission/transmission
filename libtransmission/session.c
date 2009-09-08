@@ -582,6 +582,8 @@ tr_sessionInit( const char  * tag,
     tr_session * session;
     struct init_data data;
 
+fprintf( stderr, "sizeof(tr_address) is %d\n", (int)sizeof(tr_address) );
+
     assert( tr_bencIsDict( clientSettings ) );
 
     /* initialize the bare skeleton of the session object */

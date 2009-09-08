@@ -452,6 +452,7 @@ tr_peerMgrNew( tr_session * session )
     tr_peerMgr * m = tr_new0( tr_peerMgr, 1 );
     m->session = session;
     m->incomingHandshakes = TR_PTR_ARRAY_INIT;
+fprintf( stderr, "sizeof(tr_pex) is %d\n", (int)sizeof(tr_pex) );
     return m;
 }
 
