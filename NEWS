@@ -3,7 +3,7 @@
 ==== All Platforms ====
   * Adding corrupt/invalid torrents could crash Transmission
   * Fix a couple of high CPU problems with UTF-8 and with embedded machines
-  * Fix 1.74 bug that stopped some torrents after getting a tracker warning message
+  * Fix 1.74 bug that stopped some torrents after getting a tracker error message
   * Handle HTTP redirects more gracefully
   * Faster verification of local data for torrents with small piece size
   * Fix 1.74 build error when compiling without DHT

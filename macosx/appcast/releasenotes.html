@@ -8,6 +8,19 @@
 	</head>
 
 	<body>
+			<table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0" summary="Two column table with heading">
+				<tr>
+					<td class="red">
+						<h3>Note</h3>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<p>This is a beta release. Please report any problems to us on our forums.</p>
+					</td>
+				</tr>
+			</table>
+			
 			<br>
 			<table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0" summary="Two column table with heading">
 				<tr>
@@ -18,54 +31,17 @@
 				<tr>
 					<td>
 						<ul>
-						<li>64-bit compatibility</li>
-						<li>Queuing system will not exclude transfers with tracker warnings</li>
-						<li>Links to original torrent files are no longer maintained</li>
-						<li>Better data recovery in the case of an OS or Transmission crash</li>
-						<li>If a data file is moved, stop the torrent instead of redownloading it</li>
-						<li>Fix bug that didn't list some peers in the resume file and in PEX</li>
-						<li>Fix bug where changing the global per-torrent peer connection limit did not affect the current session</li>
-						<li>Fix bug where changing settings through RPC would result in wrong values being saved for three fields</li>
-						<li>More helpful torrent error messages</li>
-						<li>Update to a newer snapshot of miniupnpc</li>
+						<li>Adding corrupt/invalid torrents could crash Transmission</li>
+						<li>Fix a couple of high CPU problems with UTF-8</li>
+						<li>Fix 1.74 bug that stopped some torrents after getting a tracker error message</li>
+						<li>Handle HTTP redirects more gracefully</li>
+						<li>Faster verification of local data for torrents with small piece size</li>
 						</ul>
 					</td>
 				</tr>
 			</table>
 			
-			<br>
-			
-			<table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0" summary="Two column table with heading">
-				<tr>
-					<td class="blue">
-						<h3>Web Client Changes</h3>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<ul>
-						<li>Progress bar shows seeding progress</li>
-						<li>Fix bug that displayed "%nan" when verifying a torrent</li>
-						<li>"Pause All" only appeared to pause torrents with peers until refresh</li>
-						</ul>
-					</td>
-				</tr>
-			</table>
-			
-			<p>For a full list of changes, <a href="http://trac.transmissionbt.com/query?milestone=1.74&group=component&groupdesc=1&order=severity">click here</a>.</p>
-
-			<table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0" summary="Two column table with heading">
-				<tr>
-					<td class="red">
-						<h3>Note</h3>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<p>Transmission requires Mac OS X 10.5 or greater.</p>
-					</td>
-				</tr>
-			</table>
+			<p>For a full list of changes, <a href="http://trac.transmissionbt.com/query?milestone=1.75&group=component&groupdesc=1&order=severity">click here</a>.</p>
 	</body>
 
 </html>
