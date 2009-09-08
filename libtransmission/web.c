@@ -27,11 +27,24 @@
 #include "version.h"
 #include "web.h"
 
-/* Use curl_multi_socket_action() instead of curl_multi_perform()
-   if libcurl >= 7.18.2.  See http://trac.transmissionbt.com/ticket/1844 */
-#if LIBCURL_VERSION_NUM >= 0x071202
-    #define USE_CURL_MULTI_SOCKET_ACTION
-#endif
+static tr_bool
+useCurlMultiSocketAction( void )
+{
+    static tr_bool tested = FALSE;
+    static tr_bool useMultiSocketAction;
+
+    if( !tested )
+    {
+        curl_version_info_data * data = curl_version_info( CURLVERSION_NOW );
+        tr_inf( "Using libcurl %s", data->version );
+        /* Use curl_multi_socket_action() instead of curl_multi_perform()
+         * if libcurl >= 7.18.2.  See http://trac.transmissionbt.com/ticket/1844 */
+        useMultiSocketAction = data->version_num >= 0x071202;
+        tested = TRUE;
+    }
+
+    return useMultiSocketAction;
+}
 
 
 enum
@@ -388,20 +401,23 @@ tr_multi_perform( tr_web * g, int fd )
             g->prev_running, g->still_running );
 
     /* invoke libcurl's processing */
-#ifdef USE_CURL_MULTI_SOCKET_ACTION
-    do {
-        dbgmsg( "calling curl_multi_socket_action..." );
-        mcode = curl_multi_socket_action( g->multi, fd, 0, &g->still_running );
-        fd = CURL_SOCKET_TIMEOUT;
-        dbgmsg( "done calling curl_multi_socket_action..." );
-    } while( mcode == CURLM_CALL_MULTI_SOCKET );
-#else
-    do {
-        dbgmsg( "calling curl_multi_perform..." );
-        mcode = curl_multi_perform( g->multi, &g->still_running );
-        dbgmsg( "done calling curl_multi_perform..." );
-    } while( mcode == CURLM_CALL_MULTI_PERFORM );
-#endif
+    if( useCurlMultiSocketAction( ) )
+    {
+        do {
+            dbgmsg( "calling curl_multi_socket_action..." );
+            mcode = curl_multi_socket_action( g->multi, fd, 0, &g->still_running );
+            fd = CURL_SOCKET_TIMEOUT;
+            dbgmsg( "done calling curl_multi_socket_action..." );
+        } while( mcode == CURLM_CALL_MULTI_SOCKET );
+    }
+    else
+    {
+        do {
+            dbgmsg( "calling curl_multi_perform..." );
+            mcode = curl_multi_perform( g->multi, &g->still_running );
+            dbgmsg( "done calling curl_multi_perform..." );
+        } while( mcode == CURLM_CALL_MULTI_PERFORM );
+    }
     tr_assert( mcode == CURLM_OK, "curl_multi_perform() failed: %d (%s)", mcode, curl_multi_strerror( mcode ) );
     if( mcode != CURLM_OK )
         tr_err( "%s", curl_multi_strerror( mcode ) );
