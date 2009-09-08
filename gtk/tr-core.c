@@ -418,7 +418,7 @@ setSort( TrCore *     core,
         sort_func = compareByAge;
     else if( !strcmp( mode, "sort-by-progress" ) )
         sort_func = compareByProgress;
-    else if( !strcmp( mode, "sort-by-eta" ) )
+    else if( !strcmp( mode, "sort-by-time-left" ) )
         sort_func = compareByETA;
     else if( !strcmp( mode, "sort-by-ratio" ) )
         sort_func = compareByRatio;
