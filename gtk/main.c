@@ -418,8 +418,9 @@ main( int argc, char ** argv )
     {
         /* There's already another copy of Transmission running,
          * so tell it to present its window to the user */
-        gtr_dbus_present_window( );
         err = NULL;
+        if( !gtr_dbus_present_window( ) )
+            err = g_strdup( _( "Transmission is already running, but is not responding.  To start a new session, you must first close the existing Transmission process." ) );
     }
 
     if( didlock && ( didinit || cf_init( configDir, &err ) ) )
