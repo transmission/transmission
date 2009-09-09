@@ -93,6 +93,7 @@ PKG_CHECK_MODULES(LIBCURL, [libcurl >= $CURL_MINIMUM])
 AC_PATH_ZLIB
 
 AC_SYS_LARGEFILE
+AC_CHECK_FUNCS([lseek64])
 
 
 dnl ----------------------------------------------------------------------------
