@@ -1,8 +1,8 @@
 === Transmission 1.75 beta 2 (2009/09/08) ===
 ==== All Platforms ====
-  * Don't wait so long on unresponsive trackers if there are other trackers we can try.
+  * Don't wait so long on unresponsive trackers if there are other trackers to try
 ==== Mac ====
-  * Fix libcurl build issue that caused tracker compatibility problems
+  * Fix libcurl build issue that caused tracker connectivity problems on Snow Leopard
 ==== GTK+ ====
   * Fix "sort by time remaining"
 
@@ -14,8 +14,6 @@
   * Handle HTTP redirects more gracefully
   * Faster verification of local data for torrents with small piece size
   * Fix 1.74 build error when compiling without DHT
-==== Mac ====
-  * Fix problem announcing on Snow Leopard experienced by some users
 ==== GTK+ ====
   * Fix the turtle toggle button on old versions of GTK+
 
