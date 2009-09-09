@@ -8,7 +8,7 @@
   * Faster verification of local data for torrents with small piece size
   * Fix 1.74 build error when compiling without DHT
 ==== Mac ====
-  * Fix problem announcing on Snow Leopard experienced by some users 
+  * Fix problem announcing on Snow Leopard experienced by some users
 ==== GTK+ ====
   * Fix the turtle toggle button on old versions of GTK+
 
