@@ -1,5 +1,12 @@
+=== Transmission 1.75 beta 2 (2009/09/08) ===
+==== All Platforms ====
+  * Don't wait so long on unresponsive trackers if there are other trackers we can try.
+==== Mac ====
+  * Fix libcurl build issue that caused tracker compatibility problems
+==== GTK+ ====
+  * Fix "sort by time remaining"
+
 === Transmission 1.75 beta 1 (2009/09/07) ===
-[http://trac.transmissionbt.com/query?milestone=1.75&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Adding corrupt/invalid torrents could crash Transmission
   * Fix a couple of high CPU problems with UTF-8 and with embedded machines
