@@ -57,9 +57,8 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
     tr_piece_index_t pieceIndex = 0;
     const int64_t buflen = tor->info.pieceSize;
     uint8_t * buffer = tr_new( uint8_t, buflen );
-#ifdef STOPWATCH
     const time_t begin = time( NULL );
-#endif
+    time_t end;
 
     SHA1_Init( &sha );
 
@@ -159,13 +158,10 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
         tr_close_file( fd );
     tr_free( buffer );
 
-#ifdef STOPWATCH
-{
-    const time_t end = time( NULL );
-    fprintf( stderr, "it took %d seconds to verify %"PRIu64" bytes (%"PRIu64" bytes per second)\n",
-             (int)(end-begin), tor->info.totalSize, (uint64_t)(tor->info.totalSize/(1+(end-begin))) );
-}
-#endif
+    /* stopwatch */
+    end = time( NULL );
+    tr_tordbg( tor, "it took %d seconds to verify %"PRIu64" bytes (%"PRIu64" bytes per second)",
+               (int)(end-begin), tor->info.totalSize, (uint64_t)(tor->info.totalSize/(1+(end-begin))) );
 
     return changed;
 }
@@ -246,17 +242,50 @@ verifyThreadFunc( void * unused UNUSED )
     tr_lockUnlock( getVerifyLock( ) );
 }
 
+static tr_bool
+torrentHasAnyLocalData( const tr_torrent * tor )
+{
+    tr_file_index_t i;
+    tr_bool hasAny = FALSE;
+    const tr_file_index_t n = tor->info.fileCount;
+
+    assert( tr_isTorrent( tor ) );
+
+    for( i=0; i<n && !hasAny; ++i )
+    {
+        struct stat sb;
+        char * path = tr_buildPath( tor->downloadDir, tor->info.files[i].name, NULL );
+        if( !stat( path, &sb ) && ( sb.st_size > 0 ) )
+            hasAny = TRUE;
+        tr_free( path );
+    }
+
+    return hasAny;
+}
+
 void
 tr_verifyAdd( tr_torrent *      tor,
               tr_verify_done_cb verify_done_cb )
 {
-    const int uncheckedCount = tr_torrentCountUncheckedPieces( tor );
-
     assert( tr_isTorrent( tor ) );
 
-    if( !uncheckedCount )
+    if( tr_torrentCountUncheckedPieces( tor ) == 0 )
     {
         /* doesn't need to be checked... */
+        fireCheckDone( tor, verify_done_cb );
+    }
+    else if( !torrentHasAnyLocalData( tor ) )
+    {
+        /* we haven't downloaded anything for this torrent yet...
+         * no need to leave it waiting in the back of the queue.
+         * we can mark it as all-missing from here and fire
+         * the "done" callback */
+        const tr_bool hadAny = tr_cpHaveTotal( &tor->completion ) != 0;
+        tr_piece_index_t i;
+        for( i=0; i<tor->info.pieceCount; ++i )
+            tr_torrentSetHasPiece( tor, i, FALSE );
+        if( hadAny ) /* if we thought we had some, flag as dirty */
+            tr_torrentSetDirty( tor );
         fireCheckDone( tor, verify_done_cb );
     }
     else
