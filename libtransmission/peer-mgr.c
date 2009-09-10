@@ -244,6 +244,9 @@ comparePeerAtoms( const void * va, const void * vb )
 {
     const struct peer_atom * b = vb;
 
+    assert( tr_isAddress( &b->addr ) );
+    assert( ( 0 <= b->from ) && ( b->from < TR_PEER_FROM__MAX ) );
+
     return comparePeerAtomToAddress( va, &b->addr );
 }
 
@@ -1191,6 +1194,9 @@ ensureAtomExists( Torrent          * t,
                   uint8_t            flags,
                   uint8_t            from )
 {
+    assert( tr_isAddress( addr ) );
+    assert( ( 0 <= from ) && ( from < TR_PEER_FROM__MAX ) );
+
     if( getExistingAtom( t, addr ) == NULL )
     {
         struct peer_atom * a;
@@ -1527,8 +1533,8 @@ compareAtomsByUsefulness( const void * va, const void *vb )
     const struct peer_atom * a = * (const struct peer_atom**) va;
     const struct peer_atom * b = * (const struct peer_atom**) vb;
 
-    assert( ( 0 < a->from ) && ( a->from < TR_PEER_FROM__MAX ) );
-    assert( ( 0 < b->from ) && ( b->from < TR_PEER_FROM__MAX ) );
+    assert( ( 0 <= a->from ) && ( a->from < TR_PEER_FROM__MAX ) );
+    assert( ( 0 <= b->from ) && ( b->from < TR_PEER_FROM__MAX ) );
 
     if( a->piece_data_time != b->piece_data_time )
         return a->piece_data_time > b->piece_data_time ? -1 : 1;
