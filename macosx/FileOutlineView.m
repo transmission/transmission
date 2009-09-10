@@ -90,7 +90,7 @@
     const unichar firstChar = [[event charactersIgnoringModifiers] characterAtIndex: 0];
     
     //don't allow quick look on add window
-    if (firstChar == ' ' && [[[self window] windowController] conformsToProtocol: @protocol(QLPreviewPanelDataSource)])
+    if ([NSApp isOnSnowLeopardOrBetter] && firstChar == ' ' && [[[self window] windowController] conformsToProtocol: @protocol(QLPreviewPanelDataSource)])
     {
         if ([[QLPreviewPanel sharedPreviewPanel] isVisible])
             [[QLPreviewPanel sharedPreviewPanel] orderOut: nil];
