@@ -58,6 +58,11 @@
 #define KEY_PROGRESS_MTIMES   "mtimes"
 #define KEY_PROGRESS_BITFIELD "bitfield"
 
+enum
+{
+    MAX_REMEMBERED_PEERS = 200
+};
+
 static char*
 getResumeFilename( const tr_torrent * tor )
 {
@@ -73,27 +78,54 @@ getResumeFilename( const tr_torrent * tor )
 ***/
 
 static void
-savePeers( tr_benc *          dict,
-           const tr_torrent * tor )
+savePeers( tr_benc * dict, const tr_torrent * tor )
 {
     int count;
     tr_pex * pex;
 
-    count = tr_peerMgrGetPeers( (tr_torrent*) tor, &pex, TR_AF_INET );
+    count = tr_peerMgrGetPeers( (tr_torrent*) tor, &pex, TR_AF_INET, MAX_REMEMBERED_PEERS );
     if( count > 0 )
         tr_bencDictAddRaw( dict, KEY_PEERS, pex, sizeof( tr_pex ) * count );
     tr_free( pex );
 
-    count = tr_peerMgrGetPeers( (tr_torrent*) tor, &pex, TR_AF_INET6 );
+    count = tr_peerMgrGetPeers( (tr_torrent*) tor, &pex, TR_AF_INET6, MAX_REMEMBERED_PEERS );
     if( count > 0 )
         tr_bencDictAddRaw( dict, KEY_PEERS6, pex, sizeof( tr_pex ) * count );
 
     tr_free( pex );
 }
 
+static tr_bool
+tr_isPex( const tr_pex * pex )
+{
+    return tr_isAddress( &pex->addr )
+        && ( pex->flags & 3 ) == pex->flags;
+}
+
+static int
+addPeers( tr_torrent * tor, const uint8_t * buf, int buflen )
+{
+    int i;
+    int numAdded = 0;
+    const int count = buflen / sizeof( tr_pex );
+
+    for( i=0; i<count && numAdded<MAX_REMEMBERED_PEERS; ++i )
+    {
+        tr_pex pex;
+        memcpy( &pex, buf + ( i * sizeof( tr_pex ) ), sizeof( tr_pex ) );
+        if( tr_isPex( &pex ) )
+        {
+            tr_peerMgrAddPex( tor, TR_PEER_FROM_CACHE, &pex );
+            ++numAdded;
+        }
+    }
+
+    return numAdded;
+}
+
+
 static uint64_t
-loadPeers( tr_benc *    dict,
-           tr_torrent * tor )
+loadPeers( tr_benc * dict, tr_torrent * tor )
 {
     uint64_t        ret = 0;
     const uint8_t * str;
@@ -101,29 +133,15 @@ loadPeers( tr_benc *    dict,
 
     if( tr_bencDictFindRaw( dict, KEY_PEERS, &str, &len ) )
     {
-        int       i;
-        const int count = len / sizeof( tr_pex );
-        for( i = 0; i < count; ++i )
-        {
-            tr_pex pex;
-            memcpy( &pex, str + ( i * sizeof( tr_pex ) ), sizeof( tr_pex ) );
-            tr_peerMgrAddPex( tor, TR_PEER_FROM_CACHE, &pex );
-        }
-        tr_tordbg( tor, "Loaded %d IPv4 peers from resume file", count );
+        const int numAdded = addPeers( tor, str, len );
+        tr_tordbg( tor, "Loaded %d IPv4 peers from resume file", numAdded );
         ret = TR_FR_PEERS;
     }
 
     if( tr_bencDictFindRaw( dict, KEY_PEERS6, &str, &len ) )
     {
-        int       i;
-        const int count = len / sizeof( tr_pex );
-        for( i = 0; i < count; ++i )
-        {
-            tr_pex pex;
-            memcpy( &pex, str + ( i * sizeof( tr_pex ) ), sizeof( tr_pex ) );
-            tr_peerMgrAddPex( tor, TR_PEER_FROM_CACHE, &pex );
-        }
-        tr_tordbg( tor, "Loaded %d IPv6 peers from resume file", count );
+        const int numAdded = addPeers( tor, str, len );
+        tr_tordbg( tor, "Loaded %d IPv6 peers from resume file", numAdded );
         ret = TR_FR_PEERS;
     }
 
