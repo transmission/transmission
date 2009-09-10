@@ -150,7 +150,8 @@ void tr_peerMgrSetBlame( tr_torrent        * tor,
 
 int  tr_peerMgrGetPeers( tr_torrent      * tor,
                          tr_pex         ** setme_pex,
-                         uint8_t           af);
+                         uint8_t           af,
+                         int               maxPeerCount );
 
 void tr_peerMgrStartTorrent( tr_torrent * tor );
 
