@@ -1329,6 +1329,10 @@ doAction( const char * action_name, gpointer user_data )
         GtkWidget * dialog = stats_dialog_create( data->wind, data->core );
         gtk_widget_show( dialog );
     }
+    else if( !strcmp( action_name, "donate" ) )
+    {
+        gtr_open_file( "http://www.transmissionbt.com/donate.php" );
+    }
     else if( !strcmp( action_name, "start-torrent" ) )
     {
         GtkTreeSelection * s = tr_window_get_selection( data->wind );

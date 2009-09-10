@@ -106,6 +106,7 @@ static GtkActionEntry entries[] =
     { "add-torrent-menu", GTK_STOCK_ADD, N_( "_Add..." ), "<control>D", N_( "Add a torrent" ), G_CALLBACK( action_cb ) },
     { "start-torrent", GTK_STOCK_MEDIA_PLAY, N_( "_Start" ), "<control>S", N_( "Start torrent" ), G_CALLBACK( action_cb ) },
     { "show-stats", NULL, N_( "_Statistics" ), NULL, NULL, G_CALLBACK( action_cb ) },
+    { "donate", NULL, N_( "_Donate" ), NULL, NULL, G_CALLBACK( action_cb ) },
     { "verify-torrent", NULL, N_( "_Verify Local Data" ), NULL, NULL, G_CALLBACK( action_cb ) },
     { "pause-torrent", GTK_STOCK_MEDIA_PAUSE, N_( "_Pause" ), "<control>P", N_( "Pause torrent" ), G_CALLBACK( action_cb ) },
     { "pause-all-torrents", GTK_STOCK_MEDIA_PAUSE, N_( "_Pause All" ), NULL, N_( "Pause all torrents" ), G_CALLBACK( action_cb ) },
