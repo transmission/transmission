@@ -23,11 +23,12 @@
  *****************************************************************************/
 
 #import "InfoWindowController.h"
-#import "FileOutlineView.h"
+#import "FileListNode.h"
 #import "FileNameCell.h"
+#import "FileOutlineView.h"
 #import "FilePriorityCell.h"
 #import "Torrent.h"
-#import "FileListNode.h"
+#import "NSApplicationAdditions.h"
 #import <Quartz/Quartz.h>
 
 @implementation FileOutlineView
