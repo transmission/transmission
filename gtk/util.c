@@ -504,8 +504,13 @@ gtr_open_file( const char * path )
         if( !opened )
         {
             char * argv[] = { (char*)"xdg-open", (char*)path, NULL };
-            g_spawn_async( NULL, argv, NULL, G_SPAWN_SEARCH_PATH,
-                           NULL, NULL, NULL, NULL );
+            opened = g_spawn_async( NULL, argv, NULL, G_SPAWN_SEARCH_PATH,
+                                    NULL, NULL, NULL, NULL );
+        }
+
+        if( !opened )
+        {
+            g_message( "Unable to open \"%s\"", path );
         }
     }
 }
