@@ -123,6 +123,14 @@ struct peer_atom
     time_t      piece_data_time;
 };
 
+static tr_bool
+tr_isAtom( const struct peer_atom * atom )
+{
+    return ( atom != NULL )
+        && ( atom->from < TR_PEER_FROM__MAX )
+        && ( tr_isAddress( &atom->addr ) );
+}
+
 struct tr_blockIterator
 {
     time_t expirationDate;
@@ -244,8 +252,7 @@ comparePeerAtoms( const void * va, const void * vb )
 {
     const struct peer_atom * b = vb;
 
-    assert( tr_isAddress( &b->addr ) );
-    assert( ( 0 <= b->from ) && ( b->from < TR_PEER_FROM__MAX ) );
+    assert( tr_isAtom( b ) );
 
     return comparePeerAtomToAddress( va, &b->addr );
 }
@@ -1195,7 +1202,7 @@ ensureAtomExists( Torrent          * t,
                   uint8_t            from )
 {
     assert( tr_isAddress( addr ) );
-    assert( ( 0 <= from ) && ( from < TR_PEER_FROM__MAX ) );
+    assert( from < TR_PEER_FROM__MAX );
 
     if( getExistingAtom( t, addr ) == NULL )
     {
@@ -1533,8 +1540,8 @@ compareAtomsByUsefulness( const void * va, const void *vb )
     const struct peer_atom * a = * (const struct peer_atom**) va;
     const struct peer_atom * b = * (const struct peer_atom**) vb;
 
-    assert( ( 0 <= a->from ) && ( a->from < TR_PEER_FROM__MAX ) );
-    assert( ( 0 <= b->from ) && ( b->from < TR_PEER_FROM__MAX ) );
+    assert( tr_isAtom( a ) );
+    assert( tr_isAtom( b ) );
 
     if( a->piece_data_time != b->piece_data_time )
         return a->piece_data_time > b->piece_data_time ? -1 : 1;
