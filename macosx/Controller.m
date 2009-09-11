@@ -670,8 +670,11 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             [window orderOut: nil];
     }
     
-    [[QLPreviewPanel sharedPreviewPanel] updateController];
-    [[QLPreviewPanel sharedPreviewPanel] orderOut: nil];
+    if (quickLookOpen)
+    {
+        [[QLPreviewPanel sharedPreviewPanel] updateController];
+        [[QLPreviewPanel sharedPreviewPanel] orderOut: nil];
+    }
     
     [self showStatusBar: NO animate: NO];
     [self showFilterBar: NO animate: NO];
