@@ -1489,13 +1489,18 @@ peer_page_new( struct DetailsImpl * di )
     gtk_tree_sortable_set_sort_column_id( GTK_TREE_SORTABLE( m ),
                                           PEER_COL_PROGRESS,
                                           GTK_SORT_DESCENDING );
+#if GTK_CHECK_VERSION( 2,12,0 )
     v = GTK_WIDGET( g_object_new( GTK_TYPE_TREE_VIEW,
                                   "model",  m,
                                   "rules-hint", TRUE,
-#if GTK_CHECK_VERSION( 2,12,0 )
                                   "has-tooltip", TRUE,
-#endif
                                   NULL ) );
+#else
+    v = GTK_WIDGET( g_object_new( GTK_TYPE_TREE_VIEW,
+                                  "model",  m,
+                                  "rules-hint", TRUE,
+                                  NULL ) );
+#endif
 
 #if GTK_CHECK_VERSION( 2,12,0 )
     g_signal_connect( v, "query-tooltip",
