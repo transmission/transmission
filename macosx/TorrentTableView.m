@@ -501,7 +501,7 @@
     if (firstChar == 'f' && [event modifierFlags] & NSAlternateKeyMask && [event modifierFlags] & NSCommandKeyMask)
         [fController focusFilterField];
     else if (firstChar == ' ')
-        [fController toggleQuickLook: self];
+        [fController toggleQuickLook: nil];
     else
         [super keyDown: event];
 }

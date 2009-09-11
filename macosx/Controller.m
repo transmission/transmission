@@ -661,7 +661,18 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     //remember window states and close all windows
     [fDefaults setBool: [[fInfoController window] isVisible] forKey: @"InfoVisible"];
-    [[NSApp windows] makeObjectsPerformSelector: @selector(close)];
+    
+    const BOOL quickLookOpen = [NSApp isOnSnowLeopardOrBetter] && [QLPreviewPanel sharedPreviewPanelExists]
+                                && [[QLPreviewPanel sharedPreviewPanel] isVisible];
+    for (NSWindow * window in [NSApp windows])
+    {
+        if (!quickLookOpen || window != [QLPreviewPanel sharedPreviewPanel]) //hide quicklook window last to avoid animation
+            [window orderOut: nil];
+    }
+    
+    [[QLPreviewPanel sharedPreviewPanel] updateController];
+    [[QLPreviewPanel sharedPreviewPanel] orderOut: nil];
+    
     [self showStatusBar: NO animate: NO];
     [self showFilterBar: NO animate: NO];
     
