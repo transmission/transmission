@@ -64,7 +64,7 @@
 - (id) initWithHandle: (tr_session *) handle path: (NSString *) path
 {
     if ((self = [super initWithWindowNibName: @"Creator"]))
-    {//NSLog([[self window] frameAutosaveName]);
+    {
         fStarted = NO;
         
         fPath = [path retain];
