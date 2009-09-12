@@ -332,7 +332,7 @@ syncAltSpeedButton( PrivateData * p )
 {
     char u[32];
     char d[32];
-    char buf[128];
+    char buf[512];
     const char * fmt;
     const gboolean b = pref_flag_get( TR_PREFS_KEY_ALT_SPEED_ENABLED );
     GtkWidget * w = p->alt_speed_button;
@@ -583,7 +583,7 @@ onAskTrackerQueryTooltip( GtkWidget *            widget UNUSED,
     }
     else
     {
-        char      buf[128];
+        char      buf[512];
         char      timebuf[64];
         const int seconds = maxTime - now;
 
@@ -1080,7 +1080,7 @@ updateTorrentCount( PrivateData * p )
 {
     if( p && p->core )
     {
-        char      buf[128];
+        char      buf[512];
         const int torrentCount = gtk_tree_model_iter_n_children(
             tr_core_model( p->core ), NULL );
         const int visibleCount = gtk_tree_model_iter_n_children(
@@ -1106,7 +1106,7 @@ static void
 updateStats( PrivateData * p )
 {
     const char *            pch;
-    char                    up[32], down[32], ratio[32], buf[128];
+    char                    up[32], down[32], ratio[32], buf[512];
     struct tr_session_stats stats;
     tr_session *            session = tr_core_session( p->core );
 

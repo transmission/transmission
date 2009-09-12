@@ -189,7 +189,7 @@ getShortStatusString( const tr_stat * torStat,
         case TR_STATUS_DOWNLOAD:
         case TR_STATUS_SEED:
         {
-            char buf[128];
+            char buf[512];
             if( torStat->activity != TR_STATUS_DOWNLOAD )
             {
                 tr_strlratio( buf, torStat->ratio, sizeof( buf ) );
