@@ -151,6 +151,11 @@ tr_session * fLib;
         didEndSelector: @selector(resetSheetClosed:returnCode:contextInfo:) contextInfo: nil];
 }
 
+- (NSString *) windowFrameAutosaveName
+{
+    return @"StatsWindow";
+}
+
 @end
 
 @implementation StatsWindowController (Private)
