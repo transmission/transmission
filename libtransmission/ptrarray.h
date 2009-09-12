@@ -41,15 +41,8 @@ extern const tr_ptrArray TR_PTR_ARRAY_INIT;
 
 void          tr_ptrArrayDestruct( tr_ptrArray*, PtrArrayForeachFunc func );
 
-tr_ptrArray * tr_ptrArrayNew( void );
-
-tr_ptrArray * tr_ptrArrayDup( tr_ptrArray* );
-
 void          tr_ptrArrayForeach( tr_ptrArray         * array,
                                   PtrArrayForeachFunc   func );
-
-void          tr_ptrArrayFree( tr_ptrArray         * array,
-                               PtrArrayForeachFunc   func );
 
 void*         tr_ptrArrayNth( tr_ptrArray   * array,
                               int             nth );
@@ -71,10 +64,6 @@ static TR_INLINE int tr_ptrArrayAppend( tr_ptrArray * array, void * appendMe )
 }
 
 void*         tr_ptrArrayPop( tr_ptrArray    * array );
-
-void          tr_ptrArrayErase( tr_ptrArray  * array,
-                                int            begin,
-                                int            end );
 
 static TR_INLINE void** tr_ptrArrayBase( const tr_ptrArray * a )
 {
