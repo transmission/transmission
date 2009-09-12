@@ -479,6 +479,7 @@
             [fProgressView setHidden: YES];
             
             NSWindow * window = [self window];
+            [window setFrameAutosaveName: @""];
             
             NSRect windowRect = [window frame];
             CGFloat difference = [fProgressView frame].size.height - [[window contentView] frame].size.height;
