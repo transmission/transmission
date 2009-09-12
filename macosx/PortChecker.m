@@ -108,7 +108,7 @@
             [self callBackWithStatus: PORT_STATUS_CLOSED];
         else
         {
-            NSLog([NSString stringWithFormat: @"Unable to get port status: invalid response (%@)", probeString]);
+            NSLog(@"Unable to get port status: invalid response (%@)", probeString);
             [self callBackWithStatus: PORT_STATUS_ERROR];
         }
         [probeString release];
