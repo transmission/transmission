@@ -1,21 +1,21 @@
-=== Transmission 1.75 beta 2 (2009/09/08) ===
+=== Transmission 1.75 (2009/09/13) ===
 ==== All Platforms ====
   * Don't wait so long on unresponsive trackers if there are other trackers to try
-==== Mac ====
-  * Fix libcurl build issue that caused tracker connectivity problems on Snow Leopard
-==== GTK+ ====
-  * Fix "sort by time remaining"
-
-=== Transmission 1.75 beta 1 (2009/09/07) ===
-==== All Platforms ====
   * Adding corrupt/invalid torrents could crash Transmission
-  * Fix a couple of high CPU problems with UTF-8 and with embedded machines
-  * Fix 1.74 bug that stopped some torrents after getting a tracker error message
+  * Fix 1.74 bug that caused a high CPU load on startup
+  * Fix 1.74 bug that stopped multitracker if a single tracker sent an error message
+  * Fix older bug in converting other charsets to UTF-8
   * Handle HTTP redirects more gracefully
   * Faster verification of local data for torrents with small piece size
   * Fix 1.74 build error when compiling without DHT
+==== Mac ====
+  * Fix "unknown error occurred (1)" when creating torrent
+  * Fix libcurl build issue that caused tracker connectivity problems on Snow Leopard
 ==== GTK+ ====
+  * Fix "sort by time remaining"
   * Fix the turtle toggle button on old versions of GTK+
+  * Fix startup error if another copy of the Transmission GTK client is running
+  * Fix clang build issue
 
 === Transmission 1.74 (2009/08/24) ===
 [http://trac.transmissionbt.com/query?milestone=1.74&group=component&groupdesc=1&order=severity All tickets closed by this release]
