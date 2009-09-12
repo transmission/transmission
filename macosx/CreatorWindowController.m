@@ -64,7 +64,7 @@
 - (id) initWithHandle: (tr_session *) handle path: (NSString *) path
 {
     if ((self = [super initWithWindowNibName: @"Creator"]))
-    {
+    {//NSLog([[self window] frameAutosaveName]);
         fStarted = NO;
         
         fPath = [path retain];
@@ -479,6 +479,7 @@
             [fProgressView setHidden: YES];
             
             NSWindow * window = [self window];
+            [window setFrameAutosaveName: @""];
             
             NSRect windowRect = [window frame];
             CGFloat difference = [fProgressView frame].size.height - [[window contentView] frame].size.height;
