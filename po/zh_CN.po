@@ -5,14 +5,14 @@ msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-07-13 16:23-0500\n"
-"PO-Revision-Date: 2009-09-05 15:43+0000\n"
-"Last-Translator: Aron Xu <happyaron.xu@gmail.com>\n"
+"PO-Revision-Date: 2009-09-10 15:21+0000\n"
+"Last-Translator: rainofchaos <rainofchaos@gmail.com>\n"
 "Language-Team: Chinese (China) <zh_CN@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2009-09-07 22:24+0000\n"
+"X-Launchpad-Export-Date: 2009-09-14 03:44+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:49
@@ -508,11 +508,11 @@ msgstr "乐观解锁"
 
 #: ../gtk/details.c:1404
 msgid "Downloading from this peer"
-msgstr "从该peer下载"
+msgstr "从该 peer 下载"
 
 #: ../gtk/details.c:1405
 msgid "We would download from this peer if they would let us"
-msgstr "若对方允许，将从该peer下载"
+msgstr "若对方允许，将从该 peer 下载"
 
 #: ../gtk/details.c:1406
 msgid "Uploading to peer"
@@ -520,7 +520,7 @@ msgstr "上传到 peer"
 
 #: ../gtk/details.c:1407
 msgid "We would upload to this peer if they asked"
-msgstr "若对方询问，将上传至该peer"
+msgstr "若对方询问，将上传至该 peer"
 
 #: ../gtk/details.c:1408
 msgid "Peer has unchoked us, but we're not interested"
