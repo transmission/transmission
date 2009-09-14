@@ -1,4 +1,5 @@
 === Transmission 1.75 (2009/09/13) ===
+[http://trac.transmissionbt.com/query?milestone=1.75&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Don't wait so long on unresponsive trackers if there are other trackers to try
   * Adding corrupt/invalid torrents could crash Transmission
@@ -9,8 +10,8 @@
   * Faster verification of local data for torrents with small piece size
   * Fix 1.74 build error when compiling without DHT
 ==== Mac ====
-  * Fix "unknown error occurred (1)" when creating torrent
   * Fix libcurl build issue that caused tracker connectivity problems on Snow Leopard
+  * Fix error when creating a torrent while still changing the announce address
 ==== GTK+ ====
   * Fix "sort by time remaining"
   * Fix the turtle toggle button on old versions of GTK+
