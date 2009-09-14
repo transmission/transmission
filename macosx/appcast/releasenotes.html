@@ -8,18 +8,6 @@
 	</head>
 
 	<body>
-			<table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0" summary="Two column table with heading">
-				<tr>
-					<td class="red">
-						<h3>Note</h3>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<p>This is a beta release. Please report any problems to us on our forums.</p>
-					</td>
-				</tr>
-			</table>
 			
 			<br>
 			<table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0" summary="Two column table with heading">
@@ -34,10 +22,12 @@
 						<li>Fix libcurl build issue that caused tracker connectivity problems on Snow Leopard</li>
                         <li>Don't wait so long on unresponsive trackers if there are other trackers to try</li>
 						<li>Adding corrupt/invalid torrents could crash Transmission</li>
-						<li>Fix a couple of high CPU problems with UTF-8</li>
-						<li>Fix 1.74 bug that stopped some torrents after getting a tracker error message</li>
+						<li>Fix 1.74 bug that caused a high CPU load on startup</li>
+						<li>Fix 1.74 bug that stopped multitracker if a single tracker sent an error message</li>
+						<li>Fix bug in converting other charsets to UTF-8</li>
 						<li>Handle HTTP redirects more gracefully</li>
 						<li>Faster verification of local data for torrents with small piece size</li>
+						<li>Fix error when creating a torrent file while still changing the announce address</li>
 						</ul>
 					</td>
 				</tr>

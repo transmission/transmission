@@ -11,7 +11,7 @@
   * Fix 1.74 build error when compiling without DHT
 ==== Mac ====
   * Fix libcurl build issue that caused tracker connectivity problems on Snow Leopard
-  * Fix error when creating a torrent while still changing the announce address
+  * Fix error when creating a torrent file while still changing the announce address
 ==== GTK+ ====
   * Fix "sort by time remaining"
   * Fix the turtle toggle button on old versions of GTK+
