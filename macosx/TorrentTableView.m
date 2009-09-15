@@ -171,13 +171,18 @@
         if ([ident isEqualToString: @"UL Image"] || [ident isEqualToString: @"DL Image"])
         {
             //ensure arrows are white only when selected
-            NSImage * image = [cell image];
-            BOOL template = [cell backgroundStyle] == NSBackgroundStyleLowered;
-            if ([image isTemplate] != template)
+            if ([NSApp isOnSnowLeopardOrBetter])
+                [[cell image] setTemplate: [cell backgroundStyle] == NSBackgroundStyleLowered];
+            else
             {
-                [image setTemplate: template];
-                [cell setImage: nil];
-                [cell setImage: image];
+                NSImage * image = [cell image];
+                const BOOL template = [cell backgroundStyle] == NSBackgroundStyleLowered;
+                if ([image isTemplate] != template)
+                {
+                    [image setTemplate: template];
+                    [cell setImage: nil];
+                    [cell setImage: image];
+                }
             }
         }
     }
