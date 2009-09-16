@@ -410,7 +410,6 @@ typedef enum
             [fImageView setImage: icon];
             [icon release];
         }
-
         
         NSString * name = [torrent name];
         [fNameField setStringValue: name];
