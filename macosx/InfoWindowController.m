@@ -401,7 +401,16 @@ typedef enum
         
         [fFileController setTorrent: torrent];
         
-        [fImageView setImage: [torrent icon]];
+        if ([NSApp isOnSnowLeopardOrBetter])
+            [fImageView setImage: [torrent icon]];
+        else
+        {
+            NSImage * icon = [[torrent icon] copy];
+            [icon setFlipped: NO];
+            [fImageView setImage: icon];
+            [icon release];
+        }
+
         
         NSString * name = [torrent name];
         [fNameField setStringValue: name];
