@@ -74,7 +74,8 @@ typedef struct tr_metainfo_builder
     int                        isDone;
     tr_metainfo_builder_err    result;
 
-    /* file in use when result was set to _IO_READ or _IO_WRITE */
+    /* file in use when result was set to _IO_READ or _IO_WRITE,
+     * or the URL in use when the result was set to _URL */
     char    errfile[2048];
 
     /* errno encountered when result was set to _IO_READ or _IO_WRITE */
