@@ -192,7 +192,7 @@
 	<true/>
 	<key>WarningRemainingSpace</key>
 	<true/>
-	<key>WarningRemoveBuiltInTracker</key>
+	<key>WarningRemoveTrackers</key>
 	<true/>
 	<key>WarningResetStats</key>
 	<true/>
