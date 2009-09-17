@@ -132,9 +132,10 @@
     
     NSImage * image = [self image];
     
-    NSInteger index = -1;
-    NSRect rect = NSMakeRect(0, 0, fWidth, fWidth);
-    BOOL change = NO;
+    NSRect fillRects[fNumPieces];
+    NSColor * fillColors[fNumPieces];
+    
+    NSInteger index = -1, usedIndex = 0;
     
     for (NSInteger i = 0; i < fAcross; i++)
         for (NSInteger j = 0; j < fAcross; j++)
@@ -148,7 +149,7 @@
             
             NSColor * pieceColor = nil;
             
-            if (showAvailablity ? pieces[index] == -1 : piecesPercent[index] == 1.0f)
+            if (showAvailablity ? pieces[index] == -1 : piecesPercent[index] == 1.0)
             {
                 if (first || fPieces[index] != PIECE_FINISHED)
                 {
@@ -164,7 +165,7 @@
                     }
                 }
             }
-            else if (showAvailablity ? pieces[index] == 0 : piecesPercent[index] == 0.0f)
+            else if (showAvailablity ? pieces[index] == 0 : piecesPercent[index] == 0.0)
             {
                 if (first || fPieces[index] != PIECE_NONE)
                 {
@@ -191,24 +192,19 @@
             
             if (pieceColor)
             {
-                //avoid unneeded memory usage by only locking focus if drawing will occur
-                if (!change)
-                {
-                    change = YES;
-                    [image lockFocus];
-                }
+                fillRects[usedIndex] = NSMakeRect(j * (fWidth + BETWEEN) + BETWEEN + fExtraBorder,
+                                                    [image size].width - (i + 1) * (fWidth + BETWEEN) - fExtraBorder,
+                                                    fWidth, fWidth);
+                fillColors[usedIndex] = pieceColor;
                 
-                rect.origin = NSMakePoint(j * (fWidth + BETWEEN) + BETWEEN + fExtraBorder,
-                                        [image size].width - (i + 1) * (fWidth + BETWEEN) - fExtraBorder);
-                
-                #warning use NSRectFillListWithColors
-                [pieceColor set];
-                NSRectFill(rect);
+                usedIndex++;
             }
         }
     
-    if (change)
+    if (usedIndex > 0)
     {
+        [image lockFocus];
+        NSRectFillListWithColors(fillRects, fillColors, usedIndex);
         [image unlockFocus];
         [self setNeedsDisplay];
     }
