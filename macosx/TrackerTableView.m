@@ -40,12 +40,14 @@
 //alternating rows - first row after group row is white
 - (void) highlightSelectionInClipRect: (NSRect) clipRect
 {
-    NSColor * altColor = [[NSColor controlAlternatingRowBackgroundColors] objectAtIndex: 1];
-    [altColor set];
-    
     NSRect visibleRect = clipRect;
     NSRange rows = [self rowsInRect: visibleRect];
     BOOL start = YES;
+    
+    const CGFloat totalRowHeight = [self rowHeight] + [self intercellSpacing].height;
+    
+    NSRect * gridRects = (NSRect *)alloca(sizeof(NSRect) * (ceil(visibleRect.size.height / totalRowHeight) / 2));
+    NSInteger rectNum = 0;
     
     if (rows.length > 0)
     {
@@ -75,29 +77,32 @@
             }
             
             if (!start && ![self isRowSelected: i])
-                NSRectFill([self rectOfRow: i]);
+                gridRects[rectNum++] = [self rectOfRow: i];
             
             start = !start;
         }
         
-        CGFloat newY = NSMaxY([self rectOfRow: i-1]);
+        const CGFloat newY = NSMaxY([self rectOfRow: i-1]);
         visibleRect.size.height -= newY - visibleRect.origin.y;
         visibleRect.origin.y = newY;
     }
     
     //remaining visible rows continue alternating
-    const CGFloat height = [self rowHeight] + [self intercellSpacing].height;
-    const NSInteger numberOfRects = ceil(visibleRect.size.height / height);
-    
-    visibleRect.size.height = height;
+    visibleRect.size.height = totalRowHeight;
     if (start)
-        visibleRect.origin.y += height;
+        visibleRect.origin.y += totalRowHeight;
     
-    for (NSInteger i = start ? 1 : 0; i < numberOfRects; i += 2)
+    const NSInteger numberBlankRows = ceil(visibleRect.size.height / totalRowHeight);
+    for (NSInteger i = start ? 1 : 0; i < numberBlankRows; i += 2)
     {
-        NSRectFill(visibleRect);
-        visibleRect.origin.y += 2.0 * height;
+        gridRects[rectNum++] = visibleRect;
+        visibleRect.origin.y += 2.0 * totalRowHeight;
     }
+    
+    NSAssert([[NSColor controlAlternatingRowBackgroundColors] count] >= 2, @"There should be 2 alternating row colors");
+    
+    [[[NSColor controlAlternatingRowBackgroundColors] objectAtIndex: 1] set];
+    NSRectFillList(gridRects, rectNum);
     
     [super highlightSelectionInClipRect: clipRect];
 }
