@@ -171,7 +171,7 @@ struct tr_peerMgr
 #define tordbg( t, ... ) \
     do { \
         if( tr_deepLoggingIsActive( ) ) \
-            tr_deepLog( __FILE__, __LINE__, t->tor->info.name, __VA_ARGS__ ); \
+            tr_deepLog( __FILE__, __LINE__, tr_torrentName( t->tor ), __VA_ARGS__ ); \
     } while( 0 )
 
 #define dbgmsg( ... ) \
@@ -2363,7 +2363,7 @@ reconnectTorrent( Torrent * t )
                    "%d connection candidates, "
                    "%d atoms, "
                    "max per pulse is %d",
-                   t->tor->info.name,
+                   tr_torrentName( t->tor ),
                    mustCloseCount,
                    canCloseCount,
                    candidateCount,

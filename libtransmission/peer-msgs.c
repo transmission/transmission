@@ -219,7 +219,7 @@ myDebug( const char * file, int line,
 
         evbuffer_add_printf( buf, "[%s] %s - %s [%s]: ",
                              tr_getLogTimeStr( timestr, sizeof( timestr ) ),
-                             msgs->torrent->info.name,
+                             tr_torrentName( msgs->torrent ),
                              tr_peerIoGetAddrStr( msgs->peer->io ),
                              msgs->peer->client );
         va_start( args, fmt );

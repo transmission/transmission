@@ -69,7 +69,7 @@ getResumeFilename( const tr_torrent * tor )
     return tr_strdup_printf( "%s%c%s.%16.16s.resume",
                              tr_getResumeDir( tor->session ),
                              TR_PATH_DELIMITER,
-                             tor->info.name,
+                             tr_torrentName( tor ),
                              tor->info.hashString );
 }
 
@@ -501,7 +501,7 @@ tr_torrentSaveResume( const tr_torrent * tor )
     if( !tr_isTorrent( tor ) )
         return;
 
-    tr_tordbg( tor, "Saving .resume file for \"%s\"", tor->info.name );
+    tr_tordbg( tor, "Saving .resume file for \"%s\"", tr_torrentName( tor ) );
 
     tr_bencInitDict( &top, 32 ); /* arbitrary "big enough" number */
     tr_bencDictAddInt( &top, KEY_ACTIVITY_DATE,

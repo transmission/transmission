@@ -862,7 +862,7 @@ readCryptoProvide( tr_handshake *    handshake,
         const tr_bool clientIsSeed = tr_torrentIsSeed( tor );
         const tr_bool peerIsSeed = tr_peerMgrPeerIsSeed( tor, tr_peerIoGetAddress( handshake->io, NULL ) );
         dbgmsg( handshake, "got INCOMING connection's encrypted handshake for torrent [%s]",
-                tor->info.name );
+                tr_torrentName( tor ) );
         tr_peerIoSetTorrentHash( handshake->io, tor->info.hash );
 
         if( clientIsSeed && peerIsSeed )

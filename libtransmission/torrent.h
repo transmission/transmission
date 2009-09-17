@@ -326,7 +326,7 @@ enum
     TORRENT_MAGIC_NUMBER = 95549
 };
 
-static inline tr_bool tr_isTorrent( const tr_torrent * tor )
+static TR_INLINE tr_bool tr_isTorrent( const tr_torrent * tor )
 {
     return ( tor != NULL )
         && ( tor->magicNumber == TORRENT_MAGIC_NUMBER )
@@ -335,11 +335,18 @@ static inline tr_bool tr_isTorrent( const tr_torrent * tor )
 
 /* set a flag indicating that the torrent's .resume file
  * needs to be saved when the torrent is closed */
-static inline void tr_torrentSetDirty( tr_torrent * tor )
+static TR_INLINE void tr_torrentSetDirty( tr_torrent * tor )
 {
     assert( tr_isTorrent( tor ) );
 
     tor->isDirty = TRUE;
+}
+
+static TR_INLINE const char * tr_torrentName( const tr_torrent * tor )
+{
+    assert( tr_isTorrent( tor ) );
+
+    return tor->info.name;
 }
 
 #endif
