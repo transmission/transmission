@@ -54,6 +54,12 @@ void       hig_workarea_add_control( GtkWidget * table,
                                      int         row,
                                      GtkWidget * control );
 
+GtkWidget* hig_workarea_add_tall_row( GtkWidget *  table,
+                                      int *        row,
+                                      const char * mnemonic_string,
+                                      GtkWidget *  control,
+                                      GtkWidget *  mnemonic_or_null_for_control );
+
 GtkWidget* hig_workarea_add_row( GtkWidget *  table,
                                  int *        row,
                                  const char * mnemonic_string,

@@ -125,6 +125,21 @@ hig_workarea_add_label( GtkWidget *  t,
     return l;
 }
 
+static void
+hig_workarea_add_tall_control( GtkWidget * t,
+                               int         row,
+                               GtkWidget * control )
+{
+    if( GTK_IS_MISC( control ) )
+        gtk_misc_set_alignment( GTK_MISC( control ), 0.0f, 0.5f );
+
+    gtk_table_attach( GTK_TABLE( t ), control,
+                      1, 2, row, row + 1,
+                      GTK_EXPAND | GTK_SHRINK | GTK_FILL,
+                      GTK_EXPAND | GTK_SHRINK | GTK_FILL,
+                      0, 0 );
+}
+
 void
 hig_workarea_add_control( GtkWidget * t,
                           int         row,
@@ -163,6 +178,30 @@ hig_workarea_add_row( GtkWidget *  t,
     GtkWidget * l = gtk_label_new_with_mnemonic( mnemonic_string );
 
     hig_workarea_add_row_w( t, row, l, control, mnemonic );
+    return l;
+}
+
+GtkWidget*
+hig_workarea_add_tall_row( GtkWidget *  table,
+                           int *        row,
+                           const char * mnemonic_string,
+                           GtkWidget *  control,
+                           GtkWidget *  mnemonic )
+{
+    GtkWidget * l = gtk_label_new_with_mnemonic( mnemonic_string );
+    GtkWidget * h = gtk_hbox_new( FALSE, 0 );
+    GtkWidget * v = gtk_vbox_new( FALSE, 0 );
+    gtk_box_pack_start( GTK_BOX( h ), l, FALSE, FALSE, 0 );
+    gtk_box_pack_start( GTK_BOX( v ), h, FALSE, FALSE, GUI_PAD_SMALL );
+
+    hig_workarea_add_label_w( table, *row, v );
+    hig_workarea_add_tall_control( table, *row, control );
+
+    if( GTK_IS_LABEL( l ) )
+        gtk_label_set_mnemonic_widget( GTK_LABEL( l ),
+                                       mnemonic ? mnemonic : control );
+
+    ++ * row;
     return l;
 }
 
