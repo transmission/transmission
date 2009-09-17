@@ -87,12 +87,12 @@
         visibleRect.origin.y = newY;
     }
     
+    const NSInteger numberBlankRows = ceil(visibleRect.size.height / totalRowHeight);
+    
     //remaining visible rows continue alternating
     visibleRect.size.height = totalRowHeight;
     if (start)
         visibleRect.origin.y += totalRowHeight;
-    
-    const NSInteger numberBlankRows = ceil(visibleRect.size.height / totalRowHeight);
     for (NSInteger i = start ? 1 : 0; i < numberBlankRows; i += 2)
     {
         gridRects[rectNum++] = visibleRect;
