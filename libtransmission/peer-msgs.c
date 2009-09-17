@@ -69,7 +69,7 @@ enum
 
     TR_LTEP_PEX             = 1,
 
-    MAX_PEX_PEER_COUNT      = 100,
+    MAX_PEX_PEER_COUNT      = 50,
 
     MIN_CHOKE_PERIOD_SEC    = ( 10 ),
 
@@ -1088,31 +1088,35 @@ parseUtPex( tr_peermsgs * msgs, int msglen, struct evbuffer * inbuf )
     {
         if( tr_bencDictFindRaw( &val, "added", &added, &added_len ) )
         {
+            tr_pex * pex;
+            size_t i, n;
+            size_t added_f_len = 0;
             const uint8_t * added_f = NULL;
-            tr_pex *        pex;
-            size_t          i, n;
-            size_t          added_f_len = 0;
+
             tr_bencDictFindRaw( &val, "added.f", &added_f, &added_f_len );
-            pex =
-                tr_peerMgrCompactToPex( added, added_len, added_f, added_f_len,
-                                        &n );
-            for( i = 0; i < n; ++i )
+            pex = tr_peerMgrCompactToPex( added, added_len, added_f, added_f_len, &n );
+
+            n = MIN( n, MAX_PEX_PEER_COUNT );
+            for( i=0; i<n; ++i )
                 tr_peerMgrAddPex( tor, TR_PEER_FROM_PEX, pex + i );
+
             tr_free( pex );
         }
 
         if( tr_bencDictFindRaw( &val, "added6", &added, &added_len ) )
         {
+            tr_pex * pex;
+            size_t i, n;
+            size_t added_f_len = 0;
             const uint8_t * added_f = NULL;
-            tr_pex *        pex;
-            size_t          i, n;
-            size_t          added_f_len = 0;
+
             tr_bencDictFindRaw( &val, "added6.f", &added_f, &added_f_len );
-            pex =
-                tr_peerMgrCompact6ToPex( added, added_len, added_f, added_f_len,
-                                         &n );
-            for( i = 0; i < n; ++i )
+            pex = tr_peerMgrCompact6ToPex( added, added_len, added_f, added_f_len, &n );
+
+            n = MIN( n, MAX_PEX_PEER_COUNT );
+            for( i=0; i<n; ++i )
                 tr_peerMgrAddPex( tor, TR_PEER_FROM_PEX, pex + i );
+
             tr_free( pex );
         }
     }
