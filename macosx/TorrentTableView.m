@@ -682,7 +682,7 @@
     
     const CGFloat totalRowHeight = [self rowHeight] + [self intercellSpacing].height;
     
-    NSRect * gridRects = (NSRect *)alloca(sizeof(NSRect) * (ceil(visibleRect.size.height / totalRowHeight) / 2));
+    NSRect gridRects[(NSInteger)(ceil(visibleRect.size.height / totalRowHeight) / 2)];
     NSInteger rectNum = 0;
     
     if (rows.length > 0)
@@ -729,6 +729,7 @@
     visibleRect.size.height = totalRowHeight;
     if (start)
         visibleRect.origin.y += totalRowHeight;
+    
     for (NSInteger i = start ? 1 : 0; i < numberBlankRows; i += 2)
     {
         gridRects[rectNum++] = visibleRect;

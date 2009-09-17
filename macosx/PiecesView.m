@@ -201,6 +201,7 @@
                 rect.origin = NSMakePoint(j * (fWidth + BETWEEN) + BETWEEN + fExtraBorder,
                                         [image size].width - (i + 1) * (fWidth + BETWEEN) - fExtraBorder);
                 
+                #warning use NSRectFillListWithColors
                 [pieceColor set];
                 NSRectFill(rect);
             }
