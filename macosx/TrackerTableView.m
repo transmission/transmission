@@ -46,7 +46,7 @@
     
     const CGFloat totalRowHeight = [self rowHeight] + [self intercellSpacing].height;
     
-    NSRect gridRects[(NSInteger)(ceil(visibleRect.size.height / totalRowHeight) / 2)];
+    NSRect gridRects[(NSInteger)(ceil(visibleRect.size.height / totalRowHeight / 2.0))];
     NSInteger rectNum = 0;
     
     if (rows.length > 0)

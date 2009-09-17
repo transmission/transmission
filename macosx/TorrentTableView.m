@@ -593,7 +593,8 @@
         NSMenuItem * item;
         if ([menu numberOfItems] == 3)
         {
-            const NSInteger speedLimitActionValue[] = { 0, 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750, 1000, 1500, 2000, -1 };
+            const NSInteger speedLimitActionValue[] = { 0, 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500,
+                                                        750, 1000, 1500, 2000, -1 };
             
             for (NSInteger i = 0; speedLimitActionValue[i] != -1; i++)
             {
@@ -682,7 +683,7 @@
     
     const CGFloat totalRowHeight = [self rowHeight] + [self intercellSpacing].height;
     
-    NSRect gridRects[(NSInteger)(ceil(visibleRect.size.height / totalRowHeight) / 2)];
+    NSRect gridRects[(NSInteger)(ceil(visibleRect.size.height / totalRowHeight / 2.0))];
     NSInteger rectNum = 0;
     
     if (rows.length > 0)
