@@ -34,7 +34,7 @@
         downloadFolder: (NSString *) downloadFolder
         useIncompleteFolder: (NSNumber *) useIncompleteFolder incompleteFolder: (NSString *) incompleteFolder
         waitToStart: (NSNumber *) waitToStart
-        groupValue: (NSNumber *) groupValue addedTrackers: (NSNumber *) addedTrackers;
+        groupValue: (NSNumber *) groupValue;
 
 - (BOOL) shouldUseIncompleteFolderForName: (NSString *) name;
 - (void) updateDownloadFolder;
@@ -83,7 +83,7 @@ int trashDataFile(const char * filename)
     self = [self initWithPath: path hash: nil torrentStruct: NULL lib: lib
             downloadFolder: location
             useIncompleteFolder: nil incompleteFolder: nil
-            waitToStart: nil groupValue: nil addedTrackers: nil];
+            waitToStart: nil groupValue: nil];
     
     if (self)
     {
@@ -98,7 +98,7 @@ int trashDataFile(const char * filename)
     self = [self initWithPath: nil hash: nil torrentStruct: torrentStruct lib: lib
             downloadFolder: location
             useIncompleteFolder: nil incompleteFolder: nil
-            waitToStart: nil groupValue: nil addedTrackers: nil];
+            waitToStart: nil groupValue: nil];
     
     return self;
 }
@@ -112,8 +112,7 @@ int trashDataFile(const char * filename)
                 useIncompleteFolder: [history objectForKey: @"UseIncompleteFolder"]
                 incompleteFolder: [history objectForKey: @"IncompleteFolder"]
                 waitToStart: [history objectForKey: @"WaitToStart"]
-                groupValue: [history objectForKey: @"GroupValue"]
-                addedTrackers: [history objectForKey: @"AddedTrackers"]];
+                groupValue: [history objectForKey: @"GroupValue"]];
     
     if (self)
     {
@@ -161,8 +160,7 @@ int trashDataFile(const char * filename)
                     [NSNumber numberWithBool: fUseIncompleteFolder], @"UseIncompleteFolder",
                     [NSNumber numberWithBool: [self isActive]], @"Active",
                     [NSNumber numberWithBool: fWaitToStart], @"WaitToStart",
-                    [NSNumber numberWithInt: fGroupValue], @"GroupValue",
-                    [NSNumber numberWithBool: fAddedTrackers], @"AddedTrackers", nil];
+                    [NSNumber numberWithInt: fGroupValue], @"GroupValue", nil];
     
     if (fIncompleteFolder)
         [history setObject: fIncompleteFolder forKey: @"IncompleteFolder"];
@@ -748,7 +746,7 @@ int trashDataFile(const char * filename)
         if (separators && tier != fInfo->trackers[i].tier)
         {
             tier = fInfo->trackers[i].tier;
-            [allTrackers addObject: [NSNumber numberWithInt: fAddedTrackers ? tier : tier + 1]];
+            [allTrackers addObject: [NSNumber numberWithInteger: tier + 1]];
         }
         
         [allTrackers addObject: [NSString stringWithUTF8String: fInfo->trackers[i].announce]];
@@ -764,21 +762,13 @@ int trashDataFile(const char * filename)
 
 - (BOOL) updateAllTrackersForAdd: (NSMutableArray *) trackers
 {
-    //find added tracker at end of first tier
-    NSInteger i;
-    for (i = 1; i < [trackers count]; i++)
-        if ([[trackers objectAtIndex: i] isKindOfClass: [NSNumber class]])
-            break;
-    i--;
-    
-    NSString * tracker = [trackers objectAtIndex: i];
-    
+    NSString * tracker = [trackers lastObject];
     tracker = [tracker stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
     
     if ([tracker rangeOfString: @"://"].location == NSNotFound)
     {
         tracker = [@"http://" stringByAppendingString: tracker];
-        [trackers replaceObjectAtIndex: i withObject: tracker];
+        [trackers replaceObjectAtIndex: [trackers count]-1 withObject: tracker];
     }
     
     if (!tr_httpIsValidURL([tracker UTF8String]))
@@ -786,22 +776,13 @@ int trashDataFile(const char * filename)
     
     [self updateAllTrackers: trackers];
     
-    fAddedTrackers = YES;
     return YES;
 }
 
+#warning needed?
 - (void) updateAllTrackersForRemove: (NSMutableArray *) trackers
 {
-    //check if no user-added groups
-    if ([trackers count] == 0 || [[trackers objectAtIndex: 0] intValue] != 0)
-        fAddedTrackers = NO;
-    
     [self updateAllTrackers: trackers];
-}
-
-- (BOOL) hasAddedTrackers
-{
-    return fAddedTrackers;
 }
 
 - (NSString *) comment
@@ -1567,7 +1548,7 @@ int trashDataFile(const char * filename)
         downloadFolder: (NSString *) downloadFolder
         useIncompleteFolder: (NSNumber *) useIncompleteFolder incompleteFolder: (NSString *) incompleteFolder
         waitToStart: (NSNumber *) waitToStart
-        groupValue: (NSNumber *) groupValue addedTrackers: (NSNumber *) addedTrackers
+        groupValue: (NSNumber *) groupValue
 {
     if (!(self = [super init]))
         return nil;
@@ -1650,9 +1631,7 @@ int trashDataFile(const char * filename)
 	
     [self createFileList];
 	
-    fGroupValue = groupValue ? [groupValue intValue] : [[GroupsController groups] groupIndexForTorrent: self];
-    
-    fAddedTrackers = addedTrackers ? [addedTrackers boolValue] : NO;    
+    fGroupValue = groupValue ? [groupValue intValue] : [[GroupsController groups] groupIndexForTorrent: self]; 
     
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(checkGroupValueForRemoval:)
         name: @"GroupValueRemoved" object: nil];

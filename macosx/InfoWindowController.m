@@ -1102,10 +1102,6 @@ typedef enum
     if (tableView != fTrackerTable)
         return NO;
     
-    //only allow modification of custom-added trackers
-    if ([[fTrackers objectAtIndex: row] isKindOfClass: [NSNumber class]] || ![[fTorrents objectAtIndex: 0] hasAddedTrackers])
-        return NO;
-    
     NSUInteger i;
     for (i = row-1; ![[fTrackers objectAtIndex: i] isKindOfClass: [NSNumber class]]; i--);
     
@@ -1731,20 +1727,17 @@ typedef enum
 {
     [[self window] makeKeyWindow];
     
-    NSUInteger index = 1;
-    if ([fTrackers count] > 0 && [[fTorrents objectAtIndex: 0] hasAddedTrackers])
-    {
-        for (; index < [fTrackers count]; index++)
-            if ([[fTrackers objectAtIndex: index] isKindOfClass: [NSNumber class]])
-                break;
-    }
-    else
-        [fTrackers insertObject: [NSNumber numberWithInt: 0] atIndex: 0];
+    NSUInteger tierCount = 0;
+    for (id trackerObject in fTrackers)
+        if ([trackerObject isKindOfClass: [NSNumber class]])
+            tierCount++;
     
-    [fTrackers insertObject: @"" atIndex: index];
+    [fTrackers addObject: [NSNumber numberWithInt: tierCount+1]];
+    [fTrackers addObject: @""];
+    
     [fTrackerTable reloadData];
-    [fTrackerTable selectRowIndexes: [NSIndexSet indexSetWithIndex: index] byExtendingSelection: NO];
-    [fTrackerTable editColumn: 0 row: index withEvent: nil select: YES];
+    [fTrackerTable selectRowIndexes: [NSIndexSet indexSetWithIndex: [fTrackers count]-1] byExtendingSelection: NO];
+    [fTrackerTable editColumn: 0 row: [fTrackers count]-1 withEvent: nil select: YES];
 }
 
 - (void) removeTrackers
@@ -1798,7 +1791,8 @@ typedef enum
     Torrent * torrent = [fTorrents objectAtIndex: 0];
     
     //determine if removing trackers built into the torrent
-    if (numberBuiltIn > 0 && [[NSUserDefaults standardUserDefaults] boolForKey: @"WarningRemoveBuiltInTracker"])
+    #warning remove?
+    if (NO && numberBuiltIn > 0 && [[NSUserDefaults standardUserDefaults] boolForKey: @"WarningRemoveBuiltInTracker"])
     {
         NSAlert * alert = [[NSAlert alloc] init];
         

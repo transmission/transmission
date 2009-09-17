@@ -140,6 +140,7 @@
     return [timeArray componentsJoinedByString: @" "];
 }
 
+//also used in InfoWindow.xib
 - (NSComparisonResult) compareFinder: (NSString *) string
 {
     if ([NSApp isOnSnowLeopardOrBetter])

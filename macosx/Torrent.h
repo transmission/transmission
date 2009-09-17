@@ -58,8 +58,6 @@
     
     NSInteger fGroupValue;
     
-    BOOL fAddedTrackers;
-    
     NSDictionary * fQuickPauseDict;
 }
 
@@ -147,7 +145,6 @@
 - (NSArray *) allTrackersFlat;
 - (BOOL) updateAllTrackersForAdd: (NSMutableArray *) trackers;
 - (void) updateAllTrackersForRemove: (NSMutableArray *) trackers;
-- (BOOL) hasAddedTrackers;
 
 - (NSString *) comment;
 - (NSString *) creator;
