@@ -1783,8 +1783,6 @@ typedef enum
         return;
     }
     
-    Torrent * torrent = [fTorrents objectAtIndex: 0];
-    
     if ([[NSUserDefaults standardUserDefaults] boolForKey: @"WarningRemoveTrackers"])
     {
         NSAlert * alert = [[NSAlert alloc] init];
@@ -1819,6 +1817,7 @@ typedef enum
     
     [fTrackers removeObjectsAtIndexes: indexes];
     
+    Torrent * torrent = [fTorrents objectAtIndex: 0];
     [torrent updateAllTrackersForRemove: fTrackers];
     [fTrackerTable deselectAll: self];
     

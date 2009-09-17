@@ -779,7 +779,6 @@ int trashDataFile(const char * filename)
     return YES;
 }
 
-#warning needed?
 - (void) updateAllTrackersForRemove: (NSMutableArray *) trackers
 {
     [self updateAllTrackers: trackers];
