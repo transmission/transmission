@@ -1390,8 +1390,7 @@ doAction( const char * action_name, gpointer user_data )
     }
     else if( !strcmp( action_name, "new-torrent" ) )
     {
-        GtkWidget * w = make_meta_ui( GTK_WINDOW( data->wind ),
-                                     tr_core_session( data->core ) );
+        GtkWidget * w = make_meta_ui( GTK_WINDOW( data->wind ), data->core );
         gtk_widget_show_all( w );
     }
     else if( !strcmp( action_name, "remove-torrent" ) )

@@ -861,6 +861,15 @@ add_ctor( TrCore * core, tr_ctor * ctor, gboolean doPrompt, gboolean doNotify )
     return err;
 }
 
+void
+tr_core_add_ctor( TrCore * core, tr_ctor * ctor )
+{
+    const gboolean doStart = pref_flag_get( PREF_KEY_START );
+    const gboolean doPrompt = pref_flag_get( PREF_KEY_OPTIONS_PROMPT );
+    tr_core_apply_defaults( ctor );
+    add_ctor( core, ctor, doStart, doPrompt );
+}
+
 /* invoked remotely via dbus. */
 gboolean
 tr_core_add_metainfo( TrCore      * core,

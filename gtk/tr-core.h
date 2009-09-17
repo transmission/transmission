@@ -135,6 +135,12 @@ gboolean tr_core_add_metainfo( TrCore      * core,
                                gboolean    * setme_success,
                                GError     ** err );
 
+/** @brief Add a torrent.
+    @param ctor this function assumes ownership of the ctor */
+void tr_core_add_ctor( TrCore  * core,
+                       tr_ctor * ctor );
+
+
 /** Add a torrent. */
 void tr_core_add_torrent( TrCore*, TrTorrent*, gboolean doNotify );
 
