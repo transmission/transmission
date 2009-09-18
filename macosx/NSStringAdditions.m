@@ -42,7 +42,12 @@
 + (NSString *) stringForFileSize: (uint64_t) size
 {
     if (size < 1024)
-        return [NSString stringWithFormat: @"%lld %@", size, NSLocalizedString(@"bytes", "File size - bytes")];
+    {
+        if (size != 1)
+            return [NSString stringWithFormat: @"%lld %@", size, NSLocalizedString(@"bytes", "File size - bytes")];
+        else
+            return NSLocalizedString(@"1 byte", "File size - bytes");
+    }
 
     CGFloat convertedSize;
     NSString * unit;
