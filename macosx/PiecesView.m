@@ -28,7 +28,7 @@
 #import "utils.h"
 
 #define MAX_ACROSS 18
-#define BETWEEN 1.0f
+#define BETWEEN 1.0
 
 #define HIGH_PEERS 30
 
@@ -108,17 +108,14 @@
         return;
     
     //determine if first time
-    BOOL first = NO;
-    if (!fPieces)
-    {
+    const BOOL first = fPieces == NULL;
+    if (first)
         fPieces = (int8_t *)tr_malloc(fNumPieces * sizeof(int8_t));
-        first = YES;
-    }
 
     int8_t * pieces = NULL;
     float * piecesPercent = NULL;
     
-    BOOL showAvailablity = [[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"];
+    const BOOL showAvailablity = [[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"];
     if (showAvailablity)
     {   
         pieces = (int8_t *)tr_malloc(fNumPieces * sizeof(int8_t));
@@ -135,7 +132,7 @@
     NSRect fillRects[fNumPieces];
     NSColor * fillColors[fNumPieces];
     
-    NSInteger index = -1, usedIndex = 0;
+    NSInteger index = -1, usedCount = 0;
     
     for (NSInteger i = 0; i < fAcross; i++)
         for (NSInteger j = 0; j < fAcross; j++)
@@ -192,19 +189,19 @@
             
             if (pieceColor)
             {
-                fillRects[usedIndex] = NSMakeRect(j * (fWidth + BETWEEN) + BETWEEN + fExtraBorder,
+                fillRects[usedCount] = NSMakeRect(j * (fWidth + BETWEEN) + BETWEEN + fExtraBorder,
                                                     [image size].width - (i + 1) * (fWidth + BETWEEN) - fExtraBorder,
                                                     fWidth, fWidth);
-                fillColors[usedIndex] = pieceColor;
+                fillColors[usedCount] = pieceColor;
                 
-                usedIndex++;
+                usedCount++;
             }
         }
     
-    if (usedIndex > 0)
+    if (usedCount > 0)
     {
         [image lockFocus];
-        NSRectFillListWithColors(fillRects, fillColors, usedIndex);
+        NSRectFillListWithColors(fillRects, fillColors, usedCount);
         [image unlockFocus];
         [self setNeedsDisplay];
     }

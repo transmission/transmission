@@ -39,9 +39,6 @@
 #define ACTION_MENU_PRIORITY_NORMAL_TAG 102
 #define ACTION_MENU_PRIORITY_LOW_TAG 103
 
-#define GROUP_SPEED_IMAGE_COLUMN_WIDTH 8.0f
-#define GROUP_RATIO_IMAGE_COLUMN_WIDTH 10.0f
-
 #define TOGGLE_PROGRESS_SECONDS 0.175
 
 @interface TorrentTableView (Private)
@@ -945,21 +942,10 @@
 
 - (void) setGroupStatusColumns
 {
-    BOOL ratio = [fDefaults boolForKey: @"DisplayGroupRowRatio"];
+    const BOOL ratio = [fDefaults boolForKey: @"DisplayGroupRowRatio"];
     
     [[self tableColumnWithIdentifier: @"DL"] setHidden: ratio];
     [[self tableColumnWithIdentifier: @"DL Image"] setHidden: ratio];
-    
-    //change size of image column
-    NSTableColumn * ulImageTableColumn = [self tableColumnWithIdentifier: @"UL Image"];
-    CGFloat oldWidth = [ulImageTableColumn width], newWidth = ratio ? GROUP_RATIO_IMAGE_COLUMN_WIDTH : GROUP_SPEED_IMAGE_COLUMN_WIDTH;
-    if (oldWidth != newWidth)
-    {
-        [ulImageTableColumn setWidth: newWidth];
-        
-        NSTableColumn * groupTableColumn = [self tableColumnWithIdentifier: @"Group"];
-        [groupTableColumn setWidth: [groupTableColumn width] - (newWidth - oldWidth)];
-    }
 }
 
 - (void) createFileMenu: (NSMenu *) menu forFiles: (NSArray *) files
