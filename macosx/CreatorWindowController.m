@@ -162,15 +162,13 @@
     }
     [fStatusField setStringValue: statusString];
     
-    NSString * piecesCountString;
-    int piecesCount = fInfo->pieceCount;
+    const int piecesCount = fInfo->pieceCount;
     if (piecesCount == 1)
-        piecesCountString = NSLocalizedString(@"1 piece", "Create torrent -> info");
+        [fPiecesField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"1 piece, %@", "Create torrent -> info"),
+                                                            [NSString stringForFileSize: fInfo->pieceSize]]];
     else
-        piecesCountString = [NSString stringWithFormat: NSLocalizedString(@"%d pieces", "Create torrent -> info"),
-                                                                piecesCount];
-    [fPiecesField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%@, %@ each", "Create torrent -> info"),
-                                        piecesCountString, [NSString stringForFileSize: fInfo->pieceSize]]];
+        [fPiecesField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%d pieces, %@ each", "Create torrent -> info"),
+                                                            piecesCount, [NSString stringForFileSize: fInfo->pieceSize]]];
     
     fLocation = [[[[fDefaults stringForKey: @"CreatorLocation"] stringByExpandingTildeInPath] stringByAppendingPathComponent:
                     [name stringByAppendingPathExtension: @"torrent"]] retain];
