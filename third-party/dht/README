@@ -93,7 +93,7 @@ interesting happens (see below).
 
 This schedules a search for information about the info-hash specified in
 id.  If port is not 0, it specifies the TCP port on which the current peer
-is litening; in that case, when the search is complete it will be announced
+is listening; in that case, when the search is complete it will be announced
 to the network.  The port is in host order, beware if you got it from
 a struct sockaddr_in.
 
@@ -101,7 +101,7 @@ In either case, data is passed to the callback function as soon as it is
 available, possibly in multiple pieces.  The callback function will
 additionally be called when the search is complete.
 
-Up to DHT_MAX_SEARCHES (20) searches can be in progress at a given time;
+Up to DHT_MAX_SEARCHES (1024) searches can be in progress at a given time;
 any more, and dht_search will return -1.  If you specify a new search for
 the same info hash as a search still in progress, the previous search is
 combined with the new one -- you will only receive a completion indication
@@ -123,12 +123,12 @@ It also includes the number of nodes that recently send us an unsolicited
 request; this can be used to determine if the UDP port used for the DHT is
 firewalled.
 
-If you want to display a single figure to the user, you should display good
-+ doubtful, which is the total number of nodes in your routing table.  Some
-clients try to estimate the total number of nodes, but this doesn't make
-much sense -- since the result is exponential in the number of nodes in the
-routing table, small variations in the latter cause huge jumps in the
-former.
+If you want to display a single figure to the user, you should display
+good + doubtful, which is the total number of nodes in your routing table.
+Some clients try to estimate the total number of nodes, but this doesn't
+make much sense -- since the result is exponential in the number of nodes
+in the routing table, small variations in the latter cause huge jumps in
+the former.
 
 * dht_get_nodes
 
@@ -185,8 +185,6 @@ make most full cone NATs happy.
 
 Some of the code has had very little testing.  If it breaks, you get to
 keep both pieces.
-
-There is currently no good way to save and restore your routing table.
 
 IPv6 support is deliberately not included: designing a double-stack
 distributed hash table raises some tricky issues, and doing it naively may
