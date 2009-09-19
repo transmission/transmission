@@ -91,6 +91,7 @@ struct DetailsImpl
     GtkWidget * last_scrape_time_lb;
     GtkWidget * last_scrape_response_lb;
     GtkWidget * next_scrape_countdown_lb;
+    GtkWidget * last_announce_url_lb;
     GtkWidget * last_announce_time_lb;
     GtkWidget * last_announce_response_lb;
     GtkWidget * next_announce_countdown_lb;
@@ -1710,6 +1711,20 @@ refreshTracker( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     }
     gtk_label_set_text( GTK_LABEL( di->next_scrape_countdown_lb ), str );
 
+    /* last_announce_url_lb */
+    if( n<1 )
+        str = none;
+    else {
+        const char * baseline = stats[0]->announceURL;
+        for( i=1; i<n; ++i)
+            if( strcmp( baseline, stats[i]->announceURL ) )
+                break;
+        if( i==n )
+            str = baseline;
+        else
+            str = mixed;
+    }
+    gtk_label_set_text( GTK_LABEL( di->last_announce_url_lb ), str );
 
     /* last_announce_time_lb */
     if( n<1 )
@@ -1825,6 +1840,7 @@ tracker_page_new( struct DetailsImpl * di )
 
         l = gtk_label_new( NULL );
         gtk_label_set_ellipsize( GTK_LABEL( l ), PANGO_ELLIPSIZE_END );
+        di->last_announce_url_lb = l;
         hig_workarea_add_row( t, &row, _( "Tracker:" ), l, NULL );
 
         s = _( "Last announce at:" );
