@@ -419,10 +419,13 @@ tr_session * fHandle;
 {
     NSMutableArray * sounds = [NSMutableArray array];
     
-    NSArray * directories = [NSArray arrayWithObjects: @"/System/Library/Sounds", @"/Library/Sounds", @"Library/Sounds", nil];
+    NSArray * directories = NSSearchPathForDirectoriesInDomains(NSAllLibrariesDirectory,
+                                NSUserDomainMask | NSLocalDomainMask | NSSystemDomainMask, YES);
     
     for (NSString * directory in directories)
     {
+        directory = [directory stringByAppendingPathComponent: @"Sounds"];
+        
         BOOL isDirectory;
         if ([[NSFileManager defaultManager] fileExistsAtPath: directory isDirectory: &isDirectory] && isDirectory)
         {
