@@ -137,7 +137,7 @@ typedef enum
 #define DOCK_SEEDING_TAG        101
 #define DOCK_DOWNLOADING_TAG    102
 
-#define SUPPORT_FOLDER  @"/Library/Application Support/Transmission/Transfers.plist"
+#define TRANSFER_PLIST  @"/Library/Application Support/Transmission/Transfers.plist"
 
 #define WEBSITE_URL @"http://www.transmissionbt.com/"
 #define FORUM_URL   @"http://forum.transmissionbt.com/"
@@ -387,7 +387,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         NSLog(@"Could not IORegisterForSystemPower");
     
     //load previous transfers
-    NSArray * history = [[NSArray alloc] initWithContentsOfFile: [NSHomeDirectory() stringByAppendingPathComponent: SUPPORT_FOLDER]];
+    NSArray * history = [[NSArray alloc] initWithContentsOfFile: [NSHomeDirectory() stringByAppendingPathComponent: TRANSFER_PLIST]];
     
     //old version saved transfer info in prefs file
     if (!history)
@@ -1805,7 +1805,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     for (Torrent * torrent in fTorrents)
         [history addObject: [torrent history]];
     
-    [history writeToFile: [NSHomeDirectory() stringByAppendingPathComponent: SUPPORT_FOLDER] atomically: YES];
+    [history writeToFile: [NSHomeDirectory() stringByAppendingPathComponent: TRANSFER_PLIST] atomically: YES];
 }
 
 - (void) setSort: (id) sender
