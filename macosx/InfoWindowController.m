@@ -1782,6 +1782,7 @@ typedef enum
     return [item isFolder] || [torrent fileProgress: item] == 1.0;
 }
 
+#warning doesn't like blank addresses
 - (void) addTrackers
 {
     [[self window] makeKeyWindow];
@@ -1796,7 +1797,7 @@ typedef enum
     
     [fTrackerTable reloadData];
     [fTrackerTable selectRowIndexes: [NSIndexSet indexSetWithIndex: [fTrackers count]-1] byExtendingSelection: NO];
-    [fTrackerTable editColumn: 0 row: [fTrackers count]-1 withEvent: nil select: YES];
+    [fTrackerTable editColumn: [fTrackerTable columnWithIdentifier: @"Address"] row: [fTrackers count]-1 withEvent: nil select: YES];
 }
 
 - (void) removeTrackers
