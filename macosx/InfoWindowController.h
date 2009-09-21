@@ -77,6 +77,9 @@
                         * fUploadLimitLabel, * fDownloadLimitLabel, * fPeersConnectLabel,
                         * fPeersConnectField;
     
+    NSCache * fTrackerIconCache;
+    NSMutableSet * fTrackerIconLoaded;
+    
     NSString * fInitialString;
     
     QLPreviewPanel * fPreviewPanel;

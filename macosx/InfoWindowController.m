@@ -192,6 +192,14 @@ typedef enum
     
     [self setWebSeedTableHidden: YES animate: NO];
     
+    if ([NSApp isOnSnowLeopardOrBetter])
+    {
+        fTrackerIconCache = [[NSCache alloc] init];
+        fTrackerIconLoaded = [[NSMutableSet alloc] init];
+    }
+    else
+        [fTrackerTable removeTableColumn: [fTrackerTable tableColumnWithIdentifier: @"Icon"]];
+    
     //set blank inspector
     [self setInfoForTorrents: [NSArray array]];
     
@@ -228,6 +236,9 @@ typedef enum
     [fTrackers release];
     
     [fWebSeedTableAnimation release];
+    
+    [fTrackerIconCache release];
+    [fTrackerIconLoaded release];
     
     [fPreviewPanel release];
     
@@ -483,7 +494,7 @@ typedef enum
         
         [fTrackerAddRemoveControl setEnabled: YES forSegment: TRACKER_ADD_TAG];
         [fTrackerAddRemoveControl setEnabled: NO forSegment: TRACKER_REMOVE_TAG];
-        
+
         [fFileFilterField setEnabled: [torrent isFolder]];
     }
     
@@ -907,12 +918,66 @@ typedef enum
     }
     else if (tableView == fTrackerTable)
     {
+        NSString * ident = [column identifier];
         id item = [fTrackers objectAtIndex: row];
-        if ([item isKindOfClass: [NSNumber class]])
-            return [NSString stringWithFormat: NSLocalizedString(@"Tier %d", "Inspector -> tracker table"), [item integerValue]];
-        else
+        
+        if ([ident isEqualToString: @"Icon"])
+        {
+            NSAssert([item isKindOfClass: [NSString class]], @"Value passed to tracker table's icon row is not a string!");
+            
+            NSURL * address = [NSURL URLWithString: item];
+            NSArray * hostComponents = [[address host] componentsSeparatedByString: @"."];
+            
+            //let's try getting the favicon without using any subdomains
+            NSURL * favIconUrl;
+            if ([hostComponents count] > 1)
+                favIconUrl = [NSURL URLWithString: [NSString stringWithFormat: @"%@://%@.%@/favicon.ico", [address scheme],
+                                [hostComponents objectAtIndex: [hostComponents count] - 2], [hostComponents lastObject]]];
+            else
+                favIconUrl = [NSURL URLWithString: [NSString stringWithFormat: @"%@://%@/favicon.ico", [address scheme],
+                                [hostComponents lastObject]]];
+            
+            NSImage * icon = nil;
+            if ([fTrackerIconLoaded containsObject: favIconUrl])
+                icon = [fTrackerIconCache objectForKey: favIconUrl];
+            else
+                [NSThread detachNewThreadSelector: @selector(loadTrackerIcon:) toTarget: self withObject: favIconUrl];
+            
+            return icon;
+        }
+        if ([ident isEqualToString: @"Address"])
             return item;
+        else
+            return [NSString stringWithFormat: NSLocalizedString(@"Tier %d", "Inspector -> tracker table"), [item integerValue]];
     }
+    return nil;
+}
+
+- (void) loadTrackerIcon: (NSURL *) favIconUrl
+{
+    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+    
+    [fTrackerIconLoaded addObject: favIconUrl];
+    
+    NSImage * icon = [[NSImage alloc] initWithContentsOfURL: favIconUrl];
+    if (icon)
+    {
+        [fTrackerIconCache setObject: icon forKey: favIconUrl];
+        [icon release];
+    }
+    
+    [pool drain];
+}
+
+- (NSCell *)tableView: (NSTableView *) tableView dataCellForTableColumn: (NSTableColumn *) tableColumn row: (NSInteger) row
+{
+    if (tableView == fTrackerTable)
+    {
+        //group row the full column width
+        if (!tableColumn && [[fTrackers objectAtIndex: row] isKindOfClass: [NSNumber class]])
+            return [[tableView tableColumnWithIdentifier: @"Address"] dataCell];
+    }
+    
     return nil;
 }
 
