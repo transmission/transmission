@@ -928,7 +928,7 @@ typedef enum
             NSURL * address = [NSURL URLWithString: item];
             NSArray * hostComponents = [[address host] componentsSeparatedByString: @"."];
             
-            //let's try getting the favicon without using any subdomains
+            //let's try getting the tracker address without using any subdomains
             NSString * baseAddress;
             if ([hostComponents count] > 1)
                 baseAddress = [NSString stringWithFormat: @"%@://%@.%@", [address scheme],
@@ -943,7 +943,7 @@ typedef enum
                 [NSThread detachNewThreadSelector: @selector(loadTrackerIcon:) toTarget: self withObject: baseAddress];
             }
             
-            return (icon && icon != [NSNull null]) ? icon : nil;
+            return (icon && icon != [NSNull null]) ? icon : [NSImage imageNamed: @"FavIcon.png"];
         }
         if ([ident isEqualToString: @"Address"])
             return item;
@@ -957,7 +957,7 @@ typedef enum
 {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     
-    NSURL * favIconUrl = [NSURL URLWithString: [baseAddress stringByAppendingString: @"/favicon.ico"]];
+    NSURL * favIconUrl = [NSURL URLWithString: [baseAddress stringByAppendingPathComponent: @"favicon.ico"]];
     NSImage * icon = [[NSImage alloc] initWithContentsOfURL: favIconUrl];
     if (icon)
     {

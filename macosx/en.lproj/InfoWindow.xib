@@ -12,7 +12,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="1731"/>
+			<integer value="1823"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -2021,7 +2021,7 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSBDb21wdXRlciwgSW5jLiwgMjAwNQAAAAA</bytes>
 									<object class="NSTableView" id="423972458">
 										<reference key="NSNextResponder" ref="198254095"/>
 										<int key="NSvFlags">256</int>
-										<string key="NSFrameSize">{360, 143}</string>
+										<string key="NSFrameSize">{363, 143}</string>
 										<reference key="NSSuperview" ref="198254095"/>
 										<bool key="NSEnabled">YES</bool>
 										<object class="_NSCornerView" key="NSCornerView">
@@ -2033,9 +2033,9 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSBDb21wdXRlciwgSW5jLiwgMjAwNQAAAAA</bytes>
 											<bool key="EncodedWithXMLCoder">YES</bool>
 											<object class="NSTableColumn" id="78872301">
 												<string key="NSIdentifier">Icon</string>
-												<double key="NSWidth">14</double>
-												<double key="NSMinWidth">14</double>
-												<double key="NSMaxWidth">14</double>
+												<double key="NSWidth">17</double>
+												<double key="NSMinWidth">17</double>
+												<double key="NSMaxWidth">17</double>
 												<object class="NSTableHeaderCell" key="NSHeaderCell">
 													<int key="NSCellFlags">75628096</int>
 													<int key="NSCellFlags2">2048</int>
@@ -2058,7 +2058,7 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSBDb21wdXRlciwgSW5jLiwgMjAwNQAAAAA</bytes>
 													<int key="NSCellFlags">67239424</int>
 													<int key="NSCellFlags2">33554432</int>
 													<reference key="NSSupport" ref="737793924"/>
-													<int key="NSAlign">0</int>
+													<int key="NSAlign">8</int>
 													<int key="NSScale">3</int>
 													<int key="NSStyle">0</int>
 													<bool key="NSAnimates">NO</bool>
@@ -2153,6 +2153,7 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSBDb21wdXRlciwgSW5jLiwgMjAwNQAAAAA</bytes>
 								<int key="NSvFlags">-2147483392</int>
 								<string key="NSFrame">{{-100, -100}, {372, 15}}</string>
 								<reference key="NSSuperview" ref="754568592"/>
+								<bool key="NSEnabled">YES</bool>
 								<int key="NSsFlags">1</int>
 								<reference key="NSTarget" ref="754568592"/>
 								<string key="NSAction">_doScroller:</string>
@@ -2163,7 +2164,7 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSBDb21wdXRlciwgSW5jLiwgMjAwNQAAAAA</bytes>
 						<string key="NSFrame">{{10, 202}, {362, 145}}</string>
 						<reference key="NSSuperview" ref="296911506"/>
 						<reference key="NSNextKeyView" ref="198254095"/>
-						<int key="NSsFlags">530</int>
+						<int key="NSsFlags">658</int>
 						<reference key="NSVScroller" ref="964808471"/>
 						<reference key="NSHScroller" ref="265048045"/>
 						<reference key="NSContentView" ref="198254095"/>

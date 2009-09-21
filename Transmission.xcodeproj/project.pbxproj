@@ -124,6 +124,7 @@
 		A257C1820CAD3003004E121C /* PeerTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = A257C1800CAD3003004E121C /* PeerTableView.m */; };
 		A25892640CF1F7E800CCCDDF /* StatsWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A25892630CF1F7E800CCCDDF /* StatsWindowController.m */; };
 		A259317E0A73B2CC002F4FE7 /* TransmissionHelp in Resources */ = {isa = PBXBuildFile; fileRef = A259316A0A73B2CC002F4FE7 /* TransmissionHelp */; };
+		A25963E11068376200453B31 /* FavIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = A25963E01068376200453B31 /* FavIcon.png */; };
 		A25D2CBD0CF4C73E0096A262 /* stats.c in Sources */ = {isa = PBXBuildFile; fileRef = A25D2CBB0CF4C7190096A262 /* stats.c */; };
 		A25D2CBE0CF4C73E0096A262 /* stats.h in Headers */ = {isa = PBXBuildFile; fileRef = A25D2CBA0CF4C7190096A262 /* stats.h */; };
 		A25E03D90E4015100086C225 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
@@ -551,6 +552,7 @@
 		A25892620CF1F7E800CCCDDF /* StatsWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StatsWindowController.h; path = macosx/StatsWindowController.h; sourceTree = "<group>"; };
 		A25892630CF1F7E800CCCDDF /* StatsWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StatsWindowController.m; path = macosx/StatsWindowController.m; sourceTree = "<group>"; };
 		A259316A0A73B2CC002F4FE7 /* TransmissionHelp */ = {isa = PBXFileReference; lastKnownFileType = folder; name = TransmissionHelp; path = macosx/TransmissionHelp; sourceTree = "<group>"; };
+		A25963E01068376200453B31 /* FavIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = FavIcon.png; path = macosx/Images/FavIcon.png; sourceTree = "<group>"; };
 		A25D2CBA0CF4C7190096A262 /* stats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = stats.h; path = libtransmission/stats.h; sourceTree = "<group>"; };
 		A25D2CBB0CF4C7190096A262 /* stats.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = stats.c; path = libtransmission/stats.c; sourceTree = "<group>"; };
 		A25E03E00E4015380086C225 /* tr-getopt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "tr-getopt.h"; path = "libtransmission/tr-getopt.h"; sourceTree = "<group>"; };
@@ -1070,6 +1072,7 @@
 				4DA6FDC3091141AD00450CB1 /* ResumeOff.png */,
 				4DA6FDC4091141AD00450CB1 /* ResumeOn.png */,
 				A2623B3D0D3DC5930045D19A /* ResumeHover.png */,
+				A25963E01068376200453B31 /* FavIcon.png */,
 				4DDFDD20099A5D8E00189D81 /* DownloadBadge.png */,
 				4DDFDD21099A5D8E00189D81 /* UploadBadge.png */,
 				A24B655F0D3F30870079EA4D /* QuitBadge.png */,
@@ -1811,6 +1814,7 @@
 				A22F1E550E7DA8030065DB9D /* sparkle_dsa_pub.pem in Resources */,
 				A2E2EA920EE321C200EB6308 /* Groups.png in Resources */,
 				A215BF5C0F02EBB800350CDB /* GroupRules.xib in Resources */,
+				A25963E11068376200453B31 /* FavIcon.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
