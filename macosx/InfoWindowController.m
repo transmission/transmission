@@ -195,7 +195,7 @@ typedef enum
     if ([NSApp isOnSnowLeopardOrBetter])
     {
         fTrackerIconCache = [[NSCache alloc] init];
-        fTrackerIconLoaded = [[NSMutableSet alloc] init];
+        fTrackerIconLoading = [[NSMutableSet alloc] init];
     }
     else
         [fTrackerTable removeTableColumn: [fTrackerTable tableColumnWithIdentifier: @"Icon"]];
@@ -238,7 +238,7 @@ typedef enum
     [fWebSeedTableAnimation release];
     
     [fTrackerIconCache release];
-    [fTrackerIconLoaded release];
+    [fTrackerIconLoading release];
     
     [fPreviewPanel release];
     
@@ -929,21 +929,21 @@ typedef enum
             NSArray * hostComponents = [[address host] componentsSeparatedByString: @"."];
             
             //let's try getting the favicon without using any subdomains
-            NSURL * favIconUrl;
+            NSString * baseAddress;
             if ([hostComponents count] > 1)
-                favIconUrl = [NSURL URLWithString: [NSString stringWithFormat: @"%@://%@.%@/favicon.ico", [address scheme],
-                                [hostComponents objectAtIndex: [hostComponents count] - 2], [hostComponents lastObject]]];
+                baseAddress = [NSString stringWithFormat: @"%@://%@.%@", [address scheme],
+                                [hostComponents objectAtIndex: [hostComponents count] - 2], [hostComponents lastObject]];
             else
-                favIconUrl = [NSURL URLWithString: [NSString stringWithFormat: @"%@://%@/favicon.ico", [address scheme],
-                                [hostComponents lastObject]]];
+                baseAddress = [NSString stringWithFormat: @"%@://%@", [address scheme], [hostComponents lastObject]];
             
-            NSImage * icon = nil;
-            if ([fTrackerIconLoaded containsObject: favIconUrl])
-                icon = [fTrackerIconCache objectForKey: favIconUrl];
-            else
-                [NSThread detachNewThreadSelector: @selector(loadTrackerIcon:) toTarget: self withObject: favIconUrl];
+            id icon = [fTrackerIconCache objectForKey: baseAddress];
+            if (!icon && ![fTrackerIconLoading containsObject: baseAddress])
+            {
+                [fTrackerIconLoading addObject: baseAddress];
+                [NSThread detachNewThreadSelector: @selector(loadTrackerIcon:) toTarget: self withObject: baseAddress];
+            }
             
-            return icon;
+            return (icon && icon != [NSNull null]) ? icon : nil;
         }
         if ([ident isEqualToString: @"Address"])
             return item;
@@ -953,19 +953,22 @@ typedef enum
     return nil;
 }
 
-- (void) loadTrackerIcon: (NSURL *) favIconUrl
+- (void) loadTrackerIcon: (NSString *) baseAddress
 {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     
-    [fTrackerIconLoaded addObject: favIconUrl];
-    
+    NSURL * favIconUrl = [NSURL URLWithString: [baseAddress stringByAppendingString: @"/favicon.ico"]];
     NSImage * icon = [[NSImage alloc] initWithContentsOfURL: favIconUrl];
     if (icon)
     {
-        [fTrackerIconCache setObject: icon forKey: favIconUrl];
+        [fTrackerIconCache setObject: icon forKey: baseAddress];
         [icon release];
     }
+    else
+        [fTrackerIconCache setObject: [NSNull null] forKey: baseAddress];
     
+    [fTrackerIconLoading removeObject: baseAddress];
+
     [pool drain];
 }
 

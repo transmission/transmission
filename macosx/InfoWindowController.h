@@ -78,7 +78,7 @@
                         * fPeersConnectField;
     
     NSCache * fTrackerIconCache;
-    NSMutableSet * fTrackerIconLoaded;
+    NSMutableSet * fTrackerIconLoading;
     
     NSString * fInitialString;
     
