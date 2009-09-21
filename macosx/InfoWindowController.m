@@ -909,13 +909,7 @@ typedef enum
     {
         id item = [fTrackers objectAtIndex: row];
         if ([item isKindOfClass: [NSNumber class]])
-        {
-            NSInteger tier = [item intValue];
-            if (tier == 0)
-                return NSLocalizedString(@"User-Added", "Inspector -> tracker table");
-            else
-                return [NSString stringWithFormat: NSLocalizedString(@"Tier %d", "Inspector -> tracker table"), tier];
-        }
+            return [NSString stringWithFormat: NSLocalizedString(@"Tier %d", "Inspector -> tracker table"), [item integerValue]];
         else
             return item;
     }
