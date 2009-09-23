@@ -958,7 +958,12 @@ typedef enum
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     
     NSURL * favIconUrl = [NSURL URLWithString: [baseAddress stringByAppendingPathComponent: @"favicon.ico"]];
-    NSImage * icon = [[NSImage alloc] initWithContentsOfURL: favIconUrl];
+    
+    NSURLRequest * request = [NSURLRequest requestWithURL: favIconUrl cachePolicy: NSURLRequestUseProtocolCachePolicy
+                                timeoutInterval: 10.0];
+    NSData * iconData = [NSURLConnection sendSynchronousRequest: request returningResponse: NULL error: NULL];
+    NSImage * icon = [[NSImage alloc] initWithData: iconData];
+    
     if (icon)
     {
         [fTrackerIconCache setObject: icon forKey: baseAddress];
