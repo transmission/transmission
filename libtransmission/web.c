@@ -35,11 +35,16 @@ useCurlMultiSocketAction( void )
 
     if( !tested )
     {
+#ifdef SYS_DARWIN /* for some reason, curl_multi_socket_action() + libevent
+                     keeps crashing in event_queue_insert() on OS X 10.5 & 10.6 */
+        useMultiSocketAction = FALSE;
+#else
         curl_version_info_data * data = curl_version_info( CURLVERSION_NOW );
         tr_inf( "Using libcurl %s", data->version );
         /* Use curl_multi_socket_action() instead of curl_multi_perform()
          * if libcurl >= 7.18.2.  See http://trac.transmissionbt.com/ticket/1844 */
         useMultiSocketAction = data->version_num >= 0x071202;
+#endif
         tested = TRUE;
     }
 
