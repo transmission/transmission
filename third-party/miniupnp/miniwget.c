@@ -20,6 +20,7 @@
 #else
 #include <unistd.h>
 #include <sys/param.h>
+#include <sys/select.h> /* fd_set */
 #include <sys/socket.h>
 #include <netdb.h>
 #include <netinet/in.h>
@@ -33,6 +34,7 @@
 #endif
 
 #include "miniupnpcstrings.h"
+#include "miniwget.h"
 
 /* miniwget2() :
  * */

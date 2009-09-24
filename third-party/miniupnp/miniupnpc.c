@@ -34,6 +34,7 @@
 #else
 /* Standard POSIX includes */
 #include <unistd.h>
+#include <sys/select.h> /* fd_set */
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/param.h>
@@ -697,7 +698,7 @@ int ReceiveData(int socket, char * data, int length, int timeout)
 	return n;
 }
 
-int
+static int
 UPNPIGD_IsConnected(struct UPNPUrls * urls, struct IGDdatas * data)
 {
 	char status[64];
