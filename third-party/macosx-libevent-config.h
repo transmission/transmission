@@ -31,6 +31,9 @@
 /* Define to 1 if you have the <fcntl.h> header file. */
 #define HAVE_FCNTL_H 1
 
+/* Define to 1 if the system has the type `fd_mask'. */ 
+#define HAVE_FD_MASK 1 
+
 /* Define to 1 if you have the `getaddrinfo' function. */
 #define HAVE_GETADDRINFO 1
 
@@ -230,7 +233,7 @@
 #define TIME_WITH_SYS_TIME 1
 
 /* Version number of package */
-#define VERSION "1.4.8-stable"
+#define VERSION "1.4.12-stable"
 
 /* Define to appropriate substitue if compiler doesnt have __func__ */
 /* #undef __func__ */
