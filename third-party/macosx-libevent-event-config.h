@@ -38,6 +38,9 @@
 /* Define to 1 if you have the <fcntl.h> header file. */
 #define _EVENT_HAVE_FCNTL_H 1
 
+/* Define to 1 if the system has the type `fd_mask'. */ 
+#define _EVENT_HAVE_FD_MASK 1 
+
 /* Define to 1 if you have the `getaddrinfo' function. */
 #define _EVENT_HAVE_GETADDRINFO 1
 
@@ -237,7 +240,7 @@
 #define _EVENT_TIME_WITH_SYS_TIME 1
 
 /* Version number of package */
-#define _EVENT_VERSION "1.4.8-stable"
+#define _EVENT_VERSION "1.4.12-stable"
 
 /* Define to appropriate substitue if compiler doesnt have __func__ */
 /* #undef _EVENT___func__ */
