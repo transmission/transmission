@@ -1,5 +1,8 @@
-$Id: Changelog.txt,v 1.90 2009/08/07 08:42:18 nanard Exp $
+$Id: Changelog.txt,v 1.91 2009/09/21 12:57:42 nanard Exp $
 miniUPnP client Changelog.
+
+2009/09/21:
+  fixing the code to ignore EINTR during connect() calls.
 
 2009/08/07:
   Set socket timeout for connect()

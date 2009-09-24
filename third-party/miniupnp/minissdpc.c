@@ -1,4 +1,4 @@
-/* $Id: minissdpc.c,v 1.9 2009/07/20 09:18:05 nanard Exp $ */
+/* $Id: minissdpc.c,v 1.10 2009/09/21 12:57:42 nanard Exp $ */
 /* Project : miniupnp
  * Author : Thomas BERNARD
  * copyright (c) 2005-2009 Thomas Bernard
@@ -53,6 +53,7 @@ getDevicesFromMiniSSDPD(const char * devtype, const char * socketpath)
 	}
 	addr.sun_family = AF_UNIX;
 	strncpy(addr.sun_path, socketpath, sizeof(addr.sun_path));
+	/* TODO : check if we need to handle the EINTR */
 	if(connect(s, (struct sockaddr *)&addr, sizeof(struct sockaddr_un)) < 0)
 	{
 		/*syslog(LOG_WARNING, "connect(\"%s\"): %m", socketpath);*/

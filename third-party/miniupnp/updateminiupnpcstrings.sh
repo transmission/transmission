@@ -1,5 +1,5 @@
 #! /bin/sh
-# $Id: updateminiupnpcstrings.sh,v 1.3 2009/07/09 16:13:31 nanard Exp $
+# $Id: updateminiupnpcstrings.sh,v 1.4 2009/07/29 08:34:01 nanard Exp $
 
 TEMPLATE_FILE=$1
 OUTPUT_FILE=$2
@@ -34,5 +34,5 @@ EXPR="s|OS_STRING \".*\"|OS_STRING \"${OS_NAME}/${OS_VERSION}\"|"
 #cp $OUTPUT_FILE $OUTPUT_FILE.bak
 test -f ${TEMPLATE_FILE}
 echo "setting OS_STRING macro value to ${OS_NAME}/${OS_VERSION} in $OUTPUT_FILE."
-sed "$EXPR" <"$TEMPLATE_FILE" >"$OUTPUT_FILE"
+sed -e "$EXPR" < $TEMPLATE_FILE > $OUTPUT_FILE
 
