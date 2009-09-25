@@ -11,6 +11,7 @@ AM_CFLAGS = \
 noinst_LIBRARIES = libtransmission.a
 
 libtransmission_a_SOURCES = \
+    announcer.c \
     bandwidth.c \
     bencode.c \
     bitfield.c \
@@ -48,7 +49,6 @@ libtransmission_a_SOURCES = \
     torrent.c \
     torrent-ctor.c \
     tr-getopt.c \
-    tracker.c \
     tr-dht.c \
     trevent.c \
     upnp.c \
@@ -59,6 +59,7 @@ libtransmission_a_SOURCES = \
     wildmat.c
 
 noinst_HEADERS = \
+    announcer.h \
     bandwidth.h \
     bencode.h \
     bitfield.h \
@@ -95,7 +96,6 @@ noinst_HEADERS = \
     session.h \
     stats.h \
     torrent.h \
-    tracker.h \
     tr-getopt.h \
     transmission.h \
     tr-dht.h \

@@ -23,6 +23,7 @@
 #include <event.h>
 
 #include "transmission.h"
+#include "announcer.h"
 #include "bandwidth.h"
 #include "bencode.h"
 #include "blocklist.h"
@@ -39,7 +40,6 @@
 #include "session.h"
 #include "stats.h"
 #include "torrent.h"
-#include "tracker.h"
 #include "tr-dht.h"
 #include "trevent.h"
 #include "utils.h"
@@ -717,9 +717,6 @@ tr_sessionInitImpl( void * vdata )
 
     tr_setConfigDir( session, data->configDir );
 
-    tr_trackerSessionInit( session );
-    assert( session->tracker != NULL );
-
     session->peerMgr = tr_peerMgrNew( session );
 
     found = tr_bencDictFindBool( &settings, TR_PREFS_KEY_LAZY_BITFIELD, &boolVal );
@@ -869,6 +866,8 @@ tr_sessionInitImpl( void * vdata )
     evtimer_set( session->saveTimer, onSaveTimer, session );
     tr_timerAdd( session->saveTimer, SAVE_INTERVAL_SECS, 0 );
 
+    tr_announcerInit( session );
+
     /* first %s is the application name
        second %s is the version number */
     tr_inf( _( "%s %s started" ), TR_NAME, LONG_VERSION_STRING );
@@ -876,7 +875,6 @@ tr_sessionInitImpl( void * vdata )
     tr_statsInit( session );
     session->web = tr_webInit( session );
     session->isWaiting = FALSE;
-    dbgmsg( "returning session %p; session->tracker is %p", session, session->tracker );
 
     if( session->isDHTEnabled )
     {
@@ -1470,6 +1468,7 @@ sessionCloseImpl( void * vsession )
     tr_free( session->altTimer );
     session->altTimer = NULL;
 
+    tr_announcerClose( session );
     tr_verifyClose( session );
     tr_statsClose( session );
     tr_sharedClose( session );
@@ -1490,7 +1489,6 @@ sessionCloseImpl( void * vsession )
 
     tr_peerMgrFree( session->peerMgr );
 
-    tr_trackerSessionClose( session );
     tr_list_free( &session->blocklists,
                   (TrListForeachFunc)_tr_blocklistFree );
     tr_webClose( &session->web );
@@ -1530,10 +1528,10 @@ tr_sessionClose( tr_session * session )
      * for a bit while they tell the router & tracker
      * that we're closing now */
     while( ( session->shared
-           || session->tracker ) && !deadlineReached( deadline ) )
+           || session->announcer ) && !deadlineReached( deadline ) )
     {
-        dbgmsg( "waiting on port unmap (%p) or tracker (%p)",
-                session->shared, session->tracker );
+        dbgmsg( "waiting on port unmap (%p) or announcer (%p)",
+                session->shared, session->announcer );
         tr_wait( 100 );
     }
 
@@ -1891,9 +1889,18 @@ tr_torrent*
 tr_torrentNext( tr_session * session,
                 tr_torrent * tor )
 {
-    assert( tr_isSession( session ) );
+    tr_torrent * ret;
 
-    return tor ? tor->next : session->torrentList;
+    assert( !session || tr_isSession( session ) );
+
+    if( !session )
+        ret = NULL;
+    else if( !tor )
+        ret = session->torrentList;
+    else
+        ret = tor->next;
+
+    return ret;
 }
 
 /***

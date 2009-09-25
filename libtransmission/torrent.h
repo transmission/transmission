@@ -24,7 +24,7 @@
 
 struct tr_bandwidth;
 struct tr_ratecontrol;
-struct tr_torrent_peers;
+struct tr_torrent_tiers;
 
 /**
 ***  Package-visible ctor API
@@ -50,8 +50,6 @@ void        tr_torrentInitFileDLs( tr_torrent *      tor,
                                    tr_bool           do_download );
 
 void        tr_torrentRecheckCompleteness( tr_torrent * );
-
-void        tr_torrentResetTransferStats( tr_torrent * );
 
 void        tr_torrentSetHasPiece( tr_torrent *     tor,
                                    tr_piece_index_t pieceIndex,
@@ -177,8 +175,8 @@ struct tr_torrent
     struct tr_bitfield         checkedPieces;
     tr_completeness            completeness;
 
-    struct tr_tracker *        tracker;
-    struct tr_publisher_tag *  trackerSubscription;
+    struct tr_torrent_tiers  * tiers;
+    struct tr_publisher_tag  * tiersSubscription;
 
     time_t                     dhtAnnounceAt;
     tr_bool                    dhtAnnounceInProgress;

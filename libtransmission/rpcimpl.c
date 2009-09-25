@@ -367,6 +367,41 @@ addTrackers( const tr_info * info,
 }
 
 static void
+addTrackerStats( const tr_tracker_stat * st, int n, tr_benc * list )
+{
+    int i;
+
+    for( i=0; i<n; ++i )
+    {
+        const tr_tracker_stat * s = &st[i];
+        tr_benc * d = tr_bencListAddDict( list, 23 );
+        tr_bencDictAddInt ( d, "downloadCount", s->downloadCount );
+        tr_bencDictAddBool( d, "hasAnnounced", s->hasAnnounced );
+        tr_bencDictAddBool( d, "hasScraped", s->hasScraped );
+        tr_bencDictAddStr ( d, "host", s->host );
+        tr_bencDictAddBool( d, "isActive", s->isActive );
+        tr_bencDictAddBool( d, "isAnnouncing", s->isAnnouncing );
+        tr_bencDictAddBool( d, "isScraping", s->isScraping );
+        tr_bencDictAddInt ( d, "lastAnnouncePeerCount", s->lastAnnouncePeerCount );
+        tr_bencDictAddStr ( d, "lastAnnounceResult", s->lastAnnounceResult );
+        tr_bencDictAddInt ( d, "lastAnnounceStartTime", s->lastAnnounceStartTime );
+        tr_bencDictAddBool( d, "lastAnnounceSucceeded", s->lastAnnounceSucceeded );
+        tr_bencDictAddInt ( d, "lastAnnounceTime", s->lastAnnounceTime );
+        tr_bencDictAddStr ( d, "lastScrapeResult", s->lastScrapeResult );
+        tr_bencDictAddInt ( d, "lastScrapeStartTime", s->lastScrapeStartTime );
+        tr_bencDictAddBool( d, "lastScrapeSucceeded", s->lastScrapeSucceeded );
+        tr_bencDictAddInt ( d, "lastScrapeTime", s->lastScrapeTime );
+        tr_bencDictAddInt ( d, "leecherCount", s->leecherCount );
+        tr_bencDictAddInt ( d, "nextAnnounceTime", s->nextAnnounceTime );
+        tr_bencDictAddInt ( d, "nextScrapeTime", s->nextScrapeTime );
+        tr_bencDictAddInt ( d, "seederCount", s->seederCount );
+        tr_bencDictAddInt ( d, "tier", s->tier );
+        tr_bencDictAddBool( d, "willAnnounce", s->willAnnounce );
+        tr_bencDictAddBool( d, "willScrape", s->willScrape );
+    }
+}
+
+static void
 addPeers( const tr_torrent * tor,
           tr_benc *          list )
 {
@@ -416,10 +451,6 @@ addField( const tr_torrent * tor, tr_benc * d, const char * key )
         tr_bencDictAddInt( d, key, st->activityDate );
     else if( tr_streq( key, keylen, "addedDate" ) )
         tr_bencDictAddInt( d, key, st->addedDate );
-    else if( tr_streq( key, keylen, "announceResponse" ) )
-        tr_bencDictAddStr( d, key, st->announceResponse );
-    else if( tr_streq( key, keylen, "announceURL" ) )
-        tr_bencDictAddStr( d, key, st->announceURL );
     else if( tr_streq( key, keylen, "bandwidthPriority" ) )
         tr_bencDictAddInt( d, key, tr_torrentGetPriority( tor ) );
     else if( tr_streq( key, keylen, "comment" ) )
@@ -466,10 +497,6 @@ addField( const tr_torrent * tor, tr_benc * d, const char * key )
         tr_bencDictAddInt( d, key, st->id );
     else if( tr_streq( key, keylen, "isPrivate" ) )
         tr_bencDictAddBool( d, key, tr_torrentIsPrivate( tor ) );
-    else if( tr_streq( key, keylen, "lastAnnounceTime" ) )
-        tr_bencDictAddInt( d, key, st->lastAnnounceTime );
-    else if( tr_streq( key, keylen, "lastScrapeTime" ) )
-        tr_bencDictAddInt( d, key, st->lastScrapeTime );
     else if( tr_streq( key, keylen, "leechers" ) )
         tr_bencDictAddInt( d, key, st->leechers );
     else if( tr_streq( key, keylen, "leftUntilDone" ) )
@@ -480,10 +507,6 @@ addField( const tr_torrent * tor, tr_benc * d, const char * key )
         tr_bencDictAddInt( d, key,  tr_torrentGetPeerLimit( tor ) );
     else if( tr_streq( key, keylen, "name" ) )
         tr_bencDictAddStr( d, key, inf->name );
-    else if( tr_streq( key, keylen, "nextAnnounceTime" ) )
-        tr_bencDictAddInt( d, key, st->nextAnnounceTime );
-    else if( tr_streq( key, keylen, "nextScrapeTime" ) )
-        tr_bencDictAddInt( d, key, st->nextScrapeTime );
     else if( tr_streq( key, keylen, "percentDone" ) )
         tr_bencDictAddReal( d, key, st->percentDone );
     else if( tr_streq( key, keylen, "peer-limit" ) )
@@ -530,10 +553,6 @@ addField( const tr_torrent * tor, tr_benc * d, const char * key )
         tr_bencDictAddInt( d, key, (int)( st->pieceUploadSpeed * 1024 ) );
     else if( tr_streq( key, keylen, "recheckProgress" ) )
         tr_bencDictAddReal( d, key, st->recheckProgress );
-    else if( tr_streq( key, keylen, "scrapeResponse" ) )
-        tr_bencDictAddStr( d, key, st->scrapeResponse );
-    else if( tr_streq( key, keylen, "scrapeURL" ) )
-        tr_bencDictAddStr( d, key, st->scrapeURL );
     else if( tr_streq( key, keylen, "seeders" ) )
         tr_bencDictAddInt( d, key, st->seeders );
     else if( tr_streq( key, keylen, "seedRatioLimit" ) )
@@ -552,6 +571,12 @@ addField( const tr_torrent * tor, tr_benc * d, const char * key )
         tr_bencDictAddInt( d, key, st->timesCompleted );
     else if( tr_streq( key, keylen, "trackers" ) )
         addTrackers( inf, tr_bencDictAddList( d, key, inf->trackerCount ) );
+    else if( tr_streq( key, keylen, "trackerStats" ) ) {
+        int n;
+        tr_tracker_stat * s = tr_torrentTrackers( tor, &n );
+        addTrackerStats( s, n, tr_bencDictAddList( d, key, n ) );
+        tr_torrentTrackersFree( s, n );
+    }
     else if( tr_streq( key, keylen, "torrentFile" ) )
         tr_bencDictAddStr( d, key, inf->torrent );
     else if( tr_streq( key, keylen, "totalSize" ) )
@@ -626,7 +651,9 @@ torrentGet( tr_session               * session,
     if( !tr_bencDictFindList( args_in, "fields", &fields ) )
         msg = "no fields specified";
     else for( i = 0; i < torrentCount; ++i )
-            addInfo( torrents[i], tr_bencListAdd( list ), fields );
+        addInfo( torrents[i], tr_bencListAdd( list ), fields );
+
+fprintf( stderr, "%s\n", tr_bencToStr( args_out, TR_FMT_JSON, NULL ) );
 
     tr_free( torrents );
     return msg;

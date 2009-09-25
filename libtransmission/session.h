@@ -36,6 +36,7 @@ uint8_t*       tr_peerIdNew( void );
 const uint8_t* tr_getPeerId( void );
 
 struct tr_address;
+struct tr_announcer;
 struct tr_bandwidth;
 struct tr_bindsockets;
 
@@ -119,7 +120,8 @@ struct tr_session
     void *                       rpc_func_user_data;
 
     struct tr_stats_handle     * sessionStats;
-    struct tr_tracker_handle   * tracker;
+
+    struct tr_announcer        * announcer;
 
     tr_benc                    * metainfoLookup;
 

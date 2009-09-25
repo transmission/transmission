@@ -72,11 +72,11 @@
    "torrent-reannounce" | tr_torrentManualUpdate ("ask tracker for more peers")
 
    Request arguments: "ids", which specifies which torrents to use.
-                      All torrents are used if the "ids" argument is omitted.
-                      "ids" should be one of the following:
-                      (1) an integer referring to a torrent id
-                      (2) a list of torrent id numbers, sha1 hash strings, or both
-                      (3) a string, "recently-active", for recently-active torrents
+                  All torrents are used if the "ids" argument is omitted.
+                  "ids" should be one of the following:
+                  (1) an integer referring to a torrent id
+                  (2) a list of torrent id numbers, sha1 hash strings, or both
+                  (3) a string, "recently-active", for recently-active torrents
 
    Response arguments: none
 
@@ -86,24 +86,24 @@
 
    Request arguments:
 
-   string                            | value type & description
-   ----------------------------------+-------------------------------------------------
-   "bandwidthPriority"               | number     this torrent's bandwidth tr_priority_t
-   "downloadLimit"                   | number     maximum download speed (in K/s)
-   "downloadLimited"                 | boolean    true if "downloadLimit" is honored
-   "files-wanted"                    | array      indices of file(s) to download
-   "files-unwanted"                  | array      indices of file(s) to not download
-   "honorsSessionLimits"             | boolean    true if session upload limits are honored
-   "ids"                             | array      torrent list, as described in 3.1
-   "location"                        | string     new location of the torrent's content
-   "peer-limit"                      | number     maximum number of peers
-   "priority-high"                   | array      indices of high-priority file(s)
-   "priority-low"                    | array      indices of low-priority file(s)
-   "priority-normal"                 | array      indices of normal-priority file(s)
-   "seedRatioLimit"                  | double     session seeding ratio
-   "seedRatioMode"                   | number     which ratio to use.  See tr_ratiolimit
-   "uploadLimit"                     | number     maximum upload speed (in K/s)
-   "uploadLimited"                   | boolean    true if "uploadLimit" is honored
+   string                | value type & description
+   ----------------------+-------------------------------------------------
+   "bandwidthPriority"   | number     this torrent's bandwidth tr_priority_t
+   "downloadLimit"       | number     maximum download speed (in K/s)
+   "downloadLimited"     | boolean    true if "downloadLimit" is honored
+   "files-wanted"        | array      indices of file(s) to download
+   "files-unwanted"      | array      indices of file(s) to not download
+   "honorsSessionLimits" | boolean    true if session upload limits are honored
+   "ids"                 | array      torrent list, as described in 3.1
+   "location"            | string     new location of the torrent's content
+   "peer-limit"          | number     maximum number of peers
+   "priority-high"       | array      indices of high-priority file(s)
+   "priority-low"        | array      indices of low-priority file(s)
+   "priority-normal"     | array      indices of normal-priority file(s)
+   "seedRatioLimit"      | double     session seeding ratio
+   "seedRatioMode"       | number     which ratio to use.  See tr_ratiolimit
+   "uploadLimit"         | number     maximum upload speed (in K/s)
+   "uploadLimited"       | boolean    true if "uploadLimit" is honored
 
    Just as an empty "ids" value is shorthand for "all ids", using an empty array
    for "files-wanted", "files-unwanted", "priority-high", "priority-low", or
@@ -128,145 +128,164 @@
        a "removed" array of torrent-id numbers of recently-removed
        torrents.
 
-   key                             | type                        | source 
-   --------------------------------+-----------------------------+---------
-   activityDate                    | number                      | tr_stat
-   addedDate                       | number                      | tr_stat
-   announceResponse                | string                      | tr_stat
-   announceURL                     | string                      | tr_stat
-   bandwidthPriority               | number                      | tr_priority_t
-   comment                         | string                      | tr_info
-   corruptEver                     | number                      | tr_stat
-   creator                         | string                      | tr_info
-   dateCreated                     | number                      | tr_info
-   desiredAvailable                | number                      | tr_stat
-   doneDate                        | number                      | tr_stat
-   downloadDir                     | string                      | tr_torrent
-   downloadedEver                  | number                      | tr_stat
-   downloaders                     | number                      | tr_stat
-   downloadLimit                   | number                      | tr_torrent
-   downloadLimited                 | boolean                     | tr_torrent
-   error                           | number                      | tr_stat
-   errorString                     | string                      | tr_stat
-   eta                             | number                      | tr_stat
-   files                           | array (see below)           | n/a
-   fileStats                       | array (see below)           | n/a
-   hashString                      | string                      | tr_info
-   haveUnchecked                   | number                      | tr_stat
-   haveValid                       | number                      | tr_stat
-   honorsSessionLimits             | boolean                     | tr_torrent
-   id                              | number                      | tr_torrent
-   isPrivate                       | boolean                     | tr_torrent
-   lastAnnounceTime                | number                      | tr_stat
-   lastScrapeTime                  | number                      | tr_stat
-   leechers                        | number                      | tr_stat
-   leftUntilDone                   | number                      | tr_stat
-   manualAnnounceTime              | number                      | tr_stat
-   maxConnectedPeers               | number                      | tr_torrent
-   name                            | string                      | tr_info
-   nextAnnounceTime                | number                      | tr_stat
-   nextScrapeTime                  | number                      | tr_stat
-   peer-limit                      | number                      | tr_torrent
-   peers                           | array (see below)           | n/a
-   peersConnected                  | number                      | tr_stat
-   peersFrom                       | object (see below)          | n/a
-   peersGettingFromUs              | number                      | tr_stat
-   peersKnown                      | number                      | tr_stat
-   peersSendingToUs                | number                      | tr_stat
-   percentDone                     | double                      | tr_stat
-   pieces                          | string (see below)          | tr_torrent
-   pieceCount                      | number                      | tr_info
-   pieceSize                       | number                      | tr_info
-   priorities                      | array (see below)           | n/a
-   rateDownload (B/s)              | number                      | tr_stat
-   rateUpload (B/s)                | number                      | tr_stat
-   recheckProgress                 | double                      | tr_stat
-   scrapeResponse                  | string                      | tr_stat
-   scrapeURL                       | string                      | tr_stat
-   seeders                         | number                      | tr_stat
-   seedRatioLimit                  | double                      | tr_torrent
-   seedRatioMode                   | number                      | tr_ratiolimit
-   sizeWhenDone                    | number                      | tr_stat
-   startDate                       | number                      | tr_stat
-   status                          | number                      | tr_stat
-   swarmSpeed (K/s)                | number                      | tr_stat
-   timesCompleted                  | number                      | tr_stat
-   trackers                        | array (see below)           | n/a
-   totalSize                       | number                      | tr_info
-   torrentFile                     | string                      | tr_info
-   uploadedEver                    | number                      | tr_stat
-   uploadLimit                     | number                      | tr_torrent
-   uploadLimited                   | boolean                     | tr_torrent
-   uploadRatio                     | double                      | tr_stat
-   wanted                          | array (see below)           | n/a
-   webseeds                        | array (see below)           | n/a
-   webseedsSendingToUs             | number                      | tr_stat
-                                   |                             |
-                                   |                             |
-   -----------------------+--------+-----------------------------+
-   files                  | array of objects, each containing:   |
-                          +-------------------------+------------+
-                          | key                     | type       |
-                          | bytesCompleted          | number     | tr_torrent
-                          | length                  | number     | tr_info
-                          | name                    | string     | tr_info
-   -----------------------+--------------------------------------+
-   fileStats              | a file's non-constant properties.    |
-                          | array of tr_info.filecount objects,  |
-                          | each containing:                     |
-                          +-------------------------+------------+
-                          | bytesCompleted          | number     | tr_torrent
-                          | wanted                  | boolean    | tr_info
-                          | priority                | number     | tr_info
-   -----------------------+--------------------------------------+
-   peers                  | array of objects, each containing:   |
-                          +-------------------------+------------+
-                          | address                 | string     | tr_peer_stat
-                          | clientName              | string     | tr_peer_stat
-                          | clientIsChoked          | boolean    | tr_peer_stat
-                          | clientIsInterested      | boolean    | tr_peer_stat
-                          | isDownloadingFrom       | boolean    | tr_peer_stat
-                          | isEncrypted             | boolean    | tr_peer_stat
-                          | isIncoming              | boolean    | tr_peer_stat
-                          | isUploadingTo           | boolean    | tr_peer_stat
-                          | peerIsChoked            | boolean    | tr_peer_stat
-                          | peerIsInterested        | boolean    | tr_peer_stat
-                          | port                    | number     | tr_peer_stat
-                          | progress                | double     | tr_peer_stat
-                          | rateToClient (B/s)      | number     | tr_peer_stat
-                          | rateToPeer (B/s)        | number     | tr_peer_stat
-   -----------------------+--------------------------------------+
-   peersFrom              | an object containing:                |
-                          +-------------------------+------------+
-                          | fromCache               | number     | tr_stat
-                          | fromIncoming            | number     | tr_stat
-                          | fromPex                 | number     | tr_stat
-                          | fromTracker             | number     | tr_stat
-   -----------------------+--------------------------------------+
-   pieces                 | A bitfield holding pieceCount flags  | tr_torrent
-                          | which are set to 'true' if we have   |
-                          | the piece matching that position.    |
-                          | JSON doesn't allow raw binary data,  |
-                          | so this is a base64-encoded string.  |
-   -----------------------+--------------------------------------+
-   priorities             | an array of tr_info.filecount        | tr_info
-                          | numbers. each is the tr_priority_t   |
-                          | mode for the corresponding file.     |
-   -----------------------+--------------------------------------+
-   trackers               | array of objects, each containing:   |
-                          +-------------------------+------------+
-                          | announce                | string     | tr_info
-                          | scrape                  | string     | tr_info
-                          | tier                    | number     | tr_info
-   -----------------------+--------------------------------------+
-   wanted                 | an array of tr_info.fileCount        | tr_info
-                          | 'booleans' true if the corresponding |
-                          | file is to be downloaded.            |
-   -----------------------+--------------------------------------+
-   webseeds               | an array of strings:                 |
-                          +-------------------------+------------+
-                          | webseed                 | string     | tr_info
-                          +-------------------------+------------+
+   key                         | type                        | source 
+   ----------------------------+-----------------------------+---------
+   activityDate                | number                      | tr_stat
+   addedDate                   | number                      | tr_stat
+   bandwidthPriority           | number                      | tr_priority_t
+   comment                     | string                      | tr_info
+   corruptEver                 | number                      | tr_stat
+   creator                     | string                      | tr_info
+   dateCreated                 | number                      | tr_info
+   desiredAvailable            | number                      | tr_stat
+   doneDate                    | number                      | tr_stat
+   downloadDir                 | string                      | tr_torrent
+   downloadedEver              | number                      | tr_stat
+   downloaders                 | number                      | tr_stat
+   downloadLimit               | number                      | tr_torrent
+   downloadLimited             | boolean                     | tr_torrent
+   error                       | number                      | tr_stat
+   errorString                 | string                      | tr_stat
+   eta                         | number                      | tr_stat
+   files                       | array (see below)           | n/a
+   fileStats                   | array (see below)           | n/a
+   hashString                  | string                      | tr_info
+   haveUnchecked               | number                      | tr_stat
+   haveValid                   | number                      | tr_stat
+   honorsSessionLimits         | boolean                     | tr_torrent
+   id                          | number                      | tr_torrent
+   isPrivate                   | boolean                     | tr_torrent
+   leechers                    | number                      | tr_stat
+   leftUntilDone               | number                      | tr_stat
+   manualAnnounceTime          | number                      | tr_stat
+   maxConnectedPeers           | number                      | tr_torrent
+   name                        | string                      | tr_info
+   peer-limit                  | number                      | tr_torrent
+   peers                       | array (see below)           | n/a
+   peersConnected              | number                      | tr_stat
+   peersFrom                   | object (see below)          | n/a
+   peersGettingFromUs          | number                      | tr_stat
+   peersKnown                  | number                      | tr_stat
+   peersSendingToUs            | number                      | tr_stat
+   percentDone                 | double                      | tr_stat
+   pieces                      | string (see below)          | tr_torrent
+   pieceCount                  | number                      | tr_info
+   pieceSize                   | number                      | tr_info
+   priorities                  | array (see below)           | n/a
+   rateDownload (B/s)          | number                      | tr_stat
+   rateUpload (B/s)            | number                      | tr_stat
+   recheckProgress             | double                      | tr_stat
+   seeders                     | number                      | tr_stat
+   seedRatioLimit              | double                      | tr_torrent
+   seedRatioMode               | number                      | tr_ratiolimit
+   sizeWhenDone                | number                      | tr_stat
+   startDate                   | number                      | tr_stat
+   status                      | number                      | tr_stat
+   swarmSpeed (K/s)            | number                      | tr_stat
+   timesCompleted              | number                      | tr_stat
+   trackers                    | array (see below)           | n/a
+   trackerStats                | array (see below)           | n/a
+   totalSize                   | number                      | tr_info
+   torrentFile                 | string                      | tr_info
+   uploadedEver                | number                      | tr_stat
+   uploadLimit                 | number                      | tr_torrent
+   uploadLimited               | boolean                     | tr_torrent
+   uploadRatio                 | double                      | tr_stat
+   wanted                      | array (see below)           | n/a
+   webseeds                    | array (see below)           | n/a
+   webseedsSendingToUs         | number                      | tr_stat
+                               |                             |
+                               |                             |
+   -------------------+--------+-----------------------------+
+   files              | array of objects, each containing:   |
+                      +-------------------------+------------+
+                      | key                     | type       |
+                      | bytesCompleted          | number     | tr_torrent
+                      | length                  | number     | tr_info
+                      | name                    | string     | tr_info
+   -------------------+--------------------------------------+
+   fileStats          | a file's non-constant properties.    |
+                      | array of tr_info.filecount objects,  |
+                      | each containing:                     |
+                      +-------------------------+------------+
+                      | bytesCompleted          | number     | tr_torrent
+                      | wanted                  | boolean    | tr_info
+                      | priority                | number     | tr_info
+   -------------------+--------------------------------------+
+   peers              | array of objects, each containing:   |
+                      +-------------------------+------------+
+                      | address                 | string     | tr_peer_stat
+                      | clientName              | string     | tr_peer_stat
+                      | clientIsChoked          | boolean    | tr_peer_stat
+                      | clientIsInterested      | boolean    | tr_peer_stat
+                      | isDownloadingFrom       | boolean    | tr_peer_stat
+                      | isEncrypted             | boolean    | tr_peer_stat
+                      | isIncoming              | boolean    | tr_peer_stat
+                      | isUploadingTo           | boolean    | tr_peer_stat
+                      | peerIsChoked            | boolean    | tr_peer_stat
+                      | peerIsInterested        | boolean    | tr_peer_stat
+                      | port                    | number     | tr_peer_stat
+                      | progress                | double     | tr_peer_stat
+                      | rateToClient (B/s)      | number     | tr_peer_stat
+                      | rateToPeer (B/s)        | number     | tr_peer_stat
+   -------------------+--------------------------------------+
+   peersFrom          | an object containing:                |
+                      +-------------------------+------------+
+                      | fromCache               | number     | tr_stat
+                      | fromIncoming            | number     | tr_stat
+                      | fromPex                 | number     | tr_stat
+                      | fromTracker             | number     | tr_stat
+   -------------------+--------------------------------------+
+   pieces             | A bitfield holding pieceCount flags  | tr_torrent
+                      | which are set to 'true' if we have   |
+                      | the piece matching that position.    |
+                      | JSON doesn't allow raw binary data,  |
+                      | so this is a base64-encoded string.  |
+   -------------------+--------------------------------------+
+   priorities         | an array of tr_info.filecount        | tr_info
+                      | numbers. each is the tr_priority_t   |
+                      | mode for the corresponding file.     |
+   -------------------+--------------------------------------+
+   trackers           | array of objects, each containing:   |
+                      +-------------------------+------------+
+                      | announce                | string     | tr_info
+                      | scrape                  | string     | tr_info
+                      | tier                    | number     | tr_info
+   -------------------+--------------------------------------+
+   trackerStats       | array of objects, each containing:   |
+                      +-------------------------+------------+
+                      | downloadCount           | number     | tr_tracker_stat
+                      | hasAnnounced            | boolean    | tr_tracker_stat
+                      | hasScraped              | boolean    | tr_tracker_stat
+                      | host                    | string     | tr_tracker_stat
+                      | isActive                | boolean    | tr_tracker_stat
+                      | isAnnouncing            | boolean    | tr_tracker_stat
+                      | isScraping              | boolean    | tr_tracker_stat
+                      | lastAnnouncePeerCount   | number     | tr_tracker_stat
+                      | lastAnnounceResult      | number     | tr_tracker_stat
+                      | lastAnnounceStartTime   | number     | tr_tracker_stat
+                      | lastAnnounceSucceeded   | boolean    | tr_tracker_stat
+                      | lastAnnounceTime        | number     | tr_tracker_stat
+                      | lastScrapeResult        | string     | tr_tracker_stat
+                      | lastScrapeStartTime     | number     | tr_tracker_stat
+                      | lastScrapeSucceeded     | boolean    | tr_tracker_stat
+                      | lastScrapeTime          | number     | tr_tracker_stat
+                      | leecherCount            | number     | tr_tracker_stat
+                      | nextAnnounceTime        | number     | tr_tracker_stat
+                      | nextScrapeTime          | number     | tr_tracker_stat
+                      | seederCount             | number     | tr_tracker_stat
+                      | tier                    | number     | tr_tracker_stat
+                      | willAnnounce            | boolean    | tr_tracker_stat
+                      | willScrape              | boolean    | tr_tracker_stat
+   -------------------+-------------------------+------------+
+   wanted             | an array of tr_info.fileCount        | tr_info
+                      | 'booleans' true if the corresponding |
+                      | file is to be downloaded.            |
+   -------------------+--------------------------------------+
+   webseeds           | an array of strings:                 |
+                      +-------------------------+------------+
+                      | webseed                 | string     | tr_info
+                      +-------------------------+------------+
 
    Example:
 
@@ -533,5 +552,14 @@
    ------+---------+-----------+----------------+-------------------------------
    6     | 1.70    | yes       |                | new "method torrent-set-location"
    ------+---------+-----------+----------------+-------------------------------
+   7     | 1.80    |        NO | torrent-get    | removed arg "announceResponse"
+         |         |        NO | torrent-get    | removed arg "announceURL"
+         |         |        NO | torrent-get    | removed arg "lastAnnounceTime"
+         |         |        NO | torrent-get    | removed arg "lastScrapeTime"
+         |         |        NO | torrent-get    | removed arg "nextAnnounceTime"
+         |         |        NO | torrent-get    | removed arg "nextScrapeTime"
+         |         |        NO | torrent-get    | removed arg "scrapeResponse"
+         |         |        NO | torrent-get    | removed arg "scrapeURL"
+         |         | yes    NO | torrent-get    | new arg "trackerStats"
 
 

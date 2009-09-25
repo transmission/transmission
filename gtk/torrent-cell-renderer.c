@@ -602,6 +602,7 @@ render_full( TorrentCellRenderer   * cell,
 
     icon = get_icon( tor, FULL_ICON_SIZE, widget );
     name = inf->name;
+g_message( "%s --- %f\n", name, (double)p->download_speed );
     status = getStatusString( st, p->upload_speed, p->download_speed );
     progress = getProgressString( tor, inf, st );
 

@@ -25,7 +25,7 @@
 #include <event.h> /* evbuffer */
 
 #include "transmission.h"
-#include "session.h"
+#include "announcer.h"
 #include "bandwidth.h"
 #include "bencode.h"
 #include "completion.h"
@@ -37,8 +37,8 @@
 #include "platform.h" /* TR_PATH_DELIMITER_STR */
 #include "ptrarray.h"
 #include "ratecontrol.h"
+#include "session.h"
 #include "torrent.h"
-#include "tracker.h"
 #include "trevent.h"
 #include "utils.h"
 #include "verify.h"
@@ -662,11 +662,6 @@ torrentRealInit( tr_torrent * tor, const tr_ctor * ctor )
 
     tor->completeness = tr_cpGetStatus( &tor->completion );
 
-    tor->tracker = tr_trackerNew( tor );
-    tor->trackerSubscription =
-        tr_trackerSubscribe( tor->tracker, onTrackerResponse,
-                             tor );
-
     {
         tr_torrent * it = NULL;
         tr_torrent * last = NULL;
@@ -693,6 +688,9 @@ torrentRealInit( tr_torrent * tor, const tr_ctor * ctor )
             tr_sessionSetTorrentFile( tor->session, tor->info.hashString, filename );
         }
     }
+
+    tor->tiers = tr_announcerAddTorrent( session->announcer, tor );
+    tor->tiersSubscription = tr_announcerSubscribe( tor->tiers, onTrackerResponse, tor );
 
     tr_metainfoMigrate( session, &tor->info );
 
@@ -791,8 +789,7 @@ tr_torrentChangeMyPort( tr_torrent * tor )
 {
     assert( tr_isTorrent( tor  ) );
 
-    if( tor->tracker )
-        tr_trackerChangeMyPort( tor->tracker );
+    tr_announcerChangeMyPort( tor );
 }
 
 static TR_INLINE void
@@ -803,7 +800,7 @@ tr_torrentManualUpdateImpl( void * vtor )
     assert( tr_isTorrent( tor  ) );
 
     if( tor->isRunning )
-        tr_trackerReannounce( tor->tracker );
+        tr_announcerManualAnnounce( tor );
 }
 
 void
@@ -819,7 +816,7 @@ tr_torrentCanManualUpdate( const tr_torrent * tor )
 {
     return ( tr_isTorrent( tor  ) )
         && ( tor->isRunning )
-        && ( tr_trackerCanManualAnnounce( tor->tracker ) );
+        && ( tr_announcerCanManualAnnounce( tor ) );
 }
 
 const tr_info *
@@ -871,8 +868,6 @@ const tr_stat *
 tr_torrentStat( tr_torrent * tor )
 {
     tr_stat *               s;
-    struct tr_tracker *     tc;
-    const tr_tracker_info * ti;
     int                     usableSeeds = 0;
     uint64_t                now;
     double                  downloadedForRatio, seedRatio=0;
@@ -893,16 +888,12 @@ tr_torrentStat( tr_torrent * tor )
     s->error = tor->error;
     memcpy( s->errorString, tor->errorString, sizeof( s->errorString ) );
 
-    tc = tor->tracker;
-    ti = tr_trackerGetAddress( tor->tracker, tor );
-    s->announceURL = ti ? ti->announce : NULL;
-    s->scrapeURL   = ti ? ti->scrape   : NULL;
-    tr_trackerStat( tc, s );
+    s->manualAnnounceTime = tr_announcerNextManualAnnounce( tor );
 
-    tr_trackerGetCounts( tc, &s->timesCompleted,
-                             &s->leechers,
-                             &s->seeders,
-                             &s->downloaders );
+    tr_announcerGetCounts( tor, &s->timesCompleted,
+                                &s->leechers,
+                                &s->seeders,
+                                &s->downloaders );
 
     tr_peerMgrTorrentStats( tor,
                             &s->peersKnown,
@@ -1158,6 +1149,22 @@ tr_torrentPeersFree( tr_peer_stat * peers,
     tr_free( peers );
 }
 
+tr_tracker_stat *
+tr_torrentTrackers( const tr_torrent * torrent,
+                    int              * setmeTrackerCount )
+{
+    assert( tr_isTorrent( torrent ) );
+
+    return tr_announcerStats( torrent, setmeTrackerCount );
+}
+
+void
+tr_torrentTrackersFree( tr_tracker_stat * trackers,
+                        int trackerCount )
+{
+    tr_announcerStatsFree( trackers, trackerCount );
+}
+
 void
 tr_torrentAvailability( const tr_torrent * tor,
                         int8_t *           tab,
@@ -1178,7 +1185,7 @@ tr_torrentAmountFinished( const tr_torrent * tor,
     tr_torrentUnlock( tor );
 }
 
-void
+static void
 tr_torrentResetTransferStats( tr_torrent * tor )
 {
     assert( tr_isTorrent( tor ) );
@@ -1233,9 +1240,7 @@ freeTorrent( tr_torrent * tor )
 
     tr_rcDestruct( &tor->swarmSpeed );
 
-    tr_trackerUnsubscribe( tor->tracker, tor->trackerSubscription );
-    tr_trackerFree( tor->tracker );
-    tor->tracker = NULL;
+    tr_announcerRemoveTorrent( session->announcer, tor );
 
     tr_bitfieldDestruct( &tor->checkedPieces );
 
@@ -1291,8 +1296,9 @@ checkAndStartImpl( void * vtor )
         tor->errorString[0] = '\0';
         tor->completeness = tr_cpGetStatus( &tor->completion );
         tor->startDate = tor->anyDate = now;
+
         tr_torrentResetTransferStats( tor );
-        tr_trackerStart( tor->tracker );
+        tr_announcerTorrentStarted( tor );
         tor->dhtAnnounceAt = now + tr_cryptoWeakRandInt( 20 );
         tr_peerMgrStartTorrent( tor );
     }
@@ -1319,6 +1325,16 @@ torrentStart( tr_torrent * tor )
     if( !tor->isRunning )
     {
         tr_verifyRemove( tor );
+
+        /* corresponds to the peer_id sent as a tracker request parameter.
+         * one tracker admin says: "When the same torrent is opened and
+         * closed and opened again without quitting Transmission ...
+         * change the peerid. It would help sometimes if a stopped event
+         * was missed to ensure that we didn't think someone was cheating. */
+        tr_free( tor->peer_id );
+        tor->peer_id = tr_peerIdNew( );
+fprintf( stderr, "setting torrent \"%s\" peer_id as %s\n", tr_torrentName( tor ), tor->peer_id );
+
         tor->isRunning = 1;
         tor->preVerifyTotal = tr_cpHaveTotal( &tor->completion );
         tr_verifyAdd( tor, checkAndStartCB );
@@ -1415,7 +1431,7 @@ stopTorrent( void * vtor )
 
     tr_verifyRemove( tor );
     tr_peerMgrStopTorrent( tor );
-    tr_trackerStop( tor->tracker );
+    tr_announcerTorrentStopped( tor );
 
     tr_fdTorrentClose( tor->uniqueId );
 
@@ -1589,7 +1605,7 @@ tr_torrentRecheckCompleteness( tr_torrent * tor )
 
         if( recentChange && ( completeness == TR_SEED ) )
         {
-            tr_trackerCompleted( tor->tracker );
+            tr_announcerTorrentCompleted( tor );
 
             tor->doneDate = tor->anyDate = time( NULL );
         }
