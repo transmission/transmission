@@ -960,7 +960,7 @@ typedef enum
     NSURL * favIconUrl = [NSURL URLWithString: [baseAddress stringByAppendingPathComponent: @"favicon.ico"]];
     
     NSURLRequest * request = [NSURLRequest requestWithURL: favIconUrl cachePolicy: NSURLRequestUseProtocolCachePolicy
-                                timeoutInterval: 10.0];
+                                timeoutInterval: 30.0];
     NSData * iconData = [NSURLConnection sendSynchronousRequest: request returningResponse: NULL error: NULL];
     NSImage * icon = [[NSImage alloc] initWithData: iconData];
     
