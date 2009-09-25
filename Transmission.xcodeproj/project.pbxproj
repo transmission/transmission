@@ -125,6 +125,8 @@
 		A25892640CF1F7E800CCCDDF /* StatsWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A25892630CF1F7E800CCCDDF /* StatsWindowController.m */; };
 		A259317E0A73B2CC002F4FE7 /* TransmissionHelp in Resources */ = {isa = PBXBuildFile; fileRef = A259316A0A73B2CC002F4FE7 /* TransmissionHelp */; };
 		A25963E11068376200453B31 /* FavIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = A25963E01068376200453B31 /* FavIcon.png */; };
+		A25964A6106D73A800453B31 /* announcer.c in Sources */ = {isa = PBXBuildFile; fileRef = A25964A4106D73A800453B31 /* announcer.c */; };
+		A25964A7106D73A800453B31 /* announcer.h in Headers */ = {isa = PBXBuildFile; fileRef = A25964A5106D73A800453B31 /* announcer.h */; };
 		A25D2CBD0CF4C73E0096A262 /* stats.c in Sources */ = {isa = PBXBuildFile; fileRef = A25D2CBB0CF4C7190096A262 /* stats.c */; };
 		A25D2CBE0CF4C73E0096A262 /* stats.h in Headers */ = {isa = PBXBuildFile; fileRef = A25D2CBA0CF4C7190096A262 /* stats.h */; };
 		A25E03D90E4015100086C225 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
@@ -276,8 +278,6 @@
 		BEFC1E2D0C07861A00B0BB3C /* upnp.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1DF40C07861A00B0BB3C /* upnp.c */; };
 		BEFC1E2E0C07861A00B0BB3C /* transmission.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1DF50C07861A00B0BB3C /* transmission.h */; };
 		BEFC1E2F0C07861A00B0BB3C /* session.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1DF60C07861A00B0BB3C /* session.c */; };
-		BEFC1E300C07861A00B0BB3C /* tracker.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1DF70C07861A00B0BB3C /* tracker.h */; };
-		BEFC1E310C07861A00B0BB3C /* tracker.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1DF80C07861A00B0BB3C /* tracker.c */; };
 		BEFC1E320C07861A00B0BB3C /* torrent.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1DF90C07861A00B0BB3C /* torrent.c */; };
 		BEFC1E350C07861A00B0BB3C /* port-forwarding.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1DFC0C07861A00B0BB3C /* port-forwarding.h */; };
 		BEFC1E360C07861A00B0BB3C /* port-forwarding.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1DFD0C07861A00B0BB3C /* port-forwarding.c */; };
@@ -553,6 +553,8 @@
 		A25892630CF1F7E800CCCDDF /* StatsWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StatsWindowController.m; path = macosx/StatsWindowController.m; sourceTree = "<group>"; };
 		A259316A0A73B2CC002F4FE7 /* TransmissionHelp */ = {isa = PBXFileReference; lastKnownFileType = folder; name = TransmissionHelp; path = macosx/TransmissionHelp; sourceTree = "<group>"; };
 		A25963E01068376200453B31 /* FavIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = FavIcon.png; path = macosx/Images/FavIcon.png; sourceTree = "<group>"; };
+		A25964A4106D73A800453B31 /* announcer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = announcer.c; path = libtransmission/announcer.c; sourceTree = "<group>"; };
+		A25964A5106D73A800453B31 /* announcer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = announcer.h; path = libtransmission/announcer.h; sourceTree = "<group>"; };
 		A25D2CBA0CF4C7190096A262 /* stats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = stats.h; path = libtransmission/stats.h; sourceTree = "<group>"; };
 		A25D2CBB0CF4C7190096A262 /* stats.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = stats.c; path = libtransmission/stats.c; sourceTree = "<group>"; };
 		A25E03E00E4015380086C225 /* tr-getopt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "tr-getopt.h"; path = "libtransmission/tr-getopt.h"; sourceTree = "<group>"; };
@@ -771,8 +773,6 @@
 		BEFC1DF40C07861A00B0BB3C /* upnp.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = upnp.c; path = libtransmission/upnp.c; sourceTree = "<group>"; };
 		BEFC1DF50C07861A00B0BB3C /* transmission.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = transmission.h; path = libtransmission/transmission.h; sourceTree = "<group>"; };
 		BEFC1DF60C07861A00B0BB3C /* session.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = session.c; path = libtransmission/session.c; sourceTree = "<group>"; };
-		BEFC1DF70C07861A00B0BB3C /* tracker.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = tracker.h; path = libtransmission/tracker.h; sourceTree = "<group>"; };
-		BEFC1DF80C07861A00B0BB3C /* tracker.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = tracker.c; path = libtransmission/tracker.c; sourceTree = "<group>"; };
 		BEFC1DF90C07861A00B0BB3C /* torrent.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = torrent.c; path = libtransmission/torrent.c; sourceTree = "<group>"; };
 		BEFC1DFC0C07861A00B0BB3C /* port-forwarding.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = "port-forwarding.h"; path = "libtransmission/port-forwarding.h"; sourceTree = "<group>"; };
 		BEFC1DFD0C07861A00B0BB3C /* port-forwarding.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = "port-forwarding.c"; path = "libtransmission/port-forwarding.c"; sourceTree = "<group>"; };
@@ -1175,8 +1175,8 @@
 				BEFC1DF60C07861A00B0BB3C /* session.c */,
 				BEFC1E140C07861A00B0BB3C /* session.h */,
 				A20152790D1C26EB0081714F /* torrent-ctor.c */,
-				BEFC1DF70C07861A00B0BB3C /* tracker.h */,
-				BEFC1DF80C07861A00B0BB3C /* tracker.c */,
+				A25964A4106D73A800453B31 /* announcer.c */,
+				A25964A5106D73A800453B31 /* announcer.h */,
 				BEFC1DF90C07861A00B0BB3C /* torrent.c */,
 				BEFC1DFC0C07861A00B0BB3C /* port-forwarding.h */,
 				BEFC1DFD0C07861A00B0BB3C /* port-forwarding.c */,
@@ -1428,7 +1428,6 @@
 				A2AAB65D0DE0CF6200E04DDA /* rpcimpl.h in Headers */,
 				A2AAB65E0DE0CF6200E04DDA /* rpc-server.h in Headers */,
 				BEFC1E2E0C07861A00B0BB3C /* transmission.h in Headers */,
-				BEFC1E300C07861A00B0BB3C /* tracker.h in Headers */,
 				BEFC1E350C07861A00B0BB3C /* port-forwarding.h in Headers */,
 				BEFC1E390C07861A00B0BB3C /* ratecontrol.h in Headers */,
 				BEFC1E3B0C07861A00B0BB3C /* platform.h in Headers */,
@@ -1467,6 +1466,7 @@
 				A263E0740F111B8A008D09D6 /* request-list.h in Headers */,
 				A22CFCA90FC24ED80009BD3E /* tr-dht.h in Headers */,
 				0A6169A80FE5C9A200C66CE6 /* bitfield.h in Headers */,
+				A25964A7106D73A800453B31 /* announcer.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1883,7 +1883,6 @@
 				BEFC1E2D0C07861A00B0BB3C /* upnp.c in Sources */,
 				A2AAB65C0DE0CF6200E04DDA /* rpc-server.c in Sources */,
 				BEFC1E2F0C07861A00B0BB3C /* session.c in Sources */,
-				BEFC1E310C07861A00B0BB3C /* tracker.c in Sources */,
 				BEFC1E320C07861A00B0BB3C /* torrent.c in Sources */,
 				BEFC1E360C07861A00B0BB3C /* port-forwarding.c in Sources */,
 				BEFC1E3A0C07861A00B0BB3C /* ratecontrol.c in Sources */,
@@ -1924,6 +1923,7 @@
 				A263E0730F111B89008D09D6 /* request-list.c in Sources */,
 				A22CFCA80FC24ED80009BD3E /* tr-dht.c in Sources */,
 				0A6169A70FE5C9A200C66CE6 /* bitfield.c in Sources */,
+				A25964A6106D73A800453B31 /* announcer.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

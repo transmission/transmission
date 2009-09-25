@@ -489,6 +489,7 @@ typedef enum
         
         //get trackers for table
         [fTrackers release];
+        #warning fix!
         fTrackers = [[torrent allTrackers: YES] retain];
         [fTrackerTable deselectAll: self];
         
@@ -1131,6 +1132,7 @@ typedef enum
     return nil;
 }
 
+#warning fix!
 - (void) tableView: (NSTableView *) tableView setObjectValue: (id) object forTableColumn: (NSTableColumn *) tableColumn
     row: (NSInteger) row
 {
@@ -1416,7 +1418,8 @@ typedef enum
     
     Torrent * torrent = [fTorrents objectAtIndex: 0];
     
-    [fTrackerField setStringValue: [torrent trackerAddressAnnounce]];
+    #warning fix!
+    //[fTrackerField setStringValue: [torrent trackerAddressAnnounce]];
     
     NSString * location = [torrent dataLocation];
     [fDataLocationField setStringValue: [location stringByAbbreviatingWithTildeInPath]];
@@ -1496,9 +1499,10 @@ typedef enum
 }
 
 #warning reload table when necessary?
+#warning fix!
 - (void) updateInfoTracker
 {
-    if ([fTorrents count] != 1)
+    /*if ([fTorrents count] != 1)
         return;
     Torrent * torrent = [fTorrents objectAtIndex: 0];
     
@@ -1562,7 +1566,7 @@ typedef enum
         default:
             scrapeNextString = [NSString timeString: scrapeNext showSeconds: YES];
     }
-    [fScrapeNextField setStringValue: scrapeNextString];
+    [fScrapeNextField setStringValue: scrapeNextString];*/
 }
 
 - (void) updateInfoPeers
@@ -1885,6 +1889,7 @@ typedef enum
     
     [fTrackers removeObjectsAtIndexes: indexes];
     
+    #warning fix!
     Torrent * torrent = [fTorrents objectAtIndex: 0];
     [torrent updateAllTrackersForRemove: fTrackers];
     [fTrackerTable deselectAll: self];

@@ -131,7 +131,7 @@
 - (uint64_t) size;
 - (uint64_t) sizeLeft;
 
-- (NSString *) trackerAddressAnnounce;
+/*- (NSString *) trackerAddressAnnounce;
 - (NSDate *) lastAnnounceTime;
 - (NSInteger) nextAnnounceTime;
 - (NSString *) announceResponse;
@@ -139,7 +139,7 @@
 - (NSString *) trackerAddressScrape;
 - (NSDate *) lastScrapeTime;
 - (NSInteger) nextScrapeTime;
-- (NSString *) scrapeResponse;
+- (NSString *) scrapeResponse;*/
 
 - (NSMutableArray *) allTrackers: (BOOL) separators;
 - (NSArray *) allTrackersFlat;

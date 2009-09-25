@@ -671,9 +671,11 @@ int trashDataFile(const char * filename)
     return fStat->leftUntilDone;
 }
 
-- (NSString *) trackerAddressAnnounce
+/*- (NSString *) trackerAddressAnnounce
 {
-    return fStat->announceURL ? [NSString stringWithUTF8String: fStat->announceURL] : nil;
+#warning fix
+    return @"fix me!";
+    //return fStat->announceURL ? [NSString stringWithUTF8String: fStat->announceURL] : nil;
 }
 
 - (NSDate *) lastAnnounceTime
@@ -705,7 +707,9 @@ int trashDataFile(const char * filename)
 
 - (NSString *) trackerAddressScrape
 {
-    return fStat->scrapeURL ? [NSString stringWithUTF8String: fStat->scrapeURL] : nil;
+#warning fix
+    return @"fix me!";
+    //return fStat->scrapeURL ? [NSString stringWithUTF8String: fStat->scrapeURL] : nil;
 }
 
 - (NSDate *) lastScrapeTime
@@ -733,7 +737,7 @@ int trashDataFile(const char * filename)
 - (NSString *) scrapeResponse
 {
     return [NSString stringWithUTF8String: fStat->scrapeResponse];
-}
+}*/
 
 - (NSMutableArray *) allTrackers: (BOOL) separators
 {

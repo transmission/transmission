@@ -2023,7 +2023,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         {
             if (filterTracker)
             {
-                BOOL removeTextField = YES;
+                #warning fix!
+                /*BOOL removeTextField = YES;
                 for (NSString * tracker in [torrent allTrackers: NO])
                 {
                     if ([tracker rangeOfString: searchString options: NSCaseInsensitiveSearch].location != NSNotFound)
@@ -2034,7 +2035,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 }
                 
                 if (removeTextField)
-                    continue;
+                    continue;*/
             }
             else
             {
