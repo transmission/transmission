@@ -1468,9 +1468,7 @@ sessionCloseImpl( void * vsession )
     tr_free( session->altTimer );
     session->altTimer = NULL;
 
-    tr_announcerClose( session );
     tr_verifyClose( session );
-    tr_statsClose( session );
     tr_sharedClose( session );
     tr_rpcClose( &session->rpcServer );
 
@@ -1487,6 +1485,8 @@ sessionCloseImpl( void * vsession )
         tr_torrentFree( torrents[i] );
     tr_free( torrents );
 
+    tr_announcerClose( session );
+    tr_statsClose( session );
     tr_peerMgrFree( session->peerMgr );
 
     tr_list_free( &session->blocklists,
