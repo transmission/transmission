@@ -23,16 +23,17 @@
  *****************************************************************************/
 
 #import "InfoWindowController.h"
-#import "Torrent.h"
-#import "InfoTabButtonCell.h"
-#import "FileOutlineView.h"
-#import "FileOutlineController.h"
 #import "FileListNode.h"
-#import "PeerProgressIndicatorCell.h"
-#import "TrackerTableView.h"
-#import "PiecesView.h"
+#import "FileOutlineController.h"
+#import "FileOutlineView.h"
+#import "InfoTabButtonCell.h"
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
+#import "PeerProgressIndicatorCell.h"
+#import "PiecesView.h"
+#import "Torrent.h"
+#import "TrackerNode.h"
+#import "TrackerTableView.h"
 #include "utils.h" //tr_getRatio()
 
 #define TAB_INFO_IDENT @"Info"
@@ -86,8 +87,8 @@ typedef enum
 - (BOOL) canQuickLook;
 - (BOOL) canQuickLookFile: (FileListNode *) item;
 
-- (void) addTrackers;
-- (void) removeTrackers;
+/*- (void) addTrackers;
+- (void) removeTrackers;*/
 
 @end
 
@@ -355,24 +356,6 @@ typedef enum
         [fErrorMessageView setString: @""];
         [fErrorMessageView setSelectable: NO];
         
-        [fAnnounceAddressField setStringValue: @""];
-        [fAnnounceAddressField setToolTip: nil];
-        [fAnnounceAddressField setSelectable: NO];
-        [fAnnounceLastField setStringValue: @""];
-        [fAnnounceResponseField setStringValue: @""];
-        [fAnnounceResponseField setToolTip: nil];
-        [fAnnounceResponseField setSelectable: NO];
-        [fAnnounceNextField setStringValue: @""];
-        
-        [fScrapeAddressField setStringValue: @""];
-        [fScrapeAddressField setToolTip: nil];
-        [fScrapeAddressField setSelectable: NO];
-        [fScrapeLastField setStringValue: @""];
-        [fScrapeResponseField setStringValue: @""];
-        [fScrapeResponseField setToolTip: nil];
-        [fScrapeResponseField setSelectable: NO];
-        [fScrapeNextField setStringValue: @""];
-        
         [fConnectedPeersField setStringValue: @""];
         [fDownloadingFromField setStringValue: @""];
         [fUploadingToField setStringValue: @""];
@@ -400,6 +383,9 @@ typedef enum
         
         [fTrackers release];
         fTrackers = nil;
+        
+        [fTrackerTable reloadData];
+        [fTrackerTable setTrackers: nil];
         
         [fTrackerAddRemoveControl setEnabled: NO forSegment: TRACKER_ADD_TAG];
         [fTrackerAddRemoveControl setEnabled: NO forSegment: TRACKER_REMOVE_TAG];
@@ -467,8 +453,6 @@ typedef enum
         [fCommentView setSelectable: ![commentString isEqualToString: @""]];
         [fCreatorField setSelectable: ![creatorString isEqualToString: @""]];
         [fDataLocationField setSelectable: YES];
-        [fAnnounceAddressField setSelectable: YES];
-        [fScrapeAddressField setSelectable: YES];
         
         //set pieces view
         BOOL piecesAvailableSegment = [[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"];
@@ -487,12 +471,7 @@ typedef enum
             [fWebSeedTable reloadData];
         }
         
-        //get trackers for table
-        [fTrackers release];
-        #warning fix!
-        fTrackers = [[torrent allTrackers: YES] retain];
         [fTrackerTable deselectAll: self];
-        
         [fTrackerAddRemoveControl setEnabled: YES forSegment: TRACKER_ADD_TAG];
         [fTrackerAddRemoveControl setEnabled: NO forSegment: TRACKER_REMOVE_TAG];
 
@@ -504,10 +483,6 @@ typedef enum
     //update stats and settings
     [self updateInfoStats];
     [self updateOptions];
-    
-    //reload tables that won't change every update
-    [fTrackerTable setTrackers: fTrackers];
-    [fTrackerTable reloadData];
 }
 
 - (void) updateInfoStats
@@ -924,9 +899,9 @@ typedef enum
         
         if ([ident isEqualToString: @"Icon"])
         {
-            NSAssert([item isKindOfClass: [NSString class]], @"Value passed to tracker table's icon row is not a string!");
+            NSAssert([item isKindOfClass: [TrackerNode class]], @"Value passed to tracker table's icon row is not a TrackerNode!");
             
-            NSURL * address = [NSURL URLWithString: item];
+            NSURL * address = [NSURL URLWithString: [(TrackerNode *)item host]];
             NSArray * hostComponents = [[address host] componentsSeparatedByString: @"."];
             
             //let's try getting the tracker address without using any subdomains
@@ -947,7 +922,7 @@ typedef enum
             return (icon && icon != [NSNull null]) ? icon : [NSImage imageNamed: @"FavIcon.png"];
         }
         if ([ident isEqualToString: @"Address"])
-            return item;
+            return [(TrackerNode *)item host];
         else
             return [NSString stringWithFormat: NSLocalizedString(@"Tier %d", "Inspector -> tracker table"), [item integerValue]];
     }
@@ -1133,6 +1108,7 @@ typedef enum
 }
 
 #warning fix!
+#if 0
 - (void) tableView: (NSTableView *) tableView setObjectValue: (id) object forTableColumn: (NSTableColumn *) tableColumn
     row: (NSInteger) row
 {
@@ -1153,19 +1129,21 @@ typedef enum
     [fTrackerTable setTrackers: fTrackers];
     [fTrackerTable reloadData];
 }
+#endif
 
 - (void) addRemoveTracker: (id) sender
 {
-    //don't allow add/remove when currently adding - it leads to weird results
+/*    //don't allow add/remove when currently adding - it leads to weird results
     if ([fTrackerTable editedRow] != -1)
         return;
     
     if ([[sender cell] tagForSegment: [sender selectedSegment]] == TRACKER_REMOVE_TAG)
         [self removeTrackers];
     else
-        [self addTrackers];
+        [self addTrackers];*/
 }
 
+#warning what?!
 - (BOOL) tableView: (NSTableView *) tableView shouldEditTableColumn: (NSTableColumn *) tableColumn row: (NSInteger) row
 {
     if (tableView != fTrackerTable)
@@ -1502,71 +1480,16 @@ typedef enum
 #warning fix!
 - (void) updateInfoTracker
 {
-    /*if ([fTorrents count] != 1)
+    if ([fTorrents count] != 1)
         return;
     Torrent * torrent = [fTorrents objectAtIndex: 0];
     
-    //announce fields
-    NSString * announceAddress = [torrent trackerAddressAnnounce];
-    [fAnnounceAddressField setStringValue: announceAddress];
-    [fAnnounceAddressField setToolTip: announceAddress];
+    //get update tracker stats
+    [fTrackers release];
+    fTrackers = [[torrent allTrackerStats] retain];
     
-    [fAnnounceLastField setObjectValue: [torrent lastAnnounceTime]];
-    
-    NSString * announceResponse = [torrent announceResponse];
-    [fAnnounceResponseField setStringValue: announceResponse];
-    [fAnnounceResponseField setToolTip: announceResponse];
-    [fAnnounceResponseField setSelectable: ![announceResponse isEqualToString: @""]];
-    
-    NSInteger announceNext = [torrent nextAnnounceTime];
-    NSString * announceNextString;
-    switch (announceNext)
-    {
-        case STAT_TIME_NOW:
-            announceNextString = [NSLocalizedString(@"In progress", "Inspector -> tracker tab") stringByAppendingEllipsis];
-            break;
-        case STAT_TIME_NONE:
-            announceNextString = @"";
-            break;
-        default:
-            announceNextString = [NSString timeString: announceNext showSeconds: YES];
-    }
-    [fAnnounceNextField setStringValue: announceNextString];
-    
-    //scrape fields
-    NSString * scrapeAddress;
-    if ((scrapeAddress = [torrent trackerAddressScrape]))
-    {
-        [fScrapeAddressField setStringValue: scrapeAddress];
-        [fScrapeAddressField setToolTip: scrapeAddress];
-    }
-    else
-    {
-        [fScrapeAddressField setStringValue: @""];
-        [fScrapeAddressField setToolTip: @""];
-    }
-    
-    [fScrapeLastField setObjectValue: [torrent lastScrapeTime]];
-    
-    NSString * scrapeResponse = [torrent scrapeResponse];
-    [fScrapeResponseField setStringValue: scrapeResponse];
-    [fScrapeResponseField setToolTip: scrapeResponse];
-    [fScrapeResponseField setSelectable: ![scrapeResponse isEqualToString: @""]];
-    
-    NSInteger scrapeNext = [torrent nextScrapeTime];
-    NSString * scrapeNextString;
-    switch (scrapeNext)
-    {
-        case STAT_TIME_NOW:
-            scrapeNextString = [NSLocalizedString(@"In progress", "Inspector -> tracker tab") stringByAppendingEllipsis];
-            break;
-        case STAT_TIME_NONE:
-            scrapeNextString = @"";
-            break;
-        default:
-            scrapeNextString = [NSString timeString: scrapeNext showSeconds: YES];
-    }
-    [fScrapeNextField setStringValue: scrapeNextString];*/
+    [fTrackerTable setTrackers: fTrackers];
+    [fTrackerTable reloadData];
 }
 
 - (void) updateInfoPeers
@@ -1794,6 +1717,8 @@ typedef enum
     return [item isFolder] || [torrent fileProgress: item] == 1.0;
 }
 
+#if 0
+
 #warning doesn't like blank addresses
 - (void) addTrackers
 {
@@ -1901,5 +1826,7 @@ typedef enum
     [fTrackerTable setTrackers: fTrackers];
     [fTrackerTable reloadData];
 }
+
+#endif
 
 @end

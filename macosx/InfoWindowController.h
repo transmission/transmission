@@ -34,7 +34,6 @@
 @interface InfoWindowController : NSWindowController <QLPreviewPanelDataSource, QLPreviewPanelDelegate>
 {
     NSArray * fTorrents;
-    NSMutableArray * fTrackers;
     
     IBOutlet NSView * fInfoView, * fActivityView, * fTrackerView, * fPeersView, * fFilesView, * fOptionsView;
     NSInteger fCurrentTabTag;
@@ -55,8 +54,6 @@
     
     IBOutlet TrackerTableView * fTrackerTable;
     IBOutlet NSSegmentedControl * fTrackerAddRemoveControl;
-    IBOutlet NSTextField * fAnnounceAddressField, * fAnnounceLastField, * fAnnounceResponseField, * fAnnounceNextField,
-                            * fScrapeAddressField, * fScrapeLastField, * fScrapeResponseField, * fScrapeNextField;
     
     NSArray * fPeers, * fWebSeeds;
     IBOutlet NSTableView * fPeerTable, * fWebSeedTable;
@@ -77,6 +74,7 @@
                         * fUploadLimitLabel, * fDownloadLimitLabel, * fPeersConnectLabel,
                         * fPeersConnectField;
     
+    NSArray * fTrackers;
     NSCache * fTrackerIconCache;
     NSMutableSet * fTrackerIconLoading;
     

@@ -26,6 +26,7 @@
 #import "GroupsController.h"
 #import "FileListNode.h"
 #import "NSStringAdditions.h"
+#import "TrackerNode.h"
 #import "utils.h" //tr_httpIsValidURL
 
 @interface Torrent (Private)
@@ -739,32 +740,40 @@ int trashDataFile(const char * filename)
     return [NSString stringWithUTF8String: fStat->scrapeResponse];
 }*/
 
-- (NSMutableArray *) allTrackers: (BOOL) separators
+- (NSArray *) allTrackerStats
 {
-    const NSInteger count = fInfo->trackerCount;
-    const NSInteger capacity = (separators && count > 0) ? count + fInfo->trackers[count-1].tier + 1 : count;
-    NSMutableArray * allTrackers = [NSMutableArray arrayWithCapacity: capacity];
+    int count;
+    tr_tracker_stat * stats = tr_torrentTrackers(fHandle, &count);
     
-    for (NSInteger i = 0, tier = -1; i < count; i++)
+    NSMutableArray * trackers = [NSMutableArray arrayWithCapacity: count + stats[count-1].tier + 1];
+    
+    int prevTier = -1;
+    for (int i=0; i < count; ++i)
     {
-        if (separators && tier != fInfo->trackers[i].tier)
+        if (stats[i].tier != prevTier)
         {
-            tier = fInfo->trackers[i].tier;
-            [allTrackers addObject: [NSNumber numberWithInteger: tier + 1]];
+            [trackers addObject: [NSNumber numberWithInteger: stats[i].tier]];
+            prevTier = stats[i].tier;
         }
         
-        [allTrackers addObject: [NSString stringWithUTF8String: fInfo->trackers[i].announce]];
+        TrackerNode * tracker = [[TrackerNode alloc] initWithTrackerStat: stats[i]];
+        [trackers addObject: tracker];
+        [tracker release];
     }
     
-    return allTrackers;
+    tr_torrentTrackersFree(stats, count);
+    return trackers;
 }
 
 - (NSArray *) allTrackersFlat
 {
-    return [self allTrackers: NO];
+    NSMutableArray * allTrackers = [NSMutableArray arrayWithCapacity: fInfo->trackerCount];
+    
+    for (NSInteger i = 0, tier = -1; i < fInfo->trackerCount; i++)
+        [allTrackers addObject: [NSString stringWithUTF8String: fInfo->trackers[i].announce]];
 }
 
-- (BOOL) updateAllTrackersForAdd: (NSMutableArray *) trackers
+/*- (BOOL) updateAllTrackersForAdd: (NSMutableArray *) trackers
 {
     NSString * tracker = [trackers lastObject];
     tracker = [tracker stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
@@ -786,7 +795,7 @@ int trashDataFile(const char * filename)
 - (void) updateAllTrackersForRemove: (NSMutableArray *) trackers
 {
     [self updateAllTrackers: trackers];
-}
+}*/
 
 - (NSString *) comment
 {

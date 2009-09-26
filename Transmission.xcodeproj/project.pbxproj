@@ -79,6 +79,7 @@
 		A21282A80CA6C66800EAEE0F /* StatusBarView.m in Sources */ = {isa = PBXBuildFile; fileRef = A21282A60CA6C66800EAEE0F /* StatusBarView.m */; };
 		A215BF5C0F02EBB800350CDB /* GroupRules.xib in Resources */ = {isa = PBXBuildFile; fileRef = A215BF5B0F02EBB800350CDB /* GroupRules.xib */; };
 		A219798B0D07B78400438EA7 /* GroupToolbarItem.m in Sources */ = {isa = PBXBuildFile; fileRef = A219798A0D07B78400438EA7 /* GroupToolbarItem.m */; };
+		A21A9BE2106D86A800F1C3C1 /* TrackerNode.m in Sources */ = {isa = PBXBuildFile; fileRef = A21A9BE1106D86A800F1C3C1 /* TrackerNode.m */; };
 		A21DFF100A292B2B007C5F76 /* Transfers.png in Resources */ = {isa = PBXBuildFile; fileRef = A21DFF0F0A292B2B007C5F76 /* Transfers.png */; };
 		A21FBBAB0EDA78C300BC3C51 /* bandwidth.h in Headers */ = {isa = PBXBuildFile; fileRef = A21FBBA90EDA78C300BC3C51 /* bandwidth.h */; };
 		A21FBBAC0EDA78C300BC3C51 /* bandwidth.c in Sources */ = {isa = PBXBuildFile; fileRef = A21FBBAA0EDA78C300BC3C51 /* bandwidth.c */; };
@@ -486,6 +487,8 @@
 		A215BF5D0F02EBB800350CDB /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = macosx/en.lproj/GroupRules.xib; sourceTree = "<group>"; };
 		A21979890D07B78400438EA7 /* GroupToolbarItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GroupToolbarItem.h; path = macosx/GroupToolbarItem.h; sourceTree = "<group>"; };
 		A219798A0D07B78400438EA7 /* GroupToolbarItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GroupToolbarItem.m; path = macosx/GroupToolbarItem.m; sourceTree = "<group>"; };
+		A21A9BE0106D86A800F1C3C1 /* TrackerNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TrackerNode.h; path = macosx/TrackerNode.h; sourceTree = "<group>"; };
+		A21A9BE1106D86A800F1C3C1 /* TrackerNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TrackerNode.m; path = macosx/TrackerNode.m; sourceTree = "<group>"; };
 		A21DFF0F0A292B2B007C5F76 /* Transfers.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Transfers.png; path = macosx/Images/Transfers.png; sourceTree = "<group>"; };
 		A21FBBA90EDA78C300BC3C51 /* bandwidth.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bandwidth.h; path = libtransmission/bandwidth.h; sourceTree = "<group>"; };
 		A21FBBAA0EDA78C300BC3C51 /* bandwidth.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bandwidth.c; path = libtransmission/bandwidth.c; sourceTree = "<group>"; };
@@ -901,6 +904,8 @@
 		080E96DDFE201D6D7F000001 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				A21A9BE0106D86A800F1C3C1 /* TrackerNode.h */,
+				A21A9BE1106D86A800F1C3C1 /* TrackerNode.m */,
 				32CA4F630368D1EE00C91783 /* Transmission_Prefix.pch */,
 				29B97316FDCFA39411CA2CEA /* main.m */,
 				A29D84021049C25600D1987A /* NSApplicationAdditions.h */,
@@ -1990,6 +1995,7 @@
 				A232F07E0EEA034A00041646 /* BonjourController.m in Sources */,
 				A23F526F0F14395900AA02E3 /* PredicateEditorRowTemplateAny.m in Sources */,
 				A29D84041049C25600D1987A /* NSApplicationAdditions.m in Sources */,
+				A21A9BE2106D86A800F1C3C1 /* TrackerNode.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

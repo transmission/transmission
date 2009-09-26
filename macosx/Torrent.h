@@ -28,6 +28,7 @@
 
 @class FileListNode;
 
+#warning remove!?
 #define STAT_TIME_NONE -1
 #define STAT_TIME_NOW -2
 
@@ -141,10 +142,10 @@
 - (NSInteger) nextScrapeTime;
 - (NSString *) scrapeResponse;*/
 
-- (NSMutableArray *) allTrackers: (BOOL) separators;
-- (NSArray *) allTrackersFlat;
-- (BOOL) updateAllTrackersForAdd: (NSMutableArray *) trackers;
-- (void) updateAllTrackersForRemove: (NSMutableArray *) trackers;
+- (NSArray *) allTrackerStats;
+- (NSArray *) allTrackersFlat; //used by GroupRules
+/*- (BOOL) updateAllTrackersForAdd: (NSMutableArray *) trackers;
+- (void) updateAllTrackersForRemove: (NSMutableArray *) trackers;*/
 
 - (NSString *) comment;
 - (NSString *) creator;
