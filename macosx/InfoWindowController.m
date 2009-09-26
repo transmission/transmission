@@ -904,10 +904,10 @@ typedef enum
             //let's try getting the tracker address without using any subdomains
             NSString * baseAddress;
             if ([hostComponents count] > 1)
-                baseAddress = [NSString stringWithFormat: @"%@://%@.%@", [address scheme],
+                baseAddress = [NSString stringWithFormat: @"http://%@.%@",
                                 [hostComponents objectAtIndex: [hostComponents count] - 2], [hostComponents lastObject]];
             else
-                baseAddress = [NSString stringWithFormat: @"%@://%@", [address scheme], [hostComponents lastObject]];
+                baseAddress = [NSString stringWithFormat: @"http://%@", [hostComponents lastObject]];
             
             id icon = [fTrackerIconCache objectForKey: baseAddress];
             if (!icon && ![fTrackerIconLoading containsObject: baseAddress])
