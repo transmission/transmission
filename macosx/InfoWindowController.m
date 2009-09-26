@@ -327,7 +327,6 @@ typedef enum
         
         [fNameField setToolTip: nil];
 
-        [fTrackerField setStringValue: @""];
         [fPiecesField setStringValue: @""];
         [fHashField setStringValue: @""];
         [fHashField setToolTip: nil];
@@ -344,7 +343,6 @@ typedef enum
         [fRevealDataButton setHidden: YES];
         
         //don't allow empty fields to be selected
-        [fTrackerField setSelectable: NO];
         [fHashField setSelectable: NO];
         [fCreatorField setSelectable: NO];
         [fDataLocationField setSelectable: NO];
@@ -448,7 +446,6 @@ typedef enum
         [fRevealDataButton setHidden: NO];
         
         //allow these fields to be selected
-        [fTrackerField setSelectable: YES];
         [fHashField setSelectable: YES];
         [fCommentView setSelectable: ![commentString isEqualToString: @""]];
         [fCreatorField setSelectable: ![creatorString isEqualToString: @""]];
@@ -1395,9 +1392,6 @@ typedef enum
         return;
     
     Torrent * torrent = [fTorrents objectAtIndex: 0];
-    
-    #warning fix!
-    //[fTrackerField setStringValue: [torrent trackerAddressAnnounce]];
     
     NSString * location = [torrent dataLocation];
     [fDataLocationField setStringValue: [location stringByAbbreviatingWithTildeInPath]];
