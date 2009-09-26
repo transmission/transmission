@@ -51,6 +51,9 @@ class TrMainWindow: public QMainWindow
         Q_OBJECT
 
     private:
+        virtual void closeEvent( QCloseEvent * event );
+
+    private:
         time_t myLastFullUpdateTime;
         QDialog * mySessionDialog;
         QDialog * myPrefsDialog;
