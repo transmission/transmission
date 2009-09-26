@@ -377,6 +377,27 @@
 
 - (void) createReal
 {
+    //check if the location currently exists
+    if (![[NSFileManager defaultManager] fileExistsAtPath: [fLocation stringByDeletingLastPathComponent]])
+    {
+        NSArray * pathComponents = [fLocation pathComponents];
+        NSInteger count = [pathComponents count];
+        
+        NSAlert * alert = [[[NSAlert alloc] init] autorelease];
+        [alert addButtonWithTitle: NSLocalizedString(@"OK", "Create torrent -> directory doesn't exist warning -> button")];
+        [alert setMessageText: NSLocalizedString(@"The chosen torrent file location does not exist.",
+                                                "Create torrent -> directory doesn't exist warning -> title")];
+        [alert setInformativeText: [NSString stringWithFormat:
+                NSLocalizedString(@"The directory \"%@\" does not currently exist. "
+                    "Create this directory or choose a different one to create the torrent file.",
+                    "Create torrent -> directory doesn't exist warning -> warning"),
+                    [fLocation stringByDeletingLastPathComponent]]];
+        [alert setAlertStyle: NSWarningAlertStyle];
+        
+        [alert beginSheetModalForWindow: [self window] modalDelegate: self didEndSelector: nil contextInfo: nil];
+        return;
+    }
+    
     //check if a file with the same name and location already exists
     if ([[NSFileManager defaultManager] fileExistsAtPath: fLocation])
     {
