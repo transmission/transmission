@@ -218,10 +218,8 @@ getHost( tr_announcer * announcer, const char * url )
     if( host == NULL )
     {
         host = hostNew( name );
-        fprintf( stderr, "creating new tr_host [%s] %p\n", name, host );
         tr_ptrArrayInsertSorted( &announcer->hosts, host, compareHosts );
     }
-    else fprintf( stderr, "reusing tr_host [%s] %p\n", name, host );
 
     tr_free( name );
     return host;
