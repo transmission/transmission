@@ -211,7 +211,6 @@ Details :: onTorrentChanged( )
 void
 Details :: refresh( )
 {
-    int i;
     QLocale locale;
     const int n = myIds.size( );
     const bool single = n == 1;
@@ -678,18 +677,6 @@ Details :: refresh( )
     ///  Peers tab
     ///
 
-    i = 0;
-    foreach( const Torrent * t, torrents ) i += t->seeders( );
-    mySeedersLabel->setText( locale.toString( i ) );
-
-    i = 0;
-    foreach( const Torrent * t, torrents ) i += t->leechers( );
-    myLeechersLabel->setText( locale.toString( i ) );
-
-    i = 0;
-    foreach( const Torrent * t, torrents ) i += t->timesCompleted( );
-    myTimesCompletedLabel->setText( locale.toString( i ) );
-
     QMap<QString,QTreeWidgetItem*> peers2;
     QList<QTreeWidgetItem*> newItems;
     foreach( const Torrent * t, torrents )
@@ -1049,30 +1036,6 @@ Details :: createPeersTab( )
     size = m.size( 0, "Some BitTorrent Client" );
     myPeerTree->setColumnWidth( COL_CLIENT, size.width( ) );
     myPeerTree->setAlternatingRowColors( true );
-
-    QHBoxLayout * h = new QHBoxLayout;
-    h->setSpacing( HIG :: PAD );
-    v->addLayout( h );
-
-    QLabel * l = new QLabel( "Seeders:" );
-    l->setStyleSheet( "font: bold" );
-    h->addWidget( l );
-    l = mySeedersLabel = new QLabel( "a" );
-    h->addWidget( l );
-    h->addStretch( 1 );
-    
-    l = new QLabel( "Leechers:" );
-    l->setStyleSheet( "font: bold" );
-    h->addWidget( l );
-    l = myLeechersLabel = new QLabel( "b" );
-    h->addWidget( l );
-    h->addStretch( 1 );
-    
-    l = new QLabel( "Times Completed:" );
-    l->setStyleSheet( "font: bold" );
-    h->addWidget( l );
-    l = myTimesCompletedLabel = new QLabel( "c" );
-    h->addWidget( l );
 
     return top;
 }

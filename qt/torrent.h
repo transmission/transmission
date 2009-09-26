@@ -135,9 +135,6 @@ class Torrent: public QObject
             SCRAPE_RESPONSE,
             ANNOUNCE_RESPONSE,
             ANNOUNCE_URL,
-            SEEDERS,
-            LEECHERS,
-            TIMES_COMPLETED,
             PEERS,
             TORRENT_FILE,
             BANDWIDTH_PRIORITY,
@@ -266,9 +263,6 @@ class Torrent: public QObject
         int peerLimit( ) const { return getInt( PEER_LIMIT ); }
         double seedRatioLimit( ) const { return getDouble( SEED_RATIO_LIMIT ); }
         tr_ratiolimit seedRatioMode( ) const { return (tr_ratiolimit) getInt( SEED_RATIO_MODE ); }
-        int seeders() const { return getInt( SEEDERS ); }
-        int leechers() const { return getInt( LEECHERS ); }
-        int timesCompleted() const { return getInt( TIMES_COMPLETED ); }
         PeerList peers( ) const{ return myValues[PEERS].value<PeerList>(); }
         const FileList& files( ) const { return myFiles; }
 

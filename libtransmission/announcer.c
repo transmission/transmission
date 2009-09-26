@@ -1574,40 +1574,6 @@ onUpkeepTimer( int foo UNUSED, short bar UNUSED, void * vannouncer )
 ****
 ***/
 
-void
-tr_announcerGetCounts( tr_torrent * torrent,
-                       int * setme_completedCount,
-                       int * setme_leecherCount,
-                       int * setme_seederCount,
-                       int * setme_downloaderCount )
-{
-    int i;
-    int n;
-    int completed = 0;
-    int leechers = 0;
-    int seeders = 0;
-    int downloaders = 0;
-
-    /* count the trackers... */
-    for( i=0, n=tr_ptrArraySize( &torrent->tiers->tiers ); i<n; ++i )
-    {
-        const tr_tier * tier = tr_ptrArrayNth( &torrent->tiers->tiers, i );
-
-        if( tier->currentTracker )
-        {
-            seeders += tier->currentTracker->seederCount;
-            leechers += tier->currentTracker->leecherCount;
-            completed += tier->currentTracker->downloadCount;
-            downloaders += tier->currentTracker->downloaderCount;
-        }
-    }
-
-    if( setme_completedCount )  *setme_completedCount = completed;
-    if( setme_leecherCount )    *setme_leecherCount = leechers;
-    if( setme_seederCount )     *setme_seederCount = seeders;
-    if( setme_downloaderCount ) *setme_downloaderCount = downloaders;
-}
-
 tr_tracker_stat *
 tr_announcerStats( const tr_torrent * torrent,
                    int              * setmeTrackerCount )

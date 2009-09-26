@@ -98,8 +98,6 @@ Transmission.prototype =
 		this._inspector._info_tab.size = $(ti+'size')[0];
 		this._inspector._info_tab.state = $(ti+'state')[0];
 		this._inspector._info_tab.swarm_speed = $(ti+'swarm_speed')[0];
-		this._inspector._info_tab.total_leechers = $(ti+'total_leechers')[0];
-		this._inspector._info_tab.total_seeders = $(ti+'total_seeders')[0];
 		this._inspector._info_tab.tracker = $(ti+'tracker')[0];
 		this._inspector._info_tab.uploaded = $(ti+'uploaded')[0];
 		this._inspector._info_tab.upload_speed = $(ti+'upload_speed')[0];
@@ -936,9 +934,7 @@ Transmission.prototype =
 		var total_download_peers = 0;
 		var total_download_speed = 0;
 		var total_have = 0;
-		var total_leechers = 0;
 		var total_size = 0;
-		var total_seeders = 0;
 		var total_state = null;
 		var total_swarm_speed = 0;
 		var total_tracker = null;
@@ -963,8 +959,6 @@ Transmission.prototype =
 			setInnerHTML( tab.uploaded, na );
 			setInnerHTML( tab.downloaded, na );
 			setInnerHTML( tab.ratio, na );
-			setInnerHTML( tab.total_seeders, na );
-			setInnerHTML( tab.total_leechers, na );
 			setInnerHTML( tab.swarm_speed, na );
 			setInnerHTML( tab.have, na );
 			setInnerHTML( tab.upload_to, na );
@@ -1011,8 +1005,6 @@ Transmission.prototype =
 			total_download       += t.downloadTotal();
 			total_upload_speed   += t.uploadSpeed();
 			total_download_speed += t.downloadSpeed();
-			total_seeders        += t.totalSeeders();
-			total_leechers       += t.totalLeechers();
 			total_upload_peers   += t.peersGettingFromUs();
 			total_download_peers += t.peersSendingToUs();
 			total_swarm_speed    += t.swarmSpeed();
@@ -1046,8 +1038,6 @@ Transmission.prototype =
 		setInnerHTML( tab.uploaded, torrents.length ? Math.formatBytes( total_upload ) : na );
 		setInnerHTML( tab.downloaded, torrents.length ? Math.formatBytes( total_download ) : na );
 		setInnerHTML( tab.ratio, torrents.length ? Math.ratio( total_upload, total_download ) : na );
-		setInnerHTML( tab.total_seeders, torrents.length ? total_seeders : na );
-		setInnerHTML( tab.total_leechers, torrents.length ? total_leechers : na );
 		setInnerHTML( tab.swarm_speed, torrents.length ? Math.formatBytes(total_swarm_speed) + '/s' : na );
 		setInnerHTML( tab.have, torrents.length ? Math.formatBytes(total_completed) + ' (' + Math.formatBytes(total_verified) + ' verified)' : na );
 		setInnerHTML( tab.upload_to, torrents.length ? total_upload_peers : na );

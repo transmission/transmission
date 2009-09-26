@@ -141,7 +141,6 @@
    doneDate                    | number                      | tr_stat
    downloadDir                 | string                      | tr_torrent
    downloadedEver              | number                      | tr_stat
-   downloaders                 | number                      | tr_stat
    downloadLimit               | number                      | tr_torrent
    downloadLimited             | boolean                     | tr_torrent
    error                       | number                      | tr_stat
@@ -155,7 +154,6 @@
    honorsSessionLimits         | boolean                     | tr_torrent
    id                          | number                      | tr_torrent
    isPrivate                   | boolean                     | tr_torrent
-   leechers                    | number                      | tr_stat
    leftUntilDone               | number                      | tr_stat
    manualAnnounceTime          | number                      | tr_stat
    maxConnectedPeers           | number                      | tr_torrent
@@ -175,14 +173,12 @@
    rateDownload (B/s)          | number                      | tr_stat
    rateUpload (B/s)            | number                      | tr_stat
    recheckProgress             | double                      | tr_stat
-   seeders                     | number                      | tr_stat
    seedRatioLimit              | double                      | tr_torrent
    seedRatioMode               | number                      | tr_ratiolimit
    sizeWhenDone                | number                      | tr_stat
    startDate                   | number                      | tr_stat
    status                      | number                      | tr_stat
    swarmSpeed (K/s)            | number                      | tr_stat
-   timesCompleted              | number                      | tr_stat
    trackers                    | array (see below)           | n/a
    trackerStats                | array (see below)           | n/a
    totalSize                   | number                      | tr_info
@@ -555,12 +551,16 @@
    ------+---------+-----------+----------------+-------------------------------
    7     | 1.80    |        NO | torrent-get    | removed arg "announceResponse"
          |         |        NO | torrent-get    | removed arg "announceURL"
+         |         |        NO | torrent-get    | removed arg "downloaders"
          |         |        NO | torrent-get    | removed arg "lastAnnounceTime"
          |         |        NO | torrent-get    | removed arg "lastScrapeTime"
+         |         |        NO | torrent-get    | removed arg "leechers"
          |         |        NO | torrent-get    | removed arg "nextAnnounceTime"
          |         |        NO | torrent-get    | removed arg "nextScrapeTime"
          |         |        NO | torrent-get    | removed arg "scrapeResponse"
          |         |        NO | torrent-get    | removed arg "scrapeURL"
+         |         |        NO | torrent-get    | removed arg "seeders"
+         |         |        NO | torrent-get    | removed arg "timesCompleted"
          |         | yes    NO | torrent-get    | new arg "trackerStats"
 
 

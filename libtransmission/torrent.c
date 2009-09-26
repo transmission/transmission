@@ -890,11 +890,6 @@ tr_torrentStat( tr_torrent * tor )
 
     s->manualAnnounceTime = tr_announcerNextManualAnnounce( tor );
 
-    tr_announcerGetCounts( tor, &s->timesCompleted,
-                                &s->leechers,
-                                &s->seeders,
-                                &s->downloaders );
-
     tr_peerMgrTorrentStats( tor,
                             &s->peersKnown,
                             &s->peersConnected,

@@ -88,12 +88,6 @@ void tr_announcerTorrentCompleted( tr_torrent * );
 
 time_t tr_announcerNextManualAnnounce( const tr_torrent * );
 
-void tr_announcerGetCounts( tr_torrent *,
-                            int * setme_completedCount,
-                            int * setme_leecherCount,
-                            int * setme_seederCount,
-                            int * setme_downloaderCount );
-
 tr_tracker_stat * tr_announcerStats( const tr_torrent * torrent,
                                      int              * setmeTrackerCount );
 

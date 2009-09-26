@@ -82,9 +82,6 @@ struct DetailsImpl
     GHashTable * webseed_hash;
     GtkListStore * peer_store;
     GtkListStore * webseed_store;
-    GtkWidget * seeders_lb;
-    GtkWidget * leechers_lb;
-    GtkWidget * completed_lb;
     GtkWidget * webseed_view;
 
     GtkListStore * trackers;
@@ -1341,35 +1338,6 @@ refreshWebseedList( struct DetailsImpl * di, tr_torrent ** torrents, int n )
 static void
 refreshPeers( struct DetailsImpl * di, tr_torrent ** torrents, int n )
 {
-    int i;
-    char buf[512];
-    const char * none = _( "None" );
-
-    /* seeders_lb */
-    /* leechers_lb */
-    /* completed_lb */
-    if( n<=0 ) {
-        gtk_label_set_text( GTK_LABEL( di->seeders_lb ), none );
-        gtk_label_set_text( GTK_LABEL( di->leechers_lb ), none );
-        gtk_label_set_text( GTK_LABEL( di->completed_lb ), none );
-    } else {
-        int seeders = 0;
-        int leechers = 0;
-        int completed = 0;
-        for( i=0; i<n; ++i ) {
-            const tr_stat * s = tr_torrentStat( torrents[i] );
-            seeders = s->seeders;
-            leechers = s->leechers;
-            completed += s->timesCompleted;
-        }
-        g_snprintf( buf, sizeof( buf ), "%'d", seeders );
-        gtk_label_set_text( GTK_LABEL( di->seeders_lb ), buf );
-        g_snprintf( buf, sizeof( buf ), "%'d", leechers );
-        gtk_label_set_text( GTK_LABEL( di->leechers_lb ), buf );
-        g_snprintf( buf, sizeof( buf ), "%'d", completed );
-        gtk_label_set_text( GTK_LABEL( di->completed_lb ), buf );
-    }
-
     refreshPeerList( di, torrents, n );
     refreshWebseedList( di, torrents, n );
 }
@@ -1433,7 +1401,7 @@ peer_page_new( struct DetailsImpl * di )
     guint i;
     const char * str;
     GtkListStore *store;
-    GtkWidget *v, *w, *ret, *sw, *l, *vbox, *hbox;
+    GtkWidget *v, *w, *ret, *sw, *vbox;
     GtkWidget *webtree = NULL;
     GtkTreeModel * m;
     GtkTreeViewColumn * c;
@@ -1595,28 +1563,6 @@ peer_page_new( struct DetailsImpl * di )
     gtk_paned_pack1( GTK_PANED( v ), webtree, FALSE, TRUE );
     gtk_paned_pack2( GTK_PANED( v ), sw, TRUE, TRUE );
     gtk_box_pack_start( GTK_BOX( vbox ), v, TRUE, TRUE, 0 );
-
-    hbox = gtk_hbox_new( FALSE, GUI_PAD );
-    l = gtk_label_new( NULL );
-    gtk_label_set_markup( GTK_LABEL( l ), _( "<b>Seeders:</b>" ) );
-    gtk_box_pack_start( GTK_BOX( hbox ), l, FALSE, FALSE, 0 );
-    l = di->seeders_lb = gtk_label_new( NULL );
-    gtk_box_pack_start( GTK_BOX( hbox ), l, FALSE, FALSE, 0 );
-    w = gtk_alignment_new( 0.0f, 0.0f, 0.0f, 0.0f );
-    gtk_box_pack_start( GTK_BOX( hbox ), w, TRUE, TRUE, 0 );
-    l = gtk_label_new( NULL );
-    gtk_label_set_markup( GTK_LABEL( l ), _( "<b>Leechers:</b>" ) );
-    gtk_box_pack_start( GTK_BOX( hbox ), l, FALSE, FALSE, 0 );
-    l = di->leechers_lb = gtk_label_new( NULL );
-    gtk_box_pack_start( GTK_BOX( hbox ), l, FALSE, FALSE, 0 );
-    w = gtk_alignment_new( 0.0f, 0.0f, 0.0f, 0.0f );
-    gtk_box_pack_start( GTK_BOX( hbox ), w, TRUE, TRUE, 0 );
-    l = gtk_label_new( NULL );
-    gtk_label_set_markup( GTK_LABEL( l ), _( "<b>Times Completed:</b>" ) );
-    gtk_box_pack_start( GTK_BOX( hbox ), l, FALSE, FALSE, 0 );
-    l = di->completed_lb = gtk_label_new( NULL );
-    gtk_box_pack_start( GTK_BOX( hbox ), l, FALSE, FALSE, 0 );
-    gtk_box_pack_start( GTK_BOX( vbox ), hbox, FALSE, FALSE, 0 );
 
     /* ip-to-GtkTreeRowReference */
     di->peer_hash = g_hash_table_new_full( g_str_hash,

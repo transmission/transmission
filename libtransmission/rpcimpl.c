@@ -470,8 +470,6 @@ addField( const tr_torrent * tor, tr_benc * d, const char * key )
         tr_bencDictAddStr( d, key, tr_torrentGetDownloadDir( tor ) );
     else if( tr_streq( key, keylen, "downloadedEver" ) )
         tr_bencDictAddInt( d, key, st->downloadedEver );
-    else if( tr_streq( key, keylen, "downloaders" ) )
-        tr_bencDictAddInt( d, key, st->downloaders );
     else if( tr_streq( key, keylen, "downloadLimit" ) )
         tr_bencDictAddInt( d, key, tr_torrentGetSpeedLimit( tor, TR_DOWN ) );
     else if( tr_streq( key, keylen, "downloadLimited" ) )
@@ -498,8 +496,6 @@ addField( const tr_torrent * tor, tr_benc * d, const char * key )
         tr_bencDictAddInt( d, key, st->id );
     else if( tr_streq( key, keylen, "isPrivate" ) )
         tr_bencDictAddBool( d, key, tr_torrentIsPrivate( tor ) );
-    else if( tr_streq( key, keylen, "leechers" ) )
-        tr_bencDictAddInt( d, key, st->leechers );
     else if( tr_streq( key, keylen, "leftUntilDone" ) )
         tr_bencDictAddInt( d, key, st->leftUntilDone );
     else if( tr_streq( key, keylen, "manualAnnounceTime" ) )
@@ -554,8 +550,6 @@ addField( const tr_torrent * tor, tr_benc * d, const char * key )
         tr_bencDictAddInt( d, key, (int)( st->pieceUploadSpeed * 1024 ) );
     else if( tr_streq( key, keylen, "recheckProgress" ) )
         tr_bencDictAddReal( d, key, st->recheckProgress );
-    else if( tr_streq( key, keylen, "seeders" ) )
-        tr_bencDictAddInt( d, key, st->seeders );
     else if( tr_streq( key, keylen, "seedRatioLimit" ) )
         tr_bencDictAddReal( d, key, tr_torrentGetRatioLimit( tor ) );
     else if( tr_streq( key, keylen, "seedRatioMode" ) )
@@ -568,8 +562,6 @@ addField( const tr_torrent * tor, tr_benc * d, const char * key )
         tr_bencDictAddInt( d, key, st->activity );
     else if( tr_streq( key, keylen, "swarmSpeed" ) )
         tr_bencDictAddInt( d, key, (int)( st->swarmSpeed * 1024 ) );
-    else if( tr_streq( key, keylen, "timesCompleted" ) )
-        tr_bencDictAddInt( d, key, st->timesCompleted );
     else if( tr_streq( key, keylen, "trackers" ) )
         addTrackers( inf, tr_bencDictAddList( d, key, inf->trackerCount ) );
     else if( tr_streq( key, keylen, "trackerStats" ) ) {

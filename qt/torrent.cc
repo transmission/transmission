@@ -105,9 +105,6 @@ Torrent :: myProperties[] =
     { SCRAPE_RESPONSE, "scrapeResponse", QVariant::String, STAT_EXTRA },
     { ANNOUNCE_RESPONSE, "announceResponse", QVariant::String, STAT_EXTRA },
     { ANNOUNCE_URL, "announceURL", QVariant::String, STAT_EXTRA },
-    { SEEDERS, "seeders", QVariant::Int, STAT_EXTRA },
-    { LEECHERS, "leechers", QVariant::Int, STAT_EXTRA },
-    { TIMES_COMPLETED, "timesCompleted", QVariant::Int, STAT_EXTRA },
     { PEERS, "peers", TrTypes::PeerList, STAT_EXTRA },
     { TORRENT_FILE, "torrentFile", QVariant::String, STAT_EXTRA },
     { BANDWIDTH_PRIORITY, "bandwidthPriority", QVariant::Int, STAT_EXTRA }
