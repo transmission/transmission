@@ -48,9 +48,8 @@ namespace
     const char*
     getUsage( void )
     {
-        return "Transmission " LONG_VERSION_STRING "\n"
-               "http://www.transmissionbt.com/\n"
-               "A fast and easy BitTorrent client";
+        return "Usage:\n"
+               "  transmission [OPTIONS...] [torrent files]";
     }
 
     void
@@ -98,13 +97,14 @@ MyApp :: MyApp( int& argc, char ** argv ):
     bool minimized = false;
     const char * optarg;
     const char * configDir = 0;
+    QStringList filenames;
     while( ( c = tr_getopt( getUsage( ), argc, (const char**)argv, opts, &optarg ) ) ) {
         switch( c ) {
             case 'g': configDir = optarg; break;
             case 'm': minimized = true; break;
             case 'v':        Utils::toStderr( QObject::tr( "transmission %1" ).arg( LONG_VERSION_STRING ) ); exit( 0 ); break;
             case TR_OPT_ERR: Utils::toStderr( QObject::tr( "Invalid option" ) ); showUsage( ); break;
-            default:         Utils::toStderr( QObject::tr( "Got opt %1" ).arg((int)c) ); showUsage( ); break;
+            default:         filenames.append( optarg ); break;
         }
     }
 
@@ -167,6 +167,9 @@ MyApp :: MyApp( int& argc, char ** argv ):
         QDialog * d = new SessionDialog( *mySession, *myPrefs, myWindow );
         d->show( );
     }
+
+    for( QStringList::const_iterator it=filenames.begin(), end=filenames.end(); it!=end; ++it )
+        mySession->addTorrent( *it );
 }
 
 MyApp :: ~MyApp( )
