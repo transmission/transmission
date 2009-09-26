@@ -1496,20 +1496,6 @@ typedef struct tr_stat
     /** What is this torrent doing right now? */
     tr_torrent_activity activity;
 
-#if 0
-    /** Our current announce URL, or NULL if none.
-        This URL may change during the session if the torrent's
-        metainfo has multiple trackers and the current one
-        becomes unreachable. */
-    char *  announceURL;
-
-    /** Our current scrape URL, or NULL if none.
-        This URL may change during the session if the torrent's
-        metainfo has multiple trackers and the current one
-        becomes unreachable. */
-    char *  scrapeURL;
-#endif
-
     /** Defines what kind of text is in errorString.
         @see errorString */
     tr_stat_errtype error;
@@ -1630,40 +1616,6 @@ typedef struct tr_stat
         As pieces become complete, this value may decrease as portions of it
         are moved to `corrupt' or `haveValid'. */
     uint64_t    haveUnchecked;
-
-#if 0
-    /**
-     * This is a human-readable string with the last scrape's results.
-     * 1. If an http error occurred, the response code and description is given.
-     * 2. If the tracker gave an error or warning messae, that is given.
-     * 3. If everything went fine, "Success" is given.
-     */
-    char    scrapeResponse[128];
-
-    /** This is a human-readable string with the last announce's results.
-        Its contents have the same form as scrapeResponse. */
-    char    announceResponse[128];
-
-    /** Time the most recent scrape request was sent,
-        or zero if one hasn't been sent yet. */
-    time_t    lastScrapeTime;
-
-    /** Time when the next scrape request will be sent,
-        or 0 if an error has occured that stops scraping,
-        or 1 if a scrape is currently in progress s.t.
-        we haven't set a timer for the next one yet. */
-    time_t    nextScrapeTime;
-
-    /** Time the most recent announce request was sent,
-        or zero if one hasn't been sent yet. */
-    time_t    lastAnnounceTime;
-
-    /** Time when the next reannounce request will be sent,
-        or 0 if the torrent is stopped,
-        or 1 if an announce is currently in progress s.t.
-        we haven't set a timer for the next one yet */
-    time_t    nextAnnounceTime;
-#endif
 
     /** time when one or more of the torrent's trackers will
         allow you to manually ask for more peers,

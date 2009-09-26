@@ -408,7 +408,8 @@ on_tree_view_button_pressed( GtkWidget *      view,
             gtk_tree_path_free( path );
         }
 
-        ( (PopupFunc*)func )( view, event );
+        if( func != NULL )
+            ( (PopupFunc*)func )( view, event );
 
         return TRUE;
     }
