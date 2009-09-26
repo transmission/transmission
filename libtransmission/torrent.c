@@ -1235,6 +1235,7 @@ freeTorrent( tr_torrent * tor )
 
     tr_rcDestruct( &tor->swarmSpeed );
 
+    tr_announcerUnsubscribe( tor->tiers, tor->tiersSubscription );
     tr_announcerRemoveTorrent( session->announcer, tor );
 
     tr_bitfieldDestruct( &tor->checkedPieces );
@@ -1328,7 +1329,6 @@ torrentStart( tr_torrent * tor )
          * was missed to ensure that we didn't think someone was cheating. */
         tr_free( tor->peer_id );
         tor->peer_id = tr_peerIdNew( );
-fprintf( stderr, "setting torrent \"%s\" peer_id as %s\n", tr_torrentName( tor ), tor->peer_id );
 
         tor->isRunning = 1;
         tor->preVerifyTotal = tr_cpHaveTotal( &tor->completion );
