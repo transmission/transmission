@@ -1643,7 +1643,8 @@ tr_announcerStats( const tr_torrent * torrent,
             const tr_tracker_item * tracker = tr_ptrArrayNth( (tr_ptrArray*)&tier->trackers, j );
             tr_tracker_stat * st = ret + out++;
 
-            st->host = tr_strdup( tracker->host->name );
+            tr_strlcpy( st->host, tracker->host->name, sizeof( st->host ) );
+            tr_strlcpy( st->announce, tracker->announce, sizeof( st->announce ) );
             st->tier = i + 1;
             st->isActive = tracker == tier->currentTracker;
             st->lastScrapeStartTime = tier->lastScrapeStartTime;
@@ -1679,10 +1680,7 @@ tr_announcerStats( const tr_torrent * torrent,
 
 void
 tr_announcerStatsFree( tr_tracker_stat * trackers,
-                       int               trackerCount )
+                       int trackerCount UNUSED )
 {
-    int i;
-    for( i=0; i<trackerCount; ++i )
-        tr_free( trackers[i].host );
     tr_free( trackers );
 }

@@ -254,6 +254,7 @@
    -------------------+--------------------------------------+
    trackerStats       | array of objects, each containing:   |
                       +-------------------------+------------+
+                      | announce                | string     | tr_tracker_stat
                       | downloadCount           | number     | tr_tracker_stat
                       | hasAnnounced            | boolean    | tr_tracker_stat
                       | hasScraped              | boolean    | tr_tracker_stat

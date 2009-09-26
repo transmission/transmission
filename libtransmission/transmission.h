@@ -1242,7 +1242,10 @@ typedef struct
     tr_bool hasScraped;
 
     /* ex: legaltorrents.com */
-    char * host;
+    char host[1024];
+
+    /* the full announce URL */
+    char announce[1024];
 
     /* true if we're trying to use this tracker.
        Transmission typically uses one tracker per tier. */
