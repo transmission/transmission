@@ -164,7 +164,6 @@ writeFunc( void * ptr, size_t size, size_t nmemb, void * vtask )
     const size_t byteCount = size * nmemb;
     struct tr_web_task * task = vtask;
     evbuffer_add( task->response, ptr, byteCount );
-fprintf( stderr, "writing %d bytes to task #%lu [%s], done_func %p\n", (int)(size*nmemb), task->tag, task->url, task->done_func );
     dbgmsg( "wrote %zu bytes to task %p's buffer", byteCount, task );
     return byteCount;
 }
@@ -192,7 +191,6 @@ addTask( void * vtask )
         CURL * easy;
         long timeout;
 
-fprintf( stderr, "adding task #%lu [%s]\n", task->tag, task->url );
         dbgmsg( "adding task #%lu [%s]", task->tag, task->url );
 
         easy = curl_easy_init( );
@@ -275,7 +273,6 @@ task_finish( struct tr_web_task * task, long response_code )
     dbgmsg( "finished a web task... response code is %ld", response_code );
     dbgmsg( "===================================================" );
 
-fprintf( stderr, "finishing task #%lu [%s] done_func %p\n", task->tag, task->url, task->done_func );
     if( task->done_func != NULL )
         task->done_func( task->session,
                          response_code,

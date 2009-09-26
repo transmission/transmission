@@ -1097,7 +1097,6 @@ parseAnnounceResponse( tr_tier     * tier,
     if( bencLoaded )
         tr_bencFree( &benc );
 
-fprintf( stderr, "scrapeField count is %d\n", scrapeFields );
     *gotScrape = scrapeFields >= 2;
 
     return success;
@@ -1475,7 +1474,6 @@ flushCloseMessages( tr_announcer * announcer )
     for( i=0; i<n; ++i )
     {
         struct stop_message * stop = tr_ptrArrayNth( &announcer->stops, i );
-        fprintf( stderr, "sending close message: [%s]\n", stop->url );
         tr_webRun( announcer->session, stop->url, NULL, NULL, NULL );
         stopFree( stop );
     }
