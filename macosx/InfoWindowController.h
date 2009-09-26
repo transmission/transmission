@@ -76,6 +76,7 @@
     
     NSArray * fTrackers;
     NSCache * fTrackerIconCache;
+    NSMutableDictionary * fTrackerIconCacheLeopard;
     NSMutableSet * fTrackerIconLoading;
     
     NSString * fInitialString;

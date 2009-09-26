@@ -194,12 +194,10 @@ typedef enum
     [self setWebSeedTableHidden: YES animate: NO];
     
     if ([NSApp isOnSnowLeopardOrBetter])
-    {
         fTrackerIconCache = [[NSCache alloc] init];
-        fTrackerIconLoading = [[NSMutableSet alloc] init];
-    }
     else
-        [fTrackerTable removeTableColumn: [fTrackerTable tableColumnWithIdentifier: @"Icon"]];
+        fTrackerIconCacheLeopard = [[NSMutableDictionary alloc] init];
+    fTrackerIconLoading = [[NSMutableSet alloc] init];
     
     //set blank inspector
     [self setInfoForTorrents: [NSArray array]];
@@ -239,6 +237,7 @@ typedef enum
     [fWebSeedTableAnimation release];
     
     [fTrackerIconCache release];
+    [fTrackerIconCacheLeopard release];
     [fTrackerIconLoading release];
     
     [fPreviewPanel release];
@@ -909,7 +908,8 @@ typedef enum
             else
                 baseAddress = [NSString stringWithFormat: @"http://%@", [hostComponents lastObject]];
             
-            id icon = [fTrackerIconCache objectForKey: baseAddress];
+            id icon = [NSApp isOnSnowLeopardOrBetter] ? [fTrackerIconCache objectForKey: baseAddress]
+                                                    : [fTrackerIconCacheLeopard objectForKey: baseAddress];
             if (!icon && ![fTrackerIconLoading containsObject: baseAddress])
             {
                 [fTrackerIconLoading addObject: baseAddress];
@@ -940,10 +940,14 @@ typedef enum
     if (icon)
     {
         [fTrackerIconCache setObject: icon forKey: baseAddress];
+        [fTrackerIconCacheLeopard setObject: icon forKey: baseAddress];
         [icon release];
     }
     else
+    {
         [fTrackerIconCache setObject: [NSNull null] forKey: baseAddress];
+        [fTrackerIconCacheLeopard setObject: [NSNull null] forKey: baseAddress];
+    }
     
     [fTrackerIconLoading removeObject: baseAddress];
 
