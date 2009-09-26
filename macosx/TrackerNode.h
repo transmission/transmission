@@ -30,7 +30,7 @@
     tr_tracker_stat fStat;
 }
 
-- (id) initWithTrackerStat: (tr_tracker_stat) stat;
+- (id) initWithTrackerStat: (tr_tracker_stat *) stat;
 
 - (NSString *) host;
 

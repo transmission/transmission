@@ -26,11 +26,11 @@
 
 @implementation TrackerNode
 
-- (id) initWithTrackerStat: (tr_tracker_stat) stat
+- (id) initWithTrackerStat: (tr_tracker_stat *) stat
 {
     if ((self = [super init]))
     {
-        fStat = stat;
+        fStat = *stat;
     }
     
     return self;

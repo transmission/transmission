@@ -756,7 +756,7 @@ int trashDataFile(const char * filename)
             prevTier = stats[i].tier;
         }
         
-        TrackerNode * tracker = [[TrackerNode alloc] initWithTrackerStat: stats[i]];
+        TrackerNode * tracker = [[TrackerNode alloc] initWithTrackerStat: &stats[i]];
         [trackers addObject: tracker];
         [tracker release];
     }
