@@ -188,11 +188,6 @@
 - (NSString *) remainingTimeString;
 
 - (NSString *) stateString;
-
-- (NSInteger) seeders;
-- (NSInteger) leechers;
-- (NSInteger) completedFromTracker;
-
 - (NSInteger) totalPeersConnected;
 - (NSInteger) totalPeersTracker;
 - (NSInteger) totalPeersIncoming;

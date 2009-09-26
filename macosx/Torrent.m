@@ -745,7 +745,7 @@ int trashDataFile(const char * filename)
     int count;
     tr_tracker_stat * stats = tr_torrentTrackers(fHandle, &count);
     
-    NSMutableArray * trackers = [NSMutableArray arrayWithCapacity: count + stats[count-1].tier + 1];
+    NSMutableArray * trackers = [NSMutableArray arrayWithCapacity: count + stats[count-1].tier];
     
     int prevTier = -1;
     for (int i=0; i < count; ++i)
@@ -1205,21 +1205,6 @@ int trashDataFile(const char * filename)
         case TR_STATUS_SEED:
             return NSLocalizedString(@"Seeding", "Torrent -> status string");
     }
-}
-
-- (NSInteger) seeders
-{
-    return fStat->seeders;
-}
-
-- (NSInteger) leechers
-{
-    return fStat->leechers;
-}
-
-- (NSInteger) completedFromTracker
-{
-    return fStat->timesCompleted;
 }
 
 - (NSInteger) totalPeersConnected
