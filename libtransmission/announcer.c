@@ -1245,7 +1245,10 @@ onAnnounceDone( tr_session   * session,
             tierIncrementTracker( tier );
     }
 
-    ++announcer->announceSlotsAvailable;
+    if( announcer != NULL )
+    {
+        ++announcer->announceSlotsAvailable;
+    }
 
     tr_free( data );
 }
