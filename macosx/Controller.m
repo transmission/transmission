@@ -2027,7 +2027,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 for (NSString * tracker in [torrent allTrackersFlat])
                 {
                     if ([tracker rangeOfString: searchString options:
-                            (NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch | NSWidthInsensitiveSearch)].location != NSNotFound)
+                            (NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch)].location != NSNotFound)
                     {
                         removeTextField = NO;
                         break;
@@ -2040,7 +2040,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             else
             {
                 if ([[torrent name] rangeOfString: searchString options:
-                        (NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch | NSWidthInsensitiveSearch)].location == NSNotFound)
+                        (NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch)].location == NSNotFound)
                     continue;
             }
         }
