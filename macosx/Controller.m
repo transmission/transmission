@@ -2023,11 +2023,11 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         {
             if (filterTracker)
             {
-                #warning fix!
-                /*BOOL removeTextField = YES;
-                for (NSString * tracker in [torrent allTrackers: NO])
+                BOOL removeTextField = YES;
+                for (NSString * tracker in [torrent allTrackersFlat])
                 {
-                    if ([tracker rangeOfString: searchString options: NSCaseInsensitiveSearch].location != NSNotFound)
+                    if ([tracker rangeOfString: searchString options:
+                            (NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch | NSWidthInsensitiveSearch)].location != NSNotFound)
                     {
                         removeTextField = NO;
                         break;
@@ -2035,11 +2035,12 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 }
                 
                 if (removeTextField)
-                    continue;*/
+                    continue;
             }
             else
             {
-                if ([[torrent name] rangeOfString: searchString options: NSCaseInsensitiveSearch].location == NSNotFound)
+                if ([[torrent name] rangeOfString: searchString options:
+                        (NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch | NSWidthInsensitiveSearch)].location == NSNotFound)
                     continue;
             }
         }
