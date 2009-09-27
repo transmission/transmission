@@ -9,12 +9,18 @@
 #include "icons.h"
 
 #ifdef HAVE_GIO
+ #if GTK_CHECK_VERSION( 2, 12, 0 )
+   #define USE_GIO_ICONS
+ #endif
+#endif
+
+#ifdef USE_GIO_ICONS
  #include <gio/gio.h>
 #endif
 
 #define VOID_PIXBUF_KEY "void-pixbuf"
 
-#ifdef HAVE_GIO
+#ifdef USE_GIO_ICONS
 static const char *
 get_static_string( const char *s )
 {
@@ -90,7 +96,7 @@ icon_cache_new (GtkWidget * for_widget,
     return icon_cache;
 }
 
-#ifdef HAVE_GIO
+#ifdef USE_GIO_ICONS
 static const char *
 _icon_cache_get_icon_key( GIcon * icon )
 {
@@ -215,7 +221,7 @@ icon_cache_get_mime_type_icon( IconCache  * icon_cache,
     return pixbuf;
 }
 
-#else /* HAVE_GIO */
+#else /* USE_GIO_ICONS */
 
 static GdkPixbuf *
 icon_cache_get_mime_type_icon( IconCache  * icon_cache,
@@ -275,7 +281,7 @@ get_mime_type_icon( const char   * mime_type,
 const char * 
 get_mime_type_from_filename( const char * file G_GNUC_UNUSED )
 {
-#ifdef HAVE_GIO
+#ifdef USE_GIO_ICONS
     char * tmp = g_content_type_guess( file, NULL, 0, NULL );
     const char * ret = get_static_string( tmp );
     g_free( tmp );
