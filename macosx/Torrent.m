@@ -769,8 +769,10 @@ int trashDataFile(const char * filename)
 {
     NSMutableArray * allTrackers = [NSMutableArray arrayWithCapacity: fInfo->trackerCount];
     
-    for (NSInteger i = 0, tier = -1; i < fInfo->trackerCount; i++)
+    for (NSInteger i=0; i < fInfo->trackerCount; i++)
         [allTrackers addObject: [NSString stringWithUTF8String: fInfo->trackers[i].announce]];
+    
+    return allTrackers;
 }
 
 /*- (BOOL) updateAllTrackersForAdd: (NSMutableArray *) trackers
