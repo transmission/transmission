@@ -29,7 +29,6 @@
 #import "Controller.h"
 #import "Torrent.h"
 #import "TorrentGroup.h"
-#import "TorrentCell.h"
 #import "TorrentTableView.h"
 #import "CreatorWindowController.h"
 #import "StatsWindowController.h"

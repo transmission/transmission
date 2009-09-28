@@ -28,6 +28,7 @@
 
 @class Torrent;
 @class TrackerTableView;
+@class TrackerCell;
 @class FileOutlineController;
 @class PiecesView;
 
@@ -53,6 +54,7 @@
     IBOutlet NSButton * fRevealDataButton;
     
     IBOutlet TrackerTableView * fTrackerTable;
+    TrackerCell * fTrackerCell;
     IBOutlet NSSegmentedControl * fTrackerAddRemoveControl;
     
     NSArray * fPeers, * fWebSeeds;

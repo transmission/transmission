@@ -23,6 +23,8 @@
  *****************************************************************************/
 
 #import "TrackerNode.h"
+#import "NSApplicationAdditions.h"
+#import "NSStringAdditions.h"
 
 @implementation TrackerNode
 
@@ -36,9 +38,90 @@
     return self;
 }
 
+- (id) copyWithZone: (NSZone *) zone
+{
+    //this object is essentially immutable after initial setup
+    return [self retain];
+}
+
 - (NSString *) host
 {
     return [NSString stringWithUTF8String: fStat.host];
+}
+
+#warning work in peer count?
+#warning consider "isActive"
+- (NSString *) lastAnnounceStatusString
+{
+    NSString * dateString;
+    if (fStat.hasAnnounced && fStat.lastAnnounceTime != 0)
+    {
+        NSDate * announceDate = [NSDate dateWithTimeIntervalSince1970: fStat.lastAnnounceTime];
+        if ([NSApp isOnSnowLeopardOrBetter])
+            dateString = [NSDateFormatter localizedStringFromDate: announceDate dateStyle: NSDateFormatterFullStyle
+                            timeStyle: NSDateFormatterShortStyle];
+        else
+        {
+            NSDateFormatter * dateFormatter = [[NSDateFormatter alloc] init];
+            [dateFormatter setDateStyle: NSDateFormatterFullStyle];
+            [dateFormatter setTimeStyle: NSDateFormatterShortStyle];
+            
+            dateString = [dateFormatter stringFromDate: announceDate];
+            [dateFormatter release];
+        }
+    }
+    else
+        dateString = NSLocalizedString(@"N/A", "Tracker last announce");
+    
+    if (fStat.hasAnnounced && !fStat.lastAnnounceSucceeded)
+        dateString = [NSString stringWithFormat: @"%@: %@ - %@", NSLocalizedString(@"Announce error", "Tracker last announce"),
+                        [NSString stringWithUTF8String: fStat.lastAnnounceResult], dateString];
+    else
+        dateString = [NSString stringWithFormat: NSLocalizedString(@"Last Announce: %@", "Tracker last announce"), dateString];
+    
+    return dateString;
+}
+
+- (NSString *) nextAnnounceStatusString
+{
+    if (fStat.isAnnouncing)
+        return [NSLocalizedString(@"Announce in progress", "Tracker next announce") stringByAppendingEllipsis];
+    else if (fStat.willAnnounce)
+        return [NSString stringWithFormat: NSLocalizedString(@"Next announce in %@", "Tracker next announce"),
+                [NSString timeString: fStat.nextAnnounceTime - [[NSDate date] timeIntervalSince1970] showSeconds: YES]];
+    else
+        return NSLocalizedString(@"Announce not scheduled", "Tracker next announce");
+}
+
+- (NSString *) lastScrapeStatusString
+{
+    NSString * dateString;
+    if (fStat.hasScraped && fStat.lastScrapeTime != 0)
+    {
+        NSDate * scrapeDate = [NSDate dateWithTimeIntervalSince1970: fStat.lastScrapeTime];
+        if ([NSApp isOnSnowLeopardOrBetter])
+            dateString = [NSDateFormatter localizedStringFromDate: scrapeDate dateStyle: NSDateFormatterFullStyle
+                            timeStyle: NSDateFormatterShortStyle];
+        else
+        {
+            NSDateFormatter * dateFormatter = [[NSDateFormatter alloc] init];
+            [dateFormatter setDateStyle: NSDateFormatterFullStyle];
+            [dateFormatter setTimeStyle: NSDateFormatterShortStyle];
+            
+            dateString = [dateFormatter stringFromDate: scrapeDate];
+            [dateFormatter release];
+        }
+    }
+    else
+        dateString = NSLocalizedString(@"N/A", "Tracker last announce");
+    
+    if (fStat.hasScraped && !fStat.lastScrapeSucceeded)
+        dateString = [NSString stringWithFormat: @"%@: %@ - %@", NSLocalizedString(@"Scrape error", "Tracker last announce"),
+                        [NSString stringWithUTF8String: fStat.lastScrapeResult], dateString];
+    else
+        dateString = [NSString stringWithFormat: NSLocalizedString(@"Last Scrape: %@", "Tracker last announce"), dateString];
+    
+    return dateString;
 }
 
 @end

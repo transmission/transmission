@@ -32,6 +32,7 @@
 #import "PeerProgressIndicatorCell.h"
 #import "PiecesView.h"
 #import "Torrent.h"
+#import "TrackerCell.h"
 #import "TrackerNode.h"
 #import "TrackerTableView.h"
 #include "utils.h" //tr_getRatio()
@@ -44,6 +45,8 @@
 #define TAB_OPTIONS_IDENT @"Options"
 
 #define TAB_MIN_HEIGHT 250
+
+#define TRACKER_GROUP_SEPARATOR_HEIGHT 14.0
 
 #define PIECES_CONTROL_PROGRESS 0
 #define PIECES_CONTROL_AVAILABLE 1
@@ -96,7 +99,12 @@ typedef enum
 
 - (id) init
 {
-    return [super initWithWindowNibName: @"InfoWindow"];
+    if ((self = [super initWithWindowNibName: @"InfoWindow"]))
+    {
+        fTrackerCell = [[TrackerCell alloc] init];
+    }
+    
+    return self;
 }
 
 - (void) awakeFromNib
@@ -235,6 +243,8 @@ typedef enum
     [fTrackers release];
     
     [fWebSeedTableAnimation release];
+    
+    [fTrackerCell release];
     
     [fTrackerIconCache release];
     [fTrackerIconCacheLeopard release];
@@ -890,10 +900,11 @@ typedef enum
     }
     else if (tableView == fTrackerTable)
     {
-        NSString * ident = [column identifier];
+        //NSString * ident = [column identifier];
         id item = [fTrackers objectAtIndex: row];
         
-        if ([ident isEqualToString: @"Icon"])
+        #warning isn't used
+        /*if ([ident isEqualToString: @"Icon"])
         {
             NSAssert([item isKindOfClass: [TrackerNode class]], @"Value passed to tracker table's icon row is not a TrackerNode!");
             
@@ -917,11 +928,13 @@ typedef enum
             }
             
             return (icon && icon != [NSNull null]) ? icon : [NSImage imageNamed: @"FavIcon.png"];
-        }
-        if ([ident isEqualToString: @"Address"])
-            return [(TrackerNode *)item host];
-        else
+        }*/ 
+        
+        if ([item isKindOfClass: [NSNumber class]])
             return [NSString stringWithFormat: NSLocalizedString(@"Tier %d", "Inspector -> tracker table"), [item integerValue]];
+        else
+            return item;
+
     }
     return nil;
 }
@@ -954,16 +967,26 @@ typedef enum
     [pool drain];
 }
 
-- (NSCell *)tableView: (NSTableView *) tableView dataCellForTableColumn: (NSTableColumn *) tableColumn row: (NSInteger) row
+- (NSCell *) tableView: (NSTableView *) tableView dataCellForTableColumn: (NSTableColumn *) tableColumn row: (NSInteger) row
 {
     if (tableView == fTrackerTable)
     {
-        //group row the full column width
-        if (!tableColumn && [[fTrackers objectAtIndex: row] isKindOfClass: [NSNumber class]])
-            return [[tableView tableColumnWithIdentifier: @"Address"] dataCell];
+        const BOOL group = [[fTrackers objectAtIndex: row] isKindOfClass: [NSNumber class]];
+        return group ? [tableColumn dataCellForRow: row] : fTrackerCell;
     }
     
     return nil;
+}
+
+- (CGFloat) tableView: (NSTableView *) tableView heightOfRow: (NSInteger) row
+{
+    if (tableView == fTrackerTable)
+    {
+        if ([[fTrackers objectAtIndex: row] isKindOfClass: [NSNumber class]])
+            return TRACKER_GROUP_SEPARATOR_HEIGHT;
+    }
+    
+    return [tableView rowHeight];
 }
 
 - (void) tableView: (NSTableView *) tableView willDisplayCell: (id) cell forTableColumn: (NSTableColumn *) tableColumn
@@ -1731,7 +1754,7 @@ typedef enum
     
     [fTrackerTable reloadData];
     [fTrackerTable selectRowIndexes: [NSIndexSet indexSetWithIndex: [fTrackers count]-1] byExtendingSelection: NO];
-    [fTrackerTable editColumn: [fTrackerTable columnWithIdentifier: @"Address"] row: [fTrackers count]-1 withEvent: nil select: YES];
+    [fTrackerTable editColumn: [fTrackerTable columnWithIdentifier: @"Tracker"] row: [fTrackers count]-1 withEvent: nil select: YES];
 }
 
 - (void) removeTrackers

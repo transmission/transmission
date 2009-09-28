@@ -1,6 +1,6 @@
 /******************************************************************************
  * $Id$
- *
+ * 
  * Copyright (c) 2009 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
@@ -23,53 +23,10 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-#import <transmission.h>
 
-@interface TrackerNode : NSObject
+@interface TrackerCell : NSActionCell
 {
-    tr_tracker_stat fStat;
+    NSMutableDictionary * fNameAttributes, * fStatusAttributes;
 }
-
-- (id) initWithTrackerStat: (tr_tracker_stat *) stat;
-
-- (NSString *) host;
-
-- (NSString *) lastAnnounceStatusString;
-- (NSString *) nextAnnounceStatusString;
-- (NSString *) lastScrapeStatusString;
-
-#if 0
-
-- (BOOL) isActive;
-- (int) tier;
-
-- (BOOL) isAnnouncing;
-- (BOOL) hasAnnounced;
-- (BOOL) willAnnounce;
-- (NSDate *) nextAnnounceDate;
-
-- (BOOL) isScraping;
-- (BOOL) hasScraped;
-- (BOOL) willScrape;
-- (NSDate *) nextScrapeDate;
-
-- (int) lastAnnouncePeerCount;
-- (NSString *) lastAnnounceResult;
-- (NSDate *) lastAnnounceDate;
-- (NSDate *) lastAnnounceStartDate;
-- (BOOL) lastAnnounceSucceeded;
-- (NSDate *) lastAnnounceDate;
-
-- (NSString *) lastScrapeResult;
-- (NSDate *) lastScrapeDate;
-- (NSDate *) lastScrapeStartDate;
-- (BOOL) lastScrapeSucceeded;
-- (NSDate *) lastScrapeDate;
-
-- (int) seederCount;
-- (int) leecherCount;
-- (int) downloadCount;
-
-#endif
 
 @end

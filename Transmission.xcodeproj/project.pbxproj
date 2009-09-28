@@ -80,6 +80,7 @@
 		A215BF5C0F02EBB800350CDB /* GroupRules.xib in Resources */ = {isa = PBXBuildFile; fileRef = A215BF5B0F02EBB800350CDB /* GroupRules.xib */; };
 		A219798B0D07B78400438EA7 /* GroupToolbarItem.m in Sources */ = {isa = PBXBuildFile; fileRef = A219798A0D07B78400438EA7 /* GroupToolbarItem.m */; };
 		A21A9BE2106D86A800F1C3C1 /* TrackerNode.m in Sources */ = {isa = PBXBuildFile; fileRef = A21A9BE1106D86A800F1C3C1 /* TrackerNode.m */; };
+		A21A9D41106EC2E800F1C3C1 /* TrackerCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A21A9D40106EC2E800F1C3C1 /* TrackerCell.m */; };
 		A21DFF100A292B2B007C5F76 /* Transfers.png in Resources */ = {isa = PBXBuildFile; fileRef = A21DFF0F0A292B2B007C5F76 /* Transfers.png */; };
 		A21FBBAB0EDA78C300BC3C51 /* bandwidth.h in Headers */ = {isa = PBXBuildFile; fileRef = A21FBBA90EDA78C300BC3C51 /* bandwidth.h */; };
 		A21FBBAC0EDA78C300BC3C51 /* bandwidth.c in Sources */ = {isa = PBXBuildFile; fileRef = A21FBBAA0EDA78C300BC3C51 /* bandwidth.c */; };
@@ -489,6 +490,8 @@
 		A219798A0D07B78400438EA7 /* GroupToolbarItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GroupToolbarItem.m; path = macosx/GroupToolbarItem.m; sourceTree = "<group>"; };
 		A21A9BE0106D86A800F1C3C1 /* TrackerNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TrackerNode.h; path = macosx/TrackerNode.h; sourceTree = "<group>"; };
 		A21A9BE1106D86A800F1C3C1 /* TrackerNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TrackerNode.m; path = macosx/TrackerNode.m; sourceTree = "<group>"; };
+		A21A9D3F106EC2E800F1C3C1 /* TrackerCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TrackerCell.h; path = macosx/TrackerCell.h; sourceTree = "<group>"; };
+		A21A9D40106EC2E800F1C3C1 /* TrackerCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TrackerCell.m; path = macosx/TrackerCell.m; sourceTree = "<group>"; };
 		A21DFF0F0A292B2B007C5F76 /* Transfers.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Transfers.png; path = macosx/Images/Transfers.png; sourceTree = "<group>"; };
 		A21FBBA90EDA78C300BC3C51 /* bandwidth.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bandwidth.h; path = libtransmission/bandwidth.h; sourceTree = "<group>"; };
 		A21FBBAA0EDA78C300BC3C51 /* bandwidth.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bandwidth.c; path = libtransmission/bandwidth.c; sourceTree = "<group>"; };
@@ -1381,6 +1384,8 @@
 				A2AA579B0ADFCAB400CA59F6 /* PiecesView.m */,
 				A2725D5B0DE7507C003445E7 /* TrackerTableView.h */,
 				A2725D5C0DE7507C003445E7 /* TrackerTableView.m */,
+				A21A9D3F106EC2E800F1C3C1 /* TrackerCell.h */,
+				A21A9D40106EC2E800F1C3C1 /* TrackerCell.m */,
 			);
 			name = "Info Window";
 			sourceTree = "<group>";
@@ -1996,6 +2001,7 @@
 				A23F526F0F14395900AA02E3 /* PredicateEditorRowTemplateAny.m in Sources */,
 				A29D84041049C25600D1987A /* NSApplicationAdditions.m in Sources */,
 				A21A9BE2106D86A800F1C3C1 /* TrackerNode.m in Sources */,
+				A21A9D41106EC2E800F1C3C1 /* TrackerCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
