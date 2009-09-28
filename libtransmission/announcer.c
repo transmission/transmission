@@ -316,6 +316,9 @@ trackerNew( tr_announcer  * announcer,
     tracker->announce = tr_strdup( announce );
     tracker->scrape = tr_strdup( scrape );
     generateKeyParam( tracker->key_param, KEYLEN );
+    tracker->seederCount = -1;
+    tracker->leecherCount = -1;
+    tracker->downloadCount = -1;
     return tracker;
 }
 

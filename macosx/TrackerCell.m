@@ -134,20 +134,23 @@ NSMutableSet * fTrackerIconLoading;
     [nameString drawInRect: nameRect];
     
     //count strings
-    NSString * seederBaseString = [NSLocalizedString(@"Seeders", "tracker peer stat") stringByAppendingFormat: @": %d",
-                                    [node totalSeeders]];
+    NSString * seederBaseString = [NSLocalizedString(@"Seeders", "tracker peer stat") stringByAppendingFormat: @": %@",
+                                    [node totalSeeders] != -1 ? [NSString stringWithFormat: @"%d", [node totalSeeders]]
+                                                                : NSLocalizedString(@"N/A", "tracker peer stat")];
     NSAttributedString * seederString = [self attributedStatusWithString: seederBaseString color: statusColor];
     const NSRect seederRect = [self rectForCountWithString: seederString withAboveRect: nameRect inBounds: cellFrame];
     [seederString drawInRect: seederRect];
     
-    NSString * leecherBaseString = [NSLocalizedString(@"Leechers", "tracker peer stat") stringByAppendingFormat: @": %d",
-                                    [node totalLeechers]];
+    NSString * leecherBaseString = [NSLocalizedString(@"Leechers", "tracker peer stat") stringByAppendingFormat: @": %@",
+                                    [node totalLeechers] != -1 ? [NSString stringWithFormat: @"%d", [node totalLeechers]]
+                                                                : NSLocalizedString(@"N/A", "tracker peer stat")];
     NSAttributedString * leecherString = [self attributedStatusWithString: leecherBaseString color: statusColor];
     const NSRect leecherRect = [self rectForCountWithString: leecherString withAboveRect: seederRect inBounds: cellFrame];
     [leecherString drawInRect: leecherRect];
     
-    NSString * downloadedBaseString = [NSLocalizedString(@"Downloaded", "tracker peer stat") stringByAppendingFormat: @": %d",
-                                    [node totalDownloaded]];
+    NSString * downloadedBaseString = [NSLocalizedString(@"Downloaded", "tracker peer stat") stringByAppendingFormat: @": %@",
+                                            [node totalDownloaded] != -1 ? [NSString stringWithFormat: @"%d", [node totalDownloaded]]
+                                                                        : NSLocalizedString(@"N/A", "tracker peer stat")];
     NSAttributedString * downloadedString = [self attributedStatusWithString: downloadedBaseString color: statusColor];
     const NSRect downloadedRect = [self rectForCountWithString: downloadedString withAboveRect: leecherRect inBounds: cellFrame];
     [downloadedString drawInRect: downloadedRect];

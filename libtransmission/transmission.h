@@ -1232,7 +1232,7 @@ void           tr_torrentPeersFree( tr_peer_stat * peerStats,
 
 typedef struct
 {
-    /* how many downloads this tracker knows of */
+    /* how many downloads this tracker knows of (-1 means it does not know) */
     int downloadCount;
 
     /* whether or not we've ever sent this tracker an announcement */
@@ -1293,7 +1293,7 @@ typedef struct
        if "hasScraped" is false, this field is undefined */
     time_t lastScrapeTime;
 
-    /* number of leechers this tracker knows of */
+    /* number of leechers this tracker knows of (-1 means it does not know) */
     int leecherCount;
 
     /* when the next periodic announce message will be sent out.
@@ -1304,7 +1304,7 @@ typedef struct
        if "willScrape" is false, this field is undefined */
     time_t nextScrapeTime;
 
-    /* number of seeders this tracker knows of */
+    /* number of seeders this tracker knows of (-1 means it does not know) */
     int seederCount;
 
     /* which tier this tracker is in */
