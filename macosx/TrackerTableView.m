@@ -23,6 +23,8 @@
  *****************************************************************************/
 
 #import "TrackerTableView.h"
+#import "NSApplicationAdditions.h"
+#import "TrackerNode.h"
 
 @implementation TrackerTableView
 
@@ -35,6 +37,48 @@
 - (void) setTrackers: (NSArray *) trackers
 {
     fTrackers = trackers;
+}
+
+- (IBAction) copy: (id) sender
+{
+    NSMutableArray * addresses = [NSMutableArray arrayWithCapacity: [fTrackers count]];
+    NSIndexSet * indexes = [self selectedRowIndexes];
+    for (NSUInteger i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
+    {
+        id item = [fTrackers objectAtIndex: i];
+        if ([item isKindOfClass: [NSNumber class]])
+        {
+            for (++i; i < [fTrackers count] && ![[fTrackers objectAtIndex: i] isKindOfClass: [NSNumber class]]; ++i)
+                [addresses addObject: [(TrackerNode *)[fTrackers objectAtIndex: i] fullAnnounceAddress]];
+            --i;
+        }
+        else
+            [addresses addObject: [(TrackerNode *)item fullAnnounceAddress]];
+    }
+    
+    NSString * text = [addresses componentsJoinedByString: @"\n"];;
+    
+    NSPasteboard * pb = [NSPasteboard generalPasteboard];
+    if ([NSApp isOnSnowLeopardOrBetter])
+    {
+        [pb clearContents];
+        [pb writeObjects: [NSArray arrayWithObject: text]];
+    }
+    else
+    {
+        [pb declareTypes: [NSArray arrayWithObject: NSStringPboardType] owner: nil];
+        [pb setString: text forType: NSStringPboardType];
+    }
+}
+
+- (BOOL) validateMenuItem: (NSMenuItem *) menuItem
+{
+    SEL action = [menuItem action];
+    
+    if (action == @selector(copy:))
+        return [self numberOfSelectedRows] > 0;
+    
+    return YES;
 }
 
 //alternating rows - first row after group row is white

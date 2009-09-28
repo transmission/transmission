@@ -31,4 +31,6 @@
 
 - (void) setTrackers: (NSArray *) trackers;
 
+- (IBAction) copy: (id) sender;
+
 @end
