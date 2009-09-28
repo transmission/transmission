@@ -127,22 +127,23 @@ NSMutableSet * fTrackerIconLoading;
     
     //name
     NSAttributedString * nameString = [self attributedNameWithColor: nameColor];
-    NSRect nameRect = [self rectForNameWithString: nameString inBounds: cellFrame];
+    const NSRect nameRect = [self rectForNameWithString: nameString inBounds: cellFrame];
     [nameString drawInRect: nameRect];
     
     //status strings
     TrackerNode * node = (TrackerNode *)[self objectValue];
     
     NSAttributedString * lastAnnounceString = [self attributedStatusWithString: [node lastAnnounceStatusString] color: statusColor];
-    NSRect lastAnnounceRect = [self rectForStatusWithString: lastAnnounceString withAboveRect: nameRect inBounds: cellFrame];
+    const NSRect lastAnnounceRect = [self rectForStatusWithString: lastAnnounceString withAboveRect: nameRect inBounds: cellFrame];
     [lastAnnounceString drawInRect: lastAnnounceRect];
     
     NSAttributedString * nextAnnounceString = [self attributedStatusWithString: [node nextAnnounceStatusString] color: statusColor];
-    NSRect nextAnnounceRect = [self rectForStatusWithString: nextAnnounceString withAboveRect: lastAnnounceRect inBounds: cellFrame];
+    const NSRect nextAnnounceRect = [self rectForStatusWithString: nextAnnounceString withAboveRect: lastAnnounceRect
+                                        inBounds: cellFrame];
     [nextAnnounceString drawInRect: nextAnnounceRect];
     
     NSAttributedString * lastScrapeString = [self attributedStatusWithString: [node lastScrapeStatusString] color: statusColor];
-    NSRect lastScrapeRect = [self rectForStatusWithString: lastScrapeString withAboveRect: nextAnnounceRect inBounds: cellFrame];
+    const NSRect lastScrapeRect = [self rectForStatusWithString: lastScrapeString withAboveRect: nextAnnounceRect inBounds: cellFrame];
     [lastScrapeString drawInRect: lastScrapeRect];
 }
 
@@ -187,14 +188,14 @@ NSMutableSet * fTrackerIconLoading;
     
     if (icon)
     {
-        [fTrackerIconCache setObject: icon forKey: baseAddress];
-        [fTrackerIconCacheLeopard setObject: icon forKey: baseAddress];
+        [NSApp isOnSnowLeopardOrBetter] ? [fTrackerIconCache setObject: icon forKey: baseAddress];
+                                        : [fTrackerIconCacheLeopard setObject: icon forKey: baseAddress];
         [icon release];
     }
     else
     {
-        [fTrackerIconCache setObject: [NSNull null] forKey: baseAddress];
-        [fTrackerIconCacheLeopard setObject: [NSNull null] forKey: baseAddress];
+        [NSApp isOnSnowLeopardOrBetter] ? [fTrackerIconCache setObject: [NSNull null] forKey: baseAddress];
+                                        : [fTrackerIconCacheLeopard setObject: [NSNull null] forKey: baseAddress];
     }
     
     [fTrackerIconLoading removeObject: baseAddress];
