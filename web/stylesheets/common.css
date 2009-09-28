@@ -219,7 +219,7 @@ div.torrent_global_details div#torrent_global_download {
 }
 
 div.torrent_global_details div#torrent_global_upload {
-	background: url('../images/graphics/transfer_arrows.png') left -11px no-repeat;
+	background: url('../images/graphics/transfer_arrows.png') left -12px no-repeat;
 }
 
 div.torrent_global_details div#torrent_global_download {
