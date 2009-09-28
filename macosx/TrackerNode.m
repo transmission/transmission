@@ -54,7 +54,6 @@
     return [NSString stringWithUTF8String: fStat.announce];
 }
 
-#warning consider "isActive"
 - (NSString *) lastAnnounceStatusString
 {
     NSString * dateString;
@@ -81,13 +80,17 @@
         dateString = [NSString stringWithFormat: NSLocalizedString(@"Last Announce: %@", "Tracker last announce"),
                         dateString];
         if (fStat.hasAnnounced && fStat.lastAnnounceSucceeded)
-            dateString = [dateString stringByAppendingFormat: NSLocalizedString(@" (got %d peers)", "Tracker last announce"),
-                            fStat.lastAnnouncePeerCount];
+        {
+            NSString * peerString = [NSString stringWithFormat: NSLocalizedString(@"got %d peers", "Tracker last announce"),
+                                        fStat.lastAnnouncePeerCount];
+            dateString = [dateString stringByAppendingFormat: @" (%@)", peerString];
+        }
     }
     
     return dateString;
 }
 
+#warning consider "isActive"
 - (NSString *) nextAnnounceStatusString
 {
     if (fStat.isAnnouncing)
@@ -95,8 +98,10 @@
     else if (fStat.willAnnounce)
         return [NSString stringWithFormat: NSLocalizedString(@"Next announce in %@", "Tracker next announce"),
                 [NSString timeString: fStat.nextAnnounceTime - [[NSDate date] timeIntervalSince1970] showSeconds: YES]];
-    else
+    else if (fStat.isActive)
         return NSLocalizedString(@"Announce not scheduled", "Tracker next announce");
+    else
+        return NSLocalizedString(@"Tracker will be used as a backup", "Tracker next announce");
 }
 
 - (NSString *) lastScrapeStatusString
