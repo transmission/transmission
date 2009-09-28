@@ -132,16 +132,6 @@
 - (uint64_t) size;
 - (uint64_t) sizeLeft;
 
-/*- (NSString *) trackerAddressAnnounce;
-- (NSDate *) lastAnnounceTime;
-- (NSInteger) nextAnnounceTime;
-- (NSString *) announceResponse;
-
-- (NSString *) trackerAddressScrape;
-- (NSDate *) lastScrapeTime;
-- (NSInteger) nextScrapeTime;
-- (NSString *) scrapeResponse;*/
-
 - (NSArray *) allTrackerStats;
 - (NSArray *) allTrackersFlat; //used by GroupRules
 /*- (BOOL) updateAllTrackersForAdd: (NSMutableArray *) trackers;
