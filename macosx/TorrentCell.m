@@ -73,8 +73,8 @@
 - (NSRect) rectForProgressWithString: (NSAttributedString *) string inBounds: (NSRect) bounds;
 - (NSRect) rectForStatusWithString: (NSAttributedString *) string inBounds: (NSRect) bounds;
 
-- (NSAttributedString *) attributedTitleWithColor: (NSColor *) color;
-- (NSAttributedString *) attributedStatusString: (NSString *) string withColor: (NSColor *) color;
+- (NSAttributedString *) attributedTitle;
+- (NSAttributedString *) attributedStatusString: (NSString *) string;
 
 - (NSString *) buttonString;
 - (NSString *) statusString;
@@ -130,7 +130,7 @@
 
 - (NSRect) titleRectForBounds: (NSRect) bounds
 {
-    return [self rectForTitleWithString: [self attributedTitleWithColor: nil]
+    return [self rectForTitleWithString: [self attributedTitle]
             basedOnMinimalStatusRect: [self minimalStatusRectForBounds: bounds] inBounds: bounds];
 }
 
@@ -139,7 +139,7 @@
     if (![fDefaults boolForKey: @"SmallView"])
         return NSZeroRect;
     
-    return [self rectForMinimalStatusWithString: [self attributedStatusString: [self minimalStatusString] withColor: nil]
+    return [self rectForMinimalStatusWithString: [self attributedStatusString: [self minimalStatusString]]
             inBounds: bounds];
 }
 
@@ -148,7 +148,7 @@
     if ([fDefaults boolForKey: @"SmallView"])
         return NSZeroRect;
     
-    return [self rectForProgressWithString: [self attributedStatusString: [[self representedObject] progressString] withColor: nil]
+    return [self rectForProgressWithString: [self attributedStatusString: [[self representedObject] progressString]]
             inBounds: bounds];
 }
 
@@ -176,7 +176,7 @@
     if ([fDefaults boolForKey: @"SmallView"])
         return NSZeroRect;
     
-    return [self rectForStatusWithString: [self attributedStatusString: [self statusString] withColor: nil] inBounds: bounds];
+    return [self rectForStatusWithString: [self attributedStatusString: [self statusString]] inBounds: bounds];
 }
 
 - (NSRect) controlButtonRectForBounds: (NSRect) bounds
@@ -456,18 +456,21 @@
         statusColor = [NSColor darkGrayColor];
     }
     
+    [fTitleAttributes setObject: titleColor forKey: NSForegroundColorAttributeName];
+    [fStatusAttributes setObject: statusColor forKey: NSForegroundColorAttributeName];
+    
     //minimal status
     NSRect minimalStatusRect;
     if (minimal)
     {
-        NSAttributedString * minimalString = [self attributedStatusString: [self minimalStatusString] withColor: statusColor];
+        NSAttributedString * minimalString = [self attributedStatusString: [self minimalStatusString]];
         minimalStatusRect = [self rectForMinimalStatusWithString: minimalString inBounds: cellFrame];
         
         [minimalString drawInRect: minimalStatusRect];
     }
     
     //title
-    NSAttributedString * titleString = [self attributedTitleWithColor: titleColor];
+    NSAttributedString * titleString = [self attributedTitle];
     NSRect titleRect = [self rectForTitleWithString: titleString basedOnMinimalStatusRect: minimalStatusRect inBounds: cellFrame];
     [titleString drawInRect: titleRect];
     
@@ -485,7 +488,7 @@
     //progress
     if (!minimal)
     {
-        NSAttributedString * progressString = [self attributedStatusString: [torrent progressString] withColor: statusColor];
+        NSAttributedString * progressString = [self attributedStatusString: [torrent progressString]];
         NSRect progressRect = [self rectForProgressWithString: progressString inBounds: cellFrame];
         
         [progressString drawInRect: progressRect];
@@ -548,7 +551,7 @@
     //status
     if (!minimal)
     {
-        NSAttributedString * statusString = [self attributedStatusString: [self statusString] withColor: statusColor];
+        NSAttributedString * statusString = [self attributedStatusString: [self statusString]];
         [statusString drawInRect: [self rectForStatusWithString: statusString inBounds: cellFrame]];
     }
 }
@@ -744,20 +747,14 @@
     return result;
 }
 
-- (NSAttributedString *) attributedTitleWithColor: (NSColor *) color
+- (NSAttributedString *) attributedTitle
 {
-    if (color)
-        [fTitleAttributes setObject: color forKey: NSForegroundColorAttributeName];
-    
     NSString * title = [[self representedObject] name];
     return [[[NSAttributedString alloc] initWithString: title attributes: fTitleAttributes] autorelease];
 }
 
-- (NSAttributedString *) attributedStatusString: (NSString *) string withColor: (NSColor *) color
+- (NSAttributedString *) attributedStatusString: (NSString *) string
 {
-    if (color)
-        [fStatusAttributes setObject: color forKey: NSForegroundColorAttributeName];
-    
     return [[[NSAttributedString alloc] initWithString: string attributes: fStatusAttributes] autorelease];
 }
 

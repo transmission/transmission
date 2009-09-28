@@ -41,8 +41,8 @@
 - (NSRect) rectForTitleWithString: (NSAttributedString *) string inBounds: (NSRect) bounds;
 - (NSRect) rectForStatusWithString: (NSAttributedString *) string withTitleRect: (NSRect) titleRect inBounds: (NSRect) bounds;
 
-- (NSAttributedString *) attributedTitleWithColor: (NSColor *) color;
-- (NSAttributedString *) attributedStatusWithColor: (NSColor *) color;
+- (NSAttributedString *) attributedTitle;
+- (NSAttributedString *) attributedStatus;
 
 @end
 
@@ -124,12 +124,12 @@
 
 - (NSRect) titleRectForBounds: (NSRect) bounds
 {
-    return [self rectForTitleWithString: [self attributedTitleWithColor: nil] inBounds: bounds];
+    return [self rectForTitleWithString: [self attributedTitle] inBounds: bounds];
 }
 
 - (NSRect) statusRectForBounds: (NSRect) bounds
 {
-    return [self rectForStatusWithString: [self attributedStatusWithColor: nil]
+    return [self rectForStatusWithString: [self attributedStatus]
             withTitleRect: [(FileListNode *)[self objectValue] isFolder] ? [self titleRectForBounds: bounds] : NSZeroRect
             inBounds: bounds];
 }
@@ -150,13 +150,16 @@
         statusColor = [NSColor darkGrayColor];
     }
     
+    [fTitleAttributes setObject: titleColor forKey: NSForegroundColorAttributeName];
+    [fStatusAttributes setObject: statusColor forKey: NSForegroundColorAttributeName];
+    
     //title
-    NSAttributedString * titleString = [self attributedTitleWithColor: titleColor];
+    NSAttributedString * titleString = [self attributedTitle];
     NSRect titleRect = [self rectForTitleWithString: titleString inBounds: cellFrame];
     [titleString drawInRect: titleRect];
     
     //status
-    NSAttributedString * statusString = [self attributedStatusWithColor: statusColor];
+    NSAttributedString * statusString = [self attributedStatus];
     NSRect statusRect = [self rectForStatusWithString: statusString withTitleRect: titleRect inBounds: cellFrame];
     [statusString drawInRect: statusRect];
 }
@@ -209,20 +212,14 @@
     return result;
 }
 
-- (NSAttributedString *) attributedTitleWithColor: (NSColor *) color
+- (NSAttributedString *) attributedTitle
 {
-    if (color)
-        [fTitleAttributes setObject: color forKey: NSForegroundColorAttributeName];
-        
     NSString * title = [(FileListNode *)[self objectValue] name];
     return [[[NSAttributedString alloc] initWithString: title attributes: fTitleAttributes] autorelease];
 }
 
-- (NSAttributedString *) attributedStatusWithColor: (NSColor *) color
+- (NSAttributedString *) attributedStatus
 {
-    if (color)
-        [fStatusAttributes setObject: color forKey: NSForegroundColorAttributeName];
-    
     Torrent * torrent = [(FileOutlineView *)[self controlView] torrent];
     FileListNode * node = (FileListNode *)[self objectValue];
     
