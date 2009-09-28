@@ -188,13 +188,13 @@ NSMutableSet * fTrackerIconLoading;
     
     if (icon)
     {
-        [NSApp isOnSnowLeopardOrBetter] ? [fTrackerIconCache setObject: icon forKey: baseAddress];
+        [NSApp isOnSnowLeopardOrBetter] ? [fTrackerIconCache setObject: icon forKey: baseAddress]
                                         : [fTrackerIconCacheLeopard setObject: icon forKey: baseAddress];
         [icon release];
     }
     else
     {
-        [NSApp isOnSnowLeopardOrBetter] ? [fTrackerIconCache setObject: [NSNull null] forKey: baseAddress];
+        [NSApp isOnSnowLeopardOrBetter] ? [fTrackerIconCache setObject: [NSNull null] forKey: baseAddress]
                                         : [fTrackerIconCacheLeopard setObject: [NSNull null] forKey: baseAddress];
     }
     
