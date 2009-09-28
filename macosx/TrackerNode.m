@@ -55,19 +55,15 @@
     NSString * dateString;
     if (fStat.hasAnnounced && fStat.lastAnnounceTime != 0)
     {
-        NSDate * announceDate = [NSDate dateWithTimeIntervalSince1970: fStat.lastAnnounceTime];
+        NSDateFormatter * dateFormatter = [[NSDateFormatter alloc] init];
+        [dateFormatter setDateStyle: NSDateFormatterFullStyle];
+        [dateFormatter setTimeStyle: NSDateFormatterShortStyle];
+        
         if ([NSApp isOnSnowLeopardOrBetter])
-            dateString = [NSDateFormatter localizedStringFromDate: announceDate dateStyle: NSDateFormatterFullStyle
-                            timeStyle: NSDateFormatterShortStyle];
-        else
-        {
-            NSDateFormatter * dateFormatter = [[NSDateFormatter alloc] init];
-            [dateFormatter setDateStyle: NSDateFormatterFullStyle];
-            [dateFormatter setTimeStyle: NSDateFormatterShortStyle];
-            
-            dateString = [dateFormatter stringFromDate: announceDate];
-            [dateFormatter release];
-        }
+            [dateFormatter setDoesRelativeDateFormatting: YES];
+        
+        dateString = [dateFormatter stringFromDate: [NSDate dateWithTimeIntervalSince1970: fStat.lastAnnounceTime]];
+        [dateFormatter release];
     }
     else
         dateString = NSLocalizedString(@"N/A", "Tracker last announce");
@@ -103,19 +99,15 @@
     NSString * dateString;
     if (fStat.hasScraped && fStat.lastScrapeTime != 0)
     {
-        NSDate * scrapeDate = [NSDate dateWithTimeIntervalSince1970: fStat.lastScrapeTime];
+        NSDateFormatter * dateFormatter = [[NSDateFormatter alloc] init];
+        [dateFormatter setDateStyle: NSDateFormatterFullStyle];
+        [dateFormatter setTimeStyle: NSDateFormatterShortStyle];
+        
         if ([NSApp isOnSnowLeopardOrBetter])
-            dateString = [NSDateFormatter localizedStringFromDate: scrapeDate dateStyle: NSDateFormatterFullStyle
-                            timeStyle: NSDateFormatterShortStyle];
-        else
-        {
-            NSDateFormatter * dateFormatter = [[NSDateFormatter alloc] init];
-            [dateFormatter setDateStyle: NSDateFormatterFullStyle];
-            [dateFormatter setTimeStyle: NSDateFormatterShortStyle];
-            
-            dateString = [dateFormatter stringFromDate: scrapeDate];
-            [dateFormatter release];
-        }
+            [dateFormatter setDoesRelativeDateFormatting: YES];
+        
+        dateString = [dateFormatter stringFromDate: [NSDate dateWithTimeIntervalSince1970: fStat.lastScrapeTime]];
+        [dateFormatter release];
     }
     else
         dateString = NSLocalizedString(@"N/A", "Tracker last announce");
