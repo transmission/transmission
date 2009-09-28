@@ -33,6 +33,8 @@
 #define PADDING_ABOVE_ICON 1.0
 #define PADDING_ABOVE_NAME 2.0
 #define PADDING_BETWEEN_LINES 1.0
+#define PADDING_BETWEEN_LINES_ON_SAME_LINE 3.0
+#define COUNT_WIDTH 100.0
 
 @interface TrackerCell (Private)
 
@@ -41,7 +43,9 @@
 
 - (NSRect) imageRectForBounds: (NSRect) bounds;
 - (NSRect) rectForNameWithString: (NSAttributedString *) string inBounds: (NSRect) bounds;
-- (NSRect) rectForStatusWithString: (NSAttributedString *) string withAboveRect: (NSRect) nameRect inBounds: (NSRect) bounds;
+- (NSRect) rectForCountWithString: (NSAttributedString *) string withAboveRect: (NSRect) nameRect inBounds: (NSRect) bounds;
+- (NSRect) rectForStatusWithString: (NSAttributedString *) string withAboveRect: (NSRect) aboveRect withRightRect: (NSRect) rightRect
+            inBounds: (NSRect) bounds;
 
 - (NSAttributedString *) attributedNameWithColor: (NSColor *) color;
 - (NSAttributedString *) attributedStatusWithString: (NSString *) statusString color: (NSColor *) color;
@@ -122,25 +126,46 @@ NSMutableSet * fTrackerIconLoading;
         statusColor = [NSColor darkGrayColor];
     }
     
+    TrackerNode * node = (TrackerNode *)[self objectValue];
+    
     //name
     NSAttributedString * nameString = [self attributedNameWithColor: nameColor];
     const NSRect nameRect = [self rectForNameWithString: nameString inBounds: cellFrame];
     [nameString drawInRect: nameRect];
     
-    //status strings
-    TrackerNode * node = (TrackerNode *)[self objectValue];
+    //count strings
+    NSString * seederBaseString = [NSLocalizedString(@"Seeders", "tracker peer stat") stringByAppendingFormat: @": %d",
+                                    [node totalSeeders]];
+    NSAttributedString * seederString = [self attributedStatusWithString: seederBaseString color: statusColor];
+    const NSRect seederRect = [self rectForCountWithString: seederString withAboveRect: nameRect inBounds: cellFrame];
+    [seederString drawInRect: seederRect];
     
+    NSString * leecherBaseString = [NSLocalizedString(@"Leechers", "tracker peer stat") stringByAppendingFormat: @": %d",
+                                    [node totalLeechers]];
+    NSAttributedString * leecherString = [self attributedStatusWithString: leecherBaseString color: statusColor];
+    const NSRect leecherRect = [self rectForCountWithString: leecherString withAboveRect: seederRect inBounds: cellFrame];
+    [leecherString drawInRect: leecherRect];
+    
+    NSString * downloadedBaseString = [NSLocalizedString(@"Downloaded", "tracker peer stat") stringByAppendingFormat: @": %d",
+                                    [node totalDownloaded]];
+    NSAttributedString * downloadedString = [self attributedStatusWithString: downloadedBaseString color: statusColor];
+    const NSRect downloadedRect = [self rectForCountWithString: downloadedString withAboveRect: leecherRect inBounds: cellFrame];
+    [downloadedString drawInRect: downloadedRect];
+    
+    //status strings
     NSAttributedString * lastAnnounceString = [self attributedStatusWithString: [node lastAnnounceStatusString] color: statusColor];
-    const NSRect lastAnnounceRect = [self rectForStatusWithString: lastAnnounceString withAboveRect: nameRect inBounds: cellFrame];
+    const NSRect lastAnnounceRect = [self rectForStatusWithString: lastAnnounceString withAboveRect: nameRect withRightRect: seederRect
+                                        inBounds: cellFrame];
     [lastAnnounceString drawInRect: lastAnnounceRect];
     
     NSAttributedString * nextAnnounceString = [self attributedStatusWithString: [node nextAnnounceStatusString] color: statusColor];
     const NSRect nextAnnounceRect = [self rectForStatusWithString: nextAnnounceString withAboveRect: lastAnnounceRect
-                                        inBounds: cellFrame];
+                                        withRightRect: leecherRect inBounds: cellFrame];
     [nextAnnounceString drawInRect: nextAnnounceRect];
     
     NSAttributedString * lastScrapeString = [self attributedStatusWithString: [node lastScrapeStatusString] color: statusColor];
-    const NSRect lastScrapeRect = [self rectForStatusWithString: lastScrapeString withAboveRect: nextAnnounceRect inBounds: cellFrame];
+    const NSRect lastScrapeRect = [self rectForStatusWithString: lastScrapeString withAboveRect: nextAnnounceRect
+                                    withRightRect: downloadedRect inBounds: cellFrame];
     [lastScrapeString drawInRect: lastScrapeRect];
 }
 
@@ -219,16 +244,24 @@ NSMutableSet * fTrackerIconLoading;
     return result;
 }
 
-- (NSRect) rectForStatusWithString: (NSAttributedString *) string withAboveRect: (NSRect) nameRect inBounds: (NSRect) bounds;
+- (NSRect) rectForCountWithString: (NSAttributedString *) string withAboveRect: (NSRect) nameRect inBounds: (NSRect) bounds
+{
+    return NSMakeRect(NSMaxX(bounds) - PADDING_HORIZONAL - COUNT_WIDTH,
+                        NSMaxY(nameRect) + PADDING_BETWEEN_LINES,
+                        COUNT_WIDTH, [string size].height);
+}
+
+- (NSRect) rectForStatusWithString: (NSAttributedString *) string withAboveRect: (NSRect) aboveRect withRightRect: (NSRect) rightRect
+            inBounds: (NSRect) bounds
 {
     const NSSize statusSize = [string size];
     
     NSRect result = bounds;
     result.origin.x += PADDING_STATUS_HORIZONAL;
-    result.origin.y = NSMaxY(nameRect) + PADDING_BETWEEN_LINES;
+    result.origin.y = NSMaxY(aboveRect) + PADDING_BETWEEN_LINES;
     
     result.size = statusSize;
-    result.size.width = MIN(result.size.width, NSMaxX(bounds) - NSMinX(result));
+    result.size.width = MIN(result.size.width, (NSMinX(rightRect) - PADDING_BETWEEN_LINES_ON_SAME_LINE) - NSMinX(result));
     
     return result;
 }
