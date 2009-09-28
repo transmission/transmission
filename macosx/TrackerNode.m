@@ -49,7 +49,6 @@
     return [NSString stringWithUTF8String: fStat.host];
 }
 
-#warning work in peer count?
 #warning consider "isActive"
 - (NSString *) lastAnnounceStatusString
 {
@@ -77,7 +76,13 @@
         dateString = [NSString stringWithFormat: @"%@: %@ - %@", NSLocalizedString(@"Announce error", "Tracker last announce"),
                         [NSString stringWithUTF8String: fStat.lastAnnounceResult], dateString];
     else
-        dateString = [NSString stringWithFormat: NSLocalizedString(@"Last Announce: %@", "Tracker last announce"), dateString];
+    {
+        dateString = [NSString stringWithFormat: NSLocalizedString(@"Last Announce: %@", "Tracker last announce"),
+                        dateString];
+        if (fStat.hasAnnounced && fStat.lastAnnounceSucceeded)
+            dateString = [dateString stringByAppendingFormat: NSLocalizedString(@" (got %d peers)", "Tracker last announce"),
+                            fStat.lastAnnouncePeerCount];
+    }
     
     return dateString;
 }
