@@ -111,6 +111,10 @@ EXTRA_DIST = \
     Torrent.m \
     TorrentTableView.h \
     TorrentTableView.m \
+    TrackerCell.h \
+    TrackerCell.m \
+    TrackerNode.h \
+    TrackerNode.m \
     TrackerTableView.h \
     TrackerTableView.m
 
