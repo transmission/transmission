@@ -35,6 +35,10 @@
 - (NSString *) host;
 - (NSString *) fullAnnounceAddress;
 
+- (NSInteger) totalSeeders;
+- (NSInteger) totalLeechers;
+- (NSInteger) totalDownloaded;
+
 - (NSString *) lastAnnounceStatusString;
 - (NSString *) nextAnnounceStatusString;
 - (NSString *) lastScrapeStatusString;

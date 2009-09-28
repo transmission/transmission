@@ -54,6 +54,21 @@
     return [NSString stringWithUTF8String: fStat.announce];
 }
 
+- (NSInteger) totalSeeders
+{
+    return fStat.seederCount;
+}
+
+- (NSInteger) totalLeechers
+{
+    return fStat.leecherCount;
+}
+
+- (NSInteger) totalDownloaded
+{
+    return fStat.downloadCount;
+}
+
 - (NSString *) lastAnnounceStatusString
 {
     NSString * dateString;

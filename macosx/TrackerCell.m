@@ -51,16 +51,13 @@
 @implementation TrackerCell
 
 //make the favicons accessible to all tracker cells
-NSCache * fTrackerIconCache;
-NSMutableDictionary * fTrackerIconCacheLeopard;
+#warning make NSCache when 10.6-only
+NSMutableDictionary * fTrackerIconCache;
 NSMutableSet * fTrackerIconLoading;
 
 + (void) initialize
 {
-    if ([NSApp isOnSnowLeopardOrBetter])
-        fTrackerIconCache = [[NSCache alloc] init];
-    else
-        fTrackerIconCacheLeopard = [[NSMutableDictionary alloc] init];
+    fTrackerIconCache = [[NSMutableDictionary alloc] init];
     fTrackerIconLoading = [[NSMutableSet alloc] init];
 }
 
@@ -164,8 +161,7 @@ NSMutableSet * fTrackerIconLoading;
     else
         baseAddress = [NSString stringWithFormat: @"http://%@", [hostComponents lastObject]];
     
-    id icon = [NSApp isOnSnowLeopardOrBetter] ? [fTrackerIconCache objectForKey: baseAddress]
-                                            : [fTrackerIconCacheLeopard objectForKey: baseAddress];
+    id icon = [fTrackerIconCache objectForKey: baseAddress];
     if (!icon && ![fTrackerIconLoading containsObject: baseAddress])
     {
         [fTrackerIconLoading addObject: baseAddress];
@@ -188,15 +184,11 @@ NSMutableSet * fTrackerIconLoading;
     
     if (icon)
     {
-        [NSApp isOnSnowLeopardOrBetter] ? [fTrackerIconCache setObject: icon forKey: baseAddress]
-                                        : [fTrackerIconCacheLeopard setObject: icon forKey: baseAddress];
+        [fTrackerIconCache setObject: icon forKey: baseAddress];
         [icon release];
     }
     else
-    {
-        [NSApp isOnSnowLeopardOrBetter] ? [fTrackerIconCache setObject: [NSNull null] forKey: baseAddress]
-                                        : [fTrackerIconCacheLeopard setObject: [NSNull null] forKey: baseAddress];
-    }
+        [fTrackerIconCache setObject: [NSNull null] forKey: baseAddress];
     
     [fTrackerIconLoading removeObject: baseAddress];
 
