@@ -90,6 +90,7 @@ typedef enum
 - (BOOL) canQuickLook;
 - (BOOL) canQuickLookFile: (FileListNode *) item;
 
+#warning lookie
 /*- (void) addTrackers;
 - (void) removeTrackers;*/
 
@@ -201,12 +202,6 @@ typedef enum
     
     [self setWebSeedTableHidden: YES animate: NO];
     
-    if ([NSApp isOnSnowLeopardOrBetter])
-        fTrackerIconCache = [[NSCache alloc] init];
-    else
-        fTrackerIconCacheLeopard = [[NSMutableDictionary alloc] init];
-    fTrackerIconLoading = [[NSMutableSet alloc] init];
-    
     //set blank inspector
     [self setInfoForTorrents: [NSArray array]];
     
@@ -245,10 +240,6 @@ typedef enum
     [fWebSeedTableAnimation release];
     
     [fTrackerCell release];
-    
-    [fTrackerIconCache release];
-    [fTrackerIconCacheLeopard release];
-    [fTrackerIconLoading release];
     
     [fPreviewPanel release];
     
@@ -900,71 +891,14 @@ typedef enum
     }
     else if (tableView == fTrackerTable)
     {
-        //NSString * ident = [column identifier];
         id item = [fTrackers objectAtIndex: row];
-        
-        #warning isn't used
-        /*if ([ident isEqualToString: @"Icon"])
-        {
-            NSAssert([item isKindOfClass: [TrackerNode class]], @"Value passed to tracker table's icon row is not a TrackerNode!");
-            
-            NSURL * address = [NSURL URLWithString: [(TrackerNode *)item host]];
-            NSArray * hostComponents = [[address host] componentsSeparatedByString: @"."];
-            
-            //let's try getting the tracker address without using any subdomains
-            NSString * baseAddress;
-            if ([hostComponents count] > 1)
-                baseAddress = [NSString stringWithFormat: @"http://%@.%@",
-                                [hostComponents objectAtIndex: [hostComponents count] - 2], [hostComponents lastObject]];
-            else
-                baseAddress = [NSString stringWithFormat: @"http://%@", [hostComponents lastObject]];
-            
-            id icon = [NSApp isOnSnowLeopardOrBetter] ? [fTrackerIconCache objectForKey: baseAddress]
-                                                    : [fTrackerIconCacheLeopard objectForKey: baseAddress];
-            if (!icon && ![fTrackerIconLoading containsObject: baseAddress])
-            {
-                [fTrackerIconLoading addObject: baseAddress];
-                [NSThread detachNewThreadSelector: @selector(loadTrackerIcon:) toTarget: self withObject: baseAddress];
-            }
-            
-            return (icon && icon != [NSNull null]) ? icon : [NSImage imageNamed: @"FavIcon.png"];
-        }*/ 
         
         if ([item isKindOfClass: [NSNumber class]])
             return [NSString stringWithFormat: NSLocalizedString(@"Tier %d", "Inspector -> tracker table"), [item integerValue]];
         else
             return item;
-
     }
     return nil;
-}
-
-- (void) loadTrackerIcon: (NSString *) baseAddress
-{
-    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-    
-    NSURL * favIconUrl = [NSURL URLWithString: [baseAddress stringByAppendingPathComponent: @"favicon.ico"]];
-    
-    NSURLRequest * request = [NSURLRequest requestWithURL: favIconUrl cachePolicy: NSURLRequestUseProtocolCachePolicy
-                                timeoutInterval: 30.0];
-    NSData * iconData = [NSURLConnection sendSynchronousRequest: request returningResponse: NULL error: NULL];
-    NSImage * icon = [[NSImage alloc] initWithData: iconData];
-    
-    if (icon)
-    {
-        [fTrackerIconCache setObject: icon forKey: baseAddress];
-        [fTrackerIconCacheLeopard setObject: icon forKey: baseAddress];
-        [icon release];
-    }
-    else
-    {
-        [fTrackerIconCache setObject: [NSNull null] forKey: baseAddress];
-        [fTrackerIconCacheLeopard setObject: [NSNull null] forKey: baseAddress];
-    }
-    
-    [fTrackerIconLoading removeObject: baseAddress];
-
-    [pool drain];
 }
 
 - (NSCell *) tableView: (NSTableView *) tableView dataCellForTableColumn: (NSTableColumn *) tableColumn row: (NSInteger) row

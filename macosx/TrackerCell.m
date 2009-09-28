@@ -23,18 +23,21 @@
  *****************************************************************************/
 
 #import "TrackerCell.h"
+#import "NSApplicationAdditions.h"
 #import "TrackerNode.h"
 
-#define PADDING_HORIZONAL 2.0
-#define PADDING_STATUS_HORIZONAL 4.0
+#define PADDING_HORIZONAL 3.0
+#define PADDING_STATUS_HORIZONAL 3.0
 #define ICON_SIZE 14.0
-#define PADDING_BETWEEN_IMAGE_AND_NAME 4.0
+#define PADDING_BETWEEN_ICON_AND_NAME 4.0
+#define PADDING_ABOVE_ICON 1.0
 #define PADDING_ABOVE_NAME 2.0
 #define PADDING_BETWEEN_LINES 1.0
 
 @interface TrackerCell (Private)
 
 - (NSImage *) favIcon;
+- (void) loadTrackerIcon: (NSString *) baseAddress;
 
 - (NSRect) imageRectForBounds: (NSRect) bounds;
 - (NSRect) rectForNameWithString: (NSAttributedString *) string inBounds: (NSRect) bounds;
@@ -46,6 +49,20 @@
 @end
 
 @implementation TrackerCell
+
+//make the favicons accessible to all tracker cells
+NSCache * fTrackerIconCache;
+NSMutableDictionary * fTrackerIconCacheLeopard;
+NSMutableSet * fTrackerIconLoading;
+
++ (void) initialize
+{
+    if ([NSApp isOnSnowLeopardOrBetter])
+        fTrackerIconCache = [[NSCache alloc] init];
+    else
+        fTrackerIconCacheLeopard = [[NSMutableDictionary alloc] init];
+    fTrackerIconLoading = [[NSMutableSet alloc] init];
+}
 
 - (id) init
 {
@@ -88,8 +105,16 @@
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
 {
     //icon
-    [[self favIcon] drawInRect: [self imageRectForBounds: cellFrame] fromRect: NSZeroRect operation: NSCompositeSourceOver
-                    fraction: 1.0];
+    if ([NSApp isOnSnowLeopardOrBetter])
+        [[self favIcon] drawInRect: [self imageRectForBounds: cellFrame] fromRect: NSZeroRect operation: NSCompositeSourceOver
+                        fraction: 1.0 respectFlipped: YES hints: nil];
+    else
+    {
+        NSImage * icon = [self favIcon];
+        [icon setFlipped: YES];
+        [icon drawInRect: [self imageRectForBounds: cellFrame] fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
+    }
+
     
     NSColor * nameColor, * statusColor;
     if ([self backgroundStyle] == NSBackgroundStyleDark)
@@ -125,20 +150,65 @@
 
 @end
 
-
 @implementation TrackerCell (Private)
 
-#warning needed?
 - (NSImage *) favIcon
 {
-    return [NSImage imageNamed: @"FavIcon.png"];
+    NSURL * address = [NSURL URLWithString: [(TrackerNode *)[self objectValue] host]];
+    NSArray * hostComponents = [[address host] componentsSeparatedByString: @"."];
+    
+    //let's try getting the tracker address without using any subdomains
+    NSString * baseAddress;
+    if ([hostComponents count] > 1)
+        baseAddress = [NSString stringWithFormat: @"http://%@.%@",
+                        [hostComponents objectAtIndex: [hostComponents count] - 2], [hostComponents lastObject]];
+    else
+        baseAddress = [NSString stringWithFormat: @"http://%@", [hostComponents lastObject]];
+    
+    id icon = [NSApp isOnSnowLeopardOrBetter] ? [fTrackerIconCache objectForKey: baseAddress]
+                                            : [fTrackerIconCacheLeopard objectForKey: baseAddress];
+    if (!icon && ![fTrackerIconLoading containsObject: baseAddress])
+    {
+        [fTrackerIconLoading addObject: baseAddress];
+        [NSThread detachNewThreadSelector: @selector(loadTrackerIcon:) toTarget: self withObject: baseAddress];
+    }
+    
+    return (icon && icon != [NSNull null]) ? icon : [NSImage imageNamed: @"FavIcon.png"];
+}
+
+- (void) loadTrackerIcon: (NSString *) baseAddress
+{
+    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+    
+    NSURL * favIconUrl = [NSURL URLWithString: [baseAddress stringByAppendingPathComponent: @"favicon.ico"]];
+    
+    NSURLRequest * request = [NSURLRequest requestWithURL: favIconUrl cachePolicy: NSURLRequestUseProtocolCachePolicy
+                                timeoutInterval: 30.0];
+    NSData * iconData = [NSURLConnection sendSynchronousRequest: request returningResponse: NULL error: NULL];
+    NSImage * icon = [[NSImage alloc] initWithData: iconData];
+    
+    if (icon)
+    {
+        [fTrackerIconCache setObject: icon forKey: baseAddress];
+        [fTrackerIconCacheLeopard setObject: icon forKey: baseAddress];
+        [icon release];
+    }
+    else
+    {
+        [fTrackerIconCache setObject: [NSNull null] forKey: baseAddress];
+        [fTrackerIconCacheLeopard setObject: [NSNull null] forKey: baseAddress];
+    }
+    
+    [fTrackerIconLoading removeObject: baseAddress];
+
+    [pool drain];
 }
 
 - (NSRect) imageRectForBounds: (NSRect) bounds
 {
     NSRect result = bounds;
     result.origin.x += PADDING_HORIZONAL;
-    result.origin.y += PADDING_ABOVE_NAME;
+    result.origin.y += PADDING_ABOVE_ICON;
     result.size = NSMakeSize(ICON_SIZE, ICON_SIZE);
     
     return result;
@@ -149,7 +219,7 @@
     const NSSize nameSize = [string size];
     
     NSRect result = bounds;
-    result.origin.x += PADDING_HORIZONAL + ICON_SIZE + PADDING_BETWEEN_IMAGE_AND_NAME;
+    result.origin.x += PADDING_HORIZONAL + ICON_SIZE + PADDING_BETWEEN_ICON_AND_NAME;
     result.origin.y += PADDING_ABOVE_NAME;
         
     result.size = nameSize;

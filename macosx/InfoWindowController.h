@@ -53,6 +53,7 @@
     IBOutlet NSTextView * fCommentView;
     IBOutlet NSButton * fRevealDataButton;
     
+    NSArray * fTrackers;
     IBOutlet TrackerTableView * fTrackerTable;
     TrackerCell * fTrackerCell;
     IBOutlet NSSegmentedControl * fTrackerAddRemoveControl;
@@ -75,11 +76,6 @@
     IBOutlet NSTextField * fUploadLimitField, * fDownloadLimitField, * fRatioLimitField,
                         * fUploadLimitLabel, * fDownloadLimitLabel, * fPeersConnectLabel,
                         * fPeersConnectField;
-    
-    NSArray * fTrackers;
-    NSCache * fTrackerIconCache;
-    NSMutableDictionary * fTrackerIconCacheLeopard;
-    NSMutableSet * fTrackerIconLoading;
     
     NSString * fInitialString;
     

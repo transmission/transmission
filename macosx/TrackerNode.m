@@ -90,7 +90,6 @@
     return dateString;
 }
 
-#warning consider "isActive"
 - (NSString *) nextAnnounceStatusString
 {
     if (fStat.isAnnouncing)
