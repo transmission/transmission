@@ -144,8 +144,6 @@ NSMutableSet * fTrackerIconLoading;
     NSAttributedString * lastScrapeString = [self attributedStatusWithString: [node lastScrapeStatusString] color: statusColor];
     NSRect lastScrapeRect = [self rectForStatusWithString: lastScrapeString withAboveRect: nextAnnounceRect inBounds: cellFrame];
     [lastScrapeString drawInRect: lastScrapeRect];
-    
-    NSLog(@"%f", NSMaxY(lastScrapeRect)-NSMinY(cellFrame));
 }
 
 @end
