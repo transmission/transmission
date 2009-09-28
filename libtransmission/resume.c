@@ -549,6 +549,8 @@ loadFromFile( tr_torrent * tor,
     tr_bool boolVal;
     const tr_bool  wasDirty = tor->isDirty;
 
+    assert( tr_isTorrent( tor ) );
+
     filename = getResumeFilename( tor );
 
     if( tr_bencLoadFile( &top, TR_FMT_BENC, filename ) )
@@ -729,6 +731,8 @@ tr_torrentLoadResume( tr_torrent *    tor,
                       const tr_ctor * ctor )
 {
     uint64_t ret = 0;
+
+    assert( tr_isTorrent( tor ) );
 
     ret |= useManditoryFields( tor, fieldsToLoad, ctor );
     fieldsToLoad &= ~ret;
