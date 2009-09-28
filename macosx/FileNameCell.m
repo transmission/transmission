@@ -230,7 +230,7 @@
     NSString * percentString = progress == 1.0f ? @"100%" : [NSString localizedStringWithFormat: @"%.2f%%", progress * 100.0f];
     
     
-    NSString * status = [NSString localizedStringWithFormat: NSLocalizedString(@"%@ of %@",
+    NSString * status = [NSString stringWithFormat: NSLocalizedString(@"%@ of %@",
                             "Inspector -> Files tab -> file status string"), percentString, [NSString stringForFileSize: [node size]]];
     
     return [[[NSAttributedString alloc] initWithString: status attributes: fStatusAttributes] autorelease];
