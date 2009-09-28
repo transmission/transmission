@@ -88,12 +88,11 @@
         dateString = NSLocalizedString(@"N/A", "Tracker last announce");
     
     if (fStat.hasAnnounced && !fStat.lastAnnounceSucceeded)
-        dateString = [NSString stringWithFormat: @"%@: %@ - %@", NSLocalizedString(@"Announce error", "Tracker last announce"),
+        dateString = [NSLocalizedString(@"Announce error", "Tracker last announce") stringByAppendingFormat: @": %@ - %@",
                         [NSString stringWithUTF8String: fStat.lastAnnounceResult], dateString];
     else
     {
-        dateString = [NSString stringWithFormat: NSLocalizedString(@"Last Announce: %@", "Tracker last announce"),
-                        dateString];
+        dateString = [NSLocalizedString(@"Last Announce", "Tracker last announce") stringByAppendingFormat: @": %@", dateString];
         if (fStat.hasAnnounced && fStat.lastAnnounceSucceeded)
         {
             NSString * peerString = [NSString stringWithFormat: NSLocalizedString(@"got %d peers", "Tracker last announce"),
@@ -134,13 +133,13 @@
         [dateFormatter release];
     }
     else
-        dateString = NSLocalizedString(@"N/A", "Tracker last announce");
+        dateString = NSLocalizedString(@"N/A", "Tracker last scrape");
     
     if (fStat.hasScraped && !fStat.lastScrapeSucceeded)
-        dateString = [NSString stringWithFormat: @"%@: %@ - %@", NSLocalizedString(@"Scrape error", "Tracker last announce"),
+        dateString = [NSLocalizedString(@"Scrape error", "Tracker last scrape") stringByAppendingFormat: @": %@ - %@",
                         [NSString stringWithUTF8String: fStat.lastScrapeResult], dateString];
     else
-        dateString = [NSString stringWithFormat: NSLocalizedString(@"Last Scrape: %@", "Tracker last announce"), dateString];
+        dateString = [NSLocalizedString(@"Last Scrape", "Tracker last scrape") stringByAppendingFormat: @": %@", dateString];
     
     return dateString;
 }
