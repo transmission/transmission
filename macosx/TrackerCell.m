@@ -50,6 +50,7 @@
 
 - (NSAttributedString *) attributedNameWithColor: (NSColor *) color;
 - (NSAttributedString *) attributedStatusWithString: (NSString *) statusString color: (NSColor *) color;
+- (NSAttributedString *) attributedCount: (NSInteger) count color: (NSColor *) color;
 
 @end
 
@@ -135,21 +136,15 @@ NSMutableSet * fTrackerIconLoading;
     [nameString drawInRect: nameRect];
     
     //count strings
-    NSString * seederBaseString = [node totalSeeders] != -1 ? [NSString stringWithFormat: @"%d", [node totalSeeders]]
-                                                            : NSLocalizedString(@"N/A", "tracker peer stat");
-    NSAttributedString * seederString = [self attributedStatusWithString: seederBaseString color: statusColor];
+    NSAttributedString * seederString = [self attributedCount: [node totalSeeders] color: statusColor];
     const NSRect seederRect = [self rectForCountWithString: seederString withAboveRect: nameRect inBounds: cellFrame];
     [seederString drawInRect: seederRect];
     
-    NSString * leecherBaseString = [node totalLeechers] != -1 ? [NSString stringWithFormat: @"%d", [node totalLeechers]]
-                                                                : NSLocalizedString(@"N/A", "tracker peer stat");
-    NSAttributedString * leecherString = [self attributedStatusWithString: leecherBaseString color: statusColor];
+    NSAttributedString * leecherString = [self attributedCount: [node totalLeechers] color: statusColor];
     const NSRect leecherRect = [self rectForCountWithString: leecherString withAboveRect: seederRect inBounds: cellFrame];
     [leecherString drawInRect: leecherRect];
     
-    NSString * downloadedBaseString = [node totalDownloaded] != -1 ? [NSString stringWithFormat: @"%d", [node totalDownloaded]]
-                                                                    : NSLocalizedString(@"N/A", "tracker peer stat");
-    NSAttributedString * downloadedString = [self attributedStatusWithString: downloadedBaseString color: statusColor];
+    NSAttributedString * downloadedString = [self attributedCount: [node totalDownloaded] color: statusColor];
     const NSRect downloadedRect = [self rectForCountWithString: downloadedString withAboveRect: leecherRect inBounds: cellFrame];
     [downloadedString drawInRect: downloadedRect];
     
@@ -297,19 +292,25 @@ NSMutableSet * fTrackerIconLoading;
 
 - (NSAttributedString *) attributedNameWithColor: (NSColor *) color
 {
-    if (color)
-        [fNameAttributes setObject: color forKey: NSForegroundColorAttributeName];
-        
+    [fNameAttributes setObject: color forKey: NSForegroundColorAttributeName];
+    
     NSString * name = [(TrackerNode *)[self objectValue] host];
     return [[[NSAttributedString alloc] initWithString: name attributes: fNameAttributes] autorelease];
 }
 
 - (NSAttributedString *) attributedStatusWithString: (NSString *) statusString color: (NSColor *) color
 {
-    if (color)
-        [fStatusAttributes setObject: color forKey: NSForegroundColorAttributeName];
+    [fStatusAttributes setObject: color forKey: NSForegroundColorAttributeName];
     
     return [[[NSAttributedString alloc] initWithString: statusString attributes: fStatusAttributes] autorelease];
+}
+
+- (NSAttributedString *) attributedCount: (NSInteger) count color: (NSColor *) color
+{
+    [fStatusAttributes setObject: color forKey: NSForegroundColorAttributeName];
+    
+    NSString * countString = count != -1 ? [NSString stringWithFormat: @"%d", count] : NSLocalizedString(@"N/A", "tracker peer stat");
+    return [[[NSAttributedString alloc] initWithString: countString attributes: fStatusAttributes] autorelease];
 }
 
 @end
