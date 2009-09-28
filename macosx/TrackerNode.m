@@ -49,6 +49,11 @@
     return [NSString stringWithUTF8String: fStat.host];
 }
 
+- (NSString *) fullAnnounceAddress
+{
+    return [NSString stringWithUTF8String: fStat.announce];
+}
+
 #warning consider "isActive"
 - (NSString *) lastAnnounceStatusString
 {

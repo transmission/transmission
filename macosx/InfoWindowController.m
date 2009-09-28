@@ -1128,6 +1128,13 @@ typedef enum
         
         return [components componentsJoinedByString: @"\n"];
     }
+    else if (tableView == fTrackerTable)
+    {
+        id node = [fTrackers objectAtIndex: row];
+        if (![node isKindOfClass: [NSNumber class]])
+            return [(TrackerNode *)node fullAnnounceAddress];
+    }
+    
     return nil;
 }
 

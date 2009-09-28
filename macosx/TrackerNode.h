@@ -33,6 +33,7 @@
 - (id) initWithTrackerStat: (tr_tracker_stat *) stat;
 
 - (NSString *) host;
+- (NSString *) fullAnnounceAddress;
 
 - (NSString *) lastAnnounceStatusString;
 - (NSString *) nextAnnounceStatusString;
