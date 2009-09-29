@@ -1692,42 +1692,24 @@ typedef enum
 
 - (void) removeTrackers
 {
-    NSMutableIndexSet * indexes = [[[fTrackerTable selectedRowIndexes] mutableCopy] autorelease];
+    const NSInteger oldCount = [fTrackers count] - [(TrackerNode *)[fTrackers lastObject] tier];
+    NSMutableArray * addresses = [NSMutableArray arrayWithCapacity: oldCount];
     
-    //get all rows to remove
-    NSUInteger i = 0, trackerCount = 0;
-    while (i < [fTrackers count])
+    NSIndexSet * indexes = [fTrackerTable selectedRowIndexes];
+    for (NSUInteger i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
     {
-        //if a group is selected, remove all trackers in the group
-        if ([indexes containsIndex: i])
+        id item = [fTrackers objectAtIndex: i];
+        if ([item isKindOfClass: [NSNumber class]])
         {
-            for (i = i+1; i < [fTrackers count] && ![[fTrackers objectAtIndex: i] isKindOfClass: [NSNumber class]]; i++)
-            {
-                [indexes addIndex: i];
-                trackerCount++;
-            }
+            for (NSInteger j = i+1; j < [fTrackers count] && ![[fTrackers objectAtIndex: j] isKindOfClass: [NSNumber class]]; ++j, ++i)
+                [addresses addObject: [fTrackers objectAtIndex: j]];
+            --i;
         }
-        //remove empty groups
         else
-        {
-            BOOL allSelected = YES;
-            NSUInteger j;
-            for (j = i+1; j < [fTrackers count] && ![[fTrackers objectAtIndex: j] isKindOfClass: [NSNumber class]]; j++)
-            {
-                if (![indexes containsIndex: j])
-                    allSelected = NO;
-                else
-                    trackerCount++;
-            }
-            
-            if (allSelected)
-                [indexes addIndex: i];
-            
-            i = j;
-        }
+            [addresses addObject: [(TrackerNode *)item fullAnnounceAddress]];
     }
     
-    if ([fTrackers count] == [indexes count])
+    if (oldCount == [addresses count])
     {
         NSBeep();
         return;
@@ -1737,10 +1719,10 @@ typedef enum
     {
         NSAlert * alert = [[NSAlert alloc] init];
         
-        if (trackerCount > 1)
+        if ([addresses count] > 1)
         {
             [alert setMessageText: [NSString stringWithFormat: NSLocalizedString(@"Are you sure you want to remove %d trackers?",
-                                                                "Remove trackers alert -> title"), trackerCount]];
+                                                                "Remove trackers alert -> title"), [addresses count]]];
             [alert setInformativeText: NSLocalizedString(@"Once removed, Transmission will no longer attempt to contact them."
                                         " This cannot be undone.", "Remove trackers alert -> message")];
         }
@@ -1765,12 +1747,8 @@ typedef enum
             return;
     }
     
-    [fTrackers removeObjectsAtIndexes: indexes];
-    
-    #warning fix!
     Torrent * torrent = [fTorrents objectAtIndex: 0];
-    [torrent updateAllTrackersForRemove: fTrackers];
-    [fTrackerTable deselectAll: self];
+    [torrent removeTrackersWithAnnounceAddresses: addresses];
     
     //reset table with either new or old value
     [fTrackers release];
@@ -1778,6 +1756,7 @@ typedef enum
     
     [fTrackerTable setTrackers: fTrackers];
     [fTrackerTable reloadData];
+    [fTrackerTable deselectAll: self];
 }
 
 @end

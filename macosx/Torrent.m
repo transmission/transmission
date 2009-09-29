@@ -53,8 +53,6 @@
 
 - (NSString *) etaString;
 
-- (void) updateAllTrackers: (NSMutableArray *) trackers;
-
 - (void) setTimeMachineExclude: (BOOL) exclude forPath: (NSString *) path;
 
 @end
@@ -732,10 +730,23 @@ int trashDataFile(const char * filename)
     return YES;
 }
 
-#warning this doesn't work
-- (void) updateAllTrackersForRemove: (NSMutableArray *) trackers
+- (void) removeTrackersWithAnnounceAddresses: (NSArray *) trackers
 {
-    [self updateAllTrackers: trackers];
+    //recreate the tracker structure
+    const int oldTrackerCount = fInfo->trackerCount;
+    tr_tracker_info * trackerStructs = tr_new(tr_tracker_info, oldTrackerCount-1);
+    
+    NSInteger newCount = 0;
+    for (NSInteger oldIndex = 0; oldIndex < oldTrackerCount; ++newCount, ++oldIndex)
+    {
+        if (![trackers containsObject: [NSString stringWithUTF8String: fInfo->trackers[oldIndex].announce]])
+            trackerStructs[newCount] = fInfo->trackers[oldIndex];
+        else
+            --newCount;
+    }
+    
+    tr_torrentSetAnnounceList(fHandle, trackerStructs, newCount);
+    tr_free(trackerStructs);
 }
 
 - (NSString *) comment
@@ -1804,34 +1815,6 @@ int trashDataFile(const char * filename)
             return [NSString stringWithFormat: NSLocalizedString(@"%@ remaining", "Torrent -> eta string"),
                         [NSString timeString: eta showSeconds: YES maxFields: 2]];
     }
-}
-
-#warning needs to be removed
-- (void) updateAllTrackers: (NSMutableArray *) trackers
-{
-    //get count
-    NSInteger count = 0;
-    for (id object in trackers)
-        if (![object isKindOfClass: [NSNumber class]])
-            count++;
-    
-    //recreate the tracker structure
-    tr_tracker_info * trackerStructs = tr_new(tr_tracker_info, count);
-    NSInteger tier = 0, i = 0;
-    for (id object in trackers)
-    {
-        if (![object isKindOfClass: [NSNumber class]])
-        {
-            trackerStructs[i].tier = tier;
-            trackerStructs[i].announce = (char *)[object UTF8String];
-            i++;
-        }
-        else
-            tier++;
-    }
-    
-    tr_torrentSetAnnounceList(fHandle, trackerStructs, count);
-    tr_free(trackerStructs);
 }
 
 - (void) setTimeMachineExclude: (BOOL) exclude forPath: (NSString *) path
