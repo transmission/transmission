@@ -1448,6 +1448,24 @@ typedef enum
         [fTrackerTable setTrackers: fTrackers];
         [fTrackerTable reloadData];
     }
+    else
+    {
+        if ([NSApp isOnSnowLeopardOrBetter])
+        {
+            NSIndexSet * addedIndexes = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange([fTrackers count]-2, 2)];
+            NSArray * tierAndTrackerBeingAdded = [fTrackers objectsAtIndexes: addedIndexes];
+            
+            [fTrackers release];
+            fTrackers = [[torrent allTrackerStats] retain];
+            [fTrackers addObjectsFromArray: tierAndTrackerBeingAdded];
+            
+            [fTrackerTable setTrackers: fTrackers];
+            
+            NSIndexSet * updateIndexes = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fTrackers count]-2)],
+                    * columnIndexes = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [[fTrackerTable tableColumns] count])];
+            [fTrackerTable reloadDataForRowIndexes: updateIndexes columnIndexes: columnIndexes];
+        }
+    }
 }
 
 - (void) updateInfoPeers
