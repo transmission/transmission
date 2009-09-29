@@ -672,7 +672,7 @@ int trashDataFile(const char * filename)
     return fStat->leftUntilDone;
 }
 
-- (NSArray *) allTrackerStats
+- (NSMutableArray *) allTrackerStats
 {
     int count;
     tr_tracker_stat * stats = tr_torrentTrackers(fHandle, &count);
@@ -697,7 +697,7 @@ int trashDataFile(const char * filename)
     return trackers;
 }
 
-- (NSArray *) allTrackersFlat
+- (NSMutableArray *) allTrackersFlat
 {
     NSMutableArray * allTrackers = [NSMutableArray arrayWithCapacity: fInfo->trackerCount];
     
@@ -707,29 +707,36 @@ int trashDataFile(const char * filename)
     return allTrackers;
 }
 
-/*- (BOOL) updateAllTrackersForAdd: (NSMutableArray *) trackers
+- (BOOL) addTrackerToNewTier: (NSString *) tracker
 {
-    NSString * tracker = [trackers lastObject];
     tracker = [tracker stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
     
     if ([tracker rangeOfString: @"://"].location == NSNotFound)
-    {
         tracker = [@"http://" stringByAppendingString: tracker];
-        [trackers replaceObjectAtIndex: [trackers count]-1 withObject: tracker];
-    }
     
     if (!tr_httpIsValidURL([tracker UTF8String]))
         return NO;
     
-    [self updateAllTrackers: trackers];
+    //recreate the tracker structure
+    const int oldTrackerCount = fInfo->trackerCount;
+    tr_tracker_info * trackerStructs = tr_new(tr_tracker_info, oldTrackerCount+1);
+    for (NSInteger i=0; i < oldTrackerCount; ++i)
+        trackerStructs[i] = fInfo->trackers[i];
+    
+    trackerStructs[oldTrackerCount].announce = (char *)[tracker UTF8String];
+    trackerStructs[oldTrackerCount].tier = trackerStructs[oldTrackerCount-1].tier + 1;
+    
+    tr_torrentSetAnnounceList(fHandle, trackerStructs, oldTrackerCount+1);
+    tr_free(trackerStructs);
     
     return YES;
 }
 
+#warning this doesn't work
 - (void) updateAllTrackersForRemove: (NSMutableArray *) trackers
 {
     [self updateAllTrackers: trackers];
-}*/
+}
 
 - (NSString *) comment
 {
@@ -1799,6 +1806,7 @@ int trashDataFile(const char * filename)
     }
 }
 
+#warning needs to be removed
 - (void) updateAllTrackers: (NSMutableArray *) trackers
 {
     //get count

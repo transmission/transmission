@@ -56,7 +56,7 @@
             [addresses addObject: [(TrackerNode *)item fullAnnounceAddress]];
     }
     
-    NSString * text = [addresses componentsJoinedByString: @"\n"];;
+    NSString * text = [addresses componentsJoinedByString: @"\n"];
     
     NSPasteboard * pb = [NSPasteboard generalPasteboard];
     if ([NSApp isOnSnowLeopardOrBetter])
@@ -73,7 +73,7 @@
 
 - (BOOL) validateMenuItem: (NSMenuItem *) menuItem
 {
-    SEL action = [menuItem action];
+    const SEL action = [menuItem action];
     
     if (action == @selector(copy:))
         return [self numberOfSelectedRows] > 0;

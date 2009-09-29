@@ -35,6 +35,8 @@
 - (NSString *) host;
 - (NSString *) fullAnnounceAddress;
 
+- (NSInteger) tier;
+
 - (NSInteger) totalSeeders;
 - (NSInteger) totalLeechers;
 - (NSInteger) totalDownloaded;

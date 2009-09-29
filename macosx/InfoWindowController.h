@@ -53,7 +53,7 @@
     IBOutlet NSTextView * fCommentView;
     IBOutlet NSButton * fRevealDataButton;
     
-    NSArray * fTrackers;
+    NSMutableArray * fTrackers;
     IBOutlet TrackerTableView * fTrackerTable;
     TrackerCell * fTrackerCell;
     IBOutlet NSSegmentedControl * fTrackerAddRemoveControl;

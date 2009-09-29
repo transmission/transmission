@@ -54,6 +54,11 @@
     return [NSString stringWithUTF8String: fStat.announce];
 }
 
+- (NSInteger) tier
+{
+    return fStat.tier;
+}
+
 - (NSInteger) totalSeeders
 {
     return fStat.seederCount;
