@@ -1619,30 +1619,61 @@ tr_announcerStats( const tr_torrent * torrent,
             st->tier = i + 1;
             st->isActive = tracker == tier->currentTracker;
             st->lastScrapeStartTime = tier->lastScrapeStartTime;
-            if(( st->hasScraped = tier->lastScrapeTime != 0 )) {
-                st->lastScrapeTime = tier->lastScrapeTime;
-                st->lastScrapeSucceeded = tier->lastScrapeSucceeded;
-                tr_strlcpy( st->lastScrapeResult, tier->lastScrapeStr, sizeof( st->lastScrapeResult ) );
+
+            if( !st->isActive )
+            {
+                st->hasScraped = FALSE;
+                st->lastScrapeTime = 0;
+                st->lastScrapeSucceeded = FALSE;
+                st->lastScrapeResult[0] = '\0';
+                st->isScraping = FALSE;
+                st->willScrape = FALSE;
+                st->nextScrapeTime = 0;
+                st->lastAnnounceStartTime = 0;
+                st->hasAnnounced = 0;
+                st->lastAnnounceTime = 0;
+                st->lastAnnounceResult[0] = '\0';
+                st->lastAnnounceSucceeded = FALSE;
+                st->lastAnnouncePeerCount = 0;
+                st->isAnnouncing = FALSE;
+                st->willAnnounce = FALSE;
+                st->nextAnnounceTime = 0;
+                st->seederCount = 0;
+                st->leecherCount = 0;
+                st->downloadCount = 0;
             }
-            st->isScraping = tier->isScraping;
-            if(( st->willScrape = st->isActive && !tier->isScraping )) {
-                st->nextScrapeTime = tier->scrapeAt;
-            }
-            st->lastAnnounceStartTime = tier->lastAnnounceStartTime;
-            if(( st->hasAnnounced = tier->lastAnnounceTime != 0 )) {
-                st->lastAnnounceTime = tier->lastAnnounceTime;
-                tr_strlcpy( st->lastAnnounceResult, tier->lastAnnounceStr, sizeof( st->lastAnnounceResult ) );
-                if(( st->lastAnnounceSucceeded = tier->lastAnnounceSucceeded )) {
-                    st->lastAnnouncePeerCount = tier->lastAnnouncePeerCount;
+            else
+            {
+                if(( st->hasScraped = tier->lastScrapeTime != 0 )) {
+                    st->lastScrapeTime = tier->lastScrapeTime;
+                    st->lastScrapeSucceeded = tier->lastScrapeSucceeded;
+                    tr_strlcpy( st->lastScrapeResult, tier->lastScrapeStr, sizeof( st->lastScrapeResult ) );
                 }
+
+                st->isScraping = tier->isScraping;
+
+                if(( st->willScrape = !tier->isScraping ))
+                    st->nextScrapeTime = tier->scrapeAt;
+
+                st->lastAnnounceStartTime = tier->lastAnnounceStartTime;
+
+                if(( st->hasAnnounced = tier->lastAnnounceTime != 0 )) {
+                    st->lastAnnounceTime = tier->lastAnnounceTime;
+                    tr_strlcpy( st->lastAnnounceResult, tier->lastAnnounceStr, sizeof( st->lastAnnounceResult ) );
+                    if(( st->lastAnnounceSucceeded = tier->lastAnnounceSucceeded )) {
+                        st->lastAnnouncePeerCount = tier->lastAnnouncePeerCount;
+                    }
+                }
+
+                st->isAnnouncing = tier->isAnnouncing;
+
+                if(( st->willAnnounce = torrent->isRunning && !tier->isAnnouncing ))
+                    st->nextAnnounceTime = tier->announceAt;
+
+                st->seederCount = tracker->seederCount;
+                st->leecherCount = tracker->leecherCount;
+                st->downloadCount = tracker->downloadCount;
             }
-            st->isAnnouncing = tier->isAnnouncing;
-            if(( st->willAnnounce = torrent->isRunning && !tier->isAnnouncing )) {
-                st->nextAnnounceTime = tier->announceAt;
-            }
-            st->seederCount = tracker->seederCount;
-            st->leecherCount = tracker->leecherCount;
-            st->downloadCount = tracker->downloadCount;
         }
     }
 
