@@ -1719,8 +1719,9 @@ typedef enum
         id item = [fTrackers objectAtIndex: i];
         if ([item isKindOfClass: [NSNumber class]])
         {
-            for (NSInteger j = i+1; j < [fTrackers count] && ![[fTrackers objectAtIndex: j] isKindOfClass: [NSNumber class]]; ++j, ++i)
-                [addresses addObject: [fTrackers objectAtIndex: j]];
+            ++i;
+            for (NSInteger j = i; j < [fTrackers count] && ![[fTrackers objectAtIndex: j] isKindOfClass: [NSNumber class]]; ++j, ++i)
+                [addresses addObject: [[fTrackers objectAtIndex: j] fullAnnounceAddress]];
             --i;
         }
         else
