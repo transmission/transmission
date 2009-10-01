@@ -24,6 +24,7 @@
 
 #import "TrackerTableView.h"
 #import "NSApplicationAdditions.h"
+#import "Torrent.h"
 #import "TrackerNode.h"
 
 @implementation TrackerTableView
@@ -34,12 +35,17 @@
     [super mouseDown: event];
 }
 
+- (void) setTorrent: (Torrent *) torrent
+{
+    fTorrent = torrent;
+}
+
 - (void) setTrackers: (NSArray *) trackers
 {
     fTrackers = trackers;
 }
 
-- (IBAction) copy: (id) sender
+- (void) copy: (id) sender
 {
     NSMutableArray * addresses = [NSMutableArray arrayWithCapacity: [fTrackers count]];
     NSIndexSet * indexes = [self selectedRowIndexes];
@@ -71,12 +77,40 @@
     }
 }
 
+- (void) paste: (id) sender
+{
+    if (!fTorrent)
+        return;
+    
+    if ([NSApp isOnSnowLeopardOrBetter])
+    {
+        NSArray * items = [[NSPasteboard generalPasteboard] readObjectsForClasses:
+                            [NSArray arrayWithObject: [NSString class]] options: nil];
+        NSAssert(items != nil, @"no string items to paste; should not be able to call this method");
+        
+        BOOL added = NO;
+        for (NSString * pbItem in items)
+        {
+            for (NSString * item in [pbItem componentsSeparatedByString: @"\n"])
+                if ([fTorrent addTrackerToNewTier: item])
+                    added = YES;
+        }
+        
+        //none added
+        if (!added)
+            NSBeep();
+    }
+}
+
 - (BOOL) validateMenuItem: (NSMenuItem *) menuItem
 {
     const SEL action = [menuItem action];
     
     if (action == @selector(copy:))
         return [self numberOfSelectedRows] > 0;
+    
+    if (action == @selector(paste:))
+        return [[NSPasteboard generalPasteboard] canReadObjectForClasses: [NSArray arrayWithObject: [NSString class]] options: nil];
     
     return YES;
 }

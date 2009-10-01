@@ -378,6 +378,8 @@ typedef enum
         [fWebSeedTable reloadData];
         [self setWebSeedTableHidden: YES animate: YES];
         
+        [fTrackerTable setTorrent: nil];
+        
         [fTrackers release];
         fTrackers = nil;
         
@@ -467,6 +469,7 @@ typedef enum
             [fWebSeedTable reloadData];
         }
         
+        [fTrackerTable setTorrent: torrent];
         [fTrackerTable deselectAll: self];
         [fTrackerAddRemoveControl setEnabled: YES forSegment: TRACKER_ADD_TAG];
         [fTrackerAddRemoveControl setEnabled: NO forSegment: TRACKER_REMOVE_TAG];
@@ -1719,9 +1722,8 @@ typedef enum
         id item = [fTrackers objectAtIndex: i];
         if ([item isKindOfClass: [NSNumber class]])
         {
-            ++i;
-            for (NSInteger j = i; j < [fTrackers count] && ![[fTrackers objectAtIndex: j] isKindOfClass: [NSNumber class]]; ++j, ++i)
-                [addresses addObject: [[fTrackers objectAtIndex: j] fullAnnounceAddress]];
+            for (++i; i < [fTrackers count] && ![[fTrackers objectAtIndex: i] isKindOfClass: [NSNumber class]]; ++i)
+                [addresses addObject: [[fTrackers objectAtIndex: i] fullAnnounceAddress]];
             --i;
         }
         else

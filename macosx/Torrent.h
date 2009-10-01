@@ -28,10 +28,6 @@
 
 @class FileListNode;
 
-#warning remove!?
-#define STAT_TIME_NONE -1
-#define STAT_TIME_NOW -2
-
 @interface Torrent : NSObject <QLPreviewItem>
 {
     tr_torrent * fHandle;

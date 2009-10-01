@@ -705,6 +705,7 @@ int trashDataFile(const char * filename)
     return allTrackers;
 }
 
+#warning check for duplicates?
 - (BOOL) addTrackerToNewTier: (NSString *) tracker
 {
     tracker = [tracker stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
