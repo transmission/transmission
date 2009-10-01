@@ -79,8 +79,9 @@
 
 - (void) paste: (id) sender
 {
-    if (!fTorrent)
-        return;
+    NSAssert(fTorrent != nil, @"no torrent but trying to paste; should not be able to call this method");
+    
+    BOOL added = NO;
     
     if ([NSApp isOnSnowLeopardOrBetter])
     {
@@ -88,18 +89,26 @@
                             [NSArray arrayWithObject: [NSString class]] options: nil];
         NSAssert(items != nil, @"no string items to paste; should not be able to call this method");
         
-        BOOL added = NO;
         for (NSString * pbItem in items)
         {
             for (NSString * item in [pbItem componentsSeparatedByString: @"\n"])
                 if ([fTorrent addTrackerToNewTier: item])
                     added = YES;
         }
-        
-        //none added
-        if (!added)
-            NSBeep();
     }
+    else
+    {
+        NSString * pbItem =[[NSPasteboard generalPasteboard] stringForType: NSStringPboardType];
+        NSAssert(pbItem != nil, @"no string items to paste; should not be able to call this method");
+        
+        for (NSString * item in [pbItem componentsSeparatedByString: @"\n"])
+            if ([fTorrent addTrackerToNewTier: item])
+                added = YES;
+    }
+    
+    //none added
+    if (!added)
+        NSBeep();
 }
 
 - (BOOL) validateMenuItem: (NSMenuItem *) menuItem
@@ -110,7 +119,11 @@
         return [self numberOfSelectedRows] > 0;
     
     if (action == @selector(paste:))
-        return [[NSPasteboard generalPasteboard] canReadObjectForClasses: [NSArray arrayWithObject: [NSString class]] options: nil];
+    {
+        return fTorrent && ([NSApp isOnSnowLeopardOrBetter]
+                ? [[NSPasteboard generalPasteboard] canReadObjectForClasses: [NSArray arrayWithObject: [NSString class]] options: nil]
+                : [[NSPasteboard generalPasteboard] availableTypeFromArray: [NSArray arrayWithObject: NSStringPboardType]] != nil);
+    }
     
     return YES;
 }
