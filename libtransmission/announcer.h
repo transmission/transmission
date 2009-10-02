@@ -66,6 +66,8 @@ void tr_announcerClose( tr_session * );
 struct tr_torrent_tiers * tr_announcerAddTorrent( struct tr_announcer  *,
                                                   tr_torrent           * );
 
+void tr_announcerResetTorrent( struct tr_announcer*, tr_torrent* );
+
 tr_publisher_tag tr_announcerSubscribe( struct tr_torrent_tiers  * tiers, 
                                         tr_delivery_func           func,
                                         void                     * userData );

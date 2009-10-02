@@ -289,7 +289,8 @@ typedef struct
 
     /* sent as the "key" argument in tracker requests
      * to verify us if our IP address changes.
-     * This is immutable for the life of the tracker object. */
+     * This is immutable for the life of the tracker object.
+     * The +1 is for '\0' */
     char key_param[KEYLEN + 1];
 }
 tr_tracker_item;
@@ -393,7 +394,7 @@ tierNew( tr_torrent * tor )
     const time_t now = time( NULL );
 
     t = tr_new0( tr_tier, 1 );
-    t->randOffset = tr_cryptoRandInt( 60 );
+    t->randOffset = tr_cryptoRandInt( tor->uniqueId % 60 );
     t->key = nextKey++;
     t->trackers = TR_PTR_ARRAY_INIT;
     t->currentTracker = NULL;
@@ -473,6 +474,13 @@ tiersNew( void )
     tiers->tiers = TR_PTR_ARRAY_INIT;
     tiers->publisher = TR_PUBLISHER_INIT;
     return tiers;
+}
+
+static void
+tiersClear( tr_torrent_tiers * tiers )
+{
+    tr_ptrArrayDestruct( &tiers->tiers, tierFree );
+    tiers->tiers = TR_PTR_ARRAY_INIT;
 }
 
 static void
@@ -701,23 +709,19 @@ announceURLIsSupported( const char * announce )
              ( strstr( announce, "https://" ) == announce ) );
 }
 
-tr_torrent_tiers *
-tr_announcerAddTorrent( tr_announcer * announcer, tr_torrent * tor )
+static void
+addTorrentToTier( tr_announcer * announcer, tr_torrent_tiers * tiers, tr_torrent * tor )
 {
     int i, n;
-    tr_torrent_tiers * tiers;
     tr_tracker_info ** infos;
+    const int trackerCount = tor->info.trackerCount;
+    const tr_tracker_info  * trackers = tor->info.trackers;
 
     /* get the trackers that we support... */
-    infos = tr_new( tr_tracker_info*, tor->info.trackerCount );
-    for( i=n=0; i<tor->info.trackerCount; ++i )
-        if( announceURLIsSupported( tor->info.trackers[i].announce ) )
-            infos[n++] = &tor->info.trackers[i];
-
-    assert( announcer != NULL );
-    assert( tr_isTorrent( tor ) );
-
-    tiers = tiersNew( );
+    infos = tr_new0( tr_tracker_info*, trackerCount );
+    for( i=n=0; i<trackerCount; ++i )
+        if( announceURLIsSupported( trackers[i].announce ) )
+            infos[n++] = &trackers[i];
 
     /* build our private table of tiers... */
     if( n > 0 )
@@ -725,7 +729,7 @@ tr_announcerAddTorrent( tr_announcer * announcer, tr_torrent * tor )
         int tierIndex = -1;
         tr_tier * tier = NULL;
 
-        for( i=0; i<tor->info.trackerCount; ++i )
+        for( i=0; i<trackerCount; ++i )
         {
             const tr_tracker_info * info = infos[i];
 
@@ -745,7 +749,32 @@ tr_announcerAddTorrent( tr_announcer * announcer, tr_torrent * tor )
     }
 
     tr_free( infos );
+}
+
+tr_torrent_tiers *
+tr_announcerAddTorrent( tr_announcer * announcer, tr_torrent * tor )
+{
+    tr_torrent_tiers * tiers;
+
+    assert( announcer != NULL );
+    assert( tr_isTorrent( tor ) );
+
+    tiers = tiersNew( );
+
+    addTorrentToTier( announcer, tiers, tor );
+
     return tiers;
+}
+
+void
+tr_announcerResetTorrent( tr_announcer * announcer, tr_torrent * tor )
+{
+    if( tor->tiers != NULL )
+    {
+        tiersClear( tor->tiers );
+
+        addTorrentToTier( announcer, tor->tiers, tor );
+    }
 }
 
 tr_publisher_tag

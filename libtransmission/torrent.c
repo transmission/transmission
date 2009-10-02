@@ -2064,6 +2064,9 @@ tr_torrentSetAnnounceList( tr_torrent *            tor,
 
         /* cleanup */
         tr_bencFree( &metainfo );
+
+        /* tell the announcer to reload this torrent's tracker list */
+        tr_announcerResetTorrent( tor->session->announcer, tor );
     }
 }
 
