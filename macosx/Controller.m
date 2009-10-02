@@ -183,7 +183,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                                                     "Transmission already running alert -> title")];
             [alert setInformativeText: NSLocalizedString(@"There is already a copy of Transmission running. "
                 "This copy cannot be opened until that instance is quit.", "Transmission already running alert -> message")];
-            [alert setAlertStyle: NSWarningAlertStyle];
+            [alert setAlertStyle: NSCriticalAlertStyle];
             
             [alert runModal];
             [alert release];
@@ -202,6 +202,27 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     ExpandedPathToIconTransformer * iconTransformer = [[[ExpandedPathToIconTransformer alloc] init] autorelease];
     [NSValueTransformer setValueTransformer: iconTransformer forName: @"ExpandedPathToIconTransformer"];
+    
+    //cover our asses
+    if (YES || [[NSUserDefaults standardUserDefaults] boolForKey: @"WarningLegal"])
+    {
+        NSAlert * alert = [[NSAlert alloc] init];
+        [alert addButtonWithTitle: NSLocalizedString(@"I Accept", "Legal alert -> button")];
+        [alert addButtonWithTitle: NSLocalizedString(@"Quit", "Legal alert -> button")];
+        [alert setMessageText: NSLocalizedString(@"Hear ye, hear ye!", "Legal alert -> title")];
+        [alert setInformativeText: [NSString stringWithFormat: @"%@\n\n%@",
+            NSLocalizedString(@"Transmission is a file-sharing program. When you add a torrent for download, all of its data will"
+            " also be made available to others by means of upload."
+            " And of course, any content you do choose to share is your sole responsibility.", "Legal alert -> message"),
+            NSLocalizedString(@"You probably knew this already, so we won't tell you again.", "Legal alert -> message")]];
+        [alert setAlertStyle: NSInformationalAlertStyle];
+        
+        if ([alert runModal] == NSAlertSecondButtonReturn)
+            exit(0);
+        [alert release];
+        
+        [[NSUserDefaults standardUserDefaults] setBool: NO forKey: @"WarningLegal"];
+    }
 }
 
 - (id) init
@@ -1900,6 +1921,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             descriptors = [[NSArray alloc] initWithObjects: progressDescriptor, ratioProgressDescriptor, ratioDescriptor,
                                                                 nameDescriptor, nil];
         }
+        #warning broken
         else if ([sortType isEqualToString: SORT_TRACKER])
         {
             NSSortDescriptor * trackerDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"trackerAddressAnnounce" ascending: asc
