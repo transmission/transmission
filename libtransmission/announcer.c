@@ -693,10 +693,26 @@ createAnnounceURL( const tr_announcer     * announcer,
 ****
 ***/
 
+static tr_bool
+announceURLIsSupported( const char * announce )
+{
+    return ( announce != NULL )
+        && ( ( strstr( announce, "http://" ) == announce ) ||
+             ( strstr( announce, "https://" ) == announce ) );
+}
+
 tr_torrent_tiers *
 tr_announcerAddTorrent( tr_announcer * announcer, tr_torrent * tor )
 {
+    int i, n;
     tr_torrent_tiers * tiers;
+    tr_tracker_info ** infos;
+
+    /* get the trackers that we support... */
+    infos = tr_new( tr_tracker_info*, tor->info.trackerCount );
+    for( i=n=0; i<tor->info.trackerCount; ++i )
+        if( announceURLIsSupported( tor->info.trackers[i].announce ) )
+            infos[n++] = &tor->info.trackers[i];
 
     assert( announcer != NULL );
     assert( tr_isTorrent( tor ) );
@@ -704,18 +720,19 @@ tr_announcerAddTorrent( tr_announcer * announcer, tr_torrent * tor )
     tiers = tiersNew( );
 
     /* build our private table of tiers... */
-    if( tor->info.trackerCount )
+    if( n > 0 )
     {
-        int i;
         int tierIndex = -1;
         tr_tier * tier = NULL;
 
         for( i=0; i<tor->info.trackerCount; ++i )
         {
-            if( tor->info.trackers[i].tier != tierIndex )
+            const tr_tracker_info * info = infos[i];
+
+            if( info->tier != tierIndex )
                 tier = NULL;
 
-            tierIndex = tor->info.trackers[i].tier;
+            tierIndex = info->tier;
 
             if( tier == NULL ) {
                 tier = tierNew( tor );
@@ -723,11 +740,11 @@ tr_announcerAddTorrent( tr_announcer * announcer, tr_torrent * tor )
                 tr_ptrArrayAppend( &tiers->tiers, tier );
             }
 
-            tierAddTracker( announcer, tier, tor->info.trackers[i].announce,
-                                             tor->info.trackers[i].scrape );
+            tierAddTracker( announcer, tier, info->announce, info->scrape );
         }
     }
 
+    tr_free( infos );
     return tiers;
 }
 
