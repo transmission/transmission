@@ -21,6 +21,7 @@ GtkWidget * tr_prefs_dialog_new( GObject *   core,
 /* if you add a key here,  you /must/ add its
  * default in tr_prefs_init_defaults( void ) */
 
+#define PREF_KEY_LEGAL_DIALOG_ON_STARTUP    "show-legal-dialog-on-startup"
 #define PREF_KEY_OPTIONS_PROMPT             "show-options-window"
 #define PREF_KEY_OPEN_DIALOG_FOLDER         "open-dialog-dir"
 #define PREF_KEY_INHIBIT_HIBERNATION        "inhibit-desktop-hibernation"

@@ -541,6 +541,32 @@ appsetup( TrWindow *      wind,
         gtk_window_set_skip_taskbar_hint( cbdata->wind,
                                           cbdata->icon != NULL );
     }
+
+    if( pref_flag_get( PREF_KEY_LEGAL_DIALOG_ON_STARTUP ) )
+    {
+        GtkWidget * w = gtk_message_dialog_new( GTK_WINDOW( wind ),
+                                                GTK_DIALOG_DESTROY_WITH_PARENT,
+                                                GTK_MESSAGE_INFO,
+                                                GTK_BUTTONS_NONE,
+                                                "%s",
+            _( "Transmission is a file-sharing program.  When you run a torrent "
+               "in Transmission, its files are made available for copying to "
+               "other computers.  And, of course, any content you share is your "
+               "sole responsibility.\n\n"
+               "You probably knew this, so we won't tell you again." ) );
+        gtk_dialog_add_button( GTK_DIALOG( w ), GTK_STOCK_QUIT, GTK_RESPONSE_REJECT );
+        gtk_dialog_add_button( GTK_DIALOG( w ), _( "I Accept" ), GTK_RESPONSE_ACCEPT );
+        gtk_dialog_set_default_response( GTK_DIALOG( w ), GTK_RESPONSE_ACCEPT );
+        switch( gtk_dialog_run( GTK_DIALOG( w ) ) ) {
+            case GTK_RESPONSE_ACCEPT:
+                /* only show it once */
+                pref_flag_set( PREF_KEY_LEGAL_DIALOG_ON_STARTUP, FALSE );
+                gtk_widget_destroy( w );
+                break;
+            default:
+                exit( 0 );
+        }
+    }
 }
 
 static void
