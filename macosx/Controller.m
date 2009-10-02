@@ -204,7 +204,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [NSValueTransformer setValueTransformer: iconTransformer forName: @"ExpandedPathToIconTransformer"];
     
     //cover our asses
-    if (YES || [[NSUserDefaults standardUserDefaults] boolForKey: @"WarningLegal"])
+    if ([[NSUserDefaults standardUserDefaults] boolForKey: @"WarningLegal"])
     {
         NSAlert * alert = [[NSAlert alloc] init];
         [alert addButtonWithTitle: NSLocalizedString(@"I Accept", "Legal alert -> button")];
