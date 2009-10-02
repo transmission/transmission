@@ -65,6 +65,7 @@ class Prefs: public QObject
             SESSION_REMOTE_AUTH,
             SESSION_REMOTE_USERNAME,
             SESSION_REMOTE_PASSWORD,
+            USER_HAS_GIVEN_INFORMED_CONSENT,
 
             /* core prefs */
             FIRST_CORE_PREF,

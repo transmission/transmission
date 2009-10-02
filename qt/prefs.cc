@@ -62,6 +62,7 @@ Prefs::PrefItem Prefs::myItems[] =
     { SESSION_REMOTE_AUTH, "remote-session-requres-authentication", QVariant::Bool },
     { SESSION_REMOTE_USERNAME, "remote-session-username", QVariant::String },
     { SESSION_REMOTE_PASSWORD, "remote-session-password", QVariant::String },
+    { USER_HAS_GIVEN_INFORMED_CONSENT, "user-has-given-informed-consent", QVariant::Bool },
 
     /* libtransmission settings */
     { ALT_SPEED_LIMIT_UP, TR_PREFS_KEY_ALT_SPEED_UP, QVariant::Int },
@@ -259,6 +260,7 @@ Prefs :: initDefaults( tr_benc * d )
     tr_bencDictAddInt( d, keyStr(SESSION_REMOTE_PORT), atoi(TR_DEFAULT_RPC_PORT_STR) );
     tr_bencDictAddBool( d, keyStr(SESSION_IS_REMOTE), false );
     tr_bencDictAddBool( d, keyStr(SESSION_REMOTE_AUTH), false );
+    tr_bencDictAddBool( d, keyStr(USER_HAS_GIVEN_INFORMED_CONSENT), false );
 }
 
 /***

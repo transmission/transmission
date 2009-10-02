@@ -14,8 +14,10 @@
 #include <ctime>
 #include <iostream>
 
+#include <QDialogButtonBox>
 #include <QIcon>
 #include <QLibraryInfo>
+#include <QLabel>
 #include <QRect>
 #include <QTranslator>
 
@@ -168,8 +170,36 @@ MyApp :: MyApp( int& argc, char ** argv ):
         d->show( );
     }
 
+    if( !myPrefs->getBool( Prefs::USER_HAS_GIVEN_INFORMED_CONSENT ))
+    {
+        QDialog * dialog = new QDialog( myWindow );
+        dialog->setModal( true );
+        QVBoxLayout * v = new QVBoxLayout( dialog );
+        QLabel * l = new QLabel( tr( "Transmission is a file sharing program.  When you run a torrent, its data will be made available to others by means of upload.  And of course, any content you share is your sole responsibility.\n\nYou probably knew this, so we won't tell you again." ) );
+        l->setWordWrap( true );
+        v->addWidget( l );
+        QDialogButtonBox * box = new QDialogButtonBox;
+        box->addButton( new QPushButton( tr( "&Cancel" ) ), QDialogButtonBox::RejectRole );
+        QPushButton * agree = new QPushButton( tr( "I &Agree" ) );
+        agree->setDefault( true );
+        box->addButton( agree, QDialogButtonBox::AcceptRole );
+        box->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
+        box->setOrientation( Qt::Horizontal );
+        v->addWidget( box );
+        connect( box, SIGNAL(rejected()), this, SLOT(quit()) );
+        connect( box, SIGNAL(accepted()), dialog, SLOT(deleteLater()) );
+        connect( box, SIGNAL(accepted()), this, SLOT(consentGiven()) );
+        dialog->show();
+    }
+
     for( QStringList::const_iterator it=filenames.begin(), end=filenames.end(); it!=end; ++it )
         mySession->addTorrent( *it );
+}
+
+void
+MyApp :: consentGiven( )
+{
+    myPrefs->set<bool>( Prefs::USER_HAS_GIVEN_INFORMED_CONSENT, true );
 }
 
 MyApp :: ~MyApp( )

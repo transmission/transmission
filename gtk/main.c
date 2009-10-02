@@ -542,7 +542,7 @@ appsetup( TrWindow *      wind,
                                           cbdata->icon != NULL );
     }
 
-    if( pref_flag_get( PREF_KEY_LEGAL_DIALOG_ON_STARTUP ) )
+    if( !pref_flag_get( PREF_KEY_USER_HAS_GIVEN_INFORMED_CONSENT ) )
     {
         GtkWidget * w = gtk_message_dialog_new( GTK_WINDOW( wind ),
                                                 GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -556,7 +556,7 @@ appsetup( TrWindow *      wind,
         switch( gtk_dialog_run( GTK_DIALOG( w ) ) ) {
             case GTK_RESPONSE_ACCEPT:
                 /* only show it once */
-                pref_flag_set( PREF_KEY_LEGAL_DIALOG_ON_STARTUP, FALSE );
+                pref_flag_set( PREF_KEY_USER_HAS_GIVEN_INFORMED_CONSENT, TRUE );
                 gtk_widget_destroy( w );
                 break;
             default:
