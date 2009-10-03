@@ -1323,10 +1323,6 @@ myHandshakeDoneCB( tr_handshake  * handshake,
                 tr_peerIoSetParent( peer->io, t->tor->bandwidth );
                 tr_peerMsgsNew( t->tor, peer, peerCallbackFunc, t, &peer->msgsTag );
 
-#warning do not check this code in it is for personal use only
-                if( peer_id && !memcmp( peer_id, "-TR", 3 ) )
-                    peer->io->bandwidth.priority = TR_PRI_HIGH;
-
                 success = TRUE;
             }
         }
