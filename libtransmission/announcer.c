@@ -374,7 +374,6 @@ typedef struct
     int retryAnnounceIntervalSec;
     int retryScrapeIntervalSec;
 
-    int randOffset;
     int lastAnnouncePeerCount;
 
     tr_bool isRunning;
@@ -394,7 +393,6 @@ tierNew( tr_torrent * tor )
     const time_t now = time( NULL );
 
     t = tr_new0( tr_tier, 1 );
-    t->randOffset = tor->uniqueId % 60;
     t->key = nextKey++;
     t->trackers = TR_PTR_ARRAY_INIT;
     t->currentTracker = NULL;
@@ -402,7 +400,7 @@ tierNew( tr_torrent * tor )
     t->scrapeIntervalSec = DEFAULT_SCRAPE_INTERVAL_SEC;
     t->announceIntervalSec = DEFAULT_ANNOUNCE_INTERVAL_SEC;
     t->announceMinIntervalSec = DEFAULT_ANNOUNCE_MIN_INTERVAL_SEC;
-    t->scrapeAt = now + t->randOffset;
+    t->scrapeAt = now;
     t->tor = tor;
 
     return t;
@@ -1230,17 +1228,17 @@ onAnnounceDone( tr_session   * session,
         {
             dbgmsg( tier, "No response from tracker... retrying in two minutes." );
             tier->manualAnnounceAllowedAt = ~(time_t)0;
-            tierSetNextAnnounce( tier, tier->announceEvent, now + tier->randOffset + 120 );
+            tierSetNextAnnounce( tier, tier->announceEvent, now + 120 );
         }
         else if( 200 <= responseCode && responseCode <= 299 )
         {
-            const int interval = tier->announceIntervalSec + tier->randOffset;
+            const int interval = tier->announceIntervalSec;
             dbgmsg( tier, "request succeeded. reannouncing in %d seconds", interval );
 
             if( gotScrape )
             {
                 tier->lastScrapeTime = now;
-                tier->scrapeAt = now + tier->scrapeIntervalSec + tier->randOffset;
+                tier->scrapeAt = now + tier->scrapeIntervalSec;
             }
 
             tier->manualAnnounceAllowedAt = now + tier->announceMinIntervalSec;
@@ -1279,7 +1277,7 @@ onAnnounceDone( tr_session   * session,
         else
         {
             /* WTF did we get?? */
-            const int interval = tier->randOffset + 120;
+            const int interval = 120;
             dbgmsg( tier, "Invalid response from tracker... retrying in two minutes." );
             tier->manualAnnounceAllowedAt = ~(time_t)0;
             tierSetNextAnnounce( tier, tier->announceEvent, now + interval );
@@ -1445,7 +1443,7 @@ onScrapeDone( tr_session   * session,
 
         if( 200 <= responseCode && responseCode <= 299 )
         {
-            const int interval = tier->scrapeIntervalSec + tier->randOffset;
+            const int interval = tier->scrapeIntervalSec;
             tier->scrapeAt = now + interval;
 
             tr_strlcpy( tier->lastScrapeStr, _( "Success" ), sizeof( tier->lastScrapeStr ) );
@@ -1462,7 +1460,7 @@ onScrapeDone( tr_session   * session,
         }
         else
         {
-            const int interval = tier->retryScrapeIntervalSec + tier->randOffset;
+            const int interval = tier->retryScrapeIntervalSec;
             tier->retryScrapeIntervalSec *= 2;
             tier->scrapeAt = now + interval;
 
