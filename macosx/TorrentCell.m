@@ -428,22 +428,22 @@
         [gradient release];
     }
     
-    //error image
     const BOOL error = [torrent isErrorOrWarning];
-    NSImage * errorImage = error ? [NSImage imageNamed: [NSApp isOnSnowLeopardOrBetter] ? NSImageNameCaution : @"Error.png"] : nil;
     
     //icon
     if (!minimal || !(!fTracking && fHoverAction)) //don't show in minimal mode when hovered over
     {
-        NSImage * icon = (minimal && error) ? errorImage : [torrent icon];
+        NSImage * icon = (minimal && error) ? [NSImage imageNamed: [NSApp isOnSnowLeopardOrBetter] ? NSImageNameCaution : @"Error.png"]
+                                            : [torrent icon];
         [self drawImage: icon inRect: iconRect];
     }
     
+    //error badge
     if (error && !minimal)
     {
         NSRect errorRect = NSMakeRect(NSMaxX(iconRect) - ERROR_IMAGE_SIZE, NSMaxY(iconRect) - ERROR_IMAGE_SIZE,
                                         ERROR_IMAGE_SIZE, ERROR_IMAGE_SIZE);
-        [self drawImage: errorImage inRect: errorRect];
+        [self drawImage: [NSImage imageNamed: [NSApp isOnSnowLeopardOrBetter] ? NSImageNameCaution : @"Error.png"] inRect: errorRect];
     }
     
     //text color

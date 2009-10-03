@@ -66,37 +66,37 @@ GroupsController * fGroupsInstance = nil;
             NSMutableDictionary * red = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                             [NSColor redColor], @"Color",
                                             NSLocalizedString(@"Red", "Groups -> Name"), @"Name",
-                                            [NSNumber numberWithInt: 0], @"Index", nil];
+                                            [NSNumber numberWithInteger: 0], @"Index", nil];
             
             NSMutableDictionary * orange = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                             [NSColor orangeColor], @"Color",
                                             NSLocalizedString(@"Orange", "Groups -> Name"), @"Name",
-                                            [NSNumber numberWithInt: 1], @"Index", nil];
+                                            [NSNumber numberWithInteger: 1], @"Index", nil];
             
             NSMutableDictionary * yellow = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                             [NSColor yellowColor], @"Color",
                                             NSLocalizedString(@"Yellow", "Groups -> Name"), @"Name",
-                                            [NSNumber numberWithInt: 2], @"Index", nil];
+                                            [NSNumber numberWithInteger: 2], @"Index", nil];
             
             NSMutableDictionary * green = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                             [NSColor greenColor], @"Color",
                                             NSLocalizedString(@"Green", "Groups -> Name"), @"Name",
-                                            [NSNumber numberWithInt: 3], @"Index", nil];
+                                            [NSNumber numberWithInteger: 3], @"Index", nil];
             
             NSMutableDictionary * blue = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                             [NSColor blueColor], @"Color",
                                             NSLocalizedString(@"Blue", "Groups -> Name"), @"Name",
-                                            [NSNumber numberWithInt: 4], @"Index", nil];
+                                            [NSNumber numberWithInteger: 4], @"Index", nil];
             
             NSMutableDictionary * purple = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                             [NSColor purpleColor], @"Color",
                                             NSLocalizedString(@"Purple", "Groups -> Name"), @"Name",
-                                            [NSNumber numberWithInt: 5], @"Index", nil];
+                                            [NSNumber numberWithInteger: 5], @"Index", nil];
             
             NSMutableDictionary * gray = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                             [NSColor grayColor], @"Color",
                                             NSLocalizedString(@"Gray", "Groups -> Name"), @"Name",
-                                            [NSNumber numberWithInt: 6], @"Index", nil];
+                                            [NSNumber numberWithInteger: 6], @"Index", nil];
             
             fGroups = [[NSMutableArray alloc] initWithObjects: red, orange, yellow, green, blue, purple, gray, nil];
             [self saveGroups]; //make sure this is saved right away
@@ -122,7 +122,7 @@ GroupsController * fGroupsInstance = nil;
     if (index != -1)
     {
         for (NSInteger i = 0; i < [fGroups count]; i++)
-            if (index == [[[fGroups objectAtIndex: i] objectForKey: @"Index"] intValue])
+            if (index == [[[fGroups objectAtIndex: i] objectForKey: @"Index"] integerValue])
                 return i;
     }
     return -1;
@@ -130,7 +130,7 @@ GroupsController * fGroupsInstance = nil;
 
 - (NSInteger) indexForRow: (NSInteger) row
 {
-    return [[[fGroups objectAtIndex: row] objectForKey: @"Index"] intValue];
+    return [[[fGroups objectAtIndex: row] objectForKey: @"Index"] integerValue];
 }
 
 - (NSString *) nameForIndex: (NSInteger) index
@@ -256,7 +256,7 @@ GroupsController * fGroupsInstance = nil;
     {
         BOOL found = NO;
         for (NSDictionary * dict in fGroups)
-            if ([[dict objectForKey: @"Index"] intValue] == index)
+            if ([[dict objectForKey: @"Index"] integerValue] == index)
             {
                 found = YES;
                 break;
@@ -266,7 +266,7 @@ GroupsController * fGroupsInstance = nil;
             break;
     }
     
-    [fGroups addObject: [NSMutableDictionary dictionaryWithObjectsAndKeys: [NSNumber numberWithInt: index], @"Index",
+    [fGroups addObject: [NSMutableDictionary dictionaryWithObjectsAndKeys: [NSNumber numberWithInteger: index], @"Index",
                             [NSColor cyanColor], @"Color", @"", @"Name", nil]];
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGroups" object: self];
@@ -275,11 +275,11 @@ GroupsController * fGroupsInstance = nil;
 
 - (void) removeGroupWithRowIndex: (NSInteger) row
 {
-    NSInteger index = [[[fGroups objectAtIndex: row] objectForKey: @"Index"] intValue];
+    NSInteger index = [[[fGroups objectAtIndex: row] objectForKey: @"Index"] integerValue];
     [fGroups removeObjectAtIndex: row];
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"GroupValueRemoved" object: self userInfo:
-        [NSDictionary dictionaryWithObject: [NSNumber numberWithInt: index] forKey: @"Index"]];
+        [NSDictionary dictionaryWithObject: [NSNumber numberWithInteger: index] forKey: @"Index"]];
     
     if (index == [[NSUserDefaults standardUserDefaults] integerForKey: @"FilterGroup"])
         [[NSUserDefaults standardUserDefaults] setInteger: -2 forKey: @"FilterGroup"];
@@ -335,7 +335,7 @@ GroupsController * fGroupsInstance = nil;
         item = [[NSMenuItem alloc] initWithTitle: [dict objectForKey: @"Name"] action: action keyEquivalent: @""];
         [item setTarget: target];
         
-        [item setTag: [[dict objectForKey: @"Index"] intValue]];
+        [item setTag: [[dict objectForKey: @"Index"] integerValue]];
         
         NSImage * icon = [self imageForGroup: dict];
         if (small)
@@ -360,7 +360,7 @@ GroupsController * fGroupsInstance = nil;
 {
     for (NSDictionary * group in fGroups)
     {
-        NSInteger row = [[group objectForKey: @"Index"] intValue];
+        NSInteger row = [[group objectForKey: @"Index"] integerValue];
         if ([self torrent: torrent doesMatchRulesForGroupAtIndex: row])
             return row;
     }

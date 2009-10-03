@@ -119,11 +119,9 @@
         return [self numberOfSelectedRows] > 0;
     
     if (action == @selector(paste:))
-    {
         return fTorrent && ([NSApp isOnSnowLeopardOrBetter]
                 ? [[NSPasteboard generalPasteboard] canReadObjectForClasses: [NSArray arrayWithObject: [NSString class]] options: nil]
                 : [[NSPasteboard generalPasteboard] availableTypeFromArray: [NSArray arrayWithObject: NSStringPboardType]] != nil);
-    }
     
     return YES;
 }

@@ -513,6 +513,7 @@
     return [fTorrentCell iconRectForBounds: [self rectOfRow: row]];
 }
 
+#warning catch string urls?
 - (void) paste: (id) sender
 {
     NSURL * url;
