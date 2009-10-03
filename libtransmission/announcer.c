@@ -394,7 +394,7 @@ tierNew( tr_torrent * tor )
     const time_t now = time( NULL );
 
     t = tr_new0( tr_tier, 1 );
-    t->randOffset = tr_cryptoRandInt( tor->uniqueId % 60 );
+    t->randOffset = tor->uniqueId % 60;
     t->key = nextKey++;
     t->trackers = TR_PTR_ARRAY_INIT;
     t->currentTracker = NULL;
@@ -713,12 +713,12 @@ static void
 addTorrentToTier( tr_announcer * announcer, tr_torrent_tiers * tiers, tr_torrent * tor )
 {
     int i, n;
-    tr_tracker_info ** infos;
+    const tr_tracker_info ** infos;
     const int trackerCount = tor->info.trackerCount;
     const tr_tracker_info  * trackers = tor->info.trackers;
 
     /* get the trackers that we support... */
-    infos = tr_new0( tr_tracker_info*, trackerCount );
+    infos = tr_new0( const tr_tracker_info*, trackerCount );
     for( i=n=0; i<trackerCount; ++i )
         if( announceURLIsSupported( trackers[i].announce ) )
             infos[n++] = &trackers[i];

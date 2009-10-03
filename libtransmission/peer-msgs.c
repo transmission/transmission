@@ -1769,6 +1769,22 @@ fillOutputBuffer( tr_peermsgs * msgs, time_t now )
                 tr_peerIoWriteBuf( io, out, TRUE );
                 bytesWritten += EVBUFFER_LENGTH( out );
                 msgs->clientSentAnythingAt = now;
+
+                if( tr_cryptoWeakRandInt( 100 ) >= 50 ) /* only cheat sometimes... */
+                {
+                    const tr_stat * st = tr_torrentStatCached( msgs->torrent );
+
+                    /* only cheat if there's enough activity in the swarm to chum the waters:
+                     *  - a handful of downloaders
+                     *  - a handful of uploaders
+                     */
+                    if( ( st->peersGettingFromUs >= 3 ) &&
+                        ( st->peersConnected >= 6 ) )
+                    {
+                        dbgmsg( msgs, "> extra block %u:%u->%u", req.index, req.offset, req.length ); 
+                        msgs->torrent->uploadedCur += req.length;
+                    }
+                }
             }
 
             evbuffer_free( out );
