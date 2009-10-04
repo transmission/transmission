@@ -86,6 +86,7 @@ struct DetailsImpl
 
     GtkListStore * trackers;
     GtkTreeModel * trackers_filtered;
+    GtkWidget * edit_trackers_button;
     GtkWidget * tracker_view;
     GtkWidget * scrape_check;
     GtkWidget * all_check;
@@ -1704,7 +1705,8 @@ trackerVisibleFunc( GtkTreeModel * model, GtkTreeIter * iter, gpointer data )
      return active;
 }
 
-//ccc
+#define TORRENT_PTR_KEY "torrent-pointer"
+
 static void
 refreshTracker( struct DetailsImpl * di, tr_torrent ** torrents, int n )
 {
@@ -1720,6 +1722,11 @@ refreshTracker( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     stats = g_new0( tr_tracker_stat *, n );
     for( i=0; i<n; ++i )
         stats[i] = tr_torrentTrackers( torrents[i], &statCount[i] );
+
+    /* "edit trackers" button */
+    gtk_widget_set_sensitive( di->edit_trackers_button, n==1 );
+    if( n==1 )
+        g_object_set_data( G_OBJECT( di->edit_trackers_button ), TORRENT_PTR_KEY, torrents[0] );
 
     /* build the store if we don't already have it */
     if( store == NULL )
@@ -1750,11 +1757,11 @@ refreshTracker( struct DetailsImpl * di, tr_torrent ** torrents, int n )
         const tr_info * inf = tr_torrentInfo( torrents[0] );
         for( i=0; i<inf->trackerCount; ++i ) {
             const tr_tracker_info * t = &inf->trackers[i];
-            g_string_append_printf( gstr, "%s\n", t->announce );
             if( tier != t->tier ) {
                 tier = t->tier;
                 g_string_append_c( gstr, '\n' );
             }
+            g_string_append_printf( gstr, "%s\n", t->announce );
         }
         if( gstr->len > 0 )
             g_string_truncate( gstr, gstr->len-1 );
@@ -1851,6 +1858,7 @@ onEditTrackersResponse( GtkDialog * dialog, int response, gpointer data )
         char * tracker_text;
         char ** tracker_strings;
         tr_tracker_info * trackers;
+        tr_torrent * tor = g_object_get_data( G_OBJECT( dialog ), TORRENT_PTR_KEY );
 
         /* build the array of trackers */
         gtk_text_buffer_get_bounds( di->tracker_buffer, &start, &end );
@@ -1871,7 +1879,7 @@ onEditTrackersResponse( GtkDialog * dialog, int response, gpointer data )
         }
 
         /* update the torrent */
-        tr_torrentSetAnnounceList( NULL, trackers, n );
+        tr_torrentSetAnnounceList( tor, trackers, n );
         di->trackers = NULL;
         di->tracker_buffer = NULL;
 
@@ -1887,7 +1895,8 @@ onEditTrackersResponse( GtkDialog * dialog, int response, gpointer data )
 static void
 onEditTrackers( GtkButton * button, gpointer data )
 {
-    GtkWidget *w, *d, *sw, *fr;
+    int row;
+    GtkWidget *w, *d, *fr, *t, *l, *sw;
     GtkWindow * win = GTK_WINDOW( gtk_widget_get_toplevel( GTK_WIDGET( button ) ) );
     struct DetailsImpl * di = data;
 
@@ -1896,22 +1905,36 @@ onEditTrackers( GtkButton * button, gpointer data )
                                      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                      GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,
                                      NULL );
+    g_object_set_data( G_OBJECT( d ), TORRENT_PTR_KEY,
+                       g_object_get_data( G_OBJECT( button ), TORRENT_PTR_KEY ) );
     g_signal_connect( d, "response",
                       G_CALLBACK( onEditTrackersResponse ), data );
 
-    w = gtk_text_view_new_with_buffer( di->tracker_buffer );
-    gtr_widget_set_tooltip_text( w, _( "Transmission supports HTTP and HTTPS (SSL) trackers.  Torrents with multiple trackers are also supported -- trackers from the same server (with similar URLs) must be grouped together and those from different servers separated by a blank line." ) );
-    gtk_widget_set_size_request( w, 400, 300 );
-    sw = gtk_scrolled_window_new( NULL, NULL );
-    gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( sw ),
-                                    GTK_POLICY_AUTOMATIC,
-                                    GTK_POLICY_AUTOMATIC );
-    gtk_container_add( GTK_CONTAINER( sw ), w );
-    fr = gtk_frame_new( NULL );
-    gtk_frame_set_shadow_type( GTK_FRAME( fr ), GTK_SHADOW_IN );
-    gtk_container_add( GTK_CONTAINER( fr ), sw );
+    row = 0;
+    t = hig_workarea_create( );
+    hig_workarea_add_section_title( t, &row, _( "Tracker Announce URLs" ) );
 
-    gtk_box_pack_start( GTK_BOX( GTK_DIALOG( d )->vbox ), fr, TRUE, TRUE, GUI_PAD_SMALL );
+        l = gtk_label_new( NULL );
+        gtk_label_set_markup( GTK_LABEL( l ), _( "To add a backup URL, add it on the line after the primary URL.\n"
+                                                 "To add another primary URL, add it after a blank line." ) );
+        gtk_label_set_justify( GTK_LABEL( l ), GTK_JUSTIFY_LEFT );
+        gtk_misc_set_alignment( GTK_MISC( l ), 0.0, 0.5 );
+        hig_workarea_add_wide_control( t, &row, l );
+
+        w = gtk_text_view_new_with_buffer( di->tracker_buffer );
+        gtk_widget_set_size_request( w, 500u, 66u );
+        fr = gtk_frame_new( NULL );
+        gtk_frame_set_shadow_type( GTK_FRAME( fr ), GTK_SHADOW_IN );
+        sw = gtk_scrolled_window_new( NULL, NULL );
+        gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( sw ),
+                                        GTK_POLICY_AUTOMATIC,
+                                        GTK_POLICY_AUTOMATIC );
+        gtk_container_add( GTK_CONTAINER( sw ), w );
+        gtk_container_add( GTK_CONTAINER( fr ), sw );
+        hig_workarea_add_wide_control( t, &row, fr );
+
+    hig_workarea_finish( t, &row );
+    gtk_box_pack_start( GTK_BOX( GTK_DIALOG( d )->vbox ), t, TRUE, TRUE, GUI_PAD_SMALL );
     gtk_widget_show_all( d );
 }
 
@@ -1959,9 +1982,11 @@ tracker_page_new( struct DetailsImpl * di )
       g_signal_connect( w, "toggled", G_CALLBACK( onScrapeToggled ), di );
       gtk_box_pack_start( GTK_BOX( hbox ), w, FALSE, FALSE, 0 );
 
-      w = gtk_button_new_from_stock( GTK_STOCK_EDIT );
+      w = gtk_button_new_with_mnemonic( _( "_Edit URLs" ) );
+      gtk_button_set_image( GTK_BUTTON( w ), gtk_image_new_from_stock( GTK_STOCK_EDIT, GTK_ICON_SIZE_BUTTON ) );
       g_signal_connect( w, "clicked", G_CALLBACK( onEditTrackers ), di );
       gtk_box_pack_end( GTK_BOX( hbox ), w, FALSE, FALSE, 0 );
+      di->edit_trackers_button = w;
 
     gtk_box_pack_start( GTK_BOX( vbox ), hbox, FALSE, FALSE, 0 );
 

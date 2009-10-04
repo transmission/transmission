@@ -373,7 +373,7 @@ make_meta_ui( GtkWindow  * parent, TrCore * core )
 {
     int row = 0;
     const char * str;
-    GtkWidget * d, *t, *w, *l, *fr, *sw;
+    GtkWidget * d, *t, *w, *l, *fr, *sw, *v;
     GSList * slist;
     MakeMetaUI * ui = g_new0 ( MakeMetaUI, 1 );
 
@@ -429,9 +429,9 @@ make_meta_ui( GtkWindow  * parent, TrCore * core )
     hig_workarea_add_section_title ( t, &row, _( "Properties" ) );
 
         str = _( "_Trackers:" );
+        v = gtk_vbox_new( FALSE, GUI_PAD_SMALL );
         ui->announce_text_buffer = gtk_text_buffer_new( NULL );
         w = gtk_text_view_new_with_buffer( ui->announce_text_buffer );
-        gtr_widget_set_tooltip_text( w, _( "Transmission supports HTTP and HTTPS (SSL) trackers.  Torrents with multiple trackers are also supported -- trackers from the same server (with similar URLs) must be grouped together and those from different servers separated by a blank line." ) );
         gtk_widget_set_size_request( w, -1, 80 );
         sw = gtk_scrolled_window_new( NULL, NULL );
         gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( sw ),
@@ -441,7 +441,14 @@ make_meta_ui( GtkWindow  * parent, TrCore * core )
         fr = gtk_frame_new( NULL );
         gtk_frame_set_shadow_type( GTK_FRAME( fr ), GTK_SHADOW_IN );
         gtk_container_add( GTK_CONTAINER( fr ), sw );
-        hig_workarea_add_tall_row( t, &row, str, fr, NULL );
+        gtk_box_pack_start( GTK_BOX( v ), fr, TRUE, TRUE, 0 );
+        l = gtk_label_new( NULL );
+        gtk_label_set_markup( GTK_LABEL( l ), _( "To add a backup URL, add it on the line after the primary URL.\n"
+                                                 "To add another primary URL, add it after a blank line." ) );
+        gtk_label_set_justify( GTK_LABEL( l ), GTK_JUSTIFY_LEFT );
+        gtk_misc_set_alignment( GTK_MISC( l ), 0.0, 0.5 );
+        gtk_box_pack_start( GTK_BOX( v ), l, FALSE, FALSE, 0 );
+        hig_workarea_add_tall_row( t, &row, str, v, NULL );
 
         l = gtk_check_button_new_with_mnemonic( _( "Co_mment:" ) );
         ui->comment_check = l;
