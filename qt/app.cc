@@ -43,7 +43,11 @@ namespace
     {
         { 'g', "config-dir", "Where to look for configuration files", "g", 1, "<path>" },
         { 'm', "minimized",  "Start minimized in system tray", "m", 0, NULL },
+        { 'p', "port",  "Port to use when connecting to an existing session", "p", 1, "<port>" },
+        { 'r', "remote",  "Connect to an existing session at the specified hostname", "r", 1, "<host>" },
+        { 'u', "username", "Username to use when connecting to an existing session", "v", 1, "<username>" },
         { 'v', "version", "Show version number and exit", "v", 0, NULL },
+        { 'w', "password", "Password to use when connecting to an existing session", "w", 1, "<password>" },
         { 0, NULL, NULL, NULL, 0, NULL }
     };
 
@@ -98,11 +102,19 @@ MyApp :: MyApp( int& argc, char ** argv ):
     int c;
     bool minimized = false;
     const char * optarg;
+    const char * host = 0;
+    const char * port = 0;
+    const char * username = 0;
+    const char * password = 0;
     const char * configDir = 0;
     QStringList filenames;
     while( ( c = tr_getopt( getUsage( ), argc, (const char**)argv, opts, &optarg ) ) ) {
         switch( c ) {
             case 'g': configDir = optarg; break;
+            case 'p': port = optarg; break;
+            case 'r': host = optarg; break;
+            case 'u': username = optarg; break;
+            case 'w': password = optarg; break;
             case 'm': minimized = true; break;
             case 'v':        Utils::toStderr( QObject::tr( "transmission %1" ).arg( LONG_VERSION_STRING ) ); exit( 0 ); break;
             case TR_OPT_ERR: Utils::toStderr( QObject::tr( "Invalid option" ) ); showUsage( ); break;
@@ -117,7 +129,19 @@ MyApp :: MyApp( int& argc, char ** argv ):
     // is this the first time we've run transmission?
     const bool firstTime = !QFile(QDir(configDir).absoluteFilePath("settings.json")).exists();
 
+    // initialize the prefs
     myPrefs = new Prefs ( configDir );
+    if( host != 0 )
+        myPrefs->set( Prefs::SESSION_REMOTE_HOST, host );
+    if( port != 0 )
+        myPrefs->set( Prefs::SESSION_REMOTE_PORT, port );
+    if( username != 0 )
+        myPrefs->set( Prefs::SESSION_REMOTE_USERNAME, username );
+    if( password != 0 )
+        myPrefs->set( Prefs::SESSION_REMOTE_USERNAME, password );
+    if( ( host != 0 ) || ( port != 0 ) || ( username != 0 ) || ( password != 0 ) )
+        myPrefs->set( Prefs::SESSION_IS_REMOTE, true );
+
     mySession = new Session( configDir, *myPrefs );
     myModel = new TorrentModel( *myPrefs );
     myWindow = new TrMainWindow( *mySession, *myPrefs, *myModel, minimized );
