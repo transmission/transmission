@@ -550,7 +550,6 @@ Session :: exec( const char * request )
 {
     if( mySession  )
     {
-std::cerr << request << std::endl;
         tr_rpc_request_exec_json( mySession, request, strlen( request ), localSessionCallback, this );
     }
     else if( !myUrl.isEmpty( ) )
