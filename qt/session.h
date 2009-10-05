@@ -104,6 +104,7 @@ class Session: public QObject
         void refreshAllTorrents( );
         void initTorrents( const QSet<int>& ids = QSet<int>() );
         void addTorrent( QString filename );
+        void addTorrent( QString filename, QString localPath );
         void removeTorrents( const QSet<int>& torrentIds, bool deleteFiles=false );
         void verifyTorrents( const QSet<int>& torrentIds );
         void reannounceTorrents( const QSet<int>& torrentIds );

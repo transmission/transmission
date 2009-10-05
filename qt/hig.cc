@@ -10,6 +10,8 @@
  * $Id$
  */
 
+#include <iostream>
+
 #include <QCheckBox>
 #include <QGridLayout>
 #include <QHBoxLayout>
@@ -21,6 +23,7 @@
 HIG :: HIG( QWidget * parent ):
     QWidget( parent ),
     myRow( 0 ),
+    myHasTall( false ),
     myGrid( new QGridLayout( this ) )
 {
     myGrid->setContentsMargins( PAD_BIG, PAD_BIG, PAD_BIG, PAD_BIG );
@@ -126,10 +129,25 @@ HIG :: addLabel( QWidget * w )
 QLabel*
 HIG :: addLabel( const QString& text )
 {
-    QLabel * label = new QLabel( this );
-    label->setText( text );
-    label->setAlignment( Qt::AlignLeft );
+    QLabel * label = new QLabel( text, this );
     addLabel( label );
+    return label;
+}
+
+void
+HIG :: addTallLabel( QWidget * w )
+{
+    QHBoxLayout * h = new QHBoxLayout( );
+    h->addSpacing( 18 );
+    h->addWidget( w );
+    myGrid->addLayout( h, myRow, 0, 1, 1, Qt::AlignLeft|Qt::AlignTop );
+}
+
+QLabel*
+HIG :: addTallLabel( const QString& text )
+{
+    QLabel * label = new QLabel( text, this );
+    addTallLabel( label );
     return label;
 }
 
@@ -151,6 +169,18 @@ HIG :: addRow( const QString& text, QWidget * control, QWidget * buddy )
     QLabel * label = addLabel( text );
     addControl( control );
     label->setBuddy( buddy ? buddy : control );
+    ++myRow;
+    return label;
+}
+
+QLabel *
+HIG :: addTallRow( const QString& text, QWidget * control, QWidget * buddy )
+{
+    QLabel* label = addTallLabel( text );
+    label->setBuddy( buddy ? buddy : control );
+    addControl( control );
+    myHasTall = true;
+    myGrid->setRowStretch ( myRow, 1 );
     ++myRow;
     return label;
 }
@@ -195,8 +225,10 @@ HIG :: addRow( QWidget * label, QLayout * control, QWidget * buddy )
 void
 HIG :: finish( )
 {
-    QWidget * w = new QWidget( this );
-    myGrid->addWidget( w, myRow, 0, 1, 2 );
-    myGrid->setRowStretch( myRow, 100 );
-    ++myRow;
+    if( !myHasTall ) {
+        QWidget * w = new QWidget( this );
+        myGrid->addWidget( w, myRow, 0, 1, 2 );
+        myGrid->setRowStretch( myRow, 100 );
+        ++myRow;
+    }
 }

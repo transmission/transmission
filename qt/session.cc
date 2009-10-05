@@ -550,6 +550,7 @@ Session :: exec( const char * request )
 {
     if( mySession  )
     {
+std::cerr << request << std::endl;
         tr_rpc_request_exec_json( mySession, request, strlen( request ), localSessionCallback, this );
     }
     else if( !myUrl.isEmpty( ) )
@@ -822,6 +823,12 @@ Session :: setBlocklistSize( int64_t i )
 void
 Session :: addTorrent( QString filename )
 {
+    addTorrent( filename, myPrefs.getString( Prefs::DOWNLOAD_DIR ) );
+}
+
+void
+Session :: addTorrent( QString filename, QString localPath )
+{
     QFile file( filename );
     file.open( QIODevice::ReadOnly );
     const QByteArray raw( file.readAll( ) );
@@ -836,7 +843,7 @@ Session :: addTorrent( QString filename )
         tr_bencInitDict( &top, 2 );
         tr_bencDictAddStr( &top, "method", "torrent-add" );
         args = tr_bencDictAddDict( &top, "arguments", 3 );
-        tr_bencDictAddStr( args, "download-dir", qPrintable(myPrefs.getString(Prefs::DOWNLOAD_DIR)) );
+        tr_bencDictAddStr( args, "download-dir", qPrintable(localPath) );
         tr_bencDictAddRaw( args, "metainfo", b64, b64len  );
         tr_bencDictAddInt( args, "paused", !myPrefs.getBool( Prefs::START ) );
         exec( &top );

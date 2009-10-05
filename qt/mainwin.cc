@@ -1062,8 +1062,8 @@ TrMainWindow :: refreshPref( int key )
 void
 TrMainWindow :: newTorrent( )
 {
-    MakeDialog * d = new MakeDialog( mySession, this );
-    d->show( );
+    MakeDialog * dialog = new MakeDialog( mySession, this );
+    dialog->show( );
 }
 
 void
