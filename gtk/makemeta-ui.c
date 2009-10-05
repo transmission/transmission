@@ -235,7 +235,6 @@ onResponse( GtkDialog* d, int response, gpointer user_data )
                 if( !*str )
                     ++tier;
                 else {
-g_message( "tier %d announce %s", tier, tracker_strings[i] );
                     trackers[n].tier = tier;
                     trackers[n].announce = tracker_strings[i];
                     ++n;
