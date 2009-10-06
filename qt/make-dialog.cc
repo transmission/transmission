@@ -130,10 +130,9 @@ MakeDialog :: makeTorrent( )
     QVBoxLayout * top = new QVBoxLayout( dialog );
     top->addWidget(( myNewLabel = new QLabel));
     top->addWidget(( myNewProgress = new QProgressBar ));
-    QDialogButtonBox * buttons = new QDialogButtonBox( dialog );
-    buttons->setStandardButtons( QDialogButtonBox::Ok
-                               | QDialogButtonBox::Open
-                               | QDialogButtonBox::Abort );
+    QDialogButtonBox * buttons = new QDialogButtonBox( QDialogButtonBox::Ok
+                                                     | QDialogButtonBox::Open
+                                                     | QDialogButtonBox::Abort );
     myNewButtonBox = buttons;
     connect( buttons, SIGNAL(clicked(QAbstractButton*)),
              this, SLOT(onNewButtonBoxClicked(QAbstractButton*)) );
@@ -383,9 +382,8 @@ MakeDialog :: MakeDialog( Session & session, QWidget * parent ):
     hig->finish( );
     top->addWidget( hig, 1 );
 
-    myButtonBox = new QDialogButtonBox( this );
-    myButtonBox->setStandardButtons( QDialogButtonBox::Ok
-                               | QDialogButtonBox::Close );
+    myButtonBox = new QDialogButtonBox( QDialogButtonBox::Ok
+                                      | QDialogButtonBox::Close );
     connect( myButtonBox, SIGNAL(clicked(QAbstractButton*)),
              this, SLOT(onButtonBoxClicked(QAbstractButton*)) );
 

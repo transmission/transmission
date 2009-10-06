@@ -13,19 +13,22 @@
 #include <cassert>
 #include <iostream>
 
-#include <QCoreApplication>
 #include <QCheckBox>
-#include <QFileDialog>
 #include <QComboBox>
+#include <QCoreApplication>
 #include <QDialogButtonBox>
 #include <QDoubleSpinBox>
+#include <QFileDialog>
+#include <QFileIconProvider>
+#include <QFileInfo>
 #include <QHBoxLayout>
+#include <QHttp>
+#include <QIcon>
 #include <QLabel>
 #include <QLineEdit>
-#include <QFileInfo>
 #include <QList>
+#include <QMessageBox>
 #include <QPushButton>
-#include <QIcon>
 #include <QSpinBox>
 #include <QStyle>
 #include <QTabWidget>
@@ -33,8 +36,6 @@
 #include <QTimeEdit>
 #include <QTimer>
 #include <QVBoxLayout>
-#include <QHttp>
-#include <QMessageBox>
 
 #include "hig.h"
 #include "prefs.h"
@@ -524,7 +525,8 @@ QWidget *
 PrefsDialog :: createTorrentsTab( )
 {
     const int iconSize( style( )->pixelMetric( QStyle :: PM_SmallIconSize ) );
-    const QIcon folderIcon = QtIconLoader :: icon( "folder", style()->standardIcon( QStyle::SP_DirIcon ) );
+    const QFileIconProvider iconProvider;
+    const QIcon folderIcon = iconProvider.icon( QFileIconProvider::Folder );
     const QPixmap folderPixmap = folderIcon.pixmap( iconSize );
 
     QWidget *l, *r;

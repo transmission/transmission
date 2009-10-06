@@ -16,8 +16,8 @@
 
 #include <QDialogButtonBox>
 #include <QIcon>
-#include <QLibraryInfo>
 #include <QLabel>
+#include <QLibraryInfo>
 #include <QRect>
 #include <QTranslator>
 

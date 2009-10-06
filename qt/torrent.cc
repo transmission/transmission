@@ -14,10 +14,11 @@
 #include <iostream>
 
 #include <QApplication>
-#include <QStyle>
+#include <QFileIconProvider>
+#include <QFileInfo>
 #include <QSet>
 #include <QString>
-#include <QFileInfo>
+#include <QStyle>
 #include <QVariant>
 
 #include <libtransmission/transmission.h>
@@ -26,7 +27,6 @@
 
 #include "app.h"
 #include "prefs.h"
-#include "qticonloader.h"
 #include "torrent.h"
 #include "utils.h"
 
@@ -413,7 +413,7 @@ Torrent :: updateMimeIcon( )
     QIcon icon;
 
     if( files.size( ) > 1 )
-        icon = QtIconLoader :: icon( "folder", QApplication::style()->standardIcon( QStyle::SP_DirIcon ) );
+        icon = QFileIconProvider().icon( QFileIconProvider::Folder );
     else
         icon = Utils :: guessMimeIcon( files.at(0).filename );
 

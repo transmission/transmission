@@ -14,9 +14,9 @@
 #include <iostream>
 
 #include <QApplication>
+#include <QHeaderView>
 #include <QPainter>
 #include <QResizeEvent>
-#include <QHeaderView>
 #include <QStringList>
 
 #include <libtransmission/transmission.h> // priorities

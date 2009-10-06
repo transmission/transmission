@@ -13,19 +13,19 @@
 #include <cstdio>
 #include <iostream>
 
+#include <QCheckBox>
+#include <QDialogButtonBox>
 #include <QEvent>
-#include <QResizeEvent>
 #include <QFileDialog>
+#include <QFileIconProvider>
+#include <QFileInfo>
 #include <QGridLayout>
 #include <QLabel>
-#include <QCheckBox>
-#include <QFileInfo>
-#include <QDialogButtonBox>
 #include <QPushButton>
-#include <QLabel>
+#include <QResizeEvent>
 #include <QSet>
-#include <QWidget>
 #include <QVBoxLayout>
+#include <QWidget>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/bencode.h>
@@ -35,7 +35,6 @@
 #include "hig.h"
 #include "options.h"
 #include "prefs.h"
-#include "qticonloader.h"
 #include "session.h"
 #include "torrent.h"
 
@@ -79,7 +78,8 @@ Options :: Options( Session& session, const Prefs& prefs, const QString& filenam
   
     if( session.isLocal( ) ) 
     {
-        const QIcon folderIcon = QtIconLoader :: icon( "folder", style()->standardIcon( QStyle::SP_DirIcon ) );
+        const QFileIconProvider iconProvider;
+        const QIcon folderIcon = iconProvider.icon( QFileIconProvider::Folder );
         const QPixmap folderPixmap = folderIcon.pixmap( iconSize );
 
         l = new QLabel( tr( "&Destination folder:" ) );

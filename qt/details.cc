@@ -16,29 +16,28 @@
 
 #include <QCheckBox>
 #include <QComboBox>
-#include <QEvent>
-#include <QHeaderView>
-#include <QResizeEvent>
+#include <QDateTime>
 #include <QDialogButtonBox>
 #include <QDoubleSpinBox>
+#include <QEvent>
 #include <QFont>
 #include <QFontMetrics>
 #include <QHBoxLayout>
-#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QHeaderView>
 #include <QLabel>
 #include <QLocale>
 #include <QPushButton>
-#include <QSpinBox>
 #include <QRadioButton>
+#include <QResizeEvent>
+#include <QSpinBox>
 #include <QStyle>
 #include <QTabWidget>
-#include <QTreeView>
 #include <QTextBrowser>
-#include <QDateTime>
+#include <QTreeView>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <QVBoxLayout>
-#include <QHBoxLayout>
 
 #include <libtransmission/transmission.h>
 

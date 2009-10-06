@@ -17,13 +17,13 @@
 #include <QCloseEvent>
 #include <QDesktopServices>
 #include <QFileDialog>
+#include <QHBoxLayout>
 #include <QLabel>
+#include <QSignalMapper>
 #include <QSize>
 #include <QStyle>
-#include <QHBoxLayout>
 #include <QSystemTrayIcon>
 #include <QUrl>
-#include <QSignalMapper>
 
 #include <libtransmission/version.h>
 
