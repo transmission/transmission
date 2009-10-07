@@ -357,9 +357,6 @@ typedef enum
         [fDownloadingFromField setStringValue: @""];
         [fUploadingToField setStringValue: @""];
         [fKnownField setStringValue: @""];
-        [fSeedersField setStringValue: @""];
-        [fLeechersField setStringValue: @""];
-        [fCompletedFromTrackerField setStringValue: @""];
         
         [fDateAddedField setStringValue: @""];
         [fDateCompletedField setStringValue: @""];
@@ -1477,15 +1474,7 @@ typedef enum
         return;
     Torrent * torrent = [fTorrents objectAtIndex: 0];
     
-    #warning remove corresponding fields
-    /*NSInteger seeders = [torrent seeders], leechers = [torrent leechers], completed = [torrent completedFromTracker];
-    [fSeedersField setStringValue: seeders >= 0 ? [NSString stringWithFormat: @"%d", seeders] : @""];
-    [fLeechersField setStringValue: leechers >= 0 ? [NSString stringWithFormat: @"%d", leechers] : @""];
-    [fCompletedFromTrackerField setStringValue: completed >= 0 ? [NSString stringWithFormat: @"%d", completed] : @""];*/
-    
-    BOOL active = [torrent isActive];
-    
-    if (active)
+    if ([torrent isActive])
     {
         NSInteger total = [torrent totalPeersConnected];
         NSString * connected = [NSString stringWithFormat:
