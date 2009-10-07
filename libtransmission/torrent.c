@@ -2320,7 +2320,8 @@ struct LocationData
 static void
 setLocation( void * vdata )
 {
-    int err = 0;
+    tr_bool err = FALSE;
+    tr_bool verify_needed = FALSE;
     struct LocationData * data = vdata;
     tr_torrent * tor = data->tor;
     const tr_bool do_move = data->move_from_old_location;
@@ -2358,10 +2359,15 @@ setLocation( void * vdata )
             {
                 errno = 0;
                 tr_torinf( tor, "moving \"%s\" to \"%s\"", oldpath, newpath );
-                if( tr_moveFile( oldpath, newpath ) ) {
-                    err = 1;
-                    tr_torerr( tor, "error moving \"%s\" to \"%s\": %s",
-                                    oldpath, newpath, tr_strerror( errno ) );
+                if( rename( oldpath, newpath ) )
+                {
+                    verify_needed = TRUE;
+                    if( tr_moveFile( oldpath, newpath ) )
+                    {
+                        err = TRUE;
+                        tr_torerr( tor, "error moving \"%s\" to \"%s\": %s",
+                                        oldpath, newpath, tr_strerror( errno ) );
+                    }
                 }
             }
             else if( !stat( newpath, &sb ) )
@@ -2382,12 +2388,13 @@ setLocation( void * vdata )
         if( !err )
         {
             /* blow away the leftover subdirectories in the old location */
-            if( do_move )
+            if( do_move && verify_needed )
                 tr_torrentDeleteLocalData( tor, remove );
 
             /* set the new location and reverify */
             tr_torrentSetDownloadDir( tor, location );
-            tr_torrentVerify( tor );
+            if( verify_needed )
+                tr_torrentVerify( tor );
         }
     }
 
