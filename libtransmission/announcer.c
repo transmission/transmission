@@ -1634,6 +1634,7 @@ tr_announcerStats( const tr_torrent * torrent,
     int out = 0;
     int tierCount;
     tr_tracker_stat * ret;
+    const time_t now = time( NULL );
 
     assert( tr_isTorrent( torrent ) );
 
@@ -1670,8 +1671,8 @@ tr_announcerStats( const tr_torrent * torrent,
                 st->lastScrapeTime = 0;
                 st->lastScrapeSucceeded = FALSE;
                 st->lastScrapeResult[0] = '\0';
-                st->isScraping = FALSE;
-                st->willScrape = FALSE;
+                st->scrapeState = TR_TRACKER_INACTIVE;
+                st->announceState = TR_TRACKER_INACTIVE;
                 st->nextScrapeTime = 0;
                 st->lastAnnounceStartTime = 0;
                 st->hasAnnounced = 0;
@@ -1679,8 +1680,6 @@ tr_announcerStats( const tr_torrent * torrent,
                 st->lastAnnounceResult[0] = '\0';
                 st->lastAnnounceSucceeded = FALSE;
                 st->lastAnnouncePeerCount = 0;
-                st->isAnnouncing = FALSE;
-                st->willAnnounce = FALSE;
                 st->nextAnnounceTime = 0;
                 st->seederCount = 0;
                 st->leecherCount = 0;
@@ -1694,10 +1693,14 @@ tr_announcerStats( const tr_torrent * torrent,
                     tr_strlcpy( st->lastScrapeResult, tier->lastScrapeStr, sizeof( st->lastScrapeResult ) );
                 }
 
-                st->isScraping = tier->isScraping;
-
-                if(( st->willScrape = !tier->isScraping ))
+                if( tier->isScraping )
+                    st->scrapeState = TR_TRACKER_ACTIVE;
+                else if( tierNeedsToScrape( tier, now ) )
+                    st->scrapeState = TR_TRACKER_QUEUED;
+                else {
+                    st->scrapeState = TR_TRACKER_WAITING;
                     st->nextScrapeTime = tier->scrapeAt;
+                }
 
                 st->lastAnnounceStartTime = tier->lastAnnounceStartTime;
 
@@ -1709,10 +1712,16 @@ tr_announcerStats( const tr_torrent * torrent,
                     }
                 }
 
-                st->isAnnouncing = tier->isAnnouncing;
-
-                if(( st->willAnnounce = torrent->isRunning && !tier->isAnnouncing ))
+                if( tier->isAnnouncing )
+                    st->announceState = TR_TRACKER_ACTIVE;
+                else if( !torrent->isRunning )
+                    st->announceState = TR_TRACKER_INACTIVE;
+                else if( tierNeedsToAnnounce( tier, now ) )
+                    st->announceState = TR_TRACKER_QUEUED;
+                else {
+                    st->announceState = TR_TRACKER_WAITING;
                     st->nextAnnounceTime = tier->announceAt;
+                }
 
                 st->seederCount = tracker->seederCount;
                 st->leecherCount = tracker->leecherCount;

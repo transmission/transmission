@@ -251,13 +251,12 @@
    trackerStats       | array of objects, each containing:   |
                       +-------------------------+------------+
                       | announce                | string     | tr_tracker_stat
+                      | announceState           | number     | tr_tracker_stat
                       | downloadCount           | number     | tr_tracker_stat
                       | hasAnnounced            | boolean    | tr_tracker_stat
                       | hasScraped              | boolean    | tr_tracker_stat
                       | host                    | string     | tr_tracker_stat
                       | isActive                | boolean    | tr_tracker_stat
-                      | isAnnouncing            | boolean    | tr_tracker_stat
-                      | isScraping              | boolean    | tr_tracker_stat
                       | lastAnnouncePeerCount   | number     | tr_tracker_stat
                       | lastAnnounceResult      | number     | tr_tracker_stat
                       | lastAnnounceStartTime   | number     | tr_tracker_stat
@@ -270,10 +269,9 @@
                       | leecherCount            | number     | tr_tracker_stat
                       | nextAnnounceTime        | number     | tr_tracker_stat
                       | nextScrapeTime          | number     | tr_tracker_stat
+                      | scrapeState             | number     | tr_tracker_stat
                       | seederCount             | number     | tr_tracker_stat
                       | tier                    | number     | tr_tracker_stat
-                      | willAnnounce            | boolean    | tr_tracker_stat
-                      | willScrape              | boolean    | tr_tracker_stat
    -------------------+-------------------------+------------+
    wanted             | an array of tr_info.fileCount        | tr_info
                       | 'booleans' true if the corresponding |

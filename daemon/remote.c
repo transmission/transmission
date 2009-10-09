@@ -1247,8 +1247,6 @@ printDetails( tr_benc * top )
                     tr_bool hasScraped; 
                     const char * host;
                     tr_bool isActive; 
-                    tr_bool isAnnouncing; 
-                    tr_bool isScraping; 
                     int64_t lastAnnouncePeerCount; 
                     const char * lastAnnounceResult; 
                     time_t lastAnnounceStartTime; 
@@ -1263,16 +1261,16 @@ printDetails( tr_benc * top )
                     int64_t nextScrapeTime; 
                     int64_t seederCount;
                     int64_t tier;
-                    tr_bool willAnnounce;
-                    tr_bool willScrape;
+                    int64_t announceState;
+                    int64_t scrapeState;
            
                     if( tr_bencDictFindInt ( t, "downloadCount", &downloadCount ) &&
                         tr_bencDictFindBool( t, "hasAnnounced", &hasAnnounced ) &&
                         tr_bencDictFindBool( t, "hasScraped", &hasScraped ) &&
                         tr_bencDictFindStr ( t, "host", &host ) &&
                         tr_bencDictFindBool( t, "isActive", &isActive ) &&
-                        tr_bencDictFindBool( t, "isAnnouncing", &isAnnouncing ) &&
-                        tr_bencDictFindBool( t, "isScraping", &isScraping ) &&
+                        tr_bencDictFindInt ( t, "announceState", &announceState ) &&
+                        tr_bencDictFindInt ( t, "scrapeState", &scrapeState ) &&
                         tr_bencDictFindInt ( t, "lastAnnouncePeerCount", &lastAnnouncePeerCount ) &&
                         tr_bencDictFindStr ( t, "lastAnnounceResult", &lastAnnounceResult ) &&
                         tr_bencDictFindInt ( t, "lastAnnounceStartTime", &lastAnnounceStartTime ) &&
@@ -1286,9 +1284,7 @@ printDetails( tr_benc * top )
                         tr_bencDictFindInt ( t, "nextAnnounceTime", &nextAnnounceTime ) &&
                         tr_bencDictFindInt ( t, "nextScrapeTime", &nextScrapeTime ) &&
                         tr_bencDictFindInt ( t, "seederCount", &seederCount ) &&
-                        tr_bencDictFindInt ( t, "tier", &tier ) &&
-                        tr_bencDictFindBool( t, "willAnnounce", &willAnnounce ) &&
-                        tr_bencDictFindBool( t, "willScrape", &willScrape ) )
+                        tr_bencDictFindInt ( t, "tier", &tier ) )
                     {
                         const time_t now = time( NULL );
 
@@ -1310,20 +1306,25 @@ printDetails( tr_benc * top )
                                         lastAnnounceResult, buf );
                         }
 
-                        if( isActive && ( isAnnouncing || willAnnounce ) ) {
-                            if( !isAnnouncing ) {
+                        if( isActive ) switch( announceState ) {
+                            case TR_TRACKER_INACTIVE:
+                                printf( "  No updates scheduled\n" );
+                                break;
+                            case TR_TRACKER_WAITING:
                                 tr_strltime( buf, nextAnnounceTime - now, sizeof( buf ) );
                                 printf( "  Asking for more peers in %s\n", buf );
-                            } else {
+                                break;
+                            case TR_TRACKER_QUEUED:
+                                printf( "  Queued to ask for more peers\n" );
+                                break;
+                            case TR_TRACKER_ACTIVE:
                                 tr_strltime( buf, now - lastAnnounceStartTime, sizeof( buf ) );
                                 printf( "  Asking for more peers now... %s\n", buf );
-                            }
+                                break;
                         }
 
-                        if( !hasAnnounced && !isAnnouncing && !willAnnounce )
-                          printf( "  No updates scheduled\n" );
-
-                        if( isActive && hasScraped ) {
+                        if( isActive && hasScraped )
+                        {
                             tr_strltime( buf, now - lastScrapeTime, sizeof( buf ) );
                             if( lastScrapeSucceeded )
                                 printf( "  Tracker had %'d seeders and %'d leechers %s ago\n",
@@ -1333,14 +1334,20 @@ printDetails( tr_benc * top )
                                         lastScrapeResult, buf );
                         }
 
-                        if( isScraping || willScrape ) {
-                            if( !isScraping ) {
+                        switch( scrapeState ) {
+                            case TR_TRACKER_INACTIVE:
+                                break;
+                            case TR_TRACKER_WAITING:
                                 tr_strltime( buf, nextScrapeTime - now, sizeof( buf ) );
                                 printf( "  Asking for peer counts in %s\n", buf );
-                            } else {
+                                break;
+                            case TR_TRACKER_QUEUED:
+                                printf( "  Queued to ask for peer counts\n" );
+                                break;
+                            case TR_TRACKER_ACTIVE:
                                 tr_strltime( buf, now - lastScrapeStartTime, sizeof( buf ) );
                                 printf( "  Asking for peer counts now... %s\n", buf );
-                            }
+                                break;
                         }
                     }
                 }

@@ -1635,20 +1635,26 @@ buildTrackerSummary( const char * key, const tr_tracker_stat * st, gboolean show
                                     timebuf );
     }
 
-    if( st->isActive && ( st->isAnnouncing || st->willAnnounce ) ) {
-        g_string_append_c( gstr, '\n' );
-        if( !st->isAnnouncing ) {
+    if( st->isActive ) switch( st->announceState ) {
+        case TR_TRACKER_INACTIVE:
+            if( !st->hasAnnounced ) {
+                g_string_append_c( gstr, '\n' );
+                g_string_append( gstr, _( "No updates scheduled" ) );
+            }
+            break;
+        case TR_TRACKER_WAITING:
             tr_strltime_rounded( timebuf, st->nextAnnounceTime - now, sizeof( timebuf ) );
+            g_string_append_c( gstr, '\n' );
             g_string_append_printf( gstr, _( "Asking for more peers in %s" ), timebuf );
-        } else {
+            break;
+        case TR_TRACKER_QUEUED:
+            g_string_append_c( gstr, '\n' );
+            g_string_append( gstr, _( "Queued to ask for more peers" ) );
+            break;
+        case TR_TRACKER_ACTIVE:
             tr_strltime_rounded( timebuf, now - st->lastAnnounceStartTime, sizeof( timebuf ) );
             g_string_append_printf( gstr, _( "Asking for more peers now... <small>%s</small>" ), timebuf );
-        }
-    }
-
-    if( !st->hasAnnounced && !st->isAnnouncing && !st->willAnnounce ) {
-        g_string_append_c( gstr, '\n' );
-        g_string_append( gstr, _( "No updates scheduled" ) );
+            break;
     }
 
     if( st->isActive && showScrape )
@@ -1664,18 +1670,27 @@ buildTrackerSummary( const char * key, const tr_tracker_stat * st, gboolean show
                 g_string_append_printf( gstr, _( "Got a scrape error \"%s%s%s\" %s ago" ), err_markup_begin, st->lastScrapeResult, err_markup_end, timebuf );
         }
 
-        if( st->isScraping || st->willScrape ) {
-            g_string_append_c( gstr, '\n' );
-            if( !st->isScraping ) {
-                tr_strltime_rounded( timebuf, st->nextScrapeTime - now, sizeof( timebuf ) );
-                g_string_append_printf( gstr, _( "Asking for peer counts in %s" ), timebuf );
-            } else {
+        switch( st->scrapeState )
+        {
+            case TR_TRACKER_INACTIVE:
+                break;
+            case TR_TRACKER_WAITING:
+                g_string_append_c( gstr, '\n' );
                 tr_strltime_rounded( timebuf, now - st->lastScrapeStartTime, sizeof( timebuf ) );
                 g_string_append_printf( gstr, _( "Asking for peer counts now... <small>%s</small>" ), timebuf );
-            }
+                break;
+            case TR_TRACKER_QUEUED:
+                g_string_append_c( gstr, '\n' );
+                g_string_append( gstr, _( "Queued to ask for peer counts" ) );
+                break;
+            case TR_TRACKER_ACTIVE:
+                g_string_append_c( gstr, '\n' );
+                tr_strltime_rounded( timebuf, st->nextScrapeTime - now, sizeof( timebuf ) );
+                g_string_append_printf( gstr, _( "Asking for peer counts in %s" ), timebuf );
+                break;
         }
     }
-      
+
     return g_string_free( gstr, FALSE );
 }
 

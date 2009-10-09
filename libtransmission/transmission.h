@@ -1230,6 +1230,25 @@ void           tr_torrentPeersFree( tr_peer_stat * peerStats,
 ****  tr_tracker_stat
 ***/
 
+typedef enum
+{
+    /* we won't (announce,scrape) this torrent to this tracker because
+     * the torrent is stopped, or because of an error, or whatever */
+    TR_TRACKER_INACTIVE,
+
+    /* we will (announce,scrape) this torrent to this tracker, and are
+     * waiting for enough time to pass to satisfy the tracker's interval */
+    TR_TRACKER_WAITING,
+
+    /* it's time to (announce,scrape) this torrent, and we're waiting on a
+     * a free slot to open up in the announce manager */
+    TR_TRACKER_QUEUED,
+
+    /* we're (announcing,scraping) this torrent right now */
+    TR_TRACKER_ACTIVE
+}
+tr_tracker_state;
+
 typedef struct
 {
     /* how many downloads this tracker knows of (-1 means it does not know) */
@@ -1251,11 +1270,11 @@ typedef struct
        Transmission typically uses one tracker per tier. */
     tr_bool isActive;
 
-    /* true if we've sent an announce and waiting for the response */
-    tr_bool isAnnouncing;
+    /* is the tracker announcing, waiting, queued, etc */
+    tr_tracker_state announceState;
 
-    /* true if we've got a scrape request pending right now */
-    tr_bool isScraping;
+    /* is the tracker scraping, waiting, queued, etc */
+    tr_tracker_state scrapeState;
 
     /* number of peers the tracker told us about last time.
      * if "lastAnnounceSucceeded" is false, this field is undefined */
@@ -1297,11 +1316,11 @@ typedef struct
     int leecherCount;
 
     /* when the next periodic announce message will be sent out.
-       if "willAnnounce" is false, this field is undefined */
+       if announceState isn't TR_TRACKER_WAITING, this field is undefined */
     time_t nextAnnounceTime;
 
     /* when the next periodic scrape message will be sent out.
-       if "willScrape" is false, this field is undefined */
+       if scrapeState isn't TR_TRACKER_WAITING, this field is undefined */
     time_t nextScrapeTime;
 
     /* number of seeders this tracker knows of (-1 means it does not know) */
@@ -1309,12 +1328,6 @@ typedef struct
 
     /* which tier this tracker is in */
     int tier;
-
-    /* true if the torrent's not announcing now, but will at nextAnnounceTime */
-    tr_bool willAnnounce;
-
-    /* true if we're not scraping now but will at nextScrapeTime */
-    tr_bool willScrape;
 }
 tr_tracker_stat;
 
