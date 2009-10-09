@@ -697,10 +697,10 @@
 - (NSRect) rectForMinimalStatusWithString: (NSAttributedString *) string inBounds: (NSRect) bounds
 {
     NSRect result;
-    result.origin.x = NSMinX(bounds) + bounds.size.width - result.size.width - PADDING_HORIZONTAL;
-    result.origin.y = NSMinY(bounds) + PADDING_ABOVE_MIN_STATUS;
-    
     result.size = [string size];
+    
+    result.origin.x = NSMaxX(bounds) - result.size.width - PADDING_HORIZONTAL;
+    result.origin.y = NSMinY(bounds) + PADDING_ABOVE_MIN_STATUS;
     
     return result;
 }
