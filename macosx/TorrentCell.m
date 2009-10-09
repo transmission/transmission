@@ -696,11 +696,11 @@
 
 - (NSRect) rectForMinimalStatusWithString: (NSAttributedString *) string inBounds: (NSRect) bounds
 {
-    NSRect result = bounds;
-    result.size = [string size];
+    NSRect result;
+    result.origin.x = NSMinX(bounds) + bounds.size.width - result.size.width - PADDING_HORIZONTAL;
+    result.origin.y = NSMinY(bounds) + PADDING_ABOVE_MIN_STATUS;
     
-    result.origin.x += bounds.size.width - result.size.width - PADDING_HORIZONTAL;
-    result.origin.y += PADDING_ABOVE_MIN_STATUS;
+    result.size = [string size];
     
     return result;
 }
@@ -710,9 +710,10 @@
 {
     const BOOL minimal = [fDefaults boolForKey: @"SmallView"];
     
-    NSRect result = bounds;
-    result.origin.y += PADDING_ABOVE_TITLE;
-    result.origin.x += PADDING_HORIZONTAL + (minimal ? IMAGE_SIZE_MIN : IMAGE_SIZE_REG) + PADDING_BETWEEN_IMAGE_AND_TITLE;
+    NSRect result;
+    result.origin.y = NSMinY(bounds) + PADDING_ABOVE_TITLE;
+    result.origin.x = NSMinX(bounds) + PADDING_HORIZONTAL
+                        + (minimal ? IMAGE_SIZE_MIN : IMAGE_SIZE_REG) + PADDING_BETWEEN_IMAGE_AND_TITLE;
     
     result.size = [string size];
     result.size.width = MIN(result.size.width, NSMaxX(bounds) - result.origin.x - PADDING_HORIZONTAL
@@ -724,9 +725,9 @@
 
 - (NSRect) rectForProgressWithString: (NSAttributedString *) string inBounds: (NSRect) bounds
 {
-    NSRect result = bounds;
-    result.origin.y += PADDING_ABOVE_TITLE + HEIGHT_TITLE + PADDING_BETWEEN_TITLE_AND_PROGRESS;
-    result.origin.x += PADDING_HORIZONTAL + IMAGE_SIZE_REG + PADDING_BETWEEN_IMAGE_AND_TITLE;
+    NSRect result;
+    result.origin.y = NSMinY(bounds) + PADDING_ABOVE_TITLE + HEIGHT_TITLE + PADDING_BETWEEN_TITLE_AND_PROGRESS;
+    result.origin.x = NSMinX(bounds) + PADDING_HORIZONTAL + IMAGE_SIZE_REG + PADDING_BETWEEN_IMAGE_AND_TITLE;
     
     result.size = [string size];
     result.size.width = MIN(result.size.width, NSMaxX(bounds) - result.origin.x - PADDING_HORIZONTAL);
@@ -736,10 +737,10 @@
 
 - (NSRect) rectForStatusWithString: (NSAttributedString *) string inBounds: (NSRect) bounds
 {
-    NSRect result = bounds;
-    result.origin.y += PADDING_ABOVE_TITLE + HEIGHT_TITLE + PADDING_BETWEEN_TITLE_AND_PROGRESS + HEIGHT_STATUS
+    NSRect result;
+    result.origin.y = NSMinY(bounds) + PADDING_ABOVE_TITLE + HEIGHT_TITLE + PADDING_BETWEEN_TITLE_AND_PROGRESS + HEIGHT_STATUS
                         + PADDING_BETWEEN_PROGRESS_AND_BAR + BAR_HEIGHT + PADDING_BETWEEN_BAR_AND_STATUS;
-    result.origin.x += PADDING_HORIZONTAL + IMAGE_SIZE_REG + PADDING_BETWEEN_IMAGE_AND_TITLE;
+    result.origin.x = NSMinX(bounds) + PADDING_HORIZONTAL + IMAGE_SIZE_REG + PADDING_BETWEEN_IMAGE_AND_TITLE;
     
     result.size = [string size];
     result.size.width = MIN(result.size.width, NSMaxX(bounds) - result.origin.x - PADDING_HORIZONTAL);

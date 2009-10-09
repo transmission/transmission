@@ -136,7 +136,7 @@
 - (NSString *) lastScrapeStatusString
 {
     NSString * dateString;
-    if (fStat.hasScraped && fStat.lastScrapeTime != 0)
+    if (fStat.hasScraped)
     {
         NSDateFormatter * dateFormatter = [[NSDateFormatter alloc] init];
         [dateFormatter setDateStyle: NSDateFormatterFullStyle];
