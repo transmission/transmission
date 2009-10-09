@@ -77,7 +77,7 @@
 - (NSString *) lastAnnounceStatusString
 {
     NSString * dateString;
-    if (fStat.hasAnnounced && fStat.lastAnnounceTime != 0)
+    if (fStat.hasAnnounced)
     {
         NSDateFormatter * dateFormatter = [[NSDateFormatter alloc] init];
         [dateFormatter setDateStyle: NSDateFormatterFullStyle];
@@ -111,15 +111,26 @@
 
 - (NSString *) nextAnnounceStatusString
 {
-    if (fStat.isAnnouncing)
-        return [NSLocalizedString(@"Announce in progress", "Tracker next announce") stringByAppendingEllipsis];
-    else if (fStat.willAnnounce)
-        return [NSString stringWithFormat: NSLocalizedString(@"Next announce in %@", "Tracker next announce"),
-                [NSString timeString: fStat.nextAnnounceTime - [[NSDate date] timeIntervalSince1970] showSeconds: YES]];
-    else if (fStat.isActive)
-        return NSLocalizedString(@"Announce not scheduled", "Tracker next announce");
-    else
-        return NSLocalizedString(@"Tracker will be used as a backup", "Tracker next announce");
+    switch (fStat.announceState)
+    {
+        case TR_TRACKER_ACTIVE:
+            return [NSLocalizedString(@"Announce in progress", "Tracker next announce") stringByAppendingEllipsis];
+        
+        case TR_TRACKER_WAITING:
+            return [NSString stringWithFormat: NSLocalizedString(@"Next announce in %@", "Tracker next announce"),
+                    [NSString timeString: fStat.nextAnnounceTime - [[NSDate date] timeIntervalSince1970] showSeconds: YES]];
+        
+        case TR_TRACKER_QUEUED:
+            return [NSLocalizedString(@"Announce is queued", "Tracker next announce") stringByAppendingEllipsis];
+        
+        case TR_TRACKER_INACTIVE:
+            return fStat.isActive ? NSLocalizedString(@"Announce not scheduled", "Tracker next announce")
+                                    : NSLocalizedString(@"Tracker will be used as a backup", "Tracker next announce");
+        
+        default:
+            NSAssert(NO, @"unknown announce state: %d", fStat.announceState);
+            return nil;
+    }
 }
 
 - (NSString *) lastScrapeStatusString
