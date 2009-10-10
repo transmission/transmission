@@ -1868,6 +1868,7 @@ onBackupToggled( GtkToggleButton * button, struct DetailsImpl * di )
 static void
 onEditTrackersResponse( GtkDialog * dialog, int response, gpointer data )
 {
+    gboolean do_destroy = TRUE;
     struct DetailsImpl * di = data;
 
     if( response == GTK_RESPONSE_ACCEPT )
@@ -1875,6 +1876,7 @@ onEditTrackersResponse( GtkDialog * dialog, int response, gpointer data )
         int i, n;
         int tier;
         GtkTextIter start, end;
+        tr_announce_list_err err;
         char * tracker_text;
         char ** tracker_strings;
         tr_tracker_info * trackers;
@@ -1899,9 +1901,30 @@ onEditTrackersResponse( GtkDialog * dialog, int response, gpointer data )
         }
 
         /* update the torrent */
-        tr_torrentSetAnnounceList( tor, trackers, n );
-        di->trackers = NULL;
-        di->tracker_buffer = NULL;
+        err = tr_torrentSetAnnounceList( tor, trackers, n );
+        if( err )
+        {
+            GtkWidget * w;
+            const char * str = NULL;
+            if( err == TR_ANNOUNCE_LIST_HAS_DUPLICATES )
+                str = _( "List contains duplicate URLs" );
+            else if( err == TR_ANNOUNCE_LIST_HAS_BAD )
+                str = _( "List contains invalid URLs" );
+            else
+                assert( 0 && "unhandled condition" );
+            w = gtk_message_dialog_new( GTK_WINDOW( dialog ),
+                                        GTK_DIALOG_MODAL,
+                                        GTK_MESSAGE_ERROR,
+                                        GTK_BUTTONS_CLOSE, "%s", str );
+            gtk_dialog_run( GTK_DIALOG( w ) );
+            gtk_widget_destroy( w );
+            do_destroy = FALSE;
+        }
+        else
+        {
+            di->trackers = NULL;
+            di->tracker_buffer = NULL;
+        }
 
         /* cleanup */
         g_free( trackers );
@@ -1909,7 +1932,8 @@ onEditTrackersResponse( GtkDialog * dialog, int response, gpointer data )
         g_free( tracker_text );
     }
 
-    gtk_widget_destroy( GTK_WIDGET( dialog ) );
+    if( do_destroy )
+        gtk_widget_destroy( GTK_WIDGET( dialog ) );
 }
 
 static void
