@@ -699,7 +699,7 @@
     NSRect result;
     result.size = [string size];
     
-    result.origin.x = NSMaxX(bounds) - result.size.width - PADDING_HORIZONTAL;
+    result.origin.x = NSMaxX(bounds) - (NSWidth(result) + PADDING_HORIZONTAL);
     result.origin.y = NSMinY(bounds) + PADDING_ABOVE_MIN_STATUS;
     
     return result;

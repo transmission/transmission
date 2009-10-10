@@ -169,28 +169,41 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 + (void) initialize
 {
     //make sure another Transmission.app isn't running already
-    NSString * bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
-    int processIdentifier = [[NSProcessInfo processInfo] processIdentifier];
-
-    for (NSDictionary * dic in [[NSWorkspace sharedWorkspace] launchedApplications])
+    BOOL othersRunning = NO;
+    
+    if ([NSApp isOnSnowLeopardOrBetter])
     {
-        if ([[dic objectForKey: @"NSApplicationBundleIdentifier"] isEqualToString: bundleIdentifier]
-            && [[dic objectForKey: @"NSApplicationProcessIdentifier"] intValue] != processIdentifier)
+        NSArray * apps = [NSRunningApplication runningApplicationsWithBundleIdentifier: [[NSBundle mainBundle] bundleIdentifier]];
+        othersRunning = [apps count] > 1;
+    }
+    else
+    {
+        NSString * bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
+        const int processIdentifier = [[NSProcessInfo processInfo] processIdentifier];
+
+        for (NSDictionary * dic in [[NSWorkspace sharedWorkspace] launchedApplications])
         {
-            NSAlert * alert = [[NSAlert alloc] init];
-            [alert addButtonWithTitle: NSLocalizedString(@"Quit", "Transmission already running alert -> button")];
-            [alert setMessageText: NSLocalizedString(@"Transmission is already running.",
-                                                    "Transmission already running alert -> title")];
-            [alert setInformativeText: NSLocalizedString(@"There is already a copy of Transmission running. "
-                "This copy cannot be opened until that instance is quit.", "Transmission already running alert -> message")];
-            [alert setAlertStyle: NSCriticalAlertStyle];
-            
-            [alert runModal];
-            [alert release];
-            
-            //kill ourselves right away
-            exit(0);
+            if ([[dic objectForKey: @"NSApplicationBundleIdentifier"] isEqualToString: bundleIdentifier]
+                    && [[dic objectForKey: @"NSApplicationProcessIdentifier"] intValue] != processIdentifier)
+                othersRunning = YES;
         }
+    }
+    
+    if (othersRunning)
+    {
+        NSAlert * alert = [[NSAlert alloc] init];
+        [alert addButtonWithTitle: NSLocalizedString(@"Quit", "Transmission already running alert -> button")];
+        [alert setMessageText: NSLocalizedString(@"Transmission is already running.",
+                                                "Transmission already running alert -> title")];
+        [alert setInformativeText: NSLocalizedString(@"There is already a copy of Transmission running. "
+            "This copy cannot be opened until that instance is quit.", "Transmission already running alert -> message")];
+        [alert setAlertStyle: NSCriticalAlertStyle];
+        
+        [alert runModal];
+        [alert release];
+        
+        //kill ourselves right away
+        exit(0);
     }
     
     [[NSUserDefaults standardUserDefaults] registerDefaults: [NSDictionary dictionaryWithContentsOfFile:
