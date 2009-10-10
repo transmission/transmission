@@ -423,7 +423,10 @@
     tr_tracker_info * trackerInfo = tr_new0(tr_tracker_info, [fTrackers count]);
     
     for (NSUInteger i = 0; i < [fTrackers count]; i++)
+    {
         trackerInfo[i].announce = (char *)[[fTrackers objectAtIndex: i] UTF8String];
+        trackerInfo[i].tier = i;
+    }
     
     //store values
     [fDefaults setObject: fTrackers forKey: @"CreatorTrackers"];
