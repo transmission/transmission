@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #define QLPreviewPanelSL NSClassFromString(@"QLPreviewPanel")
+#define NSRunningApplicationSL NSClassFromString(@"NSRunningApplication")
 
 @interface NSApplication (NSApplicationAdditions)
 

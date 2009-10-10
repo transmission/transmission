@@ -31,7 +31,7 @@
 
 #define GROUP_SEPARATOR_HEIGHT 18.0
 
-#warning revert
+#warning uncomment
 @interface TorrentTableView : NSOutlineView //<QLPreviewPanelDataSource, QLPreviewPanelDelegate>
 {
     IBOutlet Controller * fController;
