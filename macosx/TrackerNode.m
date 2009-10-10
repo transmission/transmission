@@ -128,7 +128,7 @@
                                     : NSLocalizedString(@"Tracker will be used as a backup", "Tracker next announce");
         
         default:
-            NSAssert(NO, @"unknown announce state: %d", fStat.announceState);
+            NSAssert1(NO, @"unknown announce state: %d", fStat.announceState);
             return nil;
     }
 }
