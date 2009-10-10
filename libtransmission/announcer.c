@@ -1695,12 +1695,10 @@ tr_announcerStats( const tr_torrent * torrent,
 
                 if( tier->isScraping )
                     st->scrapeState = TR_TRACKER_ACTIVE;
-                else if( tierNeedsToScrape( tier, now ) )
-                    st->scrapeState = TR_TRACKER_QUEUED;
-                else {
+                else if( tier->scrapeAt > now )
                     st->scrapeState = TR_TRACKER_WAITING;
-                    st->nextScrapeTime = tier->scrapeAt;
-                }
+                else
+                    st->scrapeState = TR_TRACKER_QUEUED;
 
                 st->lastAnnounceStartTime = tier->lastAnnounceStartTime;
 
@@ -1716,12 +1714,10 @@ tr_announcerStats( const tr_torrent * torrent,
                     st->announceState = TR_TRACKER_ACTIVE;
                 else if( !torrent->isRunning )
                     st->announceState = TR_TRACKER_INACTIVE;
-                else if( tierNeedsToAnnounce( tier, now ) )
-                    st->announceState = TR_TRACKER_QUEUED;
-                else {
+                else if( tier->announceAt > now )
                     st->announceState = TR_TRACKER_WAITING;
-                    st->nextAnnounceTime = tier->announceAt;
-                }
+                else
+                    st->announceState = TR_TRACKER_QUEUED;
 
                 st->seederCount = tracker->seederCount;
                 st->leecherCount = tracker->leecherCount;
