@@ -76,6 +76,7 @@ class Details: public QDialog
         QLabel * myRatioLabel;
         QLabel * myErrorLabel;
         QLabel * myRunTimeLabel;
+        QLabel * myETALabel;
         QLabel * myLastActivityLabel;
 
         QCheckBox * mySessionLimitCheck;

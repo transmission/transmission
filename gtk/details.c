@@ -70,6 +70,7 @@ struct DetailsImpl
     GtkWidget * ratio_lb;
     GtkWidget * error_lb;
     GtkWidget * date_started_lb;
+    GtkWidget * eta_lb;
     GtkWidget * last_activity_lb;
 
     GtkWidget * hash_lb;
@@ -732,6 +733,25 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     gtk_label_set_text( GTK_LABEL( di->date_started_lb ), str );
 
 
+    /* eta */
+    if( n <= 0 )
+        str = none;
+    else {
+        const int baseline = stats[0]->eta;
+        for( i=1; i<n; ++i )
+            if( baseline != stats[i]->eta )
+                break;
+        if( i!=n )
+            str = mixed;
+        else if( baseline < 0 )
+            str = _( "Unknown" );
+        else
+            str = tr_strltime( buf, baseline, sizeof( buf ) );
+    }
+    gtk_label_set_text( GTK_LABEL( di->eta_lb ), str );
+     
+
+
     /* size_lb */
     {
         char sizebuf[128];
@@ -940,6 +960,10 @@ info_page_new( struct DetailsImpl * di )
         /* running for */
         l = di->date_started_lb = gtk_label_new( NULL );
         hig_workarea_add_row( t, &row, _( "Running time:" ), l, NULL );
+
+        /* eta */
+        l = di->eta_lb = gtk_label_new( NULL );
+        hig_workarea_add_row( t, &row, _( "Remaining time:" ), l, NULL );
 
         /* last activity */
         l = di->last_activity_lb = gtk_label_new( NULL );

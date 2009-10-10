@@ -329,6 +329,28 @@ Details :: refresh( )
     myRunTimeLabel->setText( string );
 
 
+    // myETALabel
+    string.clear( );
+    if( torrents.empty( ) )
+        string = none;
+    else {
+        int baseline = torrents[0]->getETA( );
+        foreach( const Torrent * t, torrents ) {
+            if( baseline != t->getETA( ) ) {
+                string = mixed;
+                break;
+            }
+        }
+        if( string.isEmpty( ) ) {
+            if( baseline < 0 )
+                string = tr( "Unknown" );
+            else
+                string = Utils::timeToString( baseline );
+       } 
+    }
+    myETALabel->setText( string );
+
+
     // myLastActivityLabel
     if( torrents.empty( ) )
         string = none;
@@ -791,6 +813,7 @@ Details :: createInfoTab( )
     hig->addRow( tr( "Ratio:" ), myRatioLabel = new SqueezeLabel );
     hig->addRow( tr( "State:" ), myStateLabel = new SqueezeLabel );
     hig->addRow( tr( "Running time:" ), myRunTimeLabel = new SqueezeLabel );
+    hig->addRow( tr( "Remaining time:" ), myETALabel = new SqueezeLabel );
     hig->addRow( tr( "Last activity:" ), myLastActivityLabel = new SqueezeLabel );
     hig->addRow( tr( "Error:" ), myErrorLabel = new SqueezeLabel );
     hig->addSectionDivider( );
