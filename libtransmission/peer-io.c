@@ -115,13 +115,17 @@ didWriteWrapper( tr_peerIo * io, size_t bytes_transferred )
 static void
 canReadWrapper( tr_peerIo * io )
 {
-    tr_bool done = 0;
     tr_bool err = 0;
-    tr_session * session = io->session;
+    tr_bool done = 0;
+    tr_session * session;
 
     dbgmsg( io, "canRead" );
 
+    assert( tr_isPeerIo( io ) );
+    assert( tr_isSession( io->session ) );
     tr_peerIoRef( io );
+
+    session = io->session;
 
     /* try to consume the input buffer */
     if( io->canRead )
@@ -160,6 +164,8 @@ canReadWrapper( tr_peerIo * io )
                     err = 1;
                     break;
             }
+
+            assert( tr_isPeerIo( io ) );
         }
 
         tr_globalUnlock( session );
@@ -171,6 +177,7 @@ canReadWrapper( tr_peerIo * io )
         io->inbuf = evbuffer_new( );
     }
 
+    assert( tr_isPeerIo( io ) );
     tr_peerIoUnref( io );
 }
 

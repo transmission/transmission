@@ -1026,6 +1026,8 @@ canRead( struct tr_peerIo * io, void * arg, size_t * piece )
     ReadState         ret;
     tr_bool           readyForMore = TRUE;
 
+    assert( tr_isPeerIo( io ) );
+
     /* no piece data in handshake */
     *piece = 0;
 
