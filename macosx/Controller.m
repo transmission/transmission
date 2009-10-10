@@ -171,12 +171,13 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //make sure another Transmission.app isn't running already
     BOOL othersRunning = NO;
     
-    if ([NSApp isOnSnowLeopardOrBetter])
+    #warning enable when 10.6-only
+    /*if ([NSApp isOnSnowLeopardOrBetter])
     {
         NSArray * apps = [NSRunningApplication runningApplicationsWithBundleIdentifier: [[NSBundle mainBundle] bundleIdentifier]];
         othersRunning = [apps count] > 1;
     }
-    else
+    else*/
     {
         NSString * bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
         const int processIdentifier = [[NSProcessInfo processInfo] processIdentifier];
