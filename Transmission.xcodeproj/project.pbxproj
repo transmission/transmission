@@ -2384,7 +2384,7 @@
 					"third-party/curl/include",
 					"third-party/openssl/include",
 				);
-				IBC_FLATTEN_NIBS = YES;
+				IBC_FLATTEN_NIBS = NO;
 				IBC_NOTICES = NO;
 				INFOPLIST_FILE = "$(SRCROOT)/macosx/Info.plist";
 				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "-CC";
