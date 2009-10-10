@@ -2029,10 +2029,8 @@ tr_torrentSetAnnounceList( tr_torrent *            tor,
     /* look for duplicates */
     for( i=0; i<trackerCount; ++i )
         for( j=0; j<trackerCount; ++j )
-            if(    ( i != j )
-                && ( trackers[i].tier == trackers[j].tier)
-                && ( !strcmp( trackers[i].announce, trackers[j].announce ) ) )
-                    return TR_ANNOUNCE_LIST_HAS_DUPLICATES;
+            if( ( i != j ) && ( !strcmp( trackers[i].announce, trackers[j].announce ) ) )
+                return TR_ANNOUNCE_LIST_HAS_DUPLICATES;
 
     /* save to the .torrent file */
     if( !tr_bencLoadFile( &metainfo, TR_FMT_BENC, tor->info.torrent ) )
