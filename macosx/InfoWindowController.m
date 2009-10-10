@@ -1439,7 +1439,6 @@ typedef enum
         return;
     Torrent * torrent = [fTorrents objectAtIndex: 0];
     
-    #warning still update unselected rows
     //get update tracker stats
     if ([fTrackerTable editedRow] == -1)
     {
@@ -1704,7 +1703,7 @@ typedef enum
 - (void) removeTrackers
 {
     const NSInteger oldCount = [fTrackers count] - [(TrackerNode *)[fTrackers lastObject] tier];
-    NSMutableArray * addresses = [NSMutableArray arrayWithCapacity: oldCount];
+    NSMutableSet * addresses = [NSMutableSet setWithCapacity: oldCount];
     
     NSIndexSet * indexes = [fTrackerTable selectedRowIndexes];
     for (NSUInteger i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
