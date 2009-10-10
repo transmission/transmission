@@ -17,19 +17,19 @@
 				</div>
 			</div>
 			<div id="pagetitle">
-				<h1>Can I add/remove/edit the trackers in my transfers? </h1>
+				<h1>Can I add and remove trackers in my transfers? </h1>
 			</div>
-				<p>Yes. To add trackers to a currently running transfer, go to Inspector > Tracker, and click the plus button (+). To remove them click minus button (-). Multiple trackers can also be added to torrent files you create. Currently trackers will be added to a tier before Tier 1, meaning attempts to use your custom-added trackers will be made before built-in trackers.
+				<p>Yes. To add trackers to a currently running transfer, go to Inspector > Tracker, and click the plus button (+). To remove them click minus button (-). Multiple trackers can also be added to torrent files you create. Each newly-added tracker will be placed in a new tier.
 				<p>
 			<div id="pagetitle">
-				<h1>What is 'Tier 1', 'Tier 2' etc? </h1>
+				<h1>What is 'Tier 1', 'Tier 2', etc? </h1>
 			</div>
-				<p>Transmission supports multitracker torrents. These are torrents which have multiple trackers as a fallback in case one doesn't respond. All of a given torrent's trackers are divided into 'Tiers'. Transmission randomly chooses a tracker from Tier 1 until it finds one that works. If it doesn't it moves on to Tier 2, and so on. This system prevents any one tracker being overloaded.
+				<p>Transmission supports multitracker torrents. All of a given torrent's trackers are divided into 'Tiers'. A tracker from each tier will be contacted simultaneously. Transmission randomly chooses a tracker from each tier until it finds one that works.
 				<p>
 			<div id="pagetitle">
 				<h1>What does 'announce' mean? </h1>
 			</div>
-				<p>When Transmission <i>announces</i>, it is updating its presence to the tracker and asking for more peers. This happens periodically, at the discretion of the tracker, however can be manually invoked via Transfers menu >> Update tracker.
+				<p>When Transmission <i>announces</i>, it is updating its presence to the tracker and asking for more peers. This happens periodically, at the discretion of the tracker, however can be manually invoked via Transfers menu >> Update Tracker.
 				<p>
 			<div id="pagetitle">
 				<h1>What does 'scrape' mean? </h1>
