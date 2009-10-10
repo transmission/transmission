@@ -1101,6 +1101,15 @@ typedef struct tr_tracker_info
 }
 tr_tracker_info;
 
+
+typedef enum
+{
+  TR_ANNOUNCE_LIST_OK,
+  TR_ANNOUNCE_LIST_HAS_DUPLICATES,
+  TR_ANNOUNCE_LIST_HAS_BAD
+}
+tr_announce_list_err;
+
 /**
  * @brief Modify a torrent's tracker list.
  *
@@ -1113,9 +1122,10 @@ tr_tracker_info;
  *                 libtransmission derives `scrape' from `announce'.
  * @param trackerCount size of the `trackers' array
  */
-void tr_torrentSetAnnounceList( tr_torrent *            torrent,
-                                const tr_tracker_info * trackers,
-                                int                     trackerCount );
+tr_announce_list_err
+tr_torrentSetAnnounceList( tr_torrent             * torrent,
+                           const tr_tracker_info  * trackers,
+                           int                      trackerCount );
 
 
 /**

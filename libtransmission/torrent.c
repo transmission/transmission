@@ -2011,14 +2011,28 @@ tr_torrentGetMTimes( const tr_torrent * tor,
 ****
 ***/
 
-void
+tr_announce_list_err
 tr_torrentSetAnnounceList( tr_torrent *            tor,
                            const tr_tracker_info * trackers,
                            int                     trackerCount )
 {
+    int i, j;
     tr_benc metainfo;
 
     assert( tr_isTorrent( tor ) );
+
+    /* look for bad URLs */
+    for( i=0; i<trackerCount; ++i )
+        if( !tr_httpIsValidURL( trackers[i].announce ) )
+            return TR_ANNOUNCE_LIST_HAS_BAD;
+
+    /* look for duplicates */
+    for( i=0; i<trackerCount; ++i )
+        for( j=0; j<trackerCount; ++j )
+            if(    ( i != j )
+                && ( trackers[i].tier == trackers[j].tier)
+                && ( !strcmp( trackers[i].announce, trackers[j].announce ) ) )
+                    return TR_ANNOUNCE_LIST_HAS_DUPLICATES;
 
     /* save to the .torrent file */
     if( !tr_bencLoadFile( &metainfo, TR_FMT_BENC, tor->info.torrent ) )
@@ -2068,6 +2082,8 @@ tr_torrentSetAnnounceList( tr_torrent *            tor,
         /* tell the announcer to reload this torrent's tracker list */
         tr_announcerResetTorrent( tor->session->announcer, tor );
     }
+
+    return TR_ANNOUNCE_LIST_OK;
 }
 
 /**
