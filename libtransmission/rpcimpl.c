@@ -381,7 +381,7 @@ addTrackerStats( const tr_tracker_stat * st, int n, tr_benc * list )
         tr_bencDictAddBool( d, "hasAnnounced", s->hasAnnounced );
         tr_bencDictAddBool( d, "hasScraped", s->hasScraped );
         tr_bencDictAddStr ( d, "host", s->host );
-        tr_bencDictAddBool( d, "isActive", s->isActive );
+        tr_bencDictAddBool( d, "isBackup", s->isBackup );
         tr_bencDictAddInt ( d, "lastAnnouncePeerCount", s->lastAnnouncePeerCount );
         tr_bencDictAddStr ( d, "lastAnnounceResult", s->lastAnnounceResult );
         tr_bencDictAddInt ( d, "lastAnnounceStartTime", s->lastAnnounceStartTime );

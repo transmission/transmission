@@ -1246,7 +1246,7 @@ printDetails( tr_benc * top )
                     tr_bool hasAnnounced; 
                     tr_bool hasScraped; 
                     const char * host;
-                    tr_bool isActive; 
+                    tr_bool isBackup; 
                     int64_t lastAnnouncePeerCount; 
                     const char * lastAnnounceResult; 
                     time_t lastAnnounceStartTime; 
@@ -1268,7 +1268,7 @@ printDetails( tr_benc * top )
                         tr_bencDictFindBool( t, "hasAnnounced", &hasAnnounced ) &&
                         tr_bencDictFindBool( t, "hasScraped", &hasScraped ) &&
                         tr_bencDictFindStr ( t, "host", &host ) &&
-                        tr_bencDictFindBool( t, "isActive", &isActive ) &&
+                        tr_bencDictFindBool( t, "isBackup", &isBackup ) &&
                         tr_bencDictFindInt ( t, "announceState", &announceState ) &&
                         tr_bencDictFindInt ( t, "scrapeState", &scrapeState ) &&
                         tr_bencDictFindInt ( t, "lastAnnouncePeerCount", &lastAnnouncePeerCount ) &&
@@ -1290,64 +1290,69 @@ printDetails( tr_benc * top )
 
                         printf( "\n" );
                         printf( "  Tracker #%d: %s\n", (int)(i+1), host );
-                        if( isActive )
-                          printf( "  Active in tier #%d\n", (int)tier );
-                        else
+                        if( isBackup )
                           printf( "  Backup on tier #%d\n", (int)tier );
+                        else
+                          printf( "  Active in tier #%d\n", (int)tier );
 
-                        if( isActive && hasAnnounced )
+                        if( !isBackup )
                         {
-                            tr_strltime( buf, now - lastAnnounceTime, sizeof( buf ) );
-                            if( lastAnnounceSucceeded )
-                                printf( "  Got a list of %'d peers %s ago\n",
-                                        (int)lastAnnouncePeerCount, buf );
-                            else
-                                printf( "  Got an error \"%s\" %s ago\n",
-                                        lastAnnounceResult, buf );
-                        }
+                            if( hasAnnounced )
+                            {
+                                tr_strltime( buf, now - lastAnnounceTime, sizeof( buf ) );
+                                if( lastAnnounceSucceeded )
+                                    printf( "  Got a list of %'d peers %s ago\n",
+                                            (int)lastAnnouncePeerCount, buf );
+                                else
+                                    printf( "  Got an error \"%s\" %s ago\n",
+                                            lastAnnounceResult, buf );
+                            }
 
-                        if( isActive ) switch( announceState ) {
-                            case TR_TRACKER_INACTIVE:
-                                printf( "  No updates scheduled\n" );
-                                break;
-                            case TR_TRACKER_WAITING:
-                                tr_strltime( buf, nextAnnounceTime - now, sizeof( buf ) );
-                                printf( "  Asking for more peers in %s\n", buf );
-                                break;
-                            case TR_TRACKER_QUEUED:
-                                printf( "  Queued to ask for more peers\n" );
-                                break;
-                            case TR_TRACKER_ACTIVE:
-                                tr_strltime( buf, now - lastAnnounceStartTime, sizeof( buf ) );
-                                printf( "  Asking for more peers now... %s\n", buf );
-                                break;
-                        }
+                            switch( announceState )
+                            {
+                                case TR_TRACKER_INACTIVE:
+                                    printf( "  No updates scheduled\n" );
+                                    break;
+                                case TR_TRACKER_WAITING:
+                                    tr_strltime( buf, nextAnnounceTime - now, sizeof( buf ) );
+                                    printf( "  Asking for more peers in %s\n", buf );
+                                    break;
+                                case TR_TRACKER_QUEUED:
+                                    printf( "  Queued to ask for more peers\n" );
+                                    break;
+                                case TR_TRACKER_ACTIVE:
+                                    tr_strltime( buf, now - lastAnnounceStartTime, sizeof( buf ) );
+                                    printf( "  Asking for more peers now... %s\n", buf );
+                                    break;
+                            }
 
-                        if( isActive && hasScraped )
-                        {
-                            tr_strltime( buf, now - lastScrapeTime, sizeof( buf ) );
-                            if( lastScrapeSucceeded )
-                                printf( "  Tracker had %'d seeders and %'d leechers %s ago\n",
-                                        (int)seederCount, (int)leecherCount, buf );
-                            else
-                                printf( "  Got a scrape error \"%s\" %s ago\n", 
-                                        lastScrapeResult, buf );
-                        }
+                            if( hasScraped )
+                            {
+                                tr_strltime( buf, now - lastScrapeTime, sizeof( buf ) );
+                                if( lastScrapeSucceeded )
+                                    printf( "  Tracker had %'d seeders and %'d leechers %s ago\n",
+                                            (int)seederCount, (int)leecherCount, buf );
+                                else
+                                    printf( "  Got a scrape error \"%s\" %s ago\n", 
+                                            lastScrapeResult, buf );
+                            }
 
-                        switch( scrapeState ) {
-                            case TR_TRACKER_INACTIVE:
-                                break;
-                            case TR_TRACKER_WAITING:
-                                tr_strltime( buf, nextScrapeTime - now, sizeof( buf ) );
-                                printf( "  Asking for peer counts in %s\n", buf );
-                                break;
-                            case TR_TRACKER_QUEUED:
-                                printf( "  Queued to ask for peer counts\n" );
-                                break;
-                            case TR_TRACKER_ACTIVE:
-                                tr_strltime( buf, now - lastScrapeStartTime, sizeof( buf ) );
-                                printf( "  Asking for peer counts now... %s\n", buf );
-                                break;
+                            switch( scrapeState )
+                            {
+                                case TR_TRACKER_INACTIVE:
+                                    break;
+                                case TR_TRACKER_WAITING:
+                                    tr_strltime( buf, nextScrapeTime - now, sizeof( buf ) );
+                                    printf( "  Asking for peer counts in %s\n", buf );
+                                    break;
+                                case TR_TRACKER_QUEUED:
+                                    printf( "  Queued to ask for peer counts\n" );
+                                    break;
+                                case TR_TRACKER_ACTIVE:
+                                    tr_strltime( buf, now - lastScrapeStartTime, sizeof( buf ) );
+                                    printf( "  Asking for peer counts now... %s\n", buf );
+                                    break;
+                            }
                         }
                     }
                 }

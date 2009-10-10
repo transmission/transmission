@@ -1266,9 +1266,9 @@ typedef struct
     /* the full announce URL */
     char announce[1024];
 
-    /* true if we're trying to use this tracker.
-       Transmission typically uses one tracker per tier. */
-    tr_bool isActive;
+    /* Transmission uses one tracker per tier,
+     * and the others are kept as backups */
+    tr_bool isBackup;
 
     /* is the tracker announcing, waiting, queued, etc */
     tr_tracker_state announceState;

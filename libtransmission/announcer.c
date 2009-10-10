@@ -1662,10 +1662,10 @@ tr_announcerStats( const tr_torrent * torrent,
             tr_strlcpy( st->host, tracker->host->name, sizeof( st->host ) );
             tr_strlcpy( st->announce, tracker->announce, sizeof( st->announce ) );
             st->tier = i + 1;
-            st->isActive = tracker == tier->currentTracker;
+            st->isBackup = tracker != tier->currentTracker;
             st->lastScrapeStartTime = tier->lastScrapeStartTime;
 
-            if( !st->isActive )
+            if( st->isBackup )
             {
                 st->hasScraped = FALSE;
                 st->lastScrapeTime = 0;
