@@ -1667,23 +1667,10 @@ tr_announcerStats( const tr_torrent * torrent,
 
             if( st->isBackup )
             {
-                st->hasScraped = FALSE;
-                st->lastScrapeTime = 0;
-                st->lastScrapeSucceeded = FALSE;
-                st->lastScrapeResult[0] = '\0';
                 st->scrapeState = TR_TRACKER_INACTIVE;
                 st->announceState = TR_TRACKER_INACTIVE;
                 st->nextScrapeTime = 0;
-                st->lastAnnounceStartTime = 0;
-                st->hasAnnounced = 0;
-                st->lastAnnounceTime = 0;
-                st->lastAnnounceResult[0] = '\0';
-                st->lastAnnounceSucceeded = FALSE;
-                st->lastAnnouncePeerCount = 0;
                 st->nextAnnounceTime = 0;
-                st->seederCount = 0;
-                st->leecherCount = 0;
-                st->downloadCount = 0;
             }
             else
             {
