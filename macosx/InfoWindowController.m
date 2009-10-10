@@ -814,8 +814,8 @@ typedef enum
     [view setHidden: NO];
     
     if ([NSApp isOnSnowLeopardOrBetter] && (fCurrentTabTag == TAB_FILES_TAG || oldTabTag == TAB_FILES_TAG)
-        && ([QLPreviewPanel sharedPreviewPanelExists] && [[QLPreviewPanel sharedPreviewPanel] isVisible]))
-        [[QLPreviewPanel sharedPreviewPanel] updateController];
+        && ([QLPreviewPanelSL sharedPreviewPanelExists] && [[QLPreviewPanelSL sharedPreviewPanel] isVisible]))
+        [[QLPreviewPanelSL sharedPreviewPanel] updateController];
 }
 
 - (void) setNextTab
@@ -1114,35 +1114,36 @@ typedef enum
     return [[fTrackers objectAtIndex: i] intValue] == 0;
 }*/
 
-- (BOOL) acceptsPreviewPanelControl: (QLPreviewPanel *) panel
+#warning change to QLPreviewPanel
+- (BOOL) acceptsPreviewPanelControl: (id) panel
 {
     return fCurrentTabTag == TAB_FILES_TAG && [self canQuickLook];
 }
 
-- (void) beginPreviewPanelControl: (QLPreviewPanel *) panel
+- (void) beginPreviewPanelControl: (id) panel
 {
     fPreviewPanel = [panel retain];
-    fPreviewPanel.delegate = self;
-    fPreviewPanel.dataSource = self;
+    [fPreviewPanel setDelegate: self];
+    [fPreviewPanel setDataSource: self];
 }
 
-- (void) endPreviewPanelControl: (QLPreviewPanel *) panel
+- (void) endPreviewPanelControl: (id) panel
 {
     [fPreviewPanel release];
     fPreviewPanel = nil;
 }
 
-- (NSInteger) numberOfPreviewItemsInPreviewPanel: (QLPreviewPanel *) panel
+- (NSInteger) numberOfPreviewItemsInPreviewPanel: (id) panel
 {
     return [[self quickLookURLs] count];
 }
 
-- (id <QLPreviewItem>) previewPanel: (QLPreviewPanel *)panel previewItemAtIndex: (NSInteger) index
+- (id /*<QLPreviewItem>*/) previewPanel: (id)panel previewItemAtIndex: (NSInteger) index
 {
     return [[self quickLookURLs] objectAtIndex: index];
 }
 
-- (BOOL) previewPanel: (QLPreviewPanel *) panel handleEvent: (NSEvent *) event
+- (BOOL) previewPanel: (id) panel handleEvent: (NSEvent *) event
 {
     if ([event type] == NSKeyDown)
     {
@@ -1153,7 +1154,7 @@ typedef enum
     return NO;
 }
 
-- (NSRect) previewPanel: (QLPreviewPanel *) panel sourceFrameOnScreenForPreviewItem: (id <QLPreviewItem>) item
+- (NSRect) previewPanel: (id) panel sourceFrameOnScreenForPreviewItem: (id /*<QLPreviewItem>*/) item
 {
     FileOutlineView * fileOutlineView = [fFileController outlineView];
     

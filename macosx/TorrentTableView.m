@@ -874,35 +874,36 @@
     return fPiecesBarPercent;
 }
 
-- (BOOL) acceptsPreviewPanelControl: (QLPreviewPanel *) panel
+#warning change from id to QLPreviewPanel
+- (BOOL) acceptsPreviewPanelControl: (id) panel
 {
     return YES;
 }
 
-- (void) beginPreviewPanelControl: (QLPreviewPanel *) panel
+- (void) beginPreviewPanelControl: (id) panel
 {
     fPreviewPanel = [panel retain];
-    fPreviewPanel.delegate = self;
-    fPreviewPanel.dataSource = self;
+    [fPreviewPanel setDelegate: self];
+    [fPreviewPanel setDataSource: self];
 }
 
-- (void) endPreviewPanelControl: (QLPreviewPanel *) panel
+- (void) endPreviewPanelControl: (id) panel
 {
     [fPreviewPanel release];
     fPreviewPanel = nil;
 }
 
-- (NSInteger) numberOfPreviewItemsInPreviewPanel: (QLPreviewPanel *) panel
+- (NSInteger) numberOfPreviewItemsInPreviewPanel: (id) panel
 {
     return [[self quickLookableTorrents] count];
 }
 
-- (id <QLPreviewItem>) previewPanel: (QLPreviewPanel *)panel previewItemAtIndex: (NSInteger) index
+- (id /*<QLPreviewItem>*/) previewPanel: (id) panel previewItemAtIndex: (NSInteger) index
 {
     return [[self quickLookableTorrents] objectAtIndex: index];
 }
 
-- (BOOL) previewPanel: (QLPreviewPanel *) panel handleEvent: (NSEvent *) event
+- (BOOL) previewPanel: (id) panel handleEvent: (NSEvent *) event
 {
     if ([event type] == NSKeyDown)
     {
@@ -913,7 +914,7 @@
     return NO;
 }
 
-- (NSRect) previewPanel: (QLPreviewPanel *) panel sourceFrameOnScreenForPreviewItem: (id <QLPreviewItem>) item
+- (NSRect) previewPanel: (id) panel sourceFrameOnScreenForPreviewItem: (id /*<QLPreviewItem>*/) item
 {
     const NSInteger row = [self rowForItem: item];
     if (row == -1)

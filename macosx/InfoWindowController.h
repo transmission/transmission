@@ -32,7 +32,8 @@
 @class FileOutlineController;
 @class PiecesView;
 
-@interface InfoWindowController : NSWindowController <QLPreviewPanelDataSource, QLPreviewPanelDelegate>
+#warning uncomment
+@interface InfoWindowController : NSWindowController //<QLPreviewPanelDataSource, QLPreviewPanelDelegate>
 {
     NSArray * fTorrents;
     
@@ -78,7 +79,8 @@
     
     NSString * fInitialString;
     
-    QLPreviewPanel * fPreviewPanel;
+    #warning change to QLPreviewPanel
+    id fPreviewPanel;
 }
 
 - (void) setInfoForTorrents: (NSArray *) torrents;

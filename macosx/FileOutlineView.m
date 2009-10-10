@@ -91,12 +91,13 @@
     const unichar firstChar = [[event charactersIgnoringModifiers] characterAtIndex: 0];
     
     //don't allow quick look on add window
-    if ([NSApp isOnSnowLeopardOrBetter] && firstChar == ' ' && [[[self window] windowController] conformsToProtocol: @protocol(QLPreviewPanelDataSource)])
+    #warning get rid of conversion of protocol and replace with @protocol(QLPreviewPanelDataSource)
+    if ([NSApp isOnSnowLeopardOrBetter] && firstChar == ' ' && [[[self window] windowController] conformsToProtocol: NSProtocolFromString(@"QLPreviewPanelDataSource")])
     {
-        if ([[QLPreviewPanel sharedPreviewPanel] isVisible])
-            [[QLPreviewPanel sharedPreviewPanel] orderOut: nil];
+        if ([[QLPreviewPanelSL sharedPreviewPanel] isVisible])
+            [[QLPreviewPanelSL sharedPreviewPanel] orderOut: nil];
         else
-            [[QLPreviewPanel sharedPreviewPanel] makeKeyAndOrderFront: nil];
+            [[QLPreviewPanelSL sharedPreviewPanel] makeKeyAndOrderFront: nil];
     }
     
     [super keyDown: event];  

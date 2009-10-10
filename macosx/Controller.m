@@ -696,18 +696,18 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //remember window states and close all windows
     [fDefaults setBool: [[fInfoController window] isVisible] forKey: @"InfoVisible"];
     
-    const BOOL quickLookOpen = [NSApp isOnSnowLeopardOrBetter] && [QLPreviewPanel sharedPreviewPanelExists]
-                                && [[QLPreviewPanel sharedPreviewPanel] isVisible];
+    const BOOL quickLookOpen = [NSApp isOnSnowLeopardOrBetter] && [QLPreviewPanelSL sharedPreviewPanelExists]
+                                && [[QLPreviewPanelSL sharedPreviewPanel] isVisible];
     for (NSWindow * window in [NSApp windows])
     {
-        if (!quickLookOpen || window != [QLPreviewPanel sharedPreviewPanel]) //hide quicklook window last to avoid animation
+        if (!quickLookOpen || window != [QLPreviewPanelSL sharedPreviewPanel]) //hide quicklook window last to avoid animation
             [window orderOut: nil];
     }
     
     if (quickLookOpen)
     {
-        [[QLPreviewPanel sharedPreviewPanel] updateController];
-        [[QLPreviewPanel sharedPreviewPanel] orderOut: nil];
+        [[QLPreviewPanelSL sharedPreviewPanel] updateController];
+        [[QLPreviewPanelSL sharedPreviewPanel] orderOut: nil];
     }
     
     [self showStatusBar: NO animate: NO];
@@ -1522,8 +1522,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 {
     [fInfoController setInfoForTorrents: [fTableView selectedTorrents]];
     
-    if ([NSApp isOnSnowLeopardOrBetter] && [QLPreviewPanel sharedPreviewPanelExists] && [[QLPreviewPanel sharedPreviewPanel] isVisible])
-        [[QLPreviewPanel sharedPreviewPanel] reloadData];
+    if ([NSApp isOnSnowLeopardOrBetter] && [QLPreviewPanelSL sharedPreviewPanelExists] && [[QLPreviewPanelSL sharedPreviewPanel] isVisible])
+        [[QLPreviewPanelSL sharedPreviewPanel] reloadData];
 }
 
 - (void) setInfoTab: (id) sender
@@ -4024,10 +4024,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     if (![NSApp isOnSnowLeopardOrBetter])
         return;
     
-    if ([[QLPreviewPanel sharedPreviewPanel] isVisible])
-        [[QLPreviewPanel sharedPreviewPanel] orderOut: nil];
+    if ([[QLPreviewPanelSL sharedPreviewPanel] isVisible])
+        [[QLPreviewPanelSL sharedPreviewPanel] orderOut: nil];
     else
-        [[QLPreviewPanel sharedPreviewPanel] makeKeyAndOrderFront: nil];
+        [[QLPreviewPanelSL sharedPreviewPanel] makeKeyAndOrderFront: nil];
 }
 
 - (void) linkHomepage: (id) sender
