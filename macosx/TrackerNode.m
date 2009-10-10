@@ -124,8 +124,8 @@
             return [NSLocalizedString(@"Announce is queued", "Tracker next announce") stringByAppendingEllipsis];
         
         case TR_TRACKER_INACTIVE:
-            return fStat.isActive ? NSLocalizedString(@"Announce not scheduled", "Tracker next announce")
-                                    : NSLocalizedString(@"Tracker will be used as a backup", "Tracker next announce");
+            return fStat.isBackup ? NSLocalizedString(@"Tracker will be used as a backup", "Tracker next announce")
+                                    : NSLocalizedString(@"Announce not scheduled", "Tracker next announce");
         
         default:
             NSAssert1(NO, @"unknown announce state: %d", fStat.announceState);
