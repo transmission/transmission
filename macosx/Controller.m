@@ -3123,6 +3123,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     return YES;
 }
 
+#warning refresh QL is either window is closed
 - (void) beginPreviewPanelControl: (id) panel
 {
     fPreviewPanel = [panel retain];
@@ -3136,12 +3137,26 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     fPreviewPanel = nil;
 }
 
+- (NSArray *) quickLookableTorrents
+{
+    NSArray * selectedTorrents = [fTableView selectedTorrents];
+    NSMutableArray * qlArray = [NSMutableArray arrayWithCapacity: [selectedTorrents count]];
+    
+    for (Torrent * torrent in selectedTorrents)
+        if (([torrent isFolder] || [torrent isComplete]) && [[NSFileManager defaultManager] fileExistsAtPath: [torrent dataLocation]])
+            [qlArray addObject: torrent];
+    
+    return qlArray;
+}
+
 - (NSInteger) numberOfPreviewItemsInPreviewPanel: (id) panel
 {
     if ([fInfoController canQuickLook])
         return [[fInfoController quickLookURLs] count];
-    else
+    else if ([fWindow isVisible])
         return [[self quickLookableTorrents] count];
+    else
+        return 0;
 }
 
 - (id /*<QLPreviewItem>*/) previewPanel: (id) panel previewItemAtIndex: (NSInteger) index
@@ -3179,18 +3194,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         frame.origin.y -= frame.size.height;
         return frame;
     }
-}
-
-- (NSArray *) quickLookableTorrents
-{
-    NSArray * selectedTorrents = [fTableView selectedTorrents];
-    NSMutableArray * qlArray = [NSMutableArray arrayWithCapacity: [selectedTorrents count]];
-    
-    for (Torrent * torrent in selectedTorrents)
-        if (([torrent isFolder] || [torrent isComplete]) && [[NSFileManager defaultManager] fileExistsAtPath: [torrent dataLocation]])
-            [qlArray addObject: torrent];
-    
-    return qlArray;
 }
 
 - (ButtonToolbarItem *) standardToolbarButtonWithIdentifier: (NSString *) ident

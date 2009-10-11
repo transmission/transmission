@@ -1139,7 +1139,7 @@ typedef enum
 
 - (BOOL) canQuickLook
 {
-    if (fCurrentTabTag != TAB_FILES_TAG || ![NSApp isOnSnowLeopardOrBetter])
+    if (fCurrentTabTag != TAB_FILES_TAG || ![[self window] isVisible] || ![NSApp isOnSnowLeopardOrBetter])
         return NO;
     
     if ([fTorrents count] != 1)
