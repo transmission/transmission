@@ -130,7 +130,7 @@
 - (uint64_t) sizeLeft;
 
 - (NSMutableArray *) allTrackerStats;
-- (NSMutableArray *) allTrackersFlat; //used by GroupRules
+- (NSArray *) allTrackersFlat; //used by GroupRules
 - (BOOL) addTrackerToNewTier: (NSString *) tracker;
 - (void) removeTrackersWithAnnounceAddresses: (NSSet *) trackers;
 

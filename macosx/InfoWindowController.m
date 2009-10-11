@@ -767,6 +767,7 @@ typedef enum
             title = NSLocalizedString(@"Options", "Inspector -> title");
             break;
         default:
+            NSAssert1(NO, @"Unknown info tab selected: %d", fCurrentTabTag);
             return;
     }
     
@@ -1011,7 +1012,8 @@ typedef enum
         [components addObject: [NSString stringWithFormat: @"%@: %@", NSLocalizedString(@"Port",
             "Inspector -> Peers tab -> table row tooltip"), portString]];
         
-        switch ([[peer objectForKey: @"From"] intValue])
+        const NSInteger peerFrom = [[peer objectForKey: @"From"] integerValue];
+        switch (peerFrom)
         {
             case TR_PEER_FROM_TRACKER:
                 [components addObject: NSLocalizedString(@"From: tracker", "Inspector -> Peers tab -> table row tooltip")];
@@ -1028,6 +1030,8 @@ typedef enum
             case TR_PEER_FROM_DHT:
                 [components addObject: NSLocalizedString(@"From: distributed hash table", "Inspector -> Peers tab -> table row tooltip")];
                 break;
+            default:
+                NSAssert1(NO, @"Peer from unknown source: %d", peerFrom);
         }
         
         //determing status strings from flags 
@@ -1104,7 +1108,7 @@ typedef enum
         [self addTrackers];
 }
 
-#warning what?!
+#warning is editing trackers needed?
 /*- (BOOL) tableView: (NSTableView *) tableView shouldEditTableColumn: (NSTableColumn *) tableColumn row: (NSInteger) row
 {
     if (tableView != fTrackerTable)
@@ -1273,6 +1277,7 @@ typedef enum
             setting = TR_RATIOLIMIT_GLOBAL;
             break;
         default:
+            NSAssert1(NO, @"Unknown option selected in ratio popup: %d", [sender indexOfSelectedItem]);
             return;
     }
     
@@ -1310,6 +1315,7 @@ typedef enum
             priority = TR_PRI_LOW;
             break;
         default:
+            NSAssert1(NO, @"Unknown option selected in priority popup: %d", [sender indexOfSelectedItem]);
             return;
     }
     
@@ -1441,7 +1447,7 @@ typedef enum
         return;
     Torrent * torrent = [fTorrents objectAtIndex: 0];
     
-    //get update tracker stats
+    //get updated tracker stats
     if ([fTrackerTable editedRow] == -1)
     {
         [fTrackers release];
@@ -1554,6 +1560,7 @@ typedef enum
         case TAB_OPTIONS_TAG:
             return fOptionsView;
         default:
+            NSAssert1(NO, @"Unknown tab view for tag: %d", tag);
             return nil;
     }
 }

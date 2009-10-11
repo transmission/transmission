@@ -695,7 +695,7 @@ int trashDataFile(const char * filename)
     return trackers;
 }
 
-- (NSMutableArray *) allTrackersFlat
+- (NSArray *) allTrackersFlat
 {
     NSMutableArray * allTrackers = [NSMutableArray arrayWithCapacity: fInfo->trackerCount];
     

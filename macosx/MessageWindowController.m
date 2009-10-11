@@ -138,12 +138,11 @@
 
 - (void) updateLog: (NSTimer *) timer
 {
-    static NSUInteger currentIndex = 0;
-    
     tr_msg_list * messages;
     if ((messages = tr_getQueuedMessages()) == NULL)
         return;
     
+    static NSUInteger currentIndex = 0;
     for (tr_msg_list * currentMessage = messages; currentMessage != NULL; currentMessage = currentMessage->next)
     {
         NSString * name = currentMessage->name != NULL ? [NSString stringWithUTF8String: currentMessage->name]
