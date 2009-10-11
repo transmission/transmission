@@ -458,35 +458,93 @@ tr_core_apply_defaults( tr_ctor * ctor )
     }
 }
 
-static int
-tr_strcmp( const void * a,
-           const void * b )
-{
-    if( a && b ) return strcmp( a, b );
-    if( a ) return 1;
-    if( b ) return -1;
-    return 0;
-}
-
 #ifdef HAVE_GIO
-static gboolean
-watchFolderIdle( gpointer gcore )
+
+struct watchdir_file
 {
-    TrCore * core = TR_CORE( gcore );
+    char * filename;
+    time_t mtime;
+};
 
-    core->priv->adding_from_watch_dir = TRUE;
-    tr_core_add_list_defaults( core, core->priv->monitor_files, TRUE );
-    core->priv->adding_from_watch_dir = FALSE;
-
-    /* cleanup */
-    core->priv->monitor_files = NULL;
-    core->priv->monitor_idle_tag = 0;
-    return FALSE;
+static int
+compare_watchdir_file_to_filename( const void * a, const void * filename )
+{
+    return strcmp( ((const struct watchdir_file*)a)->filename, filename );
 }
 
 static void
-maybeAddTorrent( TrCore *     core,
-                 const char * filename )
+watchdir_file_update_mtime( struct watchdir_file * file )
+{
+    GFile * gfile = g_file_new_for_path( file->filename );
+    GFileInfo * info = g_file_query_info( gfile, G_FILE_ATTRIBUTE_TIME_MODIFIED, 0, NULL, NULL );
+
+    file->mtime = g_file_info_get_attribute_uint64( info, G_FILE_ATTRIBUTE_TIME_MODIFIED );
+
+    g_object_unref( G_OBJECT( info ) );
+    g_object_unref( G_OBJECT( gfile ) );
+}
+
+static struct watchdir_file*
+watchdir_file_new( const char * filename )
+{
+    struct watchdir_file * f;
+
+    f = g_new( struct watchdir_file, 1 );
+    f->filename = g_strdup( filename );
+    watchdir_file_update_mtime( f );
+
+    return f;
+}
+
+static void
+watchdir_file_free( struct watchdir_file * f )
+{
+    g_free( f->filename );
+    g_free( f );
+}
+    
+static gboolean
+watchFolderIdle( gpointer gcore )
+{
+    GSList * l;
+    GSList * addme = NULL;
+    GSList * monitor_files = NULL;
+    TrCore * core = TR_CORE( gcore );
+    const time_t now = time( NULL );
+    struct TrCorePrivate * p = core->priv;
+
+    /* of the monitor_files, make a list of those that haven't
+     * changed lately, since they should be ready to add */
+    for( l=p->monitor_files; l!=NULL; l=l->next ) {
+        struct watchdir_file * f = l->data;
+        watchdir_file_update_mtime( f );
+        if( f->mtime + 2 >= now )
+            monitor_files = g_slist_prepend( monitor_files, f );
+        else {
+            addme = g_slist_prepend( addme, g_strdup( f->filename ) );
+            watchdir_file_free( f );
+        }
+    }
+
+    /* add the torrents from that list */
+    core->priv->adding_from_watch_dir = TRUE;
+    tr_core_add_list_defaults( core, addme, TRUE );
+    core->priv->adding_from_watch_dir = FALSE;
+
+    /* update the monitor_files list */
+    g_slist_free( p->monitor_files );
+    p->monitor_files = monitor_files;
+
+    /* if monitor_files is nonempty, keep checking every second */
+    if( core->priv->monitor_files )
+        return TRUE;
+    core->priv->monitor_idle_tag = 0;
+    return FALSE;
+
+}
+
+static void
+maybeAddTorrent( TrCore * core, const char * filename )
 {
     const gboolean isTorrent = g_str_has_suffix( filename, ".torrent" );
 
@@ -494,10 +552,9 @@ maybeAddTorrent( TrCore *     core,
     {
         struct TrCorePrivate * p = core->priv;
 
-        if( !g_slist_find_custom( p->monitor_files, filename,
-                                  (GCompareFunc)strcmp ) )
-            p->monitor_files =
-                g_slist_append( p->monitor_files, g_strdup( filename ) );
+        if( !g_slist_find_custom( p->monitor_files, filename, (GCompareFunc)compare_watchdir_file_to_filename ) )
+            p->monitor_files = g_slist_append( p->monitor_files, watchdir_file_new( filename ) );
+
         if( !p->monitor_idle_tag )
             p->monitor_idle_tag = gtr_timeout_add_seconds( 1, watchFolderIdle, core );
     }
@@ -538,6 +595,16 @@ scanWatchDir( TrCore * core )
 
         g_dir_close( dir );
     }
+}
+
+static int
+tr_strcmp( const void * a,
+           const void * b )
+{
+    if( a && b ) return strcmp( a, b );
+    if( a ) return 1;
+    if( b ) return -1;
+    return 0;
 }
 
 static void
