@@ -23,11 +23,12 @@
  *****************************************************************************/
 
 #import "TorrentTableView.h"
-#import "TorrentCell.h"
-#import "Torrent.h"
-#import "TorrentGroup.h"
+#import "Controller.h"
 #import "FileListNode.h"
 #import "NSApplicationAdditions.h"
+#import "Torrent.h"
+#import "TorrentCell.h"
+#import "TorrentGroup.h"
 
 #define MAX_GROUP 999999
 

@@ -24,9 +24,10 @@
 
 #import <Cocoa/Cocoa.h>
 #import <transmission.h>
-#import "Controller.h"
 #import <Quartz/Quartz.h>
 
+@class Controller;
+@class Torrent;
 @class TorrentCell;
 
 #define GROUP_SEPARATOR_HEIGHT 18.0

@@ -24,18 +24,18 @@
 
 #import <Cocoa/Cocoa.h>
 #import <transmission.h>
-#import "PrefsController.h"
-#import "InfoWindowController.h"
-#import "MessageWindowController.h"
-#import "AddWindowController.h"
-#import "DragOverlayWindow.h"
-#import "Badger.h"
-
 #import <Growl/Growl.h>
 
-@class TorrentTableView;
-@class StatusBarView;
+@class AddWindowController;
+@class Badger;
+@class DragOverlayWindow;
 @class FilterButton;
+@class InfoWindowController;
+@class MessageWindowController;
+@class PrefsController;
+@class StatusBarView;
+@class Torrent;
+@class TorrentTableView;
 
 typedef enum
 {
@@ -48,7 +48,7 @@ typedef enum
 
 @interface Controller : NSObject <GrowlApplicationBridgeDelegate>
 {
-    tr_session                       * fLib;
+    tr_session                      * fLib;
     
     NSMutableArray                  * fTorrents, * fDisplayedTorrents;
     
