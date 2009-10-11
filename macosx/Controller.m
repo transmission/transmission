@@ -3117,6 +3117,82 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [self toggleFilterBar: self];
 }
 
+#warning change from id to QLPreviewPanel
+- (BOOL) acceptsPreviewPanelControl: (id) panel
+{
+    return YES;
+}
+
+- (void) beginPreviewPanelControl: (id) panel
+{
+    fPreviewPanel = [panel retain];
+    [fPreviewPanel setDelegate: self];
+    [fPreviewPanel setDataSource: self];
+}
+
+- (void) endPreviewPanelControl: (id) panel
+{
+    [fPreviewPanel release];
+    fPreviewPanel = nil;
+}
+
+- (NSInteger) numberOfPreviewItemsInPreviewPanel: (id) panel
+{
+    if ([fInfoController canQuickLook])
+        return [[fInfoController quickLookURLs] count];
+    else
+        return [[self quickLookableTorrents] count];
+}
+
+- (id /*<QLPreviewItem>*/) previewPanel: (id) panel previewItemAtIndex: (NSInteger) index
+{
+    if ([fInfoController canQuickLook])
+        return [[fInfoController quickLookURLs] objectAtIndex: index];
+    else
+        return [[self quickLookableTorrents] objectAtIndex: index];
+}
+
+- (BOOL) previewPanel: (id) panel handleEvent: (NSEvent *) event
+{
+    /*if ([event type] == NSKeyDown)
+    {
+        [super keyDown: event];
+        return YES;
+    }*/
+    
+    return NO;
+}
+
+- (NSRect) previewPanel: (id) panel sourceFrameOnScreenForPreviewItem: (id /*<QLPreviewItem>*/) item
+{
+    if ([fInfoController canQuickLook])
+        return [fInfoController quickLookSourceFrameForPreviewItem: item];
+    else
+    {
+        const NSInteger row = [fTableView rowForItem: item];
+        if (row == -1)
+            return NSZeroRect;
+        
+        NSRect frame = [fTableView iconRectForRow: row];
+        frame.origin = [fTableView convertPoint: frame.origin toView: nil];
+        frame.origin = [fWindow convertBaseToScreen: frame.origin];
+        frame.origin.y -= frame.size.height;
+        return frame;
+    }
+}
+
+- (NSArray *) quickLookableTorrents
+{
+    NSArray * selectedTorrents = [fTableView selectedTorrents];
+    NSMutableArray * qlArray = [NSMutableArray arrayWithCapacity: [selectedTorrents count]];
+    
+    for (Torrent * torrent in selectedTorrents)
+        if (([torrent isFolder] || [torrent isComplete]) && [[NSFileManager defaultManager] fileExistsAtPath: [torrent dataLocation]])
+            [qlArray addObject: torrent];
+    
+    return qlArray;
+}
+
 - (ButtonToolbarItem *) standardToolbarButtonWithIdentifier: (NSString *) ident
 {
     ButtonToolbarItem * item = [[ButtonToolbarItem alloc] initWithItemIdentifier: ident];

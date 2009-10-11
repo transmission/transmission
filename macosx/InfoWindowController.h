@@ -24,7 +24,6 @@
 
 #import <Cocoa/Cocoa.h>
 #import <transmission.h>
-#import <Quartz/Quartz.h>
 
 @class Torrent;
 @class TrackerTableView;
@@ -32,8 +31,7 @@
 @class FileOutlineController;
 @class PiecesView;
 
-#warning uncomment
-@interface InfoWindowController : NSWindowController //<QLPreviewPanelDataSource, QLPreviewPanelDelegate>
+@interface InfoWindowController : NSWindowController
 {
     NSArray * fTorrents;
     
@@ -93,6 +91,10 @@
 - (void) setPreviousTab;
 
 - (void) addRemoveTracker: (id) sender;
+
+- (NSArray *) quickLookURLs;
+- (BOOL) canQuickLook;
+- (NSRect) quickLookSourceFrameForPreviewItem: (id /*<QLPreviewItem>*/) item;
 
 - (void) setPiecesView: (id) sender;
 - (void) setPiecesViewForAvailable: (BOOL) available;

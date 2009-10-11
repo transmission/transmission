@@ -24,6 +24,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import <transmission.h>
+#import <Quartz/Quartz.h>
 #import <Growl/Growl.h>
 
 @class AddWindowController;
@@ -46,7 +47,8 @@ typedef enum
     ADD_CREATED
 } addType;
 
-@interface Controller : NSObject <GrowlApplicationBridgeDelegate>
+#warning uncomment
+@interface Controller : NSObject <GrowlApplicationBridgeDelegate> //, QLPreviewPanelDataSource, QLPreviewPanelDelegate>
 {
     tr_session                      * fLib;
     
@@ -108,6 +110,9 @@ typedef enum
     NSMutableDictionary             * fPendingTorrentDownloads;
     
     BOOL                            fSoundPlaying;
+    
+    #warning change to QLPreviewPanel
+    id fPreviewPanel;
 }
 
 - (void) openFiles:             (NSArray *) filenames addType: (addType) type forcePath: (NSString *) path;

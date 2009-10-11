@@ -24,7 +24,6 @@
 
 #import <Cocoa/Cocoa.h>
 #import <transmission.h>
-#import <Quartz/Quartz.h>
 
 @class Controller;
 @class Torrent;
@@ -32,8 +31,7 @@
 
 #define GROUP_SEPARATOR_HEIGHT 18.0
 
-#warning uncomment
-@interface TorrentTableView : NSOutlineView //<QLPreviewPanelDataSource, QLPreviewPanelDelegate>
+@interface TorrentTableView : NSOutlineView
 {
     IBOutlet Controller * fController;
     
@@ -54,9 +52,6 @@
     
     CGFloat fPiecesBarPercent;
     NSAnimation * fPiecesBarAnimation;
-    
-    #warning change to QLPreviewPanel
-    id fPreviewPanel;
 }
 
 - (BOOL) isGroupCollapsed: (NSInteger) value;
