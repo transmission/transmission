@@ -675,6 +675,13 @@ typedef enum
     return proposedFrameSize;
 }
 
+- (void) windowWillClose: (NSNotification *) notification
+{
+    if ([NSApp isOnSnowLeopardOrBetter] && fCurrentTabTag == TAB_FILES_TAG
+        && ([QLPreviewPanelSL sharedPreviewPanelExists] && [[QLPreviewPanelSL sharedPreviewPanel] isVisible]))
+        [[QLPreviewPanelSL sharedPreviewPanel] reloadData];
+}
+
 - (void) setTab: (id) sender
 {
     const NSInteger oldTabTag = fCurrentTabTag;
@@ -812,10 +819,9 @@ typedef enum
     [[window contentView] addSubview: view];
     [view setHidden: NO];
     
-    #warning take a look at
     if ([NSApp isOnSnowLeopardOrBetter] && (fCurrentTabTag == TAB_FILES_TAG || oldTabTag == TAB_FILES_TAG)
         && ([QLPreviewPanelSL sharedPreviewPanelExists] && [[QLPreviewPanelSL sharedPreviewPanel] isVisible]))
-        [[QLPreviewPanelSL sharedPreviewPanel] updateController];
+        [[QLPreviewPanelSL sharedPreviewPanel] reloadData];
 }
 
 - (void) setNextTab

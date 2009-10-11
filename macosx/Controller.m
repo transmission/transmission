@@ -711,7 +711,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     if (quickLookOpen)
     {
-        [[QLPreviewPanelSL sharedPreviewPanel] updateController];
+        [[QLPreviewPanelSL sharedPreviewPanel] reloadData];
         [[QLPreviewPanelSL sharedPreviewPanel] orderOut: nil];
     }
     
@@ -1517,9 +1517,14 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     if ([[fInfoController window] isVisible])
         [fInfoController close];
     else
-    {
+    {        
         [fInfoController updateInfoStats];
         [[fInfoController window] orderFront: nil];
+        
+        if ([fInfoController canQuickLook]
+            && [QLPreviewPanelSL sharedPreviewPanelExists] && [[QLPreviewPanelSL sharedPreviewPanel] isVisible])
+        [[QLPreviewPanelSL sharedPreviewPanel] reloadData];
+        
     }
 }
 
@@ -3123,7 +3128,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     return YES;
 }
 
-#warning refresh QL is either window is closed
 - (void) beginPreviewPanelControl: (id) panel
 {
     fPreviewPanel = [panel retain];
@@ -3153,10 +3157,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 {
     if ([fInfoController canQuickLook])
         return [[fInfoController quickLookURLs] count];
-    else if ([fWindow isVisible])
-        return [[self quickLookableTorrents] count];
     else
-        return 0;
+        return [[self quickLookableTorrents] count];
 }
 
 - (id /*<QLPreviewItem>*/) previewPanel: (id) panel previewItemAtIndex: (NSInteger) index

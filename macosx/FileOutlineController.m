@@ -134,10 +134,7 @@ typedef enum
 {
     if ([NSApp isOnSnowLeopardOrBetter] && [QLPreviewPanelSL sharedPreviewPanelExists]
         && [[QLPreviewPanelSL sharedPreviewPanel] isVisible])
-    {
         [[QLPreviewPanelSL sharedPreviewPanel] reloadData];
-        [[QLPreviewPanelSL sharedPreviewPanel] updateController];
-    }
 }
 
 - (NSInteger) outlineView: (NSOutlineView *) outlineView numberOfChildrenOfItem: (id) item
