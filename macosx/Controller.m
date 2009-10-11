@@ -1875,6 +1875,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             sortType = SORT_ACTIVITY;
             break;
         default:
+            NSAssert1(NO, @"Unknown sort tag received: %d", [sender tag]);
             return;
     }
     
@@ -2284,6 +2285,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             statusLabel = STATUS_TRANSFER_SESSION;
             break;
         default:
+            NSAssert1(NO, @"Unknown status label tag received: %d", [sender tag]);
             return;
     }
     
@@ -3470,6 +3472,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 break;
             case SORT_ACTIVITY_TAG:
                 sortType = SORT_ACTIVITY;
+            default:
+                NSAssert1(NO, @"Unknown sort tag received: %d", [menuItem tag]);
         }
         
         [menuItem setState: [sortType isEqualToString: [fDefaults stringForKey: @"Sort"]] ? NSOnState : NSOffState];
@@ -3493,6 +3497,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 break;
             case STATUS_TRANSFER_SESSION_TAG:
                 statusLabel = STATUS_TRANSFER_SESSION;
+            default:
+                NSAssert1(NO, @"Unknown status label tag received: %d", [menuItem tag]);
         }
         
         [menuItem setState: [statusLabel isEqualToString: [fDefaults stringForKey: @"StatusLabel"]] ? NSOnState : NSOffState];
@@ -4136,7 +4142,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             break;
         
         default:
-            NSLog(@"Unknown RPC command received (%d)", type);
+            NSAssert1(NO, @"Unknown RPC command received: %d", type);
             [torrent release];
     }
     
