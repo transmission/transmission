@@ -1088,6 +1088,8 @@ typedef enum
     [fTrackerTable setTrackers: fTrackers];
     [fTrackerTable reloadData];
     [fTrackerTable deselectAll: self];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil]; //incase sort by tracker
 }
 
 - (void) addRemoveTracker: (id) sender
@@ -1767,6 +1769,8 @@ typedef enum
     [fTrackerTable setTrackers: fTrackers];
     [fTrackerTable reloadData];
     [fTrackerTable deselectAll: self];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil]; //incase sort by tracker
 }
 
 @end
