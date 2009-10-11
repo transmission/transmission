@@ -23,11 +23,12 @@
  *****************************************************************************/
 
 #import "AddWindowController.h"
-#import "FileOutlineController.h"
 #import "Controller.h"
+#import "ExpandedPathToIconTransformer.h"
+#import "FileOutlineController.h"
 #import "GroupsController.h"
 #import "NSStringAdditions.h"
-#import "ExpandedPathToIconTransformer.h"
+#import "Torrent.h"
 
 #define UPDATE_SECONDS 1.0
 

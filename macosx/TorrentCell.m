@@ -23,11 +23,12 @@
  *****************************************************************************/
 
 #import "TorrentCell.h"
-#import "TorrentTableView.h"
 #import "GroupsController.h"
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "ProgressGradients.h"
+#import "Torrent.h"
+#import "TorrentTableView.h"
 
 #define BAR_HEIGHT 12.0f
 
