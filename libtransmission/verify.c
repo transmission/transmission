@@ -282,8 +282,10 @@ tr_verifyAdd( tr_torrent *      tor,
          * the "done" callback */
         const tr_bool hadAny = tr_cpHaveTotal( &tor->completion ) != 0;
         tr_piece_index_t i;
-        for( i=0; i<tor->info.pieceCount; ++i )
+        for( i=0; i<tor->info.pieceCount; ++i ) {
             tr_torrentSetHasPiece( tor, i, FALSE );
+            tr_torrentSetPieceChecked( tor, i, TRUE );
+        }
         if( hadAny ) /* if we thought we had some, flag as dirty */
             tr_torrentSetDirty( tor );
         fireCheckDone( tor, verify_done_cb );
