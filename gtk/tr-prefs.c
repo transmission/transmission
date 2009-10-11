@@ -338,7 +338,7 @@ desktopPage( GObject * core )
     w = new_check_button( s, PREF_KEY_INHIBIT_HIBERNATION, core );
     hig_workarea_add_wide_control( t, &row, w );
 
-    s = _( "Show Transmission in the system _tray" );
+    s = _( "Show Transmission in the notification _area" );
     w = new_check_button( s, PREF_KEY_SHOW_TRAY_ICON, core );
     hig_workarea_add_wide_control( t, &row, w );
 
