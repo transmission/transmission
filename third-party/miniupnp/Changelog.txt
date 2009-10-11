@@ -1,5 +1,9 @@
-$Id: Changelog.txt,v 1.91 2009/09/21 12:57:42 nanard Exp $
+$Id: Changelog.txt,v 1.93 2009/10/10 19:15:34 nanard Exp $
 miniUPnP client Changelog.
+
+2009/10/10:
+  Some fixes for compilation under Solaris
+  compilation fixes : http://miniupnp.tuxfamily.org/forum/viewtopic.php?p=1464
 
 2009/09/21:
   fixing the code to ignore EINTR during connect() calls.

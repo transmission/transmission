@@ -1,4 +1,4 @@
-/* $Id: miniupnpc.h,v 1.18 2008/09/25 18:02:50 nanard Exp $ */
+/* $Id: miniupnpc.h,v 1.19 2009/10/10 19:15:35 nanard Exp $ */
 /* Project: miniupnp
  * http://miniupnp.free.fr/
  * Author: Thomas Bernard
@@ -101,6 +101,10 @@ LIBSPEC void FreeUPNPUrls(struct UPNPUrls *);
  * Returns the number of bytes read if successful, zero if no bytes were 
  * read or if we timed out. Returns negative if there was an error. */
 int ReceiveData(int socket, char * data, int length, int timeout);
+
+/* return 0 or 1 */
+LIBSPEC int UPNPIGD_IsConnected(struct UPNPUrls *, struct IGDdatas *);
+
 
 #ifdef __cplusplus
 }

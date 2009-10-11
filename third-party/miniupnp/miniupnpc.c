@@ -1,11 +1,11 @@
-/* $Id: miniupnpc.c,v 1.64 2009/09/21 12:57:42 nanard Exp $ */
+/* $Id: miniupnpc.c,v 1.66 2009/10/10 19:15:34 nanard Exp $ */
 /* Project : miniupnp
  * Author : Thomas BERNARD
  * copyright (c) 2005-2009 Thomas Bernard
  * This software is subjet to the conditions detailed in the
  * provided LICENCE file. */
 #define __EXTENSIONS__ 1
-#ifndef MACOSX
+#if !defined(MACOSX) && !defined(__sun)
 #if !defined(_XOPEN_SOURCE) && !defined(__OpenBSD__) && !defined(__NetBSD__)
 #ifndef __cplusplus
 #define _XOPEN_SOURCE 600
@@ -34,7 +34,7 @@
 #else
 /* Standard POSIX includes */
 #include <unistd.h>
-#include <sys/select.h> /* fd_set */
+#include <sys/select.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/param.h>
@@ -698,7 +698,7 @@ int ReceiveData(int socket, char * data, int length, int timeout)
 	return n;
 }
 
-static int
+int
 UPNPIGD_IsConnected(struct UPNPUrls * urls, struct IGDdatas * data)
 {
 	char status[64];

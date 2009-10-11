@@ -1,4 +1,4 @@
-/* $Id: miniwget.c,v 1.26 2009/09/21 12:57:42 nanard Exp $ */
+/* $Id: miniwget.c,v 1.28 2009/10/10 19:15:35 nanard Exp $ */
 /* Project : miniupnp
  * Author : Thomas Bernard
  * Copyright (c) 2005-2009 Thomas Bernard
@@ -20,12 +20,13 @@
 #else
 #include <unistd.h>
 #include <sys/param.h>
-#include <sys/select.h> /* fd_set */
+#include <sys/select.h>
 #include <sys/socket.h>
 #include <netdb.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <errno.h>
+#include <time.h>
 #define closesocket close
 #define MINIUPNPC_IGNORE_EINTR
 #endif

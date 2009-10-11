@@ -1,10 +1,10 @@
-/* $Id: minixml.c,v 1.6 2007/05/15 18:14:08 nanard Exp $ */
+/* $Id: minixml.c,v 1.7 2009/10/10 19:15:35 nanard Exp $ */
 /* minixml.c : the minimum size a xml parser can be ! */
 /* Project : miniupnp
  * webpage: http://miniupnp.free.fr/ or http://miniupnp.tuxfamily.org/
  * Author : Thomas Bernard
 
-Copyright (c) 2005-2007, Thomas BERNARD 
+Copyright (c) 2005-2009, Thomas BERNARD 
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
