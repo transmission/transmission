@@ -37,8 +37,6 @@
     NSDictionary * fAttributes;
     
     NSTimer * fTimer;
-    
-    NSImage * fErrorImage, * fInfoImage, * fDebugImage;
 }
 
 - (void) updateLog: (NSTimer *) timer;
