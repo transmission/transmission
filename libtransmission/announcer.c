@@ -1352,7 +1352,9 @@ tierAnnounce( tr_announcer * announcer, tr_tier * tier )
 static tr_bool
 parseScrapeResponse( tr_tier     * tier,
                      const char  * response,
-                     size_t        responseLen )
+                     size_t        responseLen,
+                     char        * result,
+                     size_t        resultlen )
 {
     tr_bool success = FALSE;
     tr_benc benc, *files;
@@ -1405,6 +1407,11 @@ parseScrapeResponse( tr_tier     * tier,
     if( bencLoaded )
         tr_bencFree( &benc );
 
+    if( success )
+        tr_strlcpy( result, _( "Success" ), resultlen );
+    else
+        tr_strlcpy( result, _( "Error parsing response" ), resultlen );
+
     return success;
 }
 
@@ -1436,18 +1443,19 @@ onScrapeDone( tr_session   * session,
             host->lastResponseInterval = now - data->timeSent;
         }
 
-        if( responseCode == HTTP_OK )
-        {
-            success = parseScrapeResponse( tier, response, responseLen );
-        }
-
         if( 200 <= responseCode && responseCode <= 299 )
         {
             const int interval = tier->scrapeIntervalSec;
             tier->scrapeAt = now + interval;
 
-            tr_strlcpy( tier->lastScrapeStr, _( "Success" ), sizeof( tier->lastScrapeStr ) );
-            tr_tordbg( tier->tor, "Request succeeded. Rescraping in %d seconds", interval );
+            if( responseCode == HTTP_OK )
+                success = parseScrapeResponse( tier, response, responseLen,
+                                               tier->lastScrapeStr, sizeof( tier->lastScrapeStr ) );
+            else
+                tr_snprintf( tier->lastScrapeStr, sizeof( tier->lastScrapeStr ),
+                             _( "tracker gave HTTP Response Code %1$ld (%2$s)" ),
+                             responseCode, tr_webGetResponseStr( responseCode ) );
+            tr_tordbg( tier->tor, "%s", tier->lastScrapeStr );
         }
         else if( 300 <= responseCode && responseCode <= 399 )
         {
