@@ -120,7 +120,6 @@
     }
     
     fMessages = [[NSMutableArray alloc] init];
-    fIndex = 0;
 }
 
 - (void) windowDidBecomeKey: (NSNotification *) notification
@@ -139,6 +138,8 @@
 
 - (void) updateLog: (NSTimer *) timer
 {
+    static NSUInteger currentIndex = 0;
+    
     tr_msg_list * messages;
     if ((messages = tr_getQueuedMessages()) == NULL)
         return;
@@ -151,7 +152,7 @@
         NSDictionary * message  = [NSDictionary dictionaryWithObjectsAndKeys:
                                     [NSString stringWithUTF8String: currentMessage->message], @"Message",
                                     [NSDate dateWithTimeIntervalSince1970: currentMessage->when], @"Date",
-                                    [NSNumber numberWithUnsignedInteger: fIndex++], @"Index", //more accurate when sorting by date
+                                    [NSNumber numberWithUnsignedInteger: currentIndex++], @"Index", //more accurate when sorting by date
                                     [NSNumber numberWithInteger: currentMessage->level], @"Level",
                                     name, @"Name",
                                     [NSString stringWithUTF8String: currentMessage->file], @"File",
@@ -163,7 +164,7 @@
     tr_freeMessageList(messages);
     
     NSScroller * scroller = [[fMessageTable enclosingScrollView] verticalScroller];
-    BOOL shouldScroll = [scroller floatValue] == 1.0 || [scroller isHidden] || [scroller knobProportion] == 1.0;
+    const BOOL shouldScroll = [scroller floatValue] == 1.0 || [scroller isHidden] || [scroller knobProportion] == 1.0;
     
     NSUInteger total = [fMessages count];
     if (total > MAX_MESSAGES)
