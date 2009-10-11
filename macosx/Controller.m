@@ -1941,10 +1941,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             descriptors = [[NSArray alloc] initWithObjects: progressDescriptor, ratioProgressDescriptor, ratioDescriptor,
                                                                 nameDescriptor, nil];
         }
-        #warning broken
         else if ([sortType isEqualToString: SORT_TRACKER])
         {
-            NSSortDescriptor * trackerDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"trackerAddressAnnounce" ascending: asc
+            NSSortDescriptor * trackerDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"trackerSortKey" ascending: asc
                                                     selector: @selector(localizedCaseInsensitiveCompare:)] autorelease];
             
             descriptors = [[NSArray alloc] initWithObjects: trackerDescriptor, nameDescriptor, nil];
@@ -3472,8 +3471,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 break;
             case SORT_ACTIVITY_TAG:
                 sortType = SORT_ACTIVITY;
+                break;
             default:
                 NSAssert1(NO, @"Unknown sort tag received: %d", [menuItem tag]);
+                return;
         }
         
         [menuItem setState: [sortType isEqualToString: [fDefaults stringForKey: @"Sort"]] ? NSOnState : NSOffState];
@@ -4110,7 +4111,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         if (!torrent)
         {
-            [pool release];
+            [pool drain];
             
             NSLog(@"No torrent found matching the given torrent struct from the RPC callback!");
             return;

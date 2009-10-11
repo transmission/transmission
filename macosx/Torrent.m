@@ -1478,6 +1478,24 @@ int trashDataFile(const char * filename)
         return 2;
 }
 
+- (NSString *) trackerSortKey
+{
+    int count;
+    tr_tracker_stat * stats = tr_torrentTrackers(fHandle, &count);
+    
+    NSString * best = nil;
+    
+    for (int i=0; i < count; ++i)
+    {
+        NSString * tracker = [NSString stringWithUTF8String: stats[i].host];
+        if (!best || [tracker localizedCaseInsensitiveCompare: best] == NSOrderedAscending)
+            best = tracker;
+    }
+    
+    tr_torrentTrackersFree(stats, count);
+    return best;
+}
+
 - (tr_torrent *) torrentStruct
 {
     return fHandle;

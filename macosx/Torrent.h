@@ -226,6 +226,7 @@
 - (BOOL) isStalled;
 
 - (NSInteger) stateSortKey;
+- (NSString *) trackerSortKey;
 
 - (tr_torrent *) torrentStruct;
 
