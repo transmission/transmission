@@ -332,6 +332,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [PrefsController setHandle: fLib];
         fPrefsController = [[PrefsController alloc] init];
         
+        fQuitting = NO;
         fSoundPlaying = NO;
         
         tr_sessionSetAltSpeedFunc(fLib, altSpeedToggledCallback, self);
@@ -665,6 +666,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) applicationWillTerminate: (NSNotification *) notification
 {
+    fQuitting = YES;
+    
     //stop the Bonjour service
     [[BonjourController defaultController] stop];
 
@@ -703,17 +706,11 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     const BOOL quickLookOpen = [NSApp isOnSnowLeopardOrBetter] && [QLPreviewPanelSL sharedPreviewPanelExists]
                                 && [[QLPreviewPanelSL sharedPreviewPanel] isVisible];
-    for (NSWindow * window in [NSApp windows])
-    {
-        if (!quickLookOpen || window != [QLPreviewPanelSL sharedPreviewPanel]) //hide quicklook window last to avoid animation
-            [window orderOut: nil];
-    }
-    
     if (quickLookOpen)
-    {
-        [[QLPreviewPanelSL sharedPreviewPanel] reloadData];
-        [[QLPreviewPanelSL sharedPreviewPanel] orderOut: nil];
-    }
+        [[QLPreviewPanelSL sharedPreviewPanel] updateController];
+    
+    for (NSWindow * window in [NSApp windows])
+        [window orderOut: nil];
     
     [self showStatusBar: NO animate: NO];
     [self showFilterBar: NO animate: NO];
@@ -3128,7 +3125,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 #warning change from id to QLPreviewPanel
 - (BOOL) acceptsPreviewPanelControl: (id) panel
 {
-    return YES;
+    return !fQuitting;
 }
 
 - (void) beginPreviewPanelControl: (id) panel

@@ -98,6 +98,10 @@ typedef enum
     IBOutlet NSTextField            * fURLSheetTextField;
     IBOutlet NSButton               * fURLSheetOpenButton;
     
+    #warning change to QLPreviewPanel
+    id                              fPreviewPanel;
+    BOOL                            fQuitting;
+    
     BOOL                            fUpdateInProgress;
     BOOL                            fPauseOnLaunch;
     
@@ -110,9 +114,6 @@ typedef enum
     NSMutableDictionary             * fPendingTorrentDownloads;
     
     BOOL                            fSoundPlaying;
-    
-    #warning change to QLPreviewPanel
-    id fPreviewPanel;
 }
 
 - (void) openFiles:             (NSArray *) filenames addType: (addType) type forcePath: (NSString *) path;
