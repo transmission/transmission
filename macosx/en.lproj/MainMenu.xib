@@ -3,18 +3,18 @@
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
 		<string key="IBDocument.SystemVersion">10B504</string>
-		<string key="IBDocument.InterfaceBuilderVersion">732</string>
+		<string key="IBDocument.InterfaceBuilderVersion">740</string>
 		<string key="IBDocument.AppKitVersion">1038.2</string>
 		<string key="IBDocument.HIToolboxVersion">437.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">732</string>
+			<string key="NS.object.0">740</string>
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="1480"/>
 			<integer value="3126"/>
 			<integer value="29"/>
+			<integer value="1480"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -214,7 +214,7 @@
 										<object class="NSOutlineView" id="675318801">
 											<reference key="NSNextResponder" ref="306237956"/>
 											<int key="NSvFlags">256</int>
-											<string key="NSFrameSize">{472, 173}</string>
+											<string key="NSFrameSize">{468, 173}</string>
 											<reference key="NSSuperview" ref="306237956"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="_NSCornerView" key="NSCornerView">
@@ -611,7 +611,7 @@ IDIwMDkAA</bytes>
 												</object>
 												<object class="NSTableColumn" id="5943702">
 													<string key="NSIdentifier">Group</string>
-													<double key="NSWidth">283</double>
+													<double key="NSWidth">279</double>
 													<double key="NSMinWidth">48</double>
 													<double key="NSMaxWidth">3.4028229999999999e+38</double>
 													<object class="NSTableHeaderCell" key="NSHeaderCell">
@@ -792,7 +792,6 @@ IDIwMDkAA</bytes>
 									<int key="NSvFlags">-2147483392</int>
 									<string key="NSFrame">{{-100, -100}, {451, 15}}</string>
 									<reference key="NSSuperview" ref="87647552"/>
-									<bool key="NSEnabled">YES</bool>
 									<int key="NSsFlags">1</int>
 									<reference key="NSTarget" ref="87647552"/>
 									<string key="NSAction">_doScroller:</string>
@@ -802,7 +801,7 @@ IDIwMDkAA</bytes>
 							<string key="NSFrame">{{0, 23}, {468, 173}}</string>
 							<reference key="NSSuperview" ref="303120456"/>
 							<reference key="NSNextKeyView" ref="306237956"/>
-							<int key="NSsFlags">656</int>
+							<int key="NSsFlags">528</int>
 							<reference key="NSVScroller" ref="1068338331"/>
 							<reference key="NSHScroller" ref="365285506"/>
 							<reference key="NSContentView" ref="306237956"/>
@@ -8388,6 +8387,7 @@ IDIwMDkAA</bytes>
 							<string>fPauseFilterButton</string>
 							<string>fPrevFilterItem</string>
 							<string>fPrevInfoTabItem</string>
+							<string>fPreviewPanel</string>
 							<string>fRatioStopMenu</string>
 							<string>fSearchFilterField</string>
 							<string>fSeedFilterButton</string>
@@ -8430,6 +8430,7 @@ IDIwMDkAA</bytes>
 							<string>FilterButton</string>
 							<string>NSMenuItem</string>
 							<string>NSMenuItem</string>
+							<string>id</string>
 							<string>NSMenu</string>
 							<string>NSSearchField</string>
 							<string>FilterButton</string>
@@ -8678,6 +8679,27 @@ IDIwMDkAA</bytes>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">macosx/TorrentTableView.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">TrackerTableView</string>
+					<string key="superclassName">NSTableView</string>
+					<object class="NSMutableDictionary" key="actions">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>copy:</string>
+							<string>paste:</string>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
+							<string>id</string>
+						</object>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">macosx/TrackerTableView.h</string>
 					</object>
 				</object>
 			</object>

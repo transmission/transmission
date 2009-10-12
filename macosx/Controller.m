@@ -3385,6 +3385,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     else if ([ident isEqualToString: TOOLBAR_QUICKLOOK])
     {
         ButtonToolbarItem * item = [self standardToolbarButtonWithIdentifier: ident];
+        [[(NSButton *)[item view] cell] setShowsStateBy: NSContentsCellMask]; //blue when enabled
         
         [item setLabel: NSLocalizedString(@"Quick Look", "QuickLook toolbar item -> label")];
         [item setPaletteLabel: NSLocalizedString(@"Quick Look", "QuickLook toolbar item -> palette label")];
@@ -3392,8 +3393,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [item setImage: [NSImage imageNamed: NSImageNameQuickLookTemplate]];
         [item setTarget: self];
         [item setAction: @selector(toggleQuickLook:)];
-        [item setAutovalidates: NO];
-        [item setEnabled: [NSApp isOnSnowLeopardOrBetter]];
         
         return item;
     }
@@ -3507,6 +3506,14 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     {
         [(NSButton *)[toolbarItem view] setState: ![fFilterBar isHidden]];
         return YES;
+    }
+    
+    //set quick look image
+    if ([ident isEqualToString: TOOLBAR_QUICKLOOK])
+    {
+        [(NSButton *)[toolbarItem view] setState: [NSApp isOnSnowLeopardOrBetter] && [QLPreviewPanelSL sharedPreviewPanelExists]
+                                                    && [[QLPreviewPanelSL sharedPreviewPanel] isVisible]];
+        return [NSApp isOnSnowLeopardOrBetter];
     }
 
     return YES;
@@ -3864,9 +3871,17 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         return YES;
     }
     
-    //quick look only works on 10.6
     if (action == @selector(toggleQuickLook:))
+    {
+        const BOOL visible = [NSApp isOnSnowLeopardOrBetter] && [QLPreviewPanelSL sharedPreviewPanelExists]
+                                && [[QLPreviewPanelSL sharedPreviewPanel] isVisible];
+        //text consistent with Finder
+        NSString * title = !visible ? NSLocalizedString(@"Quick Look", "View menu -> Quick Look")
+                                    : NSLocalizedString(@"Close Quick Look", "View menu -> Quick Look");
+        [menuItem setTitle: title];
+        
         return [NSApp isOnSnowLeopardOrBetter];
+    }
     
     return YES;
 }
