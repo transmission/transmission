@@ -3194,6 +3194,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             return NSZeroRect;
         
         NSRect frame = [fTableView iconRectForRow: row];
+        
+        if (!NSIntersectsRect([fTableView visibleRect], frame))
+                return NSZeroRect;
+        
         frame.origin = [fTableView convertPoint: frame.origin toView: nil];
         frame.origin = [fWindow convertBaseToScreen: frame.origin];
         frame.origin.y -= frame.size.height;

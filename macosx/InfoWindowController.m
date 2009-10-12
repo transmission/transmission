@@ -1177,6 +1177,10 @@ typedef enum
         if ([[folder stringByAppendingPathComponent: [rowItem fullPath]] isEqualToString: fullPath])
         {
             NSRect frame = [fileOutlineView iconRectForRow: row];
+            
+            if (!NSIntersectsRect([fileOutlineView visibleRect], frame))
+                return NSZeroRect;
+            
             frame.origin = [fileOutlineView convertPoint: frame.origin toView: nil];
             frame.origin = [[self window] convertBaseToScreen: frame.origin];
             frame.origin.y -= frame.size.height;
