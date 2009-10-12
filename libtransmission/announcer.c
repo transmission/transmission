@@ -23,6 +23,7 @@
 #include "ptrarray.h"
 #include "publish.h"
 #include "session.h"
+#include "tr-dht.h"
 #include "torrent.h"
 #include "utils.h"
 #include "web.h"
@@ -1565,13 +1566,13 @@ announceMore( tr_announcer * announcer )
 {
     const tr_bool canAnnounce = announcer->announceSlotsAvailable > 0;
     const tr_bool canScrape = announcer->scrapeSlotsAvailable > 0;
+    tr_torrent * tor = NULL;
+    const time_t now = time( NULL );
 
     if( announcer->announceSlotsAvailable > 0 )
     {
         int i;
         int n;
-        const time_t now = time( NULL );
-        tr_torrent * tor = NULL;
         tr_ptrArray announceMe = TR_PTR_ARRAY_INIT;
         tr_ptrArray scrapeMe = TR_PTR_ARRAY_INIT;
 
@@ -1614,6 +1615,21 @@ announceMore( tr_announcer * announcer )
         /* cleanup */
         tr_ptrArrayDestruct( &scrapeMe, NULL );
         tr_ptrArrayDestruct( &announceMe, NULL );
+    }
+
+    tor = NULL;
+    while(( tor = tr_torrentNext( announcer->session, tor ))) {
+        if( tor->dhtAnnounceAt <= now ) {
+            int rc = 1;
+            if( tor->isRunning && tr_torrentAllowsDHT(tor) )
+                rc = tr_dhtAnnounce(tor, 1);
+            if(rc == 0)
+                /* The DHT is not ready yet.  Try again soon. */
+                tor->dhtAnnounceAt = now + 5 + tr_cryptoWeakRandInt( 5 );
+            else
+                /* We should announce at least once every 30 minutes. */
+                tor->dhtAnnounceAt = now + 25 * 60 + tr_cryptoWeakRandInt( 3 * 60 );
+        }
     }
 }
 
