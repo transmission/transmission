@@ -772,6 +772,9 @@ tr_announcerResetTorrent( tr_announcer * announcer, tr_torrent * tor )
         tiersClear( tor->tiers );
 
         addTorrentToTier( announcer, tor->tiers, tor );
+
+        if( tor->isRunning )
+            tr_announcerTorrentStarted( tor );
     }
 }
 
