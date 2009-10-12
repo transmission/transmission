@@ -1145,10 +1145,7 @@ typedef enum
 
 - (BOOL) canQuickLook
 {
-    if (fCurrentTabTag != TAB_FILES_TAG || ![[self window] isVisible] || ![NSApp isOnSnowLeopardOrBetter])
-        return NO;
-    
-    if ([fTorrents count] != 1)
+    if (fCurrentTabTag != TAB_FILES_TAG || ![[self window] isVisible] || [fTorrents count] != 1 || ![NSApp isOnSnowLeopardOrBetter])
         return NO;
     
     Torrent * torrent = [fTorrents objectAtIndex: 0];

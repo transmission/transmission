@@ -736,6 +736,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [fAutoImportedNames release];
     [fPendingTorrentDownloads release];
     
+    [fPreviewPanel release];
+    
     //complete cleanup
     tr_sessionClose(fLib);
 }
@@ -1517,13 +1519,13 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     if ([[fInfoController window] isVisible])
         [fInfoController close];
     else
-    {        
+    {
         [fInfoController updateInfoStats];
         [[fInfoController window] orderFront: nil];
         
         if ([fInfoController canQuickLook]
             && [QLPreviewPanelSL sharedPreviewPanelExists] && [[QLPreviewPanelSL sharedPreviewPanel] isVisible])
-        [[QLPreviewPanelSL sharedPreviewPanel] reloadData];
+            [[QLPreviewPanelSL sharedPreviewPanel] reloadData];
         
     }
 }
@@ -1532,7 +1534,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 {
     [fInfoController setInfoForTorrents: [fTableView selectedTorrents]];
     
-    if ([NSApp isOnSnowLeopardOrBetter] && [QLPreviewPanelSL sharedPreviewPanelExists] && [[QLPreviewPanelSL sharedPreviewPanel] isVisible])
+    if ([NSApp isOnSnowLeopardOrBetter] && [QLPreviewPanelSL sharedPreviewPanelExists]
+        && [[QLPreviewPanelSL sharedPreviewPanel] isVisible])
         [[QLPreviewPanelSL sharedPreviewPanel] reloadData];
 }
 
@@ -3186,6 +3189,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         return [fInfoController quickLookSourceFrameForPreviewItem: item];
     else
     {
+        if (![fWindow isVisible])
+            return NSZeroRect;
+        
         const NSInteger row = [fTableView rowForItem: item];
         if (row == -1)
             return NSZeroRect;
