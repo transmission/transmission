@@ -495,7 +495,7 @@ static int parse_parse_buffer(JSON_parser jc)
                         /*sscanf(jc->parse_buffer, "%Lf", &value.vu.float_value);*/
                         
                         /* not checking with end pointer b/c there may be trailing ws */
-                        value.vu.float_value = strtold(jc->parse_buffer, NULL);
+                        value.vu.float_value = strtod(jc->parse_buffer, NULL);
                     }
                     break;
                 case JSON_T_INTEGER:
