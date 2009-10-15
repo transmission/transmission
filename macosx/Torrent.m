@@ -1471,11 +1471,16 @@ int trashDataFile(const char * filename)
 - (NSInteger) stateSortKey
 {
     if (![self isActive]) //paused
-        return 0;
+    {
+        if (fWaitToStart)
+            return 1;
+        else
+            return 0;
+    }
     else if ([self isSeeding]) //seeding
-        return 1;
+        return 10;
     else //downloading
-        return 2;
+        return 20;
 }
 
 - (NSString *) trackerSortKey

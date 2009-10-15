@@ -698,7 +698,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             [download cancel];
             [download release];
         }
-        [fPendingTorrentDownloads removeAllObjects];
+        [fPendingTorrentDownloads release];
     }
     
     //remember window states and close all windows
@@ -731,7 +731,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [fBadger release];
     
     [fAutoImportedNames release];
-    [fPendingTorrentDownloads release];
     
     [fPreviewPanel release];
     
@@ -746,7 +745,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     NSAppleEventDescriptor * directObject = [event paramDescriptorForKeyword: keyDirectObject];
     if ([directObject descriptorType] == typeAEList)
     {
-        for (NSUInteger i = 1; i <= [directObject numberOfItems]; i++)
+        for (NSInteger i = 1; i <= [directObject numberOfItems]; i++)
             if ((urlString = [[directObject descriptorAtIndex: i] stringValue]))
                 break;
     }
@@ -3196,7 +3195,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         NSRect frame = [fTableView iconRectForRow: row];
         
         if (!NSIntersectsRect([fTableView visibleRect], frame))
-                return NSZeroRect;
+            return NSZeroRect;
         
         frame.origin = [fTableView convertPoint: frame.origin toView: nil];
         frame.origin = [fWindow convertBaseToScreen: frame.origin];
