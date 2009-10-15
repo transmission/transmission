@@ -763,7 +763,7 @@
 - (NSString *) buttonString
 {
     if (fMouseDownRevealButton || (!fTracking && fHoverReveal))
-        return NSLocalizedString(@"Reveal the data file in Finder", "Torrent cell -> button info");
+        return NSLocalizedString(@"Show the data file in Finder", "Torrent cell -> button info");
     else if (fMouseDownControlButton || (!fTracking && fHoverControl))
     {
         Torrent * torrent = [self representedObject];
