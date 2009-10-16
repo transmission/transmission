@@ -186,7 +186,7 @@ typedef enum
 - (void) updateSpeedFieldsToolTips;
 
 - (void) updateTorrentsInQueue;
-- (NSInteger) numToStartFromQueue: (BOOL) downloadQueue;
+- (NSUInteger) numToStartFromQueue: (BOOL) downloadQueue;
 
 - (void) torrentFinishedDownloading: (NSNotification *) notification;
 - (void) torrentRestartedDownloading: (NSNotification *) notification;

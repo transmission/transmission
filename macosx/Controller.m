@@ -1688,33 +1688,33 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) updateTorrentsInQueue
 {
-    BOOL download = [fDefaults boolForKey: @"Queue"],
-        seed = [fDefaults boolForKey: @"QueueSeed"];
-    
-    NSInteger desiredDownloadActive = [self numToStartFromQueue: YES],
-        desiredSeedActive = [self numToStartFromQueue: NO];
+    NSUInteger desiredDownloadActive = [fDefaults boolForKey: @"Queue"] ? [self numToStartFromQueue: YES] : NSUIntegerMax,
+                desiredSeedActive = [fDefaults boolForKey: @"QueueSeed"] ? [self numToStartFromQueue: NO] : NSUIntegerMax;
     
     for (Torrent * torrent in fTorrents)
     {
+        if (desiredDownloadActive == 0 && desiredSeedActive == 0)
+            break;
+        
         if (![torrent isActive] && ![torrent isChecking] && [torrent waitingToStart])
         {
             if (![torrent allDownloaded])
             {
-                if (!download || desiredDownloadActive > 0)
+                if (desiredDownloadActive > 0)
                 {
                     [torrent startTransfer];
                     if ([torrent isActive])
-                        desiredDownloadActive--;
+                        --desiredDownloadActive;
                     [torrent update];
                 }
             }
             else
             {
-                if (!seed || desiredSeedActive > 0)
+                if (desiredSeedActive > 0)
                 {
                     [torrent startTransfer];
                     if ([torrent isActive])
-                        desiredSeedActive--;
+                        --desiredSeedActive;
                     [torrent update];
                 }
             }
@@ -1726,29 +1726,24 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [self updateTorrentHistory];
 }
 
-- (NSInteger) numToStartFromQueue: (BOOL) downloadQueue
+- (NSUInteger) numToStartFromQueue: (BOOL) downloadQueue
 {
     if (![fDefaults boolForKey: downloadQueue ? @"Queue" : @"QueueSeed"])
         return 0;
     
-    NSInteger desired = [fDefaults integerForKey: downloadQueue ? @"QueueDownloadNumber" : @"QueueSeedNumber"];
+    NSUInteger desired = [fDefaults integerForKey: downloadQueue ? @"QueueDownloadNumber" : @"QueueSeedNumber"];
         
     for (Torrent * torrent in fTorrents)
     {
+        if (desired == 0)
+            break;
+        
         if ([torrent isChecking])
-        {
-            desired--;
-            if (desired <= 0)
-                return 0;
-        }
+            --desired;
         else if ([torrent isActive] && ![torrent isStalled] && ![torrent isError])
         {
             if ([torrent allDownloaded] != downloadQueue)
-            {
-                desired--;
-                if (desired <= 0)
-                    return 0;
-            }
+                --desired;
         }
         else;
     }
@@ -1786,7 +1781,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [[NSDistributedNotificationCenter defaultCenter] postNotificationName: @"com.apple.DownloadFileFinished"
             object: [[torrent downloadFolder] stringByAppendingPathComponent: [torrent name]]];
         
-        if ([fDefaults boolForKey: @"QueueSeed"] && [self numToStartFromQueue: NO] <= 0)
+        if ([self numToStartFromQueue: NO] == 0)
         {
             [torrent stopTransfer];
             [torrent setWaitToStart: YES];
@@ -1801,7 +1796,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     Torrent * torrent = [notification object];
     if ([torrent isActive])
     {
-        if ([fDefaults boolForKey: @"Queue"] && [self numToStartFromQueue: YES] <= 0)
+        if ([self numToStartFromQueue: YES] == 0)
         {
             [torrent stopTransfer];
             [torrent setWaitToStart: YES];
@@ -3568,7 +3563,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 break;
             default:
                 NSAssert1(NO, @"Unknown sort tag received: %d", [menuItem tag]);
-                return;
+                return NO;
         }
         
         [menuItem setState: [sortType isEqualToString: [fDefaults stringForKey: @"Sort"]] ? NSOnState : NSOffState];
