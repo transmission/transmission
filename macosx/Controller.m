@@ -1781,7 +1781,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [[NSDistributedNotificationCenter defaultCenter] postNotificationName: @"com.apple.DownloadFileFinished"
             object: [[torrent downloadFolder] stringByAppendingPathComponent: [torrent name]]];
         
-        if ([fDefaults boolForKey: @"Queue"] && [self numToStartFromQueue: NO] == 0)
+        if ([fDefaults boolForKey: @"QueueSeed"] && [self numToStartFromQueue: NO] == 0)
         {
             [torrent stopTransfer];
             [torrent setWaitToStart: YES];
@@ -1796,7 +1796,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     Torrent * torrent = [notification object];
     if ([torrent isActive])
     {
-        if ([fDefaults boolForKey: @"QueueSeed"] && [self numToStartFromQueue: YES] == 0)
+        if ([fDefaults boolForKey: @"Queue"] && [self numToStartFromQueue: YES] == 0)
         {
             [torrent stopTransfer];
             [torrent setWaitToStart: YES];
@@ -3563,7 +3563,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 break;
             default:
                 NSAssert1(NO, @"Unknown sort tag received: %d", [menuItem tag]);
-                return NO;
         }
         
         [menuItem setState: [sortType isEqualToString: [fDefaults stringForKey: @"Sort"]] ? NSOnState : NSOffState];
