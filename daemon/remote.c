@@ -1249,12 +1249,12 @@ printDetails( tr_benc * top )
                     tr_bool isBackup; 
                     int64_t lastAnnouncePeerCount; 
                     const char * lastAnnounceResult; 
-                    time_t lastAnnounceStartTime; 
+                    int64_t lastAnnounceStartTime; 
                     tr_bool lastAnnounceSucceeded; 
-                    time_t lastAnnounceTime; 
+                    int64_t lastAnnounceTime; 
                     const char * lastScrapeResult; 
-                    time_t lastScrapeStartTime; 
                     tr_bool lastScrapeSucceeded; 
+                    int64_t lastScrapeStartTime; 
                     int64_t lastScrapeTime; 
                     int64_t leecherCount; 
                     int64_t nextAnnounceTime; 
