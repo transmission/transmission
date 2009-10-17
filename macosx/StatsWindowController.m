@@ -72,7 +72,7 @@ tr_session * fLib;
                                             stringByAppendingString: @":"]];
     
     //size all elements
-    CGFloat oldWidth = [fUploadedLabelField frame].size.width;
+    const CGFloat oldWidth = [fUploadedLabelField frame].size.width;
     
     [fUploadedLabelField sizeToFit];
     [fDownloadedLabelField sizeToFit];
@@ -111,7 +111,7 @@ tr_session * fLib;
     [[self window] setFrame: windowRect display: YES];
     
     //resize reset button
-    CGFloat oldButtonWidth = [fResetButton frame].size.width;
+    const CGFloat oldButtonWidth = [fResetButton frame].size.width;
     
     [fResetButton setTitle: NSLocalizedString(@"Reset", "Stats window -> reset button")];
     [fResetButton sizeToFit];

@@ -161,7 +161,7 @@
 - (BOOL) allDownloaded;
 - (BOOL) isComplete;
 - (BOOL) isError;
-- (BOOL) isErrorOrWarning;
+- (BOOL) isAnyErrorOrWarning;
 - (NSString *) errorMessage;
 
 - (NSArray *) peers;

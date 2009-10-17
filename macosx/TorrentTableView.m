@@ -139,7 +139,7 @@
 
 - (NSCell *) outlineView: (NSOutlineView *) outlineView dataCellForTableColumn: (NSTableColumn *) tableColumn item: (id) item
 {
-    BOOL group = ![item isKindOfClass: [Torrent class]];
+    const BOOL group = ![item isKindOfClass: [Torrent class]];
     if (!tableColumn)
         return !group ? fTorrentCell : nil;
     else

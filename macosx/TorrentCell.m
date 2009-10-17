@@ -429,7 +429,7 @@
         [gradient release];
     }
     
-    const BOOL error = [torrent isErrorOrWarning];
+    const BOOL error = [torrent isAnyErrorOrWarning];
     
     //icon
     if (!minimal || !(!fTracking && fHoverAction)) //don't show in minimal mode when hovered over

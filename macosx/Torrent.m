@@ -851,17 +851,17 @@ int trashDataFile(const char * filename)
 
 - (BOOL) isError
 {
-    return fStat->error == TR_STAT_LOCAL_ERROR || fStat->error == TR_STAT_TRACKER_ERROR;
+    return fStat->error == TR_STAT_LOCAL_ERROR;
 }
 
-- (BOOL) isErrorOrWarning
+- (BOOL) isAnyErrorOrWarning
 {
     return fStat->error != TR_STAT_OK;
 }
 
 - (NSString *) errorMessage
 {
-    if (![self isErrorOrWarning])
+    if (![self isAnyErrorOrWarning])
         return @"";
     
     NSString * error;
@@ -994,7 +994,7 @@ int trashDataFile(const char * filename)
 {
     NSString * string;
     
-    if ([self isErrorOrWarning])
+    if ([self isAnyErrorOrWarning])
     {
         switch (fStat->error)
         {

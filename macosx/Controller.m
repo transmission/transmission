@@ -893,7 +893,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         //ensure torrent doesn't already exist
         tr_ctor * ctor = tr_ctorNew(fLib);
         tr_ctorSetMetainfoFromFile(ctor, [torrentPath UTF8String]);
-        int result = tr_torrentParse(ctor, &info);
+        tr_parse_result result = tr_torrentParse(ctor, &info);
         if (result != TR_PARSE_OK)
         {
             if (result == TR_PARSE_DUPLICATE)
@@ -903,8 +903,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 if (type != ADD_AUTO)
                     [self invalidOpenAlert: [torrentPath lastPathComponent]];
             }
-            else //this shouldn't happen
-                NSLog(@"Unknown error code (%d) when attempting to open \"%@\"", result, torrentPath);
+            else
+                NSAssert2(NO, @"Unknown error code (%d) when attempting to open \"%@\"", result, torrentPath);
             
             tr_ctorFree(ctor);
             tr_metainfoFree(&info);
@@ -3983,7 +3983,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     if (seeding > 0 || downloading > 0)
     {
         if (!hasSeparator)
-            [fDockMenu insertItem: [NSMenuItem separatorItem] atIndex: seeding > 0 && downloading > 0 ? 2 : 1];
+            [fDockMenu insertItem: [NSMenuItem separatorItem] atIndex: (seeding > 0 && downloading > 0) ? 2 : 1];
     }
     else
     {
