@@ -132,69 +132,63 @@ enum
     
     NSInteger usedCount = 0;
     
-    for (NSInteger i = 0; i < fAcross; i++)
-        for (NSInteger j = 0; j < fAcross; j++)
+    for (NSInteger index = 0; index < fNumPieces; index++)
+    {
+        NSColor * pieceColor = nil;
+        
+        if (showAvailablity ? pieces[index] == -1 : piecesPercent[index] == 1.0)
         {
-            const NSInteger index = i * fAcross + j;
-            if (index >= fNumPieces)
+            if (first || fPieces[index] != PIECE_FINISHED)
             {
-                i = fAcross;
-                break;
-            }
-            
-            NSColor * pieceColor = nil;
-            
-            if (showAvailablity ? pieces[index] == -1 : piecesPercent[index] == 1.0)
-            {
-                if (first || fPieces[index] != PIECE_FINISHED)
+                if (!first && fPieces[index] != PIECE_FLASHING)
                 {
-                    if (!first && fPieces[index] != PIECE_FLASHING)
-                    {
-                        pieceColor = [NSColor orangeColor];
-                        fPieces[index] = PIECE_FLASHING;
-                    }
-                    else
-                    {
-                        pieceColor = fBluePieceColor;
-                        fPieces[index] = PIECE_FINISHED;
-                    }
+                    pieceColor = [NSColor orangeColor];
+                    fPieces[index] = PIECE_FLASHING;
                 }
-            }
-            else if (showAvailablity ? pieces[index] == 0 : piecesPercent[index] == 0.0)
-            {
-                if (first || fPieces[index] != PIECE_NONE)
+                else
                 {
-                    pieceColor = [NSColor whiteColor];
-                    fPieces[index] = PIECE_NONE;
+                    pieceColor = fBluePieceColor;
+                    fPieces[index] = PIECE_FINISHED;
                 }
-            }
-            else if (showAvailablity && pieces[index] >= HIGH_PEERS)
-            {
-                if (first || fPieces[index] != PIECE_HIGH_PEERS)
-                {
-                    pieceColor = fGreenAvailabilityColor;
-                    fPieces[index] = PIECE_HIGH_PEERS;
-                }
-            }
-            else
-            {
-                //always redraw "mixed"
-                CGFloat percent = showAvailablity ? (CGFloat)pieces[index]/HIGH_PEERS : piecesPercent[index];
-                NSColor * fullColor = showAvailablity ? fGreenAvailabilityColor : fBluePieceColor;
-                pieceColor = [[NSColor whiteColor] blendedColorWithFraction: percent ofColor: fullColor];
-                fPieces[index] = PIECE_SOME;
-            }
-            
-            if (pieceColor)
-            {
-                fillRects[usedCount] = NSMakeRect(j * (fWidth + BETWEEN) + BETWEEN + fExtraBorder,
-                                                    [image size].width - (i + 1) * (fWidth + BETWEEN) - fExtraBorder,
-                                                    fWidth, fWidth);
-                fillColors[usedCount] = pieceColor;
-                
-                usedCount++;
             }
         }
+        else if (showAvailablity ? pieces[index] == 0 : piecesPercent[index] == 0.0)
+        {
+            if (first || fPieces[index] != PIECE_NONE)
+            {
+                pieceColor = [NSColor whiteColor];
+                fPieces[index] = PIECE_NONE;
+            }
+        }
+        else if (showAvailablity && pieces[index] >= HIGH_PEERS)
+        {
+            if (first || fPieces[index] != PIECE_HIGH_PEERS)
+            {
+                pieceColor = fGreenAvailabilityColor;
+                fPieces[index] = PIECE_HIGH_PEERS;
+            }
+        }
+        else
+        {
+            //always redraw "mixed"
+            CGFloat percent = showAvailablity ? (CGFloat)pieces[index]/HIGH_PEERS : piecesPercent[index];
+            NSColor * fullColor = showAvailablity ? fGreenAvailabilityColor : fBluePieceColor;
+            pieceColor = [[NSColor whiteColor] blendedColorWithFraction: percent ofColor: fullColor];
+            fPieces[index] = PIECE_SOME;
+        }
+        
+        if (pieceColor)
+        {
+            const NSInteger across = index % fAcross,
+                            down = index / fAcross;
+            fillRects[usedCount] = NSMakeRect(across * (fWidth + BETWEEN) + BETWEEN + fExtraBorder,
+                                                [image size].width - (down + 1) * (fWidth + BETWEEN) - fExtraBorder,
+                                                fWidth, fWidth);
+            fillColors[usedCount] = pieceColor;
+            
+            usedCount++;
+        }
+    }
     
     if (usedCount > 0)
     {
