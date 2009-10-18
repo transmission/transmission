@@ -42,20 +42,10 @@
 
 - (void) awakeFromNib
 {
-    //back image
-    fBack = [[NSImage alloc] initWithSize: [self bounds].size];
-    
-    [fBack lockFocus];
-    NSGradient * gradient = [[NSGradient alloc] initWithStartingColor: [NSColor colorWithCalibratedWhite: 0.0f alpha: 0.4f]
-                                endingColor: [NSColor colorWithCalibratedWhite: 0.2f alpha: 0.4f]];
-    [gradient drawInRect: [self bounds] angle: 90.0f];
-    [gradient release];
-    [fBack unlockFocus];
-    
     //store box colors
-    fGreenAvailabilityColor = [[NSColor colorWithCalibratedRed: 0.0f green: 1.0f blue: 0.4f alpha: 1.0f] retain];
-    fBluePieceColor = [[NSColor colorWithCalibratedRed: 0.0f green: 0.4f blue: 0.8f alpha: 1.0f] retain];
-            
+    fGreenAvailabilityColor = [[NSColor colorWithCalibratedRed: 0.0 green: 1.0 blue: 0.4 alpha: 1.0] retain];
+    fBluePieceColor = [[NSColor colorWithCalibratedRed: 0.0 green: 0.4 blue: 0.8 alpha: 1.0] retain];
+    
     //actually draw the box
     [self setTorrent: nil];
 }
@@ -63,8 +53,6 @@
 - (void) dealloc
 {
     tr_free(fPieces);
-    
-    [fBack release];
     
     [fGreenAvailabilityColor release];
     [fBluePieceColor release];
@@ -88,10 +76,17 @@
         fExtraBorder = (width - ((fWidth + BETWEEN) * fAcross + BETWEEN)) / 2;
     }
     
-    //reset the view to blank
-    NSImage * newBack = [fBack copy];
-    [self setImage: newBack];
-    [newBack release];
+    NSImage * back = [[NSImage alloc] initWithSize: [self bounds].size];
+    [back lockFocus];
+    
+    NSGradient * gradient = [[NSGradient alloc] initWithStartingColor: [NSColor colorWithCalibratedWhite: 0.0 alpha: 0.4]
+                                endingColor: [NSColor colorWithCalibratedWhite: 0.2 alpha: 0.4]];
+    [gradient drawInRect: [self bounds] angle: 90.0];
+    [gradient release];
+    [back unlockFocus];
+    
+    [self setImage: back];
+    [back release];
     
     [self setNeedsDisplay];
 }
