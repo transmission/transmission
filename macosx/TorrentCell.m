@@ -107,12 +107,6 @@
         
         fBluePieceColor = [[NSColor colorWithCalibratedRed: 0.0f green: 0.4f blue: 0.8f alpha: 1.0f] retain];
         fBarBorderColor = [[NSColor colorWithCalibratedWhite: 0.0f alpha: 0.2f] retain];
-        
-        fHighPriorityImage = [[NSImage imageNamed: @"PriorityHigh.png"] copy];
-        [fHighPriorityImage setFlipped: YES];
-        
-        fLowPriorityImage = [[NSImage imageNamed: @"PriorityLow.png"] copy];
-        [fLowPriorityImage setFlipped: YES];
     }
 	return self;
 }
@@ -478,12 +472,14 @@
     //priority icon
     if ([torrent priority] != TR_PRI_NORMAL)
     {
-        NSImage * priorityImage = [torrent priority] == TR_PRI_HIGH ? fHighPriorityImage : fLowPriorityImage;
+        NSImage * priorityImage = [torrent priority] == TR_PRI_HIGH ? [NSImage imageNamed: @"PriorityHigh.png"]
+                                                                    : [NSImage imageNamed: @"PriorityLow.png"];
         
         NSRect priorityRect = NSMakeRect(NSMaxX(titleRect) + PADDING_BETWEEN_TITLE_AND_PRIORITY,
                                 titleRect.origin.y - (PRIORITY_ICON_HEIGHT - titleRect.size.height) / 2.0,
                                 PRIORITY_ICON_WIDTH, PRIORITY_ICON_HEIGHT);
-        [priorityImage drawInRect: priorityRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
+        
+        [self drawImage: priorityImage inRect: priorityRect];
     }
     
     //progress
