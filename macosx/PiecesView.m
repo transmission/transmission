@@ -32,11 +32,14 @@
 
 #define HIGH_PEERS 30
 
-#define PIECE_NONE 0
-#define PIECE_SOME 1
-#define PIECE_HIGH_PEERS 2
-#define PIECE_FINISHED 3
-#define PIECE_FLASHING 4
+enum
+{
+    PIECE_NONE,
+    PIECE_SOME,
+    PIECE_HIGH_PEERS,
+    PIECE_FINISHED,
+    PIECE_FLASHING
+};
 
 @implementation PiecesView
 
@@ -71,7 +74,7 @@
         fNumPieces = MIN([fTorrent pieceCount], MAX_ACROSS * MAX_ACROSS);
         fAcross = ceil(sqrt(fNumPieces));
         
-        CGFloat width = [self bounds].size.width;
+        const CGFloat width = [self bounds].size.width;
         fWidth = (width - (fAcross + 1) * BETWEEN) / fAcross;
         fExtraBorder = (width - ((fWidth + BETWEEN) * fAcross + BETWEEN)) / 2;
     }
@@ -127,12 +130,12 @@
     NSRect fillRects[fNumPieces];
     NSColor * fillColors[fNumPieces];
     
-    NSInteger index = -1, usedCount = 0;
+    NSInteger usedCount = 0;
     
     for (NSInteger i = 0; i < fAcross; i++)
         for (NSInteger j = 0; j < fAcross; j++)
         {
-            index++;
+            const NSInteger index = i * fAcross + j;
             if (index >= fNumPieces)
             {
                 i = fAcross;
