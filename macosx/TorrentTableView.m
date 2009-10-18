@@ -904,7 +904,7 @@
         
         NSImage * icon;
         if (![node isFolder])
-            icon = [[NSWorkspace sharedWorkspace] iconForFileType: [name pathExtension]];
+            icon = [node icon];
         else
         {
             NSMenu * itemMenu = [[NSMenu alloc] initWithTitle: name];

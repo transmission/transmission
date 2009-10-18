@@ -26,6 +26,7 @@
 #import "FileOutlineView.h"
 #import "Torrent.h"
 #import "FileListNode.h"
+#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 
 #define PADDING_HORIZONAL 2.0f
@@ -97,10 +98,7 @@
     if ([node isFolder])
     {
         if (!fFolderImage)
-        {
             fFolderImage = [[[NSWorkspace sharedWorkspace] iconForFileType: NSFileTypeForHFSTypeCode('fldr')] copy];
-            [fFolderImage setFlipped: YES];
-        }
         image = fFolderImage;
     }
     else
@@ -137,7 +135,15 @@
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
 {
     //icon
-    [[self image] drawInRect: [self imageRectForBounds: cellFrame] fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
+    if ([NSApp isOnSnowLeopardOrBetter])
+        [[self image] drawInRect: [self imageRectForBounds: cellFrame] fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0
+            respectFlipped: YES hints: nil];
+    else
+    {
+        NSImage * image = [self image];
+        [image setFlipped: YES];
+        [image drawInRect: [self imageRectForBounds: cellFrame] fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
+    }
     
     NSColor * titleColor, * statusColor;
     if ([self backgroundStyle] == NSBackgroundStyleDark)

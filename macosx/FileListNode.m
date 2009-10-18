@@ -116,10 +116,7 @@
 - (NSImage *) icon
 {
     if (!fIsFolder && !fIcon)
-    {
         fIcon = [[[NSWorkspace sharedWorkspace] iconForFileType: [fName pathExtension]] retain];
-        [fIcon setFlipped: YES];
-    }
     return fIcon;
 }
 
