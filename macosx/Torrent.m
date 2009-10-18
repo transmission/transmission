@@ -1671,7 +1671,7 @@ int trashDataFile(const char * filename)
     {
         FileListNode * node = [[FileListNode alloc] initWithFileName: [self name] path: @"" size: [self size] index: 0];
         fFileList = [[NSArray arrayWithObject: node] retain];
-        fFlatFileList = [fFileList copy];
+        fFlatFileList = [fFileList retain];
         [node release];
     }
 }
