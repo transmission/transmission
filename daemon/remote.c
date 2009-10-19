@@ -72,6 +72,8 @@ static tr_option opts[] =
     { 976, "alt-speed-time-begin", "Time to start using the alt speed limits (in hhmm)", NULL,  1, "<time>" },
     { 977, "alt-speed-time-end",   "Time to stop using the alt speed limits (in hhmm)", NULL,  1, "<time>" },
     { 978, "alt-speed-days",       "Numbers for any/all days of the week - eg. \"1-7\"", NULL,  1, "<days>" },
+    { 'c', "incomplete-dir",       "Where to store new torrents until they're complete", "c", 1, "<dir>" },
+    { 'C', "no-incomplete-dir",    "Don't store incomplete torrents in a different location", "C", 0, NULL },
     { 'b', "debug",                "Print debugging information", "b",  0, NULL },
     { 'd', "downlimit",            "Set the maximum global download speed in KB/s", "d",  1, "<speed>" },
     { 'D', "no-downlimit",         "Don't limit the global download speed", "D",  0, NULL },
@@ -412,6 +414,17 @@ readargs( int           argc,
             case 'b':
                 debug = 1;
                 addArg = FALSE;
+                break;
+
+            case 'c':
+                tr_bencDictAddStr( &top, "method", "session-set" );
+                tr_bencDictAddStr( args, TR_PREFS_KEY_INCOMPLETE_DIR, optarg );
+                tr_bencDictAddBool( args, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED, TRUE );
+                break;
+
+            case 'C':
+                tr_bencDictAddStr( &top, "method", "session-set" );
+                tr_bencDictAddBool( args, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED, FALSE );
                 break;
 
             case 'd':

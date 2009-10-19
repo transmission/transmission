@@ -19,6 +19,7 @@ and
 .Op Fl asc
 .Op Fl ASC
 .Op Fl b
+.Op Fl c Ar path | Fl C
 .Op Fl d Ar number | Fl D
 .Op Fl er | ep | et
 .Op Fl f
@@ -98,6 +99,12 @@ to stop using the alt speed limits (in hhmm).
 Set the number of
 .Ar days
 on which to enable the speed scheduler, using a list such as "2,4-6".
+.It Fl c Fl -incomplete-dir Ar dir
+When adding new torrents, store their contents in
+.Ar directory
+until the torrent is done.
+.It Fl C Fl -no-incomplete-dir
+Don't store incomplete torrents in a different directory.
 .It Fl d Fl -downlimit Ar limit
 Limit the global download speed to
 .Ar limit
