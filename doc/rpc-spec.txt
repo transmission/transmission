@@ -390,9 +390,11 @@
    "alt-speed-up"             | number     max global upload speed (in K/s)
    "blocklist-enabled"        | boolean    true means enabled
    "blocklist-size"           | number     number of rules in the blocklist
+   "download-dir"             | string     default path to download torrents
    "dht-enabled"              | boolean    true means allow dht in public torrents
    "encryption"               | string     "required", "preferred", "tolerated"
-   "download-dir"             | string     default path to download torrents
+   "incomplete-dir"           | string     path for incomplete torrents, when enabled
+   "incomplete-dir-enabled"   | boolean    true means keep torrents in incomplete-dir until done
    "peer-limit-global"        | number     maximum global number of peers
    "peer-limit-per-torrent"   | number     maximum global number of peers
    "pex-enabled"              | boolean    true means allow pex in public torrents
@@ -559,6 +561,8 @@
          |         |        NO | torrent-get    | removed arg "scrapeURL"
          |         |        NO | torrent-get    | removed arg "seeders"
          |         |        NO | torrent-get    | removed arg "timesCompleted"
-         |         | yes    NO | torrent-get    | new arg "trackerStats"
+         |         | yes       | torrent-get    | new arg "trackerStats"
+         |         | yes       | session-set    | new arg "incomplete-dir"
+         |         | yes       | session-set    | new arg "incomplete-dir-enabled"
 
 

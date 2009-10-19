@@ -81,6 +81,8 @@ class Prefs: public QObject
             DSPEED_ENABLED,
             DOWNLOAD_DIR,
             ENCRYPTION,
+            INCOMPLETE_DIR,
+            INCOMPLETE_DIR_ENABLED,
             LAZY_BITFIELD,
             MSGLEVEL,
             OPEN_FILE_LIMIT,

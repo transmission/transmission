@@ -486,13 +486,34 @@ PrefsDialog :: createPrivacyTab( )
 ***/
 
 void
+PrefsDialog :: onIncompleteClicked( void )
+{
+    const QString title = tr( "Select Incomplete Directory" );
+    const QString path = myPrefs.getString( Prefs::INCOMPLETE_DIR );
+    QFileDialog * d = new QFileDialog( this, title, path );
+    d->setFileMode( QFileDialog::Directory );
+    connect( d, SIGNAL(filesSelected(const QStringList&)),
+             this, SLOT(onIncompleteSelected(const QStringList&)) );
+    d->show( );
+}
+
+void
+PrefsDialog :: onIncompleteSelected( const QStringList& list )
+{
+    if( list.size() == 1 )
+        myPrefs.set( Prefs::INCOMPLETE_DIR, list.first( ) );
+}
+
+
+void
 PrefsDialog :: onWatchClicked( void )
 {
-    QFileDialog * d = new QFileDialog( this,
-                                       tr( "Select Watch Directory" ),
-                                       myPrefs.getString( Prefs::DIR_WATCH ) );
+    const QString title = tr( "Select Watch Directory" );
+    const QString path = myPrefs.getString( Prefs::DIR_WATCH );
+    QFileDialog * d = new QFileDialog( this, title, path );
     d->setFileMode( QFileDialog::Directory );
-    connect( d, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onWatchSelected(const QStringList&)) );
+    connect( d, SIGNAL(filesSelected(const QStringList&)),
+             this, SLOT(onWatchSelected(const QStringList&)) );
     d->show( );
 }
 
@@ -506,11 +527,12 @@ PrefsDialog :: onWatchSelected( const QStringList& list )
 void
 PrefsDialog :: onDestinationClicked( void )
 {
-    QFileDialog * d = new QFileDialog( this,
-                                       tr( "Select Destination" ),
-                                       myPrefs.getString( Prefs::DOWNLOAD_DIR ) );
+    const QString title = tr( "Select Destination" );
+    const QString path = myPrefs.getString( Prefs::DOWNLOAD_DIR );
+    QFileDialog * d = new QFileDialog( this, title, path );
     d->setFileMode( QFileDialog::Directory );
-    connect( d, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onDestinationSelected(const QStringList&)) );
+    connect( d, SIGNAL(filesSelected(const QStringList&)),
+             this, SLOT(onDestinationSelected(const QStringList&)) );
     d->show( );
 }
 

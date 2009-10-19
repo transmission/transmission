@@ -1146,6 +1146,10 @@ sessionSet( tr_session               * session,
         tr_blocklistSetEnabled( session, boolVal );
     if( tr_bencDictFindStr( args_in, TR_PREFS_KEY_DOWNLOAD_DIR, &str ) )
         tr_sessionSetDownloadDir( session, str );
+    if( tr_bencDictFindStr( args_in, TR_PREFS_KEY_INCOMPLETE_DIR, &str ) )
+        tr_sessionSetIncompleteDir( session, str );
+    if( tr_bencDictFindBool( args_in, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED, &boolVal ) )
+        tr_sessionSetIncompleteDirEnabled( session, boolVal );
     if( tr_bencDictFindInt( args_in, TR_PREFS_KEY_PEER_LIMIT_GLOBAL, &i ) )
         tr_sessionSetPeerLimit( session, i );
     if( tr_bencDictFindInt( args_in, TR_PREFS_KEY_PEER_LIMIT_TORRENT, &i ) )
@@ -1255,12 +1259,14 @@ sessionGet( tr_session               * s,
     tr_bencDictAddStr ( d, TR_PREFS_KEY_DOWNLOAD_DIR, tr_sessionGetDownloadDir( s ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_LIMIT_GLOBAL, tr_sessionGetPeerLimit( s ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_LIMIT_TORRENT, tr_sessionGetPeerLimitPerTorrent( s ) );
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_INCOMPLETE_DIR, tr_sessionGetIncompleteDir( s ) );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED, tr_sessionGetIncompleteDirEnabled( s ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_PEX_ENABLED, tr_sessionIsPexEnabled( s ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_DHT_ENABLED, tr_sessionIsDHTEnabled( s ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_PORT, tr_sessionGetPeerPort( s ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START, tr_sessionGetPeerPortRandomOnStart( s ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_PORT_FORWARDING, tr_sessionIsPortForwardingEnabled( s ) );
-    tr_bencDictAddInt ( d, "rpc-version", 6 );
+    tr_bencDictAddInt ( d, "rpc-version", 7 );
     tr_bencDictAddInt ( d, "rpc-version-minimum", 1 );
     tr_bencDictAddReal( d, "seedRatioLimit", tr_sessionGetRatioLimit( s ) );
     tr_bencDictAddBool( d, "seedRatioLimited", tr_sessionIsRatioLimited( s ) );

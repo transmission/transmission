@@ -122,6 +122,8 @@ Session :: updatePref( int key )
         case Prefs :: BLOCKLIST_DATE:
         case Prefs :: DHT_ENABLED:
         case Prefs :: DOWNLOAD_DIR:
+        case Prefs :: INCOMPLETE_DIR:
+        case Prefs :: INCOMPLETE_DIR_ENABLED:
         case Prefs :: PEER_LIMIT_GLOBAL:
         case Prefs :: PEER_LIMIT_TORRENT:
         case Prefs :: USPEED_ENABLED:
