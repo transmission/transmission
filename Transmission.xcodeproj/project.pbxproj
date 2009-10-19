@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		002C9EE60C19CD2500C2F6F4 /* fastresume.c in Sources */ = {isa = PBXBuildFile; fileRef = 002C9EE50C19CD2500C2F6F4 /* fastresume.c */; };
 		0A6169A70FE5C9A200C66CE6 /* bitfield.c in Sources */ = {isa = PBXBuildFile; fileRef = 0A6169A50FE5C9A200C66CE6 /* bitfield.c */; };
 		0A6169A80FE5C9A200C66CE6 /* bitfield.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A6169A60FE5C9A200C66CE6 /* bitfield.h */; };
 		35B038130AC5B6EB00A10FDF /* ResumeNoWaitOn.png in Resources */ = {isa = PBXBuildFile; fileRef = 35B037F90AC5B53800A10FDF /* ResumeNoWaitOn.png */; };
@@ -298,7 +297,6 @@
 		BEFC1E4F0C07861A00B0BB3C /* inout.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E160C07861A00B0BB3C /* inout.c */; };
 		BEFC1E520C07861A00B0BB3C /* fdlimit.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E190C07861A00B0BB3C /* fdlimit.h */; };
 		BEFC1E530C07861A00B0BB3C /* fdlimit.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E1A0C07861A00B0BB3C /* fdlimit.c */; };
-		BEFC1E540C07861A00B0BB3C /* fastresume.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E1B0C07861A00B0BB3C /* fastresume.h */; };
 		BEFC1E550C07861A00B0BB3C /* completion.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E1C0C07861A00B0BB3C /* completion.h */; };
 		BEFC1E560C07861A00B0BB3C /* completion.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E1D0C07861A00B0BB3C /* completion.c */; };
 		BEFC1E570C07861A00B0BB3C /* clients.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E1E0C07861A00B0BB3C /* clients.h */; };
@@ -391,7 +389,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		002C9EE50C19CD2500C2F6F4 /* fastresume.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = fastresume.c; path = libtransmission/fastresume.c; sourceTree = "<group>"; };
 		0A6169A50FE5C9A200C66CE6 /* bitfield.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bitfield.c; path = libtransmission/bitfield.c; sourceTree = "<group>"; };
 		0A6169A60FE5C9A200C66CE6 /* bitfield.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bitfield.h; path = libtransmission/bitfield.h; sourceTree = "<group>"; };
 		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
@@ -797,7 +794,6 @@
 		BEFC1E160C07861A00B0BB3C /* inout.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = inout.c; path = libtransmission/inout.c; sourceTree = "<group>"; };
 		BEFC1E190C07861A00B0BB3C /* fdlimit.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = fdlimit.h; path = libtransmission/fdlimit.h; sourceTree = "<group>"; };
 		BEFC1E1A0C07861A00B0BB3C /* fdlimit.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = fdlimit.c; path = libtransmission/fdlimit.c; sourceTree = "<group>"; };
-		BEFC1E1B0C07861A00B0BB3C /* fastresume.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = fastresume.h; path = libtransmission/fastresume.h; sourceTree = "<group>"; };
 		BEFC1E1C0C07861A00B0BB3C /* completion.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = completion.h; path = libtransmission/completion.h; sourceTree = "<group>"; };
 		BEFC1E1D0C07861A00B0BB3C /* completion.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = completion.c; path = libtransmission/completion.c; sourceTree = "<group>"; };
 		BEFC1E1E0C07861A00B0BB3C /* clients.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = clients.h; path = libtransmission/clients.h; sourceTree = "<group>"; };
@@ -1173,7 +1169,6 @@
 				D4AF3B2E0C41F7A500D46B6B /* list.h */,
 				A2BE9C4E0C1E4ADA002D16E6 /* makemeta.c */,
 				A2BE9C4F0C1E4ADA002D16E6 /* makemeta.h */,
-				002C9EE50C19CD2500C2F6F4 /* fastresume.c */,
 				BEFC1DF00C07861A00B0BB3C /* version.h */,
 				BEFC1DF10C07861A00B0BB3C /* utils.h */,
 				BEFC1DF20C07861A00B0BB3C /* utils.c */,
@@ -1206,7 +1201,6 @@
 				BEFC1E160C07861A00B0BB3C /* inout.c */,
 				BEFC1E190C07861A00B0BB3C /* fdlimit.h */,
 				BEFC1E1A0C07861A00B0BB3C /* fdlimit.c */,
-				BEFC1E1B0C07861A00B0BB3C /* fastresume.h */,
 				BEFC1E1C0C07861A00B0BB3C /* completion.h */,
 				BEFC1E1D0C07861A00B0BB3C /* completion.c */,
 				BEFC1E1E0C07861A00B0BB3C /* clients.h */,
@@ -1447,7 +1441,6 @@
 				BEFC1E4D0C07861A00B0BB3C /* session.h in Headers */,
 				BEFC1E4E0C07861A00B0BB3C /* inout.h in Headers */,
 				BEFC1E520C07861A00B0BB3C /* fdlimit.h in Headers */,
-				BEFC1E540C07861A00B0BB3C /* fastresume.h in Headers */,
 				BEFC1E550C07861A00B0BB3C /* completion.h in Headers */,
 				BEFC1E570C07861A00B0BB3C /* clients.h in Headers */,
 				BEFC1E5C0C07861A00B0BB3C /* bencode.h in Headers */,
@@ -1905,7 +1898,6 @@
 				BEFC1E560C07861A00B0BB3C /* completion.c in Sources */,
 				BEFC1E580C07861A00B0BB3C /* clients.c in Sources */,
 				BEFC1E5D0C07861A00B0BB3C /* bencode.c in Sources */,
-				002C9EE60C19CD2500C2F6F4 /* fastresume.c in Sources */,
 				A2BE9C520C1E4AF5002D16E6 /* makemeta.c in Sources */,
 				D4AF3B2F0C41F7A500D46B6B /* list.c in Sources */,
 				4394AC670C74FB6000F367E8 /* ptrarray.c in Sources */,
