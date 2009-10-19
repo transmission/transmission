@@ -996,6 +996,17 @@ int tr_torrentId( const tr_torrent * torrent );
 tr_torrent* tr_torrentFindFromId( tr_session * session, int id );
 
 
+/**
+ * @brief find the location of a torrent's file by looking with and without
+ *        the ".part" suffix, looking in downloadDir and incompleteDir, etc.
+ * @return a newly-allocated string (that must be tr_freed() by the caller when done)
+ *         that gives the location of this file on disk, or NULL if no file exists yet.
+ * @param tor the torrent whose file we're looking for
+ * @param fileNum the fileIndex, in [0...tr_info.fileCount)
+ */
+char* tr_torrentFindFile( const tr_torrent * tor, tr_file_index_t fileNo );
+
+
 /***
 ****  Torrent speed limits
 ****

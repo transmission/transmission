@@ -355,14 +355,6 @@ static TR_INLINE const char * tr_torrentName( const tr_torrent * tor )
 }
 
 /**
- * Get the file that exists on the disk, or NULL if no file exists yet.
- * @return the file that exists on the disk, or NULL if no file exists yet.
- * @param tor the torrent whose file we're using
- * @param fileNum the fileIndex, in [0..tor->info.fileCount)
- */
-char* tr_torrentFindFile( const tr_torrent * tor, tr_file_index_t fileNo );
-
-/**
  * Tell the tr_torrent that one of its files has become complete
  */
 void tr_torrentFileCompleted( tr_torrent * tor, tr_file_index_t fileNo );
