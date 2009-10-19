@@ -2518,20 +2518,24 @@ tr_torrentCheckSeedRatio( tr_torrent * tor )
 void
 tr_torrentFileCompleted( tr_torrent * tor, tr_file_index_t fileNum )
 {
-    char * oldpath = tr_torrentFindFile( tor, fileNum );
-    char * newpath = tr_strdup( oldpath );
-    char * pch = strrchr( newpath, '.' );
-    assert( !strcmp( pch, ".part" ) );
-    *pch = '\0';
+    char * oldpath;
 
     /* close the file so that we can reopen in read-only mode as needed */
     tr_fdFileClose( tor, fileNum );
 
-    /* strip the trailing ".part" from the filename */
-    if( rename( oldpath, newpath ) )
-        tr_torerr( tor, "Error moving \"%s\" to \"%s\": %s", oldpath, newpath, tr_strerror( errno ) );
-
-    tr_free( newpath );
+    /* if the torrent's file ends in ".part" to show that it was incomplete,
+     * strip that suffix */
+    oldpath = tr_torrentFindFile( tor, fileNum );
+    if( oldpath != NULL ) {
+        char * newpath = tr_strdup( oldpath );
+        char * pch = strrchr( newpath, '.' );
+        if(( pch != NULL ) && !strcmp( pch, ".part" )) {
+            *pch = '\0';
+            if( rename( oldpath, newpath ) )
+                tr_torerr( tor, "Error moving \"%s\" to \"%s\": %s", oldpath, newpath, tr_strerror( errno ) );
+        }
+        tr_free( newpath );
+    }
     tr_free( oldpath );
 }
 
