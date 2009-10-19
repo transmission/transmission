@@ -249,16 +249,25 @@
 
 - (void) copy: (id) sender
 {
-    NSPasteboard * pb = [NSPasteboard generalPasteboard];
-    [pb declareTypes: [NSArray arrayWithObject: NSStringPboardType] owner: self];
-    
     NSIndexSet * indexes = [fMessageTable selectedRowIndexes];
     NSMutableArray * messageStrings = [NSMutableArray arrayWithCapacity: [indexes count]];
     
     for (NSDictionary * message in [fMessages objectsAtIndexes: indexes])
         [messageStrings addObject: [self stringForMessage: message]];
     
-    [pb setString: [messageStrings componentsJoinedByString: @"\n"] forType: NSStringPboardType];
+    NSString * messageString = [messageStrings componentsJoinedByString: @"\n"];
+    
+    NSPasteboard * pb = [NSPasteboard generalPasteboard];
+    if ([NSApp isOnSnowLeopardOrBetter])
+    {
+        [pb clearContents];
+        [pb writeObjects: [NSArray arrayWithObject: messageString]];
+    }
+    else
+    {
+        [pb declareTypes: [NSArray arrayWithObject: NSStringPboardType] owner: nil];
+        [pb setString: messageString forType: NSStringPboardType];
+    }
 }
 
 - (BOOL) validateMenuItem: (NSMenuItem *) menuItem
