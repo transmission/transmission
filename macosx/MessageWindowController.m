@@ -143,6 +143,11 @@
         return;
     
     static NSUInteger currentIndex = 0;
+    
+    NSScroller * scroller = [[fMessageTable enclosingScrollView] verticalScroller];
+    const BOOL shouldScroll = currentIndex == 0 || [scroller floatValue] == 1.0 || [scroller isHidden]
+                                || [scroller knobProportion] == 1.0;
+    
     for (tr_msg_list * currentMessage = messages; currentMessage != NULL; currentMessage = currentMessage->next)
     {
         NSString * name = currentMessage->name != NULL ? [NSString stringWithUTF8String: currentMessage->name]
@@ -161,9 +166,6 @@
     }
     
     tr_freeMessageList(messages);
-    
-    NSScroller * scroller = [[fMessageTable enclosingScrollView] verticalScroller];
-    const BOOL shouldScroll = [scroller floatValue] == 1.0 || [scroller isHidden] || [scroller knobProportion] == 1.0;
     
     NSUInteger total = [fMessages count];
     if (total > MAX_MESSAGES)
