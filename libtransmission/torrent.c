@@ -550,6 +550,8 @@ getBlockSize( uint32_t pieceSize )
     return b;
 }
 
+static void refreshCurrentDir( tr_torrent * tor );;
+
 static void
 torrentRealInit( tr_torrent * tor, const tr_ctor * ctor )
 {
@@ -578,6 +580,9 @@ torrentRealInit( tr_torrent * tor, const tr_ctor * ctor )
     if( !tr_ctorGetDownloadDir( ctor, TR_FORCE, &dir ) ||
         !tr_ctorGetDownloadDir( ctor, TR_FALLBACK, &dir ) )
             tor->downloadDir = tr_strdup( dir );
+
+    if( tr_sessionGetIncompleteDirEnabled( session ) )
+        tor->incompleteDir = tr_strdup( tr_sessionGetIncompleteDir( session ) );
 
     tor->lastPieceSize = info->totalSize % info->pieceSize;
 
@@ -641,6 +646,8 @@ torrentRealInit( tr_torrent * tor, const tr_ctor * ctor )
                                                     overwritten by the resume file */
 
     loaded = tr_torrentLoadResume( tor, ~0, ctor );
+
+    refreshCurrentDir( tor );
 
     doStart = tor->isRunning;
     tor->isRunning = 0;
@@ -774,6 +781,8 @@ tr_torrentSetDownloadDir( tr_torrent * tor, const char * path )
         tor->downloadDir = tr_strdup( path );
         tr_torrentSetDirty( tor );
     }
+
+    refreshCurrentDir( tor );
 }
 
 const char*
@@ -1241,6 +1250,7 @@ freeTorrent( tr_torrent * tor )
     tr_bitfieldDestruct( &tor->checkedPieces );
 
     tr_free( tor->downloadDir );
+    tr_free( tor->incompleteDir );
     tr_free( tor->peer_id );
 
     if( tor == session->torrentList )
@@ -1596,6 +1606,13 @@ tr_torrentRecheckCompleteness( tr_torrent * tor )
         tor->completeness = completeness;
         tor->needsSeedRatioCheck = TRUE;
         tr_fdTorrentClose( tor->uniqueId );
+
+        /* if the torrent is a seed now,
+         * and the files used to be in the incompleteDir,
+         * then move them to the destination directory */
+        if( tr_torrentIsSeed( tor ) && ( tor->currentDir == tor->incompleteDir ) )
+            tr_torrentSetLocation( tor, tor->downloadDir, TRUE, NULL, NULL );
+
         fireCompletenessChange( tor, completeness );
 
         if( recentChange && ( completeness == TR_SEED ) )
@@ -1979,8 +1996,7 @@ tr_torrentCountUncheckedPieces( const tr_torrent * tor )
 }
 
 time_t*
-tr_torrentGetMTimes( const tr_torrent * tor,
-                     size_t *           setme_n )
+tr_torrentGetMTimes( const tr_torrent * tor, size_t * setme_n )
 {
     size_t       i;
     const size_t n = tor->info.fileCount;
@@ -1991,8 +2007,8 @@ tr_torrentGetMTimes( const tr_torrent * tor,
     for( i = 0; i < n; ++i )
     {
         struct stat sb;
-        char * path = tr_buildPath( tor->downloadDir, tor->info.files[i].name, NULL );
-        if( !stat( path, &sb ) )
+        char * path = tr_torrentFindFile( tor, i );
+        if( ( path != NULL ) && !stat( path, &sb ) && S_ISREG( sb.st_mode ) )
         {
 #ifdef SYS_DARWIN
             m[i] = sb.st_mtimespec.tv_sec;
@@ -2124,24 +2140,24 @@ tr_torrentSetDoneDate( tr_torrent * tor,
 uint64_t
 tr_torrentGetBytesLeftToAllocate( const tr_torrent * tor )
 {
-    const tr_file * it;
-    const tr_file * end;
-    struct stat sb;
+    tr_file_index_t i;
     uint64_t bytesLeft = 0;
 
     assert( tr_isTorrent( tor ) );
 
-    for( it=tor->info.files, end=it+tor->info.fileCount; it!=end; ++it )
+    for( i=0; i<tor->info.fileCount; ++i )
     {
-        if( !it->dnd )
+        if( !tor->info.files[i].dnd )
         {
-            char * path = tr_buildPath( tor->downloadDir, it->name, NULL );
+            struct stat sb;
+            const uint64_t length = tor->info.files[i].length;
+            char * path = tr_torrentFindFile( tor, i );
 
-            bytesLeft += it->length;
+            bytesLeft += length;
 
-            if( !stat( path, &sb )
-                    && S_ISREG( sb.st_mode )
-                    && ( (uint64_t)sb.st_size <= it->length ) )
+            if( ( path != NULL ) && !stat( path, &sb )
+                                 && S_ISREG( sb.st_mode )
+                                 && ( (uint64_t)sb.st_size <= length ) )
                 bytesLeft -= sb.st_size;
 
             tr_free( path );
@@ -2228,7 +2244,7 @@ walkLocalData( const tr_torrent * tor,
         }
         else if( S_ISREG( sb.st_mode ) && ( sb.st_size > 0 ) )
         {
-            const char * sub = buf + strlen( tor->downloadDir ) + strlen( TR_PATH_DELIMITER_STR );
+            const char * sub = buf + strlen( tor->currentDir ) + strlen( TR_PATH_DELIMITER_STR );
             const tr_bool isTorrentFile = tr_ptrArrayFindSorted( torrentFiles, sub, vstrcmp ) != NULL;
             if( !isTorrentFile )
                 addDirtyFile( root, buf, dirtyFolders );
@@ -2251,12 +2267,14 @@ deleteLocalData( tr_torrent * tor, tr_fileFunc fileFunc )
     const char * firstFile = tor->info.files[0].name;
     const char * cpch = strchr( firstFile, TR_PATH_DELIMITER );
     char * tmp = cpch ? tr_strndup( firstFile, cpch - firstFile ) : NULL;
-    char * root = tr_buildPath( tor->downloadDir, tmp, NULL );
+    char * root = tr_buildPath( tor->currentDir, tmp, NULL );
 
     assert( tr_isTorrent( tor ) );
 
-    for( f=0; f<tor->info.fileCount; ++f )
-        tr_ptrArrayInsertSorted( &torrentFiles, tor->info.files[f].name, vstrcmp );
+    for( f=0; f<tor->info.fileCount; ++f ) {
+        tr_ptrArrayInsertSorted( &torrentFiles, tr_strdup( tor->info.files[f].name ), vstrcmp );
+        tr_ptrArrayInsertSorted( &torrentFiles, tr_strdup_printf( "%s.part", tor->info.files[f].name ), vstrcmp );
+    }
 
     /* build the set of folders and dirtyFolders */
     walkLocalData( tor, root, root, NULL, &torrentFiles, &folders, &dirtyFolders );
@@ -2269,7 +2287,7 @@ deleteLocalData( tr_torrent * tor, tr_fileFunc fileFunc )
 
     /* now blow away any remaining torrent files, such as torrent files in dirty folders */
     for( f=0; f<tor->info.fileCount; ++f ) {
-        char * path = tr_buildPath( tor->downloadDir, tor->info.files[f].name, NULL );
+        char * path = tr_buildPath( tor->currentDir, tor->info.files[f].name, NULL );
         fileFunc( path );
         tr_free( path );
     }
@@ -2292,7 +2310,7 @@ deleteLocalData( tr_torrent * tor, tr_fileFunc fileFunc )
     /* cleanup */
     tr_ptrArrayDestruct( &dirtyFolders, tr_free );
     tr_ptrArrayDestruct( &folders, tr_free );
-    tr_ptrArrayDestruct( &torrentFiles, NULL );
+    tr_ptrArrayDestruct( &torrentFiles, tr_free );
     tr_free( root );
     tr_free( tmp );
 }
@@ -2312,7 +2330,7 @@ tr_torrentDeleteLocalData( tr_torrent * tor, tr_fileFunc fileFunc )
         deleteLocalData( tor, fileFunc );
     else {
         /* torrent only has one file */
-        char * path = tr_buildPath( tor->downloadDir, tor->info.files[0].name, NULL );
+        char * path = tr_torrentFindFile( tor, 0 );
         fileFunc( path );
         tr_free( path );
     }
@@ -2321,6 +2339,15 @@ tr_torrentDeleteLocalData( tr_torrent * tor, tr_fileFunc fileFunc )
 /***
 ****
 ***/
+
+static char*
+rebaseFile( const tr_torrent * tor, tr_file_index_t fileNo,
+            const char * existingFile, const char * newRoot )
+{
+    const char * base = strstr( existingFile, tor->info.files[fileNo].name );
+    assert( base != NULL );
+    return tr_buildPath( newRoot, base, NULL );
+}
 
 struct LocationData
 {
@@ -2344,7 +2371,7 @@ setLocation( void * vdata )
 
     assert( tr_isTorrent( tor ) );
 
-    if( strcmp( location, tor->downloadDir ) )
+    if( strcmp( location, tor->currentDir ) )
     {
         tr_file_index_t i;
 
@@ -2366,10 +2393,10 @@ setLocation( void * vdata )
         {
             struct stat sb;
             const tr_file * f = &tor->info.files[i];
-            char * oldpath = tr_buildPath( tor->downloadDir, f->name, NULL );
-            char * newpath = tr_buildPath( location, f->name, NULL );
+            char * oldpath = tr_torrentFindFile( tor, i );
+            char * newpath = oldpath ? rebaseFile( tor, i, oldpath, location ) : NULL;
 
-            if( do_move )
+            if( do_move && ( oldpath != NULL ) )
             {
                 errno = 0;
                 tr_torinf( tor, "moving \"%s\" to \"%s\"", oldpath, newpath );
@@ -2482,4 +2509,134 @@ tr_torrentCheckSeedRatio( tr_torrent * tor )
                 tor->ratio_limit_hit_func( tor, tor->ratio_limit_hit_func_user_data );
         }
     }
+}
+
+/***
+****
+***/
+
+void
+tr_torrentFileCompleted( tr_torrent * tor, tr_file_index_t fileNum )
+{
+    char * oldpath = tr_torrentFindFile( tor, fileNum );
+    char * newpath = tr_strdup( oldpath );
+    char * pch = strrchr( newpath, '.' );
+    assert( !strcmp( pch, ".part" ) );
+    *pch = '\0';
+
+    /* close the file so that we can reopen in read-only mode as needed */
+    tr_fdFileClose( tor, fileNum );
+
+    /* strip the trailing ".part" from the filename */
+    if( rename( oldpath, newpath ) )
+        tr_torerr( tor, "Error moving \"%s\" to \"%s\": %s", oldpath, newpath, tr_strerror( errno ) );
+
+    tr_free( newpath );
+    tr_free( oldpath );
+}
+
+/***
+****
+***/
+
+enum
+{
+    TR_FILE_PARTIAL         = (1<<0),
+    TR_FILE_INCOMPLETE_DIR  = (1<<1)
+};
+
+static char*
+tr_torrentBuildFilename( const tr_torrent * tor, tr_file_index_t fileNo, int flags )
+{
+    const char * root;
+    char * base;
+    char * path;
+    const tr_bool partial = ( flags & TR_FILE_PARTIAL ) != 0;
+    const tr_bool incomplete = ( flags & TR_FILE_INCOMPLETE_DIR ) != 0;
+
+    assert( tr_isTorrent( tor ) );
+    assert( fileNo < tor->info.fileCount );
+
+    if( incomplete && ( tor->incompleteDir != NULL ) )
+        root = tor->incompleteDir;
+    else
+        root = tor->downloadDir;
+
+    if( partial )
+        base = tr_strdup_printf( "%s.part", tor->info.files[fileNo].name );
+    else
+        base = tr_strdup( tor->info.files[fileNo].name );
+
+    path = tr_buildPath( root, base, NULL );
+
+    /* cleanup */
+    tr_free( base );
+    return path;
+}
+
+static tr_bool
+fileExists( const char * filename )
+{
+    struct stat sb;
+    const tr_bool ok = !stat( filename, &sb );
+    return ok;
+}
+
+char*
+tr_torrentFindFile( const tr_torrent * tor, tr_file_index_t fileNo )
+{
+    int i;
+    char * filename;
+    int flags[4];
+    int n = 0;
+
+    assert( tr_isTorrent( tor ) );
+    assert( fileNo < tor->info.fileCount );
+
+    /* based on what we know about the torrent,
+     * put the most likely hits first... */
+    if( tr_cpFileIsComplete( &tor->completion, fileNo ) ) {
+        flags[n++] = 0;
+        flags[n++] = TR_FILE_INCOMPLETE_DIR;
+        flags[n++] = TR_FILE_PARTIAL;
+        flags[n++] = TR_FILE_INCOMPLETE_DIR|TR_FILE_PARTIAL;
+    } else {
+        flags[n++] = TR_FILE_INCOMPLETE_DIR|TR_FILE_PARTIAL;
+        flags[n++] = TR_FILE_PARTIAL;
+        flags[n++] = TR_FILE_INCOMPLETE_DIR;
+        flags[n++] = 0;
+    }
+        
+    for( i=0; i<n; ++i ) {
+        filename = tr_torrentBuildFilename( tor, fileNo, flags[i] );
+        if( fileExists( filename ))
+            break;
+        tr_free( filename );
+        filename = NULL;
+    }
+
+    return filename;
+}
+
+/* Decide whether we should be looking for files in downloadDir or incompleteDir. */
+static void
+refreshCurrentDir( tr_torrent * tor )
+{
+    const char * dir = tor->downloadDir;
+
+    if( tor->incompleteDir != NULL )
+    {
+        char * tmp1 = tr_torrentBuildFilename( tor, 0, 0 );
+        char * tmp2 = tr_torrentBuildFilename( tor, 0, TR_FILE_PARTIAL );
+
+        if( !fileExists( tmp1 ) && !fileExists( tmp2 ) )
+            dir = tor->incompleteDir;
+
+        tr_free( tmp2 );
+        tr_free( tmp1 );
+    }
+
+    assert( dir != NULL );
+    assert( ( dir == tor->downloadDir ) || ( dir == tor->incompleteDir ) );
+    tor->currentDir = dir;
 }

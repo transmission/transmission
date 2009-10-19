@@ -79,8 +79,8 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
         /* if we're starting a new file... */
         if( !filePos && (fd<0) )
         {
-            char * filename = tr_buildPath( tor->downloadDir, file->name, NULL );
-            fd = tr_open_file_for_scanning( filename );
+            char * filename = tr_torrentFindFile( tor, fileIndex );
+            fd = filename == NULL ? -1 : tr_open_file_for_scanning( filename );
             /* fprintf( stderr, "opening file #%d (%s) -- %d\n", fileIndex, filename, fd ); */
             tr_free( filename );
         }
@@ -254,8 +254,8 @@ torrentHasAnyLocalData( const tr_torrent * tor )
     for( i=0; i<n && !hasAny; ++i )
     {
         struct stat sb;
-        char * path = tr_buildPath( tor->downloadDir, tor->info.files[i].name, NULL );
-        if( !stat( path, &sb ) && ( sb.st_size > 0 ) )
+        char * path = tr_torrentFindFile( tor, i );
+        if( ( path != NULL ) && !stat( path, &sb ) && ( sb.st_size > 0 ) )
             hasAny = TRUE;
         tr_free( path );
     }

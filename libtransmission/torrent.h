@@ -157,8 +157,15 @@ struct tr_torrent
      */
     uint8_t * peer_id;
 
-    /* Where to download */
+    /* Where the files will be when it's complete */
     char * downloadDir;
+
+    /* Where the files are when the torrent is incomplete */
+    char * incompleteDir;
+
+    /* Where the files are now.
+     * This pointer will be equal to downloadDir or incompleteDir */
+    const char * currentDir;
 
     /* How many bytes we ask for per request */
     uint32_t                   blockSize;
@@ -346,5 +353,19 @@ static TR_INLINE const char * tr_torrentName( const tr_torrent * tor )
 
     return tor->info.name;
 }
+
+/**
+ * Get the file that exists on the disk, or NULL if no file exists yet.
+ * @return the file that exists on the disk, or NULL if no file exists yet.
+ * @param tor the torrent whose file we're using
+ * @param fileNum the fileIndex, in [0..tor->info.fileCount)
+ */
+char* tr_torrentFindFile( const tr_torrent * tor, tr_file_index_t fileNo );
+
+/**
+ * Tell the tr_torrent that one of its files has become complete
+ */
+void tr_torrentFileCompleted( tr_torrent * tor, tr_file_index_t fileNo );
+
 
 #endif

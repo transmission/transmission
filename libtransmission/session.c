@@ -347,8 +347,10 @@ isAltTime( const tr_session * s )
 #endif
 
 void
-tr_sessionGetDefaultSettings( tr_benc * d )
+tr_sessionGetDefaultSettings( const char * configDir, tr_benc * d )
 {
+    char * incompleteDir = tr_buildPath( configDir, "Incomplete", NULL );
+
     assert( tr_bencIsDict( d ) );
 
     tr_bencDictReserve( d, 35 );
@@ -358,6 +360,8 @@ tr_sessionGetDefaultSettings( tr_benc * d )
     tr_bencDictAddInt ( d, TR_PREFS_KEY_DSPEED,                   100 );
     tr_bencDictAddBool( d, TR_PREFS_KEY_DSPEED_ENABLED,           FALSE );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_ENCRYPTION,               TR_DEFAULT_ENCRYPTION );
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_INCOMPLETE_DIR,           incompleteDir );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED,   FALSE );
     tr_bencDictAddBool( d, TR_PREFS_KEY_LAZY_BITFIELD,            TRUE );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_MSGLEVEL,                 TR_MSG_INF );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_OPEN_FILE_LIMIT,          atoi( TR_DEFAULT_OPEN_FILE_LIMIT_STR ) );
@@ -401,6 +405,8 @@ tr_sessionGetDefaultSettings( tr_benc * d )
     tr_bencDictAddInt ( d, TR_PREFS_KEY_UPLOAD_SLOTS_PER_TORRENT, 14 );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_BIND_ADDRESS_IPV4,        TR_DEFAULT_BIND_ADDRESS_IPV4 );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_BIND_ADDRESS_IPV6,        TR_DEFAULT_BIND_ADDRESS_IPV6 );
+
+    tr_free( incompleteDir );
 }
 
 void
@@ -415,6 +421,8 @@ tr_sessionGetSettings( tr_session * s, struct tr_benc * d )
     tr_bencDictAddInt ( d, TR_PREFS_KEY_DSPEED,                   tr_sessionGetSpeedLimit( s, TR_DOWN ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_DSPEED_ENABLED,           tr_sessionIsSpeedLimited( s, TR_DOWN ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_ENCRYPTION,               s->encryptionMode );
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_INCOMPLETE_DIR,           tr_sessionGetIncompleteDir( s ) );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED,   tr_sessionGetIncompleteDirEnabled( s ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_LAZY_BITFIELD,            s->useLazyBitfield );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_MSGLEVEL,                 tr_getMessageLevel( ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_OPEN_FILE_LIMIT,          s->openFileLimit );
@@ -473,7 +481,7 @@ tr_sessionLoadSettings( tr_benc * d, const char * configDir, const char * appNam
     /* initializing the defaults: caller may have passed in some app-level defaults.
      * preserve those and use the session defaults to fill in any missing gaps. */
     tr_bencInitDict( &sessionDefaults, 0 );
-    tr_sessionGetDefaultSettings( &sessionDefaults );
+    tr_sessionGetDefaultSettings( configDir, &sessionDefaults );
     tr_bencMergeDicts( &sessionDefaults, d );
     tmp = *d; *d = sessionDefaults; sessionDefaults = tmp;
 
@@ -634,7 +642,7 @@ tr_sessionInitImpl( void * vdata )
     dbgmsg( "tr_sessionInit: the session's top-level bandwidth object is %p", session->bandwidth );
 
     tr_bencInitDict( &settings, 0 );
-    tr_sessionGetDefaultSettings( &settings );
+    tr_sessionGetDefaultSettings( data->configDir, &settings );
     tr_bencMergeDicts( &settings, clientSettings );
 
 #ifndef WIN32
@@ -683,6 +691,14 @@ tr_sessionInitImpl( void * vdata )
     found = tr_bencDictFindStr( &settings, TR_PREFS_KEY_DOWNLOAD_DIR, &str );
     assert( found );
     session->downloadDir = tr_strdup( str );
+
+    found = tr_bencDictFindStr( &settings, TR_PREFS_KEY_INCOMPLETE_DIR, &str );
+    assert( found );
+    tr_sessionSetIncompleteDir( session, str );
+
+    found = tr_bencDictFindBool( &settings, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED, &boolVal );
+    assert( found );
+    tr_sessionSetIncompleteDirEnabled( session, boolVal );
 
     found = tr_bencDictFindBool( &settings, TR_PREFS_KEY_PROXY_ENABLED, &boolVal );
     assert( found );
@@ -908,6 +924,50 @@ tr_sessionGetDownloadDir( const tr_session * session )
     assert( tr_isSession( session ) );
 
     return session->downloadDir;
+}
+
+/***
+****
+***/
+
+void
+tr_sessionSetIncompleteDir( tr_session * session, const char * dir )
+{
+    assert( tr_isSession( session ) );
+
+    if( session->incompleteDir != dir )
+    {
+        tr_free( session->incompleteDir );
+
+        session->incompleteDir = tr_strdup( dir );
+
+        tr_mkdirp( session->incompleteDir, 0777 );
+    }
+}
+
+const char*
+tr_sessionGetIncompleteDir( const tr_session * session )
+{
+    assert( tr_isSession( session ) );
+
+    return session->incompleteDir;
+}
+
+void
+tr_sessionSetIncompleteDirEnabled( tr_session * session, tr_bool b )
+{
+    assert( tr_isSession( session ) );
+    assert( tr_isBool( b ) );
+
+    session->isIncompleteDirEnabled = b;
+}
+
+tr_bool
+tr_sessionGetIncompleteDirEnabled( const tr_session * session )
+{
+    assert( tr_isSession( session ) );
+
+    return session->isIncompleteDirEnabled;
 }
 
 /***

@@ -1126,6 +1126,14 @@ prefschanged( TrCore * core UNUSED,
     {
         tr_sessionSetPeerPortRandomOnStart( tr, pref_flag_get( key ) );
     }
+    else if( !strcmp( key, TR_PREFS_KEY_INCOMPLETE_DIR ) )
+    {
+        tr_sessionSetIncompleteDir( tr, pref_string_get( key ) );
+    }
+    else if( !strcmp( key, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED ) )
+    {
+        tr_sessionSetIncompleteDirEnabled( tr, pref_flag_get( key ) );
+    }
 }
 
 static gboolean

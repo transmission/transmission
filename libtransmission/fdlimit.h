@@ -65,11 +65,16 @@ int64_t tr_lseek( int fd, int64_t offset, int whence );
  * @see tr_fdFileClose
  */
 int  tr_fdFileCheckout( int                      torrentId,
+                        tr_file_index_t          fileNum,
                         const char             * folder,
                         const char             * torrentFile,
                         tr_bool                  doWrite,
                         tr_preallocation_mode    preallocationMode,
                         uint64_t                 desiredFileSize );
+
+int tr_fdFileGetCached( int                      torrentId,
+                        tr_file_index_t          fileNum,
+                        tr_bool                  doWrite );
 
 /**
  * Closes a file that's being held by our file repository.
@@ -79,7 +84,7 @@ int  tr_fdFileCheckout( int                      torrentId,
  *
  * @see tr_fdFileCheckout
  */
-void     tr_fdFileClose( const char * filename );
+void     tr_fdFileClose( const tr_torrent * tor, tr_file_index_t fileNo );
 
 
 /**

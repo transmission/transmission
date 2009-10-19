@@ -30,11 +30,12 @@ enum
     TR_FR_SPEEDLIMIT          = ( 1 << 8 ),
     TR_FR_RUN                 = ( 1 << 9 ),
     TR_FR_DOWNLOAD_DIR        = ( 1 << 10 ),
-    TR_FR_MAX_PEERS           = ( 1 << 11 ),
-    TR_FR_ADDED_DATE          = ( 1 << 12 ),
-    TR_FR_DONE_DATE           = ( 1 << 13 ),
-    TR_FR_ACTIVITY_DATE       = ( 1 << 14 ),
-    TR_FR_RATIOLIMIT          = ( 1 << 15 )
+    TR_FR_INCOMPLETE_DIR      = ( 1 << 11 ),
+    TR_FR_MAX_PEERS           = ( 1 << 12 ),
+    TR_FR_ADDED_DATE          = ( 1 << 13 ),
+    TR_FR_DONE_DATE           = ( 1 << 14 ),
+    TR_FR_ACTIVITY_DATE       = ( 1 << 15 ),
+    TR_FR_RATIOLIMIT          = ( 1 << 16 )
 };
 
 /**

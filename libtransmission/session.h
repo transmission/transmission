@@ -52,6 +52,7 @@ struct tr_session
     tr_bool                      isWaiting;
     tr_bool                      useLazyBitfield;
     tr_bool                      isRatioLimited;
+    tr_bool                      isIncompleteDirEnabled;
 
     tr_benc                      removedTorrents;
 
@@ -101,6 +102,7 @@ struct tr_session
     char *                       downloadDir;
     char *                       resumeDir;
     char *                       torrentDir;
+    char *                       incompleteDir;
 
     tr_proxy_type                proxyType;
     char *                       proxy;

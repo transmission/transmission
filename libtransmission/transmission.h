@@ -168,6 +168,8 @@ const char* tr_getDefaultDownloadDir( void );
 #define TR_PREFS_KEY_DHT_ENABLED                "dht-enabled"
 #define TR_PREFS_KEY_DOWNLOAD_DIR               "download-dir"
 #define TR_PREFS_KEY_ENCRYPTION                 "encryption"
+#define TR_PREFS_KEY_INCOMPLETE_DIR             "incomplete-dir"
+#define TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED     "incomplete-dir-enabled"
 #define TR_PREFS_KEY_LAZY_BITFIELD              "lazy-bitfield-enabled"
 #define TR_PREFS_KEY_MSGLEVEL                   "message-level"
 #define TR_PREFS_KEY_OPEN_FILE_LIMIT            "open-file-limit"
@@ -226,7 +228,7 @@ const char* tr_getDefaultDownloadDir( void );
  * @see tr_sessionInit()
  * @see tr_getDefaultConfigDir()
  */
-void tr_sessionGetDefaultSettings( struct tr_benc * dictionary );
+void tr_sessionGetDefaultSettings( const char * configDir, struct tr_benc * dictionary );
 
 /**
  * Add the session's current configuration settings to the benc dictionary.
@@ -328,6 +330,21 @@ void tr_sessionSetDownloadDir( tr_session * session, const char * downloadDir );
  * and can be overridden on a per-torrent basis by tr_ctorSetDownloadDir().
  */
 const char * tr_sessionGetDownloadDir( const tr_session * session );
+
+/**
+ * @brief Set the per-session incomplete download folder
+ * @see tr_sessionInit()
+ * @see tr_sessionGetIncompleteDir()
+ * @see tr_sessionSetIncompleteDirEnabled()
+ * @see tr_sessionGetIncompleteDirEnabled()
+ */
+void tr_sessionSetIncompleteDir( tr_session * session, const char * dir );
+
+const char* tr_sessionGetIncompleteDir( const tr_session * session );
+
+void tr_sessionSetIncompleteDirEnabled( tr_session * session, tr_bool );
+
+tr_bool tr_sessionGetIncompleteDirEnabled( const tr_session * session );
 
 /**
  * @brief Set whether or not RPC calls are allowed in this session.

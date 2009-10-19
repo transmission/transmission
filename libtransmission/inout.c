@@ -75,53 +75,78 @@ readOrWriteBytes( const tr_torrent * tor,
 {
     const tr_info * info = &tor->info;
     const tr_file * file = &info->files[fileIndex];
-    tr_preallocation_mode preallocationMode;
 
     typedef size_t ( *iofunc )( int, void *, size_t );
     iofunc          func = ioMode == TR_IO_READ ? (iofunc)read : (iofunc)write;
     struct stat     sb;
     int             fd = -1;
-    int             err;
-    int             fileExists;
+    int             err = 0;
+    const tr_bool doWrite = ioMode == TR_IO_WRITE;
 
-    assert( tor->downloadDir && *tor->downloadDir );
+    assert( tor->currentDir && *tor->currentDir );
     assert( fileIndex < info->fileCount );
     assert( !file->length || ( fileOffset < file->length ) );
     assert( fileOffset + buflen <= file->length );
 
-    {
-        char path[MAX_PATH_LENGTH];
-        tr_snprintf( path, sizeof( path ), "%s%c%s", tor->downloadDir, TR_PATH_DELIMITER, file->name );
-        fileExists = !stat( path, &sb );
-    }
-
     if( !file->length )
         return 0;
 
-    if( ( file->dnd ) || ( ioMode != TR_IO_WRITE ) )
-        preallocationMode = TR_PREALLOCATE_NONE;
-    else
-        preallocationMode = tor->session->preallocationMode;
+    fd = tr_fdFileGetCached( tr_torrentId( tor ), fileIndex, doWrite );
 
-    if( ( ioMode == TR_IO_READ ) && !fileExists ) /* does file exist? */
-        err = ENOENT;
-    else if( ( fd = tr_fdFileCheckout( tor->uniqueId, tor->downloadDir, file->name, ioMode == TR_IO_WRITE, preallocationMode, file->length ) ) < 0 ) {
-        err = errno;
-        tr_torerr( tor, "tr_fdFileCheckout failed for \"%s\": %s", file->name, tr_strerror( err ) );
-    }
-    else if( tr_lseek( fd, (int64_t)fileOffset, SEEK_SET ) == -1 ) {
-        err = errno;
-        tr_torerr( tor, "tr_lseek failed for \"%s\": %s", file->name, tr_strerror( err ) );
-    }
-    else if( func( fd, buf, buflen ) != buflen ) {
-        err = errno;
-        tr_torerr( tor, "read/write failed for \"%s\": %s", file->name, tr_strerror( err ) );
-    }
-    else
-        err = 0;
+    if( fd < 0 )
+    {
+        /* the fd cache doesn't have this file...
+         * we'll need to open it and maybe create it */
+        char * name;
+        tr_preallocation_mode preallocationMode;
+        tr_bool fileExists;
+    
+        {
+            char * path = tr_torrentFindFile( tor, fileIndex );
 
-    if( ( !err ) && ( !fileExists ) && ( ioMode == TR_IO_WRITE ) )
-        tr_statsFileCreated( tor->session );
+            fileExists = !stat( path, &sb );
+
+            if( fileExists )
+                name = tr_strdup( strstr( path, file->name ) );
+            else
+                name = tr_strdup_printf( "%s.part", file->name );
+
+            tr_free( path );
+        }
+
+        if( ( file->dnd ) || ( ioMode != TR_IO_WRITE ) )
+            preallocationMode = TR_PREALLOCATE_NONE;
+        else
+            preallocationMode = tor->session->preallocationMode;
+
+        if( ( ioMode == TR_IO_READ ) && !fileExists ) /* does file exist? */
+        {
+            err = ENOENT;
+        }
+        else if( ( fd = tr_fdFileCheckout( tor->uniqueId, fileIndex, tor->currentDir, name,
+                                           doWrite, preallocationMode, file->length ) ) < 0 )
+        {
+            err = errno;
+            tr_torerr( tor, "tr_fdFileCheckout failed for \"%s\": %s", name, tr_strerror( err ) );
+        }
+
+        if( doWrite && !err )
+            tr_statsFileCreated( tor->session );
+    }
+
+    if( !err )
+    {
+        if( tr_lseek( fd, (int64_t)fileOffset, SEEK_SET ) == -1 )
+        {
+            err = errno;
+            tr_torerr( tor, "tr_lseek failed for \"%s\": %s", file->name, tr_strerror( err ) );
+        }
+        else if( func( fd, buf, buflen ) != buflen )
+        {
+            err = errno;
+            tr_torerr( tor, "read/write failed for \"%s\": %s", file->name, tr_strerror( err ) );
+        }
+    }
 
     return err;
 }

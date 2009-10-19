@@ -290,6 +290,13 @@ torrentPage( GObject * core )
     hig_workarea_add_row_w( t, &row, l, w, NULL );
 #endif
 
+    s = _( "Keep incomplete files in:" );
+    l = new_check_button( s, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED, core );
+    w = new_path_chooser_button( TR_PREFS_KEY_INCOMPLETE_DIR, core );
+    gtk_widget_set_sensitive( GTK_WIDGET( w ), pref_flag_get( TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED ) );
+    g_signal_connect( l, "toggled", G_CALLBACK( target_cb ), w );
+    hig_workarea_add_row_w( t, &row, l, w, NULL );
+
     s = _( "Display _options dialog" );
     w = new_check_button( s, PREF_KEY_OPTIONS_PROMPT, core );
     hig_workarea_add_wide_control( t, &row, w );

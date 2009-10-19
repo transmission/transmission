@@ -262,7 +262,6 @@ Session :: start( )
     {
         tr_benc settings;
         tr_bencInitDict( &settings, 0 );
-        tr_sessionGetDefaultSettings( &settings );
         tr_sessionLoadSettings( &settings, myConfigDir.toUtf8().constData(), "qt" );
         mySession = tr_sessionInit( "qt", myConfigDir.toUtf8().constData(), true, &settings );
         tr_bencFree( &settings );

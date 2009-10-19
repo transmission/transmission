@@ -264,7 +264,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         tr_benc settings;
         tr_bencInitDict(&settings, 34);
-        tr_sessionGetDefaultSettings(&settings);
+        const char * configDir = tr_getDefaultConfigDir("Transmission");
+        tr_sessionGetDefaultSettings(configDir, &settings);
         
         const BOOL usesSpeedLimitSched = [fDefaults boolForKey: @"SpeedLimitAuto"];
         if (!usesSpeedLimitSched)
@@ -318,7 +319,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         tr_bencDictAddStr(&settings, TR_PREFS_KEY_RPC_USERNAME,  [[fDefaults stringForKey: @"RPCUsername"] UTF8String]);
         tr_bencDictAddBool(&settings, TR_PREFS_KEY_RPC_WHITELIST_ENABLED,  [fDefaults boolForKey: @"RPCUseWhitelist"]);
         
-        fLib = tr_sessionInit("macosx", tr_getDefaultConfigDir("Transmission"), YES, &settings);
+        fLib = tr_sessionInit("macosx", configDir, YES, &settings);
         tr_bencFree(&settings);
         
         [NSApp setDelegate: self];
