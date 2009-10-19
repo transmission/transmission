@@ -150,7 +150,7 @@ main(int argc, char **argv)
         hints.ai_socktype = SOCK_DGRAM;
         rc = getaddrinfo(argv[i], NULL, &hints, &info);
         if(rc != 0) {
-            fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
+            fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rc));
             exit(1);
         }
 

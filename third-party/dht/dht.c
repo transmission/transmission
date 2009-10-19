@@ -161,13 +161,17 @@ static int send_pong(int s, struct sockaddr *sa, int salen,
 static int send_find_node(int s, struct sockaddr *sa, int salen,
                           const unsigned char *tid, int tid_len,
                           const unsigned char *target, int confirm);
-static int send_found_nodes(int s, struct sockaddr *sa, int salen,
+static int send_nodes_peers(int s, struct sockaddr *sa, int salen,
                             const unsigned char *tid, int tid_len,
                             const unsigned char *nodes, int nodes_len,
+                            struct peer *peers1, int numpeers1,
+                            struct peer *peers2, int numpeers2,
                             const unsigned char *token, int token_len);
 static int send_closest_nodes(int s, struct sockaddr *sa, int salen,
                               const unsigned char *tid, int tid_len,
                               const unsigned char *id,
+                              struct peer *peers1, int numpeers1,
+                              struct peer *peers2, int numpeers2,
                               const unsigned char *token, int token_len);
 static int send_get_peers(int s, struct sockaddr *sa, int salen,
                           unsigned char *tid, int tid_len,
@@ -176,11 +180,6 @@ static int send_announce_peer(int s, struct sockaddr *sa, int salen,
                               unsigned char *tid, int tid_len,
                               unsigned char *infohas, unsigned short port,
                               unsigned char *token, int token_len, int confirm);
-int send_peers_found(int s, struct sockaddr *sa, int salen,
-                     unsigned char *tid, int tid_len,
-                     struct peer *peers1, int numpeers1,
-                     struct peer *peers2, int numpeers2,
-                     unsigned char *token, int token_len);
 int send_peer_announced(int s, struct sockaddr *sa, int salen,
                         unsigned char *tid, int tid_len);
 
@@ -894,6 +893,10 @@ search_step(int s, struct search *sr, dht_callback *callback, void *closure)
                 struct node *node;
                 unsigned char tid[4];
                 if(n->pinged >= 3)
+                    continue;
+                /* A proposed extension to the protocol consists in
+                   omitting the token when storage tables are full. */
+                if(n->token_len == 0)
                     continue;
                 if(!n->acked) {
                     all_acked = 0;
@@ -1637,7 +1640,8 @@ dht_periodic(int s, int available, time_t *tosleep,
             new_node(s, id, &source, 1);
             debugf("Sending closest nodes.\n");
             send_closest_nodes(s, (struct sockaddr*)&source, sizeof(source),
-                               tid, tid_len, target, NULL, 0);
+                               tid, tid_len, target,
+                               NULL, 0, NULL, 0, NULL, 0);
             break;
         case GET_PEERS:
             debugf("Get_peers!\n");
@@ -1647,34 +1651,34 @@ dht_periodic(int s, int available, time_t *tosleep,
                 break;
             } else {
                 struct storage *st = find_storage(info_hash);
+                unsigned char token[TOKEN_SIZE];
+                make_token((unsigned char*)&source.sin_addr,
+                           ntohs(source.sin_port),
+                           0, token);
                 if(st && st->numpeers > 0) {
                     int i0, n0, n1;
-                    unsigned char token[TOKEN_SIZE];
-                    make_token((unsigned char*)&source.sin_addr,
-                               ntohs(source.sin_port),
-                               0, token);
                     i0 = random() % st->numpeers;
                     /* We treat peers as a circular list, and choose 50
                        peers starting at i0. */
                     n0 = MIN(st->numpeers - i0, 50);
                     n1 = n0 >= 50 ? 0 : MIN(50, i0);
-
                     debugf("Sending found peers (%d).\n", n0 + n1);
-                    send_peers_found(s, (struct sockaddr*)&source,
-                                     sizeof(source), tid, tid_len,
-                                     st->peers + i0, n0,
-                                     st->peers, n1,
-                                     token, TOKEN_SIZE);
-
+                    /* According to the spec, we should not be sending any
+                       nodes in this case.  However, this avoids breaking
+                       searches if data is stored at the wrong place, and
+                       is also what libtorrent and uTorrent do. */
+                    send_closest_nodes(s, (struct sockaddr*)&source,
+                                       sizeof(source), tid, tid_len,
+                                       info_hash,
+                                       st->peers + i0, n0,
+                                       st->peers, n1,
+                                       token, TOKEN_SIZE);
                 } else {
-                    unsigned char token[TOKEN_SIZE];
-                    make_token((unsigned char*)&source.sin_addr,
-                               ntohs(source.sin_port),
-                               0, token);
                     debugf("Sending nodes for get_peers.\n");
                     send_closest_nodes(s, (struct sockaddr*)&source,
                                        sizeof(source),
                                        tid, tid_len, info_hash,
+                                       NULL, 0, NULL, 0,
                                        token, TOKEN_SIZE);
                 }
             }
@@ -1990,24 +1994,38 @@ send_find_node(int s, struct sockaddr *sa, int salen,
 }
 
 int
-send_found_nodes(int s, struct sockaddr *sa, int salen,
+send_nodes_peers(int s, struct sockaddr *sa, int salen,
                  const unsigned char *tid, int tid_len,
                  const unsigned char *nodes, int nodes_len,
+                 struct peer *peers1, int numpeers1,
+                 struct peer *peers2, int numpeers2,
                  const unsigned char *token, int token_len)
 {
     char buf[2048];
-    int i = 0, rc;
+    int i = 0, rc, j;
     rc = snprintf(buf + i, 2048 - i, "d1:rd2:id20:"); INC(i, rc, 2048);
     COPY(buf, i, myid, 20, 2048);
-    if(nodes) {
+    if(token_len > 0) {
+        rc = snprintf(buf + i, 2048 - i, "5:token%d:", token_len);
+        INC(i, rc, 2048);
+        COPY(buf, i, token, token_len, 2048);
+    }
+    if(nodes_len > 0) {
         rc = snprintf(buf + i, 2048 - i, "5:nodes%d:", nodes_len);
         INC(i, rc, 2048);
         COPY(buf, i, nodes, nodes_len, 2048);
     }
-    if(token) {
-        rc = snprintf(buf + i, 2048 - i, "5:token%d:", token_len);
-        INC(i, rc, 2048);
-        COPY(buf, i, token, token_len, 2048);
+    for(j = 0; j < numpeers1; j++) {
+        unsigned short swapped = htons(peers1[j].port);
+        rc = snprintf(buf + i, 2048 - i, "6:"); INC(i, rc, 2048);
+        COPY(buf, i, peers1[j].ip, 4, 2048);
+        COPY(buf, i, &swapped, 2, 2048);
+    }
+    for(j = 0; j < numpeers2; j++) {
+        unsigned short swapped = htons(peers2[j].port);
+        rc = snprintf(buf + i, 2048 - i, "6:"); INC(i, rc, 2048);
+        COPY(buf, i, peers2[j].ip, 4, 2048);
+        COPY(buf, i, &swapped, 2, 2048);
     }
     rc = snprintf(buf + i, 2048 - i, "e1:t%d:", tid_len); INC(i, rc, 2048);
     COPY(buf, i, tid, tid_len, 2048);
@@ -2066,6 +2084,8 @@ int
 send_closest_nodes(int s, struct sockaddr *sa, int salen,
                    const unsigned char *tid, int tid_len,
                    const unsigned char *id,
+                   struct peer *peers1, int numpeers1,
+                   struct peer *peers2, int numpeers2,
                    const unsigned char *token, int token_len)
 {
     unsigned char nodes[8 * 26];
@@ -2080,8 +2100,9 @@ send_closest_nodes(int s, struct sockaddr *sa, int salen,
     if(b)
         numnodes = buffer_closest_nodes(nodes, numnodes, id, b);
 
-    return send_found_nodes(s, sa, salen, tid, tid_len,
+    return send_nodes_peers(s, sa, salen, tid, tid_len,
                             nodes, numnodes * 26,
+                            peers1, numpeers1, peers2, numpeers2,
                             token, token_len);
 }
 
@@ -2133,45 +2154,6 @@ send_announce_peer(int s, struct sockaddr *sa, int salen,
     rc = snprintf(buf + i, 512 - i, "1:y1:qe"); INC(i, rc, 512);
 
     return sendto(s, buf, i, confirm ? 0 : MSG_CONFIRM, sa, salen);
-
- fail:
-    errno = ENOSPC;
-    return -1;
-}
-
-int
-send_peers_found(int s, struct sockaddr *sa, int salen,
-                 unsigned char *tid, int tid_len,
-                 struct peer *peers1, int numpeers1,
-                 struct peer *peers2, int numpeers2,
-                 unsigned char *token, int token_len)
-{
-    char buf[1400];
-    int i = 0, rc, j;
-
-    rc = snprintf(buf + i, 1400 - i, "d1:rd2:id20:"); INC(i, rc, 1400);
-    COPY(buf, i, myid, 20, 1400);
-    rc = snprintf(buf + i, 1400 - i, "5:token%d:", token_len); INC(i, rc, 1400);
-    COPY(buf, i, token, token_len, 1400);
-    rc = snprintf(buf + i, 1400 - i, "6:valuesl"); INC(i, rc, 1400);
-    for(j = 0; j < numpeers1; j++) {
-        unsigned short swapped = htons(peers1[j].port);
-        rc = snprintf(buf + i, 1400 - i, "6:"); INC(i, rc, 1400);
-        COPY(buf, i, peers1[j].ip, 4, 1400);
-        COPY(buf, i, &swapped, 2, 1400);
-    }
-    for(j = 0; j < numpeers2; j++) {
-        unsigned short swapped = htons(peers2[j].port);
-        rc = snprintf(buf + i, 1400 - i, "6:"); INC(i, rc, 1400);
-        COPY(buf, i, peers2[j].ip, 4, 1400);
-        COPY(buf, i, &swapped, 2, 1400);
-    }
-    rc = snprintf(buf + i, 1400 - i, "ee1:t%d:", tid_len);
-    INC(i, rc, 1400);
-    COPY(buf, i, tid, tid_len, 1400);
-    ADD_V(buf, i, 512);
-    rc = snprintf(buf + i, 2048 - i, "1:y1:re"); INC(i, rc, 2048);
-    return sendto(s, buf, i, 0, sa, salen);
 
  fail:
     errno = ENOSPC;
@@ -2330,13 +2312,26 @@ parse_message(const unsigned char *buf, int buflen,
         if(p) {
             int i = p - buf + 9;
             int j = 0;
-            while(buf[i] == '6' && buf[i + 1] == ':' && i + 8 < buflen) {
-                if(j + 6 > *values_len)
+            while(1) {
+                long l;
+                char *q;
+                l = strtol((char*)buf + i, &q, 10);
+                if(q && *q == ':' && l > 0) {
+                    CHECK(q + 1, l);
+                    if(j + l > *values_len)
+                        break;
+                    i = q + 1 + l - (char*)buf;
+                    /* BEP 32 allows heterogeneous values -- ignore IPv6 */
+                    if(l != 6) {
+                        debugf("Received weird value -- %d bytes.\n",
+                               (int)l);
+                        continue;
+                    }
+                    memcpy((char*)values_return + j, q + 1, l);
+                    j += l;
+                } else {
                     break;
-                CHECK(buf + i + 2, 6);
-                memcpy((char*)values_return + j, buf + i + 2, 6);
-                i += 8;
-                j += 6;
+                }
             }
             if(i >= buflen || buf[i] != 'e')
                 debugf("eek... unexpected end for values.\n");
