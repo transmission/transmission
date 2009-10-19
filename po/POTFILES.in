@@ -24,7 +24,6 @@ gtk/tr-window.c
 gtk/util.c
 libtransmission/bencode.c
 libtransmission/blocklist.c
-libtransmission/fastresume.c
 libtransmission/fdlimit.c
 libtransmission/makemeta.c
 libtransmission/metainfo.c
