@@ -96,7 +96,7 @@
     saveButtonFrame.size.width += 10.0;
     [fSaveButton setFrame: saveButtonFrame];
     
-    float oldClearButtonWidth = [fClearButton frame].size.width;
+    const CGFloat oldClearButtonWidth = [fClearButton frame].size.width;
     
     [fClearButton setTitle: NSLocalizedString(@"Clear", "Message window -> save button")];
     [fClearButton sizeToFit];
@@ -170,11 +170,11 @@
     NSUInteger total = [fMessages count];
     if (total > MAX_MESSAGES)
     {
-        //remove the oldest
-        NSSortDescriptor * descriptor = [[[NSSortDescriptor alloc] initWithKey: @"Index" ascending: YES] autorelease];
+        //remove the oldest - move oldest to end for (assumedly) most efficient removal
+        NSSortDescriptor * descriptor = [[[NSSortDescriptor alloc] initWithKey: @"Index" ascending: NO] autorelease];
         [fMessages sortUsingDescriptors: [NSArray arrayWithObject: descriptor]];
         
-        [fMessages removeObjectsInRange: NSMakeRange(0, total-MAX_MESSAGES)];
+        [fMessages removeObjectsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(MAX_MESSAGES, total-MAX_MESSAGES)]];
         
         [fMessageTable noteHeightOfRowsWithIndexesChanged: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, MAX_MESSAGES)]];
         total = MAX_MESSAGES;
