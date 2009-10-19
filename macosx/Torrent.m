@@ -1637,7 +1637,7 @@ int trashDataFile(const char * filename)
                 //determine if folder node already exists
                 FileListNode * node;
                 for (node in fileList)
-                    if ([[node name] isEqualToString: name] && [node isFolder])
+                    if ([node isFolder] && [[node name] isEqualToString: name])
                         break;
                 
                 if (!node)
@@ -1680,7 +1680,7 @@ int trashDataFile(const char * filename)
     index: (NSInteger) index flatList: (NSMutableArray *) flatFileList
 {
     NSString * name = [components objectAtIndex: 0];
-    BOOL isFolder = [components count] > 1;
+    const BOOL isFolder = [components count] > 1;
     
     FileListNode * node = nil;
     if (isFolder)
