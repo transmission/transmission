@@ -2567,15 +2567,6 @@ tr_torrentFindFile2( const tr_torrent * tor, tr_file_index_t fileNum,
     part = tr_torrentBuildPartial( tor, fileNum );
 
     if( b == NULL ) {
-        char * filename = tr_buildPath( tor->downloadDir, part, NULL );
-        if( fileExists( filename ) ) {
-            b = tor->downloadDir;
-            s = part;
-        }
-        tr_free( filename );
-    }
-
-    if( b == NULL ) {
         char * filename = tr_buildPath( tor->downloadDir, file->name, NULL );
         if( fileExists( filename ) ) {
             b = tor->downloadDir;
@@ -2584,25 +2575,31 @@ tr_torrentFindFile2( const tr_torrent * tor, tr_file_index_t fileNum,
         tr_free( filename );
     }
 
-    if( tor->incompleteDir != NULL )
-    {
-        if( b == NULL ) {
-            char * filename = tr_buildPath( tor->incompleteDir, part, NULL );
-            if( fileExists( filename ) ) {
-                b = tor->incompleteDir;
-                s = part;
-            }
-            tr_free( filename );
+    if( ( b == NULL ) && ( tor->incompleteDir != NULL ) ) {
+        char * filename = tr_buildPath( tor->incompleteDir, file->name, NULL );
+        if( fileExists( filename ) ) {
+            b = tor->incompleteDir;
+            s = file->name;
         }
+        tr_free( filename );
+    }
 
-        if( b == NULL ) {
-            char * filename = tr_buildPath( tor->incompleteDir, file->name, NULL );
-            if( fileExists( filename ) ) {
-                b = tor->incompleteDir;
-                s = file->name;
-            }
-            tr_free( filename );
+    if( ( b == NULL ) && ( tor->incompleteDir != NULL ) ) {
+        char * filename = tr_buildPath( tor->incompleteDir, part, NULL );
+        if( fileExists( filename ) ) {
+            b = tor->incompleteDir;
+            s = part;
         }
+        tr_free( filename );
+    }
+
+    if( b == NULL) {
+        char * filename = tr_buildPath( tor->downloadDir, part, NULL );
+        if( fileExists( filename ) ) {
+            b = tor->downloadDir;
+            s = part;
+        }
+        tr_free( filename );
     }
 
     if( base != NULL )
