@@ -107,7 +107,7 @@ readOrWriteBytes( const tr_torrent * tor,
         {
             base = tor->currentDir;
 
-            if( tr_sessionIsPartialFilenamesEnabled( tor->session ) )
+            if( tr_sessionIsIncompleteFileNamingEnabled( tor->session ) )
                 subpath = tr_torrentBuildPartial( tor, fileIndex );
             else
                 subpath = tr_strdup( file->name );

@@ -361,18 +361,17 @@ tr_bool tr_sessionIsIncompleteDirEnabled( const tr_session * session );
 
 
 /**
- * @brief When enabled, unfinished torrent content files created after
- *        this call will have ".part" appended to their filename
+ * @brief When enabled, newly-created files will have ".part" appended
+ *        to their filename until the file is fully downloaded
  *
  * This is not retroactive -- toggling this will not rename existing files.
  * It only applies to new files created by Transmission after this API call.
  *
- * @param session
- * @param enable
+ * @see tr_sessionIsIncompleteFileNamingEnabled()
  */
-void tr_sessionSetPartialFilenamesEnabled( tr_session * session, tr_bool );
+void tr_sessionSetIncompleteFileNamingEnabled( tr_session * session, tr_bool );
 
-tr_bool tr_sessionIsPartialFilenamesEnabled( const tr_session * session );
+tr_bool tr_sessionIsIncompleteFileNamingEnabled( const tr_session * session );
 
 /**
  * @brief Set whether or not RPC calls are allowed in this session.
@@ -1129,10 +1128,10 @@ int tr_torrentGetFileDL( const tr_torrent  * torrent,
                          tr_file_index_t     file );
 
 /** @brief Set a batch of files to be downloaded or not. */
-void            tr_torrentSetFileDLs( tr_torrent       * torrent,
-                                      tr_file_index_t  * files,
-                                      tr_file_index_t    fileCount,
-                                      tr_bool            do_download );
+void tr_torrentSetFileDLs( tr_torrent       * torrent,
+                           tr_file_index_t  * files,
+                           tr_file_index_t    fileCount,
+                           tr_bool            do_download );
 
 
 const tr_info * tr_torrentInfo( const tr_torrent * torrent );
