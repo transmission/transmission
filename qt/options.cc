@@ -110,7 +110,7 @@ Options :: Options( Session& session, const Prefs& prefs, const QString& filenam
     c->setChecked( prefs.getBool( Prefs :: START ) );
     layout->addWidget( c, ++row, 0, 1, 2, Qt::AlignLeft );
 
-    c = myTrashCheck = new QCheckBox( tr( "&Delete source file" ) );
+    c = myTrashCheck = new QCheckBox( tr( "Mo&ve .torrent file to the trash" ) );
     c->setChecked( prefs.getBool( Prefs :: TRASH_ORIGINAL ) );
     layout->addWidget( c, ++row, 0, 1, 2, Qt::AlignLeft );
 

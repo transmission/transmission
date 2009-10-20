@@ -290,14 +290,7 @@ torrentPage( GObject * core )
     hig_workarea_add_row_w( t, &row, l, w, NULL );
 #endif
 
-    s = _( "Keep incomplete files in:" );
-    l = new_check_button( s, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED, core );
-    w = new_path_chooser_button( TR_PREFS_KEY_INCOMPLETE_DIR, core );
-    gtk_widget_set_sensitive( GTK_WIDGET( w ), pref_flag_get( TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED ) );
-    g_signal_connect( l, "toggled", G_CALLBACK( target_cb ), w );
-    hig_workarea_add_row_w( t, &row, l, w, NULL );
-
-    s = _( "Display _options dialog" );
+    s = _( "Show _options dialog" );
     w = new_check_button( s, PREF_KEY_OPTIONS_PROMPT, core );
     hig_workarea_add_wide_control( t, &row, w );
 
@@ -305,9 +298,16 @@ torrentPage( GObject * core )
     w = new_check_button( s, PREF_KEY_START, core );
     hig_workarea_add_wide_control( t, &row, w );
 
-    s = _( "Mo_ve source files to Trash" );
+    s = _( "Mo_ve .torrent file to the trash" );
     w = new_check_button( s, PREF_KEY_TRASH_ORIGINAL, core );
     hig_workarea_add_wide_control( t, &row, w );
+
+    s = _( "Keep _incomplete files in:" );
+    l = new_check_button( s, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED, core );
+    w = new_path_chooser_button( TR_PREFS_KEY_INCOMPLETE_DIR, core );
+    gtk_widget_set_sensitive( GTK_WIDGET( w ), pref_flag_get( TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED ) );
+    g_signal_connect( l, "toggled", G_CALLBACK( target_cb ), w );
+    hig_workarea_add_row_w( t, &row, l, w, NULL );
 
     w = new_path_chooser_button( TR_PREFS_KEY_DOWNLOAD_DIR, core );
     hig_workarea_add_row( t, &row, _( "Save to _Location:" ), w, NULL );
@@ -345,11 +345,11 @@ desktopPage( GObject * core )
     w = new_check_button( s, PREF_KEY_INHIBIT_HIBERNATION, core );
     hig_workarea_add_wide_control( t, &row, w );
 
-    s = _( "Show Transmission in the notification _area" );
+    s = _( "Show Transmission in the _notification area" );
     w = new_check_button( s, PREF_KEY_SHOW_TRAY_ICON, core );
     hig_workarea_add_wide_control( t, &row, w );
 
-    s = _( "Show popup _notifications" );
+    s = _( "Show _popup notifications" );
     w = new_check_button( s, PREF_KEY_SHOW_DESKTOP_NOTIFICATION, core );
     hig_workarea_add_wide_control( t, &row, w );
 

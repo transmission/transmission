@@ -1080,7 +1080,7 @@ TrMainWindow :: openTorrent( )
         myFileDialog->setFileMode( QFileDialog::ExistingFiles );
 
 
-        QCheckBox * button = new QCheckBox( tr( "Display &options dialog" ) );
+        QCheckBox * button = new QCheckBox( tr( "Show &options dialog" ) );
         button->setChecked( myPrefs.getBool( Prefs::OPTIONS_PROMPT ) );
         QGridLayout * layout = dynamic_cast<QGridLayout*>(myFileDialog->layout());
         layout->addWidget( button, layout->rowCount( ), 0, 1, -1, Qt::AlignLeft );

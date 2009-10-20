@@ -563,9 +563,15 @@ PrefsDialog :: createTorrentsTab( )
         hig->addRow( l, b );
         enableBuddyWhenChecked( qobject_cast<QCheckBox*>(l), b );
 
-        hig->addWideControl( checkBoxNew( tr( "Display &options dialog" ), Prefs::OPTIONS_PROMPT ) );
+        hig->addWideControl( checkBoxNew( tr( "Show &options dialog" ), Prefs::OPTIONS_PROMPT ) );
         hig->addWideControl( checkBoxNew( tr( "&Start when added" ), Prefs::START ) );
-        hig->addWideControl( checkBoxNew( tr( "&Delete source files" ), Prefs::TRASH_ORIGINAL ) );
+        hig->addWideControl( checkBoxNew( tr( "Mo&ve .torrent file to the trash" ), Prefs::TRASH_ORIGINAL ) );
+
+        b = myIncompleteButton = new QPushButton;
+        b->setIcon( folderPixmap );
+        b->setStyleSheet( "text-align: left; padding-left: 5; padding-right: 5" );
+        connect( b, SIGNAL(clicked(bool)), this, SLOT(onDestinationClicked(void)) );
+        hig->addRow( tr( "Keep &incomplete files in:" ), b );
 
         b = myDestinationButton = new QPushButton;
         b->setIcon( folderPixmap );
@@ -622,7 +628,9 @@ PrefsDialog :: PrefsDialog( Session& session, Prefs& prefs, QWidget * parent ):
          << Prefs :: ENCRYPTION
          << Prefs :: BLOCKLIST_ENABLED
          << Prefs :: DIR_WATCH
-         << Prefs :: DOWNLOAD_DIR;
+         << Prefs :: DOWNLOAD_DIR
+         << Prefs :: INCOMPLETE_DIR
+         << Prefs :: INCOMPLETE_DIR_ENABLED;
     foreach( int key, keys )
         updatePref( key );
 
@@ -709,10 +717,23 @@ PrefsDialog :: updatePref( int key )
             break;
 
         case Prefs :: DOWNLOAD_DIR: {
-            QString path( myPrefs.getString( Prefs :: DOWNLOAD_DIR ) );
+            QString path( myPrefs.getString( key ) );
             myDestinationButton->setText( QFileInfo(path).fileName() );
             break;
         }
+
+        case Prefs :: INCOMPLETE_DIR: {
+            QString path( myPrefs.getString( key ) );
+            myIncompleteButton->setText( QFileInfo(path).fileName() );
+            break;
+        }
+
+        case Prefs :: INCOMPLETE_DIR_ENABLED: {
+            const bool enabled = myPrefs.getBool( key );
+            myIncompleteButton->setEnabled( enabled );
+            break;
+        }
+       
 
         default:
             break;

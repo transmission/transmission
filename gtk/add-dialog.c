@@ -295,10 +295,10 @@ addSingleTorrentDialog( GtkWindow * parent,
     data->filename = g_strdup( tr_ctorGetSourceFile( ctor ) );
     data->downloadDir = g_strdup( str );
     data->list = file_list_new( core, 0 );
-    data->trash_check =
-        gtk_check_button_new_with_mnemonic( _( "_Move source file to Trash" ) );
-    data->run_check =
-        gtk_check_button_new_with_mnemonic( _( "_Start when added" ) );
+    str = _( "Mo_ve .torrent file to the trash" );
+    data->trash_check = gtk_check_button_new_with_mnemonic( str );
+    str = _( "_Start when added" );
+    data->run_check = gtk_check_button_new_with_mnemonic( str );
 
     g_signal_connect( G_OBJECT( d ), "response",
                       G_CALLBACK( addResponseCB ), data );
@@ -457,7 +457,7 @@ addDialog( GtkWindow * parent,
     if( ( folder = pref_string_get( PREF_KEY_OPEN_DIALOG_FOLDER ) ) )
         gtk_file_chooser_set_current_folder( GTK_FILE_CHOOSER( w ), folder );
 
-    c = gtk_check_button_new_with_mnemonic( _( "Display _options dialog" ) );
+    c = gtk_check_button_new_with_mnemonic( _( "Show _options dialog" ) );
     gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( c ),
                                  pref_flag_get( PREF_KEY_OPTIONS_PROMPT ) );
     gtk_file_chooser_set_extra_widget( GTK_FILE_CHOOSER( w ), c );
