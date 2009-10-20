@@ -387,31 +387,35 @@ tr_fdFileGetCached( int              torrentId,
                     tr_file_index_t  fileNum,
                     tr_bool          doWrite )
 {
-    int i;
-    struct tr_openfile * o;
+    struct tr_openfile * match = NULL;
 
     assert( torrentId > 0 );
     assert( tr_isBool( doWrite ) );
 
     /* is it already open? */
-    for( i=0; i<gFd->openFileLimit; ++i )
     {
-        o = &gFd->openFiles[i];
+        int i;
+        struct tr_openfile * o;
+        for( i=0; i<gFd->openFileLimit; ++i )
+        {
+            o = &gFd->openFiles[i];
 
-        if( !fileIsOpen( o ) )
-            continue;
-        if( torrentId != o->torrentId )
-            continue;
-        if( fileNum != o->fileNum )
-            continue;
+            if( torrentId != o->torrentId )
+                continue;
+            if( fileNum != o->fileNum )
+                continue;
+            if( !fileIsOpen( o ) )
+                continue;
 
-        break;
+            match = o;
+            break;
+        }
     }
 
-    if( ( o != NULL ) && ( !doWrite || o->isWritable ) )
+    if( ( match != NULL ) && ( !doWrite || match->isWritable ) )
     {
-        o->date = tr_date( );
-        return o->fd;
+        match->date = tr_date( );
+        return match->fd;
     }
 
     return -1;
@@ -444,11 +448,11 @@ tr_fdFileCheckout( int                      torrentId,
     {
         o = &gFd->openFiles[i];
 
-        if( !fileIsOpen( o ) )
-            continue;
         if( torrentId != o->torrentId )
             continue;
         if( fileNum != o->fileNum )
+            continue;
+        if( !fileIsOpen( o ) )
             continue;
 
         if( doWrite && !o->isWritable )
@@ -528,11 +532,11 @@ tr_fdFileClose( const tr_torrent * tor, tr_file_index_t fileNum )
     const int torrentId = tr_torrentId( tor );
     for( o=gFd->openFiles, end=o+gFd->openFileLimit; o!=end; ++o )
     {
-        if( !fileIsOpen( o ) )
-            continue;
         if( torrentId != o->torrentId )
             continue;
         if( fileNum != o->fileNum )
+            continue;
+        if( !fileIsOpen( o ) )
             continue;
 
         dbgmsg( "tr_fdFileClose closing \"%s\"", o->filename );
@@ -547,7 +551,7 @@ tr_fdTorrentClose( int torrentId )
     const struct tr_openfile * end;
 
     for( o=gFd->openFiles, end=o+gFd->openFileLimit; o!=end; ++o )
-        if( fileIsOpen( o ) && o->torrentId == torrentId )
+        if( fileIsOpen( o ) && ( o->torrentId == torrentId ) )
             TrCloseFile( o );
 }
 
