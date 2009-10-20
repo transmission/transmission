@@ -1260,7 +1260,7 @@ sessionGet( tr_session               * s,
     tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_LIMIT_GLOBAL, tr_sessionGetPeerLimit( s ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_LIMIT_TORRENT, tr_sessionGetPeerLimitPerTorrent( s ) );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_INCOMPLETE_DIR, tr_sessionGetIncompleteDir( s ) );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED, tr_sessionGetIncompleteDirEnabled( s ) );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED, tr_sessionIsIncompleteDirEnabled( s ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_PEX_ENABLED, tr_sessionIsPexEnabled( s ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_DHT_ENABLED, tr_sessionIsDHTEnabled( s ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_PORT, tr_sessionGetPeerPort( s ) );

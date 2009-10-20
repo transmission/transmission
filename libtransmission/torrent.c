@@ -581,7 +581,7 @@ torrentRealInit( tr_torrent * tor, const tr_ctor * ctor )
         !tr_ctorGetDownloadDir( ctor, TR_FALLBACK, &dir ) )
             tor->downloadDir = tr_strdup( dir );
 
-    if( tr_sessionGetIncompleteDirEnabled( session ) )
+    if( tr_sessionIsIncompleteDirEnabled( session ) )
         tor->incompleteDir = tr_strdup( tr_sessionGetIncompleteDir( session ) );
 
     tor->lastPieceSize = info->totalSize % info->pieceSize;
@@ -2273,7 +2273,7 @@ deleteLocalData( tr_torrent * tor, tr_fileFunc fileFunc )
 
     for( f=0; f<tor->info.fileCount; ++f ) {
         tr_ptrArrayInsertSorted( &torrentFiles, tr_strdup( tor->info.files[f].name ), vstrcmp );
-        tr_ptrArrayInsertSorted( &torrentFiles, tr_strdup_printf( "%s.part", tor->info.files[f].name ), vstrcmp );
+        tr_ptrArrayInsertSorted( &torrentFiles, tr_torrentBuildPartial( tor, f ), vstrcmp );
     }
 
     /* build the set of folders and dirtyFolders */
@@ -2340,15 +2340,6 @@ tr_torrentDeleteLocalData( tr_torrent * tor, tr_fileFunc fileFunc )
 ****
 ***/
 
-static char*
-rebaseFile( const tr_torrent * tor, tr_file_index_t fileNo,
-            const char * existingFile, const char * newRoot )
-{
-    const char * base = strstr( existingFile, tor->info.files[fileNo].name );
-    assert( base != NULL );
-    return tr_buildPath( newRoot, base, NULL );
-}
-
 struct LocationData
 {
     tr_bool move_from_old_location;
@@ -2391,29 +2382,33 @@ setLocation( void * vdata )
          * if the target directory runs out of space halfway through... */
         for( i=0; !err && i<tor->info.fileCount; ++i )
         {
-            struct stat sb;
             const tr_file * f = &tor->info.files[i];
-            char * oldpath = tr_torrentFindFile( tor, i );
-            char * newpath = oldpath ? rebaseFile( tor, i, oldpath, location ) : NULL;
-
-            if( do_move && ( oldpath != NULL ) )
+            const char * oldbase;
+            char * sub;
+            if( tr_torrentFindFile2( tor, i, &oldbase, &sub ) )
             {
-                errno = 0;
-                tr_torinf( tor, "moving \"%s\" to \"%s\"", oldpath, newpath );
-                if( rename( oldpath, newpath ) )
+                char * oldpath = tr_buildPath( oldbase, sub, NULL );
+                char * newpath = tr_buildPath( location, sub, NULL );
+
+                if( do_move )
                 {
-                    verify_needed = TRUE;
-                    if( tr_moveFile( oldpath, newpath ) )
+                    errno = 0;
+                    tr_torinf( tor, "moving \"%s\" to \"%s\"", oldpath, newpath );
+                    if( rename( oldpath, newpath ) )
                     {
-                        err = TRUE;
-                        tr_torerr( tor, "error moving \"%s\" to \"%s\": %s",
-                                        oldpath, newpath, tr_strerror( errno ) );
+                        verify_needed = TRUE;
+                        if( tr_moveFile( oldpath, newpath ) )
+                        {
+                            err = TRUE;
+                            tr_torerr( tor, "error moving \"%s\" to \"%s\": %s",
+                                            oldpath, newpath, tr_strerror( errno ) );
+                        }
                     }
                 }
-            }
-            else if( !stat( newpath, &sb ) )
-            {
-                tr_torinf( tor, "found \"%s\"", newpath );
+
+                tr_free( newpath );
+                tr_free( oldpath );
+                tr_free( sub );
             }
 
             if( data->setme_progress )
@@ -2421,9 +2416,6 @@ setLocation( void * vdata )
                 bytesHandled += f->length;
                 *data->setme_progress = bytesHandled / tor->info.totalSize;
             }
-
-            tr_free( newpath );
-            tr_free( oldpath );
         }
 
         if( !err )
@@ -2518,65 +2510,38 @@ tr_torrentCheckSeedRatio( tr_torrent * tor )
 void
 tr_torrentFileCompleted( tr_torrent * tor, tr_file_index_t fileNum )
 {
-    char * oldpath;
+    char * sub;
+    const char * base;
 
     /* close the file so that we can reopen in read-only mode as needed */
     tr_fdFileClose( tor, fileNum );
 
-    /* if the torrent's file ends in ".part" to show that it was incomplete,
-     * strip that suffix */
-    oldpath = tr_torrentFindFile( tor, fileNum );
-    if( oldpath != NULL ) {
-        char * newpath = tr_strdup( oldpath );
-        char * pch = strrchr( newpath, '.' );
-        if(( pch != NULL ) && !strcmp( pch, ".part" )) {
-            *pch = '\0';
+    /* if the torrent's filename on disk isn't the same as the one in the metadata,
+     * then it's been modified to denote that it was a partial file.
+     * Now that it's complete, use the proper filename. */
+    if( tr_torrentFindFile2( tor, fileNum, &base, &sub ) )
+    {
+        const tr_file * file = &tor->info.files[fileNum];
+
+        if( strcmp( sub, file->name ) )
+        {
+            char * oldpath = tr_buildPath( base, sub, NULL );
+            char * newpath = tr_buildPath( base, file->name, NULL );
+
             if( rename( oldpath, newpath ) )
                 tr_torerr( tor, "Error moving \"%s\" to \"%s\": %s", oldpath, newpath, tr_strerror( errno ) );
+
+            tr_free( newpath );
+            tr_free( oldpath );
         }
-        tr_free( newpath );
+
+        tr_free( sub );
     }
-    tr_free( oldpath );
 }
 
 /***
 ****
 ***/
-
-enum
-{
-    TR_FILE_PARTIAL         = (1<<0),
-    TR_FILE_INCOMPLETE_DIR  = (1<<1)
-};
-
-static char*
-tr_torrentBuildFilename( const tr_torrent * tor, tr_file_index_t fileNo, int flags )
-{
-    const char * root;
-    char * base;
-    char * path;
-    const tr_bool partial = ( flags & TR_FILE_PARTIAL ) != 0;
-    const tr_bool incomplete = ( flags & TR_FILE_INCOMPLETE_DIR ) != 0;
-
-    assert( tr_isTorrent( tor ) );
-    assert( fileNo < tor->info.fileCount );
-
-    if( incomplete && ( tor->incompleteDir != NULL ) )
-        root = tor->incompleteDir;
-    else
-        root = tor->downloadDir;
-
-    if( partial )
-        base = tr_strdup_printf( "%s.part", tor->info.files[fileNo].name );
-    else
-        base = tr_strdup( tor->info.files[fileNo].name );
-
-    path = tr_buildPath( root, base, NULL );
-
-    /* cleanup */
-    tr_free( base );
-    return path;
-}
 
 static tr_bool
 fileExists( const char * filename )
@@ -2586,61 +2551,105 @@ fileExists( const char * filename )
     return ok;
 }
 
-char*
-tr_torrentFindFile( const tr_torrent * tor, tr_file_index_t fileNo )
+tr_bool
+tr_torrentFindFile2( const tr_torrent * tor, tr_file_index_t fileNum,
+                     const char ** base, char ** subpath )
 {
-    int i;
-    char * filename;
-    int flags[4];
-    int n = 0;
+    char * part;
+    const tr_file * file;
+    const char * b = NULL;
+    const char * s = NULL;
 
     assert( tr_isTorrent( tor ) );
-    assert( fileNo < tor->info.fileCount );
+    assert( fileNum < tor->info.fileCount );
 
-    /* based on what we know about the torrent,
-     * put the most likely hits first... */
-    if( tr_cpFileIsComplete( &tor->completion, fileNo ) ) {
-        flags[n++] = 0;
-        flags[n++] = TR_FILE_INCOMPLETE_DIR;
-        flags[n++] = TR_FILE_PARTIAL;
-        flags[n++] = TR_FILE_INCOMPLETE_DIR|TR_FILE_PARTIAL;
-    } else {
-        flags[n++] = TR_FILE_INCOMPLETE_DIR|TR_FILE_PARTIAL;
-        flags[n++] = TR_FILE_PARTIAL;
-        flags[n++] = TR_FILE_INCOMPLETE_DIR;
-        flags[n++] = 0;
-    }
-        
-    for( i=0; i<n; ++i ) {
-        filename = tr_torrentBuildFilename( tor, fileNo, flags[i] );
-        if( fileExists( filename ))
-            break;
+    file = &tor->info.files[fileNum];
+    part = tr_torrentBuildPartial( tor, fileNum );
+
+    if( b == NULL ) {
+        char * filename = tr_buildPath( tor->downloadDir, part, NULL );
+        if( fileExists( filename ) ) {
+            b = tor->downloadDir;
+            s = part;
+        }
         tr_free( filename );
-        filename = NULL;
     }
 
-    return filename;
+    if( b == NULL ) {
+        char * filename = tr_buildPath( tor->downloadDir, file->name, NULL );
+        if( fileExists( filename ) ) {
+            b = tor->downloadDir;
+            s = file->name;
+        }
+        tr_free( filename );
+    }
+
+    if( tor->incompleteDir != NULL )
+    {
+        if( b == NULL ) {
+            char * filename = tr_buildPath( tor->incompleteDir, part, NULL );
+            if( fileExists( filename ) ) {
+                b = tor->incompleteDir;
+                s = part;
+            }
+            tr_free( filename );
+        }
+
+        if( b == NULL ) {
+            char * filename = tr_buildPath( tor->incompleteDir, file->name, NULL );
+            if( fileExists( filename ) ) {
+                b = tor->incompleteDir;
+                s = file->name;
+            }
+            tr_free( filename );
+        }
+    }
+
+    if( base != NULL )
+        *base = b;
+    if( subpath != NULL )
+        *subpath = tr_strdup( s );
+
+    tr_free( part );
+    return b != NULL;
+}
+
+
+char*
+tr_torrentFindFile( const tr_torrent * tor, tr_file_index_t fileNum )
+{
+    char * subpath;
+    char * ret = NULL;
+    const char * base;
+
+    if( tr_torrentFindFile2( tor, fileNum, &base, &subpath ) )
+    {
+        ret = tr_buildPath( base, subpath, NULL );
+        tr_free( subpath );
+    }
+
+    return ret;
 }
 
 /* Decide whether we should be looking for files in downloadDir or incompleteDir. */
 static void
 refreshCurrentDir( tr_torrent * tor )
 {
-    const char * dir = tor->downloadDir;
+    const char * dir = NULL;
+    char * sub;
 
-    if( tor->incompleteDir != NULL )
-    {
-        char * tmp1 = tr_torrentBuildFilename( tor, 0, 0 );
-        char * tmp2 = tr_torrentBuildFilename( tor, 0, TR_FILE_PARTIAL );
-
-        if( !fileExists( tmp1 ) && !fileExists( tmp2 ) )
-            dir = tor->incompleteDir;
-
-        tr_free( tmp2 );
-        tr_free( tmp1 );
-    }
+    if( tor->incompleteDir == NULL )
+        dir = tor->downloadDir;
+    else if( !tr_torrentFindFile2( tor, 0, &dir, &sub ) )
+        dir = tor->incompleteDir;
 
     assert( dir != NULL );
     assert( ( dir == tor->downloadDir ) || ( dir == tor->incompleteDir ) );
     tor->currentDir = dir;
+}
+
+char*
+tr_torrentBuildPartial( const tr_torrent * tor, tr_file_index_t fileNum )
+{
+    return tr_strdup_printf( "%s.part", tor->info.files[fileNum].name );
 }

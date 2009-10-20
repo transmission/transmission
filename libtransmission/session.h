@@ -51,6 +51,7 @@ struct tr_session
     tr_bool                      isClosed;
     tr_bool                      isWaiting;
     tr_bool                      useLazyBitfield;
+    tr_bool                      isPartialNamesEnabled;
     tr_bool                      isRatioLimited;
     tr_bool                      isIncompleteDirEnabled;
 

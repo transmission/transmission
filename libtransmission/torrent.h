@@ -360,4 +360,20 @@ static TR_INLINE const char * tr_torrentName( const tr_torrent * tor )
 void tr_torrentFileCompleted( tr_torrent * tor, tr_file_index_t fileNo );
 
 
+/* Like tr_torrentFindFile(), but splits the filename into base
+ * (tr_torrent.incompleteDir or tr_torrent.downloadDir)  and subpath */
+tr_bool tr_torrentFindFile2( const tr_torrent *, tr_file_index_t fileNo,
+                             const char ** base, char ** subpath );
+
+
+/* Returns a newly-allocated string that's been munged to the form
+ * that denotes to humans that it's a partial file.
+ * This is like the filenames in tr_torrent.info.files --
+ * it's not a complete filename by itself, but a fragment that
+ * can be passed to tr_buildPath() */
+char* tr_torrentBuildPartial( const tr_torrent *, tr_file_index_t fileNo );
+
+
+
+
 #endif

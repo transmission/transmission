@@ -78,7 +78,6 @@ readOrWriteBytes( const tr_torrent * tor,
 
     typedef size_t ( *iofunc )( int, void *, size_t );
     iofunc          func = ioMode == TR_IO_READ ? (iofunc)read : (iofunc)write;
-    struct stat     sb;
     int             fd = -1;
     int             err = 0;
     const tr_bool doWrite = ioMode == TR_IO_WRITE;
@@ -97,21 +96,21 @@ readOrWriteBytes( const tr_torrent * tor,
     {
         /* the fd cache doesn't have this file...
          * we'll need to open it and maybe create it */
-        char * name;
-        tr_preallocation_mode preallocationMode;
+        char * subpath;
+        const char * base;
         tr_bool fileExists;
+        tr_preallocation_mode preallocationMode;
     
+        fileExists = tr_torrentFindFile2( tor, fileIndex, &base, &subpath );
+
+        if( !fileExists )
         {
-            char * path = tr_torrentFindFile( tor, fileIndex );
+            base = tor->currentDir;
 
-            fileExists = !stat( path, &sb );
-
-            if( fileExists )
-                name = tr_strdup( strstr( path, file->name ) );
+            if( tr_sessionIsPartialFilenamesEnabled( tor->session ) )
+                subpath = tr_torrentBuildPartial( tor, fileIndex );
             else
-                name = tr_strdup_printf( "%s.part", file->name );
-
-            tr_free( path );
+                subpath = tr_strdup( file->name );
         }
 
         if( ( file->dnd ) || ( ioMode != TR_IO_WRITE ) )
@@ -123,15 +122,20 @@ readOrWriteBytes( const tr_torrent * tor,
         {
             err = ENOENT;
         }
-        else if( ( fd = tr_fdFileCheckout( tor->uniqueId, fileIndex, tor->currentDir, name,
+        else if( ( fd = tr_fdFileCheckout( tor->uniqueId, fileIndex, base, subpath,
                                            doWrite, preallocationMode, file->length ) ) < 0 )
         {
+            char * filename;
             err = errno;
-            tr_torerr( tor, "tr_fdFileCheckout failed for \"%s\": %s", name, tr_strerror( err ) );
+            filename = tr_buildPath( base, subpath, NULL );
+            tr_torerr( tor, "tr_fdFileCheckout failed for \"%s\": %s", filename, tr_strerror( err ) );
+            tr_free( filename );
         }
 
         if( doWrite && !err )
             tr_statsFileCreated( tor->session );
+
+        tr_free( subpath );
     }
 
     if( !err )

@@ -192,6 +192,7 @@ const char* tr_getDefaultDownloadDir( void );
 #define TR_PREFS_KEY_PROXY_USERNAME             "proxy-auth-username"
 #define TR_PREFS_KEY_RATIO                      "ratio-limit"
 #define TR_PREFS_KEY_RATIO_ENABLED              "ratio-limit-enabled"
+#define TR_PREFS_KEY_RENAME_PARTIAL_FILES       "rename-partial-files"
 #define TR_PREFS_KEY_RPC_AUTH_REQUIRED          "rpc-authentication-required"
 #define TR_PREFS_KEY_RPC_BIND_ADDRESS           "rpc-bind-address"
 #define TR_PREFS_KEY_RPC_ENABLED                "rpc-enabled"
@@ -332,7 +333,19 @@ void tr_sessionSetDownloadDir( tr_session * session, const char * downloadDir );
 const char * tr_sessionGetDownloadDir( const tr_session * session );
 
 /**
- * @brief Set the per-session incomplete download folder
+ * @brief Set the per-session incomplete download folder.
+ *
+ * When you add a new torrent and the session's incomplete directory is enabled,
+ * the new torrent will start downloading into that directory, and then be moved
+ * to tr_torrent.downloadDir when the torrent is finished downloading.
+ *
+ * Torrents are not moved as a result of changing the session's incomplete dir --
+ * it's applied to new torrents, not existing ones.
+ *
+ * tr_torrentSetLocation() overrules the incomplete dir: when a user specifies
+ * a new location, that becomes the torrent's new downloadDir and the torrent
+ * is moved there immediately regardless of whether or not it's complete.
+ *
  * @see tr_sessionInit()
  * @see tr_sessionGetIncompleteDir()
  * @see tr_sessionSetIncompleteDirEnabled()
@@ -344,7 +357,22 @@ const char* tr_sessionGetIncompleteDir( const tr_session * session );
 
 void tr_sessionSetIncompleteDirEnabled( tr_session * session, tr_bool );
 
-tr_bool tr_sessionGetIncompleteDirEnabled( const tr_session * session );
+tr_bool tr_sessionIsIncompleteDirEnabled( const tr_session * session );
+
+
+/**
+ * @brief When enabled, unfinished torrent content files created after
+ *        this call will have ".part" appended to their filename
+ *
+ * This is not retroactive -- toggling this will not rename existing files.
+ * It only applies to new files created by Transmission after this API call.
+ *
+ * @param session
+ * @param enable
+ */
+void tr_sessionSetPartialFilenamesEnabled( tr_session * session, tr_bool );
+
+tr_bool tr_sessionIsPartialFilenamesEnabled( const tr_session * session );
 
 /**
  * @brief Set whether or not RPC calls are allowed in this session.

@@ -384,6 +384,7 @@ tr_sessionGetDefaultSettings( const char * configDir, tr_benc * d )
     tr_bencDictAddStr ( d, TR_PREFS_KEY_PROXY_USERNAME,           "" );
     tr_bencDictAddReal( d, TR_PREFS_KEY_RATIO,                    2.0 );
     tr_bencDictAddBool( d, TR_PREFS_KEY_RATIO_ENABLED,            FALSE );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_RENAME_PARTIAL_FILES,     TRUE );
     tr_bencDictAddBool( d, TR_PREFS_KEY_RPC_AUTH_REQUIRED,        FALSE );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_RPC_BIND_ADDRESS,         "0.0.0.0" );
     tr_bencDictAddBool( d, TR_PREFS_KEY_RPC_ENABLED,              TRUE );
@@ -422,7 +423,7 @@ tr_sessionGetSettings( tr_session * s, struct tr_benc * d )
     tr_bencDictAddBool( d, TR_PREFS_KEY_DSPEED_ENABLED,           tr_sessionIsSpeedLimited( s, TR_DOWN ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_ENCRYPTION,               s->encryptionMode );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_INCOMPLETE_DIR,           tr_sessionGetIncompleteDir( s ) );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED,   tr_sessionGetIncompleteDirEnabled( s ) );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED,   tr_sessionIsIncompleteDirEnabled( s ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_LAZY_BITFIELD,            s->useLazyBitfield );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_MSGLEVEL,                 tr_getMessageLevel( ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_OPEN_FILE_LIMIT,          s->openFileLimit );
@@ -445,6 +446,7 @@ tr_sessionGetSettings( tr_session * s, struct tr_benc * d )
     tr_bencDictAddStr ( d, TR_PREFS_KEY_PROXY_USERNAME,           s->proxyUsername );
     tr_bencDictAddReal( d, TR_PREFS_KEY_RATIO,                    s->desiredRatio );
     tr_bencDictAddBool( d, TR_PREFS_KEY_RATIO_ENABLED,            s->isRatioLimited );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_RENAME_PARTIAL_FILES,     tr_sessionIsPartialFilenamesEnabled( s ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_RPC_AUTH_REQUIRED,        tr_sessionIsRPCPasswordEnabled( s ) );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_RPC_BIND_ADDRESS,         tr_sessionGetRPCBindAddress( s ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_RPC_ENABLED,              tr_sessionIsRPCEnabled( s ) );
@@ -700,6 +702,10 @@ tr_sessionInitImpl( void * vdata )
     assert( found );
     tr_sessionSetIncompleteDirEnabled( session, boolVal );
 
+    found = tr_bencDictFindBool( &settings, TR_PREFS_KEY_RENAME_PARTIAL_FILES, &boolVal );
+    assert( found );
+    tr_sessionSetPartialFilenamesEnabled( session, boolVal );
+
     found = tr_bencDictFindBool( &settings, TR_PREFS_KEY_PROXY_ENABLED, &boolVal );
     assert( found );
     session->isProxyEnabled = boolVal;
@@ -931,6 +937,28 @@ tr_sessionGetDownloadDir( const tr_session * session )
 ***/
 
 void
+tr_sessionSetPartialFilenamesEnabled( tr_session * session, tr_bool b )
+{
+    assert( tr_isSession( session ) );
+    assert( tr_isBool( b ) );
+
+    session->isPartialNamesEnabled = b;
+}
+
+tr_bool
+tr_sessionIsPartialFilenamesEnabled( const tr_session * session )
+{
+    assert( tr_isSession( session ) );
+
+    return session->isPartialNamesEnabled;
+}
+
+/***
+****
+***/
+
+
+void
 tr_sessionSetIncompleteDir( tr_session * session, const char * dir )
 {
     assert( tr_isSession( session ) );
@@ -963,7 +991,7 @@ tr_sessionSetIncompleteDirEnabled( tr_session * session, tr_bool b )
 }
 
 tr_bool
-tr_sessionGetIncompleteDirEnabled( const tr_session * session )
+tr_sessionIsIncompleteDirEnabled( const tr_session * session )
 {
     assert( tr_isSession( session ) );
 
