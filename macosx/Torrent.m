@@ -46,7 +46,6 @@
 
 - (NSString *) etaString;
 
-- (void) updateTimeMachineExclude;
 - (void) setTimeMachineExclude: (BOOL) exclude forPath: (NSString *) path;
 
 @end
@@ -1457,6 +1456,28 @@ int trashDataFile(const char * filename)
     return fStalled;
 }
 
+- (void) updateTimeMachineExclude
+{
+    NSString * newLocation = [self dataLocation];
+    
+    if (fTimeMachineExclude && newLocation && [fTimeMachineExclude isEqualToString: newLocation] && ![self allDownloaded])
+        return;
+    
+    if (fTimeMachineExclude)
+    {
+        [self setTimeMachineExclude: NO forPath: fTimeMachineExclude];
+        [fTimeMachineExclude release];
+        fTimeMachineExclude = nil;
+    }
+    
+    if (newLocation && ![self allDownloaded])
+    {
+        [self setTimeMachineExclude: YES forPath: newLocation];
+        [fTimeMachineExclude release];
+        fTimeMachineExclude = [newLocation retain];
+    }
+}
+
 - (NSInteger) stateSortKey
 {
     if (![self isActive]) //paused
@@ -1731,28 +1752,6 @@ int trashDataFile(const char * filename)
         default:
             return [NSString stringWithFormat: NSLocalizedString(@"%@ remaining", "Torrent -> eta string"),
                         [NSString timeString: eta showSeconds: YES maxFields: 2]];
-    }
-}
-
-- (void) updateTimeMachineExclude
-{
-    NSString * newLocation = [self dataLocation];
-    
-    if (fTimeMachineExclude && newLocation && [fTimeMachineExclude isEqualToString: newLocation] && ![self allDownloaded])
-        return;
-    
-    if (fTimeMachineExclude)
-    {
-        [self setTimeMachineExclude: NO forPath: fTimeMachineExclude];
-        [fTimeMachineExclude release];
-        fTimeMachineExclude = nil;
-    }
-    
-    if (newLocation && ![self allDownloaded])
-    {
-        [self setTimeMachineExclude: YES forPath: newLocation];
-        [fTimeMachineExclude release];
-        fTimeMachineExclude = [newLocation retain];
     }
 }
 

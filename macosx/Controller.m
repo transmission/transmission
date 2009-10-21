@@ -4249,6 +4249,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             [self performSelectorOnMainThread: @selector(rpcChangedTorrent:) withObject: torrent waitUntilDone: NO];
             break;
         
+        case TR_RPC_TORRENT_MOVED:
+            [self performSelectorOnMainThread: @selector(rpcMovedTorrent:) withObject: torrent waitUntilDone: NO];
+            break;
+        
         case TR_RPC_SESSION_CHANGED:
             [fPrefsController performSelectorOnMainThread: @selector(rpcUpdatePrefs) withObject: nil waitUntilDone: NO];
             break;
@@ -4304,6 +4308,17 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [fInfoController updateInfoStats]; //this will reload the file table
         [fInfoController updateOptions];
     }
+    
+    [torrent release];
+}
+
+- (void) rpcMovedTorrent: (Torrent *) torrent
+{
+    [torrent update];
+    [torrent updateTimeMachineExclude];
+    
+    if ([[fTableView selectedTorrents] containsObject: torrent])
+        [fInfoController updateInfoStats];
     
     [torrent release];
 }

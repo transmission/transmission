@@ -222,6 +222,8 @@
 - (NSInteger) stalledMinutes;
 - (BOOL) isStalled;
 
+- (void) updateTimeMachineExclude;
+
 - (NSInteger) stateSortKey;
 - (NSString *) trackerSortKey;
 
