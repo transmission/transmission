@@ -1341,6 +1341,7 @@ torrentStart( tr_torrent * tor )
         tor->peer_id = tr_peerIdNew( );
 
         tor->isRunning = 1;
+        tr_torrentSetDirty( tor );
         tor->preVerifyTotal = tr_cpHaveTotal( &tor->completion );
         tr_verifyAdd( tor, checkAndStartCB );
     }
@@ -1454,6 +1455,7 @@ tr_torrentStop( tr_torrent * tor )
         tr_globalLock( tor->session );
 
         tor->isRunning = 0;
+        tr_torrentSetDirty( tor );
         tr_runInEventThread( tor->session, stopTorrent, tor );
 
         tr_globalUnlock( tor->session );
