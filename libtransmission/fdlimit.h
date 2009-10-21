@@ -55,7 +55,6 @@ int64_t tr_lseek( int fd, int64_t offset, int whence );
  * continually opening and closing the same files when downloading
  * piece data.
  *
- * - if `folder' doesn't exist, errno is set to ENOENT.
  * - if doWrite is true, subfolders in torrentFile are created if necessary.
  * - if doWrite is true, the target file is created if necessary.
  *
@@ -66,8 +65,7 @@ int64_t tr_lseek( int fd, int64_t offset, int whence );
  */
 int  tr_fdFileCheckout( int                      torrentId,
                         tr_file_index_t          fileNum,
-                        const char             * folder,
-                        const char             * torrentFile,
+                        const char             * fileName,
                         tr_bool                  doWrite,
                         tr_preallocation_mode    preallocationMode,
                         uint64_t                 desiredFileSize );

@@ -438,6 +438,8 @@ main( int argc, char ** argv )
             gtr_mkdir_with_parents( str, 0777 );
         if(( str = pref_string_get( TR_PREFS_KEY_DOWNLOAD_DIR )))
             gtr_mkdir_with_parents( str, 0777 );
+        if(( str = pref_string_get( TR_PREFS_KEY_INCOMPLETE_DIR )))
+            gtr_mkdir_with_parents( str, 0777 );
 
         /* initialize the libtransmission session */
         session = tr_sessionInit( "gtk", configDir, TRUE, pref_get_all( ) );

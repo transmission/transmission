@@ -121,13 +121,17 @@ readOrWriteBytes( const tr_torrent * tor,
         {
             err = ENOENT;
         }
-        else if( ( fd = tr_fdFileCheckout( tor->uniqueId, fileIndex, base, subpath,
-                                           doWrite, preallocationMode, file->length ) ) < 0 )
+        else
         {
-            char * filename;
-            err = errno;
-            filename = tr_buildPath( base, subpath, NULL );
-            tr_torerr( tor, "tr_fdFileCheckout failed for \"%s\": %s", filename, tr_strerror( err ) );
+            char * filename = tr_buildPath( base, subpath, NULL );
+
+            if( ( fd = tr_fdFileCheckout( tor->uniqueId, fileIndex, filename,
+                                          doWrite, preallocationMode, file->length ) ) < 0 )
+            {
+                err = errno;
+                tr_torerr( tor, "tr_fdFileCheckout failed for \"%s\": %s", filename, tr_strerror( err ) );
+            }
+
             tr_free( filename );
         }
 

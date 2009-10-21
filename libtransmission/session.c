@@ -968,8 +968,6 @@ tr_sessionSetIncompleteDir( tr_session * session, const char * dir )
         tr_free( session->incompleteDir );
 
         session->incompleteDir = tr_strdup( dir );
-
-        tr_mkdirp( session->incompleteDir, 0777 );
     }
 }
 

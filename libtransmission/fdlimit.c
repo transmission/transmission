@@ -278,38 +278,27 @@ tr_close_file( int fd )
  */
 static int
 TrOpenFile( int                      i,
-            const char             * folder,
-            const char             * torrentFile,
+            const char             * filename,
             tr_bool                  doWrite,
             tr_preallocation_mode    preallocationMode,
             uint64_t                 desiredFileSize )
 {
     struct tr_openfile * file = &gFd->openFiles[i];
     int                  flags;
-    char               * filename;
     struct stat          sb;
     tr_bool              alreadyExisted;
 
-    /* confirm the parent folder exists */
-    if( stat( folder, &sb ) || !S_ISDIR( sb.st_mode ) )
-    {
-        tr_err( _( "Couldn't create \"%1$s\": \"%2$s\" is not a folder" ), torrentFile, folder );
-        return ENOENT;
-    }
-
     /* create subfolders, if any */
-    filename = tr_buildPath( folder, torrentFile, NULL );
     if( doWrite )
     {
-        char * tmp = tr_dirname( filename );
-        const int err = tr_mkdirp( tmp, 0777 ) ? errno : 0;
+        char * dir = tr_dirname( filename );
+        const int err = tr_mkdirp( dir, 0777 ) ? errno : 0;
         if( err ) {
-            tr_err( _( "Couldn't create \"%1$s\": %2$s" ), tmp, tr_strerror( err ) );
-            tr_free( tmp );
-            tr_free( filename );
+            tr_err( _( "Couldn't create \"%1$s\": %2$s" ), dir, tr_strerror( err ) );
+            tr_free( dir );
             return err;
         }
-        tr_free( tmp );
+        tr_free( dir );
     }
 
     alreadyExisted = !stat( filename, &sb ) && S_ISREG( sb.st_mode );
@@ -334,7 +323,6 @@ TrOpenFile( int                      i,
     {
         const int err = errno;
         tr_err( _( "Couldn't open \"%1$s\": %2$s" ), filename, tr_strerror( err ) );
-        tr_free( filename );
         return err;
     }
 
@@ -362,7 +350,6 @@ TrOpenFile( int                      i,
     }
 #endif
 
-    tr_free( filename );
     return 0;
 }
 
@@ -425,22 +412,18 @@ tr_fdFileGetCached( int              torrentId,
 int
 tr_fdFileCheckout( int                      torrentId,
                    tr_file_index_t          fileNum,
-                   const char             * folder,
-                   const char             * torrentFile,
+                   const char             * filename,
                    tr_bool                  doWrite,
                    tr_preallocation_mode    preallocationMode,
                    uint64_t                 desiredFileSize )
 {
     int i, winner = -1;
     struct tr_openfile * o;
-    char filename[MAX_PATH_LENGTH];
 
     assert( torrentId > 0 );
-    assert( folder && *folder );
-    assert( torrentFile && *torrentFile );
+    assert( filename && *filename );
     assert( tr_isBool( doWrite ) );
 
-    tr_snprintf( filename, sizeof( filename ), "%s%c%s", folder, TR_PATH_DELIMITER, torrentFile );
     dbgmsg( "looking for file '%s', writable %c", filename, doWrite ? 'y' : 'n' );
 
     /* is it already open? */
@@ -504,7 +487,7 @@ tr_fdFileCheckout( int                      torrentId,
     o = &gFd->openFiles[winner];
     if( !fileIsOpen( o ) )
     {
-        const int err = TrOpenFile( winner, folder, torrentFile, doWrite,
+        const int err = TrOpenFile( winner, filename, doWrite,
                                     preallocationMode, desiredFileSize );
         if( err ) {
             errno = err;
