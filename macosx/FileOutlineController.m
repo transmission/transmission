@@ -325,7 +325,8 @@ typedef enum
                 [paths addObject: [NSURL fileURLWithPath: path]];
         }
         
-        [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs: paths];
+        if ([paths count])
+            [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs: paths];
     }
     else
     {

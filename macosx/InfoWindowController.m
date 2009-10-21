@@ -1209,13 +1209,17 @@ typedef enum
     if ([fTorrents count] > 0)
     {
         Torrent * torrent = [fTorrents objectAtIndex: 0];
+        NSString * location = [torrent dataLocation];
+        if (!location)
+            return;
+        
         if ([NSApp isOnSnowLeopardOrBetter])
         {
-            NSURL * file = [NSURL fileURLWithPath: [torrent dataLocation]];
+            NSURL * file = [NSURL fileURLWithPath: location];
             [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs: [NSArray arrayWithObject: file]];
         }
         else
-            [[NSWorkspace sharedWorkspace] selectFile: [torrent dataLocation] inFileViewerRootedAtPath: nil];
+            [[NSWorkspace sharedWorkspace] selectFile: location inFileViewerRootedAtPath: nil];
     }
 }
 

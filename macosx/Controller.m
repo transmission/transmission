@@ -1473,7 +1473,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 [paths addObject: [NSURL fileURLWithPath: location]];
         }
         
-        [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs: paths];
+        if ([paths count] > 0)
+            [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs: paths];
     }
     else
     {
