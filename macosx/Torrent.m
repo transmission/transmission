@@ -253,7 +253,6 @@ int trashDataFile(const char * filename)
         [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self];
     
     //when the data first appears, update time machine exclusion
-    #warning perhaps always check to get if the file is moved through rpc
     if (!fTimeMachineExclude)
         [self updateTimeMachineExclude];
 }
@@ -480,6 +479,8 @@ int trashDataFile(const char * filename)
         [alert runModal];
         [alert release];
     }
+    
+    [self updateTimeMachineExclude];
 }
 
 - (void) copyTorrentFileTo: (NSString *) path
@@ -1459,23 +1460,40 @@ int trashDataFile(const char * filename)
 
 - (void) updateTimeMachineExclude
 {
-    NSString * newLocation = [self dataLocation];
-    
-    if (fTimeMachineExclude && newLocation && [fTimeMachineExclude isEqualToString: newLocation] && ![self allDownloaded])
-        return;
+    NSString * newLocation = nil;
+    BOOL checkedNewLocation = NO;
     
     if (fTimeMachineExclude)
     {
+        //long-winded way of saying "return if the locations are the same and not all is downloaded"
+        if (![self allDownloaded])
+        {
+            newLocation = [self dataLocation];
+            checkedNewLocation = YES;
+            
+            if ([fTimeMachineExclude isEqualToString: newLocation])
+                return;
+        }
+        
         [self setTimeMachineExclude: NO forPath: fTimeMachineExclude];
         [fTimeMachineExclude release];
         fTimeMachineExclude = nil;
     }
     
-    if (newLocation && ![self allDownloaded])
+    if (![self allDownloaded])
     {
-        [self setTimeMachineExclude: YES forPath: newLocation];
-        [fTimeMachineExclude release];
-        fTimeMachineExclude = [newLocation retain];
+        if (!checkedNewLocation)
+        {
+            newLocation = [self dataLocation];
+            checkedNewLocation = YES;
+        }
+        
+        if (newLocation)
+        {
+            [self setTimeMachineExclude: YES forPath: newLocation];
+            [fTimeMachineExclude release];
+            fTimeMachineExclude = [newLocation retain];
+        }
     }
 }
 
@@ -1715,7 +1733,6 @@ int trashDataFile(const char * filename)
 {
     fStat = tr_torrentStat(fHandle); //don't call update yet to avoid auto-stop
     
-    BOOL canMove;
     switch ([status intValue])
     {
         case TR_SEED:
