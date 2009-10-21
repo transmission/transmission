@@ -82,7 +82,6 @@ readOrWriteBytes( const tr_torrent * tor,
     int             err = 0;
     const tr_bool doWrite = ioMode == TR_IO_WRITE;
 
-    assert( tor->currentDir && *tor->currentDir );
     assert( fileIndex < info->fileCount );
     assert( !file->length || ( fileOffset < file->length ) );
     assert( fileOffset + buflen <= file->length );
@@ -105,7 +104,7 @@ readOrWriteBytes( const tr_torrent * tor,
 
         if( !fileExists )
         {
-            base = tor->currentDir;
+            base = tr_torrentGetCurrentDir( tor );
 
             if( tr_sessionIsIncompleteFileNamingEnabled( tor->session ) )
                 subpath = tr_torrentBuildPartial( tor, fileIndex );

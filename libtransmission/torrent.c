@@ -581,8 +581,10 @@ torrentRealInit( tr_torrent * tor, const tr_ctor * ctor )
         !tr_ctorGetDownloadDir( ctor, TR_FALLBACK, &dir ) )
             tor->downloadDir = tr_strdup( dir );
 
+    if( tr_ctorGetIncompleteDir( ctor, &dir ) )
+        dir = tr_sessionGetIncompleteDir( session );
     if( tr_sessionIsIncompleteDirEnabled( session ) )
-        tor->incompleteDir = tr_strdup( tr_sessionGetIncompleteDir( session ) );
+        tor->incompleteDir = tr_strdup( dir );
 
     tor->lastPieceSize = info->totalSize % info->pieceSize;
 
@@ -792,6 +794,15 @@ tr_torrentGetDownloadDir( const tr_torrent * tor )
 
     return tor->downloadDir;
 }
+
+const char *
+tr_torrentGetCurrentDir( const tr_torrent * tor )
+{
+    assert( tr_isTorrent( tor  ) );
+
+    return tor->currentDir;
+}
+
 
 void
 tr_torrentChangeMyPort( tr_torrent * tor )

@@ -877,6 +877,16 @@ void        tr_ctorSetDownloadDir( tr_ctor *    ctor,
                                    tr_ctorMode  mode,
                                    const char * directory );
 
+/**
+ * @brief Set the incompleteDir for this torrent.
+ *
+ * This is not a supported API call.
+ * It only exists so the mac client can migrate
+ * its older incompleteDir settings, and that's
+ * the only place where it should be used.
+ */
+void tr_ctorSetIncompleteDir( tr_ctor * ctor, const char * directory );
+ 
 /** Set whether or not the torrent begins downloading/seeding when created.
     (Default: not paused) */
 void        tr_ctorSetPaused( tr_ctor      * ctor,
@@ -905,6 +915,9 @@ int         tr_ctorGetPaused( const tr_ctor * ctor,
 int         tr_ctorGetDownloadDir( const tr_ctor  * ctor,
                                    tr_ctorMode      mode,
                                    const char    ** setmeDownloadDir );
+
+int         tr_ctorGetIncompleteDir( const tr_ctor  * ctor,
+                                     const char    ** setmeIncompleteDir );
 
 int         tr_ctorGetMetainfo( const tr_ctor         * ctor,
                                 const struct tr_benc ** setme );
@@ -1142,6 +1155,15 @@ const tr_info * tr_torrentInfo( const tr_torrent * torrent );
 void tr_torrentSetDownloadDir( tr_torrent  * torrent, const char * path );
 
 const char * tr_torrentGetDownloadDir( const tr_torrent * torrent );
+
+/**
+ * This returns the the root directory of where the torrent is.
+ *
+ * This will usually be the downloadDir.  However if the torrent
+ * has an incompleteDir enabled and hasn't finished downloading
+ * yet, that will be returned instead.
+ */
+const char * tr_torrentGetCurrentDir( const tr_torrent * tor );
 
 /**
 ***
