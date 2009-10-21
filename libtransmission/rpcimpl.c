@@ -811,7 +811,7 @@ torrentSetLocation( tr_session               * session,
         {
             tr_torrent * tor = torrents[i];
             tr_torrentSetLocation( tor, location, move, NULL, NULL );
-            notify( session, TR_RPC_TORRENT_CHANGED, tor );
+            notify( session, TR_RPC_TORRENT_MOVED, tor );
         }
 
         tr_free( torrents );
