@@ -184,7 +184,11 @@ int trashDataFile(const char * filename)
 {
     //allow the file to be index by Time Machine
     if (fTimeMachineExclude)
+    {
         [self setTimeMachineExclude: NO forPath: fTimeMachineExclude];
+        [fTimeMachineExclude release];
+        fTimeMachineExclude = nil;
+    }
     
     tr_torrentRemove(fHandle);
 }
@@ -1740,12 +1744,14 @@ int trashDataFile(const char * filename)
     if (fTimeMachineExclude)
     {
         [self setTimeMachineExclude: NO forPath: fTimeMachineExclude];
+        [fTimeMachineExclude release];
         fTimeMachineExclude = nil;
     }
     
     if (newLocation && ![self allDownloaded])
     {
         [self setTimeMachineExclude: YES forPath: newLocation];
+        [fTimeMachineExclude release];
         fTimeMachineExclude = [newLocation retain];
     }
 }
