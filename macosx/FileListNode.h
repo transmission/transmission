@@ -44,7 +44,7 @@
 
 - (BOOL) isFolder;
 - (NSString *) name;
-- (NSString *) fullPath;
+- (NSString *) path;
 - (NSIndexSet *) indexes;
 
 - (uint64_t) size;

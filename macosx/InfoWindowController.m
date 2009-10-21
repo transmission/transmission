@@ -1129,7 +1129,6 @@ typedef enum
 {
     FileOutlineView * fileOutlineView = [fFileController outlineView];
     Torrent * torrent = [fTorrents objectAtIndex: 0];
-    NSString * folder = [torrent downloadFolder];
     NSIndexSet * indexes = [fileOutlineView selectedRowIndexes];
     NSMutableArray * urlArray = [NSMutableArray arrayWithCapacity: [indexes count]];
     
@@ -1137,7 +1136,7 @@ typedef enum
     {
         FileListNode * item = [fileOutlineView itemAtRow: i];
         if ([self canQuickLookFile: item])
-            [urlArray addObject: [NSURL fileURLWithPath: [folder stringByAppendingPathComponent: [item fullPath]]]];
+            [urlArray addObject: [torrent fileLocation: item]];
     }
     
     return urlArray;
@@ -1167,14 +1166,14 @@ typedef enum
 {
     FileOutlineView * fileOutlineView = [fFileController outlineView];
     
-    NSString * fullPath = [(NSURL *) item path];
-    NSString * folder = [[fTorrents objectAtIndex: 0] downloadFolder];
+    NSString * fullPath = [(NSURL *)item path];
+    Torrent * torrent = [fTorrents objectAtIndex: 0];
     NSRange visibleRows = [fileOutlineView rowsInRect: [fileOutlineView bounds]];
     
     for (NSUInteger row = visibleRows.location; row < NSMaxRange(visibleRows); row++)
     {
         FileListNode * rowItem = [fileOutlineView itemAtRow: row];
-        if ([[folder stringByAppendingPathComponent: [rowItem fullPath]] isEqualToString: fullPath])
+        if ([[torrent fileLocation: rowItem] isEqualToString: fullPath])
         {
             NSRect frame = [fileOutlineView iconRectForRow: row];
             
@@ -1372,8 +1371,8 @@ typedef enum
     Torrent * torrent = [fTorrents objectAtIndex: 0];
     
     NSString * location = [torrent dataLocation];
-    [fDataLocationField setStringValue: [location stringByAbbreviatingWithTildeInPath]];
-    [fDataLocationField setToolTip: location];
+    [fDataLocationField setStringValue: location ? [location stringByAbbreviatingWithTildeInPath] : @""];
+    [fDataLocationField setToolTip: location ? location : @""];
 }
 
 - (void) updateInfoActivity
@@ -1662,11 +1661,7 @@ typedef enum
 - (BOOL) canQuickLookFile: (FileListNode *) item
 {
     Torrent * torrent = [fTorrents objectAtIndex: 0];
-    
-    if (![[NSFileManager defaultManager] fileExistsAtPath: [[torrent downloadFolder] stringByAppendingPathComponent: [item fullPath]]])
-        return NO;
-    
-    return [item isFolder] || [torrent fileProgress: item] >= 1.0;
+    return [torrent fileLocation: item] != nil && ([item isFolder] || [torrent fileProgress: item] >= 1.0);
 }
 
 #warning doesn't like blank addresses

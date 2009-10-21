@@ -34,11 +34,6 @@
     tr_torrent * fHandle;
     const tr_info * fInfo;
     const tr_stat * fStat;
-    
-    BOOL fResumeOnWake;
-    
-    BOOL fUseIncompleteFolder;
-    NSString * fDownloadFolder, * fIncompleteFolder;
 	
     NSUserDefaults * fDefaults;
 
@@ -56,7 +51,9 @@
     
     NSInteger fGroupValue;
     
-    NSDictionary * fQuickPauseDict;
+    BOOL fResumeOnWake;
+    
+    NSString * fTimeMachineExclude;
 }
 
 - (id) initWithPath: (NSString *) path location: (NSString *) location deleteTorrentFile: (BOOL) torrentDelete
@@ -68,9 +65,9 @@
 
 - (void) closeRemoveTorrent;
 
-- (void) changeIncompleteDownloadFolder: (NSString *) folder;
-- (void) changeDownloadFolder: (NSString *) folder;
-- (NSString *) downloadFolder;
+- (void) changeDownloadFolderBeforeUsing: (NSString *) folder;
+
+- (NSString *) currentDirectory;
 
 - (void) getAvailability: (int8_t *) tab size: (NSInteger) size;
 - (void) getAmountFinished: (float *) tab size: (NSInteger) size;
@@ -119,8 +116,6 @@
 - (void) copyTorrentFileTo: (NSString *) path;
 
 - (BOOL) alertForRemainingDiskSpace;
-- (BOOL) alertForFolderAvailable;
-- (BOOL) alertForMoveFolderAvailable;
 
 - (NSImage *) icon;
 
@@ -144,7 +139,9 @@
 - (BOOL) privateTorrent;
 
 - (NSString *) torrentLocation;
+#warning needed?
 - (NSString *) dataLocation;
+- (NSString *) fileLocation: (FileListNode *) node;
 
 - (CGFloat) progress;
 - (CGFloat) progressDone;

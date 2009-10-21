@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #import "MessageWindowController.h"
+#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import <transmission.h>
 

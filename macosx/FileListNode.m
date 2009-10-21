@@ -98,7 +98,7 @@
     return fName;
 }
 
-- (NSString *) fullPath
+- (NSString *) path
 {
     return fPath;
 }
@@ -137,7 +137,7 @@
     {
         fIsFolder = isFolder;
         fName = [name retain];
-        fPath = [[path stringByAppendingPathComponent: name] retain];
+        fPath = [path retain];
         
         fIndexes = [[NSMutableIndexSet alloc] init];
     }

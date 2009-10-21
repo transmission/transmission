@@ -298,11 +298,19 @@
         
         if ([NSApp isOnSnowLeopardOrBetter])
         {
-            NSURL * file = [NSURL fileURLWithPath: [[self representedObject] dataLocation]];
-            [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs: [NSArray arrayWithObject: file]];
+            NSString * location = [[self representedObject] dataLocation];
+            if (location)
+            {
+                NSURL * file = [NSURL fileURLWithPath: location];
+                [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs: [NSArray arrayWithObject: file]];
+            }
         }
         else
-            [[NSWorkspace sharedWorkspace] selectFile: [[self representedObject] dataLocation] inFileViewerRootedAtPath: nil];
+        {
+            NSString * location = [[self representedObject] dataLocation];
+            if (location)
+                [[NSWorkspace sharedWorkspace] selectFile: location inFileViewerRootedAtPath: nil];
+        }
     }
     else;
     

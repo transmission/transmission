@@ -263,7 +263,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         }
         
         tr_benc settings;
-        tr_bencInitDict(&settings, 34);
+        tr_bencInitDict(&settings, 36);
         const char * configDir = tr_getDefaultConfigDir("Transmission");
         tr_sessionGetDefaultSettings(configDir, &settings);
         
@@ -290,6 +290,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         tr_bencDictAddBool(&settings, TR_PREFS_KEY_DHT_ENABLED, [fDefaults boolForKey: @"DHTGlobal"]);
         tr_bencDictAddStr(&settings, TR_PREFS_KEY_DOWNLOAD_DIR, [[[fDefaults stringForKey: @"DownloadFolder"]
                                                                     stringByExpandingTildeInPath] UTF8String]);
+        tr_bencDictAddStr(&settings, TR_PREFS_KEY_INCOMPLETE_DIR, [[[fDefaults stringForKey: @"IncompleteDownloadFolder"]
+                                                                    stringByExpandingTildeInPath] UTF8String]);
+        tr_bencDictAddBool(&settings, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED, [fDefaults boolForKey: @"UseIncompleteDownloadFolder"]);
         
         tr_bencDictAddInt(&settings, TR_PREFS_KEY_MSGLEVEL, [fDefaults integerForKey: @"MessageLevel"]);
         tr_bencDictAddInt(&settings, TR_PREFS_KEY_PEER_LIMIT_GLOBAL, [fDefaults integerForKey: @"PeersTotal"]);
@@ -940,11 +943,11 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                             deleteTorrentFile: showWindow ? NO : deleteTorrentFile lib: fLib]))
             continue;
         
-        //change the location if the group calls for it (this has to wait until after the torrent is create)
+        //change the location if the group calls for it (this has to wait until after the torrent is created)
         if (!lockDestination && [[GroupsController groups] usesCustomDownloadLocationForIndex: [torrent groupValue]])
         {
             location = [[GroupsController groups] customDownloadLocationForIndex: [torrent groupValue]];
-            [torrent changeDownloadFolder: location];
+            [torrent changeDownloadFolderBeforeUsing: location];
         }
         
         //verify the data right away if it was newly created
@@ -1464,14 +1467,22 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     {
         NSMutableArray * paths = [NSMutableArray arrayWithCapacity: [selected count]];
         for (Torrent * torrent in [fTableView selectedTorrents])
-            [paths addObject: [NSURL fileURLWithPath: [torrent dataLocation]]];
+        {
+            NSString * location = [torrent dataLocation];
+            if (location)
+                [paths addObject: [NSURL fileURLWithPath: location]];
+        }
         
         [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs: paths];
     }
     else
     {
         for (Torrent * torrent in selected)
-            [[NSWorkspace sharedWorkspace] selectFile: [torrent dataLocation] inFileViewerRootedAtPath: nil];
+        {
+            NSString * location = [torrent dataLocation];
+            if (location)
+                [[NSWorkspace sharedWorkspace] selectFile: location inFileViewerRootedAtPath: nil];
+        }
     }
 }
 
@@ -1769,6 +1780,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             }
         }
         
+        #warning dataLocation could return nil
         NSDictionary * clickContext = [NSDictionary dictionaryWithObjectsAndKeys: GROWL_DOWNLOAD_COMPLETE, @"Type",
                                         [torrent dataLocation] , @"Location", nil];
         [GrowlApplicationBridge notifyWithTitle: NSLocalizedString(@"Download Complete", "Growl notification title")
@@ -1780,7 +1792,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         //bounce download stack
         [[NSDistributedNotificationCenter defaultCenter] postNotificationName: @"com.apple.DownloadFileFinished"
-            object: [[torrent downloadFolder] stringByAppendingPathComponent: [torrent name]]];
+            object: [torrent dataLocation]];
         
         if ([fDefaults boolForKey: @"QueueSeed"] && [self numToStartFromQueue: NO] == 0)
         {
@@ -1830,6 +1842,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         }
     }
     
+    #warning dataLocation could return nil
     NSDictionary * clickContext = [NSDictionary dictionaryWithObjectsAndKeys: GROWL_SEEDING_COMPLETE, @"Type",
                                     [torrent dataLocation], @"Location", nil];
     [GrowlApplicationBridge notifyWithTitle: NSLocalizedString(@"Seeding Complete", "Growl notification title")
@@ -3142,7 +3155,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     NSMutableArray * qlArray = [NSMutableArray arrayWithCapacity: [selectedTorrents count]];
     
     for (Torrent * torrent in selectedTorrents)
-        if (([torrent isFolder] || [torrent isComplete]) && [[NSFileManager defaultManager] fileExistsAtPath: [torrent dataLocation]])
+        if (([torrent isFolder] || [torrent isComplete]) && [torrent dataLocation])
             [qlArray addObject: torrent];
     
     return qlArray;

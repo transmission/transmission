@@ -254,7 +254,7 @@
         [fDestination release];
         fDestination = [destination retain];
         
-        [fTorrent changeDownloadFolder: fDestination];
+        [fTorrent changeDownloadFolderBeforeUsing: fDestination];
     }
     
     [fLocationField setStringValue: [fDestination stringByAbbreviatingWithTildeInPath]];

@@ -741,6 +741,11 @@ tr_session * fHandle;
         @selector(incompleteFolderSheetClosed:returnCode:contextInfo:) contextInfo: nil];
 }
 
+- (void) setUseIncompleteFolder: (id) sender
+{
+    tr_sessionSetIncompleteDirEnabled(fHandle, [fDefaults boolForKey: @"UseIncompleteDownloadFolder"]);
+}
+
 - (void) setAutoImport: (id) sender
 {
     NSString * path;
@@ -1091,6 +1096,12 @@ tr_session * fHandle;
     NSString * downloadLocation = [[NSString stringWithUTF8String: tr_sessionGetDownloadDir(fHandle)] stringByStandardizingPath];
     [fDefaults setObject: downloadLocation forKey: @"DownloadFolder"];
     
+    NSString * incompleteLocation = [[NSString stringWithUTF8String: tr_sessionGetIncompleteDir(fHandle)] stringByStandardizingPath];
+    [fDefaults setObject: incompleteLocation forKey: @"IncompleteDownloadFolder"];
+    
+    const BOOL useIncomplete = tr_sessionIsIncompleteDirEnabled(fHandle);
+    [fDefaults setBool: useIncomplete forKey: @"UseIncompleteDownloadFolder"];
+    
     //peers
     const uint16_t peersTotal = tr_sessionGetPeerLimit(fHandle);
     [fDefaults setInteger: peersTotal forKey: @"PeersTotal"];
@@ -1299,7 +1310,12 @@ tr_session * fHandle;
 - (void) incompleteFolderSheetClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) info
 {
     if (code == NSOKButton)
-        [fDefaults setObject: [[openPanel filenames] objectAtIndex: 0] forKey: @"IncompleteDownloadFolder"];
+    {
+        NSString * folder = [[openPanel filenames] objectAtIndex: 0];
+        [fDefaults setObject: folder forKey: @"IncompleteDownloadFolder"];
+        
+        tr_sessionSetIncompleteDir(fHandle, [folder UTF8String]);
+    }
     [fIncompleteFolderPopUp selectItemAtIndex: 0];
 }
 
