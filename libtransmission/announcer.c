@@ -1206,10 +1206,11 @@ onAnnounceDone( tr_session   * session,
             tr_strlcpy( tier->lastAnnounceStr, buf,
                         sizeof( tier->lastAnnounceStr ) );
 
-            /* if the repsonse may require intervention, notify the user;
-             * otherwise, just log it */
+            /* if the response is serious, *and* if the response may require
+             * human intervention, then notify the user... otherwise just log it */
             if( responseCode >= 400 )
-                publishWarning( tier, buf );
+                if( tr_torrentIsPrivate( tier->tor ) || ( tier->tor->info.trackerCount < 2 ) )
+                    publishWarning( tier, buf );
             tr_torinf( tier->tor, "%s", buf );
             dbgmsg( tier, "%s", buf );
 
