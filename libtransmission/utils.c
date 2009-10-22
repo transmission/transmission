@@ -1328,8 +1328,9 @@ tr_parseNumberRange( const char * str_in, int len, int * setmeCount )
 double
 tr_truncd( double x, int decimal_places )
 {
-    const int i = (int) pow( 10, decimal_places );
-    double x2 = (int)(x*i);
+    static const int multiplier[] = { 1, 10, 100, 1000, 10000, 100000, 1000000, 10000000 };
+    const int64_t i = multiplier[decimal_places];
+    double x2 = (int64_t)(x*i);
     return x2 / i;
 }
 
