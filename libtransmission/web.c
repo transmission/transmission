@@ -86,6 +86,7 @@ struct tr_web
     long timer_ms;
     CURLM * multi;
     tr_session * session;
+    const tr_address * addr;
     struct event timer_event;
     tr_list * fds;
 };
@@ -236,6 +237,7 @@ addTask( void * vtask )
                                            TR_NAME "/" LONG_VERSION_STRING );
         curl_easy_setopt( easy, CURLOPT_VERBOSE,
                                        getenv( "TR_CURL_VERBOSE" ) != NULL );
+        curl_easy_setopt( easy, CURLOPT_INTERFACE, tr_ntop_non_ts( web->addr ) );
         curl_easy_setopt( easy, CURLOPT_WRITEDATA, task );
         curl_easy_setopt( easy, CURLOPT_WRITEFUNCTION, writeFunc );
         if( task->range )
@@ -522,7 +524,7 @@ tr_webRun( tr_session         * session,
 }
 
 tr_web*
-tr_webInit( tr_session * session )
+tr_webInit( tr_session * session, const struct tr_address * addr )
 {
     CURLMcode mcode;
     static int curlInited = FALSE;
@@ -540,6 +542,7 @@ tr_webInit( tr_session * session )
     web = tr_new0( struct tr_web, 1 );
     web->multi = curl_multi_init( );
     web->session = session;
+    web->addr = addr;
     web->timer_ms = DEFAULT_TIMER_MSEC; /* overwritten by multi_timer_cb() */
 
     evtimer_set( &web->timer_event, timer_cb, web );

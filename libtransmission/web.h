@@ -15,7 +15,8 @@
 
 typedef struct tr_web tr_web;
 
-tr_web*      tr_webInit( tr_session * session );
+tr_web*      tr_webInit( tr_session                * session,
+                         const struct tr_address   * addr );
 
 void         tr_webClose( tr_web ** );
 

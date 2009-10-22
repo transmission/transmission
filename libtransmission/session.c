@@ -895,7 +895,7 @@ tr_sessionInitImpl( void * vdata )
     tr_inf( _( "%s %s started" ), TR_NAME, LONG_VERSION_STRING );
 
     tr_statsInit( session );
-    session->web = tr_webInit( session );
+    session->web = tr_webInit( session, &session->public_ipv4->addr );
     session->isWaiting = FALSE;
 
     if( session->isDHTEnabled )
