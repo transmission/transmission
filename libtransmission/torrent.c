@@ -2368,7 +2368,8 @@ setLocation( void * vdata )
         if( !err )
         {
             /* blow away the leftover subdirectories in the old location */
-            tr_torrentDeleteLocalData( tor, remove );
+            if( do_move )
+                tr_torrentDeleteLocalData( tor, remove );
 
             /* set the new location and reverify */
             tr_torrentSetDownloadDir( tor, location );

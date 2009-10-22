@@ -3,6 +3,7 @@
   * Fix manpage errors
   * Use automake's "quieter builds" rule when available
 ==== Daemon ====
+  * Fix possible dataloss when using "transmission-remote --find"
   * Fix ratio-limit bug on some uClibc systems
   * Fix invalid JSON "nan" error on optware
 ==== GTK+ ====
