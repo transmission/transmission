@@ -1821,7 +1821,12 @@ tr_torrentSetPeerLimit( tr_torrent * tor,
 {
     assert( tr_isTorrent( tor ) );
 
-    tor->maxConnectedPeers = maxConnectedPeers;
+    if ( tor->maxConnectedPeers != maxConnectedPeers )
+    {
+        tor->maxConnectedPeers = maxConnectedPeers;
+
+        tr_torrentSetDirty( tor );
+    }
 }
 
 uint16_t

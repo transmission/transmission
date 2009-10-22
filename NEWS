@@ -18,6 +18,7 @@
   * Fix broken SIGINT (ctrl-c) handling
   * Fix tray menu's main window status when Transmission is started minimized
   * Fix 1.61 build failure on systems with new versions of glib but older versions of gtk
+  * Fix tracker address display error in the torrent Properties dialog
 ==== Qt ====
   * Fix crash when removing expired torrents from the display
   * Fix client from closing, rather than closing to the system tray, when clicking X
