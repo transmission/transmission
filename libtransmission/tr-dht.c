@@ -60,10 +60,10 @@ THE SOFTWARE.
   tr_port tr_dhtPort ( const tr_session * sesssion UNUSED ) { return 0; }
   int tr_dhtStatus( tr_session * session     UNUSED,
                     int        * setmeCount  UNUSED ) { return TR_DHT_STOPPED; }
-  int tr_dhtAddNode( tr_session * session    UNUSED,
-                     tr_address * addr       UNUSED,
-                     tr_port      port       UNUSED,
-                     tr_bool      bootstrap  UNUSED ) { return 0; }
+  int tr_dhtAddNode( tr_session       * session    UNUSED,
+                     const tr_address * addr       UNUSED,
+                     tr_port            port       UNUSED,
+                     tr_bool            bootstrap  UNUSED ) { return 0; }
   int tr_dhtAnnounce( tr_torrent * session UNUSED,
                       tr_bool announce UNUSED ) { return -1; }
 
@@ -319,8 +319,10 @@ tr_dhtPort( const tr_session *ss )
 }
 
 int
-tr_dhtAddNode(tr_session *ss, tr_address *address, tr_port port,
-              tr_bool bootstrap)
+tr_dhtAddNode(tr_session        * ss,
+              const tr_address  * address,
+              tr_port             port,
+              tr_bool             bootstrap)
 {
     struct sockaddr_in sin;
 

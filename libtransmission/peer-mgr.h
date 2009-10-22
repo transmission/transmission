@@ -59,15 +59,31 @@ struct tr_bandwidth;
 struct tr_peerIo;
 struct tr_peermsgs;
 
+/**
+***
+**/
+
+/* opaque forward declaration */
+struct peer_atom;
+
+const tr_address* tr_atomGetAddr( const struct peer_atom * );
+
+tr_port tr_atomGetPort( const struct peer_atom * atom );
+
+void tr_atomSetPort( struct peer_atom * atom, tr_port port );
+
+const char* tr_atomAddrStr( const struct peer_atom * );
+
+/**
+***
+**/
+
 enum
 {
     ENCRYPTION_PREFERENCE_UNKNOWN,
     ENCRYPTION_PREFERENCE_YES,
     ENCRYPTION_PREFERENCE_NO
 };
-
-/* opaque forward declaration */
-struct peer_atom;
 
 /**
  * State information about a connected peer.
@@ -87,9 +103,7 @@ typedef struct tr_peer
     uint8_t                  strikes;
 
     uint8_t                  encryption_preference;
-    tr_port                  port;
     tr_port                  dht_port;
-    tr_address               addr;
     struct tr_peerIo       * io;
     struct peer_atom       * atom;
 
@@ -109,6 +123,9 @@ typedef struct tr_peer
 }
 tr_peer;
 
+/**
+***
+**/
 
 int tr_pexCompare( const void * a, const void * b );
 

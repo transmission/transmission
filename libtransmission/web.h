@@ -13,6 +13,8 @@
 #ifndef TR_HTTP_H
 #define TR_HTTP_H
 
+struct tr_address;
+
 typedef struct tr_web tr_web;
 
 tr_web*      tr_webInit( tr_session                * session,
