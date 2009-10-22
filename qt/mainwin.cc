@@ -700,7 +700,7 @@ TrMainWindow :: refreshStatusBar( )
         str = tr( "Down: %1, Up: %2" ).arg( Utils :: sizeToString( stats.downloadedBytes ) )
                                       .arg( Utils :: sizeToString( stats.uploadedBytes ) );
     }
-    else /* default is "total-ratio" */
+    else // default is "total-ratio"
     {
         str = tr( "Ratio: %1" ).arg( Utils :: ratioToString( mySession.getCumulativeStats().ratio ) );
     }
@@ -719,21 +719,23 @@ TrMainWindow :: refreshActionSensitivity( )
     const QItemSelectionModel * selectionModel( ui.listView->selectionModel( ) );
     const int rowCount( model->rowCount( ) );
 
-    /* count how many torrents are selected, paused, etc */
+    // count how many torrents are selected, paused, etc
     for( int row=0; row<rowCount; ++row ) {
         const QModelIndex modelIndex( model->index( row, 0 ) );
         assert( model == modelIndex.model( ) );
         const Torrent * tor( model->data( modelIndex, TorrentModel::TorrentRole ).value<const Torrent*>( ) );
-        const bool isSelected( selectionModel->isSelected( modelIndex ) );
-        const bool isPaused( tor->isPaused( ) );
-        if( isSelected )
-            ++selected;
-        if( isPaused )
-            ++ paused;
-        if( isSelected && isPaused )
-            ++selectedAndPaused;
-        if( tor->canManualAnnounce( ) )
-            ++canAnnounce;
+        if( tor ) {
+            const bool isSelected( selectionModel->isSelected( modelIndex ) );
+            const bool isPaused( tor->isPaused( ) );
+            if( isSelected )
+                ++selected;
+            if( isPaused )
+                ++ paused;
+            if( isSelected && isPaused )
+                ++selectedAndPaused;
+            if( tor->canManualAnnounce( ) )
+                ++canAnnounce;
+        }
     }
 
     const bool haveSelection( selected > 0 );

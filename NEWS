@@ -11,6 +11,8 @@
   * Fix broken SIGINT (ctrl-c) handling
   * Fix tray menu's main window status when Transmission is started minimized
   * Fix 1.61 build failure on systems with new versions of glib but older versions of gtk
+==== Qt ====
+  * Fix crash when removing expired torrents from the display
 
 === Transmission 1.75 (2009/09/13) ===
 [http://trac.transmissionbt.com/query?milestone=1.75&group=component&groupdesc=1&order=severity All tickets closed by this release]
