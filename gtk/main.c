@@ -538,9 +538,10 @@ appsetup( TrWindow *      wind,
         gtk_widget_show( GTK_WIDGET( wind ) );
     else
     {
-        gtk_window_iconify( wind );
         gtk_window_set_skip_taskbar_hint( cbdata->wind,
                                           cbdata->icon != NULL );
+        cbdata->isIconified = FALSE; // ensure that the next toggle iconifies
+        action_toggle( "toggle-main-window", FALSE );
     }
 }
 
