@@ -66,68 +66,52 @@ By default,
 .Nm
 connects to the transmission session at localhost:9091.
 Other sessions can be controlled by specifying a different host and/or port.
-
 .Sh OPTIONS
 .Bl -tag -width Ds
 .It Fl a Fl -add Ar filenames-or-URLs
 Add torrents to transmission.
-
 .It Fl b Fl -debug
 Enable debugging mode.
-
 .It Fl as Fl -alt-speed
 Use the alternate Limits.
-
 .It Fl AS Fl -no-alt-speed
 Don't use the alternate Limits.
-
 .It Fl asd Fl -alt-speed-downlimit Ar limit
 Limit the alternate download speed to
 .Ar limit
 kilobytes per second.
-
 .It Fl asu Fl -alt-speed-uplimit Ar limit
 Limit the alternate upload speed to
 .Ar limit
 kilobytes per second.
-
 .It Fl asc Fl -alt-speed-scheduler
 Use the scheduled on/off times.
-
 .It Fl ASC Fl -no-alt-speed-scheduler
 Don't use the scheduled on/off days and times.
-
 .It Fl -alt-speed-time-begin Ar time
 .Ar Time
 to start using the alt speed limits (in hhmm).
-
 .It Fl -alt-speed-time-end Ar time
 .Ar Time
 to stop using the alt speed limits (in hhmm).
-
 .It Fl -alt-speed-days Ar days
 Set the number of
 .Ar days
 on which to enable the speed scheduler, using a list such as "2,4-6".
-
 .It Fl d Fl -downlimit Ar limit
 Limit the global download speed to
 .Ar limit
 kilobytes per second.
-
 .It Fl D Fl -no-downlimit
 Remove the global download limit.
-
 .It Fl er Fl -encryption-required
 Encrypt all peer connections.
 .It Fl ep Fl -encryption-preferred
 Prefer encrypted peer connections.
 .It Fl et Fl -encryption-tolerated
 Prefer unencrypted peer connections.
-
 .It Fl f Fl -files
 Get a file list for the current torrent(s)
-
 .It Fl g Fl -get Ar all | file-index | files
 Mark file(s) for download.
 .Ar all
@@ -136,60 +120,46 @@ marks all all of the torrent's files for downloading,
 adds a single file to the download list, and
 .Ar files
 adds multiple files to the download list,
-such as "-g1,3-5" to add files #1, #3, #4, and #5 to the download list.
-
+such as "\-g1,3-5" to add files #1, #3, #4, and #5 to the download list.
 .It Fl G Fl -no-get Ar all | file-index | files
 Mark file(s) for not downloading.
-
 .It Fl gsr Fl -global-seedratio Ar ratio
 All torrents, unless overridden by a per-torrent setting, should seed until a specific
 .Ar ratio
-
 .It Fl GSR Fl -no-global-seedratio
 All torrents, unless overridden by a per-torrent setting, should seed regardless of ratio
-
 .It Fl h Fl -help
 Print command-line option descriptions.
-
 .It Fl i Fl -info Ar id | torrent-hash
 Show details of the current torrent(s)
-
 .It Fl si Fl -session-info
 List session information from the server
-
 .It Fl st Fl -session-stats
 List statistical information from the server
-
 .It Fl l Fl -list
 List all torrents
-
 .It Fl m Fl -portmap
 Enable portmapping via NAT-PMP or UPnP
 .It Fl M Fl -no-portmap
 Disable portmapping
-
 .It Fl n Fl -auth Ar username:password
 Set the
 .Ar username
 and
 .Ar password
 for authentication
-
 .It Fl N Fl -netrc Ar filename
 Set the authentication information from a
 .Ar netrc file.
 See netrc(5) for more information.
-
 .It Fl o Fl -dht
 Enable distributed hash table (DHT).
 .It Fl O Fl -no-dht
 Disable distribued hash table (DHT).
-
 .It Fl p Fl -port Ar port
 Set the
 .Ar port
 for use when listening for incoming peer connections
-
 .It Fl pn Fl -priority-normal Ar all | file-index | files
 Mark file(s) as normal priority.
 .Ar all
@@ -198,48 +168,34 @@ marks all of the torrent's files as normal priority,
 sets a single file's priority as normal, and
 .Ar files
 sets multiple files' priorities as normal,
-such as "-pn1,3-5" to normalize files #1, #3, #4, and #5.
-
+such as "\-pn1,3-5" to normalize files #1, #3, #4, and #5.
 .It Fl ph Fl -priority-high Ar all | file-index | files
 Mark file(s) as high priority.
-
 .It Fl pl Fl -priority-low Ar all | file-index | files
 Mark file(s) as low priority.
-
 .It Fl pr Fl -peers Ar number
 Set the current torrent(s)' maximum number of peers
-
 .It Fl gpr Fl -global-peers Ar number
 Set the maximum number of peers allowed globally
-
 .It Fl r Fl -remove
 Remove the current torrent(s).  This does not delete the downloaded data.
-
 .It Fl -remove-and-delete
 Remove the current torrent(s) and delete their downloaded data.
-
 .It Fl -move
 Move the current torrents' data from their current locations to the specified directory.
-
 .It Fl -find
 Tell Transmission where to look for the current torrents' data.
-
 .It Fl sr Fl -seedratio Ar ratio
 Let the current torrent(s) seed until a specific
 .Ar ratio
-
 .It Fl SR Fl -no-seedratio
 Let the current torrent(s) seed regardless of ratio
-
 .It Fl srd Fl -seedratio-default
 Let the current torrent(s) use the global seedratio settings
-
 .It Fl s Fl -start
 Start the current torrent(s)
-
 .It Fl S Fl -stop
 Stop the current torrent(s) from downloading or seeding
-
 .It Fl t Fl -torrent Ar all | id | torrent-hash
 Set the current torrent(s) for use by subsequent options.
 .Ar all
@@ -248,31 +204,25 @@ will apply following requests to all torrents, while specific torrents can be ch
 or
 .Ar hash .
 To set more than one current torrent, join their ids or hashes together in a list,
-such as "-t2,4,6-8" to operate on the torrents whose IDs are 2, 4, 6, 7, and 8.
-
+such as "\-t2,4,6-8" to operate on the torrents whose IDs are 2, 4, 6, 7, and 8.
 .It Fl u Fl -uplimit Ar limit
 Limit the global upload speed to
 .Ar limit
 kilobytes per second.
 .It Fl U Fl -no-uplimit
 Remove the global upload limit.
-
 .It Fl v Fl -verify
 Verify the current torrent(s)
-
 .It Fl V Fl -version
 Show version number and exit
-
 .It Fl w Fl -download-dir Ar directory
 Use
 .Ar directory
 as the default location for newly added torrents to download files to.
-
 .It Fl x Fl -pex
 Enable peer exchange (PEX).
 .It Fl X Fl -no-pex
 Disable peer exchange (PEX).
-
 .It Fl pi Fl -peer-info
 List the current torrent's connected peers.
 In the `status' section of the list, the following shorthand is used:
@@ -286,80 +236,65 @@ In the `status' section of the list, the following shorthand is used:
 .D1 u: We would upload to this peer if they asked
 .D1 X: Peer was discovered through Peer Exchange (PEX)
 .D1 ?: We unchoked this peer, but they're not interested
-
 .El
 .Sh EXAMPLES
-
 Set download and upload limits to 400 KiB/sec and 60 KiB/sec:
 .Bd -literal -offset indent
-$ transmission-remote -d400 -u60
-$ transmission-remote --downlimit=400 --uplimit=60
+$ transmission-remote \-d400 \-u60
+$ transmission-remote \-\-downlimit=400 \-\-uplimit=60
 .Ed
-
 Set alternate download and upload limits to 100 KiB/sec and 20 KiB/sec:
 .Bd -literal -offset indent
-$ transmission-remote -asd100 -asu20
-$ transmission-remote --alt-speed-downlimit=100 --alt-speed-uplimit=20
+$ transmission-remote \-asd100 \-asu20
+$ transmission-remote \-\-alt-speed-downlimit=100 \-\-alt-speed-uplimit=20
 .Ed
-
 Set the scheduler to use the alternate speed limits on weekdays between 10AM and 11PM
 .Bd -literal -offset indent
-$ transmission-remote --alt-speed-time-begin=1000
-$ transmission-remote --alt-speed-time-end=2300
-$ transmission-remote --alt-speed-days=1-5
-$ transmission-remote --alt-speed-scheduler
+$ transmission-remote \-\-alt-speed-time-begin=1000
+$ transmission-remote \-\-alt-speed-time-end=2300
+$ transmission-remote \-\-alt-speed-days=1-5
+$ transmission-remote \-\-alt-speed-scheduler
 .Ed
-
 List all torrents' IDs and states:
 .Bd -literal -offset indent
-$ transmission-remote -l
+$ transmission-remote \-l
 .Ed
-
 List all torrents from a remote session that requires authentication:
 .Bd -literal -offset indent
-$ transmission-remote host:9091 --auth=username:password -l
+$ transmission-remote host:9091 \-\-auth=username:password \-l
 .Ed
-
 Start all torrents:
 .Bd -literal -offset indent
-$ transmission-remote -tall --start
+$ transmission-remote \-tall \-\-start
 .Ed
-
 Add two torrents:
 .Bd -literal -offset indent
-$ transmission-remote -a one.torrent two.torrent
+$ transmission-remote \-a one.torrent two.torrent
 .Ed
-
 Add all torrents in ~/Desktop:
 .Bd -literal -offset indent
-$ transmission-remote -a ~/Desktop/*torrent
+$ transmission-remote \-a ~/Desktop/*torrent
 .Ed
-
 Get detailed information on the torrent whose ID is '1':
 .Bd -literal -offset indent
-$ transmission-remote -t1 -i
+$ transmission-remote \-t1 \-i
 .Ed
-
 Get a list of a torrent's files:
 .Bd -literal -offset indent
-$ transmission-remote -t1 -l
+$ transmission-remote \-t1 \-l
 .Ed
-
 Download only its second and fourth files:
 .Bd -literal -offset indent
-$ transmission-remote -t1 -Gall -g2,4
+$ transmission-remote \-t1 \-Gall \-g2,4
 .Ed
-
 Set all torrents' first two files' priorities to high:
 .Bd -literal -offset indent
-$ transmission-remote -tall -ph1,2
+$ transmission-remote \-tall \-ph1,2
 .Ed
-
 Set all torrents' files' priorities to normal:
 .Bd -literal -offset indent
-$ transmission-remote -tall -pnall
+$ transmission-remote \-tall \-pnall
 .Ed
-
 .Sh AUTHORS
 .An -nosplit
 .An Charles Kerr ,
@@ -367,11 +302,9 @@ $ transmission-remote -tall -pnall
 .An Eric Petit ,
 and
 .An Mitchell Livingston .
-
 .Sh SEE ALSO
 .Xr transmissioncli 1 ,
 .Xr transmission-daemon 1 ,
 .Xr transmission 1
-
 .Pp
 http://www.transmissionbt.com/

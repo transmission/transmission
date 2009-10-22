@@ -12,6 +12,8 @@ AC_INIT([transmission],
 AC_SUBST(USERAGENT_PREFIX,[user_agent_prefix])
 AC_SUBST(PEERID_PREFIX,[peer_id_prefix])
 
+m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
+
 AC_CONFIG_MACRO_DIR([m4])
 
 dnl AM_CONFIG_HEADER(config.h)

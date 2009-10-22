@@ -1,3 +1,8 @@
+=== Transmission 1.76 (2009/09/13) ===
+==== All Platforms ====
+  * Fix manpage errors
+  * Use automake's "quieter builds" rule when available
+
 === Transmission 1.75 (2009/09/13) ===
 [http://trac.transmissionbt.com/query?milestone=1.75&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== All Platforms ====

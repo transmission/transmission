@@ -19,7 +19,6 @@
 .\" LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 .\" FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 .\" DEALINGS IN THE SOFTWARE.
-
 .Dd May 20, 2008
 .Dt TRANSMISSION-GTK 1
 .Os
@@ -51,7 +50,6 @@ Start minimized in system tray
 .It Fl g, Fl -config-dir Ar directory
 Where to look for configuration files.  This can be used to swap between using the cli, daemon, gtk, and qt clients.
 See http://trac.transmissionbt.com/wiki/ConfigFiles for more information.
-
 .El
 .Pp
 Multiple .torrent files may be added at startup
@@ -59,13 +57,11 @@ by appending them on the command line.
 If
 .Nm
 is already running, the torrents will be added to the running instance.
-
 .Sh ENVIRONMENT
 .Bl -tag -width Fl
 .It Ev TRANSMISSION_HOME
 Sets the default config-dir.
 .El
-
 .Sh FILES
 .Bl -tag -width Ds -compact
 .It ~/.config/transmission
@@ -75,7 +71,6 @@ nor
 .Op Fl g
 is specified.
 .El
-
 .Sh AUTHORS
 .An -nosplit
 .Nm
@@ -85,7 +80,6 @@ was written by
 .An Eric Petit ,
 and
 .An Mitchell Livingston .
-
 .Sh SEE ALSO
 .Xr transmissioncli 1 ,
 .Xr transmission-daemon 1 ,
