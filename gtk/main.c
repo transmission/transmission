@@ -259,32 +259,29 @@ onMainWindowSizeAllocated( GtkWidget *            window,
 }
 
 static sig_atomic_t global_sigcount = 0;
+static struct cbdata * sighandler_cbdata = NULL;
 
 static void
-fatalsig( int sig )
+signal_handler( int sig )
 {
-    /* revert to default handler after this many */
-    static const int SIGCOUNT_MAX = 3;
-
-    if( ++global_sigcount >= SIGCOUNT_MAX )
+    if( ++global_sigcount > 1 )
     {
         signal( sig, SIG_DFL );
         raise( sig );
+    }
+    else switch( sig )
+    {
+        case SIGINT:
+            g_message( _( "Got signal %d; trying to shut down cleanly.  Do it again if it gets stuck." ), sig );
+            doAction( "quit", sighandler_cbdata );
+            break;
     }
 }
 
 static void
 setupsighandlers( void )
 {
-#ifdef G_OS_WIN32
-    const int sigs[] = { SIGINT, SIGTERM };
-#else
-    const int sigs[] = { SIGHUP, SIGINT, SIGQUIT, SIGTERM };
-#endif
-    guint     i;
-
-    for( i = 0; i < G_N_ELEMENTS( sigs ); ++i )
-        signal( sigs[i], fatalsig );
+    signal( SIGINT, signal_handler );
 }
 
 static tr_rpc_callback_status
@@ -434,11 +431,13 @@ main( int argc, char ** argv )
         tr_session * session;
         struct cbdata * cbdata = g_new0( struct cbdata, 1 );
 
+        sighandler_cbdata = cbdata;
+
         /* ensure the directories are created */
-       if(( str = pref_string_get( PREF_KEY_DIR_WATCH )))
-           gtr_mkdir_with_parents( str, 0777 );
-       if(( str = pref_string_get( TR_PREFS_KEY_DOWNLOAD_DIR )))
-           gtr_mkdir_with_parents( str, 0777 );
+        if(( str = pref_string_get( PREF_KEY_DIR_WATCH )))
+            gtr_mkdir_with_parents( str, 0777 );
+        if(( str = pref_string_get( TR_PREFS_KEY_DOWNLOAD_DIR )))
+            gtr_mkdir_with_parents( str, 0777 );
 
         /* initialize the libtransmission session */
         session = tr_sessionInit( "gtk", configDir, TRUE, pref_get_all( ) );
