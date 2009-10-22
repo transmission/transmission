@@ -5,7 +5,7 @@
   * Fix minor protocol error that didn't send a port message to some peers
   * Fix manpage errors
 ==== Mac ====
-  * Fix "crash in event_queue_insert" bug on Snow Leopard
+  * Fix a potential crasher on Snow Leopard
   * When creating a torrent with multiple trackers, place each tracker into its own tier
   * Fix display glitch when changing sort to "Queue Order"
 ==== Daemon ====
