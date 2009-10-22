@@ -32,5 +32,5 @@ tr_bool tr_dhtEnabled( const tr_session * );
 tr_port tr_dhtPort ( const tr_session * );
 int tr_dhtStatus( tr_session *, int * setme_nodeCount );
 const char *tr_dhtPrintableStatus(int status);
-int tr_dhtAddNode( tr_session *, const tr_address *, tr_port, tr_bool bootstrap );
+int tr_dhtAddNode( tr_session *, tr_address *, tr_port, tr_bool bootstrap );
 int tr_dhtAnnounce( tr_torrent *, tr_bool announce );

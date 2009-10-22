@@ -1059,8 +1059,8 @@ parseLtepHandshake( tr_peermsgs *     msgs,
 
     /* get peer's listening port */
     if( tr_bencDictFindInt( &val, "p", &i ) ) {
-        tr_atomSetPort( msgs->peer->atom, htons( (uint16_t)i ) );
-        dbgmsg( msgs, "msgs->port is now %hu", tr_atomGetPort( msgs->peer->atom ) );
+        msgs->peer->port = htons( (uint16_t)i );
+        dbgmsg( msgs, "msgs->port is now %hu", msgs->peer->port );
     }
 
     /* get peer's maximum request queue size */
@@ -1455,7 +1455,7 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
             dbgmsg( msgs, "Got a BT_PORT" );
             tr_peerIoReadUint16( msgs->peer->io, inbuf, &msgs->peer->dht_port );
             if( msgs->peer->dht_port > 0 )
-                tr_dhtAddNode( getSession(msgs), tr_atomGetAddr( msgs->peer->atom ), msgs->peer->dht_port, 0 );
+                tr_dhtAddNode( getSession(msgs), &msgs->peer->addr, msgs->peer->dht_port, 0 );
             break;
 
         case BT_FEXT_SUGGEST:
