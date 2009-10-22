@@ -1,10 +1,11 @@
 === Transmission 1.76 (2009/mm/dd) ===
-[http://trac.transmissionbt.com/query?milestone=1.76&group=component&groupdesc=1&order=severity All tickets closed by this release] ==== All Platforms ====
-  * Fix possible dataloss when trying to move torrents to where they already are
+[http://trac.transmissionbt.com/query?milestone=1.76&group=component&groupdesc=1&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Fix possible data loss when trying to move torrents to where they already are
   * Fix minor protocol error that didn't send a port message to some peers
   * Fix manpage errors
 ==== Daemon ====
-  * Fix possible dataloss when using "transmission-remote --find"
+  * Fix possible data loss when using "transmission-remote --find"
   * Fix ratio-limit bug on some uClibc systems
   * Fix invalid JSON "nan" error on optware
 ==== GTK+ ====
