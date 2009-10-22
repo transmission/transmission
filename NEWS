@@ -8,6 +8,7 @@
   * Fix ratio-limit bug on some uClibc systems
   * Fix invalid JSON "nan" error on optware
 ==== GTK+ ====
+  * Fix crash on exit when a torrent's Properties dialog is open
   * Fix broken SIGINT (ctrl-c) handling
   * Fix tray menu's main window status when Transmission is started minimized
   * Fix 1.61 build failure on systems with new versions of glib but older versions of gtk

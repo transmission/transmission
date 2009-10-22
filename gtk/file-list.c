@@ -204,7 +204,11 @@ gtr_tree_model_foreach_postorder( GtkTreeModel            * model,
 static void
 refresh( FileData * data )
 {
-    tr_torrent * tor = tr_torrentFindFromId( tr_core_session( data->core ), data->torrentId );
+    tr_torrent * tor = NULL;
+    tr_session * session = tr_core_session( data->core );
+
+    if( session != NULL )
+        tor = tr_torrentFindFromId( session, data->torrentId );
 
     if( tor == NULL )
     {
@@ -213,7 +217,7 @@ refresh( FileData * data )
     else
     {
         tr_file_index_t fileCount;
-        data->tor = tr_torrentFindFromId( tr_core_session( data->core ), data->torrentId );
+        data->tor = tr_torrentFindFromId( session, data->torrentId );
         data->refresh_file_stat = tr_torrentFiles( tor, &fileCount );
 
         gtr_tree_model_foreach_postorder( data->model, refreshFilesForeach, data );
