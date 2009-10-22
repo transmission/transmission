@@ -2,6 +2,8 @@
 ==== All Platforms ====
   * Fix manpage errors
   * Use automake's "quieter builds" rule when available
+==== GTK+ ====
+  * Fix 1.61 build failure if a new version of glib, but old version of gtk, is installed
 
 === Transmission 1.75 (2009/09/13) ===
 [http://trac.transmissionbt.com/query?milestone=1.75&group=component&groupdesc=1&order=severity All tickets closed by this release]
