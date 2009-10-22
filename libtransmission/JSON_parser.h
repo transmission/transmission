@@ -54,7 +54,7 @@ typedef struct JSON_value_struct {
     union {
         JSON_int_t integer_value;
         
-        long double float_value;
+        double float_value;
         
         struct {
             const char* value;

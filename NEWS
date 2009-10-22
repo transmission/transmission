@@ -2,6 +2,8 @@
 ==== All Platforms ====
   * Fix manpage errors
   * Use automake's "quieter builds" rule when available
+==== Daemon ====
+  * Fix ratio-limit bug on some uClibc systems
 ==== GTK+ ====
   * Fix broken SIGINT (ctrl-c) handling
   * Fix tray menu's main window status when Transmission is started minimized
