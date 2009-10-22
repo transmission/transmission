@@ -744,11 +744,12 @@
   * Fix rare XML parsing bug
 
 === Transmission 0.71 (2007/04/23) ===
+==== All Platforms ====
   * Send port info when sending requests
   * Calculate ratio differently when seeding without ever downloading
   * Add additional error messages and debug info
   * Improved UPnP support
-  * OS X:
+==== Mac ====
   * Fix error when using default incomplete folder
   * Disable the stop ratio once it is reached (while seeding)
   * Small interface adjustments
