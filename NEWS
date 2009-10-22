@@ -1,10 +1,11 @@
 === Transmission 1.76 (2009/mm/dd) ===
 [http://trac.transmissionbt.com/query?milestone=1.76&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== All Platforms ====
-  * Fix possible data loss when trying to move torrents to where they already are
+  * Fix possible data loss when moving torrents to where they already are
   * Fix minor protocol error that didn't send a port message to some peers
   * Fix manpage errors
 ==== Mac ====
+  * Fix "crash in event_queue_insert" bug on Snow Leopard
   * When creating a torrent with multiple trackers, place each tracker into its own tier
   * Fix display glitch when changing sort to "Queue Order"
 ==== Daemon ====
