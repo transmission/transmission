@@ -4,6 +4,9 @@
   * Fix possible data loss when trying to move torrents to where they already are
   * Fix minor protocol error that didn't send a port message to some peers
   * Fix manpage errors
+==== Mac ====
+  * When creating a torrent with multiple trackers, place each tracker into its own tier
+  * Fix display glitch when changing sort to "Queue Order"
 ==== Daemon ====
   * Fix possible data loss when using "transmission-remote --find"
   * Fix ratio-limit bug on some uClibc systems
