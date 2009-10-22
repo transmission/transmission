@@ -1,5 +1,6 @@
 === Transmission 1.76 (2009/09/13) ===
 ==== All Platforms ====
+  * Fix possible dataloss when trying to move torrents to where they already are
   * Fix manpage errors
   * Use automake's "quieter builds" rule when available
 ==== Daemon ====
