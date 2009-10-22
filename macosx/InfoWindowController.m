@@ -1136,7 +1136,7 @@ typedef enum
     {
         FileListNode * item = [fileOutlineView itemAtRow: i];
         if ([self canQuickLookFile: item])
-            [urlArray addObject: [torrent fileLocation: item]];
+            [urlArray addObject: [NSURL fileURLWithPath: [torrent fileLocation: item]]];
     }
     
     return urlArray;
@@ -1665,7 +1665,7 @@ typedef enum
 - (BOOL) canQuickLookFile: (FileListNode *) item
 {
     Torrent * torrent = [fTorrents objectAtIndex: 0];
-    return [torrent fileLocation: item] != nil && ([item isFolder] || [torrent fileProgress: item] >= 1.0);
+    return ([item isFolder] || [torrent fileProgress: item] >= 1.0) && [torrent fileLocation: item];
 }
 
 #warning doesn't like blank addresses

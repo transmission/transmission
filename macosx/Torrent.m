@@ -32,9 +32,9 @@
 @interface Torrent (Private)
 
 - (id) initWithPath: (NSString *) path hash: (NSString *) hashString torrentStruct: (tr_torrent *) torrentStruct lib: (tr_session *) lib
-        downloadFolder: (NSString *) downloadFolder incompleteFolder: (NSString *) incompleteFolder
         waitToStart: (NSNumber *) waitToStart
-        groupValue: (NSNumber *) groupValue;
+        groupValue: (NSNumber *) groupValue
+        legacyDownloadFolder: (NSString *) downloadFolder legacyIncompleteFolder: (NSString *) incompleteFolder;
 
 - (void) createFileList;
 - (void) insertPath: (NSMutableArray *) components forParent: (FileListNode *) parent fileSize: (uint64_t) size
@@ -73,8 +73,8 @@ int trashDataFile(const char * filename)
         lib: (tr_session *) lib
 {
     self = [self initWithPath: path hash: nil torrentStruct: NULL lib: lib
-            downloadFolder: location incompleteFolder: nil
-            waitToStart: nil groupValue: nil];
+            waitToStart: nil groupValue: nil
+            legacyDownloadFolder: location legacyIncompleteFolder: nil];
     
     if (self)
     {
@@ -87,8 +87,8 @@ int trashDataFile(const char * filename)
 - (id) initWithTorrentStruct: (tr_torrent *) torrentStruct location: (NSString *) location lib: (tr_session *) lib
 {
     self = [self initWithPath: nil hash: nil torrentStruct: torrentStruct lib: lib
-            downloadFolder: location incompleteFolder: nil
-            waitToStart: nil groupValue: nil];
+            waitToStart: nil groupValue: nil
+            legacyDownloadFolder: location legacyIncompleteFolder: nil];
     
     return self;
 }
@@ -98,11 +98,11 @@ int trashDataFile(const char * filename)
     self = [self initWithPath: [history objectForKey: @"InternalTorrentPath"]
                 hash: [history objectForKey: @"TorrentHash"]
                 torrentStruct: NULL lib: lib
-                downloadFolder: [history objectForKey: @"DownloadFolder"] //upgrading from versions < 1.80
-                incompleteFolder: [[history objectForKey: @"UseIncompleteFolder"] boolValue] //upgrading from versions < 1.80
-                                    ? [history objectForKey: @"IncompleteFolder"] : nil
                 waitToStart: [history objectForKey: @"WaitToStart"]
-                groupValue: [history objectForKey: @"GroupValue"]];
+                groupValue: [history objectForKey: @"GroupValue"]
+                legacyDownloadFolder: [history objectForKey: @"DownloadFolder"] //upgrading from versions < 1.80
+                legacyIncompleteFolder: [[history objectForKey: @"UseIncompleteFolder"] boolValue] //upgrading from versions < 1.80
+                                        ? [history objectForKey: @"IncompleteFolder"] : nil];
     
     if (self)
     {
@@ -1546,9 +1546,9 @@ int trashDataFile(const char * filename)
 @implementation Torrent (Private)
 
 - (id) initWithPath: (NSString *) path hash: (NSString *) hashString torrentStruct: (tr_torrent *) torrentStruct lib: (tr_session *) lib
-        downloadFolder: (NSString *) downloadFolder incompleteFolder: (NSString *) incompleteFolder
         waitToStart: (NSNumber *) waitToStart
         groupValue: (NSNumber *) groupValue
+        legacyDownloadFolder: (NSString *) downloadFolder legacyIncompleteFolder: (NSString *) incompleteFolder
 {
     if (!(self = [super init]))
         return nil;
@@ -1565,7 +1565,6 @@ int trashDataFile(const char * filename)
         //set libtransmission settings for initialization
         tr_ctor * ctor = tr_ctorNew(lib);
         tr_ctorSetPaused(ctor, TR_FORCE, YES);
-        tr_ctorSetPeerLimit(ctor, TR_FALLBACK, [fDefaults integerForKey: @"PeersTorrent"]);
         
         int result = TR_PARSE_ERR;
         if (path)
