@@ -907,7 +907,7 @@ void
 tr_sha1_to_hex( char *          out,
                 const uint8_t * sha1 )
 {
-    static const char hex[] = "0123456789ABCDEF";
+    static const char hex[] = "0123456789abcdef";
     int               i;
 
     for( i = 0; i < 20; i++ )
