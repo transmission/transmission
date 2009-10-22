@@ -14,6 +14,7 @@
 #include <iostream>
 
 #include <QCheckBox>
+#include <QCloseEvent>
 #include <QDesktopServices>
 #include <QFileDialog>
 #include <QLabel>
@@ -279,6 +280,23 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
 
 TrMainWindow :: ~TrMainWindow( )
 {
+}
+
+/****
+*****
+****/
+
+void
+TrMainWindow :: closeEvent( QCloseEvent * event )
+{
+    // if they're using a tray icon, close to the tray
+    // instead of exiting
+    if( !myPrefs.getBool( Prefs :: SHOW_TRAY_ICON ) )
+        event->accept( );
+    else {
+        toggleWindows( false );
+        event->ignore( );
+    }
 }
 
 /****
