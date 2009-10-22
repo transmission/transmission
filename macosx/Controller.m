@@ -1814,7 +1814,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     }
     
     [fDefaults setObject: sortType forKey: @"Sort"];
-    [self sortTorrents];
+    [self applyFilter: nil]; //better than calling sortTorrents because it will even apply to queue order
 }
 
 - (void) setSortByGroup: (id) sender
