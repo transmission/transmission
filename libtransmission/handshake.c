@@ -312,7 +312,8 @@ parseHandshake( tr_handshake *    handshake,
 
     tr_peerIoEnableFEXT( handshake->io, HANDSHAKE_HAS_FASTEXT( reserved ) );
 
-    /* This doesn't depend on whether the torrent is private. */
+    /* This is independent of whether or not DHT is actually used.
+     * it's okay to set this flag even for private torrents */
     if( tor && tr_sessionAllowsDHT( tor->session ) )
         tr_peerIoEnableDHT( handshake->io, HANDSHAKE_HAS_DHT( reserved ) );
 
@@ -673,6 +674,11 @@ readHandshake( tr_handshake *    handshake,
     tr_peerIoEnableLTEP( handshake->io, HANDSHAKE_HAS_LTEP( reserved ) );
 
     tr_peerIoEnableFEXT( handshake->io, HANDSHAKE_HAS_FASTEXT( reserved ) );
+
+    /* This is independent of whether or not DHT is actually used.
+     * it's okay to set this flag even for private torrents */
+    if( tr_sessionAllowsDHT( handshake->session ) )
+        tr_peerIoEnableDHT( handshake->io, HANDSHAKE_HAS_DHT( reserved ) );
 
     /* torrent hash */
     tr_peerIoReadBytes( handshake->io, inbuf, hash, sizeof( hash ) );
