@@ -1304,7 +1304,8 @@ onPortTest( GtkButton * button UNUSED, gpointer vdata )
     gtk_widget_set_sensitive( data->portButton, FALSE );
     gtk_widget_set_sensitive( data->portSpin, FALSE );
     gtk_label_set_markup( GTK_LABEL( data->portLabel ), _( "<i>Testing...</i>" ) );
-    data->portTag = g_signal_connect( data->core, "port-tested", G_CALLBACK(onPortTested), data );
+    if( !data->portTag )
+        data->portTag = g_signal_connect( data->core, "port-tested", G_CALLBACK(onPortTested), data );
     tr_core_port_test( data->core );
 }
 
