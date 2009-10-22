@@ -2,6 +2,7 @@
 ==== All Platforms ====
   * Fix possible dataloss when trying to move torrents to where they already are
   * Fix manpage errors
+  * Fix minor protocol error that didn't send a port message to some peers
   * Use automake's "quieter builds" rule when available
 ==== Daemon ====
   * Fix possible dataloss when using "transmission-remote --find"
