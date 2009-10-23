@@ -688,7 +688,7 @@ tr_sessionInitImpl( void * vdata )
 
     tr_statsInit( session );
 
-    session->web = tr_webInit( session, &session->public_ipv4->addr );
+    session->web = tr_webInit( session );
     --session->waiting;
 
 ///cccc
@@ -794,6 +794,7 @@ sessionSetImpl( void * vdata )
         b.addr = tr_inaddr_any;
     b.socket = -1;
     session->public_ipv4 = tr_memdup( &b, sizeof( struct tr_bindinfo ) );
+    tr_webSetInterface( session->web, &session->public_ipv4->addr );
 
     str = TR_PREFS_KEY_BIND_ADDRESS_IPV6;
     tr_bencDictFindStr( settings, TR_PREFS_KEY_BIND_ADDRESS_IPV6, &str );

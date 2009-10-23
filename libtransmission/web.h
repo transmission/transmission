@@ -16,10 +16,11 @@
 struct tr_address;
 typedef struct tr_web tr_web;
 
-tr_web*      tr_webInit( tr_session                * session,
-                         const struct tr_address   * addr );
+tr_web*      tr_webInit( tr_session * session );
 
 void         tr_webClose( tr_web ** );
+
+void         tr_webSetInterface( tr_web * web, const struct tr_address * addr );
 
 typedef void ( tr_web_done_func )( tr_session       * session,
                                    long               response_code,
