@@ -303,12 +303,12 @@ tr_netOpenTCP( tr_session        * session,
     if( isMulticastAddress( addr ) || isIPv6LinkLocalAddress( addr ) )
         return -EINVAL;
 
-    s = tr_fdSocketCreate( domains[addr->type], SOCK_STREAM );
+    s = tr_fdSocketCreate( session, domains[addr->type], SOCK_STREAM );
     if( s < 0 )
         return -1;
 
     if( evutil_make_socket_nonblocking( s ) < 0 ) {
-        tr_netClose( s );
+        tr_netClose( session, s );
         return -1;
     }
 
@@ -339,7 +339,7 @@ tr_netOpenTCP( tr_session        * session,
             tr_err( _( "Couldn't connect socket %d to %s, port %d (errno %d - %s)" ),
                     s, tr_ntop_non_ts( addr ), (int)port, tmperrno,
                     tr_strerror( tmperrno ) );
-        tr_netClose( s );
+        tr_netClose( session, s );
         s = -tmperrno;
     }
 
@@ -436,15 +436,15 @@ tr_net_hasIPv6( tr_port port )
 }
 
 int
-tr_netAccept( tr_session  * session UNUSED,
+tr_netAccept( tr_session  * session,
               int           b,
               tr_address  * addr,
               tr_port     * port )
 {
-    int fd = tr_fdSocketAccept( b, addr, port );
+    int fd = tr_fdSocketAccept( session, b, addr, port );
 
     if( fd>=0 && evutil_make_socket_nonblocking(fd)<0 ) {
-        tr_netClose( fd );
+        tr_netClose( session, fd );
         fd = -1;
     }
 
@@ -452,7 +452,7 @@ tr_netAccept( tr_session  * session UNUSED,
 }
 
 void
-tr_netClose( int s )
+tr_netClose( tr_session * session, int s )
 {
-    tr_fdSocketClose( s );
+    tr_fdSocketClose( session, s );
 }

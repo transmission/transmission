@@ -299,20 +299,15 @@ onRPCChanged( tr_session            * session UNUSED,
             tr_core_add_torrent( cbdata->core, tr_torrent_new_preexisting( tor ), TRUE );
             break;
 
-        case TR_RPC_TORRENT_STARTED:
-            /* this should be automatic */
-            break;
-
-        case TR_RPC_TORRENT_STOPPED:
-            /* this should be automatic */
-            break;
-
         case TR_RPC_TORRENT_REMOVING:
             tr_core_torrent_destroyed( cbdata->core, tr_torrentId( tor ) );
             break;
 
-        case TR_RPC_TORRENT_CHANGED:
         case TR_RPC_SESSION_CHANGED:
+        case TR_RPC_TORRENT_CHANGED:
+        case TR_RPC_TORRENT_MOVED:
+        case TR_RPC_TORRENT_STARTED:
+        case TR_RPC_TORRENT_STOPPED:
             /* nothing interesting to do here */
             break;
     }

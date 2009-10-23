@@ -130,21 +130,23 @@ onTimer( int fd UNUSED, short what UNUSED, void * vshared )
 ***/
 
 tr_shared *
-tr_sharedInit( tr_session  * session, tr_bool isEnabled )
+tr_sharedInit( tr_session  * session )
 {
     tr_shared * s = tr_new0( tr_shared, 1 );
 
     s->session      = session;
-    s->isEnabled    = isEnabled;
+    s->isEnabled    = FALSE;
     s->upnpStatus   = TR_PORT_UNMAPPED;
     s->natpmpStatus = TR_PORT_UNMAPPED;
 
+#if 0
     if( isEnabled )
     {
         s->timer = tr_new0( struct event, 1 );
         evtimer_set( s->timer, onTimer, s );
         tr_timerAdd( s->timer, 0, 333000 );
     }
+#endif
 
     return s;
 }

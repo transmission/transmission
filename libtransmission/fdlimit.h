@@ -34,8 +34,15 @@
  * @{
  */
 
-void tr_fdInit( size_t openFileLimit,
-                size_t globalPeerLimit );
+void tr_fdSetFileLimit( tr_session * session, int limit );
+
+int tr_fdGetFileLimit( const tr_session * session );
+
+void tr_fdSetGlobalPeerLimit( tr_session * session, int limit );
+
+/***
+****
+***/
 
 int tr_open_file_for_scanning( const char * filename );
 
@@ -63,14 +70,16 @@ int64_t tr_lseek( int fd, int64_t offset, int whence );
  *
  * @see tr_fdFileClose
  */
-int  tr_fdFileCheckout( int                      torrentId,
+int  tr_fdFileCheckout( tr_session             * session,
+                        int                      torrentId,
                         tr_file_index_t          fileNum,
                         const char             * fileName,
                         tr_bool                  doWrite,
                         tr_preallocation_mode    preallocationMode,
                         uint64_t                 desiredFileSize );
 
-int tr_fdFileGetCached( int                      torrentId,
+int tr_fdFileGetCached( tr_session             * session,
+                        int                      torrentId,
                         tr_file_index_t          fileNum,
                         tr_bool                  doWrite );
 
@@ -82,36 +91,39 @@ int tr_fdFileGetCached( int                      torrentId,
  *
  * @see tr_fdFileCheckout
  */
-void     tr_fdFileClose( const tr_torrent * tor, tr_file_index_t fileNo );
+void tr_fdFileClose( tr_session        * session,
+                     const tr_torrent  * tor,
+                     tr_file_index_t     fileNo );
 
 
 /**
  * Closes all the files associated with a given torrent id
  */
-void tr_fdTorrentClose( int torrentId );
+void tr_fdTorrentClose( tr_session * session, int torrentId );
 
 
 /***********************************************************************
  * Sockets
  **********************************************************************/
-int      tr_fdSocketCreate( int domain, int type );
+int      tr_fdSocketCreate( tr_session * session, int domain, int type );
 
-int      tr_fdSocketAccept( int           b,
+int      tr_fdSocketAccept( tr_session  * session,
+                            int           b,
                             tr_address  * addr,
                             tr_port     * port );
 
-void     tr_fdSocketClose( int s );
+void     tr_fdSocketClose( tr_session * session, int s );
 
 /***********************************************************************
  * tr_fdClose
  ***********************************************************************
  * Frees resources allocated by tr_fdInit.
  **********************************************************************/
-void     tr_fdClose( void );
+void     tr_fdClose( tr_session * session );
 
 
-void     tr_fdSetPeerLimit( uint16_t n );
+void     tr_fdSetPeerLimit( tr_session * session, int n );
 
-uint16_t tr_fdGetPeerLimit( void );
+int      tr_fdGetPeerLimit( const tr_session * );
 
 /* @} */

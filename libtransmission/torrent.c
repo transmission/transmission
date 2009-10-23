@@ -1450,7 +1450,7 @@ stopTorrent( void * vtor )
     tr_peerMgrStopTorrent( tor );
     tr_announcerTorrentStopped( tor );
 
-    tr_fdTorrentClose( tor->uniqueId );
+    tr_fdTorrentClose( tor->session, tor->uniqueId );
 
     if( !tor->isDeleting )
         tr_torrentSave( tor );
@@ -1618,7 +1618,7 @@ tr_torrentRecheckCompleteness( tr_torrent * tor )
 
         tor->completeness = completeness;
         tor->needsSeedRatioCheck = TRUE;
-        tr_fdTorrentClose( tor->uniqueId );
+        tr_fdTorrentClose( tor->session, tor->uniqueId );
 
         /* if the torrent is a seed now,
          * and the files used to be in the incompleteDir,
@@ -2342,7 +2342,7 @@ tr_torrentDeleteLocalData( tr_torrent * tor, tr_fileFunc fileFunc )
         fileFunc = remove;
 
     /* close all the files because we're about to delete them */
-    tr_fdTorrentClose( tor->uniqueId );
+    tr_fdTorrentClose( tor->session, tor->uniqueId );
 
     if( tor->info.fileCount > 1 )
         deleteLocalData( tor, fileFunc );
@@ -2532,7 +2532,7 @@ tr_torrentFileCompleted( tr_torrent * tor, tr_file_index_t fileNum )
     const char * base;
 
     /* close the file so that we can reopen in read-only mode as needed */
-    tr_fdFileClose( tor, fileNum );
+    tr_fdFileClose( tor->session, tor, fileNum );
 
     /* if the torrent's filename on disk isn't the same as the one in the metadata,
      * then it's been modified to denote that it was a partial file.

@@ -303,6 +303,9 @@ tr_session * tr_sessionInit( const char     * tag,
                              tr_bool          messageQueueingEnabled,
                              struct tr_benc * settings );
 
+void tr_sessionSet( tr_session      * session,
+                    struct tr_benc  * settings );
+
 /** @brief End a libtransmission session
     @see tr_sessionInit() */
 void tr_sessionClose( tr_session * );

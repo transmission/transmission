@@ -457,7 +457,7 @@ io_dtor( void * vio )
     tr_bandwidthDestruct( &io->bandwidth );
     evbuffer_free( io->outbuf );
     evbuffer_free( io->inbuf );
-    tr_netClose( io->socket );
+    tr_netClose( io->session, io->socket );
     tr_cryptoFree( io->crypto );
     __tr_list_destroy( &io->outbuf_datatypes, trDatatypeFree );
 
@@ -548,15 +548,20 @@ tr_peerIoClear( tr_peerIo * io )
 int
 tr_peerIoReconnect( tr_peerIo * io )
 {
+    tr_session * session;
+
+    assert( tr_isPeerIo( io ) );
     assert( !tr_peerIoIsIncoming( io ) );
 
-    if( io->socket >= 0 )
-        tr_netClose( io->socket );
+    session = tr_peerIoGetSession( io );
 
-    io->socket = tr_netOpenTCP( io->session, &io->addr, io->port );
+    if( io->socket >= 0 )
+        tr_netClose( session, io->socket );
+
+    io->socket = tr_netOpenTCP( session, &io->addr, io->port );
     if( io->socket >= 0 )
     {
-        tr_netSetTOS( io->socket, io->session->peerSocketTOS );
+        tr_netSetTOS( io->socket, session->peerSocketTOS );
         return 0;
     }
 

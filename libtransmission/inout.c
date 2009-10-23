@@ -66,7 +66,8 @@ tr_lseek( int fd, int64_t offset, int whence )
 
 /* returns 0 on success, or an errno on failure */
 static int
-readOrWriteBytes( const tr_torrent * tor,
+readOrWriteBytes( tr_session       * session,
+                  const tr_torrent * tor,
                   int                ioMode,
                   tr_file_index_t    fileIndex,
                   uint64_t           fileOffset,
@@ -89,7 +90,7 @@ readOrWriteBytes( const tr_torrent * tor,
     if( !file->length )
         return 0;
 
-    fd = tr_fdFileGetCached( tr_torrentId( tor ), fileIndex, doWrite );
+    fd = tr_fdFileGetCached( session, tr_torrentId( tor ), fileIndex, doWrite );
 
     if( fd < 0 )
     {
@@ -125,7 +126,7 @@ readOrWriteBytes( const tr_torrent * tor,
         {
             char * filename = tr_buildPath( base, subpath, NULL );
 
-            if( ( fd = tr_fdFileCheckout( tor->uniqueId, fileIndex, filename,
+            if( ( fd = tr_fdFileCheckout( session, tor->uniqueId, fileIndex, filename,
                                           doWrite, preallocationMode, file->length ) ) < 0 )
             {
                 err = errno;
@@ -219,7 +220,7 @@ readOrWritePiece( tr_torrent       * tor,
         const tr_file * file = &info->files[fileIndex];
         const uint64_t bytesThisPass = MIN( buflen, file->length - fileOffset );
 
-        err = readOrWriteBytes( tor, ioMode, fileIndex, fileOffset, buf, bytesThisPass );
+        err = readOrWriteBytes( tor->session, tor, ioMode, fileIndex, fileOffset, buf, bytesThisPass );
         buf += bytesThisPass;
         buflen -= bytesThisPass;
         ++fileIndex;

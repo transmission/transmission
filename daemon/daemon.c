@@ -99,9 +99,25 @@ showUsage( void )
 }
 
 static void
-gotsig( int sig UNUSED )
+got_sigint( int sig UNUSED )
 {
     closing = TRUE;
+}
+
+static void
+got_sighup( int sig UNUSED )
+{
+    tr_benc settings;
+    const char * configDir = tr_sessionGetConfigDir( mySession );
+
+    /* reload the settings */
+    tr_inf( "Reloading settings from \"%s\"", configDir );
+    tr_bencInitDict( &settings, 0 );
+    tr_sessionLoadSettings( &settings, configDir, MY_NAME );
+    tr_sessionSet( mySession, &settings );
+
+    /* cleanup */
+    tr_bencFree( &settings );
 }
 
 #if defined(WIN32)
@@ -213,12 +229,9 @@ main( int argc, char ** argv )
     const char * configDir = NULL;
     dtr_watchdir * watchdir = NULL;
 
-    signal( SIGINT, gotsig );
-    signal( SIGTERM, gotsig );
+    signal( SIGINT, got_sigint );
 #ifndef WIN32
-    signal( SIGQUIT, gotsig );
-    signal( SIGPIPE, SIG_IGN );
-    signal( SIGHUP, SIG_IGN );
+    signal( SIGHUP, got_sighup );
 #endif
 
     /* load settings from defaults + config file */
@@ -312,6 +325,7 @@ main( int argc, char ** argv )
 
     /* start the session */
     mySession = tr_sessionInit( "daemon", configDir, FALSE, &settings );
+    tr_sessionSaveSettings( mySession, configDir, &settings );
 
     if( tr_bencDictFindBool( &settings, TR_PREFS_KEY_RPC_AUTH_REQUIRED, &boolVal ) && boolVal )
         tr_ninf( MY_NAME, "requiring authentication" );

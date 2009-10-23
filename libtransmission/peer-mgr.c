@@ -1332,26 +1332,31 @@ tr_peerMgrAddIncoming( tr_peerMgr * manager,
                        tr_port      port,
                        int          socket )
 {
+    tr_session * session;
+
     managerLock( manager );
 
-    if( tr_sessionIsAddressBlocked( manager->session, addr ) )
+    assert( tr_isSession( manager->session ) );
+    session = manager->session;
+
+    if( tr_sessionIsAddressBlocked( session, addr ) )
     {
         tr_dbg( "Banned IP address \"%s\" tried to connect to us", tr_ntop_non_ts( addr ) );
-        tr_netClose( socket );
+        tr_netClose( session, socket );
     }
     else if( getExistingHandshake( &manager->incomingHandshakes, addr ) )
     {
-        tr_netClose( socket );
+        tr_netClose( session, socket );
     }
     else /* we don't have a connetion to them yet... */
     {
         tr_peerIo *    io;
         tr_handshake * handshake;
 
-        io = tr_peerIoNewIncoming( manager->session, manager->session->bandwidth, addr, port, socket );
+        io = tr_peerIoNewIncoming( session, session->bandwidth, addr, port, socket );
 
         handshake = tr_handshakeNew( io,
-                                     manager->session->encryptionMode,
+                                     session->encryptionMode,
                                      myHandshakeDoneCB,
                                      manager );
 
