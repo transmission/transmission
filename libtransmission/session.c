@@ -589,6 +589,7 @@ tr_sessionInit( const char  * tag,
                 tr_bool       messageQueuingEnabled,
                 tr_benc     * clientSettings )
 {
+    int64_t i;
     tr_session * session;
     struct init_data data;
 
@@ -601,6 +602,10 @@ tr_sessionInit( const char  * tag,
     session->tag = tr_strdup( tag );
     session->magicNumber = SESSION_MAGIC_NUMBER;
     tr_bencInitList( &session->removedTorrents, 0 );
+
+    /* nice to start logging at the very beginning */
+    if( tr_bencDictFindInt( clientSettings, TR_PREFS_KEY_MSGLEVEL, &i ) )
+        tr_setMessageLevel( i );
 
     /* start the libtransmission thread */
     tr_netInit( ); /* must go before tr_eventInit */
@@ -722,6 +727,9 @@ sessionSetImpl( void * vdata )
     assert( tr_bencIsDict( settings ) );
     assert( tr_amInEventThread( session ) );
 
+    if( tr_bencDictFindInt( settings, TR_PREFS_KEY_MSGLEVEL, &i ) )
+        tr_setMessageLevel( i );
+
     if( tr_bencDictFindInt( settings, TR_PREFS_KEY_UMASK, &i ) ) {
         session->umask = (mode_t)i;
         umask( session->umask );
@@ -732,8 +740,6 @@ sessionSetImpl( void * vdata )
         tr_sessionSetLazyBitfieldEnabled( session, boolVal );
     if( tr_bencDictFindInt( settings, TR_PREFS_KEY_PEER_LIMIT_TORRENT, &i ) )
         tr_sessionSetPeerLimitPerTorrent( session, i );
-    if( tr_bencDictFindInt( settings, TR_PREFS_KEY_MSGLEVEL, &i ) )
-        tr_setMessageLevel( i );
     if( tr_bencDictFindBool( settings, TR_PREFS_KEY_PEX_ENABLED, &boolVal ) )
         tr_sessionSetPexEnabled( session, boolVal );
     if( tr_bencDictFindBool( settings, TR_PREFS_KEY_DHT_ENABLED, &boolVal ) )
@@ -856,20 +862,6 @@ sessionSetImpl( void * vdata )
         useAltSpeed( session, isAltTime( session ), FALSE );
     else if( tr_bencDictFindBool( settings, TR_PREFS_KEY_ALT_SPEED_ENABLED, &boolVal ) )
         useAltSpeed( session, boolVal, FALSE );
-
-
-
-    fprintf( stderr, "what was passed in: \n%s\n", tr_bencToStr( settings, TR_FMT_JSON, NULL ) );
-
-    fprintf( stderr, "-=-=-=-=-=-\n" );
-
-    {
-    tr_benc tmp;
-    tr_bencInitDict( &tmp, 0 );
-    tr_sessionGetSettings( session, &tmp );
-    fprintf( stderr, "and the session's state now: \n%s\n", tr_bencToStr( &tmp, TR_FMT_JSON, NULL ) );
-    tr_bencFree( &tmp );
-    }
 
     --session->waiting;
 }
