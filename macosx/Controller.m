@@ -589,6 +589,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         if (!firstLaunch && timePassed)
         {
+            [fDefaults setObject: [NSDate date] forKey: @"DonateAskDate"];
+            
             NSAlert * alert = [[NSAlert alloc] init];
             [alert setMessageText: NSLocalizedString(@"Support open-source indie software", "Donation beg -> title")];
             
@@ -618,8 +620,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 [fDefaults setBool: ([[alert suppressionButton] state] != NSOnState) forKey: @"WarningDonate"];
             
             [alert release];
-            
-            [fDefaults setObject: [NSDate date] forKey: @"DonateAskDate"];
         }
     }
 }
