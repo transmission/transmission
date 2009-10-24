@@ -102,25 +102,24 @@ showUsage( void )
 }
 
 static void
-got_sigint( int sig UNUSED )
+gotsig( int sig )
 {
-    closing = TRUE;
-}
+    switch( sig )
+    {
+        case SIGHUP:
+        {
+            tr_benc settings;
+            const char * configDir = tr_sessionGetConfigDir( mySession );
+            tr_inf( "Reloading settings from \"%s\"", configDir );
+            tr_bencInitDict( &settings, 0 );
+            tr_sessionLoadSettings( &settings, configDir, MY_NAME );
+            tr_sessionSet( mySession, &settings );
+            tr_bencFree( &settings );
+        }
 
-static void
-got_sighup( int sig UNUSED )
-{
-    tr_benc settings;
-    const char * configDir = tr_sessionGetConfigDir( mySession );
-
-    /* reload the settings */
-    tr_inf( "Reloading settings from \"%s\"", configDir );
-    tr_bencInitDict( &settings, 0 );
-    tr_sessionLoadSettings( &settings, configDir, MY_NAME );
-    tr_sessionSet( mySession, &settings );
-
-    /* cleanup */
-    tr_bencFree( &settings );
+        default:
+            closing = TRUE;
+    }
 }
 
 #if defined(WIN32)
@@ -281,9 +280,10 @@ main( int argc, char ** argv )
     const char * configDir = NULL;
     dtr_watchdir * watchdir = NULL;
 
-    signal( SIGINT, got_sigint );
+    signal( SIGINT, gotsig );
+    signal( SIGKILL, gotsig );
 #ifndef WIN32
-    signal( SIGHUP, got_sighup );
+    signal( SIGHUP, gotsig );
 #endif
 
     /* load settings from defaults + config file */

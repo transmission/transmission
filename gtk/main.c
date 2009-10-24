@@ -272,9 +272,13 @@ signal_handler( int sig )
     else switch( sig )
     {
         case SIGINT:
+        case SIGKILL:
             g_message( _( "Got signal %d; trying to shut down cleanly.  Do it again if it gets stuck." ), sig );
             doAction( "quit", sighandler_cbdata );
             break;
+
+        default:
+            g_message( "unhandled signal" );
     }
 }
 
@@ -282,6 +286,7 @@ static void
 setupsighandlers( void )
 {
     signal( SIGINT, signal_handler );
+    signal( SIGKILL, signal_handler );
 }
 
 static tr_rpc_callback_status
