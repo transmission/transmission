@@ -1,24 +1,24 @@
-=== Transmission 1.76 (2009/mm/dd) ===
+=== Transmission 1.76 (2009/10/24) ===
 [http://trac.transmissionbt.com/query?milestone=1.76&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== All Platforms ====
-  * Fix possible data loss when moving torrents to where they already are
+  * Fix potential data loss when moving torrents to where they already are
   * Fix minor protocol error that didn't send a port message to some peers
-  * Fix manpage errors
+  * Fix minor manpage errors
 ==== Mac ====
   * Fix a potential crasher on Snow Leopard
-  * When creating a torrent with multiple trackers, place each tracker into its own tier
+  * When creating a multi-tracker torrent, give each tracker its own tier
   * Fix display glitch when changing sort to "Queue Order"
 ==== Daemon ====
-  * Fix possible data loss when using "transmission-remote --find"
+  * Fix potential data loss when using "transmission-remote --find"
   * Fix ratio-limit bug on some uClibc systems
   * Fix invalid JSON "nan" error on optware
 ==== GTK+ ====
   * Fix crash in the Preferences dialog when testing to see if the port is open
   * Fix crash on exit when a torrent's Properties dialog is open
-  * Fix broken SIGINT (ctrl-c) handling
-  * Fix tray menu's main window status when Transmission is started minimized
-  * Fix 1.61 build failure on systems with new versions of glib but older versions of gtk
   * Fix tracker address display error in the torrent Properties dialog
+  * Fix tray menu's main window status when Transmission is started minimized
+  * Fix broken SIGINT (ctrl-c) handling
+  * Fix 1.61 build failure on systems with new versions of glib but older versions of gtk
 ==== Qt ====
   * Fix crash when removing expired torrents from the display
   * Fix client from closing, rather than closing to the system tray, when clicking X
