@@ -1781,9 +1781,12 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             }
         }
         
-        #warning dataLocation could return nil
-        NSDictionary * clickContext = [NSDictionary dictionaryWithObjectsAndKeys: GROWL_DOWNLOAD_COMPLETE, @"Type",
-                                        [torrent dataLocation] , @"Location", nil];
+        NSMutableDictionary * clickContext = [NSMutableDictionary dictionaryWithObject: GROWL_DOWNLOAD_COMPLETE forKey: @"Type"];
+        
+        NSString * location = [torrent dataLocation];
+        if (location)
+            [clickContext setObject: location forKey: @"Location"];
+        
         [GrowlApplicationBridge notifyWithTitle: NSLocalizedString(@"Download Complete", "Growl notification title")
                                     description: [torrent name] notificationName: GROWL_DOWNLOAD_COMPLETE
                                     iconData: nil priority: 0 isSticky: NO clickContext: clickContext];
@@ -1843,9 +1846,12 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         }
     }
     
-    #warning dataLocation could return nil
-    NSDictionary * clickContext = [NSDictionary dictionaryWithObjectsAndKeys: GROWL_SEEDING_COMPLETE, @"Type",
-                                    [torrent dataLocation], @"Location", nil];
+    NSMutableDictionary * clickContext = [NSMutableDictionary dictionaryWithObject: GROWL_SEEDING_COMPLETE forKey: @"Type"];
+    
+    NSString * location = [torrent dataLocation];
+    if (location)
+        [clickContext setObject: location forKey: @"Location"];
+    
     [GrowlApplicationBridge notifyWithTitle: NSLocalizedString(@"Seeding Complete", "Growl notification title")
                         description: [torrent name] notificationName: GROWL_SEEDING_COMPLETE
                         iconData: nil priority: 0 isSticky: NO clickContext: clickContext];
