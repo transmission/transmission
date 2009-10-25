@@ -331,7 +331,7 @@
     if (code == NSOKButton)
     {
         //create the text to output
-        NSMutableArray * messageStrings = [NSMutableArray arrayWithCapacity: [fMessages count]];
+        NSMutableArray * messageStrings = [NSMutableArray arrayWithCapacity: [messages count]];
         for (NSDictionary * message in messages)
             [messageStrings addObject: [self stringForMessage: message]];
     
