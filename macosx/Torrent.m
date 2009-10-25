@@ -430,20 +430,17 @@ int trashDataFile(const char * filename)
 
 - (void) moveTorrentDataFileTo: (NSString *) folder
 {
-    #warning fix
-    /*NSString * oldFolder = [self downloadFolder];
+    NSString * oldFolder = [self currentDirectory];
     if ([oldFolder isEqualToString: folder])
         return;
     
     //check if moving inside itself
     NSArray * oldComponents = [oldFolder pathComponents],
             * newComponents = [folder pathComponents];
-    NSInteger count;
+    const NSInteger oldCount = [oldComponents count];
     
-    if ((count = [oldComponents count]) < [newComponents count]
-            && [[newComponents objectAtIndex: count] isEqualToString: [self name]]
-            && [oldComponents isEqualToArray:
-                    [newComponents objectsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, count)]]])
+    if (oldCount < [newComponents count] && [[newComponents objectAtIndex: oldCount] isEqualToString: [self name]]
+        && [folder hasPrefix: oldFolder])
     {
         NSAlert * alert = [[NSAlert alloc] init];
         [alert setMessageText: NSLocalizedString(@"A folder cannot be moved to inside itself.",
@@ -457,7 +454,7 @@ int trashDataFile(const char * filename)
         [alert release];
         
         return;
-    }*/
+    }
     
     int status;
     tr_torrentSetLocation(fHandle, [folder UTF8String], YES, NULL, &status);
