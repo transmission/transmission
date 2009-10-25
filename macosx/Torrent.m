@@ -262,7 +262,7 @@ int trashDataFile(const char * filename)
     fWaitToStart = NO;
     fFinishedSeeding = NO;
     
-    if (![self isActive] && /*[self alertForFolderAvailable] &&*/ [self alertForRemainingDiskSpace])
+    if (![self isActive] && [self alertForRemainingDiskSpace])
     {
         tr_torrentStart(fHandle);
         [self update];
@@ -526,61 +526,6 @@ int trashDataFile(const char * filename)
     }
     return YES;
 }
-
-#warning is this needed?
-/*- (BOOL) alertForFolderAvailable
-{
-    #warning check for change from incomplete to download folder first
-    if (access(tr_torrentGetDownloadDir(fHandle), 0))
-    {
-        NSAlert * alert = [[NSAlert alloc] init];
-        [alert setMessageText: [NSString stringWithFormat:
-                                NSLocalizedString(@"The folder for downloading \"%@\" cannot be used.",
-                                    "Folder cannot be used alert -> title"), [self name]]];
-        [alert setInformativeText: [NSString stringWithFormat:
-                        NSLocalizedString(@"\"%@\" cannot be used. The transfer will be paused.",
-                                            "Folder cannot be used alert -> message"), [self downloadFolder]]];
-        [alert addButtonWithTitle: NSLocalizedString(@"OK", "Folder cannot be used alert -> button")];
-        [alert addButtonWithTitle: [NSLocalizedString(@"Choose New Location",
-                                    "Folder cannot be used alert -> location button") stringByAppendingEllipsis]];
-        
-        if ([alert runModal] != NSAlertFirstButtonReturn)
-        {
-            NSOpenPanel * panel = [NSOpenPanel openPanel];
-            
-            [panel setPrompt: NSLocalizedString(@"Select", "Folder cannot be used alert -> prompt")];
-            [panel setAllowsMultipleSelection: NO];
-            [panel setCanChooseFiles: NO];
-            [panel setCanChooseDirectories: YES];
-            [panel setCanCreateDirectories: YES];
-
-            [panel setMessage: [NSString stringWithFormat: NSLocalizedString(@"Select the download folder for \"%@\"",
-                                "Folder cannot be used alert -> select destination folder"), [self name]]];
-            
-            [[NSNotificationCenter defaultCenter] postNotificationName: @"MakeWindowKey" object: nil];
-            [panel beginSheetForDirectory: nil file: nil types: nil modalForWindow: [NSApp keyWindow] modalDelegate: self
-                    didEndSelector: @selector(destinationChoiceClosed:returnCode:contextInfo:) contextInfo: nil];
-        }
-        
-        [alert release];
-        
-        return NO;
-    }
-    return YES;
-}
-
-- (void) destinationChoiceClosed: (NSOpenPanel *) openPanel returnCode: (NSInteger) code contextInfo: (void *) context
-{
-    if (code != NSOKButton)
-        return;
-    
-    [self changeDownloadFolder: [[openPanel filenames] objectAtIndex: 0]];
-    
-    [self startTransfer];
-    [self update];
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateStats" object: nil];
-}*/
 
 - (NSImage *) icon
 {
