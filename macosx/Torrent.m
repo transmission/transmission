@@ -511,7 +511,7 @@ int trashDataFile(const char * filename)
             [[alert suppressionButton] setTitle: NSLocalizedString(@"Do not check disk space again",
                                                     "Torrent disk space alert -> button")];
 
-            NSInteger result = [alert runModal];
+            const NSInteger result = [alert runModal];
             if ([[alert suppressionButton] state] == NSOnState)
                 [fDefaults setBool: NO forKey: @"WarningRemainingSpace"];
             [alert release];
@@ -669,7 +669,6 @@ int trashDataFile(const char * filename)
     return [NSString stringWithUTF8String: fInfo->torrent];
 }
 
-#warning returning nil causes the info field to not change - check all uses of data location
 - (NSString *) dataLocation
 {
     if ([self isFolder])

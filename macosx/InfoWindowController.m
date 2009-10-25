@@ -1377,6 +1377,9 @@ typedef enum
     NSString * location = [torrent dataLocation];
     [fDataLocationField setStringValue: location ? [location stringByAbbreviatingWithTildeInPath] : @""];
     [fDataLocationField setToolTip: location ? location : @""];
+    [fDataLocationField setSelectable: location != nil];
+    
+    [fRevealDataButton setHidden: !location];
 }
 
 - (void) updateInfoActivity
