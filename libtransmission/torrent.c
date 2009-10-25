@@ -1023,6 +1023,13 @@ tr_torrentStat( tr_torrent * tor )
             s->eta = TR_ETA_NOT_AVAIL;
             break;
     }
+    
+    if( !checkSeedRatio || s->ratio >= seedRatio || s->ratio == TR_RATIO_INF ) 
+        s->percentRatio = 1.0; 
+    else if( s->ratio == TR_RATIO_NA ) 
+        s->percentRatio = 0.0; 
+    else 
+        s->percentRatio = s->ratio / seedRatio; 
 
     tr_torrentUnlock( tor );
 
