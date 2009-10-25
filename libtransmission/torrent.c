@@ -979,16 +979,17 @@ tr_torrentStat( tr_torrent * tor )
 
     switch( s->activity )
     {
+        /* etaXLSpeed exists because if we use the piece speed directly,
+         * brief fluctuations cause the ETA to jump all over the place.
+         * so, etaXLSpeed is a smoothed-out version of the piece speed
+         * to dampen the effect of fluctuations */
+
         case TR_STATUS_DOWNLOAD:
-            /* etaSpeed exists because if we pieceDownloadSpeed directly,
-             * brief fluctuations cause the ETA to jump all over the place.
-             * so, etaSpeed is a smoothed-out version of pieceDownloadSpeed
-             * to dampen the effect of fluctuations */
-            if( ( tor->etaSpeedCalculatedAt + 800 ) < now ) {
-                tor->etaSpeed = ( ( tor->etaSpeedCalculatedAt + 4000 ) < now )
+            if( ( tor->etaDLSpeedCalculatedAt + 800 ) < now ) {
+                tor->etaDLSpeed = ( ( tor->etaDLSpeedCalculatedAt + 4000 ) < now )
                     ? s->pieceDownloadSpeed /* if no recent previous speed, no need to smooth */
-                    : 0.8*tor->etaSpeed + 0.2*s->pieceDownloadSpeed; /* smooth across 5 readings */
-                tor->etaSpeedCalculatedAt = now;
+                    : 0.8*tor->etaDLSpeed + 0.2*s->pieceDownloadSpeed; /* smooth across 5 readings */
+                tor->etaDLSpeedCalculatedAt = now;
             }
             
             if( s->leftUntilDone > s->desiredAvailable )
@@ -996,16 +997,23 @@ tr_torrentStat( tr_torrent * tor )
             else if( s->pieceDownloadSpeed < 0.1 )
                 s->eta = TR_ETA_UNKNOWN;
             else
-                s->eta = s->leftUntilDone / tor->etaSpeed / 1024.0;
+                s->eta = s->leftUntilDone / tor->etaDLSpeed / 1024.0;
             break;
 
         case TR_STATUS_SEED:
             if( checkSeedRatio )
             {
+                if( ( tor->etaULSpeedCalculatedAt + 800 ) < now ) {
+                    tor->etaULSpeed = ( ( tor->etaULSpeedCalculatedAt + 4000 ) < now )
+                        ? s->pieceUploadSpeed /* if no recent previous speed, no need to smooth */
+                        : 0.8*tor->etaULSpeed + 0.2*s->pieceUploadSpeed; /* smooth across 5 readings */
+                    tor->etaULSpeedCalculatedAt = now;
+                }
+                
                 if( s->pieceUploadSpeed < 0.1 )
                     s->eta = TR_ETA_UNKNOWN;
                 else
-                    s->eta = (downloadedForRatio * (seedRatio - s->ratio)) / s->pieceUploadSpeed / 1024.0;
+                    s->eta = (downloadedForRatio * (seedRatio - s->ratio)) / tor->etaULSpeed / 1024.0;
             }
             else
                 s->eta = TR_ETA_NOT_AVAIL;
