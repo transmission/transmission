@@ -12,14 +12,14 @@ msgstr ""
 "Project-Id-Version: Transmission\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-07-13 16:23-0500\n"
-"PO-Revision-Date: 2009-08-25 22:49+0000\n"
-"Last-Translator: Xosé <Unknown>\n"
+"PO-Revision-Date: 2009-09-24 02:45+0000\n"
+"Last-Translator: Antón Méixome <meixome@gmail.com>\n"
 "Language-Team: Galician <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2009-09-14 03:44+0000\n"
+"X-Launchpad-Export-Date: 2009-10-25 01:36+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Language: Galician\n"
 
@@ -145,7 +145,7 @@ msgstr "Pausar torrent"
 
 #: ../gtk/actions.c:111
 msgid "_Pause All"
-msgstr "_Por todos en pausa"
+msgstr "_Pór todos en pausa"
 
 #: ../gtk/actions.c:111
 msgid "Pause all torrents"
@@ -320,7 +320,7 @@ msgstr "Independentemente da _taxa das sementes"
 
 #: ../gtk/details.c:564 ../gtk/tr-prefs.c:311
 msgid "_Seed torrent until its ratio reaches:"
-msgstr "_Sementar torrets até que se acade a taxa:"
+msgstr "_Sementar torrents até que se acade a taxa:"
 
 #: ../gtk/details.c:581
 msgid "Peer Connections"
@@ -654,7 +654,7 @@ msgstr "%'d Propiedades do torrent"
 
 #: ../gtk/dialogs.c:121
 msgid "<big><b>Quit Transmission?</b></big>"
-msgstr "<big><b>¿Saír de transmission?</b></big>"
+msgstr "<big><b>¿Saír de Transmission?</b></big>"
 
 #: ../gtk/dialogs.c:133
 msgid "_Don't ask me again"
@@ -769,7 +769,7 @@ msgstr "Un cliente do BitTorrent rápido e sinxelo"
 
 #: ../gtk/main.c:1165
 msgid "Copyright 2005-2009 The Transmission Project"
-msgstr "Copyright 2005-2009 The Transmission Project"
+msgstr "Dereitos de autor 2005-2009 The Transmission Project"
 
 #. Translators: translate "translator-credits" as
 #. your name
@@ -781,6 +781,7 @@ msgstr ""
 "Festor Wailon Dacoba <festor90@gmail.com>\n"
 "\n"
 "Launchpad Contributions:\n"
+"  Antón Méixome https://launchpad.net/~meixome\n"
 "  Emiliano Goday Caneda https://launchpad.net/~egoday\n"
 "  Jon Amil https://launchpad.net/~amilgz\n"
 "  Kevin https://launchpad.net/~kevin64-deactivatedaccount\n"
@@ -1414,11 +1415,11 @@ msgstr "Proba de porto_s"
 
 #: ../gtk/tr-prefs.c:1345
 msgid "Use UPnP or NAT-PMP port _forwarding from my router"
-msgstr "Use un porto UPnP ou NAT-PMP para  _reenviar do meu encamiñador"
+msgstr "Use un porto UPnP ou NAT-PMP para  _reenviar desde o meu encamiñador"
 
 #: ../gtk/tr-prefs.c:1349
 msgid "Pick a _random port every time Transmission is started"
-msgstr "Escolla un porto aleatorio cada vez que se inicia Transmisión"
+msgstr "Escolla un porto aleatorio cada vez que se inicia Transmission"
 
 #: ../gtk/tr-prefs.c:1357
 msgid "Maximum peers per _torrent:"

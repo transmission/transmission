@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2009-07-13 16:23-0500\n"
-"PO-Revision-Date: 2008-10-16 22:02+0000\n"
-"Last-Translator: David Machakhelidze <david.machakhelidze@gmail.com>\n"
+"PO-Revision-Date: 2009-10-04 03:48+0000\n"
+"Last-Translator: Vladimer Sichinava <vsichi@gnome.org>\n"
 "Language-Team: Georgian <ka@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2009-09-14 03:44+0000\n"
+"X-Launchpad-Export-Date: 2009-10-25 01:36+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:49
@@ -573,7 +573,7 @@ msgstr ""
 
 #: ../gtk/details.c:1647
 msgid "In progress"
-msgstr ""
+msgstr "მიმდინარეობს"
 
 #: ../gtk/details.c:1792 ../gtk/makemeta-ui.c:425
 msgid "Trackers"
@@ -649,7 +649,7 @@ msgstr ""
 
 #: ../gtk/dialogs.c:121
 msgid "<big><b>Quit Transmission?</b></big>"
-msgstr ""
+msgstr "<big><b>გნებავთ პროგრამის დახურვა?</b></big>"
 
 #: ../gtk/dialogs.c:133
 msgid "_Don't ask me again"
@@ -771,7 +771,8 @@ msgstr ""
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
-"  David Machakhelidze https://launchpad.net/~david-mac"
+"  David Machakhelidze https://launchpad.net/~david-mac\n"
+"  Vladimer Sichinava https://launchpad.net/~alinux"
 
 #: ../gtk/makemeta-ui.c:109
 msgid "Torrent created!"

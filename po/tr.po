@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-07-13 16:23-0500\n"
-"PO-Revision-Date: 2009-08-08 14:34+0000\n"
-"Last-Translator: ironic <Unknown>\n"
+"PO-Revision-Date: 2009-10-11 15:45+0000\n"
+"Last-Translator: aylincan <Unknown>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2009-09-14 03:44+0000\n"
+"X-Launchpad-Export-Date: 2009-10-25 01:36+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:49
@@ -164,7 +164,7 @@ msgstr "Torrenti kaldır"
 
 #: ../gtk/actions.c:115
 msgid "_Delete Files and Remove"
-msgstr "D_osyaları Sil ve Kaldır"
+msgstr "_Dosyaları Sil ve Kaldır"
 
 #: ../gtk/actions.c:116
 msgid "_New..."
@@ -196,7 +196,7 @@ msgstr "_Klasör Aç"
 
 #: ../gtk/actions.c:124
 msgid "_Contents"
-msgstr "İçinde_kiler"
+msgstr "_İçindekiler"
 
 #: ../gtk/actions.c:125
 msgid "Ask Tracker for _More Peers"
@@ -291,7 +291,7 @@ msgstr ""
 
 #: ../gtk/details.c:515 ../gtk/tr-prefs.c:1180
 msgid "Limit _download speed (KB/s):"
-msgstr "İ_ndirme hızını sınırla (KB/s):"
+msgstr "_İndirme hızını sınırla (KB/s):"
 
 #: ../gtk/details.c:527 ../gtk/tr-prefs.c:1187
 msgid "Limit _upload speed (KB/s):"
@@ -720,7 +720,7 @@ msgstr "Yapılandırma dosyalarının bakılacağı yer"
 
 #: ../gtk/main.c:366
 msgid "Transmission"
-msgstr "Tranmission"
+msgstr "Transmission"
 
 #: ../gtk/main.c:373
 msgid "[torrent files]"
@@ -776,6 +776,7 @@ msgstr ""
 "  Ramazan AYYILDIZ https://launchpad.net/~rayyildiz\n"
 "  Selim Suerkan https://launchpad.net/~mokoko\n"
 "  Yigit Güneli https://launchpad.net/~yiit\n"
+"  aylincan https://launchpad.net/~sevencan83\n"
 "  charles https://launchpad.net/~charles-rebelbase\n"
 "  ironic https://launchpad.net/~fatihbostanci\n"
 "  webdr https://launchpad.net/~drumut\n"
@@ -1187,7 +1188,7 @@ msgstr "Yeni engelli listesi alınıyor..."
 
 #: ../gtk/tr-prefs.c:458
 msgid "Allow encryption"
-msgstr ""
+msgstr "Şifrelemeye izin ver"
 
 #: ../gtk/tr-prefs.c:459
 msgid "Prefer encryption"

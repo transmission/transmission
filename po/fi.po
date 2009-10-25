@@ -7,14 +7,14 @@ msgstr ""
 "Project-Id-Version: fi\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-07-13 16:23-0500\n"
-"PO-Revision-Date: 2009-09-05 18:51+0000\n"
-"Last-Translator: Elias Julkunen <elias.julkunen@gmail.com>\n"
+"PO-Revision-Date: 2009-10-03 00:43+0000\n"
+"Last-Translator: Christian Hellberg <Unknown>\n"
 "Language-Team: -\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2009-09-14 03:44+0000\n"
+"X-Launchpad-Export-Date: 2009-10-25 01:36+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:49
@@ -775,6 +775,7 @@ msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
 "  Birunthan Mohanathas https://launchpad.net/~biru\n"
+"  Christian Hellberg https://launchpad.net/~christian-hellberg\n"
 "  Elias Julkunen https://launchpad.net/~eliasj\n"
 "  Erektium https://launchpad.net/~meizinteizi\n"
 "  Heikki Kulhia https://launchpad.net/~hessuk\n"
@@ -1092,11 +1093,11 @@ msgstr "Lataa ja jaa tiedostoja BitTorrentin kautta"
 
 #: ../gtk/transmission.desktop.in.h:3
 msgid "Transmission BitTorrent Client"
-msgstr "Transmission - BitTorrent-asiakasohjelma"
+msgstr "Transmission – BitTorrent-asiakas"
 
 #: ../gtk/tr-core.c:1118
 msgid "Transmission Bittorrent Client"
-msgstr "Transmission-bittorrent-asiakasohjelma"
+msgstr "Transmission – BitTorrent-asiakas"
 
 #: ../gtk/tr-core.c:1119
 msgid "BitTorrent Activity"
@@ -1363,11 +1364,11 @@ msgstr "Korvaa normaalit siirtorajoitukset käsin tai ajastettuina aikoina"
 
 #: ../gtk/tr-prefs.c:1212
 msgid "Limit do_wnload speed (KB/s):"
-msgstr "Rajoita _latausnopeutta (KB/s):"
+msgstr "Rajoita _latausnopeutta (Kt/s):"
 
 #: ../gtk/tr-prefs.c:1216
 msgid "Limit u_pload speed (KB/s):"
-msgstr "Rajoita l_ähetysnopeutta (KB/s):"
+msgstr "Rajoita l_ähetysnopeutta (Kt/s):"
 
 #: ../gtk/tr-prefs.c:1220
 msgid "_Scheduled times:"
@@ -1375,7 +1376,7 @@ msgstr "_Määriteltyinä aikoina:"
 
 #: ../gtk/tr-prefs.c:1225
 msgid " _to "
-msgstr ""
+msgstr " _kenelle "
 
 #: ../gtk/tr-prefs.c:1236
 msgid "_On days:"

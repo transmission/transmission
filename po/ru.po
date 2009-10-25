@@ -10,15 +10,15 @@ msgstr ""
 "Project-Id-Version: Transmission HEAD\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-07-13 16:23-0500\n"
-"PO-Revision-Date: 2009-08-26 17:31+0000\n"
-"Last-Translator: Sergei Sedov <sedov@webmail.perm.ru>\n"
+"PO-Revision-Date: 2009-10-21 13:28+0000\n"
+"Last-Translator: Sergei Sedov <Unknown>\n"
 "Language-Team: Russian <gnome-cyr@gnome.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2009-09-14 03:44+0000\n"
+"X-Launchpad-Export-Date: 2009-10-25 01:36+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Country: RUSSIAN FEDERATION\n"
 "X-Poedit-Language: Russian\n"
@@ -34,7 +34,7 @@ msgstr "Сортировать по _названию"
 
 #: ../gtk/actions.c:51
 msgid "Sort by _Progress"
-msgstr "Сортировать по _прогрессу"
+msgstr "Сортировать по степени _загрузки"
 
 #: ../gtk/actions.c:52
 msgid "Sort by Rati_o"
@@ -46,7 +46,7 @@ msgstr "Сортировать по сост_оянию"
 
 #: ../gtk/actions.c:54
 msgid "Sort by T_racker"
-msgstr "Сортировать по т_рэкеру"
+msgstr "Сортировать по т_рекеру"
 
 #: ../gtk/actions.c:55
 msgid "Sort by A_ge"
@@ -82,7 +82,7 @@ msgstr "Об_ратный порядок сортировки"
 
 #: ../gtk/actions.c:93
 msgid "_Filterbar"
-msgstr "_Фильтры"
+msgstr "_Панель _фильтров"
 
 #: ../gtk/actions.c:94
 msgid "_Statusbar"
@@ -293,15 +293,15 @@ msgstr "Скорость"
 
 #: ../gtk/details.c:510
 msgid "Honor global _limits"
-msgstr "Честные общие лимит_ы"
+msgstr "Соблюдать общие лимит_ы"
 
 #: ../gtk/details.c:515 ../gtk/tr-prefs.c:1180
 msgid "Limit _download speed (KB/s):"
-msgstr "Ограничить скорость _приёма (КБ/с):"
+msgstr "Ограничить скорость _приёма (Кб/с):"
 
 #: ../gtk/details.c:527 ../gtk/tr-prefs.c:1187
 msgid "Limit _upload speed (KB/s):"
-msgstr "Ограничить скорость _раздачи (КБ/с):"
+msgstr "Ограничить скорость _раздачи (Кб/с):"
 
 #: ../gtk/details.c:539
 msgid "Torrent _priority:"
@@ -333,15 +333,15 @@ msgstr "_Максимальное количество узлов:"
 
 #: ../gtk/details.c:603 ../gtk/torrent-cell-renderer.c:173
 msgid "Waiting to verify local data"
-msgstr "Ожидается проверка локальных данных"
+msgstr "Ожидается проверка загруженных данных"
 
 #: ../gtk/details.c:604
 msgid "Verifying local data"
-msgstr "Проверка локальных данных"
+msgstr "Проверка загруженных данных"
 
 #: ../gtk/details.c:605
 msgid "Downloading"
-msgstr "Приём"
+msgstr "Загрузка"
 
 #: ../gtk/details.c:606
 msgid "Seeding"
@@ -549,7 +549,7 @@ msgstr "Зашифрованное соединение"
 
 #: ../gtk/details.c:1411
 msgid "Peer was discovered through Peer Exchange (PEX)"
-msgstr "Узел был обнаружен с помощью обмена узлами (PEX)"
+msgstr "Узел был обнаружен с помощью Обмена узалми (PEX)"
 
 #: ../gtk/details.c:1412
 msgid "Peer was discovered through DHT"
@@ -792,20 +792,16 @@ msgstr ""
 "Anton Shestakov <engored@ya.ru>\n"
 "\n"
 "Launchpad Contributions:\n"
-"   Anton Shestakov\n"
-"   Igor Zubarev\n"
-"   Pavels Sevcuks\n"
-"   Sergei Medvedev\n"
-"\n"
-"Launchpad Contributions:\n"
 "  Abaza https://launchpad.net/~abazinchik\n"
 "  Alexander Chumanov https://launchpad.net/~achumanov\n"
 "  Alexander Semyonov https://launchpad.net/~rotuka\n"
 "  Alexei Klimenko https://launchpad.net/~nimda7\n"
+"  Alexey Torkhov https://launchpad.net/~atorkhov\n"
 "  Andrei Dziahel https://launchpad.net/~develop7\n"
 "  Andrey Sitnik https://launchpad.net/~iskin\n"
 "  Anton Shestakov https://launchpad.net/~engored\n"
 "  Arseny Solokha https://launchpad.net/~raising-the-bar\n"
+"  ArtemZ https://launchpad.net/~zhirkow-yahoo\n"
 "  DooMka https://launchpad.net/~xpym-xpym\n"
 "  Egor Bushmelyov https://launchpad.net/~skipper95\n"
 "  Grigorev Mihail https://launchpad.net/~grigorevmn\n"
@@ -813,12 +809,13 @@ msgstr ""
 "  Ilya Barygin https://launchpad.net/~randomaction\n"
 "  Ivan Kliouchenkov https://launchpad.net/~quick\n"
 "  Kirill Holodilin https://launchpad.net/~charlie-chrl\n"
-"  Koptev Oleg https://launchpad.net/~koptev-oleg\n"
+"  Koterpillar https://launchpad.net/~koterpillar\n"
 "  Max Riveiro https://launchpad.net/~kavu\n"
 "  Max Schukin https://launchpad.net/~schukin\n"
 "  Maxim Prokopyev https://launchpad.net/~xjazz\n"
 "  Maxim S. https://launchpad.net/~luvme-nn\n"
 "  Novikov Andrey https://launchpad.net/~envek\n"
+"  Oleg Koptev https://launchpad.net/~koptev-oleg\n"
 "  Pavel Dmitriev https://launchpad.net/~dmitrievp\n"
 "  Pavels Sevcuks https://launchpad.net/~stlwrt\n"
 "  Phenomen https://launchpad.net/~xphenomen-ya\n"
@@ -1226,11 +1223,9 @@ msgstr "Показывать всплывающие _уведомления"
 #, c-format
 msgid "Enable _blocklist (contains %'d rule)"
 msgid_plural "Enable _blocklist (contains %'d rules)"
-msgstr[0] ""
-"Разрешить использование \"_чёрного списка\" (содержит %'d правило)"
-msgstr[1] ""
-"Разрешить использование \"_чёрного списка\" (содержит %'d правила)"
-msgstr[2] "Разрешить использование \"_чёрного списка\" (содержит %'d правил)"
+msgstr[0] "Разрешить использование «_чёрного списка» (содержит %'d правило)"
+msgstr[1] "Разрешить использование «_чёрного списка» (содержит %'d правила)"
+msgstr[2] "Разрешить использование «_чёрного списка» (содержит %'d правил)"
 
 #: ../gtk/tr-prefs.c:402
 #, c-format
@@ -1337,7 +1332,7 @@ msgstr "Па_роль:"
 #. require authentication
 #: ../gtk/tr-prefs.c:798
 msgid "Only allow these IP a_ddresses to connect:"
-msgstr "Разрешать соединения только этим IP адресам:"
+msgstr "Разрешать соединения только c этих IP-адресов:"
 
 #: ../gtk/tr-prefs.c:823
 msgid "IP addresses may use wildcards, such as 192.168.*.*"
@@ -1426,7 +1421,7 @@ msgstr "Ограничить скорость р_аздачи (КБ/с):"
 
 #: ../gtk/tr-prefs.c:1220
 msgid "_Scheduled times:"
-msgstr "_Расписание:"
+msgstr "_По расписанию:"
 
 #: ../gtk/tr-prefs.c:1225
 msgid " _to "
@@ -1804,7 +1799,7 @@ msgstr "Невозможно изменить адрес источника с %
 #: ../libtransmission/net.c:339
 #, c-format
 msgid "Couldn't connect socket %d to %s, port %d (errno %d - %s)"
-msgstr "Не удалось подключить сокет %d к %s на порт %d (код ошибки %d — %s)"
+msgstr "Не удалось подключить сокет %d к %s на порт %d (код ошибки %d - %s)"
 
 #: ../libtransmission/net.c:392
 #, c-format
@@ -1817,7 +1812,7 @@ msgstr "Перенаправление портов"
 
 #: ../libtransmission/port-forwarding.c:59
 msgid "Starting"
-msgstr "Устанавливается"
+msgstr "Запускается"
 
 #: ../libtransmission/port-forwarding.c:60
 msgid "Forwarded"
@@ -1825,7 +1820,7 @@ msgstr "Перенаправлен"
 
 #: ../libtransmission/port-forwarding.c:61
 msgid "Stopping"
-msgstr "Сбрасывается"
+msgstr "Останавливается"
 
 #: ../libtransmission/port-forwarding.c:62
 msgid "Not forwarded"
@@ -1846,7 +1841,7 @@ msgstr "%s %s запущен"
 #: ../libtransmission/session.c:1578
 #, c-format
 msgid "Loaded %d torrents"
-msgstr "Загружено %d торрентов"
+msgstr "Загружено торрентов: %d"
 
 #: ../libtransmission/torrent.c:273
 #, c-format
@@ -1869,7 +1864,7 @@ msgstr "Готово"
 
 #: ../libtransmission/torrent.c:1442
 msgid "Complete"
-msgstr "Все задачи завершены"
+msgstr "Завершено"
 
 #: ../libtransmission/torrent.c:1445
 msgid "Incomplete"
@@ -1908,7 +1903,7 @@ msgstr ""
 
 #: ../libtransmission/upnp.c:197
 msgid "Port forwarding successful!"
-msgstr "Перенаправление портов удалось!"
+msgstr "Перенаправление портов работает!"
 
 #: ../libtransmission/utils.c:521
 msgid "Not a regular file"

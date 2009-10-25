@@ -7,14 +7,14 @@ msgstr ""
 "Project-Id-Version: transmission-gtk\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-07-13 16:23-0500\n"
-"PO-Revision-Date: 2009-09-12 10:08+0000\n"
+"PO-Revision-Date: 2009-09-19 14:22+0000\n"
 "Last-Translator: Tiago Silva <Unknown>\n"
 "Language-Team: Portuguese <gnome_pt@yahoogroups.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2009-09-14 03:44+0000\n"
+"X-Launchpad-Export-Date: 2009-10-25 01:36+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:49
@@ -107,7 +107,7 @@ msgstr "_Ajuda"
 
 #: ../gtk/actions.c:105 ../gtk/actions.c:106
 msgid "Add a torrent"
-msgstr "Adicionar un torrent"
+msgstr "Adicionar um torrent"
 
 #: ../gtk/actions.c:106
 msgid "_Add..."
@@ -119,7 +119,7 @@ msgstr "_Arrancar"
 
 #: ../gtk/actions.c:107
 msgid "Start torrent"
-msgstr ""
+msgstr "Iniciar torrent"
 
 #: ../gtk/actions.c:108
 msgid "_Statistics"
@@ -143,7 +143,7 @@ msgstr "_Pausar Todos"
 
 #: ../gtk/actions.c:111
 msgid "Pause all torrents"
-msgstr ""
+msgstr "Pausar todos os torrents"
 
 #: ../gtk/actions.c:112
 msgid "_Start All"
@@ -151,7 +151,7 @@ msgstr ""
 
 #: ../gtk/actions.c:112
 msgid "Start all torrents"
-msgstr ""
+msgstr "Iniciar todos os torrents"
 
 #: ../gtk/actions.c:113
 msgid "Set _Location"
@@ -231,7 +231,7 @@ msgstr ""
 
 #: ../gtk/add-dialog.c:330
 msgid "_Destination folder:"
-msgstr ""
+msgstr "Pasta de _destino:"
 
 #: ../gtk/add-dialog.c:337
 msgid "Select Destination Folder"

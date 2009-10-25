@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2009-07-13 16:23-0500\n"
-"PO-Revision-Date: 2009-07-24 12:37+0000\n"
-"Last-Translator: Dejan Dežman <159643@gmail.com>\n"
+"PO-Revision-Date: 2009-10-01 21:04+0000\n"
+"Last-Translator: Klemen Košir <klemen913@gmail.com>\n"
 "Language-Team: Slovenian <sl@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 || "
 "n%100==4 ? 3 : 0);\n"
-"X-Launchpad-Export-Date: 2009-09-14 03:44+0000\n"
+"X-Launchpad-Export-Date: 2009-10-25 01:36+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:49
@@ -404,7 +404,7 @@ msgstr "%1$s (%2$.1f%%); %3$s nepreverjeno"
 #: ../gtk/details.c:800
 #, c-format
 msgid "%1$s (%2$.1f%%)"
-msgstr ""
+msgstr "%1$s (%2$.1f%%)"
 
 #: ../gtk/details.c:820
 #, c-format
@@ -777,7 +777,7 @@ msgstr "Hiter in preprost BitTorrent odjemalec"
 
 #: ../gtk/main.c:1165
 msgid "Copyright 2005-2009 The Transmission Project"
-msgstr ""
+msgstr "Vse pravice pridržane. 2005-2009 The Transmission Project"
 
 #. Translators: translate "translator-credits" as
 #. your name
@@ -1020,7 +1020,7 @@ msgstr "%1$s od %2$s (%3$.2f%%), naloženo %4$s (razmerje: %5$s)"
 #: ../gtk/torrent-cell-renderer.c:88
 #, c-format
 msgid "%1$s, uploaded %2$s (Ratio: %3$s Goal: %4$s)"
-msgstr ""
+msgstr "%1$s, naloženo %2$s (Razmerje: %3$s Cilj: %4$s)"
 
 #. %1$s is the torrent's total size,
 #. %2$s is how much we've uploaded,
@@ -1222,7 +1222,7 @@ msgstr "Dovoli šifriranje"
 
 #: ../gtk/tr-prefs.c:459
 msgid "Prefer encryption"
-msgstr ""
+msgstr "Priporoči šifriranje"
 
 #: ../gtk/tr-prefs.c:460
 msgid "Require encryption"
@@ -1250,20 +1250,21 @@ msgstr "Način _šifriranja:"
 
 #: ../gtk/tr-prefs.c:533
 msgid "Use PE_X to find more peers"
-msgstr ""
+msgstr "Uporabi PE_X za iskanje soležnikov"
 
 #: ../gtk/tr-prefs.c:535
 msgid ""
 "PEX is a tool for exchanging peer lists with the peers you're connected to."
 msgstr ""
+"PEX je orodje za izmenjavo soležnikov s soležniki, s katerimi ste povezani."
 
 #: ../gtk/tr-prefs.c:540
 msgid "Use _DHT to find more peers"
-msgstr ""
+msgstr "Uporabi _DHT za iskanje soležnikov"
 
 #: ../gtk/tr-prefs.c:542
 msgid "DHT is a tool for finding peers without a tracker."
-msgstr ""
+msgstr "DHT je orodje za iskanje soležnikov brez uporabe sledilnika."
 
 #: ../gtk/tr-prefs.c:753
 msgid "Web Client"
@@ -1285,7 +1286,7 @@ msgstr "Zaznavanje na _vratih:"
 #. require authentication
 #: ../gtk/tr-prefs.c:775 ../gtk/tr-prefs.c:992
 msgid "Use _authentication"
-msgstr ""
+msgstr "Uporabi _avtentikacijo"
 
 #. username
 #: ../gtk/tr-prefs.c:783 ../gtk/tr-prefs.c:998
@@ -1300,7 +1301,7 @@ msgstr "Geslo:"
 #. require authentication
 #: ../gtk/tr-prefs.c:798
 msgid "Only allow these IP a_ddresses to connect:"
-msgstr ""
+msgstr "Povezavo dovoli samo tem IP naslovom:"
 
 #: ../gtk/tr-prefs.c:823
 msgid "IP addresses may use wildcards, such as 192.168.*.*"
@@ -1380,11 +1381,11 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:1212
 msgid "Limit do_wnload speed (KB/s):"
-msgstr ""
+msgstr "Omeji hitrost _prenašanja (KB/s):"
 
 #: ../gtk/tr-prefs.c:1216
 msgid "Limit u_pload speed (KB/s):"
-msgstr ""
+msgstr "Omeji hitrost _nalaganja (KB/s):"
 
 #: ../gtk/tr-prefs.c:1220
 msgid "_Scheduled times:"
@@ -1400,7 +1401,7 @@ msgstr "_Na dneve:"
 
 #: ../gtk/tr-prefs.c:1270 ../gtk/tr-prefs.c:1335
 msgid "Status unknown"
-msgstr ""
+msgstr "Stanje neznano"
 
 #: ../gtk/tr-prefs.c:1292
 msgid "Port is <b>open</b>"
@@ -1420,11 +1421,11 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:1330
 msgid "_Port for incoming connections:"
-msgstr ""
+msgstr "_Vrata za prihajajoče povezave"
 
 #: ../gtk/tr-prefs.c:1338
 msgid "Te_st Port"
-msgstr ""
+msgstr "Testiraj vrata"
 
 #: ../gtk/tr-prefs.c:1345
 msgid "Use UPnP or NAT-PMP port _forwarding from my router"
@@ -1432,7 +1433,7 @@ msgstr "Uporabi UPnP ali NAT-PMP posredovanje vrat za moj usmerjevalnik"
 
 #: ../gtk/tr-prefs.c:1349
 msgid "Pick a _random port every time Transmission is started"
-msgstr ""
+msgstr "Izberi _naključna vrata ob vsakem zagonu Transmissiona"
 
 #: ../gtk/tr-prefs.c:1357
 msgid "Maximum peers per _torrent:"
@@ -1503,6 +1504,8 @@ msgid ""
 "Click to disable Temporary Speed Limits\n"
 "(%1$s down, %2$s up)"
 msgstr ""
+"Pritisnite za začasno onemogočitev omejitev hitrosti\n"
+"(%1$s dol %2$s gor)"
 
 #: ../gtk/tr-window.c:341
 #, c-format
@@ -1510,6 +1513,8 @@ msgid ""
 "Click to enable Temporary Speed Limits\n"
 "(%1$s down, %2$s up)"
 msgstr ""
+"Pritisnite za začasno omogočitev omejitev hitrosti\n"
+"(%1$s dol, %2$s gor)"
 
 #: ../gtk/tr-window.c:590
 #, c-format
@@ -1526,20 +1531,20 @@ msgstr "Sej za vedno"
 
 #: ../gtk/tr-window.c:766
 msgid "Limit Download Speed"
-msgstr ""
+msgstr "Omeji hitrost prenašanja"
 
 #: ../gtk/tr-window.c:770
 msgid "Limit Upload Speed"
-msgstr ""
+msgstr "Omeji hitrost nalaganja"
 
 #: ../gtk/tr-window.c:777
 msgid "Stop Seeding at Ratio"
-msgstr ""
+msgstr "Končaj s sejanjem pri razmerju"
 
 #: ../gtk/tr-window.c:811
 #, c-format
 msgid "Stop at Ratio (%s)"
-msgstr ""
+msgstr "Končaj pri razmerju (%s)"
 
 #. show all torrents
 #: ../gtk/tr-window.c:837
@@ -1715,7 +1720,7 @@ msgstr "Branje nadaljevalne datoteke ni uspelo"
 #: ../libtransmission/fdlimit.c:296
 #, c-format
 msgid "Couldn't create \"%1$s\": \"%2$s\" is not a folder"
-msgstr ""
+msgstr "Ne morem ustvariti \"%1$s\": \"%2$s\" ni mapa"
 
 #: ../libtransmission/fdlimit.c:319
 #, c-format

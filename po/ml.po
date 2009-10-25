@@ -8,23 +8,23 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2009-07-13 16:23-0500\n"
-"PO-Revision-Date: 2008-06-05 15:47+0000\n"
-"Last-Translator: പ്രതീഷ് പ്രകാശ് <Unknown>\n"
+"PO-Revision-Date: 2009-10-11 14:43+0000\n"
+"Last-Translator: sajinsj <saji89@gmail.com>\n"
 "Language-Team: Malayalam <ml@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2009-09-14 03:44+0000\n"
+"X-Launchpad-Export-Date: 2009-10-25 01:36+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:49
 msgid "Sort by _Activity"
-msgstr ""
+msgstr "ക്രമീകരണം- ജോലിയുടെ അടിസ്താനത്തില്‍"
 
 #: ../gtk/actions.c:50
 msgid "Sort by _Name"
-msgstr ""
+msgstr "_പേരനുസരിച്ചു് ക്രമത്തിലാക്കുക"
 
 #: ../gtk/actions.c:51
 msgid "Sort by _Progress"
@@ -52,11 +52,11 @@ msgstr ""
 
 #: ../gtk/actions.c:57
 msgid "Sort by Si_ze"
-msgstr ""
+msgstr "ക്രമീകരണം‌‌- വലുപ്പതിന്റെ അടിസ്താനത്തില്‍"
 
 #: ../gtk/actions.c:74
 msgid "_Main Window"
-msgstr ""
+msgstr "പ്രധാന ജാലകം"
 
 #: ../gtk/actions.c:75
 msgid "Message _Log"
@@ -72,7 +72,7 @@ msgstr ""
 
 #: ../gtk/actions.c:92
 msgid "Re_verse Sort Order"
-msgstr ""
+msgstr "പിറകോട്ടു-  ക്രമീകരണം‌‌"
 
 #: ../gtk/actions.c:93
 msgid "_Filterbar"
@@ -84,7 +84,7 @@ msgstr "_‌സ്ഥിതിവിവര പട്ട"
 
 #: ../gtk/actions.c:95
 msgid "_Toolbar"
-msgstr "ടൂള്‍ ബാര്‍ (_T)"
+msgstr "ഉപകരണനിര"
 
 #: ../gtk/actions.c:100
 msgid "_Torrent"
@@ -92,7 +92,7 @@ msgstr "ടോറന്റ് (_T)"
 
 #: ../gtk/actions.c:101
 msgid "_View"
-msgstr "കാഴ്ച (_V)"
+msgstr "‌_കാണുക"
 
 #: ../gtk/actions.c:102
 msgid "_Sort Torrents By"
@@ -100,11 +100,11 @@ msgstr ""
 
 #: ../gtk/actions.c:103
 msgid "_Edit"
-msgstr "മാറ്റം വരുത്തുക (_E)"
+msgstr "ചിട്ടപ്പെടുത്തുക (_E)"
 
 #: ../gtk/actions.c:104
 msgid "_Help"
-msgstr "സഹായം _H"
+msgstr "സഹായം"
 
 #: ../gtk/actions.c:105 ../gtk/actions.c:106
 msgid "Add a torrent"
@@ -112,7 +112,7 @@ msgstr ""
 
 #: ../gtk/actions.c:106
 msgid "_Add..."
-msgstr "ചേര്‍ക്കുക... (_A)"
+msgstr "ചേര്ക്കുക..."
 
 #: ../gtk/actions.c:107
 msgid "_Start"
@@ -774,6 +774,7 @@ msgstr ""
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
+"  sajinsj https://launchpad.net/~sajinsj\n"
 "  പ്രതീഷ് പ്രകാശ് https://launchpad.net/~pratheesh"
 
 #: ../gtk/makemeta-ui.c:109

@@ -3,14 +3,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-07-13 16:23-0500\n"
-"PO-Revision-Date: 2009-07-14 14:23+0000\n"
-"Last-Translator: Eyal Levin <eyalev@gmail.com>\n"
+"PO-Revision-Date: 2009-09-29 18:36+0000\n"
+"Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2009-09-14 03:44+0000\n"
+"X-Launchpad-Export-Date: 2009-10-25 01:36+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Language: Hebrew\n"
 
@@ -28,15 +28,15 @@ msgstr "מיון לפי _התקדמות"
 
 #: ../gtk/actions.c:52
 msgid "Sort by Rati_o"
-msgstr ""
+msgstr "מיון לפי י_חס"
 
 #: ../gtk/actions.c:53
 msgid "Sort by Stat_e"
-msgstr ""
+msgstr "מיון לפי מ_צב"
 
 #: ../gtk/actions.c:54
 msgid "Sort by T_racker"
-msgstr ""
+msgstr "מיון לפי ט_ראקר"
 
 #: ../gtk/actions.c:55
 msgid "Sort by A_ge"
@@ -44,11 +44,11 @@ msgstr "מיון לפי גי_ל"
 
 #: ../gtk/actions.c:56
 msgid "Sort by Time _Left"
-msgstr ""
+msgstr "מיון לפי זמן _שעבר"
 
 #: ../gtk/actions.c:57
 msgid "Sort by Si_ze"
-msgstr ""
+msgstr "מיון לפי גו_דל"
 
 #: ../gtk/actions.c:74
 msgid "_Main Window"
@@ -60,7 +60,7 @@ msgstr "יו_מן הודעות"
 
 #: ../gtk/actions.c:90
 msgid "Temporary  Speed _Limits"
-msgstr ""
+msgstr "מגבלות מהירות _זמניות"
 
 #: ../gtk/actions.c:91
 msgid "_Minimal View"
@@ -68,7 +68,7 @@ msgstr "תצוגה _מינימלית"
 
 #: ../gtk/actions.c:92
 msgid "Re_verse Sort Order"
-msgstr ""
+msgstr "מיון בסדר ה_פוך"
 
 #: ../gtk/actions.c:93
 msgid "_Filterbar"
@@ -144,15 +144,15 @@ msgstr "השהה את כל הטורנטים"
 
 #: ../gtk/actions.c:112
 msgid "_Start All"
-msgstr ""
+msgstr "ה_תחלת הכול"
 
 #: ../gtk/actions.c:112
 msgid "Start all torrents"
-msgstr ""
+msgstr "התחלת הורדת כל הטורנטים"
 
 #: ../gtk/actions.c:113
 msgid "Set _Location"
-msgstr ""
+msgstr "הגדרת _מיקום"
 
 #: ../gtk/actions.c:114
 msgid "Remove torrent"
@@ -263,7 +263,7 @@ msgstr "%s כבר פעיל."
 #: ../gtk/conf.c:448 ../gtk/conf.c:453
 #, c-format
 msgid "Importing \"%s\""
-msgstr ""
+msgstr "ייבוא \"%s\" מתבצע"
 
 #: ../gtk/details.c:470 ../gtk/file-list.c:579
 msgid "High"
@@ -279,7 +279,7 @@ msgstr "נמוכה"
 
 #: ../gtk/details.c:508 ../gtk/tr-prefs.c:1395
 msgid "Speed"
-msgstr ""
+msgstr "מהירות"
 
 #: ../gtk/details.c:510
 msgid "Honor global _limits"
@@ -295,15 +295,15 @@ msgstr "הגבל מהירות _העלאה (ק\"ב/ש):"
 
 #: ../gtk/details.c:539
 msgid "Torrent _priority:"
-msgstr ""
+msgstr "עדיפות ה_טורנט:"
 
 #: ../gtk/details.c:543
 msgid "Seed-Until Ratio"
-msgstr ""
+msgstr "זריעה עד ליחס של"
 
 #: ../gtk/details.c:546
 msgid "Use _global settings"
-msgstr ""
+msgstr "שימוש בה_גדרות גלובליות"
 
 #: ../gtk/details.c:555
 msgid "Seed _regardless of ratio"

@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2009-07-13 16:23-0500\n"
-"PO-Revision-Date: 2009-03-16 05:29+0000\n"
-"Last-Translator: Shin Hungjae <f9mbfxzcdve8@gmail.com>\n"
+"PO-Revision-Date: 2009-09-30 01:39+0000\n"
+"Last-Translator: sungyup nham <Unknown>\n"
 "Language-Team: Korean <ko@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2009-09-14 03:44+0000\n"
+"X-Launchpad-Export-Date: 2009-10-25 01:36+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:49
@@ -76,7 +76,7 @@ msgstr ""
 
 #: ../gtk/actions.c:93
 msgid "_Filterbar"
-msgstr ""
+msgstr "필터 표시줄(_F)"
 
 #: ../gtk/actions.c:94
 msgid "_Statusbar"
@@ -200,7 +200,7 @@ msgstr "내용(_C)"
 
 #: ../gtk/actions.c:125
 msgid "Ask Tracker for _More Peers"
-msgstr ""
+msgstr "더 많은(_M) Peer들에 관해 추적기에 요청"
 
 #: ../gtk/add-dialog.c:241
 msgid "Torrent files"
@@ -348,7 +348,7 @@ msgstr ""
 #: ../gtk/details.c:618 ../gtk/details.c:1346 ../gtk/details.c:1643
 #: ../gtk/util.c:68 ../libtransmission/utils.c:1348
 msgid "None"
-msgstr ""
+msgstr "없음"
 
 #: ../gtk/details.c:619 ../gtk/details.c:1645 ../gtk/file-list.c:582
 msgid "Mixed"
@@ -360,7 +360,7 @@ msgstr ""
 
 #: ../gtk/details.c:641
 msgid "Public torrent"
-msgstr ""
+msgstr "공개 토런트"
 
 #: ../gtk/details.c:663
 #, c-format
@@ -429,15 +429,15 @@ msgstr ""
 
 #: ../gtk/details.c:928 ../gtk/stats.c:149 ../gtk/stats.c:161
 msgid "Downloaded:"
-msgstr ""
+msgstr "다운로드됨:"
 
 #: ../gtk/details.c:932 ../gtk/stats.c:147 ../gtk/stats.c:159
 msgid "Uploaded:"
-msgstr ""
+msgstr "업로드됨:"
 
 #: ../gtk/details.c:936 ../gtk/stats.c:151 ../gtk/stats.c:163
 msgid "Ratio:"
-msgstr ""
+msgstr "비율:"
 
 #: ../gtk/details.c:940
 msgid "State:"
@@ -453,11 +453,11 @@ msgstr ""
 
 #: ../gtk/details.c:952
 msgid "Error:"
-msgstr ""
+msgstr "오류:"
 
 #: ../gtk/details.c:956
 msgid "Details"
-msgstr ""
+msgstr "세부 사항"
 
 #: ../gtk/details.c:962
 msgid "Location:"
@@ -465,11 +465,11 @@ msgstr ""
 
 #: ../gtk/details.c:969
 msgid "Hash:"
-msgstr ""
+msgstr "해시:"
 
 #: ../gtk/details.c:974
 msgid "Privacy:"
-msgstr ""
+msgstr "프라이버시"
 
 #: ../gtk/details.c:979
 msgid "Origin:"
@@ -477,7 +477,7 @@ msgstr ""
 
 #: ../gtk/details.c:996
 msgid "Comment:"
-msgstr ""
+msgstr "주석:"
 
 #: ../gtk/details.c:1028
 msgid "Webseeds"
@@ -513,7 +513,7 @@ msgstr ""
 
 #: ../gtk/details.c:1404
 msgid "Downloading from this peer"
-msgstr ""
+msgstr "동료(peer)로 부터 다운로드 중"
 
 #: ../gtk/details.c:1405
 msgid "We would download from this peer if they would let us"
@@ -521,7 +521,7 @@ msgstr ""
 
 #: ../gtk/details.c:1406
 msgid "Uploading to peer"
-msgstr ""
+msgstr "동료(peer)에게 업로드 중"
 
 #: ../gtk/details.c:1407
 msgid "We would upload to this peer if they asked"
@@ -537,7 +537,7 @@ msgstr ""
 
 #: ../gtk/details.c:1410
 msgid "Encrypted connection"
-msgstr ""
+msgstr "암호화된 연결"
 
 #: ../gtk/details.c:1411
 msgid "Peer was discovered through Peer Exchange (PEX)"
@@ -549,7 +549,7 @@ msgstr ""
 
 #: ../gtk/details.c:1413
 msgid "Peer is an incoming connection"
-msgstr ""
+msgstr "동료(peer)는 들어오는 연결입니다"
 
 #: ../gtk/details.c:1596
 msgid "<b>Seeders:</b>"
@@ -775,7 +775,8 @@ msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
 "  Exsecrabilus https://launchpad.net/~exsecrabilus\n"
-"  Shin Hungjae https://launchpad.net/~fplive"
+"  Shin Hungjae https://launchpad.net/~fplive\n"
+"  sungyup nham https://launchpad.net/~nhamfnad"
 
 #: ../gtk/makemeta-ui.c:109
 msgid "Torrent created!"
@@ -936,7 +937,7 @@ msgstr ""
 
 #: ../gtk/relocate.c:117
 msgid "Location"
-msgstr ""
+msgstr "위치"
 
 #: ../gtk/relocate.c:124
 msgid "Torrent _location:"
