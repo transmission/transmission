@@ -465,12 +465,10 @@ int trashDataFile(const char * filename)
         [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateStats" object: nil];
     else
     {
-        return;
         NSAlert * alert = [[NSAlert alloc] init];
         [alert setMessageText: NSLocalizedString(@"There was an error moving the data file.", "Move error alert -> title")];
         [alert setInformativeText: [NSString stringWithFormat:
-                        NSLocalizedString(@"The move operation of \"%@\" cannot be done.",
-                                            "Move error alert -> message"), [self name]]];
+                NSLocalizedString(@"The move operation of \"%@\" cannot be done.", "Move error alert -> message"), [self name]]];
         [alert addButtonWithTitle: NSLocalizedString(@"OK", "Move error alert -> button")];
         
         [alert runModal];
