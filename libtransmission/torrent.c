@@ -888,7 +888,7 @@ const tr_stat *
 tr_torrentStat( tr_torrent * tor )
 {
     tr_stat *               s;
-    int                     usableSeeds = 0;
+    int                     usableSeeds;
     uint64_t                now;
     double                  downloadedForRatio, seedRatio=0;
     double                  d;
@@ -980,23 +980,23 @@ tr_torrentStat( tr_torrent * tor )
     switch( s->activity )
     {
         case TR_STATUS_DOWNLOAD:
+            /* etaSpeed exists because if we pieceDownloadSpeed directly,
+             * brief fluctuations cause the ETA to jump all over the place.
+             * so, etaSpeed is a smoothed-out version of pieceDownloadSpeed
+             * to dampen the effect of fluctuations */
+            if( ( tor->etaSpeedCalculatedAt + 800 ) < now ) {
+                tor->etaSpeed = ( ( tor->etaSpeedCalculatedAt + 4000 ) < now )
+                    ? s->pieceDownloadSpeed /* if no recent previous speed, no need to smooth */
+                    : 0.8*tor->etaSpeed + 0.2*s->pieceDownloadSpeed; /* smooth across 5 readings */
+                tor->etaSpeedCalculatedAt = now;
+            }
+            
             if( s->leftUntilDone > s->desiredAvailable )
                 s->eta = TR_ETA_NOT_AVAIL;
             else if( s->pieceDownloadSpeed < 0.1 )
                 s->eta = TR_ETA_UNKNOWN;
-            else {
-                /* etaSpeed exists because if we pieceDownloadSpeed directly,
-                 * brief fluctuations cause the ETA to jump all over the place.
-                 * so, etaSpeed is a smoothed-out version of pieceDownloadSpeed
-                 * to dampen the effect of fluctuations */
-                if( ( tor->etaSpeedCalculatedAt + 800 ) < now ) {
-                    tor->etaSpeedCalculatedAt = now;
-                    tor->etaSpeed = (fabs(tor->etaSpeed)<0.0001)
-                        ? s->pieceDownloadSpeed /* if no previous speed, no need to smooth */
-                        : 0.8*tor->etaSpeed + 0.2*s->pieceDownloadSpeed; /* smooth across 5 readings */
-                }
+            else
                 s->eta = s->leftUntilDone / tor->etaSpeed / 1024.0;
-            }
             break;
 
         case TR_STATUS_SEED:
