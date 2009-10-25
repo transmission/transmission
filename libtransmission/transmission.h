@@ -1628,11 +1628,6 @@ typedef struct tr_stat
         @see tr_stat.leftUntilDone */
     float    percentDone;
 
-    /** The percentage of the actual ratio to the seed ratio.  This will be
-        equal to 1 if the ratio is reached or the torrent is set to seed forever.
-        Range is [0..1] */
-    float    percentRatio;
-
     /** Speed all data being sent for this torrent. (KiB/s)
         This includes piece data, protocol messages, and TCP overhead */
     double rawUploadSpeed;

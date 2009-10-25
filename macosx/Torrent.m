@@ -343,7 +343,13 @@ int trashDataFile(const char * filename)
 
 - (CGFloat) progressStopRatio
 {
-    return fStat->percentRatio;
+    double seedRatio;
+    if (!tr_torrentGetSeedRatio(fHandle, seedRatio) || [self ratio] >= seedRatio || [self ratio] == TR_RATIO_INF)
+        return 1.0;
+    else if ([self ratio] == TR_RATIO_NA)
+        return 0.0;
+    else
+        return [self ratio] / seedRatio;
 }
 
 - (BOOL) usesSpeedLimit: (BOOL) upload
