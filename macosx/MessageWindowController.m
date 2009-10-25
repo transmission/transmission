@@ -314,15 +314,8 @@
     //make the array sorted by date
     NSSortDescriptor * descriptor = [[[NSSortDescriptor alloc] initWithKey: @"Index" ascending: YES] autorelease];
     NSArray * descriptors = [[NSArray alloc] initWithObjects: descriptor, nil];
-    NSArray * sortedMessages = [fMessages sortedArrayUsingDescriptors: descriptors];
+    NSArray * sortedMessages = [[fMessages sortedArrayUsingDescriptors: descriptors] retain];
     [descriptors release];
-    
-    //create the text to output
-    NSMutableArray * messageStrings = [NSMutableArray arrayWithCapacity: [fMessages count]];
-    for (NSDictionary * message in sortedMessages)
-        [messageStrings addObject: [self stringForMessage: message]];
-    
-    NSString * fileString = [[messageStrings componentsJoinedByString: @"\n"] retain];
     
     NSSavePanel * panel = [NSSavePanel savePanel];
     [panel setRequiredFileType: @"txt"];
@@ -330,14 +323,21 @@
     
     [panel beginSheetForDirectory: nil file: NSLocalizedString(@"untitled", "Save log panel -> default file name")
             modalForWindow: [self window] modalDelegate: self
-            didEndSelector: @selector(writeToFileSheetClosed:returnCode:contextInfo:) contextInfo: fileString];
+            didEndSelector: @selector(writeToFileSheetClosed:returnCode:contextInfo:) contextInfo: sortedMessages];
 }
 
-- (void) writeToFileSheetClosed: (NSSavePanel *) panel returnCode: (NSInteger) code contextInfo: (NSString *) string
+- (void) writeToFileSheetClosed: (NSSavePanel *) panel returnCode: (NSInteger) code contextInfo: (NSArray *) messages
 {
     if (code == NSOKButton)
     {
-        if (![string writeToFile: [panel filename] atomically: YES encoding: NSUTF8StringEncoding error: nil])
+        //create the text to output
+        NSMutableArray * messageStrings = [NSMutableArray arrayWithCapacity: [fMessages count]];
+        for (NSDictionary * message in messages)
+            [messageStrings addObject: [self stringForMessage: message]];
+    
+        NSString * fileString = [messageStrings componentsJoinedByString: @"\n"];
+        
+        if (![fileString writeToFile: [panel filename] atomically: YES encoding: NSUTF8StringEncoding error: nil])
         {
             NSAlert * alert = [[NSAlert alloc] init];
             [alert addButtonWithTitle: NSLocalizedString(@"OK", "Save log alert panel -> button")];
@@ -352,7 +352,7 @@
         }
     }
     
-    [string release];
+    [messages release];
 }
 
 @end
