@@ -154,20 +154,21 @@ typedef enum
     [fTabMatrix selectCellWithTag: tag];
     [self setTab: nil];
     
-    //reset images for reveal button, since the images are also used in the main table
-    NSImage * revealOn = [[NSImage imageNamed: @"RevealOn.png"] copy],
-            * revealOff = [[NSImage imageNamed: @"RevealOff.png"] copy];
     if (![NSApp isOnSnowLeopardOrBetter])
     {
+        //reset images for reveal button, since the images are also used in the main table
+        NSImage * revealOn = [[NSImage imageNamed: @"RevealOn.png"] copy],
+                * revealOff = [[NSImage imageNamed: @"RevealOff.png"] copy];
+        
         [revealOn setFlipped: NO];
         [revealOff setFlipped: NO];
+        
+        [fRevealDataButton setImage: revealOff];
+        [fRevealDataButton setAlternateImage: revealOn];
+        
+        [revealOn release];
+        [revealOff release];
     }
-    
-    [fRevealDataButton setImage: revealOff];
-    [fRevealDataButton setAlternateImage: revealOn];
-    
-    [revealOn release];
-    [revealOff release];
     
     //initially sort peer table by IP
     if ([[fPeerTable sortDescriptors] count] == 0)
@@ -439,13 +440,10 @@ typedef enum
         
         [fDateAddedField setObjectValue: [torrent dateAdded]];
         
-        [fRevealDataButton setHidden: NO];
-        
         //allow these fields to be selected
         [fHashField setSelectable: YES];
         [fCommentView setSelectable: ![commentString isEqualToString: @""]];
         [fCreatorField setSelectable: ![creatorString isEqualToString: @""]];
-        [fDataLocationField setSelectable: YES];
         
         //set pieces view
         BOOL piecesAvailableSegment = [[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"];
