@@ -115,7 +115,7 @@
 + (NSString *) timeString: (uint64_t) seconds showSeconds: (BOOL) showSeconds maxFields: (NSUInteger) max
 {
     NSMutableArray * timeArray = [NSMutableArray arrayWithCapacity: MIN(max, 4)];
-    uint64_t remaining = seconds;
+    NSUInteger remaining = seconds; //causes problems for some users when it's a uint64_t
     
     if (max > 0 && seconds >= (24 * 60 * 60))
     {
