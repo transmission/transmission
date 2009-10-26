@@ -103,7 +103,7 @@
     if (ratio == TR_RATIO_NA)
         return NSLocalizedString(@"N/A", "No Ratio");
     
-    char buf[50];
+    char buf[8];
     return [NSString stringWithUTF8String: tr_strratio(buf, sizeof(buf), ratio, "\xE2\x88\x9E")];
 }
 
@@ -119,7 +119,7 @@
     
     if (max > 0 && seconds >= (24 * 60 * 60))
     {
-        NSUInteger days = remaining / (24 * 60 * 60);
+        const NSUInteger days = remaining / (24 * 60 * 60);
         if (days == 1)
             [timeArray addObject: NSLocalizedString(@"1 day", "time string")];
         else
