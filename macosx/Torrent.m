@@ -63,7 +63,8 @@ void ratioLimitHitCallback(tr_torrent * torrent, void * torrentData)
 
 int trashDataFile(const char * filename)
 {
-    [Torrent trashFile: [NSString stringWithUTF8String: filename]];
+    if (filename != NULL)
+        [Torrent trashFile: [NSString stringWithUTF8String: filename]];
     return 0;
 }
 
