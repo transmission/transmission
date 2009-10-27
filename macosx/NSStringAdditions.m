@@ -103,7 +103,7 @@
     if (ratio == TR_RATIO_NA)
         return NSLocalizedString(@"N/A", "No Ratio");
     
-    char buf[8];
+    char buf[12];
     return [NSString stringWithUTF8String: tr_strratio(buf, sizeof(buf), ratio, "\xE2\x88\x9E")];
 }
 
