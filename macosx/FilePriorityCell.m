@@ -150,6 +150,7 @@
             image = [image copy];
             [image setFlipped: YES];
             [image drawInRect: imageRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
+            [image release];
         }
     }
 }
