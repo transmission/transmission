@@ -49,6 +49,12 @@ and
 .Op Fl si
 .Op Fl st
 .Op Fl t Ar all | Ar id | Ar hash
+.Op Fl td Ar number
+.Op Fl TD
+.Op Fl tu Ar number
+.Op Fl TU
+.Op Fl hl
+.Op Fl HL
 .Op Fl u Ar number | Fl U
 .Op Fl v
 .Op Fl V
@@ -212,6 +218,22 @@ or
 .Ar hash .
 To set more than one current torrent, join their ids or hashes together in a list,
 such as "\-t2,4,6-8" to operate on the torrents whose IDs are 2, 4, 6, 7, and 8.
+.It Fl td Fl -torrent-downlimit Ar limit
+Limit the current torrent(s) download speed to
+.Ar limit
+kilobytes per second.
+.It Fl TD Fl -no-torrent-downlimit
+Don't use the current torrent(s) download limit.
+.It Fl tu Fl -torrent-uplimit Ar limit
+Limit the current torrent(s) upload speed to
+.Ar limit
+kilobytes per second.
+.It Fl TU Fl -no-torrent-uplimit
+Don't use the current torrent(s) upload limit.
+.It Fl hl Fl -honnor-session
+Make the current torrent(s) honnor the session limits.
+.It Fl HL Fl -no-honnor-session
+Make the current torrent(s) not honnor the session limits.
 .It Fl u Fl -uplimit Ar limit
 Limit the global upload speed to
 .Ar limit
