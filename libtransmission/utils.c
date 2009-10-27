@@ -1355,7 +1355,7 @@ tr_strratio( char * buf, size_t buflen, double ratio, const char * infinity )
 ***/
 
 int
-tr_moveFile( const char * oldpath, const char * newpath )
+tr_moveFile( const char * oldpath, const char * newpath, tr_bool * renamed )
 {
     int in;
     int out;
@@ -1385,9 +1385,14 @@ tr_moveFile( const char * oldpath, const char * newpath )
             return i;
     }
 
-    /* they  might be on the same filesystem... */
-    if( !rename( oldpath, newpath ) )
-        return 0;
+    /* they might be on the same filesystem... */
+    {
+        const int i = rename( oldpath, newpath );
+        if( renamed != NULL )
+            *renamed = i == 0;
+        if( !i )
+            return 0;
+    }
 
     /* copy the file */
     in = tr_open_file_for_scanning( oldpath );

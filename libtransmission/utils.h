@@ -419,7 +419,7 @@ struct tm * tr_localtime_r( const time_t *_clock, struct tm *_result );
 
 
 /** on success, return 0.  on failure, return -1 and set errno */
-int tr_moveFile( const char * oldpath, const char * newpath );
+int tr_moveFile( const char * oldpath, const char * newpath, tr_bool * renamed );
 
 
 #ifdef __cplusplus

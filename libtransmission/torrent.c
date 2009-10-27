@@ -2418,17 +2418,18 @@ setLocation( void * vdata )
 
                 if( do_move )
                 {
+                    tr_bool renamed = FALSE;
                     errno = 0;
                     tr_torinf( tor, "moving \"%s\" to \"%s\"", oldpath, newpath );
-                    if( rename( oldpath, newpath ) )
+                    if( tr_moveFile( oldpath, newpath, &renamed ) )
+                    {
+                        err = TRUE;
+                        tr_torerr( tor, "error moving \"%s\" to \"%s\": %s",
+                                        oldpath, newpath, tr_strerror( errno ) );
+                    }
+                    else if( !renamed )
                     {
                         verify_needed = TRUE;
-                        if( tr_moveFile( oldpath, newpath ) )
-                        {
-                            err = TRUE;
-                            tr_torerr( tor, "error moving \"%s\" to \"%s\": %s",
-                                            oldpath, newpath, tr_strerror( errno ) );
-                        }
                     }
                 }
 
@@ -2454,6 +2455,10 @@ setLocation( void * vdata )
             tr_torrentSetDownloadDir( tor, location );
             if( verify_needed )
                 tr_torrentVerify( tor );
+            else if( tor->startAfterVerify ) {
+                tor->startAfterVerify = FALSE;
+                tr_torrentStart( tor );
+            }
         }
     }
 
