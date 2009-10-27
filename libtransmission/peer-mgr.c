@@ -63,11 +63,11 @@ enum
     MAX_UPLOAD_IDLE_SECS = ( 60 * 5 ),
 
     /* max # of peers to ask fer per torrent per reconnect pulse */
-    MAX_RECONNECTIONS_PER_PULSE = 16,
+    MAX_RECONNECTIONS_PER_PULSE = 8,
 
     /* max number of peers to ask for per second overall.
     * this throttle is to avoid overloading the router */
-    MAX_CONNECTIONS_PER_SECOND = 32,
+    MAX_CONNECTIONS_PER_SECOND = 16,
 
     /* number of bad pieces a peer is allowed to send before we ban them */
     MAX_BAD_PIECES_PER_PEER = 5,
