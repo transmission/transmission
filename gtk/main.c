@@ -279,6 +279,7 @@ signal_handler( int sig )
 
         default:
             g_message( "unhandled signal" );
+            break;
     }
 }
 
