@@ -482,12 +482,14 @@
     {
         NSImage * priorityImage = [torrent priority] == TR_PRI_HIGH ? [NSImage imageNamed: @"PriorityHigh.png"]
                                                                     : [NSImage imageNamed: @"PriorityLow.png"];
+        priorityImage = [NSApp isOnSnowLeopardOrBetter] ? [priorityImage retain] : [priorityImage copy]; //take line out completely when 10.6-only
         
         NSRect priorityRect = NSMakeRect(NSMaxX(titleRect) + PADDING_BETWEEN_TITLE_AND_PRIORITY,
                                 titleRect.origin.y - (PRIORITY_ICON_HEIGHT - titleRect.size.height) / 2.0,
                                 PRIORITY_ICON_WIDTH, PRIORITY_ICON_HEIGHT);
         
         [self drawImage: priorityImage inRect: priorityRect];
+        [priorityImage release];
     }
     
     //progress

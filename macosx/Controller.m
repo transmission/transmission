@@ -1979,7 +1979,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         else if ([sortType isEqualToString: SORT_DATE])
         {
             NSSortDescriptor * dateDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"dateAdded" ascending: asc] autorelease];
-        
+            
             descriptors = [[NSArray alloc] initWithObjects: dateDescriptor, nameDescriptor, nil];
         }
         else
