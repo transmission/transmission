@@ -799,6 +799,9 @@ refillUpkeep( void * vmgr )
 }
 
 static void
+sortPeersByLiveliness( tr_peer ** peers, void ** clientData, int n, uint64_t now );
+
+static void
 refillPulse( int fd UNUSED, short type UNUSED, void * vtorrent )
 {
     tr_block_index_t block;
@@ -822,6 +825,7 @@ refillPulse( int fd UNUSED, short type UNUSED, void * vtorrent )
         t->refillQueue = blockIteratorNew( t );
 
     peers = getPeersUploadingToClient( t, &peerCount );
+    sortPeersByLiveliness( peers, NULL, peerCount, tr_date( ) );
     webseedCount = tr_ptrArraySize( &t->webseeds );
     webseeds = tr_memdup( tr_ptrArrayBase( &t->webseeds ),
                           webseedCount * sizeof( tr_webseed* ) );
@@ -2166,6 +2170,8 @@ shouldPeerBeClosed( const Torrent    * t,
     return TR_CAN_KEEP;
 }
 
+static void sortPeersByLivelinessReverse( tr_peer ** peers, void ** clientData, int n, uint64_t now );
+
 static tr_peer **
 getPeersToClose( Torrent * t, tr_close_type_t closeType, int * setmeSize )
 {
@@ -2178,6 +2184,8 @@ getPeersToClose( Torrent * t, tr_close_type_t closeType, int * setmeSize )
     for( i = outsize = 0; i < peerCount; ++i )
         if( shouldPeerBeClosed( t, peers[i], peerCount ) == closeType )
             ret[outsize++] = peers[i];
+
+    sortPeersByLivelinessReverse ( ret, NULL, outsize, tr_date( ) );
 
     *setmeSize = outsize;
     return ret;
@@ -2468,16 +2476,26 @@ comparePeerLiveliness( const void * va, const void * vb )
     return 0;
 }
 
-/* FIXME: getPeersToClose() should use this */
+static int
+comparePeerLivelinessReverse( const void * va, const void * vb )
+{
+    return -comparePeerLiveliness (va, vb);
+}
+
 static void
-sortPeersByLiveliness( tr_peer ** peers, void** clientData, int n, uint64_t now )
+sortPeersByLivelinessImpl( tr_peer  ** peers,
+                           void     ** clientData,
+                           int         n,
+                           uint64_t    now,
+                           int (*compare) ( const void *va, const void *vb ) )
 {
     int i;
     struct peer_liveliness *lives, *l;
 
     /* build a sortable array of peer + extra info */
     lives = l = tr_new0( struct peer_liveliness, n );
-    for( i=0; i<n; ++i, ++l ) {
+    for( i=0; i<n; ++i, ++l )
+    {
         tr_peer * p = peers[i];
         l->peer = p;
         l->doPurge = p->doPurge;
@@ -2491,7 +2509,7 @@ sortPeersByLiveliness( tr_peer ** peers, void** clientData, int n, uint64_t now 
 
     /* sort 'em */
     assert( n == ( l - lives ) );
-    qsort( lives, n, sizeof( struct peer_liveliness ), comparePeerLiveliness );
+    qsort( lives, n, sizeof( struct peer_liveliness ), compare );
 
     /* build the peer array */
     for( i=0, l=lives; i<n; ++i, ++l ) {
@@ -2504,6 +2522,19 @@ sortPeersByLiveliness( tr_peer ** peers, void** clientData, int n, uint64_t now 
     /* cleanup */
     tr_free( lives );
 }
+
+static void
+sortPeersByLiveliness( tr_peer ** peers, void ** clientData, int n, uint64_t now )
+{
+    sortPeersByLivelinessImpl( peers, clientData, n, now, comparePeerLiveliness );
+}
+
+static void
+sortPeersByLivelinessReverse( tr_peer ** peers, void ** clientData, int n, uint64_t now )
+{
+    sortPeersByLivelinessImpl( peers, clientData, n, now, comparePeerLivelinessReverse );
+}
+
 
 static void
 enforceTorrentPeerLimit( Torrent * t, uint64_t now )
