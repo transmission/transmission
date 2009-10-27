@@ -81,6 +81,7 @@ tr_natpmpInit( void )
     nat = tr_new0( struct tr_natpmp, 1 );
     nat->state = TR_NATPMP_DISCOVER;
     nat->port = -1;
+    nat->natpmp.s = -1; /* socket */
     return nat;
 }
 
@@ -89,7 +90,8 @@ tr_natpmpClose( tr_natpmp * nat )
 {
     if( nat )
     {
-        closenatpmp( &nat->natpmp );
+        if( nat->natpmp.s >= 0 )
+            tr_netCloseSocket( nat->natpmp.s );
         tr_free( nat );
     }
 }
