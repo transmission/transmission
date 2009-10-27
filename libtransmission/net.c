@@ -368,7 +368,7 @@ tr_netBindTCPImpl( const tr_address * addr, tr_port port, tr_bool suppressMsgs, 
 
     if( evutil_make_socket_nonblocking( fd ) < 0 ) {
         *errOut = sockerrno;
-        EVUTIL_CLOSESOCKET( fd );
+        tr_netCloseSocket( fd );
         return -1;
     }
 
@@ -391,7 +391,7 @@ tr_netBindTCPImpl( const tr_address * addr, tr_port port, tr_bool suppressMsgs, 
         if( !suppressMsgs )
             tr_err( _( "Couldn't bind port %d on %s: %s" ),
                     port, tr_ntop_non_ts( addr ), tr_strerror( err ) );
-        EVUTIL_CLOSESOCKET( fd );
+        tr_netCloseSocket( fd );
         *errOut = err;
         return -1;
     }
@@ -401,7 +401,7 @@ tr_netBindTCPImpl( const tr_address * addr, tr_port port, tr_bool suppressMsgs, 
 
     if( listen( fd, 128 ) == -1 ) {
         *errOut = sockerrno;
-        EVUTIL_CLOSESOCKET( fd );
+        tr_netCloseSocket( fd );
         return -1;
     }
 
@@ -428,7 +428,7 @@ tr_net_hasIPv6( tr_port port )
         if( fd >= 0 || err != EAFNOSUPPORT ) /* we support ipv6 */
             result = TRUE;
         if( fd >= 0 )
-            EVUTIL_CLOSESOCKET( fd );
+            tr_netCloseSocket( fd );
         alreadyDone = TRUE;
     }
 
@@ -449,6 +449,12 @@ tr_netAccept( tr_session  * session,
     }
 
     return fd;
+}
+
+void
+tr_netCloseSocket( int fd )
+{
+    EVUTIL_CLOSESOCKET( fd );
 }
 
 void

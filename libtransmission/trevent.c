@@ -19,6 +19,7 @@
 #include <signal.h>
 
 #include "transmission.h"
+#include "net.h"
 #include "session.h"
 
 #ifdef WIN32
@@ -271,7 +272,7 @@ tr_eventClose( tr_session * session )
 
     session->events->die = TRUE;
     tr_deepLog( __FILE__, __LINE__, NULL, "closing trevent pipe" );
-    EVUTIL_CLOSESOCKET( session->events->fds[1] );
+    tr_netCloseSocket( session->events->fds[1] );
 }
 
 /**

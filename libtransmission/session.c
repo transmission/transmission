@@ -147,7 +147,7 @@ close_bindinfo( struct tr_bindinfo * b )
     if( ( b != NULL ) && ( b->socket >=0 ) )
     {
         event_del( &b->ev );
-        EVUTIL_CLOSESOCKET( b->socket );
+        tr_netCloseSocket( b->socket );
     }
 }
 

@@ -116,6 +116,8 @@ int  tr_netSetTOS( int s,
 
 void tr_netClose( tr_session * session, int s );
 
+void tr_netCloseSocket( int fd );
+
 void tr_netInit( void );
 
 #endif /* _TR_NET_H_ */

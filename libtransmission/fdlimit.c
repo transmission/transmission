@@ -629,7 +629,7 @@ tr_fdSocketAccept( tr_session  * session,
 
     if( ( s >= 0 ) && gFd->socketCount > gFd->socketLimit )
     {
-        EVUTIL_CLOSESOCKET( s );
+        tr_netCloseSocket( s );
         s = -1;
     }
 
@@ -675,7 +675,7 @@ tr_fdSocketClose( tr_session * session, int fd )
 
     if( fd >= 0 )
     {
-        EVUTIL_CLOSESOCKET( fd );
+        tr_netCloseSocket( fd );
         --gFd->socketCount;
     }
 

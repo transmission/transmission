@@ -255,7 +255,7 @@ tr_dhtUninit(tr_session *ss)
     }
 
     dht_uninit( dht_socket, 0 );
-    EVUTIL_CLOSESOCKET( dht_socket );
+    tr_netCloseSocket( dht_socket );
 
     tr_ndbg("DHT", "Done uninitialising DHT");
 
