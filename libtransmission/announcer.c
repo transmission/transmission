@@ -1266,7 +1266,8 @@ onAnnounceDone( tr_session   * session,
             /* The request could not be understood by the server due to
              * malformed syntax. The client SHOULD NOT repeat the
              * request without modifications. */
-            publishErrorMessageAndStop( tier, _( "Tracker returned a 4xx message" ) );
+            if( tr_torrentIsPrivate( tier->tor ) || ( tier->tor->info.trackerCount < 2 ) )
+                publishErrorMessageAndStop( tier, _( "Tracker returned a 4xx message" ) );
             tier->manualAnnounceAllowedAt = ~(time_t)0;
         }
         else if( 500 <= responseCode && responseCode <= 599 )
