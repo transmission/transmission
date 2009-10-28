@@ -214,7 +214,7 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
         else if( !memcmp( id+1, "AR", 2 ) ) four_digits( buf, buflen, "Ares", id+3 );
         else if( !memcmp( id+1, "AT", 2 ) ) four_digits( buf, buflen, "Artemis", id+3 );
         else if( !memcmp( id+1, "AV", 2 ) ) four_digits( buf, buflen, "Avicora", id+3 );
-        else if( !memcmp( id+1, "BE", 2 ) ) four_digits( buf, buflen, "BitTorrent Embedded", id+3 );
+        else if( !memcmp( id+1, "BE", 2 ) ) four_digits( buf, buflen, "BitTorrent SDK", id+3 );
         else if( !memcmp( id+1, "BG", 2 ) ) four_digits( buf, buflen, "BTGetit", id+3 );
         else if( !memcmp( id+1, "BM", 2 ) ) four_digits( buf, buflen, "BitMagnet", id+3 );
         else if( !memcmp( id+1, "BP", 2 ) ) four_digits( buf, buflen, "BitTorrent Pro (Azureus + Spyware)", id+3 );
