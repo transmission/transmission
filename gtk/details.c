@@ -1681,6 +1681,7 @@ buildTrackerSummary( const char * key, const tr_tracker_stat * st, gboolean show
                 break;
             case TR_TRACKER_ACTIVE:
                 tr_strltime_rounded( timebuf, now - st->lastAnnounceStartTime, sizeof( timebuf ) );
+                g_string_append_c( gstr, '\n' );
                 g_string_append_printf( gstr, _( "Asking for more peers now... <small>%s</small>" ), timebuf );
                 break;
         }
@@ -1999,7 +2000,7 @@ onEditTrackers( GtkButton * button, gpointer data )
                                         GTK_POLICY_AUTOMATIC );
         gtk_container_add( GTK_CONTAINER( sw ), w );
         gtk_container_add( GTK_CONTAINER( fr ), sw );
-        hig_workarea_add_wide_control( t, &row, fr );
+        hig_workarea_add_wide_tall_control( t, &row, fr );
 
     hig_workarea_finish( t, &row );
     gtk_box_pack_start( GTK_BOX( GTK_DIALOG( d )->vbox ), t, TRUE, TRUE, GUI_PAD_SMALL );
