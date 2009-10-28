@@ -1206,6 +1206,8 @@ onAnnounceDone( tr_session   * session,
             tr_strlcpy( tier->lastAnnounceStr, buf,
                         sizeof( tier->lastAnnounceStr ) );
 
+            tier->lastAnnounceTime = now;
+
             /* if the response is serious, *and* if the response may require
              * human intervention, then notify the user... otherwise just log it */
             if( responseCode >= 400 )
@@ -1269,6 +1271,7 @@ onAnnounceDone( tr_session   * session,
             if( tr_torrentIsPrivate( tier->tor ) || ( tier->tor->info.trackerCount < 2 ) )
                 publishErrorMessageAndStop( tier, _( "Tracker returned a 4xx message" ) );
             tier->manualAnnounceAllowedAt = ~(time_t)0;
+            tierClearNextAnnounce( tier );
         }
         else if( 500 <= responseCode && responseCode <= 599 )
         {
@@ -1476,7 +1479,13 @@ onScrapeDone( tr_session   * session,
         {
             const int interval = tier->retryScrapeIntervalSec;
             tier->retryScrapeIntervalSec *= 2;
-            tier->scrapeAt = now + interval;
+
+            /* Don't retry on a 4xx.
+             * Retry at growing intervals on a 5xx */
+            if( 400 <= responseCode && responseCode <= 499 )
+                tier->scrapeAt = 0;
+            else
+                tier->scrapeAt = now + interval;
 
             /* %1$ld - http status code, such as 404
              * %2$s - human-readable explanation of the http status code */
@@ -1558,6 +1567,7 @@ static tr_bool
 tierNeedsToScrape( const tr_tier * tier, const time_t now )
 {
     return !tier->isScraping
+        && ( tier->scrapeAt != 0 )
         && ( tier->scrapeAt <= now )
         && ( tier->currentTracker != NULL )
         && ( tier->currentTracker->scrape != NULL );
@@ -1711,6 +1721,8 @@ tr_announcerStats( const tr_torrent * torrent,
 
                 if( tier->isScraping )
                     st->scrapeState = TR_TRACKER_ACTIVE;
+                else if( !tier->scrapeAt )
+                    st->scrapeState = TR_TRACKER_INACTIVE;
                 else if( tier->scrapeAt > now )
                 {
                     st->scrapeState = TR_TRACKER_WAITING;
@@ -1731,7 +1743,7 @@ tr_announcerStats( const tr_torrent * torrent,
 
                 if( tier->isAnnouncing )
                     st->announceState = TR_TRACKER_ACTIVE;
-                else if( !torrent->isRunning )
+                else if( !torrent->isRunning || !tier->announceAt )
                     st->announceState = TR_TRACKER_INACTIVE;
                 else if( tier->announceAt > now )
                 {
