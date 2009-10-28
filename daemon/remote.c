@@ -152,7 +152,7 @@ numarg( const char * arg )
 
 static char * reqs[256]; /* arbitrary max */
 static int    reqCount = 0;
-static int    debug = 0;
+static tr_bool debug = 0;
 static char * auth = NULL;
 static char * netrc = NULL;
 static char * sessionId = NULL;
@@ -373,11 +373,10 @@ static const char * list_keys[] = {
 };
 
 static int
-readargs( int           argc,
-          const char ** argv )
+readargs( int argc, const char ** argv )
 {
     int c;
-    int addingTorrents = 0;
+    tr_bool addingTorrents = FALSE;
     int status = EXIT_SUCCESS;
     char id[4096];
     const char * optarg;
@@ -419,12 +418,12 @@ readargs( int           argc,
                 break;
 
             case 'a':
-                addingTorrents = 1;
+                addingTorrents = TRUE;
                 addArg = FALSE;
                 break;
 
             case 'b':
-                debug = 1;
+                debug = TRUE;
                 addArg = FALSE;
                 break;
 
