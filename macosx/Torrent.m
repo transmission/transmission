@@ -409,7 +409,7 @@ int trashDataFile(const char * filename)
     return tr_torrentSetPriority(fHandle, priority);
 }
 
-#warning should be somewhere else?
+#warning when 10.6-only use recycleURLs:completionHandler:
 + (void) trashFile: (NSString *) path
 {
     //attempt to move to trash

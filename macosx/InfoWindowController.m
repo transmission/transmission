@@ -353,9 +353,6 @@ typedef enum
         [fErrorMessageView setSelectable: NO];
         
         [fConnectedPeersField setStringValue: @""];
-        [fDownloadingFromField setStringValue: @""];
-        [fUploadingToField setStringValue: @""];
-        [fKnownField setStringValue: @""];
         
         [fDateAddedField setStringValue: @""];
         [fDateCompletedField setStringValue: @""];
@@ -1493,48 +1490,55 @@ typedef enum
         return;
     Torrent * torrent = [fTorrents objectAtIndex: 0];
     
+    NSString * knownString = [NSString stringWithFormat: NSLocalizedString(@"%d known", "Inspector -> Peers tab -> peers"),
+                                [torrent totalPeersKnown]];
     if ([torrent isActive])
     {
-        NSInteger total = [torrent totalPeersConnected];
-        NSString * connected = [NSString stringWithFormat:
-                                NSLocalizedString(@"%d Connected", "Inspector -> Peers tab -> peers"), total];
+        const NSInteger total = [torrent totalPeersConnected];
+        NSString * connectedText = [NSString stringWithFormat: NSLocalizedString(@"%d Connected", "Inspector -> Peers tab -> peers"),
+                                    total];
         
         if (total > 0)
         {
-            NSMutableArray * components = [NSMutableArray arrayWithCapacity: 5];
+            NSMutableArray * fromComponents = [NSMutableArray arrayWithCapacity: 5];
             NSInteger count;
             if ((count = [torrent totalPeersTracker]) > 0)
-                [components addObject: [NSString stringWithFormat:
+                [fromComponents addObject: [NSString stringWithFormat:
                                         NSLocalizedString(@"%d tracker", "Inspector -> Peers tab -> peers"), count]];
             if ((count = [torrent totalPeersIncoming]) > 0)
-                [components addObject: [NSString stringWithFormat:
+                [fromComponents addObject: [NSString stringWithFormat:
                                         NSLocalizedString(@"%d incoming", "Inspector -> Peers tab -> peers"), count]];
             if ((count = [torrent totalPeersCache]) > 0)
-                [components addObject: [NSString stringWithFormat:
+                [fromComponents addObject: [NSString stringWithFormat:
                                         NSLocalizedString(@"%d cache", "Inspector -> Peers tab -> peers"), count]];
             if ((count = [torrent totalPeersPex]) > 0)
-                [components addObject: [NSString stringWithFormat:
+                [fromComponents addObject: [NSString stringWithFormat:
                                         NSLocalizedString(@"%d PEX", "Inspector -> Peers tab -> peers"), count]];
             if ((count = [torrent totalPeersDHT]) > 0)
-                [components addObject: [NSString stringWithFormat:
+                [fromComponents addObject: [NSString stringWithFormat:
                                         NSLocalizedString(@"%d DHT", "Inspector -> Peers tab -> peers"), count]];
             
-            connected = [connected stringByAppendingFormat: @": %@", [components componentsJoinedByString: @", "]];
+            NSMutableArray * upDownComponents = [NSMutableArray arrayWithCapacity: 3];
+            if ((count = [torrent peersSendingToUs]) > 0)
+                [upDownComponents addObject: [NSString stringWithFormat:
+                                        NSLocalizedString(@"DL from %d", "Inspector -> Peers tab -> peers"), count]];
+            if ((count = [torrent peersGettingFromUs]) > 0)
+                [upDownComponents addObject: [NSString stringWithFormat:
+                                        NSLocalizedString(@"UL to %d", "Inspector -> Peers tab -> peers"), count]];
+            [upDownComponents addObject: knownString];
+            
+            connectedText = [connectedText stringByAppendingFormat: @": %@\n%@", [fromComponents componentsJoinedByString: @", "],
+                                [upDownComponents componentsJoinedByString: @", "]];
         }
         
-        [fConnectedPeersField setStringValue: connected];
-        
-        [fDownloadingFromField setIntValue: [torrent peersSendingToUs]];
-        [fUploadingToField setIntValue: [torrent peersGettingFromUs]];
+        [fConnectedPeersField setStringValue: connectedText];
     }
     else
     {
-        [fConnectedPeersField setStringValue: @""];
-        [fDownloadingFromField setStringValue: @""];
-        [fUploadingToField setStringValue: @""];
+        NSString * connectedText = [NSString stringWithFormat: @"%@\n%@",
+                                    NSLocalizedString(@"Not Connected", "Inspector -> Peers tab -> peers"), knownString];
+        [fConnectedPeersField setStringValue: connectedText];
     }
-    
-    [fKnownField setIntValue: [torrent totalPeersKnown]];
     
     [fPeers release];
     fPeers = [[[torrent peers] sortedArrayUsingDescriptors: [self peerSortDescriptors]] retain];

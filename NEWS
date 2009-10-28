@@ -228,7 +228,7 @@
 [http://trac.transmissionbt.com/query?milestone=1.52&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== Mac ====
   * Improve interface responsiveness when downloading
-==== GTK+ ==== and Daemon
+==== GTK+ and Daemon ==== 
   * Always honor the XDG setting for the download directory
 ==== GTK+ ====
   * Fix formatting error when showing speeds measured in MB/s
