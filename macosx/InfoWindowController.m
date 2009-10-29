@@ -1034,7 +1034,7 @@ typedef enum
                 NSAssert1(NO, @"Peer from unknown source: %d", peerFrom);
         }
         
-        //determing status strings from flags 
+        //determing status strings from flags
         NSMutableArray * statusArray = [NSMutableArray arrayWithCapacity: 6];
         NSString * flags = [peer objectForKey: @"Flags"];
         
@@ -1530,6 +1530,8 @@ typedef enum
             connectedText = [connectedText stringByAppendingFormat: @": %@\n%@", [fromComponents componentsJoinedByString: @", "],
                                 [upDownComponents componentsJoinedByString: @", "]];
         }
+        else
+            connectedText = [connectedText stringByAppendingFormat: @"\n%@", knownString];
         
         [fConnectedPeersField setStringValue: connectedText];
     }

@@ -832,51 +832,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) openFiles: (NSArray *) filenames addType: (addType) type forcePath: (NSString *) path
 {
-    #warning checks could probably be removed, since location is checked when starting
-    if (!path && [fDefaults boolForKey: @"UseIncompleteDownloadFolder"]
-        && access([[[fDefaults stringForKey: @"IncompleteDownloadFolder"] stringByExpandingTildeInPath] UTF8String], 0))
-    {
-        NSOpenPanel * panel = [NSOpenPanel openPanel];
-        
-        [panel setPrompt: NSLocalizedString(@"Select", "Default incomplete folder cannot be used alert -> prompt")];
-        [panel setAllowsMultipleSelection: NO];
-        [panel setCanChooseFiles: NO];
-        [panel setCanChooseDirectories: YES];
-        [panel setCanCreateDirectories: YES];
-
-        [panel setMessage: NSLocalizedString(@"The incomplete folder cannot be used. Choose a new location or cancel for none.",
-                                        "Default incomplete folder cannot be used alert -> message")];
-        
-        NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys: filenames, @"Filenames",
-                                                        [NSNumber numberWithInt: type], @"AddType", nil];
-        
-        [panel beginSheetForDirectory: nil file: nil types: nil modalForWindow: fWindow modalDelegate: self
-                didEndSelector: @selector(incompleteChoiceClosed:returnCode:contextInfo:) contextInfo: dict];
-        return;
-    }
-    
-    if (!path && [fDefaults boolForKey: @"DownloadLocationConstant"]
-        && access([[[fDefaults stringForKey: @"DownloadFolder"] stringByExpandingTildeInPath] UTF8String], 0))
-    {
-        NSOpenPanel * panel = [NSOpenPanel openPanel];
-        
-        [panel setPrompt: NSLocalizedString(@"Select", "Default folder cannot be used alert -> prompt")];
-        [panel setAllowsMultipleSelection: NO];
-        [panel setCanChooseFiles: NO];
-        [panel setCanChooseDirectories: YES];
-        [panel setCanCreateDirectories: YES];
-
-        [panel setMessage: NSLocalizedString(@"The download folder cannot be used. Choose a new location.",
-                                        "Default folder cannot be used alert -> message")];
-        
-        NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys: filenames, @"Filenames",
-                                                        [NSNumber numberWithInt: type], @"AddType", nil];
-        
-        [panel beginSheetForDirectory: nil file: nil types: nil modalForWindow: fWindow modalDelegate: self
-                didEndSelector: @selector(downloadChoiceClosed:returnCode:contextInfo:) contextInfo: dict];
-        return;
-    }
-    
     BOOL deleteTorrentFile, canToggleDelete = NO;
     switch (type)
     {
@@ -1927,7 +1882,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     [self sortTorrentsIgnoreSelected]; //actually sort
     
-    [fTableView selectValues: selectedValues];
+    //[fTableView selectValues: selectedValues];
 }
 
 - (void) sortTorrentsIgnoreSelected
