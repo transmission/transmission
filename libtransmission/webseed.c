@@ -51,7 +51,7 @@ struct tr_webseed
 ****
 ***/
 
-static const tr_peer_event blankEvent = { 0, 0, 0, 0, 0.0f, 0, 0, 0 };
+static const tr_peer_event blankEvent = { 0, 0, 0, 0, 0.0f, 0, 0, 0, 0 };
 
 static void
 publish( tr_webseed *    w,

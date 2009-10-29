@@ -412,7 +412,7 @@ protocolSendHaveNone( tr_peermsgs * msgs )
 ***  EVENTS
 **/
 
-static const tr_peer_event blankEvent = { 0, 0, 0, 0, 0.0f, 0, 0, 0 };
+static const tr_peer_event blankEvent = { 0, 0, 0, 0, 0.0f, 0, 0, 0, 0 };
 
 static void
 publish( tr_peermsgs * msgs, tr_peer_event * e )
@@ -488,6 +488,15 @@ fireClientGotSuggest( tr_peermsgs * msgs, uint32_t pieceIndex )
     tr_peer_event e = blankEvent;
     e.eventType = TR_PEER_CLIENT_GOT_SUGGEST;
     e.pieceIndex = pieceIndex;
+    publish( msgs, &e );
+}
+
+static void
+fireClientGotPort( tr_peermsgs * msgs, tr_port port )
+{
+    tr_peer_event e = blankEvent;
+    e.eventType = TR_PEER_CLIENT_GOT_PORT;
+    e.port = port;
     publish( msgs, &e );
 }
 
@@ -1059,8 +1068,8 @@ parseLtepHandshake( tr_peermsgs *     msgs,
 
     /* get peer's listening port */
     if( tr_bencDictFindInt( &val, "p", &i ) ) {
-        msgs->peer->port = htons( (uint16_t)i );
-        dbgmsg( msgs, "msgs->port is now %hu", msgs->peer->port );
+        fireClientGotPort( msgs, (tr_port)i );
+        dbgmsg( msgs, "peer's port is now %d", (int)i );
     }
 
     /* get peer's maximum request queue size */
@@ -1455,7 +1464,9 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
             dbgmsg( msgs, "Got a BT_PORT" );
             tr_peerIoReadUint16( msgs->peer->io, inbuf, &msgs->peer->dht_port );
             if( msgs->peer->dht_port > 0 )
-                tr_dhtAddNode( getSession(msgs), &msgs->peer->addr, msgs->peer->dht_port, 0 );
+                tr_dhtAddNode( getSession(msgs),
+                               tr_peerAddress( msgs->peer ),
+                               msgs->peer->dht_port, 0 );
             break;
 
         case BT_FEXT_SUGGEST:

@@ -48,6 +48,7 @@ typedef enum
     TR_PEER_CLIENT_GOT_DATA,
     TR_PEER_CLIENT_GOT_ALLOWED_FAST,
     TR_PEER_CLIENT_GOT_SUGGEST,
+    TR_PEER_CLIENT_GOT_PORT,
     TR_PEER_PEER_GOT_DATA,
     TR_PEER_PEER_PROGRESS,
     TR_PEER_ERROR,
@@ -67,6 +68,7 @@ typedef struct
     int              err;          /* errno for GOT_ERROR */
     tr_bool          wasPieceData; /* for GOT_DATA */
     tr_bool          uploadOnly;   /* for UPLOAD_ONLY */
+    tr_port          port;         /* for GOT_PORT */
 }
 tr_peer_event;
 

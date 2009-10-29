@@ -87,9 +87,7 @@ typedef struct tr_peer
     uint8_t                  strikes;
 
     uint8_t                  encryption_preference;
-    tr_port                  port;
     tr_port                  dht_port;
-    tr_address               addr;
     struct tr_peerIo       * io;
     struct peer_atom       * atom;
 
@@ -109,6 +107,7 @@ typedef struct tr_peer
 }
 tr_peer;
 
+const tr_address * tr_peerAddress( const tr_peer * );
 
 int tr_pexCompare( const void * a, const void * b );
 
