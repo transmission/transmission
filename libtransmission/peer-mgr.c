@@ -57,7 +57,7 @@ enum
     RECONNECT_PERIOD_MSEC = 500,
 
     /* when many peers are available, keep idle ones this long */
-    MIN_UPLOAD_IDLE_SECS = ( 30 ),
+    MIN_UPLOAD_IDLE_SECS = ( 60 ),
 
     /* when few peers are available, keep idle ones this long */
     MAX_UPLOAD_IDLE_SECS = ( 60 * 5 ),
