@@ -283,7 +283,7 @@ main( int argc, char ** argv )
     dtr_watchdir * watchdir = NULL;
 
     signal( SIGINT, gotsig );
-    signal( SIGKILL, gotsig );
+    signal( SIGTERM, gotsig );
 #ifndef WIN32
     signal( SIGHUP, gotsig );
 #endif

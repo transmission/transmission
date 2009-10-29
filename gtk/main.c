@@ -272,7 +272,7 @@ signal_handler( int sig )
     else switch( sig )
     {
         case SIGINT:
-        case SIGKILL:
+        case SIGTERM:
             g_message( _( "Got signal %d; trying to shut down cleanly.  Do it again if it gets stuck." ), sig );
             doAction( "quit", sighandler_cbdata );
             break;
