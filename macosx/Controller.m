@@ -846,13 +846,16 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             canToggleDelete = YES;
     }
     
-    tr_info info;
     for (NSString * torrentPath in filenames)
     {
         //ensure torrent doesn't already exist
         tr_ctor * ctor = tr_ctorNew(fLib);
         tr_ctorSetMetainfoFromFile(ctor, [torrentPath UTF8String]);
-        tr_parse_result result = tr_torrentParse(ctor, &info);
+        
+        tr_info info;
+        const tr_parse_result result = tr_torrentParse(ctor, &info);
+        tr_ctorFree(ctor);
+        
         if (result != TR_PARSE_OK)
         {
             if (result == TR_PARSE_DUPLICATE)
@@ -865,12 +868,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             else
                 NSAssert2(NO, @"Unknown error code (%d) when attempting to open \"%@\"", result, torrentPath);
             
-            tr_ctorFree(ctor);
             tr_metainfoFree(&info);
             continue;
         }
-        
-        tr_ctorFree(ctor);
         
         //determine download location
         NSString * location;
@@ -888,9 +888,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             location = nil;
         
         //determine to show the options window
-        BOOL showWindow = type == ADD_SHOW_OPTIONS || ([fDefaults boolForKey: @"DownloadAsk"]
-                            && (info.isMultifile || ![fDefaults boolForKey: @"DownloadAskMulti"])
-                            && (type != ADD_AUTO || ![fDefaults boolForKey: @"DownloadAskManual"]));
+        const BOOL showWindow = type == ADD_SHOW_OPTIONS || ([fDefaults boolForKey: @"DownloadAsk"]
+                                    && (info.isMultifile || ![fDefaults boolForKey: @"DownloadAskMulti"])
+                                    && (type != ADD_AUTO || ![fDefaults boolForKey: @"DownloadAskManual"]));
         tr_metainfoFree(&info);
         
         Torrent * torrent;
@@ -2000,23 +2000,19 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         //check status
         if ([torrent isActive] && ![torrent isCheckingWaiting])
         {
+            const BOOL isActive = ![torrent isStalled];
+            if (isActive)
+                active++;
+            
             if ([torrent isSeeding])
             {
                 seeding++;
-                BOOL isActive = ![torrent isStalled];
-                if (isActive)
-                    active++;
-                
                 if (filterStatus && !((filterActive && isActive) || filterSeed))
                     continue;
             }
             else
             {
                 downloading++;
-                BOOL isActive = ![torrent isStalled];
-                if (isActive)
-                    active++;
-                
                 if (filterStatus && !((filterActive && isActive) || filterDownload))
                     continue;
             }
