@@ -302,7 +302,7 @@ torrentPage( GObject * core )
     w = new_check_button( s, PREF_KEY_TRASH_ORIGINAL, core );
     hig_workarea_add_wide_control( t, &row, w );
 
-    s = _( "Keep _incomplete files in:" );
+    s = _( "Keep _incomplete torrents in:" );
     l = new_check_button( s, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED, core );
     w = new_path_chooser_button( TR_PREFS_KEY_INCOMPLETE_DIR, core );
     gtk_widget_set_sensitive( GTK_WIDGET( w ), pref_flag_get( TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED ) );
