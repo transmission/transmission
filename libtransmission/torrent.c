@@ -2356,7 +2356,7 @@ tr_torrentDeleteLocalData( tr_torrent * tor, tr_fileFunc fileFunc )
         deleteLocalData( tor, fileFunc );
     else {
         /* torrent only has one file */
-        char * path = tr_torrentFindFile( tor, 0 );
+        char * path = tr_buildPath( tor->currentDir, tor->info.files[0].name, NULL );
         fileFunc( path );
         tr_free( path );
     }
