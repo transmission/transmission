@@ -1882,7 +1882,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     [self sortTorrentsIgnoreSelected]; //actually sort
     
-    //[fTableView selectValues: selectedValues];
+    [fTableView selectValues: selectedValues];
 }
 
 - (void) sortTorrentsIgnoreSelected
