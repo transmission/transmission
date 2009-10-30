@@ -1045,6 +1045,7 @@ fileBytesCompleted( const tr_torrent * tor, tr_file_index_t index )
 {
     uint64_t total = 0;
     const tr_file * f = &tor->info.files[index];
+fprintf( stderr, "in fileBytesCompleted for file #%d\n", (int)index );
 
     if( f->length )
     {
@@ -1054,6 +1055,7 @@ fileBytesCompleted( const tr_torrent * tor, tr_file_index_t index )
 
         if( firstBlock == lastBlock )
         {
+fprintf( stderr, "file fits in a single block\n" );
             if( tr_cpBlockIsCompleteFast( &tor->completion, firstBlock ) )
                 total = f->length;
         }
@@ -1068,6 +1070,7 @@ fileBytesCompleted( const tr_torrent * tor, tr_file_index_t index )
             /* the middle blocks */
             if( f->firstPiece == f->lastPiece )
             {
+fprintf( stderr, "f->firstPiece == f->lastPiece\n" );
                 for( i=firstBlock+1; i<lastBlock; ++i )
                     if( tr_cpBlockIsCompleteFast( &tor->completion, i ) )
                         total += tor->blockSize;
@@ -1082,16 +1085,19 @@ fileBytesCompleted( const tr_torrent * tor, tr_file_index_t index )
                              + tr_torPieceCountBlocks( tor, f->firstPiece ) - 1;
 
                 /* the rest of the first piece */
+fprintf( stderr, "looping on the rest of the first piece\n" );
                 for( i=firstBlock+1; i<lastBlock && i<=lastBlockOfFirstPiece; ++i )
                     if( tr_cpBlockIsCompleteFast( &tor->completion, i ) )
                         ++b;
 
                 /* the middle pieces */
+fprintf( stderr, "looking at the middle pieces\n" );
                 if( f->firstPiece + 1 < f->lastPiece )
                     for( i=f->firstPiece+1; i<f->lastPiece; ++i )
                         b += tor->blockCountInPiece - tr_cpMissingBlocksInPiece( &tor->completion, i );
 
                 /* the rest of the last piece */
+fprintf( stderr, "looping on the rest of the last piece\n" );
                 for( i=firstBlockOfLastPiece; i<lastBlock; ++i )
                     if( tr_cpBlockIsCompleteFast( &tor->completion, i ) )
                         ++b;
@@ -1105,6 +1111,7 @@ fileBytesCompleted( const tr_torrent * tor, tr_file_index_t index )
                 total += ( f->offset + f->length ) - ( tor->blockSize * lastBlock );
         }
     }
+fprintf( stderr, "finished fileBytesCompleted for file #%d\n", (int)index );
 
     return total;
 }
@@ -1118,18 +1125,26 @@ tr_torrentFiles( const tr_torrent * tor,
     tr_file_stat *        files = tr_new0( tr_file_stat, n );
     tr_file_stat *        walk = files;
     const tr_bool         isSeed = tor->completeness == TR_SEED;
+static int numCalls = 0;
+
+fprintf( stderr, "entering tr_torrentFiles for the %d time\n", ++numCalls );
 
     assert( tr_isTorrent( tor ) );
 
-    for( i = 0; i < n; ++i, ++walk )
+    for( i=0; i<n; ++i, ++walk )
     {
+fprintf( stderr, "looking at file #%d of %d\n", (int)i, (int)n );
         const uint64_t b = isSeed ? tor->info.files[i].length : fileBytesCompleted( tor, i );
+fprintf( stderr, "file has %"PRIu64" out of %"PRIu64" bytes\n", b, tor->info.files[i].length );
         walk->bytesCompleted = b;
         walk->progress = tr_getRatio( b, tor->info.files[i].length );
+fprintf( stderr, "walk->progress is %f\n", walk->progress );
     }
 
     if( fileCount )
         *fileCount = n;
+
+fprintf( stderr, "tr_torrentFiles finished\n" );
 
     return files;
 }
