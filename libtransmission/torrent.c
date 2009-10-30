@@ -1061,7 +1061,8 @@ fprintf( stderr, "file fits in a single block\n" );
         }
         else
         {
-            uint32_t i;
+            //uint32_t i;
+            tr_block_index_t i;
 
             /* the first block */
             if( tr_cpBlockIsCompleteFast( &tor->completion, firstBlock ) )
@@ -1086,9 +1087,15 @@ fprintf( stderr, "f->firstPiece == f->lastPiece\n" );
 
                 /* the rest of the first piece */
 fprintf( stderr, "looping on the rest of the first piece\n" );
-                for( i=firstBlock+1; i<lastBlock && i<=lastBlockOfFirstPiece; ++i )
-                    if( tr_cpBlockIsCompleteFast( &tor->completion, i ) )
+fprintf( stderr, "firstBlock is %"PRIu64"\n", (uint64_t)firstBlock );
+fprintf( stderr, "lastBlock is %"PRIu64"\n", (uint64_t)lastBlock );
+fprintf( stderr, "lastBlockOfFirstPiece is %"PRIu64"\n", (uint64_t)lastBlockOfFirstPiece );
+                for( i=firstBlock+1; i<lastBlock && i<=lastBlockOfFirstPiece; ++i ) {
+fprintf( stderr, "looping on i: %"PRIu64"\n", i );
+                    if( tr_cpBlockIsCompleteFast( &tor->completion, i ) ) {
                         ++b;
+                    }
+                }
 
                 /* the middle pieces */
 fprintf( stderr, "looking at the middle pieces\n" );
