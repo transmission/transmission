@@ -1362,7 +1362,7 @@ tr_moveFile( const char * oldpath, const char * newpath, tr_bool * renamed )
     char * buf;
     struct stat st;
     off_t bytesLeft;
-    size_t buflen;
+    off_t buflen;
 
     /* make sure the old file exists */
     if( stat( oldpath, &st ) ) {
@@ -1402,7 +1402,7 @@ tr_moveFile( const char * oldpath, const char * newpath, tr_bool * renamed )
     while( bytesLeft > 0 )
     {
         ssize_t bytesWritten;
-        const size_t bytesThisPass = MIN( bytesLeft, buflen );
+        const off_t bytesThisPass = MIN( bytesLeft, buflen );
         const int numRead = read( in, buf, bytesThisPass );
         if( numRead < 0 )
             break;
