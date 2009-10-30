@@ -2328,8 +2328,14 @@ deleteLocalData( tr_torrent * tor, tr_fileFunc fileFunc )
             if( tr_ptrArrayFindSorted( &dirtyFolders, s[i], vstrcmp ) == NULL )
                 tr_ptrArrayInsertSorted( &cleanFolders, s[i], compareLongestFirst );
         s = (char**) tr_ptrArrayPeek( &cleanFolders, &n );
-        for( i=0; i<n; ++i )
+        for( i=0; i<n; ++i ) {
+#ifdef SYS_DARWIN
+            char * dsStore = tr_buildPath( s[i], ".DS_Store", NULL );
+            fileFunc( dsStore );
+            tr_free( dsStore );
+#endif
             fileFunc( s[i] );
+        }
         tr_ptrArrayDestruct( &cleanFolders, NULL );
     }
 
