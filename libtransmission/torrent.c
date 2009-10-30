@@ -1090,7 +1090,8 @@ fprintf( stderr, "looping on the rest of the first piece\n" );
 fprintf( stderr, "firstBlock is %"PRIu64"\n", (uint64_t)firstBlock );
 fprintf( stderr, "lastBlock is %"PRIu64"\n", (uint64_t)lastBlock );
 fprintf( stderr, "lastBlockOfFirstPiece is %"PRIu64"\n", (uint64_t)lastBlockOfFirstPiece );
-                for( i=firstBlock+1; i<lastBlock && i<=lastBlockOfFirstPiece; ++i ) {
+                //for( i=firstBlock+1; i<lastBlock && i<=lastBlockOfFirstPiece; ++i ) {
+                for( i=firstBlock+1; i<lastBlock && i<=lastBlockOfFirstPiece; i++ ) {
 fprintf( stderr, "looping on i(1): %"PRIu64"\n", i );
                     if( tr_cpBlockIsCompleteFast( &tor->completion, i ) ) {
                         ++b;
