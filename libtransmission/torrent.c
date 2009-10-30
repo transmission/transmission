@@ -1078,7 +1078,7 @@ fprintf( stderr, "f->firstPiece == f->lastPiece\n" );
             }
             else
             {
-                int64_t b = 0;
+                uint64_t b = 0;
                 const tr_block_index_t firstBlockOfLastPiece
                            = tr_torPieceFirstBlock( tor, f->lastPiece );
                 const tr_block_index_t lastBlockOfFirstPiece
@@ -1091,10 +1091,11 @@ fprintf( stderr, "firstBlock is %"PRIu64"\n", (uint64_t)firstBlock );
 fprintf( stderr, "lastBlock is %"PRIu64"\n", (uint64_t)lastBlock );
 fprintf( stderr, "lastBlockOfFirstPiece is %"PRIu64"\n", (uint64_t)lastBlockOfFirstPiece );
                 for( i=firstBlock+1; i<lastBlock && i<=lastBlockOfFirstPiece; ++i ) {
-fprintf( stderr, "looping on i: %"PRIu64"\n", i );
+fprintf( stderr, "looping on i(1): %"PRIu64"\n", i );
                     if( tr_cpBlockIsCompleteFast( &tor->completion, i ) ) {
                         ++b;
                     }
+fprintf( stderr, "looping on i(2): %"PRIu64"\n", i );
                 }
 
                 /* the middle pieces */
