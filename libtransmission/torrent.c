@@ -2353,12 +2353,24 @@ tr_torrentDeleteLocalData( tr_torrent * tor, tr_fileFunc fileFunc )
     tr_fdTorrentClose( tor->session, tor->uniqueId );
 
     if( tor->info.fileCount > 1 )
+    {
         deleteLocalData( tor, fileFunc );
-    else {
+    }
+    else
+    {
+        char * tmp;
+
         /* torrent only has one file */
         char * path = tr_buildPath( tor->currentDir, tor->info.files[0].name, NULL );
         fileFunc( path );
         tr_free( path );
+
+       
+        tmp = tr_torrentBuildPartial( tor, 0 );
+        path = tr_buildPath( tor->currentDir, tmp, NULL );
+        fileFunc( path );
+        tr_free( path );
+        tr_free( tmp );
     }
 }
 
