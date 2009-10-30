@@ -3558,6 +3558,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 break;
             case STATUS_TRANSFER_SESSION_TAG:
                 statusLabel = STATUS_TRANSFER_SESSION;
+                break;
             default:
                 NSAssert1(NO, @"Unknown status label tag received: %d", [menuItem tag]);
         }
