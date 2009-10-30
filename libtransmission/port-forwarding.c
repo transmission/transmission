@@ -114,7 +114,8 @@ set_evtimer_from_status( tr_shared * s )
             break;
     }
 
-    tr_timerAdd( s->timer, sec, msec );
+    if( s->timer != NULL )
+        tr_timerAdd( s->timer, sec, msec );
 }
 
 static void
