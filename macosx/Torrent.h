@@ -139,7 +139,6 @@
 - (BOOL) privateTorrent;
 
 - (NSString *) torrentLocation;
-#warning needed?
 - (NSString *) dataLocation;
 - (NSString *) fileLocation: (FileListNode *) node;
 

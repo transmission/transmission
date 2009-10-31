@@ -490,7 +490,7 @@ int trashDataFile(const char * filename)
         return YES;
     
     NSString * downloadFolder = [self currentDirectory], * volumeName;
-    if (downloadFolder && (volumeName = [[[NSFileManager defaultManager] componentsToDisplayForPath: downloadFolder] objectAtIndex: 0]))
+    if ((volumeName = [[[NSFileManager defaultManager] componentsToDisplayForPath: downloadFolder] objectAtIndex: 0]))
     {
         NSDictionary * systemAttributes = [[NSFileManager defaultManager] attributesOfFileSystemForPath: downloadFolder error: NULL];
         uint64_t remainingSpace = [[systemAttributes objectForKey: NSFileSystemFreeSize] unsignedLongLongValue];
@@ -1406,7 +1406,7 @@ int trashDataFile(const char * filename)
             newLocation = [self dataLocation];
             checkedNewLocation = YES;
             
-            if ([fTimeMachineExclude isEqualToString: newLocation])
+            if (newLocation && [fTimeMachineExclude isEqualToString: newLocation])
                 return;
         }
         
