@@ -27,8 +27,8 @@ Torrent._ErrTrackerWarning     = 1;
 Torrent._ErrTrackerError       = 2;
 Torrent._ErrLocalError         = 3;
 
-Torrent._StaticFields = [ 'addedDate', 'announceURL', 'comment', 'creator',
-    'dateCreated', 'hashString', 'id', 'isPrivate', 'name', 'totalSize' ]
+Torrent._StaticFields = [ 'addedDate', 'comment', 'creator', 'dateCreated',
+		'hashString', 'id', 'isPrivate', 'name', 'totalSize' ]
 Torrent._DynamicFields = [ 'downloadedEver', 'error', 'errorString', 'eta',
     'haveUnchecked', 'haveValid', 'leftUntilDone', 'peersConnected',
     'peersGettingFromUs', 'peersSendingToUs', 'rateDownload', 'rateUpload',
@@ -46,7 +46,6 @@ Torrent.prototype =
 		this._hashString    = data.hashString;
 		this._date          = data.addedDate;
 		this._size          = data.totalSize;
-		this._tracker       = data.announceURL;
 		this._comment       = data.comment;
 		this._creator       = data.creator;
 		this._creator_date  = data.dateCreated;
@@ -615,11 +614,6 @@ Torrent.compareByName = function( a, b ) {
 };
 
 /** Helper function for sortTorrents(). */
-Torrent.compareByTracker = function( a, b ) {
-	return a._tracker.compareTo( b._tracker );
-};
-
-/** Helper function for sortTorrents(). */
 Torrent.compareByState = function( a, b ) {
 	return a.state() - b.state();
 };
@@ -661,9 +655,6 @@ Torrent.sortTorrents = function( torrents, sortMethod, sortDirection )
 			break;
 		case Prefs._SortByState:
 			torrents.sort( this.compareByState );
-			break;
-		case Prefs._SortByTracker:
-			torrents.sort( this.compareByTracker );
 			break;
 		case Prefs._SortByName:
 			torrents.sort( this.compareByName );
