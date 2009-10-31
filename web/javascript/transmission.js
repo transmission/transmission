@@ -98,6 +98,7 @@ Transmission.prototype =
 		this._inspector._info_tab.size = $(ti+'size')[0];
 		this._inspector._info_tab.state = $(ti+'state')[0];
 		this._inspector._info_tab.swarm_speed = $(ti+'swarm_speed')[0];
+		this._inspector._info_tab.pieces = $(ti+'pieces')[0];
 		this._inspector._info_tab.uploaded = $(ti+'uploaded')[0];
 		this._inspector._info_tab.upload_speed = $(ti+'upload_speed')[0];
 		this._inspector._info_tab.upload_to = $(ti+'upload_to')[0];
@@ -936,6 +937,7 @@ Transmission.prototype =
 		var total_size = 0;
 		var total_state = null;
 		var total_swarm_speed = 0;
+		var pieces = 'N/A';
 		var total_upload = 0;
 		var total_upload_peers = 0;
 		var total_upload_speed = 0;
@@ -949,6 +951,7 @@ Transmission.prototype =
 		{
 			setInnerHTML( tab.name, 'No Selection' );
 			setInnerHTML( tab.size, na );
+			setInnerHTML( tab.pieces, na );
 			setInnerHTML( tab.hash, na );
 			setInnerHTML( tab.state, na );
 			setInnerHTML( tab.download_speed, na );
@@ -989,6 +992,7 @@ Transmission.prototype =
 				download_dir = t._download_dir;
 
 			hash = t.hash();
+			pieces = t._pieceCount + ', ' + Math.formatBytes(t._pieceSize);
 			date_created = Math.formatTimestamp( t._creator_date );
 		}
 
@@ -1022,6 +1026,7 @@ Transmission.prototype =
 
 		setInnerHTML( tab.name, name );
 		setInnerHTML( tab.size, torrents.length ? Math.formatBytes( total_size ) : na );
+		setInnerHTML( tab.pieces, pieces );
 		setInnerHTML( tab.hash, hash );
 		setInnerHTML( tab.state, total_state );
 		setInnerHTML( tab.download_speed, torrents.length ? Math.formatBytes( total_download_speed ) + '/s' : na );

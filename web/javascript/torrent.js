@@ -28,7 +28,7 @@ Torrent._ErrTrackerError       = 2;
 Torrent._ErrLocalError         = 3;
 
 Torrent._StaticFields = [ 'addedDate', 'comment', 'creator', 'dateCreated',
-		'hashString', 'id', 'isPrivate', 'name', 'totalSize' ]
+		'hashString', 'id', 'isPrivate', 'name', 'totalSize', 'pieceCount', 'pieceSize' ]
 Torrent._DynamicFields = [ 'downloadedEver', 'error', 'errorString', 'eta',
     'haveUnchecked', 'haveValid', 'leftUntilDone', 'peersConnected',
     'peersGettingFromUs', 'peersSendingToUs', 'rateDownload', 'rateUpload',
@@ -46,6 +46,8 @@ Torrent.prototype =
 		this._hashString    = data.hashString;
 		this._date          = data.addedDate;
 		this._size          = data.totalSize;
+		this._pieceCount    = data.pieceCount;
+		this._pieceSize     = data.pieceSize;
 		this._comment       = data.comment;
 		this._creator       = data.creator;
 		this._creator_date  = data.dateCreated;
