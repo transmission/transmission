@@ -1395,40 +1395,26 @@ int trashDataFile(const char * filename)
 
 - (void) updateTimeMachineExclude
 {
-    NSString * newLocation = nil;
-    BOOL checkedNewLocation = NO;
+    NSString * currentLocation = ![self allDownloaded] ? [self dataLocation] : nil;
     
+    //return if the locations are the same
+    if (fTimeMachineExclude && currentLocation && [fTimeMachineExclude isEqualToString: currentLocation])
+        return;
+    
+    //remove old location...
     if (fTimeMachineExclude)
     {
-        //long-winded way of saying "return if the locations are the same and not all is downloaded"
-        if (![self allDownloaded])
-        {
-            newLocation = [self dataLocation];
-            checkedNewLocation = YES;
-            
-            if (newLocation && [fTimeMachineExclude isEqualToString: newLocation])
-                return;
-        }
-        
         [self setTimeMachineExclude: NO forPath: fTimeMachineExclude];
         [fTimeMachineExclude release];
         fTimeMachineExclude = nil;
     }
     
-    if (![self allDownloaded])
+    //...set new location
+    if (currentLocation)
     {
-        if (!checkedNewLocation)
-        {
-            newLocation = [self dataLocation];
-            checkedNewLocation = YES;
-        }
-        
-        if (newLocation)
-        {
-            [self setTimeMachineExclude: YES forPath: newLocation];
-            [fTimeMachineExclude release];
-            fTimeMachineExclude = [newLocation retain];
-        }
+        [self setTimeMachineExclude: YES forPath: currentLocation];
+        [fTimeMachineExclude release];
+        fTimeMachineExclude = [currentLocation retain];
     }
 }
 
