@@ -228,6 +228,44 @@ test_numbers( void )
 }
 
 static int
+compareInts( const void * va, const void * vb )
+{
+    const int a = *(const int *)va;
+    const int b = *(const int*)vb;
+    return a - b;
+}
+
+static int
+test_lowerbound( void )
+{
+    int i;
+    const int A[] = { 1, 2, 3, 3, 3, 5, 8 };
+    const int expected_pos[] = { 0, 1, 2, 5, 5, 6, 6, 6, 7, 7 };
+    const int expected_exact[] = { TRUE, TRUE, TRUE, FALSE, TRUE, FALSE, FALSE, TRUE, FALSE, FALSE };
+    const int N = sizeof(A) / sizeof(A[0]);
+
+    for( i=1; i<=10; ++i )
+    {
+        tr_bool exact;
+        const int pos = tr_lowerBound( &i, A, N, sizeof(int), compareInts, &exact );
+
+#if 0
+        fprintf( stderr, "searching for %d.  ", i );
+        fprintf( stderr, "result: index = %d, ", pos );
+        if( pos != N )
+            fprintf( stderr, "A[%d] == %d\n", pos, A[pos] );
+        else
+            fprintf( stderr, "which is off the end.\n" );
+#endif
+        check( pos == expected_pos[i-1] )
+        check( exact == expected_exact[i-1] )
+     
+    }
+
+    return 0;
+}
+
+static int
 test_memmem( void )
 {
     char const haystack[12] = "abcabcabcabc";
@@ -270,6 +308,8 @@ main( void )
     tr_free( in );
     tr_free( out );
 
+    if( ( i = test_lowerbound( ) ) )
+        return i;
     if( ( i = test_strstrip( ) ) )
         return i;
     if( ( i = test_buildpath( ) ) )

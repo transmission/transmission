@@ -1108,32 +1108,27 @@ tr_lowerBound( const void * key,
 {
     size_t first = 0;
     const char * cbase = base;
+    tr_bool exact = FALSE;
+    int c;
 
     while( nmemb )
     {
         const size_t half = nmemb / 2;
         const size_t middle = first + half;
-        const int c = compar( key, cbase + size*middle );
+        c = compar( key, cbase + size*middle );
 
-        if( c < 0 )
-        {
+        if( c <= 0 ) {
+            if( c == 0 )
+                exact = TRUE;
+            nmemb = half;
+        } else {
             first = middle + 1;
             nmemb = nmemb - half - 1;
-        }
-        else if( !c )
-        {
-            if( exact_match )
-                *exact_match = TRUE;
-            return middle;
-        }
-        else
-        {
-            nmemb = half;
         }
     }
 
     if( exact_match )
-        *exact_match = FALSE;
+        *exact_match = exact;
 
     return first;
 }
