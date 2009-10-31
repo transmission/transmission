@@ -1108,18 +1108,6 @@ typedef enum
         [self addTrackers];
 }
 
-#warning is editing trackers needed?
-/*- (BOOL) tableView: (NSTableView *) tableView shouldEditTableColumn: (NSTableColumn *) tableColumn row: (NSInteger) row
-{
-    if (tableView != fTrackerTable)
-        return NO;
-    
-    NSUInteger i;
-    for (i = row-1; ![[fTrackers objectAtIndex: i] isKindOfClass: [NSNumber class]]; i--);
-    
-    return [[fTrackers objectAtIndex: i] intValue] == 0;
-}*/
-
 - (NSArray *) quickLookURLs
 {
     FileOutlineView * fileOutlineView = [fFileController outlineView];
