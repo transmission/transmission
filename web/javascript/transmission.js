@@ -1030,7 +1030,7 @@ Transmission.prototype =
 
 		setInnerHTML( tab.name, name );
 		setInnerHTML( tab.size, torrents.length ? Math.formatBytes( total_size ) : na );
-		setInnerHTML( tab.tracker, total_tracker.replace(/\//g, '/&#8203;') );
+		//setInnerHTML( tab.tracker, total_tracker.replace(/\//g, '/&#8203;') );
 		setInnerHTML( tab.hash, hash );
 		setInnerHTML( tab.state, total_state );
 		setInnerHTML( tab.download_speed, torrents.length ? Math.formatBytes( total_download_speed ) + '/s' : na );
