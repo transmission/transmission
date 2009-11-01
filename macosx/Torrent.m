@@ -460,8 +460,8 @@ int trashDataFile(const char * filename)
     volatile int status;
     tr_torrentSetLocation(fHandle, [folder UTF8String], YES, NULL, &status);
     
-    while (status == TR_LOC_MOVING)
-        usleep(200); //block while moving (for now)
+    while (status == TR_LOC_MOVING) //block while moving (for now)
+        [NSThread sleepForTimeInterval: 0.05];
     
     if (status == TR_LOC_DONE)
         [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateStats" object: nil];
