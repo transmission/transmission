@@ -75,10 +75,10 @@ reqListSortPos( const struct request_list * list,
 }
 
 void
-reqListAppend( struct request_list *       list,
-               const struct peer_request * req )
+reqListAppend( struct request_list * list, const struct peer_request * req )
 {
     int low;
+    tr_bool exact;
 
     reqListReserve( list, list->len + 8 );
 
@@ -86,7 +86,7 @@ reqListAppend( struct request_list *       list,
     list->fifo[list->len] = *req;
 
     /* insert into list->sort */
-    low = reqListSortPos( list, req, NULL );
+    low = reqListSortPos( list, req, &exact );
     memmove( &list->sort[low+1], &list->sort[low], (list->len-low)*sizeof(struct peer_request) );
     list->sort[low] = *req;
 

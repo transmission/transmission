@@ -1082,18 +1082,6 @@ tr_base64_decode( const void * input,
     return ret;
 }
 
-int
-tr_ptr2int( void* v )
-{
-    return (intptr_t)v;
-}
-
-void*
-tr_int2ptr( int i )
-{
-    return (void*)(intptr_t)i;
-}
-
 /***
 ****
 ***/
@@ -1109,13 +1097,12 @@ tr_lowerBound( const void * key,
     size_t first = 0;
     const char * cbase = base;
     tr_bool exact = FALSE;
-    int c;
 
-    while( nmemb )
+    while( nmemb != 0 )
     {
         const size_t half = nmemb / 2;
         const size_t middle = first + half;
-        c = compar( key, cbase + size*middle );
+        const int c = compar( key, cbase + size*middle );
 
         if( c <= 0 ) {
             if( c == 0 )
@@ -1127,8 +1114,7 @@ tr_lowerBound( const void * key,
         }
     }
 
-    if( exact_match )
-        *exact_match = exact;
+    *exact_match = exact;
 
     return first;
 }

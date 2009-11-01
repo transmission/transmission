@@ -54,19 +54,27 @@ extern "C" {
 
 #ifndef TR_GNUC_PRINTF
  #ifdef __GNUC__
-  #define TR_GNUC_PRINTF( fmt,\
-                          args ) __attribute__ ( ( format ( printf, fmt,\
-                                                            args ) ) )
+  #define TR_GNUC_PRINTF( fmt, args ) __attribute__ ( ( format ( printf, fmt, args ) ) )
  #else
   #define TR_GNUC_PRINTF( fmt, args )
+ #endif
+#endif
+
+#ifndef TR_GNUC_NONNULL
+ #ifdef __GNUC__
+  #define TR_GNUC_NONNULL( ... ) __attribute__((nonnull (__VA_ARGS__)))
+ #else
+  #define TR_GNUC_NONNULL( ... )
  #endif
 #endif
 
 #ifndef TR_GNUC_NULL_TERMINATED
  #if __GNUC__ >= 4
   #define TR_GNUC_NULL_TERMINATED __attribute__ ( ( __sentinel__ ) )
+  #define TR_GNUC_HOT __attribute ( ( hot ) )
  #else
   #define TR_GNUC_NULL_TERMINATED
+  #define TR_GNUC_HOT
  #endif
 #endif
 
@@ -188,14 +196,14 @@ void           tr_deepLog( const char * file,
                            int          line,
                            const char * name,
                            const char * fmt,
-                           ... ) TR_GNUC_PRINTF( 4, 5 );
+                           ... ) TR_GNUC_PRINTF( 4, 5 ) TR_GNUC_NONNULL(1,4);
 
 char*          tr_getLogTimeStr( char * buf,
-                                 int    buflen );
+                                 int    buflen ) TR_GNUC_NONNULL(1);
 
 
 int            tr_wildmat( const char * text,
-                           const char * pattern );
+                           const char * pattern ) TR_GNUC_NONNULL(1,2);
 
 /** @brief Portability wrapper for basename() that uses the system implementation if available */
 char* tr_basename( const char * path ) TR_GNUC_MALLOC;
@@ -213,7 +221,7 @@ char* tr_dirname( const char * path ) TR_GNUC_MALLOC;
  * (in which case errno is set appropriately).
  */
 int            tr_mkdir( const char * path,
-                         int          permissions );
+                         int          permissions ) TR_GNUC_NONNULL(1);
 
 /**
  * Like mkdir, but makes parent directories as needed.
@@ -221,14 +229,14 @@ int            tr_mkdir( const char * path,
  * @return zero on success, or -1 if an error occurred
  * (in which case errno is set appropriately).
  */
-int tr_mkdirp( const char * path, int permissions );
+int tr_mkdirp( const char * path, int permissions ) TR_GNUC_NONNULL(1);
 
 
 /**
  * @brief Loads a file and returns its contents.
  * On failure, NULL is returned and errno is set.
  */
-uint8_t* tr_loadFile( const char * filename, size_t * size ) TR_GNUC_MALLOC;
+uint8_t* tr_loadFile( const char * filename, size_t * size ) TR_GNUC_MALLOC TR_GNUC_NONNULL(1);
 
 
 /** @brief build a filename from a series of elements using the
@@ -323,7 +331,7 @@ int tr_lowerBound( const void * key,
                    size_t       nmemb,
                    size_t       size,
                    int       (* compar)(const void* key, const void* arrayMember),
-                   tr_bool    * exact_match );
+                   tr_bool    * exact_match ) TR_GNUC_HOT TR_GNUC_NONNULL(1,5,6);
 
 
 char*       tr_strdup_printf( const char * fmt,
@@ -342,7 +350,7 @@ size_t tr_strlcpy( char * dst, const void * src, size_t siz );
 
 /** @brief Portability wrapper for snprintf() that uses the system implementation if available */
 int tr_snprintf( char * buf, size_t buflen,
-                 const char * fmt, ... ) TR_GNUC_PRINTF( 3, 4 );
+                 const char * fmt, ... ) TR_GNUC_PRINTF( 3, 4 ) TR_GNUC_NONNULL(1,3);
 
 const char* tr_strerror( int );
 
@@ -360,10 +368,8 @@ const char* tr_memmem( const char * haystack, size_t haystack_len,
 
 typedef void ( tr_set_func )( void * element, void * userData );
 
-void        tr_set_compare( const void * a,
-                            size_t aCount,
-                            const void * b,
-                            size_t bCount,
+void        tr_set_compare( const void * a, size_t aCount,
+                            const void * b, size_t bCount,
                             int compare( const void * a, const void * b ),
                             size_t elementSize,
                             tr_set_func in_a_cb,
@@ -372,25 +378,21 @@ void        tr_set_compare( const void * a,
                             void * userData );
 
 void tr_sha1_to_hex( char *          out,
-                     const uint8_t * sha1 );
+                     const uint8_t * sha1 ) TR_GNUC_NONNULL(1,2);
 
 
-tr_bool tr_httpIsValidURL( const char * url );
+tr_bool tr_httpIsValidURL( const char * url ) TR_GNUC_NONNULL(1);
 
 int  tr_httpParseURL( const char * url,
                       int          url_len,
                       char **      setme_host,
                       int *        setme_port,
-                      char **      setme_path );
+                      char **      setme_path ) TR_GNUC_NONNULL(1);
 
 double tr_getRatio( double numerator, double denominator );
 
-int* tr_parseNumberRange( const char * str, int str_len, int * setmeCount ) TR_GNUC_MALLOC;
+int* tr_parseNumberRange( const char * str, int str_len, int * setmeCount ) TR_GNUC_MALLOC TR_GNUC_NONNULL(1);
 
-
-int tr_ptr2int( void* );
-
-void* tr_int2ptr( int );
 
 /* truncate a double value at a given number of decimal places.
    this can be used to prevent a printf() call from rounding up:
@@ -412,14 +414,14 @@ double tr_truncd( double x, int decimal_places );
  * @param ratio the ratio to convert to a string
  * @param the string represntation of "infinity"
  */
-char* tr_strratio( char * buf, size_t buflen, double ratio, const char * infinity );
+char* tr_strratio( char * buf, size_t buflen, double ratio, const char * infinity ) TR_GNUC_NONNULL(1,4);
 
 /** @brief Portability wrapper for localtime_r() that uses the system implementation if available */
 struct tm * tr_localtime_r( const time_t *_clock, struct tm *_result );
 
 
 /** on success, return 0.  on failure, return -1 and set errno */
-int tr_moveFile( const char * oldpath, const char * newpath, tr_bool * renamed );
+int tr_moveFile( const char * oldpath, const char * newpath, tr_bool * renamed ) TR_GNUC_NONNULL(1,2);
 
 
 #ifdef __cplusplus
