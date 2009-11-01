@@ -89,7 +89,7 @@ enum
 
     /* this is how many blocks we'll try to queue up
      * for the iterator to walk through */
-    ITERATOR_BLOCK_BUFFER_SIZE = 2048,
+    ITERATOR_BLOCK_BUFFER_SIZE = 4096,
 
     /* if the number of blocks in the iterator queue drops
      * below this number, fill it up with more */
