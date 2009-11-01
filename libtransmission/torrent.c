@@ -1685,6 +1685,7 @@ tr_torrentSetFilePriorities( tr_torrent *      tor,
     for( i = 0; i < fileCount; ++i )
         tr_torrentInitFilePriority( tor, files[i], priority );
 
+    tr_peerMgrFilePrioritiesChanged( tor );
     tr_torrentSetDirty( tor );
     tr_torrentUnlock( tor );
 }

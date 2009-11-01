@@ -458,10 +458,13 @@ firePeerProgress( tr_peermsgs * msgs )
     publish( msgs, &e );
 }
 
+static double blocksGotten = 0.0;
+
 static void
 fireGotBlock( tr_peermsgs * msgs, const struct peer_request * req )
 {
     tr_peer_event e = blankEvent;
+++blocksGotten;
     e.eventType = TR_PEER_CLIENT_GOT_BLOCK;
     e.pieceIndex = req->index;
     e.offset = req->offset;
@@ -1558,6 +1561,8 @@ decrementDownloadedCount( tr_peermsgs * msgs, uint32_t byteCount )
 static TR_INLINE void
 clientGotUnwantedBlock( tr_peermsgs * msgs, const struct peer_request * req )
 {
+static double unwantedGotten = 0.0;
+fprintf( stderr, "dupe ratio: %f\n", ++unwantedGotten / blocksGotten );
     decrementDownloadedCount( msgs, req->length );
 }
 

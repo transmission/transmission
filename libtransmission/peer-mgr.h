@@ -118,6 +118,8 @@ void tr_peerMgrFree( tr_peerMgr * manager );
 tr_bool tr_peerMgrPeerIsSeed( const tr_torrent * tor,
                               const tr_address * addr );
 
+void tr_peerMgrFilePrioritiesChanged( tr_torrent * tor );
+
 void tr_peerMgrAddIncoming( tr_peerMgr  * manager,
                             tr_address  * addr,
                             tr_port       port,
