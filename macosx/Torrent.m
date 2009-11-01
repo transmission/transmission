@@ -457,10 +457,11 @@ int trashDataFile(const char * filename)
         return;
     }
     
-    int status;
+    volatile int status;
     tr_torrentSetLocation(fHandle, [folder UTF8String], YES, NULL, &status);
     
-    while (status == TR_LOC_MOVING); //block while moving (for now)
+    while (status == TR_LOC_MOVING)
+        sleep(1); //block while moving (for now)
     
     if (status == TR_LOC_DONE)
         [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateStats" object: nil];
@@ -1413,7 +1414,6 @@ int trashDataFile(const char * filename)
     if (currentLocation)
     {
         [self setTimeMachineExclude: YES forPath: currentLocation];
-        [fTimeMachineExclude release];
         fTimeMachineExclude = [currentLocation retain];
     }
 }
