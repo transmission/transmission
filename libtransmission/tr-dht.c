@@ -208,7 +208,7 @@ tr_dhtInit(tr_session *ss, tr_address * tr_addr)
     event_set( &dht_event, dht_socket, EV_READ, event_callback, NULL );
     tr_timerAdd( &dht_event, 0, tr_cryptoWeakRandInt( 1000000 ) );
 
-    tr_ndbg( "DHT", "DHT initialised" );
+    tr_ndbg( "DHT", "DHT initialized" );
 
     return 1;
 
