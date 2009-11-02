@@ -40,8 +40,6 @@
 #include "utils.h"
 #include "version.h"
 
-// #ifdef TRACK_DUPES
-
 /**
 ***
 **/
@@ -460,17 +458,10 @@ firePeerProgress( tr_peermsgs * msgs )
     publish( msgs, &e );
 }
 
-#ifdef TRACK_DUPES
-static double blocksGotten = 0.0;
-#endif
-
 static void
 fireGotBlock( tr_peermsgs * msgs, const struct peer_request * req )
 {
     tr_peer_event e = blankEvent;
-#ifdef TRACK_DUPES
-++blocksGotten;
-#endif
     e.eventType = TR_PEER_CLIENT_GOT_BLOCK;
     e.pieceIndex = req->index;
     e.offset = req->offset;
@@ -1567,10 +1558,6 @@ decrementDownloadedCount( tr_peermsgs * msgs, uint32_t byteCount )
 static TR_INLINE void
 clientGotUnwantedBlock( tr_peermsgs * msgs, const struct peer_request * req )
 {
-#ifdef TRACK_DUPES
-static double unwantedGotten = 0.0;
-fprintf( stderr, "dupe ratio: %f\n", ++unwantedGotten / blocksGotten );
-#endif
     decrementDownloadedCount( msgs, req->length );
 }
 
