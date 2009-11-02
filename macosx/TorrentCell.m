@@ -149,7 +149,7 @@
 
 - (NSRect) barRectForBounds: (NSRect) bounds
 {
-    BOOL minimal = [fDefaults boolForKey: @"SmallView"];
+    const BOOL minimal = [fDefaults boolForKey: @"SmallView"];
     
     NSRect result = bounds;
     result.size.height = BAR_HEIGHT;
@@ -244,11 +244,11 @@
     
     NSPoint point = [controlView convertPoint: [event locationInWindow] fromView: nil];
     
-    NSRect controlRect= [self controlButtonRectForBounds: cellFrame];
-    BOOL checkControl = NSMouseInRect(point, controlRect, [controlView isFlipped]);
+    const NSRect controlRect= [self controlButtonRectForBounds: cellFrame];
+    const BOOL checkControl = NSMouseInRect(point, controlRect, [controlView isFlipped]);
     
-    NSRect revealRect = [self revealButtonRectForBounds: cellFrame];
-    BOOL checkReveal = NSMouseInRect(point, revealRect, [controlView isFlipped]);
+    const NSRect revealRect = [self revealButtonRectForBounds: cellFrame];
+    const BOOL checkReveal = NSMouseInRect(point, revealRect, [controlView isFlipped]);
     
     [(TorrentTableView *)controlView removeButtonTrackingAreas];
     
@@ -258,7 +258,7 @@
         
         if (checkControl)
         {
-            BOOL inControlButton = NSMouseInRect(point, controlRect, [controlView isFlipped]);
+            const BOOL inControlButton = NSMouseInRect(point, controlRect, [controlView isFlipped]);
             if (fMouseDownControlButton != inControlButton)
             {
                 fMouseDownControlButton = inControlButton;
@@ -267,7 +267,7 @@
         }
         else if (checkReveal)
         {
-            BOOL inRevealButton = NSMouseInRect(point, revealRect, [controlView isFlipped]);
+            const BOOL inRevealButton = NSMouseInRect(point, revealRect, [controlView isFlipped]);
             if (fMouseDownRevealButton != inRevealButton)
             {
                 fMouseDownRevealButton = inRevealButton;

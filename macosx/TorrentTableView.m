@@ -810,7 +810,7 @@
             priority = TR_PRI_LOW;
             break;
         default:
-            return;
+            NSAssert1(NO, @"Unknown priority: %d", [sender tag]);
     }
     
     [fMenuTorrent setPriority: priority];
