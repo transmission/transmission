@@ -795,6 +795,9 @@ int trashDataFile(const char * filename)
         && !(error = [NSString stringWithCString: fStat->errorString encoding: NSISOLatin1StringEncoding]))
         error = [NSString stringWithFormat: @"(%@)", NSLocalizedString(@"unreadable error", "Torrent -> error string unreadable")];
     
+    //libtransmission uses "Set Location", Mac client uses "Move data file to..." - very hacky!
+    error = [error stringByReplacingOccurrencesOfString: @"Set Location" withString: [@"Move Data File To" stringByAppendingEllipsis]];
+    
     return error;
 }
 
