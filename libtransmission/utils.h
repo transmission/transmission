@@ -69,7 +69,7 @@ extern "C" {
 #endif
 
 #ifndef TR_GNUC_NULL_TERMINATED
- #if __GNUC__ > 4 || ( __GNUC__ == 4 && __GNUC_MINOR__ >= 2 )
+ #if __GNUC__ > 4 || ( __GNUC__ == 4 && __GNUC_MINOR__ >= 3 )
   #define TR_GNUC_NULL_TERMINATED __attribute__ ( ( __sentinel__ ) )
   #define TR_GNUC_HOT __attribute ( ( hot ) )
  #else
