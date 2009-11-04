@@ -553,7 +553,13 @@
     
     //update file action menu
     fMenuTorrent = [[self itemAtRow: row] retain];
-    [self createFileMenu: fActionMenu forFiles: [fMenuTorrent fileList]];
+    
+    //show/hide the file divider
+    const BOOL isFolder = [fMenuTorrent isFolder];
+    [[fActionMenu itemAtIndex: numberOfNonFileItems-1] setHidden: !isFolder];
+    
+    if (isFolder)
+        [self createFileMenu: fActionMenu forFiles: [fMenuTorrent fileList]];
     
     //update global limit check
     [fGlobalLimitItem setState: [fMenuTorrent usesGlobalSpeedLimit] ? NSOnState : NSOffState];
