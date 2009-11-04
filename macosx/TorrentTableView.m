@@ -568,13 +568,21 @@
     NSRect rect = [fTorrentCell iconRectForBounds: [self rectOfRow: row]];
     NSPoint location = rect.origin;
     location.y += rect.size.height + 5.0f;
-    location = [self convertPoint: location toView: nil];
     
-    NSEvent * newEvent = [NSEvent mouseEventWithType: [event type] location: location
-        modifierFlags: [event modifierFlags] timestamp: [event timestamp] windowNumber: [event windowNumber]
-        context: [event context] eventNumber: [event eventNumber] clickCount: [event clickCount] pressure: [event pressure]];
-    
-    [NSMenu popUpContextMenu: fActionMenu withEvent: newEvent forView: self];
+    if ([NSApp isOnSnowLeopardOrBetter])
+    {
+        location = [self convertPoint: location toView: self];
+        [fActionMenu popUpMenuPositioningItem: nil atLocation: location inView: self];
+    }
+    else
+    {
+        location = [self convertPoint: location toView: nil];
+        NSEvent * newEvent = [NSEvent mouseEventWithType: [event type] location: location
+            modifierFlags: [event modifierFlags] timestamp: [event timestamp] windowNumber: [event windowNumber]
+            context: [event context] eventNumber: [event eventNumber] clickCount: [event clickCount] pressure: [event pressure]];
+        
+        [NSMenu popUpContextMenu: fActionMenu withEvent: newEvent forView: self];
+    }
     
     for (NSInteger i = [fActionMenu numberOfItems]-1; i >= numberOfNonFileItems; i--)
         [fActionMenu removeItemAtIndex: i];
