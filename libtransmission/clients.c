@@ -252,7 +252,6 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
         else if( !memcmp( id+1, "TS", 2 ) ) four_digits( buf, buflen, "TorrentStorm", id+3 );
         else if( !memcmp( id+1, "UL", 2 ) ) four_digits( buf, buflen, "uLeecher!", id+3 );
         else if( !memcmp( id+1, "VG", 2 ) ) four_digits( buf, buflen, "Vagaa", id+3 );
-        else if( !memcmp( id+1, "WT", 2 ) ) four_digits( buf, buflen, "BitLet", id+3 );
         else if( !memcmp( id+1, "WY", 2 ) ) four_digits( buf, buflen, "Wyzo", id+3 );
         else if( !memcmp( id+1, "XL", 2 ) ) four_digits( buf, buflen, "Xunlei", id+3 );
         else if( !memcmp( id+1, "XT", 2 ) ) four_digits( buf, buflen, "XanTorrent", id+3 );
@@ -328,6 +327,7 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
     else if( !memcmp( id, "346-", 4 ) )      no_version( buf, buflen, "TorrentTopia" );
     else if( !memcmp( id, "eX", 2 ) )        no_version( buf, buflen, "eXeem" );
     else if( !memcmp( id, "-aria2-", 7 ) )   no_version( buf, buflen, "aria2" );
+    else if( !memcmp( id, "-WT-", 4 ) )      no_version( buf, buflen, "BitLet" );
     else if( !memcmp( id, "-FG", 3 ) )       two_major_two_minor( buf, buflen, "FlashGet", id+3 );
 
     /* Everything else */
