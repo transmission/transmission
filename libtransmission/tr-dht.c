@@ -148,7 +148,7 @@ tr_dhtInit(tr_session *ss, tr_address * tr_addr)
     if(dht_port <= 0)
         return -1;
 
-    tr_ndbg( "DHT", "Initialising DHT" );
+    tr_ndbg( "DHT", "Initializing DHT" );
 
     dht_socket = socket(PF_INET, SOCK_DGRAM, 0);
     if(dht_socket < 0)
@@ -218,7 +218,7 @@ tr_dhtInit(tr_session *ss, tr_address * tr_addr)
         close(dht_socket);
         dht_socket = -1;
         session = NULL;
-        tr_ndbg( "DHT", "DHT initialisation failed (errno = %d)", save );
+        tr_ndbg( "DHT", "DHT initialization failed (errno = %d)", save );
         errno = save;
     }
 
@@ -231,7 +231,7 @@ tr_dhtUninit(tr_session *ss)
     if(session != ss)
         return;
 
-    tr_ndbg( "DHT", "Uninitialising DHT" );
+    tr_ndbg( "DHT", "Uninitializing DHT" );
 
     event_del(&dht_event);
 
@@ -266,7 +266,7 @@ tr_dhtUninit(tr_session *ss)
     dht_uninit( dht_socket, 0 );
     tr_netCloseSocket( dht_socket );
 
-    tr_ndbg("DHT", "Done uninitialising DHT");
+    tr_ndbg("DHT", "Done uninitializing DHT");
 
     session = NULL;
 }
