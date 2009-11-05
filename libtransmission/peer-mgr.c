@@ -1175,6 +1175,7 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
                                 tr_torrentFileCompleted( tor, fileIndex );
                     }
                 }
+                tr_torrentRecheckCompleteness( tor );
             }
             break;
         }
