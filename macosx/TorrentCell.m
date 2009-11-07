@@ -633,8 +633,7 @@
     {
         if (![torrent allDownloaded])
         {
-            //the ratio of total progress to total width equals ratio of progress of amount wanted to wanted width
-            const CGFloat widthRemaining = floorf(NSWidth(barRect) * (1.0 - [torrent progressDone]) / [torrent progress]);
+            const CGFloat widthRemaining = floorf(NSWidth(barRect) * [torrent progressLeft]);
             
             NSRect wantedRect;
             NSDivideRect(missingRect, &wantedRect, &missingRect, widthRemaining, NSMinXEdge);

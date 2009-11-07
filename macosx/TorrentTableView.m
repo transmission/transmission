@@ -567,7 +567,7 @@
     //place menu below button
     NSRect rect = [fTorrentCell iconRectForBounds: [self rectOfRow: row]];
     NSPoint location = rect.origin;
-    location.y += rect.size.height + 5.0f;
+    location.y += rect.size.height + 5.0;
     
     if ([NSApp isOnSnowLeopardOrBetter])
     {

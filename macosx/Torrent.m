@@ -616,12 +616,10 @@ int trashDataFile(const char * filename)
     tr_tracker_info * trackerStructs = tr_new(tr_tracker_info, oldTrackerCount-1);
     
     NSInteger newCount = 0;
-    for (NSInteger oldIndex = 0; oldIndex < oldTrackerCount; ++newCount, ++oldIndex)
+    for (NSInteger oldIndex = 0; oldIndex < oldTrackerCount; ++oldIndex)
     {
         if (![trackers member: [NSString stringWithUTF8String: fInfo->trackers[oldIndex].announce]])
-            trackerStructs[newCount] = fInfo->trackers[oldIndex];
-        else
-            --newCount;
+            trackerStructs[newCount++] = fInfo->trackers[oldIndex];
     }
     
     const tr_announce_list_err result = tr_torrentSetAnnounceList(fHandle, trackerStructs, newCount);
@@ -728,6 +726,11 @@ int trashDataFile(const char * filename)
 - (CGFloat) progressDone
 {
     return fStat->percentDone;
+}
+
+- (CGFloat) progressLeft
+{
+    return (CGFloat)[self sizeLeft] / [self size];
 }
 
 - (CGFloat) checkingProgress
@@ -1038,8 +1041,8 @@ int trashDataFile(const char * filename)
             break;
 
         case TR_STATUS_CHECK:
-            string = [NSString localizedStringWithFormat: NSLocalizedString(@"Checking existing data (%.2f%%)",
-                                    "Torrent -> status string"), 100.0 * [self checkingProgress]];
+            string = [NSString localizedStringWithFormat: @"%@ (%.2f%%)",
+                        NSLocalizedString(@"Checking existing data", "Torrent -> status string"), 100.0 * [self checkingProgress]];
             break;
         
         case TR_STATUS_DOWNLOAD:
@@ -1073,8 +1076,8 @@ int trashDataFile(const char * filename)
             return NSLocalizedString(@"Paused", "Torrent -> status string");
 
         case TR_STATUS_CHECK:
-            return [NSString localizedStringWithFormat: NSLocalizedString(@"Checking existing data (%.2f%%)",
-                                    "Torrent -> status string"), 100.0 * [self checkingProgress]];
+            return [NSString localizedStringWithFormat: @"%@ (%.2f%%)",
+                    NSLocalizedString(@"Checking existing data", "Torrent -> status string"), 100.0 * [self checkingProgress]];
         
         case TR_STATUS_CHECK_WAIT:
             return [NSLocalizedString(@"Waiting to check existing data", "Torrent -> status string") stringByAppendingEllipsis];

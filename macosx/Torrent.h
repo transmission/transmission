@@ -144,6 +144,7 @@
 
 - (CGFloat) progress;
 - (CGFloat) progressDone;
+- (CGFloat) progressLeft;
 - (CGFloat) checkingProgress;
 
 - (NSInteger) eta;
