@@ -30,7 +30,7 @@
 {
     if ((self = [super initWithCoder: coder]))
     {
-        fCount = NSNotFound;
+        fCount = NSUIntegerMax;
     }
     return self;
 }

@@ -962,8 +962,8 @@ int trashDataFile(const char * filename)
                 break;
 
             case TR_STATUS_CHECK:
-                string = [NSString localizedStringWithFormat: NSLocalizedString(@"Checking existing data (%.2f%%)",
-                                        "Torrent -> status string"), 100.0 * [self checkingProgress]];
+                string = [NSString localizedStringWithFormat: @"%@ (%.2f%%)",
+                            NSLocalizedString(@"Checking existing data", "Torrent -> status string"), 100.0 * [self checkingProgress]];
                 break;
 
             case TR_STATUS_DOWNLOAD:
