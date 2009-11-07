@@ -629,33 +629,31 @@
         }
     }
     
-    if (!NSIsEmptyRect(missingRect))
+    if (![torrent allDownloaded])
     {
-        if (![torrent allDownloaded])
+        const CGFloat widthRemaining = floorf(NSWidth(barRect) * [torrent progressLeft]);
+        
+        NSRect wantedRect;
+        NSDivideRect(missingRect, &wantedRect, &missingRect, widthRemaining, NSMinXEdge);
+        
+        //not-available section
+        if ([torrent isActive] && ![torrent isChecking] && [fDefaults boolForKey: @"DisplayProgressBarAvailable"]
+            && [torrent availableDesired] < 1.0)
         {
-            const CGFloat widthRemaining = floorf(NSWidth(barRect) * [torrent progressLeft]);
+            NSRect unavailableRect;
+            NSDivideRect(wantedRect, &wantedRect, &unavailableRect, floorf(NSWidth(wantedRect) * [torrent availableDesired]),
+                        NSMinXEdge);
             
-            NSRect wantedRect;
-            NSDivideRect(missingRect, &wantedRect, &missingRect, widthRemaining, NSMinXEdge);
-            
-            //not-available section
-            if ([torrent isActive] && ![torrent isChecking] && [fDefaults boolForKey: @"DisplayProgressBarAvailable"]
-                && [torrent availableDesired] > 0.0)
-            {
-                NSRect unavailableRect;
-                NSDivideRect(wantedRect, &wantedRect, &unavailableRect, floorf([torrent availableDesired] * NSWidth(wantedRect)),
-                            NSMinXEdge);
-                
-                [[ProgressGradients progressRedGradient] drawInRect: unavailableRect angle: 90];
-            }
-            
-            //remaining section
-            [[ProgressGradients progressWhiteGradient] drawInRect: wantedRect angle: 90];
+            [[ProgressGradients progressRedGradient] drawInRect: unavailableRect angle: 90];
         }
         
-        //unwanted section
-        [[ProgressGradients progressLightGrayGradient] drawInRect: missingRect angle: 90];
+        //remaining section
+        [[ProgressGradients progressWhiteGradient] drawInRect: wantedRect angle: 90];
     }
+    
+    //unwanted section
+    if (!NSIsEmptyRect(missingRect))
+        [[ProgressGradients progressLightGrayGradient] drawInRect: missingRect angle: 90];
 }
 
 - (void) drawPiecesBar: (NSRect) barRect
