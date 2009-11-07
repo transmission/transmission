@@ -272,10 +272,7 @@ torrentPage( GObject * core )
     GtkWidget *  t;
     GtkWidget *  w;
     GtkWidget *  w2;
-
-#ifdef HAVE_GIO
     GtkWidget *  l;
-#endif
 
     t = hig_workarea_create( );
     hig_workarea_add_section_title( t, &row, _( "Adding Torrents" ) );

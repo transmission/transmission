@@ -458,6 +458,16 @@ tr_core_apply_defaults( tr_ctor * ctor )
     }
 }
 
+static int
+tr_strcmp( const void * a,
+           const void * b )
+{
+    if( a && b ) return strcmp( a, b );
+    if( a ) return 1;
+    if( b ) return -1;
+    return 0;
+}
+
 #ifdef HAVE_GIO
 
 struct watchdir_file
@@ -595,16 +605,6 @@ scanWatchDir( TrCore * core )
 
         g_dir_close( dir );
     }
-}
-
-static int
-tr_strcmp( const void * a,
-           const void * b )
-{
-    if( a && b ) return strcmp( a, b );
-    if( a ) return 1;
-    if( b ) return -1;
-    return 0;
 }
 
 static void
