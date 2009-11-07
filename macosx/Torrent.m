@@ -1229,6 +1229,9 @@ int trashDataFile(const char * filename)
     if ([self isComplete])
         return 1.0;
     
+    if ([self fileCount] == 1)
+        return [self progress];
+    
     if (!fFileStat)
         [self updateFileStat];
     
@@ -1252,15 +1255,20 @@ int trashDataFile(const char * filename)
 
 - (BOOL) canChangeDownloadCheckForFile: (NSInteger) index
 {
+    NSAssert2(index < [self fileCount], @"Index %d is greater than file count %d", index, [self fileCount]);
+    
+    if ([self fileCount] == 1 || [self isComplete])
+        return NO;
+    
     if (!fFileStat)
         [self updateFileStat];
     
-    return [self fileCount] > 1 && fFileStat[index].progress < 1.0;
+    return fFileStat[index].progress < 1.0;
 }
 
 - (BOOL) canChangeDownloadCheckForFiles: (NSIndexSet *) indexSet
 {
-    if ([self fileCount] <= 1 || [self isComplete])
+    if ([self fileCount] == 1 || [self isComplete])
         return NO;
     
     if (!fFileStat)
