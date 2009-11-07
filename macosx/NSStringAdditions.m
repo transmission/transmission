@@ -53,27 +53,27 @@
     NSString * unit;
     if (size < pow(1024, 2))
     {
-        convertedSize = size / 1024.0f;
+        convertedSize = size / 1024.0;
         unit = NSLocalizedString(@"KB", "File size - kilobytes");
     }
     else if (size < pow(1024, 3))
     {
-        convertedSize = size / powf(1024.0f, 2.0f);
+        convertedSize = size / (CGFloat)pow(1024, 2);
         unit = NSLocalizedString(@"MB", "File size - megabytes");
     }
     else if (size < pow(1024, 4))
     {
-        convertedSize = size / powf(1024.0f, 3.0f);
+        convertedSize = size / (CGFloat)pow(1024, 3);
         unit = NSLocalizedString(@"GB", "File size - gigabytes");
     }
     else
     {
-        convertedSize = size / powf(1024.0f, 4.0f);
+        convertedSize = size / (CGFloat)pow(1024, 4);
         unit = NSLocalizedString(@"TB", "File size - terabytes");
     }
     
     //attempt to have minimum of 3 digits with at least 1 decimal
-    return convertedSize <= 9.995f ? [NSString localizedStringWithFormat: @"%.2f %@", convertedSize, unit]
+    return convertedSize <= 9.995 ? [NSString localizedStringWithFormat: @"%.2f %@", convertedSize, unit]
                                 : [NSString localizedStringWithFormat: @"%.1f %@", convertedSize, unit];
 }
 
