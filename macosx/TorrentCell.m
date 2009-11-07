@@ -117,7 +117,7 @@
     
     NSRect result = bounds;
     result.origin.x += PADDING_HORIZONTAL;
-    result.origin.y += floorf((result.size.height - imageSize) * 0.5f);
+    result.origin.y += floor((result.size.height - imageSize) * 0.5);
     result.size = NSMakeSize(imageSize, imageSize);
     
     return result;
@@ -161,7 +161,7 @@
     else
         result.origin.y += PADDING_BETWEEN_TITLE_AND_PROGRESS + HEIGHT_STATUS + PADDING_BETWEEN_PROGRESS_AND_BAR;
     
-    result.size.width = round(NSMaxX(bounds) - result.origin.x - PADDING_HORIZONTAL - 2.0f * (PADDING_HORIZONTAL + NORMAL_BUTTON_WIDTH));
+    result.size.width = floor(NSMaxX(bounds) - result.origin.x - PADDING_HORIZONTAL - 2.0 * (PADDING_HORIZONTAL + NORMAL_BUTTON_WIDTH));
     
     return result;
 }
@@ -573,7 +573,7 @@
     if (piecesBarPercent > 0.0)
     {
         NSRect piecesBarRect, regularBarRect;
-        NSDivideRect(barRect, &piecesBarRect, &regularBarRect, floorf(NSHeight(barRect) * PIECES_TOTAL_PERCENT * piecesBarPercent),
+        NSDivideRect(barRect, &piecesBarRect, &regularBarRect, floor(NSHeight(barRect) * PIECES_TOTAL_PERCENT * piecesBarPercent),
                     NSMaxYEdge);
         
         [self drawRegularBar: regularBarRect];
@@ -595,7 +595,7 @@
     Torrent * torrent = [self representedObject];
     
     NSRect haveRect, missingRect;
-    NSDivideRect(barRect, &haveRect, &missingRect, floorf([torrent progress] * NSWidth(barRect)), NSMinXEdge);
+    NSDivideRect(barRect, &haveRect, &missingRect, round([torrent progress] * NSWidth(barRect)), NSMinXEdge);
     
     if (!NSIsEmptyRect(haveRect))
     {
@@ -606,7 +606,7 @@
             else if ([torrent isSeeding])
             {
                 NSRect ratioHaveRect, ratioRemainingRect;
-                NSDivideRect(haveRect, &ratioHaveRect, &ratioRemainingRect, floorf([torrent progressStopRatio] * NSWidth(haveRect)),
+                NSDivideRect(haveRect, &ratioHaveRect, &ratioRemainingRect, round([torrent progressStopRatio] * NSWidth(haveRect)),
                             NSMinXEdge);
                 
                 [[ProgressGradients progressGreenGradient] drawInRect: ratioHaveRect angle: 90];
@@ -631,7 +631,7 @@
     
     if (![torrent allDownloaded])
     {
-        const CGFloat widthRemaining = floorf(NSWidth(barRect) * [torrent progressLeft]);
+        const CGFloat widthRemaining = round(NSWidth(barRect) * [torrent progressLeft]);
         
         NSRect wantedRect;
         NSDivideRect(missingRect, &wantedRect, &missingRect, widthRemaining, NSMinXEdge);
@@ -641,7 +641,7 @@
             && [torrent availableDesired] < 1.0)
         {
             NSRect unavailableRect;
-            NSDivideRect(wantedRect, &wantedRect, &unavailableRect, floorf(NSWidth(wantedRect) * [torrent availableDesired]),
+            NSDivideRect(wantedRect, &wantedRect, &unavailableRect, round(NSWidth(wantedRect) * [torrent availableDesired]),
                         NSMinXEdge);
             
             [[ProgressGradients progressRedGradient] drawInRect: unavailableRect angle: 90];
