@@ -53,6 +53,9 @@ void tr_close_file( int fd );
 tr_bool tr_preallocate_file( const char * filename, uint64_t length );
 
 int64_t tr_lseek( int fd, int64_t offset, int whence );
+ssize_t tr_pread(int fd, void *buf, size_t count, off_t offset);
+ssize_t tr_pwrite(int fd, void *buf, size_t count, off_t offset);
+int tr_prefetch(int fd, off_t offset, size_t count);
 
 
 /**

@@ -34,6 +34,12 @@ int tr_ioRead( struct tr_torrent   * tor,
                uint32_t              len,
                uint8_t             * setme );
 
+int
+tr_ioPrefetch( tr_torrent       * tor,
+               tr_piece_index_t   pieceIndex,
+               uint32_t           begin,
+               uint32_t           len );
+
 /**
  * Writes the block specified by the piece index, offset, and length.
  * @return 0 on success, or an errno value on failure.

@@ -50,7 +50,10 @@
  #define write _write
 #endif
 
-enum { TR_IO_READ, TR_IO_WRITE };
+enum { TR_IO_READ, TR_IO_PREFETCH,
+       /* Any operations that require write access must follow TR_IO_WRITE. */
+       TR_IO_WRITE
+};
 
 int64_t
 tr_lseek( int fd, int64_t offset, int whence )
@@ -77,11 +80,9 @@ readOrWriteBytes( tr_session       * session,
     const tr_info * info = &tor->info;
     const tr_file * file = &info->files[fileIndex];
 
-    typedef size_t ( *iofunc )( int, void *, size_t );
-    iofunc          func = ioMode == TR_IO_READ ? (iofunc)read : (iofunc)write;
     int             fd = -1;
     int             err = 0;
-    const tr_bool doWrite = ioMode == TR_IO_WRITE;
+    const tr_bool doWrite = ioMode >= TR_IO_WRITE;
 
     assert( fileIndex < info->fileCount );
     assert( !file->length || ( fileOffset < file->length ) );
@@ -113,12 +114,12 @@ readOrWriteBytes( tr_session       * session,
                 subpath = tr_strdup( file->name );
         }
 
-        if( ( file->dnd ) || ( ioMode != TR_IO_WRITE ) )
+        if( ( file->dnd ) || ( ioMode < TR_IO_WRITE ) )
             preallocationMode = TR_PREALLOCATE_NONE;
         else
             preallocationMode = tor->session->preallocationMode;
 
-        if( ( ioMode == TR_IO_READ ) && !fileExists ) /* does file exist? */
+        if( ( ioMode < TR_IO_WRITE ) && !fileExists ) /* does file exist? */
         {
             err = ENOENT;
         }
@@ -144,16 +145,29 @@ readOrWriteBytes( tr_session       * session,
 
     if( !err )
     {
-        if( tr_lseek( fd, (int64_t)fileOffset, SEEK_SET ) == -1 )
-        {
-            err = errno;
-            tr_torerr( tor, "tr_lseek failed for \"%s\": %s", file->name, tr_strerror( err ) );
-        }
-        else if( func( fd, buf, buflen ) != buflen )
-        {
-            err = errno;
-            tr_torerr( tor, "read/write failed for \"%s\": %s", file->name, tr_strerror( err ) );
-        }
+        if( ioMode == TR_IO_READ ) {
+            int rc = tr_pread(fd, buf, buflen, fileOffset);
+            if(rc < 0) {
+                err = errno;
+                tr_torerr( tor, "read failed for \"%s\": %s",
+                           file->name, tr_strerror( err ) );
+            }
+        } else if( ioMode == TR_IO_PREFETCH ) {
+            int rc = tr_prefetch(fd, fileOffset, buflen);
+            if(rc < 0) {
+                err = errno;
+                tr_torerr( tor, "prefetch failed for \"%s\": %s",
+                           file->name, tr_strerror( err ) );
+            }
+        } else if( ioMode == TR_IO_WRITE ) {
+            int rc = tr_pwrite(fd, buf, buflen, fileOffset);
+            if(rc < 0) {
+                err = errno;
+                tr_torerr( tor, "write failed for \"%s\": %s",
+                           file->name, tr_strerror( err ) );
+            }
+        } else
+            abort();
     }
 
     return err;
@@ -244,6 +258,16 @@ tr_ioRead( tr_torrent       * tor,
            uint8_t          * buf )
 {
     return readOrWritePiece( tor, TR_IO_READ, pieceIndex, begin, buf, len );
+}
+
+int
+tr_ioPrefetch( tr_torrent       * tor,
+               tr_piece_index_t   pieceIndex,
+               uint32_t           begin,
+               uint32_t           len)
+{
+    return readOrWritePiece( tor, TR_IO_PREFETCH, pieceIndex, begin,
+                             NULL, len );
 }
 
 int

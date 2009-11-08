@@ -208,6 +208,56 @@ tr_preallocate_file( const char * filename, uint64_t length )
     return preallocateFileFull( filename, length );
 }
 
+/* Like pread and pwrite, except that the position is undefined afterwards.
+   And of course they are not thread-safe. */
+
+#ifdef SYS_DARWIN
+ #define HAVE_PREAD
+ #define HAVE_PWRITE
+#endif
+
+ssize_t
+tr_pread( int fd, void *buf, size_t count, off_t offset )
+{
+#ifdef HAVE_PREAD
+    return pread( fd, buf, count, offset );
+#else
+    const off_t lrc = lseek( fd, offset, SEEK_SET );
+    if( lrc < 0 )
+        return -1;
+    return read( fd, buf, count );
+#endif
+}
+
+ssize_t
+tr_pwrite( int fd, void *buf, size_t count, off_t offset )
+{
+#ifdef HAVE_PWRITE
+    return pwrite( fd, buf, count, offset );
+#else
+    const off_t lrc = lseek( fd, offset, SEEK_SET );
+    if( lrc < 0 )
+        return -1;
+    return write( fd, buf, count );
+#endif
+}
+
+int
+tr_prefetch( int fd, off_t offset, size_t count )
+{
+#ifdef HAVE_POSIX_FADVISE
+    return posix_fadvise( fd, offset, count, POSIX_FADV_WILLNEED );
+#elif defined(SYS_DARWIN)
+    int val;
+    struct radvisory radv;
+    radv.ra_offset = offset;
+    radv.ra_count = count;
+    return fcntl( fd, F_RDADVISE, &radv );
+#else
+    return 0;
+#endif
+}
+
 int
 tr_open_file_for_writing( const char * filename )
 {
