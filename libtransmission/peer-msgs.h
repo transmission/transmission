@@ -48,17 +48,9 @@ void         tr_peerMsgsHave( tr_peermsgs * msgs,
 void         tr_peerMsgsPulse( tr_peermsgs * msgs );
 
 void         tr_peerMsgsCancel( tr_peermsgs * msgs,
-                                uint32_t      pieceIndex,
-                                uint32_t      offset,
-                                uint32_t      length );
-
+                                tr_block_index_t block );
 
 void         tr_peerMsgsFree( tr_peermsgs* );
-
-tr_addreq_t  tr_peerMsgsAddRequest( tr_peermsgs * peer,
-                                    uint32_t      pieceIndex,
-                                    uint32_t      offset,
-                                    uint32_t      length );
 
 void         tr_peerMsgsUnsubscribe( tr_peermsgs      * peer,
                                      tr_publisher_tag   tag );

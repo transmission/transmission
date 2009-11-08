@@ -32,7 +32,6 @@
 #include "peer-msgs.h"
 #include "platform.h" /* MAX_STACK_ARRAY_SIZE */
 #include "ratecontrol.h"
-#include "request-list.h"
 #include "session.h"
 #include "stats.h"
 #include "torrent.h"
@@ -78,22 +77,14 @@ enum
 
     PEX_INTERVAL_SECS       = 90, /* sec between sendPex() calls */
 
+    REQQ                    = 512,
 
     MAX_BLOCK_SIZE          = ( 1024 * 16 ),
-
-
-    /* how long an unsent request can stay queued before it's returned
-       back to the peer-mgr's pool of requests */
-    QUEUED_REQUEST_TTL_SECS = 20,
-
-    /* how long a sent request can stay queued before it's returned
-       back to the peer-mgr's pool of requests */
-    SENT_REQUEST_TTL_SECS = 240,
 
     /* used in lowering the outMessages queue period */
     IMMEDIATE_PRIORITY_INTERVAL_SECS = 0,
     HIGH_PRIORITY_INTERVAL_SECS = 2,
-    LOW_PRIORITY_INTERVAL_SECS = 20,
+    LOW_PRIORITY_INTERVAL_SECS = 10,
 
     /* number of pieces to remove from the bitfield when
      * lazy bitfields are turned on */
@@ -110,6 +101,38 @@ enum
     AWAITING_BT_MESSAGE,
     AWAITING_BT_PIECE
 };
+
+/**
+***
+**/
+
+struct peer_request
+{
+    uint32_t    index;
+    uint32_t    offset;
+    uint32_t    length;
+};
+
+static uint32_t
+getBlockOffsetInPiece( const tr_torrent * tor, uint64_t b )
+{
+    const uint64_t piecePos = tor->info.pieceSize * tr_torBlockPiece( tor, b );
+    const uint64_t blockPos = tor->blockSize * b;
+    assert( blockPos >= piecePos );
+    return (uint32_t)( blockPos - piecePos );
+}
+
+static void
+blockToReq( const tr_torrent     * tor,
+            tr_block_index_t       block,
+            struct peer_request  * setme )
+{
+    assert( setme != NULL );
+
+    setme->index = tr_torBlockPiece( tor, block );
+    setme->offset = getBlockOffsetInPiece( tor, block );
+    setme->length = tr_torBlockCountBytes( tor, block );
+}
 
 /**
 ***
@@ -146,6 +169,9 @@ struct tr_peermsgs
     tr_bool         peerSentLtepHandshake;
     /*tr_bool         haveFastSet;*/
 
+    int             activeRequestCount;
+    int             desiredRequestCount;
+
     /* how long the outMessages batch should be allowed to grow before
      * it's flushed -- some messages (like requests >:) should be sent
      * very quickly; others aren't as urgent. */
@@ -155,7 +181,6 @@ struct tr_peermsgs
     uint8_t         ut_pex_id;
     uint16_t        pexCount;
     uint16_t        pexCount6;
-    uint16_t        maxActiveRequests;
 
 #if 0
     size_t                 fastsetSize;
@@ -170,10 +195,9 @@ struct tr_peermsgs
 
     struct evbuffer *      outMessages; /* all the non-piece messages */
 
-    struct request_list    peerAskedFor;
-    struct request_list    clientAskedFor;
-    struct request_list    clientWillAskFor;
-
+    struct peer_request    peerAskedFor[REQQ];
+    int                    peerAskedForCount;
+    
     tr_pex               * pex;
     tr_pex               * pex6;
 
@@ -442,14 +466,6 @@ fireUploadOnly( tr_peermsgs * msgs, tr_bool uploadOnly )
 }
 
 static void
-fireNeedReq( tr_peermsgs * msgs )
-{
-    tr_peer_event e = blankEvent;
-    e.eventType = TR_PEER_NEED_REQ;
-    publish( msgs, &e );
-}
-
-static void
 firePeerProgress( tr_peermsgs * msgs )
 {
     tr_peer_event e = blankEvent;
@@ -466,6 +482,25 @@ fireGotBlock( tr_peermsgs * msgs, const struct peer_request * req )
     e.pieceIndex = req->index;
     e.offset = req->offset;
     e.length = req->length;
+    publish( msgs, &e );
+}
+
+static void
+fireGotRej( tr_peermsgs * msgs, const struct peer_request * req )
+{
+    tr_peer_event e = blankEvent;
+    e.eventType = TR_PEER_CLIENT_GOT_REJ;
+    e.pieceIndex = req->index;
+    e.offset = req->offset;
+    e.length = req->length;
+    publish( msgs, &e );
+}
+
+static void
+fireGotChoke( tr_peermsgs * msgs )
+{
+    tr_peer_event e = blankEvent;
+    e.eventType = TR_PEER_CLIENT_GOT_CHOKE;
     publish( msgs, &e );
 }
 
@@ -520,17 +555,6 @@ firePeerGotData( tr_peermsgs  * msgs,
     e.eventType = TR_PEER_PEER_GOT_DATA;
     e.wasPieceData = wasPieceData;
 
-    publish( msgs, &e );
-}
-
-static void
-fireCancelledReq( tr_peermsgs * msgs, const struct peer_request * req )
-{
-    tr_peer_event e = blankEvent;
-    e.eventType = TR_PEER_CANCEL;
-    e.pieceIndex = req->index;
-    e.offset = req->offset;
-    e.length = req->length;
     publish( msgs, &e );
 }
 
@@ -688,15 +712,17 @@ updateInterest( tr_peermsgs * msgs )
 
     if( i != msgs->peer->clientIsInterested )
         sendInterest( msgs, i );
-    if( i )
-        fireNeedReq( msgs );
 }
 
 static tr_bool
-popNextRequest( tr_peermsgs *         msgs,
-                struct peer_request * setme )
+popNextRequest( tr_peermsgs * msgs, struct peer_request * setme )
 {
-    return reqListPop( &msgs->peerAskedFor, setme );
+    if( msgs->peerAskedForCount == 0 )
+        return FALSE;
+
+    *setme = msgs->peerAskedFor[0];
+    memmove( msgs->peerAskedFor, msgs->peerAskedFor + 1, --msgs->peerAskedForCount );
+    return TRUE;
 }
 
 static void
@@ -705,7 +731,7 @@ cancelAllRequestsToClient( tr_peermsgs * msgs )
     struct peer_request req;
     const int mustSendCancel = tr_peerIoSupportsFEXT( msgs->peer->io );
 
-    while( popNextRequest( msgs, &req ) )
+    while( popNextRequest( msgs, &req ))
         if( mustSendCancel )
             protocolSendReject( msgs, &req );
 }
@@ -768,214 +794,14 @@ requestIsValid( const tr_peermsgs * msgs, const struct peer_request * req )
     return reqIsValid( msgs, req->index, req->offset, req->length );
 }
 
-static void
-expireFromList( tr_peermsgs          * msgs,
-                struct request_list  * list,
-                const time_t           oldestAllowed )
-{
-    size_t i;
-    struct request_list tmp = REQUEST_LIST_INIT;
-
-    /* since the fifo list is sorted by time, the oldest will be first */
-    if( !list->len || ( list->fifo[0].time_requested >= oldestAllowed ) )
-        return;
-
-    /* if we found one too old, start pruning them */
-    reqListCopy( &tmp, list );
-    for( i=0; i<tmp.len; ++i ) {
-        const struct peer_request * req = &tmp.fifo[i];
-        if( req->time_requested >= oldestAllowed )
-            break;
-        tr_peerMsgsCancel( msgs, req->index, req->offset, req->length );
-    }
-    reqListClear( &tmp );
-}
-
-static void
-expireOldRequests( tr_peermsgs * msgs, const time_t now  )
-{
-    time_t oldestAllowed;
-    const tr_bool fext = tr_peerIoSupportsFEXT( msgs->peer->io );
-    dbgmsg( msgs, "entering `expire old requests' block" );
-
-    /* cancel requests that have been queued for too long */
-    oldestAllowed = now - QUEUED_REQUEST_TTL_SECS;
-    expireFromList( msgs, &msgs->clientWillAskFor, oldestAllowed );
-
-    /* if the peer doesn't support "Reject Request",
-     * cancel requests that were sent too long ago. */
-    if( !fext ) {
-        oldestAllowed = now - SENT_REQUEST_TTL_SECS;
-        expireFromList( msgs, &msgs->clientAskedFor, oldestAllowed );
-    }
-
-    dbgmsg( msgs, "leaving `expire old requests' block" );
-}
-
-static void
-pumpRequestQueue( tr_peermsgs * msgs, const time_t now )
-{
-    const int           max = msgs->maxActiveRequests;
-    int                 sent = 0;
-    int                 len = msgs->clientAskedFor.len;
-    struct peer_request req;
-
-    dbgmsg( msgs, "clientIsChoked %d, download allowed %d, len %d, max %d, msgs->clientWillAskFor.len %d",
-            (int)msgs->peer->clientIsChoked,
-            (int)tr_torrentIsPieceTransferAllowed( msgs->torrent, TR_PEER_TO_CLIENT ),
-            len, max, msgs->clientWillAskFor.len );
-
-    if( msgs->peer->clientIsChoked )
-        return;
-    if( !tr_torrentIsPieceTransferAllowed( msgs->torrent, TR_PEER_TO_CLIENT ) )
-        return;
-
-    while( ( len < max ) && reqListPop( &msgs->clientWillAskFor, &req ) )
-    {
-        const tr_block_index_t block = _tr_block( msgs->torrent, req.index, req.offset );
-
-        assert( requestIsValid( msgs, &req ) );
-        assert( tr_bitfieldHas( msgs->peer->have, req.index ) );
-
-        /* don't ask for it if we've already got it... this block may have
-         * come in from a different peer after we cancelled a request for it */
-        if( !tr_cpBlockIsComplete( &msgs->torrent->completion, block ) )
-        {
-            protocolSendRequest( msgs, &req );
-            req.time_requested = now;
-            reqListAppend( &msgs->clientAskedFor, &req );
-
-            ++len;
-            ++sent;
-        }
-        else dbgmsg( msgs, "not asking for it because we've already got it..." );
-    }
-
-    if( sent )
-        dbgmsg( msgs, "pump sent %d requests, now have %d active and %d queued",
-                sent, msgs->clientAskedFor.len, msgs->clientWillAskFor.len );
-
-    if( len < max )
-        fireNeedReq( msgs );
-}
-
-static TR_INLINE tr_bool
-requestQueueIsFull( const tr_peermsgs * msgs )
-{
-    const int req_max = msgs->maxActiveRequests;
-    return msgs->clientWillAskFor.len >= (size_t)req_max;
-}
-
-tr_addreq_t
-tr_peerMsgsAddRequest( tr_peermsgs *    msgs,
-                       uint32_t         index,
-                       uint32_t         offset,
-                       uint32_t         length )
-{
-    struct peer_request req;
-
-    assert( msgs );
-    assert( msgs->torrent );
-
-    /**
-    ***  Reasons to decline the request
-    **/
-
-    /* don't send requests to choked clients */
-    if( msgs->peer->clientIsChoked ) {
-        dbgmsg( msgs, "declining request because they're choking us" );
-        return TR_ADDREQ_CLIENT_CHOKED;
-    }
-
-    /* peer's queue is full */
-    if( requestQueueIsFull( msgs ) ) {
-        dbgmsg( msgs, "declining request because we're full" );
-        return TR_ADDREQ_FULL;
-    }
-
-    /* peer doesn't have this piece */
-    if( !tr_bitfieldHas( msgs->peer->have, index ) )
-        return TR_ADDREQ_MISSING;
-
-    /* have we already asked for this piece? */
-    req.index = index;
-    req.offset = offset;
-    req.length = length;
-    if( reqListHas( &msgs->clientAskedFor, &req ) ) {
-        dbgmsg( msgs, "declining because it's a duplicate" );
-        return TR_ADDREQ_DUPLICATE;
-    }
-    if( reqListHas( &msgs->clientWillAskFor, &req ) ) {
-        dbgmsg( msgs, "declining because it's a duplicate" );
-        return TR_ADDREQ_DUPLICATE;
-    }
-
-    /**
-    ***  Accept this request
-    **/
-
-    dbgmsg( msgs, "adding req for %"PRIu32":%"PRIu32"->%"PRIu32" to our `will request' list",
-            index, offset, length );
-    req.time_requested = time( NULL );
-    reqListAppend( &msgs->clientWillAskFor, &req );
-    return TR_ADDREQ_OK;
-}
-
-static void
-cancelAllRequestsToPeer( tr_peermsgs * msgs, tr_bool sendCancel )
-{
-    size_t i;
-    struct request_list a = msgs->clientWillAskFor;
-    struct request_list b = msgs->clientAskedFor;
-    dbgmsg( msgs, "cancelling all requests to peer" );
-
-    msgs->clientAskedFor = REQUEST_LIST_INIT;
-    msgs->clientWillAskFor = REQUEST_LIST_INIT;
-
-    for( i=0; i<a.len; ++i )
-        fireCancelledReq( msgs, &a.fifo[i] );
-
-    for( i = 0; i < b.len; ++i ) {
-        fireCancelledReq( msgs, &b.fifo[i] );
-        if( sendCancel )
-            protocolSendCancel( msgs, &b.fifo[i] );
-    }
-
-    reqListClear( &a );
-    reqListClear( &b );
-}
 
 void
-tr_peerMsgsCancel( tr_peermsgs * msgs,
-                   uint32_t      pieceIndex,
-                   uint32_t      offset,
-                   uint32_t      length )
+tr_peerMsgsCancel( tr_peermsgs * msgs, tr_block_index_t block )
 {
     struct peer_request req;
-
-    assert( msgs != NULL );
-    assert( length > 0 );
-
-
-    /* have we asked the peer for this piece? */
-    req.index = pieceIndex;
-    req.offset = offset;
-    req.length = length;
-
-    /* if it's only in the queue and hasn't been sent yet, free it */
-    if( reqListRemove( &msgs->clientWillAskFor, &req ) ) {
-        dbgmsg( msgs, "cancelling %"PRIu32":%"PRIu32"->%"PRIu32, pieceIndex, offset, length );
-        fireCancelledReq( msgs, &req );
-    }
-
-    /* if it's already been sent, send a cancel message too */
-    if( reqListRemove( &msgs->clientAskedFor, &req ) ) {
-        dbgmsg( msgs, "cancelling %"PRIu32":%"PRIu32"->%"PRIu32, pieceIndex, offset, length );
-        protocolSendCancel( msgs, &req );
-        fireCancelledReq( msgs, &req );
-    }
+    blockToReq( msgs->torrent, block, &req );
+    protocolSendCancel( msgs, &req );
 }
-
 
 /**
 ***
@@ -1007,6 +833,7 @@ sendLtepHandshake( tr_peermsgs * msgs )
     tr_bencInitDict( &val, 5 );
     tr_bencDictAddInt( &val, "e", getSession(msgs)->encryptionMode != TR_CLEAR_PREFERRED );
     tr_bencDictAddInt( &val, "p", tr_sessionGetPeerPort( getSession(msgs) ) );
+    tr_bencDictAddInt( &val, "reqq", REQQ ); 
     tr_bencDictAddInt( &val, "upload_only", tr_torrentIsSeed( msgs->torrent ) );
     tr_bencDictAddStr( &val, "v", TR_NAME " " USERAGENT_PREFIX );
     m  = tr_bencDictAddDict( &val, "m", 1 );
@@ -1251,11 +1078,13 @@ peerMadeRequest( tr_peermsgs *               msgs,
         dbgmsg( msgs, "rejecting request for a piece we don't have." );
     else if( peerIsChoked )
         dbgmsg( msgs, "rejecting request from choked peer" );
+    else if( msgs->peerAskedForCount + 1 >= REQQ )
+        dbgmsg( msgs, "rejecting request ... reqq is full" );
     else
         allow = TRUE;
 
     if( allow )
-        reqListAppend( &msgs->peerAskedFor, req );
+        msgs->peerAskedFor[msgs->peerAskedForCount++] = *req;
     else if( fext )
         protocolSendReject( msgs, req );
 }
@@ -1364,6 +1193,15 @@ readBtPiece( tr_peermsgs      * msgs,
     }
 }
 
+static void updateDesiredRequestCount( tr_peermsgs * msgs, uint64_t now );
+
+static void
+decrementActiveRequestCount( tr_peermsgs * msgs )
+{
+    if( msgs->activeRequestCount > 0 )
+        msgs->activeRequestCount--;
+}
+
 static int
 readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
 {
@@ -1393,13 +1231,13 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
             dbgmsg( msgs, "got Choke" );
             msgs->peer->clientIsChoked = 1;
             if( !fext )
-                cancelAllRequestsToPeer( msgs, FALSE );
+                fireGotChoke( msgs );
             break;
 
         case BT_UNCHOKE:
             dbgmsg( msgs, "got Unchoke" );
             msgs->peer->clientIsChoked = 0;
-            fireNeedReq( msgs );
+            updateDesiredRequestCount( msgs, tr_date( ) );
             break;
 
         case BT_INTERESTED:
@@ -1425,13 +1263,10 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
             break;
 
         case BT_BITFIELD:
-        {
             dbgmsg( msgs, "got a bitfield" );
             tr_peerIoReadBytes( msgs->peer->io, inbuf, msgs->peer->have->bits, msglen );
             updatePeerProgress( msgs );
-            fireNeedReq( msgs );
             break;
-        }
 
         case BT_REQUEST:
         {
@@ -1446,13 +1281,19 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
 
         case BT_CANCEL:
         {
+            int i;
             struct peer_request r;
             tr_peerIoReadUint32( msgs->peer->io, inbuf, &r.index );
             tr_peerIoReadUint32( msgs->peer->io, inbuf, &r.offset );
             tr_peerIoReadUint32( msgs->peer->io, inbuf, &r.length );
             dbgmsg( msgs, "got a Cancel %u:%u->%u", r.index, r.offset, r.length );
-            if( reqListRemove( &msgs->peerAskedFor, &r ) && fext )
-                protocolSendReject( msgs, &r );
+            for( i=0; i<msgs->peerAskedForCount; ++i ) {
+                const struct peer_request * req = msgs->peerAskedFor + i;
+                if( ( req->index == r.index ) && ( req->offset == r.offset ) && ( req->length == r.length ) )
+                    break;
+            }
+            if( i < msgs->peerAskedForCount )
+                memmove( msgs->peerAskedFor+i, msgs->peerAskedFor+i+1, --msgs->peerAskedForCount-i );
             break;
         }
 
@@ -1520,9 +1361,10 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
             tr_peerIoReadUint32( msgs->peer->io, inbuf, &r.index );
             tr_peerIoReadUint32( msgs->peer->io, inbuf, &r.offset );
             tr_peerIoReadUint32( msgs->peer->io, inbuf, &r.length );
-            if( fext )
-                reqListRemove( &msgs->clientAskedFor, &r );
-            else {
+            if( fext ) {
+                decrementActiveRequestCount( msgs );
+                fireGotRej( msgs, &r );
+            } else {
                 fireError( msgs, EMSGSIZE );
                 return READ_ERR;
             }
@@ -1591,26 +1433,8 @@ clientGotBlock( tr_peermsgs *               msgs,
     /* save the block */
     dbgmsg( msgs, "got block %u:%u->%u", req->index, req->offset, req->length );
 
-    /**
-    *** Remove the block from our `we asked for this' list
-    **/
-
-    if( !reqListRemove( &msgs->clientAskedFor, req ) ) {
-        clientGotUnwantedBlock( msgs, req );
+    if( !tr_peerMgrDidPeerRequest( msgs->torrent, msgs->peer, block ) ) {
         dbgmsg( msgs, "we didn't ask for this message..." );
-        return 0;
-    }
-
-    dbgmsg( msgs, "peer has %d more blocks we've asked for",
-            msgs->clientAskedFor.len );
-
-    /**
-    *** Error checks
-    **/
-
-    if( tr_cpBlockIsComplete( &tor->completion, block ) ) {
-        dbgmsg( msgs, "we have this block already..." );
-        clientGotUnwantedBlock( msgs, req );
         return 0;
     }
 
@@ -1622,6 +1446,7 @@ clientGotBlock( tr_peermsgs *               msgs,
         return err;
 
     addPeerToBlamefield( msgs, req->index );
+    decrementActiveRequestCount( msgs );
     fireGotBlock( msgs, req );
     return 0;
 }
@@ -1685,32 +1510,76 @@ canRead( tr_peerIo * io, void * vmsgs, size_t * piece )
 ***
 **/
 
-static int
-ratePulse( tr_peermsgs * msgs, uint64_t now )
+static void
+updateDesiredRequestCount( tr_peermsgs * msgs, uint64_t now )
 {
-    int irate;
-    const int floor = 8;
-    const int seconds = 10;
-    double rate;
-    int estimatedBlocksInPeriod;
     const tr_torrent * const torrent = msgs->torrent;
 
-    /* Get the rate limit we should use.
-     * FIXME: this needs to consider all the other peers as well... */
-    rate = tr_peerGetPieceSpeed( msgs->peer, now, TR_PEER_TO_CLIENT );
-    if( tr_torrentUsesSpeedLimit( torrent, TR_PEER_TO_CLIENT ) )
-        rate = MIN( rate, tr_torrentGetSpeedLimit( torrent, TR_PEER_TO_CLIENT ) );
-    if( tr_torrentUsesSessionLimits( torrent ) )
-        if( tr_sessionGetActiveSpeedLimit( torrent->session, TR_PEER_TO_CLIENT, &irate ) )
-            rate = MIN( rate, irate );
+    if( tr_torrentIsSeed( msgs->torrent ) )
+    {
+        msgs->desiredRequestCount = 0;
+    }
+    else if( msgs->peer->clientIsChoked )
+    {
+        msgs->desiredRequestCount = 0;
+    }
+    else
+    {
+        int irate;
+        int estimatedBlocksInPeriod;
+        double rate;
+        const int floor = 16;
+        const int seconds = REQUEST_BUF_SECS; 
 
-    estimatedBlocksInPeriod = ( rate * seconds * 1024 ) / torrent->blockSize;
-    msgs->maxActiveRequests = MAX( floor, estimatedBlocksInPeriod );
+        /* Get the rate limit we should use.
+         * FIXME: this needs to consider all the other peers as well... */
+        rate = tr_peerGetPieceSpeed( msgs->peer, now, TR_PEER_TO_CLIENT );
+        if( tr_torrentUsesSpeedLimit( torrent, TR_PEER_TO_CLIENT ) )
+            rate = MIN( rate, tr_torrentGetSpeedLimit( torrent, TR_PEER_TO_CLIENT ) );
 
-    if( msgs->reqq > 0 )
-        msgs->maxActiveRequests = MIN( msgs->maxActiveRequests, msgs->reqq );
+        /* honor the session limits, if enabled */
+        if( tr_torrentUsesSessionLimits( torrent ) )
+            if( tr_sessionGetActiveSpeedLimit( torrent->session, TR_PEER_TO_CLIENT, &irate ) )
+                rate = MIN( rate, irate );
 
-    return TRUE;
+        /* use this desired rate to figure out how
+         * many requests we should send to this peer */
+        estimatedBlocksInPeriod = ( rate * seconds * 1024 ) / torrent->blockSize;
+        msgs->desiredRequestCount = MAX( floor, estimatedBlocksInPeriod );
+
+        /* honor the peer's maximum request count, if specified */
+        if( msgs->reqq > 0 )
+            if( msgs->desiredRequestCount > msgs->reqq )
+                msgs->desiredRequestCount = msgs->reqq;
+    }
+}
+
+static void
+updateRequests( tr_peermsgs * msgs )
+{
+    const int MIN_BATCH_SIZE = 4;
+    const int numwant = msgs->desiredRequestCount - msgs->activeRequestCount;
+
+    /* make sure we have enough block requests queued up */
+    if( numwant >= MIN_BATCH_SIZE )
+    {
+        int i;
+        int n;
+        tr_block_index_t * blocks = tr_new( tr_block_index_t, numwant );
+
+        tr_peerMgrGetNextRequests( msgs->torrent, msgs->peer, numwant, blocks, &n ); 
+
+        for( i=0; i<n; ++i )
+        {
+            struct peer_request req;
+            blockToReq( msgs->torrent, blocks[i], &req );
+            protocolSendRequest( msgs, &req );
+        }
+
+        msgs->activeRequestCount += n;
+
+        tr_free( blocks );
+    }
 }
 
 static size_t
@@ -1818,10 +1687,10 @@ peerPulse( void * vmsgs )
     tr_peermsgs * msgs = vmsgs;
     const time_t  now = time( NULL );
 
-    ratePulse( msgs, now );
-
-    pumpRequestQueue( msgs, now );
-    expireOldRequests( msgs, now );
+    if ( tr_isPeerIo( msgs->peer->io ) ) {
+        updateDesiredRequestCount( msgs, now );
+        updateRequests( msgs );
+    }
 
     for( ;; )
         if( fillOutputBuffer( msgs, now ) < 1 )
@@ -2179,9 +2048,7 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
     m->outMessagesBatchedAt = 0;
     m->outMessagesBatchPeriod = LOW_PRIORITY_INTERVAL_SECS;
     m->incoming.block = evbuffer_new( );
-    m->peerAskedFor = REQUEST_LIST_INIT;
-    m->clientAskedFor = REQUEST_LIST_INIT;
-    m->clientWillAskFor = REQUEST_LIST_INIT;
+    m->peerAskedForCount = 0;
     evtimer_set( &m->pexTimer, pexPulse, m );
     tr_timerAdd( &m->pexTimer, PEX_INTERVAL_SECS, 0 );
     peer->msgs = m;
@@ -2197,7 +2064,7 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
     tellPeerWhatWeHave( m );
 
     tr_peerIoSetIOFuncs( m->peer->io, canRead, didWrite, gotError, m );
-    ratePulse( m, tr_date() );
+    updateDesiredRequestCount( m, tr_date( ) );
 
     return m;
 }
@@ -2209,9 +2076,6 @@ tr_peerMsgsFree( tr_peermsgs* msgs )
     {
         evtimer_del( &msgs->pexTimer );
         tr_publisherDestruct( &msgs->publisher );
-        reqListClear( &msgs->clientWillAskFor );
-        reqListClear( &msgs->clientAskedFor );
-        reqListClear( &msgs->peerAskedFor );
 
         evbuffer_free( msgs->incoming.block );
         evbuffer_free( msgs->outMessages );

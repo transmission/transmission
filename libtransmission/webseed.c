@@ -64,9 +64,11 @@ publish( tr_webseed *    w,
 static void
 fireNeedReq( tr_webseed * w )
 {
+#if 0
     tr_peer_event e = blankEvent;
     e.eventType = TR_PEER_NEED_REQ;
     publish( w, &e );
+#endif
 }
 
 static void

@@ -25,6 +25,7 @@
 
 #include "bitfield.h"
 #include "net.h"
+#include "peer-common.h" /* struct peer_request */
 #include "publish.h" /* tr_publisher_tag */
 #include "utils.h"
 
@@ -117,6 +118,18 @@ void tr_peerMgrFree( tr_peerMgr * manager );
 
 tr_bool tr_peerMgrPeerIsSeed( const tr_torrent * tor,
                               const tr_address * addr );
+
+void tr_peerMgrGetNextRequests( tr_torrent          * torrent,
+                                tr_peer             * peer,
+                                int                   numwant,
+                                tr_block_index_t    * setme,
+                                int                 * numgot );
+
+tr_bool tr_peerMgrDidPeerRequest( const tr_torrent  * torrent,
+                                  const tr_peer     * peer,
+                                  tr_block_index_t    block );
+
+void tr_peerMgrRebuildRequests( tr_torrent * torrent );
 
 void tr_peerMgrAddIncoming( tr_peerMgr  * manager,
                             tr_address  * addr,

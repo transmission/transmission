@@ -28,6 +28,18 @@
 
 #include "transmission.h"
 
+enum
+{
+    /** when we're making requests from another peer, 
+        batch them together to send enough requests to
+        meet our bandwidth goals for the next N seconds */
+    REQUEST_BUF_SECS = 10,
+
+    /** how long we'll let requests we've made stay pending
+        before we cancel them */
+    REQUEST_TTL_SECS = 30
+};
+
 typedef enum
 {
     TR_ADDREQ_OK = 0,
@@ -45,16 +57,16 @@ tr_addreq_t;
 typedef enum
 {
     TR_PEER_CLIENT_GOT_BLOCK,
+    TR_PEER_CLIENT_GOT_CHOKE,
     TR_PEER_CLIENT_GOT_DATA,
     TR_PEER_CLIENT_GOT_ALLOWED_FAST,
     TR_PEER_CLIENT_GOT_SUGGEST,
     TR_PEER_CLIENT_GOT_PORT,
+    TR_PEER_CLIENT_GOT_REJ,
     TR_PEER_PEER_GOT_DATA,
     TR_PEER_PEER_PROGRESS,
     TR_PEER_ERROR,
-    TR_PEER_CANCEL,
-    TR_PEER_UPLOAD_ONLY,
-    TR_PEER_NEED_REQ
+    TR_PEER_UPLOAD_ONLY
 }
 PeerEventType;
 
