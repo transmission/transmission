@@ -149,8 +149,6 @@
 		A2623B410D3DC5930045D19A /* ResumeHover.png in Resources */ = {isa = PBXBuildFile; fileRef = A2623B3D0D3DC5930045D19A /* ResumeHover.png */; };
 		A2623B420D3DC5930045D19A /* PauseHover.png in Resources */ = {isa = PBXBuildFile; fileRef = A2623B3E0D3DC5930045D19A /* PauseHover.png */; };
 		A2623B4E0D3DC6DF0045D19A /* ActionHover.png in Resources */ = {isa = PBXBuildFile; fileRef = A2623B4D0D3DC6DF0045D19A /* ActionHover.png */; };
-		A263E0730F111B89008D09D6 /* request-list.c in Sources */ = {isa = PBXBuildFile; fileRef = A263E0710F111B89008D09D6 /* request-list.c */; };
-		A263E0740F111B8A008D09D6 /* request-list.h in Headers */ = {isa = PBXBuildFile; fileRef = A263E0720F111B89008D09D6 /* request-list.h */; };
 		A26AF21A0D2DA35A00FF7140 /* FileOutlineController.m in Sources */ = {isa = PBXBuildFile; fileRef = A26AF2190D2DA35A00FF7140 /* FileOutlineController.m */; };
 		A26AF27E0D2DBDDF00FF7140 /* AddWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A26AF27C0D2DBDDF00FF7140 /* AddWindow.xib */; };
 		A26AF2840D2DC27C00FF7140 /* AddWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A26AF2830D2DC27C00FF7140 /* AddWindowController.m */; };
@@ -579,8 +577,6 @@
 		A2623B3D0D3DC5930045D19A /* ResumeHover.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ResumeHover.png; path = macosx/Images/ResumeHover.png; sourceTree = "<group>"; };
 		A2623B3E0D3DC5930045D19A /* PauseHover.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PauseHover.png; path = macosx/Images/PauseHover.png; sourceTree = "<group>"; };
 		A2623B4D0D3DC6DF0045D19A /* ActionHover.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionHover.png; path = macosx/Images/ActionHover.png; sourceTree = "<group>"; };
-		A263E0710F111B89008D09D6 /* request-list.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "request-list.c"; path = "libtransmission/request-list.c"; sourceTree = "<group>"; };
-		A263E0720F111B89008D09D6 /* request-list.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "request-list.h"; path = "libtransmission/request-list.h"; sourceTree = "<group>"; };
 		A265A32E0D25767700198AC8 /* fr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fr; path = macosx/fr.lproj/Creator.xib; sourceTree = "<group>"; };
 		A265A32F0D25767700198AC8 /* fr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fr; path = macosx/fr.lproj/InfoWindow.xib; sourceTree = "<group>"; };
 		A265A3300D25767700198AC8 /* fr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fr; path = macosx/fr.lproj/MainMenu.xib; sourceTree = "<group>"; };
@@ -1187,8 +1183,6 @@
 				BEFC1E010C07861A00B0BB3C /* ratecontrol.c */,
 				A21FBBA90EDA78C300BC3C51 /* bandwidth.h */,
 				A21FBBAA0EDA78C300BC3C51 /* bandwidth.c */,
-				A263E0710F111B89008D09D6 /* request-list.c */,
-				A263E0720F111B89008D09D6 /* request-list.h */,
 				BEFC1E020C07861A00B0BB3C /* platform.h */,
 				BEFC1E030C07861A00B0BB3C /* platform.c */,
 				BEFC1E0C0C07861A00B0BB3C /* net.h */,
@@ -1466,7 +1460,6 @@
 				A2DF58590DE4B2B1000795D5 /* JSON_parser.h in Headers */,
 				A25E03E20E4015380086C225 /* tr-getopt.h in Headers */,
 				A21FBBAB0EDA78C300BC3C51 /* bandwidth.h in Headers */,
-				A263E0740F111B8A008D09D6 /* request-list.h in Headers */,
 				A22CFCA90FC24ED80009BD3E /* tr-dht.h in Headers */,
 				0A6169A80FE5C9A200C66CE6 /* bitfield.h in Headers */,
 				A25964A7106D73A800453B31 /* announcer.h in Headers */,
@@ -1922,7 +1915,6 @@
 				A25E03E30E4015380086C225 /* tr-getopt.c in Sources */,
 				4DB74F080E8CD75100AEB1A8 /* wildmat.c in Sources */,
 				A21FBBAC0EDA78C300BC3C51 /* bandwidth.c in Sources */,
-				A263E0730F111B89008D09D6 /* request-list.c in Sources */,
 				A22CFCA80FC24ED80009BD3E /* tr-dht.c in Sources */,
 				0A6169A70FE5C9A200C66CE6 /* bitfield.c in Sources */,
 				A25964A6106D73A800453B31 /* announcer.c in Sources */,
