@@ -24,12 +24,12 @@
 
 #import "PortChecker.h"
 
-#define CHECKER_URL @"http://portcheck.transmissionbt.com/%d"
+#define CHECKER_URL(port) [NSString stringWithFormat: @"http://portcheck.transmissionbt.com/%d", port]
 #define CHECK_FIRE  3.0
 
 @interface PortChecker (Private)
 
-- (void) startProbe;
+- (void) startProbe: (NSTimer *) timer;
 
 - (void) callBackWithStatus: (port_status_t) status;
 
@@ -43,14 +43,12 @@
     {
         fDelegate = delegate;
         
-        fPortNumber = portNumber;
         fStatus = PORT_STATUS_CHECKING;
         
-        if (delay)
-            fTimer = [NSTimer scheduledTimerWithTimeInterval: CHECK_FIRE target: self
-                        selector: @selector(startProbe) userInfo: nil repeats: NO];
-        else
-            [self startProbe];
+        fTimer = [NSTimer scheduledTimerWithTimeInterval: CHECK_FIRE target: self selector: @selector(startProbe:)
+                    userInfo: [NSNumber numberWithInteger: portNumber] repeats: NO];
+        if (!delay)
+            [fTimer fire];
     }
     
     return self;
@@ -124,12 +122,11 @@
 
 @implementation PortChecker (Private)
 
-- (void) startProbe
+- (void) startProbe: (NSTimer *) timer
 {
     fTimer = nil;
     
-    NSURLRequest * portProbeRequest = [NSURLRequest requestWithURL: [NSURL URLWithString:
-                                        [NSString stringWithFormat: CHECKER_URL, fPortNumber]]
+    NSURLRequest * portProbeRequest = [NSURLRequest requestWithURL: [NSURL URLWithString: CHECKER_URL([[timer userInfo] integerValue])]
                                         cachePolicy: NSURLRequestReloadIgnoringLocalAndRemoteCacheData timeoutInterval: 15.0];
     
     if ((fConnection = [[NSURLConnection alloc] initWithRequest: portProbeRequest delegate: self]))

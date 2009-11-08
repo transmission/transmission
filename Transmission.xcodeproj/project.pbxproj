@@ -2379,6 +2379,7 @@
 				);
 				IBC_FLATTEN_NIBS = NO;
 				IBC_NOTICES = NO;
+				IBC_WARNINGS = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/macosx/Info.plist";
 				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "-CC";
 				INFOPLIST_PREFIX_HEADER = "$(SRCROOT)/libtransmission/version.h";
@@ -2387,13 +2388,13 @@
 					"third-party/curl/lib",
 					"third-party/openssl/lib",
 				);
-				LLVM_LTO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "";
 				PREBINDING = NO;
 				PRELINK_LIBS = "";
+				RUN_CLANG_STATIC_ANALYZER = NO;
 				SDKROOT = macosx10.6;
 				STRIP_INSTALLED_PRODUCT = NO;
 				VALID_ARCHS = "i386 ppc ppc7400 ppc970 x86_64";
@@ -2537,6 +2538,7 @@
 					"third-party/openssl/include",
 				);
 				IBC_NOTICES = NO;
+				IBC_WARNINGS = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/macosx/Info.plist";
 				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "-CC";
 				INFOPLIST_PREFIX_HEADER = "$(SRCROOT)/libtransmission/version.h";
@@ -2545,10 +2547,10 @@
 					"third-party/curl/lib",
 					"third-party/openssl/lib",
 				);
-				LLVM_LTO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				OTHER_LDFLAGS = "";
 				PREBINDING = NO;
+				RUN_CLANG_STATIC_ANALYZER = NO;
 				SDKROOT = macosx10.6;
 				VALID_ARCHS = "i386 ppc ppc7400 ppc970 x86_64";
 			};
@@ -2637,6 +2639,7 @@
 					"third-party/openssl/include",
 				);
 				IBC_NOTICES = NO;
+				IBC_WARNINGS = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/macosx/Info.plist";
 				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "-CC";
 				INFOPLIST_PREFIX_HEADER = "$(SRCROOT)/libtransmission/version.h";
@@ -2645,10 +2648,10 @@
 					"third-party/curl/lib",
 					"third-party/openssl/lib",
 				);
-				LLVM_LTO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				OTHER_LDFLAGS = "";
 				PREBINDING = NO;
+				RUN_CLANG_STATIC_ANALYZER = NO;
 				SDKROOT = macosx10.6;
 				STRIP_INSTALLED_PRODUCT = NO;
 				VALID_ARCHS = "i386 ppc ppc7400 ppc970 x86_64";

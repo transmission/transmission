@@ -207,7 +207,7 @@ tr_session * fHandle;
     
     //set proxy type
     [fProxyAddressField setStringValue: [fDefaults stringForKey: @"ProxyAddress"]];
-    int proxyType;
+    NSInteger proxyType;
     switch (tr_sessionGetProxyType(fHandle))
     {
         case TR_PROXY_SOCKS4:
@@ -218,6 +218,9 @@ tr_session * fHandle;
             break;
         case TR_PROXY_HTTP:
             proxyType = PROXY_HTTP;
+            break;
+        default:
+            NSAssert(NO, @"Unknown proxy type received");
     }
     [fProxyTypePopUp selectItemAtIndex: proxyType];
     
@@ -815,6 +818,9 @@ tr_session * fHandle;
             break;
         case PROXY_SOCKS5:
             type = @"SOCKS5";
+            break;
+        default:
+            NSAssert1(NO, @"Unknown index %d received for proxy type", [sender indexOfSelectedItem]);
     }
     
     [fDefaults setObject: type forKey: @"ProxyType"];

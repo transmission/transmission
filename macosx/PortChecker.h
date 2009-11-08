@@ -36,7 +36,6 @@ typedef enum
 {    
     id fDelegate;
     port_status_t fStatus;
-    NSInteger fPortNumber;
     
     NSURLConnection * fConnection;
     NSMutableData * fPortProbeData;
