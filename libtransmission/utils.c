@@ -785,8 +785,6 @@ tr_strstrip( char * str )
         while( len && isspace( str[len - 1] ) )
             --len;
 
-        str[len] = '\0';
-
         for( pos = 0; pos < len && isspace( str[pos] ); )
             ++pos;
 
