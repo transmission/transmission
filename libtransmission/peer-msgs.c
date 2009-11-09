@@ -807,6 +807,28 @@ tr_peerMsgsCancel( tr_peermsgs * msgs, tr_block_index_t block )
 ***
 **/
 
+/* Return our global IPv6 address, with caching. */
+
+static const unsigned char *
+globalIPv6( void )
+{
+    static unsigned char ipv6[16];
+    static time_t last_time = 0;
+    static int have_ipv6 = 0;
+    const time_t now = time( NULL );
+
+    /* Re-check every half hour */
+    if( last_time < now - 1800 )
+    {
+        int addrlen = 16;
+        const int rc = tr_globalAddress( AF_INET6, ipv6, &addrlen );
+        have_ipv6 = ( rc >= 0 ) && ( addrlen == 16 );
+        last_time = now;
+    }
+
+    return have_ipv6 ? ipv6 : NULL;
+}
+
 static void
 sendLtepHandshake( tr_peermsgs * msgs )
 {
@@ -815,6 +837,7 @@ sendLtepHandshake( tr_peermsgs * msgs )
     int len;
     int pex;
     struct evbuffer * out = msgs->outMessages;
+    const unsigned char * ipv6 = globalIPv6();
 
     if( msgs->clientSentLtepHandshake )
         return;
@@ -830,8 +853,10 @@ sendLtepHandshake( tr_peermsgs * msgs )
     else
         pex = 1;
 
-    tr_bencInitDict( &val, 5 );
+    tr_bencInitDict( &val, 7 );
     tr_bencDictAddInt( &val, "e", getSession(msgs)->encryptionMode != TR_CLEAR_PREFERRED );
+    if( ipv6 )
+        tr_bencDictAddRaw( &val, "ipv6", ipv6, 16 );
     tr_bencDictAddInt( &val, "p", tr_sessionGetPeerPort( getSession(msgs) ) );
     tr_bencDictAddInt( &val, "reqq", REQQ ); 
     tr_bencDictAddInt( &val, "upload_only", tr_torrentIsSeed( msgs->torrent ) );
@@ -861,6 +886,11 @@ parseLtepHandshake( tr_peermsgs *     msgs,
     int64_t   i;
     tr_benc   val, * sub;
     uint8_t * tmp = tr_new( uint8_t, len );
+    const uint8_t *addr;
+    size_t addr_len;
+    tr_pex pex;
+
+    memset( &pex, 0, sizeof( tr_pex ) );
 
     tr_peerIoReadBytes( msgs->peer->io, inbuf, tmp, len );
     msgs->peerSentLtepHandshake = 1;
@@ -875,9 +905,12 @@ parseLtepHandshake( tr_peermsgs *     msgs,
     dbgmsg( msgs, "here is the handshake: [%*.*s]", len, len,  tmp );
 
     /* does the peer prefer encrypted connections? */
-    if( tr_bencDictFindInt( &val, "e", &i ) )
+    if( tr_bencDictFindInt( &val, "e", &i ) ) {
         msgs->peer->encryption_preference = i ? ENCRYPTION_PREFERENCE_YES
                                               : ENCRYPTION_PREFERENCE_NO;
+        if( i )
+            pex.flags |= ADDED_F_ENCRYPTION_FLAG;
+    }
 
     /* check supported messages for utorrent pex */
     msgs->peerSupportsPex = 0;
@@ -890,13 +923,29 @@ parseLtepHandshake( tr_peermsgs *     msgs,
     }
 
     /* look for upload_only (BEP 21) */
-    if( tr_bencDictFindInt( &val, "upload_only", &i ) )
+    if( tr_bencDictFindInt( &val, "upload_only", &i ) ) {
         fireUploadOnly( msgs, i!=0 );
+        if( i )
+            pex.flags |= ADDED_F_SEED_FLAG;
+    }
 
     /* get peer's listening port */
     if( tr_bencDictFindInt( &val, "p", &i ) ) {
         fireClientGotPort( msgs, (tr_port)i );
+        pex.port = htons( (uint16_t)i );
         dbgmsg( msgs, "peer's port is now %d", (int)i );
+    }
+
+    if( tr_bencDictFindRaw( &val, "ipv4", &addr, &addr_len) && addr_len == 4 ) {
+        pex.addr.type = TR_AF_INET;
+        memcpy( &pex.addr.addr.addr4, addr, 4 );
+        tr_peerMgrAddPex( msgs->torrent, TR_PEER_FROM_ALT, &pex );
+    }
+ 
+    if( tr_bencDictFindRaw( &val, "ipv6", &addr, &addr_len) && addr_len == 16 ) {
+        pex.addr.type = TR_AF_INET6;
+        memcpy( &pex.addr.addr.addr6, addr, 16 );
+        tr_peerMgrAddPex( msgs->torrent, TR_PEER_FROM_ALT, &pex );
     }
 
     /* get peer's maximum request queue size */
@@ -1885,10 +1934,11 @@ sendPex( tr_peermsgs * msgs )
                         pexDroppedCb, pexAddedCb, pexElementCb, &diffs6 );
         dbgmsg(
             msgs,
-            "pex: old peer count %d, new peer count %d, added %d, removed %d",
-            msgs->pexCount, newCount + newCount6,
-            diffs.addedCount + diffs6.addedCount,
-            diffs.droppedCount + diffs6.droppedCount );
+            "pex: old peer count %d+%d, new peer count %d+%d, "
+            "added %d+%d, removed %d+%d",
+            msgs->pexCount, msgs->pexCount6, newCount, newCount6,
+            diffs.addedCount, diffs6.addedCount,
+            diffs.droppedCount, diffs6.droppedCount );
 
         if( !diffs.addedCount && !diffs.droppedCount && !diffs6.addedCount &&
             !diffs6.droppedCount )

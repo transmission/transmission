@@ -120,4 +120,6 @@ void tr_netCloseSocket( int fd );
 
 void tr_netInit( void );
 
+int tr_globalAddress(int af, void *addr, int *addr_len);
+
 #endif /* _TR_NET_H_ */

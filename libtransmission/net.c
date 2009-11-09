@@ -1,4 +1,5 @@
 /******************************************************************************
+ *
  * $Id$
  *
  * Copyright (c) 2005-2008 Transmission authors and contributors
@@ -461,4 +462,144 @@ void
 tr_netClose( tr_session * session, int s )
 {
     tr_fdSocketClose( session, s );
+}
+
+/*
+   get_source_address(), get_name_source_address(), and
+   global_unicast_address() were written by Juliusz Chroboczek,
+   and are covered under the same license as dht.c.
+   Please feel free to copy them into your software
+   if it can help unbreaking the double-stack Internet. */
+
+/* Get the source address used for a given destination address.  Since
+   there is no official interface to get this information, we create
+   a connected UDP socket (connected UDP... hmm...) and check its source
+   address. */
+static int
+get_source_address( const struct sockaddr  * dst,
+                    socklen_t                dst_len,
+                    struct sockaddr        * src,
+                    socklen_t              * src_len )
+{
+    int s, rc, save;
+
+    s = socket(dst->sa_family, SOCK_DGRAM, 0);
+    if(s < 0)
+        goto fail;
+
+    /* Since it's a UDP socket, this doesn't actually send any packets. */
+    rc = connect(s, dst, dst_len);
+    if(rc < 0)
+        goto fail;
+
+    rc = getsockname(s, src, src_len);
+    if(rc < 0)
+        goto fail;
+
+    EVUTIL_CLOSESOCKET( s );
+
+    return rc;
+
+ fail:
+    save = errno;
+    EVUTIL_CLOSESOCKET( s );
+    errno = save;
+    return -1;
+}
+
+/* Like above, but for a given DNS name. */
+static int
+get_name_source_address(int af, const char *name,
+                        struct sockaddr *src, socklen_t *src_len)
+{
+    struct addrinfo hints, *info, *infop;
+    int rc;
+
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = af;
+    hints.ai_socktype = SOCK_DGRAM;
+
+    rc = getaddrinfo(name, NULL, &hints, &info);
+    if(rc != 0) {
+        errno = ENOENT;
+        return -1;
+    }
+
+    rc = -1;
+    errno = ENOENT;
+    infop = info;
+    while(infop) {
+        if(infop->ai_addr->sa_family == af) {
+            rc = get_source_address(infop->ai_addr, infop->ai_addrlen,
+                                    src, src_len);
+            if(rc >= 0)
+                break;
+        }
+        infop = infop->ai_next;
+    }
+
+    freeaddrinfo(info);
+    return rc;
+}
+
+/* We all hate NATs. */
+static int
+global_unicast_address(struct sockaddr *sa)
+{
+    if(sa->sa_family == AF_INET) {
+        const unsigned char *a =
+            (unsigned char*)&((struct sockaddr_in*)sa)->sin_addr;
+        if(a[0] == 0 || a[0] == 127 || a[0] >= 224 ||
+           a[0] == 10 || (a[0] == 172 && a[1] >= 16 && a[1] <= 31) ||
+           (a[0] == 192 && a[1] == 168))
+            return 0;
+        return 1;
+    } else if(sa->sa_family == AF_INET6) {
+        const unsigned char *a =
+            (unsigned char*)&((struct sockaddr_in6*)sa)->sin6_addr;
+        /* 2000::/3 */
+        return (a[0] & 0xE0) == 0x20;
+    } else {
+        errno = EAFNOSUPPORT;
+        return -1;
+    }
+}
+
+int
+tr_globalAddress( int af, void *addr, int *addr_len )
+{
+    struct sockaddr_storage ss;
+    socklen_t ss_len = sizeof(ss);
+    int rc;
+
+    /* This should be a name with both IPv4 and IPv6 addresses. */
+    rc = get_name_source_address( af, "www.transmissionbt.com",
+                                  (struct sockaddr*)&ss, &ss_len );
+    /* In case Charles removes IPv6 from his website. */
+    if( rc < 0 )
+        rc = get_name_source_address(  af, "www.ietf.org",
+                                      (struct sockaddr*)&ss, &ss_len );
+
+    if( rc < 0 )
+        return -1;
+
+    if( !global_unicast_address( (struct sockaddr*)&ss) )
+        return -1;
+
+    switch(af) {
+    case AF_INET:
+        if(*addr_len < 4)
+            return -1;
+        memcpy(addr, &((struct sockaddr_in*)&ss)->sin_addr, 4);
+        *addr_len = 4;
+        return 1;
+    case AF_INET6:
+        if(*addr_len < 16)
+            return -1;
+        memcpy(addr, &((struct sockaddr_in6*)&ss)->sin6_addr, 16);
+        *addr_len = 16;
+        return 1;
+    default:
+        return -1;
+    }
 }
