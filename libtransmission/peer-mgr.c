@@ -165,6 +165,7 @@ typedef struct tr_torrent_peers
     //int                      * pendingRequestCount;
 
     tr_bool                    isRunning;
+    tr_bool                    needsCompletenessCheck;
 
     struct block_request     * requests;
     int                        requestsSort;
@@ -1383,6 +1384,8 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
                         pieceListRemovePiece( t, p );
                     }
                 }
+
+                t->needsCompletenessCheck = TRUE;
             }
             break;
         }
@@ -2880,6 +2883,15 @@ bandwidthPulse( void * vmgr )
         if( tor->needsSeedRatioCheck ) {
             tor->needsSeedRatioCheck = FALSE;
             tr_torrentCheckSeedRatio( tor );
+        }
+    }
+
+    /* run the completeness check for any torrents that need it */
+    tor = NULL;
+    while(( tor = tr_torrentNext( mgr->session, tor ))) {
+        if( tor->torrentPeers->needsCompletenessCheck ) {
+            tor->torrentPeers->needsCompletenessCheck  = FALSE;
+            tr_torrentRecheckCompleteness( tor );
         }
     }
 
