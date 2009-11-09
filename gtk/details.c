@@ -433,6 +433,7 @@ static void
 ratio_spun_cb( GtkSpinButton * s, struct DetailsImpl * di )
 {
     torrent_set_real( di, "seedRatioLimit", gtk_spin_button_get_value( s ) );
+    gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( di->seedCustomRadio ), TRUE );
 }
 
 static void
@@ -499,7 +500,6 @@ options_page_new( struct DetailsImpl * d )
     guint tag;
     int row;
     const char *s;
-    GSList *group;
     GtkWidget *t, *w, *tb, *h;
 
     row = 0;
@@ -541,18 +541,16 @@ options_page_new( struct DetailsImpl * d )
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title( t, &row, _( "Seed-Until Ratio" ) );
 
-    group = NULL;
     s = _( "Use _global settings" );
-    w = gtk_radio_button_new_with_mnemonic( group, s );
-    group = gtk_radio_button_get_group( GTK_RADIO_BUTTON( w ) );
+    w = gtk_radio_button_new_with_mnemonic( NULL, s );
     hig_workarea_add_wide_control( t, &row, w );
     g_object_set_data( G_OBJECT( w ), RATIO_KEY, GINT_TO_POINTER( TR_RATIOLIMIT_GLOBAL ) );
     tag = g_signal_connect( w, "toggled", G_CALLBACK( ratio_mode_changed_cb ), d );
     d->seedGlobalRadio = w;
     d->seedGlobalRadioTag = tag;
 
-    w = gtk_radio_button_new_with_mnemonic( group, _( "Seed _regardless of ratio" ) );
-    group = gtk_radio_button_get_group( GTK_RADIO_BUTTON( w ) );
+    s = _( "Seed _regardless of ratio" );
+    w = gtk_radio_button_new_with_mnemonic_from_widget( GTK_RADIO_BUTTON( w ), s );
     hig_workarea_add_wide_control( t, &row, w );
     g_object_set_data( G_OBJECT( w ), RATIO_KEY, GINT_TO_POINTER( TR_RATIOLIMIT_UNLIMITED ) );
     tag = g_signal_connect( w, "toggled", G_CALLBACK( ratio_mode_changed_cb ), d );
@@ -561,12 +559,11 @@ options_page_new( struct DetailsImpl * d )
 
     h = gtk_hbox_new( FALSE, GUI_PAD );
     s = _( "_Seed torrent until its ratio reaches:" );
-    w = gtk_radio_button_new_with_mnemonic( group, s );
+    w = gtk_radio_button_new_with_mnemonic_from_widget( GTK_RADIO_BUTTON( w ), s );
     d->seedCustomRadio = w;
     g_object_set_data( G_OBJECT( w ), RATIO_KEY, GINT_TO_POINTER( TR_RATIOLIMIT_SINGLE ) );
     tag = g_signal_connect( w, "toggled", G_CALLBACK( ratio_mode_changed_cb ), d );
     d->seedCustomRadioTag = tag;
-    group = gtk_radio_button_get_group( GTK_RADIO_BUTTON( w ) );
     gtk_box_pack_start( GTK_BOX( h ), w, FALSE, FALSE, 0 );
     w = gtk_spin_button_new_with_range( 0, INT_MAX, .05 );
     gtk_spin_button_set_digits( GTK_SPIN_BUTTON( w ), 2 );
