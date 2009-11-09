@@ -34,6 +34,8 @@
 
 struct DetailsImpl
 {
+    GtkWidget * dialog;
+
     GtkWidget * peersPage;
     GtkWidget * trackerPage;
     GtkWidget * activityPage;
@@ -2085,6 +2087,9 @@ refresh( struct DetailsImpl * di )
     refreshTracker( di, torrents, n );
     refreshOptions( di, torrents, n );
 
+    if( n == 0 )
+        gtk_dialog_response( GTK_DIALOG( di->dialog ), GTK_RESPONSE_CLOSE );
+
     g_free( torrents );
 }
 
@@ -2106,14 +2111,6 @@ details_free( gpointer gdata )
     g_free( data );
 }
 
-static void
-response_cb( GtkDialog * dialog, int a UNUSED, gpointer b UNUSED )
-{
-    GtkWidget * w = GTK_WIDGET( dialog );
-    torrent_inspector_set_torrents( w, NULL );
-    gtk_widget_destroy( w );
-}
-
 GtkWidget*
 torrent_inspector_new( GtkWindow * parent, TrCore * core )
 {
@@ -2125,8 +2122,10 @@ torrent_inspector_new( GtkWindow * parent, TrCore * core )
     d = gtk_dialog_new_with_buttons( NULL, parent, 0,
                                      GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
                                      NULL );
+    di->dialog = d;
     gtk_window_set_role( GTK_WINDOW( d ), "tr-info" );
-    g_signal_connect( d, "response", G_CALLBACK( response_cb ), NULL );
+    g_signal_connect_swapped( d, "response",
+                              G_CALLBACK( gtk_widget_destroy ), d );
     gtk_dialog_set_has_separator( GTK_DIALOG( d ), FALSE );
     gtk_container_set_border_width( GTK_CONTAINER( d ), GUI_PAD );
     g_object_set_data_full( G_OBJECT( d ), DETAILS_KEY, di, details_free );
@@ -2160,7 +2159,6 @@ torrent_inspector_new( GtkWindow * parent, TrCore * core )
 
     di->periodic_refresh_tag = gtr_timeout_add_seconds( UPDATE_INTERVAL_SECONDS,
                                                         periodic_refresh, di );
-    periodic_refresh( di );
     gtk_widget_show_all( GTK_DIALOG( d )->vbox );
     return d;
 }
