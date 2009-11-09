@@ -290,6 +290,11 @@ tr_torrent_delete_files( TrTorrent * gtor )
 void
 tr_torrent_open_folder( TrTorrent * gtor )
 {
-    tr_torrent * tor = tr_torrent_handle( gtor );
-    gtr_open_file( tr_torrentGetCurrentDir( tor ) );
+    const tr_torrent * tor =  tr_torrent_handle( gtor );
+    const tr_info * info = tr_torrent_info( gtor );
+    const gboolean single = info->fileCount == 1;
+    char * path = single ? g_build_filename( tr_torrentGetCurrentDir( tor ), NULL )
+                         : g_build_filename( tr_torrentGetCurrentDir( tor ), info->name, NULL );
+    gtr_open_file( path );
+    g_free( path );
 }
