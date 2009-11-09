@@ -248,7 +248,6 @@ tr_prefetch( int fd, off_t offset, size_t count )
 #ifdef HAVE_POSIX_FADVISE
     return posix_fadvise( fd, offset, count, POSIX_FADV_WILLNEED );
 #elif defined(SYS_DARWIN)
-    int val;
     struct radvisory radv;
     radv.ra_offset = offset;
     radv.ra_count = count;
