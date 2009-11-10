@@ -603,3 +603,25 @@ tr_globalAddress( int af, void *addr, int *addr_len )
         return -1;
     }
 }
+
+/* Return our global IPv6 address, with caching. */
+
+const unsigned char *
+tr_globalIPv6( void )
+{
+    static unsigned char ipv6[16];
+    static time_t last_time = 0;
+    static int have_ipv6 = 0;
+    const time_t now = time( NULL );
+
+    /* Re-check every half hour */
+    if( last_time < now - 1800 )
+    {
+        int addrlen = 16;
+        const int rc = tr_globalAddress( AF_INET6, ipv6, &addrlen );
+        have_ipv6 = ( rc >= 0 ) && ( addrlen == 16 );
+        last_time = now;
+    }
+
+    return have_ipv6 ? ipv6 : NULL;
+}

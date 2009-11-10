@@ -807,28 +807,6 @@ tr_peerMsgsCancel( tr_peermsgs * msgs, tr_block_index_t block )
 ***
 **/
 
-/* Return our global IPv6 address, with caching. */
-
-static const unsigned char *
-globalIPv6( void )
-{
-    static unsigned char ipv6[16];
-    static time_t last_time = 0;
-    static int have_ipv6 = 0;
-    const time_t now = time( NULL );
-
-    /* Re-check every half hour */
-    if( last_time < now - 1800 )
-    {
-        int addrlen = 16;
-        const int rc = tr_globalAddress( AF_INET6, ipv6, &addrlen );
-        have_ipv6 = ( rc >= 0 ) && ( addrlen == 16 );
-        last_time = now;
-    }
-
-    return have_ipv6 ? ipv6 : NULL;
-}
-
 static void
 sendLtepHandshake( tr_peermsgs * msgs )
 {
@@ -837,7 +815,7 @@ sendLtepHandshake( tr_peermsgs * msgs )
     int len;
     int pex;
     struct evbuffer * out = msgs->outMessages;
-    const unsigned char * ipv6 = globalIPv6();
+    const unsigned char * ipv6 = tr_globalIPv6();
 
     if( msgs->clientSentLtepHandshake )
         return;

@@ -108,39 +108,9 @@ makeURL( tr_webseed *    w,
     evbuffer_add( out, url, url_len );
 
     /* if url ends with a '/', add the torrent name */
-    if( url[url_len - 1] == '/' )
-    {
-        const char * str = file->name;
-
-        /* this is like curl_escape() but doesn't munge the
-         * '/' directory separators in the path */
-        while( str && *str )
-        {
-            switch( *str )
-            {
-                case ',': case '-': case '.': case '/':
-                case '0': case '1': case '2': case '3': case '4':
-                case '5': case '6': case '7': case '8': case '9':
-                case 'a': case 'b': case 'c': case 'd': case 'e':
-                case 'f': case 'g': case 'h': case 'i': case 'j':
-                case 'k': case 'l': case 'm': case 'n': case 'o':
-                case 'p': case 'q': case 'r': case 's': case 't':
-                case 'u': case 'v': case 'w': case 'x': case 'y': case 'z':
-                case 'A': case 'B': case 'C': case 'D': case 'E':
-                case 'F': case 'G': case 'H': case 'I': case 'J':
-                case 'K': case 'L': case 'M': case 'N': case 'O':
-                case 'P': case 'Q': case 'R': case 'S': case 'T':
-                case 'U': case 'V': case 'W': case 'X': case 'Y': case 'Z':
-                    evbuffer_add( out, str, 1 );
-                    break;
-                default:
-                    evbuffer_add_printf( out, "%%%02X", *str );
-                    break;
-            }
-            str++;
-        }
-    }
-
+    if( url[url_len - 1] == '/' && file->name )
+        tr_http_escape( out, file->name, strlen(file->name), 1 );
+        
     ret = tr_strndup( EVBUFFER_DATA( out ), EVBUFFER_LENGTH( out ) );
     evbuffer_free( out );
     return ret;

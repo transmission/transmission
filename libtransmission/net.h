@@ -122,4 +122,6 @@ void tr_netInit( void );
 
 int tr_globalAddress(int af, void *addr, int *addr_len);
 
+const unsigned char *tr_globalIPv6( void );
+
 #endif /* _TR_NET_H_ */

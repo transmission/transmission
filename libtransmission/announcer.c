@@ -649,6 +649,7 @@ createAnnounceURL( const tr_announcer     * announcer,
     const char * ann = tracker->announce;
     struct evbuffer * buf = evbuffer_new( );
     char * ret;
+    const unsigned char * ipv6;
 
     evbuffer_add_printf( buf, "%s"
                               "%c"
@@ -687,6 +688,23 @@ createAnnounceURL( const tr_announcer     * announcer,
 
     if( tracker->tracker_id && *tracker->tracker_id )
         evbuffer_add_printf( buf, "&trackerid=%s", tracker->tracker_id );
+
+    /* There are two incompatible techniques for announcing an IPv6 address.
+       BEP-7 suggests adding an "ipv6=" parameter to the announce URL,
+       while OpenTracker requires that peers announce twice, once over IPv4
+       and once over IPv6.
+
+       To be safe, we should do both: add the "ipv6=" parameter and
+       announce twice.  At any rate, we're already computing our IPv6
+       address (for the LTEP handshake), so this comes for free. */
+
+    ipv6 = tr_globalIPv6( );
+    if( ipv6 ) {
+        char ipv6_readable[INET6_ADDRSTRLEN];
+        inet_ntop( AF_INET6, ipv6, ipv6_readable, INET6_ADDRSTRLEN );
+        evbuffer_add_printf( buf, "&ipv6=");
+        tr_http_escape( buf, ipv6_readable, strlen(ipv6_readable), 0 );
+    }
 
     ret = tr_strndup( EVBUFFER_DATA( buf ), EVBUFFER_LENGTH( buf ) );
     evbuffer_free( buf );
@@ -1444,7 +1462,7 @@ onScrapeDone( tr_session   * session,
     {
         tier->isScraping = FALSE;
         tier->lastScrapeTime = now;
-    
+
         if( tier->currentTracker->host )
         {
             tr_host * host = tier->currentTracker->host;
@@ -1557,7 +1575,7 @@ flushCloseMessages( tr_announcer * announcer )
 static tr_bool
 tierNeedsToAnnounce( const tr_tier * tier, const time_t now )
 {
-    return !tier->isAnnouncing 
+    return !tier->isAnnouncing
         && !tier->isScraping
         && ( tier->announceEvent != NULL )
         && ( tier->announceAt <= now );
@@ -1726,7 +1744,7 @@ tr_announcerStats( const tr_torrent * torrent,
                 else if( tier->scrapeAt > now )
                 {
                     st->scrapeState = TR_TRACKER_WAITING;
-                    st->nextScrapeTime = tier->scrapeAt; 
+                    st->nextScrapeTime = tier->scrapeAt;
                 }
                 else
                     st->scrapeState = TR_TRACKER_QUEUED;
@@ -1748,7 +1766,7 @@ tr_announcerStats( const tr_torrent * torrent,
                 else if( tier->announceAt > now )
                 {
                     st->announceState = TR_TRACKER_WAITING;
-                    st->nextAnnounceTime = tier->announceAt; 
+                    st->nextAnnounceTime = tier->announceAt;
                 }
                 else
                     st->announceState = TR_TRACKER_QUEUED;
