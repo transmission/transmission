@@ -739,6 +739,22 @@ div.torrent_footer div#disk_space_container {
 	padding: 0px;
 }
 
+div.torrent_footer div#turtle_button {
+	height: 22px;
+	width: 32px !important;
+	margin: 0 0 0 38px;
+	padding: 0;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+}
+
+.turtleEnabled {
+	background: transparent url('../images/graphics/chrome.png') -32px -119px no-repeat;
+}
+.turtleDisabled {
+	background: transparent url('../images/graphics/chrome.png') left -97px no-repeat;
+}
+
 /*--------------------------------------
  *
  * D I A L O G S
@@ -865,12 +881,12 @@ iframe#torrent_upload_frame {
 
 div#prefs_container label {
 	display: block;
+	margin: 0 0 0 2px;
 }
 
 div#prefs_container label.category {
 	clear: both;
 	font-size: 1.2em;
-	margin: 0 0 0 2px;
 }
 
 div#prefs_container label.item {
@@ -889,7 +905,11 @@ div#prefs_container div.formdiv.checkbox label.item {
 }
 
 div#prefs_container div.limit_total label.item {
-	width: 91px;
+	width: 102px;
+}
+
+div#prefs_container div.limit_turtle label.item {
+	width: 120px;
 }
 
 div#prefs_container div.preference input[type=checkbox] {
@@ -933,6 +953,41 @@ div#prefs_container a {
 
 div#prefs_container h2.dialog_heading {
 	display: none;
+}
+
+div#prefs_container div#prefs_tabs {
+	clear: both;
+}
+
+div#prefs_container div#prefs_tabs ul {
+	margin: 0;
+	padding: 0;
+}
+div#prefs_container div#prefs_tabs ul li {
+	display: block;
+	float: left;
+	font-size: 1.2em;
+	color: #323232;
+	text-align: center;
+	padding: 2px 20px;
+	border-left: 1px solid #787878;
+	border-right: 1px solid #787878;
+	border-top: 1px solid #787878;
+}
+.prefs_tab_disabled {
+	background: #C0C8D6 url('../images/graphics/filter_bar.png') bottom repeat-x;
+}
+.prefs_tab_enabled {
+	background: none;
+}
+div.dialog_container div#prefs_tabs ul li.prefs_tab_disabled:hover,
+div.dialog_container div#prefs_tabs ul li.prefs_tab_disabled:active {
+	background: none;
+}
+div#prefs_container div#prefs_tabs div.prefs_tab {
+	border: 1px solid #787878;
+	clear: both;
+	padding: 2px 0;
 }
 
 div#prefs_container div#pref_error {

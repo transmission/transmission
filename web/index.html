@@ -206,52 +206,101 @@
 				<h2 class="dialog_heading">Preferences</h2>
 				<div id="pref_error"></div>
 				<form action="" id="prefs_form">
-					<div class="preference download_location">
-						<label class="category">Add transfers:</label>
-						<div class="formdiv">
-							<label for="download_location" class="item">Download to:</label>
-							<input type="text" name="download_location" id="download_location"/>
+					<div id="prefs_tabs">
+						<ul>
+							<li onclick="changeTab(this, 'prefs_tab_general');" class="prefs_tab_enabled">General</li>
+							<li onclick="changeTab(this, 'prefs_tab_speed');" class="prefs_tab_disabled">Speed</li>
+						</ul>
+						<div id="prefs_tab_general" class="prefs_tab">
+							<div class="preference download_location">
+								<label class="category">Add transfers:</label>
+								<div class="formdiv">
+									<label for="download_location" class="item">Download to:</label>
+									<input type="text" name="download_location" id="download_location"/>
+								</div>
+								<div class="formdiv checkbox auto_start">
+									<input type="checkbox" name="auto_start" id="auto_start"/>
+									<label for="auto_start" class="item">Start transfers when added</label>
+								</div>
+							</div>
+							<div class="preference port">
+								<label class="category">Network:</label>
+								<div class="formdiv">
+									<label for="port" class="item">Incoming TCP Port:</label>
+									<input type="text" id="port" name="port"/>
+								</div>
+							</div>
+							<div class="preference encryption">
+								<label class="category">Encryption:</label>
+								<div class="formdiv checkbox">
+									<input type="checkbox" name="encryption" id="encryption"/>
+									<label for="encryption" class="item">Ignore unencrypted peers</label>
+								</div>
+							</div>
+							<div class="preference web_gui">
+								<label class="category">Web Client:</label>
+								<div class="formdiv">
+									<label for="refresh_rate" class="item">Refresh Rate:</label>
+									<input type="text" name="refresh_rate" id="refresh_rate"/>
+									<label class="suffix">seconds</label>
+								</div>
+							</div>
+							<div style="clear: both; visibility: hidden;"/></div>
 						</div>
-						<div class="formdiv checkbox auto_start">
-							<input type="checkbox" name="auto_start" id="auto_start"/>
-							<label for="auto_start" class="item">Start transfers when added</label>
-						</div>
-					</div>
-					<div class="preference port">
-						<label class="category">Network:</label>
-						<div class="formdiv">
-							<label for="port" class="item">Incoming TCP Port:</label>
-							<input type="text" id="port" name="port"/>
-						</div>
-					</div>
-					<div class="preference encryption">
-						<label class="category">Encryption:</label>
-						<div class="formdiv checkbox">
-							<input type="checkbox" name="encryption" id="encryption"/>
-							<label for="encryption" class="item">Ignore unencrypted peers</label>
-						</div>
-					</div>
-					<div class="preference limit_total">
-						<label class="category">Limit total bandwidth:</label>
-						<div class="formdiv checkbox">
-							<input type="checkbox" name="limit_download" id="limit_download"/>
-							<label for="limit_download" class="item">Download Rate:</label>
-							<input type="text" name="download_rate" id="download_rate"/>
-							<label class="suffix">KB/s</label>
-						</div>
-						<div class="formdiv checkbox">
-							<input type="checkbox" name="limit_upload" id="limit_upload"/>
-							<label for="limit_upload" class="item">Upload Rate:</label>
-							<input type="text" name="upload_rate" id="upload_rate"/>
-							<label class="suffix">KB/s</label>
-						</div>
-					</div>
-					<div class="preference web_gui">
-						<label class="category">Web Client:</label>
-						<div class="formdiv">
-							<label for="refresh_rate" class="item">Refresh Rate:</label>
-							<input type="text" name="refresh_rate" id="refresh_rate"/>
-							<label class="suffix">seconds</label>
+						<div id="prefs_tab_speed" class="prefs_tab" style="display: none;">
+							<div class="preference limit_total">
+								<label class="category">Speed Limits:</label>
+								<div class="formdiv checkbox">
+									<input type="checkbox" name="limit_download" id="limit_download"/>
+									<label for="limit_download" class="item">Download Rate:</label>
+									<input type="text" name="download_rate" id="download_rate"/>
+									<label class="suffix">KB/s</label>
+								</div>
+								<div class="formdiv checkbox">
+									<input type="checkbox" name="limit_upload" id="limit_upload"/>
+									<label for="limit_upload" class="item">Upload Rate:</label>
+									<input type="text" name="upload_rate" id="upload_rate"/>
+									<label class="suffix">KB/s</label>
+								</div>
+							</div>
+							<div class="preference limit_turtle">
+								<label class="category">Temporary Speed Limits: (Turtle)</label>
+								<label>Override normal speed limits manually or at scheduled times</label>
+								<div class="formdiv">
+									<label for="turtle_download_rate" class="item">Download Rate:</label>
+									<input type="text" name="turtle_download_rate" id="turtle_download_rate"/>
+									<label class="suffix">KB/s</label>
+								</div>
+								<div class="formdiv">
+									<label for="turtle_upload_rate" class="item">Upload Rate:</label>
+									<input type="text" name="turtle_upload_rate" id="turtle_upload_rate"/>
+									<label class="suffix">KB/s</label>
+								</div>
+								<div class="formdiv checkbox">
+									<input type="checkbox" name="turtle_schedule" id="turtle_schedule"/>
+									<label for="turtle_schedule" class="item">Scheduled times:</label>
+									<select name="turtle_start_time" id="turtle_start_time" size="1">
+									</select>
+									<select name="turtle_end_time" id="turtle_end_time" size="1">
+									</select>
+								</div>
+								<div class="formdiv">
+									<label for="turtle_days" class="item">On days:</label>
+									<select name="turtle_days" id="turtle_days" size="1">
+										<option value="127">Everyday</option>
+										<option value="62">Weekdays</option>
+										<option value="65">Weekends</option>
+										<option value="1">Sunday</option>
+										<option value="2">Monday</option>
+										<option value="4">Tuesday</option>
+										<option value="8">Wednesday</option>
+										<option value="16">Thursday</option>
+										<option value="32">Friday</option>
+										<option value="64">Saturday</option>
+									</select>
+								</div>
+							</div>
+							<div style="clear: both; visibility: hidden;"/></div>
 						</div>
 					</div>
 					<a href="#save" id="prefs_save_button">Save</a>
@@ -341,6 +390,8 @@
 					</ul>
 				</li>
 			</ul>
+			<div id="turtle_button">&nbsp;</div>
+			<div style="clear: both; visibility: hidden;"></div>
 		</div>
 		
 <div class="contextMenu" id="torrent_context_menu">

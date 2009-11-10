@@ -252,6 +252,29 @@ String.prototype.compareTo = function( that ) {
         return 0;
 }
 
+/**
+ * @brief Switch between different dialog tabs
+ */
+function changeTab(tab, id) {
+	for ( var x = 0, node; tab.parentNode.childNodes[x]; x++ ) {
+		node = tab.parentNode.childNodes[x];
+		if (node == tab) {
+			node.className = "prefs_tab_enabled";
+		} else {
+			node.className = "prefs_tab_disabled";
+		}
+	}
+	for ( x = 0; tab.parentNode.parentNode.childNodes[x]; x++ ) {
+		node = tab.parentNode.parentNode.childNodes[x];
+		if (node.tagName == "DIV") {
+			if (node.id == id) {
+				node.style.display = "block";
+			} else {
+				node.style.display = "none";
+			}
+		}
+	}
+}
 
 /***
 ****  Preferences
@@ -287,6 +310,7 @@ Prefs._SortByProgress     = 'percent_completed';
 Prefs._SortByState        = 'state';
 Prefs._SortByTracker      = 'tracker';
 
+Prefs._TurtleState        = 'turtle-state';
 
 Prefs._Defaults =
 {
@@ -296,7 +320,8 @@ Prefs._Defaults =
 	'show_filter': true,
 	'show_inspector': false,
 	'sort_direction': 'ascending',
-	'sort_method': 'name'
+	'sort_method': 'name',
+	'turtle-state' : false
 };
 
 /*
