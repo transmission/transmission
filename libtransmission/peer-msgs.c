@@ -1968,69 +1968,77 @@ sendPex( tr_peermsgs * msgs )
             tr_bencInitDict( &val, 3 ); /* ipv6 support: left as 3:
                                          * speed vs. likelihood? */
 
-            /* "added" */
-            tmp = walk = tr_new( uint8_t, diffs.addedCount * 6 );
-            for( i = 0; i < diffs.addedCount; ++i )
+            if( diffs.addedCount > 0)
             {
-                memcpy( walk, &diffs.added[i].addr.addr, 4 ); walk += 4;
-                memcpy( walk, &diffs.added[i].port, 2 ); walk += 2;
+                /* "added" */
+                tmp = walk = tr_new( uint8_t, diffs.addedCount * 6 );
+                for( i = 0; i < diffs.addedCount; ++i ) {
+                    memcpy( walk, &diffs.added[i].addr.addr, 4 ); walk += 4;
+                    memcpy( walk, &diffs.added[i].port, 2 ); walk += 2;
+                }
+                assert( ( walk - tmp ) == diffs.addedCount * 6 );
+                tr_bencDictAddRaw( &val, "added", tmp, walk - tmp );
+                tr_free( tmp );
+
+                /* "added.f" */
+                tmp = walk = tr_new( uint8_t, diffs.addedCount );
+                for( i = 0; i < diffs.addedCount; ++i )
+                    *walk++ = diffs.added[i].flags;
+                assert( ( walk - tmp ) == diffs.addedCount );
+                tr_bencDictAddRaw( &val, "added.f", tmp, walk - tmp );
+                tr_free( tmp );
             }
-            assert( ( walk - tmp ) == diffs.addedCount * 6 );
-            tr_bencDictAddRaw( &val, "added", tmp, walk - tmp );
-            tr_free( tmp );
 
-            /* "added.f" */
-            tmp = walk = tr_new( uint8_t, diffs.addedCount );
-            for( i = 0; i < diffs.addedCount; ++i )
-                *walk++ = diffs.added[i].flags;
-            assert( ( walk - tmp ) == diffs.addedCount );
-            tr_bencDictAddRaw( &val, "added.f", tmp, walk - tmp );
-            tr_free( tmp );
-
-            /* "dropped" */
-            tmp = walk = tr_new( uint8_t, diffs.droppedCount * 6 );
-            for( i = 0; i < diffs.droppedCount; ++i )
+            if( diffs.droppedCount > 0 )
             {
-                memcpy( walk, &diffs.dropped[i].addr.addr, 4 ); walk += 4;
-                memcpy( walk, &diffs.dropped[i].port, 2 ); walk += 2;
+                /* "dropped" */
+                tmp = walk = tr_new( uint8_t, diffs.droppedCount * 6 );
+                for( i = 0; i < diffs.droppedCount; ++i ) {
+                    memcpy( walk, &diffs.dropped[i].addr.addr, 4 ); walk += 4;
+                    memcpy( walk, &diffs.dropped[i].port, 2 ); walk += 2;
+                }
+                assert( ( walk - tmp ) == diffs.droppedCount * 6 );
+                tr_bencDictAddRaw( &val, "dropped", tmp, walk - tmp );
+                tr_free( tmp );
             }
-            assert( ( walk - tmp ) == diffs.droppedCount * 6 );
-            tr_bencDictAddRaw( &val, "dropped", tmp, walk - tmp );
-            tr_free( tmp );
 
-            /* "added6" */
-            tmp = walk = tr_new( uint8_t, diffs6.addedCount * 18 );
-            for( i = 0; i < diffs6.addedCount; ++i )
+            if( diffs6.addedCount > 0 )
             {
-                memcpy( walk, &diffs6.added[i].addr.addr.addr6.s6_addr, 16 );
-                walk += 16;
-                memcpy( walk, &diffs6.added[i].port, 2 );
-                walk += 2;
+                /* "added6" */
+                tmp = walk = tr_new( uint8_t, diffs6.addedCount * 18 );
+                for( i = 0; i < diffs6.addedCount; ++i ) {
+                    memcpy( walk, &diffs6.added[i].addr.addr.addr6.s6_addr, 16 );
+                    walk += 16;
+                    memcpy( walk, &diffs6.added[i].port, 2 );
+                    walk += 2;
+                }
+                assert( ( walk - tmp ) == diffs6.addedCount * 18 );
+                tr_bencDictAddRaw( &val, "added6", tmp, walk - tmp );
+                tr_free( tmp );
+
+                /* "added6.f" */
+                tmp = walk = tr_new( uint8_t, diffs6.addedCount );
+                for( i = 0; i < diffs6.addedCount; ++i )
+                    *walk++ = diffs6.added[i].flags;
+                assert( ( walk - tmp ) == diffs6.addedCount );
+                tr_bencDictAddRaw( &val, "added6.f", tmp, walk - tmp );
+                tr_free( tmp );
             }
-            assert( ( walk - tmp ) == diffs6.addedCount * 18 );
-            tr_bencDictAddRaw( &val, "added6", tmp, walk - tmp );
-            tr_free( tmp );
 
-            /* "added6.f" */
-            tmp = walk = tr_new( uint8_t, diffs6.addedCount );
-            for( i = 0; i < diffs6.addedCount; ++i )
-                *walk++ = diffs6.added[i].flags;
-            assert( ( walk - tmp ) == diffs6.addedCount );
-            tr_bencDictAddRaw( &val, "added6.f", tmp, walk - tmp );
-            tr_free( tmp );
-
-            /* "dropped6" */
-            tmp = walk = tr_new( uint8_t, diffs6.droppedCount * 18 );
-            for( i = 0; i < diffs6.droppedCount; ++i )
+            if( diffs6.droppedCount > 0 )
             {
-                memcpy( walk, &diffs6.dropped[i].addr.addr.addr6.s6_addr, 16 );
-                walk += 16;
-                memcpy( walk, &diffs6.dropped[i].port, 2 );
-                walk += 2;
+                /* "dropped6" */
+                tmp = walk = tr_new( uint8_t, diffs6.droppedCount * 18 );
+                for( i = 0; i < diffs6.droppedCount; ++i ) {
+                    memcpy( walk, &diffs6.dropped[i].addr.addr.addr6.s6_addr, 16 );
+                    walk += 16;
+                    memcpy( walk, &diffs6.dropped[i].port, 2 );
+                    walk += 2;
+                }
+                assert( ( walk - tmp ) == diffs6.droppedCount * 18);
+                tr_bencDictAddRaw( &val, "dropped6", tmp, walk - tmp );
+                tr_free( tmp );
             }
-            assert( ( walk - tmp ) == diffs6.droppedCount * 18);
-            tr_bencDictAddRaw( &val, "dropped6", tmp, walk - tmp );
-            tr_free( tmp );
 
             /* write the pex message */
             benc = tr_bencToStr( &val, TR_FMT_BENC, &bencLen );
