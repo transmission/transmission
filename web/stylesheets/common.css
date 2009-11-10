@@ -749,11 +749,18 @@ div.torrent_footer div#turtle_button {
 }
 
 .turtleEnabled {
+	background: transparent url('../images/graphics/chrome.png') left -119px no-repeat;
+}
+.turtleEnabled:active {
 	background: transparent url('../images/graphics/chrome.png') -32px -119px no-repeat;
 }
 .turtleDisabled {
 	background: transparent url('../images/graphics/chrome.png') left -97px no-repeat;
 }
+.turtleDisabled:active {
+	background: transparent url('../images/graphics/chrome.png') -32px -97px no-repeat;
+}
+
 
 /*--------------------------------------
  *
