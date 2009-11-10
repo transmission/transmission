@@ -53,6 +53,9 @@ Transmission.prototype =
 		$('#upload_confirm_button').bind('click', function(e){ tr.confirmUploadClicked(e); return false;});
 		$('#upload_cancel_button').bind('click', function(e){ tr.cancelUploadClicked(e); return false; });
 		$('#turtle_button').bind('click', function(e){ tr.toggleTurtleClicked(e); return false; });
+		$('#prefs_tab_general_tab').click(function(e){ changeTab(this, 'prefs_tab_general') });
+		$('#prefs_tab_speed_tab').click(function(e){ changeTab(this, 'prefs_tab_speed') });
+
 		if (iPhone) {
 			$('#inspector_close').bind('click', function(e){ tr.hideInspector(); });
 			$('#preferences_link').bind('click', function(e){ tr.releaseClutchPreferencesButton(e); });
