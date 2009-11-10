@@ -968,7 +968,7 @@ div#prefs_container div#prefs_tabs {
 
 div#prefs_container div#prefs_tabs ul {
 	margin: 0;
-	padding: 0;
+	padding: 0 0 0 10px;
 }
 div#prefs_container div#prefs_tabs ul li {
 	display: block;
@@ -980,21 +980,24 @@ div#prefs_container div#prefs_tabs ul li {
 	border-left: 1px solid #787878;
 	border-right: 1px solid #787878;
 	border-top: 1px solid #787878;
+	margin-bottom: -1px;
 }
 .prefs_tab_disabled {
 	background: #C0C8D6 url('../images/graphics/filter_bar.png') bottom repeat-x;
+	border-bottom: 1px solid #787878;
 }
 .prefs_tab_enabled {
 	background: none;
+	border-bottom: 1px solid #efefef;
 }
 div.dialog_container div#prefs_tabs ul li.prefs_tab_disabled:hover,
 div.dialog_container div#prefs_tabs ul li.prefs_tab_disabled:active {
 	background: none;
 }
 div#prefs_container div#prefs_tabs div.prefs_tab {
-	border: 1px solid #787878;
+	border-top: 1px solid #787878;
 	clear: both;
-	padding: 2px 0;
+	padding: 7px;
 }
 
 div#prefs_container div#pref_error {
