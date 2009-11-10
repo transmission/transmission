@@ -268,9 +268,9 @@ tr_bandwidthAllocate( tr_bandwidth  * b,
         tr_peerIoFlushOutgoingProtocolMsgs( io );
 
         switch( io->priority ) {
-            case TR_PRI_HIGH: tr_ptrArrayAppend( &high,   io ); break;
-            case TR_PRI_LOW:  tr_ptrArrayAppend( &low,    io ); break;
-            default:          tr_ptrArrayAppend( &normal, io ); break;
+            case TR_PRI_HIGH:   tr_ptrArrayAppend( &high,   io ); /* fall through */
+            case TR_PRI_NORMAL: tr_ptrArrayAppend( &normal, io ); /* fall through */
+            default:            tr_ptrArrayAppend( &low,    io );
         }
     }
 
