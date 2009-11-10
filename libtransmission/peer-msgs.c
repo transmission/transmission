@@ -172,6 +172,8 @@ struct tr_peermsgs
     int             activeRequestCount;
     int             desiredRequestCount;
 
+    int             prefetchCount;
+
     /* how long the outMessages batch should be allowed to grow before
      * it's flushed -- some messages (like requests >:) should be sent
      * very quickly; others aren't as urgent. */
@@ -197,7 +199,7 @@ struct tr_peermsgs
 
     struct peer_request    peerAskedFor[REQQ];
     int                    peerAskedForCount;
-    
+ 
     tr_pex               * pex;
     tr_pex               * pex6;
 
@@ -836,7 +838,7 @@ sendLtepHandshake( tr_peermsgs * msgs )
     if( ipv6 )
         tr_bencDictAddRaw( &val, "ipv6", ipv6, 16 );
     tr_bencDictAddInt( &val, "p", tr_sessionGetPeerPort( getSession(msgs) ) );
-    tr_bencDictAddInt( &val, "reqq", REQQ ); 
+    tr_bencDictAddInt( &val, "reqq", REQQ );
     tr_bencDictAddInt( &val, "upload_only", tr_torrentIsSeed( msgs->torrent ) );
     tr_bencDictAddStr( &val, "v", TR_NAME " " USERAGENT_PREFIX );
     m  = tr_bencDictAddDict( &val, "m", 1 );
@@ -1556,7 +1558,7 @@ updateDesiredRequestCount( tr_peermsgs * msgs, uint64_t now )
         int estimatedBlocksInPeriod;
         double rate;
         const int floor = 16;
-        const int seconds = REQUEST_BUF_SECS; 
+        const int seconds = REQUEST_BUF_SECS;
 
         /* Get the rate limit we should use.
          * FIXME: this needs to consider all the other peers as well... */
@@ -1594,7 +1596,7 @@ updateRequests( tr_peermsgs * msgs )
         int n;
         tr_block_index_t * blocks = tr_new( tr_block_index_t, numwant );
 
-        tr_peerMgrGetNextRequests( msgs->torrent, msgs->peer, numwant, blocks, &n ); 
+        tr_peerMgrGetNextRequests( msgs->torrent, msgs->peer, numwant, blocks, &n );
 
         for( i=0; i<n; ++i )
         {
@@ -1606,6 +1608,31 @@ updateRequests( tr_peermsgs * msgs )
         msgs->activeRequestCount += n;
 
         tr_free( blocks );
+    }
+}
+
+static void
+prefetchPieces( tr_peermsgs *msgs )
+{
+    int i;
+    uint64_t next = 0;
+
+    /* Maintain at least 8 prefetched blocks per unchoked peer, but allow
+       up to 4 extra blocks if that would cause sequential writes. */
+    for( i=msgs->prefetchCount; i<msgs->peerAskedForCount; ++i )
+    {
+        const struct peer_request * req = msgs->peerAskedFor + i;
+        const uint64_t begin = tr_pieceOffset( msgs->torrent, req->index, req->offset, 0 );
+        const uint64_t end = begin + req->length;
+        const tr_bool isSequential = next == begin;
+
+        if( ( i >= 12 ) || ( !isSequential && ( i >= 8 ) ) )
+            break;
+
+        tr_ioPrefetch( msgs->torrent, req->index, req->offset, req->length );
+        ++msgs->prefetchCount;
+
+        next = end;
     }
 }
 
@@ -1645,6 +1672,8 @@ fillOutputBuffer( tr_peermsgs * msgs, time_t now )
     if( ( tr_peerIoGetWriteBufferSpace( msgs->peer->io, now ) >= msgs->torrent->blockSize )
         && popNextRequest( msgs, &req ) )
     {
+        --msgs->prefetchCount;
+
         if( requestIsValid( msgs, &req )
             && tr_cpPieceIsComplete( &msgs->torrent->completion, req.index ) )
         {
@@ -1690,6 +1719,8 @@ fillOutputBuffer( tr_peermsgs * msgs, time_t now )
         {
             protocolSendReject( msgs, &req );
         }
+
+        prefetchPieces( msgs );
     }
 
     /**
