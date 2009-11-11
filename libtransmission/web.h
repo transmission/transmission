@@ -36,6 +36,8 @@ void         tr_webRun( tr_session        * session,
                         tr_web_done_func    done_func,
                         void              * done_func_user_data );
 
+struct evbuffer;
+
 void tr_http_escape( struct evbuffer *out, const char *str, int len, int noslashes );
 
 #endif
