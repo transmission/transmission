@@ -64,7 +64,7 @@ enum
     CRYPTO_PROVIDE_CRYPTO          = 2,
 
     /* how long to wait before giving up on a handshake */
-    HANDSHAKE_TIMEOUT_SEC          = 60
+    HANDSHAKE_TIMEOUT_SEC          = 30
 };
 
 
