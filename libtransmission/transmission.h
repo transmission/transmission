@@ -1039,6 +1039,9 @@ int tr_torrentId( const tr_torrent * torrent );
 
 tr_torrent* tr_torrentFindFromId( tr_session * session, int id );
 
+tr_torrent* tr_torrentFindFromHash( tr_session * session, const uint8_t * hash );
+
+
 
 /**
  * @brief find the location of a torrent's file by looking with and without

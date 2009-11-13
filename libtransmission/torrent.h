@@ -57,9 +57,6 @@ void        tr_torrentSetHasPiece( tr_torrent *     tor,
 
 void        tr_torrentChangeMyPort( tr_torrent * session );
 
-tr_torrent* tr_torrentFindFromHash( tr_session *    session,
-                                    const uint8_t * hash );
-
 tr_torrent* tr_torrentFindFromHashString( tr_session * session,
                                           const char * hashString );
 
