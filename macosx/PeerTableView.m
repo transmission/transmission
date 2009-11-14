@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #import "PeerTableView.h"
+#import "NSApplicationAdditions.h"
 
 @implementation PeerTableView
 
@@ -33,7 +34,15 @@
     {
         [[NSUserDefaults standardUserDefaults] setBool: ![[NSUserDefaults standardUserDefaults]
             boolForKey: @"DisplayPeerProgressBarNumber"] forKey: @"DisplayPeerProgressBarNumber"];
-        [self reloadData];
+        
+        if ([NSApp isOnSnowLeopardOrBetter])
+        {
+            NSIndexSet * rowIndexes = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [self numberOfRows])],
+                        * columnIndexes = [NSIndexSet indexSetWithIndex: [self columnAtPoint: point]];
+            [self reloadDataForRowIndexes: rowIndexes columnIndexes: columnIndexes];
+        }
+        else
+            [self reloadData];
     }
 }
 
