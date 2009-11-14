@@ -895,9 +895,11 @@ search_step(int s, struct search *sr, dht_callback *callback, void *closure)
                 if(n->pinged >= 3)
                     continue;
                 /* A proposed extension to the protocol consists in
-                   omitting the token when storage tables are full. */
+                   omitting the token when storage tables are full.  While
+                   I don't think this makes a lot of sense -- just sending
+                   a positive reply is just as good, let's deal with it. */
                 if(n->token_len == 0)
-                    continue;
+                    n->acked = 1;
                 if(!n->acked) {
                     all_acked = 0;
                     debugf("Sending announce_peer.\n");
