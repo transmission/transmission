@@ -73,6 +73,7 @@ TransmissionRemote.prototype =
 			null,
 			'Dismiss');
 		remote._controller.togglePeriodicRefresh(false);
+		remote._controller.togglePeriodicSessionRefresh(false);
 	},
 
 	appendSessionId: function(XHR) {

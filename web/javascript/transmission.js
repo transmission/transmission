@@ -121,6 +121,7 @@ Transmission.prototype =
 		this.initializeAllTorrents();
 
 		this.togglePeriodicRefresh( true );
+		this.togglePeriodicSessionRefresh( true );
 	},
 
 	loadDaemonPrefs: function( async ){
@@ -739,7 +740,7 @@ Transmission.prototype =
 	},
 
 	/*
-	 * Turn the periodic ajax-refresh on & off
+	 * Turn the periodic ajax torrents refresh on & off
 	 */
 	togglePeriodicRefresh: function(state) {
 		var tr = this;
@@ -752,6 +753,25 @@ Transmission.prototype =
 		} else {
 			clearInterval(this._periodic_refresh);
 			this._periodic_refresh = null;
+		}
+	},
+
+	/*
+	 * Turn the periodic ajax session refresh on & off
+	 */
+	togglePeriodicSessionRefresh: function(state) {
+		var tr = this;
+		if (state && this._periodic_session_refresh == null) {
+			// sanity check
+			if( !this[Prefs._SessionRefreshRate] )
+			     this[Prefs._SessionRefreshRate] = 5;
+			remote = this.remote;
+			this._periodic_session_refresh = setInterval(
+				function(){ tr.loadDaemonPrefs(); }, this[Prefs._SessionRefreshRate] * 1000
+			);
+		} else {
+			clearInterval(this._periodic_session_refresh);
+			this._periodic_session_refresh = null;
 		}
 	},
 
@@ -787,6 +807,7 @@ Transmission.prototype =
 		if( Safari3 )
 			setTimeout("$('div#prefs_container div.dialog_window').css('top', '0px');",10);
 		this.updateButtonStates( );
+		this.togglePeriodicSessionRefresh(false);
 	},
 
 	hidePrefsDialog: function( )
@@ -802,6 +823,7 @@ Transmission.prototype =
 			$('#prefs_container').hide();
 		}
 		this.updateButtonStates( );
+		this.togglePeriodicSessionRefresh(true);
 	},
 
 	/*

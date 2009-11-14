@@ -286,6 +286,7 @@ Prefs.prototype = { };
 Prefs._AutoStart          = 'auto-start-torrents';
 
 Prefs._RefreshRate        = 'refresh_rate';
+Prefs._SessionRefreshRate        = 'session_refresh_rate';
 
 Prefs._ShowFilter         = 'show_filter';
 
