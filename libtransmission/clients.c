@@ -369,6 +369,10 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
     {
         tr_snprintf( buf, buflen, "Blizzard Downloader %d.%d", id[3]+1, id[4] );
     }
+    else if( !memcmp( id, "-SP", 3 ) )
+    {
+        three_digits( buf, buflen, "BitSpirit", id+3 );
+    }
     else if( '\0' == id[0] && !memcmp( &id[1], "BS", 2 ) )
     {
         tr_snprintf( buf, buflen, "BitSpirit %u", ( id[1] == 0 ? 1 : id[1] ) );
