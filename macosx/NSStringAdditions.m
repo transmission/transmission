@@ -84,14 +84,14 @@
 
 + (NSString *) stringForSpeedAbbrev: (CGFloat) speed
 {
-    if (speed <= 999.95f) //0.0 K to 999.9 K
+    if (speed <= 999.95) //0.0 K to 999.9 K
         return [NSString localizedStringWithFormat: @"%.1f K", speed];
     
-    speed /= 1024.0f;
+    speed /= 1024.0;
     
-    if (speed <= 99.995f) //0.98 M to 99.99 M
+    if (speed <= 99.995) //0.98 M to 99.99 M
         return [NSString localizedStringWithFormat: @"%.2f M", speed];
-    else if (speed <= 999.95f) //100.0 M to 999.9 M
+    else if (speed <= 999.95) //100.0 M to 999.9 M
         return [NSString localizedStringWithFormat: @"%.1f M", speed];
     else //insane speeds
         return [NSString localizedStringWithFormat: @"%.2f G", (speed / 1024.0f)];
@@ -100,11 +100,19 @@
 + (NSString *) stringForRatio: (CGFloat) ratio
 {
     //N/A is different than libtransmission's
-    if (ratio == TR_RATIO_NA)
+    if ((int)ratio == TR_RATIO_NA)
         return NSLocalizedString(@"N/A", "No Ratio");
-    
-    char buf[12];
-    return [NSString stringWithUTF8String: tr_strratio(buf, sizeof(buf), ratio, "\xE2\x88\x9E")];
+    else if ((int)ratio == TR_RATIO_INF)
+        return [NSString stringWithUTF8String: "\xE2\x88\x9E"];
+    else
+    {
+        if (ratio < 10.0)
+            return [NSString localizedStringWithFormat: @"%.2f", tr_truncd(ratio, 2)];
+        else if (ratio < 100.0)
+            return [NSString localizedStringWithFormat: @"%.1f", tr_truncd(ratio, 1)];
+        else
+            return [NSString localizedStringWithFormat: @"%.0f", tr_truncd(ratio, 0)];
+    }
 }
 
 + (NSString *) timeString: (uint64_t) seconds showSeconds: (BOOL) showSeconds
