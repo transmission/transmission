@@ -24,9 +24,12 @@ tr_icon_new( TrCore * core )
     return NULL;
 }
 
-#else
+void
+tr_icon_refresh( gpointer vicon UNUSED )
+{
+}
 
-#define UPDATE_INTERVAL_SECONDS 2
+#else
 
 static void
 activated( GtkStatusIcon   * self      UNUSED,
@@ -48,8 +51,8 @@ popup( GtkStatusIcon *       self,
                      self, button, when );
 }
 
-static gboolean
-refresh_tooltip_cb( gpointer data )
+void
+tr_icon_refresh( gpointer vicon )
 {
     double d;
     int limit;
@@ -59,7 +62,7 @@ refresh_tooltip_cb( gpointer data )
     char downLimit[64];
     char tip[1024];
     const char * idle = _( "Idle" );
-    GtkStatusIcon * icon = GTK_STATUS_ICON( data );
+    GtkStatusIcon * icon = GTK_STATUS_ICON( vicon );
     tr_session * session = tr_core_session( g_object_get_data( G_OBJECT( icon ), "tr-core" ) );
 
     /* up */
@@ -103,30 +106,17 @@ refresh_tooltip_cb( gpointer data )
 #else
     gtk_status_icon_set_tooltip( GTK_STATUS_ICON( icon ), tip );
 #endif
-
-    return TRUE;
-}
-
-static void
-closeTag( gpointer tag )
-{
-    g_source_remove( GPOINTER_TO_UINT( tag ) );
 }
 
 gpointer
 tr_icon_new( TrCore * core )
 {
-    guint           id;
     GtkStatusIcon * icon = gtk_status_icon_new_from_icon_name(
         "transmission" );
 
     g_signal_connect( icon, "activate", G_CALLBACK( activated ), NULL );
     g_signal_connect( icon, "popup-menu", G_CALLBACK( popup ), NULL );
-    id = gtr_timeout_add_seconds( UPDATE_INTERVAL_SECONDS, refresh_tooltip_cb, icon );
     g_object_set_data( G_OBJECT( icon ), "tr-core", core );
-    g_object_set_data_full( G_OBJECT(
-                                icon ), "update-tag", GUINT_TO_POINTER(
-                                id ), closeTag );
     return icon;
 }
 

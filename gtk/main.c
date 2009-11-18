@@ -1151,11 +1151,15 @@ updatemodel( gpointer gdata )
         tr_core_update( data->core );
 
         /* update the main window's statusbar and toolbar buttons */
-        if( data->wind )
+        if( data->wind != NULL )
             tr_window_update( data->wind );
 
         /* update the actions */
         refreshActions( data );
+
+        /* update the status tray icon */
+        if( data->icon != NULL )
+            tr_icon_refresh( data->icon );
     }
 
     return !done;

@@ -22,4 +22,6 @@
 
 gpointer tr_icon_new( TrCore * core );
 
+void tr_icon_refresh( gpointer );
+
 #endif
