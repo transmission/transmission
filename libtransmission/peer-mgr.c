@@ -623,7 +623,7 @@ requestListSort( Torrent * t, int mode )
 }
 
 static void
-requestListAdd( Torrent * t, tr_block_index_t block, tr_peer * peer )
+requestListAdd( Torrent * t, const time_t now, tr_block_index_t block, tr_peer * peer )
 {
     struct block_request key;
 
@@ -639,7 +639,7 @@ requestListAdd( Torrent * t, tr_block_index_t block, tr_peer * peer )
     /* populate the record we're inserting */
     key.block = block;
     key.peer = peer;
-    key.sentAt = time( NULL );
+    key.sentAt = now;
 
     /* insert the request to our array... */
     switch( t->requestsSort )
@@ -922,6 +922,7 @@ tr_peerMgrGetNextRequests( tr_torrent           * tor,
     Torrent * t;
     struct weighted_piece * pieces;
     const tr_bitfield * have = peer->have;
+    const time_t now = time( NULL );
 
     /* sanity clause */
     assert( tr_isTorrent( tor ) );
@@ -978,7 +979,7 @@ fprintf( stderr, "\n" );
 
                 /* update our own tables */
                 if( breq == NULL )
-                    requestListAdd( t, b, peer );
+                    requestListAdd( t, now, b, peer );
                 ++p->requestCount;
             }
         }
@@ -2389,12 +2390,11 @@ shouldPeerBeClosed( const Torrent    * t,
 static void sortPeersByLivelinessReverse( tr_peer ** peers, void ** clientData, int n, uint64_t now );
 
 static tr_peer **
-getPeersToClose( Torrent * t, tr_close_type_t closeType, int * setmeSize )
+getPeersToClose( Torrent * t, tr_close_type_t closeType, const time_t now, int * setmeSize )
 {
     int i, peerCount, outsize;
     tr_peer ** peers = (tr_peer**) tr_ptrArrayPeek( &t->peers, &peerCount );
     struct tr_peer ** ret = tr_new( tr_peer *, peerCount );
-    const time_t now = time( NULL );
 
     assert( torrentIsLocked( t ) );
 
@@ -2469,12 +2469,11 @@ getReconnectIntervalSecs( const struct peer_atom * atom, const time_t now )
 }
 
 static struct peer_atom **
-getPeerCandidates( Torrent * t, int * setmeSize )
+getPeerCandidates( Torrent * t, const time_t now, int * setmeSize )
 {
     int                 i, atomCount, retCount;
     struct peer_atom ** atoms;
     struct peer_atom ** ret;
-    const time_t        now = time( NULL );
     const int           seed = tr_torrentIsSeed( t->tor );
 
     assert( torrentIsLocked( t ) );
@@ -2554,9 +2553,8 @@ reconnectTorrent( Torrent * t )
 {
     static time_t prevTime = 0;
     static int    newConnectionsThisSecond = 0;
-    time_t        now;
+    const time_t  now = time( NULL );
 
-    now = time( NULL );
     if( prevTime != now )
     {
         prevTime = now;
@@ -2574,9 +2572,9 @@ reconnectTorrent( Torrent * t )
         int mustCloseCount;
         int candidateCount;
         int maxCandidates;
-        struct tr_peer ** canClose = getPeersToClose( t, TR_CAN_CLOSE, &canCloseCount );
-        struct tr_peer ** mustClose = getPeersToClose( t, TR_MUST_CLOSE, &mustCloseCount );
-        struct peer_atom ** candidates = getPeerCandidates( t, &candidateCount );
+        struct tr_peer ** canClose = getPeersToClose( t, TR_CAN_CLOSE, now, &canCloseCount );
+        struct tr_peer ** mustClose = getPeersToClose( t, TR_MUST_CLOSE, now, &mustCloseCount );
+        struct peer_atom ** candidates = getPeerCandidates( t, now, &candidateCount );
 
         tordbg( t, "reconnect pulse for [%s]: "
                    "%d must-close connections, "
@@ -2649,7 +2647,7 @@ reconnectTorrent( Torrent * t )
                                          handshakeCompare );
             }
 
-            atom->time = time( NULL );
+            atom->time = now;
         }
 
         /* cleanup */
