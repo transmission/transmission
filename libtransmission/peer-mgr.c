@@ -2324,10 +2324,10 @@ tr_close_type_t;
 static tr_close_type_t
 shouldPeerBeClosed( const Torrent    * t,
                     const tr_peer    * peer,
-                    int                peerCount )
+                    int                peerCount,
+                    const time_t       now )
 {
     const tr_torrent *       tor = t->tor;
-    const time_t             now = time( NULL );
     const struct peer_atom * atom = peer->atom;
 
     /* if it's marked for purging, close it */
@@ -2394,11 +2394,12 @@ getPeersToClose( Torrent * t, tr_close_type_t closeType, int * setmeSize )
     int i, peerCount, outsize;
     tr_peer ** peers = (tr_peer**) tr_ptrArrayPeek( &t->peers, &peerCount );
     struct tr_peer ** ret = tr_new( tr_peer *, peerCount );
+    const time_t now = time( NULL );
 
     assert( torrentIsLocked( t ) );
 
     for( i = outsize = 0; i < peerCount; ++i )
-        if( shouldPeerBeClosed( t, peers[i], peerCount ) == closeType )
+        if( shouldPeerBeClosed( t, peers[i], peerCount, now ) == closeType )
             ret[outsize++] = peers[i];
 
     sortPeersByLivelinessReverse ( ret, NULL, outsize, tr_date( ) );
@@ -2438,10 +2439,9 @@ compareCandidates( const void * va, const void * vb )
 }
 
 static int
-getReconnectIntervalSecs( const struct peer_atom * atom )
+getReconnectIntervalSecs( const struct peer_atom * atom, const time_t now )
 {
-    int          sec;
-    const time_t now = time( NULL );
+    int sec;
 
     /* if we were recently connected to this peer and transferring piece
      * data, try to reconnect to them sooner rather that later -- we don't
@@ -2507,7 +2507,7 @@ getPeerCandidates( Torrent * t, int * setmeSize )
             continue;
 
         /* don't reconnect too often */
-        interval = getReconnectIntervalSecs( atom );
+        interval = getReconnectIntervalSecs( atom, now );
         if( ( now - atom->time ) < interval )
         {
             tordbg( t, "RECONNECT peer %d (%s) is in its grace period of %d seconds..",
