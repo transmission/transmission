@@ -1917,8 +1917,8 @@ sendPex( tr_peermsgs * msgs )
         PexDiffs diffs6;
         tr_pex * newPex = NULL;
         tr_pex * newPex6 = NULL;
-        const int newCount = tr_peerMgrGetPeers( msgs->torrent, &newPex, TR_AF_INET, MAX_PEX_PEER_COUNT );
-        const int newCount6 = tr_peerMgrGetPeers( msgs->torrent, &newPex6, TR_AF_INET6, MAX_PEX_PEER_COUNT );
+        const int newCount = tr_peerMgrGetPeers( msgs->torrent, &newPex, TR_AF_INET, TR_PEERS_CONNECTED, MAX_PEX_PEER_COUNT );
+        const int newCount6 = tr_peerMgrGetPeers( msgs->torrent, &newPex6, TR_AF_INET6, TR_PEERS_CONNECTED, MAX_PEX_PEER_COUNT );
 
         /* build the diffs */
         diffs.added = tr_new( tr_pex, newCount );

@@ -83,12 +83,12 @@ savePeers( tr_benc * dict, const tr_torrent * tor )
     int count;
     tr_pex * pex;
 
-    count = tr_peerMgrGetPeers( (tr_torrent*) tor, &pex, TR_AF_INET, MAX_REMEMBERED_PEERS );
+    count = tr_peerMgrGetPeers( (tr_torrent*) tor, &pex, TR_AF_INET, TR_PEERS_ALL, MAX_REMEMBERED_PEERS );
     if( count > 0 )
         tr_bencDictAddRaw( dict, KEY_PEERS, pex, sizeof( tr_pex ) * count );
     tr_free( pex );
 
-    count = tr_peerMgrGetPeers( (tr_torrent*) tor, &pex, TR_AF_INET6, MAX_REMEMBERED_PEERS );
+    count = tr_peerMgrGetPeers( (tr_torrent*) tor, &pex, TR_AF_INET6, TR_PEERS_ALL, MAX_REMEMBERED_PEERS );
     if( count > 0 )
         tr_bencDictAddRaw( dict, KEY_PEERS6, pex, sizeof( tr_pex ) * count );
 

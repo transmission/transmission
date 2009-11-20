@@ -1775,46 +1775,79 @@ compareAtomsByUsefulness( const void * va, const void *vb )
 }
 
 int
-tr_peerMgrGetPeers( tr_torrent * tor, tr_pex ** setme_pex, uint8_t af, int maxPeerCount )
+tr_peerMgrGetPeers( tr_torrent   * tor,
+                    tr_pex      ** setme_pex,
+                    uint8_t        af,
+                    uint8_t        list_mode,
+                    int            maxCount )
 {
+    int i;
+    int n;
     int count = 0;
+    int atomCount = 0;
     const Torrent * t = tor->torrentPeers;
+    struct peer_atom ** atoms = NULL;
+    tr_pex * pex;
+    tr_pex * walk;
+
+    assert( tr_isTorrent( tor ) );
+    assert( setme_pex != NULL );
+    assert( setme_pex != NULL );
+    assert( af==TR_AF_INET || af==TR_AF_INET6 );
+    assert( list_mode==TR_PEERS_CONNECTED || list_mode==TR_PEERS_ALL );
 
     managerLock( t->manager );
 
+    /**
+    ***  build a list of atoms
+    **/
+
+    if( list_mode == TR_PEERS_CONNECTED ) /* connected peers only */
     {
         int i;
-        const int atomCount = tr_ptrArraySize( &t->pool );
-        const int pexCount = MIN( atomCount, maxPeerCount );
+        const tr_peer ** peers = (const tr_peer **) tr_ptrArrayBase( &t->peers );
+        atomCount = tr_ptrArraySize( &t->peers );
+        atoms = tr_new( struct peer_atom *, atomCount );
+        for( i=0; i<atomCount; ++i )
+            atoms[i] = peers[i]->atom;
+    }
+    else /* TR_PEERS_ALL */
+    {
         const struct peer_atom ** atomsBase = (const struct peer_atom**) tr_ptrArrayBase( &t->pool );
-        struct peer_atom ** atoms = tr_memdup( atomsBase, atomCount * sizeof( struct peer_atom * ) );
-        /* for now, this will waste memory on torrents that have both
-         * ipv6 and ipv4 peers */
-        tr_pex * pex = tr_new0( tr_pex, atomCount );
-        tr_pex * walk = pex;
-
-        qsort( atoms, atomCount, sizeof( struct peer_atom * ), compareAtomsByUsefulness );
-
-        for( i=0; i<atomCount && count<pexCount; ++i )
-        {
-            const struct peer_atom * atom = atoms[i];
-            if( atom->addr.type == af )
-            {
-                assert( tr_isAddress( &atom->addr ) );
-                walk->addr = atom->addr;
-                walk->port = atom->port;
-                walk->flags = atom->flags;
-                ++count;
-                ++walk;
-            }
-        }
-
-        assert( ( walk - pex ) == count );
-        *setme_pex = pex;
-
-        tr_free( atoms );
+        atomCount = tr_ptrArraySize( &t->pool );
+        atoms = tr_memdup( atomsBase, atomCount * sizeof( struct peer_atom * ) );
     }
 
+    qsort( atoms, atomCount, sizeof( struct peer_atom * ), compareAtomsByUsefulness );
+
+    /**
+    ***  add the first N of them into our return list
+    **/
+
+    n = MIN( atomCount, maxCount );
+    pex = walk = tr_new0( tr_pex, n );
+
+    for( i=0; i<atomCount && count<n; ++i )
+    {
+        const struct peer_atom * atom = atoms[i];
+        if( atom->addr.type == af )
+        {
+            assert( tr_isAddress( &atom->addr ) );
+            walk->addr = atom->addr;
+            walk->port = atom->port;
+            walk->flags = atom->flags;
+            ++count;
+            ++walk;
+        }
+    }
+
+    qsort( pex, count, sizeof( tr_pex ), tr_pexCompare );
+
+    assert( ( walk - pex ) == count );
+    *setme_pex = pex;
+
+    /* cleanup */
+    tr_free( atoms );
     managerUnlock( t->manager );
     return count;
 }

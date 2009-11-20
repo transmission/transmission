@@ -160,10 +160,17 @@ void tr_peerMgrSetBlame( tr_torrent        * tor,
                          tr_piece_index_t    pieceIndex,
                          int                 success );
 
+enum 
+{
+    TR_PEERS_CONNECTED,
+    TR_PEERS_ALL
+};
+
 int  tr_peerMgrGetPeers( tr_torrent      * tor,
                          tr_pex         ** setme_pex,
-                         uint8_t           af,
-                         int               maxPeerCount );
+                         uint8_t           address_type,
+                         uint8_t           peer_list_mode,
+                         int               max_peer_count );
 
 void tr_peerMgrStartTorrent( tr_torrent * tor );
 
