@@ -377,8 +377,11 @@ void        tr_set_compare( const void * a, size_t aCount,
                             tr_set_func in_both_cb,
                             void * userData );
 
-void tr_sha1_to_hex( char *          out,
+void tr_sha1_to_hex( char * out,
                      const uint8_t * sha1 ) TR_GNUC_NONNULL(1,2);
+
+void tr_hex_to_sha1( uint8_t * out,
+                     const char * hex ) TR_GNUC_NONNULL(1,2);
 
 
 tr_bool tr_httpIsValidURL( const char * url ) TR_GNUC_NONNULL(1);

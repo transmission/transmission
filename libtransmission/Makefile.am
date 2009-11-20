@@ -27,6 +27,7 @@ libtransmission_a_SOURCES = \
     json.c \
     JSON_parser.c \
     list.c \
+    magnet.c \
     makemeta.c \
     metainfo.c \
     natpmp.c \
@@ -73,6 +74,7 @@ noinst_HEADERS = \
     json.h \
     JSON_parser.h \
     list.h \
+    magnet.h \
     makemeta.h \
     metainfo.h \
     natpmp.h \
@@ -108,6 +110,7 @@ TESTS = \
     bencode-test \
     clients-test \
     json-test \
+    magnet-test \
     peer-msgs-test \
     rpc-test \
     test-peer-id \
@@ -145,6 +148,10 @@ clients_test_LDFLAGS = ${apps_ldflags}
 json_test_SOURCES = json-test.c
 json_test_LDADD = ${apps_ldadd}
 json_test_LDFLAGS = ${apps_ldflags}
+
+magnet_test_SOURCES = magnet-test.c
+magnet_test_LDADD = ${apps_ldadd}
+magnet_test_LDFLAGS = ${apps_ldflags}
 
 rpc_test_SOURCES = rpc-test.c
 rpc_test_LDADD = ${apps_ldadd}

@@ -40,4 +40,6 @@ struct evbuffer;
 
 void tr_http_escape( struct evbuffer *out, const char *str, int len, int noslashes );
 
+char* tr_http_unescape( const char * str, int len );
+
 #endif

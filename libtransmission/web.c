@@ -684,3 +684,12 @@ tr_http_escape( struct evbuffer *out, const char *str, int len, int keep_slashes
         }
     }
 }
+
+char*
+tr_http_unescape( const char * str, int len )
+{
+    char * tmp = curl_unescape( str, len );
+    char * ret = tr_strdup( tmp );
+    curl_free( tmp );
+    return ret;
+}

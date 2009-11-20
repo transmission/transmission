@@ -902,19 +902,33 @@ tr_getRatio( double numerator,
 }
 
 void
-tr_sha1_to_hex( char *          out,
-                const uint8_t * sha1 )
+tr_sha1_to_hex( char * out, const uint8_t * sha1 )
 {
+    int i;
     static const char hex[] = "0123456789abcdef";
-    int               i;
 
-    for( i = 0; i < 20; i++ )
+    for( i=0; i<20; ++i )
     {
-        unsigned int val = *sha1++;
+        const unsigned int val = *sha1++;
         *out++ = hex[val >> 4];
         *out++ = hex[val & 0xf];
     }
+
     *out = '\0';
+}
+
+void
+tr_hex_to_sha1( uint8_t * out, const char * in )
+{
+    int i;
+    static const char hex[] = "0123456789abcdef";
+
+    for( i=0; i<20; ++i )
+    {
+        const int hi = strchr( hex, *in++ ) - hex;
+        const int lo = strchr( hex, *in++ ) - hex;
+        *out++ = (uint8_t)( (hi<<4) | lo );
+    }
 }
 
 /***
