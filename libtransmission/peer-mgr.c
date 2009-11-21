@@ -1792,7 +1792,6 @@ tr_peerMgrGetPeers( tr_torrent   * tor,
 
     assert( tr_isTorrent( tor ) );
     assert( setme_pex != NULL );
-    assert( setme_pex != NULL );
     assert( af==TR_AF_INET || af==TR_AF_INET6 );
     assert( list_mode==TR_PEERS_CONNECTED || list_mode==TR_PEERS_ALL );
 

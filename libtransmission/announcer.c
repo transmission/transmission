@@ -1722,6 +1722,10 @@ tr_announcerStats( const tr_torrent * torrent,
             st->isBackup = tracker != tier->currentTracker;
             st->lastScrapeStartTime = tier->lastScrapeStartTime;
 
+            st->seederCount = tracker->seederCount;
+            st->leecherCount = tracker->leecherCount;
+            st->downloadCount = tracker->downloadCount;
+
             if( st->isBackup )
             {
                 st->scrapeState = TR_TRACKER_INACTIVE;
@@ -1770,10 +1774,6 @@ tr_announcerStats( const tr_torrent * torrent,
                 }
                 else
                     st->announceState = TR_TRACKER_QUEUED;
-
-                st->seederCount = tracker->seederCount;
-                st->leecherCount = tracker->leecherCount;
-                st->downloadCount = tracker->downloadCount;
             }
         }
     }
