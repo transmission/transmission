@@ -136,8 +136,6 @@ struct tr_torrent
     tr_session *             session;
     tr_info                  info;
 
-    struct tr_ratecontrol    swarmSpeed;
-
     int                      magicNumber;
 
     tr_stat_errtype          error;

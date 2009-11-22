@@ -1291,8 +1291,6 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
                 return READ_ERR;
             }
             updatePeerProgress( msgs );
-            tr_rcTransferred( &msgs->torrent->swarmSpeed,
-                              msgs->torrent->info.pieceSize );
             break;
 
         case BT_BITFIELD:

@@ -85,7 +85,6 @@ class Torrent: public QObject
             ID,
             UPLOAD_SPEED,
             DOWNLOAD_SPEED,
-            SWARM_SPEED,
             DOWNLOAD_DIR,
             ACTIVITY,
             NAME,
@@ -251,7 +250,6 @@ class Torrent: public QObject
         int connectedPeersAndWebseeds( ) const { return connectedPeers( ) + getInt( WEBSEEDS_SENDING_TO_US ); }
         Speed downloadSpeed( ) const { return Speed::fromBps( getInt( DOWNLOAD_SPEED ) ); }
         Speed uploadSpeed( ) const { return Speed::fromBps( getInt( UPLOAD_SPEED ) ); }
-        Speed swarmSpeed( ) const { return Speed::fromKbps( getInt( SWARM_SPEED ) ); }
         double getVerifyProgress( ) const { return getDouble( PERCENT_VERIFIED ); }
         bool hasFileSubstring( const QString& substr ) const;
         bool hasTrackerSubstring( const QString& substr ) const;

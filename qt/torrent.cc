@@ -55,7 +55,6 @@ Torrent :: myProperties[] =
     { ID, "id", QVariant::Int, INFO, },
     { UPLOAD_SPEED, "rateUpload", QVariant::Int, STAT } /* B/s */,
     { DOWNLOAD_SPEED, "rateDownload", QVariant::Int, STAT }, /* B/s */
-    { SWARM_SPEED, "swarmSpeed", QVariant::Int, STAT_EXTRA },/* KB/s */
     { DOWNLOAD_DIR, "downloadDir", QVariant::String, STAT },
     { ACTIVITY, "status", QVariant::Int, STAT },
     { NAME, "name", QVariant::String, INFO },

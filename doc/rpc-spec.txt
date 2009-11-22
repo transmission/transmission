@@ -178,7 +178,6 @@
    sizeWhenDone                | number                      | tr_stat
    startDate                   | number                      | tr_stat
    status                      | number                      | tr_stat
-   swarmSpeed (K/s)            | number                      | tr_stat
    trackers                    | array (see below)           | n/a
    trackerStats                | array (see below)           | n/a
    totalSize                   | number                      | tr_info
