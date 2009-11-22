@@ -32,7 +32,7 @@ Torrent._StaticFields = [ 'addedDate', 'comment', 'creator', 'dateCreated',
 Torrent._DynamicFields = [ 'downloadedEver', 'error', 'errorString', 'eta',
     'haveUnchecked', 'haveValid', 'leftUntilDone', 'peersConnected',
     'peersGettingFromUs', 'peersSendingToUs', 'rateDownload', 'rateUpload',
-    'recheckProgress', 'sizeWhenDone', 'status', 'swarmSpeed',
+    'recheckProgress', 'sizeWhenDone', 'status',
     'uploadedEver', 'uploadRatio', 'seedRatioLimit', 'seedRatioMode', 'downloadDir' ]
 
 Torrent.prototype =
@@ -206,7 +206,6 @@ Torrent.prototype =
 			default:                            return 'error';
 		}
 	},
-	swarmSpeed: function() { return this._swarm_speed; },
 	uploadSpeed: function() { return this._upload_speed; },
 	uploadTotal: function() { return this._upload_total; },
 	showFileList: function() {
@@ -330,7 +329,6 @@ Torrent.prototype =
 		this._error                 = data.error;
 		this._error_string          = data.errorString;
 		this._eta                   = data.eta;
-		this._swarm_speed           = data.swarmSpeed;
 		this._state                 = data.status;
 		this._download_dir          = data.downloadDir;
 

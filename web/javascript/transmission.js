@@ -102,7 +102,6 @@ Transmission.prototype =
 		this._inspector._info_tab.secure = $(ti+'secure')[0];
 		this._inspector._info_tab.size = $(ti+'size')[0];
 		this._inspector._info_tab.state = $(ti+'state')[0];
-		this._inspector._info_tab.swarm_speed = $(ti+'swarm_speed')[0];
 		this._inspector._info_tab.pieces = $(ti+'pieces')[0];
 		this._inspector._info_tab.uploaded = $(ti+'uploaded')[0];
 		this._inspector._info_tab.upload_speed = $(ti+'upload_speed')[0];
@@ -1011,7 +1010,6 @@ Transmission.prototype =
 		var total_have = 0;
 		var total_size = 0;
 		var total_state = null;
-		var total_swarm_speed = 0;
 		var pieces = 'N/A';
 		var total_upload = 0;
 		var total_upload_peers = 0;
@@ -1034,7 +1032,6 @@ Transmission.prototype =
 			setInnerHTML( tab.uploaded, na );
 			setInnerHTML( tab.downloaded, na );
 			setInnerHTML( tab.ratio, na );
-			setInnerHTML( tab.swarm_speed, na );
 			setInnerHTML( tab.have, na );
 			setInnerHTML( tab.upload_to, na );
 			setInnerHTML( tab.download_from, na );
@@ -1083,7 +1080,6 @@ Transmission.prototype =
 			total_download_speed += t.downloadSpeed();
 			total_upload_peers   += t.peersGettingFromUs();
 			total_download_peers += t.peersSendingToUs();
-			total_swarm_speed    += t.swarmSpeed();
 			if( total_state == null )
 				total_state = t.stateStr();
 			else if ( total_state.search ( t.stateStr() ) == -1 )
@@ -1109,7 +1105,6 @@ Transmission.prototype =
 		setInnerHTML( tab.uploaded, torrents.length ? Math.formatBytes( total_upload ) : na );
 		setInnerHTML( tab.downloaded, torrents.length ? Math.formatBytes( total_download ) : na );
 		setInnerHTML( tab.ratio, torrents.length ? Math.ratio( total_upload, total_download ) : na );
-		setInnerHTML( tab.swarm_speed, torrents.length ? Math.formatBytes(total_swarm_speed) + '/s' : na );
 		setInnerHTML( tab.have, torrents.length ? Math.formatBytes(total_completed) + ' (' + Math.formatBytes(total_verified) + ' verified)' : na );
 		setInnerHTML( tab.upload_to, torrents.length ? total_upload_peers : na );
 		setInnerHTML( tab.download_from, torrents.length ? total_download_peers : na );
