@@ -154,15 +154,17 @@
         NSString * name = currentMessage->name != NULL ? [NSString stringWithUTF8String: currentMessage->name]
                             : [[NSProcessInfo processInfo] processName];
         
+        NSString * file = [NSString stringWithFormat: @"%@:%d", [[NSString stringWithUTF8String: currentMessage->file] lastPathComponent],
+                            currentMessage->line];
+        
         NSDictionary * message  = [NSDictionary dictionaryWithObjectsAndKeys:
                                     [NSString stringWithUTF8String: currentMessage->message], @"Message",
                                     [NSDate dateWithTimeIntervalSince1970: currentMessage->when], @"Date",
                                     [NSNumber numberWithUnsignedInteger: currentIndex++], @"Index", //more accurate when sorting by date
                                     [NSNumber numberWithInteger: currentMessage->level], @"Level",
                                     name, @"Name",
-                                    [NSString stringWithUTF8String: currentMessage->file], @"File",
-                                    [NSNumber numberWithInteger: currentMessage->line], @"Line", nil];
-                                
+                                    file, @"File", nil];
+        
         [fMessages addObject: message];
     }
     
@@ -245,7 +247,7 @@
                 tableColumn: (NSTableColumn *) column row: (NSInteger) row mouseLocation: (NSPoint) mouseLocation
 {
     NSDictionary * message = [fMessages objectAtIndex: row];
-    return [NSString stringWithFormat: @"%@:%@", [[message objectForKey: @"File"] lastPathComponent], [message objectForKey: @"Line"]];
+    return [message objectForKey: @"File"];
 }
 
 - (void) copy: (id) sender
@@ -383,8 +385,8 @@
             level = @"";
     }
     
-    return [NSString stringWithFormat: @"%@ %@:%@ [%@] %@: %@", [message objectForKey: @"Date"],
-            [[message objectForKey: @"File"] lastPathComponent], [message objectForKey: @"Line"], level,
+    return [NSString stringWithFormat: @"%@ %@ [%@] %@: %@", [message objectForKey: @"Date"],
+            [message objectForKey: @"File"], level,
             [message objectForKey: @"Name"], [message objectForKey: @"Message"], nil];
 }
 
