@@ -15,7 +15,7 @@
 
 #include "transmission.h"
 
-typedef struct
+typedef struct tr_magnet_info
 {
     uint8_t hash[20];
     char * displayName;

@@ -557,16 +557,16 @@ tr_peerMgrPeerIsSeed( const tr_torrent  * tor,
 ***  REQUESTS
 ***
 *** There are two data structures associated with managing block requests:
-*** 
+***
 *** 1. Torrent::requests, an array of "struct block_request" which keeps
 ***    track of which blocks have been requested, and when, and by which peers.
 ***    This is list is used for (a) cancelling requests that have been pending
 ***    for too long and (b) avoiding duplicate requests before endgame.
-*** 
+***
 *** 2. Torrent::pieces, an array of "struct weighted_piece" which lists the
 ***    pieces that we want to request.  It's used to decide which pieces to
 ***    return next when tr_peerMgrGetBlockRequests() is called.
-**/ 
+**/
 
 /**
 *** struct block_request
@@ -616,7 +616,7 @@ requestListSort( Torrent * t, int mode )
             default: assert( 0 && "unhandled" );
         }
 
-//fprintf( stderr, "sorting requests by %s\n", (mode==REQ_SORTED_BY_BLOCK)?"block":"time" ); 
+//fprintf( stderr, "sorting requests by %s\n", (mode==REQ_SORTED_BY_BLOCK)?"block":"time" );
         qsort( t->requests, t->requestCount,
                sizeof( struct block_request ), compar );
     }
@@ -1399,7 +1399,7 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
                 tordbg( t, "setting %s doPurge flag because we got an ERANGE, EMSGSIZE, or ENOTCONN error",
                         tr_atomAddrStr( peer->atom ) );
             }
-            else 
+            else
             {
                 tordbg( t, "unhandled error: %s", tr_strerror( e->err ) );
             }

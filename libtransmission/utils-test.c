@@ -260,7 +260,6 @@ test_lowerbound( void )
 #endif
         check( pos == expected_pos[i-1] )
         check( exact == expected_exact[i-1] )
-     
     }
 
     return 0;

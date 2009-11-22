@@ -110,7 +110,7 @@ makeURL( tr_webseed *    w,
     /* if url ends with a '/', add the torrent name */
     if( url[url_len - 1] == '/' && file->name )
         tr_http_escape( out, file->name, strlen(file->name), 1 );
-        
+
     ret = tr_strndup( EVBUFFER_DATA( out ), EVBUFFER_LENGTH( out ) );
     evbuffer_free( out );
     return ret;

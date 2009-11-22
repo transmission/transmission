@@ -101,7 +101,7 @@ readOrWriteBytes( tr_session       * session,
         const char * base;
         tr_bool fileExists;
         tr_preallocation_mode preallocationMode;
-    
+
         fileExists = tr_torrentFindFile2( tor, fileIndex, &base, &subpath );
 
         if( !fileExists )

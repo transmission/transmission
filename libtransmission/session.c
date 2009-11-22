@@ -691,11 +691,6 @@ tr_sessionInitImpl( void * vdata )
     session->web = tr_webInit( session );
     --session->waiting;
 
-///cccc
-//initBlocklist        
-//    session->rpcServer = tr_rpcInit( session, settings );
-
-
     tr_sessionSet( session, &settings );
 
     if( session->isDHTEnabled )

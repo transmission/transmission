@@ -56,11 +56,11 @@ base32_to_sha1( uint8_t * out, const char * in, const int inlen )
     {
         int digit;
         int lookup = in[i] - '0';
- 
+
         /* Skip chars outside the lookup table */
         if( lookup<0 || lookup>=base32LookupLen )
             continue;
-   
+
         /* If this digit is not in the table, ignore it */
         digit = base32Lookup[lookup];
         if( digit == 0xFF )
@@ -80,7 +80,7 @@ base32_to_sha1( uint8_t * out, const char * in, const int inlen )
             index = (index + 5) % 8;
             out[offset] |= (digit >> index);
             offset++;
-   
+
             if( offset >= outlen )
                 break;
             out[offset] |= digit << (8 - index);
