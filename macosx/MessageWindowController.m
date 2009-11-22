@@ -32,7 +32,6 @@
 #define LEVEL_DEBUG 2
 
 #define UPDATE_SECONDS  0.6
-#define MAX_MESSAGES    8000
 
 @interface MessageWindowController (Private)
 
@@ -170,24 +169,11 @@
     
     tr_freeMessageList(messages);
     
-    NSUInteger total = [fMessages count];
-    if (total > MAX_MESSAGES)
-    {
-        //remove the oldest - move oldest to end for (assumedly) most efficient removal
-        NSSortDescriptor * descriptor = [[[NSSortDescriptor alloc] initWithKey: @"Index" ascending: NO] autorelease];
-        [fMessages sortUsingDescriptors: [NSArray arrayWithObject: descriptor]];
-        
-        [fMessages removeObjectsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(MAX_MESSAGES, total-MAX_MESSAGES)]];
-        
-        [fMessageTable noteHeightOfRowsWithIndexesChanged: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, MAX_MESSAGES)]];
-        total = MAX_MESSAGES;
-    }
-    
     [fMessages sortUsingDescriptors: [fMessageTable sortDescriptors]];
     
     [fMessageTable reloadData];
     if (shouldScroll)
-        [fMessageTable scrollRowToVisible: total-1];
+        [fMessageTable scrollRowToVisible: [fMessages count]-1];
 }
 
 - (NSInteger) numberOfRowsInTableView: (NSTableView *) tableView
