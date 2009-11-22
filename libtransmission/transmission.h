@@ -1719,11 +1719,6 @@ typedef struct tr_stat
         or 0 if you can't */
     time_t manualAnnounceTime;
 
-    /** A very rough estimate in KiB/s of how quickly data is being
-        passed around between all the peers we're connected to.
-        Don't put too much weight in this number. */
-    float    swarmSpeed;
-
 #define TR_RATIO_NA  -1
 #define TR_RATIO_INF -2
     /** TR_RATIO_INF, TR_RATIO_NA, or a regular ratio */

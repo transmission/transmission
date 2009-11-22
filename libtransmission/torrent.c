@@ -921,7 +921,6 @@ tr_torrentStat( tr_torrent * tor )
 
     now = tr_date( );
     d = tr_peerMgrGetWebseedSpeed( tor, now );
-    s->swarmSpeed         = tr_rcRate( &tor->swarmSpeed, now );
     s->rawUploadSpeed     = tr_bandwidthGetRawSpeed  ( tor->bandwidth, now, TR_UP );
     s->pieceUploadSpeed   = tr_bandwidthGetPieceSpeed( tor->bandwidth, now, TR_UP );
     s->rawDownloadSpeed   = d + tr_bandwidthGetRawSpeed  ( tor->bandwidth, now, TR_DOWN );
