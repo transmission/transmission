@@ -1180,11 +1180,6 @@ int trashDataFile(const char * filename)
     return fStat->corruptEver;
 }
 
-- (CGFloat) swarmSpeed
-{
-    return fStat->swarmSpeed;
-}
-
 - (NSInteger) groupValue
 {
     return fGroupValue;

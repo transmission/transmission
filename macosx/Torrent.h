@@ -192,7 +192,6 @@
 - (uint64_t) downloadedTotal;
 - (uint64_t) uploadedTotal;
 - (uint64_t) failedHash;
-- (CGFloat) swarmSpeed;
 
 - (NSInteger) groupValue;
 - (void) setGroupValue: (NSInteger) groupValue;
