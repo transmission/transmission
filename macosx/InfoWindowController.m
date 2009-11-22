@@ -348,7 +348,6 @@ typedef enum
         [fStateField setStringValue: @""];
         [fProgressField setStringValue: @""];
         
-        [fSwarmSpeedField setStringValue: @""];
         [fErrorMessageView setString: @""];
         [fErrorMessageView setSelectable: NO];
         
@@ -1417,7 +1416,6 @@ typedef enum
             [fProgressField setStringValue: [NSString localizedStringWithFormat: @"%.2f%%", 100.0 * [torrent progress]]];
             
         [fRatioField setStringValue: [NSString stringForRatio: [torrent ratio]]];
-        [fSwarmSpeedField setStringValue: [torrent isActive] ? [NSString stringForSpeed: [torrent swarmSpeed]] : @""];
         
         NSString * errorMessage = [torrent errorMessage];
         if (![errorMessage isEqualToString: [fErrorMessageView string]])
