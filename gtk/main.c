@@ -364,7 +364,7 @@ main( int argc, char ** argv )
         g_thread_init( NULL );
 
     gerr = NULL;
-    if( !gtk_init_with_args( &argc, &argv, (char*)_( "[torrent files]" ), entries,
+    if( !gtk_init_with_args( &argc, &argv, (char*)_( "[torrent files or urls]" ), entries,
                              (char*)domain, &gerr ) )
     {
         fprintf( stderr, "%s\n", gerr->message );
@@ -1356,7 +1356,11 @@ doAction( const char * action_name, gpointer user_data )
     struct cbdata * data = user_data;
     gboolean        changed = FALSE;
 
-    if(  !strcmp( action_name, "add-torrent-menu" )
+    if( !strcmp( action_name, "add-torrent-from-url" ) )
+    {
+        addURLDialog( data->wind, data->core );
+    }
+    else if(  !strcmp( action_name, "add-torrent-menu" )
       || !strcmp( action_name, "add-torrent-toolbar" ) )
     {
         addDialog( data->wind, data->core );

@@ -24,4 +24,7 @@ GtkWidget* addSingleTorrentDialog( GtkWindow * parent,
 GtkWidget* addDialog( GtkWindow * parent,
                       TrCore *    core );
 
+GtkWidget* addURLDialog( GtkWindow * parent,
+                         TrCore *    core );
+
 #endif /* TR_GTK_ADD_DIALOG */

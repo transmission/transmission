@@ -322,24 +322,46 @@ decode_uri( const char * uri )
     return ret;
 }
 
-GSList *
-checkfilenames( int    argc,
-                char **argv )
+
+gboolean
+gtr_is_supported_url( const char * str )
 {
-    int      i;
+    return gtr_is_magnet_link( str )
+        || !strncmp( str, "ftp://", 6 )
+        || !strncmp( str, "http://", 7 )
+        || !strncmp( str, "https://", 8 );
+}
+
+gboolean
+gtr_is_magnet_link( const char * str )
+{
+    return !strncmp( str, "magnet:?", 8 );
+}
+
+GSList *
+checkfilenames( int argc, char **argv )
+{
+    int i;
     GSList * ret = NULL;
-    char *   pwd = g_get_current_dir( );
+    char * pwd = g_get_current_dir( );
 
-    for( i = 0; i < argc; ++i )
+    for( i=0; i<argc; ++i )
     {
-        char * filename = g_path_is_absolute( argv[i] )
-                          ? g_strdup ( argv[i] )
-                          : g_build_filename( pwd, argv[i], NULL );
+        if( gtr_is_supported_url( argv[i] ) )
+        {
+            ret = g_slist_prepend( ret, g_strdup( argv[i] ) );
+        }
+        else /* local file */
+        {
+            char * filename = g_path_is_absolute( argv[i] )
+                            ? g_strdup ( argv[i] )
+                            : g_build_filename( pwd, argv[i], NULL );
 
-        if( g_file_test( filename, G_FILE_TEST_EXISTS ) )
-            ret = g_slist_prepend( ret, filename );
-        else
-            g_free( filename );
+            if( g_file_test( filename, G_FILE_TEST_EXISTS ) )
+                ret = g_slist_prepend( ret, filename );
+            else
+                g_free( filename );
+        }
     }
 
     g_free( pwd );

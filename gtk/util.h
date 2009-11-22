@@ -43,6 +43,10 @@ char* gtr_localtime2( char * buf, time_t time, size_t buflen );
 ****
 ***/
 
+gboolean gtr_is_supported_url( const char * str );
+
+gboolean gtr_is_magnet_link( const char * str );
+
 /* create a copy of a GSList of strings, this dups the actual strings too */
 GSList * dupstrlist( GSList * list );
 

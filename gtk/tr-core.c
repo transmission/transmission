@@ -38,6 +38,7 @@
 #include <libtransmission/rpcimpl.h>
 #include <libtransmission/json.h>
 #include <libtransmission/utils.h> /* tr_free */
+#include <libtransmission/web.h>
 
 #include "conf.h"
 #include "notify.h"
@@ -975,6 +976,69 @@ tr_core_add_metainfo( TrCore      * core,
     return TRUE;
 }
 
+/***
+****
+***/
+
+struct url_dialog_data
+{
+    TrCore * core;
+    tr_ctor * ctor;
+    GtkDialog * dialog;
+};
+
+static gboolean
+onURLDoneIdle( gpointer vdata )
+{
+    struct url_dialog_data * data = vdata;
+    tr_core_add_ctor( data->core, data->ctor );
+    g_free( data );
+    return FALSE;
+}
+
+static void
+onURLDone( tr_session       * session,
+           long               response_code UNUSED,
+           const void       * response,
+           size_t             response_byte_count,
+           void             * vdata )
+{
+    struct url_dialog_data * data = vdata;
+    tr_ctor * ctor = tr_ctorNew( session );
+
+    /* FIME: error dialog */
+
+    if( tr_ctorSetMetainfo( ctor, response, response_byte_count ) )
+    {
+        tr_ctorFree( ctor );
+        g_free( data );
+    }
+    else /* move the work back to the gtk thread */
+    {
+        data->ctor = ctor;
+        gtr_idle_add( onURLDoneIdle, data );
+    }
+}
+
+void
+tr_core_add_from_url( TrCore * core, const char * url )
+{
+    if( gtr_is_magnet_link( url ) )
+    {
+        g_message( "FIXME: magnet link \"%s\" not handled", url );
+    }
+    else
+    {
+        struct url_dialog_data * data = g_new( struct url_dialog_data, 1 );
+        data->core = core;
+        tr_webRun( tr_core_session( core ), url, NULL, onURLDone, data );
+    }
+}
+
+/***
+****
+***/
+
 static void
 add_filename( TrCore      * core,
               const char  * filename,
@@ -983,13 +1047,22 @@ add_filename( TrCore      * core,
               gboolean      doNotify )
 {
     tr_session * session = tr_core_session( core );
-    if( filename && session )
+
+    if( session == NULL )
+        return;
+
+    if( gtr_is_supported_url( filename ) )
+    {
+        tr_core_add_from_url( core, filename );
+    }
+    else /* try it as a local file */
     {
         int err;
+
         tr_ctor * ctor = tr_ctorNew( session );
+        tr_ctorSetMetainfoFromFile( ctor, filename );
         tr_core_apply_defaults( ctor );
         tr_ctorSetPaused( ctor, TR_FORCE, !doStart );
-        tr_ctorSetMetainfoFromFile( ctor, filename );
 
         err = add_ctor( core, ctor, doPrompt, doNotify );
         if( err == TR_PARSE_ERR )

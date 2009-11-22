@@ -3,6 +3,7 @@ static const char * fallback_ui_file =
     "  <menubar name='main-window-menu'>\n"
     "    <menu action='torrent-menu'>\n"
     "      <menuitem action='add-torrent-menu'/>\n"
+    "      <menuitem action='add-torrent-from-url'/>\n"
     "      <menuitem action='new-torrent'/>\n"
     "      <separator/>\n"
     "      <menuitem action='show-torrent-properties'/>\n"

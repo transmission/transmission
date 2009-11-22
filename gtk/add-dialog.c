@@ -12,6 +12,7 @@
 
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>
+
 #include "add-dialog.h"
 #include "conf.h"
 #include "file-list.h"
@@ -27,15 +28,15 @@
 static GSList*
 get_recent_destinations( void )
 {
-    int      i;
+    int i;
     GSList * list = NULL;
 
-    for( i = 0; i < N_RECENT; ++i )
+    for( i=0; i<N_RECENT; ++i )
     {
-        char         key[64];
+        char key[64];
         const char * val;
-        g_snprintf( key, sizeof( key ), "recent-download-dir-%d", i + 1 );
-        if( ( val = pref_string_get( key ) ) )
+        g_snprintf( key, sizeof( key ), "recent-download-dir-%d", i+1 );
+        if(( val = pref_string_get( key )))
             list = g_slist_append( list, (void*)val );
     }
     return list;
@@ -44,15 +45,15 @@ get_recent_destinations( void )
 static void
 save_recent_destination( TrCore * core, const char * dir  )
 {
-    int      i;
-    GSList * list = get_recent_destinations( );
+    int i;
     GSList * l;
+    GSList * list = get_recent_destinations( );
 
-    if( !dir )
+    if( dir == NULL )
         return;
 
     /* if it was already in the list, remove it */
-    if( ( l = g_slist_find_custom( list, dir, (GCompareFunc)strcmp ) ) )
+    if(( l = g_slist_find_custom( list, dir, (GCompareFunc)strcmp )))
         list = g_slist_delete_link( list, l );
 
     /* add it to the front of the list */
@@ -60,12 +61,11 @@ save_recent_destination( TrCore * core, const char * dir  )
 
     /* make local copies of the strings that aren't
      * invalidated by pref_string_set() */
-    for( l = list; l; l = l->next )
+    for( l=list; l; l=l->next )
         l->data = g_strdup( l->data );
 
     /* save the first N_RECENT directories */
-    for( l = list, i = 0; l && ( i < N_RECENT ); ++i, l = l->next )
-    {
+    for( l=list, i=0; l && ( i<N_RECENT ); ++i, l=l->next ) {
         char key[64];
         g_snprintf( key, sizeof( key ), "recent-download-dir-%d", i + 1 );
         pref_string_set( key, l->data );
@@ -467,3 +467,77 @@ addDialog( GtkWindow * parent,
     return w;
 }
 
+/***
+****
+***/
+
+static void
+onAddURLResponse( GtkDialog * dialog, int response, gpointer user_data )
+{
+    gboolean destroy = TRUE;
+
+    if( response == GTK_RESPONSE_ACCEPT )
+    {
+        GtkWidget * e = GTK_WIDGET( g_object_get_data( G_OBJECT( dialog ), "url-entry" ) );
+        char * url = g_strdup( gtk_entry_get_text( GTK_ENTRY( e ) ) );
+        g_strstrip( url );
+
+        if( url && *url )
+        {
+            TrCore * core = user_data;
+
+            if( gtr_is_supported_url( url ) )
+            {
+                tr_core_add_from_url( core, url );
+            }
+            else
+            {
+                GtkWidget * w = gtk_message_dialog_new( GTK_WINDOW( dialog ),
+                                                        GTK_DIALOG_MODAL,
+                                                        GTK_MESSAGE_ERROR,
+                                                        GTK_BUTTONS_CLOSE,
+                                                        "%s", _( "Unrecognized URL" ) );
+                gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG( w ),
+                    _( "Transmission doesn't know how to use \"%s\"" ), url );
+                gtk_dialog_run( GTK_DIALOG( w ) );
+                gtk_widget_destroy( w );
+                destroy = FALSE;
+            }
+        }
+    }
+
+    if( destroy )
+        gtk_widget_destroy( GTK_WIDGET( dialog ) );
+}
+
+GtkWidget*
+addURLDialog( GtkWindow * parent, TrCore * core )
+{
+    int row;
+    GtkWidget * e;
+    GtkWidget * t;
+    GtkWidget * w;
+
+    w = gtk_dialog_new_with_buttons( _( "Add a URL" ), parent,
+                                     GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_NO_SEPARATOR,
+                                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                                     GTK_STOCK_ADD, GTK_RESPONSE_ACCEPT,
+                                     NULL );
+    gtk_dialog_set_alternative_button_order( GTK_DIALOG( w ),
+                                             GTK_RESPONSE_ACCEPT,
+                                             GTK_RESPONSE_CANCEL,
+                                             -1 );
+    g_signal_connect( w, "response", G_CALLBACK( onAddURLResponse ), core );
+
+    row = 0;
+    t = hig_workarea_create( );
+    hig_workarea_add_section_title( t, &row, _( "Add torrent from URL" ) );
+    e = gtk_entry_new( );
+    g_object_set_data( G_OBJECT( w ), "url-entry", e );
+    hig_workarea_add_row( t, &row, _( "_URL" ), e, NULL );
+    
+    gtk_box_pack_start( GTK_BOX( GTK_DIALOG( w )->vbox ), t, TRUE, TRUE, 0 );
+    gtk_widget_show_all( t );
+    gtk_widget_show( w );
+    return w;
+}
