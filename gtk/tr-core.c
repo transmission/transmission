@@ -1051,7 +1051,7 @@ add_filename( TrCore      * core,
     if( session == NULL )
         return;
 
-    if( gtr_is_supported_url( filename ) )
+    if( gtr_is_supported_url( filename ) || gtr_is_magnet_link( filename ) )
     {
         tr_core_add_from_url( core, filename );
     }

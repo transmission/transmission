@@ -326,8 +326,7 @@ decode_uri( const char * uri )
 gboolean
 gtr_is_supported_url( const char * str )
 {
-    return gtr_is_magnet_link( str )
-        || !strncmp( str, "ftp://", 6 )
+    return !strncmp( str, "ftp://", 6 )
         || !strncmp( str, "http://", 7 )
         || !strncmp( str, "https://", 8 );
 }

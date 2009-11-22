@@ -282,7 +282,7 @@ if test "x$build_gtk" = "xyes"; then
     AC_ARG_ENABLE([libcanberra], 
                   AS_HELP_STRING([--enable-libcanberra],[enable sounds]),, 
                   [enable_libcanberra=yes]) 
-    use_libcanberra=no
+    use_canberra=no
     if test "x$enable_libcanberra" = "xyes" ; then
         if test "x$have_libcanberra" = "xyes"; then
             use_canberra=yes
