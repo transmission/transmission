@@ -723,7 +723,11 @@ popNextRequest( tr_peermsgs * msgs, struct peer_request * setme )
         return FALSE;
 
     *setme = msgs->peerAskedFor[0];
-    memmove( msgs->peerAskedFor, msgs->peerAskedFor + 1, --msgs->peerAskedForCount );
+
+    memmove( msgs->peerAskedFor,
+             msgs->peerAskedFor + 1,
+             sizeof( struct peer_request ) * --msgs->peerAskedForCount );
+
     return TRUE;
 }
 
