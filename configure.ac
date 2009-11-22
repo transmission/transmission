@@ -45,6 +45,7 @@ GTK_MINIMUM=2.6.0
 LIBNOTIFY_MINIMUM=0.4.3
 DBUS_GLIB_MINIMUM=0.70
 LIBEVENT_MINIMUM=1.4.5
+CANBERRA_MINIMUM=0.10
 AC_SUBST(OPENSSL_MINIMUM)
 AC_SUBST(CURL_MINIMUM)
 AC_SUBST(GIO_MINIMUM)
@@ -53,6 +54,7 @@ AC_SUBST(GTK_MINIMUM)
 AC_SUBST(LIBNOTIFY_MINIMUM)
 AC_SUBST(DBUS_GLIB_MINIMUM)
 AC_SUBST(LIBEVENT_MINIUM)
+AC_SUBST(CANBERRA_MINIMUM)
 
 AC_PROG_CC
 AC_PROG_CXX
@@ -273,6 +275,23 @@ if test "x$build_gtk" = "xyes"; then
         fi
     fi
 
+    PKG_CHECK_MODULES([LIBCANBERRA],
+                      [libcanberra-gtk >= $CANBERRA_MINIMUM],
+                      [have_libcanberra=yes],
+                      [have_libcanberra=no])
+    AC_ARG_ENABLE([libcanberra], 
+                  AS_HELP_STRING([--enable-libcanberra],[enable sounds]),, 
+                  [enable_libcanberra=yes]) 
+    use_libcanberra=no
+    if test "x$enable_libcanberra" = "xyes" ; then
+        if test "x$have_libcanberra" = "xyes"; then
+            use_canberra=yes
+            AC_SUBST(LIBCANBERRA_LIBS) 
+            AC_SUBST(LIBCANBERRA_CFLAGS) 
+            AC_DEFINE([HAVE_LIBCANBERRA], 1) 
+        fi
+    fi
+
     PKG_CHECK_MODULES([DBUS_GLIB],
                       [dbus-glib-1 >= $DBUS_GLIB_MINIMUM],
                       [use_dbus_glib=yes],
@@ -424,6 +443,7 @@ Configuration:
 
         Build Mac client:              ${build_mac}
         Build GTK+ client:             ${build_gtk}
+          ... with canberra support:   ${use_canberra}
           ... with gio support:        ${use_gio}
           ... with dbus-glib support:  ${use_dbus_glib}
           ... with libnotify support:  ${use_libnotify}

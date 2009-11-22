@@ -175,6 +175,7 @@ tr_prefs_init_defaults( tr_benc * d )
     tr_bencDictAddBool( d, PREF_KEY_FILTERBAR, TRUE );
     tr_bencDictAddBool( d, PREF_KEY_STATUSBAR, TRUE );
     tr_bencDictAddBool( d, PREF_KEY_SHOW_TRAY_ICON, FALSE );
+    tr_bencDictAddBool( d, PREF_KEY_PLAY_DOWNLOAD_COMPLETE_SOUND, TRUE );
     tr_bencDictAddBool( d, PREF_KEY_SHOW_DESKTOP_NOTIFICATION, TRUE );
     tr_bencDictAddBool( d, PREF_KEY_SHOW_MORE_TRACKER_INFO, FALSE );
     tr_bencDictAddBool( d, PREF_KEY_SHOW_BACKUP_TRACKERS, FALSE );

@@ -342,13 +342,19 @@ desktopPage( GObject * core )
     w = new_check_button( s, PREF_KEY_INHIBIT_HIBERNATION, core );
     hig_workarea_add_wide_control( t, &row, w );
 
-    s = _( "Show Transmission in the _notification area" );
+    s = _( "Show Transmission icon in the _notification area" );
     w = new_check_button( s, PREF_KEY_SHOW_TRAY_ICON, core );
     hig_workarea_add_wide_control( t, &row, w );
 
     s = _( "Show _popup notifications" );
     w = new_check_button( s, PREF_KEY_SHOW_DESKTOP_NOTIFICATION, core );
     hig_workarea_add_wide_control( t, &row, w );
+
+#ifdef HAVE_LIBCANBERRA
+    s = _( "Play _sound when downloads are complete" );
+    w = new_check_button( s, PREF_KEY_PLAY_DOWNLOAD_COMPLETE_SOUND, core );
+    hig_workarea_add_wide_control( t, &row, w );
+#endif
 
     hig_workarea_finish( t, &row );
     return t;

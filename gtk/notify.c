@@ -11,9 +11,15 @@
  */
 
 #include <string.h>
+
+#ifdef HAVE_LIBCANBERRA
+ #include <canberra-gtk.h>
+#endif
+
 #ifdef HAVE_GIO
  #include <gio/gio.h>
 #endif
+
 #include <glib/gi18n.h>
 #include "conf.h"
 #include "notify.h"
@@ -86,6 +92,18 @@ can_support_actions( void )
 void
 tr_notify_send( TrTorrent *tor )
 {
+#ifdef HAVE_LIBCANBERRA
+    if( pref_flag_get( PREF_KEY_PLAY_DOWNLOAD_COMPLETE_SOUND ) )
+    {
+        /* play the sound, using sounds from the naming spec */
+        ca_context_play( ca_gtk_context_get (), 0,
+                         CA_PROP_EVENT_ID, "complete-download",
+                         CA_PROP_APPLICATION_NAME, g_get_application_name,
+                         CA_PROP_EVENT_DESCRIPTION, _("Download complete"),
+                         NULL);
+    }
+#endif
+
     if( pref_flag_get( PREF_KEY_SHOW_DESKTOP_NOTIFICATION ) )
     {
         const tr_info * info = tr_torrent_info( tor );
