@@ -560,6 +560,7 @@
          |         |        NO | torrent-get    | removed arg "scrapeURL"
          |         |        NO | torrent-get    | removed arg "seeders"
          |         |        NO | torrent-get    | removed arg "timesCompleted"
+         |         |        NO | torrent-get    | removed arg "swarmSpeed"
          |         | yes       | torrent-get    | new arg "trackerStats"
          |         | yes       | session-set    | new arg "incomplete-dir"
          |         | yes       | session-set    | new arg "incomplete-dir-enabled"
