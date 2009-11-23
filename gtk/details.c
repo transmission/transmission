@@ -2179,12 +2179,10 @@ torrent_inspector_set_torrents( GtkWidget * w, GSList * ids )
         g_snprintf( title, sizeof( title ), _( "%s Properties" ), inf->name );
 
         file_list_set_torrent( di->file_list, id );
-        //tracker_list_set_torrent( di->tracker_list, id );
     }
    else
    {
         file_list_clear( di->file_list );
-        //tracker_list_clear( di->tracker_list );
         g_snprintf( title, sizeof( title ), _( "%'d Torrent Properties" ), len );
     }
 

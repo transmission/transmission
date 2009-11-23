@@ -152,8 +152,6 @@ struct weighted_piece
 
 typedef struct tr_torrent_peers
 {
-    struct event               refillTimer;
-
     tr_ptrArray                outgoingHandshakes; /* tr_handshake */
     tr_ptrArray                pool; /* struct peer_atom */
     tr_ptrArray                peers; /* tr_peer */
@@ -162,7 +160,6 @@ typedef struct tr_torrent_peers
     tr_torrent               * tor;
     tr_peer                  * optimistic; /* the optimistic peer, or NULL if none */
     struct tr_peerMgr        * manager;
-    //int                      * pendingRequestCount;
 
     tr_bool                    isRunning;
     tr_bool                    needsCompletenessCheck;
@@ -427,8 +424,6 @@ torrentDestructor( void * vt )
     assert( tr_ptrArrayEmpty( &t->outgoingHandshakes ) );
     assert( tr_ptrArrayEmpty( &t->peers ) );
 
-    evtimer_del( &t->refillTimer );
-
     tr_ptrArrayDestruct( &t->webseeds, (PtrArrayForeachFunc)tr_webseedFree );
     tr_ptrArrayDestruct( &t->pool, (PtrArrayForeachFunc)tr_free );
     tr_ptrArrayDestruct( &t->outgoingHandshakes, NULL );
@@ -439,12 +434,7 @@ torrentDestructor( void * vt )
     tr_free( t );
 }
 
-
-//static void refillPulse( int, short, void* );
-
-static void peerCallbackFunc( void * vpeer,
-                              void * vevent,
-                              void * vt );
+static void peerCallbackFunc( void * vpeer, void * vevent, void * vt );
 
 static Torrent*
 torrentConstructor( tr_peerMgr * manager,
@@ -461,8 +451,6 @@ torrentConstructor( tr_peerMgr * manager,
     t->webseeds = TR_PTR_ARRAY_INIT;
     t->outgoingHandshakes = TR_PTR_ARRAY_INIT;
     t->requests = 0;
-    //evtimer_set( &t->refillTimer, refillPulse, t );
-
 
     for( i = 0; i < tor->info.webseedCount; ++i )
     {
@@ -616,7 +604,6 @@ requestListSort( Torrent * t, int mode )
             default: assert( 0 && "unhandled" );
         }
 
-//fprintf( stderr, "sorting requests by %s\n", (mode==REQ_SORTED_BY_BLOCK)?"block":"time" );
         qsort( t->requests, t->requestCount,
                sizeof( struct block_request ), compar );
     }
@@ -754,7 +741,6 @@ pieceListSort( Torrent * t, int mode )
 
     if( t->piecesSort != mode )
     {
-//fprintf( stderr, "sort mode was %d, is now %d\n", t->piecesSort, mode );
         t->piecesSort = mode;
 
         switch( mode ) {
@@ -763,7 +749,6 @@ pieceListSort( Torrent * t, int mode )
             default: assert( 0 && "unhandled" );  break;
         }
 
-//fprintf( stderr, "sorting pieces by %s...\n", (mode==PIECES_SORTED_BY_WEIGHT)?"weight":"index" );
         weightTorrent = t->tor;
         qsort( t->pieces, t->pieceCount,
                sizeof( struct weighted_piece ), compar );
@@ -936,16 +921,6 @@ tr_peerMgrGetNextRequests( tr_torrent           * tor,
     if( t->pieces == NULL )
         pieceListRebuild( t );
     pieceListSort( t, PIECES_SORTED_BY_WEIGHT );
-//if( t->isInEndgame ) fprintf( stderr, "endgame\n" );
-
-#if 0
-{
-int i=0, n=MIN(10,t->pieceCount);
-fprintf( stderr, "the next pieces we want to request are " );
-for( i=0; i<n; i++ ) fprintf( stderr, "%d(weight:%d) ", (int)t->pieces[i].index, (int)t->pieces[i].weight );
-fprintf( stderr, "\n" );
-}
-#endif
 
     pieces = t->pieces;
     for( i=0; i<t->pieceCount && got<numwant; ++i )
@@ -975,7 +950,6 @@ fprintf( stderr, "\n" );
                 }
 
                 setme[got++] = b;
-//fprintf( stderr, "peer %p is requesting block %"PRIu64"\n", peer, b );
 
                 /* update our own tables */
                 if( breq == NULL )
@@ -999,7 +973,6 @@ fprintf( stderr, "\n" );
 
         /* rescore the pieces that we changed */
         weightTorrent = t->tor;
-//fprintf( stderr, "sorting %d changed pieces...\n", (int)(a_end-a) );
         qsort( a, a_end-a, sizeof( struct weighted_piece ), comparePieceByWeight );
 
         /* allocate a new array */
@@ -1024,7 +997,6 @@ fprintf( stderr, "\n" );
         t->pieces = pieces;
     }
 
-    //fprintf( stderr, "peer %p wanted %d requests; got %d\n", peer, numwant, got );
     *numgot = got;
 }
 
@@ -1327,8 +1299,6 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
         {
             tr_torrent * tor = t->tor;
             tr_block_index_t block = _tr_block( tor, e->pieceIndex, e->offset );
-//static int numBlocks = 0;
-//fprintf( stderr, "got a total of %d blocks\n", ++numBlocks );
 
             requestListRemove( t, block );
             pieceListRemoveRequest( t, block );
@@ -1347,7 +1317,6 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
                 {
                     const tr_piece_index_t p = e->pieceIndex;
                     const tr_bool ok = tr_ioTestPiece( tor, p, NULL, 0 );
-//fprintf( stderr, "we now have piece #%d\n", (int)p );
 
                     if( !ok )
                     {
