@@ -2404,7 +2404,7 @@ tr_torrentDeleteLocalData( tr_torrent * tor, tr_fileFunc fileFunc )
     {
         deleteLocalData( tor, fileFunc );
     }
-    else
+    else if( tor->info.fileCount == 1 )
     {
         char * tmp;
 

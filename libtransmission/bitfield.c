@@ -165,7 +165,7 @@ tr_bitfieldOr( tr_bitfield *       a,
     uint8_t *      ait;
     const uint8_t *aend, *bit;
 
-    assert( a->bitCount == b->bitCount );
+    assert( a->byteCount == b->byteCount );
 
     for( ait = a->bits, bit = b->bits, aend = ait + a->byteCount;
          ait != aend; )
@@ -182,7 +182,7 @@ tr_bitfieldDifference( tr_bitfield *       a,
     uint8_t *      ait;
     const uint8_t *aend, *bit;
 
-    assert( a->bitCount == b->bitCount );
+    assert( a->byteCount == b->byteCount );
 
     for( ait = a->bits, bit = b->bits, aend = ait + a->byteCount;
          ait != aend; )
