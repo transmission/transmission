@@ -222,6 +222,8 @@ tr_torrentSetMetadataPiece( tr_torrent  * tor,
                                               tor->info.hashString, path );
                     tr_torrentSetDirty( tor );
                 }
+
+                tr_bencFree( &dict );
             }
 
             evbuffer_free( buf );
