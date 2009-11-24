@@ -36,7 +36,7 @@
 enum
 {
     /* don't ask for the same metadata piece more than this often */
-    MIN_REPEAT_INTERVAL_SECS = 5
+    MIN_REPEAT_INTERVAL_SECS = 3
 };
 
 struct metadata_node
@@ -220,6 +220,7 @@ tr_torrentSetMetadataPiece( tr_torrent  * tor,
                     tr_bencToFile( &dict, TR_FMT_BENC, path );
                     tr_sessionSetTorrentFile( tor->session,
                                               tor->info.hashString, path );
+                    tr_torrentSetDirty( tor );
                 }
             }
 
@@ -256,7 +257,7 @@ tr_torrentGetNextMetadataRequest( tr_torrent * tor, time_t now, int * setme_piec
 
     if( ( m != NULL )
         && ( m->piecesNeededCount > 0 )
-        && ( m->piecesNeeded[0].requestedAt + MIN_REPEAT_INTERVAL_SECS <= now ) )
+        && ( m->piecesNeeded[0].requestedAt + MIN_REPEAT_INTERVAL_SECS < now ) )
     {
         int i;
         const int piece = m->piecesNeeded[0].piece;
@@ -266,8 +267,8 @@ tr_torrentGetNextMetadataRequest( tr_torrent * tor, time_t now, int * setme_piec
                                    m->piecesNeededCount-- );
 
         i = m->piecesNeededCount++;
-        m->piecesNeeded[0].piece = piece;
-        m->piecesNeeded[0].requestedAt = now;
+        m->piecesNeeded[i].piece = piece;
+        m->piecesNeeded[i].requestedAt = now;
 
         dbgmsg( tor, "next piece to request: %d", piece );
         *setme_piece = piece;
@@ -275,4 +276,22 @@ tr_torrentGetNextMetadataRequest( tr_torrent * tor, time_t now, int * setme_piec
     }
 
     return have_request;
+}
+
+float
+tr_torrentGetMetadataPercent( const tr_torrent * tor )
+{
+    float ret;
+
+    if( tr_torrentHasMetadata( tor ) )
+        ret = 1.0;
+    else {
+        const struct tr_incomplete_metadata * m = tor->incompleteMetadata;
+        if( m == NULL )
+            ret = 0.0;
+        else
+            ret = (m->pieceCount - m->piecesNeededCount) / (float)m->pieceCount;
+    }
+
+    return ret;
 }

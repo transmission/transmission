@@ -40,6 +40,7 @@
 #include "ratecontrol.h"
 #include "session.h"
 #include "torrent.h"
+#include "torrent-magnet.h"
 #include "trevent.h"
 #include "utils.h"
 #include "verify.h"
@@ -959,6 +960,7 @@ tr_torrentStat( tr_torrent * tor )
     usableSeeds += tor->info.webseedCount;
 
     s->percentComplete = tr_cpPercentComplete ( &tor->completion );
+    s->metadataPercentComplete = tr_torrentGetMetadataPercent( tor );
 
     s->percentDone   = tr_cpPercentDone  ( &tor->completion );
     s->leftUntilDone = tr_cpLeftUntilDone( &tor->completion );
@@ -1468,7 +1470,8 @@ tr_torrentSave( tr_torrent * tor )
 {
     assert( tr_isTorrent( tor ) );
 
-    if( tor->isDirty ) {
+    if( tor->isDirty && tr_torrentHasMetadata( tor ) )
+    {
         tor->isDirty = FALSE;
         tr_torrentSaveResume( tor );
     }

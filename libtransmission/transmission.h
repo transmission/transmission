@@ -1634,6 +1634,12 @@ typedef struct tr_stat
         Range is [0..1] */
     float    percentComplete;
 
+    /** How much of the metadata the torrent has.
+        For torrents added from a .torrent this will always be 1.
+        For magnet links, this number will from from 0 to 1 as the metadata is downloaded.
+        Range is [0..1] */
+    float    metadataPercentComplete;
+
     /** How much has been downloaded of the files the user wants.  This differs
         from percentComplete if the user wants only some of the torrent's files.
         Range is [0..1]

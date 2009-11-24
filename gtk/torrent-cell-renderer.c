@@ -260,11 +260,11 @@ getStatusString( const tr_torrent  * tor,
             else
             {
                 g_string_append_printf( gstr,
-                    ngettext( "Downloading .torrent data from %1$'d peer",
-                              "Downloading .torrent data from %1$'d peers",
+                    ngettext( "Downloading .torrent data from %1$'d peer (%2$d%% done)",
+                              "Downloading .torrent data from %1$'d peers (%2$d%% done)",
                               torStat->peersConnected ),
-                    torStat->peersConnected +
-                    torStat->webseedsSendingToUs );
+                    torStat->peersConnected + torStat->webseedsSendingToUs,
+                    (int)(100.0*torStat->metadataPercentComplete) );
             }
             break;
         }

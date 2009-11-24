@@ -518,7 +518,7 @@ addURLDialog( GtkWindow * parent, TrCore * core )
     GtkWidget * t;
     GtkWidget * w;
 
-    w = gtk_dialog_new_with_buttons( _( "Add a URL" ), parent,
+    w = gtk_dialog_new_with_buttons( _( "Add URL" ), parent,
                                      GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_NO_SEPARATOR,
                                      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                      GTK_STOCK_ADD, GTK_RESPONSE_ACCEPT,
