@@ -1872,7 +1872,7 @@ fillOutputBuffer( tr_peermsgs * msgs, time_t now )
             tr_bencInitDict( &tmp, 3 );
             tr_bencDictAddInt( &tmp, "msg_type", METADATA_MSG_TYPE_DATA );
             tr_bencDictAddInt( &tmp, "piece", piece );
-            tr_bencDictAddInt( &tmp, "total_size", dataLen );
+            tr_bencDictAddInt( &tmp, "total_size", msgs->torrent->infoDictLength );
             payload = tr_bencToStr( &tmp, TR_FMT_BENC, &payloadLen );
             tr_bencFree( &tmp );
 

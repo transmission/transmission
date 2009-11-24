@@ -767,23 +767,31 @@ tr_torrent *
 tr_torrentNew( const tr_ctor  * ctor,
                int            * setmeError )
 {
-    int err;
     tr_info tmpInfo;
     tr_torrent * tor = NULL;
     const tr_magnet_info * magnetInfo;
+    tr_session * session = tr_ctorGetSession( ctor );
 
     assert( ctor != NULL );
-    assert( tr_isSession( tr_ctorGetSession( ctor ) ) );
+    assert( tr_isSession( session ) );
 
     if( !tr_ctorGetMagnet( ctor, &magnetInfo ) )
     {
-        tor = tr_new0( tr_torrent, 1 );
-        tr_metainfoSetFromMagnet( &tor->info, magnetInfo );
-        torrentInit( tor, ctor );
+        if( tr_torrentFindFromHash( session, magnetInfo->hash ) != NULL )
+        {
+            if( setmeError )
+                *setmeError = TR_PARSE_DUPLICATE;
+        }
+        else
+        {
+            tor = tr_new0( tr_torrent, 1 );
+            tr_metainfoSetFromMagnet( &tor->info, magnetInfo );
+            torrentInit( tor, ctor );
+        }
     }
     else
     {
-        err = tr_torrentParse( ctor, &tmpInfo );
+        const int err = tr_torrentParse( ctor, &tmpInfo );
         if( !err )
         {
             tor = tr_new0( tr_torrent, 1 );
