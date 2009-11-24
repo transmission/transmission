@@ -129,15 +129,17 @@ getProgressString( const tr_torrent * tor,
 }
 
 static char*
-getShortTransferString( const tr_stat * torStat,
-                        double          uploadSpeed,
-                        double          downloadSpeed,
-                        char          * buf,
-                        size_t          buflen )
+getShortTransferString( const tr_torrent  * tor,
+                        const tr_stat     * torStat,
+                        double              uploadSpeed,
+                        double              downloadSpeed,
+                        char              * buf,
+                        size_t              buflen )
 {
-    char      downStr[32], upStr[32];
-    const int haveDown = torStat->peersSendingToUs > 0;
-    const int haveUp = torStat->peersGettingFromUs > 0;
+    char downStr[32], upStr[32];
+    const int haveMeta = tr_torrentHasMetadata( tor );
+    const int haveDown = haveMeta && torStat->peersSendingToUs > 0;
+    const int haveUp = haveMeta && torStat->peersGettingFromUs > 0;
 
     if( haveDown )
         tr_strlspeed( downStr, downloadSpeed, sizeof( downStr ) );
@@ -145,28 +147,31 @@ getShortTransferString( const tr_stat * torStat,
         tr_strlspeed( upStr, uploadSpeed, sizeof( upStr ) );
 
     if( haveDown && haveUp )
-        /* Translators: "speed|" is here for disambiguation.  Please remove it from your translation.
-           %1$s is the download speed
+        /* Translators: "speed|" is here for disambiguation.
+         * Please remove it from your translation.
+         * %1$s is the download speed
            %2$s is the upload speed */
-        g_snprintf( buf, buflen, Q_(
-                        "speed|Down: %1$s, Up: %2$s" ), downStr, upStr );
+        g_snprintf( buf, buflen, Q_( "speed|Down: %1$s, Up: %2$s" ), downStr, upStr );
     else if( haveDown )
         /* download speed */
         g_snprintf( buf, buflen, _( "Down: %s" ), downStr );
     else if( haveUp )
         /* upload speed */
         g_snprintf( buf, buflen, _( "Up: %s" ), upStr );
-    else
+    else if( tr_torrentHasMetadata( tor ) )
         /* the torrent isn't uploading or downloading */
         g_strlcpy( buf, _( "Idle" ), buflen );
+    else
+        *buf = '\0';
 
     return buf;
 }
 
 static char*
-getShortStatusString( const tr_stat * torStat,
-                      double          uploadSpeed,
-                      double          downloadSpeed )
+getShortStatusString( const tr_torrent  * tor,
+                      const tr_stat     * torStat,
+                      double              uploadSpeed,
+                      double              downloadSpeed )
 {
     GString * gstr = g_string_new( NULL );
 
@@ -196,7 +201,7 @@ getShortStatusString( const tr_stat * torStat,
                 g_string_append_printf( gstr, _( "Ratio: %s" ), buf );
                 g_string_append( gstr, ", " );
             }
-            getShortTransferString( torStat, uploadSpeed, downloadSpeed, buf, sizeof( buf ) );
+            getShortTransferString( tor, torStat, uploadSpeed, downloadSpeed, buf, sizeof( buf ) );
             g_string_append( gstr, buf );
             break;
         }
@@ -209,9 +214,10 @@ getShortStatusString( const tr_stat * torStat,
 }
 
 static char*
-getStatusString( const tr_stat * torStat,
-                 const double    uploadSpeed,
-                 const double    downloadSpeed )
+getStatusString( const tr_torrent  * tor,
+                 const tr_stat     * torStat,
+                 const double        uploadSpeed,
+                 const double        downloadSpeed )
 {
     const int isActive = torStat->activity != TR_STATUS_STOPPED;
     const int isChecking = torStat->activity == TR_STATUS_CHECK
@@ -227,18 +233,21 @@ getStatusString( const tr_stat * torStat,
         g_string_append_printf( gstr, _( fmt[torStat->error] ), torStat->errorString );
     }
     else switch( torStat->activity )
+    {
+        case TR_STATUS_STOPPED:
+        case TR_STATUS_CHECK_WAIT:
+        case TR_STATUS_CHECK:
         {
-            case TR_STATUS_STOPPED:
-            case TR_STATUS_CHECK_WAIT:
-            case TR_STATUS_CHECK:
-            {
-                char * pch = getShortStatusString( torStat, uploadSpeed, downloadSpeed );
-                g_string_assign( gstr, pch );
-                g_free( pch );
-                break;
-            }
+            char * pch = getShortStatusString( tor, torStat, uploadSpeed, downloadSpeed );
+            g_string_assign( gstr, pch );
+            g_free( pch );
+            break;
+        }
 
-            case TR_STATUS_DOWNLOAD:
+        case TR_STATUS_DOWNLOAD:
+        {
+            if( tr_torrentHasMetadata( tor ) ) 
+            {
                 g_string_append_printf( gstr,
                     ngettext( "Downloading from %1$'d of %2$'d connected peer",
                               "Downloading from %1$'d of %2$'d connected peers",
@@ -247,23 +256,35 @@ getStatusString( const tr_stat * torStat,
                     torStat->webseedsSendingToUs,
                     torStat->peersConnected +
                     torStat->webseedsSendingToUs );
-                break;
-
-            case TR_STATUS_SEED:
+            }
+            else
+            {
                 g_string_append_printf( gstr,
-                    ngettext( "Seeding to %1$'d of %2$'d connected peer",
-                              "Seeding to %1$'d of %2$'d connected peers",
+                    ngettext( "Downloading .torrent data from %1$'d peer",
+                              "Downloading .torrent data from %1$'d peers",
                               torStat->peersConnected ),
-                    torStat->peersGettingFromUs,
-                    torStat->peersConnected );
-                break;
+                    torStat->peersConnected +
+                    torStat->webseedsSendingToUs );
+            }
+            break;
         }
+
+        case TR_STATUS_SEED:
+            g_string_append_printf( gstr,
+                ngettext( "Seeding to %1$'d of %2$'d connected peer",
+                          "Seeding to %1$'d of %2$'d connected peers",
+                          torStat->peersConnected ),
+                torStat->peersGettingFromUs,
+                torStat->peersConnected );
+                break;
+    }
 
     if( isActive && !isChecking )
     {
         char buf[256];
-        getShortTransferString( torStat, uploadSpeed, downloadSpeed, buf, sizeof( buf ) );
-        g_string_append_printf( gstr, " - %s", buf );
+        getShortTransferString( tor, torStat, uploadSpeed, downloadSpeed, buf, sizeof( buf ) );
+        if( *buf )
+            g_string_append_printf( gstr, " - %s", buf );
     }
 
     return g_string_free( gstr, FALSE );
@@ -347,7 +368,7 @@ get_size_minimal( TorrentCellRenderer * cell,
 
     icon = get_icon( tor, MINIMAL_ICON_SIZE, widget );
     name = tr_torrentInfo( tor )->name;
-    status = getShortStatusString( st, p->upload_speed, p->download_speed );
+    status = getShortStatusString( tor, st, p->upload_speed, p->download_speed );
 
     /* get the idealized cell dimensions */
     g_object_set( p->icon_renderer, "pixbuf", icon, NULL );
@@ -404,7 +425,7 @@ get_size_full( TorrentCellRenderer * cell,
 
     icon = get_icon( tor, FULL_ICON_SIZE, widget );
     name = inf->name;
-    status = getStatusString( st, p->upload_speed, p->download_speed );
+    status = getStatusString( tor, st, p->upload_speed, p->download_speed );
     progress = getProgressString( tor, inf, st );
 
     /* get the idealized cell dimensions */
@@ -508,7 +529,7 @@ render_minimal( TorrentCellRenderer   * cell,
 
     icon = get_icon( tor, MINIMAL_ICON_SIZE, widget );
     name = tr_torrentInfo( tor )->name;
-    status = getShortStatusString( st, p->upload_speed, p->download_speed );
+    status = getShortStatusString( tor, st, p->upload_speed, p->download_speed );
 
     /* get the cell dimensions */
     g_object_set( p->icon_renderer, "pixbuf", icon, NULL );
@@ -604,7 +625,7 @@ render_full( TorrentCellRenderer   * cell,
 
     icon = get_icon( tor, FULL_ICON_SIZE, widget );
     name = inf->name;
-    status = getStatusString( st, p->upload_speed, p->download_speed );
+    status = getStatusString( tor, st, p->upload_speed, p->download_speed );
     progress = getProgressString( tor, inf, st );
 
     /* get the idealized cell dimensions */

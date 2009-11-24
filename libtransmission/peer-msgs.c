@@ -177,7 +177,6 @@ struct tr_peermsgs
     tr_bool         peerSupportsMetadataXfer;
     tr_bool         clientSentLtepHandshake;
     tr_bool         peerSentLtepHandshake;
-    tr_bool         requestingMetadataFromPeer;
 
     /*tr_bool         haveFastSet;*/
 
@@ -749,9 +748,8 @@ popNextMetadataRequest( tr_peermsgs * msgs, int * piece )
 
     *piece = msgs->peerAskedForMetadata[0];
 
-    memmove( msgs->peerAskedForMetadata,
-             msgs->peerAskedForMetadata + 1,
-             sizeof( int ) * --msgs->peerAskedForMetadataCount );
+    tr_removeElementFromArray( msgs->peerAskedForMetadata, 0, sizeof( int ),
+                               msgs->peerAskedForMetadataCount-- );
 
     return TRUE;
 }
@@ -764,9 +762,8 @@ popNextRequest( tr_peermsgs * msgs, struct peer_request * setme )
 
     *setme = msgs->peerAskedFor[0];
 
-    memmove( msgs->peerAskedFor,
-             msgs->peerAskedFor + 1,
-             sizeof( struct peer_request ) * --msgs->peerAskedForCount );
+    tr_removeElementFromArray( msgs->peerAskedFor, 0, sizeof( struct peer_request ),
+                               msgs->peerAskedForCount-- );
 
     return TRUE;
 }
@@ -1040,8 +1037,6 @@ parseUtMetadata( tr_peermsgs * msgs, int msglen, struct evbuffer * inbuf )
         && ( piece * METADATA_PIECE_SIZE + (msg_end - benc_end) <= total_size ) )
     {
         const int pieceLen = msg_end - benc_end;
-dbgmsg( msgs, "got a metadata piece... calling tr_torrentSetMetadataPiece" );
-        msgs->requestingMetadataFromPeer = FALSE;
         tr_torrentSetMetadataPiece( msgs->torrent, piece, benc_end, pieceLen );
     }
 
@@ -1142,9 +1137,7 @@ parseUtPex( tr_peermsgs * msgs, int msglen, struct evbuffer * inbuf )
 static void sendPex( tr_peermsgs * msgs );
 
 static void
-parseLtep( tr_peermsgs *     msgs,
-           int               msglen,
-           struct evbuffer * inbuf )
+parseLtep( tr_peermsgs * msgs, int msglen, struct evbuffer  * inbuf )
 {
     uint8_t ltep_msgid;
 
@@ -1203,14 +1196,12 @@ readBtLength( tr_peermsgs *     msgs,
     return READ_NOW;
 }
 
-static int readBtMessage( tr_peermsgs *     msgs,
+static int readBtMessage( tr_peermsgs     * msgs,
                           struct evbuffer * inbuf,
                           size_t            inlen );
 
 static int
-readBtId( tr_peermsgs *     msgs,
-          struct evbuffer * inbuf,
-          size_t            inlen )
+readBtId( tr_peermsgs * msgs, struct evbuffer  * inbuf, size_t inlen )
 {
     uint8_t id;
 
@@ -1477,9 +1468,8 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
             }
 
             if( i < msgs->peerAskedForCount )
-                memmove( msgs->peerAskedFor+i,
-                         msgs->peerAskedFor+i+1,
-                         sizeof(struct peer_request) *( --msgs->peerAskedForCount-i) );
+                tr_removeElementFromArray( msgs->peerAskedFor, i, sizeof( struct peer_request ),
+                                           msgs->peerAskedForCount-- );
             break;
         }
 
@@ -1746,7 +1736,6 @@ updateMetadataRequests( tr_peermsgs * msgs, time_t now )
     int piece;
 
     if( msgs->peerSupportsMetadataXfer
-        && !msgs->requestingMetadataFromPeer
         && tr_torrentGetNextMetadataRequest( msgs->torrent, now, &piece ) )
     {
         tr_benc tmp;
@@ -1771,8 +1760,6 @@ updateMetadataRequests( tr_peermsgs * msgs, time_t now )
         tr_peerIoWriteBytes ( io, out, payload, payloadLen );
         pokeBatchPeriod( msgs, HIGH_PRIORITY_INTERVAL_SECS );
         dbgOutMessageLen( msgs );
-
-        msgs->requestingMetadataFromPeer = TRUE;
 
         tr_free( payload );
     }

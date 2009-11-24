@@ -1552,6 +1552,11 @@ struct tr_info
     tr_bool            isMultifile;
 };
 
+static TR_INLINE tr_bool tr_torrentHasMetadata( const tr_torrent * tor )
+{
+    return tr_torrentInfo( tor )->fileCount > 0;
+}
+
 /**
  * What the torrent is doing right now.
  *

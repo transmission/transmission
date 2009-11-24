@@ -513,8 +513,11 @@ tr_peerMgrFree( tr_peerMgr * manager )
 }
 
 static int
-clientIsDownloadingFrom( const tr_peer * peer )
+clientIsDownloadingFrom( const tr_torrent * tor, const tr_peer * peer )
 {
+    if( !tr_torrentHasMetadata( tor ) )
+        return TRUE;
+
     return peer->clientIsInterested && !peer->clientIsChoked;
 }
 
@@ -2013,7 +2016,7 @@ tr_peerMgrTorrentStats( tr_torrent       * tor,
 
         ++setmePeersFrom[atom->from];
 
-        if( clientIsDownloadingFrom( peer ) )
+        if( clientIsDownloadingFrom( tor, peer ) )
             ++*setmePeersSendingToUs;
 
         if( clientIsUploadingTo( peer ) )
@@ -2124,7 +2127,7 @@ tr_peerMgrPeerStats( const tr_torrent    * tor,
         stat->clientIsChoked     = peer->clientIsChoked;
         stat->clientIsInterested = peer->clientIsInterested;
         stat->isIncoming         = tr_peerIoIsIncoming( peer->io );
-        stat->isDownloadingFrom  = clientIsDownloadingFrom( peer );
+        stat->isDownloadingFrom  = clientIsDownloadingFrom( tor, peer );
         stat->isUploadingTo      = clientIsUploadingTo( peer );
         stat->isSeed             = ( atom->uploadOnly == UPLOAD_ONLY_YES ) || ( peer->progress >= 1.0 );
 

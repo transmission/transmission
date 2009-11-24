@@ -93,12 +93,6 @@ tr_torrentSetMetadataSizeHint( tr_torrent * tor, int size )
     }
 }
 
-tr_bool
-tr_torrentHasMetadata( const tr_torrent * tor )
-{
-    return tor->info.fileCount > 0;
-}
-
 void*
 tr_torrentGetMetadataPiece( const tr_torrent * tor, int piece, int * len )
 {
