@@ -1650,15 +1650,29 @@ announceMore( tr_announcer * announcer )
     tor = NULL;
     while(( tor = tr_torrentNext( announcer->session, tor ))) {
         if( tor->dhtAnnounceAt <= now ) {
-            int rc = 1;
-            if( tor->isRunning && tr_torrentAllowsDHT(tor) )
-                rc = tr_dhtAnnounce(tor, 1);
-            if(rc == 0)
-                /* The DHT is not ready yet.  Try again soon. */
-                tor->dhtAnnounceAt = now + 5 + tr_cryptoWeakRandInt( 5 );
-            else
-                /* We should announce at least once every 30 minutes. */
-                tor->dhtAnnounceAt = now + 25 * 60 + tr_cryptoWeakRandInt( 3 * 60 );
+            if( tor->isRunning && tr_torrentAllowsDHT(tor) ) {
+                int rc;
+                rc = tr_dhtAnnounce(tor, AF_INET, 1);
+                if(rc == 0)
+                    /* The DHT is not ready yet.  Try again soon. */
+                    tor->dhtAnnounceAt = now + 5 + tr_cryptoWeakRandInt( 5 );
+                else
+                    /* We should announce at least once every 30 minutes. */
+                    tor->dhtAnnounceAt =
+                        now + 25 * 60 + tr_cryptoWeakRandInt( 3 * 60 );
+            }
+        }
+
+        if( tor->dhtAnnounce6At <= now ) {
+            if( tor->isRunning && tr_torrentAllowsDHT(tor) ) {
+                int rc;
+                rc = tr_dhtAnnounce(tor, AF_INET6, 1);
+                if(rc == 0)
+                    tor->dhtAnnounce6At = now + 5 + tr_cryptoWeakRandInt( 5 );
+                else
+                    tor->dhtAnnounce6At =
+                        now + 25 * 60 + tr_cryptoWeakRandInt( 3 * 60 );
+            }
         }
     }
 }

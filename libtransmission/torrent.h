@@ -181,7 +181,9 @@ struct tr_torrent
     struct tr_publisher_tag  * tiersSubscription;
 
     time_t                     dhtAnnounceAt;
+    time_t                     dhtAnnounce6At;
     tr_bool                    dhtAnnounceInProgress;
+    tr_bool                    dhtAnnounce6InProgress;
 
     uint64_t                   downloadedCur;
     uint64_t                   downloadedPrev;

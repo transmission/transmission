@@ -20,7 +20,7 @@
 #include "dht.h"
 
 #define MAX_BOOTSTRAP_NODES 20
-static struct sockaddr_in bootstrap_nodes[MAX_BOOTSTRAP_NODES];
+static struct sockaddr_storage bootstrap_nodes[MAX_BOOTSTRAP_NODES];
 static int num_bootstrap_nodes = 0;
 
 static volatile sig_atomic_t dumping = 0, searching = 0, exiting = 0;
@@ -92,15 +92,61 @@ int
 main(int argc, char **argv)
 {
     int i, rc, fd;
-    int s, port;
+    int s = -1, s6 = -1, port;
     int have_id = 0;
     unsigned char myid[20];
     time_t tosleep = 0;
+    char *id_file = "dht-example.id";
+    int opt;
+    int quiet = 0, ipv4 = 1, ipv6 = 1;
+    struct sockaddr_in sin;
+    struct sockaddr_in6 sin6;
+
+    memset(&sin, 0, sizeof(sin));
+    sin.sin_family = AF_INET;
+
+    memset(&sin6, 0, sizeof(sin6));
+    sin6.sin6_family = AF_INET6;
+
+
+
+    while(1) {
+        opt = getopt(argc, argv, "q46b:i:");
+        if(opt < 0)
+            break;
+
+        switch(opt) {
+        case 'q': quiet = 1; break;
+        case '4': ipv6 = 0; break;
+        case '6': ipv4 = 0; break;
+        case 'b': {
+            char buf[16];
+            int rc;
+            rc = inet_pton(AF_INET, optarg, buf);
+            if(rc == 1) {
+                memcpy(&sin.sin_addr, buf, 4);
+                break;
+            }
+            rc = inet_pton(AF_INET6, optarg, buf);
+            if(rc == 1) {
+                memcpy(&sin6.sin6_addr, buf, 16);
+                break;
+            }
+            goto usage;
+        }
+            break;
+        case 'i':
+            id_file = optarg;
+            break;
+        default:
+            goto usage;
+        }
+    }
 
     /* Ids need to be distributed evenly, so you cannot just use your
        bittorrent id.  Either generate it randomly, or take the SHA-1 of
        something. */
-    fd = open("dht-example.id", O_RDONLY);
+    fd = open(id_file, O_RDONLY);
     if(fd >= 0) {
         rc = read(fd, myid, 20);
         if(rc == 20)
@@ -108,12 +154,15 @@ main(int argc, char **argv)
         close(fd);
     }
     
+    fd = open("/dev/urandom", O_RDONLY);
+    if(fd < 0) {
+        perror("open(random)");
+        exit(1);
+    }
+
     if(!have_id) {
-        fd = open("/dev/urandom", O_RDONLY);
-        if(fd < 0) {
-            perror("open(random)");
-            exit(1);
-        }
+        int ofd;
+
         rc = read(fd, myid, 20);
         if(rc < 0) {
             perror("read(random)");
@@ -122,19 +171,27 @@ main(int argc, char **argv)
         have_id = 1;
         close(fd);
 
-        fd = open("dht-example.id", O_WRONLY | O_CREAT | O_TRUNC, 0666);
-        if(fd >= 0) {
-            rc = write(fd, myid, 20);
+        ofd = open(id_file, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+        if(ofd >= 0) {
+            rc = write(ofd, myid, 20);
             if(rc < 20)
-                unlink("dht-example.id");
-            close(fd);
+                unlink(id_file);
+            close(ofd);
         }
     }
+
+    {
+        unsigned seed;
+        read(fd, &seed, sizeof(seed));
+        srandom(seed);
+    }
+
+    close(fd);
 
     if(argc < 2)
         goto usage;
 
-    i = 1;
+    i = optind;
 
     if(argc < i + 1)
         goto usage;
@@ -146,9 +203,14 @@ main(int argc, char **argv)
     while(i < argc) {
         struct addrinfo hints, *info, *infop;
         memset(&hints, 0, sizeof(hints));
-        hints.ai_family = AF_INET;
         hints.ai_socktype = SOCK_DGRAM;
-        rc = getaddrinfo(argv[i], NULL, &hints, &info);
+        if(!ipv6)
+            hints.ai_family = AF_INET;
+        else if(!ipv4)
+            hints.ai_family = AF_INET6;
+        else
+            hints.ai_family = 0;
+        rc = getaddrinfo(argv[i], argv[i + 1], &hints, &info);
         if(rc != 0) {
             fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rc));
             exit(1);
@@ -160,14 +222,10 @@ main(int argc, char **argv)
 
         infop = info;
         while(infop) {
-            if(infop->ai_addr->sa_family == AF_INET) {
-                struct sockaddr_in sin;
-                memcpy(&sin, infop->ai_addr, infop->ai_addrlen);
-                sin.sin_port = htons(atoi(argv[i]));
-                bootstrap_nodes[num_bootstrap_nodes] = sin;
-                num_bootstrap_nodes++;
-            }
+            memcpy(&bootstrap_nodes[num_bootstrap_nodes],
+                   infop->ai_addr, infop->ai_addrlen);
             infop = infop->ai_next;
+            num_bootstrap_nodes++;
         }
         freeaddrinfo(info);
 
@@ -176,30 +234,66 @@ main(int argc, char **argv)
 
     /* If you set dht_debug to a stream, every action taken by the DHT will
        be logged. */
-    dht_debug = stdout;
+    if(!quiet)
+        dht_debug = stdout;
 
-    /* We need an IPv4 socket, bound to a stable port.  Rumour has it that
-       uTorrent works better when it is the same as your Bittorrent port. */
-    s = socket(PF_INET, SOCK_DGRAM, 0);
-    if(s < 0) {
-        perror("socket");
+    /* We need an IPv4 and an IPv6 socket, bound to a stable port.  Rumour
+       has it that uTorrent works better when it is the same as your
+       Bittorrent port. */
+    if(ipv4) {
+        s = socket(PF_INET, SOCK_DGRAM, 0);
+        if(s < 0) {
+            perror("socket(IPv4)");
+        }
+    }
+
+    if(ipv6) {
+        s6 = socket(PF_INET6, SOCK_DGRAM, 0);
+        if(s6 < 0) {
+            perror("socket(IPv6)");
+        }
+    }
+
+    if(s < 0 && s6 < 0) {
+        fprintf(stderr, "Eek!");
         exit(1);
     }
 
-    {
-        struct sockaddr_in sin;
-        memset(&sin, 0, sizeof(sin));
-        sin.sin_family = AF_INET;
+
+    if(s >= 0) {
         sin.sin_port = htons(port);
         rc = bind(s, (struct sockaddr*)&sin, sizeof(sin));
         if(rc < 0) {
-            perror("bind");
+            perror("bind(IPv4)");
+            exit(1);
+        }
+    }
+
+    if(s6 >= 0) {
+        int rc;
+        int val = 1;
+
+        rc = setsockopt(s6, IPPROTO_IPV6, IPV6_V6ONLY,
+                        (char *)&val, sizeof(val));
+        if(rc < 0) {
+            perror("setsockopt(IPV6_V6ONLY)");
+            exit(1);
+        }
+
+        /* BEP-32 mandates that we should bind this socket to one of our
+           global IPv6 addresses.  In this simple example, this only
+           happens if the user used the -b flag. */
+
+        sin6.sin6_port = htons(port);
+        rc = bind(s6, (struct sockaddr*)&sin6, sizeof(sin6));
+        if(rc < 0) {
+            perror("bind(IPv6)");
             exit(1);
         }
     }
 
     /* Init the dht.  This sets the socket into non-blocking mode. */
-    rc = dht_init(s, myid, NULL);
+    rc = dht_init(s, s6, myid, (unsigned char*)"JC\0\0");
     if(rc < 0) {
         perror("dht_init");
         exit(1);
@@ -217,7 +311,8 @@ main(int argc, char **argv)
        a dump) and you already know their ids, it's better to use
        dht_insert_node.  If the ids are incorrect, the DHT will recover. */
     for(i = 0; i < num_bootstrap_nodes; i++) {
-        dht_ping_node(s, &bootstrap_nodes[i]);
+        dht_ping_node((struct sockaddr*)&bootstrap_nodes[i],
+                      sizeof(bootstrap_nodes[i]));
         usleep(random() % 100000);
     }
 
@@ -228,8 +323,11 @@ main(int argc, char **argv)
         tv.tv_usec = random() % 1000000;
 
         FD_ZERO(&readfds);
-        FD_SET(s, &readfds);
-        rc = select(s + 1, &readfds, NULL, NULL, &tv);
+        if(s >= 0)
+            FD_SET(s, &readfds);
+        if(s6 >= 0)
+            FD_SET(s6, &readfds);
+        rc = select(s > s6 ? s + 1 : s6 + 1, &readfds, NULL, NULL, &tv);
         if(rc < 0) {
             if(errno != EINTR) {
                 perror("select");
@@ -240,7 +338,7 @@ main(int argc, char **argv)
         if(exiting)
             break;
 
-        rc = dht_periodic(s, rc > 0, &tosleep, callback, NULL);
+        rc = dht_periodic(rc > 0, &tosleep, callback, NULL);
         if(rc < 0) {
             if(errno == EINTR) {
                 continue;
@@ -253,11 +351,14 @@ main(int argc, char **argv)
         }
 
         /* This is how you trigger a search for a torrent hash.  If port
-           (the third argument) is non-zero, it also performs an announce.
+           (the second argument) is non-zero, it also performs an announce.
            Since peers expire announced data after 30 minutes, it's a good
            idea to reannounce every 28 minutes or so. */
         if(searching) {
-            dht_search(s, hash, 0, callback, NULL);
+            if(s >= 0)
+                dht_search(hash, 0, AF_INET, callback, NULL);
+            if(s6 >= 0)
+                dht_search(hash, 0, AF_INET6, callback, NULL);
             searching = 0;
         }
 
@@ -269,17 +370,20 @@ main(int argc, char **argv)
     }
 
     {
-        struct sockaddr_in sins[500];
+        struct sockaddr_in sin[500];
+        struct sockaddr_in6 sin6[500];
+        int num = 500, num6 = 500;
         int i;
-        i = dht_get_nodes(sins, 500);
-        printf("Found %d good nodes.\n", i);
+        i = dht_get_nodes(sin, &num, sin6, &num6);
+        printf("Found %d (%d + %d) good nodes.\n", i, num, num6);
     }
 
-    dht_uninit(s, 1);
+    dht_uninit(1);
     return 0;
     
  usage:
-    fprintf(stderr, "Foo!\n");
+    printf("Usage: dht-example [-q] [-4] [-6] [-i filename] [-b address]...\n"
+           "                   port [address port]...\n");
     exit(1);
 }
 

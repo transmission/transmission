@@ -19,14 +19,18 @@ Initialisation
 * dht_init
 
 This must be called before using the library.  You pass it a bound IPv4
-datagram socket, and your node id, a 20-octet array that should be globally
-unique.
+datagram socket, a bound IPv6 datagram socket, and your node id, a 20-octet
+array that should be globally unique.
+
+If you're on a multi-homed host, you should bind the sockets to one of your
+addresses.
 
 Node ids must be well distributed, so you cannot just use your Bittorrent
 id; you should either generate a truly random value (using plenty of
 entropy), or at least take the SHA-1 of something.  However, it is a good
 idea to keep the id stable, so you may want to store it in stable storage
 at client shutdown.
+
  
 * dht_uninit
 
@@ -147,14 +151,14 @@ Functions provided by you
 * The callback function
 
 The callback function is called with 5 arguments.  Closure is simply the
-value that you passed to dht_periodic.  Event is one of DHT_EVENT_VALUES,
-which indicates that we have new values, or DHT_EVENT_SEARCH_DONE, which
-indicates that a search has completed.  In either case, info_hash is set to
-the info-hash of the search.
+value that you passed to dht_periodic.  Event is one of DHT_EVENT_VALUES or
+DHT_EVENT_VALUES6, which indicates that we have new values, or
+DHT_EVENT_SEARCH_DONE or DHT_EVENT_SEARCH_DONE6, which indicates that
+a search has completed.  In either case, info_hash is set to the info-hash
+of the search.
 
 In the case of DHT_EVENT_VALUES, data is a list of nodes in ``compact''
-format -- 6 bytes per node, 4 for the IP address and 2 for the port.  It's
-length in bytes is in data_len.
+format -- 6 or 18 bytes per node.  Its length in bytes is in data_len.
 
 * dht_hash
 
@@ -186,9 +190,6 @@ make most full cone NATs happy.
 Some of the code has had very little testing.  If it breaks, you get to
 keep both pieces.
 
-IPv6 support is deliberately not included: designing a double-stack
-distributed hash table raises some tricky issues, and doing it naively may
-break connectivity for everyone.
 
                                         Juliusz Chroboczek
                                         <jch@pps.jussieu.fr>

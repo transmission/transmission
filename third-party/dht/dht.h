@@ -27,22 +27,26 @@ dht_callback(void *closure, int event,
 
 #define DHT_EVENT_NONE 0
 #define DHT_EVENT_VALUES 1
-#define DHT_EVENT_SEARCH_DONE 2
+#define DHT_EVENT_VALUES6 2
+#define DHT_EVENT_SEARCH_DONE 3
+#define DHT_EVENT_SEARCH_DONE6 4
 
 extern FILE *dht_debug;
 
-int dht_init(int s, const unsigned char *id, const unsigned char *v);
-int dht_insert_node(int s, const unsigned char *id, struct sockaddr_in *sin);
-int dht_ping_node(int s, struct sockaddr_in *sin);
-int dht_periodic(int s, int available, time_t *tosleep,
+int dht_init(int s, int s6, const unsigned char *id, const unsigned char *v);
+int dht_insert_node(const unsigned char *id, struct sockaddr *sa, int salen);
+int dht_ping_node(struct sockaddr *sa, int salen);
+int dht_periodic(int available, time_t *tosleep,
                  dht_callback *callback, void *closure);
-int dht_search(int s, const unsigned char *id, int port,
+int dht_search(const unsigned char *id, int port, int af,
                dht_callback *callback, void *closure);
-int dht_nodes(int *good_return, int *dubious_return, int *cached_return,
+int dht_nodes(int af,
+              int *good_return, int *dubious_return, int *cached_return,
               int *incoming_return);
 void dht_dump_tables(FILE *f);
-int dht_get_nodes(struct sockaddr_in *sins, int num);
-int dht_uninit(int s, int dofree);
+int dht_get_nodes(struct sockaddr_in *sin, int *num,
+                  struct sockaddr_in6 *sin6, int *num6);
+int dht_uninit(int dofree);
 
 /* This must be provided by the user. */
 void dht_hash(void *hash_return, int hash_size,

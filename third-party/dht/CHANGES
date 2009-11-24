@@ -1,3 +1,16 @@
+22 November 2009: dht-0.11
+
+  * Implemented IPv6 support (BEP-32).
+  * Fixed a bug which could cause us to never mark a search as finished.
+  * Fixed a bug that could cause us to send incomplete lists in response to
+    find_nodes.
+  * Limit the number of hashes that we're willing to track.
+  * Made bucket maintenance slightly more aggressive.
+  * Produce on-the-wire error messages to give a hint to the other side.
+  * Added a bunch of options to dht-example to make it useful as
+    a bootstrap node.
+  * Send version "JC\0\0" when using dht-example.
+
 18 October 2009: dht-0.10
 
   * Send nodes even when sending values.  This is a violation of the
