@@ -16,6 +16,7 @@
 #include "transmission.h"
 #include "completion.h"
 #include "torrent.h"
+#include "torrent-magnet.h"
 #include "utils.h"
 
 static void
@@ -240,6 +241,7 @@ tr_cpBlockBitfieldSet( tr_completion * cp, tr_bitfield * blockBitfield )
 tr_completeness
 tr_cpGetStatus( const tr_completion * cp )
 {
+    if( !tr_torrentHasMetadata( cp->tor ) ) return TR_LEECH;
     if( cp->sizeNow == cp->tor->info.totalSize ) return TR_SEED;
     if( cp->sizeNow == tr_cpSizeWhenDone( cp ) ) return TR_PARTIAL_SEED;
     return TR_LEECH;
@@ -254,6 +256,9 @@ calculateHaveValid( const tr_completion * ccp )
     const uint64_t            pieceSize      = tor->info.pieceSize;
     const uint64_t            lastPieceSize  = tor->lastPieceSize;
     const tr_piece_index_t    lastPiece      = tor->info.pieceCount - 1;
+
+    if( !tr_torrentHasMetadata( tor ) )
+        return 0;
 
     for( i=0; i!=lastPiece; ++i )
         if( tr_cpPieceIsComplete( ccp, i ) )

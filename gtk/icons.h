@@ -7,6 +7,7 @@
 #define ICONS_H
 
 #define DIRECTORY_MIME_TYPE "folder"
+#define UNKNOWN_MIME_TYPE "unknown"
 
 const char * get_mime_type_from_filename( const char *file );
 

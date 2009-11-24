@@ -858,6 +858,9 @@ void        tr_ctorFree( tr_ctor * ctor );
 void        tr_ctorSetDeleteSource( tr_ctor * ctor,
                                     tr_bool   doDelete );
 
+int         tr_ctorSetMagnet( tr_ctor * ctor,
+                              const char * url );
+
 int         tr_ctorSetMetainfo( tr_ctor *       ctor,
                                 const uint8_t * metainfo,
                                 size_t          len );

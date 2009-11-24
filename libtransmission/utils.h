@@ -424,8 +424,11 @@ struct tm * tr_localtime_r( const time_t *_clock, struct tm *_result );
 
 
 /** on success, return 0.  on failure, return -1 and set errno */
-int tr_moveFile( const char * oldpath, const char * newpath, tr_bool * renamed ) TR_GNUC_NONNULL(1,2);
+int tr_moveFile( const char * oldpath, const char * newpath,
+                 tr_bool * renamed ) TR_GNUC_NONNULL(1,2);
 
+void tr_removeElementFromArray( void * array, int index_to_remove,
+                                size_t sizeof_element, size_t nmemb );
 
 #ifdef __cplusplus
 }

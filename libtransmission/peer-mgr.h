@@ -24,6 +24,7 @@
 #endif
 
 #include "bitfield.h"
+#include "bitset.h"
 #include "net.h"
 #include "peer-common.h" /* struct peer_request */
 #include "publish.h" /* tr_publisher_tag */
@@ -93,7 +94,7 @@ typedef struct tr_peer
     struct peer_atom       * atom;
 
     struct tr_bitfield     * blame;
-    struct tr_bitfield     * have;
+    struct tr_bitset         have;
 
     /** how complete the peer's copy of the torrent is. [0.0...1.0] */
     float                    progress;

@@ -346,7 +346,7 @@ checkfilenames( int argc, char **argv )
 
     for( i=0; i<argc; ++i )
     {
-        if( gtr_is_supported_url( argv[i] ) )
+        if( gtr_is_supported_url( argv[i] ) || gtr_is_magnet_link( argv[i] ) )
         {
             ret = g_slist_prepend( ret, g_strdup( argv[i] ) );
         }

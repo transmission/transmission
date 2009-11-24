@@ -343,6 +343,7 @@ static tr_peer*
 peerConstructor( struct peer_atom * atom )
 {
     tr_peer * peer = tr_new0( tr_peer, 1 );
+    tr_bitsetConstructor( &peer->have, 0 );
     peer->atom = atom;
     return peer;
 }
@@ -383,7 +384,7 @@ peerDestructor( Torrent * t, tr_peer * peer )
     tr_peerIoClear( peer->io );
     tr_peerIoUnref( peer->io ); /* balanced by the ref in handshakeDoneCB() */
 
-    tr_bitfieldFree( peer->have );
+    tr_bitsetDestructor( &peer->have );
     tr_bitfieldFree( peer->blame );
     tr_free( peer->client );
 
@@ -906,7 +907,7 @@ tr_peerMgrGetNextRequests( tr_torrent           * tor,
     int got;
     Torrent * t;
     struct weighted_piece * pieces;
-    const tr_bitfield * have = peer->have;
+    const tr_bitset * have = &peer->have;
     const time_t now = time( NULL );
 
     /* sanity clause */
@@ -928,7 +929,7 @@ tr_peerMgrGetNextRequests( tr_torrent           * tor,
         struct weighted_piece * p = pieces + i;
 
         /* if the peer has this piece that we want... */
-        if( tr_bitfieldHasFast( have, p->index ) )
+        if( tr_bitsetHasFast( have, p->index ) )
         {
             tr_block_index_t b = tr_torPieceFirstBlock( tor, p->index );
             const tr_block_index_t e = b + tr_torPieceCountBlocks( tor, p->index );
@@ -1941,7 +1942,7 @@ tr_peerMgrTorrentAvailability( const tr_torrent * tor,
         else if( peerCount ) {
             int j;
             for( j = 0; j < peerCount; ++j )
-                if( tr_bitfieldHas( peers[j]->have, i ) )
+                if( tr_bitsetHas( &peers[j]->have, i ) )
                     ++tab[i];
         }
     }
@@ -1964,7 +1965,7 @@ tr_peerMgrGetAvailable( const tr_torrent * tor )
     peerCount = tr_ptrArraySize( &t->peers );
     peers = (const tr_peer**) tr_ptrArrayBase( &t->peers );
     for( i=0; i<peerCount; ++i )
-        tr_bitfieldOr( pieces, peers[i]->have );
+        tr_bitsetOr( pieces, &peers[i]->have );
 
     managerUnlock( t->manager );
     return pieces;
@@ -2351,7 +2352,7 @@ shouldPeerBeClosed( const Torrent    * t,
             peerHasEverything = FALSE;
         else {
             tr_bitfield * tmp = tr_bitfieldDup( tr_cpPieceBitfield( &tor->completion ) );
-            tr_bitfieldDifference( tmp, peer->have );
+            tr_bitsetDifference( tmp, &peer->have );
             peerHasEverything = tr_bitfieldCountTrueBits( tmp ) == 0;
             tr_bitfieldFree( tmp );
         }

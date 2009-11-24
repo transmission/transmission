@@ -37,6 +37,7 @@
 #include "session.h"
 #include "bencode.h"
 #include "crypto.h" /* tr_sha1 */
+#include "magnet.h"
 #include "metainfo.h"
 #include "platform.h"
 #include "utils.h"
@@ -227,7 +228,7 @@ parseFiles( tr_info *       inf,
 }
 
 static char *
-announceToScrape( const char * announce )
+tr_convertAnnounceToScrape( const char * announce )
 {
     char *       scrape = NULL;
     const char * s;
@@ -294,7 +295,7 @@ getannounce( tr_info * inf,
                         tr_tracker_info * t = trackers + trackerCount++;
                         t->tier = validTiers;
                         t->announce = tr_strdup( url );
-                        t->scrape = announceToScrape( url );
+                        t->scrape = tr_convertAnnounceToScrape( url );
 
                         anyAdded = TRUE;
                     }
@@ -324,7 +325,7 @@ getannounce( tr_info * inf,
             trackers = tr_new0( tr_tracker_info, 1 );
             trackers[trackerCount].tier = 0;
             trackers[trackerCount].announce = tr_strdup( url );
-            trackers[trackerCount++].scrape = announceToScrape( url );
+            trackers[trackerCount++].scrape = tr_convertAnnounceToScrape( url );
             /*fprintf( stderr, "single announce: [%s]\n", url );*/
         }
         tr_free( url );
@@ -381,8 +382,10 @@ escape( char * out, const uint8_t * in, size_t in_len ) /* rfc2396 */
 
 static const char*
 tr_metainfoParseImpl( const tr_session * session,
-                      tr_info *         inf,
-                      const tr_benc *   meta_in )
+                      tr_info          * inf,
+                      int              * infoDictOffset,
+                      int              * infoDictLength,
+                      const tr_benc    * meta_in )
 {
     int64_t         i;
     size_t          raw_len;
@@ -404,6 +407,22 @@ tr_metainfoParseImpl( const tr_session * session,
         tr_sha1( inf->hash, bstr, len, NULL );
         tr_sha1_to_hex( inf->hashString, inf->hash );
         escape( inf->hashEscaped, inf->hash, SHA_DIGEST_LENGTH );
+
+        if( infoDictLength != NULL )
+            *infoDictLength = len;
+
+        if( infoDictOffset != NULL )
+        {
+            int mlen = 0;
+            char * mstr = tr_bencToStr( meta_in, TR_FMT_BENC, &mlen );
+            const char * offset = tr_memmem( mstr, mlen, bstr, len );
+            if( offset != NULL )
+                *infoDictOffset = offset - mstr;
+            tr_free( mstr );
+            if( offset == NULL )
+                return "info";
+        }
+
         tr_free( bstr );
     }
 
@@ -483,9 +502,15 @@ tr_metainfoParseImpl( const tr_session * session,
 tr_bool
 tr_metainfoParse( const tr_session * session,
                   tr_info          * inf,
+                  int              * infoDictOffset,
+                  int              * infoDictLength,
                   const tr_benc    * meta_in )
 {
-    const char * badTag = tr_metainfoParseImpl( session, inf, meta_in );
+    const char * badTag = tr_metainfoParseImpl( session,
+                                                inf,
+                                                infoDictOffset,
+                                                infoDictLength,
+                                                meta_in );
     const tr_bool success = badTag == NULL;
 
     if( badTag )
@@ -500,8 +525,8 @@ tr_metainfoParse( const tr_session * session,
 void
 tr_metainfoFree( tr_info * inf )
 {
+    int i;
     tr_file_index_t ff;
-    int             i;
 
     for( i = 0; i < inf->webseedCount; ++i )
         tr_free( inf->webseeds[i] );
@@ -542,3 +567,37 @@ tr_metainfoRemoveSaved( const tr_session * session,
     tr_free( filename );
 }
 
+/***
+****
+***/
+
+void
+tr_metainfoSetFromMagnet( tr_info * inf, const tr_magnet_info * m )
+{
+    /* hash */
+    memcpy( inf->hash, m->hash, 20 );
+    tr_sha1_to_hex( inf->hashString, inf->hash );
+    escape( inf->hashEscaped, inf->hash, SHA_DIGEST_LENGTH );
+
+    /* name */
+    if( *m->displayName )
+        inf->name = tr_strdup( m->displayName );
+    else
+        inf->name = tr_strdup( inf->hashString );
+
+    /* trackers */
+    if( m->announceCount > 0 )
+    {
+        int i;
+        const int n = m->announceCount;
+
+        inf->trackerCount = n;
+        inf->trackers = tr_new0( tr_tracker_info, n );
+        for( i=0; i<n; ++i ) {
+            const char * url = m->announceURLs[i];
+            inf->trackers[i].tier = i;
+            inf->trackers[i].announce = tr_strdup( url );
+            inf->trackers[i].scrape = tr_convertAnnounceToScrape( url );
+        }
+    }
+}

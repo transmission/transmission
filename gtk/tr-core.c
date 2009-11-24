@@ -1023,15 +1023,40 @@ onURLDone( tr_session       * session,
 void
 tr_core_add_from_url( TrCore * core, const char * url )
 {
+    tr_session * session = tr_core_session( core );
+
     if( gtr_is_magnet_link( url ) )
     {
-        g_message( "FIXME: magnet link \"%s\" not handled", url );
+        tr_ctor * ctor = tr_ctorNew( session );
+        int err = tr_ctorSetMagnet( ctor, url );
+        if( !err ) 
+        {
+            tr_session * session = tr_core_session( core );
+            TrTorrent * gtor = tr_torrent_new_ctor( session, ctor, &err );
+            if( !err )
+                tr_core_add_torrent( core, gtor, FALSE );
+            else
+                g_message( "tr_torrent_new_ctor err %d", err );
+        }
+        else
+        {
+            GtkWidget * w = gtk_message_dialog_new( NULL, 0,
+                                                    GTK_MESSAGE_ERROR,
+                                                    GTK_BUTTONS_CLOSE,
+                                                    "%s", _( "Unrecognized URL" ) );
+            gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG( w ),
+                _( "Transmission doesn't know how to use \"%s\"" ), url );
+            g_signal_connect_swapped( w, "response",
+                                      G_CALLBACK( gtk_widget_destroy ), w );
+            gtk_widget_show( w );
+            tr_ctorFree( ctor );
+        }
     }
     else
     {
         struct url_dialog_data * data = g_new( struct url_dialog_data, 1 );
         data->core = core;
-        tr_webRun( tr_core_session( core ), url, NULL, onURLDone, data );
+        tr_webRun( session, url, NULL, onURLDone, data );
     }
 }
 
@@ -1051,6 +1076,7 @@ add_filename( TrCore      * core,
     if( session == NULL )
         return;
 
+g_message( "filename [%s]", filename );
     if( gtr_is_supported_url( filename ) || gtr_is_magnet_link( filename ) )
     {
         tr_core_add_from_url( core, filename );

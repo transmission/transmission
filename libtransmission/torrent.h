@@ -25,6 +25,7 @@
 struct tr_bandwidth;
 struct tr_ratecontrol;
 struct tr_torrent_tiers;
+struct tr_magnet_info;
 
 /**
 ***  Package-visible ctor API
@@ -34,6 +35,8 @@ void        tr_ctorSetSave( tr_ctor * ctor,
                             tr_bool   saveMetadataInOurTorrentsDir );
 
 int         tr_ctorGetSave( const tr_ctor * ctor );
+
+int         tr_ctorGetMagnet( const tr_ctor * ctor, const struct tr_magnet_info ** setme );
 
 void        tr_ctorInitTorrentPriorities( const tr_ctor * ctor, tr_torrent * tor );
 
@@ -131,6 +134,8 @@ tr_verify_state;
 void             tr_torrentSetVerifyState( tr_torrent      * tor,
                                            tr_verify_state   state );
 
+struct tr_incomplete_metadata;
+
 struct tr_torrent
 {
     tr_session *             session;
@@ -142,6 +147,11 @@ struct tr_torrent
     char                     errorString[128];
 
     uint8_t                  obfuscatedHash[SHA_DIGEST_LENGTH];
+
+    /* Used when the torrent has been created with a magnet link
+     * and we're in the process of downloading the metainfo from
+     * other peers */
+    struct tr_incomplete_metadata  * incompleteMetadata;
 
     /* If the initiator of the connection receives a handshake in which the
      * peer_id does not match the expected peerid, then the initiator is
@@ -157,6 +167,12 @@ struct tr_torrent
 
     /* Where the files are when the torrent is incomplete */
     char * incompleteDir;
+
+    /* Length, in bytes, of the "info" dict in the .torrent file */
+    int infoDictLength;
+
+    /* Offset, in bytes, of the beginning of the "info" dict in the .torrent file */
+    int infoDictOffset;
 
     /* Where the files are now.
      * This pointer will be equal to downloadDir or incompleteDir */
@@ -339,14 +355,16 @@ static TR_INLINE tr_bool tr_isTorrent( const tr_torrent * tor )
 
 /* set a flag indicating that the torrent's .resume file
  * needs to be saved when the torrent is closed */
-static TR_INLINE void tr_torrentSetDirty( tr_torrent * tor )
+static TR_INLINE
+void tr_torrentSetDirty( tr_torrent * tor )
 {
     assert( tr_isTorrent( tor ) );
 
     tor->isDirty = TRUE;
 }
 
-static TR_INLINE const char * tr_torrentName( const tr_torrent * tor )
+static TR_INLINE
+const char * tr_torrentName( const tr_torrent * tor )
 {
     assert( tr_isTorrent( tor ) );
 
@@ -382,5 +400,8 @@ tr_bool tr_torrentFindFile2( const tr_torrent *, tr_file_index_t fileNo,
  * a la Firefox. */
 char* tr_torrentBuildPartial( const tr_torrent *, tr_file_index_t fileNo );
 
+/* for when the info dict has been fundamentally changed wrt files,
+ * piece size, etc. such as in BEP 9 where peers exchange metadata */
+void tr_torrentGotNewInfoDict( tr_torrent * tor );
 
 #endif

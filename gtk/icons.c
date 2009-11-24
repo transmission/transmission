@@ -230,7 +230,9 @@ icon_cache_get_mime_type_icon( IconCache  * icon_cache,
     GdkPixbuf  * pixbuf;
     const char * stock_name;
 
-    if( !strcmp( mime_type, DIRECTORY_MIME_TYPE ) )
+    if( !strcmp( mime_type, UNKNOWN_MIME_TYPE ) )
+        stock_name = GTK_STOCK_MISSING_IMAGE;
+    else if( !strcmp( mime_type, DIRECTORY_MIME_TYPE ) )
         stock_name = GTK_STOCK_DIRECTORY;
     else
         stock_name = GTK_STOCK_FILE;

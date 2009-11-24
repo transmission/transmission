@@ -23,7 +23,7 @@
  *****************************************************************************/
 
 #ifndef __TRANSMISSION__
-#error only libtransmission should #include this header.
+ #error only libtransmission should #include this header.
 #endif
 
 #ifndef TR_METAINFO_H
@@ -32,9 +32,12 @@
 #include "transmission.h"
 
 struct tr_benc;
+struct tr_magnet_info;
 
 tr_bool  tr_metainfoParse( const tr_session     * session,
-                           tr_info              * info,
+                           tr_info              * setmeInfo,
+                           int                  * setmeInfoDictLength,
+                           int                  * setmeInfoDictOffset,
                            const struct tr_benc * benc );
 
 void tr_metainfoRemoveSaved( const tr_session * session,
@@ -42,5 +45,8 @@ void tr_metainfoRemoveSaved( const tr_session * session,
 
 void tr_metainfoMigrate( tr_session * session,
                          tr_info    * inf );
+
+void tr_metainfoSetFromMagnet( tr_info * inf, const struct tr_magnet_info * m );
+
 
 #endif

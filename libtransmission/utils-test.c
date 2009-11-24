@@ -297,6 +297,28 @@ test_hex( void )
     return 0;
 }
 
+static int
+test_array( void )
+{
+    int i;
+    int array[10] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+    int n = sizeof( array ) / sizeof( array[0] );
+
+    tr_removeElementFromArray( array, 5, sizeof( int ), n-- );
+    for( i=0; i<n; ++i )
+        check( array[i] == ( i<5 ? i : i+1 ) );
+
+    tr_removeElementFromArray( array, 0, sizeof( int ), n-- );
+    for( i=0; i<n; ++i )
+        check( array[i] == ( i<4 ? i+1 : i+2 ) );
+
+    tr_removeElementFromArray( array, n-1, sizeof( int ), n ); n--;
+    for( i=0; i<n; ++i )
+        check( array[i] == ( i<4 ? i+1 : i+2 ) );
+
+    return 0;
+}
+
 int
 main( void )
 {
@@ -337,6 +359,8 @@ main( void )
     if( ( i = test_numbers( ) ) )
         return i;
     if( ( i = test_memmem( ) ) )
+        return i;
+    if( ( i = test_array( ) ) )
         return i;
 
     /* test that tr_cryptoRandInt() stays in-bounds */

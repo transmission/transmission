@@ -13,6 +13,7 @@
 #include <errno.h>
 #include "transmission.h"
 #include "bencode.h"
+#include "magnet.h"
 #include "platform.h"
 #include "session.h" /* tr_sessionFindTorrentFile() */
 #include "torrent.h" /* tr_ctorGetSave() */
@@ -41,6 +42,8 @@ struct tr_ctor
     tr_bool                 isSet_delete;
     tr_benc                 metainfo;
     char *                  sourceFile;
+
+    tr_magnet_info        * magnetInfo;
 
     struct optional_args    optionalArgs[2];
 
@@ -99,6 +102,20 @@ const char*
 tr_ctorGetSourceFile( const tr_ctor * ctor )
 {
     return ctor->sourceFile;
+}
+
+int
+tr_ctorSetMagnet( tr_ctor * ctor, const char * uri )
+{
+    int err;
+
+    if( ctor->magnetInfo != NULL )
+        tr_magnetFree( ctor->magnetInfo );
+
+    ctor->magnetInfo = tr_magnetParse( uri );
+
+    err = ctor->magnetInfo == NULL;
+    return err;
 }
 
 int
@@ -367,6 +384,19 @@ tr_ctorGetIncompleteDir( const tr_ctor  * ctor,
         err = 1;
     else
         *setmeIncompleteDir = ctor->incompleteDir;
+
+    return err;
+}
+
+int
+tr_ctorGetMagnet( const tr_ctor * ctor, const tr_magnet_info ** setme )
+{
+    int err = 0;
+
+    if( ctor->magnetInfo == NULL )
+        err = 1;
+    else
+        *setme = ctor->magnetInfo;
 
     return err;
 }

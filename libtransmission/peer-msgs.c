@@ -35,6 +35,7 @@
 #include "session.h"
 #include "stats.h"
 #include "torrent.h"
+#include "torrent-magnet.h"
 #include "tr-dht.h"
 #include "utils.h"
 #include "version.h"
@@ -66,11 +67,12 @@ enum
 
     LTEP_HANDSHAKE          = 0,
 
-    TR_LTEP_PEX             = 1,
+    UT_PEX_ID               = 1,
+    UT_METADATA_ID          = 3,
 
     MAX_PEX_PEER_COUNT      = 50,
 
-    MIN_CHOKE_PERIOD_SEC    = ( 10 ),
+    MIN_CHOKE_PERIOD_SEC    = 10,
 
     /* idle seconds before we send a keepalive */
     KEEPALIVE_INTERVAL_SECS = 100,
@@ -78,6 +80,8 @@ enum
     PEX_INTERVAL_SECS       = 90, /* sec between sendPex() calls */
 
     REQQ                    = 512,
+
+    METADATA_REQQ           = 64,
 
     MAX_BLOCK_SIZE          = ( 1024 * 16 ),
 
@@ -91,7 +95,12 @@ enum
     LAZY_PIECE_COUNT = 26,
 
     /* number of pieces we'll allow in our fast set */
-    MAX_FAST_SET_SIZE = 3
+    MAX_FAST_SET_SIZE = 3,
+
+    /* defined in BEP #9 */
+    METADATA_MSG_TYPE_REQUEST = 0,
+    METADATA_MSG_TYPE_DATA = 1,
+    METADATA_MSG_TYPE_REJECT = 2
 };
 
 enum
@@ -165,8 +174,11 @@ struct tr_incoming
 struct tr_peermsgs
 {
     tr_bool         peerSupportsPex;
+    tr_bool         peerSupportsMetadataXfer;
     tr_bool         clientSentLtepHandshake;
     tr_bool         peerSentLtepHandshake;
+    tr_bool         requestingMetadataFromPeer;
+
     /*tr_bool         haveFastSet;*/
 
     int             activeRequestCount;
@@ -181,6 +193,7 @@ struct tr_peermsgs
 
     uint8_t         state;
     uint8_t         ut_pex_id;
+    uint8_t         ut_metadata_id;
     uint16_t        pexCount;
     uint16_t        pexCount6;
 
@@ -199,7 +212,10 @@ struct tr_peermsgs
 
     struct peer_request    peerAskedFor[REQQ];
     int                    peerAskedForCount;
- 
+
+    int                    peerAskedForMetadata[METADATA_REQQ];
+    int                    peerAskedForMetadataCount;
+
     tr_pex               * pex;
     tr_pex               * pex6;
 
@@ -218,6 +234,20 @@ struct tr_peermsgs
 
     struct event          pexTimer;
 };
+
+/**
+***
+**/
+
+#if 0
+static tr_bitfield*
+getHave( const struct tr_peermsgs * msgs )
+{
+    if( msgs->peer->have == NULL )
+        msgs->peer->have = tr_bitfieldNew( msgs->torrent->info.pieceCount );
+    return msgs->peer->have;
+}
+#endif
 
 static TR_INLINE tr_session*
 getSession( struct tr_peermsgs * msgs )
@@ -654,9 +684,9 @@ isPieceInteresting( const tr_peermsgs * msgs,
 {
     const tr_torrent * torrent = msgs->torrent;
 
-    return ( !torrent->info.pieces[piece].dnd )                 /* we want it */
+    return ( !torrent->info.pieces[piece].dnd )                  /* we want it */
           && ( !tr_cpPieceIsComplete( &torrent->completion, piece ) ) /* !have */
-          && ( tr_bitfieldHas( msgs->peer->have, piece ) );    /* peer has it */
+          && ( tr_bitsetHas( &msgs->peer->have, piece ) );      /* peer has it */
 }
 
 /* "interested" means we'll ask for piece data if they unchoke us */
@@ -676,11 +706,6 @@ isPeerInteresting( const tr_peermsgs * msgs )
 
     torrent = msgs->torrent;
     bitfield = tr_cpPieceBitfield( &torrent->completion );
-
-    if( !msgs->peer->have )
-        return TRUE;
-
-    assert( bitfield->byteCount == msgs->peer->have->byteCount );
 
     for( i = 0; i < torrent->info.pieceCount; ++i )
         if( isPieceInteresting( msgs, i ) )
@@ -714,6 +739,21 @@ updateInterest( tr_peermsgs * msgs )
 
     if( i != msgs->peer->clientIsInterested )
         sendInterest( msgs, i );
+}
+
+static tr_bool
+popNextMetadataRequest( tr_peermsgs * msgs, int * piece )
+{
+    if( msgs->peerAskedForMetadataCount == 0 )
+        return FALSE;
+
+    *piece = msgs->peerAskedForMetadata[0];
+
+    memmove( msgs->peerAskedForMetadata,
+             msgs->peerAskedForMetadata + 1,
+             sizeof( int ) * --msgs->peerAskedForMetadataCount );
+
+    return TRUE;
 }
 
 static tr_bool
@@ -819,7 +859,8 @@ sendLtepHandshake( tr_peermsgs * msgs )
     tr_benc val, *m;
     char * buf;
     int len;
-    int pex;
+    tr_bool allow_pex;
+    tr_bool allow_metadata_xfer;
     struct evbuffer * out = msgs->outMessages;
     const unsigned char * ipv6 = tr_globalIPv6();
 
@@ -829,25 +870,37 @@ sendLtepHandshake( tr_peermsgs * msgs )
     dbgmsg( msgs, "sending an ltep handshake" );
     msgs->clientSentLtepHandshake = 1;
 
+    /* decide if we want to advertise metadata xfer support (BEP 9) */
+    if( tr_torrentIsPrivate( msgs->torrent ) )
+        allow_metadata_xfer = 0;
+    else
+        allow_metadata_xfer = 1;
+
     /* decide if we want to advertise pex support */
     if( !tr_torrentAllowsPex( msgs->torrent ) )
-        pex = 0;
+        allow_pex = 0;
     else if( msgs->peerSentLtepHandshake )
-        pex = msgs->peerSupportsPex ? 1 : 0;
+        allow_pex = msgs->peerSupportsPex ? 1 : 0;
     else
-        pex = 1;
+        allow_pex = 1;
 
-    tr_bencInitDict( &val, 7 );
+    tr_bencInitDict( &val, 8 );
     tr_bencDictAddInt( &val, "e", getSession(msgs)->encryptionMode != TR_CLEAR_PREFERRED );
-    if( ipv6 )
+    if( ipv6 != NULL )
         tr_bencDictAddRaw( &val, "ipv6", ipv6, 16 );
+    if( allow_metadata_xfer && tr_torrentHasMetadata( msgs->torrent )
+                            && ( msgs->torrent->infoDictLength > 0 ) )
+        tr_bencDictAddInt( &val, "metadata_size", msgs->torrent->infoDictLength );
     tr_bencDictAddInt( &val, "p", tr_sessionGetPeerPort( getSession(msgs) ) );
     tr_bencDictAddInt( &val, "reqq", REQQ );
     tr_bencDictAddInt( &val, "upload_only", tr_torrentIsSeed( msgs->torrent ) );
     tr_bencDictAddStr( &val, "v", TR_NAME " " USERAGENT_PREFIX );
-    m  = tr_bencDictAddDict( &val, "m", 1 );
-    if( pex )
-        tr_bencDictAddInt( m, "ut_pex", TR_LTEP_PEX );
+    m  = tr_bencDictAddDict( &val, "m", 2 );
+    if( allow_metadata_xfer )
+        tr_bencDictAddInt( m, "ut_metadata", UT_METADATA_ID );
+    if( allow_pex )
+        tr_bencDictAddInt( m, "ut_pex", UT_PEX_ID );
+
     buf = tr_bencToStr( &val, TR_FMT_BENC, &len );
 
     tr_peerIoWriteUint32( msgs->peer->io, out, 2 * sizeof( uint8_t ) + len );
@@ -898,13 +951,24 @@ parseLtepHandshake( tr_peermsgs *     msgs,
 
     /* check supported messages for utorrent pex */
     msgs->peerSupportsPex = 0;
+    msgs->peerSupportsMetadataXfer = 0;
+
     if( tr_bencDictFindDict( &val, "m", &sub ) ) {
         if( tr_bencDictFindInt( sub, "ut_pex", &i ) ) {
+            msgs->peerSupportsPex = i != 0;
             msgs->ut_pex_id = (uint8_t) i;
-            msgs->peerSupportsPex = msgs->ut_pex_id == 0 ? 0 : 1;
             dbgmsg( msgs, "msgs->ut_pex is %d", (int)msgs->ut_pex_id );
         }
+        if( tr_bencDictFindInt( sub, "ut_metadata", &i ) ) {
+            msgs->peerSupportsMetadataXfer = i != 0;
+            msgs->ut_metadata_id = (uint8_t) i;
+            dbgmsg( msgs, "msgs->ut_metadata_id is %d", (int)msgs->ut_metadata_id );
+        }
     }
+
+    /* look for metainfo size (BEP 9) */
+    if( tr_bencDictFindInt( &val, "metadata_size", &i ) )
+        tr_torrentSetMetadataSizeHint( msgs->torrent, i );
 
     /* look for upload_only (BEP 21) */
     if( tr_bencDictFindInt( &val, "upload_only", &i ) ) {
@@ -925,7 +989,7 @@ parseLtepHandshake( tr_peermsgs *     msgs,
         memcpy( &pex.addr.addr.addr4, addr, 4 );
         tr_peerMgrAddPex( msgs->torrent, TR_PEER_FROM_ALT, &pex );
     }
- 
+
     if( tr_bencDictFindRaw( &val, "ipv6", &addr, &addr_len) && addr_len == 16 ) {
         pex.addr.type = TR_AF_INET6;
         memcpy( &pex.addr.addr.addr6, addr, 16 );
@@ -937,6 +1001,86 @@ parseLtepHandshake( tr_peermsgs *     msgs,
         msgs->reqq = i;
 
     tr_bencFree( &val );
+    tr_free( tmp );
+}
+
+static void
+parseUtMetadata( tr_peermsgs * msgs, int msglen, struct evbuffer * inbuf )
+{
+    tr_benc dict;
+    char * msg_end;
+    char * benc_end;
+    int64_t msg_type = -1;
+    int64_t piece = -1;
+    int64_t total_size = 0;
+    uint8_t * tmp = tr_new( uint8_t, msglen );
+
+    tr_peerIoReadBytes( msgs->peer->io, inbuf, tmp, msglen );
+    msg_end = (char*)tmp + msglen;
+
+    if( !tr_bencLoad( tmp, msglen, &dict, &benc_end ) )
+    {
+        tr_bencDictFindInt( &dict, "msg_type", &msg_type );
+        tr_bencDictFindInt( &dict, "piece", &piece );
+        tr_bencDictFindInt( &dict, "total_size", &total_size );
+        tr_bencFree( &dict );
+    }
+
+    dbgmsg( msgs, "got ut_metadata msg: type %d, piece %d, total_size %d",
+            (int)msg_type, (int)piece, (int)total_size );
+
+    if( msg_type == METADATA_MSG_TYPE_REJECT )
+    {
+        /* NOOP */
+    }
+
+    if( ( msg_type == METADATA_MSG_TYPE_DATA )
+        && ( !tr_torrentHasMetadata( msgs->torrent ) )
+        && ( msg_end - benc_end <= METADATA_PIECE_SIZE )
+        && ( piece * METADATA_PIECE_SIZE + (msg_end - benc_end) <= total_size ) )
+    {
+        const int pieceLen = msg_end - benc_end;
+dbgmsg( msgs, "got a metadata piece... calling tr_torrentSetMetadataPiece" );
+        msgs->requestingMetadataFromPeer = FALSE;
+        tr_torrentSetMetadataPiece( msgs->torrent, piece, benc_end, pieceLen );
+    }
+
+    if( msg_type == METADATA_MSG_TYPE_REQUEST )
+    {
+        if( ( piece >= 0 )
+            && tr_torrentHasMetadata( msgs->torrent )
+            && !tr_torrentIsPrivate( msgs->torrent )
+            && ( msgs->peerAskedForMetadataCount < METADATA_REQQ ) )
+        {
+            msgs->peerAskedForMetadata[msgs->peerAskedForMetadataCount++] = piece;
+        }
+        else
+        {
+            tr_benc tmp;
+            int payloadLen;
+            char * payload;
+            tr_peerIo  * io  = msgs->peer->io;
+            struct evbuffer * out = msgs->outMessages;
+
+            /* build the rejection message */
+            tr_bencInitDict( &tmp, 2 );
+            tr_bencDictAddInt( &tmp, "msg_type", METADATA_MSG_TYPE_REJECT );
+            tr_bencDictAddInt( &tmp, "piece", piece );
+            payload = tr_bencToStr( &tmp, TR_FMT_BENC, &payloadLen );
+            tr_bencFree( &tmp );
+
+            /* write it out as a LTEP message to our outMessages buffer */
+            tr_peerIoWriteUint32( io, out, 2 * sizeof( uint8_t ) + payloadLen );
+            tr_peerIoWriteUint8 ( io, out, BT_LTEP );
+            tr_peerIoWriteUint8 ( io, out, msgs->ut_metadata_id );
+            tr_peerIoWriteBytes ( io, out, payload, payloadLen );
+            pokeBatchPeriod( msgs, HIGH_PRIORITY_INTERVAL_SECS );
+            dbgOutMessageLen( msgs );
+
+            tr_free( payload );
+        }
+    }
+
     tr_free( tmp );
 }
 
@@ -1017,11 +1161,17 @@ parseLtep( tr_peermsgs *     msgs,
             sendPex( msgs );
         }
     }
-    else if( ltep_msgid == TR_LTEP_PEX )
+    else if( ltep_msgid == UT_PEX_ID )
     {
         dbgmsg( msgs, "got ut pex" );
         msgs->peerSupportsPex = 1;
         parseUtPex( msgs, msglen, inbuf );
+    }
+    else if( ltep_msgid == UT_METADATA_ID )
+    {
+        dbgmsg( msgs, "got ut metadata" );
+        msgs->peerSupportsMetadataXfer = 1;
+        parseUtMetadata( msgs, msglen, inbuf );
     }
     else
     {
@@ -1087,7 +1237,7 @@ readBtId( tr_peermsgs *     msgs,
 static void
 updatePeerProgress( tr_peermsgs * msgs )
 {
-    msgs->peer->progress = tr_bitfieldCountTrueBits( msgs->peer->have ) / (float)msgs->torrent->info.pieceCount;
+    msgs->peer->progress = tr_bitsetPercent( &msgs->peer->have );
     dbgmsg( msgs, "peer progress is %f", msgs->peer->progress );
     updateFastSet( msgs );
     updateInterest( msgs );
@@ -1286,7 +1436,7 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
         case BT_HAVE:
             tr_peerIoReadUint32( msgs->peer->io, inbuf, &ui32 );
             dbgmsg( msgs, "got Have: %u", ui32 );
-            if( tr_bitfieldAdd( msgs->peer->have, ui32 ) ) {
+            if( tr_bitsetAdd( &msgs->peer->have, ui32 ) ) {
                 fireError( msgs, ERANGE );
                 return READ_ERR;
             }
@@ -1295,7 +1445,8 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
 
         case BT_BITFIELD:
             dbgmsg( msgs, "got a bitfield" );
-            tr_peerIoReadBytes( msgs->peer->io, inbuf, msgs->peer->have->bits, msglen );
+            tr_bitsetReserve( &msgs->peer->have, msglen*8 );
+            tr_peerIoReadBytes( msgs->peer->io, inbuf, msgs->peer->have.bitfield.bits, msglen );
             updatePeerProgress( msgs );
             break;
 
@@ -1318,13 +1469,17 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
             tr_peerIoReadUint32( msgs->peer->io, inbuf, &r.offset );
             tr_peerIoReadUint32( msgs->peer->io, inbuf, &r.length );
             dbgmsg( msgs, "got a Cancel %u:%u->%u", r.index, r.offset, r.length );
+
             for( i=0; i<msgs->peerAskedForCount; ++i ) {
                 const struct peer_request * req = msgs->peerAskedFor + i;
                 if( ( req->index == r.index ) && ( req->offset == r.offset ) && ( req->length == r.length ) )
                     break;
             }
+
             if( i < msgs->peerAskedForCount )
-                memmove( msgs->peerAskedFor+i, msgs->peerAskedFor+i+1, --msgs->peerAskedForCount-i );
+                memmove( msgs->peerAskedFor+i,
+                         msgs->peerAskedFor+i+1,
+                         sizeof(struct peer_request) *( --msgs->peerAskedForCount-i) );
             break;
         }
 
@@ -1366,7 +1521,7 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
         case BT_FEXT_HAVE_ALL:
             dbgmsg( msgs, "Got a BT_FEXT_HAVE_ALL" );
             if( fext ) {
-                tr_bitfieldAddRange( msgs->peer->have, 0, msgs->torrent->info.pieceCount );
+                tr_bitsetSetHaveAll( &msgs->peer->have );
                 updatePeerProgress( msgs );
             } else {
                 fireError( msgs, EMSGSIZE );
@@ -1377,7 +1532,7 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
         case BT_FEXT_HAVE_NONE:
             dbgmsg( msgs, "Got a BT_FEXT_HAVE_NONE" );
             if( fext ) {
-                tr_bitfieldClear( msgs->peer->have );
+                tr_bitsetSetHaveNone( &msgs->peer->have );
                 updatePeerProgress( msgs );
             } else {
                 fireError( msgs, EMSGSIZE );
@@ -1586,7 +1741,45 @@ updateDesiredRequestCount( tr_peermsgs * msgs, uint64_t now )
 }
 
 static void
-updateRequests( tr_peermsgs * msgs )
+updateMetadataRequests( tr_peermsgs * msgs, time_t now )
+{
+    int piece;
+
+    if( msgs->peerSupportsMetadataXfer
+        && !msgs->requestingMetadataFromPeer
+        && tr_torrentGetNextMetadataRequest( msgs->torrent, now, &piece ) )
+    {
+        tr_benc tmp;
+        int payloadLen;
+        char * payload;
+        tr_peerIo  * io  = msgs->peer->io;
+        struct evbuffer * out = msgs->outMessages;
+
+        /* build the data message */
+        tr_bencInitDict( &tmp, 3 );
+        tr_bencDictAddInt( &tmp, "msg_type", METADATA_MSG_TYPE_REQUEST );
+        tr_bencDictAddInt( &tmp, "piece", piece );
+        payload = tr_bencToStr( &tmp, TR_FMT_BENC, &payloadLen );
+        tr_bencFree( &tmp );
+
+        dbgmsg( msgs, "requesting metadata piece #%d", piece );
+
+        /* write it out as a LTEP message to our outMessages buffer */
+        tr_peerIoWriteUint32( io, out, 2 * sizeof( uint8_t ) + payloadLen );
+        tr_peerIoWriteUint8 ( io, out, BT_LTEP );
+        tr_peerIoWriteUint8 ( io, out, msgs->ut_metadata_id );
+        tr_peerIoWriteBytes ( io, out, payload, payloadLen );
+        pokeBatchPeriod( msgs, HIGH_PRIORITY_INTERVAL_SECS );
+        dbgOutMessageLen( msgs );
+
+        msgs->requestingMetadataFromPeer = TRUE;
+
+        tr_free( payload );
+    }
+}
+
+static void
+updateBlockRequests( tr_peermsgs * msgs )
 {
     const int MIN_BATCH_SIZE = 4;
     const int numwant = msgs->desiredRequestCount - msgs->activeRequestCount;
@@ -1641,6 +1834,7 @@ prefetchPieces( tr_peermsgs *msgs )
 static size_t
 fillOutputBuffer( tr_peermsgs * msgs, time_t now )
 {
+    int piece;
     size_t bytesWritten = 0;
     struct peer_request req;
     const tr_bool haveMessages = EVBUFFER_LENGTH( msgs->outMessages ) != 0;
@@ -1668,7 +1862,77 @@ fillOutputBuffer( tr_peermsgs * msgs, time_t now )
     }
 
     /**
-    ***  Blocks
+    ***  Metadata Pieces
+    **/
+
+    if( ( tr_peerIoGetWriteBufferSpace( msgs->peer->io, now ) >= METADATA_PIECE_SIZE )
+        && popNextMetadataRequest( msgs, &piece ) )
+    {
+        char * data;
+        int dataLen;
+        tr_bool ok = FALSE;
+
+        data = tr_torrentGetMetadataPiece( msgs->torrent, piece, &dataLen );
+        if( ( dataLen > 0 ) && ( data != NULL ) )
+        {
+            tr_benc tmp;
+            int payloadLen;
+            char * payload;
+            tr_peerIo  * io  = msgs->peer->io;
+            struct evbuffer * out = msgs->outMessages;
+
+            /* build the data message */
+            tr_bencInitDict( &tmp, 3 );
+            tr_bencDictAddInt( &tmp, "msg_type", METADATA_MSG_TYPE_DATA );
+            tr_bencDictAddInt( &tmp, "piece", piece );
+            tr_bencDictAddInt( &tmp, "total_size", dataLen );
+            payload = tr_bencToStr( &tmp, TR_FMT_BENC, &payloadLen );
+            tr_bencFree( &tmp );
+
+            /* write it out as a LTEP message to our outMessages buffer */
+            tr_peerIoWriteUint32( io, out, 2 * sizeof( uint8_t ) + payloadLen + dataLen );
+            tr_peerIoWriteUint8 ( io, out, BT_LTEP );
+            tr_peerIoWriteUint8 ( io, out, msgs->ut_metadata_id );
+            tr_peerIoWriteBytes ( io, out, payload, payloadLen );
+            tr_peerIoWriteBytes ( io, out, data, dataLen );
+            pokeBatchPeriod( msgs, HIGH_PRIORITY_INTERVAL_SECS );
+            dbgOutMessageLen( msgs );
+
+            tr_free( payload );
+            tr_free( data );
+
+            ok = TRUE;
+        }
+
+        if( !ok ) /* send a rejection message */
+        {
+            tr_benc tmp;
+            int payloadLen;
+            char * payload;
+            tr_peerIo  * io  = msgs->peer->io;
+            struct evbuffer * out = msgs->outMessages;
+
+            /* build the rejection message */
+            tr_bencInitDict( &tmp, 2 );
+            tr_bencDictAddInt( &tmp, "msg_type", METADATA_MSG_TYPE_REJECT );
+            tr_bencDictAddInt( &tmp, "piece", piece );
+            payload = tr_bencToStr( &tmp, TR_FMT_BENC, &payloadLen );
+            tr_bencFree( &tmp );
+
+            /* write it out as a LTEP message to our outMessages buffer */
+            tr_peerIoWriteUint32( io, out, 2 * sizeof( uint8_t ) + payloadLen );
+            tr_peerIoWriteUint8 ( io, out, BT_LTEP );
+            tr_peerIoWriteUint8 ( io, out, msgs->ut_metadata_id );
+            tr_peerIoWriteBytes ( io, out, payload, payloadLen );
+            pokeBatchPeriod( msgs, HIGH_PRIORITY_INTERVAL_SECS );
+            dbgOutMessageLen( msgs );
+
+            tr_free( payload );
+        }
+    }
+
+    /**
+    ***  Data Blocks
     **/
 
     if( ( tr_peerIoGetWriteBufferSpace( msgs->peer->io, now ) >= msgs->torrent->blockSize )
@@ -1749,7 +2013,8 @@ peerPulse( void * vmsgs )
 
     if ( tr_isPeerIo( msgs->peer->io ) ) {
         updateDesiredRequestCount( msgs, now );
-        updateRequests( msgs );
+        updateBlockRequests( msgs );
+        updateMetadataRequests( msgs, now );
     }
 
     for( ;; )
@@ -2111,7 +2376,6 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
     m->peer->peerIsChoked = 1;
     m->peer->clientIsInterested = 0;
     m->peer->peerIsInterested = 0;
-    m->peer->have = tr_bitfieldNew( torrent->info.pieceCount );
     m->state = AWAITING_BT_LENGTH;
     m->outMessages = evbuffer_new( );
     m->outMessagesBatchedAt = 0;
@@ -2167,4 +2431,3 @@ tr_peerMsgsUnsubscribe( tr_peermsgs *    peer,
 {
     tr_publisherUnsubscribe( &peer->publisher, tag );
 }
-

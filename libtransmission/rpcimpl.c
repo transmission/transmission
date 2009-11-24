@@ -1093,14 +1093,22 @@ torrentAdd( tr_session               * session,
         }
         else
         {
-            if( filename != NULL )
-                tr_ctorSetMetainfoFromFile( ctor, filename );
-            else {
+            if( filename == NULL )
+            {
                 int len;
-                char * metainfo = tr_base64_decode( metainfo_base64, -1,  &len );
+                char * metainfo = tr_base64_decode( metainfo_base64, -1, &len );
                 tr_ctorSetMetainfo( ctor, (uint8_t*)metainfo, len );
                 tr_free( metainfo );
             }
+            else if( !strncmp( filename, "magnet:?", 8 ) )
+            {
+                tr_ctorSetMagnet( ctor, filename );
+            }
+            else
+            {
+                tr_ctorSetMetainfoFromFile( ctor, filename );
+            }
+
             addTorrentImpl( idle_data, ctor );
         }
 
