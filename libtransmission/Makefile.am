@@ -63,6 +63,7 @@ noinst_HEADERS = \
     bandwidth.h \
     bencode.h \
     bitfield.h \
+    bitset.h \
     blocklist.h \
     clients.h \
     ConvertUTF.h \
