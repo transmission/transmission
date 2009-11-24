@@ -580,7 +580,7 @@ tr_metainfoSetFromMagnet( tr_info * inf, const tr_magnet_info * m )
     escape( inf->hashEscaped, inf->hash, SHA_DIGEST_LENGTH );
 
     /* name */
-    if( *m->displayName )
+    if( m->displayName && *m->displayName )
         inf->name = tr_strdup( m->displayName );
     else
         inf->name = tr_strdup( inf->hashString );
