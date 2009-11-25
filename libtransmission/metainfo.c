@@ -258,8 +258,7 @@ tr_convertAnnounceToScrape( const char * announce )
 }
 
 static const char*
-getannounce( tr_info * inf,
-             tr_benc * meta )
+getannounce( tr_info * inf, tr_benc * meta )
 {
     const char *      str;
     tr_tracker_info * trackers = NULL;
@@ -334,7 +333,7 @@ getannounce( tr_info * inf,
     inf->trackers = trackers;
     inf->trackerCount = trackerCount;
 
-    return inf->trackerCount ? NULL : "announce";
+    return NULL;
 }
 
 static void
