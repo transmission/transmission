@@ -336,6 +336,11 @@ int trashDataFile(const char * filename)
     [self update];
 }
 
+- (BOOL) isMagnet
+{
+    return !tr_torrentHasMetadata(fHandle);
+}
+
 - (CGFloat) ratio
 {
     return fStat->ratio;
@@ -655,12 +660,12 @@ int trashDataFile(const char * filename)
 
 - (NSString *) comment
 {
-    return [NSString stringWithUTF8String: fInfo->comment];
+    return fInfo->comment ? [NSString stringWithUTF8String: fInfo->comment] : @"";
 }
 
 - (NSString *) creator
 {
-    return [NSString stringWithUTF8String: fInfo->creator];
+    return fInfo->creator ? [NSString stringWithUTF8String: fInfo->creator] : @"";
 }
 
 - (NSDate *) dateCreated
@@ -696,6 +701,9 @@ int trashDataFile(const char * filename)
 
 - (NSString *) dataLocation
 {
+    if ([self isMagnet])
+        return nil;
+    
     if ([self isFolder])
     {
         NSString * dataLocation = [[self currentDirectory] stringByAppendingPathComponent: [self name]];
@@ -755,6 +763,9 @@ int trashDataFile(const char * filename)
 
 - (CGFloat) progressLeft
 {
+    if ([self size] == 0) //magnet links
+        return 0.0;
+    
     return (CGFloat)[self sizeLeft] / [self size];
 }
 
