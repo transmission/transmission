@@ -670,7 +670,9 @@ torrentInit( tr_torrent * tor, const tr_ctor * ctor )
     tr_torrentSetAddedDate( tor, time( NULL ) ); /* this is a default value to be
                                                     overwritten by the resume file */
 
+    torrentInitFromInfo( tor );
     loaded = tr_torrentLoadResume( tor, ~0, ctor );
+    tor->completeness = tr_cpGetStatus( &tor->completion );
 
     refreshCurrentDir( tor );
 
@@ -704,8 +706,6 @@ torrentInit( tr_torrent * tor, const tr_ctor * ctor )
             last->next = tor;
         ++session->torrentCount;
     }
-
-    torrentInitFromInfo( tor );
 
     /* maybe save our own copy of the metainfo */
     if( tr_ctorGetSave( ctor ) )
