@@ -162,14 +162,15 @@ tr_bitfield*
 tr_bitfieldOr( tr_bitfield *       a,
                const tr_bitfield * b )
 {
-    uint8_t *      ait;
-    const uint8_t *aend, *bit;
+    uint8_t * ait;
+    const uint8_t *aend, *bit, *bend;
 
-    assert( a->byteCount == b->byteCount );
-
-    for( ait = a->bits, bit = b->bits, aend = ait + a->byteCount;
-         ait != aend; )
+    for( ait = a->bits, aend = ait + a->byteCount,
+         bit = b->bits, bend = bit + b->byteCount;
+         ait != aend && bit != bend; )
+    {
         *ait++ |= *bit++;
+    }
 
     return a;
 }

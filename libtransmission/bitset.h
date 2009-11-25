@@ -17,8 +17,6 @@
 #ifndef TR_BITSET_H
 #define TR_BITSET_H 1
 
-#include <assert.h>
-
 #include "transmission.h"
 #include "bitfield.h"
 
@@ -52,8 +50,7 @@ tr_bitsetReserve( tr_bitset * b, size_t size )
 
         tr_bitfieldDestruct( &b->bitfield );
         tr_bitfieldConstruct( &b->bitfield, size );
-        assert( b->bitfield.byteCount >= tmp->byteCount );
-        memcpy( &b->bitfield.bits, tmp->bits, tmp->byteCount );
+        memcpy( b->bitfield.bits, tmp->bits, tmp->byteCount );
 
         tr_bitfieldFree( tmp );
     }
@@ -64,6 +61,7 @@ tr_bitsetHasFast( const tr_bitset * b, const size_t nth )
 {
     if( b->haveAll ) return TRUE;
     if( b->haveNone ) return FALSE;
+    if( nth >= b->bitfield.bitCount ) return FALSE;
     return tr_bitfieldHasFast( &b->bitfield, nth );
 }
 
@@ -72,6 +70,7 @@ tr_bitsetHas( const tr_bitset * b, const size_t nth )
 {
     if( b->haveAll ) return TRUE;
     if( b->haveNone ) return FALSE;
+    if( nth >= b->bitfield.bitCount ) return FALSE;
     return tr_bitfieldHas( &b->bitfield, nth );
 }
 
@@ -123,7 +122,7 @@ tr_bitsetAdd( tr_bitset * b, int i )
     int ret = 0;
     if( !b->haveAll ) {
         b->haveNone = 0;
-        tr_bitsetReserve( b, i );
+        tr_bitsetReserve( b, i+1 );
         ret = tr_bitfieldAdd( &b->bitfield, i );
     }
     return ret;
