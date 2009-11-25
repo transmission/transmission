@@ -183,7 +183,7 @@ tr_torrentSetMetadataPiece( tr_torrent  * tor,
             int err;
             tr_benc dict;
             struct evbuffer * buf = evbuffer_new( );
-            dbgmsg( tor, "metadata checksum passed!  (length: %d)", m->metadata_size );
+            dbgmsg( tor, "metadata checksum passed!  (length: %d)", (int)m->metadata_size );
 
             /* add a wrapper dictionary to the benc.
              * include the announce-list too,
