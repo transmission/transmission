@@ -933,6 +933,25 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [self updateTorrentsInQueue];
 }
 
+- (void) openMagnet: (NSString *) address
+{
+    Torrent * torrent;
+    if (!(torrent = [[Torrent alloc] initWithMagnetAddress: address location: nil lib: fLib]))
+    {
+        #warning should we do something here?
+        return;
+    }
+    
+    #warning should we do this?
+    [torrent setWaitToStart: [fDefaults boolForKey: @"AutoStartDownload"]];
+    
+    [torrent update];
+    [fTorrents addObject: torrent];
+    [torrent release];
+
+    [self updateTorrentsInQueue];
+}
+
 - (void) askOpenConfirmed: (AddWindowController *) addController add: (BOOL) add
 {
     Torrent * torrent = [addController torrent];
@@ -1110,24 +1129,34 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         return;
     
     NSString * urlString = [fURLSheetTextField stringValue];
-    if ([urlString rangeOfString: @"://"].location == NSNotFound)
-    {
-        if ([urlString rangeOfString: @"."].location == NSNotFound)
-        {
-            NSInteger beforeCom;
-            if ((beforeCom = [urlString rangeOfString: @"/"].location) != NSNotFound)
-                urlString = [NSString stringWithFormat: @"http://www.%@.com/%@",
-                                [urlString substringToIndex: beforeCom],
-                                [urlString substringFromIndex: beforeCom + 1]];
-            else
-                urlString = [NSString stringWithFormat: @"http://www.%@.com/", urlString];
-        }
-        else
-            urlString = [@"http://" stringByAppendingString: urlString];
-    }
     
-    NSURL * url = [NSURL URLWithString: urlString];
-    [self performSelectorOnMainThread: @selector(openURL:) withObject: url waitUntilDone: NO];
+    if ([urlString compare: @"magnet:" options: (NSAnchoredSearch | NSCaseInsensitiveSearch)])
+        [self openMagnet: urlString];
+    else
+    {
+        if ([urlString rangeOfString: @"://"].location == NSNotFound)
+        {
+            if ([urlString rangeOfString: @"."].location == NSNotFound)
+            {
+                NSInteger beforeCom;
+                if ((beforeCom = [urlString rangeOfString: @"/"].location) != NSNotFound)
+                    urlString = [NSString stringWithFormat: @"http://www.%@.com/%@",
+                                    [urlString substringToIndex: beforeCom],
+                                    [urlString substringFromIndex: beforeCom + 1]];
+                else
+                    urlString = [NSString stringWithFormat: @"http://www.%@.com/", urlString];
+            }
+            else
+                urlString = [@"http://" stringByAppendingString: urlString];
+        }
+        
+        
+        else
+        {
+            NSURL * url = [NSURL URLWithString: urlString];
+            [self performSelectorOnMainThread: @selector(openURL:) withObject: url waitUntilDone: NO];
+        }
+    }
 }
 
 - (void) createFile: (id) sender

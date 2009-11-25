@@ -45,7 +45,7 @@ NSGradient * fProgressWhiteGradient = nil;
 + (NSGradient *) progressWhiteGradient
 {
     if (!fProgressWhiteGradient)
-        fProgressWhiteGradient = [[[self class] progressGradientForRed: 0.95 green: 0.95  blue: 0.95] retain];
+        fProgressWhiteGradient = [[[self class] progressGradientForRed: 0.95 green: 0.95 blue: 0.95] retain];
     return fProgressWhiteGradient;
 }
 
@@ -53,7 +53,7 @@ NSGradient * fProgressGrayGradient = nil;
 + (NSGradient *) progressGrayGradient
 {
     if (!fProgressGrayGradient)
-        fProgressGrayGradient = [[[self class] progressGradientForRed: 0.7 green: 0.7  blue: 0.7] retain];
+        fProgressGrayGradient = [[[self class] progressGradientForRed: 0.7 green: 0.7 blue: 0.7] retain];
     return fProgressGrayGradient;
 }
 
@@ -61,7 +61,7 @@ NSGradient * fProgressLightGrayGradient = nil;
 + (NSGradient *) progressLightGrayGradient
 {
     if (!fProgressLightGrayGradient)
-        fProgressLightGrayGradient = [[[self class] progressGradientForRed: 0.87 green: 0.87  blue: 0.87] retain];
+        fProgressLightGrayGradient = [[[self class] progressGradientForRed: 0.87 green: 0.87 blue: 0.87] retain];
     return fProgressLightGrayGradient;
 }
 
@@ -69,7 +69,7 @@ NSGradient * fProgressBlueGradient = nil;
 + (NSGradient *) progressBlueGradient
 {
     if (!fProgressBlueGradient)
-        fProgressBlueGradient = [[[self class] progressGradientForRed: 0.35 green: 0.67  blue: 0.98] retain];
+        fProgressBlueGradient = [[[self class] progressGradientForRed: 0.35 green: 0.67 blue: 0.98] retain];
     return fProgressBlueGradient;
 }
 
@@ -77,7 +77,7 @@ NSGradient * fProgressDarkBlueGradient = nil;
 + (NSGradient *) progressDarkBlueGradient
 {
     if (!fProgressDarkBlueGradient)
-        fProgressDarkBlueGradient = [[[self class] progressGradientForRed: 0.616 green: 0.722  blue: 0.776] retain];
+        fProgressDarkBlueGradient = [[[self class] progressGradientForRed: 0.616 green: 0.722 blue: 0.776] retain];
     return fProgressDarkBlueGradient;
 }
 
@@ -85,7 +85,7 @@ NSGradient * fProgressGreenGradient = nil;
 + (NSGradient *) progressGreenGradient
 {
     if (!fProgressGreenGradient)
-        fProgressGreenGradient = [[[self class] progressGradientForRed: 0.44 green: 0.89  blue: 0.40] retain];
+        fProgressGreenGradient = [[[self class] progressGradientForRed: 0.44 green: 0.89 blue: 0.40] retain];
     return fProgressGreenGradient;
 }
 
@@ -93,7 +93,7 @@ NSGradient * fProgressLightGreenGradient = nil;
 + (NSGradient *) progressLightGreenGradient
 {
     if (!fProgressLightGreenGradient)
-        fProgressLightGreenGradient = [[[self class] progressGradientForRed: 0.62 green: 0.99  blue: 0.58] retain];
+        fProgressLightGreenGradient = [[[self class] progressGradientForRed: 0.62 green: 0.99 blue: 0.58] retain];
     return fProgressLightGreenGradient;
 }
 
@@ -101,7 +101,7 @@ NSGradient * fProgressDarkGreenGradient = nil;
 + (NSGradient *) progressDarkGreenGradient
 {
     if (!fProgressDarkGreenGradient)
-        fProgressDarkGreenGradient = [[[self class] progressGradientForRed: 0.627 green: 0.714  blue: 0.639] retain];
+        fProgressDarkGreenGradient = [[[self class] progressGradientForRed: 0.627 green: 0.714 blue: 0.639] retain];
     return fProgressDarkGreenGradient;
 }
 
@@ -109,7 +109,7 @@ NSGradient * fProgressRedGradient = nil;
 + (NSGradient *) progressRedGradient
 {
     if (!fProgressRedGradient)
-        fProgressRedGradient = [[[self class] progressGradientForRed: 0.902 green: 0.439  blue: 0.451] retain];
+        fProgressRedGradient = [[[self class] progressGradientForRed: 0.902 green: 0.439 blue: 0.451] retain];
     return fProgressRedGradient;
 }
 
@@ -117,7 +117,7 @@ NSGradient * fProgressYellowGradient = nil;
 + (NSGradient *) progressYellowGradient
 {
     if (!fProgressYellowGradient)
-        fProgressYellowGradient = [[[self class] progressGradientForRed: 0.933 green: 0.890  blue: 0.243] retain];
+        fProgressYellowGradient = [[[self class] progressGradientForRed: 0.933 green: 0.890 blue: 0.243] retain];
     return fProgressYellowGradient;
 }
 

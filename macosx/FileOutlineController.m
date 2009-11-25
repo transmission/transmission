@@ -358,7 +358,7 @@ typedef enum
     
     if (action == @selector(setCheck:))
     {
-        if ([fOutline numberOfSelectedRows] <= 0)
+        if ([fOutline numberOfSelectedRows] == 0)
             return NO;
         
         NSIndexSet * indexSet = [fOutline selectedRowIndexes];
@@ -372,7 +372,7 @@ typedef enum
     
     if (action == @selector(setOnlySelectedCheck:))
     {
-        if ([fOutline numberOfSelectedRows] <= 0)
+        if ([fOutline numberOfSelectedRows] == 0)
             return NO;
         
         NSIndexSet * indexSet = [fOutline selectedRowIndexes];
@@ -385,7 +385,7 @@ typedef enum
     
     if (action == @selector(setPriority:))
     {
-        if ([fOutline numberOfSelectedRows] <= 0)
+        if ([fOutline numberOfSelectedRows] == 0)
         {
             [menuItem setState: NSOffState];
             return NO;
@@ -404,13 +404,13 @@ typedef enum
                 break;
             case FILE_PRIORITY_LOW_TAG:
                 priority = TR_PRI_LOW;
+                break;
         }
         
         BOOL current = NO, canChange = NO;
-        NSIndexSet * fileIndexSet;
         for (NSInteger i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
         {
-            fileIndexSet = [[fOutline itemAtRow: i] indexes];
+            NSIndexSet * fileIndexSet = [[fOutline itemAtRow: i] indexes];
             if (![fTorrent canChangeDownloadCheckForFiles: fileIndexSet])
                 continue;
             

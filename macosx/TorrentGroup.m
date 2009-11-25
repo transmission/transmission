@@ -68,7 +68,7 @@
 
 - (CGFloat) uploadRate
 {
-    CGFloat rate = 0.0f;
+    CGFloat rate = 0.0;
     for (Torrent * torrent in fTorrents)
         rate += [torrent uploadRate];
     
@@ -77,7 +77,7 @@
 
 - (CGFloat) downloadRate
 {
-    CGFloat rate = 0.0f;
+    CGFloat rate = 0.0;
     for (Torrent * torrent in fTorrents)
         rate += [torrent downloadRate];
     
