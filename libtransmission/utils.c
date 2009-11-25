@@ -824,10 +824,7 @@ tr_wait( uint64_t delay_milliseconds )
 ***/
 
 int
-tr_snprintf( char *       buf,
-             size_t       buflen,
-             const char * fmt,
-             ... )
+tr_snprintf( char * buf, size_t buflen, const char * fmt, ... )
 {
     int     len;
     va_list args;

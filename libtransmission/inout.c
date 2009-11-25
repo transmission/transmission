@@ -146,28 +146,28 @@ readOrWriteBytes( tr_session       * session,
     if( !err )
     {
         if( ioMode == TR_IO_READ ) {
-            int rc = tr_pread(fd, buf, buflen, fileOffset);
-            if(rc < 0) {
+            const int rc = tr_pread( fd, buf, buflen, fileOffset );
+            if( rc < 0 ) {
                 err = errno;
                 tr_torerr( tor, "read failed for \"%s\": %s",
                            file->name, tr_strerror( err ) );
             }
         } else if( ioMode == TR_IO_PREFETCH ) {
-            int rc = tr_prefetch(fd, fileOffset, buflen);
-            if(rc < 0) {
-                err = errno;
-                tr_torerr( tor, "prefetch failed for \"%s\": %s",
+            const int rc = tr_prefetch( fd, fileOffset, buflen );
+            if( rc < 0 ) {
+                tr_tordbg( tor, "prefetch failed for \"%s\": %s",
                            file->name, tr_strerror( err ) );
             }
         } else if( ioMode == TR_IO_WRITE ) {
-            int rc = tr_pwrite(fd, buf, buflen, fileOffset);
-            if(rc < 0) {
+            const int rc = tr_pwrite( fd, buf, buflen, fileOffset );
+            if( rc < 0 ) {
                 err = errno;
                 tr_torerr( tor, "write failed for \"%s\": %s",
                            file->name, tr_strerror( err ) );
             }
-        } else
+        } else {
             abort();
+        }
     }
 
     return err;
