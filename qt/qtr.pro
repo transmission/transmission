@@ -14,9 +14,7 @@ PKGCONFIG = fontconfig libcurl openssl
 TRANSMISSION_TOP = ..
 INCLUDEPATH += $${TRANSMISSION_TOP}
 LIBS += $${TRANSMISSION_TOP}/libtransmission/libtransmission.a
-exists ( $${TRANSMISSION_TOP}/third-party/dht/libdht.a ) {
-  LIBS += $${TRANSMISSION_TOP}/third-party/dht/libdht.a
-}
+LIBS += $${TRANSMISSION_TOP}/third-party/dht/libdht.a
 LIBS += $${TRANSMISSION_TOP}/third-party/miniupnp/libminiupnp.a
 LIBS += $${TRANSMISSION_TOP}/third-party/libnatpmp/libnatpmp.a
 LIBS += $${TRANSMISSION_TOP}/third-party/libevent/.libs/libevent.a
