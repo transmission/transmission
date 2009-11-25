@@ -1610,6 +1610,7 @@ tr_sessionClose( tr_session * session )
     tr_free( session->resumeDir );
     tr_free( session->torrentDir );
     tr_free( session->downloadDir );
+    tr_free( session->incompleteDir );
     tr_free( session->proxy );
     tr_free( session->proxyUsername );
     tr_free( session->proxyPassword );
