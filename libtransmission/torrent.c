@@ -2116,10 +2116,6 @@ tr_torrentSetAnnounceList( tr_torrent *            tor,
     /* save to the .torrent file */
     if( !tr_bencLoadFile( &metainfo, TR_FMT_BENC, tor->info.torrent ) )
     {
-        int       i;
-        int       prevTier = -1;
-        tr_benc * tier = NULL;
-        tr_benc * announceList;
         tr_info   tmpInfo;
 
         /* remove the old fields */
@@ -2127,14 +2123,24 @@ tr_torrentSetAnnounceList( tr_torrent *            tor,
         tr_bencDictRemove( &metainfo, "announce-list" );
 
         /* add the new fields */
-        tr_bencDictAddStr( &metainfo, "announce", trackers[0].announce );
-        announceList = tr_bencDictAddList( &metainfo, "announce-list", 0 );
-        for( i = 0; i < trackerCount; ++i ) {
-            if( prevTier != trackers[i].tier ) {
-                prevTier = trackers[i].tier;
-                tier = tr_bencListAddList( announceList, 0 );
+        if( trackerCount > 0 )
+        {
+            tr_bencDictAddStr( &metainfo, "announce", trackers[0].announce );
+        }
+        if( trackerCount > 1 )
+        {
+            int i;
+            int prevTier = -1;
+            tr_benc * tier = NULL;
+            tr_benc * announceList = tr_bencDictAddList( &metainfo, "announce-list", 0 );
+
+            for( i=0; i<trackerCount; ++i ) {
+                if( prevTier != trackers[i].tier ) {
+                    prevTier = trackers[i].tier;
+                    tier = tr_bencListAddList( announceList, 0 );
+                }
+                tr_bencListAddStr( tier, trackers[i].announce );
             }
-            tr_bencListAddStr( tier, trackers[i].announce );
         }
 
         /* try to parse it back again, to make sure it's good */
