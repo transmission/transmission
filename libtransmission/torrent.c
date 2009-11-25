@@ -2726,6 +2726,8 @@ refreshCurrentDir( tr_torrent * tor )
 
     if( tor->incompleteDir == NULL )
         dir = tor->downloadDir;
+    else if( !tr_torrentHasMetadata( tor ) ) /* no files to find */
+        dir = tor->incompleteDir;
     else if( !tr_torrentFindFile2( tor, 0, &dir, &sub ) )
         dir = tor->incompleteDir;
 
