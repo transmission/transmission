@@ -806,25 +806,18 @@ gotdrag( GtkWidget         * widget UNUSED,
                 continue;
 
             /* walk past "file://", if present */
-            if( g_str_has_prefix( filename, "file:" ) )
-            {
+            if( g_str_has_prefix( filename, "file:" ) ) {
                 filename += 5;
                 while( g_str_has_prefix( filename, "//" ) )
                     ++filename;
             }
 
-            /* if the file doesn't exist, the first part
-               might be a hostname ... walk past it. */
-            if( !g_file_test( filename, G_FILE_TEST_EXISTS ) )
-            {
-                char * pch = strchr( filename + 1, '/' );
-                if( pch != NULL )
-                    filename = pch;
-            }
+            g_debug( "got from drag: [%s]", filename );
 
-            /* finally, add it to the list of torrents to try adding */
             if( g_file_test( filename, G_FILE_TEST_EXISTS ) )
                 paths = g_slist_prepend( paths, g_strdup( filename ) );
+            else
+                tr_core_add_from_url( data->core, filename );
         }
 
         /* try to add any torrents we found */
