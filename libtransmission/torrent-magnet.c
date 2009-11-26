@@ -193,7 +193,7 @@ tr_torrentSetMetadataPiece( tr_torrent  * tor,
             evbuffer_add_printf( buf, "l" );
             for( i=0; i<tor->info.trackerCount; ++i ) {
                 const char * url = tor->info.trackers[i].announce;
-                evbuffer_add_printf( buf, "l%d:%se", strlen( url ), url );
+                evbuffer_add_printf( buf, "l%zu:%se", strlen( url ), url );
             }
             evbuffer_add_printf( buf, "e" );
             evbuffer_add_printf( buf, "4:info" );
