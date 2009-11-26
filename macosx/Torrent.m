@@ -187,7 +187,6 @@ int trashDataFile(const char * filename)
     [fPreviousFinishedIndexes release];
     [fPreviousFinishedIndexesDate release];
     
-    [fNameString release];
     [fHashString release];
     
     [fIcon release];
@@ -564,7 +563,7 @@ int trashDataFile(const char * filename)
 
 - (NSString *) name
 {
-    return fNameString;
+    return [NSString stringWithUTF8String: fInfo->name];
 }
 
 - (BOOL) isFolder
@@ -696,7 +695,7 @@ int trashDataFile(const char * filename)
 
 - (NSString *) torrentLocation
 {
-    return [NSString stringWithUTF8String: fInfo->torrent];
+    return fInfo->torrent ? [NSString stringWithUTF8String: fInfo->torrent] : @"";
 }
 
 - (NSString *) dataLocation
@@ -1561,7 +1560,6 @@ int trashDataFile(const char * filename)
     tr_torrentSetCompletenessCallback(fHandle, completenessChangeCallback, self);
     tr_torrentSetRatioLimitHitCallback(fHandle, ratioLimitHitCallback, self);
     
-    fNameString = [[NSString alloc] initWithUTF8String: fInfo->name];
     fHashString = [[NSString alloc] initWithUTF8String: fInfo->hashString];
 	
     fFinishedSeeding = NO;

@@ -39,7 +39,7 @@
 
     NSImage * fIcon;
     
-    NSString * fNameString, * fHashString;
+    NSString * fHashString;
     
     tr_file_stat * fFileStat;
     NSArray * fFileList, * fFlatFileList;

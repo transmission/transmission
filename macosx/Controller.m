@@ -1130,7 +1130,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     NSString * urlString = [fURLSheetTextField stringValue];
     
-    if ([urlString compare: @"magnet:" options: (NSAnchoredSearch | NSCaseInsensitiveSearch)])
+    if ([urlString rangeOfString: @"magnet:" options: (NSAnchoredSearch | NSCaseInsensitiveSearch)].location != NSNotFound)
         [self openMagnet: urlString];
     else
     {
@@ -1150,12 +1150,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 urlString = [@"http://" stringByAppendingString: urlString];
         }
         
-        
-        else
-        {
-            NSURL * url = [NSURL URLWithString: urlString];
-            [self performSelectorOnMainThread: @selector(openURL:) withObject: url waitUntilDone: NO];
-        }
+        NSURL * url = [NSURL URLWithString: urlString];
+        [self performSelectorOnMainThread: @selector(openURL:) withObject: url waitUntilDone: NO];
     }
 }
 
