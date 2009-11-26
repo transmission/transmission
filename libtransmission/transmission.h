@@ -1580,9 +1580,9 @@ enum
     TR_PEER_FROM_INCOMING  = 0,  /* connections made to the listening port */
     TR_PEER_FROM_TRACKER   = 1,  /* peers received from a tracker */
     TR_PEER_FROM_DHT       = 2,  /* peers learnt from the DHT */
-    TR_PEER_FROM_CACHE     = 3,  /* peers read from the peer cache */
+    TR_PEER_FROM_RESUME    = 3,  /* peers read from the .resume file */
     TR_PEER_FROM_PEX       = 4,  /* peers discovered via PEX */
-    TR_PEER_FROM_ALT       = 5,  /* alternate peer address */
+    TR_PEER_FROM_LTEP      = 5,  /* peer address provided in an LTEP handshake */
     TR_PEER_FROM__MAX
 };
 

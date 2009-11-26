@@ -514,7 +514,7 @@ addField( const tr_torrent * tor, tr_benc * d, const char * key )
     {
         tr_benc *   tmp = tr_bencDictAddDict( d, key, 4 );
         const int * f = st->peersFrom;
-        tr_bencDictAddInt( tmp, "fromCache",    f[TR_PEER_FROM_CACHE] );
+        tr_bencDictAddInt( tmp, "fromCache",    f[TR_PEER_FROM_RESUME] );
         tr_bencDictAddInt( tmp, "fromIncoming", f[TR_PEER_FROM_INCOMING] );
         tr_bencDictAddInt( tmp, "fromPex",      f[TR_PEER_FROM_PEX] );
         tr_bencDictAddInt( tmp, "fromTracker",  f[TR_PEER_FROM_TRACKER] );

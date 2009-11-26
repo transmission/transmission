@@ -984,13 +984,13 @@ parseLtepHandshake( tr_peermsgs *     msgs,
     if( tr_bencDictFindRaw( &val, "ipv4", &addr, &addr_len) && addr_len == 4 ) {
         pex.addr.type = TR_AF_INET;
         memcpy( &pex.addr.addr.addr4, addr, 4 );
-        tr_peerMgrAddPex( msgs->torrent, TR_PEER_FROM_ALT, &pex );
+        tr_peerMgrAddPex( msgs->torrent, TR_PEER_FROM_LTEP, &pex );
     }
 
     if( tr_bencDictFindRaw( &val, "ipv6", &addr, &addr_len) && addr_len == 16 ) {
         pex.addr.type = TR_AF_INET6;
         memcpy( &pex.addr.addr.addr6, addr, 16 );
-        tr_peerMgrAddPex( msgs->torrent, TR_PEER_FROM_ALT, &pex );
+        tr_peerMgrAddPex( msgs->torrent, TR_PEER_FROM_LTEP, &pex );
     }
 
     /* get peer's maximum request queue size */
