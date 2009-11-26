@@ -1146,7 +1146,7 @@ int trashDataFile(const char * filename)
 
 - (NSInteger) totalPeersCache
 {
-    return fStat->peersFrom[TR_PEER_FROM_CACHE];
+    return fStat->peersFrom[TR_PEER_FROM_RESUME];
 }
 
 - (NSInteger) totalPeersPex

@@ -1020,7 +1020,7 @@ typedef enum
             case TR_PEER_FROM_INCOMING:
                 [components addObject: NSLocalizedString(@"From: incoming connection", "Inspector -> Peers tab -> table row tooltip")];
                 break;
-            case TR_PEER_FROM_CACHE:
+            case TR_PEER_FROM_RESUME:
                 [components addObject: NSLocalizedString(@"From: cache", "Inspector -> Peers tab -> table row tooltip")];
                 break;
             case TR_PEER_FROM_PEX:
