@@ -393,12 +393,25 @@ compareByTracker( GtkTreeModel * model,
                   GtkTreeIter  * b,
                   gpointer       user_data UNUSED )
 {
-    const tr_torrent *ta, *tb;
+    const tr_torrent * ta;
+    const tr_torrent * tb;
+    const tr_info * aInf;
+    const tr_info * bInf;
+    const char * aTracker;
+    const char * bTracker;
 
     gtk_tree_model_get( model, a, MC_TORRENT_RAW, &ta, -1 );
     gtk_tree_model_get( model, b, MC_TORRENT_RAW, &tb, -1 );
-    return strcmp( tr_torrentInfo( ta )->trackers[0].announce,
-                   tr_torrentInfo( tb )->trackers[0].announce );
+
+    aInf = tr_torrentInfo( ta );
+    bInf = tr_torrentInfo( tb );
+    aTracker = aInf->trackerCount > 0 ? aInf->trackers[0].announce : NULL;
+    bTracker = bInf->trackerCount > 0 ? bInf->trackers[0].announce : NULL;
+
+    if( !aTracker && !bTracker ) return 0;
+    if( !aTracker ) return -1;
+    if( !bTracker ) return 1;
+    return strcmp( aTracker, bTracker );
 }
 
 static void

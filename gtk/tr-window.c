@@ -365,7 +365,7 @@ alt_speed_toggled_cb( GtkToggleButton * button, gpointer vprivate )
 
 static int
 checkFilterText( filter_text_mode_t    filter_text_mode,
-                 const tr_info       * torInfo,
+                 const tr_info       * inf,
                  const char          * text )
 {
     tr_file_index_t i;
@@ -375,22 +375,25 @@ checkFilterText( filter_text_mode_t    filter_text_mode,
     switch( filter_text_mode )
     {
         case FILTER_TEXT_MODE_FILES:
-            for( i = 0; i < torInfo->fileCount && !ret; ++i )
+            for( i = 0; i < inf->fileCount && !ret; ++i )
             {
-                pch = g_utf8_casefold( torInfo->files[i].name, -1 );
+                pch = g_utf8_casefold( inf->files[i].name, -1 );
                 ret = !text || strstr( pch, text ) != NULL;
                 g_free( pch );
             }
             break;
 
         case FILTER_TEXT_MODE_TRACKER:
-            pch = g_utf8_casefold( torInfo->trackers[0].announce, -1 );
-            ret = !text || ( strstr( pch, text ) != NULL );
-            g_free( pch );
+            if( inf->trackerCount > 0 )
+            {
+                pch = g_utf8_casefold( inf->trackers[0].announce, -1 );
+                ret = !text || ( strstr( pch, text ) != NULL );
+                g_free( pch );
+            }
             break;
 
         default: /* NAME */
-            pch = g_utf8_casefold( torInfo->name, -1 );
+            pch = g_utf8_casefold( inf->name, -1 );
             ret = !text || ( strstr( pch, text ) != NULL );
             g_free( pch );
             break;
