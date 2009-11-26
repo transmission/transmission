@@ -1571,7 +1571,8 @@ int trashDataFile(const char * filename)
     fWaitToStart = waitToStart && [waitToStart boolValue];
     fResumeOnWake = NO;
 	
-    [self createFileList];
+    if (![self isMagnet])
+        [self createFileList];
 	
     fGroupValue = groupValue ? [groupValue intValue] : [[GroupsController groups] groupIndexForTorrent: self]; 
     
@@ -1586,6 +1587,8 @@ int trashDataFile(const char * filename)
 
 - (void) createFileList
 {
+    NSAssert(![self isMagnet], @"Cannot create a file list until the torrent is demagnetized");
+    
     if ([self isFolder])
     {
         NSInteger count = [self fileCount];
