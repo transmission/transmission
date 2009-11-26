@@ -32,7 +32,6 @@
 @interface CreatorWindowController (Private)
 
 + (NSString *) chooseFile;
-- (void) updateEnableOpenCheckForTrackers;
 - (void) locationSheetClosed: (NSSavePanel *) openPanel returnCode: (NSInteger) code contextInfo: (void *) info;
 
 - (void) createBlankAddressAlertDidEnd: (NSAlert *) alert returnCode: (NSInteger) returnCode contextInfo: (void *) contextInfo;
@@ -178,8 +177,7 @@
     if ([fDefaults objectForKey: @"CreatorPrivate"])
         [fPrivateCheck setState: [fDefaults boolForKey: @"CreatorPrivate"] ? NSOnState : NSOffState];
     
-    fOpenTorrent = [fDefaults boolForKey: @"CreatorOpen"];
-    [self updateEnableOpenCheckForTrackers];
+    [fOpenCheck setState: [fDefaults boolForKey: @"CreatorOpen"] ? NSOnState : NSOffState];
 }
 
 - (void) dealloc
@@ -195,11 +193,6 @@
     [fTimer invalidate];
     
     [super dealloc];
-}
-
-- (void) toggleOpenCheck: (id) sender
-{
-    fOpenTorrent = [fOpenCheck state] == NSOnState;
 }
 
 - (void) setLocation: (id) sender
@@ -224,13 +217,22 @@
     if ([fTrackerTable editedRow] != -1)
         [[self window] endEditingFor: fTrackerTable];
     
-    if ([fTrackers count] == 0 && [fDefaults boolForKey: @"WarningCreatorBlankAddress"])
+    const BOOL isPrivate = [fPrivateCheck state] == NSOnState;
+    if ([fTrackers count] == 0
+        && [fDefaults boolForKey: isPrivate ? @"WarningCreatorPrivateBlankAddress" : @"WarningCreatorBlankAddress"])
     {
         NSAlert * alert = [[NSAlert alloc] init];
-        [alert setMessageText: NSLocalizedString(@"There is no tracker address.", "Create torrent -> blank address -> title")];
-        [alert setInformativeText: NSLocalizedString(@"The torrent file will not be able to be opened."
-            " A torrent file with no tracker address is only useful when you plan to upload the file to a tracker website"
-            " that will add the address for you.", "Create torrent -> blank address -> message")];
+        [alert setMessageText: NSLocalizedString(@"There are no tracker addresses.", "Create torrent -> blank address -> title")];
+        
+        NSString * infoString = isPrivate
+                    ? NSLocalizedString(@"A transfer marked as private with no tracker addresses will be unable to connect to peers."
+                        " The torrent file will only be useful if you plan to upload the file to a tracker website"
+                        " that will add the addresses for you.", "Create torrent -> blank address -> message")
+                    : NSLocalizedString(@"The transfer will not contact trackers for peers,"
+                        " and will have to rely solely on DHT and PEX to download and seed.",
+                        "Create torrent -> blank address -> message");
+        
+        [alert setInformativeText: infoString];
         [alert addButtonWithTitle: NSLocalizedString(@"Create", "Create torrent -> blank address -> button")];
         [alert addButtonWithTitle: NSLocalizedString(@"Cancel", "Create torrent -> blank address -> button")];
         [alert setShowsSuppressionButton: YES];
@@ -280,8 +282,6 @@
         
         [fTrackerTable deselectAll: self];
         [fTrackerTable reloadData];
-        
-        [self updateEnableOpenCheckForTrackers];
     }
     else
     {
@@ -310,10 +310,7 @@
         [fTrackers removeObjectAtIndex: row];
     }
     else
-    {
         [fTrackers replaceObjectAtIndex: row withObject: tracker];
-        [self updateEnableOpenCheckForTrackers];
-    }
     
     [fTrackerTable deselectAll: self];
     [fTrackerTable reloadData];
@@ -345,13 +342,6 @@
     return success ? [[panel filenames] objectAtIndex: 0] : nil;
 }
 
-- (void) updateEnableOpenCheckForTrackers
-{
-    BOOL hasTracker = [fTrackers count] > 0;
-    [fOpenCheck setEnabled: hasTracker];
-    [fOpenCheck setState: (fOpenTorrent && hasTracker) ? NSOnState : NSOffState];
-}
-
 - (void) locationSheetClosed: (NSSavePanel *) panel returnCode: (NSInteger) code contextInfo: (void *) info
 {
     if (code == NSOKButton)
@@ -367,7 +357,11 @@
 - (void) createBlankAddressAlertDidEnd: (NSAlert *) alert returnCode: (NSInteger) returnCode contextInfo: (void *) contextInfo
 {
     if ([[alert suppressionButton] state] == NSOnState)
-        [[NSUserDefaults standardUserDefaults] setBool: NO forKey: @"WarningCreatorBlankAddress"];
+    {
+        [[NSUserDefaults standardUserDefaults] setBool: NO forKey: @"WarningCreatorBlankAddress"]; //set regardless of private/public
+        if ([fPrivateCheck state] == NSOnState)
+            [[NSUserDefaults standardUserDefaults] setBool: NO forKey: @"WarningCreatorPrivateBlankAddress"];
+    }
     
     [alert release];
     
@@ -428,7 +422,7 @@
     //store values
     [fDefaults setObject: fTrackers forKey: @"CreatorTrackers"];
     [fDefaults setBool: [fPrivateCheck state] == NSOnState forKey: @"CreatorPrivate"];
-    [fDefaults setBool: fOpenTorrent forKey: @"CreatorOpen"];
+    [fDefaults setBool: [fOpenCheck state] == NSOnState forKey: @"CreatorOpen"];
     [fDefaults setObject: [fLocation stringByDeletingLastPathComponent] forKey: @"CreatorLocation"];
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"BeginCreateTorrentFile" object: fLocation userInfo: nil];
@@ -451,7 +445,7 @@
         switch (fInfo->result)
         {
             case TR_MAKEMETA_OK:
-                if (fOpenTorrent && [fTrackers count] > 0)
+                if ([fDefaults boolForKey: @"CreatorOpen"])
                 {
                     NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys: fLocation, @"File",
                                             [fPath stringByDeletingLastPathComponent], @"Path", nil];

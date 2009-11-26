@@ -41,7 +41,6 @@
     tr_metainfo_builder * fInfo;
     NSString * fPath, * fLocation;
     NSMutableArray * fTrackers;
-    BOOL fOpenTorrent;
     
     NSTimer * fTimer;
     BOOL fStarted;
@@ -53,8 +52,6 @@
 + (void) createTorrentFile: (tr_session *) handle forFile: (NSString *) file;
 
 - (id) initWithHandle: (tr_session *) handle path: (NSString *) path;
-
-- (void) toggleOpenCheck: (id) sender;
 
 - (void) setLocation: (id) sender;
 - (void) create: (id) sender;

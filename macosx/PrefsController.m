@@ -681,6 +681,7 @@ tr_session * fHandle;
     [fDefaults removeObjectForKey: @"WarningFolderDataSameName"];
     [fDefaults removeObjectForKey: @"WarningResetStats"];
     [fDefaults removeObjectForKey: @"WarningCreatorBlankAddress"];
+    [fDefaults removeObjectForKey: @"WarningCreatorPrivateBlankAddress"];
     [fDefaults removeObjectForKey: @"WarningRemoveTrackers"];
     [fDefaults removeObjectForKey: @"WarningInvalidOpen"];
     [fDefaults removeObjectForKey: @"WarningDonate"];

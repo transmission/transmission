@@ -182,6 +182,8 @@
 	<false/>
 	<key>WarningCreatorBlankAddress</key>
 	<true/>
+	<key>WarningCreatorPrivateBlankAddress</key>
+	<true/>
 	<key>WarningDonate</key>
 	<true/>
 	<key>WarningDuplicate</key>
