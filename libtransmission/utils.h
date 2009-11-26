@@ -19,7 +19,7 @@
 #include <stdio.h> /* FILE* */
 #include <string.h> /* memcpy()* */
 #include <stdlib.h> /* malloc() */
-#include <time.h> /* time_t* */
+#include <time.h> /* time_t */
 
 #include "transmission.h"
 
@@ -429,6 +429,20 @@ int tr_moveFile( const char * oldpath, const char * newpath,
 
 void tr_removeElementFromArray( void * array, int index_to_remove,
                                 size_t sizeof_element, size_t nmemb );
+
+/***
+****
+***/
+
+extern time_t transmission_now;
+
+static TR_INLINE time_t tr_time( void ) { return transmission_now; }
+
+void tr_timeUpdate( time_t now );
+
+/***
+****
+***/
 
 #ifdef __cplusplus
 }

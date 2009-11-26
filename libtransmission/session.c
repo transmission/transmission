@@ -628,6 +628,22 @@ tr_sessionInit( const char  * tag,
 static void useAltSpeed( tr_session * session, tr_bool enabled, tr_bool byUser );
 static void useAltSpeedTime( tr_session * session, tr_bool enabled, tr_bool byUser );
 
+static void 
+onNowTimer( int foo UNUSED, short bar UNUSED, void * vsession ) 
+{ 
+    struct timeval tv; 
+    tr_session * session = vsession; 
+
+    assert( tr_isSession( session ) ); 
+    assert( session->nowTimer != NULL ); 
+
+    /* schedule the next timer for right after the next second begins */ 
+    gettimeofday( &tv, NULL ); 
+    tr_timerAdd( session->nowTimer, 0, 1000000 - tv.tv_usec ); 
+    tr_timeUpdate( tv.tv_sec );
+    /* fprintf( stderr, "time %zu sec, %zu microsec\n", (size_t)tr_time(), (size_t)tv.tv_usec );  */
+}
+
 static void
 tr_sessionInitImpl( void * vdata )
 {
@@ -645,6 +661,10 @@ tr_sessionInitImpl( void * vdata )
     tr_bencInitDict( &settings, 0 );
     tr_sessionGetDefaultSettings( data->configDir, &settings );
     tr_bencMergeDicts( &settings, clientSettings );
+
+    session->nowTimer = tr_new0( struct event, 1 ); 
+    evtimer_set( session->nowTimer, onNowTimer, session ); 
+    onNowTimer( 0, 0, session );
 
 #ifndef WIN32
     /* Don't exit when writing on a broken socket */
@@ -1515,6 +1535,10 @@ sessionCloseImpl( void * vsession )
     evtimer_del( session->saveTimer );
     tr_free( session->saveTimer );
     session->saveTimer = NULL;
+
+    evtimer_del( session->nowTimer );
+    tr_free( session->nowTimer );
+    session->nowTimer = NULL;
 
     evtimer_del( session->altTimer );
     tr_free( session->altTimer );

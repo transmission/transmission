@@ -671,8 +671,8 @@ torrentInit( tr_torrent * tor, const tr_ctor * ctor )
 
     tr_torrentUncheck( tor );
 
-    tr_torrentSetAddedDate( tor, time( NULL ) ); /* this is a default value to be
-                                                    overwritten by the resume file */
+    tr_torrentSetAddedDate( tor, tr_time( ) ); /* this is a default value to be
+                                                  overwritten by the resume file */
 
     torrentInitFromInfo( tor );
     loaded = tr_torrentLoadResume( tor, ~0, ctor );
@@ -891,7 +891,7 @@ tr_torrentInfo( const tr_torrent * tor )
 const tr_stat *
 tr_torrentStatCached( tr_torrent * tor )
 {
-    const time_t now = time( NULL );
+    const time_t now = tr_time( );
 
     return tr_isTorrent( tor ) && ( now == tor->lastStatTime )
          ? &tor->stats
@@ -905,7 +905,7 @@ tr_torrentSetVerifyState( tr_torrent * tor, tr_verify_state state )
     assert( state==TR_VERIFY_NONE || state==TR_VERIFY_WAIT || state==TR_VERIFY_NOW );
 
     tor->verifyState = state;
-    tor->anyDate = time( NULL );
+    tor->anyDate = tr_time( );
 }
 
 tr_torrent_activity
@@ -943,7 +943,7 @@ tr_torrentStat( tr_torrent * tor )
     assert( tr_isTorrent( tor ) );
     tr_torrentLock( tor );
 
-    tor->lastStatTime = time( NULL );
+    tor->lastStatTime = tr_time( );
 
     s = &tor->stats;
     s->id = tor->uniqueId;
@@ -1354,7 +1354,7 @@ checkAndStartImpl( void * vtor )
     }
     else
     {
-        const time_t now = time( NULL );
+        const time_t now = tr_time( );
         tor->isRunning = TRUE;
         tor->needsSeedRatioCheck = TRUE;
         tor->error = TR_STAT_OK;
@@ -1533,7 +1533,7 @@ closeTorrent( void * vtor )
 
     d = tr_bencListAddDict( &tor->session->removedTorrents, 2 );
     tr_bencDictAddInt( d, "id", tor->uniqueId );
-    tr_bencDictAddInt( d, "date", time( NULL ) );
+    tr_bencDictAddInt( d, "date", tr_time( ) );
 
     stopTorrent( tor );
 
@@ -1682,7 +1682,7 @@ tr_torrentRecheckCompleteness( tr_torrent * tor )
         {
             tr_announcerTorrentCompleted( tor );
 
-            tor->doneDate = tor->anyDate = time( NULL );
+            tor->doneDate = tor->anyDate = tr_time( );
         }
 
         tr_torrentSetDirty( tor );

@@ -113,7 +113,7 @@ tr_statsInit( tr_session * session )
 
     loadCumulativeStats( session, &stats->old );
     stats->single.sessionCount = 1;
-    stats->startTime = time( NULL );
+    stats->startTime = tr_time( );
     session->sessionStats = stats;
 }
 
@@ -167,7 +167,7 @@ tr_sessionGetStats( const tr_session * session,
     if( stats )
     {
         *setme = stats->single;
-        setme->secondsActive = time( NULL ) - stats->startTime;
+        setme->secondsActive = tr_time( ) - stats->startTime;
         updateRatio( setme );
     }
 }
@@ -199,7 +199,7 @@ tr_sessionClearStats( tr_session * session )
     zero.secondsActive = 0;
 
     session->sessionStats->single = session->sessionStats->old = zero;
-    session->sessionStats->startTime = time( NULL );
+    session->sessionStats->startTime = tr_time( );
 }
 
 /**

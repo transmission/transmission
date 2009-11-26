@@ -391,7 +391,7 @@ tierNew( tr_torrent * tor )
 {
     tr_tier * t;
     static int nextKey = 1;
-    const time_t now = time( NULL );
+    const time_t now = tr_time( );
 
     t = tr_new0( tr_tier, 1 );
     t->key = nextKey++;
@@ -817,7 +817,7 @@ static tr_bool
 tierCanManualAnnounce( const tr_tier * tier )
 {
     return tier->isRunning
-        && tier->manualAnnounceAllowedAt <= time( NULL );
+        && tier->manualAnnounceAllowedAt <= tr_time( );
 }
 
 tr_bool
@@ -900,22 +900,22 @@ torrentSetNextAnnounce( tr_torrent * tor, const char * announceEvent, time_t ann
 void
 tr_announcerManualAnnounce( tr_torrent * tor )
 {
-    torrentSetNextAnnounce( tor, "manual", time( NULL ) );
+    torrentSetNextAnnounce( tor, "manual", tr_time( ) );
 }
 void
 tr_announcerTorrentStarted( tr_torrent * tor )
 {
-    torrentSetNextAnnounce( tor, "started", time( NULL ) );
+    torrentSetNextAnnounce( tor, "started", tr_time( ) );
 }
 void
 tr_announcerTorrentStopped( tr_torrent * tor )
 {
-    torrentSetNextAnnounce( tor, "stopped", time( NULL ) );
+    torrentSetNextAnnounce( tor, "stopped", tr_time( ) );
 }
 void
 tr_announcerTorrentCompleted( tr_torrent * tor )
 {
-    torrentSetNextAnnounce( tor, "completed", time( NULL ) );
+    torrentSetNextAnnounce( tor, "completed", tr_time( ) );
 }
 void
 tr_announcerChangeMyPort( tr_torrent * tor )
@@ -980,7 +980,7 @@ compareTiers( const void * va, const void * vb )
 
     /* working domains come before non-working */
     if( !ret ) {
-        const time_t now = time( NULL );
+        const time_t now = tr_time( );
         af = tierIsNotResponding( a, now );
         bf = tierIsNotResponding( b, now );
         if( af != bf )
@@ -1356,7 +1356,7 @@ tierAnnounce( tr_announcer * announcer, tr_tier * tier )
     char * url;
     struct announce_data * data;
     const tr_torrent * tor = tier->tor;
-    const time_t now = time( NULL );
+    const time_t now = tr_time( );
 
     assert( !tier->isAnnouncing );
 
@@ -1452,7 +1452,7 @@ onScrapeDone( tr_session   * session,
     tr_announcer * announcer = session->announcer;
     struct announce_data * data = vdata;
     tr_tier * tier = getTier( announcer, data->torrentId, data->tierId );
-    const time_t now = time( NULL );
+    const time_t now = tr_time( );
     tr_bool success = FALSE;
 
     if( announcer )
@@ -1528,7 +1528,7 @@ tierScrape( tr_announcer * announcer, tr_tier * tier )
     const char * scrape;
     struct evbuffer * buf;
     struct announce_data * data;
-    const time_t now = time( NULL );
+    const time_t now = tr_time( );
 
     assert( tier );
     assert( !tier->isScraping );
@@ -1597,7 +1597,7 @@ announceMore( tr_announcer * announcer )
     const tr_bool canAnnounce = announcer->announceSlotsAvailable > 0;
     const tr_bool canScrape = announcer->scrapeSlotsAvailable > 0;
     tr_torrent * tor = NULL;
-    const time_t now = time( NULL );
+    const time_t now = tr_time( );
 
     if( announcer->announceSlotsAvailable > 0 )
     {
@@ -1705,7 +1705,7 @@ tr_announcerStats( const tr_torrent * torrent,
     int out = 0;
     int tierCount;
     tr_tracker_stat * ret;
-    const time_t now = time( NULL );
+    const time_t now = tr_time( );
 
     assert( tr_isTorrent( torrent ) );
 

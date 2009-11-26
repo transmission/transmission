@@ -57,7 +57,7 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
     tr_piece_index_t pieceIndex = 0;
     const int64_t buflen = tor->info.pieceSize;
     uint8_t * buffer = tr_new( uint8_t, buflen );
-    const time_t begin = time( NULL );
+    const time_t begin = tr_time( );
     time_t end;
 
     SHA1_Init( &sha );
@@ -127,7 +127,7 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
                 changed = TRUE;
             }
             tr_torrentSetPieceChecked( tor, pieceIndex, TRUE );
-            now = time( NULL );
+            now = tr_time( );
             tor->anyDate = now;
 
             /* sleeping even just a few msec per second goes a long
@@ -159,7 +159,7 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
     tr_free( buffer );
 
     /* stopwatch */
-    end = time( NULL );
+    end = tr_time( );
     tr_tordbg( tor, "it took %d seconds to verify %"PRIu64" bytes (%"PRIu64" bytes per second)",
                (int)(end-begin), tor->info.totalSize, (uint64_t)(tor->info.totalSize/(1+(end-begin))) );
 

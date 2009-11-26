@@ -150,7 +150,7 @@ getTorrents( tr_session * session,
         if( !strcmp( str, "recently-active" ) )
         {
             tr_torrent * tor = NULL;
-            const time_t now = time( NULL );
+            const time_t now = tr_time( );
             const time_t window = RECENTLY_ACTIVE_SECONDS;
             const int n = tr_sessionCountTorrents( session );
             torrents = tr_new0( tr_torrent *, n );
@@ -625,7 +625,7 @@ torrentGet( tr_session               * session,
     if( tr_bencDictFindStr( args_in, "ids", &strVal ) && !strcmp( strVal, "recently-active" ) ) {
         int n = 0;
         tr_benc * d;
-        const time_t now = time( NULL );
+        const time_t now = tr_time( );
         const int interval = RECENTLY_ACTIVE_SECONDS;
         tr_benc * removed_out = tr_bencDictAddList( args_out, "removed", 0 );
         while(( d = tr_bencListChild( &session->removedTorrents, n++ ))) {

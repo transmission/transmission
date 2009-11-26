@@ -130,6 +130,7 @@ struct tr_session
     tr_benc                    * metainfoLookup;
 
     struct event               * altTimer;
+    struct event               * nowTimer;
     struct event               * saveTimer;
 
     /* monitors the "global pool" speeds */

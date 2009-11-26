@@ -783,7 +783,7 @@ void
 tr_peerMsgsSetChoke( tr_peermsgs * msgs,
                      int           choke )
 {
-    const time_t now = time( NULL );
+    const time_t now = tr_time( );
     const time_t fibrillationTime = now - MIN_CHOKE_PERIOD_SEC;
 
     assert( msgs );
@@ -1996,7 +1996,7 @@ static int
 peerPulse( void * vmsgs )
 {
     tr_peermsgs * msgs = vmsgs;
-    const time_t  now = time( NULL );
+    const time_t  now = tr_time( );
 
     if ( tr_isPeerIo( msgs->peer->io ) ) {
         updateDesiredRequestCount( msgs, now );
@@ -2325,7 +2325,7 @@ sendPex( tr_peermsgs * msgs )
         tr_free( diffs6.dropped );
         tr_free( newPex6 );
 
-        /*msgs->clientSentPexAt = time( NULL );*/
+        /*msgs->clientSentPexAt = tr_time( );*/
     }
 }
 

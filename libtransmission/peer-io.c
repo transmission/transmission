@@ -385,7 +385,7 @@ tr_peerIoNew( tr_session       * session,
     io->socket = socket;
     io->isIncoming = isIncoming != 0;
     io->hasFinishedConnecting = FALSE;
-    io->timeCreated = time( NULL );
+    io->timeCreated = tr_time( );
     io->inbuf = evbuffer_new( );
     io->outbuf = evbuffer_new( );
     tr_bandwidthConstruct( &io->bandwidth, session, parent );

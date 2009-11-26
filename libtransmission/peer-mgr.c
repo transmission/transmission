@@ -408,7 +408,7 @@ removePeer( Torrent * t, tr_peer * peer )
     assert( torrentIsLocked( t ) );
     assert( atom );
 
-    atom->time = time( NULL );
+    atom->time = tr_time( );
 
     removed = tr_ptrArrayRemoveSorted( &t->peers, peer, peerCompare );
     assert( removed == peer );
@@ -916,7 +916,7 @@ tr_peerMgrGetNextRequests( tr_torrent           * tor,
     Torrent * t;
     struct weighted_piece * pieces;
     const tr_bitset * have = &peer->have;
-    const time_t now = time( NULL );
+    const time_t now = tr_time( );
 
     /* sanity clause */
     assert( tr_isTorrent( tor ) );
@@ -1032,7 +1032,7 @@ refillUpkeep( void * vmgr )
     tr_peerMgr * mgr = vmgr;
     managerLock( mgr );
 
-    now = time( NULL );
+    now = tr_time( );
     too_old = now - REQUEST_TTL_SECS;
 
     tor = NULL;
@@ -1215,7 +1215,7 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
 
         case TR_PEER_PEER_GOT_DATA:
         {
-            const time_t now = time( NULL );
+            const time_t now = tr_time( );
             tr_torrent * tor = t->tor;
 
             tr_torrentSetActivityDate( tor, now );
@@ -1263,7 +1263,7 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
 
         case TR_PEER_CLIENT_GOT_DATA:
         {
-            const time_t now = time( NULL );
+            const time_t now = tr_time( );
             tr_torrent * tor = t->tor;
 
             tr_torrentSetActivityDate( tor, now );
@@ -1410,7 +1410,6 @@ getDefaultShelfLife( uint8_t from )
 
 static void
 ensureAtomExists( Torrent           * t,
-                  const time_t        now,
                   const tr_address  * addr,
                   const tr_port       port,
                   const uint8_t       flags,
@@ -1429,7 +1428,7 @@ ensureAtomExists( Torrent           * t,
         a->port = port;
         a->flags = flags;
         a->from = from;
-        a->shelf_date = now + getDefaultShelfLife( from ) + jitter;
+        a->shelf_date = tr_time( ) + getDefaultShelfLife( from ) + jitter;
         tr_ptrArrayInsertSorted( &t->pool, a, compareAtomsByAddress );
 
         tordbg( t, "got a new atom: %s", tr_atomAddrStr( a ) );
@@ -1500,11 +1499,10 @@ myHandshakeDoneCB( tr_handshake  * handshake,
     else /* looking good */
     {
         struct peer_atom * atom;
-        const time_t now = time( NULL );
 
-        ensureAtomExists( t, now, addr, port, 0, TR_PEER_FROM_INCOMING );
+        ensureAtomExists( t, addr, port, 0, TR_PEER_FROM_INCOMING );
         atom = getExistingAtom( t, addr );
-        atom->time = now;
+        atom->time = tr_time( );
         atom->piece_data_time = 0;
 
         if( atom->myflags & MYFLAG_BANNED )
@@ -1614,7 +1612,7 @@ tr_peerMgrAddPex( tr_torrent   *  tor,
 
         if( !tr_sessionIsAddressBlocked( t->manager->session, &pex->addr ) )
             if( tr_isValidPeerAddress( &pex->addr, pex->port ) )
-                ensureAtomExists( t, time( NULL ), &pex->addr, pex->port, pex->flags, from );
+                ensureAtomExists( t, &pex->addr, pex->port, pex->flags, from );
 
         managerUnlock( t->manager );
     }
@@ -2596,7 +2594,7 @@ reconnectTorrent( Torrent * t )
 {
     static time_t prevTime = 0;
     static int    newConnectionsThisSecond = 0;
-    const time_t  now = time( NULL );
+    const time_t  now = tr_time( );
 
     if( prevTime != now )
     {
@@ -3037,7 +3035,7 @@ atomPulse( void * vmgr )
             /* if there's room, keep the best of what's left */
             i = 0;
             if( keepCount < maxAtomCount ) {
-                tr_now = time( NULL );
+                tr_now = tr_time( );
                 qsort( test, testCount, sizeof( struct peer_atom * ), compareAtomPtrsByShelfDate );
                 while( i<testCount && keepCount<maxAtomCount )
                     keep[keepCount++] = test[i++];

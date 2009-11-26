@@ -92,7 +92,7 @@ struct tr_rpc_server
 static char*
 get_current_session_id( struct tr_rpc_server * server )
 {
-    const time_t now = time( NULL );
+    const time_t now = tr_time( );
 
     if( !server->sessionId || ( now >= server->sessionIdExpiresAt ) )
     {
@@ -422,7 +422,7 @@ serve_file( struct evhttp_request * req,
         else
         {
             struct evbuffer * out;
-            const time_t now = time( NULL );
+            const time_t now = tr_time( );
 
             errno = error;
             out = evbuffer_new( );

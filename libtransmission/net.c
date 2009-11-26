@@ -612,7 +612,7 @@ tr_globalIPv6( void )
     static unsigned char ipv6[16];
     static time_t last_time = 0;
     static int have_ipv6 = 0;
-    const time_t now = time( NULL );
+    const time_t now = tr_time( );
 
     /* Re-check every half hour */
     if( last_time < now - 1800 )

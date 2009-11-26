@@ -44,6 +44,7 @@
 #include "platform.h"
 #include "version.h"
 
+
 static tr_lock *      messageLock = NULL;
 static int            messageLevel = 0;
 static tr_bool        messageQueuing = FALSE;
@@ -55,6 +56,23 @@ static tr_msg_list ** messageQueueTail = &messageQueue;
     static int IsDebuggerPresent( void ) { return FALSE; }
     static void OutputDebugString( const void * unused UNUSED ) { }
 #endif
+
+/***
+****
+***/
+
+time_t transmission_now = 0;
+
+void
+tr_timeUpdate( time_t now )
+{
+    transmission_now = now;
+}
+
+/***
+****
+***/
+
 
 static void
 tr_msgInit( void )
@@ -201,15 +219,13 @@ char*
 tr_getLogTimeStr( char * buf, int buflen )
 {
     char           tmp[64];
-    time_t         now;
     struct tm      now_tm;
     struct timeval tv;
     int            milliseconds;
 
-    now = time( NULL );
     gettimeofday( &tv, NULL );
 
-    tr_localtime_r( &now, &now_tm );
+    tr_localtime_r( &tv.tv_sec, &now_tm );
     strftime( tmp, sizeof( tmp ), "%H:%M:%S", &now_tm );
     milliseconds = (int)( tv.tv_usec / 1000 );
     tr_snprintf( buf, buflen, "%s.%03d", tmp, milliseconds );
@@ -325,7 +341,7 @@ tr_msg( const char * file, int line,
                 tr_msg_list * newmsg;
                 newmsg = tr_new0( tr_msg_list, 1 );
                 newmsg->level = level;
-                newmsg->when = time( NULL );
+                newmsg->when = tr_time( );
                 newmsg->message = tr_strdup( buf );
                 newmsg->file = file;
                 newmsg->line = line;

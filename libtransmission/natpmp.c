@@ -99,13 +99,13 @@ tr_natpmpClose( tr_natpmp * nat )
 static int
 canSendCommand( const struct tr_natpmp * nat )
 {
-    return time( NULL ) >= nat->commandTime;
+    return tr_time( ) >= nat->commandTime;
 }
 
 static void
 setCommandTime( struct tr_natpmp * nat )
 {
-    nat->commandTime = time( NULL ) + COMMAND_WAIT_SECS;
+    nat->commandTime = tr_time( ) + COMMAND_WAIT_SECS;
 }
 
 int
@@ -189,7 +189,7 @@ tr_natpmpPulse( struct tr_natpmp * nat,
         if( isEnabled && !nat->isMapped && nat->hasDiscovered )
             nat->state = TR_NATPMP_SEND_MAP;
 
-        else if( nat->isMapped && time( NULL ) >= nat->renewTime )
+        else if( nat->isMapped && tr_time( ) >= nat->renewTime )
             nat->state = TR_NATPMP_SEND_MAP;
     }
 
@@ -214,7 +214,7 @@ tr_natpmpPulse( struct tr_natpmp * nat,
         {
             nat->state = TR_NATPMP_IDLE;
             nat->isMapped = 1;
-            nat->renewTime = time( NULL ) + LIFETIME_SECS;
+            nat->renewTime = tr_time( ) + LIFETIME_SECS;
             nat->port = resp.pnu.newportmapping.privateport;
             tr_ninf( getKey( ), _(
                          "Port %d forwarded successfully" ), nat->port );
