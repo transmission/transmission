@@ -127,7 +127,7 @@ typedef enum
 - (void) invalidOpenAlert: (NSString *) filename;
 - (void) duplicateOpenAlert: (NSString *) name;
 
-- (void) openURL:               (NSURL *) torrentURL;
+- (void) openURL:               (NSString *) urlString;
 - (void) openURLEndSheet:       (id) sender;
 - (void) openURLCancelEndSheet: (id) sender;
 - (void) openURLShowSheet:      (id) sender;

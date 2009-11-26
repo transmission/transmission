@@ -909,7 +909,8 @@ int trashDataFile(const char * filename)
 - (NSString *) progressString
 {
     if ([self isMagnet])
-        return NSLocalizedString(@"Magnetized transfer - acquiring torrent information", "Torrent -> progress string");
+        return [NSString stringWithFormat: @"%@ - %@", NSLocalizedString(@"Magnetized transfer", "Torrent -> progress string"),
+                                            NSLocalizedString(@"torrent information needed", "Torrent -> progress string")];
     
     NSString * string;
     

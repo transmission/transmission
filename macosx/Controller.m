@@ -345,6 +345,14 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         tr_sessionSetRPCCallback(fLib, rpcCallback, self);
         
+        //register for dock icon drags
+        [[NSAppleEventManager sharedAppleEventManager] setEventHandler: self andSelector: @selector(handleOpenContentsEvent:replyEvent:)
+            forEventClass: kCoreEventClass andEventID: kAEOpenContents];
+        
+        //register for magnet URLs
+        [[NSAppleEventManager sharedAppleEventManager] setEventHandler: self andSelector: @selector(handleOpenContentsEvent:replyEvent:)
+        forEventClass: kInternetEventClass andEventID: kAEGetURL];
+        
         [GrowlApplicationBridge setGrowlDelegate: self];
         
         [[UKKQueue sharedFileWatcher] setDelegate: self];
@@ -566,10 +574,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 {
     [NSApp setServicesProvider: self];
     
-    //register for dock icon drags
-    [[NSAppleEventManager sharedAppleEventManager] setEventHandler: self andSelector: @selector(handleOpenContentsEvent:replyEvent:)
-        forEventClass: kCoreEventClass andEventID: kAEOpenContents];
-    
     //auto importing
     [self checkAutoImportDirectory];
     
@@ -757,7 +761,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         urlString = [directObject stringValue];
     
     if (urlString)
-        [self openURL: [NSURL URLWithString: urlString]];
+        [self openURL: urlString];
 }
 
 - (void) download: (NSURLDownload *) download decideDestinationWithSuggestedFilename: (NSString *) suggestedName
@@ -1080,9 +1084,31 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [alert release];
 }
 
-- (void) openURL: (NSURL *) url
+- (void) openURL: (NSString *) urlString
 {
-    [[NSURLDownload alloc] initWithRequest: [NSURLRequest requestWithURL: url] delegate: self];
+    if ([urlString rangeOfString: @"magnet:" options: (NSAnchoredSearch | NSCaseInsensitiveSearch)].location != NSNotFound)
+        [self openMagnet: urlString];
+    else
+    {
+        if ([urlString rangeOfString: @"://"].location == NSNotFound)
+        {
+            if ([urlString rangeOfString: @"."].location == NSNotFound)
+            {
+                NSInteger beforeCom;
+                if ((beforeCom = [urlString rangeOfString: @"/"].location) != NSNotFound)
+                    urlString = [NSString stringWithFormat: @"http://www.%@.com/%@",
+                                    [urlString substringToIndex: beforeCom],
+                                    [urlString substringFromIndex: beforeCom + 1]];
+                else
+                    urlString = [NSString stringWithFormat: @"http://www.%@.com/", urlString];
+            }
+            else
+                urlString = [@"http://" stringByAppendingString: urlString];
+        }
+        
+        NSURL * url = [NSURL URLWithString: urlString];
+        [[NSURLDownload alloc] initWithRequest: [NSURLRequest requestWithURL: url] delegate: self];
+    }
 }
 
 - (void) openURLShowSheet: (id) sender
@@ -1129,30 +1155,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         return;
     
     NSString * urlString = [fURLSheetTextField stringValue];
-    
-    if ([urlString rangeOfString: @"magnet:" options: (NSAnchoredSearch | NSCaseInsensitiveSearch)].location != NSNotFound)
-        [self openMagnet: urlString];
-    else
-    {
-        if ([urlString rangeOfString: @"://"].location == NSNotFound)
-        {
-            if ([urlString rangeOfString: @"."].location == NSNotFound)
-            {
-                NSInteger beforeCom;
-                if ((beforeCom = [urlString rangeOfString: @"/"].location) != NSNotFound)
-                    urlString = [NSString stringWithFormat: @"http://www.%@.com/%@",
-                                    [urlString substringToIndex: beforeCom],
-                                    [urlString substringFromIndex: beforeCom + 1]];
-                else
-                    urlString = [NSString stringWithFormat: @"http://www.%@.com/", urlString];
-            }
-            else
-                urlString = [@"http://" stringByAppendingString: urlString];
-        }
-        
-        NSURL * url = [NSURL URLWithString: urlString];
-        [self performSelectorOnMainThread: @selector(openURL:) withObject: url waitUntilDone: NO];
-    }
+    [self performSelectorOnMainThread: @selector(openURL:) withObject: urlString waitUntilDone: NO];
 }
 
 - (void) createFile: (id) sender
@@ -2875,7 +2878,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         NSURL * url;
         if ((url = [NSURL URLFromPasteboard: pasteboard]))
         {
-            [self openURL: url];
+            [[NSURLDownload alloc] initWithRequest: [NSURLRequest requestWithURL: url] delegate: self];
             return YES;
         }
     }

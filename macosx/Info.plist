@@ -45,6 +45,18 @@
 	<string>TR##</string>
 	<key>CFBundleShortVersionString</key>
 	<string>VERSION_STRING_INFOPLIST</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>magnet</string>
+				<string>dht</string>
+			</array>
+			<key>CFBundleURLName</key>
+			<string>BitTorrent Magnet URL</string>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>SVN_REVISION_NUM</string>
 	<key>CFBundleGetInfoString</key>
