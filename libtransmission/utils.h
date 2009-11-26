@@ -254,7 +254,7 @@ void tr_timevalSet( struct timeval * setme, int seconds, int microseconds );
 
 struct event;
 
-void tr_timerAdd( struct event * timer, int seconds, int milliseconds );
+void tr_timerAdd( struct event * timer, int seconds, int microseconds );
 
 
 /** @brief return the current date in milliseconds */

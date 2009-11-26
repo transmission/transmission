@@ -485,10 +485,10 @@ tr_timevalSet( struct timeval * setme, int seconds, int microseconds )
 }
 
 void
-tr_timerAdd( struct event * timer, int seconds, int milliseconds )
+tr_timerAdd( struct event * timer, int seconds, int microseconds )
 {
     struct timeval tv;
-    tr_timevalSet( &tv, seconds, milliseconds );
+    tr_timevalSet( &tv, seconds, microseconds );
     event_add( timer, &tv );
 }
 
