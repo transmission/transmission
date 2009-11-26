@@ -1255,6 +1255,20 @@ void tr_torrentSetCompletenessCallback(
 void tr_torrentClearCompletenessCallback( tr_torrent * torrent );
 
 
+
+typedef void ( tr_torrent_metadata_func )( tr_torrent  * torrent,
+                                           void        * user_data );
+/**
+ * Register to be notified whenever a torrent changes from
+ * having incomplete metadata to having complete metadata.
+ * This happens when a magnet link finishes downloading
+ * metadata from its peers.
+ */
+void tr_torrentSetMetadataCallback (
+         tr_torrent                * tor,
+         tr_torrent_metadata_func     func,
+         void                      * user_data );
+
 /**
  * Register to be notified whenever a torrent's ratio limit
  * has been hit. This will be called when the torrent's

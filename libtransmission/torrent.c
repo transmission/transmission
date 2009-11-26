@@ -614,10 +614,14 @@ torrentInitFromInfo( tr_torrent * tor )
     tor->completeness = tr_cpGetStatus( &tor->completion );
 }
 
+static void tr_torrentFireMetadataCompleted( tr_torrent * tor );
+
 void
 tr_torrentGotNewInfoDict( tr_torrent * tor )
 {
     torrentInitFromInfo( tor );
+
+    tr_torrentFireMetadataCompleted( tor );
 }
 
 static void
@@ -1618,6 +1622,12 @@ tr_torrentSetCompletenessCallback( tr_torrent                    * tor,
 }
 
 void
+tr_torrentClearCompletenessCallback( tr_torrent * torrent )
+{
+    tr_torrentSetCompletenessCallback( torrent, NULL, NULL );
+}
+
+void
 tr_torrentSetRatioLimitHitCallback( tr_torrent                     * tor,
                                     tr_torrent_ratio_limit_hit_func  func,
                                     void                           * user_data )
@@ -1626,12 +1636,6 @@ tr_torrentSetRatioLimitHitCallback( tr_torrent                     * tor,
 
     tor->ratio_limit_hit_func = func;
     tor->ratio_limit_hit_func_user_data = user_data;
-}
-
-void
-tr_torrentClearCompletenessCallback( tr_torrent * torrent )
-{
-    tr_torrentSetCompletenessCallback( torrent, NULL, NULL );
 }
 
 void
@@ -1686,6 +1690,31 @@ tr_torrentRecheckCompleteness( tr_torrent * tor )
 
     tr_torrentUnlock( tor );
 }
+
+/***
+****
+***/
+
+static void
+tr_torrentFireMetadataCompleted( tr_torrent * tor )
+{
+    assert( tr_isTorrent( tor ) );
+
+    if( tor->metadata_func )
+        tor->metadata_func( tor, tor->metadata_func_user_data );
+}
+
+void
+tr_torrentSetMetadataCallback( tr_torrent                * tor,
+                               tr_torrent_metadata_func    func,
+                               void                      * user_data )
+{
+    assert( tr_isTorrent( tor ) );
+
+    tor->metadata_func = func;
+    tor->metadata_func_user_data = user_data;
+}
+
 
 /**
 ***  File priorities
