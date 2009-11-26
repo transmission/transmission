@@ -1397,13 +1397,13 @@ getDefaultShelfLife( uint8_t from )
      * are better than those from secondhand, etc etc */
     switch( from )
     {
-        case TR_PEER_FROM_INCOMING : return 60 * 60 * 8;
-        case TR_PEER_FROM_LTEP     : return 60 * 60 * 8;
-        case TR_PEER_FROM_TRACKER  : return 60 * 60 * 4;
+        case TR_PEER_FROM_INCOMING : return 60 * 60 * 6;
+        case TR_PEER_FROM_LTEP     : return 60 * 60 * 6;
+        case TR_PEER_FROM_TRACKER  : return 60 * 60 * 3;
+        case TR_PEER_FROM_DHT      : return 60 * 60 * 3;
         case TR_PEER_FROM_PEX      : return 60 * 60 * 2;
         case TR_PEER_FROM_RESUME   : return 60 * 60;
-        case TR_PEER_FROM_DHT      : return 60 * 40;
-        default                    : return 60 * 60;            
+        default                    : return 60 * 60;
     }
 }
 
@@ -1422,7 +1422,7 @@ ensureAtomExists( Torrent           * t,
     if( getExistingAtom( t, addr ) == NULL )
     {
         struct peer_atom * a;
-        const int jitter = tr_cryptoWeakRandInt( 120 );
+        const int jitter = tr_cryptoWeakRandInt( 60*10 );
 
         a = tr_new0( struct peer_atom, 1 );
         a->addr = *addr;
