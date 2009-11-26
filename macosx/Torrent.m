@@ -555,6 +555,10 @@ int trashDataFile(const char * filename)
 
 - (NSImage *) icon
 {
+    if ([self isMagnet])
+        return [NSImage imageNamed: NSImageNameNetwork]; //placeholder
+    
+    #warning replace 'fldr' stuff with NSImageNameFolder on 10.6
     if (!fIcon)
         fIcon = [[[NSWorkspace sharedWorkspace] iconForFileType: [self isFolder] ? NSFileTypeForHFSTypeCode('fldr')
                                                                                 : [[self name] pathExtension]] retain];
