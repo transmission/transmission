@@ -1029,6 +1029,10 @@ typedef enum
             case TR_PEER_FROM_DHT:
                 [components addObject: NSLocalizedString(@"From: distributed hash table", "Inspector -> Peers tab -> table row tooltip")];
                 break;
+            case TR_PEER_FROM_LTEP:
+                [components addObject: NSLocalizedString(@"From: libtorrent extension protocol handshake",
+                                        "Inspector -> Peers tab -> table row tooltip")];
+                break;
             default:
                 NSAssert1(NO, @"Peer from unknown source: %d", peerFrom);
         }
@@ -1503,6 +1507,9 @@ typedef enum
             if ((count = [torrent totalPeersDHT]) > 0)
                 [fromComponents addObject: [NSString stringWithFormat:
                                         NSLocalizedString(@"%d DHT", "Inspector -> Peers tab -> peers"), count]];
+            if ((count = [torrent totalPeersLTEP]) > 0)
+                [fromComponents addObject: [NSString stringWithFormat:
+                                        NSLocalizedString(@"%d LTEP", "Inspector -> Peers tab -> peers"), count]];
             
             NSMutableArray * upDownComponents = [NSMutableArray arrayWithCapacity: 3];
             if ((count = [torrent peersSendingToUs]) > 0)

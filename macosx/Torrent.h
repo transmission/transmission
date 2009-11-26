@@ -181,6 +181,7 @@
 - (NSInteger) totalPeersCache;
 - (NSInteger) totalPeersPex;
 - (NSInteger) totalPeersDHT;
+- (NSInteger) totalPeersLTEP;
 - (NSInteger) totalPeersKnown;
 
 - (NSInteger) peersSendingToUs;
