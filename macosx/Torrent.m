@@ -587,7 +587,7 @@ int trashDataFile(const char * filename)
     int count;
     tr_tracker_stat * stats = tr_torrentTrackers(fHandle, &count);
     
-    NSMutableArray * trackers = [NSMutableArray arrayWithCapacity: count + stats[count-1].tier];
+    NSMutableArray * trackers = [NSMutableArray arrayWithCapacity: (count > 0 ? count + stats[count-1].tier : 0)];
     
     int prevTier = -1;
     for (int i=0; i < count; ++i)

@@ -1694,12 +1694,6 @@ typedef enum
             [addresses addObject: [(TrackerNode *)item fullAnnounceAddress]];
     }
     
-    if (oldCount == [addresses count])
-    {
-        NSBeep();
-        return;
-    }
-    
     if ([[NSUserDefaults standardUserDefaults] boolForKey: @"WarningRemoveTrackers"])
     {
         NSAlert * alert = [[NSAlert alloc] init];
