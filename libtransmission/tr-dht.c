@@ -379,9 +379,13 @@ tr_dhtInit(tr_session *ss, const tr_address * tr_addr)
     tr_threadNew( dht_bootstrap, cl );
 
     event_set( &dht_event, dht_socket, EV_READ, event_callback, NULL );
-    event_set( &dht6_event, dht6_socket, EV_READ, event_callback, NULL );
     tr_timerAdd( &dht_event, 0, tr_cryptoWeakRandInt( 1000000 ) );
-    tr_timerAdd( &dht6_event, 0, tr_cryptoWeakRandInt( 1000000 ) );
+
+    if( dht6_socket >= 0 )
+    {
+        event_set( &dht6_event, dht6_socket, EV_READ, event_callback, NULL );
+        tr_timerAdd( &dht6_event, 0, tr_cryptoWeakRandInt( 1000000 ) );
+    }
 
     tr_ndbg( "DHT", "DHT initialized" );
 
@@ -410,8 +414,10 @@ tr_dhtUninit(tr_session *ss)
 
     tr_ndbg( "DHT", "Uninitializing DHT" );
 
-    event_del(&dht_event);
-    event_del(&dht6_event);
+    event_del( &dht_event );
+
+    if( dht6_socket >= 0 )
+        event_del( &dht6_event );
 
     /* Since we only save known good nodes, avoid erasing older data if we
        don't know enough nodes. */

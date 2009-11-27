@@ -2228,7 +2228,7 @@ dht_ping_node(struct sockaddr *sa, int salen)
 #define COPY(buf, offset, src, delta, size)             \
     CHECK(offset, delta, size);                         \
     memcpy(buf + offset, src, delta);                   \
-    i += delta;
+    offset += delta;
 
 #define ADD_V(buf, offset, size)                        \
     if(have_v) {                                        \
