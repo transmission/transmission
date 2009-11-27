@@ -593,6 +593,8 @@ tr_sessionInit( const char  * tag,
     tr_session * session;
     struct init_data data;
 
+    tr_msgInit( );
+
     assert( tr_bencIsDict( clientSettings ) );
 
     /* initialize the bare skeleton of the session object */

@@ -45,8 +45,8 @@
 #include "version.h"
 
 
+int                   messageLevel = 0;
 static tr_lock *      messageLock = NULL;
-static int            messageLevel = 0;
 static tr_bool        messageQueuing = FALSE;
 static tr_msg_list *  messageQueue = NULL;
 static tr_msg_list ** messageQueueTail = &messageQueue;
@@ -73,8 +73,7 @@ tr_timeUpdate( time_t now )
 ****
 ***/
 
-
-static void
+void
 tr_msgInit( void )
 {
     static tr_bool initialized = FALSE;
@@ -300,14 +299,6 @@ tr_deepLog( const char  * file,
 /***
 ****
 ***/
-
-int
-tr_msgLoggingIsActive( int level )
-{
-    tr_msgInit( );
-
-    return messageLevel >= level;
-}
 
 void
 tr_msg( const char * file, int line,
