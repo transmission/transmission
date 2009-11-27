@@ -1973,7 +1973,8 @@ fillOutputBuffer( tr_peermsgs * msgs, time_t now )
             protocolSendReject( msgs, &req );
         }
 
-        prefetchPieces( msgs );
+        if( msgs != NULL )
+            prefetchPieces( msgs );
     }
 
     /**
