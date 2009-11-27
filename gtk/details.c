@@ -2139,7 +2139,7 @@ torrent_inspector_new( GtkWindow * parent, TrCore * core )
     gtk_notebook_append_page( GTK_NOTEBOOK( n ),  w, l );
 
     w = tracker_page_new( di );
-    l = gtk_label_new( _( "Tracker" ) );
+    l = gtk_label_new( _( "Trackers" ) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ), w, l );
 
     w = file_list_new( core, 0 );
