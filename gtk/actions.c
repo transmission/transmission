@@ -11,15 +11,20 @@
  */
 
 #include <string.h>
+
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>
+
 #include <libtransmission/transmission.h>
+
 #include "actions.h"
 #include "conf.h"
 #include "tr-core.h"
 #include "tr-prefs.h"
 #include "lock.h"
+
 #include "logo.h"
+#include "ratio-icon.h"
 #include "options-icon.h"
 #include "turtles.h"
 
@@ -141,7 +146,8 @@ static const BuiltinIconInfo my_fallback_icons[] =
     { tr_icon_lock, "transmission-lock" },
     { options_icon, "options"           },
     { blue_turtle,  "alt-speed-on"      },
-    { grey_turtle,  "alt-speed-off"     }
+    { grey_turtle,  "alt-speed-off"     },
+    { ratio_icon,   "ratio"             }
 };
 
 static void

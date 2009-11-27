@@ -960,7 +960,7 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
         g_signal_connect( w, "clicked", G_CALLBACK(onOptionsClicked), p );
 
         p->alt_speed_image[0] = gtk_image_new_from_stock( "alt-speed-off", -1 );
-        p->alt_speed_image[1]  = gtk_image_new_from_stock( "alt-speed-on", -1 );
+        p->alt_speed_image[1] = gtk_image_new_from_stock( "alt-speed-on", -1 );
         w = p->alt_speed_button = gtk_toggle_button_new( );
         gtk_button_set_relief( GTK_BUTTON( w ), GTK_RELIEF_NONE );
         g_object_ref( G_OBJECT( p->alt_speed_image[0] ) );
@@ -997,7 +997,7 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
             gtk_widget_set_size_request( w, GUI_PAD, 0u );
             gtk_box_pack_start( GTK_BOX( hbox ), w, FALSE, FALSE, 0 );
             w = gtk_button_new( );
-            gtk_container_add( GTK_CONTAINER( w ), gtk_image_new_from_stock( GTK_STOCK_REFRESH, GTK_ICON_SIZE_MENU ) );
+            gtk_container_add( GTK_CONTAINER( w ), gtk_image_new_from_stock( "ratio", GTK_ICON_SIZE_SMALL_TOOLBAR ) );
             gtk_button_set_relief( GTK_BUTTON( w ), GTK_RELIEF_NONE );
             g_signal_connect( w, "clicked", G_CALLBACK( onYinYangReleased ), p );
             gtk_box_pack_start( GTK_BOX( hbox ), w, FALSE, FALSE, 0 );
