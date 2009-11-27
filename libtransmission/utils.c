@@ -93,7 +93,7 @@ tr_msgInit( void )
 FILE*
 tr_getLog( void )
 {
-    static int    initialized = FALSE;
+    static tr_bool initialized = FALSE;
     static FILE * file = NULL;
 
     if( !initialized )
@@ -301,10 +301,7 @@ tr_msg( const char * file, int line,
         const char * fmt, ... )
 {
     const int err = errno; /* message logging shouldn't affect errno */
-    FILE * fp;
     tr_lockLock( messageLock );
-
-    fp = tr_getLog( );
 
     if( messageLevel >= level )
     {
@@ -338,7 +335,9 @@ tr_msg( const char * file, int line,
             else
             {
                 char timestr[64];
+                FILE * fp;
 
+                fp = tr_getLog( );
                 if( fp == NULL )
                     fp = stderr;
 
