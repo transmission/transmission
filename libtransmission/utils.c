@@ -76,18 +76,12 @@ tr_timeUpdate( time_t now )
 void
 tr_msgInit( void )
 {
-    static tr_bool initialized = FALSE;
+    const char * env = getenv( "TR_DEBUG" );
+    messageLevel = ( env ? atoi( env ) : 0 ) + 1;
+    messageLevel = MAX( 1, messageLevel );
 
-    if( !initialized )
-    {
-        char * env = getenv( "TR_DEBUG" );
-        messageLevel = ( env ? atoi( env ) : 0 ) + 1;
-        messageLevel = MAX( 1, messageLevel );
-
+    if( messageLock == NULL )
         messageLock = tr_lockNew( );
-
-        initialized = TRUE;
-    }
 }
 
 FILE*
