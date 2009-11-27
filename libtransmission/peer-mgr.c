@@ -3021,7 +3021,6 @@ atomPulse( void * vmgr )
             int testCount = 0;
             struct peer_atom ** keep = tr_new( struct peer_atom*, atomCount );
             struct peer_atom ** test = tr_new( struct peer_atom*, atomCount );
-            tordbg( t, "max atom count is %d; have %d.. pruning\n", maxAtomCount, atomCount );
 
             /* keep the ones that are in use */
             for( i=0; i<atomCount; ++i ) {
@@ -3049,11 +3048,10 @@ atomPulse( void * vmgr )
             tr_ptrArrayDestruct( &t->pool, NULL );
             t->pool = TR_PTR_ARRAY_INIT;
             qsort( keep, keepCount, sizeof( struct peer_atom * ), compareAtomPtrsByAddress );
-            for( i=0; i<keepCount; ++i ) {
-                if( i+1<keepCount )
-                    assert( tr_compareAddresses( &keep[i]->addr, &keep[i+1]->addr ) < 0 );
+            for( i=0; i<keepCount; ++i )
                 tr_ptrArrayAppend( &t->pool, keep[i] );
-            }
+
+            tordbg( t, "max atom count is %d... pruned from %d to %d\n", maxAtomCount, atomCount, keepCount );
 
             /* cleanup */
             tr_free( test );
