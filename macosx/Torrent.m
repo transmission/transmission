@@ -1745,7 +1745,7 @@ int trashDataFile(const char * filename)
     
     [self createFileList];
     
-    #warning update inspector
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"ResetInspector" object: self];
 }
 
 - (NSString *) etaString
