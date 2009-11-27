@@ -629,7 +629,7 @@
         }
     }
     
-    if (![torrent allDownloaded] && ![torrent isMagnet])
+    if (![torrent allDownloaded])
     {
         const CGFloat widthRemaining = round(NSWidth(barRect) * [torrent progressLeft]);
         

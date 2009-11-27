@@ -946,8 +946,12 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         return;
     }
     
+    #warning show add window perhaps?
+    
     #warning should we do this?
     [torrent setWaitToStart: [fDefaults boolForKey: @"AutoStartDownload"]];
+    
+    #warning should set group
     
     [torrent update];
     [fTorrents addObject: torrent];

@@ -51,7 +51,6 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>magnet</string>
-				<string>dht</string>
 			</array>
 			<key>CFBundleURLName</key>
 			<string>BitTorrent Magnet URL</string>

@@ -809,7 +809,7 @@ int trashDataFile(const char * filename)
 
 - (BOOL) allDownloaded
 {
-    return [self sizeLeft] == 0;
+    return [self sizeLeft] == 0 && ![self isMagnet];
 }
 
 - (BOOL) isComplete
@@ -909,8 +909,12 @@ int trashDataFile(const char * filename)
 - (NSString *) progressString
 {
     if ([self isMagnet])
+    {
+        NSString * progressString = [NSString localizedStringWithFormat: @"%.2f%% of torrent metadata retrieved",
+                                        fStat->metadataPercentComplete];
         return [NSString stringWithFormat: @"%@ - %@", NSLocalizedString(@"Magnetized transfer", "Torrent -> progress string"),
-                                            NSLocalizedString(@"torrent information needed", "Torrent -> progress string")];
+                                            progressString];
+    }
     
     NSString * string;
     
