@@ -628,18 +628,24 @@ tr_sessionInit( const char  * tag,
 static void useAltSpeed( tr_session * session, tr_bool enabled, tr_bool byUser );
 static void useAltSpeedTime( tr_session * session, tr_bool enabled, tr_bool byUser );
 
-static void 
-onNowTimer( int foo UNUSED, short bar UNUSED, void * vsession ) 
-{ 
-    struct timeval tv; 
-    tr_session * session = vsession; 
+static void
+onNowTimer( int foo UNUSED, short bar UNUSED, void * vsession )
+{
+    int usec;
+    const int min = 100;
+    const int max = 999999;
+    struct timeval tv;
+    tr_session * session = vsession;
 
-    assert( tr_isSession( session ) ); 
-    assert( session->nowTimer != NULL ); 
+    assert( tr_isSession( session ) );
+    assert( session->nowTimer != NULL );
 
-    /* schedule the next timer for right after the next second begins */ 
-    gettimeofday( &tv, NULL ); 
-    tr_timerAdd( session->nowTimer, 0, 1000000 - tv.tv_usec ); 
+    /* schedule the next timer for right after the next second begins */
+    gettimeofday( &tv, NULL );
+    usec = 1000000 - tv.tv_usec;
+    if( usec > max ) usec = max;
+    if( usec < min ) usec = min;
+    tr_timerAdd( session->nowTimer, 0, usec );
     tr_timeUpdate( tv.tv_sec );
     /* fprintf( stderr, "time %zu sec, %zu microsec\n", (size_t)tr_time(), (size_t)tv.tv_usec );  */
 }
@@ -662,8 +668,8 @@ tr_sessionInitImpl( void * vdata )
     tr_sessionGetDefaultSettings( data->configDir, &settings );
     tr_bencMergeDicts( &settings, clientSettings );
 
-    session->nowTimer = tr_new0( struct event, 1 ); 
-    evtimer_set( session->nowTimer, onNowTimer, session ); 
+    session->nowTimer = tr_new0( struct event, 1 );
+    evtimer_set( session->nowTimer, onNowTimer, session );
     onNowTimer( 0, 0, session );
 
 #ifndef WIN32
