@@ -120,6 +120,8 @@ int trashDataFile(const char * filename)
         self = [self initWithPath: nil hash: nil torrentStruct: handle lib: lib
                 waitToStart: nil groupValue: nil
                 legacyDownloadFolder: location legacyIncompleteFolder: nil];
+    else
+        self = nil;
     
     return self;
 }
