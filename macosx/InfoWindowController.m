@@ -748,7 +748,7 @@ typedef enum
             break;
         case TAB_TRACKER_TAG:
             identifier = TAB_TRACKER_IDENT;
-            title = NSLocalizedString(@"Tracker", "Inspector -> title");
+            title = NSLocalizedString(@"Trackers", "Inspector -> title");
             resizeSaveKey = @"InspectorContentHeightTracker";
             break;
         case TAB_PEERS_TAG:
