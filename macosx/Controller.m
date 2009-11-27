@@ -2882,7 +2882,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         NSURL * url;
         if ((url = [NSURL URLFromPasteboard: pasteboard]))
         {
-            [[NSURLDownload alloc] initWithRequest: [NSURLRequest requestWithURL: url] delegate: self];
+            [self openURL: [url absoluteString]];
             return YES;
         }
     }
