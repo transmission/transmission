@@ -35,8 +35,8 @@
     {
         fLib = lib;
         
-        [self setBackgroundColor: [NSColor colorWithCalibratedWhite: 0.0f alpha: 0.5f]];
-        [self setAlphaValue: 0.0f];
+        [self setBackgroundColor: [NSColor colorWithCalibratedWhite: 0.0 alpha: 0.5]];
+        [self setAlphaValue: 0.0];
         [self setOpaque: NO];
         [self setHasShadow: NO];
         
@@ -145,6 +145,7 @@
 
 - (void) setURL: (NSString *) url
 {
+    #warning get magnet image/phrase
     [[self contentView] setOverlay: [NSImage imageNamed: @"Globe.png"]
         mainLine: NSLocalizedString(@"Web Address", "Drag overlay -> url") subLine: url];
     [self fadeIn];
@@ -170,7 +171,7 @@
         [fFadeInAnimation stopAnimation];
         [fFadeOutAnimation setCurrentProgress: 1.0 - [fFadeInAnimation currentProgress]];
     }
-    if ([self alphaValue] > 0.0f)
+    if ([self alphaValue] > 0.0)
         [fFadeOutAnimation startAnimation];
 }
 

@@ -153,7 +153,7 @@
         NSString * name = currentMessage->name != NULL ? [NSString stringWithUTF8String: currentMessage->name]
                             : [[NSProcessInfo processInfo] processName];
         
-        NSString * file = [NSString stringWithFormat: @"%@:%d", [[NSString stringWithUTF8String: currentMessage->file] lastPathComponent],
+        NSString * file = [[[NSString stringWithUTF8String: currentMessage->file] lastPathComponent] stringByAppendingFormat: @":%d",
                             currentMessage->line];
         
         NSDictionary * message  = [NSDictionary dictionaryWithObjectsAndKeys:

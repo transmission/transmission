@@ -1140,7 +1140,7 @@ typedef enum
 
 - (void) resetInfo
 {
-    NSUInteger numberSelected = [fTorrents count];
+    const NSUInteger numberSelected = [fTorrents count];
     if (numberSelected != 1)
     {
         if (numberSelected > 0)
@@ -1151,19 +1151,51 @@ typedef enum
                                             "Inspector -> selected torrents"), numberSelected]];
         
             uint64_t size = 0;
-            NSInteger fileCount = 0;
+            NSUInteger fileCount = 0, magnetCount = 0;
             for (Torrent * torrent in fTorrents)
             {
                 size += [torrent size];
                 fileCount += [torrent fileCount];
+                if ([torrent isMagnet])
+                    ++magnetCount;
             }
             
-            [fBasicInfoField setStringValue: [NSString stringWithFormat: @"%@, %@",
-                [NSString stringWithFormat: NSLocalizedString(@"%d files", "Inspector -> selected torrents"), fileCount],
-                [NSString stringWithFormat: NSLocalizedString(@"%@ total", "Inspector -> selected torrents"),
-                [NSString stringForFileSize: size]]]];
-            [fBasicInfoField setToolTip: [NSString stringWithFormat: NSLocalizedString(@"%llu bytes", "Inspector -> selected torrents"),
-                                            size]];
+            NSMutableArray * fileStrings = [NSMutableArray arrayWithCapacity: 2];
+            if (fileCount > 0)
+            {
+                NSString * fileString;
+                if (fileCount == 1)
+                    fileString = NSLocalizedString(@"1 file", "Inspector -> selected torrents");
+                else
+                    fileString = [NSString stringWithFormat: NSLocalizedString(@"%d files", "Inspector -> selected torrents"), fileCount];
+                [fileStrings addObject: fileString];
+            }
+            if (magnetCount > 0)
+            {
+                NSString * magnetString;
+                if (magnetCount == 1)
+                    magnetString = NSLocalizedString(@"1 magnetized transfer", "Inspector -> selected torrents");
+                else
+                    magnetString = [NSString stringWithFormat: NSLocalizedString(@"%d magnetized transfers",
+                                    "Inspector -> selected torrents"), magnetCount];
+                [fileStrings addObject: magnetString];
+            }
+            
+            NSString * fileString = [fileStrings componentsJoinedByString: @" + "];
+            
+            if (magnetCount < numberSelected)
+            {
+                [fBasicInfoField setStringValue: [NSString stringWithFormat: @"%@, %@", fileString,
+                    [NSString stringWithFormat: NSLocalizedString(@"%@ total", "Inspector -> selected torrents"),
+                        [NSString stringForFileSize: size]]]];
+                [fBasicInfoField setToolTip: [NSString stringWithFormat: NSLocalizedString(@"%llu bytes", "Inspector -> selected torrents"),
+                                                size]];
+            }
+            else
+            {
+                [fBasicInfoField setStringValue: fileString];
+                [fBasicInfoField setToolTip: nil];
+            }
         }
         else
         {
@@ -1291,24 +1323,34 @@ typedef enum
         [fNameField setStringValue: name];
         [fNameField setToolTip: name];
         
-        NSString * basicString = [NSString stringForFileSize: [torrent size]];
-        if ([torrent isFolder])
+        if (![torrent isMagnet])
         {
-            NSString * fileString;
-            NSInteger fileCount = [torrent fileCount];
-            if (fileCount == 1)
-                fileString = NSLocalizedString(@"1 file", "Inspector -> selected torrents");
-            else
-                fileString= [NSString stringWithFormat: NSLocalizedString(@"%d files", "Inspector -> selected torrents"), fileCount];
-            basicString = [NSString stringWithFormat: @"%@, %@", fileString, basicString];
+            NSString * basicString = [NSString stringForFileSize: [torrent size]];
+            if ([torrent isFolder])
+            {
+                NSString * fileString;
+                NSInteger fileCount = [torrent fileCount];
+                if (fileCount == 1)
+                    fileString = NSLocalizedString(@"1 file", "Inspector -> selected torrents");
+                else
+                    fileString= [NSString stringWithFormat: NSLocalizedString(@"%d files", "Inspector -> selected torrents"), fileCount];
+                basicString = [NSString stringWithFormat: @"%@, %@", fileString, basicString];
+            }
+            [fBasicInfoField setStringValue: basicString];
+            [fBasicInfoField setToolTip: [NSString stringWithFormat: NSLocalizedString(@"%llu bytes", "Inspector -> selected torrents"),
+                                            [torrent size]]];
         }
-        [fBasicInfoField setStringValue: basicString];
-        [fBasicInfoField setToolTip: [NSString stringWithFormat: NSLocalizedString(@"%llu bytes", "Inspector -> selected torrents"),
-                                        [torrent size]]];
+        else
+        {
+            [fBasicInfoField setStringValue: NSLocalizedString(@"Magnetized transfer", "Inspector -> selected torrents")];
+            [fBasicInfoField setToolTip: nil];
+        }
         
+        NSString * piecesString = ![torrent isMagnet] ? [NSString stringWithFormat: @"%d, %@", [torrent pieceCount],
+                                        [NSString stringForFileSize: [torrent pieceSize]]] : @"";
+        [fPiecesField setStringValue: piecesString];
+                                        
         NSString * hashString = [torrent hashString];
-        [fPiecesField setStringValue: [NSString stringWithFormat: @"%d, %@", [torrent pieceCount],
-                                        [NSString stringForFileSize: [torrent pieceSize]]]];
         [fHashField setStringValue: hashString];
         [fHashField setToolTip: hashString];
         [fSecureField setStringValue: [torrent privateTorrent]
