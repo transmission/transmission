@@ -42,8 +42,8 @@
     index: (NSInteger) index flatList: (NSMutableArray *) flatFileList;
 
 - (void) completenessChange: (NSNumber *) status;
-
 - (void) ratioLimitHit;
+- (void) metadataRetrieved;
 
 - (NSString *) etaString;
 
@@ -60,6 +60,11 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, vo
 void ratioLimitHitCallback(tr_torrent * torrent, void * torrentData)
 {
     [(Torrent *)torrentData performSelectorOnMainThread: @selector(ratioLimitHit) withObject: nil waitUntilDone: NO];
+}
+
+void metadataCallback(tr_torrent * torrent, void * torrentData)
+{
+    [(Torrent *)torrentData performSelectorOnMainThread: @selector(metadataRetrieved) withObject: nil waitUntilDone: NO];
 }
 
 int trashDataFile(const char * filename)
@@ -1576,6 +1581,7 @@ int trashDataFile(const char * filename)
     
     tr_torrentSetCompletenessCallback(fHandle, completenessChangeCallback, self);
     tr_torrentSetRatioLimitHitCallback(fHandle, ratioLimitHitCallback, self);
+    tr_torrentSetMetadataCallback(fHandle, metadataCallback, self);
     
     fHashString = [[NSString alloc] initWithUTF8String: fInfo->hashString];
 	
@@ -1729,6 +1735,15 @@ int trashDataFile(const char * filename)
     [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentStoppedForRatio" object: self];
     
     fFinishedSeeding = YES;
+}
+
+- (void) metadataRetrieved
+{
+    fStat = tr_torrentStat(fHandle);
+    
+    [self createFileList];
+    
+    #warning update inspector
 }
 
 - (NSString *) etaString
