@@ -122,7 +122,6 @@ tr_getLog( void )
 void
 tr_setMessageLevel( int level )
 {
-    tr_msgInit( );
     tr_lockLock( messageLock );
 
     messageLevel = MAX( 0, level );
@@ -134,7 +133,6 @@ int
 tr_getMessageLevel( void )
 {
     int ret;
-    tr_msgInit( );
     tr_lockLock( messageLock );
 
     ret = messageLevel;
@@ -146,7 +144,6 @@ tr_getMessageLevel( void )
 void
 tr_setMessageQueuing( tr_bool enabled )
 {
-    tr_msgInit( );
     tr_lockLock( messageLock );
 
     messageQueuing = enabled;
@@ -158,7 +155,6 @@ tr_bool
 tr_getMessageQueuing( void )
 {
     int ret;
-    tr_msgInit( );
     tr_lockLock( messageLock );
 
     ret = messageQueuing;
@@ -171,7 +167,6 @@ tr_msg_list *
 tr_getQueuedMessages( void )
 {
     tr_msg_list * ret;
-    tr_msgInit( );
     tr_lockLock( messageLock );
 
     ret = messageQueue;
@@ -307,7 +302,6 @@ tr_msg( const char * file, int line,
 {
     const int err = errno; /* message logging shouldn't affect errno */
     FILE * fp;
-    tr_msgInit( );
     tr_lockLock( messageLock );
 
     fp = tr_getLog( );
