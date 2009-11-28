@@ -942,12 +942,14 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     Torrent * torrent;
     if (!(torrent = [[Torrent alloc] initWithMagnetAddress: address location: nil lib: fLib]))
     {
-        #warning should we do something here?
+        NSRunAlertPanel(NSLocalizedString(@"Adding magnetized transfer failed", "Magnet link failed -> title"),
+            [NSString stringWithFormat: NSLocalizedString(@"There was an error when adding the magnet link \"%@\"."
+            " The transfer will not occur.", "Magnet link failed -> message"), address],
+            NSLocalizedString(@"OK", "Magnet link failed -> button"), nil, nil);
         return;
     }
     
     #warning show add window perhaps?
-    
     
     //change the location if the group calls for it (this has to wait until after the torrent is created)
     if ([[GroupsController groups] usesCustomDownloadLocationForIndex: [torrent groupValue]])
@@ -956,7 +958,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [torrent changeDownloadFolderBeforeUsing: location];
     }
     
-    #warning should we do this?
     [torrent setWaitToStart: [fDefaults boolForKey: @"AutoStartDownload"]];
     
     [torrent update];
