@@ -50,6 +50,8 @@
 - (void) dealloc
 {
     [fTimer invalidate];
+    [fLock release];
+    
     [fMessages release];
     [fDisplayedMessages release];
     
@@ -123,6 +125,8 @@
     
     fMessages = [[NSMutableArray alloc] init];
     fDisplayedMessages = [[NSMutableArray alloc] init];
+    
+    fLock = [[NSLock alloc] init];
 }
 
 - (void) windowDidBecomeKey: (NSNotification *) notification
@@ -146,6 +150,8 @@
         return;
     
     static NSUInteger currentIndex = 0;
+    
+    [fLock lock];
     
     NSScroller * scroller = [[fMessageTable enclosingScrollView] verticalScroller];
     const BOOL shouldScroll = currentIndex == 0 || [scroller floatValue] == 1.0 || [scroller isHidden]
@@ -189,6 +195,8 @@
         if (shouldScroll)
             [fMessageTable scrollRowToVisible: [fDisplayedMessages count]-1];
     }
+    
+    [fLock unlock];
 }
 
 - (NSInteger) numberOfRowsInTableView: (NSTableView *) tableView
@@ -303,6 +311,8 @@
     if ([[NSUserDefaults standardUserDefaults] integerForKey: @"MessageLevel"] == level)
         return;
     
+    [fLock lock];
+    
     [[NSUserDefaults standardUserDefaults] setInteger: level forKey: @"MessageLevel"];
     
     if (level == TR_MSG_DBG) //all messages at this level
@@ -319,6 +329,8 @@
     
     [fMessageTable deselectAll: nil];
     [fMessageTable reloadData];
+    
+    [fLock unlock];
 }
 
 - (void) clearLog: (id) sender

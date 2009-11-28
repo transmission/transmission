@@ -36,6 +36,8 @@
     NSDictionary * fAttributes;
     
     NSTimer * fTimer;
+    
+    NSLock * fLock;
 }
 
 - (void) updateLog: (NSTimer *) timer;
