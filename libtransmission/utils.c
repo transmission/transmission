@@ -53,8 +53,8 @@ static tr_msg_list ** messageQueueTail = &messageQueue;
 
 #ifndef WIN32
     /* make null versions of these win32 functions */
-    static int IsDebuggerPresent( void ) { return FALSE; }
-    static void OutputDebugString( const void * unused UNUSED ) { }
+    static TR_INLINE int IsDebuggerPresent( void ) { return FALSE; }
+    static TR_INLINE void OutputDebugString( const void * unused UNUSED ) { }
 #endif
 
 /***
