@@ -919,7 +919,7 @@ int trashDataFile(const char * filename)
     {
         NSString * progressString = fStat->metadataPercentComplete > 0.0
                     ? [NSString localizedStringWithFormat: NSLocalizedString(@"%.2f%% of torrent metadata retrieved",
-                        "Torrent -> progress string"), fStat->metadataPercentComplete]
+                        "Torrent -> progress string"), 100.0 * fStat->metadataPercentComplete]
                     : NSLocalizedString(@"torrent metadata needed", "Torrent -> progress string");
         
         return [NSString stringWithFormat: @"%@ - %@", NSLocalizedString(@"Magnetized transfer", "Torrent -> progress string"),
