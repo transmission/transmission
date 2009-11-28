@@ -185,8 +185,6 @@
         }
     }
     
-    tr_freeMessageList(messages);
-    
     if (changed)
     {
         [fDisplayedMessages sortUsingDescriptors: [fMessageTable sortDescriptors]];
@@ -197,6 +195,8 @@
     }
     
     [fLock unlock];
+    
+    tr_freeMessageList(messages);
 }
 
 - (NSInteger) numberOfRowsInTableView: (NSTableView *) tableView
@@ -329,6 +329,9 @@
     
     [fMessageTable deselectAll: nil];
     [fMessageTable reloadData];
+    
+    if ([fDisplayedMessages count] > 0)
+        [fMessageTable scrollRowToVisible: [fDisplayedMessages count]-1];
     
     [fLock unlock];
 }
