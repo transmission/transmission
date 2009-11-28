@@ -49,6 +49,7 @@ noinst_HEADERS = \
     msgwin.h \
     notify.h \
     options-icon.h \
+    ratio-icon.h \
     relocate.h \
     stats.h \
     sexy-icon-entry.h \
