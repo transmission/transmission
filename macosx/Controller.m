@@ -389,7 +389,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     contentMinSize.height = [[fWindow contentView] frame].size.height - [[fTableView enclosingScrollView] frame].size.height
                                 + [fTableView rowHeight] + [fTableView intercellSpacing].height;
     [fWindow setContentMinSize: contentMinSize];
-    [fWindow setContentBorderThickness: [[fTableView enclosingScrollView] frame].origin.y forEdge: NSMinYEdge];
+    [fWindow setContentBorderThickness: NSMinY([[fTableView enclosingScrollView] frame]) forEdge: NSMinYEdge];
         
     [[fTotalTorrentsField cell] setBackgroundStyle: NSBackgroundStyleRaised];
     
@@ -948,10 +948,16 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     #warning show add window perhaps?
     
+    
+    //change the location if the group calls for it (this has to wait until after the torrent is created)
+    if ([[GroupsController groups] usesCustomDownloadLocationForIndex: [torrent groupValue]])
+    {
+        NSString * location = [[GroupsController groups] customDownloadLocationForIndex: [torrent groupValue]];
+        [torrent changeDownloadFolderBeforeUsing: location];
+    }
+    
     #warning should we do this?
     [torrent setWaitToStart: [fDefaults boolForKey: @"AutoStartDownload"]];
-    
-    #warning should set group
     
     [torrent update];
     [fTorrents addObject: torrent];
