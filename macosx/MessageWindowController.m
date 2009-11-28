@@ -327,8 +327,8 @@
     
     [fDisplayedMessages sortUsingDescriptors: [fMessageTable sortDescriptors]];
     
-    [fMessageTable deselectAll: nil];
     [fMessageTable reloadData];
+    [fMessageTable deselectAll: self];
     
     if ([fDisplayedMessages count] > 0)
         [fMessageTable scrollRowToVisible: [fDisplayedMessages count]-1];
