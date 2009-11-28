@@ -496,45 +496,6 @@ tr_torrentPromoteTracker( tr_torrent * tor,
     return i;
 }
 
-struct RandomTracker
-{
-    tr_tracker_info    tracker;
-    int                random_value;
-};
-
-/* the tiers will be sorted from lowest to highest,
- * and trackers are randomized within the tiers */
-static TR_INLINE int
-compareRandomTracker( const void * va,
-                      const void * vb )
-{
-    const struct RandomTracker * a = va;
-    const struct RandomTracker * b = vb;
-
-    if( a->tracker.tier != b->tracker.tier )
-        return a->tracker.tier - b->tracker.tier;
-
-    return a->random_value - b->random_value;
-}
-
-static void
-randomizeTiers( tr_info * info )
-{
-    int                    i;
-    const int              n = info->trackerCount;
-    struct RandomTracker * r = tr_new0( struct RandomTracker, n );
-
-    for( i = 0; i < n; ++i )
-    {
-        r[i].tracker = info->trackers[i];
-        r[i].random_value = tr_cryptoRandInt( INT_MAX );
-    }
-    qsort( r, n, sizeof( struct RandomTracker ), compareRandomTracker );
-    for( i = 0; i < n; ++i )
-        info->trackers[i] = r[i].tracker;
-    tr_free( r );
-}
-
 static void torrentStart( tr_torrent * tor );
 
 /**
@@ -640,8 +601,6 @@ torrentInit( tr_torrent * tor, const tr_ctor * ctor )
     tor->session   = session;
     tor->uniqueId = nextUniqueId++;
     tor->magicNumber = TORRENT_MAGIC_NUMBER;
-
-    randomizeTiers( &tor->info );
 
     tr_sha1( tor->obfuscatedHash, "req2", 4,
              tor->info.hash, SHA_DIGEST_LENGTH,

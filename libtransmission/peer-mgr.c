@@ -338,7 +338,6 @@ peerConstructor( struct peer_atom * atom )
     tr_bitsetConstructor( &peer->have, 0 );
     peer->atom = atom;
     atom->peer = peer;
-    peer->atom = atom;
     return peer;
 }
 
