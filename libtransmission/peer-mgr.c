@@ -114,6 +114,7 @@ enum
  */
 struct peer_atom
 {
+    tr_peer   * peer;        /* will be NULL if not connected */
     uint8_t     from;
     uint8_t     flags;       /* these match the added_f flags */
     uint8_t     myflags;     /* flags that aren't defined in added_f */
@@ -309,22 +310,6 @@ peerCompare( const void * a, const void * b )
     return tr_compareAddresses( tr_peerAddress( a ), tr_peerAddress( b ) );
 }
 
-static int
-peerCompareToAddr( const void * a, const void * vb )
-{
-    return tr_compareAddresses( tr_peerAddress( a ), vb );
-}
-
-static tr_peer*
-getExistingPeer( Torrent          * torrent,
-                 const tr_address * addr )
-{
-    assert( torrentIsLocked( torrent ) );
-    assert( addr );
-
-    return tr_ptrArrayFindSorted( &torrent->peers, addr, peerCompareToAddr );
-}
-
 static struct peer_atom*
 getExistingAtom( const Torrent    * t,
                  const tr_address * addr )
@@ -335,16 +320,15 @@ getExistingAtom( const Torrent    * t,
 }
 
 static tr_bool
-peerIsInUse( const Torrent    * ct,
-             const tr_address * addr )
+peerIsInUse( const Torrent * ct, const struct peer_atom * atom )
 {
     Torrent * t = (Torrent*) ct;
 
     assert( torrentIsLocked ( t ) );
 
-    return getExistingPeer( t, addr )
-        || getExistingHandshake( &t->outgoingHandshakes, addr )
-        || getExistingHandshake( &t->manager->incomingHandshakes, addr );
+    return ( atom->peer != NULL )
+        || getExistingHandshake( &t->outgoingHandshakes, &atom->addr )
+        || getExistingHandshake( &t->manager->incomingHandshakes, &atom->addr );
 }
 
 static tr_peer*
@@ -352,6 +336,8 @@ peerConstructor( struct peer_atom * atom )
 {
     tr_peer * peer = tr_new0( tr_peer, 1 );
     tr_bitsetConstructor( &peer->have, 0 );
+    peer->atom = atom;
+    atom->peer = peer;
     peer->atom = atom;
     return peer;
 }
@@ -363,7 +349,7 @@ getPeer( Torrent * torrent, struct peer_atom * atom )
 
     assert( torrentIsLocked( torrent ) );
 
-    peer = getExistingPeer( torrent, &atom->addr );
+    peer = atom->peer;
 
     if( peer == NULL )
     {
@@ -395,6 +381,7 @@ peerDestructor( Torrent * t, tr_peer * peer )
     tr_bitsetDestructor( &peer->have );
     tr_bitfieldFree( peer->blame );
     tr_free( peer->client );
+    peer->atom->peer = NULL;
 
     tr_free( peer );
 }
@@ -1517,7 +1504,7 @@ myHandshakeDoneCB( tr_handshake  * handshake,
         }
         else
         {
-            tr_peer * peer = getExistingPeer( t, addr );
+            tr_peer * peer = atom->peer;
 
             if( peer ) /* we already have this peer */
             {
@@ -2538,7 +2525,7 @@ getPeerCandidates( Torrent * t, const time_t now, int * setmeSize )
             continue;
 
         /* we don't need two connections to the same peer... */
-        if( peerIsInUse( t, &atom->addr ) )
+        if( peerIsInUse( t, atom ) )
             continue;
 
         /* no need to connect if we're both seeds... */
@@ -3025,7 +3012,7 @@ atomPulse( void * vmgr )
             /* keep the ones that are in use */
             for( i=0; i<atomCount; ++i ) {
                 struct peer_atom * atom = atoms[i];
-                if( peerIsInUse( t, &atom->addr ) )
+                if( peerIsInUse( t, atom ) )
                     keep[keepCount++] = atom;
                 else
                     test[testCount++] = atom;
