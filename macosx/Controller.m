@@ -294,7 +294,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                                                                     stringByExpandingTildeInPath] UTF8String]);
         tr_bencDictAddBool(&settings, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED, [fDefaults boolForKey: @"UseIncompleteDownloadFolder"]);
         
-        tr_bencDictAddInt(&settings, TR_PREFS_KEY_MSGLEVEL, [fDefaults integerForKey: @"MessageLevel"]);
+        tr_bencDictAddInt(&settings, TR_PREFS_KEY_MSGLEVEL, TR_MSG_DBG);
         tr_bencDictAddInt(&settings, TR_PREFS_KEY_PEER_LIMIT_GLOBAL, [fDefaults integerForKey: @"PeersTotal"]);
         tr_bencDictAddInt(&settings, TR_PREFS_KEY_PEER_LIMIT_TORRENT, [fDefaults integerForKey: @"PeersTorrent"]);
         

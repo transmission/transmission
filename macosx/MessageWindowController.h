@@ -31,7 +31,7 @@
     IBOutlet NSPopUpButton * fLevelButton;
     IBOutlet NSButton * fSaveButton, * fClearButton;
     
-    NSMutableArray * fMessages;
+    NSMutableArray * fMessages, * fDisplayedMessages;
     
     NSDictionary * fAttributes;
     
