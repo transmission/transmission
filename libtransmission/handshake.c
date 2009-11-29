@@ -375,7 +375,7 @@ static uint32_t
 getCryptoSelect( const tr_handshake * handshake,
                  uint32_t             crypto_provide )
 {
-    uint32_t choices[4];
+    uint32_t choices[2];
     int      i, nChoices = 0;
 
     switch( handshake->encryptionMode )
