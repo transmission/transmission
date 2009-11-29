@@ -121,6 +121,9 @@
         case TR_MSG_DBG:
             [fLevelButton selectItemAtIndex: LEVEL_DEBUG];
             break;
+        default: //safety
+            [[NSUserDefaults standardUserDefaults] setInteger: TR_MSG_ERR forKey: @"MessageLevel"];
+            [fLevelButton selectItemAtIndex: LEVEL_ERROR];
     }
     
     fMessages = [[NSMutableArray alloc] init];
@@ -191,7 +194,7 @@
         
         [fMessageTable reloadData];
         if (shouldScroll)
-            [fMessageTable scrollRowToVisible: [fDisplayedMessages count]-1];
+            [fMessageTable scrollRowToVisible: [fMessageTable numberOfRows]-1];
     }
     
     [fLock unlock];
@@ -241,8 +244,8 @@
     if (!fAttributes)
         fAttributes = [[[[column dataCell] attributedStringValue] attributesAtIndex: 0 effectiveRange: NULL] retain];
     
-    const CGFloat count = floorf([[[fDisplayedMessages objectAtIndex: row] objectForKey: @"Message"] sizeWithAttributes: fAttributes].width
-                                / [column width]);
+    NSString * message = [[fDisplayedMessages objectAtIndex: row] objectForKey: @"Message"];
+    const CGFloat count = floorf([message sizeWithAttributes: fAttributes].width / [column width]);
     return [tableView rowHeight] * (count + 1.0);
 }
 
@@ -306,6 +309,8 @@
         case LEVEL_DEBUG:
             level = TR_MSG_DBG;
             break;
+        default:
+            NSAssert1(NO, @"Unknown message log level: %d", [fLevelButton indexOfSelectedItem]);
     }
     
     if ([[NSUserDefaults standardUserDefaults] integerForKey: @"MessageLevel"] == level)
@@ -328,10 +333,12 @@
     [fDisplayedMessages sortUsingDescriptors: [fMessageTable sortDescriptors]];
     
     [fMessageTable reloadData];
-    [fMessageTable deselectAll: self];
     
     if ([fDisplayedMessages count] > 0)
-        [fMessageTable scrollRowToVisible: [fDisplayedMessages count]-1];
+    {
+        [fMessageTable deselectAll: self];
+        [fMessageTable scrollRowToVisible: [fMessageTable numberOfRows]-1];
+    }
     
     [fLock unlock];
 }
@@ -401,24 +408,25 @@
 
 - (NSString *) stringForMessage: (NSDictionary *) message
 {
-    NSString * level;
-    switch ([[message objectForKey: @"Level"] integerValue])
+    NSString * levelString;
+    const NSInteger level = [[message objectForKey: @"Level"] integerValue];
+    switch (level)
     {
         case TR_MSG_ERR:
-            level = NSLocalizedString(@"Error", "Message window -> level");
+            levelString = NSLocalizedString(@"Error", "Message window -> level");
             break;
         case TR_MSG_INF:
-            level = NSLocalizedString(@"Info", "Message window -> level");
+            levelString = NSLocalizedString(@"Info", "Message window -> level");
             break;
         case TR_MSG_DBG:
-            level = NSLocalizedString(@"Debug", "Message window -> level");
+            levelString = NSLocalizedString(@"Debug", "Message window -> level");
             break;
         default:
-            level = @"";
+            NSAssert1(NO, @"Unknown message log level: %d", level);
     }
     
     return [NSString stringWithFormat: @"%@ %@ [%@] %@: %@", [message objectForKey: @"Date"],
-            [message objectForKey: @"File"], level,
+            [message objectForKey: @"File"], levelString,
             [message objectForKey: @"Name"], [message objectForKey: @"Message"], nil];
 }
 
