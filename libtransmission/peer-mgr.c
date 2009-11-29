@@ -1559,7 +1559,7 @@ tr_peerMgrAddIncoming( tr_peerMgr * manager,
     {
         tr_netClose( session, socket );
     }
-    else /* we don't have a connetion to them yet... */
+    else /* we don't have a connection to them yet... */
     {
         tr_peerIo *    io;
         tr_handshake * handshake;
@@ -2523,10 +2523,6 @@ getPeerCandidates( Torrent * t, const time_t now, int * setmeSize )
         if( atom->myflags & MYFLAG_UNREACHABLE )
             continue;
 
-        /* we don't need two connections to the same peer... */
-        if( peerIsInUse( t, atom ) )
-            continue;
-
         /* no need to connect if we're both seeds... */
         if( seed && ( ( atom->flags & ADDED_F_SEED_FLAG ) ||
                       ( atom->uploadOnly == UPLOAD_ONLY_YES ) ) )
@@ -2545,10 +2541,15 @@ getPeerCandidates( Torrent * t, const time_t now, int * setmeSize )
         if( tr_sessionIsAddressBlocked( t->manager->session, &atom->addr ) )
             continue;
 
+        /* we don't need two connections to the same peer... */
+        if( peerIsInUse( t, atom ) )
+            continue;
+
         ret[retCount++] = atom;
     }
 
-    qsort( ret, retCount, sizeof( struct peer_atom* ), compareCandidates );
+    if( retCount != 0 )
+        qsort( ret, retCount, sizeof( struct peer_atom* ), compareCandidates );
     *setmeSize = retCount;
     return ret;
 }
@@ -2595,92 +2596,113 @@ reconnectTorrent( Torrent * t )
     else
     {
         int i;
-        int canCloseCount;
         int mustCloseCount;
-        int candidateCount;
         int maxCandidates;
-        struct tr_peer ** canClose = getPeersToClose( t, TR_CAN_CLOSE, now, &canCloseCount );
-        struct tr_peer ** mustClose = getPeersToClose( t, TR_MUST_CLOSE, now, &mustCloseCount );
-        struct peer_atom ** candidates = getPeerCandidates( t, now, &candidateCount );
-
-        tordbg( t, "reconnect pulse for [%s]: "
-                   "%d must-close connections, "
-                   "%d can-close connections, "
-                   "%d connection candidates, "
-                   "%d atoms, "
-                   "max per pulse is %d",
-                   tr_torrentName( t->tor ),
-                   mustCloseCount,
-                   canCloseCount,
-                   candidateCount,
-                   tr_ptrArraySize( &t->pool ),
-                   MAX_RECONNECTIONS_PER_PULSE );
+        struct tr_peer ** mustClose;
 
         /* disconnect the really bad peers */
+        mustClose = getPeersToClose( t, TR_MUST_CLOSE, now, &mustCloseCount );
         for( i=0; i<mustCloseCount; ++i )
             closePeer( t, mustClose[i] );
+        tr_free( mustClose );
 
         /* decide how many peers can we try to add in this pass */
-        maxCandidates = candidateCount;
-        maxCandidates = MIN( maxCandidates, MAX_RECONNECTIONS_PER_PULSE );
+        maxCandidates = MAX_RECONNECTIONS_PER_PULSE;
         maxCandidates = MIN( maxCandidates, getMaxPeerCount( t->tor ) - getPeerCount( t ) );
         maxCandidates = MIN( maxCandidates, MAX_CONNECTIONS_PER_SECOND - newConnectionsThisSecond );
 
-        /* maybe disconnect some lesser peers, if we have candidates to replace them with */
-        for( i=0; ( i<canCloseCount ) && ( i<maxCandidates ); ++i )
-            closePeer( t, canClose[i] );
-
-        tordbg( t, "candidateCount is %d, MAX_RECONNECTIONS_PER_PULSE is %d,"
-                   " getPeerCount(t) is %d, getMaxPeerCount(t) is %d, "
-                   "newConnectionsThisSecond is %d, MAX_CONNECTIONS_PER_SECOND is %d",
-                   candidateCount,
-                   MAX_RECONNECTIONS_PER_PULSE,
-                   getPeerCount( t ),
-                   getMaxPeerCount( t->tor ),
-                   newConnectionsThisSecond, MAX_CONNECTIONS_PER_SECOND );
-
-        /* add some new ones */
-        for( i=0; i<maxCandidates; ++i )
+        /* select the best candidates, if they are requested */
+        if( maxCandidates == 0 )
         {
-            tr_peerMgr        * mgr = t->manager;
-            struct peer_atom  * atom = candidates[i];
-            tr_peerIo         * io;
+            tordbg( t, "reconnect pulse for [%s]: %d must-close connections, "
+                       "NO connection candidates needed, %d atoms, "
+                       "max per pulse is %d",
+                       t->tor->info.name, mustCloseCount,
+                       tr_ptrArraySize( &t->pool ),
+                       MAX_RECONNECTIONS_PER_PULSE );
 
-            tordbg( t, "Starting an OUTGOING connection with %s",
-                   tr_atomAddrStr( atom ) );
-
-            io = tr_peerIoNewOutgoing( mgr->session, mgr->session->bandwidth, &atom->addr, atom->port, t->tor->info.hash );
-
-            if( io == NULL )
-            {
-                tordbg( t, "peerIo not created; marking peer %s as unreachable",
-                        tr_atomAddrStr( atom ) );
-                atom->myflags |= MYFLAG_UNREACHABLE;
-            }
-            else
-            {
-                tr_handshake * handshake = tr_handshakeNew( io,
-                                                            mgr->session->encryptionMode,
-                                                            myHandshakeDoneCB,
-                                                            mgr );
-
-                assert( tr_peerIoGetTorrentHash( io ) );
-
-                tr_peerIoUnref( io ); /* balanced by the implicit ref in tr_peerIoNewOutgoing() */
-
-                ++newConnectionsThisSecond;
-
-                tr_ptrArrayInsertSorted( &t->outgoingHandshakes, handshake,
-                                         handshakeCompare );
-            }
-
-            atom->time = now;
+            tordbg( t, "maxCandidates is %d, MAX_RECONNECTIONS_PER_PULSE is %d, "
+                       "getPeerCount(t) is %d, getMaxPeerCount(t) is %d, "
+                       "newConnectionsThisSecond is %d, MAX_CONNECTIONS_PER_SECOND is %d",
+                       maxCandidates, MAX_RECONNECTIONS_PER_PULSE,
+                       getPeerCount( t ), getMaxPeerCount( t->tor ),
+                       newConnectionsThisSecond, MAX_CONNECTIONS_PER_SECOND );
         }
+        else
+        {
+            int canCloseCount = 0;
+            int candidateCount;
+            struct peer_atom ** candidates;
 
-        /* cleanup */
-        tr_free( candidates );
-        tr_free( mustClose );
-        tr_free( canClose );
+            candidates = getPeerCandidates( t, now, &candidateCount );
+            maxCandidates = MIN( maxCandidates, candidateCount );
+
+            /* maybe disconnect some lesser peers, if we have candidates to replace them with */
+            if( maxCandidates != 0 )
+            {
+                struct tr_peer ** canClose = getPeersToClose( t, TR_CAN_CLOSE, now, &canCloseCount );
+                for( i=0; ( i<canCloseCount ) && ( i<maxCandidates ); ++i )
+                   closePeer( t, canClose[i] );
+                tr_free( canClose );
+            }
+
+            tordbg( t, "reconnect pulse for [%s]: %d must-close connections, "
+                       "%d can-close connections, %d connection candidates, "
+                       "%d atoms, max per pulse is %d",
+                       t->tor->info.name, mustCloseCount,
+                       canCloseCount, candidateCount,
+                       tr_ptrArraySize( &t->pool ), MAX_RECONNECTIONS_PER_PULSE );
+
+            tordbg( t, "candidateCount is %d, MAX_RECONNECTIONS_PER_PULSE is %d,"
+                       " getPeerCount(t) is %d, getMaxPeerCount(t) is %d, "
+                       "newConnectionsThisSecond is %d, MAX_CONNECTIONS_PER_SECOND is %d",
+                       candidateCount, MAX_RECONNECTIONS_PER_PULSE,
+                       getPeerCount( t ), getMaxPeerCount( t->tor ),
+                       newConnectionsThisSecond, MAX_CONNECTIONS_PER_SECOND );
+
+            /* add some new ones */
+            for( i=0; i<maxCandidates; ++i )
+            {
+                tr_peerMgr        * mgr = t->manager;
+                struct peer_atom  * atom = candidates[i];
+                tr_peerIo         * io;
+
+                tordbg( t, "Starting an OUTGOING connection with %s",
+                        tr_atomAddrStr( atom ) );
+
+                io = tr_peerIoNewOutgoing( mgr->session,
+                                           mgr->session->bandwidth,
+                                           &atom->addr,
+                                           atom->port,
+                                           t->tor->info.hash );
+
+                if( io == NULL )
+                {
+                    tordbg( t, "peerIo not created; marking peer %s as unreachable",
+                            tr_atomAddrStr( atom ) );
+                    atom->myflags |= MYFLAG_UNREACHABLE;
+                }
+                else
+                {
+                    tr_handshake * handshake = tr_handshakeNew( io,
+                                                                mgr->session->encryptionMode,
+                                                                myHandshakeDoneCB,
+                                                                mgr );
+
+                    assert( tr_peerIoGetTorrentHash( io ) );
+
+                    tr_peerIoUnref( io ); /* balanced by the implicit ref in tr_peerIoNewOutgoing() */
+
+                    ++newConnectionsThisSecond;
+
+                    tr_ptrArrayInsertSorted( &t->outgoingHandshakes, handshake,
+                                             handshakeCompare );
+                }
+
+                atom->time = now;
+            }
+            tr_free( candidates );
+        }
     }
 }
 
