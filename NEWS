@@ -4,17 +4,24 @@
   * Added support for Magnet links
   * If a torrent has multiple tracker tiers, announce to them in parallel
   * Add optional "incomplete directory" where partial downloads are stored
-  * Allow trackerless torrents to be added
+  * Trackerless torrent support
   * Improved IPv6 support
-  * Update to libdht 0.11
+  * Append .part to incomplete files
   * Fix potential crash on shutdown when port forwarding is disabled
   * Faster management of very long peer lists
   * When seeding, prefetch the data we upload
+  * Improved DHT support (libdht 0.11)
   * Improved PEX support
   * Brand-new torrents with no downloaded data don't have to wait in the "Verify Local Data" queue
-  * Various bugfixes
-  * Add first-time user as per the proposed "Informed P2P User Act"
+  * Various bugfixes and performance tweaks
+  * Add first-time user prompt as per the proposed "Informed P2P User Act"
 ==== Mac ====
+  * Redesigned trackers inspector tabbed with favicons and copy-paste functionality (paste lists of trackers at once)
+  * Message log window stores all messages and does real filtering
+  * Quick Look restored on Snow Leopard
+  * Moving data and incomplete folders are now handled by libtransmission
+  * Improved reveal in Finder functionality on Snow Leopard
+  * Various smaller behavior and interface tweaks
 ==== GTK+ ====
   * When creating a torrent, make it easier to auto-add that new torrent
   * Added support for adding torrents by URL
