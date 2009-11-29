@@ -1167,13 +1167,20 @@ void tr_torrentSetDownloadDir( tr_torrent  * torrent, const char * path );
 const char * tr_torrentGetDownloadDir( const tr_torrent * torrent );
 
 /**
- * This returns the the root directory of where the torrent is.
+ * Returns the the root directory of where the torrent is.
  *
  * This will usually be the downloadDir.  However if the torrent
  * has an incompleteDir enabled and hasn't finished downloading
  * yet, that will be returned instead.
  */
 const char * tr_torrentGetCurrentDir( const tr_torrent * tor );
+
+
+/**
+ * Returns a newly-allocated string with a magnet link of the torrent.
+ * Use tr_free() to free the string when done.
+ */
+char* tr_torrentGetMagnetLink( const tr_torrent * tor );
 
 /**
 ***

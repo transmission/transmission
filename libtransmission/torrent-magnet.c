@@ -297,3 +297,27 @@ tr_torrentGetMetadataPercent( const tr_torrent * tor )
 
     return ret;
 }
+
+char*
+tr_torrentGetMagnetLink( const tr_torrent * tor )
+{
+    int i;
+    char * ret;
+    struct evbuffer * s;
+
+    assert( tr_isTorrent( tor ) );
+
+    s = evbuffer_new( );
+    evbuffer_add_printf( s, "magnet:?xt=urn:btih:%s", tor->info.hashString );
+    evbuffer_add_printf( s, "%s", "&dn=" );
+    tr_http_escape( s, tr_torrentName( tor ), -1, TRUE );
+    for( i=0; i<tor->info.trackerCount; ++i )
+    {
+        evbuffer_add_printf( s, "%s", "&tr=" );
+        tr_http_escape( s, tor->info.trackers[i].announce, -1, TRUE );
+    }
+
+    ret = tr_strndup( EVBUFFER_DATA( s ), EVBUFFER_LENGTH( s ) );
+    evbuffer_free( s );
+    return ret;
+}
