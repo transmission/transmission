@@ -688,6 +688,12 @@ tr_session * fHandle;
     //[fDefaults removeObjectForKey: @"WarningLegal"];
 }
 
+- (void) setDefaultForMagnets: (id) sender
+{
+    NSString * bundleID = [[NSBundle mainBundle] bundleIdentifier];
+    const OSStatus result = LSSetDefaultHandlerForURLScheme((CFStringRef)@"magnet", (CFStringRef)bundleID);
+}
+
 - (void) setQueue: (id) sender
 {
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self];

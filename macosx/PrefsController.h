@@ -93,7 +93,10 @@
 - (void) updateBlocklistFields;
 
 - (void) setBadge: (id) sender;
+
 - (void) resetWarnings: (id) sender;
+
+- (void) setDefaultForMagnets: (id) sender;
 
 - (void) setQueue: (id) sender;
 - (void) setQueueNumber: (id) sender;
