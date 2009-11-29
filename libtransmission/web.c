@@ -649,11 +649,17 @@ tr_webGetResponseStr( long code )
 }
 
 /* escapes a string to be URI-legal as per RFC 2396.
-   like curl_escape() but can optionally avoid munging slashes. */
+   like curl_escape() but can optionally avoid escaping slashes. */
 void
-tr_http_escape( struct evbuffer *out, const char *str, int len, int keep_slashes )
+tr_http_escape( struct evbuffer  * out,
+                const char       * str,
+                int                len,
+                tr_bool            escape_slashes )
 {
     int i;
+
+    if( ( len < 0 ) && ( str != NULL ) )
+        len = strlen( str );
 
     for( i = 0; i < len; i++ ) {
         switch( str[i] ) {
@@ -673,7 +679,7 @@ tr_http_escape( struct evbuffer *out, const char *str, int len, int keep_slashes
             evbuffer_add( out, &str[i], 1 );
             break;
         case '/':
-            if(keep_slashes) {
+            if(!escape_slashes) {
                 evbuffer_add( out, &str[i], 1 );
                 break;
             }

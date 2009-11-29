@@ -703,7 +703,7 @@ createAnnounceURL( const tr_announcer     * announcer,
         char ipv6_readable[INET6_ADDRSTRLEN];
         inet_ntop( AF_INET6, ipv6, ipv6_readable, INET6_ADDRSTRLEN );
         evbuffer_add_printf( buf, "&ipv6=");
-        tr_http_escape( buf, ipv6_readable, strlen(ipv6_readable), 0 );
+        tr_http_escape( buf, ipv6_readable, strlen(ipv6_readable), TRUE );
     }
 
     ret = tr_strndup( EVBUFFER_DATA( buf ), EVBUFFER_LENGTH( buf ) );
