@@ -652,6 +652,22 @@ tr_fdSocketCreate( tr_session * session, int domain, int type )
         ++gFd->socketCount;
 
     assert( gFd->socketCount >= 0 );
+
+    if( s >= 0 )
+    {
+        static tr_bool buf_logged = FALSE;
+        if( !buf_logged )
+        {
+            int i;
+            socklen_t size = sizeof( int );
+            buf_logged = TRUE;
+            getsockopt( s, SOL_SOCKET, SO_SNDBUF, &i, &size );
+            tr_inf( "SO_SNDBUF size is %d", i );
+            getsockopt( s, SOL_SOCKET, SO_RCVBUF, &i, &size );
+            tr_inf( "SO_RCVBUF size is %d", i );
+        }
+    }
+
     return s;
 }
 
