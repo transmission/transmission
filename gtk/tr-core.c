@@ -1038,10 +1038,17 @@ tr_core_add_from_url( TrCore * core, const char * url )
 {
     tr_session * session = tr_core_session( core );
 
-    if( gtr_is_magnet_link( url ) )
+    if( gtr_is_magnet_link( url ) || gtr_is_hex_hashcode( url ) )
     {
+        int err;
+        char * tmp = NULL;
         tr_ctor * ctor = tr_ctorNew( session );
-        int err = tr_ctorSetMagnet( ctor, url );
+
+        if( gtr_is_hex_hashcode( url ) )
+            url = tmp = g_strdup_printf( "magnet:?xt=urn:btih:%s", url );
+
+        err = tr_ctorSetMagnet( ctor, url );
+
         if( !err ) 
         {
             tr_session * session = tr_core_session( core );
@@ -1064,6 +1071,8 @@ tr_core_add_from_url( TrCore * core, const char * url )
             gtk_widget_show( w );
             tr_ctorFree( ctor );
         }
+
+        g_free( tmp );
     }
     else
     {

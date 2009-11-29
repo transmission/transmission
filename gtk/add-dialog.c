@@ -486,7 +486,8 @@ onAddURLResponse( GtkDialog * dialog, int response, gpointer user_data )
         {
             TrCore * core = user_data;
 
-            if( gtr_is_supported_url( url ) || gtr_is_magnet_link( url ) )
+            if( gtr_is_supported_url( url ) || gtr_is_magnet_link( url )
+                                            || gtr_is_hex_hashcode( url ) )
             {
                 tr_core_add_from_url( core, url );
             }

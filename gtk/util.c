@@ -337,6 +337,21 @@ gtr_is_magnet_link( const char * str )
     return !strncmp( str, "magnet:?", 8 );
 }
 
+gboolean
+gtr_is_hex_hashcode( const char * str )
+{
+    int i;
+
+    if( !str || ( strlen( str ) != 40 ) )
+        return FALSE;
+
+    for( i=0; i<40; ++i )
+        if( !isxdigit( str[i] ) )
+            return FALSE;
+
+    return TRUE;
+}
+
 GSList *
 checkfilenames( int argc, char **argv )
 {
@@ -357,6 +372,8 @@ checkfilenames( int argc, char **argv )
                             : g_build_filename( pwd, argv[i], NULL );
 
             if( g_file_test( filename, G_FILE_TEST_EXISTS ) )
+                ret = g_slist_prepend( ret, filename );
+            else if( gtr_is_hex_hashcode( filename ) )
                 ret = g_slist_prepend( ret, filename );
             else
                 g_free( filename );
