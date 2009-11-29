@@ -102,6 +102,7 @@ static GtkToggleActionEntry  pref_toggle_entries[] =
 
 static GtkActionEntry entries[] =
 {
+    { "file-menu", NULL, N_( "_File" ), NULL, NULL, NULL  },
     { "torrent-menu", NULL, N_( "_Torrent" ), NULL, NULL, NULL  },
     { "view-menu", NULL, N_( "_View" ), NULL, NULL, NULL  },
     { "sort-menu", NULL, N_( "_Sort Torrents By" ), NULL, NULL, NULL },
