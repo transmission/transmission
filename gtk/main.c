@@ -123,6 +123,51 @@ static void           prefschanged( TrCore *     core,
 
 static gboolean       updatemodel( gpointer gdata );
 
+/***
+****
+***/
+
+#ifdef HAVE_LIBGCONF
+ #include <gconf/gconf.h>
+ #include <gconf/gconf-client.h>
+#endif
+
+static void
+registerMagnetLinkHandler( void )
+{
+#ifdef HAVE_LIBGCONF
+    GError * err;
+    GConfValue * value;
+    GConfClient * client = gconf_client_get_default( );
+    const char * key = "/desktop/gnome/url-handlers/magnet/command";
+
+    /* if there's already a manget handler registered, don't do anything */
+    value = gconf_client_get( client, key, NULL );
+    if( value != NULL )
+    {
+        gconf_value_free( value );
+        return;
+    }
+
+    err = NULL;
+    if( !gconf_client_set_string( client, key, "transmission '%s'", &err ) )
+    {
+        tr_inf( "Unable to register Transmission as default magnet link handler: \"%s\"", err->message );
+        g_clear_error( &err );
+    }
+    else
+    {
+        gconf_client_set_bool( client, "/desktop/gnome/url-handlers/magnet/needs_terminal", FALSE, NULL );
+        gconf_client_set_bool( client, "/desktop/gnome/url-handlers/magnet/enabled", TRUE, NULL );
+        tr_inf( "Transmission registered as default magnet link handler" );
+    }
+#endif
+}
+
+/***
+****
+***/
+
 struct counts_data
 {
     int    totalCount;
@@ -467,6 +512,9 @@ main( int argc, char ** argv )
         if( pref_flag_get( PREF_KEY_BLOCKLIST_UPDATES_ENABLED )
             && ( time( NULL ) - pref_int_get( "blocklist-date" ) > ( 60 * 60 * 24 * 7 ) ) )
                 tr_core_blocklist_update( cbdata->core );
+
+        /* if there's no magnet link handler registered, register us */
+        registerMagnetLinkHandler( );
 
         gtk_main( );
     }

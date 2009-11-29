@@ -37,24 +37,26 @@ else
 fi
 AM_CONDITIONAL(TR_UNSTABLE, test "x$supported_build" = "xno")
 
-OPENSSL_MINIMUM=0.9.4
-CURL_MINIMUM=7.16.3
-GIO_MINIMUM=2.15.5
-GLIB_MINIMUM=2.6.0
-GTK_MINIMUM=2.6.0
-LIBNOTIFY_MINIMUM=0.4.3
-DBUS_GLIB_MINIMUM=0.70
-LIBEVENT_MINIMUM=1.4.5
 CANBERRA_MINIMUM=0.10
-AC_SUBST(OPENSSL_MINIMUM)
-AC_SUBST(CURL_MINIMUM)
-AC_SUBST(GIO_MINIMUM)
-AC_SUBST(GLIB_MINIMUM)
-AC_SUBST(GTK_MINIMUM)
-AC_SUBST(LIBNOTIFY_MINIMUM)
-AC_SUBST(DBUS_GLIB_MINIMUM)
-AC_SUBST(LIBEVENT_MINIUM)
-AC_SUBST(CANBERRA_MINIMUM)
+ AC_SUBST(CANBERRA_MINIMUM)
+CURL_MINIMUM=7.16.3
+ AC_SUBST(CURL_MINIMUM)
+DBUS_GLIB_MINIMUM=0.70
+ AC_SUBST(DBUS_GLIB_MINIMUM)
+GCONF2_MINIMUM=2.20.0
+ AC_SUBST(GCONF2_MINIMUM)
+GIO_MINIMUM=2.15.5
+  AC_SUBST(GIO_MINIMUM)
+GLIB_MINIMUM=2.6.0
+  AC_SUBST(GLIB_MINIMUM)
+GTK_MINIMUM=2.6.0
+  AC_SUBST(GTK_MINIMUM)
+LIBEVENT_MINIMUM=1.4.5
+  AC_SUBST(LIBEVENT_MINIUM)
+LIBNOTIFY_MINIMUM=0.4.3
+  AC_SUBST(LIBNOTIFY_MINIMUM)
+OPENSSL_MINIMUM=0.9.4
+  AC_SUBST(OPENSSL_MINIMUM)
 
 AC_PROG_CC
 AC_PROG_CXX
@@ -292,6 +294,23 @@ if test "x$build_gtk" = "xyes"; then
         fi
     fi
 
+    PKG_CHECK_MODULES([LIBGCONF],
+                      [gconf-2.0 >= $GCONF2_MINIMUM],
+                      [have_libgconf=yes],
+                      [have_libgconf=no])
+    AC_ARG_ENABLE([gconf2], 
+                  AS_HELP_STRING([--enable-libgconf],[enable GConf support]),, 
+                  [enable_libgconf=yes]) 
+    use_libgconf=no
+    if test "x$enable_libgconf" = "xyes" ; then
+        if test "x$have_libgconf" = "xyes"; then
+            use_libgconf=yes
+            AC_SUBST(LIBGCONF_LIBS) 
+            AC_SUBST(LIBGCONF_CFLAGS) 
+            AC_DEFINE([HAVE_LIBGCONF], 1) 
+        fi
+    fi
+
     PKG_CHECK_MODULES([DBUS_GLIB],
                       [dbus-glib-1 >= $DBUS_GLIB_MINIMUM],
                       [use_dbus_glib=yes],
@@ -446,6 +465,7 @@ Configuration:
           ... with canberra support:   ${use_canberra}
           ... with gio support:        ${use_gio}
           ... with dbus-glib support:  ${use_dbus_glib}
+          ... with libgconf support:   ${use_libgconf}
           ... with libnotify support:  ${use_libnotify}
         Build Command-Line client:     ${build_cli}
         Build Daemon:                  ${build_daemon}
