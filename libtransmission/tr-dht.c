@@ -506,17 +506,13 @@ tr_dhtStatus( tr_session * ss, int af, int * nodes_return )
 {
     struct getstatus_closure closure = { af, -1, -1 };
 
-    if( !tr_dhtEnabled( ss ) )
+    if( !tr_dhtEnabled( ss ) ||
+        (af == AF_INET && dht_socket < 0) ||
+        (af == AF_INET6 && dht6_socket < 0) ) {
+        if( nodes_return )
+            *nodes_return = 0;
         return TR_DHT_STOPPED;
-
-    if(dht_socket < 0 && dht6_socket < 0)
-        return TR_DHT_STOPPED;
-
-    if(af == AF_INET && dht_socket < 0)
-        return TR_DHT_STOPPED;
-
-    if(af == AF_INET6 && dht6_socket < 0)
-        return TR_DHT_STOPPED;
+    }
 
     tr_runInEventThread( ss, getstatus, &closure );
     while( closure.status < 0 )
@@ -635,6 +631,12 @@ tr_dhtAnnounce(tr_torrent *tor, int af, tr_bool announce)
         return -1;
 
     status = tr_dhtStatus( tor->session, af, &numnodes );
+
+    if( status == TR_DHT_STOPPED ) {
+        /* Let the caller believe everything is all right. */
+        return 1;
+    }
+
     if(status >= TR_DHT_POOR ) {
         rc = dht_search( tor->info.hash,
                          announce ? tr_sessionGetPeerPort(session) : 0,
