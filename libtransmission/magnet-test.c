@@ -44,12 +44,15 @@ test1( void )
           "d2354010a3ca4ade5b7427bb093a62a3899ff381"
           "&dn=Display%20Name"
           "&tr=http%3A%2F%2Ftracker.openbittorrent.com%2Fannounce"
-          "&tr=http%3A%2F%2Ftracker.opentracker.org%2Fannounce";
+          "&tr=http%3A%2F%2Ftracker.opentracker.org%2Fannounce"
+          "&ws=http%3A%2F%2Fserver.webseed.org%2Fpath%2Fto%2Ffile";
     info = tr_magnetParse( uri );
     check( info != NULL )
-    check( info->announceCount == 2 );
-    check( !strcmp( info->announceURLs[0], "http://tracker.openbittorrent.com/announce" ) )
-    check( !strcmp( info->announceURLs[1], "http://tracker.opentracker.org/announce" ) )
+    check( info->trackerCount == 2 );
+    check( !strcmp( info->trackers[0], "http://tracker.openbittorrent.com/announce" ) )
+    check( !strcmp( info->trackers[1], "http://tracker.opentracker.org/announce" ) )
+    check( info->webseedCount == 1 );
+    check( !strcmp( info->webseeds[0], "http://server.webseed.org/path/to/file" ) )
     check( !strcmp( info->displayName, "Display Name" ) )
     for( i=0; i<20; ++i )
         check( info->hash[i] == dec[i] );
@@ -61,12 +64,15 @@ test1( void )
           "2I2UAEFDZJFN4W3UE65QSOTCUOEZ744B"
           "&dn=Display%20Name"
           "&tr=http%3A%2F%2Ftracker.openbittorrent.com%2Fannounce"
+          "&ws=http%3A%2F%2Fserver.webseed.org%2Fpath%2Fto%2Ffile"
           "&tr=http%3A%2F%2Ftracker.opentracker.org%2Fannounce";
     info = tr_magnetParse( uri );
     check( info != NULL )
-    check( info->announceCount == 2 );
-    check( !strcmp( info->announceURLs[0], "http://tracker.openbittorrent.com/announce" ) )
-    check( !strcmp( info->announceURLs[1], "http://tracker.opentracker.org/announce" ) )
+    check( info->trackerCount == 2 );
+    check( !strcmp( info->trackers[0], "http://tracker.openbittorrent.com/announce" ) )
+    check( !strcmp( info->trackers[1], "http://tracker.opentracker.org/announce" ) )
+    check( info->webseedCount == 1 );
+    check( !strcmp( info->webseeds[0], "http://server.webseed.org/path/to/file" ) )
     check( !strcmp( info->displayName, "Display Name" ) )
     for( i=0; i<20; ++i )
         check( info->hash[i] == dec[i] );

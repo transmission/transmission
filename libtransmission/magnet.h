@@ -18,9 +18,14 @@
 typedef struct tr_magnet_info
 {
     uint8_t hash[20];
+
     char * displayName;
-    char ** announceURLs;
-    int announceCount;
+
+    int trackerCount;
+    char ** trackers;
+
+    int webseedCount;
+    char ** webseeds;
 }
 tr_magnet_info;
 

@@ -93,13 +93,16 @@ base32_to_sha1( uint8_t * out, const char * in, const int inlen )
 ***/
 
 #define MAX_TRACKERS 64
+#define MAX_WEBSEEDS 64
 
 tr_magnet_info *
 tr_magnetParse( const char * uri )
 {
     tr_bool got_checksum = FALSE;
-    int announceCount = 0;
-    char * announceURLs[MAX_TRACKERS];
+    int trCount = 0;
+    int wsCount = 0;
+    char * tr[MAX_TRACKERS];
+    char * ws[MAX_WEBSEEDS];
     char * displayName = NULL;
     uint8_t sha1[SHA_DIGEST_LENGTH];
     tr_magnet_info * info = NULL;
@@ -149,7 +152,10 @@ tr_magnetParse( const char * uri )
                 displayName = tr_http_unescape( val, vallen );
 
             if( ( keylen==2 ) && !memcmp( key, "tr", 2 ) )
-                announceURLs[announceCount++] = tr_http_unescape( val, vallen );
+                tr[trCount++] = tr_http_unescape( val, vallen );
+
+            if( ( keylen==2 ) && !memcmp( key, "ws", 2 ) )
+                ws[wsCount++] = tr_http_unescape( val, vallen );
 
             walk = next != NULL ? next + 1 : NULL;
         }
@@ -159,8 +165,10 @@ tr_magnetParse( const char * uri )
     {
         info = tr_new0( tr_magnet_info, 1 );
         info->displayName = displayName;
-        info->announceCount = announceCount;
-        info->announceURLs = tr_memdup( announceURLs, sizeof(char*) * announceCount );
+        info->trackerCount = trCount;
+        info->trackers = tr_memdup( tr, sizeof(char*) * trCount );
+        info->webseedCount = wsCount;
+        info->webseeds = tr_memdup( ws, sizeof(char*) * wsCount );
         memcpy( info->hash, sha1, sizeof(uint8_t) * SHA_DIGEST_LENGTH );
     }
 
@@ -174,10 +182,14 @@ tr_magnetFree( tr_magnet_info * info )
     {
         int i;
 
-        for( i=0; i<info->announceCount; ++i )
-            tr_free( info->announceURLs[i] );
+        for( i=0; i<info->trackerCount; ++i )
+            tr_free( info->trackers[i] );
+        tr_free( info->trackers );
 
-        tr_free( info->announceURLs );
+        for( i=0; i<info->webseedCount; ++i )
+            tr_free( info->webseeds[i] );
+        tr_free( info->webseeds );
+
         tr_free( info->displayName );
         tr_free( info );
     }

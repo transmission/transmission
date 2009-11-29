@@ -585,18 +585,28 @@ tr_metainfoSetFromMagnet( tr_info * inf, const tr_magnet_info * m )
         inf->name = tr_strdup( inf->hashString );
 
     /* trackers */
-    if( m->announceCount > 0 )
+    if(( inf->trackerCount = m->trackerCount ))
     {
         int i;
-        const int n = m->announceCount;
+        const int n = m->trackerCount;
 
-        inf->trackerCount = n;
         inf->trackers = tr_new0( tr_tracker_info, n );
         for( i=0; i<n; ++i ) {
-            const char * url = m->announceURLs[i];
+            const char * url = m->trackers[i];
             inf->trackers[i].tier = i;
             inf->trackers[i].announce = tr_strdup( url );
             inf->trackers[i].scrape = tr_convertAnnounceToScrape( url );
         }
+    }
+
+    /* webseeds */
+    if(( inf->webseedCount = m->webseedCount ))
+    {
+        int i;
+        const int n = m->webseedCount;
+
+        inf->webseeds = tr_new0( char*, n );
+        for( i=0; i<n; ++i )
+            inf->webseeds[i] = tr_strdup( m->webseeds[i] );
     }
 }
