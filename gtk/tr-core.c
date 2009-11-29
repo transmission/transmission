@@ -1103,7 +1103,7 @@ g_message( "filename [%s]", filename );
     {
         tr_core_add_from_url( core, filename );
     }
-    else /* try it as a local file */
+    else if( g_file_test( filename, G_FILE_TEST_EXISTS ) )
     {
         int err;
 
@@ -1115,6 +1115,10 @@ g_message( "filename [%s]", filename );
         err = add_ctor( core, ctor, doPrompt, doNotify );
         if( err == TR_PARSE_ERR )
             tr_core_errsig( core, TR_PARSE_ERR, filename );
+    }
+    else if( gtr_is_hex_hashcode( filename ) )
+    {
+        tr_core_add_from_url( core, filename );
     }
 }
 

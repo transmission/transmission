@@ -373,10 +373,11 @@ checkfilenames( int argc, char **argv )
 
             if( g_file_test( filename, G_FILE_TEST_EXISTS ) )
                 ret = g_slist_prepend( ret, filename );
-            else if( gtr_is_hex_hashcode( filename ) )
-                ret = g_slist_prepend( ret, filename );
-            else
+            else {
+                if( gtr_is_hex_hashcode( argv[i] ) )
+                    ret = g_slist_prepend( ret, g_strdup( argv[i] ) );
                 g_free( filename );
+            }
         }
     }
 
