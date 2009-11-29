@@ -76,7 +76,6 @@ struct DetailsImpl
     GtkWidget * last_activity_lb;
 
     GtkWidget * hash_lb;
-    GtkWidget * magnet_lb;
     GtkWidget * privacy_lb;
     GtkWidget * origin_lb;
     GtkWidget * destination_lb;
@@ -620,7 +619,6 @@ static void
 refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
 {
     int i;
-    char * freeme;
     const char * str;
     const char * none = _( "None" );
     const char * mixed = _( "Mixed" );
@@ -887,19 +885,6 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
         str = mixed;
     gtr_label_set_text( GTK_LABEL( di->hash_lb ), str );
 
-    /* magnet lb */
-    freeme = NULL;
-    if( n<=0 )
-        str = none;
-    else if ( n>1 )
-        str = mixed;
-    else if( infos[0]->isPrivate )
-        str = _( "Private Torrent" );
-    else
-        str = freeme = tr_torrentGetMagnetLink( torrents[0] );
-    gtr_label_set_text( GTK_LABEL( di->magnet_lb ), str );
-    tr_free( freeme );
-
     /* error */
     if( n <= 0 )
         str = none;
@@ -1013,13 +998,6 @@ info_page_new( struct DetailsImpl * di )
                                            NULL );
         hig_workarea_add_row( t, &row, _( "Hash:" ), l, NULL );
         di->hash_lb = l;
-
-        /* magnet url */
-        l = g_object_new( GTK_TYPE_LABEL, "selectable", TRUE,
-                                          "ellipsize", PANGO_ELLIPSIZE_END,
-                                           NULL );
-        hig_workarea_add_row( t, &row, _( "Magnet link:" ), l, NULL );
-        di->magnet_lb = l;
 
         /* privacy */
         l = gtk_label_new( NULL );

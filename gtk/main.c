@@ -179,6 +179,7 @@ refreshActions( struct cbdata * data )
     action_sensitize( "show-torrent-properties", counts.totalCount != 0 );
     action_sensitize( "open-torrent-folder", counts.totalCount == 1 );
     action_sensitize( "relocate-torrent", counts.totalCount == 1 );
+    action_sensitize( "copy-magnet-link-to-clipboard", counts.totalCount == 1 );
 
     canUpdate = 0;
     gtk_tree_selection_selected_foreach( s, accumulateCanUpdateForeach, &canUpdate );
@@ -1343,6 +1344,17 @@ detailsClosed( gpointer gdata, GObject * dead )
     data->details = g_slist_remove( data->details, dead );
 }
 
+static void
+copyMagnetLinkToClipboard( GtkWidget * w, tr_torrent * tor )
+{
+    char * magnet = tr_torrentGetMagnetLink( tor );
+    GdkDisplay * display = gtk_widget_get_display( w );
+    GdkAtom selection = GDK_SELECTION_CLIPBOARD;
+    GtkClipboard * clipboard = gtk_clipboard_get_for_display( display, selection );
+    gtk_clipboard_set_text( clipboard, magnet, -1 );
+    tr_free( magnet );
+}
+
 void
 doAction( const char * action_name, gpointer user_data )
 {
@@ -1381,10 +1393,18 @@ doAction( const char * action_name, gpointer user_data )
     {
         startAllTorrents( data );
     }
+    else if( !strcmp( action_name, "copy-magnet-link-to-clipboard" ) )
+    {
+        tr_torrent * tor = getFirstSelectedTorrent( data );
+        if( tor != NULL )
+        {
+            copyMagnetLinkToClipboard( GTK_WIDGET( data->wind ), tor );
+        }
+    }
     else if( !strcmp( action_name, "relocate-torrent" ) )
     {
         tr_torrent * tor = getFirstSelectedTorrent( data );
-        if( tor )
+        if( tor != NULL )
         {
             GtkWindow * parent = GTK_WINDOW( data->wind );
             GtkWidget * w = gtr_relocate_dialog_new( parent, tor );
