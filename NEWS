@@ -1,3 +1,34 @@
+=== Transmission 1.80 (In Development) ===
+[http://trac.transmissionbt.com/query?milestone=1.80&group=component&groupdesc=1&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Added support for Magnet links
+  * If a torrent has multiple tracker tiers, announce to them in parallel
+  * Add optional "incomplete directory" where partial downloads are stored
+  * Allow trackerless torrents to be added
+  * Improved IPv6 support
+  * Update to libdht 0.11
+  * Fix potential crash on shutdown when port forwarding is disabled
+  * Faster management of very long peer lists
+  * When seeding, prefetch the data we upload
+  * Improved PEX support
+  * Brand-new torrents with no downloaded data don't have to wait in the "Verify Local Data" queue
+  * Various bugfixes
+  * Add first-time user as per the proposed "Informed P2P User Act"
+==== Mac ====
+==== GTK+ ====
+  * When creating a torrent, make it easier to auto-add that new torrent
+  * Added support for adding torrents by URL
+  * Add optional "download complete" sound using the XDG sound naming spec
+  * New statusbar "Ratio" icon submitted by jimmac
+  * Fix minor memory leaks
+==== Daemon ====
+  * Reload settings.json when receiving SIGHUP
+  * When running as a daemon, send log messages to syslog
+  * transmission-remote now allows per-torrent speed limits to be set
+==== Web Client ====
+  * Add "turtle mode" support to the web client
+  * Double-clicking a torrent opens/closes the torrent inspector
+
 === Transmission 1.76 (2009/10/24) ===
 [http://trac.transmissionbt.com/query?milestone=1.76&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== All Platforms ====
