@@ -954,7 +954,7 @@ tr_core_add_ctor( TrCore * core, tr_ctor * ctor )
 /* invoked remotely via dbus. */
 gboolean
 tr_core_add_metainfo( TrCore      * core,
-                      const char  * base64_metainfo,
+                      const char  * payload,
                       gboolean    * setme_success,
                       GError     ** gerr UNUSED )
 {
@@ -964,7 +964,12 @@ tr_core_add_metainfo( TrCore      * core,
     {
         *setme_success = FALSE;
     }
-    else
+    else if( gtr_is_supported_url( payload ) || gtr_is_magnet_link( payload ) )
+    {
+        tr_core_add_from_url( core, payload );
+        *setme_success = TRUE;
+    }
+    else /* base64-encoded metainfo */
     {
         int err;
         int file_length;
@@ -975,7 +980,7 @@ tr_core_add_metainfo( TrCore      * core,
         ctor = tr_ctorNew( session );
         tr_core_apply_defaults( ctor );
 
-        file_contents = tr_base64_decode( base64_metainfo, -1, &file_length );
+        file_contents = tr_base64_decode( payload, -1, &file_length );
         err = tr_ctorSetMetainfo( ctor, (const uint8_t*)file_contents, file_length );
 
         if( !err )
