@@ -1586,7 +1586,7 @@ deadlineReached( const uint64_t deadline )
     return tr_date( ) >= deadline;
 }
 
-#define SHUTDOWN_MAX_SECONDS 30
+#define SHUTDOWN_MAX_SECONDS 20
 
 void
 tr_sessionClose( tr_session * session )
@@ -1602,8 +1602,7 @@ tr_sessionClose( tr_session * session )
     tr_runInEventThread( session, sessionCloseImpl, session );
     while( !session->isClosed && !deadlineReached( deadline ) )
     {
-        dbgmsg(
-            "waiting for the shutdown commands to run in the main thread" );
+        dbgmsg( "waiting for the libtransmission thread to finish" );
         tr_wait( 100 );
     }
 
@@ -1623,10 +1622,16 @@ tr_sessionClose( tr_session * session )
 
     /* close the libtransmission thread */
     tr_eventClose( session );
-    while( session->events && !deadlineReached( deadline ) )
+    while( session->events != NULL )
     {
-        dbgmsg( "waiting for the libevent thread to shutdown cleanly" );
+        static tr_bool forced = FALSE;
+        dbgmsg( "waiting for libtransmission thread to finish" );
         tr_wait( 100 );
+        if( deadlineReached( deadline ) && !forced )
+        {
+            event_loopbreak( );
+            forced = TRUE;
+        }
     }
 
     /* free the session memory */
