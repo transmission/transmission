@@ -1167,7 +1167,7 @@ void tr_torrentSetDownloadDir( tr_torrent  * torrent, const char * path );
 const char * tr_torrentGetDownloadDir( const tr_torrent * torrent );
 
 /**
- * Returns the the root directory of where the torrent is.
+ * Returns the root directory of where the torrent is.
  *
  * This will usually be the downloadDir.  However if the torrent
  * has an incompleteDir enabled and hasn't finished downloading
