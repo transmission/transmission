@@ -7,17 +7,17 @@
   * Trackerless torrent support
   * Improved IPv6 support
   * Append .part to incomplete files
-  * Fix potential crash on shutdown when port forwarding is disabled
   * Faster management of very long peer lists
   * When seeding, prefetch the data we upload
   * Improved DHT support (libdht 0.11)
   * Improved PEX support
   * Brand-new torrents with no downloaded data don't have to wait in the "Verify Local Data" queue
-  * Various bugfixes and performance tweaks
+  * Fix potential crash on shutdown when port forwarding is disabled
+  * Various bug fixes and performance tweaks
   * Add first-time user prompt as per the proposed "Informed P2P User Act"
 ==== Mac ====
-  * Redesigned trackers inspector tabbed with favicons and copy-paste functionality (paste lists of trackers at once)
-  * Message log window stores all messages and does real filtering
+  * Redesigned trackers inspector tab with favicons and copy-paste functionality (paste lists of multiple trackers)
+  * Message log stores all messages and does real filtering
   * Quick Look restored on Snow Leopard
   * Moving data and incomplete folders are now handled by libtransmission
   * Improved reveal in Finder functionality on Snow Leopard
