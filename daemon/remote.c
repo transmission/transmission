@@ -1468,6 +1468,7 @@ printDetails( tr_benc * top )
             if( tr_bencDictFindRaw( t, "pieces", &raw, &rawlen ) && tr_bencDictFindInt( t, "pieceCount", &j ) ) {
                 int len;
                 char * str = tr_base64_decode( raw, rawlen, &len );
+                printf( "  " );
                 for( i=k=0; k<len; ++k ) {
                     int e;
                     for( e=0; i<j && e<8; ++e, ++i )
