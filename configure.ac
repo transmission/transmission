@@ -458,7 +458,6 @@ Configuration:
         Source code location:          ${srcdir}
         Compiler:                      ${CXX}
         System or bundled libevent:    ${libevent_source}
-        DHT support:                   ${enable_dht}
 
         Build Mac client:              ${build_mac}
         Build GTK+ client:             ${build_gtk}
