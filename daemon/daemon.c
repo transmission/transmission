@@ -115,6 +115,7 @@ gotsig( int sig )
             tr_sessionLoadSettings( &settings, configDir, MY_NAME );
             tr_sessionSet( mySession, &settings );
             tr_bencFree( &settings );
+            tr_sessionReloadBlocklists( mySession );
             break;
         }
 

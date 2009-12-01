@@ -306,6 +306,9 @@ tr_session * tr_sessionInit( const char     * tag,
 void tr_sessionSet( tr_session      * session,
                     struct tr_benc  * settings );
 
+void tr_sessionReloadBlocklists( tr_session * session );
+
+
 /** @brief End a libtransmission session
     @see tr_sessionInit() */
 void tr_sessionClose( tr_session * );
