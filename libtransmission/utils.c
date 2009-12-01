@@ -50,6 +50,7 @@ static tr_lock *      messageLock = NULL;
 static tr_bool        messageQueuing = FALSE;
 static tr_msg_list *  messageQueue = NULL;
 static tr_msg_list ** messageQueueTail = &messageQueue;
+static int            messageQueueCount = 0;
 
 #ifndef WIN32
     /* make null versions of these win32 functions */
@@ -166,6 +167,8 @@ tr_getQueuedMessages( void )
     ret = messageQueue;
     messageQueue = NULL;
     messageQueueTail = &messageQueue;
+    
+    messageQueueCount = 0;
 
     tr_lockUnlock( messageLock );
     return ret;
@@ -325,6 +328,19 @@ tr_msg( const char * file, int line,
 
                 *messageQueueTail = newmsg;
                 messageQueueTail = &newmsg->next;
+                ++messageQueueCount;
+                
+                if (messageQueueCount > TR_MAX_MSG_LOG)
+                {
+                    tr_msg_list * old = messageQueue;
+                    messageQueue = old->next;
+                    old->next = NULL;
+                    tr_freeMessageList(old);
+                    
+                    --messageQueueCount;
+                    
+                    assert( messageQueueCount == TR_MAX_MSG_LOG );
+                }
             }
             else
             {

@@ -125,6 +125,8 @@ void tr_assertImpl( const char * file, int line, const char * test, const char *
 
 void tr_msgInit( void );
 
+#define TR_MAX_MSG_LOG 20000
+
 extern int messageLevel;
 
 static TR_INLINE tr_bool tr_msgLoggingIsActive( int level )
