@@ -1103,7 +1103,6 @@ add_filename( TrCore      * core,
     if( session == NULL )
         return;
 
-g_message( "filename [%s]", filename );
     if( gtr_is_supported_url( filename ) || gtr_is_magnet_link( filename ) )
     {
         tr_core_add_from_url( core, filename );
@@ -1318,8 +1317,11 @@ tr_core_quit( TrCore * core )
 static DBusGProxy*
 get_hibernation_inhibit_proxy( void )
 {
-    GError *          error = NULL;
     DBusGConnection * conn;
+    GError * error = NULL;
+    const char * name = "org.gnome.SessionManager";
+    const char * path = "/org/gnome/SessionManager";
+    const char * interface = "org.gnome.SessionManager";
 
     conn = dbus_g_bus_get( DBUS_BUS_SESSION, &error );
     if( error )
@@ -1329,11 +1331,7 @@ get_hibernation_inhibit_proxy( void )
         return NULL;
     }
 
-    return dbus_g_proxy_new_for_name (
-               conn,
-               "org.freedesktop.PowerManagement",
-               "/org/freedesktop/PowerManagement/Inhibit",
-               "org.freedesktop.PowerManagement.Inhibit" );
+    return dbus_g_proxy_new_for_name ( conn, name, path, interface );
 }
 
 static gboolean
@@ -1344,15 +1342,20 @@ gtr_inhibit_hibernation( guint * cookie )
 
     if( proxy )
     {
-        GError *     error = NULL;
+        GError * error = NULL;
+        const int toplevel_xid = 0;
         const char * application = _( "Transmission Bittorrent Client" );
         const char * reason = _( "BitTorrent Activity" );
+        const int flags = 8; /* Inhibit the session being marked as idle */
+
         success = dbus_g_proxy_call( proxy, "Inhibit", &error,
                                      G_TYPE_STRING, application,
+                                     G_TYPE_UINT, toplevel_xid,
                                      G_TYPE_STRING, reason,
-                                     G_TYPE_INVALID,
+                                     G_TYPE_UINT, flags,
+                                     G_TYPE_INVALID, /* sentinel - end of input args */
                                      G_TYPE_UINT, cookie,
-                                     G_TYPE_INVALID );
+                                     G_TYPE_INVALID /* senitnel - end of output args */ );
         if( success )
             tr_inf( "%s", _( "Disallowing desktop hibernation" ) );
         else
@@ -1376,7 +1379,7 @@ gtr_uninhibit_hibernation( guint inhibit_cookie )
     if( proxy )
     {
         GError * error = NULL;
-        gboolean success = dbus_g_proxy_call( proxy, "UnInhibit", &error,
+        gboolean success = dbus_g_proxy_call( proxy, "Uninhibit", &error,
                                               G_TYPE_UINT, inhibit_cookie,
                                               G_TYPE_INVALID,
                                               G_TYPE_INVALID );
