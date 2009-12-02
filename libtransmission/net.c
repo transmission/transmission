@@ -289,7 +289,8 @@ tr_isValidPeerAddress( const tr_address * addr, tr_port port )
 int
 tr_netOpenTCP( tr_session        * session,
                const tr_address  * addr,
-               tr_port             port )
+               tr_port             port,
+               tr_bool             isSeed )
 {
     static const int domains[NUM_TR_AF_INET_TYPES] = { AF_INET, AF_INET6 };
     int                     s;
@@ -307,6 +308,13 @@ tr_netOpenTCP( tr_session        * session,
     s = tr_fdSocketCreate( session, domains[addr->type], SOCK_STREAM );
     if( s < 0 )
         return -1;
+
+    /* seeds don't need much of a read buffer... */
+    if( isSeed ) {
+        int n = 1024 * 2;
+        if( setsockopt( s, SOL_SOCKET, SO_RCVBUF, &n, sizeof(n) ) )
+            tr_inf( "Unable to set SO_RCVBUF on socket %d: %s", s, tr_strerror( sockerrno ) );
+    }
 
     if( evutil_make_socket_nonblocking( s ) < 0 ) {
         tr_netClose( session, s );

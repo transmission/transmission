@@ -19,6 +19,7 @@
 #include <event.h>
 
 #include "transmission.h"
+#include "announcer.h"
 #include "bandwidth.h"
 #include "bencode.h"
 #include "blocklist.h"
@@ -2608,6 +2609,8 @@ reconnectTorrent( Torrent * t )
 
         /* decide how many peers can we try to add in this pass */
         maxCandidates = MAX_RECONNECTIONS_PER_PULSE;
+        if( tr_announcerHasBacklog( t->manager->session->announcer ) )
+            maxCandidates /= 2;
         maxCandidates = MIN( maxCandidates, getMaxPeerCount( t->tor ) - getPeerCount( t ) );
         maxCandidates = MIN( maxCandidates, MAX_CONNECTIONS_PER_SECOND - newConnectionsThisSecond );
 
@@ -2674,7 +2677,8 @@ reconnectTorrent( Torrent * t )
                                            mgr->session->bandwidth,
                                            &atom->addr,
                                            atom->port,
-                                           t->tor->info.hash );
+                                           t->tor->info.hash,
+                                           t->tor->completeness == TR_SEED );
 
                 if( io == NULL )
                 {

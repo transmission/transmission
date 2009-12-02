@@ -100,7 +100,8 @@ tr_bool tr_net_hasIPv6( tr_port );
  **********************************************************************/
 int  tr_netOpenTCP( tr_session       * session,
                     const tr_address * addr,
-                    tr_port            port );
+                    tr_port            port,
+                    tr_bool            isSeed );
 
 int  tr_netBindTCP( const tr_address * addr,
                     tr_port            port,

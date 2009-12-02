@@ -363,13 +363,16 @@ tr_peerIoNew( tr_session       * session,
               const tr_address * addr,
               tr_port            port,
               const uint8_t    * torrentHash,
-              int                isIncoming,
+              tr_bool            isIncoming,
+              tr_bool            isSeed,
               int                socket )
 {
     tr_peerIo * io;
 
     assert( session != NULL );
     assert( session->events != NULL );
+    assert( tr_isBool( isIncoming ) );
+    assert( tr_isBool( isSeed ) );
     assert( tr_amInEventThread( session ) );
 
     if( socket >= 0 )
@@ -405,13 +408,13 @@ tr_peerIoNewIncoming( tr_session        * session,
                       tr_bandwidth      * parent,
                       const tr_address  * addr,
                       tr_port             port,
-                      int                 socket )
+                      int                 fd )
 {
     assert( session );
     assert( tr_isAddress( addr ) );
-    assert( socket >= 0 );
+    assert( fd >= 0 );
 
-    return tr_peerIoNew( session, parent, addr, port, NULL, 1, socket );
+    return tr_peerIoNew( session, parent, addr, port, NULL, TRUE, FALSE, fd );
 }
 
 tr_peerIo*
@@ -419,20 +422,20 @@ tr_peerIoNewOutgoing( tr_session        * session,
                       tr_bandwidth      * parent,
                       const tr_address  * addr,
                       tr_port             port,
-                      const uint8_t     * torrentHash )
+                      const uint8_t     * torrentHash,
+                      tr_bool             isSeed )
 {
-    int socket;
+    int fd;
 
     assert( session );
     assert( tr_isAddress( addr ) );
     assert( torrentHash );
 
-    socket = tr_netOpenTCP( session, addr, port );
-    dbgmsg( NULL, "tr_netOpenTCP returned fd %d", socket );
+    fd = tr_netOpenTCP( session, addr, port, isSeed );
+    dbgmsg( NULL, "tr_netOpenTCP returned fd %d", fd );
 
-    return socket < 0
-           ? NULL
-           : tr_peerIoNew( session, parent, addr, port, torrentHash, 0, socket );
+    return fd < 0 ? NULL
+                  : tr_peerIoNew( session, parent, addr, port, torrentHash, FALSE, isSeed, fd );
 }
 
 static void
@@ -558,7 +561,7 @@ tr_peerIoReconnect( tr_peerIo * io )
     if( io->socket >= 0 )
         tr_netClose( session, io->socket );
 
-    io->socket = tr_netOpenTCP( session, &io->addr, io->port );
+    io->socket = tr_netOpenTCP( session, &io->addr, io->port, io->isSeed );
     if( io->socket >= 0 )
     {
         tr_netSetTOS( io->socket, session->peerSocketTOS );

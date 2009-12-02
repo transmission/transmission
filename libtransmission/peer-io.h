@@ -82,6 +82,7 @@ typedef struct tr_peerIo
     int                   magicNumber;
 
     uint8_t               encryptionMode;
+    tr_bool               isSeed;
 
     tr_port               port;
     int                   socket;
@@ -120,7 +121,8 @@ tr_peerIo*  tr_peerIoNewOutgoing( tr_session              * session,
                                   struct tr_bandwidth     * parent,
                                   const struct tr_address * addr,
                                   tr_port                   port,
-                                  const  uint8_t          * torrentHash );
+                                  const  uint8_t          * torrentHash,
+                                  tr_bool                   isSeed );
 
 tr_peerIo*  tr_peerIoNewIncoming( tr_session              * session,
                                   struct tr_bandwidth     * parent,

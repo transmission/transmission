@@ -57,10 +57,10 @@ enum
     KEYLEN = 8,
 
     /* how many scrapes we allow at one time */
-    MAX_CONCURRENT_SCRAPES = 16,
+    MAX_CONCURRENT_SCRAPES = 96,
 
     /* how many announces we allow at one time */
-    MAX_CONCURRENT_ANNOUNCES = 48,
+    MAX_CONCURRENT_ANNOUNCES = 96,
 
     /* if a tracker takes more than this long to respond,
      * we treat it as nonresponsive */
@@ -208,6 +208,13 @@ typedef struct tr_announcer
     int scrapeSlotsAvailable;
 }
 tr_announcer;
+
+tr_bool
+tr_announcerHasBacklog( const struct tr_announcer * announcer )
+{
+    return ( announcer->scrapeSlotsAvailable < 1 )
+        || ( announcer->announceSlotsAvailable < 1 );
+}
 
 static tr_host *
 getHost( tr_announcer * announcer, const char * url )
@@ -1641,6 +1648,12 @@ announceMore( tr_announcer * announcer )
             dbgmsg( tier, "scraping tier %d of %d", (i+1), n );
             tierScrape( announcer, tier );
         }
+
+#if 0
+char timebuf[64];
+tr_getLogTimeStr( timebuf, 64 );
+fprintf( stderr, "[%s] announce.c has %d requests ready to send (announce: %d, scrape: %d)\n", timebuf, (int)(tr_ptrArraySize(&announceMe)+tr_ptrArraySize(&scrapeMe)), (int)tr_ptrArraySize(&announceMe), (int)tr_ptrArraySize(&scrapeMe) );
+#endif
 
         /* cleanup */
         tr_ptrArrayDestruct( &scrapeMe, NULL );
