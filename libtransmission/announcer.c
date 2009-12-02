@@ -130,6 +130,7 @@ compareHostToName( const void * va, const void * vb )
     return strcmp( a->name, vb );
 }
 
+/* format: hostname + ':' + port */
 static char *
 getHostName( const char * url )
 {
@@ -425,6 +426,7 @@ tierFree( void * vtier )
 static void
 tierIncrementTracker( tr_tier * tier )
 {
+    /* move our index to the next tracker in the tier */
     const int i = ( tier->currentTrackerIndex + 1 )
                         % tr_ptrArraySize( &tier->trackers );
     tier->currentTracker = tr_ptrArrayNth( &tier->trackers, i );
@@ -1456,11 +1458,11 @@ onScrapeDone( tr_session   * session,
               size_t         responseLen,
               void         * vdata )
 {
+    tr_bool success = FALSE;
     tr_announcer * announcer = session->announcer;
     struct announce_data * data = vdata;
     tr_tier * tier = getTier( announcer, data->torrentId, data->tierId );
     const time_t now = tr_time( );
-    tr_bool success = FALSE;
 
     if( announcer )
         ++announcer->scrapeSlotsAvailable;
@@ -1532,8 +1534,8 @@ onScrapeDone( tr_session   * session,
 static void
 tierScrape( tr_announcer * announcer, tr_tier * tier )
 {
+    char * url;
     const char * scrape;
-    struct evbuffer * buf;
     struct announce_data * data;
     const time_t now = tr_time( );
 
@@ -1548,19 +1550,18 @@ tierScrape( tr_announcer * announcer, tr_tier * tier )
 
     scrape = tier->currentTracker->scrape;
 
-    buf = evbuffer_new( );
-    evbuffer_add_printf( buf, "%s%cinfo_hash=%s",
-                         scrape,
-                         strchr( scrape, '?' ) ? '&' : '?',
-                         tier->tor->info.hashEscaped );
+    url = tr_strdup_printf( "%s%cinfo_hash=%s",
+                            scrape,
+                            strchr( scrape, '?' ) ? '&' : '?',
+                            tier->tor->info.hashEscaped );
 
     tier->isScraping = TRUE;
     tier->lastScrapeStartTime = now;
     --announcer->scrapeSlotsAvailable;
-    dbgmsg( tier, "scraping \"%s\"", (const char*)EVBUFFER_DATA(buf) );
-    tr_webRun( announcer->session, (const char*)EVBUFFER_DATA(buf), NULL, onScrapeDone, data );
+    dbgmsg( tier, "scraping \"%s\"", url );
+    tr_webRun( announcer->session, url, NULL, onScrapeDone, data );
 
-    evbuffer_free( buf );
+    tr_free( url );
 }
 
 static void

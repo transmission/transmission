@@ -83,7 +83,6 @@ tr_bencParseInt( const uint8_t *  buf,
                  const uint8_t ** setme_end,
                  int64_t *        setme_val )
 {
-    int          err = 0;
     char *       endptr;
     const void * begin;
     const void * end;
@@ -102,16 +101,13 @@ tr_bencParseInt( const uint8_t *  buf,
     errno = 0;
     val = evutil_strtoll( begin, &endptr, 10 );
     if( errno || ( endptr != end ) ) /* incomplete parse */
-        err = EILSEQ;
-    else if( val && *(const char*)begin == '0' ) /* no leading zeroes! */
-        err = EILSEQ;
-    else
-    {
-        *setme_end = (const uint8_t*)end + 1;
-        *setme_val = val;
-    }
+        return EILSEQ;
+    if( val && *(const char*)begin == '0' ) /* no leading zeroes! */
+        return EILSEQ;
 
-    return err;
+    *setme_end = (const uint8_t*)end + 1;
+    *setme_val = val;
+    return 0;
 }
 
 /**
