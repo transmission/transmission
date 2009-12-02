@@ -1855,7 +1855,7 @@ dht_periodic(int available, time_t *tosleep,
             if(tid_len != 4) {
                 debugf("Broken node truncates transaction ids: ");
                 debug_printable(buf, rc);
-                printf("\n");
+                debugf("\n");
                 /* This is really annoying, as it means that we will
                    time-out all our searches that go through this node.
                    Kill it. */
