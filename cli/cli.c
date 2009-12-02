@@ -88,7 +88,7 @@ getUsage( void )
 {
     return "A fast and easy BitTorrent client\n"
            "\n"
-           "Usage: " MY_NAME " [options] <torrent-filename>";
+           "Usage: " MY_NAME " [options] <file|url|magnet>";
 }
 
 static int parseCommandLine( tr_benc*, int argc, const char ** argv );
@@ -143,6 +143,19 @@ torrentCompletenessChanged( tr_torrent       * torrent       UNUSED,
                             void             * user_data     UNUSED )
 {
     system( finishCall );
+}
+
+static tr_bool waitingOnWeb;
+
+static void
+onTorrentFileDownloaded( tr_session   * session UNUSED,
+                         long           response_code UNUSED,
+                         const void   * response,
+                         size_t         response_byte_count,
+                         void         * ctor )
+{
+    tr_ctorSetMetainfo( ctor, response, response_byte_count );
+    waitingOnWeb = FALSE;
 }
 
 static int leftToScrape = 0;
@@ -302,6 +315,8 @@ main( int     argc,
     const char  * configDir;
     tr_bool       haveSource;
     tr_bool       haveAnnounce;
+    uint8_t     * fileContents;
+    size_t        fileLength;
 
     printf( "Transmission %s - http://www.transmissionbt.com/\n",
             LONG_VERSION_STRING );
@@ -360,8 +375,19 @@ main( int     argc,
     }
 
     ctor = tr_ctorNew( h );
-    tr_ctorSetMetainfoFromFile( ctor, torrentPath );
+
+    fileContents = tr_loadFile( torrentPath, &fileLength );
     tr_ctorSetPaused( ctor, TR_FORCE, showScrape );
+    if( fileContents != NULL ) {
+        tr_ctorSetMetainfo( ctor, fileContents, fileLength );
+    } else if( !memcmp( torrentPath, "magnet:?", 8 ) ) {
+        tr_ctorSetMagnet( ctor, torrentPath );
+    } else if( !memcmp( torrentPath, "http", 4 ) ) {
+        tr_webRun( h, torrentPath, NULL, onTorrentFileDownloaded, ctor );
+        waitingOnWeb = TRUE;
+        while( waitingOnWeb ) tr_wait( 1000 );
+    }
+    tr_free( fileContents );
 
     if( showScrape )
     {
@@ -386,6 +412,7 @@ main( int     argc,
                                             escaped );
                     tr_httpParseURL( scrape, -1, &host, NULL, NULL );
                     ++leftToScrape;
+
                     tr_webRun( h, url, NULL, scrapeDoneFunc, host );
                     tr_free( url );
                 }
