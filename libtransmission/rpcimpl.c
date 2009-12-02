@@ -500,6 +500,8 @@ addField( const tr_torrent * tor, tr_benc * d, const char * key )
         tr_bencDictAddInt( d, key, st->manualAnnounceTime );
     else if( tr_streq( key, keylen, "maxConnectedPeers" ) )
         tr_bencDictAddInt( d, key,  tr_torrentGetPeerLimit( tor ) );
+    else if( tr_streq( key, keylen, "metadataPecentComplete" ) )
+        tr_bencDictAddReal( d, key, st->metadataPercentComplete );
     else if( tr_streq( key, keylen, "name" ) )
         tr_bencDictAddStr( d, key, inf->name );
     else if( tr_streq( key, keylen, "percentDone" ) )
