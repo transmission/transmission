@@ -311,7 +311,7 @@ tr_netOpenTCP( tr_session        * session,
 
     /* seeds don't need much of a read buffer... */
     if( isSeed ) {
-        int n = 1024 * 2;
+        int n = 8192;
         if( setsockopt( s, SOL_SOCKET, SO_RCVBUF, &n, sizeof(n) ) )
             tr_inf( "Unable to set SO_RCVBUF on socket %d: %s", s, tr_strerror( sockerrno ) );
     }
