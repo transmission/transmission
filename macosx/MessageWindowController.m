@@ -189,44 +189,18 @@
         }
     }
     
+    if ([fMessages count] > TR_MAX_MSG_LOG)
+    {
+        NSIndexSet * removeIndexes = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fMessages count]-TR_MAX_MSG_LOG)];
+        NSArray * itemsToRemove = [fMessages objectsAtIndexes: removeIndexes];
+        
+        [fMessages removeObjectsAtIndexes: removeIndexes];
+        [fDisplayedMessages removeObjectsInArray: itemsToRemove];
+        changed = YES;
+    }
+    
     if (changed)
     {
-        if ([fMessages count] > TR_MAX_MSG_LOG)
-        {
-            const NSUInteger removeCount = [fMessages count] - TR_MAX_MSG_LOG;
-            
-            //find the latest message to removed that is also displayed
-            NSDictionary * latestMessageToRemove = nil;
-            for (NSInteger i = removeCount-1; i >= 0; --i)
-            {
-                NSDictionary * message = [fMessages objectAtIndex: i];
-                if ([[message objectForKey: @"Level"] integerValue] <= maxLevel)
-                {
-                    latestMessageToRemove = message;
-                    break;
-                }
-            }
-            
-            if (latestMessageToRemove)
-            {
-                NSSortDescriptor * descriptor = [[[NSSortDescriptor alloc] initWithKey: @"Index" ascending: NO] autorelease];
-                [fDisplayedMessages sortUsingDescriptors: [NSArray arrayWithObject: descriptor]];
-                
-                //sort in reverse and find the message within the bounds of the number of messages to remove
-                const NSUInteger displayedCount = [fDisplayedMessages count];
-                const NSUInteger removeDisplayedCount = MIN(removeCount, displayedCount);
-                const NSUInteger lastIndex = [fDisplayedMessages indexOfObject: latestMessageToRemove inRange:
-                                                NSMakeRange(displayedCount-removeDisplayedCount, removeDisplayedCount)];
-                NSAssert(lastIndex != NSNotFound, @"message to trim not found when it should be");
-                
-                NSIndexSet * removeIndexes = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(lastIndex, displayedCount-lastIndex)];
-                [fDisplayedMessages removeObjectsAtIndexes: removeIndexes];
-            }
-            
-            NSIndexSet * removeIndexes = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, removeCount)];
-            [fMessages removeObjectsAtIndexes: removeIndexes];
-        }
-        
         [fDisplayedMessages sortUsingDescriptors: [fMessageTable sortDescriptors]];
         
         [fMessageTable reloadData];
