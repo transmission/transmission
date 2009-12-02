@@ -942,10 +942,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     Torrent * torrent;
     if (!(torrent = [[Torrent alloc] initWithMagnetAddress: address location: nil lib: fLib]))
     {
-        NSRunAlertPanel(NSLocalizedString(@"Adding magnetized transfer failed", "Magnet link failed -> title"),
-            [NSString stringWithFormat: NSLocalizedString(@"There was an error when adding the magnet link \"%@\"."
-            " The transfer will not occur.", "Magnet link failed -> message"), address],
-            NSLocalizedString(@"OK", "Magnet link failed -> button"), nil, nil);
+        [self invalidOpenMagnetAlert: address];
         return;
     }
     
@@ -1074,6 +1071,24 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [alert release];
 }
 
+- (void) invalidOpenMagnetAlert: (NSString *) address
+{
+    if (![fDefaults boolForKey: @"WarningInvalidOpen"])
+        return;
+    
+    NSAlert * alert = [[NSAlert alloc] init];
+    [alert setMessageText: NSLocalizedString(@"Adding magnetized transfer failed", "Magnet link failed -> title")];
+    [alert setInformativeText: [NSString stringWithFormat: NSLocalizedString(@"There was an error when adding the magnet link \"%@\"."
+                                " The transfer will not occur.", "Magnet link failed -> message"), address]];
+    [alert setAlertStyle: NSWarningAlertStyle];
+    [alert addButtonWithTitle: NSLocalizedString(@"OK", "Magnet link failed -> button")];
+    
+    [alert runModal];
+    if ([[alert suppressionButton] state] == NSOnState)
+        [fDefaults setBool: NO forKey: @"WarningInvalidOpen"];
+    [alert release];
+}
+
 - (void) duplicateOpenAlert: (NSString *) name
 {
     if (![fDefaults boolForKey: @"WarningDuplicate"])
@@ -1083,7 +1098,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [alert setMessageText: [NSString stringWithFormat: NSLocalizedString(@"A transfer of \"%@\" already exists.",
                             "Open duplicate alert -> title"), name]];
     [alert setInformativeText:
-            NSLocalizedString(@"The torrent file cannot be opened because it is a duplicate of an already added transfer.",
+            NSLocalizedString(@"The transfer cannot be added because it is a duplicate of an already existing transfer.",
                             "Open duplicate alert -> message")];
     [alert setAlertStyle: NSWarningAlertStyle];
     [alert addButtonWithTitle: NSLocalizedString(@"OK", "Open duplicate alert -> button")];

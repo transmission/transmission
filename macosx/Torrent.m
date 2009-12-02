@@ -1748,6 +1748,7 @@ int trashDataFile(const char * filename)
     
     [self createFileList];
     
+    #warning only call when torrent is selected
     [[NSNotificationCenter defaultCenter] postNotificationName: @"ResetInspector" object: self];
 }
 
