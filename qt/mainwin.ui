@@ -51,7 +51,7 @@
      <x>0</x>
      <y>0</y>
      <width>792</width>
-     <height>23</height>
+     <height>25</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -126,7 +126,8 @@
     <property name="title">
      <string>&amp;File</string>
     </property>
-    <addaction name="action_Add"/>
+    <addaction name="action_AddFile"/>
+    <addaction name="action_AddURL"/>
     <addaction name="action_New"/>
     <addaction name="separator"/>
     <addaction name="action_StartAll"/>
@@ -168,16 +169,16 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="action_Add"/>
+   <addaction name="action_AddFile"/>
    <addaction name="action_Start"/>
    <addaction name="action_Pause"/>
    <addaction name="action_Remove"/>
    <addaction name="separator"/>
    <addaction name="action_Properties"/>
   </widget>
-  <action name="action_Add">
+  <action name="action_AddFile">
    <property name="text">
-    <string>&amp;Add...</string>
+    <string>&amp;Add File...</string>
    </property>
    <property name="toolTip">
     <string>Add a torrent</string>
@@ -547,6 +548,11 @@
   <action name="action_CopyMagnetToClipboard">
    <property name="text">
     <string>&amp;Copy Magnet Link to Clipboard</string>
+   </property>
+  </action>
+  <action name="action_AddURL">
+   <property name="text">
+    <string>Add &amp;URL...</string>
    </property>
   </action>
  </widget>

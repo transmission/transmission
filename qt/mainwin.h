@@ -110,6 +110,7 @@ class TrMainWindow: public QMainWindow
         void refreshTitle( );
         void refreshStatusBar( );
         void openTorrent( );
+        void openURL( );
         void newTorrent( );
         void trayActivated( QSystemTrayIcon::ActivationReason );
         void refreshPref( int key );

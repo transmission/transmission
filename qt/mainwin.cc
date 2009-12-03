@@ -18,6 +18,7 @@
 #include <QDesktopServices>
 #include <QFileDialog>
 #include <QHBoxLayout>
+#include <QInputDialog>
 #include <QLabel>
 #include <QSignalMapper>
 #include <QSize>
@@ -110,7 +111,7 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     const QSize smallIconSize( i, i );
 
     // icons
-    ui.action_Add->setIcon( getStockIcon( "list-add", QStyle::SP_DialogOpenButton ) );
+    ui.action_AddFile->setIcon( getStockIcon( "list-add", QStyle::SP_DialogOpenButton ) );
     ui.action_New->setIcon( getStockIcon( "document-new", QStyle::SP_DesktopIcon ) );
     ui.action_Properties->setIcon( getStockIcon( "document-properties", QStyle::SP_DesktopIcon ) );
     ui.action_OpenFolder->setIcon( getStockIcon( "folder-open", QStyle::SP_DirOpenIcon ) );
@@ -152,7 +153,8 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     connect( ui.action_Announce, SIGNAL(triggered()), this, SLOT(reannounceSelected()) );
     connect( ui.action_StartAll, SIGNAL(triggered()), this, SLOT(startAll()));
     connect( ui.action_PauseAll, SIGNAL(triggered()), this, SLOT(pauseAll()));
-    connect( ui.action_Add, SIGNAL(triggered()), this, SLOT(openTorrent()));
+    connect( ui.action_AddFile, SIGNAL(triggered()), this, SLOT(openTorrent()));
+    connect( ui.action_AddURL, SIGNAL(triggered()), this, SLOT(openURL()));
     connect( ui.action_New, SIGNAL(triggered()), this, SLOT(newTorrent()));
     connect( ui.action_Preferences, SIGNAL(triggered()), myPrefsDialog, SLOT(show()));
     connect( ui.action_Statistics, SIGNAL(triggered()), myStatsDialog, SLOT(show()));
@@ -219,7 +221,8 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     actionGroup->addAction( ui.action_SortByTracker );
 
     QMenu * menu = new QMenu( );
-    menu->addAction( ui.action_Add );
+    menu->addAction( ui.action_AddFile );
+    menu->addAction( ui.action_AddURL );
     menu->addSeparator( );
     menu->addAction( ui.action_ShowMainWindow );
     menu->addAction( ui.action_ShowMessageLog );
@@ -1099,10 +1102,25 @@ TrMainWindow :: openTorrent( )
         layout->addWidget( button, layout->rowCount( ), 0, 1, -1, Qt::AlignLeft );
         myFileDialogOptionsCheck = button;
 
-        connect( myFileDialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(addTorrents(const QStringList&)));
+        connect( myFileDialog, SIGNAL(filesSelected(const QStringList&)),
+                 this, SLOT(addTorrents(const QStringList&)));
     }
 
     myFileDialog->show( );
+}
+
+void
+TrMainWindow :: openURL( )
+{
+    bool ok;
+    const QString key = QInputDialog::getText( this,
+                                               tr( "Add URL or Magnet Link" ),
+                                               tr( "Add URL or Magnet Link" ),
+                                               QLineEdit::Normal,
+                                               QString( ),
+                                               &ok );
+    if( ok && !key.isEmpty( ) )
+        mySession.addTorrent( key );
 }
 
 void

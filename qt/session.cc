@@ -857,30 +857,37 @@ Session :: addTorrent( QString filename )
 }
 
 void
-Session :: addTorrent( QString filename, QString localPath )
+Session :: addTorrent( QString key, QString localPath )
 {
-    QFile file( filename );
+    tr_benc top, *args;
+    tr_bencInitDict( &top, 2 );
+    tr_bencDictAddStr( &top, "method", "torrent-add" );
+    args = tr_bencDictAddDict( &top, "arguments", 3 );
+    tr_bencDictAddStr( args, "download-dir", qPrintable(localPath) );
+    tr_bencDictAddInt( args, "paused", !myPrefs.getBool( Prefs::START ) );
+
+    // if "key" is a readable local file, add it as metadata...
+    // otherwise it's probably a URL or magnet link, so pass it along
+    // for the daemon to handle
+    QFile file( key );
     file.open( QIODevice::ReadOnly );
     const QByteArray raw( file.readAll( ) );
     file.close( );
-
     if( !raw.isEmpty( ) )
     {
         int b64len = 0;
         char * b64 = tr_base64_encode( raw.constData(), raw.size(), &b64len );
-
-        tr_benc top, *args;
-        tr_bencInitDict( &top, 2 );
-        tr_bencDictAddStr( &top, "method", "torrent-add" );
-        args = tr_bencDictAddDict( &top, "arguments", 3 );
-        tr_bencDictAddStr( args, "download-dir", qPrintable(localPath) );
         tr_bencDictAddRaw( args, "metainfo", b64, b64len  );
-        tr_bencDictAddInt( args, "paused", !myPrefs.getBool( Prefs::START ) );
-        exec( &top );
-
         tr_free( b64 );
         tr_bencFree( &top );
     }
+    else
+    {
+        tr_bencDictAddStr( args, "filename", key.toUtf8().constData() );
+    }
+
+    exec( &top );
+    tr_bencFree( &top );
 }
 
 void

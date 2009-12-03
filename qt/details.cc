@@ -254,13 +254,15 @@ Details :: refresh( )
     int64_t haveUnverified = 0;
     int64_t verifiedPieces = 0;
     foreach( const Torrent * t, torrents ) {
-        haveTotal += t->haveTotal( );
-        haveUnverified += t->haveUnverified( );
-        const uint64_t v = t->haveVerified( );
-        haveVerified += v;
-        verifiedPieces += v / t->pieceSize( );
-        sizeWhenDone += t->sizeWhenDone( );
-        leftUntilDone += t->leftUntilDone( );
+        if( t->hasMetadata( ) ) {
+            haveTotal += t->haveTotal( );
+            haveUnverified += t->haveUnverified( );
+            const uint64_t v = t->haveVerified( );
+            haveVerified += v;
+            verifiedPieces += v / t->pieceSize( );
+            sizeWhenDone += t->sizeWhenDone( );
+            leftUntilDone += t->leftUntilDone( );
+        }
     }
     if( !haveVerified && !haveUnverified )
         string = none;
