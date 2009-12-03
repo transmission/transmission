@@ -159,6 +159,7 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     connect( ui.action_About, SIGNAL(triggered()), myAboutDialog, SLOT(show()));
     connect( ui.action_Contents, SIGNAL(triggered()), this, SLOT(openHelp()));
     connect( ui.action_OpenFolder, SIGNAL(triggered()), this, SLOT(openFolder()));
+    connect( ui.action_CopyMagnetToClipboard, SIGNAL(triggered()), this, SLOT(copyMagnetLinkToClipboard()));
     connect( ui.action_SetLocation, SIGNAL(triggered()), this, SLOT(setLocation()));
     connect( ui.action_Properties, SIGNAL(triggered()), this, SLOT(openProperties()));
     connect( ui.action_SessionDialog, SIGNAL(triggered()), mySessionDialog, SLOT(show()));
@@ -166,17 +167,21 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
 
     QAction * sep2 = new QAction( this );
     sep2->setSeparator( true );
+    QAction * sep3 = new QAction( this );
+    sep3->setSeparator( true );
 
     // context menu
     QList<QAction*> actions;
     actions << ui.action_Properties
             << ui.action_OpenFolder
-            << ui.action_SetLocation
             << sep2
             << ui.action_Start
-            << ui.action_Pause
-            << ui.action_Verify
             << ui.action_Announce
+            << ui.action_Pause
+            << ui.action_CopyMagnetToClipboard
+            << sep3
+            << ui.action_Verify
+            << ui.action_SetLocation
             << sep
             << ui.action_Remove
             << ui.action_Delete;
@@ -653,6 +658,13 @@ TrMainWindow :: openFolder( )
 }
 
 void
+TrMainWindow :: copyMagnetLinkToClipboard( )
+{
+    const int id( *getSelectedTorrents().begin() );
+    mySession.copyMagnetLinkToClipboard( id );
+}
+
+void
 TrMainWindow :: openHelp( )
 {
     const char * fmt = "http://www.transmissionbt.com/help/gtk/%d.%dx";
@@ -766,6 +778,7 @@ TrMainWindow :: refreshActionSensitivity( )
 
     const bool oneSelection( selected == 1 );
     ui.action_OpenFolder->setEnabled( oneSelection && mySession.isLocal( ) );
+    ui.action_CopyMagnetToClipboard->setEnabled( oneSelection );
 
     ui.action_SelectAll->setEnabled( selected < rowCount );
     ui.action_StartAll->setEnabled( paused > 0 );

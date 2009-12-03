@@ -116,6 +116,7 @@ class TrMainWindow: public QMainWindow
         void addTorrents( const QStringList& filenames );
         void openHelp( );
         void openFolder( );
+        void copyMagnetLinkToClipboard( );
         void setLocation( );
         void openProperties( );
         void toggleSpeedMode( );

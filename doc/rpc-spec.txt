@@ -155,6 +155,7 @@
    id                          | number                      | tr_torrent
    isPrivate                   | boolean                     | tr_torrent
    leftUntilDone               | number                      | tr_stat
+   magnetLink                  | number                      | n/a
    manualAnnounceTime          | number                      | tr_stat
    maxConnectedPeers           | number                      | tr_torrent
    metadataPercentComplete     | double                      | tr_stat
@@ -562,6 +563,7 @@
          |         |        NO | torrent-get    | removed arg "seeders"
          |         |        NO | torrent-get    | removed arg "timesCompleted"
          |         |        NO | torrent-get    | removed arg "swarmSpeed"
+         |         | yes       | torrent-get    | new arg "magnetLink"
          |         | yes       | torrent-get    | new arg "metadataPercentComplete"
          |         | yes       | torrent-get    | new arg "trackerStats"
          |         | yes       | session-set    | new arg "incomplete-dir"

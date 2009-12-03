@@ -58,6 +58,7 @@ class Session: public QObject
         void setBlocklistSize( int64_t i );
         void updateBlocklist( );
         void portTest( );
+        void copyMagnetLinkToClipboard( int torrentId );
 
     public:
 

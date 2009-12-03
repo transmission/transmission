@@ -15,6 +15,7 @@
 
 #include <QApplication>
 #include <QByteArray>
+#include <QClipboard>
 #include <QCoreApplication>
 #include <QDesktopServices>
 #include <QMessageBox>
@@ -48,6 +49,7 @@ namespace
         TAG_BLOCKLIST_UPDATE,
         TAG_ADD_TORRENT,
         TAG_PORT_TEST,
+        TAG_MAGNET_LINK,
 
         FIRST_UNIQUE_TAG
     };
@@ -102,6 +104,21 @@ Session :: portTest( )
     tr_bencInitDict( &top, 2 );
     tr_bencDictAddStr( &top, "method", "port-test" );
     tr_bencDictAddInt( &top, "tag", TAG_PORT_TEST );
+    exec( &top );
+    tr_bencFree( &top );
+}
+
+void
+Session :: copyMagnetLinkToClipboard( int torrentId )
+{
+    tr_benc top;
+    tr_bencInitDict( &top, 3 );
+    tr_bencDictAddStr( &top, "method", "torrent-get" );
+    tr_bencDictAddInt( &top, "tag", TAG_MAGNET_LINK );
+    tr_benc * args = tr_bencDictAddDict( &top, "arguments", 2 );
+    tr_bencListAddInt( tr_bencDictAddList( args, "ids", 1 ), torrentId );
+    tr_bencListAddStr( tr_bencDictAddList( args, "fields", 1 ), "magnetLink" );
+
     exec( &top );
     tr_bencFree( &top );
 }
@@ -678,6 +695,19 @@ Session :: parseResponse( const char * json, size_t jsonLength )
                     if( tr_bencDictFindDict( &top, "arguments", &args ) )
                         tr_bencDictFindBool( args, "port-is-open", &isOpen );
                     emit portTested( (bool)isOpen );
+                }
+
+                case TAG_MAGNET_LINK: {
+                    tr_benc * args;
+                    tr_benc * torrents;
+                    tr_benc * child;
+                    const char * str;
+                    if( tr_bencDictFindDict( &top, "arguments", &args )
+                        && tr_bencDictFindList( args, "torrents", &torrents )
+                        && (( child = tr_bencListChild( torrents, 0 )))
+                        && tr_bencDictFindStr( child, "magnetLink", &str ) )
+                            QApplication::clipboard()->setText( str );
+                    break;
                 }
 
                 case TAG_ADD_TORRENT:
