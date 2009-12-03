@@ -478,7 +478,7 @@ TrMainWindow :: createStatusBar( )
         connect( ui.action_SessionRatio, SIGNAL(triggered()), this, SLOT(showSessionRatio()));
         connect( ui.action_SessionTransfer, SIGNAL(triggered()), this, SLOT(showSessionTransfer()));
         p = myStatsModeButton = new TrIconPushButton( this );
-        p->setIcon( getStockIcon( "view-refresh", QStyle::SP_BrowserReload ) );
+        p->setIcon( QIcon( ":/icons/ratio.png" ) );
         p->setFlat( true );
         p->setMenu( m );
         h->addWidget( p );  

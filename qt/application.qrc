@@ -1,5 +1,6 @@
 <RCC version="1.0">
   <qresource prefix="icons" >
+    <file alias="ratio.png">icons/ratio.png</file>
     <file alias="transmission-16.png">icons/hicolor_apps_16x16_transmission.png</file>
     <file alias="transmission-22.png">icons/hicolor_apps_22x22_transmission.png</file>
     <file alias="transmission-24.png">icons/hicolor_apps_24x24_transmission.png</file>
