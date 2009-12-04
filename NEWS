@@ -9,7 +9,8 @@
   * Append .part to incomplete files
   * Faster management of very long peer lists
   * When seeding, prefetch the data we upload
-  * Improved DHT support (libdht 0.11)
+  * IPv6 support for the DHT (dht 0.11) 
+  * Improved DHT bootstrapping 
   * Improved PEX support
   * Brand-new torrents with no downloaded data don't have to wait in the "Verify Local Data" queue
   * Fix potential crash on shutdown when port forwarding is disabled
