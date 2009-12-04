@@ -131,8 +131,9 @@ TorrentDelegate :: progressString( const Torrent& tor ) const
 QString
 TorrentDelegate :: shortTransferString( const Torrent& tor ) const
 {
-    const bool haveDown( tor.peersWeAreDownloadingFrom( ) > 0 );
-    const bool haveUp( tor.peersWeAreUploadingTo( ) > 0 );
+    const bool haveMeta( tor.hasMetadata( ) );
+    const bool haveDown( haveMeta && tor.peersWeAreDownloadingFrom( ) > 0 );
+    const bool haveUp( haveMeta && tor.peersWeAreUploadingTo( ) > 0 );
     QString downStr, upStr, str;
 
     if( haveDown )
@@ -146,7 +147,7 @@ TorrentDelegate :: shortTransferString( const Torrent& tor ) const
         str = tr( "Down: %1" ).arg( downStr );
     else if( haveUp )
         str = tr( "Up: %1" ).arg( upStr );
-    else
+    else if( tor.hasMetadata( ) )
         str = tr( "Idle" );
 
     return str;
@@ -203,8 +204,12 @@ TorrentDelegate :: statusString( const Torrent& tor ) const
             break;
 
         case TR_STATUS_DOWNLOAD:
-            str = tr( "Downloading from %1 of %n connected peer(s)", 0, tor.connectedPeersAndWebseeds( ) )
-                  .arg( tor.peersWeAreDownloadingFrom( ) );
+            if( tor.hasMetadata( ) )
+                str = tr( "Downloading from %1 of %n connected peer(s)", 0, tor.connectedPeersAndWebseeds( ) )
+                        .arg( tor.peersWeAreDownloadingFrom( ) );
+            else
+                str = tr( "Downloading metadata from %n peer(s) (%1% done)", 0, tor.peersWeAreDownloadingFrom( ) )
+                        .arg( int(100.0 * tor.metadataPercentDone( ) ) );
             break;
 
         case TR_STATUS_SEED:
@@ -217,8 +222,11 @@ TorrentDelegate :: statusString( const Torrent& tor ) const
             break;
     }
 
-    if( tor.isReadyToTransfer( ) )
-        str += tr( " - " ) + shortTransferString( tor );
+    if( tor.isReadyToTransfer( ) ) {
+        QString s = shortTransferString( tor );
+        if( !s.isEmpty( ) )
+            str += tr( " - " ) + s;
+    }
 
     return str;
 }
