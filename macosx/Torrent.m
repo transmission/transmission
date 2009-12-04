@@ -347,6 +347,11 @@ int trashDataFile(const char * filename)
     return !tr_torrentHasMetadata(fHandle);
 }
 
+- (NSString *) magnetLink
+{
+    return [NSString stringWithUTF8String: tr_torrentGetMagnetLink(fHandle)];
+}
+
 - (CGFloat) ratio
 {
     return fStat->ratio;

@@ -1427,9 +1427,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [torrents release];
         return;
     }
-
+    
     Torrent * torrent = [torrents objectAtIndex: 0];
-
+    
     //warn user if torrent file can't be found
     if (![[NSFileManager defaultManager] fileExistsAtPath: [torrent torrentLocation]])
     {
@@ -1467,6 +1467,32 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     [torrents removeObjectAtIndex: 0];
     [self performSelectorOnMainThread: @selector(copyTorrentFileForTorrents:) withObject: torrents waitUntilDone: NO];
+}
+
+- (void) copyMagnetLinks: (id) sender
+{
+    NSArray * torrents = [fTableView selectedTorrents];
+    
+    if ([torrents count] <= 0)
+        return;
+    
+    NSMutableArray * links = [NSMutableArray arrayWithCapacity: [torrents count]];
+    for (Torrent * torrent in torrents)
+        [links addObject: [torrent magnetLink]];
+    
+    NSString * text = [links componentsJoinedByString: @"\n"];
+    
+    NSPasteboard * pb = [NSPasteboard generalPasteboard];
+    if ([NSApp isOnSnowLeopardOrBetter])
+    {
+        [pb clearContents];
+        [pb writeObjects: [NSArray arrayWithObject: text]];
+    }
+    else
+    {
+        [pb declareTypes: [NSArray arrayWithObject: NSStringPboardType] owner: nil];
+        [pb setString: text forType: NSStringPboardType];
+    }
 }
 
 - (void) revealFile: (id) sender
@@ -3864,6 +3890,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     //enable copy torrent file item
     if (action == @selector(copyTorrentFiles:))
+        return canUseTable && [fTableView numberOfSelectedRows] > 0;
+    
+    //enable copy torrent file item
+    if (action == @selector(copyMagnetLinks:))
         return canUseTable && [fTableView numberOfSelectedRows] > 0;
     
     //enable reverse sort item

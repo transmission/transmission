@@ -2,19 +2,20 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">10B504</string>
+		<string key="IBDocument.SystemVersion">10C540</string>
 		<string key="IBDocument.InterfaceBuilderVersion">740</string>
-		<string key="IBDocument.AppKitVersion">1038.2</string>
-		<string key="IBDocument.HIToolboxVersion">437.00</string>
+		<string key="IBDocument.AppKitVersion">1038.25</string>
+		<string key="IBDocument.HIToolboxVersion">458.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
 			<string key="NS.object.0">740</string>
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="3126"/>
-			<integer value="29"/>
 			<integer value="1480"/>
+			<integer value="21"/>
+			<integer value="456"/>
+			<integer value="81"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1100,6 +1101,26 @@ IDIwMDkAA</bytes>
 									<reference key="NSOnImage" ref="322614661"/>
 									<reference key="NSMixedImage" ref="3851078"/>
 								</object>
+								<object class="NSMenuItem" id="500522949">
+									<reference key="NSMenu" ref="455126894"/>
+									<string key="NSTitle">Move Data File To…</string>
+									<string key="NSKeyEquiv"/>
+									<int key="NSKeyEquivModMask">1048576</int>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="322614661"/>
+									<reference key="NSMixedImage" ref="3851078"/>
+								</object>
+								<object class="NSMenuItem" id="7348933">
+									<reference key="NSMenu" ref="455126894"/>
+									<bool key="NSIsDisabled">YES</bool>
+									<bool key="NSIsSeparator">YES</bool>
+									<string key="NSTitle"/>
+									<string key="NSKeyEquiv"/>
+									<int key="NSKeyEquivModMask">1048576</int>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="322614661"/>
+									<reference key="NSMixedImage" ref="3851078"/>
+								</object>
 								<object class="NSMenuItem" id="521960375">
 									<reference key="NSMenu" ref="455126894"/>
 									<string key="NSTitle">Save Torrent File As…</string>
@@ -1110,11 +1131,10 @@ IDIwMDkAA</bytes>
 									<reference key="NSMixedImage" ref="3851078"/>
 									<int key="NSTag">4</int>
 								</object>
-								<object class="NSMenuItem" id="500522949">
+								<object class="NSMenuItem" id="850390185">
 									<reference key="NSMenu" ref="455126894"/>
-									<string key="NSTitle">Move Data File To…</string>
+									<string key="NSTitle">Copy Magnet Link to Clipboard</string>
 									<string key="NSKeyEquiv"/>
-									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="322614661"/>
 									<reference key="NSMixedImage" ref="3851078"/>
@@ -2000,6 +2020,26 @@ IDIwMDkAA</bytes>
 						<reference key="NSOnImage" ref="322614661"/>
 						<reference key="NSMixedImage" ref="3851078"/>
 					</object>
+					<object class="NSMenuItem" id="922629505">
+						<reference key="NSMenu" ref="434296936"/>
+						<string key="NSTitle">Move Data File To…</string>
+						<string key="NSKeyEquiv"/>
+						<int key="NSKeyEquivModMask">1048576</int>
+						<int key="NSMnemonicLoc">2147483647</int>
+						<reference key="NSOnImage" ref="322614661"/>
+						<reference key="NSMixedImage" ref="3851078"/>
+					</object>
+					<object class="NSMenuItem" id="143702072">
+						<reference key="NSMenu" ref="434296936"/>
+						<bool key="NSIsDisabled">YES</bool>
+						<bool key="NSIsSeparator">YES</bool>
+						<string key="NSTitle"/>
+						<string key="NSKeyEquiv"/>
+						<int key="NSKeyEquivModMask">1048576</int>
+						<int key="NSMnemonicLoc">2147483647</int>
+						<reference key="NSOnImage" ref="322614661"/>
+						<reference key="NSMixedImage" ref="3851078"/>
+					</object>
 					<object class="NSMenuItem" id="953360563">
 						<reference key="NSMenu" ref="434296936"/>
 						<string key="NSTitle">Save Torrent File As…</string>
@@ -2009,11 +2049,10 @@ IDIwMDkAA</bytes>
 						<reference key="NSMixedImage" ref="3851078"/>
 						<int key="NSTag">4</int>
 					</object>
-					<object class="NSMenuItem" id="922629505">
+					<object class="NSMenuItem" id="24108443">
 						<reference key="NSMenu" ref="434296936"/>
-						<string key="NSTitle">Move Data File To…</string>
+						<string key="NSTitle">Copy Magnet Link to Clipboard</string>
 						<string key="NSKeyEquiv"/>
-						<int key="NSKeyEquivModMask">1048576</int>
 						<int key="NSMnemonicLoc">2147483647</int>
 						<reference key="NSOnImage" ref="322614661"/>
 						<reference key="NSMixedImage" ref="3851078"/>
@@ -4973,6 +5012,22 @@ IDIwMDkAA</bytes>
 					</object>
 					<int key="connectionID">3213</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">copyMagnetLinks:</string>
+						<reference key="source" ref="30116300"/>
+						<reference key="destination" ref="850390185"/>
+					</object>
+					<int key="connectionID">3217</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">copyMagnetLinks:</string>
+						<reference key="source" ref="30116300"/>
+						<reference key="destination" ref="24108443"/>
+					</object>
+					<int key="connectionID">3219</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -5181,11 +5236,13 @@ IDIwMDkAA</bytes>
 							<reference ref="521960375"/>
 							<reference ref="711840500"/>
 							<reference ref="439865608"/>
-							<reference ref="500522949"/>
 							<reference ref="690856088"/>
 							<reference ref="1043081358"/>
 							<reference ref="414623283"/>
 							<reference ref="765429693"/>
+							<reference ref="500522949"/>
+							<reference ref="7348933"/>
+							<reference ref="850390185"/>
 						</object>
 						<reference key="parent" ref="5799201"/>
 					</object>
@@ -5786,7 +5843,9 @@ IDIwMDkAA</bytes>
 							<reference ref="780056445"/>
 							<reference ref="274991158"/>
 							<reference ref="612287796"/>
+							<reference ref="24108443"/>
 							<reference ref="922629505"/>
+							<reference ref="143702072"/>
 						</object>
 						<reference key="parent" ref="0"/>
 						<string key="objectName">ContextRowMenu</string>
@@ -7008,6 +7067,26 @@ IDIwMDkAA</bytes>
 						<reference key="object" ref="461235918"/>
 						<reference key="parent" ref="152009435"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">3215</int>
+						<reference key="object" ref="7348933"/>
+						<reference key="parent" ref="455126894"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">3216</int>
+						<reference key="object" ref="850390185"/>
+						<reference key="parent" ref="455126894"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">3218</int>
+						<reference key="object" ref="24108443"/>
+						<reference key="parent" ref="434296936"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">3220</int>
+						<reference key="object" ref="143702072"/>
+						<reference key="parent" ref="434296936"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -7563,6 +7642,12 @@ IDIwMDkAA</bytes>
 					<string>3211.ImportedFromIB2</string>
 					<string>3212.IBPluginDependency</string>
 					<string>3212.ImportedFromIB2</string>
+					<string>3215.IBPluginDependency</string>
+					<string>3215.ImportedFromIB2</string>
+					<string>3216.IBPluginDependency</string>
+					<string>3218.IBPluginDependency</string>
+					<string>3220.IBPluginDependency</string>
+					<string>3220.ImportedFromIB2</string>
 					<string>418.IBPluginDependency</string>
 					<string>418.ImportedFromIB2</string>
 					<string>456.IBEditorWindowLastContentRect</string>
@@ -7965,9 +8050,9 @@ IDIwMDkAA</bytes>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>{{350, 492}, {468, 196}}</string>
+					<string>{{178, 675}, {468, 196}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{350, 492}, {468, 196}}</string>
+					<string>{{178, 675}, {468, 196}}</string>
 					<integer value="1"/>
 					<string>{{52, 684}, {468, 196}}</string>
 					<integer value="0"/>
@@ -8169,7 +8254,13 @@ IDIwMDkAA</bytes>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>{{586, 272}, {274, 283}}</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<integer value="1"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<integer value="1"/>
+					<string>{{586, 242}, {291, 313}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -8211,7 +8302,7 @@ IDIwMDkAA</bytes>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>{{501, 668}, {291, 213}}</string>
+					<string>{{501, 638}, {302, 243}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>{{597, 705}, {294, 183}}</string>
@@ -8237,7 +8328,7 @@ IDIwMDkAA</bytes>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">3214</int>
+			<int key="maxID">3220</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -8252,6 +8343,7 @@ IDIwMDkAA</bytes>
 							<string>allToolbarClicked:</string>
 							<string>announceSelectedTorrents:</string>
 							<string>applyFilter:</string>
+							<string>copyMagnetLinks:</string>
 							<string>copyTorrentFiles:</string>
 							<string>createFile:</string>
 							<string>linkDonate:</string>
@@ -8306,6 +8398,7 @@ IDIwMDkAA</bytes>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>

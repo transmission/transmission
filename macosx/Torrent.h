@@ -88,6 +88,7 @@
 - (void) resetCache;
 
 - (BOOL) isMagnet;
+- (NSString *) magnetLink;
 
 - (CGFloat) ratio;
 - (tr_ratiolimit) ratioSetting;

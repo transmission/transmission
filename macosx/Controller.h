@@ -163,6 +163,8 @@ typedef enum
 - (void) copyTorrentFiles: (id) sender;
 - (void) copyTorrentFileForTorrents: (NSMutableArray *) torrents;
 
+- (void) copyMagnetLinks: (id) sender;
+
 - (void) revealFile: (id) sender;
 
 - (void) announceSelectedTorrents: (id) sender;
