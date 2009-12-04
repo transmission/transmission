@@ -30,7 +30,7 @@ Torrent._ErrLocalError         = 3;
 Torrent._StaticFields = [ 'addedDate', 'comment', 'creator', 'dateCreated',
 		'hashString', 'id', 'isPrivate', 'name', 'totalSize', 'pieceCount', 'pieceSize' ]
 Torrent._DynamicFields = [ 'downloadedEver', 'error', 'errorString', 'eta',
-    'haveUnchecked', 'haveValid', 'leftUntilDone', 'peersConnected',
+    'haveUnchecked', 'haveValid', 'leftUntilDone', 'metadataPercentComplete', 'peersConnected',
     'peersGettingFromUs', 'peersSendingToUs', 'rateDownload', 'rateUpload',
     'recheckProgress', 'sizeWhenDone', 'status',
     'uploadedEver', 'uploadRatio', 'seedRatioLimit', 'seedRatioMode', 'downloadDir' ]
@@ -185,6 +185,7 @@ Torrent.prototype =
 	name: function() { return this._name; },
 	peersSendingToUs: function() { return this._peers_sending_to_us; },
 	peersGettingFromUs: function() { return this._peers_getting_from_us; },
+	needsMetaData: function(){ return this._metadataPercentComplete < 1 },
 	getPercentDone: function() {
 		if( !this._sizeWhenDone ) return 1.0;
 		if( !this._leftUntilDone ) return 1.0;
@@ -311,26 +312,27 @@ Torrent.prototype =
 	 * Refresh display
 	 */
 	refreshData: function(data) {
-		this._completed             = data.haveUnchecked + data.haveValid;
-		this._verified              = data.haveValid;
-		this._leftUntilDone         = data.leftUntilDone;
-		this._download_total        = data.downloadedEver;
-		this._upload_total          = data.uploadedEver;
-		this._upload_ratio          = data.uploadRatio;
-		this._seed_ratio_limit      = data.seedRatioLimit;
-		this._seed_ratio_mode       = data.seedRatioMode;
-		this._download_speed        = data.rateDownload;
-		this._upload_speed          = data.rateUpload;
-		this._peers_connected       = data.peersConnected;
-		this._peers_getting_from_us = data.peersGettingFromUs;
-		this._peers_sending_to_us   = data.peersSendingToUs;
-		this._sizeWhenDone          = data.sizeWhenDone;
-		this._recheckProgress       = data.recheckProgress;
-		this._error                 = data.error;
-		this._error_string          = data.errorString;
-		this._eta                   = data.eta;
-		this._state                 = data.status;
-		this._download_dir          = data.downloadDir;
+		this._completed               = data.haveUnchecked + data.haveValid;
+		this._verified                = data.haveValid;
+		this._leftUntilDone           = data.leftUntilDone;
+		this._download_total          = data.downloadedEver;
+		this._upload_total            = data.uploadedEver;
+		this._upload_ratio            = data.uploadRatio;
+		this._seed_ratio_limit        = data.seedRatioLimit;
+		this._seed_ratio_mode         = data.seedRatioMode;
+		this._download_speed          = data.rateDownload;
+		this._upload_speed            = data.rateUpload;
+		this._peers_connected         = data.peersConnected;
+		this._peers_getting_from_us   = data.peersGettingFromUs;
+		this._peers_sending_to_us     = data.peersSendingToUs;
+		this._sizeWhenDone            = data.sizeWhenDone;
+		this._recheckProgress         = data.recheckProgress;
+		this._error                   = data.error;
+		this._error_string            = data.errorString;
+		this._eta                     = data.eta;
+		this._state                   = data.status;
+		this._download_dir            = data.downloadDir;
+		this._metadataPercentComplete = data.metadataPercentComplete;
 
 		if (data.fileStats)
 			this.refreshFileModel( data );
@@ -424,8 +426,25 @@ Torrent.prototype =
 		// when a verifying/downloading torrent gets state seeding
 		if( this._state === Torrent._StatusSeeding )
 			notDone = false ;
-		
-		if( notDone )
+
+		if( this.needsMetaData() ){
+			var metaPercentComplete = this._metadataPercentComplete * 1000 / 100
+			progress_details = "Magnetized transfer - retrieving metadata (";
+			progress_details += metaPercentComplete;
+			progress_details += "%)";
+
+			var empty = "";
+			if(metaPercentComplete == 0)
+				empty = "empty";
+
+			root._progress_complete_container.style.width = metaPercentComplete + "%";
+			root._progress_complete_container.className = 'torrent_progress_bar in_progress meta ' + empty;
+			root._progress_incomplete_container.style.width = 100 - metaPercentComplete + "%"
+			root._progress_incomplete_container.className = 'torrent_progress_bar incomplete meta';
+			root._progress_incomplete_container.style.display = 'block';
+
+		}
+		else if( notDone )
 		{
 			var eta = '';
 			
@@ -462,11 +481,7 @@ Torrent.prototype =
 			
 			// Update the 'incomplete' bar
 			e = root._progress_incomplete_container;
-			if( e.className.indexOf( 'incomplete' ) === -1 )
-				e.className = 'torrent_progress_bar in_progress';
-			// Clear the 'seeding' tag 
-			if( e.className.indexOf( 'seeding' ) != -1 ) 
-				e.className = 'torrent_progress_bar incomplete';
+			e.className = 'torrent_progress_bar incomplete'
 			e.style.width =  (MaxBarWidth - css_completed_width) + '%';
 			e.style.display = 'block';
 		}

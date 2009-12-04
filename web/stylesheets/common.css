@@ -466,6 +466,20 @@ ul.torrent_list li.torrent div.torrent_progress_bar.empty {
 	border-color: #c8cacd;
 }
 
+ul.torrent_list li.torrent div.torrent_progress_bar.incomplete.meta {
+	background-position: left -50px;
+	border: 1px solid #cc6068;
+}
+
+ul.torrent_list li.torrent div.torrent_progress_bar.in_progress.meta {
+	background-position: left -20px;
+	border-color: #c8cacd;
+}
+
+ul.torrent_list li.torrent div.torrent_progress_bar.in_progress.meta.empty {
+	border: 0 none;
+}
+
 li.torrent a div {
 	float: right;
 	position: relative;
