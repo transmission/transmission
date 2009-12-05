@@ -2,7 +2,7 @@
 #define DTR_WATCH_H
 
 /*
- * This file Copyright (C) 2009 Charles Kerr <charles@transmissionbt.com>
+ * This file Copyright (C) 2009 Mnemosyne LLC
  *
  * This file is licensed by the GPL version 2.  Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
