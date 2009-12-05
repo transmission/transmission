@@ -692,6 +692,8 @@ tr_session * fHandle;
 {
     NSString * bundleID = [[NSBundle mainBundle] bundleIdentifier];
     const OSStatus result = LSSetDefaultHandlerForURLScheme((CFStringRef)@"magnet", (CFStringRef)bundleID);
+    if (result != noErr)
+        NSLog(@"Failed setting default magnet link handler");
 }
 
 - (void) setQueue: (id) sender

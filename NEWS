@@ -20,7 +20,7 @@
   * Redesigned trackers inspector tab with favicons and copy-paste functionality (paste lists of multiple trackers)
   * Message log stores all messages and does real filtering
   * Quick Look restored on Snow Leopard
-  * Moving data and incomplete folders are now handled by libtransmission
+  * Moving data and incomplete folder are now handled by libtransmission
   * Improved reveal in Finder functionality on Snow Leopard
   * Various smaller behavior and interface tweaks
 ==== GTK+ ====
