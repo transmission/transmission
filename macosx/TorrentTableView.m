@@ -515,7 +515,7 @@
 {
     NSURL * url;
     if ((url = [NSURL URLFromPasteboard: [NSPasteboard generalPasteboard]]))
-        [fController openURL: url];
+        [fController openURL: [url absoluteString]];
 }
 
 - (BOOL) validateMenuItem: (NSMenuItem *) menuItem
