@@ -1802,24 +1802,13 @@ static void
 prefetchPieces( tr_peermsgs *msgs )
 {
     int i;
-    uint64_t next = 0;
 
-    /* Maintain at least 8 prefetched blocks per unchoked peer, but allow
-       up to 4 extra blocks if that would cause sequential writes. */
-    for( i=msgs->prefetchCount; i<msgs->peerAskedForCount; ++i )
+    /* Maintain 12 prefetched blocks per unchoked peer */
+    for( i=msgs->prefetchCount; i<msgs->peerAskedForCount && i<12; ++i )
     {
         const struct peer_request * req = msgs->peerAskedFor + i;
-        const uint64_t begin = tr_pieceOffset( msgs->torrent, req->index, req->offset, 0 );
-        const uint64_t end = begin + req->length;
-        const tr_bool isSequential = next == begin;
-
-        if( ( i >= 12 ) || ( !isSequential && ( i >= 8 ) ) )
-            break;
-
         tr_ioPrefetch( msgs->torrent, req->index, req->offset, req->length );
         ++msgs->prefetchCount;
-
-        next = end;
     }
 }
 
