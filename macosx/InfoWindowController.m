@@ -77,6 +77,7 @@ typedef enum
 @interface InfoWindowController (Private)
 
 - (void) resetInfo;
+- (void) resetInfoForTorrent: (NSNotification *) notification;
 
 - (void) updateInfoGeneral;
 - (void) updateInfoActivity;
@@ -207,7 +208,7 @@ typedef enum
     
     //allow for update notifications
     NSNotificationCenter * nc = [NSNotificationCenter defaultCenter];
-    [nc addObserver: self selector: @selector(resetInfo) name: @"ResetInspector" object: nil];
+    [nc addObserver: self selector: @selector(resetInfoForTorrent:) name: @"ResetInspector" object: nil];
     [nc addObserver: self selector: @selector(updateInfoStats) name: @"UpdateStats" object: nil];
     [nc addObserver: self selector: @selector(updateOptions) name: @"UpdateOptions" object: nil];
 }
@@ -1401,6 +1402,12 @@ typedef enum
     //update stats and settings
     [self updateInfoStats];
     [self updateOptions];
+}
+
+- (void) resetInfoForTorrent: (NSNotification *) notification
+{
+    if (fTorrents && [fTorrents containsObject: [notification object]])
+        [self resetInfo];
 }
 
 - (void) updateInfoGeneral
