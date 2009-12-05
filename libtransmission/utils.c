@@ -298,7 +298,7 @@ tr_msg( const char * file, int line,
         const char * fmt, ... )
 {
     const int err = errno; /* message logging shouldn't affect errno */
-    char buf[MAX_STACK_ARRAY_SIZE];
+    char buf[1024];
     va_list ap;
 
     tr_lockLock( messageLock );
@@ -328,7 +328,7 @@ tr_msg( const char * file, int line,
             messageQueueTail = &newmsg->next;
             ++messageQueueCount;
             
-            if (messageQueueCount > TR_MAX_MSG_LOG)
+            if( messageQueueCount > TR_MAX_MSG_LOG )
             {
                 tr_msg_list * old = messageQueue;
                 messageQueue = old->next;
