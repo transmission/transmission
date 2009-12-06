@@ -527,7 +527,7 @@ get_name_source_address(int af, const char *name,
     hints.ai_family = af;
     hints.ai_socktype = SOCK_DGRAM;
 
-    rc = getaddrinfo(name, NULL, &hints, &info);
+    rc = getaddrinfo(name, "80", &hints, &info);
     if(rc != 0) {
         errno = ENOENT;
         return -1;
