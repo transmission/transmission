@@ -63,7 +63,7 @@
 		</div>
 		<div id="torrent_inspector" style="display:none;">
 			
-		<div style="display:none;" class="inspector_close" id="inspector_close"><img id="inspector_close_image" src="./images/buttons/cancel.png"/></div>
+			<div style="display:none;" class="inspector_close" id="inspector_close"><img id="inspector_close_image" src="./images/buttons/cancel.png"/></div>
 
 			<div id="inspector_tabs">
 				<div class="inspector_tab selected" id="inspector_tab_info"><a href="#info"><img src="images/buttons/info_general.png" alt="Information"/></a></div>
@@ -174,7 +174,12 @@
 			</div><!-- id="inspector_tab_activity_container" -->
 
 			<div style="display:none;" class="inspector_container" id="inspector_tab_files_container">
-				<div id="inspector_file_list"></div>
+				<div id="inspector_file_list">
+					<ul id="select_all_button_container">
+						<li id="files_deselect_all" class="select_all_button">Deselect All</li>
+						<li id="files_select_all" class="select_all_button">Select All</li>
+					</ul>
+				</div>
 			</div><!-- id="inspector_tab_files_container" -->
 
 		</div>

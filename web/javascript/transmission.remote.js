@@ -154,10 +154,12 @@ TransmissionRemote.prototype =
 		} );
 	},
 	
-	sendTorrentActionRequests: function( method, torrent_ids, callback ) {
+	sendTorrentSetRequests: function( method, torrent_ids, args, callback ) {
+		if (!args) args = { };
+		args['ids'] = torrent_ids;
 		var o = {
 			method: method,
-			arguments: { ids: torrent_ids }
+			arguments: args
 		};
 
 		this.sendRequest( o, function( data ) {
@@ -165,6 +167,10 @@ TransmissionRemote.prototype =
 		});
 	},
 	
+	sendTorrentActionRequests: function( method, torrent_ids, callback ) {
+		this.sendTorrentSetRequests( method, torrent_ids, null, callback );
+	},
+
 	startTorrents: function( torrent_ids, callback ) {
 		this.sendTorrentActionRequests( 'torrent-start', torrent_ids, callback );
 	},
@@ -217,5 +223,11 @@ TransmissionRemote.prototype =
 		this.sendRequest( o, function() {
 			remote._controller.loadDaemonPrefs();
 		} );
+	},
+	filesSelectAll: function( torrent_ids, files, callback ) {
+		this.sendTorrentSetRequests( 'torrent-set', torrent_ids, { 'files-wanted': files }, callback );
+	},
+	filesDeselectAll: function( torrent_ids, files, callback ) {
+		this.sendTorrentSetRequests( 'torrent-set', torrent_ids, { 'files-unwanted': files }, callback );
 	}
 };

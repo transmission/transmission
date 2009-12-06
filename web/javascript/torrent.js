@@ -808,18 +808,20 @@ TorrentFile.prototype = {
 		}
 	},
 	
-	setWanted: function(wanted) {
+	setWanted: function(wanted, process) {
 		this._dirty = true;
 		this._wanted = wanted;
 		if(!iPhone)
 		  this.element().toggleClass( 'skip', !wanted );
-		var command = wanted ? 'files-wanted' : 'files-unwanted';
-		this._torrent._controller.changeFileCommand(command, this._torrent, this);
+		if (process) {
+			var command = wanted ? 'files-wanted' : 'files-unwanted';
+			this._torrent._controller.changeFileCommand(command, this._torrent, this);
+		}
 	},
 	
 	toggleWanted: function() {
 		if (this.isEditable())
-			this.setWanted( !this._wanted );
+			this.setWanted( !this._wanted, true );
 	},
 	
 	refreshHTML: function() {

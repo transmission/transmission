@@ -566,7 +566,7 @@ div#inspector_tabs {
 	background-position: left -26px; /* the highlighted part of the image */
 }
 .inspector_container {
-	margin: 3%;
+	margin: 0 3%;
 	width: 96%;
 }
 .inspector_group {
@@ -601,6 +601,19 @@ div#inspector_tabs {
 	cursor: default;
 	overflow: hidden;
 }
+#inspector_file_list #select_all_button_container {
+	margin: 0;
+}
+#inspector_file_list ul li.select_all_button {
+	background: transparent url(../images/buttons/tab_backgrounds.png) repeat-x scroll left -6px;
+	border: 1px solid #888888;
+	cursor: pointer;
+	float: right;
+	list-style-type: none;
+	margin: 2px;
+	padding: 2px 5px;
+}
+
 ul.inspector_torrent_file_list {
 	width: 100%;
 	margin: 0  0 0 0;
@@ -611,6 +624,7 @@ ul.inspector_torrent_file_list {
 	list-style-type: none;
 	list-style: none;
 	list-style-image: none;
+	clear: both;
 }
 li.inspector_torrent_file_list_entry {
 	padding: 3px 0 3px 2px;
@@ -632,9 +646,6 @@ div.inspector_torrent_file_list_entry_name {
 }
 li.inspector_torrent_file_list_entry.skip>.inspector_torrent_file_list_entry_name {
 	color: #666;
-}
-li.inspector_torrent_file_list_entry.even {
-	background-color: #EEEEEE;
 }
 div.inspector_torrent_file_list_entry_progress {
 	font-size: 1em;
