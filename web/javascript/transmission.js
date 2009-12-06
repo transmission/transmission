@@ -1410,6 +1410,7 @@ Transmission.prototype =
 		if (! confirmed) {
 				$('input#torrent_upload_file').attr('value', '');
 				$('input#torrent_upload_url').attr('value', '');
+				$('input#torrent_auto_start').attr('checked', this[Prefs._AutoStart]);
 				$('#upload_container').show();
 			if (!iPhone && Safari3) {
 				setTimeout("$('div#upload_container div.dialog_window').css('top', '0px');",10);
@@ -1419,10 +1420,11 @@ Transmission.prototype =
 		} else {
 			var tr = this;
 			var args = { };
+			var paused = !$('#torrent_auto_start').is(':checked');
 			if ('' != $('#torrent_upload_url').val()) {
-				tr.remote.addTorrentByUrl($('#torrent_upload_url').val(), { paused: !this[Prefs._AutoStart] });
+				tr.remote.addTorrentByUrl($('#torrent_upload_url').val(), { paused: paused });
 			} else {
-				args.url = '/transmission/upload?paused=' + (this[Prefs._AutoStart] ? 'false' : 'true');
+				args.url = '/transmission/upload?paused=' + paused;
 				args.type = 'POST';
 				args.data = { 'X-Transmission-Session-Id' : tr.remote._token };
 				args.dataType = 'xml';

@@ -894,6 +894,16 @@ div#upload_container div.dialog_window div.dialog_message input[type=text] {
 	padding: 2px;
 }
 
+div#upload_container div.dialog_window div.dialog_message input[type=checkbox] {
+	margin: 15px 3px 0 0;
+	display: inline;
+	width: auto;
+}
+
+div#upload_container div.dialog_window div.dialog_message #auto_start_label {
+	display: inline;
+}
+
 div.dialog_container div.dialog_window form {
 	margin: 0;
 	padding: 0px;

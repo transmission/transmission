@@ -205,7 +205,7 @@ TransmissionRemote.prototype =
 		var o = {
 			method: 'torrent-add',
 			arguments: {
-				paused: (options.paused ? 'true' : 'false'),
+				paused: (options.paused),
 				filename: url
 			}
 		};
