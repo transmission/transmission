@@ -356,9 +356,13 @@
 
 - (void) clearLog: (id) sender
 {
+    [fLock lock];
+    
     [fMessages removeAllObjects];
     [fDisplayedMessages removeAllObjects];
     [fMessageTable reloadData];
+    
+    [fLock unlock];
 }
 
 - (void) writeToFile: (id) sender

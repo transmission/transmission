@@ -1,7 +1,7 @@
 === Transmission 1.80 (In Development) ===
 [http://trac.transmissionbt.com/query?milestone=1.80&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== All Platforms ====
-  * Added support for Magnet links
+  * Magnet link support
   * If a torrent has multiple tracker tiers, announce to them in parallel
   * Add optional "incomplete directory" where partial downloads are stored
   * Trackerless torrent support

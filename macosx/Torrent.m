@@ -579,7 +579,7 @@ int trashDataFile(const char * filename)
 
 - (NSString *) name
 {
-    return [NSString stringWithUTF8String: fInfo->name];
+    return fInfo->name != NULL ? [NSString stringWithUTF8String: fInfo->name] : @"";
 }
 
 - (BOOL) isFolder
@@ -1753,7 +1753,6 @@ int trashDataFile(const char * filename)
     
     [self createFileList];
     
-    #warning only call when torrent is selected
     [[NSNotificationCenter defaultCenter] postNotificationName: @"ResetInspector" object: self];
 }
 
