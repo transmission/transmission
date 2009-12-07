@@ -18,12 +18,10 @@
 #define TR_TORRENT_H 1
 
 #include "completion.h" /* tr_completion */
-#include "ratecontrol.h" /* tr_ratecontrol */
 #include "session.h" /* tr_globalLock(), tr_globalUnlock() */
 #include "utils.h" /* TR_GNUC_PRINTF */
 
 struct tr_bandwidth;
-struct tr_ratecontrol;
 struct tr_torrent_tiers;
 struct tr_magnet_info;
 

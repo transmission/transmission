@@ -31,7 +31,6 @@
 #include "peer-mgr.h"
 #include "peer-msgs.h"
 #include "platform.h" /* MAX_STACK_ARRAY_SIZE */
-#include "ratecontrol.h"
 #include "session.h"
 #include "stats.h"
 #include "torrent.h"

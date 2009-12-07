@@ -37,7 +37,6 @@
 #include "peer-mgr.h"
 #include "platform.h" /* TR_PATH_DELIMITER_STR */
 #include "ptrarray.h"
-#include "ratecontrol.h"
 #include "session.h"
 #include "torrent.h"
 #include "torrent-magnet.h"
