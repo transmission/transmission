@@ -880,7 +880,7 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
     gtk_container_add ( GTK_CONTAINER( self ), vbox );
 
     /* main menu */
-    w = mainmenu = action_get_widget( "/main-window-menu" );
+    mainmenu = action_get_widget( "/main-window-menu" );
     w = action_get_widget( "/main-window-menu/torrent-menu/update-tracker" );
 #if GTK_CHECK_VERSION( 2, 12, 0 )
     g_signal_connect( w, "query-tooltip",
@@ -888,7 +888,7 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
 #endif
 
     /* toolbar */
-    w = toolbar = p->toolbar = action_get_widget( "/main-window-toolbar" );
+    toolbar = p->toolbar = action_get_widget( "/main-window-toolbar" );
     action_set_important( "add-torrent-toolbar", TRUE );
     action_set_important( "show-torrent-properties", TRUE );
 

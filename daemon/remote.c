@@ -1174,10 +1174,7 @@ printDetails( tr_benc * top )
             char         buf[512];
             char         buf2[512];
             int64_t      i, j, k;
-            tr_bool      isStopped;
             tr_bool      boolVal;
-
-            isStopped = tr_bencDictFindInt( t, "status", &i ) && (i==TR_STATUS_STOPPED);
 
             printf( "NAME\n" );
             if( tr_bencDictFindInt( t, "id", &i ) )
@@ -1876,14 +1873,13 @@ main( int     argc,
     if( host == NULL )
         host = tr_strdup( DEFAULT_HOST );
 
-    exit_status |= readargs( argc, (const char**)argv );
-    if( reqCount )
-        exit_status = processRequests( host, port, (const char**)reqs, reqCount );
-    else {
+    readargs( argc, (const char**)argv );
+    if( reqCount == 0 ) {
         showUsage( );
         return EXIT_FAILURE;
     }
 
+    exit_status = processRequests( host, port, (const char**)reqs, reqCount );
 
     for( i=0; i<reqCount; ++i )
         tr_free( reqs[i] );

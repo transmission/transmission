@@ -1192,9 +1192,9 @@ refreshPeerList( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     int i;
     int * peerCount;
     GtkTreeIter iter;
+    GtkTreeModel * model;
     GHashTable * hash = di->peer_hash;
     GtkListStore * store = di->peer_store;
-    GtkTreeModel * model = GTK_TREE_MODEL( store );
     struct tr_peer_stat ** peers;
 
     /* step 1: get all the peers */

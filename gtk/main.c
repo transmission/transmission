@@ -250,7 +250,7 @@ refreshActions( struct cbdata * data )
 static void
 refreshDetailsDialog( struct cbdata * data, GtkWidget * details )
 {
-    GtkTreeSelection * s = tr_window_get_selection( data->wind );
+    GtkTreeSelection * s;
     GtkTreeModel * model;
     GSList * ids = NULL;
     GList * selrows = NULL;

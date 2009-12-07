@@ -59,7 +59,7 @@ freeMetaUI( gpointer p )
 static gboolean
 onProgressDialogRefresh( gpointer data )
 {
-    char * str;
+    char * str = NULL;
     MakeMetaUI * ui = data;
     const tr_metainfo_builder * b = ui->builder;
     GtkDialog * d = GTK_DIALOG( ui->progress_dialog );
@@ -80,8 +80,13 @@ onProgressDialogRefresh( gpointer data )
         str = g_strdup_printf( _( "Error reading \"%s\": %s" ), b->errfile, g_strerror( b->my_errno ) );
     else if( b->result == TR_MAKEMETA_IO_WRITE )
         str = g_strdup_printf( _( "Error writing \"%s\": %s" ), b->errfile, g_strerror( b->my_errno ) );
-    gtk_label_set_text( GTK_LABEL( ui->progress_label ), str );
-    g_free( str );
+    else
+        g_assert_not_reached( );
+
+    if( str != NULL ) {
+        gtk_label_set_text( GTK_LABEL( ui->progress_label ), str );
+        g_free( str );
+    }
 
     /* progress bar */
     if( !b->pieceIndex )

@@ -955,23 +955,22 @@ tr_core_add_ctor( TrCore * core, tr_ctor * ctor )
 gboolean
 tr_core_add_metainfo( TrCore      * core,
                       const char  * payload,
-                      gboolean    * setme_success,
+                      gboolean    * setme_handled,
                       GError     ** gerr UNUSED )
 {
     tr_session * session = tr_core_session( core );
 
     if( !session )
     {
-        *setme_success = FALSE;
+        *setme_handled = FALSE;
     }
     else if( gtr_is_supported_url( payload ) || gtr_is_magnet_link( payload ) )
     {
         tr_core_add_from_url( core, payload );
-        *setme_success = TRUE;
+        *setme_handled = TRUE;
     }
     else /* base64-encoded metainfo */
     {
-        int err;
         int file_length;
         tr_ctor * ctor;
         char * file_contents;
@@ -981,14 +980,12 @@ tr_core_add_metainfo( TrCore      * core,
         tr_core_apply_defaults( ctor );
 
         file_contents = tr_base64_decode( payload, -1, &file_length );
-        err = tr_ctorSetMetainfo( ctor, (const uint8_t*)file_contents, file_length );
-
-        if( !err )
-            err = add_ctor( core, ctor, do_prompt, TRUE );
+        tr_ctorSetMetainfo( ctor, (const uint8_t*)file_contents, file_length );
+        add_ctor( core, ctor, do_prompt, TRUE );
 
         tr_free( file_contents );
         tr_core_torrents_added( core );
-        *setme_success = TRUE;
+        *setme_handled = TRUE;
     }
 
     return TRUE;

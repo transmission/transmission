@@ -563,7 +563,7 @@ gboolean
 gtr_dbus_add_torrent( const char * filename )
 {
     /* FIXME: why is this static? */
-    static gboolean success = FALSE;
+    static gboolean handled = FALSE;
 
 #ifdef HAVE_DBUS_GLIB
     char * payload;
@@ -596,7 +596,7 @@ gtr_dbus_add_torrent( const char * filename )
             dbus_g_proxy_call( proxy, "AddMetainfo", &err,
                                G_TYPE_STRING, payload,
                                G_TYPE_INVALID,
-                               G_TYPE_BOOLEAN, &success,
+                               G_TYPE_BOOLEAN, &handled,
                                G_TYPE_INVALID );
         if( err )
            g_message( "err: %s", err->message );
@@ -612,7 +612,7 @@ gtr_dbus_add_torrent( const char * filename )
     g_free( file_contents );
 
 #endif
-    return success;
+    return handled;
 }
 
 gboolean
