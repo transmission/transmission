@@ -1343,7 +1343,7 @@ gtr_inhibit_hibernation( guint * cookie )
         const int toplevel_xid = 0;
         const char * application = _( "Transmission Bittorrent Client" );
         const char * reason = _( "BitTorrent Activity" );
-        const int flags = 8; /* Inhibit the session being marked as idle */
+        const int flags = 4; /* Inhibit suspending the session or computer */
 
         success = dbus_g_proxy_call( proxy, "Inhibit", &error,
                                      G_TYPE_STRING, application,
