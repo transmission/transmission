@@ -871,7 +871,13 @@ typedef enum
         return;
     
     Torrent * torrent= [fTorrents objectAtIndex: 0];
-    if (![torrent addTrackerToNewTier: object])
+    
+    BOOL added = NO;
+    for (NSString * tracker in [object componentsSeparatedByString: @"\n"])
+        if ([torrent addTrackerToNewTier: tracker])
+            added = YES;
+    
+    if (!added)
         NSBeep();
     
     //reset table with either new or old value
