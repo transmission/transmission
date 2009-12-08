@@ -482,6 +482,8 @@ onSaveTimer( int foo UNUSED, short bar UNUSED, void * vsession )
     while(( tor = tr_torrentNext( session, tor )))
         tr_torrentSave( tor );
 
+    tr_statsSaveDirty( session );
+
     tr_timerAdd( session->saveTimer, SAVE_INTERVAL_SECS, 0 );
 }
 

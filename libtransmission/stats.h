@@ -21,6 +21,8 @@ void tr_statsInit           ( tr_session  * session );
 
 void tr_statsClose          ( tr_session  * session );
 
+void tr_statsSaveDirty      ( tr_session  * session );
+
 void tr_statsAddUploaded    ( tr_session  * session,
                               uint32_t      bytes );
 

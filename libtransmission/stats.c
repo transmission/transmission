@@ -28,6 +28,7 @@ struct tr_stats_handle
     tr_session_stats    single;
     tr_session_stats    old;
     time_t              startTime;
+    tr_bool             isDirty;
 };
 
 static char*
@@ -117,22 +118,32 @@ tr_statsInit( tr_session * session )
     session->sessionStats = stats;
 }
 
-void
-tr_statsClose( tr_session * session )
-{
-    tr_session_stats cumulative = STATS_INIT;
-
-    tr_sessionGetCumulativeStats( session, &cumulative );
-    saveCumulativeStats( session, &cumulative );
-
-    tr_free( session->sessionStats );
-    session->sessionStats = NULL;
-}
-
 static struct tr_stats_handle *
 getStats( const tr_session * session )
 {
     return session ? session->sessionStats : NULL;
+}
+
+void
+tr_statsSaveDirty( tr_session * session )
+{
+    struct tr_stats_handle * h = getStats( session );
+    if( ( h != NULL ) && h->isDirty )
+    {
+        tr_session_stats cumulative = STATS_INIT;
+        tr_sessionGetCumulativeStats( session, &cumulative );
+        saveCumulativeStats( session, &cumulative );
+        h->isDirty = FALSE;
+    }
+}
+
+void
+tr_statsClose( tr_session * session )
+{
+    tr_statsSaveDirty( session );
+
+    tr_free( session->sessionStats );
+    session->sessionStats = NULL;
 }
 
 /***
@@ -213,7 +224,10 @@ tr_statsAddUploaded( tr_session * session,
     struct tr_stats_handle * s;
 
     if( ( s = getStats( session ) ) )
+    {
         s->single.uploadedBytes += bytes;
+        s->isDirty = TRUE;
+    }
 }
 
 void
@@ -223,7 +237,10 @@ tr_statsAddDownloaded( tr_session * session,
     struct tr_stats_handle * s;
 
     if( ( s = getStats( session ) ) )
+    {
         s->single.downloadedBytes += bytes;
+        s->isDirty = TRUE;
+    }
 }
 
 void
