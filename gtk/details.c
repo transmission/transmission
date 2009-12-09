@@ -96,6 +96,7 @@ struct DetailsImpl
     GtkTextBuffer * tracker_buffer;
 
     GtkWidget * file_list;
+    GtkWidget * file_label;
 
     GSList * ids;
     TrCore * core;
@@ -2151,11 +2152,16 @@ torrent_inspector_new( GtkWindow * parent, TrCore * core )
     l = gtk_label_new( _( "Trackers" ) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ), w, l );
 
-    w = file_list_new( core, 0 );
-    gtk_container_set_border_width( GTK_CONTAINER( w ), GUI_PAD_BIG );
-    l = gtk_label_new( _( "Files" ) );
-    gtk_notebook_append_page( GTK_NOTEBOOK( n ), w, l );
-    di->file_list = w;
+    {
+        GtkWidget * v = gtk_vbox_new( FALSE, 0 );
+        di->file_list = file_list_new( core, 0 );
+        di->file_label = gtk_label_new( _( "File listing not available for combined torrent properties" ) );
+        gtk_box_pack_start( GTK_BOX( v ), di->file_list, TRUE, TRUE, 0 );
+        gtk_box_pack_start( GTK_BOX( v ), di->file_label, TRUE, TRUE, 0 );
+        gtk_container_set_border_width( GTK_CONTAINER( v ), GUI_PAD_BIG );
+        l = gtk_label_new( _( "Files" ) );
+        gtk_notebook_append_page( GTK_NOTEBOOK( n ), v, l );
+    }
 
     w = options_page_new( di );
     l = gtk_label_new( _( "Options" ) );
@@ -2188,10 +2194,15 @@ torrent_inspector_set_torrents( GtkWidget * w, GSList * ids )
         g_snprintf( title, sizeof( title ), _( "%s Properties" ), inf->name );
 
         file_list_set_torrent( di->file_list, id );
+        gtk_widget_show( di->file_list );
+        gtk_widget_hide( di->file_label );
+        di->file_label = gtk_label_new( _( "File listing not available for combined torrent properties" ) );
     }
    else
    {
         file_list_clear( di->file_list );
+        gtk_widget_hide( di->file_list );
+        gtk_widget_show( di->file_label );
         g_snprintf( title, sizeof( title ), _( "%'d Torrent Properties" ), len );
     }
 
