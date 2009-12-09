@@ -317,16 +317,20 @@ Transmission.prototype =
 
 
 	initTurtleDropDowns: function() {
-		var i, out, hour, mins;
+		var i, out, hour, mins, start, end, value, content;
 		// Build the list of times
 		out = "";
+		start = $('#turtle_start_time')[0];
+		end = $('#turtle_end_time')[0];
 		for (i = 0; i < 24 * 4; i++) {
 			hour = parseInt(i / 4);
 			mins = ((i % 4) * 15);
-			out += "<option value='" + (i * 15) + "'>" + hour + ":" + (mins == 0 ? "00" : mins) + "</option>";
+
+			value = (i * 15);
+			content = hour + ":" + (mins == 0 ? "00" : mins);
+			start.options[i] = new Option(content, value);
+			end.options[i]  = new Option(content, value);
 		}
-		setInnerHTML( $('#turtle_start_time')[0], out );
-		setInnerHTML( $('#turtle_end_time')[0], out );
 	},
 
 	/*--------------------------------------------
