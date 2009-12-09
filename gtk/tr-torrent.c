@@ -281,16 +281,10 @@ tr_torrent_set_remove_flag( TrTorrent * gtor,
         gtor->priv->do_remove = do_remove;
 }
 
-static int
-deleteFile( const char * filename, void * unused UNUSED )
-{
-    return tr_file_trash_or_remove( filename );
-}
-
 void
 tr_torrent_delete_files( TrTorrent * gtor )
 {
-    tr_torrentDeleteLocalData( tr_torrent_handle( gtor ), deleteFile, NULL );
+    tr_torrentDeleteLocalData( tr_torrent_handle( gtor ), tr_file_trash_or_remove );
 }
 
 void

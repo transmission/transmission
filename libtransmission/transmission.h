@@ -1021,7 +1021,7 @@ void tr_torrentSetLocation( tr_torrent  * torrent,
                             double      * setme_progress,
                             int         * setme_state );
 
-typedef int tr_fileFunc( const char * filename, void * clientData );
+typedef int tr_fileFunc( const char * filename );
 
 /**
  * @brief Deletes the torrent's local data.
@@ -1030,9 +1030,7 @@ typedef int tr_fileFunc( const char * filename, void * clientData );
  *                 recycle bins, pass in a function that uses it instead.
  *                 tr_torrentDeleteLocalData() ignores fileFunc's return value.
  */
-void tr_torrentDeleteLocalData( tr_torrent   * torrent, 
-                                tr_fileFunc    fileFunc,
-                                void         * fileFuncClientData );
+void tr_torrentDeleteLocalData( tr_torrent * torrent, tr_fileFunc fileFunc );
 
 uint64_t tr_torrentGetBytesLeftToAllocate( const tr_torrent * torrent );
 
