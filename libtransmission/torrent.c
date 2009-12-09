@@ -2316,6 +2316,14 @@ walkLocalData( const tr_torrent * tor,
 }
 
 static void
+deleteLocalFile( const char * filename, tr_fileFunc fileFunc )
+{
+    struct stat sb;
+    if( !stat( filename, &sb ) ) /* if file exists... */
+        fileFunc( filename );
+}
+
+static void
 deleteLocalData( tr_torrent * tor, tr_fileFunc fileFunc )
 {
     int i, n;
@@ -2344,12 +2352,12 @@ deleteLocalData( tr_torrent * tor, tr_fileFunc fileFunc )
     s = (char**) tr_ptrArrayPeek( &folders, &n );
     for( i=0; i<n; ++i )
         if( tr_ptrArrayFindSorted( &dirtyFolders, s[i], vstrcmp ) == NULL )
-            fileFunc( s[i] );
+            deleteLocalFile( s[i], fileFunc );
 
     /* now blow away any remaining torrent files, such as torrent files in dirty folders */
     for( f=0; f<tor->info.fileCount; ++f ) {
         char * path = tr_buildPath( tor->currentDir, tor->info.files[f].name, NULL );
-        fileFunc( path );
+        deleteLocalFile( path, fileFunc );
         tr_free( path );
     }
 
@@ -2366,10 +2374,10 @@ deleteLocalData( tr_torrent * tor, tr_fileFunc fileFunc )
         for( i=0; i<n; ++i ) {
 #ifdef SYS_DARWIN
             char * dsStore = tr_buildPath( s[i], ".DS_Store", NULL );
-            fileFunc( dsStore );
+            deleteLocalFile( dsStore, fileFunc );
             tr_free( dsStore );
 #endif
-            fileFunc( s[i] );
+            deleteLocalFile( s[i], fileFunc );
         }
         tr_ptrArrayDestruct( &cleanFolders, NULL );
     }
@@ -2403,12 +2411,12 @@ tr_torrentDeleteLocalData( tr_torrent * tor, tr_fileFunc fileFunc )
 
         /* torrent only has one file */
         char * path = tr_buildPath( tor->currentDir, tor->info.files[0].name, NULL );
-        fileFunc( path );
+        deleteLocalFile( path, fileFunc );
         tr_free( path );
 
         tmp = tr_torrentBuildPartial( tor, 0 );
         path = tr_buildPath( tor->currentDir, tmp, NULL );
-        fileFunc( path );
+        deleteLocalFile( path, fileFunc );
         tr_free( path );
         tr_free( tmp );
     }
