@@ -345,6 +345,9 @@ main( void )
     check( len == 5 );
     tr_free( in );
     tr_free( out );
+    out = tr_base64_encode( NULL, 0, &len );
+    check( out == NULL );
+    check( len == 0 );
 
     if( ( i = test_hex( ) ) )
         return i;

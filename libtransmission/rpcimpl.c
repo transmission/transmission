@@ -535,7 +535,7 @@ addField( const tr_torrent * tor, tr_benc * d, const char * key )
     else if( tr_streq( key, keylen, "pieces" ) ) {
         const tr_bitfield * pieces = tr_cpPieceBitfield( &tor->completion );
         char * str = tr_base64_encode( pieces->bits, pieces->byteCount, NULL );
-        tr_bencDictAddStr( d, key, str );
+        tr_bencDictAddStr( d, key, str!=NULL ? str : "" );
         tr_free( str );
     }
     else if( tr_streq( key, keylen, "pieceCount" ) )

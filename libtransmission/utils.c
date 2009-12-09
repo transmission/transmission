@@ -1036,29 +1036,34 @@ tr_httpParseURL( const char * url_in,
 #include <openssl/buffer.h>
 
 char *
-tr_base64_encode( const void * input,
-                  int          length,
-                  int *        setme_len )
+tr_base64_encode( const void * input, int length, int * setme_len )
 {
-    char *    ret;
-    BIO *     b64;
-    BIO *     bmem;
-    BUF_MEM * bptr;
+    int retlen = 0;
+    char * ret = NULL;
 
-    if( length < 1 )
-        length = strlen( input );
+    if( input != NULL )
+    {
+        BIO * b64;
+        BIO * bmem;
+        BUF_MEM * bptr;
 
-    bmem = BIO_new( BIO_s_mem( ) );
-    b64 = BIO_new( BIO_f_base64( ) );
-    b64 = BIO_push( b64, bmem );
-    BIO_write( b64, input, length );
-    (void) BIO_flush( b64 );
-    BIO_get_mem_ptr( b64, &bptr );
-    ret = tr_strndup( bptr->data, bptr->length );
+        if( length < 1 )
+            length = strlen( input );
+
+        bmem = BIO_new( BIO_s_mem( ) );
+        b64 = BIO_new( BIO_f_base64( ) );
+        b64 = BIO_push( b64, bmem );
+        BIO_write( b64, input, length );
+        (void) BIO_flush( b64 );
+        BIO_get_mem_ptr( b64, &bptr );
+        ret = tr_strndup( bptr->data, bptr->length );
+        retlen = bptr->length;
+        BIO_free_all( b64 );
+    }
+
     if( setme_len )
-        *setme_len = bptr->length;
+        *setme_len = retlen;
 
-    BIO_free_all( b64 );
     return ret;
 }
 
