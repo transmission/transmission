@@ -756,10 +756,10 @@ torrentSet( tr_session               * session,
         if( tr_bencDictFindInt( args_in, "bandwidthPriority", &tmp ) )
             if( tr_isPriority( tmp ) )
                 tr_torrentSetPriority( tor, tmp );
-        if( tr_bencDictFindList( args_in, "files-unwanted", &files ) )
-            setFileDLs( tor, FALSE, files );
-        if( tr_bencDictFindList( args_in, "files-wanted", &files ) )
-            setFileDLs( tor, TRUE, files );
+        if( !errmsg && tr_bencDictFindList( args_in, "files-unwanted", &files ) )
+            errmsg = setFileDLs( tor, FALSE, files );
+        if( !errmsg && tr_bencDictFindList( args_in, "files-wanted", &files ) )
+            errmsg = setFileDLs( tor, TRUE, files );
         if( tr_bencDictFindInt( args_in, "peer-limit", &tmp ) )
             tr_torrentSetPeerLimit( tor, tmp );
         if( !errmsg &&  tr_bencDictFindList( args_in, "priority-high", &files ) )
