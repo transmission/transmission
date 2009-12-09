@@ -2196,7 +2196,6 @@ torrent_inspector_set_torrents( GtkWidget * w, GSList * ids )
         file_list_set_torrent( di->file_list, id );
         gtk_widget_show( di->file_list );
         gtk_widget_hide( di->file_label );
-        di->file_label = gtk_label_new( _( "File listing not available for combined torrent properties" ) );
     }
    else
    {
