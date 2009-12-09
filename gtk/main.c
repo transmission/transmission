@@ -1495,9 +1495,20 @@ copyMagnetLinkToClipboard( GtkWidget * w, tr_torrent * tor )
 {
     char * magnet = tr_torrentGetMagnetLink( tor );
     GdkDisplay * display = gtk_widget_get_display( w );
-    GdkAtom selection = GDK_SELECTION_CLIPBOARD;
-    GtkClipboard * clipboard = gtk_clipboard_get_for_display( display, selection );
+    GdkAtom selection;
+    GtkClipboard * clipboard;
+
+    /* this is The Right Thing for copy/paste... */
+    selection = GDK_SELECTION_CLIPBOARD;
+    clipboard = gtk_clipboard_get_for_display( display, selection );
     gtk_clipboard_set_text( clipboard, magnet, -1 );
+
+    /* ...but people using plain ol' X need this instead */
+    selection = GDK_SELECTION_PRIMARY;
+    clipboard = gtk_clipboard_get_for_display( display, selection );
+    gtk_clipboard_set_text( clipboard, magnet, -1 );
+
+    /* cleanup */
     tr_free( magnet );
 }
 
