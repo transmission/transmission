@@ -2316,15 +2316,15 @@ walkLocalData( const tr_torrent * tor,
 }
 
 static void
-deleteLocalFile( const char * filename, tr_fileFunc fileFunc )
+deleteLocalFile( const char * filename, tr_fileFunc fileFunc, void * fileFuncClientData )
 {
     struct stat sb;
     if( !stat( filename, &sb ) ) /* if file exists... */
-        fileFunc( filename );
+        fileFunc( filename, fileFuncClientData );
 }
 
 static void
-deleteLocalData( tr_torrent * tor, tr_fileFunc fileFunc )
+deleteLocalData( tr_torrent * tor, tr_fileFunc fileFunc, void * fileFuncClientData )
 {
     int i, n;
     char ** s;
@@ -2352,12 +2352,12 @@ deleteLocalData( tr_torrent * tor, tr_fileFunc fileFunc )
     s = (char**) tr_ptrArrayPeek( &folders, &n );
     for( i=0; i<n; ++i )
         if( tr_ptrArrayFindSorted( &dirtyFolders, s[i], vstrcmp ) == NULL )
-            deleteLocalFile( s[i], fileFunc );
+            deleteLocalFile( s[i], fileFunc, fileFuncClientData );
 
     /* now blow away any remaining torrent files, such as torrent files in dirty folders */
     for( f=0; f<tor->info.fileCount; ++f ) {
         char * path = tr_buildPath( tor->currentDir, tor->info.files[f].name, NULL );
-        deleteLocalFile( path, fileFunc );
+        deleteLocalFile( path, fileFunc, fileFuncClientData );
         tr_free( path );
     }
 
@@ -2374,10 +2374,10 @@ deleteLocalData( tr_torrent * tor, tr_fileFunc fileFunc )
         for( i=0; i<n; ++i ) {
 #ifdef SYS_DARWIN
             char * dsStore = tr_buildPath( s[i], ".DS_Store", NULL );
-            deleteLocalFile( dsStore, fileFunc );
+            deleteLocalFile( dsStore, fileFunc, fileFuncClientData );
             tr_free( dsStore );
 #endif
-            deleteLocalFile( s[i], fileFunc );
+            deleteLocalFile( s[i], fileFunc, fileFuncClientData );
         }
         tr_ptrArrayDestruct( &cleanFolders, NULL );
     }
@@ -2390,20 +2390,26 @@ deleteLocalData( tr_torrent * tor, tr_fileFunc fileFunc )
     tr_free( tmp );
 }
 
+static int
+removeFile( const char * filename, void * unused UNUSED )
+{
+    return remove( filename );
+}
+
 void
-tr_torrentDeleteLocalData( tr_torrent * tor, tr_fileFunc fileFunc )
+tr_torrentDeleteLocalData( tr_torrent * tor, tr_fileFunc fileFunc, void * fileFuncClientData )
 {
     assert( tr_isTorrent( tor ) );
 
     if( fileFunc == NULL )
-        fileFunc = remove;
+        fileFunc = removeFile;
 
     /* close all the files because we're about to delete them */
     tr_fdTorrentClose( tor->session, tor->uniqueId );
 
     if( tor->info.fileCount > 1 )
     {
-        deleteLocalData( tor, fileFunc );
+        deleteLocalData( tor, fileFunc, fileFuncClientData );
     }
     else if( tor->info.fileCount == 1 )
     {
@@ -2411,12 +2417,12 @@ tr_torrentDeleteLocalData( tr_torrent * tor, tr_fileFunc fileFunc )
 
         /* torrent only has one file */
         char * path = tr_buildPath( tor->currentDir, tor->info.files[0].name, NULL );
-        deleteLocalFile( path, fileFunc );
+        deleteLocalFile( path, fileFunc, fileFuncClientData );
         tr_free( path );
 
         tmp = tr_torrentBuildPartial( tor, 0 );
         path = tr_buildPath( tor->currentDir, tmp, NULL );
-        deleteLocalFile( path, fileFunc );
+        deleteLocalFile( path, fileFunc, fileFuncClientData );
         tr_free( path );
         tr_free( tmp );
     }
@@ -2509,7 +2515,7 @@ setLocation( void * vdata )
         {
             /* blow away the leftover subdirectories in the old location */
             if( do_move )
-                tr_torrentDeleteLocalData( tor, remove );
+                tr_torrentDeleteLocalData( tor, removeFile, NULL );
 
             /* set the new location and reverify */
             tr_torrentSetDownloadDir( tor, location );

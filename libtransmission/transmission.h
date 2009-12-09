@@ -1007,8 +1007,6 @@ void tr_torrentStart( tr_torrent * torrent );
 /** @brief Stop (pause) a torrent */
 void tr_torrentStop( tr_torrent * torrent );
 
-typedef int tr_fileFunc( const char * filename );
-
 enum
 {
     TR_LOC_MOVING,
@@ -1023,6 +1021,8 @@ void tr_torrentSetLocation( tr_torrent  * torrent,
                             double      * setme_progress,
                             int         * setme_state );
 
+typedef int tr_fileFunc( const char * filename, void * clientData );
+
 /**
  * @brief Deletes the torrent's local data.
  * @param torrent
@@ -1030,7 +1030,9 @@ void tr_torrentSetLocation( tr_torrent  * torrent,
  *                 recycle bins, pass in a function that uses it instead.
  *                 tr_torrentDeleteLocalData() ignores fileFunc's return value.
  */
-void tr_torrentDeleteLocalData( tr_torrent * torrent,  tr_fileFunc fileFunc );
+void tr_torrentDeleteLocalData( tr_torrent   * torrent, 
+                                tr_fileFunc    fileFunc,
+                                void         * fileFuncClientData );
 
 uint64_t tr_torrentGetBytesLeftToAllocate( const tr_torrent * torrent );
 
