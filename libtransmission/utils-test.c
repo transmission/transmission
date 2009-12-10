@@ -5,8 +5,9 @@
 #include "bitfield.h"
 #include "ConvertUTF.h" /* tr_utf8_validate*/
 #include "platform.h"
-#include "utils.h"
 #include "crypto.h"
+#include "utils.h"
+#include "web.h"
 
 /* #define VERBOSE */
 #undef VERBOSE
@@ -325,6 +326,7 @@ test_url( void )
     int port;
     char * host;
     char * path;
+    char * str;
     const char * url;
 
     url = "http://www.some-tracker.org/some/path";
@@ -332,13 +334,21 @@ test_url( void )
     check( !strcmp( host, "www.some-tracker.org" ) )
     check( !strcmp( path, "/some/path" ) )
     check( port == 80 )
+    tr_free( path );
+    tr_free( host );
 
     url = "http://www.some-tracker.org:80/some/path";
     check( !tr_httpParseURL( url, -1, &host, &port, &path ) )
     check( !strcmp( host, "www.some-tracker.org" ) )
     check( !strcmp( path, "/some/path" ) )
     check( port == 80 )
+    tr_free( path );
+    tr_free( host );
 
+    url = "http%3A%2F%2Fwww.example.com%2F~user%2F%3Ftest%3D1%26test1%3D2";
+    str = tr_http_unescape( url, strlen( url ) );
+    check( !strcmp( str, "http://www.example.com/~user/?test=1&test1=2" ) )
+    tr_free( str );
 
     return 0;
 }
