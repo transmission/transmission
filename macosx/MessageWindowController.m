@@ -155,8 +155,10 @@
     
     [fLock lock];
     
+    NSUInteger currentCount = [fMessages count];
+    
     NSScroller * scroller = [[fMessageTable enclosingScrollView] verticalScroller];
-    const BOOL shouldScroll = fCurrentIndex == 0 || [scroller floatValue] == 1.0 || [scroller isHidden]
+    const BOOL shouldScroll = currentCount == 0 || [scroller floatValue] == 1.0 || [scroller isHidden]
                                 || [scroller knobProportion] == 1.0;
     
     const NSInteger maxLevel = [[NSUserDefaults standardUserDefaults] integerForKey: @"MessageLevel"];
@@ -173,7 +175,7 @@
         NSDictionary * message  = [NSDictionary dictionaryWithObjectsAndKeys:
                                     [NSString stringWithUTF8String: currentMessage->message], @"Message",
                                     [NSDate dateWithTimeIntervalSince1970: currentMessage->when], @"Date",
-                                    [NSNumber numberWithUnsignedInteger: fCurrentIndex++], @"Index", //more accurate when sorting by date
+                                    [NSNumber numberWithUnsignedInteger: currentCount++], @"Index", //more accurate when sorting by date
                                     [NSNumber numberWithInteger: currentMessage->level], @"Level",
                                     name, @"Name",
                                     file, @"File", nil];
@@ -187,9 +189,9 @@
         }
     }
     
-    if ([fMessages count] > TR_MAX_MSG_LOG)
+    if (currentCount > TR_MAX_MSG_LOG)
     {
-        NSIndexSet * removeIndexes = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fMessages count]-TR_MAX_MSG_LOG)];
+        NSIndexSet * removeIndexes = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, currentCount-TR_MAX_MSG_LOG)];
         NSArray * itemsToRemove = [fMessages objectsAtIndexes: removeIndexes];
         
         [fMessages removeObjectsAtIndexes: removeIndexes];
@@ -359,7 +361,6 @@
     [fMessages removeAllObjects];
     [fDisplayedMessages removeAllObjects];
     [fMessageTable reloadData];
-    fCurrentIndex = 0;
     
     [fLock unlock];
 }
