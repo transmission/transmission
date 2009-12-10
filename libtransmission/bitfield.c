@@ -159,34 +159,29 @@ tr_bitfieldRemRange( tr_bitfield * b,
 }
 
 tr_bitfield*
-tr_bitfieldOr( tr_bitfield *       a,
-               const tr_bitfield * b )
+tr_bitfieldOr( tr_bitfield * a, const tr_bitfield * b )
 {
-    uint8_t * ait;
-    const uint8_t *aend, *bit, *bend;
+    uint8_t * ait = a->bits;
+    const uint8_t * aend = ait + a->byteCount;
+    const uint8_t * bit = b->bits;
+    const uint8_t * bend = bit + b->byteCount;
 
-    for( ait = a->bits, aend = ait + a->byteCount,
-         bit = b->bits, bend = bit + b->byteCount;
-         ait != aend && bit != bend; )
-    {
+    while( ait!=aend && bit!=bend )
         *ait++ |= *bit++;
-    }
 
     return a;
 }
 
 /* set 'a' to all the flags that were in 'a' but not 'b' */
 void
-tr_bitfieldDifference( tr_bitfield *       a,
-                       const tr_bitfield * b )
+tr_bitfieldDifference( tr_bitfield * a, const tr_bitfield * b )
 {
-    uint8_t *      ait;
-    const uint8_t *aend, *bit;
+    uint8_t * ait = a->bits;
+    const uint8_t * aend = ait + a->byteCount;
+    const uint8_t * bit = b->bits;
+    const uint8_t * bend = bit + b->byteCount;
 
-    assert( a->byteCount == b->byteCount );
-
-    for( ait = a->bits, bit = b->bits, aend = ait + a->byteCount;
-         ait != aend; )
+    while( ait!=aend && bit!=bend )
         *ait++ &= ~( *bit++ );
 }
 
