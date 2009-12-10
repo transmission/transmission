@@ -1,5 +1,29 @@
 === Transmission 1.80 (In Development) ===
 [http://trac.transmissionbt.com/query?milestone=1.80&group=component&groupdesc=1&order=severity All tickets closed by this release]
+
+=== Transmission 1.80 beta 2 (2009/12/10) ===
+==== All Platforms ====
+  * Fix 1.80 beta 1 tracker connection / announce bug
+  * Fix 1.80 beta 1 crash "Assertion failed: (a->byteCount == b->byteCount)" 
+  * Fix 1.80 beta 1 crash when being controled by transmission-remote-dotnet
+  * Fix 1.80 beta 1 crash when a malformed magnet link is given to Transmission
+  * Better prefetching of local data that's being uploaded to peers
+==== Mac ====
+  * Fix 1.80 beta 1 IPv6 port check issue on 10.6
+  * Fix 1.80 beta 1 freeze when deleting local data
+  * Fix 1.80 beta 1 bug when pasting a URL into the torrent window
+  * Support pasting a list of trackers into the Info Window
+  * Updated Spanish translation
+==== GTK+ ====
+  * Fix 1.80 beta 1 bug in "Copy Magnet Link to Clipboard" on non-GNOME desktops
+  * Support org.gnome.SessionManager interface for inhibiting hibernation
+  * Minor GNOME HIG improvements
+==== Web Client ====
+  * Fix the turtle dropdown in IE
+  * Add "Start When Added" checkbox when adding torrents
+  * Add Select All / Deselect All buttons
+
+=== Transmission 1.80 beta 1 (2009/12/03) ===
 ==== All Platforms ====
   * Magnet link support
   * If a torrent has multiple tracker tiers, announce to them in parallel
