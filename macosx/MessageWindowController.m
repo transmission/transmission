@@ -153,12 +153,10 @@
     if ((messages = tr_getQueuedMessages()) == NULL)
         return;
     
-    static NSUInteger currentIndex = 0;
-    
     [fLock lock];
     
     NSScroller * scroller = [[fMessageTable enclosingScrollView] verticalScroller];
-    const BOOL shouldScroll = currentIndex == 0 || [scroller floatValue] == 1.0 || [scroller isHidden]
+    const BOOL shouldScroll = fCurrentIndex == 0 || [scroller floatValue] == 1.0 || [scroller isHidden]
                                 || [scroller knobProportion] == 1.0;
     
     const NSInteger maxLevel = [[NSUserDefaults standardUserDefaults] integerForKey: @"MessageLevel"];
@@ -175,7 +173,7 @@
         NSDictionary * message  = [NSDictionary dictionaryWithObjectsAndKeys:
                                     [NSString stringWithUTF8String: currentMessage->message], @"Message",
                                     [NSDate dateWithTimeIntervalSince1970: currentMessage->when], @"Date",
-                                    [NSNumber numberWithUnsignedInteger: currentIndex++], @"Index", //more accurate when sorting by date
+                                    [NSNumber numberWithUnsignedInteger: fCurrentIndex++], @"Index", //more accurate when sorting by date
                                     [NSNumber numberWithInteger: currentMessage->level], @"Level",
                                     name, @"Name",
                                     file, @"File", nil];
@@ -361,6 +359,7 @@
     [fMessages removeAllObjects];
     [fDisplayedMessages removeAllObjects];
     [fMessageTable reloadData];
+    fCurrentIndex = 0;
     
     [fLock unlock];
 }

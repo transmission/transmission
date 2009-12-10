@@ -153,7 +153,7 @@
     return [timeArray componentsJoinedByString: @" "];
 }
 
-//also used in InfoWindow.xib
+//also used in InfoWindow.xib and MessageWindow.xib
 - (NSComparisonResult) compareFinder: (NSString *) string
 {
     if ([NSApp isOnSnowLeopardOrBetter])
