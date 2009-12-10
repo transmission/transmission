@@ -319,6 +319,30 @@ test_array( void )
     return 0;
 }
 
+static int
+test_url( void )
+{
+    int port;
+    char * host;
+    char * path;
+    const char * url;
+
+    url = "http://www.some-tracker.org/some/path";
+    check( !tr_httpParseURL( url, -1, &host, &port, &path ) )
+    check( !strcmp( host, "www.some-tracker.org" ) )
+    check( !strcmp( path, "/some/path" ) )
+    check( port == 80 )
+
+    url = "http://www.some-tracker.org:80/some/path";
+    check( !tr_httpParseURL( url, -1, &host, &port, &path ) )
+    check( !strcmp( host, "www.some-tracker.org" ) )
+    check( !strcmp( path, "/some/path" ) )
+    check( port == 80 )
+
+
+    return 0;
+}
+
 int
 main( void )
 {
@@ -364,6 +388,8 @@ main( void )
     if( ( i = test_memmem( ) ) )
         return i;
     if( ( i = test_array( ) ) )
+        return i;
+    if( ( i = test_url( ) ) )
         return i;
 
     /* test that tr_cryptoRandInt() stays in-bounds */

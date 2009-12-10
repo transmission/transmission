@@ -984,8 +984,7 @@ tr_httpParseURL( const char * url_in,
         *pch = '\0';
         protocol = tmp;
         pch += 3;
-/*fprintf( stderr, "protocol is [%s]... what's left is [%s]\n", protocol, pch
-  );*/
+/*fprintf( stderr, "protocol is [%s]... what's left is [%s]\n", protocol, pch);*/
         if( ( n = strcspn( pch, ":/" ) ) )
         {
             const int havePort = pch[n] == ':';
@@ -1017,9 +1016,9 @@ tr_httpParseURL( const char * url_in,
     if( !err )
     {
         if( setme_host ){ ( (char*)host )[-3] = ':'; *setme_host =
-                              tr_strdup( protocol ); }
-        if( setme_path ){ ( (char*)path )[-1] = '/'; *setme_path =
-                              tr_strdup( path - 1 ); }
+                              tr_strdup( host ); }
+        if( setme_path ){ if( path[0] == '/' ) *setme_path = tr_strdup( path );
+                          else { ( (char*)path )[-1] = '/'; *setme_path = tr_strdup( path - 1 ); } }
         if( setme_port ) *setme_port = port;
     }
 
