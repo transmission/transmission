@@ -731,6 +731,7 @@ static tr_bool
 announceURLIsSupported( const char * announce )
 {
     return ( announce != NULL )
+        && ( strstr( announce, "tracker.thepiratebay.org" ) == NULL ) /* dead */
         && ( ( strstr( announce, "http://" ) == announce ) ||
              ( strstr( announce, "https://" ) == announce ) );
 }

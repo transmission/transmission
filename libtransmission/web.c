@@ -27,35 +27,14 @@
 #include "version.h"
 #include "web.h"
 
-static tr_bool
-useCurlMultiSocketAction( void )
-{
-    static tr_bool tested = FALSE;
-    static tr_bool useMultiSocketAction;
-
-    if( !tested )
-    {
-#ifdef SYS_DARWIN /* for some reason, curl_multi_socket_action() + libevent
-                     keeps crashing in event_queue_insert() on OS X 10.5 & 10.6 */
-        useMultiSocketAction = FALSE;
-#else
-        curl_version_info_data * data = curl_version_info( CURLVERSION_NOW );
-        tr_inf( "Using libcurl %s", data->version );
-        /* Use curl_multi_socket_action() instead of curl_multi_perform()
-         * if libcurl >= 7.18.2.  See http://trac.transmissionbt.com/ticket/1844 */
-        useMultiSocketAction = data->version_num >= 0x071202;
-#endif
-        tested = TRUE;
-    }
-
-    return useMultiSocketAction;
-}
-
 enum
 {
     /* arbitrary number */
-    DEFAULT_TIMER_MSEC = 2500
+    DEFAULT_TIMER_MSEC = 1500
 };
+
+static void
+tr_multi_perform( tr_web * g, int fd );
 
 #if 0
 #define dbgmsg(...) \
@@ -83,7 +62,7 @@ struct tr_web
     tr_bool closing;
     int prev_running;
     int still_running;
-    long timer_ms;
+    long timer_msec;
     CURLM * multi;
     tr_session * session;
     tr_bool haveAddr;
@@ -278,6 +257,8 @@ addTask( void * vtask )
                 ++web->still_running;
             else
                 tr_err( "%s", curl_multi_strerror( mcode ) );
+
+            tr_multi_perform( web, CURL_SOCKET_TIMEOUT );
         }
     }
 }
@@ -371,16 +352,13 @@ stop_timer( tr_web* g )
 static void
 restart_timer( tr_web * g )
 {
-    struct timeval interval;
-
     assert( tr_amInEventThread( g->session ) );
     assert( g->session != NULL );
     assert( g->session->events != NULL );
 
     stop_timer( g );
-    dbgmsg( "adding a timeout for %.1f seconds from now", g->timer_ms/1000.0 );
-    tr_timevalMsec( g->timer_ms, &interval );
-    evtimer_add( &g->timer_event, &interval );
+    dbgmsg( "adding a timeout for %.1f seconds from now", g->timer_msec/1000.0 );
+    tr_timerAddMsec( &g->timer_event, g->timer_msec );
 }
 
 static void
@@ -411,23 +389,12 @@ tr_multi_perform( tr_web * g, int fd )
             g->prev_running, g->still_running );
 
     /* invoke libcurl's processing */
-    if( useCurlMultiSocketAction( ) )
-    {
-        do {
-            dbgmsg( "calling curl_multi_socket_action..." );
-            mcode = curl_multi_socket_action( g->multi, fd, 0, &g->still_running );
-            fd = CURL_SOCKET_TIMEOUT;
-            dbgmsg( "done calling curl_multi_socket_action..." );
-        } while( mcode == CURLM_CALL_MULTI_SOCKET );
-    }
-    else
-    {
-        do {
-            dbgmsg( "calling curl_multi_perform..." );
-            mcode = curl_multi_perform( g->multi, &g->still_running );
-            dbgmsg( "done calling curl_multi_perform..." );
-        } while( mcode == CURLM_CALL_MULTI_PERFORM );
-    }
+    do {
+        dbgmsg( "calling curl_multi_socket_action..." );
+        mcode = curl_multi_socket_action( g->multi, fd, 0, &g->still_running );
+        fd = CURL_SOCKET_TIMEOUT;
+        dbgmsg( "done calling curl_multi_socket_action..." );
+    } while( mcode == CURLM_CALL_MULTI_SOCKET );
     tr_assert( mcode == CURLM_OK, "curl_multi_perform() failed: %d (%s)", mcode, curl_multi_strerror( mcode ) );
     if( mcode != CURLM_OK )
         tr_err( "%s", curl_multi_strerror( mcode ) );
@@ -452,14 +419,6 @@ static void
 event_cb( int fd, short kind UNUSED, void * g )
 {
     tr_multi_perform( g, fd );
-}
-
-/* libevent says that timer_ms have passed, so wake up libcurl */
-static void
-timer_cb( int socket UNUSED, short action UNUSED, void * g )
-{
-    dbgmsg( "libevent timer is done" );
-    tr_multi_perform( g, CURL_SOCKET_TIMEOUT );
 }
 
 /* CURLMOPT_SOCKETFUNCTION */
@@ -500,23 +459,30 @@ sock_cb( CURL            * e UNUSED,
     return 0;
 }
 
+/* libevent says that timer_msec have passed, so wake up libcurl */
+static void
+libevent_timer_cb( int fd UNUSED, short what UNUSED, void * g )
+{
+    dbgmsg( "libevent timer is done" );
+    tr_multi_perform( g, CURL_SOCKET_TIMEOUT );
+}
 
 /* libcurl documentation: "If 0, it means you should proceed immediately
  * without waiting for anything. If it returns -1, there's no timeout at all
  * set ... (but) you must not wait too long (more than a few seconds perhaps)
  * before you call curl_multi_perform() again."  */
 static void
-multi_timer_cb( CURLM *multi UNUSED, long timer_ms, void * vg )
+multi_timer_cb( CURLM * multi UNUSED, long timer_msec, void * vg )
 {
     tr_web * g = vg;
 
-    if( timer_ms < 1 ) {
-        if( timer_ms == 0 ) /* call it immediately */
-            timer_cb( 0, 0, g );
-        timer_ms = DEFAULT_TIMER_MSEC;
+    if( timer_msec < 1 ) {
+        if( timer_msec == 0 ) /* call it immediately */
+            libevent_timer_cb( 0, 0, g );
+        timer_msec = DEFAULT_TIMER_MSEC;
     }
 
-    g->timer_ms = timer_ms;
+    g->timer_msec = timer_msec;
     restart_timer( g );
 }
 
@@ -533,8 +499,8 @@ tr_webRun( tr_session         * session,
 {
     if( session->web )
     {
-        static unsigned long tag = 0;
         struct tr_web_task * task;
+        static unsigned long tag = 0;
 
         task = tr_new0( struct tr_web_task, 1 );
         task->session = session;
@@ -559,9 +525,8 @@ tr_webSetInterface( tr_web * web, const tr_address * addr )
 tr_web*
 tr_webInit( tr_session * session )
 {
-    CURLMcode mcode;
-    static int curlInited = FALSE;
     tr_web * web;
+    static int curlInited = FALSE;
 
     /* call curl_global_init if we haven't done it already.
      * try to enable ssl for https support; but if that fails,
@@ -575,17 +540,13 @@ tr_webInit( tr_session * session )
     web = tr_new0( struct tr_web, 1 );
     web->multi = curl_multi_init( );
     web->session = session;
-    web->timer_ms = DEFAULT_TIMER_MSEC; /* overwritten by multi_timer_cb() */
+    web->timer_msec = DEFAULT_TIMER_MSEC; /* overwritten by multi_timer_cb() */
 
-    evtimer_set( &web->timer_event, timer_cb, web );
-    mcode = curl_multi_setopt( web->multi, CURLMOPT_SOCKETDATA, web );
-    tr_assert( mcode == CURLM_OK, "curl_mutli_setopt() failed: %d (%s)", mcode, curl_multi_strerror( mcode ) );
-    mcode = curl_multi_setopt( web->multi, CURLMOPT_SOCKETFUNCTION, sock_cb );
-    tr_assert( mcode == CURLM_OK, "curl_mutli_setopt() failed: %d (%s)", mcode, curl_multi_strerror( mcode ) );
-    mcode = curl_multi_setopt( web->multi, CURLMOPT_TIMERDATA, web );
-    tr_assert( mcode == CURLM_OK, "curl_mutli_setopt() failed: %d (%s)", mcode, curl_multi_strerror( mcode ) );
-    mcode = curl_multi_setopt( web->multi, CURLMOPT_TIMERFUNCTION, multi_timer_cb );
-    tr_assert( mcode == CURLM_OK, "curl_mutli_setopt() failed: %d (%s)", mcode, curl_multi_strerror( mcode ) );
+    evtimer_set( &web->timer_event, libevent_timer_cb, web );
+    curl_multi_setopt( web->multi, CURLMOPT_SOCKETDATA, web );
+    curl_multi_setopt( web->multi, CURLMOPT_SOCKETFUNCTION, sock_cb );
+    curl_multi_setopt( web->multi, CURLMOPT_TIMERDATA, web );
+    curl_multi_setopt( web->multi, CURLMOPT_TIMERFUNCTION, multi_timer_cb );
 
     return web;
 }
