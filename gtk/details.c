@@ -1714,8 +1714,8 @@ buildTrackerSummary( const char * key, const tr_tracker_stat * st, gboolean show
                     break;
                 case TR_TRACKER_WAITING:
                     g_string_append_c( gstr, '\n' );
-                    tr_strltime_rounded( timebuf, now - st->lastScrapeStartTime, sizeof( timebuf ) );
-                    g_string_append_printf( gstr, _( "Asking for peer counts now... <small>%s</small>" ), timebuf );
+                    tr_strltime_rounded( timebuf, st->nextScrapeTime - now, sizeof( timebuf ) );
+                    g_string_append_printf( gstr, _( "Asking for peer counts in %s" ), timebuf );
                     break;
                 case TR_TRACKER_QUEUED:
                     g_string_append_c( gstr, '\n' );
@@ -1723,8 +1723,8 @@ buildTrackerSummary( const char * key, const tr_tracker_stat * st, gboolean show
                     break;
                 case TR_TRACKER_ACTIVE:
                     g_string_append_c( gstr, '\n' );
-                    tr_strltime_rounded( timebuf, st->nextScrapeTime - now, sizeof( timebuf ) );
-                    g_string_append_printf( gstr, _( "Asking for peer counts in %s" ), timebuf );
+                    tr_strltime_rounded( timebuf, now - st->lastScrapeStartTime, sizeof( timebuf ) );
+                    g_string_append_printf( gstr, _( "Asking for peer counts now... <small>%s</small>" ), timebuf );
                     break;
             }
         }
