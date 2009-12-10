@@ -499,6 +499,14 @@ tr_timerAdd( struct event * timer, int seconds, int microseconds )
     event_add( timer, &tv );
 }
 
+void
+tr_timerAddMsec( struct event * timer, int msec )
+{
+    const int seconds =  msec / 1000;
+    const int usec = (msec%1000) * 1000;
+    tr_timerAdd( timer, seconds, usec );
+}
+
 /**
 ***
 **/

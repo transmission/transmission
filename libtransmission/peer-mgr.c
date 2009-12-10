@@ -1008,14 +1008,6 @@ tr_peerMgrDidPeerRequest( const tr_torrent  * tor,
     return FALSE;
 }
 
-static void
-renewTimer( struct event * timer, int msec )
-{
-    const int seconds =  msec / 1000;
-    const int usec = (msec%1000) * 1000;
-    tr_timerAdd( timer, seconds, usec );
-}
-
 /* cancel requests that are too old */
 static void
 refillUpkeep( int foo UNUSED, short bar UNUSED, void * vmgr )
@@ -1069,7 +1061,7 @@ refillUpkeep( int foo UNUSED, short bar UNUSED, void * vmgr )
         }
     }
 
-    renewTimer( mgr->refillUpkeepTimer, REFILL_UPKEEP_PERIOD_MSEC );
+    tr_timerAddMsec( mgr->refillUpkeepTimer, REFILL_UPKEEP_PERIOD_MSEC );
     managerUnlock( mgr );
 }
 
@@ -1856,7 +1848,7 @@ createTimer( int msec, void (*callback)(int, short, void *), void * cbdata )
 {
     struct event * timer = tr_new0( struct event, 1 );
     evtimer_set( timer, callback, cbdata );
-    renewTimer( timer, msec );
+    tr_timerAddMsec( timer, msec );
     return timer;
 }
 
@@ -2346,7 +2338,7 @@ rechokePulse( int foo UNUSED, short bar UNUSED, void * vmgr )
         if( tor->isRunning )
             rechokeTorrent( tor->torrentPeers, now );
 
-    renewTimer( mgr->rechokeTimer, RECHOKE_PERIOD_MSEC );
+    tr_timerAddMsec( mgr->rechokeTimer, RECHOKE_PERIOD_MSEC );
     managerUnlock( mgr );
 }
 
@@ -2901,7 +2893,7 @@ reconnectPulse( int foo UNUSED, short bar UNUSED, void * vmgr )
         if( tor->isRunning )
             reconnectTorrent( tor->torrentPeers );
 
-    renewTimer( mgr->reconnectTimer, RECONNECT_PERIOD_MSEC );
+    tr_timerAddMsec( mgr->reconnectTimer, RECONNECT_PERIOD_MSEC );
     managerUnlock( mgr );
 }
 
@@ -2966,7 +2958,7 @@ bandwidthPulse( int foo UNUSED, short bar UNUSED, void * vmgr )
         if( tor->isRunning && ( tor->error == TR_STAT_LOCAL_ERROR ))
             tr_torrentStop( tor );
 
-    renewTimer( mgr->bandwidthTimer, BANDWIDTH_PERIOD_MSEC );
+    tr_timerAddMsec( mgr->bandwidthTimer, BANDWIDTH_PERIOD_MSEC );
     managerUnlock( mgr );
 }
 
@@ -3085,6 +3077,6 @@ atomPulse( int foo UNUSED, short bar UNUSED, void * vmgr )
         }
     }
 
-    renewTimer( mgr->atomTimer, ATOM_PERIOD_MSEC );
+    tr_timerAddMsec( mgr->atomTimer, ATOM_PERIOD_MSEC );
     managerUnlock( mgr );
 }

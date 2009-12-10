@@ -265,6 +265,8 @@ struct event;
 
 void tr_timerAdd( struct event * timer, int seconds, int microseconds );
 
+void tr_timerAddMsec( struct event * timer, int milliseconds );
+
 
 /** @brief return the current date in milliseconds */
 uint64_t       tr_date( void );
