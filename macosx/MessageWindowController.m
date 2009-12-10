@@ -158,7 +158,7 @@
     
     [fLock lock];
     
-    NSUInteger currentIndex = [fMessages count] > 0 ? [[[fMessages lastObject] objectForKey: @"Index"] unsignedIntegerValue] : 0;
+    NSUInteger currentIndex = [fMessages count] > 0 ? ([[[fMessages lastObject] objectForKey: @"Index"] unsignedIntegerValue] + 1) : 0;
     
     NSScroller * scroller = [[fMessageTable enclosingScrollView] verticalScroller];
     const BOOL shouldScroll = currentIndex == 0 || [scroller floatValue] == 1.0 || [scroller isHidden]
