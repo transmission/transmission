@@ -36,7 +36,6 @@
 #include "session.h"
 #include "stats.h" /* tr_statsAddUploaded, tr_statsAddDownloaded */
 #include "torrent.h"
-#include "trevent.h"
 #include "utils.h"
 #include "webseed.h"
 
@@ -47,9 +46,6 @@ enum
 
     /* how frequently to change which peers are choked */
     RECHOKE_PERIOD_MSEC = ( 10 * 1000 ),
-
-    /* minimum interval for refilling peers' request lists */
-    REFILL_PERIOD_MSEC = 400,
 
     /* how frequently to reallocate bandwidth */
     BANDWIDTH_PERIOD_MSEC = 500,
@@ -188,13 +184,13 @@ Torrent;
 
 struct tr_peerMgr
 {
-    tr_session      * session;
-    tr_ptrArray       incomingHandshakes; /* tr_handshake */
-    tr_timer        * bandwidthTimer;
-    tr_timer        * rechokeTimer;
-    tr_timer        * reconnectTimer;
-    tr_timer        * refillUpkeepTimer;
-    tr_timer        * atomTimer;
+    tr_session    * session;
+    tr_ptrArray     incomingHandshakes; /* tr_handshake */
+    struct event  * bandwidthTimer;
+    struct event  * rechokeTimer;
+    struct event  * reconnectTimer;
+    struct event  * refillUpkeepTimer;
+    struct event  * atomTimer;
 };
 
 #define tordbg( t, ... ) \
@@ -468,22 +464,24 @@ tr_peerMgrNew( tr_session * session )
 }
 
 static void
+deleteTimer( struct event ** t )
+{
+    if( *t != NULL )
+    {
+        evtimer_del( *t );
+        tr_free( *t );
+        *t = NULL;
+    }
+}
+
+static void
 deleteTimers( struct tr_peerMgr * m )
 {
-    if( m->atomTimer )
-        tr_timerFree( &m->atomTimer );
-
-    if( m->bandwidthTimer )
-        tr_timerFree( &m->bandwidthTimer );
-
-    if( m->rechokeTimer )
-        tr_timerFree( &m->rechokeTimer );
-
-    if( m->reconnectTimer )
-        tr_timerFree( &m->reconnectTimer );
-
-    if( m->refillUpkeepTimer )
-        tr_timerFree( &m->refillUpkeepTimer );
+    deleteTimer( &m->atomTimer );
+    deleteTimer( &m->bandwidthTimer );
+    deleteTimer( &m->rechokeTimer );
+    deleteTimer( &m->reconnectTimer );
+    deleteTimer( &m->refillUpkeepTimer );
 }
 
 void
@@ -1010,9 +1008,17 @@ tr_peerMgrDidPeerRequest( const tr_torrent  * tor,
     return FALSE;
 }
 
+static void
+renewTimer( struct event * timer, int msec )
+{
+    const int seconds =  msec / 1000;
+    const int usec = (msec%1000) * 1000;
+    tr_timerAdd( timer, seconds, usec );
+}
+
 /* cancel requests that are too old */
-static int
-refillUpkeep( void * vmgr )
+static void
+refillUpkeep( int foo UNUSED, short bar UNUSED, void * vmgr )
 {
     time_t now;
     time_t too_old;
@@ -1063,8 +1069,8 @@ refillUpkeep( void * vmgr )
         }
     }
 
+    renewTimer( mgr->refillUpkeepTimer, REFILL_UPKEEP_PERIOD_MSEC );
     managerUnlock( mgr );
-    return TRUE;
 }
 
 static void
@@ -1840,30 +1846,37 @@ tr_peerMgrGetPeers( tr_torrent   * tor,
     return count;
 }
 
-static int atomPulse      ( void * vmgr );
-static int bandwidthPulse ( void * vmgr );
-static int rechokePulse   ( void * vmgr );
-static int reconnectPulse ( void * vmgr );
+static void atomPulse      ( int, short, void * );
+static void bandwidthPulse ( int, short, void * );
+static void rechokePulse   ( int, short, void * );
+static void reconnectPulse ( int, short, void * );
+
+static struct event *
+createTimer( int msec, void (*callback)(int, short, void *), void * cbdata )
+{
+    struct event * timer = tr_new0( struct event, 1 );
+    evtimer_set( timer, callback, cbdata );
+    renewTimer( timer, msec );
+    return timer;
+}
 
 static void
 ensureMgrTimersExist( struct tr_peerMgr * m )
 {
-    tr_session * s = m->session;
-
     if( m->atomTimer == NULL )
-        m->atomTimer = tr_timerNew( s, atomPulse, m, ATOM_PERIOD_MSEC );
+        m->atomTimer = createTimer( ATOM_PERIOD_MSEC, atomPulse, m );
 
     if( m->bandwidthTimer == NULL )
-        m->bandwidthTimer = tr_timerNew( s, bandwidthPulse, m, BANDWIDTH_PERIOD_MSEC );
+        m->bandwidthTimer = createTimer( BANDWIDTH_PERIOD_MSEC, bandwidthPulse, m );
 
     if( m->rechokeTimer == NULL )
-        m->rechokeTimer = tr_timerNew( s, rechokePulse, m, RECHOKE_PERIOD_MSEC );
+        m->rechokeTimer = createTimer( RECHOKE_PERIOD_MSEC, rechokePulse, m );
 
     if( m->reconnectTimer == NULL )
-        m->reconnectTimer = tr_timerNew( s, reconnectPulse, m, RECONNECT_PERIOD_MSEC );
+        m->reconnectTimer = createTimer( RECONNECT_PERIOD_MSEC, reconnectPulse, m );
 
     if( m->refillUpkeepTimer == NULL )
-        m->refillUpkeepTimer = tr_timerNew( s, refillUpkeep, m, REFILL_UPKEEP_PERIOD_MSEC );
+        m->refillUpkeepTimer = createTimer( REFILL_UPKEEP_PERIOD_MSEC, refillUpkeep, m );
 }
 
 void
@@ -1877,7 +1890,7 @@ tr_peerMgrStartTorrent( tr_torrent * tor )
 
     t->isRunning = TRUE;
 
-    rechokePulse( t->manager );
+    rechokePulse( 0, 0, t->manager );
     managerUnlock( t->manager );
 }
 
@@ -2320,8 +2333,8 @@ rechokeTorrent( Torrent * t, const uint64_t now )
     tr_free( choke );
 }
 
-static int
-rechokePulse( void * vmgr )
+static void
+rechokePulse( int foo UNUSED, short bar UNUSED, void * vmgr )
 {
     uint64_t now;
     tr_torrent * tor = NULL;
@@ -2333,8 +2346,8 @@ rechokePulse( void * vmgr )
         if( tor->isRunning )
             rechokeTorrent( tor->torrentPeers, now );
 
+    renewTimer( mgr->rechokeTimer, RECHOKE_PERIOD_MSEC );
     managerUnlock( mgr );
-    return TRUE;
 }
 
 /***
@@ -2864,8 +2877,8 @@ enforceSessionPeerLimit( tr_session * session, uint64_t now )
 }
 
 
-static int
-reconnectPulse( void * vmgr )
+static void
+reconnectPulse( int foo UNUSED, short bar UNUSED, void * vmgr )
 {
     tr_torrent * tor;
     tr_peerMgr * mgr = vmgr;
@@ -2888,8 +2901,8 @@ reconnectPulse( void * vmgr )
         if( tor->isRunning )
             reconnectTorrent( tor->torrentPeers );
 
+    renewTimer( mgr->reconnectTimer, RECONNECT_PERIOD_MSEC );
     managerUnlock( mgr );
-    return TRUE;
 }
 
 /****
@@ -2916,8 +2929,8 @@ pumpAllPeers( tr_peerMgr * mgr )
     }
 }
 
-static int
-bandwidthPulse( void * vmgr )
+static void
+bandwidthPulse( int foo UNUSED, short bar UNUSED, void * vmgr )
 {
     tr_torrent * tor = NULL;
     tr_peerMgr * mgr = vmgr;
@@ -2953,8 +2966,8 @@ bandwidthPulse( void * vmgr )
         if( tor->isRunning && ( tor->error == TR_STAT_LOCAL_ERROR ))
             tr_torrentStop( tor );
 
+    renewTimer( mgr->bandwidthTimer, BANDWIDTH_PERIOD_MSEC );
     managerUnlock( mgr );
-    return TRUE;
 }
 
 /***
@@ -3013,8 +3026,8 @@ getMaxAtomCount( const tr_torrent * tor )
     return n * 10;
 }
 
-static int
-atomPulse( void * vmgr )
+static void
+atomPulse( int foo UNUSED, short bar UNUSED, void * vmgr )
 {
     tr_torrent * tor = NULL;
     tr_peerMgr * mgr = vmgr;
@@ -3072,6 +3085,6 @@ atomPulse( void * vmgr )
         }
     }
 
+    renewTimer( mgr->atomTimer, ATOM_PERIOD_MSEC );
     managerUnlock( mgr );
-    return TRUE;
 }

@@ -24,7 +24,6 @@
 #include "port-forwarding.h"
 #include "session.h"
 #include "torrent.h"
-#include "trevent.h"
 #include "upnp.h"
 #include "utils.h"
 

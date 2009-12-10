@@ -22,7 +22,7 @@
 #include "list.h"
 #include "net.h" /* socklen_t */
 #include "session.h"
-#include "trevent.h"
+#include "trevent.h" /* tr_runInEventThread() */
 #include "utils.h"
 #include "version.h"
 #include "web.h"

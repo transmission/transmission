@@ -40,7 +40,7 @@
 #include "session.h"
 #include "torrent.h"
 #include "torrent-magnet.h"
-#include "trevent.h"
+#include "trevent.h" /* tr_runInEventThread() */
 #include "utils.h"
 #include "verify.h"
 

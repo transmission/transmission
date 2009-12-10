@@ -33,7 +33,7 @@
 #include "net.h"
 #include "peer-io.h"
 #include "platform.h" /* MAX_STACK_ARRAY_SIZE */
-#include "trevent.h"
+#include "trevent.h" /* tr_runInEventThread() */
 #include "utils.h"
 
 #define MAGIC_NUMBER 206745

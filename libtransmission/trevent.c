@@ -132,18 +132,6 @@ typedef struct tr_event_handle
 }
 tr_event_handle;
 
-typedef int timer_func ( void* );
-
-struct tr_timer
-{
-    tr_bool                   inCallback;
-    timer_func *              func;
-    void *                    user_data;
-    struct tr_event_handle *  eh;
-    struct timeval            tv;
-    struct event              event;
-};
-
 struct tr_run_data
 {
     void    ( *func )( void * );
@@ -280,7 +268,7 @@ tr_eventClose( tr_session * session )
 **/
 
 tr_bool
-tr_amInEventThread( tr_session * session )
+tr_amInEventThread( const tr_session * session )
 {
     assert( tr_isSession( session ) );
     assert( session->events != NULL );
@@ -291,67 +279,6 @@ tr_amInEventThread( tr_session * session )
 /**
 ***
 **/
-
-static void
-timerCallback( int    fd UNUSED,
-               short  event UNUSED,
-               void * vtimer )
-{
-    int               more;
-    struct tr_timer * timer = vtimer;
-
-    timer->inCallback = 1;
-    more = ( *timer->func )( timer->user_data );
-    timer->inCallback = 0;
-
-    if( !more )
-        tr_timerFree( &timer );
-    else {
-        assert( tr_isTimeval( &timer->tv ) );
-        evtimer_add( &timer->event, &timer->tv );
-    }
-}
-
-void
-tr_timerFree( tr_timer ** ptimer )
-{
-    tr_timer * timer;
-
-    /* zero out the argument passed in */
-    assert( ptimer );
-    timer = *ptimer;
-    *ptimer = NULL;
-
-    /* destroy the timer directly or via the command queue */
-    if( timer && !timer->inCallback )
-    {
-        assert( tr_amInEventThread( timer->eh->session ) );
-        event_del( &timer->event );
-        tr_free( timer );
-    }
-}
-
-tr_timer*
-tr_timerNew( tr_session  * session,
-             timer_func    func,
-             void        * user_data,
-             uint64_t      interval_milliseconds )
-{
-    tr_timer * timer;
-
-    assert( tr_amInEventThread( session ) );
-
-    timer = tr_new0( tr_timer, 1 );
-    timer->func = func;
-    timer->user_data = user_data;
-    timer->eh = session->events;
-
-    tr_timevalMsec( interval_milliseconds, &timer->tv );
-    evtimer_set( &timer->event, timerCallback, timer );
-    evtimer_add( &timer->event,  &timer->tv );
-
-    return timer;
-}
 
 void
 tr_runInEventThread( tr_session * session,
