@@ -111,7 +111,7 @@ bootstrap_from_name( const char *name, short int port, int af )
     hints.ai_socktype = SOCK_DGRAM;
     hints.ai_family = af;
     /* No, just passing p + 1 to gai won't work. */
-    snprintf(pp, 10, "%d", port);
+    tr_snprintf(pp, sizeof(pp), "%d", port);
 
     rc = getaddrinfo(name, pp, &hints, &info);
     if(rc != 0) {
