@@ -139,9 +139,11 @@
 - (void) windowDidBecomeKey: (NSNotification *) notification
 {
     if (!fTimer)
+    {
         fTimer = [NSTimer scheduledTimerWithTimeInterval: UPDATE_SECONDS target: self
                     selector: @selector(updateLog:) userInfo: nil repeats: YES];
-    [self updateLog: nil];
+        [self updateLog: nil];
+    }
 }
 
 - (void) windowWillClose: (id)sender
