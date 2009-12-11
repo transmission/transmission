@@ -12,8 +12,14 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="57"/>
-			<integer value="1603"/>
+			<integer value="1041"/>
+			<integer value="2043"/>
+			<integer value="29"/>
+			<integer value="1936"/>
+			<integer value="2942"/>
+			<integer value="2547"/>
+			<integer value="589"/>
+			<integer value="456"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1936,7 +1942,7 @@ AAAAAAAAA</bytes>
 					</object>
 					<object class="NSMenuItem" id="953360563">
 						<reference key="NSMenu" ref="434296936"/>
-						<string key="NSTitle">Salvar .torrent como...</string>
+						<string key="NSTitle">Salvar .torrent Como...</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSMnemonicLoc">2147483647</int>
 						<reference key="NSOnImage" ref="322614661"/>
@@ -2267,7 +2273,7 @@ AAAAAAAAA</bytes>
 				<string key="NSExtension">NSView</string>
 			</object>
 			<object class="NSCustomView" id="793806362">
-				<reference key="NSNextResponder"/>
+				<nil key="NSNextResponder"/>
 				<int key="NSvFlags">266</int>
 				<object class="NSMutableArray" key="NSSubviews">
 					<bool key="EncodedWithXMLCoder">YES</bool>
@@ -2538,7 +2544,6 @@ AAAAAAAAA</bytes>
 					</object>
 				</object>
 				<string key="NSFrameSize">{457, 23}</string>
-				<reference key="NSSuperview"/>
 				<string key="NSClassName">StatusBarView</string>
 				<string key="NSExtension">NSView</string>
 			</object>
@@ -2981,7 +2986,7 @@ AAAAAAAAA</bytes>
 								<bool key="EncodedWithXMLCoder">YES</bool>
 								<object class="NSMenuItem" id="1040336365">
 									<reference key="NSMenu" ref="591449677"/>
-									<string key="NSTitle">High</string>
+									<string key="NSTitle">Alta</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<object class="NSCustomResource" key="NSImage">
@@ -3007,7 +3012,7 @@ AAAAAAAAA</bytes>
 								</object>
 								<object class="NSMenuItem" id="920118256">
 									<reference key="NSMenu" ref="591449677"/>
-									<string key="NSTitle">Low</string>
+									<string key="NSTitle">Baixa</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<object class="NSCustomResource" key="NSImage">
@@ -3047,7 +3052,7 @@ AAAAAAAAA</bytes>
 								<bool key="EncodedWithXMLCoder">YES</bool>
 								<object class="NSMenuItem" id="701056891">
 									<reference key="NSMenu" ref="137637493"/>
-									<string key="NSTitle">Unlimited</string>
+									<string key="NSTitle">Ilimitado</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -3094,7 +3099,7 @@ AAAAAAAAA</bytes>
 								<bool key="EncodedWithXMLCoder">YES</bool>
 								<object class="NSMenuItem" id="67180675">
 									<reference key="NSMenu" ref="192501462"/>
-									<string key="NSTitle">Unlimited</string>
+									<string key="NSTitle">Ilimitado</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -3171,7 +3176,7 @@ AAAAAAAAA</bytes>
 								</object>
 								<object class="NSMenuItem" id="947610053">
 									<reference key="NSMenu" ref="729841321"/>
-									<string key="NSTitle">Seed Forever</string>
+									<string key="NSTitle">Enviar para Sempre</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -7312,6 +7317,7 @@ AAAAAAAAA</bytes>
 					<string>2005.ImportedFromIB2</string>
 					<string>2017.IBPluginDependency</string>
 					<string>2017.ImportedFromIB2</string>
+					<string>2018.IBEditorWindowLastContentRect</string>
 					<string>2018.IBPluginDependency</string>
 					<string>2018.ImportedFromIB2</string>
 					<string>2018.editorWindowContentRectSynchronizationRect</string>
@@ -7903,7 +7909,7 @@ AAAAAAAAA</bytes>
 					<string>{{381, 469}, {214, 113}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>{{322, 871}, {135, 53}}</string>
+					<string>{{364, 464}, {126, 53}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>{{595, 509}, {135, 73}}</string>
@@ -7911,7 +7917,7 @@ AAAAAAAAA</bytes>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>{{313, 922}, {135, 53}}</string>
+					<string>{{364, 444}, {126, 53}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>{{595, 489}, {135, 73}}</string>
@@ -7931,6 +7937,7 @@ AAAAAAAAA</bytes>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
+					<string>{{364, 374}, {197, 73}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>{{595, 459}, {156, 73}}</string>
@@ -8048,7 +8055,7 @@ AAAAAAAAA</bytes>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>{{860, 429}, {64, 6}}</string>
+					<string>{{400, 600}, {64, 6}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -8147,7 +8154,7 @@ AAAAAAAAA</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{322, 891}, {105, 63}}</string>
+					<string>{{364, 154}, {234, 393}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -8198,7 +8205,7 @@ AAAAAAAAA</bytes>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>{{84, 560}, {257, 93}}</string>
+					<string>{{84, 561}, {257, 93}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>{{0, 902}, {234, 93}}</string>
