@@ -11,7 +11,7 @@
 ==== Mac ====
   * Fix 1.80 beta 1 IPv6 port check issue on 10.6
   * Fix 1.80 beta 1 bug when pasting a URL into the torrent window
-  * Updated Spanish and Italian localizations
+  * Updated Spanish, Italian, and Brazilian Portuguese localizations
 ==== GTK+ ====
   * Fix 1.80 beta 1 bug in "Copy Magnet Link to Clipboard" on non-GNOME desktops
   * Support org.gnome.SessionManager interface for inhibiting hibernation
