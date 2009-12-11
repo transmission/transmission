@@ -19,7 +19,6 @@
 #include <curl/curl.h>
 
 #include "transmission.h"
-#include "list.h"
 #include "net.h" /* socklen_t */
 #include "session.h"
 #include "trevent.h" /* tr_runInEventThread() */
@@ -50,13 +49,6 @@ tr_multi_perform( tr_web * g, int fd );
     } while( 0 )
 #endif
 
-struct tr_web_sockinfo
-{
-    int fd;
-    tr_bool evset;
-    struct event ev;
-};
-
 struct tr_web
 {
     tr_bool closing;
@@ -68,61 +60,7 @@ struct tr_web
     tr_bool haveAddr;
     tr_address addr;
     struct event timer_event;
-    tr_list * fds;
 };
-
-/***
-****
-***/
-
-static struct tr_web_sockinfo *
-getSockinfo( tr_web * web, int fd, tr_bool createIfMissing )
-{
-    tr_list * l;
-
-    for( l=web->fds; l!=NULL; l=l->next ) {
-        struct tr_web_sockinfo * s =  l->data;
-        if( s->fd == fd ) {
-            dbgmsg( "looked up sockinfo %p for fd %d", s, fd );
-            return s;
-        }
-    }
-
-    if( createIfMissing ) {
-        struct tr_web_sockinfo * s =  tr_new0( struct tr_web_sockinfo, 1 );
-        s->fd = fd;
-        tr_list_prepend( &web->fds, s );
-        dbgmsg( "created sockinfo %p for fd %d... we now have %d sockinfos", s, fd, tr_list_size(web->fds) );
-        return s;
-    }
-
-    return NULL;
-}
-
-static void
-clearSockinfoEvent( struct tr_web_sockinfo * s )
-{
-    if( s && s->evset )
-    {
-        dbgmsg( "clearing libevent polling for sockinfo %p, fd %d", s, s->fd );
-        event_del( &s->ev );
-        s->evset = FALSE;
-    }
-}
-
-static void
-purgeSockinfo( tr_web * web, int fd )
-{
-    struct tr_web_sockinfo * s = getSockinfo( web, fd, FALSE );
-
-    if( s != NULL )
-    {
-        tr_list_remove_data( &web->fds, s );
-        clearSockinfoEvent( s );
-        dbgmsg( "freeing sockinfo %p, fd %d", s, s->fd );
-        tr_free( s );
-    }
-}
 
 /***
 ****
@@ -309,27 +247,13 @@ remove_finished_tasks( tr_web * g )
             }
         }
 
-        if( easy ) {
+        if( easy )
+        {
             long code;
-            long fd;
             struct tr_web_task * task;
-            CURLcode ecode;
-            CURLMcode mcode;
-
-            ecode = curl_easy_getinfo( easy, CURLINFO_PRIVATE, (void*)&task );
-            tr_assert( ecode == CURLE_OK, "curl_easy_getinfo() failed: %d (%s)", ecode, curl_easy_strerror( ecode ) );
-
-            ecode = curl_easy_getinfo( easy, CURLINFO_RESPONSE_CODE, &code );
-            tr_assert( ecode == CURLE_OK, "curl_easy_getinfo() failed: %d (%s)", ecode, curl_easy_strerror( ecode ) );
-
-            ecode = curl_easy_getinfo( easy, CURLINFO_LASTSOCKET, &fd );
-            tr_assert( ecode == CURLE_OK, "curl_easy_getinfo() failed: %d (%s)", ecode, curl_easy_strerror( ecode ) );
-            if( fd != -1L )
-                purgeSockinfo( g, fd );
-
-            mcode = curl_multi_remove_handle( g->multi, easy );
-            tr_assert( mcode == CURLM_OK, "curl_multi_remove_handle() failed: %d (%s)", mcode, curl_multi_strerror( mcode ) );
-
+            curl_easy_getinfo( easy, CURLINFO_PRIVATE, (void*)&task );
+            curl_easy_getinfo( easy, CURLINFO_RESPONSE_CODE, &code );
+            curl_multi_remove_handle( g->multi, easy );
             curl_easy_cleanup( easy );
             task_finish( task, code );
         }
@@ -342,11 +266,8 @@ remove_finished_tasks( tr_web * g )
 static void
 stop_timer( tr_web* g )
 {
-    if( evtimer_pending( &g->timer_event, NULL ) )
-    {
-        dbgmsg( "deleting the pending global timer" );
-        evtimer_del( &g->timer_event );
-    }
+    dbgmsg( "deleting the pending global timer" );
+    evtimer_del( &g->timer_event );
 }
 
 static void
@@ -402,7 +323,6 @@ tr_multi_perform( tr_web * g, int fd )
     remove_finished_tasks( g );
 
     if( !g->still_running ) {
-        assert( tr_list_size( g->fds ) == 0 );
         stop_timer( g );
         if( g->closing ) {
             web_close( g );
@@ -423,40 +343,47 @@ event_cb( int fd, short kind UNUSED, void * g )
 
 /* CURLMOPT_SOCKETFUNCTION */
 static int
-sock_cb( CURL            * e UNUSED,
+sock_cb( CURL            * easy UNUSED,
          curl_socket_t     fd,
          int               action,
          void            * vweb,
-         void            * unused UNUSED)
+         void            * vevent )
 {
+    /*static int num_events = 0;*/
     struct tr_web * web = vweb;
-    dbgmsg( "sock_cb: action is %d, fd is %d", action, (int)fd );
+    struct event * io_event = vevent;
+    dbgmsg( "sock_cb: action is %d, fd is %d, io_event is %p", action, (int)fd, io_event );
 
     if( action == CURL_POLL_REMOVE )
     {
-        purgeSockinfo( web, fd );
+        if( io_event != NULL )
+        {
+            event_del( io_event );
+            tr_free( io_event );
+            curl_multi_assign( web->multi, fd, NULL ); /* does libcurl do this automatically? */
+            /*fprintf( stderr, "-1 io_events to %d\n", --num_events );*/
+        }
     }
     else
     {
-        struct tr_web_sockinfo * sockinfo = getSockinfo( web, fd, TRUE );
-        const int kind = EV_PERSIST
-                       | (( action & CURL_POLL_IN ) ? EV_READ : 0 )
-                       | (( action & CURL_POLL_OUT ) ? EV_WRITE : 0 );
-        dbgmsg( "setsock: fd is %d, curl action is %d, libevent action is %d", fd, action, kind );
-        assert( tr_amInEventThread( web->session ) );
-        assert( kind != EV_PERSIST );
+        const short events = EV_PERSIST
+                           | (( action & CURL_POLL_IN ) ? EV_READ : 0 )
+                           | (( action & CURL_POLL_OUT ) ? EV_WRITE : 0 );
 
-        /* clear any old polling on this fd */
-        clearSockinfoEvent( sockinfo );
+        if( io_event != NULL )
+            event_del( io_event );
+        else {
+            io_event = tr_new0( struct event, 1 );
+            curl_multi_assign( web->multi, fd, io_event );
+            /*fprintf( stderr, "+1 io_events to %d\n", ++num_events );*/
+        }
 
-        /* set the new polling on this fd */
-        dbgmsg( "enabling (libevent %d, libcurl %d) polling on sockinfo %p, fd %d", action, kind, sockinfo, fd );
-        event_set( &sockinfo->ev, fd, kind, event_cb, web );
-        event_add( &sockinfo->ev, NULL );
-        sockinfo->evset = TRUE;
+        dbgmsg( "enabling (libevent %hd, libcurl %d) polling on io_event %p, fd %d", events, action, io_event, fd );
+        event_set( io_event, fd, events, event_cb, web );
+        event_add( io_event, NULL );
     }
 
-    return 0;
+    return 0; /* libcurl doc sez: "The callback MUST return 0." */
 }
 
 /* libevent says that timer_msec have passed, so wake up libcurl */
@@ -538,11 +465,12 @@ tr_webInit( tr_session * session )
     }
 
     web = tr_new0( struct tr_web, 1 );
-    web->multi = curl_multi_init( );
     web->session = session;
-    web->timer_msec = DEFAULT_TIMER_MSEC; /* overwritten by multi_timer_cb() */
 
+    web->timer_msec = DEFAULT_TIMER_MSEC; /* overwritten by multi_timer_cb() */
     evtimer_set( &web->timer_event, libevent_timer_cb, web );
+
+    web->multi = curl_multi_init( );
     curl_multi_setopt( web->multi, CURLMOPT_SOCKETDATA, web );
     curl_multi_setopt( web->multi, CURLMOPT_SOCKETFUNCTION, sock_cb );
     curl_multi_setopt( web->multi, CURLMOPT_TIMERDATA, web );
