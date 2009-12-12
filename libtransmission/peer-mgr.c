@@ -2868,16 +2868,56 @@ enforceSessionPeerLimit( tr_session * session, uint64_t now )
     }
 }
 
+struct reconnectTorrentStruct
+{
+    tr_torrent * torrent;
+    int salt;
+};
 
+static int
+compareReconnectTorrents( const void * va, const void * vb )
+{
+    int ai, bi;
+    const struct reconnectTorrentStruct * a = va;
+    const struct reconnectTorrentStruct * b = vb;
+
+    /* primary key: higher priority goes first */
+    ai = tr_torrentGetPriority( a->torrent );
+    bi = tr_torrentGetPriority( b->torrent );
+    if( ai != bi )
+        return ai > bi ? -1 : 1;
+
+    /* secondary key: since users tend to stare at the screens
+     * watching their downloads' progress, give downloads a
+     * first shot at attempting outbound peer connections. */
+    ai = tr_torrentIsSeed( a->torrent );
+    bi = tr_torrentIsSeed( b->torrent );
+    if( ai != bi )
+        return bi ? -1 : 1;
+
+    /* tertiary key: random */
+    if( a->salt != b->salt )
+        return a->salt - b->salt;
+
+    return 0;
+}
+    
 static void
 reconnectPulse( int foo UNUSED, short bar UNUSED, void * vmgr )
 {
     tr_torrent * tor;
     tr_peerMgr * mgr = vmgr;
+    struct reconnectTorrentStruct * torrents;
+    int torrentCount;
+    int i;
     uint64_t now;
     managerLock( mgr );
 
     now = tr_date( );
+
+    /**
+    ***  enforce the per-session and per-torrent peer limits
+    **/
 
     /* if we're over the per-torrent peer limits, cull some peers */
     tor = NULL;
@@ -2888,11 +2928,29 @@ reconnectPulse( int foo UNUSED, short bar UNUSED, void * vmgr )
     /* if we're over the per-session peer limits, cull some peers */
     enforceSessionPeerLimit( mgr->session, now );
 
-    tor = NULL;
-    while(( tor = tr_torrentNext( mgr->session, tor )))
-        if( tor->isRunning )
-            reconnectTorrent( tor->torrentPeers );
+    /**
+    ***  try to make new peer connections
+    **/
 
+    torrentCount = 0;
+    torrents = tr_new( struct reconnectTorrentStruct,
+                       mgr->session->torrentCount );
+    while(( tor = tr_torrentNext( mgr->session, tor ))) {
+        if( tor->isRunning ) {
+            struct reconnectTorrentStruct * r = torrents + torrentCount++;
+            r->torrent = tor;
+            r->salt = tr_cryptoWeakRandInt( 1024 );
+        }
+    }
+    qsort( torrents,
+           torrentCount, sizeof( struct reconnectTorrentStruct ),
+           compareReconnectTorrents );
+    for( i=0; i<torrentCount; ++i )
+        reconnectTorrent( torrents[i].torrent->torrentPeers );
+
+
+    /* cleanup */
+    tr_free( torrents );
     tr_timerAddMsec( mgr->reconnectTimer, RECONNECT_PERIOD_MSEC );
     managerUnlock( mgr );
 }
