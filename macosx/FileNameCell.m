@@ -120,18 +120,6 @@
     return result;
 }
 
-- (NSRect) titleRectForBounds: (NSRect) bounds
-{
-    return [self rectForTitleWithString: [self attributedTitle] inBounds: bounds];
-}
-
-- (NSRect) statusRectForBounds: (NSRect) bounds
-{
-    return [self rectForStatusWithString: [self attributedStatus]
-            withTitleRect: [(FileListNode *)[self objectValue] isFolder] ? [self titleRectForBounds: bounds] : NSZeroRect
-            inBounds: bounds];
-}
-
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
 {
     //icon

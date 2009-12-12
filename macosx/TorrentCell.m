@@ -73,6 +73,11 @@
             inBounds: (NSRect) bounds;
 - (NSRect) rectForProgressWithString: (NSAttributedString *) string inBounds: (NSRect) bounds;
 - (NSRect) rectForStatusWithString: (NSAttributedString *) string inBounds: (NSRect) bounds;
+- (NSRect) barRectForBounds: (NSRect) bounds;
+
+- (NSRect) controlButtonRectForBounds: (NSRect) bounds;
+- (NSRect) revealButtonRectForBounds: (NSRect) bounds;
+- (NSRect) actionButtonRectForBounds: (NSRect) bounds;
 
 - (NSAttributedString *) attributedTitle;
 - (NSAttributedString *) attributedStatusString: (NSString *) string;
@@ -113,109 +118,12 @@
 
 - (NSRect) iconRectForBounds: (NSRect) bounds
 {
-    CGFloat imageSize = [fDefaults boolForKey: @"SmallView"] ? IMAGE_SIZE_MIN : IMAGE_SIZE_REG;
+    const CGFloat imageSize = [fDefaults boolForKey: @"SmallView"] ? IMAGE_SIZE_MIN : IMAGE_SIZE_REG;
     
     NSRect result = bounds;
     result.origin.x += PADDING_HORIZONTAL;
     result.origin.y += floor((result.size.height - imageSize) * 0.5);
     result.size = NSMakeSize(imageSize, imageSize);
-    
-    return result;
-}
-
-- (NSRect) titleRectForBounds: (NSRect) bounds
-{
-    return [self rectForTitleWithString: [self attributedTitle]
-            basedOnMinimalStatusRect: [self minimalStatusRectForBounds: bounds] inBounds: bounds];
-}
-
-- (NSRect) minimalStatusRectForBounds: (NSRect) bounds
-{
-    if (![fDefaults boolForKey: @"SmallView"])
-        return NSZeroRect;
-    
-    return [self rectForMinimalStatusWithString: [self attributedStatusString: [self minimalStatusString]]
-            inBounds: bounds];
-}
-
-- (NSRect) progressRectForBounds: (NSRect) bounds
-{
-    if ([fDefaults boolForKey: @"SmallView"])
-        return NSZeroRect;
-    
-    return [self rectForProgressWithString: [self attributedStatusString: [[self representedObject] progressString]]
-            inBounds: bounds];
-}
-
-- (NSRect) barRectForBounds: (NSRect) bounds
-{
-    const BOOL minimal = [fDefaults boolForKey: @"SmallView"];
-    
-    NSRect result = bounds;
-    result.size.height = BAR_HEIGHT;
-    result.origin.x += (minimal ? IMAGE_SIZE_MIN : IMAGE_SIZE_REG) + PADDING_BETWEEN_IMAGE_AND_BAR;
-    
-    result.origin.y += PADDING_ABOVE_TITLE + HEIGHT_TITLE;
-    if (minimal)
-        result.origin.y += PADDING_BETWEEN_TITLE_AND_BAR_MIN;
-    else
-        result.origin.y += PADDING_BETWEEN_TITLE_AND_PROGRESS + HEIGHT_STATUS + PADDING_BETWEEN_PROGRESS_AND_BAR;
-    
-    result.size.width = floor(NSMaxX(bounds) - result.origin.x - PADDING_HORIZONTAL - 2.0 * (PADDING_HORIZONTAL + NORMAL_BUTTON_WIDTH));
-    
-    return result;
-}
-
-- (NSRect) statusRectForBounds: (NSRect) bounds
-{
-    if ([fDefaults boolForKey: @"SmallView"])
-        return NSZeroRect;
-    
-    return [self rectForStatusWithString: [self attributedStatusString: [self statusString]] inBounds: bounds];
-}
-
-- (NSRect) controlButtonRectForBounds: (NSRect) bounds
-{
-    NSRect result = bounds;
-    result.size.height = NORMAL_BUTTON_WIDTH;
-    result.size.width = NORMAL_BUTTON_WIDTH;
-    result.origin.x = NSMaxX(bounds) - 2.0f * (PADDING_HORIZONTAL + NORMAL_BUTTON_WIDTH);
-    
-    result.origin.y += PADDING_ABOVE_TITLE + HEIGHT_TITLE - (NORMAL_BUTTON_WIDTH - BAR_HEIGHT) * 0.5f;
-    if ([fDefaults boolForKey: @"SmallView"])
-        result.origin.y += PADDING_BETWEEN_TITLE_AND_BAR_MIN;
-    else
-        result.origin.y += PADDING_BETWEEN_TITLE_AND_PROGRESS + HEIGHT_STATUS + PADDING_BETWEEN_PROGRESS_AND_BAR;
-    
-    return result;
-}
-
-- (NSRect) revealButtonRectForBounds: (NSRect) bounds
-{
-    NSRect result = bounds;
-    result.size.height = NORMAL_BUTTON_WIDTH;
-    result.size.width = NORMAL_BUTTON_WIDTH;
-    result.origin.x = NSMaxX(bounds) - (PADDING_HORIZONTAL + NORMAL_BUTTON_WIDTH);
-    
-    result.origin.y += PADDING_ABOVE_TITLE + HEIGHT_TITLE - (NORMAL_BUTTON_WIDTH - BAR_HEIGHT) * 0.5f;
-    if ([fDefaults boolForKey: @"SmallView"])
-        result.origin.y += PADDING_BETWEEN_TITLE_AND_BAR_MIN;
-    else
-        result.origin.y += PADDING_BETWEEN_TITLE_AND_PROGRESS + HEIGHT_STATUS + PADDING_BETWEEN_PROGRESS_AND_BAR;
-    
-    return result;
-}
-
-- (NSRect) actionButtonRectForBounds: (NSRect) bounds
-{
-    NSRect result = [self iconRectForBounds: bounds];
-    if (![fDefaults boolForKey: @"SmallView"])
-    {
-        result.origin.x += (result.size.width - ACTION_BUTTON_WIDTH) * 0.5f;
-        result.origin.y += (result.size.height - ACTION_BUTTON_WIDTH) * 0.5f;
-        result.size.width = ACTION_BUTTON_WIDTH;
-        result.size.height = ACTION_BUTTON_WIDTH;
-    }
     
     return result;
 }
@@ -753,6 +661,71 @@
     
     result.size = [string size];
     result.size.width = MIN(result.size.width, NSMaxX(bounds) - result.origin.x - PADDING_HORIZONTAL);
+    
+    return result;
+}
+
+- (NSRect) barRectForBounds: (NSRect) bounds
+{
+    const BOOL minimal = [fDefaults boolForKey: @"SmallView"];
+    
+    NSRect result = bounds;
+    result.size.height = BAR_HEIGHT;
+    result.origin.x += (minimal ? IMAGE_SIZE_MIN : IMAGE_SIZE_REG) + PADDING_BETWEEN_IMAGE_AND_BAR;
+    
+    result.origin.y += PADDING_ABOVE_TITLE + HEIGHT_TITLE;
+    if (minimal)
+        result.origin.y += PADDING_BETWEEN_TITLE_AND_BAR_MIN;
+    else
+        result.origin.y += PADDING_BETWEEN_TITLE_AND_PROGRESS + HEIGHT_STATUS + PADDING_BETWEEN_PROGRESS_AND_BAR;
+    
+    result.size.width = floor(NSMaxX(bounds) - result.origin.x - PADDING_HORIZONTAL - 2.0 * (PADDING_HORIZONTAL + NORMAL_BUTTON_WIDTH));
+    
+    return result;
+}
+
+- (NSRect) controlButtonRectForBounds: (NSRect) bounds
+{
+    NSRect result = bounds;
+    result.size.height = NORMAL_BUTTON_WIDTH;
+    result.size.width = NORMAL_BUTTON_WIDTH;
+    result.origin.x = NSMaxX(bounds) - 2.0f * (PADDING_HORIZONTAL + NORMAL_BUTTON_WIDTH);
+    
+    result.origin.y += PADDING_ABOVE_TITLE + HEIGHT_TITLE - (NORMAL_BUTTON_WIDTH - BAR_HEIGHT) * 0.5f;
+    if ([fDefaults boolForKey: @"SmallView"])
+        result.origin.y += PADDING_BETWEEN_TITLE_AND_BAR_MIN;
+    else
+        result.origin.y += PADDING_BETWEEN_TITLE_AND_PROGRESS + HEIGHT_STATUS + PADDING_BETWEEN_PROGRESS_AND_BAR;
+    
+    return result;
+}
+
+- (NSRect) revealButtonRectForBounds: (NSRect) bounds
+{
+    NSRect result = bounds;
+    result.size.height = NORMAL_BUTTON_WIDTH;
+    result.size.width = NORMAL_BUTTON_WIDTH;
+    result.origin.x = NSMaxX(bounds) - (PADDING_HORIZONTAL + NORMAL_BUTTON_WIDTH);
+    
+    result.origin.y += PADDING_ABOVE_TITLE + HEIGHT_TITLE - (NORMAL_BUTTON_WIDTH - BAR_HEIGHT) * 0.5f;
+    if ([fDefaults boolForKey: @"SmallView"])
+        result.origin.y += PADDING_BETWEEN_TITLE_AND_BAR_MIN;
+    else
+        result.origin.y += PADDING_BETWEEN_TITLE_AND_PROGRESS + HEIGHT_STATUS + PADDING_BETWEEN_PROGRESS_AND_BAR;
+    
+    return result;
+}
+
+- (NSRect) actionButtonRectForBounds: (NSRect) bounds
+{
+    NSRect result = [self iconRectForBounds: bounds];
+    if (![fDefaults boolForKey: @"SmallView"])
+    {
+        result.origin.x += (result.size.width - ACTION_BUTTON_WIDTH) * 0.5f;
+        result.origin.y += (result.size.height - ACTION_BUTTON_WIDTH) * 0.5f;
+        result.size.width = ACTION_BUTTON_WIDTH;
+        result.size.height = ACTION_BUTTON_WIDTH;
+    }
     
     return result;
 }

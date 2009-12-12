@@ -35,15 +35,6 @@
 }
 
 - (NSRect) iconRectForBounds: (NSRect) bounds;
-- (NSRect) titleRectForBounds: (NSRect) bounds;
-- (NSRect) progressRectForBounds: (NSRect) bounds;
-- (NSRect) barRectForBounds: (NSRect) bounds;
-- (NSRect) statusRectForBounds: (NSRect) bounds;
-- (NSRect) minimalStatusRectForBounds: (NSRect) bounds;
-
-- (NSRect) controlButtonRectForBounds: (NSRect) bounds;
-- (NSRect) revealButtonRectForBounds: (NSRect) bounds;
-- (NSRect) actionButtonRectForBounds: (NSRect) bounds;
 
 - (void) addTrackingAreasForView: (NSView *) controlView inRect: (NSRect) cellFrame withUserInfo: (NSDictionary *) userInfo
             mouseLocation: (NSPoint) mouseLocation;
