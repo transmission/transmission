@@ -337,15 +337,12 @@ tr_cryptoRandInt( int upperBound )
         val = tr_cryptoWeakRandInt( upperBound );
     }
 
-    assert( val >= 0 );
-    assert( val < upperBound );
     return val;
 }
 
 int
 tr_cryptoWeakRandInt( int upperBound )
 {
-    int val;
     static tr_bool init = FALSE;
 
     assert( upperBound > 0 );
@@ -356,10 +353,7 @@ tr_cryptoWeakRandInt( int upperBound )
         init = TRUE;
     }
 
-    val = rand( ) % upperBound;
-    assert( val >= 0 );
-    assert( val < upperBound );
-    return val;
+    return rand( ) % upperBound;
 }
 
 void
