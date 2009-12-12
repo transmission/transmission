@@ -84,8 +84,8 @@ static void
 nap( int roughly )
 {
     struct timeval tv;
-    tr_timevalSet( &tv, roughly / 2 + tr_cryptoWeakRandInt( roughly ),
-                   tr_cryptoWeakRandInt( 1000000 ) );
+    tv.tv_sec = roughly / 2 + tr_cryptoWeakRandInt( roughly );
+    tv.tv_usec = tr_cryptoWeakRandInt( 1000000 );
     select( 0, NULL, NULL, NULL, &tv );
 }
 

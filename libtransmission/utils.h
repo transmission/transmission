@@ -253,14 +253,6 @@ uint8_t* tr_loadFile( const char * filename, size_t * size ) TR_GNUC_MALLOC TR_G
 char* tr_buildPath( const char * first_element, ... ) TR_GNUC_NULL_TERMINATED
                                                       TR_GNUC_MALLOC;
 
-struct timeval;
-
-tr_bool tr_isTimeval( const struct timeval * tv );
-
-void tr_timevalMsec( uint64_t milliseconds, struct timeval * setme );
-
-void tr_timevalSet( struct timeval * setme, int seconds, int microseconds );
-
 struct event;
 
 void tr_timerAdd( struct event * timer, int seconds, int microseconds );
