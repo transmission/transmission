@@ -69,6 +69,9 @@ tr_sha1( uint8_t *    setme,
 
 #define PRIME_LEN 96
 
+#define DH_PRIVKEY_LEN_MIN 16
+#define DH_PRIVKEY_LEN 20
+
 static const uint8_t dh_P[PRIME_LEN] =
 {
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC9, 0x0F, 0xDA, 0xA2,
@@ -93,6 +96,7 @@ struct tr_crypto
     tr_bool         mySecretIsSet;
     uint8_t         myPublicKey[KEY_LEN];
     uint8_t         mySecret[KEY_LEN];
+    DH *            dh;
 };
 
 /**
@@ -108,14 +112,13 @@ struct tr_crypto
         } \
     } while( 0 )
 
-static DH*
-getSharedDH( void )
+static void
+ensureKeyExists( tr_crypto * crypto)
 {
-    static DH * dh = NULL;
-
-    if( dh == NULL )
+    if( crypto->dh == NULL )
     {
-        dh = DH_new( );
+        int len, offset;
+        DH * dh = DH_new( );
 
         dh->p = BN_bin2bn( dh_P, sizeof( dh_P ), NULL );
         if( dh->p == NULL )
@@ -125,33 +128,39 @@ getSharedDH( void )
         if( dh->g == NULL )
             logErrorFromSSL( );
 
+        /* private DH value: strong random BN of DH_PRIVKEY_LEN*8 bits */
+        dh->priv_key = BN_new( );
+        do {
+            if( BN_rand( dh->priv_key, DH_PRIVKEY_LEN * 8, -1, 0 ) != 1 )
+                logErrorFromSSL( );
+        } while ( BN_num_bits( dh->priv_key ) < DH_PRIVKEY_LEN_MIN * 8 );
+
         if( !DH_generate_key( dh ) )
             logErrorFromSSL( );
-    }
 
-    return dh;
+        /* DH can generate key sizes that are smaller than the size of
+           P with exponentially decreasing probability, in which case
+           the msb's of myPublicKey need to be zeroed appropriately. */
+        len = BN_num_bytes( dh->pub_key );
+        offset = KEY_LEN - len;
+        assert( len <= KEY_LEN );
+        memset( crypto->myPublicKey, 0, offset );
+        BN_bn2bin( dh->pub_key, crypto->myPublicKey + offset );
+
+        crypto->dh = dh;
+    }
 }
 
 tr_crypto *
 tr_cryptoNew( const uint8_t * torrentHash,
               int             isIncoming )
 {
-    int         len, offset;
     tr_crypto * crypto;
-    DH *        dh = getSharedDH( );
 
     crypto = tr_new0( tr_crypto, 1 );
     crypto->isIncoming = isIncoming ? 1 : 0;
     tr_cryptoSetTorrentHash( crypto, torrentHash );
-
-    /* DH can generate key sizes that are smaller than the size of
-       P with exponentially decreasing probability, in which case
-       the msb's of myPublicKey need to be zeroed appropriately. */
-    len = DH_size( dh );
-    offset = KEY_LEN - len;
-    assert( len <= KEY_LEN );
-    memset( crypto->myPublicKey, 0, offset );
-    BN_bn2bin( dh->pub_key, crypto->myPublicKey + offset );
+    crypto->dh = NULL;
 
     return crypto;
 }
@@ -159,6 +168,8 @@ tr_cryptoNew( const uint8_t * torrentHash,
 void
 tr_cryptoFree( tr_crypto * crypto )
 {
+    if( crypto->dh != NULL )
+        DH_free( crypto->dh );
     tr_free( crypto );
 }
 
@@ -173,7 +184,10 @@ tr_cryptoComputeSecret( tr_crypto *     crypto,
     int      len;
     uint8_t  secret[KEY_LEN];
     BIGNUM * bn = BN_bin2bn( peerPublicKey, KEY_LEN, NULL );
-    DH *     dh = getSharedDH( );
+    DH *     dh;
+
+    ensureKeyExists( crypto );
+    dh = crypto->dh;
 
     assert( DH_size( dh ) == KEY_LEN );
 
@@ -197,6 +211,7 @@ const uint8_t*
 tr_cryptoGetMyPublicKey( const tr_crypto * crypto,
                          int *             setme_len )
 {
+    ensureKeyExists( (tr_crypto *) crypto );
     *setme_len = KEY_LEN;
     return crypto->myPublicKey;
 }
