@@ -26,6 +26,8 @@
 #include <QSystemTrayIcon>
 #include <QUrl>
 
+#include <libtransmission/transmission.h>
+#include <libtransmission/utils.h>
 #include <libtransmission/version.h>
 
 #include "about.h"
