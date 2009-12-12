@@ -25,7 +25,7 @@
 #import "BadgeView.h"
 #import "NSStringAdditions.h"
 
-#define BETWEEN_PADDING 2.0f
+#define BETWEEN_PADDING 2.0
 
 @interface BadgeView (Private)
 
@@ -78,13 +78,13 @@
     {
         NSImage * quitBadge = [NSImage imageNamed: @"QuitBadge.png"];
         [self badge: quitBadge string: NSLocalizedString(@"Quitting", "Dock Badger -> quit")
-                atHeight: (rect.size.height - [quitBadge size].height) * 0.5f adjustForQuit: YES];
+                atHeight: (NSHeight(rect) - [quitBadge size].height) * 0.5 adjustForQuit: YES];
         return;
     }
     
-    const BOOL upload = fUploadRate >= 0.1f,
-            download = fDownloadRate >= 0.1f;
-    CGFloat bottom = 0.0f;
+    const BOOL upload = fUploadRate >= 0.1,
+            download = fDownloadRate >= 0.1;
+    CGFloat bottom = 0.0;
     if (upload)
     {
         NSImage * uploadBadge = [NSImage imageNamed: @"UploadBadge.png"];
@@ -106,12 +106,12 @@
     if (!fAttributes)
     {
         NSShadow * stringShadow = [[NSShadow alloc] init];
-        [stringShadow setShadowOffset: NSMakeSize(2.0f, -2.0f)];
-        [stringShadow setShadowBlurRadius: 4.0f];
+        [stringShadow setShadowOffset: NSMakeSize(2.0, -2.0)];
+        [stringShadow setShadowBlurRadius: 4.0];
         
-        fAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
-            [NSColor whiteColor], NSForegroundColorAttributeName,
-            [NSFont boldSystemFontOfSize: 26.0f], NSFontAttributeName, stringShadow, NSShadowAttributeName, nil];
+        fAttributes = [[NSMutableDictionary alloc] initWithCapacity: 3];
+        [fAttributes setObject: [NSColor whiteColor] forKey: NSForegroundColorAttributeName];
+        [fAttributes setObject: stringShadow forKey: NSShadowAttributeName];
         
         [stringShadow release];
     }
@@ -121,14 +121,22 @@
     badgeRect.origin.x = 0;
     badgeRect.origin.y = height;
     
-    [badge drawInRect: badgeRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0f];
+    [badge drawInRect: badgeRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
+    
+    //make sure text fits on the badge
+    CGFloat fontSize = 26.0;
+    NSSize stringSize;
+    do
+    {
+        [fAttributes setObject: [NSFont boldSystemFontOfSize: fontSize] forKey: NSFontAttributeName];
+        stringSize = [string sizeWithAttributes: fAttributes];
+        fontSize -= 1.0;
+    } while (NSWidth(badgeRect) < stringSize.width);
     
     //string is in center of image
-    NSSize stringSize = [string sizeWithAttributes: fAttributes];
-    
     NSRect stringRect = badgeRect;
-    stringRect.origin.x += (badgeRect.size.width - stringSize.width) * 0.5f;
-    stringRect.origin.y += (badgeRect.size.height - stringSize.height) * 0.5f + (quit ? 2.0f : 1.0f); //adjust for shadow, extra for quit
+    stringRect.origin.x += (NSWidth(badgeRect) - stringSize.width) * 0.5;
+    stringRect.origin.y += (NSHeight(badgeRect) - stringSize.height) * 0.5 + (quit ? 2.0 : 1.0); //adjust for shadow, extra for quit
     stringRect.size = stringSize;
     
     [string drawInRect: stringRect withAttributes: fAttributes];

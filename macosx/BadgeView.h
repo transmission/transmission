@@ -29,7 +29,7 @@
 {
     tr_session * fLib;
     
-    NSDictionary * fAttributes;
+    NSMutableDictionary * fAttributes;
     
     CGFloat fDownloadRate, fUploadRate;
     BOOL fQuitting;
