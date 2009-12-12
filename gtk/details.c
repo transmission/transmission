@@ -1940,9 +1940,7 @@ onEditTrackersResponse( GtkDialog * dialog, int response, gpointer data )
         {
             GtkWidget * w;
             const char * str = NULL;
-            if( err == TR_ANNOUNCE_LIST_HAS_DUPLICATES )
-                str = _( "List contains duplicate URLs" );
-            else if( err == TR_ANNOUNCE_LIST_HAS_BAD )
+            if( err == TR_ANNOUNCE_LIST_HAS_BAD )
                 str = _( "List contains invalid URLs" );
             else
                 assert( 0 && "unhandled condition" );
