@@ -630,8 +630,11 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (BOOL) applicationShouldHandleReopen: (NSApplication *) app hasVisibleWindows: (BOOL) visibleWindows
 {
-    if (!visibleWindows)
-        [fWindow makeKeyAndOrderFront: nil];
+    for (NSWindow * window in [NSApp windows])
+        if ([window isMainWindow] && [window isVisible])
+            return NO;
+    
+    [fWindow makeKeyAndOrderFront: nil];
     return NO;
 }
 
