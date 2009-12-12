@@ -653,18 +653,19 @@ int trashDataFile(const char * filename)
     return result == TR_ANNOUNCE_LIST_OK;
 }
 
-- (void) removeTrackersWithAnnounceAddresses: (NSSet *) trackers
+- (void) removeTrackersAtIndexes: (NSIndexSet *) removeIndexes
 {
-    //recreate the tracker structure
-    const int oldTrackerCount = fInfo->trackerCount;
-    tr_tracker_info * trackerStructs = tr_new(tr_tracker_info, oldTrackerCount-1);
+    NSAssert([removeIndexes lastIndex] < fInfo->trackerCount, @"Trying to remove trackers outside the tracker count.");
     
-    NSInteger newCount = 0;
-    for (NSInteger oldIndex = 0; oldIndex < oldTrackerCount; ++oldIndex)
-    {
-        if (![trackers member: [NSString stringWithUTF8String: fInfo->trackers[oldIndex].announce]])
-            trackerStructs[newCount++] = fInfo->trackers[oldIndex];
-    }
+    NSMutableIndexSet * indexes = [NSMutableIndexSet indexSetWithIndexesInRange: NSMakeRange(0, fInfo->trackerCount)];
+    [indexes removeIndexes: removeIndexes];
+    
+    //recreate the tracker structure
+    tr_tracker_info * trackerStructs = tr_new(tr_tracker_info, [indexes count]);
+    
+    int newCount = 0;
+    for (NSUInteger oldIndex = [indexes firstIndex]; oldIndex != NSNotFound; oldIndex = [indexes indexGreaterThanIndex: oldIndex])
+        trackerStructs[newCount++] = fInfo->trackers[oldIndex];
     
     const tr_announce_list_err result = tr_torrentSetAnnounceList(fHandle, trackerStructs, newCount);
     NSAssert1(result == TR_ANNOUNCE_LIST_OK, @"Removing tracker addresses resulted in error: %d", result);

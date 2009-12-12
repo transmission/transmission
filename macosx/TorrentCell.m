@@ -317,8 +317,8 @@
         NSRect groupRect = NSInsetRect(iconRect, -1.0f, -2.0f);
         if (!minimal)
         {
-            groupRect.size.height--;
-            groupRect.origin.y--;
+            groupRect.size.height -= 1.0f;
+            groupRect.origin.y -= 1.0f;
         }
         const CGFloat radius = minimal ? 3.0f : 6.0f;
         
@@ -545,8 +545,8 @@
         NSDivideRect(missingRect, &wantedRect, &missingRect, widthRemaining, NSMinXEdge);
         
         //not-available section
-        if ([torrent isActive] && ![torrent isChecking] && [fDefaults boolForKey: @"DisplayProgressBarAvailable"]
-            && [torrent availableDesired] < 1.0)
+        if ([torrent isActive] && ![torrent isChecking] && [torrent availableDesired] < 1.0
+            && [fDefaults boolForKey: @"DisplayProgressBarAvailable"])
         {
             NSRect unavailableRect;
             NSDivideRect(wantedRect, &wantedRect, &unavailableRect, round(NSWidth(wantedRect) * [torrent availableDesired]),
