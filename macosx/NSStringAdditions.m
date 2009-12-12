@@ -94,7 +94,7 @@
     else if (speed <= 999.95) //100.0 M to 999.9 M
         return [NSString localizedStringWithFormat: @"%.1f M", speed];
     else //insane speeds
-        return [NSString localizedStringWithFormat: @"%.2f G", (speed / 1024.0f)];
+        return [NSString localizedStringWithFormat: @"%.2f G", (speed / 1024.0)];
 }
 
 + (NSString *) stringForRatio: (CGFloat) ratio
@@ -160,14 +160,15 @@
         return [self localizedStandardCompare: string];
     else
     {
-        const NSInteger comparisonOptions = NSCaseInsensitiveSearch | NSNumericSearch | NSWidthInsensitiveSearch | NSForcedOrderingSearch;
+        const NSStringCompareOptions comparisonOptions = NSCaseInsensitiveSearch | NSNumericSearch | NSWidthInsensitiveSearch
+                                                            | NSForcedOrderingSearch;
         return [self compare: string options: comparisonOptions range: NSMakeRange(0, [self length]) locale: [NSLocale currentLocale]];
     }
 }
 
 - (NSComparisonResult) compareNumeric: (NSString *) string
 {
-    const NSInteger comparisonOptions = NSNumericSearch | NSForcedOrderingSearch;
+    const NSStringCompareOptions comparisonOptions = NSNumericSearch | NSForcedOrderingSearch;
     return [self compare: string options: comparisonOptions range: NSMakeRange(0, [self length]) locale: [NSLocale currentLocale]];
 }
 

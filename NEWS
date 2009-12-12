@@ -9,7 +9,7 @@
   * Fix 1.80 beta 1 crash when a malformed magnet link is given to Transmission
   * Better prefetching of local data that's being uploaded to peers
 ==== Mac ====
-  * Fix 1.80 beta 1 IPv6 port check issue on 10.6
+  * Fix 1.80 beta 1 IPv6 port check issue on Snow Leopard
   * Fix 1.80 beta 1 bug when pasting a URL into the torrent window
   * Updated Spanish, Italian, and Brazilian Portuguese localizations
 ==== GTK+ ====
