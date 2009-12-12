@@ -2084,7 +2084,7 @@ tr_torrentSetAnnounceList( tr_torrent *            tor,
                            const tr_tracker_info * trackers,
                            int                     trackerCount )
 {
-    int i, j;
+    int i;
     tr_benc metainfo;
 
     assert( tr_isTorrent( tor ) );
@@ -2093,12 +2093,6 @@ tr_torrentSetAnnounceList( tr_torrent *            tor,
     for( i=0; i<trackerCount; ++i )
         if( !tr_httpIsValidURL( trackers[i].announce ) )
             return TR_ANNOUNCE_LIST_HAS_BAD;
-
-    /* look for duplicates */
-    for( i=0; i<trackerCount; ++i )
-        for( j=0; j<trackerCount; ++j )
-            if( ( i != j ) && ( !strcmp( trackers[i].announce, trackers[j].announce ) ) )
-                return TR_ANNOUNCE_LIST_HAS_DUPLICATES;
 
     /* save to the .torrent file */
     if( !tr_bencLoadFile( &metainfo, TR_FMT_BENC, tor->info.torrent ) )

@@ -1202,7 +1202,6 @@ tr_tracker_info;
 typedef enum
 {
   TR_ANNOUNCE_LIST_OK,
-  TR_ANNOUNCE_LIST_HAS_DUPLICATES,
   TR_ANNOUNCE_LIST_HAS_BAD
 }
 tr_announce_list_err;
