@@ -12,14 +12,14 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="1041"/>
 			<integer value="2043"/>
-			<integer value="29"/>
-			<integer value="1936"/>
-			<integer value="2942"/>
+			<integer value="1684"/>
 			<integer value="2547"/>
+			<integer value="2850"/>
+			<integer value="1603"/>
+			<integer value="581"/>
 			<integer value="589"/>
-			<integer value="456"/>
+			<integer value="1310"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1186,7 +1186,7 @@ AAAAAAAAA</bytes>
 											<bool key="EncodedWithXMLCoder">YES</bool>
 											<object class="NSMenuItem" id="245235570">
 												<reference key="NSMenu" ref="188604546"/>
-												<string key="NSTitle">Queue Order</string>
+												<string key="NSTitle">Ordem na Fila</string>
 												<string key="NSKeyEquiv"/>
 												<int key="NSKeyEquivModMask">1048576</int>
 												<int key="NSMnemonicLoc">2147483647</int>
@@ -1195,7 +1195,7 @@ AAAAAAAAA</bytes>
 											</object>
 											<object class="NSMenuItem" id="204564835">
 												<reference key="NSMenu" ref="188604546"/>
-												<string key="NSTitle">Activity</string>
+												<string key="NSTitle">Atividade</string>
 												<string key="NSKeyEquiv"/>
 												<int key="NSKeyEquivModMask">1048576</int>
 												<int key="NSMnemonicLoc">2147483647</int>
@@ -1205,7 +1205,7 @@ AAAAAAAAA</bytes>
 											</object>
 											<object class="NSMenuItem" id="138424002">
 												<reference key="NSMenu" ref="188604546"/>
-												<string key="NSTitle">Date Added</string>
+												<string key="NSTitle">Data de Adição</string>
 												<string key="NSKeyEquiv"/>
 												<int key="NSKeyEquivModMask">1048576</int>
 												<int key="NSMnemonicLoc">2147483647</int>
@@ -1215,7 +1215,7 @@ AAAAAAAAA</bytes>
 											</object>
 											<object class="NSMenuItem" id="996241967">
 												<reference key="NSMenu" ref="188604546"/>
-												<string key="NSTitle">Name</string>
+												<string key="NSTitle">Nome</string>
 												<string key="NSKeyEquiv"/>
 												<int key="NSKeyEquivModMask">1048576</int>
 												<int key="NSMnemonicLoc">2147483647</int>
@@ -1225,7 +1225,7 @@ AAAAAAAAA</bytes>
 											</object>
 											<object class="NSMenuItem" id="957075071">
 												<reference key="NSMenu" ref="188604546"/>
-												<string key="NSTitle">Progress</string>
+												<string key="NSTitle">Progresso</string>
 												<string key="NSKeyEquiv"/>
 												<int key="NSKeyEquivModMask">1048576</int>
 												<int key="NSMnemonicLoc">2147483647</int>
@@ -1235,7 +1235,7 @@ AAAAAAAAA</bytes>
 											</object>
 											<object class="NSMenuItem" id="686852801">
 												<reference key="NSMenu" ref="188604546"/>
-												<string key="NSTitle">State</string>
+												<string key="NSTitle">Estado</string>
 												<string key="NSKeyEquiv"/>
 												<int key="NSKeyEquivModMask">1048576</int>
 												<int key="NSMnemonicLoc">2147483647</int>
@@ -1245,7 +1245,7 @@ AAAAAAAAA</bytes>
 											</object>
 											<object class="NSMenuItem" id="680215502">
 												<reference key="NSMenu" ref="188604546"/>
-												<string key="NSTitle">Tracker</string>
+												<string key="NSTitle">Rastreador</string>
 												<string key="NSKeyEquiv"/>
 												<int key="NSKeyEquivModMask">1048576</int>
 												<int key="NSMnemonicLoc">2147483647</int>
@@ -1266,7 +1266,7 @@ AAAAAAAAA</bytes>
 											</object>
 											<object class="NSMenuItem" id="499215618">
 												<reference key="NSMenu" ref="188604546"/>
-												<string key="NSTitle">Reverse Sort Order</string>
+												<string key="NSTitle">Inverter Ordem</string>
 												<string key="NSKeyEquiv"/>
 												<int key="NSKeyEquivModMask">1048576</int>
 												<int key="NSMnemonicLoc">2147483647</int>
@@ -1942,7 +1942,7 @@ AAAAAAAAA</bytes>
 					</object>
 					<object class="NSMenuItem" id="953360563">
 						<reference key="NSMenu" ref="434296936"/>
-						<string key="NSTitle">Salvar .torrent Como...</string>
+						<string key="NSTitle">Salvar .torrent como...</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSMnemonicLoc">2147483647</int>
 						<reference key="NSOnImage" ref="322614661"/>
@@ -2273,7 +2273,7 @@ AAAAAAAAA</bytes>
 				<string key="NSExtension">NSView</string>
 			</object>
 			<object class="NSCustomView" id="793806362">
-				<nil key="NSNextResponder"/>
+				<reference key="NSNextResponder"/>
 				<int key="NSvFlags">266</int>
 				<object class="NSMutableArray" key="NSSubviews">
 					<bool key="EncodedWithXMLCoder">YES</bool>
@@ -2544,6 +2544,7 @@ AAAAAAAAA</bytes>
 					</object>
 				</object>
 				<string key="NSFrameSize">{457, 23}</string>
+				<reference key="NSSuperview"/>
 				<string key="NSClassName">StatusBarView</string>
 				<string key="NSExtension">NSView</string>
 			</object>
@@ -7690,7 +7691,7 @@ AAAAAAAAA</bytes>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>{{480, 403}, {350, 333}}</string>
+					<string>{{459, 403}, {350, 333}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>{{446, 528}, {293, 373}}</string>
@@ -7877,7 +7878,7 @@ AAAAAAAAA</bytes>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>{{562, 692}, {197, 173}}</string>
+					<string>{{710, 473}, {169, 173}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>{{449, 701}, {197, 173}}</string>
@@ -7903,7 +7904,7 @@ AAAAAAAAA</bytes>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>{{85, 414}, {279, 133}}</string>
+					<string>{{86, 413}, {279, 133}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>{{381, 469}, {214, 113}}</string>
@@ -7937,7 +7938,7 @@ AAAAAAAAA</bytes>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>{{364, 374}, {197, 73}}</string>
+					<string>{{365, 373}, {197, 73}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>{{595, 459}, {156, 73}}</string>
@@ -8092,7 +8093,7 @@ AAAAAAAAA</bytes>
 					<string>FilterButton</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>{{395, 493}, {336, 243}}</string>
+					<string>{{374, 493}, {336, 243}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>{{396, 658}, {236, 243}}</string>
@@ -8205,7 +8206,7 @@ AAAAAAAAA</bytes>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>{{84, 561}, {257, 93}}</string>
+					<string>{{84, 560}, {257, 93}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>{{0, 902}, {234, 93}}</string>
