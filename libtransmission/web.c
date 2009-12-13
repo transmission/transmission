@@ -107,14 +107,10 @@ sockoptfunction( void * vtask, curl_socket_t fd, curlsocktype purpose UNUSED )
      * which have very small payloads */
     if( isScrape || isAnnounce )
     {
-        int sndbuf = 1024;
-        int rcvbuf = isScrape ? 2048 : 3072;
-
-        if( setsockopt( fd, SOL_SOCKET, SO_SNDBUF, &sndbuf, sizeof(sndbuf) ) )
-            tr_inf( "Unable to set SO_SNDBUF on socket %d: %s", fd, tr_strerror( sockerrno ) );
-
-        if( setsockopt( fd, SOL_SOCKET, SO_RCVBUF, &rcvbuf, sizeof(rcvbuf) ) )
-            tr_inf( "Unable to set SO_RCVBUF on socket %d: %s", fd, tr_strerror( sockerrno ) );
+        const int sndbuf = 1024;
+        const int rcvbuf = isScrape ? 2048 : 3072;
+        setsockopt( fd, SOL_SOCKET, SO_SNDBUF, &sndbuf, sizeof(sndbuf) );
+        setsockopt( fd, SOL_SOCKET, SO_RCVBUF, &rcvbuf, sizeof(rcvbuf) );
     }
 }
 
@@ -141,6 +137,7 @@ addTask( void * vtask )
         struct tr_web * web = session->web;
         const long timeout = getTimeoutFromURL( task->url );
         const long verbose = getenv( "TR_CURL_VERBOSE" ) != NULL;
+        const char * user_agent = TR_NAME "/" LONG_VERSION_STRING;
 
         dbgmsg( "adding task #%lu [%s]", task->tag, task->url );
 
@@ -173,7 +170,7 @@ addTask( void * vtask )
         curl_easy_setopt( easy, CURLOPT_SSL_VERIFYHOST, 0L );
         curl_easy_setopt( easy, CURLOPT_SSL_VERIFYPEER, 0L );
         curl_easy_setopt( easy, CURLOPT_URL, task->url );
-        curl_easy_setopt( easy, CURLOPT_USERAGENT, TR_NAME "/" LONG_VERSION_STRING );
+        curl_easy_setopt( easy, CURLOPT_USERAGENT, user_agent );
         curl_easy_setopt( easy, CURLOPT_VERBOSE, verbose );
         curl_easy_setopt( easy, CURLOPT_WRITEDATA, task );
         curl_easy_setopt( easy, CURLOPT_WRITEFUNCTION, writeFunc );
@@ -210,8 +207,7 @@ task_free( struct tr_web_task * task )
 static void
 task_finish( struct tr_web_task * task, long response_code )
 {
-    dbgmsg( "finished a web task... response code is %ld", response_code );
-    dbgmsg( "===================================================" );
+    dbgmsg( "finished web task %lu; got %ld", task->tag, response_code );
 
     if( task->done_func != NULL )
         task->done_func( task->session,
@@ -294,8 +290,6 @@ tr_multi_perform( tr_web * g, int fd )
     do {
         mcode = curl_multi_socket_action( g->multi, fd, 0, &g->still_running );
     } while( mcode == CURLM_CALL_MULTI_SOCKET );
-    if( mcode != CURLM_OK )
-        tr_err( "%s", curl_multi_strerror( mcode ) );
 
     remove_finished_tasks( g );
 
