@@ -13,23 +13,21 @@
 #include <assert.h>
 #include <stdlib.h> /* bsearch */
 
-#include <event.h>
-
 #define CURL_DISABLE_TYPECHECK /* otherwise -Wunreachable-code goes insane */
 #include <curl/curl.h>
+#include <event.h>
 
 #include "transmission.h"
-#include "net.h" /* socklen_t */
+#include "net.h"
 #include "session.h"
-#include "trevent.h" /* tr_runInEventThread() */
+#include "trevent.h"
 #include "utils.h"
 #include "version.h"
 #include "web.h"
 
 enum
 {
-    /* arbitrary number */
-    DEFAULT_TIMER_MSEC = 1500
+    DEFAULT_TIMER_MSEC = 1500 /* arbitrary */
 };
 
 static void
@@ -120,6 +118,16 @@ sockoptfunction( void * vtask, curl_socket_t fd, curlsocktype purpose UNUSED )
     }
 }
 
+static int
+getTimeoutFromURL( const char * url )
+{
+    if( strstr( url, "scrape" ) != NULL )
+        return 20;
+    if( strstr( url, "announce" ) != NULL )
+        return 30;
+    return 240;
+}
+
 static void
 addTask( void * vtask )
 {
@@ -128,13 +136,13 @@ addTask( void * vtask )
 
     if( session && session->web )
     {
+        CURLMcode mcode;
+        CURL * easy = curl_easy_init( );
         struct tr_web * web = session->web;
-        CURL * easy;
-        long timeout;
+        const long timeout = getTimeoutFromURL( task->url );
+        const long verbose = getenv( "TR_CURL_VERBOSE" ) != NULL;
 
         dbgmsg( "adding task #%lu [%s]", task->tag, task->url );
-
-        easy = curl_easy_init( );
 
         if( !task->range && session->isProxyEnabled ) {
             curl_easy_setopt( easy, CURLOPT_PROXY, session->proxy );
@@ -151,18 +159,8 @@ addTask( void * vtask )
         }
 
         curl_easy_setopt( easy, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4 );
-
-        /* set a time limit for announces & scrapes */
-        if( strstr( task->url, "scrape" ) != NULL )
-            timeout = 20L;
-        else if( strstr( task->url, "announce" ) != NULL )
-            timeout = 30L;
-        else
-            timeout = 240L;
         curl_easy_setopt( easy, CURLOPT_TIMEOUT, timeout );
         curl_easy_setopt( easy, CURLOPT_CONNECTTIMEOUT, timeout-5 );
-        dbgmsg( "new task's timeout is %ld\n", timeout );
-
         curl_easy_setopt( easy, CURLOPT_SOCKOPTFUNCTION, sockoptfunction );
         curl_easy_setopt( easy, CURLOPT_SOCKOPTDATA, task );
         curl_easy_setopt( easy, CURLOPT_DNS_CACHE_TIMEOUT, 1800L );
@@ -175,29 +173,24 @@ addTask( void * vtask )
         curl_easy_setopt( easy, CURLOPT_SSL_VERIFYHOST, 0L );
         curl_easy_setopt( easy, CURLOPT_SSL_VERIFYPEER, 0L );
         curl_easy_setopt( easy, CURLOPT_URL, task->url );
-        curl_easy_setopt( easy, CURLOPT_USERAGENT,
-                                           TR_NAME "/" LONG_VERSION_STRING );
-        curl_easy_setopt( easy, CURLOPT_VERBOSE,
-                                       getenv( "TR_CURL_VERBOSE" ) != NULL );
-        if( web->haveAddr )
-            curl_easy_setopt( easy, CURLOPT_INTERFACE, tr_ntop_non_ts( &web->addr ) );
+        curl_easy_setopt( easy, CURLOPT_USERAGENT, TR_NAME "/" LONG_VERSION_STRING );
+        curl_easy_setopt( easy, CURLOPT_VERBOSE, verbose );
         curl_easy_setopt( easy, CURLOPT_WRITEDATA, task );
         curl_easy_setopt( easy, CURLOPT_WRITEFUNCTION, writeFunc );
+        if( web->haveAddr )
+            curl_easy_setopt( easy, CURLOPT_INTERFACE, tr_ntop_non_ts( &web->addr ) );
         if( task->range )
             curl_easy_setopt( easy, CURLOPT_RANGE, task->range );
         else /* don't set encoding on webseeds; it messes up binary data */
             curl_easy_setopt( easy, CURLOPT_ENCODING, "" );
 
-        {
-            const CURLMcode mcode = curl_multi_add_handle( web->multi, easy );
-            tr_assert( mcode == CURLM_OK, "curl_multi_add_handle() failed: %d (%s)", mcode, curl_multi_strerror( mcode ) );
-            if( mcode == CURLM_OK )
-                ++web->still_running;
-            else
-                tr_err( "%s", curl_multi_strerror( mcode ) );
+        mcode = curl_multi_add_handle( web->multi, easy );
+        if( mcode == CURLM_OK )
+            ++web->still_running;
+        else
+            tr_err( "%s", curl_multi_strerror( mcode ) );
 
-            tr_multi_perform( web, CURL_SOCKET_TIMEOUT );
-        }
+        /*tr_multi_perform( web, CURL_SOCKET_TIMEOUT );*/
     }
 }
 
@@ -232,25 +225,14 @@ task_finish( struct tr_web_task * task, long response_code )
 static void
 remove_finished_tasks( tr_web * g )
 {
-    CURL * easy;
+    CURLMsg * msg;
+    int msgs_left;
 
-    do
-    {
-        CURLMsg * msg;
-        int msgs_left;
-
-        easy = NULL;
-        while(( msg = curl_multi_info_read( g->multi, &msgs_left ))) {
-            if( msg->msg == CURLMSG_DONE ) {
-                easy = msg->easy_handle;
-                break;
-            }
-        }
-
-        if( easy )
-        {
+    while(( msg = curl_multi_info_read( g->multi, &msgs_left ))) {
+        if(( msg->msg == CURLMSG_DONE ) && ( msg->easy_handle != NULL )) {
             long code;
             struct tr_web_task * task;
+            CURL * easy = msg->easy_handle;
             curl_easy_getinfo( easy, CURLINFO_PRIVATE, (void*)&task );
             curl_easy_getinfo( easy, CURLINFO_RESPONSE_CODE, &code );
             curl_multi_remove_handle( g->multi, easy );
@@ -258,7 +240,6 @@ remove_finished_tasks( tr_web * g )
             task_finish( task, code );
         }
     }
-    while ( easy );
 
     g->prev_running = g->still_running;
 }
@@ -311,12 +292,8 @@ tr_multi_perform( tr_web * g, int fd )
 
     /* invoke libcurl's processing */
     do {
-        dbgmsg( "calling curl_multi_socket_action..." );
         mcode = curl_multi_socket_action( g->multi, fd, 0, &g->still_running );
-        fd = CURL_SOCKET_TIMEOUT;
-        dbgmsg( "done calling curl_multi_socket_action..." );
     } while( mcode == CURLM_CALL_MULTI_SOCKET );
-    tr_assert( mcode == CURLM_OK, "curl_multi_perform() failed: %d (%s)", mcode, curl_multi_strerror( mcode ) );
     if( mcode != CURLM_OK )
         tr_err( "%s", curl_multi_strerror( mcode ) );
 
@@ -343,11 +320,7 @@ event_cb( int fd, short kind UNUSED, void * g )
 
 /* CURLMOPT_SOCKETFUNCTION */
 static int
-sock_cb( CURL            * easy UNUSED,
-         curl_socket_t     fd,
-         int               action,
-         void            * vweb,
-         void            * vevent )
+sock_cb( CURL * easy UNUSED, curl_socket_t fd, int action, void * vweb, void * vevent )
 {
     /*static int num_events = 0;*/
     struct tr_web * web = vweb;
@@ -378,12 +351,13 @@ sock_cb( CURL            * easy UNUSED,
             /*fprintf( stderr, "+1 io_events to %d\n", ++num_events );*/
         }
 
-        dbgmsg( "enabling (libevent %hd, libcurl %d) polling on io_event %p, fd %d", events, action, io_event, fd );
+        dbgmsg( "enabling (libevent %hd, libcurl %d) polling on io_event %p, fd %d",
+                events, action, io_event, fd );
         event_set( io_event, fd, events, event_cb, web );
         event_add( io_event, NULL );
     }
 
-    return 0; /* libcurl doc sez: "The callback MUST return 0." */
+    return 0; /* libcurl documentation: "The callback MUST return 0." */
 }
 
 /* libevent says that timer_msec have passed, so wake up libcurl */
@@ -466,7 +440,6 @@ tr_webInit( tr_session * session )
 
     web = tr_new0( struct tr_web, 1 );
     web->session = session;
-
     web->timer_msec = DEFAULT_TIMER_MSEC; /* overwritten by multi_timer_cb() */
     evtimer_set( &web->timer_event, libevent_timer_cb, web );
 
