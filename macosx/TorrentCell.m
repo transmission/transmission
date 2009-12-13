@@ -69,10 +69,10 @@
 - (void) drawPiecesBar: (NSRect) barRect;
 
 - (NSRect) rectForMinimalStatusWithString: (NSAttributedString *) string inBounds: (NSRect) bounds;
-- (NSRect) rectForTitleWithString: (NSAttributedString *) string basedOnMinimalStatusRect: (NSRect) statusRect
+- (NSRect) rectForTitleWithStringBasedOnMinimalStatusRect: (NSRect) statusRect
             inBounds: (NSRect) bounds;
-- (NSRect) rectForProgressWithString: (NSAttributedString *) string inBounds: (NSRect) bounds;
-- (NSRect) rectForStatusWithString: (NSAttributedString *) string inBounds: (NSRect) bounds;
+- (NSRect) rectForProgressWithStringInBounds: (NSRect) bounds;
+- (NSRect) rectForStatusWithStringInBounds: (NSRect) bounds;
 - (NSRect) barRectForBounds: (NSRect) bounds;
 
 - (NSRect) controlButtonRectForBounds: (NSRect) bounds;
@@ -382,7 +382,7 @@
     
     //title
     NSAttributedString * titleString = [self attributedTitle];
-    NSRect titleRect = [self rectForTitleWithString: titleString basedOnMinimalStatusRect: minimalStatusRect inBounds: cellFrame];
+    NSRect titleRect = [self rectForTitleWithStringBasedOnMinimalStatusRect: minimalStatusRect inBounds: cellFrame];
     [titleString drawInRect: titleRect];
     
     //priority icon
@@ -404,7 +404,7 @@
     if (!minimal)
     {
         NSAttributedString * progressString = [self attributedStatusString: [torrent progressString]];
-        NSRect progressRect = [self rectForProgressWithString: progressString inBounds: cellFrame];
+        NSRect progressRect = [self rectForProgressWithStringInBounds: cellFrame];
         
         [progressString drawInRect: progressRect];
     }
@@ -467,7 +467,7 @@
     if (!minimal)
     {
         NSAttributedString * statusString = [self attributedStatusString: [self statusString]];
-        [statusString drawInRect: [self rectForStatusWithString: statusString inBounds: cellFrame]];
+        [statusString drawInRect: [self rectForStatusWithStringInBounds: cellFrame]];
     }
 }
 
@@ -622,7 +622,7 @@
     return result;
 }
 
-- (NSRect) rectForTitleWithString: (NSAttributedString *) string basedOnMinimalStatusRect: (NSRect) statusRect
+- (NSRect) rectForTitleWithStringBasedOnMinimalStatusRect: (NSRect) statusRect
             inBounds: (NSRect) bounds
 {
     const BOOL minimal = [fDefaults boolForKey: @"SmallView"];
@@ -632,35 +632,35 @@
     result.origin.x = NSMinX(bounds) + PADDING_HORIZONTAL
                         + (minimal ? IMAGE_SIZE_MIN : IMAGE_SIZE_REG) + PADDING_BETWEEN_IMAGE_AND_TITLE;
     
-    result.size = [string size];
-    result.size.width = MIN(result.size.width, NSMaxX(bounds) - result.origin.x - PADDING_HORIZONTAL
-                - (minimal ? PADDING_BETWEEN_TITLE_AND_MIN_STATUS + statusRect.size.width : 0.0)
-                - ([[self representedObject] priority] != TR_PRI_NORMAL ? PRIORITY_ICON_WIDTH + PADDING_BETWEEN_TITLE_AND_PRIORITY: 0.0));
+    result.size.height = HEIGHT_TITLE;
+    result.size.width = NSMaxX(bounds) - result.origin.x - PADDING_HORIZONTAL
+                - (minimal ? PADDING_BETWEEN_TITLE_AND_MIN_STATUS + NSWidth(statusRect) : 0.0)
+                - ([[self representedObject] priority] != TR_PRI_NORMAL ? PRIORITY_ICON_WIDTH + PADDING_BETWEEN_TITLE_AND_PRIORITY: 0.0);
     
     return result;
 }
 
-- (NSRect) rectForProgressWithString: (NSAttributedString *) string inBounds: (NSRect) bounds
+- (NSRect) rectForProgressWithStringInBounds: (NSRect) bounds
 {
     NSRect result;
     result.origin.y = NSMinY(bounds) + PADDING_ABOVE_TITLE + HEIGHT_TITLE + PADDING_BETWEEN_TITLE_AND_PROGRESS;
     result.origin.x = NSMinX(bounds) + PADDING_HORIZONTAL + IMAGE_SIZE_REG + PADDING_BETWEEN_IMAGE_AND_TITLE;
     
-    result.size = [string size];
-    result.size.width = MIN(result.size.width, NSMaxX(bounds) - result.origin.x - PADDING_HORIZONTAL);
+    result.size.height = HEIGHT_STATUS;
+    result.size.width = NSMaxX(bounds) - NSMinX(result) - PADDING_HORIZONTAL;
     
     return result;
 }
 
-- (NSRect) rectForStatusWithString: (NSAttributedString *) string inBounds: (NSRect) bounds
+- (NSRect) rectForStatusWithStringInBounds: (NSRect) bounds
 {
     NSRect result;
     result.origin.y = NSMinY(bounds) + PADDING_ABOVE_TITLE + HEIGHT_TITLE + PADDING_BETWEEN_TITLE_AND_PROGRESS + HEIGHT_STATUS
                         + PADDING_BETWEEN_PROGRESS_AND_BAR + BAR_HEIGHT + PADDING_BETWEEN_BAR_AND_STATUS;
     result.origin.x = NSMinX(bounds) + PADDING_HORIZONTAL + IMAGE_SIZE_REG + PADDING_BETWEEN_IMAGE_AND_TITLE;
     
-    result.size = [string size];
-    result.size.width = MIN(result.size.width, NSMaxX(bounds) - result.origin.x - PADDING_HORIZONTAL);
+    result.size.height = HEIGHT_STATUS;
+    result.size.width = NSMaxX(bounds) - NSMinX(result) - PADDING_HORIZONTAL;
     
     return result;
 }
