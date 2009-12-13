@@ -31,7 +31,8 @@
 
 @interface Torrent (Private)
 
-- (id) initWithPath: (NSString *) path hash: (NSString *) hashString torrentStruct: (tr_torrent *) torrentStruct lib: (tr_session *) lib
+- (id) initWithPath: (NSString *) path hash: (NSString *) hashString torrentStruct: (tr_torrent *) torrentStruct
+        magnetAddress: (NSString *) magnetAddress lib: (tr_session *) lib
         waitToStart: (NSNumber *) waitToStart
         groupValue: (NSNumber *) groupValue
         downloadFolder: (NSString *) downloadFolder legacyIncompleteFolder: (NSString *) incompleteFolder;
@@ -78,7 +79,7 @@ int trashDataFile(const char * filename)
 - (id) initWithPath: (NSString *) path location: (NSString *) location deleteTorrentFile: (BOOL) torrentDelete
         lib: (tr_session *) lib
 {
-    self = [self initWithPath: path hash: nil torrentStruct: NULL lib: lib
+    self = [self initWithPath: path hash: nil torrentStruct: NULL magnetAddress: nil lib: lib
             waitToStart: nil groupValue: nil
             downloadFolder: location legacyIncompleteFolder: nil];
     
@@ -92,7 +93,7 @@ int trashDataFile(const char * filename)
 
 - (id) initWithTorrentStruct: (tr_torrent *) torrentStruct location: (NSString *) location lib: (tr_session *) lib
 {
-    self = [self initWithPath: nil hash: nil torrentStruct: torrentStruct lib: lib
+    self = [self initWithPath: nil hash: nil torrentStruct: torrentStruct magnetAddress: nil lib: lib
             waitToStart: nil groupValue: nil
             downloadFolder: location legacyIncompleteFolder: nil];
     
@@ -102,25 +103,9 @@ int trashDataFile(const char * filename)
 #warning need location (and use it)?
 - (id) initWithMagnetAddress: (NSString *) address location: (NSString *) location lib: (tr_session *) lib
 {
-    #warning move into real constructor?
-    //set libtransmission settings for initialization
-    tr_ctor * ctor = tr_ctorNew(lib);
-    tr_ctorSetPaused(ctor, TR_FORCE, YES);
-    
-    const tr_parse_result result = tr_ctorSetMagnet(ctor, [address UTF8String]);
-    
-    tr_torrent * handle = NULL;
-    if (result == TR_PARSE_OK)
-        handle = tr_torrentNew(ctor, NULL);
-    
-    tr_ctorFree(ctor);
-    
-    if (handle)
-        self = [self initWithPath: nil hash: nil torrentStruct: handle lib: lib
-                waitToStart: nil groupValue: nil
-                downloadFolder: location legacyIncompleteFolder: nil];
-    else
-        self = nil;
+    self = [self initWithPath: nil hash: nil torrentStruct: nil magnetAddress: address
+            lib: lib waitToStart: nil groupValue: nil
+            downloadFolder: location legacyIncompleteFolder: nil];
     
     return self;
 }
@@ -129,7 +114,9 @@ int trashDataFile(const char * filename)
 {
     self = [self initWithPath: [history objectForKey: @"InternalTorrentPath"]
                 hash: [history objectForKey: @"TorrentHash"]
-                torrentStruct: NULL lib: lib
+                torrentStruct: NULL
+                magnetAddress: nil
+                lib: lib
                 waitToStart: [history objectForKey: @"WaitToStart"]
                 groupValue: [history objectForKey: @"GroupValue"]
                 downloadFolder: [history objectForKey: @"DownloadFolder"] //upgrading from versions < 1.80
@@ -1542,7 +1529,8 @@ int trashDataFile(const char * filename)
 
 @implementation Torrent (Private)
 
-- (id) initWithPath: (NSString *) path hash: (NSString *) hashString torrentStruct: (tr_torrent *) torrentStruct lib: (tr_session *) lib
+- (id) initWithPath: (NSString *) path hash: (NSString *) hashString torrentStruct: (tr_torrent *) torrentStruct
+        magnetAddress: (NSString *) magnetAddress lib: (tr_session *) lib
         waitToStart: (NSNumber *) waitToStart
         groupValue: (NSNumber *) groupValue
         downloadFolder: (NSString *) downloadFolder legacyIncompleteFolder: (NSString *) incompleteFolder
@@ -1554,11 +1542,37 @@ int trashDataFile(const char * filename)
     
     if (torrentStruct)
         fHandle = torrentStruct;
+    else if (magnetAddress)
+    {
+        tr_ctor * ctor = tr_ctorNew(lib);
+        
+        tr_ctorSetPaused(ctor, TR_FORCE, YES);
+        if (downloadFolder)
+            tr_ctorSetDownloadDir(ctor, TR_FORCE, [downloadFolder UTF8String]);
+        
+        const tr_parse_result result = tr_ctorSetMagnet(ctor, [magnetAddress UTF8String]);
+        
+        if (result == TR_PARSE_OK)
+            fHandle = tr_torrentNew(ctor, NULL);
+        
+        tr_ctorFree(ctor);
+        
+        if (!fHandle)
+        {
+            [self release];
+            return nil;
+        }
+    }
     else
     {
         //set libtransmission settings for initialization
         tr_ctor * ctor = tr_ctorNew(lib);
+        
         tr_ctorSetPaused(ctor, TR_FORCE, YES);
+        if (downloadFolder)
+            tr_ctorSetDownloadDir(ctor, TR_FORCE, [downloadFolder UTF8String]);
+        if (incompleteFolder)
+            tr_ctorSetIncompleteDir(ctor, [incompleteFolder UTF8String]);
         
         tr_parse_result result = TR_PARSE_ERR;
         if (path)
@@ -1569,14 +1583,7 @@ int trashDataFile(const char * filename)
             result = tr_ctorSetMetainfoFromHash(ctor, [hashString UTF8String]);
         
         if (result == TR_PARSE_OK)
-        {
-            if (downloadFolder)
-                tr_ctorSetDownloadDir(ctor, TR_FORCE, [downloadFolder UTF8String]);
-            if (incompleteFolder)
-                tr_ctorSetIncompleteDir(ctor, [incompleteFolder UTF8String]);
-            
             fHandle = tr_torrentNew(ctor, NULL);
-        }
         
         tr_ctorFree(ctor);
         
