@@ -239,6 +239,9 @@ Torrent.prototype =
 		// Prevents click carrying to parent element
 		// which deselects all on click
 		event.stopPropagation();
+		// but still hide the context menu if it is showing
+		$('#jqContextMenu').hide();
+
 		var torrent = this;
 		
 		// 'Apple' button emulation on PC :
