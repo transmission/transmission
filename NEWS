@@ -1,6 +1,10 @@
 === Transmission 1.80 (In Development) ===
 [http://trac.transmissionbt.com/query?milestone=1.80&group=component&groupdesc=1&order=severity All tickets closed by this release]
 
+=== Transmission 1.80 beta 3 (2009/12/DD) ===
+==== Mac ====
+  * German localization
+
 === Transmission 1.80 beta 2 (2009/12/10) ===
 ==== All Platforms ====
   * Fix 1.80 beta 1 tracker connection / announce bug
