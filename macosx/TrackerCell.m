@@ -193,7 +193,7 @@ NSMutableSet * fTrackerIconLoading;
 
 - (NSImage *) favIcon
 {
-    NSURL * address = [NSURL URLWithString: [(TrackerNode *)[self objectValue] host]];
+    NSURL * address = [NSURL URLWithString: [(TrackerNode *)[self objectValue] fullAnnounceAddress]];
     NSArray * hostComponents = [[address host] componentsSeparatedByString: @"."];
     
     //let's try getting the tracker address without using any subdomains
