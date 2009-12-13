@@ -564,7 +564,11 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     [self applyFilter: nil];
     
-    [fWindow makeKeyAndOrderFront: nil]; 
+    [fWindow makeKeyAndOrderFront: nil];
+    
+    //can't be done earlier
+    if (![fFilterBar isHidden])
+        [self resizeFilterBar];
     
     if ([fDefaults boolForKey: @"InfoVisible"])
         [self showInfo: nil];
@@ -4090,39 +4094,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     return [self windowFrameByAddingHeight: heightChange checkLimits: YES];
 }
 
-- (void) updateForExpandCollape
+- (void) resizeFilterBar
 {
-    [self setWindowSizeToFit];
-    [self setBottomCountText: YES];
-}
-
-- (void) showMainWindow: (id) sender
-{
-    [fWindow makeKeyAndOrderFront: nil];
-}
-
-- (void) windowDidBecomeMain: (NSNotification *) notification
-{
-    [fBadger clearCompleted];
-    [self updateUI];
-}
-
-- (NSSize) windowWillResize: (NSWindow *) sender toSize: (NSSize) proposedFrameSize
-{
-    //only resize horizontally if autosize is enabled
-    if ([fDefaults boolForKey: @"AutoSize"])
-        proposedFrameSize.height = [fWindow frame].size.height;
-    return proposedFrameSize;
-}
-
-- (void) windowDidResize: (NSNotification *) notification
-{
-    if (![fStatusBar isHidden])
-        [self resizeStatusButton];
-    
-    if ([fFilterBar isHidden])
-        return;
-    
     //replace all buttons
     [fNoFilterButton sizeToFit];
     [fActiveFilterButton sizeToFit];
@@ -4179,6 +4152,42 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [fPauseFilterButton setFrame: pauseRect];
     
     [fSearchFilterField setFrame: searchFrame];
+}
+
+- (void) updateForExpandCollape
+{
+    [self setWindowSizeToFit];
+    [self setBottomCountText: YES];
+}
+
+- (void) showMainWindow: (id) sender
+{
+    [fWindow makeKeyAndOrderFront: nil];
+}
+
+- (void) windowDidBecomeMain: (NSNotification *) notification
+{
+    [fBadger clearCompleted];
+    [self updateUI];
+}
+
+- (NSSize) windowWillResize: (NSWindow *) sender toSize: (NSSize) proposedFrameSize
+{
+    //only resize horizontally if autosize is enabled
+    if ([fDefaults boolForKey: @"AutoSize"])
+        proposedFrameSize.height = [fWindow frame].size.height;
+    return proposedFrameSize;
+}
+
+- (void) windowDidResize: (NSNotification *) notification
+{
+    if (![fStatusBar isHidden])
+        [self resizeStatusButton];
+    
+    if ([fFilterBar isHidden])
+        return;
+
+    [self resizeFilterBar];
 }
 
 - (void) applicationWillUnhide: (NSNotification *) notification

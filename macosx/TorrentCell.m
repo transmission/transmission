@@ -69,8 +69,7 @@
 - (void) drawPiecesBar: (NSRect) barRect;
 
 - (NSRect) rectForMinimalStatusWithString: (NSAttributedString *) string inBounds: (NSRect) bounds;
-- (NSRect) rectForTitleWithStringBasedOnMinimalStatusRect: (NSRect) statusRect
-            inBounds: (NSRect) bounds;
+- (NSRect) rectForTitleWithStringBasedOnMinimalStatusRect: (NSRect) statusRect inBounds: (NSRect) bounds;
 - (NSRect) rectForProgressWithStringInBounds: (NSRect) bounds;
 - (NSRect) rectForStatusWithStringInBounds: (NSRect) bounds;
 - (NSRect) barRectForBounds: (NSRect) bounds;
@@ -622,8 +621,7 @@
     return result;
 }
 
-- (NSRect) rectForTitleWithStringBasedOnMinimalStatusRect: (NSRect) statusRect
-            inBounds: (NSRect) bounds
+- (NSRect) rectForTitleWithStringBasedOnMinimalStatusRect: (NSRect) statusRect inBounds: (NSRect) bounds
 {
     const BOOL minimal = [fDefaults boolForKey: @"SmallView"];
     
@@ -633,9 +631,11 @@
                         + (minimal ? IMAGE_SIZE_MIN : IMAGE_SIZE_REG) + PADDING_BETWEEN_IMAGE_AND_TITLE;
     
     result.size.height = HEIGHT_TITLE;
-    result.size.width = NSMaxX(bounds) - result.origin.x - PADDING_HORIZONTAL
-                - (minimal ? PADDING_BETWEEN_TITLE_AND_MIN_STATUS + NSWidth(statusRect) : 0.0)
-                - ([[self representedObject] priority] != TR_PRI_NORMAL ? PRIORITY_ICON_WIDTH + PADDING_BETWEEN_TITLE_AND_PRIORITY: 0.0);
+    result.size.width = NSMaxX(bounds) - NSMinX(result) - PADDING_HORIZONTAL;
+    if (minimal)
+        result.size.width -= PADDING_BETWEEN_TITLE_AND_MIN_STATUS + NSWidth(statusRect);
+    if ([[self representedObject] priority] != TR_PRI_NORMAL)
+        result.size.width -= PRIORITY_ICON_WIDTH + PADDING_BETWEEN_TITLE_AND_PRIORITY;
     
     return result;
 }
@@ -669,11 +669,11 @@
 {
     const BOOL minimal = [fDefaults boolForKey: @"SmallView"];
     
-    NSRect result = bounds;
+    NSRect result;
     result.size.height = BAR_HEIGHT;
-    result.origin.x += (minimal ? IMAGE_SIZE_MIN : IMAGE_SIZE_REG) + PADDING_BETWEEN_IMAGE_AND_BAR;
+    result.origin.x = NSMinX(bounds) + (minimal ? IMAGE_SIZE_MIN : IMAGE_SIZE_REG) + PADDING_BETWEEN_IMAGE_AND_BAR;
     
-    result.origin.y += PADDING_ABOVE_TITLE + HEIGHT_TITLE;
+    result.origin.y = NSMinY(bounds) + PADDING_ABOVE_TITLE + HEIGHT_TITLE;
     if (minimal)
         result.origin.y += PADDING_BETWEEN_TITLE_AND_BAR_MIN;
     else
@@ -686,12 +686,12 @@
 
 - (NSRect) controlButtonRectForBounds: (NSRect) bounds
 {
-    NSRect result = bounds;
+    NSRect result;
     result.size.height = NORMAL_BUTTON_WIDTH;
     result.size.width = NORMAL_BUTTON_WIDTH;
     result.origin.x = NSMaxX(bounds) - 2.0f * (PADDING_HORIZONTAL + NORMAL_BUTTON_WIDTH);
     
-    result.origin.y += PADDING_ABOVE_TITLE + HEIGHT_TITLE - (NORMAL_BUTTON_WIDTH - BAR_HEIGHT) * 0.5f;
+    result.origin.y = NSMinY(bounds) + PADDING_ABOVE_TITLE + HEIGHT_TITLE - (NORMAL_BUTTON_WIDTH - BAR_HEIGHT) * 0.5f;
     if ([fDefaults boolForKey: @"SmallView"])
         result.origin.y += PADDING_BETWEEN_TITLE_AND_BAR_MIN;
     else
@@ -702,12 +702,12 @@
 
 - (NSRect) revealButtonRectForBounds: (NSRect) bounds
 {
-    NSRect result = bounds;
+    NSRect result;
     result.size.height = NORMAL_BUTTON_WIDTH;
     result.size.width = NORMAL_BUTTON_WIDTH;
     result.origin.x = NSMaxX(bounds) - (PADDING_HORIZONTAL + NORMAL_BUTTON_WIDTH);
     
-    result.origin.y += PADDING_ABOVE_TITLE + HEIGHT_TITLE - (NORMAL_BUTTON_WIDTH - BAR_HEIGHT) * 0.5f;
+    result.origin.y = NSMinY(bounds) + PADDING_ABOVE_TITLE + HEIGHT_TITLE - (NORMAL_BUTTON_WIDTH - BAR_HEIGHT) * 0.5f;
     if ([fDefaults boolForKey: @"SmallView"])
         result.origin.y += PADDING_BETWEEN_TITLE_AND_BAR_MIN;
     else

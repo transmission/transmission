@@ -254,6 +254,8 @@ typedef enum
 - (void) setWindowSizeToFit;
 - (NSRect) sizedWindowFrame;
 
+- (void) resizeFilterBar;
+
 - (void) updateForExpandCollape;
 
 - (void) showMainWindow: (id) sender;
