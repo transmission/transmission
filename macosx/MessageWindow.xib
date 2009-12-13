@@ -89,7 +89,7 @@
 						<object class="NSPopUpButton" id="539084345">
 							<reference key="NSNextResponder" ref="459370864"/>
 							<int key="NSvFlags">292</int>
-							<string key="NSFrame">{{20, 5}, {89, 25}}</string>
+							<string key="NSFrame">{{20, 5}, {101, 25}}</string>
 							<reference key="NSSuperview" ref="459370864"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSPopUpButtonCell" key="NSCell" id="462670475">
@@ -176,7 +176,7 @@
 						<object class="NSButton" id="945411764">
 							<reference key="NSNextResponder" ref="459370864"/>
 							<int key="NSvFlags">292</int>
-							<string key="NSFrame">{{117, 5}, {82, 25}}</string>
+							<string key="NSFrame">{{129, 5}, {82, 25}}</string>
 							<reference key="NSSuperview" ref="459370864"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="45431789">
@@ -596,7 +596,7 @@ AAAAAAAAAAAAAAAAAAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOQA</bytes>
 												</object>
 												<object class="NSTableColumn" id="155009194">
 													<string key="NSIdentifier">Message</string>
-													<double key="NSWidth">372</double>
+													<double key="NSWidth">378</double>
 													<double key="NSMinWidth">10</double>
 													<double key="NSMaxWidth">3.4028229999999999e+38</double>
 													<object class="NSTableHeaderCell" key="NSHeaderCell">

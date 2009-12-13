@@ -84,6 +84,9 @@
     [[fLevelButton itemAtIndex: LEVEL_INFO] setTitle: NSLocalizedString(@"Info", "Message window -> level string")];
     [[fLevelButton itemAtIndex: LEVEL_DEBUG] setTitle: NSLocalizedString(@"Debug", "Message window -> level string")];
     
+    const CGFloat levelButtonOldWidth = NSWidth([fLevelButton frame]);
+    [fLevelButton sizeToFit];
+    
     //set table column text
     [[[fMessageTable tableColumnWithIdentifier: @"Date"] headerCell] setTitle: NSLocalizedString(@"Date",
         "Message window -> table column")];
@@ -98,6 +101,7 @@
     
     NSRect saveButtonFrame = [fSaveButton frame];
     saveButtonFrame.size.width += 10.0;
+    saveButtonFrame.origin.x += NSWidth([fLevelButton frame]) - levelButtonOldWidth;
     [fSaveButton setFrame: saveButtonFrame];
     
     const CGFloat oldClearButtonWidth = [fClearButton frame].size.width;
