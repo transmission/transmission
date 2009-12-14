@@ -187,7 +187,7 @@ dht_bootstrap(void *closure)
 
     if(!bootstrap_done(cl->session, 0)) {
         char *bootstrap_file;
-        FILE *f = NULL;
+        FILE *f;
 
         bootstrap_file =
             tr_buildPath(cl->session->configDir, "dht.bootstrap", NULL);
@@ -221,6 +221,8 @@ dht_bootstrap(void *closure)
                     break;
             }
         }
+
+        tr_free( bootstrap_file );
     }
 
     /* We really don't want to abuse our bootstrap nodes.
