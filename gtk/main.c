@@ -134,12 +134,12 @@ getSelectedTorrentIds( struct cbdata * data )
     GtkTreeSelection * s;
     GtkTreeModel * model;
     GSList * ids = NULL;
-    GList * selrows = NULL;
+    GList * paths = NULL;
     GList * l;
 
     /* build a list of the selected torrents' ids */
     s = tr_window_get_selection( data->wind );
-    for( selrows=l=gtk_tree_selection_get_selected_rows(s,&model); l; l=l->next ) {
+    for( paths=l=gtk_tree_selection_get_selected_rows(s,&model); l; l=l->next ) {
         GtkTreeIter iter;
         if( gtk_tree_model_get_iter( model, &iter, l->data ) ) {
             tr_torrent * tor;
@@ -148,6 +148,9 @@ getSelectedTorrentIds( struct cbdata * data )
         }
     }
 
+    /* cleanup */
+    g_list_foreach( paths, (GFunc)gtk_tree_path_free, NULL );
+    g_list_free( paths );
     return ids;
 }
 
