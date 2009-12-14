@@ -980,13 +980,21 @@ parseLtepHandshake( tr_peermsgs *     msgs,
         dbgmsg( msgs, "peer's port is now %d", (int)i );
     }
 
-    if( tr_bencDictFindRaw( &val, "ipv4", &addr, &addr_len) && addr_len == 4 ) {
+    if( tr_peerIoIsIncoming( msgs->peer->io )
+        && tr_bencDictFindRaw( &val, "ipv4", &addr, &addr_len )
+        && ( addr_len == 4 )
+        && ( !tr_isMartian( AF_INET, addr ) ) )
+    {
         pex.addr.type = TR_AF_INET;
         memcpy( &pex.addr.addr.addr4, addr, 4 );
         tr_peerMgrAddPex( msgs->torrent, TR_PEER_FROM_LTEP, &pex );
     }
 
-    if( tr_bencDictFindRaw( &val, "ipv6", &addr, &addr_len) && addr_len == 16 ) {
+    if( tr_peerIoIsIncoming( msgs->peer->io )
+        && tr_bencDictFindRaw( &val, "ipv6", &addr, &addr_len )
+        && ( addr_len == 16 )
+        && ( !tr_isMartian( AF_INET6, addr ) ) )
+    {
         pex.addr.type = TR_AF_INET6;
         memcpy( &pex.addr.addr.addr6, addr, 16 );
         tr_peerMgrAddPex( msgs->torrent, TR_PEER_FROM_LTEP, &pex );

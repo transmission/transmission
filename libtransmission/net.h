@@ -125,4 +125,7 @@ int tr_globalAddress(int af, void *addr, int *addr_len);
 
 const unsigned char *tr_globalIPv6( void );
 
+int tr_isMartian( int af, const unsigned char * address );
+
+
 #endif /* _TR_NET_H_ */

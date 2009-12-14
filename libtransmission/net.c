@@ -633,3 +633,29 @@ tr_globalIPv6( void )
 
     return have_ipv6 ? ipv6 : NULL;
 }
+
+int
+tr_isMartian( int af, const unsigned char * address )
+{
+    static const unsigned char v4prefix[16] =
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xFF, 0xFF, 0, 0, 0, 0 };
+    static const unsigned char zeroes[16] =
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+    switch( af )
+    {
+        case AF_INET:
+            return (address[0] == 0) ||
+                   (address[0] == 127) ||
+                   ((address[0] & 0xE0) == 0xE0);
+
+        case AF_INET6:
+            return (address[0] == 0xFF) ||
+                   (address[0] == 0xFE && (address[1] & 0xC0) == 0x80) ||
+                   (memcmp(address, zeroes, 15) == 0 && (address[15] == 0 || address[15] == 1)) ||
+                   (memcmp(address, v4prefix, 12) == 0);
+
+        default:
+            return FALSE;
+    }
+}
