@@ -635,9 +635,10 @@
     if (minimal)
         result.size.width -= PADDING_BETWEEN_TITLE_AND_MIN_STATUS + NSWidth(statusRect);
     if ([[self representedObject] priority] != TR_PRI_NORMAL)
+    {
         result.size.width -= PRIORITY_ICON_WIDTH + PADDING_BETWEEN_TITLE_AND_PRIORITY;
-    
-    result.size.width = MIN(result.size.width, [string size].width);
+        result.size.width = MIN(result.size.width, [string size].width); //only need to force it smaller for the priority icon
+    }
     
     return result;
 }
