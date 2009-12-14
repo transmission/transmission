@@ -781,18 +781,9 @@ onSessionClosed( gpointer gdata )
     struct cbdata * cbdata = gdata;
 
     /* shutdown the gui */
-    if( cbdata->details != NULL )
-    {
-        GSList * l;
-        for( l=cbdata->details; l!=NULL; l=l->next )
-        {
-            struct DetailsDialogHandle * h = l->data;
-            gtk_widget_destroy( h->dialog );
-            g_free( h->key );
-            g_free( h );
-        }
-        g_slist_free( cbdata->details );
-        cbdata->details = NULL;
+    while( cbdata->details != NULL ) {
+        struct DetailsDialogHandle * h = cbdata->details->data;
+        gtk_widget_destroy( h->dialog );
     }
 
     if( cbdata->prefs )
