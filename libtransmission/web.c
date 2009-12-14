@@ -140,7 +140,6 @@ addTask( void * vtask )
 
     if( session && session->web )
     {
-        CURLMcode mcode;
         CURL * e = curl_easy_init( );
         struct tr_web * web = session->web;
         const long timeout = getTimeoutFromURL( task->url );
@@ -186,11 +185,9 @@ addTask( void * vtask )
             curl_easy_setopt( e, CURLOPT_INTERFACE, tr_ntop_non_ts( &web->addr ) );
         if( task->range )
             curl_easy_setopt( e, CURLOPT_RANGE, task->range );
-        else /* don't set encoding on webseeds; it messes up binary data */
-            curl_easy_setopt( e, CURLOPT_ENCODING, "" );
 
-        mcode = curl_multi_add_handle( web->multi, e );
-        ++web->taskCount;
+        if( curl_multi_add_handle( web->multi, e ) == CURLM_OK )
+            ++web->taskCount;
     }
 }
 

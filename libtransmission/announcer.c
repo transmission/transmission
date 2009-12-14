@@ -1273,6 +1273,7 @@ onAnnounceDone( tr_session   * session,
             if( gotScrape )
             {
                 tier->lastScrapeTime = now;
+                tier->lastScrapeSucceeded = 1;
                 tier->scrapeAt = now + tier->scrapeIntervalSec;
             }
 
