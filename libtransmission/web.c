@@ -54,6 +54,14 @@ struct tr_web
     struct event timer_event;
 };
 
+static void
+web_close( tr_web * g )
+{
+    curl_multi_cleanup( g->multi );
+    evtimer_del( &g->timer_event );
+    tr_free( g );
+}
+
 /***
 ****
 ***/
@@ -68,6 +76,19 @@ struct tr_web_task
     tr_web_done_func * done_func;
     void * done_func_user_data;
 };
+
+static void
+task_free( struct tr_web_task * task )
+{
+    evbuffer_free( task->response );
+    tr_free( task->range );
+    tr_free( task->url );
+    tr_free( task );
+}
+
+/***
+****
+***/
 
 static size_t
 writeFunc( void * ptr, size_t size, size_t nmemb, void * vtask )
@@ -122,7 +143,7 @@ addTask( void * vtask )
     if( session && session->web )
     {
         CURLMcode mcode;
-        CURL * easy = curl_easy_init( );
+        CURL * e = curl_easy_init( );
         struct tr_web * web = session->web;
         const long timeout = getTimeoutFromURL( task->url );
         const long verbose = getenv( "TR_CURL_VERBOSE" ) != NULL;
@@ -131,47 +152,46 @@ addTask( void * vtask )
         dbgmsg( "adding task #%lu [%s]", task->tag, task->url );
 
         if( !task->range && session->isProxyEnabled ) {
-            curl_easy_setopt( easy, CURLOPT_PROXY, session->proxy );
-            curl_easy_setopt( easy, CURLOPT_PROXYAUTH, CURLAUTH_ANY );
-            curl_easy_setopt( easy, CURLOPT_PROXYPORT, session->proxyPort );
-            curl_easy_setopt( easy, CURLOPT_PROXYTYPE,
+            curl_easy_setopt( e, CURLOPT_PROXY, session->proxy );
+            curl_easy_setopt( e, CURLOPT_PROXYAUTH, CURLAUTH_ANY );
+            curl_easy_setopt( e, CURLOPT_PROXYPORT, session->proxyPort );
+            curl_easy_setopt( e, CURLOPT_PROXYTYPE,
                                       getCurlProxyType( session->proxyType ) );
         }
         if( !task->range && session->isProxyAuthEnabled ) {
             char * str = tr_strdup_printf( "%s:%s", session->proxyUsername,
                                                     session->proxyPassword );
-            curl_easy_setopt( easy, CURLOPT_PROXYUSERPWD, str );
+            curl_easy_setopt( e, CURLOPT_PROXYUSERPWD, str );
             tr_free( str );
         }
 
-        curl_easy_setopt( easy, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4 );
-        curl_easy_setopt( easy, CURLOPT_TIMEOUT, timeout );
-        curl_easy_setopt( easy, CURLOPT_CONNECTTIMEOUT, timeout-5 );
-        curl_easy_setopt( easy, CURLOPT_SOCKOPTFUNCTION, sockoptfunction );
-        curl_easy_setopt( easy, CURLOPT_SOCKOPTDATA, task );
-        curl_easy_setopt( easy, CURLOPT_WRITEDATA, task );
-        curl_easy_setopt( easy, CURLOPT_WRITEFUNCTION, writeFunc );
-        curl_easy_setopt( easy, CURLOPT_DNS_CACHE_TIMEOUT, 1800L );
-        curl_easy_setopt( easy, CURLOPT_FOLLOWLOCATION, 1L );
-        curl_easy_setopt( easy, CURLOPT_AUTOREFERER, 1L );
-        curl_easy_setopt( easy, CURLOPT_FORBID_REUSE, 1L );
-        curl_easy_setopt( easy, CURLOPT_MAXREDIRS, -1L );
-        curl_easy_setopt( easy, CURLOPT_NOSIGNAL, 1L );
-        curl_easy_setopt( easy, CURLOPT_PRIVATE, task );
-        curl_easy_setopt( easy, CURLOPT_SSL_VERIFYHOST, 0L );
-        curl_easy_setopt( easy, CURLOPT_SSL_VERIFYPEER, 0L );
-        curl_easy_setopt( easy, CURLOPT_URL, task->url );
-        curl_easy_setopt( easy, CURLOPT_USERAGENT, user_agent );
-        curl_easy_setopt( easy, CURLOPT_VERBOSE, verbose );
+        curl_easy_setopt( e, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4 );
+        curl_easy_setopt( e, CURLOPT_TIMEOUT, timeout );
+        curl_easy_setopt( e, CURLOPT_CONNECTTIMEOUT, timeout-5 );
+        curl_easy_setopt( e, CURLOPT_SOCKOPTFUNCTION, sockoptfunction );
+        curl_easy_setopt( e, CURLOPT_SOCKOPTDATA, task );
+        curl_easy_setopt( e, CURLOPT_WRITEDATA, task );
+        curl_easy_setopt( e, CURLOPT_WRITEFUNCTION, writeFunc );
+        curl_easy_setopt( e, CURLOPT_DNS_CACHE_TIMEOUT, 1800L );
+        curl_easy_setopt( e, CURLOPT_FOLLOWLOCATION, 1L );
+        curl_easy_setopt( e, CURLOPT_AUTOREFERER, 1L );
+        curl_easy_setopt( e, CURLOPT_FORBID_REUSE, 1L );
+        curl_easy_setopt( e, CURLOPT_MAXREDIRS, -1L );
+        curl_easy_setopt( e, CURLOPT_NOSIGNAL, 1L );
+        curl_easy_setopt( e, CURLOPT_PRIVATE, task );
+        curl_easy_setopt( e, CURLOPT_SSL_VERIFYHOST, 0L );
+        curl_easy_setopt( e, CURLOPT_SSL_VERIFYPEER, 0L );
+        curl_easy_setopt( e, CURLOPT_URL, task->url );
+        curl_easy_setopt( e, CURLOPT_USERAGENT, user_agent );
+        curl_easy_setopt( e, CURLOPT_VERBOSE, verbose );
         if( web->haveAddr )
-            curl_easy_setopt( easy, CURLOPT_INTERFACE,
-                                            tr_ntop_non_ts( &web->addr ) );
+            curl_easy_setopt( e, CURLOPT_INTERFACE, tr_ntop_non_ts( &web->addr ) );
         if( task->range )
-            curl_easy_setopt( easy, CURLOPT_RANGE, task->range );
+            curl_easy_setopt( e, CURLOPT_RANGE, task->range );
         else /* don't set encoding on webseeds; it messes up binary data */
-            curl_easy_setopt( easy, CURLOPT_ENCODING, "" );
+            curl_easy_setopt( e, CURLOPT_ENCODING, "" );
 
-        mcode = curl_multi_add_handle( web->multi, easy );
+        mcode = curl_multi_add_handle( web->multi, e );
         ++web->taskCount;
         /*tr_multi_perform( web, CURL_SOCKET_TIMEOUT );*/
     }
@@ -180,15 +200,6 @@ addTask( void * vtask )
 /***
 ****
 ***/
-
-static void
-task_free( struct tr_web_task * task )
-{
-    evbuffer_free( task->response );
-    tr_free( task->range );
-    tr_free( task->url );
-    tr_free( task );
-}
 
 static void
 task_finish( struct tr_web_task * task, long response_code )
@@ -214,11 +225,11 @@ remove_finished_tasks( tr_web * g )
         if(( msg->msg == CURLMSG_DONE ) && ( msg->easy_handle != NULL )) {
             long code;
             struct tr_web_task * task;
-            CURL * easy = msg->easy_handle;
-            curl_easy_getinfo( easy, CURLINFO_PRIVATE, (void*)&task );
-            curl_easy_getinfo( easy, CURLINFO_RESPONSE_CODE, &code );
-            curl_multi_remove_handle( g->multi, easy );
-            curl_easy_cleanup( easy );
+            CURL * e = msg->easy_handle;
+            curl_easy_getinfo( e, CURLINFO_PRIVATE, (void*)&task );
+            curl_easy_getinfo( e, CURLINFO_RESPONSE_CODE, &code );
+            curl_multi_remove_handle( g->multi, e );
+            curl_easy_cleanup( e );
             task_finish( task, code );
         }
     }
@@ -232,22 +243,11 @@ restart_timer( tr_web * g )
     tr_timerAddMsec( &g->timer_event, g->timer_msec );
 }
 
-static void
-web_close( tr_web * g )
-{
-    curl_multi_cleanup( g->multi );
-    evtimer_del( &g->timer_event );
-    tr_free( g );
-}
-
-/* note: this function can free the tr_web if its 'closing' flag is set
-   and no tasks remain.  callers must not reference their g pointer
-   after calling this function */
 static tr_bool
 tr_multi_perform( tr_web * g, int fd )
 {
-    tr_bool closed = FALSE;
     CURLMcode mcode;
+    tr_bool closed = FALSE;
 
     dbgmsg( "check_run_count: %d taskCount", g->taskCount );
 
@@ -258,12 +258,9 @@ tr_multi_perform( tr_web * g, int fd )
 
     remove_finished_tasks( g );
 
-    if( g->closing && !g->taskCount ) {
+    if(( closed = g->closing && !g->taskCount ))
         web_close( g );
-        closed = TRUE;
-    }
-
-    if( !closed )
+    else
         restart_timer( g );
 
     return closed;
@@ -278,12 +275,14 @@ event_cb( int fd, short kind UNUSED, void * g )
 
 /* CURLMOPT_SOCKETFUNCTION */
 static int
-sock_cb( CURL * easy UNUSED, curl_socket_t fd, int action, void * vweb, void * vevent )
+sock_cb( CURL * easy UNUSED, curl_socket_t fd, int action,
+         void * vweb, void * vevent )
 {
     /*static int num_events = 0;*/
     struct tr_web * web = vweb;
     struct event * io_event = vevent;
-    dbgmsg( "sock_cb: action is %d, fd is %d, io_event is %p", action, (int)fd, io_event );
+    dbgmsg( "sock_cb: action is %d, fd is %d, io_event is %p",
+            action, (int)fd, io_event );
 
     if( action == CURL_POLL_REMOVE )
     {
@@ -295,7 +294,7 @@ sock_cb( CURL * easy UNUSED, curl_socket_t fd, int action, void * vweb, void * v
             /*fprintf( stderr, "-1 io_events to %d\n", --num_events );*/
         }
     }
-    else
+    else if( action & ( EV_READ | EV_WRITE ) )
     {
         const short events = EV_PERSIST
                            | (( action & CURL_POLL_IN ) ? EV_READ : 0 )
@@ -359,7 +358,7 @@ tr_webRun( tr_session         * session,
            tr_web_done_func     done_func,
            void               * done_func_user_data )
 {
-    if( session->web )
+    if( session->web != NULL )
     {
         static unsigned long tag = 0;
         struct tr_web_task * task = tr_new0( struct tr_web_task, 1 );
@@ -386,16 +385,11 @@ tr_web*
 tr_webInit( tr_session * session )
 {
     tr_web * web;
-    static int curlInited = FALSE;
 
-    /* call curl_global_init if we haven't done it already.
-     * try to enable ssl for https support; but if that fails,
+    /* try to enable ssl for https support; but if that fails,
      * try a plain vanilla init */
-    if( curlInited == FALSE ) {
-        curlInited = TRUE;
-        if( curl_global_init( CURL_GLOBAL_SSL ) )
-            curl_global_init( 0 );
-    }
+    if( curl_global_init( CURL_GLOBAL_SSL ) )
+        curl_global_init( 0 );
 
     web = tr_new0( struct tr_web, 1 );
     web->session = session;
@@ -427,62 +421,54 @@ tr_webClose( tr_web ** web_in )
 ******
 *****/
 
-static const struct http_msg {
-    long code;
-    const char * text;
-} http_msg[] = {
-    {   0, "No Response" },
-    { 101, "Switching Protocols" },
-    { 200, "OK" },
-    { 201, "Created" },
-    { 202, "Accepted" },
-    { 203, "Non-Authoritative Information" },
-    { 204, "No Content" },
-    { 205, "Reset Content" },
-    { 206, "Partial Content" },
-    { 300, "Multiple Choices" },
-    { 301, "Moved Permanently" },
-    { 302, "Found" },
-    { 303, "See Other" },
-    { 304, "Not Modified" },
-    { 305, "Use Proxy" },
-    { 306, "(Unused)" },
-    { 307, "Temporary Redirect" },
-    { 400, "Bad Request" },
-    { 401, "Unauthorized" },
-    { 402, "Payment Required" },
-    { 403, "Forbidden" },
-    { 404, "Not Found" },
-    { 405, "Method Not Allowed" },
-    { 406, "Not Acceptable" },
-    { 407, "Proxy Authentication Required" },
-    { 408, "Request Timeout" },
-    { 409, "Conflict" },
-    { 410, "Gone" },
-    { 411, "Length Required" },
-    { 412, "Precondition Failed" },
-    { 413, "Request Entity Too Large" },
-    { 414, "Request-URI Too Long" },
-    { 415, "Unsupported Media Type" },
-    { 416, "Requested Range Not Satisfiable" },
-    { 417, "Expectation Failed" },
-    { 500, "Internal Server Error" },
-    { 501, "Not Implemented" },
-    { 502, "Bad Gateway" },
-    { 503, "Service Unavailable" },
-    { 504, "Gateway Timeout" },
-    { 505, "HTTP Version Not Supported" }
-};
-
 const char *
 tr_webGetResponseStr( long code )
 {
-    int i;
-    static const int n = sizeof( http_msg ) / sizeof( http_msg[0] );
-    for( i=0; i<n; ++i )
-        if( http_msg[i].code == code )
-            return http_msg[i].text;
-    return "Unknown Error";
+    switch( code )
+    {
+        case   0: return "No Response";
+        case 101: return "Switching Protocols";
+        case 200: return "OK";
+        case 201: return "Created";
+        case 202: return "Accepted";
+        case 203: return "Non-Authoritative Information";
+        case 204: return "No Content";
+        case 205: return "Reset Content";
+        case 206: return "Partial Content";
+        case 300: return "Multiple Choices";
+        case 301: return "Moved Permanently";
+        case 302: return "Found";
+        case 303: return "See Other";
+        case 304: return "Not Modified";
+        case 305: return "Use Proxy";
+        case 306: return "(Unused)";
+        case 307: return "Temporary Redirect";
+        case 400: return "Bad Request";
+        case 401: return "Unauthorized";
+        case 402: return "Payment Required";
+        case 403: return "Forbidden";
+        case 404: return "Not Found";
+        case 405: return "Method Not Allowed";
+        case 406: return "Not Acceptable";
+        case 407: return "Proxy Authentication Required";
+        case 408: return "Request Timeout";
+        case 409: return "Conflict";
+        case 410: return "Gone";
+        case 411: return "Length Required";
+        case 412: return "Precondition Failed";
+        case 413: return "Request Entity Too Large";
+        case 414: return "Request-URI Too Long";
+        case 415: return "Unsupported Media Type";
+        case 416: return "Requested Range Not Satisfiable";
+        case 417: return "Expectation Failed";
+        case 500: return "Internal Server Error";
+        case 501: return "Not Implemented";
+        case 502: return "Bad Gateway";
+        case 503: return "Service Unavailable";
+        case 504: return "Gateway Timeout";
+        case 505: return "HTTP Version Not Supported";
+        default:  return "Unknown Error";
+    }
 }
 
 void
