@@ -1355,6 +1355,18 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     [fTorrents removeObjectsInArray: torrents];
     
+    //if not removed from displayed torrents, updateTorrentsInQueue might cause a crash
+    if ([fDisplayedTorrents count] > 0)
+    {
+        if ([[fDisplayedTorrents objectAtIndex: 0] isKindOfClass: [TorrentGroup class]])
+        {
+            for (TorrentGroup * group in fDisplayedTorrents)
+                [[group torrents] removeObjectsInArray: torrents];
+        }
+        else
+            [fDisplayedTorrents removeObjectsInArray: torrents];
+    }
+    
     for (Torrent * torrent in torrents)
     {
         //let's expand all groups that have removed items - they either don't exist anymore, are already expanded, or are collapsed (rpc)
