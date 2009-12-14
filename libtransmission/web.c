@@ -10,10 +10,6 @@
  * $Id$
  */
 
-#include <assert.h>
-#include <stdlib.h> /* bsearch */
-
-#define CURL_DISABLE_TYPECHECK /* otherwise -Wunreachable-code goes insane */
 #include <curl/curl.h>
 #include <event.h>
 
@@ -30,8 +26,7 @@ enum
     DEFAULT_TIMER_MSEC = 1500 /* arbitrary */
 };
 
-static void
-tr_multi_perform( tr_web * g, int fd );
+static tr_bool tr_multi_perform( tr_web * g, int fd );
 
 #if 0
 #define dbgmsg(...) \
@@ -50,8 +45,7 @@ tr_multi_perform( tr_web * g, int fd );
 struct tr_web
 {
     tr_bool closing;
-    int prev_running;
-    int still_running;
+    int taskCount;
     long timer_msec;
     CURLM * multi;
     tr_session * session;
@@ -85,17 +79,6 @@ writeFunc( void * ptr, size_t size, size_t nmemb, void * vtask )
     return byteCount;
 }
 
-static int
-getCurlProxyType( tr_proxy_type t )
-{
-    switch( t )
-    {
-        case TR_PROXY_SOCKS4: return CURLPROXY_SOCKS4;
-        case TR_PROXY_SOCKS5: return CURLPROXY_SOCKS5;
-        default:              return CURLPROXY_HTTP;
-    }
-}
-
 static void
 sockoptfunction( void * vtask, curl_socket_t fd, curlsocktype purpose UNUSED )
 {
@@ -115,12 +98,18 @@ sockoptfunction( void * vtask, curl_socket_t fd, curlsocktype purpose UNUSED )
 }
 
 static int
+getCurlProxyType( tr_proxy_type t )
+{
+    if( t == TR_PROXY_SOCKS4 ) return CURLPROXY_SOCKS4;
+    if( t == TR_PROXY_SOCKS5 ) return CURLPROXY_SOCKS5;
+    return CURLPROXY_HTTP;
+}
+
+static int
 getTimeoutFromURL( const char * url )
 {
-    if( strstr( url, "scrape" ) != NULL )
-        return 20;
-    if( strstr( url, "announce" ) != NULL )
-        return 30;
+    if( strstr( url, "scrape" ) != NULL ) return 20;
+    if( strstr( url, "announce" ) != NULL ) return 30;
     return 240;
 }
 
@@ -160,6 +149,8 @@ addTask( void * vtask )
         curl_easy_setopt( easy, CURLOPT_CONNECTTIMEOUT, timeout-5 );
         curl_easy_setopt( easy, CURLOPT_SOCKOPTFUNCTION, sockoptfunction );
         curl_easy_setopt( easy, CURLOPT_SOCKOPTDATA, task );
+        curl_easy_setopt( easy, CURLOPT_WRITEDATA, task );
+        curl_easy_setopt( easy, CURLOPT_WRITEFUNCTION, writeFunc );
         curl_easy_setopt( easy, CURLOPT_DNS_CACHE_TIMEOUT, 1800L );
         curl_easy_setopt( easy, CURLOPT_FOLLOWLOCATION, 1L );
         curl_easy_setopt( easy, CURLOPT_AUTOREFERER, 1L );
@@ -172,21 +163,16 @@ addTask( void * vtask )
         curl_easy_setopt( easy, CURLOPT_URL, task->url );
         curl_easy_setopt( easy, CURLOPT_USERAGENT, user_agent );
         curl_easy_setopt( easy, CURLOPT_VERBOSE, verbose );
-        curl_easy_setopt( easy, CURLOPT_WRITEDATA, task );
-        curl_easy_setopt( easy, CURLOPT_WRITEFUNCTION, writeFunc );
         if( web->haveAddr )
-            curl_easy_setopt( easy, CURLOPT_INTERFACE, tr_ntop_non_ts( &web->addr ) );
+            curl_easy_setopt( easy, CURLOPT_INTERFACE,
+                                            tr_ntop_non_ts( &web->addr ) );
         if( task->range )
             curl_easy_setopt( easy, CURLOPT_RANGE, task->range );
         else /* don't set encoding on webseeds; it messes up binary data */
             curl_easy_setopt( easy, CURLOPT_ENCODING, "" );
 
         mcode = curl_multi_add_handle( web->multi, easy );
-        if( mcode == CURLM_OK )
-            ++web->still_running;
-        else
-            tr_err( "%s", curl_multi_strerror( mcode ) );
-
+        ++web->taskCount;
         /*tr_multi_perform( web, CURL_SOCKET_TIMEOUT );*/
     }
 }
@@ -236,73 +222,51 @@ remove_finished_tasks( tr_web * g )
             task_finish( task, code );
         }
     }
-
-    g->prev_running = g->still_running;
-}
-
-static void
-stop_timer( tr_web* g )
-{
-    dbgmsg( "deleting the pending global timer" );
-    evtimer_del( &g->timer_event );
 }
 
 static void
 restart_timer( tr_web * g )
 {
-    assert( tr_amInEventThread( g->session ) );
-    assert( g->session != NULL );
-    assert( g->session->events != NULL );
-
-    stop_timer( g );
     dbgmsg( "adding a timeout for %.1f seconds from now", g->timer_msec/1000.0 );
+    evtimer_del( &g->timer_event );
     tr_timerAddMsec( &g->timer_event, g->timer_msec );
 }
 
 static void
 web_close( tr_web * g )
 {
-    CURLMcode mcode;
-
-    stop_timer( g );
-
-    mcode = curl_multi_cleanup( g->multi );
-    tr_assert( mcode == CURLM_OK, "curl_multi_cleanup() failed: %d (%s)", mcode, curl_multi_strerror( mcode ) );
-    if( mcode != CURLM_OK )
-        tr_err( "%s", curl_multi_strerror( mcode ) );
-
+    curl_multi_cleanup( g->multi );
+    evtimer_del( &g->timer_event );
     tr_free( g );
 }
 
 /* note: this function can free the tr_web if its 'closing' flag is set
    and no tasks remain.  callers must not reference their g pointer
    after calling this function */
-static void
+static tr_bool
 tr_multi_perform( tr_web * g, int fd )
 {
-    int closed = FALSE;
+    tr_bool closed = FALSE;
     CURLMcode mcode;
 
-    dbgmsg( "check_run_count: prev_running %d, still_running %d",
-            g->prev_running, g->still_running );
+    dbgmsg( "check_run_count: %d taskCount", g->taskCount );
 
     /* invoke libcurl's processing */
     do {
-        mcode = curl_multi_socket_action( g->multi, fd, 0, &g->still_running );
+        mcode = curl_multi_socket_action( g->multi, fd, 0, &g->taskCount );
     } while( mcode == CURLM_CALL_MULTI_SOCKET );
 
     remove_finished_tasks( g );
 
-    if( !g->still_running ) {
-        stop_timer( g );
-        if( g->closing ) {
-            web_close( g );
-            closed = TRUE;
-        }
+    if( g->closing && !g->taskCount ) {
+        web_close( g );
+        closed = TRUE;
     }
 
     if( !closed )
         restart_timer( g );
+
+    return closed;
 }
 
 /* libevent says that sock is ready to be processed, so wake up libcurl */
@@ -327,7 +291,7 @@ sock_cb( CURL * easy UNUSED, curl_socket_t fd, int action, void * vweb, void * v
         {
             event_del( io_event );
             tr_free( io_event );
-            curl_multi_assign( web->multi, fd, NULL ); /* does libcurl do this automatically? */
+            curl_multi_assign( web->multi, fd, NULL );
             /*fprintf( stderr, "-1 io_events to %d\n", --num_events );*/
         }
     }
@@ -370,15 +334,18 @@ static void
 multi_timer_cb( CURLM * multi UNUSED, long timer_msec, void * vg )
 {
     tr_web * g = vg;
+    tr_bool closed = FALSE;
 
     if( timer_msec < 1 ) {
         if( timer_msec == 0 ) /* call it immediately */
-            libevent_timer_cb( 0, 0, g );
+            closed = tr_multi_perform( g, CURL_SOCKET_TIMEOUT );
         timer_msec = DEFAULT_TIMER_MSEC;
     }
 
-    g->timer_msec = timer_msec;
-    restart_timer( g );
+    if( !closed ) {
+        g->timer_msec = timer_msec;
+        restart_timer( g );
+    }
 }
 
 /****
@@ -394,10 +361,8 @@ tr_webRun( tr_session         * session,
 {
     if( session->web )
     {
-        struct tr_web_task * task;
         static unsigned long tag = 0;
-
-        task = tr_new0( struct tr_web_task, 1 );
+        struct tr_web_task * task = tr_new0( struct tr_web_task, 1 );
         task->session = session;
         task->url = tr_strdup( url );
         task->range = tr_strdup( range );
@@ -451,7 +416,7 @@ tr_webClose( tr_web ** web_in )
 {
     tr_web * web = *web_in;
     *web_in = NULL;
-    if( web->still_running < 1 )
+    if( web->taskCount < 1 )
         web_close( web );
     else
         web->closing = 1;
@@ -462,7 +427,7 @@ tr_webClose( tr_web ** web_in )
 ******
 *****/
 
-static struct http_msg {
+static const struct http_msg {
     long code;
     const char * text;
 } http_msg[] = {
@@ -509,32 +474,19 @@ static struct http_msg {
     { 505, "HTTP Version Not Supported" }
 };
 
-static int
-compareResponseCodes( const void * va, const void * vb )
-{
-    const long a = *(const long*) va;
-    const struct http_msg * b = vb;
-    return a - b->code;
-}
-
 const char *
 tr_webGetResponseStr( long code )
 {
-    struct http_msg * msg = bsearch( &code,
-                                     http_msg,
-                                     sizeof( http_msg ) / sizeof( http_msg[0] ),
-                                     sizeof( http_msg[0] ),
-                                     compareResponseCodes );
-    return msg ? msg->text : "Unknown Error";
+    int i;
+    static const int n = sizeof( http_msg ) / sizeof( http_msg[0] );
+    for( i=0; i<n; ++i )
+        if( http_msg[i].code == code )
+            return http_msg[i].text;
+    return "Unknown Error";
 }
 
-/* escapes a string to be URI-legal as per RFC 2396.
-   like curl_escape() but can optionally avoid escaping slashes. */
 void
-tr_http_escape( struct evbuffer  * out,
-                const char       * str,
-                int                len,
-                tr_bool            escape_slashes )
+tr_http_escape( struct evbuffer  * out, const char * str, int len, tr_bool escape_slashes )
 {
     int i;
 
@@ -571,7 +523,7 @@ tr_http_escape( struct evbuffer  * out,
     }
 }
 
-char*
+char *
 tr_http_unescape( const char * str, int len )
 {
     char * tmp = curl_unescape( str, len );
