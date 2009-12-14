@@ -69,7 +69,7 @@
 - (void) drawPiecesBar: (NSRect) barRect;
 
 - (NSRect) rectForMinimalStatusWithString: (NSAttributedString *) string inBounds: (NSRect) bounds;
-- (NSRect) rectForTitleWithStringBasedOnMinimalStatusRect: (NSRect) statusRect inBounds: (NSRect) bounds;
+- (NSRect) rectForTitleWithString: (NSAttributedString *) string basedOnMinimalStatusRect: (NSRect) statusRect inBounds: (NSRect) bounds;
 - (NSRect) rectForProgressWithStringInBounds: (NSRect) bounds;
 - (NSRect) rectForStatusWithStringInBounds: (NSRect) bounds;
 - (NSRect) barRectForBounds: (NSRect) bounds;
@@ -381,7 +381,7 @@
     
     //title
     NSAttributedString * titleString = [self attributedTitle];
-    NSRect titleRect = [self rectForTitleWithStringBasedOnMinimalStatusRect: minimalStatusRect inBounds: cellFrame];
+    NSRect titleRect = [self rectForTitleWithString: titleString basedOnMinimalStatusRect: minimalStatusRect inBounds: cellFrame];
     [titleString drawInRect: titleRect];
     
     //priority icon
@@ -621,7 +621,7 @@
     return result;
 }
 
-- (NSRect) rectForTitleWithStringBasedOnMinimalStatusRect: (NSRect) statusRect inBounds: (NSRect) bounds
+- (NSRect) rectForTitleWithString: (NSAttributedString *) string basedOnMinimalStatusRect: (NSRect) statusRect inBounds: (NSRect) bounds
 {
     const BOOL minimal = [fDefaults boolForKey: @"SmallView"];
     
@@ -636,6 +636,8 @@
         result.size.width -= PADDING_BETWEEN_TITLE_AND_MIN_STATUS + NSWidth(statusRect);
     if ([[self representedObject] priority] != TR_PRI_NORMAL)
         result.size.width -= PRIORITY_ICON_WIDTH + PADDING_BETWEEN_TITLE_AND_PRIORITY;
+    
+    result.size.width = MIN(result.size.width, [string size].width);
     
     return result;
 }
