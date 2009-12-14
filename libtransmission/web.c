@@ -238,7 +238,7 @@ restart_timer( tr_web * g )
 }
 
 static void
-tr_multi_perform( tr_web * g, int fd )
+tr_multi_perform( tr_web * g, int fd, int curl_what )
 {
     CURLMcode mcode;
 
@@ -246,7 +246,7 @@ tr_multi_perform( tr_web * g, int fd )
 
     /* invoke libcurl's processing */
     do
-        mcode = curl_multi_socket_action( g->multi, fd, 0, &g->taskCount );
+        mcode = curl_multi_socket_action( g->multi, fd, curl_what, &g->taskCount );
     while( mcode == CURLM_CALL_MULTI_SOCKET );
 
     remove_finished_tasks( g );
@@ -259,9 +259,12 @@ tr_multi_perform( tr_web * g, int fd )
 
 /* libevent says that sock is ready to be processed, so wake up libcurl */
 static void
-event_cb( int fd, short kind UNUSED, void * g )
+event_cb( int fd, short ev_what, void * g )
 {
-    tr_multi_perform( g, fd );
+    int curl_what = 0;
+    if( ev_what & EV_READ ) curl_what |= CURL_POLL_IN;
+    if( ev_what & EV_WRITE ) curl_what |= CURL_POLL_OUT;
+    tr_multi_perform( g, fd, curl_what );
 }
 
 /* CURLMOPT_SOCKETFUNCTION */
@@ -274,7 +277,7 @@ sock_cb( CURL * e UNUSED, curl_socket_t fd, int action,
     struct event * io_event = vevent;
     dbgmsg( "sock_cb: action %d, fd %d, io_event %p", action, (int)fd, io_event );
 
-    if( action == CURL_POLL_REMOVE )
+    if( ( action == CURL_POLL_NONE ) || ( action & CURL_POLL_REMOVE ) )
     {
         if( io_event != NULL )
         {
@@ -284,7 +287,7 @@ sock_cb( CURL * e UNUSED, curl_socket_t fd, int action,
             /*fprintf( stderr, "-1 io_events to %d\n", --num_events );*/
         }
     }
-    else if( action & ( EV_READ | EV_WRITE ) )
+    else if( action & ( CURL_POLL_IN | CURL_POLL_OUT ) )
     {
         const short events = EV_PERSIST
                            | (( action & CURL_POLL_IN ) ? EV_READ : 0 )
@@ -303,6 +306,7 @@ sock_cb( CURL * e UNUSED, curl_socket_t fd, int action,
         event_set( io_event, fd, events, event_cb, web );
         event_add( io_event, NULL );
     }
+    else tr_assert( 0, "unhandled action: %d", action );
 
     return 0; /* libcurl documentation: "The callback MUST return 0." */
 }
@@ -312,7 +316,7 @@ static void
 libevent_timer_cb( int fd UNUSED, short what UNUSED, void * g )
 {
     dbgmsg( "libevent timer is done" );
-    tr_multi_perform( g, CURL_SOCKET_TIMEOUT );
+    tr_multi_perform( g, CURL_SOCKET_TIMEOUT, 0 );
 }
 
 /* libcurl documentation: "If 0, it means you should proceed immediately
@@ -327,7 +331,7 @@ multi_timer_cb( CURLM * multi UNUSED, long timer_msec, void * vg )
     g->timer_msec = timer_msec > 0 ? timer_msec : DEFAULT_TIMER_MSEC;
 
     if( timer_msec < 1 )
-        tr_multi_perform( g, CURL_SOCKET_TIMEOUT );
+        tr_multi_perform( g, CURL_SOCKET_TIMEOUT, 0 );
 }
 
 /****
