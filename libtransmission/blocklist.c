@@ -212,7 +212,8 @@ _tr_blocklistHasAddress( tr_blocklist     * b,
         return 0;
 
     blocklistEnsureLoaded( b );
-    if( !b->rules )
+
+    if( !b->rules || !b->ruleCount )
         return 0;
 
     needle = ntohl( addr->addr.addr4.s_addr );
