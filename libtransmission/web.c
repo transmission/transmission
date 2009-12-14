@@ -26,8 +26,6 @@ enum
     DEFAULT_TIMER_MSEC = 1500 /* arbitrary */
 };
 
-static tr_bool tr_multi_perform( tr_web * g, int fd );
-
 #if 0
 #define dbgmsg(...) \
     do { \
@@ -45,17 +43,17 @@ static tr_bool tr_multi_perform( tr_web * g, int fd );
 struct tr_web
 {
     tr_bool closing;
+    tr_bool haveAddr;
     int taskCount;
     long timer_msec;
     CURLM * multi;
     tr_session * session;
-    tr_bool haveAddr;
     tr_address addr;
     struct event timer_event;
 };
 
 static void
-web_close( tr_web * g )
+web_free( tr_web * g )
 {
     curl_multi_cleanup( g->multi );
     evtimer_del( &g->timer_event );
@@ -193,7 +191,6 @@ addTask( void * vtask )
 
         mcode = curl_multi_add_handle( web->multi, e );
         ++web->taskCount;
-        /*tr_multi_perform( web, CURL_SOCKET_TIMEOUT );*/
     }
 }
 
@@ -243,27 +240,24 @@ restart_timer( tr_web * g )
     tr_timerAddMsec( &g->timer_event, g->timer_msec );
 }
 
-static tr_bool
+static void
 tr_multi_perform( tr_web * g, int fd )
 {
     CURLMcode mcode;
-    tr_bool closed = FALSE;
 
     dbgmsg( "check_run_count: %d taskCount", g->taskCount );
 
     /* invoke libcurl's processing */
-    do {
+    do
         mcode = curl_multi_socket_action( g->multi, fd, 0, &g->taskCount );
-    } while( mcode == CURLM_CALL_MULTI_SOCKET );
+    while( mcode == CURLM_CALL_MULTI_SOCKET );
 
     remove_finished_tasks( g );
 
-    if(( closed = g->closing && !g->taskCount ))
-        web_close( g );
+    if( g->closing && !g->taskCount )
+        web_free( g );
     else
         restart_timer( g );
-
-    return closed;
 }
 
 /* libevent says that sock is ready to be processed, so wake up libcurl */
@@ -275,14 +269,13 @@ event_cb( int fd, short kind UNUSED, void * g )
 
 /* CURLMOPT_SOCKETFUNCTION */
 static int
-sock_cb( CURL * easy UNUSED, curl_socket_t fd, int action,
+sock_cb( CURL * e UNUSED, curl_socket_t fd, int action,
          void * vweb, void * vevent )
 {
     /*static int num_events = 0;*/
     struct tr_web * web = vweb;
     struct event * io_event = vevent;
-    dbgmsg( "sock_cb: action is %d, fd is %d, io_event is %p",
-            action, (int)fd, io_event );
+    dbgmsg( "sock_cb: action %d, fd %d, io_event %p", action, (int)fd, io_event );
 
     if( action == CURL_POLL_REMOVE )
     {
@@ -333,18 +326,11 @@ static void
 multi_timer_cb( CURLM * multi UNUSED, long timer_msec, void * vg )
 {
     tr_web * g = vg;
-    tr_bool closed = FALSE;
 
-    if( timer_msec < 1 ) {
-        if( timer_msec == 0 ) /* call it immediately */
-            closed = tr_multi_perform( g, CURL_SOCKET_TIMEOUT );
-        timer_msec = DEFAULT_TIMER_MSEC;
-    }
+    g->timer_msec = timer_msec > 0 ? timer_msec : DEFAULT_TIMER_MSEC;
 
-    if( !closed ) {
-        g->timer_msec = timer_msec;
-        restart_timer( g );
-    }
+    if( timer_msec < 1 )
+        tr_multi_perform( g, CURL_SOCKET_TIMEOUT );
 }
 
 /****
@@ -369,7 +355,6 @@ tr_webRun( tr_session         * session,
         task->done_func_user_data = done_func_user_data;
         task->tag = ++tag;
         task->response = evbuffer_new( );
-
         tr_runInEventThread( session, addTask, task );
     }
 }
@@ -411,7 +396,7 @@ tr_webClose( tr_web ** web_in )
     tr_web * web = *web_in;
     *web_in = NULL;
     if( web->taskCount < 1 )
-        web_close( web );
+        web_free( web );
     else
         web->closing = 1;
 }
@@ -472,7 +457,8 @@ tr_webGetResponseStr( long code )
 }
 
 void
-tr_http_escape( struct evbuffer  * out, const char * str, int len, tr_bool escape_slashes )
+tr_http_escape( struct evbuffer  * out,
+                const char * str, int len, tr_bool escape_slashes )
 {
     int i;
 
