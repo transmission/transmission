@@ -612,7 +612,7 @@ gtr_label_set_text( GtkLabel * lb, const char * newstr )
 {
     const char * oldstr = gtk_label_get_text( lb );
 
-    if( strcmp( oldstr, newstr ) )
+    if( ( oldstr == NULL ) || strcmp( oldstr, newstr ) )
         gtk_label_set_text( lb, newstr );
 }
 
