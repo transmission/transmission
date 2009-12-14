@@ -95,7 +95,7 @@ typedef struct
     GtkWidget *           dl_lb;
     GtkWidget *           stats_lb;
     GtkWidget *           gutter_lb;
-    GtkWidget *           alt_speed_image[2]; /* 0==off, 1==on */
+    GtkWidget *           alt_speed_image;
     GtkWidget *           alt_speed_button;
     GtkWidget *           options_menu;
     GtkTreeSelection *    selection;
@@ -284,10 +284,7 @@ static void
 privateFree( gpointer vprivate )
 {
     PrivateData * p = vprivate;
-
     g_signal_handler_disconnect( p->core, p->pref_handler_id );
-    g_object_unref( G_OBJECT( p->alt_speed_image[1] ) );
-    g_object_unref( G_OBJECT( p->alt_speed_image[0] ) );
     g_free( p->filter_text );
     g_free( p );
 }
@@ -335,6 +332,7 @@ syncAltSpeedButton( PrivateData * p )
     char * str;
     const char * fmt;
     const gboolean b = pref_flag_get( TR_PREFS_KEY_ALT_SPEED_ENABLED );
+    const char * stock = b ? "alt-speed-on" : "alt-speed-off";
     GtkWidget * w = p->alt_speed_button;
 
     tr_strlspeed( u, pref_int_get( TR_PREFS_KEY_ALT_SPEED_UP ), sizeof( u ) );
@@ -344,7 +342,7 @@ syncAltSpeedButton( PrivateData * p )
     str = g_strdup_printf( fmt, d, u );
 
     gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( w ), b );
-    gtk_button_set_image( GTK_BUTTON( w ), p->alt_speed_image[b?1:0] );
+    gtk_image_set_from_stock( GTK_IMAGE( p->alt_speed_image ), stock, -1 );
     gtk_button_set_alignment( GTK_BUTTON( w ), 0.5, 0.5 );
     gtr_widget_set_tooltip_text( w, str );
 
@@ -959,13 +957,10 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
         p->options_menu = createOptionsMenu( p );
         g_signal_connect( w, "clicked", G_CALLBACK(onOptionsClicked), p );
 
-        p->alt_speed_image[0] = gtk_image_new_from_stock( "alt-speed-off", -1 );
-        p->alt_speed_image[1] = gtk_image_new_from_stock( "alt-speed-on", -1 );
+        p->alt_speed_image = gtk_image_new( );
         w = p->alt_speed_button = gtk_toggle_button_new( );
+        gtk_button_set_image( GTK_BUTTON( w ), p->alt_speed_image );
         gtk_button_set_relief( GTK_BUTTON( w ), GTK_RELIEF_NONE );
-        g_object_ref( G_OBJECT( p->alt_speed_image[0] ) );
-        g_object_ref( G_OBJECT( p->alt_speed_image[1] ) );
-        gtk_container_add( GTK_CONTAINER( w ), p->alt_speed_image[0] );
         g_signal_connect( w, "toggled", G_CALLBACK(alt_speed_toggled_cb ), p );
         gtk_box_pack_start( GTK_BOX( h ), w, 0, 0, 0 );
 
