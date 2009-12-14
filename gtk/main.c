@@ -1604,6 +1604,7 @@ doAction( const char * action_name, gpointer user_data )
             g_object_weak_ref( G_OBJECT( w ), detailsClosed, data );
         }
         gtk_window_present( GTK_WINDOW( w ) );
+        g_slist_free( ids );
     }
     else if( !strcmp( action_name, "update-tracker" ) )
     {
