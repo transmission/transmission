@@ -594,18 +594,6 @@ tr_globalIPv6( void )
 ***/
 
 static tr_bool
-isMulticastAddress( const tr_address * addr )
-{
-    if( addr->type == TR_AF_INET && IN_MULTICAST( htonl( addr->addr.addr4.s_addr ) ) )
-        return TRUE;
-
-    if( addr->type == TR_AF_INET6 && ( addr->addr.addr6.s6_addr[0] == 0xff ) )
-        return TRUE;
-
-    return FALSE;
-}
-
-static tr_bool
 isIPv4MappedAddress( const tr_address * addr )
 {
     return ( addr->type == TR_AF_INET6 ) && IN6_IS_ADDR_V4MAPPED( &addr->addr.addr6 );
@@ -623,8 +611,6 @@ isIPv6LinkLocalAddress( const tr_address * addr )
 static tr_bool
 isMartianAddr( const struct tr_address * a )
 {
-    static const unsigned char v4prefix[16] =
-        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xFF, 0xFF, 0, 0, 0, 0 };
     static const unsigned char zeroes[16] =
         { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
@@ -643,9 +629,8 @@ isMartianAddr( const struct tr_address * a )
         case TR_AF_INET6: {
             const unsigned char * address = (const unsigned char*)&a->addr.addr6;
             return (address[0] == 0xFF) ||
-                   (address[0] == 0xFE && (address[1] & 0xC0) == 0x80) ||
-                   (memcmp(address, zeroes, 15) == 0 && (address[15] == 0 || address[15] == 1)) ||
-                   (memcmp(address, v4prefix, 12) == 0);
+                   (memcmp(address, zeroes, 15) == 0 &&
+                    (address[15] == 0 || address[15] == 1));
             break;
         }
 
@@ -659,7 +644,6 @@ tr_isValidPeerAddress( const tr_address * addr, tr_port port )
 {
     return ( port != 0 )
         && ( tr_isAddress( addr ) )
-        && ( !isMulticastAddress( addr ) )
         && ( !isIPv6LinkLocalAddress( addr ) )
         && ( !isIPv4MappedAddress( addr ) )
         && ( !isMartianAddr( addr ) );
