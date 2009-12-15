@@ -1,10 +1,10 @@
 === Transmission 1.80 (In Development) ===
 [http://trac.transmissionbt.com/query?milestone=1.80&group=component&groupdesc=1&order=severity All tickets closed by this release]
 
-=== Transmission 1.80 beta 3 (2009/12/DD) ===
+=== Transmission 1.80 beta 3 (2009/12/14) ===
 ==== All Platforms ====
   * Tracker announcement improvements
-  * Encrypted handshakes to other peers now use less CPU
+  * Encrypted handshakes to peers now use less CPU
   * Filter out spurious IP addresses obtained through LTEP
   * Fix 1.80 beta 1 bug that incorrectly displayed some scrapes as failed
   * Fix minor memory leaks
