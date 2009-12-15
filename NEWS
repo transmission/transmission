@@ -19,7 +19,7 @@
   * Fix 1.80 beta 1 crash in the torrent properties dialog
 ==== Web Client ====
   * Ensure the context menu goes away when clicking on torrents
-  * Fix bug where the context menu could scroll past the window's bottom
+  * Fix bug where the context menu could extend past the window's right or bottom edge
 
 === Transmission 1.80 beta 2 (2009/12/10) ===
 ==== All Platforms ====
