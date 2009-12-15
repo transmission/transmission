@@ -657,6 +657,9 @@ requestListAdd( Torrent * t, const time_t now, tr_block_index_t block, tr_peer *
             break;
         }
     }
+    /*fprintf( stderr, "added request of block %lu from peer %p... "
+                       "there are now %d block\n",
+                       (unsigned long)block, peer, t->requestCount );*/
 }
 
 static struct block_request *
@@ -673,6 +676,7 @@ requestListLookup( Torrent * t, tr_block_index_t block, const tr_peer * peer )
                     compareReqByBlock );
 }
 
+/* how many peers are we currently requesting this block from... */
 static int
 countBlockRequests( Torrent * t, tr_block_index_t block )
 {
@@ -711,6 +715,9 @@ requestListRemove( Torrent * t, tr_block_index_t block, const tr_peer * peer )
         memmove( t->requests + pos,
                  t->requests + pos + 1,
                  sizeof( struct block_request ) * ( --t->requestCount - pos ) );
+        /*fprintf( stderr, "removing request of block %lu from peer %p... "
+                           "there are now %d block requests left\n",
+                           (unsigned long)block, peer, t->requestCount );*/
     }
 }
 
@@ -806,6 +813,7 @@ pieceListSort( Torrent * t, int mode )
         }
 
         t->isInEndgame = endgame;
+        /*if( t->isInEndgame ) fprintf( stderr, "ENDGAME reached\n" );*/
     }
 }
 
@@ -985,7 +993,7 @@ tr_peerMgrGetNextRequests( tr_torrent           * tor,
                     continue;
 
                 /* don't send the same request to any peer too many times */
-                if( countBlockRequests( t, b ) > maxDuplicatesPerBlock )
+                if( countBlockRequests( t, b ) >= maxDuplicatesPerBlock )
                     continue;
 
                 /* update the caller's table */
