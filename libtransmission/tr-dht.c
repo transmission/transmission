@@ -319,9 +319,17 @@ tr_dhtInit(tr_session *ss, const tr_address * tr_addr)
         goto fail;
 
     if(tr_globalIPv6()) {
+        int one = 1;
         dht6_socket = socket(PF_INET6, SOCK_DGRAM, 0);
         if(dht6_socket < 0)
             goto fail;
+
+#ifdef IPV6_V6ONLY
+        /* Since we always open an IPv4 socket on the same port, this
+           shouldn't matter.  But I'm superstitious. */
+        setsockopt(dht6_socket, IPPROTO_IPV6, IPV6_V6ONLY,
+                   &one, sizeof(one));
+#endif
 
         rebind_ipv6(1);
 
