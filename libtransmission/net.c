@@ -240,57 +240,11 @@ setup_sockaddr( const tr_address        * addr,
     }
 }
 
-static tr_bool
-isMulticastAddress( const tr_address * addr )
-{
-    if( addr->type == TR_AF_INET && IN_MULTICAST( htonl( addr->addr.addr4.s_addr ) ) )
-        return TRUE;
-
-    if( addr->type == TR_AF_INET6 && ( addr->addr.addr6.s6_addr[0] == 0xff ) )
-        return TRUE;
-
-    return FALSE;
-}
-
-static TR_INLINE tr_bool
-isIPv4MappedOrCompatAddress( const tr_address * addr )
-{
-    if( addr->type == TR_AF_INET6 )
-    {
-        if( IN6_IS_ADDR_V4MAPPED( &addr->addr.addr6 ) ||
-            IN6_IS_ADDR_V4COMPAT( &addr->addr.addr6 ) )
-            return TRUE;
-    }
-    return FALSE;
-}
-
-static TR_INLINE tr_bool
-isIPv6LinkLocalAddress( const tr_address * addr )
-{
-    if( addr->type == TR_AF_INET6 &&
-        IN6_IS_ADDR_LINKLOCAL( &addr->addr.addr6 ) )
-        return TRUE;
-    return FALSE;
-}
-
-tr_bool
-tr_isValidPeerAddress( const tr_address * addr, tr_port port )
-{
-    if( isMulticastAddress( addr ) || isIPv6LinkLocalAddress( addr ) ||
-        isIPv4MappedOrCompatAddress( addr ) )
-        return FALSE;
-
-    if( port == 0 )
-        return FALSE;
-
-    return TRUE;
-}
-
 int
-tr_netOpenTCP( tr_session        * session,
-               const tr_address  * addr,
-               tr_port             port,
-               tr_bool             isSeed )
+tr_netOpenPeerSocket( tr_session        * session,
+                      const tr_address  * addr,
+                      tr_port             port,
+                      tr_bool             clientIsSeed )
 {
     static const int domains[NUM_TR_AF_INET_TYPES] = { AF_INET, AF_INET6 };
     int                     s;
@@ -302,7 +256,7 @@ tr_netOpenTCP( tr_session        * session,
 
     assert( tr_isAddress( addr ) );
 
-    if( isMulticastAddress( addr ) || isIPv6LinkLocalAddress( addr ) )
+    if( !tr_isValidPeerAddress( addr, port ) )
         return -EINVAL;
 
     s = tr_fdSocketCreate( session, domains[addr->type], SOCK_STREAM );
@@ -310,7 +264,7 @@ tr_netOpenTCP( tr_session        * session,
         return -1;
 
     /* seeds don't need much of a read buffer... */
-    if( isSeed ) {
+    if( clientIsSeed ) {
         int n = 8192;
         if( setsockopt( s, SOL_SOCKET, SO_RCVBUF, &n, sizeof(n) ) )
             tr_inf( "Unable to set SO_RCVBUF on socket %d: %s", s, tr_strerror( sockerrno ) );
@@ -634,28 +588,81 @@ tr_globalIPv6( void )
     return have_ipv6 ? ipv6 : NULL;
 }
 
-int
-tr_isMartian( int af, const unsigned char * address )
+/***
+****
+****
+***/
+
+static tr_bool
+isMulticastAddress( const tr_address * addr )
+{
+    if( addr->type == TR_AF_INET && IN_MULTICAST( htonl( addr->addr.addr4.s_addr ) ) )
+        return TRUE;
+
+    if( addr->type == TR_AF_INET6 && ( addr->addr.addr6.s6_addr[0] == 0xff ) )
+        return TRUE;
+
+    return FALSE;
+}
+
+static tr_bool
+isIPv4MappedOrCompatAddress( const tr_address * addr )
+{
+    return ( ( addr->type == TR_AF_INET6 )
+                  && ( IN6_IS_ADDR_V4MAPPED( &addr->addr.addr6 )
+                        || IN6_IS_ADDR_V4COMPAT( &addr->addr.addr6 ) ) );
+}
+
+static tr_bool
+isIPv6LinkLocalAddress( const tr_address * addr )
+{
+    return ( ( addr->type == TR_AF_INET6 )
+                  && IN6_IS_ADDR_LINKLOCAL( &addr->addr.addr6 ) );
+}
+
+/* isMartianAddr was written by Juliusz Chroboczek,
+   and is covered under the same license as third-party/dht/dht.c. */
+static tr_bool
+isMartianAddr( const struct tr_address * a )
 {
     static const unsigned char v4prefix[16] =
         { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xFF, 0xFF, 0, 0, 0, 0 };
     static const unsigned char zeroes[16] =
         { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-    switch( af )
+    assert( tr_isAddress( a ) );
+
+    switch( a->type )
     {
-        case AF_INET:
+        case TR_AF_INET: {
+            const unsigned char * address = (const unsigned char*)&a->addr.addr4;
             return (address[0] == 0) ||
                    (address[0] == 127) ||
                    ((address[0] & 0xE0) == 0xE0);
+            break;
+        }
 
-        case AF_INET6:
+        case TR_AF_INET6: {
+            const unsigned char * address = (const unsigned char*)&a->addr.addr6;
             return (address[0] == 0xFF) ||
                    (address[0] == 0xFE && (address[1] & 0xC0) == 0x80) ||
                    (memcmp(address, zeroes, 15) == 0 && (address[15] == 0 || address[15] == 1)) ||
                    (memcmp(address, v4prefix, 12) == 0);
+            break;
+        }
 
         default:
-            return FALSE;
+            return TRUE;
     }
+}
+
+tr_bool
+tr_isValidPeerAddress( const tr_address * addr, tr_port port )
+{
+    return ( port != 0 )
+        && ( tr_isAddress( addr ) )
+        && ( !isMulticastAddress( addr ) )
+        && ( !isIPv6LinkLocalAddress( addr ) )
+        && ( !isIPv4MappedOrCompatAddress( addr ) )
+        && ( !isMartianAddr( addr ) );
 }

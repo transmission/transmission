@@ -982,8 +982,7 @@ parseLtepHandshake( tr_peermsgs *     msgs,
 
     if( tr_peerIoIsIncoming( msgs->peer->io )
         && tr_bencDictFindRaw( &val, "ipv4", &addr, &addr_len )
-        && ( addr_len == 4 )
-        && ( !tr_isMartian( AF_INET, addr ) ) )
+        && ( addr_len == 4 ) )
     {
         pex.addr.type = TR_AF_INET;
         memcpy( &pex.addr.addr.addr4, addr, 4 );
@@ -992,8 +991,7 @@ parseLtepHandshake( tr_peermsgs *     msgs,
 
     if( tr_peerIoIsIncoming( msgs->peer->io )
         && tr_bencDictFindRaw( &val, "ipv6", &addr, &addr_len )
-        && ( addr_len == 16 )
-        && ( !tr_isMartian( AF_INET6, addr ) ) )
+        && ( addr_len == 16 ) )
     {
         pex.addr.type = TR_AF_INET6;
         memcpy( &pex.addr.addr.addr6, addr, 16 );

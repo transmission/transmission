@@ -98,10 +98,10 @@ tr_bool tr_net_hasIPv6( tr_port );
 /***********************************************************************
  * Sockets
  **********************************************************************/
-int  tr_netOpenTCP( tr_session       * session,
-                    const tr_address * addr,
-                    tr_port            port,
-                    tr_bool            isSeed );
+int  tr_netOpenPeerSocket( tr_session       * session,
+                           const tr_address * addr,
+                           tr_port            port,
+                           tr_bool            clientIsSeed );
 
 int  tr_netBindTCP( const tr_address * addr,
                     tr_port            port,
@@ -124,8 +124,6 @@ void tr_netInit( void );
 int tr_globalAddress(int af, void *addr, int *addr_len);
 
 const unsigned char *tr_globalIPv6( void );
-
-int tr_isMartian( int af, const unsigned char * address );
 
 
 #endif /* _TR_NET_H_ */
