@@ -20,11 +20,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#define TR_DHT_STOPPED 0
-#define TR_DHT_BROKEN 1
-#define TR_DHT_POOR 2
-#define TR_DHT_FIREWALLED 3
-#define TR_DHT_GOOD 4
+#ifndef __TRANSMISSION__
+ #error only libtransmission should #include this header.
+#endif
+
+enum
+{
+    TR_DHT_STOPPED      = 0,
+    TR_DHT_BROKEN       = 1,
+    TR_DHT_POOR         = 2,
+    TR_DHT_FIREWALLED   = 3,
+    TR_DHT_GOOD         = 4
+};
 
 int  tr_dhtInit( tr_session *, const tr_address * );
 void tr_dhtUninit( tr_session * );

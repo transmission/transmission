@@ -10,10 +10,16 @@
  * $Id$
  */
 
+#ifndef __TRANSMISSION__
+ #error only libtransmission should #include this header.
+#endif
+
+#ifndef TR_CLIENTS_H
+#define TR_CLIENTS_H
+
 /**
  * @ingroup utils
  */
-void tr_clientForId( char       * buf,
-                     size_t       buflen,
-                     const void * peer_id );
+void tr_clientForId( char * buf, size_t buflen, const void * peer_id );
 
+#endif

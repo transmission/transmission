@@ -36,7 +36,6 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/bencode.h>
-#include <libtransmission/platform.h>
 
 #include "conf.h"
 #include "tr-prefs.h"

@@ -13,6 +13,10 @@
 #ifndef TR_PLATFORM_H
 #define TR_PLATFORM_H
 
+#ifndef __TRANSMISSION__
+ #error only libtransmission should #include this header.
+#endif
+
 #if defined( WIN32 )
  #define TR_PATH_DELIMITER '\\'
  #define TR_PATH_DELIMITER_STR "\\"
