@@ -566,8 +566,15 @@ compareReqByBlock( const void * va, const void * vb )
 {
     const struct block_request * a = va;
     const struct block_request * b = vb;
+
+    /* primary key: block */
     if( a->block < b->block ) return -1;
     if( a->block > b->block ) return 1;
+
+    /* secondary key: peer */
+    if( a->peer < b->peer ) return -1;
+    if( a->peer > b->peer ) return 1;
+
     return 0;
 }
 
@@ -576,8 +583,15 @@ compareReqByTime( const void * va, const void * vb )
 {
     const struct block_request * a = va;
     const struct block_request * b = vb;
+
+    /* primary key: time */
     if( a->sentAt < b->sentAt ) return -1;
     if( a->sentAt > b->sentAt ) return 1;
+
+    /* secondary key: peer */
+    if( a->peer < b->peer ) return -1;
+    if( a->peer > b->peer ) return 1;
+
     return 0;
 }
 
@@ -646,10 +660,11 @@ requestListAdd( Torrent * t, const time_t now, tr_block_index_t block, tr_peer *
 }
 
 static struct block_request *
-requestListLookup( Torrent * t, tr_block_index_t block )
+requestListLookup( Torrent * t, tr_block_index_t block, const tr_peer * peer )
 {
     struct block_request key;
     key.block = block;
+    key.peer = (tr_peer*) peer;
 
     requestListSort( t, REQ_SORTED_BY_BLOCK );
 
@@ -658,10 +673,37 @@ requestListLookup( Torrent * t, tr_block_index_t block )
                     compareReqByBlock );
 }
 
-static void
-requestListRemove( Torrent * t, tr_block_index_t block )
+static int
+countBlockRequests( Torrent * t, tr_block_index_t block )
 {
-    const struct block_request * b = requestListLookup( t, block );
+    tr_bool exact;
+    int i, n, pos;
+    struct block_request key;
+
+    requestListSort( t, REQ_SORTED_BY_BLOCK );
+    key.block = block;
+    key.peer = NULL;
+    pos = tr_lowerBound( &key, t->requests, t->requestCount,
+                         sizeof( struct block_request ),
+                         compareReqByBlock, &exact );
+
+    assert( !exact ); /* shouldn't have a request with .peer == NULL */
+
+    n = 0;
+    for( i=pos; i<t->requestCount; ++i ) {
+        if( t->requests[i].block == block )
+            ++n;
+        else
+            break;
+    }
+
+    return n;
+}
+
+static void
+requestListRemove( Torrent * t, tr_block_index_t block, const tr_peer * peer )
+{
+    const struct block_request * b = requestListLookup( t, block, peer );
     if( b != NULL )
     {
         const int pos = b - t->requests;
@@ -920,6 +962,11 @@ tr_peerMgrGetNextRequests( tr_torrent           * tor,
     for( i=0; i<t->pieceCount && got<numwant; ++i )
     {
         struct weighted_piece * p = pieces + i;
+        const int missing = tr_cpMissingBlocksInPiece( &tor->completion, p->index );
+        const int maxDuplicatesPerBlock = t->isInEndgame ? 3 : 1;
+
+        if( p->requestCount > ( missing * maxDuplicatesPerBlock ) )
+            continue;
 
         /* if the peer has this piece that we want... */
         if( tr_bitsetHasFast( have, p->index ) )
@@ -929,32 +976,30 @@ tr_peerMgrGetNextRequests( tr_torrent           * tor,
 
             for( ; b!=e && got<numwant; ++b )
             {
-                struct block_request * breq;
-
                 /* don't request blocks we've already got */
                 if( tr_cpBlockIsCompleteFast( &tor->completion, b ) )
                     continue;
 
-                /* don't request blocks we've already requested (FIXME) */
-                breq = requestListLookup( t, b );
-                if( breq != NULL ) {
-                    assert( breq->peer != NULL );
-                    if( breq->peer == peer ) continue;
-                    if( !t->isInEndgame ) continue;
-                }
+                /* don't send the same request to the same peer twice */
+                if( tr_peerMgrDidPeerRequest( tor, peer, b ) )
+                    continue;
 
+                /* don't send the same request to any peer too many times */
+                if( countBlockRequests( t, b ) > maxDuplicatesPerBlock )
+                    continue;
+
+                /* update the caller's table */
                 setme[got++] = b;
 
                 /* update our own tables */
-                if( breq == NULL )
-                    requestListAdd( t, now, b, peer );
+                requestListAdd( t, now, b, peer );
                 ++p->requestCount;
             }
         }
     }
 
     /* In most cases we've just changed the weights of a small number of pieces.
-     * So rather than qsort()ing the entire array, it's faster to sort just the
+     * So rather than qsort()ing the entire array, it's faster to sort only the
      * changed ones, then do a standard merge-two-sorted-arrays pass on the
      * changed and unchanged pieces. */
     if( got > 0 )
@@ -1001,11 +1046,7 @@ tr_peerMgrDidPeerRequest( const tr_torrent  * tor,
                           tr_block_index_t    block )
 {
     const Torrent * t = tor->torrentPeers;
-    const struct block_request * b = requestListLookup( (Torrent*)t, block );
-    if( b == NULL ) return FALSE;
-    if( b->peer == peer ) return TRUE;
-    if( t->isInEndgame ) return TRUE;
-    return FALSE;
+    return requestListLookup( (Torrent*)t, block, peer ) != NULL;
 }
 
 /* cancel requests that are too old */
@@ -1151,9 +1192,9 @@ clientGotUnwantedBlock( tr_torrent * tor, tr_block_index_t block )
 }
 
 static void
-removeRequestFromTables( Torrent * t, tr_block_index_t block )
+removeRequestFromTables( Torrent * t, tr_block_index_t block, const tr_peer * peer )
 {
-    requestListRemove( t, block );
+    requestListRemove( t, block, peer );
     pieceListRemoveRequest( t, block );
 }
 
@@ -1170,7 +1211,7 @@ peerDeclinedAllRequests( Torrent * t, const tr_peer * peer )
             blocks[n++] = t->requests[i].block;
 
     for( i=0; i<n; ++i )
-        removeRequestFromTables( t, blocks[i] );
+        removeRequestFromTables( t, blocks[i], peer );
 
     tr_free( blocks );
 }
@@ -1225,7 +1266,7 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
         }
 
         case TR_PEER_CLIENT_GOT_REJ:
-            removeRequestFromTables( t, _tr_block( t->tor, e->pieceIndex, e->offset ) );
+            removeRequestFromTables( t, _tr_block( t->tor, e->pieceIndex, e->offset ), peer );
             break;
 
         case TR_PEER_CLIENT_GOT_CHOKE:
@@ -1295,7 +1336,7 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
             tr_torrent * tor = t->tor;
             tr_block_index_t block = _tr_block( tor, e->pieceIndex, e->offset );
 
-            requestListRemove( t, block );
+            requestListRemove( t, block, peer );
             pieceListRemoveRequest( t, block );
 
             if( tr_cpBlockIsComplete( &tor->completion, block ) )
