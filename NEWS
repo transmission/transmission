@@ -2,8 +2,21 @@
 [http://trac.transmissionbt.com/query?milestone=1.80&group=component&groupdesc=1&order=severity All tickets closed by this release]
 
 === Transmission 1.80 beta 3 (2009/12/DD) ===
+==== All Platforms ====
+  * Tracker announcement improvements
+  * Encrypted handshakes to other peers now use less CPU
+  * Filter out spurious IP addresses obtained through LTEP
+  * Fix 1.80 beta 1 bug that incorrectly displayed some scrapes as failed
+  * Fix minor memory leaks
 ==== Mac ====
+  * livings do you want to describe the dock/favicons/mesage-log/peer inspector changes here
+  * Fix 1.80 beta 1 crash while removing data files
   * German localization
+  * Portuguese localization
+==== GTK+ ====
+  * Fix 1.80 beta 1 crash in the torrent properties dialog
+==== Web Client ====
+  * Make sure the context menu goes away when you click on torrents
 
 === Transmission 1.80 beta 2 (2009/12/10) ===
 ==== All Platforms ====
