@@ -1714,7 +1714,7 @@ updateDesiredRequestCount( tr_peermsgs * msgs, uint64_t now )
         int irate;
         int estimatedBlocksInPeriod;
         double rate;
-        const int floor = 16;
+        const int floor = 4;
         const int seconds = REQUEST_BUF_SECS;
 
         /* Get the rate limit we should use.
