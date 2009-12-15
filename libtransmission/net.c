@@ -606,11 +606,9 @@ isMulticastAddress( const tr_address * addr )
 }
 
 static tr_bool
-isIPv4MappedOrCompatAddress( const tr_address * addr )
+isIPv4MappedAddress( const tr_address * addr )
 {
-    return ( ( addr->type == TR_AF_INET6 )
-                  && ( IN6_IS_ADDR_V4MAPPED( &addr->addr.addr6 )
-                        || IN6_IS_ADDR_V4COMPAT( &addr->addr.addr6 ) ) );
+    return ( addr->type == TR_AF_INET6 ) && IN6_IS_ADDR_V4MAPPED( &addr->addr.addr6 );
 }
 
 static tr_bool
@@ -663,6 +661,6 @@ tr_isValidPeerAddress( const tr_address * addr, tr_port port )
         && ( tr_isAddress( addr ) )
         && ( !isMulticastAddress( addr ) )
         && ( !isIPv6LinkLocalAddress( addr ) )
-        && ( !isIPv4MappedOrCompatAddress( addr ) )
+        && ( !isIPv4MappedAddress( addr ) )
         && ( !isMartianAddr( addr ) );
 }
