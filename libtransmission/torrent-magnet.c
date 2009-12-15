@@ -207,8 +207,8 @@ tr_torrentSetMetadataPiece( tr_torrent  * tor,
             {
                 if( tr_metainfoParse( tor->session,
                                       &tor->info,
-                                      &tor->infoDictLength,
                                       &tor->infoDictOffset,
+                                      &tor->infoDictLength,
                                       &dict ) )
                 {
                     const char * path = tor->info.torrent;

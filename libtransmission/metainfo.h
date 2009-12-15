@@ -24,8 +24,8 @@ struct tr_magnet_info;
 
 tr_bool  tr_metainfoParse( const tr_session     * session,
                            tr_info              * setmeInfo,
-                           int                  * setmeInfoDictLength,
                            int                  * setmeInfoDictOffset,
+                           int                  * setmeInfoDictLength,
                            const struct tr_benc * benc );
 
 void tr_metainfoRemoveSaved( const tr_session * session,
