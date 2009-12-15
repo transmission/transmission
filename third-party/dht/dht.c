@@ -224,6 +224,9 @@ static const unsigned char ones[20] = {
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
     0xFF, 0xFF, 0xFF, 0xFF
 };
+static const unsigned char v4prefix[16] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xFF, 0xFF, 0, 0, 0, 0
+};
 
 static int dht_socket = -1;
 static int dht_socket6 = -1;
@@ -295,6 +298,34 @@ print_hex(FILE *f, const unsigned char *buf, int buflen)
     int i;
     for(i = 0; i < buflen; i++)
         fprintf(f, "%02x", buf[i]);
+}
+
+static int
+is_martian(struct sockaddr *sa)
+{
+    switch(sa->sa_family) {
+    case AF_INET: {
+        struct sockaddr_in *sin = (struct sockaddr_in*)sa;
+        const unsigned char *address = (const unsigned char*)&sin->sin_addr;
+        return sin->sin_port == 0 ||
+            (address[0] == 0) ||
+            (address[0] == 127) ||
+            ((address[0] & 0xE0) == 0xE0);
+    }
+    case AF_INET6: {
+        struct sockaddr_in6 *sin6 = (struct sockaddr_in6*)sa;
+        const unsigned char *address = (const unsigned char*)&sin6->sin6_addr;
+        return sin6->sin6_port == 0 ||
+            (address[0] == 0xFF) ||
+            (address[0] == 0xFE && (address[1] & 0xC0) == 0x80) ||
+            (memcmp(address, zeroes, 15) == 0 &&
+             (address[15] == 0 || address[15] == 1)) ||
+            (memcmp(address, v4prefix, 12) == 0);
+    }
+
+    default:
+        return 0;
+    }
 }
 
 /* Forget about the ``XOR-metric''.  An id is just a path from the
@@ -620,6 +651,9 @@ new_node(const unsigned char *id, struct sockaddr *sa, int salen, int confirm)
     if(id_cmp(id, myid) == 0)
         return NULL;
 
+    if(is_martian(sa))
+        return NULL;
+
     mybucket = in_bucket(myid, b);
 
     if(confirm == 2)
@@ -644,7 +678,16 @@ new_node(const unsigned char *id, struct sockaddr *sa, int salen, int confirm)
         n = n->next;
     }
 
-    /* New node.  First, try to get rid of a known-bad node. */
+    /* New node. */
+
+    if(mybucket) {
+        if(sa->sa_family == AF_INET)
+            mybucket_grow_time = now.tv_sec;
+        else
+            mybucket6_grow_time = now.tv_sec;
+    }
+
+    /* First, try to get rid of a known-bad node. */
     n = b->nodes;
     while(n) {
         if(n->pinged >= 3 && n->pinged_time < now.tv_sec - 15) {
@@ -654,12 +697,6 @@ new_node(const unsigned char *id, struct sockaddr *sa, int salen, int confirm)
             n->reply_time = confirm >= 2 ? now.tv_sec : 0;
             n->pinged_time = 0;
             n->pinged = 0;
-            if(mybucket) {
-                if(sa->sa_family == AF_INET)
-                    mybucket_grow_time = now.tv_sec;
-                else
-                    mybucket6_grow_time = now.tv_sec;
-            }
             return n;
         }
         n = n->next;
@@ -705,10 +742,6 @@ new_node(const unsigned char *id, struct sockaddr *sa, int salen, int confirm)
         if(split) {
             debugf("Splitting.\n");
             b = split_bucket(b);
-            if(sa->sa_family == AF_INET)
-                mybucket_grow_time = now.tv_sec;
-            else
-                mybucket6_grow_time = now.tv_sec;
             return new_node(id, sa, salen, confirm);
         }
 
@@ -733,12 +766,6 @@ new_node(const unsigned char *id, struct sockaddr *sa, int salen, int confirm)
     n->next = b->nodes;
     b->nodes = n;
     b->count++;
-    if(mybucket) {
-        if(sa->sa_family == AF_INET)
-            mybucket_grow_time = now.tv_sec;
-        else
-            mybucket6_grow_time = now.tv_sec;
-    }
     return n;
 }
 
@@ -1652,7 +1679,7 @@ neighbourhood_maintenance(int af)
     struct node *n;
 
     if(b == NULL)
-        return -1;
+        return 0;
 
     memcpy(id, myid, 20);
     id[19] = random() & 0xFF;
@@ -1667,6 +1694,8 @@ neighbourhood_maintenance(int af)
     }
 
     if(q) {
+        /* Since our node-id is the same in both DHTs, it's probably
+           profitable to query both families. */
         int want = dht_socket >= 0 && dht_socket6 >= 0 ? (WANT4 | WANT6) : -1;
         n = random_node(q);
         if(n) {
@@ -1679,8 +1708,9 @@ neighbourhood_maintenance(int af)
                            n->reply_time >= now.tv_sec - 15);
             pinged(n, q);
         }
+        return 1;
     }
-    return 1;
+    return 0;
 }
 
 static int
@@ -1796,6 +1826,9 @@ dht_periodic(int available, time_t *tosleep,
         }
 
         if(rc < 0 || sourcelen > sizeof(struct sockaddr_storage))
+            goto dontread;
+
+        if(is_martian(source))
             goto dontread;
 
         for(i = 0; i < DHT_MAX_BLACKLISTED; i++) {
@@ -2644,6 +2677,12 @@ parse_message(const unsigned char *buf, int buflen,
               int *want_return)
 {
     const unsigned char *p;
+
+    /* This code will happily crash if the buffer is not NUL-terminated. */
+    if(buf[buflen] != '\0') {
+        debugf("Eek!  parse_message with unterminated buffer.\n");
+        return -1;
+    }
 
 #define CHECK(ptr, len)                                                 \
     if(((unsigned char*)ptr) + (len) > (buf) + (buflen)) goto overflow;

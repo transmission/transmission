@@ -1,3 +1,8 @@
+15 December 2009: dht-0.13
+
+  * Implemented protection against incorrect addresses in the DHT.
+  * Tweaked neighborhood maintenance to wake up less often.
+
 11 December 2009: dht-0.12
   * Fixed slightly incorrect formatting of DHT messages.
   * Fixed incorrect debugging message.
