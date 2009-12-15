@@ -107,23 +107,27 @@ tr_torrentGetMetadataPiece( const tr_torrent * tor, int piece, int * len )
         FILE * fp = fopen( tor->info.torrent, "rb" );
         if( fp != NULL )
         {
-            const int offset = piece  * METADATA_PIECE_SIZE;
+            const int o = piece  * METADATA_PIECE_SIZE;
 
-            if( !fseek( fp, tor->infoDictOffset + offset, SEEK_SET ) )
+            if( !fseek( fp, tor->infoDictOffset + o, SEEK_SET ) )
             {
-                const int l = offset + METADATA_PIECE_SIZE <= tor->infoDictLength
+                const int l = o + METADATA_PIECE_SIZE <= tor->infoDictLength
                             ? METADATA_PIECE_SIZE
-                            : tor->infoDictLength - offset;
-                char * buf = tr_new( char, l );
-                const int n = fread( buf, 1, l, fp );
-                if( n != l )
-                {
-                    *len = l;
-                    ret = buf;
-                    buf = NULL;
-                }
+                            : tor->infoDictLength - o;
 
-                tr_free( buf );
+                if( 0<l && l<=METADATA_PIECE_SIZE )
+                {
+                    char * buf = tr_new( char, l );
+                    const int n = fread( buf, 1, l, fp );
+                    if( n == l )
+                    {
+                        *len = l;
+                        ret = buf;
+                        buf = NULL;
+                    }
+
+                    tr_free( buf );
+                }
             }
 
             fclose( fp );
