@@ -90,6 +90,8 @@
 
   function display(index, trigger, e, options) {
     var cur = hash[index];
+    var top = e[cur.eventPosY];
+    var left = e[cur.eventPosX];
     content = $('#'+cur.id).find('ul:first').clone(true);
     content.css(cur.menuStyle).find('li').css(cur.itemStyle).hover(
       function() {
@@ -115,7 +117,10 @@
       });
     });
 
-    menu.css({'left':e[cur.eventPosX],'top':e[cur.eventPosY]}).show();
+
+    if( top + menu.height() > $(window).height() ) top = top - menu.height();
+    if( left + menu.width() > $(window).width() ) left = left - menu.width();
+    menu.css({'left':left,'top':top}).show();
     if (cur.shadow) shadow.css({width:menu.width(),height:menu.height(),left:e.pageX+2,top:e.pageY+2}).show();
     $(document).one('click', hide);
   }
