@@ -446,6 +446,14 @@ AC_CONFIG_FILES([Makefile
                  macosx/Makefile
                  gtk/Makefile
                  gtk/icons/Makefile
+                 web/Makefile
+                 web/images/Makefile
+                 web/images/buttons/Makefile
+                 web/images/graphics/Makefile
+                 web/images/progress/Makefile
+                 web/javascript/Makefile
+                 web/javascript/jquery/Makefile
+                 web/stylesheets/Makefile
                  po/Makefile.in])
 
 ac_configure_args="$ac_configure_args --enable-static --disable-shared -q"
