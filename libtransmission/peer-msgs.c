@@ -1999,7 +1999,7 @@ peerPulse( void * vmsgs )
     const time_t  now = tr_time( );
 
     if ( tr_isPeerIo( msgs->peer->io ) ) {
-        updateDesiredRequestCount( msgs, now );
+        updateDesiredRequestCount( msgs, tr_date( ) );
         updateBlockRequests( msgs );
         updateMetadataRequests( msgs, now );
     }
