@@ -1,6 +1,6 @@
 datadir = ${datarootdir}/${PACKAGE_NAME}/${subdir}
 
-data_DATA = \
+dist_data_DATA = \
   favicon.ico \
   favicon.png \
   webclip-icon.png 

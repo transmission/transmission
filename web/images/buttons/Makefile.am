@@ -1,6 +1,6 @@
 datadir = ${datarootdir}/${PACKAGE_NAME}/${subdir}
 
-data_DATA = \
+dist_data_DATA = \
   cancel.png \
   file_priority_buttons.png \
   file_wanted_buttons.png \

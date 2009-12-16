@@ -1,6 +1,6 @@
 datadir = ${datarootdir}/${PACKAGE_NAME}/${subdir}
 
-data_DATA = \
+dist_data_DATA = \
   common.css \
   ie6.css \
   ie7.css \
