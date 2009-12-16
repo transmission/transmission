@@ -6,7 +6,11 @@
   * Tracker announcement improvements
   * Encrypted handshakes to peers now use less CPU
   * Filter out spurious IP addresses obtained through LTEP
+  * Fix 1.80 beta 1 crash in magnet links when serving metadata to peers
+  * Fix 1.80 beta 1 bug that caused peer lists to be lost over time
+  * Fix 1.80 beta 1 bug that caused duplicate block downloads from peers
   * Fix 1.80 beta 1 bug that incorrectly displayed some scrapes as failed
+  * Updated DHT library
   * Fix minor memory leaks
 ==== Mac ====
   * Fix favicons in the tracker inspector tab
