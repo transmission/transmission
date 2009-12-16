@@ -99,6 +99,12 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
                 pieceBytesRead += numRead;
             if( numRead == bytesThisPass )
                 SHA1_Update( &sha, buffer, numRead );
+#ifdef HAVE_POSIX_FADVISE
+            posix_fadvise( fd, filePos, bytesThisPass, POSIX_FADV_DONTNEED );
+#endif
+#ifdef SYS_DARWIN
+            fcntl( fd, F_NOCACHE, 1 );
+#endif
         }
 
         /* move our offsets */
