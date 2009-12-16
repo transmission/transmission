@@ -23,7 +23,6 @@ SUBDIRS = \
   $(CLI_DIR) \
   $(GTK_DIR) \
   $(MAC_DIR) \
-  utils \
   web
 
 EXTRA_DIST = \
