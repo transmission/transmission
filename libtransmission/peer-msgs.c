@@ -975,8 +975,8 @@ parseLtepHandshake( tr_peermsgs *     msgs,
 
     /* get peer's listening port */
     if( tr_bencDictFindInt( &val, "p", &i ) ) {
-        fireClientGotPort( msgs, (tr_port)i );
         pex.port = htons( (uint16_t)i );
+        fireClientGotPort( msgs, pex.port );
         dbgmsg( msgs, "peer's port is now %d", (int)i );
     }
 

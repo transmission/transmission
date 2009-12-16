@@ -51,7 +51,7 @@ enum
 typedef struct tr_pex
 {
     tr_address addr;
-    tr_port    port;
+    tr_port    port; /* this field is in network byte order */
     uint8_t    flags;
 }
 tr_pex;
