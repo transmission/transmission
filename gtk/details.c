@@ -86,6 +86,8 @@ struct DetailsImpl
     GtkListStore * peer_store;
     GtkListStore * webseed_store;
     GtkWidget * webseed_view;
+    GtkWidget * peer_view;
+    GtkWidget * more_peer_details_check;
 
     GtkListStore * trackers;
     GtkTreeModel * trackers_filtered;
@@ -1086,6 +1088,10 @@ enum
     PEER_COL_UPLOAD_RATE_STRING,
     PEER_COL_CLIENT,
     PEER_COL_PROGRESS,
+    PEER_COL_UPLOAD_REQUEST_COUNT_INT,
+    PEER_COL_UPLOAD_REQUEST_COUNT_STRING,
+    PEER_COL_DOWNLOAD_REQUEST_COUNT_INT,
+    PEER_COL_DOWNLOAD_REQUEST_COUNT_STRING,
     PEER_COL_ENCRYPTION_STOCK_ID,
     PEER_COL_STATUS,
     N_PEER_COLS
@@ -1103,6 +1109,10 @@ getPeerColumnName( int column )
         case PEER_COL_UPLOAD_RATE_DOUBLE: return _( "Up" );
         case PEER_COL_CLIENT: return _( "Client" );
         case PEER_COL_PROGRESS: return _( "%" );
+        case PEER_COL_UPLOAD_REQUEST_COUNT_INT:
+        case PEER_COL_UPLOAD_REQUEST_COUNT_STRING: return _( "Up Reqs" );
+        case PEER_COL_DOWNLOAD_REQUEST_COUNT_INT:
+        case PEER_COL_DOWNLOAD_REQUEST_COUNT_STRING: return _( "Dn Reqs" );
         case PEER_COL_STATUS: return _( "Status" );
         default: return "";
     }
@@ -1122,6 +1132,10 @@ peer_store_new( void )
                                G_TYPE_STRING,   /* upload speed string  */
                                G_TYPE_STRING,   /* client */
                                G_TYPE_INT,      /* progress [0..100] */
+                               G_TYPE_INT,      /* upload request count int */
+                               G_TYPE_STRING,   /* upload request count string */
+                               G_TYPE_INT,      /* download request count int */
+                               G_TYPE_STRING,   /* download request count string */
                                G_TYPE_STRING,   /* encryption stock id */
                                G_TYPE_STRING);  /* flagString */
 }
@@ -1165,6 +1179,8 @@ refreshPeerRow( GtkListStore        * store,
 {
     char up_speed[128];
     char down_speed[128];
+    char up_count[128];
+    char down_count[128];
 
     if( peer->rateToPeer > 0.01 )
         tr_strlspeed( up_speed, peer->rateToPeer, sizeof( up_speed ) );
@@ -1176,8 +1192,22 @@ refreshPeerRow( GtkListStore        * store,
     else
         *down_speed = '\0';
 
+    if( peer->pendingReqsToPeer > 0 )
+        g_snprintf( down_count, sizeof( down_count ), "%d", peer->pendingReqsToPeer );
+    else
+        *down_count = '\0';
+
+    if( peer->pendingReqsToClient > 0 )
+        g_snprintf( up_count, sizeof( down_count ), "%d", peer->pendingReqsToClient );
+    else
+        *up_count = '\0';
+
     gtk_list_store_set( store, iter,
                         PEER_COL_PROGRESS, (int)( 100.0 * peer->progress ),
+                        PEER_COL_UPLOAD_REQUEST_COUNT_INT, peer->pendingReqsToClient,
+                        PEER_COL_UPLOAD_REQUEST_COUNT_STRING, up_count,
+                        PEER_COL_DOWNLOAD_REQUEST_COUNT_INT, peer->pendingReqsToPeer,
+                        PEER_COL_DOWNLOAD_REQUEST_COUNT_STRING, down_count,
                         PEER_COL_DOWNLOAD_RATE_DOUBLE, peer->rateToClient,
                         PEER_COL_DOWNLOAD_RATE_STRING, down_speed,
                         PEER_COL_UPLOAD_RATE_DOUBLE, peer->rateToPeer,
@@ -1429,10 +1459,132 @@ onPeerViewQueryTooltip( GtkWidget   * widget,
 }
 #endif
 
+static void
+setPeerViewColumns( GtkTreeView * peer_view )
+{
+    int i;
+    int n = 0;
+    const tr_bool more = pref_flag_get( PREF_KEY_SHOW_MORE_PEER_INFO );
+    int view_columns[32];
+    GtkTreeViewColumn * c;
+    GtkCellRenderer *   r;
+
+    view_columns[n++] = PEER_COL_ENCRYPTION_STOCK_ID;
+    view_columns[n++] = PEER_COL_UPLOAD_RATE_STRING;
+    if( more ) view_columns[n++] = PEER_COL_UPLOAD_REQUEST_COUNT_STRING;
+    view_columns[n++] = PEER_COL_DOWNLOAD_RATE_STRING;
+    if( more ) view_columns[n++] = PEER_COL_DOWNLOAD_REQUEST_COUNT_STRING;
+    view_columns[n++] = PEER_COL_PROGRESS;
+    view_columns[n++] = PEER_COL_STATUS;
+    view_columns[n++] = PEER_COL_ADDRESS;
+    view_columns[n++] = PEER_COL_CLIENT;
+
+    /* remove any existing columns */
+    {
+        GList * l;
+        GList * columns = gtk_tree_view_get_columns( peer_view );
+        for( l=columns; l!=NULL; l=l->next )
+            gtk_tree_view_remove_column( peer_view, l->data );
+        g_list_free( columns );
+    }
+
+    for( i=0; i<n; ++i )
+    {
+        const int col = view_columns[i];
+        const char * t = getPeerColumnName( col );
+        int sort_col = col;
+
+        switch( col )
+        {
+            case PEER_COL_ADDRESS:
+                r = gtk_cell_renderer_text_new( );
+                c = gtk_tree_view_column_new_with_attributes( t, r, "text", col, NULL );
+                sort_col = PEER_COL_ADDRESS_COLLATED;
+                break;
+
+            case PEER_COL_CLIENT:
+                r = gtk_cell_renderer_text_new( );
+                c = gtk_tree_view_column_new_with_attributes( t, r, "text", col, NULL );
+                break;
+
+            case PEER_COL_PROGRESS:
+                r = gtk_cell_renderer_progress_new( );
+                c = gtk_tree_view_column_new_with_attributes( t, r, "value", PEER_COL_PROGRESS, NULL );
+                break;
+
+            case PEER_COL_ENCRYPTION_STOCK_ID:
+                r = gtk_cell_renderer_pixbuf_new( );
+                g_object_set( r, "xalign", (gfloat)0.0,
+                                 "yalign", (gfloat)0.5,
+                                 NULL );
+                c = gtk_tree_view_column_new_with_attributes( t, r, "stock-id", PEER_COL_ENCRYPTION_STOCK_ID, NULL );
+                gtk_tree_view_column_set_sizing( c, GTK_TREE_VIEW_COLUMN_FIXED );
+                gtk_tree_view_column_set_fixed_width( c, 20 );
+                break;
+
+            case PEER_COL_UPLOAD_REQUEST_COUNT_STRING:
+                r = gtk_cell_renderer_text_new( );
+                c = gtk_tree_view_column_new_with_attributes( t, r, "text", col, NULL );
+                sort_col = PEER_COL_UPLOAD_REQUEST_COUNT_INT;
+                break;
+
+            case PEER_COL_DOWNLOAD_REQUEST_COUNT_STRING:
+                r = gtk_cell_renderer_text_new( );
+                c = gtk_tree_view_column_new_with_attributes( t, r, "text", col, NULL );
+                sort_col = PEER_COL_DOWNLOAD_REQUEST_COUNT_INT;
+                break;
+
+            case PEER_COL_DOWNLOAD_RATE_STRING:
+                r = gtk_cell_renderer_text_new( );
+                c = gtk_tree_view_column_new_with_attributes( t, r, "text", col, NULL );
+                sort_col = PEER_COL_DOWNLOAD_RATE_DOUBLE;
+                break;
+
+            case PEER_COL_UPLOAD_RATE_STRING:
+                r = gtk_cell_renderer_text_new( );
+                c = gtk_tree_view_column_new_with_attributes( t, r, "text", col, NULL );
+                sort_col = PEER_COL_UPLOAD_RATE_DOUBLE;
+                break;
+
+            case PEER_COL_STATUS:
+                r = gtk_cell_renderer_text_new( );
+                c = gtk_tree_view_column_new_with_attributes( t, r, "text", col, NULL );
+                break;
+
+            default:
+                abort( );
+        }
+
+        gtk_tree_view_column_set_resizable( c, FALSE );
+        gtk_tree_view_column_set_sort_column_id( c, sort_col );
+        gtk_tree_view_append_column( GTK_TREE_VIEW( peer_view ), c );
+    }
+
+    /* the 'expander' column has a 10-pixel margin on the left
+       that doesn't look quite correct in any of these columns...
+       so create a non-visible column and assign it as the
+       'expander column. */
+    {
+        GtkTreeViewColumn *c = gtk_tree_view_column_new( );
+        gtk_tree_view_column_set_visible( c, FALSE );
+        gtk_tree_view_append_column( GTK_TREE_VIEW( peer_view ), c );
+        gtk_tree_view_set_expander_column( GTK_TREE_VIEW( peer_view ), c );
+    }
+}
+
+static void
+onMorePeerInfoToggled( GtkToggleButton * button, struct DetailsImpl * di )
+{
+    const char * key = PREF_KEY_SHOW_MORE_PEER_INFO;
+    const gboolean value = gtk_toggle_button_get_active( button );
+    tr_core_set_pref_bool( di->core, key, value );
+    setPeerViewColumns( GTK_TREE_VIEW( di->peer_view ) );
+}
+
 static GtkWidget*
 peer_page_new( struct DetailsImpl * di )
 {
-    guint i;
+    gboolean b;
     const char * str;
     GtkListStore *store;
     GtkWidget *v, *w, *ret, *sw, *vbox;
@@ -1440,14 +1592,6 @@ peer_page_new( struct DetailsImpl * di )
     GtkTreeModel * m;
     GtkTreeViewColumn * c;
     GtkCellRenderer *   r;
-    int view_columns[] = { PEER_COL_ENCRYPTION_STOCK_ID,
-                           PEER_COL_UPLOAD_RATE_STRING,
-                           PEER_COL_DOWNLOAD_RATE_STRING,
-                           PEER_COL_PROGRESS,
-                           PEER_COL_STATUS,
-                           PEER_COL_ADDRESS,
-                           PEER_COL_CLIENT };
-
 
     /* webseeds */
 
@@ -1501,6 +1645,7 @@ peer_page_new( struct DetailsImpl * di )
                                   "rules-hint", TRUE,
                                   NULL ) );
 #endif
+    di->peer_view = v;
 
 #if GTK_CHECK_VERSION( 2,12,0 )
     g_signal_connect( v, "query-tooltip",
@@ -1510,76 +1655,7 @@ peer_page_new( struct DetailsImpl * di )
     g_signal_connect( v, "button-release-event",
                       G_CALLBACK( on_tree_view_button_released ), NULL );
 
-    for( i=0; i<G_N_ELEMENTS( view_columns ); ++i )
-    {
-        const int col = view_columns[i];
-        const char * t = getPeerColumnName( col );
-        int sort_col = col;
-
-        switch( col )
-        {
-            case PEER_COL_ADDRESS:
-                r = gtk_cell_renderer_text_new( );
-                c = gtk_tree_view_column_new_with_attributes( t, r, "text", col, NULL );
-                sort_col = PEER_COL_ADDRESS_COLLATED;
-                break;
-
-            case PEER_COL_CLIENT:
-                r = gtk_cell_renderer_text_new( );
-                c = gtk_tree_view_column_new_with_attributes( t, r, "text", col, NULL );
-                break;
-
-            case PEER_COL_PROGRESS:
-                r = gtk_cell_renderer_progress_new( );
-                c = gtk_tree_view_column_new_with_attributes( t, r, "value", PEER_COL_PROGRESS, NULL );
-                break;
-
-            case PEER_COL_ENCRYPTION_STOCK_ID:
-                r = gtk_cell_renderer_pixbuf_new( );
-                g_object_set( r, "xalign", (gfloat)0.0,
-                                 "yalign", (gfloat)0.5,
-                                 NULL );
-                c = gtk_tree_view_column_new_with_attributes( t, r, "stock-id", PEER_COL_ENCRYPTION_STOCK_ID, NULL );
-                gtk_tree_view_column_set_sizing( c, GTK_TREE_VIEW_COLUMN_FIXED );
-                gtk_tree_view_column_set_fixed_width( c, 20 );
-                break;
-
-            case PEER_COL_DOWNLOAD_RATE_STRING:
-                r = gtk_cell_renderer_text_new( );
-                c = gtk_tree_view_column_new_with_attributes( t, r, "text", col, NULL );
-                sort_col = PEER_COL_DOWNLOAD_RATE_DOUBLE;
-                break;
-
-            case PEER_COL_UPLOAD_RATE_STRING:
-                r = gtk_cell_renderer_text_new( );
-                c = gtk_tree_view_column_new_with_attributes( t, r, "text", col, NULL );
-                sort_col = PEER_COL_UPLOAD_RATE_DOUBLE;
-                break;
-
-            case PEER_COL_STATUS:
-                r = gtk_cell_renderer_text_new( );
-                c = gtk_tree_view_column_new_with_attributes( t, r, "text", col, NULL );
-                break;
-
-            default:
-                abort( );
-        }
-
-        gtk_tree_view_column_set_resizable( c, FALSE );
-        gtk_tree_view_column_set_sort_column_id( c, sort_col );
-        gtk_tree_view_append_column( GTK_TREE_VIEW( v ), c );
-    }
-
-    /* the 'expander' column has a 10-pixel margin on the left
-       that doesn't look quite correct in any of these columns...
-       so create a non-visible column and assign it as the
-       'expander column. */
-    {
-        GtkTreeViewColumn *c = gtk_tree_view_column_new( );
-        gtk_tree_view_column_set_visible( c, FALSE );
-        gtk_tree_view_append_column( GTK_TREE_VIEW( v ), c );
-        gtk_tree_view_set_expander_column( GTK_TREE_VIEW( v ), c );
-    }
+    setPeerViewColumns( GTK_TREE_VIEW( v ) );
 
     w = sw = gtk_scrolled_window_new( NULL, NULL );
     gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( w ),
@@ -1589,7 +1665,6 @@ peer_page_new( struct DetailsImpl * di )
                                          GTK_SHADOW_IN );
     gtk_container_add( GTK_CONTAINER( w ), v );
 
-
     vbox = gtk_vbox_new( FALSE, GUI_PAD );
     gtk_container_set_border_width( GTK_CONTAINER( vbox ), GUI_PAD_BIG );
 
@@ -1597,6 +1672,14 @@ peer_page_new( struct DetailsImpl * di )
     gtk_paned_pack1( GTK_PANED( v ), webtree, FALSE, TRUE );
     gtk_paned_pack2( GTK_PANED( v ), sw, TRUE, TRUE );
     gtk_box_pack_start( GTK_BOX( vbox ), v, TRUE, TRUE, 0 );
+
+    w = gtk_check_button_new_with_mnemonic( _( "Show _more details" ) );
+    di->more_peer_details_check = w;
+    b = pref_flag_get( PREF_KEY_SHOW_MORE_PEER_INFO );
+    gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( w ), b );
+    g_signal_connect( w, "toggled", G_CALLBACK( onMorePeerInfoToggled ), di );
+    gtk_box_pack_start( GTK_BOX( vbox ), w, FALSE, FALSE, 0 );
+
 
     /* ip-to-GtkTreeRowReference */
     di->peer_hash = g_hash_table_new_full( g_str_hash,

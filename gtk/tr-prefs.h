@@ -31,6 +31,7 @@ GtkWidget * tr_prefs_dialog_new( GObject *   core,
 #define PREF_KEY_SHOW_DESKTOP_NOTIFICATION         "show-desktop-notification"
 #define PREF_KEY_PLAY_DOWNLOAD_COMPLETE_SOUND      "play-download-complete-sound"
 #define PREF_KEY_SHOW_MORE_TRACKER_INFO            "show-tracker-scrapes"
+#define PREF_KEY_SHOW_MORE_PEER_INFO               "show-extra-peer-details"
 #define PREF_KEY_SHOW_BACKUP_TRACKERS              "show-backup-trackers"
 #define PREF_KEY_START                             "start-added-torrents"
 #define PREF_KEY_TRASH_ORIGINAL                    "trash-original-torrent-files"

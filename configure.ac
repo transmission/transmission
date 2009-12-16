@@ -446,6 +446,7 @@ AC_CONFIG_FILES([Makefile
                  macosx/Makefile
                  gtk/Makefile
                  gtk/icons/Makefile
+                 utils/Makefile
                  web/Makefile
                  web/images/Makefile
                  web/images/buttons/Makefile

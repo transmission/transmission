@@ -1316,27 +1316,33 @@ tr_bool tr_torrentCanManualUpdate( const tr_torrent * torrent );
 
 typedef struct tr_peer_stat
 {
-    tr_bool      isEncrypted;
-    tr_bool      isDownloadingFrom;
-    tr_bool      isUploadingTo;
-    tr_bool      isSeed;
+    tr_bool  isEncrypted;
+    tr_bool  isDownloadingFrom;
+    tr_bool  isUploadingTo;
+    tr_bool  isSeed;
 
-    tr_bool      peerIsChoked;
-    tr_bool      peerIsInterested;
-    tr_bool      clientIsChoked;
-    tr_bool      clientIsInterested;
-    tr_bool      isIncoming;
+    tr_bool  peerIsChoked;
+    tr_bool  peerIsInterested;
+    tr_bool  clientIsChoked;
+    tr_bool  clientIsInterested;
+    tr_bool  isIncoming;
 
-    uint8_t      from;
-    tr_port      port;
+    uint8_t  from;
+    tr_port  port;
 
-    char         addr[TR_INET6_ADDRSTRLEN];
-    char         client[80];
-    char         flagStr[32];
+    char     addr[TR_INET6_ADDRSTRLEN];
+    char     client[80];
+    char     flagStr[32];
 
-    float        progress;
-    float        rateToPeer;
-    float        rateToClient;
+    float    progress;
+    float    rateToPeer;
+    float    rateToClient;
+
+    /* how many requests the peer has made that we haven't responded to yet */
+    int      pendingReqsToClient;
+
+    /* how many requests we've made and are currently awaiting a response for */
+    int      pendingReqsToPeer;
 }
 tr_peer_stat;
 

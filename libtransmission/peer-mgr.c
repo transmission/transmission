@@ -85,7 +85,10 @@ enum
     MYFLAG_UNREACHABLE = 2,
 
     /* the minimum we'll wait before attempting to reconnect to a peer */
-    MINIMUM_RECONNECT_INTERVAL_SECS = 5
+    MINIMUM_RECONNECT_INTERVAL_SECS = 5,
+
+    /** how long we'll let requests we've made linger before we cancel them */
+    REQUEST_TTL_SECS = 45
 };
 
 
@@ -618,7 +621,7 @@ requestListSort( Torrent * t, int mode )
 }
 
 static void
-requestListAdd( Torrent * t, const time_t now, tr_block_index_t block, tr_peer * peer )
+requestListAdd( Torrent * t, tr_block_index_t block, tr_peer * peer )
 {
     struct block_request key;
 
@@ -634,7 +637,7 @@ requestListAdd( Torrent * t, const time_t now, tr_block_index_t block, tr_peer *
     /* populate the record we're inserting */
     key.block = block;
     key.peer = peer;
-    key.sentAt = now;
+    key.sentAt = tr_time( );
 
     /* insert the request to our array... */
     switch( t->requestsSort )
@@ -657,9 +660,16 @@ requestListAdd( Torrent * t, const time_t now, tr_block_index_t block, tr_peer *
             break;
         }
     }
-    /*fprintf( stderr, "added request of block %lu from peer %p... "
+
+    if( peer != NULL )
+    {
+        ++peer->pendingReqsToPeer;
+        assert( peer->pendingReqsToPeer >= 0 );
+    }
+
+    /*fprintf( stderr, "added request of block %lu from peer %s... "
                        "there are now %d block\n",
-                       (unsigned long)block, peer, t->requestCount );*/
+                       (unsigned long)block, tr_atomAddrStr( peer->atom ), t->requestCount );*/
 }
 
 static struct block_request *
@@ -712,12 +722,19 @@ requestListRemove( Torrent * t, tr_block_index_t block, const tr_peer * peer )
     {
         const int pos = b - t->requests;
         assert( pos < t->requestCount );
+
+        if( b->peer != NULL )
+        {
+            --b->peer->pendingReqsToPeer;
+            assert( b->peer->pendingReqsToPeer >= 0 );
+        }
+
         memmove( t->requests + pos,
                  t->requests + pos + 1,
                  sizeof( struct block_request ) * ( --t->requestCount - pos ) );
-        /*fprintf( stderr, "removing request of block %lu from peer %p... "
+        /*fprintf( stderr, "removing request of block %lu from peer %s... "
                            "there are now %d block requests left\n",
-                           (unsigned long)block, peer, t->requestCount );*/
+                           (unsigned long)block, tr_atomAddrStr( peer->atom ), t->requestCount );*/
     }
 }
 
@@ -951,7 +968,6 @@ tr_peerMgrGetNextRequests( tr_torrent           * tor,
     Torrent * t;
     struct weighted_piece * pieces;
     const tr_bitset * have = &peer->have;
-    const time_t now = tr_time( );
 
     /* sanity clause */
     assert( tr_isTorrent( tor ) );
@@ -1000,7 +1016,7 @@ tr_peerMgrGetNextRequests( tr_torrent           * tor,
                 setme[got++] = b;
 
                 /* update our own tables */
-                requestListAdd( t, now, b, peer );
+                requestListAdd( t, b, peer );
                 ++p->requestCount;
             }
         }
@@ -2194,20 +2210,22 @@ tr_peerMgrPeerStats( const tr_torrent    * tor,
         tr_ntop( &atom->addr, stat->addr, sizeof( stat->addr ) );
         tr_strlcpy( stat->client, ( peer->client ? peer->client : "" ),
                    sizeof( stat->client ) );
-        stat->port               = ntohs( peer->atom->port );
-        stat->from               = atom->from;
-        stat->progress           = peer->progress;
-        stat->isEncrypted        = tr_peerIoIsEncrypted( peer->io ) ? 1 : 0;
-        stat->rateToPeer         = tr_peerGetPieceSpeed( peer, now, TR_CLIENT_TO_PEER );
-        stat->rateToClient       = tr_peerGetPieceSpeed( peer, now, TR_PEER_TO_CLIENT );
-        stat->peerIsChoked       = peer->peerIsChoked;
-        stat->peerIsInterested   = peer->peerIsInterested;
-        stat->clientIsChoked     = peer->clientIsChoked;
-        stat->clientIsInterested = peer->clientIsInterested;
-        stat->isIncoming         = tr_peerIoIsIncoming( peer->io );
-        stat->isDownloadingFrom  = clientIsDownloadingFrom( tor, peer );
-        stat->isUploadingTo      = clientIsUploadingTo( peer );
-        stat->isSeed             = ( atom->uploadOnly == UPLOAD_ONLY_YES ) || ( peer->progress >= 1.0 );
+        stat->port                = ntohs( peer->atom->port );
+        stat->from                = atom->from;
+        stat->progress            = peer->progress;
+        stat->isEncrypted         = tr_peerIoIsEncrypted( peer->io ) ? 1 : 0;
+        stat->rateToPeer          = tr_peerGetPieceSpeed( peer, now, TR_CLIENT_TO_PEER );
+        stat->rateToClient        = tr_peerGetPieceSpeed( peer, now, TR_PEER_TO_CLIENT );
+        stat->peerIsChoked        = peer->peerIsChoked;
+        stat->peerIsInterested    = peer->peerIsInterested;
+        stat->clientIsChoked      = peer->clientIsChoked;
+        stat->clientIsInterested  = peer->clientIsInterested;
+        stat->isIncoming          = tr_peerIoIsIncoming( peer->io );
+        stat->isDownloadingFrom   = clientIsDownloadingFrom( tor, peer );
+        stat->isUploadingTo       = clientIsUploadingTo( peer );
+        stat->isSeed              = ( atom->uploadOnly == UPLOAD_ONLY_YES ) || ( peer->progress >= 1.0 );
+        stat->pendingReqsToPeer   = peer->pendingReqsToPeer;
+        stat->pendingReqsToClient = peer->pendingReqsToClient;
 
         pch = stat->flagStr;
         if( t->optimistic == peer ) *pch++ = 'O';
@@ -3085,8 +3103,6 @@ compareAtomPtrsByAddress( const void * va, const void *vb )
     return tr_compareAddresses( &a->addr, &b->addr );
 }
 
-static time_t tr_now = 0;
-
 /* best come first, worst go last */
 static int
 compareAtomPtrsByShelfDate( const void * va, const void *vb )
@@ -3096,6 +3112,7 @@ compareAtomPtrsByShelfDate( const void * va, const void *vb )
     const struct peer_atom * a = * (const struct peer_atom**) va;
     const struct peer_atom * b = * (const struct peer_atom**) vb;
     const int data_time_cutoff_secs = 60 * 60;
+    const time_t tr_now = tr_time( );
 
     assert( tr_isAtom( a ) );
     assert( tr_isAtom( b ) );
@@ -3159,7 +3176,6 @@ atomPulse( int foo UNUSED, short bar UNUSED, void * vmgr )
             /* if there's room, keep the best of what's left */
             i = 0;
             if( keepCount < maxAtomCount ) {
-                tr_now = tr_time( );
                 qsort( test, testCount, sizeof( struct peer_atom * ), compareAtomPtrsByShelfDate );
                 while( i<testCount && keepCount<maxAtomCount )
                     keep[keepCount++] = test[i++];
