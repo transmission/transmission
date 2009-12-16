@@ -1,7 +1,7 @@
 === Transmission 1.80 (In Development) ===
 [http://trac.transmissionbt.com/query?milestone=1.80&group=component&groupdesc=1&order=severity All tickets closed by this release]
 
-=== Transmission 1.80 beta 3 (2009/12/14) ===
+=== Transmission 1.80 beta 3 (2009/12/15) ===
 ==== All Platforms ====
   * Tracker announcement improvements
   * Encrypted handshakes to peers now use less CPU
