@@ -35,6 +35,7 @@
 @interface GroupsPrefsController (Private)
 
 - (void) updateSelectedGroup;
+- (void) refreshCustomLocation;
 
 @end
 
@@ -216,18 +217,15 @@
         NSString * path = [[openPanel filenames] objectAtIndex: 0];
         [[GroupsController groups] setCustomDownloadLocation: path forIndex: index];
         [[GroupsController groups] setUsesCustomDownloadLocation: YES forIndex: index];
-        [self updateSelectedGroup]; //update the popup's icon/title
     }
     else
     {
         if (![[GroupsController groups] customDownloadLocationForIndex: index])
-        {
             [[GroupsController groups] setUsesCustomDownloadLocation: NO forIndex: index];
-            [fCustomLocationEnableCheck setState: NSOffState];
-            [fCustomLocationPopUp setEnabled: NO];
-        }
     }
-
+    
+    [self refreshCustomLocation];
+    
     [fCustomLocationPopUp selectItemAtIndex: 0];
 }
 
@@ -314,27 +312,13 @@
     [fAddRemoveControl setEnabled: [fTableView numberOfSelectedRows] > 0 forSegment: REMOVE_TAG];
     if ([fTableView numberOfSelectedRows] == 1)
     {
-        NSInteger index = [[GroupsController groups] indexForRow: [fTableView selectedRow]];
+        const NSInteger index = [[GroupsController groups] indexForRow: [fTableView selectedRow]];
         [fSelectedColorView setColor: [[GroupsController groups] colorForIndex: index]];
         [fSelectedColorView setEnabled: YES];
         [fSelectedColorNameField setStringValue: [[GroupsController groups] nameForIndex: index]];
         [fSelectedColorNameField setEnabled: YES];
-        [fCustomLocationEnableCheck setState: [[GroupsController groups] usesCustomDownloadLocationForIndex: index]];
-        [fCustomLocationEnableCheck setEnabled: YES];
-        [fCustomLocationPopUp setEnabled: [fCustomLocationEnableCheck state] == NSOnState];
-        if ([[GroupsController groups] customDownloadLocationForIndex: index])
-        {
-            NSString * location = [[GroupsController groups] customDownloadLocationForIndex: index];
-            ExpandedPathToPathTransformer * pathTransformer = [[[ExpandedPathToPathTransformer alloc] init] autorelease];
-            [[fCustomLocationPopUp itemAtIndex: 0] setTitle: [pathTransformer transformedValue: location]];
-            ExpandedPathToIconTransformer * iconTransformer = [[[ExpandedPathToIconTransformer alloc] init] autorelease];
-            [[fCustomLocationPopUp itemAtIndex: 0] setImage: [iconTransformer transformedValue: location]];
-        }
-        else
-        {
-            [[fCustomLocationPopUp itemAtIndex: 0] setTitle: @""];
-            [[fCustomLocationPopUp itemAtIndex: 0] setImage: nil];
-        }
+        
+        [self refreshCustomLocation];
 
         [fAutoAssignRulesEnableCheck setState: [[GroupsController groups] usesAutoAssignRulesForIndex: index]];
         [fAutoAssignRulesEnableCheck setEnabled: YES];
@@ -350,6 +334,29 @@
         [fCustomLocationPopUp setEnabled: NO];
         [fAutoAssignRulesEnableCheck setEnabled: NO];
         [fAutoAssignRulesEditButton setEnabled: NO];
+    }
+}
+
+- (void) refreshCustomLocation
+{
+    const NSInteger index = [[GroupsController groups] indexForRow: [fTableView selectedRow]];
+    
+    [fCustomLocationEnableCheck setState: [[GroupsController groups] usesCustomDownloadLocationForIndex: index]];
+    [fCustomLocationEnableCheck setEnabled: YES];
+    [fCustomLocationPopUp setEnabled: [fCustomLocationEnableCheck state] == NSOnState];
+    
+    if ([[GroupsController groups] customDownloadLocationForIndex: index])
+    {
+        NSString * location = [[GroupsController groups] customDownloadLocationForIndex: index];
+        ExpandedPathToPathTransformer * pathTransformer = [[[ExpandedPathToPathTransformer alloc] init] autorelease];
+        [[fCustomLocationPopUp itemAtIndex: 0] setTitle: [pathTransformer transformedValue: location]];
+        ExpandedPathToIconTransformer * iconTransformer = [[[ExpandedPathToIconTransformer alloc] init] autorelease];
+        [[fCustomLocationPopUp itemAtIndex: 0] setImage: [iconTransformer transformedValue: location]];
+    }
+    else
+    {
+        [[fCustomLocationPopUp itemAtIndex: 0] setTitle: @""];
+        [[fCustomLocationPopUp itemAtIndex: 0] setImage: nil];
     }
 }
 
