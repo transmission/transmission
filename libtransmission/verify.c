@@ -15,7 +15,9 @@
 
 #ifdef HAVE_POSIX_FADVISE
  #define _XOPEN_SOURCE 600
- #include <fcntl.h> /* posix_fadvise() */
+#endif
+#if defined(HAVE_POSIX_FADVISE) || defined(SYS_DARWIN)
+ #include <fcntl.h> /* posix_fadvise() / fcntl() */
 #endif
 
 #include <openssl/sha.h>
