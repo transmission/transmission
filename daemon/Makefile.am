@@ -1,14 +1,14 @@
 AM_CPPFLAGS = -I@top_srcdir@ -DEMBEDDED
 
 AM_CFLAGS = \
-    $(LIBEVENT_CFLAGS) \
-    $(OPENSSL_CFLAGS) \
-    $(LIBCURL_CFLAGS) \
-    $(ZLIB_CFLAGS) \
-    $(PTHREAD_CFLAGS)
+    @LIBEVENT_CFLAGS@ \
+    @OPENSSL_CFLAGS@ \
+    @LIBCURL_CFLAGS@ \
+    @ZLIB_CFLAGS@ \
+    @PTHREAD_CFLAGS@
 
 AM_LDFLAGS = \
-    $(ZLIB_LDFLAGS)
+    @ZLIB_LDFLAGS@
 
 dist_man_MANS = \
     transmission-daemon.1 \
@@ -22,13 +22,13 @@ LDADD = \
     $(top_builddir)/libtransmission/libtransmission.a \
     $(top_builddir)/third-party/miniupnp/libminiupnp.a \
     $(top_builddir)/third-party/libnatpmp/libnatpmp.a \
-    $(DHT_LIBS) \
-    $(LIBEVENT_LIBS) \
-    $(INTLLIBS) \
-    $(LIBCURL_LIBS) \
-    $(ZLIB_LIBS) \
-    $(OPENSSL_LIBS) \
-    $(PTHREAD_LIBS)
+    @DHT_LIBS@ \
+    @LIBEVENT_LIBS@ \
+    @LIBCURL_LIBS@ \
+    @OPENSSL_LIBS@ \
+    @INTLLIBS@ \
+    @ZLIB_LIBS@ \
+    @PTHREAD_LIBS@
 
 noinst_HEADERS = \
     watch.h

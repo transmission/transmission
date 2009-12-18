@@ -46,17 +46,17 @@ DBUS_GLIB_MINIMUM=0.70
 GCONF2_MINIMUM=2.20.0
  AC_SUBST(GCONF2_MINIMUM)
 GIO_MINIMUM=2.15.5
-  AC_SUBST(GIO_MINIMUM)
+ AC_SUBST(GIO_MINIMUM)
 GLIB_MINIMUM=2.6.0
-  AC_SUBST(GLIB_MINIMUM)
+ AC_SUBST(GLIB_MINIMUM)
 GTK_MINIMUM=2.6.0
-  AC_SUBST(GTK_MINIMUM)
+ AC_SUBST(GTK_MINIMUM)
 LIBEVENT_MINIMUM=1.4.5
-  AC_SUBST(LIBEVENT_MINIUM)
+ AC_SUBST(LIBEVENT_MINIUM)
 LIBNOTIFY_MINIMUM=0.4.3
-  AC_SUBST(LIBNOTIFY_MINIMUM)
+ AC_SUBST(LIBNOTIFY_MINIMUM)
 OPENSSL_MINIMUM=0.9.4
-  AC_SUBST(OPENSSL_MINIMUM)
+ AC_SUBST(OPENSSL_MINIMUM)
 
 AC_PROG_CC
 AC_PROG_CXX
@@ -203,14 +203,14 @@ else
     LIBEVENT_CFLAGS=""
     LIBEVENT_LIBS="-levent $libevent_extra_libs"
 fi
-AC_SUBST(LIBEVENT_CFLAGS)
-AC_SUBST(LIBEVENT_LIBS)
+AC_ARG_VAR([LIBEVENT_CFLAGS], [C compiler flags for LIBEVENT, overriding pkg-config])dnl
+AC_ARG_VAR([LIBEVENT_LIBS], [linker flags for LIBEVENT, overriding pkg-config])dnl
+
 
 
 dnl ----------------------------------------------------------------------------
 dnl
 dnl  dht
-
 
 DHT_CFLAGS="-I\$(top_srcdir)/third-party/dht"
 DHT_LIBS="\$(top_builddir)/third-party/dht/libdht.a"
@@ -245,8 +245,6 @@ if test "x$want_gtk" = "xyes" ; then
     fi
 fi
 AM_CONDITIONAL([BUILD_GTK],[test "x$build_gtk" = "xyes"])
-AC_SUBST(GTK_LIBS)
-AC_SUBST(GTK_CFLAGS)
 
 if test "x$build_gtk" = "xyes"; then
 
@@ -254,8 +252,6 @@ if test "x$build_gtk" = "xyes"; then
                       [gio-2.0 >= $GIO_MINIMUM],
                       [use_gio=yes],
                       [use_gio=no])
-    AC_SUBST(GIO_LIBS)
-    AC_SUBST(GIO_CFLAGS)
     if test "x$use_gio" = "xyes"; then
         AC_DEFINE([HAVE_GIO], 1)
     fi
@@ -271,8 +267,6 @@ if test "x$build_gtk" = "xyes"; then
     if test "x$enable_libnotify" = "xyes" ; then
         if test "x$have_libnotify" = "xyes"; then
             use_libnotify=yes
-            AC_SUBST(LIBNOTIFY_LIBS) 
-            AC_SUBST(LIBNOTIFY_CFLAGS) 
             AC_DEFINE([HAVE_LIBNOTIFY], 1) 
         fi
     fi
@@ -288,8 +282,6 @@ if test "x$build_gtk" = "xyes"; then
     if test "x$enable_libcanberra" = "xyes" ; then
         if test "x$have_libcanberra" = "xyes"; then
             use_canberra=yes
-            AC_SUBST(LIBCANBERRA_LIBS) 
-            AC_SUBST(LIBCANBERRA_CFLAGS) 
             AC_DEFINE([HAVE_LIBCANBERRA], 1) 
         fi
     fi
@@ -305,8 +297,6 @@ if test "x$build_gtk" = "xyes"; then
     if test "x$enable_libgconf" = "xyes" ; then
         if test "x$have_libgconf" = "xyes"; then
             use_libgconf=yes
-            AC_SUBST(LIBGCONF_LIBS) 
-            AC_SUBST(LIBGCONF_CFLAGS) 
             AC_DEFINE([HAVE_LIBGCONF], 1) 
         fi
     fi
@@ -315,8 +305,6 @@ if test "x$build_gtk" = "xyes"; then
                       [dbus-glib-1 >= $DBUS_GLIB_MINIMUM],
                       [use_dbus_glib=yes],
                       [use_dbus_glib=no])
-    AC_SUBST(DBUS_GLIB_LIBS)
-    AC_SUBST(DBUS_GLIB_CFLAGS)
     if test "x$use_dbus_glib" = "xyes"; then
         AC_DEFINE([HAVE_DBUS_GLIB], 1)
     fi

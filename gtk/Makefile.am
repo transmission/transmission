@@ -20,20 +20,20 @@ AM_CPPFLAGS = \
     $(GTK_EXTRA_CPPFLAGS)
 
 AM_CFLAGS = \
-    $(LIBEVENT_CFLAGS) \
-    $(LIBCANBERRA_CFLAGS) \
-    $(LIBGCONF_CFLAGS) \
-    $(GTK_CFLAGS) \
-    $(LIBCURL_CFLAGS) \
-    $(GIO_CFLAGS) \
-    $(DBUS_GLIB_CFLAGS) \
-    $(LIBNOTIFY_CFLAGS) \
-    $(OPENSSL_CFLAGS) \
-    $(ZLIB_CFLAGS) \
-    $(PTHREAD_CFLAGS)
+    @LIBEVENT_CFLAGS@ \
+    @LIBCANBERRA_CFLAGS@ \
+    @LIBGCONF_CFLAGS@ \
+    @GTK_CFLAGS@ \
+    @LIBCURL_CFLAGS@ \
+    @GIO_CFLAGS@ \
+    @LIBNOTIFY_CFLAGS@ \
+    @DBUS_GLIB_CFLAGS@ \
+    @OPENSSL_CFLAGS@ \
+    @ZLIB_CFLAGS@ \
+    @PTHREAD_CFLAGS@
 
 AM_LDFLAGS = \
-    $(ZLIB_LDFLAGS)
+    @ZLIB_LDFLAGS@
 
 noinst_HEADERS = \
     actions.h \
@@ -104,18 +104,18 @@ transmission_LDADD = \
     $(top_builddir)/libtransmission/libtransmission.a \
     $(top_builddir)/third-party/miniupnp/libminiupnp.a \
     $(top_builddir)/third-party/libnatpmp/libnatpmp.a \
-    $(LIBCANBERRA_LIBS) \
-    $(LIBGCONF_LIBS) \
-    $(DHT_LIBS) \
-    $(GTK_LIBS) \
-    $(GIO_LIBS) \
-    $(LIBNOTIFY_LIBS) \
-    $(LIBEVENT_LIBS) \
-    $(DBUS_GLIB_LIBS) \
-    $(OPENSSL_LIBS) \
-    $(LIBCURL_LIBS) \
-    $(ZLIB_LIBS) \
-    $(PTHREAD_LIBS)
+    @LIBCANBERRA_LIBS@ \
+    @LIBGCONF_LIBS@ \
+    @DHT_LIBS@ \
+    @GTK_LIBS@ \
+    @GIO_LIBS@ \
+    @LIBNOTIFY_LIBS@ \
+    @LIBEVENT_LIBS@ \
+    @DBUS_GLIB_LIBS@ \
+    @LIBCURL_LIBS@ \
+    @OPENSSL_LIBS@ \
+    @ZLIB_LIBS@ \
+    @PTHREAD_LIBS@
 
 DESKTOP_IN_FILES=transmission.desktop.in
 DESKTOP_FILES=$(DESKTOP_IN_FILES:.desktop.in=.desktop)

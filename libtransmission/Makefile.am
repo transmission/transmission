@@ -1,12 +1,17 @@
-AM_CPPFLAGS = -I. -I$(top_srcdir) -I$(top_srcdir)/third-party/ -D__TRANSMISSION__ -DPACKAGE_DATA_DIR=\""$(datadir)"\"
+AM_CPPFLAGS = \
+    -I. \
+    -I$(top_srcdir) \
+    -I$(top_srcdir)/third-party/ \
+    -D__TRANSMISSION__ \
+    -DPACKAGE_DATA_DIR=\""$(datadir)"\"
 
 AM_CFLAGS = \
-    $(DHT_CFLAGS) \
-    $(LIBEVENT_CFLAGS) \
-    $(LIBCURL_CFLAGS) \
-    $(OPENSSL_CFLAGS) \
-    $(PTHREAD_CFLAGS) \
-    $(ZLIB_CFLAGS)
+    @DHT_CFLAGS@ \
+    @LIBEVENT_CFLAGS@ \
+    @LIBCURL_CFLAGS@ \
+    @OPENSSL_CFLAGS@ \
+    @PTHREAD_CFLAGS@ \
+    @ZLIB_CFLAGS@
 
 noinst_LIBRARIES = libtransmission.a
 
@@ -122,19 +127,19 @@ TESTS = \
 noinst_PROGRAMS = $(TESTS)
 
 apps_ldflags = \
-    $(ZLIB_LDFLAGS)
+    @ZLIB_LDFLAGS@
 
 apps_ldadd = \
     ./libtransmission.a  \
     $(top_builddir)/third-party/miniupnp/libminiupnp.a \
     $(top_builddir)/third-party/libnatpmp/libnatpmp.a \
-    $(INTLLIBS) \
-    $(DHT_LIBS) \
-    $(LIBEVENT_LIBS) \
-    $(LIBCURL_LIBS) \
-    $(OPENSSL_LIBS) \
-    $(PTHREAD_LIBS) \
-    $(ZLIB_LIBS)
+    @INTLLIBS@ \
+    @DHT_LIBS@ \
+    @LIBCURL_LIBS@ \
+    @LIBEVENT_LIBS@ \
+    @OPENSSL_LIBS@ \
+    @PTHREAD_LIBS@ \
+    @ZLIB_LIBS@
 
 bencode_test_SOURCES = bencode-test.c
 bencode_test_LDADD = ${apps_ldadd}
