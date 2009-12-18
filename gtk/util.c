@@ -352,39 +352,6 @@ gtr_is_hex_hashcode( const char * str )
     return TRUE;
 }
 
-GSList *
-checkfilenames( int argc, char **argv )
-{
-    int i;
-    GSList * ret = NULL;
-    char * pwd = g_get_current_dir( );
-
-    for( i=0; i<argc; ++i )
-    {
-        if( gtr_is_supported_url( argv[i] ) || gtr_is_magnet_link( argv[i] ) )
-        {
-            ret = g_slist_prepend( ret, g_strdup( argv[i] ) );
-        }
-        else /* local file */
-        {
-            char * filename = g_path_is_absolute( argv[i] )
-                            ? g_strdup ( argv[i] )
-                            : g_build_filename( pwd, argv[i], NULL );
-
-            if( g_file_test( filename, G_FILE_TEST_EXISTS ) )
-                ret = g_slist_prepend( ret, filename );
-            else {
-                if( gtr_is_hex_hashcode( argv[i] ) )
-                    ret = g_slist_prepend( ret, g_strdup_printf( "magnet:?xt=urn:btih:%s", argv[i] ) );
-                g_free( filename );
-            }
-        }
-    }
-
-    g_free( pwd );
-    return g_slist_reverse( ret );
-}
-
 void
 addTorrentErrorDialog( GtkWidget *  child,
                        int          err,

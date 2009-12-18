@@ -62,9 +62,6 @@ void freestrlist( GSList *list );
 /* decodes a string that has been urlencoded */
 char * decode_uri( const char * uri );
 
-/* return a list of cleaned-up paths, with invalid directories removed */
-GSList * checkfilenames( int argc, char ** argv );
-
 /***
 ****
 ***/
