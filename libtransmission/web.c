@@ -23,6 +23,8 @@
 
 enum
 {
+    TR_MEMORY_TRASH = 0xCC,
+
     DEFAULT_TIMER_MSEC = 1500 /* arbitrary */
 };
 
@@ -57,6 +59,7 @@ web_free( tr_web * g )
 {
     curl_multi_cleanup( g->multi );
     evtimer_del( &g->timer_event );
+    memset( g, TR_MEMORY_TRASH, sizeof( struct tr_web ) );
     tr_free( g );
 }
 
@@ -81,6 +84,7 @@ task_free( struct tr_web_task * task )
     evbuffer_free( task->response );
     tr_free( task->range );
     tr_free( task->url );
+    memset( task, TR_MEMORY_TRASH, sizeof( struct tr_web_task ) );
     tr_free( task );
 }
 
@@ -282,6 +286,7 @@ sock_cb( CURL * e UNUSED, curl_socket_t fd, int action,
         if( io_event != NULL )
         {
             event_del( io_event );
+            memset( io_event, TR_MEMORY_TRASH, sizeof( struct event ) );
             tr_free( io_event );
             curl_multi_assign( web->multi, fd, NULL );
             /*fprintf( stderr, "-1 io_events to %d\n", --num_events );*/
