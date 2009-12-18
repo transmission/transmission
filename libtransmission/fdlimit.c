@@ -53,8 +53,8 @@
  #include <sys/time.h> /* getrlimit */
  #include <sys/resource.h> /* getrlimit */
 #endif
-#include <unistd.h>
 #include <fcntl.h> /* O_LARGEFILE posix_fadvise */
+#include <unistd.h>
 
 #include <evutil.h>
 
@@ -76,12 +76,6 @@
 /**
 ***
 **/
-
-enum
-{
-    NOFILE_BUFFER = 512, /* the process' number of open files is
-                            globalMaxPeers + NOFILE_BUFFER */
-};
 
 struct tr_openfile
 {
@@ -822,8 +816,16 @@ tr_fdGetFileLimit( const tr_session * session )
     return session && session->fdInfo ? session->fdInfo->openFileLimit : -1;
 }
 
+static TR_INLINE int clamp( int val, int lo, int hi )
+{
+    if( val < lo ) val = lo;
+    if( val > hi ) val = hi;
+    return val;
+}
+    
+
 void
-tr_fdSetPeerLimit( tr_session * session, int limit )
+tr_fdSetPeerLimit( tr_session * session, int socketLimit )
 {
     struct tr_fdInfo * gFd;
 
@@ -834,18 +836,20 @@ tr_fdSetPeerLimit( tr_session * session, int limit )
 #ifdef HAVE_GETRLIMIT
     {
         struct rlimit rlim;
+        const int NOFILE_BUFFER = 512;
+        const int open_max = sysconf( _SC_OPEN_MAX );
         getrlimit( RLIMIT_NOFILE, &rlim );
-        rlim.rlim_cur = MIN( rlim.rlim_max, (rlim_t)( limit + NOFILE_BUFFER ) );
+        rlim.rlim_cur = clamp( open_max, 1024, rlim.rlim_max );
         setrlimit( RLIMIT_NOFILE, &rlim );
-        gFd->socketLimit = rlim.rlim_cur - NOFILE_BUFFER;
         tr_dbg( "setrlimit( RLIMIT_NOFILE, %d )", (int)rlim.rlim_cur );
+        gFd->socketLimit = MIN( socketLimit, (int)rlim.rlim_cur - NOFILE_BUFFER );
     }
 #else
-    gFd->socketLimit = limit;
+    gFd->socketLimit = socketLimit;
 #endif
-    gFd->publicSocketLimit = limit;
+    gFd->publicSocketLimit = socketLimit;
 
-    tr_dbg( "%d usable file descriptors", limit );
+    tr_dbg( "socket limit is %d", (int)gFd->socketLimit );
 }
 
 int
