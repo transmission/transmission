@@ -1266,6 +1266,11 @@ typedef enum
         
         [fRevealDataButton setHidden: YES];
         
+        #warning remove after 1.8
+        [fHashField setSelectable: NO];
+        [fCreatorField setSelectable: NO];
+        [fDataLocationField setSelectable: NO];
+        
         [fStateField setStringValue: @""];
         [fProgressField setStringValue: @""];
         
@@ -1365,6 +1370,11 @@ typedef enum
         [fDateCreatedField setObjectValue: [torrent dateCreated]];
         
         [fDateAddedField setObjectValue: [torrent dateAdded]];
+        
+        #warning remove after 1.8
+        [fHashField setSelectable: YES];
+        [fCommentView setSelectable: ![commentString isEqualToString: @""]];
+        [fCreatorField setSelectable: ![creatorString isEqualToString: @""]];
         
         //set pieces view
         BOOL piecesAvailableSegment = [[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"];
