@@ -35,7 +35,7 @@
 @interface GroupsPrefsController (Private)
 
 - (void) updateSelectedGroup;
-- (void) refreshCustomLocation;
+- (void) refreshCustomLocationWithSingleGroup;
 
 @end
 
@@ -318,7 +318,7 @@
         [fSelectedColorNameField setStringValue: [[GroupsController groups] nameForIndex: index]];
         [fSelectedColorNameField setEnabled: YES];
         
-        [self refreshCustomLocation];
+        [self refreshCustomLocationWithSingleGroup];
 
         [fAutoAssignRulesEnableCheck setState: [[GroupsController groups] usesAutoAssignRulesForIndex: index]];
         [fAutoAssignRulesEnableCheck setEnabled: YES];
@@ -337,17 +337,18 @@
     }
 }
 
-- (void) refreshCustomLocation
+- (void) refreshCustomLocationWithSingleGroup
 {
     const NSInteger index = [[GroupsController groups] indexForRow: [fTableView selectedRow]];
     
-    [fCustomLocationEnableCheck setState: [[GroupsController groups] usesCustomDownloadLocationForIndex: index]];
+    const BOOL hasCustomLocation = [[GroupsController groups] usesCustomDownloadLocationForIndex: index];
+    [fCustomLocationEnableCheck setState: hasCustomLocation];
     [fCustomLocationEnableCheck setEnabled: YES];
-    [fCustomLocationPopUp setEnabled: [fCustomLocationEnableCheck state] == NSOnState];
+    [fCustomLocationPopUp setEnabled: hasCustomLocation];
     
-    if ([[GroupsController groups] customDownloadLocationForIndex: index])
+    NSString * location = [[GroupsController groups] customDownloadLocationForIndex: index];
+    if (location)
     {
-        NSString * location = [[GroupsController groups] customDownloadLocationForIndex: index];
         ExpandedPathToPathTransformer * pathTransformer = [[[ExpandedPathToPathTransformer alloc] init] autorelease];
         [[fCustomLocationPopUp itemAtIndex: 0] setTitle: [pathTransformer transformedValue: location]];
         ExpandedPathToIconTransformer * iconTransformer = [[[ExpandedPathToIconTransformer alloc] init] autorelease];

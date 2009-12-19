@@ -138,8 +138,7 @@
         }
         
         NSSize imageSize = [image size];
-        NSRect imageRect = NSMakeRect(cellFrame.origin.x + (cellFrame.size.width - imageSize.width) * 0.5,
-                                        cellFrame.origin.y + (cellFrame.size.height - imageSize.height) * 0.5,
+        NSRect imageRect = NSMakeRect(NSMidX(cellFrame) - imageSize.width * 0.5, NSMidY(cellFrame) - imageSize.height * 0.5,
                                         imageSize.width, imageSize.height);
         
         if ([NSApp isOnSnowLeopardOrBetter])
