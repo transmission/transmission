@@ -1138,8 +1138,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 urlString = [@"http://" stringByAppendingString: urlString];
         }
         
-        NSURL * url = [NSURL URLWithString: urlString];
-        [[NSURLDownload alloc] initWithRequest: [NSURLRequest requestWithURL: url] delegate: self];
+        NSURLRequest * request = [NSURLRequest requestWithURL: [NSURL URLWithString: urlString]
+                                    cachePolicy: NSURLRequestReloadIgnoringLocalAndRemoteCacheData timeoutInterval: 60];
+        [[NSURLDownload alloc] initWithRequest: request delegate: self];
     }
 }
 
