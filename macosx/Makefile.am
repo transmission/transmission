@@ -73,6 +73,8 @@ EXTRA_DIST = \
     GroupToolbarItem.m \
     InfoTabButtonCell.h \
     InfoTabButtonCell.m \
+    InfoTextField.h \
+    InfoTextField.m \
     InfoWindowController.h \
     InfoWindowController.m \
     main.m \

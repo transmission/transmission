@@ -12,9 +12,8 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="1563"/>
 			<integer value="995"/>
-			<integer value="1615"/>
+			<integer value="1030"/>
 			<integer value="965"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
@@ -54,7 +53,7 @@
 				<string key="NSWindowContentMaxSize">{1.79769e+308, 1.79769e+308}</string>
 				<string key="NSWindowContentMinSize">{350, 73}</string>
 				<object class="NSView" key="NSWindowView" id="429007171">
-					<nil key="NSNextResponder"/>
+					<reference key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
 					<object class="NSMutableArray" key="NSSubviews">
 						<bool key="EncodedWithXMLCoder">YES</bool>
@@ -63,6 +62,7 @@
 							<int key="NSvFlags">266</int>
 							<string key="NSFrame">{{47, 47}, {296, 17}}</string>
 							<reference key="NSSuperview" ref="429007171"/>
+							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="585844623">
 								<int key="NSCellFlags">67239488</int>
@@ -111,6 +111,7 @@
 							</object>
 							<string key="NSFrame">{{10, 32}, {32, 32}}</string>
 							<reference key="NSSuperview" ref="429007171"/>
+							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSImageCell" key="NSCell" id="1001933557">
 								<int key="NSCellFlags">130560</int>
@@ -131,6 +132,7 @@
 							<int key="NSvFlags">266</int>
 							<string key="NSFrame">{{47, 33}, {296, 14}}</string>
 							<reference key="NSSuperview" ref="429007171"/>
+							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="615989236">
 								<int key="NSCellFlags">67239424</int>
@@ -151,6 +153,7 @@
 							<int key="NSvFlags">264</int>
 							<string key="NSFrameSize">{330, 25}</string>
 							<reference key="NSSuperview" ref="429007171"/>
+							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<int key="NSNumRows">1</int>
 							<int key="NSNumCols">6</int>
@@ -402,6 +405,7 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSBDb21wdXRlciwgSW5jLiwgMjAwNQAAAAA</bytes>
 							</object>
 							<string key="NSFrame">{{330, 0}, {20, 25}}</string>
 							<reference key="NSSuperview" ref="429007171"/>
+							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSImageCell" key="NSCell" id="1024147571">
 								<int key="NSCellFlags">130560</int>
@@ -419,6 +423,8 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSBDb21wdXRlciwgSW5jLiwgMjAwNQAAAAA</bytes>
 						</object>
 					</object>
 					<string key="NSFrameSize">{350, 75}</string>
+					<reference key="NSSuperview"/>
+					<reference key="NSWindow"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1680, 1028}}</string>
 				<string key="NSMinSize">{350, 89}</string>
@@ -1545,7 +1551,7 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSBDb21wdXRlciwgSW5jLiwgMjAwNQAAAAA</bytes>
 				<string key="NSExtension">NSResponder</string>
 			</object>
 			<object class="NSCustomView" id="296911506">
-				<reference key="NSNextResponder"/>
+				<nil key="NSNextResponder"/>
 				<int key="NSvFlags">274</int>
 				<object class="NSMutableArray" key="NSSubviews">
 					<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1642,7 +1648,6 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSBDb21wdXRlciwgSW5jLiwgMjAwNQAAAAA</bytes>
 								</object>
 								<string key="NSFrame">{{1, 1}, {360, 315}}</string>
 								<reference key="NSSuperview" ref="754568592"/>
-								<reference key="NSNextKeyView" ref="423972458"/>
 								<reference key="NSDocView" ref="423972458"/>
 								<reference key="NSBGColor" ref="987864771"/>
 								<int key="NScvFlags">2</int>
@@ -1671,7 +1676,6 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSBDb21wdXRlciwgSW5jLiwgMjAwNQAAAAA</bytes>
 						</object>
 						<string key="NSFrame">{{10, 30}, {362, 317}}</string>
 						<reference key="NSSuperview" ref="296911506"/>
-						<reference key="NSNextKeyView" ref="198254095"/>
 						<int key="NSsFlags">530</int>
 						<reference key="NSVScroller" ref="964808471"/>
 						<reference key="NSHScroller" ref="265048045"/>
@@ -1717,7 +1721,6 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSBDb21wdXRlciwgSW5jLiwgMjAwNQAAAAA</bytes>
 					</object>
 				</object>
 				<string key="NSFrameSize">{382, 352}</string>
-				<reference key="NSSuperview"/>
 				<object class="NSMutableString" key="NSClassName">
 					<characters key="NS.bytes">NSView</characters>
 				</object>
@@ -2556,7 +2559,6 @@ AAAAAAAAAAAAAAAAAAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOQA</bytes>
 								</object>
 								<string key="NSFrame">{{1, 1}, {307, 324}}</string>
 								<reference key="NSSuperview" ref="723460874"/>
-								<reference key="NSNextKeyView" ref="40458268"/>
 								<reference key="NSDocView" ref="40458268"/>
 								<reference key="NSBGColor" ref="987864771"/>
 								<int key="NScvFlags">4</int>
@@ -2584,7 +2586,6 @@ AAAAAAAAAAAAAAAAAAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOQA</bytes>
 						</object>
 						<string key="NSFrame">{{10, 34}, {320, 326}}</string>
 						<reference key="NSSuperview" ref="175372463"/>
-						<reference key="NSNextKeyView" ref="162592510"/>
 						<int key="NSsFlags">18</int>
 						<reference key="NSVScroller" ref="344671998"/>
 						<reference key="NSHScroller" ref="280304392"/>
@@ -4096,7 +4097,6 @@ AAAAAAAAAAAAAAAAAAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOQA</bytes>
 							<reference ref="196187459"/>
 							<reference ref="376112253"/>
 							<reference ref="414447631"/>
-							<reference ref="805116426"/>
 							<reference ref="781079664"/>
 							<reference ref="658415681"/>
 							<reference ref="47194185"/>
@@ -4111,6 +4111,7 @@ AAAAAAAAAAAAAAAAAAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOQA</bytes>
 							<reference ref="430757697"/>
 							<reference ref="553765141"/>
 							<reference ref="876850876"/>
+							<reference ref="805116426"/>
 						</object>
 						<reference key="parent" ref="0"/>
 						<string key="objectName">Info</string>
@@ -5671,14 +5672,17 @@ AAAAAAAAAAAAAAAAAAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOQA</bytes>
 					<string>-3.ImportedFromIB2</string>
 					<string>1000.IBPluginDependency</string>
 					<string>1000.ImportedFromIB2</string>
+					<string>1001.CustomClassName</string>
 					<string>1001.IBPluginDependency</string>
 					<string>1001.ImportedFromIB2</string>
 					<string>1002.IBPluginDependency</string>
 					<string>1002.ImportedFromIB2</string>
+					<string>1003.CustomClassName</string>
 					<string>1003.IBPluginDependency</string>
 					<string>1003.ImportedFromIB2</string>
 					<string>1004.IBPluginDependency</string>
 					<string>1004.ImportedFromIB2</string>
+					<string>1005.CustomClassName</string>
 					<string>1005.IBPluginDependency</string>
 					<string>1005.ImportedFromIB2</string>
 					<string>1008.CustomClassName</string>
@@ -5694,12 +5698,14 @@ AAAAAAAAAAAAAAAAAAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOQA</bytes>
 					<string>1012.ImportedFromIB2</string>
 					<string>1013.IBPluginDependency</string>
 					<string>1013.ImportedFromIB2</string>
+					<string>1014.CustomClassName</string>
 					<string>1014.IBPluginDependency</string>
 					<string>1014.ImportedFromIB2</string>
 					<string>1015.IBPluginDependency</string>
 					<string>1015.ImportedFromIB2</string>
 					<string>1016.IBPluginDependency</string>
 					<string>1016.ImportedFromIB2</string>
+					<string>1017.CustomClassName</string>
 					<string>1017.IBPluginDependency</string>
 					<string>1017.ImportedFromIB2</string>
 					<string>1018.IBPluginDependency</string>
@@ -5712,6 +5718,7 @@ AAAAAAAAAAAAAAAAAAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOQA</bytes>
 					<string>1021.ImportedFromIB2</string>
 					<string>1022.IBPluginDependency</string>
 					<string>1022.ImportedFromIB2</string>
+					<string>1023.CustomClassName</string>
 					<string>1023.IBPluginDependency</string>
 					<string>1023.ImportedFromIB2</string>
 					<string>1024.IBPluginDependency</string>
@@ -5720,10 +5727,12 @@ AAAAAAAAAAAAAAAAAAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOQA</bytes>
 					<string>1025.ImportedFromIB2</string>
 					<string>1026.IBPluginDependency</string>
 					<string>1026.ImportedFromIB2</string>
+					<string>1027.CustomClassName</string>
 					<string>1027.IBPluginDependency</string>
 					<string>1027.ImportedFromIB2</string>
 					<string>1028.IBPluginDependency</string>
 					<string>1028.ImportedFromIB2</string>
+					<string>1029.CustomClassName</string>
 					<string>1029.IBPluginDependency</string>
 					<string>1029.ImportedFromIB2</string>
 					<string>1030.IBEditorWindowLastContentRect</string>
@@ -6008,6 +6017,7 @@ AAAAAAAAAAAAAAAAAAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOQA</bytes>
 					<string>965.editorWindowContentRectSynchronizationRect</string>
 					<string>967.IBPluginDependency</string>
 					<string>967.ImportedFromIB2</string>
+					<string>969.CustomClassName</string>
 					<string>969.IBPluginDependency</string>
 					<string>969.ImportedFromIB2</string>
 					<string>970.IBPluginDependency</string>
@@ -6018,10 +6028,12 @@ AAAAAAAAAAAAAAAAAAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOQA</bytes>
 					<string>972.ImportedFromIB2</string>
 					<string>973.IBPluginDependency</string>
 					<string>973.ImportedFromIB2</string>
+					<string>974.CustomClassName</string>
 					<string>974.IBPluginDependency</string>
 					<string>974.ImportedFromIB2</string>
 					<string>976.IBPluginDependency</string>
 					<string>976.ImportedFromIB2</string>
+					<string>977.CustomClassName</string>
 					<string>977.IBPluginDependency</string>
 					<string>977.ImportedFromIB2</string>
 					<string>979.IBPluginDependency</string>
@@ -6030,10 +6042,12 @@ AAAAAAAAAAAAAAAAAAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOQA</bytes>
 					<string>981.ImportedFromIB2</string>
 					<string>982.IBPluginDependency</string>
 					<string>982.ImportedFromIB2</string>
+					<string>983.CustomClassName</string>
 					<string>983.IBPluginDependency</string>
 					<string>983.ImportedFromIB2</string>
 					<string>984.IBPluginDependency</string>
 					<string>984.ImportedFromIB2</string>
+					<string>985.CustomClassName</string>
 					<string>985.IBPluginDependency</string>
 					<string>985.ImportedFromIB2</string>
 					<string>986.IBDateFormatterBehaviorMetadataKey</string>
@@ -6043,6 +6057,7 @@ AAAAAAAAAAAAAAAAAAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOQA</bytes>
 					<string>990.ImportedFromIB2</string>
 					<string>993.IBPluginDependency</string>
 					<string>993.ImportedFromIB2</string>
+					<string>994.CustomClassName</string>
 					<string>994.IBPluginDependency</string>
 					<string>994.ImportedFromIB2</string>
 					<string>995.IBEditorWindowLastContentRect</string>
@@ -6051,10 +6066,12 @@ AAAAAAAAAAAAAAAAAAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOQA</bytes>
 					<string>995.editorWindowContentRectSynchronizationRect</string>
 					<string>996.IBPluginDependency</string>
 					<string>996.ImportedFromIB2</string>
+					<string>997.CustomClassName</string>
 					<string>997.IBPluginDependency</string>
 					<string>997.ImportedFromIB2</string>
 					<string>998.IBPluginDependency</string>
 					<string>998.ImportedFromIB2</string>
+					<string>999.CustomClassName</string>
 					<string>999.IBPluginDependency</string>
 					<string>999.ImportedFromIB2</string>
 				</object>
@@ -6064,14 +6081,17 @@ AAAAAAAAAAAAAAAAAAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOQA</bytes>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
+					<string>InfoTextField</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
+					<string>InfoTextField</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
+					<string>InfoTextField</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>PiecesView</string>
@@ -6087,6 +6107,14 @@ AAAAAAAAAAAAAAAAAAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOQA</bytes>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
+					<string>InfoTextField</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<integer value="1"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<integer value="1"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<integer value="1"/>
+					<string>InfoTextField</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -6099,6 +6127,7 @@ AAAAAAAAAAAAAAAAAAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOQA</bytes>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
+					<string>InfoTextField</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -6107,16 +6136,12 @@ AAAAAAAAAAAAAAAAAAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOQA</bytes>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
+					<string>InfoTextField</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<integer value="1"/>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<integer value="1"/>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<integer value="1"/>
+					<string>InfoTextField</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>{{460, 509}, {358, 346}}</string>
@@ -6401,6 +6426,7 @@ AAAAAAAAAAAAAAAAAAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOQA</bytes>
 					<string>{{519, 533}, {350, 268}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
+					<string>InfoTextField</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -6411,6 +6437,12 @@ AAAAAAAAAAAAAAAAAAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOQA</bytes>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
+					<string>InfoTextField</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<integer value="1"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<integer value="1"/>
+					<string>InfoTextField</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -6419,23 +6451,22 @@ AAAAAAAAAAAAAAAAAAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOQA</bytes>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
+					<string>InfoTextField</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<integer value="1"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<integer value="1"/>
+					<string>InfoTextField</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<integer value="1"/>
+					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<integer value="1"/>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<integer value="1"/>
-					<integer value="1"/>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<integer value="1"/>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<integer value="1"/>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<integer value="1"/>
+					<string>InfoTextField</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>{{409, 647}, {360, 275}}</string>
@@ -6444,10 +6475,12 @@ AAAAAAAAAAAAAAAAAAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOQA</bytes>
 					<string>{{274, 636}, {360, 290}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
+					<string>InfoTextField</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
+					<string>InfoTextField</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 				</object>
@@ -6556,6 +6589,14 @@ AAAAAAAAAAAAAAAAAAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOQA</bytes>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBUserSource</string>
 						<string key="minorKey"/>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">InfoTextField</string>
+					<string key="superclassName">NSTextField</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">macosx/InfoTextField.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">

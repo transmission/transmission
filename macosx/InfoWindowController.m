@@ -1260,23 +1260,16 @@ typedef enum
         
         [fCreatorField setStringValue: @""];
         [fDateCreatedField setStringValue: @""];
-        [fCommentView setSelectable: NO];
         
         [fDataLocationField setStringValue: @""];
         [fDataLocationField setToolTip: nil];
         
         [fRevealDataButton setHidden: YES];
         
-        //don't allow empty fields to be selected
-        [fHashField setSelectable: NO];
-        [fCreatorField setSelectable: NO];
-        [fDataLocationField setSelectable: NO];
-        
         [fStateField setStringValue: @""];
         [fProgressField setStringValue: @""];
         
         [fErrorMessageView setString: @""];
-        [fErrorMessageView setSelectable: NO];
         
         [fConnectedPeersField setStringValue: @""];
         
@@ -1373,11 +1366,6 @@ typedef enum
         
         [fDateAddedField setObjectValue: [torrent dateAdded]];
         
-        //allow these fields to be selected
-        [fHashField setSelectable: YES];
-        [fCommentView setSelectable: ![commentString isEqualToString: @""]];
-        [fCreatorField setSelectable: ![creatorString isEqualToString: @""]];
-        
         //set pieces view
         BOOL piecesAvailableSegment = [[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"];
         [fPiecesControl setSelected: piecesAvailableSegment forSegment: PIECES_CONTROL_AVAILABLE];
@@ -1426,7 +1414,6 @@ typedef enum
     NSString * location = [torrent dataLocation];
     [fDataLocationField setStringValue: location ? [location stringByAbbreviatingWithTildeInPath] : @""];
     [fDataLocationField setToolTip: location ? location : @""];
-    [fDataLocationField setSelectable: location != nil];
     
     [fRevealDataButton setHidden: !location];
 }
@@ -1486,10 +1473,7 @@ typedef enum
         
         NSString * errorMessage = [torrent errorMessage];
         if (![errorMessage isEqualToString: [fErrorMessageView string]])
-        {
             [fErrorMessageView setString: errorMessage];
-            [fErrorMessageView setSelectable: ![errorMessage isEqualToString: @""]];
-        }
         
         [fDateCompletedField setObjectValue: [torrent dateCompleted]];
         

@@ -153,6 +153,7 @@
 		A2623B410D3DC5930045D19A /* ResumeHover.png in Resources */ = {isa = PBXBuildFile; fileRef = A2623B3D0D3DC5930045D19A /* ResumeHover.png */; };
 		A2623B420D3DC5930045D19A /* PauseHover.png in Resources */ = {isa = PBXBuildFile; fileRef = A2623B3E0D3DC5930045D19A /* PauseHover.png */; };
 		A2623B4E0D3DC6DF0045D19A /* ActionHover.png in Resources */ = {isa = PBXBuildFile; fileRef = A2623B4D0D3DC6DF0045D19A /* ActionHover.png */; };
+		A263CFC010DD67670038DE27 /* InfoTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = A263CFBF10DD67670038DE27 /* InfoTextField.m */; };
 		A26AF21A0D2DA35A00FF7140 /* FileOutlineController.m in Sources */ = {isa = PBXBuildFile; fileRef = A26AF2190D2DA35A00FF7140 /* FileOutlineController.m */; };
 		A26AF27E0D2DBDDF00FF7140 /* AddWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A26AF27C0D2DBDDF00FF7140 /* AddWindow.xib */; };
 		A26AF2840D2DC27C00FF7140 /* AddWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A26AF2830D2DC27C00FF7140 /* AddWindowController.m */; };
@@ -585,6 +586,8 @@
 		A2623B3D0D3DC5930045D19A /* ResumeHover.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ResumeHover.png; path = macosx/Images/ResumeHover.png; sourceTree = "<group>"; };
 		A2623B3E0D3DC5930045D19A /* PauseHover.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PauseHover.png; path = macosx/Images/PauseHover.png; sourceTree = "<group>"; };
 		A2623B4D0D3DC6DF0045D19A /* ActionHover.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionHover.png; path = macosx/Images/ActionHover.png; sourceTree = "<group>"; };
+		A263CFBE10DD67670038DE27 /* InfoTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InfoTextField.h; path = macosx/InfoTextField.h; sourceTree = "<group>"; };
+		A263CFBF10DD67670038DE27 /* InfoTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InfoTextField.m; path = macosx/InfoTextField.m; sourceTree = "<group>"; };
 		A265A32E0D25767700198AC8 /* fr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fr; path = macosx/fr.lproj/Creator.xib; sourceTree = "<group>"; };
 		A265A32F0D25767700198AC8 /* fr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fr; path = macosx/fr.lproj/InfoWindow.xib; sourceTree = "<group>"; };
 		A265A3300D25767700198AC8 /* fr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fr; path = macosx/fr.lproj/MainMenu.xib; sourceTree = "<group>"; };
@@ -1394,6 +1397,8 @@
 				A2725D5C0DE7507C003445E7 /* TrackerTableView.m */,
 				A21A9D3F106EC2E800F1C3C1 /* TrackerCell.h */,
 				A21A9D40106EC2E800F1C3C1 /* TrackerCell.m */,
+				A263CFBE10DD67670038DE27 /* InfoTextField.h */,
+				A263CFBF10DD67670038DE27 /* InfoTextField.m */,
 			);
 			name = "Info Window";
 			sourceTree = "<group>";
@@ -2011,6 +2016,7 @@
 				A29D84041049C25600D1987A /* NSApplicationAdditions.m in Sources */,
 				A21A9BE2106D86A800F1C3C1 /* TrackerNode.m in Sources */,
 				A21A9D41106EC2E800F1C3C1 /* TrackerCell.m in Sources */,
+				A263CFC010DD67670038DE27 /* InfoTextField.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
