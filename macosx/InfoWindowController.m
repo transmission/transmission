@@ -1374,7 +1374,7 @@ typedef enum
         #warning remove after 1.8
         [fHashField setSelectable: YES];
         [fCommentView setSelectable: ![commentString isEqualToString: @""]];
-        [fCreatorField setSelectable: ![creatorString isEqualToString: @""]];
+        [fDataLocationField setSelectable: YES];
         
         //set pieces view
         BOOL piecesAvailableSegment = [[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"];
