@@ -224,7 +224,7 @@
             [[GroupsController groups] setUsesCustomDownloadLocation: NO forIndex: index];
     }
     
-    [self refreshCustomLocation];
+    [self refreshCustomLocationWithSingleGroup];
     
     [fCustomLocationPopUp selectItemAtIndex: 0];
 }

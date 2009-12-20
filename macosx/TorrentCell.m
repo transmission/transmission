@@ -30,35 +30,35 @@
 #import "Torrent.h"
 #import "TorrentTableView.h"
 
-#define BAR_HEIGHT 12.0f
+#define BAR_HEIGHT 12.0
 
-#define IMAGE_SIZE_REG 32.0f
-#define IMAGE_SIZE_MIN 16.0f
-#define ERROR_IMAGE_SIZE 20.0f
+#define IMAGE_SIZE_REG 32.0
+#define IMAGE_SIZE_MIN 16.0
+#define ERROR_IMAGE_SIZE 20.0
 
-#define NORMAL_BUTTON_WIDTH 14.0f
-#define ACTION_BUTTON_WIDTH 16.0f
+#define NORMAL_BUTTON_WIDTH 14.0
+#define ACTION_BUTTON_WIDTH 16.0
 
-#define PRIORITY_ICON_WIDTH 14.0f
-#define PRIORITY_ICON_HEIGHT 14.0f
+#define PRIORITY_ICON_WIDTH 14.0
+#define PRIORITY_ICON_HEIGHT 14.0
 
 //ends up being larger than font height
-#define HEIGHT_TITLE 16.0f
-#define HEIGHT_STATUS 12.0f
+#define HEIGHT_TITLE 16.0
+#define HEIGHT_STATUS 12.0
 
-#define PADDING_HORIZONTAL 3.0f
-#define PADDING_BETWEEN_IMAGE_AND_TITLE 5.0f
-#define PADDING_BETWEEN_IMAGE_AND_BAR 7.0f
-#define PADDING_BETWEEN_TITLE_AND_PRIORITY 4.0f
-#define PADDING_ABOVE_TITLE 4.0f
-#define PADDING_ABOVE_MIN_STATUS 4.0f
-#define PADDING_BETWEEN_TITLE_AND_MIN_STATUS 2.0f
-#define PADDING_BETWEEN_TITLE_AND_PROGRESS 1.0f
-#define PADDING_BETWEEN_PROGRESS_AND_BAR 2.0f
-#define PADDING_BETWEEN_TITLE_AND_BAR_MIN 3.0f
-#define PADDING_BETWEEN_BAR_AND_STATUS 2.0f
+#define PADDING_HORIZONTAL 3.0
+#define PADDING_BETWEEN_IMAGE_AND_TITLE 5.0
+#define PADDING_BETWEEN_IMAGE_AND_BAR 7.0
+#define PADDING_BETWEEN_TITLE_AND_PRIORITY 4.0
+#define PADDING_ABOVE_TITLE 4.0
+#define PADDING_ABOVE_MIN_STATUS 4.0
+#define PADDING_BETWEEN_TITLE_AND_MIN_STATUS 2.0
+#define PADDING_BETWEEN_TITLE_AND_PROGRESS 1.0
+#define PADDING_BETWEEN_PROGRESS_AND_BAR 2.0
+#define PADDING_BETWEEN_TITLE_AND_BAR_MIN 3.0
+#define PADDING_BETWEEN_BAR_AND_STATUS 2.0
 
-#define PIECES_TOTAL_PERCENT 0.6f
+#define PIECES_TOTAL_PERCENT 0.6
 
 #define MAX_PIECES (18*18)
 
@@ -100,17 +100,19 @@
         
         NSMutableParagraphStyle * paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
         [paragraphStyle setLineBreakMode: NSLineBreakByTruncatingTail];
-    
-        fTitleAttributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
-                                [NSFont messageFontOfSize: 12.0f], NSFontAttributeName,
-                                paragraphStyle, NSParagraphStyleAttributeName, nil];
-        fStatusAttributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
-                                [NSFont messageFontOfSize: 9.0f], NSFontAttributeName,
-                                paragraphStyle, NSParagraphStyleAttributeName, nil];
+        
+        fTitleAttributes = [[NSMutableDictionary alloc] initWithCapacity: 3];
+        [fTitleAttributes setObject: [NSFont messageFontOfSize: 12.0] forKey: NSFontAttributeName];
+        [fTitleAttributes setObject: paragraphStyle forKey: NSParagraphStyleAttributeName];
+        
+        fStatusAttributes = [[NSMutableDictionary alloc] initWithCapacity: 3];
+        [fStatusAttributes setObject: [NSFont messageFontOfSize: 9.0] forKey: NSFontAttributeName];
+        [fStatusAttributes setObject: paragraphStyle forKey: NSParagraphStyleAttributeName];
+        
         [paragraphStyle release];
         
-        fBluePieceColor = [[NSColor colorWithCalibratedRed: 0.0f green: 0.4f blue: 0.8f alpha: 1.0f] retain];
-        fBarBorderColor = [[NSColor colorWithCalibratedWhite: 0.0f alpha: 0.2f] retain];
+        fBluePieceColor = [[NSColor colorWithCalibratedRed: 0.0 green: 0.4 blue: 0.8 alpha: 1.0] retain];
+        fBarBorderColor = [[NSColor colorWithCalibratedWhite: 0.0 alpha: 0.2] retain];
     }
 	return self;
 }
@@ -119,12 +121,8 @@
 {
     const CGFloat imageSize = [fDefaults boolForKey: @"SmallView"] ? IMAGE_SIZE_MIN : IMAGE_SIZE_REG;
     
-    NSRect result = bounds;
-    result.origin.x += PADDING_HORIZONTAL;
-    result.origin.y += floor((result.size.height - imageSize) * 0.5);
-    result.size = NSMakeSize(imageSize, imageSize);
-    
-    return result;
+    return NSMakeRect(NSMinX(bounds) + PADDING_HORIZONTAL, floor(NSMidY(bounds) - imageSize * 0.5),
+                        imageSize, imageSize);
 }
 
 - (NSUInteger) hitTestForEvent: (NSEvent *) event inRect: (NSRect) cellFrame ofView: (NSView *) controlView
@@ -237,7 +235,7 @@
     if (NSMouseInRect(mouseLocation, controlButtonRect, [controlView isFlipped]))
     {
         controlOptions |= NSTrackingAssumeInside;
-        [(TorrentTableView *)controlView setControlButtonHover: [[userInfo objectForKey: @"Row"] intValue]];
+        [(TorrentTableView *)controlView setControlButtonHover: [[userInfo objectForKey: @"Row"] integerValue]];
     }
     
     NSMutableDictionary * controlInfo = [userInfo mutableCopy];
@@ -254,7 +252,7 @@
     if (NSMouseInRect(mouseLocation, revealButtonRect, [controlView isFlipped]))
     {
         revealOptions |= NSTrackingAssumeInside;
-        [(TorrentTableView *)controlView setRevealButtonHover: [[userInfo objectForKey: @"Row"] intValue]];
+        [(TorrentTableView *)controlView setRevealButtonHover: [[userInfo objectForKey: @"Row"] integerValue]];
     }
     
     NSMutableDictionary * revealInfo = [userInfo mutableCopy];
@@ -270,7 +268,7 @@
     if (NSMouseInRect(mouseLocation, actionButtonRect, [controlView isFlipped]))
     {
         actionOptions |= NSTrackingAssumeInside;
-        [(TorrentTableView *)controlView setActionButtonHover: [[userInfo objectForKey: @"Row"] intValue]];
+        [(TorrentTableView *)controlView setActionButtonHover: [[userInfo objectForKey: @"Row"] integerValue]];
     }
     
     NSMutableDictionary * actionInfo = [userInfo mutableCopy];
@@ -308,33 +306,33 @@
     const BOOL minimal = [fDefaults boolForKey: @"SmallView"];
     
     //group coloring
-    NSRect iconRect = [self iconRectForBounds: cellFrame];
+    const NSRect iconRect = [self iconRectForBounds: cellFrame];
     
-    NSInteger groupValue = [torrent groupValue];
+    const NSInteger groupValue = [torrent groupValue];
     if (groupValue != -1)
     {
-        NSRect groupRect = NSInsetRect(iconRect, -1.0f, -2.0f);
+        NSRect groupRect = NSInsetRect(iconRect, -1.0, -2.0);
         if (!minimal)
         {
-            groupRect.size.height -= 1.0f;
-            groupRect.origin.y -= 1.0f;
+            groupRect.size.height -= 1.0;
+            groupRect.origin.y -= 1.0;
         }
-        const CGFloat radius = minimal ? 3.0f : 6.0f;
+        const CGFloat radius = minimal ? 3.0 : 6.0;
         
         NSColor * groupColor = [[GroupsController groups] colorForIndex: groupValue],
-                * darkGroupColor = [groupColor blendedColorWithFraction: 0.2f ofColor: [NSColor whiteColor]];
+                * darkGroupColor = [groupColor blendedColorWithFraction: 0.2 ofColor: [NSColor whiteColor]];
         
         //border
         NSBezierPath * bp = [NSBezierPath bezierPathWithRoundedRect: groupRect xRadius: radius yRadius: radius];
         [darkGroupColor set];
-        [bp setLineWidth: 2.0f];
+        [bp setLineWidth: 2.0];
         [bp stroke];
         
         //inside
         bp = [NSBezierPath bezierPathWithRoundedRect: groupRect xRadius: radius yRadius: radius];
-        NSGradient * gradient = [[NSGradient alloc] initWithStartingColor: [groupColor blendedColorWithFraction: 0.7f
+        NSGradient * gradient = [[NSGradient alloc] initWithStartingColor: [groupColor blendedColorWithFraction: 0.7
                                     ofColor: [NSColor whiteColor]] endingColor: darkGroupColor];
-        [gradient drawInBezierPath: bp angle: 90.0f];
+        [gradient drawInBezierPath: bp angle: 90.0];
         [gradient release];
     }
     
@@ -389,11 +387,12 @@
     {
         NSImage * priorityImage = [torrent priority] == TR_PRI_HIGH ? [NSImage imageNamed: @"PriorityHigh.png"]
                                                                     : [NSImage imageNamed: @"PriorityLow.png"];
-        priorityImage = [NSApp isOnSnowLeopardOrBetter] ? [priorityImage retain] : [priorityImage copy]; //take line out completely when 10.6-only
+        //take line out completely when 10.6-only
+        priorityImage = [NSApp isOnSnowLeopardOrBetter] ? [priorityImage retain] : [priorityImage copy];
         
         NSRect priorityRect = NSMakeRect(NSMaxX(titleRect) + PADDING_BETWEEN_TITLE_AND_PRIORITY,
-                                titleRect.origin.y - (PRIORITY_ICON_HEIGHT - titleRect.size.height) / 2.0,
-                                PRIORITY_ICON_WIDTH, PRIORITY_ICON_HEIGHT);
+                                        NSMidY(titleRect) - PRIORITY_ICON_HEIGHT  * 0.5,
+                                        PRIORITY_ICON_WIDTH, PRIORITY_ICON_HEIGHT);
         
         [self drawImage: priorityImage inRect: priorityRect];
         [priorityImage release];
@@ -637,7 +636,7 @@
     if ([[self representedObject] priority] != TR_PRI_NORMAL)
     {
         result.size.width -= PRIORITY_ICON_WIDTH + PADDING_BETWEEN_TITLE_AND_PRIORITY;
-        result.size.width = MIN(result.size.width, [string size].width); //only need to force it smaller for the priority icon
+        result.size.width = MIN(NSWidth(result), [string size].width); //only need to force it smaller for the priority icon
     }
     
     return result;
@@ -692,9 +691,9 @@
     NSRect result;
     result.size.height = NORMAL_BUTTON_WIDTH;
     result.size.width = NORMAL_BUTTON_WIDTH;
-    result.origin.x = NSMaxX(bounds) - 2.0f * (PADDING_HORIZONTAL + NORMAL_BUTTON_WIDTH);
+    result.origin.x = NSMaxX(bounds) - 2.0 * (PADDING_HORIZONTAL + NORMAL_BUTTON_WIDTH);
     
-    result.origin.y = NSMinY(bounds) + PADDING_ABOVE_TITLE + HEIGHT_TITLE - (NORMAL_BUTTON_WIDTH - BAR_HEIGHT) * 0.5f;
+    result.origin.y = NSMinY(bounds) + PADDING_ABOVE_TITLE + HEIGHT_TITLE - (NORMAL_BUTTON_WIDTH - BAR_HEIGHT) * 0.5;
     if ([fDefaults boolForKey: @"SmallView"])
         result.origin.y += PADDING_BETWEEN_TITLE_AND_BAR_MIN;
     else
@@ -710,7 +709,7 @@
     result.size.width = NORMAL_BUTTON_WIDTH;
     result.origin.x = NSMaxX(bounds) - (PADDING_HORIZONTAL + NORMAL_BUTTON_WIDTH);
     
-    result.origin.y = NSMinY(bounds) + PADDING_ABOVE_TITLE + HEIGHT_TITLE - (NORMAL_BUTTON_WIDTH - BAR_HEIGHT) * 0.5f;
+    result.origin.y = NSMinY(bounds) + PADDING_ABOVE_TITLE + HEIGHT_TITLE - (NORMAL_BUTTON_WIDTH - BAR_HEIGHT) * 0.5;
     if ([fDefaults boolForKey: @"SmallView"])
         result.origin.y += PADDING_BETWEEN_TITLE_AND_BAR_MIN;
     else
@@ -721,16 +720,11 @@
 
 - (NSRect) actionButtonRectForBounds: (NSRect) bounds
 {
-    NSRect result = [self iconRectForBounds: bounds];
-    if (![fDefaults boolForKey: @"SmallView"])
-    {
-        result.origin.x += (result.size.width - ACTION_BUTTON_WIDTH) * 0.5f;
-        result.origin.y += (result.size.height - ACTION_BUTTON_WIDTH) * 0.5f;
-        result.size.width = ACTION_BUTTON_WIDTH;
-        result.size.height = ACTION_BUTTON_WIDTH;
-    }
+    const NSRect iconRect = [self iconRectForBounds: bounds];
     
-    return result;
+    //in minimal view the rect will be the icon rect, but avoid the extra defaults lookup with some cheap math
+    return NSMakeRect(NSMidX(iconRect) - ACTION_BUTTON_WIDTH * 0.5, NSMidY(iconRect) - ACTION_BUTTON_WIDTH * 0.5,
+                        ACTION_BUTTON_WIDTH, ACTION_BUTTON_WIDTH);
 }
 
 - (NSAttributedString *) attributedTitle
