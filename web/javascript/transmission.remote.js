@@ -11,6 +11,7 @@ function RPC() { }
 
 // Constants
 RPC._Root                   = '/transmission/rpc';
+RPC._DaemonVersion          = 'version';
 RPC._Encryption             = 'encryption';
 RPC._EncryptionPreferred    = 'preferred';
 RPC._EncryptionRequired     = 'required';

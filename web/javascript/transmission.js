@@ -895,6 +895,7 @@ Transmission.prototype =
 		$('select#turtle_start_time').val(          prefs[RPC._TurtleTimeBegin] );
 		$('select#turtle_end_time').val(            prefs[RPC._TurtleTimeEnd] );
 		$('select#turtle_days').val(                prefs[RPC._TurtleTimeDay] );
+		$('#transmission_version').text(            prefs[RPC._DaemonVersion] );
 
 		if (!iPhone)
 		{

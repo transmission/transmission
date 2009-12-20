@@ -1050,6 +1050,13 @@ div#prefs_container div#pref_error {
 	background-color: #FFEFEF;
 }
 
+#transmission_version{
+  position: absolute;
+  bottom: 10px;
+  left:   10px;
+  color:  #999;
+}
+
 /*--------------------------------------
  *
  * T R A N S   M E N U
