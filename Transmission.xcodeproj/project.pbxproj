@@ -154,6 +154,7 @@
 		A2623B420D3DC5930045D19A /* PauseHover.png in Resources */ = {isa = PBXBuildFile; fileRef = A2623B3E0D3DC5930045D19A /* PauseHover.png */; };
 		A2623B4E0D3DC6DF0045D19A /* ActionHover.png in Resources */ = {isa = PBXBuildFile; fileRef = A2623B4D0D3DC6DF0045D19A /* ActionHover.png */; };
 		A263CFC010DD67670038DE27 /* InfoTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = A263CFBF10DD67670038DE27 /* InfoTextField.m */; };
+		A263D03E10DE6F010038DE27 /* Magnet.png in Resources */ = {isa = PBXBuildFile; fileRef = A263D03D10DE6F010038DE27 /* Magnet.png */; };
 		A26AF21A0D2DA35A00FF7140 /* FileOutlineController.m in Sources */ = {isa = PBXBuildFile; fileRef = A26AF2190D2DA35A00FF7140 /* FileOutlineController.m */; };
 		A26AF27E0D2DBDDF00FF7140 /* AddWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A26AF27C0D2DBDDF00FF7140 /* AddWindow.xib */; };
 		A26AF2840D2DC27C00FF7140 /* AddWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A26AF2830D2DC27C00FF7140 /* AddWindowController.m */; };
@@ -588,6 +589,7 @@
 		A2623B4D0D3DC6DF0045D19A /* ActionHover.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionHover.png; path = macosx/Images/ActionHover.png; sourceTree = "<group>"; };
 		A263CFBE10DD67670038DE27 /* InfoTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InfoTextField.h; path = macosx/InfoTextField.h; sourceTree = "<group>"; };
 		A263CFBF10DD67670038DE27 /* InfoTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InfoTextField.m; path = macosx/InfoTextField.m; sourceTree = "<group>"; };
+		A263D03D10DE6F010038DE27 /* Magnet.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Magnet.png; path = macosx/Images/Magnet.png; sourceTree = "<group>"; };
 		A265A32E0D25767700198AC8 /* fr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fr; path = macosx/fr.lproj/Creator.xib; sourceTree = "<group>"; };
 		A265A32F0D25767700198AC8 /* fr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fr; path = macosx/fr.lproj/InfoWindow.xib; sourceTree = "<group>"; };
 		A265A3300D25767700198AC8 /* fr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fr; path = macosx/fr.lproj/MainMenu.xib; sourceTree = "<group>"; };
@@ -1055,6 +1057,7 @@
 				A2623B2E0D3DC2EF0045D19A /* PriorityControlHigh.png */,
 				A2FB06950BFF484A0095564D /* Globe.png */,
 				A261A8250C6A0D68003BAFDA /* Error.png */,
+				A263D03D10DE6F010038DE27 /* Magnet.png */,
 				A2F1511F0CD438BA001F3B0E /* Lock.png */,
 				A245030B0D6A1FB000B49D00 /* UpArrowGroupTemplate.png */,
 				A245030D0D6A1FBC00B49D00 /* DownArrowGroupTemplate.png */,
@@ -1839,6 +1842,7 @@
 				A2E2EA920EE321C200EB6308 /* Groups.png in Resources */,
 				A215BF5C0F02EBB800350CDB /* GroupRules.xib in Resources */,
 				A25963E11068376200453B31 /* FavIcon.png in Resources */,
+				A263D03E10DE6F010038DE27 /* Magnet.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -554,7 +554,7 @@ int trashDataFile(const char * filename)
 - (NSImage *) icon
 {
     if ([self isMagnet])
-        return [NSImage imageNamed: NSImageNameNetwork]; //placeholder
+        return [NSImage imageNamed: @"Magnet.png"];
     
     #warning replace 'fldr' stuff with NSImageNameFolder on 10.6
     if (!fIcon)
