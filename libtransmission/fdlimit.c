@@ -832,7 +832,8 @@ tr_fdSetPeerLimit( tr_session * session, int socketLimit )
         const int NOFILE_BUFFER = 512;
         const int open_max = sysconf( _SC_OPEN_MAX );
         getrlimit( RLIMIT_NOFILE, &rlim );
-        rlim.rlim_cur = MIN( MAX( 1024, open_max ), rlim.rlim_max );
+        rlim.rlim_cur = MAX( 1024, open_max );
+        rlim.rlim_cur = MIN( rlim.rlim_cur, rlim.rlim_max );
         setrlimit( RLIMIT_NOFILE, &rlim );
         tr_dbg( "setrlimit( RLIMIT_NOFILE, %d )", (int)rlim.rlim_cur );
         gFd->socketLimit = MIN( socketLimit, (int)rlim.rlim_cur - NOFILE_BUFFER );
