@@ -815,13 +815,6 @@ tr_fdGetFileLimit( const tr_session * session )
 {
     return session && session->fdInfo ? session->fdInfo->openFileLimit : -1;
 }
-
-static TR_INLINE int clamp( int val, int lo, int hi )
-{
-    if( val < lo ) val = lo;
-    if( val > hi ) val = hi;
-    return val;
-}
     
 
 void
@@ -839,7 +832,7 @@ tr_fdSetPeerLimit( tr_session * session, int socketLimit )
         const int NOFILE_BUFFER = 512;
         const int open_max = sysconf( _SC_OPEN_MAX );
         getrlimit( RLIMIT_NOFILE, &rlim );
-        rlim.rlim_cur = clamp( open_max, 1024, rlim.rlim_max );
+        rlim.rlim_cur = MIN( MAX( 1024, open_max ), rlim.rlim_max );
         setrlimit( RLIMIT_NOFILE, &rlim );
         tr_dbg( "setrlimit( RLIMIT_NOFILE, %d )", (int)rlim.rlim_cur );
         gFd->socketLimit = MIN( socketLimit, (int)rlim.rlim_cur - NOFILE_BUFFER );
