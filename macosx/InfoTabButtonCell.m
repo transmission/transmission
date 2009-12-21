@@ -66,12 +66,14 @@
     
     if (fIcon)
     {
-        NSSize iconSize = [fIcon size], tabSize = [tabImage size];
-        NSPoint point = NSMakePoint(floorf((tabSize.width - iconSize.width) * 0.5),
-                                    floorf((tabSize.height - iconSize.height) * 0.5));
+        const NSSize iconSize = [fIcon size], tabSize = [tabImage size];
+        
+        const NSRect iconRect = NSMakeRect(floor((tabSize.width - iconSize.width) * 0.5),
+                                            floor((tabSize.height - iconSize.height) * 0.5),
+                                            iconSize.width, iconSize.height);
         
         [tabImage lockFocus];
-        [fIcon compositeToPoint: point operation: NSCompositeSourceOver];
+        [fIcon drawInRect: iconRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
         [tabImage unlockFocus];
     }
     
