@@ -2081,7 +2081,7 @@ onEditTrackers( GtkButton * button, gpointer data )
         hig_workarea_add_wide_control( t, &row, l );
 
         w = gtk_text_view_new_with_buffer( di->tracker_buffer );
-        gtk_widget_set_size_request( w, 500u, 66u );
+        gtk_widget_set_size_request( w, 500u, 166u );
         fr = gtk_frame_new( NULL );
         gtk_frame_set_shadow_type( GTK_FRAME( fr ), GTK_SHADOW_IN );
         sw = gtk_scrolled_window_new( NULL, NULL );
