@@ -47,11 +47,11 @@
 {
     [fButton setTitle: NSLocalizedString(@"Cancel", "Blocklist -> cancel button")];
     
-    const CGFloat oldWidth = [fButton frame].size.width;
+    const CGFloat oldWidth = NSWidth([fButton frame]);
     [fButton sizeToFit];
     NSRect buttonFrame = [fButton frame];
-    buttonFrame.size.width += 12.0f; //sizeToFit sizes a bit too small
-    buttonFrame.origin.x -= buttonFrame.size.width - oldWidth;
+    buttonFrame.size.width += 12.0; //sizeToFit sizes a bit too small
+    buttonFrame.origin.x -= NSWidth(buttonFrame) - oldWidth;
     [fButton setFrame: buttonFrame];
     
     [fProgressBar setUsesThreadedAnimation: YES];

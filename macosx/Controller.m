@@ -4090,8 +4090,11 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [scrollView setHasVerticalScroller: YES];
         
         //hack to ensure scrollbars don't disappear after resizing
-        [scrollView setAutohidesScrollers: NO];
-        [scrollView setAutohidesScrollers: YES];
+        if (![NSApp isOnSnowLeopardOrBetter])
+        {
+            [scrollView setAutohidesScrollers: NO];
+            [scrollView setAutohidesScrollers: YES];
+        }
     }
 }
 

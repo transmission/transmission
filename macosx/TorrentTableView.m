@@ -240,7 +240,7 @@
         if (![[self itemAtRow: row] isKindOfClass: [Torrent class]])
             continue;
         
-        NSDictionary * userInfo = [NSDictionary dictionaryWithObject: [NSNumber numberWithUnsignedInteger: row] forKey: @"Row"];
+        NSDictionary * userInfo = [NSDictionary dictionaryWithObject: [NSNumber numberWithInteger: row] forKey: @"Row"];
         TorrentCell * cell = (TorrentCell *)[self preparedCellAtColumn: -1 row: row];
         [cell addTrackingAreasForView: self inRect: [self rectOfRow: row] withUserInfo: userInfo mouseLocation: mouseLocation];
     }
@@ -287,7 +287,7 @@
     NSNumber * row;
     if ((row = [dict objectForKey: @"Row"]))
     {
-        NSInteger rowVal = [row intValue];
+        NSInteger rowVal = [row integerValue];
         NSString * type = [dict objectForKey: @"Type"];
         if ([type isEqualToString: @"Action"])
             fMouseActionRow = rowVal;
@@ -315,7 +315,7 @@
         else
             fMouseRevealRow = -1;
         
-        [self setNeedsDisplayInRect: [self rectOfRow: [row intValue]]];
+        [self setNeedsDisplayInRect: [self rectOfRow: [row integerValue]]];
     }
 }
 
@@ -411,20 +411,17 @@
     {
         if ([item isKindOfClass: [Torrent class]])
         {
-            NSInteger index = [self rowForItem: item];
+            const NSInteger index = [self rowForItem: item];
             if (index != -1)
                 [indexSet addIndex: index];
         }
         else
         {
-            NSInteger group = [item groupIndex];
+            const NSInteger group = [item groupIndex];
             for (NSInteger i = 0; i < [self numberOfRows]; i++)
             {
-                if ([indexSet containsIndex: i])
-                    continue;
-                
                 id tableItem = [self itemAtRow: i];
-                if (![tableItem isKindOfClass: [Torrent class]] && group == [tableItem groupIndex])
+                if ([tableItem isKindOfClass: [TorrentGroup class]] && group == [tableItem groupIndex])
                 {
                     [indexSet addIndex: i];
                     break;

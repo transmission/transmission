@@ -145,7 +145,6 @@
 
 - (void) setURL: (NSString *) url
 {
-    #warning get magnet image/phrase
     [[self contentView] setOverlay: [NSImage imageNamed: @"Globe.png"]
         mainLine: NSLocalizedString(@"Web Address", "Drag overlay -> url") subLine: url];
     [self fadeIn];
