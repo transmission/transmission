@@ -42,6 +42,7 @@
 #define KEY_SPEEDLIMIT_OLD      "speed-limit"
 #define KEY_SPEEDLIMIT_UP       "speed-limit-up"
 #define KEY_SPEEDLIMIT_DOWN     "speed-limit-down"
+#define KEY_STREAMING           "streaming"
 #define KEY_RATIOLIMIT          "ratio-limit"
 #define KEY_UPLOADED            "uploaded"
 
@@ -503,7 +504,7 @@ tr_torrentSaveResume( const tr_torrent * tor )
 
     tr_tordbg( tor, "Saving .resume file for \"%s\"", tr_torrentName( tor ) );
 
-    tr_bencInitDict( &top, 33 ); /* arbitrary "big enough" number */
+    tr_bencInitDict( &top, 34 ); /* arbitrary "big enough" number */
     tr_bencDictAddInt( &top, KEY_ACTIVITY_DATE, tor->activityDate );
     tr_bencDictAddInt( &top, KEY_ADDED_DATE, tor->addedDate );
     tr_bencDictAddInt( &top, KEY_CORRUPT, tor->corruptPrev + tor->corruptCur );
@@ -516,6 +517,7 @@ tr_torrentSaveResume( const tr_torrent * tor )
     tr_bencDictAddInt( &top, KEY_MAX_PEERS, tor->maxConnectedPeers );
     tr_bencDictAddInt( &top, KEY_BANDWIDTH_PRIORITY, tr_torrentGetPriority( tor ) );
     tr_bencDictAddBool( &top, KEY_PAUSED, !tor->isRunning );
+    tr_bencDictAddBool( &top, KEY_STREAMING, tr_torrentIsStreaming( tor ) );
     savePeers( &top, tor );
     saveFilePriorities( &top, tor );
     saveDND( &top, tor );
@@ -607,6 +609,13 @@ loadFromFile( tr_torrent * tor,
     {
         tor->isRunning = !boolVal;
         fieldsLoaded |= TR_FR_RUN;
+    }
+
+    if( ( fieldsToLoad & TR_FR_STREAMING )
+      && tr_bencDictFindBool( &top, KEY_STREAMING, &boolVal ) )
+    {
+        tor->isStreaming = boolVal;
+        fieldsLoaded |= TR_FR_STREAMING;
     }
 
     if( ( fieldsToLoad & TR_FR_ADDED_DATE )

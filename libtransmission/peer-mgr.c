@@ -11,10 +11,8 @@
  */
 
 #include <assert.h>
-#include <errno.h>
 #include <string.h> /* memcpy, memcmp, strstr */
 #include <stdlib.h> /* qsort */
-#include <limits.h> /* INT_MAX */
 
 #include <event.h>
 
@@ -154,7 +152,7 @@ struct block_request
 struct weighted_piece
 {
     tr_piece_index_t index;
-    int16_t salt;
+    tr_piece_index_t salt;
     int16_t requestCount;
 };
 
@@ -778,7 +776,11 @@ comparePieceByWeight( const void * va, const void * vb )
     if( ia < ib ) return 1;
 
     /* tertiary key: random */
-    return a->salt - b->salt;
+    if( a->salt < b->salt ) return -1;
+    if( a->salt > b->salt ) return 1;
+
+    /* okay, they're equal */
+    return 0;
 }
 
 static int
@@ -857,6 +859,7 @@ pieceListRebuild( Torrent * t )
         tr_piece_index_t poolCount = 0;
         const tr_torrent * tor = t->tor;
         const tr_info * inf = tr_torrentInfo( tor );
+        const tr_bool isStreaming = tr_torrentIsStreaming( tor );
         struct weighted_piece * pieces;
         int pieceCount;
 
@@ -872,7 +875,8 @@ pieceListRebuild( Torrent * t )
             struct weighted_piece * piece = pieces + i;
             piece->index = pool[i];
             piece->requestCount = 0;
-            piece->salt = tr_cryptoWeakRandInt( 255 );
+            piece->salt = isStreaming ? piece->index
+                                      : (tr_piece_index_t)tr_cryptoWeakRandInt( 4096 );
         }
 
         /* if we already had a list of pieces, merge it into

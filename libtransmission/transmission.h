@@ -707,9 +707,6 @@ uint16_t   tr_sessionGetPeerLimit( const tr_session * );
 void       tr_sessionSetPeerLimitPerTorrent( tr_session *, uint16_t maxGlobalPeers );
 uint16_t   tr_sessionGetPeerLimitPerTorrent( const tr_session * );
 
-tr_priority_t   tr_torrentGetPriority( const tr_torrent * );
-void            tr_torrentSetPriority( tr_torrent *, tr_priority_t );
-
 
 /**
  *  Load all the torrents in tr_getTorrentDir().
@@ -1074,6 +1071,12 @@ tr_bool  tr_torrentUsesSpeedLimit     ( const tr_torrent *, tr_direction );
 void     tr_torrentUseSessionLimits   ( tr_torrent *, tr_bool );
 tr_bool  tr_torrentUsesSessionLimits  ( const tr_torrent * );
 
+
+tr_priority_t   tr_torrentGetPriority( const tr_torrent * );
+void            tr_torrentSetPriority( tr_torrent *, tr_priority_t );
+
+tr_bool         tr_torrentIsStreaming( const tr_torrent * );
+void            tr_torrentSetStreaming( tr_torrent *, tr_bool );
 
 /****
 *****  Ratio Limits

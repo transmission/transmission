@@ -1890,6 +1890,28 @@ tr_torrentSetPriority( tr_torrent * tor, tr_priority_t priority )
 ****
 ***/
 
+tr_bool
+tr_torrentIsStreaming( const tr_torrent * tor )
+{
+    assert( tr_isTorrent( tor ) );
+    assert( tr_isBool( tor->isStreaming ) );
+
+    return tor->isStreaming;
+}
+
+void
+tr_torrentSetStreaming( tr_torrent * tor, tr_bool isStreaming )
+{
+    assert( tr_isTorrent( tor ) );
+    assert( tr_isBool( isStreaming ) );
+
+    tor->isStreaming = isStreaming;
+}
+
+/***
+****
+***/
+
 void
 tr_torrentSetPeerLimit( tr_torrent * tor,
                         uint16_t     maxConnectedPeers )
