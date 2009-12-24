@@ -859,7 +859,6 @@ pieceListRebuild( Torrent * t )
         tr_piece_index_t poolCount = 0;
         const tr_torrent * tor = t->tor;
         const tr_info * inf = tr_torrentInfo( tor );
-        const tr_bool isStreaming = tr_torrentIsStreaming( tor );
         struct weighted_piece * pieces;
         int pieceCount;
 
@@ -875,8 +874,7 @@ pieceListRebuild( Torrent * t )
             struct weighted_piece * piece = pieces + i;
             piece->index = pool[i];
             piece->requestCount = 0;
-            piece->salt = isStreaming ? piece->index
-                                      : (tr_piece_index_t)tr_cryptoWeakRandInt( 4096 );
+            piece->salt = tr_cryptoWeakRandInt( 4096 );
         }
 
         /* if we already had a list of pieces, merge it into

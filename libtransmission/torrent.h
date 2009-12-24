@@ -226,7 +226,6 @@ struct tr_torrent
     tr_torrent_ratio_limit_hit_func  * ratio_limit_hit_func;
     void                             * ratio_limit_hit_func_user_data;
 
-    tr_bool                    isStreaming;
     tr_bool                    isRunning;
     tr_bool                    isDeleting;
     tr_bool                    needsSeedRatioCheck;
