@@ -101,7 +101,7 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
                 pieceBytesRead += numRead;
             if( numRead == bytesThisPass )
                 SHA1_Update( &sha, buffer, numRead );
-#ifdef HAVE_POSIX_FADVISE
+#if defined HAVE_POSIX_FADVISE && defined POSIX_FADV_DONTNEED
             posix_fadvise( fd, filePos, bytesThisPass, POSIX_FADV_DONTNEED );
 #endif
 #ifdef SYS_DARWIN
