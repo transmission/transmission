@@ -725,20 +725,20 @@ tr_fdSocketAccept( tr_session  * session,
 void
 tr_fdSocketClose( tr_session * session, int fd )
 {
-    struct tr_fdInfo * gFd;
-
     assert( tr_isSession( session ) );
-    assert( session->fdInfo != NULL );
 
-    gFd = session->fdInfo;
-
-    if( fd >= 0 )
+    if( session->fdInfo != NULL )
     {
-        tr_netCloseSocket( fd );
-        --gFd->socketCount;
-    }
+        struct tr_fdInfo * gFd = session->fdInfo;
 
-    assert( gFd->socketCount >= 0 );
+        if( fd >= 0 )
+        {
+            tr_netCloseSocket( fd );
+            --gFd->socketCount;
+        }
+
+        assert( gFd->socketCount >= 0 );
+    }
 }
 
 /***
