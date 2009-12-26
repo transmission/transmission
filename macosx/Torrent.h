@@ -210,7 +210,7 @@
 
 //methods require fileStats to have been updated recently to be accurate
 - (CGFloat) fileProgress: (FileListNode *) node;
-- (BOOL) canChangeDownloadCheckForFile: (NSInteger) index;
+- (BOOL) canChangeDownloadCheckForFile: (NSUInteger) index;
 - (BOOL) canChangeDownloadCheckForFiles: (NSIndexSet *) indexSet;
 - (NSInteger) checkForFiles: (NSIndexSet *) indexSet;
 - (void) setFileCheckState: (NSInteger) state forIndexes: (NSIndexSet *) indexSet;

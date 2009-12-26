@@ -2183,16 +2183,16 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         NSSortDescriptor * groupDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"groupOrderValue" ascending: YES] autorelease];
         [allTorrents sortUsingDescriptors: [NSArray arrayWithObject: groupDescriptor]];
         
-        NSMutableArray * groupTorrents;
+        TorrentGroup * group = nil;
         NSInteger lastGroupValue = -2, currentOldGroupIndex = 0;
         for (Torrent * torrent in allTorrents)
         {
-            NSInteger groupValue = [torrent groupValue];
+            const NSInteger groupValue = [torrent groupValue];
             if (groupValue != lastGroupValue)
             {
                 lastGroupValue = groupValue;
                 
-                TorrentGroup * group = nil;
+                group = nil;
                 
                 //try to see if the group already exists
                 for (; currentOldGroupIndex < [oldTorrentGroups count]; currentOldGroupIndex++)
@@ -2214,11 +2214,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 if (!group)
                     group = [[[TorrentGroup alloc] initWithGroup: groupValue] autorelease];
                 [fDisplayedTorrents addObject: group];
-                
-                groupTorrents = [group torrents];
             }
             
-            [groupTorrents addObject: torrent];
+            NSAssert(group != nil, @"No group object to add torrents to");
+            [[group torrents] addObject: torrent];
         }
     }
     else

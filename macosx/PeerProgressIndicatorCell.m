@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #import "PeerProgressIndicatorCell.h"
+#import "NSApplicationAdditions.h"
 
 @implementation PeerProgressIndicatorCell
 
@@ -74,12 +75,19 @@
         if (fSeed)
         {
             NSImage * checkImage = [NSImage imageNamed: @"CompleteCheck.png"];
-            [checkImage setFlipped: YES];
             
-            NSSize imageSize = [checkImage size];
-            NSRect rect = NSMakeRect(cellFrame.origin.x + (cellFrame.size.width - imageSize.width) * 0.5,
-                        cellFrame.origin.y + (cellFrame.size.height - imageSize.height) * 0.5, imageSize.width, imageSize.height);
-            [checkImage drawInRect: rect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
+            const NSSize imageSize = [checkImage size];
+            const NSRect rect = NSMakeRect(NSMidX(cellFrame) - imageSize.width * 0.5, NSMidY(cellFrame) - imageSize.height * 0.5,
+                                            imageSize.width, imageSize.height);
+            
+            if ([NSApp isOnSnowLeopardOrBetter])
+                [checkImage drawInRect: rect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0 respectFlipped: YES
+                        hints: nil];
+            else
+            {
+                [checkImage setFlipped: YES];
+                [checkImage drawInRect: rect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
+            }
         }
     }
 }

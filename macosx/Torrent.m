@@ -1023,7 +1023,7 @@ int trashDataFile(const char * filename)
                     string = [NSString stringWithFormat: NSLocalizedString(@"Downloading from %d of 1 peer",
                                                     "Torrent -> status string"), [self peersSendingToUs]];
                 
-                NSInteger webSeedCount = fStat->webseedsSendingToUs;
+                const NSInteger webSeedCount = fStat->webseedsSendingToUs;
                 if (webSeedCount > 0)
                 {
                     NSString * webSeedString;
@@ -1275,10 +1275,7 @@ int trashDataFile(const char * filename)
 
 - (CGFloat) fileProgress: (FileListNode *) node
 {
-    if ([self isComplete])
-        return 1.0;
-    
-    if ([self fileCount] == 1)
+    if ([self fileCount] == 1 || [self isComplete])
         return [self progress];
     
     if (!fFileStat)
@@ -1302,7 +1299,7 @@ int trashDataFile(const char * filename)
     return fFlatFileList;
 }
 
-- (BOOL) canChangeDownloadCheckForFile: (NSInteger) index
+- (BOOL) canChangeDownloadCheckForFile: (NSUInteger) index
 {
     NSAssert2(index < [self fileCount], @"Index %d is greater than file count %d", index, [self fileCount]);
     
@@ -1323,7 +1320,7 @@ int trashDataFile(const char * filename)
     if (!fFileStat)
         [self updateFileStat];
     
-    for (NSInteger index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
+    for (NSUInteger index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
         if (fFileStat[index].progress < 1.0)
             return YES;
     return NO;
@@ -1332,7 +1329,7 @@ int trashDataFile(const char * filename)
 - (NSInteger) checkForFiles: (NSIndexSet *) indexSet
 {
     BOOL onState = NO, offState = NO;
-    for (NSInteger index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
+    for (NSUInteger index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
     {
         if (tr_torrentGetFileDL(fHandle, index) || ![self canChangeDownloadCheckForFile: index])
             onState = YES;
@@ -1362,17 +1359,17 @@ int trashDataFile(const char * filename)
 - (void) setFilePriority: (tr_priority_t) priority forIndexes: (NSIndexSet *) indexSet
 {
     const NSUInteger count = [indexSet count];
-    tr_file_index_t * files = malloc(count * sizeof(tr_file_index_t));
+    tr_file_index_t * files = tr_malloc(count * sizeof(tr_file_index_t));
     for (NSUInteger index = [indexSet firstIndex], i = 0; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index], i++)
         files[i] = index;
     
     tr_torrentSetFilePriorities(fHandle, files, count, priority);
-    free(files);
+    tr_free(files);
 }
 
 - (BOOL) hasFilePriority: (tr_priority_t) priority forIndexes: (NSIndexSet *) indexSet
 {
-    for (NSInteger index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
+    for (NSUInteger index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
         if (priority == tr_torrentGetFilePriority(fHandle, index) && [self canChangeDownloadCheckForFile: index])
             return YES;
     return NO;
@@ -1381,9 +1378,9 @@ int trashDataFile(const char * filename)
 - (NSSet *) filePrioritiesForIndexes: (NSIndexSet *) indexSet
 {
     BOOL low = NO, normal = NO, high = NO;
-    NSMutableSet * priorities = [NSMutableSet setWithCapacity: 3];
+    NSMutableSet * priorities = [NSMutableSet setWithCapacity: MIN([indexSet count], 3)];
     
-    for (NSInteger index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
+    for (NSUInteger index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
     {
         if (![self canChangeDownloadCheckForFile: index])
             continue;

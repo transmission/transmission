@@ -135,9 +135,8 @@
     
     //string is in center of image
     NSRect stringRect;
-    stringRect.origin.x = NSMinX(badgeRect) + (NSWidth(badgeRect) - stringSize.width) * 0.5;
-    stringRect.origin.y = NSMinY(badgeRect) + (NSHeight(badgeRect) - stringSize.height) * 0.5
-                            + (quit ? 2.0 : 1.0); //adjust for shadow, extra for quit
+    stringRect.origin.x = NSMidX(badgeRect) - stringSize.width * 0.5;
+    stringRect.origin.y = NSMidY(badgeRect) - stringSize.height * 0.5 + (quit ? 2.0 : 1.0); //adjust for shadow, extra for quit
     stringRect.size = stringSize;
     
     [string drawInRect: stringRect withAttributes: fAttributes];
