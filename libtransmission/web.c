@@ -53,14 +53,14 @@ struct tr_web
     tr_session * session;
     tr_address addr;
     struct event timer_event;
-    /*tr_list * freeme;*/
+    tr_list * freeme;
 };
 
 static void
 web_free( tr_web * g )
 {
     curl_multi_cleanup( g->multi );
-    /*tr_list_free( &g->freeme, tr_free );*/
+    tr_list_free( &g->freeme, tr_free );
     evtimer_del( &g->timer_event );
     memset( g, TR_MEMORY_TRASH, sizeof( struct tr_web ) );
     tr_free( g );
@@ -289,8 +289,7 @@ sock_cb( CURL * e UNUSED, curl_socket_t fd, int action,
         if( io_event != NULL )
         {
             event_del( io_event );
-            /*memset( io_event, TR_MEMORY_TRASH, sizeof( struct event ) );
-              tr_list_append( &web->freeme, io_event );*/
+            tr_list_append( &web->freeme, io_event );
             curl_multi_assign( web->multi, fd, NULL );
             /*fprintf( stderr, "-1 io_events to %d\n", --num_events );*/
         }
@@ -324,7 +323,7 @@ static void
 libevent_timer_cb( int fd UNUSED, short what UNUSED, void * vg )
 {
     tr_web * g = vg;
-    /*tr_list_free( &g->freeme, tr_free );*/
+    tr_list_free( &g->freeme, tr_free );
     dbgmsg( "libevent timer is done" );
     tr_multi_perform( g, CURL_SOCKET_TIMEOUT, 0 );
 }
