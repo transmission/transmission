@@ -74,8 +74,6 @@
     [fTitleAttributes release];
     [fStatusAttributes release];
     
-    [fFolderImage release];
-    
     [super dealloc];
 }
 
@@ -86,25 +84,13 @@
     copy->fTitleAttributes = [fTitleAttributes retain];
     copy->fStatusAttributes = [fStatusAttributes retain];
     
-    copy->fFolderImage = [fFolderImage retain];
-    
     return copy;
 }
 
 - (NSImage *) image
 {
     FileListNode * node = (FileListNode *)[self objectValue];
-    NSImage * image;
-    if ([node isFolder])
-    {
-        if (!fFolderImage)
-            fFolderImage = [[[NSWorkspace sharedWorkspace] iconForFileType: NSFileTypeForHFSTypeCode('fldr')] copy];
-        image = fFolderImage;
-    }
-    else
-        image = [node icon];
-    
-    return image;
+    return [node icon];
 }
 
 - (NSRect) imageRectForBounds: (NSRect) bounds

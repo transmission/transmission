@@ -26,8 +26,6 @@
 
 @interface FileNameCell : NSActionCell
 {
-    NSImage * fFolderImage;
-    
     NSMutableDictionary * fTitleAttributes, * fStatusAttributes;
 }
 
