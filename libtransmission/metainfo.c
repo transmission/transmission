@@ -136,24 +136,28 @@ tr_metainfoMigrate( tr_session * session,
 ***/
 
 static tr_bool
-getfile( char        ** setme,
-         const char   * root,
-         tr_benc      * path )
+path_is_suspicious( const char * path )
+{
+    return ( path == NULL )
+        || ( strstr( path, "../" ) != NULL );
+}
+
+static tr_bool
+getfile( char ** setme, const char * root, tr_benc * path )
 {
     tr_bool success = FALSE;
 
     if( tr_bencIsList( path ) )
     {
+        int i;
+        const int n = tr_bencListSize( path );
         struct evbuffer * buf = evbuffer_new( );
-        int               n = tr_bencListSize( path );
-        int               i;
 
         evbuffer_add( buf, root, strlen( root ) );
         for( i = 0; i < n; ++i )
         {
             const char * str;
-            if( tr_bencGetStr( tr_bencListChild( path, i ), &str )
-              && strcmp( str, ".." ) )
+            if( tr_bencGetStr( tr_bencListChild( path, i ), &str ) )
             {
                 evbuffer_add( buf, TR_PATH_DELIMITER_STR, 1 );
                 evbuffer_add( buf, str, strlen( str ) );
@@ -164,6 +168,13 @@ getfile( char        ** setme,
         /* fprintf( stderr, "[%s]\n", *setme ); */
         evbuffer_free( buf );
         success = TRUE;
+    }
+
+    if( ( *setme != NULL ) && path_is_suspicious( *setme ) )
+    {
+        tr_free( *setme );
+        *setme = NULL;
+        success = FALSE;
     }
 
     return success;
@@ -211,6 +222,9 @@ parseFiles( tr_info *       inf,
     }
     else if( tr_bencGetInt( length, &len ) ) /* single-file mode */
     {
+        if( path_is_suspicious( inf->name ) )
+            return "path";
+
         inf->isMultifile      = 0;
         inf->fileCount        = 1;
         inf->files            = tr_new0( tr_file, 1 );
