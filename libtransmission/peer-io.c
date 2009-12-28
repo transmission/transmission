@@ -384,6 +384,7 @@ tr_peerIoNew( tr_session       * session,
     io->crypto = tr_cryptoNew( torrentHash, isIncoming );
     io->session = session;
     io->addr = *addr;
+    io->isSeed = isSeed;
     io->port = port;
     io->socket = socket;
     io->isIncoming = isIncoming != 0;
