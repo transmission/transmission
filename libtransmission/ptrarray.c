@@ -170,17 +170,19 @@ tr_ptrArrayLowerBound( const tr_ptrArray *                t,
     return first;
 }
 
+#ifdef NDEBUG
+#define assertSortedAndUnique(a,b)
+#else
 static void
 assertSortedAndUnique( const tr_ptrArray * t,
                         int compare(const void*, const void*) )
 {
-#ifndef NDEBUG
     int i;
 
     for( i = 0; i < t->n_items - 2; ++i )
         assert( compare( t->items[i], t->items[i + 1] ) <= 0 );
-#endif
 }
+#endif
 
 int
 tr_ptrArrayInsertSorted( tr_ptrArray * t,

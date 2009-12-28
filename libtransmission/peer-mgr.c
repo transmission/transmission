@@ -128,6 +128,9 @@ struct peer_atom
     time_t      shelf_date;
 };
 
+#ifdef NDEBUG
+#define tr_isAtom(a) (TRUE)
+#else
 static tr_bool
 tr_isAtom( const struct peer_atom * atom )
 {
@@ -135,6 +138,7 @@ tr_isAtom( const struct peer_atom * atom )
         && ( atom->from < TR_PEER_FROM__MAX )
         && ( tr_isAddress( &atom->addr ) );
 }
+#endif
 
 static const char*
 tr_atomAddrStr( const struct peer_atom * atom )

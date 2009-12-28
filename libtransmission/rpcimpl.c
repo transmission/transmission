@@ -183,7 +183,7 @@ static const char*
 torrentStart( tr_session               * session,
               tr_benc                  * args_in,
               tr_benc                  * args_out UNUSED,
-              struct tr_rpc_idle_data  * idle_data )
+              struct tr_rpc_idle_data  * idle_data UNUSED )
 {
     int           i, torrentCount;
     tr_torrent ** torrents = getTorrents( session, args_in, &torrentCount );
@@ -204,7 +204,7 @@ static const char*
 torrentStop( tr_session               * session,
              tr_benc                  * args_in,
              tr_benc                  * args_out UNUSED,
-             struct tr_rpc_idle_data  * idle_data )
+             struct tr_rpc_idle_data  * idle_data UNUSED )
 {
     int           i, torrentCount;
     tr_torrent ** torrents = getTorrents( session, args_in, &torrentCount );
@@ -225,7 +225,7 @@ static const char*
 torrentRemove( tr_session               * session,
                tr_benc                  * args_in,
                tr_benc                  * args_out UNUSED,
-               struct tr_rpc_idle_data  * idle_data )
+               struct tr_rpc_idle_data  * idle_data UNUSED )
 {
     int i;
     int torrentCount;
@@ -252,7 +252,7 @@ static const char*
 torrentReannounce( tr_session               * session,
                    tr_benc                  * args_in,
                    tr_benc                  * args_out UNUSED,
-                   struct tr_rpc_idle_data  * idle_data )
+                   struct tr_rpc_idle_data  * idle_data UNUSED )
 {
     int i, torrentCount;
     tr_torrent ** torrents = getTorrents( session, args_in, &torrentCount );
@@ -277,7 +277,7 @@ static const char*
 torrentVerify( tr_session               * session,
                tr_benc                  * args_in,
                tr_benc                  * args_out UNUSED,
-               struct tr_rpc_idle_data  * idle_data )
+               struct tr_rpc_idle_data  * idle_data UNUSED )
 {
     int           i, torrentCount;
     tr_torrent ** torrents = getTorrents( session, args_in, &torrentCount );
@@ -618,7 +618,7 @@ static const char*
 torrentGet( tr_session               * session,
             tr_benc                  * args_in,
             tr_benc                  * args_out,
-            struct tr_rpc_idle_data  * idle_data )
+            struct tr_rpc_idle_data  * idle_data UNUSED )
 {
     int           i, torrentCount;
     tr_torrent ** torrents = getTorrents( session, args_in, &torrentCount );
@@ -737,7 +737,7 @@ static const char*
 torrentSet( tr_session               * session,
             tr_benc                  * args_in,
             tr_benc                  * args_out UNUSED,
-            struct tr_rpc_idle_data  * idle_data )
+            struct tr_rpc_idle_data  * idle_data UNUSED )
 {
     const char * errmsg = NULL;
     int i, torrentCount;
@@ -793,7 +793,7 @@ static const char*
 torrentSetLocation( tr_session               * session,
                     tr_benc                  * args_in,
                     tr_benc                  * args_out UNUSED,
-                    struct tr_rpc_idle_data  * idle_data )
+                    struct tr_rpc_idle_data  * idle_data UNUSED )
 {
     const char * errmsg = NULL;
     const char * location = NULL;
@@ -1132,7 +1132,7 @@ static const char*
 sessionSet( tr_session               * session,
             tr_benc                  * args_in,
             tr_benc                  * args_out UNUSED,
-            struct tr_rpc_idle_data  * idle_data )
+            struct tr_rpc_idle_data  * idle_data UNUSED )
 {
     int64_t      i;
     double       d;
@@ -1207,7 +1207,7 @@ static const char*
 sessionStats( tr_session               * session,
               tr_benc                  * args_in UNUSED,
               tr_benc                  * args_out,
-              struct tr_rpc_idle_data  * idle_data )
+              struct tr_rpc_idle_data  * idle_data UNUSED )
 {
     int running = 0;
     int total = 0;
@@ -1254,7 +1254,7 @@ static const char*
 sessionGet( tr_session               * s,
             tr_benc                  * args_in UNUSED,
             tr_benc                  * args_out,
-            struct tr_rpc_idle_data  * idle_data )
+            struct tr_rpc_idle_data  * idle_data UNUSED )
 {
     const char * str;
     tr_benc *    d = args_out;

@@ -187,16 +187,16 @@ dht_bootstrap(void *closure)
 
     if(!bootstrap_done(cl->session, 0)) {
         char *bootstrap_file;
-        FILE *f;
+        FILE *f = NULL;
 
         bootstrap_file =
             tr_buildPath(cl->session->configDir, "dht.bootstrap", NULL);
 
         if(bootstrap_file)
             f = fopen(bootstrap_file, "r");
-        if(f) {
+        if(f != NULL) {
             tr_ninf("DHT", "Attempting manual bootstrap");
-            while(1) {
+            for(;;) {
                 char buf[201];
                 char *p;
                 int port = 0;

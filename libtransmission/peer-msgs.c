@@ -1377,7 +1377,9 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
     uint32_t      ui32;
     uint32_t      msglen = msgs->incoming.length;
     const uint8_t id = msgs->incoming.id;
+#ifndef NDEBUG
     const size_t  startBufLen = EVBUFFER_LENGTH( inbuf );
+#endif
     const tr_bool fext = tr_peerIoSupportsFEXT( msgs->peer->io );
 
     --msglen; /* id length */
