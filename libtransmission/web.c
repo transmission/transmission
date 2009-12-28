@@ -107,7 +107,7 @@ writeFunc( void * ptr, size_t size, size_t nmemb, void * vtask )
     return byteCount;
 }
 
-static void
+static int
 sockoptfunction( void * vtask, curl_socket_t fd, curlsocktype purpose UNUSED )
 {
     struct tr_web_task * task = vtask;
@@ -123,6 +123,9 @@ sockoptfunction( void * vtask, curl_socket_t fd, curlsocktype purpose UNUSED )
         setsockopt( fd, SOL_SOCKET, SO_SNDBUF, &sndbuf, sizeof(sndbuf) );
         setsockopt( fd, SOL_SOCKET, SO_RCVBUF, &rcvbuf, sizeof(rcvbuf) );
     }
+
+    /* return nonzero if this function encountered an error */
+    return 0;
 }
 
 static int
