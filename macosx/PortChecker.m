@@ -25,7 +25,7 @@
 #import "PortChecker.h"
 
 #define CHECKER_URL(port) [NSString stringWithFormat: @"http://portcheck.transmissionbt.com/%d", port]
-#define CHECK_FIRE  3.0
+#define CHECK_FIRE 3.0
 
 @interface PortChecker (Private)
 

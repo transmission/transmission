@@ -913,22 +913,18 @@
         
         NSMenuItem * item = [[NSMenuItem alloc] initWithTitle: name action: @selector(checkFile:) keyEquivalent: @""];
         
-        NSImage * icon;
-        if (![node isFolder])
-            icon = [node icon];
-        else
+        if ([node isFolder])
         {
             NSMenu * itemMenu = [[NSMenu alloc] initWithTitle: name];
             [itemMenu setAutoenablesItems: NO];
             [item setSubmenu: itemMenu];
             [itemMenu setDelegate: self];
             [itemMenu release];
-            
-            icon = [[NSWorkspace sharedWorkspace] iconForFileType: NSFileTypeForHFSTypeCode('fldr')];
         }
         
         [item setRepresentedObject: node];
         
+        NSImage * icon = [node icon];
         [icon setSize: NSMakeSize(16.0, 16.0)];
         [item setImage: icon];
         

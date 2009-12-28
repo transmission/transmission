@@ -33,7 +33,7 @@
     [self setSelectable: ![[self stringValue] isEqualToString: @""]];
 }
 
-- (void)setObjectValue: (id < NSCopying >) object
+- (void) setObjectValue: (id <NSCopying>) object
 {
     [super setObjectValue: object];
     

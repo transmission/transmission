@@ -44,10 +44,10 @@
     NSString * path = [value stringByExpandingTildeInPath];
     NSImage * icon;
     //show a folder icon if the folder doesn't exist
-    if (![[NSFileManager defaultManager] fileExistsAtPath: path] && [[path pathExtension] isEqualToString: @""])
+    if ([[path pathExtension] isEqualToString: @""] && ![[NSFileManager defaultManager] fileExistsAtPath: path])
         icon = [[NSWorkspace sharedWorkspace] iconForFileType: NSFileTypeForHFSTypeCode('fldr')];
     else
-        icon = [[NSWorkspace sharedWorkspace] iconForFile: [value stringByExpandingTildeInPath]];
+        icon = [[NSWorkspace sharedWorkspace] iconForFile: path];
     
     [icon setSize: NSMakeSize(16.0, 16.0)];
     

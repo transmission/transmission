@@ -240,24 +240,17 @@ NSMutableSet * fTrackerIconLoading;
 
 - (NSRect) imageRectForBounds: (NSRect) bounds
 {
-    NSRect result = bounds;
-    result.origin.x += PADDING_HORIZONAL;
-    result.origin.y += PADDING_ABOVE_ICON;
-    result.size = NSMakeSize(ICON_SIZE, ICON_SIZE);
-    
-    return result;
+    return NSMakeRect(NSMinX(bounds) + PADDING_HORIZONAL, NSMinY(bounds) + PADDING_ABOVE_ICON, ICON_SIZE, ICON_SIZE);
 }
 
 - (NSRect) rectForNameWithString: (NSAttributedString *) string inBounds: (NSRect) bounds
 {
-    const NSSize nameSize = [string size];
-    
-    NSRect result = bounds;
-    result.origin.x += PADDING_HORIZONAL + ICON_SIZE + PADDING_BETWEEN_ICON_AND_NAME;
-    result.origin.y += PADDING_ABOVE_NAME;
+    NSRect result;
+    result.origin.x = NSMinX(bounds) + PADDING_HORIZONAL + ICON_SIZE + PADDING_BETWEEN_ICON_AND_NAME;
+    result.origin.y = NSMinY(bounds) + PADDING_ABOVE_NAME;
         
-    result.size = nameSize;
-    result.size.width = MIN(result.size.width, NSMaxX(bounds) - NSMinX(result));
+    result.size.height = [string size].height;
+    result.size.width = NSMaxX(bounds) - NSMinX(result) - PADDING_HORIZONAL;
     
     return result;
 }
@@ -273,7 +266,7 @@ NSMutableSet * fTrackerIconLoading;
 {
     NSRect result = rightRect;
     result.size.width = [string size].width;
-    result.origin.x -= result.size.width;
+    result.origin.x -= NSWidth(result);
     
     return result;
 }
@@ -281,14 +274,12 @@ NSMutableSet * fTrackerIconLoading;
 - (NSRect) rectForStatusWithString: (NSAttributedString *) string withAboveRect: (NSRect) aboveRect withRightRect: (NSRect) rightRect
             inBounds: (NSRect) bounds
 {
-    const NSSize statusSize = [string size];
-    
-    NSRect result = bounds;
-    result.origin.x += PADDING_STATUS_HORIZONAL;
+    NSRect result;
+    result.origin.x = NSMinX(bounds) + PADDING_STATUS_HORIZONAL;
     result.origin.y = NSMaxY(aboveRect) + PADDING_BETWEEN_LINES;
     
-    result.size = statusSize;
-    result.size.width = MIN(result.size.width, (NSMinX(rightRect) - PADDING_BETWEEN_LINES_ON_SAME_LINE) - NSMinX(result));
+    result.size.height = [string size].height;
+    result.size.width = NSMinX(rightRect) - PADDING_BETWEEN_LINES_ON_SAME_LINE - NSMinX(result);
     
     return result;
 }
