@@ -224,26 +224,6 @@ tr_getLogTimeStr( char * buf, int buflen )
     return buf;
 }
 
-void
-tr_assertImpl( const char * file, int line, const char * test, const char * fmt, ... )
-{
-    char buf[64];
-    fprintf( stderr, "[%s] Transmission %s Assertion \"%s\" failed at %s:%d.  ",
-                     tr_getLogTimeStr( buf, sizeof( buf ) ),
-                      LONG_VERSION_STRING, test, file, line );
-    if( fmt && *fmt ) {
-        va_list args;
-        fputc( '(', stderr );
-        va_start( args, fmt );
-        vfprintf( stderr, fmt, args );
-        va_end( args );
-        fputs( ")  ", stderr );
-    }
-    fputs( "Please report this bug at <http://trac.transmissionbt.com/newticket>; Thank you.\n", stderr );
-    abort( );
-}
-
-
 tr_bool
 tr_deepLoggingIsActive( void )
 {

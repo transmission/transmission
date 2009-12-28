@@ -13,6 +13,8 @@
 #include <curl/curl.h>
 #include <event.h>
 
+#include <assert.h>
+
 #include "transmission.h"
 #include "list.h"
 #include "net.h"
@@ -313,7 +315,7 @@ sock_cb( CURL * e UNUSED, curl_socket_t fd, int action,
         event_set( io_event, fd, events, event_cb, web );
         event_add( io_event, NULL );
     }
-    else tr_assert( 0, "unhandled action: %d", action );
+    else assert( 0 && "unhandled action" );
 
     return 0; /* libcurl documentation: "The callback MUST return 0." */
 }
