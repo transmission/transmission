@@ -2,8 +2,19 @@
 [http://trac.transmissionbt.com/query?milestone=1.80&group=component&groupdesc=1&order=severity All tickets closed by this release]
 
 === Transmission 1.80 beta 4 (20YY/MM/DD) ===
+==== All Platforms ====
+  * Fix 1.80b2 bug in the libcurl glue code
+  * Fix 1.80b1 bug that could download too many torrent pieces
+  * Fix 1.80b1 crash in tr_fdSocketClose()
+  * Fix minor display bug with zero-sized files in a torrent
+  * Fix "too many open files" issue in some environments
+  * Fix minor compiler warnings and tarball packaging issues
+  * Add an OS hint to not cache torrent files during torrent verification
 ==== Mac ====
+  * Fix 1.80b1 crash in "insert_event"
   * Simplified Chinese localization
+==== Web Client ====
+  * Show version information in the preferences dialog
 
 === Transmission 1.80 beta 3 (2009/12/15) ===
 ==== All Platforms ====
