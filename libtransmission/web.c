@@ -16,7 +16,6 @@
 #include <assert.h>
 
 #include "transmission.h"
-#include "list.h"
 #include "net.h"
 #include "session.h"
 #include "trevent.h"
@@ -55,23 +54,12 @@ struct tr_web
     tr_session * session;
     tr_address addr;
     struct event timer_event;
-    tr_list * active_events;
-    tr_list * inactive_events;
 };
-
-static void
-event_list_node_free( void * event )
-{
-    event_del( event );
-    tr_free( event );
-}
 
 static void
 web_free( tr_web * g )
 {
     curl_multi_cleanup( g->multi );
-    tr_list_free( &g->active_events, event_list_node_free );
-    tr_list_free( &g->inactive_events, event_list_node_free );
     evtimer_del( &g->timer_event );
     memset( g, TR_MEMORY_TRASH, sizeof( struct tr_web ) );
     tr_free( g );
@@ -303,8 +291,11 @@ sock_cb( CURL * e UNUSED, curl_socket_t fd, int action,
         if( io_event != NULL )
         {
             event_del( io_event );
-            tr_list_remove_data( &web->active_events, io_event );
-            tr_list_append( &web->inactive_events, io_event );
+#ifndef SYS_DARWIN
+            tr_free( io_event );
+#else
+#warning FIXME - OS X
+#endif
             curl_multi_assign( web->multi, fd, NULL );
             /*fprintf( stderr, "-1 io_events to %d\n", --num_events );*/
         }
@@ -318,11 +309,8 @@ sock_cb( CURL * e UNUSED, curl_socket_t fd, int action,
         if( io_event != NULL )
             event_del( io_event );
         else {
-            io_event = tr_list_pop_front( &web->inactive_events );
-            if( io_event == NULL )
-                io_event = tr_new0( struct event, 1 );
+            io_event = tr_new0( struct event, 1 );
             curl_multi_assign( web->multi, fd, io_event );
-            tr_list_append( &web->active_events, io_event );
             /*fprintf( stderr, "+1 io_events to %d\n", ++num_events );*/
         }
 
