@@ -1615,7 +1615,7 @@ int trashDataFile(const char * filename)
             tr_file * file = &fInfo->files[i];
             
             NSString * fullPath = [NSString stringWithUTF8String: file->name];
-            NSMutableArray * pathComponents = [[NSMutableArray alloc] initWithArray: [fullPath pathComponents]];
+            NSArray * pathComponents = [fullPath pathComponents];
             NSAssert1([pathComponents count] >= 2, @"Not enough components in path %@", fullPath);
             
             NSString * path = [pathComponents objectAtIndex: 0];
@@ -1623,8 +1623,6 @@ int trashDataFile(const char * filename)
             
             if ([pathComponents count] > 2)
             {
-                [pathComponents removeObjectsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, 2)]];
-                
                 //determine if folder node already exists
                 FileListNode * node;
                 for (node in fileList)
@@ -1638,8 +1636,11 @@ int trashDataFile(const char * filename)
                     [node release];
                 }
                 
+                NSMutableArray * trimmedComponents = [NSMutableArray arrayWithArray: [pathComponents subarrayWithRange:
+                                                        NSMakeRange(2, [pathComponents count]-2)]];
+                
                 [node insertIndex: i withSize: file->length];
-                [self insertPath: pathComponents forParent: node fileSize: file->length index: i flatList: flatFileList];
+                [self insertPath: trimmedComponents forParent: node fileSize: file->length index: i flatList: flatFileList];
             }
             else
             {
@@ -1648,8 +1649,6 @@ int trashDataFile(const char * filename)
                 [flatFileList addObject: node];
                 [node release];
             }
-            
-            [pathComponents release];
         }
         
         fFileList = [[NSArray alloc] initWithArray: fileList];
