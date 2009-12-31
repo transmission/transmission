@@ -1125,7 +1125,7 @@ tr_torrentFiles( const tr_torrent * tor,
     for( i=0; i<n; ++i, ++walk ) {
         const uint64_t b = isSeed ? tor->info.files[i].length : fileBytesCompleted( tor, i );
         walk->bytesCompleted = b;
-        walk->progress = tor->info.files[i].length > 0.0 ? ( (float)b / tor->info.files[i].length ) : 1.0;
+        walk->progress = tor->info.files[i].length > 0 ? ( (float)b / tor->info.files[i].length ) : 1.0;
     }
 
     if( fileCount )

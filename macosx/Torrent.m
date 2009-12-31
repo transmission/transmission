@@ -1251,7 +1251,7 @@ int trashDataFile(const char * filename)
 
 - (void) checkGroupValueForRemoval: (NSNotification *) notification
 {
-    if (fGroupValue != -1 && [[[notification userInfo] objectForKey: @"Index"] intValue] == fGroupValue)
+    if (fGroupValue != -1 && [[[notification userInfo] objectForKey: @"Index"] integerValue] == fGroupValue)
         fGroupValue = -1;
 }
 
@@ -1614,13 +1614,17 @@ int trashDataFile(const char * filename)
         {
             tr_file * file = &fInfo->files[i];
             
-            NSMutableArray * pathComponents = [[[NSString stringWithUTF8String: file->name] pathComponents] mutableCopy];
+            NSString * fullPath = [NSString stringWithUTF8String: file->name];
+            NSMutableArray * pathComponents = [[NSMutableArray alloc] initWithArray: [fullPath pathComponents]];
+            NSAssert1([pathComponents count] >= 2, @"Not enough components in path %@", fullPath);
+            
             NSString * path = [pathComponents objectAtIndex: 0];
             NSString * name = [pathComponents objectAtIndex: 1];
-            [pathComponents removeObjectsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, 2)]];
             
-            if ([pathComponents count] > 0)
+            if ([pathComponents count] > 2)
             {
+                [pathComponents removeObjectsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, 2)]];
+                
                 //determine if folder node already exists
                 FileListNode * node;
                 for (node in fileList)
