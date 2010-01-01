@@ -470,8 +470,11 @@ tr_dhtUninit(tr_session *ss)
 
     dht_uninit( 1 );
     tr_netCloseSocket( dht_socket );
-    if(dht6_socket > 0)
+    dht_socket = -1;
+    if(dht6_socket > 0) {
         tr_netCloseSocket( dht6_socket );
+        dht6_socket = -1;
+    }
 
     tr_ndbg("DHT", "Done uninitializing DHT");
 
