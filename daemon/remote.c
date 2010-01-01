@@ -1469,7 +1469,7 @@ printDetails( tr_benc * top )
                 for( i=k=0; k<len; ++k ) {
                     int e;
                     for( e=0; i<j && e<8; ++e, ++i )
-                        printf( str[k] & (1<<(7-e)) ? "1" : "0" );
+                        printf( "%c", str[k] & (1<<(7-e)) ? '1' : '0' );
                     printf( " " );
                     if( !(i%64) )
                         printf( "\n  " );

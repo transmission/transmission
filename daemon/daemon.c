@@ -417,7 +417,7 @@ main( int argc, char ** argv )
 #endif
 
     while( !closing ) {
-        tr_wait( 1000 ); /* sleep one second */
+        tr_wait_msec( 1000 ); /* sleep one second */
         dtr_watchdir_update( watchdir );
         pumpLogMessages( foreground );
     }

@@ -32,7 +32,7 @@
 #include <libtransmission/bencode.h>
 #include <libtransmission/makemeta.h>
 #include <libtransmission/tr-getopt.h>
-#include <libtransmission/utils.h> /* tr_wait */
+#include <libtransmission/utils.h> /* tr_wait_msec */
 #include <libtransmission/version.h>
 #include <libtransmission/web.h> /* tr_webRun */
 
@@ -365,7 +365,7 @@ main( int     argc,
         tr_makeMetaInfo( b, torrentPath, announce, announceCount, comment, isPrivate );
         while( !b->isDone )
         {
-            tr_wait( 1000 );
+            tr_wait_msec( 1000 );
             printf( "." );
         }
 
@@ -385,7 +385,7 @@ main( int     argc,
     } else if( !memcmp( torrentPath, "http", 4 ) ) {
         tr_webRun( h, torrentPath, NULL, onTorrentFileDownloaded, ctor );
         waitingOnWeb = TRUE;
-        while( waitingOnWeb ) tr_wait( 1000 );
+        while( waitingOnWeb ) tr_wait_msec( 1000 );
     }
     tr_free( fileContents );
 
@@ -421,7 +421,7 @@ main( int     argc,
             fprintf( stderr, "scraping %d trackers:\n", leftToScrape );
 
             while( leftToScrape > 0 && ( ( time( NULL ) - start ) < 20 ) )
-                tr_wait( 250 );
+                tr_wait_msec( 250 );
         }
         goto cleanup;
     }
@@ -470,7 +470,7 @@ main( int     argc,
                                              "Tracker gave an error:",
                                              "Error:" };
 
-        tr_wait( 200 );
+        tr_wait_msec( 200 );
 
         if( gotsig )
         {
