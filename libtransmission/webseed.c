@@ -10,7 +10,6 @@
  * $Id$
  */
 
-#include <assert.h>
 #include <string.h> /* strlen */
 
 #include <event.h>
