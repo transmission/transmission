@@ -254,21 +254,21 @@ struct tr_torrent
 };
 
 /* get the index of this piece's first block */
-static TR_INLINE tr_block_index_t
+static inline tr_block_index_t
 tr_torPieceFirstBlock( const tr_torrent * tor, const tr_piece_index_t piece )
 {
     return piece * tor->blockCountInPiece;
 }
 
 /* what piece index is this block in? */
-static TR_INLINE tr_piece_index_t
+static inline tr_piece_index_t
 tr_torBlockPiece( const tr_torrent * tor, const tr_block_index_t block )
 {
     return block / tor->blockCountInPiece;
 }
 
 /* how many blocks are in this piece? */
-static TR_INLINE uint32_t
+static inline uint32_t
 tr_torPieceCountBlocks( const tr_torrent * tor, const tr_piece_index_t piece )
 {
     return piece == tor->info.pieceCount - 1 ? tor->blockCountInLastPiece
@@ -276,7 +276,7 @@ tr_torPieceCountBlocks( const tr_torrent * tor, const tr_piece_index_t piece )
 }
 
 /* how many bytes are in this piece? */
-static TR_INLINE uint32_t
+static inline uint32_t
 tr_torPieceCountBytes( const tr_torrent * tor, const tr_piece_index_t piece )
 {
     return piece == tor->info.pieceCount - 1 ? tor->lastPieceSize
@@ -284,55 +284,55 @@ tr_torPieceCountBytes( const tr_torrent * tor, const tr_piece_index_t piece )
 }
 
 /* how many bytes are in this block? */
-static TR_INLINE uint32_t
+static inline uint32_t
 tr_torBlockCountBytes( const tr_torrent * tor, const tr_block_index_t block )
 {
     return block == tor->blockCount - 1 ? tor->lastBlockSize
                                         : tor->blockSize;
 }
 
-static TR_INLINE void tr_torrentLock( const tr_torrent * tor )
+static inline void tr_torrentLock( const tr_torrent * tor )
 {
     tr_globalLock( tor->session );
 }
 
-static TR_INLINE void tr_torrentUnlock( const tr_torrent * tor )
+static inline void tr_torrentUnlock( const tr_torrent * tor )
 {
     tr_globalUnlock( tor->session );
 }
 
-static TR_INLINE tr_bool
+static inline tr_bool
 tr_torrentExists( const tr_session * session, const uint8_t *   torrentHash )
 {
     return tr_torrentFindFromHash( (tr_session*)session, torrentHash ) != NULL;
 }
 
-static TR_INLINE tr_bool
+static inline tr_bool
 tr_torrentIsSeed( const tr_torrent * tor )
 {
     return tor->completeness != TR_LEECH;
 }
 
-static TR_INLINE tr_bool tr_torrentIsPrivate( const tr_torrent * tor )
+static inline tr_bool tr_torrentIsPrivate( const tr_torrent * tor )
 {
     return ( tor != NULL ) && tor->info.isPrivate;
 }
 
-static TR_INLINE tr_bool tr_torrentAllowsPex( const tr_torrent * tor )
+static inline tr_bool tr_torrentAllowsPex( const tr_torrent * tor )
 {
     return ( tor != NULL )
         && ( tor->session->isPexEnabled )
         && ( !tr_torrentIsPrivate( tor ) );
 }
 
-static TR_INLINE tr_bool tr_torrentAllowsDHT( const tr_torrent * tor )
+static inline tr_bool tr_torrentAllowsDHT( const tr_torrent * tor )
 {
     return ( tor != NULL )
         && ( tr_sessionAllowsDHT( tor->session ) )
         && ( !tr_torrentIsPrivate( tor ) );
 }
 
-static TR_INLINE tr_bool tr_torrentIsPieceChecked( const tr_torrent  * tor,
+static inline tr_bool tr_torrentIsPieceChecked( const tr_torrent  * tor,
                                                    tr_piece_index_t    i )
 {
     return tr_bitfieldHasFast( &tor->checkedPieces, i );
@@ -347,7 +347,7 @@ enum
     TORRENT_MAGIC_NUMBER = 95549
 };
 
-static TR_INLINE tr_bool tr_isTorrent( const tr_torrent * tor )
+static inline tr_bool tr_isTorrent( const tr_torrent * tor )
 {
     return ( tor != NULL )
         && ( tor->magicNumber == TORRENT_MAGIC_NUMBER )
@@ -356,7 +356,7 @@ static TR_INLINE tr_bool tr_isTorrent( const tr_torrent * tor )
 
 /* set a flag indicating that the torrent's .resume file
  * needs to be saved when the torrent is closed */
-static TR_INLINE
+static inline
 void tr_torrentSetDirty( tr_torrent * tor )
 {
     assert( tr_isTorrent( tor ) );
@@ -364,7 +364,7 @@ void tr_torrentSetDirty( tr_torrent * tor )
     tor->isDirty = TRUE;
 }
 
-static TR_INLINE
+static inline
 const char * tr_torrentName( const tr_torrent * tor )
 {
     assert( tr_isTorrent( tor ) );

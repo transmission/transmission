@@ -54,8 +54,8 @@ static int            messageQueueCount = 0;
 
 #ifndef WIN32
     /* make null versions of these win32 functions */
-    static TR_INLINE int IsDebuggerPresent( void ) { return FALSE; }
-    static TR_INLINE void OutputDebugString( const void * unused UNUSED ) { }
+    static inline int IsDebuggerPresent( void ) { return FALSE; }
+    static inline void OutputDebugString( const void * unused UNUSED ) { }
 #endif
 
 /***

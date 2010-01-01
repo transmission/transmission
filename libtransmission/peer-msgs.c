@@ -245,7 +245,7 @@ getHave( const struct tr_peermsgs * msgs )
 }
 #endif
 
-static TR_INLINE tr_session*
+static inline tr_session*
 getSession( struct tr_peermsgs * msgs )
 {
     return msgs->torrent->session;
@@ -307,7 +307,7 @@ pokeBatchPeriod( tr_peermsgs * msgs,
     }
 }
 
-static TR_INLINE void
+static inline void
 dbgOutMessageLen( tr_peermsgs * msgs )
 {
     dbgmsg( msgs, "outMessage size is now %zu", EVBUFFER_LENGTH( msgs->outMessages ) );
@@ -1566,7 +1566,7 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
     return READ_NOW;
 }
 
-static TR_INLINE void
+static inline void
 decrementDownloadedCount( tr_peermsgs * msgs, uint32_t byteCount )
 {
     tr_torrent * tor = msgs->torrent;
@@ -1574,7 +1574,7 @@ decrementDownloadedCount( tr_peermsgs * msgs, uint32_t byteCount )
     tor->downloadedCur -= MIN( tor->downloadedCur, byteCount );
 }
 
-static TR_INLINE void
+static inline void
 clientGotUnwantedBlock( tr_peermsgs * msgs, const struct peer_request * req )
 {
     decrementDownloadedCount( msgs, req->length );
@@ -2125,7 +2125,7 @@ pexAddedCb( void * vpex,
     }
 }
 
-static TR_INLINE void
+static inline void
 pexDroppedCb( void * vpex,
               void * userData )
 {
@@ -2138,7 +2138,7 @@ pexDroppedCb( void * vpex,
     }
 }
 
-static TR_INLINE void
+static inline void
 pexElementCb( void * vpex,
               void * userData )
 {

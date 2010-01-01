@@ -813,7 +813,7 @@ tr_torrentChangeMyPort( tr_torrent * tor )
     tr_announcerChangeMyPort( tor );
 }
 
-static TR_INLINE void
+static inline void
 tr_torrentManualUpdateImpl( void * vtor )
 {
     tr_torrent * tor = vtor;

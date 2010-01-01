@@ -403,7 +403,7 @@ TrOpenFile( tr_session             * session,
     return 0;
 }
 
-static TR_INLINE tr_bool
+static inline tr_bool
 fileIsOpen( const struct tr_openfile * o )
 {
     return o->fd >= 0;

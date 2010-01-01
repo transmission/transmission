@@ -17,7 +17,7 @@
 #ifndef TR_LIST_H
 #define TR_LIST_H
 
-#include "transmission.h" /* TR_INLINE */
+#include "transmission.h" /* inline */
 
 typedef struct tr_list
 {
@@ -82,7 +82,7 @@ typedef void ( *__tr_list_free_t )( void * );
  *
  * Init @head as an empty list.
  */
-static TR_INLINE void
+static inline void
 __tr_list_init( struct __tr_list * head )
 {
     head->next = head->prev = head;
@@ -114,7 +114,7 @@ __tr_list_splice( struct __tr_list * prev,
  *
  * Append @list to the end of @head.
  */
-static TR_INLINE void
+static inline void
 __tr_list_append( struct __tr_list * head,
                   struct __tr_list * list)
 {

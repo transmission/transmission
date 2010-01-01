@@ -29,19 +29,19 @@ typedef struct tr_bitset
 }
 tr_bitset;
 
-static TR_INLINE void
+static inline void
 tr_bitsetConstructor( tr_bitset * b, int size )
 {
     tr_bitfieldConstruct( &b->bitfield, size );
 }
 
-static TR_INLINE void
+static inline void
 tr_bitsetDestructor( tr_bitset * b )
 {
     tr_bitfieldDestruct( &b->bitfield );
 }
 
-static TR_INLINE void
+static inline void
 tr_bitsetReserve( tr_bitset * b, size_t size )
 {
     if( b->bitfield.bitCount < size )
@@ -56,7 +56,7 @@ tr_bitsetReserve( tr_bitset * b, size_t size )
     }
 }
 
-static TR_INLINE tr_bool
+static inline tr_bool
 tr_bitsetHasFast( const tr_bitset * b, const size_t nth )
 {
     if( b->haveAll ) return TRUE;
@@ -65,7 +65,7 @@ tr_bitsetHasFast( const tr_bitset * b, const size_t nth )
     return tr_bitfieldHasFast( &b->bitfield, nth );
 }
 
-static TR_INLINE tr_bool
+static inline tr_bool
 tr_bitsetHas( const tr_bitset * b, const size_t nth )
 {
     if( b->haveAll ) return TRUE;
@@ -74,7 +74,7 @@ tr_bitsetHas( const tr_bitset * b, const size_t nth )
     return tr_bitfieldHas( &b->bitfield, nth );
 }
 
-static TR_INLINE void
+static inline void
 tr_bitsetOr( tr_bitfield * a, const tr_bitset * b )
 {
     if( b->haveAll )
@@ -84,7 +84,7 @@ tr_bitsetOr( tr_bitfield * a, const tr_bitset * b )
 }
 
 /* set 'a' to all the flags that were in 'a' but not 'b' */
-static TR_INLINE void
+static inline void
 tr_bitsetDifference( tr_bitfield * a, const tr_bitset * b )
 {
     if( b->haveAll )
@@ -93,7 +93,7 @@ tr_bitsetDifference( tr_bitfield * a, const tr_bitset * b )
         tr_bitfieldDifference( a, &b->bitfield );
 }
 
-static TR_INLINE double
+static inline double
 tr_bitsetPercent( const tr_bitset * b )
 {
     if( b->haveAll ) return 1.0;
@@ -102,21 +102,21 @@ tr_bitsetPercent( const tr_bitset * b )
     return tr_bitfieldCountTrueBits( &b->bitfield ) / (double)b->bitfield.bitCount;
 }
 
-static TR_INLINE void
+static inline void
 tr_bitsetSetHaveAll( tr_bitset * b )
 {
     b->haveAll = 1;
     b->haveNone = 0;
 }
 
-static TR_INLINE void
+static inline void
 tr_bitsetSetHaveNone( tr_bitset * b )
 {
     b->haveAll = 0;
     b->haveNone = 1;
 }
 
-static TR_INLINE int
+static inline int
 tr_bitsetAdd( tr_bitset * b, int i )
 {
     int ret = 0;

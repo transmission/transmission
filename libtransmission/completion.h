@@ -62,12 +62,12 @@ tr_completion * tr_cpConstruct( tr_completion *, tr_torrent * );
 
 tr_completion * tr_cpDestruct( tr_completion * );
 
-static TR_INLINE tr_completion* tr_cpNew( tr_torrent * tor )
+static inline tr_completion* tr_cpNew( tr_torrent * tor )
 {
     return tr_cpConstruct( tr_new0( tr_completion, 1 ), tor );
 }
 
-static TR_INLINE void tr_cpFree( tr_completion * cp )
+static inline void tr_cpFree( tr_completion * cp )
 {
     tr_free( tr_cpDestruct( cp ) );
 }
@@ -88,22 +88,22 @@ void                       tr_cpGetAmountDone( const   tr_completion * completio
                                                float                 * tab,
                                                int                     tabCount );
 
-static TR_INLINE uint64_t tr_cpHaveTotal( const tr_completion * cp )
+static inline uint64_t tr_cpHaveTotal( const tr_completion * cp )
 {
     return cp->sizeNow;
 }
 
-static TR_INLINE uint64_t tr_cpLeftUntilComplete( const tr_completion * cp )
+static inline uint64_t tr_cpLeftUntilComplete( const tr_completion * cp )
 {
     return tr_torrentInfo(cp->tor)->totalSize - cp->sizeNow;
 }
 
-static TR_INLINE uint64_t tr_cpLeftUntilDone( const tr_completion * cp )
+static inline uint64_t tr_cpLeftUntilDone( const tr_completion * cp )
 {
     return tr_cpSizeWhenDone( cp ) - cp->sizeNow;
 }
 
-static TR_INLINE float tr_cpPercentComplete( const tr_completion * cp )
+static inline float tr_cpPercentComplete( const tr_completion * cp )
 {
     const double ratio = tr_getRatio( cp->sizeNow, tr_torrentInfo(cp->tor)->totalSize );
     if( (int)ratio == TR_RATIO_NA )
@@ -114,7 +114,7 @@ static TR_INLINE float tr_cpPercentComplete( const tr_completion * cp )
         return ratio;
 }
 
-static TR_INLINE float tr_cpPercentDone( const tr_completion * cp )
+static inline float tr_cpPercentDone( const tr_completion * cp )
 {
     const double ratio = tr_getRatio( cp->sizeNow, tr_cpSizeWhenDone( cp ) );
     return (ratio == TR_RATIO_NA ||  ratio == TR_RATIO_INF) ? 0.0f : ratio;
@@ -142,12 +142,12 @@ tr_bool tr_cpFileIsComplete( const tr_completion * cp, tr_file_index_t );
 *** Blocks
 **/
 
-static TR_INLINE tr_bool tr_cpBlockIsCompleteFast( const tr_completion * cp, tr_block_index_t block )
+static inline tr_bool tr_cpBlockIsCompleteFast( const tr_completion * cp, tr_block_index_t block )
 {
     return tr_bitfieldHasFast( &cp->blockBitfield, block );
 }
 
-static TR_INLINE tr_bool tr_cpBlockIsComplete( const tr_completion * cp, tr_block_index_t block )
+static inline tr_bool tr_cpBlockIsComplete( const tr_completion * cp, tr_block_index_t block )
 {
     return tr_bitfieldHas( &cp->blockBitfield, block );
 }
@@ -162,11 +162,11 @@ tr_bool   tr_cpBlockBitfieldSet( tr_completion      * completion,
 ****
 ***/
 
-static TR_INLINE const struct tr_bitfield * tr_cpPieceBitfield( const tr_completion * cp ) {
+static inline const struct tr_bitfield * tr_cpPieceBitfield( const tr_completion * cp ) {
     return &cp->pieceBitfield;
 }
 
-static TR_INLINE const struct tr_bitfield * tr_cpBlockBitfield( const tr_completion * cp ) {
+static inline const struct tr_bitfield * tr_cpBlockBitfield( const tr_completion * cp ) {
     assert( cp );
     assert( cp->blockBitfield.bits );
     assert( cp->blockBitfield.bitCount );

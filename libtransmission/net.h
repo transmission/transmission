@@ -91,7 +91,7 @@ int tr_compareAddresses( const tr_address * a,
 
 tr_bool tr_isValidPeerAddress( const tr_address * addr, tr_port port );
 
-static TR_INLINE tr_bool tr_isAddress( const tr_address * a ) { return ( a != NULL ) && ( a->type==TR_AF_INET || a->type==TR_AF_INET6 ); }
+static inline tr_bool tr_isAddress( const tr_address * a ) { return ( a != NULL ) && ( a->type==TR_AF_INET || a->type==TR_AF_INET6 ); }
 
 tr_bool tr_net_hasIPv6( tr_port );
 
