@@ -785,7 +785,7 @@ tr_date( void )
 }
 
 void
-tr_wait( uint64_t delay_milliseconds )
+tr_wait_msec( uint64_t delay_milliseconds )
 {
 #ifdef WIN32
     Sleep( (DWORD)delay_milliseconds );

@@ -250,7 +250,7 @@ tr_eventInit( tr_session * session )
 
     /* wait until the libevent thread is running */
     while( session->events == NULL )
-        tr_wait( 100 );
+        tr_wait_msec( 100 );
 }
 
 void

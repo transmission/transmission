@@ -142,7 +142,7 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
              * way towards reducing IO load... */
             if( lastSleptAt != now ) {
                 lastSleptAt = now;
-                tr_wait( MSEC_TO_SLEEP_PER_SECOND_DURING_VERIFY );
+                tr_wait_msec( MSEC_TO_SLEEP_PER_SECOND_DURING_VERIFY );
             }
 
             SHA1_Init( &sha );
@@ -357,7 +357,7 @@ tr_verifyRemove( tr_torrent * tor )
         while( stopCurrent )
         {
             tr_lockUnlock( lock );
-            tr_wait( 100 );
+            tr_wait_msec( 100 );
             tr_lockLock( lock );
         }
     }

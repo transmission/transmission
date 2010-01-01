@@ -515,11 +515,11 @@ getstatus( void * cl )
 }
 
 int
-tr_dhtStatus( tr_session * ss, int af, int * nodes_return )
+tr_dhtStatus( tr_session * session, int af, int * nodes_return )
 {
     struct getstatus_closure closure = { af, -1, -1 };
 
-    if( !tr_dhtEnabled( ss ) ||
+    if( !tr_dhtEnabled( session ) ||
         (af == AF_INET && dht_socket < 0) ||
         (af == AF_INET6 && dht6_socket < 0) ) {
         if( nodes_return )
@@ -527,9 +527,9 @@ tr_dhtStatus( tr_session * ss, int af, int * nodes_return )
         return TR_DHT_STOPPED;
     }
 
-    tr_runInEventThread( ss, getstatus, &closure );
+    tr_runInEventThread( session, getstatus, &closure );
     while( closure.status < 0 )
-        tr_wait( 10 /*msec*/ );
+        tr_wait_msec( 10 /*msec*/ );
 
     if( nodes_return )
         *nodes_return = closure.count;

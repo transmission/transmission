@@ -542,7 +542,7 @@ tr_sessionInit( const char  * tag,
     data.clientSettings = clientSettings;
     tr_runInEventThread( session, tr_sessionInitImpl, &data );
     while( session->waiting > 0 )
-        tr_wait( 100 );
+        tr_wait_msec( 100 );
 
     return session;
 }
@@ -819,7 +819,7 @@ tr_sessionSet( tr_session * session, struct tr_benc  * settings )
     ++session->waiting;
     tr_runInEventThread( session, sessionSetImpl, &data );
     while( session->waiting > 0 )
-        tr_wait( 100 );
+        tr_wait_msec( 100 );
 }
 
 /***
@@ -1526,7 +1526,7 @@ tr_sessionClose( tr_session * session )
     while( !session->isClosed && !deadlineReached( deadline ) )
     {
         dbgmsg( "waiting for the libtransmission thread to finish" );
-        tr_wait( 100 );
+        tr_wait_msec( 100 );
     }
 
     /* "shared" and "tracker" have live sockets,
@@ -1538,7 +1538,7 @@ tr_sessionClose( tr_session * session )
     {
         dbgmsg( "waiting on port unmap (%p) or announcer (%p)",
                 session->shared, session->announcer );
-        tr_wait( 100 );
+        tr_wait_msec( 100 );
     }
 
     tr_fdClose( session );
@@ -1549,7 +1549,7 @@ tr_sessionClose( tr_session * session )
     {
         static tr_bool forced = FALSE;
         dbgmsg( "waiting for libtransmission thread to finish" );
-        tr_wait( 100 );
+        tr_wait_msec( 100 );
         if( deadlineReached( deadline ) && !forced )
         {
             event_loopbreak( );
