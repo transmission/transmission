@@ -55,9 +55,7 @@ extern "C" {
 #endif
 
 #if defined(WIN32) && defined(_MSC_VER)
- #define TR_INLINE __inline
-#else
- #define TR_INLINE inline
+ #define inline __inline
 #endif
 
 #define SHA_DIGEST_LENGTH 20
@@ -303,9 +301,11 @@ tr_session * tr_sessionInit( const char     * tag,
                              tr_bool          messageQueueingEnabled,
                              struct tr_benc * settings );
 
+/** @brief Update a session's settings from a benc dictionary like to the one used in tr_sessionInit() */
 void tr_sessionSet( tr_session      * session,
                     struct tr_benc  * settings );
 
+/** @brief Rescan the blocklists directory and reload whatever blocklist files are found there */
 void tr_sessionReloadBlocklists( tr_session * session );
 
 
@@ -852,35 +852,37 @@ tr_ctorMode;
 
 struct tr_benc;
 
-/* it's okay to use NULL here if you're only parsing the torrent.
- * @see tr_torrentParse() */
-tr_ctor*    tr_ctorNew( const tr_session * session_or_NULL );
+/** @brief Create a new torrent constructor object used to instantiate a tr_torrent
+    @param session the tr_session.  NULL is allowed if you're only calling tr_torrentParse() rather than tr_torrentNew()
+    @see tr_torrentNew(), tr_torrentParse() */
+tr_ctor* tr_ctorNew( const tr_session * session_or_NULL );
 
-void        tr_ctorFree( tr_ctor * ctor );
+/** @brief Free a torrent constructor object */
+void  tr_ctorFree( tr_ctor * ctor );
 
-void        tr_ctorSetDeleteSource( tr_ctor * ctor,
-                                    tr_bool   doDelete );
+/** @brief Set whether or not to delete the source .torrent file when a torrent is added. (Default: False) */
+void  tr_ctorSetDeleteSource( tr_ctor * ctor, tr_bool doDelete );
 
-int         tr_ctorSetMagnet( tr_ctor * ctor,
-                              const char * url );
+/** @brief Set the link for creating a tr_torrent from a magnet link */
+int tr_ctorSetMagnet( tr_ctor * ctor, const char * magnet_link );
 
-int         tr_ctorSetMetainfo( tr_ctor *       ctor,
-                                const uint8_t * metainfo,
-                                size_t          len );
+/** @brief Set the constructor's metainfo from a raw benc already in memory */
+int tr_ctorSetMetainfo( tr_ctor * ctor, const uint8_t * metainfo, size_t len );
 
-int         tr_ctorSetMetainfoFromFile( tr_ctor *    ctor,
-                                        const char * filename );
+/** @brief Set the constructor's metainfo from a local .torrent file */
+int tr_ctorSetMetainfoFromFile( tr_ctor * ctor, const char * filename );
 
-int         tr_ctorSetMetainfoFromHash( tr_ctor *    ctor,
-                                        const char * hashString );
+/**
+ * @brief Set the constructor's metainfo from an already-existing file in tr_getTorrentDir().
+ *
+ * This is used by the mac client on startup to pick and choose which existing torrents to load
+ */
+int tr_ctorSetMetainfoFromHash( tr_ctor * ctor, const char * hashString );
 
-/** Set the maximum number of peers this torrent can connect to.
-    (Default: 50) */
-void        tr_ctorSetPeerLimit( tr_ctor *   ctor,
-                                 tr_ctorMode mode,
-                                 uint16_t    peerLimit  );
+/** @brief Set the maximum number of peers this torrent can connect to. (Default: 50) */
+void tr_ctorSetPeerLimit( tr_ctor * ctor, tr_ctorMode mode, uint16_t peerLimit  );
 
-/** Set the download folder for the torrent being added with this ctor.
+/** @brief Set the download folder for the torrent being added with this ctor.
     @see tr_ctorSetDownloadDir()
     @see tr_sessionInit() */
 void        tr_ctorSetDownloadDir( tr_ctor *    ctor,
@@ -903,41 +905,50 @@ void        tr_ctorSetPaused( tr_ctor      * ctor,
                               tr_ctorMode    mode,
                               tr_bool        isPaused );
 
+/** @brief Set the priorities for files in a torrent */
 void        tr_ctorSetFilePriorities( tr_ctor                * ctor,
                                       const tr_file_index_t  * files,
                                       tr_file_index_t          fileCount,
                                       tr_priority_t            priority );
 
+/** @brief Set the download flag for files in a torrent */
 void        tr_ctorSetFilesWanted( tr_ctor                * ctor,
                                    const tr_file_index_t  * fileIndices,
                                    tr_file_index_t          fileCount,
                                    tr_bool                  wanted );
 
 
+/** @brief Get this peer constructor's peer limit */
 int         tr_ctorGetPeerLimit( const tr_ctor * ctor,
                                  tr_ctorMode     mode,
                                  uint16_t *      setmeCount );
 
+/** @brief Get the "isPaused" flag from this peer constructor */
 int         tr_ctorGetPaused( const tr_ctor * ctor,
                               tr_ctorMode     mode,
                               tr_bool       * setmeIsPaused );
 
+/** @brief Get the download path from this peer constructor */
 int         tr_ctorGetDownloadDir( const tr_ctor  * ctor,
                                    tr_ctorMode      mode,
                                    const char    ** setmeDownloadDir );
 
+/** @brief Get the incomplete directory from this peer constructor */
 int         tr_ctorGetIncompleteDir( const tr_ctor  * ctor,
                                      const char    ** setmeIncompleteDir );
 
+/** @brief Get the metainfo from this peer constructor */
 int         tr_ctorGetMetainfo( const tr_ctor         * ctor,
                                 const struct tr_benc ** setme );
 
+/** @brief Get the "delete .torrent file" flag from this peer constructor */
 int         tr_ctorGetDeleteSource( const tr_ctor  * ctor,
                                     tr_bool        * setmeDoDelete );
 
+/** @brief Get the tr_session poiner from this peer constructor */
 tr_session* tr_ctorGetSession( const tr_ctor * ctor );
 
-/* returns NULL if tr_ctorSetMetainfoFromFile() wasn't used */
+/** @brief Get the .torrent file that this ctor's metainfo came from, or NULL if tr_ctorSetMetainfoFromFile() wasn't used */
 const char* tr_ctorGetSourceFile( const tr_ctor * ctor );
 
 typedef enum
@@ -1581,7 +1592,7 @@ struct tr_info
     tr_bool            isMultifile;
 };
 
-static TR_INLINE tr_bool tr_torrentHasMetadata( const tr_torrent * tor )
+static inline tr_bool tr_torrentHasMetadata( const tr_torrent * tor )
 {
     return tr_torrentInfo( tor )->fileCount > 0;
 }
@@ -1805,10 +1816,10 @@ void tr_torrentSetDoneDate( tr_torrent * torrent, time_t doneDate );
 /** @} */
 
 /** @brief Sanity checker to test that the direction is TR_UP or TR_DOWN */
-static TR_INLINE tr_bool tr_isDirection( tr_direction d ) { return d==TR_UP || d==TR_DOWN; }
+static inline tr_bool tr_isDirection( tr_direction d ) { return d==TR_UP || d==TR_DOWN; }
 
 /** @brief Sanity checker to test that a bool is TRUE or FALSE */
-static TR_INLINE tr_bool tr_isBool( tr_bool b ) { return b==1 || b==0; }
+static inline tr_bool tr_isBool( tr_bool b ) { return b==1 || b==0; }
 
 #ifdef __cplusplus
 }

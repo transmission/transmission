@@ -120,17 +120,15 @@ void tr_msgInit( void );
 
 extern int messageLevel;
 
-static TR_INLINE tr_bool tr_msgLoggingIsActive( int level )
+static inline tr_bool tr_msgLoggingIsActive( int level )
 {
     return messageLevel >= level;
 }
 
-void           tr_msg( const char * file,
-                       int          line,
-                       int          level,
-                       const char * torrent,
-                       const char * fmt,
-                       ... ) TR_GNUC_PRINTF( 5, 6 );
+void tr_msg( const char * file, int line,
+             int level,
+             const char * torrent,
+             const char * fmt, ... ) TR_GNUC_PRINTF( 5, 6 );
 
 #define tr_nerr( n, ... ) \
     do { \
@@ -202,8 +200,11 @@ char*          tr_getLogTimeStr( char * buf,
                                  int    buflen ) TR_GNUC_NONNULL(1);
 
 
-int            tr_wildmat( const char * text,
-                           const char * pattern ) TR_GNUC_NONNULL(1,2);
+/**
+ * @brief Rich Salz's classic implementation of shell-style pattern matching for ?, \, [], and * characters.
+ * @return 1 if the pattern matches, 0 if it doesn't, or -1 if an error occured
+ */
+int tr_wildmat( const char * text, const char * pattern ) TR_GNUC_NONNULL(1,2);
 
 /** @brief Portability wrapper for basename() that uses the system implementation if available */
 char* tr_basename( const char * path ) TR_GNUC_MALLOC;
@@ -214,14 +215,13 @@ char* tr_dirname( const char * path ) TR_GNUC_MALLOC;
 /**
  * @brief Portability wrapper for mkdir()
  *
- * a portability wrapper around mkdir().
+ * A portability wrapper around mkdir().
  * On WIN32, the `permissions' argument is unused.
  *
  * @return zero on success, or -1 if an error occurred
  * (in which case errno is set appropriately).
  */
-int            tr_mkdir( const char * path,
-                         int          permissions ) TR_GNUC_NONNULL(1);
+int tr_mkdir( const char * path, int permissions ) TR_GNUC_NONNULL(1);
 
 /**
  * Like mkdir, but makes parent directories as needed.
@@ -236,7 +236,8 @@ int tr_mkdirp( const char * path, int permissions ) TR_GNUC_NONNULL(1);
  * @brief Loads a file and returns its contents.
  * On failure, NULL is returned and errno is set.
  */
-uint8_t* tr_loadFile( const char * filename, size_t * size ) TR_GNUC_MALLOC TR_GNUC_NONNULL(1);
+uint8_t* tr_loadFile( const char * filename, size_t * size ) TR_GNUC_MALLOC
+                                                             TR_GNUC_NONNULL(1);
 
 
 /** @brief build a filename from a series of elements using the
@@ -246,19 +247,31 @@ char* tr_buildPath( const char * first_element, ... ) TR_GNUC_NULL_TERMINATED
 
 struct event;
 
-void tr_timerAdd( struct event * timer, int seconds, int microseconds );
+/**
+ * @brief Convenience wrapper around timer_add() to have a timer wake up in a number of seconds and microseconds
+ * @param timer
+ * @param seconds
+ * @param microseconds
+ */
+void tr_timerAdd( struct event * timer, int seconds, int microseconds ) TR_GNUC_NONNULL(1);
 
-void tr_timerAddMsec( struct event * timer, int milliseconds );
+/**
+ * @brief Convenience wrapper around timer_add() to have a timer wake up in a number of milliseconds
+ * @param timer
+ * @param milliseconds
+ */
+void tr_timerAddMsec( struct event * timer, int milliseconds ) TR_GNUC_NONNULL(1);
 
 
 /** @brief return the current date in milliseconds */
-uint64_t       tr_date( void );
+uint64_t tr_date( void );
 
-/** @brief wait the specified number of milliseconds */
-void           tr_wait( uint64_t delay_milliseconds );
+/** @brief sleep the specified number of milliseconds */
+void tr_wait( uint64_t delay_milliseconds );
 
 /**
  * @brief make a copy of 'str' whose non-utf8 content has been corrected or stripped
+ * @return a newly-allocated string that must be freed with tr_free()
  * @param str the string to make a clean copy of
  * @param len the length of the string to copy.  If -1, the entire string is used.
  * @param err if an error occurs and err is non-NULL, it's set to TRUE.
@@ -283,20 +296,32 @@ char* tr_utf8clean( const char * str, int len, tr_bool * err ) TR_GNUC_MALLOC;
 ****
 ***/
 
-static TR_INLINE void* tr_malloc( size_t size )
+/** @brief Portability wrapper around malloc() in which `0' is a safe argument */
+static inline void* tr_malloc( size_t size )
 {
     return size ? malloc( size ) : NULL;
 }
-static TR_INLINE void* tr_malloc0( size_t size )
+
+/** @brief Portability wrapper around calloc() in which `0' is a safe argument */
+static inline void* tr_malloc0( size_t size )
 {
     return size ? calloc( 1, size ) : NULL;
 }
-static TR_INLINE void tr_free( void * p )
+
+/** @brief Portability wrapper around free() in which `NULL' is a safe argument */
+static inline void tr_free( void * p )
 {
     if( p != NULL )
         free( p );
 }
-static TR_INLINE void* tr_memdup( const void * src, int byteCount )
+
+/**
+ * @brief make a newly-allocated copy of a chunk of memory
+ * @param src the memory to copy
+ * @param byteCount the number of bytes to copy
+ * @return a newly-allocated copy of `src' that can be freed with tr_free()
+ */
+static inline void* tr_memdup( const void * src, int byteCount )
 {
     return memcpy( tr_malloc( byteCount ), src, byteCount );
 }
@@ -310,16 +335,25 @@ static TR_INLINE void* tr_memdup( const void * src, int byteCount )
 #define tr_renew( struct_type, mem, n_structs )    \
     ( (struct_type *) realloc ( ( mem ), ( (size_t) sizeof ( struct_type ) ) * ( ( size_t) ( n_structs ) ) ) )
 
-/** @param in is a void* so that callers can pass in both signed & unsigned without a cast */
+/**
+ * @brief make a newly-allocated copy of a substring
+ * @param in is a void* so that callers can pass in both signed & unsigned without a cast
+ * @param len length of the substring to copy.  if a length less than zero is passed in, strlen( len ) is used
+ * @return a newly-allocated copy of `in' that can be freed with tr_free()
+ */
 char* tr_strndup( const void * in, int len ) TR_GNUC_MALLOC;
 
-/** @param in is a void* so that callers can pass in both signed & unsigned without a cast */
-static TR_INLINE char* tr_strdup( const void * in )
+/**
+ * @brief make a newly-allocated copy of a string
+ * @param in is a void* so that callers can pass in both signed & unsigned without a cast
+ * @return a newly-allocated copy of `in' that can be freed with tr_free()
+ */
+static inline char* tr_strdup( const void * in )
 {
     return tr_strndup( in, in ? strlen( (const char *) in ) : 0 );
 }
 
-/* @brief same argument list as bsearch() */
+/** @brief similar to bsearch() but returns the index of the lower bound */
 int tr_lowerBound( const void * key,
                    const void * base,
                    size_t       nmemb,
@@ -328,16 +362,28 @@ int tr_lowerBound( const void * key,
                    tr_bool    * exact_match ) TR_GNUC_HOT TR_GNUC_NONNULL(1,5,6);
 
 
-char*       tr_strdup_printf( const char * fmt,
-                              ... )  TR_GNUC_PRINTF( 1, 2 ) TR_GNUC_MALLOC;
+/**
+ * @brief sprintf() a string into a newly-allocated buffer large enough to hold it
+ * @return a newly-allocated string that can be freed with tr_free()
+ */
+char* tr_strdup_printf( const char * fmt, ... ) TR_GNUC_PRINTF( 1, 2 )
+                                                TR_GNUC_MALLOC;
 
-char*       tr_base64_encode( const void * input,
-                              int          inlen,
-                              int *        outlen ) TR_GNUC_MALLOC;
+/**
+ * @brief Translate a block of bytes into base64
+ * @return a newly-allocated string that can be freed with tr_free()
+ */
+char* tr_base64_encode( const void * input,
+                        int          inlen,
+                        int        * outlen ) TR_GNUC_MALLOC;
 
-char*       tr_base64_decode( const void * input,
-                              int          inlen,
-                              int *        outlen ) TR_GNUC_MALLOC;
+/**
+ * @brief Translate a block of bytes from base64 into raw form
+ * @return a newly-allocated string that can be freed with tr_free()
+ */
+char* tr_base64_decode( const void * input,
+                        int          inlen,
+                        int        * outlen ) TR_GNUC_MALLOC;
 
 /** @brief Portability wrapper for strlcpy() that uses the system implementation if available */
 size_t tr_strlcpy( char * dst, const void * src, size_t siz );
@@ -346,6 +392,8 @@ size_t tr_strlcpy( char * dst, const void * src, size_t siz );
 int tr_snprintf( char * buf, size_t buflen,
                  const char * fmt, ... ) TR_GNUC_PRINTF( 3, 4 ) TR_GNUC_NONNULL(1,3);
 
+/** @brief Convenience wrapper around strerorr() guaranteed to not return NULL
+    @param errno */
 const char* tr_strerror( int );
 
 /** @brief strips leading and trailing whitspace from a string
@@ -362,33 +410,60 @@ const char* tr_memmem( const char * haystack, size_t haystack_len,
 
 typedef void ( tr_set_func )( void * element, void * userData );
 
-void        tr_set_compare( const void * a, size_t aCount,
-                            const void * b, size_t bCount,
-                            int compare( const void * a, const void * b ),
-                            size_t elementSize,
-                            tr_set_func in_a_cb,
-                            tr_set_func in_b_cb,
-                            tr_set_func in_both_cb,
-                            void * userData );
+/**
+ * @brief find the differences and commonalities in two sorted sets
+ * @param a the first set
+ * @param aCount the number of elements in the set 'a'
+ * @param b the second set
+ * @param bCount the number of elements in the set 'b'
+ * @param compare the sorting method for both sets
+ * @param elementSize the sizeof the element in the two sorted sets
+ * @param in_a called for items in set 'a' but not set 'b'
+ * @param in_b called for items in set 'b' but not set 'a'
+ * @param in_both called for items that are in both sets
+ * @param userData user data passed along to in_a, in_b, and in_both
+ */
+void tr_set_compare( const void * a, size_t aCount,
+                     const void * b, size_t bCount,
+                     int compare( const void * a, const void * b ),
+                     size_t elementSize,
+                     tr_set_func in_a_cb,
+                     tr_set_func in_b_cb,
+                     tr_set_func in_both_cb,
+                     void * userData );
 
-void tr_sha1_to_hex( char * out,
-                     const uint8_t * sha1 ) TR_GNUC_NONNULL(1,2);
+void tr_sha1_to_hex( char * out, const uint8_t * sha1 ) TR_GNUC_NONNULL(1,2);
 
-void tr_hex_to_sha1( uint8_t * out,
-                     const char * hex ) TR_GNUC_NONNULL(1,2);
+void tr_hex_to_sha1( uint8_t * out, const char * hex ) TR_GNUC_NONNULL(1,2);
 
 
+/** @brief return TRUE if the url is a http, https, or ftp url that Transmission understands */
 tr_bool tr_httpIsValidURL( const char * url ) TR_GNUC_NONNULL(1);
 
+/** @brief parse a URL into its component parts
+    @return zero on success or an error number if an error occurred */
 int  tr_httpParseURL( const char * url,
                       int          url_len,
-                      char **      setme_host,
-                      int *        setme_port,
-                      char **      setme_path ) TR_GNUC_NONNULL(1);
+                      char      ** setme_host,
+                      int        * setme_port,
+                      char      ** setme_path ) TR_GNUC_NONNULL(1);
 
+
+/** @brief return TR_RATIO_NA, TR_RATIO_INF, or a number in [0..1]
+    @return TR_RATIO_NA, TR_RATIO_INF, or a number in [0..1] */
 double tr_getRatio( double numerator, double denominator );
 
-int* tr_parseNumberRange( const char * str, int str_len, int * setmeCount ) TR_GNUC_MALLOC TR_GNUC_NONNULL(1);
+/**
+ * @brief Given a string like "1-4" or "1-4,6,9,14-51", this returns a
+ *        newly-allocated array of all the integers in the set.
+ * @return a newly-allocated array of integers that must be freed with tr_free(),
+ *         or NULL if a fragment of the string can't be parsed.
+ *
+ * For example, "5-8" will return [ 5, 6, 7, 8 ] and setmeCount will be 4.
+ */
+int* tr_parseNumberRange( const char * str,
+                          int str_len,
+                          int * setmeCount ) TR_GNUC_MALLOC TR_GNUC_NONNULL(1);
 
 
 /* truncate a double value at a given number of decimal places.
@@ -421,7 +496,7 @@ struct tm * tr_localtime_r( const time_t *_clock, struct tm *_result );
 int tr_moveFile( const char * oldpath, const char * newpath,
                  tr_bool * renamed ) TR_GNUC_NONNULL(1,2);
 
-static TR_INLINE void tr_removeElementFromArray( void   * array,
+static inline void tr_removeElementFromArray( void   * array,
                                                  int      index_to_remove,
                                                  size_t   sizeof_element,
                                                  size_t   nmemb )
@@ -439,8 +514,19 @@ static TR_INLINE void tr_removeElementFromArray( void   * array,
 
 extern time_t transmission_now;
 
-static TR_INLINE time_t tr_time( void ) { return transmission_now; }
+/**
+ * @brief very inexpensive form of time(NULL) 
+ * @return the current epoch time in seconds
+ *
+ * This function returns a second counter that is updated once per second.
+ * If something blocks the libtransmission thread for more than a second,
+ * that counter may be thrown off, so this function is not guaranteed
+ * to always be accurate.  However, it is *much* faster when 100% accuracy
+ * isn't needed
+ */
+static inline time_t tr_time( void ) { return transmission_now; }
 
+/** @brief Private libtransmission function to update the second counter used by tr_time() */
 void tr_timeUpdate( time_t now );
 
 /***

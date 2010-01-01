@@ -22,6 +22,7 @@ extern "C" {
  * @{
  */
 
+/** @brief Similar to optind, this is the current index into argv */
 extern int tr_optind;
 
 typedef struct tr_option
@@ -49,18 +50,19 @@ enum
 };
 
 /**
- * @return TR_GETOPT_DONE, TR_GETOPT_ERR, TR_GETOPT_UNK,
- *         or the matching tr_option's `val' field
+ * @brief similar to getopt()
+ * @return TR_GETOPT_DONE, TR_GETOPT_ERR, TR_GETOPT_UNK, or the matching tr_option's `val' field
  */
-int  tr_getopt( const char *      summary,
-                int               argc,
-                const char **     argv,
-                const tr_option * opts,
-                const char **     setme_optarg );
+int  tr_getopt( const char       * summary,
+                int                argc,
+                const char      ** argv,
+                const tr_option  * opts,
+                const char      ** setme_optarg );
 
-void tr_getopt_usage( const char *      appName,
-                      const char *      description,
-                      const tr_option * opts );
+/** @brief prints the `Usage' help section to stdout */
+void tr_getopt_usage( const char       * appName,
+                      const char       * description,
+                      const tr_option  * opts );
 
 #ifdef __cplusplus
 } /* extern "C" */

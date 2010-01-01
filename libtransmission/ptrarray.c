@@ -68,14 +68,6 @@ tr_ptrArrayNth( tr_ptrArray* t,
     return t->items[i];
 }
 
-void*
-tr_ptrArrayBack( tr_ptrArray* t )
-{
-    assert( t->n_items > 0 );
-
-    return tr_ptrArrayNth( t, t->n_items - 1 );
-}
-
 int
 tr_ptrArrayInsert( tr_ptrArray * t,
                    void        * ptr,
