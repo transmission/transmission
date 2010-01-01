@@ -1,7 +1,7 @@
 /******************************************************************************
  * $Id$
  *
- * Copyright (c) 2006-2009 Transmission authors and contributors
+ * Copyright (c) 2006-2010 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -1607,8 +1607,8 @@ int trashDataFile(const char * filename)
     if ([self isFolder])
     {
         NSInteger count = [self fileCount];
-        NSMutableArray * fileList = [[NSMutableArray alloc] initWithCapacity: count],
-                    * flatFileList = [[NSMutableArray alloc] initWithCapacity: count];
+        NSMutableArray * fileList = [NSMutableArray arrayWithCapacity: count],
+                    * flatFileList = [NSMutableArray arrayWithCapacity: count];
         
         for (NSInteger i = 0; i < count; i++)
         {
@@ -1626,7 +1626,7 @@ int trashDataFile(const char * filename)
                 //determine if folder node already exists
                 FileListNode * node;
                 for (node in fileList)
-                    if ([node isFolder] && [[node name] isEqualToString: name])
+                    if ([[node name] isEqualToString: name] && [node isFolder])
                         break;
                 
                 if (!node)
@@ -1652,10 +1652,7 @@ int trashDataFile(const char * filename)
         }
         
         fFileList = [[NSArray alloc] initWithArray: fileList];
-        [fileList release];
-        
         fFlatFileList = [[NSArray alloc] initWithArray: flatFileList];
-        [flatFileList release];
     }
     else
     {
