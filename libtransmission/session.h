@@ -57,7 +57,6 @@ struct tr_session
 
     tr_benc                      removedTorrents;
 
-    int                          waiting;
     int                          umask;
 
     int                          speedLimit[2];

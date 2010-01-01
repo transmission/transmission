@@ -499,6 +499,7 @@ struct init_data
 {
     tr_session  * session;
     const char  * configDir;
+    tr_bool       done;
     tr_bool       messageQueuingEnabled;
     tr_benc     * clientSettings;
 };
@@ -535,13 +536,13 @@ tr_sessionInit( const char  * tag,
     assert( session->events != NULL );
 
     /* run the rest in the libtransmission thread */
-    ++session->waiting;
+    data.done = FALSE;
     data.session = session;
     data.configDir = configDir;
     data.messageQueuingEnabled = messageQueuingEnabled;
     data.clientSettings = clientSettings;
     tr_runInEventThread( session, tr_sessionInitImpl, &data );
-    while( session->waiting > 0 )
+    while( !data.done )
         tr_wait_msec( 100 );
 
     return session;
@@ -639,7 +640,6 @@ tr_sessionInitImpl( void * vdata )
     tr_statsInit( session );
 
     session->web = tr_webInit( session );
-    --session->waiting;
 
     tr_sessionSet( session, &settings );
 
@@ -650,6 +650,7 @@ tr_sessionInitImpl( void * vdata )
 
     /* cleanup */
     tr_bencFree( &settings );
+    data->done = TRUE;
 }
 
 static void
@@ -805,20 +806,20 @@ sessionSetImpl( void * vdata )
     else if( tr_bencDictFindBool( settings, TR_PREFS_KEY_ALT_SPEED_ENABLED, &boolVal ) )
         useAltSpeed( session, boolVal, FALSE );
 
-    --session->waiting;
+    data->done = TRUE;
 }
 
 void
 tr_sessionSet( tr_session * session, struct tr_benc  * settings )
 {
     struct init_data data;
+    data.done = FALSE;
     data.session = session;
     data.clientSettings = settings;
 
     /* run the rest in the libtransmission thread */
-    ++session->waiting;
     tr_runInEventThread( session, sessionSetImpl, &data );
-    while( session->waiting > 0 )
+    while( !data.done )
         tr_wait_msec( 100 );
 }
 
