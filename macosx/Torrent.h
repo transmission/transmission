@@ -204,9 +204,9 @@
 - (void) checkGroupValueForRemoval: (NSNotification *) notification;
 
 - (NSArray *) fileList;
+- (NSArray *) flatFileList;
 - (NSInteger) fileCount;
 - (void) updateFileStat;
-- (NSArray *) flatFileList;
 
 //methods require fileStats to have been updated recently to be accurate
 - (CGFloat) fileProgress: (FileListNode *) node;

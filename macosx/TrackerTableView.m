@@ -135,7 +135,7 @@
     
     const CGFloat totalRowHeight = [self rowHeight] + [self intercellSpacing].height;
     
-    NSRect gridRects[(NSInteger)(ceil(visibleRect.size.height / totalRowHeight / 2.0)) + 1]; //add one if partial rows at top and bottom
+    NSRect gridRects[(NSInteger)(ceil(NSHeight(visibleRect) / totalRowHeight / 2.0)) + 1]; //add one if partial rows at top and bottom
     NSInteger rectNum = 0;
     
     if (rows.length > 0)

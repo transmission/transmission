@@ -1257,7 +1257,18 @@ int trashDataFile(const char * filename)
 
 - (NSArray *) fileList
 {
+    if (!fFileList && ![self isMagnet])
+        [self createFileList];
+    
     return fFileList;
+}
+
+- (NSArray *) flatFileList
+{
+    if (!fFlatFileList && ![self isMagnet])
+        [self createFileList];
+    
+    return fFlatFileList;
 }
 
 - (NSInteger) fileCount
@@ -1292,11 +1303,6 @@ int trashDataFile(const char * filename)
     
     NSAssert([node size], @"directory in torrent file has size 0");
     return (CGFloat)have / [node size];
-}
-
-- (NSArray *) flatFileList
-{
-    return fFlatFileList;
 }
 
 - (BOOL) canChangeDownloadCheckForFile: (NSUInteger) index
@@ -1586,9 +1592,6 @@ int trashDataFile(const char * filename)
     fWaitToStart = waitToStart && [waitToStart boolValue];
     fResumeOnWake = NO;
 	
-    if (![self isMagnet])
-        [self createFileList];
-	
     fGroupValue = groupValue ? [groupValue intValue] : [[GroupsController groups] groupIndexForTorrent: self]; 
     
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(checkGroupValueForRemoval:)
@@ -1736,8 +1739,6 @@ int trashDataFile(const char * filename)
 - (void) metadataRetrieved
 {
     fStat = tr_torrentStat(fHandle);
-    
-    [self createFileList];
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"ResetInspector" object: self];
 }
