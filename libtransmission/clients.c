@@ -38,8 +38,8 @@ getShadowInt( char ch, int * setme )
     const char * str = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-";
     const char * pch = strchr( str, ch );
     if( !pch )
-    return 0;
-        *setme = pch - str;
+        return 0;
+    *setme = pch - str;
     return 1;
 }
 
@@ -226,6 +226,7 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
         else if( !memcmp( id+1, "MR", 2 ) ) four_digits( buf, buflen, "Miro", id+3 );
         else if( !memcmp( id+1, "MT", 2 ) ) four_digits( buf, buflen, "Moonlight", id+3 );
         else if( !memcmp( id+1, "OT", 2 ) ) four_digits( buf, buflen, "OmegaTorrent", id+3 );
+        else if( !memcmp( id+1, "OS", 2 ) ) four_digits( buf, buflen, "OneSwarm", id+3 );
         else if( !memcmp( id+1, "PD", 2 ) ) four_digits( buf, buflen, "Pando", id+3 );
         else if( !memcmp( id+1, "QD", 2 ) ) four_digits( buf, buflen, "QQDownload", id+3 );
         else if( !memcmp( id+1, "RS", 2 ) ) four_digits( buf, buflen, "Rufus", id+3 );
