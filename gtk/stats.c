@@ -18,7 +18,7 @@
 
 enum
 {
-    TR_RESPONSE_CLEAR = 1
+    TR_RESPONSE_RESET = 1
 };
 
 struct stat_ui
@@ -101,7 +101,7 @@ dialogResponse( GtkDialog * dialog,
 {
     struct stat_ui * ui = gdata;
 
-    if( response == TR_RESPONSE_CLEAR )
+    if( response == TR_RESPONSE_RESET )
     {
         tr_sessionClearStats( tr_core_session( ui->core ) );
         updateStats( ui );
@@ -124,19 +124,18 @@ stats_dialog_create( GtkWindow * parent,
     GtkWidget *      l;
     struct stat_ui * ui = g_new0( struct stat_ui, 1 );
 
-    d = gtk_dialog_new_with_buttons( _(
-                                         "Statistics" ),
+    d = gtk_dialog_new_with_buttons( _( "Statistics" ),
                                      parent,
                                      GTK_DIALOG_DESTROY_WITH_PARENT |
                                      GTK_DIALOG_NO_SEPARATOR,
-                                     GTK_STOCK_DELETE, TR_RESPONSE_CLEAR,
+                                     _( "_Reset" ), TR_RESPONSE_RESET,
                                      GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
                                      NULL );
     gtk_dialog_set_default_response( GTK_DIALOG( d ),
                                      GTK_RESPONSE_CLOSE );
     gtk_dialog_set_alternative_button_order( GTK_DIALOG( d ),
                                              GTK_RESPONSE_CLOSE,
-                                             TR_RESPONSE_CLEAR,
+                                             TR_RESPONSE_RESET,
                                              -1 );
     t = hig_workarea_create( );
     gtk_box_pack_start( GTK_BOX( GTK_DIALOG( d )->vbox ), t, TRUE, TRUE, 0 );
