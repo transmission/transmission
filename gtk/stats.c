@@ -103,8 +103,27 @@ dialogResponse( GtkDialog * dialog,
 
     if( response == TR_RESPONSE_RESET )
     {
-        tr_sessionClearStats( tr_core_session( ui->core ) );
-        updateStats( ui );
+        const char * primary = _( "Reset your statistics?" );
+        const char * secondary = _( "These statistics are for your information only.  "
+                                    "Resetting them doesn't affect the statistics logged by your BitTorrent trackers." );
+        const int flags = GTK_DIALOG_DESTROY_WITH_PARENT
+                        | GTK_DIALOG_MODAL;
+        GtkWidget * w = gtk_message_dialog_new( GTK_WINDOW( dialog ),
+                                                flags,
+                                                GTK_MESSAGE_QUESTION,
+                                                GTK_BUTTONS_NONE,
+                                                "%s", primary );
+        gtk_dialog_add_buttons( GTK_DIALOG( w ),
+                                GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                                _( "_Reset" ), TR_RESPONSE_RESET,
+                                NULL );
+        gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG( w ), "%s", secondary );
+        if( gtk_dialog_run( GTK_DIALOG( w ) ) == TR_RESPONSE_RESET )
+        {
+            tr_sessionClearStats( tr_core_session( ui->core ) );
+            updateStats( ui );
+        }
+        gtk_widget_destroy( w );
     }
 
     if( response == GTK_RESPONSE_CLOSE )
