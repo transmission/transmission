@@ -595,7 +595,7 @@ torrentInit( tr_torrent * tor, const tr_ctor * ctor )
 
     assert( session != NULL );
 
-    tr_globalLock( session );
+    tr_sessionLock( session );
 
     tor->session   = session;
     tor->uniqueId = nextUniqueId++;
@@ -687,7 +687,7 @@ torrentInit( tr_torrent * tor, const tr_ctor * ctor )
     if( doStart )
         torrentStart( tor );
 
-    tr_globalUnlock( session );
+    tr_sessionUnlock( session );
 }
 
 tr_parse_result
@@ -1255,7 +1255,7 @@ freeTorrent( tr_torrent * tor )
     assert( tr_isTorrent( tor ) );
     assert( !tor->isRunning );
 
-    tr_globalLock( session );
+    tr_sessionLock( session );
 
     tr_peerMgrRemoveTorrent( tor );
 
@@ -1287,7 +1287,7 @@ freeTorrent( tr_torrent * tor )
     tr_metainfoFree( inf );
     tr_free( tor );
 
-    tr_globalUnlock( session );
+    tr_sessionUnlock( session );
 }
 
 /**
@@ -1301,7 +1301,7 @@ checkAndStartImpl( void * vtor )
 
     assert( tr_isTorrent( tor ) );
 
-    tr_globalLock( tor->session );
+    tr_sessionLock( tor->session );
 
     /** If we had local data before, but it's disappeared,
         stop the torrent and log an error. */
@@ -1327,7 +1327,7 @@ checkAndStartImpl( void * vtor )
         tr_peerMgrStartTorrent( tor );
     }
 
-    tr_globalUnlock( tor->session );
+    tr_sessionUnlock( tor->session );
 }
 
 static void
@@ -1344,7 +1344,7 @@ torrentStart( tr_torrent * tor )
 {
     assert( tr_isTorrent( tor ) );
 
-    tr_globalLock( tor->session );
+    tr_sessionLock( tor->session );
 
     if( !tor->isRunning )
     {
@@ -1364,7 +1364,7 @@ torrentStart( tr_torrent * tor )
         tr_verifyAdd( tor, checkAndStartCB );
     }
 
-    tr_globalUnlock( tor->session );
+    tr_sessionUnlock( tor->session );
 }
 
 void
@@ -1409,7 +1409,7 @@ verifyTorrent( void * vtor )
     tr_torrent * tor = vtor;
 
     assert( tr_isTorrent( tor ) );
-    tr_globalLock( tor->session );
+    tr_sessionLock( tor->session );
 
     /* if the torrent's already being verified, stop it */
     tr_verifyRemove( tor );
@@ -1425,7 +1425,7 @@ verifyTorrent( void * vtor )
     tr_torrentUncheck( tor );
     tr_verifyAdd( tor, torrentRecheckDoneCB );
 
-    tr_globalUnlock( tor->session );
+    tr_sessionUnlock( tor->session );
 }
 
 void
@@ -1471,13 +1471,13 @@ tr_torrentStop( tr_torrent * tor )
 
     if( tr_isTorrent( tor ) )
     {
-        tr_globalLock( tor->session );
+        tr_sessionLock( tor->session );
 
         tor->isRunning = 0;
         tr_torrentSetDirty( tor );
         tr_runInEventThread( tor->session, stopTorrent, tor );
 
-        tr_globalUnlock( tor->session );
+        tr_sessionUnlock( tor->session );
     }
 }
 
@@ -1512,12 +1512,12 @@ tr_torrentFree( tr_torrent * tor )
     {
         tr_session * session = tor->session;
         assert( tr_isSession( session ) );
-        tr_globalLock( session );
+        tr_sessionLock( session );
 
         tr_torrentClearCompletenessCallback( tor );
         tr_runInEventThread( session, closeTorrent, tor );
 
-        tr_globalUnlock( session );
+        tr_sessionUnlock( session );
     }
 }
 

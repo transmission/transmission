@@ -18,7 +18,7 @@
 #define TR_TORRENT_H 1
 
 #include "completion.h" /* tr_completion */
-#include "session.h" /* tr_globalLock(), tr_globalUnlock() */
+#include "session.h" /* tr_sessionLock(), tr_sessionUnlock() */
 #include "utils.h" /* TR_GNUC_PRINTF */
 
 struct tr_bandwidth;
@@ -293,12 +293,12 @@ tr_torBlockCountBytes( const tr_torrent * tor, const tr_block_index_t block )
 
 static inline void tr_torrentLock( const tr_torrent * tor )
 {
-    tr_globalLock( tor->session );
+    tr_sessionLock( tor->session );
 }
 
 static inline void tr_torrentUnlock( const tr_torrent * tor )
 {
-    tr_globalUnlock( tor->session );
+    tr_sessionUnlock( tor->session );
 }
 
 static inline tr_bool

@@ -916,7 +916,7 @@ tr_sessionIsIncompleteDirEnabled( const tr_session * session )
 ***/
 
 void
-tr_globalLock( tr_session * session )
+tr_sessionLock( tr_session * session )
 {
     assert( tr_isSession( session ) );
 
@@ -924,7 +924,7 @@ tr_globalLock( tr_session * session )
 }
 
 void
-tr_globalUnlock( tr_session * session )
+tr_sessionUnlock( tr_session * session )
 {
     assert( tr_isSession( session ) );
 
@@ -932,7 +932,7 @@ tr_globalUnlock( tr_session * session )
 }
 
 tr_bool
-tr_globalIsLocked( const tr_session * session )
+tr_sessionIsLocked( const tr_session * session )
 {
     return tr_isSession( session ) && tr_lockHave( session->lock );
 }
@@ -1724,9 +1724,9 @@ tr_sessionSetPortForwardingEnabled( tr_session  * session,
 {
     assert( tr_isSession( session ) );
 
-    tr_globalLock( session );
+    tr_sessionLock( session );
     tr_sharedTraversalEnable( session->shared, enabled );
-    tr_globalUnlock( session );
+    tr_sessionUnlock( session );
 }
 
 tr_bool

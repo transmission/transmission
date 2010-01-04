@@ -602,7 +602,7 @@ callback( void *ignore UNUSED, int event,
 {
     if( event == DHT_EVENT_VALUES || event == DHT_EVENT_VALUES6 ) {
         tr_torrent *tor;
-        tr_globalLock( session );
+        tr_sessionLock( session );
         tor = tr_torrentFindFromHash( session, info_hash );
         if( tor && tr_torrentAllowsDHT( tor ))
         {
@@ -619,7 +619,7 @@ callback( void *ignore UNUSED, int event,
                       (int)n,
                       event == DHT_EVENT_VALUES6 ? " IPv6" : "");
         }
-        tr_globalUnlock( session );
+        tr_sessionUnlock( session );
     } else if( event == DHT_EVENT_SEARCH_DONE ||
                event == DHT_EVENT_SEARCH_DONE6) {
         tr_torrent * tor = tr_torrentFindFromHash( session, info_hash );

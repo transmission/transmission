@@ -130,7 +130,7 @@ canReadWrapper( tr_peerIo * io )
     /* try to consume the input buffer */
     if( io->canRead )
     {
-        tr_globalLock( session );
+        tr_sessionLock( session );
 
         while( !done && !err )
         {
@@ -168,7 +168,7 @@ canReadWrapper( tr_peerIo * io )
             assert( tr_isPeerIo( io ) );
         }
 
-        tr_globalUnlock( session );
+        tr_sessionUnlock( session );
     }
 
     /* keep the iobuf's excess capacity from growing too large */

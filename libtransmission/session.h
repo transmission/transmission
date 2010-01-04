@@ -153,11 +153,11 @@ void         tr_sessionSetTorrentFile( tr_session * session,
 tr_bool      tr_sessionIsAddressBlocked( const tr_session        * session,
                                          const struct tr_address * addr );
 
-void         tr_globalLock( tr_session * );
+void         tr_sessionLock( tr_session * );
 
-void         tr_globalUnlock( tr_session * );
+void         tr_sessionUnlock( tr_session * );
 
-tr_bool      tr_globalIsLocked( const tr_session * );
+tr_bool      tr_sessionIsLocked( const tr_session * );
 
 const struct tr_address*  tr_sessionGetPublicAddress( const tr_session *, int tr_af_type );
 
