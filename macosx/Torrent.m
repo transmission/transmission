@@ -634,10 +634,10 @@ int trashDataFile(const char * filename)
     trackerStructs[oldTrackerCount].announce = (char *)[tracker UTF8String];
     trackerStructs[oldTrackerCount].tier = trackerStructs[oldTrackerCount-1].tier + 1;
     
-    const tr_announce_list_err result = tr_torrentSetAnnounceList(fHandle, trackerStructs, oldTrackerCount+1);
+    const BOOL ok = tr_torrentSetAnnounceList(fHandle, trackerStructs, oldTrackerCount+1);
     tr_free(trackerStructs);
     
-    return result == TR_ANNOUNCE_LIST_OK;
+    return ok;
 }
 
 - (void) removeTrackersAtIndexes: (NSIndexSet *) removeIndexes
@@ -654,8 +654,8 @@ int trashDataFile(const char * filename)
     for (NSUInteger oldIndex = [indexes firstIndex]; oldIndex != NSNotFound; oldIndex = [indexes indexGreaterThanIndex: oldIndex])
         trackerStructs[newCount++] = fInfo->trackers[oldIndex];
     
-    const tr_announce_list_err result = tr_torrentSetAnnounceList(fHandle, trackerStructs, newCount);
-    NSAssert1(result == TR_ANNOUNCE_LIST_OK, @"Removing tracker addresses resulted in error: %d", result);
+    const BOOL ok = tr_torrentSetAnnounceList(fHandle, trackerStructs, newCount);
+    NSAssert1(ok, @"Removing tracker addresses resulted in error: %d", result);
     
     tr_free(trackerStructs);
 }

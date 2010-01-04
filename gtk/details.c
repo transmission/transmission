@@ -1993,7 +1993,6 @@ onEditTrackersResponse( GtkDialog * dialog, int response, gpointer data )
         int i, n;
         int tier;
         GtkTextIter start, end;
-        tr_announce_list_err err;
         char * tracker_text;
         char ** tracker_strings;
         tr_tracker_info * trackers;
@@ -2018,19 +2017,14 @@ onEditTrackersResponse( GtkDialog * dialog, int response, gpointer data )
         }
 
         /* update the torrent */
-        err = tr_torrentSetAnnounceList( tor, trackers, n );
-        if( err )
+        if( !tr_torrentSetAnnounceList( tor, trackers, n ) )
         {
             GtkWidget * w;
-            const char * str = NULL;
-            if( err == TR_ANNOUNCE_LIST_HAS_BAD )
-                str = _( "List contains invalid URLs" );
-            else
-                assert( 0 && "unhandled condition" );
+            const char * text = _( "List contains invalid URLs" );
             w = gtk_message_dialog_new( GTK_WINDOW( dialog ),
                                         GTK_DIALOG_MODAL,
                                         GTK_MESSAGE_ERROR,
-                                        GTK_BUTTONS_CLOSE, "%s", str );
+                                        GTK_BUTTONS_CLOSE, "%s", text );
             gtk_dialog_run( GTK_DIALOG( w ) );
             gtk_widget_destroy( w );
             do_destroy = FALSE;
