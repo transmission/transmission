@@ -10,10 +10,10 @@
  * $Id$
  */
 
+#include <assert.h>
+
 #include <curl/curl.h>
 #include <event.h>
-
-#include <assert.h>
 
 #include "transmission.h"
 #include "net.h"
@@ -43,6 +43,10 @@ enum
             tr_deepLog( __FILE__, __LINE__, "web", __VA_ARGS__ ); \
     } while( 0 )
 #endif
+
+/***
+****
+***/
 
 struct tr_web
 {
@@ -111,8 +115,7 @@ sockoptfunction( void * vtask, curl_socket_t fd, curlsocktype purpose UNUSED )
     const tr_bool isScrape = strstr( task->url, "scrape" ) != NULL;
     const tr_bool isAnnounce = strstr( task->url, "announce" ) != NULL;
 
-    /* announce and scrape requests have tiny payloads... 
-     * which have very small payloads */
+    /* announce and scrape requests have tiny payloads. */
     if( isScrape || isAnnounce )
     {
         const int sndbuf = 1024;
@@ -249,14 +252,14 @@ restart_timer( tr_web * g )
 static void
 tr_multi_perform( tr_web * g, int fd, int curl_what )
 {
-    CURLMcode mcode;
+    CURLMcode m;
 
     dbgmsg( "check_run_count: %d taskCount", g->taskCount );
 
     /* invoke libcurl's processing */
     do
-        mcode = curl_multi_socket_action( g->multi, fd, curl_what, &g->taskCount );
-    while( mcode == CURLM_CALL_MULTI_SOCKET );
+        m = curl_multi_socket_action( g->multi, fd, curl_what, &g->taskCount );
+    while( m == CURLM_CALL_MULTI_SOCKET );
 
     remove_finished_tasks( g );
 
@@ -278,15 +281,16 @@ event_cb( int fd, short ev_what, void * g )
 
 /* CURLMOPT_SOCKETFUNCTION */
 static int
-sock_cb( CURL * e UNUSED, curl_socket_t fd, int action,
+sock_cb( CURL * e UNUSED, curl_socket_t fd, int curl_what,
          void * vweb, void * vevent )
 {
     /*static int num_events = 0;*/
     struct tr_web * web = vweb;
     struct event * io_event = vevent;
-    dbgmsg( "sock_cb: action %d, fd %d, io_event %p", action, (int)fd, io_event );
+    dbgmsg( "sock_cb: curl_what %d, fd %d, io_event %p",
+            curl_what, (int)fd, io_event );
 
-    if( ( action == CURL_POLL_NONE ) || ( action & CURL_POLL_REMOVE ) )
+    if( ( curl_what == CURL_POLL_NONE ) || ( curl_what & CURL_POLL_REMOVE ) )
     {
         if( io_event != NULL )
         {
@@ -300,11 +304,11 @@ sock_cb( CURL * e UNUSED, curl_socket_t fd, int action,
             /*fprintf( stderr, "-1 io_events to %d\n", --num_events );*/
         }
     }
-    else if( action & ( CURL_POLL_IN | CURL_POLL_OUT ) )
+    else if( curl_what & ( CURL_POLL_IN | CURL_POLL_OUT ) )
     {
-        const short events = EV_PERSIST
-                           | (( action & CURL_POLL_IN ) ? EV_READ : 0 )
-                           | (( action & CURL_POLL_OUT ) ? EV_WRITE : 0 );
+        const short ev_what = EV_PERSIST
+                           | (( curl_what & CURL_POLL_IN ) ? EV_READ : 0 )
+                           | (( curl_what & CURL_POLL_OUT ) ? EV_WRITE : 0 );
 
         if( io_event != NULL )
             event_del( io_event );
@@ -314,21 +318,20 @@ sock_cb( CURL * e UNUSED, curl_socket_t fd, int action,
             /*fprintf( stderr, "+1 io_events to %d\n", ++num_events );*/
         }
 
-        dbgmsg( "enabling (libevent %hd, libcurl %d) polling on io_event %p, fd %d",
-                events, action, io_event, fd );
-        event_set( io_event, fd, events, event_cb, web );
+        dbgmsg( "enabling (libevent %hd, libcurl %d) on io_event %p, fd %d",
+                ev_what, curl_what, io_event, fd );
+        event_set( io_event, fd, ev_what, event_cb, web );
         event_add( io_event, NULL );
     }
-    else assert( 0 && "unhandled action" );
+    else assert( 0 && "unhandled curl_what" );
 
     return 0; /* libcurl documentation: "The callback MUST return 0." */
 }
 
 /* libevent says that timer_msec have passed, so wake up libcurl */
 static void
-libevent_timer_cb( int fd UNUSED, short what UNUSED, void * vg )
+libevent_timer_cb( int fd UNUSED, short what UNUSED, void * g )
 {
-    tr_web * g = vg;
     dbgmsg( "libevent timer is done" );
     tr_multi_perform( g, CURL_SOCKET_TIMEOUT, 0 );
 }
@@ -346,6 +349,8 @@ multi_timer_cb( CURLM * multi UNUSED, long timer_msec, void * vg )
 
     if( timer_msec < 1 )
         tr_multi_perform( g, CURL_SOCKET_TIMEOUT, 0 );
+    else
+        restart_timer( g );
 }
 
 /****
