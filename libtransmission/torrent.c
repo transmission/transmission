@@ -2089,16 +2089,18 @@ tr_torrentSetAnnounceList( tr_torrent *            tor,
 {
     int i;
     tr_benc metainfo;
+    tr_bool ok = TRUE;
+    tr_torrentLock( tor );
 
     assert( tr_isTorrent( tor ) );
 
     /* look for bad URLs */
-    for( i=0; i<trackerCount; ++i )
+    for( i=0; ok && i<trackerCount; ++i )
         if( !tr_httpIsValidURL( trackers[i].announce ) )
-            return TR_ANNOUNCE_LIST_HAS_BAD;
+            ok = FALSE;
 
     /* save to the .torrent file */
-    if( !tr_bencLoadFile( &metainfo, TR_FMT_BENC, tor->info.torrent ) )
+    if( ok && !tr_bencLoadFile( &metainfo, TR_FMT_BENC, tor->info.torrent ) )
     {
         tr_info   tmpInfo;
 
@@ -2155,7 +2157,8 @@ tr_torrentSetAnnounceList( tr_torrent *            tor,
         tr_announcerResetTorrent( tor->session->announcer, tor );
     }
 
-    return TR_ANNOUNCE_LIST_OK;
+    tr_torrentUnlock( tor );
+    return ok ? TR_ANNOUNCE_LIST_OK : TR_ANNOUNCE_LIST_HAS_BAD;
 }
 
 /**

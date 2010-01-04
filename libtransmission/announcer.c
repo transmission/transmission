@@ -1697,6 +1697,7 @@ static void
 onUpkeepTimer( int foo UNUSED, short bar UNUSED, void * vannouncer )
 {
     tr_announcer * announcer = vannouncer;
+    tr_sessionLock( announcer->session );
 
     /* maybe send out some "stopped" messages for closed torrents */
     flushCloseMessages( announcer );
@@ -1706,6 +1707,8 @@ onUpkeepTimer( int foo UNUSED, short bar UNUSED, void * vannouncer )
 
     /* set up the next timer */
     tr_timerAdd( announcer->upkeepTimer, UPKEEP_INTERVAL_SECS, 0 );
+
+    tr_sessionUnlock( announcer->session );
 }
 
 /***
