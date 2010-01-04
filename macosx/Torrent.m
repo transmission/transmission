@@ -655,7 +655,7 @@ int trashDataFile(const char * filename)
         trackerStructs[newCount++] = fInfo->trackers[oldIndex];
     
     const BOOL ok = tr_torrentSetAnnounceList(fHandle, trackerStructs, newCount);
-    NSAssert1(ok, @"Removing tracker addresses resulted in error: %d", result);
+    NSAssert1(ok, @"Removing tracker addresses failed");
     
     tr_free(trackerStructs);
 }
