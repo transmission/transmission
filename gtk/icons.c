@@ -211,12 +211,15 @@ icon_cache_get_mime_type_icon( IconCache  * icon_cache,
     pixbuf = g_hash_table_lookup( icon_cache->cache, key );
     if (pixbuf != NULL) {
         g_object_ref( pixbuf );
+        g_object_unref( G_OBJECT( icon ) );
         return pixbuf;
     }
 
     pixbuf = _get_icon_pixbuf( icon, icon_cache->icon_size, icon_cache->icon_theme );
     if( pixbuf != NULL )
         g_hash_table_insert( icon_cache->cache, (gpointer) key, g_object_ref( pixbuf ) );
+
+    g_object_unref( G_OBJECT( icon ) );
 	
     return pixbuf;
 }
