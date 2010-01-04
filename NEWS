@@ -5,7 +5,9 @@
 ==== All Platforms ====
   * Fix 1.80b2 bug in the libcurl glue code
   * Fix 1.80b1 bug that could download too many torrent pieces
+  * Fix 1.80b1 bug with sending metadata to other peers
   * Fix 1.80b1 crash in tr_fdSocketClose()
+  * Fix 1.80b1 crash when editing a torrent's trackers
   * Fix minor display bug with zero-sized files in a torrent
   * Fix "too many open files" issue in some environments
   * Fix minor compiler warnings and tarball packaging issues
@@ -13,6 +15,8 @@
 ==== Mac ====
   * Fix 1.80b1 crash in "insert_event"
   * Simplified Chinese localization
+==== GTK+ ====
+  * Minor HiG improvements
 ==== Web Client ====
   * Show version information in the preferences dialog
 
