@@ -690,8 +690,9 @@ torrentInit( tr_torrent * tor, const tr_ctor * ctor )
     tr_sessionUnlock( session );
 }
 
-tr_parse_result
-tr_torrentParse( const tr_ctor * ctor, tr_info * setmeInfo )
+static tr_parse_result
+torrentParseImpl( const tr_ctor * ctor, tr_info * setmeInfo,
+                  int * dictOffset, int * dictLength )
 {
     int             doFree;
     tr_bool         didParse;
@@ -707,7 +708,7 @@ tr_torrentParse( const tr_ctor * ctor, tr_info * setmeInfo )
     if( tr_ctorGetMetainfo( ctor, &metainfo ) )
         return TR_PARSE_ERR;
 
-    didParse = tr_metainfoParse( session, setmeInfo, NULL, NULL, metainfo );
+    didParse = tr_metainfoParse( session, setmeInfo, dictOffset, dictLength, metainfo );
     doFree = didParse && ( setmeInfo == &tmp );
 
     if( !didParse )
@@ -725,9 +726,14 @@ tr_torrentParse( const tr_ctor * ctor, tr_info * setmeInfo )
     return result;
 }
 
+tr_parse_result
+tr_torrentParse( const tr_ctor * ctor, tr_info * setmeInfo )
+{
+    return torrentParseImpl( ctor, setmeInfo, NULL, NULL );
+}
+
 tr_torrent *
-tr_torrentNew( const tr_ctor  * ctor,
-               int            * setmeError )
+tr_torrentNew( const tr_ctor * ctor, int * setmeError )
 {
     tr_info tmpInfo;
     tr_torrent * tor = NULL;
@@ -753,16 +759,19 @@ tr_torrentNew( const tr_ctor  * ctor,
     }
     else
     {
-        const int err = tr_torrentParse( ctor, &tmpInfo );
-        if( !err )
+        int off, len;
+        tr_parse_result r = torrentParseImpl( ctor, &tmpInfo, &off, &len );
+        if( r == TR_PARSE_OK )
         {
             tor = tr_new0( tr_torrent, 1 );
             tor->info = tmpInfo;
+            tor->infoDictOffset = off;
+            tor->infoDictLength = len;
             torrentInit( tor, ctor );
         }
         else if( setmeError )
         {
-            *setmeError = err;
+            *setmeError = r;
         }
     }
 
