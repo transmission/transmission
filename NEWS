@@ -13,7 +13,6 @@
   * Fix minor compiler warnings and tarball packaging issues
   * Add an OS hint to not cache torrent files during torrent verification
 ==== Mac ====
-  * Fix 1.80b1 crash in "insert_event"
   * Simplified Chinese localization
 ==== GTK+ ====
   * Minor HiG improvements
