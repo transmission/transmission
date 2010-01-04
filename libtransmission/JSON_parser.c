@@ -500,7 +500,7 @@ static int parse_parse_buffer(JSON_parser jc)
                     break;
                 case JSON_T_INTEGER:
                     arg = &value;
-                    sscanf(jc->parse_buffer, JSON_PARSER_INTEGER_SSCANF_TOKEN, &value.vu.integer_value);
+                    value.vu.integer_value = evutil_strtoll( jc->parse_buffer, NULL, 10 );
                     break;
                 case JSON_T_STRING:
                     arg = &value;
