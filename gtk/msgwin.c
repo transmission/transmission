@@ -448,7 +448,7 @@ msgwin_new( TrCore * core )
     gtr_toolbar_set_orientation( GTK_TOOLBAR( toolbar ), GTK_ORIENTATION_HORIZONTAL );
     gtk_toolbar_set_style( GTK_TOOLBAR( toolbar ), GTK_TOOLBAR_BOTH_HORIZ );
 
-    item = gtk_tool_button_new_from_stock( GTK_STOCK_SAVE );
+    item = gtk_tool_button_new_from_stock( GTK_STOCK_SAVE_AS );
     g_object_set( G_OBJECT( item ), "is-important", TRUE, NULL );
     g_signal_connect( item, "clicked", G_CALLBACK( onSaveRequest ), data );
     gtk_toolbar_insert( GTK_TOOLBAR( toolbar ), item, -1 );
