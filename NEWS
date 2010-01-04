@@ -1,3 +1,14 @@
+=== Transmission 1.77 (2010/xx/yy) ===
+[http://trac.transmissionbt.com/query?milestone=1.77&group=component&groupdesc=1&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Fix potential data loss by maliciously-crafted .torrent files
+  * Fix minor build issues and packaging issues on various platforms
+  * Fix 1.7x error that could unpause or repause a torrent on startup
+  * Minor CPU speedups
+==== GTK+ ====
+  * Fix GIcon memory leak
+
+
 === Transmission 1.76 (2009/10/24) ===
 [http://trac.transmissionbt.com/query?milestone=1.76&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== All Platforms ====
