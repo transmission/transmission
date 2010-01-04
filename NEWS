@@ -1,8 +1,9 @@
 === Transmission 1.80 (In Development) ===
 [http://trac.transmissionbt.com/query?milestone=1.80&group=component&groupdesc=1&order=severity All tickets closed by this release]
 
-=== Transmission 1.80 beta 4 (20YY/MM/DD) ===
+=== Transmission 1.80 beta 4 (2010/01/04) ===
 ==== All Platforms ====
+  * Fix potential data loss by maliciously-crafted .torrent files
   * Fix 1.80b2 bug in the libcurl glue code
   * Fix 1.80b1 bug that could download too many torrent pieces
   * Fix 1.80b1 bug with sending metadata to other peers
@@ -19,6 +20,20 @@
   * Minor HiG improvements
 ==== Web Client ====
   * Show version information in the preferences dialog
+
+=== Transmission 1.77 (2010/01/04) ===
+[http://trac.transmissionbt.com/query?milestone=1.77&group=component&groupdesc=1&order=severity All tickets closed by this release]
+This is a maintenance release for OSes that bundle Transmission and are frozen at 1.7x.
+Users are encouraged to try the latest release (1.80 beta 4), which also has these fixes.
+==== All Platforms ====
+  * Fix potential data loss by maliciously-crafted .torrent files
+  * Fix minor build issues and packaging issues on various platforms
+  * Fix 1.7x error that could unpause or repause a torrent on startup
+  * Minor CPU speedups
+==== GTK+ ====
+  * Fix crash on shutdown
+  * Fix GIcon memory leak
+
 
 === Transmission 1.80 beta 3 (2009/12/15) ===
 ==== All Platforms ====
