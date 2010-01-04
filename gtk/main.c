@@ -627,13 +627,10 @@ winsetup( struct cbdata * cbdata,
     setupdrag( GTK_WIDGET( wind ), cbdata );
 }
 
-static gpointer
-quitThreadFunc( gpointer gdata )
+static gboolean
+onSessionClosed( gpointer gdata )
 {
     struct cbdata * cbdata = gdata;
-    gdk_threads_enter( );
-
-    tr_core_close( cbdata->core );
 
     /* shutdown the gui */
     if( cbdata->details ) {
@@ -658,8 +655,21 @@ quitThreadFunc( gpointer gdata )
     g_free( cbdata );
 
     gtk_main_quit( );
-    gdk_threads_leave( );
 
+    return FALSE;
+}
+
+static gpointer
+sessionCloseThreadFunc( gpointer gdata )
+{
+    /* since tr_sessionClose() is a blocking function,
+     * call it from another thread... when it's done,
+     * punt the GUI teardown back to the GTK+ thread */
+    struct cbdata * cbdata = gdata;
+    gdk_threads_enter( );
+    tr_core_close( cbdata->core );
+    gtr_idle_add( onSessionClosed, gdata );
+    gdk_threads_leave( );
     return NULL;
 }
 
@@ -726,7 +736,7 @@ wannaquit( gpointer vdata )
                                    pref_int_get( PREF_KEY_MAIN_WINDOW_Y ) );
 
     /* shut down libT */
-    g_thread_create( quitThreadFunc, vdata, TRUE, NULL );
+    g_thread_create( sessionCloseThreadFunc, vdata, TRUE, NULL );
 }
 
 static void
