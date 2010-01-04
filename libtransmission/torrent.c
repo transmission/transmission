@@ -2082,10 +2082,10 @@ tr_torrentGetMTimes( const tr_torrent * tor, size_t * setme_n )
 ****
 ***/
 
-tr_announce_list_err
-tr_torrentSetAnnounceList( tr_torrent *            tor,
-                           const tr_tracker_info * trackers,
-                           int                     trackerCount )
+tr_bool
+tr_torrentSetAnnounceList( tr_torrent             * tor,
+                           const tr_tracker_info  * trackers,
+                           int                      trackerCount )
 {
     int i;
     tr_benc metainfo;
@@ -2158,7 +2158,7 @@ tr_torrentSetAnnounceList( tr_torrent *            tor,
     }
 
     tr_torrentUnlock( tor );
-    return ok ? TR_ANNOUNCE_LIST_OK : TR_ANNOUNCE_LIST_HAS_BAD;
+    return ok;
 }
 
 /**
