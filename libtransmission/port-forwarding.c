@@ -122,7 +122,8 @@ onTimer( int fd UNUSED, short what UNUSED, void * vshared )
             break;
     }
 
-    tr_timerAdd( s->timer, sec, msec );
+    if( s->timer != NULL )
+        tr_timerAdd( s->timer, sec, msec );
 }
 
 /***
