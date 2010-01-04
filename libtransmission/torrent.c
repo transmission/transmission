@@ -1637,7 +1637,8 @@ tr_torrentSetFilePriorities( tr_torrent *      tor,
     tr_torrentLock( tor );
 
     for( i = 0; i < fileCount; ++i )
-        tr_torrentInitFilePriority( tor, files[i], priority );
+        if( files[i] < tor->info.fileCount )
+            tr_torrentInitFilePriority( tor, files[i], priority );
 
     tr_torrentSetDirty( tor );
     tr_torrentUnlock( tor );
@@ -1766,7 +1767,9 @@ tr_torrentInitFileDLs( tr_torrent      * tor,
     tr_torrentLock( tor );
 
     for( i=0; i<fileCount; ++i )
-        setFileDND( tor, files[i], doDownload );
+        if( files[i] < tor->info.fileCount )
+            setFileDND( tor, files[i], doDownload );
+
     tr_cpInvalidateDND( &tor->completion );
     tor->needsSeedRatioCheck = TRUE;
 
