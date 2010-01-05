@@ -32,7 +32,7 @@
     
     NSNotificationCenter * nc = [NSNotificationCenter defaultCenter];
     [nc addObserver: self selector: @selector(updateControlTint:)
-        name: NSControlTintDidChangeNotification object: nil];
+        name: NSControlTintDidChangeNotification object: NSApp];
     
     fSelected = NO;
 }

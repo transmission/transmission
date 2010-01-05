@@ -1,85 +1,5 @@
-=== Transmission 1.80 (In Development) ===
+=== Transmission 1.80 (2010/MM/DD) ===
 [http://trac.transmissionbt.com/query?milestone=1.80&group=component&groupdesc=1&order=severity All tickets closed by this release]
-
-=== Transmission 1.80 beta 4 (2010/01/04) ===
-==== All Platforms ====
-  * Fix potential data loss by maliciously-crafted .torrent files
-  * Fix 1.80b2 bug in the libcurl glue code
-  * Fix 1.80b1 bug that could download too many torrent pieces
-  * Fix 1.80b1 bug with sending metadata to other peers
-  * Fix 1.80b1 crash in tr_fdSocketClose()
-  * Fix 1.80b1 crash when editing a torrent's trackers
-  * Fix minor display bug with zero-sized files in a torrent
-  * Fix "too many open files" issue in some environments
-  * Fix minor compiler warnings and tarball packaging issues
-  * Add an OS hint to not cache torrent files during torrent verification
-==== Mac ====
-  * Simplified Chinese localization
-  * Updated remaining 1.76 localizations except Turkish
-==== GTK+ ====
-  * Minor HiG improvements
-==== Web Client ====
-  * Show version information in the preferences dialog
-
-=== Transmission 1.77 (2010/01/04) ===
-[http://trac.transmissionbt.com/query?milestone=1.77&group=component&groupdesc=1&order=severity All tickets closed by this release]
-This is a maintenance release for OSes that bundle Transmission and are frozen at 1.7x.
-Users are encouraged to try the latest release (1.80 beta 4), which also has these fixes.
-==== All Platforms ====
-  * Fix potential data loss by maliciously-crafted .torrent files
-  * Fix minor build issues and packaging issues on various platforms
-  * Fix 1.7x error that could unpause or repause a torrent on startup
-  * Minor CPU speedups
-==== GTK+ ====
-  * Fix crash on shutdown
-  * Fix GIcon memory leak
-
-
-=== Transmission 1.80 beta 3 (2009/12/15) ===
-==== All Platforms ====
-  * Tracker announcement improvements
-  * Encrypted handshakes to peers now use less CPU
-  * Filter out spurious IP addresses obtained through LTEP
-  * Fix 1.80 beta 1 crash in magnet links when serving metadata to peers
-  * Fix 1.80 beta 1 bug that caused peer lists to be lost over time
-  * Fix 1.80 beta 1 bug that caused duplicate block downloads from peers
-  * Fix 1.80 beta 1 bug that incorrectly displayed some scrapes as failed
-  * Updated DHT library
-  * Fix minor memory leaks
-==== Mac ====
-  * Fix favicons in the tracker inspector tab
-  * Fix 1.80 beta 1 potential crash when removing trackers
-  * Fix 1.80 beta 1 crash when removing data files
-  * Fix 1.80 beta 1 issue with revealing the window when clicking on the dock icon
-  * German localization
-  * Various interface tweaks
-==== GTK+ ====
-  * Fix 1.80 beta 1 crash in the torrent properties dialog
-==== Web Client ====
-  * Ensure the context menu goes away when clicking on torrents
-  * Fix bug where the context menu could extend past the window's right or bottom edge
-
-=== Transmission 1.80 beta 2 (2009/12/10) ===
-==== All Platforms ====
-  * Fix 1.80 beta 1 tracker connection / announce bug
-  * Fix 1.80 beta 1 crash "Assertion failed: (a->byteCount == b->byteCount)" 
-  * Fix 1.80 beta 1 crash when being controlled by transmission-remote-dotnet
-  * Fix 1.80 beta 1 crash when a malformed magnet link is given to Transmission
-  * Better prefetching of local data that's being uploaded to peers
-==== Mac ====
-  * Fix 1.80 beta 1 IPv6 port check issue on Snow Leopard
-  * Fix 1.80 beta 1 bug when pasting a URL into the torrent window
-  * Updated Spanish, Italian, and Brazilian Portuguese localizations
-==== GTK+ ====
-  * Fix 1.80 beta 1 bug in "Copy Magnet Link to Clipboard" on non-GNOME desktops
-  * Support org.gnome.SessionManager interface for inhibiting hibernation
-  * Minor GNOME HIG improvements
-==== Web Client ====
-  * Fix the turtle drop-down in IE
-  * Add "Start When Added" checkbox when adding torrents
-  * Add Select All / Deselect All buttons
-
-=== Transmission 1.80 beta 1 (2009/12/03) ===
 ==== All Platforms ====
   * Magnet link support
   * If a torrent has multiple tracker tiers, announce to them in parallel
@@ -88,13 +8,19 @@ Users are encouraged to try the latest release (1.80 beta 4), which also has the
   * Append .part to incomplete files
   * Improved IPv6 support
   * Faster management of very large peer lists
-  * When seeding, prefetch the data we upload
-  * IPv6 support for the DHT (dht 0.12) 
+  * IPv6 support for the DHT (dht-0.13) 
   * Improved DHT bootstrapping
   * Improved PEX support
+  * Better prefetching of data
+  * Protect against potential data loss by maliciously-crafted torrent files
   * Brand-new torrents with no downloaded data don't have to wait in the "Verify Local Data" queue
+  * Encrypted handshakes to peers now use less CPU
+  * Fix "too many open files" issue in some environments
+  * Filter out spurious IP addresses obtained through LTEP
   * Fix potential crash on shutdown when port forwarding is disabled
-  * Various bug fixes and performance tweaks
+  * Fix 1.7x error that could unpause or repause a torrent on startup
+  * Add an OS hint to not cache torrent files during torrent verification
+  * Various smaller bug fixes and performance tweaks
   * Add first-time user prompt as per the proposed "Informed P2P User Act"
 ==== Mac ====
   * Redesigned trackers inspector tab with favicons and copy-paste functionality (paste lists of multiple trackers)
@@ -103,19 +29,40 @@ Users are encouraged to try the latest release (1.80 beta 4), which also has the
   * Moving data and incomplete folder are now handled by libtransmission
   * Improved reveal in Finder functionality on Snow Leopard
   * Various smaller behavior and interface tweaks
+  * German and Simplified Chinese localizations
+  * Removed Turkish localization because of lack of localizer
 ==== GTK+ ====
   * When creating a torrent, make it easier to auto-add that new torrent
   * Added support for adding torrents by URL
   * Add optional "download complete" sound using the XDG sound naming spec
+  * Support org.gnome.SessionManager interface for inhibiting hibernation
   * New statusbar "Ratio" icon submitted by jimmac
   * Fix minor memory leaks
+  * Minor GNOME HIG improvements
 ==== Daemon ====
   * Reload settings.json when receiving SIGHUP
   * When running as a daemon, send log messages to syslog
   * transmission-remote now allows per-torrent speed limits to be set
 ==== Web Client ====
-  * Add speed limit "turtle mode" support to the web client
+  * Add speed limit "turtle mode" support
   * Double-clicking a torrent opens/closes the torrent inspector
+  * Add "Start When Added" checkbox when adding torrents
+  * Add Select All / Deselect All buttons to the file inspector
+  * Add version information in the preferences dialog
+  * Ensure the context menu goes away when clicking on torrents
+  * Fix bug where the context menu could extend past the window's right or bottom edge
+  * Fix the turtle drop-down in IE
+
+=== Transmission 1.77 (2010/01/04) ===
+[http://trac.transmissionbt.com/query?milestone=1.77&group=component&groupdesc=1&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Protect against potential data loss by maliciously-crafted torrent files
+  * Fix minor build issues and packaging issues on various platforms
+  * Fix 1.7x error that could unpause or repause a torrent on startup
+  * Minor CPU speedups
+==== GTK+ ====
+  * Fix crash on shutdown
+  * Fix GIcon memory leak
 
 === Transmission 1.76 (2009/10/24) ===
 [http://trac.transmissionbt.com/query?milestone=1.76&group=component&groupdesc=1&order=severity All tickets closed by this release]
