@@ -588,8 +588,6 @@ main( int argc, char ** argv )
         sighandler_cbdata = cbdata;
 
         /* ensure the directories are created */
-        if(( str = pref_string_get( PREF_KEY_DIR_WATCH )))
-            gtr_mkdir_with_parents( str, 0777 );
         if(( str = pref_string_get( TR_PREFS_KEY_DOWNLOAD_DIR )))
             gtr_mkdir_with_parents( str, 0777 );
         if(( str = pref_string_get( TR_PREFS_KEY_INCOMPLETE_DIR )))

@@ -606,18 +606,21 @@ scanWatchDir( TrCore * core )
 
     if( isEnabled )
     {
-        const char * basename;
         const char * dirname = pref_string_get( PREF_KEY_DIR_WATCH );
         GDir * dir = g_dir_open( dirname, 0, NULL );
 
-        while(( basename = g_dir_read_name( dir )))
+        if( dir != NULL )
         {
-            char * filename = g_build_filename( dirname, basename, NULL );
-            maybeAddTorrent( core, filename );
-            g_free( filename );
-        }
+            const char * basename;
+            while(( basename = g_dir_read_name( dir )))
+            {
+                char * filename = g_build_filename( dirname, basename, NULL );
+                maybeAddTorrent( core, filename );
+                g_free( filename );
+            }
 
-        g_dir_close( dir );
+            g_dir_close( dir );
+        }
     }
 }
 
