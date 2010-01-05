@@ -815,7 +815,6 @@ tr_fdGetFileLimit( const tr_session * session )
 {
     return session && session->fdInfo ? session->fdInfo->openFileLimit : -1;
 }
-    
 
 void
 tr_fdSetPeerLimit( tr_session * session, int socketLimit )

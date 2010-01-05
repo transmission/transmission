@@ -515,7 +515,7 @@ static inline void tr_removeElementFromArray( void   * array,
 extern time_t transmission_now;
 
 /**
- * @brief very inexpensive form of time(NULL) 
+ * @brief very inexpensive form of time(NULL)
  * @return the current epoch time in seconds
  *
  * This function returns a second counter that is updated once per second.

@@ -526,7 +526,7 @@ watchdir_file_free( struct watchdir_file * f )
     g_free( f->filename );
     g_free( f );
 }
-    
+
 static gboolean
 watchFolderIdle( gpointer gcore )
 {
@@ -1054,7 +1054,7 @@ tr_core_add_from_url( TrCore * core, const char * url )
 
         err = tr_ctorSetMagnet( ctor, url );
 
-        if( !err ) 
+        if( !err )
         {
             tr_session * session = tr_core_session( core );
             TrTorrent * gtor = tr_torrent_new_ctor( session, ctor, &err );

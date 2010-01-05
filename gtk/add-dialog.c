@@ -536,7 +536,7 @@ addURLDialog( GtkWindow * parent, TrCore * core )
     e = gtk_entry_new( );
     g_object_set_data( G_OBJECT( w ), "url-entry", e );
     hig_workarea_add_row( t, &row, _( "_URL" ), e, NULL );
-    
+
     gtk_box_pack_start( GTK_BOX( GTK_DIALOG( w )->vbox ), t, TRUE, TRUE, 0 );
     gtk_widget_show_all( t );
     gtk_widget_show( w );

@@ -75,8 +75,8 @@ Options :: Options( Session& session, const Prefs& prefs, const QString& filenam
     layout->addWidget( p, row, 1 );
     l->setBuddy( p );
     connect( p, SIGNAL(clicked(bool)), this, SLOT(onFilenameClicked()));
-  
-    if( session.isLocal( ) ) 
+
+    if( session.isLocal( ) )
     {
         const QFileIconProvider iconProvider;
         const QIcon folderIcon = iconProvider.icon( QFileIconProvider::Folder );
@@ -93,10 +93,10 @@ Options :: Options( Session& session, const Prefs& prefs, const QString& filenam
         l->setBuddy( p );
         connect( p, SIGNAL(clicked(bool)), this, SLOT(onDestinationClicked()));
     }
- 
+
     myTree = new FileTreeView;
     layout->addWidget( myTree, ++row, 0, 1, 2 );
-    if( !session.isLocal( ) ) 
+    if( !session.isLocal( ) )
         myTree->hideColumn( 1 ); // hide the % done, since we've no way of knowing
 
     if( session.isLocal( ) )
@@ -132,7 +132,7 @@ Options :: Options( Session& session, const Prefs& prefs, const QString& filenam
 
     reload( );
 }
-    
+
 Options :: ~Options( )
 {
     clearInfo( );

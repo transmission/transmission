@@ -1768,7 +1768,7 @@ updateMetadataRequests( tr_peermsgs * msgs, time_t now )
 static void
 updateBlockRequests( tr_peermsgs * msgs )
 {
-    if( ( msgs->desiredRequestCount > 0 ) && 
+    if( ( msgs->desiredRequestCount > 0 ) &&
         ( msgs->peer->pendingReqsToPeer <= ( msgs->desiredRequestCount * 0.66 ) ) )
     {
         int i;

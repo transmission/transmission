@@ -637,7 +637,7 @@ readargs( int argc, const char ** argv )
                 tr_bencDictAddStr( &top, "method", "session-stats" );
                 tr_bencDictAddInt( &top, "tag", TAG_STATS );
                 break;
-                
+
             case 930:
                 tr_bencDictAddStr( &top, "method", "torrent-set" );
                 addIdArg( args, id );
@@ -705,85 +705,85 @@ readargs( int argc, const char ** argv )
                 tr_bencDictAddStr( &top, "method", "session-set" );
                 tr_bencDictAddBool( args, TR_PREFS_KEY_ALT_SPEED_ENABLED, TRUE );
                 break;
-                
+
             case 971:
                 tr_bencDictAddStr( &top, "method", "session-set" );
                 tr_bencDictAddBool( args, TR_PREFS_KEY_ALT_SPEED_ENABLED, FALSE );
                 break;
-                
+
             case 972:
                 tr_bencDictAddStr( &top, "method", "session-set" );
                 tr_bencDictAddInt( args, TR_PREFS_KEY_ALT_SPEED_DOWN, numarg( optarg ) );
                 break;
-                
+
             case 973:
                 tr_bencDictAddStr( &top, "method", "session-set" );
                 tr_bencDictAddInt( args, TR_PREFS_KEY_ALT_SPEED_UP, numarg( optarg ) );
                 break;
-                
+
             case 974:
                 tr_bencDictAddStr( &top, "method", "session-set" );
                 tr_bencDictAddBool( args, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED, TRUE );
                 break;
-                
+
             case 975:
                 tr_bencDictAddStr( &top, "method", "session-set" );
                 tr_bencDictAddBool( args, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED, FALSE );
                 break;
-                
+
             case 976:
                 tr_bencDictAddStr( &top, "method", "session-set" );
                 addTime( args, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN, optarg);
                 break;
-                
+
             case 977:
-                tr_bencDictAddStr( &top, "method", "session-set" );                
+                tr_bencDictAddStr( &top, "method", "session-set" );
                 addTime( args, TR_PREFS_KEY_ALT_SPEED_TIME_END, optarg);
                 break;
-                
+
             case 978:
                 tr_bencDictAddStr( &top, "method", "session-set" );
                 addDays( args, TR_PREFS_KEY_ALT_SPEED_TIME_DAY, optarg );
                 break;
-                
+
             case 980:
                 tr_bencDictAddStr( &top, "method", "torrent-set" );
                 addIdArg( args, id );
                 tr_bencDictAddInt( args, "downloadLimit", numarg( optarg ) );
                 tr_bencDictAddBool( args, "downloadLimited", TRUE );
                 break;
-                
+
             case 981:
                 tr_bencDictAddStr( &top, "method", "torrent-set" );
                 addIdArg( args, id );
                 tr_bencDictAddBool( args, "downloadLimited", FALSE );
                 break;
-                
+
             case 982:
                 tr_bencDictAddStr( &top, "method", "torrent-set" );
                 addIdArg( args, id );
                 tr_bencDictAddInt( args, "uploadLimit", numarg( optarg ) );
                 tr_bencDictAddBool( args, "uploadLimited", TRUE );
                 break;
-                
+
             case 983:
                 tr_bencDictAddStr( &top, "method", "torrent-set" );
                 addIdArg( args, id );
                 tr_bencDictAddBool( args, "uploadLimited", FALSE );
                 break;
-                
+
             case 984:
                 tr_bencDictAddStr( &top, "method", "torrent-set" );
                 addIdArg( args, id );
                 tr_bencDictAddBool( args, "honorsSessionLimits", TRUE );
                 break;
-                
+
             case 985:
                 tr_bencDictAddStr( &top, "method", "torrent-set" );
                 addIdArg( args, id );
                 tr_bencDictAddBool( args, "honorsSessionLimits", FALSE );
                 break;
-                
+
             case TR_OPT_ERR:
                 fprintf( stderr, "invalid option\n" );
                 showUsage( );
@@ -850,20 +850,20 @@ writeFunc( void * ptr,
 }
 
 
-static void 
-etaToString( char *  buf, size_t  buflen, int64_t eta ) 
-{ 
+static void
+etaToString( char *  buf, size_t  buflen, int64_t eta )
+{
     if( eta < 0 )
-        tr_snprintf( buf, buflen, "Unknown" ); 
+        tr_snprintf( buf, buflen, "Unknown" );
     else if( eta < 60 )
-        tr_snprintf( buf, buflen, "%" PRId64 "sec", eta ); 
+        tr_snprintf( buf, buflen, "%" PRId64 "sec", eta );
     else if( eta < ( 60 * 60 ) )
-        tr_snprintf( buf, buflen, "%" PRId64 " min", eta / 60 ); 
+        tr_snprintf( buf, buflen, "%" PRId64 " min", eta / 60 );
     else if( eta < ( 60 * 60 * 24 ) )
-        tr_snprintf( buf, buflen, "%" PRId64 " hrs", eta / ( 60 * 60 ) ); 
+        tr_snprintf( buf, buflen, "%" PRId64 " hrs", eta / ( 60 * 60 ) );
     else
-        tr_snprintf( buf, buflen, "%" PRId64 " days", eta / ( 60 * 60 * 24 ) ); 
-} 
+        tr_snprintf( buf, buflen, "%" PRId64 " days", eta / ( 60 * 60 * 24 ) );
+}
 
 static char*
 tr_strltime( char * buf, int seconds, size_t buflen )
@@ -1301,28 +1301,28 @@ printDetails( tr_benc * top )
                 tr_benc * t;
                 for( i=0; (( t = tr_bencListChild( l, i ))); ++i )
                 {
-                    int64_t downloadCount; 
-                    tr_bool hasAnnounced; 
-                    tr_bool hasScraped; 
+                    int64_t downloadCount;
+                    tr_bool hasAnnounced;
+                    tr_bool hasScraped;
                     const char * host;
-                    tr_bool isBackup; 
-                    int64_t lastAnnouncePeerCount; 
-                    const char * lastAnnounceResult; 
-                    int64_t lastAnnounceStartTime; 
-                    tr_bool lastAnnounceSucceeded; 
-                    int64_t lastAnnounceTime; 
-                    const char * lastScrapeResult; 
-                    tr_bool lastScrapeSucceeded; 
-                    int64_t lastScrapeStartTime; 
-                    int64_t lastScrapeTime; 
-                    int64_t leecherCount; 
-                    int64_t nextAnnounceTime; 
-                    int64_t nextScrapeTime; 
+                    tr_bool isBackup;
+                    int64_t lastAnnouncePeerCount;
+                    const char * lastAnnounceResult;
+                    int64_t lastAnnounceStartTime;
+                    tr_bool lastAnnounceSucceeded;
+                    int64_t lastAnnounceTime;
+                    const char * lastScrapeResult;
+                    tr_bool lastScrapeSucceeded;
+                    int64_t lastScrapeStartTime;
+                    int64_t lastScrapeTime;
+                    int64_t leecherCount;
+                    int64_t nextAnnounceTime;
+                    int64_t nextScrapeTime;
                     int64_t seederCount;
                     int64_t tier;
                     int64_t announceState;
                     int64_t scrapeState;
-           
+
                     if( tr_bencDictFindInt ( t, "downloadCount", &downloadCount ) &&
                         tr_bencDictFindBool( t, "hasAnnounced", &hasAnnounced ) &&
                         tr_bencDictFindBool( t, "hasScraped", &hasScraped ) &&
@@ -1392,7 +1392,7 @@ printDetails( tr_benc * top )
                                     printf( "  Tracker had %'d seeders and %'d leechers %s ago\n",
                                             (int)seederCount, (int)leecherCount, buf );
                                 else
-                                    printf( "  Got a scrape error \"%s\" %s ago\n", 
+                                    printf( "  Got a scrape error \"%s\" %s ago\n",
                                             lastScrapeResult, buf );
                             }
 

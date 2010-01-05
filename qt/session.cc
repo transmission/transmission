@@ -155,8 +155,8 @@ Session :: updatePref( int key )
             break;
 
         case Prefs :: RATIO:
-            sessionSet( "seedRatioLimit", myPrefs.variant(key) );           
-            break;           
+            sessionSet( "seedRatioLimit", myPrefs.variant(key) );
+            break;
         case Prefs :: RATIO_ENABLED:
             sessionSet( "seedRatioLimited", myPrefs.variant(key) );
             break;
@@ -718,7 +718,7 @@ Session :: parseResponse( const char * json, size_t jsonLength )
                                                            QString::fromUtf8(str),
                                                            QMessageBox::Close,
                                                            QApplication::activeWindow());
-                        QPixmap pixmap; 
+                        QPixmap pixmap;
                         QIcon icon = QtIconLoader :: icon( "dialog-information" );
                         if( !icon.isNull( ) ) {
                             const int size = QApplication::style()->pixelMetric( QStyle::PM_LargeIconSize );

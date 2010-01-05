@@ -246,7 +246,7 @@ getStatusString( const tr_torrent  * tor,
 
         case TR_STATUS_DOWNLOAD:
         {
-            if( tr_torrentHasMetadata( tor ) ) 
+            if( tr_torrentHasMetadata( tor ) )
             {
                 g_string_append_printf( gstr,
                     ngettext( "Downloading from %1$'d of %2$'d connected peer",

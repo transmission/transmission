@@ -760,7 +760,6 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
             str = tr_strltime( buf, baseline, sizeof( buf ) );
     }
     gtr_label_set_text( GTK_LABEL( di->eta_lb ), str );
-     
 
 
     /* size_lb */
@@ -2115,7 +2114,7 @@ tracker_page_new( struct DetailsImpl * di )
     g_object_set( G_OBJECT( r ), "ypad", (GUI_PAD+GUI_PAD_BIG)/2,
                                  "xpad", (GUI_PAD+GUI_PAD_BIG)/2,
                                  NULL );
-   
+
     sw = gtk_scrolled_window_new( NULL, NULL );
     gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( sw ),
                                     GTK_POLICY_AUTOMATIC,
@@ -2149,7 +2148,7 @@ tracker_page_new( struct DetailsImpl * di )
     gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( w ), b );
     g_signal_connect( w, "toggled", G_CALLBACK( onBackupToggled ), di );
     gtk_box_pack_start( GTK_BOX( vbox ), w, FALSE, FALSE, 0 );
-    
+
     return vbox;
 }
 

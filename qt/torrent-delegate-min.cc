@@ -136,8 +136,8 @@ TorrentDelegateMin :: drawTorrent( QPainter * painter, const QStyleOptionViewIte
     const QRect barArea( nameArea.left( ),
                          nameArea.bottom( ),
                          statusArea.right( ) - nameArea.left( ),
-                         BAR_HEIGHT );               
-                           
+                         BAR_HEIGHT );
+
     // render
     if( tor.hasError( ) )
         painter->setPen( QColor( "red" ) );

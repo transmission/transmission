@@ -492,7 +492,7 @@ get_pixbuf_from_icon(SexyIconEntry *entry, SexyIconEntryPosition icon_pos)
 			gtk_icon_size_lookup (size, &w, &h);
 			pixbuf = gtk_icon_theme_load_icon (gtk_icon_theme_get_default (), stock_id, size, 0, NULL);
 			break;
-          
+
 		default:
 			return NULL;
 	}

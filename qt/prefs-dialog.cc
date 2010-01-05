@@ -436,7 +436,7 @@ PrefsDialog :: onUpdateBlocklistClicked( )
     myBlocklistDialog->show( );
     mySession.updateBlocklist( );
 }
-    
+
 void
 PrefsDialog :: encryptionEdited( int i )
 {
@@ -680,8 +680,8 @@ PrefsDialog :: updatePref( int key )
             const bool enabled( myPrefs.getBool( Prefs::RPC_ENABLED ) );
             const bool whitelist( myPrefs.getBool( Prefs::RPC_WHITELIST_ENABLED ) );
             const bool auth( myPrefs.getBool( Prefs::RPC_AUTH_REQUIRED ) );
-            foreach( QWidget * w, myWebWhitelistWidgets ) w->setEnabled( enabled && whitelist ); 
-            foreach( QWidget * w, myWebAuthWidgets ) w->setEnabled( enabled && auth ); 
+            foreach( QWidget * w, myWebWhitelistWidgets ) w->setEnabled( enabled && whitelist );
+            foreach( QWidget * w, myWebAuthWidgets ) w->setEnabled( enabled && auth );
             foreach( QWidget * w, myWebWidgets ) w->setEnabled( enabled );
             break;
         }
@@ -690,7 +690,7 @@ PrefsDialog :: updatePref( int key )
         case Prefs :: PROXY_AUTH_ENABLED: {
             const bool enabled( myPrefs.getBool( Prefs::PROXY_ENABLED ) );
             const bool auth( myPrefs.getBool( Prefs::PROXY_AUTH_ENABLED ) );
-            foreach( QWidget * w, myProxyAuthWidgets ) w->setEnabled( enabled && auth ); 
+            foreach( QWidget * w, myProxyAuthWidgets ) w->setEnabled( enabled && auth );
             foreach( QWidget * w, myProxyWidgets ) w->setEnabled( enabled );
             break;
         }
@@ -733,7 +733,6 @@ PrefsDialog :: updatePref( int key )
             myIncompleteButton->setEnabled( enabled );
             break;
         }
-       
 
         default:
             break;

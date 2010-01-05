@@ -167,7 +167,7 @@ tr_getQueuedMessages( void )
     ret = messageQueue;
     messageQueue = NULL;
     messageQueueTail = &messageQueue;
-    
+
     messageQueueCount = 0;
 
     tr_lockUnlock( messageLock );
@@ -307,16 +307,16 @@ tr_msg( const char * file, int line,
             *messageQueueTail = newmsg;
             messageQueueTail = &newmsg->next;
             ++messageQueueCount;
-            
+
             if( messageQueueCount > TR_MAX_MSG_LOG )
             {
                 tr_msg_list * old = messageQueue;
                 messageQueue = old->next;
                 old->next = NULL;
                 tr_freeMessageList(old);
-                
+
                 --messageQueueCount;
-                
+
                 assert( messageQueueCount == TR_MAX_MSG_LOG );
             }
         }

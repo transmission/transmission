@@ -72,13 +72,13 @@ get_size_in_pixels( GtkWidget   * widget,
 
     gtk_icon_size_lookup_for_settings( gtk_widget_get_settings( widget ),
                                        icon_size,
-                                       &width, 
+                                       &width,
                                        &height );
     return MAX( width, height );
 }
 
 
-static IconCache * 
+static IconCache *
 icon_cache_new (GtkWidget * for_widget,
 		int         icon_size)
 {
@@ -87,7 +87,7 @@ icon_cache_new (GtkWidget * for_widget,
     g_return_val_if_fail( for_widget != NULL, NULL );
 	
     icon_cache = g_new0( IconCache, 1 );
-    icon_cache->icon_theme = gtk_icon_theme_get_for_screen( gtk_widget_get_screen( for_widget )); 
+    icon_cache->icon_theme = gtk_icon_theme_get_for_screen( gtk_widget_get_screen( for_widget ));
     icon_cache->icon_size = get_size_in_pixels( for_widget, icon_size );
     icon_cache->cache = g_hash_table_new_full (g_str_hash, g_str_equal, NULL, g_object_unref);
 	
@@ -193,7 +193,7 @@ _get_icon_pixbuf( GIcon        *icon,
     return NULL;
 }
 
-                  
+
 static GdkPixbuf *
 icon_cache_get_mime_type_icon( IconCache  * icon_cache,
 		               const char * mime_type )
@@ -259,20 +259,20 @@ icon_cache_get_mime_type_icon( IconCache  * icon_cache,
 #endif
 
 
-GdkPixbuf * 
+GdkPixbuf *
 get_mime_type_icon( const char   * mime_type,
                     GtkIconSize    icon_size,
                     GtkWidget    * for_widget )
 {
     int n;
-    
+
     switch ( icon_size ) {
         case GTK_ICON_SIZE_MENU:            n = 1; break;
         case GTK_ICON_SIZE_SMALL_TOOLBAR:   n = 2; break;
         case GTK_ICON_SIZE_LARGE_TOOLBAR:   n = 3; break;
         case GTK_ICON_SIZE_BUTTON:          n = 4; break;
         case GTK_ICON_SIZE_DND:             n = 5; break;
-        case GTK_ICON_SIZE_DIALOG:          n = 6; break; 
+        case GTK_ICON_SIZE_DIALOG:          n = 6; break;
         default /*GTK_ICON_SIZE_INVALID*/:  n = 0; break;
     }	
 
@@ -280,10 +280,10 @@ get_mime_type_icon( const char   * mime_type,
         icon_cache[n] = icon_cache_new( for_widget, icon_size );
 
     return icon_cache_get_mime_type_icon( icon_cache[n], mime_type );
-}                    
+}
 
 
-const char * 
+const char *
 get_mime_type_from_filename( const char * file G_GNUC_UNUSED )
 {
 #ifdef USE_GIO_ICONS

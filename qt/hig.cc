@@ -36,7 +36,7 @@ HIG :: ~HIG( )
 {
     delete myGrid;
 }
- 
+
 /***
 ****
 ***/

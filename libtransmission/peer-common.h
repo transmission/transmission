@@ -30,7 +30,7 @@
 
 enum
 {
-    /** when we're making requests from another peer, 
+    /** when we're making requests from another peer,
         batch them together to send enough requests to
         meet our bandwidth goals for the next N seconds */
     REQUEST_BUF_SECS = 10

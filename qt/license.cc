@@ -25,7 +25,7 @@ LicenseDialog :: LicenseDialog( QWidget * parent ):
 
     QPlainTextEdit * t = new QPlainTextEdit( this );
     t->setReadOnly( true );
-    t->setPlainText( 
+    t->setPlainText(
 "The OS X client, CLI client, and parts of libtransmission are licensed under the terms of the MIT license.\n\n"
 "The Transmission daemon, GTK+ client, Qt client, Web client, and most of libtransmission are licensed under the terms of the GNU GPL version 2, with two special exceptions:\n\n"
 "1. The MIT-licensed portions of Transmission listed above are exempt from GPLv2 clause 2(b) and may retain their MIT license.\n\n"

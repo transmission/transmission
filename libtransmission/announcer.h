@@ -70,7 +70,7 @@ tr_bool tr_announcerHasBacklog( const struct tr_announcer * );
 
 void tr_announcerResetTorrent( struct tr_announcer*, tr_torrent* );
 
-tr_publisher_tag tr_announcerSubscribe( struct tr_torrent_tiers  * tiers, 
+tr_publisher_tag tr_announcerSubscribe( struct tr_torrent_tiers  * tiers,
                                         tr_delivery_func           func,
                                         void                     * userData );
 

@@ -114,4 +114,4 @@ SessionDialog :: SessionDialog( Session& session, Prefs& prefs, QWidget * parent
     connect( buttons, SIGNAL(rejected()), this, SLOT(hide()));
     connect( buttons, SIGNAL(accepted()), this, SLOT(onAccepted()));
     top->addWidget( buttons, 0 );
-} 
+}

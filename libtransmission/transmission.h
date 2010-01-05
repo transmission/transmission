@@ -898,7 +898,7 @@ void        tr_ctorSetDownloadDir( tr_ctor *    ctor,
  * the only place where it should be used.
  */
 void tr_ctorSetIncompleteDir( tr_ctor * ctor, const char * directory );
- 
+
 /** Set whether or not the torrent begins downloading/seeding when created.
     (Default: not paused) */
 void        tr_ctorSetPaused( tr_ctor      * ctor,
@@ -1411,15 +1411,15 @@ typedef struct
     int lastAnnouncePeerCount;
 
     /* human-readable string with the result of the last announce.
-       if "hasAnnounced" is false, this field is undefined */ 
+       if "hasAnnounced" is false, this field is undefined */
     char lastAnnounceResult[128];
 
     /* when the last announce was sent to the tracker.
      * if "hasAnnounced" is false, this field is undefined */
     time_t lastAnnounceStartTime;
-   
+
     /* whether or not the last announce was a success.
-       if "hasAnnounced" is false, this field is undefined */ 
+       if "hasAnnounced" is false, this field is undefined */
     tr_bool lastAnnounceSucceeded;
 
     /* when the last announce was completed.
@@ -1435,7 +1435,7 @@ typedef struct
     time_t lastScrapeStartTime;
 
     /* whether or not the last scrape was a success.
-       if "hasAnnounced" is false, this field is undefined */ 
+       if "hasAnnounced" is false, this field is undefined */
     tr_bool lastScrapeSucceeded;
 
     /* when the last scrape was completed.
@@ -1468,7 +1468,6 @@ void tr_torrentTrackersFree( tr_tracker_stat * trackerStats,
                              int               trackerCount );
 
 
-    
 
 /**
  * @brief get the download speeds for each of this torrent's webseed sources.
@@ -1679,10 +1678,10 @@ typedef struct tr_stat
         @see tr_stat.leftUntilDone */
     float    percentDone;
 
-    /** The percentage of the actual ratio to the seed ratio.  This will be 
-        equal to 1 if the ratio is reached or the torrent is set to seed forever. 
-        Range is [0..1] */ 
-    float    percentRatio; 
+    /** The percentage of the actual ratio to the seed ratio.  This will be
+        equal to 1 if the ratio is reached or the torrent is set to seed forever.
+        Range is [0..1] */
+    float    percentRatio;
 
     /** Speed all data being sent for this torrent. (KiB/s)
         This includes piece data, protocol messages, and TCP overhead */

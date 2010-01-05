@@ -106,7 +106,7 @@ onProgressDialogRefresh( gpointer data )
     gtk_dialog_set_response_sensitive( d, GTK_RESPONSE_CANCEL, !b->isDone );
     gtk_dialog_set_response_sensitive( d, GTK_RESPONSE_CLOSE, b->isDone );
     gtk_dialog_set_response_sensitive( d, GTK_RESPONSE_ACCEPT, b->isDone && !b->result );
-    
+
     g_free( base );
     return TRUE;
 }
@@ -465,7 +465,7 @@ make_meta_ui( GtkWindow  * parent, TrCore * core )
 
         w = hig_workarea_add_wide_checkbutton( t, &row, _( "_Private torrent" ), FALSE );
         ui->private_check = w;
- 
+
     hig_workarea_finish( t, &row );
     gtk_box_pack_start( GTK_BOX( GTK_DIALOG( d )->vbox ), t, TRUE, TRUE, 0 );
 

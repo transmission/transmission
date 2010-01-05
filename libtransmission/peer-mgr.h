@@ -168,7 +168,7 @@ void tr_peerMgrSetBlame( tr_torrent        * tor,
                          tr_piece_index_t    pieceIndex,
                          int                 success );
 
-enum 
+enum
 {
     TR_PEERS_CONNECTED,
     TR_PEERS_ALL

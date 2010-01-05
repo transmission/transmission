@@ -47,7 +47,7 @@ FileTreeItem :: ~FileTreeItem( )
         const int pos = myParent->myChildren.indexOf( this );
         if( pos >= 0 )
             myParent->myChildren.removeAt( pos );
-        else 
+        else
             assert( 0 && "failed to remove" );
     }
 }
@@ -252,7 +252,7 @@ FileTreeModel :: FileTreeModel( QObject *parent ):
 {
     rootItem = new FileTreeItem( -1 );
 }
-     
+
 FileTreeModel :: ~FileTreeModel( )
 {
     clear( );
@@ -299,7 +299,7 @@ FileTreeModel :: headerData( int column, Qt::Orientation orientation, int role )
             default: break;
         }
     }
-                
+
     return data;
 }
 
@@ -602,7 +602,7 @@ FileTreeView :: FileTreeView( QWidget * parent ):
              this,     SIGNAL(wantedChanged(const QSet<int>&, bool)));
 }
 
-bool 
+bool
 FileTreeView :: eventFilter( QObject * o, QEvent * event )
 {
     if( o != this )

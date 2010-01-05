@@ -66,7 +66,7 @@ TorrentDelegate :: progressString( const Torrent& tor ) const
     const bool isSeed( tor.isSeed( ) );
     const uint64_t haveTotal( tor.haveTotal( ) );
     QString str;
-    double seedRatio; 
+    double seedRatio;
     bool hasSeedRatio;
 
     if( !isDone )

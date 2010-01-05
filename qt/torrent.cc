@@ -216,7 +216,7 @@ Torrent :: setDateTime( int i, const QDateTime& value )
 
     return changed;
 }
-  
+
 bool
 Torrent :: setSize( int i, qulonglong value )
 {
@@ -498,7 +498,6 @@ Torrent :: update( tr_benc * d )
             default:
                 assert( 0 && "unhandled type" );
         }
-        
     }
 
     tr_benc * files;

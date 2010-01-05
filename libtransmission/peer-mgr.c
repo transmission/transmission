@@ -2974,7 +2974,7 @@ compareReconnectTorrents( const void * va, const void * vb )
 
     return 0;
 }
-    
+
 static void
 reconnectPulse( int foo UNUSED, short bar UNUSED, void * vmgr )
 {
