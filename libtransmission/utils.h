@@ -188,7 +188,8 @@ void tr_msg( const char * file, int line,
 
 FILE*          tr_getLog( void );
 
-tr_bool        tr_deepLoggingIsActive( void );
+/** @brief return true if deep logging has been enabled by the user; false otherwise */
+tr_bool tr_deepLoggingIsActive( void );
 
 void           tr_deepLog( const char * file,
                            int          line,
@@ -196,8 +197,8 @@ void           tr_deepLog( const char * file,
                            const char * fmt,
                            ... ) TR_GNUC_PRINTF( 4, 5 ) TR_GNUC_NONNULL(1,4);
 
-char*          tr_getLogTimeStr( char * buf,
-                                 int    buflen ) TR_GNUC_NONNULL(1);
+/** @brief set the buffer with the current time formatted for deep logging. */
+char* tr_getLogTimeStr( char * buf, int buflen ) TR_GNUC_NONNULL(1);
 
 
 /**
@@ -466,18 +467,20 @@ int* tr_parseNumberRange( const char * str,
                           int * setmeCount ) TR_GNUC_MALLOC TR_GNUC_NONNULL(1);
 
 
-/* truncate a double value at a given number of decimal places.
-   this can be used to prevent a printf() call from rounding up:
-   call with the decimal_places argument equal to the number of
-   decimal places in the printf()'s precision:
-
-   - printf("%.2f%%",           99.999    ) ==> "100.00%"
-
-   - printf("%.2f%%", tr_truncd(99.999, 2)) ==>  "99.99%"
-               ^                        ^
-               |   These should match   |
-               +------------------------+
-*/
+/**
+ * @brief truncate a double value at a given number of decimal places.
+ *
+ * this can be used to prevent a printf() call from rounding up:
+ * call with the decimal_places argument equal to the number of
+ * decimal places in the printf()'s precision:
+ *
+ * - printf("%.2f%%",           99.999    ) ==> "100.00%"
+ *
+ * - printf("%.2f%%", tr_truncd(99.999, 2)) ==>  "99.99%"
+ *             ^                        ^
+ *             |   These should match   |
+ *             +------------------------+
+ */
 double tr_truncd( double x, int decimal_places );
 
 /**
@@ -492,14 +495,18 @@ char* tr_strratio( char * buf, size_t buflen, double ratio, const char * infinit
 struct tm * tr_localtime_r( const time_t *_clock, struct tm *_result );
 
 
-/** on success, return 0.  on failure, return -1 and set errno */
+/**
+ * @brief move a file
+ * @return 0 on success; otherwise, return -1 and set errno
+ */
 int tr_moveFile( const char * oldpath, const char * newpath,
                  tr_bool * renamed ) TR_GNUC_NONNULL(1,2);
 
+/** @brief convenience function to remove an item from an array */
 static inline void tr_removeElementFromArray( void   * array,
-                                                 int      index_to_remove,
-                                                 size_t   sizeof_element,
-                                                 size_t   nmemb )
+                                              int      index_to_remove,
+                                              size_t   sizeof_element,
+                                              size_t   nmemb )
 {
     char * a = (char*) array;
 

@@ -39,7 +39,10 @@
 extern "C" {
 #endif
 
-/** @ingroup utils */
+/**
+ * @brief read a line from a file and place it in a newly-allocated string
+ * @ingroup utils
+ */
 int fggets( char* *ln, FILE * f );
 
 #define ggets( ln ) fggets( ln, stdin )

@@ -41,6 +41,7 @@ struct tr_bandwidth;
 struct tr_bindsockets;
 struct tr_fdInfo;
 
+/** @brief handle to an active libtransmission session */
 struct tr_session
 {
     tr_bool                      isPortRandom;

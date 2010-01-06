@@ -25,7 +25,7 @@
  */
 
 /**
- * A simple pointer array that resizes itself dynamically.
+ * @brief simple pointer array that resizes itself dynamically.
  */
 typedef struct tr_ptrArray
 {

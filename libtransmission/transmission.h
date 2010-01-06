@@ -1635,7 +1635,7 @@ typedef enum
 tr_stat_errtype;
 
 /**
- * The current status of a torrent.
+ * @brief Describes a torrent's status
  * @see tr_torrentStat()
  */
 typedef struct tr_stat

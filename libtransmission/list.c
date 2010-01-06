@@ -177,7 +177,7 @@ __tr_list_insert( struct __tr_list * list,
     prev->next = list;
 }
 
-void
+static void
 __tr_list_splice( struct __tr_list * prev,
 		  struct __tr_list * next)
 {
