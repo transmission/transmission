@@ -103,6 +103,7 @@ static const char * fallback_ui_file =
     "\n"
     "  <popup name='icon-popup'>\n"
     "    <menuitem action='add-torrent-menu'/>\n"
+    "    <menuitem action='add-torrent-from-url'/>\n"
     "    <separator/>\n"
     "    <menuitem action='toggle-main-window'/>\n"
     "    <menuitem action='toggle-message-log'/>\n"
