@@ -1744,22 +1744,18 @@ typedef enum
     NSMutableIndexSet * removeIndexes = [NSMutableIndexSet indexSet];
     
     NSIndexSet * selectedIndexes = [fTrackerTable selectedRowIndexes];
-    for (NSUInteger i=0, trackerIndex = 0; i <= [selectedIndexes lastIndex]; ++i)
+    BOOL groupSelected = NO;
+    for (NSUInteger i = 0, trackerIndex = 0; i < [fTrackers count]; ++i)
     {
-        const BOOL isSelected = [selectedIndexes containsIndex: i];
-        
         if ([[fTrackers objectAtIndex: i] isKindOfClass: [NSNumber class]])
         {
-            if (isSelected)
-            {
-                for (++i; i < [fTrackers count] && ![[fTrackers objectAtIndex: i] isKindOfClass: [NSNumber class]]; ++i)
-                    [removeIndexes addIndex: trackerIndex++];
-                --i;
-            }
+            groupSelected = [selectedIndexes containsIndex: i];
+            if (!groupSelected && i > [selectedIndexes lastIndex])
+                break;
         }
         else
         {
-            if (isSelected)
+            if (groupSelected || [selectedIndexes containsIndex: i])
                 [removeIndexes addIndex: trackerIndex];
             ++trackerIndex;
         }
