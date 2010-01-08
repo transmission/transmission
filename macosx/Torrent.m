@@ -652,7 +652,10 @@ int trashDataFile(const char * filename)
     
     int newCount = 0;
     for (NSUInteger oldIndex = [indexes firstIndex]; oldIndex != NSNotFound; oldIndex = [indexes indexGreaterThanIndex: oldIndex])
+    {
+        NSLog(@"oldIndex: %d %s", oldIndex, fInfo->trackers[oldIndex].announce);
         trackerStructs[newCount++] = fInfo->trackers[oldIndex];
+    }
     
     const BOOL success = tr_torrentSetAnnounceList(fHandle, trackerStructs, newCount);
     NSAssert(success, @"Removing tracker addresses failed");

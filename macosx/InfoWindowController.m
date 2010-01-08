@@ -1761,6 +1761,8 @@ typedef enum
         }
     }
     
+    NSLog(@"%@", removeIndexes);
+    
     NSAssert([removeIndexes count] > 0, @"Trying to remove no trackers.");
     
     if ([[NSUserDefaults standardUserDefaults] boolForKey: @"WarningRemoveTrackers"])
