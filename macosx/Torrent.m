@@ -587,6 +587,7 @@ int trashDataFile(const char * filename)
 {
     int count;
     tr_tracker_stat * stats = tr_torrentTrackers(fHandle, &count);
+    NSLog(@"count from tr_torrentTrackers: %d", count);
     
     NSMutableArray * trackers = [NSMutableArray arrayWithCapacity: (count > 0 ? count + stats[count-1].tier : 0)];
     
@@ -649,6 +650,7 @@ int trashDataFile(const char * filename)
     
     //recreate the tracker structure
     tr_tracker_info * trackerStructs = tr_new(tr_tracker_info, [indexes count]);
+    NSLog(@"count from fInfo: %d", fInfo->trackerCount);
     
     int newCount = 0;
     for (NSUInteger oldIndex = [indexes firstIndex]; oldIndex != NSNotFound; oldIndex = [indexes indexGreaterThanIndex: oldIndex])
