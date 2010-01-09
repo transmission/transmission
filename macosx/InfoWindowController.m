@@ -1744,6 +1744,8 @@ typedef enum
     NSMutableIndexSet * removeIndexes = [NSMutableIndexSet indexSet];
     
     NSIndexSet * selectedIndexes = [fTrackerTable selectedRowIndexes];
+    NSLog(@"%@", fTrackers);
+    NSLog(@"selected: %@", selectedIndexes);
     BOOL groupSelected = NO;
     for (NSUInteger i = 0, trackerIndex = 0; i < [fTrackers count]; ++i)
     {
@@ -1756,7 +1758,10 @@ typedef enum
         else
         {
             if (groupSelected || [selectedIndexes containsIndex: i])
+            {
                 [removeIndexes addIndex: trackerIndex];
+                NSLog(@"adding for remove %d (%d): %@", trackerIndex, i, [fTrackers objectAtIndex: i]);
+            }
             ++trackerIndex;
         }
     }

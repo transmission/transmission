@@ -38,6 +38,11 @@
     return self;
 }
 
+- (NSString *) description
+{
+    return [@"Tracker: " stringByAppendingString: [self fullAnnounceAddress]];
+}
+
 - (id) copyWithZone: (NSZone *) zone
 {
     //this object is essentially immutable after initial setup
