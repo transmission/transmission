@@ -84,6 +84,7 @@ struct tr_web_task
     void * done_func_user_data;
     struct event timer_event;
     CURL * easy;
+    CURLM * multi;
 };
 
 static void
@@ -185,6 +186,7 @@ addTask( void * vtask )
 #endif
 
         task->easy = e;
+        task->multi = web->multi;
 
         /* use our own timeout instead of CURLOPT_TIMEOUT because the latter
          * doesn't play nicely with curl_multi.  See curl bug #2501457 */
@@ -240,10 +242,9 @@ static void
 remove_task( struct tr_web_task * task )
 {
     long code;
-    tr_web * g = task->session->web;
 
     curl_easy_getinfo( task->easy, CURLINFO_RESPONSE_CODE, &code );
-    curl_multi_remove_handle( g->multi, task->easy );
+    curl_multi_remove_handle( task->multi, task->easy );
     curl_easy_cleanup( task->easy );
     task_finish( task, code );
 }
@@ -338,12 +339,14 @@ sock_cb( CURL * e UNUSED, curl_socket_t fd, int curl_what,
         dbgmsg( "enabling (libevent %hd, libcurl %d) on io_event %p, fd %d",
                 ev_what, curl_what, io_event, fd );
         event_set( io_event, fd, ev_what, event_cb, web );
+        assert( io_event->ev_base != NULL );
         event_add( io_event, NULL );
     }
 
     if( ( io_event != NULL ) && ( curl_what & CURL_POLL_REMOVE ) )
     {
         CURLMcode m;
+        memset( io_event, TR_MEMORY_TRASH, sizeof( struct event ) );
         tr_free( io_event );
         m = curl_multi_assign( web->multi, fd, NULL );
         assert( m == CURLM_OK );
