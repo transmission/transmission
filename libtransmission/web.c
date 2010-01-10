@@ -132,7 +132,6 @@ sockoptfunction( void * vtask, curl_socket_t fd, curlsocktype purpose UNUSED )
     return 0;
 }
 
-#if 0
 static int
 getCurlProxyType( tr_proxy_type t )
 {
@@ -140,7 +139,6 @@ getCurlProxyType( tr_proxy_type t )
     if( t == TR_PROXY_SOCKS5 ) return CURLPROXY_SOCKS5;
     return CURLPROXY_HTTP;
 }
-#endif
 
 static int
 getTimeoutFromURL( const char * url )
@@ -168,8 +166,6 @@ addTask( void * vtask )
 
         dbgmsg( "adding task #%lu [%s]", task->tag, task->url );
 
-/* experimentally disable proxies to see if that has any effect on the libevent crashes */
-#if 0
         if( !task->range && session->isProxyEnabled ) {
             curl_easy_setopt( e, CURLOPT_PROXY, session->proxy );
             curl_easy_setopt( e, CURLOPT_PROXYAUTH, CURLAUTH_ANY );
@@ -183,7 +179,6 @@ addTask( void * vtask )
             curl_easy_setopt( e, CURLOPT_PROXYUSERPWD, str );
             tr_free( str );
         }
-#endif
 
         task->easy = e;
         task->multi = web->multi;
