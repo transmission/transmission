@@ -89,8 +89,6 @@ typedef struct
     GtkWidget *           filter;
     GtkWidget *           status;
     GtkWidget *           status_menu;
-    GtkWidget *           ul_hbox;
-    GtkWidget *           dl_hbox;
     GtkWidget *           ul_lb;
     GtkWidget *           dl_lb;
     GtkWidget *           stats_lb;
@@ -968,7 +966,7 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
         w = p->gutter_lb = gtk_label_new( "N Torrents" );
         gtk_box_pack_start( GTK_BOX( h ), w, 1, 1, GUI_PAD_BIG );
 
-        hbox = p->ul_hbox = gtk_hbox_new( FALSE, GUI_PAD_SMALL );
+        hbox = gtk_hbox_new( FALSE, GUI_PAD_SMALL );
             w = gtk_alignment_new( 0.0f, 0.0f, 0.0f, 0.0f );
             gtk_widget_set_size_request( w, GUI_PAD, 0u );
             gtk_box_pack_start( GTK_BOX( hbox ), w, FALSE, FALSE, 0 );
@@ -978,7 +976,7 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
             gtk_box_pack_start( GTK_BOX( hbox ), w, FALSE, FALSE, 0 );
         gtk_box_pack_end( GTK_BOX( h ), hbox, FALSE, FALSE, 0 );
 
-        hbox = p->dl_hbox = gtk_hbox_new( FALSE, GUI_PAD_SMALL );
+        hbox = gtk_hbox_new( FALSE, GUI_PAD_SMALL );
             w = gtk_alignment_new( 0.0f, 0.0f, 0.0f, 0.0f );
             gtk_widget_set_size_request( w, GUI_PAD, 0u );
             gtk_box_pack_start( GTK_BOX( hbox ), w, FALSE, FALSE, 0 );
@@ -1054,6 +1052,20 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
                 gtk_box_pack_start( GTK_BOX( vbox ), status, FALSE, FALSE, 0 );
         }
         g_strfreev( tokens );
+    }
+
+    {
+        int w=0, h=0;
+        /* this is to determine the maximum width/height for the label */
+        PangoLayout * pango_layout =
+            gtk_widget_create_pango_layout( p->ul_lb, _( "999.9 KB/s" ) );
+        pango_layout_get_pixel_size( pango_layout, &w, &h );
+        g_message( "w %d h %d", w, h );
+        gtk_widget_set_size_request( p->ul_lb, w, h );
+        gtk_widget_set_size_request( p->dl_lb, w, h );
+        gtk_misc_set_alignment( GTK_MISC( p->ul_lb ), 1.0, 0.5 );
+        gtk_misc_set_alignment( GTK_MISC( p->dl_lb ), 1.0, 0.5 );
+        g_object_unref( G_OBJECT( pango_layout ) );
     }
 
     /* show all but the window */
@@ -1176,11 +1188,9 @@ updateSpeeds( PrivateData * p )
 
         tr_strlspeed( buf, down, sizeof( buf ) );
         gtk_label_set_text( GTK_LABEL( p->dl_lb ), buf );
-        g_object_set( p->dl_hbox, "visible", down>0, NULL );
 
         tr_strlspeed( buf, up, sizeof( buf ) );
         gtk_label_set_text( GTK_LABEL( p->ul_lb ), buf );
-        g_object_set( p->ul_hbox, "visible", up>0, NULL );
     }
 }
 
