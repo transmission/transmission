@@ -359,11 +359,11 @@ addTrackers( const tr_info * info,
     for( i = 0; i < info->trackerCount; ++i )
     {
         const tr_tracker_info * t = &info->trackers[i];
-        tr_benc *               d = tr_bencListAddDict( trackers, 3 );
+        tr_benc *               d = tr_bencListAddDict( trackers, 4 );
         tr_bencDictAddStr( d, "announce", t->announce );
+        tr_bencDictAddInt( d, "identifier", t->identifier );
         tr_bencDictAddStr( d, "scrape", t->scrape );
         tr_bencDictAddInt( d, "tier", t->tier );
-        tr_bencDictAddInt( d, "id", t->identifier );
     }
 }
 
@@ -375,13 +375,14 @@ addTrackerStats( const tr_tracker_stat * st, int n, tr_benc * list )
     for( i=0; i<n; ++i )
     {
         const tr_tracker_stat * s = &st[i];
-        tr_benc * d = tr_bencListAddDict( list, 22 );
+        tr_benc * d = tr_bencListAddDict( list, 23 );
         tr_bencDictAddStr ( d, "announce", s->announce );
         tr_bencDictAddInt ( d, "announceState", s->announceState );
         tr_bencDictAddInt ( d, "downloadCount", s->downloadCount );
         tr_bencDictAddBool( d, "hasAnnounced", s->hasAnnounced );
         tr_bencDictAddBool( d, "hasScraped", s->hasScraped );
         tr_bencDictAddStr ( d, "host", s->host );
+        tr_bencDictAddInt ( d, "identifier", s->identifier );
         tr_bencDictAddBool( d, "isBackup", s->isBackup );
         tr_bencDictAddInt ( d, "lastAnnouncePeerCount", s->lastAnnouncePeerCount );
         tr_bencDictAddStr ( d, "lastAnnounceResult", s->lastAnnounceResult );

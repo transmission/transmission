@@ -271,7 +271,6 @@ getannounce( tr_info * inf, tr_benc * meta )
         int       n;
         int       i, j, validTiers;
         const int numTiers = tr_bencListSize( tiers );
-        uint32_t  trackerId = 0;
 
         n = 0;
         for( i = 0; i < numTiers; ++i )
