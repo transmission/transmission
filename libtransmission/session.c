@@ -249,7 +249,11 @@ isAltTime( const tr_session * s )
         return FALSE;
 
     if( toNextDay && (minutes < end) )
-        day = (day - 1) % 7;
+    {
+        --day;
+        if( day == -1 )
+            day = 6;
+    }
 
     return ((1<<day) & s->altSpeedTimeDay) != 0;
 }
@@ -1148,7 +1152,11 @@ onAltTimer( int foo UNUSED, short bar UNUSED, void * vsession )
         {
             /* if looking at the end date, look at the next day if end time is before begin time */
             if( isEndTime && !isBeginTime && session->altSpeedTimeEnd < session->altSpeedTimeBegin )
-                day = (day - 1) % 7;
+            {
+                --day;
+                if( day == -1 )
+                    day = 6;
+            }
 
             isDay = ((1<<day) & session->altSpeedTimeDay) != 0;
 
