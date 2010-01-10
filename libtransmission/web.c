@@ -345,11 +345,8 @@ sock_cb( CURL * e UNUSED, curl_socket_t fd, int curl_what,
 
     if( ( io_event != NULL ) && ( curl_what & CURL_POLL_REMOVE ) )
     {
-        CURLMcode m;
         memset( io_event, TR_MEMORY_TRASH, sizeof( struct event ) );
         tr_free( io_event );
-        m = curl_multi_assign( web->multi, fd, NULL );
-        assert( m == CURLM_OK );
         /*fprintf( stderr, "-1 io_events to %d\n", --num_events );*/
     }
 
