@@ -341,6 +341,7 @@ sock_cb( CURL * e UNUSED, curl_socket_t fd, int curl_what,
         event_set( io_event, fd, ev_what, event_cb, web );
         assert( io_event->ev_base != NULL );
         event_add( io_event, NULL );
+        event_loop( EVLOOP_ONCE );
     }
 
     if( ( io_event != NULL ) && ( curl_what & CURL_POLL_REMOVE ) )
