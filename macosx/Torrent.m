@@ -636,7 +636,7 @@ int trashDataFile(const char * filename)
     
     trackerStructs[oldTrackerCount].announce = (char *)[tracker UTF8String];
     trackerStructs[oldTrackerCount].tier = trackerStructs[oldTrackerCount-1].tier + 1;
-    trackerStructs[oldTrackerCount].identifier = trackerStructs[oldTrackerCount-1].identifier + 1;
+    trackerStructs[oldTrackerCount].identifier = oldTrackerCount;
     
     const BOOL success = tr_torrentSetAnnounceList(fHandle, trackerStructs, oldTrackerCount+1);
     tr_free(trackerStructs);

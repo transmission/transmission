@@ -1745,9 +1745,10 @@ typedef enum
     
     NSIndexSet * selectedIndexes = [fTrackerTable selectedRowIndexes];
     BOOL groupSelected = NO;
-    for (NSUInteger i = 0, trackerIndex = 0; i < [fTrackers count]; ++i)
+    for (NSUInteger i = 0; i < [fTrackers count]; ++i)
     {
-        if ([[fTrackers objectAtIndex: i] isKindOfClass: [NSNumber class]])
+        id object = [fTrackers objectAtIndex: i];
+        if ([object isKindOfClass: [NSNumber class]])
         {
             groupSelected = [selectedIndexes containsIndex: i];
             if (!groupSelected && i > [selectedIndexes lastIndex])
@@ -1756,12 +1757,9 @@ typedef enum
         else
         {
             if (groupSelected || [selectedIndexes containsIndex: i])
-                [removeIdentifiers addIndex: [(TrackerNode *)[fTrackers objectAtIndex: i] identifier]];
-            ++trackerIndex;
+                [removeIdentifiers addIndex: [(TrackerNode *)object identifier]];
         }
     }
-    
-    NSLog(@"%@", removeIdentifiers);
     
     NSAssert([removeIdentifiers count] > 0, @"Trying to remove no trackers.");
     

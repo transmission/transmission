@@ -516,8 +516,8 @@ tr_http_escape( struct evbuffer  * out,
     for( i = 0; i < len; i++ ) {
         if( str[i] == ',' || str[i] == '-' || str[i] == '.'
             || ( '0' <= str[i] && str[i] <= '9' )
-            || ( 'a' <= str[i] && str[i] <= 'z' )
             || ( 'A' <= str[i] && str[i] <= 'Z' )
+            || ( 'a' <= str[i] && str[i] <= 'z' )
             || ( str[i] == '/' && !escape_slashes ) )
             evbuffer_add( out, &str[i], 1 );
         else
