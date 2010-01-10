@@ -1200,15 +1200,16 @@ char* tr_torrentGetMagnetLink( const tr_torrent * tor );
 ***
 **/
 
+
 /** @brief a part of tr_info that represents a single tracker */
 typedef struct tr_tracker_info
 {
-    int     tier;
-    char *  announce;
-    char *  scrape;
+    int      tier;
+    char *   announce;
+    char *   scrape;
+    uint32_t identifier; /* used to match to a tr_tracker_stat */
 }
 tr_tracker_info;
-
 
 /**
  * @brief Modify a torrent's tracker list.
@@ -1458,6 +1459,9 @@ typedef struct
 
     /* which tier this tracker is in */
     int tier;
+    
+    /* used to match to a tr_tracker_info */
+    uint32_t identifier;
 }
 tr_tracker_stat;
 

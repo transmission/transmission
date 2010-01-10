@@ -271,13 +271,13 @@ getannounce( tr_info * inf, tr_benc * meta )
         int       n;
         int       i, j, validTiers;
         const int numTiers = tr_bencListSize( tiers );
+        uint32_t  trackerId = 0;
 
         n = 0;
         for( i = 0; i < numTiers; ++i )
             n += tr_bencListSize( tr_bencListChild( tiers, i ) );
 
         trackers = tr_new0( tr_tracker_info, n );
-        trackerCount = 0;
 
         for( i = 0, validTiers = 0; i < numTiers; ++i )
         {
@@ -291,12 +291,14 @@ getannounce( tr_info * inf, tr_benc * meta )
                     char * url = tr_strstrip( tr_strdup( str ) );
                     if( tr_httpIsValidURL( url ) )
                     {
-                        tr_tracker_info * t = trackers + trackerCount++;
+                        tr_tracker_info * t = trackers + trackerCount;
                         t->tier = validTiers;
                         t->announce = tr_strdup( url );
                         t->scrape = tr_convertAnnounceToScrape( url );
+                        t->identifier = trackerCount;
 
                         anyAdded = TRUE;
+                        ++trackerCount;
                     }
                     tr_free( url );
                 }
@@ -324,7 +326,9 @@ getannounce( tr_info * inf, tr_benc * meta )
             trackers = tr_new0( tr_tracker_info, 1 );
             trackers[trackerCount].tier = 0;
             trackers[trackerCount].announce = tr_strdup( url );
-            trackers[trackerCount++].scrape = tr_convertAnnounceToScrape( url );
+            trackers[trackerCount].scrape = tr_convertAnnounceToScrape( url );
+            trackers[trackerCount].identifier = 0;
+            trackerCount++;
             /*fprintf( stderr, "single announce: [%s]\n", url );*/
         }
         tr_free( url );
@@ -596,6 +600,7 @@ tr_metainfoSetFromMagnet( tr_info * inf, const tr_magnet_info * m )
             inf->trackers[i].tier = i;
             inf->trackers[i].announce = tr_strdup( url );
             inf->trackers[i].scrape = tr_convertAnnounceToScrape( url );
+            inf->trackers[i].identifier = i;
         }
     }
 

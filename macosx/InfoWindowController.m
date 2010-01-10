@@ -1741,11 +1741,9 @@ typedef enum
 
 - (void) removeTrackers
 {
-    NSMutableIndexSet * removeIndexes = [NSMutableIndexSet indexSet];
+    NSMutableIndexSet * removeIdentifiers = [NSMutableIndexSet indexSet];
     
     NSIndexSet * selectedIndexes = [fTrackerTable selectedRowIndexes];
-    NSLog(@"%@", fTrackers);
-    NSLog(@"selected: %@", selectedIndexes);
     BOOL groupSelected = NO;
     for (NSUInteger i = 0, trackerIndex = 0; i < [fTrackers count]; ++i)
     {
@@ -1758,26 +1756,23 @@ typedef enum
         else
         {
             if (groupSelected || [selectedIndexes containsIndex: i])
-            {
-                [removeIndexes addIndex: trackerIndex];
-                NSLog(@"adding for remove %d (%d): %@", trackerIndex, i, [fTrackers objectAtIndex: i]);
-            }
+                [removeIdentifiers addIndex: [(TrackerNode *)[fTrackers objectAtIndex: i] identifier]];
             ++trackerIndex;
         }
     }
     
-    NSLog(@"%@", removeIndexes);
+    NSLog(@"%@", removeIdentifiers);
     
-    NSAssert([removeIndexes count] > 0, @"Trying to remove no trackers.");
+    NSAssert([removeIdentifiers count] > 0, @"Trying to remove no trackers.");
     
     if ([[NSUserDefaults standardUserDefaults] boolForKey: @"WarningRemoveTrackers"])
     {
         NSAlert * alert = [[NSAlert alloc] init];
         
-        if ([removeIndexes count] > 1)
+        if ([removeIdentifiers count] > 1)
         {
             [alert setMessageText: [NSString stringWithFormat: NSLocalizedString(@"Are you sure you want to remove %d trackers?",
-                                                                "Remove trackers alert -> title"), [removeIndexes count]]];
+                                                                "Remove trackers alert -> title"), [removeIdentifiers count]]];
             [alert setInformativeText: NSLocalizedString(@"Once removed, Transmission will no longer attempt to contact them."
                                         " This cannot be undone.", "Remove trackers alert -> message")];
         }
@@ -1803,7 +1798,7 @@ typedef enum
     }
     
     Torrent * torrent = [fTorrents objectAtIndex: 0];
-    [torrent removeTrackersAtIndexes: removeIndexes];
+    [torrent removeTrackersWithIdentifiers: removeIdentifiers];
     
     //reset table with either new or old value
     [fTrackers release];

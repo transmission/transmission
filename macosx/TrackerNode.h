@@ -37,6 +37,8 @@
 
 - (NSInteger) tier;
 
+- (NSUInteger) identifier;
+
 - (NSInteger) totalSeeders;
 - (NSInteger) totalLeechers;
 - (NSInteger) totalDownloaded;

@@ -587,7 +587,6 @@ int trashDataFile(const char * filename)
 {
     int count;
     tr_tracker_stat * stats = tr_torrentTrackers(fHandle, &count);
-    NSLog(@"count from tr_torrentTrackers: %d", count);
     
     NSMutableArray * trackers = [NSMutableArray arrayWithCapacity: (count > 0 ? count + stats[count-1].tier : 0)];
     
@@ -629,11 +628,15 @@ int trashDataFile(const char * filename)
     //recreate the tracker structure
     const int oldTrackerCount = fInfo->trackerCount;
     tr_tracker_info * trackerStructs = tr_new(tr_tracker_info, oldTrackerCount+1);
-    for (NSInteger i=0; i < oldTrackerCount; ++i)
+    for (NSUInteger i=0; i < oldTrackerCount; ++i)
+    {
         trackerStructs[i] = fInfo->trackers[i];
+        trackerStructs[i].identifier = i;
+    }
     
     trackerStructs[oldTrackerCount].announce = (char *)[tracker UTF8String];
     trackerStructs[oldTrackerCount].tier = trackerStructs[oldTrackerCount-1].tier + 1;
+    trackerStructs[oldTrackerCount].identifier = trackerStructs[oldTrackerCount-1].identifier + 1;
     
     const BOOL success = tr_torrentSetAnnounceList(fHandle, trackerStructs, oldTrackerCount+1);
     tr_free(trackerStructs);
@@ -641,22 +644,19 @@ int trashDataFile(const char * filename)
     return success;
 }
 
-- (void) removeTrackersAtIndexes: (NSIndexSet *) removeIndexes
+- (void) removeTrackersWithIdentifiers: (NSIndexSet *) removeIdentifiers
 {
-    NSAssert([removeIndexes lastIndex] < fInfo->trackerCount, @"Trying to remove trackers outside the tracker count.");
-    
-    NSMutableIndexSet * indexes = [NSMutableIndexSet indexSetWithIndexesInRange: NSMakeRange(0, fInfo->trackerCount)];
-    [indexes removeIndexes: removeIndexes];
-    
     //recreate the tracker structure
-    tr_tracker_info * trackerStructs = tr_new(tr_tracker_info, [indexes count]);
-    NSLog(@"count from fInfo: %d", fInfo->trackerCount);
+    tr_tracker_info * trackerStructs = tr_new(tr_tracker_info, fInfo->trackerCount);
     
-    int newCount = 0;
-    for (NSUInteger oldIndex = [indexes firstIndex]; oldIndex != NSNotFound; oldIndex = [indexes indexGreaterThanIndex: oldIndex])
+    NSUInteger newCount = 0;
+    for (NSUInteger i = 0; i < fInfo->trackerCount; i++)
     {
-        NSLog(@"oldIndex: %d %s", oldIndex, fInfo->trackers[oldIndex].announce);
-        trackerStructs[newCount++] = fInfo->trackers[oldIndex];
+        if (![removeIdentifiers containsIndex: fInfo->trackers[i].identifier])
+        {
+            trackerStructs[newCount] = fInfo->trackers[i];
+            trackerStructs[newCount].identifier = newCount++;
+        }
     }
     
     const BOOL success = tr_torrentSetAnnounceList(fHandle, trackerStructs, newCount);
