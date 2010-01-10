@@ -1060,7 +1060,6 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
         PangoLayout * pango_layout =
             gtk_widget_create_pango_layout( p->ul_lb, _( "999.9 KB/s" ) );
         pango_layout_get_pixel_size( pango_layout, &w, &h );
-        g_message( "w %d h %d", w, h );
         gtk_widget_set_size_request( p->ul_lb, w, h );
         gtk_widget_set_size_request( p->dl_lb, w, h );
         gtk_misc_set_alignment( GTK_MISC( p->ul_lb ), 1.0, 0.5 );
