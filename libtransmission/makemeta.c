@@ -340,7 +340,7 @@ makeInfoDict( tr_benc *             dict,
 
     tr_bencDictReserve( dict, 5 );
 
-    if( builder->isSingleFile )
+    if( builder->fileCount == 1 )
         tr_bencDictAddInt( dict, "length", builder->files[0].size );
     else
     {
