@@ -910,6 +910,7 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
     sexy_icon_entry_set_icon( SEXY_ICON_ENTRY( s ),
                               SEXY_ICON_ENTRY_PRIMARY,
                               GTK_IMAGE( w ) );
+    g_object_unref( w );
     sexy_icon_entry_set_icon_highlight( SEXY_ICON_ENTRY( s ),
                                         SEXY_ICON_ENTRY_PRIMARY, TRUE );
 #else

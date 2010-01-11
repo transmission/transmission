@@ -673,7 +673,7 @@ gtr_thread_func( gpointer data )
     gdk_threads_leave( );
 
     if( !more )
-        g_free( data );
+        g_slice_free( struct gtr_func_data, data );
 
     return more;
 }
@@ -685,7 +685,7 @@ gtr_idle_add( GSourceFunc function, gpointer data )
 #if GTK_CHECK_VERSION( 2,12,0 )
     gdk_threads_add_idle( function, data );
 #else
-    struct gtr_func_data * d = g_new( struct gtr_func_data, 1 );
+    struct gtr_func_data * d = g_slice_new( struct gtr_func_data );
     d->function = function;
     d->data = data;
     g_idle_add( gtr_thread_func, d );

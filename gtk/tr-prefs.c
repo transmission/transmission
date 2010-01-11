@@ -743,6 +743,17 @@ onLaunchClutchCB( GtkButton * w UNUSED,
     g_free( url );
 }
 
+static void
+remotePageFree( gpointer gpage )
+{
+    struct remote_page * page = gpage;
+
+    g_slist_free( page->widgets );
+    g_slist_free( page->auth_widgets );
+    g_slist_free( page->whitelist_widgets );
+    g_free( page );
+}
+
 static GtkWidget*
 webPage( GObject * core )
 {
@@ -756,7 +767,7 @@ webPage( GObject * core )
     page->core = TR_CORE( core );
 
     t = hig_workarea_create( );
-    g_object_set_data_full( G_OBJECT( t ), "page", page, g_free );
+    g_object_set_data_full( G_OBJECT( t ), "page", page, remotePageFree );
 
     hig_workarea_add_section_title( t, &row, _( "Web Client" ) );
 
