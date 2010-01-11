@@ -1,27 +1,26 @@
 === Transmission 1.80 (2010/MM/DD) ===
 [http://trac.transmissionbt.com/query?milestone=1.80&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== All Platforms ====
-  * Magnet link support
-  * If a torrent has multiple tracker tiers, announce to them in parallel
+  * Add support for magnet links
+  * Add support for trackerless torrents
   * Add optional "incomplete directory" where partial downloads are stored
-  * Trackerless torrent support
-  * Append .part to incomplete files
+  * Add .part to incomplete files' filenames
+  * Get peers from each tier in a torrent's tracker list, rather than only one
+  * Fix vulnerability from maliciously-crafted torrent files that could overwrite other files
   * Improved IPv6 support
-  * Faster management of very large peer lists
-  * IPv6 support for the DHT (dht-0.13) 
-  * Improved DHT bootstrapping
-  * Improved PEX support
-  * Better prefetching of data
-  * Protect against potential data loss by maliciously-crafted torrent files
-  * Brand-new torrents with no downloaded data don't have to wait in the "Verify Local Data" queue
+  * Improved PEX sharing with other peers
+  * Faster management of large peer lists
+  * DHT improvements to bootstrapping and IPv6
+  * Newly-added torrents without local data don't wait in the "Verify Local Data" queue anymore
+  * Add an OS hint to not cache local data during torrent verification
   * Encrypted handshakes to peers now use less CPU
-  * Fix "too many open files" issue in some environments
-  * Filter out spurious IP addresses obtained through LTEP
-  * Fix potential crash on shutdown when port forwarding is disabled
-  * Fix 1.7x error that could unpause or repause a torrent on startup
-  * Add an OS hint to not cache torrent files during torrent verification
-  * Various smaller bug fixes and performance tweaks
-  * Add first-time user prompt as per the proposed "Informed P2P User Act"
+  * Better filtering of malformed IP addresses
+  * Fix bug that gave "too many open files" error messages
+  * Fix bug that could crash Transmission on shutdown
+  * Fix bug that could unpause or repause a torrent on startup
+  * Slightly better IO performance by prefetching data to upload
+  * Other minor bug fixes and performance tweaks
+  * Portability fixes for embedded systems
 ==== Mac ====
   * Redesigned trackers inspector tab with favicons and copy-paste functionality (paste lists of multiple trackers)
   * Message log stores all messages and does real filtering
@@ -32,13 +31,13 @@
   * German and Simplified Chinese localizations
   * Removed Turkish localization because of lack of localizer
 ==== GTK+ ====
-  * When creating a torrent, make it easier to auto-add that new torrent
-  * Added support for adding torrents by URL
-  * Add optional "download complete" sound using the XDG sound naming spec
   * Support org.gnome.SessionManager interface for inhibiting hibernation
+  * Added support for adding torrents by URL or magnet link
+  * Add optional "download complete" sound using the XDG sound naming spec
+  * When creating a torrent, make it easier to auto-add that new torrent
   * New statusbar "Ratio" icon submitted by jimmac
   * Fix minor memory leaks
-  * Minor GNOME HIG improvements
+  * GNOME HIG improvements
 ==== Daemon ====
   * Reload settings.json when receiving SIGHUP
   * When running as a daemon, send log messages to syslog
@@ -50,7 +49,7 @@
   * Add Select All / Deselect All buttons to the file inspector
   * Add version information in the preferences dialog
   * Ensure the context menu goes away when clicking on torrents
-  * Fix bug where the context menu could extend past the window's right or bottom edge
+  * Fix bug that obscured part of the context menu
   * Fix the turtle drop-down in IE
 
 === Transmission 1.77 (2010/01/04) ===
