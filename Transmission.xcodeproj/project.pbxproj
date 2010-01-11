@@ -520,7 +520,6 @@
 		A22CF7B90FA352740009BD3E /* fr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fr; path = macosx/fr.lproj/GroupRules.xib; sourceTree = "<group>"; };
 		A22CF7C90FA5D3F90009BD3E /* es */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = es; path = macosx/es.lproj/GroupRules.xib; sourceTree = "<group>"; };
 		A22CF7CC0FA5E2DB0009BD3E /* nl */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nl; path = macosx/nl.lproj/GroupRules.xib; sourceTree = "<group>"; };
-		A22CF7CF0FA6750E0009BD3E /* tr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = tr; path = macosx/tr.lproj/GroupRules.xib; sourceTree = "<group>"; };
 		A22CF7D10FA6A19B0009BD3E /* ru */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ru; path = macosx/ru.lproj/GroupRules.xib; sourceTree = "<group>"; };
 		A22CFB810FB66EF30009BD3E /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
 		A22CFCA60FC24ED80009BD3E /* tr-dht.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "tr-dht.c"; path = "libtransmission/tr-dht.c"; sourceTree = "<group>"; };
@@ -688,13 +687,6 @@
 		A2AF1C370A3D0F6200F1575D /* FileOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FileOutlineView.m; path = macosx/FileOutlineView.m; sourceTree = "<group>"; };
 		A2B3FB450E5901E700FF78FB /* cli.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cli.c; path = cli/cli.c; sourceTree = "<group>"; };
 		A2B5BB7A0D9C7C2300FCB650 /* es */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = es; path = macosx/es.lproj/AddWindow.xib; sourceTree = "<group>"; };
-		A2B5DF860E39880000394E9A /* tr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = tr; path = macosx/tr.lproj/AddWindow.xib; sourceTree = "<group>"; };
-		A2B5DF890E39881000394E9A /* tr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = tr; path = macosx/tr.lproj/Creator.xib; sourceTree = "<group>"; };
-		A2B5DF8B0E39881900394E9A /* tr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = tr; path = macosx/tr.lproj/InfoWindow.xib; sourceTree = "<group>"; };
-		A2B5DF8D0E39882200394E9A /* tr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = tr; path = macosx/tr.lproj/MainMenu.xib; sourceTree = "<group>"; };
-		A2B5DF8F0E39882900394E9A /* tr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = tr; path = macosx/tr.lproj/PrefsWindow.xib; sourceTree = "<group>"; };
-		A2B5DF910E39883100394E9A /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = macosx/tr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		A2B5DF930E39884200394E9A /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = macosx/tr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A2BB67780D5BA74600AB0618 /* ToolbarOpenWebTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ToolbarOpenWebTemplate.png; path = macosx/Images/ToolbarOpenWebTemplate.png; sourceTree = "<group>"; };
 		A2BC19840CA9AF5A00DD302A /* CompleteCheck.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = CompleteCheck.png; path = macosx/Images/CompleteCheck.png; sourceTree = "<group>"; };
 		A2BC19DF0CA9D82300DD302A /* evutil.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = evutil.h; path = "third-party/libevent/evutil.h"; sourceTree = "<group>"; };
@@ -2151,7 +2143,6 @@
 				A26AF1050D2855FC00FF7140 /* ru */,
 				A28AFE070DA1C47A00673957 /* zh_TW */,
 				A202FF5D0DDA9275009938FF /* it */,
-				A2B5DF910E39883100394E9A /* tr */,
 				A251A65E0F9E8FDA004F5973 /* pt */,
 				A28393FD10D54A79005C0240 /* de */,
 				A2DC1E4810E6731000DFB18C /* zh_CN */,
@@ -2169,7 +2160,6 @@
 				A22CF7B90FA352740009BD3E /* fr */,
 				A22CF7C90FA5D3F90009BD3E /* es */,
 				A22CF7CC0FA5E2DB0009BD3E /* nl */,
-				A22CF7CF0FA6750E0009BD3E /* tr */,
 				A22CF7D10FA6A19B0009BD3E /* ru */,
 				A28393FC10D54A66005C0240 /* de */,
 				A2DC1E4710E6731000DFB18C /* zh_CN */,
@@ -2187,7 +2177,6 @@
 				A28AFE090DA1C47A00673957 /* zh_TW */,
 				A202FF5F0DDA9275009938FF /* it */,
 				A291477F0E195A0C00F60CB2 /* en */,
-				A2B5DF930E39884200394E9A /* tr */,
 				A251A6620F9E8FED004F5973 /* pt */,
 				A28393FF10D54A96005C0240 /* de */,
 				A2DC1E4A10E6731000DFB18C /* zh_CN */,
@@ -2205,7 +2194,6 @@
 				A26AF10A0D2855FC00FF7140 /* ru */,
 				A28AFE0B0DA1C47A00673957 /* zh_TW */,
 				A202FF610DDA9275009938FF /* it */,
-				A2B5DF8F0E39882900394E9A /* tr */,
 				A251A65D0F9E8FD5004F5973 /* pt */,
 				A283940110D54AA7005C0240 /* de */,
 				A2DC1E4C10E6731000DFB18C /* zh_CN */,
@@ -2223,7 +2211,6 @@
 				A26AF1080D2855FC00FF7140 /* ru */,
 				A28AFE0A0DA1C47A00673957 /* zh_TW */,
 				A202FF600DDA9275009938FF /* it */,
-				A2B5DF8D0E39882200394E9A /* tr */,
 				A251A65C0F9E8FD5004F5973 /* pt */,
 				A283940010D54A9D005C0240 /* de */,
 				A2DC1E4B10E6731000DFB18C /* zh_CN */,
@@ -2241,7 +2228,6 @@
 				A2B5BB7A0D9C7C2300FCB650 /* es */,
 				A28AFE050DA1C47A00673957 /* zh_TW */,
 				A202FF5B0DDA9275009938FF /* it */,
-				A2B5DF860E39880000394E9A /* tr */,
 				A251A6590F9E8FBF004F5973 /* pt */,
 				A28393F910D54A35005C0240 /* de */,
 				A2DC1E4510E6731000DFB18C /* zh_CN */,
@@ -2259,7 +2245,6 @@
 				A26AF1040D2855FC00FF7140 /* ru */,
 				A28AFE060DA1C47A00673957 /* zh_TW */,
 				A202FF5C0DDA9275009938FF /* it */,
-				A2B5DF890E39881000394E9A /* tr */,
 				A251A65A0F9E8FCA004F5973 /* pt */,
 				A28393FA10D54A4B005C0240 /* de */,
 				A2DC1E4610E6731000DFB18C /* zh_CN */,
@@ -2277,7 +2262,6 @@
 				A26AF1060D2855FC00FF7140 /* ru */,
 				A28AFE080DA1C47A00673957 /* zh_TW */,
 				A202FF5E0DDA9275009938FF /* it */,
-				A2B5DF8B0E39881900394E9A /* tr */,
 				A251A65B0F9E8FCE004F5973 /* pt */,
 				A28393FE10D54A89005C0240 /* de */,
 				A2DC1E4910E6731000DFB18C /* zh_CN */,
