@@ -1470,6 +1470,8 @@ sessionCloseImpl( void * vsession )
 
     free_incoming_peer_port( session );
 
+    tr_fdClose( session );
+
     if( session->isDHTEnabled )
         tr_dhtUninit( session );
 
@@ -1549,8 +1551,6 @@ tr_sessionClose( tr_session * session )
                 session->shared, session->announcer );
         tr_wait_msec( 100 );
     }
-
-    tr_fdClose( session );
 
     /* close the libtransmission thread */
     tr_eventClose( session );
