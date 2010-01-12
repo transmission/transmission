@@ -207,10 +207,7 @@ sexy_icon_entry_map(GtkWidget *widget)
 		GTK_WIDGET_CLASS(parent_class)->map(widget);
 
 		for (i = 0; i < MAX_ICONS; i++)
-		{
-			if (entry->priv->icons[i].icon != NULL)
-				gdk_window_show(entry->priv->icons[i].window);
-		}
+			gdk_window_show(entry->priv->icons[i].window);
 	}
 }
 
@@ -223,10 +220,7 @@ sexy_icon_entry_unmap(GtkWidget *widget)
 		int i;
 
 		for (i = 0; i < MAX_ICONS; i++)
-		{
-			if (entry->priv->icons[i].icon != NULL)
-				gdk_window_hide(entry->priv->icons[i].window);
-		}
+			gdk_window_hide(entry->priv->icons[i].window);
 
 		GTK_WIDGET_CLASS(parent_class)->unmap(widget);
 	}
@@ -338,25 +332,22 @@ sexy_icon_entry_realize(GtkWidget *widget)
 
 	GTK_WIDGET_CLASS(parent_class)->realize(widget);
 
-	attributes.x = 0;
-	attributes.y = 0;
-	attributes.width = 1;
-	attributes.height = 1;
-	attributes.window_type = GDK_WINDOW_CHILD;
-	attributes.wclass = GDK_INPUT_OUTPUT;
-	attributes.visual = gtk_widget_get_visual(widget);
-	attributes.colormap = gtk_widget_get_colormap(widget);
-	attributes.event_mask = gtk_widget_get_events(widget);
-	attributes.event_mask |=
-		(GDK_EXPOSURE_MASK
-		 | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK
-		 | GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK);
-
-	attributes_mask = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL | GDK_WA_COLORMAP;
-
 	for (i = 0; i < MAX_ICONS; i++)
 	{
 		SexyIconInfo *icon_info;
+
+		attributes.window_type = GDK_WINDOW_CHILD;
+		attributes.wclass = GDK_INPUT_OUTPUT;
+		attributes.visual = gtk_widget_get_visual(widget);
+		attributes.colormap = gtk_widget_get_colormap(widget);
+		attributes.event_mask = gtk_widget_get_events(widget);
+		attributes.event_mask |=
+			(GDK_EXPOSURE_MASK
+			 | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK
+			 | GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK);
+
+		attributes_mask = GDK_WA_X | GDK_WA_Y |
+		                  GDK_WA_VISUAL | GDK_WA_COLORMAP;
 
 		icon_info = &entry->priv->icons[i];
 		icon_info->window = gdk_window_new(widget->window, &attributes,
@@ -469,10 +460,9 @@ static GdkPixbuf *
 get_pixbuf_from_icon(SexyIconEntry *entry, SexyIconEntryPosition icon_pos)
 {
 	GdkPixbuf *pixbuf = NULL;
-	const gchar *stock_id;
+	gchar *stock_id;
 	SexyIconInfo *icon_info = &entry->priv->icons[icon_pos];
 	GtkIconSize size;
-	int w, h;
 
 	switch (gtk_image_get_storage_type(GTK_IMAGE(icon_info->icon)))
 	{
@@ -482,15 +472,9 @@ get_pixbuf_from_icon(SexyIconEntry *entry, SexyIconEntryPosition icon_pos)
 			break;
 
 		case GTK_IMAGE_STOCK:
-			gtk_image_get_stock(GTK_IMAGE(icon_info->icon), (char**)&stock_id, &size);
+			gtk_image_get_stock(GTK_IMAGE(icon_info->icon), &stock_id, &size);
 			pixbuf = gtk_widget_render_icon(GTK_WIDGET(entry),
 											stock_id, size, NULL);
-			break;
-
-		case GTK_IMAGE_ICON_NAME:
-			gtk_image_get_icon_name (GTK_IMAGE(icon_info->icon), &stock_id, &size);
-			gtk_icon_size_lookup (size, &w, &h);
-			pixbuf = gtk_icon_theme_load_icon (gtk_icon_theme_get_default (), stock_id, size, 0, NULL);
 			break;
 
 		default:
@@ -555,21 +539,13 @@ draw_icon(GtkWidget *widget, SexyIconEntryPosition icon_pos)
 	GdkPixbuf *pixbuf;
 	gint x, y, width, height;
 
-	if (icon_info->icon == NULL || !GTK_WIDGET_REALIZED(widget))
+	if (icon_info->icon == NULL)
 		return;
 
 	if ((pixbuf = get_pixbuf_from_icon(entry, icon_pos)) == NULL)
 		return;
 
 	gdk_drawable_get_size(icon_info->window, &width, &height);
-
-	if (width == 1 || height == 1)
-	{
-		/*
-		 * size_allocate hasn't been called yet. These are the default values.
-		 */
-		return;
-	}
 
 	if (gdk_pixbuf_get_height(pixbuf) > height)
 	{
@@ -663,8 +639,7 @@ update_icon(GObject *obj G_GNUC_UNUSED, GParamSpec *param, SexyIconEntry *entry)
 
 		if (strcmp(name, "pixbuf")   && strcmp(name, "stock")  &&
 			strcmp(name, "image")    && strcmp(name, "pixmap") &&
-			strcmp(name, "icon-set") && strcmp(name, "pixbuf-animation") &&
-			strcmp(name, "icon-name"))
+			strcmp(name, "icon_set") && strcmp(name, "pixbuf_animation"))
 		{
 			return;
 		}
@@ -840,24 +815,15 @@ sexy_icon_entry_set_icon(SexyIconEntry *entry, SexyIconEntryPosition icon_pos,
 		{
 			gtk_widget_destroy(GTK_WIDGET(icon_info->icon));
 			icon_info->icon = NULL;
-
-			/*
-			 * Explicitly check, as the pointer may become invalidated
-			 * during destruction.
-			 */
-			if (icon_info->window != NULL && GDK_IS_WINDOW(icon_info->window))
-				gdk_window_hide(icon_info->window);
 		}
 	}
 	else
 	{
-		if (icon_info->window != NULL && icon_info->icon == NULL)
-			gdk_window_show(icon_info->window);
-
 		g_signal_connect(G_OBJECT(icon), "notify",
 						 G_CALLBACK(update_icon), entry);
 
 		icon_info->icon = icon;
+
 		g_object_ref(icon);
 	}
 
@@ -964,6 +930,7 @@ sexy_icon_entry_add_clear_button(SexyIconEntry *icon_entry)
 							 GTK_IMAGE(icon));
 	sexy_icon_entry_set_icon_highlight(SEXY_ICON_ENTRY(icon_entry),
 									   SEXY_ICON_ENTRY_SECONDARY, TRUE);
+        g_object_unref(icon);
 
 	if (icon_entry->priv->icon_released_id != 0)
 	{
