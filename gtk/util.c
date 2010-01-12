@@ -662,18 +662,41 @@ struct gtr_func_data
     gpointer data;
 };
 
+static void
+gtr_func_data_free( gpointer data )
+{
+#if GTK_CHECK_VERSION( 2,10,0 )
+    g_slice_free( struct gtr_func_data, data );
+#else
+    g_free( data );
+#endif
+}
+
+static struct gtr_func_data *
+gtr_func_data_new( GSourceFunc function, gpointer data )
+{
+#if GTK_CHECK_VERSION( 2,10,0 )
+    struct gtr_func_data * d = g_slice_new( struct gtr_func_data );
+#else
+    struct gtr_func_data * d = g_new( struct gtr_func_data, 1 );
+#endif
+    d->function = function;
+    d->data = data;
+    return d;
+}
+
 static gboolean
 gtr_thread_func( gpointer data )
 {
-    struct gtr_func_data * idle_data = data;
     gboolean more;
+    struct gtr_func_data * idle_data = data;
 
     gdk_threads_enter( );
     more = idle_data->function( idle_data->data );
     gdk_threads_leave( );
 
     if( !more )
-        g_slice_free( struct gtr_func_data, data );
+        gtr_func_data_free( data );
 
     return more;
 }
@@ -685,10 +708,10 @@ gtr_idle_add( GSourceFunc function, gpointer data )
 #if GTK_CHECK_VERSION( 2,12,0 )
     gdk_threads_add_idle( function, data );
 #else
-    struct gtr_func_data * d = g_slice_new( struct gtr_func_data );
-    d->function = function;
-    d->data = data;
-    g_idle_add( gtr_thread_func, d );
+    g_idle_add_full( G_PRIORITY_DEFAULT,
+                     gtr_thread_func,
+                     gtr_func_data_new( function, data ),
+                     gtr_func_data_free );
 #endif
 }
 
@@ -700,9 +723,10 @@ gtr_timeout_add_seconds( guint seconds, GSourceFunc function, gpointer data )
 #elif GTK_CHECK_VERSION( 2,12,0 )
     return gdk_threads_add_timeout( seconds*1000, function, data );
 #else
-    struct gtr_func_data * d = g_new( struct gtr_func_data, 1 );
-    d->function = function;
-    d->data = data;
-    return g_timeout_add( seconds*1000, gtr_thread_func, d );
+    return g_timeout_add_full( G_PRIORITY_DEFAULT,
+                               seconds * 1000,
+                               gtr_thread_func,
+                               gtr_func_data_new( function, data ),
+                               gtr_func_data_free );
 #endif
 }
