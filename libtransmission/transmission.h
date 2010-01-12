@@ -249,13 +249,14 @@ void tr_sessionGetSettings( tr_session *, struct tr_benc * dictionary );
  * @param dictionary pointer to an uninitialized tr_benc
  * @param configDir the configuration directory to find settings.json
  * @param appName if configDir is empty, appName is used to find the default dir.
+ * @return success TRUE if the settings were loaded, FALSE otherwise
  * @see tr_sessionGetDefaultSettings()
  * @see tr_sessionInit()
  * @see tr_sessionSaveSettings()
  */
-void tr_sessionLoadSettings( struct tr_benc  * dictionary,
-                             const char      * configDir,
-                             const char      * appName );
+tr_bool tr_sessionLoadSettings( struct tr_benc  * dictionary,
+                                const char      * configDir,
+                                const char      * appName );
 
 /**
  * Add the session's configuration settings to the benc dictionary

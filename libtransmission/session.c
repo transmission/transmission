@@ -392,13 +392,14 @@ tr_sessionGetSettings( tr_session * s, struct tr_benc * d )
     tr_bencDictAddStr ( d, TR_PREFS_KEY_BIND_ADDRESS_IPV6,        tr_ntop_non_ts( &s->public_ipv6->addr ) );
 }
 
-void
+tr_bool
 tr_sessionLoadSettings( tr_benc * d, const char * configDir, const char * appName )
 {
     char * filename;
     tr_benc fileSettings;
     tr_benc sessionDefaults;
     tr_benc tmp;
+    tr_bool success = FALSE;
 
     assert( tr_bencIsDict( d ) );
 
@@ -418,11 +419,13 @@ tr_sessionLoadSettings( tr_benc * d, const char * configDir, const char * appNam
     if( !tr_bencLoadFile( &fileSettings, TR_FMT_JSON, filename ) ) {
         tr_bencMergeDicts( d, &fileSettings );
         tr_bencFree( &fileSettings );
+        success = TRUE;
     }
 
     /* cleanup */
     tr_bencFree( &sessionDefaults );
     tr_free( filename );
+    return success;
 }
 
 void

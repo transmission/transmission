@@ -278,6 +278,7 @@ main( int argc, char ** argv )
     const char * optarg;
     tr_benc settings;
     tr_bool boolVal;
+    tr_bool loaded;
     tr_bool foreground = FALSE;
     tr_bool dumpSettings = FALSE;
     const char * configDir = NULL;
@@ -292,7 +293,7 @@ main( int argc, char ** argv )
     /* load settings from defaults + config file */
     tr_bencInitDict( &settings, 0 );
     configDir = getConfigDir( argc, (const char**)argv );
-    tr_sessionLoadSettings( &settings, configDir, MY_NAME );
+    loaded = tr_sessionLoadSettings( &settings, configDir, MY_NAME );
     tr_bencDictAddBool( &settings, TR_PREFS_KEY_RPC_ENABLED, TRUE );
 
     /* overwrite settings from the comamndline */
@@ -380,6 +381,12 @@ main( int argc, char ** argv )
 
     /* start the session */
     mySession = tr_sessionInit( "daemon", configDir, TRUE, &settings );
+
+    if( loaded )
+        tr_ninf( NULL, "Using settings from \"%s\"", configDir );
+    else
+        tr_nerr( NULL, "Couldn't find settings in \"%s\"; using defaults", configDir );
+
     tr_sessionSaveSettings( mySession, configDir, &settings );
 
     if( tr_bencDictFindBool( &settings, TR_PREFS_KEY_RPC_AUTH_REQUIRED, &boolVal ) && boolVal )
