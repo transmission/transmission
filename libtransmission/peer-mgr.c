@@ -156,7 +156,7 @@ struct block_request
 struct weighted_piece
 {
     tr_piece_index_t index;
-    tr_piece_index_t salt;
+    int16_t salt;
     int16_t requestCount;
 };
 
@@ -180,10 +180,7 @@ typedef struct tr_torrent_peers
     int                        requestAlloc;
 
     struct weighted_piece    * pieces;
-    int                        piecesSort;
     int                        pieceCount;
-
-    tr_bool                    isInEndgame;
 }
 Torrent;
 
@@ -805,52 +802,49 @@ pieceListSort( Torrent * t, int mode )
     assert( mode==PIECES_SORTED_BY_INDEX
          || mode==PIECES_SORTED_BY_WEIGHT );
 
-    if( t->piecesSort != mode )
-    {
-        t->piecesSort = mode;
-
-        switch( mode ) {
-            case PIECES_SORTED_BY_WEIGHT: compar = comparePieceByWeight; break;
-            case PIECES_SORTED_BY_INDEX: compar = comparePieceByIndex; break;
-            default: assert( 0 && "unhandled" );  break;
-        }
-
-        weightTorrent = t->tor;
-        qsort( t->pieces, t->pieceCount,
-               sizeof( struct weighted_piece ), compar );
+    switch( mode ) {
+        case PIECES_SORTED_BY_WEIGHT: compar = comparePieceByWeight; break;
+        case PIECES_SORTED_BY_INDEX: compar = comparePieceByIndex; break;
+        default: assert( 0 && "unhandled" );  break;
     }
 
-    /* Also, as long as we've got the pieces sorted by weight,
-     * let's also update t.isInEndgame */
-    if( t->piecesSort == PIECES_SORTED_BY_WEIGHT )
+    weightTorrent = t->tor;
+    qsort( t->pieces, t->pieceCount,
+           sizeof( struct weighted_piece ), compar );
+}
+
+static tr_bool
+isInEndgame( Torrent * t )
+{
+    tr_bool endgame = TRUE;
+
+    if( ( t->pieces != NULL ) && ( t->pieceCount > 0 ) )
     {
-        tr_bool endgame = TRUE;
-
-        if( ( t->pieces != NULL ) && ( t->pieceCount > 0 ) )
-        {
-            const tr_completion * cp = &t->tor->completion;
-            const struct weighted_piece * p = t->pieces;
-            const int pending = p->requestCount;
-            const int missing = tr_cpMissingBlocksInPiece( cp, p->index );
-            endgame = pending >= missing;
-        }
-
-        t->isInEndgame = endgame;
-        /*if( t->isInEndgame ) fprintf( stderr, "ENDGAME reached\n" );*/
+        const tr_completion * cp = &t->tor->completion;
+        const struct weighted_piece * p = t->pieces;
+        const int pending = p->requestCount;
+        const int missing = tr_cpMissingBlocksInPiece( cp, p->index );
+        endgame = pending >= missing;
     }
+
+    /*if( endgame ) fprintf( stderr, "ENDGAME reached\n" );*/
+    return endgame;
 }
 
 static struct weighted_piece *
 pieceListLookup( Torrent * t, tr_piece_index_t index )
 {
-    struct weighted_piece key;
-    key.index = index;
+    const struct weighted_piece * limit = t->pieces;
+    struct weighted_piece * piece = t->pieces + t->pieceCount - 1;
 
-    pieceListSort( t, PIECES_SORTED_BY_INDEX );
+    if ( t->pieceCount == 0 ) return NULL;
 
-    return bsearch( &key, t->pieces, t->pieceCount,
-                    sizeof( struct weighted_piece ),
-                    comparePieceByIndex );
+    /* reverse linear search */
+    for( ;; )
+    { 
+        if( piece < limit ) return NULL;
+        if( index == piece->index ) return piece; else --piece;
+    }
 }
 
 static void
@@ -906,7 +900,8 @@ pieceListRebuild( Torrent * t )
 
         t->pieces = pieces;
         t->pieceCount = pieceCount;
-        t->piecesSort = PIECES_SORTED_BY_INDEX;
+
+        pieceListSort( t, PIECES_SORTED_BY_WEIGHT );
 
         /* cleanup */
         tr_free( pool );
@@ -937,17 +932,48 @@ pieceListRemovePiece( Torrent * t, tr_piece_index_t piece )
 static void
 pieceListRemoveRequest( Torrent * t, tr_block_index_t block )
 {
-    struct weighted_piece * p;
     const tr_piece_index_t index = tr_torBlockPiece( t->tor, block );
+    const struct weighted_piece * p = pieceListLookup( t, index );
 
-    if(( p = pieceListLookup( t, index )))
-        if( p->requestCount > 0 )
-            --p->requestCount;
+    if( p != NULL )
+    {
+        const int pos = p - t->pieces;
+        struct weighted_piece piece = t->pieces[pos];
+        int newpos;
+        tr_bool exact;
 
-    /* note: this invalidates the weighted.piece.weight field,
-     * but that's OK since the call to pieceListLookup ensured
-     * that we were sorted by index anyway.. next time we resort
-     * by weight, pieceListSort() will update the weights */
+        /* remove request */
+        if( piece.requestCount > 0 )
+            --piece.requestCount;
+
+        /* List is nearly sorted (by weight) : insert piece into the right place. */
+
+        weightTorrent = t->tor;
+        newpos = tr_lowerBound( &piece, t->pieces, t->pieceCount,
+                                sizeof( struct weighted_piece ),
+                                comparePieceByWeight, &exact );
+
+        if( newpos == pos || newpos == pos + 1 )
+        {
+            /* it's VERY likely that piece keeps its position */
+            t->pieces[pos].requestCount = piece.requestCount;
+        }
+        else
+        {
+            /* piece is removed temporally to make insertion easier */
+            memmove( &t->pieces[pos],
+                     &t->pieces[pos + 1],
+                     sizeof( struct weighted_piece ) * ( --t->pieceCount - pos ) );
+
+            if( newpos > pos ) --newpos;
+
+            memmove( &t->pieces[newpos + 1],
+                     &t->pieces[newpos],
+                     sizeof( struct weighted_piece ) * ( t->pieceCount++ - newpos ) );
+
+            t->pieces[newpos] = piece;
+        }
+    }
 }
 
 /**
@@ -972,6 +998,7 @@ tr_peerMgrGetNextRequests( tr_torrent           * tor,
     int i;
     int got;
     Torrent * t;
+    tr_bool endgame;
     struct weighted_piece * pieces;
     const tr_bitset * have = &peer->have;
 
@@ -986,14 +1013,15 @@ tr_peerMgrGetNextRequests( tr_torrent           * tor,
     /* prep the pieces list */
     if( t->pieces == NULL )
         pieceListRebuild( t );
-    pieceListSort( t, PIECES_SORTED_BY_WEIGHT );
+
+    endgame = isInEndgame( t );
 
     pieces = t->pieces;
     for( i=0; i<t->pieceCount && got<numwant; ++i )
     {
         struct weighted_piece * p = pieces + i;
         const int missing = tr_cpMissingBlocksInPiece( &tor->completion, p->index );
-        const int maxDuplicatesPerBlock = t->isInEndgame ? 3 : 1;
+        const int maxDuplicatesPerBlock = endgame ? 3 : 1;
 
         if( p->requestCount > ( missing * maxDuplicatesPerBlock ) )
             continue;
@@ -1029,42 +1057,32 @@ tr_peerMgrGetNextRequests( tr_torrent           * tor,
     }
 
     /* In most cases we've just changed the weights of a small number of pieces.
-     * So rather than qsort()ing the entire array, it's faster to sort only the
-     * changed ones, then do a standard merge-two-sorted-arrays pass on the
-     * changed and unchanged pieces. */
+     * So rather than qsort()ing the entire array, it's faster to apply an
+     * adaptive insertion sort algorithm. */
     if( got > 0 )
     {
-        struct weighted_piece * p;
-        struct weighted_piece * pieces;
-        struct weighted_piece * a = t->pieces;
-        struct weighted_piece * a_end = t->pieces + i;
-        struct weighted_piece * b = a_end;
-        struct weighted_piece * b_end = t->pieces + t->pieceCount;
+        /* not enough requests || last piece modified */
+        if ( i == t->pieceCount ) --i;
 
-        /* resort the pieces that we changed */
         weightTorrent = t->tor;
-        qsort( a, a_end-a, sizeof( struct weighted_piece ), comparePieceByWeight );
+        while( --i >= 0 )
+        {
+            tr_bool exact;
 
-        /* allocate a new array */
-        p = pieces = tr_new( struct weighted_piece, t->pieceCount );
-
-        /* merge the two sorted arrays into this new array */
-        weightTorrent = t->tor;
-        while( a!=a_end && b!=b_end )
-            *p++ = comparePieceByWeight( a, b ) < 0 ? *a++ : *b++;
-        while( a!=a_end ) *p++ = *a++;
-        while( b!=b_end ) *p++ = *b++;
-
-#if 0
-        /* make sure we did it right */
-        assert( p - pieces == t->pieceCount );
-        for( it=pieces; it+1<p; ++it )
-            assert( it->weight <= it[1].weight );
-#endif
-
-        /* update */
-        tr_free( t->pieces );
-        t->pieces = pieces;
+            /* relative position! */
+            const int newpos = tr_lowerBound( &t->pieces[i], &t->pieces[i + 1],
+                                              t->pieceCount - (i + 1),
+                                              sizeof( struct weighted_piece ),
+                                              comparePieceByWeight, &exact );
+            if( newpos > 0 )
+            {
+                const struct weighted_piece piece = t->pieces[i];
+                memmove( &t->pieces[i],
+                         &t->pieces[i + 1],
+                         sizeof( struct weighted_piece ) * ( newpos ) );
+                t->pieces[i + newpos] = piece;
+            }
+        }
     }
 
     *numgot = got;
@@ -1367,16 +1385,17 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
             tr_block_index_t block = _tr_block( tor, e->pieceIndex, e->offset );
 
             requestListRemove( t, block, peer );
-            pieceListRemoveRequest( t, block );
 
             if( tr_cpBlockIsComplete( &tor->completion, block ) )
             {
                 tordbg( t, "we have this block already..." );
                 clientGotUnwantedBlock( tor, block );
+                pieceListRemoveRequest( t, block );
             }
             else
             {
                 tr_cpBlockAdd( &tor->completion, block );
+                pieceListRemoveRequest( t, block );
                 tr_torrentSetDirty( tor );
 
                 if( tr_cpPieceIsComplete( &tor->completion, e->pieceIndex ) )
