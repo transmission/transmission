@@ -14,23 +14,27 @@ Source0:   %{name}-%{version}.tar.bz2
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
+# MANDATORY for libtransmission
 BuildRequires: curl-devel >= @CURL_MINIMUM@
-BuildRequires: dbus-glib-devel >= @DBUS_GLIB_MINIMUM@
+BuildRequires: libevent-devel >= @LIBEVENT_MINIMUM@
+BuildRequires: openssl-devel >= @OPENSSL_MINIMUM@
+Requires: curl >= @CURL_MINIMUM@
+Requires: libevent >= @LIBEVENT_MINIMUM@
+Requires: openssl >= @OPENSSL_MINIMUM@
+# MANDATORY for the gtk+ client
 BuildRequires: glib2-devel >= @GLIB_MINIMUM@
 BuildRequires: gtk2-devel >= @GTK_MINIMUM@
-BuildRequires: libcanberra-devel >= @CANBERRA_MINIMUM@
-BuildRequires: libevent-devel >= @LIBEVENT_MINIMUM@
-BuildRequires: libnotify-devel >= @LIBNOTIFY_MINIMUM@
-BuildRequires: openssl-devel >= @OPENSSL_MINIMUM@
-
-Requires: curl >= @CURL_MINIMUM@
-Requires: dbus-glib >= @DBUS_GLIB_MINIMUM@
 Requires: glib2 >= @GLIB_MINIMUM@
 Requires: gtk2 >= @GTK_MINIMUM@
+# OPTIONAL for the gtk+ client... see configure.ac for details
+BuildRequires: GConf2-devel >= @GCONF2_MINIMUM@
+BuildRequires: dbus-glib-devel >= @DBUS_GLIB_MINIMUM@
+BuildRequires: libcanberra-devel >= @CANBERRA_MINIMUM@
+BuildRequires: libnotify-devel >= @LIBNOTIFY_MINIMUM@
+Requires: GConf2 >= @GCONF2_MINIMUM@
+Requires: dbus-glib >= @DBUS_GLIB_MINIMUM@
 Requires: libcanberra >= @CANBERRA_MINIMUM@
-Requires: libevent >= @LIBEVENT_MINIMUM@
 Requires: libnotify >= @LIBNOTIFY_MINIMUM@
-Requires: openssl >= @OPENSSL_MINIMUM@
 
 Provides: %{name}
 
@@ -62,6 +66,9 @@ rm -rf $RPM_BUILD_ROOT
 
 %changelog
 
+* Wed Jan 13 2010 Charles Kerr <charles@transmissionbt.com>
+- made the GConf dependency explicit
+- annotated the Depends section to show which libraries are optional
 * Thu Mar 5 2009 Gijs <info@bsnw.nl>
 - fixed %files section
 - added Source0
