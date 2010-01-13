@@ -604,18 +604,18 @@ tr_fdFileClose( tr_session        * session,
 void
 tr_fdTorrentClose( tr_session * session, int torrentId )
 {
-    struct tr_openfile * o;
-    struct tr_fdInfo * gFd;
-    const struct tr_openfile * end;
-
     assert( tr_isSession( session ) );
-    assert( session->fdInfo != NULL );
 
-    gFd = session->fdInfo;
+    if( session->fdInfo != NULL )
+    {
+        struct tr_openfile * o;
+        const struct tr_openfile * end;
+        struct tr_fdInfo * gFd = session->fdInfo;
 
-    for( o=gFd->openFiles, end=o+gFd->openFileLimit; o!=end; ++o )
-        if( fileIsOpen( o ) && ( o->torrentId == torrentId ) )
-            TrCloseFile( o );
+        for( o=gFd->openFiles, end=o+gFd->openFileLimit; o!=end; ++o )
+            if( fileIsOpen( o ) && ( o->torrentId == torrentId ) )
+                TrCloseFile( o );
+    }
 }
 
 /***
