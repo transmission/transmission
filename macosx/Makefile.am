@@ -19,7 +19,7 @@ EXTRA_DIST = \
     it.lproj \
     nl.lproj \
     ru.lproj \
-    tr.lproj \
+    zh_CN.lproj \
     zh_TW.lproj \
     AboutWindowController.h \
     AboutWindowController.m \
