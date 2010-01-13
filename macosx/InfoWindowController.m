@@ -984,21 +984,18 @@ typedef enum
 
 - (void) revealDataFile: (id) sender
 {
-    if ([fTorrents count] > 0)
+    Torrent * torrent = [fTorrents objectAtIndex: 0];
+    NSString * location = [torrent dataLocation];
+    if (!location)
+        return;
+    
+    if ([NSApp isOnSnowLeopardOrBetter])
     {
-        Torrent * torrent = [fTorrents objectAtIndex: 0];
-        NSString * location = [torrent dataLocation];
-        if (!location)
-            return;
-        
-        if ([NSApp isOnSnowLeopardOrBetter])
-        {
-            NSURL * file = [NSURL fileURLWithPath: location];
-            [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs: [NSArray arrayWithObject: file]];
-        }
-        else
-            [[NSWorkspace sharedWorkspace] selectFile: location inFileViewerRootedAtPath: nil];
+        NSURL * file = [NSURL fileURLWithPath: location];
+        [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs: [NSArray arrayWithObject: file]];
     }
+    else
+        [[NSWorkspace sharedWorkspace] selectFile: location inFileViewerRootedAtPath: nil];
 }
 
 - (void) setFileFilterText: (id) sender
