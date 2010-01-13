@@ -66,7 +66,7 @@
 
 - (NSUInteger) identifier
 {
-    return fStat.identifier;
+    return fStat.id;
 }
 
 - (NSInteger) totalSeeders

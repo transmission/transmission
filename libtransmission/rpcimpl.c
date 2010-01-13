@@ -361,7 +361,7 @@ addTrackers( const tr_info * info,
         const tr_tracker_info * t = &info->trackers[i];
         tr_benc *               d = tr_bencListAddDict( trackers, 4 );
         tr_bencDictAddStr( d, "announce", t->announce );
-        tr_bencDictAddInt( d, "identifier", t->identifier );
+        tr_bencDictAddInt( d, "id", t->id );
         tr_bencDictAddStr( d, "scrape", t->scrape );
         tr_bencDictAddInt( d, "tier", t->tier );
     }

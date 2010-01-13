@@ -776,7 +776,7 @@ addTorrentToTier( tr_announcer * announcer, tr_torrent_tiers * tiers, tr_torrent
                 tr_ptrArrayAppend( &tiers->tiers, tier );
             }
 
-            tierAddTracker( announcer, tier, info->announce, info->scrape, info->identifier );
+            tierAddTracker( announcer, tier, info->announce, info->scrape, info->id );
         }
     }
 

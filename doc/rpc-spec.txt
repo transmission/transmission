@@ -245,9 +245,10 @@
    -------------------+--------------------------------------+
    trackers           | array of objects, each containing:   |
                       +-------------------------+------------+
-                      | announce                | string     | tr_info
-                      | scrape                  | string     | tr_info
-                      | tier                    | number     | tr_info
+                      | announce                | string     | tr_tracker_info
+                      | scrape                  | string     | tr_tracker_info
+                      | tier                    | number     | tr_tracker_info
+                      | id                      | number     | tr_tracker_info
    -------------------+--------------------------------------+
    trackerStats       | array of objects, each containing:   |
                       +-------------------------+------------+

@@ -1208,7 +1208,7 @@ typedef struct tr_tracker_info
     int      tier;
     char *   announce;
     char *   scrape;
-    uint32_t identifier; /* used to match to a tr_tracker_stat */
+    uint32_t id; /* unique identifier used to match to a tr_tracker_stat */
 }
 tr_tracker_info;
 

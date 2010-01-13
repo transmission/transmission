@@ -1,5 +1,6 @@
 /*
  * This file Copyright (C) 2009-2010 Mnemosyne LLC
+            trackers[trackerCount].id = 0;
  *
  * This file is licensed by the GPL version 2.  Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
@@ -294,7 +295,7 @@ getannounce( tr_info * inf, tr_benc * meta )
                         t->tier = validTiers;
                         t->announce = tr_strdup( url );
                         t->scrape = tr_convertAnnounceToScrape( url );
-                        t->identifier = trackerCount;
+                        t->id = trackerCount;
 
                         anyAdded = TRUE;
                         ++trackerCount;
@@ -326,7 +327,7 @@ getannounce( tr_info * inf, tr_benc * meta )
             trackers[trackerCount].tier = 0;
             trackers[trackerCount].announce = tr_strdup( url );
             trackers[trackerCount].scrape = tr_convertAnnounceToScrape( url );
-            trackers[trackerCount].identifier = 0;
+            trackers[trackerCount].id = 0;
             trackerCount++;
             /*fprintf( stderr, "single announce: [%s]\n", url );*/
         }
@@ -599,7 +600,7 @@ tr_metainfoSetFromMagnet( tr_info * inf, const tr_magnet_info * m )
             inf->trackers[i].tier = i;
             inf->trackers[i].announce = tr_strdup( url );
             inf->trackers[i].scrape = tr_convertAnnounceToScrape( url );
-            inf->trackers[i].identifier = i;
+            inf->trackers[i].id = i;
         }
     }
 

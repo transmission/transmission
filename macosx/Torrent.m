@@ -631,12 +631,12 @@ int trashDataFile(const char * filename)
     for (NSUInteger i=0; i < oldTrackerCount; ++i)
     {
         trackerStructs[i] = fInfo->trackers[i];
-        trackerStructs[i].identifier = i;
+        trackerStructs[i].id = i;
     }
     
     trackerStructs[oldTrackerCount].announce = (char *)[tracker UTF8String];
     trackerStructs[oldTrackerCount].tier = trackerStructs[oldTrackerCount-1].tier + 1;
-    trackerStructs[oldTrackerCount].identifier = oldTrackerCount;
+    trackerStructs[oldTrackerCount].id = oldTrackerCount;
     
     const BOOL success = tr_torrentSetAnnounceList(fHandle, trackerStructs, oldTrackerCount+1);
     tr_free(trackerStructs);
@@ -652,10 +652,10 @@ int trashDataFile(const char * filename)
     NSUInteger newCount = 0;
     for (NSUInteger i = 0; i < fInfo->trackerCount; i++)
     {
-        if (![removeIdentifiers containsIndex: fInfo->trackers[i].identifier])
+        if (![removeIdentifiers containsIndex: fInfo->trackers[i].id])
         {
             trackerStructs[newCount] = fInfo->trackers[i];
-            trackerStructs[newCount].identifier = newCount++;
+            trackerStructs[newCount].id = newCount++;
         }
     }
     
