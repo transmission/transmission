@@ -296,7 +296,7 @@ typedef struct
     int downloadCount;
     int downloaderCount;
     
-    uint32_t identifier;
+    uint32_t id;
 
     /* sent as the "key" argument in tracker requests
      * to verify us if our IP address changes.
@@ -322,13 +322,13 @@ static tr_tracker_item*
 trackerNew( tr_announcer  * announcer,
             const char    * announce,
             const char    * scrape,
-            uint32_t      identifier )
+            uint32_t        id )
 {
     tr_tracker_item * tracker = tr_new0( tr_tracker_item, 1  );
     tracker->host = getHost( announcer, announce );
     tracker->announce = tr_strdup( announce );
     tracker->scrape = tr_strdup( scrape );
-    tracker->identifier = identifier;
+    tracker->id = id;
     generateKeyParam( tracker->key_param, KEYLEN );
     tracker->seederCount = -1;
     tracker->leecherCount = -1;
@@ -453,9 +453,9 @@ tierAddTracker( tr_announcer * announcer,
                 tr_tier      * tier,
                 const char   * announce,
                 const char   * scrape,
-                uint32_t     identifier )
+                uint32_t       id )
 {
-    tr_tracker_item * tracker = trackerNew( announcer, announce, scrape, identifier );
+    tr_tracker_item * tracker = trackerNew( announcer, announce, scrape, id );
 
     tr_ptrArrayAppend( &tier->trackers, tracker );
     dbgmsg( tier, "adding tracker %s", announce );
@@ -1754,7 +1754,7 @@ tr_announcerStats( const tr_torrent * torrent,
             const tr_tracker_item * tracker = tr_ptrArrayNth( (tr_ptrArray*)&tier->trackers, j );
             tr_tracker_stat * st = ret + out++;
 
-            st->identifier = tracker->identifier;
+            st->id = tracker->id;
             tr_strlcpy( st->host, tracker->host->name, sizeof( st->host ) );
             tr_strlcpy( st->announce, tracker->announce, sizeof( st->announce ) );
             st->tier = i + 1;

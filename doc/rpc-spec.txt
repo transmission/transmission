@@ -258,6 +258,7 @@
                       | hasAnnounced            | boolean    | tr_tracker_stat
                       | hasScraped              | boolean    | tr_tracker_stat
                       | host                    | string     | tr_tracker_stat
+                      | id                      | number     | tr_tracker_stat
                       | isBackup                | boolean    | tr_tracker_stat
                       | lastAnnouncePeerCount   | number     | tr_tracker_stat
                       | lastAnnounceResult      | number     | tr_tracker_stat

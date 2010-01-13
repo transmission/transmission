@@ -1462,7 +1462,7 @@ typedef struct
     int tier;
     
     /* used to match to a tr_tracker_info */
-    uint32_t identifier;
+    uint32_t id;
 }
 tr_tracker_stat;
 
