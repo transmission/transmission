@@ -229,7 +229,9 @@
    peersFrom          | an object containing:                |
                       +-------------------------+------------+
                       | fromCache               | number     | tr_stat
+                      | fromDht                 | number     | tr_stat
                       | fromIncoming            | number     | tr_stat
+                      | fromLtep                | number     | tr_stat
                       | fromPex                 | number     | tr_stat
                       | fromTracker             | number     | tr_stat
    -------------------+--------------------------------------+
