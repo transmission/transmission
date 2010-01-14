@@ -1473,8 +1473,6 @@ sessionCloseImpl( void * vsession )
 
     free_incoming_peer_port( session );
 
-    tr_fdClose( session );
-
     if( session->isDHTEnabled )
         tr_dhtUninit( session );
 
@@ -1513,6 +1511,8 @@ sessionCloseImpl( void * vsession )
 
     closeBlocklists( session );
     tr_webClose( &session->web );
+
+    tr_fdClose( session );
 
     session->isClosed = TRUE;
 }
