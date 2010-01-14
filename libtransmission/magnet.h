@@ -10,6 +10,10 @@
  * $Id:$
  */
 
+#ifndef __TRANSMISSION__
+ #error only libtransmission should #include this header.
+#endif
+
 #ifndef TR_MAGNET_H
 #define TR_MAGNET_H 1
 

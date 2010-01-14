@@ -10,12 +10,12 @@
  * $Id$
  */
 
-#ifndef TR_COMPLETION_H
-#define TR_COMPLETION_H
-
 #ifndef __TRANSMISSION__
  #error only libtransmission should #include this header.
 #endif
+
+#ifndef TR_COMPLETION_H
+#define TR_COMPLETION_H
 
 #include <assert.h>
 

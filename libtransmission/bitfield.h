@@ -11,7 +11,7 @@
  */
 
 #ifndef __TRANSMISSION__
-#error only libtransmission should #include this header.
+ #error only libtransmission should #include this header.
 #endif
 
 #ifndef TR_BITFIELD_H
