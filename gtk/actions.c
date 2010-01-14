@@ -76,7 +76,7 @@ sort_changed_cb( GtkAction            * action UNUSED,
 
 static GtkToggleActionEntry show_toggle_entries[] =
 {
-    { "toggle-main-window", NULL, N_( "_Main Window" ), NULL, NULL, G_CALLBACK( action_cb ), TRUE },
+    { "toggle-main-window", NULL, N_( "_Show Transmission" ), NULL, NULL, G_CALLBACK( action_cb ), TRUE },
     { "toggle-message-log", NULL, N_( "Message _Log" ), NULL, NULL, G_CALLBACK( action_cb ), FALSE }
 };
 
@@ -92,7 +92,7 @@ toggle_pref_cb( GtkToggleAction *  action,
 
 static GtkToggleActionEntry  pref_toggle_entries[] =
 {
-    { "alt-speed-enabled", NULL, N_( "Temporary  Speed _Limits" ), NULL, NULL, G_CALLBACK( toggle_pref_cb ), FALSE },
+    { "alt-speed-enabled", NULL, N_( "Enable Temporary Speed _Limits" ), NULL, NULL, G_CALLBACK( toggle_pref_cb ), FALSE },
     { "minimal-view",      NULL, N_( "_Minimal View" ), "<alt>M", NULL, G_CALLBACK( toggle_pref_cb ), FALSE },
     { "sort-reversed",     NULL, N_( "Re_verse Sort Order" ), NULL, NULL, G_CALLBACK( toggle_pref_cb ), FALSE },
     { "show-filterbar",    NULL, N_( "_Filterbar" ), NULL, NULL, G_CALLBACK( toggle_pref_cb ), FALSE },
