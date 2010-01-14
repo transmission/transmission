@@ -17,6 +17,8 @@
 #ifndef TR_BITSET_H
 #define TR_BITSET_H 1
 
+#include <assert.h>
+
 #include "transmission.h"
 #include "bitfield.h"
 
@@ -50,6 +52,11 @@ tr_bitsetReserve( tr_bitset * b, size_t size )
 
         tr_bitfieldDestruct( &b->bitfield );
         tr_bitfieldConstruct( &b->bitfield, size );
+
+        assert( b != NULL );
+        assert( b->bitfield.bits != NULL );
+        assert( tmp->bits != NULL );
+
         memcpy( b->bitfield.bits, tmp->bits, tmp->byteCount );
 
         tr_bitfieldFree( tmp );
