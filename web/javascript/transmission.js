@@ -1082,6 +1082,7 @@ Transmission.prototype =
 			setInnerHTML( tab.progress, na );
 			setInnerHTML( tab.comment, na );
 			setInnerHTML( tab.creator, na );
+			setInnerHTML( tab.download_dir, na );
 			setInnerHTML( tab.error, na );
 			this.updateVisibleFileLists();
 			$("#torrent_inspector_size, .inspector_row > div:contains('N/A')").css('color', '#666');
