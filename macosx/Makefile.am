@@ -80,6 +80,8 @@ EXTRA_DIST = \
     main.m \
     MessageWindowController.h \
     MessageWindowController.m \
+    NSApplicationAdditions.h \
+    NSApplicationAdditions.m \
     NSStringAdditions.h \
     NSStringAdditions.m \
     PeerProgressIndicatorCell.h \
