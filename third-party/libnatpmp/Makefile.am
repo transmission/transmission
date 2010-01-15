@@ -1,6 +1,6 @@
 noinst_LIBRARIES = libnatpmp.a
 
-AM_CPPFLAGS = -DENABLE_STRNATPMPERR
+AM_CFLAGS = @PTHREAD_CFLAGS@ -DENABLE_STRNATPMPERR
 
 libnatpmp_a_SOURCES = \
     getgateway.c \

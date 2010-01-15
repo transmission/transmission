@@ -1,6 +1,6 @@
 noinst_LIBRARIES = libminiupnp.a
 
-AM_CPPFLAGS = -DNDEBUG
+AM_CFLAGS = @PTHREAD_CFLAGS@ -DNDEBUG
 
 libminiupnp_a_SOURCES = \
     igd_desc_parse.c \
