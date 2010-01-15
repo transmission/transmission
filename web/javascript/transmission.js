@@ -437,11 +437,10 @@ Transmission.prototype =
 	},
 
 	selectElement: function( e, doUpdate ) {
-		$.className.add( e[0], 'selected' );
+		e.addClass('selected');
 		this.scrollToElement( e );
 		if( doUpdate )
 			this.selectionChanged( );
-		$.className.add( e[0], 'selected' );
 	},
 	selectRow: function( rowIndex, doUpdate ) {
 		this.selectElement( this._rows[rowIndex], doUpdate );
@@ -452,7 +451,7 @@ Transmission.prototype =
 	},
 
 	deselectElement: function( e, doUpdate ) {
-		$.className.remove( e[0], 'selected' );
+		e.removeClass('selected');
 		if( doUpdate )
 			this.selectionChanged( );
 	},
