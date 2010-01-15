@@ -53,11 +53,8 @@ tr_bitsetReserve( tr_bitset * b, size_t size )
         tr_bitfieldDestruct( &b->bitfield );
         tr_bitfieldConstruct( &b->bitfield, size );
 
-        assert( b != NULL );
-        assert( b->bitfield.bits != NULL );
-        assert( tmp->bits != NULL );
-
-        memcpy( b->bitfield.bits, tmp->bits, tmp->byteCount );
+        if( ( tmp->bits != NULL ) && ( tmp->byteCount > 0 ) )
+            memcpy( b->bitfield.bits, tmp->bits, tmp->byteCount );
 
         tr_bitfieldFree( tmp );
     }
