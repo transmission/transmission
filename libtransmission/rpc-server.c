@@ -728,6 +728,8 @@ void
 tr_rpcSetPort( tr_rpc_server * server,
                tr_port         port )
 {
+    assert( server != NULL );
+
     if( server->port != port )
     {
         server->port = port;
