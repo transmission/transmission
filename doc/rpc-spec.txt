@@ -311,7 +311,7 @@
                { 
                    "id": 10,
                    "name": "Fedora x86_64 DVD",
-                   "totalSize", 34983493932,
+                   "totalSize": 34983493932,
                },
                {
                    "id": 7,
