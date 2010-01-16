@@ -724,7 +724,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [[QLPreviewPanelSL sharedPreviewPanel] updateController];
     
     for (NSWindow * window in [NSApp windows])
-        [window orderOut: nil];
+        [window close];
     
     [self showStatusBar: NO animate: NO];
     [self showFilterBar: NO animate: NO];
