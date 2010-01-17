@@ -12,13 +12,13 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="965"/>
-			<integer value="5"/>
-			<integer value="1057"/>
 			<integer value="1066"/>
 			<integer value="1030"/>
-			<integer value="1615"/>
 			<integer value="995"/>
+			<integer value="1615"/>
+			<integer value="1057"/>
+			<integer value="965"/>
+			<integer value="5"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1628,8 +1628,8 @@
 						<reference key="NSSuperview" ref="180459949"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="326971372">
-							<int key="NSCellFlags">67239424</int>
-							<int key="NSCellFlags2">138543104</int>
+							<int key="NSCellFlags">67239488</int>
+							<int key="NSCellFlags2">138545152</int>
 							<string type="base64-UTF8" key="NSContents">5aSa6KGM5qiZ57GkCuWkmuihjOaomeexpA</string>
 							<reference key="NSSupport" ref="26"/>
 							<string key="NSPlaceholderString">沒有可用的 peer 資訊</string>
