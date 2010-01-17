@@ -51,6 +51,9 @@
 #include <inttypes.h>
 #endif
 
+#ifndef DEBUG_KQUEUE_CHANGEIDX
+#define DEBUG_KQUEUE_CHANGEIDX
+
 /* Some platforms apparently define the udata field of struct kevent as
  * intptr_t, whereas others define it as void*.  There doesn't seem to be an
  * easy way to tell them apart via autoconf, so we need to use OS macros. */
