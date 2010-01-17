@@ -364,8 +364,8 @@ kq_dispatch(struct event_base *base, void *arg, struct timeval *tv)
 			ev = (struct event *)events[i].udata;
 			assert(ev != NULL);
 			assert(ev->ev_pri == 0);
-			assert(ev->base != NULL);
-			assert(ev->base == base);
+			assert(ev->ev_base != NULL);
+			assert(ev->ev_base == base);
 
 			if (!(ev->ev_events & EV_PERSIST))
 				ev->ev_flags &= ~EVLIST_X_KQINKERNEL;
