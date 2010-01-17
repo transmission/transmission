@@ -1449,7 +1449,7 @@ int trashDataFile(const char * filename)
 
 - (NSInteger) stalledMinutes
 {
-    time_t start = fStat->startDate;
+    const time_t start = fStat->startDate;
     if (start == 0)
         return -1;
     
@@ -1457,7 +1457,8 @@ int trashDataFile(const char * filename)
             * activity = [self dateActivity];
     
     NSDate * laterDate = activity ? [started laterDate: activity] : started;
-    return -1 * [laterDate timeIntervalSinceNow] / 60;
+    
+    return ABS([laterDate timeIntervalSinceNow]) / 60;
 }
 
 - (BOOL) isStalled
