@@ -1,0 +1,180 @@
+  
+  Platform SDK: File Storage 
+ReadFile
+The ReadFile function reads data from a file, starting at the position indicated by the file pointer. After the read operation has been completed, the file pointer is adjusted by the number of bytes actually read, unless the file handle is created with the overlapped attribute. If the file handle is created for overlapped input and output (I/O), the application must adjust the position of the file pointer after the read operation. 
+
+This function is designed for both synchronous and asynchronous operation. The ReadFileEx function is designed solely for asynchronous operation. It lets an application perform other processing during a file read operation.
+
+BOOL ReadFile(
+  HANDLE hFile,                // handle to file
+  LPVOID lpBuffer,             // data buffer
+  DWORD nNumberOfBytesToRead,  // number of bytes to read
+  LPDWORD lpNumberOfBytesRead, // number of bytes read
+  LPOVERLAPPED lpOverlapped    // overlapped buffer
+);
+Parameters
+hFile 
+[in] Handle to the file to be read. The file handle must have been created with GENERIC_READ access to the file. 
+Windows NT/2000/XP: For asynchronous read operations, hFile can be any handle opened with the FILE_FLAG_OVERLAPPED flag by the CreateFile function, or a socket handle returned by the socket or accept function. 
+
+Windows 95/98/Me: For asynchronous read operations, hFile can be a communications resource opened with the FILE_FLAG_OVERLAPPED flag by CreateFile, or a socket handle returned by socket or accept. You cannot perform asynchronous read operations on mailslots, named pipes, or disk files. 
+
+lpBuffer 
+[out] Pointer to the buffer that receives the data read from the file. 
+nNumberOfBytesToRead 
+[in] Specifies the number of bytes to be read from the file. 
+lpNumberOfBytesRead 
+[out] Pointer to the variable that receives the number of bytes read. ReadFile sets this value to zero before doing any work or error checking. If this parameter is zero when ReadFile returns TRUE on a named pipe, the other end of the message-mode pipe called the WriteFile function with nNumberOfBytesToWrite set to zero. 
+Windows NT/2000/XP: If lpOverlapped is NULL, lpNumberOfBytesRead cannot be NULL. If lpOverlapped is not NULL, lpNumberOfBytesRead can be NULL. If this is an overlapped read operation, you can get the number of bytes read by calling GetOverlappedResult. If hFile is associated with an I/O completion port, you can get the number of bytes read by calling GetQueuedCompletionStatus. 
+
+If I/O completion ports are used and you are using a callback routine to free the memory allocated to the OVERLAPPED structure pointed to by the lpOverlapped parameter, specify NULL as the value of this parameter to avoid a memory corruption problem during the deallocation. This memory corruption problem will cause an invalid number of bytes to be returned in this parameter. 
+
+Windows 95/98/Me: This parameter cannot be NULL. 
+
+lpOverlapped 
+[in] Pointer to an OVERLAPPED structure. This structure is required if hFile was created with FILE_FLAG_OVERLAPPED. 
+If hFile was opened with FILE_FLAG_OVERLAPPED, the lpOverlapped parameter must not be NULL. It must point to a valid OVERLAPPED structure. If hFile was created with FILE_FLAG_OVERLAPPED and lpOverlapped is NULL, the function can incorrectly report that the read operation is complete. 
+
+If hFile was opened with FILE_FLAG_OVERLAPPED and lpOverlapped is not NULL, the read operation starts at the offset specified in the OVERLAPPED structure and ReadFile may return before the read operation has been completed. In this case, ReadFile returns FALSE and the GetLastError function returns ERROR_IO_PENDING. This allows the calling process to continue while the read operation finishes. The event specified in the OVERLAPPED structure is set to the signaled state upon completion of the read operation. 
+
+If hFile was not opened with FILE_FLAG_OVERLAPPED and lpOverlapped is NULL, the read operation starts at the current file position and ReadFile does not return until the operation has been completed. 
+
+Windows NT/2000/XP: If hFile is not opened with FILE_FLAG_OVERLAPPED and lpOverlapped is not NULL, the read operation starts at the offset specified in the OVERLAPPED structure. ReadFile does not return until the read operation has been completed. 
+
+Windows 95/98/Me: For operations on files, disks, pipes, or mailslots, this parameter must be NULL; a pointer to an OVERLAPPED structure causes the call to fail. However, Windows 95/98/Me supports overlapped I/O on serial and parallel ports. 
+
+Return Values
+The ReadFile function returns when one of the following is true: a write operation completes on the write end of the pipe, the number of bytes requested has been read, or an error occurs. 
+
+If the function succeeds, the return value is nonzero. 
+
+If the return value is nonzero and the number of bytes read is zero, the file pointer was beyond the current end of the file at the time of the read operation. However, if the file was opened with FILE_FLAG_OVERLAPPED and lpOverlapped is not NULL, the return value is FALSE and GetLastError returns ERROR_HANDLE_EOF when the file pointer goes beyond the current end of file.
+
+If the function fails, the return value is zero. To get extended error information, call GetLastError. 
+
+Remarks
+If part of the file is locked by another process and the read operation overlaps the locked portion, this function fails. 
+
+An application must meet certain requirements when working with files opened with FILE_FLAG_NO_BUFFERING: 
+
+File access must begin at byte offsets within the file that are integer multiples of the volume's sector size. To determine a volume's sector size, call the GetDiskFreeSpace function. 
+File access must be for numbers of bytes that are integer multiples of the volume's sector size. For example, if the sector size is 512 bytes, an application can request reads and writes of 512, 1024, or 2048 bytes, but not of 335, 981, or 7171 bytes. 
+Buffer addresses for read and write operations must be sector aligned (aligned on addresses in memory that are integer multiples of the volume's sector size). One way to sector align buffers is to use the VirtualAlloc function to allocate the buffers. This function allocates memory that is aligned on addresses that are integer multiples of the system's page size. Because both page and volume sector sizes are powers of 2, memory aligned by multiples of the system's page size is also aligned by multiples of the volume's sector size. 
+Accessing the input buffer while a read operation is using the buffer may lead to corruption of the data read into that buffer. Applications must not read from, write to, reallocate, or free the input buffer that a read operation is using until the read operation completes.
+
+Characters can be read from the console input buffer by using ReadFile with a handle to console input. The console mode determines the exact behavior of the ReadFile function. 
+
+If a named pipe is being read in message mode and the next message is longer than the nNumberOfBytesToRead parameter specifies, ReadFile returns FALSE and GetLastError returns ERROR_MORE_DATA. The remainder of the message may be read by a subsequent call to the ReadFile or PeekNamedPipe function. 
+
+When reading from a communications device, the behavior of ReadFile is governed by the current communication time-outs as set and retrieved using the SetCommTimeouts and GetCommTimeouts functions. Unpredictable results can occur if you fail to set the time-out values. For more information about communication time-outs, see COMMTIMEOUTS.
+
+If ReadFile attempts to read from a mailslot whose buffer is too small, the function returns FALSE and GetLastError returns ERROR_INSUFFICIENT_BUFFER. 
+
+If the anonymous write pipe handle has been closed and ReadFile attempts to read using the corresponding anonymous read pipe handle, the function returns FALSE and GetLastError returns ERROR_BROKEN_PIPE. 
+
+The ReadFile function may fail and return ERROR_INVALID_USER_BUFFER or ERROR_NOT_ENOUGH_MEMORY whenever there are too many outstanding asynchronous I/O requests. 
+
+The ReadFile code to check for the end-of-file condition (eof) differs for synchronous and asynchronous read operations.
+
+When a synchronous read operation reaches the end of a file, ReadFile returns TRUE and sets *lpNumberOfBytesRead to zero. The following sample code tests for end-of-file for a synchronous read operation:
+
+// Attempt a synchronous read operation. 
+bResult = ReadFile(hFile, &inBuffer, nBytesToRead, &nBytesRead, NULL) ; 
+// Check for end of file. 
+if (bResult &&  nBytesRead == 0, ) 
+{ 
+    // we're at the end of the file 
+} 
+An asynchronous read operation can encounter the end of a file during the initiating call to ReadFile, or during subsequent asynchronous operation. 
+
+If EOF is detected at ReadFile time for an asynchronous read operation, ReadFile returns FALSE and GetLastError returns ERROR_HANDLE_EOF.
+
+If EOF is detected during subsequent asynchronous operation, the call to GetOverlappedResult to obtain the results of that operation returns FALSE and GetLastError returns ERROR_HANDLE_EOF.
+
+To cancel all pending asynchronous I/O operations, use the CancelIo function. This function only cancels operations issued by the calling thread for the specified file handle. I/O operations that are canceled complete with the error ERROR_OPERATION_ABORTED. 
+
+If you are attempting to read from a floppy drive that does not have a floppy disk, the system displays a message box prompting the user to retry the operation. To prevent the system from displaying this message box, call the SetErrorMode function with SEM_NOOPENFILEERRORBOX. 
+
+The following sample code illustrates testing for end-of-file for an asynchronous read operation:
+
+// set up overlapped structure fields 
+gOverLapped.Offset     = 0; 
+gOverLapped.OffsetHigh = 0; 
+gOverLapped.hEvent     = hEvent; 
+ 
+// attempt an asynchronous read operation 
+bResult = ReadFile(hFile, &inBuffer, nBytesToRead, &nBytesRead, 
+    &gOverlapped) ; 
+ 
+// if there was a problem, or the async. operation's still pending ... 
+if (!bResult) 
+{ 
+    // deal with the error code 
+    switch (dwError = GetLastError()) 
+    { 
+        case ERROR_HANDLE_EOF: 
+        { 
+            // we have reached the end of the file 
+            // during the call to ReadFile 
+ 
+            // code to handle that 
+        } 
+ 
+        case ERROR_IO_PENDING: 
+        { 
+            // asynchronous i/o is still in progress 
+ 
+            // do something else for a while 
+            GoDoSomethingElse() ; 
+ 
+            // check on the results of the asynchronous read 
+            bResult = GetOverlappedResult(hFile, &gOverlapped, 
+                &nBytesRead, FALSE) ; 
+ 
+            // if there was a problem ... 
+            if (!bResult) 
+            { 
+                // deal with the error code 
+                switch (dwError = GetLastError()) 
+                { 
+                    case ERROR_HANDLE_EOF: 
+                    { 
+                        // we have reached the end of
+                        // the file during asynchronous
+                        // operation
+                    } 
+ 
+                    // deal with other error cases 
+                } 
+            } 
+        } // end case 
+ 
+        // deal with other error cases 
+ 
+    } // end switch 
+} // end if 
+Example Code
+For an example, see Reading, Writing, and Locking Files. 
+
+Requirements 
+  Windows NT/2000/XP: Included in Windows NT 3.1 and later.
+  Windows 95/98/Me: Included in Windows 95 and later.
+  Header: Declared in Winbase.h; include Windows.h.
+  Library: Use Kernel32.lib.
+
+See Also
+File I/O Overview, File I/O Functions, CancelIo, CreateFile, GetCommTimeouts, GetOverlappedResult, GetQueuedCompletionStatus, OVERLAPPED, PeekNamedPipe, ReadFileEx, SetCommTimeouts, SetErrorMode, WriteFile 
+
+Platform SDK Release: November 2001  What did you think of this topic?
+Let us know.  Order a Platform SDK CD Online
+(U.S/Canada)   (International) 
+
+ 
+
+Requirements 
+  Windows NT/2000/XP: Included in Windows NT 3.1 and later.
+  Windows 95/98/Me: Included in Windows 95 and later.
+  Header: Declared in Winbase.h; include Windows.h.
+  Library: Use Kernel32.lib.
+See Also
+File I/O Overview, File I/O Functions, CancelIo, CreateFile, GetCommTimeouts, GetOverlappedResult, GetQueuedCompletionStatus, OVERLAPPED, PeekNamedPipe, ReadFileEx, SetCommTimeouts, SetErrorMode, WriteFile 

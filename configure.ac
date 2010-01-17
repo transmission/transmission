@@ -192,7 +192,7 @@ dnl because "make dist" needs its Makefiles to exist, and
 dnl AM_CONDITIONAL + AC_CONFIG_SUBDIRS don't seem to play nice
 AC_CONFIG_SUBDIRS([third-party/libevent])
 libevent_source=bundled
-AC_CHECK_LIB([event],[evutil_vsnprintf],
+AC_CHECK_LIB([event],[evbuffer_readln],
              [libevent_found=yes],
              [libevent_found=no],
              [$libevent_extra_libs])
@@ -202,7 +202,7 @@ AC_CHECK_HEADER([event-config.h],
 libevent_source=bundled
 if test "x$libevent_found" = "xyes" ; then
     if test "x$libevent_headers_found" = "xyes"; then
-      libevent_source=system
+        libevent_source=system
     fi
 fi
 if test "x$libevent_source" = "xbundled"; then
