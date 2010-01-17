@@ -836,6 +836,9 @@ event_del(struct event *ev)
 void
 event_active(struct event *ev, int res, short ncalls)
 {
+	assert(ev != NULL);
+	assert(res != 0);
+
 	/* We get different kinds of events, add them together */
 	if (ev->ev_flags & EVLIST_ACTIVE) {
 		ev->ev_res |= res;
@@ -974,6 +977,10 @@ event_queue_remove(struct event_base *base, struct event *ev, int queue)
 void
 event_queue_insert(struct event_base *base, struct event *ev, int queue)
 {
+	assert(base != NULL);
+	assert(ev != NULL);
+	assert(queue != 0);
+
 	if (ev->ev_flags & queue) {
 		/* Double insertion is possible for active events */
 		if (queue & EVLIST_ACTIVE)
