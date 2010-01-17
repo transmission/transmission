@@ -1441,7 +1441,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) copyTorrentFileForTorrents: (NSMutableArray *) torrents
 {
-    if ([torrents count] <= 0)
+    if ([torrents count] == 0)
     {
         [torrents release];
         return;
@@ -1449,25 +1449,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     Torrent * torrent = [torrents objectAtIndex: 0];
     
-    //warn user if torrent file can't be found
-    if (![[NSFileManager defaultManager] fileExistsAtPath: [torrent torrentLocation]])
-    {
-        NSAlert * alert = [[NSAlert alloc] init];
-        [alert addButtonWithTitle: NSLocalizedString(@"OK", "Torrent file copy alert -> button")];
-        [alert setMessageText: [NSString stringWithFormat: NSLocalizedString(@"Copy of \"%@\" Cannot Be Created",
-                                "Torrent file copy alert -> title"), [torrent name]]];
-        [alert setInformativeText: [NSString stringWithFormat: 
-                NSLocalizedString(@"The torrent file (%@) cannot be found.", "Torrent file copy alert -> message"),
-                                    [torrent torrentLocation]]];
-        [alert setAlertStyle: NSWarningAlertStyle];
-        
-        [alert runModal];
-        [alert release];
-        
-        [torrents removeObjectAtIndex: 0];
-        [self copyTorrentFileForTorrents: torrents];
-    }
-    else
+    if (![torrent isMagnet] && [[NSFileManager defaultManager] fileExistsAtPath: [torrent torrentLocation]])
     {
         NSSavePanel * panel = [NSSavePanel savePanel];
         [panel setAllowedFileTypes: [NSArray arrayWithObjects: @"org.bittorrent.torrent", @"torrent", nil]];
@@ -1475,6 +1457,26 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         [panel beginSheetForDirectory: nil file: [torrent name] modalForWindow: fWindow modalDelegate: self
             didEndSelector: @selector(saveTorrentCopySheetClosed:returnCode:contextInfo:) contextInfo: torrents];
+    }
+    else
+    {
+        if (![torrent isMagnet])
+        {
+            NSAlert * alert = [[NSAlert alloc] init];
+            [alert addButtonWithTitle: NSLocalizedString(@"OK", "Torrent file copy alert -> button")];
+            [alert setMessageText: [NSString stringWithFormat: NSLocalizedString(@"Copy of \"%@\" Cannot Be Created",
+                                    "Torrent file copy alert -> title"), [torrent name]]];
+            [alert setInformativeText: [NSString stringWithFormat: 
+                    NSLocalizedString(@"The torrent file (%@) cannot be found.", "Torrent file copy alert -> message"),
+                                        [torrent torrentLocation]]];
+            [alert setAlertStyle: NSWarningAlertStyle];
+            
+            [alert runModal];
+            [alert release];
+        }
+        
+        [torrents removeObjectAtIndex: 0];
+        [self copyTorrentFileForTorrents: torrents];
     }
 }
 
@@ -3908,7 +3910,15 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     //enable copy torrent file item
     if (action == @selector(copyTorrentFiles:))
-        return canUseTable && [fTableView numberOfSelectedRows] > 0;
+    {
+        if (!canUseTable)
+            return NO;
+        
+        for (Torrent * torrent in [fTableView selectedTorrents])
+            if (![torrent isMagnet])
+                return YES;
+        return NO;
+    }
     
     //enable copy torrent file item
     if (action == @selector(copyMagnetLinks:))
