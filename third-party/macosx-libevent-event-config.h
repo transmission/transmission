@@ -44,6 +44,12 @@
 /* Define to 1 if you have the `getaddrinfo' function. */
 #define _EVENT_HAVE_GETADDRINFO 1
 
+/* Define to 1 if you have the `getegid' function. */
+#define _EVENT_HAVE_GETEGID 1
+
+/* Define to 1 if you have the `geteuid' function. */
+#define _EVENT_HAVE_GETEUID 1
+
 /* Define to 1 if you have the `getnameinfo' function. */
 #define _EVENT_HAVE_GETNAMEINFO 1
 
@@ -55,6 +61,9 @@
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #define _EVENT_HAVE_INTTYPES_H 1
+
+/* Define to 1 if you have the `issetugid' function. */
+#define _EVENT_HAVE_ISSETUGID 1
 
 /* Define to 1 if you have the `kqueue' function. */
 #define _EVENT_HAVE_KQUEUE 1
@@ -207,6 +216,9 @@
    */
 #define _EVENT_LT_OBJDIR ".libs/"
 
+/* Numeric representation of the version */
+#define _EVENT_NUMERIC_VERSION 0x01040d01
+
 /* Name of package */
 #define _EVENT_PACKAGE "libevent"
 
@@ -244,7 +256,7 @@
 #define _EVENT_TIME_WITH_SYS_TIME 1
 
 /* Version number of package */
-#define _EVENT_VERSION "1.4.12-stable"
+#define _EVENT_VERSION "1.4.13-stable-dev"
 
 /* Define to appropriate substitue if compiler doesnt have __func__ */
 /* #undef _EVENT___func__ */
