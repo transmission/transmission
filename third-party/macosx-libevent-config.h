@@ -50,7 +50,7 @@
 #define HAVE_INTTYPES_H 1
 
 /* Define to 1 if you have the `kqueue' function. */
-/* #define HAVE_KQUEUE 1 */
+#define HAVE_KQUEUE 1
 
 /* Define to 1 if you have the `nsl' library (-lnsl). */
 /* #undef HAVE_LIBNSL */
@@ -194,7 +194,7 @@
 #define HAVE_VASPRINTF 1
 
 /* Define if kqueue works correctly with pipes */
-/* #define HAVE_WORKING_KQUEUE 1 */
+#define HAVE_WORKING_KQUEUE 1
 
 /* Define to the sub-directory in which libtool stores uninstalled libraries.
    */

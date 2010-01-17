@@ -57,7 +57,7 @@
 #define _EVENT_HAVE_INTTYPES_H 1
 
 /* Define to 1 if you have the `kqueue' function. */
-/* #define _EVENT_HAVE_KQUEUE 1 */
+#define _EVENT_HAVE_KQUEUE 1
 
 /* Define to 1 if you have the `nsl' library (-lnsl). */
 /* #undef _EVENT_HAVE_LIBNSL */
@@ -201,7 +201,7 @@
 #define _EVENT_HAVE_VASPRINTF 1
 
 /* Define if kqueue works correctly with pipes */
-/* #define _EVENT_HAVE_WORKING_KQUEUE 1 */
+#define _EVENT_HAVE_WORKING_KQUEUE 1
 
 /* Define to the sub-directory in which libtool stores uninstalled libraries.
    */
