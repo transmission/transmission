@@ -999,7 +999,12 @@ event_queue_insert(struct event_base *base, struct event *ev, int queue)
 		TAILQ_INSERT_TAIL(&base->eventqueue, ev, ev_next);
 		break;
 	case EVLIST_ACTIVE:
+		assert(base->event_count_active >= 0);
 		base->event_count_active++;
+		assert(0 <= ev->ev_pri);
+		assert(ev->ev_pri < base->nactivequeues);
+		assert(base->nactivequeues == 1);
+		assert(ev->ev_pri == 0);
 		TAILQ_INSERT_TAIL(base->activequeues[ev->ev_pri],
 		    ev,ev_active_next);
 		break;
