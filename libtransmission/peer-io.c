@@ -439,6 +439,80 @@ tr_peerIoNewOutgoing( tr_session        * session,
                   : tr_peerIoNew( session, parent, addr, port, torrentHash, FALSE, isSeed, fd );
 }
 
+/***
+****
+***/
+
+static void
+event_enable( tr_peerIo * io, short event )
+{
+    assert( tr_amInEventThread( io->session ) );
+    assert( io->session != NULL );
+    assert( io->session->events != NULL );
+    assert( event_initialized( &io->event_read ) );
+    assert( event_initialized( &io->event_write ) );
+
+    if( ( event & EV_READ ) && ! ( io->pendingEvents & EV_READ ) )
+    {
+        dbgmsg( io, "enabling libevent ready-to-read polling" );
+        event_add( &io->event_read, NULL );
+        io->pendingEvents |= EV_READ;
+    }
+
+    if( ( event & EV_WRITE ) && ! ( io->pendingEvents & EV_WRITE ) )
+    {
+        dbgmsg( io, "enabling libevent ready-to-write polling" );
+        event_add( &io->event_write, NULL );
+        io->pendingEvents |= EV_WRITE;
+    }
+}
+
+static void
+event_disable( struct tr_peerIo * io, short event )
+{
+    assert( tr_amInEventThread( io->session ) );
+    assert( io->session != NULL );
+    assert( io->session->events != NULL );
+    assert( event_initialized( &io->event_read ) );
+    assert( event_initialized( &io->event_write ) );
+
+    if( ( event & EV_READ ) && ( io->pendingEvents & EV_READ ) )
+    {
+        dbgmsg( io, "disabling libevent ready-to-read polling" );
+        event_del( &io->event_read );
+        io->pendingEvents &= ~EV_READ;
+    }
+
+    if( ( event & EV_WRITE ) && ( io->pendingEvents & EV_WRITE ) )
+    {
+        dbgmsg( io, "disabling libevent ready-to-write polling" );
+        event_del( &io->event_write );
+        io->pendingEvents &= ~EV_WRITE;
+    }
+}
+
+void
+tr_peerIoSetEnabled( tr_peerIo    * io,
+                     tr_direction   dir,
+                     tr_bool        isEnabled )
+{
+    const short event = dir == TR_UP ? EV_WRITE : EV_READ;
+
+    assert( tr_isPeerIo( io ) );
+    assert( tr_isDirection( dir ) );
+    assert( tr_amInEventThread( io->session ) );
+    assert( io->session->events != NULL );
+
+    if( isEnabled )
+        event_enable( io, event );
+    else
+        event_disable( io, event );
+}
+
+/***
+****
+***/
+
 static void
 trDatatypeFree( void * data )
 {
@@ -456,8 +530,7 @@ io_dtor( void * vio )
     assert( io->session->events != NULL );
 
     dbgmsg( io, "in tr_peerIo destructor" );
-    event_del( &io->event_read );
-    event_del( &io->event_write );
+    event_disable( io, ~0 );
     tr_bandwidthDestruct( &io->bandwidth );
     evbuffer_free( io->outbuf );
     evbuffer_free( io->inbuf );
@@ -552,6 +625,7 @@ tr_peerIoClear( tr_peerIo * io )
 int
 tr_peerIoReconnect( tr_peerIo * io )
 {
+    int pendingEvents;
     tr_session * session;
 
     assert( tr_isPeerIo( io ) );
@@ -559,10 +633,17 @@ tr_peerIoReconnect( tr_peerIo * io )
 
     session = tr_peerIoGetSession( io );
 
+    pendingEvents = io->pendingEvents;
+    event_disable( io, ~0 );
+
     if( io->socket >= 0 )
         tr_netClose( session, io->socket );
 
     io->socket = tr_netOpenPeerSocket( session, &io->addr, io->port, io->isSeed );
+    event_set( &io->event_read, io->socket, EV_READ, event_read_cb, io );
+    event_set( &io->event_write, io->socket, EV_WRITE, event_write_cb, io );
+    event_enable( io, pendingEvents );
+
     if( io->socket >= 0 )
     {
         tr_netSetTOS( io->socket, session->peerSocketTOS );
@@ -907,76 +988,4 @@ tr_peerIoFlushOutgoingProtocolMsgs( tr_peerIo * io )
     }
 
     return tr_peerIoFlush( io, TR_UP, byteCount );
-}
-
-
-/***
-****
-****/
-
-static void
-event_enable( tr_peerIo * io, short event )
-{
-    assert( tr_amInEventThread( io->session ) );
-    assert( io->session != NULL );
-    assert( io->session->events != NULL );
-    assert( event_initialized( &io->event_read ) );
-    assert( event_initialized( &io->event_write ) );
-
-    if( ( event & EV_READ ) && ! ( io->pendingEvents & EV_READ ) )
-    {
-        dbgmsg( io, "enabling libevent ready-to-read polling" );
-        event_add( &io->event_read, NULL );
-        io->pendingEvents |= EV_READ;
-    }
-
-    if( ( event & EV_WRITE ) && ! ( io->pendingEvents & EV_WRITE ) )
-    {
-        dbgmsg( io, "enabling libevent ready-to-write polling" );
-        event_add( &io->event_write, NULL );
-        io->pendingEvents |= EV_WRITE;
-    }
-}
-
-static void
-event_disable( struct tr_peerIo * io, short event )
-{
-    assert( tr_amInEventThread( io->session ) );
-    assert( io->session != NULL );
-    assert( io->session->events != NULL );
-    assert( event_initialized( &io->event_read ) );
-    assert( event_initialized( &io->event_write ) );
-
-    if( ( event & EV_READ ) && ( io->pendingEvents & EV_READ ) )
-    {
-        dbgmsg( io, "disabling libevent ready-to-read polling" );
-        event_del( &io->event_read );
-        io->pendingEvents &= ~EV_READ;
-    }
-
-    if( ( event & EV_WRITE ) && ( io->pendingEvents & EV_WRITE ) )
-    {
-        dbgmsg( io, "disabling libevent ready-to-write polling" );
-        event_del( &io->event_write );
-        io->pendingEvents &= ~EV_WRITE;
-    }
-}
-
-
-void
-tr_peerIoSetEnabled( tr_peerIo    * io,
-                     tr_direction   dir,
-                     tr_bool        isEnabled )
-{
-    const short event = dir == TR_UP ? EV_WRITE : EV_READ;
-
-    assert( tr_isPeerIo( io ) );
-    assert( tr_isDirection( dir ) );
-    assert( tr_amInEventThread( io->session ) );
-    assert( io->session->events != NULL );
-
-    if( isEnabled )
-        event_enable( io, event );
-    else
-        event_disable( io, event );
 }
