@@ -837,6 +837,7 @@ void
 event_active(struct event *ev, int res, short ncalls)
 {
 	assert(ev != NULL);
+	assert(ev->ev_base != NULL);
 	assert(res != 0);
 
 	/* We get different kinds of events, add them together */

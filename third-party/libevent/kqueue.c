@@ -288,6 +288,8 @@ kq_dispatch(struct event_base *base, void *arg, struct timeval *tv)
 	struct timespec ts, *ts_p = NULL;
 	int i, res;
 
+	assert(base != NULL);
+
 	if (tv != NULL) {
 		TIMEVAL_TO_TIMESPEC(tv, &ts);
 		ts_p = &ts;
@@ -360,6 +362,10 @@ kq_dispatch(struct event_base *base, void *arg, struct timeval *tv)
 			}
 		} else {
 			ev = (struct event *)events[i].udata;
+			assert(ev != NULL);
+			assert(ev->ev_pri == 0);
+			assert(ev->base != NULL);
+			assert(ev->base == base);
 
 			if (!(ev->ev_events & EV_PERSIST))
 				ev->ev_flags &= ~EVLIST_X_KQINKERNEL;
@@ -518,6 +524,9 @@ kq_del(void *arg, struct event *ev)
 	struct kqop *kqop = arg;
 	struct kevent kev, *kev_old;
 	struct kqidx *kqidx;
+
+        assert(ev != NULL);
+        assert(ev->ev_pri == 0);
 
 	changes_ok(kqop);
 	if (!(ev->ev_flags & EVLIST_X_KQINKERNEL))
