@@ -192,7 +192,7 @@ dnl because "make dist" needs its Makefiles to exist, and
 dnl AM_CONDITIONAL + AC_CONFIG_SUBDIRS don't seem to play nice
 AC_CONFIG_SUBDIRS([third-party/libevent])
 libevent_source=bundled
-AC_CHECK_LIB([event],[evbuffer_readln],
+AC_CHECK_LIB([event],[evutil_vsnprintf],
              [libevent_found=yes],
              [libevent_found=no],
              [$libevent_extra_libs])

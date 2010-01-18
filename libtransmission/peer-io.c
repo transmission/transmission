@@ -530,7 +530,7 @@ io_dtor( void * vio )
     assert( io->session->events != NULL );
 
     dbgmsg( io, "in tr_peerIo destructor" );
-    event_disable( io, ~0 );
+    event_disable( io, EV_READ | EV_WRITE );
     tr_bandwidthDestruct( &io->bandwidth );
     evbuffer_free( io->outbuf );
     evbuffer_free( io->inbuf );
@@ -634,7 +634,7 @@ tr_peerIoReconnect( tr_peerIo * io )
     session = tr_peerIoGetSession( io );
 
     pendingEvents = io->pendingEvents;
-    event_disable( io, ~0 );
+    event_disable( io, EV_READ | EV_WRITE );
 
     if( io->socket >= 0 )
         tr_netClose( session, io->socket );
