@@ -28,35 +28,24 @@
 struct evbuffer;
 
 /**
- * @addtogroup utils Utilities
- * @{
- */
+*** @addtogroup peers
+*** @{
+**/
 
 typedef struct tr_crypto tr_crypto;
 
-/**
-***
-**/
+/** @brief create a new tr_crypto object */
+tr_crypto*  tr_cryptoNew( const uint8_t * torrentHash, int isIncoming );
 
-tr_crypto*     tr_cryptoNew( const uint8_t * torrentHash,
-                             int             isIncoming );
-
+/** @brief destroy an existing tr_crypto object */
 void           tr_cryptoFree( tr_crypto * crypto );
 
-/**
-***
-**/
 
-void           tr_cryptoSetTorrentHash( tr_crypto *     crypto,
-                                        const uint8_t * torrentHash );
+void tr_cryptoSetTorrentHash( tr_crypto * crypto, const uint8_t * torrentHash );
 
 const uint8_t* tr_cryptoGetTorrentHash( const tr_crypto * crypto );
 
 int            tr_cryptoHasTorrentHash( const tr_crypto * crypto );
-
-/**
-***
-**/
 
 const uint8_t* tr_cryptoComputeSecret( tr_crypto *     crypto,
                                        const uint8_t * peerPublicKey );
@@ -71,10 +60,6 @@ void           tr_cryptoDecrypt( tr_crypto *  crypto,
                                  const void * buf_in,
                                  void *       buf_out );
 
-/**
-***
-**/
-
 void           tr_cryptoEncryptInit( tr_crypto * crypto );
 
 void           tr_cryptoEncrypt( tr_crypto *  crypto,
@@ -82,17 +67,26 @@ void           tr_cryptoEncrypt( tr_crypto *  crypto,
                                  const void * buf_in,
                                  void *       buf_out );
 
-void           tr_sha1( uint8_t *    setme,
-                        const void * content1,
-                        int          content1_len,
-                        ... ) TR_GNUC_NULL_TERMINATED;
-
-
-/** @brief Returns a random number in the range of [0...n) */
-int            tr_cryptoRandInt( int n );
+/* @} */
 
 /**
- * @brief Returns a vaguely random number in the range of [0...n).
+*** @addtogroup utils Utilities
+*** @{
+**/
+
+
+/** @brief generate a SHA1 hash from one or more chunks of memory */
+void tr_sha1( uint8_t    * setme,
+              const void * content1,
+              int          content1_len,
+              ... ) TR_GNUC_NULL_TERMINATED;
+
+
+/** @brief returns a random number in the range of [0...n) */
+int tr_cryptoRandInt( int n );
+
+/**
+ * @brief returns a pseudorandom number in the range of [0...n)
  *
  * This is faster, BUT WEAKER, than tr_cryptoRandInt() and never
  * be used in sensitive cases.
@@ -100,12 +94,14 @@ int            tr_cryptoRandInt( int n );
  */
 int            tr_cryptoWeakRandInt( int n );
 
-/** @brief Fills a buffer with random bytes */
-void           tr_cryptoRandBuf( void * buf, size_t len );
+/** @brief fill a buffer with random bytes */
+void  tr_cryptoRandBuf( void * buf, size_t len );
 
-char*          tr_ssha1( const void * plaintext );
+/** @brief generate a SSHA password from its plaintext source */
+char*  tr_ssha1( const void * plaintext );
 
-tr_bool        tr_ssha1_matches( const char * source, const char * pass );
+/** @brief Validate a test password against the a ssha1 password */
+tr_bool tr_ssha1_matches( const char * ssha1, const char * pass );
 
 /* @} */
 

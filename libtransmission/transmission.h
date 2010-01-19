@@ -340,7 +340,7 @@ void tr_sessionSetDownloadDir( tr_session * session, const char * downloadDir );
 const char * tr_sessionGetDownloadDir( const tr_session * session );
 
 /**
- * @brief Set the per-session incomplete download folder.
+ * @brief set the per-session incomplete download folder.
  *
  * When you add a new torrent and the session's incomplete directory is enabled,
  * the new torrent will start downloading into that directory, and then be moved
@@ -360,10 +360,13 @@ const char * tr_sessionGetDownloadDir( const tr_session * session );
  */
 void tr_sessionSetIncompleteDir( tr_session * session, const char * dir );
 
+/** @brief get the per-session incomplete download folder */
 const char* tr_sessionGetIncompleteDir( const tr_session * session );
 
+/** @brief enable or disable use of the incomplete download folder */
 void tr_sessionSetIncompleteDirEnabled( tr_session * session, tr_bool );
 
+/** @brief get whether or not the incomplete download folder is enabled */
 tr_bool tr_sessionIsIncompleteDirEnabled( const tr_session * session );
 
 
@@ -378,6 +381,7 @@ tr_bool tr_sessionIsIncompleteDirEnabled( const tr_session * session );
  */
 void tr_sessionSetIncompleteFileNamingEnabled( tr_session * session, tr_bool );
 
+/** @brief return whether or filenames will have ".part" at the end until they're complete */
 tr_bool tr_sessionIsIncompleteFileNamingEnabled( const tr_session * session );
 
 /**
@@ -538,6 +542,7 @@ void          tr_sessionSetProxyPassword( tr_session * session,
 ***
 **/
 
+/** @brief Used by tr_sessionGetStats() and tr_sessionGetCumulativeStats() to give bandwidth statistics */ 
 typedef struct tr_session_stats
 {
     float       ratio;        /* TR_RATIO_INF, TR_RATIO_NA, or total up/down */
@@ -549,23 +554,21 @@ typedef struct tr_session_stats
 }
 tr_session_stats;
 
-/* stats from the current session. */
-void               tr_sessionGetStats( const tr_session * session,
-                                       tr_session_stats * setme );
+/** @brief Get bandwidth use statistics about the current session */
+void tr_sessionGetStats( const tr_session * session, tr_session_stats * setme );
 
-/* stats from the current and past sessions. */
-void               tr_sessionGetCumulativeStats( const tr_session * session,
-                                                 tr_session_stats * setme );
+/** @brief Get cumulative bandwidth use statistics for the current and past sessions */
+void tr_sessionGetCumulativeStats( const tr_session * session, tr_session_stats * setme );
 
-void               tr_sessionClearStats( tr_session * session );
+void tr_sessionClearStats( tr_session * session );
 
 /**
- * Set whether or not torrents are allowed to do peer exchanges.
+ * @brief Set whether or not torrents are allowed to do peer exchanges.
+ *
  * PEX is always disabled in private torrents regardless of this.
  * In public torrents, PEX is enabled by default.
  */
-void               tr_sessionSetPexEnabled( tr_session  * session,
-                                            tr_bool       isEnabled );
+void tr_sessionSetPexEnabled( tr_session  * session, tr_bool isEnabled );
 
 tr_bool            tr_sessionIsPexEnabled( const tr_session * session );
 
@@ -1639,10 +1642,7 @@ typedef enum
 }
 tr_stat_errtype;
 
-/**
- * @brief Describes a torrent's status
- * @see tr_torrentStat()
- */
+/** @brief Used by tr_torrentStat() to tell clients about a torrent's state and statistics */
 typedef struct tr_stat
 {
     /** The torrent's unique Id.

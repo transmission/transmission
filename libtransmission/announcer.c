@@ -353,10 +353,7 @@ trackerFree( void * vtracker )
 
 struct tr_torrent_tiers;
 
-/**
- * A group of trackers in a single tier,
- * as per the multitracker spec
- */
+/** @brief A group of trackers in a single tier, as per the multitracker spec */
 typedef struct
 {
     tr_ptrArray trackers; /* tr_tracker_item */
@@ -469,8 +466,9 @@ tierAddTracker( tr_announcer * announcer,
 ****
 ***/
 
-/*
- * per-torrent info.
+/**
+ * @brief Opaque, per-torrent data structure for tracker announce information
+ *
  * this opaque data structure can be found in tr_torrent.tiers
  */
 typedef struct tr_torrent_tiers

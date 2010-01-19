@@ -160,6 +160,7 @@ struct weighted_piece
     int16_t requestCount;
 };
 
+/** @brief Opaque, per-torrent data structure for peer connection information */
 typedef struct tr_torrent_peers
 {
     tr_ptrArray                outgoingHandshakes; /* tr_handshake */

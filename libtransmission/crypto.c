@@ -86,6 +86,7 @@ static const uint8_t dh_P[PRIME_LEN] =
 
 static const uint8_t dh_G[] = { 2 };
 
+/** @brief Holds state information for encrypted peer communications */
 struct tr_crypto
 {
     RC4_KEY         dec_key;

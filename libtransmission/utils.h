@@ -519,6 +519,7 @@ static inline void tr_removeElementFromArray( void   * array,
 ****
 ***/
 
+/** @brief Private libtransmission variable that's visible only for inlining in tr_time() */
 extern time_t transmission_now;
 
 /**

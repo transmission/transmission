@@ -576,8 +576,10 @@ onNowTimer( int foo UNUSED, short bar UNUSED, void * vsession )
     if( usec > max ) usec = max;
     if( usec < min ) usec = min;
     tr_timerAdd( session->nowTimer, 0, usec );
+
+    /* update libtransmission's epoch time */
     tr_timeUpdate( tv.tv_sec );
-    /* fprintf( stderr, "time %zu sec, %zu microsec\n", (size_t)tr_time(), (size_t)tv.tv_usec );  */
+    /* fprintf( stderr, "time %zu sec, %zu microsec\n", (size_t)tr_time(), (size_t)tv.tv_usec ); */
 }
 
 static void loadBlocklists( tr_session * session );

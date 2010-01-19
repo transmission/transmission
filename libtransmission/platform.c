@@ -78,6 +78,7 @@ tr_areThreadsEqual( tr_thread_id a,
 #endif
 }
 
+/** @brief portability wrapper around OS-dependent threads */
 struct tr_thread
 {
     void            ( * func )( void * );
@@ -142,6 +143,7 @@ tr_threadNew( void   ( *func )(void *),
 ****  LOCKS
 ***/
 
+/** @brief portability wrapper around OS-dependent thread mutexes */
 struct tr_lock
 {
     int                 depth;
@@ -378,8 +380,7 @@ migrateFiles( const tr_session * session )
 }
 
 void
-tr_setConfigDir( tr_session * session,
-                 const char * configDir )
+tr_setConfigDir( tr_session * session, const char * configDir )
 {
     char * path;
 

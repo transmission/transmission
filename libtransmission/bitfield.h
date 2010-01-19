@@ -20,6 +20,7 @@
 #include "transmission.h"
 #include "utils.h" /* tr_new0 */
 
+/** @brief Implementation of the BitTorrent spec's Bitfield array of bits */
 typedef struct tr_bitfield
 {
     uint8_t *  bits;

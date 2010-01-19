@@ -1176,6 +1176,7 @@ tr_bencFree( tr_benc * val )
 ****
 ***/
 
+/** @brief Implementation helper class for tr_bencToBuffer(TR_FMT_JSON) */
 struct ParentState
 {
     int    bencType;
@@ -1183,6 +1184,7 @@ struct ParentState
     int    childCount;
 };
 
+/** @brief Implementation helper class for tr_bencToBuffer(TR_FMT_JSON) */
 struct jsonWalk
 {
     tr_bool doIndent;

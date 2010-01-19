@@ -36,6 +36,7 @@ typedef enum
 }
 TrackerEventType;
 
+/** @brief Notification object to tell listeners about announce or scrape occurences */
 typedef struct
 {
     /* what type of event this is */

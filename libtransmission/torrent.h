@@ -134,6 +134,7 @@ void             tr_torrentSetVerifyState( tr_torrent      * tor,
 
 struct tr_incomplete_metadata;
 
+/** @brief Torrent object */
 struct tr_torrent
 {
     tr_session *             session;

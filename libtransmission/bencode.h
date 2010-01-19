@@ -198,12 +198,24 @@ tr_bool   tr_bencDictFindRaw( tr_benc *, const char * key,
 ****
 ***/
 
+/** @brief Get an int64_t from a variant object
+    @return TRUE if successful, or FALSE if the variant could not be represented as an int64_t  */
 tr_bool   tr_bencGetInt( const tr_benc * val, int64_t * setme );
+
+/** @brief Get an string from a variant object
+    @return TRUE if successful, or FALSE if the variant could not be represented as a string  */
 tr_bool   tr_bencGetStr( const tr_benc * val, const char ** setme );
+
+/** @brief Get a boolean from a variant object
+    @return TRUE if successful, or FALSE if the variant could not be represented as a boolean  */
 tr_bool   tr_bencGetBool( const tr_benc * val, tr_bool * setme );
+
+/** @brief Get a floating-point number from a variant object
+    @return TRUE if successful, or FALSE if the variant could not be represented as a floating-point number  */
 tr_bool   tr_bencGetReal( const tr_benc * val, double * setme );
 
 static inline tr_bool tr_bencIsType  ( const tr_benc * b, int type ) { return ( b != NULL ) && ( b->type == type ); }
+
 static inline tr_bool tr_bencIsInt   ( const tr_benc * b ) { return tr_bencIsType( b, TR_TYPE_INT ); }
 static inline tr_bool tr_bencIsDict  ( const tr_benc * b ) { return tr_bencIsType( b, TR_TYPE_DICT ); }
 static inline tr_bool tr_bencIsList  ( const tr_benc * b ) { return tr_bencIsType( b, TR_TYPE_LIST ); }
@@ -211,16 +223,13 @@ static inline tr_bool tr_bencIsString( const tr_benc * b ) { return tr_bencIsTyp
 static inline tr_bool tr_bencIsBool  ( const tr_benc * b ) { return tr_bencIsType( b, TR_TYPE_BOOL ); }
 static inline tr_bool tr_bencIsReal  ( const tr_benc * b ) { return tr_bencIsType( b, TR_TYPE_REAL ); }
 
-/**
-***  Treat these as private -- they're only made public here
-***  so that the unit tests can find them
-**/
-
+/** @brief Private function that's exposed here only for unit tests */
 int tr_bencParseInt( const uint8_t *  buf,
                      const uint8_t *  bufend,
                      const uint8_t ** setme_end,
                      int64_t *        setme_val );
 
+/** @brief Private function that's exposed here only for unit tests */
 int tr_bencParseStr( const uint8_t *  buf,
                      const uint8_t *  bufend,
                      const uint8_t ** setme_end,
