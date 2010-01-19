@@ -5,7 +5,7 @@
   * Add support for trackerless torrents
   * Add optional "incomplete directory" where partial downloads are stored
   * Add .part to incomplete files' filenames
-  * Get peers from each tier in a torrent's tracker list, rather than only one
+  * Find more peers by announcing to each tier in a torrent's tracker list, rather than only one
   * Fix vulnerability from maliciously-crafted torrent files that could overwrite other files
   * Improved IPv6 support
   * Improved PEX sharing with other peers
@@ -13,14 +13,14 @@
   * DHT improvements to bootstrapping and IPv6
   * Newly-added torrents without local data don't wait in the "Verify Local Data" queue anymore
   * Add an OS hint to not cache local data during torrent verification
-  * Encrypted handshakes to peers now use less CPU
-  * Better filtering of malformed IP addresses
+  * Use less CPU when making encrypted handshakes to peers
+  * Better filtering of bad IP addresses
   * Fix bug that gave "too many open files" error messages
   * Fix bug that could crash Transmission on shutdown
   * Fix bug that could unpause or repause a torrent on startup
-  * Slightly better IO performance by prefetching data to upload
-  * Other minor bug fixes and performance tweaks
+  * When uploading, improve disk IO performance by prefetching the data in batches
   * Portability fixes for embedded systems
+  * Other small bugfixes and improvements
 ==== Mac ====
   * Redesigned trackers inspector tab with favicons and copy-paste functionality (paste lists of multiple trackers)
   * Message log stores all messages and does real filtering
@@ -39,8 +39,8 @@
   * Fix minor memory leaks
   * GNOME HIG improvements
 ==== Daemon ====
-  * Reload settings.json when receiving SIGHUP
   * When running as a daemon, send log messages to syslog
+  * Reload settings.json when receiving SIGHUP
   * transmission-remote now allows per-torrent speed limits to be set
 ==== Web Client ====
   * Add speed limit "turtle mode" support
@@ -427,7 +427,7 @@
   * Minor display fixes
 ==== Web Client ====
   * Minor display fixes
-==== CLI ====:
+==== CLI ====
   * Fix crash when creating a torrent file
 
 === Transmission 1.33 (2008/08/30) ===
