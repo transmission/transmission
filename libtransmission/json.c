@@ -12,7 +12,7 @@
 
 #include <assert.h>
 #include <ctype.h>
-#include <errno.h>
+#include <errno.h> /* EILSEQ, EINVAL */
 #include <string.h>
 #include <stdio.h> /* printf */
 

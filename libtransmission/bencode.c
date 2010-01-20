@@ -11,7 +11,7 @@
  */
 
 #include <assert.h>
-#include <ctype.h> /* isdigit, isprint, isspace */
+#include <ctype.h> /* isdigit */
 #include <errno.h>
 #include <math.h> /* fabs */
 #include <stdio.h>

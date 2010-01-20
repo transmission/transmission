@@ -17,7 +17,7 @@
 
 #include <assert.h>
 #include <limits.h> /* INT_MAX */
-#include <math.h> /* fabs */
+#include <math.h>
 #include <stdarg.h>
 #include <string.h> /* memcmp */
 #include <stdlib.h> /* qsort */

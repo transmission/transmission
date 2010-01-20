@@ -10,7 +10,7 @@
  * $Id$
  */
 
-#include <errno.h>
+#include <errno.h> /* EINVAL */
 #include "transmission.h"
 #include "bencode.h"
 #include "magnet.h"

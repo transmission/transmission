@@ -11,7 +11,6 @@
  */
 
 #include <assert.h>
-#include <ctype.h> /* tolower() */
 #include <string.h> /* strchr() */
 
 #include "transmission.h"
