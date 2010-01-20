@@ -1004,9 +1004,9 @@ isCurlURL( const char * filename )
     if( filename == NULL )
         return FALSE;
 
-    return !memcmp( filename, "ftp://", 6 ) ||
-           !memcmp( filename, "http://", 7 ) ||
-           !memcmp( filename, "https://", 8 );
+    return !strncmp( filename, "ftp://", 6 ) ||
+           !strncmp( filename, "http://", 7 ) ||
+           !strncmp( filename, "https://", 8 );
 }
 
 static tr_file_index_t*
