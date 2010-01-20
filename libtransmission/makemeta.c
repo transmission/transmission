@@ -90,9 +90,9 @@ getFiles( const char *      dir,
 static int
 bestPieceSize( uint64_t totalSize )
 {
-    static const uint64_t GiB = 1073741824;
-    static const uint64_t MiB = 1048576;
-    static const uint64_t KiB = 1024;
+    const uint64_t GiB = 1073741824;
+    const uint64_t MiB = 1048576;
+    const uint64_t KiB = 1024;
 
     if( totalSize >=   ( 2 * GiB ) ) return 2 * MiB;
     if( totalSize >=   ( 1 * GiB ) ) return 1 * MiB;

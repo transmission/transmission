@@ -154,7 +154,7 @@ enum classes {
     NR_CLASSES
 };
 
-static int ascii_class[128] = {
+static const int ascii_class[128] = {
 /*
     This array maps the 128 ASCII characters into character classes.
     The remaining Unicode characters should be mapped to C_ETC.
@@ -243,7 +243,7 @@ enum actions
 };
 
 
-static int state_transition_table[NR_STATES][NR_CLASSES] = {
+static const int state_transition_table[NR_STATES][NR_CLASSES] = {
 /*
     The state transition table takes the current state and the current symbol,
     and returns either a new state or an action. An action is represented as a
@@ -523,7 +523,7 @@ static int parse_parse_buffer(JSON_parser jc)
 #define IS_HIGH_SURROGATE(uc) (((uc) & 0xFC00) == 0xD800)
 #define IS_LOW_SURROGATE(uc)  (((uc) & 0xFC00) == 0xDC00)
 #define DECODE_SURROGATE_PAIR(hi,lo) ((((hi) & 0x3FF) << 10) + ((lo) & 0x3FF) + 0x10000)
-static unsigned char utf8_lead_bits[4] = { 0x00, 0xC0, 0xE0, 0xF0 };
+static const unsigned char utf8_lead_bits[4] = { 0x00, 0xC0, 0xE0, 0xF0 };
 
 static int decode_unicode_char(JSON_parser jc)
 {

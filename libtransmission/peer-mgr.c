@@ -1120,22 +1120,24 @@ refillUpkeep( int foo UNUSED, short bar UNUSED, void * vmgr )
         {
             int keepCount = 0;
             int cancelCount = 0;
-            struct block_request * keep = tr_new( struct block_request, n );
             struct block_request * cancel = tr_new( struct block_request, n );
             const struct block_request * it;
             const struct block_request * end;
 
             for( it=t->requests, end=it+n; it!=end; ++it )
+            {
                 if( it->sentAt <= too_old )
                     cancel[cancelCount++] = *it;
                 else
-                    keep[keepCount++] = *it;
+                {
+                    if( it != &t->requests[keepCount] )
+                        t->requests[keepCount] = *it;
+                    keepCount++;
+                }
+            }
 
             /* prune out the ones we aren't keeping */
-            tr_free( t->requests );
-            t->requests = keep;
             t->requestCount = keepCount;
-            t->requestAlloc = n;
 
             /* send cancel messages for all the "cancel" ones */
             for( it=cancel, end=it+cancelCount; it!=end; ++it )

@@ -57,7 +57,7 @@ guessPacketOverhead( size_t d )
      *  (1500-72)/(38+1500) = 92.8479 %  IPv6, TCP timestamps
      *  (1500-72)/(42+1500) = 92.6070 %  802.1q, IPv6, ICP timestamps
      */
-    static const double assumed_payload_data_rate = 94.0;
+    const double assumed_payload_data_rate = 94.0;
 
     return (size_t)( d * ( 100.0 / assumed_payload_data_rate ) - d );
 }
