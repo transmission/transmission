@@ -2134,7 +2134,7 @@ tracker_page_new( struct DetailsImpl * di )
       g_signal_connect( w, "toggled", G_CALLBACK( onScrapeToggled ), di );
       gtk_box_pack_start( GTK_BOX( hbox ), w, FALSE, FALSE, 0 );
 
-      w = gtk_button_new_with_mnemonic( _( "_Edit URLs" ) );
+      w = gtk_button_new_with_mnemonic( _( "_Edit Trackers" ) );
       gtk_button_set_image( GTK_BUTTON( w ), gtk_image_new_from_stock( GTK_STOCK_EDIT, GTK_ICON_SIZE_BUTTON ) );
       g_signal_connect( w, "clicked", G_CALLBACK( onEditTrackers ), di );
       gtk_box_pack_end( GTK_BOX( hbox ), w, FALSE, FALSE, 0 );
