@@ -505,6 +505,8 @@ onAddURLResponse( GtkDialog * dialog, int response, gpointer user_data )
                 destroy = FALSE;
             }
         }
+
+        g_free( url );
     }
 
     if( destroy )
