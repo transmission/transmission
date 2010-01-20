@@ -1,4 +1,4 @@
-=== Transmission 1.80 (2010/MM/DD) ===
+=== Transmission 1.80 (2010/01/20) ===
 [http://trac.transmissionbt.com/query?milestone=1.80&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Add support for magnet links
@@ -47,10 +47,9 @@
   * Double-clicking a torrent opens/closes the torrent inspector
   * Add "Start When Added" checkbox when adding torrents
   * Add Select All / Deselect All buttons to the file inspector
-  * Add version information in the preferences dialog
+  * Add version information to the preferences dialog
   * Ensure the context menu goes away when clicking on torrents
   * Fix bug that obscured part of the context menu
-  * Fix the turtle drop-down in IE
 
 === Transmission 1.77 (2010/01/04) ===
 [http://trac.transmissionbt.com/query?milestone=1.77&group=component&groupdesc=1&order=severity All tickets closed by this release]
