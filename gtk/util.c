@@ -695,9 +695,6 @@ gtr_thread_func( gpointer data )
     more = idle_data->function( idle_data->data );
     gdk_threads_leave( );
 
-    if( !more )
-        gtr_func_data_free( data );
-
     return more;
 }
 #endif
