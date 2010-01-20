@@ -331,8 +331,11 @@ onTrackerResponse( void * tracker UNUSED,
             break;
 
         case TR_TRACKER_ERROR_CLEAR:
-            tor->error = TR_STAT_OK;
-            tor->errorString[0] = '\0';
+            if( tor->error != TR_STAT_LOCAL_ERROR )
+            {
+                tor->error = TR_STAT_OK;
+                tor->errorString[0] = '\0';
+            }
             break;
     }
 }
@@ -1316,7 +1319,7 @@ checkAndStartImpl( void * vtor )
         stop the torrent and log an error. */
     if( tor->preVerifyTotal && !tr_cpHaveTotal( &tor->completion ) )
     {
-        tr_torrentSetLocalError( tor, _( "Can't find local data.  Try \"Set Location\" to find it, or restart the torrent to re-download." ) );
+        tr_torrentSetLocalError( tor, _( "No data found!  Please reconnect any disconnected drives, use \"Set Location\" to find the data, or restart the torrent to re-download." ) );
         tr_torrentStop( tor );
     }
     else
