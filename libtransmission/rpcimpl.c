@@ -1004,9 +1004,9 @@ isCurlURL( const char * filename )
     if( filename == NULL )
         return FALSE;
 
-    return ( strstr( filename, "ftp://" ) != NULL )
-        || ( strstr( filename, "http://" ) != NULL )
-        || ( strstr( filename, "https://" ) != NULL );
+    return !memcmp( filename, "ftp://", 6 ) ||
+           !memcmp( filename, "http://", 7 ) ||
+           !memcmp( filename, "https://", 8 );
 }
 
 static tr_file_index_t*
@@ -1104,23 +1104,27 @@ torrentAdd( tr_session               * session,
         }
         else
         {
-            if( filename == NULL )
+            char * fname = tr_strstrip( tr_strdup( filename ) );
+
+            if( fname == NULL )
             {
                 int len;
                 char * metainfo = tr_base64_decode( metainfo_base64, -1, &len );
                 tr_ctorSetMetainfo( ctor, (uint8_t*)metainfo, len );
                 tr_free( metainfo );
             }
-            else if( !strncmp( filename, "magnet:?", 8 ) )
+            else if( !strncmp( fname, "magnet:?", 8 ) )
             {
-                tr_ctorSetMagnet( ctor, filename );
+                tr_ctorSetMagnet( ctor, fname );
             }
             else
             {
-                tr_ctorSetMetainfoFromFile( ctor, filename );
+                tr_ctorSetMetainfoFromFile( ctor, fname );
             }
 
             addTorrentImpl( idle_data, ctor );
+
+            tr_free( fname );
         }
 
     }
