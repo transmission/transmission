@@ -20,7 +20,7 @@
   * Fix bug that could unpause or repause a torrent on startup
   * When uploading, improve disk IO performance by prefetching the data in batches
   * Portability fixes for embedded systems
-  * Other small bugfixes and improvements
+  * Other small bug fixes and improvements
 ==== Mac ====
   * Redesigned trackers inspector tab with favicons and copy-paste functionality (paste lists of multiple trackers)
   * Message log stores all messages and does real filtering
@@ -242,7 +242,7 @@
   * Close potential CSRF security hole for Web Client users
   * Fix locale error in the JSON parser
 ==== Qt ====
-  * Various small bugfixes to the beta Qt client
+  * Various small bug fixes to the beta Qt client
 ==== Web Client ====
   * Fix 1.60 error when serving Web Client files on some embedded platforms
   * Add response header to allow clients to cache static files
@@ -329,7 +329,7 @@
   * Better handling of non-UTF-8 torrent files 
   * When removing local data, only remove data from the torrent
   * Close potential DoS vulnerability in 1.41
-  * Many other bugfixes
+  * Many other bug fixes
 ==== GTK+ ====
   * Various usability improvements 
   * Better Gnome HIG compliance in the statusbar, properties dialog, and more
@@ -365,12 +365,12 @@
   * Fix autoconf/automake build warnings
 ==== GTK+ ====
   * In the Details dialog's peer tabs, rows were sometimes duplicated
-  * Minor bugfixes, usability changes, and locale improvements
+  * Minor bug fixes, usability changes, and locale improvements
   * Three new translations: Afrikaans, Asturian, Bosnian
   * Sixteen updated translations
 ==== Daemon ====
   * Fix 1.40 bug in handling IP whitelist
-  * Minor bugfixes and output cleanup
+  * Minor bug fixes and output cleanup
   * Windows portability
 ==== CLI ====
   * Fix minor free-memory-read bug
@@ -412,7 +412,7 @@
 [http://trac.transmissionbt.com/query?milestone=1.34&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Don't reconnect too frequently to the same peer
-  * Webseed bugfix
+  * Webseed bug fix
   * Fix bug that caused some transfers to not be scraped
   * Fix BSD build issues
   * Handle OpenTracker's `downloaded' key in announce responses
@@ -523,7 +523,7 @@
   * Better support of multitracker torrents
   * Faster UPnP port mapping on startup
   * Ability to reset global statistics
-  * Various bugfixes
+  * Various bug fixes
 ==== Mac ====
   * Display of decimal numbers matches system international settings
   * Updated Dock badge images
@@ -548,7 +548,7 @@
   * Stop torrents when downloading and the disk becomes full
   * Removing a torrent also removes it from the cache
   * Smaller memory footprint per-torrent and per-peer
-  * Various backend bugfixes & improvements
+  * Various backend bug fixes & improvements
 ==== Mac ====
   * Window when adding torrents to select files and other settings
   * Leopard: Collapsable group dividers
@@ -572,7 +572,7 @@
 
 === Transmission 1.06 (2008/02/26) ===
 ==== All Platforms ====
-  * Improvements and bugfixes to "Verify Local Data"
+  * Improvements and bug fixes to "Verify Local Data"
   * Use less CPU
   * Fix support for multitracker torrents
   * Updated UPnP code to miniupnpc-1.0
@@ -790,7 +790,7 @@
   * Fix to UPnP
   * Rechecking torrents is now done one-at-a-time to avoid heavy disk load
   * Better rechecking of torrents that have many files
-  * Many miscellaneous improvements and bugfixes
+  * Many miscellaneous improvements and bug fixes
   * Partial licensing change -- see the LICENSE file for details
 ==== Mac ====
   * Overlay when dragging torrent files, URLs, and data files onto window
@@ -828,7 +828,7 @@
   * Fixes bug where absurdly huge upload/download totals could be sent
   * Automatic tracker scraping
   * Cache connected peers
-  * Many miscellaneous bugfixes and small improvements
+  * Many miscellaneous bug fixes and small improvements
 ==== Mac ====
   * Requires 10.4 Tiger or newer
   * Download and seeding queues that can be user-ordered
@@ -866,7 +866,7 @@
   * Ability to limit download rate
   * Automatic banning of peers who send bad data
   * Can keep a copy of the torrent file so the original can be deleted
-  * Many bugfixes
+  * Many bug fixes
 ==== Mac ====
   * Reworked interface
   * Rate limits can be changed directly from the main window
@@ -925,11 +925,11 @@
   * Cleaner icon
   * Show all sizes in human readable form
   * Keep downloading in the background when the window is closed
-  * Miscellaneous bugfixes and internal enhancements
+  * Miscellaneous bug fixes and internal enhancements
 
 === Transmission 0.2 (2005/09/22) ===
 ==== All Platforms ====
-  * Bugfixes
+  * bug fixes
 ==== Mac ====
   * Users can now choose where the downloads are sent
 
