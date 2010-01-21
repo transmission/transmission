@@ -2413,7 +2413,7 @@
 					"third-party/curl/include",
 					"third-party/openssl/include",
 				);
-				IBC_FLATTEN_NIBS = NO;
+				IBC_FLATTEN_NIBS = YES;
 				IBC_NOTICES = NO;
 				IBC_WARNINGS = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/macosx/Info.plist";
@@ -2573,6 +2573,7 @@
 					"third-party/curl/include",
 					"third-party/openssl/include",
 				);
+				IBC_FLATTEN_NIBS = YES;
 				IBC_NOTICES = NO;
 				IBC_WARNINGS = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/macosx/Info.plist";
@@ -2674,6 +2675,7 @@
 					"third-party/curl/include",
 					"third-party/openssl/include",
 				);
+				IBC_FLATTEN_NIBS = YES;
 				IBC_NOTICES = NO;
 				IBC_WARNINGS = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/macosx/Info.plist";
