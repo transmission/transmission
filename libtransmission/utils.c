@@ -897,8 +897,8 @@ tr_hex_to_sha1( uint8_t * out, const char * in )
 
     for( i=0; i<20; ++i )
     {
-        const int hi = strchr( hex, *in++ ) - hex;
-        const int lo = strchr( hex, *in++ ) - hex;
+        const int hi = strchr( hex, tolower( *in++ ) ) - hex;
+        const int lo = strchr( hex, tolower( *in++ ) ) - hex;
         *out++ = (uint8_t)( (hi<<4) | lo );
     }
 }
