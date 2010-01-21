@@ -86,7 +86,7 @@ TransmissionRemote.prototype =
 		if( typeof async != 'boolean' )
 		  async = true;
 
-		$.ajax( {
+		var ajaxSettings = {
 			url: RPC._Root,
 			type: 'POST',
 			contentType: 'json',
@@ -94,10 +94,12 @@ TransmissionRemote.prototype =
 			cache: false,
 			data: $.toJSON(data),
 			beforeSend: function(XHR){ remote.appendSessionId(XHR) },
-			error: function(request, error_string, exception){ remote.ajaxError(request, error_string, exception, this) },
+			error: function(request, error_string, exception){ remote.ajaxError(request, error_string, exception, ajaxSettings) },
 			success: success,
 			async: async
-		} );
+		};
+
+		$.ajax( ajaxSettings );
 	},
 
 	loadDaemonPrefs: function( callback, async ) {
