@@ -108,6 +108,7 @@ ThreadFunc( void * _t )
 
     t->func( t->arg );
 
+    tr_free( t );
 #ifdef WIN32
     _endthreadex( 0 );
     return 0;
