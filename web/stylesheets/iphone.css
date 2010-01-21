@@ -788,6 +788,26 @@ iframe#torrent_upload_frame {
 	margin: 0;
 }
 
+div.torrent_footer div#turtle_button {
+	height: 18px;
+	width: 32px !important;
+	margin: 1px 0 0 3px;
+	padding: 0;
+}
+
+.turtleEnabled {
+	background: transparent url('../images/graphics/chrome.png') left -121px no-repeat;
+}
+.turtleEnabled:active {
+	background: transparent url('../images/graphics/chrome.png') -32px -121px no-repeat;
+}
+.turtleDisabled {
+	background: transparent url('../images/graphics/chrome.png') left -99px no-repeat;
+}
+.turtleDisabled:active {
+	background: transparent url('../images/graphics/chrome.png') -32px -99px no-repeat;
+}
+
 /*--------------------------------------
  *
  * Hide remnants of stuff we don't need, like
