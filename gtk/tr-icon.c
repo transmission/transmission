@@ -111,8 +111,8 @@ tr_icon_refresh( gpointer vicon )
 gpointer
 tr_icon_new( TrCore * core )
 {
-    GtkStatusIcon * icon = gtk_status_icon_new_from_icon_name(
-        "transmission" );
+    const char * icon_name = TRAY_ICON;
+    GtkStatusIcon * icon = gtk_status_icon_new_from_icon_name( icon_name );
 
     g_signal_connect( icon, "activate", G_CALLBACK( activated ), NULL );
     g_signal_connect( icon, "popup-menu", G_CALLBACK( popup ), NULL );

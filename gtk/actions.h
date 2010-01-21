@@ -16,6 +16,11 @@
 #include <gtk/gtk.h>
 #include "tr-core.h"
 
+#define WINDOW_ICON        "transmission-main-window-icon"
+#define TRAY_ICON          "transmission-tray-icon"
+#define NOTIFICATION_ICON  "transmission-notification-icon"
+
+
 void       actions_init( GtkUIManager * ui_manager,
                          gpointer       callback_user_data );
 

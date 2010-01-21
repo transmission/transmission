@@ -144,7 +144,9 @@ BuiltinIconInfo;
 
 static const BuiltinIconInfo my_fallback_icons[] =
 {
-    { tr_icon_logo, "transmission"      },
+    { tr_icon_logo, WINDOW_ICON         },
+    { tr_icon_logo, TRAY_ICON           },
+    { tr_icon_logo, NOTIFICATION_ICON   },
     { tr_icon_lock, "transmission-lock" },
     { options_icon, "options"           },
     { blue_turtle,  "alt-speed-on"      },

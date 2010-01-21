@@ -21,6 +21,7 @@
 #endif
 
 #include <glib/gi18n.h>
+#include "actions.h" /* NOTIFICATION_ICON */
 #include "conf.h"
 #include "notify.h"
 #include "tr-prefs.h"
@@ -89,6 +90,24 @@ can_support_actions( void )
     return supported;
 }
 
+static void
+addIcon( NotifyNotification * notify )
+{
+    int size = 32;
+    GtkIconTheme * theme;
+    GdkPixbuf * icon;
+
+    gtk_icon_size_lookup( GTK_ICON_SIZE_DIALOG, &size, &size );
+    theme = gtk_icon_theme_get_default( );
+    icon = gtk_icon_theme_load_icon( theme, NOTIFICATION_ICON, size, 0, NULL );
+
+    if( icon != NULL )
+    {
+        notify_notification_set_icon_from_pixbuf( notify, icon );
+        g_object_unref( icon );
+    }
+}
+
 void
 tr_notify_send( TrTorrent *tor )
 {
@@ -111,7 +130,8 @@ tr_notify_send( TrTorrent *tor )
 
         n = notify_notification_new( _( "Torrent Complete" ),
                                      info->name,
-                                     "transmission", NULL );
+                                     NULL, NULL );
+        addIcon( n );
 
         if( can_support_actions( ) )
         {
@@ -136,7 +156,8 @@ tr_notify_added( const char * name )
     if( pref_flag_get( PREF_KEY_SHOW_DESKTOP_NOTIFICATION ) )
     {
         NotifyNotification * n = notify_notification_new(
-            _( "Torrent Added" ), name, "transmission", NULL );
+            _( "Torrent Added" ), name, NULL, NULL );
+        addIcon( n );
         notify_notification_set_timeout( n, NOTIFY_EXPIRES_DEFAULT );
         notify_notification_show( n, NULL );
     }
