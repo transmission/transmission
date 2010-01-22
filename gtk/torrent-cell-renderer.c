@@ -107,7 +107,8 @@ getProgressString( const tr_torrent * tor,
     }
 
     /* add time when downloading */
-    if( hasSeedRatio || ( torStat->activity == TR_STATUS_DOWNLOAD ) )
+    if( ( torStat->activity == TR_STATUS_DOWNLOAD )
+        || ( hasSeedRatio && ( torStat->activity == TR_STATUS_SEED ) ) )
     {
         const int eta = torStat->eta;
         GString * gstr = g_string_new( str );
