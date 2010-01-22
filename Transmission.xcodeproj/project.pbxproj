@@ -199,6 +199,8 @@
 		A2AAB65E0DE0CF6200E04DDA /* rpc-server.h in Headers */ = {isa = PBXBuildFile; fileRef = A2AAB65A0DE0CF6200E04DDA /* rpc-server.h */; };
 		A2AAB65F0DE0CF6200E04DDA /* rpcimpl.c in Sources */ = {isa = PBXBuildFile; fileRef = A2AAB65B0DE0CF6200E04DDA /* rpcimpl.c */; };
 		A2AAB6650DE0D08B00E04DDA /* blocklist.h in Headers */ = {isa = PBXBuildFile; fileRef = A2D307930D9EC4860051FD27 /* blocklist.h */; };
+		A2ABA6DB11094917009C40BA /* evdns.c in Sources */ = {isa = PBXBuildFile; fileRef = A2ABA6D911094917009C40BA /* evdns.c */; };
+		A2ABA6DC11094917009C40BA /* evdns.h in Headers */ = {isa = PBXBuildFile; fileRef = A2ABA6DA11094917009C40BA /* evdns.h */; };
 		A2AF1C390A3D0F6200F1575D /* FileOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2AF1C370A3D0F6200F1575D /* FileOutlineView.m */; };
 		A2B3FB460E5901E700FF78FB /* cli.c in Sources */ = {isa = PBXBuildFile; fileRef = A2B3FB450E5901E700FF78FB /* cli.c */; };
 		A2B3FB4C0E59023000FF78FB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
@@ -682,6 +684,8 @@
 		A2AAB6590DE0CF6200E04DDA /* rpcimpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rpcimpl.h; path = libtransmission/rpcimpl.h; sourceTree = "<group>"; };
 		A2AAB65A0DE0CF6200E04DDA /* rpc-server.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "rpc-server.h"; path = "libtransmission/rpc-server.h"; sourceTree = "<group>"; };
 		A2AAB65B0DE0CF6200E04DDA /* rpcimpl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rpcimpl.c; path = libtransmission/rpcimpl.c; sourceTree = "<group>"; };
+		A2ABA6D911094917009C40BA /* evdns.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = evdns.c; path = "third-party/libevent/evdns.c"; sourceTree = "<group>"; };
+		A2ABA6DA11094917009C40BA /* evdns.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = evdns.h; path = "third-party/libevent/evdns.h"; sourceTree = "<group>"; };
 		A2AC81D60D987E2D00A2878C /* nl */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nl; path = macosx/nl.lproj/AddWindow.xib; sourceTree = "<group>"; };
 		A2AF1C360A3D0F6200F1575D /* FileOutlineView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FileOutlineView.h; path = macosx/FileOutlineView.h; sourceTree = "<group>"; };
 		A2AF1C370A3D0F6200F1575D /* FileOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FileOutlineView.m; path = macosx/FileOutlineView.m; sourceTree = "<group>"; };
@@ -1343,6 +1347,7 @@
 				A2BC19DF0CA9D82300DD302A /* evutil.h */,
 				BE75C3810C72A1C100DBEFE0 /* evhttp.h */,
 				BE75C3840C72A1C100DBEFE0 /* event.h */,
+				A2ABA6DA11094917009C40BA /* evdns.h */,
 				4D36BBC80CA309AA00A63CA5 /* evutil.c */,
 				BE75C3580C72A0EF00DBEFE0 /* kqueue.c */,
 				BE75C3590C72A0EF00DBEFE0 /* signal.c */,
@@ -1353,6 +1358,7 @@
 				BE75C3630C72A0EF00DBEFE0 /* poll.c */,
 				BE75C3640C72A0EF00DBEFE0 /* select.c */,
 				4DB74EF10E8CD6FA00AEB1A8 /* http.c */,
+				A2ABA6D911094917009C40BA /* evdns.c */,
 			);
 			name = libevent;
 			sourceTree = "<group>";
@@ -1527,6 +1533,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A2ABA6DC11094917009C40BA /* evdns.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2062,6 +2069,7 @@
 				BE75C3710C72A0EF00DBEFE0 /* select.c in Sources */,
 				4D36BBC90CA309AA00A63CA5 /* evutil.c in Sources */,
 				4DB74EF20E8CD6FA00AEB1A8 /* http.c in Sources */,
+				A2ABA6DB11094917009C40BA /* evdns.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
