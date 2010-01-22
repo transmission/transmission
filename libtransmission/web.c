@@ -84,6 +84,7 @@ web_free( tr_web * g )
 struct tr_web_task
 {
     unsigned long tag;
+    struct curl_slist * slist;
     struct evbuffer * response;
     char * url;
     char * host;
@@ -100,6 +101,8 @@ struct tr_web_task
 static void
 task_free( struct tr_web_task * task )
 {
+    if( task->slist != NULL )
+        curl_slist_free_all( task->slist );
     evtimer_del( &task->timer_event );
     evbuffer_free( task->response );
     tr_free( task->host );
@@ -258,6 +261,7 @@ addTask( void * vtask )
          * so that curl's DNS won't block */
         if( task->resolved_host != NULL )
         {
+            char * host;
             struct evbuffer * buf = evbuffer_new( );
             char * pch = strstr( task->url, task->host );
             char * tail = pch + strlen( task->host );
@@ -267,6 +271,11 @@ addTask( void * vtask )
             url = tr_strndup( EVBUFFER_DATA( buf ), EVBUFFER_LENGTH( buf ) );
             dbgmsg( "old url: \"%s\" -- new url: \"%s\"", task->url, url );
             evbuffer_free( buf );
+
+            host = tr_strdup_printf( "Host: %s", task->host );
+            task->slist = curl_slist_append( NULL, host );
+            curl_easy_setopt( e, CURLOPT_HTTPHEADER, task->slist );
+            tr_free( host );
         }
 
         dbgmsg( "adding task #%lu [%s]", task->tag, url ? url : task->url );
