@@ -69,6 +69,7 @@ static void dns_cache_item_free( struct dns_cache_item * );
 static void
 web_free( tr_web * g )
 {
+    evdns_shutdown( TRUE );
     curl_multi_cleanup( g->multi );
     evtimer_del( &g->timer_event );
     tr_list_free( &g->dns_cache, (TrListForeachFunc)dns_cache_item_free );
@@ -586,6 +587,9 @@ tr_webInit( tr_session * session )
     evtimer_set( &web->timer_event, libevent_timer_cb, web );
 
     web->multi = curl_multi_init( );
+
+    evdns_init( );
+
     curl_multi_setopt( web->multi, CURLMOPT_SOCKETDATA, web );
     curl_multi_setopt( web->multi, CURLMOPT_SOCKETFUNCTION, sock_cb );
     curl_multi_setopt( web->multi, CURLMOPT_TIMERDATA, web );
