@@ -18,6 +18,9 @@
 
 #include <signal.h>
 
+#include <event.h>
+#include <evdns.h>
+
 #include "transmission.h"
 #include "net.h"
 #include "session.h"
@@ -217,6 +220,8 @@ libeventThreadFunc( void * veh )
 
     eh->base = event_init( );
     eh->session->events = eh;
+    evdns_init( );
+
 
     /* listen to the pipe's read fd */
     event_set( &eh->pipeEvent, eh->fds[0], EV_READ | EV_PERSIST, readFromPipe, veh );

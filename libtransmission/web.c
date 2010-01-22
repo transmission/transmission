@@ -14,8 +14,10 @@
 
 #include <curl/curl.h>
 #include <event.h>
+#include <evdns.h>
 
 #include "transmission.h"
+#include "list.h"
 #include "net.h"
 #include "session.h"
 #include "trevent.h"
@@ -57,14 +59,19 @@ struct tr_web
     CURLM * multi;
     tr_session * session;
     tr_address addr;
+    tr_list * dns_cache;
     struct event timer_event;
 };
+
+struct dns_cache_item;
+static void dns_cache_item_free( struct dns_cache_item * );
 
 static void
 web_free( tr_web * g )
 {
     curl_multi_cleanup( g->multi );
     evtimer_del( &g->timer_event );
+    tr_list_free( &g->dns_cache, (TrListForeachFunc)dns_cache_item_free );
     memset( g, TR_MEMORY_TRASH, sizeof( struct tr_web ) );
     tr_free( g );
 }
@@ -78,6 +85,8 @@ struct tr_web_task
     unsigned long tag;
     struct evbuffer * response;
     char * url;
+    char * host;
+    const char * resolved_host;
     char * range;
     tr_session * session;
     tr_web_done_func * done_func;
@@ -92,10 +101,87 @@ task_free( struct tr_web_task * task )
 {
     evtimer_del( &task->timer_event );
     evbuffer_free( task->response );
+    tr_free( task->host );
     tr_free( task->range );
     tr_free( task->url );
     memset( task, TR_MEMORY_TRASH, sizeof( struct tr_web_task ) );
     tr_free( task );
+}
+
+/***
+****
+***/
+
+struct dns_cache_item
+{
+    char * host;
+    char * resolved_host;
+    time_t expiration;
+};
+
+static void
+dns_cache_item_free( struct dns_cache_item * item )
+{
+    tr_free( item->host );
+    tr_free( item->resolved_host );
+    tr_free( item );
+}
+
+static const char *
+dns_get_cached_host( struct tr_web_task * task, const char * host )
+{
+    tr_list * l;
+    tr_web * g = task->session->web;
+    struct dns_cache_item * item = NULL;
+
+    if( g != NULL )
+    {
+        /* do we have it cached? */
+        for( l=g->dns_cache; l!=NULL; l=l->next ) {
+            struct dns_cache_item * tmp = l->data;
+            if( !strcmp( host, tmp->host ) ) {
+                item = tmp;
+                break;
+            }
+        }
+
+        /* has the ttl expired? */
+        if( ( item != NULL ) && ( item->expiration <= tr_time( ) ) ) {
+            tr_list_remove_data( &g->dns_cache, item );
+            dns_cache_item_free( item );
+            item = NULL;
+        }
+    }
+
+    if( item != NULL )
+        dbgmsg( "found cached dns entry for \"%s\": %s", host, item->resolved_host );
+
+    return item ? item->resolved_host : NULL;
+}
+
+static const char*
+dns_set_cached_host( struct tr_web_task * task, const char * host, const char * resolved, int ttl )
+{
+    char * ret = NULL;
+    tr_web * g;
+
+    assert( task != NULL );
+    assert( host != NULL );
+    assert( resolved != NULL );
+    assert( ttl >= 0 );
+
+    g = task->session->web;
+    if( g != NULL )
+    {
+        struct dns_cache_item * item = tr_new( struct dns_cache_item, 1 );
+        item->host = tr_strdup( host );
+        item->resolved_host = tr_strdup( resolved );
+        item->expiration = tr_time( ) + ttl;
+        tr_list_append( &g->dns_cache, item );
+        ret = item->resolved_host;
+        dbgmsg( "adding dns cache entry for \"%s\": %s", host, resolved );
+    }
+    return ret;
 }
 
 /***
@@ -163,8 +249,26 @@ addTask( void * vtask )
         const int timeout = getTimeoutFromURL( task->url );
         const long verbose = getenv( "TR_CURL_VERBOSE" ) != NULL;
         const char * user_agent = TR_NAME "/" LONG_VERSION_STRING;
+        char * url = NULL;
 
-        dbgmsg( "adding task #%lu [%s]", task->tag, task->url );
+        /* If we've got a resolved host, insert it into the URL: replace
+         * "http://www.craptrackular.org/announce?key=val&key2=..." with
+         * "http://127.0.0.1/announce?key=val&key2=..."
+         * so that curl's DNS won't block */
+        if( task->resolved_host != NULL )
+        {
+            struct evbuffer * buf = evbuffer_new( );
+            char * pch = strstr( task->url, task->host );
+            char * tail = pch + strlen( task->host );
+            evbuffer_add( buf, task->url, pch - task->url );
+            evbuffer_add_printf( buf, "%s", task->resolved_host );
+            evbuffer_add_printf( buf, "%s", tail );
+            url = tr_strndup( EVBUFFER_DATA( buf ), EVBUFFER_LENGTH( buf ) );
+            dbgmsg( "old url: \"%s\" -- new url: \"%s\"", task->url, url );
+            evbuffer_free( buf );
+        }
+
+        dbgmsg( "adding task #%lu [%s]", task->tag, url ? url : task->url );
 
         if( !task->range && session->isProxyEnabled ) {
             curl_easy_setopt( e, CURLOPT_PROXY, session->proxy );
@@ -202,7 +306,7 @@ addTask( void * vtask )
         curl_easy_setopt( e, CURLOPT_PRIVATE, task );
         curl_easy_setopt( e, CURLOPT_SSL_VERIFYHOST, 0L );
         curl_easy_setopt( e, CURLOPT_SSL_VERIFYPEER, 0L );
-        curl_easy_setopt( e, CURLOPT_URL, task->url );
+        curl_easy_setopt( e, CURLOPT_URL, url ? url : task->url );
         curl_easy_setopt( e, CURLOPT_USERAGENT, user_agent );
         curl_easy_setopt( e, CURLOPT_VERBOSE, verbose );
         if( web->haveAddr )
@@ -212,7 +316,67 @@ addTask( void * vtask )
 
         if( curl_multi_add_handle( web->multi, e ) == CURLM_OK )
             ++web->taskCount;
+
+        tr_free( url );
     }
+}
+
+static void
+dns_ipv6_done_cb( int err, char type, int count, int ttl, void * addresses, void * vtask )
+{
+    struct tr_web_task * task = vtask;
+
+    if( !err && ( task->host != NULL ) && ( count > 0 ) && ( ttl >= 0 ) && ( type == DNS_IPv6_AAAA ) )
+    {
+        int i;
+        char buf[INET6_ADDRSTRLEN+1];
+        struct in6_addr *in6_addrs = addresses;
+
+        for( i=0; i<count; ++i ) {
+            const char * b = inet_ntop(AF_INET6, &in6_addrs[i], buf,sizeof(buf));
+            if( b != NULL ) {
+                /* FIXME: is there a better way to tell which one to use if count > 1? */
+                task->resolved_host = dns_set_cached_host( task, task->host, b, ttl );
+                break;
+            }
+        }
+    }
+
+    addTask( task );
+}
+
+static void
+dns_ipv4_done_cb( int err, char type, int count, int ttl, void * addresses, void * vtask )
+{
+    struct tr_web_task * task = vtask;
+
+    if( !err && ( task->host != NULL ) && ( count > 0 ) && ( ttl >= 0 ) && ( type == DNS_IPv4_A ) )
+    {
+        struct in_addr * in_addrs = addresses;
+        const char * resolved = inet_ntoa( in_addrs[0] );
+        task->resolved_host = dns_set_cached_host( task, task->host, resolved, ttl );
+        /* FIXME: if count > 1, is there a way to decide which is best to use? */
+    }
+
+    if( task->resolved_host || evdns_resolve_ipv6( task->host, 0, dns_ipv6_done_cb, task ) )
+        dns_ipv6_done_cb( DNS_ERR_UNKNOWN, DNS_IPv6_AAAA, 0, 0, NULL, task );
+}
+
+static void
+doDNS( void * vtask )
+{
+    char * host = NULL;
+    struct tr_web_task * task = vtask;
+
+    assert( task->resolved_host == NULL );
+
+    if( !tr_httpParseURL( task->url, -1, &host, NULL, NULL ) ) {
+        task->host = host;
+        task->resolved_host = dns_get_cached_host( task, host );
+    }
+
+    if( task->resolved_host || evdns_resolve_ipv4( host, 0, dns_ipv4_done_cb, task ) )
+        dns_ipv4_done_cb( DNS_ERR_UNKNOWN, DNS_IPv4_A, 0, 0, NULL, task );
 }
 
 /***
@@ -395,7 +559,7 @@ tr_webRun( tr_session         * session,
         task->done_func_user_data = done_func_user_data;
         task->tag = ++tag;
         task->response = evbuffer_new( );
-        tr_runInEventThread( session, addTask, task );
+        tr_runInEventThread( session, doDNS, task );
     }
 }
 
