@@ -3902,7 +3902,15 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     //enable reset cache item
     if (action == @selector(verifySelectedTorrents:))
-        return canUseTable && [fTableView numberOfSelectedRows] > 0;
+    {
+        if (!canUseTable)
+            return NO;
+            
+        for (Torrent * torrent in [fTableView selectedTorrents])
+            if (![torrent isMagnet])
+                return YES;
+        return NO;
+    }
     
     //enable move torrent file item
     if (action == @selector(moveDataFilesSelected:))
