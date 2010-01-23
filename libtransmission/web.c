@@ -83,6 +83,7 @@ web_free( tr_web * g )
 
 struct tr_web_task
 {
+    int port;
     unsigned long tag;
     struct curl_slist * slist;
     struct evbuffer * response;
@@ -272,7 +273,7 @@ addTask( void * vtask )
             dbgmsg( "old url: \"%s\" -- new url: \"%s\"", task->url, url );
             evbuffer_free( buf );
 
-            host = tr_strdup_printf( "Host: %s", task->host );
+            host = tr_strdup_printf( "Host: %s:%d", task->host, task->port );
             task->slist = curl_slist_append( NULL, host );
             curl_easy_setopt( e, CURLOPT_HTTPHEADER, task->slist );
             tr_free( host );
@@ -375,12 +376,14 @@ dns_ipv4_done_cb( int err, char type, int count, int ttl, void * addresses, void
 static void
 doDNS( void * vtask )
 {
+    int port = -1;
     char * host = NULL;
     struct tr_web_task * task = vtask;
 
     assert( task->resolved_host == NULL );
 
-    if( !tr_httpParseURL( task->url, -1, &host, NULL, NULL ) ) {
+    if( !tr_httpParseURL( task->url, -1, &host, &port, NULL ) ) {
+        task->port = port;
         task->host = host;
         task->resolved_host = dns_get_cached_host( task, host );
     }
