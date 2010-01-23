@@ -1262,17 +1262,11 @@ int trashDataFile(const char * filename)
 
 - (NSArray *) fileList
 {
-    if (!fFileList && ![self isMagnet])
-        [self createFileList];
-    
     return fFileList;
 }
 
 - (NSArray *) flatFileList
 {
-    if (!fFlatFileList && ![self isMagnet])
-        [self createFileList];
-    
     return fFlatFileList;
 }
 
@@ -1597,6 +1591,10 @@ int trashDataFile(const char * filename)
     
     fWaitToStart = waitToStart && [waitToStart boolValue];
     fResumeOnWake = NO;
+    
+    //don't do after this point - it messes with auto-group functionality
+    if (![self isMagnet])
+        [self createFileList];
 	
     fGroupValue = groupValue ? [groupValue intValue] : [[GroupsController groups] groupIndexForTorrent: self]; 
     
@@ -1745,6 +1743,8 @@ int trashDataFile(const char * filename)
 - (void) metadataRetrieved
 {
     fStat = tr_torrentStat(fHandle);
+    
+    [self createFileList];
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"ResetInspector" object: self];
 }
