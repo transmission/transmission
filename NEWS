@@ -1,3 +1,9 @@
+=== Transmission 1.81 (2010/01/22) ===
+[http://trac.transmissionbt.com/query?milestone=1.81&group=component&groupdesc=1&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Fix 1.80 bug that misparsed some magnet links
+  * Fix 1.80 bug that caused startup to be very sluggish for some people
+
 === Transmission 1.80 (2010/01/20) ===
 [http://trac.transmissionbt.com/query?milestone=1.80&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== All Platforms ====
