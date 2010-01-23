@@ -345,14 +345,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         tr_sessionSetRPCCallback(fLib, rpcCallback, self);
         
-        //register for dock icon drags
-        [[NSAppleEventManager sharedAppleEventManager] setEventHandler: self andSelector: @selector(handleOpenContentsEvent:replyEvent:)
-            forEventClass: kCoreEventClass andEventID: kAEOpenContents];
-        
-        //register for magnet URLs
-        [[NSAppleEventManager sharedAppleEventManager] setEventHandler: self andSelector: @selector(handleOpenContentsEvent:replyEvent:)
-        forEventClass: kInternetEventClass andEventID: kAEGetURL];
-        
         [GrowlApplicationBridge setGrowlDelegate: self];
         
         [[UKKQueue sharedFileWatcher] setDelegate: self];
@@ -577,6 +569,14 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 - (void) applicationDidFinishLaunching: (NSNotification *) notification
 {
     [NSApp setServicesProvider: self];
+    
+    //register for dock icon drags (has to be in applicationDidFinishLaunching: to work)
+    [[NSAppleEventManager sharedAppleEventManager] setEventHandler: self andSelector: @selector(handleOpenContentsEvent:replyEvent:)
+        forEventClass: kCoreEventClass andEventID: kAEOpenContents];
+    
+    //register for magnet URLs
+    [[NSAppleEventManager sharedAppleEventManager] setEventHandler: self andSelector: @selector(handleOpenContentsEvent:replyEvent:)
+        forEventClass: kInternetEventClass andEventID: kAEGetURL];
     
     //auto importing
     [self checkAutoImportDirectory];
