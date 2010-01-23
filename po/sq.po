@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-01-20 15:27-0600\n"
-"PO-Revision-Date: 2010-01-13 04:25+0000\n"
+"PO-Revision-Date: 2010-01-22 04:04+0000\n"
 "Last-Translator: Vilson Gjeci <vilsongjeci@gmail.com>\n"
 "Language-Team: Albanian <sq@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2010-01-21 00:20+0000\n"
+"X-Launchpad-Export-Date: 2010-01-23 00:12+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:54
@@ -56,7 +56,7 @@ msgstr "Rendit sipas Si_ze"
 
 #: ../gtk/actions.c:79
 msgid "_Show Transmission"
-msgstr ""
+msgstr "_Shfaq Transmission"
 
 #: ../gtk/actions.c:80
 msgid "Message _Log"
@@ -64,7 +64,7 @@ msgstr "Mesazhe _Log"
 
 #: ../gtk/actions.c:95
 msgid "Enable Temporary Speed _Limits"
-msgstr ""
+msgstr "Aktivizo kufizim të _përkohshëm të shpejtësisë"
 
 #: ../gtk/actions.c:96
 msgid "_Minimal View"
@@ -690,7 +690,7 @@ msgstr "Gjurmuesit"
 
 #: ../gtk/details.c:2137
 msgid "_Edit Trackers"
-msgstr ""
+msgstr "_Modifiko Gjurmuesit"
 
 #: ../gtk/details.c:2145
 msgid "Show _backup trackers"
@@ -1726,7 +1726,7 @@ msgstr "_Në Pauzë"
 
 #: ../gtk/tr-window.c:1062
 msgid "999.9 KB/s"
-msgstr ""
+msgstr "999.9 KB/s"
 
 #: ../gtk/tr-window.c:1107
 #, c-format
@@ -1982,6 +1982,8 @@ msgid ""
 "No data found!  Reconnect any disconnected drives, use \"Set Location\", or "
 "restart the torrent to re-download."
 msgstr ""
+"Nuk u gjetën të dhëna! Rilidhni çdo draiv të shkëputur, përdorni \"Vendos "
+"Vendndodhjen\", ose riniseni torrentin për ta shkarkuar përsëri."
 
 #: ../libtransmission/torrent.c:1399
 msgid ""

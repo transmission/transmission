@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-01-20 15:27-0600\n"
-"PO-Revision-Date: 2009-12-30 09:06+0000\n"
+"PO-Revision-Date: 2010-01-22 20:07+0000\n"
 "Last-Translator: Kristjan <Unknown>\n"
 "Language-Team: Esperanto <eo@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2010-01-21 00:21+0000\n"
+"X-Launchpad-Export-Date: 2010-01-23 00:12+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:54
@@ -116,11 +116,11 @@ msgstr ""
 
 #: ../gtk/actions.c:112
 msgid "Add _URL..."
-msgstr ""
+msgstr "Aldoni _URL-on..."
 
 #: ../gtk/actions.c:112
 msgid "Add URL..."
-msgstr ""
+msgstr "Aldoni URL-on..."
 
 #: ../gtk/actions.c:113 ../gtk/actions.c:114
 msgid "Add a torrent"
@@ -128,7 +128,7 @@ msgstr "Aldoni torenton"
 
 #: ../gtk/actions.c:114
 msgid "_Add File..."
-msgstr ""
+msgstr "_Aldoni dosieron..."
 
 #: ../gtk/actions.c:115
 msgid "_Start"
@@ -144,7 +144,7 @@ msgstr "_Statistiko"
 
 #: ../gtk/actions.c:117
 msgid "_Donate"
-msgstr ""
+msgstr "_Donaci"
 
 #: ../gtk/actions.c:118 ../gtk/add-dialog.c:362
 msgid "_Verify Local Data"

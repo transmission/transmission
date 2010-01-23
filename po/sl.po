@@ -6,17 +6,17 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: transmission\n"
-"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-01-20 15:27-0600\n"
-"PO-Revision-Date: 2010-01-20 10:06+0000\n"
-"Last-Translator: Andrej Znidarsic <Unknown>\n"
+"PO-Revision-Date: 2010-01-22 08:18+0000\n"
+"Last-Translator: Matej Urbančič <Unknown>\n"
 "Language-Team: Slovenian <sl@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 || "
 "n%100==4 ? 3 : 0);\n"
-"X-Launchpad-Export-Date: 2010-01-21 00:20+0000\n"
+"X-Launchpad-Export-Date: 2010-01-23 00:12+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Country: SLOVENIA\n"
 "X-Poedit-Language: Slovenian\n"
@@ -60,7 +60,7 @@ msgstr "Razvrsti po _velikosti"
 
 #: ../gtk/actions.c:79
 msgid "_Show Transmission"
-msgstr ""
+msgstr "_Pokaži program"
 
 #: ../gtk/actions.c:80
 msgid "Message _Log"
@@ -68,7 +68,7 @@ msgstr "Dnevnik sporočil"
 
 #: ../gtk/actions.c:95
 msgid "Enable Temporary Speed _Limits"
-msgstr ""
+msgstr "Omogoči začasne _omejitve hitrosti"
 
 #: ../gtk/actions.c:96
 msgid "_Minimal View"
@@ -272,12 +272,12 @@ msgstr "Pokaži okno _možnosti"
 
 #: ../gtk/add-dialog.c:499 ../gtk/tr-core.c:1071
 msgid "Unrecognized URL"
-msgstr "Neprepoznan URL"
+msgstr "Neznan zapis naslova URL"
 
 #: ../gtk/add-dialog.c:501 ../gtk/tr-core.c:1073
 #, c-format
 msgid "Transmission doesn't know how to use \"%s\""
-msgstr "Program ne prepozna predmeta \"%s\""
+msgstr "Ni mogoče prepoznati predmeta \"%s\""
 
 #: ../gtk/add-dialog.c:524
 msgid "Add URL"
@@ -372,7 +372,7 @@ msgstr "_Največje število soležnikov:"
 
 #: ../gtk/details.c:602 ../gtk/torrent-cell-renderer.c:185
 msgid "Waiting to verify local data"
-msgstr "Čakanje za preverjanje klrajevnih podatkov"
+msgstr "Čakanje za preverjanje krajevnih podatkov"
 
 #: ../gtk/details.c:603
 msgid "Verifying local data"
@@ -581,7 +581,7 @@ msgstr "Prejemanje od tega soležnika"
 
 #: ../gtk/details.c:1436
 msgid "We would download from this peer if they would let us"
-msgstr "Od tega soležnika bi bilo mogoče prejemati, če bi odobril zahtevo"
+msgstr "Od tega soležnika bi bilo mogoče prejemati, če bi ta odobril zahtevo"
 
 #: ../gtk/details.c:1437
 msgid "Uploading to peer"
@@ -636,7 +636,7 @@ msgstr "Ni pripravljenih posodobitev"
 #: ../gtk/details.c:1767
 #, c-format
 msgid "Asking for more peers in %s"
-msgstr "Zahtevnje več soležnikov v %s"
+msgstr "Zahtevanje več soležnikov v %s"
 
 #: ../gtk/details.c:1771
 msgid "Queued to ask for more peers"
@@ -697,7 +697,7 @@ msgstr "Sledilniki"
 
 #: ../gtk/details.c:2137
 msgid "_Edit Trackers"
-msgstr ""
+msgstr "_Uredi sledilnike"
 
 #: ../gtk/details.c:2145
 msgid "Show _backup trackers"
@@ -735,7 +735,7 @@ msgstr "%'d lastnosti torrenta"
 
 #: ../gtk/dialogs.c:121
 msgid "<big><b>Quit Transmission?</b></big>"
-msgstr "<big><b>Ali naj se Transmission konča?</b></big>"
+msgstr "<big><b>Ali naj se program Transmission konča?</b></big>"
 
 #: ../gtk/dialogs.c:133
 msgid "_Don't ask me again"
@@ -845,12 +845,12 @@ msgid ""
 "Transmission is already running, but is not responding.  To start a new "
 "session, you must first close the existing Transmission process."
 msgstr ""
-"program Transmission je že zagnan, vendar se ne odziva. Za zagon nove seje "
+"Program Transmission je že zagnan, vendar se ne odziva. Za zagon nove seje "
 "je treba najprej zapreti obstoječa Transmission opravila."
 
 #: ../gtk/main.c:628
 msgid "Transmission cannot be started."
-msgstr "Prenosa ni mogoče začeti."
+msgstr "Programa ni mogoče začeti."
 
 #: ../gtk/main.c:710
 msgid ""
@@ -860,9 +860,9 @@ msgid ""
 "\n"
 "You probably knew this, so we won't tell you again."
 msgstr ""
-"Program Transmission je namenjen izmenjavi datotek preko omrežja. Ob zagonu "
-"torrenta so podatki datotek torrenta preko omrežja na voljo za izmenjavo z "
-"drugimi uporabniki. Vsebina datotek je odgovornost posameznika.\n"
+"Program Transmission je namenjen izmenjavi datotek. Podatki torrent datotek "
+"so na voljo za izmenjavo z drugimi uporabniki preko omrežja. Vsebina datotek "
+"je odgovornost posameznika.\n"
 "\n"
 "To sporočilo ne bo več prikazano."
 
@@ -1008,7 +1008,7 @@ msgstr "Lastnosti"
 
 #: ../gtk/makemeta-ui.c:437
 msgid "_Trackers:"
-msgstr "_Sledilci:"
+msgstr "_Sledilniki:"
 
 #: ../gtk/makemeta-ui.c:459
 msgid "Co_mment:"
@@ -1123,8 +1123,7 @@ msgid ""
 "affect the statistics logged by your BitTorrent trackers."
 msgstr ""
 "Krajevna statistika je neodvisna od statistike zabeležene na sledilnikih. "
-"Izbrisanje krajevne statistike ne vpliva na statistiko BitTorrent "
-"sledilnikov."
+"Brisanje krajevne statistike ne vpliva na statistiko BitTorrent sledilnikov."
 
 #: ../gtk/stats.c:118 ../gtk/stats.c:150
 msgid "_Reset"
@@ -1300,7 +1299,7 @@ msgstr "BitTorrent dejavnosti"
 
 #: ../gtk/tr-core.c:1360
 msgid "Disallowing desktop hibernation"
-msgstr "Prepovej hiberniranje namizja"
+msgstr "Prepovej hiberniracijo namizja"
 
 #: ../gtk/tr-core.c:1363
 #, c-format
@@ -1357,7 +1356,7 @@ msgstr "Namizje"
 
 #: ../gtk/tr-prefs.c:341
 msgid "Inhibit _hibernation when torrents are active"
-msgstr "Onemogoči hiberniranje, kadar so torrenti dejavni"
+msgstr "Onemogoči hiberniracijo, kadar so torrenti dejavni"
 
 #: ../gtk/tr-prefs.c:345
 msgid "Show Transmission icon in the _notification area"
@@ -1570,7 +1569,7 @@ msgstr "Prepiši običajne omejitve hitrosti ročno ali ob navedenem času"
 
 #: ../gtk/tr-prefs.c:1231
 msgid "Limit do_wnload speed (KB/s):"
-msgstr "Omeji hitrost _prejemaja (KB/s):"
+msgstr "Omeji hitrost _prejemanja (KB/s):"
 
 #: ../gtk/tr-prefs.c:1235
 msgid "Limit u_pload speed (KB/s):"
@@ -1708,7 +1707,7 @@ msgstr ""
 #: ../gtk/tr-window.c:593
 #, c-format
 msgid "Tracker will allow requests in %s"
-msgstr "Sledilec bo dovolil zahtevke v %s"
+msgstr "Sledilnik bo dovolil zahtevke v %s"
 
 #: ../gtk/tr-window.c:664
 msgid "Unlimited"
@@ -1762,7 +1761,7 @@ msgstr "_V premoru"
 
 #: ../gtk/tr-window.c:1062
 msgid "999.9 KB/s"
-msgstr ""
+msgstr "999.9 KB/s"
 
 #: ../gtk/tr-window.c:1107
 #, c-format
@@ -2032,6 +2031,9 @@ msgid ""
 "No data found!  Reconnect any disconnected drives, use \"Set Location\", or "
 "restart the torrent to re-download."
 msgstr ""
+"Ni mogoče najti podatkov. Popraviti je treba povezati z napravami, na novo "
+"\"določiti mesto\" ali pa je treba ponovno začeti prenos preko torrent "
+"datoteke."
 
 #: ../libtransmission/torrent.c:1399
 msgid ""
@@ -2060,7 +2062,7 @@ msgstr "Posredovanje vrat (UPnP)"
 #: ../libtransmission/upnp.c:104
 #, c-format
 msgid "Found Internet Gateway Device \"%s\""
-msgstr "Najdena je medmrežna prehodna naprava \"%s\""
+msgstr "Najdena je prehodna naprava medmrežja \"%s\""
 
 #: ../libtransmission/upnp.c:107
 #, c-format
@@ -2112,9 +2114,6 @@ msgstr "V vrsti za preverjanje"
 
 #~ msgid "_Main Window"
 #~ msgstr "_Glavno okno"
-
-#~ msgid "Temporary  Speed _Limits"
-#~ msgstr "Začasne omejitve hitrosti"
 
 #~ msgid "_Edit URLs"
 #~ msgstr "_Uredi naslove URL"
