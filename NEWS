@@ -1,3 +1,8 @@
+=== Transmission 1.82 (2010/01/23) ===
+[http://trac.transmissionbt.com/query?milestone=1.82&group=component&groupdesc=1&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * The 1.81 announce did not contain the port number
+
 === Transmission 1.81 (2010/01/22) ===
 [http://trac.transmissionbt.com/query?milestone=1.81&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== All Platforms ====
