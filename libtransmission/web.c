@@ -273,7 +273,13 @@ addTask( void * vtask )
             dbgmsg( "old url: \"%s\" -- new url: \"%s\"", task->url, url );
             evbuffer_free( buf );
 
-            host = tr_strdup_printf( "Host: %s:%d", task->host, task->port );
+            if( ( ( task->port <= 0 ) ) ||
+                ( ( task->port == 80 ) && !strncmp( task->url, "http://", 7 ) ) ||
+                ( ( task->port == 443 ) && !strncmp( task->url, "https://", 8 ) ) )
+                host = tr_strdup_printf( "Host: %s", task->host );
+            else
+                host = tr_strdup_printf( "Host: %s:%d", task->host, task->port );
+
             task->slist = curl_slist_append( NULL, host );
             curl_easy_setopt( e, CURLOPT_HTTPHEADER, task->slist );
             tr_free( host );
