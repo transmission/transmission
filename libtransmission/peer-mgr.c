@@ -715,6 +715,14 @@ countBlockRequests( Torrent * t, tr_block_index_t block )
 }
 
 static void
+decrementPendingReqCount( const struct block_request * b )
+{
+    if( b->peer != NULL )
+        if( b->peer->pendingReqsToPeer > 0 )
+            --b->peer->pendingReqsToPeer;
+}
+
+static void
 requestListRemove( Torrent * t, tr_block_index_t block, const tr_peer * peer )
 {
     const struct block_request * b = requestListLookup( t, block, peer );
@@ -723,11 +731,7 @@ requestListRemove( Torrent * t, tr_block_index_t block, const tr_peer * peer )
         const int pos = b - t->requests;
         assert( pos < t->requestCount );
 
-        if( b->peer != NULL )
-        {
-            --b->peer->pendingReqsToPeer;
-            assert( b->peer->pendingReqsToPeer >= 0 );
-        }
+        decrementPendingReqCount( b );
 
         memmove( t->requests + pos,
                  t->requests + pos + 1,
@@ -1143,8 +1147,7 @@ refillUpkeep( int foo UNUSED, short bar UNUSED, void * vmgr )
             for( it=cancel, end=it+cancelCount; it!=end; ++it ) {
                 if( ( it->peer != NULL ) && ( it->peer->msgs != NULL ) ) {
                     tr_peerMsgsCancel( it->peer->msgs, it->block );
-                    if( t->requestCount > 0 )
-                        --t->requestCount;
+                    decrementPendingReqCount( it );
                 }
             }
 
