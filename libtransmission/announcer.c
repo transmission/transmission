@@ -410,7 +410,7 @@ tierNew( tr_torrent * tor )
     t->scrapeIntervalSec = DEFAULT_SCRAPE_INTERVAL_SEC;
     t->announceIntervalSec = DEFAULT_ANNOUNCE_INTERVAL_SEC;
     t->announceMinIntervalSec = DEFAULT_ANNOUNCE_MIN_INTERVAL_SEC;
-    t->scrapeAt = now;
+    t->scrapeAt = now + tr_cryptoWeakRandInt( 60*10 );
     t->tor = tor;
 
     return t;
