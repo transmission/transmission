@@ -30,6 +30,8 @@ enum
     TR_MEMORY_TRASH = 0xCC,
 
     DEFAULT_TIMER_MSEC = 1500 /* arbitrary */
+
+    MIN_DNS_CACHE_TIME = 60 * 60 * 24
 };
 
 #if 0
@@ -159,13 +161,15 @@ dns_get_cached_host( struct tr_web_task * task, const char * host )
     }
 
     if( item != NULL )
-        dbgmsg( "found cached dns entry for \"%s\": %s", host, item->resolved_host );
+        dbgmsg( "found cached dns entry for \"%s\": %s",
+                host, item->resolved_host );
 
     return item ? item->resolved_host : NULL;
 }
 
 static const char*
-dns_set_cached_host( struct tr_web_task * task, const char * host, const char * resolved, int ttl )
+dns_set_cached_host( struct tr_web_task * task, const char * host,
+                     const char * resolved, int ttl )
 {
     char * ret = NULL;
     tr_web * g;
@@ -174,6 +178,8 @@ dns_set_cached_host( struct tr_web_task * task, const char * host, const char * 
     assert( host != NULL );
     assert( resolved != NULL );
     assert( ttl >= 0 );
+
+    ttl = MAX( MIN_DNS_CACHE_TIME, ttl );
 
     g = task->session->web;
     if( g != NULL )
@@ -314,7 +320,7 @@ addTask( void * vtask )
         curl_easy_setopt( e, CURLOPT_SOCKOPTDATA, task );
         curl_easy_setopt( e, CURLOPT_WRITEDATA, task );
         curl_easy_setopt( e, CURLOPT_WRITEFUNCTION, writeFunc );
-        curl_easy_setopt( e, CURLOPT_DNS_CACHE_TIMEOUT, 1800L );
+        curl_easy_setopt( e, CURLOPT_DNS_CACHE_TIMEOUT, MIN_DNS_CACHE_TIME );
         curl_easy_setopt( e, CURLOPT_FOLLOWLOCATION, 1L );
         curl_easy_setopt( e, CURLOPT_AUTOREFERER, 1L );
         curl_easy_setopt( e, CURLOPT_FORBID_REUSE, 1L );
