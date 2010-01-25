@@ -527,7 +527,7 @@ global_unicast_address(struct sockaddr *sa)
     }
 }
 
-int
+static int
 tr_globalAddress( int af, void *addr, int *addr_len )
 {
     struct sockaddr_storage ss;
