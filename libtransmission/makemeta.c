@@ -14,7 +14,7 @@
 #include <errno.h>
 #include <stdio.h> /* FILE, stderr */
 #include <stdlib.h> /* qsort */
-#include <string.h> /* strcmp, strlen */
+#include <string.h> /* strcmp, strlen, strcasecmp */
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -110,7 +110,7 @@ builderFileCompare( const void * va,
     const tr_metainfo_builder_file * a = va;
     const tr_metainfo_builder_file * b = vb;
 
-    return strcmp( a->filename, b->filename );
+    return strcasecmp( a->filename, b->filename );
 }
 
 tr_metainfo_builder*

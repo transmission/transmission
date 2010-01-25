@@ -12,7 +12,7 @@
 
 /* thanks amc1! */
 
-#include <ctype.h> /* isprint, tolower */
+#include <ctype.h> /* isprint */
 #include <stdio.h>
 #include <stdlib.h> /* strtol */
 #include <string.h>
