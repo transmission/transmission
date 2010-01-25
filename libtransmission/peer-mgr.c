@@ -1140,9 +1140,13 @@ refillUpkeep( int foo UNUSED, short bar UNUSED, void * vmgr )
             t->requestCount = keepCount;
 
             /* send cancel messages for all the "cancel" ones */
-            for( it=cancel, end=it+cancelCount; it!=end; ++it )
-                if( ( it->peer != NULL ) && ( it->peer->msgs != NULL ) )
+            for( it=cancel, end=it+cancelCount; it!=end; ++it ) {
+                if( ( it->peer != NULL ) && ( it->peer->msgs != NULL ) ) {
                     tr_peerMsgsCancel( it->peer->msgs, it->block );
+                    if( t->requestCount > 0 )
+                        --t->requestCount;
+                }
+            }
 
             /* decrement the pending request counts for the timed-out blocks */
             for( it=cancel, end=it+cancelCount; it!=end; ++it )
