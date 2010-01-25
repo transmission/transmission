@@ -375,7 +375,9 @@ dns_ipv4_done_cb( int err, char type, int count, int ttl, void * addresses, void
         /* FIXME: if count > 1, is there a way to decide which is best to use? */
     }
 
-    if( task->resolved_host || evdns_resolve_ipv6( task->host, 0, dns_ipv6_done_cb, task ) )
+    if( ( task->resolved_host != NULL )
+            || ( task->host == NULL )
+            || evdns_resolve_ipv6( task->host, 0, dns_ipv6_done_cb, task ) )
         dns_ipv6_done_cb( DNS_ERR_UNKNOWN, DNS_IPv6_AAAA, 0, 0, NULL, task );
 }
 
@@ -394,7 +396,9 @@ doDNS( void * vtask )
         task->resolved_host = dns_get_cached_host( task, host );
     }
 
-    if( task->resolved_host || evdns_resolve_ipv4( host, 0, dns_ipv4_done_cb, task ) )
+    if( ( task->resolved_host != NULL )
+            || ( host == NULL )
+            || evdns_resolve_ipv4( host, 0, dns_ipv4_done_cb, task ) )
         dns_ipv4_done_cb( DNS_ERR_UNKNOWN, DNS_IPv4_A, 0, 0, NULL, task );
 }
 
