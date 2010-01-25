@@ -29,7 +29,7 @@ enum
 {
     TR_MEMORY_TRASH = 0xCC,
 
-    DEFAULT_TIMER_MSEC = 1500 /* arbitrary */
+    DEFAULT_TIMER_MSEC = 1500, /* arbitrary */
 
     MIN_DNS_CACHE_TIME = 60 * 60 * 24
 };
