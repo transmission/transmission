@@ -240,7 +240,8 @@ readOrWritePiece( tr_torrent       * tor,
         ++fileIndex;
         fileOffset = 0;
 
-        if( err ) {
+        if( ( err != 0 ) && (ioMode == TR_IO_WRITE ) )
+        {
             char * path = tr_buildPath( tor->downloadDir, file->name, NULL );
             tr_torrentSetLocalError( tor, "%s (%s)", tr_strerror( err ), path );
             tr_free( path );
