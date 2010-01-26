@@ -99,6 +99,7 @@ struct tr_web_task
     struct event timer_event;
     CURL * easy;
     CURLM * multi;
+    tr_bool timer_event_isSet;
 };
 
 static void
@@ -106,7 +107,8 @@ task_free( struct tr_web_task * task )
 {
     if( task->slist != NULL )
         curl_slist_free_all( task->slist );
-    evtimer_del( &task->timer_event );
+    if( task->timer_event_isSet )
+        evtimer_del( &task->timer_event );
     evbuffer_free( task->response );
     tr_free( task->host );
     tr_free( task->range );
@@ -246,6 +248,7 @@ getTimeoutFromURL( const char * url )
 }
 
 static void task_timeout_cb( int fd UNUSED, short what UNUSED, void * task );
+static void task_finish( struct tr_web_task * task, long response_code );
 
 static void
 addTask( void * vtask )
@@ -253,7 +256,15 @@ addTask( void * vtask )
     struct tr_web_task * task = vtask;
     const tr_session * session = task->session;
 
-    if( session && session->web )
+    if( ( session == NULL ) || ( session->web == NULL ) )
+        return;
+
+    if( task->resolved_host == NULL )
+    {
+        dbgmsg( "couldn't resolve host for \"%s\"... task failed", task->url );
+        task_finish( task, 0 );
+    }
+    else
     {
         CURL * e = curl_easy_init( );
         struct tr_web * web = session->web;
@@ -262,11 +273,10 @@ addTask( void * vtask )
         const char * user_agent = TR_NAME "/" LONG_VERSION_STRING;
         char * url = NULL;
 
-        /* If we've got a resolved host, insert it into the URL: replace
-         * "http://www.craptrackular.org/announce?key=val&key2=..." with
-         * "http://127.0.0.1/announce?key=val&key2=..."
-         * so that curl's DNS won't block */
-        if( task->resolved_host != NULL )
+        /* insert the resolved host into the URL s.t. curl's DNS won't block
+         * even if -- like on most OSes -- it wasn't built with C-Ares :(
+         * "http://www.craptrackular.org/announce?key=val&key2=..." becomes
+         * "http://127.0.0.1/announce?key=val&key2=..." */
         {
             char * host;
             struct evbuffer * buf = evbuffer_new( );
@@ -279,6 +289,7 @@ addTask( void * vtask )
             dbgmsg( "old url: \"%s\" -- new url: \"%s\"", task->url, url );
             evbuffer_free( buf );
 
+            /* Manually add a Host: argument that refers to the true URL */
             if( ( ( task->port <= 0 ) ) ||
                 ( ( task->port == 80 ) && !strncmp( task->url, "http://", 7 ) ) ||
                 ( ( task->port == 443 ) && !strncmp( task->url, "https://", 8 ) ) )
@@ -312,6 +323,7 @@ addTask( void * vtask )
 
         /* use our own timeout instead of CURLOPT_TIMEOUT because the latter
          * doesn't play nicely with curl_multi.  See curl bug #2501457 */
+        task->timer_event_isSet = TRUE;
         evtimer_set( &task->timer_event, task_timeout_cb, task );
         tr_timerAdd( &task->timer_event, timeout, 0 );
 
