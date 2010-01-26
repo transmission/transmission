@@ -30,7 +30,7 @@ typedef struct tr_bitset
 tr_bitset;
 
 static inline void
-tr_bitsetConstructor( tr_bitset * b, int size )
+tr_bitsetConstructor( tr_bitset * b, size_t size )
 {
     tr_bitfieldConstruct( &b->bitfield, size );
 }
@@ -119,7 +119,7 @@ tr_bitsetSetHaveNone( tr_bitset * b )
 }
 
 static inline int
-tr_bitsetAdd( tr_bitset * b, int i )
+tr_bitsetAdd( tr_bitset * b, size_t i )
 {
     int ret = 0;
     if( !b->haveAll ) {
