@@ -19,6 +19,7 @@
 #include "transmission.h"
 #include "list.h"
 #include "net.h"
+#include "ptrarray.h"
 #include "session.h"
 #include "trevent.h"
 #include "utils.h"
@@ -61,7 +62,7 @@ struct tr_web
     CURLM * multi;
     tr_session * session;
     tr_address addr;
-    tr_list * dns_cache;
+    tr_ptrArray dns_cache;
     struct event timer_event;
 };
 
@@ -74,7 +75,7 @@ web_free( tr_web * g )
     evdns_shutdown( TRUE );
     curl_multi_cleanup( g->multi );
     evtimer_del( &g->timer_event );
-    tr_list_free( &g->dns_cache, (TrListForeachFunc)dns_cache_item_free );
+    tr_ptrArrayDestruct( &g->dns_cache, (TrListForeachFunc)dns_cache_item_free );
     memset( g, TR_MEMORY_TRASH, sizeof( struct tr_web ) );
     tr_free( g );
 }
@@ -126,6 +127,7 @@ struct dns_cache_item
     char * host;
     char * resolved_host;
     time_t expiration;
+    tr_bool success;
 };
 
 static void
@@ -136,61 +138,95 @@ dns_cache_item_free( struct dns_cache_item * item )
     tr_free( item );
 }
 
-static const char *
-dns_get_cached_host( struct tr_web_task * task, const char * host )
+static int
+dns_cache_compare( const void * va, const void * vb )
 {
-    tr_list * l;
-    tr_web * g = task->session->web;
-    struct dns_cache_item * item = NULL;
+    const struct dns_cache_item * a = va;
+    const struct dns_cache_item * b = vb;
+    return strcmp( a->host, b->host );
+}
 
-    if( g != NULL )
+static int
+dns_cache_compare_key( const void * va, const void * key )
+{
+    const struct dns_cache_item * a = va;
+    return strcmp( a->host, key );
+}
+
+typedef enum
+{
+    TR_DNS_OK,
+    TR_DNS_FAIL,
+    TR_DNS_UNTESTED
+}
+tr_dns_result;
+
+static tr_dns_result
+dns_cache_lookup( struct tr_web_task * task, const char * host, const char ** resolved )
+{
+    tr_dns_result result = TR_DNS_UNTESTED;
+
+    if( task->session->web != NULL )
     {
-        /* do we have it cached? */
-        for( l=g->dns_cache; l!=NULL; l=l->next ) {
-            struct dns_cache_item * tmp = l->data;
-            if( !strcmp( host, tmp->host ) ) {
-                item = tmp;
-                break;
-            }
-        }
+        tr_ptrArray * cache = &task->session->web->dns_cache;
+
+        struct dns_cache_item * item = tr_ptrArrayFindSorted( cache, host,
+                                                              dns_cache_compare_key );
 
         /* has the ttl expired? */
-        if( ( item != NULL ) && ( item->expiration <= tr_time( ) ) ) {
-            tr_list_remove_data( &g->dns_cache, item );
+        if( ( item != NULL ) && ( item->expiration <= tr_time( ) ) )
+        {
+            tr_ptrArrayRemoveSorted( cache, host, dns_cache_compare_key );
             dns_cache_item_free( item );
             item = NULL;
         }
+
+        if( item != NULL )
+        {
+            result = item->success ? TR_DNS_OK : TR_DNS_FAIL;
+
+            if( result == TR_DNS_OK )
+            {
+                *resolved = item->resolved_host;
+            
+                dbgmsg( "found cached dns entry for \"%s\": %s", host, *resolved );
+            }
+        }
     }
 
-    if( item != NULL )
-        dbgmsg( "found cached dns entry for \"%s\": %s",
-                host, item->resolved_host );
+    return result;
+}
 
-    return item ? item->resolved_host : NULL;
+static void
+dns_cache_set_fail( struct tr_web_task * task, const char * host )
+{
+    if( task->session->web != NULL )
+    {
+        struct dns_cache_item * item = tr_new( struct dns_cache_item, 1 );
+        item->host = tr_strdup( host );
+        item->resolved_host = NULL;
+        item->expiration = tr_time( ) + MIN_DNS_CACHE_TIME;
+        item->success = FALSE;
+        tr_ptrArrayInsertSorted( &task->session->web->dns_cache, item, dns_cache_compare );
+    }
 }
 
 static const char*
-dns_set_cached_host( struct tr_web_task * task, const char * host,
-                     const char * resolved, int ttl )
+dns_cache_set_name( struct tr_web_task * task, const char * host,
+                   const char * resolved, int ttl )
 {
     char * ret = NULL;
-    tr_web * g;
-
-    assert( task != NULL );
-    assert( host != NULL );
-    assert( resolved != NULL );
-    assert( ttl >= 0 );
 
     ttl = MAX( MIN_DNS_CACHE_TIME, ttl );
 
-    g = task->session->web;
-    if( g != NULL )
+    if( task->session->web != NULL )
     {
         struct dns_cache_item * item = tr_new( struct dns_cache_item, 1 );
         item->host = tr_strdup( host );
         item->resolved_host = tr_strdup( resolved );
         item->expiration = tr_time( ) + ttl;
-        tr_list_append( &g->dns_cache, item );
+        item->success = TRUE;
+        tr_ptrArrayInsertSorted( &task->session->web->dns_cache, item, dns_cache_compare );
         ret = item->resolved_host;
         dbgmsg( "adding dns cache entry for \"%s\": %s", host, resolved );
     }
@@ -259,7 +295,7 @@ addTask( void * vtask )
     if( ( session == NULL ) || ( session->web == NULL ) )
         return;
 
-    if( task->resolved_host == NULL )
+    if( !task->resolved_host )
     {
         dbgmsg( "couldn't resolve host for \"%s\"... task failed", task->url );
         task_finish( task, 0 );
@@ -361,7 +397,7 @@ dns_ipv6_done_cb( int err, char type, int count, int ttl, void * addresses, void
 {
     struct tr_web_task * task = vtask;
 
-    if( !err && ( task->host != NULL ) && ( count > 0 ) && ( ttl >= 0 ) && ( type == DNS_IPv6_AAAA ) )
+    if( !err && task->host && ( count>0 ) && ( ttl>=0 ) && ( type==DNS_IPv6_AAAA ) )
     {
         int i;
         char buf[INET6_ADDRSTRLEN+1];
@@ -371,11 +407,14 @@ dns_ipv6_done_cb( int err, char type, int count, int ttl, void * addresses, void
             const char * b = inet_ntop(AF_INET6, &in6_addrs[i], buf,sizeof(buf));
             if( b != NULL ) {
                 /* FIXME: is there a better way to tell which one to use if count > 1? */
-                task->resolved_host = dns_set_cached_host( task, task->host, b, ttl );
+                task->resolved_host = dns_cache_set_name( task, task->host, b, ttl );
                 break;
             }
         }
     }
+
+    if( task->resolved_host == NULL )
+        dns_cache_set_fail( task, task->host );
 
     addTask( task );
 }
@@ -385,11 +424,11 @@ dns_ipv4_done_cb( int err, char type, int count, int ttl, void * addresses, void
 {
     struct tr_web_task * task = vtask;
 
-    if( !err && ( task->host != NULL ) && ( count > 0 ) && ( ttl >= 0 ) && ( type == DNS_IPv4_A ) )
+    if( !err && task->host && ( count>0 ) && ( ttl>=0 ) && ( type==DNS_IPv4_A ) )
     {
         struct in_addr * in_addrs = addresses;
         const char * resolved = inet_ntoa( in_addrs[0] );
-        task->resolved_host = dns_set_cached_host( task, task->host, resolved, ttl );
+        task->resolved_host = dns_cache_set_name( task, task->host, resolved, ttl );
         /* FIXME: if count > 1, is there a way to decide which is best to use? */
     }
 
@@ -405,19 +444,25 @@ doDNS( void * vtask )
     int port = -1;
     char * host = NULL;
     struct tr_web_task * task = vtask;
+    tr_dns_result lookup_result = TR_DNS_UNTESTED;
 
     assert( task->resolved_host == NULL );
 
-    if( !tr_httpParseURL( task->url, -1, &host, &port, NULL ) ) {
+    if( !tr_httpParseURL( task->url, -1, &host, &port, NULL ) )
+    {
         task->port = port;
         task->host = host;
-        task->resolved_host = dns_get_cached_host( task, host );
+        lookup_result = dns_cache_lookup( task, host, &task->resolved_host );
     }
 
-    if( ( task->resolved_host != NULL )
-            || ( host == NULL )
-            || evdns_resolve_ipv4( host, 0, dns_ipv4_done_cb, task ) )
+    if( lookup_result != TR_DNS_UNTESTED )
+    {
+        addTask( task );
+    }
+    else if( !host || evdns_resolve_ipv4( host, 0, dns_ipv4_done_cb, task ) )
+    {
         dns_ipv4_done_cb( DNS_ERR_UNKNOWN, DNS_IPv4_A, 0, 0, NULL, task );
+    }
 }
 
 /***
@@ -622,6 +667,7 @@ tr_webInit( tr_session * session )
         curl_global_init( 0 );
 
     web = tr_new0( struct tr_web, 1 );
+    web->dns_cache = TR_PTR_ARRAY_INIT;
     web->session = session;
     web->timer_msec = DEFAULT_TIMER_MSEC; /* overwritten by multi_timer_cb() */
     evtimer_set( &web->timer_event, libevent_timer_cb, web );
