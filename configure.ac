@@ -133,7 +133,7 @@ AC_CHECK_HEADER([sys/inotify.h],
                 [have_inotify="no"]) 
 AC_ARG_WITH([inotify], 
             [AS_HELP_STRING([--with-inotify],[Enable inotify support (default=auto)])], 
-            [want_inotify=${enableval}], 
+            [want_inotify=${withval}], 
             [want_inotify=${have_inotify}]) 
 if test "x$want_inotify" = "xyes" ; then 
     if test "x$have_inotify" = "xyes"; then 
@@ -148,7 +148,7 @@ AC_CHECK_HEADER([sys/event.h],
                 [have_kqueue="no"]) 
 AC_ARG_WITH([kqueue], 
             [AS_HELP_STRING([--with-kqueue],[Enable kqueue support (default=auto)])], 
-            [want_kqueue=${enableval}], 
+            [want_kqueue=${withval}], 
             [want_kqueue=${have_kqueue}]) 
 if test "x$want_kqueue" = "xyes" ; then 
     if test "x$have_kqueue" = "xyes"; then 
