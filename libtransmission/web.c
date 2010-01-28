@@ -441,6 +441,7 @@ dns_ipv4_done_cb( int err, char type, int count, int ttl, void * addresses, void
 static void
 doDNS( void * vtask )
 {
+    tr_address addr;
     int port = -1;
     char * host = NULL;
     struct tr_web_task * task = vtask;
@@ -452,7 +453,18 @@ doDNS( void * vtask )
     {
         task->port = port;
         task->host = host;
-        lookup_result = dns_cache_lookup( task, host, &task->resolved_host );
+
+        /* If 'host' is an IPv4 or IPv6 address in text form, use it as-is.
+         * Otherwise, see if its resolved name is in our DNS cache */
+        if( tr_pton( task->host, &addr ) != NULL )
+        {
+            task->resolved_host = task->host;
+            lookup_result = TR_DNS_OK;
+        }
+        else
+        {
+            lookup_result = dns_cache_lookup( task, host, &task->resolved_host );
+        }
     }
 
     if( lookup_result != TR_DNS_UNTESTED )
