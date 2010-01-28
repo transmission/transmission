@@ -25,8 +25,6 @@
 #ifndef TR_CORE_H
 #define TR_CORE_H
 
-#include <string.h>
-
 #include <glib-object.h>
 #include <gtk/gtk.h>
 

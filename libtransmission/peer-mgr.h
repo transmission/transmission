@@ -28,7 +28,6 @@
 #include "net.h"
 #include "peer-common.h" /* struct peer_request */
 #include "publish.h" /* tr_publisher_tag */
-#include "utils.h"
 
 /**
  * @addtogroup peers Peers

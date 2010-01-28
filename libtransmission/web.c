@@ -17,7 +17,6 @@
 #include <evdns.h>
 
 #include "transmission.h"
-#include "list.h"
 #include "net.h"
 #include "ptrarray.h"
 #include "session.h"
@@ -75,7 +74,7 @@ web_free( tr_web * g )
     evdns_shutdown( TRUE );
     curl_multi_cleanup( g->multi );
     evtimer_del( &g->timer_event );
-    tr_ptrArrayDestruct( &g->dns_cache, (TrListForeachFunc)dns_cache_item_free );
+    tr_ptrArrayDestruct( &g->dns_cache, (PtrArrayForeachFunc)dns_cache_item_free );
     memset( g, TR_MEMORY_TRASH, sizeof( struct tr_web ) );
     tr_free( g );
 }
@@ -135,6 +134,7 @@ dns_cache_item_free( struct dns_cache_item * item )
 {
     tr_free( item->host );
     tr_free( item->resolved_host );
+    memset( item, TR_MEMORY_TRASH, sizeof( struct dns_cache_item ) );
     tr_free( item );
 }
 

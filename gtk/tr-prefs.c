@@ -11,8 +11,6 @@
  */
 
 #include <ctype.h> /* isspace */
-#include <errno.h>
-#include <stdarg.h>
 #include <limits.h> /* USHRT_MAX */
 #include <stdlib.h> /* free() */
 #include <unistd.h>

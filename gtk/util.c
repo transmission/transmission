@@ -12,7 +12,6 @@
 
 #include <ctype.h> /* isxdigit() */
 #include <errno.h>
-#include <stdarg.h>
 #include <stdlib.h> /* free() */
 #include <string.h> /* strcmp() */
 

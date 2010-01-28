@@ -16,7 +16,6 @@
 
 #include "transmission.h"
 #include "inout.h"
-#include "list.h"
 #include "ratecontrol.h"
 #include "torrent.h"
 #include "utils.h"

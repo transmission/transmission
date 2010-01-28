@@ -22,7 +22,6 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#include <assert.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -108,7 +107,7 @@ lockfile( const char             * filename,
 static char*
 getLockFilename( void )
 {
-    assert( gl_confdir != NULL );
+    g_assert( gl_confdir != NULL );
     return g_build_filename( gl_confdir, "lock", NULL );
 }
 
@@ -211,7 +210,7 @@ tr_prefs_init_defaults( tr_benc * d )
 static char*
 getPrefsFilename( void )
 {
-    assert( gl_confdir != NULL );
+    g_assert( gl_confdir != NULL );
     return g_build_filename( gl_confdir, "settings.json", NULL );
 }
 
@@ -363,7 +362,7 @@ tr_file_set_contents( const char *   filename,
 static char*
 getCompat090PrefsFilename( void )
 {
-    assert( gl_confdir != NULL );
+    g_assert( gl_confdir != NULL );
 
     return g_build_filename( g_get_home_dir( ), ".transmission", "gtk", "prefs.ini", NULL );
 }

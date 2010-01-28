@@ -10,7 +10,6 @@
  * $Id$
  */
 
-#include "assert.h"
 #include <string.h> /* strcmp() */
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>

@@ -61,7 +61,6 @@
 
 #include "transmission.h"
 #include "fdlimit.h"
-#include "list.h"
 #include "net.h"
 #include "platform.h" /* MAX_PATH_LENGTH, TR_PATH_DELIMITER */
 #include "session.h"

@@ -10,7 +10,6 @@
  * $Id$
  */
 
-#include <assert.h>
 #include <errno.h>
 #include <stdio.h> /* printf */
 #include <stdlib.h> /* exit, atoi */
