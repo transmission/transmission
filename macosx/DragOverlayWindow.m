@@ -170,7 +170,6 @@
         [fFadeOutAnimation stopAnimation];
         [fFadeInAnimation setCurrentProgress: 1.0 - [fFadeOutAnimation currentProgress]];
     }
-    [self setFrame: [[self parentWindow] frame] display: YES];
     [fFadeInAnimation startAnimation];
 }
 
