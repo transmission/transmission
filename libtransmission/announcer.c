@@ -1264,9 +1264,10 @@ onAnnounceDone( tr_session   * session,
 
         if( responseCode == 0 )
         {
-            dbgmsg( tier, "No response from tracker... retrying in two minutes." );
+            const int interval = 120 + tr_cryptoWeakRandInt( 120 );
+            dbgmsg( tier, "No response from tracker... retrying in %d seconds.", interval );
             tier->manualAnnounceAllowedAt = ~(time_t)0;
-            tierSetNextAnnounce( tier, tier->announceEvent, now + 120 );
+            tierSetNextAnnounce( tier, tier->announceEvent, now + interval );
         }
         else if( 200 <= responseCode && responseCode <= 299 )
         {
