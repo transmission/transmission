@@ -24,8 +24,8 @@
 
 #import "DragOverlayView.h"
 
-#define PADDING 10.0f
-#define ICON_WIDTH 64.0f
+#define PADDING 10.0
+#define ICON_WIDTH 64.0
 
 @implementation DragOverlayView
 
@@ -33,26 +33,14 @@
 {
     if ((self = [super initWithFrame: frame]))
     {
-        //create badge
-        NSRect badgeRect = NSMakeRect(0.0f, 0.0f, 325.0f, 84.0f);
-        NSBezierPath * bp = [NSBezierPath bezierPathWithRoundedRect: badgeRect xRadius: 15.0f yRadius: 15.0f];
-        
-        fBackBadge = [[NSImage alloc] initWithSize: badgeRect.size];
-        [fBackBadge lockFocus];
-        
-        [[NSColor colorWithCalibratedWhite: 0.0f alpha: 0.75f] set];
-        [bp fill];
-        
-        [fBackBadge unlockFocus];
-        
         //create attributes
         NSShadow * stringShadow = [[NSShadow alloc] init];
-        [stringShadow setShadowOffset: NSMakeSize(2.0f, -2.0f)];
-        [stringShadow setShadowBlurRadius: 4.0f];
+        [stringShadow setShadowOffset: NSMakeSize(2.0, -2.0)];
+        [stringShadow setShadowBlurRadius: 4.0];
         
         NSFont * bigFont = [[NSFontManager sharedFontManager] convertFont:
-                                [NSFont fontWithName: @"Lucida Grande" size: 18.0f] toHaveTrait: NSBoldFontMask],
-                * smallFont = [NSFont fontWithName: @"Lucida Grande" size: 14.0f];
+                                [NSFont fontWithName: @"Lucida Grande" size: 18.0] toHaveTrait: NSBoldFontMask],
+                * smallFont = [NSFont fontWithName: @"Lucida Grande" size: 14.0];
         
         NSMutableParagraphStyle * paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
         [paragraphStyle setLineBreakMode: NSLineBreakByTruncatingTail];
@@ -75,7 +63,6 @@
 
 - (void) dealloc
 {
-    [fBackBadge release];
     [fBadge release];
     
     [fMainLineAttributes release];
@@ -87,26 +74,32 @@
 - (void) setOverlay: (NSImage *) icon mainLine: (NSString *) mainLine subLine: (NSString *) subLine
 {
     [fBadge release];
-    fBadge = [fBackBadge copy];
-    NSSize badgeSize = [fBadge size];
     
+    //create badge
+    const NSRect badgeRect = NSMakeRect(0.0, 0.0, 325.0, 84.0);
+    NSBezierPath * bp = [NSBezierPath bezierPathWithRoundedRect: badgeRect xRadius: 15.0 yRadius: 15.0];
+    
+    fBadge = [[NSImage alloc] initWithSize: badgeRect.size];
     [fBadge lockFocus];
     
+    [[NSColor colorWithCalibratedWhite: 0.0 alpha: 0.75] set];
+    [bp fill];
+    
     //place icon
-    [icon drawInRect: NSMakeRect(PADDING, (badgeSize.height - ICON_WIDTH) * 0.5f, ICON_WIDTH, ICON_WIDTH) fromRect: NSZeroRect
-            operation: NSCompositeSourceOver fraction: 1.0f];
+    [icon drawInRect: NSMakeRect(PADDING, (NSHeight(badgeRect) - ICON_WIDTH) * 0.5, ICON_WIDTH, ICON_WIDTH) fromRect: NSZeroRect
+            operation: NSCompositeSourceOver fraction: 1.0];
     
     //place main text
-    NSSize mainLineSize = [mainLine sizeWithAttributes: fMainLineAttributes];
-    NSSize subLineSize = [subLine sizeWithAttributes: fSubLineAttributes];
+    const NSSize mainLineSize = [mainLine sizeWithAttributes: fMainLineAttributes];
+    const NSSize subLineSize = [subLine sizeWithAttributes: fSubLineAttributes];
     
-    NSRect lineRect = NSMakeRect(PADDING + ICON_WIDTH + 5.0f,
-                        (badgeSize.height + (subLineSize.height + 2.0f - mainLineSize.height)) * 0.5f,
-                        badgeSize.width - (PADDING + ICON_WIDTH + 2.0f) - PADDING, mainLineSize.height);
+    NSRect lineRect = NSMakeRect(PADDING + ICON_WIDTH + 5.0,
+                        (NSHeight(badgeRect) + (subLineSize.height + 2.0 - mainLineSize.height)) * 0.5,
+                        NSWidth(badgeRect) - (PADDING + ICON_WIDTH + 2.0) - PADDING, mainLineSize.height);
     [mainLine drawInRect: lineRect withAttributes: fMainLineAttributes];
     
     //place sub text
-    lineRect.origin.y -= subLineSize.height + 2.0f;
+    lineRect.origin.y -= subLineSize.height + 2.0;
     lineRect.size.height = subLineSize.height;
     [subLine drawInRect: lineRect withAttributes: fSubLineAttributes];
     
@@ -119,10 +112,10 @@
 {
     if (fBadge)
     {
-        NSRect frame = [self frame];
-        NSSize imageSize = [fBadge size];
-        [fBadge compositeToPoint: NSMakePoint((frame.size.width - imageSize.width) * 0.5f,
-                    (frame.size.height - imageSize.height) * 0.5f) operation: NSCompositeSourceOver];
+        const NSRect frame = [self frame];
+        const NSSize imageSize = [fBadge size];
+        [fBadge compositeToPoint: NSMakePoint((NSWidth(frame) - imageSize.width) * 0.5,
+                    (NSHeight(frame) - imageSize.height) * 0.5) operation: NSCompositeSourceOver];
     }
 }
 
