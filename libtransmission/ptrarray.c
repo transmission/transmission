@@ -201,7 +201,7 @@ tr_ptrArrayFindSorted( tr_ptrArray * t,
 
 void*
 tr_ptrArrayRemoveSorted( tr_ptrArray * t,
-                         void *        ptr,
+                         const void *        ptr,
                           int            compare(const void*, const void*) )
 {
     void *    ret = NULL;

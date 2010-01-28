@@ -109,7 +109,7 @@ int tr_ptrArrayInsertSorted( tr_ptrArray * array,
 /** @brief Remove a pointer from an array sorted by the specified sort function
     @return the matching pointer, or NULL if no match was found */
 void* tr_ptrArrayRemoveSorted( tr_ptrArray * array,
-                               void        * value,
+                               const void  * value,
                                int compare(const void*, const void*) );
 
 /** @brief Find a pointer from an array sorted by the specified sort function
