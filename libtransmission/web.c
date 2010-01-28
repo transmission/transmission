@@ -132,10 +132,13 @@ struct dns_cache_item
 static void
 dns_cache_item_free( struct dns_cache_item * item )
 {
-    tr_free( item->host );
-    tr_free( item->resolved_host );
-    memset( item, TR_MEMORY_TRASH, sizeof( struct dns_cache_item ) );
-    tr_free( item );
+    if( item != NULL )
+    {
+        tr_free( item->host );
+        tr_free( item->resolved_host );
+        memset( item, TR_MEMORY_TRASH, sizeof( struct dns_cache_item ) );
+        tr_free( item );
+    }
 }
 
 static int
@@ -146,13 +149,6 @@ dns_cache_compare( const void * va, const void * vb )
     return strcmp( a->host, b->host );
 }
 
-static int
-dns_cache_compare_key( const void * va, const void * key )
-{
-    const struct dns_cache_item * a = va;
-    return strcmp( a->host, key );
-}
-
 typedef enum
 {
     TR_DNS_OK,
@@ -161,6 +157,14 @@ typedef enum
 }
 tr_dns_result;
 
+static void
+dns_cache_clear_entry( struct tr_ptrArray * cache, const char * host )
+{
+    struct dns_cache_item key;
+    key.host = (char*) host;
+    dns_cache_item_free( tr_ptrArrayRemoveSorted( cache, &key, dns_cache_compare ) );
+}
+
 static tr_dns_result
 dns_cache_lookup( struct tr_web_task * task, const char * host, const char ** resolved )
 {
@@ -168,16 +172,17 @@ dns_cache_lookup( struct tr_web_task * task, const char * host, const char ** re
 
     if( task->session->web != NULL )
     {
+        struct dns_cache_item key;
+        struct dns_cache_item * item;
         tr_ptrArray * cache = &task->session->web->dns_cache;
 
-        struct dns_cache_item * item = tr_ptrArrayFindSorted( cache, host,
-                                                              dns_cache_compare_key );
+        key.host = (char*) host;
+        item = tr_ptrArrayFindSorted( cache, &key, dns_cache_compare );
 
         /* has the ttl expired? */
         if( ( item != NULL ) && ( item->expiration <= tr_time( ) ) )
         {
-            tr_ptrArrayRemoveSorted( cache, host, dns_cache_compare_key );
-            dns_cache_item_free( item );
+            dns_cache_clear_entry( cache, host );
             item = NULL;
         }
 
@@ -202,12 +207,17 @@ dns_cache_set_fail( struct tr_web_task * task, const char * host )
 {
     if( task->session->web != NULL )
     {
-        struct dns_cache_item * item = tr_new( struct dns_cache_item, 1 );
+        struct dns_cache_item * item;
+        tr_ptrArray * cache = &task->session->web->dns_cache;
+
+        dns_cache_clear_entry( cache, host );
+
+        item = tr_new( struct dns_cache_item, 1 );
         item->host = tr_strdup( host );
         item->resolved_host = NULL;
         item->expiration = tr_time( ) + MIN_DNS_CACHE_TIME;
         item->success = FALSE;
-        tr_ptrArrayInsertSorted( &task->session->web->dns_cache, item, dns_cache_compare );
+        tr_ptrArrayInsertSorted( cache, item, dns_cache_compare );
     }
 }
 
@@ -221,12 +231,17 @@ dns_cache_set_name( struct tr_web_task * task, const char * host,
 
     if( task->session->web != NULL )
     {
-        struct dns_cache_item * item = tr_new( struct dns_cache_item, 1 );
+        struct dns_cache_item * item;
+        tr_ptrArray * cache = &task->session->web->dns_cache;
+
+        dns_cache_clear_entry( cache, host );
+
+        item = tr_new( struct dns_cache_item, 1 );
         item->host = tr_strdup( host );
         item->resolved_host = tr_strdup( resolved );
         item->expiration = tr_time( ) + ttl;
         item->success = TRUE;
-        tr_ptrArrayInsertSorted( &task->session->web->dns_cache, item, dns_cache_compare );
+        tr_ptrArrayInsertSorted( cache, item, dns_cache_compare );
         ret = item->resolved_host;
         dbgmsg( "adding dns cache entry for \"%s\": %s", host, resolved );
     }
