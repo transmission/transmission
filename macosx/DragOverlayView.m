@@ -38,9 +38,8 @@
         [stringShadow setShadowOffset: NSMakeSize(2.0, -2.0)];
         [stringShadow setShadowBlurRadius: 4.0];
         
-        NSFont * bigFont = [[NSFontManager sharedFontManager] convertFont:
-                                [NSFont fontWithName: @"Lucida Grande" size: 18.0] toHaveTrait: NSBoldFontMask],
-                * smallFont = [NSFont fontWithName: @"Lucida Grande" size: 14.0];
+        NSFont * bigFont = [NSFont boldSystemFontOfSize: 18.0],
+                * smallFont = [NSFont systemFontOfSize: 14.0];
         
         NSMutableParagraphStyle * paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
         [paragraphStyle setLineBreakMode: NSLineBreakByTruncatingTail];
@@ -77,11 +76,11 @@
     
     //create badge
     const NSRect badgeRect = NSMakeRect(0.0, 0.0, 325.0, 84.0);
-    NSBezierPath * bp = [NSBezierPath bezierPathWithRoundedRect: badgeRect xRadius: 15.0 yRadius: 15.0];
     
     fBadge = [[NSImage alloc] initWithSize: badgeRect.size];
     [fBadge lockFocus];
     
+    NSBezierPath * bp = [NSBezierPath bezierPathWithRoundedRect: badgeRect xRadius: 15.0 yRadius: 15.0];
     [[NSColor colorWithCalibratedWhite: 0.0 alpha: 0.75] set];
     [bp fill];
     
