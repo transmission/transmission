@@ -40,7 +40,7 @@
 #define DEFAULT_HOST "localhost"
 #define DEFAULT_PORT atoi(TR_DEFAULT_RPC_PORT_STR)
 
-enum { TAG_SESSION, TAG_STATS, TAG_LIST, TAG_DETAILS, TAG_FILES, TAG_PEERS };
+enum { TAG_SESSION, TAG_STATS, TAG_LIST, TAG_DETAILS, TAG_FILES, TAG_PEERS, TAG_PORTTEST };
 
 static const char*
 getUsage( void )
@@ -72,6 +72,7 @@ static tr_option opts[] =
     { 976, "alt-speed-time-begin",  "Time to start using the alt speed limits (in hhmm)", NULL,  1, "<time>" },
     { 977, "alt-speed-time-end",    "Time to stop using the alt speed limits (in hhmm)", NULL,  1, "<time>" },
     { 978, "alt-speed-days",        "Numbers for any/all days of the week - eg. \"1-7\"", NULL,  1, "<days>" },
+    { 963, "blocklist-update",      "Blocklist update", NULL, 0, NULL },
     { 'c', "incomplete-dir",        "Where to store new torrents until they're complete", "c", 1, "<dir>" },
     { 'C', "no-incomplete-dir",     "Don't store incomplete torrents in a different location", "C", 0, NULL },
     { 'b', "debug",                 "Print debugging information", "b",  0, NULL },
@@ -96,6 +97,7 @@ static tr_option opts[] =
     { 'o', "dht",                   "Enable distributed hash tables (DHT)", "o", 0, NULL },
     { 'O', "no-dht",                "Disable distributed hash tables (DHT)", "O", 0, NULL },
     { 'p', "port",                  "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "p", 1, "<port>" },
+    { 962, "port-test",             "Port testing", "pt", 0, NULL },
     { 'P', "random-port",           "Random port for incomping peers", "P", 0, NULL },
     { 900, "priority-high",         "Set the files' priorities as high", "ph", 1, "<files>" },
     { 901, "priority-normal",       "Set the files' priorities as normal", "pn", 1, "<files>" },
@@ -699,6 +701,15 @@ readargs( int argc, const char ** argv )
                 tr_bencDictAddStr( args, "location", optarg );
                 tr_bencDictAddBool( args, "move", FALSE );
                 addIdArg( args, id );
+                break;
+
+            case 962:
+                tr_bencDictAddStr( &top, "method", "port-test" );
+                tr_bencDictAddInt( &top, "tag", TAG_PORTTEST );
+                break;
+
+            case 963:
+                tr_bencDictAddStr( &top, "method", "blocklist-update" );
                 break;
 
             case 970:
@@ -1602,6 +1613,19 @@ printPeers( tr_benc * top )
 }
 
 static void
+printPortTest( tr_benc * top )
+{
+    tr_benc *args;
+    if( ( tr_bencDictFindDict( top, "arguments", &args ) ) )
+    {
+        tr_bool      boolVal;
+
+        if( tr_bencDictFindBool( args, "port-is-open", &boolVal ) )
+            printf( "Port is open: %s\n", ( boolVal ? "Yes" : "No" ) );
+    }
+}
+
+static void
 printTorrentList( tr_benc * top )
 {
     tr_benc *args, *list;
@@ -1725,6 +1749,9 @@ processResponse( const char * host,
 
             case TAG_PEERS:
                 printPeers( &top ); break;
+
+            case TAG_PORTTEST:
+                printPortTest( &top ); break;
 
             default:
                 if( !tr_bencDictFindStr( &top, "result", &str ) )
