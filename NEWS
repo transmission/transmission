@@ -1,3 +1,13 @@
+=== Transmission 1.83 (2010/01/23) ===
+[http://trac.transmissionbt.com/query?milestone=1.83&group=component&groupdesc=1&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Fix 1.80 announce error that caused uploads and downloads to periodically freeze
+  * Fix 1.80 announce timeout error that caused "no response from tracker" message
+  * Fix 1.80 "file not found" error message that stopped some torrents
+  * Fix 1.82 crash when adding new torrents via their ftp URL
+  * Fix 1.80 crash when receiving invalid request messages from peers
+  * Fix 1.82 error when updating the blocklist
+
 === Transmission 1.82 (2010/01/23) ===
 [http://trac.transmissionbt.com/query?milestone=1.82&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== All Platforms ====
