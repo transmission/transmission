@@ -1897,11 +1897,11 @@ int
 tr_blocklistSetContent( tr_session * session,
                         const char * contentFilename )
 {
-    tr_list *      l;
+    tr_list * l;
+    int ruleCount;
     tr_blocklist * b;
-    const char *   defaultName = "level1.bin";
-
-    assert( tr_isSession( session ) );
+    const char * defaultName = "level1.bin";
+    tr_sessionLock( session );
 
     for( b = NULL, l = session->blocklists; !b && l; l = l->next )
         if( tr_stringEndsWith( _tr_blocklistGetFilename( l->data ),
@@ -1916,7 +1916,9 @@ tr_blocklistSetContent( tr_session * session,
         tr_free( path );
     }
 
-    return _tr_blocklistSetContent( b, contentFilename );
+    ruleCount = _tr_blocklistSetContent( b, contentFilename );
+    tr_sessionUnlock( session );
+    return ruleCount;
 }
 
 tr_bool
