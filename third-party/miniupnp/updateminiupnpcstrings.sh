@@ -13,7 +13,7 @@ if [ -f /etc/debian_version ]; then
 fi
 # use lsb_release (Linux Standard Base) when available
 LSB_RELEASE=`which lsb_release`
-if [ 0 -eq $? ]; then
+if [ 0 -eq $? -a -x "${LSB_RELEASE}" ]; then
 	OS_NAME=`${LSB_RELEASE} -i -s`
 	OS_VERSION=`${LSB_RELEASE} -r -s`
 	case $OS_NAME in

@@ -385,18 +385,7 @@ case $host_os in
 
   *darwin*)
     have_darwin="yes"
-    # Make sure the proper Mac SDK is installed
-    if test ! -d /Developer/SDKs/MacOSX10.5.sdk; then
-      cat << EOF
-You need to install the Mac OS X 10.5 SDK in order to build Transmission:
-  Get your Xcode CD or package
-  Restart the install
-  When it gets to "Installation Type", select "Customize"
-  Select "Mac OS X 10.5 SDK" under "Cross Development"
-  Finish the install.
-EOF
-      exit 1
-    fi
+    CFLAGS="-DMACOSX $CFLAGS"
     ;;
 
 esac
@@ -420,6 +409,21 @@ AC_ARG_ENABLE([daemon],
 AM_CONDITIONAL([BUILD_DAEMON],[test "x$build_daemon" = "xyes"])
 
 
+if test "x$build_mac" = "xyes" ; then
+    # Make sure the proper Mac SDK is installed
+    if test ! -d /Developer/SDKs/MacOSX10.5.sdk; then
+      cat << EOF
+You need to install the Mac OS X 10.5 SDK in order to build Transmission
+with --enable-mac:
+  Get your Xcode CD or package
+  Restart the install
+  When it gets to "Installation Type", select "Customize"
+  Select "Mac OS X 10.5 SDK" under "Cross Development"
+  Finish the install.
+EOF
+      exit 1
+    fi
+fi
 if test "x$have_darwin" = "xyes"; then
     AC_DEFINE([HAVE_DARWIN], 1)
 fi
