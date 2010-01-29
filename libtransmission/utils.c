@@ -212,11 +212,13 @@ tr_getLogTimeStr( char * buf, int buflen )
     char           tmp[64];
     struct tm      now_tm;
     struct timeval tv;
+    time_t         seconds;
     int            milliseconds;
 
     gettimeofday( &tv, NULL );
 
-    tr_localtime_r( &tv.tv_sec, &now_tm );
+    seconds = tv.tv_sec;
+    tr_localtime_r( &seconds, &now_tm );
     strftime( tmp, sizeof( tmp ), "%H:%M:%S", &now_tm );
     milliseconds = (int)( tv.tv_usec / 1000 );
     tr_snprintf( buf, buflen, "%s.%03d", tmp, milliseconds );
