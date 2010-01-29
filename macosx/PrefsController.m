@@ -341,7 +341,7 @@ tr_session * fHandle;
 
 - (void) setPort: (id) sender
 {
-    const int port = [sender intValue];
+    const tr_port port = [sender intValue];
     [fDefaults setInteger: port forKey: @"BindPort"];
     tr_sessionSetPeerPort(fHandle, port);
     
@@ -352,9 +352,11 @@ tr_session * fHandle;
 - (void) randomPort: (id) sender
 {
     const tr_port port = tr_sessionSetPeerPortRandom(fHandle);
-    
+    [fDefaults setInteger: port forKey: @"BindPort"];
     [fPortField setIntValue: port];
-    [self setPort: fPortField];
+    
+    fPeerPort = -1;
+    [self updatePortStatus];
 }
 
 - (void) setRandomPortOnStart: (id) sender
