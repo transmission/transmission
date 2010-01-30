@@ -37,7 +37,7 @@
 #include <libtransmission/web.h> /* tr_webRun */
 
 #define LINEWIDTH 80
-#define MY_NAME "transmission-cli"
+#define MY_NAME "transmissioncli"
 
 static tr_bool showInfo         = 0;
 static tr_bool showScrape       = 0;
