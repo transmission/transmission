@@ -590,7 +590,7 @@ div#inspector_header {
 	padding-right: 10px;
 }
 div#inspector_tabs {
-	width: 189px;
+	width: 243px;
 	margin: 0 auto;
 	padding-top: 10px;
 }
@@ -632,6 +632,50 @@ div#inspector_tabs {
 	display: table-cell;
 	padding-top: 10px;
 	width: 230px; /* inspector_container_width==330 - inspector_label_width==100 */
+}
+
+/* Trackers Inspector Tab */
+#inspector_trackers_list {
+	padding: 0 0 0 0;
+	margin: 0 0 0 0;
+	text-align: left;
+	cursor: default;
+	overflow: hidden;
+}
+#inspector_trackers_list > div.inspector_group {
+	padding-bottom: 0;
+	margin-bottom: 0;
+}
+ul.tier_list {
+	width: 100%;
+	margin: 10px 0 0 0;
+	padding-left: 0px;
+	text-align: left;
+	display: block;
+	cursor: default;
+	list-style-type: none;
+	list-style: none;
+	list-style-image: none;
+	clear: both;
+}
+.tier_list table{
+  margin-left: 15px;
+  color: #666;
+}
+.tier_list th{
+  text-align: right;
+}
+li.inspector_tracker_entry {
+	padding: 3px 0 3px 2px;
+	display: block;
+}
+li.inspector_tracker_entry.odd {
+	background-color: #EEEEEE;
+}
+div.tracker_host {
+	font-size: 1.2em;
+	font-weight: bold;
+	color: #222;
 }
 
 /* Files Inspector Tab */
