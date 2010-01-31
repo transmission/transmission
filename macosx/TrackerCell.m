@@ -28,10 +28,10 @@
 
 #define PADDING_HORIZONAL 3.0
 #define PADDING_STATUS_HORIZONAL 3.0
-#define ICON_SIZE 14.0
+#define ICON_SIZE 16.0
 #define PADDING_BETWEEN_ICON_AND_NAME 4.0
 #define PADDING_ABOVE_ICON 1.0
-#define PADDING_ABOVE_NAME 2.0
+#define PADDING_ABOVE_NAME 1.0
 #define PADDING_BETWEEN_LINES 1.0
 #define PADDING_BETWEEN_LINES_ON_SAME_LINE 4.0
 #define COUNT_WIDTH 40.0
@@ -75,7 +75,7 @@ NSMutableSet * fTrackerIconLoading;
         [paragraphStyle setLineBreakMode: NSLineBreakByTruncatingTail];
         
         fNameAttributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
-                            [NSFont messageFontOfSize: 11.0], NSFontAttributeName,
+                            [NSFont messageFontOfSize: 12.0], NSFontAttributeName,
                             paragraphStyle, NSParagraphStyleAttributeName, nil];
         
         fStatusAttributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
