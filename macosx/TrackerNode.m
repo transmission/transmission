@@ -118,9 +118,8 @@
         baseString = [NSLocalizedString(@"Last Announce", "Tracker last announce") stringByAppendingFormat: @": %@", dateString];
         if (fStat.hasAnnounced && fStat.lastAnnounceSucceeded)
         {
-            #warning after 1.8 fix ugly hack
             NSString * peerString;
-            if (fStat.lastAnnouncePeerCount == 1 && [[[NSLocale currentLocale] localeIdentifier] hasPrefix: @"en_"])
+            if (fStat.lastAnnouncePeerCount == 1)
                 peerString = NSLocalizedString(@"got 1 peer", "Tracker last announce");
             else
                 peerString = [NSString stringWithFormat: NSLocalizedString(@"got %d peers", "Tracker last announce"),
