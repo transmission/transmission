@@ -34,6 +34,7 @@
     IBOutlet NSTextField * fNameField, * fStatusField, * fLocationField;
     IBOutlet NSButton * fStartCheck, * fDeleteCheck;
     IBOutlet NSPopUpButton * fGroupPopUp;
+    IBOutlet NSProgressIndicator * fVerifyIndicator;
     
     IBOutlet FileOutlineController * fFileController;
     

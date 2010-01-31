@@ -34,6 +34,8 @@
 
 @interface AddWindowController (Private)
 
+- (void) updateFiles;
+
 - (void) confirmAdd;
 
 - (void) setDestinationPath: (NSString *) destination;
@@ -105,8 +107,9 @@
         [fLocationImageView setImage: nil];
     }
     
-    fTimer = [NSTimer scheduledTimerWithTimeInterval: UPDATE_SECONDS target: fFileController
-                selector: @selector(reloadData) userInfo: nil repeats: YES];
+    fTimer = [NSTimer scheduledTimerWithTimeInterval: UPDATE_SECONDS target: self
+                selector: @selector(updateFiles) userInfo: nil repeats: YES];
+    [self updateFiles];
 }
 
 - (void) windowDidLoad
@@ -191,7 +194,7 @@
 - (void) verifyLocalData: (id) sender
 {
     [fTorrent resetCache];
-    [fFileController reloadData];
+    [self updateFiles];
 }
 
 - (void) updateStatusField: (NSNotification *) notification
@@ -228,6 +231,21 @@
 @end
 
 @implementation AddWindowController (Private)
+
+- (void) updateFiles
+{
+    [fTorrent update];
+    
+    [fFileController reloadData];
+    
+    if ([fTorrent isChecking])
+    {
+        [fVerifyIndicator setHidden: NO];
+        [fVerifyIndicator setDoubleValue: [fTorrent checkingProgress]];
+    }
+    else
+        [fVerifyIndicator setHidden: YES];
+}
 
 - (void) confirmAdd
 {
