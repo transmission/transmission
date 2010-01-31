@@ -636,7 +636,7 @@ isMartianAddr( const struct tr_address * a )
                       there are a lot of buggy peers pushing around such
                       addresses over PEX, we reject them until the end of
                       the 13th Baktun. */
-                   (tr_time() < 1356130800 && (address[0] & 0xC0) != 0x20);
+                   (tr_time() < 1356130800 && (address[0] & 0xE0) != 0x20);
             break;
         }
 
