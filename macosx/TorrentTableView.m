@@ -48,8 +48,6 @@
 
 - (void) setGroupStatusColumns;
 
-- (void) createFileMenu: (NSMenu *) menu forFiles: (NSArray *) files;
-
 @end
 
 @implementation TorrentTableView
@@ -546,17 +544,8 @@
     if (row < 0)
         return;
     
-    const NSInteger numberOfNonFileItems = [fActionMenu numberOfItems];
-    
     //update file action menu
     fMenuTorrent = [[self itemAtRow: row] retain];
-    
-    //show/hide the file divider
-    const BOOL isFolder = [fMenuTorrent isFolder];
-    [[fActionMenu itemAtIndex: numberOfNonFileItems-1] setHidden: !isFolder];
-    
-    if (isFolder)
-        [self createFileMenu: fActionMenu forFiles: [fMenuTorrent fileList]];
     
     //update global limit check
     [fGlobalLimitItem setState: [fMenuTorrent usesGlobalSpeedLimit] ? NSOnState : NSOffState];
@@ -580,9 +569,6 @@
         
         [NSMenu popUpContextMenu: fActionMenu withEvent: newEvent forView: self];
     }
-    
-    for (NSInteger i = [fActionMenu numberOfItems]-1; i >= numberOfNonFileItems; i--)
-        [fActionMenu removeItemAtIndex: i];
     
     [fMenuTorrent release];
     fMenuTorrent = nil;
@@ -668,15 +654,6 @@
         
         item = [menu itemWithTag: ACTION_MENU_PRIORITY_LOW_TAG];
         [item setState: priority == TR_PRI_LOW ? NSOnState : NSOffState];
-    }
-    else //assume the menu is part of the file list
-    {
-        if ([menu numberOfItems] > 0)
-            return;
-        
-        NSMenu * supermenu = [menu supermenu];
-        [self createFileMenu: menu forFiles: [(FileListNode *)[[supermenu itemAtIndex: [supermenu indexOfItemWithSubmenu: menu]]
-                                                representedObject] children]];
     }
 }
 
@@ -903,38 +880,6 @@
     
     [[self tableColumnWithIdentifier: @"DL"] setHidden: ratio];
     [[self tableColumnWithIdentifier: @"DL Image"] setHidden: ratio];
-}
-
-- (void) createFileMenu: (NSMenu *) menu forFiles: (NSArray *) files
-{
-    for (FileListNode * node in files)
-    {
-        NSString * name = [node name];
-        
-        NSMenuItem * item = [[NSMenuItem alloc] initWithTitle: name action: @selector(checkFile:) keyEquivalent: @""];
-        
-        if ([node isFolder])
-        {
-            NSMenu * itemMenu = [[NSMenu alloc] initWithTitle: name];
-            [itemMenu setAutoenablesItems: NO];
-            [item setSubmenu: itemMenu];
-            [itemMenu setDelegate: self];
-            [itemMenu release];
-        }
-        
-        [item setRepresentedObject: node];
-        
-        NSImage * icon = [node icon];
-        [icon setSize: NSMakeSize(16.0, 16.0)];
-        [item setImage: icon];
-        
-        NSIndexSet * indexSet = [node indexes];
-        [item setState: [fMenuTorrent checkForFiles: indexSet]];
-        [item setEnabled: [fMenuTorrent canChangeDownloadCheckForFiles: indexSet]];
-        
-        [menu addItem: item];
-        [item release];
-    }
 }
 
 @end

@@ -12,10 +12,11 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
+			<integer value="1936"/>
+			<integer value="81"/>
+			<integer value="456"/>
 			<integer value="1480"/>
 			<integer value="21"/>
-			<integer value="456"/>
-			<integer value="81"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -416,9 +417,9 @@ uF1MuF0d31394F4LFIkD59u9u5SF29tt3D6d5kI1090F4V6N6V6d6g8RSF69593d3UFovl3l6t796QgI
 AA8BAAADAAAAAQA+AAABAQADAAAAAQA+AAABAgADAAAABAAAJNIBAwADAAAAAQAFAAABBgADAAAAAQAC
 AAABEQAEAAAAAQAAAAgBEgADAAAAAQABAAABFQADAAAAAQAEAAABFgADAAAAAQA+AAABFwAEAAAAAQAA
 JBABHAADAAAAAQABAAABPQADAAAAAQACAAABUgADAAAAAQABAAABUwADAAAABAAAJNqHcwAHAAAoQAAA
-JOIAAAAAAAgACAAIAAgAAQABAAEAAQAAKEBhcHBsAgAAAG1udHJSR0IgWFlaIAfZAAgAHAASABUAJWFj
-c3BBUFBMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD21gABAAAAANMtYXBwbNyPwG1i+VmcTdMqo0kS
-h5AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEXJYWVoAAAFQAAAAFGdYWVoAAAFkAAAAFGJY
+JOIAAAAAAAgACAAIAAgAAQABAAEAAQAAKEBhcHBsAgAAAG1udHJSR0IgWFlaIAfaAAEAAgATABsAGGFj
+c3BBUFBMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD21gABAAAAANMtYXBwbDNKw7X760UhC6e2eZMW
+kx0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEXJYWVoAAAFQAAAAFGdYWVoAAAFkAAAAFGJY
 WVoAAAF4AAAAFHd0cHQAAAGMAAAAFGNoYWQAAAGgAAAALHJUUkMAAAHMAAAIDGdUUkMAAAnYAAAIDGJU
 UkMAABHkAAAIDGFhcmcAABnwAAAAIGFhZ2cAABoQAAAAIGFhYmcAABowAAAAIHZjZ3QAABpQAAAGEm5k
 aW4AACBkAAAGPmRlc2MAACakAAAAX2RzY20AACcEAAAA8G1tb2QAACf0AAAAKGNwcnQAACgcAAAAJFhZ
@@ -588,7 +589,7 @@ AAgAAADoZnJGUgAAAAgAAADocHRCUgAAAAgAAADocHRQVAAAAAgAAADoemhDTgAAAAgAAADoZXNFUwAA
 AAgAAADoamFKUAAAAAgAAADocnVSVQAAAAgAAADoc3ZTRQAAAAgAAADoemhUVwAAAAgAAADoZGVERQAA
 AAgAAADoZmlGSQAAAAgAAADoaXRJVAAAAAgAAADoa29LUgAAAAgAAADoAGkATQBhAGNtbW9kAAAAAAAA
 BhAAAJxqAAAAAL/TkYAAAAAAAAAAAAAAAAAAAAAAdGV4dAAAAABDb3B5cmlnaHQgQXBwbGUsIEluYy4s
-IDIwMDkAA</bytes>
+IDIwMTAAA</bytes>
 																		</object>
 																		<string key="NSCacheWindowColorSpace">NSCalibratedRGBColorSpace</string>
 																		<int key="NSCacheWindowBPS">8</int>
@@ -3308,17 +3309,6 @@ IDIwMDkAA</bytes>
 								</object>
 							</object>
 						</object>
-					</object>
-					<object class="NSMenuItem" id="1033685900">
-						<reference key="NSMenu" ref="588646173"/>
-						<bool key="NSIsDisabled">YES</bool>
-						<bool key="NSIsSeparator">YES</bool>
-						<string key="NSTitle"/>
-						<string key="NSKeyEquiv"/>
-						<int key="NSKeyEquivModMask">1048576</int>
-						<int key="NSMnemonicLoc">2147483647</int>
-						<reference key="NSOnImage" ref="322614661"/>
-						<reference key="NSMixedImage" ref="3851078"/>
 					</object>
 				</object>
 				<string key="NSName"/>
@@ -6427,7 +6417,6 @@ IDIwMDkAA</bytes>
 							<reference ref="624203829"/>
 							<reference ref="585779654"/>
 							<reference ref="113299757"/>
-							<reference ref="1033685900"/>
 							<reference ref="1039703472"/>
 							<reference ref="48945683"/>
 							<reference ref="350082482"/>
@@ -6956,11 +6945,6 @@ IDIwMDkAA</bytes>
 						<int key="objectID">3146</int>
 						<reference key="object" ref="121868389"/>
 						<reference key="parent" ref="354434380"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">3148</int>
-						<reference key="object" ref="1033685900"/>
-						<reference key="parent" ref="588646173"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">1282</int>
@@ -7610,8 +7594,6 @@ IDIwMDkAA</bytes>
 					<string>3140.IBPluginDependency</string>
 					<string>3145.IBPluginDependency</string>
 					<string>3146.IBPluginDependency</string>
-					<string>3148.IBPluginDependency</string>
-					<string>3148.ImportedFromIB2</string>
 					<string>3163.IBPluginDependency</string>
 					<string>3163.ImportedFromIB2</string>
 					<string>3164.IBPluginDependency</string>
@@ -7990,7 +7972,7 @@ IDIwMDkAA</bytes>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>{{209, 474}, {310, 133}}</string>
+					<string>{{209, 484}, {310, 123}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>{{381, 469}, {214, 113}}</string>
@@ -8220,8 +8202,6 @@ IDIwMDkAA</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
