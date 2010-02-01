@@ -1074,6 +1074,7 @@ static tr_bool
 parseAnnounceResponse( tr_tier     * tier,
                        const char  * response,
                        size_t        responseLen,
+                       tr_bool       isStopped,
                        tr_bool     * gotScrape )
 {
     tr_benc benc;
@@ -1092,7 +1093,6 @@ parseAnnounceResponse( tr_tier     * tier,
         tr_benc * tmp;
         const char * str;
         const uint8_t * raw;
-        tr_bool gotPeers = FALSE;
 
         success = TRUE;
 
@@ -1155,7 +1155,6 @@ parseAnnounceResponse( tr_tier     * tier,
             /* "compact" extension */
             const int allAreSeeds = incomplete == 0;
             peerCount += publishNewPeersCompact( tier, allAreSeeds, raw, rawlen );
-            gotPeers = TRUE;
         }
         else if( tr_bencDictFindList( &benc, "peers", &tmp ) )
         {
@@ -1164,7 +1163,6 @@ parseAnnounceResponse( tr_tier     * tier,
             size_t byteCount = 0;
             uint8_t * array = parseOldPeers( tmp, &byteCount );
             peerCount += publishNewPeers( tier, allAreSeeds, array, byteCount );
-            gotPeers = TRUE;
             tr_free( array );
         }
 
@@ -1173,14 +1171,13 @@ parseAnnounceResponse( tr_tier     * tier,
             /* "compact" extension */
             const tr_bool allAreSeeds = incomplete == 0;
             peerCount += publishNewPeersCompact6( tier, allAreSeeds, raw, rawlen );
-            gotPeers = TRUE;
         }
 
         if( tier->lastAnnounceStr[0] == '\0' )
             tr_strlcpy( tier->lastAnnounceStr, _( "Success" ),
                         sizeof( tier->lastAnnounceStr ) );
 
-        if( gotPeers )
+        if( !isStopped )
             tier->lastAnnouncePeerCount = peerCount;
     }
 
@@ -1197,6 +1194,7 @@ struct announce_data
     int torrentId;
     int tierId;
     time_t timeSent;
+    const char * event;
 
     /** If the request succeeds, the value for tier's "isRunning" flag */
     tr_bool isRunningOnSuccess;
@@ -1215,6 +1213,7 @@ onAnnounceDone( tr_session   * session,
     tr_bool gotScrape = FALSE;
     tr_bool success = FALSE;
     const time_t now = time ( NULL );
+    const tr_bool isStopped = !strcmp( data->event, "stopped" );
 
     if( announcer && tier )
     {
@@ -1229,7 +1228,7 @@ onAnnounceDone( tr_session   * session,
 
         if( responseCode == HTTP_OK )
         {
-            success = parseAnnounceResponse( tier, response, responseLen, &gotScrape );
+            success = parseAnnounceResponse( tier, response, responseLen, isStopped, &gotScrape );
             dbgmsg( tier, "success is %d", success );
         }
         else if( responseCode )
@@ -1385,8 +1384,8 @@ tierAnnounce( tr_announcer * announcer, tr_tier * tier )
     data->tierId = tier->key;
     data->isRunningOnSuccess = tor->isRunning;
     data->timeSent = now;
-
-    url = createAnnounceURL( announcer, tor, tier, getAnnounceEvent( tier ) );
+    data->event = getAnnounceEvent( tier );
+    url = createAnnounceURL( announcer, tor, tier, data->event );
 
     tier->isAnnouncing = TRUE;
     tier->lastAnnounceStartTime = now;
