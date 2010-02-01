@@ -201,7 +201,43 @@ Math.formatSeconds = function(seconds)
  */
 Math.formatTimestamp = function(seconds) {
 	var myDate = new Date(seconds*1000);
-	return myDate.toGMTString();
+	var now = new Date();
+
+	var date = "";
+	var time = "";
+
+	var sameYear = now.getFullYear() == myDate.getFullYear();
+	var sameMonth = now.getMonth() == myDate.getMonth();
+
+	var dateDiff = now.getDate() - myDate.getDate();
+	if(sameYear && sameMonth && Math.abs(dateDiff) <= 1){
+		if(dateDiff == 0){
+			date = "Today";
+		}
+		else if(dateDiff == 1){
+			date = "Yesterday";
+		}
+		else{
+			date = "Tomorrow";
+		}
+	}
+	else{
+		date = myDate.toDateString();
+	}
+
+	var hours = myDate.getHours();
+	var period = "AM";
+	if(hours > 12){
+		hours = hours - 12;
+		period = "PM";
+	}
+	if(hours == 0){
+		hours = 12;
+	}
+
+	time = [hours, myDate.getMinutes(), myDate.getSeconds()].join(':');
+
+	return [date, time, period].join(' ');
 };
 
 /*
