@@ -40,6 +40,7 @@
 #include "fdlimit.h"
 #include "ConvertUTF.h"
 #include "list.h"
+#include "net.h"
 #include "utils.h"
 #include "platform.h"
 #include "version.h"
@@ -930,6 +931,12 @@ tr_httpIsValidURL( const char * url )
             return FALSE;
 
     return tr_httpParseURL( url, -1, NULL, NULL, NULL ) == 0;
+}
+
+tr_bool tr_addressIsIP( const char * address )
+{
+    tr_address tempAddr;
+    return tr_pton(address, &tempAddr) != NULL;
 }
 
 int
