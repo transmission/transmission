@@ -1219,9 +1219,10 @@ onAnnounceDone( tr_session   * session,
             host->lastResponseInterval = now - data->timeSent;
         }
 
+        tier->lastAnnounceTime = now;
+
         if( responseCode == HTTP_OK )
         {
-            tier->lastAnnounceTime = now;
             success = parseAnnounceResponse( tier, response, responseLen, &gotScrape );
             dbgmsg( tier, "success is %d", success );
         }
@@ -1236,8 +1237,6 @@ onAnnounceDone( tr_session   * session,
 
             tr_strlcpy( tier->lastAnnounceStr, buf,
                         sizeof( tier->lastAnnounceStr ) );
-
-            tier->lastAnnounceTime = now;
 
             /* if the response is serious, *and* if the response may require
              * human intervention, then notify the user... otherwise just log it */
