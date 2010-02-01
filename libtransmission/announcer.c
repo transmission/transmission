@@ -1795,9 +1795,8 @@ tr_announcerStats( const tr_torrent * torrent,
                 if(( st->hasAnnounced = tier->lastAnnounceTime != 0 )) {
                     st->lastAnnounceTime = tier->lastAnnounceTime;
                     tr_strlcpy( st->lastAnnounceResult, tier->lastAnnounceStr, sizeof( st->lastAnnounceResult ) );
-                    if(( st->lastAnnounceSucceeded = tier->lastAnnounceSucceeded )) {
-                        st->lastAnnouncePeerCount = tier->lastAnnouncePeerCount;
-                    }
+                    st->lastAnnounceSucceeded = tier->lastAnnounceSucceeded;
+                    st->lastAnnouncePeerCount = tier->lastAnnouncePeerCount;
                 }
 
                 if( tier->isAnnouncing )
