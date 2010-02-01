@@ -1193,6 +1193,10 @@ prefschanged( TrCore * core UNUSED,
     {
         tr_sessionSetPexEnabled( tr, pref_flag_get( key ) );
     }
+    else if( !strcmp( key, TR_PREFS_KEY_RENAME_PARTIAL_FILES ) )
+    {
+        tr_sessionSetIncompleteFileNamingEnabled( tr, pref_flag_get( key ) );
+    }
     else if( !strcmp( key, TR_PREFS_KEY_DHT_ENABLED ) )
     {
         tr_sessionSetDHTEnabled( tr, pref_flag_get( key ) );

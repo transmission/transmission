@@ -406,6 +406,7 @@
    "peer-port"                | number     port number
    "peer-port-random-on-start"| boolean    true means pick a random peer port on launch
    "port-forwarding-enabled"  | boolean    true means enabled
+   "rename-partial-files"     | boolean    true means append ".part" to incomplete files
    "rpc-version"              | number     the current RPC API version
    "rpc-version-minimum"      | number     the minimum RPC API version supported
    "seedRatioLimit"           | double     the default seed ratio for torrents to use
@@ -572,5 +573,7 @@
          |         | yes       | torrent-get    | new arg "trackerStats"
          |         | yes       | session-set    | new arg "incomplete-dir"
          |         | yes       | session-set    | new arg "incomplete-dir-enabled"
-
+   ------+---------+-----------+----------------+-------------------------------
+   8     | 1.90    | yes       | session-set    | new arg "rename-partial-files"
+         |         | yes       | session-get    | new arg "rename-partial-files"
 

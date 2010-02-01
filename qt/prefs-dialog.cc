@@ -566,6 +566,7 @@ PrefsDialog :: createTorrentsTab( )
         hig->addWideControl( checkBoxNew( tr( "Show &options dialog" ), Prefs::OPTIONS_PROMPT ) );
         hig->addWideControl( checkBoxNew( tr( "&Start when added" ), Prefs::START ) );
         hig->addWideControl( checkBoxNew( tr( "Mo&ve .torrent file to the trash" ), Prefs::TRASH_ORIGINAL ) );
+        hig->addWideControl( checkBoxNew( tr( "Append \".&part\" to incomplete files' names" ), Prefs::RENAME_PARTIAL_FILES ) );
 
         b = myIncompleteButton = new QPushButton;
         b->setIcon( folderPixmap );

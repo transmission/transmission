@@ -106,6 +106,7 @@ class Prefs: public QObject
             PROXY_USERNAME,
             RATIO,
             RATIO_ENABLED,
+            RENAME_PARTIAL_FILES,
             RPC_AUTH_REQUIRED,
             RPC_ENABLED,
             RPC_PASSWORD,

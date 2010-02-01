@@ -1185,6 +1185,8 @@ sessionSet( tr_session               * session,
         tr_sessionSetPeerPort( session, i );
     if( tr_bencDictFindBool( args_in, TR_PREFS_KEY_PORT_FORWARDING, &boolVal ) )
         tr_sessionSetPortForwardingEnabled( session, boolVal );
+    if( tr_bencDictFindBool( args_in, TR_PREFS_KEY_RENAME_PARTIAL_FILES, &boolVal ) )
+        tr_sessionSetIncompleteFileNamingEnabled( session, boolVal );
     if( tr_bencDictFindReal( args_in, "seedRatioLimit", &d ) )
         tr_sessionSetRatioLimit( session, d );
     if( tr_bencDictFindBool( args_in, "seedRatioLimited", &boolVal ) )
@@ -1287,7 +1289,8 @@ sessionGet( tr_session               * s,
     tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_PORT, tr_sessionGetPeerPort( s ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START, tr_sessionGetPeerPortRandomOnStart( s ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_PORT_FORWARDING, tr_sessionIsPortForwardingEnabled( s ) );
-    tr_bencDictAddInt ( d, "rpc-version", 7 );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_RENAME_PARTIAL_FILES, tr_sessionIsIncompleteFileNamingEnabled( s ) );
+    tr_bencDictAddInt ( d, "rpc-version", 8 );
     tr_bencDictAddInt ( d, "rpc-version-minimum", 1 );
     tr_bencDictAddReal( d, "seedRatioLimit", tr_sessionGetRatioLimit( s ) );
     tr_bencDictAddBool( d, "seedRatioLimited", tr_sessionIsRatioLimited( s ) );
