@@ -18,8 +18,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <sys/types.h> /* stat() */
+#include <sys/stat.h> /* stat() */
 #include <locale.h>
-#include <unistd.h> /* close() */
+#include <unistd.h> /* stat(), close() */
 
 #include <event.h> /* evbuffer */
 
@@ -1529,9 +1531,21 @@ tr_bencToStr( const tr_benc * top, tr_fmt_mode mode, int * len )
 int
 tr_bencToFile( const tr_benc * top, tr_fmt_mode mode, const char * filename )
 {
+    FILE * fp;
+    struct stat sb;
     int err = 0;
-    FILE * fp = fopen( filename, "wb+" );
+    char * backup = NULL;
+    tr_bool have_backup = FALSE;
 
+    /* if the file already exists, try to move it out of the way & keep it as a backup */
+    if( !stat( filename, &sb ) && S_ISREG( sb.st_mode ) ) {
+        backup = tr_strdup_printf( "%s.temp-backup", filename );
+        if( stat( backup, &sb ) && ( errno == ENOENT ) )
+            have_backup = !rename( filename, backup );
+    }
+
+    /* save the bencoded data to the file */
+    fp = fopen( filename, "wb+" );
     if( fp == NULL )
     {
         err = errno;
@@ -1554,6 +1568,14 @@ tr_bencToFile( const tr_benc * top, tr_fmt_mode mode, const char * filename )
         fclose( fp );
     }
 
+    if( have_backup ) {
+        if( err )
+            rename( backup, filename );
+        else
+            unlink( backup );
+    }
+
+    tr_free( backup );
     return err;
 }
 
