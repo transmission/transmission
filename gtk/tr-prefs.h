@@ -52,4 +52,11 @@ GtkWidget * tr_prefs_dialog_new( GObject *   core,
 #define PREF_KEY_MAIN_WINDOW_Y                     "main-window-y"
 #define PREF_KEY_MAIN_WINDOW_IS_MAXIMIZED          "main-window-is-maximized"
 
+enum
+{
+    MAIN_WINDOW_REFRESH_INTERVAL_SECONDS = 1,
+
+    SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS = 2
+};
+
 #endif

@@ -30,8 +30,6 @@
 
 #define DETAILS_KEY "details-data"
 
-#define UPDATE_INTERVAL_SECONDS 2
-
 struct DetailsImpl
 {
     GtkWidget * dialog;
@@ -2243,7 +2241,7 @@ torrent_inspector_new( GtkWindow * parent, TrCore * core )
 
     gtk_box_pack_start( GTK_BOX( GTK_DIALOG( d )->vbox ), n, TRUE, TRUE, 0 );
 
-    di->periodic_refresh_tag = gtr_timeout_add_seconds( UPDATE_INTERVAL_SECONDS,
+    di->periodic_refresh_tag = gtr_timeout_add_seconds( SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS,
                                                         periodic_refresh, di );
     gtk_widget_show_all( GTK_DIALOG( d )->vbox );
     return d;

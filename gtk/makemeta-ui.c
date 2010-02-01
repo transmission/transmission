@@ -22,6 +22,7 @@
 #include "hig.h"
 #include "makemeta-ui.h"
 #include "tr-core.h"
+#include "tr-prefs.h"
 #include "util.h"
 
 #define FILE_CHOSEN_KEY "file-is-chosen"
@@ -189,7 +190,7 @@ makeProgressDialog( GtkWidget * parent, MakeMetaUI * ui )
     ui->progress_bar = w;
     gtk_box_pack_start( GTK_BOX( v ), w, FALSE, FALSE, 0 );
 
-    ui->progress_tag = gtr_timeout_add_seconds( 1, onProgressDialogRefresh, ui );
+    ui->progress_tag = gtr_timeout_add_seconds( SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS, onProgressDialogRefresh, ui );
     g_object_weak_ref( G_OBJECT( d ), onProgressDialogDestroyed, ui );
     onProgressDialogRefresh( ui );
 

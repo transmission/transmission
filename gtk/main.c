@@ -61,8 +61,6 @@
 
 #define MY_NAME "transmission"
 
-#define REFRESH_INTERVAL_SECONDS 2
-
 #if GTK_CHECK_VERSION( 2, 8, 0 )
  #define SHOW_LICENSE
 static const char * LICENSE =
@@ -686,7 +684,7 @@ appsetup( TrWindow *      wind,
     prefschanged( cbdata->core, PREF_KEY_SHOW_TRAY_ICON, cbdata );
 
     /* start model update timer */
-    cbdata->timer = gtr_timeout_add_seconds( REFRESH_INTERVAL_SECONDS, updatemodel, cbdata );
+    cbdata->timer = gtr_timeout_add_seconds( MAIN_WINDOW_REFRESH_INTERVAL_SECONDS, updatemodel, cbdata );
     updatemodel( cbdata );
 
     /* either show the window or iconify it */
