@@ -1085,6 +1085,7 @@ parseAnnounceResponse( tr_tier     * tier,
     publishErrorClear( tier );
     if( bencLoaded && tr_bencIsDict( &benc ) )
     {
+        int peerCount = 0;
         int incomplete = -1;
         size_t rawlen;
         int64_t i;
@@ -1152,7 +1153,7 @@ parseAnnounceResponse( tr_tier     * tier,
         {
             /* "compact" extension */
             const int allAreSeeds = incomplete == 0;
-            tier->lastAnnouncePeerCount = publishNewPeersCompact( tier, allAreSeeds, raw, rawlen );
+            peerCount = publishNewPeersCompact( tier, allAreSeeds, raw, rawlen );
         }
         else if( tr_bencDictFindList( &benc, "peers", &tmp ) )
         {
@@ -1160,7 +1161,7 @@ parseAnnounceResponse( tr_tier     * tier,
             const tr_bool allAreSeeds = incomplete == 0;
             size_t byteCount = 0;
             uint8_t * array = parseOldPeers( tmp, &byteCount );
-            tier->lastAnnouncePeerCount = publishNewPeers( tier, allAreSeeds, array, byteCount );
+            peerCount = publishNewPeers( tier, allAreSeeds, array, byteCount );
             tr_free( array );
         }
 
@@ -1168,12 +1169,14 @@ parseAnnounceResponse( tr_tier     * tier,
         {
             /* "compact" extension */
             const tr_bool allAreSeeds = incomplete == 0;
-            tier->lastAnnouncePeerCount += publishNewPeersCompact6( tier, allAreSeeds, raw, rawlen );
+            peerCount += publishNewPeersCompact6( tier, allAreSeeds, raw, rawlen );
         }
 
         if( tier->lastAnnounceStr[0] == '\0' )
             tr_strlcpy( tier->lastAnnounceStr, _( "Success" ),
                         sizeof( tier->lastAnnounceStr ) );
+
+        tier->lastAnnouncePeerCount = peerCount;
     }
 
     if( bencLoaded )
@@ -1210,8 +1213,6 @@ onAnnounceDone( tr_session   * session,
 
     if( announcer && tier )
     {
-        tier->lastAnnouncePeerCount = 0;
-
         if( tier->currentTracker->host )
         {
             tr_host * host = tier->currentTracker->host;
