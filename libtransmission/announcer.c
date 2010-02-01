@@ -1092,6 +1092,7 @@ parseAnnounceResponse( tr_tier     * tier,
         tr_benc * tmp;
         const char * str;
         const uint8_t * raw;
+        tr_bool gotPeers = FALSE;
 
         success = TRUE;
 
@@ -1153,7 +1154,8 @@ parseAnnounceResponse( tr_tier     * tier,
         {
             /* "compact" extension */
             const int allAreSeeds = incomplete == 0;
-            peerCount = publishNewPeersCompact( tier, allAreSeeds, raw, rawlen );
+            peerCount += publishNewPeersCompact( tier, allAreSeeds, raw, rawlen );
+            gotPeers = TRUE;
         }
         else if( tr_bencDictFindList( &benc, "peers", &tmp ) )
         {
@@ -1161,7 +1163,8 @@ parseAnnounceResponse( tr_tier     * tier,
             const tr_bool allAreSeeds = incomplete == 0;
             size_t byteCount = 0;
             uint8_t * array = parseOldPeers( tmp, &byteCount );
-            peerCount = publishNewPeers( tier, allAreSeeds, array, byteCount );
+            peerCount += publishNewPeers( tier, allAreSeeds, array, byteCount );
+            gotPeers = TRUE;
             tr_free( array );
         }
 
@@ -1170,13 +1173,15 @@ parseAnnounceResponse( tr_tier     * tier,
             /* "compact" extension */
             const tr_bool allAreSeeds = incomplete == 0;
             peerCount += publishNewPeersCompact6( tier, allAreSeeds, raw, rawlen );
+            gotPeers = TRUE;
         }
 
         if( tier->lastAnnounceStr[0] == '\0' )
             tr_strlcpy( tier->lastAnnounceStr, _( "Success" ),
                         sizeof( tier->lastAnnounceStr ) );
 
-        tier->lastAnnouncePeerCount = peerCount;
+        if( gotPeers )
+            tier->lastAnnouncePeerCount = peerCount;
     }
 
     if( bencLoaded )
