@@ -619,12 +619,25 @@ ul.tier_list {
 	list-style-image: none;
 	clear: both;
 }
+.tier_list li{
+	overflow: hidden;
+}
+.tier_list .tracker_activity{
+	float: left;
+	color: #666;
+	width: 200px;
+	display: table;
+	margin-top: 1px;
+}
+.tier_list .tracker_activity div{
+	padding: 2px;
+}
 .tier_list table{
-  margin-left: 15px;
-  color: #666;
+	float: right;
+	color: #666;
 }
 .tier_list th{
-  text-align: right;
+	text-align: right;
 }
 
 li.inspector_tracker_entry {

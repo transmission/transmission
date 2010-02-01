@@ -27,6 +27,12 @@ Torrent._ErrTrackerWarning     = 1;
 Torrent._ErrTrackerError       = 2;
 Torrent._ErrLocalError         = 3;
 
+Torrent._TrackerInactive         = 0;
+Torrent._TrackerWaiting          = 1;
+Torrent._TrackerQueued           = 2;
+Torrent._TrackerActive           = 3;
+
+
 Torrent._StaticFields = [ 'addedDate', 'comment', 'creator', 'dateCreated',
 		'hashString', 'id', 'isPrivate', 'name', 'totalSize', 'pieceCount', 'pieceSize' ]
 Torrent._DynamicFields = [ 'downloadedEver', 'error', 'errorString', 'eta',
@@ -159,6 +165,19 @@ Torrent.prototype =
 			tier = result[tracker.tier - 1] || [];
 			tier[tier.length] = {
 				'host': tracker.host,
+				'announce': tracker.announce,
+				'hasAnnounced': tracker.hasAnnounced,
+				'lastAnnounceTime': tracker.lastAnnounceTime,
+				'lastAnnounceSucceeded': tracker.lastAnnounceSucceeded,
+				'lastAnnounceResult': tracker.lastAnnounceResult,
+				'lastAnnouncePeerCount': tracker.lastAnnouncePeerCount,
+				'announceState': tracker.announceState,
+				'nextAnnounceTime': tracker.nextAnnounceTime,
+				'isBackup': tracker.isBackup,
+				'hasScraped': tracker.hasScraped,
+				'lastScrapeTime': tracker.lastScrapeTime,
+				'lastScrapeSucceeded': tracker.lastScrapeSucceeded,
+				'lastScrapeResult': tracker.lastScrapeResult,
 				'seederCount': tracker.seederCount,
 				'leecherCount': tracker.leecherCount,
 				'downloadCount': tracker.downloadCount
