@@ -1602,7 +1602,8 @@ tierNeedsToAnnounce( const tr_tier * tier, const time_t now )
 static tr_bool
 tierNeedsToScrape( const tr_tier * tier, const time_t now )
 {
-    return !tier->isScraping
+    return tier->isRunning
+        && !tier->isScraping
         && ( tier->scrapeAt != 0 )
         && ( tier->scrapeAt <= now )
         && ( tier->currentTracker != NULL )
