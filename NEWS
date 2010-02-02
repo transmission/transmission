@@ -1,4 +1,4 @@
-=== Transmission 1.83 (2010/01/23) ===
+=== Transmission 1.83 (2010/01/28) ===
 [http://trac.transmissionbt.com/query?milestone=1.83&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Fix 1.80 announce error that caused uploads and downloads to periodically freeze
