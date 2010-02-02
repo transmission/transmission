@@ -443,7 +443,6 @@ fprintf( stderr, "in tr_ctorSetPriority with %d\n", (int)priority );
 tr_priority_t
 tr_ctorGetBandwidthPriority( const tr_ctor * ctor )
 {
-fprintf( stderr, "got priority with %d\n", (int)ctor->bandwidthPriority );
     return ctor->bandwidthPriority;
 }
 

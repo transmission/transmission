@@ -54,7 +54,7 @@ GtkWidget * tr_prefs_dialog_new( GObject *   core,
 
 enum
 {
-    MAIN_WINDOW_REFRESH_INTERVAL_SECONDS = 1,
+    MAIN_WINDOW_REFRESH_INTERVAL_SECONDS = 2,
 
     SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS = 2
 };
