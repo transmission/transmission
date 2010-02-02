@@ -37,6 +37,7 @@
 @interface MessageWindowController (Private)
 
 - (void) resizeColumn;
+- (BOOL) shouldIncludeMessageForFilter: (NSString *) filterString message: (NSDictionary *) message;
 - (NSString *) stringForMessage: (NSDictionary *) message;
 
 @end
@@ -113,8 +114,13 @@
     
     NSRect clearButtonFrame = [fClearButton frame];
     clearButtonFrame.size.width = MAX(clearButtonFrame.size.width + 10.0, saveButtonFrame.size.width);
-    clearButtonFrame.origin.x -= clearButtonFrame.size.width - oldClearButtonWidth;
+    clearButtonFrame.origin.x -= NSWidth(clearButtonFrame) - oldClearButtonWidth;
     [fClearButton setFrame: clearButtonFrame];
+    
+    [[fFilterField cell] setPlaceholderString: NSLocalizedString(@"Filter", "Message window -> filter field")];
+    NSRect filterButtonFrame = [fFilterField frame];
+    filterButtonFrame.origin.x -= NSWidth(clearButtonFrame) - oldClearButtonWidth;
+    [fFilterField setFrame: filterButtonFrame];
     
     fAttributes = [[[[[fMessageTable tableColumnWithIdentifier: @"Message"] dataCell] attributedStringValue]
                     attributesAtIndex: 0 effectiveRange: NULL] retain];
@@ -173,6 +179,8 @@
                                 || [scroller knobProportion] == 1.0;
     
     const NSInteger maxLevel = [[NSUserDefaults standardUserDefaults] integerForKey: @"MessageLevel"];
+    NSString * filterString = [fFilterField stringValue];
+    
     BOOL changed = NO;
     
     for (tr_msg_list * currentMessage = messages; currentMessage != NULL; currentMessage = currentMessage->next)
@@ -193,7 +201,7 @@
         
         [fMessages addObject: message];
         
-        if (currentMessage->level <= maxLevel)
+        if (currentMessage->level <= maxLevel && [self shouldIncludeMessageForFilter: filterString message: message])
         {
             [fDisplayedMessages addObject: message];
             changed = YES;
@@ -339,15 +347,39 @@
     
     [[NSUserDefaults standardUserDefaults] setInteger: level forKey: @"MessageLevel"];
     
-    if (level == TR_MSG_DBG) //all messages at this level
-        [fDisplayedMessages setArray: fMessages];
-    else
+    NSString * filterString = [fFilterField stringValue];
+    
+    [fDisplayedMessages removeAllObjects];
+    for (NSDictionary * message in fMessages)
+        if ([[message objectForKey: @"Level"] integerValue] <= level
+            && [self shouldIncludeMessageForFilter: filterString message: message])
+            [fDisplayedMessages addObject: message];
+    
+    [fDisplayedMessages sortUsingDescriptors: [fMessageTable sortDescriptors]];
+    
+    [fMessageTable reloadData];
+    
+    if ([fDisplayedMessages count] > 0)
     {
-        [fDisplayedMessages removeAllObjects];
-        for (NSDictionary * message in fMessages)
-            if ([[message objectForKey: @"Level"] integerValue] <= level)
-                [fDisplayedMessages addObject: message];
+        [fMessageTable deselectAll: self];
+        [fMessageTable scrollRowToVisible: [fMessageTable numberOfRows]-1];
     }
+    
+    [fLock unlock];
+}
+
+- (void) changeFilter: (id) sender
+{
+    [fLock lock];
+    
+    const NSInteger level = [[NSUserDefaults standardUserDefaults] integerForKey: @"MessageLevel"];
+    NSString * filterString = [fFilterField stringValue];
+    
+    [fDisplayedMessages removeAllObjects];
+    for (NSDictionary * message in fMessages)
+        if ([[message objectForKey: @"Level"] integerValue] <= level
+            && [self shouldIncludeMessageForFilter: filterString message: message])
+            [fDisplayedMessages addObject: message];
     
     [fDisplayedMessages sortUsingDescriptors: [fMessageTable sortDescriptors]];
     
@@ -427,6 +459,16 @@
 {
     [fMessageTable noteHeightOfRowsWithIndexesChanged: [NSIndexSet indexSetWithIndexesInRange:
                     NSMakeRange(0, [fMessageTable numberOfRows])]];
+}
+
+- (BOOL) shouldIncludeMessageForFilter: (NSString *) filterString message: (NSDictionary *) message
+{
+    if ([filterString isEqualToString: @""])
+        return YES;
+    
+    const NSStringCompareOptions searchOptions = NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch;
+    return [[message objectForKey: @"Name"] rangeOfString: filterString options: searchOptions].location != NSNotFound
+            || [[message objectForKey: @"Message"] rangeOfString: filterString options: searchOptions].location != NSNotFound;
 }
 
 - (NSString *) stringForMessage: (NSDictionary *) message

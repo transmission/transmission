@@ -30,6 +30,7 @@
     
     IBOutlet NSPopUpButton * fLevelButton;
     IBOutlet NSButton * fSaveButton, * fClearButton;
+    IBOutlet NSSearchField * fFilterField;
     
     NSMutableArray * fMessages, * fDisplayedMessages;
     
@@ -43,6 +44,7 @@
 - (void) updateLog: (NSTimer *) timer;
 
 - (void) changeLevel: (id) sender;
+- (void) changeFilter: (id) sender;
 - (void) clearLog: (id) sender;
 
 - (void) writeToFile: (id) sender;
