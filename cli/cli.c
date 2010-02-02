@@ -381,7 +381,7 @@ main( int     argc,
     if( fileContents != NULL ) {
         tr_ctorSetMetainfo( ctor, fileContents, fileLength );
     } else if( !memcmp( torrentPath, "magnet:?", 8 ) ) {
-        tr_ctorSetMagnet( ctor, torrentPath );
+        tr_ctorSetMetainfoFromMagnetLink( ctor, torrentPath );
     } else if( !memcmp( torrentPath, "http", 4 ) ) {
         tr_webRun( h, torrentPath, NULL, onTorrentFileDownloaded, ctor );
         waitingOnWeb = TRUE;

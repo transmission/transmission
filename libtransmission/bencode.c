@@ -671,8 +671,7 @@ tr_bencListAdd( tr_benc * list )
 }
 
 tr_benc *
-tr_bencListAddInt( tr_benc * list,
-                   int64_t   val )
+tr_bencListAddInt( tr_benc * list, int64_t val )
 {
     tr_benc * node = tr_bencListAdd( list );
 
@@ -681,12 +680,34 @@ tr_bencListAddInt( tr_benc * list,
 }
 
 tr_benc *
-tr_bencListAddStr( tr_benc *    list,
-                   const char * val )
+tr_bencListAddReal( tr_benc * list, double val )
 {
     tr_benc * node = tr_bencListAdd( list );
+    tr_bencInitReal( node, val );
+    return node;
+}
 
+tr_benc *
+tr_bencListAddBool( tr_benc * list, tr_bool val )
+{
+    tr_benc * node = tr_bencListAdd( list );
+    tr_bencInitBool( node, val );
+    return node;
+}
+
+tr_benc *
+tr_bencListAddStr( tr_benc * list, const char * val )
+{
+    tr_benc * node = tr_bencListAdd( list );
     tr_bencInitStr( node, val, -1 );
+    return node;
+}
+
+tr_benc *
+tr_bencListAddRaw( tr_benc * list, const uint8_t * val, size_t len )
+{
+    tr_benc * node = tr_bencListAdd( list );
+    tr_bencInitRaw( node, val, len );
     return node;
 }
 
@@ -803,6 +824,35 @@ tr_bencDictAddStr( tr_benc * dict, const char * key, const char * val )
 }
 
 tr_benc*
+tr_bencDictAddRaw( tr_benc *    dict,
+                   const char * key,
+                   const void * src,
+                   size_t       len )
+{
+    tr_benc * child;
+
+    /* see if it already exists, and if so, try to reuse it */
+    if(( child = tr_bencDictFind( dict, key ))) {
+        if( tr_bencIsString( child ) ) {
+            if( stringIsAlloced( child ) )
+                tr_free( child->val.s.str.ptr );
+        } else {
+            tr_bencDictRemove( dict, key );
+            child = NULL;
+        }
+    }
+
+    /* if it doesn't exist, create it */
+    if( child == NULL )
+        child = tr_bencDictAdd( dict, key );
+
+    /* set it */
+    tr_bencInitRaw( child, src, len );
+
+    return child;
+}
+
+tr_benc*
 tr_bencDictAddList( tr_benc *    dict,
                     const char * key,
                     size_t       reserveCount )
@@ -821,18 +871,6 @@ tr_bencDictAddDict( tr_benc *    dict,
     tr_benc * child = tr_bencDictAdd( dict, key );
 
     tr_bencInitDict( child, reserveCount );
-    return child;
-}
-
-tr_benc*
-tr_bencDictAddRaw( tr_benc *    dict,
-                   const char * key,
-                   const void * src,
-                   size_t       len )
-{
-    tr_benc * child = tr_bencDictAdd( dict, key );
-
-    tr_bencInitRaw( child, src, len );
     return child;
 }
 
@@ -1404,6 +1442,51 @@ static const struct WalkFuncs jsonWalkFuncs = { jsonIntFunc,
 ****
 ***/
 
+static void
+tr_bencListCopy( tr_benc * target, const tr_benc * src )
+{
+    int i = 0;
+    const tr_benc * val;
+
+    while(( val = tr_bencListChild( (tr_benc*)src, i++ )))
+    {
+       if( tr_bencIsBool( val ) )
+       {
+           tr_bool boolVal = 0;
+           tr_bencGetBool( val, &boolVal );
+           tr_bencListAddBool( target, boolVal );
+       }
+       else if( tr_bencIsReal( val ) )
+       {
+           double realVal = 0;
+           tr_bencGetReal( val, &realVal );
+           tr_bencListAddReal( target, realVal );
+       }
+       else if( tr_bencIsInt( val ) )
+       {
+           int64_t intVal = 0;
+           tr_bencGetInt( val, &intVal );
+           tr_bencListAddInt( target, intVal );
+       }
+       else if( tr_bencIsString( val ) )
+       {
+           tr_bencListAddRaw( target, (const uint8_t*)getStr( val ), val->val.s.len );
+       }
+       else if( tr_bencIsDict( val ) )
+       {
+           tr_bencMergeDicts( tr_bencListAddDict( target, 0 ), val );
+       }
+       else if ( tr_bencIsList( val ) )
+       {
+           tr_bencListCopy( tr_bencListAddList( target, 0 ), val );
+       }
+       else
+       {
+           tr_err( "tr_bencListCopy skipping item" );
+       }
+   }
+}
+
 static size_t
 tr_bencDictSize( const tr_benc * dict )
 {
@@ -1470,13 +1553,18 @@ tr_bencMergeDicts( tr_benc * target, const tr_benc * source )
             }
             else if( tr_bencIsString( val ) )
             {
-                const char * strVal = NULL;
-                tr_bencGetStr( val, &strVal );
-                tr_bencDictAddStr( target, key, strVal );
+                tr_bencDictAddRaw( target, key, getStr( val ), val->val.s.len );
             }
             else if( tr_bencIsDict( val ) && tr_bencDictFindDict( target, key, &t ) )
             {
                 tr_bencMergeDicts( t, val );
+            }
+            else if( tr_bencIsList( val ) )
+            {
+                if( tr_bencDictFind( target, key ) == NULL )
+                {
+                    tr_bencListCopy( tr_bencDictAddList( target, key, tr_bencListSize( val ) ), val );
+                }
             }
             else
             {

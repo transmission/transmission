@@ -34,8 +34,6 @@ void        tr_ctorSetSave( tr_ctor * ctor,
 
 int         tr_ctorGetSave( const tr_ctor * ctor );
 
-int         tr_ctorGetMagnet( const tr_ctor * ctor, const struct tr_magnet_info ** setme );
-
 void        tr_ctorInitTorrentPriorities( const tr_ctor * ctor, tr_torrent * tor );
 
 void        tr_ctorInitTorrentWanted( const tr_ctor * ctor, tr_torrent * tor );

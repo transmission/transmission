@@ -1118,7 +1118,7 @@ torrentAdd( tr_session               * session,
             }
             else if( !strncmp( fname, "magnet:?", 8 ) )
             {
-                tr_ctorSetMagnet( ctor, fname );
+                tr_ctorSetMetainfoFromMagnetLink( ctor, fname );
             }
             else
             {

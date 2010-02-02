@@ -44,8 +44,6 @@ struct tr_ctor
     tr_benc                 metainfo;
     char *                  sourceFile;
 
-    tr_magnet_info        * magnetInfo;
-
     struct optional_args    optionalArgs[2];
 
     char                  * incompleteDir;
@@ -106,16 +104,26 @@ tr_ctorGetSourceFile( const tr_ctor * ctor )
 }
 
 int
-tr_ctorSetMagnet( tr_ctor * ctor, const char * uri )
+tr_ctorSetMetainfoFromMagnetLink( tr_ctor * ctor, const char * magnet_link )
 {
     int err;
+    tr_magnet_info * magnet_info = tr_magnetParse( magnet_link );
 
-    if( ctor->magnetInfo != NULL )
-        tr_magnetFree( ctor->magnetInfo );
+    if( magnet_info == NULL )
+        err = -1;
+    else {
+        int len;
+        tr_benc tmp;
+        char * str;
 
-    ctor->magnetInfo = tr_magnetParse( uri );
+        tr_magnetCreateMetainfo( magnet_info, &tmp );
+        str = tr_bencToStr( &tmp, TR_FMT_BENC, &len );
+        err = tr_ctorSetMetainfo( ctor, (const uint8_t*)str, len );
 
-    err = ctor->magnetInfo == NULL;
+        tr_free( str );
+        tr_magnetFree( magnet_info );
+    }
+
     return err;
 }
 
@@ -385,19 +393,6 @@ tr_ctorGetIncompleteDir( const tr_ctor  * ctor,
         err = 1;
     else
         *setmeIncompleteDir = ctor->incompleteDir;
-
-    return err;
-}
-
-int
-tr_ctorGetMagnet( const tr_ctor * ctor, const tr_magnet_info ** setme )
-{
-    int err = 0;
-
-    if( ctor->magnetInfo == NULL )
-        err = 1;
-    else
-        *setme = ctor->magnetInfo;
 
     return err;
 }

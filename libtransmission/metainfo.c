@@ -26,7 +26,6 @@
 #include "session.h"
 #include "bencode.h"
 #include "crypto.h" /* tr_sha1 */
-#include "magnet.h"
 #include "metainfo.h"
 #include "platform.h"
 #include "utils.h"
@@ -384,29 +383,61 @@ escape( char * out, const uint8_t * in, size_t in_len ) /* rfc2396 */
 }
 
 static const char*
-tr_metainfoParseImpl( const tr_session * session,
-                      tr_info          * inf,
-                      int              * infoDictOffset,
-                      int              * infoDictLength,
-                      const tr_benc    * meta_in )
+tr_metainfoParseImpl( const tr_session  * session,
+                      tr_info           * inf,
+                      tr_bool           * hasInfoDict,
+                      int               * infoDictOffset,
+                      int               * infoDictLength,
+                      const tr_benc     * meta_in )
 {
     int64_t         i;
     size_t          raw_len;
     const char *    str;
     const uint8_t * raw;
-    tr_benc *       beInfo;
+    tr_benc *       d;
+    tr_benc *       infoDict = NULL;
     tr_benc *       meta = (tr_benc *) meta_in;
     tr_bool         err;
+    tr_bool         b;
+    tr_bool         isMagnet = FALSE;
 
     /* info_hash: urlencoded 20-byte SHA1 hash of the value of the info key
      * from the Metainfo file. Note that the value will be a bencoded
      * dictionary, given the definition of the info key above. */
-    if( !tr_bencDictFindDict( meta, "info", &beInfo ) )
-        return "info";
+    b = tr_bencDictFindDict( meta, "info", &infoDict );
+    if( hasInfoDict != NULL )
+        *hasInfoDict = b;
+    if( !b )
+    {
+        /* no info dictionary... is this a magnet link? */
+        if( tr_bencDictFindDict( meta, "magnet-info", &d ) )
+        {
+            isMagnet = TRUE;
+
+            /* get the info-hash */
+            if( !tr_bencDictFindRaw( d, "info_hash", &raw, &raw_len ) )
+                return "info_hash";
+            if( raw_len != SHA_DIGEST_LENGTH )
+                return "info_hash";
+            memcpy( inf->hash, raw, raw_len );
+            tr_sha1_to_hex( inf->hashString, inf->hash );
+            escape( inf->hashEscaped, inf->hash, SHA_DIGEST_LENGTH );
+
+            /* maybe get the display name */
+            if( tr_bencDictFindStr( d, "display-name", &str ) ) {
+                tr_free( inf->name );
+                inf->name = tr_strdup( str );
+            }
+        }
+        else /* not a magnet link and has no info dict... */
+        {
+            return "info";
+        }
+    }
     else
     {
         int len;
-        char * bstr = tr_bencToStr( beInfo, TR_FMT_BENC, &len );
+        char * bstr = tr_bencToStr( infoDict, TR_FMT_BENC, &len );
         tr_sha1( inf->hash, bstr, len, NULL );
         tr_sha1_to_hex( inf->hashString, inf->hash );
         escape( inf->hashEscaped, inf->hash, SHA_DIGEST_LENGTH );
@@ -430,13 +461,15 @@ tr_metainfoParseImpl( const tr_session * session,
     }
 
     /* name */
-    if( !tr_bencDictFindStr( beInfo, "name.utf-8", &str ) )
-        if( !tr_bencDictFindStr( beInfo, "name", &str ) )
-            str = "";
-    if( !str || !*str )
-        return "name";
-    tr_free( inf->name );
-    inf->name = tr_utf8clean( str, -1, &err );
+    if( !isMagnet ) {
+        if( !tr_bencDictFindStr( infoDict, "name.utf-8", &str ) )
+            if( !tr_bencDictFindStr( infoDict, "name", &str ) )
+                str = "";
+        if( !str || !*str )
+            return "name";
+        tr_free( inf->name );
+        inf->name = tr_utf8clean( str, -1, &err );
+    }
 
     /* comment */
     if( !tr_bencDictFindStr( meta, "comment.utf-8", &str ) )
@@ -458,35 +491,42 @@ tr_metainfoParseImpl( const tr_session * session,
     inf->dateCreated = i;
 
     /* private */
-    if( !tr_bencDictFindInt( beInfo, "private", &i ) )
+    if( !tr_bencDictFindInt( infoDict, "private", &i ) )
         if( !tr_bencDictFindInt( meta, "private", &i ) )
             i = 0;
     inf->isPrivate = i != 0;
 
     /* piece length */
-    if( !tr_bencDictFindInt( beInfo, "piece length", &i ) || ( i < 1 ) )
-        return "piece length";
-    inf->pieceSize = i;
+    if( !isMagnet ) {
+        if( !tr_bencDictFindInt( infoDict, "piece length", &i ) || ( i < 1 ) )
+            return "piece length";
+        inf->pieceSize = i;
+    }
 
     /* pieces */
-    if( !tr_bencDictFindRaw( beInfo, "pieces", &raw,
-                             &raw_len ) || ( raw_len % SHA_DIGEST_LENGTH ) )
-        return "pieces";
-    inf->pieceCount = raw_len / SHA_DIGEST_LENGTH;
-    inf->pieces = tr_new0( tr_piece, inf->pieceCount );
-    for( i = 0; i < inf->pieceCount; ++i )
-        memcpy( inf->pieces[i].hash, &raw[i * SHA_DIGEST_LENGTH],
-                SHA_DIGEST_LENGTH );
+    if( !isMagnet ) {
+        if( !tr_bencDictFindRaw( infoDict, "pieces", &raw, &raw_len ) )
+            return "pieces";
+        if( raw_len % SHA_DIGEST_LENGTH )
+            return "pieces";
+        inf->pieceCount = raw_len / SHA_DIGEST_LENGTH;
+        inf->pieces = tr_new0( tr_piece, inf->pieceCount );
+        for( i = 0; i < inf->pieceCount; ++i )
+            memcpy( inf->pieces[i].hash, &raw[i * SHA_DIGEST_LENGTH],
+                    SHA_DIGEST_LENGTH );
+    }
 
     /* files */
-    if( ( str = parseFiles( inf, tr_bencDictFind( beInfo, "files" ),
-                                 tr_bencDictFind( beInfo, "length" ) ) ) )
-        return str;
-    if( !inf->fileCount || !inf->totalSize )
-        return "files";
-    if( (uint64_t) inf->pieceCount !=
-       ( inf->totalSize + inf->pieceSize - 1 ) / inf->pieceSize )
-        return "files";
+    if( !isMagnet ) {
+        if( ( str = parseFiles( inf, tr_bencDictFind( infoDict, "files" ),
+                                     tr_bencDictFind( infoDict, "length" ) ) ) )
+            return str;
+        if( !inf->fileCount || !inf->totalSize )
+            return "files";
+        if( (uint64_t) inf->pieceCount !=
+           ( inf->totalSize + inf->pieceSize - 1 ) / inf->pieceSize )
+            return "files";
+    }
 
     /* get announce or announce-list */
     if( ( str = getannounce( inf, meta ) ) )
@@ -504,13 +544,15 @@ tr_metainfoParseImpl( const tr_session * session,
 
 tr_bool
 tr_metainfoParse( const tr_session * session,
+                  const tr_benc    * meta_in,
                   tr_info          * inf,
+                  tr_bool          * hasInfoDict,
                   int              * infoDictOffset,
-                  int              * infoDictLength,
-                  const tr_benc    * meta_in )
+                  int              * infoDictLength )
 {
     const char * badTag = tr_metainfoParseImpl( session,
                                                 inf,
+                                                hasInfoDict,
                                                 infoDictOffset,
                                                 infoDictLength,
                                                 meta_in );
@@ -568,50 +610,4 @@ tr_metainfoRemoveSaved( const tr_session * session,
     filename = getOldTorrentFilename( session, inf );
     unlink( filename );
     tr_free( filename );
-}
-
-/***
-****
-***/
-
-void
-tr_metainfoSetFromMagnet( tr_info * inf, const tr_magnet_info * m )
-{
-    /* hash */
-    memcpy( inf->hash, m->hash, 20 );
-    tr_sha1_to_hex( inf->hashString, inf->hash );
-    escape( inf->hashEscaped, inf->hash, SHA_DIGEST_LENGTH );
-
-    /* name */
-    if( m->displayName && *m->displayName )
-        inf->name = tr_strdup( m->displayName );
-    else
-        inf->name = tr_strdup( inf->hashString );
-
-    /* trackers */
-    if(( inf->trackerCount = m->trackerCount ))
-    {
-        int i;
-        const int n = m->trackerCount;
-
-        inf->trackers = tr_new0( tr_tracker_info, n );
-        for( i=0; i<n; ++i ) {
-            const char * url = m->trackers[i];
-            inf->trackers[i].tier = i;
-            inf->trackers[i].announce = tr_strdup( url );
-            inf->trackers[i].scrape = tr_convertAnnounceToScrape( url );
-            inf->trackers[i].id = i;
-        }
-    }
-
-    /* webseeds */
-    if(( inf->webseedCount = m->webseedCount ))
-    {
-        int i;
-        const int n = m->webseedCount;
-
-        inf->webseeds = tr_new0( char*, n );
-        for( i=0; i<n; ++i )
-            inf->webseeds[i] = tr_strdup( m->webseeds[i] );
-    }
 }

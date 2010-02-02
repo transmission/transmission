@@ -20,21 +20,19 @@
 #include "transmission.h"
 
 struct tr_benc;
-struct tr_magnet_info;
 
 tr_bool  tr_metainfoParse( const tr_session     * session,
+                           const struct tr_benc * benc,
                            tr_info              * setmeInfo,
+                           tr_bool              * setmeHasInfoDict,
                            int                  * setmeInfoDictOffset,
-                           int                  * setmeInfoDictLength,
-                           const struct tr_benc * benc );
+                           int                  * setmeInfoDictLength );
 
 void tr_metainfoRemoveSaved( const tr_session * session,
                              const tr_info    * info );
 
 void tr_metainfoMigrate( tr_session * session,
                          tr_info    * inf );
-
-void tr_metainfoSetFromMagnet( tr_info * inf, const struct tr_magnet_info * m );
 
 
 #endif

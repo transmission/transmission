@@ -879,8 +879,8 @@ void  tr_ctorFree( tr_ctor * ctor );
 /** @brief Set whether or not to delete the source .torrent file when a torrent is added. (Default: False) */
 void  tr_ctorSetDeleteSource( tr_ctor * ctor, tr_bool doDelete );
 
-/** @brief Set the link for creating a tr_torrent from a magnet link */
-int tr_ctorSetMagnet( tr_ctor * ctor, const char * magnet_link );
+/** @brief Set the constructor's metainfo from a magnet link */
+int tr_ctorSetMetainfoFromMagnetLink( tr_ctor * ctor, const char * magnet_link );
 
 /** @brief Set the constructor's metainfo from a raw benc already in memory */
 int tr_ctorSetMetainfo( tr_ctor * ctor, const uint8_t * metainfo, size_t len );

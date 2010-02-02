@@ -1052,7 +1052,7 @@ tr_core_add_from_url( TrCore * core, const char * url )
         if( gtr_is_hex_hashcode( url ) )
             url = tmp = g_strdup_printf( "magnet:?xt=urn:btih:%s", url );
 
-        err = tr_ctorSetMagnet( ctor, url );
+        err = tr_ctorSetMetainfoFromMagnetLink( ctor, url );
 
         if( !err )
         {

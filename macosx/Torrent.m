@@ -1563,7 +1563,7 @@ int trashDataFile(const char * filename)
             result = tr_ctorSetMetainfoFromFile(ctor, [path UTF8String]);
         
         if (result != TR_PARSE_OK && magnetAddress)
-            result = tr_ctorSetMagnet(ctor, [magnetAddress UTF8String]);
+            result = tr_ctorSetMetainfoFromMagnetLink(ctor, [magnetAddress UTF8String]);
         
         //backup - shouldn't be needed after upgrade to 1.70
         if (result != TR_PARSE_OK && hashString)

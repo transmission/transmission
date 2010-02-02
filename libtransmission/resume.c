@@ -517,9 +517,12 @@ tr_torrentSaveResume( const tr_torrent * tor )
     tr_bencDictAddInt( &top, KEY_BANDWIDTH_PRIORITY, tr_torrentGetPriority( tor ) );
     tr_bencDictAddBool( &top, KEY_PAUSED, !tor->isRunning );
     savePeers( &top, tor );
-    saveFilePriorities( &top, tor );
-    saveDND( &top, tor );
-    saveProgress( &top, tor );
+    if( tr_torrentHasMetadata( tor ) )
+    {
+        saveFilePriorities( &top, tor );
+        saveDND( &top, tor );
+        saveProgress( &top, tor );
+    }
     saveSpeedLimits( &top, tor );
     saveRatioLimits( &top, tor );
 

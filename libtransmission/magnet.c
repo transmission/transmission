@@ -14,6 +14,7 @@
 #include <string.h> /* strchr() */
 
 #include "transmission.h"
+#include "bencode.h"
 #include "magnet.h"
 #include "utils.h"
 #include "web.h"
@@ -193,3 +194,35 @@ tr_magnetFree( tr_magnet_info * info )
         tr_free( info );
     }
 }
+
+void
+tr_magnetCreateMetainfo( const tr_magnet_info * info, tr_benc * top )
+{
+    int i;
+    tr_benc * d;
+    tr_bencInitDict( top, 4 );
+
+    /* announce list */
+    if( info->trackerCount == 1 )
+        tr_bencDictAddStr( top, "announce", info->trackers[0] );
+    else {
+        tr_benc * trackers = tr_bencDictAddList( top, "announce-list", info->trackerCount );
+        for( i=0; i<info->trackerCount; ++i )
+            tr_bencListAddStr( tr_bencListAddList( trackers, 1 ), info->trackers[i] );
+    }
+
+    /* webseeds */
+    if( info->webseedCount > 0 ) {
+        tr_benc * urls = tr_bencDictAddList( top, "url-list", info->webseedCount );
+        for( i=0; i<info->webseedCount; ++i )
+            tr_bencListAddStr( urls, info->webseeds[i] );
+    }
+
+    /* nonstandard keys */
+    d = tr_bencDictAddDict( top, "magnet-info", 2 );
+    tr_bencDictAddRaw( d, "info_hash", info->hash, 20 );
+    if( info->displayName != NULL )
+        tr_bencDictAddStr( d, "display-name", info->displayName );
+}
+
+

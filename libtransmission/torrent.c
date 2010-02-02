@@ -712,10 +712,11 @@ torrentInit( tr_torrent * tor, const tr_ctor * ctor )
 
 static tr_parse_result
 torrentParseImpl( const tr_ctor * ctor, tr_info * setmeInfo,
-                  int * dictOffset, int * dictLength )
+                  tr_bool * setmeHasInfo, int * dictOffset, int * dictLength )
 {
     int             doFree;
     tr_bool         didParse;
+    tr_bool         hasInfo = FALSE;
     tr_info         tmp;
     const tr_benc * metainfo;
     tr_session    * session = tr_ctorGetSession( ctor );
@@ -728,13 +729,14 @@ torrentParseImpl( const tr_ctor * ctor, tr_info * setmeInfo,
     if( tr_ctorGetMetainfo( ctor, &metainfo ) )
         return TR_PARSE_ERR;
 
-    didParse = tr_metainfoParse( session, setmeInfo, dictOffset, dictLength, metainfo );
+    didParse = tr_metainfoParse( session, metainfo, setmeInfo,
+                                 &hasInfo, dictOffset, dictLength );
     doFree = didParse && ( setmeInfo == &tmp );
 
     if( !didParse )
         result = TR_PARSE_ERR;
 
-    if( didParse && !getBlockSize( setmeInfo->pieceSize ) )
+    if( didParse && hasInfo && !getBlockSize( setmeInfo->pieceSize ) )
         result = TR_PARSE_ERR;
 
     if( didParse && session && tr_torrentExists( session, setmeInfo->hash ) )
@@ -743,56 +745,46 @@ torrentParseImpl( const tr_ctor * ctor, tr_info * setmeInfo,
     if( doFree )
         tr_metainfoFree( setmeInfo );
 
+    if( setmeHasInfo != NULL )
+        *setmeHasInfo = hasInfo;
+
     return result;
 }
 
 tr_parse_result
 tr_torrentParse( const tr_ctor * ctor, tr_info * setmeInfo )
 {
-    return torrentParseImpl( ctor, setmeInfo, NULL, NULL );
+    return torrentParseImpl( ctor, setmeInfo, NULL, NULL, NULL );
 }
 
 tr_torrent *
 tr_torrentNew( const tr_ctor * ctor, int * setmeError )
 {
+    int off, len;
+    tr_bool hasInfo;
     tr_info tmpInfo;
+    tr_parse_result r;
     tr_torrent * tor = NULL;
-    const tr_magnet_info * magnetInfo;
     tr_session * session = tr_ctorGetSession( ctor );
 
     assert( ctor != NULL );
     assert( tr_isSession( session ) );
 
-    if( !tr_ctorGetMagnet( ctor, &magnetInfo ) )
+    r = torrentParseImpl( ctor, &tmpInfo, &hasInfo, &off, &len );
+    if( r == TR_PARSE_OK )
     {
-        if( tr_torrentFindFromHash( session, magnetInfo->hash ) != NULL )
+        tor = tr_new0( tr_torrent, 1 );
+        tor->info = tmpInfo;
+        if( hasInfo )
         {
-            if( setmeError )
-                *setmeError = TR_PARSE_DUPLICATE;
-        }
-        else
-        {
-            tor = tr_new0( tr_torrent, 1 );
-            tr_metainfoSetFromMagnet( &tor->info, magnetInfo );
-            torrentInit( tor, ctor );
-        }
-    }
-    else
-    {
-        int off, len;
-        tr_parse_result r = torrentParseImpl( ctor, &tmpInfo, &off, &len );
-        if( r == TR_PARSE_OK )
-        {
-            tor = tr_new0( tr_torrent, 1 );
-            tor->info = tmpInfo;
             tor->infoDictOffset = off;
             tor->infoDictLength = len;
-            torrentInit( tor, ctor );
         }
-        else if( setmeError )
-        {
-            *setmeError = r;
-        }
+        torrentInit( tor, ctor );
+    }
+    else if( setmeError )
+    {
+        *setmeError = r;
     }
 
     return tor;
@@ -1469,7 +1461,7 @@ tr_torrentSave( tr_torrent * tor )
 {
     assert( tr_isTorrent( tor ) );
 
-    if( tor->isDirty && tr_torrentHasMetadata( tor ) )
+    if( tor->isDirty )
     {
         tor->isDirty = FALSE;
         tr_torrentSaveResume( tor );
@@ -2131,7 +2123,8 @@ tr_torrentSetAnnounceList( tr_torrent             * tor,
     /* save to the .torrent file */
     if( ok && !tr_bencLoadFile( &metainfo, TR_FMT_BENC, tor->info.torrent ) )
     {
-        tr_info   tmpInfo;
+        tr_bool hasInfo;
+        tr_info tmpInfo;
 
         /* remove the old fields */
         tr_bencDictRemove( &metainfo, "announce" );
@@ -2160,10 +2153,8 @@ tr_torrentSetAnnounceList( tr_torrent             * tor,
 
         /* try to parse it back again, to make sure it's good */
         memset( &tmpInfo, 0, sizeof( tr_info ) );
-        if( tr_metainfoParse( tor->session, &tmpInfo,
-                              &tor->infoDictOffset,
-                              &tor->infoDictLength,
-                              &metainfo ) )
+        if( tr_metainfoParse( tor->session, &metainfo, &tmpInfo,
+                              &hasInfo, &tor->infoDictOffset, &tor->infoDictLength ) )
         {
             /* it's good, so keep these new trackers and free the old ones */
 

@@ -138,10 +138,7 @@ tr_torrentGetMetadataPiece( const tr_torrent * tor, int piece, int * len )
 }
 
 void
-tr_torrentSetMetadataPiece( tr_torrent  * tor,
-                            int           piece,
-                            const void  * data,
-                            int           len )
+tr_torrentSetMetadataPiece( tr_torrent  * tor, int piece, const void  * data, int len )
 {
     int i;
     struct tr_incomplete_metadata * m;
@@ -179,58 +176,48 @@ tr_torrentSetMetadataPiece( tr_torrent  * tor,
     if( m->piecesNeededCount == 0 )
     {
         tr_bool success = FALSE;
+        tr_bool checksumPassed = FALSE;
+        tr_bool metainfoParsed = FALSE;
         uint8_t sha1[SHA_DIGEST_LENGTH];
+
+        /* we've got a complete set of metainfo... see if it passes the checksum test */
         dbgmsg( tor, "metainfo piece %d was the last one", piece );
         tr_sha1( sha1, m->metadata, m->metadata_size, NULL );
-        if( !memcmp( sha1, tor->info.hash, SHA_DIGEST_LENGTH ) )
+        if(( checksumPassed = !memcmp( sha1, tor->info.hash, SHA_DIGEST_LENGTH )))
         {
-            int err;
-            tr_benc dict;
-            struct evbuffer * buf = evbuffer_new( );
-            dbgmsg( tor, "metadata checksum passed!  (length: %d)", (int)m->metadata_size );
-
-            /* add a wrapper dictionary to the benc.
-             * include the announce-list too,
-             * so we can save it in the .torrent for future sessions */
-            evbuffer_add_printf( buf, "d" );
-            evbuffer_add_printf( buf, "13:announce-list" );
-            evbuffer_add_printf( buf, "l" );
-            for( i=0; i<tor->info.trackerCount; ++i ) {
-                const char * url = tor->info.trackers[i].announce;
-                evbuffer_add_printf( buf, "l%zu:%se", strlen( url ), url );
-            }
-            evbuffer_add_printf( buf, "e" );
-            evbuffer_add_printf( buf, "4:info" );
-            evbuffer_add( buf, m->metadata, m->metadata_size );
-            evbuffer_add_printf( buf, "e" );
-
-            /* does it parse? */
-            err = tr_bencLoad( EVBUFFER_DATA( buf ), EVBUFFER_LENGTH( buf ), &dict, NULL );
+            /* checksum passed; now try to parse it as benc */
+            tr_benc infoDict;
+            const int err = tr_bencLoad( m->metadata, m->metadata_size, &infoDict, NULL );
             dbgmsg( tor, "err is %d", err );
-            if( !err )
+            if(( metainfoParsed = !err ))
             {
-                if( tr_metainfoParse( tor->session,
-                                      &tor->info,
-                                      &tor->infoDictOffset,
-                                      &tor->infoDictLength,
-                                      &dict ) )
+                /* yay we have bencoded metainfo... merge it into our .torrnet file */
+                tr_benc newMetainfo;
+                const char * path = tor->info.torrent;
+                if( !tr_bencLoadFile( &newMetainfo, TR_FMT_BENC, path ) )
                 {
-                    const char * path = tor->info.torrent;
-                    dbgmsg( tor, "saving completed metadata to \"%s\"", path );
+                    tr_bool hasInfo;
+                    tr_benc * tmp;
 
-                    success = TRUE;
+                    dbgmsg( tor, "Saving completed metadata to \"%s\"", path );
+                    assert( !tr_bencDictFindDict( &newMetainfo, "info", &tmp ) );
+                    tr_bencMergeDicts( tr_bencDictAddDict( &newMetainfo, "info", 0 ), &infoDict );
+                    tr_bencToFile( &newMetainfo, TR_FMT_BENC, path );
+
+                    success = tr_metainfoParse( tor->session, &newMetainfo, &tor->info,
+                                                &hasInfo, &tor->infoDictOffset, &tor->infoDictLength );
+
+                    assert( hasInfo );
+                    assert( success );
+
                     tr_torrentGotNewInfoDict( tor );
-
-                    tr_bencToFile( &dict, TR_FMT_BENC, path );
-                    tr_sessionSetTorrentFile( tor->session,
-                                              tor->info.hashString, path );
                     tr_torrentSetDirty( tor );
+
+                    tr_bencFree( &newMetainfo );
                 }
-
-                tr_bencFree( &dict );
+        
+                tr_bencFree( &infoDict );
             }
-
-            evbuffer_free( buf );
         }
 
         if( success )
@@ -241,12 +228,16 @@ tr_torrentSetMetadataPiece( tr_torrent  * tor,
         else /* drat. */
         {
             const int n = m->pieceCount;
-            for( i=0; i<n; ++i ) {
+            for( i=0; i<n; ++i )
+            {
                 m->piecesNeeded[i].piece = i;
                 m->piecesNeeded[i].requestedAt = 0;
             }
             m->piecesNeededCount = n;
             dbgmsg( tor, "metadata error; trying again. %d pieces left", n );
+
+            tr_err( "magnet status: checksum passed %d, metainfo parsed %d",
+                    (int)checksumPassed, (int)metainfoParsed );
         }
     }
 }

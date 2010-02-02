@@ -35,6 +35,10 @@ tr_magnet_info;
 
 tr_magnet_info * tr_magnetParse( const char * uri );
 
+struct tr_benc;
+
+void tr_magnetCreateMetainfo( const tr_magnet_info *, struct tr_benc * );
+
 void tr_magnetFree( tr_magnet_info * info );
 
 #endif

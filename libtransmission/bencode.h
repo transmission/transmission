@@ -138,9 +138,15 @@ int tr_bencListReserve( tr_benc *, size_t reserveCount );
 
 tr_benc * tr_bencListAdd( tr_benc * );
 
+tr_benc * tr_bencListAddBool( tr_benc *, tr_bool val );
+
 tr_benc * tr_bencListAddInt( tr_benc *, int64_t val );
 
+tr_benc * tr_bencListAddReal( tr_benc *, double val );
+
 tr_benc * tr_bencListAddStr( tr_benc *, const char * val );
+
+tr_benc * tr_bencListAddRaw( tr_benc *, const uint8_t * val, size_t len );
 
 tr_benc * tr_bencListAddList( tr_benc *, size_t reserveCount );
 
