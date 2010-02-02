@@ -97,6 +97,21 @@ tr_torrentFindFromHash( tr_session * session, const uint8_t * torrentHash )
 }
 
 tr_torrent*
+tr_torrentFindFromMagnetLink( tr_session * session, const char * magnet )
+{
+    tr_magnet_info * info;
+    tr_torrent * tor = NULL;
+
+    if(( info = tr_magnetParse( magnet )))
+    {
+        tor = tr_torrentFindFromHash( session, info->hash );
+        tr_magnetFree( info );
+    }
+
+    return tor;
+}
+
+tr_torrent*
 tr_torrentFindFromObfuscatedHash( tr_session * session,
                                   const uint8_t * obfuscatedTorrentHash )
 {
