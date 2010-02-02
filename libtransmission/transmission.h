@@ -339,6 +339,18 @@ void tr_sessionSetDownloadDir( tr_session * session, const char * downloadDir );
  */
 const char * tr_sessionGetDownloadDir( const tr_session * session );
 
+
+/**
+ * @brief Set the torrent's bandwidth priority.
+ */
+void tr_ctorSetBandwidthPriority( tr_ctor * ctor, tr_priority_t priority );
+
+/**
+ * @brief Get the torrent's bandwidth priority.
+ */
+tr_priority_t tr_ctorGetBandwidthPriority( const tr_ctor * ctor );
+
+
 /**
  * @brief set the per-session incomplete download folder.
  *

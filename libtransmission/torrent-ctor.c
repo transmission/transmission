@@ -38,6 +38,7 @@ struct tr_ctor
     tr_bool                 saveInOurTorrentsDir;
     tr_bool                 doDelete;
 
+    tr_priority_t           bandwidthPriority;
     tr_bool                 isSet_metainfo;
     tr_bool                 isSet_delete;
     tr_benc                 metainfo;
@@ -425,12 +426,38 @@ tr_ctorGetSession( const tr_ctor * ctor )
 ****
 ***/
 
+static tr_bool
+isPriority( int i )
+{
+    return (i==TR_PRI_LOW) || (i==TR_PRI_NORMAL) || (i==TR_PRI_HIGH);
+}
+
+void
+tr_ctorSetBandwidthPriority( tr_ctor * ctor, tr_priority_t priority )
+{
+fprintf( stderr, "in tr_ctorSetPriority with %d\n", (int)priority );
+    if( isPriority( priority ) )
+        ctor->bandwidthPriority = priority;
+}
+
+tr_priority_t
+tr_ctorGetBandwidthPriority( const tr_ctor * ctor )
+{
+fprintf( stderr, "got priority with %d\n", (int)ctor->bandwidthPriority );
+    return ctor->bandwidthPriority;
+}
+
+/***
+****
+***/
+
 tr_ctor*
 tr_ctorNew( const tr_session * session )
 {
     tr_ctor * ctor = tr_new0( struct tr_ctor, 1 );
 
     ctor->session = session;
+    ctor->bandwidthPriority = TR_PRI_NORMAL;
     tr_ctorSetPaused( ctor, TR_FALLBACK, FALSE );
     if( session != NULL ) {
         tr_ctorSetPeerLimit( ctor, TR_FALLBACK, session->peerLimitPerTorrent );

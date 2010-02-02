@@ -1061,6 +1061,9 @@ torrentAdd( tr_session               * session,
         if( tr_bencDictFindInt( args_in, "peer-limit", &i ) )
             tr_ctorSetPeerLimit( ctor, TR_FORCE, i );
 
+        if( tr_bencDictFindInt( args_in, "bandwidthPriority", &i ) )
+            tr_ctorSetBandwidthPriority( ctor, i );
+
         if( tr_bencDictFindList( args_in, "files-unwanted", &l ) ) {
             tr_file_index_t fileCount;
             tr_file_index_t * files = fileListFromList( l, &fileCount );
