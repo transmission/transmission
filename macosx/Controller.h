@@ -127,6 +127,7 @@ typedef enum
 - (void) invalidOpenAlert: (NSString *) filename;
 - (void) invalidOpenMagnetAlert: (NSString *) address;
 - (void) duplicateOpenAlert: (NSString *) name;
+- (void) duplicateOpenMagnetAlert: (NSString *) address transferName: (NSString *) name;
 
 - (void) openURL:               (NSString *) urlString;
 - (void) openURLEndSheet:       (id) sender;

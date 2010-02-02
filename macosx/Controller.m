@@ -945,6 +945,15 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) openMagnet: (NSString *) address
 {
+    tr_torrent * duplicateTorrent;
+    if ((duplicateTorrent = tr_torrentFindFromMagnetLink(fLib, [address UTF8String])))
+    {
+        const tr_info * info = tr_torrentInfo(duplicateTorrent);
+        NSString * name = (info != NULL && info->name != NULL) ? [NSString stringWithUTF8String: info->name] : nil;
+        [self duplicateOpenMagnetAlert: address transferName: name];
+        return;
+    }
+    
     Torrent * torrent;
     if (!(torrent = [[Torrent alloc] initWithMagnetAddress: address location: nil lib: fLib]))
     {
@@ -1083,7 +1092,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         return;
     
     NSAlert * alert = [[NSAlert alloc] init];
-    [alert setMessageText: NSLocalizedString(@"Adding magnetized transfer failed", "Magnet link failed -> title")];
+    [alert setMessageText: NSLocalizedString(@"Adding magnetized transfer failed.", "Magnet link failed -> title")];
     [alert setInformativeText: [NSString stringWithFormat: NSLocalizedString(@"There was an error when adding the magnet link \"%@\"."
                                 " The transfer will not occur.", "Magnet link failed -> message"), address]];
     [alert setAlertStyle: NSWarningAlertStyle];
@@ -1108,6 +1117,31 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                             "Open duplicate alert -> message")];
     [alert setAlertStyle: NSWarningAlertStyle];
     [alert addButtonWithTitle: NSLocalizedString(@"OK", "Open duplicate alert -> button")];
+    [alert setShowsSuppressionButton: YES];
+    
+    [alert runModal];
+    if ([[alert suppressionButton] state])
+        [fDefaults setBool: NO forKey: @"WarningDuplicate"];
+    [alert release];
+}
+
+- (void) duplicateOpenMagnetAlert: (NSString *) address transferName: (NSString *) name
+{
+    if (![fDefaults boolForKey: @"WarningDuplicate"])
+        return;
+    
+    NSAlert * alert = [[NSAlert alloc] init];
+    if (name)
+        [alert setMessageText: [NSString stringWithFormat: NSLocalizedString(@"A transfer of \"%@\" already exists.",
+                                "Open duplicate magnet alert -> title"), name]];
+    else
+        [alert setMessageText: NSLocalizedString(@"Magnet link is a duplicate of an existing transfer.",
+                                "Open duplicate magnet alert -> title")];
+    [alert setInformativeText: [NSString stringWithFormat:
+            NSLocalizedString(@"The magnet link  \"%@\" cannot be added because it is a duplicate of an already existing transfer.",
+                            "Open duplicate magnet alert -> message"), address]];
+    [alert setAlertStyle: NSWarningAlertStyle];
+    [alert addButtonWithTitle: NSLocalizedString(@"OK", "Open duplicate magnet alert -> button")];
     [alert setShowsSuppressionButton: YES];
     
     [alert runModal];
