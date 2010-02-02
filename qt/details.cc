@@ -249,6 +249,7 @@ Details :: refresh( )
     // myHaveLabel
     double sizeWhenDone = 0;
     double leftUntilDone = 0;
+    double available = 0;
     int64_t haveTotal = 0;
     int64_t haveVerified = 0;
     int64_t haveUnverified = 0;
@@ -262,6 +263,7 @@ Details :: refresh( )
             verifiedPieces += v / t->pieceSize( );
             sizeWhenDone += t->sizeWhenDone( );
             leftUntilDone += t->leftUntilDone( );
+            available += t->sizeWhenDone() - t->leftUntilDone() + t->desiredAvailable();
         }
     }
     if( !haveVerified && !haveUnverified )
@@ -280,6 +282,13 @@ Details :: refresh( )
                          .arg( Utils :: sizeToString( haveUnverified ) );
     }
     myHaveLabel->setText( string );
+
+    // myAvailabilityLabel
+    if( sizeWhenDone < 1 )
+        string = none;
+    else
+        string.sprintf( "%'.1f%%", ( 100.0 * available ) / sizeWhenDone );
+    myAvailabilityLabel->setText( string );
 
     // myDownloadedLabel
     if( torrents.empty( ) )
@@ -809,6 +818,7 @@ Details :: createInfoTab( )
     hig->addSectionTitle( tr( "Activity" ) );
     hig->addRow( tr( "Torrent size:" ), mySizeLabel = new SqueezeLabel );
     hig->addRow( tr( "Have:" ), myHaveLabel = new SqueezeLabel );
+    hig->addRow( tr( "Availability:" ), myAvailabilityLabel = new SqueezeLabel );
     hig->addRow( tr( "Downloaded:" ), myDownloadedLabel = new SqueezeLabel );
     hig->addRow( tr( "Uploaded:" ), myUploadedLabel = new SqueezeLabel );
     hig->addRow( tr( "Ratio:" ), myRatioLabel = new SqueezeLabel );

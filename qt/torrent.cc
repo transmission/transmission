@@ -64,6 +64,7 @@ Torrent :: myProperties[] =
     { LEFT_UNTIL_DONE, "leftUntilDone", QVariant::ULongLong, STAT },
     { HAVE_UNCHECKED, "haveUnchecked", QVariant::ULongLong, STAT },
     { HAVE_VERIFIED, "haveValid", QVariant::ULongLong, STAT },
+    { DESIRED_AVAILABLE, "desiredAvailable", QVariant::ULongLong, STAT },
     { TOTAL_SIZE, "totalSize", QVariant::ULongLong, INFO },
     { PIECE_SIZE, "pieceSize", QVariant::ULongLong, INFO },
     { PIECE_COUNT, "pieceCount", QVariant::Int, INFO },

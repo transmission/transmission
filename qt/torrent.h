@@ -94,6 +94,7 @@ class Torrent: public QObject
             LEFT_UNTIL_DONE,
             HAVE_UNCHECKED,
             HAVE_VERIFIED,
+            DESIRED_AVAILABLE,
             TOTAL_SIZE,
             PIECE_SIZE,
             PIECE_COUNT,
@@ -218,6 +219,7 @@ class Torrent: public QObject
         bool getSeedRatio( double& setme ) const;
         uint64_t haveVerified( ) const { return getSize( HAVE_VERIFIED ); }
         uint64_t haveUnverified( ) const { return getSize( HAVE_UNCHECKED ); }
+        uint64_t desiredAvailable( ) const { return getSize( DESIRED_AVAILABLE ); }
         uint64_t haveTotal( ) const { return haveVerified( ) + haveUnverified(); }
         uint64_t totalSize( ) const { return getSize( TOTAL_SIZE ); }
         uint64_t sizeWhenDone( ) const { return getSize( SIZE_WHEN_DONE ); }

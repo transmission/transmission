@@ -71,6 +71,7 @@ class Details: public QDialog
 
         QLabel * myStateLabel;
         QLabel * myHaveLabel;
+        QLabel * myAvailabilityLabel;
         QLabel * myDownloadedLabel;
         QLabel * myUploadedLabel;
         QLabel * myRatioLabel;

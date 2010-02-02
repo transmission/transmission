@@ -65,6 +65,7 @@ struct DetailsImpl
     GtkWidget * size_lb;
     GtkWidget * state_lb;
     GtkWidget * have_lb;
+    GtkWidget * availability_lb;
     GtkWidget * dl_lb;
     GtkWidget * ul_lb;
     GtkWidget * ratio_lb;
@@ -624,6 +625,8 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     const char * none = _( "None" );
     const char * mixed = _( "Mixed" );
     char buf[512];
+    double available = 0;
+    double sizeWhenDone = 0;
     const tr_stat ** stats = g_new( const tr_stat*, n );
     const tr_info ** infos = g_new( const tr_info*, n );
     for( i=0; i<n; ++i ) {
@@ -800,18 +803,19 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     if( n <= 0 )
         str = none;
     else {
-        double sizeWhenDone = 0;
         double leftUntilDone = 0;
         double haveUnchecked = 0;
         double haveValid = 0;
         double verifiedPieces = 0;
         for( i=0; i<n; ++i ) {
-            const double v = stats[i]->haveValid;
-            haveUnchecked += stats[i]->haveUnchecked;
+            const tr_stat * st = stats[i];
+            const double v = st->haveValid;
+            haveUnchecked += st->haveUnchecked;
             haveValid += v;
             verifiedPieces += v / tr_torrentInfo(torrents[i])->pieceSize;
-            sizeWhenDone += stats[i]->sizeWhenDone;
-            leftUntilDone += stats[i]->leftUntilDone;
+            sizeWhenDone += st->sizeWhenDone;
+            leftUntilDone += st->leftUntilDone;
+            available += st->sizeWhenDone - st->leftUntilDone + st->desiredAvailable;
         }
         if( !haveValid && !haveUnchecked )
             str = none;
@@ -829,6 +833,15 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     }
     gtr_label_set_text( GTK_LABEL( di->have_lb ), str );
 
+    /* availability_lb */
+    if( sizeWhenDone  )
+        str = none;
+    else {
+        const double d = ( 100.0 * available ) / sizeWhenDone;
+        g_snprintf( buf, sizeof( buf ), _( "%1$.1f%%" ),  d );
+        str = buf;
+    }
+    gtr_label_set_text( GTK_LABEL( di->availability_lb ), str );
 
     /* dl_lb */
     if( n <= 0 )
@@ -948,6 +961,10 @@ info_page_new( struct DetailsImpl * di )
         /* have */
         l = di->have_lb = gtk_label_new( NULL );
         hig_workarea_add_row( t, &row, _( "Have:" ), l, NULL );
+
+        /* availability */
+        l = di->availability_lb = gtk_label_new( NULL );
+        hig_workarea_add_row( t, &row, _( "Availability:" ), l, NULL );
 
         /* downloaded */
         l = di->dl_lb = gtk_label_new( NULL );
