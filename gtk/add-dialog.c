@@ -87,6 +87,7 @@ struct AddData
     GtkWidget *  list;
     GtkWidget *  run_check;
     GtkWidget *  trash_check;
+    GtkWidget *  priority_combo;
     char *       filename;
     char *       downloadDir;
     TrTorrent *  gtor;
@@ -120,8 +121,12 @@ addResponseCB( GtkDialog * dialog,
         }
         else
         {
+            tr_torrent * tor = tr_torrent_handle( data->gtor );
+
+            tr_torrentSetPriority( tor, gtr_priority_combo_get_value( data->priority_combo ) );
+
             if( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( data->run_check ) ) )
-                tr_torrentStart( tr_torrent_handle( data->gtor ) );
+                tr_torrentStart( tor );
 
             tr_core_add_torrent( data->core, data->gtor, FALSE );
 
@@ -203,8 +208,7 @@ sourceChanged( GtkFileChooserButton * b,
 }
 
 static void
-verifyRequested( GtkButton * button UNUSED,
-                 gpointer           gdata )
+verifyRequested( GtkButton * button UNUSED, gpointer gdata )
 {
     struct AddData * data = gdata;
 
@@ -253,9 +257,7 @@ addTorrentFilters( GtkFileChooser * chooser )
 ****/
 
 GtkWidget*
-addSingleTorrentDialog( GtkWindow * parent,
-                        TrCore *    core,
-                        tr_ctor *   ctor )
+addSingleTorrentDialog( GtkWindow * parent, TrCore * core, tr_ctor * ctor )
 {
     int              row;
     int              col;
@@ -271,8 +273,7 @@ addSingleTorrentDialog( GtkWindow * parent,
     GSList *         walk;
 
     /* make the dialog */
-    d = gtk_dialog_new_with_buttons( _(
-                                         "Torrent Options" ), parent,
+    d = gtk_dialog_new_with_buttons( _( "Torrent Options" ), parent,
                                      GTK_DIALOG_DESTROY_WITH_PARENT |
                                      GTK_DIALOG_NO_SEPARATOR,
                                      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
@@ -300,6 +301,9 @@ addSingleTorrentDialog( GtkWindow * parent,
     str = _( "_Start when added" );
     data->run_check = gtk_check_button_new_with_mnemonic( str );
 
+    data->priority_combo = gtr_priority_combo_new( );
+    gtr_priority_combo_set_value( data->priority_combo, TR_PRI_NORMAL );
+
     g_signal_connect( G_OBJECT( d ), "response",
                       G_CALLBACK( addResponseCB ), data );
 
@@ -311,15 +315,12 @@ addSingleTorrentDialog( GtkWindow * parent,
     row = col = 0;
     l = gtk_label_new_with_mnemonic( _( "_Torrent file:" ) );
     gtk_misc_set_alignment( GTK_MISC( l ), 0.0f, 0.5f );
-    gtk_table_attach( GTK_TABLE(
-                          t ), l, col, col + 1, row, row + 1, GTK_FILL, 0,
-                      0, 0 );
+    gtk_table_attach( GTK_TABLE( t ), l, col, col + 1, row, row + 1, GTK_FILL, 0, 0, 0 );
     ++col;
     w = gtk_file_chooser_button_new( _( "Select Source File" ),
                                      GTK_FILE_CHOOSER_ACTION_OPEN );
     source_chooser = w;
-    gtk_table_attach( GTK_TABLE(
-                          t ), w, col, col + 1, row, row + 1, ~0, 0, 0, 0 );
+    gtk_table_attach( GTK_TABLE( t ), w, col, col + 1, row, row + 1, ~0, 0, 0, 0 );
     gtk_label_set_mnemonic_widget( GTK_LABEL( l ), w );
     addTorrentFilters( GTK_FILE_CHOOSER( w ) );
     g_signal_connect( w, "selection-changed",
@@ -329,23 +330,18 @@ addSingleTorrentDialog( GtkWindow * parent,
     col = 0;
     l = gtk_label_new_with_mnemonic( _( "_Destination folder:" ) );
     gtk_misc_set_alignment( GTK_MISC( l ), 0.0f, 0.5f );
-    gtk_table_attach( GTK_TABLE(
-                          t ), l, col, col + 1, row, row + 1, GTK_FILL, 0,
-                      0, 0 );
+    gtk_table_attach( GTK_TABLE( t ), l, col, col + 1, row, row + 1, GTK_FILL, 0, 0, 0 );
     ++col;
-    w = gtk_file_chooser_button_new( _(
-                                         "Select Destination Folder" ),
+    w = gtk_file_chooser_button_new( _( "Select Destination Folder" ),
                                      GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER );
     if( !gtk_file_chooser_set_filename( GTK_FILE_CHOOSER( w ),
                                         data->downloadDir ) )
         g_warning( "couldn't select '%s'", data->downloadDir );
     list = get_recent_destinations( );
     for( walk = list; walk; walk = walk->next )
-        gtk_file_chooser_add_shortcut_folder( GTK_FILE_CHOOSER(
-                                                  w ), walk->data, NULL );
+        gtk_file_chooser_add_shortcut_folder( GTK_FILE_CHOOSER( w ), walk->data, NULL );
     g_slist_free( list );
-    gtk_table_attach( GTK_TABLE(
-                          t ), w, col, col + 1, row, row + 1, ~0, 0, 0, 0 );
+    gtk_table_attach( GTK_TABLE( t ), w, col, col + 1, row, row + 1, ~0, 0, 0, 0 );
     gtk_label_set_mnemonic_widget( GTK_LABEL( l ), w );
     g_signal_connect( w, "selection-changed",
                       G_CALLBACK( downloadDirChanged ), data );
@@ -354,16 +350,16 @@ addSingleTorrentDialog( GtkWindow * parent,
     col = 0;
     w = data->list;
     gtk_widget_set_size_request ( w, 466u, 300u );
-    gtk_table_attach_defaults( GTK_TABLE(
-                                   t ), w, col, col + 2, row, row + 1 );
+    gtk_table_attach_defaults( GTK_TABLE( t ), w, col, col + 2, row, row + 1 );
 
     ++row;
     col = 0;
-    w = gtk_button_new_with_mnemonic( _( "_Verify Local Data" ) );
-    gtk_table_attach( GTK_TABLE(
-                          t ), w, col, col + 1, row, row + 1, GTK_FILL, 0,
-                      0, 0 );
-    g_signal_connect( w, "clicked", G_CALLBACK( verifyRequested ), data );
+    w = gtk_label_new_with_mnemonic( _( "Torrent _priority:" ) );
+    gtk_misc_set_alignment( GTK_MISC( w ), 0.0f, 0.5f );
+    gtk_table_attach_defaults( GTK_TABLE( t ), w, col, col + 1, row, row + 1 );
+    ++col;
+    gtk_table_attach_defaults( GTK_TABLE( t ), data->priority_combo, col, col + 1, row, row + 1 );
+    gtk_label_set_mnemonic_widget( GTK_LABEL( w ), data->priority_combo );
 
     ++row;
     col = 0;
@@ -371,9 +367,7 @@ addSingleTorrentDialog( GtkWindow * parent,
     if( tr_ctorGetPaused( ctor, TR_FORCE, &flag ) )
         g_assert_not_reached( );
     gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( w ), !flag );
-    gtk_table_attach( GTK_TABLE(
-                          t ), w, col, col + 2, row, row + 1, GTK_FILL, 0,
-                      0, 0 );
+    gtk_table_attach( GTK_TABLE( t ), w, col, col + 2, row, row + 1, GTK_FILL, 0, 0, 0 );
 
     ++row;
     col = 0;
@@ -381,9 +375,11 @@ addSingleTorrentDialog( GtkWindow * parent,
     if( tr_ctorGetDeleteSource( ctor, &flag ) )
         g_assert_not_reached( );
     gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( w ), flag );
-    gtk_table_attach( GTK_TABLE(
-                          t ), w, col, col + 2, row, row + 1, GTK_FILL, 0,
-                      0, 0 );
+    gtk_table_attach( GTK_TABLE( t ), w, col, col + 2, row, row + 1, GTK_FILL, 0, 0, 0 );
+
+    ++row;
+    col = 0;
+    w = data->priority_combo;
 
     /* trigger sourceChanged, either directly or indirectly,
      * so that it creates the tor/gtor objects */

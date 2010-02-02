@@ -118,6 +118,21 @@ gpointer tr_object_ref_sink( gpointer object );
 GtkWidget * gtr_button_new_from_stock( const char * stock,
                                        const char * mnemonic );
 
+
+/***
+****
+***/
+
+void gtr_priority_combo_set_value( GtkWidget * w, tr_priority_t );
+
+tr_priority_t gtr_priority_combo_get_value( GtkWidget * w );
+
+GtkWidget * gtr_priority_combo_new( void );
+
+/***
+****
+***/
+
 void addTorrentErrorDialog( GtkWidget  * window_or_child,
                             int          err,
                             const char * filename );

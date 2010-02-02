@@ -176,35 +176,6 @@ set_double_spin_if_different( GtkWidget * w, guint tag, double value )
 }
 
 static void
-set_int_combo_if_different( GtkWidget * w, guint tag, int column, int value )
-{
-    int i;
-    int currentValue;
-    GtkTreeIter iter;
-    GtkComboBox * combobox = GTK_COMBO_BOX( w );
-    GtkTreeModel * model = gtk_combo_box_get_model( combobox );
-
-    /* do the value and current value match? */
-    if( gtk_combo_box_get_active_iter( combobox, &iter ) ) {
-        gtk_tree_model_get( model, &iter, column, &currentValue, -1 );
-        if( currentValue == value )
-            return;
-    }
-
-    /* find the one to select */
-    i = 0;
-    while(( gtk_tree_model_iter_nth_child( model, &iter, NULL, i++ ))) {
-        gtk_tree_model_get( model, &iter, column, &currentValue, -1 );
-        if( currentValue == value ) {
-            g_signal_handler_block( combobox, tag );
-            gtk_combo_box_set_active_iter( combobox, &iter );
-            g_signal_handler_unblock( combobox, tag );
-            return;
-        }
-    }
-}
-
-static void
 unset_combo( GtkWidget * w, guint tag )
 {
     GtkComboBox * combobox = GTK_COMBO_BOX( w );
@@ -288,9 +259,11 @@ refreshOptions( struct DetailsImpl * di, tr_torrent ** torrents, int n )
         for( i=1; i<n; ++i )
             if( baseline != tr_torrentGetPriority( torrents[i] ) )
                 break;
-        if( i == n )
-            set_int_combo_if_different( di->bandwidthCombo,
-                                        di->bandwidthComboTag, 0, baseline );
+        if( i == n ) {
+            g_signal_handler_block( di->bandwidthCombo, di->bandwidthComboTag );
+            gtr_priority_combo_set_value( di->bandwidthCombo, baseline );
+            g_signal_handler_unblock( di->bandwidthCombo, di->bandwidthComboTag );
+        }
         else
             unset_combo( di->bandwidthCombo, di->bandwidthComboTag );
     }
@@ -447,51 +420,15 @@ max_peers_spun_cb( GtkSpinButton * s, struct DetailsImpl * di )
 static void
 onPriorityChanged( GtkComboBox * w, struct DetailsImpl * di )
 {
-    GtkTreeIter iter;
-
-    if( gtk_combo_box_get_active_iter( w, &iter ) )
-    {
-        int val = 0;
-        gtk_tree_model_get( gtk_combo_box_get_model( w ), &iter, 0, &val, -1 );
-        torrent_set_int( di, "bandwidthPriority", val );
-    }
+    const tr_priority_t priority = gtr_priority_combo_get_value( GTK_WIDGET( w ) );
+    torrent_set_int( di, "bandwidthPriority", priority );
 }
 
 static GtkWidget*
 new_priority_combo( struct DetailsImpl * di )
 {
-    int i;
-    guint tag;
-    GtkWidget * w;
-    GtkCellRenderer * r;
-    GtkListStore * store;
-    const struct {
-        int value;
-        const char * text;
-    } items[] = {
-        { TR_PRI_HIGH,   N_( "High" )  },
-        { TR_PRI_NORMAL, N_( "Normal" ) },
-        { TR_PRI_LOW,    N_( "Low" )  }
-    };
-
-    store = gtk_list_store_new( 2, G_TYPE_INT, G_TYPE_STRING );
-    for( i=0; i<(int)G_N_ELEMENTS(items); ++i ) {
-        GtkTreeIter iter;
-        gtk_list_store_append( store, &iter );
-        gtk_list_store_set( store, &iter, 0, items[i].value,
-                                          1, _( items[i].text ),
-                                         -1 );
-    }
-
-    w = gtk_combo_box_new_with_model( GTK_TREE_MODEL( store ) );
-    r = gtk_cell_renderer_text_new( );
-    gtk_cell_layout_pack_start( GTK_CELL_LAYOUT( w ), r, TRUE );
-    gtk_cell_layout_set_attributes( GTK_CELL_LAYOUT( w ), r, "text", 1, NULL );
-    tag = g_signal_connect( w, "changed", G_CALLBACK( onPriorityChanged ), di );
-    di->bandwidthComboTag = tag;
-
-    /* cleanup */
-    g_object_unref( store );
+    GtkWidget * w = gtr_priority_combo_new( );
+    di->bandwidthComboTag = g_signal_connect( w, "changed", G_CALLBACK( onPriorityChanged ), di );
     return w;
 }
 
