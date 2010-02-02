@@ -771,7 +771,7 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     gtr_label_set_text( GTK_LABEL( di->have_lb ), str );
 
     /* availability_lb */
-    if( sizeWhenDone  )
+    if( !sizeWhenDone  )
         str = none;
     else {
         const double d = ( 100.0 * available ) / sizeWhenDone;
