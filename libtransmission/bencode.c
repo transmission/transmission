@@ -1531,51 +1531,62 @@ tr_bencToStr( const tr_benc * top, tr_fmt_mode mode, int * len )
 int
 tr_bencToFile( const tr_benc * top, tr_fmt_mode mode, const char * filename )
 {
-    FILE * fp;
-    struct stat sb;
+    char * tmp;
+    int fd;
     int err = 0;
-    char * backup = NULL;
-    tr_bool have_backup = FALSE;
 
     /* if the file already exists, try to move it out of the way & keep it as a backup */
-    if( !stat( filename, &sb ) && S_ISREG( sb.st_mode ) ) {
-        backup = tr_strdup_printf( "%s.temp-backup", filename );
-        if( stat( backup, &sb ) && ( errno == ENOENT ) )
-            have_backup = !rename( filename, backup );
-    }
-
-    /* save the bencoded data to the file */
-    fp = fopen( filename, "wb+" );
-    if( fp == NULL )
-    {
-        err = errno;
-        tr_err( _( "Couldn't open \"%1$s\": %2$s" ),
-                filename, tr_strerror( errno ) );
-    }
-    else
+    tmp = tr_strdup_printf( "%s.tmp.XXXXXX", filename );
+    fd = mkstemp( tmp );
+    if( fd >= 0 )
     {
         int len;
         char * str = tr_bencToStr( top, mode, &len );
+        tr_dbg( "Writing %d bytes to temporary file \"%s\"", (int)len, tmp );
 
-        if( fwrite( str, 1, len, fp ) == (size_t)len )
-            tr_dbg( "tr_bencToFile saved \"%s\"", filename );
-        else {
+        if( write( fd, str, len ) == (ssize_t)len )
+        {
+            close( fd );
+
+            if( !unlink( filename ) || ( errno == ENOENT ) )
+            {
+                tr_dbg( "Renaming \"%s\" as \"%s\"", tmp, filename );
+
+                if( !rename( tmp, filename ) )
+                {
+                    tr_inf( _( "Saved \"%s\"" ), filename );
+                }
+                else
+                {
+                    err = errno;
+                    tr_err( _( "Couldn't save file \"%1$s\": %2$s" ), filename, tr_strerror( err ) );
+                    unlink( tmp );
+                }
+            }
+            else
+            {
+                err = errno;
+                tr_err( _( "Couldn't save file \"%1$s\": %2$s" ), filename, tr_strerror( err ) );
+                unlink( tmp );
+            }
+        }
+        else
+        {
             err = errno;
-            tr_err( _( "Couldn't save file \"%1$s\": %2$s" ), filename, tr_strerror( errno ) );
+            tr_err( _( "Couldn't save temporary file \"%1$s\": %2$s" ), tmp, tr_strerror( err ) );
+            close( fd );
+            unlink( tmp );
         }
 
         tr_free( str );
-        fclose( fp );
+    }
+    else
+    {
+        err = errno;
+        tr_err( _( "Couldn't save temporary file \"%1$s\": %2$s" ), tmp, tr_strerror( err ) );
     }
 
-    if( have_backup ) {
-        if( err )
-            rename( backup, filename );
-        else
-            unlink( backup );
-    }
-
-    tr_free( backup );
+    tr_free( tmp );
     return err;
 }
 
