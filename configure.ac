@@ -93,7 +93,7 @@ fi
 AC_HEADER_STDC
 AC_HEADER_TIME
 
-AC_CHECK_FUNCS([pread pwrite lrintf strlcpy daemon dirname basename strcasecmp localtime_r posix_fallocate memmem strtold syslog])
+AC_CHECK_FUNCS([pread pwrite lrintf strlcpy daemon dirname basename strcasecmp localtime_r fallocate64 posix_fallocate memmem strtold syslog])
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 ACX_PTHREAD

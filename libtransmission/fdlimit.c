@@ -43,6 +43,11 @@
  #include <fcntl.h>
 #endif
 
+#ifdef HAVE_FALLOCATE64
+  /* FIXME can't find the right #include voodoo to pick up the declaration.. */
+  extern int fallocate64( int fd, int mode, uint64_t offset, uint64_t len );
+#endif
+
 #ifdef HAVE_XFS_XFS_H
  #include <xfs/xfs.h>
 #endif
@@ -146,6 +151,12 @@ preallocateFileFull( const char * filename, uint64_t length )
     int fd = open( filename, flags, 0666 );
     if( fd >= 0 )
     {
+# ifdef HAVE_FALLOCATE64
+       if( !success )
+       {
+           success = !fallocate64( fd, 0, 0, length );
+       }
+# endif
 # ifdef HAVE_XFS_XFS_H
         if( !success && platform_test_xfs_fd( fd ) )
         {
