@@ -14,6 +14,7 @@
 #include <iostream>
 
 #include <QCheckBox>
+#include <QComboBox>
 #include <QDialogButtonBox>
 #include <QEvent>
 #include <QFileDialog>
@@ -98,6 +99,17 @@ Options :: Options( Session& session, const Prefs& prefs, const QString& filenam
     layout->addWidget( myTree, ++row, 0, 1, 2 );
     if( !session.isLocal( ) )
         myTree->hideColumn( 1 ); // hide the % done, since we've no way of knowing
+
+    QComboBox * m = new QComboBox;
+    m->addItem( tr( "High" ),   TR_PRI_HIGH );
+    m->addItem( tr( "Normal" ), TR_PRI_NORMAL );
+    m->addItem( tr( "Low" ),    TR_PRI_LOW );
+    m->setCurrentIndex( 1 ); // Normal
+    myPriorityCombo = m;
+    l = new QLabel( tr( "Torrent &priority:" ) );
+    l->setBuddy( m );
+    layout->addWidget( l, ++row, 0, Qt::AlignLeft );
+    layout->addWidget( m, row, 1 );
 
     if( session.isLocal( ) )
     {
@@ -274,6 +286,11 @@ Options :: onAccepted( )
 
     // paused
     tr_bencDictAddBool( args, "paused", !myStartCheck->isChecked( ) );
+
+    // priority
+    const int index = myPriorityCombo->currentIndex( );
+    const int priority = myPriorityCombo->itemData(index).toInt( );
+    tr_bencDictAddInt( args, "bandwidthPriority", priority );
 
     // files-unwanted
     int count = myWanted.count( false );

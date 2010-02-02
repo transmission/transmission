@@ -30,6 +30,7 @@
 class FileTreeView;
 class Prefs;
 class QCheckBox;
+class QComboBox;
 class Session;
 
 extern "C" { struct tr_benc; };
@@ -79,6 +80,7 @@ class Options: public QDialog
         FileTreeView * myTree;
         QCheckBox * myStartCheck;
         QCheckBox * myTrashCheck;
+        QComboBox * myPriorityCombo;
         QPushButton * myFileButton;
         QPushButton * myDestinationButton;
         QPushButton * myVerifyButton;
