@@ -1053,7 +1053,9 @@ printSession( tr_benc * top )
             printf( "  RPC minimum version: %" PRId64 "\n", i );
         printf( "\n" );
 
-        printf( "TRANSFER\n" );
+        printf( "CONFIG\n" );
+        if( tr_bencDictFindStr( args, "config-dir", &str ) )
+            printf( "  Configuration directory: %s\n", str );
         if( tr_bencDictFindStr( args,  TR_PREFS_KEY_DOWNLOAD_DIR, &str ) )
             printf( "  Download directory: %s\n", str );
         if( tr_bencDictFindInt( args, TR_PREFS_KEY_PEER_PORT, &i ) )

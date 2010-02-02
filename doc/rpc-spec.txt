@@ -430,7 +430,8 @@
 
    Method name: "session-set"
    Request arguments: one or more of 4.1's arguments, except: "blocklist-size",
-                      "rpc-version", "rpc-version-minimum", and "version"
+                      "config-dir", "rpc-version", "rpc-version-minimum",
+                      and "version"
    Response arguments: none
 
 4.1.2.  Accessors
@@ -577,4 +578,5 @@
    ------+---------+-----------+----------------+-------------------------------
    8     | 1.90    | yes       | session-set    | new arg "rename-partial-files"
          |         | yes       | session-get    | new arg "rename-partial-files"
+         |         | yes       | session-get    | new arg "config-dir"
          |         | yes       | torrent-add    | new arg "bandwidthPriority"
