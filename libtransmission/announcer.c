@@ -661,6 +661,7 @@ createAnnounceURL( const tr_announcer     * announcer,
     const char * ann = tracker->announce;
     struct evbuffer * buf = evbuffer_new( );
     char * ret;
+    const char * str;
     const unsigned char * ipv6;
 
     evbuffer_add_printf( buf, "%s"
@@ -673,8 +674,7 @@ createAnnounceURL( const tr_announcer     * announcer,
                               "&left=%" PRIu64
                               "&numwant=%d"
                               "&key=%s"
-                              "&compact=1"
-                              "&supportcrypto=1",
+                              "&compact=1",
                               ann,
                               strchr( ann, '?' ) ? '&' : '?',
                               torrent->info.hashEscaped,
@@ -689,17 +689,13 @@ createAnnounceURL( const tr_announcer     * announcer,
     if( torrent->corruptCur )
         evbuffer_add_printf( buf, "&corrupt=%" PRIu64, torrent->corruptCur );
 
-    if( !isStopping )
-        evbuffer_add_printf( buf, "&upload_only=%d", tr_torrentIsSeed( torrent ) ? 1 : 0 );
+    str = eventName;
+    if( str && *str )
+        evbuffer_add_printf( buf, "&event=%s", str );
 
-    if( announcer->session->encryptionMode == TR_ENCRYPTION_REQUIRED )
-        evbuffer_add_printf( buf, "&requirecrypto=1" );
-
-    if( eventName && *eventName )
-        evbuffer_add_printf( buf, "&event=%s", eventName );
-
-    if( tracker->tracker_id && *tracker->tracker_id )
-        evbuffer_add_printf( buf, "&trackerid=%s", tracker->tracker_id );
+    str = tracker->tracker_id;
+    if( str && *str )
+        evbuffer_add_printf( buf, "&trackerid=%s", str );
 
     /* There are two incompatible techniques for announcing an IPv6 address.
        BEP-7 suggests adding an "ipv6=" parameter to the announce URL,
@@ -719,9 +715,8 @@ createAnnounceURL( const tr_announcer     * announcer,
     }
 
     ret = tr_strndup( EVBUFFER_DATA( buf ), EVBUFFER_LENGTH( buf ) );
-    evbuffer_free( buf );
-
     dbgmsg( tier, "announce URL is \"%s\"", ret );
+    evbuffer_free( buf );
     return ret;
 }
 
@@ -1268,7 +1263,7 @@ onAnnounceDone( tr_session   * session,
 
         if( responseCode == 0 )
         {
-            const int interval = 120 + tr_cryptoWeakRandInt( 120 );
+            const int interval = tr_cryptoWeakRandInt( 120 );
             dbgmsg( tier, "No response from tracker... retrying in %d seconds.", interval );
             tier->manualAnnounceAllowedAt = ~(time_t)0;
             tierSetNextAnnounce( tier, tier->announceEvent, now + interval );

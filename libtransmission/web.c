@@ -294,7 +294,7 @@ static int
 getTimeoutFromURL( const char * url )
 {
     if( strstr( url, "scrape" ) != NULL ) return 20;
-    if( strstr( url, "announce" ) != NULL ) return 45;
+    if( strstr( url, "announce" ) != NULL ) return 60;
     return 240;
 }
 
@@ -321,7 +321,7 @@ addTask( void * vtask )
         struct tr_web * web = session->web;
         const int timeout = getTimeoutFromURL( task->url );
         const long verbose = getenv( "TR_CURL_VERBOSE" ) != NULL;
-        const char * user_agent = TR_NAME "/" LONG_VERSION_STRING;
+        const char * user_agent = TR_NAME "/" SHORT_VERSION_STRING;
         char * url = NULL;
 
         /* insert the resolved host into the URL s.t. curl's DNS won't block
@@ -349,6 +349,7 @@ addTask( void * vtask )
                 host = tr_strdup_printf( "Host: %s:%d", task->host, task->port );
 
             task->slist = curl_slist_append( NULL, host );
+            task->slist = curl_slist_append( task->slist, tr_strdup_printf( "Accept:" ) );
             curl_easy_setopt( e, CURLOPT_HTTPHEADER, task->slist );
             tr_free( host );
         }
@@ -385,8 +386,6 @@ addTask( void * vtask )
         curl_easy_setopt( e, CURLOPT_DNS_CACHE_TIMEOUT, MIN_DNS_CACHE_TIME );
         curl_easy_setopt( e, CURLOPT_FOLLOWLOCATION, 1L );
         curl_easy_setopt( e, CURLOPT_AUTOREFERER, 1L );
-        curl_easy_setopt( e, CURLOPT_MAXREDIRS, 4L );
-        curl_easy_setopt( e, CURLOPT_NOSIGNAL, 1L );
         curl_easy_setopt( e, CURLOPT_PRIVATE, task );
         curl_easy_setopt( e, CURLOPT_SSL_VERIFYHOST, 0L );
         curl_easy_setopt( e, CURLOPT_SSL_VERIFYPEER, 0L );
