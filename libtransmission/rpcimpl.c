@@ -1096,7 +1096,7 @@ torrentAdd( tr_session               * session,
             tr_free( files );
         }
 
-        dbgmsg( "torrentAdd: filename is \"%s\"", filename );
+        dbgmsg( "torrentAdd: filename is \"%s\"", filename ? filename : "(null)" );
 
         if( isCurlURL( filename ) )
         {
