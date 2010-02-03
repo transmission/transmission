@@ -29,7 +29,7 @@ enum
 {
     TR_MEMORY_TRASH = 0xCC,
 
-    DEFAULT_TIMER_MSEC = 1500, /* arbitrary */
+    DEFAULT_TIMER_MSEC = 250, /* arbitrary */
 
     MIN_DNS_CACHE_TIME = 60 * 60 * 24
 };
@@ -378,7 +378,6 @@ addTask( void * vtask )
         evtimer_set( &task->timer_event, task_timeout_cb, task );
         tr_timerAdd( &task->timer_event, timeout, 0 );
 
-        curl_easy_setopt( e, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4 );
         curl_easy_setopt( e, CURLOPT_SOCKOPTFUNCTION, sockoptfunction );
         curl_easy_setopt( e, CURLOPT_SOCKOPTDATA, task );
         curl_easy_setopt( e, CURLOPT_WRITEDATA, task );
@@ -386,8 +385,7 @@ addTask( void * vtask )
         curl_easy_setopt( e, CURLOPT_DNS_CACHE_TIMEOUT, MIN_DNS_CACHE_TIME );
         curl_easy_setopt( e, CURLOPT_FOLLOWLOCATION, 1L );
         curl_easy_setopt( e, CURLOPT_AUTOREFERER, 1L );
-        curl_easy_setopt( e, CURLOPT_FORBID_REUSE, 1L );
-        curl_easy_setopt( e, CURLOPT_MAXREDIRS, -1L );
+        curl_easy_setopt( e, CURLOPT_MAXREDIRS, 4L );
         curl_easy_setopt( e, CURLOPT_NOSIGNAL, 1L );
         curl_easy_setopt( e, CURLOPT_PRIVATE, task );
         curl_easy_setopt( e, CURLOPT_SSL_VERIFYHOST, 0L );

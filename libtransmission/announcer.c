@@ -57,10 +57,10 @@ enum
     KEYLEN = 8,
 
     /* how many scrapes we allow at one time */
-    MAX_CONCURRENT_SCRAPES = 96,
+    MAX_CONCURRENT_SCRAPES = 48,
 
     /* how many announces we allow at one time */
-    MAX_CONCURRENT_ANNOUNCES = 96,
+    MAX_CONCURRENT_ANNOUNCES = 48,
 
     /* if a tracker takes more than this long to respond,
      * we treat it as nonresponsive */
