@@ -10,7 +10,7 @@
 #include "json.h"
 #include "utils.h" /* tr_free */
 
-#undef VERBOSE
+/* #define VERBOSE */
 
 static int test = 0;
 
@@ -170,7 +170,7 @@ testString( const char * str,
         check( !err );
 #if 0
         fprintf( stderr, "in: [%s]\n", str );
-        fprintf( stderr, "out:\n%s", tr_bencSaveAsJSON( &val, NULL ) );
+        fprintf( stderr, "out:\n%s", tr_bencToStr( &val, TR_FMT_JSON, NULL ) );
 #endif
         check( end == (const uint8_t*)str + len );
         saved = tr_bencToStr( &val, TR_FMT_BENC, &savedLen );

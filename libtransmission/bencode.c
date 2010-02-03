@@ -355,19 +355,12 @@ tr_bencLoad( const void * buf_in,
 ****
 ***/
 
-/* returns true if the given string length would fit in our string buffer */
-static inline int
-stringFitsInBuffer( const tr_benc * val, int len )
-{
-    return len < (int)sizeof( val->val.s.str.buf );
-}
-
 /* returns true if the benc's string was malloced.
  * this occurs when the string is too long for our string buffer */
 static inline int
 stringIsAlloced( const tr_benc * val )
 {
-    return !stringFitsInBuffer( val, val->val.s.len );
+    return val->val.s.len >= sizeof( val->val.s.str.buf );
 }
 
 /* returns a const pointer to the benc's string */
@@ -577,29 +570,34 @@ tr_bencDictFindRaw( tr_benc         * dict,
 void
 tr_bencInitRaw( tr_benc * val, const void * src, size_t byteCount )
 {
+    char * setme;
     tr_bencInit( val, TR_TYPE_STR );
 
-    if( stringFitsInBuffer( val, val->val.s.len = byteCount ))
-        memcpy( val->val.s.str.buf, src, byteCount );
+    /* There's no way in benc notation to distinguish between
+     * zero-terminated strings and raw byte arrays.
+     * Because of this, tr_bencMergeDicts() and tr_bencListCopy()
+     * don't know whether or not a TR_TYPE_STR node needs a '\0'.
+     * Append one, een to the raw arrays, just to be safe. */
+
+    if( byteCount < sizeof( val->val.s.str.buf ) )
+        setme = val->val.s.str.buf;
     else
-        val->val.s.str.ptr = tr_memdup( src, byteCount );
+        setme = val->val.s.str.ptr = tr_new( char, byteCount + 1 );
+
+    memcpy( setme, src, byteCount );
+    setme[byteCount] = '\0';
+    val->val.s.len = byteCount;
 }
 
 void
 tr_bencInitStr( tr_benc * val, const void * str, int len )
 {
-    tr_bencInit( val, TR_TYPE_STR );
-
     if( str == NULL )
         len = 0;
     else if( len < 0 )
         len = strlen( str );
 
-    if( stringFitsInBuffer( val, val->val.s.len = len )) {
-        memcpy( val->val.s.str.buf, str, len );
-        val->val.s.str.buf[len] = '\0';
-    } else
-        val->val.s.str.ptr = tr_strndup( str, len );
+    tr_bencInitRaw( val, str, len );
 }
 
 void
