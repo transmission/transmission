@@ -60,9 +60,6 @@ enum
     /* when few peers are available, keep idle ones this long */
     MAX_UPLOAD_IDLE_SECS = ( 60 * 5 ),
 
-    /* max # of peers to ask fer per torrent per reconnect pulse */
-    MAX_RECONNECTIONS_PER_PULSE = 8,
-
     /* max number of peers to ask for per second overall.
     * this throttle is to avoid overloading the router */
     MAX_CONNECTIONS_PER_SECOND = 16,
@@ -2685,6 +2682,23 @@ closePeer( Torrent * t, tr_peer * peer )
     removePeer( t, peer );
 }
 
+/* Make a lot of slots available to newly-running torrents...
+ * once they reach steady state, they shouldn't need as many */
+static int
+maxNewPeersPerPulse( const Torrent * t )
+{
+    double runTime;
+    const tr_torrent * tor = t->tor;
+
+    assert( tr_isTorrent( tor ) );
+
+    runTime = difftime( tr_time( ), tor->startDate );
+    if( runTime > 480 ) return 1;
+    if( runTime > 240 ) return 2;
+    if( runTime > 120 ) return 3;
+    return 4;
+}
+
 static void
 reconnectTorrent( Torrent * t )
 {
@@ -2708,6 +2722,7 @@ reconnectTorrent( Torrent * t )
         int mustCloseCount;
         int maxCandidates;
         struct tr_peer ** mustClose;
+        const int maxPerPulse = maxNewPeersPerPulse( t );
 
         /* disconnect the really bad peers */
         mustClose = getPeersToClose( t, TR_MUST_CLOSE, now, &mustCloseCount );
@@ -2716,7 +2731,8 @@ reconnectTorrent( Torrent * t )
         tr_free( mustClose );
 
         /* decide how many peers can we try to add in this pass */
-        maxCandidates = MAX_RECONNECTIONS_PER_PULSE;
+    
+        maxCandidates = maxPerPulse;
         if( tr_announcerHasBacklog( t->manager->session->announcer ) )
             maxCandidates /= 2;
         maxCandidates = MIN( maxCandidates, getMaxPeerCount( t->tor ) - getPeerCount( t ) );
@@ -2730,12 +2746,12 @@ reconnectTorrent( Torrent * t )
                        "max per pulse is %d",
                        t->tor->info.name, mustCloseCount,
                        tr_ptrArraySize( &t->pool ),
-                       MAX_RECONNECTIONS_PER_PULSE );
+                       maxPerPulse );
 
-            tordbg( t, "maxCandidates is %d, MAX_RECONNECTIONS_PER_PULSE is %d, "
+            tordbg( t, "maxCandidates is %d, maxPerPulse is %d, "
                        "getPeerCount(t) is %d, getMaxPeerCount(t) is %d, "
                        "newConnectionsThisSecond is %d, MAX_CONNECTIONS_PER_SECOND is %d",
-                       maxCandidates, MAX_RECONNECTIONS_PER_PULSE,
+                       maxCandidates, maxPerPulse,
                        getPeerCount( t ), getMaxPeerCount( t->tor ),
                        newConnectionsThisSecond, MAX_CONNECTIONS_PER_SECOND );
         }
@@ -2762,12 +2778,12 @@ reconnectTorrent( Torrent * t )
                        "%d atoms, max per pulse is %d",
                        t->tor->info.name, mustCloseCount,
                        canCloseCount, candidateCount,
-                       tr_ptrArraySize( &t->pool ), MAX_RECONNECTIONS_PER_PULSE );
+                       tr_ptrArraySize( &t->pool ), maxPerPulse );
 
-            tordbg( t, "candidateCount is %d, MAX_RECONNECTIONS_PER_PULSE is %d,"
+            tordbg( t, "candidateCount is %d, maxPerPulse is %d,"
                        " getPeerCount(t) is %d, getMaxPeerCount(t) is %d, "
                        "newConnectionsThisSecond is %d, MAX_CONNECTIONS_PER_SECOND is %d",
-                       candidateCount, MAX_RECONNECTIONS_PER_PULSE,
+                       candidateCount, maxPerPulse,
                        getPeerCount( t ), getMaxPeerCount( t->tor ),
                        newConnectionsThisSecond, MAX_CONNECTIONS_PER_SECOND );
 
