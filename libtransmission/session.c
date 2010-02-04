@@ -225,43 +225,6 @@ tr_sessionGetPublicAddress( const tr_session * session, int tr_af_type )
 ****
 ***/
 
-static tr_bool
-isAltTime( const tr_session * s )
-{
-    int minutes, day;
-    tr_bool withinTime;
-    struct tm tm;
-    const time_t now = time( NULL );
-    const int begin = s->altSpeedTimeBegin;
-    const int end = s->altSpeedTimeEnd;
-    const tr_bool toNextDay = begin > end;
-
-    tr_localtime_r( &now, &tm );
-    minutes = tm.tm_hour*60 + tm.tm_min;
-    day = tm.tm_wday;
-
-    if( !toNextDay )
-        withinTime = ( begin <= minutes ) && ( minutes < end );
-    else /* goes past midnight */
-        withinTime = ( begin <= minutes ) || ( minutes < end );
-
-    if( !withinTime )
-        return FALSE;
-
-    if( toNextDay && (minutes < end) )
-    {
-        --day;
-        if( day == -1 )
-            day = 6;
-    }
-
-    return ((1<<day) & s->altSpeedTimeDay) != 0;
-}
-
-/***
-****
-***/
-
 #ifdef TR_EMBEDDED
  #define TR_DEFAULT_ENCRYPTION   TR_CLEAR_PREFERRED
 #else
@@ -503,8 +466,6 @@ onSaveTimer( int foo UNUSED, short bar UNUSED, void * vsession )
 ***/
 
 static void tr_sessionInitImpl( void * );
-static void onAltTimer( int, short, void* );
-static void setAltTimer( tr_session * session );
 
 struct init_data
 {
@@ -559,8 +520,7 @@ tr_sessionInit( const char  * tag,
     return session;
 }
 
-static void useAltSpeed( tr_session * session, tr_bool enabled, tr_bool byUser );
-static void useAltSpeedTime( tr_session * session, tr_bool enabled, tr_bool byUser );
+static void turtleCheckClock( tr_session * session, struct tr_turtle_info * t, tr_bool byUser );
 
 static void
 onNowTimer( int foo UNUSED, short bar UNUSED, void * vsession )
@@ -580,10 +540,11 @@ onNowTimer( int foo UNUSED, short bar UNUSED, void * vsession )
     if( usec > max ) usec = max;
     if( usec < min ) usec = min;
     tr_timerAdd( session->nowTimer, 0, usec );
-
-    /* update libtransmission's epoch time */
-    tr_timeUpdate( tv.tv_sec );
     /* fprintf( stderr, "time %zu sec, %zu microsec\n", (size_t)tr_time(), (size_t)tv.tv_usec ); */
+
+    /* tr_session things to do once per second */
+    tr_timeUpdate( tv.tv_sec );
+    turtleCheckClock( session, &session->turtle, FALSE );
 }
 
 static void loadBlocklists( tr_session * session );
@@ -636,10 +597,6 @@ tr_sessionInitImpl( void * vdata )
 
     assert( tr_isSession( session ) );
 
-    session->altTimer = tr_new0( struct event, 1 );
-    evtimer_set( session->altTimer, onAltTimer, session );
-    setAltTimer( session );
-
     session->saveTimer = tr_new0( struct event, 1 );
     evtimer_set( session->saveTimer, onSaveTimer, session );
     tr_timerAdd( session->saveTimer, SAVE_INTERVAL_SECS, 0 );
@@ -666,6 +623,8 @@ tr_sessionInitImpl( void * vdata )
     data->done = TRUE;
 }
 
+static void turtleBootstrap( tr_session *, struct tr_turtle_info *, tr_bool isEnabled );
+
 static void
 sessionSetImpl( void * vdata )
 {
@@ -677,6 +636,7 @@ sessionSetImpl( void * vdata )
     struct init_data * data = vdata;
     tr_session * session = data->session;
     tr_benc * settings = data->clientSettings;
+    struct tr_turtle_info * turtle = &session->turtle;
 
     assert( tr_isSession( session ) );
     assert( tr_bencIsDict( settings ) );
@@ -799,25 +759,26 @@ sessionSetImpl( void * vdata )
         tr_sessionSetRatioLimited( session, boolVal );
 
     /**
-    ***  Alternate speed limits
+    ***  Turtle Mode
     **/
 
+    /* update the turtle mode's fields */
     if( tr_bencDictFindInt( settings, TR_PREFS_KEY_ALT_SPEED_UP, &i ) )
-        tr_sessionSetAltSpeed( session, TR_UP, i );
+        turtle->speedLimit[TR_UP] = i;
     if( tr_bencDictFindInt( settings, TR_PREFS_KEY_ALT_SPEED_DOWN, &i ) )
-        tr_sessionSetAltSpeed( session, TR_DOWN, i );
+        turtle->speedLimit[TR_DOWN] = i;
     if( tr_bencDictFindInt( settings, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN, &i ) )
-        tr_sessionSetAltSpeedBegin( session, i );
+        turtle->beginMinute = i;
     if( tr_bencDictFindInt( settings, TR_PREFS_KEY_ALT_SPEED_TIME_END, &i ) )
-        tr_sessionSetAltSpeedEnd( session, i );
+        turtle->endMinute = i;
     if( tr_bencDictFindInt( settings, TR_PREFS_KEY_ALT_SPEED_TIME_DAY, &i ) )
-        tr_sessionSetAltSpeedDay( session, i );
+        turtle->days = i;
     if( tr_bencDictFindBool( settings, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED, &boolVal ) )
-        useAltSpeedTime( session, boolVal, FALSE );
-    if( boolVal )
-        useAltSpeed( session, isAltTime( session ), FALSE );
-    else if( tr_bencDictFindBool( settings, TR_PREFS_KEY_ALT_SPEED_ENABLED, &boolVal ) )
-        useAltSpeed( session, boolVal, FALSE );
+        turtle->isClockEnabled = boolVal;
+
+    if( !tr_bencDictFindBool( settings, TR_PREFS_KEY_ALT_SPEED_ENABLED, &boolVal ) )
+        boolVal = FALSE;
+    turtleBootstrap( session, turtle, boolVal );
 
     data->done = TRUE;
 }
@@ -1074,7 +1035,9 @@ tr_sessionGetRatioLimit( const tr_session * session )
 }
 
 /***
+****
 ****  SPEED LIMITS
+****
 ***/
 
 tr_bool
@@ -1108,73 +1071,127 @@ updateBandwidth( tr_session * session, tr_direction dir )
 }
 
 static void
+turtleFindNextChange( struct tr_turtle_info * t )
+{
+    struct tm tm;
+    time_t today_began_at;
+    time_t next_begin;
+    time_t next_end;
+    const time_t now = tr_time( );
+    const int SECONDS_PER_DAY = 86400;
+
+    tr_localtime_r( &now, &tm );
+    tm.tm_hour = tm.tm_min = tm.tm_sec = 0;
+    today_began_at = mktime( &tm );
+
+    next_begin = today_began_at + ( t->beginMinute * 60 );
+    if( next_begin <= now )
+        next_begin += SECONDS_PER_DAY;
+
+    next_end = today_began_at + ( t->endMinute * 60 );
+    if( next_end <= now )
+        next_end += SECONDS_PER_DAY;
+
+    if( next_begin < next_end ) {
+        t->_nextChangeAt = next_begin;
+        t->_nextChangeValue = TRUE;
+    } else {
+        t->_nextChangeAt = next_end;
+        t->_nextChangeValue = FALSE;
+    }
+
+    /* if the next change is today, look for today in t->days.
+       if the next change is tomorrow to turn limits OFF, look for today in t->days.
+       if the next change is tomorrow to turn limits ON, look for tomorrow in t->days. */
+    if( t->_nextChangeValue && (( t->_nextChangeAt >= today_began_at + SECONDS_PER_DAY )))
+        t->_nextChangeAllowed = ( t->days & ( ( tm.tm_wday + 1 ) % 7 ) ) != 0;
+    else
+        t->_nextChangeAllowed = ( t->days & tm.tm_wday ) != 0;
+
+    if( t->isClockEnabled && t->_nextChangeAllowed ) {
+        char buf[128];
+        tr_localtime_r( &t->_nextChangeAt, &tm );
+        strftime( buf, sizeof( buf ), "%a %b %d %T %Y", &tm );
+        tr_dbg( "Turtle clock updated: at %s we'll turn limits %s", buf, (t->_nextChangeValue?"on":"off") );
+    }
+}
+
+static void
 altSpeedToggled( void * vsession )
 {
     tr_session * session = vsession;
+    struct tr_turtle_info * t = &session->turtle;
 
     assert( tr_isSession( session ) );
 
     updateBandwidth( session, TR_UP );
     updateBandwidth( session, TR_DOWN );
+    turtleFindNextChange( t );
 
-    if( session->altCallback != NULL )
-        (*session->altCallback)( session, session->altSpeedEnabled, session->altSpeedChangedByUser, session->altCallbackUserData );
+    if( t->callback != NULL )
+        (*t->callback)( session, t->isEnabled, t->changedByUser, t->callbackUserData );
 }
 
-/* tell the alt speed limit timer to fire again at the top of the minute */
 static void
-setAltTimer( tr_session * session )
+useAltSpeed( tr_session * s, struct tr_turtle_info * t, tr_bool enabled, tr_bool byUser )
 {
-    const time_t now = time( NULL );
-    struct tm tm;
+    assert( tr_isSession( s ) );
+    assert( t != NULL );
+    assert( tr_isBool( enabled ) );
+    assert( tr_isBool( byUser ) );
 
-    assert( tr_isSession( session ) );
-    assert( session->altTimer != NULL );
-
-    tr_localtime_r( &now, &tm );
-    tr_timerAdd( session->altTimer, 60-tm.tm_sec, 0 );
-}
-
-/* this is called once a minute to:
- * (1) update session->isAltTime
- * (2) alter the speed limits when the alt limits go on and off */
-static void
-onAltTimer( int foo UNUSED, short bar UNUSED, void * vsession )
-{
-    tr_session * session = vsession;
-
-    assert( tr_isSession( session ) );
-
-    if( session->altSpeedTimeEnabled )
+    if( t->isEnabled != enabled )
     {
-        const time_t now = time( NULL );
-        struct tm tm;
-        int currentMinute, day;
-        tr_bool isBeginTime, isEndTime, isDay;
-        tr_localtime_r( &now, &tm );
-        currentMinute = tm.tm_hour*60 + tm.tm_min;
-        day = tm.tm_wday;
-
-        isBeginTime = currentMinute == session->altSpeedTimeBegin;
-        isEndTime = currentMinute == session->altSpeedTimeEnd;
-        if( isBeginTime || isEndTime )
-        {
-            /* if looking at the end date, look at the next day if end time is before begin time */
-            if( isEndTime && !isBeginTime && session->altSpeedTimeEnd < session->altSpeedTimeBegin )
-            {
-                --day;
-                if( day == -1 )
-                    day = 6;
-            }
-
-            isDay = ((1<<day) & session->altSpeedTimeDay) != 0;
-
-            if( isDay )
-                useAltSpeed( session, isBeginTime, FALSE );
-        }
+        t->isEnabled = enabled;
+        t->changedByUser = byUser;
+        tr_runInEventThread( s, altSpeedToggled, s );
     }
+}
 
-    setAltTimer( session );
+static tr_bool
+turtleTestClock( struct tr_turtle_info * t, tr_bool * enabled )
+{
+    tr_bool hit;
+
+    if(( hit = ( t->testedAt < t->_nextChangeAt ) && ( t->_nextChangeAt <= tr_time( ))))
+        *enabled = t->_nextChangeValue;
+
+    return hit;
+}
+
+static void
+turtleCheckClock( tr_session * session, struct tr_turtle_info * t, tr_bool byUser )
+{
+    tr_bool enabled;
+    const time_t now = tr_time( );
+    const tr_bool hit = turtleTestClock( t, &enabled );
+
+    t->testedAt = now;
+
+    if( hit )
+    {
+        if( t->isClockEnabled && t->_nextChangeAllowed )
+        {
+            tr_inf( "Time to turn %s turtle mode!", (enabled?"on":"off") );
+            useAltSpeed( session, t, enabled, byUser );
+        }
+
+        turtleFindNextChange( t );
+    }
+}
+
+/* Called after the turtle's fields are loaded from an outside source.
+ * It initializes the implementation fields 
+ * and turns on turtle mode if the clock settings say to. */
+static void
+turtleBootstrap( tr_session * session, struct tr_turtle_info * turtle, tr_bool isEnabled )
+{
+    turtleFindNextChange( turtle );
+
+    if( !isEnabled )
+        turtleTestClock( turtle, &isEnabled );
+
+    useAltSpeed( session, turtle, isEnabled, FALSE );
 }
 
 /***
@@ -1234,7 +1251,7 @@ tr_sessionSetAltSpeed( tr_session * s, tr_direction d, int KB_s )
     assert( tr_isDirection( d ) );
     assert( KB_s >= 0 );
 
-    s->altSpeed[d] = KB_s;
+    s->turtle.speedLimit[d] = KB_s;
 
     updateBandwidth( s, d );
 }
@@ -1245,30 +1262,33 @@ tr_sessionGetAltSpeed( const tr_session * s, tr_direction d )
     assert( tr_isSession( s ) );
     assert( tr_isDirection( d ) );
 
-    return s->altSpeed[d];
+    return s->turtle.speedLimit[d];
 }
 
-void
-useAltSpeedTime( tr_session * session, tr_bool enabled, tr_bool byUser )
+static void
+userPokedTheClock( tr_session * s, struct tr_turtle_info * t )
 {
-    assert( tr_isSession( session ) );
-    assert( tr_isBool( enabled ) );
-    assert( tr_isBool( byUser ) );
+    tr_dbg( "Refreshing the turtle mode clock due to user changes" );
 
-    if( session->altSpeedTimeEnabled != enabled )
-    {
-        const tr_bool isAlt = isAltTime( session );
+    t->testedAt = 0;
+    turtleFindNextChange( t );
 
-        session->altSpeedTimeEnabled = enabled;
-
-        if( enabled && session->altSpeedEnabled != isAlt )
-            useAltSpeed( session, isAlt, byUser );
-    }
+    if( t->isClockEnabled && t->_nextChangeAllowed && !t->_nextChangeValue )
+        useAltSpeed( s, t, TRUE, TRUE );
 }
+
 void
 tr_sessionUseAltSpeedTime( tr_session * s, tr_bool b )
 {
-    useAltSpeedTime( s, b, TRUE );
+    struct tr_turtle_info * t = &s->turtle;
+
+    assert( tr_isSession( s ) );
+    assert( tr_isBool ( b ) );
+
+    if( t->isClockEnabled != b ) {
+        t->isClockEnabled = b;
+        userPokedTheClock( s, t );
+    }
 }
 
 tr_bool
@@ -1276,21 +1296,18 @@ tr_sessionUsesAltSpeedTime( const tr_session * s )
 {
     assert( tr_isSession( s ) );
 
-    return s->altSpeedTimeEnabled;
+    return s->turtle.isClockEnabled;
 }
 
 void
-tr_sessionSetAltSpeedBegin( tr_session * s, int minutes )
+tr_sessionSetAltSpeedBegin( tr_session * s, int minute )
 {
     assert( tr_isSession( s ) );
-    assert( 0<=minutes && minutes<(60*24) );
+    assert( 0<=minute && minute<(60*24) );
 
-    if( s->altSpeedTimeBegin != minutes )
-    {
-        s->altSpeedTimeBegin = minutes;
-
-        if( tr_sessionUsesAltSpeedTime( s ) )
-            useAltSpeed( s, isAltTime( s ), TRUE );
+    if( s->turtle.beginMinute != minute ) {
+        s->turtle.beginMinute = minute;
+        userPokedTheClock( s, &s->turtle );
     }
 }
 
@@ -1299,21 +1316,18 @@ tr_sessionGetAltSpeedBegin( const tr_session * s )
 {
     assert( tr_isSession( s ) );
 
-    return s->altSpeedTimeBegin;
+    return s->turtle.beginMinute;
 }
 
 void
-tr_sessionSetAltSpeedEnd( tr_session * s, int minutes )
+tr_sessionSetAltSpeedEnd( tr_session * s, int minute )
 {
     assert( tr_isSession( s ) );
-    assert( 0<=minutes && minutes<(60*24) );
+    assert( 0<=minute && minute<(60*24) );
 
-    if( s->altSpeedTimeEnd != minutes )
-    {
-        s->altSpeedTimeEnd = minutes;
-
-        if( tr_sessionUsesAltSpeedTime( s ) )
-            useAltSpeed( s, isAltTime( s ), TRUE );
+    if( s->turtle.endMinute != minute ) {
+        s->turtle.endMinute = minute;
+        userPokedTheClock( s, &s->turtle );
     }
 }
 
@@ -1322,20 +1336,17 @@ tr_sessionGetAltSpeedEnd( const tr_session * s )
 {
     assert( tr_isSession( s ) );
 
-    return s->altSpeedTimeEnd;
+    return s->turtle.endMinute;
 }
 
 void
-tr_sessionSetAltSpeedDay( tr_session * s, tr_sched_day day )
+tr_sessionSetAltSpeedDay( tr_session * s, tr_sched_day days )
 {
     assert( tr_isSession( s ) );
 
-    if( s->altSpeedTimeDay != day )
-    {
-        s->altSpeedTimeDay = day;
-
-        if( tr_sessionUsesAltSpeedTime( s ) )
-            useAltSpeed( s, isAltTime( s ), TRUE );
+    if( s->turtle.days != days ) {
+        s->turtle.days = days;
+        userPokedTheClock( s, &s->turtle );
     }
 }
 
@@ -1344,28 +1355,13 @@ tr_sessionGetAltSpeedDay( const tr_session * s )
 {
     assert( tr_isSession( s ) );
 
-    return s->altSpeedTimeDay;
+    return s->turtle.days;
 }
 
-void
-useAltSpeed( tr_session * s, tr_bool enabled, tr_bool byUser )
-{
-    assert( tr_isSession( s ) );
-    assert( tr_isBool( enabled ) );
-    assert( tr_isBool( byUser ) );
-
-    if( s->altSpeedEnabled != enabled)
-    {
-        s->altSpeedEnabled = enabled;
-        s->altSpeedChangedByUser = byUser;
-
-        tr_runInEventThread( s, altSpeedToggled, s );
-    }
-}
 void
 tr_sessionUseAltSpeed( tr_session * session, tr_bool enabled )
 {
-    useAltSpeed( session, enabled, TRUE );
+    useAltSpeed( session, &session->turtle, enabled, TRUE );
 }
 
 tr_bool
@@ -1373,7 +1369,7 @@ tr_sessionUsesAltSpeed( const tr_session * s )
 {
     assert( tr_isSession( s ) );
 
-    return s->altSpeedEnabled;
+    return s->turtle.isEnabled;
 }
 
 void
@@ -1383,8 +1379,8 @@ tr_sessionSetAltSpeedFunc( tr_session       * session,
 {
     assert( tr_isSession( session ) );
 
-    session->altCallback = func;
-    session->altCallbackUserData = userData;
+    session->turtle.callback = func;
+    session->turtle.callbackUserData = userData;
 }
 
 void
@@ -1489,10 +1485,6 @@ sessionCloseImpl( void * vsession )
     evtimer_del( session->nowTimer );
     tr_free( session->nowTimer );
     session->nowTimer = NULL;
-
-    evtimer_del( session->altTimer );
-    tr_free( session->altTimer );
-    session->altTimer = NULL;
 
     tr_verifyClose( session );
     tr_sharedClose( session );
