@@ -1273,8 +1273,8 @@ userPokedTheClock( tr_session * s, struct tr_turtle_info * t )
     t->testedAt = 0;
     turtleFindNextChange( t );
 
-    if( t->isClockEnabled && t->_nextChangeAllowed && !t->_nextChangeValue )
-        useAltSpeed( s, t, TRUE, TRUE );
+    if( t->isClockEnabled && t->_nextChangeAllowed )
+        useAltSpeed( s, t, !t->_nextChangeValue, TRUE );
 }
 
 void
