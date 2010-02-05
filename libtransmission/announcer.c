@@ -56,11 +56,8 @@ enum
     /* the length of the 'key' argument passed in tracker requests */
     KEYLEN = 8,
 
-    /* how many scrapes we allow at one time */
-    MAX_CONCURRENT_SCRAPES = 48,
-
-    /* how many announces we allow at one time */
-    MAX_CONCURRENT_ANNOUNCES = 48,
+    /* how many web tasks we allow at one time */
+    MAX_CONCURRENT_TASKS = 48,
 
     /* if a tracker takes more than this long to respond,
      * we treat it as nonresponsive */
@@ -205,16 +202,14 @@ typedef struct tr_announcer
     tr_ptrArray stops; /* struct stop_message */
     tr_session * session;
     struct event * upkeepTimer;
-    int announceSlotsAvailable;
-    int scrapeSlotsAvailable;
+    int slotsAvailable;
 }
 tr_announcer;
 
 tr_bool
 tr_announcerHasBacklog( const struct tr_announcer * announcer )
 {
-    return ( announcer->scrapeSlotsAvailable < 1 )
-        || ( announcer->announceSlotsAvailable < 1 );
+    return announcer->slotsAvailable < 1;
 }
 
 static tr_host *
@@ -248,8 +243,7 @@ tr_announcerInit( tr_session * session )
     a->hosts = TR_PTR_ARRAY_INIT;
     a->stops = TR_PTR_ARRAY_INIT;
     a->session = session;
-    a->announceSlotsAvailable = MAX_CONCURRENT_ANNOUNCES;
-    a->scrapeSlotsAvailable = MAX_CONCURRENT_SCRAPES;
+    a->slotsAvailable = MAX_CONCURRENT_TASKS;
     a->upkeepTimer = tr_new0( struct event, 1 );
     evtimer_set( a->upkeepTimer, onUpkeepTimer, a );
     tr_timerAdd( a->upkeepTimer, UPKEEP_INTERVAL_SECS, 0 );
@@ -1335,7 +1329,7 @@ onAnnounceDone( tr_session   * session,
 
     if( announcer != NULL )
     {
-        ++announcer->announceSlotsAvailable;
+        ++announcer->slotsAvailable;
     }
 
     tr_free( data );
@@ -1384,7 +1378,7 @@ tierAnnounce( tr_announcer * announcer, tr_tier * tier )
 
     tier->isAnnouncing = TRUE;
     tier->lastAnnounceStartTime = now;
-    --announcer->announceSlotsAvailable;
+    --announcer->slotsAvailable;
     tr_webRun( announcer->session, url, NULL, onAnnounceDone, data );
 
     tr_free( url );
@@ -1470,7 +1464,7 @@ onScrapeDone( tr_session   * session,
     const time_t now = tr_time( );
 
     if( announcer )
-        ++announcer->scrapeSlotsAvailable;
+        ++announcer->slotsAvailable;
 
     if( announcer && tier )
     {
@@ -1562,7 +1556,7 @@ tierScrape( tr_announcer * announcer, tr_tier * tier )
 
     tier->isScraping = TRUE;
     tier->lastScrapeStartTime = now;
-    --announcer->scrapeSlotsAvailable;
+    --announcer->slotsAvailable;
     dbgmsg( tier, "scraping \"%s\"", url );
     tr_webRun( announcer->session, url, NULL, onScrapeDone, data );
 
@@ -1597,8 +1591,7 @@ tierNeedsToAnnounce( const tr_tier * tier, const time_t now )
 static tr_bool
 tierNeedsToScrape( const tr_tier * tier, const time_t now )
 {
-    return tier->isRunning
-        && !tier->isScraping
+    return ( !tier->isScraping )
         && ( tier->scrapeAt != 0 )
         && ( tier->scrapeAt <= now )
         && ( tier->currentTracker != NULL )
@@ -1608,12 +1601,10 @@ tierNeedsToScrape( const tr_tier * tier, const time_t now )
 static void
 announceMore( tr_announcer * announcer )
 {
-    const tr_bool canAnnounce = announcer->announceSlotsAvailable > 0;
-    const tr_bool canScrape = announcer->scrapeSlotsAvailable > 0;
     tr_torrent * tor = NULL;
     const time_t now = tr_time( );
 
-    if( announcer->announceSlotsAvailable > 0 )
+    if( announcer->slotsAvailable > 0 )
     {
         int i;
         int n;
@@ -1626,9 +1617,9 @@ announceMore( tr_announcer * announcer )
                 n = tr_ptrArraySize( &tor->tiers->tiers );
                 for( i=0; i<n; ++i ) {
                     tr_tier * tier = tr_ptrArrayNth( &tor->tiers->tiers, i );
-                    if( canAnnounce && tierNeedsToAnnounce( tier, now ) )
+                    if( tierNeedsToAnnounce( tier, now ) )
                         tr_ptrArrayAppend( &announceMe, tier );
-                    else if( canScrape && tierNeedsToScrape( tier, now ) )
+                    else if( tierNeedsToScrape( tier, now ) )
                         tr_ptrArrayAppend( &scrapeMe, tier );
                 }
             }
@@ -1636,20 +1627,19 @@ announceMore( tr_announcer * announcer )
 
         /* if there are more tiers than slots available, prioritize */
         n = tr_ptrArraySize( &announceMe );
-        if( n > announcer->announceSlotsAvailable )
+        if( n > announcer->slotsAvailable )
             qsort( tr_ptrArrayBase( &announceMe ), n, sizeof( tr_tier * ), compareTiers );
 
         /* announce some */
-        n = MIN( tr_ptrArraySize( &announceMe ), announcer->announceSlotsAvailable );
+        n = MIN( tr_ptrArraySize( &announceMe ), announcer->slotsAvailable );
         for( i=0; i<n; ++i ) {
             tr_tier * tier = tr_ptrArrayNth( &announceMe, i );
             dbgmsg( tier, "announcing tier %d of %d", i, n );
             tierAnnounce( announcer, tier );
         }
 
-
         /* scrape some */
-        n = MIN( tr_ptrArraySize( &scrapeMe ), announcer->scrapeSlotsAvailable );
+        n = MIN( tr_ptrArraySize( &scrapeMe ), announcer->slotsAvailable );
         for( i=0; i<n; ++i ) {
             tr_tier * tier = tr_ptrArrayNth( &scrapeMe, i );
             dbgmsg( tier, "scraping tier %d of %d", (i+1), n );
