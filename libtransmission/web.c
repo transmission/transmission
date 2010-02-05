@@ -293,8 +293,8 @@ getCurlProxyType( tr_proxy_type t )
 static int
 getTimeoutFromURL( const char * url )
 {
-    if( strstr( url, "scrape" ) != NULL ) return 20;
-    if( strstr( url, "announce" ) != NULL ) return 60;
+    if( strstr( url, "scrape" ) != NULL ) return 30;
+    if( strstr( url, "announce" ) != NULL ) return 120;
     return 240;
 }
 
