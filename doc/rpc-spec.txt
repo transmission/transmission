@@ -267,6 +267,7 @@
                       | lastAnnounceStartTime   | number     | tr_tracker_stat
                       | lastAnnounceSucceeded   | boolean    | tr_tracker_stat
                       | lastAnnounceTime        | number     | tr_tracker_stat
+                      | lastAnnounceTimedOut    | boolean    | tr_tracker_stat
                       | lastScrapeResult        | string     | tr_tracker_stat
                       | lastScrapeStartTime     | number     | tr_tracker_stat
                       | lastScrapeSucceeded     | boolean    | tr_tracker_stat
@@ -580,3 +581,4 @@
          |         | yes       | session-get    | new arg "rename-partial-files"
          |         | yes       | session-get    | new arg "config-dir"
          |         | yes       | torrent-add    | new arg "bandwidthPriority"
+         |         | yes       | torrent-get    | new trackerStats arg "lastAnnounceTimedOut"

@@ -1441,6 +1441,9 @@ typedef struct
        if "hasAnnounced" is false, this field is undefined */
     tr_bool lastAnnounceSucceeded;
 
+    /* whether or not the last announce timed out. */
+    tr_bool lastAnnounceTimedOut;
+
     /* when the last announce was completed.
        if "hasAnnounced" is false, this field is undefined */
     time_t lastAnnounceTime;

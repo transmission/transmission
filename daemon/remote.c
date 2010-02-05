@@ -1324,6 +1324,7 @@ printDetails( tr_benc * top )
                     int64_t lastAnnounceStartTime;
                     tr_bool lastAnnounceSucceeded;
                     int64_t lastAnnounceTime;
+                    tr_bool lastAnnounceTimedOut;
                     const char * lastScrapeResult;
                     tr_bool lastScrapeSucceeded;
                     int64_t lastScrapeStartTime;
@@ -1348,6 +1349,7 @@ printDetails( tr_benc * top )
                         tr_bencDictFindInt ( t, "lastAnnounceStartTime", &lastAnnounceStartTime ) &&
                         tr_bencDictFindBool( t, "lastAnnounceSucceeded", &lastAnnounceSucceeded ) &&
                         tr_bencDictFindInt ( t, "lastAnnounceTime", &lastAnnounceTime ) &&
+                        tr_bencDictFindBool( t, "lastAnnounceTimedOut", &lastAnnounceTimedOut ) &&
                         tr_bencDictFindStr ( t, "lastScrapeResult", &lastScrapeResult ) &&
                         tr_bencDictFindInt ( t, "lastScrapeStartTime", &lastScrapeStartTime ) &&
                         tr_bencDictFindBool( t, "lastScrapeSucceeded", &lastScrapeSucceeded ) &&
@@ -1375,6 +1377,8 @@ printDetails( tr_benc * top )
                                 if( lastAnnounceSucceeded )
                                     printf( "  Got a list of %'d peers %s ago\n",
                                             (int)lastAnnouncePeerCount, buf );
+                                else if( lastAnnounceTimedOut )
+                                    printf( "  Peer list request timed out; will retry\n" );
                                 else
                                     printf( "  Got an error \"%s\" %s ago\n",
                                             lastAnnounceResult, buf );

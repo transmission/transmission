@@ -375,7 +375,7 @@ addTrackerStats( const tr_tracker_stat * st, int n, tr_benc * list )
     for( i=0; i<n; ++i )
     {
         const tr_tracker_stat * s = &st[i];
-        tr_benc * d = tr_bencListAddDict( list, 23 );
+        tr_benc * d = tr_bencListAddDict( list, 24 );
         tr_bencDictAddStr ( d, "announce", s->announce );
         tr_bencDictAddInt ( d, "announceState", s->announceState );
         tr_bencDictAddInt ( d, "downloadCount", s->downloadCount );
@@ -389,6 +389,7 @@ addTrackerStats( const tr_tracker_stat * st, int n, tr_benc * list )
         tr_bencDictAddInt ( d, "lastAnnounceStartTime", s->lastAnnounceStartTime );
         tr_bencDictAddBool( d, "lastAnnounceSucceeded", s->lastAnnounceSucceeded );
         tr_bencDictAddInt ( d, "lastAnnounceTime", s->lastAnnounceTime );
+        tr_bencDictAddBool( d, "lastAnnounceTimedOut", s->lastAnnounceTimedOut );
         tr_bencDictAddStr ( d, "lastScrapeResult", s->lastScrapeResult );
         tr_bencDictAddInt ( d, "lastScrapeStartTime", s->lastScrapeStartTime );
         tr_bencDictAddBool( d, "lastScrapeSucceeded", s->lastScrapeSucceeded );

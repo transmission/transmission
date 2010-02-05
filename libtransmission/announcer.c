@@ -39,7 +39,7 @@ if( tr_deepLoggingIsActive( ) ) do { \
 enum
 {
     /* unless the tracker says otherwise, rescrape this frequently */
-    DEFAULT_SCRAPE_INTERVAL_SEC = ( 60 * 15 ),
+    DEFAULT_SCRAPE_INTERVAL_SEC = ( 60 * 30 ),
 
     /* unless the tracker says otherwise, this is the announce interval */
     DEFAULT_ANNOUNCE_INTERVAL_SEC = ( 60 * 10 ),
@@ -358,6 +358,7 @@ typedef struct
     time_t lastAnnounceStartTime;
     tr_bool lastScrapeSucceeded;
     tr_bool lastAnnounceSucceeded;
+    tr_bool lastAnnounceTimedOut;
 
     time_t scrapeAt;
     time_t manualAnnounceAllowedAt;
@@ -1324,6 +1325,7 @@ onAnnounceDone( tr_session   * session,
         }
 
         tier->lastAnnounceSucceeded = success;
+        tier->lastAnnounceTimedOut = responseCode == 0;
 
         if( success )
         {
@@ -1434,12 +1436,7 @@ parseScrapeResponse( tr_tier     * tier,
 
             if( tr_bencDictFindDict( val, "flags", &flags ) )
                 if( ( tr_bencDictFindInt( flags, "min_request_interval", &intVal ) ) )
-                    tier->scrapeIntervalSec = intVal;
-
-            /* as per ticket #1045, safeguard against trackers returning
-             * a very low min_request_interval... */
-            if( tier->scrapeIntervalSec < DEFAULT_SCRAPE_INTERVAL_SEC )
-                tier->scrapeIntervalSec = DEFAULT_SCRAPE_INTERVAL_SEC;
+                    tier->scrapeIntervalSec = MAX( DEFAULT_SCRAPE_INTERVAL_SEC, (int)intVal );
 
             tr_tordbg( tier->tor,
                        "Scrape successful. Rescraping in %d seconds.",
@@ -1797,6 +1794,7 @@ tr_announcerStats( const tr_torrent * torrent,
                     st->lastAnnounceTime = tier->lastAnnounceTime;
                     tr_strlcpy( st->lastAnnounceResult, tier->lastAnnounceStr, sizeof( st->lastAnnounceResult ) );
                     st->lastAnnounceSucceeded = tier->lastAnnounceSucceeded;
+                    st->lastAnnounceTimedOut = tier->lastAnnounceTimedOut;
                     st->lastAnnouncePeerCount = tier->lastAnnouncePeerCount;
                 }
 

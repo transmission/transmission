@@ -1670,6 +1670,8 @@ buildTrackerSummary( const char * key, const tr_tracker_stat * st, gboolean show
     GString * gstr = g_string_new( NULL );
     const char * err_markup_begin = "<span color=\"red\">";
     const char * err_markup_end = "</span>";
+    const char * timeout_markup_begin = "<span color=\"#224466\">";
+    const char * timeout_markup_end = "</span>";
     const char * success_markup_begin = "<span color=\"#008B00\">";
     const char * success_markup_end = "</span>";
 
@@ -1696,13 +1698,15 @@ buildTrackerSummary( const char * key, const tr_tracker_stat * st, gboolean show
             g_string_append_c( gstr, '\n' );
             tr_strltime_rounded( timebuf, now - st->lastAnnounceTime, sizeof( timebuf ) );
             if( st->lastAnnounceSucceeded )
-                g_string_append_printf( gstr, _( "Got a list of %s%'d peers%s %s ago" ),
+                g_string_append_printf( gstr, _( "Got a list of %1$s%2$'d peers%3$s %4$s ago" ),
                                         success_markup_begin, st->lastAnnouncePeerCount, success_markup_end,
                                         timebuf );
+            else if( st->lastAnnounceTimedOut )
+                g_string_append_printf( gstr, _( "Peer list request %1$stimed out%2$s %3$s ago; will retry" ),
+                                        timeout_markup_begin, timeout_markup_end, timebuf );
             else
-                g_string_append_printf( gstr, _( "Got an error %s\"%s\"%s %s ago" ),
-                                        err_markup_begin, st->lastAnnounceResult, err_markup_end,
-                                        timebuf );
+                g_string_append_printf( gstr, _( "Got an error %1$s\"%2$s\"%3$s %4$s ago" ),
+                                        err_markup_begin, st->lastAnnounceResult, err_markup_end, timebuf );
         }
 
         switch( st->announceState )
