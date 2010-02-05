@@ -52,9 +52,9 @@
     for (NSUInteger i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
     {
         id item = [fTrackers objectAtIndex: i];
-        if ([item isKindOfClass: [NSNumber class]])
+        if (![item isKindOfClass: [TrackerNode class]])
         {
-            for (++i; i < [fTrackers count] && ![[fTrackers objectAtIndex: i] isKindOfClass: [NSNumber class]]; ++i)
+            for (++i; i < [fTrackers count] && [[fTrackers objectAtIndex: i] isKindOfClass: [TrackerNode class]]; ++i)
                 [addresses addObject: [(TrackerNode *)[fTrackers objectAtIndex: i] fullAnnounceAddress]];
             --i;
         }
@@ -141,11 +141,11 @@
     if (rows.length > 0)
     {
         //determine what the first row color should be
-        if (![[fTrackers objectAtIndex: rows.location] isKindOfClass: [NSNumber class]])
+        if ([[fTrackers objectAtIndex: rows.location] isKindOfClass: [TrackerNode class]] || [self editedRow] == rows.location)
         {
             for (NSInteger i = rows.location-1; i>=0; i--)
             {
-                if ([[fTrackers objectAtIndex: i] isKindOfClass: [NSNumber class]])
+                if (![[fTrackers objectAtIndex: i] isKindOfClass: [TrackerNode class]])
                     break;
                 start = !start;
             }
@@ -159,7 +159,7 @@
         NSInteger i;
         for (i = rows.location; i < NSMaxRange(rows); i++)
         {
-            if ([[fTrackers objectAtIndex: i] isKindOfClass: [NSNumber class]])
+            if (![[fTrackers objectAtIndex: i] isKindOfClass: [TrackerNode class]] && [self editedRow] != i)
             {
                 start = YES;
                 continue;

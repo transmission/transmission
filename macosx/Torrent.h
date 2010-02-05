@@ -128,7 +128,7 @@
 - (uint64_t) size;
 - (uint64_t) sizeLeft;
 
-- (NSMutableArray *) allTrackerStats;
+- (NSMutableArray *) allTrackerStatsWithTransferName: (BOOL) includeTransferName;
 - (NSArray *) allTrackersFlat; //used by GroupRules
 - (BOOL) addTrackerToNewTier: (NSString *) tracker;
 - (void) removeTrackersWithIdentifiers: (NSIndexSet *) removeIdentifiers;

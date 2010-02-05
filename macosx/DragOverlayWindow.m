@@ -36,7 +36,7 @@
 
 - (id) initWithLib: (tr_session *) lib forWindow: (NSWindow *) window
 {
-    if ((self = ([super initWithContentRect: NSZeroRect styleMask: NSBorderlessWindowMask
+    if ((self = ([super initWithContentRect: [window frame] styleMask: NSBorderlessWindowMask
                     backing: NSBackingStoreBuffered defer: NO])))
     {
         fLib = lib;
@@ -66,7 +66,6 @@
         [fFadeOutAnimation setAnimationBlockingMode: NSAnimationNonblockingThreaded];
         
         [window addChildWindow: self ordered: NSWindowAbove];
-        [self setFrame: [window frame] display: NO];
         
         [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(resizeWindow)
             name: NSWindowDidResizeNotification object: window];

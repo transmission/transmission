@@ -583,7 +583,7 @@ int trashDataFile(const char * filename)
     return fStat->leftUntilDone;
 }
 
-- (NSMutableArray *) allTrackerStats
+- (NSMutableArray *) allTrackerStatsWithTransferName: (BOOL) includeTransferName
 {
     int count;
     tr_tracker_stat * stats = tr_torrentTrackers(fHandle, &count);
@@ -595,7 +595,12 @@ int trashDataFile(const char * filename)
     {
         if (stats[i].tier != prevTier)
         {
-            [trackers addObject: [NSNumber numberWithInteger: stats[i].tier]];
+            NSString * tierString = [NSString stringWithFormat: NSLocalizedString(@"Tier %d", "Inspector -> tracker table"),
+                                        stats[i].tier];
+            if (includeTransferName)
+                tierString = [tierString stringByAppendingFormat: @" - %@", [self name]];
+            
+            [trackers addObject: tierString];
             prevTier = stats[i].tier;
         }
         

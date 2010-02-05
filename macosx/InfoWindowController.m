@@ -675,14 +675,7 @@ typedef enum
             return [webSeed objectForKey: @"Address"];
     }
     else if (tableView == fTrackerTable)
-    {
-        id item = [fTrackers objectAtIndex: row];
-        
-        if ([item isKindOfClass: [NSNumber class]])
-            return [NSString stringWithFormat: NSLocalizedString(@"Tier %d", "Inspector -> tracker table"), [item integerValue]];
-        else
-            return item;
-    }
+        return [fTrackers objectAtIndex: row];
     return nil;
 }
 
@@ -701,7 +694,7 @@ typedef enum
 {
     if (tableView == fTrackerTable)
     {
-        if ([[fTrackers objectAtIndex: row] isKindOfClass: [NSNumber class]])
+        if (![[fTrackers objectAtIndex: row] isKindOfClass: [TrackerNode class]] && [tableView editedRow] != row)
             return TRACKER_GROUP_SEPARATOR_HEIGHT;
     }
     
@@ -756,16 +749,14 @@ typedef enum
 - (void) tableViewSelectionDidChange: (NSNotification *) notification
 {
     if ([notification object] == fTrackerTable)
-    {
-        NSInteger numSelected = [fTrackerTable numberOfSelectedRows];
-        [fTrackerAddRemoveControl setEnabled: numSelected > 0 forSegment: TRACKER_REMOVE_TAG];
-    }
+        [fTrackerAddRemoveControl setEnabled: [fTorrents count] == 1 && [fTrackerTable numberOfSelectedRows] > 0
+            forSegment: TRACKER_REMOVE_TAG];
 }
 
 - (BOOL) tableView: (NSTableView *) tableView isGroupRow: (NSInteger) row
 {
     if (tableView == fTrackerTable)
-        return [[fTrackers objectAtIndex: row] isKindOfClass: [NSNumber class]];
+        return ![[fTrackers objectAtIndex: row] isKindOfClass: [TrackerNode class]] && [tableView editedRow] != row;
     return NO;
 }
 
@@ -857,7 +848,7 @@ typedef enum
     else if (tableView == fTrackerTable)
     {
         id node = [fTrackers objectAtIndex: row];
-        if (![node isKindOfClass: [NSNumber class]])
+        if ([node isKindOfClass: [TrackerNode class]])
             return [(TrackerNode *)node fullAnnounceAddress];
     }
     
@@ -882,7 +873,7 @@ typedef enum
     
     //reset table with either new or old value
     [fTrackers release];
-    fTrackers = [[torrent allTrackerStats] retain];
+    fTrackers = [[torrent allTrackerStatsWithTransferName: NO] retain];
     
     [fTrackerTable setTrackers: fTrackers];
     [fTrackerTable reloadData];
@@ -1485,28 +1476,33 @@ typedef enum
 
 - (void) updateInfoTracker
 {
-    if ([fTorrents count] != 1)
+    if ([fTorrents count] == 0)
         return;
-    Torrent * torrent = [fTorrents objectAtIndex: 0];
     
     //get updated tracker stats
     if ([fTrackerTable editedRow] == -1)
     {
+        const BOOL multiple = [fTorrents count] != 1;
+        
         [fTrackers release];
-        fTrackers = [[torrent allTrackerStats] retain];
+        fTrackers = [[NSMutableArray alloc] init];
+        for (Torrent * torrent in fTorrents)
+            [fTrackers addObjectsFromArray: [torrent allTrackerStatsWithTransferName: multiple]];
         
         [fTrackerTable setTrackers: fTrackers];
         [fTrackerTable reloadData];
     }
     else
     {
+        NSAssert1([fTorrents count] == 1, @"Attempting to add tracker with %d transfers selected", [fTorrents count]);
+        
         if ([NSApp isOnSnowLeopardOrBetter])
         {
             NSIndexSet * addedIndexes = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange([fTrackers count]-2, 2)];
             NSArray * tierAndTrackerBeingAdded = [fTrackers objectsAtIndexes: addedIndexes];
             
             [fTrackers release];
-            fTrackers = [[torrent allTrackerStats] retain];
+            fTrackers = [[[fTorrents objectAtIndex: 0] allTrackerStatsWithTransferName: NO] retain];
             [fTrackers addObjectsFromArray: tierAndTrackerBeingAdded];
             
             [fTrackerTable setTrackers: fTrackers];
@@ -1717,7 +1713,7 @@ typedef enum
 {
     [[self window] makeKeyWindow];
     
-    [fTrackers addObject: [NSNumber numberWithInt: [(TrackerNode *)[fTrackers lastObject] tier]+1]];
+    [fTrackers addObject: NSLocalizedString(@"New Tier", "inspector -> add tracker")];
     [fTrackers addObject: @""];
     
     [fTrackerTable setTrackers: fTrackers];
@@ -1735,16 +1731,16 @@ typedef enum
     for (NSUInteger i = 0; i < [fTrackers count]; ++i)
     {
         id object = [fTrackers objectAtIndex: i];
-        if ([object isKindOfClass: [NSNumber class]])
+        if ([object isKindOfClass: [TrackerNode class]])
+        {
+            if (groupSelected || [selectedIndexes containsIndex: i])
+                [removeIdentifiers addIndex: [(TrackerNode *)object identifier]];
+        }
+        else
         {
             groupSelected = [selectedIndexes containsIndex: i];
             if (!groupSelected && i > [selectedIndexes lastIndex])
                 break;
-        }
-        else
-        {
-            if (groupSelected || [selectedIndexes containsIndex: i])
-                [removeIdentifiers addIndex: [(TrackerNode *)object identifier]];
         }
     }
     
@@ -1787,7 +1783,7 @@ typedef enum
     
     //reset table with either new or old value
     [fTrackers release];
-    fTrackers = [[torrent allTrackerStats] retain];
+    fTrackers = [[torrent allTrackerStatsWithTransferName: NO] retain];
     
     [fTrackerTable setTrackers: fTrackers];
     [fTrackerTable reloadData];
