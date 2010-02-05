@@ -13,6 +13,8 @@
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>
 
+#include <string.h>
+
 #include "add-dialog.h"
 #include "conf.h"
 #include "file-list.h"
