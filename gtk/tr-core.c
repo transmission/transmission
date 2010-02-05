@@ -1042,8 +1042,9 @@ void
 tr_core_add_from_url( TrCore * core, const char * url )
 {
     tr_session * session = tr_core_session( core );
+    const gboolean is_magnet_link = gtr_is_magnet_link( url );
 
-    if( gtr_is_magnet_link( url ) || gtr_is_hex_hashcode( url ) )
+    if( is_magnet_link || gtr_is_hex_hashcode( url ) )
     {
         int err;
         char * tmp = NULL;
@@ -1054,7 +1055,12 @@ tr_core_add_from_url( TrCore * core, const char * url )
 
         err = tr_ctorSetMetainfoFromMagnetLink( ctor, url );
 
-        if( !err )
+        if( err )
+        {
+            gtr_unrecognized_url_dialog( NULL, url );
+            tr_ctorFree( ctor );
+        }
+        else
         {
             tr_session * session = tr_core_session( core );
             TrTorrent * gtor = tr_torrent_new_ctor( session, ctor, &err );
@@ -1062,19 +1068,6 @@ tr_core_add_from_url( TrCore * core, const char * url )
                 tr_core_add_torrent( core, gtor, FALSE );
             else
                 g_message( "tr_torrent_new_ctor err %d", err );
-        }
-        else
-        {
-            GtkWidget * w = gtk_message_dialog_new( NULL, 0,
-                                                    GTK_MESSAGE_ERROR,
-                                                    GTK_BUTTONS_CLOSE,
-                                                    "%s", _( "Unrecognized URL" ) );
-            gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG( w ),
-                _( "Transmission doesn't know how to use \"%s\"" ), url );
-            g_signal_connect_swapped( w, "response",
-                                      G_CALLBACK( gtk_widget_destroy ), w );
-            gtk_widget_show( w );
-            tr_ctorFree( ctor );
         }
 
         g_free( tmp );

@@ -491,15 +491,7 @@ onAddURLResponse( GtkDialog * dialog, int response, gpointer user_data )
             }
             else
             {
-                GtkWidget * w = gtk_message_dialog_new( GTK_WINDOW( dialog ), 0,
-                                                        GTK_MESSAGE_ERROR,
-                                                        GTK_BUTTONS_CLOSE,
-                                                        "%s", _( "Unrecognized URL" ) );
-                gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG( w ),
-                    _( "Transmission doesn't know how to use \"%s\"" ), url );
-                g_signal_connect_swapped( w, "response",
-                                          G_CALLBACK( gtk_widget_destroy ), w );
-                gtk_widget_show( w );
+                gtr_unrecognized_url_dialog( GTK_WIDGET( dialog ), url );
                 destroy = FALSE;
             }
         }

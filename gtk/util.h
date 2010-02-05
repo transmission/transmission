@@ -133,6 +133,9 @@ GtkWidget * gtr_priority_combo_new( void );
 ****
 ***/
 
+void gtr_unrecognized_url_dialog( GtkWidget * parent, const char * url );
+
+
 void addTorrentErrorDialog( GtkWidget  * window_or_child,
                             int          err,
                             const char * filename );

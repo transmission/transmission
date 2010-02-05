@@ -351,15 +351,27 @@ gtr_is_hex_hashcode( const char * str )
     return TRUE;
 }
 
+static GtkWindow *
+getWindow( GtkWidget * w )
+{
+    if( w == NULL )
+        return NULL;
+
+    if( GTK_IS_WINDOW( w ) )
+        return GTK_WINDOW( w );
+
+    return GTK_WINDOW( gtk_widget_get_ancestor( w, GTK_TYPE_WINDOW ) );
+}
+
 void
 addTorrentErrorDialog( GtkWidget *  child,
                        int          err,
                        const char * filename )
 {
-    GtkWidget *  w;
-    GtkWidget *  win;
+    char * secondary;
     const char * fmt;
-    char *       secondary;
+    GtkWidget * w;
+    GtkWindow * win = getWindow( child );
 
     switch( err )
     {
@@ -368,15 +380,12 @@ addTorrentErrorDialog( GtkWidget *  child,
         default: fmt = _( "The torrent file \"%s\" encountered an unknown error." ); break;
     }
     secondary = g_strdup_printf( fmt, filename );
-    win = ( !child || GTK_IS_WINDOW( child ) )
-          ? child
-          : gtk_widget_get_ancestor( child ? GTK_WIDGET(
-                                         child ) : NULL, GTK_TYPE_WINDOW );
-    w = gtk_message_dialog_new( GTK_WINDOW( win ),
-                               GTK_DIALOG_DESTROY_WITH_PARENT,
-                               GTK_MESSAGE_ERROR,
-                               GTK_BUTTONS_CLOSE,
-                               "%s", _( "Error opening torrent" ) );
+
+    w = gtk_message_dialog_new( win,
+                                GTK_DIALOG_DESTROY_WITH_PARENT,
+                                GTK_MESSAGE_ERROR,
+                                GTK_BUTTONS_CLOSE,
+                                "%s", _( "Error opening torrent" ) );
     gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG( w ),
                                               "%s", secondary );
     g_signal_connect_swapped( w, "response",
@@ -384,6 +393,7 @@ addTorrentErrorDialog( GtkWidget *  child,
     gtk_widget_show_all( w );
     g_free( secondary );
 }
+
 typedef void ( PopupFunc )( GtkWidget*, GdkEventButton* );
 
 /* pop up the context menu if a user right-clicks.
@@ -805,4 +815,32 @@ gtr_timeout_add_seconds( guint seconds, GSourceFunc function, gpointer data )
                                gtr_func_data_new( function, data ),
                                gtr_func_data_free );
 #endif
+}
+
+void
+gtr_unrecognized_url_dialog( GtkWidget * parent, const char * url )
+{
+    const char * xt = "xt=urn:btih";
+
+    GtkWindow * window = getWindow( parent );
+
+    GString * gstr = g_string_new( NULL );
+
+    GtkWidget * w = gtk_message_dialog_new( window, 0,
+                                            GTK_MESSAGE_ERROR,
+                                            GTK_BUTTONS_CLOSE,
+                                            "%s", _( "Unrecognized URL" ) );
+
+    g_string_append_printf( gstr, _( "Transmission doesn't know how to use \"%s\"" ), url );
+
+    if( gtr_is_magnet_link( url ) && ( strstr( url, xt ) == NULL ) )
+    {
+        g_string_append_printf( gstr, "\n \n" );
+        g_string_append_printf( gstr, _( "This magnet link appears to be intended for something other than BitTorrent.  BitTorrent magnet links have a section containing \"%s\"." ), xt ); 
+    }
+
+    gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG( w ), "%s", gstr->str );
+    g_signal_connect_swapped( w, "response", G_CALLBACK( gtk_widget_destroy ), w );
+    gtk_widget_show( w );
+    g_string_free( gstr, TRUE );
 }
