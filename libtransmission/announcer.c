@@ -47,12 +47,6 @@ enum
     /* unless the tracker says otherwise, this is the announce min_interval */
     DEFAULT_ANNOUNCE_MIN_INTERVAL_SEC = ( 60 * 2 ),
 
-    /* how long to wait before a reannounce the first time we get an error */
-    FIRST_ANNOUNCE_RETRY_INTERVAL_SEC = 30,
-
-    /* how long to wait before a rescrape the first time we get an error */
-    FIRST_SCRAPE_RETRY_INTERVAL_SEC = 120,
-
     /* the length of the 'key' argument passed in tracker requests */
     KEYLEN = 8,
 
@@ -109,6 +103,9 @@ typedef struct
 
     /* the last time we sent an announce or scrape message */
     time_t lastRequestTime;
+
+    /* the last successful announce/scrape time for this host */
+    time_t lastSuccessfulRequest;
 }
 tr_host;
 
@@ -375,8 +372,6 @@ typedef struct
     int scrapeIntervalSec;
     int announceIntervalSec;
     int announceMinIntervalSec;
-    int retryAnnounceIntervalSec;
-    int retryScrapeIntervalSec;
 
     int lastAnnouncePeerCount;
 
@@ -431,8 +426,6 @@ tierIncrementTracker( tr_tier * tier )
     tier->scrapeIntervalSec = DEFAULT_SCRAPE_INTERVAL_SEC;
     tier->announceIntervalSec = DEFAULT_ANNOUNCE_INTERVAL_SEC;
     tier->announceMinIntervalSec = DEFAULT_ANNOUNCE_MIN_INTERVAL_SEC;
-    tier->retryAnnounceIntervalSec = FIRST_ANNOUNCE_RETRY_INTERVAL_SEC;
-    tier->retryScrapeIntervalSec = FIRST_SCRAPE_RETRY_INTERVAL_SEC;
     tier->isAnnouncing = FALSE;
     tier->isScraping = FALSE;
     tier->lastAnnounceStartTime = 0;
@@ -973,6 +966,20 @@ tierIsNotResponding( const tr_tier * tier, const time_t now )
 }
 
 static int
+getRetryInterval( const tr_host * host )
+{
+    int interval;
+    const int jitter = tr_cryptoWeakRandInt( 120 );
+    const time_t timeSinceLastSuccess = tr_time() - host->lastSuccessfulRequest;
+         if( timeSinceLastSuccess < 15*60 ) interval = 0;
+    else if( timeSinceLastSuccess < 30*60 ) interval = 60*4;
+    else if( timeSinceLastSuccess < 45*60 ) interval = 60*8;
+    else if( timeSinceLastSuccess < 60*60 ) interval = 60*16;
+    else                                    interval = 60*32;
+    return interval + jitter;
+}
+
+static int
 compareTiers( const void * va, const void * vb )
 {
     int ret = 0;
@@ -1084,8 +1091,6 @@ parseAnnounceResponse( tr_tier     * tier,
         const uint8_t * raw;
 
         success = TRUE;
-
-        tier->retryAnnounceIntervalSec = FIRST_ANNOUNCE_RETRY_INTERVAL_SEC;
 
         if( tr_bencDictFindStr( &benc, "failure reason", &str ) )
         {
@@ -1257,7 +1262,7 @@ onAnnounceDone( tr_session   * session,
 
         if( responseCode == 0 )
         {
-            const int interval = tr_cryptoWeakRandInt( 120 );
+            const int interval = getRetryInterval( tier->currentTracker->host );
             dbgmsg( tier, "No response from tracker... retrying in %d seconds.", interval );
             tier->manualAnnounceAllowedAt = ~(time_t)0;
             tierSetNextAnnounce( tier, tier->announceEvent, now + interval );
@@ -1305,9 +1310,9 @@ onAnnounceDone( tr_session   * session,
              * cases in which the server is aware that it has erred or is
              * incapable of performing the request.  So we pause a bit and
              * try again. */
+            const int interval = getRetryInterval( tier->currentTracker->host );
             tier->manualAnnounceAllowedAt = ~(time_t)0;
-            tierSetNextAnnounce( tier, tier->announceEvent, now + tier->retryAnnounceIntervalSec );
-            tier->retryAnnounceIntervalSec *= 2;
+            tierSetNextAnnounce( tier, tier->announceEvent, now + interval );
         }
         else
         {
@@ -1321,7 +1326,12 @@ onAnnounceDone( tr_session   * session,
         tier->lastAnnounceSucceeded = success;
 
         if( success )
+        {
             tier->isRunning = data->isRunningOnSuccess;
+
+            if( tier->currentTracker->host )
+                tier->currentTracker->host->lastSuccessfulRequest = now;
+        }
 
         if( !success )
             tierIncrementTracker( tier );
@@ -1434,8 +1444,6 @@ parseScrapeResponse( tr_tier     * tier,
             tr_tordbg( tier->tor,
                        "Scrape successful. Rescraping in %d seconds.",
                        tier->scrapeIntervalSec );
-
-            tier->retryScrapeIntervalSec = FIRST_SCRAPE_RETRY_INTERVAL_SEC;
         }
     }
 
@@ -1503,8 +1511,7 @@ onScrapeDone( tr_session   * session,
         }
         else
         {
-            const int interval = tier->retryScrapeIntervalSec;
-            tier->retryScrapeIntervalSec *= 2;
+            const int interval = getRetryInterval( tier->currentTracker->host );
 
             /* Don't retry on a 4xx.
              * Retry at growing intervals on a 5xx */
@@ -1525,6 +1532,9 @@ onScrapeDone( tr_session   * session,
         }
 
         tier->lastScrapeSucceeded = success;
+
+        if( success && tier->currentTracker->host )
+            tier->currentTracker->host->lastSuccessfulRequest = now;
     }
 
     tr_free( data );
