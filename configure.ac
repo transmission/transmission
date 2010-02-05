@@ -248,6 +248,8 @@ build_gtk=no
 use_gio=no
 use_libnotify=no
 use_dbus_glib=no
+use_canberra=no
+use_libgconf=no
 if test "x$want_gtk" = "xyes" ; then
     if test "x$have_gtk" = "xyes"; then
       build_gtk=yes
@@ -289,7 +291,6 @@ if test "x$build_gtk" = "xyes"; then
     AC_ARG_ENABLE([libcanberra], 
                   AS_HELP_STRING([--enable-libcanberra],[enable sounds]),, 
                   [enable_libcanberra=yes]) 
-    use_canberra=no
     if test "x$enable_libcanberra" = "xyes" ; then
         if test "x$have_libcanberra" = "xyes"; then
             use_canberra=yes
@@ -304,7 +305,6 @@ if test "x$build_gtk" = "xyes"; then
     AC_ARG_ENABLE([gconf2], 
                   AS_HELP_STRING([--enable-libgconf],[enable GConf support]),, 
                   [enable_libgconf=yes]) 
-    use_libgconf=no
     if test "x$enable_libgconf" = "xyes" ; then
         if test "x$have_libgconf" = "xyes"; then
             use_libgconf=yes
