@@ -735,9 +735,7 @@ typedef enum
     {
         if (fPeers)
         {
-            NSArray * oldPeers = fPeers;
-            fPeers = [[fPeers sortedArrayUsingDescriptors: [self peerSortDescriptors]] retain];
-            [oldPeers release];
+            [fPeers sortUsingDescriptors: [self peerSortDescriptors]];
             [tableView reloadData];
         }
     }
@@ -745,9 +743,7 @@ typedef enum
     {
         if (fWebSeeds)
         {
-            NSArray * oldWebSeeds = fWebSeeds;
-            fWebSeeds = [[fWebSeeds sortedArrayUsingDescriptors: [fWebSeedTable sortDescriptors]] retain];
-            [oldWebSeeds release];
+            [fWebSeeds sortUsingDescriptors: [fWebSeedTable sortDescriptors]];
             [tableView reloadData];
         }
     }
@@ -1257,7 +1253,7 @@ typedef enum
             [fPeersConnectField setEnabled: NO];
             [fPeersConnectField setStringValue: @""];
             [fPeersConnectLabel setEnabled: NO];
-        
+            
             [fPeers release];
             fPeers = nil;
             [fPeerTable reloadData];
@@ -1389,19 +1385,23 @@ typedef enum
     
     [fFileFilterField setStringValue: @""];
     
-    [fWebSeeds release];
-    fWebSeeds = nil;
-    
+    //reset webseeds here, since it might be hidden regardless of number selected
     BOOL hasWebSeeds = NO;
     for (Torrent * torrent in fTorrents)
+    {
         if ([torrent webSeedCount] > 0)
         {
             hasWebSeeds = YES;
             break;
         }
+    }
     
     if (!hasWebSeeds)
+    {
+        [fWebSeeds release];
+        fWebSeeds = nil;
         [fWebSeedTable reloadData];
+    }
     [self setWebSeedTableHidden: !hasWebSeeds animate: YES];
     
     //update stats and settings
@@ -1546,8 +1546,10 @@ typedef enum
     if ([fTorrents count] == 0)
         return;
     
-    [fPeers release];
-    fPeers = [[NSMutableArray alloc] init];
+    if (!fPeers)
+        fPeers = [[NSMutableArray alloc] init];
+    else
+        [fPeers removeAllObjects];
     
     NSUInteger known = 0, connected = 0, tracker = 0, incoming = 0, cache = 0, pex = 0, dht = 0, ltep = 0,
                 toUs = 0, fromUs = 0;
@@ -1638,8 +1640,10 @@ typedef enum
     [fPeers sortUsingDescriptors: [self peerSortDescriptors]];
     [fPeerTable reloadData];
     
-    [fWebSeeds release];
-    fWebSeeds = [[NSMutableArray alloc] init];
+    if (!fWebSeeds)
+        fWebSeeds = [[NSMutableArray alloc] init];
+    else
+        [fWebSeeds removeAllObjects];
     
     for (Torrent * torrent in fTorrents)
         [fWebSeeds addObjectsFromArray: [torrent webSeeds]];
