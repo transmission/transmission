@@ -352,8 +352,22 @@ tr_netBindTCPImpl( const tr_address * addr, tr_port port, tr_bool suppressMsgs, 
     if( bind( fd, (struct sockaddr *) &sock, addrlen ) ) {
         const int err = sockerrno;
         if( !suppressMsgs )
-            tr_err( _( "Couldn't bind port %d on %s: %s" ),
-                    port, tr_ntop_non_ts( addr ), tr_strerror( err ) );
+        {
+            const char * fmt;
+            const char * hint;
+
+            if( err == EADDRINUSE )
+                hint = _( "Is another copy of Transmission already running?" );
+            else
+                hint = NULL;
+
+            if( hint == NULL )
+                fmt = _( "Couldn't bind port %d on %s: %s" );
+            else
+                fmt = _( "Couldn't bind port %d on %s: %s (%s)" );
+            
+            tr_err( fmt, port, tr_ntop_non_ts( addr ), tr_strerror( err ), hint );
+        }
         tr_netCloseSocket( fd );
         *errOut = err;
         return -1;
