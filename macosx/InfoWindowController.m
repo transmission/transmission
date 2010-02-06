@@ -486,6 +486,9 @@ typedef enum
                 break;
             
             case TAB_TRACKER_TAG:
+                [fTrackers release];
+                fTrackers = nil;
+                
                 oldResizeSaveKey = @"InspectorContentHeightTracker";
                 break;
             
@@ -1257,6 +1260,12 @@ typedef enum
             [fPeers release];
             fPeers = nil;
             [fPeerTable reloadData];
+            
+            [fTrackers release];
+            fTrackers = nil;
+            
+            [fTrackerTable setTrackers: nil];
+            [fTrackerTable reloadData];
         }
         
         [fFileController setTorrent: nil];
@@ -1293,12 +1302,6 @@ typedef enum
         [fPiecesView setTorrent: nil];
         
         [fTrackerTable setTorrent: nil];
-        
-        [fTrackers release];
-        fTrackers = nil;
-        
-        [fTrackerTable setTrackers: fTrackers];
-        [fTrackerTable reloadData];
         
         [fTrackerAddRemoveControl setEnabled: NO forSegment: TRACKER_ADD_TAG];
         [fTrackerAddRemoveControl setEnabled: NO forSegment: TRACKER_REMOVE_TAG];
