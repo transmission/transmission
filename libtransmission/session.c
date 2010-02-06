@@ -1727,15 +1727,28 @@ tr_sessionIsLazyBitfieldEnabled( const tr_session * session )
 ****
 ***/
 
-void
-tr_sessionSetPortForwardingEnabled( tr_session  * session,
-                                    tr_bool       enabled )
+struct port_forwarding_data
 {
-    assert( tr_isSession( session ) );
+    tr_bool enabled;
+    struct tr_shared * shared;
+};
 
-    tr_sessionLock( session );
-    tr_sharedTraversalEnable( session->shared, enabled );
-    tr_sessionUnlock( session );
+static void
+setPortForwardingEnabled( void * vdata )
+{
+    struct port_forwarding_data * data = vdata;
+    tr_sharedTraversalEnable( data->shared, data->enabled );
+    tr_free( data );
+}
+
+void
+tr_sessionSetPortForwardingEnabled( tr_session  * session, tr_bool enabled )
+{
+    struct port_forwarding_data * d;
+    d = tr_new0( struct port_forwarding_data, 1 );
+    d->shared = session->shared;
+    d->enabled = enabled;
+    tr_runInEventThread( session, setPortForwardingEnabled, d );
 }
 
 tr_bool
