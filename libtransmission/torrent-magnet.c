@@ -12,12 +12,14 @@
 
 #include <assert.h>
 #include <event.h> /* struct evbuffer */
+#include <stdio.h> /* remove() */
 
 #include "transmission.h"
 #include "bencode.h"
 #include "crypto.h"
 #include "magnet.h"
 #include "metainfo.h"
+#include "resume.h"
 #include "torrent.h"
 #include "torrent-magnet.h"
 #include "utils.h"
@@ -191,18 +193,22 @@ tr_torrentSetMetadataPiece( tr_torrent  * tor, int piece, const void  * data, in
             dbgmsg( tor, "err is %d", err );
             if(( metainfoParsed = !err ))
             {
-                /* yay we have bencoded metainfo... merge it into our .torrnet file */
+                /* yay we have bencoded metainfo... merge it into our .torrent file */
                 tr_benc newMetainfo;
-                const char * path = tor->info.torrent;
+                char * path = tr_strdup( tor->info.torrent );
+
                 if( !tr_bencLoadFile( &newMetainfo, TR_FMT_BENC, path ) )
                 {
                     tr_bool hasInfo;
                     tr_benc * tmp;
 
+                    /* remove any old .torrent and .resume files */
+                    remove( path );
+                    tr_torrentRemoveResume( tor );
+
                     dbgmsg( tor, "Saving completed metadata to \"%s\"", path );
                     assert( !tr_bencDictFindDict( &newMetainfo, "info", &tmp ) );
                     tr_bencMergeDicts( tr_bencDictAddDict( &newMetainfo, "info", 0 ), &infoDict );
-                    tr_bencToFile( &newMetainfo, TR_FMT_BENC, path );
 
                     success = tr_metainfoParse( tor->session, &newMetainfo, &tor->info,
                                                 &hasInfo, &tor->infoDictOffset, &tor->infoDictLength );
@@ -210,6 +216,9 @@ tr_torrentSetMetadataPiece( tr_torrent  * tor, int piece, const void  * data, in
                     assert( hasInfo );
                     assert( success );
 
+                    /* save the new .torrent file */
+                    tr_bencToFile( &newMetainfo, TR_FMT_BENC, tor->info.torrent );
+                    tr_sessionSetTorrentFile( tor->session, tor->info.hashString, tor->info.torrent );
                     tr_torrentGotNewInfoDict( tor );
                     tr_torrentSetDirty( tor );
 
@@ -217,6 +226,7 @@ tr_torrentSetMetadataPiece( tr_torrent  * tor, int piece, const void  * data, in
                 }
         
                 tr_bencFree( &infoDict );
+                tr_free( path );
             }
         }
 
