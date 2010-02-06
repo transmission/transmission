@@ -112,7 +112,24 @@ TransmissionRemote.prototype =
 		var o = {
 			method: 'torrent-get',
 			arguments: {
-			fields: Torrent._StaticFields.concat(Torrent._DynamicFields, [ 'files', 'fileStats' ])
+			fields: Torrent._StaticFields.concat( Torrent._MetaDataFields,
+                                                              Torrent._DynamicFields,
+                                                              [ 'files', 'fileStats' ] )
+			}
+		};
+
+		if(torrent_ids)
+			o.arguments.ids = torrent_ids;
+
+		this.sendRequest( o, function(data){ callback(data.arguments.torrents)} );
+	},
+
+	getMetaDataFor: function(torrent_ids, callback) {
+		var o = {
+			method: 'torrent-get',
+			arguments: {
+			fields: Torrent._StaticFields.concat( Torrent._MetaDataFields,
+                                                              [ 'files', 'fileStats' ] )
 			}
 		};
 

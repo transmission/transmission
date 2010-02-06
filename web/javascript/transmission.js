@@ -1358,6 +1358,27 @@ Transmission.prototype =
 		this.setFilter( Prefs._FilterAll );
 	},
 
+	refreshMetaData: function(ids) {
+		var tr = this;
+		this.remote.getMetaDataFor(ids, function(active, removed){ tr.updateMetaData(active); });
+	},
+
+	updateMetaData: function( torrents )
+	{
+		var tr = this;
+		var refresh_files_for = [ ];
+		jQuery.each( torrents, function( ) {
+			var t = tr._torrents[ this.id ];
+			if( t ) {
+				t.refreshMetaData( this );
+				if( t.isSelected( ) )
+					refresh_files_for.push( t.id( ) );
+			}
+		} );
+		if( refresh_files_for.length > 0 )
+			tr.remote.loadTorrentFiles( refresh_files_for );
+	},
+
 	refreshTorrents: function(ids) {
 		var tr = this;
 		if (!ids)
