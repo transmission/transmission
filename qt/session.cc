@@ -864,7 +864,7 @@ Session :: addTorrent( QString key, QString localPath )
     tr_bencDictAddStr( &top, "method", "torrent-add" );
     args = tr_bencDictAddDict( &top, "arguments", 3 );
     tr_bencDictAddStr( args, "download-dir", qPrintable(localPath) );
-    tr_bencDictAddInt( args, "paused", !myPrefs.getBool( Prefs::START ) );
+    tr_bencDictAddBool( args, "paused", !myPrefs.getBool( Prefs::START ) );
 
     // if "key" is a readable local file, add it as metadata...
     // otherwise it's probably a URL or magnet link, so pass it along
@@ -879,7 +879,6 @@ Session :: addTorrent( QString key, QString localPath )
         char * b64 = tr_base64_encode( raw.constData(), raw.size(), &b64len );
         tr_bencDictAddRaw( args, "metainfo", b64, b64len  );
         tr_free( b64 );
-        tr_bencFree( &top );
     }
     else
     {
