@@ -565,7 +565,7 @@ int trashDataFile(const char * filename)
 
 - (NSString *) name
 {
-    return fInfo->name != NULL ? [NSString stringWithUTF8String: fInfo->name] : @"";
+    return fInfo->name != NULL ? [NSString stringWithUTF8String: fInfo->name] : fHashString;
 }
 
 - (BOOL) isFolder
