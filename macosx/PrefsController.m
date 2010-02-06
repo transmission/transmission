@@ -760,6 +760,11 @@ tr_session * fHandle;
     tr_sessionSetIncompleteDirEnabled(fHandle, [fDefaults boolForKey: @"UseIncompleteDownloadFolder"]);
 }
 
+- (void) setRenamePartialFiles: (id) sender
+{
+    tr_sessionSetIncompleteFileNamingEnabled(fHandle, [fDefaults boolForKey: @"RenamePartialFiles"]);
+}
+
 - (void) setAutoImport: (id) sender
 {
     NSString * path;
@@ -1118,6 +1123,9 @@ tr_session * fHandle;
     
     const BOOL useIncomplete = tr_sessionIsIncompleteDirEnabled(fHandle);
     [fDefaults setBool: useIncomplete forKey: @"UseIncompleteDownloadFolder"];
+    
+    const BOOL usePartialFileRanaming = tr_sessionIsIncompleteFileNamingEnabled(fHandle);
+    [fDefaults setBool: usePartialFileRanaming forKey: @"RenamePartialFiles"];
     
     //peers
     const uint16_t peersTotal = tr_sessionGetPeerLimit(fHandle);

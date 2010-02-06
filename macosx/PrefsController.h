@@ -109,6 +109,8 @@
 - (void) incompleteFolderSheetShow: (id) sender;
 - (void) setUseIncompleteFolder: (id) sender;
 
+- (void) setRenamePartialFiles: (id) sender;
+
 - (void) applyRatioSetting: (id) sender;
 - (void) updateRatioStopField;
 - (void) setRatioStop: (id) sender;
