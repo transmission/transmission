@@ -810,9 +810,9 @@ tr_core_session( TrCore * core )
 static char*
 doCollate( const char * in )
 {
-    const char * end = in + strlen( in );
-    char *       casefold;
-    char *       ret;
+    char * ret;
+    char * casefold;
+    const char * end = in ? in + strlen( in ) : NULL;
 
     while( in < end )
     {

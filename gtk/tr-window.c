@@ -389,9 +389,13 @@ checkFilterText( filter_text_mode_t    filter_text_mode,
             break;
 
         default: /* NAME */
-            pch = g_utf8_casefold( inf->name, -1 );
-            ret = !text || ( strstr( pch, text ) != NULL );
-            g_free( pch );
+            if( !inf->name )
+                ret = TRUE;
+            else {
+                pch = g_utf8_casefold( inf->name, -1 );
+                ret = !text || ( strstr( pch, text ) != NULL );
+                g_free( pch );
+            }
             break;
     }
 
