@@ -184,6 +184,7 @@
     {
         NSDictionary * item = [self itemAtRow: row]; 
         NSIndexSet * indexes = [(FileListNode *)item indexes];
+        NSAssert(indexes != nil, @"indexSet must not be nil - temp");
         
         if ([fTorrent checkForFiles: indexes] != NSOffState)
         {

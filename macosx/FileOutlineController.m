@@ -161,7 +161,11 @@ typedef enum
 - (id) outlineView: (NSOutlineView *) outlineView objectValueForTableColumn: (NSTableColumn *) tableColumn byItem: (id) item
 {
     if ([[tableColumn identifier] isEqualToString: @"Check"])
+    {
+        NSIndexSet * indexSet = [(FileListNode *)item indexes];
+        NSAssert(indexSet != nil, @"indexSet must not be nil - temp");
         return [NSNumber numberWithInteger: [fTorrent checkForFiles: [(FileListNode *)item indexes]]];
+    }
     else
         return item;
 }
@@ -171,7 +175,11 @@ typedef enum
 {
     NSString * identifier = [tableColumn identifier];
     if ([identifier isEqualToString: @"Check"])
+    {
+        NSIndexSet * indexSet = [(FileListNode *)item indexes];
+        NSAssert(indexSet != nil, @"indexSet must not be nil - temp");
         [cell setEnabled: [fTorrent canChangeDownloadCheckForFiles: [(FileListNode *)item indexes]]];
+    }
     else if ([identifier isEqualToString: @"Priority"])
     {
         [cell setRepresentedObject: item];
@@ -367,6 +375,7 @@ typedef enum
             [itemIndexes addIndexes: [[fOutline itemAtRow: i] indexes]];
         
         NSInteger state = ([menuItem tag] == FILE_CHECK_TAG) ? NSOnState : NSOffState;
+        NSAssert(itemIndexes != nil, @"indexSet must not be nil - temp");
         return [fTorrent checkForFiles: itemIndexes] != state && [fTorrent canChangeDownloadCheckForFiles: itemIndexes];
     }
     
@@ -379,7 +388,8 @@ typedef enum
         NSMutableIndexSet * itemIndexes = [NSMutableIndexSet indexSet];
         for (NSInteger i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
             [itemIndexes addIndexes: [[fOutline itemAtRow: i] indexes]];
-            
+        
+        NSAssert(itemIndexes != nil, @"indexSet must not be nil - temp");
         return [fTorrent canChangeDownloadCheckForFiles: itemIndexes];
     }
     
@@ -411,6 +421,7 @@ typedef enum
         for (NSInteger i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
         {
             NSIndexSet * fileIndexSet = [[fOutline itemAtRow: i] indexes];
+            NSAssert(fileIndexSet != nil, @"indexSet must not be nil - temp");
             if (![fTorrent canChangeDownloadCheckForFiles: fileIndexSet])
                 continue;
             
