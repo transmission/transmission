@@ -1260,12 +1260,7 @@ typedef enum
         
             [fPeers release];
             fPeers = nil;
-            [fPeerTable reloadData];    
-            
-            [fWebSeeds release];
-            fWebSeeds = nil;
-            [fWebSeedTable reloadData];
-            [self setWebSeedTableHidden: YES animate: YES];
+            [fPeerTable reloadData];
         }
         
         [fFileController setTorrent: nil];
@@ -1393,6 +1388,21 @@ typedef enum
     }
     
     [fFileFilterField setStringValue: @""];
+    
+    [fWebSeeds release];
+    fWebSeeds = nil;
+    
+    BOOL hasWebSeeds = NO;
+    for (Torrent * torrent in fTorrents)
+        if ([torrent webSeedCount] > 0)
+        {
+            hasWebSeeds = YES;
+            break;
+        }
+    
+    if (!hasWebSeeds)
+        [fWebSeedTable reloadData];
+    [self setWebSeedTableHidden: !hasWebSeeds animate: YES];
     
     //update stats and settings
     [self updateInfoStats];
@@ -1636,7 +1646,6 @@ typedef enum
     
     [fWebSeeds sortUsingDescriptors: [fWebSeedTable sortDescriptors]];
     [fWebSeedTable reloadData];
-    [self setWebSeedTableHidden: [fWebSeeds count] == 0 animate: YES];
 }
 
 - (void) updateInfoFiles
