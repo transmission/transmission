@@ -675,7 +675,20 @@ typedef enum
             return [webSeed objectForKey: @"Address"];
     }
     else if (tableView == fTrackerTable)
-        return [fTrackers objectAtIndex: row];
+    {
+        id item = [fTrackers objectAtIndex: row]; 
+        
+        if (![item isKindOfClass: [TrackerNode class]])
+        {
+            NSString * tierString = [NSString stringWithFormat: NSLocalizedString(@"Tier %d", "Inspector -> tracker table"),
+                                        [[item objectForKey: @"Tier"] integerValue]];
+            if ([fTorrents count] > 1)
+                tierString = [tierString stringByAppendingFormat: @" - %@", [item objectForKey: @"Name"]];
+            return tierString;
+        }
+        else
+            return item;
+    }
     return nil;
 }
 
@@ -873,7 +886,7 @@ typedef enum
     
     //reset table with either new or old value
     [fTrackers release];
-    fTrackers = [[torrent allTrackerStatsWithTransferName: NO] retain];
+    fTrackers = [[torrent allTrackerStats] retain];
     
     [fTrackerTable setTrackers: fTrackers];
     [fTrackerTable reloadData];
@@ -1482,12 +1495,16 @@ typedef enum
     //get updated tracker stats
     if ([fTrackerTable editedRow] == -1)
     {
-        const BOOL multiple = [fTorrents count] != 1;
-        
         [fTrackers release];
-        fTrackers = [[NSMutableArray alloc] init];
-        for (Torrent * torrent in fTorrents)
-            [fTrackers addObjectsFromArray: [torrent allTrackerStatsWithTransferName: multiple]];
+        
+        if ([fTorrents count] == 1)
+            fTrackers = [[[fTorrents objectAtIndex: 0] allTrackerStats] retain];
+        else
+        {
+            fTrackers = [[NSMutableArray alloc] init];
+            for (Torrent * torrent in fTorrents)
+                [fTrackers addObjectsFromArray: [torrent allTrackerStats]];
+        }
         
         [fTrackerTable setTrackers: fTrackers];
         [fTrackerTable reloadData];
@@ -1502,7 +1519,7 @@ typedef enum
             NSArray * tierAndTrackerBeingAdded = [fTrackers objectsAtIndexes: addedIndexes];
             
             [fTrackers release];
-            fTrackers = [[[fTorrents objectAtIndex: 0] allTrackerStatsWithTransferName: NO] retain];
+            fTrackers = [[[fTorrents objectAtIndex: 0] allTrackerStats] retain];
             [fTrackers addObjectsFromArray: tierAndTrackerBeingAdded];
             
             [fTrackerTable setTrackers: fTrackers];
@@ -1783,7 +1800,7 @@ typedef enum
     
     //reset table with either new or old value
     [fTrackers release];
-    fTrackers = [[torrent allTrackerStatsWithTransferName: NO] retain];
+    fTrackers = [[torrent allTrackerStats] retain];
     
     [fTrackerTable setTrackers: fTrackers];
     [fTrackerTable reloadData];
