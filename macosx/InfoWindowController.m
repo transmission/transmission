@@ -778,10 +778,15 @@ typedef enum
 {
     if (tableView == fPeerTable)
     {
-        NSDictionary * peer = [fPeers objectAtIndex: row];
-        NSMutableArray * components = [NSMutableArray arrayWithCapacity: 5];
+        const BOOL multiple = [fTorrents count] > 1;
         
-        CGFloat progress = [[peer objectForKey: @"Progress"] floatValue];
+        NSDictionary * peer = [fPeers objectAtIndex: row];
+        NSMutableArray * components = [NSMutableArray arrayWithCapacity: multiple ? 6 : 5];
+        
+        if (multiple)
+            [components addObject: [peer objectForKey: @"Name"]];
+        
+        const CGFloat progress = [[peer objectForKey: @"Progress"] floatValue];
         NSString * progressString = [NSString localizedStringWithFormat: NSLocalizedString(@"Progress: %.1f%%",
                                         "Inspector -> Peers tab -> table row tooltip"), progress * 100.0];
         if (progress < 1.0 && [[peer objectForKey: @"Seed"] boolValue])
@@ -863,6 +868,11 @@ typedef enum
         id node = [fTrackers objectAtIndex: row];
         if ([node isKindOfClass: [TrackerNode class]])
             return [(TrackerNode *)node fullAnnounceAddress];
+    }
+    else if (tableView == fWebSeedTable)
+    {
+        if ([fTorrents count] > 1)
+            return [[fWebSeeds objectAtIndex: row] objectForKey: @"Name"];
     }
     
     return nil;
@@ -1247,6 +1257,15 @@ typedef enum
             [fPeersConnectField setEnabled: NO];
             [fPeersConnectField setStringValue: @""];
             [fPeersConnectLabel setEnabled: NO];
+        
+            [fPeers release];
+            fPeers = nil;
+            [fPeerTable reloadData];    
+            
+            [fWebSeeds release];
+            fWebSeeds = nil;
+            [fWebSeedTable reloadData];
+            [self setWebSeedTableHidden: YES animate: YES];
         }
         
         [fFileController setTorrent: nil];
@@ -1281,15 +1300,6 @@ typedef enum
         [fPiecesControl setSelected: NO forSegment: PIECES_CONTROL_PROGRESS];
         [fPiecesControl setEnabled: NO];
         [fPiecesView setTorrent: nil];
-        
-        [fPeers release];
-        fPeers = nil;
-        [fPeerTable reloadData];
-        
-        [fWebSeeds release];
-        fWebSeeds = nil;
-        [fWebSeedTable reloadData];
-        [self setWebSeedTableHidden: YES animate: YES];
         
         [fTrackerTable setTorrent: nil];
         
@@ -1373,16 +1383,6 @@ typedef enum
         [fPiecesControl setSelected: !piecesAvailableSegment forSegment: PIECES_CONTROL_PROGRESS];
         [fPiecesControl setEnabled: YES];
         [fPiecesView setTorrent: torrent];
-        
-        //get webseeds for table - if no webseeds for this torrent, clear the table
-        BOOL hasWebSeeds = [torrent webSeedCount] > 0;
-        [self setWebSeedTableHidden: !hasWebSeeds animate: YES];
-        if (!hasWebSeeds)
-        {
-            [fWebSeeds release];
-            fWebSeeds = nil;
-            [fWebSeedTable reloadData];
-        }
         
         [fTrackerTable setTorrent: torrent];
         [fTrackerTable deselectAll: self];
@@ -1533,48 +1533,76 @@ typedef enum
 
 - (void) updateInfoPeers
 {
-    if ([fTorrents count] != 1)
+    if ([fTorrents count] == 0)
         return;
-    Torrent * torrent = [fTorrents objectAtIndex: 0];
     
-    NSString * knownString = [NSString stringWithFormat: NSLocalizedString(@"%d known", "Inspector -> Peers tab -> peers"),
-                                [torrent totalPeersKnown]];
-    if ([torrent isActive])
+    [fPeers release];
+    fPeers = [[NSMutableArray alloc] init];
+    
+    NSUInteger known = 0, connected = 0, tracker = 0, incoming = 0, cache = 0, pex = 0, dht = 0, ltep = 0,
+                toUs = 0, fromUs = 0;
+    BOOL anyActive = false;
+    for (Torrent * torrent in fTorrents)
     {
-        const NSInteger total = [torrent totalPeersConnected];
-        NSString * connectedText = [NSString stringWithFormat: NSLocalizedString(@"%d Connected", "Inspector -> Peers tab -> peers"),
-                                    total];
+        [fPeers addObjectsFromArray: [torrent peers]];
         
-        if (total > 0)
+        known += [torrent totalPeersKnown];
+        
+        if ([torrent isActive])
         {
-            NSMutableArray * fromComponents = [NSMutableArray arrayWithCapacity: 5];
-            NSInteger count;
-            if ((count = [torrent totalPeersTracker]) > 0)
+            anyActive = YES;
+            const NSUInteger connectedThis = [torrent totalPeersConnected];
+            if (connectedThis > 0)
+            {
+                connected += [torrent totalPeersConnected];
+                tracker += [torrent totalPeersTracker];
+                incoming += [torrent totalPeersIncoming];
+                cache += [torrent totalPeersCache];
+                pex += [torrent totalPeersPex];
+                dht += [torrent totalPeersDHT];
+                ltep += [torrent totalPeersLTEP];
+                
+                toUs += [torrent peersSendingToUs];
+                fromUs += [torrent peersGettingFromUs];
+            }
+        }
+    }
+    
+    NSString * knownString = [NSString stringWithFormat: NSLocalizedString(@"%d known", "Inspector -> Peers tab -> peers"), known];
+    if (anyActive)
+    {
+        NSString * connectedText = [NSString stringWithFormat: NSLocalizedString(@"%d Connected", "Inspector -> Peers tab -> peers"),
+                                    connected];
+        
+        if (connected > 0)
+        {
+            NSMutableArray * fromComponents = [NSMutableArray arrayWithCapacity: 6];
+            if (tracker > 0)
                 [fromComponents addObject: [NSString stringWithFormat:
-                                        NSLocalizedString(@"%d tracker", "Inspector -> Peers tab -> peers"), count]];
-            if ((count = [torrent totalPeersIncoming]) > 0)
+                                        NSLocalizedString(@"%d tracker", "Inspector -> Peers tab -> peers"), tracker]];
+            if (incoming > 0)
                 [fromComponents addObject: [NSString stringWithFormat:
-                                        NSLocalizedString(@"%d incoming", "Inspector -> Peers tab -> peers"), count]];
-            if ((count = [torrent totalPeersCache]) > 0)
+                                        NSLocalizedString(@"%d incoming", "Inspector -> Peers tab -> peers"), incoming]];
+            if (cache > 0)
                 [fromComponents addObject: [NSString stringWithFormat:
-                                        NSLocalizedString(@"%d cache", "Inspector -> Peers tab -> peers"), count]];
-            if ((count = [torrent totalPeersPex]) > 0)
+                                        NSLocalizedString(@"%d cache", "Inspector -> Peers tab -> peers"), cache]];
+            if (pex > 0)
                 [fromComponents addObject: [NSString stringWithFormat:
-                                        NSLocalizedString(@"%d PEX", "Inspector -> Peers tab -> peers"), count]];
-            if ((count = [torrent totalPeersDHT]) > 0)
+                                        NSLocalizedString(@"%d PEX", "Inspector -> Peers tab -> peers"), pex]];
+            if (dht > 0)
                 [fromComponents addObject: [NSString stringWithFormat:
-                                        NSLocalizedString(@"%d DHT", "Inspector -> Peers tab -> peers"), count]];
-            if ((count = [torrent totalPeersLTEP]) > 0)
+                                        NSLocalizedString(@"%d DHT", "Inspector -> Peers tab -> peers"), dht]];
+            if (ltep > 0)
                 [fromComponents addObject: [NSString stringWithFormat:
-                                        NSLocalizedString(@"%d LTEP", "Inspector -> Peers tab -> peers"), count]];
+                                        NSLocalizedString(@"%d LTEP", "Inspector -> Peers tab -> peers"), ltep]];
             
             NSMutableArray * upDownComponents = [NSMutableArray arrayWithCapacity: 3];
-            if ((count = [torrent peersSendingToUs]) > 0)
+            if (toUs > 0)
                 [upDownComponents addObject: [NSString stringWithFormat:
-                                        NSLocalizedString(@"DL from %d", "Inspector -> Peers tab -> peers"), count]];
-            if ((count = [torrent peersGettingFromUs]) > 0)
+                                        NSLocalizedString(@"DL from %d", "Inspector -> Peers tab -> peers"), toUs]];
+            if (fromUs > 0)
                 [upDownComponents addObject: [NSString stringWithFormat:
-                                        NSLocalizedString(@"UL to %d", "Inspector -> Peers tab -> peers"), count]];
+                                        NSLocalizedString(@"UL to %d", "Inspector -> Peers tab -> peers"), fromUs]];
             [upDownComponents addObject: knownString];
             
             connectedText = [connectedText stringByAppendingFormat: @": %@\n%@", [fromComponents componentsJoinedByString: @", "],
@@ -1587,21 +1615,28 @@ typedef enum
     }
     else
     {
-        NSString * connectedText = [NSString stringWithFormat: @"%@\n%@",
-                                    NSLocalizedString(@"Not Connected", "Inspector -> Peers tab -> peers"), knownString];
+        NSString * activeString;
+        if ([fTorrents count] == 1)
+            activeString = NSLocalizedString(@"Transfer Not Active", "Inspector -> Peers tab -> peers");
+        else
+            activeString = NSLocalizedString(@"Transfers Not Active", "Inspector -> Peers tab -> peers");
+        
+        NSString * connectedText = [NSString stringWithFormat: @"%@\n%@", activeString, knownString];
         [fConnectedPeersField setStringValue: connectedText];
     }
     
-    [fPeers release];
-    fPeers = [[[torrent peers] sortedArrayUsingDescriptors: [self peerSortDescriptors]] retain];
+    [fPeers sortUsingDescriptors: [self peerSortDescriptors]];
     [fPeerTable reloadData];
     
-    if ([torrent webSeedCount] > 0)
-    {
-        [fWebSeeds release];
-        fWebSeeds = [[[torrent webSeeds] sortedArrayUsingDescriptors: [fWebSeedTable sortDescriptors]] retain];
-        [fWebSeedTable reloadData];
-    }
+    [fWebSeeds release];
+    fWebSeeds = [[NSMutableArray alloc] init];
+    
+    for (Torrent * torrent in fTorrents)
+        [fWebSeeds addObjectsFromArray: [torrent webSeeds]];
+    
+    [fWebSeeds sortUsingDescriptors: [fWebSeedTable sortDescriptors]];
+    [fWebSeedTable reloadData];
+    [self setWebSeedTableHidden: [fWebSeeds count] == 0 animate: YES];
 }
 
 - (void) updateInfoFiles

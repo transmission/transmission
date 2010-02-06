@@ -57,7 +57,7 @@
     TrackerCell * fTrackerCell;
     IBOutlet NSSegmentedControl * fTrackerAddRemoveControl;
     
-    NSArray * fPeers, * fWebSeeds;
+    NSMutableArray * fPeers, * fWebSeeds;
     IBOutlet NSTableView * fPeerTable, * fWebSeedTable;
     IBOutlet NSTextField * fConnectedPeersField;
     IBOutlet NSTextView * fErrorMessageView;

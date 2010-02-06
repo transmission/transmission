@@ -858,8 +858,9 @@ int trashDataFile(const char * filename)
     for (int i = 0; i < totalPeers; i++)
     {
         tr_peer_stat * peer = &peers[i];
-        NSMutableDictionary * dict = [NSMutableDictionary dictionaryWithCapacity: 10];
+        NSMutableDictionary * dict = [NSMutableDictionary dictionaryWithCapacity: 11];
         
+        [dict setObject: [self name] forKey: @"Name"];
         [dict setObject: [NSNumber numberWithInt: peer->from] forKey: @"From"];
         [dict setObject: [NSString stringWithUTF8String: peer->addr] forKey: @"IP"];
         [dict setObject: [NSNumber numberWithInt: peer->port] forKey: @"Port"];
@@ -896,8 +897,9 @@ int trashDataFile(const char * filename)
     
     for (NSInteger i = 0; i < webSeedCount; i++)
     {
-        NSMutableDictionary * dict = [NSMutableDictionary dictionaryWithCapacity: 2];
+        NSMutableDictionary * dict = [NSMutableDictionary dictionaryWithCapacity: 3];
         
+        [dict setObject: [self name] forKey: @"Name"];
         [dict setObject: [NSString stringWithUTF8String: fInfo->webseeds[i]] forKey: @"Address"];
         
         if (dlSpeeds[i] != -1.0)
