@@ -103,7 +103,11 @@
         dateString = NSLocalizedString(@"N/A", "Tracker last announce");
     
     NSString * baseString;
-    if (fStat.hasAnnounced && !fStat.lastAnnounceSucceeded)
+    if (fStat.hasAnnounced && fStat.lastAnnounceTimedOut)
+    {
+        baseString = [NSLocalizedString(@"Announce timed out", "Tracker last announce") stringByAppendingFormat: @": %@", dateString];
+    }
+    else if (fStat.hasAnnounced && !fStat.lastAnnounceSucceeded)
     {
         baseString = NSLocalizedString(@"Announce error", "Tracker last announce");
         NSString * errorString = [NSString stringWithUTF8String: fStat.lastAnnounceResult];
