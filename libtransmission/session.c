@@ -1073,6 +1073,7 @@ updateBandwidth( tr_session * session, tr_direction dir )
 static void
 turtleFindNextChange( struct tr_turtle_info * t )
 {
+    int day;
     struct tm tm;
     time_t today_began_at;
     time_t next_begin;
@@ -1104,15 +1105,16 @@ turtleFindNextChange( struct tr_turtle_info * t )
        if the next change is tomorrow to turn limits OFF, look for today in t->days.
        if the next change is tomorrow to turn limits ON, look for tomorrow in t->days. */
     if( t->_nextChangeValue && (( t->_nextChangeAt >= today_began_at + SECONDS_PER_DAY )))
-        t->_nextChangeAllowed = ( t->days & ( ( tm.tm_wday + 1 ) % 7 ) ) != 0;
+        day = ( tm.tm_wday + 1 ) % 7;
     else
-        t->_nextChangeAllowed = ( t->days & tm.tm_wday ) != 0;
+        day = tm.tm_wday;
+    t->_nextChangeAllowed = ( t->days & (1<<day) ) != 0;
 
     if( t->isClockEnabled && t->_nextChangeAllowed ) {
         char buf[128];
         tr_localtime_r( &t->_nextChangeAt, &tm );
         strftime( buf, sizeof( buf ), "%a %b %d %T %Y", &tm );
-        tr_dbg( "Turtle clock updated: at %s we'll turn limits %s", buf, (t->_nextChangeValue?"on":"off") );
+        tr_inf( "Turtle clock updated: at %s we'll turn limits %s", buf, (t->_nextChangeValue?"on":"off") );
     }
 }
 
