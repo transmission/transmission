@@ -1265,6 +1265,7 @@ typedef enum
             fTrackers = nil;
             
             [fTrackerTable setTrackers: nil];
+            [fTrackerTable deselectAll: self];
             [fTrackerTable reloadData];
         }
         
@@ -1554,12 +1555,18 @@ typedef enum
     else
         [fPeers removeAllObjects];
     
+    if (!fWebSeeds)
+        fWebSeeds = [[NSMutableArray alloc] init];
+    else
+        [fWebSeeds removeAllObjects];
+    
     NSUInteger known = 0, connected = 0, tracker = 0, incoming = 0, cache = 0, pex = 0, dht = 0, ltep = 0,
                 toUs = 0, fromUs = 0;
     BOOL anyActive = false;
     for (Torrent * torrent in fTorrents)
     {
         [fPeers addObjectsFromArray: [torrent peers]];
+        [fWebSeeds addObjectsFromArray: [torrent webSeeds]];
         
         known += [torrent totalPeersKnown];
         
@@ -1582,6 +1589,12 @@ typedef enum
             }
         }
     }
+    
+    [fPeers sortUsingDescriptors: [self peerSortDescriptors]];
+    [fPeerTable reloadData];
+    
+    [fWebSeeds sortUsingDescriptors: [fWebSeedTable sortDescriptors]];
+    [fWebSeedTable reloadData];
     
     NSString * knownString = [NSString stringWithFormat: NSLocalizedString(@"%d known", "Inspector -> Peers tab -> peers"), known];
     if (anyActive)
@@ -1639,20 +1652,6 @@ typedef enum
         NSString * connectedText = [NSString stringWithFormat: @"%@\n%@", activeString, knownString];
         [fConnectedPeersField setStringValue: connectedText];
     }
-    
-    [fPeers sortUsingDescriptors: [self peerSortDescriptors]];
-    [fPeerTable reloadData];
-    
-    if (!fWebSeeds)
-        fWebSeeds = [[NSMutableArray alloc] init];
-    else
-        [fWebSeeds removeAllObjects];
-    
-    for (Torrent * torrent in fTorrents)
-        [fWebSeeds addObjectsFromArray: [torrent webSeeds]];
-    
-    [fWebSeeds sortUsingDescriptors: [fWebSeedTable sortDescriptors]];
-    [fWebSeedTable reloadData];
 }
 
 - (void) updateInfoFiles
