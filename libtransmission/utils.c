@@ -46,7 +46,7 @@
 #include "version.h"
 
 
-int                   messageLevel = 0;
+int                   messageLevel = TR_MSG_INF;
 static tr_lock *      messageLock = NULL;
 static tr_bool        messageQueuing = FALSE;
 static tr_msg_list *  messageQueue = NULL;
@@ -284,7 +284,8 @@ tr_msg( const char * file, int line,
     char buf[1024];
     va_list ap;
 
-    tr_lockLock( messageLock );
+    if( messageLock != NULL )
+        tr_lockLock( messageLock );
 
     /* build the text message */
     *buf = '\0';
@@ -342,7 +343,9 @@ tr_msg( const char * file, int line,
         }
     }
 
-    tr_lockUnlock( messageLock );
+    if( messageLock != NULL )
+        tr_lockUnlock( messageLock );
+
     errno = err;
 }
 

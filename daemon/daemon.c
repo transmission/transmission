@@ -228,50 +228,54 @@ onFileAdded( tr_session * session, const char * dir, const char * file )
 }
 
 static void
+printMessage( tr_bool foreground, int level, const char * name, const char * message, const char * file, int line )
+{
+#ifdef HAVE_SYSLOG
+    if( foreground )
+    {
+        char timestr[64];
+        tr_getLogTimeStr( timestr, sizeof( timestr ) );
+        if( name )
+            fprintf( stderr, "[%s] %s %s (%s:%d)\n", timestr, name, message, file, line );
+        else
+            fprintf( stderr, "[%s] %s (%s:%d)\n", timestr, message, file, line );
+    }
+    else /* daemon... write to syslog */
+    {
+        int priority;
+
+        /* figure out the syslog priority */
+        switch( level ) {
+            case TR_MSG_ERR: priority = LOG_ERR; break;
+            case TR_MSG_DBG: priority = LOG_DEBUG; break;
+            default: priority = LOG_INFO; break;
+        }
+
+        if( name )
+            syslog( priority, "%s %s (%s:%d)", name, message, file, line );
+        else
+            syslog( priority, "%s (%s:%d)", message, file, line );
+    }
+#else
+    {
+        char timestr[64];
+        tr_getLogTimeStr( timestr, sizeof( timestr ) );
+        if( name )
+            fprintf( stderr, "[%s] %s %s (%s:%d)\n", timestr, name, message, file, line );
+        else
+            fprintf( stderr, "[%s] %s (%s:%d)\n", timestr, message, file, line );
+    }
+#endif
+}
+
+static void
 pumpLogMessages( tr_bool foreground )
 {
     const tr_msg_list * l;
     tr_msg_list * list = tr_getQueuedMessages( );
 
     for( l=list; l!=NULL; l=l->next )
-    {
-#ifdef HAVE_SYSLOG
-        if( foreground )
-        {
-            char timestr[64];
-            tr_getLogTimeStr( timestr, sizeof( timestr ) );
-            if( l->name )
-                fprintf( stderr, "[%s] %s %s (%s:%d)\n", timestr, l->name, l->message, l->file, l->line );
-            else
-                fprintf( stderr, "[%s] %s (%s:%d)\n", timestr, l->message, l->file, l->line );
-        }
-        else /* daemon... write to syslog */
-        {
-            int priority;
-
-            /* figure out the syslog priority */
-            switch( l->level ) {
-                case TR_MSG_ERR: priority = LOG_ERR; break;
-                case TR_MSG_DBG: priority = LOG_DEBUG; break;
-                default: priority = LOG_INFO; break;
-            }
-
-            if( l->name )
-                syslog( priority, "%s %s (%s:%d)", l->name, l->message, l->file, l->line );
-            else
-                syslog( priority, "%s (%s:%d)", l->message, l->file, l->line );
-        }
-#else
-        {
-            char timestr[64];
-            tr_getLogTimeStr( timestr, sizeof( timestr ) );
-            if( l->name )
-                fprintf( stderr, "[%s] %s %s (%s:%d)\n", timestr, l->name, l->message, l->file, l->line );
-            else
-                fprintf( stderr, "[%s] %s (%s:%d)\n", timestr, l->message, l->file, l->line );
-        }
-#endif
-    }
+        printMessage( foreground, l->level, l->name, l->message, l->file, l->line );
 
     tr_freeMessageList( list );
 }
@@ -299,7 +303,6 @@ main( int argc, char ** argv )
     tr_bencInitDict( &settings, 0 );
     configDir = getConfigDir( argc, (const char**)argv );
     loaded = tr_sessionLoadSettings( &settings, configDir, MY_NAME );
-    tr_bencDictAddBool( &settings, TR_PREFS_KEY_RPC_ENABLED, TRUE );
 
     /* overwrite settings from the comamndline */
     tr_optind = 1;
@@ -390,6 +393,12 @@ main( int argc, char ** argv )
         }
     }
 
+    if( !loaded )
+    {
+        printMessage( foreground, TR_MSG_ERR, MY_NAME, "Error loading config file -- exiting.", __FILE__, __LINE__ );
+        return -1;
+    }
+
     if( dumpSettings )
     {
         char * str = tr_bencToStr( &settings, TR_FMT_JSON, NULL );
@@ -400,18 +409,15 @@ main( int argc, char ** argv )
 
     if( !foreground && tr_daemon( TRUE, FALSE ) < 0 )
     {
-        fprintf( stderr, "failed to daemonize: %s\n", strerror( errno ) );
+        char buf[256];
+        tr_snprintf( buf, sizeof( buf ), "Failed to dameonize: %s", tr_strerror( errno ) );
+        printMessage( foreground, TR_MSG_ERR, MY_NAME, buf, __FILE__, __LINE__ );
         exit( 1 );
     }
 
     /* start the session */
     mySession = tr_sessionInit( "daemon", configDir, TRUE, &settings );
-
-    if( loaded )
-        tr_ninf( NULL, "Using settings from \"%s\"", configDir );
-    else
-        tr_nerr( NULL, "Couldn't find settings in \"%s\"; using defaults", configDir );
-
+    tr_ninf( NULL, "Using settings from \"%s\"", configDir );
     tr_sessionSaveSettings( mySession, configDir, &settings );
 
     if( tr_bencDictFindBool( &settings, TR_PREFS_KEY_RPC_AUTH_REQUIRED, &boolVal ) && boolVal )

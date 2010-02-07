@@ -11,6 +11,7 @@
  */
 
 #include <assert.h>
+#include <errno.h> /* ENOENT */
 #include <stdlib.h>
 #include <string.h> /* memcpy */
 
@@ -362,6 +363,7 @@ tr_sessionGetSettings( tr_session * s, struct tr_benc * d )
 tr_bool
 tr_sessionLoadSettings( tr_benc * d, const char * configDir, const char * appName )
 {
+    int err = 0;
     char * filename;
     tr_benc fileSettings;
     tr_benc sessionDefaults;
@@ -383,15 +385,16 @@ tr_sessionLoadSettings( tr_benc * d, const char * configDir, const char * appNam
 
     /* file settings override the defaults */
     filename = tr_buildPath( configDir, "settings.json", NULL );
-    if( !tr_bencLoadFile( &fileSettings, TR_FMT_JSON, filename ) ) {
+    err = tr_bencLoadFile( &fileSettings, TR_FMT_JSON, filename );
+    if( !err ) {
         tr_bencMergeDicts( d, &fileSettings );
         tr_bencFree( &fileSettings );
-        success = TRUE;
     }
 
     /* cleanup */
     tr_bencFree( &sessionDefaults );
     tr_free( filename );
+    success = (err==0) || (err==ENOENT);
     return success;
 }
 
@@ -410,7 +413,8 @@ tr_sessionSaveSettings( tr_session    * session,
     /* the existing file settings are the fallback values */
     {
         tr_benc fileSettings;
-        if( !tr_bencLoadFile( &fileSettings, TR_FMT_JSON, filename ) )
+        const int err = tr_bencLoadFile( &fileSettings, TR_FMT_JSON, filename );
+        if( !err )
         {
             tr_bencMergeDicts( &settings, &fileSettings );
             tr_bencFree( &fileSettings );
@@ -431,7 +435,6 @@ tr_sessionSaveSettings( tr_session    * session,
 
     /* save the result */
     tr_bencToFile( &settings, TR_FMT_JSON, filename );
-    tr_inf( "Saved \"%s\"", filename );
 
     /* cleanup */
     tr_free( filename );
