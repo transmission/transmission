@@ -1023,7 +1023,7 @@ trackerPage( GObject * core )
     page->proxy_auth_widgets = g_slist_append( page->proxy_auth_widgets, w );
 
     s = _( "Pass_word:" );
-    w = new_entry( TR_PREFS_KEY_RPC_PASSWORD, core );
+    w = new_entry( TR_PREFS_KEY_PROXY_PASSWORD, core );
     gtk_entry_set_visibility( GTK_ENTRY( w ), FALSE );
     page->proxy_auth_widgets = g_slist_append( page->proxy_auth_widgets, w );
     w = hig_workarea_add_row( t, &row, s, w, NULL );
