@@ -892,25 +892,22 @@ int trashDataFile(const char * filename)
 {
     NSMutableArray * webSeeds = [NSMutableArray arrayWithCapacity: fInfo->webseedCount];
     
-    if (fInfo->webseedCount > 0)
+    float * dlSpeeds = tr_torrentWebSpeeds(fHandle);
+    
+    for (NSInteger i = 0; i < fInfo->webseedCount; i++)
     {
-        float * dlSpeeds = tr_torrentWebSpeeds(fHandle);
+        NSMutableDictionary * dict = [NSMutableDictionary dictionaryWithCapacity: 3];
         
-        for (NSInteger i = 0; i < fInfo->webseedCount; i++)
-        {
-            NSMutableDictionary * dict = [NSMutableDictionary dictionaryWithCapacity: 3];
-            
-            [dict setObject: [self name] forKey: @"Name"];
-            [dict setObject: [NSString stringWithUTF8String: fInfo->webseeds[i]] forKey: @"Address"];
-            
-            if (dlSpeeds[i] != -1.0)
-                [dict setObject: [NSNumber numberWithFloat: dlSpeeds[i]] forKey: @"DL From Rate"];
-            
-            [webSeeds addObject: dict];
-        }
+        [dict setObject: [self name] forKey: @"Name"];
+        [dict setObject: [NSString stringWithUTF8String: fInfo->webseeds[i]] forKey: @"Address"];
         
-        tr_free(dlSpeeds);
+        if (dlSpeeds[i] != -1.0)
+            [dict setObject: [NSNumber numberWithFloat: dlSpeeds[i]] forKey: @"DL From Rate"];
+        
+        [webSeeds addObject: dict];
     }
+    
+    tr_free(dlSpeeds);
     
     return webSeeds;
 }

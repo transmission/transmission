@@ -32,7 +32,7 @@
     
     NSGradient * fHighPriorityGradient, * fLowPriorityGradient, * fMixedPriorityGradient;
     
-    int fMouseRow;
+    NSInteger fMouseRow;
 }
 
 - (void) setTorrent: (Torrent *) torrent;
@@ -40,6 +40,6 @@
 
 - (NSRect) iconRectForRow: (int) row;
 
-- (int) hoveredRow;
+- (NSInteger) hoveredRow;
 
 @end

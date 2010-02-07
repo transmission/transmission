@@ -1565,14 +1565,16 @@ typedef enum
     BOOL anyActive = false;
     for (Torrent * torrent in fTorrents)
     {
-        [fPeers addObjectsFromArray: [torrent peers]];
-        [fWebSeeds addObjectsFromArray: [torrent webSeeds]];
+        if ([torrent webSeedCount] > 0)
+            [fWebSeeds addObjectsFromArray: [torrent webSeeds]];
         
         known += [torrent totalPeersKnown];
         
         if ([torrent isActive])
         {
             anyActive = YES;
+            [fPeers addObjectsFromArray: [torrent peers]];
+            
             const NSUInteger connectedThis = [torrent totalPeersConnected];
             if (connectedThis > 0)
             {
@@ -1649,7 +1651,7 @@ typedef enum
         else
             activeString = NSLocalizedString(@"Transfers Not Active", "Inspector -> Peers tab -> peers");
         
-        NSString * connectedText = [NSString stringWithFormat: @"%@\n%@", activeString, knownString];
+        NSString * connectedText = [activeString stringByAppendingFormat: @"\n%@", knownString];
         [fConnectedPeersField setStringValue: connectedText];
     }
 }

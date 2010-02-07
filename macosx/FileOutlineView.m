@@ -105,7 +105,7 @@
 
 - (NSMenu *) menuForEvent: (NSEvent *) event
 {
-    int row = [self rowAtPoint: [self convertPoint: [event locationInWindow] fromView: nil]];
+    const NSInteger row = [self rowAtPoint: [self convertPoint: [event locationInWindow] fromView: nil]];
     
     if (row >= 0)
     {
@@ -123,7 +123,7 @@
     FileNameCell * cell = (FileNameCell *)[self preparedCellAtColumn: [self columnWithIdentifier: @"Name"] row: row];
     NSRect iconRect = [cell imageRectForBounds: [self rectOfRow: row]];
     
-    iconRect.origin.x += [self indentationPerLevel] * (float)([self levelForRow: row] + 1);
+    iconRect.origin.x += [self indentationPerLevel] * (CGFloat)([self levelForRow: row] + 1);
     return iconRect;
 }
 
@@ -153,7 +153,7 @@
     }
 }
 
-- (int) hoveredRow
+- (NSInteger) hoveredRow
 {
     return fMouseRow;
 }
@@ -191,7 +191,7 @@
             NSGradient * gradient = nil;
             
             NSSet * priorities = [fTorrent filePrioritiesForIndexes: indexes];
-            int count = [priorities count];
+            const NSUInteger count = [priorities count];
             if (count == 1)
             {
                 switch ([[priorities anyObject] intValue])
