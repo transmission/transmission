@@ -188,7 +188,7 @@ getForegroundColor( int msgLevel )
     switch( msgLevel )
     {
         case TR_MSG_DBG:
-            foreground = "gray"; break;
+            foreground = "forestgreen"; break;
 
         case TR_MSG_INF:
             foreground = "black"; break;
