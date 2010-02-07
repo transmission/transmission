@@ -345,6 +345,8 @@ static const char * details_keys[] = {
     "rateDownload",
     "rateUpload",
     "recheckProgress",
+    "seedRatioMode",
+    "seedRatioLimit",
     "sizeWhenDone",
     "startDate",
     "status",
@@ -1069,8 +1071,9 @@ printSession( tr_benc * top )
         printf( "\n" );
 
         {
-            tr_bool altEnabled, altTimeEnabled, upEnabled, downEnabled;
+            tr_bool altEnabled, altTimeEnabled, upEnabled, downEnabled, seedRatioLimited;
             int64_t altDown, altUp, altBegin, altEnd, altDay, upLimit, downLimit, peerLimit;
+            double seedRatioLimit;
 
             if( tr_bencDictFindInt ( args, TR_PREFS_KEY_ALT_SPEED_DOWN, &altDown ) &&
                 tr_bencDictFindBool( args, TR_PREFS_KEY_ALT_SPEED_ENABLED, &altEnabled ) &&
@@ -1083,12 +1086,20 @@ printSession( tr_benc * top )
                 tr_bencDictFindInt ( args, TR_PREFS_KEY_DSPEED, &downLimit ) &&
                 tr_bencDictFindBool( args, TR_PREFS_KEY_DSPEED_ENABLED, &downEnabled ) &&
                 tr_bencDictFindInt ( args, TR_PREFS_KEY_USPEED, &upLimit ) &&
-                tr_bencDictFindBool( args, TR_PREFS_KEY_USPEED_ENABLED, &upEnabled ) )
+                tr_bencDictFindBool( args, TR_PREFS_KEY_USPEED_ENABLED, &upEnabled ) &&
+                tr_bencDictFindReal( args, "seedRatioLimit", &seedRatioLimit ) &&
+                tr_bencDictFindBool( args, "seedRatioLimited", &seedRatioLimited) )
             {
                 char buf[128];
 
                 printf( "LIMITS\n" );
                 printf( "  Peer limit: %" PRId64 "\n", peerLimit );
+
+                if( seedRatioLimited )
+                    tr_snprintf( buf, sizeof( buf ), "%.2f", seedRatioLimit );
+                else
+                    tr_strlcpy( buf, "Unlimited", sizeof( buf ) );
+                printf( "  Default seed ratio limit: %s\n", buf );
 
                 if( altEnabled )
                     tr_snprintf( buf, sizeof( buf ), "%"PRId64" KB/s", altUp );
@@ -1188,6 +1199,7 @@ printDetails( tr_benc * top )
             char         buf2[512];
             int64_t      i, j, k;
             tr_bool      boolVal;
+            double       d;
 
             printf( "NAME\n" );
             if( tr_bencDictFindInt( t, "id", &i ) )
@@ -1242,6 +1254,22 @@ printDetails( tr_benc * top )
                 printf( "  Uploaded: %s\n", buf );
                 strlratio( buf, j, i, sizeof( buf ) );
                 printf( "  Ratio: %s\n", buf );
+            }
+            if( tr_bencDictFindInt( t, "seedRatioMode", &i))
+            {
+                switch( i ) {
+                    case TR_RATIOLIMIT_GLOBAL: 
+                        printf( "  Ratio Limit: Default\n" );
+                        break;
+                    case TR_RATIOLIMIT_SINGLE:
+                        if( tr_bencDictFindReal( t, "seedRatioLimit", &d))
+                            printf( "  Ratio Limit: %.2f\n", d );
+                        break;
+                    case TR_RATIOLIMIT_UNLIMITED:
+                        printf( "  Ratio Limit: Unlimited\n" );
+                        break;
+                    default: break;
+                }
             }
             if( tr_bencDictFindInt( t, "corruptEver", &i ) )
             {
