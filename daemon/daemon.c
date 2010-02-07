@@ -68,6 +68,8 @@ static const struct tr_option options[] =
     { 'B', "no-blocklist", "Disable peer blocklists", "B", 0, NULL },
     { 'c', "watch-dir", "Directory to watch for new .torrent files", "c", 1, "<directory>" },
     { 'C', "no-watch-dir", "Disable the watch-dir", "C", 0, NULL },
+    { 941, "incomplete-dir", "Where to store new torrents until they're complete", NULL, 1, "<directory>" },
+    { 942, "no-incomplete-dir", "Don't store incomplete torrents in a different location", NULL, 0, NULL },
     { 'd', "dump-settings", "Dump the settings and exit", "d", 0, NULL },
     { 'f', "foreground", "Run in the foreground instead of daemonizing", "f", 0, NULL },
     { 'g', "config-dir", "Where to look for configuration files", "g", 1, "<path>" },
@@ -79,6 +81,8 @@ static const struct tr_option options[] =
     { 'V', "version", "Show version number and exit", "V", 0, NULL },
     { 'w', "download-dir", "Where to save downloaded data", "w", 1, "<path>" },
     { 800, "paused", "Pause all torrents on startup", NULL, 0, NULL },
+    { 'o', "dht", "Enable distributed hash tables (DHT)", "o", 0, NULL },
+    { 'O', "no-dht", "Disable distributed hash tables (DHT)", "O", 0, NULL },
     { 'P', "peerport", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "P", 1, "<port>" },
     { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", 0, NULL },
     { 'M', "no-portmap", "Disable portmapping", "M", 0, NULL },
@@ -90,6 +94,8 @@ static const struct tr_option options[] =
     { 'i', "bind-address-ipv4", "Where to listen for peer connections", "i", 1, "<ipv4 address>" },
     { 'I', "bind-address-ipv6", "Where to listen for peer connections", "I", 1, "<ipv6 address>" },
     { 'r', "rpc-bind-address", "Where to listen for RPC connections", "r", 1, "<ipv4 address>" },
+    { 953, "global-seedratio", "All torrents, unless overridden by a per-torrent setting, should seed until a specific ratio", "gsr", 1, "ratio" },
+    { 954, "no-global-seedratio", "All torrents, unless overridden by a per-torrent setting, should seed regardless of ratio", "GSR", 0, NULL },
     { 0, NULL, NULL, NULL, 0, NULL }
 };
 
@@ -311,6 +317,13 @@ main( int argc, char ** argv )
                       break;
             case 'C': tr_bencDictAddBool( &settings, PREF_KEY_DIR_WATCH_ENABLED, FALSE );
                       break;
+	    case 941:
+        	      tr_bencDictAddStr( &settings, TR_PREFS_KEY_INCOMPLETE_DIR, optarg );
+		      tr_bencDictAddBool( &settings, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED, TRUE );
+		      break;
+	    case 942:
+		      tr_bencDictAddBool( &settings, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED, FALSE );
+		      break;
             case 'd': dumpSettings = TRUE;
                       break;
             case 'f': foreground = TRUE;
@@ -320,6 +333,12 @@ main( int argc, char ** argv )
 	    case 'V': /* version */
 		      fprintf(stderr, "Transmission %s\n", LONG_VERSION_STRING);
 		      exit( 0 );
+	    case 'o':
+		      tr_bencDictAddBool( &settings, TR_PREFS_KEY_DHT_ENABLED, TRUE );
+		      break;
+	    case 'O':
+		      tr_bencDictAddBool( &settings, TR_PREFS_KEY_DHT_ENABLED, FALSE );
+		      break;
             case 'p': tr_bencDictAddInt( &settings, TR_PREFS_KEY_RPC_PORT, atoi( optarg ) );
                       break;
             case 't': tr_bencDictAddBool( &settings, TR_PREFS_KEY_RPC_AUTH_REQUIRED, TRUE );
@@ -359,6 +378,13 @@ main( int argc, char ** argv )
             case 'r':
                       tr_bencDictAddStr( &settings, TR_PREFS_KEY_RPC_BIND_ADDRESS, optarg );
                       break;
+	    case 953:
+		      tr_bencDictAddReal( &settings, TR_PREFS_KEY_RATIO, atof(optarg) );
+		      tr_bencDictAddBool( &settings, TR_PREFS_KEY_RATIO_ENABLED, TRUE );
+		      break;
+	    case 954:
+		      tr_bencDictAddBool( &settings, TR_PREFS_KEY_RATIO_ENABLED, FALSE );
+		      break;
             default:  showUsage( );
                       break;
         }
