@@ -890,25 +890,27 @@ int trashDataFile(const char * filename)
 
 - (NSArray *) webSeeds
 {
-    const NSInteger webSeedCount = fInfo->webseedCount;
-    NSMutableArray * webSeeds = [NSMutableArray arrayWithCapacity: webSeedCount];
+    NSMutableArray * webSeeds = [NSMutableArray arrayWithCapacity: fInfo->webseedCount];
     
-    float * dlSpeeds = tr_torrentWebSpeeds(fHandle);
-    
-    for (NSInteger i = 0; i < webSeedCount; i++)
+    if (fInfo->webseedCount > 0)
     {
-        NSMutableDictionary * dict = [NSMutableDictionary dictionaryWithCapacity: 3];
+        float * dlSpeeds = tr_torrentWebSpeeds(fHandle);
         
-        [dict setObject: [self name] forKey: @"Name"];
-        [dict setObject: [NSString stringWithUTF8String: fInfo->webseeds[i]] forKey: @"Address"];
+        for (NSInteger i = 0; i < fInfo->webseedCount; i++)
+        {
+            NSMutableDictionary * dict = [NSMutableDictionary dictionaryWithCapacity: 3];
+            
+            [dict setObject: [self name] forKey: @"Name"];
+            [dict setObject: [NSString stringWithUTF8String: fInfo->webseeds[i]] forKey: @"Address"];
+            
+            if (dlSpeeds[i] != -1.0)
+                [dict setObject: [NSNumber numberWithFloat: dlSpeeds[i]] forKey: @"DL From Rate"];
+            
+            [webSeeds addObject: dict];
+        }
         
-        if (dlSpeeds[i] != -1.0)
-            [dict setObject: [NSNumber numberWithFloat: dlSpeeds[i]] forKey: @"DL From Rate"];
-        
-        [webSeeds addObject: dict];
+        tr_free(dlSpeeds);
     }
-    
-    tr_free(dlSpeeds);
     
     return webSeeds;
 }
