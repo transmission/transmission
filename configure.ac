@@ -37,7 +37,11 @@ else
 fi
 AM_CONDITIONAL(TR_UNSTABLE, test "x$supported_build" = "xno")
 
-# MANDATORY for libtransmission
+##
+##
+##   MANDATORY for everything
+##
+##
 CURL_MINIMUM=7.16.3
 AC_SUBST(CURL_MINIMUM)
 LIBEVENT_MINIMUM=1.4.5
@@ -45,13 +49,21 @@ AC_SUBST(LIBEVENT_MINIUM)
 OPENSSL_MINIMUM=0.9.4
 AC_SUBST(OPENSSL_MINIMUM)
 
-# MANDATORY for the GTK+ client
+##
+##
+##   MANDATORY for the GTK+ client
+##
+##
 GLIB_MINIMUM=2.6.0
 AC_SUBST(GLIB_MINIMUM)
 GTK_MINIMUM=2.6.0
 AC_SUBST(GTK_MINIMUM)
 
-# OPTIONAL for the GTK+ client
+##
+##
+##   OPTIONAL for the GTK+ client
+##
+##
 # play the XDG "download done" sound...
 CANBERRA_MINIMUM=0.10
 AC_SUBST(CANBERRA_MINIMUM)
@@ -67,6 +79,9 @@ AC_SUBST(GIO_MINIMUM)
 # pop up a "download done" notice...
 LIBNOTIFY_MINIMUM=0.4.3
 AC_SUBST(LIBNOTIFY_MINIMUM)
+# create the tray icon with AppIndicator
+LIBAPPINDICATOR_MINIMUM=0.0.11
+  AC_SUBST(LIBAPPINDICATOR_MINIMUM)
 
 
 AC_PROG_CC
@@ -246,6 +261,7 @@ AC_ARG_ENABLE([gtk],
               [want_gtk=${have_gtk}])
 build_gtk=no
 use_gio=no
+use_libappindicator=no
 use_libnotify=no
 use_dbus_glib=no
 use_canberra=no
@@ -281,6 +297,24 @@ if test "x$build_gtk" = "xyes"; then
         if test "x$have_libnotify" = "xyes"; then
             use_libnotify=yes
             AC_DEFINE([HAVE_LIBNOTIFY], 1) 
+        fi
+    fi
+
+    PKG_CHECK_MODULES([LIBAPPINDICATOR],
+                      [appindicator-0.1 >= $LIBAPPINDICATOR_MINIMUM],
+                      [have_libappindicator=yes],
+                      [have_libappindicator=no])
+
+    AC_ARG_ENABLE([libappindicator], 
+                  AS_HELP_STRING([--enable-libappindicator],[enable AppIndicator support]),, 
+                  [enable_libappindicator=yes])
+    use_libappindicator=no
+    if test "x$enable_libappindicator" = "xyes" ; then
+        if test "x$have_libappindicator" = "xyes"; then
+            use_libappindicator=yes
+            AC_SUBST(LIBAPPINDICATOR_LIBS) 
+            AC_SUBST(LIBAPPINDICATOR_CFLAGS) 
+            AC_DEFINE([HAVE_LIBAPPINDICATOR], 1) 
         fi
     fi
 
@@ -466,18 +500,19 @@ echo "
 
 Configuration:
 
-        Source code location:          ${srcdir}
-        Compiler:                      ${CXX}
-        System or bundled libevent:    ${libevent_source}
+        Source code location:        ${srcdir}
+        Compiler:                    ${CXX}
+        System or bundled libevent:  ${libevent_source}
 
-        Build Mac client:              ${build_mac}
-        Build GTK+ client:             ${build_gtk}
-          ... with canberra support:   ${use_canberra}
-          ... with gio support:        ${use_gio}
-          ... with dbus-glib support:  ${use_dbus_glib}
-          ... with libgconf support:   ${use_libgconf}
-          ... with libnotify support:  ${use_libnotify}
-        Build Command-Line client:     ${build_cli}
-        Build Daemon:                  ${build_daemon}
+        Build Mac client:            ${build_mac}
+        Build GTK+ client:           ${build_gtk}
+          ... with gio:              ${use_gio}
+          ... with dbus-glib:        ${use_dbus_glib}
+          ... with libcanberra:      ${use_canberra}
+          ... with libappindicator:  ${use_libappindicator}
+          ... with libgconf:         ${use_libgconf}
+          ... with libnotify:        ${use_libnotify}
+        Build Command-Line client:   ${build_cli}
+        Build Daemon:                ${build_daemon}
 
 "

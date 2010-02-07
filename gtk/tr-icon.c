@@ -12,6 +12,9 @@
 
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>
+#ifdef HAVE_LIBAPPINDICATOR
+ #include <libappindicator/app-indicator.h>
+#endif
 #include "actions.h"
 #include "tr-icon.h"
 #include "util.h"
@@ -31,6 +34,12 @@ tr_icon_refresh( gpointer vicon UNUSED )
 
 #else
 
+#ifdef HAVE_LIBAPPINDICATOR
+void
+tr_icon_refresh( gpointer vindicator UNUSED )
+{
+}
+#else
 static void
 activated( GtkStatusIcon   * self      UNUSED,
            gpointer          user_data UNUSED )
@@ -107,7 +116,26 @@ tr_icon_refresh( gpointer vicon )
     gtk_status_icon_set_tooltip( GTK_STATUS_ICON( icon ), tip );
 #endif
 }
+#endif
 
+#ifdef HAVE_LIBAPPINDICATOR
+gpointer
+tr_icon_new( TrCore * core)
+{
+	const char * icon_name = TRAY_ICON;
+	AppIndicator * indicator = app_indicator_new ( "transmission",
+													icon_name,
+													APP_INDICATOR_CATEGORY_SYSTEM_SERVICES );
+
+	GtkWidget * indicator_menu = action_get_widget( "/icon-popup" );
+
+	app_indicator_set_status ( indicator, APP_INDICATOR_STATUS_ACTIVE );
+	app_indicator_set_menu ( indicator, GTK_MENU (indicator_menu) );
+
+	g_object_set_data( G_OBJECT( indicator ), "tr-core", core );
+	return indicator;
+}                       
+#else
 gpointer
 tr_icon_new( TrCore * core )
 {
@@ -119,5 +147,7 @@ tr_icon_new( TrCore * core )
     g_object_set_data( G_OBJECT( icon ), "tr-core", core );
     return icon;
 }
+
+#endif
 
 #endif
