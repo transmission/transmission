@@ -681,7 +681,7 @@ typedef enum
     {
         id item = [fTrackers objectAtIndex: row]; 
         
-        if (![item isKindOfClass: [TrackerNode class]])
+        if ([item isKindOfClass: [NSDictionary class]])
         {
             NSString * tierString = [NSString stringWithFormat: NSLocalizedString(@"Tier %d", "Inspector -> tracker table"),
                                         [[item objectForKey: @"Tier"] integerValue]];
@@ -690,7 +690,7 @@ typedef enum
             return tierString;
         }
         else
-            return item;
+            return item; //TrackerNode or NSString
     }
     return nil;
 }
