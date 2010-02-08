@@ -366,7 +366,7 @@ TrOpenFile( tr_session             * session,
 
     if( doWrite && !alreadyExisted && ( preallocationMode == TR_PREALLOCATE_FULL ) )
         if( preallocateFileFull( filename, desiredFileSize ) )
-            tr_inf( _( "Preallocated file \"%s\"" ), filename );
+            tr_dbg( _( "Preallocated file \"%s\"" ), filename );
 
     /* open the file */
     flags = doWrite ? ( O_RDWR | O_CREAT ) : O_RDONLY;
@@ -667,9 +667,9 @@ tr_fdSocketCreate( tr_session * session, int domain, int type )
             socklen_t size = sizeof( int );
             buf_logged = TRUE;
             getsockopt( s, SOL_SOCKET, SO_SNDBUF, &i, &size );
-            tr_inf( "SO_SNDBUF size is %d", i );
+            tr_dbg( "SO_SNDBUF size is %d", i );
             getsockopt( s, SOL_SOCKET, SO_RCVBUF, &i, &size );
-            tr_inf( "SO_RCVBUF size is %d", i );
+            tr_dbg( "SO_RCVBUF size is %d", i );
         }
     }
 
