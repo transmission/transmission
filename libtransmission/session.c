@@ -626,7 +626,7 @@ tr_sessionInitImpl( void * vdata )
     data->done = TRUE;
 }
 
-static void turtleBootstrap( tr_session *, struct tr_turtle_info *, tr_bool isEnabled );
+static void turtleBootstrap( tr_session *, struct tr_turtle_info * );
 
 static void
 sessionSetImpl( void * vdata )
@@ -778,10 +778,7 @@ sessionSetImpl( void * vdata )
         turtle->days = i;
     if( tr_bencDictFindBool( settings, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED, &boolVal ) )
         turtle->isClockEnabled = boolVal;
-
-    if( !tr_bencDictFindBool( settings, TR_PREFS_KEY_ALT_SPEED_ENABLED, &boolVal ) )
-        boolVal = FALSE;
-    turtleBootstrap( session, turtle, boolVal );
+    turtleBootstrap( session, turtle );
 
     data->done = TRUE;
 }
@@ -1153,28 +1150,18 @@ useAltSpeed( tr_session * s, struct tr_turtle_info * t, tr_bool enabled, tr_bool
     }
 }
 
-static tr_bool
-turtleTestClock( struct tr_turtle_info * t, tr_bool * enabled )
-{
-    tr_bool hit;
-
-    if(( hit = ( t->testedAt < t->_nextChangeAt ) && ( t->_nextChangeAt <= tr_time( ))))
-        *enabled = t->_nextChangeValue;
-
-    return hit;
-}
-
 static void
 turtleCheckClock( tr_session * session, struct tr_turtle_info * t, tr_bool byUser )
 {
-    tr_bool enabled;
     const time_t now = tr_time( );
-    const tr_bool hit = turtleTestClock( t, &enabled );
+    const tr_bool hit = ( t->testedAt < t->_nextChangeAt ) && ( t->_nextChangeAt <= tr_time( ));
 
     t->testedAt = now;
 
     if( hit )
     {
+        const tr_bool enabled = t->_nextChangeValue;
+
         if( t->isClockEnabled && t->_nextChangeAllowed )
         {
             tr_inf( "Time to turn %s turtle mode!", (enabled?"on":"off") );
@@ -1189,13 +1176,12 @@ turtleCheckClock( tr_session * session, struct tr_turtle_info * t, tr_bool byUse
  * It initializes the implementation fields 
  * and turns on turtle mode if the clock settings say to. */
 static void
-turtleBootstrap( tr_session * session, struct tr_turtle_info * turtle, tr_bool isEnabled )
+turtleBootstrap( tr_session * session, struct tr_turtle_info * turtle )
 {
+    tr_bool isEnabled;
+
     turtleFindNextChange( turtle );
-
-    if( !isEnabled )
-        turtleTestClock( turtle, &isEnabled );
-
+    isEnabled = turtle->isClockEnabled && !turtle->_nextChangeValue;
     useAltSpeed( session, turtle, isEnabled, FALSE );
 }
 
