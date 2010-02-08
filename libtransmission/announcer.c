@@ -347,6 +347,10 @@ struct tr_torrent_tiers;
 /** @brief A group of trackers in a single tier, as per the multitracker spec */
 typedef struct
 {
+    /* number of up/down/corrupt bytes since the last time we sent an
+     * "event=stopped" message that was acknowledged by the tracker */
+    uint64_t byteCounts[3];
+
     tr_ptrArray trackers; /* tr_tracker_item */
     tr_tracker_item * currentTracker;
 
@@ -668,14 +672,14 @@ createAnnounceURL( const tr_announcer     * announcer,
                               torrent->info.hashEscaped,
                               torrent->peer_id,
                               (int)tr_sessionGetPeerPort( announcer->session ),
-                              torrent->uploadedCur,
-                              torrent->downloadedCur,
+                              tier->byteCounts[TR_ANN_UP],
+                              tier->byteCounts[TR_ANN_DOWN],
                               tr_cpLeftUntilComplete( &torrent->completion ),
                               numwant,
                               tracker->key_param );
 
-    if( torrent->corruptCur )
-        evbuffer_add_printf( buf, "&corrupt=%" PRIu64, torrent->corruptCur );
+    if( tier->byteCounts[TR_ANN_CORRUPT] )
+        evbuffer_add_printf( buf, "&corrupt=%" PRIu64, tier->byteCounts[TR_ANN_CORRUPT] );
 
     str = eventName;
     if( str && *str )
@@ -919,6 +923,50 @@ tr_announcerChangeMyPort( tr_torrent * tor )
     tr_announcerTorrentStarted( tor );
 }
 
+/***
+****
+***/
+
+void
+tr_announcerAddBytes( tr_torrent * tor, int type, uint32_t byteCount )
+{
+    int i, n;
+    tr_torrent_tiers * tiers;
+
+    assert( tr_isTorrent( tor ) );
+    assert( type==TR_ANN_UP || type==TR_ANN_DOWN || type==TR_ANN_CORRUPT );
+
+    tiers = tor->tiers;
+    n = tr_ptrArraySize( &tiers->tiers );
+    for( i=0; i<n; ++i )
+    {
+        tr_tier * tier = tr_ptrArrayNth( &tiers->tiers, i );
+        tier->byteCounts[ type ] += byteCount;
+    }
+}
+
+void
+tr_announcerSubtractBytes( tr_torrent * tor, int type, uint32_t byteCount )
+{
+    int i, n;
+    tr_torrent_tiers * tiers;
+
+    assert( tr_isTorrent( tor ) );
+    assert( type==TR_ANN_UP || type==TR_ANN_DOWN || type==TR_ANN_CORRUPT );
+
+    tiers = tor->tiers;
+    n = tr_ptrArraySize( &tiers->tiers );
+    for( i=0; i<n; ++i )
+    {
+        tr_tier * tier = tr_ptrArrayNth( &tiers->tiers, i );
+        uint64_t * setme = &tier->byteCounts[type];
+        *setme -= MIN( *setme, byteCount );
+    }
+}
+
+/***
+****
+***/
 
 void
 tr_announcerRemoveTorrent( tr_announcer * announcer, tr_torrent * tor )
@@ -936,8 +984,8 @@ tr_announcerRemoveTorrent( tr_announcer * announcer, tr_torrent * tor )
             if( tier->isRunning )
             {
                 struct stop_message * s = tr_new0( struct stop_message, 1 );
-                s->up = tor->uploadedCur;
-                s->down = tor->downloadedCur;
+                s->up = tier->byteCounts[TR_ANN_UP];
+                s->down = tier->byteCounts[TR_ANN_DOWN];
                 s->url = createAnnounceURL( announcer, tor, tier, "stopped" );
                 s->host = tier->currentTracker->host;
                 tr_ptrArrayInsertSorted( &announcer->stops, s, compareStops );
@@ -1007,8 +1055,8 @@ compareTiers( const void * va, const void * vb )
 
     /* upload comes before download */
     if( !ret )
-        ret = compareTransfer( a->tor->uploadedCur, a->tor->downloadedCur,
-                               b->tor->uploadedCur, b->tor->downloadedCur );
+        ret = compareTransfer( a->byteCounts[TR_ANN_UP], a->byteCounts[TR_ANN_DOWN],
+                               b->byteCounts[TR_ANN_UP], b->byteCounts[TR_ANN_DOWN] );
 
     /* incomplete comes before complete */
     if( !ret ) {
@@ -1225,6 +1273,16 @@ onAnnounceDone( tr_session   * session,
         {
             success = parseAnnounceResponse( tier, response, responseLen, isStopped, &gotScrape );
             dbgmsg( tier, "success is %d", success );
+
+            if( isStopped )
+            {
+                /* now that we've successfully stopped the torrent,
+                 * we can reset the up/down/corrupt count we've kept
+                 * for this tracker */
+                tier->byteCounts[ TR_ANN_UP ] = 0;
+                tier->byteCounts[ TR_ANN_DOWN ] = 0;
+                tier->byteCounts[ TR_ANN_CORRUPT ] = 0;
+            }
         }
         else if( responseCode )
         {

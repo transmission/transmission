@@ -1184,6 +1184,9 @@ gotBadPiece( Torrent * t, tr_piece_index_t pieceIndex )
 
     tor->corruptCur += byteCount;
     tor->downloadedCur -= MIN( tor->downloadedCur, byteCount );
+
+    tr_announcerAddBytes( tor, TR_ANN_CORRUPT, byteCount );
+    tr_announcerSubtractBytes( tor, TR_ANN_DOWN, byteCount );
 }
 
 static void
@@ -1238,6 +1241,7 @@ static void
 decrementDownloadedCount( tr_torrent * tor, uint32_t byteCount )
 {
     tor->downloadedCur -= MIN( tor->downloadedCur, byteCount );
+    tr_announcerSubtractBytes( tor, TR_ANN_DOWN, byteCount );
 }
 
 static void
@@ -1304,6 +1308,7 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
 
             if( e->wasPieceData ) {
                 tor->uploadedCur += e->length;
+                tr_announcerAddBytes( tor, TR_ANN_UP, e->length );
                 tr_torrentSetDirty( tor );
             }
 
@@ -1358,6 +1363,7 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
              * into the jurisdiction of the tracker." */
             if( peer && e->wasPieceData ) {
                 tor->downloadedCur += e->length;
+                tr_announcerAddBytes( tor, TR_ANN_DOWN, e->length );
                 tr_torrentSetDirty( tor );
             }
 
