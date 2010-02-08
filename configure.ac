@@ -500,19 +500,19 @@ echo "
 
 Configuration:
 
-        Source code location:        ${srcdir}
-        Compiler:                    ${CXX}
-        System or bundled libevent:  ${libevent_source}
+   Source code location:                                     ${srcdir}
+   Compiler:                                                 ${CXX}
+   System or bundled libevent:                               ${libevent_source}
 
-        Build Mac client:            ${build_mac}
-        Build GTK+ client:           ${build_gtk}
-          ... with gio:              ${use_gio}
-          ... with dbus-glib:        ${use_dbus_glib}
-          ... with libcanberra:      ${use_canberra}
-          ... with libappindicator:  ${use_libappindicator}
-          ... with libgconf:         ${use_libgconf}
-          ... with libnotify:        ${use_libnotify}
-        Build Command-Line client:   ${build_cli}
-        Build Daemon:                ${build_daemon}
+   Build Command-Line client:                                ${build_cli}
+   Build GTK+ client:                                        ${build_gtk}
+      with dbus support:                                     ${use_dbus_glib}
+      with gio for optional watchdir support:                ${use_gio}
+      with libnotify for 'download completed' popups:        ${use_libnotify}
+      with libcanberra for 'download completed' sounds:      ${use_canberra}
+      with libgconf to tell GNOME we handle magnet links:    ${use_libgconf}
+      with libappindicator for an Ubuntu-style system tray:  ${use_libappindicator}
+   Build Daemon:                                             ${build_daemon}
+   Build Mac client:                                         ${build_mac}
 
 "
