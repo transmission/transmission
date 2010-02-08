@@ -1574,20 +1574,6 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
     return READ_NOW;
 }
 
-static inline void
-decrementDownloadedCount( tr_peermsgs * msgs, uint32_t byteCount )
-{
-    tr_torrent * tor = msgs->torrent;
-
-    tor->downloadedCur -= MIN( tor->downloadedCur, byteCount );
-}
-
-static inline void
-clientGotUnwantedBlock( tr_peermsgs * msgs, const struct peer_request * req )
-{
-    decrementDownloadedCount( msgs, req->length );
-}
-
 static void
 addPeerToBlamefield( tr_peermsgs * msgs, uint32_t index )
 {
