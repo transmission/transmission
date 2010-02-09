@@ -1418,7 +1418,8 @@ getAnnounceEvent( const tr_tier * tier )
      * it MUST send an event=paused parameter in every announce while
      * it is a partial seed." */
     if( tr_cpGetStatus( &tier->tor->completion ) == TR_PARTIAL_SEED )
-        return "paused";
+        if( strcmp( tier->announceEvent, "stopped" ) )
+            return "paused";
 
     event = tier->announceEvent;
 
