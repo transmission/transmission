@@ -216,8 +216,8 @@ will apply following requests to all torrents, while specific torrents can be ch
 .Ar id
 or
 .Ar hash .
-To set more than one current torrent, join their ids or hashes together in a list,
-such as "\-t2,4,6-8" to operate on the torrents whose IDs are 2, 4, 6, 7, and 8.
+To set more than one current torrent, join their ids together in a list, such as
+"\-t2,4,6-8" to operate on the torrents whose IDs are 2, 4, 6, 7, and 8.
 .It Fl td Fl -torrent-downlimit Ar limit
 Limit the current torrent(s) download speed to
 .Ar limit
@@ -310,7 +310,7 @@ $ transmission-remote \-t1 \-i
 .Ed
 Get a list of a torrent's files:
 .Bd -literal -offset indent
-$ transmission-remote \-t1 \-l
+$ transmission-remote \-t1 \-f
 .Ed
 Download only its second and fourth files:
 .Bd -literal -offset indent
