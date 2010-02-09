@@ -335,7 +335,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         fTorrents = [[NSMutableArray alloc] init];
         fDisplayedTorrents = [[NSMutableArray alloc] init];
         
-        fMessageController = [[MessageWindowController alloc] init];
         fInfoController = [[InfoWindowController alloc] init];
         
         [PrefsController setHandle: fLib];
@@ -436,16 +435,13 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         NSLog(@"Could not IORegisterForSystemPower");
     
     //load previous transfers
-    NSArray * history = [[NSArray alloc] initWithContentsOfFile: [NSHomeDirectory() stringByAppendingPathComponent: TRANSFER_PLIST]];
+    NSArray * history = [NSArray arrayWithContentsOfFile: [NSHomeDirectory() stringByAppendingPathComponent: TRANSFER_PLIST]];
     
-    //old version saved transfer info in prefs file
     if (!history)
     {
+        //old version saved transfer info in prefs file
         if ((history = [fDefaults arrayForKey: @"History"]))
-        {
-            [history retain];
             [fDefaults removeObjectForKey: @"History"];
-        }
     }
     
     if (history)
@@ -459,7 +455,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 [torrent release];
             }
         }
-        [history release];
     }
     
     //set filter
@@ -1649,6 +1644,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) showMessageWindow: (id) sender
 {
+    if (!fMessageController)
+        fMessageController = [[MessageWindowController alloc] init];
     [fMessageController showWindow: nil];
 }
 
