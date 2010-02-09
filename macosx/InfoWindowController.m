@@ -1213,6 +1213,8 @@ typedef enum
                 [fBasicInfoField setStringValue: fileString];
                 [fBasicInfoField setToolTip: nil];
             }
+            
+            [fTrackerTable deselectAll: self];
         }
         else
         {
@@ -1265,7 +1267,6 @@ typedef enum
             fTrackers = nil;
             
             [fTrackerTable setTrackers: nil];
-            [fTrackerTable deselectAll: self];
             [fTrackerTable reloadData];
         }
         
