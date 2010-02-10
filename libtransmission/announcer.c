@@ -866,7 +866,7 @@ static void
 tierAddAnnounce( tr_tier * tier, const char * announceEvent, time_t announceAt )
 {
     assert( tier != NULL );
-    assert( event != NULL );
+    assert( announceEvent != NULL );
 
     tr_ptrArrayAppend( &tier->announceEvents, (void*)announceEvent );
     tier->announceAt = announceAt;
@@ -1411,10 +1411,9 @@ getNextAnnounceEvent( tr_tier * tier )
     const char * str = NULL;
 
     assert( tier != NULL );
-    assert( tier->announceEvent != NULL );
     assert( tr_isTorrent( tier->tor ) );
 
-    /* rule #1: if there's a "stopped" in the queue, ignore everything before it */
+    /* rule #1: if "stopped" is in the queue, ignore everything before it */
     events = (char**) tr_ptrArrayPeek( &tier->announceEvents, &n );
     for( i=0; pos<0 && i<n; ++i )
         if( !strcmp( events[i], "stopped" ) )
