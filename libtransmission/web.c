@@ -319,17 +319,11 @@ addTask( void * vtask )
     }
     else
     {
-static FILE * fp = NULL;
         CURL * e = curl_easy_init( );
         struct tr_web * web = session->web;
         const int timeout = getTimeoutFromURL( task->url );
-        //const long verbose = getenv( "TR_CURL_VERBOSE" ) != NULL;
+        const long verbose = getenv( "TR_CURL_VERBOSE" ) != NULL;
         const char * user_agent = TR_NAME "/" SHORT_VERSION_STRING;
-
-if( fp == NULL ) { 
-    fp = fopen( "/tmp/transmission-announce-log.txt", "a+" ); 
-    fprintf( fp, "Starting new Transmission session...\n" ); 
-}
 
         /* insert the resolved host into the URL s.t. curl's DNS won't block
          * even if -- like on most OSes -- it wasn't built with C-Ares :(
@@ -398,9 +392,7 @@ if( fp == NULL ) {
         curl_easy_setopt( e, CURLOPT_SSL_VERIFYPEER, 0L );
         curl_easy_setopt( e, CURLOPT_URL, task->resolved_url ? task->resolved_url : task->url );
         curl_easy_setopt( e, CURLOPT_USERAGENT, user_agent );
-        //curl_easy_setopt( e, CURLOPT_VERBOSE, verbose );
-curl_easy_setopt( e, CURLOPT_VERBOSE, TRUE );
-curl_easy_setopt( e, CURLOPT_STDERR, fp );
+        curl_easy_setopt( e, CURLOPT_VERBOSE, verbose );
         if( web->haveAddr )
             curl_easy_setopt( e, CURLOPT_INTERFACE, tr_ntop_non_ts( &web->addr ) );
         if( task->range )
