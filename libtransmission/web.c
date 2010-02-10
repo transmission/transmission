@@ -90,6 +90,7 @@ struct tr_web_task
     struct curl_slist * slist;
     struct evbuffer * response;
     char * url;
+    char * resolved_url;
     char * host;
     const char * resolved_host;
     char * range;
@@ -112,6 +113,7 @@ task_free( struct tr_web_task * task )
     evbuffer_free( task->response );
     tr_free( task->host );
     tr_free( task->range );
+    tr_free( task->resolved_url );
     tr_free( task->url );
     memset( task, TR_MEMORY_TRASH, sizeof( struct tr_web_task ) );
     tr_free( task );
@@ -322,7 +324,6 @@ addTask( void * vtask )
         const int timeout = getTimeoutFromURL( task->url );
         const long verbose = getenv( "TR_CURL_VERBOSE" ) != NULL;
         const char * user_agent = TR_NAME "/" SHORT_VERSION_STRING;
-        char * url = NULL;
 
         /* insert the resolved host into the URL s.t. curl's DNS won't block
          * even if -- like on most OSes -- it wasn't built with C-Ares :(
@@ -336,8 +337,8 @@ addTask( void * vtask )
             evbuffer_add( buf, task->url, pch - task->url );
             evbuffer_add_printf( buf, "%s", task->resolved_host );
             evbuffer_add_printf( buf, "%s", tail );
-            url = tr_strndup( EVBUFFER_DATA( buf ), EVBUFFER_LENGTH( buf ) );
-            dbgmsg( "old url: \"%s\" -- new url: \"%s\"", task->url, url );
+            task->resolved_url = tr_strndup( EVBUFFER_DATA( buf ), EVBUFFER_LENGTH( buf ) );
+            dbgmsg( "old url: \"%s\" -- new url: \"%s\"", task->url, task->resolved_url );
             evbuffer_free( buf );
 
             /* Manually add a Host: argument that refers to the true URL */
@@ -354,7 +355,7 @@ addTask( void * vtask )
             tr_free( host );
         }
 
-        dbgmsg( "adding task #%lu [%s]", task->tag, url ? url : task->url );
+        dbgmsg( "adding task #%lu [%s]", task->tag, task->resolved_url ? task->resolved_url : task->url );
 
         if( !task->range && session->isProxyEnabled ) {
             curl_easy_setopt( e, CURLOPT_PROXY, session->proxy );
@@ -389,7 +390,7 @@ addTask( void * vtask )
         curl_easy_setopt( e, CURLOPT_PRIVATE, task );
         curl_easy_setopt( e, CURLOPT_SSL_VERIFYHOST, 0L );
         curl_easy_setopt( e, CURLOPT_SSL_VERIFYPEER, 0L );
-        curl_easy_setopt( e, CURLOPT_URL, url ? url : task->url );
+        curl_easy_setopt( e, CURLOPT_URL, task->resolved_url ? task->resolved_url : task->url );
         curl_easy_setopt( e, CURLOPT_USERAGENT, user_agent );
         curl_easy_setopt( e, CURLOPT_VERBOSE, verbose );
         if( web->haveAddr )
@@ -399,8 +400,6 @@ addTask( void * vtask )
 
         if( curl_multi_add_handle( web->multi, e ) == CURLM_OK )
             ++web->taskCount;
-
-        tr_free( url );
     }
 }
 
