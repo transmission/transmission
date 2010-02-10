@@ -351,8 +351,6 @@ typedef struct
      * "event=stopped" message that was acknowledged by the tracker */
     uint64_t byteCounts[3];
 
-    tr_ptrArray announceEvents; /* const char* */
-
     tr_ptrArray trackers; /* tr_tracker_item */
     tr_tracker_item * currentTracker;
 
@@ -370,7 +368,7 @@ typedef struct
     time_t manualAnnounceAllowedAt;
 
     time_t announceAt;
-    //const char * announceEvent;
+    tr_ptrArray announceEvents; /* const char* */
 
     /* unique lookup key */
     int key;
@@ -1422,10 +1420,6 @@ getNextAnnounceEvent( tr_tier * tier )
         if( !strcmp( events[i], "stopped" ) )
             pos = i;
 
-fprintf( stderr, "in the queue: " );
-for( i=0; i<n; ++i ) fprintf( stderr, "(%d)%s, ", i, events[i] );
-fprintf( stderr, "\n" );
-
     /* rule #2: if the next two events are the same, ignore the first one */
     for( i=0; pos<0 && i<=n-2; ++i )
         if( strcmp( events[i], events[i+1] ) )
@@ -1444,17 +1438,11 @@ fprintf( stderr, "\n" );
             str = "paused";
 
     /* announceEvents array upkeep */
-fprintf( stderr, "what's left in the queue: " );
     tmp = TR_PTR_ARRAY_INIT;
-    for( i=pos+1; i<n; ++i ) {
-        fprintf( stderr, "(%d)%s, ", i, events[i] );
+    for( i=pos+1; i<n; ++i )
         tr_ptrArrayAppend( &tmp, events[i] );
-    }
     tr_ptrArrayDestruct( &tier->announceEvents, NULL );
     tier->announceEvents = tmp;
-fprintf( stderr, "\n" );
-
-fprintf( stderr, "returning [%s] (pos %d)\n", (str?str:"(null)"), pos );
 
     return str;
 }
