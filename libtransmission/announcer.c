@@ -351,6 +351,8 @@ typedef struct
      * "event=stopped" message that was acknowledged by the tracker */
     uint64_t byteCounts[3];
 
+    tr_ptrArray announceEvents; /* const char* */
+
     tr_ptrArray trackers; /* tr_tracker_item */
     tr_tracker_item * currentTracker;
 
@@ -368,7 +370,7 @@ typedef struct
     time_t manualAnnounceAllowedAt;
 
     time_t announceAt;
-    const char * announceEvent;
+    //const char * announceEvent;
 
     /* unique lookup key */
     int key;
@@ -398,6 +400,7 @@ tierNew( tr_torrent * tor )
 
     t = tr_new0( tr_tier, 1 );
     t->key = nextKey++;
+    t->announceEvents = TR_PTR_ARRAY_INIT;
     t->trackers = TR_PTR_ARRAY_INIT;
     t->currentTracker = NULL;
     t->currentTrackerIndex = -1;
@@ -415,6 +418,7 @@ tierFree( void * vtier )
 {
     tr_tier * tier = vtier;
     tr_ptrArrayDestruct( &tier->trackers, trackerFree );
+    tr_ptrArrayDestruct( &tier->announceEvents, NULL );
     tr_free( tier );
 }
 
@@ -861,29 +865,19 @@ tr_announcerNextManualAnnounce( const tr_torrent * tor )
 }
 
 static void
-tierClearNextAnnounce( tr_tier * tier )
-{
-    tier->announceAt = 0;
-    tier->announceEvent = NULL;
-    dbgmsg( tier, "cleared out announceEvent -- no announces pending." );
-}
-
-static void
-tierSetNextAnnounce( tr_tier * tier, const char * announceEvent, time_t announceAt )
+tierAddAnnounce( tr_tier * tier, const char * announceEvent, time_t announceAt )
 {
     assert( tier != NULL );
-    assert( announceEvent != NULL );
+    assert( event != NULL );
 
-    if( !strcmp( announceEvent, "manual" ) && !tierCanManualAnnounce( tier ) )
-        return;
-
+    tr_ptrArrayAppend( &tier->announceEvents, (void*)announceEvent );
     tier->announceAt = announceAt;
-    tier->announceEvent = announceEvent;
-    dbgmsg( tier, "next announce event is \"%s\" in %d seconds\n", announceEvent, (int)difftime(announceAt,time(NULL)) );
+
+    dbgmsg( tier, "appended event \"%s\"; announcing in %d seconds\n", announceEvent, (int)difftime(announceAt,time(NULL)) );
 }
 
 static void
-torrentSetNextAnnounce( tr_torrent * tor, const char * announceEvent, time_t announceAt )
+torrentAddAnnounce( tr_torrent * tor, const char * announceEvent, time_t announceAt )
 {
     int i;
     int n;
@@ -894,28 +888,28 @@ torrentSetNextAnnounce( tr_torrent * tor, const char * announceEvent, time_t ann
     tiers = tor->tiers;
     n = tr_ptrArraySize( &tiers->tiers );
     for( i=0; i<n; ++i )
-        tierSetNextAnnounce( tr_ptrArrayNth( &tiers->tiers, i ), announceEvent, announceAt );
+        tierAddAnnounce( tr_ptrArrayNth( &tiers->tiers, i ), announceEvent, announceAt );
 }
 
 void
-tr_announcerManualAnnounce( tr_torrent * tor )
-{
-    torrentSetNextAnnounce( tor, "manual", tr_time( ) );
-}
-void
 tr_announcerTorrentStarted( tr_torrent * tor )
 {
-    torrentSetNextAnnounce( tor, "started", tr_time( ) );
+    torrentAddAnnounce( tor, "started", tr_time( ) );
+}
+void
+tr_announcerManualAnnounce( tr_torrent * tor )
+{
+    torrentAddAnnounce( tor, "", tr_time( ) );
 }
 void
 tr_announcerTorrentStopped( tr_torrent * tor )
 {
-    torrentSetNextAnnounce( tor, "stopped", tr_time( ) );
+    torrentAddAnnounce( tor, "stopped", tr_time( ) );
 }
 void
 tr_announcerTorrentCompleted( tr_torrent * tor )
 {
-    torrentSetNextAnnounce( tor, "completed", tr_time( ) );
+    torrentAddAnnounce( tor, "completed", tr_time( ) );
 }
 void
 tr_announcerChangeMyPort( tr_torrent * tor )
@@ -1256,7 +1250,8 @@ onAnnounceDone( tr_session   * session,
     tr_bool gotScrape = FALSE;
     tr_bool success = FALSE;
     const time_t now = time ( NULL );
-    const tr_bool isStopped = !strcmp( data->event, "stopped" );
+    const char * announceEvent = data->event;
+    const tr_bool isStopped = !strcmp( announceEvent, "stopped" );
 
     if( announcer && tier )
     {
@@ -1324,7 +1319,7 @@ onAnnounceDone( tr_session   * session,
             const int interval = getRetryInterval( tier->currentTracker->host );
             dbgmsg( tier, "No response from tracker... retrying in %d seconds.", interval );
             tier->manualAnnounceAllowedAt = ~(time_t)0;
-            tierSetNextAnnounce( tier, tier->announceEvent, now + interval );
+            tierAddAnnounce( tier, announceEvent, now + interval );
         }
         else if( 200 <= responseCode && responseCode <= 299 )
         {
@@ -1340,17 +1335,18 @@ onAnnounceDone( tr_session   * session,
 
             tier->manualAnnounceAllowedAt = now + tier->announceMinIntervalSec;
 
-            if( strcmp( tier->announceEvent, "stopped" ) == 0 )
-                tierClearNextAnnounce( tier );
-            else
-                tierSetNextAnnounce( tier, "", now + interval );
+            /* if we're running and the queue is empty, add the next update */
+            if( !isStopped && !tr_ptrArraySize( &tier->announceEvents ) )
+            {
+                tierAddAnnounce( tier, "", now + interval );
+            }
         }
         else if( 300 <= responseCode && responseCode <= 399 )
         {
             /* how did this get here?  libcurl handles this */
             const int interval = 5;
             dbgmsg( tier, "got a redirect. retrying in %d seconds", interval );
-            tierSetNextAnnounce( tier, tier->announceEvent, now + interval );
+            tierAddAnnounce( tier, announceEvent, now + interval );
             tier->manualAnnounceAllowedAt = now + tier->announceMinIntervalSec;
         }
         else if( 400 <= responseCode && responseCode <= 499 )
@@ -1361,7 +1357,6 @@ onAnnounceDone( tr_session   * session,
             if( tr_torrentIsPrivate( tier->tor ) || ( tier->tor->info.trackerCount < 2 ) )
                 publishErrorMessageAndStop( tier, _( "Tracker returned a 4xx message" ) );
             tier->manualAnnounceAllowedAt = ~(time_t)0;
-            tierClearNextAnnounce( tier );
         }
         else if( 500 <= responseCode && responseCode <= 599 )
         {
@@ -1371,7 +1366,7 @@ onAnnounceDone( tr_session   * session,
              * try again. */
             const int interval = getRetryInterval( tier->currentTracker->host );
             tier->manualAnnounceAllowedAt = ~(time_t)0;
-            tierSetNextAnnounce( tier, tier->announceEvent, now + interval );
+            tierAddAnnounce( tier, announceEvent, now + interval );
         }
         else
         {
@@ -1379,7 +1374,7 @@ onAnnounceDone( tr_session   * session,
             const int interval = 120;
             dbgmsg( tier, "Invalid response from tracker... retrying in two minutes." );
             tier->manualAnnounceAllowedAt = ~(time_t)0;
-            tierSetNextAnnounce( tier, tier->announceEvent, now + interval );
+            tierAddAnnounce( tier, announceEvent, now + interval );
         }
 
         tier->lastAnnounceSucceeded = success;
@@ -1392,9 +1387,12 @@ onAnnounceDone( tr_session   * session,
             if( tier->currentTracker->host )
                 tier->currentTracker->host->lastSuccessfulRequest = now;
         }
-
-        if( !success )
+        else if( responseCode != HTTP_OK )
+        {
             tierIncrementTracker( tier );
+
+            tr_ptrArrayInsert( &tier->announceEvents, (void*)announceEvent, 0 );
+        }
     }
 
     if( announcer != NULL )
@@ -1405,54 +1403,91 @@ onAnnounceDone( tr_session   * session,
     tr_free( data );
 }
 
-static const char *
-getAnnounceEvent( const tr_tier * tier )
+static const char*
+getNextAnnounceEvent( tr_tier * tier )
 {
-    const char * event;
+    int i, n;
+    int pos = -1;
+    tr_ptrArray tmp;
+    char ** events;
+    const char * str = NULL;
 
     assert( tier != NULL );
     assert( tier->announceEvent != NULL );
     assert( tr_isTorrent( tier->tor ) );
 
-    /* BEP 21: "In order to tell the tracker that a peer is a partial seed,
-     * it MUST send an event=paused parameter in every announce while
-     * it is a partial seed." */
+    /* rule #1: if there's a "stopped" in the queue, ignore everything before it */
+    events = (char**) tr_ptrArrayPeek( &tier->announceEvents, &n );
+    for( i=0; pos<0 && i<n; ++i )
+        if( !strcmp( events[i], "stopped" ) )
+            pos = i;
+
+fprintf( stderr, "in the queue: " );
+for( i=0; i<n; ++i ) fprintf( stderr, "(%d)%s, ", i, events[i] );
+fprintf( stderr, "\n" );
+
+    /* rule #2: if the next two events are the same, ignore the first one */
+    for( i=0; pos<0 && i<=n-2; ++i )
+        if( strcmp( events[i], events[i+1] ) )
+            pos = i;
+
+    /* otherwise use the next announce event in line */
+    if( ( pos < 0 ) && ( n > 0 ) )
+        pos = 0;
+
+    /* rule #3: BEP 21: "In order to tell the tracker that a peer is a
+     * partial seed, it MUST send an event=paused parameter in every
+     * announce while it is a partial seed." */
+    str = pos>=0 ? events[pos] : NULL;
     if( tr_cpGetStatus( &tier->tor->completion ) == TR_PARTIAL_SEED )
-        if( strcmp( tier->announceEvent, "stopped" ) )
-            return "paused";
+        if( !str || !strcmp( str, "stopped" ) )
+            str = "paused";
 
-    event = tier->announceEvent;
+    /* announceEvents array upkeep */
+fprintf( stderr, "what's left in the queue: " );
+    tmp = TR_PTR_ARRAY_INIT;
+    for( i=pos+1; i<n; ++i ) {
+        fprintf( stderr, "(%d)%s, ", i, events[i] );
+        tr_ptrArrayAppend( &tmp, events[i] );
+    }
+    tr_ptrArrayDestruct( &tier->announceEvents, NULL );
+    tier->announceEvents = tmp;
+fprintf( stderr, "\n" );
 
-    if( !strcmp( event, "manual" ) )
-        return "started";
+fprintf( stderr, "returning [%s] (pos %d)\n", (str?str:"(null)"), pos );
 
-    return event;
+    return str;
 }
 
 static void
 tierAnnounce( tr_announcer * announcer, tr_tier * tier )
 {
-    char * url;
-    struct announce_data * data;
-    const tr_torrent * tor = tier->tor;
-    const time_t now = tr_time( );
+    const char * announceEvent = getNextAnnounceEvent( tier );
 
     assert( !tier->isAnnouncing );
 
-    data = tr_new0( struct announce_data, 1 );
-    data->torrentId = tr_torrentId( tor );
-    data->tierId = tier->key;
-    data->isRunningOnSuccess = tor->isRunning;
-    data->timeSent = now;
-    data->event = getAnnounceEvent( tier );
-    url = createAnnounceURL( announcer, tor, tier, data->event );
+    if( announceEvent != NULL )
+    {
+        char * url;
+        struct announce_data * data;
+        const tr_torrent * tor = tier->tor;
+        const time_t now = tr_time( );
 
-    tier->isAnnouncing = TRUE;
-    tier->lastAnnounceStartTime = now;
-    --announcer->slotsAvailable;
-    tr_webRun( announcer->session, url, NULL, onAnnounceDone, data );
+        data = tr_new0( struct announce_data, 1 );
+        data->torrentId = tr_torrentId( tor );
+        data->tierId = tier->key;
+        data->isRunningOnSuccess = tor->isRunning;
+        data->timeSent = now;
+        data->event = announceEvent;
+        url = createAnnounceURL( announcer, tor, tier, data->event );
 
-    tr_free( url );
+        tier->isAnnouncing = TRUE;
+        tier->lastAnnounceStartTime = now;
+        --announcer->slotsAvailable;
+        tr_webRun( announcer->session, url, NULL, onAnnounceDone, data );
+
+        tr_free( url );
+    }
 }
 
 static tr_bool
@@ -1650,8 +1685,8 @@ tierNeedsToAnnounce( const tr_tier * tier, const time_t now )
 {
     return !tier->isAnnouncing
         && !tier->isScraping
-        && ( tier->announceEvent != NULL )
-        && ( tier->announceAt <= now );
+        && ( tier->announceAt <= now )
+        && ( tr_ptrArraySize( &tier->announceEvents ) != 0 );
 }
 
 static tr_bool
