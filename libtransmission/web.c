@@ -350,7 +350,7 @@ addTask( void * vtask )
                 host = tr_strdup_printf( "Host: %s:%d", task->host, task->port );
 
             task->slist = curl_slist_append( NULL, host );
-            task->slist = curl_slist_append( task->slist, tr_strdup_printf( "Accept:" ) );
+            task->slist = curl_slist_append( task->slist, "Accept:" );
             curl_easy_setopt( e, CURLOPT_HTTPHEADER, task->slist );
             tr_free( host );
         }

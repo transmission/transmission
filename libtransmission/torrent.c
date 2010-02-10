@@ -765,10 +765,9 @@ tr_torrentNew( const tr_ctor * ctor, int * setmeError )
     tr_info tmpInfo;
     tr_parse_result r;
     tr_torrent * tor = NULL;
-    tr_session * session = tr_ctorGetSession( ctor );
 
     assert( ctor != NULL );
-    assert( tr_isSession( session ) );
+    assert( tr_isSession( tr_ctorGetSession( ctor ) ) );
 
     r = torrentParseImpl( ctor, &tmpInfo, &hasInfo, &off, &len );
     if( r == TR_PARSE_OK )

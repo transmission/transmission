@@ -200,14 +200,12 @@ tr_torrentSetMetadataPiece( tr_torrent  * tor, int piece, const void  * data, in
                 if( !tr_bencLoadFile( &newMetainfo, TR_FMT_BENC, path ) )
                 {
                     tr_bool hasInfo;
-                    tr_benc * tmp;
 
                     /* remove any old .torrent and .resume files */
                     remove( path );
                     tr_torrentRemoveResume( tor );
 
                     dbgmsg( tor, "Saving completed metadata to \"%s\"", path );
-                    assert( !tr_bencDictFindDict( &newMetainfo, "info", &tmp ) );
                     tr_bencMergeDicts( tr_bencDictAddDict( &newMetainfo, "info", 0 ), &infoDict );
 
                     success = tr_metainfoParse( tor->session, &newMetainfo, &tor->info,
