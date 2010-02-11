@@ -1288,7 +1288,7 @@ onAnnounceDone( tr_session   * session,
             /* %1$ld - http status code, such as 404
              * %2$s - human-readable explanation of the http status code */
             char * buf = tr_strdup_printf(
-                _( "Announce failed: tracker gave HTTP Response Code %1$ld (%2$s)" ),
+                _( "tracker gave HTTP Response Code %1$ld (%2$s)" ),
                 responseCode,
                 tr_webGetResponseStr( responseCode ) );
 
