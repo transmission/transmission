@@ -1168,20 +1168,6 @@ void tr_torrentSetFilePriorities( tr_torrent       * torrent,
  */
 tr_priority_t*  tr_torrentGetFilePriorities( const tr_torrent * torrent );
 
-/**
- * @brief Single-file form of tr_torrentGetFilePriorities.
- * @return TR_PRI_NORMAL, TR_PRI_HIGH, or TR_PRI_LOW.
- */
-tr_priority_t   tr_torrentGetFilePriority( const tr_torrent  * torrent,
-                                           tr_file_index_t     file );
-
-/**
- * @brief See if a file's `download' flag is set.
- * @return true if the file's `download' flag is set.
- */
-int tr_torrentGetFileDL( const tr_torrent  * torrent,
-                         tr_file_index_t     file );
-
 /** @brief Set a batch of files to be downloaded or not. */
 void tr_torrentSetFileDLs( tr_torrent       * torrent,
                            tr_file_index_t  * files,

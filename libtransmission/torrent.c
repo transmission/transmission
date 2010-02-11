@@ -1735,23 +1735,6 @@ tr_torrentSetFilePriorities( tr_torrent *      tor,
     tr_torrentUnlock( tor );
 }
 
-tr_priority_t
-tr_torrentGetFilePriority( const tr_torrent * tor,
-                           tr_file_index_t    file )
-{
-    tr_priority_t ret;
-
-    assert( tr_isTorrent( tor ) );
-
-    tr_torrentLock( tor );
-    assert( tor );
-    assert( file < tor->info.fileCount );
-    ret = tor->info.files[file].priority;
-    tr_torrentUnlock( tor );
-
-    return ret;
-}
-
 tr_priority_t*
 tr_torrentGetFilePriorities( const tr_torrent * tor )
 {
@@ -1772,23 +1755,6 @@ tr_torrentGetFilePriorities( const tr_torrent * tor )
 /**
 ***  File DND
 **/
-
-int
-tr_torrentGetFileDL( const tr_torrent * tor,
-                     tr_file_index_t    file )
-{
-    int doDownload;
-
-    assert( tr_isTorrent( tor ) );
-
-    tr_torrentLock( tor );
-
-    assert( file < tor->info.fileCount );
-    doDownload = !tor->info.files[file].dnd;
-
-    tr_torrentUnlock( tor );
-    return doDownload != 0;
-}
 
 static void
 setFileDND( tr_torrent * tor, tr_file_index_t fileIndex, int doDownload )

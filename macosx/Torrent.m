@@ -1340,7 +1340,7 @@ int trashDataFile(const char * filename)
     BOOL onState = NO, offState = NO;
     for (NSUInteger index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
     {
-        if (tr_torrentGetFileDL(fHandle, index) || ![self canChangeDownloadCheckForFile: index])
+        if ( !fInfo->files[index].dnd || ![self canChangeDownloadCheckForFile: index])
             onState = YES;
         else
             offState = YES;
@@ -1379,7 +1379,7 @@ int trashDataFile(const char * filename)
 - (BOOL) hasFilePriority: (tr_priority_t) priority forIndexes: (NSIndexSet *) indexSet
 {
     for (NSUInteger index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
-        if (priority == tr_torrentGetFilePriority(fHandle, index) && [self canChangeDownloadCheckForFile: index])
+        if ((priority == fInfo->files[index].priority) && [self canChangeDownloadCheckForFile: index])
             return YES;
     return NO;
 }
@@ -1394,7 +1394,7 @@ int trashDataFile(const char * filename)
         if (![self canChangeDownloadCheckForFile: index])
             continue;
         
-        const tr_priority_t priority = tr_torrentGetFilePriority(fHandle, index);
+        const tr_priority_t priority = fInfo->files[index].priority;
         if (priority == TR_PRI_LOW)
         {
             if (low)
