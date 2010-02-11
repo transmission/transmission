@@ -71,6 +71,7 @@ static const struct tr_option options[] =
     { 941, "incomplete-dir", "Where to store new torrents until they're complete", NULL, 1, "<directory>" },
     { 942, "no-incomplete-dir", "Don't store incomplete torrents in a different location", NULL, 0, NULL },
     { 'd', "dump-settings", "Dump the settings and exit", "d", 0, NULL },
+    { 'e', "logfile", "Dump the log messages to this filename", "e", 1, "<filename>" },
     { 'f', "foreground", "Run in the foreground instead of daemonizing", "f", 0, NULL },
     { 'g', "config-dir", "Where to look for configuration files", "g", 1, "<path>" },
     { 'p', "port", "RPC port (Default: " TR_DEFAULT_RPC_PORT_STR ")", "p", 1, "<port>" },
@@ -228,18 +229,18 @@ onFileAdded( tr_session * session, const char * dir, const char * file )
 }
 
 static void
-printMessage( tr_bool foreground, int level, const char * name, const char * message, const char * file, int line )
+printMessage( FILE * logfile, int level, const char * name, const char * message, const char * file, int line )
 {
-#ifdef HAVE_SYSLOG
-    if( foreground )
+    if( logfile != NULL )
     {
         char timestr[64];
         tr_getLogTimeStr( timestr, sizeof( timestr ) );
         if( name )
-            fprintf( stderr, "[%s] %s %s (%s:%d)\n", timestr, name, message, file, line );
+            fprintf( logfile, "[%s] %s %s (%s:%d)\n", timestr, name, message, file, line );
         else
-            fprintf( stderr, "[%s] %s (%s:%d)\n", timestr, message, file, line );
+            fprintf( logfile, "[%s] %s (%s:%d)\n", timestr, message, file, line );
     }
+#ifdef HAVE_SYSLOG
     else /* daemon... write to syslog */
     {
         int priority;
@@ -256,26 +257,17 @@ printMessage( tr_bool foreground, int level, const char * name, const char * mes
         else
             syslog( priority, "%s (%s:%d)", message, file, line );
     }
-#else
-    {
-        char timestr[64];
-        tr_getLogTimeStr( timestr, sizeof( timestr ) );
-        if( name )
-            fprintf( stderr, "[%s] %s %s (%s:%d)\n", timestr, name, message, file, line );
-        else
-            fprintf( stderr, "[%s] %s (%s:%d)\n", timestr, message, file, line );
-    }
 #endif
 }
 
 static void
-pumpLogMessages( tr_bool foreground )
+pumpLogMessages( FILE * logfile )
 {
     const tr_msg_list * l;
     tr_msg_list * list = tr_getQueuedMessages( );
 
     for( l=list; l!=NULL; l=l->next )
-        printMessage( foreground, l->level, l->name, l->message, l->file, l->line );
+        printMessage( logfile, l->level, l->name, l->message, l->file, l->line );
 
     tr_freeMessageList( list );
 }
@@ -292,6 +284,7 @@ main( int argc, char ** argv )
     tr_bool dumpSettings = FALSE;
     const char * configDir = NULL;
     dtr_watchdir * watchdir = NULL;
+    FILE * logfile = NULL;
 
     signal( SIGINT, gotsig );
     signal( SIGTERM, gotsig );
@@ -328,6 +321,10 @@ main( int argc, char ** argv )
 		      tr_bencDictAddBool( &settings, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED, FALSE );
 		      break;
             case 'd': dumpSettings = TRUE;
+                      break;
+            case 'e': logfile = fopen( optarg, "a+" );
+                      if( logfile == NULL )
+                          fprintf( stderr, "Couldn't open \"%s\": %s\n", optarg, tr_strerror( errno ) );
                       break;
             case 'f': foreground = TRUE;
                       break;
@@ -393,9 +390,12 @@ main( int argc, char ** argv )
         }
     }
 
+    if( foreground && !logfile )
+        logfile = stderr;
+
     if( !loaded )
     {
-        printMessage( foreground, TR_MSG_ERR, MY_NAME, "Error loading config file -- exiting.", __FILE__, __LINE__ );
+        printMessage( logfile, TR_MSG_ERR, MY_NAME, "Error loading config file -- exiting.", __FILE__, __LINE__ );
         return -1;
     }
 
@@ -411,7 +411,7 @@ main( int argc, char ** argv )
     {
         char buf[256];
         tr_snprintf( buf, sizeof( buf ), "Failed to dameonize: %s", tr_strerror( errno ) );
-        printMessage( foreground, TR_MSG_ERR, MY_NAME, buf, __FILE__, __LINE__ );
+        printMessage( logfile, TR_MSG_ERR, MY_NAME, buf, __FILE__, __LINE__ );
         exit( 1 );
     }
 
@@ -457,7 +457,7 @@ main( int argc, char ** argv )
     while( !closing ) {
         tr_wait_msec( 1000 ); /* sleep one second */
         dtr_watchdir_update( watchdir );
-        pumpLogMessages( foreground );
+        pumpLogMessages( logfile );
     }
 
     closelog( );
