@@ -25,6 +25,7 @@ static char * previousLocation = NULL;
 struct UpdateData
 {
     GtkDialog * dialog;
+    GtkDialog * moving_dialog;
     int done;
 };
 
@@ -34,11 +35,24 @@ static gboolean
 onTimer( gpointer gdata )
 {
     struct UpdateData * data = gdata;
-    const tr_bool done = data->done;
+    const int done = data->done;
 
-    if( done != TR_LOC_MOVING )
+    if( done == TR_LOC_ERROR )
     {
-        gtk_widget_destroy( GTK_WIDGET( data->dialog ) );
+        const int flags = GTK_DIALOG_MODAL
+                        | GTK_DIALOG_DESTROY_WITH_PARENT;
+        GtkWidget * w = gtk_message_dialog_new( GTK_WINDOW( data->moving_dialog ),
+                                                flags,
+                                                GTK_MESSAGE_ERROR,
+                                                GTK_BUTTONS_CLOSE,
+                                                "%s",
+                                                _( "Couldn't move torrent" ) );
+        gtk_dialog_run( GTK_DIALOG( w ) );
+        gtk_widget_destroy( GTK_WIDGET( data->moving_dialog ) );
+    }
+    else if( done != TR_LOC_MOVING )
+    {
+        gtk_widget_destroy( GTK_WIDGET( data->moving_dialog ) );
         g_free( data );
     }
 
@@ -74,6 +88,7 @@ onResponse( GtkDialog * dialog, int response, gpointer unused UNUSED )
         /* start the move and periodically check its status */
         updateData = g_new( struct UpdateData, 1 );
         updateData->dialog = dialog;
+        updateData->moving_dialog = GTK_DIALOG( w );
         updateData->done = FALSE;
         tr_torrentSetLocation( tor, location, do_move, NULL, &updateData->done );
         gtr_timeout_add_seconds( 1, onTimer, updateData );
