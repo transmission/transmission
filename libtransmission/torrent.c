@@ -320,7 +320,7 @@ onTrackerResponse( void * tracker UNUSED,
              if( event->allAreSeeds )
                 tr_tordbg( tor, "Got %d seeds from tracker", (int)n );
             else
-                tr_torinf( tor, _( "Got %d peers from tracker" ), (int)n );
+                tr_tordbg( tor, "Got %d peers from tracker", (int)n );
 
             for( i = 0; i < n; ++i )
             {

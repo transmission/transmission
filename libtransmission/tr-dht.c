@@ -615,7 +615,7 @@ callback( void *ignore UNUSED, int event,
             for( i=0; i<n; ++i )
                 tr_peerMgrAddPex( tor, TR_PEER_FROM_DHT, pex+i );
             tr_free(pex);
-            tr_torinf(tor, "Learned %d%s peers from DHT",
+            tr_tordbg(tor, "Learned %d%s peers from DHT",
                       (int)n,
                       event == DHT_EVENT_VALUES6 ? " IPv6" : "");
         }
