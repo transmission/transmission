@@ -33,7 +33,7 @@
     IBOutlet NSImageView * fIconView, * fLocationImageView;
     IBOutlet NSTextField * fNameField, * fStatusField, * fLocationField;
     IBOutlet NSButton * fStartCheck, * fDeleteCheck;
-    IBOutlet NSPopUpButton * fGroupPopUp;
+    IBOutlet NSPopUpButton * fGroupPopUp, * fPriorityPopUp;
     IBOutlet NSProgressIndicator * fVerifyIndicator;
     
     IBOutlet FileOutlineController * fFileController;
@@ -62,6 +62,8 @@
 - (void) cancelAdd: (id) sender;
 
 - (void) verifyLocalData: (id) sender;
+
+- (void) changePriority: (id) sender;
 
 - (void) updateStatusField: (NSNotification *) notification;
 
