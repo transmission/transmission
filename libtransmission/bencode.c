@@ -1580,6 +1580,7 @@ void
 tr_bencToBuf( const tr_benc * top, tr_fmt_mode mode, struct evbuffer * buf )
 {
     evbuffer_drain( buf, EVBUFFER_LENGTH( buf ) );
+    evbuffer_expand( buf, 4096 ); /* alloc a little memory to start off with */
 
     switch( mode )
     {
