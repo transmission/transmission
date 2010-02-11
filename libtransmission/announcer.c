@@ -405,7 +405,7 @@ tierNew( tr_torrent * tor )
     t->scrapeIntervalSec = DEFAULT_SCRAPE_INTERVAL_SEC;
     t->announceIntervalSec = DEFAULT_ANNOUNCE_INTERVAL_SEC;
     t->announceMinIntervalSec = DEFAULT_ANNOUNCE_MIN_INTERVAL_SEC;
-    t->scrapeAt = now + tr_cryptoWeakRandInt( 60*10 );
+    t->scrapeAt = now + tr_cryptoWeakRandInt( 60*5 );
     t->tor = tor;
 
     return t;
@@ -1117,7 +1117,6 @@ static tr_bool
 parseAnnounceResponse( tr_tier     * tier,
                        const char  * response,
                        size_t        responseLen,
-                       tr_bool       isStopped,
                        tr_bool     * gotScrape )
 {
     tr_benc benc;
@@ -1136,6 +1135,7 @@ parseAnnounceResponse( tr_tier     * tier,
         tr_benc * tmp;
         const char * str;
         const uint8_t * raw;
+        tr_bool gotPeers = FALSE;
 
         success = TRUE;
 
@@ -1196,6 +1196,7 @@ parseAnnounceResponse( tr_tier     * tier,
             /* "compact" extension */
             const int allAreSeeds = incomplete == 0;
             peerCount += publishNewPeersCompact( tier, allAreSeeds, raw, rawlen );
+            gotPeers = TRUE;
         }
         else if( tr_bencDictFindList( &benc, "peers", &tmp ) )
         {
@@ -1204,6 +1205,7 @@ parseAnnounceResponse( tr_tier     * tier,
             size_t byteCount = 0;
             uint8_t * array = parseOldPeers( tmp, &byteCount );
             peerCount += publishNewPeers( tier, allAreSeeds, array, byteCount );
+            gotPeers = TRUE;
             tr_free( array );
         }
 
@@ -1212,13 +1214,14 @@ parseAnnounceResponse( tr_tier     * tier,
             /* "compact" extension */
             const tr_bool allAreSeeds = incomplete == 0;
             peerCount += publishNewPeersCompact6( tier, allAreSeeds, raw, rawlen );
+            gotPeers = TRUE;
         }
 
         if( tier->lastAnnounceStr[0] == '\0' )
             tr_strlcpy( tier->lastAnnounceStr, _( "Success" ),
                         sizeof( tier->lastAnnounceStr ) );
 
-        if( !isStopped )
+        if( gotPeers )
             tier->lastAnnouncePeerCount = peerCount;
     }
 
@@ -1270,7 +1273,7 @@ onAnnounceDone( tr_session   * session,
 
         if( responseCode == HTTP_OK )
         {
-            success = parseAnnounceResponse( tier, response, responseLen, isStopped, &gotScrape );
+            success = parseAnnounceResponse( tier, response, responseLen, &gotScrape );
             dbgmsg( tier, "success is %d", success );
 
             if( isStopped )
