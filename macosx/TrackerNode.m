@@ -118,7 +118,7 @@
     else
     {
         baseString = [NSLocalizedString(@"Last Announce", "Tracker last announce") stringByAppendingFormat: @": %@", dateString];
-        if (fStat.hasAnnounced && fStat.lastAnnounceSucceeded)
+        if (fStat.hasAnnounced && fStat.lastAnnounceSucceeded && fStat.lastAnnouncePeerCount > 0)
         {
             NSString * peerString;
             if (fStat.lastAnnouncePeerCount == 1)
