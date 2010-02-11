@@ -175,10 +175,15 @@ stop_forwarding( tr_shared * s )
 {
     tr_ninf( getKey( ), "%s", _( "Stopped" ) );
     natPulse( s, FALSE );
+
     tr_natpmpClose( s->natpmp );
     s->natpmp = NULL;
+    s->natpmpStatus = TR_PORT_UNMAPPED;
+
     tr_upnpClose( s->upnp );
     s->upnp = NULL;
+    s->upnpStatus = TR_PORT_UNMAPPED;
+
     stop_timer( s );
 }
 
@@ -217,7 +222,7 @@ tr_sharedPortChanged( tr_session * session )
 
     if( s->isEnabled )
     {
-        stop_timer( s );
+        stop_forwarding( s );
         start_timer( s );
     }
 }
