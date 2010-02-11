@@ -658,6 +658,8 @@ createAnnounceURL( const tr_announcer     * announcer,
     const char * str;
     const unsigned char * ipv6;
 
+    evbuffer_expand( buf, 2048 );
+
     evbuffer_add_printf( buf, "%s"
                               "%c"
                               "info_hash=%s"
@@ -668,7 +670,8 @@ createAnnounceURL( const tr_announcer     * announcer,
                               "&left=%" PRIu64
                               "&numwant=%d"
                               "&key=%s"
-                              "&compact=1",
+                              "&compact=1"
+                              "&supportcrypto=1",
                               ann,
                               strchr( ann, '?' ) ? '&' : '?',
                               torrent->info.hashEscaped,
@@ -679,6 +682,9 @@ createAnnounceURL( const tr_announcer     * announcer,
                               tr_cpLeftUntilComplete( &torrent->completion ),
                               numwant,
                               tracker->key_param );
+
+    if( announcer->session->encryptionMode == TR_ENCRYPTION_REQUIRED ) 
+        evbuffer_add_printf( buf, "&requirecrypto=1" ); 
 
     if( tier->byteCounts[TR_ANN_CORRUPT] )
         evbuffer_add_printf( buf, "&corrupt=%" PRIu64, tier->byteCounts[TR_ANN_CORRUPT] );
