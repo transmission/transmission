@@ -1507,9 +1507,9 @@ sessionCloseImpl( void * vsession )
 }
 
 static int
-deadlineReached( const uint64_t deadline )
+deadlineReached( const time_t deadline )
 {
-    return tr_date( ) >= deadline;
+    return time( NULL ) >= deadline;
 }
 
 #define SHUTDOWN_MAX_SECONDS 20
@@ -1517,8 +1517,7 @@ deadlineReached( const uint64_t deadline )
 void
 tr_sessionClose( tr_session * session )
 {
-    const int      maxwait_msec = SHUTDOWN_MAX_SECONDS * 1000;
-    const uint64_t deadline = tr_date( ) + maxwait_msec;
+    const time_t deadline = time( NULL ) + SHUTDOWN_MAX_SECONDS;
 
     assert( tr_isSession( session ) );
 
@@ -1550,11 +1549,14 @@ tr_sessionClose( tr_session * session )
     {
         static tr_bool forced = FALSE;
         dbgmsg( "waiting for libtransmission thread to finish" );
-        tr_wait_msec( 100 );
+        tr_wait_msec( 500 );
         if( deadlineReached( deadline ) && !forced )
         {
             event_loopbreak( );
             forced = TRUE;
+
+            if( time( NULL ) >= deadline + 3 )
+                break;
         }
     }
 
