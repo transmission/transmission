@@ -19,6 +19,9 @@
 #if defined(HAVE_POSIX_FADVISE) || defined(SYS_DARWIN)
  #include <fcntl.h> /* posix_fadvise() / fcntl() */
 #endif
+#if defined(SYS_DARWIN)
+ #define HAVE_VALLOC
+#endif
 
 #include <openssl/sha.h>
 
@@ -57,8 +60,8 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
     uint32_t pieceBytesRead = 0;
     tr_file_index_t fileIndex = 0;
     tr_piece_index_t pieceIndex = 0;
-    const int64_t buflen = tor->info.pieceSize;
-    uint8_t * buffer = tr_new( uint8_t, buflen );
+    uint8_t * buffer = NULL;
+    int64_t buflen = 0;
     const time_t begin = tr_time( );
     time_t end;
 
@@ -84,6 +87,16 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
             char * filename = tr_torrentFindFile( tor, fileIndex );
             fd = filename == NULL ? -1 : tr_open_file_for_scanning( filename );
             /* fprintf( stderr, "opening file #%d (%s) -- %d\n", fileIndex, filename, fd ); */
+            if( ( fd >= 0 ) && ( buffer == NULL ) )
+            {
+                struct stat st;
+                buflen = fstat( fd, &st ) ? 4096 : st.st_blksize;
+#ifdef HAVE_VALLOC
+                buffer = valloc( buflen );
+#else
+                buffer = malloc( buflen );
+#endif
+            }
             tr_free( filename );
         }
 
@@ -164,7 +177,7 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
     /* cleanup */
     if( fd >= 0 )
         tr_close_file( fd );
-    tr_free( buffer );
+    free( buffer );
 
     /* stopwatch */
     end = tr_time( );
