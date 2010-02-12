@@ -72,6 +72,7 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
         int64_t leftInPiece;
         int64_t leftInFile;
         int64_t bytesThisPass;
+        ssize_t numRead;
         const tr_file * file = &tor->info.files[fileIndex];
 
         /* if we're starting a new piece... */
@@ -108,17 +109,13 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
         /* fprintf( stderr, "reading this pass: %d\n", (int)bytesThisPass ); */
 
         /* read a bit */
-        if( (fd>=0) && tr_lseek( fd, filePos, SEEK_SET ) != -1 ) {
-            const int64_t numRead = read( fd, buffer, bytesThisPass );
-            if( numRead > 0 )
-                pieceBytesRead += numRead;
-            if( numRead == bytesThisPass )
-                SHA1_Update( &sha, buffer, numRead );
+        numRead = tr_pread( fd, buffer, bytesThisPass, filePos );
+        if( numRead == bytesThisPass )
+            SHA1_Update( &sha, buffer, numRead );
+        if( numRead > 0 ) {
+            pieceBytesRead += numRead;
 #if defined HAVE_POSIX_FADVISE && defined POSIX_FADV_DONTNEED
             posix_fadvise( fd, filePos, bytesThisPass, POSIX_FADV_DONTNEED );
-#endif
-#ifdef SYS_DARWIN
-            fcntl( fd, F_NOCACHE, 1 );
 #endif
         }
 
