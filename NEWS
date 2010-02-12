@@ -1,19 +1,22 @@
-=== Transmission 1.83 (2010/02/xx) ===
+=== Transmission 1.90 (2010/02/xx) ===
 [http://trac.transmissionbt.com/query?milestone=1.90&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== All Platforms ====
-  * Add an option to disable the ".part" suffix for incomplete files
+  * Add an option to disable the .part suffix for incomplete files
   * Fix 1.81 bug that broke HTTP requests to sites that gave HTTP 301 redirects
   * Fix 1.8x seed-ratio bug that could cause some inaccurate tracker announces
   * Fix 1.8x bug in announcing partial seeds
-  * Try harder to make announces to finish, even if the tracker responds slowly
-  * Fix buf that didn't honor download speed limits of 0
+  * Try harder to make announces finish, even if the tracker responds slowly
+  * Fix bug that didn't honor download speed limits of 0
   * Use fallocate64() for fast file preallocation on systems that support it
   * Magnet link improvements
-  * Don't let "Disk is full" errors cause us to lose configuration files
+  * Don't let "Disk is full" errors cause loss of configuration files
 ==== Mac ====
-  * FIXME(livings)
-  * Fix crash when updating the blocklist
-  * Fix bug that disabled scheduled "turtle mode" times after laptop sleep
+  * Display information for all selected transfers in the inspector's tracker and peer tabs
+  * Add a filter to the message log
+  * Fix potential crash when updating the blocklist
+  * Fix bug that caused the speed limit scheduler to not be applied after sleep
+  * Remove file selection for the per-torrent action menu
+  * Smaller interface tweaks
 ==== GTK+ ====
   * Give more helpful error messages if "Set Location" or "Add Magnet Link" fail
   * Add optional support for libappindicator
@@ -21,11 +24,11 @@
 ==== Daemon ====
   * Add transmission-remote support for port testing and blocklist updating
   * Add transmission-daemon support for incomplete-dir, dht, and seedratio
-  * If settings.json is corrupt, give an error telling where the error is
+  * If settings.json is corrupt, give an error telling where the problem is
   * Add option to specify where log messages should be written
 ==== Web Client ====
-  * Add a tracker tab to the Torrent Inspector
-  * Fix a 1.8x display error when showing magnet links' information
+  * Add a tracker tab to the inspector
+  * Fix 1.8x display error when showing magnet link information
 ==== Qt ====
   * Fix bug that prevented torrents from being added via web browsers
 
