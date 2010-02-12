@@ -1340,7 +1340,7 @@ int trashDataFile(const char * filename)
     BOOL onState = NO, offState = NO;
     for (NSUInteger index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
     {
-        if ( !fInfo->files[index].dnd || ![self canChangeDownloadCheckForFile: index])
+        if (!fInfo->files[index].dnd || ![self canChangeDownloadCheckForFile: index])
             onState = YES;
         else
             offState = YES;
@@ -1379,7 +1379,7 @@ int trashDataFile(const char * filename)
 - (BOOL) hasFilePriority: (tr_priority_t) priority forIndexes: (NSIndexSet *) indexSet
 {
     for (NSUInteger index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
-        if ((priority == fInfo->files[index].priority) && [self canChangeDownloadCheckForFile: index])
+        if (priority == fInfo->files[index].priority && [self canChangeDownloadCheckForFile: index])
             return YES;
     return NO;
 }
@@ -1394,24 +1394,26 @@ int trashDataFile(const char * filename)
         if (![self canChangeDownloadCheckForFile: index])
             continue;
         
-        const tr_priority_t priority = fInfo->files[index].priority;
-        if (priority == TR_PRI_LOW)
+        const NSInteger priority = fInfo->files[index].priority;
+        switch (priority)
         {
-            if (low)
-                continue;
-            low = YES;
-        }
-        else if (priority == TR_PRI_HIGH)
-        {
-            if (high)
-                continue;
-            high = YES;
-        }
-        else
-        {
-            if (normal)
-                continue;
-            normal = YES;
+            case TR_PRI_LOW:
+                if (low)
+                    continue;
+                low = YES;
+                break;
+            case TR_PRI_NORMAL:
+                if (normal)
+                    continue;
+                normal = YES;
+                break;
+            case TR_PRI_HIGH:
+                if (high)
+                    continue;
+                high = YES;
+                break;
+            default:
+                NSAssert2(NO, @"Unknown priority %d for file index %d", priority, index);
         }
         
         [priorities addObject: [NSNumber numberWithInteger: priority]];
