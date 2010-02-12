@@ -99,8 +99,11 @@ watchdir_update_impl( dtr_watchdir * w )
         int len = read( fd, buf, sizeof( buf ) );
         while (i < len) {
             struct inotify_event * event = (struct inotify_event *) &buf[i];
-            tr_inf( "Found new .torrent file \"%s\" in watchdir \"%s\"", event->name, w->dir );
-            w->callback( w->session, w->dir, event->name );
+            if( strstr( event->name, ".torrent" ) != NULL )
+            {
+                tr_inf( "Found new .torrent file \"%s\" in watchdir \"%s\"", event->name, w->dir );
+                w->callback( w->session, w->dir, event->name );
+            }
             i += EVENT_SIZE +  event->len;
         }
     }
