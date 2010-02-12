@@ -1394,7 +1394,7 @@ int trashDataFile(const char * filename)
         if (![self canChangeDownloadCheckForFile: index])
             continue;
         
-        const NSInteger priority = fInfo->files[index].priority;
+        const tr_priority_t priority = fInfo->files[index].priority;
         switch (priority)
         {
             case TR_PRI_LOW:
