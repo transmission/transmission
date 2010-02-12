@@ -783,6 +783,9 @@ tr_torrentNew( const tr_ctor * ctor, int * setmeError )
     }
     else if( setmeError )
     {
+        if( r == TR_PARSE_DUPLICATE )
+            tr_metainfoFree( &tmpInfo );
+
         *setmeError = r;
     }
 
