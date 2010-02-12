@@ -3,9 +3,10 @@
 ==== All Platforms ====
   * Add an option to disable the .part suffix for incomplete files
   * Fix 1.81 bug that broke HTTP requests to sites that gave HTTP 301 redirects
-  * Fix 1.8x seed-ratio bug that could cause some inaccurate tracker announces
+  * Fix 1.8x bug in announcing when finishing downloading and stopping at the same time
   * Fix 1.8x bug in announcing partial seeds
   * Try harder to make announces finish, even if the tracker responds slowly
+  * Add priority selector to GUI clients' add torrent windows
   * Fix bug that didn't honor download speed limits of 0
   * Use fallocate64() for fast file preallocation on systems that support it
   * Magnet link improvements
