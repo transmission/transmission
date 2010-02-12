@@ -222,7 +222,8 @@ tr_sharedPortChanged( tr_session * session )
 
     if( s->isEnabled )
     {
-        stop_forwarding( s );
+        stop_timer( s );
+        natPulse( s, FALSE );
         start_timer( s );
     }
 }
