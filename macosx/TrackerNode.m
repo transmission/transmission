@@ -28,11 +28,12 @@
 
 @implementation TrackerNode
 
-- (id) initWithTrackerStat: (tr_tracker_stat *) stat
+- (id) initWithTrackerStat: (tr_tracker_stat *) stat torrent: (Torrent *) torrent
 {
     if ((self = [super init]))
     {
         fStat = *stat;
+        fTorrent = torrent;
     }
     
     return self;
@@ -67,6 +68,11 @@
 - (NSUInteger) identifier
 {
     return fStat.id;
+}
+
+- (Torrent *) torrent
+{
+    return fTorrent;
 }
 
 - (NSInteger) totalSeeders

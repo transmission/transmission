@@ -761,8 +761,7 @@ typedef enum
 - (void) tableViewSelectionDidChange: (NSNotification *) notification
 {
     if ([notification object] == fTrackerTable)
-        [fTrackerAddRemoveControl setEnabled: [fTorrents count] == 1 && [fTrackerTable numberOfSelectedRows] > 0
-            forSegment: TRACKER_REMOVE_TAG];
+        [fTrackerAddRemoveControl setEnabled: [fTrackerTable numberOfSelectedRows] > 0 forSegment: TRACKER_REMOVE_TAG];
 }
 
 - (BOOL) tableView: (NSTableView *) tableView isGroupRow: (NSInteger) row
@@ -1794,7 +1793,7 @@ typedef enum
 
 - (void) removeTrackers
 {
-    NSMutableIndexSet * removeIdentifiers = [NSMutableIndexSet indexSet];
+    NSMutableDictionary * removeIdentifiers = [NSMutableDictionary dictionary];
     
     NSIndexSet * selectedIndexes = [fTrackerTable selectedRowIndexes];
     BOOL groupSelected = NO;
@@ -1804,7 +1803,17 @@ typedef enum
         if ([object isKindOfClass: [TrackerNode class]])
         {
             if (groupSelected || [selectedIndexes containsIndex: i])
-                [removeIdentifiers addIndex: [(TrackerNode *)object identifier]];
+            {
+                Torrent * torrent = [(TrackerNode *)object torrent];
+                NSMutableIndexSet * removeIndexSet;
+                if (!(removeIndexSet = [removeIdentifiers objectForKey: torrent]))
+                {
+                    removeIndexSet = [NSMutableIndexSet indexSet];
+                    [removeIdentifiers setObject: removeIndexSet forKey: torrent];
+                }
+                
+                [removeIndexSet addIndex: [(TrackerNode *)object identifier]];
+            }
         }
         else
         {
@@ -1848,12 +1857,14 @@ typedef enum
             return;
     }
     
-    Torrent * torrent = [fTorrents objectAtIndex: 0];
-    [torrent removeTrackersWithIdentifiers: removeIdentifiers];
+    for (Torrent * torrent in removeIdentifiers)
+        [torrent removeTrackersWithIdentifiers: [removeIdentifiers objectForKey: torrent]];
     
     //reset table with either new or old value
     [fTrackers release];
-    fTrackers = [[torrent allTrackerStats] retain];
+    fTrackers = [[NSMutableArray alloc] init];
+    for (Torrent * torrent in fTorrents)
+        [fTrackers addObjectsFromArray: [torrent allTrackerStats]];
     
     [fTrackerTable setTrackers: fTrackers];
     [fTrackerTable reloadData];

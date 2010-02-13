@@ -197,6 +197,11 @@ int trashDataFile(const char * filename)
     return [@"Torrent: " stringByAppendingString: [self name]];
 }
 
+- (id) copyWithZone: (NSZone *) zone
+{
+    return [self retain];
+}
+
 - (void) closeRemoveTorrent
 {
     //allow the file to be index by Time Machine
@@ -600,7 +605,7 @@ int trashDataFile(const char * filename)
             prevTier = stats[i].tier;
         }
         
-        TrackerNode * tracker = [[TrackerNode alloc] initWithTrackerStat: &stats[i]];
+        TrackerNode * tracker = [[TrackerNode alloc] initWithTrackerStat: &stats[i] torrent: self];
         [trackers addObject: tracker];
         [tracker release];
     }

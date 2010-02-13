@@ -25,12 +25,16 @@
 #import <Cocoa/Cocoa.h>
 #import <transmission.h>
 
+@class Torrent;
+
 @interface TrackerNode : NSObject
 {
     tr_tracker_stat fStat;
+    
+    Torrent * fTorrent; //weak reference
 }
 
-- (id) initWithTrackerStat: (tr_tracker_stat *) stat;
+- (id) initWithTrackerStat: (tr_tracker_stat *) stat torrent: (Torrent *) torrent;
 
 - (NSString *) host;
 - (NSString *) fullAnnounceAddress;
@@ -38,6 +42,8 @@
 - (NSInteger) tier;
 
 - (NSUInteger) identifier;
+
+- (Torrent *) torrent;
 
 - (NSInteger) totalSeeders;
 - (NSInteger) totalLeechers;
