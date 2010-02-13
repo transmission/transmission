@@ -47,6 +47,10 @@ enum
 
 /* #define STOPWATCH */
 
+#ifndef HAVE_VALLOC
+ #define valloc malloc
+#endif
+
 static tr_bool
 verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
 {
@@ -59,9 +63,10 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
     uint32_t piecePos = 0;
     uint32_t pieceBytesRead = 0;
     tr_file_index_t fileIndex = 0;
+    tr_file_index_t prevFileIndex = !fileIndex;
     tr_piece_index_t pieceIndex = 0;
-    uint8_t * buffer = NULL;
-    int64_t buflen = 0;
+    const int64_t buflen = 4096;
+    uint8_t * buffer = valloc( buflen );
     const time_t begin = tr_time( );
     time_t end;
 
@@ -72,7 +77,6 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
         int64_t leftInPiece;
         int64_t leftInFile;
         int64_t bytesThisPass;
-        ssize_t numRead;
         const tr_file * file = &tor->info.files[fileIndex];
 
         /* if we're starting a new piece... */
@@ -83,22 +87,13 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
         }
 
         /* if we're starting a new file... */
-        if( !filePos && (fd<0) )
+        if( !filePos && (fd<0) && (fileIndex!=prevFileIndex) )
         {
             char * filename = tr_torrentFindFile( tor, fileIndex );
             fd = filename == NULL ? -1 : tr_open_file_for_scanning( filename );
             /* fprintf( stderr, "opening file #%d (%s) -- %d\n", fileIndex, filename, fd ); */
-            if( ( fd >= 0 ) && ( buffer == NULL ) )
-            {
-                struct stat st;
-                buflen = fstat( fd, &st ) ? 4096 : st.st_blksize;
-#ifdef HAVE_VALLOC
-                buffer = valloc( buflen );
-#else
-                buffer = malloc( buflen );
-#endif
-            }
             tr_free( filename );
+            prevFileIndex = fileIndex;
         }
 
         /* figure out how much we can read this pass */
@@ -109,14 +104,16 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
         /* fprintf( stderr, "reading this pass: %d\n", (int)bytesThisPass ); */
 
         /* read a bit */
-        numRead = tr_pread( fd, buffer, bytesThisPass, filePos );
-        if( numRead == bytesThisPass )
-            SHA1_Update( &sha, buffer, numRead );
-        if( numRead > 0 ) {
-            pieceBytesRead += numRead;
+        if( fd >= 0 ) {
+            const ssize_t numRead = tr_pread( fd, buffer, bytesThisPass, filePos );
+            if( numRead == bytesThisPass )
+                SHA1_Update( &sha, buffer, numRead );
+            if( numRead > 0 ) {
+                pieceBytesRead += numRead;
 #if defined HAVE_POSIX_FADVISE && defined POSIX_FADV_DONTNEED
-            posix_fadvise( fd, filePos, bytesThisPass, POSIX_FADV_DONTNEED );
+                posix_fadvise( fd, filePos, bytesThisPass, POSIX_FADV_DONTNEED );
 #endif
+            }
         }
 
         /* move our offsets */
