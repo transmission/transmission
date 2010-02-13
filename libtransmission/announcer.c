@@ -286,7 +286,7 @@ typedef struct
     int leecherCount;
     int downloadCount;
     int downloaderCount;
-    
+
     uint32_t id;
 
     /* sent as the "key" argument in tracker requests
@@ -353,27 +353,27 @@ typedef struct
 
     tr_ptrArray trackers; /* tr_tracker_item */
     tr_tracker_item * currentTracker;
+    int currentTrackerIndex;
 
     tr_torrent * tor;
 
-    time_t lastScrapeTime;
-    time_t lastAnnounceTime;
+    time_t scrapeAt;
     time_t lastScrapeStartTime;
-    time_t lastAnnounceStartTime;
+    time_t lastScrapeTime;
     tr_bool lastScrapeSucceeded;
+
+    time_t announceAt;
+    time_t manualAnnounceAllowedAt;
+    time_t lastAnnounceStartTime;
+    time_t lastAnnounceTime;
     tr_bool lastAnnounceSucceeded;
     tr_bool lastAnnounceTimedOut;
 
-    time_t scrapeAt;
-    time_t manualAnnounceAllowedAt;
-
-    time_t announceAt;
     tr_ptrArray announceEvents; /* const char* */
 
     /* unique lookup key */
     int key;
 
-    int currentTrackerIndex;
     int scrapeIntervalSec;
     int announceIntervalSec;
     int announceMinIntervalSec;
@@ -418,6 +418,29 @@ tierFree( void * vtier )
     tr_ptrArrayDestruct( &tier->trackers, trackerFree );
     tr_ptrArrayDestruct( &tier->announceEvents, NULL );
     tr_free( tier );
+}
+
+static void
+tierCopyAttributes( tr_tier * t, const tr_tier * o )
+{
+    int i, n;
+    tr_tier bak;
+
+    assert( t != NULL );
+    assert( o != NULL );
+    assert( t != o );
+
+    bak = *t;
+    *t = *o;
+    t->tor = bak.tor;
+    t->trackers = bak.trackers;
+    t->announceEvents = bak.announceEvents;
+    t->currentTracker = bak.currentTracker;
+    t->currentTrackerIndex = bak.currentTrackerIndex;
+
+    tr_ptrArrayClear( &t->announceEvents );
+    for( i=0, n=tr_ptrArraySize(&o->announceEvents); i<n; ++i )
+        tr_ptrArrayAppend( &t->announceEvents, tr_ptrArrayNth((tr_ptrArray*)&o->announceEvents,i) );
 }
 
 static void
@@ -479,13 +502,6 @@ tiersNew( void )
     tiers->tiers = TR_PTR_ARRAY_INIT;
     tiers->publisher = TR_PUBLISHER_INIT;
     return tiers;
-}
-
-static void
-tiersClear( tr_torrent_tiers * tiers )
-{
-    tr_ptrArrayDestruct( &tiers->tiers, tierFree );
-    tiers->tiers = TR_PTR_ARRAY_INIT;
 }
 
 static void
@@ -683,8 +699,8 @@ createAnnounceURL( const tr_announcer     * announcer,
                               numwant,
                               tracker->key_param );
 
-    if( announcer->session->encryptionMode == TR_ENCRYPTION_REQUIRED ) 
-        evbuffer_add_printf( buf, "&requirecrypto=1" ); 
+    if( announcer->session->encryptionMode == TR_ENCRYPTION_REQUIRED )
+        evbuffer_add_printf( buf, "&requirecrypto=1" );
 
     if( tier->byteCounts[TR_ANN_CORRUPT] )
         evbuffer_add_printf( buf, "&corrupt=%" PRIu64, tier->byteCounts[TR_ANN_CORRUPT] );
@@ -794,15 +810,60 @@ tr_announcerAddTorrent( tr_announcer * announcer, tr_torrent * tor )
 void
 tr_announcerResetTorrent( tr_announcer * announcer, tr_torrent * tor )
 {
+    tr_ptrArray oldTiers = TR_PTR_ARRAY_INIT;
+
+    /* if we had tiers already, make a backup of them */
     if( tor->tiers != NULL )
     {
-        tiersClear( tor->tiers );
+        oldTiers = tor->tiers->tiers;
+        tor->tiers->tiers = TR_PTR_ARRAY_INIT;
+    }
 
-        addTorrentToTier( announcer, tor->tiers, tor );
+    /* create the new tier/tracker structs */
+    addTorrentToTier( announcer, tor->tiers, tor );
 
+    /* if we had tiers already, merge their state into the new structs */
+    if( !tr_ptrArrayEmpty( &oldTiers ) )
+    {
+        int i, in;
+        for( i=0, in=tr_ptrArraySize(&oldTiers); i<in; ++i )
+        {
+            int j, jn;
+            const tr_tier * o = tr_ptrArrayNth( &oldTiers, i );
+
+            if( o->currentTracker == NULL )
+                continue;
+
+            for( j=0, jn=tr_ptrArraySize(&tor->tiers->tiers); j<jn; ++j )
+            {
+                int k, kn;
+                tr_tier * t = tr_ptrArrayNth(&tor->tiers->tiers,j);
+
+                for( k=0, kn=tr_ptrArraySize(&t->trackers); k<kn; ++k )
+                {
+                    tr_tracker_item * item = tr_ptrArrayNth(&t->trackers,k);
+                    if( strcmp( o->currentTracker->announce, item->announce ) )
+                        continue;
+                    tierCopyAttributes( t, o );
+                    t->currentTracker = item;
+                    t->currentTrackerIndex = k;
+                    dbgmsg( t, "attributes copied to tier %d, tracker %d"
+                                               "from tier %d, tracker %d",
+                            i, o->currentTrackerIndex, j, k );
+
+                }
+            }
+        }
+    }
+    else
+    {
+        /* start the torrent, if applicable */
         if( tor->isRunning )
             tr_announcerTorrentStarted( tor );
     }
+
+    /* cleanup */
+    tr_ptrArrayDestruct( &oldTiers, tierFree );
 }
 
 tr_publisher_tag
