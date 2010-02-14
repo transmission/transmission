@@ -1452,7 +1452,7 @@ onAnnounceDone( tr_session   * session,
              * request without modifications. */
             if( tr_torrentIsPrivate( tier->tor ) || ( tier->tor->info.trackerCount < 2 ) )
                 publishErrorMessageAndStop( tier, _( "Tracker returned a 4xx message" ) );
-            tier->announceAt = ~(time_t)0;
+            tier->announceAt = 0;
             tier->manualAnnounceAllowedAt = ~(time_t)0;
         }
         else if( 500 <= responseCode && responseCode <= 599 )
@@ -1771,6 +1771,7 @@ tierNeedsToAnnounce( const tr_tier * tier, const time_t now )
 {
     return !tier->isAnnouncing
         && !tier->isScraping
+        && ( tier->announceAt != 0 )
         && ( tier->announceAt <= now )
         && ( tr_ptrArraySize( &tier->announceEvents ) != 0 );
 }
