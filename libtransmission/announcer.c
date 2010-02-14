@@ -28,6 +28,8 @@
 #include "utils.h"
 #include "web.h"
 
+#define STARTED "started"
+
 #define dbgmsg( tier, ... ) \
 if( tr_deepLoggingIsActive( ) ) do { \
   char name[128]; \
@@ -822,6 +824,9 @@ tr_announcerAddTorrent( tr_announcer * announcer, tr_torrent * tor )
     return tiers;
 }
 
+static void
+tierAddAnnounce( tr_tier * tier, const char * announceEvent, time_t announceAt );
+
 void
 tr_announcerResetTorrent( tr_announcer * announcer, tr_torrent * tor )
 {
@@ -871,11 +876,18 @@ tr_announcerResetTorrent( tr_announcer * announcer, tr_torrent * tor )
             }
         }
     }
-    else
+
+    /* kickstart any tiers that didn't get started */
+    if( tor->isRunning )
     {
-        /* start the torrent, if applicable */
-        if( tor->isRunning )
-            tr_announcerTorrentStarted( tor );
+        int i, n;
+        const time_t now = tr_time( );
+        tr_tier ** tiers = (tr_tier**) tr_ptrArrayPeek( &tor->tiers->tiers, &n );
+        for( i=0; i<n; ++i ) {
+            tr_tier * tier = tiers[i];
+            if( !tier->isRunning )    
+                tierAddAnnounce( tier, STARTED, now );
+        }
     }
 
     /* cleanup */
@@ -975,7 +987,7 @@ torrentAddAnnounce( tr_torrent * tor, const char * announceEvent, time_t announc
 void
 tr_announcerTorrentStarted( tr_torrent * tor )
 {
-    torrentAddAnnounce( tor, "started", tr_time( ) );
+    torrentAddAnnounce( tor, STARTED, tr_time( ) );
 }
 void
 tr_announcerManualAnnounce( tr_torrent * tor )
