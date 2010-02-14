@@ -593,14 +593,14 @@ int trashDataFile(const char * filename)
     int count;
     tr_tracker_stat * stats = tr_torrentTrackers(fHandle, &count);
     
-    NSMutableArray * trackers = [NSMutableArray arrayWithCapacity: (count > 0 ? count + stats[count-1].tier : 0)];
+    NSMutableArray * trackers = [NSMutableArray arrayWithCapacity: (count > 0 ? count + (stats[count-1].tier + 1) : 0)];
     
     int prevTier = -1;
     for (int i=0; i < count; ++i)
     {
         if (stats[i].tier != prevTier)
         {
-            [trackers addObject: [NSDictionary dictionaryWithObjectsAndKeys: [NSNumber numberWithInteger: stats[i].tier], @"Tier",
+            [trackers addObject: [NSDictionary dictionaryWithObjectsAndKeys: [NSNumber numberWithInteger: stats[i].tier + 1], @"Tier",
                                     [self name], @"Name", nil]];
             prevTier = stats[i].tier;
         }
@@ -622,6 +622,14 @@ int trashDataFile(const char * filename)
         [allTrackers addObject: [NSString stringWithUTF8String: fInfo->trackers[i].announce]];
     
     return allTrackers;
+}
+
+- (NSUInteger) numberOfTrackerTiers
+{
+    if (fInfo->trackerCount == 0)
+        return 0;
+    
+    return fInfo->trackers[fInfo->trackerCount-1].tier + 1;
 }
 
 - (BOOL) addTrackerToNewTier: (NSString *) tracker

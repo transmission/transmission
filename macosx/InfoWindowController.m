@@ -710,7 +710,8 @@ typedef enum
 {
     if (tableView == fTrackerTable)
     {
-        if (![[fTrackers objectAtIndex: row] isKindOfClass: [TrackerNode class]] && [tableView editedRow] != row)
+        //check for NSDictionay instead of TrackerNode because of display issue when adding a row
+        if ([[fTrackers objectAtIndex: row] isKindOfClass: [NSDictionary class]])
             return TRACKER_GROUP_SEPARATOR_HEIGHT;
     }
     
@@ -1782,7 +1783,12 @@ typedef enum
 {
     [[self window] makeKeyWindow];
     
-    [fTrackers addObject: NSLocalizedString(@"New Tier", "inspector -> add tracker")];
+    NSAssert1([fTorrents count] == 1, @"Attempting to add tracker with %d transfers selected", [fTorrents count]);
+    
+    Torrent * torrent = [fTorrents objectAtIndex: 0];
+    
+    [fTrackers addObject: [NSDictionary dictionaryWithObject: [NSNumber numberWithInteger: [torrent numberOfTrackerTiers]+1]
+                                        forKey: @"Tier"]];
     [fTrackers addObject: @""];
     
     [fTrackerTable setTrackers: fTrackers];
