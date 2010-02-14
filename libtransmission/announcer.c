@@ -298,6 +298,21 @@ typedef struct
 tr_tracker_item;
 
 static void
+trackerItemCopyAttributes( tr_tracker_item * t, const tr_tracker_item * o )
+{
+    assert( t != o );
+    assert( t != NULL );
+    assert( o != NULL );
+
+    t->seederCount = o->seederCount;
+    t->leecherCount = o->leecherCount;
+    t->downloadCount = o->downloadCount;
+    t->downloaderCount = o->downloaderCount;
+    t->id = o->id;
+    memcpy( t->key_param, o->key_param, sizeof( t->key_param ) );
+}
+
+static void
 generateKeyParam( char * msg, size_t msglen )
 {
     size_t i;
@@ -847,6 +862,7 @@ tr_announcerResetTorrent( tr_announcer * announcer, tr_torrent * tor )
                     tierCopyAttributes( t, o );
                     t->currentTracker = item;
                     t->currentTrackerIndex = k;
+                    trackerItemCopyAttributes( item, o->currentTracker );
                     dbgmsg( t, "attributes copied to tier %d, tracker %d"
                                                "from tier %d, tracker %d",
                             i, o->currentTrackerIndex, j, k );
