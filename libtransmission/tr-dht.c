@@ -482,7 +482,7 @@ tr_dhtUninit(tr_session *ss)
 }
 
 tr_bool
-tr_dhtEnabled( tr_session * ss )
+tr_dhtEnabled( const tr_session * ss )
 {
     return ss && ( ss == session );
 }

@@ -35,7 +35,7 @@ enum
 
 int  tr_dhtInit( tr_session *, const tr_address * );
 void tr_dhtUninit( tr_session * );
-tr_bool tr_dhtEnabled( tr_session * );
+tr_bool tr_dhtEnabled( const tr_session * );
 tr_port tr_dhtPort ( tr_session * );
 int tr_dhtStatus( tr_session *, int af, int * setme_nodeCount );
 const char *tr_dhtPrintableStatus(int status);

@@ -2358,7 +2358,8 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
     if( tr_peerIoSupportsLTEP( peer->io ) )
         sendLtepHandshake( m );
 
-    if(tr_peerIoSupportsDHT(peer->io)) {
+    if( tr_dhtEnabled( torrent->session ) && tr_peerIoSupportsDHT( peer->io ))
+    {
         /* Only send PORT over IPv6 when the IPv6 DHT is running (BEP-32). */
         const struct tr_address *addr = tr_peerIoGetAddress( peer->io, NULL );
         if( addr->type == TR_AF_INET || tr_globalIPv6() ) {
