@@ -400,6 +400,7 @@ typedef struct
     tr_bool isRunning;
     tr_bool isAnnouncing;
     tr_bool isScraping;
+    tr_bool wasCopied;
 
     char lastAnnounceStr[128];
     char lastScrapeStr[128];
@@ -867,6 +868,7 @@ tr_announcerResetTorrent( tr_announcer * announcer, tr_torrent * tor )
                     tierCopyAttributes( t, o );
                     t->currentTracker = item;
                     t->currentTrackerIndex = k;
+                    t->wasCopied = TRUE;
                     trackerItemCopyAttributes( item, o->currentTracker );
                     dbgmsg( t, "attributes copied to tier %d, tracker %d"
                                                "from tier %d, tracker %d",
@@ -885,7 +887,7 @@ tr_announcerResetTorrent( tr_announcer * announcer, tr_torrent * tor )
         tr_tier ** tiers = (tr_tier**) tr_ptrArrayPeek( &tor->tiers->tiers, &n );
         for( i=0; i<n; ++i ) {
             tr_tier * tier = tiers[i];
-            if( !tier->isRunning )    
+            if( !tier->wasCopied )    
                 tierAddAnnounce( tier, STARTED, now );
         }
     }
