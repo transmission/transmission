@@ -169,7 +169,7 @@ Torrent.prototype =
 	buildTrackerStats: function(trackerStats) {
 		result = [];
 		for( var i=0, tracker; tracker=trackerStats[i]; ++i ) {
-			tier = result[tracker.tier - 1] || [];
+			tier = result[tracker.tier] || [];
 			tier[tier.length] = {
 				'host': tracker.host,
 				'announce': tracker.announce,
@@ -189,7 +189,7 @@ Torrent.prototype =
 				'leecherCount': tracker.leecherCount,
 				'downloadCount': tracker.downloadCount
 			};
-			result[tracker.tier - 1] = tier;
+			result[tracker.tier] = tier;
 		}
 		return result;
 	},
