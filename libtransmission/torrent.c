@@ -781,12 +781,13 @@ tr_torrentNew( const tr_ctor * ctor, int * setmeError )
         }
         torrentInit( tor, ctor );
     }
-    else if( setmeError )
+    else
     {
         if( r == TR_PARSE_DUPLICATE )
             tr_metainfoFree( &tmpInfo );
 
-        *setmeError = r;
+        if( setmeError )
+            *setmeError = r;
     }
 
     return tor;
