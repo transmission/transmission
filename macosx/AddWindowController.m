@@ -140,6 +140,7 @@
     [fTimer invalidate];
     
     [fDestination release];
+    [fTorrentFile release];
     
     [super dealloc];
 }
