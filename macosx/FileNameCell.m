@@ -119,9 +119,6 @@
         [image drawInRect: [self imageRectForBounds: cellFrame] fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
     }
     
-    NSIndexSet * indexSet = [(FileListNode *)[self objectValue] indexes];
-    NSAssert(indexSet != nil, @"indexSet must not be nil - temp");
-    
     NSColor * titleColor, * statusColor;
     if ([self backgroundStyle] == NSBackgroundStyleDark)
         titleColor = statusColor = [NSColor whiteColor];

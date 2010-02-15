@@ -1348,8 +1348,6 @@ int trashDataFile(const char * filename)
 
 - (NSInteger) checkForFiles: (NSIndexSet *) indexSet
 {
-    NSAssert(indexSet != nil, @"indexSet must not be nil");
-    
     BOOL onState = NO, offState = NO;
     for (NSUInteger index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
     {

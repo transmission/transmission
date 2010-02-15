@@ -105,7 +105,6 @@
 
 - (NSIndexSet *) indexes
 {
-    NSAssert(fIndexes != nil, @"How did this get nil? - temp");
     return fIndexes;
 }
 

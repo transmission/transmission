@@ -73,7 +73,7 @@
         
         [self setDelegate: self];
         
-        fPiecesBarPercent = [fDefaults boolForKey: @"PiecesBar"] ? 1.0f : 0.0f;
+        fPiecesBarPercent = [fDefaults boolForKey: @"PiecesBar"] ? 1.0 : 0.0;
     }
     
     return self;
@@ -616,9 +616,9 @@
         NSMenuItem * item;
         if ([menu numberOfItems] == 4)
         {
-            const CGFloat ratioLimitActionValue[] = { 0.25f, 0.5f, 0.75f, 1.0f, 1.5f, 2.0f, 3.0f, -1.0f };
+            const CGFloat ratioLimitActionValue[] = { 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, -1.0 };
             
-            for (NSInteger i = 0; ratioLimitActionValue[i] != -1.0f; i++)
+            for (NSInteger i = 0; ratioLimitActionValue[i] != -1.0; i++)
             {
                 item = [[NSMenuItem alloc] initWithTitle: [NSString localizedStringWithFormat: @"%.2f", ratioLimitActionValue[i]]
                         action: @selector(setQuickRatio:) keyEquivalent: @""];
@@ -821,7 +821,7 @@
         [fPiecesBarAnimation release];
     
     NSMutableArray * progressMarks = [NSMutableArray arrayWithCapacity: 16];
-    for (NSAnimationProgress i = 0.0625f; i <= 1.0f; i += 0.0625f)
+    for (NSAnimationProgress i = 0.0625; i <= 1.0; i += 0.0625)
         [progressMarks addObject: [NSNumber numberWithFloat: i]];
     
     fPiecesBarAnimation = [[NSAnimation alloc] initWithDuration: TOGGLE_PROGRESS_SECONDS animationCurve: NSAnimationEaseIn];
@@ -848,7 +848,7 @@
         if ([fDefaults boolForKey: @"PiecesBar"])
             fPiecesBarPercent = progress;
         else
-            fPiecesBarPercent = 1.0f - progress;
+            fPiecesBarPercent = 1.0 - progress;
         
         [self reloadData];
     }
