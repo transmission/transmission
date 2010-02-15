@@ -12,8 +12,6 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="1760"/>
-			<integer value="1361"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -44,95 +42,43 @@
 				<int key="NSWindowBacking">2</int>
 				<string key="NSWindowRect">{{108, 632}, {542, 107}}</string>
 				<int key="NSWTFlags">1886913536</int>
-				<string key="NSWindowTitle">预设</string>
+				<string key="NSWindowTitle">预置</string>
 				<string key="NSWindowClass">PrefsWindow</string>
 				<object class="NSMutableString" key="NSViewClass">
 					<characters key="NS.bytes">View</characters>
 				</object>
-				<string key="NSWindowContentMaxSize">{1.79769e+308, 1.79769e+308}</string>
+				<string key="NSWindowContentMaxSize">{542, 107}</string>
+				<string key="NSWindowContentMinSize">{542, 107}</string>
 				<object class="NSView" key="NSWindowView" id="334064964">
-					<reference key="NSNextResponder"/>
+					<nil key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
 					<string key="NSFrameSize">{542, 107}</string>
-					<reference key="NSSuperview"/>
-					<reference key="NSWindow"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1680, 1028}}</string>
-				<string key="NSMaxSize">{1.79769e+308, 1.79769e+308}</string>
+				<string key="NSMinSize">{542, 129}</string>
+				<string key="NSMaxSize">{542, 129}</string>
 			</object>
 			<object class="NSCustomView" id="249126185">
-				<reference key="NSNextResponder"/>
+				<nil key="NSNextResponder"/>
 				<int key="NSvFlags">256</int>
 				<object class="NSMutableArray" key="NSSubviews">
 					<bool key="EncodedWithXMLCoder">YES</bool>
-					<object class="NSButton" id="588239529">
+					<object class="NSTextField" id="1015958671">
 						<reference key="NSNextResponder" ref="249126185"/>
 						<int key="NSvFlags">256</int>
-						<string key="NSFrame">{{192, 120}, {181, 18}}</string>
+						<string key="NSFrame">{{52, 78}, {137, 17}}</string>
 						<reference key="NSSuperview" ref="249126185"/>
-						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
-						<object class="NSButtonCell" key="NSCell" id="114288993">
-							<int key="NSCellFlags">67239424</int>
-							<int key="NSCellFlags2">0</int>
-							<string key="NSContents">退出时有活动的任务</string>
-							<object class="NSFont" key="NSSupport" id="393988310">
-								<string key="NSName">STHeitiSC-Light</string>
-								<double key="NSSize">13</double>
-								<int key="NSfFlags">16</int>
-							</object>
-							<reference key="NSControlView" ref="588239529"/>
-							<int key="NSButtonFlags">1211912703</int>
-							<int key="NSButtonFlags2">2</int>
-							<object class="NSCustomResource" key="NSNormalImage" id="1001726176">
-								<string key="NSClassName">NSImage</string>
-								<string key="NSResourceName">NSSwitch</string>
-							</object>
-							<object class="NSButtonImageSource" key="NSAlternateImage" id="764913887">
-								<string key="NSImageName">NSSwitch</string>
-							</object>
-							<string key="NSAlternateContents"/>
-							<string key="NSKeyEquivalent"/>
-							<int key="NSPeriodicDelay">200</int>
-							<int key="NSPeriodicInterval">25</int>
-						</object>
-					</object>
-					<object class="NSButton" id="276216218">
-						<reference key="NSNextResponder" ref="249126185"/>
-						<int key="NSvFlags">256</int>
-						<string key="NSFrame">{{192, 160}, {193, 18}}</string>
-						<reference key="NSSuperview" ref="249126185"/>
-						<reference key="NSWindow"/>
-						<bool key="NSEnabled">YES</bool>
-						<object class="NSButtonCell" key="NSCell" id="1341189">
-							<int key="NSCellFlags">67239424</int>
-							<int key="NSCellFlags2">0</int>
-							<string key="NSContents">清除所有活动的任务</string>
-							<reference key="NSSupport" ref="393988310"/>
-							<reference key="NSControlView" ref="276216218"/>
-							<int key="NSButtonFlags">1211912703</int>
-							<int key="NSButtonFlags2">2</int>
-							<reference key="NSNormalImage" ref="1001726176"/>
-							<reference key="NSAlternateImage" ref="764913887"/>
-							<string key="NSAlternateContents"/>
-							<string key="NSKeyEquivalent"/>
-							<int key="NSPeriodicDelay">200</int>
-							<int key="NSPeriodicInterval">25</int>
-						</object>
-					</object>
-					<object class="NSTextField" id="196954257">
-						<reference key="NSNextResponder" ref="249126185"/>
-						<int key="NSvFlags">256</int>
-						<string key="NSFrame">{{81, 161}, {108, 17}}</string>
-						<reference key="NSSuperview" ref="249126185"/>
-						<reference key="NSWindow"/>
-						<bool key="NSEnabled">YES</bool>
-						<object class="NSTextFieldCell" key="NSCell" id="184036008">
+						<object class="NSTextFieldCell" key="NSCell" id="819203889">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">71303168</int>
-							<string key="NSContents">提醒用户:</string>
-							<reference key="NSSupport" ref="393988310"/>
-							<reference key="NSControlView" ref="196954257"/>
+							<string key="NSContents">接受磁化链接(magnet):</string>
+							<object class="NSFont" key="NSSupport" id="86725571">
+								<string key="NSName">LucidaGrande</string>
+								<double key="NSSize">13</double>
+								<int key="NSfFlags">1044</int>
+							</object>
+							<reference key="NSControlView" ref="1015958671"/>
 							<object class="NSColor" key="NSBackgroundColor" id="977951849">
 								<int key="NSColorSpace">6</int>
 								<string key="NSCatalogName">System</string>
@@ -153,22 +99,82 @@
 							</object>
 						</object>
 					</object>
+					<object class="NSButton" id="588239529">
+						<reference key="NSNextResponder" ref="249126185"/>
+						<int key="NSvFlags">256</int>
+						<string key="NSFrame">{{192, 160}, {181, 18}}</string>
+						<reference key="NSSuperview" ref="249126185"/>
+						<bool key="NSEnabled">YES</bool>
+						<object class="NSButtonCell" key="NSCell" id="114288993">
+							<int key="NSCellFlags">67239424</int>
+							<int key="NSCellFlags2">0</int>
+							<string key="NSContents">退出并有活动的传输</string>
+							<reference key="NSSupport" ref="86725571"/>
+							<reference key="NSControlView" ref="588239529"/>
+							<int key="NSButtonFlags">1211912703</int>
+							<int key="NSButtonFlags2">2</int>
+							<object class="NSCustomResource" key="NSNormalImage" id="1001726176">
+								<string key="NSClassName">NSImage</string>
+								<string key="NSResourceName">NSSwitch</string>
+							</object>
+							<object class="NSButtonImageSource" key="NSAlternateImage" id="764913887">
+								<string key="NSImageName">NSSwitch</string>
+							</object>
+							<string key="NSAlternateContents"/>
+							<string key="NSKeyEquivalent"/>
+							<int key="NSPeriodicDelay">200</int>
+							<int key="NSPeriodicInterval">25</int>
+						</object>
+					</object>
+					<object class="NSButton" id="276216218">
+						<reference key="NSNextResponder" ref="249126185"/>
+						<int key="NSvFlags">256</int>
+						<string key="NSFrame">{{192, 200}, {193, 18}}</string>
+						<reference key="NSSuperview" ref="249126185"/>
+						<bool key="NSEnabled">YES</bool>
+						<object class="NSButtonCell" key="NSCell" id="1341189">
+							<int key="NSCellFlags">67239424</int>
+							<int key="NSCellFlags2">0</int>
+							<string key="NSContents">移除活动的传输</string>
+							<reference key="NSSupport" ref="86725571"/>
+							<reference key="NSControlView" ref="276216218"/>
+							<int key="NSButtonFlags">1211912703</int>
+							<int key="NSButtonFlags2">2</int>
+							<reference key="NSNormalImage" ref="1001726176"/>
+							<reference key="NSAlternateImage" ref="764913887"/>
+							<string key="NSAlternateContents"/>
+							<string key="NSKeyEquivalent"/>
+							<int key="NSPeriodicDelay">200</int>
+							<int key="NSPeriodicInterval">25</int>
+						</object>
+					</object>
+					<object class="NSTextField" id="196954257">
+						<reference key="NSNextResponder" ref="249126185"/>
+						<int key="NSvFlags">256</int>
+						<string key="NSFrame">{{81, 201}, {108, 17}}</string>
+						<reference key="NSSuperview" ref="249126185"/>
+						<bool key="NSEnabled">YES</bool>
+						<object class="NSTextFieldCell" key="NSCell" id="184036008">
+							<int key="NSCellFlags">67239424</int>
+							<int key="NSCellFlags2">71303168</int>
+							<string key="NSContents">提示用户:</string>
+							<reference key="NSSupport" ref="86725571"/>
+							<reference key="NSControlView" ref="196954257"/>
+							<reference key="NSBackgroundColor" ref="977951849"/>
+							<reference key="NSTextColor" ref="400627124"/>
+						</object>
+					</object>
 					<object class="NSTextField" id="71273405">
 						<reference key="NSNextResponder" ref="249126185"/>
 						<int key="NSvFlags">256</int>
-						<string key="NSFrame">{{45, 217}, {144, 17}}</string>
+						<string key="NSFrame">{{45, 257}, {144, 17}}</string>
 						<reference key="NSSuperview" ref="249126185"/>
-						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="811813130">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">71303168</int>
-							<string key="NSContents">Dock 图像显示:</string>
-							<object class="NSFont" key="NSSupport" id="86725571">
-								<string key="NSName">LucidaGrande</string>
-								<double key="NSSize">13</double>
-								<int key="NSfFlags">1044</int>
-							</object>
+							<string key="NSContents">标彰Dock图标于:</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="71273405"/>
 							<reference key="NSBackgroundColor" ref="977951849"/>
 							<reference key="NSTextColor" ref="400627124"/>
@@ -177,15 +183,14 @@
 					<object class="NSButton" id="843992339">
 						<reference key="NSNextResponder" ref="249126185"/>
 						<int key="NSvFlags">256</int>
-						<string key="NSFrame">{{192, 216}, {149, 18}}</string>
+						<string key="NSFrame">{{192, 256}, {149, 18}}</string>
 						<reference key="NSSuperview" ref="249126185"/>
-						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="284839720">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">0</int>
-							<string key="NSContents">总下载速率</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">总下载速度</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="843992339"/>
 							<int key="NSButtonFlags">1211912703</int>
 							<int key="NSButtonFlags2">2</int>
@@ -200,15 +205,14 @@
 					<object class="NSButton" id="390486891">
 						<reference key="NSNextResponder" ref="249126185"/>
 						<int key="NSvFlags">256</int>
-						<string key="NSFrame">{{192, 196}, {131, 18}}</string>
+						<string key="NSFrame">{{192, 236}, {131, 18}}</string>
 						<reference key="NSSuperview" ref="249126185"/>
-						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="556408151">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">0</int>
-							<string key="NSContents">总上传速率</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">总上传速度</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="390486891"/>
 							<int key="NSButtonFlags">1211912703</int>
 							<int key="NSButtonFlags2">2</int>
@@ -223,15 +227,14 @@
 					<object class="NSButton" id="351716965">
 						<reference key="NSNextResponder" ref="249126185"/>
 						<int key="NSvFlags">256</int>
-						<string key="NSFrame">{{211, 140}, {258, 18}}</string>
+						<string key="NSFrame">{{211, 180}, {258, 18}}</string>
 						<reference key="NSSuperview" ref="249126185"/>
-						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="263018774">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">0</int>
 							<string key="NSContents">只当传输在下载</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="351716965"/>
 							<int key="NSButtonFlags">1211912703</int>
 							<int key="NSButtonFlags2">2</int>
@@ -246,15 +249,14 @@
 					<object class="NSButton" id="1004103148">
 						<reference key="NSNextResponder" ref="249126185"/>
 						<int key="NSvFlags">256</int>
-						<string key="NSFrame">{{211, 100}, {258, 18}}</string>
+						<string key="NSFrame">{{211, 140}, {258, 18}}</string>
 						<reference key="NSSuperview" ref="249126185"/>
-						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="718603970">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">0</int>
 							<string key="NSContents">只当传输在下载</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="1004103148"/>
 							<int key="NSButtonFlags">1211912703</int>
 							<int key="NSButtonFlags2">2</int>
@@ -269,15 +271,14 @@
 					<object class="NSTextField" id="343626323">
 						<reference key="NSNextResponder" ref="249126185"/>
 						<int key="NSvFlags">256</int>
-						<string key="NSFrame">{{98, 237}, {91, 34}}</string>
+						<string key="NSFrame">{{109, 294}, {80, 17}}</string>
 						<reference key="NSSuperview" ref="249126185"/>
-						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="1017981285">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">71303168</int>
 							<string key="NSContents">自动调整大小:</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="343626323"/>
 							<reference key="NSBackgroundColor" ref="977951849"/>
 							<reference key="NSTextColor" ref="400627124"/>
@@ -286,15 +287,14 @@
 					<object class="NSButton" id="1205696">
 						<reference key="NSNextResponder" ref="249126185"/>
 						<int key="NSvFlags">256</int>
-						<string key="NSFrame">{{192, 253}, {303, 18}}</string>
+						<string key="NSFrame">{{192, 293}, {303, 18}}</string>
 						<reference key="NSSuperview" ref="249126185"/>
-						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="37001111">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">0</int>
-							<string key="NSContents">自动调整窗口大小来显示所有传输任务</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">自动调整窗口大小适应传输</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="1205696"/>
 							<int key="NSButtonFlags">1211912703</int>
 							<int key="NSButtonFlags2">2</int>
@@ -306,18 +306,40 @@
 							<int key="NSPeriodicInterval">25</int>
 						</object>
 					</object>
+					<object class="NSButton" id="609293684">
+						<reference key="NSNextResponder" ref="249126185"/>
+						<int key="NSvFlags">256</int>
+						<string key="NSFrame">{{188, 68}, {185, 32}}</string>
+						<reference key="NSSuperview" ref="249126185"/>
+						<bool key="NSEnabled">YES</bool>
+						<object class="NSButtonCell" key="NSCell" id="891757673">
+							<int key="NSCellFlags">67239424</int>
+							<int key="NSCellFlags2">134217728</int>
+							<string key="NSContents">设置预设应用</string>
+							<reference key="NSSupport" ref="86725571"/>
+							<reference key="NSControlView" ref="609293684"/>
+							<int key="NSButtonFlags">-2038284033</int>
+							<int key="NSButtonFlags2">1</int>
+							<reference key="NSAlternateImage" ref="86725571"/>
+							<string key="NSAlternateContents"/>
+							<object class="NSMutableString" key="NSKeyEquivalent">
+								<characters key="NS.bytes"/>
+							</object>
+							<int key="NSPeriodicDelay">200</int>
+							<int key="NSPeriodicInterval">25</int>
+						</object>
+					</object>
 					<object class="NSButton" id="574904146">
 						<reference key="NSNextResponder" ref="249126185"/>
 						<int key="NSvFlags">256</int>
-						<string key="NSFrame">{{291, 68}, {82, 32}}</string>
+						<string key="NSFrame">{{291, 108}, {82, 32}}</string>
 						<reference key="NSSuperview" ref="249126185"/>
-						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="983781505">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">134217728</int>
 							<string key="NSContents">重置</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="574904146"/>
 							<int key="NSButtonFlags">-2038284033</int>
 							<int key="NSButtonFlags2">1</int>
@@ -333,15 +355,14 @@
 					<object class="NSTextField" id="692603192">
 						<reference key="NSNextResponder" ref="249126185"/>
 						<int key="NSvFlags">256</int>
-						<string key="NSFrame">{{191, 78}, {101, 17}}</string>
+						<string key="NSFrame">{{191, 118}, {101, 17}}</string>
 						<reference key="NSSuperview" ref="249126185"/>
-						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="765517424">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">272629760</int>
-							<string key="NSContents">重置所有提示:</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">重置所有警告:</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="692603192"/>
 							<reference key="NSBackgroundColor" ref="977951849"/>
 							<reference key="NSTextColor" ref="400627124"/>
@@ -352,13 +373,12 @@
 						<int key="NSvFlags">256</int>
 						<string key="NSFrame">{{192, 38}, {183, 18}}</string>
 						<reference key="NSSuperview" ref="249126185"/>
-						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="687318378">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">0</int>
 							<string key="NSContents">每日自动检查</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="688052354"/>
 							<int key="NSButtonFlags">1211912703</int>
 							<int key="NSButtonFlags2">2</int>
@@ -375,13 +395,12 @@
 						<int key="NSvFlags">256</int>
 						<string key="NSFrame">{{192, 18}, {155, 18}}</string>
 						<reference key="NSSuperview" ref="249126185"/>
-						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="794987986">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">0</int>
 							<string key="NSContents">包括测试版本</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="1005555131"/>
 							<int key="NSButtonFlags">1211912703</int>
 							<int key="NSButtonFlags2">2</int>
@@ -398,36 +417,32 @@
 						<int key="NSvFlags">256</int>
 						<string key="NSFrame">{{72, 39}, {117, 17}}</string>
 						<reference key="NSSuperview" ref="249126185"/>
-						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="450175985">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">71303168</int>
 							<string key="NSContents">检查更新:</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="964665196"/>
 							<reference key="NSBackgroundColor" ref="977951849"/>
 							<reference key="NSTextColor" ref="400627124"/>
 						</object>
 					</object>
 				</object>
-				<string key="NSFrameSize">{542, 291}</string>
-				<reference key="NSSuperview"/>
-				<reference key="NSWindow"/>
+				<string key="NSFrameSize">{542, 331}</string>
 				<string key="NSClassName">NSView</string>
 				<string key="NSExtension">NSResponder</string>
 			</object>
 			<object class="NSCustomView" id="314557528">
-				<reference key="NSNextResponder"/>
+				<nil key="NSNextResponder"/>
 				<int key="NSvFlags">256</int>
 				<object class="NSMutableArray" key="NSSubviews">
 					<bool key="EncodedWithXMLCoder">YES</bool>
 					<object class="NSTabView" id="463462813">
 						<reference key="NSNextResponder" ref="314557528"/>
 						<int key="NSvFlags">256</int>
-						<string key="NSFrame">{{13, 10}, {516, 272}}</string>
+						<string key="NSFrame">{{13, 10}, {516, 294}}</string>
 						<reference key="NSSuperview" ref="314557528"/>
-						<reference key="NSWindow"/>
 						<object class="NSMutableArray" key="NSTabViewItems">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<object class="NSTabViewItem" id="73412354">
@@ -439,9 +454,8 @@
 										<object class="NSPopUpButton" id="870266578">
 											<reference key="NSNextResponder" ref="833882848"/>
 											<int key="NSvFlags">256</int>
-											<string key="NSFrame">{{279, 192}, {182, 26}}</string>
+											<string key="NSFrame">{{219, 214}, {182, 26}}</string>
 											<reference key="NSSuperview" ref="833882848"/>
-											<reference key="NSWindow"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSPopUpButtonCell" key="NSCell" id="90676977">
 												<int key="NSCellFlags">-2076049856</int>
@@ -477,9 +491,7 @@
 												</object>
 												<bool key="NSMenuItemRespectAlignment">YES</bool>
 												<object class="NSMenu" key="NSMenu" id="408456560">
-													<object class="NSMutableString" key="NSTitle">
-														<characters key="NS.bytes">OtherViews</characters>
-													</object>
+													<string key="NSTitle">其他视图</string>
 													<object class="NSMutableArray" key="NSMenuItems">
 														<bool key="EncodedWithXMLCoder">YES</bool>
 														<reference ref="256851620"/>
@@ -498,7 +510,7 @@
 														</object>
 														<object class="NSMenuItem" id="762395921">
 															<reference key="NSMenu" ref="408456560"/>
-															<string key="NSTitle">Same as torrent file</string>
+															<string key="NSTitle">和种子文件相同</string>
 															<string key="NSKeyEquiv"/>
 															<int key="NSKeyEquivModMask">1048576</int>
 															<int key="NSMnemonicLoc">2147483647</int>
@@ -523,7 +535,7 @@
 														</object>
 														<object class="NSMenuItem" id="470732104">
 															<reference key="NSMenu" ref="408456560"/>
-															<string key="NSTitle">Other…</string>
+															<string key="NSTitle">其他…</string>
 															<string key="NSKeyEquiv"/>
 															<int key="NSKeyEquivModMask">1048576</int>
 															<int key="NSMnemonicLoc">2147483647</int>
@@ -543,15 +555,14 @@
 										<object class="NSTextField" id="796360506">
 											<reference key="NSNextResponder" ref="833882848"/>
 											<int key="NSvFlags">256</int>
-											<string key="NSFrame">{{108, 198}, {109, 17}}</string>
+											<string key="NSFrame">{{108, 220}, {109, 17}}</string>
 											<reference key="NSSuperview" ref="833882848"/>
-											<reference key="NSWindow"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="17039439">
 												<int key="NSCellFlags">67239424</int>
 												<int key="NSCellFlags2">4194304</int>
-												<string key="NSContents">默认位置:</string>
-												<reference key="NSSupport" ref="393988310"/>
+												<string key="NSContents">预设位置：</string>
+												<reference key="NSSupport" ref="86725571"/>
 												<reference key="NSControlView" ref="796360506"/>
 												<reference key="NSBackgroundColor" ref="977951849"/>
 												<reference key="NSTextColor" ref="400627124"/>
@@ -560,15 +571,14 @@
 										<object class="NSTextField" id="563372628">
 											<reference key="NSNextResponder" ref="833882848"/>
 											<int key="NSvFlags">256</int>
-											<string key="NSFrame">{{44, 198}, {62, 17}}</string>
+											<string key="NSFrame">{{44, 220}, {62, 17}}</string>
 											<reference key="NSSuperview" ref="833882848"/>
-											<reference key="NSWindow"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="928268714">
 												<int key="NSCellFlags">67239424</int>
 												<int key="NSCellFlags2">71303168</int>
-												<string key="NSContents">设置:</string>
-												<reference key="NSSupport" ref="393988310"/>
+												<string key="NSContents">设置：</string>
+												<reference key="NSSupport" ref="86725571"/>
 												<reference key="NSControlView" ref="563372628"/>
 												<reference key="NSBackgroundColor" ref="977951849"/>
 												<reference key="NSTextColor" ref="400627124"/>
@@ -577,16 +587,37 @@
 										<object class="NSButton" id="955128727">
 											<reference key="NSNextResponder" ref="833882848"/>
 											<int key="NSvFlags">256</int>
-											<string key="NSFrame">{{109, 129}, {188, 18}}</string>
+											<string key="NSFrame">{{109, 151}, {188, 18}}</string>
 											<reference key="NSSuperview" ref="833882848"/>
-											<reference key="NSWindow"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSButtonCell" key="NSCell" id="617366714">
 												<int key="NSCellFlags">67239424</int>
 												<int key="NSCellFlags2">0</int>
-												<string key="NSContents">删除原来的种子文件</string>
-												<reference key="NSSupport" ref="393988310"/>
+												<string key="NSContents">删除种子文件</string>
+												<reference key="NSSupport" ref="86725571"/>
 												<reference key="NSControlView" ref="955128727"/>
+												<int key="NSButtonFlags">1211912703</int>
+												<int key="NSButtonFlags2">2</int>
+												<reference key="NSNormalImage" ref="1001726176"/>
+												<reference key="NSAlternateImage" ref="764913887"/>
+												<string key="NSAlternateContents"/>
+												<string key="NSKeyEquivalent"/>
+												<int key="NSPeriodicDelay">200</int>
+												<int key="NSPeriodicInterval">25</int>
+											</object>
+										</object>
+										<object class="NSButton" id="325340152">
+											<reference key="NSNextResponder" ref="833882848"/>
+											<int key="NSvFlags">256</int>
+											<string key="NSFrame">{{109, 131}, {226, 18}}</string>
+											<reference key="NSSuperview" ref="833882848"/>
+											<bool key="NSEnabled">YES</bool>
+											<object class="NSButtonCell" key="NSCell" id="467554707">
+												<int key="NSCellFlags">67239424</int>
+												<int key="NSCellFlags2">0</int>
+												<string key="NSContents">添加 .part 到未完成文件</string>
+												<reference key="NSSupport" ref="86725571"/>
+												<reference key="NSControlView" ref="325340152"/>
 												<int key="NSButtonFlags">1211912703</int>
 												<int key="NSButtonFlags2">2</int>
 												<reference key="NSNormalImage" ref="1001726176"/>
@@ -600,15 +631,14 @@
 										<object class="NSButton" id="465342204">
 											<reference key="NSNextResponder" ref="833882848"/>
 											<int key="NSvFlags">256</int>
-											<string key="NSFrame">{{109, 19}, {181, 18}}</string>
+											<string key="NSFrame">{{109, 18}, {181, 18}}</string>
 											<reference key="NSSuperview" ref="833882848"/>
-											<reference key="NSWindow"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSButtonCell" key="NSCell" id="43391012">
 												<int key="NSCellFlags">67239424</int>
 												<int key="NSCellFlags2">0</int>
-												<string key="NSContents">查看种子文件于:</string>
-												<reference key="NSSupport" ref="393988310"/>
+												<string key="NSContents">观察种子文件在:</string>
+												<reference key="NSSupport" ref="86725571"/>
 												<reference key="NSControlView" ref="465342204"/>
 												<int key="NSButtonFlags">1211912703</int>
 												<int key="NSButtonFlags2">2</int>
@@ -623,9 +653,8 @@
 										<object class="NSPopUpButton" id="254542693">
 											<reference key="NSNextResponder" ref="833882848"/>
 											<int key="NSvFlags">256</int>
-											<string key="NSFrame">{{279, 17}, {182, 26}}</string>
+											<string key="NSFrame">{{293, 13}, {182, 26}}</string>
 											<reference key="NSSuperview" ref="833882848"/>
-											<reference key="NSWindow"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSPopUpButtonCell" key="NSCell" id="325815098">
 												<int key="NSCellFlags">-2076049856</int>
@@ -655,9 +684,7 @@
 												</object>
 												<bool key="NSMenuItemRespectAlignment">YES</bool>
 												<object class="NSMenu" key="NSMenu" id="78341159">
-													<object class="NSMutableString" key="NSTitle">
-														<characters key="NS.bytes">OtherViews</characters>
-													</object>
+													<string key="NSTitle">其他视图</string>
 													<object class="NSMutableArray" key="NSMenuItems">
 														<bool key="EncodedWithXMLCoder">YES</bool>
 														<reference ref="1056290010"/>
@@ -676,7 +703,7 @@
 														</object>
 														<object class="NSMenuItem" id="293192998">
 															<reference key="NSMenu" ref="78341159"/>
-															<string key="NSTitle">Other…</string>
+															<string key="NSTitle">其他…</string>
 															<string key="NSKeyEquiv"/>
 															<int key="NSKeyEquivModMask">1048576</int>
 															<int key="NSMnemonicLoc">2147483647</int>
@@ -696,15 +723,14 @@
 										<object class="NSTextField" id="529357945">
 											<reference key="NSNextResponder" ref="833882848"/>
 											<int key="NSvFlags">256</int>
-											<string key="NSFrame">{{40, 20}, {66, 17}}</string>
+											<string key="NSFrame">{{40, 19}, {66, 17}}</string>
 											<reference key="NSSuperview" ref="833882848"/>
-											<reference key="NSWindow"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="89538612">
 												<int key="NSCellFlags">67239424</int>
 												<int key="NSCellFlags2">71303168</int>
 												<string key="NSContents">自动添加:</string>
-												<reference key="NSSupport" ref="393988310"/>
+												<reference key="NSSupport" ref="86725571"/>
 												<reference key="NSControlView" ref="529357945"/>
 												<reference key="NSBackgroundColor" ref="977951849"/>
 												<reference key="NSTextColor" ref="400627124"/>
@@ -713,15 +739,14 @@
 										<object class="NSButton" id="615763784">
 											<reference key="NSNextResponder" ref="833882848"/>
 											<int key="NSvFlags">256</int>
-											<string key="NSFrame">{{109, 172}, {160, 18}}</string>
+											<string key="NSFrame">{{109, 194}, {178, 18}}</string>
 											<reference key="NSSuperview" ref="833882848"/>
-											<reference key="NSWindow"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSButtonCell" key="NSCell" id="631844593">
 												<int key="NSCellFlags">67239424</int>
 												<int key="NSCellFlags2">0</int>
 												<string key="NSContents">保存未完成文件于:</string>
-												<reference key="NSSupport" ref="393988310"/>
+												<reference key="NSSupport" ref="86725571"/>
 												<reference key="NSControlView" ref="615763784"/>
 												<int key="NSButtonFlags">1211912703</int>
 												<int key="NSButtonFlags2">2</int>
@@ -736,9 +761,8 @@
 										<object class="NSPopUpButton" id="970366881">
 											<reference key="NSNextResponder" ref="833882848"/>
 											<int key="NSvFlags">256</int>
-											<string key="NSFrame">{{279, 170}, {182, 26}}</string>
+											<string key="NSFrame">{{290, 189}, {182, 26}}</string>
 											<reference key="NSSuperview" ref="833882848"/>
-											<reference key="NSWindow"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSPopUpButtonCell" key="NSCell" id="706439761">
 												<int key="NSCellFlags">-2076049856</int>
@@ -768,9 +792,7 @@
 												</object>
 												<bool key="NSMenuItemRespectAlignment">YES</bool>
 												<object class="NSMenu" key="NSMenu" id="756881815">
-													<object class="NSMutableString" key="NSTitle">
-														<characters key="NS.bytes">OtherViews</characters>
-													</object>
+													<string key="NSTitle">其他视图</string>
 													<object class="NSMutableArray" key="NSMenuItems">
 														<bool key="EncodedWithXMLCoder">YES</bool>
 														<reference ref="153476677"/>
@@ -789,7 +811,7 @@
 														</object>
 														<object class="NSMenuItem" id="785898418">
 															<reference key="NSMenu" ref="756881815"/>
-															<string key="NSTitle">Other…</string>
+															<string key="NSTitle">其他…</string>
 															<string key="NSKeyEquiv"/>
 															<int key="NSKeyEquivModMask">1048576</int>
 															<int key="NSMnemonicLoc">2147483647</int>
@@ -809,15 +831,14 @@
 										<object class="NSButton" id="186376617">
 											<reference key="NSNextResponder" ref="833882848"/>
 											<int key="NSvFlags">256</int>
-											<string key="NSFrame">{{109, 93}, {283, 18}}</string>
+											<string key="NSFrame">{{109, 95}, {283, 18}}</string>
 											<reference key="NSSuperview" ref="833882848"/>
-											<reference key="NSWindow"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSButtonCell" key="NSCell" id="737399332">
 												<int key="NSCellFlags">67239424</int>
 												<int key="NSCellFlags2">0</int>
-												<string key="NSContents">显示 "增加传输" 选项窗口</string>
-												<reference key="NSSupport" ref="393988310"/>
+												<string key="NSContents">显示“加入传输”选项窗口</string>
+												<reference key="NSSupport" ref="86725571"/>
 												<reference key="NSControlView" ref="186376617"/>
 												<int key="NSButtonFlags">1211912703</int>
 												<int key="NSButtonFlags2">2</int>
@@ -832,15 +853,14 @@
 										<object class="NSButton" id="511956256">
 											<reference key="NSNextResponder" ref="833882848"/>
 											<int key="NSvFlags">256</int>
-											<string key="NSFrame">{{109, 149}, {192, 18}}</string>
+											<string key="NSFrame">{{109, 171}, {192, 18}}</string>
 											<reference key="NSSuperview" ref="833882848"/>
-											<reference key="NSWindow"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSButtonCell" key="NSCell" id="698939556">
 												<int key="NSCellFlags">67239424</int>
 												<int key="NSCellFlags2">0</int>
-												<string key="NSContents">添加时开始任务</string>
-												<reference key="NSSupport" ref="393988310"/>
+												<string key="NSContents">开始传输时</string>
+												<reference key="NSSupport" ref="86725571"/>
 												<reference key="NSControlView" ref="511956256"/>
 												<int key="NSButtonFlags">1211912703</int>
 												<int key="NSButtonFlags2">2</int>
@@ -855,15 +875,14 @@
 										<object class="NSButton" id="305717884">
 											<reference key="NSNextResponder" ref="833882848"/>
 											<int key="NSvFlags">256</int>
-											<string key="NSFrame">{{128, 53}, {197, 18}}</string>
+											<string key="NSFrame">{{128, 55}, {197, 18}}</string>
 											<reference key="NSSuperview" ref="833882848"/>
-											<reference key="NSWindow"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSButtonCell" key="NSCell" id="728696603">
 												<int key="NSCellFlags">67239424</int>
 												<int key="NSCellFlags2">0</int>
-												<string key="NSContents">仅当手动添加时</string>
-												<reference key="NSSupport" ref="393988310"/>
+												<string key="NSContents">只当自动添加时</string>
+												<reference key="NSSupport" ref="86725571"/>
 												<reference key="NSControlView" ref="305717884"/>
 												<int key="NSButtonFlags">1211912703</int>
 												<int key="NSButtonFlags2">2</int>
@@ -878,15 +897,14 @@
 										<object class="NSTextField" id="976245322">
 											<reference key="NSNextResponder" ref="833882848"/>
 											<int key="NSvFlags">256</int>
-											<string key="NSFrame">{{21, 94}, {86, 17}}</string>
+											<string key="NSFrame">{{21, 96}, {86, 17}}</string>
 											<reference key="NSSuperview" ref="833882848"/>
-											<reference key="NSWindow"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="184279790">
 												<int key="NSCellFlags">67239424</int>
 												<int key="NSCellFlags2">71303168</int>
 												<string key="NSContents">添加窗口:</string>
-												<reference key="NSSupport" ref="393988310"/>
+												<reference key="NSSupport" ref="86725571"/>
 												<reference key="NSControlView" ref="976245322"/>
 												<reference key="NSBackgroundColor" ref="977951849"/>
 												<reference key="NSTextColor" ref="400627124"/>
@@ -895,15 +913,14 @@
 										<object class="NSButton" id="830529860">
 											<reference key="NSNextResponder" ref="833882848"/>
 											<int key="NSvFlags">256</int>
-											<string key="NSFrame">{{128, 73}, {235, 18}}</string>
+											<string key="NSFrame">{{128, 75}, {235, 18}}</string>
 											<reference key="NSSuperview" ref="833882848"/>
-											<reference key="NSWindow"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSButtonCell" key="NSCell" id="735010614">
 												<int key="NSCellFlags">67239424</int>
 												<int key="NSCellFlags2">0</int>
-												<string key="NSContents">仅当有多个文件之时</string>
-												<reference key="NSSupport" ref="393988310"/>
+												<string key="NSContents">只有当有多个文件</string>
+												<reference key="NSSupport" ref="86725571"/>
 												<reference key="NSControlView" ref="830529860"/>
 												<int key="NSButtonFlags">1211912703</int>
 												<int key="NSButtonFlags2">2</int>
@@ -916,11 +933,10 @@
 											</object>
 										</object>
 									</object>
-									<string key="NSFrame">{{10, 33}, {496, 226}}</string>
+									<string key="NSFrame">{{10, 33}, {496, 248}}</string>
 									<reference key="NSSuperview" ref="463462813"/>
-									<reference key="NSWindow"/>
 								</object>
-								<string key="NSLabel">加入</string>
+								<string key="NSLabel">添加</string>
 								<reference key="NSColor" ref="977951849"/>
 								<reference key="NSTabView" ref="463462813"/>
 							</object>
@@ -933,7 +949,7 @@
 										<object class="NSTextField" id="192996348">
 											<reference key="NSNextResponder" ref="159788047"/>
 											<int key="NSvFlags">256</int>
-											<string key="NSFrame">{{297, 133}, {35, 22}}</string>
+											<string key="NSFrame">{{311, 156}, {35, 22}}</string>
 											<reference key="NSSuperview" ref="159788047"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="283641828">
@@ -1016,14 +1032,14 @@
 										<object class="NSTextField" id="977701368">
 											<reference key="NSNextResponder" ref="159788047"/>
 											<int key="NSvFlags">256</int>
-											<string key="NSFrame">{{41, 136}, {56, 17}}</string>
+											<string key="NSFrame">{{41, 158}, {56, 17}}</string>
 											<reference key="NSSuperview" ref="159788047"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="1040746680">
 												<int key="NSCellFlags">67239424</int>
 												<int key="NSCellFlags2">4194304</int>
-												<string key="NSContents">   队列:</string>
-												<reference key="NSSupport" ref="393988310"/>
+												<string key="NSContents">队列:</string>
+												<reference key="NSSupport" ref="86725571"/>
 												<reference key="NSControlView" ref="977701368"/>
 												<reference key="NSBackgroundColor" ref="977951849"/>
 												<reference key="NSTextColor" ref="400627124"/>
@@ -1032,14 +1048,14 @@
 										<object class="NSTextField" id="271336507">
 											<reference key="NSNextResponder" ref="159788047"/>
 											<int key="NSvFlags">256</int>
-											<string key="NSFrame">{{337, 135}, {101, 17}}</string>
+											<string key="NSFrame">{{351, 158}, {101, 17}}</string>
 											<reference key="NSSuperview" ref="159788047"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="506158787">
 												<int key="NSCellFlags">67239424</int>
 												<int key="NSCellFlags2">272629760</int>
 												<string key="NSContents">活动的传输</string>
-												<reference key="NSSupport" ref="393988310"/>
+												<reference key="NSSupport" ref="86725571"/>
 												<reference key="NSControlView" ref="271336507"/>
 												<reference key="NSBackgroundColor" ref="977951849"/>
 												<reference key="NSTextColor" ref="400627124"/>
@@ -1048,14 +1064,14 @@
 										<object class="NSButton" id="131289284">
 											<reference key="NSNextResponder" ref="159788047"/>
 											<int key="NSvFlags">256</int>
-											<string key="NSFrame">{{100, 195}, {157, 18}}</string>
+											<string key="NSFrame">{{100, 217}, {157, 18}}</string>
 											<reference key="NSSuperview" ref="159788047"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSButtonCell" key="NSCell" id="643656096">
 												<int key="NSCellFlags">67239424</int>
 												<int key="NSCellFlags2">0</int>
 												<string key="NSContents">停止做种比率:</string>
-												<reference key="NSSupport" ref="393988310"/>
+												<reference key="NSSupport" ref="86725571"/>
 												<reference key="NSControlView" ref="131289284"/>
 												<int key="NSButtonFlags">1211912703</int>
 												<int key="NSButtonFlags2">2</int>
@@ -1070,7 +1086,7 @@
 										<object class="NSTextField" id="106990921">
 											<reference key="NSNextResponder" ref="159788047"/>
 											<int key="NSvFlags">256</int>
-											<string key="NSFrame">{{263, 194}, {50, 22}}</string>
+											<string key="NSFrame">{{263, 216}, {50, 22}}</string>
 											<reference key="NSSuperview" ref="159788047"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="301067821">
@@ -1136,14 +1152,14 @@
 										<object class="NSTextField" id="926230950">
 											<reference key="NSNextResponder" ref="159788047"/>
 											<int key="NSvFlags">256</int>
-											<string key="NSFrame">{{24, 196}, {73, 17}}</string>
+											<string key="NSFrame">{{24, 218}, {73, 17}}</string>
 											<reference key="NSSuperview" ref="159788047"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="1052593840">
 												<int key="NSCellFlags">67239424</int>
 												<int key="NSCellFlags2">4194304</int>
-												<string key="NSContents">          自动:</string>
-												<reference key="NSSupport" ref="393988310"/>
+												<string key="NSContents">自动:</string>
+												<reference key="NSSupport" ref="86725571"/>
 												<reference key="NSControlView" ref="926230950"/>
 												<reference key="NSBackgroundColor" ref="977951849"/>
 												<reference key="NSTextColor" ref="400627124"/>
@@ -1152,17 +1168,17 @@
 										<object class="NSTextField" id="879532515">
 											<reference key="NSNextResponder" ref="159788047"/>
 											<int key="NSvFlags">256</int>
-											<string key="NSFrame">{{118, 176}, {269, 14}}</string>
+											<string key="NSFrame">{{118, 198}, {269, 14}}</string>
 											<reference key="NSSuperview" ref="159788047"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="256948442">
 												<int key="NSCellFlags">67239424</int>
 												<int key="NSCellFlags2">272760832</int>
-												<string key="NSContents">比率是 上传量比下载量</string>
-												<object class="NSFont" key="NSSupport" id="878019005">
-													<string key="NSName">STHeitiSC-Light</string>
+												<string key="NSContents">比率是上传与下载的商</string>
+												<object class="NSFont" key="NSSupport" id="26">
+													<string key="NSName">LucidaGrande</string>
 													<double key="NSSize">11</double>
-													<int key="NSfFlags">16</int>
+													<int key="NSfFlags">3100</int>
 												</object>
 												<reference key="NSControlView" ref="879532515"/>
 												<reference key="NSBackgroundColor" ref="977951849"/>
@@ -1180,14 +1196,14 @@
 										<object class="NSButton" id="959697936">
 											<reference key="NSNextResponder" ref="159788047"/>
 											<int key="NSvFlags">256</int>
-											<string key="NSFrame">{{100, 135}, {205, 18}}</string>
+											<string key="NSFrame">{{100, 157}, {205, 18}}</string>
 											<reference key="NSSuperview" ref="159788047"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSButtonCell" key="NSCell" id="415355814">
 												<int key="NSCellFlags">67239424</int>
 												<int key="NSCellFlags2">0</int>
-												<string key="NSContents">最大下载于:</string>
-												<reference key="NSSupport" ref="393988310"/>
+												<string key="NSContents">下载最大:</string>
+												<reference key="NSSupport" ref="86725571"/>
 												<reference key="NSControlView" ref="959697936"/>
 												<int key="NSButtonFlags">1211912703</int>
 												<int key="NSButtonFlags2">2</int>
@@ -1202,7 +1218,7 @@
 										<object class="NSTextField" id="642835928">
 											<reference key="NSNextResponder" ref="159788047"/>
 											<int key="NSvFlags">256</int>
-											<string key="NSFrame">{{297, 108}, {35, 22}}</string>
+											<string key="NSFrame">{{297, 130}, {35, 22}}</string>
 											<reference key="NSSuperview" ref="159788047"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="440983450">
@@ -1265,14 +1281,14 @@
 										<object class="NSTextField" id="929631251">
 											<reference key="NSNextResponder" ref="159788047"/>
 											<int key="NSvFlags">256</int>
-											<string key="NSFrame">{{337, 110}, {101, 17}}</string>
+											<string key="NSFrame">{{337, 132}, {101, 17}}</string>
 											<reference key="NSSuperview" ref="159788047"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="153425121">
 												<int key="NSCellFlags">67239424</int>
 												<int key="NSCellFlags2">272629760</int>
 												<string key="NSContents">活动的传输</string>
-												<reference key="NSSupport" ref="393988310"/>
+												<reference key="NSSupport" ref="86725571"/>
 												<reference key="NSControlView" ref="929631251"/>
 												<reference key="NSBackgroundColor" ref="977951849"/>
 												<reference key="NSTextColor" ref="400627124"/>
@@ -1281,14 +1297,14 @@
 										<object class="NSButton" id="802622975">
 											<reference key="NSNextResponder" ref="159788047"/>
 											<int key="NSvFlags">256</int>
-											<string key="NSFrame">{{100, 109}, {191, 18}}</string>
+											<string key="NSFrame">{{100, 131}, {191, 18}}</string>
 											<reference key="NSSuperview" ref="159788047"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSButtonCell" key="NSCell" id="265029926">
 												<int key="NSCellFlags">67239424</int>
 												<int key="NSCellFlags2">0</int>
-												<string key="NSContents">最大做种于:</string>
-												<reference key="NSSupport" ref="393988310"/>
+												<string key="NSContents">做种最大:</string>
+												<reference key="NSSupport" ref="86725571"/>
 												<reference key="NSControlView" ref="802622975"/>
 												<int key="NSButtonFlags">1211912703</int>
 												<int key="NSButtonFlags2">2</int>
@@ -1303,7 +1319,7 @@
 										<object class="NSTextField" id="805721613">
 											<reference key="NSNextResponder" ref="159788047"/>
 											<int key="NSvFlags">256</int>
-											<string key="NSFrame">{{374, 82}, {41, 22}}</string>
+											<string key="NSFrame">{{374, 104}, {41, 22}}</string>
 											<reference key="NSSuperview" ref="159788047"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="997390601">
@@ -1365,14 +1381,14 @@
 										<object class="NSTextField" id="452040825">
 											<reference key="NSNextResponder" ref="159788047"/>
 											<int key="NSvFlags">256</int>
-											<string key="NSFrame">{{420, 84}, {55, 17}}</string>
+											<string key="NSFrame">{{420, 106}, {55, 17}}</string>
 											<reference key="NSSuperview" ref="159788047"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="416442895">
 												<int key="NSCellFlags">67239424</int>
 												<int key="NSCellFlags2">272629760</int>
 												<string key="NSContents">分钟</string>
-												<reference key="NSSupport" ref="393988310"/>
+												<reference key="NSSupport" ref="86725571"/>
 												<reference key="NSControlView" ref="452040825"/>
 												<reference key="NSBackgroundColor" ref="977951849"/>
 												<reference key="NSTextColor" ref="400627124"/>
@@ -1381,14 +1397,14 @@
 										<object class="NSButton" id="605552642">
 											<reference key="NSNextResponder" ref="159788047"/>
 											<int key="NSvFlags">256</int>
-											<string key="NSFrame">{{100, 83}, {268, 18}}</string>
+											<string key="NSFrame">{{100, 105}, {268, 18}}</string>
 											<reference key="NSSuperview" ref="159788047"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSButtonCell" key="NSCell" id="983632896">
 												<int key="NSCellFlags">67239424</int>
 												<int key="NSCellFlags2">0</int>
-												<string key="NSContents">传输将停止当没有活动任务:</string>
-												<reference key="NSSupport" ref="393988310"/>
+												<string key="NSContents">传输停止当没有活动:</string>
+												<reference key="NSSupport" ref="86725571"/>
 												<reference key="NSControlView" ref="605552642"/>
 												<int key="NSButtonFlags">1211912703</int>
 												<int key="NSButtonFlags2">2</int>
@@ -1403,14 +1419,14 @@
 										<object class="NSTextField" id="489294512">
 											<reference key="NSNextResponder" ref="159788047"/>
 											<int key="NSvFlags">256</int>
-											<string key="NSFrame">{{20, 44}, {77, 17}}</string>
+											<string key="NSFrame">{{20, 66}, {77, 17}}</string>
 											<reference key="NSSuperview" ref="159788047"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="146274476">
 												<int key="NSCellFlags">67239424</int>
 												<int key="NSCellFlags2">4194304</int>
-												<string key="NSContents"> 播放声音:</string>
-												<reference key="NSSupport" ref="393988310"/>
+												<string key="NSContents">播放声音：</string>
+												<reference key="NSSupport" ref="86725571"/>
 												<reference key="NSControlView" ref="489294512"/>
 												<reference key="NSBackgroundColor" ref="977951849"/>
 												<reference key="NSTextColor" ref="400627124"/>
@@ -1419,7 +1435,7 @@
 										<object class="NSPopUpButton" id="986412145">
 											<reference key="NSNextResponder" ref="159788047"/>
 											<int key="NSvFlags">256</int>
-											<string key="NSFrame">{{298, 38}, {130, 26}}</string>
+											<string key="NSFrame">{{298, 60}, {130, 26}}</string>
 											<reference key="NSSuperview" ref="159788047"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSPopUpButtonCell" key="NSCell" id="705215561">
@@ -1454,9 +1470,7 @@
 												</object>
 												<bool key="NSMenuItemRespectAlignment">YES</bool>
 												<object class="NSMenu" key="NSMenu" id="309989267">
-													<object class="NSMutableString" key="NSTitle">
-														<characters key="NS.bytes">OtherViews</characters>
-													</object>
+													<string key="NSTitle">其他视图</string>
 													<object class="NSMutableArray" key="NSMenuItems">
 														<bool key="EncodedWithXMLCoder">YES</bool>
 														<reference ref="117173661"/>
@@ -1471,14 +1485,14 @@
 										<object class="NSButton" id="144778876">
 											<reference key="NSNextResponder" ref="159788047"/>
 											<int key="NSvFlags">256</int>
-											<string key="NSFrame">{{100, 18}, {183, 18}}</string>
+											<string key="NSFrame">{{100, 40}, {183, 18}}</string>
 											<reference key="NSSuperview" ref="159788047"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSButtonCell" key="NSCell" id="665924860">
 												<int key="NSCellFlags">67239424</int>
 												<int key="NSCellFlags2">0</int>
 												<string key="NSContents">当做种完成:</string>
-												<reference key="NSSupport" ref="393988310"/>
+												<reference key="NSSupport" ref="86725571"/>
 												<reference key="NSControlView" ref="144778876"/>
 												<int key="NSButtonFlags">1211912703</int>
 												<int key="NSButtonFlags2">2</int>
@@ -1493,7 +1507,7 @@
 										<object class="NSPopUpButton" id="1042395974">
 											<reference key="NSNextResponder" ref="159788047"/>
 											<int key="NSvFlags">256</int>
-											<string key="NSFrame">{{298, 13}, {130, 26}}</string>
+											<string key="NSFrame">{{298, 35}, {130, 26}}</string>
 											<reference key="NSSuperview" ref="159788047"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSPopUpButtonCell" key="NSCell" id="301407755">
@@ -1524,9 +1538,7 @@
 												</object>
 												<bool key="NSMenuItemRespectAlignment">YES</bool>
 												<object class="NSMenu" key="NSMenu" id="1028946720">
-													<object class="NSMutableString" key="NSTitle">
-														<characters key="NS.bytes">OtherViews</characters>
-													</object>
+													<string key="NSTitle">其他视图</string>
 													<object class="NSMutableArray" key="NSMenuItems">
 														<bool key="EncodedWithXMLCoder">YES</bool>
 														<reference ref="418211706"/>
@@ -1541,14 +1553,14 @@
 										<object class="NSButton" id="630340288">
 											<reference key="NSNextResponder" ref="159788047"/>
 											<int key="NSvFlags">256</int>
-											<string key="NSFrame">{{100, 43}, {195, 18}}</string>
+											<string key="NSFrame">{{100, 65}, {195, 18}}</string>
 											<reference key="NSSuperview" ref="159788047"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSButtonCell" key="NSCell" id="1000733872">
 												<int key="NSCellFlags">67239424</int>
 												<int key="NSCellFlags2">0</int>
 												<string key="NSContents">当下载完成:</string>
-												<reference key="NSSupport" ref="393988310"/>
+												<reference key="NSSupport" ref="86725571"/>
 												<reference key="NSControlView" ref="630340288"/>
 												<int key="NSButtonFlags">1211912703</int>
 												<int key="NSButtonFlags2">2</int>
@@ -1561,7 +1573,7 @@
 											</object>
 										</object>
 									</object>
-									<string key="NSFrame">{{10, 33}, {496, 226}}</string>
+									<string key="NSFrame">{{10, 33}, {496, 248}}</string>
 								</object>
 								<string key="NSLabel">管理</string>
 								<reference key="NSColor" ref="977951849"/>
@@ -1579,14 +1591,12 @@
 						</object>
 					</object>
 				</object>
-				<string key="NSFrameSize">{542, 288}</string>
-				<reference key="NSSuperview"/>
-				<reference key="NSWindow"/>
+				<string key="NSFrameSize">{542, 307}</string>
 				<string key="NSClassName">NSView</string>
 				<string key="NSExtension">NSResponder</string>
 			</object>
 			<object class="NSCustomView" id="284666863">
-				<reference key="NSNextResponder"/>
+				<nil key="NSNextResponder"/>
 				<int key="NSvFlags">256</int>
 				<object class="NSMutableArray" key="NSSubviews">
 					<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1621,12 +1631,8 @@
 												<object class="NSTableHeaderCell" key="NSHeaderCell">
 													<int key="NSCellFlags">75628096</int>
 													<int key="NSCellFlags2">2048</int>
-													<string key="NSContents">Color</string>
-													<object class="NSFont" key="NSSupport" id="26">
-														<string key="NSName">LucidaGrande</string>
-														<double key="NSSize">11</double>
-														<int key="NSfFlags">3100</int>
-													</object>
+													<string key="NSContents">颜色</string>
+													<reference key="NSSupport" ref="26"/>
 													<object class="NSColor" key="NSBackgroundColor">
 														<int key="NSColorSpace">6</int>
 														<string key="NSCatalogName">System</string>
@@ -1651,45 +1657,203 @@
 															<object class="NSArray">
 																<bool key="EncodedWithXMLCoder">YES</bool>
 																<integer value="0"/>
-																<object class="NSCachedImageRep">
+																<object class="NSBitmapImageRep">
 																	<object class="NSData" key="NSTIFFRepresentation">
-																		<bytes key="NS.bytes">TU0AKgAABHSAACBQOCQWDQeEQmDAuBv6BveFRGJROKDkSg5GO12vhlNp3PpVRSRRQDQMEwMEQMJg4JhU
-cJkxjFILZetJssF3g9kOJvNlBwN1QeSwIHgGjBkFAwGBkEAgGBgGAoEhUIBEJiANB0PB4NhkMB0JBQK2
-MJg8IgUBvwFFAEM4AOV5goALl9i0AIQ9nAkv5/gBcQQQCEQoEnFAsGMTisSA8OhkNAgOBoNASzBMAA4G
-Sl8vt9gAIA0HwIBX16PV9ABztJUgANO9ZgB4uYGABlBQqgA0moznd5vB2oqCBAHhI5pNMpdElkplQB6V
-5gB+vt+AABAQBgAGgwHABzOZxgBnL5gAAbkolABwOFuAAPvlXgADvFobBvdNviU6AAwGs6KBxm8a4woI
-AUCB4PZBkIWA7DgNwJnieR5AABICpKAwEpSA4DAOAB5nMc7wFmWAAM2gQIhcCIABYCLxn6d0Pnwb8InE
-Dg4AANxEEwZJlGCXgjIHCKBBAMQ0jcXZIEUQ4SAAfzpgOpIAOugR5nsfAAFSUhTAAEwQg/JZwnEAAMg6
-bAAA8DRygAfR2nhEZynWAB0gYLgAESXJvHUVBNkkHCBm+gYIiYKYpluT5MkyG5+UTOB2HdJZ8tOchwmi
-t5xmo2B8gqAAIgOeoAC0IJ4gAd5uzIeh2L6CgIwijYeAAURtgmfxDkCPAiIGX6BgGHAfiCV5TlEUgmgF
-KJhl0WLPLkAADH6aUJAKCgAHoe7ZgmCDnhaFjnmAVr1n8AjLBwFU0HMcIJAAZACCgAA1t0OZ9HyepHII
-FAXhgTZWFOVYyBAEQPAAYxfFyAAEH675+ngYYAH4B4pAAfGHgAHwXnM6h8HCABbL/hR9OeJQfTedhnIg
-bIPDcAAxDiOpPHUcRvjGggNg6D5CFGUpUD2HgcBmABsm9ihymqTYAAeAq5BCHY3gAdhuluAASg6cE4Gg
-bs0g0M4AHGZRVxSChlRGcB2gAbwQjk3BBk2YpqmaYQjoIpQJDQTJPk+S4rigJmxPSABgFmSoABAFAfgA
-DgQhLoYAmKAAJgUdAAGqYx8s8HGknca1cA+emhH4dh0tQCM5kCVxpHQWRVlGIKCAGAYECWRZIEmWY2DQ
-MAAm+bxvAAnkwBWGQYgAb5rmEAAahTih9HZihwGuiAIArFB+nicgAAKdxtzScB2L8bAEn+TZygieZmmG
-Xe8IMGI3jsQRikUQY8ASzq+nseaIGx+oAA6AZkgACoJzfhw/Ulj6HodAeiER+DzgGP0eRnYFJsFULkcQ
-+Q7C1HKF0zg+2BEGBKE0KwXhig2BgC4CQ4BvjiHaNgbZHgYgpK+IkOQNCGD/U6P0fJ001HPHUOZNg5hy
-juH27YdI8RvDiHGOcZ43R3jOFwNgd4cyBthIMA0A4CAFhEHyPgezkQAD/TAQIBwbguBIEkCoDABQHjNG
-qNoc5PB3jpHKO8ew4B0DwHoNceJpxvmdaUQNRpAn/JpIiAEgZfSFEpIECcgcegAONSkQM6ZApCEjIMQE
-AA8BAAADAAAAAQASAAABAQADAAAAAQASAAABAgADAAAABAAABS4BAwADAAAAAQAFAAABBgADAAAAAQAC
-AAABEQAEAAAAAQAAAAgBEgADAAAAAQABAAABFQADAAAAAQAEAAABFgADAAAAAQASAAABFwAEAAAAAQAA
-BGwBHAADAAAAAQABAAABPQADAAAAAQACAAABUgADAAAAAQABAAABUwADAAAABAAABTaHcwAHAAACKAAA
-BT4AAAAAAAgACAAIAAgAAQABAAEAAQAAAihBREJFAhAAAG1udHJSR0IgWFlaIAfQAAgACwATADQAGGFj
-c3BBUFBMAAAAAG5vbmUAAAAAAAAAAAAAAAAAAAAAAAD21gABAAAAANMtQURCRQAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACmNwcnQAAAD8AAAAMmRlc2MAAAEwAAAAZHd0
-cHQAAAGUAAAAFGJrcHQAAAGoAAAAFHJUUkMAAAG8AAAADmdUUkMAAAHMAAAADmJUUkMAAAHcAAAADnJY
-WVoAAAHsAAAAFGdYWVoAAAIAAAAAFGJYWVoAAAIUAAAAFHRleHQAAAAAQ29weXJpZ2h0IDIwMDAgQWRv
-YmUgU3lzdGVtcyBJbmNvcnBvcmF0ZWQAAABkZXNjAAAAAAAAAApBcHBsZSBSR0IAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAWFlaIAAAAAAAAPNRAAEAAAABFsxYWVogAAAAAAAAAAAAAAAAAAAAAGN1cnYAAAAAAAAAAQHN
-AABjdXJ2AAAAAAAAAAEBzQAAY3VydgAAAAAAAAABAc0AAFhZWiAAAAAAAAB5vQAAQVIAAAS5WFlaIAAA
-AAAAAFb4AACsLwAAHQNYWVogAAAAAAAAJiIAABJ/AACxcA</bytes>
+																		<bytes key="NS.bytes">TU0AKgAABGyAACBQOCQWDQeEQmDAuBv6BveFRGJROKEQYBdGOl0vRlNNzvVVRSRRQDQMEwMEQMJhMNBw
+cKI4EFILhcslsrt0gxkNhqM5BwN1QeSwIHgEBAIMg8IBAMgoFA4MA4GAsKhMKBYQBwPh8PB0NBoOhMLB
+YK1UIBECgN+goiglrAB1PQDgBgvoTgA4mkvkl/P8ALiCCkVCtAlcsF4xiUUiMHhoLhcEBgLBcCA0HA8A
+AsFXN9Px+AAGgoGQIBX57vd93BtrkABV5r0APV0SlpBAlAAwGEwHd2upzIqCWQMnNOKFPoklkYigN7Pd
+7AB/Px+gAAgMBZkFQx1ut0gBrMhlAAXD4fAByudxgAMPzYAZ6W96uF8eYPmYAF40nJQNlpswwoIo4BB4
+RpJkoWAzDEMAJnoep6gABACAKAACAOkoDAKkp7HWdgAGuXxeAAfR9r8BoVAiAARggZjoHi7p9HGeAAHQ
+CwxAAOZFkwZJdliVojIGeSBhAOY8j8XZBD4PISAAf7pgKBCTgGgZ6nwfQAFuWRaAAEIOg3JZynMAAJg2
+cAAMedYAH4eB4gAfZ0KCdwEiiABJF4bh1EsRJAhwgZvoGCItjEMRbkoRxHBuftEAAdp3zWf0RRkcxsRk
+c5sgAeZ8gkAAHgOiAlB0+Z5nEbQAHudzpqW554nwGgAFcboHH8Og3DMIiBl+gYBiMJonleT5NE2JqjoE
+ZhitgBwEgDCZ/0lCFMuaBQAAgB7nhGEz5maXFKn8AdMhcE0OHYcgGgAaABCKAAui4Lg5nwe54kcggaB2
+HhNlQUZTDIDQNgxchlGMAADH8dAAH6ebwn8BgjgAfOGAAGQUnc6h9HKABiGBKp+n0egAB4HONnkakgG+
+DD/i6No4k8cRsGqMaCBIEwUEIUxTlSPYYhcFQAHCckznObpVtAAqTg6F4uAAdxymKAAOgzgZ3GxPp+go
+KwAHOaRbgAEgJmnNhyQ4cgNjKAA1kGTJimQX5aYVPwIgwNBRlQUxLiSIYfgAchzHOABkl8UgAA4Ec9gw
+rQAAUARo00BJ2gAb5nOeBwXaMeJumW9R8FTgh3KCdgHCkABFFgaB0FATJIiCggCgIBYlk2UBQFmLYsCi
+AJynIcmqnJvQSBSFO7m+ZoABUEeIn2eDu59BwGgkCDoHnvQCHib00HGoJhmwAh/k2cIGnmXhZFSJiDhi
+QREEmYo8DkNAEs+vx8HsfPGG/PrKGpaIIRjELpn+fcHH8ew82CINealUfw9EYi2F2NofIZhQjTC6PofQ
++TWEGBKF8NAcBig2BgC0CQ4RvjiHaNYbI2R3AzBaBwDodgzg2IYP8iCjjPppY25pGI6hzjtH2OIcA5x4
+vyG8OcZo1x0jOFYMwcgcy/KKIOaEBYDwiD2HqPJ+CSxxEDAcHwNgWRJAnAyAgB40RqDXHOOEbZGhxDqH
+kOBng7xrjsHuP4b8U0OECYiQJM5AkqkKWSQKJJCSUkCLuQI1JAmBkCgAQIz8fCRkIICAAAAPAQAAAwAA
+AAEAEgAAAQEAAwAAAAEAEgAAAQIAAwAAAAQAAAUmAQMAAwAAAAEABQAAAQYAAwAAAAEAAgAAAREABAAA
+AAEAAAAIARIAAwAAAAEAAQAAARUAAwAAAAEABAAAARYAAwAAAAEAEgAAARcABAAAAAEAAARjARwAAwAA
+AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAQAAAUuh3MABwAAKEAAAAU2AAAAAAAI
+AAgACAAIAAEAAQABAAEAAChAYXBwbAIAAABtbnRyUkdCIFhZWiAH2gABAAIAEwAbABhhY3NwQVBQTAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA9tYAAQAAAADTLWFwcGwzSsO1++tFIQuntnmTFpMdAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABFyWFlaAAABUAAAABRnWFlaAAABZAAAABRiWFlaAAABeAAA
+ABR3dHB0AAABjAAAABRjaGFkAAABoAAAACxyVFJDAAABzAAACAxnVFJDAAAJ2AAACAxiVFJDAAAR5AAA
+CAxhYXJnAAAZ8AAAACBhYWdnAAAaEAAAACBhYWJnAAAaMAAAACB2Y2d0AAAaUAAABhJuZGluAAAgZAAA
+Bj5kZXNjAAAmpAAAAF9kc2NtAAAnBAAAAPBtbW9kAAAn9AAAAChjcHJ0AAAoHAAAACRYWVogAAAAAAAA
+db8AAD6WAAACLlhZWiAAAAAAAABbeAAAqwIAABOQWFlaIAAAAAAAACWfAAAWZwAAvW5YWVogAAAAAAAA
+81IAAQAAAAEWz3NmMzIAAAAAAAEMQgAABd7///MmAAAHkgAA/ZH///ui///9owAAA9wAAMBsY3VydgAA
+AAAAAAQAAAAABQAKAA8AFAAZAB4AIwAoAC0AMgA3ADsAQABFAEoATwBUAFkAXgBjAGgAbQByAHcAfACB
+AIYAiwCQAJUAmgCfAKQAqQCuALIAtwC8AMEAxgDLANAA1QDaAOAA5QDqAPAA9QD7AQEBBwEMARIBGAEe
+ASUBKwExATgBPgFFAUsBUgFZAWABZgFtAXUBfAGDAYoBkgGZAaEBqAGwAbgBwAHIAdAB2AHgAekB8QH6
+AgICCwIUAhwCJQIuAjcCQAJKAlMCXAJmAnACeQKDAo0ClwKhAqsCtQK/AsoC1ALfAuoC9AL/AwoDFQMg
+AysDNwNCA00DWQNlA3ADfAOIA5QDoAOsA7kDxQPSA94D6wP4BAQEEQQeBCwEOQRGBFQEYQRvBHwEigSY
+BKYEtATCBNEE3wTuBPwFCwUaBSgFNwVHBVYFZQV0BYQFkwWjBbMFwwXTBeMF8wYDBhQGJAY1BkUGVgZn
+BngGiQaaBqsGvQbOBuAG8gcDBxUHJwc5B0wHXgdwB4MHlgeoB7sHzgfhB/QICAgbCC8IQghWCGoIfgiS
+CKYIugjOCOMI9wkMCSEJNglLCWAJdQmKCaAJtQnLCeAJ9goMCiIKOQpPCmUKfAqSCqkKwArXCu4LBQsd
+CzQLSwtjC3sLkwurC8ML2wvzDAwMJAw9DFYMbgyHDKEMugzTDO0NBg0gDToNVA1uDYgNog28DdcN8Q4M
+DicOQg5dDngOkw6vDsoO5g8CDx4POg9WD3IPjg+rD8gP5BABEB4QOxBYEHYQkxCxEM4Q7BEKESgRRhFk
+EYMRoRHAEd8R/hIdEjwSWxJ6EpoSuRLZEvkTGRM5E1kTehOaE7sT2xP8FB0UPhRfFIEUohTEFOUVBxUp
+FUsVbRWQFbIV1RX3FhoWPRZgFoMWpxbKFu4XEhc1F1kXfReiF8YX6hgPGDQYWRh9GKMYyBjtGRMZOBle
+GYQZqhnQGfYaHRpDGmoakBq3Gt4bBhstG1QbfBujG8sb8xwbHEMcbByUHL0c5h0OHTcdYB2KHbMd3R4G
+HjAeWh6EHq4e2B8DHy0fWB+DH64f2SAEIDAgWyCHILMg3iEKITchYyGPIbwh6SIVIkIicCKdIsoi+CMl
+I1MjgSOvI90kDCQ6JGkklyTGJPUlJCVUJYMlsyXiJhImQiZyJqMm0ycDJzQnZSeWJ8cn+CgqKFsojSi+
+KPApIilVKYcpuSnsKh8qUiqFKrgq6yseK1Irhiu6K+4sIixWLIosvyz0LSktXi2TLcgt/S4zLmkuni7U
+LwsvQS93L64v5DAbMFIwiTDBMPgxMDFnMZ8x1zIPMkgygDK4MvEzKjNjM5wz1TQPNEg0gjS8NPY1MDVq
+NaU13zYaNlU2kDbLNwY3Qjd+N7k39TgxOG04qjjmOSM5YDmdOdo6FzpUOpI6zzsNO0s7iTvHPAY8RDyD
+PMI9AT1APX89vz3+Pj4+fj6+Pv4/Pz9/P8BAAEBBQIJAxEEFQUdBiEHKQgxCTkKRQtNDFkNYQ5tD3kQh
+RGVEqETsRTBFdEW4RfxGQEaFRspHDkdTR5lH3kgjSGlIr0j1STtJgUnHSg5KVUqbSuJLKktxS7hMAExI
+TJBM2E0gTWhNsU36TkJOjE7VTx5PZ0+xT/tQRVCPUNlRJFFuUblSBFJPUppS5VMxU3xTyFQUVGBUrVT5
+VUZVklXfVixWelbHVxRXYlewV/5YTFiaWOlZOFmGWdVaJFp0WsNbE1tjW7JcA1xTXKNc9F1EXZVd5l43
+Xole2l8sX35f0GAiYHRgx2EZYWxhv2ISYmViuWMMY2BjtGQIZFxksWUFZVplr2YEZllmr2cEZ1pnsGgG
+aFxosmkJaV9ptmoNamRqvGsTa2trw2wbbHNsy20jbXxt1W4ubodu4G86b5Nv7XBHcKFw+3FWcbByC3Jm
+csFzHHN4c9N0L3SLdOd1Q3Wgdfx2WXa2dxN3cHfOeCt4iXjneUV5o3oCemB6v3see3173Hw8fJt8+31b
+fbt+G358ftx/PX+ef/+AYIDCgSOBhYHngkmCq4MOg3CD04Q2hJmE/IVghcOGJ4aLhu+HVIe4iB2IgYjm
+iUyJsYoWinyK4otIi66MFIx7jOKNSI2vjheOfo7lj02PtZAdkIWQ7pFWkb+SKJKRkvqTZJPNlDeUoZUL
+lXWV4JZKlrWXIJeLl/eYYpjOmTqZppoSmn6a65tXm8ScMZyfnQydeZ3nnlWew58xn6CgD6B9oOyhW6HL
+ojqiqqMao4qj+qRqpNulTKW8pi6mn6cQp4Kn9KhlqNipSqm8qi+qoqsVq4ir+6xvrOOtVq3Lrj+us68o
+r52wEbCHsPyxcbHnsl2y07NJs7+0NrSttSS1m7YStom3Abd5t/G4abjhuVq50rpLusS7Pru3vDC8qr0k
+vZ6+Gb6Tvw6/icAEwH/A+sF2wfHCbcLpw2bD4sRfxNzFWcXWxlPG0cdOx8zISsjJyUfJxspFysTLQ8vC
+zELMwc1BzcHOQs7Cz0PPw9BE0MbRR9HI0krSzNNO09DUU9TW1VjV29Ze1uLXZdfp2G3Y8dl12fraf9sD
+24jcDtyT3Rndnt4k3qrfMd+34D7gxeFM4dPiWuLi42rj8uR65QLli+YT5pznJeev6DjowulM6dbqYOrq
+63Xr/+yK7Rbtoe4s7rjvRO/Q8Fzw6fF18gLyj/Mc86r0N/TF9VP14fZv9v73jPgb+Kr5OfnJ+ln66Pt4
+/Aj8mf0p/br+S/7c/25jdXJ2AAAAAAAABAAAAAAFAAoADwAUABkAHgAjACgALQAyADcAOwBAAEUASgBP
+AFQAWQBeAGMAaABtAHIAdwB8AIEAhgCLAJAAlQCaAJ8ApACpAK4AsgC3ALwAwQDGAMsA0ADVANoA4ADl
+AOoA8AD1APsBAQEHAQwBEgEYAR4BJQErATEBOAE+AUUBSwFSAVkBYAFmAW0BdQF8AYMBigGSAZkBoQGo
+AbABuAHAAcgB0AHYAeAB6QHxAfoCAgILAhQCHAIlAi4CNwJAAkoCUwJcAmYCcAJ5AoMCjQKXAqECqwK1
+Ar8CygLUAt8C6gL0Av8DCgMVAyADKwM3A0IDTQNZA2UDcAN8A4gDlAOgA6wDuQPFA9ID3gPrA/gEBAQR
+BB4ELAQ5BEYEVARhBG8EfASKBJgEpgS0BMIE0QTfBO4E/AULBRoFKAU3BUcFVgVlBXQFhAWTBaMFswXD
+BdMF4wXzBgMGFAYkBjUGRQZWBmcGeAaJBpoGqwa9Bs4G4AbyBwMHFQcnBzkHTAdeB3AHgweWB6gHuwfO
+B+EH9AgICBsILwhCCFYIagh+CJIIpgi6CM4I4wj3CQwJIQk2CUsJYAl1CYoJoAm1CcsJ4An2CgwKIgo5
+Ck8KZQp8CpIKqQrACtcK7gsFCx0LNAtLC2MLewuTC6sLwwvbC/MMDAwkDD0MVgxuDIcMoQy6DNMM7Q0G
+DSANOg1UDW4NiA2iDbwN1w3xDgwOJw5CDl0OeA6TDq8Oyg7mDwIPHg86D1YPcg+OD6sPyA/kEAEQHhA7
+EFgQdhCTELEQzhDsEQoRKBFGEWQRgxGhEcAR3xH+Eh0SPBJbEnoSmhK5EtkS+RMZEzkTWRN6E5oTuxPb
+E/wUHRQ+FF8UgRSiFMQU5RUHFSkVSxVtFZAVshXVFfcWGhY9FmAWgxanFsoW7hcSFzUXWRd9F6IXxhfq
+GA8YNBhZGH0YoxjIGO0ZExk4GV4ZhBmqGdAZ9hodGkMaahqQGrca3hsGGy0bVBt8G6MbyxvzHBscQxxs
+HJQcvRzmHQ4dNx1gHYodsx3dHgYeMB5aHoQerh7YHwMfLR9YH4Mfrh/ZIAQgMCBbIIcgsyDeIQohNyFj
+IY8hvCHpIhUiQiJwIp0iyiL4IyUjUyOBI68j3SQMJDokaSSXJMYk9SUkJVQlgyWzJeImEiZCJnImoybT
+JwMnNCdlJ5Ynxyf4KCooWyiNKL4o8CkiKVUphym5KewqHypSKoUquCrrKx4rUiuGK7or7iwiLFYsiiy/
+LPQtKS1eLZMtyC39LjMuaS6eLtQvCy9BL3cvri/kMBswUjCJMMEw+DEwMWcxnzHXMg8ySDKAMrgy8TMq
+M2MznDPVNA80SDSCNLw09jUwNWo1pTXfNho2VTaQNss3BjdCN343uTf1ODE4bTiqOOY5IzlgOZ052joX
+OlQ6kjrPOw07SzuJO8c8BjxEPIM8wj0BPUA9fz2/Pf4+Pj5+Pr4+/j8/P38/wEAAQEFAgkDEQQVBR0GI
+QcpCDEJOQpFC00MWQ1hDm0PeRCFEZUSoROxFMEV0RbhF/EZARoVGykcOR1NHmUfeSCNIaUivSPVJO0mB
+ScdKDkpVSptK4ksqS3FLuEwATEhMkEzYTSBNaE2xTfpOQk6MTtVPHk9nT7FP+1BFUI9Q2VEkUW5RuVIE
+Uk9SmlLlUzFTfFPIVBRUYFStVPlVRlWSVd9WLFZ6VsdXFFdiV7BX/lhMWJpY6Vk4WYZZ1VokWnRaw1sT
+W2NbslwDXFNco1z0XURdlV3mXjdeiV7aXyxffl/QYCJgdGDHYRlhbGG/YhJiZWK5YwxjYGO0ZAhkXGSx
+ZQVlWmWvZgRmWWavZwRnWmewaAZoXGiyaQlpX2m2ag1qZGq8axNra2vDbBtsc2zLbSNtfG3Vbi5uh27g
+bzpvk2/tcEdwoXD7cVZxsHILcmZywXMcc3hz03QvdIt053VDdaB1/HZZdrZ3E3dwd854K3iJeOd5RXmj
+egJ6YHq/ex57fXvcfDx8m3z7fVt9u34bfnx+3H89f55//4BggMKBI4GFgeeCSYKrgw6DcIPThDaEmYT8
+hWCFw4YnhouG74dUh7iIHYiBiOaJTImxihaKfIrii0iLrowUjHuM4o1Ija+OF45+juWPTY+1kB2QhZDu
+kVaRv5IokpGS+pNkk82UN5ShlQuVdZXglkqWtZcgl4uX95himM6ZOpmmmhKafprrm1ebxJwxnJ+dDJ15
+neeeVZ7DnzGfoKAPoH2g7KFbocuiOqKqoxqjiqP6pGqk26VMpbymLqafpxCngqf0qGWo2KlKqbyqL6qi
+qxWriKv7rG+s461WrcuuP66zryivnbARsIew/LFxseeyXbLTs0mzv7Q2tK21JLWbthK2ibcBt3m38bhp
+uOG5WrnSuku6xLs+u7e8MLyqvSS9nr4ZvpO/Dr+JwATAf8D6wXbB8cJtwunDZsPixF/E3MVZxdbGU8bR
+x07HzMhKyMnJR8nGykXKxMtDy8LMQszBzUHNwc5CzsLPQ8/D0ETQxtFH0cjSStLM007T0NRT1NbVWNXb
+1l7W4tdl1+nYbdjx2XXZ+tp/2wPbiNwO3JPdGd2e3iTeqt8x37fgPuDF4Uzh0+Ja4uLjauPy5HrlAuWL
+5hPmnOcl56/oOOjC6Uzp1upg6urrdev/7IrtFu2h7izuuO9E79DwXPDp8XXyAvKP8xzzqvQ39MX1U/Xh
+9m/2/veM+Bv4qvk5+cn6Wfro+3j8CPyZ/Sn9uv5L/tz/bmN1cnYAAAAAAAAEAAAAAAUACgAPABQAGQAe
+ACMAKAAtADIANwA7AEAARQBKAE8AVABZAF4AYwBoAG0AcgB3AHwAgQCGAIsAkACVAJoAnwCkAKkArgCy
+ALcAvADBAMYAywDQANUA2gDgAOUA6gDwAPUA+wEBAQcBDAESARgBHgElASsBMQE4AT4BRQFLAVIBWQFg
+AWYBbQF1AXwBgwGKAZIBmQGhAagBsAG4AcAByAHQAdgB4AHpAfEB+gICAgsCFAIcAiUCLgI3AkACSgJT
+AlwCZgJwAnkCgwKNApcCoQKrArUCvwLKAtQC3wLqAvQC/wMKAxUDIAMrAzcDQgNNA1kDZQNwA3wDiAOU
+A6ADrAO5A8UD0gPeA+sD+AQEBBEEHgQsBDkERgRUBGEEbwR8BIoEmASmBLQEwgTRBN8E7gT8BQsFGgUo
+BTcFRwVWBWUFdAWEBZMFowWzBcMF0wXjBfMGAwYUBiQGNQZFBlYGZwZ4BokGmgarBr0GzgbgBvIHAwcV
+BycHOQdMB14HcAeDB5YHqAe7B84H4Qf0CAgIGwgvCEIIVghqCH4IkgimCLoIzgjjCPcJDAkhCTYJSwlg
+CXUJigmgCbUJywngCfYKDAoiCjkKTwplCnwKkgqpCsAK1wruCwULHQs0C0sLYwt7C5MLqwvDC9sL8wwM
+DCQMPQxWDG4MhwyhDLoM0wztDQYNIA06DVQNbg2IDaINvA3XDfEODA4nDkIOXQ54DpMOrw7KDuYPAg8e
+DzoPVg9yD44Pqw/ID+QQARAeEDsQWBB2EJMQsRDOEOwRChEoEUYRZBGDEaERwBHfEf4SHRI8ElsSehKa
+ErkS2RL5ExkTORNZE3oTmhO7E9sT/BQdFD4UXxSBFKIUxBTlFQcVKRVLFW0VkBWyFdUV9xYaFj0WYBaD
+FqcWyhbuFxIXNRdZF30XohfGF+oYDxg0GFkYfRijGMgY7RkTGTgZXhmEGaoZ0Bn2Gh0aQxpqGpAatxre
+GwYbLRtUG3wboxvLG/McGxxDHGwclBy9HOYdDh03HWAdih2zHd0eBh4wHloehB6uHtgfAx8tH1gfgx+u
+H9kgBCAwIFsghyCzIN4hCiE3IWMhjyG8IekiFSJCInAinSLKIvgjJSNTI4EjryPdJAwkOiRpJJckxiT1
+JSQlVCWDJbMl4iYSJkImciajJtMnAyc0J2UnlifHJ/goKihbKI0ovijwKSIpVSmHKbkp7CofKlIqhSq4
+KusrHitSK4YruivuLCIsViyKLL8s9C0pLV4tky3ILf0uMy5pLp4u1C8LL0Evdy+uL+QwGzBSMIkwwTD4
+MTAxZzGfMdcyDzJIMoAyuDLxMyozYzOcM9U0DzRINII0vDT2NTA1ajWlNd82GjZVNpA2yzcGN0I3fje5
+N/U4MThtOKo45jkjOWA5nTnaOhc6VDqSOs87DTtLO4k7xzwGPEQ8gzzCPQE9QD1/Pb89/j4+Pn4+vj7+
+Pz8/fz/AQABAQUCCQMRBBUFHQYhBykIMQk5CkULTQxZDWEObQ95EIURlRKhE7EUwRXRFuEX8RkBGhUbK
+Rw5HU0eZR95II0hpSK9I9Uk7SYFJx0oOSlVKm0riSypLcUu4TABMSEyQTNhNIE1oTbFN+k5CToxO1U8e
+T2dPsU/7UEVQj1DZUSRRblG5UgRST1KaUuVTMVN8U8hUFFRgVK1U+VVGVZJV31YsVnpWx1cUV2JXsFf+
+WExYmljpWThZhlnVWiRadFrDWxNbY1uyXANcU1yjXPRdRF2VXeZeN16JXtpfLF9+X9BgImB0YMdhGWFs
+Yb9iEmJlYrljDGNgY7RkCGRcZLFlBWVaZa9mBGZZZq9nBGdaZ7BoBmhcaLJpCWlfabZqDWpkarxrE2tr
+a8NsG2xzbMttI218bdVuLm6HbuBvOm+Tb+1wR3ChcPtxVnGwcgtyZnLBcxxzeHPTdC90i3TndUN1oHX8
+dll2tncTd3B3zngreIl453lFeaN6Anpger97Hnt9e9x8PHybfPt9W327fht+fH7cfz1/nn//gGCAwoEj
+gYWB54JJgquDDoNwg9OENoSZhPyFYIXDhieGi4bvh1SHuIgdiIGI5olMibGKFop8iuKLSIuujBSMe4zi
+jUiNr44Xjn6O5Y9Nj7WQHZCFkO6RVpG/kiiSkZL6k2STzZQ3lKGVC5V1leCWSpa1lyCXi5f3mGKYzpk6
+maaaEpp+muubV5vEnDGcn50MnXmd555VnsOfMZ+goA+gfaDsoVuhy6I6oqqjGqOKo/qkaqTbpUylvKYu
+pp+nEKeCp/SoZajYqUqpvKovqqKrFauIq/usb6zjrVaty64/rrOvKK+dsBGwh7D8sXGx57JdstOzSbO/
+tDa0rbUktZu2EraJtwG3ebfxuGm44blaudK6S7rEuz67t7wwvKq9JL2evhm+k78Ov4nABMB/wPrBdsHx
+wm3C6cNmw+LEX8TcxVnF1sZTxtHHTsfMyErIyclHycbKRcrEy0PLwsxCzMHNQc3BzkLOws9Dz8PQRNDG
+0UfRyNJK0szTTtPQ1FPU1tVY1dvWXtbi12XX6dht2PHZddn62n/bA9uI3A7ck90Z3Z7eJN6q3zHft+A+
+4MXhTOHT4lri4uNq4/LkeuUC5YvmE+ac5yXnr+g46MLpTOnW6mDq6ut16//siu0W7aHuLO6470Tv0PBc
+8OnxdfIC8o/zHPOq9Df0xfVT9eH2b/b+94z4G/iq+Tn5yfpZ+uj7ePwI/Jn9Kf26/kv+3P9ucGFyYQAA
+AAAAAwAAAAJmZgAA8qcAAA1ZAAAT0AAACwNwYXJhAAAAAAADAAAAAmZmAADypwAADVkAABPQAAALA3Bh
+cmEAAAAAAAMAAAACZmYAAPKnAAANWQAAE9AAAAsDdmNndAAAAAAAAAAAAAMBAAACAAAAAwANACAAPABi
+AJMAzgESAVoBrQIKAnkC8gOEBCYE2gWoBogHfQiMCasK1gwRDVsOqxAMEWwSzBQzFZMW+hhfGcgbNRyj
+HhcfjSEKIo8kDSWQJxIolioZK5wtGC6VMAwxgDLrNE01rDcGOFg5pDrsPC09Wz52P4hAmkGnQrVDwUTL
+RdJG1EfXSNhJ1ErNS8RMuE2pTptPjVB8UWtSVVNGVDFVK1YpVyRYIFkbWhVbDFwDXPld7l7iX9ZgyWG9
+YrJjpmScZZZmjWeFaIFpd2pYazVsE2zybdVuum+gcIhxc3Jjc1d0THVEdkJ3QXhEeUt6VXtgfGp9c352
+f3eAe4GBgpCDnYSwhcWG3Yf1iQuKIYs6jE+NY451j4OQkZGakqaTy5TxlhiXPZhgmX6ampu1nMud4J7z
+oAShEqIdoyqkNKU8pkanUahrqYqqqavIrOKt+68QsCGxMbI/s0u0VrVftmi3crh7uYa6kbubvJS9f75o
+v1HAO8Emwg/C/MPqxNjFysa9x7LIpsmhyprLl8yWzY3Odc9X0DzRI9IN0vfT4tTP1b3WqdeU2H3ZY9pI
+2yzcDNzp3cTerd+W4H/haOJO4zDkEOTw5cvmo+d46EzpHunv6sDrj+xd7TXuJO8b8BPxDPIJ8wf0B/UN
+9hf3J/g8+Vn6e/uk/NX+CP8r//8AAAACAAoAGQAwAE4AdACjANoBGgFgAa8CCAJ3AvEDhQQpBN4FsgaZ
+B5oIrgnVCxAMUw2qDwEQWRG5ExEUbhXGFxoYdhnSGzYcox4WH4khASJ+JAIliicXKKAqKCuxLTUuujA0
+MaYzGDR6NdU3LTh2Obg69DwbPSk+NT8/QEdBUUJYQ11EZUVqRnJHeUh/SYNKh0uJTIlNi06NT5BQk1GW
+UpdTkVSAVW9WXldPWEBZNVorWyFcGV0TXg9fDWAOYRJiFWMaZCNlLWY3Z0JoUWlVaj9rKGwQbPht4G7J
+b7FwlXF+cmZzTXQ3dSB2Cnb2d+J40nnEerV7pXyWfYR+cX9igFeBVYJUg1iEYYVthnqHiIiWiaiKuYvG
+jNWN347nj++Q+5IZkzyUYJWClqKXvZjWmeya/5wPnR6eK58zoDqhQKJFo0ekS6VOpmGneqiSqayqwKvV
+rOWt9K8BsA2xGbIksy20NrVBtku3V7hkuW66abtXvEO9Lr4Zvwa/8cDfwc/Cv8OxxKbFm8aRx4vIhcmC
+yoLLesxlzU3ON88m0BjRC9IB0vrT9NTv1erW49fa2NHZxNq326Tckt2N3o3fi+CI4YPieuNv5GLlUuY+
+5ynoEej36dzqweuj7IXtd+6B75rwsfHJ8uPz+fUN9h/3MPg++Uj6UvtY/F79Y/5l/0j//wAAAAMADQAf
+ADoAXwCOAMcBCgFOAZwB9AJeAtQDXQP5BKYFaQZDBzMIMglECmgLkQzQDhYPXRC0EgkTWxSxFgoXXhi9
+GhgbeRzbHkQftiEnIpskCiV9JvUoainfK04suS4jL4cw5TI6M4803DYiN2I4nznSOvs8CD0VPh0/IkAq
+QS5CLkMvRClFJEYdRxFIA0jySd9Ky0u2TKFNiU5yT1dQQFEmUhZTC1P9VO9V4lbTV8FYrlmcWodbc1xd
+XUdeMV8bYAZg8mHgYs5jvWSuZZlmb2c/aA9o32mwaoNrVmwpbP1t026qb4NwXHE6chdy9nPZdL51onaG
+d2V4NnkEedN6pXt8fFF9KX4EfuB/vICYgXCCTIMkg/yE0oWmhneHR4gbiPaJ2Yq7i5yMfo1djjyPG4/5
+kNiRtpKXk3SUUpUylhKW8ZfRmLaZppqem5eckJ2Gnn2fcaBloVmiTKNApDWlKqYgpxeoEKkLqgerAKvt
+rM+tra6Nr22wTbEushKy97PdtMa1sraft424f7lxume7X7xQvTW+Fr75v+LAzMG4wqXDlsSIxXnGasdZ
+yEfJM8odywXL6szOzc3O0M/a0N3R49Ll0+bU6dXp1ufX49jh2dva1tvR3MrdxN7J3/rhNuJu46jk6OYu
+533o3upT6+PtlO9w8YPz0fZ/+aT9Yf//AABuZGluAAAAAAAABjYAAKNuAABYEAAATb8AAJyLAAAlWQAA
+FB8AAFANAABUOQACTMwAAj1wAAHhRwADAQAAAgAAAB4AQABgAH0AmQCzAM0A5gD+ARcBMAFJAWIBfAGW
+AbABywHnAgQCIQJAAl8CfwKgAsIC5AMHAysDTwN0A5oDvwPmBAwENARdBIYEsATbBQYFMwVgBY4FvQXu
+Bh8GUgaGBrsG8gcrB2YHowffCCAIYgimCOwJNAl/Cc8KJgqCCt8LQQujDAgMcAzaDUgNug4sDqMPHg+c
+EB4QpBEtEbcSRhLXE24UAxSeFTEVxRZdFvcXkxgzGNcZfRomGtMbghw0HOkdnh5XHxIfyyCJIUgiByLL
+I6YkiCVsJlAnMygYKP0p4irFK6csii1sLksvLDAMMOoxyDKoM4s0cTVeNlA3QTgyOR46DTr6O+c80z3B
+PrE/pkCbQY9Ci0OJRIpFkkacR6xIvkm5SrVLsUywTbJOuU/FUNVR6FMBVB1VP1ZiV4tYu1ntWx9cWV2W
+XtFgEGE3YmNjkGS/ZfZnL2huabRq/2xMbaBu9nBRcbFzEnR1ddt3QHinehN7n31EfuqAl4I/g/GFn4dN
+iP2Kq4xXjgSPtZFckwuUs5ZamBiZ+5vkncafpqGIo2ulS6cvqRirB60Arv+xB7MXtTe3Xblku2+9gL+U
+wbfD5sYZyFvKqs0Gz2vR2dRL1srZStt/3Zzfu+Hc4/bmEegq6jvsRe5I8EbyNvQf9gX33/my+4X9Uv//
+AAAAJgBOAHEAkACuAMkA5AD9ARcBMAFJAWMBfAGWAbEBzQHpAgYCJQJEAmQChgKpAswC8AMVAzoDXwOF
+A6sD0gP6BCIESwRzBJ0ExwTxBRwFSAV1BaMF0QYBBjIGYwaWBssHAgc5B3IHrgfsCCwIbQiyCPoJQwmQ
+CeQKQQqgCwELZQvKDDIMnQ0IDXcN5g5YDswPQw+8EDcQtxE3EbkSPRLDE0sT1RRkFP4VmxY6FtoXfRgf
+GMMZaRoQGrgbYRwKHLQdXh4MHrkfZiAVIMYheCIqIuYjuiSRJWsmRycnKAgo8SnYKsMrsSyfLZEugy94
+MG0xYDJXM1E0TjVQNlY3WThcOVU6UztMPEQ9Oz4zPy1AKUEkQiBDJEQmRTBGPkdPSGRJa0pmS2dMZk1r
+TnNPgVCTUahSxFPkVQlWMVdeWJNZy1sEXERdiV7MYBNhQmJ1Y6lk3mYcZ1pooGnrazlsim3gbzdwlHHz
+c1R0tXYbd31443pRe919gX8hgMyCcoQghcyHd4kkitCMe44nj9aRfJMqlNGWeJg3mhGb753Dn5OhY6Mx
+pPumxaiSqmCsNa4Qr+2x1rPDtb+3ubmTu3K9V79AwTHDL8UxxzvJUstzzZvPztIF1EHWiNjP2tzcvt6a
+4H/iYuRG5jLoJOoa7BbuGPAn8jX0TfZu+I76tvzo//8AAAAfAEMAZACCAJ8AugDUAO4BCAEhATwBVgFw
+AYsBpwHDAd8B/QIcAjsCXAJ9AqACwgLmAwsDMANWA30DpAPLA/MEHARFBHAEnATIBPUFIgVRBYAFsQXj
+BhcGSwaBBrgG8gcsB2oHqAfoCCsIcAi3CQAJSwmbCe4KTQqrCw4LcwvZDEMMsA0fDZMOCQ6CDwAPgRAG
+EI8RGxGpEjwS0RNrFAUUpBU9FdYWdRcVF7cYXhkKGbYaaBscG9Qcjh1LHgoezB+OIFIhGSHgIqkjjiR+
+JXEmaCdeKFgpVSpSK1IsUi1VLlUvWTBcMV0yYjNqNHs1ozbSOAE5KjpYO4Q8sD3fPxFAS0GEQsZEC0Va
+RrBIDUljSqpL801BTpJP6lFDUqNUBVVrVtBYPlmtWxtckV4HX3tg32I5Y5Vk8mZXZ75pK2qcbA5thW78
+cHVx8XNudOl2Z3fieWF68Xyhfl2AGIHVg5mFWIcXiNaKk4xOjgiPxpF6kzaU6ZadmG2aVZxCniCgAKHe
+o72lladxqVCrNK0frw+xB7MGtRO3JbkBute8pb6BwFrCPMQlxgrH+cnuy+rN5c/r0fHT+dYK2BnaFdvG
+3WvfHeDL4nrkIuXH52jo++p96/btW+6z8AHxNfJd83z0gvWD9nX3Xfg0+QX5w/qC+yv70Px0/QP9k/4i
+/wv//wAAZGVzYwAAAAAAAAAFaU1hYwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAbWx1YwAAAAAAAAASAAAADG5s
+TkwAAAAIAAAA6GRhREsAAAAIAAAA6HBsUEwAAAAIAAAA6GVuVVMAAAAIAAAA6G5iTk8AAAAIAAAA6GZy
+RlIAAAAIAAAA6HB0QlIAAAAIAAAA6HB0UFQAAAAIAAAA6HpoQ04AAAAIAAAA6GVzRVMAAAAIAAAA6Gph
+SlAAAAAIAAAA6HJ1UlUAAAAIAAAA6HN2U0UAAAAIAAAA6HpoVFcAAAAIAAAA6GRlREUAAAAIAAAA6GZp
+RkkAAAAIAAAA6Gl0SVQAAAAIAAAA6GtvS1IAAAAIAAAA6ABpAE0AYQBjbW1vZAAAAAAAAAYQAACcagAA
+AAC/05GAAAAAAAAAAAAAAAAAAAAAAHRleHQAAAAAQ29weXJpZ2h0IEFwcGxlLCBJbmMuLCAyMDEwAA</bytes>
 																	</object>
-																	<string key="NSCacheWindowColorSpace">NSCalibratedRGBColorSpace</string>
-																	<int key="NSCacheWindowBPS">8</int>
-																	<int key="NSCacheWindowBPP">24</int>
-																	<int key="NSCacheWindowIsPlanar">0</int>
 																</object>
 															</object>
 														</object>
@@ -1714,7 +1878,7 @@ AAAAAFb4AACsLwAAHQNYWVogAAAAAAAAJiIAABJ/AACxcA</bytes>
 												<object class="NSTableHeaderCell" key="NSHeaderCell">
 													<int key="NSCellFlags">75628096</int>
 													<int key="NSCellFlags2">2048</int>
-													<string key="NSContents">Name</string>
+													<string key="NSContents">公司名称</string>
 													<reference key="NSSupport" ref="26"/>
 													<object class="NSColor" key="NSBackgroundColor">
 														<int key="NSColorSpace">3</int>
@@ -1865,8 +2029,8 @@ AAAAAFb4AACsLwAAHQNYWVogAAAAAAAAJiIAABJ/AACxcA</bytes>
 						<object class="NSTextFieldCell" key="NSCell" id="810991095">
 							<int key="NSCellFlags">68288064</int>
 							<int key="NSCellFlags2">272630784</int>
-							<string key="NSContents">群组名称:</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">群组名称</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="415414007"/>
 							<reference key="NSBackgroundColor" ref="977951849"/>
 							<reference key="NSTextColor" ref="400627124"/>
@@ -1925,9 +2089,7 @@ AAAAAFb4AACsLwAAHQNYWVogAAAAAAAAJiIAABJ/AACxcA</bytes>
 							</object>
 							<bool key="NSMenuItemRespectAlignment">YES</bool>
 							<object class="NSMenu" key="NSMenu" id="675067443">
-								<object class="NSMutableString" key="NSTitle">
-									<characters key="NS.bytes">OtherViews</characters>
-								</object>
+								<string key="NSTitle">其他视图</string>
 								<object class="NSMutableArray" key="NSMenuItems">
 									<bool key="EncodedWithXMLCoder">YES</bool>
 									<reference ref="338800676"/>
@@ -1973,7 +2135,7 @@ AAAAAFb4AACsLwAAHQNYWVogAAAAAAAAJiIAABJ/AACxcA</bytes>
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">0</int>
 							<string key="NSContents">自定义位置:</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="340964805"/>
 							<int key="NSButtonFlags">1211912703</int>
 							<int key="NSButtonFlags2">2</int>
@@ -1994,8 +2156,8 @@ AAAAAFb4AACsLwAAHQNYWVogAAAAAAAAJiIAABJ/AACxcA</bytes>
 						<object class="NSTextFieldCell" key="NSCell" id="12341917">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">272760832</int>
-							<string key="NSContents">只有在添加传输任务时设定</string>
-							<reference key="NSSupport" ref="878019005"/>
+							<string key="NSContents">该位置将只能在添加传输时候设置</string>
+							<reference key="NSSupport" ref="26"/>
 							<reference key="NSControlView" ref="25528693"/>
 							<reference key="NSBackgroundColor" ref="977951849"/>
 							<reference key="NSTextColor" ref="540507142"/>
@@ -2010,8 +2172,8 @@ AAAAAFb4AACsLwAAHQNYWVogAAAAAAAAJiIAABJ/AACxcA</bytes>
 						<object class="NSButtonCell" key="NSCell" id="23936638">
 							<int key="NSCellFlags">-2080244224</int>
 							<int key="NSCellFlags2">0</int>
-							<string key="NSContents">依据条件将群主指定到新传输任务</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">根据标准为新的传输分配组别</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="31476212"/>
 							<int key="NSButtonFlags">1211912703</int>
 							<int key="NSButtonFlags2">2</int>
@@ -2033,7 +2195,7 @@ AAAAAFb4AACsLwAAHQNYWVogAAAAAAAAJiIAABJ/AACxcA</bytes>
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">134217728</int>
 							<string key="NSContents">编辑…</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="233310108"/>
 							<int key="NSButtonFlags">-2038284033</int>
 							<int key="NSButtonFlags2">129</int>
@@ -2052,8 +2214,8 @@ AAAAAFb4AACsLwAAHQNYWVogAAAAAAAAJiIAABJ/AACxcA</bytes>
 						<object class="NSTextFieldCell" key="NSCell" id="660134747">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">272760832</int>
-							<string key="NSContents">满足条件时，会指定到第一个群组</string>
-							<reference key="NSSupport" ref="878019005"/>
+							<string key="NSContents">传输将被分配到所有符合条件第一组</string>
+							<reference key="NSSupport" ref="26"/>
 							<reference key="NSControlView" ref="360885126"/>
 							<reference key="NSBackgroundColor" ref="977951849"/>
 							<reference key="NSTextColor" ref="540507142"/>
@@ -2061,7 +2223,6 @@ AAAAAFb4AACsLwAAHQNYWVogAAAAAAAAJiIAABJ/AACxcA</bytes>
 					</object>
 				</object>
 				<string key="NSFrameSize">{542, 240}</string>
-				<reference key="NSSuperview"/>
 				<string key="NSClassName">NSView</string>
 			</object>
 			<object class="NSCustomView" id="352903881">
@@ -2140,8 +2301,8 @@ AAAAAFb4AACsLwAAHQNYWVogAAAAAAAAJiIAABJ/AACxcA</bytes>
 						<object class="NSButtonCell" key="NSCell" id="157187468">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">0</int>
-							<string key="NSContents">上传速率:</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">上传速度:</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="557603520"/>
 							<int key="NSButtonFlags">1211912703</int>
 							<int key="NSButtonFlags2">2</int>
@@ -2224,8 +2385,8 @@ AAAAAFb4AACsLwAAHQNYWVogAAAAAAAAJiIAABJ/AACxcA</bytes>
 						<object class="NSButtonCell" key="NSCell" id="651662374">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">0</int>
-							<string key="NSContents">下载速率:</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">下载速度:</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="1047565229"/>
 							<int key="NSButtonFlags">1211912703</int>
 							<int key="NSButtonFlags2">2</int>
@@ -2278,8 +2439,8 @@ AAAAAFb4AACsLwAAHQNYWVogAAAAAAAAJiIAABJ/AACxcA</bytes>
 						<object class="NSTextFieldCell" key="NSCell" id="916691300">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">71303168</int>
-							<string key="NSContents">全局速度限制:</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">全局带宽限制:</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="402912687"/>
 							<reference key="NSBackgroundColor" ref="977951849"/>
 							<reference key="NSTextColor" ref="400627124"/>
@@ -2451,7 +2612,7 @@ AAAAAFb4AACsLwAAHQNYWVogAAAAAAAAJiIAABJ/AACxcA</bytes>
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">71303168</int>
 							<string key="NSContents">限速模式:</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="150499212"/>
 							<reference key="NSBackgroundColor" ref="977951849"/>
 							<reference key="NSTextColor" ref="400627124"/>
@@ -2460,14 +2621,14 @@ AAAAAFb4AACsLwAAHQNYWVogAAAAAAAAJiIAABJ/AACxcA</bytes>
 					<object class="NSTextField" id="680684601">
 						<reference key="NSNextResponder" ref="352903881"/>
 						<int key="NSvFlags">256</int>
-						<string key="NSFrame">{{177, 93}, {100, 17}}</string>
+						<string key="NSFrame">{{177, 93}, {82, 17}}</string>
 						<reference key="NSSuperview" ref="352903881"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="646507129">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">71303168</int>
-							<string key="NSContents">上次速率:</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">上传速度:</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="680684601"/>
 							<reference key="NSBackgroundColor" ref="977951849"/>
 							<reference key="NSTextColor" ref="400627124"/>
@@ -2482,8 +2643,8 @@ AAAAAFb4AACsLwAAHQNYWVogAAAAAAAAJiIAABJ/AACxcA</bytes>
 						<object class="NSTextFieldCell" key="NSCell" id="1023099604">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">71303168</int>
-							<string key="NSContents">下载速率:</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">下载速度:</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="55562493"/>
 							<reference key="NSBackgroundColor" ref="977951849"/>
 							<reference key="NSTextColor" ref="400627124"/>
@@ -2498,8 +2659,8 @@ AAAAAFb4AACsLwAAHQNYWVogAAAAAAAAJiIAABJ/AACxcA</bytes>
 						<object class="NSTextFieldCell" key="NSCell" id="229954658">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">272760832</int>
-							<string key="NSContents">启用时，限速模式会覆盖全局限速</string>
-							<reference key="NSSupport" ref="878019005"/>
+							<string key="NSContents">启用时,限速会覆盖全局带宽限制</string>
+							<reference key="NSSupport" ref="26"/>
 							<reference key="NSControlView" ref="767699022"/>
 							<reference key="NSBackgroundColor" ref="977951849"/>
 							<reference key="NSTextColor" ref="540507142"/>
@@ -2546,8 +2707,8 @@ AAAAAFb4AACsLwAAHQNYWVogAAAAAAAAJiIAABJ/AACxcA</bytes>
 						<object class="NSButtonCell" key="NSCell" id="881251804">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">0</int>
-							<string key="NSContents">日程限速:</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">日程化速度限制:</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="49689562"/>
 							<int key="NSButtonFlags">1211912703</int>
 							<int key="NSButtonFlags2">2</int>
@@ -2568,8 +2729,8 @@ AAAAAFb4AACsLwAAHQNYWVogAAAAAAAAJiIAABJ/AACxcA</bytes>
 						<object class="NSTextFieldCell" key="NSCell" id="314009658">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">272629760</int>
-							<string key="NSContents">到</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">至</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="161729812"/>
 							<reference key="NSBackgroundColor" ref="977951849"/>
 							<reference key="NSTextColor" ref="400627124"/>
@@ -2662,9 +2823,9 @@ AAABAAAAAQ</bytes>
 							<string key="NSKeyEquivalent"/>
 							<int key="NSPeriodicDelay">400</int>
 							<int key="NSPeriodicInterval">75</int>
-							<object class="NSMenuItem" key="NSMenuItem" id="575736191">
+							<object class="NSMenuItem" key="NSMenuItem" id="202066299">
 								<reference key="NSMenu" ref="368787081"/>
-								<string key="NSTitle">周日</string>
+								<string key="NSTitle">每天</string>
 								<string key="NSKeyEquiv"/>
 								<int key="NSKeyEquivModMask">1048576</int>
 								<int key="NSMnemonicLoc">2147483647</int>
@@ -2672,29 +2833,18 @@ AAABAAAAAQ</bytes>
 								<reference key="NSOnImage" ref="550412468"/>
 								<reference key="NSMixedImage" ref="32510707"/>
 								<string key="NSAction">_popUpItemAction:</string>
-								<int key="NSTag">1</int>
+								<int key="NSTag">127</int>
 								<reference key="NSTarget" ref="159778332"/>
 							</object>
 							<bool key="NSMenuItemRespectAlignment">YES</bool>
 							<object class="NSMenu" key="NSMenu" id="368787081">
-								<string key="NSTitle">OtherViews</string>
+								<string key="NSTitle">其他视图</string>
 								<object class="NSMutableArray" key="NSMenuItems">
 									<bool key="EncodedWithXMLCoder">YES</bool>
-									<object class="NSMenuItem" id="202066299">
-										<reference key="NSMenu" ref="368787081"/>
-										<string key="NSTitle">每天</string>
-										<string key="NSKeyEquiv"/>
-										<int key="NSKeyEquivModMask">1048576</int>
-										<int key="NSMnemonicLoc">2147483647</int>
-										<reference key="NSOnImage" ref="550412468"/>
-										<reference key="NSMixedImage" ref="32510707"/>
-										<string key="NSAction">_popUpItemAction:</string>
-										<int key="NSTag">127</int>
-										<reference key="NSTarget" ref="159778332"/>
-									</object>
+									<reference ref="202066299"/>
 									<object class="NSMenuItem" id="443861028">
 										<reference key="NSMenu" ref="368787081"/>
-										<string key="NSTitle">每工作日</string>
+										<string key="NSTitle">工作日</string>
 										<string key="NSKeyEquiv"/>
 										<int key="NSKeyEquivModMask">1048576</int>
 										<int key="NSMnemonicLoc">2147483647</int>
@@ -2706,7 +2856,7 @@ AAABAAAAAQ</bytes>
 									</object>
 									<object class="NSMenuItem" id="916784179">
 										<reference key="NSMenu" ref="368787081"/>
-										<string key="NSTitle">每周末</string>
+										<string key="NSTitle">周末</string>
 										<string key="NSKeyEquiv"/>
 										<int key="NSKeyEquivModMask">1048576</int>
 										<int key="NSMnemonicLoc">2147483647</int>
@@ -2731,7 +2881,7 @@ AAABAAAAAQ</bytes>
 									</object>
 									<object class="NSMenuItem" id="788827026">
 										<reference key="NSMenu" ref="368787081"/>
-										<string key="NSTitle">周一</string>
+										<string key="NSTitle">星期一</string>
 										<string key="NSKeyEquiv"/>
 										<int key="NSKeyEquivModMask">1048576</int>
 										<int key="NSMnemonicLoc">2147483647</int>
@@ -2743,7 +2893,7 @@ AAABAAAAAQ</bytes>
 									</object>
 									<object class="NSMenuItem" id="197091967">
 										<reference key="NSMenu" ref="368787081"/>
-										<string key="NSTitle">周二</string>
+										<string key="NSTitle">星期二</string>
 										<string key="NSKeyEquiv"/>
 										<int key="NSKeyEquivModMask">1048576</int>
 										<int key="NSMnemonicLoc">2147483647</int>
@@ -2755,7 +2905,7 @@ AAABAAAAAQ</bytes>
 									</object>
 									<object class="NSMenuItem" id="466427115">
 										<reference key="NSMenu" ref="368787081"/>
-										<string key="NSTitle">周三</string>
+										<string key="NSTitle">星期三</string>
 										<string key="NSKeyEquiv"/>
 										<int key="NSKeyEquivModMask">1048576</int>
 										<int key="NSMnemonicLoc">2147483647</int>
@@ -2767,7 +2917,7 @@ AAABAAAAAQ</bytes>
 									</object>
 									<object class="NSMenuItem" id="436039952">
 										<reference key="NSMenu" ref="368787081"/>
-										<string key="NSTitle">周四</string>
+										<string key="NSTitle">星期四</string>
 										<string key="NSKeyEquiv"/>
 										<int key="NSKeyEquivModMask">1048576</int>
 										<int key="NSMnemonicLoc">2147483647</int>
@@ -2779,7 +2929,7 @@ AAABAAAAAQ</bytes>
 									</object>
 									<object class="NSMenuItem" id="6729843">
 										<reference key="NSMenu" ref="368787081"/>
-										<string key="NSTitle">周五</string>
+										<string key="NSTitle">星期五</string>
 										<string key="NSKeyEquiv"/>
 										<int key="NSKeyEquivModMask">1048576</int>
 										<int key="NSMnemonicLoc">2147483647</int>
@@ -2791,7 +2941,7 @@ AAABAAAAAQ</bytes>
 									</object>
 									<object class="NSMenuItem" id="734333048">
 										<reference key="NSMenu" ref="368787081"/>
-										<string key="NSTitle">周六</string>
+										<string key="NSTitle">星期六</string>
 										<string key="NSKeyEquiv"/>
 										<int key="NSKeyEquivModMask">1048576</int>
 										<int key="NSMnemonicLoc">2147483647</int>
@@ -2801,10 +2951,20 @@ AAABAAAAAQ</bytes>
 										<int key="NSTag">64</int>
 										<reference key="NSTarget" ref="159778332"/>
 									</object>
-									<reference ref="575736191"/>
+									<object class="NSMenuItem" id="575736191">
+										<reference key="NSMenu" ref="368787081"/>
+										<string key="NSTitle">星期日</string>
+										<string key="NSKeyEquiv"/>
+										<int key="NSKeyEquivModMask">1048576</int>
+										<int key="NSMnemonicLoc">2147483647</int>
+										<reference key="NSOnImage" ref="550412468"/>
+										<reference key="NSMixedImage" ref="32510707"/>
+										<string key="NSAction">_popUpItemAction:</string>
+										<int key="NSTag">1</int>
+										<reference key="NSTarget" ref="159778332"/>
+									</object>
 								</object>
 							</object>
-							<int key="NSSelectedIndex">10</int>
 							<int key="NSPreferredEdge">1</int>
 							<bool key="NSUsesItemFromMenu">YES</bool>
 							<bool key="NSAltersState">YES</bool>
@@ -2817,7 +2977,7 @@ AAABAAAAAQ</bytes>
 				<string key="NSExtension">NSResponder</string>
 			</object>
 			<object class="NSCustomView" id="538122014">
-				<reference key="NSNextResponder"/>
+				<nil key="NSNextResponder"/>
 				<int key="NSvFlags">256</int>
 				<object class="NSMutableArray" key="NSSubviews">
 					<bool key="EncodedWithXMLCoder">YES</bool>
@@ -2830,8 +2990,8 @@ AAABAAAAAQ</bytes>
 						<object class="NSButtonCell" key="NSCell" id="261591174">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">0</int>
-							<string key="NSContents">忽略为加密 peer</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">忽略未加密的peer</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="130041388"/>
 							<int key="NSButtonFlags">1211912703</int>
 							<int key="NSButtonFlags2">2</int>
@@ -2852,8 +3012,8 @@ AAABAAAAAQ</bytes>
 						<object class="NSTextFieldCell" key="NSCell" id="695755489">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">71303168</int>
-							<string key="NSContents">加密:</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">加密：</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="531465471"/>
 							<reference key="NSBackgroundColor" ref="977951849"/>
 							<reference key="NSTextColor" ref="400627124"/>
@@ -2868,8 +3028,8 @@ AAABAAAAAQ</bytes>
 						<object class="NSButtonCell" key="NSCell" id="478851799">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">0</int>
-							<string key="NSContents">偏好加密的 peer</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">偏好加密的peer</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="142580376"/>
 							<int key="NSButtonFlags">1211912703</int>
 							<int key="NSButtonFlags2">2</int>
@@ -2890,8 +3050,8 @@ AAABAAAAAQ</bytes>
 						<object class="NSTextFieldCell" key="NSCell" id="759095525">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">71303168</int>
-							<string key="NSContents">连接:</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">连接：</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="1068385234"/>
 							<reference key="NSBackgroundColor" ref="977951849"/>
 							<reference key="NSTextColor" ref="400627124"/>
@@ -2906,8 +3066,8 @@ AAABAAAAAQ</bytes>
 						<object class="NSTextFieldCell" key="NSCell" id="195557530">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">4194304</int>
-							<string key="NSContents">全局最大连接数:</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">全局最大连接:</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="276894958"/>
 							<reference key="NSBackgroundColor" ref="977951849"/>
 							<reference key="NSTextColor" ref="400627124"/>
@@ -2996,7 +3156,7 @@ AAABAAAAAQ</bytes>
 					<object class="NSTextField" id="695790301">
 						<reference key="NSNextResponder" ref="538122014"/>
 						<int key="NSvFlags">256</int>
-						<string key="NSFrame">{{390, 256}, {39, 17}}</string>
+						<string key="NSFrame">{{457, 252}, {39, 17}}</string>
 						<reference key="NSSuperview" ref="538122014"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="454043587">
@@ -3012,7 +3172,7 @@ AAABAAAAAQ</bytes>
 					<object class="NSTextField" id="439211863">
 						<reference key="NSNextResponder" ref="538122014"/>
 						<int key="NSvFlags">256</int>
-						<string key="NSFrame">{{335, 254}, {50, 22}}</string>
+						<string key="NSFrame">{{402, 250}, {50, 22}}</string>
 						<reference key="NSSuperview" ref="538122014"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="963807331">
@@ -3082,8 +3242,8 @@ AAABAAAAAQ</bytes>
 						<object class="NSTextFieldCell" key="NSCell" id="250566813">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">4194304</int>
-							<string key="NSContents">新传输任务最大连接数:</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">最大连接给新的传输:</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="210126275"/>
 							<reference key="NSBackgroundColor" ref="977951849"/>
 							<reference key="NSTextColor" ref="400627124"/>
@@ -3098,8 +3258,8 @@ AAABAAAAAQ</bytes>
 						<object class="NSButtonCell" key="NSCell" id="985508058">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">0</int>
-							<string key="NSContents">对公共种子使用 (PEX) peer 交换</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">使用同类传输交换(PEX)于公共种子</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="895326079"/>
 							<int key="NSButtonFlags">1211912703</int>
 							<int key="NSButtonFlags2">2</int>
@@ -3120,8 +3280,8 @@ AAABAAAAAQ</bytes>
 						<object class="NSButtonCell" key="NSCell" id="467934606">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">0</int>
-							<string key="NSContents">对公共种子使用分布式 hash 表 (DHT)</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">使用分布哈希表(DHT)于公共种子</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="72739699"/>
 							<int key="NSButtonFlags">1211912703</int>
 							<int key="NSButtonFlags2">2</int>
@@ -3142,8 +3302,8 @@ AAABAAAAAQ</bytes>
 						<object class="NSTextFieldCell" key="NSCell" id="32643885">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">272760832</int>
-							<string key="NSContents">高连接限制会减慢某些路由速度</string>
-							<reference key="NSSupport" ref="878019005"/>
+							<string key="NSContents">高连接限制可能会极大地影响系统性能</string>
+							<reference key="NSSupport" ref="26"/>
 							<reference key="NSControlView" ref="593278680"/>
 							<reference key="NSBackgroundColor" ref="977951849"/>
 							<reference key="NSTextColor" ref="540507142"/>
@@ -3158,8 +3318,8 @@ AAABAAAAAQ</bytes>
 						<object class="NSTextFieldCell" key="NSCell" id="520011795">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">272760832</int>
-							<string key="NSContents">上次更新: N/A</string>
-							<reference key="NSSupport" ref="878019005"/>
+							<string key="NSContents">上次更新: 不详</string>
+							<reference key="NSSupport" ref="26"/>
 							<reference key="NSControlView" ref="484538294"/>
 							<reference key="NSBackgroundColor" ref="977951849"/>
 							<object class="NSColor" key="NSTextColor">
@@ -3177,8 +3337,8 @@ AAABAAAAAQ</bytes>
 						<object class="NSButtonCell" key="NSCell" id="245208224">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">0</int>
-							<string key="NSContents">防止未知的不良 peer 连接</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">防止连接已知的恶意同行</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="902371491"/>
 							<int key="NSButtonFlags">1211912703</int>
 							<int key="NSButtonFlags2">2</int>
@@ -3199,8 +3359,8 @@ AAABAAAAAQ</bytes>
 						<object class="NSTextFieldCell" key="NSCell" id="188659193">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">71303168</int>
-							<string key="NSContents">封锁列表:</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">拦截列表:</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="844132556"/>
 							<reference key="NSBackgroundColor" ref="977951849"/>
 							<reference key="NSTextColor" ref="400627124"/>
@@ -3215,8 +3375,8 @@ AAABAAAAAQ</bytes>
 						<object class="NSTextFieldCell" key="NSCell" id="234963311">
 							<int key="NSCellFlags">67239488</int>
 							<int key="NSCellFlags2">4196352</int>
-							<string key="NSContents">列表已载入/未载入</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">黑名单加载/未加载</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="326257173"/>
 							<reference key="NSBackgroundColor" ref="977951849"/>
 							<reference key="NSTextColor" ref="400627124"/>
@@ -3229,10 +3389,10 @@ AAABAAAAAQ</bytes>
 						<reference key="NSSuperview" ref="538122014"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="650733440">
-							<int key="NSCellFlags">-2080244224</int>
+							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">134217728</int>
 							<string key="NSContents">更新</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="826556979"/>
 							<int key="NSButtonFlags">-2038284033</int>
 							<int key="NSButtonFlags2">129</int>
@@ -3274,8 +3434,8 @@ AAABAAAAAQ</bytes>
 						<object class="NSButtonCell" key="NSCell" id="46409197">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">0</int>
-							<string key="NSContents">每周自动更新</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">自动每周更新</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="1064247210"/>
 							<int key="NSButtonFlags">1211912703</int>
 							<int key="NSButtonFlags2">2</int>
@@ -3289,7 +3449,6 @@ AAABAAAAAQ</bytes>
 					</object>
 				</object>
 				<string key="NSFrameSize">{542, 318}</string>
-				<reference key="NSSuperview"/>
 				<string key="NSClassName">NSView</string>
 				<string key="NSExtension">NSResponder</string>
 			</object>
@@ -3330,8 +3489,8 @@ AAABAAAAAQ</bytes>
 						<object class="NSTextFieldCell" key="NSCell" id="514153614">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">71303168</int>
-							<string key="NSContents">系统休眠:</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">系统睡眠:</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="631967205"/>
 							<reference key="NSBackgroundColor" ref="977951849"/>
 							<reference key="NSTextColor" ref="400627124"/>
@@ -3346,8 +3505,8 @@ AAABAAAAAQ</bytes>
 						<object class="NSButtonCell" key="NSCell" id="127446013">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">0</int>
-							<string key="NSContents">有活动的任务时防止电脑休眠</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">在有活动的传输时防止电脑睡眠</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="109684042"/>
 							<int key="NSButtonFlags">1211912703</int>
 							<int key="NSButtonFlags2">2</int>
@@ -3409,7 +3568,7 @@ AAABAAAAAQ</bytes>
 						<object class="NSTextFieldCell" key="NSCell" id="941628063">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">4194304</int>
-							<string key="NSContents">Peer 监听端口:</string>
+							<string key="NSContents">peer侦听端口:</string>
 							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="585772012"/>
 							<reference key="NSBackgroundColor" ref="977951849"/>
@@ -3425,8 +3584,8 @@ AAABAAAAAQ</bytes>
 						<object class="NSButtonCell" key="NSCell" id="633401664">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">0</int>
-							<string key="NSContents">自动对应端口</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">自动映射端口</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="316696878"/>
 							<int key="NSButtonFlags">1211912703</int>
 							<int key="NSButtonFlags2">2</int>
@@ -3447,8 +3606,8 @@ AAABAAAAAQ</bytes>
 						<object class="NSButtonCell" key="NSCell" id="847795095">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">0</int>
-							<string key="NSContents">启动时随机选取端口</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">启动时随机端口</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="200017199"/>
 							<int key="NSButtonFlags">1211912703</int>
 							<int key="NSButtonFlags2">2</int>
@@ -3469,8 +3628,8 @@ AAABAAAAAQ</bytes>
 						<object class="NSButtonCell" key="NSCell" id="20752657">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">0</int>
-							<string key="NSContents">连接 tracker 时使用代理</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">用代理连接到tracker</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="622323577"/>
 							<int key="NSButtonFlags">1211912703</int>
 							<int key="NSButtonFlags2">2</int>
@@ -3619,8 +3778,8 @@ AAABAAAAAQ</bytes>
 						<object class="NSTextFieldCell" key="NSCell" id="67017561">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">272760832</int>
-							<string key="NSContents">内网互联使用 NAT-PMP 或 UPnP</string>
-							<reference key="NSSupport" ref="878019005"/>
+							<string key="NSContents">NAT使用NAT- PMP或UPnP穿越</string>
+							<reference key="NSSupport" ref="26"/>
 							<reference key="NSControlView" ref="646636981"/>
 							<reference key="NSBackgroundColor" ref="977951849"/>
 							<reference key="NSTextColor" ref="540507142"/>
@@ -3635,8 +3794,8 @@ AAABAAAAAQ</bytes>
 						<object class="NSTextFieldCell" key="NSCell" id="931894024">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">272629760</int>
-							<string key="NSContents">端口已打开</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">端口开放</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="992746122"/>
 							<reference key="NSBackgroundColor" ref="977951849"/>
 							<reference key="NSTextColor" ref="540507142"/>
@@ -3651,8 +3810,8 @@ AAABAAAAAQ</bytes>
 						<object class="NSTextFieldCell" key="NSCell" id="475516915">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">71303168</int>
-							<string key="NSContents">网络:</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">网络：</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="25993221"/>
 							<reference key="NSBackgroundColor" ref="977951849"/>
 							<reference key="NSTextColor" ref="400627124"/>
@@ -3668,7 +3827,7 @@ AAABAAAAAQ</bytes>
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">71303168</int>
 							<string key="NSContents">代理:</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="90035294"/>
 							<reference key="NSBackgroundColor" ref="977951849"/>
 							<reference key="NSTextColor" ref="400627124"/>
@@ -3700,8 +3859,8 @@ AAABAAAAAQ</bytes>
 						<object class="NSTextFieldCell" key="NSCell" id="954130018">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">71303168</int>
-							<string key="NSContents">密码:</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">密码：</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="257109686"/>
 							<reference key="NSBackgroundColor" ref="977951849"/>
 							<reference key="NSTextColor" ref="400627124"/>
@@ -3716,8 +3875,8 @@ AAABAAAAAQ</bytes>
 						<object class="NSTextFieldCell" key="NSCell" id="108838744">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">71303168</int>
-							<string key="NSContents">用户名:</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">用户名称：</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="925265526"/>
 							<reference key="NSBackgroundColor" ref="977951849"/>
 							<reference key="NSTextColor" ref="400627124"/>
@@ -3732,8 +3891,8 @@ AAABAAAAAQ</bytes>
 						<object class="NSTextFieldCell" key="NSCell" id="677732006">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">71303168</int>
-							<string key="NSContents">服务器:</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">服务器：</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="995948995"/>
 							<reference key="NSBackgroundColor" ref="977951849"/>
 							<reference key="NSTextColor" ref="400627124"/>
@@ -3748,8 +3907,8 @@ AAABAAAAAQ</bytes>
 						<object class="NSTextFieldCell" key="NSCell" id="63707525">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">71303168</int>
-							<string key="NSContents">端口:</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">端口：</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="191075786"/>
 							<reference key="NSBackgroundColor" ref="977951849"/>
 							<reference key="NSTextColor" ref="400627124"/>
@@ -3764,8 +3923,8 @@ AAABAAAAAQ</bytes>
 						<object class="NSTextFieldCell" key="NSCell" id="502542662">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">71303168</int>
-							<string key="NSContents">协定:</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">协议：</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="190240104"/>
 							<reference key="NSBackgroundColor" ref="977951849"/>
 							<reference key="NSTextColor" ref="400627124"/>
@@ -3780,8 +3939,8 @@ AAABAAAAAQ</bytes>
 						<object class="NSButtonCell" key="NSCell" id="296153825">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">0</int>
-							<string key="NSContents">需要验证</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">需要认证</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="473194484"/>
 							<int key="NSButtonFlags">1211912703</int>
 							<int key="NSButtonFlags2">2</int>
@@ -3862,7 +4021,7 @@ AAABAAAAAQ</bytes>
 							</object>
 							<bool key="NSMenuItemRespectAlignment">YES</bool>
 							<object class="NSMenu" key="NSMenu" id="461366439">
-								<string key="NSTitle">OtherViews</string>
+								<string key="NSTitle">其他视图</string>
 								<object class="NSMutableArray" key="NSMenuItems">
 									<bool key="EncodedWithXMLCoder">YES</bool>
 									<reference ref="990190837"/>
@@ -3905,8 +4064,8 @@ AAABAAAAAQ</bytes>
 						<object class="NSButtonCell" key="NSCell" id="681368311">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">134217728</int>
-							<string key="NSContents">随机选取</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">随机</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="994561291"/>
 							<int key="NSButtonFlags">-2038284033</int>
 							<int key="NSButtonFlags2">1</int>
@@ -3939,7 +4098,7 @@ AAABAAAAAQ</bytes>
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">71303168</int>
 							<string key="NSContents">监听端口:</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="712370553"/>
 							<reference key="NSBackgroundColor" ref="977951849"/>
 							<reference key="NSTextColor" ref="400627124"/>
@@ -3954,8 +4113,8 @@ AAABAAAAAQ</bytes>
 						<object class="NSTextFieldCell" key="NSCell" id="404750455">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">71303168</int>
-							<string key="NSContents">密码:</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">密码：</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="966253460"/>
 							<reference key="NSBackgroundColor" ref="977951849"/>
 							<reference key="NSTextColor" ref="400627124"/>
@@ -3970,8 +4129,8 @@ AAABAAAAAQ</bytes>
 						<object class="NSTextFieldCell" key="NSCell" id="705209842">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">71303168</int>
-							<string key="NSContents">用户名:</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">用户名称：</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="1807399"/>
 							<reference key="NSBackgroundColor" ref="977951849"/>
 							<reference key="NSTextColor" ref="400627124"/>
@@ -4050,8 +4209,8 @@ AAABAAAAAQ</bytes>
 						<object class="NSButtonCell" key="NSCell" id="844429646">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">0</int>
-							<string key="NSContents">启用远程控制</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">启动远程访问</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="898169443"/>
 							<int key="NSButtonFlags">1211912703</int>
 							<int key="NSButtonFlags2">2</int>
@@ -4072,8 +4231,8 @@ AAABAAAAAQ</bytes>
 						<object class="NSButtonCell" key="NSCell" id="105041185">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">0</int>
-							<string key="NSContents">在本地网络用 Bonjour 打开网络界面</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">与Bonjour显示在本地网络的网络界面</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="3575"/>
 							<int key="NSButtonFlags">1211912703</int>
 							<int key="NSButtonFlags2">2</int>
@@ -4095,7 +4254,7 @@ AAABAAAAAQ</bytes>
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">0</int>
 							<string key="NSContents">需要验证</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="151618662"/>
 							<int key="NSButtonFlags">1211912703</int>
 							<int key="NSButtonFlags2">2</int>
@@ -4116,8 +4275,8 @@ AAABAAAAAQ</bytes>
 						<object class="NSButtonCell" key="NSCell" id="958039142">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">0</int>
-							<string key="NSContents">只允许以下 IP 地址连接:</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">只允许下列 IP 地址来连接:</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="264419599"/>
 							<int key="NSButtonFlags">1211912703</int>
 							<int key="NSButtonFlags2">2</int>
@@ -4138,8 +4297,8 @@ AAABAAAAAQ</bytes>
 						<object class="NSTextFieldCell" key="NSCell" id="644224844">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">272760832</int>
-							<string key="NSContents">启用网络界面并允许远程请求</string>
-							<reference key="NSSupport" ref="878019005"/>
+							<string key="NSContents">启用网络界面允许远程要求</string>
+							<reference key="NSSupport" ref="26"/>
 							<reference key="NSControlView" ref="535988411"/>
 							<reference key="NSBackgroundColor" ref="977951849"/>
 							<reference key="NSTextColor" ref="540507142"/>
@@ -4197,7 +4356,7 @@ AAABAAAAAQ</bytes>
 												<object class="NSTableHeaderCell" key="NSHeaderCell">
 													<int key="NSCellFlags">75628096</int>
 													<int key="NSCellFlags2">2048</int>
-													<string key="NSContents">IP Address</string>
+													<string key="NSContents">IP 地址</string>
 													<reference key="NSSupport" ref="26"/>
 													<object class="NSColor" key="NSBackgroundColor">
 														<int key="NSColorSpace">3</int>
@@ -4312,7 +4471,7 @@ AAABAAAAAQ</bytes>
 						<object class="NSTextFieldCell" key="NSCell" id="159713069">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">272760832</int>
-							<string key="NSContents">IP 地址可能包含 * 万用字元</string>
+							<string key="NSContents">P地址可能包括*通配符</string>
 							<reference key="NSSupport" ref="26"/>
 							<reference key="NSControlView" ref="189299072"/>
 							<reference key="NSBackgroundColor" ref="977951849"/>
@@ -4365,8 +4524,8 @@ AAABAAAAAQ</bytes>
 						<object class="NSButtonCell" key="NSCell" id="853520292">
 							<int key="NSCellFlags">-2080244224</int>
 							<int key="NSCellFlags2">134217728</int>
-							<string key="NSContents">启用网络界面</string>
-							<reference key="NSSupport" ref="393988310"/>
+							<string key="NSContents">启动网络界面</string>
+							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="52925771"/>
 							<int key="NSButtonFlags">-2038021889</int>
 							<int key="NSButtonFlags2">163</int>
@@ -7671,6 +7830,38 @@ AAABAAAAAQ</bytes>
 					</object>
 					<int key="connectionID">1929</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">setDefaultForMagnets:</string>
+						<reference key="source" ref="511492310"/>
+						<reference key="destination" ref="609293684"/>
+					</object>
+					<int key="connectionID">1935</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">value: values.RenamePartialFiles</string>
+						<reference key="source" ref="325340152"/>
+						<reference key="destination" ref="356871564"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="325340152"/>
+							<reference key="NSDestination" ref="356871564"/>
+							<string key="NSLabel">value: values.RenamePartialFiles</string>
+							<string key="NSBinding">value</string>
+							<string key="NSKeyPath">values.RenamePartialFiles</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">1942</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">setRenamePartialFiles:</string>
+						<reference key="source" ref="511492310"/>
+						<reference key="destination" ref="325340152"/>
+					</object>
+					<int key="connectionID">1944</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -7734,6 +7925,8 @@ AAABAAAAAQ</bytes>
 							<reference ref="688052354"/>
 							<reference ref="964665196"/>
 							<reference ref="1005555131"/>
+							<reference ref="609293684"/>
+							<reference ref="1015958671"/>
 						</object>
 						<reference key="parent" ref="0"/>
 						<string key="objectName">General</string>
@@ -7898,20 +8091,21 @@ AAABAAAAAQ</bytes>
 						<reference key="object" ref="833882848"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="870266578"/>
 							<reference ref="796360506"/>
 							<reference ref="465342204"/>
+							<reference ref="254542693"/>
 							<reference ref="529357945"/>
 							<reference ref="615763784"/>
+							<reference ref="970366881"/>
 							<reference ref="976245322"/>
 							<reference ref="830529860"/>
 							<reference ref="305717884"/>
 							<reference ref="511956256"/>
 							<reference ref="563372628"/>
-							<reference ref="186376617"/>
 							<reference ref="955128727"/>
-							<reference ref="970366881"/>
-							<reference ref="870266578"/>
-							<reference ref="254542693"/>
+							<reference ref="186376617"/>
+							<reference ref="325340152"/>
 						</object>
 						<reference key="parent" ref="73412354"/>
 					</object>
@@ -8001,7 +8195,9 @@ AAABAAAAAQ</bytes>
 						<reference key="object" ref="159788047"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="192996348"/>
 							<reference ref="977701368"/>
+							<reference ref="271336507"/>
 							<reference ref="131289284"/>
 							<reference ref="106990921"/>
 							<reference ref="926230950"/>
@@ -8018,8 +8214,6 @@ AAABAAAAAQ</bytes>
 							<reference ref="144778876"/>
 							<reference ref="1042395974"/>
 							<reference ref="630340288"/>
-							<reference ref="192996348"/>
-							<reference ref="271336507"/>
 						</object>
 						<reference key="parent" ref="298493360"/>
 					</object>
@@ -8204,6 +8398,7 @@ AAABAAAAAQ</bytes>
 							<reference ref="1047565229"/>
 							<reference ref="936149367"/>
 							<reference ref="620460385"/>
+							<reference ref="402912687"/>
 							<reference ref="412524231"/>
 							<reference ref="272019863"/>
 							<reference ref="522207273"/>
@@ -8218,7 +8413,6 @@ AAABAAAAAQ</bytes>
 							<reference ref="401711944"/>
 							<reference ref="497078689"/>
 							<reference ref="290463241"/>
-							<reference ref="402912687"/>
 						</object>
 						<reference key="parent" ref="0"/>
 						<string key="objectName">Bandwidth</string>
@@ -9042,6 +9236,8 @@ AAABAAAAAQ</bytes>
 							<reference ref="276894958"/>
 							<reference ref="391991918"/>
 							<reference ref="171936512"/>
+							<reference ref="695790301"/>
+							<reference ref="439211863"/>
 							<reference ref="210126275"/>
 							<reference ref="895326079"/>
 							<reference ref="593278680"/>
@@ -9053,8 +9249,6 @@ AAABAAAAAQ</bytes>
 							<reference ref="484538294"/>
 							<reference ref="1064247210"/>
 							<reference ref="72739699"/>
-							<reference ref="439211863"/>
-							<reference ref="695790301"/>
 						</object>
 						<reference key="parent" ref="0"/>
 						<string key="objectName">Peers</string>
@@ -10413,6 +10607,48 @@ AAABAAAAAQ</bytes>
 						<reference key="object" ref="467934606"/>
 						<reference key="parent" ref="72739699"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">1930</int>
+						<reference key="object" ref="1015958671"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="819203889"/>
+						</object>
+						<reference key="parent" ref="249126185"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">1931</int>
+						<reference key="object" ref="819203889"/>
+						<reference key="parent" ref="1015958671"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">1932</int>
+						<reference key="object" ref="609293684"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="891757673"/>
+						</object>
+						<reference key="parent" ref="249126185"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">1933</int>
+						<reference key="object" ref="891757673"/>
+						<reference key="parent" ref="609293684"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">1939</int>
+						<reference key="object" ref="325340152"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="467554707"/>
+						</object>
+						<reference key="parent" ref="833882848"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">1940</int>
+						<reference key="object" ref="467554707"/>
+						<reference key="parent" ref="325340152"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -10800,8 +11036,17 @@ AAABAAAAAQ</bytes>
 					<string>1925.IBPluginDependency</string>
 					<string>1925.ImportedFromIB2</string>
 					<string>1926.IBPluginDependency</string>
+					<string>1930.IBPluginDependency</string>
+					<string>1930.ImportedFromIB2</string>
+					<string>1931.IBPluginDependency</string>
+					<string>1932.IBPluginDependency</string>
+					<string>1932.ImportedFromIB2</string>
+					<string>1933.IBPluginDependency</string>
+					<string>1939.IBPluginDependency</string>
+					<string>1939.ImportedFromIB2</string>
 					<string>194.IBPluginDependency</string>
 					<string>194.ImportedFromIB2</string>
+					<string>1940.IBPluginDependency</string>
 					<string>195.IBPluginDependency</string>
 					<string>195.ImportedFromIB2</string>
 					<string>196.IBPluginDependency</string>
@@ -10835,7 +11080,9 @@ AAABAAAAAQ</bytes>
 					<string>23.ImportedFromIB2</string>
 					<string>23.editorWindowContentRectSynchronizationRect</string>
 					<string>23.windowTemplate.hasMaxSize</string>
+					<string>23.windowTemplate.hasMinSize</string>
 					<string>23.windowTemplate.maxSize</string>
+					<string>23.windowTemplate.minSize</string>
 					<string>230.IBPluginDependency</string>
 					<string>230.ImportedFromIB2</string>
 					<string>24.IBPluginDependency</string>
@@ -11117,7 +11364,7 @@ AAABAAAAAQ</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<real value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{85, 294}, {542, 318}}</string>
+					<string>{{371, 336}, {542, 318}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<real value="1"/>
 					<string>{{281, 577}, {539, 315}}</string>
@@ -11184,7 +11431,7 @@ AAABAAAAAQ</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<real value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{39, 262}, {542, 441}}</string>
+					<string>{{179, 379}, {542, 441}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<real value="1"/>
 					<string>{{281, 577}, {539, 315}}</string>
@@ -11212,7 +11459,7 @@ AAABAAAAAQ</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{71, 286}, {542, 227}}</string>
+					<string>{{289, 593}, {542, 227}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<real value="1"/>
 					<string>{{149, 524}, {539, 226}}</string>
@@ -11283,7 +11530,7 @@ AAABAAAAAQ</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{344, 447}, {124, 63}}</string>
+					<string>{{673, 501}, {127, 63}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -11312,7 +11559,7 @@ AAABAAAAAQ</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<real value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{31, 327}, {542, 240}}</string>
+					<string>{{361, 334}, {542, 240}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -11334,7 +11581,7 @@ AAABAAAAAQ</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<real value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{322, 436}, {182, 53}}</string>
+					<string>{{504, 585}, {182, 53}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<real value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -11371,7 +11618,7 @@ AAABAAAAAQ</bytes>
 					<real value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{256, 116}, {142, 213}}</string>
+					<string>{{474, 423}, {145, 213}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -11391,6 +11638,15 @@ AAABAAAAAQ</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<real value="1"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<real value="1"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<real value="1"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<real value="1"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<real value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -11418,13 +11674,15 @@ AAABAAAAAQ</bytes>
 					<real value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<real value="1"/>
-					<string>{{74, 471}, {542, 107}}</string>
+					<string>{{108, 632}, {542, 107}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{74, 471}, {542, 107}}</string>
+					<string>{{108, 632}, {542, 107}}</string>
 					<real value="1"/>
 					<string>{{127, 767}, {539, 107}}</string>
-					<integer value="0"/>
-					<string>{1, -21}</string>
+					<boolean value="YES"/>
+					<boolean value="YES"/>
+					<string>{542, 107}</string>
+					<string>{542, 107}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<real value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -11462,7 +11720,7 @@ AAABAAAAAQ</bytes>
 					<real value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<real value="1"/>
-					<string>{{64, 304}, {542, 291}}</string>
+					<string>{{242, 502}, {542, 331}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<real value="1"/>
 					<string>{{0, 701}, {539, 272}}</string>
@@ -11501,7 +11759,7 @@ AAABAAAAAQ</bytes>
 					<real value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<real value="1"/>
-					<string>{{54, 320}, {542, 288}}</string>
+					<string>{{333, 387}, {542, 307}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<real value="1"/>
 					<string>{{429, 310}, {539, 288}}</string>
@@ -11619,7 +11877,7 @@ AAABAAAAAQ</bytes>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">1929</int>
+			<int key="maxID">1944</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -11788,6 +12046,7 @@ AAABAAAAAQ</bytes>
 							<string>setBlocklistAutoUpdate:</string>
 							<string>setBlocklistEnabled:</string>
 							<string>setDHT:</string>
+							<string>setDefaultForMagnets:</string>
 							<string>setDownloadLocation:</string>
 							<string>setEncryptionMode:</string>
 							<string>setGlobalLimit:</string>
@@ -11814,6 +12073,7 @@ AAABAAAAAQ</bytes>
 							<string>setRPCWebUIDiscovery:</string>
 							<string>setRandomPortOnStart:</string>
 							<string>setRatioStop:</string>
+							<string>setRenamePartialFiles:</string>
 							<string>setSound:</string>
 							<string>setSpeedLimit:</string>
 							<string>setStalled:</string>
@@ -11823,6 +12083,8 @@ AAABAAAAAQ</bytes>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
