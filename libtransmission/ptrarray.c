@@ -17,7 +17,7 @@
 #include "ptrarray.h"
 #include "utils.h"
 
-#define GROW 32
+#define FLOOR 32
 
 const tr_ptrArray TR_PTR_ARRAY_INIT = { NULL, 0, 0 };
 
@@ -78,7 +78,7 @@ tr_ptrArrayInsert( tr_ptrArray * t,
 
     if( t->n_items >= t->n_alloc )
     {
-        t->n_alloc = t->n_items + GROW;
+        t->n_alloc = MAX( FLOOR, t->n_alloc * 2 );
         t->items = tr_renew( void*, t->items, t->n_alloc );
     }
 
