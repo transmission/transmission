@@ -2,16 +2,17 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">10C540</string>
+		<string key="IBDocument.SystemVersion">10D552</string>
 		<string key="IBDocument.InterfaceBuilderVersion">740</string>
-		<string key="IBDocument.AppKitVersion">1038.25</string>
-		<string key="IBDocument.HIToolboxVersion">458.00</string>
+		<string key="IBDocument.AppKitVersion">1038.29</string>
+		<string key="IBDocument.HIToolboxVersion">460.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
 			<string key="NS.object.0">740</string>
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
+			<integer value="6"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -50,7 +51,7 @@
 				<string key="NSWindowContentMaxSize">{1.79769e+308, 1.79769e+308}</string>
 				<string key="NSWindowContentMinSize">{563, 399}</string>
 				<object class="NSView" key="NSWindowView" id="755547124">
-					<nil key="NSNextResponder"/>
+					<reference key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
 					<object class="NSMutableArray" key="NSSubviews">
 						<bool key="EncodedWithXMLCoder">YES</bool>
@@ -155,33 +156,36 @@
 										<object class="NSTextView" id="428363936">
 											<reference key="NSNextResponder" ref="468443008"/>
 											<int key="NSvFlags">2322</int>
-											<string key="NSFrameSize">{408, 14}</string>
+											<object class="NSMutableSet" key="NSDragTypes">
+												<bool key="EncodedWithXMLCoder">YES</bool>
+												<object class="NSArray" key="set.sortedObjects">
+													<bool key="EncodedWithXMLCoder">YES</bool>
+													<string>Apple HTML pasteboard type</string>
+													<string>Apple PDF pasteboard type</string>
+													<string>Apple PICT pasteboard type</string>
+													<string>Apple PNG pasteboard type</string>
+													<string>Apple URL pasteboard type</string>
+													<string>CorePasteboardFlavorType 0x6D6F6F76</string>
+													<string>NSColor pasteboard type</string>
+													<string>NSFilenamesPboardType</string>
+													<string>NSStringPboardType</string>
+													<string>NeXT Encapsulated PostScript v1.2 pasteboard type</string>
+													<string>NeXT RTFD pasteboard type</string>
+													<string>NeXT Rich Text Format v1.0 pasteboard type</string>
+													<string>NeXT TIFF v4.0 pasteboard type</string>
+													<string>NeXT font pasteboard type</string>
+													<string>NeXT ruler pasteboard type</string>
+													<string>WebURLsWithTitlesPboardType</string>
+													<string>public.url</string>
+												</object>
+											</object>
+											<string key="NSFrameSize">{408, 16}</string>
 											<reference key="NSSuperview" ref="468443008"/>
 											<object class="NSTextContainer" key="NSTextContainer" id="742813744">
 												<object class="NSLayoutManager" key="NSLayoutManager">
 													<object class="NSTextStorage" key="NSTextStorage">
 														<object class="NSMutableString" key="NSString">
-															<characters key="NS.bytes">Kommentar</characters>
-														</object>
-														<object class="NSDictionary" key="NSAttributes">
-															<bool key="EncodedWithXMLCoder">YES</bool>
-															<object class="NSArray" key="dict.sortedKeys">
-																<bool key="EncodedWithXMLCoder">YES</bool>
-																<string>NSFont</string>
-																<string>NSParagraphStyle</string>
-															</object>
-															<object class="NSMutableArray" key="dict.values">
-																<bool key="EncodedWithXMLCoder">YES</bool>
-																<object class="NSFont">
-																	<string key="NSName">Helvetica</string>
-																	<double key="NSSize">12</double>
-																	<int key="NSfFlags">16</int>
-																</object>
-																<object class="NSParagraphStyle">
-																	<int key="NSAlignment">4</int>
-																	<nil key="NSTabStops"/>
-																</object>
-															</object>
+															<characters key="NS.bytes"/>
 														</object>
 														<nil key="NSDelegate"/>
 													</object>
@@ -254,6 +258,7 @@
 									</object>
 									<string key="NSFrame">{{1, 1}, {408, 73}}</string>
 									<reference key="NSSuperview" ref="1007617591"/>
+									<reference key="NSNextKeyView" ref="428363936"/>
 									<reference key="NSDocView" ref="428363936"/>
 									<reference key="NSBGColor" ref="885755327"/>
 									<object class="NSCursor" key="NSCursor">
@@ -285,6 +290,7 @@
 							</object>
 							<string key="NSFrame">{{118, 117}, {425, 75}}</string>
 							<reference key="NSSuperview" ref="755547124"/>
+							<reference key="NSNextKeyView" ref="468443008"/>
 							<int key="NSsFlags">18</int>
 							<reference key="NSVScroller" ref="947788581"/>
 							<reference key="NSHScroller" ref="704686863"/>
@@ -639,6 +645,7 @@
 									</object>
 									<string key="NSFrame">{{1, 1}, {408, 89}}</string>
 									<reference key="NSSuperview" ref="453590654"/>
+									<reference key="NSNextKeyView" ref="910757453"/>
 									<reference key="NSDocView" ref="910757453"/>
 									<reference key="NSBGColor" ref="844220701"/>
 									<int key="NScvFlags">4</int>
@@ -665,6 +672,7 @@
 							</object>
 							<string key="NSFrame">{{118, 226}, {425, 91}}</string>
 							<reference key="NSSuperview" ref="755547124"/>
+							<reference key="NSNextKeyView" ref="87995314"/>
 							<int key="NSsFlags">18</int>
 							<reference key="NSVScroller" ref="512681079"/>
 							<reference key="NSHScroller" ref="864982587"/>
@@ -733,6 +741,7 @@
 						</object>
 					</object>
 					<string key="NSFrameSize">{563, 399}</string>
+					<reference key="NSSuperview"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1680, 1028}}</string>
 				<string key="NSMinSize">{563, 421}</string>
