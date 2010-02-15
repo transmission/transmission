@@ -33,7 +33,6 @@
 ==== Qt ====
   * Fix bug that prevented torrents from being added via web browsers
 
-
 === Transmission 1.83 (2010/01/28) ===
 [http://trac.transmissionbt.com/query?milestone=1.83&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== All Platforms ====
