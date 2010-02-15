@@ -683,8 +683,10 @@ typedef enum
         
         if ([item isKindOfClass: [NSDictionary class]])
         {
-            NSString * tierString = [NSString stringWithFormat: NSLocalizedString(@"Tier %d", "Inspector -> tracker table"),
-                                        [[item objectForKey: @"Tier"] integerValue]];
+            const NSInteger tier = [[item objectForKey: @"Tier"] integerValue];
+            NSString * tierString = tier == -1 ? NSLocalizedString(@"New Tier", "Inspector -> tracker table")
+                                    : [NSString stringWithFormat: NSLocalizedString(@"Tier %d", "Inspector -> tracker table"), tier];
+            
             if ([fTorrents count] > 1)
                 tierString = [tierString stringByAppendingFormat: @" - %@", [item objectForKey: @"Name"]];
             return tierString;
@@ -1785,10 +1787,7 @@ typedef enum
     
     NSAssert1([fTorrents count] == 1, @"Attempting to add tracker with %d transfers selected", [fTorrents count]);
     
-    Torrent * torrent = [fTorrents objectAtIndex: 0];
-    
-    [fTrackers addObject: [NSDictionary dictionaryWithObject: [NSNumber numberWithInteger: [torrent numberOfTrackerTiers]+1]
-                                        forKey: @"Tier"]];
+    [fTrackers addObject: [NSDictionary dictionaryWithObject: [NSNumber numberWithInteger: -1] forKey: @"Tier"]];
     [fTrackers addObject: @""];
     
     [fTrackerTable setTrackers: fTrackers];

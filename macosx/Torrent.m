@@ -624,14 +624,6 @@ int trashDataFile(const char * filename)
     return allTrackers;
 }
 
-- (NSUInteger) numberOfTrackerTiers
-{
-    if (fInfo->trackerCount == 0)
-        return 0;
-    
-    return fInfo->trackers[fInfo->trackerCount-1].tier + 1;
-}
-
 - (BOOL) addTrackerToNewTier: (NSString *) tracker
 {
     tracker = [tracker stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
