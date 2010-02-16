@@ -1,4 +1,4 @@
-=== Transmission 1.90 (2010/02/xx) ===
+=== Transmission 1.90 (2010/02/16) ===
 [http://trac.transmissionbt.com/query?milestone=1.90&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Add an option to disable the .part suffix for incomplete files
@@ -11,6 +11,7 @@
   * Use fallocate64() for fast file preallocation on systems that support it
   * Magnet link improvements
   * Don't let "Disk is full" errors cause loss of configuration files
+  * Faster parsing of bencoded data, such as .torrent files
 ==== Mac ====
   * Display information for all selected transfers in the inspector's tracker and peer tabs
   * Add a filter to the message log
