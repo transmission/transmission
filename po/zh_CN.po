@@ -4,15 +4,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-20 15:27-0600\n"
-"PO-Revision-Date: 2009-12-30 12:08+0000\n"
-"Last-Translator: Xhacker Liu <liu.dongyuan@gmail.com>\n"
+"POT-Creation-Date: 2010-02-10 20:02-0600\n"
+"PO-Revision-Date: 2010-02-14 03:30+0000\n"
+"Last-Translator: Eleanor Chen <chenyueg@gmail.com>\n"
 "Language-Team: Chinese (China) <zh_CN@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2010-01-23 00:12+0000\n"
+"X-Launchpad-Export-Date: 2010-02-16 15:44+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:54
@@ -41,7 +41,7 @@ msgstr "按 Tracker 排序(_T)"
 
 #: ../gtk/actions.c:60
 msgid "Sort by A_ge"
-msgstr "按时间排序(_G)"
+msgstr "按存在时间排序(_G)"
 
 #: ../gtk/actions.c:61
 msgid "Sort by Time _Left"
@@ -53,7 +53,7 @@ msgstr "按大小排列(_Z)"
 
 #: ../gtk/actions.c:79
 msgid "_Show Transmission"
-msgstr ""
+msgstr "显示 Transmission (_S)"
 
 #: ../gtk/actions.c:80
 msgid "Message _Log"
@@ -61,7 +61,7 @@ msgstr "消息日志(_L)"
 
 #: ../gtk/actions.c:95
 msgid "Enable Temporary Speed _Limits"
-msgstr ""
+msgstr "启用临时速度限制(_L)"
 
 #: ../gtk/actions.c:96
 msgid "_Minimal View"
@@ -93,7 +93,7 @@ msgstr "种子(_T)"
 
 #: ../gtk/actions.c:107
 msgid "_View"
-msgstr "视图(_V)"
+msgstr "查看(_V)"
 
 #: ../gtk/actions.c:108
 msgid "_Sort Torrents By"
@@ -109,15 +109,15 @@ msgstr "帮助(_H)"
 
 #: ../gtk/actions.c:111
 msgid "Copy _Magnet Link to Clipboard"
-msgstr ""
+msgstr "复制Magnet链接到粘贴板(_G)"
 
 #: ../gtk/actions.c:112
 msgid "Add _URL..."
-msgstr ""
+msgstr "添加URL地址(_U)"
 
 #: ../gtk/actions.c:112
 msgid "Add URL..."
-msgstr ""
+msgstr "添加URL地址..."
 
 #: ../gtk/actions.c:113 ../gtk/actions.c:114
 msgid "Add a torrent"
@@ -125,7 +125,7 @@ msgstr "添加种子文件"
 
 #: ../gtk/actions.c:114
 msgid "_Add File..."
-msgstr "添加文件...(_A)"
+msgstr "添加文件(_A)..."
 
 #: ../gtk/actions.c:115
 msgid "_Start"
@@ -143,7 +143,7 @@ msgstr "统计信息(_S)"
 msgid "_Donate"
 msgstr "捐助(_D)"
 
-#: ../gtk/actions.c:118 ../gtk/add-dialog.c:362
+#: ../gtk/actions.c:118
 msgid "_Verify Local Data"
 msgstr "校验本地数据(_V)"
 
@@ -219,35 +219,36 @@ msgstr "内容(_C)"
 msgid "Ask Tracker for _More Peers"
 msgstr "向 Traker 要求更多的连接(_M)"
 
-#: ../gtk/add-dialog.c:241
+#: ../gtk/add-dialog.c:247
 msgid "Torrent files"
 msgstr "种子文件"
 
-#: ../gtk/add-dialog.c:246
+#: ../gtk/add-dialog.c:252
 msgid "All files"
 msgstr "所有文件"
 
-#: ../gtk/add-dialog.c:275
+#. make the dialog
+#: ../gtk/add-dialog.c:278
 msgid "Torrent Options"
 msgstr "Torrent 选项"
 
-#: ../gtk/add-dialog.c:298 ../gtk/tr-prefs.c:298
+#: ../gtk/add-dialog.c:301 ../gtk/tr-prefs.c:296
 msgid "Mo_ve .torrent file to the trash"
-msgstr ""
+msgstr "移动(_V).torrent文件至回收站"
 
-#: ../gtk/add-dialog.c:300 ../gtk/tr-prefs.c:294
+#: ../gtk/add-dialog.c:303 ../gtk/tr-prefs.c:292
 msgid "_Start when added"
 msgstr "添加后立即开始(_S)"
 
-#: ../gtk/add-dialog.c:312
+#: ../gtk/add-dialog.c:318
 msgid "_Torrent file:"
 msgstr "种子文件(_T):"
 
-#: ../gtk/add-dialog.c:318
+#: ../gtk/add-dialog.c:322
 msgid "Select Source File"
 msgstr "选择源文件"
 
-#: ../gtk/add-dialog.c:330
+#: ../gtk/add-dialog.c:333
 msgid "_Destination folder:"
 msgstr "目标文件夹(_D)"
 
@@ -255,465 +256,457 @@ msgstr "目标文件夹(_D)"
 msgid "Select Destination Folder"
 msgstr "选择目标文件夹"
 
-#: ../gtk/add-dialog.c:443
+#: ../gtk/add-dialog.c:359 ../gtk/details.c:477
+msgid "Torrent _priority:"
+msgstr "Torrent 优先级(_P)："
+
+#: ../gtk/add-dialog.c:441
 msgid "Add a Torrent"
 msgstr "添加一个种子"
 
-#: ../gtk/add-dialog.c:460 ../gtk/tr-prefs.c:290
+#: ../gtk/add-dialog.c:458 ../gtk/tr-prefs.c:288
 msgid "Show _options dialog"
-msgstr ""
+msgstr "显示选项(_O)对话框"
 
-#: ../gtk/add-dialog.c:499 ../gtk/tr-core.c:1071
-msgid "Unrecognized URL"
-msgstr ""
-
-#: ../gtk/add-dialog.c:501 ../gtk/tr-core.c:1073
-#, c-format
-msgid "Transmission doesn't know how to use \"%s\""
-msgstr ""
-
-#: ../gtk/add-dialog.c:524
+#: ../gtk/add-dialog.c:514
 msgid "Add URL"
 msgstr "添加 URL"
 
-#: ../gtk/add-dialog.c:537
+#: ../gtk/add-dialog.c:527
 msgid "Add torrent from URL"
-msgstr ""
+msgstr "从URL地址添加torrent"
 
-#: ../gtk/add-dialog.c:540
+#: ../gtk/add-dialog.c:530
 msgid "_URL"
-msgstr ""
+msgstr "URL(_U)"
 
-#: ../gtk/conf.c:63 ../libtransmission/fdlimit.c:348
-#: ../libtransmission/metainfo.c:100 ../libtransmission/utils.c:602
-#: ../libtransmission/utils.c:613
+#: ../gtk/conf.c:62 ../libtransmission/fdlimit.c:358
+#: ../libtransmission/metainfo.c:99 ../libtransmission/utils.c:608
+#: ../libtransmission/utils.c:619
 #, c-format
 msgid "Couldn't create \"%1$s\": %2$s"
 msgstr "无法创建 \"%1$s\": %2$s"
 
-#: ../gtk/conf.c:88 ../libtransmission/bencode.c:1538
-#: ../libtransmission/fdlimit.c:376
+#: ../gtk/conf.c:87 ../libtransmission/fdlimit.c:386
 #, c-format
 msgid "Couldn't open \"%1$s\": %2$s"
 msgstr "无法打开 \"%1$s\": %2$s"
 
-#: ../gtk/conf.c:93
+#: ../gtk/conf.c:92
 #, c-format
 msgid "%s is already running."
 msgstr "%s 已在运行中。"
 
-#: ../gtk/conf.c:451 ../gtk/conf.c:456
+#: ../gtk/conf.c:450 ../gtk/conf.c:455
 #, c-format
 msgid "Importing \"%s\""
 msgstr "正在导入\"%s\""
 
-#: ../gtk/details.c:473 ../gtk/file-list.c:582
-msgid "High"
-msgstr "高"
-
-#: ../gtk/details.c:474 ../gtk/file-list.c:583
-msgid "Normal"
-msgstr "正常"
-
-#: ../gtk/details.c:475 ../gtk/file-list.c:584
-msgid "Low"
-msgstr "低"
-
-#: ../gtk/details.c:510 ../gtk/tr-prefs.c:1415
+#: ../gtk/details.c:446 ../gtk/tr-prefs.c:1417
 msgid "Speed"
 msgstr "速度"
 
-#: ../gtk/details.c:512
+#: ../gtk/details.c:448
 msgid "Honor global _limits"
 msgstr "服从全局限制(_L)"
 
-#: ../gtk/details.c:517 ../gtk/tr-prefs.c:1199
+#: ../gtk/details.c:453 ../gtk/tr-prefs.c:1201
 msgid "Limit _download speed (KB/s):"
 msgstr "下载限速 (KB/s)(_D)："
 
-#: ../gtk/details.c:529 ../gtk/tr-prefs.c:1206
+#: ../gtk/details.c:465 ../gtk/tr-prefs.c:1208
 msgid "Limit _upload speed (KB/s):"
 msgstr "上传限速 (KB/s)(_U)："
 
-#: ../gtk/details.c:541
-msgid "Torrent _priority:"
-msgstr "Torrent 优先级(_P)："
-
-#: ../gtk/details.c:545
+#: ../gtk/details.c:481
 msgid "Seed-Until Ratio"
 msgstr "做种至以下比率"
 
-#: ../gtk/details.c:547
+#: ../gtk/details.c:483
 msgid "Use _global settings"
 msgstr "使用全局设置(_G)"
 
-#: ../gtk/details.c:555
+#: ../gtk/details.c:491
 msgid "Seed _regardless of ratio"
 msgstr "无视分享比例做种"
 
-#: ../gtk/details.c:564 ../gtk/tr-prefs.c:315
+#: ../gtk/details.c:500 ../gtk/tr-prefs.c:317
 msgid "_Seed torrent until its ratio reaches:"
 msgstr "做种直到以下分享比率(_S)："
 
-#: ../gtk/details.c:580
+#: ../gtk/details.c:516
 msgid "Peer Connections"
 msgstr "Peer 连接数"
 
-#: ../gtk/details.c:583
+#: ../gtk/details.c:519
 msgid "_Maximum peers:"
 msgstr "最大 Peers 连接数(_M)："
 
-#: ../gtk/details.c:602 ../gtk/torrent-cell-renderer.c:185
+#: ../gtk/details.c:538 ../gtk/torrent-cell-renderer.c:185
 msgid "Waiting to verify local data"
 msgstr "等待校验本地数据"
 
-#: ../gtk/details.c:603
+#: ../gtk/details.c:539
 msgid "Verifying local data"
 msgstr "正在验证本地数据"
 
-#: ../gtk/details.c:604
+#: ../gtk/details.c:540
 msgid "Downloading"
 msgstr "下载中"
 
-#: ../gtk/details.c:605
+#: ../gtk/details.c:541
 msgid "Seeding"
 msgstr "做种中"
 
-#: ../gtk/details.c:606 ../gtk/torrent-cell-renderer.c:181
+#: ../gtk/details.c:542 ../gtk/torrent-cell-renderer.c:181
 msgid "Paused"
 msgstr "已暂停"
 
-#: ../gtk/details.c:626 ../gtk/util.c:109 ../libtransmission/utils.c:1310
+#: ../gtk/details.c:562 ../gtk/util.c:108 ../libtransmission/utils.c:1322
 msgid "None"
 msgstr "无"
 
-#: ../gtk/details.c:627 ../gtk/file-list.c:585
+#: ../gtk/details.c:563 ../gtk/file-list.c:586
 msgid "Mixed"
 msgstr "混合"
 
-#: ../gtk/details.c:647
+#: ../gtk/details.c:585
 msgid "Private to this tracker -- DHT and PEX disabled"
 msgstr "当前 Tracker 设置为私有 -- DHT 和 PEX 被禁用"
 
-#: ../gtk/details.c:649
+#: ../gtk/details.c:587
 msgid "Public torrent"
 msgstr "公共种子"
 
-#: ../gtk/details.c:672
+#: ../gtk/details.c:610
 #, c-format
 msgid "Created by %1$s"
 msgstr "创建者：%1$s"
 
-#: ../gtk/details.c:674
+#: ../gtk/details.c:612
 #, c-format
 msgid "Created on %1$s"
 msgstr "创建时间：%1$s"
 
-#: ../gtk/details.c:676
+#: ../gtk/details.c:614
 #, c-format
 msgid "Created by %1$s on %2$s"
 msgstr "由 %1$s 于 %2$s 创建"
 
-#: ../gtk/details.c:758
+#: ../gtk/details.c:696
 msgid "Unknown"
 msgstr "未知"
 
-#: ../gtk/details.c:786
+#: ../gtk/details.c:724
 #, c-format
 msgid "%1$s (%2$'d piece @ %3$s)"
 msgid_plural "%1$s (%2$'d pieces @ %3$s)"
 msgstr[0] "%1$s (%2$'d 块 @ %3$s)"
 
-#: ../gtk/details.c:792
+#: ../gtk/details.c:730
 #, c-format
 msgid "%1$s (%2$'d piece)"
 msgid_plural "%1$s (%2$'d pieces)"
 msgstr[0] "%1$s (%2$'d 块)"
 
-#: ../gtk/details.c:826
+#: ../gtk/details.c:765
 #, c-format
 msgid "%1$s (%2$.1f%%); %3$s Unverified"
 msgstr "%1$s (%2$.1f%%); %3$s 未校验"
 
-#: ../gtk/details.c:828
+#: ../gtk/details.c:767
 #, c-format
 msgid "%1$s (%2$.1f%%)"
 msgstr "%1$s (%2$.1f%%)"
 
-#: ../gtk/details.c:848
+#: ../gtk/details.c:778
+#, c-format
+msgid "%1$.1f%%"
+msgstr ""
+
+#: ../gtk/details.c:796
 #, c-format
 msgid "%1$s (+%2$s corrupt)"
 msgstr ""
 
-#: ../gtk/details.c:921
+#: ../gtk/details.c:869
 msgid "Active now"
 msgstr "当前活跃"
 
-#: ../gtk/details.c:925
+#: ../gtk/details.c:873
 #, c-format
 msgid "%1$s ago"
 msgstr "%1$s 前"
 
-#: ../gtk/details.c:944
+#: ../gtk/details.c:892
 msgid "Activity"
 msgstr "活动"
 
-#: ../gtk/details.c:948
+#: ../gtk/details.c:896
 msgid "Torrent size:"
 msgstr "Torrent 尺寸："
 
-#: ../gtk/details.c:952
+#: ../gtk/details.c:900
 msgid "Have:"
 msgstr "已下载："
 
-#: ../gtk/details.c:956 ../gtk/stats.c:167 ../gtk/stats.c:179
+#: ../gtk/details.c:904
+msgid "Availability:"
+msgstr ""
+
+#: ../gtk/details.c:908 ../gtk/stats.c:168 ../gtk/stats.c:180
 msgid "Downloaded:"
 msgstr "已传输："
 
-#: ../gtk/details.c:960 ../gtk/stats.c:165 ../gtk/stats.c:177
+#: ../gtk/details.c:912 ../gtk/stats.c:166 ../gtk/stats.c:178
 msgid "Uploaded:"
 msgstr "已上传："
 
-#: ../gtk/details.c:964 ../gtk/stats.c:169 ../gtk/stats.c:181
+#: ../gtk/details.c:916 ../gtk/stats.c:170 ../gtk/stats.c:182
 msgid "Ratio:"
 msgstr "分享比率："
 
-#: ../gtk/details.c:968
+#: ../gtk/details.c:920
 msgid "State:"
 msgstr "状态："
 
-#: ../gtk/details.c:972
+#: ../gtk/details.c:924
 msgid "Running time:"
 msgstr "运行时间"
 
-#: ../gtk/details.c:976
+#: ../gtk/details.c:928
 msgid "Remaining time:"
-msgstr ""
+msgstr "剩余"
 
-#: ../gtk/details.c:980
+#: ../gtk/details.c:932
 msgid "Last activity:"
 msgstr "上次活跃："
 
-#: ../gtk/details.c:984
+#: ../gtk/details.c:936
 msgid "Error:"
 msgstr "错误："
 
-#: ../gtk/details.c:988
+#: ../gtk/details.c:940
 msgid "Details"
 msgstr "详细信息"
 
-#: ../gtk/details.c:994
+#: ../gtk/details.c:946
 msgid "Location:"
 msgstr "位置："
 
-#: ../gtk/details.c:1001
+#: ../gtk/details.c:953
 msgid "Hash:"
 msgstr "Hash值："
 
-#: ../gtk/details.c:1006
+#: ../gtk/details.c:958
 msgid "Privacy:"
 msgstr "隐私："
 
-#: ../gtk/details.c:1011
+#: ../gtk/details.c:963
 msgid "Origin:"
-msgstr ""
+msgstr "来源："
 
-#: ../gtk/details.c:1028
+#: ../gtk/details.c:980
 msgid "Comment:"
 msgstr "备注："
 
-#: ../gtk/details.c:1060
+#: ../gtk/details.c:1012
 msgid "Webseeds"
 msgstr "Web 种子"
 
-#: ../gtk/details.c:1062 ../gtk/details.c:1106
+#: ../gtk/details.c:1014 ../gtk/details.c:1058
 msgid "Down"
 msgstr "下载"
 
-#: ../gtk/details.c:1104
+#: ../gtk/details.c:1056
 msgid "Address"
 msgstr "地址"
 
-#: ../gtk/details.c:1108
+#: ../gtk/details.c:1060
 msgid "Up"
 msgstr "上传"
 
-#: ../gtk/details.c:1109
+#: ../gtk/details.c:1061
 msgid "Client"
 msgstr "客户端"
 
-#: ../gtk/details.c:1110
+#: ../gtk/details.c:1062
 msgid "%"
 msgstr "%"
 
-#: ../gtk/details.c:1112
+#: ../gtk/details.c:1064
 msgid "Up Reqs"
 msgstr ""
 
-#: ../gtk/details.c:1114
+#: ../gtk/details.c:1066
 msgid "Dn Reqs"
 msgstr ""
 
-#: ../gtk/details.c:1115
+#: ../gtk/details.c:1067
 msgid "Status"
 msgstr "状态"
 
-#: ../gtk/details.c:1434
+#: ../gtk/details.c:1386
 msgid "Optimistic unchoke"
 msgstr "乐观解锁"
 
-#: ../gtk/details.c:1435
+#: ../gtk/details.c:1387
 msgid "Downloading from this peer"
 msgstr "从该 peer 下载"
 
-#: ../gtk/details.c:1436
+#: ../gtk/details.c:1388
 msgid "We would download from this peer if they would let us"
 msgstr "若对方允许，将从该 peer 下载"
 
-#: ../gtk/details.c:1437
+#: ../gtk/details.c:1389
 msgid "Uploading to peer"
 msgstr "上传到 peer"
 
-#: ../gtk/details.c:1438
+#: ../gtk/details.c:1390
 msgid "We would upload to this peer if they asked"
 msgstr "若对方询问，将上传至该 peer"
 
-#: ../gtk/details.c:1439
+#: ../gtk/details.c:1391
 msgid "Peer has unchoked us, but we're not interested"
 msgstr "此 peer 已经对我们解锁，但我们对此不感兴趣"
 
-#: ../gtk/details.c:1440
+#: ../gtk/details.c:1392
 msgid "We unchoked this peer, but they're not interested"
 msgstr "我们解锁了此 peer，但是他们并不感兴趣"
 
-#: ../gtk/details.c:1441
+#: ../gtk/details.c:1393
 msgid "Encrypted connection"
 msgstr "加密连接"
 
-#: ../gtk/details.c:1442
+#: ../gtk/details.c:1394
 msgid "Peer was discovered through Peer Exchange (PEX)"
 msgstr "通过 peer 交换 (PEX) 所发现的 peer 数"
 
-#: ../gtk/details.c:1443
+#: ../gtk/details.c:1395
 msgid "Peer was discovered through DHT"
 msgstr "通过 DHT 发现的 Peer"
 
-#: ../gtk/details.c:1444
+#: ../gtk/details.c:1396
 msgid "Peer is an incoming connection"
 msgstr "Peer 是输入连接"
 
-#: ../gtk/details.c:1675 ../gtk/details.c:2130
+#: ../gtk/details.c:1627 ../gtk/details.c:2086
 msgid "Show _more details"
-msgstr ""
+msgstr "更多细节(_M)"
 
-#: ../gtk/details.c:1747
+#: ../gtk/details.c:1701
 #, c-format
-msgid "Got a list of %s%'d peers%s %s ago"
+msgid "Got a list of %1$s%2$'d peers%3$s %4$s ago"
 msgstr ""
 
-#: ../gtk/details.c:1751
+#: ../gtk/details.c:1705
 #, c-format
-msgid "Got an error %s\"%s\"%s %s ago"
+msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
 msgstr ""
 
-#: ../gtk/details.c:1761
+#: ../gtk/details.c:1708
+#, c-format
+msgid "Got an error %1$s\"%2$s\"%3$s %4$s ago"
+msgstr ""
+
+#: ../gtk/details.c:1717
 msgid "No updates scheduled"
 msgstr ""
 
-#: ../gtk/details.c:1767
+#: ../gtk/details.c:1723
 #, c-format
 msgid "Asking for more peers in %s"
 msgstr ""
 
-#: ../gtk/details.c:1771
+#: ../gtk/details.c:1727
 msgid "Queued to ask for more peers"
 msgstr ""
 
-#: ../gtk/details.c:1776
+#: ../gtk/details.c:1732
 #, c-format
 msgid "Asking for more peers now... <small>%s</small>"
 msgstr ""
 
-#: ../gtk/details.c:1786
+#: ../gtk/details.c:1742
 #, c-format
 msgid "Tracker had %s%'d seeders and %'d leechers%s %s ago"
 msgstr ""
 
-#: ../gtk/details.c:1790
+#: ../gtk/details.c:1746
 #, c-format
 msgid "Got a scrape error \"%s%s%s\" %s ago"
 msgstr ""
 
-#: ../gtk/details.c:1800
+#: ../gtk/details.c:1756
 #, c-format
 msgid "Asking for peer counts in %s"
 msgstr ""
 
-#: ../gtk/details.c:1804
+#: ../gtk/details.c:1760
 msgid "Queued to ask for peer counts"
 msgstr ""
 
-#: ../gtk/details.c:1809
+#: ../gtk/details.c:1765
 #, c-format
 msgid "Asking for peer counts now... <small>%s</small>"
 msgstr ""
 
-#: ../gtk/details.c:2022
+#: ../gtk/details.c:1978
 msgid "List contains invalid URLs"
 msgstr ""
 
-#: ../gtk/details.c:2055
+#: ../gtk/details.c:2011
 msgid "Edit Trackers"
-msgstr ""
+msgstr "编辑Trackers"
 
-#: ../gtk/details.c:2067
+#: ../gtk/details.c:2023
 msgid "Tracker Announce URLs"
 msgstr ""
 
-#: ../gtk/details.c:2070 ../gtk/makemeta-ui.c:452
+#: ../gtk/details.c:2026 ../gtk/makemeta-ui.c:453
 msgid ""
 "To add a backup URL, add it on the line after the primary URL.\n"
 "To add another primary URL, add it after a blank line."
 msgstr ""
 
-#: ../gtk/details.c:2112 ../gtk/details.c:2226
+#: ../gtk/details.c:2068 ../gtk/details.c:2182
 msgid "Trackers"
 msgstr "Trackers"
 
-#: ../gtk/details.c:2137
+#: ../gtk/details.c:2093
 msgid "_Edit Trackers"
-msgstr ""
+msgstr "编辑 Trackers (_E)"
 
-#: ../gtk/details.c:2145
+#: ../gtk/details.c:2101
 msgid "Show _backup trackers"
-msgstr ""
+msgstr "显示备用 Trackers (_B)"
 
-#: ../gtk/details.c:2218 ../gtk/msgwin.c:179
+#: ../gtk/details.c:2174 ../gtk/msgwin.c:179
 msgid "Information"
 msgstr "信息"
 
-#: ../gtk/details.c:2222
+#: ../gtk/details.c:2178
 msgid "Peers"
 msgstr "连接数"
 
-#: ../gtk/details.c:2232
+#: ../gtk/details.c:2188
 msgid "File listing not available for combined torrent properties"
 msgstr ""
 
-#: ../gtk/details.c:2236 ../gtk/makemeta-ui.c:401 ../gtk/tr-window.c:851
+#: ../gtk/details.c:2192 ../gtk/makemeta-ui.c:402 ../gtk/tr-window.c:855
 msgid "Files"
 msgstr "文件"
 
-#: ../gtk/details.c:2241 ../gtk/tr-window.c:954
+#: ../gtk/details.c:2197 ../gtk/tr-window.c:958
 msgid "Options"
 msgstr "选项"
 
-#: ../gtk/details.c:2268
+#: ../gtk/details.c:2224
 #, c-format
 msgid "%s Properties"
 msgstr "%s 属性"
 
-#: ../gtk/details.c:2279
+#: ../gtk/details.c:2235
 #, c-format
 msgid "%'d Torrent Properties"
 msgstr "%'d BT种子属性"
@@ -756,66 +749,78 @@ msgid "One of these torrents has not finished downloading."
 msgid_plural "Some of these torrents have not finished downloading."
 msgstr[0] "部分 Torrent 尚未完成下载."
 
+#: ../gtk/file-list.c:583 ../gtk/util.c:691
+msgid "High"
+msgstr "高"
+
+#: ../gtk/file-list.c:584 ../gtk/util.c:692
+msgid "Normal"
+msgstr "正常"
+
+#: ../gtk/file-list.c:585 ../gtk/util.c:693
+msgid "Low"
+msgstr "低"
+
 #. add "enabled" column
-#: ../gtk/file-list.c:612 ../gtk/file-list.c:745
+#: ../gtk/file-list.c:613 ../gtk/file-list.c:746
 msgid "Download"
 msgstr "下载"
 
 #. add priority column
-#: ../gtk/file-list.c:613 ../gtk/file-list.c:759
+#: ../gtk/file-list.c:614 ../gtk/file-list.c:760
 msgid "Priority"
 msgstr "优先级"
 
-#: ../gtk/file-list.c:717
+#: ../gtk/file-list.c:718
 msgid "File"
 msgstr "文件"
 
 #. add "progress" column
-#: ../gtk/file-list.c:732
+#: ../gtk/file-list.c:733
 msgid "Progress"
 msgstr "进度"
 
-#: ../gtk/main.c:396
+#: ../gtk/main.c:394
 #, c-format
 msgid ""
 "Got signal %d; trying to shut down cleanly.  Do it again if it gets stuck."
 msgstr ""
 
-#: ../gtk/main.c:495
+#: ../gtk/main.c:493
 msgid "Start with all torrents paused"
 msgstr "启动时暂停所有任务"
 
-#: ../gtk/main.c:497
+#: ../gtk/main.c:495
 msgid "Show version number and exit"
 msgstr "显示版本并退出"
 
-#: ../gtk/main.c:501
+#: ../gtk/main.c:499
 msgid "Start minimized in notification area"
-msgstr ""
+msgstr "启动后最小化到通知区域"
 
-#: ../gtk/main.c:504
+#: ../gtk/main.c:502
 msgid "Where to look for configuration files"
 msgstr "配置文件位置"
 
-#: ../gtk/main.c:513
+#: ../gtk/main.c:511 ../gtk/transmission.desktop.in.h:3
 msgid "Transmission"
 msgstr "Transmission"
 
-#: ../gtk/main.c:520
+#: ../gtk/main.c:518
 msgid "[torrent files or urls]"
 msgstr ""
 
-#: ../gtk/main.c:574
+#: ../gtk/main.c:572
 msgid ""
 "Transmission is already running, but is not responding.  To start a new "
 "session, you must first close the existing Transmission process."
-msgstr ""
+msgstr "Transmission 正在运行，但是没有响应。要开启新的进程，您需要将现有的 Transmission 进程关闭。"
 
-#: ../gtk/main.c:628
+#: ../gtk/main.c:626
 msgid "Transmission cannot be started."
 msgstr ""
 
-#: ../gtk/main.c:710
+#: ../gtk/main.c:708
 msgid ""
 "Transmission is a file sharing program.  When you run a torrent, its data "
 "will be made available to others by means of upload.  And of course, any "
@@ -823,38 +828,40 @@ msgid ""
 "\n"
 "You probably knew this, so we won't tell you again."
 msgstr ""
+"Transmission 是一个文件分享程序，当您运行一个下载任务时，这些文件将会被通过各种方式上传。当然，您需要为您分享的内容承担责任。\n"
+"您大概已经知道这一点，所以我们不会再提示您。"
 
-#: ../gtk/main.c:712
+#: ../gtk/main.c:710
 msgid "I _Accept"
-msgstr ""
+msgstr "我同意(_A)"
 
-#: ../gtk/main.c:890
+#: ../gtk/main.c:888
 msgid "<b>Closing Connections</b>"
 msgstr "<b>关闭连接</b>"
 
-#: ../gtk/main.c:894
+#: ../gtk/main.c:892
 msgid "Sending upload/download totals to tracker..."
 msgstr "向 tracker 发送上传/下载总量"
 
-#: ../gtk/main.c:899
+#: ../gtk/main.c:897
 msgid "_Quit Now"
 msgstr "立即退出（_Q)"
 
-#: ../gtk/main.c:1059
+#: ../gtk/main.c:1057
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
 msgstr[0] "无法添加已损坏的种子"
 
-#: ../gtk/main.c:1066
+#: ../gtk/main.c:1064
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] "无法重复添加种子"
 
-#: ../gtk/main.c:1352
+#: ../gtk/main.c:1354
 msgid "A fast and easy BitTorrent client"
 msgstr "一个快速简单的 BitTorrent 客户端"
 
-#: ../gtk/main.c:1357
+#: ../gtk/main.c:1359
 msgid "Copyright 2005-2009 The Transmission Project"
 msgstr "版权所有 2005-2009 The Transmission Project"
 
@@ -862,12 +869,14 @@ msgstr "版权所有 2005-2009 The Transmission Project"
 #. your name
 #. to have it appear in the credits in the "About"
 #. dialog
-#: ../gtk/main.c:1368
+#: ../gtk/main.c:1370
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
 "  Alexey Kotlyarov https://launchpad.net/~koterpillar\n"
 "  Aron Xu https://launchpad.net/~happyaron\n"
+"  Chen Tao https://launchpad.net/~pro711\n"
+"  Eleanor Chen https://launchpad.net/~chenyueg\n"
 "  GrayWaLL https://launchpad.net/~graywall\n"
 "  Hello World! https://launchpad.net/~liuwanfang86\n"
 "  Peng Huang https://launchpad.net/~shawn-p-huang\n"
@@ -889,96 +898,97 @@ msgstr ""
 "  冯超 https://launchpad.net/~rainofchaos\n"
 "  王英华 https://launchpad.net/~wantinghard"
 
-#: ../gtk/makemeta-ui.c:74
+#: ../gtk/makemeta-ui.c:75
 #, c-format
 msgid "Creating \"%s\""
 msgstr ""
 
-#: ../gtk/makemeta-ui.c:76
+#: ../gtk/makemeta-ui.c:77
 #, c-format
 msgid "Created \"%s\"!"
 msgstr ""
 
-#: ../gtk/makemeta-ui.c:78
+#: ../gtk/makemeta-ui.c:79
 #, c-format
 msgid "Error: invalid announce URL \"%s\""
 msgstr ""
 
-#: ../gtk/makemeta-ui.c:80
+#: ../gtk/makemeta-ui.c:81
+#, c-format
 msgid "Cancelled"
-msgstr ""
+msgstr "已取消"
 
-#: ../gtk/makemeta-ui.c:82
+#: ../gtk/makemeta-ui.c:83
 #, c-format
 msgid "Error reading \"%s\": %s"
-msgstr ""
+msgstr "读取 \"%s\" 时发生错误： %s"
 
-#: ../gtk/makemeta-ui.c:84
+#: ../gtk/makemeta-ui.c:85
 #, c-format
 msgid "Error writing \"%s\": %s"
-msgstr ""
+msgstr "写入 \"%s\" 时发生错误： %s"
 
 #. how much data we've scanned through to generate checksums
-#: ../gtk/makemeta-ui.c:101
+#: ../gtk/makemeta-ui.c:102
 #, c-format
 msgid "Scanned %s"
 msgstr ""
 
-#: ../gtk/makemeta-ui.c:166 ../gtk/makemeta-ui.c:388
+#: ../gtk/makemeta-ui.c:167 ../gtk/makemeta-ui.c:389
 msgid "New Torrent"
 msgstr "新增种子"
 
-#: ../gtk/makemeta-ui.c:182
+#: ../gtk/makemeta-ui.c:183
 msgid "Creating torrent..."
 msgstr ""
 
-#: ../gtk/makemeta-ui.c:291
+#: ../gtk/makemeta-ui.c:292
 msgid "No source selected"
 msgstr "未选择源"
 
-#: ../gtk/makemeta-ui.c:297
+#: ../gtk/makemeta-ui.c:298
 #, c-format
 msgid "%1$s; %2$'d File"
 msgid_plural "%1$s; %2$'d Files"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/makemeta-ui.c:303
+#: ../gtk/makemeta-ui.c:304
 #, c-format
 msgid "%1$'d Piece @ %2$s"
 msgid_plural "%1$'d Pieces @ %2$s"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/makemeta-ui.c:403
+#: ../gtk/makemeta-ui.c:404
 msgid "Sa_ve to:"
 msgstr ""
 
-#: ../gtk/makemeta-ui.c:409
+#: ../gtk/makemeta-ui.c:410
 msgid "Source F_older:"
 msgstr ""
 
-#: ../gtk/makemeta-ui.c:420
+#: ../gtk/makemeta-ui.c:421
 msgid "Source _File:"
 msgstr ""
 
-#: ../gtk/makemeta-ui.c:431
+#: ../gtk/makemeta-ui.c:432
 msgid "<i>No source selected</i>"
 msgstr "<i>未选择源</i>"
 
-#: ../gtk/makemeta-ui.c:435
+#: ../gtk/makemeta-ui.c:436
 msgid "Properties"
 msgstr ""
 
-#: ../gtk/makemeta-ui.c:437
+#: ../gtk/makemeta-ui.c:438
 msgid "_Trackers:"
 msgstr ""
 
-#: ../gtk/makemeta-ui.c:459
+#: ../gtk/makemeta-ui.c:460
 msgid "Co_mment:"
 msgstr ""
 
-#: ../gtk/makemeta-ui.c:468
+#: ../gtk/makemeta-ui.c:469
 msgid "_Private torrent"
 msgstr "私有种子(_P)"
 
@@ -1003,7 +1013,7 @@ msgstr "调试"
 msgid "Time"
 msgstr "时间"
 
-#: ../gtk/msgwin.c:258 ../gtk/tr-window.c:851
+#: ../gtk/msgwin.c:258 ../gtk/tr-window.c:855
 msgid "Name"
 msgstr "名称"
 
@@ -1019,23 +1029,23 @@ msgstr "消息日志"
 msgid "Level"
 msgstr "级别"
 
-#: ../gtk/notify.c:102
+#: ../gtk/notify.c:121
 msgid "Download complete"
 msgstr ""
 
-#: ../gtk/notify.c:112
+#: ../gtk/notify.c:131
 msgid "Torrent Complete"
 msgstr "创建种子"
 
-#: ../gtk/notify.c:120
+#: ../gtk/notify.c:140
 msgid "Open File"
 msgstr "打开文件"
 
-#: ../gtk/notify.c:125
+#: ../gtk/notify.c:145
 msgid "Open Folder"
 msgstr "打开文件夹"
 
-#: ../gtk/notify.c:139
+#: ../gtk/notify.c:159
 msgid "Torrent Added"
 msgstr "已添加 Torrent"
 
@@ -1068,46 +1078,46 @@ msgstr "从当前目录移动(_M)"
 msgid "Local data is _already there"
 msgstr "本地数据已存在(_A)"
 
-#: ../gtk/stats.c:75 ../gtk/stats.c:174
+#: ../gtk/stats.c:76 ../gtk/stats.c:175
 #, c-format
 msgid "Started %'d time"
 msgid_plural "Started %'d times"
 msgstr[0] "已启动 %d 次"
 
-#: ../gtk/stats.c:106
+#: ../gtk/stats.c:107
 msgid "Reset your statistics?"
 msgstr ""
 
-#: ../gtk/stats.c:107
+#: ../gtk/stats.c:108
 msgid ""
 "These statistics are for your information only.  Resetting them doesn't "
 "affect the statistics logged by your BitTorrent trackers."
 msgstr ""
 
-#: ../gtk/stats.c:118 ../gtk/stats.c:150
+#: ../gtk/stats.c:119 ../gtk/stats.c:151
 msgid "_Reset"
 msgstr ""
 
-#: ../gtk/stats.c:146 ../gtk/tr-window.c:995
+#: ../gtk/stats.c:147 ../gtk/tr-window.c:999
 msgid "Statistics"
 msgstr "统计信息"
 
-#: ../gtk/stats.c:163
+#: ../gtk/stats.c:164
 msgid "Current Session"
 msgstr "当前会话"
 
-#: ../gtk/stats.c:171 ../gtk/stats.c:183
+#: ../gtk/stats.c:172 ../gtk/stats.c:184
 msgid "Duration:"
 msgstr "持续时间："
 
-#: ../gtk/stats.c:173
+#: ../gtk/stats.c:174
 msgid "Total"
 msgstr "总数"
 
 #. %1$s is how much we've got,
 #. %2$s is how much we'll have when done,
 #. %3$.2f%% is a percentage of the two
-#: ../gtk/torrent-cell-renderer.c:64
+#: ../gtk/torrent-cell-renderer.c:63
 #, c-format
 msgid "%1$s of %2$s (%3$.2f%%)"
 msgstr "%1$s, 共 %2$s (%3$.2f%%)"
@@ -1117,7 +1127,7 @@ msgstr "%1$s, 共 %2$s (%3$.2f%%)"
 #. %3$.2f%% is a percentage of the two,
 #. %4$s is how much we've uploaded,
 #. %5$s is our upload-to-download ratio
-#: ../gtk/torrent-cell-renderer.c:77
+#: ../gtk/torrent-cell-renderer.c:76
 #, c-format
 msgid "%1$s of %2$s (%3$.2f%%), uploaded %4$s (Ratio: %5$s)"
 msgstr "%1$s, 共 %2$s (%3$.2f%%), 已上传 %4$s (分享比率: %5$s)"
@@ -1126,7 +1136,7 @@ msgstr "%1$s, 共 %2$s (%3$.2f%%), 已上传 %4$s (分享比率: %5$s)"
 #. %2$s is how much we've uploaded,
 #. %3$s is our upload-to-download ratio,
 #. $4$s is the ratio we want to reach before we stop uploading
-#: ../gtk/torrent-cell-renderer.c:91
+#: ../gtk/torrent-cell-renderer.c:90
 #, c-format
 msgid "%1$s, uploaded %2$s (Ratio: %3$s Goal: %4$s)"
 msgstr "%1$s，已上传 %2$s (分享比率：%3$s 目标：%4$s)"
@@ -1134,12 +1144,13 @@ msgstr "%1$s，已上传 %2$s (分享比率：%3$s 目标：%4$s)"
 #. %1$s is the torrent's total size,
 #. %2$s is how much we've uploaded,
 #. %3$s is our upload-to-download ratio
-#: ../gtk/torrent-cell-renderer.c:103
+#: ../gtk/torrent-cell-renderer.c:102
 #, c-format
 msgid "%1$s, uploaded %2$s (Ratio: %3$s)"
 msgstr "%1$s, 已上传 %2$s (分享比率: %3$s)"
 
 #: ../gtk/torrent-cell-renderer.c:116 ../gtk/tr-torrent.c:246
+#, c-format
 msgid "Remaining time unknown"
 msgstr "剩余时间未知"
 
@@ -1171,7 +1182,7 @@ msgid "Up: %s"
 msgstr "上传: %s"
 
 #. the torrent isn't uploading or downloading
-#: ../gtk/torrent-cell-renderer.c:163 ../gtk/tr-icon.c:64
+#: ../gtk/torrent-cell-renderer.c:163 ../gtk/tr-icon.c:73
 msgid "Idle"
 msgstr "空闲"
 
@@ -1180,8 +1191,8 @@ msgstr "空闲"
 msgid "Verifying local data (%.1f%% tested)"
 msgstr "校验本地数据 ( %.1f%% 完成 )"
 
-#: ../gtk/torrent-cell-renderer.c:201 ../gtk/tr-window.c:1133
-#: ../gtk/tr-window.c:1161
+#: ../gtk/torrent-cell-renderer.c:201 ../gtk/tr-window.c:1137
+#: ../gtk/tr-window.c:1165
 #, c-format
 msgid "Ratio: %s"
 msgstr "分享比率: %s"
@@ -1236,32 +1247,32 @@ msgstr "BitTorrent 客户端"
 msgid "Download and share files over BitTorrent"
 msgstr "通过 BitTorrent 下载和共享文件"
 
-#: ../gtk/transmission.desktop.in.h:3
+#: ../gtk/transmission.desktop.in.h:4
 msgid "Transmission BitTorrent Client"
 msgstr "Transmission BitTorrent 客户端"
 
-#: ../gtk/tr-core.c:1347
+#: ../gtk/tr-core.c:1340
 msgid "Transmission Bittorrent Client"
 msgstr "Transmission Bittorrent 客户端"
 
-#: ../gtk/tr-core.c:1348
+#: ../gtk/tr-core.c:1341
 msgid "BitTorrent Activity"
 msgstr "BitTorrent 活动"
 
-#: ../gtk/tr-core.c:1360
+#: ../gtk/tr-core.c:1353
 msgid "Disallowing desktop hibernation"
 msgstr "禁止桌面休眠"
 
-#: ../gtk/tr-core.c:1363
+#: ../gtk/tr-core.c:1356
 #, c-format
 msgid "Couldn't disable desktop hibernation: %s"
 msgstr "无法禁用桌面休眠: %s"
 
-#: ../gtk/tr-core.c:1387
+#: ../gtk/tr-core.c:1380
 msgid "Allowing desktop hibernation"
 msgstr "允许桌面休眠"
 
-#: ../gtk/tr-icon.c:80 ../gtk/tr-icon.c:95
+#: ../gtk/tr-icon.c:89 ../gtk/tr-icon.c:104
 #, c-format
 msgid "(Limit: %s)"
 msgstr "(限制：%s)"
@@ -1270,7 +1281,7 @@ msgstr "(限制：%s)"
 #. * %2$s: current upload limit, if any
 #. * %3$s: current download speed
 #. * %4$s: current download limit, if any
-#: ../gtk/tr-icon.c:102
+#: ../gtk/tr-icon.c:111
 #, c-format
 msgid ""
 "Transmission\n"
@@ -1281,317 +1292,321 @@ msgstr ""
 "上传：%1$s %2$s\n"
 "下载：%3$s %4$s"
 
-#: ../gtk/tr-prefs.c:278
+#: ../gtk/tr-prefs.c:276
 msgid "Adding Torrents"
 msgstr "添加种子"
 
-#: ../gtk/tr-prefs.c:281
+#: ../gtk/tr-prefs.c:279
 msgid "Automatically _add torrents from:"
 msgstr "从此处自动添加种子(_a)："
 
-#: ../gtk/tr-prefs.c:302
+#: ../gtk/tr-prefs.c:300
+msgid "Append \"._part\" to incomplete files' names"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:304
 msgid "Keep _incomplete torrents in:"
 msgstr ""
 
-#: ../gtk/tr-prefs.c:310
+#: ../gtk/tr-prefs.c:312
 msgid "Save to _Location:"
 msgstr "保存到位置(_L)："
 
-#: ../gtk/tr-prefs.c:313 ../gtk/tr-prefs.c:1374
+#: ../gtk/tr-prefs.c:315 ../gtk/tr-prefs.c:1376
 msgid "Limits"
 msgstr "限速"
 
-#: ../gtk/tr-prefs.c:339 ../gtk/tr-prefs.c:1424
+#: ../gtk/tr-prefs.c:341 ../gtk/tr-prefs.c:1426
 msgid "Desktop"
 msgstr "桌面"
 
-#: ../gtk/tr-prefs.c:341
+#: ../gtk/tr-prefs.c:343
 msgid "Inhibit _hibernation when torrents are active"
 msgstr "当种子活跃时禁止休眠(_H)"
 
-#: ../gtk/tr-prefs.c:345
+#: ../gtk/tr-prefs.c:347
 msgid "Show Transmission icon in the _notification area"
 msgstr ""
 
-#: ../gtk/tr-prefs.c:349
+#: ../gtk/tr-prefs.c:351
 msgid "Show _popup notifications"
 msgstr ""
 
-#: ../gtk/tr-prefs.c:354
+#: ../gtk/tr-prefs.c:356
 msgid "Play _sound when downloads are complete"
 msgstr ""
 
-#: ../gtk/tr-prefs.c:382
+#: ../gtk/tr-prefs.c:384
 #, c-format
 msgid "Enable _blocklist (contains %'d rule)"
 msgid_plural "Enable _blocklist (contains %'d rules)"
 msgstr[0] "启用屏蔽列表 (_B) (包含 %'d 个规则)"
 
-#: ../gtk/tr-prefs.c:412
+#: ../gtk/tr-prefs.c:414
 #, c-format
 msgid "Blocklist now has %'d rule."
 msgid_plural "Blocklist now has %'d rules."
 msgstr[0] "屏蔽列表现在有 %'d 条规则。"
 
-#: ../gtk/tr-prefs.c:416
+#: ../gtk/tr-prefs.c:418
 msgid "<b>Update succeeded!</b>"
 msgstr "<b>更新成功！</b>"
 
-#: ../gtk/tr-prefs.c:431
+#: ../gtk/tr-prefs.c:433
 msgid "Update Blocklist"
 msgstr "更新屏蔽列表"
 
-#: ../gtk/tr-prefs.c:433
+#: ../gtk/tr-prefs.c:435
 msgid "Getting new blocklist..."
 msgstr "获取新的屏蔽列表..."
 
-#: ../gtk/tr-prefs.c:468
+#: ../gtk/tr-prefs.c:470
 msgid "Allow encryption"
 msgstr "允许加密"
 
-#: ../gtk/tr-prefs.c:469
+#: ../gtk/tr-prefs.c:471
 msgid "Prefer encryption"
 msgstr "优先使用加密"
 
-#: ../gtk/tr-prefs.c:470
+#: ../gtk/tr-prefs.c:472
 msgid "Require encryption"
 msgstr "需要加密"
 
-#: ../gtk/tr-prefs.c:514
+#: ../gtk/tr-prefs.c:516
 msgid "Blocklist"
 msgstr "过滤列表"
 
-#: ../gtk/tr-prefs.c:520
+#: ../gtk/tr-prefs.c:522
 msgid "_Update"
 msgstr "更新(_U)"
 
-#: ../gtk/tr-prefs.c:530
+#: ../gtk/tr-prefs.c:532
 msgid "Enable _automatic updates"
 msgstr "启用自动升级(_A)"
 
-#: ../gtk/tr-prefs.c:537 ../gtk/tr-prefs.c:1418
+#: ../gtk/tr-prefs.c:539 ../gtk/tr-prefs.c:1420
 msgid "Privacy"
 msgstr "隐私"
 
-#: ../gtk/tr-prefs.c:539
+#: ../gtk/tr-prefs.c:541
 msgid "_Encryption mode:"
 msgstr "加密模式(_E)："
 
-#: ../gtk/tr-prefs.c:543
+#: ../gtk/tr-prefs.c:545
 msgid "Use PE_X to find more peers"
 msgstr "使用 PE_X 以寻找更多 peer"
 
-#: ../gtk/tr-prefs.c:545
+#: ../gtk/tr-prefs.c:547
 msgid ""
 "PEX is a tool for exchanging peer lists with the peers you're connected to."
 msgstr "PEX是用来与您所连接到的peers交换peer名单的工具。"
 
-#: ../gtk/tr-prefs.c:549
+#: ../gtk/tr-prefs.c:551
 msgid "Use _DHT to find more peers"
 msgstr "使用 _DHT 以寻找更多 peer"
 
-#: ../gtk/tr-prefs.c:551
+#: ../gtk/tr-prefs.c:553
 msgid "DHT is a tool for finding peers without a tracker."
 msgstr "DHT 是不通过 tracker 寻找 peer 的工具"
 
-#: ../gtk/tr-prefs.c:772
+#: ../gtk/tr-prefs.c:774
 msgid "Web Client"
 msgstr "Web 客户端"
 
 #. "enabled" checkbutton
-#: ../gtk/tr-prefs.c:775
+#: ../gtk/tr-prefs.c:777
 msgid "_Enable web client"
 msgstr "启用 Web 客户端(_E)"
 
-#: ../gtk/tr-prefs.c:781
+#: ../gtk/tr-prefs.c:783
 msgid "_Open web client"
 msgstr "打开 Web 客户端(_O)"
 
-#: ../gtk/tr-prefs.c:790
+#: ../gtk/tr-prefs.c:792
 msgid "Listening _port:"
 msgstr "监听端口(_p)："
 
 #. require authentication
-#: ../gtk/tr-prefs.c:794 ../gtk/tr-prefs.c:1011
+#: ../gtk/tr-prefs.c:796 ../gtk/tr-prefs.c:1013
 msgid "Use _authentication"
 msgstr "使用认证(_A)"
 
 #. username
-#: ../gtk/tr-prefs.c:802 ../gtk/tr-prefs.c:1017
+#: ../gtk/tr-prefs.c:804 ../gtk/tr-prefs.c:1019
 msgid "_Username:"
 msgstr "用户名(_U)："
 
 #. password
-#: ../gtk/tr-prefs.c:809 ../gtk/tr-prefs.c:1023
+#: ../gtk/tr-prefs.c:811 ../gtk/tr-prefs.c:1025
 msgid "Pass_word:"
 msgstr "密码(_w)："
 
 #. require authentication
-#: ../gtk/tr-prefs.c:817
+#: ../gtk/tr-prefs.c:819
 msgid "Only allow these IP a_ddresses to connect:"
 msgstr "仅允许以下 IP 地址连接(_D)："
 
-#: ../gtk/tr-prefs.c:842
+#: ../gtk/tr-prefs.c:844
 msgid "IP addresses may use wildcards, such as 192.168.*.*"
 msgstr "可用通配符表示IP 地址，例如 192.168.*.*"
 
-#: ../gtk/tr-prefs.c:864
+#: ../gtk/tr-prefs.c:866
 msgid "Addresses:"
 msgstr "地址："
 
-#: ../gtk/tr-prefs.c:980 ../gtk/tr-window.c:851
+#: ../gtk/tr-prefs.c:982 ../gtk/tr-window.c:855
 msgid "Tracker"
 msgstr "Tracker"
 
-#: ../gtk/tr-prefs.c:982
+#: ../gtk/tr-prefs.c:984
 msgid "Connect to tracker via a pro_xy"
 msgstr "通过代理连接至 tracker (_X)"
 
-#: ../gtk/tr-prefs.c:987
+#: ../gtk/tr-prefs.c:989
 msgid "Proxy _server:"
 msgstr "代理服务器(_s)："
 
-#: ../gtk/tr-prefs.c:995
+#: ../gtk/tr-prefs.c:997
 msgid "Proxy _port:"
 msgstr "代理服务器端口 (_p)："
 
-#: ../gtk/tr-prefs.c:998
+#: ../gtk/tr-prefs.c:1000
 msgid "Proxy _type:"
 msgstr "代理服务器类型(_T)："
 
-#: ../gtk/tr-prefs.c:1136
+#: ../gtk/tr-prefs.c:1138
 msgid "Every Day"
 msgstr "每天"
 
-#: ../gtk/tr-prefs.c:1137
+#: ../gtk/tr-prefs.c:1139
 msgid "Weekdays"
 msgstr "工作日"
 
-#: ../gtk/tr-prefs.c:1138
+#: ../gtk/tr-prefs.c:1140
 msgid "Weekends"
 msgstr "周末"
 
-#: ../gtk/tr-prefs.c:1139
+#: ../gtk/tr-prefs.c:1141
 msgid "Sunday"
 msgstr "星期日"
 
-#: ../gtk/tr-prefs.c:1140
+#: ../gtk/tr-prefs.c:1142
 msgid "Monday"
 msgstr "星期一"
 
-#: ../gtk/tr-prefs.c:1141
+#: ../gtk/tr-prefs.c:1143
 msgid "Tuesday"
 msgstr "星期二"
 
-#: ../gtk/tr-prefs.c:1142
+#: ../gtk/tr-prefs.c:1144
 msgid "Wednesday"
 msgstr "星期三"
 
-#: ../gtk/tr-prefs.c:1143
+#: ../gtk/tr-prefs.c:1145
 msgid "Thursday"
 msgstr "星期四"
 
-#: ../gtk/tr-prefs.c:1144
+#: ../gtk/tr-prefs.c:1146
 msgid "Friday"
 msgstr "星期五"
 
-#: ../gtk/tr-prefs.c:1145
+#: ../gtk/tr-prefs.c:1147
 msgid "Saturday"
 msgstr "星期六"
 
-#: ../gtk/tr-prefs.c:1197
+#: ../gtk/tr-prefs.c:1199
 msgid "Speed Limits"
 msgstr "速度限制"
 
-#: ../gtk/tr-prefs.c:1217
+#: ../gtk/tr-prefs.c:1219
 msgid "Temporary Speed Limits"
 msgstr "临时速度限制"
 
-#: ../gtk/tr-prefs.c:1224
+#: ../gtk/tr-prefs.c:1226
 msgid "Override normal speed limits manually or at scheduled times"
 msgstr "手动或者定时覆盖正常速度限制设置"
 
-#: ../gtk/tr-prefs.c:1231
+#: ../gtk/tr-prefs.c:1233
 msgid "Limit do_wnload speed (KB/s):"
 msgstr "限制下载速度(KB/s)(_W)："
 
-#: ../gtk/tr-prefs.c:1235
+#: ../gtk/tr-prefs.c:1237
 msgid "Limit u_pload speed (KB/s):"
 msgstr "上传限速(KB/s)(_ P):"
 
-#: ../gtk/tr-prefs.c:1239
+#: ../gtk/tr-prefs.c:1241
 msgid "_Scheduled times:"
 msgstr "定时(_S)："
 
-#: ../gtk/tr-prefs.c:1244
+#: ../gtk/tr-prefs.c:1246
 msgid " _to "
 msgstr ""
 
-#: ../gtk/tr-prefs.c:1255
+#: ../gtk/tr-prefs.c:1257
 msgid "_On days:"
 msgstr "于天数(_O)："
 
-#: ../gtk/tr-prefs.c:1289 ../gtk/tr-prefs.c:1355
+#: ../gtk/tr-prefs.c:1291 ../gtk/tr-prefs.c:1357
 msgid "Status unknown"
 msgstr "状态未知"
 
-#: ../gtk/tr-prefs.c:1311
+#: ../gtk/tr-prefs.c:1313
 msgid "Port is <b>open</b>"
 msgstr "端口已<b>打开</b>"
 
-#: ../gtk/tr-prefs.c:1311
+#: ../gtk/tr-prefs.c:1313
 msgid "Port is <b>closed</b>"
 msgstr "端口已<b>关闭</b>"
 
-#: ../gtk/tr-prefs.c:1325
+#: ../gtk/tr-prefs.c:1327
 msgid "<i>Testing...</i>"
 msgstr "<i>正在测试...</i>"
 
-#: ../gtk/tr-prefs.c:1348
+#: ../gtk/tr-prefs.c:1350
 msgid "Incoming Peers"
 msgstr "连接的客户"
 
-#: ../gtk/tr-prefs.c:1350
+#: ../gtk/tr-prefs.c:1352
 msgid "_Port for incoming connections:"
 msgstr "入站连接端口(_P)："
 
-#: ../gtk/tr-prefs.c:1358
+#: ../gtk/tr-prefs.c:1360
 msgid "Te_st Port"
 msgstr "测试端口(_S)"
 
-#: ../gtk/tr-prefs.c:1365
+#: ../gtk/tr-prefs.c:1367
 msgid "Use UPnP or NAT-PMP port _forwarding from my router"
 msgstr "启用路由器的 UPnP 或 NAT-PMP 端口转发功能 (_F)"
 
-#: ../gtk/tr-prefs.c:1369
+#: ../gtk/tr-prefs.c:1371
 msgid "Pick a _random port every time Transmission is started"
 msgstr "在 Transmission 启动时随机选择端口(R)"
 
-#: ../gtk/tr-prefs.c:1377
+#: ../gtk/tr-prefs.c:1379
 msgid "Maximum peers per _torrent:"
 msgstr "单个种子最大 peer 数(_T):"
 
-#: ../gtk/tr-prefs.c:1379
+#: ../gtk/tr-prefs.c:1381
 msgid "Maximum peers _overall:"
 msgstr "全局最大 peer 数 (_O):"
 
-#: ../gtk/tr-prefs.c:1397
+#: ../gtk/tr-prefs.c:1399
 msgid "Transmission Preferences"
 msgstr "Transmission 首选项"
 
-#: ../gtk/tr-prefs.c:1412
+#: ../gtk/tr-prefs.c:1414
 msgid "Torrents"
 msgstr "种子"
 
-#: ../gtk/tr-prefs.c:1421
+#: ../gtk/tr-prefs.c:1423
 msgid "Network"
 msgstr "网络"
 
-#: ../gtk/tr-prefs.c:1427
+#: ../gtk/tr-prefs.c:1429
 msgid "Web"
 msgstr "Web"
 
-#: ../gtk/tr-prefs.c:1430
+#: ../gtk/tr-prefs.c:1432
 msgid "Proxy"
 msgstr "代理"
 
@@ -1606,7 +1621,7 @@ msgstr "等待校验本地数据 (%.1f%% 已完成)"
 msgid "%1$s remaining"
 msgstr "剩余 %1$s 分钟"
 
-#: ../gtk/tr-torrent.c:265 ../libtransmission/port-forwarding.c:177
+#: ../gtk/tr-torrent.c:265 ../libtransmission/port-forwarding.c:176
 msgid "Stopped"
 msgstr "已停止"
 
@@ -1648,182 +1663,209 @@ msgstr ""
 "点击以启用临时速度限制\n"
 "(%1$s 下载，%2$s 上传)"
 
-#: ../gtk/tr-window.c:593
+#: ../gtk/tr-window.c:597
 #, c-format
 msgid "Tracker will allow requests in %s"
 msgstr "Tracker 将允许来自 %s 的请求"
 
-#: ../gtk/tr-window.c:664
+#: ../gtk/tr-window.c:668
 msgid "Unlimited"
 msgstr "无限制"
 
-#: ../gtk/tr-window.c:731
+#: ../gtk/tr-window.c:735
 msgid "Seed Forever"
 msgstr "一直做种"
 
-#: ../gtk/tr-window.c:769
+#: ../gtk/tr-window.c:773
 msgid "Limit Download Speed"
 msgstr "限制下载速度"
 
-#: ../gtk/tr-window.c:773
+#: ../gtk/tr-window.c:777
 msgid "Limit Upload Speed"
 msgstr "限制上传速度"
 
-#: ../gtk/tr-window.c:780
+#: ../gtk/tr-window.c:784
 msgid "Stop Seeding at Ratio"
 msgstr "达到比例后停止做种"
 
-#: ../gtk/tr-window.c:814
+#: ../gtk/tr-window.c:818
 #, c-format
 msgid "Stop at Ratio (%s)"
 msgstr "达到比例后停止 (%s)"
 
 #. show all torrents
-#: ../gtk/tr-window.c:840
+#: ../gtk/tr-window.c:844
 msgid "A_ll"
 msgstr "全部(_l)"
 
 #. show only torrents that have connected peers
-#: ../gtk/tr-window.c:842
+#: ../gtk/tr-window.c:846
 msgid "_Active"
 msgstr "活动(_A)"
 
 #. show only torrents that are trying to download
-#: ../gtk/tr-window.c:844
+#: ../gtk/tr-window.c:848
 msgid "_Downloading"
 msgstr "下载(_D)"
 
 #. show only torrents that are trying to upload
-#: ../gtk/tr-window.c:846
+#: ../gtk/tr-window.c:850
 msgid "_Seeding"
 msgstr "做种(_S)"
 
 #. show only torrents that are paused
-#: ../gtk/tr-window.c:848
+#: ../gtk/tr-window.c:852
 msgid "_Paused"
 msgstr "暂停(_P)"
 
-#: ../gtk/tr-window.c:1062
+#: ../gtk/tr-window.c:1066
 msgid "999.9 KB/s"
 msgstr ""
 
-#: ../gtk/tr-window.c:1107
+#: ../gtk/tr-window.c:1111
 #, c-format
 msgid "%1$'d of %2$'d Torrent"
 msgid_plural "%1$'d of %2$'d Torrents"
 msgstr[0] "%2$'d 中的 %1$'d 个种子"
 
-#: ../gtk/tr-window.c:1113
+#: ../gtk/tr-window.c:1117
 #, c-format
 msgid "%'d Torrent"
 msgid_plural "%'d Torrents"
 msgstr[0] "%'d 个种子"
 
-#: ../gtk/tr-window.c:1144 ../gtk/tr-window.c:1155
+#: ../gtk/tr-window.c:1148 ../gtk/tr-window.c:1159
 #, c-format
 msgid "size|Down: %1$s, Up: %2$s"
 msgstr "下载: %s 上传: %s"
 
-#: ../gtk/util.c:120
+#: ../gtk/util.c:119
 #, c-format
 msgid "%'u byte"
 msgid_plural "%'u bytes"
 msgstr[0] "%'u 字节"
 
-#: ../gtk/util.c:128
+#: ../gtk/util.c:127
 #, c-format
 msgid "%'.1f KB"
 msgstr "%'.1f KB"
 
-#: ../gtk/util.c:133
+#: ../gtk/util.c:132
 #, c-format
 msgid "%'.1f MB"
 msgstr "%'.1f MB"
 
-#: ../gtk/util.c:138
+#: ../gtk/util.c:137
 #, c-format
 msgid "%'.1f GB"
 msgstr "%'.1f GB"
 
 #. 0.0 KB to 999.9 KB
-#: ../gtk/util.c:153
+#: ../gtk/util.c:152
 #, c-format
 msgid "%'.1f KB/s"
 msgstr "%'.1f KB/s"
 
 #. 0.98 MB to 99.99 MB
-#: ../gtk/util.c:155
+#: ../gtk/util.c:154
 #, c-format
 msgid "%'.2f MB/s"
 msgstr "%'.2f MB/s"
 
 #. 100.0 MB to 999.9 MB
-#: ../gtk/util.c:157
+#: ../gtk/util.c:156
 #, c-format
 msgid "%'.1f MB/s"
 msgstr "%'.1f MB/s"
 
 #. insane speeds
-#: ../gtk/util.c:159
+#: ../gtk/util.c:158
 #, c-format
 msgid "%'.2f GB/s"
 msgstr "%'.2f GB/s"
 
-#: ../gtk/util.c:180
+#: ../gtk/util.c:179
 #, c-format
 msgid "%'d day"
 msgid_plural "%'d days"
 msgstr[0] "%'d 天"
 
-#: ../gtk/util.c:182
+#: ../gtk/util.c:181
 #, c-format
 msgid "%'d hour"
 msgid_plural "%'d hours"
 msgstr[0] "%'d 小时"
 
-#: ../gtk/util.c:185
+#: ../gtk/util.c:184
 #, c-format
 msgid "%'d minute"
 msgid_plural "%'d minutes"
 msgstr[0] "%'d 分"
 
-#: ../gtk/util.c:187
+#: ../gtk/util.c:186
 #, c-format
 msgid "%'d second"
 msgid_plural "%'d seconds"
 msgstr[0] "%'d 秒"
 
-#: ../gtk/util.c:367
+#: ../gtk/util.c:378
 #, c-format
 msgid "The torrent file \"%s\" contains invalid data."
 msgstr "种子文件 \"%s\" 包含无效数据。"
 
-#: ../gtk/util.c:368
+#: ../gtk/util.c:379
 #, c-format
 msgid "The torrent file \"%s\" is already in use."
 msgstr "种子文件 \"%s\" 已在使用中。"
 
-#: ../gtk/util.c:369
+#: ../gtk/util.c:380
 #, c-format
 msgid "The torrent file \"%s\" encountered an unknown error."
 msgstr "种子文件 \"%s\" 出现未知错误。"
 
-#: ../gtk/util.c:380
+#: ../gtk/util.c:388
 msgid "Error opening torrent"
 msgstr "打开种子文件时出错。"
 
+#: ../gtk/util.c:832
+msgid "Unrecognized URL"
+msgstr "无法识别的URL地址"
+
+#: ../gtk/util.c:834
+#, c-format
+msgid "Transmission doesn't know how to use \"%s\""
+msgstr ""
+
+#: ../gtk/util.c:839
+#, c-format
+msgid ""
+"This magnet link appears to be intended for something other than BitTorrent. "
+" BitTorrent magnet links have a section containing \"%s\"."
+msgstr ""
+
 #. did caller give us an uninitialized val?
-#: ../libtransmission/bencode.c:1054
+#: ../libtransmission/bencode.c:1092
 msgid "Invalid metadata"
 msgstr "无效元数据"
 
-#: ../libtransmission/bencode.c:1550 ../libtransmission/blocklist.c:294
+#: ../libtransmission/bencode.c:1644
+#, c-format
+msgid "Saved \"%s\""
+msgstr ""
+
+#: ../libtransmission/bencode.c:1649 ../libtransmission/bencode.c:1656
+#: ../libtransmission/blocklist.c:294
 #, c-format
 msgid "Couldn't save file \"%1$s\": %2$s"
 msgstr "无法保存文件 \"%1$s\": %2$s"
 
+#: ../libtransmission/bencode.c:1663 ../libtransmission/bencode.c:1673
+#, c-format
+msgid "Couldn't save temporary file \"%1$s\": %2$s"
+msgstr ""
+
 #: ../libtransmission/blocklist.c:78 ../libtransmission/blocklist.c:238
-#: ../libtransmission/utils.c:482
+#: ../libtransmission/utils.c:488
 #, c-format
 msgid "Couldn't read \"%1$s\": %2$s"
 msgstr "无法读取 \"%1$s\": %2$s"
@@ -1838,12 +1880,12 @@ msgstr "屏蔽列表 \"%s\" 包含 %'zu 项"
 msgid "Blocklist \"%1$s\" updated with %2$'d entries"
 msgstr "屏蔽列表 \"%1$s\" 已更新，本次更新 %2$'d 条记录"
 
-#: ../libtransmission/fdlimit.c:359
+#: ../libtransmission/fdlimit.c:369
 #, c-format
 msgid "Preallocated file \"%s\""
 msgstr "预分配的文件 \"%s\""
 
-#: ../libtransmission/fdlimit.c:642
+#: ../libtransmission/fdlimit.c:652
 #, c-format
 msgid "Couldn't create socket: %s"
 msgstr "接口创建失败: %s"
@@ -1853,7 +1895,7 @@ msgstr "接口创建失败: %s"
 msgid "Torrent Creator is skipping file \"%s\": %s"
 msgstr "种子创建器跳过文件\"%s\": %s"
 
-#: ../libtransmission/metainfo.c:521
+#: ../libtransmission/metainfo.c:563
 #, c-format
 msgid "Invalid metadata entry \"%s\""
 msgstr "无效元数据项 \"%s\""
@@ -1892,84 +1934,88 @@ msgstr "无法设置源地址 %s 在 %d: %s"
 msgid "Couldn't connect socket %d to %s, port %d (errno %d - %s)"
 msgstr "无法连接 socket %d 到 %s, 端口 %d (错误号 %d - %s)"
 
-#: ../libtransmission/net.c:355
+#: ../libtransmission/net.c:360
+msgid "Is another copy of Transmission already running?"
+msgstr ""
+
+#: ../libtransmission/net.c:365
 #, c-format
 msgid "Couldn't bind port %d on %s: %s"
 msgstr "无法绑定端口 %d[%s]: %s"
 
-#: ../libtransmission/port-forwarding.c:32
+#: ../libtransmission/net.c:367
+#, c-format
+msgid "Couldn't bind port %d on %s: %s (%s)"
+msgstr ""
+
+#: ../libtransmission/port-forwarding.c:31
 msgid "Port Forwarding"
 msgstr "端口转发"
 
-#: ../libtransmission/port-forwarding.c:59
+#: ../libtransmission/port-forwarding.c:58
 msgid "Starting"
 msgstr "开始"
 
-#: ../libtransmission/port-forwarding.c:60
+#: ../libtransmission/port-forwarding.c:59
 msgid "Forwarded"
 msgstr "已转发"
 
-#: ../libtransmission/port-forwarding.c:61
+#: ../libtransmission/port-forwarding.c:60
 msgid "Stopping"
 msgstr "正在停止"
 
-#: ../libtransmission/port-forwarding.c:62
+#: ../libtransmission/port-forwarding.c:61
 msgid "Not forwarded"
 msgstr "未转发"
 
-#: ../libtransmission/port-forwarding.c:86 ../libtransmission/torrent.c:1634
+#: ../libtransmission/port-forwarding.c:85 ../libtransmission/torrent.c:1642
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
 msgstr "状态从 \"%1$s\" 转换到 \"%2$s\""
 
 #. first %s is the application name
 #. second %s is the version number
-#: ../libtransmission/session.c:647
+#: ../libtransmission/session.c:611
 #, c-format
 msgid "%s %s started"
 msgstr "%s %s 已开始"
 
-#: ../libtransmission/session.c:1642
+#: ../libtransmission/session.c:1629
 #, c-format
 msgid "Loaded %d torrents"
 msgstr "载入了 %d 个种子"
 
-#: ../libtransmission/torrent.c:308
-#, c-format
-msgid "Got %d peers from tracker"
-msgstr "从 Tracker 获取了 %d 个 Peer"
-
-#: ../libtransmission/torrent.c:322
+#: ../libtransmission/torrent.c:337
 #, c-format
 msgid "Tracker warning: \"%s\""
 msgstr "Tracker 警告: \"%s\""
 
-#: ../libtransmission/torrent.c:328
+#: ../libtransmission/torrent.c:343
 #, c-format
 msgid "Tracker error: \"%s\""
 msgstr "Tracker 错误: \"%s\""
 
-#: ../libtransmission/torrent.c:1322
+#: ../libtransmission/torrent.c:1330
 msgid ""
 "No data found!  Reconnect any disconnected drives, use \"Set Location\", or "
 "restart the torrent to re-download."
 msgstr ""
 
-#: ../libtransmission/torrent.c:1399
+#: ../libtransmission/torrent.c:1407
 msgid ""
 "Can't find local data.  Try \"Set Location\" to find it, or restart the "
 "torrent to re-download."
-msgstr ""
+msgstr "无法找到本地数据。尝试“设置位置”来找到它，或者重新下载。"
 
-#: ../libtransmission/torrent.c:1560
+#: ../libtransmission/torrent.c:1568
 msgid "Done"
 msgstr "完成"
 
-#: ../libtransmission/torrent.c:1563
+#: ../libtransmission/torrent.c:1571
 msgid "Complete"
 msgstr "完成"
 
-#: ../libtransmission/torrent.c:1566
+#: ../libtransmission/torrent.c:1574
 msgid "Incomplete"
 msgstr "未完成"
 
@@ -2007,16 +2053,16 @@ msgstr "通过端口\"%s\"，向服务\"%s\"转发。（本地地址：%s:%d）"
 msgid "Port forwarding successful!"
 msgstr "端口转发成功"
 
-#: ../libtransmission/utils.c:496
+#: ../libtransmission/utils.c:502
 msgid "Not a regular file"
 msgstr "非常规文件"
 
-#: ../libtransmission/utils.c:514
+#: ../libtransmission/utils.c:520
 msgid "Memory allocation failed"
 msgstr "内存分配失败"
 
 #. Node exists but isn't a folder
-#: ../libtransmission/utils.c:612
+#: ../libtransmission/utils.c:618
 #, c-format
 msgid "File \"%s\" is in the way"
 msgstr "文件\"%s\"正常"
@@ -2071,6 +2117,10 @@ msgstr "加入验证队列"
 
 #~ msgid "Couldn't read resume file"
 #~ msgstr "无法读取恢复文件"
+
+#, c-format
+#~ msgid "Got %d peers from tracker"
+#~ msgstr "从 Tracker 获取了 %d 个 Peer"
 
 #, c-format
 #~ msgid "%.1f%%"
