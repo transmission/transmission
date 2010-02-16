@@ -1552,7 +1552,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     if ([NSApp isOnSnowLeopardOrBetter])
     {
         NSMutableArray * paths = [NSMutableArray arrayWithCapacity: [selected count]];
-        for (Torrent * torrent in [fTableView selectedTorrents])
+        for (Torrent * torrent in selected)
         {
             NSString * location = [torrent dataLocation];
             if (location)
