@@ -173,6 +173,7 @@
 "A transfer marked as private with no tracker addresses will be unable to connect to peers. The torrent file will only be useful if you plan to upload the file to a tracker website that will add the addresses for you." = "Un transfert marqué comme privé et ne possédant pas d'adresse de trackeur ne pourra pas se connecter à des pairs. Le fichier torrent ne pourra être utilisable qu'une fois envoyé à un site de trackeur qui y ajoutera ses adresses.";
 
 /* Open duplicate alert -> title */
+
 "A transfer of \"%@\" already exists." = "Un transfert de \"%@\" est déja en cours.";
 
 /* Inspector -> title */
@@ -182,7 +183,7 @@
 "Add" = "Ajouter";
 
 /* Magnet link failed -> title */
-"Adding magnetized transfer failed" = "L'ajout d'un transfert aimanté a échoué";
+"Adding magnetized transfer failed." = "L'ajout d'un transfert aimanté a échoué.";
 
 /* Groups -> Button */
 "All Groups" = "Tous les groupes";
@@ -201,6 +202,9 @@
 
 /* Tracker next announce */
 "Announce not scheduled" = "Annonce non programmée";
+
+/* Tracker last announce */
+"Announce timed out" = "Annonce sans réponse";
 
 /* All toolbar item -> label */
 "Apply All" = "Appliquer à tous";
@@ -408,6 +412,7 @@
 "Files" = "Fichiers";
 
 /* Filter toolbar item -> label */
+
 "Filter" = "Filtre";
 
 /* Inspector -> Peers tab -> table row tooltip */
@@ -439,6 +444,9 @@
 
 /* Tracker last announce */
 "got %d peers" = "obtenu %d pairs";
+
+/* Tracker last announce */
+"got 1 peer" = "obtenu 1 pair";
 
 /* Groups -> Name */
 "Gray" = "Gris";
@@ -519,6 +527,9 @@
 /* files tab -> tooltip */
 "Low Priority" = "Priorité Basse";
 
+/* Open duplicate magnet alert -> title */
+"Magnet link is a duplicate of an existing transfer." = "Ce lien aimanté est un duplicata d'un transfert existant.";
+
 /* Inspector -> selected torrents
    Torrent -> progress string */
 
@@ -551,6 +562,9 @@
 /* Prefs -> blocklist -> message */
 "Never" = "Jamais";
 
+/* Inspector -> tracker table */
+"New Tier" = "Nouveau tier";
+
 /* Tracker next announce */
 "Next announce in %@" = "Prochaine annonce dans %@";
 
@@ -574,9 +588,6 @@
 /* files tab -> tooltip */
 "Normal Priority" = "Priorité Normale";
 
-/* Inspector -> Peers tab -> peers */
-"Not Connected" = "Non connecté";
-
 /* Torrent disk space alert -> title */
 "Not enough remaining disk space to download \"%@\" completely." = "Pas suffisament d'espace disque restant pour télécharger complètement \"%@\".";
 
@@ -597,6 +608,7 @@
    Create torrent -> zero size -> button
    Move folder cannot be used alert -> button
    Move inside itself alert -> button */
+
 
 
 
@@ -924,6 +936,9 @@
 /* Create torrent -> directory doesn't exist warning -> warning */
 "The directory \"%@\" does not currently exist. Create this directory or choose a different one to create the torrent file." = "Le dossier \"%@\" n'existe pas. Créez ce dossier ou choissisez un emplacement différent pour créer le fichier torrent.";
 
+/* Open duplicate magnet alert -> message */
+"The magnet link  \"%@\" cannot be added because it is a duplicate of an already existing transfer." = "Le lien aimant \"%@\" ne peut être ajouté car il est un duplicata d'un transfert existant.";
+
 /* Move error alert -> message
    Move inside itself alert -> message */
 
@@ -1039,8 +1054,14 @@
 /* Inspector -> title */
 "Trackers" = "Trackeurs";
 
+/* Inspector -> Peers tab -> peers */
+"Transfer Not Active" = "Transfert inactif";
+
 /* Preferences -> toolbar item title */
 "Transfers" = "Transferts";
+
+/* Inspector -> Peers tab -> peers */
+"Transfers Not Active" = "Transferts inactifs";
 
 /* Legal alert -> message */
 "Transmission is a file-sharing program. When you run a torrent, its data will be made available to others by means of upload. And of course, any content you choose to share is your sole responsibility." = "Transmission est un programme de partage de fichiers. Quand vous démarrer un transfert, ses données seront rendues disponibles à d'autres utilisateurs. Et bien sûr, les contenus que vous rendez disponibles sont sous votre seule responsabilité.";
