@@ -1064,7 +1064,7 @@
 "Transfers Not Active" = "Transferts inactifs";
 
 /* Legal alert -> message */
-"Transmission is a file-sharing program. When you run a torrent, its data will be made available to others by means of upload. And of course, any content you choose to share is your sole responsibility." = "Transmission est un programme de partage de fichiers. Quand vous démarrer un transfert, ses données seront rendues disponibles à d'autres utilisateurs. Et bien sûr, les contenus que vous rendez disponibles sont sous votre seule responsabilité.";
+"Transmission is a file-sharing program. When you run a torrent, its data will be made available to others by means of upload. And of course, any content you choose to share is your sole responsibility." = "Transmission est un programme de partage de fichiers. Quand vous démarrez un transfert, ses données seront rendues disponibles à d'autres utilisateurs. Et bien sûr, les contenus que vous rendez disponibles sont sous votre seule responsabilité.";
 
 /* Donation beg -> message */
 "Transmission is a full-featured torrent application. A lot of time and effort have gone into development, coding, and refinement. If you enjoy using it, please consider showing your love with a donation." = "Transmission est une application Bittorrent complète. Beaucoup d'efforts et de temps ont étés nécessaires à son développement, sa programmation et son peaufinage. Si vous appréciez son utilisation, pensez à montrer votre amour par un don.";
