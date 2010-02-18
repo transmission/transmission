@@ -11,13 +11,13 @@
   * Use fallocate64() for fast file preallocation on systems that support it
   * Magnet link improvements
   * Don't let "Disk is full" errors cause loss of configuration files
-  * Faster parsing of bencoded data, such as .torrent files
+  * Faster parsing of bencoded data, such as torrent files
 ==== Mac ====
   * Display information for all selected transfers in the inspector's tracker and peer tabs
   * Add a filter to the message log
   * Fix potential crash when updating the blocklist
   * Fix bug that caused the speed limit scheduler to not be applied after sleep
-  * Remove file selection for the per-torrent action menu
+  * Remove excessive file selection for the per-torrent action menu
   * Smaller interface tweaks
 ==== GTK+ ====
   * Give more helpful error messages if "Set Location" or "Add Magnet Link" fail
