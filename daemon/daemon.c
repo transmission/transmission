@@ -412,7 +412,7 @@ main( int argc, char ** argv )
     if( !foreground && tr_daemon( TRUE, FALSE ) < 0 )
     {
         char buf[256];
-        tr_snprintf( buf, sizeof( buf ), "Failed to dameonize: %s", tr_strerror( errno ) );
+        tr_snprintf( buf, sizeof( buf ), "Failed to daemonize: %s", tr_strerror( errno ) );
         printMessage( logfile, TR_MSG_ERR, MY_NAME, buf, __FILE__, __LINE__ );
         exit( 1 );
     }
