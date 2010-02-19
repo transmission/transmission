@@ -111,7 +111,7 @@ task_free( struct tr_web_task * task )
     if( task->timer_event_isSet )
         evtimer_del( &task->timer_event );
     evbuffer_free( task->response );
-    tr_free( task->host );
+    /*tr_free( task->host );*/
     tr_free( task->range );
     tr_free( task->resolved_url );
     tr_free( task->url );
@@ -352,7 +352,7 @@ addTask( void * vtask )
             task->slist = curl_slist_append( NULL, host );
             task->slist = curl_slist_append( task->slist, "Accept:" );
             curl_easy_setopt( e, CURLOPT_HTTPHEADER, task->slist );
-            tr_free( host );
+            /*tr_free( host );*/
         }
 
         dbgmsg( "adding task #%lu [%s]", task->tag, task->resolved_url ? task->resolved_url : task->url );
