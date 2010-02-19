@@ -1180,16 +1180,14 @@ turtleCheckClock( tr_session * session, struct tr_turtle_info * t, tr_bool byUse
 static void
 turtleBootstrap( tr_session * session, struct tr_turtle_info * turtle )
 {
-    tr_bool isEnabled;
-
     turtleFindNextChange( turtle );
 
-    if( turtle->isClockEnabled )
-        isEnabled = !turtle->_nextChangeValue;
-    else
-        isEnabled = turtle->isEnabled;
+    turtle->changedByUser = FALSE;
 
-    useAltSpeed( session, turtle, isEnabled, FALSE );
+    if( turtle->isClockEnabled )
+        turtle->isEnabled = !turtle->_nextChangeValue;
+
+    altSpeedToggled( session );
 }
 
 /***
