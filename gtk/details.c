@@ -545,6 +545,8 @@ static const char * activityString( int activity )
     return "";
 }
 
+/* Only call gtk_label_set_text() if the new text differs from the old.
+ * This way if the user has text selected, refreshing won't deselect it */
 static void
 gtr_label_set_text( GtkLabel * lb, const char * newstr )
 {
@@ -552,6 +554,26 @@ gtr_label_set_text( GtkLabel * lb, const char * newstr )
 
     if( ( oldstr == NULL ) || strcmp( oldstr, newstr ) )
         gtk_label_set_text( lb, newstr );
+}
+
+/* Only call gtk_text_buffer_set_text() if the new text differs from the old.
+ * This way if the user has text selected, refreshing won't deselect it */
+static void
+gtr_text_buffer_set_text( GtkTextBuffer * b, const char * str )
+{
+    char * old_str;
+    GtkTextIter start, end;
+
+    if( str == NULL )
+        str = "";
+
+    gtk_text_buffer_get_bounds( b, &start, &end );
+    old_str = gtk_text_buffer_get_text( b, &start, &end, FALSE );
+
+    if( ( old_str == NULL ) || strcmp( old_str, str ) )
+        gtk_text_buffer_set_text( b, str, -1 );
+
+    g_free( old_str );
 }
 
 static void
@@ -631,7 +653,7 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
         else
             str = mixed;
     }
-    gtk_text_buffer_set_text( di->comment_buffer, str, -1 );
+    gtr_text_buffer_set_text( di->comment_buffer, str );
 
     /* destination_lb */
     if( n<=0 )
