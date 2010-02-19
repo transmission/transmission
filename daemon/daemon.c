@@ -172,6 +172,8 @@ tr_daemon( int nochdir, int noclose )
                 /* send stdin, stdout, and stderr to /dev/null */
                 int i;
                 int fd = open( "/dev/null", O_RDWR, 0 );
+                if( fd < 0 )
+                    fprintf( stderr, "unable to open /dev/null: %s\n", tr_strerror(errno) );
                 for( i=0; i<3; ++i ) {
                     if( close( i ) )
                         return -1;
