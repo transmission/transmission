@@ -210,12 +210,15 @@
     
     if ([fMessages count] > TR_MAX_MSG_LOG)
     {
+        const NSUInteger oldCount = [fDisplayedMessages count];
+        
         NSIndexSet * removeIndexes = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fMessages count]-TR_MAX_MSG_LOG)];
         NSArray * itemsToRemove = [fMessages objectsAtIndexes: removeIndexes];
         
         [fMessages removeObjectsAtIndexes: removeIndexes];
         [fDisplayedMessages removeObjectsInArray: itemsToRemove];
-        changed = YES;
+        
+        changed |= oldCount > [fDisplayedMessages count];
     }
     
     if (changed)
