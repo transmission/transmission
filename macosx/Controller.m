@@ -1003,27 +1003,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [dict release];
 }
 
-- (void) incompleteChoiceClosed: (NSOpenPanel *) openPanel returnCode: (NSInteger) code contextInfo: (NSDictionary *) dictionary
-{
-    if (code == NSOKButton)
-        [fDefaults setObject: [[openPanel filenames] objectAtIndex: 0] forKey: @"IncompleteDownloadFolder"];
-    else
-        [fDefaults setBool: NO forKey: @"UseIncompleteDownloadFolder"];
-    
-    [self performSelectorOnMainThread: @selector(openFilesWithDict:) withObject: dictionary waitUntilDone: NO];
-}
-
-- (void) downloadChoiceClosed: (NSOpenPanel *) openPanel returnCode: (NSInteger) code contextInfo: (NSDictionary *) dictionary
-{
-    if (code == NSOKButton)
-    {
-        [fDefaults setObject: [[openPanel filenames] objectAtIndex: 0] forKey: @"DownloadFolder"];
-        [self performSelectorOnMainThread: @selector(openFilesWithDict:) withObject: dictionary waitUntilDone: NO];
-    }
-    else
-        [dictionary release];
-}
-
 - (void) openFilesWithDict: (NSDictionary *) dictionary
 {
     [self openFiles: [dictionary objectForKey: @"Filenames"] addType: [[dictionary objectForKey: @"AddType"] intValue] forcePath: nil];
@@ -4046,8 +4025,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             //resume sleeping transfers after we wake up
             for (Torrent * torrent in fTorrents)
                 [torrent wakeUp];
-            #warning check speed limit timer?
-            //[self autoSpeedLimitChange: nil];
             break;
     }
 }
