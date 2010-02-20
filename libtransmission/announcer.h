@@ -93,7 +93,6 @@ void tr_announcerTorrentCompleted( tr_torrent * );
 
 enum { TR_ANN_UP, TR_ANN_DOWN, TR_ANN_CORRUPT };
 void tr_announcerAddBytes( tr_torrent *, int up_down_or_corrupt, uint32_t byteCount );
-void tr_announcerSubtractBytes( tr_torrent *, int up_down_or_corrupt, uint32_t byteCount );
 
 time_t tr_announcerNextManualAnnounce( const tr_torrent * );
 
