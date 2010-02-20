@@ -983,7 +983,7 @@ gotMetadataFromURL( tr_session       * session UNUSED,
     dbgmsg( "torrentAdd: HTTP response code was %ld (%s); response length was %zu bytes",
             response_code, tr_webGetResponseStr( response_code ), response_byte_count );
 
-    if( response_code == 200 )
+    if( response_code==200 || response_code==221 ) /* http or ftp success.. */
     {
         tr_ctorSetMetainfo( data->ctor, response, response_byte_count );
         addTorrentImpl( data->data, data->ctor );
