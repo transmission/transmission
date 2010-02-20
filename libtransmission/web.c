@@ -387,6 +387,7 @@ addTask( void * vtask )
         curl_easy_setopt( e, CURLOPT_DNS_CACHE_TIMEOUT, MIN_DNS_CACHE_TIME );
         curl_easy_setopt( e, CURLOPT_FOLLOWLOCATION, 1L );
         curl_easy_setopt( e, CURLOPT_AUTOREFERER, 1L );
+        curl_easy_setopt( e, CURLOPT_FORBIDREUSE, 1L );
         curl_easy_setopt( e, CURLOPT_PRIVATE, task );
         curl_easy_setopt( e, CURLOPT_SSL_VERIFYHOST, 0L );
         curl_easy_setopt( e, CURLOPT_SSL_VERIFYPEER, 0L );
