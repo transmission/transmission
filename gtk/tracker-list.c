@@ -18,7 +18,7 @@
 #include <gtk/gtk.h>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h> /* tr_httpIsValidURL */
+#include <libtransmission/utils.h> /* tr_urlIsValidTracker() */
 
 #include "actions.h"
 #include "details.h"
@@ -239,7 +239,7 @@ onAnnounceEdited( GtkCellRendererText * renderer UNUSED,
     {
         char * old_text;
         gtk_tree_model_get( model, &iter, TR_COL_ANNOUNCE, &old_text, -1 );
-        if( tr_httpIsValidURL( new_text ) )
+        if( tr_urlIsValidTracker( new_text ) )
         {
             if( strcmp( old_text, new_text ) )
             {
@@ -249,7 +249,7 @@ onAnnounceEdited( GtkCellRendererText * renderer UNUSED,
                 setTrackerChangeState( page, TRUE );
             }
         }
-        else if( !tr_httpIsValidURL( old_text ) )
+        else if( !tr_urlIsValidTracker( old_text ) )
         {
             /* both old and new are invalid...
                they must've typed in an invalid URL

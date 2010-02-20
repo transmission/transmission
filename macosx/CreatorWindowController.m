@@ -24,7 +24,7 @@
 
 #import "CreatorWindowController.h"
 #import "NSStringAdditions.h"
-#import "utils.h" //tr_httpIsValidURL
+#import "utils.h" //tr_urlIsValidTracker
 
 #define TRACKER_ADD_TAG 0
 #define TRACKER_REMOVE_TAG 1
@@ -125,7 +125,7 @@
         //remove potentially invalid addresses
         for (NSInteger i = [fTrackers count]-1; i >= 0; i--)
         {
-            if (!tr_httpIsValidURL([[fTrackers objectAtIndex: i] UTF8String]))
+            if (!tr_urlIsValidTracker([[fTrackers objectAtIndex: i] UTF8String]))
                 [fTrackers removeObjectAtIndex: i];
         }
     }
@@ -304,7 +304,7 @@
     if ([tracker rangeOfString: @"://"].location == NSNotFound)
         tracker = [@"http://" stringByAppendingString: tracker];
     
-    if (!tr_httpIsValidURL([tracker UTF8String]))
+    if (!tr_urlIsValidTracker([tracker UTF8String]))
     {
         NSBeep();
         [fTrackers removeObjectAtIndex: row];
