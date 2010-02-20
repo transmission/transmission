@@ -133,7 +133,7 @@ getHostName( const char * url )
     int port = 0;
     char * host = NULL;
     char * ret;
-    tr_httpParseURL( url, strlen( url ), &host, &port, NULL );
+    tr_urlParse( url, strlen( url ), NULL, &host, &port, NULL );
     ret = tr_strdup_printf( "%s:%d", ( host ? host : "invalid" ), port );
     tr_free( host );
     return ret;

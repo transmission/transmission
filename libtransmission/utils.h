@@ -436,20 +436,23 @@ void tr_sha1_to_hex( char * out, const uint8_t * sha1 ) TR_GNUC_NONNULL(1,2);
 
 void tr_hex_to_sha1( uint8_t * out, const char * hex ) TR_GNUC_NONNULL(1,2);
 
-
-/** @brief return TRUE if the url is a http, https, or ftp url that Transmission understands */
-tr_bool tr_httpIsValidURL( const char * url ) TR_GNUC_NONNULL(1);
-
 /** @brief convenience function to determine if an address is an IP address (IPv4 or IPv6) */
 tr_bool tr_addressIsIP( const char * address );
 
+/** @brief return TRUE if the url is a http or https url that Transmission understands */
+tr_bool tr_urlIsValidTracker( const char * url ) TR_GNUC_NONNULL(1);
+
+/** @brief return TRUE if the url is a [ http, https, ftp, ftps ] url that Transmission understands */
+tr_bool tr_urlIsValid( const char * url ) TR_GNUC_NONNULL(1);
+
 /** @brief parse a URL into its component parts
     @return zero on success or an error number if an error occurred */
-int  tr_httpParseURL( const char * url,
-                      int          url_len,
-                      char      ** setme_host,
-                      int        * setme_port,
-                      char      ** setme_path ) TR_GNUC_NONNULL(1);
+int  tr_urlParse( const char * url,
+                  int          url_len,
+                  char      ** setme_scheme,
+                  char      ** setme_host,
+                  int        * setme_port,
+                  char      ** setme_path ) TR_GNUC_NONNULL(1);
 
 
 /** @brief return TR_RATIO_NA, TR_RATIO_INF, or a number in [0..1]

@@ -207,7 +207,7 @@ dns_cache_lookup( struct tr_web_task * task, const char * host, const char ** re
 static void
 dns_cache_set_fail( struct tr_web_task * task, const char * host )
 {
-    if( task->session->web != NULL )
+    if( ( task->session->web != NULL ) && ( host != NULL ) )
     {
         struct dns_cache_item * item;
         tr_ptrArray * cache = &task->session->web->dns_cache;
@@ -463,7 +463,7 @@ doDNS( void * vtask )
 
     assert( task->resolved_host == NULL );
 
-    if( !tr_httpParseURL( task->url, -1, &host, &port, NULL ) )
+    if( !tr_urlParse( task->url, -1, NULL, &host, &port, NULL ) )
     {
         task->port = port;
         task->host = host;

@@ -324,24 +324,29 @@ static int
 test_url( void )
 {
     int port;
+    char * scheme;
     char * host;
     char * path;
     char * str;
     const char * url;
 
     url = "http://www.some-tracker.org/some/path";
-    check( !tr_httpParseURL( url, -1, &host, &port, &path ) )
+    check( !tr_urlParse( url, -1, &scheme, &host, &port, &path ) )
+    check( !strcmp( scheme, "http" ) )
     check( !strcmp( host, "www.some-tracker.org" ) )
     check( !strcmp( path, "/some/path" ) )
     check( port == 80 )
+    tr_free( scheme );
     tr_free( path );
     tr_free( host );
 
     url = "http://www.some-tracker.org:80/some/path";
-    check( !tr_httpParseURL( url, -1, &host, &port, &path ) )
+    check( !tr_urlParse( url, -1, &scheme, &host, &port, &path ) )
+    check( !strcmp( scheme, "http" ) )
     check( !strcmp( host, "www.some-tracker.org" ) )
     check( !strcmp( path, "/some/path" ) )
     check( port == 80 )
+    tr_free( scheme );
     tr_free( path );
     tr_free( host );
 

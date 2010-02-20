@@ -913,8 +913,8 @@ tr_hex_to_sha1( uint8_t * out, const char * in )
 ****
 ***/
 
-tr_bool
-tr_httpIsValidURL( const char * url )
+static tr_bool
+isValidURLChars( const char * url )
 {
     const char * c;
     static const char * rfc2396_valid_chars =
@@ -933,21 +933,55 @@ tr_httpIsValidURL( const char * url )
         if( !strchr( rfc2396_valid_chars, *c ) )
             return FALSE;
 
-    return tr_httpParseURL( url, -1, NULL, NULL, NULL ) == 0;
+    return TRUE;
 }
 
-tr_bool tr_addressIsIP( const char * address )
+/** @brief return TRUE if the url is a http or https url that Transmission understands */
+tr_bool
+tr_urlIsValidTracker( const char * url )
+{
+    tr_bool valid;
+    char * scheme = NULL;
+
+    valid = isValidURLChars( url ) 
+         && !tr_urlParse( url, -1, &scheme, NULL, NULL, NULL )
+         && ( scheme != NULL )
+         && ( !strcmp(scheme,"http") || !strcmp(scheme,"https") );
+
+    tr_free( scheme );
+    return valid;
+}
+
+/** @brief return TRUE if the url is a http or https or ftp or sftp url that Transmission understands */
+tr_bool
+tr_urlIsValid( const char * url )
+{
+    tr_bool valid;
+    char * scheme = NULL;
+
+    valid = isValidURLChars( url ) 
+         && !tr_urlParse( url, -1, &scheme, NULL, NULL, NULL )
+         && ( scheme != NULL )
+         && ( !strcmp(scheme,"http") || !strcmp(scheme,"https") || !strcmp(scheme,"ftp") || !strcmp(scheme,"sftp") );
+
+    tr_free( scheme );
+    return valid;
+}
+
+tr_bool
+tr_addressIsIP( const char * address )
 {
     tr_address tempAddr;
     return tr_pton(address, &tempAddr) != NULL;
 }
 
 int
-tr_httpParseURL( const char * url_in,
-                 int          len,
-                 char **      setme_host,
-                 int *        setme_port,
-                 char **      setme_path )
+tr_urlParse( const char * url_in,
+             int          len,
+             char **      setme_protocol,
+             char **      setme_host,
+             int *        setme_port,
+             char **      setme_path )
 {
     int          err;
     int          port = 0;
@@ -984,17 +1018,20 @@ tr_httpParseURL( const char * url_in,
         }
     }
 
-    err = !host || !path || !protocol
-          || ( strcmp( protocol, "http" ) && strcmp( protocol, "https" ) );
+    err = !host || !path || !protocol;
 
     if( !err && !port )
     {
+        if( !strcmp( protocol, "ftp" ) ) port = 21;
+        if( !strcmp( protocol, "sftp" ) ) port = 22;
         if( !strcmp( protocol, "http" ) ) port = 80;
         if( !strcmp( protocol, "https" ) ) port = 443;
     }
 
     if( !err )
     {
+        if( setme_protocol ) *setme_protocol = tr_strdup( protocol );
+
         if( setme_host ){ ( (char*)host )[-3] = ':'; *setme_host =
                               tr_strdup( host ); }
         if( setme_path ){ if( path[0] == '/' ) *setme_path = tr_strdup( path );

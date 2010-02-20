@@ -380,7 +380,7 @@ tr_realMakeMetaInfo( tr_metainfo_builder * builder )
 
     /* allow an empty set, but if URLs *are* listed, verify them. #814, #971 */
     for( i = 0; i < builder->trackerCount && !builder->result; ++i ) {
-        if( !tr_httpIsValidURL( builder->trackers[i].announce ) ) {
+        if( !tr_urlIsValidTracker( builder->trackers[i].announce ) ) {
             tr_strlcpy( builder->errfile, builder->trackers[i].announce,
                        sizeof( builder->errfile ) );
             builder->result = TR_MAKEMETA_URL;

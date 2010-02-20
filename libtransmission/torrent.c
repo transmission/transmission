@@ -2086,7 +2086,7 @@ tr_torrentSetAnnounceList( tr_torrent             * tor,
 
     /* look for bad URLs */
     for( i=0; ok && i<trackerCount; ++i )
-        if( !tr_httpIsValidURL( trackers[i].announce ) )
+        if( !tr_urlIsValidTracker( trackers[i].announce ) )
             ok = FALSE;
 
     /* save to the .torrent file */
