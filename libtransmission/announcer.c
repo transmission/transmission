@@ -1489,14 +1489,14 @@ getNextAnnounceEvent( tr_tier * tier )
     int i, n;
     int pos = -1;
     tr_ptrArray tmp;
-    char ** events;
+    const char ** events;
     const char * str = NULL;
 
     assert( tier != NULL );
     assert( tr_isTorrent( tier->tor ) );
 
     /* special case #1: if "stopped" is in the queue, ignore everything before it */
-    events = (char**) tr_ptrArrayPeek( &tier->announceEvents, &n );
+    events = (const char**) tr_ptrArrayPeek( &tier->announceEvents, &n );
     if( pos == -1 ) {
         for( i=0; i<n; ++i )
             if( !strcmp( events[i], "stopped" ) )
@@ -1521,7 +1521,7 @@ getNextAnnounceEvent( tr_tier * tier )
     /* special case #3: if there are duplicate requests in a row, skip to the last one */
     if( pos >= 0 ) {
         for( i=pos+1; i<n; ++i )
-            if( events[pos] != events[i] )
+            if( strcmp( events[pos], events[i] ) )
                 break;
         pos = i - 1;
     }
@@ -1543,7 +1543,7 @@ fprintf( stderr, "using (%d)\"%s\"\n", pos, events[pos] );
     /* announceEvents array upkeep */
     tmp = TR_PTR_ARRAY_INIT;
     for( i=pos+1; i<n; ++i )
-        tr_ptrArrayAppend( &tmp, events[i] );
+        tr_ptrArrayAppend( &tmp, (void*)events[i] );
     tr_ptrArrayDestruct( &tier->announceEvents, NULL );
     tier->announceEvents = tmp;
 
