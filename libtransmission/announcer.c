@@ -1526,19 +1526,20 @@ getNextAnnounceEvent( tr_tier * tier )
         pos = i - 1;
     }
 
-#if 0
-for( i=0; i<n; ++i ) fprintf( stderr, "(%d)\"%s\" ", i, events[i] );
-fprintf( stderr, "\n" );
-fprintf( stderr, "using (%d)\"%s\"\n", pos, events[pos] );
-#endif
-
     /* special case #4: BEP 21: "In order to tell the tracker that a peer is a
      * partial seed, it MUST send an event=paused parameter in every
      * announce while it is a partial seed." */
     str = pos>=0 ? events[pos] : NULL;
     if( tr_cpGetStatus( &tier->tor->completion ) == TR_PARTIAL_SEED )
-        if( !str || !strcmp( str, "stopped" ) )
+        if( !str || strcmp( str, "stopped" ) )
             str = "paused";
+
+#if 0
+for( i=0; i<n; ++i ) fprintf( stderr, "(%d)\"%s\" ", i, events[i] );
+fprintf( stderr, "\n" );
+fprintf( stderr, "using (%d)\"%s\"\n", pos, events[pos] );
+if( strcmp( events[pos], str ) ) fprintf( stderr, "...but really using [%s]\n", str );
+#endif
 
     /* announceEvents array upkeep */
     tmp = TR_PTR_ARRAY_INIT;

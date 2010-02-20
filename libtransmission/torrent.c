@@ -1660,7 +1660,7 @@ tr_torrentRecheckCompleteness( tr_torrent * tor )
 
         fireCompletenessChange( tor, completeness );
 
-        if( recentChange && ( completeness == TR_SEED ) )
+        if( recentChange && tr_torrentIsSeed( tor ) )
         {
             tr_announcerTorrentCompleted( tor );
 

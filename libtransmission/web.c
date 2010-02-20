@@ -296,7 +296,7 @@ static int
 getTimeoutFromURL( const char * url )
 {
     if( strstr( url, "scrape" ) != NULL ) return 30;
-    if( strstr( url, "announce" ) != NULL ) return 120;
+    if( strstr( url, "announce" ) != NULL ) return 90;
     return 240;
 }
 
