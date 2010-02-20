@@ -27,7 +27,7 @@
 #import "FileListNode.h"
 #import "NSStringAdditions.h"
 #import "TrackerNode.h"
-#import "utils.h" //tr_httpIsValidURL
+#import "utils.h" //tr_new
 
 @interface Torrent (Private)
 
