@@ -1526,9 +1526,11 @@ getNextAnnounceEvent( tr_tier * tier )
         pos = i - 1;
     }
 
+#if 0
 for( i=0; i<n; ++i ) fprintf( stderr, "(%d)\"%s\" ", i, events[i] );
 fprintf( stderr, "\n" );
 fprintf( stderr, "using (%d)\"%s\"\n", pos, events[pos] );
+#endif
 
     /* special case #4: BEP 21: "In order to tell the tracker that a peer is a
      * partial seed, it MUST send an event=paused parameter in every
