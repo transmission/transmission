@@ -1799,8 +1799,9 @@ typedef enum
 
 - (void) removeTrackers
 {
-    NSMutableDictionary * removeIdentifiers = [NSMutableDictionary dictionary];
-    
+    NSMutableDictionary * removeIdentifiers = [NSMutableDictionary dictionaryWithCapacity: [fTorrents count]];
+    NSUInteger removeCount = 0;
+       
     NSIndexSet * selectedIndexes = [fTrackerTable selectedRowIndexes];
     BOOL groupSelected = NO;
     for (NSUInteger i = 0; i < [fTrackers count]; ++i)
@@ -1819,6 +1820,7 @@ typedef enum
                 }
                 
                 [removeIndexSet addIndex: [(TrackerNode *)object identifier]];
+                ++removeCount;
             }
         }
         else
@@ -1829,16 +1831,16 @@ typedef enum
         }
     }
     
-    NSAssert([removeIdentifiers count] > 0, @"Trying to remove no trackers.");
+    NSAssert(removeCount > 0, @"Trying to remove no trackers.");
     
     if ([[NSUserDefaults standardUserDefaults] boolForKey: @"WarningRemoveTrackers"])
     {
         NSAlert * alert = [[NSAlert alloc] init];
         
-        if ([removeIdentifiers count] > 1)
+        if (removeCount > 1)
         {
             [alert setMessageText: [NSString stringWithFormat: NSLocalizedString(@"Are you sure you want to remove %d trackers?",
-                                                                "Remove trackers alert -> title"), [removeIdentifiers count]]];
+                                                                "Remove trackers alert -> title"), removeCount]];
             [alert setInformativeText: NSLocalizedString(@"Once removed, Transmission will no longer attempt to contact them."
                                         " This cannot be undone.", "Remove trackers alert -> message")];
         }
