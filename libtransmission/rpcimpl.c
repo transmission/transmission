@@ -193,8 +193,11 @@ torrentStart( tr_session               * session,
     for( i = 0; i < torrentCount; ++i )
     {
         tr_torrent * tor = torrents[i];
-        tr_torrentStart( tor );
-        notify( session, TR_RPC_TORRENT_STARTED, tor );
+        if( !tor->isRunning )
+        {
+            tr_torrentStart( tor );
+            notify( session, TR_RPC_TORRENT_STARTED, tor );
+        }
     }
     tr_free( torrents );
     return NULL;
@@ -214,8 +217,11 @@ torrentStop( tr_session               * session,
     for( i = 0; i < torrentCount; ++i )
     {
         tr_torrent * tor = torrents[i];
-        tr_torrentStop( tor );
-        notify( session, TR_RPC_TORRENT_STOPPED, tor );
+        if( tor->isRunning )
+        {
+            tr_torrentStop( tor );
+            notify( session, TR_RPC_TORRENT_STOPPED, tor );
+        }
     }
     tr_free( torrents );
     return NULL;
