@@ -1372,39 +1372,39 @@ about( GtkWindow * parent )
 }
 
 static void
-startTorrentForeach( GtkTreeModel *      model,
-                     GtkTreePath  * path UNUSED,
-                     GtkTreeIter *       iter,
-                     gpointer       data UNUSED )
+appendIdToBencList( GtkTreeModel * m, GtkTreePath * path UNUSED,
+                    GtkTreeIter * iter, gpointer list )
 {
     tr_torrent * tor = NULL;
-
-    gtk_tree_model_get( model, iter, MC_TORRENT_RAW, &tor, -1 );
-    tr_torrentStart( tor );
+    gtk_tree_model_get( m, iter, MC_TORRENT_RAW, &tor, -1 );
+    tr_bencListAddInt( list, tr_torrentId( tor ) );
 }
 
-static void
-stopTorrentForeach( GtkTreeModel *      model,
-                    GtkTreePath  * path UNUSED,
-                    GtkTreeIter *       iter,
-                    gpointer       data UNUSED )
+static gboolean
+rpcOnSelectedTorrents( struct cbdata * data, const char * method )
 {
-    tr_torrent * tor = NULL;
+    tr_benc top, *args, *ids;
+    gboolean invoked = FALSE;
+    tr_session * session = tr_core_session( data->core );
+    GtkTreeSelection * s = tr_window_get_selection( data->wind );
 
-    gtk_tree_model_get( model, iter, MC_TORRENT_RAW, &tor, -1 );
-    tr_torrentStop( tor );
-}
+    tr_bencInitDict( &top, 2 );
+    tr_bencDictAddStr( &top, "method", method );
+    args = tr_bencDictAddDict( &top, "arguments", 1 );
+    ids = tr_bencDictAddList( args, "ids", 0 );
+    gtk_tree_selection_selected_foreach( s, appendIdToBencList, ids );
 
-static void
-updateTrackerForeach( GtkTreeModel *      model,
-                      GtkTreePath  * path UNUSED,
-                      GtkTreeIter *       iter,
-                      gpointer       data UNUSED )
-{
-    tr_torrent * tor = NULL;
+    if( tr_bencListSize( ids ) != 0 )
+    {
+        int json_len;
+        char * json = tr_bencToStr( &top, TR_FMT_JSON_LEAN, &json_len );
+        tr_rpc_request_exec_json( session, json, json_len, NULL, NULL );
+        g_free( json );
+        invoked = TRUE;
+    }
 
-    gtk_tree_model_get( model, iter, MC_TORRENT_RAW, &tor, -1 );
-    tr_torrentManualUpdate( tor );
+    tr_bencFree( &top );
+    return invoked;
 }
 
 static void
@@ -1417,19 +1417,6 @@ openFolderForeach( GtkTreeModel *           model,
 
     gtk_tree_model_get( model, iter, MC_TORRENT, &gtor, -1 );
     tr_torrent_open_folder( gtor );
-    g_object_unref( G_OBJECT( gtor ) );
-}
-
-static void
-recheckTorrentForeach( GtkTreeModel *      model,
-                       GtkTreePath  * path UNUSED,
-                       GtkTreeIter *       iter,
-                       gpointer       data UNUSED )
-{
-    TrTorrent * gtor = NULL;
-
-    gtk_tree_model_get( model, iter, MC_TORRENT, &gtor, -1 );
-    tr_torrentVerify( tr_torrent_handle( gtor ) );
     g_object_unref( G_OBJECT( gtor ) );
 }
 
@@ -1563,12 +1550,6 @@ doAction( const char * action_name, gpointer user_data )
     {
         gtr_open_file( "http://www.transmissionbt.com/donate.php" );
     }
-    else if( !strcmp( action_name, "start-torrent" ) )
-    {
-        GtkTreeSelection * s = tr_window_get_selection( data->wind );
-        gtk_tree_selection_selected_foreach( s, startTorrentForeach, NULL );
-        changed |= gtk_tree_selection_count_selected_rows( s ) != 0;
-    }
     else if( !strcmp( action_name, "pause-all-torrents" ) )
     {
         pauseAllTorrents( data );
@@ -1595,17 +1576,21 @@ doAction( const char * action_name, gpointer user_data )
             gtk_widget_show( w );
         }
     }
+    else if( !strcmp( action_name, "start-torrent" ) )
+    {
+        changed |= rpcOnSelectedTorrents( data, "torrent-start" );
+    }
     else if( !strcmp( action_name, "pause-torrent" ) )
     {
-        GtkTreeSelection * s = tr_window_get_selection( data->wind );
-        gtk_tree_selection_selected_foreach( s, stopTorrentForeach, NULL );
-        changed |= gtk_tree_selection_count_selected_rows( s ) != 0;
+        changed |= rpcOnSelectedTorrents( data, "torrent-stop" );
     }
     else if( !strcmp( action_name, "verify-torrent" ) )
     {
-        GtkTreeSelection * s = tr_window_get_selection( data->wind );
-        gtk_tree_selection_selected_foreach( s, recheckTorrentForeach, NULL );
-        changed |= gtk_tree_selection_count_selected_rows( s ) != 0;
+        changed |= rpcOnSelectedTorrents( data, "torrent-verify" );
+    }
+    else if( !strcmp( action_name, "update-tracker" ) )
+    {
+        changed |= rpcOnSelectedTorrents( data, "torrent-reannounce" );
     }
     else if( !strcmp( action_name, "open-torrent-folder" ) )
     {
@@ -1629,12 +1614,6 @@ doAction( const char * action_name, gpointer user_data )
         }
         gtk_window_present( GTK_WINDOW( w ) );
         g_slist_free( ids );
-    }
-    else if( !strcmp( action_name, "update-tracker" ) )
-    {
-        GtkTreeSelection * s = tr_window_get_selection( data->wind );
-        gtk_tree_selection_selected_foreach( s, updateTrackerForeach,
-                                             data->wind );
     }
     else if( !strcmp( action_name, "new-torrent" ) )
     {
