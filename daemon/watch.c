@@ -111,10 +111,11 @@ watchdir_update_impl( dtr_watchdir * w )
         int len = read( fd, buf, sizeof( buf ) );
         while (i < len) {
             struct inotify_event * event = (struct inotify_event *) &buf[i];
-            if( str_has_suffix( event->name, ".torrent" ) )
+            const char * name = event->name;
+            if( str_has_suffix( name, ".torrent" ) )
             {
-                tr_inf( "Found new .torrent file \"%s\" in watchdir \"%s\"", event->name, w->dir );
-                w->callback( w->session, w->dir, event->name );
+                tr_inf( "Found new .torrent file \"%s\" in watchdir \"%s\"", name, w->dir );
+                w->callback( w->session, w->dir, name );
             }
             i += EVENT_SIZE +  event->len;
         }
@@ -179,19 +180,20 @@ watchdir_update_impl( dtr_watchdir * w )
         for( d = readdir( odir ); d != NULL; d = readdir( odir ) )
         {
             size_t len;
+            const char * name = d->d_name;
 
-            if( !d->d_name || *d->d_name=='.' ) /* skip dotfiles */
+            if( !name || *name=='.' ) /* skip dotfiles */
                 continue;
-            if( !str_has_suffix( event->name, ".torrent" ) ) /* skip non-torrents */
+            if( !str_has_suffix( name, ".torrent" ) ) /* skip non-torrents */
                 continue;
 
-            len = strlen( d->d_name );
-            add_file_to_list( curFiles, d->d_name, len );
+            len = strlen( name );
+            add_file_to_list( curFiles, name, len );
 
             /* if this file wasn't here last time, try adding it */
-            if( !is_file_in_list( w->lastFiles, d->d_name, len ) ) {
-                tr_inf( "Found new .torrent file \"%s\" in watchdir \"%s\"", d->d_name, w->dir );
-                w->callback( w->session, w->dir, d->d_name );
+            if( !is_file_in_list( w->lastFiles, name, len ) ) {
+                tr_inf( "Found new .torrent file \"%s\" in watchdir \"%s\"", name, w->dir );
+                w->callback( w->session, w->dir, name );
             }
         }
 
