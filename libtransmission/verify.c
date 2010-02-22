@@ -20,6 +20,8 @@
  #include <fcntl.h> /* posix_fadvise() / fcntl() */
 #endif
 #if defined(SYS_DARWIN)
+ #define HAVE_GETPAGESIZE
+ #define HAVE_POSIX_MEMALIGN
  #define HAVE_VALLOC
 #endif
 
