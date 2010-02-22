@@ -569,7 +569,7 @@
   * Updated Czech, Spanish, Romanian, Russian, Dutch, Polish, Italian,
     Portuguese, Catalan, Danish, German, Swedish, Traditional Chinese,
     Finnish, and Chinese (simplified) translations
-==== CLI ====:
+==== CLI ====
   * Fix scraping torrents with the -s command-line argument
 
 === Transmission 1.21 (2008/05/21) ===
