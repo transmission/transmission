@@ -47,10 +47,6 @@ enum
 
 /* #define STOPWATCH */
 
-#ifndef HAVE_VALLOC
- #define valloc malloc
-#endif
-
 static tr_bool
 verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
 {
@@ -65,10 +61,30 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
     tr_file_index_t fileIndex = 0;
     tr_file_index_t prevFileIndex = !fileIndex;
     tr_piece_index_t pieceIndex = 0;
-    const int64_t buflen = 4096;
-    uint8_t * buffer = valloc( buflen );
     const time_t begin = tr_time( );
     time_t end;
+    int64_t buflen;
+    uint8_t * buffer = NULL;
+    const int64_t maxbuf = 16384;
+
+#ifdef HAVE_GETPAGESIZE
+    buflen = getpagesize();
+    while( buflen * 2 <= maxbuf )
+        buflen *= 2;
+#else
+    buflen = maxbuf;
+#endif
+
+#ifdef HAVE_POSIX_MEMALIGN
+    if( !buffer )
+        posix_memalign( (void**)&buffer, getpagesize(), buflen );
+#endif
+#ifdef HAVE_VALLOC
+    if( !buffer )
+        buffer = valloc( buflen );
+#endif
+    if( !buffer )
+        buffer = malloc( buflen );
 
     SHA1_Init( &sha );
 
