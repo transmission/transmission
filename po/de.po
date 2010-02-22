@@ -3,14 +3,14 @@ msgstr ""
 "Project-Id-Version: Transmission 0.81\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-02-10 20:02-0600\n"
-"PO-Revision-Date: 2010-02-05 13:32+0000\n"
+"PO-Revision-Date: 2010-02-21 20:51+0000\n"
 "Last-Translator: Martin Lettner <m.lettner@gmail.com>\n"
 "Language-Team: Michael Färber <0102@gmx.at>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2010-02-16 15:44+0000\n"
+"X-Launchpad-Export-Date: 2010-02-22 01:53+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:54
@@ -452,7 +452,7 @@ msgstr "Vorhanden:"
 
 #: ../gtk/details.c:904
 msgid "Availability:"
-msgstr ""
+msgstr "Verfügbarkeit:"
 
 #: ../gtk/details.c:908 ../gtk/stats.c:168 ../gtk/stats.c:180
 msgid "Downloaded:"
@@ -600,17 +600,18 @@ msgstr "_Mehr Details anzeigen"
 #: ../gtk/details.c:1701
 #, c-format
 msgid "Got a list of %1$s%2$'d peers%3$s %4$s ago"
-msgstr ""
+msgstr "Liste mit %1$s%2$'d Peers erhalten%3$s vor %4$s"
 
 #: ../gtk/details.c:1705
 #, c-format
 msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
 msgstr ""
+"Anforderung einer Peer-Liste %1$sabgelaufen%2$s vor %3$s; wird wiederholt"
 
 #: ../gtk/details.c:1708
 #, c-format
 msgid "Got an error %1$s\"%2$s\"%3$s %4$s ago"
-msgstr ""
+msgstr "Fehler festgestellt %1$s\"%2$s\"%3$s vor %4$s"
 
 #: ../gtk/details.c:1717
 msgid "No updates scheduled"
@@ -1356,7 +1357,7 @@ msgstr "Torrents automatisch _hinzufügen aus:"
 
 #: ../gtk/tr-prefs.c:300
 msgid "Append \"._part\" to incomplete files' names"
-msgstr ""
+msgstr "»._part« an unvollständige Dateinamen anhängen"
 
 #: ../gtk/tr-prefs.c:304
 msgid "Keep _incomplete torrents in:"
@@ -1908,6 +1909,8 @@ msgid ""
 "This magnet link appears to be intended for something other than BitTorrent. "
 " BitTorrent magnet links have a section containing \"%s\"."
 msgstr ""
+"Dieser Magnet-Link scheint für etwas anders gedacht zu sein als BitTorrent. "
+"BitTorrent-Magnet-Links beinhalten »%s«."
 
 #. did caller give us an uninitialized val?
 #: ../libtransmission/bencode.c:1092
@@ -1917,7 +1920,7 @@ msgstr "Ungültige Metadaten"
 #: ../libtransmission/bencode.c:1644
 #, c-format
 msgid "Saved \"%s\""
-msgstr ""
+msgstr "»%s« wurde gespeichert"
 
 #: ../libtransmission/bencode.c:1649 ../libtransmission/bencode.c:1656
 #: ../libtransmission/blocklist.c:294
@@ -1928,7 +1931,7 @@ msgstr "\"%1$s\" konnte nicht gespeichert werden: %2$s"
 #: ../libtransmission/bencode.c:1663 ../libtransmission/bencode.c:1673
 #, c-format
 msgid "Couldn't save temporary file \"%1$s\": %2$s"
-msgstr ""
+msgstr "Temporäre Datei »%1$s« konnte nicht gespeichert werden: %2$s"
 
 #: ../libtransmission/blocklist.c:78 ../libtransmission/blocklist.c:238
 #: ../libtransmission/utils.c:488
@@ -2003,7 +2006,7 @@ msgstr ""
 
 #: ../libtransmission/net.c:360
 msgid "Is another copy of Transmission already running?"
-msgstr ""
+msgstr "Läuft bereits eine andere Instanz von Transmission?"
 
 #: ../libtransmission/net.c:365
 #, c-format
@@ -2013,7 +2016,7 @@ msgstr "Port %d konnte nicht an %s gebunden werden: %s"
 #: ../libtransmission/net.c:367
 #, c-format
 msgid "Couldn't bind port %d on %s: %s (%s)"
-msgstr ""
+msgstr "Port %d konnte nicht an %s gebunden werden: %s (%s)"
 
 #: ../libtransmission/port-forwarding.c:31
 msgid "Port Forwarding"

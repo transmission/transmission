@@ -10,15 +10,15 @@ msgstr ""
 "Project-Id-Version: Transmission HEAD\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-02-10 20:02-0600\n"
-"PO-Revision-Date: 2010-02-05 13:31+0000\n"
-"Last-Translator: Sergey \"Shnatsel\" Davidoff <Shnatsel@gmail.com>\n"
+"PO-Revision-Date: 2010-02-21 01:47+0000\n"
+"Last-Translator: AsstZD <eskaer_spamsink@ngs.ru>\n"
 "Language-Team: Russian <gnome-cyr@gnome.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2010-02-16 15:44+0000\n"
+"X-Launchpad-Export-Date: 2010-02-22 01:53+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Country: RUSSIAN FEDERATION\n"
 "X-Poedit-Language: Russian\n"
@@ -465,7 +465,7 @@ msgstr "В наличии:"
 
 #: ../gtk/details.c:904
 msgid "Availability:"
-msgstr ""
+msgstr "Доступность:"
 
 #: ../gtk/details.c:908 ../gtk/stats.c:168 ../gtk/stats.c:180
 msgid "Downloaded:"
@@ -926,7 +926,9 @@ msgstr ""
 "  Anton Lashkov https://launchpad.net/~onto\n"
 "  Anton Shestakov https://launchpad.net/~engored\n"
 "  Arseny Solokha https://launchpad.net/~raising-the-bar\n"
+"  Artem Karimov https://launchpad.net/~skybon\n"
 "  ArtemZ https://launchpad.net/~zhirkow-yahoo\n"
+"  DIX2005 https://launchpad.net/~dimail-box\n"
 "  DooMka https://launchpad.net/~xpym-xpym\n"
 "  Egor Bushmelyov https://launchpad.net/~skipper95\n"
 "  Fatroll https://launchpad.net/~fatroll\n"
@@ -1320,11 +1322,11 @@ msgstr "Скачивайте и обменивайтесь файлами в с�
 
 #: ../gtk/transmission.desktop.in.h:4
 msgid "Transmission BitTorrent Client"
-msgstr "BitTorrent клиент Transmission"
+msgstr "BitTorrent-клиент Transmission"
 
 #: ../gtk/tr-core.c:1340
 msgid "Transmission Bittorrent Client"
-msgstr "BitTorrent клиент Transmission"
+msgstr "BitTorrent-клиент Transmission"
 
 #: ../gtk/tr-core.c:1341
 msgid "BitTorrent Activity"
@@ -1933,6 +1935,8 @@ msgid ""
 "This magnet link appears to be intended for something other than BitTorrent. "
 " BitTorrent magnet links have a section containing \"%s\"."
 msgstr ""
+"Похоже, что эта магнет-ссылка не предназначена для протокола BitTorrent. "
+"Магнет-ссылки BitTorrent имеют раздел, содержащий \"%s\"."
 
 #. did caller give us an uninitialized val?
 #: ../libtransmission/bencode.c:1092
@@ -2027,7 +2031,7 @@ msgstr "Не удалось подключить сокет %d к %s на пор
 
 #: ../libtransmission/net.c:360
 msgid "Is another copy of Transmission already running?"
-msgstr ""
+msgstr "Уже запущена другая копия Transmission?"
 
 #: ../libtransmission/net.c:365
 #, c-format
@@ -2037,7 +2041,7 @@ msgstr "Не удалось открыть порт %d на %s: %s"
 #: ../libtransmission/net.c:367
 #, c-format
 msgid "Couldn't bind port %d on %s: %s (%s)"
-msgstr ""
+msgstr "Не удалось привязать порт %d к %s: %s (%s)"
 
 #: ../libtransmission/port-forwarding.c:31
 msgid "Port Forwarding"

@@ -7,14 +7,14 @@ msgstr ""
 "Project-Id-Version: fi\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-02-10 20:02-0600\n"
-"PO-Revision-Date: 2010-02-14 13:40+0000\n"
-"Last-Translator: Heikki Mäntysaari <heikki.mantysaari@linux.fi>\n"
+"PO-Revision-Date: 2010-02-19 19:23+0000\n"
+"Last-Translator: Saku Laukkanen <nollapiste@nettikirje.fi>\n"
 "Language-Team: -\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2010-02-16 15:44+0000\n"
+"X-Launchpad-Export-Date: 2010-02-22 01:53+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:54
@@ -334,7 +334,7 @@ msgstr "Jaa suhteesta _välittämättä"
 
 #: ../gtk/details.c:500 ../gtk/tr-prefs.c:317
 msgid "_Seed torrent until its ratio reaches:"
-msgstr "Jaa _torrenttia, kunnen suhde on:"
+msgstr "Jaa _torrenttia, kunnes suhde on:"
 
 #: ../gtk/details.c:516
 msgid "Peer Connections"
@@ -457,7 +457,7 @@ msgstr "Ladattu:"
 
 #: ../gtk/details.c:904
 msgid "Availability:"
-msgstr ""
+msgstr "Saatavuus:"
 
 #: ../gtk/details.c:908 ../gtk/stats.c:168 ../gtk/stats.c:180
 msgid "Downloaded:"
@@ -905,6 +905,7 @@ msgstr ""
 "  Ilari Oras https://launchpad.net/~ilarioras\n"
 "  Jaakko Huhtala https://launchpad.net/~jaakko-huhtala\n"
 "  Juhana Uuttu https://launchpad.net/~rexroom\n"
+"  Saku Laukkanen https://launchpad.net/~nollapiste\n"
 "  Timo Jyrinki https://launchpad.net/~timo-jyrinki\n"
 "  Tuomas Aavikko https://launchpad.net/~taavikko\n"
 "  papukaija https://launchpad.net/~papukaija\n"
@@ -1879,7 +1880,7 @@ msgstr "Epäkelpo metatieto"
 #: ../libtransmission/bencode.c:1644
 #, c-format
 msgid "Saved \"%s\""
-msgstr ""
+msgstr "\"%s\" tallennettu"
 
 #: ../libtransmission/bencode.c:1649 ../libtransmission/bencode.c:1656
 #: ../libtransmission/blocklist.c:294
@@ -1966,7 +1967,7 @@ msgstr ""
 
 #: ../libtransmission/net.c:360
 msgid "Is another copy of Transmission already running?"
-msgstr ""
+msgstr "Varmista ettei toinen Transmission ole jo käynnissä."
 
 #: ../libtransmission/net.c:365
 #, c-format
