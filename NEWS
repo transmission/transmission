@@ -1,10 +1,12 @@
-=== Transmission 1.91 (2010/02/xx) ===
+=== Transmission 1.91 (2010/02/21) ===
 [http://trac.transmissionbt.com/query?milestone=1.91&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Fix 1.90 crash-on-startup bug that affected some users
   * Fix 1.90 bug that caused the "turtle mode" state to be forgotten between sessions
   * Fix 1.83 crash when adding a torrent by URL from an ftp source via the web client
   * For the BitTorrent spec's "downloaded=X" passage, use the de facto standard
+==== Mac ====
+  * Fix 1.90 bug when removing trackers
 
 === Transmission 1.90 (2010/02/16) ===
 [http://trac.transmissionbt.com/query?milestone=1.90&group=component&groupdesc=1&order=severity All tickets closed by this release]
