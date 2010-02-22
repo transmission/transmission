@@ -310,7 +310,6 @@ trackerItemCopyAttributes( tr_tracker_item * t, const tr_tracker_item * o )
     t->leecherCount = o->leecherCount;
     t->downloadCount = o->downloadCount;
     t->downloaderCount = o->downloaderCount;
-    t->id = o->id;
     memcpy( t->key_param, o->key_param, sizeof( t->key_param ) );
 }
 
