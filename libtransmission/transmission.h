@@ -1224,7 +1224,8 @@ tr_tracker_info;
  * @param torrent The torrent whose tracker list is to be modified
  * @param trackers An array of trackers, sorted by tier from first to last.
  *                 NOTE: only the `tier' and `announce' fields are used.
- *                 libtransmission derives `scrape' from `announce'.
+ *                 libtransmission derives `scrape' from `announce'
+ *                  and reassigns 'id'.
  * @param trackerCount size of the `trackers' array
  */
 tr_bool
