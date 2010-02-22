@@ -21,7 +21,7 @@
 #endif
 #if defined(SYS_DARWIN)
  #define HAVE_GETPAGESIZE
- #define HAVE_POSIX_MEMALIGN
+ //#define HAVE_POSIX_MEMALIGN requires Mac OS X 10.6
  #define HAVE_VALLOC
 #endif
 
