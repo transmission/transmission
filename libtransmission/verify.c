@@ -19,11 +19,6 @@
 #if defined(HAVE_POSIX_FADVISE) || defined(SYS_DARWIN)
  #include <fcntl.h> /* posix_fadvise() / fcntl() */
 #endif
-#if defined(SYS_DARWIN)
- #define HAVE_GETPAGESIZE
- //#define HAVE_POSIX_MEMALIGN requires Mac OS X 10.6
- #define HAVE_VALLOC
-#endif
 
 #include <openssl/sha.h>
 
@@ -65,28 +60,8 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
     tr_piece_index_t pieceIndex = 0;
     const time_t begin = tr_time( );
     time_t end;
-    int64_t buflen;
-    uint8_t * buffer = NULL;
-    const int64_t maxbuf = 16384;
-
-#ifdef HAVE_GETPAGESIZE
-    buflen = getpagesize();
-    while( buflen * 2 <= maxbuf )
-        buflen *= 2;
-#else
-    buflen = maxbuf;
-#endif
-
-#ifdef HAVE_POSIX_MEMALIGN
-    if( !buffer )
-        posix_memalign( (void**)&buffer, getpagesize(), buflen );
-#endif
-#ifdef HAVE_VALLOC
-    if( !buffer )
-        buffer = valloc( buflen );
-#endif
-    if( !buffer )
-        buffer = malloc( buflen );
+    const int64_t buflen = 16384;
+    uint8_t * buffer = tr_valloc( buflen );
 
     SHA1_Init( &sha );
 

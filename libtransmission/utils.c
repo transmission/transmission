@@ -14,6 +14,16 @@
  #define _GNU_SOURCE /* glibc's string.h needs this to pick up memmem */
 #endif
 
+#if defined(SYS_DARWIN)
+ #define HAVE_GETPAGESIZE
+ #define HAVE_VALLOC
+ #undef HAVE_POSIX_MEMALIGN /* not supported on OS X 10.5 and lower */
+#endif
+
+#if defined(HAVE_POSIX_MEMALIGN) || defined(HAVE_VALLOC)
+ #define _XOPEN_SOURCE 600 /* pick posix_memalign and valloc declarations */
+#endif
+
 #include <assert.h>
 #include <ctype.h> /* isalpha, tolower */
 #include <errno.h>
@@ -27,7 +37,7 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h> /* usleep, stat, getcwd */
+#include <unistd.h> /* usleep, stat, getcwd, getpagesize */
 
 #include "event.h"
 
@@ -1439,4 +1449,42 @@ tr_moveFile( const char * oldpath, const char * newpath, tr_bool * renamed )
 
     unlink( oldpath );
     return 0;
+}
+
+/***
+****
+***/
+
+void*
+tr_valloc( size_t bufLen )
+{
+    size_t allocLen;
+    void * buf = NULL;
+    static size_t pageSize = 0;
+
+    if( !pageSize ) {
+#ifdef HAVE_GETPAGESIZE
+        pageSize = getpagesize();
+#else /* guess */
+        pageSize = 4096;
+#endif
+    }
+
+    allocLen = pageSize;
+    while( allocLen < bufLen )
+        allocLen += pageSize;
+
+#ifdef HAVE_POSIX_MEMALIGN
+    if( !buf )
+        posix_memalign( &buf, pageSize, allocLen );
+#endif
+#ifdef HAVE_VALLOC
+    if( !buf )
+        buf = valloc( allocLen );
+#endif
+    if( !buf )
+        buf = malloc( allocLen );
+
+    tr_dbg( "tr_valloc(%zu) allocating %zu bytes", bufLen, allocLen );
+    return buf;
 }

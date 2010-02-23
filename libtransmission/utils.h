@@ -335,6 +335,8 @@ static inline void* tr_memdup( const void * src, int byteCount )
 #define tr_renew( struct_type, mem, n_structs )    \
     ( (struct_type *) realloc ( ( mem ), ( (size_t) sizeof ( struct_type ) ) * ( ( size_t) ( n_structs ) ) ) )
 
+void* tr_valloc( size_t bufLen );
+
 /**
  * @brief make a newly-allocated copy of a substring
  * @param in is a void* so that callers can pass in both signed & unsigned without a cast
