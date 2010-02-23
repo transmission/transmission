@@ -1428,7 +1428,7 @@ tr_moveFile( const char * oldpath, const char * newpath, tr_bool * renamed )
     in = tr_open_file_for_scanning( oldpath );
     out = tr_open_file_for_writing( newpath );
     buflen = stat( newpath, &st ) ? 4096 : st.st_blksize;
-    buf = tr_new( char, buflen );
+    buf = tr_valloc( buflen );
     while( bytesLeft > 0 )
     {
         ssize_t bytesWritten;

@@ -208,7 +208,7 @@ getHashInfo( tr_metainfo_builder * b )
     if( !b->totalSize )
         return ret;
 
-    buf = tr_new( uint8_t, b->pieceSize );
+    buf = tr_valloc( b->pieceSize );
     b->pieceIndex = 0;
     totalRemain = b->totalSize;
     fp = fopen( b->files[fileIndex].filename, "rb" );
