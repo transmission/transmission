@@ -268,6 +268,7 @@ addSingleTorrentDialog( GtkWindow * parent, TrCore * core, tr_ctor * ctor )
     GtkWidget *      d;
     GtkWidget *      t;
     GtkWidget *      l;
+    GtkWidget *      grab;
     GtkWidget *      source_chooser;
     struct AddData * data;
     uint8_t          flag;
@@ -278,9 +279,9 @@ addSingleTorrentDialog( GtkWindow * parent, TrCore * core, tr_ctor * ctor )
     d = gtk_dialog_new_with_buttons( _( "Torrent Options" ), parent,
                                      GTK_DIALOG_DESTROY_WITH_PARENT |
                                      GTK_DIALOG_NO_SEPARATOR,
-                                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-                                     GTK_STOCK_ADD, GTK_RESPONSE_ACCEPT,
                                      NULL );
+    gtk_dialog_add_button( GTK_DIALOG( d ), GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL );
+    grab = gtk_dialog_add_button( GTK_DIALOG( d ), GTK_STOCK_ADD, GTK_RESPONSE_ACCEPT );
     gtk_dialog_set_default_response( GTK_DIALOG( d ),
                                      GTK_RESPONSE_ACCEPT );
     gtk_dialog_set_alternative_button_order( GTK_DIALOG( d ),
@@ -392,6 +393,8 @@ addSingleTorrentDialog( GtkWindow * parent, TrCore * core, tr_ctor * ctor )
         sourceChanged( GTK_FILE_CHOOSER_BUTTON( w ), data );
 
     gtk_box_pack_start( GTK_BOX( GTK_DIALOG( d )->vbox ), t, TRUE, TRUE, 0 );
+
+    gtk_widget_grab_focus( grab );
     gtk_widget_show_all( d );
     return d;
 }
