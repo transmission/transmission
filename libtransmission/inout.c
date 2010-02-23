@@ -290,22 +290,14 @@ tr_ioWrite( tr_torrent       * tor,
 static tr_bool
 recalculateHash( tr_torrent       * tor,
                  tr_piece_index_t   pieceIndex,
-                 void             * buffer,
-                 size_t             buflen,
                  uint8_t          * setme )
 {
     size_t   bytesLeft;
     uint32_t offset = 0;
     tr_bool  success = TRUE;
-    uint8_t  stackbuf[MAX_STACK_ARRAY_SIZE];
+    uint8_t  buffer[MAX_STACK_ARRAY_SIZE];
+    const size_t buflen = MAX_STACK_ARRAY_SIZE;
     SHA_CTX  sha;
-
-    /* fallback buffer */
-    if( ( buffer == NULL ) || ( buflen < 1 ) )
-    {
-        buffer = stackbuf;
-        buflen = sizeof( stackbuf );
-    }
 
     assert( tor != NULL );
     assert( pieceIndex < tor->info.pieceCount );
@@ -334,13 +326,10 @@ recalculateHash( tr_torrent       * tor,
 }
 
 tr_bool
-tr_ioTestPiece( tr_torrent        * tor,
-                tr_piece_index_t    pieceIndex,
-                void              * buffer,
-                size_t              buflen )
+tr_ioTestPiece( tr_torrent * tor, tr_piece_index_t piece )
 {
     uint8_t hash[SHA_DIGEST_LENGTH];
 
-    return recalculateHash( tor, pieceIndex, buffer, buflen, hash )
-           && !memcmp( hash, tor->info.pieces[pieceIndex].hash, SHA_DIGEST_LENGTH );
+    return recalculateHash( tor, piece, hash )
+           && !memcmp( hash, tor->info.pieces[piece].hash, SHA_DIGEST_LENGTH );
 }

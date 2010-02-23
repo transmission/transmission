@@ -1335,7 +1335,7 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
                 if( tr_cpPieceIsComplete( &tor->completion, e->pieceIndex ) )
                 {
                     const tr_piece_index_t p = e->pieceIndex;
-                    const tr_bool ok = tr_ioTestPiece( tor, p, NULL, 0 );
+                    const tr_bool ok = tr_ioTestPiece( tor, p );
 
                     if( !ok )
                     {
