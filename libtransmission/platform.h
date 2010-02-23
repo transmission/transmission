@@ -32,8 +32,6 @@
  #define MAX_PATH_LENGTH  2048
 #endif
 
-#define MAX_STACK_ARRAY_SIZE 7168
-
 /**
  * @addtogroup tr_session Session
  * @{

@@ -499,6 +499,7 @@ tr_sessionInit( const char  * tag,
     session->lock = tr_lockNew( );
     session->tag = tr_strdup( tag );
     session->magicNumber = SESSION_MAGIC_NUMBER;
+    session->buffer = tr_valloc( SESSION_BUFFER_SIZE );
     tr_bencInitList( &session->removedTorrents, 0 );
 
     /* nice to start logging at the very beginning */
@@ -890,6 +891,27 @@ tr_sessionIsIncompleteDirEnabled( const tr_session * session )
 /***
 ****
 ***/
+
+void*
+tr_sessionGetBuffer( tr_session * session )
+{
+    assert( tr_isSession( session ) );
+    assert( !session->bufferInUse );
+    assert( tr_amInEventThread( session ) );
+
+    session->bufferInUse = TRUE;
+    return session->buffer;
+}
+
+void
+tr_sessionReleaseBuffer( tr_session * session )
+{
+    assert( tr_isSession( session ) );
+    assert( session->bufferInUse );
+    assert( tr_amInEventThread( session ) );
+
+    session->bufferInUse = FALSE;
+}
 
 void
 tr_sessionLock( tr_session * session )
@@ -1573,6 +1595,7 @@ tr_sessionClose( tr_session * session )
         tr_bencFree( session->metainfoLookup );
         tr_free( session->metainfoLookup );
     }
+    tr_free( session->buffer );
     tr_free( session->tag );
     tr_free( session->configDir );
     tr_free( session->resumeDir );

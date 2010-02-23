@@ -185,6 +185,12 @@ struct tr_session
 
     struct tr_bindinfo         * public_ipv4;
     struct tr_bindinfo         * public_ipv6;
+
+    /* a page-aligned buffer for use by the libtransmission thread.
+     * @see SESSION_BUFFER_SIZE */
+    void * buffer;
+
+    tr_bool bufferInUse;
 };
 
 tr_bool      tr_sessionAllowsDHT( const tr_session * session );
@@ -211,8 +217,15 @@ struct tr_bindsockets * tr_sessionGetBindSockets( tr_session * );
 
 enum
 {
-    SESSION_MAGIC_NUMBER = 3845
+    SESSION_MAGIC_NUMBER = 3845,
+
+    /* @see tr_session.buffer */
+    SESSION_BUFFER_SIZE = (16*1024)
 };
+
+void* tr_sessionGetBuffer( tr_session * session );
+
+void tr_sessionReleaseBuffer( tr_session * session );
 
 static inline tr_bool tr_isSession( const tr_session * session )
 {

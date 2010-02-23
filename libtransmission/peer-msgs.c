@@ -31,7 +31,6 @@
 #include "peer-io.h"
 #include "peer-mgr.h"
 #include "peer-msgs.h"
-#include "platform.h" /* MAX_STACK_ARRAY_SIZE */
 #include "session.h"
 #include "stats.h"
 #include "torrent.h"
@@ -1340,15 +1339,19 @@ readBtPiece( tr_peermsgs      * msgs,
         const size_t nLeft = req->length - EVBUFFER_LENGTH( msgs->incoming.block );
         size_t n = MIN( nLeft, inlen );
         size_t i = n;
+        void * buf = tr_sessionGetBuffer( getSession( msgs ) );
+        const size_t buflen = SESSION_BUFFER_SIZE;
 
         while( i > 0 )
         {
-            uint8_t buf[MAX_STACK_ARRAY_SIZE];
-            const size_t thisPass = MIN( i, sizeof( buf ) );
+            const size_t thisPass = MIN( i, buflen );
             tr_peerIoReadBytes( msgs->peer->io, inbuf, buf, thisPass );
             evbuffer_add( msgs->incoming.block, buf, thisPass );
             i -= thisPass;
         }
+
+        tr_sessionReleaseBuffer( getSession( msgs ) );
+        buf = NULL;
 
         fireClientGotData( msgs, n, TRUE );
         *setme_piece_bytes_read += n;

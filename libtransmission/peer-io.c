@@ -32,7 +32,6 @@
 #include "list.h"
 #include "net.h"
 #include "peer-io.h"
-#include "platform.h" /* MAX_STACK_ARRAY_SIZE */
 #include "trevent.h" /* tr_runInEventThread() */
 #include "utils.h"
 
@@ -810,17 +809,19 @@ tr_peerIoWrite( tr_peerIo   * io,
         case PEER_ENCRYPTION_RC4:
         {
             /* FIXME(libevent2): use evbuffer_reserve_space() and evbuffer_commit_space() instead of tmp */
-            uint8_t tmp[MAX_STACK_ARRAY_SIZE];
+            void * tmp = tr_sessionGetBuffer( io->session );
+            const size_t tmplen = SESSION_BUFFER_SIZE;
             const uint8_t * walk = bytes;
             evbuffer_expand( io->outbuf, byteCount );
             while( byteCount > 0 )
             {
-                const size_t thisPass = MIN( byteCount, sizeof( tmp ) );
+                const size_t thisPass = MIN( byteCount, tmplen );
                 tr_cryptoEncrypt( io->crypto, thisPass, walk, tmp );
                 evbuffer_add( io->outbuf, tmp, thisPass );
                 walk += thisPass;
                 byteCount -= thisPass;
             }
+            tr_sessionReleaseBuffer( io->session );
             break;
         }
 
@@ -881,14 +882,17 @@ tr_peerIoDrain( tr_peerIo       * io,
                 struct evbuffer * inbuf,
                 size_t            byteCount )
 {
-    uint8_t tmp[MAX_STACK_ARRAY_SIZE];
+    void * buf = tr_sessionGetBuffer( io->session );
+    const size_t buflen = SESSION_BUFFER_SIZE;
 
     while( byteCount > 0 )
     {
-        const size_t thisPass = MIN( byteCount, sizeof( tmp ) );
-        tr_peerIoReadBytes( io, inbuf, tmp, thisPass );
+        const size_t thisPass = MIN( byteCount, buflen );
+        tr_peerIoReadBytes( io, inbuf, buf, thisPass );
         byteCount -= thisPass;
     }
+
+    tr_sessionReleaseBuffer( io->session );
 }
 
 /***
