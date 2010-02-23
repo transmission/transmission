@@ -21,7 +21,9 @@
 #endif
 
 #if defined(HAVE_POSIX_MEMALIGN) || defined(HAVE_VALLOC)
- #define _XOPEN_SOURCE 600 /* pick posix_memalign and valloc declarations */
+ #if !defined(SYS_DARWIN)
+  #define _XOPEN_SOURCE 600 /* pick posix_memalign and valloc declarations */
+ #endif
 #endif
 
 #include <assert.h>
