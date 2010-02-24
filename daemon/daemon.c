@@ -463,13 +463,15 @@ main( int argc, char ** argv )
         pumpLogMessages( logfile );
     }
 
-    closelog( );
-
     /* shutdown */
 #if HAVE_SYSLOG
     if( !foreground )
+    {
         syslog( LOG_INFO, "%s", "Closing session" );
+        closelog( );
+    }
 #endif
+
     printf( "Closing transmission session..." );
     tr_sessionSaveSettings( mySession, configDir, &settings );
     dtr_watchdir_free( watchdir );
