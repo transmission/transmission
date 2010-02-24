@@ -234,8 +234,19 @@ Math.formatTimestamp = function(seconds) {
 	if(hours == 0){
 		hours = 12;
 	}
+	if(hours < 10){
+		hours = "0" + hours; 
+	} 
+	var minutes = myDate.getMinutes(); 
+	if(minutes < 10){ 
+		minutes = "0" + minutes; 
+	} 
+	var seconds = myDate.getSeconds(); 
+		if(seconds < 10){ 
+			seconds = "0" + seconds; 
+	} 
 
-	time = [hours, myDate.getMinutes(), myDate.getSeconds()].join(':');
+	time = [hours, minutes, seconds].join(':');
 
 	return [date, time, period].join(' ');
 };
