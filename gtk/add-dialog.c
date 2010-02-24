@@ -359,9 +359,9 @@ addSingleTorrentDialog( GtkWindow * parent, TrCore * core, tr_ctor * ctor )
     col = 0;
     w = gtk_label_new_with_mnemonic( _( "Torrent _priority:" ) );
     gtk_misc_set_alignment( GTK_MISC( w ), 0.0f, 0.5f );
-    gtk_table_attach_defaults( GTK_TABLE( t ), w, col, col + 1, row, row + 1 );
+    gtk_table_attach( GTK_TABLE( t ), w, col, col + 1, row, row + 1, ~0, 0, 0, 0 );
     ++col;
-    gtk_table_attach_defaults( GTK_TABLE( t ), data->priority_combo, col, col + 1, row, row + 1 );
+    gtk_table_attach( GTK_TABLE( t ), data->priority_combo, col, col + 1, row, row + 1, ~0, 0, 0, 0 );
     gtk_label_set_mnemonic_widget( GTK_LABEL( w ), data->priority_combo );
 
     ++row;
