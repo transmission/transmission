@@ -151,10 +151,10 @@ tr_magnetParse( const char * uri )
             if( ( keylen==2 ) && !memcmp( key, "dn", 2 ) )
                 displayName = tr_http_unescape( val, vallen );
 
-            if( ( keylen==2 ) && !memcmp( key, "tr", 2 ) )
+            if( ( keylen==2 ) && !memcmp( key, "tr", 2 ) && ( trCount < MAX_TRACKERS ) )
                 tr[trCount++] = tr_http_unescape( val, vallen );
 
-            if( ( keylen==2 ) && !memcmp( key, "ws", 2 ) )
+            if( ( keylen==2 ) && !memcmp( key, "ws", 2 ) && ( wsCount < MAX_TRACKERS ) )
                 ws[wsCount++] = tr_http_unescape( val, vallen );
 
             walk = next != NULL ? next + 1 : NULL;
