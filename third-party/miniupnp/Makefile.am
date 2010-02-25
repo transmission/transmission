@@ -27,7 +27,7 @@ noinst_HEADERS = \
 
 EXTRA_DIST = \
     README \
-    LICENCE \
+    LICENSE \
     miniupnpcstrings.h.in \
     updateminiupnpcstrings.sh
 
