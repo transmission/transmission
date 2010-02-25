@@ -182,7 +182,9 @@
         dateString = NSLocalizedString(@"N/A", "Tracker last scrape");
     
     NSString * baseString;
-    if (fStat.hasScraped && !fStat.lastScrapeSucceeded)
+    if (fStat.hasScraped && fStat.lastScrapeTimedOut)
+        baseString = [NSLocalizedString(@"Scrape timed out", "Tracker last scrape") stringByAppendingFormat: @": %@", dateString];
+    else if (fStat.hasScraped && !fStat.lastScrapeSucceeded)
     {
         baseString = NSLocalizedString(@"Scrape error", "Tracker last scrape");
         

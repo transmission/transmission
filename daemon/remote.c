@@ -1357,6 +1357,7 @@ printDetails( tr_benc * top )
                     tr_bool lastScrapeSucceeded;
                     int64_t lastScrapeStartTime;
                     int64_t lastScrapeTime;
+                    tr_bool lastScrapeTimedOut;
                     int64_t leecherCount;
                     int64_t nextAnnounceTime;
                     int64_t nextScrapeTime;
@@ -1382,6 +1383,7 @@ printDetails( tr_benc * top )
                         tr_bencDictFindInt ( t, "lastScrapeStartTime", &lastScrapeStartTime ) &&
                         tr_bencDictFindBool( t, "lastScrapeSucceeded", &lastScrapeSucceeded ) &&
                         tr_bencDictFindInt ( t, "lastScrapeTime", &lastScrapeTime ) &&
+                        tr_bencDictFindBool( t, "lastScrapeTimedOut", &lastScrapeTimedOut ) &&
                         tr_bencDictFindInt ( t, "leecherCount", &leecherCount ) &&
                         tr_bencDictFindInt ( t, "nextAnnounceTime", &nextAnnounceTime ) &&
                         tr_bencDictFindInt ( t, "nextScrapeTime", &nextScrapeTime ) &&
@@ -1436,6 +1438,8 @@ printDetails( tr_benc * top )
                                 if( lastScrapeSucceeded )
                                     printf( "  Tracker had %'d seeders and %'d leechers %s ago\n",
                                             (int)seederCount, (int)leecherCount, buf );
+                                else if( lastScrapeTimedOut )
+                                    printf( "  Tracker scrape timed out; will retry\n" );
                                 else
                                     printf( "  Got a scrape error \"%s\" %s ago\n",
                                             lastScrapeResult, buf );

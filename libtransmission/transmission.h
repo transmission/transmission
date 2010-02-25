@@ -1447,6 +1447,9 @@ typedef struct
        if "hasAnnounced" is false, this field is undefined */
     tr_bool lastScrapeSucceeded;
 
+    /* whether or not the last scrape timed out. */
+    tr_bool lastScrapeTimedOut;
+
     /* when the last scrape was completed.
        if "hasScraped" is false, this field is undefined */
     time_t lastScrapeTime;

@@ -272,6 +272,7 @@
                       | lastScrapeStartTime     | number     | tr_tracker_stat
                       | lastScrapeSucceeded     | boolean    | tr_tracker_stat
                       | lastScrapeTime          | number     | tr_tracker_stat
+                      | lastScrapeTimedOut      | boolean    | tr_tracker_stat
                       | leecherCount            | number     | tr_tracker_stat
                       | nextAnnounceTime        | number     | tr_tracker_stat
                       | nextScrapeTime          | number     | tr_tracker_stat
@@ -582,3 +583,5 @@
          |         | yes       | session-get    | new arg "config-dir"
          |         | yes       | torrent-add    | new arg "bandwidthPriority"
          |         | yes       | torrent-get    | new trackerStats arg "lastAnnounceTimedOut"
+   ------+---------+-----------+----------------+-------------------------------
+   8     | 1.92    | yes       | torrent-get    | new trackerStats arg "lastScrapeTimedOut"
