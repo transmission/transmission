@@ -1,9 +1,9 @@
-/* $Id: miniupnpc.c,v 1.66 2009/10/10 19:15:34 nanard Exp $ */
+/* $Id: miniupnpc.c,v 1.74 2010/01/09 23:54:40 nanard Exp $ */
 /* Project : miniupnp
  * Author : Thomas BERNARD
- * copyright (c) 2005-2009 Thomas Bernard
+ * copyright (c) 2005-2010 Thomas Bernard
  * This software is subjet to the conditions detailed in the
- * provided LICENCE file. */
+ * provided LICENSE file. */
 #define __EXTENSIONS__ 1
 #if !defined(MACOSX) && !defined(__sun)
 #if !defined(_XOPEN_SOURCE) && !defined(__OpenBSD__) && !defined(__NetBSD__)
@@ -16,6 +16,10 @@
 #endif
 #endif
 
+#ifdef __APPLE__
+#define _DARWIN_C_SOURCE
+#endif
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -24,32 +28,45 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <io.h>
+/*#include <IPHlpApi.h>*/
 #define snprintf _snprintf
 #if defined(_MSC_VER) && (_MSC_VER >= 1400)
 #define strncasecmp _memicmp
-#else
+#else /* defined(_MSC_VER) && (_MSC_VER >= 1400) */
 #define strncasecmp memicmp
-#endif
+#endif /* defined(_MSC_VER) && (_MSC_VER >= 1400) */
 #define MAXHOSTNAMELEN 64
-#else
+#else /* #ifdef WIN32 */
 /* Standard POSIX includes */
 #include <unistd.h>
+#if defined(__amigaos__) && !defined(__amigaos4__)
+/* Amiga OS 3 specific stuff */
+#define socklen_t int
+#else
 #include <sys/select.h>
+#endif
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/param.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#if !defined(__amigaos__) && !defined(__amigaos4__)
 #include <poll.h>
+#endif
 #include <netdb.h>
 #include <strings.h>
 #include <errno.h>
 #define closesocket close
 #define MINIUPNPC_IGNORE_EINTR
-#endif
+#endif /* #else WIN32 */
 #ifdef MINIUPNPC_SET_SOCKET_TIMEOUT
 #include <sys/time.h>
 #endif
+#if defined(__amigaos__) || defined(__amigaos4__)
+/* Amiga OS specific stuff */
+#define TIMEVAL struct timeval
+#endif
+
 #include "miniupnpc.h"
 #include "minissdpc.h"
 #include "miniwget.h"
@@ -85,7 +102,8 @@ LIBSPEC void parserootdesc(const char * buffer, int bufsize, struct IGDdatas * d
 #endif
 }
 
-/* Content-length: nnn */
+/* getcontentlenfromline() : parse the Content-Length HTTP header line.
+ * Content-length: nnn */
 static int getcontentlenfromline(const char * p, int n)
 {
 	static const char contlenstr[] = "content-length";
@@ -120,6 +138,10 @@ static int getcontentlenfromline(const char * p, int n)
 	return a;
 }
 
+/* getContentLengthAndHeaderLength()
+ * retrieve header length and content length from an HTTP response
+ * TODO : retrieve Transfer-Encoding: header value, in order to support
+ *        HTTP/1.1, chunked transfer encoding must be supported. */
 static void
 getContentLengthAndHeaderLength(char * p, int n,
                                 int * contentlen, int * headerlen)
@@ -430,8 +452,11 @@ LIBSPEC struct UPNPDev * upnpDiscover(int delay, const char * multicastif,
 	int n;
 	struct sockaddr_in sockudp_r, sockudp_w;
 	unsigned int mx;
+#ifdef WIN32
+	/*MIB_IPFORWARDROW ip_forward;*/
+#endif
 
-#ifndef WIN32
+#if !defined(WIN32) && !defined(__amigaos__) && !defined(__amigaos4__)
 	/* first try to get infos from minissdpd ! */
 	if(!minissdpdsock)
 		minissdpdsock = "/var/run/minissdpd.sock";
@@ -467,6 +492,45 @@ LIBSPEC struct UPNPDev * upnpDiscover(int delay, const char * multicastif,
     sockudp_w.sin_family = AF_INET;
     sockudp_w.sin_port = htons(PORT);
     sockudp_w.sin_addr.s_addr = inet_addr(UPNP_MCAST_ADDR);
+#ifdef WIN32
+/* This code could help us to use the right Network interface for 
+ * SSDP multicast traffic */
+/* TODO : Get IP associated with the index given in the ip_forward struct
+ * in order to give this ip to setsockopt(sudp, IPPROTO_IP, IP_MULTICAST_IF) */
+ /*
+	if(GetBestRoute(inet_addr("223.255.255.255"), 0, &ip_forward) == NO_ERROR) {
+		DWORD dwRetVal = 0;
+		PMIB_IPADDRTABLE pIPAddrTable;
+    DWORD dwSize = 0;
+    IN_ADDR IPAddr;
+    int i;
+    printf("ifIndex=%lu nextHop=%lx \n", ip_forward.dwForwardIfIndex, ip_forward.dwForwardNextHop);
+    pIPAddrTable = (MIB_IPADDRTABLE *) malloc(sizeof (MIB_IPADDRTABLE));
+    if (GetIpAddrTable(pIPAddrTable, &dwSize, 0) == ERROR_INSUFFICIENT_BUFFER) {
+	    free(pIPAddrTable);
+      pIPAddrTable = (MIB_IPADDRTABLE *) malloc(dwSize);
+    }
+    if(pIPAddrTable) {
+    	dwRetVal = GetIpAddrTable( pIPAddrTable, &dwSize, 0 );
+    	printf("\tNum Entries: %ld\n", pIPAddrTable->dwNumEntries);
+    	for (i=0; i < (int) pIPAddrTable->dwNumEntries; i++) {
+        printf("\n\tInterface Index[%d]:\t%ld\n", i, pIPAddrTable->table[i].dwIndex);
+        IPAddr.S_un.S_addr = (u_long) pIPAddrTable->table[i].dwAddr;
+        printf("\tIP Address[%d]:     \t%s\n", i, inet_ntoa(IPAddr) );
+        IPAddr.S_un.S_addr = (u_long) pIPAddrTable->table[i].dwMask;
+        printf("\tSubnet Mask[%d]:    \t%s\n", i, inet_ntoa(IPAddr) );
+        IPAddr.S_un.S_addr = (u_long) pIPAddrTable->table[i].dwBCastAddr;
+        printf("\tBroadCast[%d]:      \t%s (%ld)\n", i, inet_ntoa(IPAddr), pIPAddrTable->table[i].dwBCastAddr);
+        printf("\tReassembly size[%d]:\t%ld\n", i, pIPAddrTable->table[i].dwReasmSize);
+        printf("\tType and State[%d]:", i);
+        printf("\n");
+    	}
+			free(pIPAddrTable);
+    	pIPAddrTable = NULL;
+    }
+	}
+*/
+#endif
 
 #ifdef WIN32
 	if (setsockopt(sudp, SOL_SOCKET, SO_REUSEADDR, (const char *)&opt, sizeof (opt)) < 0)
@@ -652,7 +716,7 @@ FreeUPNPUrls(struct UPNPUrls * urls)
 int ReceiveData(int socket, char * data, int length, int timeout)
 {
     int n;
-#ifndef WIN32
+#if !defined(WIN32) && !defined(__amigaos__) && !defined(__amigaos4__)
     struct pollfd fds[1]; /* for the poll */
 #ifdef MINIUPNPC_IGNORE_EINTR
     do {

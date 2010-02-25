@@ -1,4 +1,4 @@
-/* $Id: igd_desc_parse.c,v 1.8 2008/04/23 11:51:06 nanard Exp $ */
+/* $Id: igd_desc_parse.c,v 1.9 2009/12/03 13:50:06 nanard Exp $ */
 /* Project : miniupnp
  * http://miniupnp.free.fr/
  * Author : Thomas Bernard
@@ -95,19 +95,19 @@ void IGDdata(void * d, const char * data, int l)
 
 void printIGD(struct IGDdatas * d)
 {
-	printf("urlbase = %s\n", d->urlbase);
+	printf("urlbase = '%s'\n", d->urlbase);
 	printf("WAN Device (Common interface config) :\n");
-	/*printf(" deviceType = %s\n", d->devicetype_CIF);*/
-	printf(" serviceType = %s\n", d->servicetype_CIF);
-	printf(" controlURL = %s\n", d->controlurl_CIF);
-	printf(" eventSubURL = %s\n", d->eventsuburl_CIF);
-	printf(" SCPDURL = %s\n", d->scpdurl_CIF);
+	/*printf(" deviceType = '%s'\n", d->devicetype_CIF);*/
+	printf(" serviceType = '%s'\n", d->servicetype_CIF);
+	printf(" controlURL = '%s'\n", d->controlurl_CIF);
+	printf(" eventSubURL = '%s'\n", d->eventsuburl_CIF);
+	printf(" SCPDURL = '%s'\n", d->scpdurl_CIF);
 	printf("WAN Connection Device (IP or PPP Connection):\n");
-	/*printf(" deviceType = %s\n", d->devicetype);*/
-	printf(" servicetype = %s\n", d->servicetype);
-	printf(" controlURL = %s\n", d->controlurl);
-	printf(" eventSubURL = %s\n", d->eventsuburl);
-	printf(" SCPDURL = %s\n", d->scpdurl);
+	/*printf(" deviceType = '%s'\n", d->devicetype);*/
+	printf(" servicetype = '%s'\n", d->servicetype);
+	printf(" controlURL = '%s'\n", d->controlurl);
+	printf(" eventSubURL = '%s'\n", d->eventsuburl);
+	printf(" SCPDURL = '%s'\n", d->scpdurl);
 }
 
 

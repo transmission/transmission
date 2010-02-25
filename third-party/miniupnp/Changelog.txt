@@ -1,5 +1,43 @@
-$Id: Changelog.txt,v 1.93 2009/10/10 19:15:34 nanard Exp $
+$Id: Changelog.txt,v 1.105 2010/01/06 10:03:53 nanard Exp $
 miniUPnP client Changelog.
+
+2010/01/06:
+  #define _DARWIN_C_SOURCE for macosx
+
+2009/12/19:
+  Improve MinGW32 build
+
+2009/12/11:
+  adding a MSVC9 project to build the static library and executable
+
+2009/12/10:
+  Fixing some compilation stuff for Windows/MinGW
+
+2009/12/07:
+  adaptations in Makefile and updateminiupnpcstring.sh for AmigaOS
+  some fixes for Windows when using virtual ethernet adapters (it is the
+  case with VMWare installed).
+
+2009/12/04:
+  some fixes for AmigaOS compilation
+  Changed HTTP version to HTTP/1.0 for Soap too (to prevent chunked
+  transfer encoding)
+
+2009/12/03:
+  updating printIDG and testigddescparse.c for debug.
+  modifications to compile under AmigaOS
+  adding a testminiwget program
+  Changed miniwget to advertise itself as HTTP/1.0 to prevent chunked
+  transfer encoding
+
+2009/11/26:
+  fixing updateminiupnpcstrings.sh to take into account
+  which command that does not return an error code.
+
+VERSION 1.4 : released 2009/10/30
+
+2009/10/16:
+  using Py_BEGIN_ALLOW_THREADS and Py_END_ALLOW_THREADS in python module.
 
 2009/10/10:
   Some fixes for compilation under Solaris

@@ -1,7 +1,7 @@
-/* $Id: minisoap.c,v 1.16 2008/10/11 16:39:29 nanard Exp $ */
+/* $Id: minisoap.c,v 1.18 2009/12/04 11:29:18 nanard Exp $ */
 /* Project : miniupnp
  * Author : Thomas Bernard
- * Copyright (c) 2005 Thomas Bernard
+ * Copyright (c) 2005-2009 Thomas Bernard
  * This software is subject to the conditions detailed in the
  * LICENCE file provided in this distribution.
  *
@@ -84,14 +84,17 @@ int soapPostSubmit(int fd,
 	bodysize = (int)strlen(body);
 	/* We are not using keep-alive HTTP connections.
 	 * HTTP/1.1 needs the header Connection: close to do that.
-	 * This is the default with HTTP/1.0 */
+	 * This is the default with HTTP/1.0
+	 * Using HTTP/1.1 means we need to support chunked transfer-encoding :
+	 * When using HTTP/1.1, the router "BiPAC 7404VNOX" always use chunked
+	 * transfer encoding. */
     /* Connection: Close is normally there only in HTTP/1.1 but who knows */
 	portstr[0] = '\0';
 	if(port != 80)
 		snprintf(portstr, sizeof(portstr), ":%hu", port);
 	headerssize = snprintf(headerbuf, sizeof(headerbuf),
-                       "POST %s HTTP/1.1\r\n"
-/*                       "POST %s HTTP/1.0\r\n"*/
+/*                       "POST %s HTTP/1.1\r\n" */
+                       "POST %s HTTP/1.0\r\n"
 	                   "Host: %s%s\r\n"
 					   "User-Agent: " OS_STRING ", UPnP/1.0, MiniUPnPc/" MINIUPNPC_VERSION_STRING "\r\n"
 	                   "Content-Length: %d\r\n"

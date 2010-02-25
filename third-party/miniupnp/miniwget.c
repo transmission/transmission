@@ -1,4 +1,4 @@
-/* $Id: miniwget.c,v 1.28 2009/10/10 19:15:35 nanard Exp $ */
+/* $Id: miniwget.c,v 1.31 2009/12/04 11:29:19 nanard Exp $ */
 /* Project : miniupnp
  * Author : Thomas Bernard
  * Copyright (c) 2005-2009 Thomas Bernard
@@ -20,7 +20,11 @@
 #else
 #include <unistd.h>
 #include <sys/param.h>
+#if defined(__amigaos__) && !defined(__amigaos4__)
+#define socklen_t int
+#else
 #include <sys/select.h>
+#endif
 #include <sys/socket.h>
 #include <netdb.h>
 #include <netinet/in.h>
@@ -32,6 +36,9 @@
 #endif
 #if defined(__sun) || defined(sun)
 #define MIN(x,y) (((x)<(y))?(x):(y))
+#endif
+#if defined(__amigaos__) || defined(__amigaos4__)
+#define herror(A) printf("%s\n", A)
 #endif
 
 #include "miniupnpcstrings.h"
@@ -132,9 +139,7 @@ miniwget2(const char * url, const char * host,
 		}
 		else
 		{
-#ifndef WIN32
-			inet_ntop(AF_INET, &saddr.sin_addr, addr_str, addr_str_len);
-#else
+#if defined(WIN32) || (defined(__amigaos__) && !defined(__amigaos4__))
 	/* using INT WINAPI WSAAddressToStringA(LPSOCKADDR, DWORD, LPWSAPROTOCOL_INFOA, LPSTR, LPDWORD);
      * But his function make a string with the port :  nn.nn.nn.nn:port */
 /*		if(WSAAddressToStringA((SOCKADDR *)&saddr, sizeof(saddr),
@@ -143,6 +148,8 @@ miniwget2(const char * url, const char * host,
 		    printf("WSAAddressToStringA() failed : %d\n", WSAGetLastError());
 		}*/
 			strncpy(addr_str, inet_ntoa(saddr.sin_addr), addr_str_len);
+#else
+			inet_ntop(AF_INET, &saddr.sin_addr, addr_str, addr_str_len);
 #endif
 		}
 #ifdef DEBUG
@@ -151,7 +158,7 @@ miniwget2(const char * url, const char * host,
 	}
 
 	len = snprintf(buf, sizeof(buf),
-                 "GET %s HTTP/1.1\r\n"
+                 "GET %s HTTP/1.0\r\n"
 			     "Host: %s:%d\r\n"
 				 "Connection: Close\r\n"
 				 "User-Agent: " OS_STRING ", UPnP/1.0, MiniUPnPc/" MINIUPNPC_VERSION_STRING "\r\n"
@@ -175,6 +182,9 @@ miniwget2(const char * url, const char * host,
 		}
 	}
 	{
+		/* TODO : in order to support HTTP/1.1, chunked transfer encoding
+		 *        must be supported. That means parsing of headers must be
+		 *        added.                                                   */
 		int headers=1;
 		char * respbuffer = NULL;
 		int allreadyread = 0;
