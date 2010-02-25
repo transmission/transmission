@@ -1,6 +1,7 @@
-/* $Id: getgateway.h,v 1.4 2009/12/19 12:00:00 nanard Exp $ */
+/* $Id: wingettimeofday.h,v 1.1 2009/12/19 12:02:42 nanard Exp $ */
 /* libnatpmp
- * Copyright (c) 2007, Thomas BERNARD <miniupnp@free.fr>
+ * Copyright (c) 2007-2008, Thomas BERNARD <miniupnp@free.fr>
+ * http://miniupnp.free.fr/libnatpmp.html
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -13,24 +14,14 @@
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. */
-#ifndef __GETGATEWAY_H__
-#define __GETGATEWAY_H__
-
+#ifndef __WINGETTIMEOFDAY_H__
+#define __WINGETTIMEOFDAY_H__
 #ifdef WIN32
-#if !defined(_MSC_VER)
-#include <stdint.h>
+#if defined(_MSC_VER)
+#include <time.h>
 #else
-typedef unsigned long uint32_t;
-typedef unsigned short uint16_t;
+#include <sys/time.h>
 #endif
-#define in_addr_t uint32_t
+int gettimeofday(struct timeval* p, void* tz /* IGNORED */);
 #endif
-#include "declspec.h"
-
-/* getdefaultgateway() :
- * return value :
- *    0 : success
- *   -1 : failure    */
-LIBSPEC int getdefaultgateway(in_addr_t * addr);
-
 #endif

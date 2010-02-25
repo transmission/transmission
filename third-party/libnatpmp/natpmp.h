@@ -1,4 +1,4 @@
-/* $Id: natpmp.h,v 1.11 2009/02/27 22:38:05 nanard Exp $ */
+/* $Id: natpmp.h,v 1.12 2009/12/19 12:00:00 nanard Exp $ */
 /* libnatpmp
  * Copyright (c) 2007-2008, Thomas BERNARD <miniupnp@free.fr>
  * http://miniupnp.free.fr/libnatpmp.html
@@ -21,10 +21,17 @@
 #define NATPMP_PORT (5351)
 
 #include <time.h>
+#if !defined(_MSC_VER)
 #include <sys/time.h>
+#endif
 #ifdef WIN32
 #include <winsock2.h>
+#if !defined(_MSC_VER)
 #include <stdint.h>
+#else
+typedef unsigned long uint32_t;
+typedef unsigned short uint16_t;
+#endif
 #define in_addr_t uint32_t
 #include "declspec.h"
 #else

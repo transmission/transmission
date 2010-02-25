@@ -1,6 +1,6 @@
-/* $Id: natpmp.c,v 1.9 2009/06/04 22:27:53 nanard Exp $ */
+/* $Id: natpmp.c,v 1.12 2009/12/19 14:10:09 nanard Exp $ */
 /* libnatpmp
- * Copyright (c) 2007-2008, Thomas BERNARD <miniupnp@free.fr>
+ * Copyright (c) 2007-2009, Thomas BERNARD <miniupnp@free.fr>
  * http://miniupnp.free.fr/libnatpmp.html
  *
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -14,9 +14,14 @@
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. */
+#ifdef __linux__
+#define _BSD_SOURCE 1
+#endif
 #include <string.h>
 #include <time.h>
+#if !defined(_MSC_VER)
 #include <sys/time.h>
+#endif
 #ifdef WIN32
 #include <errno.h>
 #include <winsock2.h>
@@ -24,6 +29,7 @@
 #include <io.h>
 #define EWOULDBLOCK WSAEWOULDBLOCK
 #define ECONNREFUSED WSAECONNREFUSED
+#include "wingettimeofday.h"
 #else
 #include <errno.h>
 #include <unistd.h>
@@ -80,7 +86,7 @@ LIBSPEC int closenatpmp(natpmp_t * p)
 	return 0;
 }
 
-static int sendpendingrequest(natpmp_t * p)
+int sendpendingrequest(natpmp_t * p)
 {
 	int r;
 /*	struct sockaddr_in addr;*/
@@ -96,7 +102,7 @@ static int sendpendingrequest(natpmp_t * p)
 	return (r<0) ? NATPMP_ERR_SENDERR : r;
 }
 
-static int sendnatpmprequest(natpmp_t * p)
+int sendnatpmprequest(natpmp_t * p)
 {
 	int n;
 	if(!p)
