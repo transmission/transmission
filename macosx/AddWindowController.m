@@ -98,15 +98,15 @@
     [self setGroupsMenu];
     [fGroupPopUp selectItemWithTag: fGroupValue];
     
-    NSInteger priorityTag;
+    NSInteger priorityIndex;
     switch ([fTorrent priority])
     {
-        case TR_PRI_HIGH: priorityTag = POPUP_PRIORITY_HIGH; break;
-        case TR_PRI_NORMAL: priorityTag = POPUP_PRIORITY_NORMAL; break;
-        case TR_PRI_LOW: priorityTag = POPUP_PRIORITY_LOW; break;
+        case TR_PRI_HIGH: priorityIndex = POPUP_PRIORITY_HIGH; break;
+        case TR_PRI_NORMAL: priorityIndex = POPUP_PRIORITY_NORMAL; break;
+        case TR_PRI_LOW: priorityIndex = POPUP_PRIORITY_LOW; break;
         default: NSAssert1(NO, @"Unknown priority for adding torrent: %d", [fTorrent priority]);
     }
-    [fPriorityPopUp selectItemWithTag: priorityTag];
+    [fPriorityPopUp selectItemAtIndex: priorityIndex];
     
     [fStartCheck setState: [[NSUserDefaults standardUserDefaults] boolForKey: @"AutoStartDownload"] ? NSOnState : NSOffState];
     
@@ -215,7 +215,7 @@
 - (void) changePriority: (id) sender
 {
     tr_priority_t priority;
-    switch ([sender tag])
+    switch ([sender indexOfSelectedItem])
     {
         case POPUP_PRIORITY_HIGH: priority = TR_PRI_HIGH; break;
         case POPUP_PRIORITY_NORMAL: priority = TR_PRI_NORMAL; break;
