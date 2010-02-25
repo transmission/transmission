@@ -65,7 +65,7 @@ str_has_suffix( const char *str, const char *suffix )
 /* reasonable guess as to size of 50 events */
 #define BUF_LEN (EVENT_BATCH_COUNT * (EVENT_SIZE + 16) + 2048)
 
-#define DTR_INOTIFY_MASK (IN_CREATE|IN_CLOSE_WRITE|IN_MOVED_TO)
+#define DTR_INOTIFY_MASK (IN_CLOSE_WRITE|IN_MOVED_TO)
 
 static void
 watchdir_new_impl( dtr_watchdir * w )
