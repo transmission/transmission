@@ -392,6 +392,7 @@ if test "x$enable_nls" = "xyes" ; then
     transmissionlocaledir='${prefix}/${DATADIRNAME}/locale'
     AC_SUBST(transmissionlocaledir)
 fi
+AC_SUBST(INTLLIBS)
 
 
 dnl ----------------------------------------------------------------------------
