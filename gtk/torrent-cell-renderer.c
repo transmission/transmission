@@ -331,6 +331,8 @@ get_icon( const tr_torrent * tor, GtkIconSize icon_size, GtkWidget * for_widget 
         mime_type = UNKNOWN_MIME_TYPE;
     else if( info->fileCount > 1 )
         mime_type = DIRECTORY_MIME_TYPE;
+    else if( strchr( info->files[0].name, '/' ) != NULL )
+        mime_type = DIRECTORY_MIME_TYPE;
     else
         mime_type = get_mime_type_from_filename( info->files[0].name );
 
