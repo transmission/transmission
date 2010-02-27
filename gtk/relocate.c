@@ -52,7 +52,7 @@ onTimer( gpointer gdata )
     }
     else if( done != TR_LOC_MOVING )
     {
-        gtk_widget_destroy( GTK_WIDGET( data->moving_dialog ) );
+        gtk_widget_destroy( GTK_WIDGET( data->dialog ) );
         g_free( data );
     }
 
