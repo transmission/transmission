@@ -16,12 +16,13 @@
 #else
   #include <sys/types.h> /* stat */
   #include <sys/stat.h> /* stat */
-  #include <dirent.h> /* readdir */
   #include <event.h> /* evbuffer */
 #endif
 
 #include <errno.h>
 #include <string.h> /* strstr */
+
+#include <dirent.h> /* readdir */
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h> /* tr_buildPath(), tr_inf() */
@@ -65,17 +66,41 @@ str_has_suffix( const char *str, const char *suffix )
 /* reasonable guess as to size of 50 events */
 #define BUF_LEN (EVENT_BATCH_COUNT * (EVENT_SIZE + 16) + 2048)
 
-#define DTR_INOTIFY_MASK (IN_CLOSE_WRITE|IN_MOVED_TO)
+#define DTR_INOTIFY_MASK (IN_CLOSE_WRITE|IN_MOVED_TO|IN_ONLYDIR)
 
 static void
 watchdir_new_impl( dtr_watchdir * w )
 {
     int i;
+    DIR * odir;
     w->inotify_fd = inotify_init( );
     tr_inf( "Using inotify to watch directory \"%s\"", w->dir );
     i = inotify_add_watch( w->inotify_fd, w->dir, DTR_INOTIFY_MASK );
+
     if( i < 0 )
+    {
         tr_err( "Unable to watch \"%s\": %s", w->dir, strerror (errno) );
+    }
+    else if(( odir = opendir( w->dir )))
+    {
+        struct dirent * d;
+
+        while(( d = readdir( odir )))
+        {
+            const char * name = d->d_name;
+
+            if( !name || *name=='.' ) /* skip dotfiles */
+                continue;
+            if( !str_has_suffix( name, ".torrent" ) ) /* skip non-torrents */
+                continue;
+
+            tr_inf( "Found new .torrent file \"%s\" in watchdir \"%s\"", name, w->dir );
+            w->callback( w->session, w->dir, name );
+        }
+
+        closedir( odir );
+    }
+
 }
 static void
 watchdir_free_impl( dtr_watchdir * w )
