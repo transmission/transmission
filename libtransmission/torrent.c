@@ -2344,8 +2344,8 @@ deleteLocalData( tr_torrent * tor, tr_fileFunc fileFunc )
             deleteLocalFile( s[i], fileFunc );
 
     /* now blow away any remaining torrent files, such as torrent files in dirty folders */
-    for( f=0; f<tor->info.fileCount; ++f ) {
-        char * path = tr_buildPath( tor->currentDir, tor->info.files[f].name, NULL );
+    for( i=0, n=tr_ptrArraySize( &torrentFiles ); i<n; ++i ) {
+        char * path = tr_buildPath( tor->currentDir, tr_ptrArrayNth( &torrentFiles, i ), NULL );
         deleteLocalFile( path, fileFunc );
         tr_free( path );
     }
