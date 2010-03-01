@@ -827,13 +827,20 @@ Transmission.prototype =
 	},
 
 	updateTurtleButton: function() {
+		var w = $('#turtle_button');
+		var t;
 		if ( this[Prefs._TurtleState] ) {
-			$('#turtle_button').addClass('turtleEnabled');
-			$('#turtle_button').removeClass('turtleDisabled');
+			w.addClass('turtleEnabled');
+			w.removeClass('turtleDisabled');
+			t = "Click to disable Temporary Speed Limits";
 		} else {
-			$('#turtle_button').removeClass('turtleEnabled');
-			$('#turtle_button').addClass('turtleDisabled');
+			w.removeClass('turtleEnabled');
+			w.addClass('turtleDisabled');
+			t = "Click to enable Temporary Speed Limits";
 		}
+		t += " (" + this._prefs[RPC._TurtleUpSpeedLimit] + " kB/s up, "
+		          + this._prefs[RPC._TurtleDownSpeedLimit] + " kB/s down)";
+		w.attr( 'title', t );
 	},
 
 	/*--------------------------------------------
