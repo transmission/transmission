@@ -31,7 +31,7 @@ enum
 
     DEFAULT_TIMER_MSEC = 250, /* arbitrary */
 
-    MIN_DNS_CACHE_TIME = 60 * 60 * 24
+    DNS_CACHE_FAIL_TTL = 120 /* seconds */
 };
 
 #if 0
@@ -217,7 +217,7 @@ dns_cache_set_fail( struct tr_web_task * task, const char * host )
         item = tr_new( struct dns_cache_item, 1 );
         item->host = tr_strdup( host );
         item->resolved_host = NULL;
-        item->expiration = tr_time( ) + MIN_DNS_CACHE_TIME;
+        item->expiration = tr_time( ) + DNS_CACHE_FAIL_TTL;
         item->success = FALSE;
         tr_ptrArrayInsertSorted( cache, item, dns_cache_compare );
     }
@@ -228,8 +228,6 @@ dns_cache_set_name( struct tr_web_task * task, const char * host,
                    const char * resolved, int ttl )
 {
     char * ret = NULL;
-
-    ttl = MAX( MIN_DNS_CACHE_TIME, ttl );
 
     if( task->session->web != NULL )
     {
@@ -385,7 +383,6 @@ addTask( void * vtask )
         curl_easy_setopt( e, CURLOPT_SOCKOPTDATA, task );
         curl_easy_setopt( e, CURLOPT_WRITEDATA, task );
         curl_easy_setopt( e, CURLOPT_WRITEFUNCTION, writeFunc );
-        curl_easy_setopt( e, CURLOPT_DNS_CACHE_TIMEOUT, MIN_DNS_CACHE_TIME );
         curl_easy_setopt( e, CURLOPT_FOLLOWLOCATION, 1L );
         curl_easy_setopt( e, CURLOPT_AUTOREFERER, 1L );
         curl_easy_setopt( e, CURLOPT_FORBID_REUSE, 1L );
