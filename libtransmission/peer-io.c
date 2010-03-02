@@ -948,7 +948,9 @@ tr_peerIoTryWrite( tr_peerIo * io, size_t howmuch )
         {
             const short what = EVBUFFER_WRITE | EVBUFFER_ERROR;
             dbgmsg( io, "tr_peerIoTryWrite got an error. res is %d, what is %hd, errno is %d (%s)", n, what, e, strerror( e ) );
-            io->gotError( io, what, io->userData );
+
+            if( io->gotError != NULL )
+                io->gotError( io, what, io->userData );
         }
     }
 
