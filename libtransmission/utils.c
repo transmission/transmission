@@ -20,12 +20,6 @@
  #undef HAVE_POSIX_MEMALIGN /* not supported on OS X 10.5 and lower */
 #endif
 
-#if defined(HAVE_POSIX_MEMALIGN) || defined(HAVE_VALLOC)
- #if !defined(SYS_DARWIN)
-  #define _XOPEN_SOURCE 600 /* pick posix_memalign and valloc declarations */
- #endif
-#endif
-
 #include <assert.h>
 #include <ctype.h> /* isalpha, tolower */
 #include <errno.h>
