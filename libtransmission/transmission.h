@@ -1041,7 +1041,13 @@ enum
     TR_LOC_ERROR
 };
 
-/** @brief Tell transmsision where to find this torrent's local data */
+/**
+ * @brief Tell transmsision where to find this torrent's local data.
+ * 
+ * if move_from_previous_location is `true', the torrent's incompleteDir
+ * will be clobberred s.t. additional files being added will be saved
+ * to the torrent's downloadDir.
+ */
 void tr_torrentSetLocation( tr_torrent  * torrent,
                             const char  * location,
                             tr_bool       move_from_previous_location,

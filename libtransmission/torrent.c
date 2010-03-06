@@ -2544,6 +2544,13 @@ setLocation( void * vdata )
         }
     }
 
+    if( !err && do_move )
+    {
+        tr_free( tor->incompleteDir );
+        tor->incompleteDir = NULL;
+        tor->currentDir = tor->downloadDir;
+    }
+
     if( data->setme_state )
         *data->setme_state = err ? TR_LOC_ERROR : TR_LOC_DONE;
 
