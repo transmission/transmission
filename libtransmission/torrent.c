@@ -834,7 +834,8 @@ tr_torrentChangeMyPort( tr_torrent * tor )
 {
     assert( tr_isTorrent( tor  ) );
 
-    tr_announcerChangeMyPort( tor );
+    if( tor->isRunning )
+        tr_announcerChangeMyPort( tor );
 }
 
 static inline void
