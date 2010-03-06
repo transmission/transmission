@@ -287,6 +287,7 @@ tr_webThreadFunc( void * vsession )
             msec = THREADFUNC_MAX_SLEEP_MSEC;
         if( msec > 0 )
         {
+            int usec;
             int max_fd;
             struct timeval t;
             fd_set r_fd_set, w_fd_set, c_fd_set;
@@ -299,8 +300,10 @@ tr_webThreadFunc( void * vsession )
 
             if( msec > THREADFUNC_MAX_SLEEP_MSEC )
                 msec = THREADFUNC_MAX_SLEEP_MSEC;
-            t.tv_sec = 0;
-            t.tv_usec = msec * 1000;
+
+            usec = msec * 1000;
+            t.tv_sec =  usec / 1000000;
+            t.tv_usec = usec % 1000000;
 
             select( max_fd+1, &r_fd_set, &w_fd_set, &c_fd_set, &t );
         }
