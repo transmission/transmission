@@ -68,19 +68,21 @@ typedef enum
 
 - (id) init
 {
-    self = [super initWithWindowNibName: @"InfoWindow"];
+    if ((self = [super initWithWindowNibName: @"InfoWindow"]))
+    {
+        fGeneralViewController = [[InfoGeneralViewController alloc] init];
+        fActivityViewController = [[InfoActivityViewController alloc] init];
+        fTrackersViewController = [[InfoTrackersViewController alloc] init];
+        fPeersViewController = [[InfoPeersViewController alloc] init];
+        fFileViewController = [[InfoFileViewController alloc] init];
+        fOptionsViewController = [[InfoOptionsViewController alloc] init];
+    }
+    
     return self;
 }
 
 - (void) awakeFromNib
 {
-    fGeneralViewController = [[InfoGeneralViewController alloc] init];
-    fActivityViewController = [[InfoActivityViewController alloc] init];
-    fTrackersViewController = [[InfoTrackersViewController alloc] init];
-    fPeersViewController = [[InfoPeersViewController alloc] init];
-    fFileViewController = [[InfoFileViewController alloc] init];
-    fOptionsViewController = [[InfoOptionsViewController alloc] init];
-    
     //window location and size
     NSPanel * window = (NSPanel *)[self window];
     
@@ -136,7 +138,6 @@ typedef enum
     [fTabMatrix selectCellWithTag: tag];
     [self setTab: nil];
     
-    #warning do for all views
     //set blank inspector
     [self setInfoForTorrents: [NSArray array]];
     
@@ -168,7 +169,6 @@ typedef enum
     
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     
-    #warning fTorrents needed at all?
     [fTorrents release];
     
     [super dealloc];
@@ -550,7 +550,7 @@ typedef enum
         [self resetInfo];
 }
 
-#warning should we use the 
+#warning should we use the view controllers directly
 - (NSView *) tabViewForTag: (NSInteger) tag
 {
     switch (tag)

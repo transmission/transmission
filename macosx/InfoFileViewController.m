@@ -46,6 +46,7 @@
 
 - (void) awakeFromNib
 {
+    [[fFileFilterField cell] setPlaceholderString: NSLocalizedString(@"Filter", "inspector -> file filter")];
 }
 
 - (void) dealloc

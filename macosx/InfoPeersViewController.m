@@ -57,16 +57,29 @@
         [fWebSeedTable setSortDescriptors: [NSArray arrayWithObject: [[fWebSeedTable tableColumnWithIdentifier: @"Address"]
                                             sortDescriptorPrototype]]];
     
-    #warning set localized table headers
+    //set table header text
+    [[[fPeerTable tableColumnWithIdentifier: @"IP"] headerCell] setStringValue: NSLocalizedString(@"IP Address",
+                                                                        "inspector -> peer table -> header")];
+    [[[fPeerTable tableColumnWithIdentifier: @"Client"] headerCell] setStringValue: NSLocalizedString(@"Client",
+                                                                        "inspector -> peer table -> header")];
+    [[[fPeerTable tableColumnWithIdentifier: @"DL From"] headerCell] setStringValue: NSLocalizedString(@"DL",
+                                                                        "inspector -> peer table -> header")];
+    [[[fPeerTable tableColumnWithIdentifier: @"UL To"] headerCell] setStringValue: NSLocalizedString(@"UL",
+                                                                        "inspector -> peer table -> header")];
+    
+    [[[fWebSeedTable tableColumnWithIdentifier: @"Address"] headerCell] setStringValue: NSLocalizedString(@"Web Seeds",
+                                                                        "inspector -> web seed table -> header")];
+    [[[fWebSeedTable tableColumnWithIdentifier: @"DL From"] headerCell] setStringValue: NSLocalizedString(@"DL",
+                                                                        "inspector -> web seed table -> header")];
     
     //set table header tool tips
     [[fPeerTable tableColumnWithIdentifier: @"Encryption"] setHeaderToolTip: NSLocalizedString(@"Encrypted Connection",
                                                                         "inspector -> peer table -> header tool tip")];
     [[fPeerTable tableColumnWithIdentifier: @"Progress"] setHeaderToolTip: NSLocalizedString(@"Available",
                                                                         "inspector -> peer table -> header tool tip")];
-    [[fPeerTable tableColumnWithIdentifier: @"UL To"] setHeaderToolTip: NSLocalizedString(@"Uploading To Peer",
-                                                                        "inspector -> peer table -> header tool tip")];
     [[fPeerTable tableColumnWithIdentifier: @"DL From"] setHeaderToolTip: NSLocalizedString(@"Downloading From Peer",
+                                                                        "inspector -> peer table -> header tool tip")];
+    [[fPeerTable tableColumnWithIdentifier: @"UL To"] setHeaderToolTip: NSLocalizedString(@"Uploading To Peer",
                                                                         "inspector -> peer table -> header tool tip")];
     
     [[fWebSeedTable tableColumnWithIdentifier: @"DL From"] setHeaderToolTip: NSLocalizedString(@"Downloading From Web Seed",
