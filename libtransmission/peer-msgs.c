@@ -711,18 +711,17 @@ isPeerInteresting( const tr_peermsgs * msgs )
 }
 
 static void
-sendInterest( tr_peermsgs * msgs,
-              int           weAreInterested )
+sendInterest( tr_peermsgs * msgs, tr_bool clientIsInterested )
 {
     struct evbuffer * out = msgs->outMessages;
 
     assert( msgs );
-    assert( weAreInterested == 0 || weAreInterested == 1 );
+    assert( tr_isBool( clientIsInterested ) );
 
-    msgs->peer->clientIsInterested = weAreInterested;
-    dbgmsg( msgs, "Sending %s", weAreInterested ? "Interested" : "Not Interested" );
+    msgs->peer->clientIsInterested = clientIsInterested;
+    dbgmsg( msgs, "Sending %s", clientIsInterested ? "Interested" : "Not Interested" );
     tr_peerIoWriteUint32( msgs->peer->io, out, sizeof( uint8_t ) );
-    tr_peerIoWriteUint8 ( msgs->peer->io, out, weAreInterested ? BT_INTERESTED : BT_NOT_INTERESTED );
+    tr_peerIoWriteUint8 ( msgs->peer->io, out, clientIsInterested ? BT_INTERESTED : BT_NOT_INTERESTED );
 
     pokeBatchPeriod( msgs, HIGH_PRIORITY_INTERVAL_SECS );
     dbgOutMessageLen( msgs );
@@ -1679,6 +1678,17 @@ canRead( tr_peerIo * io, void * vmsgs, size_t * piece )
     return ret;
 }
 
+int
+tr_peerMsgsIsReadingBlock( const tr_peermsgs * msgs, tr_block_index_t block )
+{
+    if( msgs->state != AWAITING_BT_PIECE )
+        return FALSE;
+
+    return block == _tr_block( msgs->torrent,
+                               msgs->incoming.blockReq.index,
+                               msgs->incoming.blockReq.offset );
+}
+
 /**
 ***
 **/
@@ -1693,6 +1703,10 @@ updateDesiredRequestCount( tr_peermsgs * msgs, uint64_t now )
         msgs->desiredRequestCount = 0;
     }
     else if( msgs->peer->clientIsChoked )
+    {
+        msgs->desiredRequestCount = 0;
+    }
+    else if( !msgs->peer->clientIsInterested )
     {
         msgs->desiredRequestCount = 0;
     }

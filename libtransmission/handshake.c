@@ -1143,9 +1143,9 @@ tr_handshakeAbort( tr_handshake * handshake )
 static void
 gotError( tr_peerIo  * io UNUSED,
           short        what,
-          void       * arg )
+          void       * vhandshake )
 {
-    tr_handshake * handshake = (tr_handshake *) arg;
+    tr_handshake * handshake = vhandshake;
 
     /* if the error happened while we were sending a public key, we might
      * have encountered a peer that doesn't do encryption... reconnect and

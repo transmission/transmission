@@ -83,7 +83,7 @@ enum
     MINIMUM_RECONNECT_INTERVAL_SECS = 5,
 
     /** how long we'll let requests we've made linger before we cancel them */
-    REQUEST_TTL_SECS = 45
+    REQUEST_TTL_SECS = 60
 };
 
 
@@ -980,6 +980,8 @@ tr_peerMgrGetNextRequests( tr_torrent           * tor,
 
     /* sanity clause */
     assert( tr_isTorrent( tor ) );
+    assert( peer->clientIsInterested );
+    assert( !peer->clientIsChoked );
     assert( numwant > 0 );
 
     /* walk through the pieces and find blocks that should be requested */
@@ -1103,7 +1105,7 @@ refillUpkeep( int foo UNUSED, short bar UNUSED, void * vmgr )
 
             for( it=t->requests, end=it+n; it!=end; ++it )
             {
-                if( it->sentAt <= too_old )
+                if( ( it->sentAt <= too_old ) && !tr_peerMsgsIsReadingBlock( it->peer->msgs, it->block ) )
                     cancel[cancelCount++] = *it;
                 else
                 {
@@ -2283,21 +2285,12 @@ compareChoke( const void * va,
     return 0;
 }
 
+/* is this a new connection? */
 static int
 isNew( const tr_peer * peer )
 {
     return peer && peer->io && tr_peerIoGetAge( peer->io ) < 45;
 }
-
-static int
-isSame( const tr_peer * peer )
-{
-    return peer && peer->client && strstr( peer->client, "Transmission" );
-}
-
-/**
-***
-**/
 
 static void
 rechokeTorrent( Torrent * t, const uint64_t now )
@@ -2375,7 +2368,6 @@ rechokeTorrent( Torrent * t, const uint64_t now )
                 const tr_peer * peer = choke[i].peer;
                 int x = 1, y;
                 if( isNew( peer ) ) x *= 3;
-                if( isSame( peer ) ) x *= 3;
                 for( y=0; y<x; ++y )
                     tr_ptrArrayAppend( &randPool, &choke[i] );
             }
@@ -2407,9 +2399,11 @@ rechokePulse( int foo UNUSED, short bar UNUSED, void * vmgr )
     managerLock( mgr );
 
     now = tr_date( );
-    while(( tor = tr_torrentNext( mgr->session, tor )))
-        if( tor->isRunning )
+    while(( tor = tr_torrentNext( mgr->session, tor ))) {
+        if( tor->isRunning ) {
             rechokeTorrent( tor->torrentPeers, now );
+        }
+    }
 
     tr_timerAddMsec( mgr->rechokeTimer, RECHOKE_PERIOD_MSEC );
     managerUnlock( mgr );
@@ -3074,7 +3068,7 @@ pumpAllPeers( tr_peerMgr * mgr )
 static void
 bandwidthPulse( int foo UNUSED, short bar UNUSED, void * vmgr )
 {
-    tr_torrent * tor = NULL;
+    tr_torrent * tor;
     tr_peerMgr * mgr = vmgr;
     managerLock( mgr );
 
@@ -3086,6 +3080,7 @@ bandwidthPulse( int foo UNUSED, short bar UNUSED, void * vmgr )
     tr_bandwidthAllocate( mgr->session->bandwidth, TR_DOWN, BANDWIDTH_PERIOD_MSEC );
 
     /* possibly stop torrents that have seeded enough */
+    tor = NULL;
     while(( tor = tr_torrentNext( mgr->session, tor ))) {
         if( tor->needsSeedRatioCheck ) {
             tor->needsSeedRatioCheck = FALSE;
