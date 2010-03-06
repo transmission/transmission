@@ -105,12 +105,12 @@ typedef enum
     [[fTabMatrix cellWithTag: TAB_OPTIONS_TAG] setIcon: [NSImage imageNamed: @"InfoOptions.png"]];
     
     //set tab tooltips
-    [[fTabMatrix cellWithTag: TAB_GENERAL_TAG] setToolTip: NSLocalizedString(@"General Info", "Inspector -> tab")];
-    [[fTabMatrix cellWithTag: TAB_ACTIVITY_TAG] setToolTip: NSLocalizedString(@"Activity", "Inspector -> tab")];
-    [[fTabMatrix cellWithTag: TAB_TRACKERS_TAG] setToolTip: NSLocalizedString(@"Trackers", "Inspector -> tab")];
-    [[fTabMatrix cellWithTag: TAB_PEERS_TAG] setToolTip: NSLocalizedString(@"Peers", "Inspector -> tab")];
-    [[fTabMatrix cellWithTag: TAB_FILE_TAG] setToolTip: NSLocalizedString(@"Files", "Inspector -> tab")];
-    [[fTabMatrix cellWithTag: TAB_OPTIONS_TAG] setToolTip: NSLocalizedString(@"Options", "Inspector -> tab")];
+    [fTabMatrix setToolTip: NSLocalizedString(@"General Info", "Inspector -> tab") forCell: [fTabMatrix cellWithTag: TAB_GENERAL_TAG]];
+    [fTabMatrix setToolTip: NSLocalizedString(@"Activity", "Inspector -> tab") forCell: [fTabMatrix cellWithTag: TAB_ACTIVITY_TAG]];
+    [fTabMatrix setToolTip: NSLocalizedString(@"Trackers", "Inspector -> tab") forCell: [fTabMatrix cellWithTag: TAB_TRACKERS_TAG]];
+    [fTabMatrix setToolTip: NSLocalizedString(@"Peers", "Inspector -> tab") forCell: [fTabMatrix cellWithTag: TAB_PEERS_TAG]];
+    [fTabMatrix setToolTip: NSLocalizedString(@"Files", "Inspector -> tab") forCell: [fTabMatrix cellWithTag: TAB_FILE_TAG]];
+    [fTabMatrix setToolTip: NSLocalizedString(@"Options", "Inspector -> tab") forCell: [fTabMatrix cellWithTag: TAB_OPTIONS_TAG]];
     
     //set selected tab
     fCurrentTabTag = INVALID;
