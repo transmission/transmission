@@ -1,7 +1,7 @@
 /******************************************************************************
  * $Id$
  *
- * Copyright (c) 2006-2010 Transmission authors and contributors
+ * Copyright (c) 2010 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -24,42 +24,22 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class InfoGeneralViewController;
-@class InfoActivityViewController;
-@class InfoTrackersViewController;
-@class InfoPeersViewController;
-@class InfoFileViewController;
-@class InfoOptionsViewController;
-
-@interface InfoWindowController : NSWindowController
+@interface InfoGeneralViewController : NSViewController
 {
     NSArray * fTorrents;
     
-    InfoGeneralViewController * fGeneralViewController;
-    InfoActivityViewController * fActivityViewController;
-    InfoTrackersViewController * fTrackersViewController;
-    InfoPeersViewController * fPeersViewController;
-    InfoFileViewController * fFileViewController;
-    InfoOptionsViewController * fOptionsViewController;
+    IBOutlet NSTextField * fPiecesField, * fHashField, * fSecureField,
+                        * fDataLocationField,
+                        * fCreatorField, * fDateCreatedField;
     
-    NSInteger fCurrentTabTag;
-    IBOutlet NSMatrix * fTabMatrix;
-
-    IBOutlet NSImageView * fImageView;
-    IBOutlet NSTextField * fNameField, * fBasicInfoField;
+    IBOutlet NSTextView * fCommentView;
+    
+    IBOutlet NSButton * fRevealDataButton;
 }
 
 - (void) setInfoForTorrents: (NSArray *) torrents;
-- (void) updateInfoStats;
-- (void) updateOptions;
+- (void) updateInfo;
 
-- (void) setTab: (id) sender;
-
-- (void) setNextTab;
-- (void) setPreviousTab;
-
-- (NSArray *) quickLookURLs;
-- (BOOL) canQuickLook;
-- (NSRect) quickLookSourceFrameForPreviewItem: (id /*<QLPreviewItem>*/) item;
+- (void) revealDataFile: (id) sender;
 
 @end

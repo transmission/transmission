@@ -1,7 +1,7 @@
 /******************************************************************************
  * $Id$
  *
- * Copyright (c) 2006-2010 Transmission authors and contributors
+ * Copyright (c) 2010 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -24,39 +24,21 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class InfoGeneralViewController;
-@class InfoActivityViewController;
-@class InfoTrackersViewController;
-@class InfoPeersViewController;
-@class InfoFileViewController;
-@class InfoOptionsViewController;
+@class FileOutlineController;
 
-@interface InfoWindowController : NSWindowController
+@interface InfoFileViewController : NSViewController
 {
     NSArray * fTorrents;
     
-    InfoGeneralViewController * fGeneralViewController;
-    InfoActivityViewController * fActivityViewController;
-    InfoTrackersViewController * fTrackersViewController;
-    InfoPeersViewController * fPeersViewController;
-    InfoFileViewController * fFileViewController;
-    InfoOptionsViewController * fOptionsViewController;
+    IBOutlet FileOutlineController * fFileController;
     
-    NSInteger fCurrentTabTag;
-    IBOutlet NSMatrix * fTabMatrix;
-
-    IBOutlet NSImageView * fImageView;
-    IBOutlet NSTextField * fNameField, * fBasicInfoField;
+    IBOutlet NSSearchField * fFileFilterField;
 }
 
 - (void) setInfoForTorrents: (NSArray *) torrents;
-- (void) updateInfoStats;
-- (void) updateOptions;
+- (void) updateInfo;
 
-- (void) setTab: (id) sender;
-
-- (void) setNextTab;
-- (void) setPreviousTab;
+- (void) setFileFilterText: (id) sender;
 
 - (NSArray *) quickLookURLs;
 - (BOOL) canQuickLook;

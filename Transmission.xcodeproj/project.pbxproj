@@ -73,6 +73,18 @@
 		A20152640D1C1BE70081714F /* PinTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = A20152630D1C1BE70081714F /* PinTemplate.png */; };
 		A201527E0D1C270F0081714F /* torrent-ctor.c in Sources */ = {isa = PBXBuildFile; fileRef = A20152790D1C26EB0081714F /* torrent-ctor.c */; };
 		A2085DDC0C53BC74000BC3B7 /* AboutWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2085DDA0C53BC74000BC3B7 /* AboutWindowController.m */; };
+		A209EAC61142CF28002B02D1 /* InfoActivityViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A209EAC31142CF28002B02D1 /* InfoActivityViewController.m */; };
+		A209EAC71142CF28002B02D1 /* InfoGeneralViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A209EAC51142CF28002B02D1 /* InfoGeneralViewController.m */; };
+		A209EAEC1142D294002B02D1 /* InfoActivityView.xib in Resources */ = {isa = PBXBuildFile; fileRef = A209EAE81142D294002B02D1 /* InfoActivityView.xib */; };
+		A209EAED1142D294002B02D1 /* InfoGeneralView.xib in Resources */ = {isa = PBXBuildFile; fileRef = A209EAEA1142D294002B02D1 /* InfoGeneralView.xib */; };
+		A209EB011142D3A5002B02D1 /* InfoTrackersViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A209EB001142D3A5002B02D1 /* InfoTrackersViewController.m */; };
+		A209EB201142DD85002B02D1 /* InfoTrackersView.xib in Resources */ = {isa = PBXBuildFile; fileRef = A209EB1F1142DD85002B02D1 /* InfoTrackersView.xib */; };
+		A209EB9D1142E59A002B02D1 /* InfoPeersViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A209EB9C1142E59A002B02D1 /* InfoPeersViewController.m */; };
+		A209EBA71142EAF3002B02D1 /* InfoPeersView.xib in Resources */ = {isa = PBXBuildFile; fileRef = A209EBA61142EAF3002B02D1 /* InfoPeersView.xib */; };
+		A209EBCE1142F2B4002B02D1 /* InfoFileViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A209EBCD1142F2B4002B02D1 /* InfoFileViewController.m */; };
+		A209EBD91142F52B002B02D1 /* InfoFileView.xib in Resources */ = {isa = PBXBuildFile; fileRef = A209EBD81142F52B002B02D1 /* InfoFileView.xib */; };
+		A209EBF91142FEEE002B02D1 /* InfoOptionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A209EBF81142FEEE002B02D1 /* InfoOptionsViewController.m */; };
+		A209EC12114301C6002B02D1 /* InfoOptionsView.xib in Resources */ = {isa = PBXBuildFile; fileRef = A209EC11114301C6002B02D1 /* InfoOptionsView.xib */; };
 		A20B6F6B0C4D842B0034AB1D /* PriorityLow.png in Resources */ = {isa = PBXBuildFile; fileRef = A20B6F6A0C4D842B0034AB1D /* PriorityLow.png */; };
 		A20B6F830C4D8A610034AB1D /* PriorityHigh.png in Resources */ = {isa = PBXBuildFile; fileRef = A20B6F820C4D8A610034AB1D /* PriorityHigh.png */; };
 		A20B6F8C0C4D90980034AB1D /* PriorityMixed.png in Resources */ = {isa = PBXBuildFile; fileRef = A20B6F8B0C4D90980034AB1D /* PriorityMixed.png */; };
@@ -483,6 +495,24 @@
 		A202FF610DDA9275009938FF /* it */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = it; path = macosx/it.lproj/PrefsWindow.xib; sourceTree = "<group>"; };
 		A2085DD90C53BC74000BC3B7 /* AboutWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AboutWindowController.h; path = macosx/AboutWindowController.h; sourceTree = "<group>"; };
 		A2085DDA0C53BC74000BC3B7 /* AboutWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AboutWindowController.m; path = macosx/AboutWindowController.m; sourceTree = "<group>"; };
+		A209EAC21142CF28002B02D1 /* InfoActivityViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InfoActivityViewController.h; path = macosx/InfoActivityViewController.h; sourceTree = "<group>"; };
+		A209EAC31142CF28002B02D1 /* InfoActivityViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InfoActivityViewController.m; path = macosx/InfoActivityViewController.m; sourceTree = "<group>"; };
+		A209EAC41142CF28002B02D1 /* InfoGeneralViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InfoGeneralViewController.h; path = macosx/InfoGeneralViewController.h; sourceTree = "<group>"; };
+		A209EAC51142CF28002B02D1 /* InfoGeneralViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InfoGeneralViewController.m; path = macosx/InfoGeneralViewController.m; sourceTree = "<group>"; };
+		A209EAE91142D294002B02D1 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = macosx/en.lproj/InfoActivityView.xib; sourceTree = "<group>"; };
+		A209EAEB1142D294002B02D1 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = macosx/en.lproj/InfoGeneralView.xib; sourceTree = "<group>"; };
+		A209EAFF1142D3A5002B02D1 /* InfoTrackersViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InfoTrackersViewController.h; path = macosx/InfoTrackersViewController.h; sourceTree = "<group>"; };
+		A209EB001142D3A5002B02D1 /* InfoTrackersViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InfoTrackersViewController.m; path = macosx/InfoTrackersViewController.m; sourceTree = "<group>"; };
+		A209EB1F1142DD85002B02D1 /* InfoTrackersView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = InfoTrackersView.xib; path = macosx/InfoTrackersView.xib; sourceTree = "<group>"; };
+		A209EB9B1142E59A002B02D1 /* InfoPeersViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InfoPeersViewController.h; path = macosx/InfoPeersViewController.h; sourceTree = "<group>"; };
+		A209EB9C1142E59A002B02D1 /* InfoPeersViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InfoPeersViewController.m; path = macosx/InfoPeersViewController.m; sourceTree = "<group>"; };
+		A209EBA61142EAF3002B02D1 /* InfoPeersView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = InfoPeersView.xib; path = macosx/InfoPeersView.xib; sourceTree = "<group>"; };
+		A209EBCC1142F2B4002B02D1 /* InfoFileViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InfoFileViewController.h; path = macosx/InfoFileViewController.h; sourceTree = "<group>"; };
+		A209EBCD1142F2B4002B02D1 /* InfoFileViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InfoFileViewController.m; path = macosx/InfoFileViewController.m; sourceTree = "<group>"; };
+		A209EBD81142F52B002B02D1 /* InfoFileView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = InfoFileView.xib; path = macosx/InfoFileView.xib; sourceTree = "<group>"; };
+		A209EBF71142FEEE002B02D1 /* InfoOptionsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InfoOptionsViewController.h; path = macosx/InfoOptionsViewController.h; sourceTree = "<group>"; };
+		A209EBF81142FEEE002B02D1 /* InfoOptionsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InfoOptionsViewController.m; path = macosx/InfoOptionsViewController.m; sourceTree = "<group>"; };
+		A209EC13114301C6002B02D1 /* en */ = {isa = PBXFileReference; explicitFileType = file.xib; name = en; path = macosx/en.lproj/InfoOptionsView.xib; sourceTree = "<group>"; };
 		A20B6F6A0C4D842B0034AB1D /* PriorityLow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PriorityLow.png; path = macosx/Images/PriorityLow.png; sourceTree = "<group>"; };
 		A20B6F820C4D8A610034AB1D /* PriorityHigh.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PriorityHigh.png; path = macosx/Images/PriorityHigh.png; sourceTree = "<group>"; };
 		A20B6F8B0C4D90980034AB1D /* PriorityMixed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PriorityMixed.png; path = macosx/Images/PriorityMixed.png; sourceTree = "<group>"; };
@@ -928,8 +958,6 @@
 				A21A9BE1106D86A800F1C3C1 /* TrackerNode.m */,
 				32CA4F630368D1EE00C91783 /* Transmission_Prefix.pch */,
 				29B97316FDCFA39411CA2CEA /* main.m */,
-				A29D84021049C25600D1987A /* NSApplicationAdditions.h */,
-				A29D84031049C25600D1987A /* NSApplicationAdditions.m */,
 				4DF0C5AA0899190500DD8943 /* Controller.h */,
 				4DF0C5A90899190500DD8943 /* Controller.m */,
 				4DFBC2DD09C0970D00D5C571 /* Torrent.h */,
@@ -1051,6 +1079,12 @@
 				A233BD680D8CF2C7007EE7B4 /* StatsWindow.xib */,
 				A231274B0D11D0B7003F9AFF /* AboutWindow.xib */,
 				A2D307B00D9EC9F50051FD27 /* BlocklistStatusWindow.xib */,
+				A209EAEA1142D294002B02D1 /* InfoGeneralView.xib */,
+				A209EAE81142D294002B02D1 /* InfoActivityView.xib */,
+				A209EB1F1142DD85002B02D1 /* InfoTrackersView.xib */,
+				A209EBA61142EAF3002B02D1 /* InfoPeersView.xib */,
+				A209EBD81142F52B002B02D1 /* InfoFileView.xib */,
+				A209EC11114301C6002B02D1 /* InfoOptionsView.xib */,
 				A20B6FA40C4D97840034AB1D /* PriorityNone.png */,
 				A20B6F8B0C4D90980034AB1D /* PriorityMixed.png */,
 				A20B6FAD0C4D9B040034AB1D /* PriorityNormal.png */,
@@ -1295,6 +1329,8 @@
 			children = (
 				4DE5CC9B0980656F00BE280E /* NSStringAdditions.h */,
 				4DE5CC9C0980656F00BE280E /* NSStringAdditions.m */,
+				A29D84021049C25600D1987A /* NSApplicationAdditions.h */,
+				A29D84031049C25600D1987A /* NSApplicationAdditions.m */,
 			);
 			name = Additions;
 			sourceTree = "<group>";
@@ -1392,6 +1428,18 @@
 		E1B6FBF80C0D719B0015FE4D /* Info Window */ = {
 			isa = PBXGroup;
 			children = (
+				A209EAC41142CF28002B02D1 /* InfoGeneralViewController.h */,
+				A209EAC51142CF28002B02D1 /* InfoGeneralViewController.m */,
+				A209EAC21142CF28002B02D1 /* InfoActivityViewController.h */,
+				A209EAC31142CF28002B02D1 /* InfoActivityViewController.m */,
+				A209EAFF1142D3A5002B02D1 /* InfoTrackersViewController.h */,
+				A209EB001142D3A5002B02D1 /* InfoTrackersViewController.m */,
+				A209EB9B1142E59A002B02D1 /* InfoPeersViewController.h */,
+				A209EB9C1142E59A002B02D1 /* InfoPeersViewController.m */,
+				A209EBCC1142F2B4002B02D1 /* InfoFileViewController.h */,
+				A209EBCD1142F2B4002B02D1 /* InfoFileViewController.m */,
+				A209EBF71142FEEE002B02D1 /* InfoOptionsViewController.h */,
+				A209EBF81142FEEE002B02D1 /* InfoOptionsViewController.m */,
 				A257C17F0CAD3003004E121C /* PeerTableView.h */,
 				A257C1800CAD3003004E121C /* PeerTableView.m */,
 				A2E23AC30CB5E1930002BB25 /* InfoTabButtonCell.h */,
@@ -1851,6 +1899,12 @@
 				A215BF5C0F02EBB800350CDB /* GroupRules.xib in Resources */,
 				A25963E11068376200453B31 /* FavIcon.png in Resources */,
 				A263D03E10DE6F010038DE27 /* Magnet.png in Resources */,
+				A209EAEC1142D294002B02D1 /* InfoActivityView.xib in Resources */,
+				A209EAED1142D294002B02D1 /* InfoGeneralView.xib in Resources */,
+				A209EB201142DD85002B02D1 /* InfoTrackersView.xib in Resources */,
+				A209EBA71142EAF3002B02D1 /* InfoPeersView.xib in Resources */,
+				A209EBD91142F52B002B02D1 /* InfoFileView.xib in Resources */,
+				A209EC12114301C6002B02D1 /* InfoOptionsView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2029,6 +2083,12 @@
 				A21A9BE2106D86A800F1C3C1 /* TrackerNode.m in Sources */,
 				A21A9D41106EC2E800F1C3C1 /* TrackerCell.m in Sources */,
 				A263CFC010DD67670038DE27 /* InfoTextField.m in Sources */,
+				A209EAC61142CF28002B02D1 /* InfoActivityViewController.m in Sources */,
+				A209EAC71142CF28002B02D1 /* InfoGeneralViewController.m in Sources */,
+				A209EB011142D3A5002B02D1 /* InfoTrackersViewController.m in Sources */,
+				A209EB9D1142E59A002B02D1 /* InfoPeersViewController.m in Sources */,
+				A209EBCE1142F2B4002B02D1 /* InfoFileViewController.m in Sources */,
+				A209EBF91142FEEE002B02D1 /* InfoOptionsViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2156,6 +2216,30 @@
 				A2DC1E4810E6731000DFB18C /* zh_CN */,
 			);
 			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		A209EAE81142D294002B02D1 /* InfoActivityView.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A209EAE91142D294002B02D1 /* en */,
+			);
+			name = InfoActivityView.xib;
+			sourceTree = "<group>";
+		};
+		A209EAEA1142D294002B02D1 /* InfoGeneralView.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A209EAEB1142D294002B02D1 /* en */,
+			);
+			name = InfoGeneralView.xib;
+			sourceTree = "<group>";
+		};
+		A209EC11114301C6002B02D1 /* InfoOptionsView.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A209EC13114301C6002B02D1 /* en */,
+			);
+			name = InfoOptionsView.xib;
 			sourceTree = "<group>";
 		};
 		A215BF5B0F02EBB800350CDB /* GroupRules.xib */ = {

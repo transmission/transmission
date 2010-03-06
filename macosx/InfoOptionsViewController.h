@@ -1,7 +1,7 @@
 /******************************************************************************
  * $Id$
  *
- * Copyright (c) 2006-2010 Transmission authors and contributors
+ * Copyright (c) 2010 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -24,42 +24,31 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class InfoGeneralViewController;
-@class InfoActivityViewController;
-@class InfoTrackersViewController;
-@class InfoPeersViewController;
-@class InfoFileViewController;
-@class InfoOptionsViewController;
-
-@interface InfoWindowController : NSWindowController
+@interface InfoOptionsViewController : NSViewController
 {
     NSArray * fTorrents;
     
-    InfoGeneralViewController * fGeneralViewController;
-    InfoActivityViewController * fActivityViewController;
-    InfoTrackersViewController * fTrackersViewController;
-    InfoPeersViewController * fPeersViewController;
-    InfoFileViewController * fFileViewController;
-    InfoOptionsViewController * fOptionsViewController;
+    IBOutlet NSPopUpButton * fPriorityPopUp, * fRatioPopUp;
+    IBOutlet NSButton * fUploadLimitCheck, * fDownloadLimitCheck, * fGlobalLimitCheck;
+    IBOutlet NSTextField * fUploadLimitField, * fDownloadLimitField, * fRatioLimitField,
+                        * fUploadLimitLabel, * fDownloadLimitLabel, * fPeersConnectLabel,
+                        * fPeersConnectField;
     
-    NSInteger fCurrentTabTag;
-    IBOutlet NSMatrix * fTabMatrix;
-
-    IBOutlet NSImageView * fImageView;
-    IBOutlet NSTextField * fNameField, * fBasicInfoField;
+    NSString * fInitialString;
 }
 
 - (void) setInfoForTorrents: (NSArray *) torrents;
-- (void) updateInfoStats;
 - (void) updateOptions;
 
-- (void) setTab: (id) sender;
+- (void) setUseSpeedLimit: (id) sender;
+- (void) setSpeedLimit: (id) sender;
+- (void) setUseGlobalSpeedLimit: (id) sender;
 
-- (void) setNextTab;
-- (void) setPreviousTab;
+- (void) setRatioSetting: (id) sender;
+- (void) setRatioLimit: (id) sender;
 
-- (NSArray *) quickLookURLs;
-- (BOOL) canQuickLook;
-- (NSRect) quickLookSourceFrameForPreviewItem: (id /*<QLPreviewItem>*/) item;
+- (void) setPriority: (id) sender;
+
+- (void) setPeersConnectLimit: (id) sender;
 
 @end
