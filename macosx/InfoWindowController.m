@@ -96,13 +96,21 @@ typedef enum
     
     [window setBecomesKeyOnlyIfNeeded: YES];
     
-    //set tab images and tooltips
+    //set tab images
     [[fTabMatrix cellWithTag: TAB_GENERAL_TAG] setIcon: [NSImage imageNamed: @"InfoGeneral.png"]];
     [[fTabMatrix cellWithTag: TAB_ACTIVITY_TAG] setIcon: [NSImage imageNamed: @"InfoActivity.png"]];
     [[fTabMatrix cellWithTag: TAB_TRACKERS_TAG] setIcon: [NSImage imageNamed: @"InfoTracker.png"]];
     [[fTabMatrix cellWithTag: TAB_PEERS_TAG] setIcon: [NSImage imageNamed: @"InfoPeers.png"]];
     [[fTabMatrix cellWithTag: TAB_FILE_TAG] setIcon: [NSImage imageNamed: @"InfoFiles.png"]];
     [[fTabMatrix cellWithTag: TAB_OPTIONS_TAG] setIcon: [NSImage imageNamed: @"InfoOptions.png"]];
+    
+    //set tab tooltips
+    [[fTabMatrix cellWithTag: TAB_GENERAL_TAG] setToolTip: NSLocalizedString(@"General Info", "Inspector -> tab")];
+    [[fTabMatrix cellWithTag: TAB_ACTIVITY_TAG] setToolTip: NSLocalizedString(@"Activity", "Inspector -> tab")];
+    [[fTabMatrix cellWithTag: TAB_TRACKERS_TAG] setToolTip: NSLocalizedString(@"Trackers", "Inspector -> tab")];
+    [[fTabMatrix cellWithTag: TAB_PEERS_TAG] setToolTip: NSLocalizedString(@"Peers", "Inspector -> tab")];
+    [[fTabMatrix cellWithTag: TAB_FILE_TAG] setToolTip: NSLocalizedString(@"Files", "Inspector -> tab")];
+    [[fTabMatrix cellWithTag: TAB_OPTIONS_TAG] setToolTip: NSLocalizedString(@"Options", "Inspector -> tab")];
     
     //set selected tab
     fCurrentTabTag = INVALID;

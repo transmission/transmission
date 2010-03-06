@@ -85,6 +85,7 @@
 		A209EBD91142F52B002B02D1 /* InfoFileView.xib in Resources */ = {isa = PBXBuildFile; fileRef = A209EBD81142F52B002B02D1 /* InfoFileView.xib */; };
 		A209EBF91142FEEE002B02D1 /* InfoOptionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A209EBF81142FEEE002B02D1 /* InfoOptionsViewController.m */; };
 		A209EC12114301C6002B02D1 /* InfoOptionsView.xib in Resources */ = {isa = PBXBuildFile; fileRef = A209EC11114301C6002B02D1 /* InfoOptionsView.xib */; };
+		A209ECA2114319C3002B02D1 /* InfoWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A209ECA1114319C3002B02D1 /* InfoWindow.xib */; };
 		A20B6F6B0C4D842B0034AB1D /* PriorityLow.png in Resources */ = {isa = PBXBuildFile; fileRef = A20B6F6A0C4D842B0034AB1D /* PriorityLow.png */; };
 		A20B6F830C4D8A610034AB1D /* PriorityHigh.png in Resources */ = {isa = PBXBuildFile; fileRef = A20B6F820C4D8A610034AB1D /* PriorityHigh.png */; };
 		A20B6F8C0C4D90980034AB1D /* PriorityMixed.png in Resources */ = {isa = PBXBuildFile; fileRef = A20B6F8B0C4D90980034AB1D /* PriorityMixed.png */; };
@@ -180,7 +181,6 @@
 		A28F4F770E085BDC003A3882 /* ColorTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = A28F4F760E085BDC003A3882 /* ColorTextField.m */; };
 		A292A6E80DFB45FC004B9C0A /* webseed.c in Sources */ = {isa = PBXBuildFile; fileRef = A292A6E50DFB45EC004B9C0A /* webseed.c */; };
 		A29576030D11D63C0093B167 /* Creator.xib in Resources */ = {isa = PBXBuildFile; fileRef = A29576010D11D63C0093B167 /* Creator.xib */; };
-		A29576130D11D8DD0093B167 /* InfoWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A29576110D11D8DD0093B167 /* InfoWindow.xib */; };
 		A29AF4F70D01BADC00D097EC /* DownArrowTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = A29AF4F60D01BADC00D097EC /* DownArrowTemplate.png */; };
 		A29AF4F90D01BAEB00D097EC /* UpArrowTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = A29AF4F80D01BAEB00D097EC /* UpArrowTemplate.png */; };
 		A29B0C270BD15FEF0006F230 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = A2F8951E0A2D4BA500ED2127 /* Credits.rtf */; };
@@ -489,7 +489,6 @@
 		A202FF5B0DDA9275009938FF /* it */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = it; path = macosx/it.lproj/AddWindow.xib; sourceTree = "<group>"; };
 		A202FF5C0DDA9275009938FF /* it */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = it; path = macosx/it.lproj/Creator.xib; sourceTree = "<group>"; };
 		A202FF5D0DDA9275009938FF /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = macosx/it.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		A202FF5E0DDA9275009938FF /* it */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = it; path = macosx/it.lproj/InfoWindow.xib; sourceTree = "<group>"; };
 		A202FF5F0DDA9275009938FF /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = macosx/it.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A202FF600DDA9275009938FF /* it */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = it; path = macosx/it.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		A202FF610DDA9275009938FF /* it */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = it; path = macosx/it.lproj/PrefsWindow.xib; sourceTree = "<group>"; };
@@ -513,6 +512,7 @@
 		A209EBF71142FEEE002B02D1 /* InfoOptionsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InfoOptionsViewController.h; path = macosx/InfoOptionsViewController.h; sourceTree = "<group>"; };
 		A209EBF81142FEEE002B02D1 /* InfoOptionsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InfoOptionsViewController.m; path = macosx/InfoOptionsViewController.m; sourceTree = "<group>"; };
 		A209EC13114301C6002B02D1 /* en */ = {isa = PBXFileReference; explicitFileType = file.xib; name = en; path = macosx/en.lproj/InfoOptionsView.xib; sourceTree = "<group>"; };
+		A209ECA1114319C3002B02D1 /* InfoWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = InfoWindow.xib; path = macosx/InfoWindow.xib; sourceTree = "<group>"; };
 		A20B6F6A0C4D842B0034AB1D /* PriorityLow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PriorityLow.png; path = macosx/Images/PriorityLow.png; sourceTree = "<group>"; };
 		A20B6F820C4D8A610034AB1D /* PriorityHigh.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PriorityHigh.png; path = macosx/Images/PriorityHigh.png; sourceTree = "<group>"; };
 		A20B6F8B0C4D90980034AB1D /* PriorityMixed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PriorityMixed.png; path = macosx/Images/PriorityMixed.png; sourceTree = "<group>"; };
@@ -541,7 +541,6 @@
 		A222EA7A0E6C32C4009FB003 /* BlocklistScheduler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BlocklistScheduler.m; path = macosx/BlocklistScheduler.m; sourceTree = "<group>"; };
 		A223AA7D0D220CEB00840069 /* nl */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nl; path = macosx/nl.lproj/Creator.xib; sourceTree = "<group>"; };
 		A223AA7E0D220CEB00840069 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = macosx/nl.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		A223AA7F0D220CEB00840069 /* nl */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nl; path = macosx/nl.lproj/InfoWindow.xib; sourceTree = "<group>"; };
 		A223AA800D220CEB00840069 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = macosx/nl.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A223AA810D220CEB00840069 /* nl */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nl; path = macosx/nl.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		A223AA830D220CEB00840069 /* nl */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nl; path = macosx/nl.lproj/PrefsWindow.xib; sourceTree = "<group>"; };
@@ -581,7 +580,6 @@
 		A251A6580F9E8FB3004F5973 /* pt */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = pt; path = macosx/pt.lproj/GroupRules.xib; sourceTree = "<group>"; };
 		A251A6590F9E8FBF004F5973 /* pt */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = pt; path = macosx/pt.lproj/AddWindow.xib; sourceTree = "<group>"; };
 		A251A65A0F9E8FCA004F5973 /* pt */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = pt; path = macosx/pt.lproj/Creator.xib; sourceTree = "<group>"; };
-		A251A65B0F9E8FCE004F5973 /* pt */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = pt; path = macosx/pt.lproj/InfoWindow.xib; sourceTree = "<group>"; };
 		A251A65C0F9E8FD5004F5973 /* pt */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = pt; path = macosx/pt.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		A251A65D0F9E8FD5004F5973 /* pt */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = pt; path = macosx/pt.lproj/PrefsWindow.xib; sourceTree = "<group>"; };
 		A251A65E0F9E8FDA004F5973 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = macosx/pt.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -622,16 +620,13 @@
 		A263CFBF10DD67670038DE27 /* InfoTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InfoTextField.m; path = macosx/InfoTextField.m; sourceTree = "<group>"; };
 		A263D03D10DE6F010038DE27 /* Magnet.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Magnet.png; path = macosx/Images/Magnet.png; sourceTree = "<group>"; };
 		A265A32E0D25767700198AC8 /* fr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fr; path = macosx/fr.lproj/Creator.xib; sourceTree = "<group>"; };
-		A265A32F0D25767700198AC8 /* fr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fr; path = macosx/fr.lproj/InfoWindow.xib; sourceTree = "<group>"; };
 		A265A3300D25767700198AC8 /* fr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fr; path = macosx/fr.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		A265A3320D25767700198AC8 /* fr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fr; path = macosx/fr.lproj/PrefsWindow.xib; sourceTree = "<group>"; };
 		A265A3BE0D25AE7800198AC8 /* es */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = es; path = macosx/es.lproj/Creator.xib; sourceTree = "<group>"; };
-		A265A3BF0D25AE7800198AC8 /* es */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = es; path = macosx/es.lproj/InfoWindow.xib; sourceTree = "<group>"; };
 		A265A3C00D25AE7800198AC8 /* es */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = es; path = macosx/es.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		A265A3C20D25AE7800198AC8 /* es */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = es; path = macosx/es.lproj/PrefsWindow.xib; sourceTree = "<group>"; };
 		A26AF1040D2855FC00FF7140 /* ru */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ru; path = macosx/ru.lproj/Creator.xib; sourceTree = "<group>"; };
 		A26AF1050D2855FC00FF7140 /* ru */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = ru; path = macosx/ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		A26AF1060D2855FC00FF7140 /* ru */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ru; path = macosx/ru.lproj/InfoWindow.xib; sourceTree = "<group>"; };
 		A26AF1070D2855FC00FF7140 /* ru */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = ru; path = macosx/ru.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A26AF1080D2855FC00FF7140 /* ru */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ru; path = macosx/ru.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		A26AF10A0D2855FC00FF7140 /* ru */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ru; path = macosx/ru.lproj/PrefsWindow.xib; sourceTree = "<group>"; };
@@ -656,14 +651,12 @@
 		A28393FA10D54A4B005C0240 /* de */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = de; path = macosx/de.lproj/Creator.xib; sourceTree = "<group>"; };
 		A28393FC10D54A66005C0240 /* de */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = de; path = macosx/de.lproj/GroupRules.xib; sourceTree = "<group>"; };
 		A28393FD10D54A79005C0240 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = macosx/de.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		A28393FE10D54A89005C0240 /* de */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = de; path = macosx/de.lproj/InfoWindow.xib; sourceTree = "<group>"; };
 		A28393FF10D54A96005C0240 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = macosx/de.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A283940010D54A9D005C0240 /* de */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = de; path = macosx/de.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		A283940110D54AA7005C0240 /* de */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = de; path = macosx/de.lproj/PrefsWindow.xib; sourceTree = "<group>"; };
 		A28AFE050DA1C47A00673957 /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = zh_TW; path = macosx/zh_TW.lproj/AddWindow.xib; sourceTree = "<group>"; };
 		A28AFE060DA1C47A00673957 /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = zh_TW; path = macosx/zh_TW.lproj/Creator.xib; sourceTree = "<group>"; };
 		A28AFE070DA1C47A00673957 /* zh_TW */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = zh_TW; path = macosx/zh_TW.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		A28AFE080DA1C47A00673957 /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = zh_TW; path = macosx/zh_TW.lproj/InfoWindow.xib; sourceTree = "<group>"; };
 		A28AFE090DA1C47A00673957 /* zh_TW */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = zh_TW; path = macosx/zh_TW.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A28AFE0A0DA1C47A00673957 /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = zh_TW; path = macosx/zh_TW.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		A28AFE0B0DA1C47A00673957 /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = zh_TW; path = macosx/zh_TW.lproj/PrefsWindow.xib; sourceTree = "<group>"; };
@@ -673,7 +666,6 @@
 		A291477B0E195A0C00F60CB2 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = macosx/en.lproj/AddWindow.xib; sourceTree = "<group>"; };
 		A291477C0E195A0C00F60CB2 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = macosx/en.lproj/Creator.xib; sourceTree = "<group>"; };
 		A291477D0E195A0C00F60CB2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = macosx/en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		A291477E0E195A0C00F60CB2 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = macosx/en.lproj/InfoWindow.xib; sourceTree = "<group>"; };
 		A291477F0E195A0C00F60CB2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = macosx/en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A29147800E195A0C00F60CB2 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = macosx/en.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		A29147810E195A0C00F60CB2 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = macosx/en.lproj/PrefsWindow.xib; sourceTree = "<group>"; };
@@ -750,7 +742,6 @@
 		A2DC1E4610E6731000DFB18C /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = zh_CN; path = macosx/zh_CN.lproj/Creator.xib; sourceTree = "<group>"; };
 		A2DC1E4710E6731000DFB18C /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = zh_CN; path = macosx/zh_CN.lproj/GroupRules.xib; sourceTree = "<group>"; };
 		A2DC1E4810E6731000DFB18C /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh_CN; path = macosx/zh_CN.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		A2DC1E4910E6731000DFB18C /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = zh_CN; path = macosx/zh_CN.lproj/InfoWindow.xib; sourceTree = "<group>"; };
 		A2DC1E4A10E6731000DFB18C /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh_CN; path = macosx/zh_CN.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A2DC1E4B10E6731000DFB18C /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = zh_CN; path = macosx/zh_CN.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		A2DC1E4C10E6731000DFB18C /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = zh_CN; path = macosx/zh_CN.lproj/PrefsWindow.xib; sourceTree = "<group>"; };
@@ -1071,7 +1062,6 @@
 				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
 				A23F50000D1D99D7002FCB97 /* MainMenu.xib */,
 				A23F4FF00D1D98AD002FCB97 /* PrefsWindow.xib */,
-				A29576110D11D8DD0093B167 /* InfoWindow.xib */,
 				A29576010D11D63C0093B167 /* Creator.xib */,
 				A26AF27C0D2DBDDF00FF7140 /* AddWindow.xib */,
 				A215BF5B0F02EBB800350CDB /* GroupRules.xib */,
@@ -1079,6 +1069,7 @@
 				A233BD680D8CF2C7007EE7B4 /* StatsWindow.xib */,
 				A231274B0D11D0B7003F9AFF /* AboutWindow.xib */,
 				A2D307B00D9EC9F50051FD27 /* BlocklistStatusWindow.xib */,
+				A209ECA1114319C3002B02D1 /* InfoWindow.xib */,
 				A209EAEA1142D294002B02D1 /* InfoGeneralView.xib */,
 				A209EAE81142D294002B02D1 /* InfoActivityView.xib */,
 				A209EB1F1142DD85002B02D1 /* InfoTrackersView.xib */,
@@ -1868,7 +1859,6 @@
 				A2F41DAB0D0B916B006CE378 /* YingYangTemplate.png in Resources */,
 				A231274C0D11D0B7003F9AFF /* AboutWindow.xib in Resources */,
 				A29576030D11D63C0093B167 /* Creator.xib in Resources */,
-				A29576130D11D8DD0093B167 /* InfoWindow.xib in Resources */,
 				A20152640D1C1BE70081714F /* PinTemplate.png in Resources */,
 				A23F4FF20D1D98AD002FCB97 /* PrefsWindow.xib in Resources */,
 				A23F50020D1D99D7002FCB97 /* MainMenu.xib in Resources */,
@@ -1905,6 +1895,7 @@
 				A209EBA71142EAF3002B02D1 /* InfoPeersView.xib in Resources */,
 				A209EBD91142F52B002B02D1 /* InfoFileView.xib in Resources */,
 				A209EC12114301C6002B02D1 /* InfoOptionsView.xib in Resources */,
+				A209ECA2114319C3002B02D1 /* InfoWindow.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2342,23 +2333,6 @@
 				A2DC1E4610E6731000DFB18C /* zh_CN */,
 			);
 			name = Creator.xib;
-			sourceTree = "<group>";
-		};
-		A29576110D11D8DD0093B167 /* InfoWindow.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				A291477E0E195A0C00F60CB2 /* en */,
-				A223AA7F0D220CEB00840069 /* nl */,
-				A265A32F0D25767700198AC8 /* fr */,
-				A265A3BF0D25AE7800198AC8 /* es */,
-				A26AF1060D2855FC00FF7140 /* ru */,
-				A28AFE080DA1C47A00673957 /* zh_TW */,
-				A202FF5E0DDA9275009938FF /* it */,
-				A251A65B0F9E8FCE004F5973 /* pt */,
-				A28393FE10D54A89005C0240 /* de */,
-				A2DC1E4910E6731000DFB18C /* zh_CN */,
-			);
-			name = InfoWindow.xib;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
