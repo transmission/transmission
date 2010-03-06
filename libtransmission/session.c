@@ -613,7 +613,7 @@ tr_sessionInitImpl( void * vdata )
 
     tr_statsInit( session );
 
-    session->web = tr_webInit( session );
+    tr_webInit( session );
 
     tr_sessionSet( session, &settings );
 
@@ -713,7 +713,7 @@ sessionSetImpl( void * vdata )
         b.addr = tr_inaddr_any;
     b.socket = -1;
     session->public_ipv4 = tr_memdup( &b, sizeof( struct tr_bindinfo ) );
-    tr_webSetInterface( session->web, &session->public_ipv4->addr );
+    tr_webSetInterface( session, &session->public_ipv4->addr );
 
     str = TR_PREFS_KEY_BIND_ADDRESS_IPV6;
     tr_bencDictFindStr( settings, TR_PREFS_KEY_BIND_ADDRESS_IPV6, &str );
@@ -1456,7 +1456,7 @@ tr_sessionGetPieceSpeed( const tr_session * session, tr_direction dir )
 double
 tr_sessionGetRawSpeed( const tr_session * session, tr_direction dir )
 {
-    return tr_isSession( session ) ? tr_bandwidthGetPieceSpeed( session->bandwidth, 0, dir ) : 0.0;
+    return tr_isSession( session ) ? tr_bandwidthGetRawSpeed( session->bandwidth, 0, dir ) : 0.0;
 }
 
 int
@@ -1524,9 +1524,9 @@ sessionCloseImpl( void * vsession )
     tr_announcerClose( session );
     tr_statsClose( session );
     tr_peerMgrFree( session->peerMgr );
+    tr_webClose( session, TR_WEB_CLOSE_WHEN_IDLE );
 
     closeBlocklists( session );
-    tr_webClose( &session->web );
 
     tr_fdClose( session );
 
@@ -1562,13 +1562,15 @@ tr_sessionClose( tr_session * session )
      * so we need to keep the transmission thread alive
      * for a bit while they tell the router & tracker
      * that we're closing now */
-    while( ( session->shared
-           || session->announcer ) && !deadlineReached( deadline ) )
+    while( ( session->shared || session->web || session->announcer )
+           && !deadlineReached( deadline ) )
     {
         dbgmsg( "waiting on port unmap (%p) or announcer (%p)",
                 session->shared, session->announcer );
         tr_wait_msec( 100 );
     }
+
+    tr_webClose( session, TR_WEB_CLOSE_NOW );
 
     /* close the libtransmission thread */
     tr_eventClose( session );

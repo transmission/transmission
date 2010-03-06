@@ -14,13 +14,19 @@
 #define TR_HTTP_H
 
 struct tr_address;
-typedef struct tr_web tr_web;
 
-tr_web*      tr_webInit( tr_session * session );
+void tr_webInit( tr_session * session );
 
-void         tr_webClose( tr_web ** );
+typedef enum
+{
+    TR_WEB_CLOSE_WHEN_IDLE,
+    TR_WEB_CLOSE_NOW
+}
+tr_web_close_mode;
 
-void         tr_webSetInterface( tr_web * web, const struct tr_address * addr );
+void tr_webClose( tr_session * session, tr_web_close_mode close_mode );
+
+void tr_webSetInterface( tr_session * session, const struct tr_address * addr );
 
 typedef void ( tr_web_done_func )( tr_session       * session,
                                    long               response_code,
