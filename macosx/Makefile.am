@@ -2,6 +2,10 @@ EXTRA_DIST = \
     Credits.rtf \
     AboutWindow.xib \
     BlocklistStatusWindow.xib \
+    InfoFileView.xib \
+    InfoPeersView.xib \
+    InfoTrackersView.xib \
+    InfoWindow.xib \
     MessageWindow.xib \
     StatsWindow.xib \
     Defaults.plist \
@@ -75,6 +79,18 @@ EXTRA_DIST = \
     InfoTabButtonCell.m \
     InfoTextField.h \
     InfoTextField.m \
+    InfoActivityViewController.h \
+    InfoActivityViewController.m \
+    InfoFileViewController.h \
+    InfoFileViewController.m \
+    InfoGeneralViewController.h \
+    InfoGeneralViewController.m \
+    InfoOptionsViewController.h \
+    InfoOptionsViewController.m \
+    InfoPeersViewController.h \
+    InfoPeersViewController.m \
+    InfoTrackersViewController.h \
+    InfoTrackersViewController.m \
     InfoWindowController.h \
     InfoWindowController.m \
     main.m \
