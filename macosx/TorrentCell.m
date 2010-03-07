@@ -571,6 +571,14 @@
 {
     Torrent * torrent = [self representedObject];
     
+    //fill an all-white bar for magnet links
+    if ([torrent isMagnet])
+    {
+        [[NSColor whiteColor] set];
+        NSRectFill(barRect);
+        return;
+    }
+    
     NSInteger pieceCount = MIN([torrent pieceCount], MAX_PIECES);
     float * piecesPercent = malloc(pieceCount * sizeof(float));
     [torrent getAmountFinished: piecesPercent size: pieceCount];
