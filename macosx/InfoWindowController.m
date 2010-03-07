@@ -206,19 +206,13 @@ typedef enum
     return windowRect;
 }
 
-#warning fix
-/*- (NSSize) windowWillResize: (NSWindow *) window toSize: (NSSize) proposedFrameSize
+- (NSSize) windowWillResize: (NSWindow *) window toSize: (NSSize) proposedFrameSize
 {
-    //this is an edge-case - just stop the animation (stopAnimation jumps to end frame)
-    if (fWebSeedTableAnimation)
-    {
-        [fWebSeedTableAnimation stopAnimation];
-        [fWebSeedTableAnimation release];
-        fWebSeedTableAnimation = nil;
-    }
+    //this is an edge-case - just stop the animation
+    [fPeersViewController stopWebSeedAnimation];
     
     return proposedFrameSize;
-}*/
+}
 
 - (void) windowWillClose: (NSNotification *) notification
 {
@@ -490,8 +484,8 @@ typedef enum
                 [fBasicInfoField setStringValue: [NSString stringWithFormat: @"%@, %@", fileString,
                     [NSString stringWithFormat: NSLocalizedString(@"%@ total", "Inspector -> selected torrents"),
                         [NSString stringForFileSize: size]]]];
-                [fBasicInfoField setToolTip: [NSString stringWithFormat: NSLocalizedString(@"%llu bytes", "Inspector -> selected torrents"),
-                                                size]];
+                [fBasicInfoField setToolTip: [NSString stringWithFormat: NSLocalizedString(@"%llu bytes",
+                                                "Inspector -> selected torrents"), size]];
             }
             else
             {
@@ -534,7 +528,7 @@ typedef enum
             if ([torrent isFolder])
             {
                 NSString * fileString;
-                NSInteger fileCount = [torrent fileCount];
+                const NSInteger fileCount = [torrent fileCount];
                 if (fileCount == 1)
                     fileString = NSLocalizedString(@"1 file", "Inspector -> selected torrents");
                 else

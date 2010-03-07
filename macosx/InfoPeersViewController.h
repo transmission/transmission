@@ -42,5 +42,6 @@
 - (void) updateInfo;
 
 - (void) clearPeers;
+- (void) stopWebSeedAnimation;
 
 @end

@@ -437,6 +437,16 @@
     }
 }
 
+- (void) stopWebSeedAnimation
+{
+    if (fWebSeedTableAnimation)
+    {
+        [fWebSeedTableAnimation stopAnimation]; // jumps to end frame
+        [fWebSeedTableAnimation release];
+        fWebSeedTableAnimation = nil;
+    }
+}
+
 @end
 
 @implementation InfoPeersViewController (Private)
