@@ -323,6 +323,7 @@ tr_close_file( int fd )
     posix_fadvise( fd, 0, 0, POSIX_FADV_DONTNEED );
     errno = err;
 #endif
+    fsync( fd );
     close( fd );
 }
 
