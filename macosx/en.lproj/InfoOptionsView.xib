@@ -141,8 +141,8 @@
 					</object>
 					<object class="NSTextField" id="275413408">
 						<reference key="NSNextResponder" ref="617828785"/>
-						<int key="NSvFlags">266</int>
-						<string key="NSFrame">{{9, 76}, {278, 14}}</string>
+						<int key="NSvFlags">268</int>
+						<string key="NSFrame">{{9, 73}, {49, 17}}</string>
 						<reference key="NSSuperview" ref="617828785"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="960257683">
@@ -174,7 +174,7 @@
 					</object>
 					<object class="NSTextField" id="1004759797">
 						<reference key="NSNextResponder" ref="617828785"/>
-						<int key="NSvFlags">266</int>
+						<int key="NSvFlags">268</int>
 						<string key="NSFrame">{{9, 159}, {117, 14}}</string>
 						<reference key="NSSuperview" ref="617828785"/>
 						<bool key="NSEnabled">YES</bool>
@@ -190,8 +190,8 @@
 					</object>
 					<object class="NSTextField" id="234468111">
 						<reference key="NSNextResponder" ref="617828785"/>
-						<int key="NSvFlags">266</int>
-						<string key="NSFrame">{{9, 200}, {278, 14}}</string>
+						<int key="NSvFlags">268</int>
+						<string key="NSFrame">{{9, 197}, {46, 17}}</string>
 						<reference key="NSSuperview" ref="617828785"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="235794164">
@@ -474,8 +474,8 @@
 					</object>
 					<object class="NSTextField" id="249386201">
 						<reference key="NSNextResponder" ref="617828785"/>
-						<int key="NSvFlags">266</int>
-						<string key="NSFrame">{{9, 32}, {278, 14}}</string>
+						<int key="NSvFlags">268</int>
+						<string key="NSFrame">{{9, 29}, {60, 17}}</string>
 						<reference key="NSSuperview" ref="617828785"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="982055451">
@@ -1375,6 +1375,7 @@
 				<bool key="EncodedWithXMLCoder">YES</bool>
 				<object class="NSArray" key="dict.sortedKeys">
 					<bool key="EncodedWithXMLCoder">YES</bool>
+					<string>-3.IBPluginDependency</string>
 					<string>10.IBPluginDependency</string>
 					<string>10.ImportedFromIB2</string>
 					<string>11.CustomClassName</string>
@@ -1460,6 +1461,7 @@
 				</object>
 				<object class="NSMutableArray" key="dict.values">
 					<bool key="EncodedWithXMLCoder">YES</bool>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>ColorTextField</string>
