@@ -86,6 +86,10 @@
         
         [fDateAddedField setObjectValue: [torrent dateAdded]];
         
+        BOOL piecesAvailableSegment = [[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"];
+        [fPiecesControl setSelected: piecesAvailableSegment forSegment: PIECES_CONTROL_AVAILABLE];
+        [fPiecesControl setSelected: !piecesAvailableSegment forSegment: PIECES_CONTROL_PROGRESS];
+        [fPiecesControl setEnabled: YES];
         [fPiecesView setTorrent: torrent];
     }
 }
