@@ -405,8 +405,8 @@
 					</object>
 					<object class="NSTextField" id="293727443">
 						<reference key="NSNextResponder" ref="570476534"/>
-						<int key="NSvFlags">266</int>
-						<string key="NSFrame">{{9, 58}, {296, 14}}</string>
+						<int key="NSvFlags">268</int>
+						<string key="NSFrame">{{9, 55}, {37, 17}}</string>
 						<reference key="NSSuperview" ref="570476534"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="719007168">
@@ -566,8 +566,8 @@
 					</object>
 					<object class="NSTextField" id="381599958">
 						<reference key="NSNextResponder" ref="570476534"/>
-						<int key="NSvFlags">266</int>
-						<string key="NSFrame">{{9, 256}, {296, 14}}</string>
+						<int key="NSvFlags">268</int>
+						<string key="NSFrame">{{9, 253}, {53, 17}}</string>
 						<reference key="NSSuperview" ref="570476534"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="921833840">
@@ -1358,6 +1358,7 @@
 				<bool key="EncodedWithXMLCoder">YES</bool>
 				<object class="NSArray" key="dict.sortedKeys">
 					<bool key="EncodedWithXMLCoder">YES</bool>
+					<string>-3.IBPluginDependency</string>
 					<string>10.IBPluginDependency</string>
 					<string>10.ImportedFromIB2</string>
 					<string>11.IBPluginDependency</string>
@@ -1469,6 +1470,7 @@
 				</object>
 				<object class="NSMutableArray" key="dict.values">
 					<bool key="EncodedWithXMLCoder">YES</bool>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
