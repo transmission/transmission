@@ -1603,13 +1603,16 @@ clientGotBlock( tr_peermsgs *               msgs,
         return EMSGSIZE;
     }
 
-    /* save the block */
     dbgmsg( msgs, "got block %u:%u->%u", req->index, req->offset, req->length );
 
     if( !tr_peerMgrDidPeerRequest( msgs->torrent, msgs->peer, block ) ) {
         dbgmsg( msgs, "we didn't ask for this message..." );
         return 0;
     }
+    if( tr_cpPieceIsComplete( &msgs->torrent->completion, req->index ) ) { 
+        dbgmsg( msgs, "we did ask for this message, but the piece is already complete..." ); 
+        return 0; 
+    } 
 
     /**
     ***  Save the block
