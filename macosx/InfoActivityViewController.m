@@ -83,7 +83,10 @@
     else
     {
         Torrent * torrent = [fTorrents objectAtIndex: 0];
+        
         [fDateAddedField setObjectValue: [torrent dateAdded]];
+        
+        [fPiecesView setTorrent: torrent];
     }
 }
 
