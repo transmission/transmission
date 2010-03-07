@@ -47,16 +47,6 @@
 
 - (void) awakeFromNib
 {
-    //initially sort peer table by IP
-    if ([[fPeerTable sortDescriptors] count] == 0)
-        [fPeerTable setSortDescriptors: [NSArray arrayWithObject: [[fPeerTable tableColumnWithIdentifier: @"IP"]
-                                            sortDescriptorPrototype]]];
-    
-    //initially sort webseed table by address
-    if ([[fWebSeedTable sortDescriptors] count] == 0)
-        [fWebSeedTable setSortDescriptors: [NSArray arrayWithObject: [[fWebSeedTable tableColumnWithIdentifier: @"Address"]
-                                            sortDescriptorPrototype]]];
-    
     //set table header text
     [[[fPeerTable tableColumnWithIdentifier: @"IP"] headerCell] setStringValue: NSLocalizedString(@"IP Address",
                                                                         "inspector -> peer table -> header")];
@@ -484,7 +474,6 @@
 
 - (void) setWebSeedTableHidden: (BOOL) hide animate: (BOOL) animate
 {
-    #warning needs to be verified
     if (animate && (![[self view] window] || ![[[self view] window] isVisible]))
         animate = NO;
     

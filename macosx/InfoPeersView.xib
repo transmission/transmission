@@ -12,7 +12,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="9"/>
+			<integer value="2"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -667,7 +667,7 @@ AAAAAAAAAAAAAAAAAAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAxMAA</bytes>
 												<int key="NSResizingMask">3</int>
 												<bool key="NSIsResizeable">YES</bool>
 												<reference key="NSTableView" ref="804988141"/>
-												<object class="NSSortDescriptor" key="NSSortDescriptorPrototype">
+												<object class="NSSortDescriptor" key="NSSortDescriptorPrototype" id="946902179">
 													<string key="NSKey">Address</string>
 													<bool key="NSAscending">YES</bool>
 													<string key="NSSelector">localizedCaseInsensitiveCompare:</string>
@@ -718,6 +718,10 @@ AAAAAAAAAAAAAAAAAAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAxMAA</bytes>
 										<reference key="NSDelegate"/>
 										<reference key="NSDataSource"/>
 										<string key="NSAutosaveName">InspectorTableWebSeeds</string>
+										<object class="NSArray" key="NSSortDescriptors">
+											<bool key="EncodedWithXMLCoder">YES</bool>
+											<reference ref="946902179"/>
+										</object>
 										<int key="NSColumnAutoresizingStyle">1</int>
 										<int key="NSDraggingSourceMaskForLocal">15</int>
 										<int key="NSDraggingSourceMaskForNonLocal">0</int>

@@ -75,11 +75,6 @@
     
     [window setContentBorderThickness: NSMinY([[fMessageTable enclosingScrollView] frame]) forEdge: NSMinYEdge];
     
-    //initially sort peer table by date
-    if ([[fMessageTable sortDescriptors] count] == 0)
-        [fMessageTable setSortDescriptors: [NSArray arrayWithObject: [[fMessageTable tableColumnWithIdentifier: @"Date"]
-                                            sortDescriptorPrototype]]];
-    
     [[self window] setTitle: NSLocalizedString(@"Message Log", "Message window -> title")];
     
     //set images and text for popup button items
