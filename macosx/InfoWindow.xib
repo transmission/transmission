@@ -41,7 +41,7 @@
 			<object class="NSWindowTemplate" id="571546118">
 				<int key="NSWindowStyleMask">27</int>
 				<int key="NSWindowBacking">2</int>
-				<string key="NSWindowRect">{{859, 827}, {350, 75}}</string>
+				<string key="NSWindowRect">{{897, 867}, {403, 75}}</string>
 				<int key="NSWTFlags">-534249472</int>
 				<string key="NSWindowTitle">Torrent Inspector</string>
 				<string key="NSWindowClass">NSPanel</string>
@@ -58,7 +58,7 @@
 						<object class="NSTextField" id="974784210">
 							<reference key="NSNextResponder" ref="429007171"/>
 							<int key="NSvFlags">266</int>
-							<string key="NSFrame">{{47, 47}, {296, 17}}</string>
+							<string key="NSFrame">{{47, 47}, {349, 17}}</string>
 							<reference key="NSSuperview" ref="429007171"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="585844623">
@@ -126,7 +126,7 @@
 						<object class="NSTextField" id="843033231">
 							<reference key="NSNextResponder" ref="429007171"/>
 							<int key="NSvFlags">266</int>
-							<string key="NSFrame">{{47, 33}, {296, 14}}</string>
+							<string key="NSFrame">{{47, 33}, {349, 14}}</string>
 							<reference key="NSSuperview" ref="429007171"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="615989236">
@@ -397,7 +397,7 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSBDb21wdXRlciwgSW5jLiwgMjAwNQAAAAA</bytes>
 									<string>NeXT TIFF v4.0 pasteboard type</string>
 								</object>
 							</object>
-							<string key="NSFrame">{{330, 0}, {20, 25}}</string>
+							<string key="NSFrame">{{330, 0}, {73, 25}}</string>
 							<reference key="NSSuperview" ref="429007171"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSImageCell" key="NSCell" id="1024147571">
@@ -415,7 +415,7 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSBDb21wdXRlciwgSW5jLiwgMjAwNQAAAAA</bytes>
 							<bool key="NSEditable">YES</bool>
 						</object>
 					</object>
-					<string key="NSFrameSize">{350, 75}</string>
+					<string key="NSFrameSize">{403, 75}</string>
 					<reference key="NSSuperview"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1680, 1028}}</string>
@@ -714,9 +714,9 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSBDb21wdXRlciwgSW5jLiwgMjAwNQAAAAA</bytes>
 					<string>InfoTextField</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>{{0, 926}, {350, 75}}</string>
+					<string>{{897, 867}, {403, 75}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{0, 926}, {350, 75}}</string>
+					<string>{{897, 867}, {403, 75}}</string>
 					<integer value="1"/>
 					<string>{{687, 827}, {350, 75}}</string>
 					<boolean value="NO"/>
