@@ -68,16 +68,7 @@ typedef enum
 
 - (id) init
 {
-    if ((self = [super initWithWindowNibName: @"InfoWindow"]))
-    {
-        fGeneralViewController = [[InfoGeneralViewController alloc] init];
-        fActivityViewController = [[InfoActivityViewController alloc] init];
-        fTrackersViewController = [[InfoTrackersViewController alloc] init];
-        fPeersViewController = [[InfoPeersViewController alloc] init];
-        fFileViewController = [[InfoFileViewController alloc] init];
-        fOptionsViewController = [[InfoOptionsViewController alloc] init];
-    }
-    
+    self = [super initWithWindowNibName: @"InfoWindow"];
     return self;
 }
 
@@ -243,8 +234,6 @@ typedef enum
     if (fCurrentTabTag == oldTabTag)
         return;
     
-    [self updateInfoStats];
-    
     //take care of old view
     CGFloat oldHeight = 0;
     NSString * oldResizeSaveKey = nil;
@@ -287,37 +276,53 @@ typedef enum
     }
     
     //set new tab item
-    NSView * view = [self tabViewForTag: fCurrentTabTag];
-    
     #warning get titles from view controller?
     NSString * resizeSaveKey = nil;
     NSString * identifier, * title;
     switch (fCurrentTabTag)
     {
         case TAB_GENERAL_TAG:
+            if (!fGeneralViewController)
+                fGeneralViewController = [[InfoGeneralViewController alloc] init];
+            
             identifier = TAB_INFO_IDENT;
             title = NSLocalizedString(@"General Info", "Inspector -> title");
             break;
         case TAB_ACTIVITY_TAG:
+            if (!fActivityViewController)
+                fActivityViewController = [[InfoActivityViewController alloc] init];
+            
             identifier = TAB_ACTIVITY_IDENT;
             title = NSLocalizedString(@"Activity", "Inspector -> title");
             break;
         case TAB_TRACKERS_TAG:
+            if (!fTrackersViewController)
+                fTrackersViewController = [[InfoTrackersViewController alloc] init];
+            
             identifier = TAB_TRACKER_IDENT;
             title = NSLocalizedString(@"Trackers", "Inspector -> title");
             resizeSaveKey = @"InspectorContentHeightTracker";
             break;
         case TAB_PEERS_TAG:
+            if (!fPeersViewController)
+                fPeersViewController = [[InfoPeersViewController alloc] init];
+            
             identifier = TAB_PEERS_IDENT;
             title = NSLocalizedString(@"Peers", "Inspector -> title");
             resizeSaveKey = @"InspectorContentHeightPeers";
             break;
         case TAB_FILE_TAG:
+            if (!fFileViewController)
+                fFileViewController = [[InfoFileViewController alloc] init];
+            
             identifier = TAB_FILES_IDENT;
             title = NSLocalizedString(@"Files", "Inspector -> title");
             resizeSaveKey = @"InspectorContentHeightFiles";
             break;
         case TAB_OPTIONS_TAG:
+            if (!fOptionsViewController)
+                fOptionsViewController = [[InfoOptionsViewController alloc] init];
+            
             identifier = TAB_OPTIONS_IDENT;
             title = NSLocalizedString(@"Options", "Inspector -> title");
             break;
@@ -334,6 +339,18 @@ typedef enum
     
     //selected tab item
     [(InfoTabButtonCell *)[fTabMatrix selectedCell] setSelectedTab: YES];
+    
+    NSView * view = [self tabViewForTag: fCurrentTabTag];
+    
+    //if view was just loaded - has to be a better way
+    [fGeneralViewController setInfoForTorrents: fTorrents];
+    [fActivityViewController setInfoForTorrents: fTorrents];
+    [fTrackersViewController setInfoForTorrents: fTorrents];
+    [fPeersViewController setInfoForTorrents: fTorrents];
+    [fFileViewController setInfoForTorrents: fTorrents];
+    [fOptionsViewController setInfoForTorrents: fTorrents];
+    
+    [self updateInfoStats];
     
     NSRect windowRect = [window frame], viewRect = [view frame];
     
@@ -367,6 +384,7 @@ typedef enum
     
     [window setFrame: windowRect display: YES animate: oldTabTag != INVALID];
     [[window contentView] addSubview: view];
+    
     [view setHidden: NO];
     
     if ([NSApp isOnSnowLeopardOrBetter] && (fCurrentTabTag == TAB_FILE_TAG || oldTabTag == TAB_FILE_TAG)

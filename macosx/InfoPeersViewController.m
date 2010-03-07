@@ -451,7 +451,6 @@
         fPeers = nil;
         [fPeerTable reloadData];
         
-        #warning should be reset when != to 1?
         [fConnectedPeersField setStringValue: @""];
     }
     else
@@ -552,7 +551,7 @@
     //sort by IP after primary sort
     if (useSecond)
     {
-        #warning when 10.6-only, replate with sortDescriptorWithKey:ascending:selector:
+        #warning when 10.6-only, replace with sortDescriptorWithKey:ascending:selector:
         NSSortDescriptor * secondDescriptor = [[NSSortDescriptor alloc] initWithKey: @"IP" ascending: asc
                                                                         selector: @selector(compareNumeric:)];
         [descriptors addObject: secondDescriptor];

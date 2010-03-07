@@ -35,12 +35,6 @@
 
 #define INVALID -99
 
-@interface InfoOptionsViewController (Private)
-
-- (void) resetInfo;
-
-@end
-
 @implementation InfoOptionsViewController
 
 - (id) init
@@ -64,7 +58,37 @@
     [fTorrents release];
     fTorrents = [torrents retain];
     
-    [self resetInfo];
+    if ([fTorrents count] == 0)
+    {
+        [fUploadLimitCheck setEnabled: NO];
+        [fUploadLimitCheck setState: NSOffState];
+        [fUploadLimitField setEnabled: NO];
+        [fUploadLimitLabel setEnabled: NO];
+        [fUploadLimitField setStringValue: @""];
+        
+        [fDownloadLimitCheck setEnabled: NO];
+        [fDownloadLimitCheck setState: NSOffState];
+        [fDownloadLimitField setEnabled: NO];
+        [fDownloadLimitLabel setEnabled: NO];
+        [fDownloadLimitField setStringValue: @""];
+        
+        [fGlobalLimitCheck setEnabled: NO];
+        [fGlobalLimitCheck setState: NSOffState];
+        
+        [fPriorityPopUp setEnabled: NO];
+        [fPriorityPopUp selectItemAtIndex: -1];
+        
+        [fRatioPopUp setEnabled: NO];
+        [fRatioPopUp selectItemAtIndex: -1];
+        [fRatioLimitField setHidden: YES];
+        [fRatioLimitField setStringValue: @""];
+        
+        [fPeersConnectField setEnabled: NO];
+        [fPeersConnectField setStringValue: @""];
+        [fPeersConnectLabel setEnabled: NO];
+    }
+    else
+        [self updateOptions];
 }
 
 - (void) updateOptions
@@ -350,40 +374,5 @@
 @end
 
 @implementation InfoOptionsViewController (Private)
-
-- (void) resetInfo
-{
-    if ([fTorrents count] == 0)
-    {
-        [fUploadLimitCheck setEnabled: NO];
-        [fUploadLimitCheck setState: NSOffState];
-        [fUploadLimitField setEnabled: NO];
-        [fUploadLimitLabel setEnabled: NO];
-        [fUploadLimitField setStringValue: @""];
-        
-        [fDownloadLimitCheck setEnabled: NO];
-        [fDownloadLimitCheck setState: NSOffState];
-        [fDownloadLimitField setEnabled: NO];
-        [fDownloadLimitLabel setEnabled: NO];
-        [fDownloadLimitField setStringValue: @""];
-        
-        [fGlobalLimitCheck setEnabled: NO];
-        [fGlobalLimitCheck setState: NSOffState];
-        
-        [fPriorityPopUp setEnabled: NO];
-        [fPriorityPopUp selectItemAtIndex: -1];
-        
-        [fRatioPopUp setEnabled: NO];
-        [fRatioPopUp selectItemAtIndex: -1];
-        [fRatioLimitField setHidden: YES];
-        [fRatioLimitField setStringValue: @""];
-        
-        [fPeersConnectField setEnabled: NO];
-        [fPeersConnectField setStringValue: @""];
-        [fPeersConnectLabel setEnabled: NO];
-    }
-    else
-        [self updateOptions];
-}
 
 @end

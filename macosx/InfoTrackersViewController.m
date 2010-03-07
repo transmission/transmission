@@ -36,8 +36,6 @@
 
 @interface InfoTrackersViewController (Private)
 
-- (void) resetInfo;
-
 - (void) addTrackers;
 - (void) removeTrackers;
 
@@ -72,7 +70,32 @@
     [fTorrents release];
     fTorrents = [torrents retain];
     
-    [self resetInfo];
+    const NSUInteger numberSelected = [fTorrents count];
+    if (numberSelected != 1)
+    {
+        if (numberSelected == 0)
+        {
+            [fTrackers release];
+            fTrackers = nil;
+            
+            [fTrackerTable setTrackers: nil];
+            [fTrackerTable reloadData];
+        }
+        
+        [fTrackerTable setTorrent: nil];
+        
+        [fTrackerAddRemoveControl setEnabled: NO forSegment: TRACKER_ADD_TAG];
+        [fTrackerAddRemoveControl setEnabled: NO forSegment: TRACKER_REMOVE_TAG];
+    }
+    else
+    {
+        [fTrackerTable setTorrent: [fTorrents objectAtIndex: 0]];
+        
+        [fTrackerAddRemoveControl setEnabled: YES forSegment: TRACKER_ADD_TAG];
+        [fTrackerAddRemoveControl setEnabled: NO forSegment: TRACKER_REMOVE_TAG];
+    }
+    
+    [fTrackerTable deselectAll: self];
 }
 
 - (void) updateInfo
@@ -222,36 +245,6 @@
 @end
 
 @implementation InfoTrackersViewController (Private)
-
-- (void) resetInfo
-{
-    const NSUInteger numberSelected = [fTorrents count];
-    if (numberSelected != 1)
-    {
-        if (numberSelected == 0)
-        {
-            [fTrackers release];
-            fTrackers = nil;
-            
-            [fTrackerTable setTrackers: nil];
-            [fTrackerTable reloadData];
-        }
-        
-        [fTrackerTable setTorrent: nil];
-        
-        [fTrackerAddRemoveControl setEnabled: NO forSegment: TRACKER_ADD_TAG];
-        [fTrackerAddRemoveControl setEnabled: NO forSegment: TRACKER_REMOVE_TAG];
-    }
-    else
-    {
-        [fTrackerTable setTorrent: [fTorrents objectAtIndex: 0]];
-        
-        [fTrackerAddRemoveControl setEnabled: YES forSegment: TRACKER_ADD_TAG];
-        [fTrackerAddRemoveControl setEnabled: NO forSegment: TRACKER_REMOVE_TAG];
-    }
-    
-    [fTrackerTable deselectAll: self];
-}
 
 #warning doesn't like blank addresses
 - (void) addTrackers
