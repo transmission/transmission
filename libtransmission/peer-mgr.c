@@ -728,24 +728,6 @@ comparePieceByWeight( const void * va, const void * vb )
     return 0;
 }
 
-/**
- * This function is useful for sanity checking,
- * but is too expensive even for nightly builds... 
- * let's leave it disabled but add an easy hook to compile it back in
- */
-#if 1
-static void
-assertWeightedPiecesAreSorted( Torrent * t )
-{
-    int i;
-    weightTorrent = t->tor;
-    for( i=0; i<t->pieceCount-1; ++i )
-        assert( comparePieceByWeight( &t->pieces[i], &t->pieces[i+1] ) <= 0 );
-}
-#else
-#define assertWeightedPiecesAreSorted(t)
-#endif
-
 static int
 comparePieceByIndex( const void * va, const void * vb )
 {
@@ -791,6 +773,27 @@ isInEndgame( Torrent * t )
     /*if( endgame ) fprintf( stderr, "ENDGAME reached\n" );*/
     return endgame;
 }
+
+/**
+ * This function is useful for sanity checking,
+ * but is too expensive even for nightly builds... 
+ * let's leave it disabled but add an easy hook to compile it back in
+ */
+#if 0
+static void
+assertWeightedPiecesAreSorted( Torrent * t )
+{
+    if( !isInEndgame( t ) )
+    {
+        int i;
+        weightTorrent = t->tor;
+        for( i=0; i<t->pieceCount-1; ++i )
+            assert( comparePieceByWeight( &t->pieces[i], &t->pieces[i+1] ) <= 0 );
+    }
+}
+#else
+#define assertWeightedPiecesAreSorted(t)
+#endif
 
 static struct weighted_piece *
 pieceListLookup( Torrent * t, tr_piece_index_t index )
