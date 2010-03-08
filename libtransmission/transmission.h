@@ -1354,6 +1354,21 @@ typedef struct tr_peer_stat
     float    rateToPeer;
     float    rateToClient;
 
+
+/***
+****  THESE NEXT FOUR FIELDS ARE EXPERIMENTAL.
+****  They're currently being used in the GTK+ client to help tune the new download congestion code
+****  and probably won't make the cut for 2.0.
+***/
+    /* how many blocks we've sent to this peer in the last 120 seconds */
+    uint32_t  blocksToPeer;
+    /* how many blocks this client's sent to us in the last 120 seconds */
+    uint32_t  blocksToClient;
+    /* how many requests to this peer that we've cancelled in the last 120 seconds */
+    uint32_t  cancelsToPeer;
+    /* how many requests this peer made of us, then cancelled, in the last 120 seconds */
+    uint32_t  cancelsToClient;
+
     /* how many requests the peer has made that we haven't responded to yet */
     int      pendingReqsToClient;
 

@@ -28,6 +28,7 @@ libtransmission_a_SOURCES = \
     fdlimit.c \
     ggets.c \
     handshake.c \
+    history.c \
     inout.c \
     json.c \
     JSON_parser.c \
@@ -77,6 +78,7 @@ noinst_HEADERS = \
     fdlimit.h \
     ggets.h \
     handshake.h \
+    history.h \
     inout.h \
     json.h \
     JSON_parser.h \
@@ -117,6 +119,7 @@ TESTS = \
     blocklist-test \
     bencode-test \
     clients-test \
+    history-test \
     json-test \
     magnet-test \
     peer-msgs-test \
@@ -152,6 +155,10 @@ blocklist_test_LDFLAGS = ${apps_ldflags}
 clients_test_SOURCES = clients-test.c
 clients_test_LDADD = ${apps_ldadd}
 clients_test_LDFLAGS = ${apps_ldflags}
+
+history_test_SOURCES = history-test.c
+history_test_LDADD = ${apps_ldadd}
+history_test_LDFLAGS = ${apps_ldflags}
 
 json_test_SOURCES = json-test.c
 json_test_LDADD = ${apps_ldadd}

@@ -25,6 +25,7 @@
 
 #include "bitfield.h"
 #include "bitset.h"
+#include "history.h"
 #include "net.h"
 #include "peer-common.h" /* struct peer_request */
 #include "publish.h" /* tr_publisher_tag */
@@ -109,6 +110,18 @@ typedef struct tr_peer
     char                   * client;
 
     time_t                   chokeChangedAt;
+
+    time_t                   lastBlocksAtTime;
+    int                      blocksAt[60];
+
+    time_t                   lastCancelTime;
+    int                      cancelAt[60];
+
+    tr_recentHistory       * blocksSentToClient;
+    tr_recentHistory       * blocksSentToPeer;
+
+    tr_recentHistory       * cancelsSentToClient;
+    tr_recentHistory       * cancelsSentToPeer;
 
     struct tr_peermsgs     * msgs;
     tr_publisher_tag         msgsTag;

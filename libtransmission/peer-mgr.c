@@ -83,7 +83,9 @@ enum
     MINIMUM_RECONNECT_INTERVAL_SECS = 5,
 
     /** how long we'll let requests we've made linger before we cancel them */
-    REQUEST_TTL_SECS = 60
+    REQUEST_TTL_SECS = 60,
+
+    HISTORY_SEC = TORRENT_DOWNLOAD_CONGESTION_HISTORY_SEC
 };
 
 
@@ -178,6 +180,13 @@ typedef struct tr_torrent_peers
 
     struct weighted_piece    * pieces;
     int                        pieceCount;
+
+    int                        interestedCount;
+
+    /* An arbitrary metric of how congested the downloads are.
+     * Based on how many of requests are cancelled and how many are completed.
+     * Lower values indicate less congestion. */
+    double                     downloadCongestion;
 }
 Torrent;
 
@@ -331,9 +340,17 @@ static tr_peer*
 peerConstructor( struct peer_atom * atom )
 {
     tr_peer * peer = tr_new0( tr_peer, 1 );
+
     tr_bitsetConstructor( &peer->have, 0 );
+
     peer->atom = atom;
     atom->peer = peer;
+
+    peer->blocksSentToClient  = tr_historyNew( HISTORY_SEC, 1 );
+    peer->blocksSentToPeer    = tr_historyNew( HISTORY_SEC, 1 );
+    peer->cancelsSentToClient = tr_historyNew( HISTORY_SEC, 1 );
+    peer->cancelsSentToPeer   = tr_historyNew( HISTORY_SEC, 1 );
+
     return peer;
 }
 
@@ -372,6 +389,11 @@ peerDestructor( Torrent * t, tr_peer * peer )
 
     tr_peerIoClear( peer->io );
     tr_peerIoUnref( peer->io ); /* balanced by the ref in handshakeDoneCB() */
+
+    tr_historyFree( peer->blocksSentToClient  );
+    tr_historyFree( peer->blocksSentToPeer    );
+    tr_historyFree( peer->cancelsSentToClient );
+    tr_historyFree( peer->cancelsSentToPeer   );
 
     tr_bitsetDestructor( &peer->have );
     tr_bitfieldFree( peer->blame );
@@ -1085,12 +1107,14 @@ static void
 refillUpkeep( int foo UNUSED, short bar UNUSED, void * vmgr )
 {
     time_t now;
+    uint64_t now_msec;
     time_t too_old;
     tr_torrent * tor;
     tr_peerMgr * mgr = vmgr;
     managerLock( mgr );
 
     now = tr_time( );
+    now_msec = tr_date( );
     too_old = now - REQUEST_TTL_SECS;
 
     tor = NULL;
@@ -1124,6 +1148,8 @@ refillUpkeep( int foo UNUSED, short bar UNUSED, void * vmgr )
             /* send cancel messages for all the "cancel" ones */
             for( it=cancel, end=it+cancelCount; it!=end; ++it ) {
                 if( ( it->peer != NULL ) && ( it->peer->msgs != NULL ) ) {
+                    tr_historyAdd( it->peer->cancelsSentToPeer, now_msec, 1 );
+                    tr_historyAdd( tor->cancelsSentToPeer, now_msec, 1 );
                     tr_peerMsgsCancel( it->peer->msgs, it->block );
                     decrementPendingReqCount( it );
                 }
@@ -1355,10 +1381,16 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
         case TR_PEER_CLIENT_GOT_BLOCK:
         {
             tr_torrent * tor = t->tor;
+            uint64_t now_msec;
             tr_block_index_t block = _tr_block( tor, e->pieceIndex, e->offset );
 
             requestListRemove( t, block, peer );
             pieceListRemoveRequest( t, block );
+
+            now_msec = tr_date( );
+            tr_historyAdd( tor->blocksSentToClient, now_msec, 1 );
+            if( peer != NULL )
+                tr_historyAdd( peer->blocksSentToClient, now_msec, 1 );
 
             if( tr_cpBlockIsComplete( &tor->completion, block ) )
             {
@@ -2235,6 +2267,12 @@ tr_peerMgrPeerStats( const tr_torrent    * tor,
         stat->isDownloadingFrom   = clientIsDownloadingFrom( tor, peer );
         stat->isUploadingTo       = clientIsUploadingTo( peer );
         stat->isSeed              = ( atom->uploadOnly == UPLOAD_ONLY_YES ) || ( peer->progress >= 1.0 );
+
+        stat->blocksToPeer        = tr_historyGet( peer->blocksSentToPeer,    now, HISTORY_SEC*1000 );
+        stat->blocksToClient      = tr_historyGet( peer->blocksSentToClient,  now, HISTORY_SEC*1000 );
+        stat->cancelsToPeer       = tr_historyGet( peer->cancelsSentToPeer,   now, HISTORY_SEC*1000 );
+        stat->cancelsToClient     = tr_historyGet( peer->cancelsSentToClient, now, HISTORY_SEC*1000 );
+
         stat->pendingReqsToPeer   = peer->pendingReqsToPeer;
         stat->pendingReqsToClient = peer->pendingReqsToClient;
 
@@ -2257,6 +2295,156 @@ tr_peerMgrPeerStats( const tr_torrent    * tor,
 
     managerUnlock( t->manager );
     return ret;
+}
+
+/**
+***
+**/
+
+/* do we still want this piece and does the peer have it? */
+static tr_bool
+isPieceInteresting( const tr_torrent * tor, const tr_peer * peer, tr_piece_index_t index )
+{
+    return ( !tor->info.pieces[index].dnd ) /* we want it */
+        && ( !tr_cpPieceIsComplete( &tor->completion, index ) )  /* we don't have it */
+        && ( tr_bitsetHas( &peer->have, index ) ); /* peer has it */
+}
+
+/* does this peer have any pieces that we want? */
+static tr_bool
+isPeerInteresting( const tr_torrent * tor, const tr_peer * peer )
+{
+    tr_piece_index_t i, n;
+
+    if ( tr_torrentIsSeed( tor ) )
+        return FALSE;
+
+    if( !tr_torrentIsPieceTransferAllowed( tor, TR_PEER_TO_CLIENT ) )
+        return FALSE;
+
+    for( i=0, n=tor->info.pieceCount; i<n; ++i )
+        if( isPieceInteresting( tor, peer, i ) )
+            return TRUE;
+
+    return FALSE;
+}
+
+/* determines who we send "interested" messages to */
+static void
+rechokeDownloads( Torrent * t )
+{
+    int i;
+    const uint64_t now = tr_date( );
+    const int msec = 60 * 1000;
+    const int MIN_INTERESTING_PEERS = 5;
+    const int peerCount = tr_ptrArraySize( &t->peers );
+    int maxPeers;
+
+    int badCount         = 0;
+    int goodCount        = 0;
+    int untestedCount    = 0;
+    tr_peer ** bad       = tr_new( tr_peer*, peerCount );
+    tr_peer ** good      = tr_new( tr_peer*, peerCount );
+    tr_peer ** untested  = tr_new( tr_peer*, peerCount );
+
+    /* decide how many peers to be interested in */
+    {
+        const int blocks = tr_historyGet( t->tor->blocksSentToClient, now, msec );
+        const int cancels = tr_historyGet( t->tor->cancelsSentToPeer, now, msec );
+
+        if( !cancels && !t->interestedCount )
+        {
+            /* this is the torrent's first time to call this function...
+             * start off optimistically by allowing interest in many peers */
+            maxPeers = t->tor->maxConnectedPeers;
+        }
+        else if( !blocks )
+        {
+            /* we've gotten cancels but zero blocks...
+             * something is seriously wrong.  throttle back sharply */
+            maxPeers = t->interestedCount * 0.5;
+        }
+        else
+        {
+            const double c = ( cancels * 30.0 ) / blocks;
+                 if( c > 5   ) maxPeers = t->interestedCount * 0.7;
+            else if( c > 3   ) maxPeers = t->interestedCount * 0.8;
+            else if( c > 1   ) maxPeers = t->interestedCount * 0.9;
+            else if( c > 0.5 ) maxPeers = t->interestedCount;
+            else               maxPeers = t->interestedCount + 1;
+
+            /* if things are getting worse, don't add more peers */
+            if( ( t->downloadCongestion > 0.1 ) && ( c > t->downloadCongestion ) )
+                maxPeers = MIN( maxPeers, t->interestedCount );
+
+            t->downloadCongestion = c;
+/*fprintf( stderr, "OVERALL TORRENT DOWNLOAD CONGESTION: %.3f... num allowed goes from %d to %d\n", c, t->interestedCount, maxPeers );*/
+        }
+    }
+
+    /* don't let the previous paragraph's number tweaking go too far... */
+    maxPeers = MAX( maxPeers, MIN_INTERESTING_PEERS );
+    maxPeers = MIN( maxPeers, t->tor->maxConnectedPeers );
+
+    /* separate the peers into "good" (ones with a low cancel-to-block ratio),
+     * untested peers, and "bad" (ones with a high cancel-to-block ratio).
+     * That's the order in which we'll choose who to show interest in */
+    for( i=0; i<peerCount; ++i )
+    {
+        tr_peer * peer = tr_ptrArrayNth( &t->peers, i );
+
+        if( !isPeerInteresting( t->tor, peer ) )
+        {
+            tr_peerMsgsSetInterested( peer->msgs, FALSE );
+        }
+        else
+        {
+            const int blocks = tr_historyGet( peer->blocksSentToClient, now, msec );
+            const int cancels = tr_historyGet( peer->cancelsSentToPeer, now, msec );
+
+            if( !blocks && !cancels )
+                untested[untestedCount++] = peer;
+            else if( !cancels )
+                good[goodCount++] = peer;
+            else if( !blocks )
+                bad[badCount++] = peer;
+            else if( ( ( cancels * 10.0 ) / blocks ) < 1.0 )
+                good[goodCount++] = peer;
+            else
+                bad[badCount++] = peer;
+        }
+    }
+    
+    t->interestedCount = 0;
+
+    /* We've decided (1) how many peers to be interested in,
+     * and (2) which peers are the best candidates,
+     * Now it's time to update our `interest' flags. */
+    for( i=0; i<goodCount; ++i ) {
+        const tr_bool b = t->interestedCount < maxPeers;
+        tr_peerMsgsSetInterested( good[i]->msgs, b );
+        if( b )
+            ++t->interestedCount;
+    }
+    for( i=0; i<untestedCount; ++i ) {
+        const tr_bool b = t->interestedCount < maxPeers;
+        tr_peerMsgsSetInterested( untested[i]->msgs, b );
+        if( b )
+            ++t->interestedCount;
+    }
+    for( i=0; i<badCount; ++i ) {
+        const tr_bool b = t->interestedCount < maxPeers;
+        tr_peerMsgsSetInterested( bad[i]->msgs, b );
+        if( b )
+            ++t->interestedCount;
+    }
+
+/*fprintf( stderr, "num interested: %d\n", t->interestedCount );*/
+        
+    /* cleanup */
+    tr_free( untested );
+    tr_free( good );
+    tr_free( bad );
 }
 
 /**
@@ -2296,7 +2484,7 @@ isNew( const tr_peer * peer )
 }
 
 static void
-rechokeTorrent( Torrent * t, const uint64_t now )
+rechokeUploads( Torrent * t, const uint64_t now )
 {
     int i, size, unchokedInterested;
     const int peerCount = tr_ptrArraySize( &t->peers );
@@ -2404,7 +2592,9 @@ rechokePulse( int foo UNUSED, short bar UNUSED, void * vmgr )
     now = tr_date( );
     while(( tor = tr_torrentNext( mgr->session, tor ))) {
         if( tor->isRunning ) {
-            rechokeTorrent( tor->torrentPeers, now );
+            rechokeUploads( tor->torrentPeers, now );
+            if( !tr_torrentIsSeed( tor ) )
+                rechokeDownloads( tor->torrentPeers );
         }
     }
 

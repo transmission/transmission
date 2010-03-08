@@ -674,42 +674,6 @@ updateFastSet( tr_peermsgs * msgs UNUSED )
 ***  INTEREST
 **/
 
-static tr_bool
-isPieceInteresting( const tr_peermsgs * msgs,
-                    tr_piece_index_t    piece )
-{
-    const tr_torrent * torrent = msgs->torrent;
-
-    return ( !torrent->info.pieces[piece].dnd )                  /* we want it */
-          && ( !tr_cpPieceIsComplete( &torrent->completion, piece ) ) /* !have */
-          && ( tr_bitsetHas( &msgs->peer->have, piece ) );      /* peer has it */
-}
-
-/* "interested" means we'll ask for piece data if they unchoke us */
-static tr_bool
-isPeerInteresting( const tr_peermsgs * msgs )
-{
-    tr_piece_index_t    i;
-    const tr_torrent *  torrent;
-    const tr_bitfield * bitfield;
-    const int           clientIsSeed = tr_torrentIsSeed( msgs->torrent );
-
-    if( clientIsSeed )
-        return FALSE;
-
-    if( !tr_torrentIsPieceTransferAllowed( msgs->torrent, TR_PEER_TO_CLIENT ) )
-        return FALSE;
-
-    torrent = msgs->torrent;
-    bitfield = tr_cpPieceBitfield( &torrent->completion );
-
-    for( i = 0; i < torrent->info.pieceCount; ++i )
-        if( isPieceInteresting( msgs, i ) )
-            return TRUE;
-
-    return FALSE;
-}
-
 static void
 sendInterest( tr_peermsgs * msgs, tr_bool clientIsInterested )
 {
@@ -728,12 +692,18 @@ sendInterest( tr_peermsgs * msgs, tr_bool clientIsInterested )
 }
 
 static void
-updateInterest( tr_peermsgs * msgs )
+updateInterest( tr_peermsgs * msgs UNUSED )
 {
-    const int i = isPeerInteresting( msgs );
+    /* FIXME -- might need to poke the mgr on startup */
+}
 
-    if( i != msgs->peer->clientIsInterested )
-        sendInterest( msgs, i );
+void
+tr_peerMsgsSetInterested( tr_peermsgs * msgs, int isInterested )
+{
+    assert( tr_isBool( isInterested ) );
+
+    if( isInterested != msgs->peer->clientIsInterested )
+        sendInterest( msgs, isInterested );
 }
 
 static tr_bool
@@ -837,6 +807,7 @@ void
 tr_peerMsgsCancel( tr_peermsgs * msgs, tr_block_index_t block )
 {
     struct peer_request req;
+/*fprintf( stderr, "SENDING CANCEL MESSAGE FOR BLOCK %zu\n\t\tFROM PEER %p ------------------------------------\n", (size_t)block, msgs->peer );*/
     blockToReq( msgs->torrent, block, &req );
     protocolSendCancel( msgs, &req );
 }
@@ -1468,9 +1439,12 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
         {
             int i;
             struct peer_request r;
+            const uint64_t now_msec = tr_date( );
             tr_peerIoReadUint32( msgs->peer->io, inbuf, &r.index );
             tr_peerIoReadUint32( msgs->peer->io, inbuf, &r.offset );
             tr_peerIoReadUint32( msgs->peer->io, inbuf, &r.length );
+            tr_historyAdd( msgs->torrent->blocksSentToClient, now_msec, 1 );
+            tr_historyAdd( msgs->peer->cancelsSentToClient, now_msec, 1 );
             dbgmsg( msgs, "got a Cancel %u:%u->%u", r.index, r.offset, r.length );
 
             for( i=0; i<msgs->peer->pendingReqsToClient; ++i ) {
@@ -1952,12 +1926,15 @@ fillOutputBuffer( tr_peermsgs * msgs, time_t now )
             }
             else
             {
+                const uint64_t now_msec = tr_date( );
                 dbgmsg( msgs, "sending block %u:%u->%u", req.index, req.offset, req.length );
                 EVBUFFER_LENGTH(out) += req.length;
                 assert( EVBUFFER_LENGTH( out ) == msglen );
                 tr_peerIoWriteBuf( io, out, TRUE );
                 bytesWritten += EVBUFFER_LENGTH( out );
                 msgs->clientSentAnythingAt = now;
+                tr_historyAdd( msgs->torrent->blocksSentToClient, now_msec, 1 );
+                tr_historyAdd( msgs->peer->blocksSentToPeer, now_msec, 1 );
             }
 
             evbuffer_free( out );

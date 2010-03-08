@@ -610,6 +610,7 @@ torrentInit( tr_torrent * tor, const tr_ctor * ctor )
     const char * dir;
     static int nextUniqueId = 1;
     tr_session * session = tr_ctorGetSession( ctor );
+    const int sec = TORRENT_DOWNLOAD_CONGESTION_HISTORY_SEC;
 
     assert( session != NULL );
 
@@ -618,6 +619,11 @@ torrentInit( tr_torrent * tor, const tr_ctor * ctor )
     tor->session   = session;
     tor->uniqueId = nextUniqueId++;
     tor->magicNumber = TORRENT_MAGIC_NUMBER;
+
+    tor->blocksSentToClient  = tr_historyNew( sec, 1 );
+    tor->blocksSentToPeer    = tr_historyNew( sec, 1 );
+    tor->cancelsSentToClient = tr_historyNew( sec, 1 );
+    tor->cancelsSentToPeer   = tr_historyNew( sec, 1 );
 
     tr_sha1( tor->obfuscatedHash, "req2", 4,
              tor->info.hash, SHA_DIGEST_LENGTH,
@@ -1290,6 +1296,11 @@ freeTorrent( tr_torrent * tor )
     tr_announcerRemoveTorrent( session->announcer, tor );
 
     tr_bitfieldDestruct( &tor->checkedPieces );
+
+    tr_historyFree( tor->blocksSentToClient  );
+    tr_historyFree( tor->blocksSentToPeer    );
+    tr_historyFree( tor->cancelsSentToClient );
+    tr_historyFree( tor->cancelsSentToPeer   );
 
     tr_free( tor->downloadDir );
     tr_free( tor->incompleteDir );
