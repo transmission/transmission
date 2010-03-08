@@ -1311,7 +1311,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                                 "Removal confirm panel -> title"), torrentName];
                 
                 message = NSLocalizedString(@"This transfer is active."
-                            " Once removed, continuing the transfer will require the torrent file or magnet link.",
+                            " Once removed, continuing the transfer will require the torrent file.",
                             "Removal confirm panel -> message");
             }
             else
@@ -1332,7 +1332,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                     message = [NSString stringWithFormat: NSLocalizedString(@"There are %d transfers (%d active).",
                                 "Removal confirm panel -> message part 1"), selected, active];
                 message = [message stringByAppendingFormat: @" %@",
-                            NSLocalizedString(@"Once removed, continuing the transfers will require the torrent files or magnet links.",
+                            NSLocalizedString(@"Once removed, continuing the transfers will require the torrent files.",
                             "Removal confirm panel -> message part 2")];
             }
             
