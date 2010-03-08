@@ -86,6 +86,8 @@
 		A209EBF91142FEEE002B02D1 /* InfoOptionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A209EBF81142FEEE002B02D1 /* InfoOptionsViewController.m */; };
 		A209EC12114301C6002B02D1 /* InfoOptionsView.xib in Resources */ = {isa = PBXBuildFile; fileRef = A209EC11114301C6002B02D1 /* InfoOptionsView.xib */; };
 		A209ECA2114319C3002B02D1 /* InfoWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A209ECA1114319C3002B02D1 /* InfoWindow.xib */; };
+		A209EE5C1144B51E002B02D1 /* history.c in Sources */ = {isa = PBXBuildFile; fileRef = A209EE5A1144B51E002B02D1 /* history.c */; };
+		A209EE5D1144B51E002B02D1 /* history.h in Headers */ = {isa = PBXBuildFile; fileRef = A209EE5B1144B51E002B02D1 /* history.h */; };
 		A20B6F6B0C4D842B0034AB1D /* PriorityLow.png in Resources */ = {isa = PBXBuildFile; fileRef = A20B6F6A0C4D842B0034AB1D /* PriorityLow.png */; };
 		A20B6F830C4D8A610034AB1D /* PriorityHigh.png in Resources */ = {isa = PBXBuildFile; fileRef = A20B6F820C4D8A610034AB1D /* PriorityHigh.png */; };
 		A20B6F8C0C4D90980034AB1D /* PriorityMixed.png in Resources */ = {isa = PBXBuildFile; fileRef = A20B6F8B0C4D90980034AB1D /* PriorityMixed.png */; };
@@ -513,6 +515,8 @@
 		A209EBF81142FEEE002B02D1 /* InfoOptionsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InfoOptionsViewController.m; path = macosx/InfoOptionsViewController.m; sourceTree = "<group>"; };
 		A209EC13114301C6002B02D1 /* en */ = {isa = PBXFileReference; explicitFileType = file.xib; name = en; path = macosx/en.lproj/InfoOptionsView.xib; sourceTree = "<group>"; };
 		A209ECA1114319C3002B02D1 /* InfoWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = InfoWindow.xib; path = macosx/InfoWindow.xib; sourceTree = "<group>"; };
+		A209EE5A1144B51E002B02D1 /* history.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = history.c; path = libtransmission/history.c; sourceTree = "<group>"; };
+		A209EE5B1144B51E002B02D1 /* history.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = history.h; path = libtransmission/history.h; sourceTree = "<group>"; };
 		A20B6F6A0C4D842B0034AB1D /* PriorityLow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PriorityLow.png; path = macosx/Images/PriorityLow.png; sourceTree = "<group>"; };
 		A20B6F820C4D8A610034AB1D /* PriorityHigh.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PriorityHigh.png; path = macosx/Images/PriorityHigh.png; sourceTree = "<group>"; };
 		A20B6F8B0C4D90980034AB1D /* PriorityMixed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PriorityMixed.png; path = macosx/Images/PriorityMixed.png; sourceTree = "<group>"; };
@@ -1238,6 +1242,8 @@
 				BEFC1E010C07861A00B0BB3C /* ratecontrol.c */,
 				A21FBBA90EDA78C300BC3C51 /* bandwidth.h */,
 				A21FBBAA0EDA78C300BC3C51 /* bandwidth.c */,
+				A209EE5B1144B51E002B02D1 /* history.h */,
+				A209EE5A1144B51E002B02D1 /* history.c */,
 				BEFC1E020C07861A00B0BB3C /* platform.h */,
 				BEFC1E030C07861A00B0BB3C /* platform.c */,
 				BEFC1E0C0C07861A00B0BB3C /* net.h */,
@@ -1538,6 +1544,7 @@
 				A25964A7106D73A800453B31 /* announcer.h in Headers */,
 				4D8017EB10BBC073008A4AF2 /* torrent-magnet.h in Headers */,
 				4D80185A10BBC0B0008A4AF2 /* magnet.h in Headers */,
+				A209EE5D1144B51E002B02D1 /* history.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2005,6 +2012,7 @@
 				A25964A6106D73A800453B31 /* announcer.c in Sources */,
 				4D8017EA10BBC073008A4AF2 /* torrent-magnet.c in Sources */,
 				4D80185910BBC0B0008A4AF2 /* magnet.c in Sources */,
+				A209EE5C1144B51E002B02D1 /* history.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
