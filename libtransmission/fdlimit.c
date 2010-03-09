@@ -115,18 +115,22 @@ static tr_bool
 preallocateFileSparse( int fd, uint64_t length )
 {
     const char zero = '\0';
+    tr_bool success = 0;
 
-    if( length == 0 )
-        return TRUE;
+    if( !length )
+        success = TRUE;
 
-    if( lseek( fd, length-1, SEEK_SET ) == -1 )
-        return FALSE;
-    if( write( fd, &zero, 1 ) == -1 )
-        return FALSE;
-    if( ftruncate( fd, length ) == -1 )
-        return FALSE;
+#ifdef HAVE_FALLOCATE64
+    if( !success ) /* fallocate64 is always preferred, so try it first */
+        success = !fallocate64( fd, 0, 0, length );
+#endif
 
-    return TRUE;
+    if( !success ) /* fallback: the old-style seek-and-write */
+        success = ( lseek( fd, length-1, SEEK_SET ) != -1 )
+               && ( write( fd, &zero, 1 ) != -1 )
+               && ( ftruncate( fd, length ) != -1 );
+
+    return success;
 }
 
 static tr_bool
