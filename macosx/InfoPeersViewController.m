@@ -30,7 +30,7 @@
 
 @interface InfoPeersViewController (Private)
 
-- (void) resetInfo;
+- (void) setupInfo;
 
 - (void) setWebSeedTableHidden: (BOOL) hide animate: (BOOL) animate;
 - (NSArray *) peerSortDescriptors;
@@ -104,11 +104,14 @@
     [fTorrents release];
     fTorrents = [torrents retain];
     
-    [self resetInfo];
+    fSet = NO;
 }
 
 - (void) updateInfo
 {
+    if (!fSet)
+        [self setupInfo];
+    
     if ([fTorrents count] == 0)
         return;
     
@@ -441,7 +444,7 @@
 
 @implementation InfoPeersViewController (Private)
 
-- (void) resetInfo
+- (void) setupInfo
 {
     BOOL hasWebSeeds = NO;
     
@@ -470,6 +473,8 @@
         [fWebSeedTable reloadData];
     }
     [self setWebSeedTableHidden: !hasWebSeeds animate: YES];
+    
+    fSet = YES;
 }
 
 - (void) setWebSeedTableHidden: (BOOL) hide animate: (BOOL) animate

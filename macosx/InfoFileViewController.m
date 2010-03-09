@@ -30,6 +30,8 @@
 
 @interface InfoFileViewController (Private)
 
+- (void) setupInfo;
+
 - (BOOL) canQuickLookFile: (FileListNode *) item;
 
 @end
@@ -62,24 +64,14 @@
     [fTorrents release];
     fTorrents = [torrents retain];
     
-    [fFileFilterField setStringValue: @""];
-    
-    if ([fTorrents count] == 1)
-    {
-        Torrent * torrent = [fTorrents objectAtIndex: 0];
-        
-        [fFileController setTorrent: torrent];
-        [fFileFilterField setEnabled: [torrent isFolder]];
-    }
-    else
-    {
-        [fFileController setTorrent: nil];
-        [fFileFilterField setEnabled: NO];
-    }
+    fSet = NO;
 }
 
 - (void) updateInfo
 {
+    if (!fSet)
+        [self setupInfo];
+    
     if ([fTorrents count] == 1)
         [fFileController reloadData];
 }
@@ -157,6 +149,26 @@
 @end
 
 @implementation InfoFileViewController (Private)
+
+- (void) setupInfo
+{
+    [fFileFilterField setStringValue: @""];
+    
+    if ([fTorrents count] == 1)
+    {
+        Torrent * torrent = [fTorrents objectAtIndex: 0];
+        
+        [fFileController setTorrent: torrent];
+        [fFileFilterField setEnabled: [torrent isFolder]];
+    }
+    else
+    {
+        [fFileController setTorrent: nil];
+        [fFileFilterField setEnabled: NO];
+    }
+    
+    fSet = YES;
+}
 
 - (BOOL) canQuickLookFile: (FileListNode *) item
 {

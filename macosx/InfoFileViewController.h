@@ -30,6 +30,8 @@
 {
     NSArray * fTorrents;
     
+    BOOL fSet;
+    
     IBOutlet FileOutlineController * fFileController;
     
     IBOutlet NSSearchField * fFileFilterField;

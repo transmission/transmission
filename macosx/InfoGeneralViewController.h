@@ -28,6 +28,8 @@
 {
     NSArray * fTorrents;
     
+    BOOL fSet;
+    
     IBOutlet NSTextField * fPiecesField, * fHashField, * fSecureField,
                         * fDataLocationField,
                         * fCreatorField, * fDateCreatedField;

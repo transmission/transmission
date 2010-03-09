@@ -32,6 +32,8 @@
 {
     NSArray * fTorrents;
     
+    BOOL fSet;
+    
     NSMutableArray * fTrackers;
     
     IBOutlet TrackerTableView * fTrackerTable;

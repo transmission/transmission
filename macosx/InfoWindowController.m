@@ -77,13 +77,14 @@ typedef enum
     //window location and size
     NSPanel * window = (NSPanel *)[self window];
     
-    CGFloat windowHeight = [window frame].size.height;
+    const CGFloat windowHeight = NSHeight([window frame]);
     
+    #warning check if this is still needed
     [window setFrameAutosaveName: @"InspectorWindow"];
     [window setFrameUsingName: @"InspectorWindow"];
     
     NSRect windowRect = [window frame];
-    windowRect.origin.y -= windowHeight - windowRect.size.height;
+    windowRect.origin.y -= windowHeight - NSHeight(windowRect);
     windowRect.size.height = windowHeight;
     [window setFrame: windowRect display: NO];
     
@@ -196,6 +197,9 @@ typedef enum
         case TAB_FILE_TAG:
             [fFileViewController updateInfo];
             break;
+        case TAB_OPTIONS_TAG:
+            [fOptionsViewController updateInfo];
+            break;
     }
 }
 
@@ -277,21 +281,30 @@ typedef enum
     {
         case TAB_GENERAL_TAG:
             if (!fGeneralViewController)
+            {
                 fGeneralViewController = [[InfoGeneralViewController alloc] init];
+                [fGeneralViewController setInfoForTorrents: fTorrents];
+            }
             
             identifier = TAB_INFO_IDENT;
             title = NSLocalizedString(@"General Info", "Inspector -> title");
             break;
         case TAB_ACTIVITY_TAG:
             if (!fActivityViewController)
+            {
                 fActivityViewController = [[InfoActivityViewController alloc] init];
+                [fActivityViewController setInfoForTorrents: fTorrents];
+            }
             
             identifier = TAB_ACTIVITY_IDENT;
             title = NSLocalizedString(@"Activity", "Inspector -> title");
             break;
         case TAB_TRACKERS_TAG:
             if (!fTrackersViewController)
+            {
                 fTrackersViewController = [[InfoTrackersViewController alloc] init];
+                [fTrackersViewController setInfoForTorrents: fTorrents];
+            }
             
             identifier = TAB_TRACKER_IDENT;
             title = NSLocalizedString(@"Trackers", "Inspector -> title");
@@ -299,7 +312,10 @@ typedef enum
             break;
         case TAB_PEERS_TAG:
             if (!fPeersViewController)
+            {
                 fPeersViewController = [[InfoPeersViewController alloc] init];
+                [fPeersViewController setInfoForTorrents: fTorrents];
+            }
             
             identifier = TAB_PEERS_IDENT;
             title = NSLocalizedString(@"Peers", "Inspector -> title");
@@ -307,7 +323,10 @@ typedef enum
             break;
         case TAB_FILE_TAG:
             if (!fFileViewController)
+            {
                 fFileViewController = [[InfoFileViewController alloc] init];
+                [fFileViewController setInfoForTorrents: fTorrents];
+            }
             
             identifier = TAB_FILES_IDENT;
             title = NSLocalizedString(@"Files", "Inspector -> title");
@@ -315,7 +334,10 @@ typedef enum
             break;
         case TAB_OPTIONS_TAG:
             if (!fOptionsViewController)
+            {
                 fOptionsViewController = [[InfoOptionsViewController alloc] init];
+                [fOptionsViewController setInfoForTorrents: fTorrents];
+            }
             
             identifier = TAB_OPTIONS_IDENT;
             title = NSLocalizedString(@"Options", "Inspector -> title");
@@ -335,14 +357,6 @@ typedef enum
     [(InfoTabButtonCell *)[fTabMatrix selectedCell] setSelectedTab: YES];
     
     NSView * view = [self tabViewForTag: fCurrentTabTag];
-    
-    //if view was just loaded - has to be a better way
-    [fGeneralViewController setInfoForTorrents: fTorrents];
-    [fActivityViewController setInfoForTorrents: fTorrents];
-    [fTrackersViewController setInfoForTorrents: fTorrents];
-    [fPeersViewController setInfoForTorrents: fTorrents];
-    [fFileViewController setInfoForTorrents: fTorrents];
-    [fOptionsViewController setInfoForTorrents: fTorrents];
     
     [self updateInfoStats];
     

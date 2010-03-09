@@ -31,6 +31,8 @@
 {
     NSArray * fTorrents;
     
+    BOOL fSet;
+    
     IBOutlet NSTextField * fDateAddedField, * fDateCompletedField, * fDateActivityField,
                         * fStateField, * fProgressField,
                         * fHaveField, * fDownloadedTotalField, * fUploadedTotalField, * fFailedHashField,

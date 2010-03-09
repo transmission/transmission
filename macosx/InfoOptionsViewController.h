@@ -28,6 +28,8 @@
 {
     NSArray * fTorrents;
     
+    BOOL fSet;
+    
     IBOutlet NSPopUpButton * fPriorityPopUp, * fRatioPopUp;
     IBOutlet NSButton * fUploadLimitCheck, * fDownloadLimitCheck, * fGlobalLimitCheck;
     IBOutlet NSTextField * fUploadLimitField, * fDownloadLimitField, * fRatioLimitField,
@@ -38,6 +40,7 @@
 }
 
 - (void) setInfoForTorrents: (NSArray *) torrents;
+- (void) updateInfo;
 - (void) updateOptions;
 
 - (void) setUseSpeedLimit: (id) sender;

@@ -28,6 +28,8 @@
 {
     NSArray * fTorrents;
     
+    BOOL fSet;
+    
     NSMutableArray * fPeers, * fWebSeeds;
     
     IBOutlet NSTableView * fPeerTable, * fWebSeedTable;
