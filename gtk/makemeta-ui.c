@@ -403,7 +403,7 @@ make_meta_ui( GtkWindow  * parent, TrCore * core )
 
         str = _( "Sa_ve to:" );
         w = gtk_file_chooser_button_new( NULL, GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER );
-        gtk_file_chooser_set_filename( GTK_FILE_CHOOSER( w ), getDefaultSavePath( ) );
+        gtk_file_chooser_set_current_folder( GTK_FILE_CHOOSER( w ), getDefaultSavePath( ) );
         ui->destination_chooser = w;
         hig_workarea_add_row( t, &row, str, w, NULL );
 

@@ -134,7 +134,7 @@ gtr_relocate_dialog_new( GtkWindow * parent, tr_torrent * tor )
     if( previousLocation == NULL )
         previousLocation = g_strdup( pref_string_get( TR_PREFS_KEY_DOWNLOAD_DIR ) );
     w = gtk_file_chooser_button_new( _( "Set Torrent Location" ), GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER );
-    gtk_file_chooser_set_filename( GTK_FILE_CHOOSER( w ), previousLocation );
+    gtk_file_chooser_set_current_folder( GTK_FILE_CHOOSER( w ), previousLocation );
     g_object_set_data( G_OBJECT( d ), "chooser", w );
     hig_workarea_add_row( t, &row, _( "Torrent _location:" ), w, NULL );
     w = gtk_radio_button_new_with_mnemonic( NULL, _( "_Move from the current folder" ) );

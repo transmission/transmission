@@ -337,8 +337,8 @@ addSingleTorrentDialog( GtkWindow * parent, TrCore * core, tr_ctor * ctor )
     ++col;
     w = gtk_file_chooser_button_new( _( "Select Destination Folder" ),
                                      GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER );
-    if( !gtk_file_chooser_set_filename( GTK_FILE_CHOOSER( w ),
-                                        data->downloadDir ) )
+    if( !gtk_file_chooser_set_current_folder( GTK_FILE_CHOOSER( w ),
+                                              data->downloadDir ) )
         g_warning( "couldn't select '%s'", data->downloadDir );
     list = get_recent_destinations( );
     for( walk = list; walk; walk = walk->next )
