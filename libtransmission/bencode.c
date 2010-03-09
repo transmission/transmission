@@ -1633,6 +1633,7 @@ tr_bencToFile( const tr_benc * top, tr_fmt_mode mode, const char * filename )
 
         if( write( fd, str, len ) == (ssize_t)len )
         {
+            fsync( fd );
             close( fd );
 
             if( !unlink( filename ) || ( errno == ENOENT ) )
