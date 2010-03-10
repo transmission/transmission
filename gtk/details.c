@@ -1819,6 +1819,27 @@ trackerVisibleFunc( GtkTreeModel * model, GtkTreeIter * iter, gpointer data )
      return !isBackup;
 }
 
+static void
+populate_tracker_buffer( GtkTextBuffer * buffer, const tr_torrent * tor )
+{
+    int i;
+    int tier = 0;
+    GString * gstr = g_string_new( NULL );
+    const tr_info * inf = tr_torrentInfo( tor );
+    for( i=0; i<inf->trackerCount; ++i ) {
+        const tr_tracker_info * t = &inf->trackers[i];
+        if( tier != t->tier ) {
+            tier = t->tier;
+            g_string_append_c( gstr, '\n' );
+        }
+        g_string_append_printf( gstr, "%s\n", t->announce );
+    }
+    if( gstr->len > 0 )
+        g_string_truncate( gstr, gstr->len-1 );
+    gtk_text_buffer_set_text( buffer, gstr->str, -1 );
+    g_string_free( gstr, TRUE );
+}
+
 #define TORRENT_PTR_KEY "torrent-pointer"
 
 static void
@@ -1866,22 +1887,8 @@ refreshTracker( struct DetailsImpl * di, tr_torrent ** torrents, int n )
 
     if( ( di->tracker_buffer == NULL ) && ( n == 1 ) )
     {
-        int tier = 0;
-        GString * gstr = g_string_new( NULL );
-        const tr_info * inf = tr_torrentInfo( torrents[0] );
-        for( i=0; i<inf->trackerCount; ++i ) {
-            const tr_tracker_info * t = &inf->trackers[i];
-            if( tier != t->tier ) {
-                tier = t->tier;
-                g_string_append_c( gstr, '\n' );
-            }
-            g_string_append_printf( gstr, "%s\n", t->announce );
-        }
-        if( gstr->len > 0 )
-            g_string_truncate( gstr, gstr->len-1 );
         di->tracker_buffer = gtk_text_buffer_new( NULL );
-        gtk_text_buffer_set_text( di->tracker_buffer, gstr->str, -1 );
-        g_string_free( gstr, TRUE );
+        populate_tracker_buffer( di->tracker_buffer, torrents[0] );
     }
 
     /* add any missing rows (FIXME: doesn't handle edited trackers) */
@@ -2016,6 +2023,12 @@ onEditTrackersResponse( GtkDialog * dialog, int response, gpointer data )
         g_free( trackers );
         g_strfreev( tracker_strings );
         g_free( tracker_text );
+    }
+
+    if( response == GTK_RESPONSE_CANCEL )
+    {
+        tr_torrent * tor = g_object_get_data( G_OBJECT( dialog ), TORRENT_PTR_KEY );
+        populate_tracker_buffer( di->tracker_buffer, tor );
     }
 
     if( do_destroy )
