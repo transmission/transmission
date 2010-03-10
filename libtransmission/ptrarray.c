@@ -73,18 +73,18 @@ tr_ptrArrayInsert( tr_ptrArray * t,
                    void        * ptr,
                    int           pos )
 {
-    if( pos < 0 || pos > t->n_items )
-        pos = t->n_items;
-
     if( t->n_items >= t->n_alloc )
     {
         t->n_alloc = MAX( FLOOR, t->n_alloc * 2 );
         t->items = tr_renew( void*, t->items, t->n_alloc );
     }
 
-    memmove( t->items + pos + 1,
-             t->items + pos,
-             sizeof( void* ) * ( t->n_items - pos ) );
+    if( pos < 0 || pos > t->n_items )
+        pos = t->n_items;
+    else
+        memmove( t->items + pos + 1,
+                 t->items + pos,
+                 sizeof( void* ) * ( t->n_items - pos ) );
 
     t->items[pos] = ptr;
     t->n_items++;
