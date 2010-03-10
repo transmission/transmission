@@ -18,7 +18,6 @@
 #define TR_TORRENT_H 1
 
 #include "completion.h" /* tr_completion */
-#include "history.h" /* tr_recentHistory */
 #include "session.h" /* tr_sessionLock(), tr_sessionUnlock() */
 #include "utils.h" /* TR_GNUC_PRINTF */
 
@@ -175,12 +174,6 @@ struct tr_torrent
     /* Where the files are now.
      * This pointer will be equal to downloadDir or incompleteDir */
     const char * currentDir;
-
-    tr_recentHistory       * blocksSentToClient;
-    tr_recentHistory       * blocksSentToPeer;
-
-    tr_recentHistory       * cancelsSentToClient;
-    tr_recentHistory       * cancelsSentToPeer;
 
     /* How many bytes we ask for per request */
     uint32_t                   blockSize;
@@ -350,8 +343,6 @@ static inline tr_bool tr_torrentIsPieceChecked( const tr_torrent  * tor,
 
 enum
 {
-    TORRENT_DOWNLOAD_CONGESTION_HISTORY_SEC = 120,
-
     TORRENT_MAGIC_NUMBER = 95549
 };
 

@@ -85,7 +85,7 @@ enum
     /** how long we'll let requests we've made linger before we cancel them */
     REQUEST_TTL_SECS = 60,
 
-    HISTORY_SEC = TORRENT_DOWNLOAD_CONGESTION_HISTORY_SEC
+    CANCEL_HISTORY_SEC = 120
 };
 
 
@@ -346,10 +346,10 @@ peerConstructor( struct peer_atom * atom )
     peer->atom = atom;
     atom->peer = peer;
 
-    peer->blocksSentToClient  = tr_historyNew( HISTORY_SEC, 1 );
-    peer->blocksSentToPeer    = tr_historyNew( HISTORY_SEC, 1 );
-    peer->cancelsSentToClient = tr_historyNew( HISTORY_SEC, 1 );
-    peer->cancelsSentToPeer   = tr_historyNew( HISTORY_SEC, 1 );
+    peer->blocksSentToClient  = tr_historyNew( CANCEL_HISTORY_SEC, 1 );
+    peer->blocksSentToPeer    = tr_historyNew( CANCEL_HISTORY_SEC, 1 );
+    peer->cancelsSentToClient = tr_historyNew( CANCEL_HISTORY_SEC, 1 );
+    peer->cancelsSentToPeer   = tr_historyNew( CANCEL_HISTORY_SEC, 1 );
 
     return peer;
 }
@@ -1149,7 +1149,6 @@ refillUpkeep( int foo UNUSED, short bar UNUSED, void * vmgr )
             for( it=cancel, end=it+cancelCount; it!=end; ++it ) {
                 if( ( it->peer != NULL ) && ( it->peer->msgs != NULL ) ) {
                     tr_historyAdd( it->peer->cancelsSentToPeer, now_msec, 1 );
-                    tr_historyAdd( tor->cancelsSentToPeer, now_msec, 1 );
                     tr_peerMsgsCancel( it->peer->msgs, it->block );
                     decrementPendingReqCount( it );
                 }
@@ -1381,16 +1380,13 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
         case TR_PEER_CLIENT_GOT_BLOCK:
         {
             tr_torrent * tor = t->tor;
-            uint64_t now_msec;
             tr_block_index_t block = _tr_block( tor, e->pieceIndex, e->offset );
 
             requestListRemove( t, block, peer );
             pieceListRemoveRequest( t, block );
 
-            now_msec = tr_date( );
-            tr_historyAdd( tor->blocksSentToClient, now_msec, 1 );
             if( peer != NULL )
-                tr_historyAdd( peer->blocksSentToClient, now_msec, 1 );
+                tr_historyAdd( peer->blocksSentToClient, tr_date( ), 1 );
 
             if( tr_cpBlockIsComplete( &tor->completion, block ) )
             {
@@ -2268,10 +2264,10 @@ tr_peerMgrPeerStats( const tr_torrent    * tor,
         stat->isUploadingTo       = clientIsUploadingTo( peer );
         stat->isSeed              = ( atom->uploadOnly == UPLOAD_ONLY_YES ) || ( peer->progress >= 1.0 );
 
-        stat->blocksToPeer        = tr_historyGet( peer->blocksSentToPeer,    now, HISTORY_SEC*1000 );
-        stat->blocksToClient      = tr_historyGet( peer->blocksSentToClient,  now, HISTORY_SEC*1000 );
-        stat->cancelsToPeer       = tr_historyGet( peer->cancelsSentToPeer,   now, HISTORY_SEC*1000 );
-        stat->cancelsToClient     = tr_historyGet( peer->cancelsSentToClient, now, HISTORY_SEC*1000 );
+        stat->blocksToPeer        = tr_historyGet( peer->blocksSentToPeer,    now, CANCEL_HISTORY_SEC*1000 );
+        stat->blocksToClient      = tr_historyGet( peer->blocksSentToClient,  now, CANCEL_HISTORY_SEC*1000 );
+        stat->cancelsToPeer       = tr_historyGet( peer->cancelsSentToPeer,   now, CANCEL_HISTORY_SEC*1000 );
+        stat->cancelsToClient     = tr_historyGet( peer->cancelsSentToClient, now, CANCEL_HISTORY_SEC*1000 );
 
         stat->pendingReqsToPeer   = peer->pendingReqsToPeer;
         stat->pendingReqsToClient = peer->pendingReqsToClient;

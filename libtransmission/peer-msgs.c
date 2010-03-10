@@ -1439,12 +1439,10 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
         {
             int i;
             struct peer_request r;
-            const uint64_t now_msec = tr_date( );
             tr_peerIoReadUint32( msgs->peer->io, inbuf, &r.index );
             tr_peerIoReadUint32( msgs->peer->io, inbuf, &r.offset );
             tr_peerIoReadUint32( msgs->peer->io, inbuf, &r.length );
-            tr_historyAdd( msgs->torrent->blocksSentToClient, now_msec, 1 );
-            tr_historyAdd( msgs->peer->cancelsSentToClient, now_msec, 1 );
+            tr_historyAdd( msgs->peer->cancelsSentToClient, tr_date( ), 1 );
             dbgmsg( msgs, "got a Cancel %u:%u->%u", r.index, r.offset, r.length );
 
             for( i=0; i<msgs->peer->pendingReqsToClient; ++i ) {
@@ -1926,15 +1924,13 @@ fillOutputBuffer( tr_peermsgs * msgs, time_t now )
             }
             else
             {
-                const uint64_t now_msec = tr_date( );
                 dbgmsg( msgs, "sending block %u:%u->%u", req.index, req.offset, req.length );
                 EVBUFFER_LENGTH(out) += req.length;
                 assert( EVBUFFER_LENGTH( out ) == msglen );
                 tr_peerIoWriteBuf( io, out, TRUE );
                 bytesWritten += EVBUFFER_LENGTH( out );
                 msgs->clientSentAnythingAt = now;
-                tr_historyAdd( msgs->torrent->blocksSentToClient, now_msec, 1 );
-                tr_historyAdd( msgs->peer->blocksSentToPeer, now_msec, 1 );
+                tr_historyAdd( msgs->peer->blocksSentToPeer, tr_date( ), 1 );
             }
 
             evbuffer_free( out );
