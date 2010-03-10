@@ -2349,10 +2349,37 @@ rechokeDownloads( Torrent * t )
 
     /* decide how many peers to be interested in */
     {
-        const int blocks = tr_historyGet( t->tor->blocksSentToClient, now, msec );
-        const int cancels = tr_historyGet( t->tor->cancelsSentToPeer, now, msec );
+        int blocks = 0;
+        int cancels = 0;
 
-        if( !cancels && !t->interestedCount )
+        /* Count up how many blocks & cancels each peer has.
+         *
+         * There are two situations where we send out cancels --
+         *
+         * 1. We've got unresponsive peers, which is handled by deciding
+         *    -which- peers to be interested in.
+         *
+         * 2. We've hit our bandwidth cap, which is handled by deciding
+         *    -how many- peers to be interested in.
+         *
+         * We're working on 2. here, so we need to ignore unresponsive
+         * peers in our calculations lest they confuse Transmission into
+         * think it's hit its bandwidth cap.
+         */
+        for( i=0; i<peerCount; ++i )
+        {
+            const tr_peer * peer = tr_ptrArrayNth( &t->peers, i );
+            const int b = tr_historyGet( peer->blocksSentToClient, now, msec );
+            const int c = tr_historyGet( peer->cancelsSentToPeer, now, msec );
+
+            if( b == 0 ) /* ignore unresponsive peers, as described above */
+                continue;
+
+            blocks += b;
+            cancels += c;
+        }
+
+        if( !t->interestedCount )
         {
             /* this is the torrent's first time to call this function...
              * start off optimistically by allowing interest in many peers */
