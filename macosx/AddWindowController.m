@@ -73,6 +73,8 @@
         fDeleteEnable = canToggleDelete;
         
         fGroupValue = [torrent groupValue];
+        
+        [fVerifyIndicator setUsesThreadedAnimation: YES];
     }
     return self;
 }
@@ -268,11 +270,20 @@
     
     if ([fTorrent isChecking])
     {
+        const BOOL waiting = [fTorrent isCheckingWaiting];
+        [fVerifyIndicator setIndeterminate: waiting];
+        if (!waiting)
+            [fVerifyIndicator setDoubleValue: [fTorrent checkingProgress]];
+        else
+            [fVerifyIndicator startAnimation: self];
+        
         [fVerifyIndicator setHidden: NO];
-        [fVerifyIndicator setDoubleValue: [fTorrent checkingProgress]];
     }
     else
+    {
+        [fVerifyIndicator stopAnimation: self];
         [fVerifyIndicator setHidden: YES];
+    }
 }
 
 - (void) confirmAdd
