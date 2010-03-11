@@ -316,6 +316,59 @@
 				</form>
 			</div>
 		</div>
+
+		<div class="dialog_container" id="stats_container" style="display:none;">
+			<div class="dialog_top_bar"></div>
+			<div class="dialog_window">
+				<h2 class="dialog_heading">Statistics</h2>
+				<div id="stats_error"></div>
+				<div id="stats_info_container" class="stats_info_container">
+					<div class="stats_group">
+						<label class="category">Current Session:</label>
+						<div class="stats_row">
+							<div class="item">Uploaded:</div>
+							<div id="stats_session_uploaded"></div>
+						</div>
+						<div class="stats_row">
+							<div class="item">Downloaded:</div>
+							<div id="stats_session_downloaded"></div>
+						</div>
+						<div class="stats_row">
+							<div class="item">Ratio:</div>
+							<div id="stats_session_ratio"></div>
+						</div>
+						<div class="stats_row">
+							<div class="item">Duration:</div>
+							<div id="stats_session_duration"></div>
+						</div>
+					</div>
+					<div class="stats_group">
+						<label class="category">Total:</label>
+						<div class="stats_row">
+							<div class="item2">Started </div>
+							<div id="stats_total_count"></div>
+						</div>
+						<div class="stats_row">
+							<div class="item">Uploaded:</div>
+							<div id="stats_total_uploaded"></div>
+						</div>
+						<div class="stats_row">
+							<div class="item">Downloaded:</div>
+							<div id="stats_total_downloaded"></div>
+						</div>
+						<div class="stats_row">
+							<div class="item">Ratio:</div>
+							<div id="stats_total_ratio"></div>
+						</div>
+						<div class="stats_row">
+							<div class="item">Duration:</div>
+							<div id="stats_total_duration"></div>
+						</div>
+					</div>
+				</div>
+				<a href="#close" id="stats_close_button">Close</a>
+			</div>
+		</div>
 		
 		<div class="dialog_container" id="upload_container" style="display:none;">
 			<div class="dialog_top_bar"></div>
@@ -343,6 +396,7 @@
 				<li id="button">&nbsp;
 					<ul id="footer_super_menu">
 						<li id="preferences">Preferences</li>
+						<li id="statistics">Statistics</li>
 						<li class="separator"></li>
 						<li>Total Download Rate
 							<ul id="footer_download_rate_menu">
