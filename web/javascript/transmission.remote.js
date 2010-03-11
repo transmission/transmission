@@ -108,6 +108,12 @@ TransmissionRemote.prototype =
 		this.sendRequest( o, callback, async );
 	},
 
+	loadDaemonStats: function( callback, async ) {
+		var tr = this._controller;
+		var o = { method: 'session-stats' };
+		this.sendRequest( o, callback, async );
+	},
+
 	getInitialDataFor: function(torrent_ids, callback) {
 		var o = {
 			method: 'torrent-get',

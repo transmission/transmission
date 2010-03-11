@@ -46,6 +46,7 @@ Transmission.prototype =
 		$('#filter_paused_link').parent().bind('click', function(e){ tr.showPausedClicked(e); });
 		$('#prefs_save_button').bind('click', function(e) { tr.savePrefsClicked(e); return false;});
 		$('#prefs_cancel_button').bind('click', function(e){ tr.cancelPrefsClicked(e); return false; });
+		$('#stats_close_button').bind('click', function(e){ tr.closeStatsClicked(e); return false; });
 		$('.inspector_tab').bind('click', function(e){ tr.inspectorTabClicked(e, this); });
 		$('.file_wanted_control').live('click', function(e){ tr.fileWantedClicked(e, this); });
 		$('.file_priority_control').live('click', function(e){ tr.filePriorityClicked(e, this); });
@@ -120,6 +121,7 @@ Transmission.prototype =
 		var tr = this;
 		var async = false;
 		this.loadDaemonPrefs( async );
+		this.loadDaemonStats( async );
 		this.initializeAllTorrents();
 
 		this.togglePeriodicRefresh( true );
@@ -132,6 +134,14 @@ Transmission.prototype =
 			var o = data.arguments;
 			Prefs.getClutchPrefs( o );
 			tr.updatePrefs( o );
+		}, async );
+	},
+
+	loadDaemonStats: function( async ){
+		var tr = this;
+		this.remote.loadDaemonStats( function(data){
+			var o = data.arguments;
+			tr.updateStats( o );
 		}, async );
 	},
 
@@ -649,6 +659,10 @@ Transmission.prototype =
 		tr.hidePrefsDialog( );
 	},
 
+	closeStatsClicked: function(event) {
+		this.hideStatsDialog( );
+	},
+
 	removeClicked: function( event ) {	
 		var tr = this;
 		if( tr.isButtonEnabled( event ) ) {
@@ -817,6 +831,25 @@ Transmission.prototype =
 		}
 	},
 
+	/*
+	 * Turn the periodic ajax stats refresh on & off
+	 */
+	togglePeriodicStatsRefresh: function(state) {
+		var tr = this;
+		if (state && this._periodic_stats_refresh == null) {
+			// sanity check
+			if( !this[Prefs._SessionRefreshRate] )
+			     this[Prefs._SessionRefreshRate] = 5;
+			remote = this.remote;
+			this._periodic_stats_refresh = setInterval(
+				function(){ tr.loadDaemonStats(); }, this[Prefs._SessionRefreshRate] * 1000
+			);
+		} else {
+			clearInterval(this._periodic_stats_refresh);
+			this._periodic_stats_refresh = null;
+		}
+	},
+
 	toggleTurtleClicked: function() {
 		// Toggle the value
 		this[Prefs._TurtleState] = !this[Prefs._TurtleState];
@@ -922,6 +955,54 @@ Transmission.prototype =
 		this.updateTurtleButton();
 	},
 
+	showStatsDialog: function( ) {
+		this.loadDaemonStats();
+		$('body').addClass('stats_showing');
+		$('#stats_container').show();
+		this.hideiPhoneAddressbar();
+		if( Safari3 )
+			setTimeout("$('div#stats_container div.dialog_window').css('top', '0px');",10);
+		this.updateButtonStates( );
+		this.togglePeriodicStatsRefresh(true);
+	},
+
+	hideStatsDialog: function( ){
+		$('body.stats_showing').removeClass('stats_showing');
+		if (iPhone) {
+			this.hideiPhoneAddressbar();
+			$('#stats_container').hide();
+		} else if (Safari3) {
+			$('div#stats_container div.dialog_window').css('top', '-425px');
+			setTimeout("$('#stats_container').hide();",500);
+		} else {
+			$('#stats_container').hide();
+		}
+		this.updateButtonStates( );
+		this.togglePeriodicStatsRefresh(false);
+	},
+
+	/*
+	 * Process got some new session stats from the server
+	 */
+	updateStats: function( stats )
+	{
+		// can't think of a reason to remember this
+		//this._stats = stats;
+
+		var session = stats["current-stats"];
+		var total = stats["cumulative-stats"];
+
+		setInnerHTML( $('#stats_session_uploaded')[0], Math.formatBytes(session["uploadedBytes"]) );
+		setInnerHTML( $('#stats_session_downloaded')[0], Math.formatBytes(session["downloadedBytes"]) );
+		setInnerHTML( $('#stats_session_ratio')[0], Math.ratio(session["uploadedBytes"],session["downloadedBytes"]));
+		setInnerHTML( $('#stats_session_duration')[0], Math.formatSeconds(session["secondsActive"]) );
+		setInnerHTML( $('#stats_total_count')[0], total["sessionCount"] + " times" );
+		setInnerHTML( $('#stats_total_uploaded')[0], Math.formatBytes(total["uploadedBytes"]) );
+		setInnerHTML( $('#stats_total_downloaded')[0], Math.formatBytes(total["downloadedBytes"]) );
+		setInnerHTML( $('#stats_total_ratio')[0], Math.ratio(total["uploadedBytes"],total["downloadedBytes"]));
+		setInnerHTML( $('#stats_total_duration')[0], Math.formatSeconds(total["secondsActive"]) );
+	},
+
 	setSearch: function( search ) {
 		this._current_search = search ? search.trim() : null;
 		this.refilter( );
@@ -953,6 +1034,11 @@ Transmission.prototype =
 					$('div#prefs_container div#pref_error').hide();
 					$('div#prefs_container h2.dialog_heading').show();
 					tr.showPrefsDialog( );
+				}
+				else if ($element[0].id == 'statistics') {
+					$('div#stats_container div#stats_error').hide();
+					$('div#stats_container h2.dialog_heading').show();
+					tr.showStatsDialog( );
 				}
 				break;
 			
