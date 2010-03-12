@@ -5,6 +5,7 @@
   * Fix potential buffer overflow when adding maliciously-crafted magnet links
   * Fix announces to IPv6 trackers
   * Fix DNS problems on some platforms, including Debian
+  * Fix issues with the incomplete directory functionality
   * Fix port forwarding error on some routers by updating libnatpmp and miniupnp
 ==== Mac ====
   * Fix bug where setting low priority in the add window resulted in high priority
