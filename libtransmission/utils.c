@@ -52,6 +52,8 @@
 #include "version.h"
 
 
+time_t transmission_now = 0;
+
 int                   messageLevel = TR_MSG_INF;
 static tr_lock *      messageLock = NULL;
 static tr_bool        messageQueuing = FALSE;
@@ -64,18 +66,6 @@ static int            messageQueueCount = 0;
     static inline int IsDebuggerPresent( void ) { return FALSE; }
     static inline void OutputDebugString( const void * unused UNUSED ) { }
 #endif
-
-/***
-****
-***/
-
-time_t transmission_now = 0;
-
-void
-tr_timeUpdate( time_t now )
-{
-    transmission_now = now;
-}
 
 /***
 ****
