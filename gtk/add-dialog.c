@@ -155,6 +155,7 @@ updateTorrent( struct AddData * o )
         tr_torrent * tor = tr_torrent_handle( o->gtor );
         tr_torrentSetDownloadDir( tor, o->downloadDir );
         file_list_set_torrent( o->list, tr_torrentId( tor ) );
+        tr_torrentVerify( tor );
     }
 }
 
@@ -166,12 +167,10 @@ updateTorrent( struct AddData * o )
  * metadata when that happens.
  */
 static void
-sourceChanged( GtkFileChooserButton * b,
-               gpointer               gdata )
+sourceChanged( GtkFileChooserButton * b, gpointer gdata )
 {
     struct AddData * data = gdata;
-    char *           filename = gtk_file_chooser_get_filename(
-         GTK_FILE_CHOOSER( b ) );
+    char * filename = gtk_file_chooser_get_filename( GTK_FILE_CHOOSER( b ) );
 
     /* maybe instantiate a torrent */
     if( data->filename || !data->gtor )
@@ -210,29 +209,16 @@ sourceChanged( GtkFileChooserButton * b,
 }
 
 static void
-verifyRequested( GtkButton * button UNUSED, gpointer gdata )
+downloadDirChanged( GtkFileChooserButton * b, gpointer gdata )
 {
     struct AddData * data = gdata;
-
-    if( data->gtor )
-        tr_torrentVerify( tr_torrent_handle( data->gtor ) );
-}
-
-static void
-downloadDirChanged( GtkFileChooserButton * b,
-                    gpointer               gdata )
-{
-    char *           fname = gtk_file_chooser_get_filename(
-         GTK_FILE_CHOOSER( b ) );
-    struct AddData * data = gdata;
+    char * fname = gtk_file_chooser_get_filename( GTK_FILE_CHOOSER( b ) );
 
     if( fname && ( !data->downloadDir || strcmp( fname, data->downloadDir ) ) )
     {
         g_free( data->downloadDir );
         data->downloadDir = g_strdup( fname );
-
         updateTorrent( data );
-        verifyRequested( NULL, data );
     }
 
     g_free( fname );
