@@ -1,20 +1,21 @@
-=== Transmission 1.92 (2010/03/xx) ===
+=== Transmission 1.92 (2010/03/11) ===
+[http://trac.transmissionbt.com/query?milestone=1.92&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== All Platforms ====
-  * Fix data corruption issue caused by data sent by bad peers during endgame
+  * Fix possible data corruption issue caused by data sent by bad peers during endgame
   * Fix potential buffer overflow when adding maliciously-crafted magnet links
   * Fix announces to IPv6 trackers
   * Fix DNS problems on some platforms, including Debian
   * Fix port forwarding error on some routers by updating libnatpmp and miniupnp
 ==== Mac ====
-  * WRITEME(livings)
+  * Fix bug where setting low priority in the add window resulted in high priority
 ==== GTK+ ====
   * Fix directory selection error in GTK+ 2.19
   * Small GUI improvements: HIG correctness, remove deprecated GTK+ calls, etc.
 ==== Daemon ====
-  * Fix 1.91 build error on OS X and FreeBSD
+  * Fix 1.91 build error on Mac and FreeBSD
   * Standardize the daemon's watchdir feature to behave like the other clients'
 ==== Web Client ====
-  * Add "Statistics" dialog similar to the Mac, GTK+, and Qt clients'
+  * Statistics dialog
   * Fix error in "trash data & remove from list" that didn't trash all data
   * Fix display of ratios and time
   * Update to jQuery 1.4.2
