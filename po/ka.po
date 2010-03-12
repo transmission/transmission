@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-02-10 20:02-0600\n"
-"PO-Revision-Date: 2009-11-18 01:11+0000\n"
-"Last-Translator: Vladimer Sichinava <vsichi@gnome.org>\n"
+"PO-Revision-Date: 2010-02-23 20:48+0000\n"
+"Last-Translator: al_x <momtsere@yahoo.com>\n"
 "Language-Team: Georgian <ka@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2010-02-22 01:52+0000\n"
+"X-Launchpad-Export-Date: 2010-03-12 01:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:54
@@ -857,8 +857,7 @@ msgstr "_დახურვა"
 #: ../gtk/main.c:1057
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "ვერ ვამატებ გაუმართავ ტორენტს"
 
 #: ../gtk/main.c:1064
 msgid "Couldn't add duplicate torrent"

@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-02-10 20:02-0600\n"
-"PO-Revision-Date: 2009-12-20 17:09+0000\n"
+"PO-Revision-Date: 2010-02-24 19:43+0000\n"
 "Last-Translator: Adrian Guniš <andygun696@gmail.com>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2010-02-22 01:52+0000\n"
+"X-Launchpad-Export-Date: 2010-03-12 01:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:54
@@ -56,7 +56,7 @@ msgstr "Řadit dle v_elikosti"
 
 #: ../gtk/actions.c:79
 msgid "_Show Transmission"
-msgstr ""
+msgstr "_Zobrazit Transmission"
 
 #: ../gtk/actions.c:80
 msgid "Message _Log"
@@ -64,7 +64,7 @@ msgstr "Protoko_l zpráv"
 
 #: ../gtk/actions.c:95
 msgid "Enable Temporary Speed _Limits"
-msgstr ""
+msgstr "Povolit dočasné _omezení rychlosti"
 
 #: ../gtk/actions.c:96
 msgid "_Minimal View"
@@ -269,7 +269,7 @@ msgstr "Přidat torrent"
 
 #: ../gtk/add-dialog.c:458 ../gtk/tr-prefs.c:288
 msgid "Show _options dialog"
-msgstr ""
+msgstr "Zobrazit _okno s možnostmi"
 
 #: ../gtk/add-dialog.c:514
 msgid "Add URL"
@@ -429,7 +429,7 @@ msgstr "%1$s (%2$.1f%%)"
 #: ../gtk/details.c:778
 #, c-format
 msgid "%1$.1f%%"
-msgstr ""
+msgstr "%1$.1f%%"
 
 #: ../gtk/details.c:796
 #, c-format
@@ -459,7 +459,7 @@ msgstr "Získáno:"
 
 #: ../gtk/details.c:904
 msgid "Availability:"
-msgstr ""
+msgstr "Dostupnost:"
 
 #: ../gtk/details.c:908 ../gtk/stats.c:168 ../gtk/stats.c:180
 msgid "Downloaded:"
@@ -623,7 +623,7 @@ msgstr "Nenaplánovány žádné aktualizace"
 #: ../gtk/details.c:1723
 #, c-format
 msgid "Asking for more peers in %s"
-msgstr ""
+msgstr "Požadování více protějšků za %s"
 
 #: ../gtk/details.c:1727
 msgid "Queued to ask for more peers"
@@ -632,7 +632,7 @@ msgstr "Žádost o více protějšků zařazena do fronty"
 #: ../gtk/details.c:1732
 #, c-format
 msgid "Asking for more peers now... <small>%s</small>"
-msgstr ""
+msgstr "Žádá se o více protějšků... <small>%s</small>"
 
 #: ../gtk/details.c:1742
 #, c-format
@@ -668,7 +668,7 @@ msgstr "Upravit trackery"
 
 #: ../gtk/details.c:2023
 msgid "Tracker Announce URLs"
-msgstr ""
+msgstr "Oznamovací URL trackeru"
 
 #: ../gtk/details.c:2026 ../gtk/makemeta-ui.c:453
 msgid ""
@@ -684,7 +684,7 @@ msgstr "Trackery"
 
 #: ../gtk/details.c:2093
 msgid "_Edit Trackers"
-msgstr ""
+msgstr "_Upravit trackery"
 
 #: ../gtk/details.c:2101
 msgid "Show _backup trackers"
@@ -907,6 +907,7 @@ msgstr ""
 "  Jakub Žáček https://launchpad.net/~dawon\n"
 "  Kamil Páral https://launchpad.net/~kamil.paral\n"
 "  Kuvaly [LCT] https://launchpad.net/~kuvaly\n"
+"  Roman Horník https://launchpad.net/~roman.hornik\n"
 "  schunka https://launchpad.net/~schunka\n"
 "  syntax https://launchpad.net/~syntax"
 
@@ -1102,17 +1103,19 @@ msgstr[2] "Spuštěno %'d x"
 
 #: ../gtk/stats.c:107
 msgid "Reset your statistics?"
-msgstr ""
+msgstr "Vynulovat vaše statistiky?"
 
 #: ../gtk/stats.c:108
 msgid ""
 "These statistics are for your information only.  Resetting them doesn't "
 "affect the statistics logged by your BitTorrent trackers."
 msgstr ""
+"Tyto statistiky jsou pouze pro vaši informaci. Jejich vynulování neovlivní "
+"statistiky zaznamenané vašimi BitTorrent trackery."
 
 #: ../gtk/stats.c:119 ../gtk/stats.c:151
 msgid "_Reset"
-msgstr ""
+msgstr "_Vynulovat"
 
 #: ../gtk/stats.c:147 ../gtk/tr-window.c:999
 msgid "Statistics"
@@ -1748,7 +1751,7 @@ msgstr "_Pozastaveno"
 
 #: ../gtk/tr-window.c:1066
 msgid "999.9 KB/s"
-msgstr ""
+msgstr "999.9 KB/s"
 
 #: ../gtk/tr-window.c:1111
 #, c-format
@@ -1893,7 +1896,7 @@ msgstr "Neplatná metadata"
 #: ../libtransmission/bencode.c:1644
 #, c-format
 msgid "Saved \"%s\""
-msgstr ""
+msgstr "Uloženo \"%s\""
 
 #: ../libtransmission/bencode.c:1649 ../libtransmission/bencode.c:1656
 #: ../libtransmission/blocklist.c:294
@@ -1904,7 +1907,7 @@ msgstr "Nelze uložit soubor \"%1$s\": %2$s"
 #: ../libtransmission/bencode.c:1663 ../libtransmission/bencode.c:1673
 #, c-format
 msgid "Couldn't save temporary file \"%1$s\": %2$s"
-msgstr ""
+msgstr "Nelze uložit dočasný soubor \"%1$s\": %2$s"
 
 #: ../libtransmission/blocklist.c:78 ../libtransmission/blocklist.c:238
 #: ../libtransmission/utils.c:488
@@ -1978,7 +1981,7 @@ msgstr "Nelze spojit soket %d s %s, port %d (errno %d - %s)"
 
 #: ../libtransmission/net.c:360
 msgid "Is another copy of Transmission already running?"
-msgstr ""
+msgstr "Je spuštěna ještě další kopie Transmission?"
 
 #: ../libtransmission/net.c:365
 #, c-format
@@ -1988,7 +1991,7 @@ msgstr "Nelze získat port %d na %s: %s"
 #: ../libtransmission/net.c:367
 #, c-format
 msgid "Couldn't bind port %d on %s: %s (%s)"
-msgstr ""
+msgstr "Nelze získat port %d na %s: %s (%s)"
 
 #: ../libtransmission/port-forwarding.c:31
 msgid "Port Forwarding"
@@ -2042,6 +2045,8 @@ msgid ""
 "No data found!  Reconnect any disconnected drives, use \"Set Location\", or "
 "restart the torrent to re-download."
 msgstr ""
+"Nenalezena žádná data! Připojte znovu jakékoli odpojené jednotky, zvolte "
+"\"Nastavit umístění\" nebo restartujte torrent pro opětovné stažení."
 
 #: ../libtransmission/torrent.c:1407
 msgid ""

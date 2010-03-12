@@ -3,14 +3,14 @@ msgstr ""
 "Project-Id-Version: Transmission 0.81\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-02-10 20:02-0600\n"
-"PO-Revision-Date: 2010-02-21 20:51+0000\n"
-"Last-Translator: Martin Lettner <m.lettner@gmail.com>\n"
+"PO-Revision-Date: 2010-02-26 19:35+0000\n"
+"Last-Translator: Daniel Schury <Surst@gmx.net>\n"
 "Language-Team: Michael Färber <0102@gmx.at>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2010-02-22 01:53+0000\n"
+"X-Launchpad-Export-Date: 2010-03-12 01:53+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:54
@@ -422,7 +422,7 @@ msgstr "%1$s (%2$.1f%%)"
 #: ../gtk/details.c:778
 #, c-format
 msgid "%1$.1f%%"
-msgstr ""
+msgstr "%1$.1f%%"
 
 #: ../gtk/details.c:796
 #, c-format
@@ -536,11 +536,11 @@ msgstr "%"
 
 #: ../gtk/details.c:1064
 msgid "Up Reqs"
-msgstr ""
+msgstr "Anfragen hoch"
 
 #: ../gtk/details.c:1066
 msgid "Dn Reqs"
-msgstr ""
+msgstr "Anfragen runter"
 
 #: ../gtk/details.c:1067
 msgid "Status"

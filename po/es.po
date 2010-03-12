@@ -12,14 +12,14 @@ msgstr ""
 "Project-Id-Version: es\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-02-10 20:02-0600\n"
-"PO-Revision-Date: 2010-02-04 23:36+0000\n"
+"PO-Revision-Date: 2010-03-09 20:01+0000\n"
 "Last-Translator: Fernando Muñoz <munozferna@gmail.com>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2010-02-22 01:52+0000\n"
+"X-Launchpad-Export-Date: 2010-03-12 01:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Country: SPAIN\n"
 "X-Poedit-Language: Spanish\n"
@@ -275,7 +275,7 @@ msgstr "Añadir un torrent"
 
 #: ../gtk/add-dialog.c:458 ../gtk/tr-prefs.c:288
 msgid "Show _options dialog"
-msgstr "Mostrar el diálgo _opciones"
+msgstr "Mostrar el diálogo _opciones"
 
 #: ../gtk/add-dialog.c:514
 msgid "Add URL"
@@ -321,7 +321,7 @@ msgstr "Satisfacer _límites globales"
 
 #: ../gtk/details.c:453 ../gtk/tr-prefs.c:1201
 msgid "Limit _download speed (KB/s):"
-msgstr "Limitar la velocidad de _descarga (KiB/s):"
+msgstr "Limitar la velocidad de des_carga (KiB/s):"
 
 #: ../gtk/details.c:465 ../gtk/tr-prefs.c:1208
 msgid "Limit _upload speed (KB/s):"
@@ -433,7 +433,7 @@ msgstr "%1$s (%2$.1f%%)"
 #: ../gtk/details.c:778
 #, c-format
 msgid "%1$.1f%%"
-msgstr ""
+msgstr "%1$.1f%%"
 
 #: ../gtk/details.c:796
 #, c-format
@@ -455,7 +455,7 @@ msgstr "Actividad"
 
 #: ../gtk/details.c:896
 msgid "Torrent size:"
-msgstr "Tamaño de Torrent"
+msgstr "Tamaño de Torrent:"
 
 #: ../gtk/details.c:900
 msgid "Have:"
@@ -463,7 +463,7 @@ msgstr "Tengo:"
 
 #: ../gtk/details.c:904
 msgid "Availability:"
-msgstr ""
+msgstr "Disponibilidad:"
 
 #: ../gtk/details.c:908 ../gtk/stats.c:168 ../gtk/stats.c:180
 msgid "Downloaded:"
@@ -487,7 +487,7 @@ msgstr "Tiempo de ejecución:"
 
 #: ../gtk/details.c:928
 msgid "Remaining time:"
-msgstr ""
+msgstr "Tiempo restante:"
 
 #: ../gtk/details.c:932
 msgid "Last activity:"
@@ -924,6 +924,7 @@ msgstr ""
 "  Fernando Muñoz https://launchpad.net/~munozferna\n"
 "  Francisco José Rey https://launchpad.net/~fcojreyg\n"
 "  Francisco Vila https://launchpad.net/~francisco-vila\n"
+"  Gabriel https://launchpad.net/~galvarez-mdp\n"
 "  Gabriel Ruiz https://launchpad.net/~anakron\n"
 "  Guillermo González Díez https://launchpad.net/~ibrotha-deactivatedaccount\n"
 "  Helmy Giacoman || Eos87 https://launchpad.net/~eos87\n"
@@ -1612,11 +1613,11 @@ msgstr "Limitar velocidad de _descarga (KB/s):"
 
 #: ../gtk/tr-prefs.c:1237
 msgid "Limit u_pload speed (KB/s):"
-msgstr "Limitar la velocidad de _subida (KB/s):"
+msgstr "Limitar la velocidad de s_ubida (KB/s):"
 
 #: ../gtk/tr-prefs.c:1241
 msgid "_Scheduled times:"
-msgstr "Vece_s de programación:"
+msgstr "_Horas de programación:"
 
 #: ../gtk/tr-prefs.c:1246
 msgid " _to "
@@ -1758,7 +1759,7 @@ msgstr "Compartir para siempre"
 
 #: ../gtk/tr-window.c:773
 msgid "Limit Download Speed"
-msgstr "Limitar velocidad de bajada"
+msgstr "Limitar velocidad de descarga"
 
 #: ../gtk/tr-window.c:777
 msgid "Limit Upload Speed"

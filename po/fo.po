@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-02-10 20:02-0600\n"
-"PO-Revision-Date: 2010-02-20 21:29+0000\n"
+"PO-Revision-Date: 2010-03-11 13:53+0000\n"
 "Last-Translator: Jonhard Sørensen <Unknown>\n"
 "Language-Team: Faroese <fo@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2010-02-22 01:53+0000\n"
+"X-Launchpad-Export-Date: 2010-03-12 01:53+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:54
@@ -92,7 +92,7 @@ msgstr "_Fíla"
 
 #: ../gtk/actions.c:106
 msgid "_Torrent"
-msgstr ""
+msgstr "_Torrent"
 
 #: ../gtk/actions.c:107
 msgid "_View"
@@ -140,43 +140,43 @@ msgstr "Byrja torrent"
 
 #: ../gtk/actions.c:116
 msgid "_Statistics"
-msgstr ""
+msgstr "_Hagtøl"
 
 #: ../gtk/actions.c:117
 msgid "_Donate"
-msgstr ""
+msgstr "_Gev"
 
 #: ../gtk/actions.c:118
 msgid "_Verify Local Data"
-msgstr ""
+msgstr "_Vátta Staðbundna Dáta"
 
 #: ../gtk/actions.c:119
 msgid "_Pause"
-msgstr ""
+msgstr "_Pausa"
 
 #: ../gtk/actions.c:119
 msgid "Pause torrent"
-msgstr ""
+msgstr "Pausa torrent"
 
 #: ../gtk/actions.c:120
 msgid "_Pause All"
-msgstr ""
+msgstr "_Pausa Alt"
 
 #: ../gtk/actions.c:120
 msgid "Pause all torrents"
-msgstr ""
+msgstr "Pausa allar torrentar"
 
 #: ../gtk/actions.c:121
 msgid "_Start All"
-msgstr ""
+msgstr "_Starta Øll"
 
 #: ../gtk/actions.c:121
 msgid "Start all torrents"
-msgstr ""
+msgstr "Starta allar torrentar"
 
 #: ../gtk/actions.c:122
 msgid "Set _Location"
-msgstr ""
+msgstr "Set _Pláss"
 
 #: ../gtk/actions.c:123
 msgid "Remove torrent"
