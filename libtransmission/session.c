@@ -524,7 +524,7 @@ tr_sessionInit( const char  * tag,
     return session;
 }
 
-static void turtleCheckClock( tr_session * session, struct tr_turtle_info * t, tr_bool byUser );
+static void turtleCheckClock( tr_session * s, struct tr_turtle_info * t );
 
 static void
 onNowTimer( int foo UNUSED, short bar UNUSED, void * vsession )
@@ -548,7 +548,8 @@ onNowTimer( int foo UNUSED, short bar UNUSED, void * vsession )
 
     /* tr_session things to do once per second */
     tr_timeUpdate( tv.tv_sec );
-    turtleCheckClock( session, &session->turtle, FALSE );
+    if( session->turtle.isClockEnabled )
+        turtleCheckClock( session, &session->turtle );
 }
 
 static void loadBlocklists( tr_session * session );
@@ -1142,7 +1143,8 @@ altSpeedToggled( void * vsession )
 }
 
 static void
-useAltSpeed( tr_session * s, struct tr_turtle_info * t, tr_bool enabled, tr_bool byUser )
+useAltSpeed( tr_session * s, struct tr_turtle_info * t,
+             tr_bool enabled, tr_bool byUser )
 {
     assert( tr_isSession( s ) );
     assert( t != NULL );
@@ -1157,9 +1159,16 @@ useAltSpeed( tr_session * s, struct tr_turtle_info * t, tr_bool enabled, tr_bool
     }
 }
 
-static tr_bool
-testTurtleTime( const struct tr_turtle_info * t )
+/**
+ * @param enabled whether turtle should be on/off according to the scheduler
+ * @param changed whether that's different from the previous minute
+ */
+static void
+testTurtleTime( const struct tr_turtle_info * t,
+                tr_bool * enabled,
+                tr_bool * changed )
 {
+    tr_bool e;
     struct tm tm;
     size_t minute_of_the_week;
     const time_t now = tr_time( );
@@ -1169,25 +1178,35 @@ testTurtleTime( const struct tr_turtle_info * t )
     minute_of_the_week = tm.tm_wday * MINUTES_PER_DAY
                        + tm.tm_hour * MINUTES_PER_HOUR
                        + tm.tm_min;
-
     if( minute_of_the_week >= MINUTES_PER_WEEK ) /* leap minutes? */
         minute_of_the_week = MINUTES_PER_WEEK - 1;
 
-    return tr_bitfieldHasFast( &t->minutes, minute_of_the_week );
+    e = tr_bitfieldHasFast( &t->minutes, minute_of_the_week );
+    if( enabled != NULL )
+        *enabled = e;
+
+    if( changed != NULL )
+    {
+        const size_t prev = minute_of_the_week > 0 ? minute_of_the_week - 1
+                                                   : MINUTES_PER_WEEK - 1;
+        *changed = e != tr_bitfieldHasFast( &t->minutes, prev );
+    }
 }
 
 static void
-turtleCheckClock( tr_session * session, struct tr_turtle_info * t, tr_bool byUser )
+turtleCheckClock( tr_session * s, struct tr_turtle_info * t )
 {
-    if( t->isClockEnabled )
-    {
-        const tr_bool hit = testTurtleTime( t );
+    tr_bool enabled;
+    tr_bool changed;
 
-        if( hit != t->isEnabled )
-        {
-            tr_inf( "Time to turn %s turtle mode!", (hit?"on":"off") );
-            useAltSpeed( session, t, hit, byUser );
-        }
+    assert( t->isClockEnabled );
+
+    testTurtleTime( t, &enabled, &changed );
+
+    if( changed )
+    {
+        tr_inf( "Time to turn %s turtle mode!", (enabled?"on":"off") );
+        useAltSpeed( s, t, enabled, FALSE );
     }
 }
 
@@ -1204,7 +1223,7 @@ turtleBootstrap( tr_session * session, struct tr_turtle_info * turtle )
     turtleUpdateTable( turtle );
 
     if( turtle->isClockEnabled )
-        turtle->isEnabled = testTurtleTime( turtle );
+        testTurtleTime( turtle, &turtle->isEnabled, NULL );
 
     altSpeedToggled( session );
 }
@@ -1288,7 +1307,11 @@ userPokedTheClock( tr_session * s, struct tr_turtle_info * t )
     turtleUpdateTable( t );
 
     if( t->isClockEnabled )
-        useAltSpeed( s, t, testTurtleTime( t ), TRUE );
+    {
+        tr_bool enabled, changed;
+        testTurtleTime( t, &enabled, &changed );
+        useAltSpeed( s, t, enabled, TRUE );
+    }
 }
 
 void

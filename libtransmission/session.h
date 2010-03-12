@@ -42,17 +42,6 @@ struct tr_bandwidth;
 struct tr_bindsockets;
 struct tr_fdInfo;
 
-/**
- * How clock mode works:
- *
- * ._nextChangeAt, ._nextChangeValue and ._nextChangeAllowed are private fields
- * that are derived from .days, .beginMinute, .endMinute and the current time.
- * They're rebuilt when either (a) the user changes the clock settings or
- * (b) when the time at ._nextChangeAt is reached.
- *
- * When ._nextChangeAt is reached, if .isClockEnabled and ._nextChangeAllowed
- * are both true, then turtle mode's flag is set to ._nextChangeValue.
- */
 struct tr_turtle_info
 {
     /* TR_UP and TR_DOWN speed limits */
@@ -83,6 +72,9 @@ struct tr_turtle_info
      * indicates whether the change came from the user or from the clock. */
     tr_bool changedByUser;
 
+    /* bitfield of all the minutes in a week.
+     * Each bit's value indicates whether the scheduler wants turtle
+     * limits on or off at that given minute in the week. */
     tr_bitfield minutes;
 };
 
