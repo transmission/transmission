@@ -160,6 +160,13 @@ typedef enum
     
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     
+    [fGeneralViewController dealloc];
+    [fActivityViewController dealloc];
+    [fTrackersViewController dealloc];
+    [fPeersViewController dealloc];
+    [fFileViewController dealloc];
+    [fOptionsViewController dealloc];
+    
     [fTorrents release];
     
     [super dealloc];
