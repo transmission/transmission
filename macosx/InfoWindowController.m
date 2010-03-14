@@ -213,31 +213,24 @@ typedef enum
         //deselect old tab item
         [(InfoTabButtonCell *)[fTabMatrix cellWithTag: oldTabTag] setSelectedTab: NO];
         
+        if ([fViewController respondsToSelector: @selector(clearView)])
+            [fViewController clearView];
+        
         switch (oldTabTag)
         {
-            case TAB_ACTIVITY_TAG:
-                [fActivityViewController clearPiecesView];
-                break;
-            
             case TAB_TRACKERS_TAG:
-                [fTrackersViewController clearTrackers];
-                
                 oldResizeSaveKey = @"InspectorContentHeightTracker";
                 break;
-            
             case TAB_PEERS_TAG:
-                [fPeersViewController clearPeers];
-                
                 oldResizeSaveKey = @"InspectorContentHeightPeers";
                 break;
-            
             case TAB_FILE_TAG:
                 oldResizeSaveKey = @"InspectorContentHeightFiles";
                 break;
         }
         
         NSView * oldView = [fViewController view];
-        oldHeight = [oldView frame].size.height;
+        oldHeight = NSHeight([oldView frame]);
         if (oldResizeSaveKey)
             [[NSUserDefaults standardUserDefaults] setFloat: oldHeight forKey: oldResizeSaveKey];
         

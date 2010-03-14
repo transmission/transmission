@@ -30,4 +30,7 @@
 - (void) setInfoForTorrents: (NSArray *) torrents;
 - (void) updateInfo;
 
+@optional
+- (void) clearView;
+
 @end

@@ -221,7 +221,7 @@
     }
 }
 
-- (void) clearPeers
+- (void) clearView
 {
     //if in the middle of animating, just stop and resize immediately
     if (fWebSeedTableAnimation)

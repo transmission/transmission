@@ -44,7 +44,7 @@
 - (void) setInfoForTorrents: (NSArray *) torrents;
 - (void) updateInfo;
 
-- (void) clearPeers;
+- (void) clearView;
 - (void) stopWebSeedAnimation;
 
 @end

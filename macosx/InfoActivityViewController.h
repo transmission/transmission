@@ -50,6 +50,6 @@
 
 - (void) setPiecesView: (id) sender;
 - (void) setPiecesViewForAvailable: (BOOL) available;
-- (void) clearPiecesView;
+- (void) clearView;
 
 @end

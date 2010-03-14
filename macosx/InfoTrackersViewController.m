@@ -122,7 +122,7 @@
     }
 }
 
-- (void) clearTrackers
+- (void) clearView
 {
     [fTrackers release];
     fTrackers = nil;

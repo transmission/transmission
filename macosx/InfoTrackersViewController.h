@@ -46,7 +46,7 @@
 - (void) setInfoForTorrents: (NSArray *) torrents;
 - (void) updateInfo;
 
-- (void) clearTrackers;
+- (void) clearView;
 
 - (void) addRemoveTracker: (id) sender;
 

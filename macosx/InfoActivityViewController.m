@@ -148,7 +148,7 @@
     [fPiecesView updateView];
 }
 
-- (void) clearPiecesView
+- (void) clearView
 {
     [fPiecesView clearView];
 }
