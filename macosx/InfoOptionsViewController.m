@@ -45,7 +45,11 @@
 
 - (id) init
 {
-    self = [super initWithNibName: @"InfoOptionsView" bundle: nil];
+    if ((self = [super initWithNibName: @"InfoOptionsView" bundle: nil]))
+    {
+        [self setTitle: NSLocalizedString(@"Options", "Inspector view -> title")];
+    }
+    
     return self;
 }
 

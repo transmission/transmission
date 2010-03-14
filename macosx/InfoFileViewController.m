@@ -40,7 +40,11 @@
 
 - (id) init
 {
-    self = [super initWithNibName: @"InfoFileView" bundle: nil];
+    if ((self = [super initWithNibName: @"InfoFileView" bundle: nil]))
+    {
+        [self setTitle: NSLocalizedString(@"Files", "Inspector view -> title")];
+    }
+    
     return self;
 }
 

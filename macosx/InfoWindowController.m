@@ -219,8 +219,7 @@ typedef enum
     }
     
     //set new tab item
-    #warning get titles from view controller?
-    NSString * identifier, * title;
+    NSString * identifier;
     switch (fCurrentTabTag)
     {
         case TAB_GENERAL_TAG:
@@ -232,7 +231,6 @@ typedef enum
             
             fViewController = fGeneralViewController;
             identifier = TAB_INFO_IDENT;
-            title = NSLocalizedString(@"General Info", "Inspector -> title");
             break;
         case TAB_ACTIVITY_TAG:
             if (!fActivityViewController)
@@ -243,7 +241,6 @@ typedef enum
             
             fViewController = fActivityViewController;
             identifier = TAB_ACTIVITY_IDENT;
-            title = NSLocalizedString(@"Activity", "Inspector -> title");
             break;
         case TAB_TRACKERS_TAG:
             if (!fTrackersViewController)
@@ -254,7 +251,6 @@ typedef enum
             
             fViewController = fTrackersViewController;
             identifier = TAB_TRACKER_IDENT;
-            title = NSLocalizedString(@"Trackers", "Inspector -> title");
             break;
         case TAB_PEERS_TAG:
             if (!fPeersViewController)
@@ -265,7 +261,6 @@ typedef enum
             
             fViewController = fPeersViewController;
             identifier = TAB_PEERS_IDENT;
-            title = NSLocalizedString(@"Peers", "Inspector -> title");
             break;
         case TAB_FILE_TAG:
             if (!fFileViewController)
@@ -276,7 +271,6 @@ typedef enum
             
             fViewController = fFileViewController;
             identifier = TAB_FILES_IDENT;
-            title = NSLocalizedString(@"Files", "Inspector -> title");
             break;
         case TAB_OPTIONS_TAG:
             if (!fOptionsViewController)
@@ -287,7 +281,6 @@ typedef enum
             
             fViewController = fOptionsViewController;
             identifier = TAB_OPTIONS_IDENT;
-            title = NSLocalizedString(@"Options", "Inspector -> title");
             break;
         default:
             NSAssert1(NO, @"Unknown info tab selected: %d", fCurrentTabTag);
@@ -298,7 +291,8 @@ typedef enum
     
     NSWindow * window = [self window];
     
-    [window setTitle: [NSString stringWithFormat: @"%@ - %@", title, NSLocalizedString(@"Torrent Inspector", "Inspector -> title")]];
+    [window setTitle: [NSString stringWithFormat: @"%@ - %@", [fViewController title],
+                        NSLocalizedString(@"Torrent Inspector", "Inspector -> title")]];
     
     //selected tab item
     [(InfoTabButtonCell *)[fTabMatrix selectedCell] setSelectedTab: YES];

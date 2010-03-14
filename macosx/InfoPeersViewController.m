@@ -41,7 +41,11 @@
 
 - (id) init
 {
-    self = [super initWithNibName: @"InfoPeersView" bundle: nil];
+    if ((self = [super initWithNibName: @"InfoPeersView" bundle: nil]))
+    {
+        [self setTitle: NSLocalizedString(@"Peers", "Inspector view -> title")];
+    }
+    
     return self;
 }
 

@@ -50,6 +50,8 @@
 {
     if ((self = [super initWithNibName: @"InfoTrackersView" bundle: nil]))
     {
+        [self setTitle: NSLocalizedString(@"Trackers", "Inspector view -> title")];
+        
         fTrackerCell = [[TrackerCell alloc] init];
     }
     
