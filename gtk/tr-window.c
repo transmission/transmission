@@ -38,6 +38,7 @@
 
 #include "actions.h"
 #include "conf.h"
+#include "filter.h"
 #include "hig.h"
 #include "torrent-cell-renderer.h"
 #include "tr-prefs.h"
@@ -109,31 +110,7 @@ typedef struct
 }
 PrivateData;
 
-static const char*
-getFilterName( int mode )
-{
-    switch( mode )
-    {
-        case FILTER_MODE_ACTIVE:      return "show-active";
-        case FILTER_MODE_DOWNLOADING: return "show-downloading";
-        case FILTER_MODE_SEEDING:     return "show-seeding";
-        case FILTER_MODE_PAUSED:      return "show-paused";
-        default:                      return "show-all"; /* the fallback */
-    }
-}
-static int
-getFilterModeFromName( const char * name )
-{
-    if( !strcmp( name, "show-active"      ) ) return FILTER_MODE_ACTIVE;
-    if( !strcmp( name, "show-downloading" ) ) return FILTER_MODE_DOWNLOADING;
-    if( !strcmp( name, "show-seeding"     ) ) return FILTER_MODE_SEEDING;
-    if( !strcmp( name, "show-paused"      ) ) return FILTER_MODE_PAUSED;
-    return FILTER_MODE_ALL; /* the fallback */
-}
-
 #define PRIVATE_DATA_KEY "private-data"
-#define FILTER_MODE_KEY "tr-filter-mode"
-#define FILTER_TEXT_MODE_KEY "tr-filter-text-mode"
 
 static PrivateData*
 get_private_data( TrWindow * w )
@@ -165,19 +142,13 @@ view_row_activated( GtkTreeView       * tree_view UNUSED,
     action_activate( "show-torrent-properties" );
 }
 
-static gboolean is_row_visible( GtkTreeModel *,
-                                GtkTreeIter  *,
-                                gpointer );
-
 static GtkWidget*
-makeview( PrivateData * p,
-          TrCore *      core )
+makeview( PrivateData * p )
 {
     GtkWidget *         view;
     GtkTreeViewColumn * col;
     GtkTreeSelection *  sel;
     GtkCellRenderer *   r;
-    GtkTreeModel *      filter_model;
 
     view = gtk_tree_view_new( );
     gtk_tree_view_set_headers_visible( GTK_TREE_VIEW( view ), FALSE );
@@ -216,21 +187,12 @@ makeview( PrivateData * p,
                       G_CALLBACK( view_row_activated ), NULL );
 
 
-    filter_model = p->filter_model = gtk_tree_model_filter_new(
-                       tr_core_model( core ), NULL );
-
-    gtk_tree_model_filter_set_visible_func( GTK_TREE_MODEL_FILTER(
-                                                filter_model ),
-                                            is_row_visible,
-                                            p, NULL );
-
-    gtk_tree_view_set_model( GTK_TREE_VIEW( view ), filter_model );
+    gtk_tree_view_set_model( GTK_TREE_VIEW( view ), p->filter_model );
 
     return view;
 }
 
 static void syncAltSpeedButton( PrivateData * p );
-static void setFilter( PrivateData * p, int mode );
 
 static void
 prefsChanged( TrCore * core UNUSED,
@@ -246,10 +208,6 @@ prefsChanged( TrCore * core UNUSED,
          * its fixed-height mode values.  Unfortunately there's not an API call
          * for that, but it *does* revalidate when it thinks the style's been tweaked */
         g_signal_emit_by_name( p->view, "style-set", NULL, NULL );
-    }
-    else if( !strcmp( key, PREF_KEY_FILTER_MODE ) )
-    {
-        setFilter( p, getFilterModeFromName( pref_string_get( key ) ) );
     }
     else if( !strcmp( key, PREF_KEY_STATUSBAR ) )
     {
@@ -358,197 +316,6 @@ alt_speed_toggled_cb( GtkToggleButton * button, gpointer vprivate )
 /***
 ****  FILTER
 ***/
-
-static int
-checkFilterText( filter_text_mode_t    filter_text_mode,
-                 const tr_info       * inf,
-                 const char          * text )
-{
-    tr_file_index_t i;
-    int             ret = 0;
-    char *          pch;
-
-    switch( filter_text_mode )
-    {
-        case FILTER_TEXT_MODE_FILES:
-            for( i = 0; i < inf->fileCount && !ret; ++i )
-            {
-                pch = g_utf8_casefold( inf->files[i].name, -1 );
-                ret = !text || strstr( pch, text ) != NULL;
-                g_free( pch );
-            }
-            break;
-
-        case FILTER_TEXT_MODE_TRACKER:
-            if( inf->trackerCount > 0 )
-            {
-                pch = g_utf8_casefold( inf->trackers[0].announce, -1 );
-                ret = !text || ( strstr( pch, text ) != NULL );
-                g_free( pch );
-            }
-            break;
-
-        default: /* NAME */
-            if( !inf->name )
-                ret = TRUE;
-            else {
-                pch = g_utf8_casefold( inf->name, -1 );
-                ret = !text || ( strstr( pch, text ) != NULL );
-                g_free( pch );
-            }
-            break;
-    }
-
-    return ret;
-}
-
-static int
-checkFilterMode( filter_mode_t filter_mode,
-                 tr_torrent *  tor )
-{
-    int ret = 0;
-
-    switch( filter_mode )
-    {
-        case FILTER_MODE_DOWNLOADING:
-            ret = tr_torrentGetActivity( tor ) == TR_STATUS_DOWNLOAD;
-            break;
-
-        case FILTER_MODE_SEEDING:
-            ret = tr_torrentGetActivity( tor ) == TR_STATUS_SEED;
-            break;
-
-        case FILTER_MODE_PAUSED:
-            ret = tr_torrentGetActivity( tor ) == TR_STATUS_STOPPED;
-            break;
-
-        case FILTER_MODE_ACTIVE:
-        {
-            const tr_stat * s = tr_torrentStatCached( tor );
-            ret = s->peersSendingToUs > 0
-               || s->peersGettingFromUs > 0
-               || tr_torrentGetActivity( tor ) == TR_STATUS_CHECK;
-            break;
-        }
-
-        default: /* all */
-            ret = 1;
-    }
-
-    return ret;
-}
-
-static gboolean
-is_row_visible( GtkTreeModel * model,
-                GtkTreeIter *  iter,
-                gpointer       vprivate )
-{
-    PrivateData * p = vprivate;
-    tr_torrent *  tor;
-
-    gtk_tree_model_get( model, iter, MC_TORRENT_RAW, &tor, -1 );
-
-    return checkFilterMode( p->filter_mode, tor )
-           && checkFilterText( p->filter_text_mode, tr_torrentInfo( tor ), p->filter_text );
-}
-
-static void updateTorrentCount( PrivateData * p );
-
-static void
-refilter( PrivateData * p )
-{
-    gtk_tree_model_filter_refilter( GTK_TREE_MODEL_FILTER( p->filter_model ) );
-
-    updateTorrentCount( p );
-}
-
-static void
-filter_text_toggled_cb( GtkCheckMenuItem * menu_item,
-                        gpointer           vprivate )
-{
-    if( gtk_check_menu_item_get_active( menu_item ) )
-    {
-        PrivateData * p = vprivate;
-        p->filter_text_mode =
-            GPOINTER_TO_UINT( g_object_get_data( G_OBJECT( menu_item ),
-                                                 FILTER_TEXT_MODE_KEY ) );
-        refilter( p );
-    }
-}
-
-static void
-setFilter( PrivateData * p, int mode )
-{
-    if( mode != (int)p->filter_mode )
-    {
-        int i;
-
-        /* refilter */
-        p->filter_mode = mode;
-        refilter( p );
-
-        /* update the prefs */
-        tr_core_set_pref( p->core, PREF_KEY_FILTER_MODE, getFilterName( mode ) );
-
-        /* update the togglebuttons */
-        for( i=0; i<FILTER_MODE_QTY; ++i )
-            gtk_toggle_button_set_active( p->filter_toggles[i], i==mode );
-    }
-}
-
-
-static void
-filter_toggled_cb( GtkToggleButton * toggle, gpointer vprivate )
-{
-    if( gtk_toggle_button_get_active( toggle ) )
-    {
-        PrivateData * p = vprivate;
-        const int mode = GPOINTER_TO_UINT( g_object_get_data( G_OBJECT( toggle ), FILTER_MODE_KEY ) );
-        setFilter( p, mode );
-    }
-}
-
-static void
-filter_entry_changed( GtkEditable * e,
-                      gpointer      vprivate )
-{
-    char *        pch;
-    PrivateData * p = vprivate;
-
-    pch = gtk_editable_get_chars( e, 0, -1 );
-    g_free( p->filter_text );
-    p->filter_text = g_utf8_casefold( pch, -1 );
-    refilter( p );
-    g_free( pch );
-}
-
-
-#ifdef USE_SEXY
-static void
-entry_icon_released( SexyIconEntry           * entry  UNUSED,
-                     SexyIconEntryPosition     icon_pos,
-                     int                       button UNUSED,
-                     gpointer                  menu )
-{
-    if( icon_pos == SEXY_ICON_ENTRY_PRIMARY )
-        gtk_menu_popup( GTK_MENU( menu ), NULL, NULL, NULL, NULL, 0,
-                        gtk_get_current_event_time( ) );
-}
-#else
-static void
-entry_icon_release( GtkEntry              * entry  UNUSED,
-                    GtkEntryIconPosition    icon_pos,
-                    GdkEventButton        * event  UNUSED,
-                    gpointer                menu )
-{
-    if( icon_pos == GTK_ENTRY_ICON_SECONDARY )
-        gtk_entry_set_text( entry, "" );
-
-    if( icon_pos == GTK_ENTRY_ICON_PRIMARY )
-        gtk_menu_popup( GTK_MENU( menu ), NULL, NULL, NULL, NULL, 0,
-                        gtk_get_current_event_time( ) );
-}
-#endif
 
 #if GTK_CHECK_VERSION( 2, 12, 0 )
 
@@ -835,25 +602,9 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
     const char  * pch;
     PrivateData * p;
     GtkWidget   * mainmenu, *toolbar, *filter, *list, *status;
-    GtkWidget   * vbox, *w, *self, *h, *s, *hbox, *menu;
+    GtkWidget   * vbox, *w, *self, *h, *hbox, *menu;
     GtkWindow   * win;
     GSList      * l;
-
-    const char *  filter_names[FILTER_MODE_QTY] = {
-        /* show all torrents */
-        N_( "A_ll" ),
-        /* show only torrents that have connected peers */
-        N_( "_Active" ),
-        /* show only torrents that are trying to download */
-        N_( "_Downloading" ),
-        /* show only torrents that are trying to upload */
-        N_( "_Seeding" ),
-        /* show only torrents that are paused */
-        N_( "_Paused" )
-    };
-    const char *  filter_text_names[FILTER_TEXT_MODE_QTY] = {
-        N_( "Name" ), N_( "Files" ), N_( "Tracker" )
-    };
 
     p = g_new0( PrivateData, 1 );
     p->filter_text_mode = FILTER_TEXT_MODE_NAME;
@@ -893,41 +644,8 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
     action_set_important( "show-torrent-properties", TRUE );
 
     /* filter */
-    h = filter = p->filter = gtk_hbox_new( FALSE, 0 );
+    h = filter = p->filter = gtr_filter_bar_new( tr_core_model( core ), &p->filter_model );
     gtk_container_set_border_width( GTK_CONTAINER( h ), GUI_PAD_SMALL );
-    for( i = 0; i < FILTER_MODE_QTY; ++i )
-    {
-        const char * mnemonic = _( filter_names[i] );
-        w = gtk_toggle_button_new_with_mnemonic( mnemonic );
-        g_object_set_data( G_OBJECT( w ), FILTER_MODE_KEY, GINT_TO_POINTER( i ) );
-        gtk_button_set_relief( GTK_BUTTON( w ), GTK_RELIEF_NONE );
-        gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( w ), i == FILTER_MODE_ALL );
-        p->filter_toggles[i] = GTK_TOGGLE_BUTTON( w );
-        g_signal_connect( w, "toggled", G_CALLBACK( filter_toggled_cb ), p );
-        gtk_box_pack_start( GTK_BOX( h ), w, FALSE, FALSE, 0 );
-    }
-
-#ifdef USE_SEXY
-    s = sexy_icon_entry_new( );
-    sexy_icon_entry_add_clear_button( SEXY_ICON_ENTRY( s ) );
-    w = gtk_image_new_from_stock( GTK_STOCK_FIND, GTK_ICON_SIZE_MENU );
-    sexy_icon_entry_set_icon( SEXY_ICON_ENTRY( s ),
-                              SEXY_ICON_ENTRY_PRIMARY,
-                              GTK_IMAGE( w ) );
-    g_object_unref( w );
-    sexy_icon_entry_set_icon_highlight( SEXY_ICON_ENTRY( s ),
-                                        SEXY_ICON_ENTRY_PRIMARY, TRUE );
-#else
-    s = gtk_entry_new( );
-    gtk_entry_set_icon_from_stock( GTK_ENTRY( s ),
-                                   GTK_ENTRY_ICON_PRIMARY,
-                                   GTK_STOCK_FIND);
-   gtk_entry_set_icon_from_stock( GTK_ENTRY( s ),
-                                  GTK_ENTRY_ICON_SECONDARY,
-                                  GTK_STOCK_CLEAR );
-#endif
-    gtk_box_pack_end( GTK_BOX( h ), s, FALSE, FALSE, 0 );
-    g_signal_connect( s, "changed", G_CALLBACK( filter_entry_changed ), p );
 
     /* status menu */
     menu = p->status_menu = gtk_menu_new( );
@@ -1006,30 +724,8 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
         gtk_box_pack_end( GTK_BOX( h ), hbox, FALSE, FALSE, 0 );
 
 
-    menu = gtk_menu_new( );
-    l = NULL;
-    for( i=0; i<FILTER_TEXT_MODE_QTY; ++i )
-    {
-        const char * name = _( filter_text_names[i] );
-        GtkWidget *  w = gtk_radio_menu_item_new_with_label ( l, name );
-        l = gtk_radio_menu_item_get_group( GTK_RADIO_MENU_ITEM( w ) );
-        g_object_set_data( G_OBJECT( w ), FILTER_TEXT_MODE_KEY,
-                           GINT_TO_POINTER( i ) );
-        g_signal_connect( w, "toggled",
-                          G_CALLBACK( filter_text_toggled_cb ), p );
-        gtk_menu_shell_append( GTK_MENU_SHELL( menu ), w );
-        gtk_widget_show( w );
-    }
-
-#ifdef USE_SEXY
-    g_signal_connect( s, "icon-released", G_CALLBACK( entry_icon_released ), menu );
-#else
-    g_signal_connect( s, "icon-release", G_CALLBACK( entry_icon_release ), menu );
-
-#endif
-
     /* workarea */
-    p->view = makeview( p, core );
+    p->view = makeview( p );
     w = list = p->scroll = gtk_scrolled_window_new( NULL, NULL );
     gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( w ),
                                     GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC );
@@ -1089,7 +785,6 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
 
     tr_sessionSetAltSpeedFunc( tr_core_session( core ), onAltSpeedToggled, p );
 
-    filter_entry_changed( GTK_EDITABLE( s ), p );
     return self;
 }
 
@@ -1208,7 +903,7 @@ tr_window_update( TrWindow * self )
         updateSpeeds( p );
         updateTorrentCount( p );
         updateStats( p );
-        refilter( p );
+        gtk_tree_model_filter_refilter( GTK_TREE_MODEL_FILTER( p->filter_model ) );
     }
 }
 

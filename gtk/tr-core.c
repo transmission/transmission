@@ -1666,3 +1666,29 @@ tr_core_exec( TrCore * core, const tr_benc * top )
     tr_core_exec_json( core, json );
     tr_free( json );
 }
+
+/***
+****
+***/
+
+void
+tr_core_torrent_changed( TrCore * core, int id )
+{
+    GtkTreeIter iter;
+    GtkTreeModel * model = tr_core_model( core );
+
+    if( gtk_tree_model_get_iter_first( model, &iter ) ) do
+    {
+        tr_torrent * tor;
+        gtk_tree_model_get( model, &iter, MC_TORRENT_RAW, &tor, -1 );
+        if( tr_torrentId( tor ) == id )
+        {
+            GtkTreePath * path = gtk_tree_model_get_path( model, &iter );
+            gtk_tree_model_row_changed( model, path, &iter );
+            gtk_tree_path_free( path );
+            break;
+        }
+    }
+    while( gtk_tree_model_iter_next( model, &iter ) );
+}
+

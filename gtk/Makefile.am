@@ -42,6 +42,7 @@ noinst_HEADERS = \
     conf.h \
     details.h \
     dialogs.h \
+    filter.h \
     hig.h \
     icons.h \
     file-list.h \
@@ -79,6 +80,7 @@ transmission_SOURCES = \
     details.c \
     dialogs.c \
     file-list.c \
+    filter.c \
     hig.c \
     icons.c \
     main.c \
