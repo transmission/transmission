@@ -141,24 +141,10 @@ typedef enum
 
 - (void) dealloc
 {
-    //save resizeable view height
-    NSString * resizeSaveKey = nil;
-    switch (fCurrentTabTag)
-    {
-        case TAB_TRACKERS_TAG:
-            resizeSaveKey = @"InspectorContentHeightTracker";
-            break;
-        case TAB_PEERS_TAG:
-            resizeSaveKey = @"InspectorContentHeightPeers";
-            break;
-        case TAB_FILE_TAG:
-            resizeSaveKey = @"InspectorContentHeightFiles";
-            break;
-    }
-    if (resizeSaveKey)
-        [[NSUserDefaults standardUserDefaults] setFloat: [[fViewController view] frame].size.height forKey: resizeSaveKey];
-    
     [[NSNotificationCenter defaultCenter] removeObserver: self];
+    
+    if ([fViewController respondsToSelector: @selector(saveViewSize)])
+        [fViewController saveViewSize];
     
     [fGeneralViewController dealloc];
     [fActivityViewController dealloc];
@@ -214,32 +200,19 @@ typedef enum
     
     //take care of old view
     CGFloat oldHeight = 0;
-    NSString * oldResizeSaveKey = nil;
     if (oldTabTag != INVALID)
     {
         //deselect old tab item
         [(InfoTabButtonCell *)[fTabMatrix cellWithTag: oldTabTag] setSelectedTab: NO];
         
+        if ([fViewController respondsToSelector: @selector(saveViewSize)])
+            [fViewController saveViewSize];
+        
         if ([fViewController respondsToSelector: @selector(clearView)])
             [fViewController clearView];
         
-        switch (oldTabTag)
-        {
-            case TAB_TRACKERS_TAG:
-                oldResizeSaveKey = @"InspectorContentHeightTracker";
-                break;
-            case TAB_PEERS_TAG:
-                oldResizeSaveKey = @"InspectorContentHeightPeers";
-                break;
-            case TAB_FILE_TAG:
-                oldResizeSaveKey = @"InspectorContentHeightFiles";
-                break;
-        }
-        
         NSView * oldView = [fViewController view];
         oldHeight = NSHeight([oldView frame]);
-        if (oldResizeSaveKey)
-            [[NSUserDefaults standardUserDefaults] setFloat: oldHeight forKey: oldResizeSaveKey];
         
         //remove old view
         [oldView setHidden: YES];
@@ -248,7 +221,6 @@ typedef enum
     
     //set new tab item
     #warning get titles from view controller?
-    NSString * resizeSaveKey = nil;
     NSString * identifier, * title;
     switch (fCurrentTabTag)
     {
@@ -284,7 +256,6 @@ typedef enum
             fViewController = fTrackersViewController;
             identifier = TAB_TRACKER_IDENT;
             title = NSLocalizedString(@"Trackers", "Inspector -> title");
-            resizeSaveKey = @"InspectorContentHeightTracker";
             break;
         case TAB_PEERS_TAG:
             if (!fPeersViewController)
@@ -296,7 +267,6 @@ typedef enum
             fViewController = fPeersViewController;
             identifier = TAB_PEERS_IDENT;
             title = NSLocalizedString(@"Peers", "Inspector -> title");
-            resizeSaveKey = @"InspectorContentHeightPeers";
             break;
         case TAB_FILE_TAG:
             if (!fFileViewController)
@@ -308,7 +278,6 @@ typedef enum
             fViewController = fFileViewController;
             identifier = TAB_FILES_IDENT;
             title = NSLocalizedString(@"Files", "Inspector -> title");
-            resizeSaveKey = @"InspectorContentHeightFiles";
             break;
         case TAB_OPTIONS_TAG:
             if (!fOptionsViewController)
@@ -341,29 +310,19 @@ typedef enum
     
     NSRect windowRect = [window frame], viewRect = [view frame];
     
-    if (resizeSaveKey)
-    {
-        CGFloat height = [[NSUserDefaults standardUserDefaults] floatForKey: resizeSaveKey];
-        if (height != 0.0)
-            viewRect.size.height = MAX(height, TAB_MIN_HEIGHT);
-    }
-    
-    CGFloat difference = (viewRect.size.height - oldHeight) * [window userSpaceScaleFactor];
+    CGFloat difference = (NSHeight(viewRect) - oldHeight) * [window userSpaceScaleFactor];
     windowRect.origin.y -= difference;
     windowRect.size.height += difference;
     
-    if (resizeSaveKey)
+    if ([fViewController respondsToSelector: @selector(saveViewSize)]) //a little bit hacky, but avoids an extra required method
     {
-        if (!oldResizeSaveKey)
-        {
-            [window setMinSize: NSMakeSize([window minSize].width, windowRect.size.height - viewRect.size.height + TAB_MIN_HEIGHT)];
-            [window setMaxSize: NSMakeSize(FLT_MAX, FLT_MAX)];
-        }
+        [window setMinSize: NSMakeSize([window minSize].width, NSHeight(windowRect) - NSHeight(viewRect) + TAB_MIN_HEIGHT)];
+        [window setMaxSize: NSMakeSize(FLT_MAX, FLT_MAX)];
     }
     else
     {
-        [window setMinSize: NSMakeSize([window minSize].width, windowRect.size.height)];
-        [window setMaxSize: NSMakeSize(FLT_MAX, windowRect.size.height)];
+        [window setMinSize: NSMakeSize([window minSize].width, NSHeight(windowRect))];
+        [window setMaxSize: NSMakeSize(FLT_MAX, NSHeight(windowRect))];
     }
     
     viewRect.size.width = windowRect.size.width;

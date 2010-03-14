@@ -34,6 +34,7 @@
 #define TRACKER_ADD_TAG 0
 #define TRACKER_REMOVE_TAG 1
 
+
 @interface InfoTrackersViewController (Private)
 
 - (void) setupInfo;
@@ -53,6 +54,17 @@
     }
     
     return self;
+}
+
+- (void) awakeFromNib
+{
+    const CGFloat height = [[NSUserDefaults standardUserDefaults] floatForKey: @"InspectorContentHeightTracker"];
+    if (height != 0.0)
+    {
+        NSRect viewRect = [[self view] frame];
+        viewRect.size.height = height;
+        [[self view] setFrame: viewRect];
+    }
 }
 
 - (void) dealloc
@@ -120,6 +132,11 @@
             [fTrackerTable reloadDataForRowIndexes: updateIndexes columnIndexes: columnIndexes];
         }
     }
+}
+
+- (void) saveViewSize
+{
+    [[NSUserDefaults standardUserDefaults] setFloat: NSHeight([[self view] frame]) forKey: @"InspectorContentHeightTracker"];
 }
 
 - (void) clearView

@@ -32,5 +32,6 @@
 
 @optional
 - (void) clearView;
+- (void) saveViewSize;
 
 @end

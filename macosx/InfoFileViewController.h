@@ -41,6 +41,8 @@
 - (void) setInfoForTorrents: (NSArray *) torrents;
 - (void) updateInfo;
 
+- (void) saveViewSize;
+
 - (void) setFileFilterText: (id) sender;
 
 - (NSArray *) quickLookURLs;

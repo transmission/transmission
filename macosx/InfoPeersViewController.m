@@ -47,6 +47,14 @@
 
 - (void) awakeFromNib
 {
+    const CGFloat height = [[NSUserDefaults standardUserDefaults] floatForKey: @"InspectorContentHeightPeers"];
+    if (height != 0.0)
+    {
+        NSRect viewRect = [[self view] frame];
+        viewRect.size.height = height;
+        [[self view] setFrame: viewRect];
+    }
+    
     //set table header text
     [[[fPeerTable tableColumnWithIdentifier: @"IP"] headerCell] setStringValue: NSLocalizedString(@"IP Address",
                                                                         "inspector -> peer table -> header")];
@@ -219,6 +227,11 @@
         NSString * connectedText = [activeString stringByAppendingFormat: @"\n%@", knownString];
         [fConnectedPeersField setStringValue: connectedText];
     }
+}
+
+- (void) saveViewSize
+{
+    [[NSUserDefaults standardUserDefaults] setFloat: NSHeight([[self view] frame]) forKey: @"InspectorContentHeightPeers"];
 }
 
 - (void) clearView
