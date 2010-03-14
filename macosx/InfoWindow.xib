@@ -12,7 +12,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="931"/>
+			<integer value="6"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -156,15 +156,19 @@
 								<object class="NSButtonCell" id="120462994">
 									<int key="NSCellFlags">67239424</int>
 									<int key="NSCellFlags2">0</int>
-									<string key="NSContents">General Info</string>
+									<string key="NSContents"/>
 									<object class="NSFont" key="NSSupport" id="737793924">
 										<string key="NSName">LucidaGrande</string>
 										<double key="NSSize">13</double>
 										<int key="NSfFlags">1044</int>
 									</object>
 									<reference key="NSControlView" ref="1020839921"/>
-									<int key="NSButtonFlags">104612095</int>
+									<int key="NSButtonFlags">108282111</int>
 									<int key="NSButtonFlags2">6</int>
+									<object class="NSCustomResource" key="NSNormalImage">
+										<string key="NSClassName">NSImage</string>
+										<string key="NSResourceName">InfoGeneral</string>
+									</object>
 									<string key="NSAlternateContents"/>
 									<string key="NSKeyEquivalent"/>
 									<int key="NSPeriodicDelay">200</int>
@@ -173,12 +177,16 @@
 								<object class="NSButtonCell" id="308477966">
 									<int key="NSCellFlags">67239424</int>
 									<int key="NSCellFlags2">0</int>
-									<string key="NSContents">Activity</string>
+									<string key="NSContents"/>
 									<reference key="NSSupport" ref="737793924"/>
 									<reference key="NSControlView" ref="1020839921"/>
 									<int key="NSTag">1</int>
-									<int key="NSButtonFlags">104612095</int>
+									<int key="NSButtonFlags">108282111</int>
 									<int key="NSButtonFlags2">6</int>
+									<object class="NSCustomResource" key="NSNormalImage">
+										<string key="NSClassName">NSImage</string>
+										<string key="NSResourceName">InfoActivity</string>
+									</object>
 									<string key="NSAlternateContents"/>
 									<string key="NSKeyEquivalent"/>
 									<int key="NSPeriodicDelay">400</int>
@@ -187,12 +195,16 @@
 								<object class="NSButtonCell" id="570838979">
 									<int key="NSCellFlags">67239424</int>
 									<int key="NSCellFlags2">0</int>
-									<string key="NSContents">Tracker</string>
+									<string key="NSContents"/>
 									<reference key="NSSupport" ref="737793924"/>
 									<reference key="NSControlView" ref="1020839921"/>
 									<int key="NSTag">2</int>
-									<int key="NSButtonFlags">104612095</int>
+									<int key="NSButtonFlags">108282111</int>
 									<int key="NSButtonFlags2">6</int>
+									<object class="NSCustomResource" key="NSNormalImage">
+										<string key="NSClassName">NSImage</string>
+										<string key="NSResourceName">InfoTracker</string>
+									</object>
 									<string key="NSAlternateContents"/>
 									<string key="NSKeyEquivalent"/>
 									<int key="NSPeriodicDelay">400</int>
@@ -201,12 +213,16 @@
 								<object class="NSButtonCell" id="38805807">
 									<int key="NSCellFlags">67239424</int>
 									<int key="NSCellFlags2">0</int>
-									<string key="NSContents">Peers</string>
+									<string key="NSContents"/>
 									<reference key="NSSupport" ref="737793924"/>
 									<reference key="NSControlView" ref="1020839921"/>
 									<int key="NSTag">3</int>
-									<int key="NSButtonFlags">104612095</int>
+									<int key="NSButtonFlags">108282111</int>
 									<int key="NSButtonFlags2">6</int>
+									<object class="NSCustomResource" key="NSNormalImage">
+										<string key="NSClassName">NSImage</string>
+										<string key="NSResourceName">InfoPeers</string>
+									</object>
 									<string key="NSAlternateContents"/>
 									<string key="NSKeyEquivalent"/>
 									<int key="NSPeriodicDelay">400</int>
@@ -215,12 +231,16 @@
 								<object class="NSButtonCell" id="530185020">
 									<int key="NSCellFlags">67239424</int>
 									<int key="NSCellFlags2">0</int>
-									<string key="NSContents">Files</string>
+									<string key="NSContents"/>
 									<reference key="NSSupport" ref="737793924"/>
 									<reference key="NSControlView" ref="1020839921"/>
 									<int key="NSTag">4</int>
-									<int key="NSButtonFlags">104612095</int>
+									<int key="NSButtonFlags">108806399</int>
 									<int key="NSButtonFlags2">6</int>
+									<object class="NSCustomResource" key="NSNormalImage">
+										<string key="NSClassName">NSImage</string>
+										<string key="NSResourceName">InfoFiles</string>
+									</object>
 									<string key="NSAlternateContents"/>
 									<string key="NSKeyEquivalent"/>
 									<int key="NSPeriodicDelay">400</int>
@@ -229,12 +249,16 @@
 								<object class="NSButtonCell" id="219666447">
 									<int key="NSCellFlags">-2080244224</int>
 									<int key="NSCellFlags2">0</int>
-									<string key="NSContents">Options</string>
+									<string key="NSContents"/>
 									<reference key="NSSupport" ref="737793924"/>
 									<reference key="NSControlView" ref="1020839921"/>
 									<int key="NSTag">5</int>
-									<int key="NSButtonFlags">-2042871553</int>
+									<int key="NSButtonFlags">-2038677249</int>
 									<int key="NSButtonFlags2">6</int>
+									<object class="NSCustomResource" key="NSNormalImage">
+										<string key="NSClassName">NSImage</string>
+										<string key="NSResourceName">InfoOptions</string>
+									</object>
 									<int key="NSPeriodicDelay">400</int>
 									<int key="NSPeriodicInterval">75</int>
 								</object>
@@ -714,9 +738,9 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSBDb21wdXRlciwgSW5jLiwgMjAwNQAAAAA</bytes>
 					<string>InfoTextField</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>{{897, 867}, {403, 75}}</string>
+					<string>{{500, 881}, {403, 75}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{897, 867}, {403, 75}}</string>
+					<string>{{500, 881}, {403, 75}}</string>
 					<integer value="1"/>
 					<string>{{687, 827}, {350, 75}}</string>
 					<boolean value="NO"/>

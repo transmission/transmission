@@ -35,6 +35,10 @@
         name: NSControlTintDidChangeNotification object: NSApp];
     
     fSelected = NO;
+    
+    //expects the icon to currently be set as the image
+    fIcon = [[self image] retain];
+    [self setSelectedTab: fSelected];
 }
 
 - (void) dealloc
@@ -43,14 +47,6 @@
     
     [fIcon release];
     [super dealloc];
-}
-
-- (void) setIcon: (NSImage *) image
-{
-    [fIcon release];
-    fIcon = [image retain];
-    
-    [self setSelectedTab: fSelected];
 }
 
 - (void) setSelectedTab: (BOOL) selected

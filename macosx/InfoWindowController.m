@@ -78,7 +78,6 @@ typedef enum
     
     const CGFloat windowHeight = NSHeight([window frame]);
     
-    #warning check if this is still needed
     [window setFrameAutosaveName: @"InspectorWindow"];
     [window setFrameUsingName: @"InspectorWindow"];
     
@@ -88,14 +87,6 @@ typedef enum
     [window setFrame: windowRect display: NO];
     
     [window setBecomesKeyOnlyIfNeeded: YES];
-    
-    //set tab images
-    [[fTabMatrix cellWithTag: TAB_GENERAL_TAG] setIcon: [NSImage imageNamed: @"InfoGeneral.png"]];
-    [[fTabMatrix cellWithTag: TAB_ACTIVITY_TAG] setIcon: [NSImage imageNamed: @"InfoActivity.png"]];
-    [[fTabMatrix cellWithTag: TAB_TRACKERS_TAG] setIcon: [NSImage imageNamed: @"InfoTracker.png"]];
-    [[fTabMatrix cellWithTag: TAB_PEERS_TAG] setIcon: [NSImage imageNamed: @"InfoPeers.png"]];
-    [[fTabMatrix cellWithTag: TAB_FILE_TAG] setIcon: [NSImage imageNamed: @"InfoFiles.png"]];
-    [[fTabMatrix cellWithTag: TAB_OPTIONS_TAG] setIcon: [NSImage imageNamed: @"InfoOptions.png"]];
     
     //set tab tooltips
     [fTabMatrix setToolTip: NSLocalizedString(@"General Info", "Inspector -> tab") forCell: [fTabMatrix cellWithTag: TAB_GENERAL_TAG]];
