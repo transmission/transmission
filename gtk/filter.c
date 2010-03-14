@@ -515,8 +515,10 @@ testCategory( GtkWidget * category_combo, tr_torrent * tor )
         }
 
         case CAT_FILTER_TYPE_TAG:
+            /* FIXME */
+            return TRUE;
+
         default:
-            g_message( "FIXME" );
             return TRUE;
     }
 }
@@ -922,7 +924,7 @@ gtr_filter_bar_new( GtkTreeModel * tmodel, GtkTreeModel ** filter_model )
     h = gtk_hbox_new( FALSE, GUI_PAD_SMALL );
 
     /* add the category combobox */
-    str = _( "Show _Category:" );
+    str = _( "_Category:" );
     w = category;
     l = gtk_label_new( NULL );
     gtk_label_set_markup_with_mnemonic( GTK_LABEL( l ), str );
