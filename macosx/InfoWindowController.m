@@ -215,7 +215,6 @@ typedef enum
         oldHeight = NSHeight([oldView frame]);
         
         //remove old view
-        [oldView setHidden: YES];
         [oldView removeFromSuperview];
     }
     
@@ -314,7 +313,7 @@ typedef enum
     windowRect.origin.y -= difference;
     windowRect.size.height += difference;
     
-    if ([fViewController respondsToSelector: @selector(saveViewSize)]) //a little bit hacky, but avoids an extra required method
+    if ([fViewController respondsToSelector: @selector(saveViewSize)]) //a little bit hacky, but avoids requiring an extra method
     {
         [window setMinSize: NSMakeSize([window minSize].width, NSHeight(windowRect) - NSHeight(viewRect) + TAB_MIN_HEIGHT)];
         [window setMaxSize: NSMakeSize(FLT_MAX, FLT_MAX)];
@@ -325,13 +324,11 @@ typedef enum
         [window setMaxSize: NSMakeSize(FLT_MAX, NSHeight(windowRect))];
     }
     
-    viewRect.size.width = windowRect.size.width;
+    viewRect.size.width = NSWidth(windowRect);
     [view setFrame: viewRect];
     
     [window setFrame: windowRect display: YES animate: oldTabTag != INVALID];
     [[window contentView] addSubview: view];
-    
-    [view setHidden: NO];
     
     if ([NSApp isOnSnowLeopardOrBetter] && (fCurrentTabTag == TAB_FILE_TAG || oldTabTag == TAB_FILE_TAG)
         && ([QLPreviewPanelSL sharedPreviewPanelExists] && [[QLPreviewPanelSL sharedPreviewPanel] isVisible]))

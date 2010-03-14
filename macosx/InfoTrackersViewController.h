@@ -46,7 +46,6 @@
 - (void) setInfoForTorrents: (NSArray *) torrents;
 - (void) updateInfo;
 
-
 - (void) saveViewSize;
 - (void) clearView;
 
