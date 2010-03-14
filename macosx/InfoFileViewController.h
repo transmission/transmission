@@ -23,10 +23,11 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
+#import "InfoViewController.h"
 
 @class FileOutlineController;
 
-@interface InfoFileViewController : NSViewController
+@interface InfoFileViewController : NSViewController <InfoViewController>
 {
     NSArray * fTorrents;
     

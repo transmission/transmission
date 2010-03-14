@@ -23,12 +23,13 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
+#import "InfoViewController.h"
 
 @class Torrent;
 @class TrackerTableView;
 @class TrackerCell;
 
-@interface InfoTrackersViewController : NSViewController
+@interface InfoTrackersViewController : NSViewController <InfoViewController>
 {
     NSArray * fTorrents;
     

@@ -24,6 +24,7 @@
 
 #import <Cocoa/Cocoa.h>
 
+@protocol InfoViewController;
 @class InfoGeneralViewController;
 @class InfoActivityViewController;
 @class InfoTrackersViewController;
@@ -35,15 +36,16 @@
 {
     NSArray * fTorrents;
     
+    NSViewController <InfoViewController> * fViewController;
+    NSInteger fCurrentTabTag;
+    IBOutlet NSMatrix * fTabMatrix;
+    
     InfoGeneralViewController * fGeneralViewController;
     InfoActivityViewController * fActivityViewController;
     InfoTrackersViewController * fTrackersViewController;
     InfoPeersViewController * fPeersViewController;
     InfoFileViewController * fFileViewController;
     InfoOptionsViewController * fOptionsViewController;
-    
-    NSInteger fCurrentTabTag;
-    IBOutlet NSMatrix * fTabMatrix;
 
     IBOutlet NSImageView * fImageView;
     IBOutlet NSTextField * fNameField, * fBasicInfoField;

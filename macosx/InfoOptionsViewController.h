@@ -23,8 +23,9 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
+#import "InfoViewController.h"
 
-@interface InfoOptionsViewController : NSViewController
+@interface InfoOptionsViewController : NSViewController <InfoViewController>
 {
     NSArray * fTorrents;
     

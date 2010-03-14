@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #import "InfoWindowController.h"
+#import "InfoViewController.h"
 #import "InfoGeneralViewController.h"
 #import "InfoActivityViewController.h"
 #import "InfoTrackersViewController.h"
@@ -59,8 +60,6 @@ typedef enum
 
 - (void) resetInfo;
 - (void) resetInfoForTorrent: (NSNotification *) notification;
-
-- (NSView *) tabViewForTag: (NSInteger) tag;
 
 @end
 
@@ -157,7 +156,7 @@ typedef enum
             break;
     }
     if (resizeSaveKey)
-        [[NSUserDefaults standardUserDefaults] setFloat: [[self tabViewForTag: fCurrentTabTag] frame].size.height forKey: resizeSaveKey];
+        [[NSUserDefaults standardUserDefaults] setFloat: [[fViewController view] frame].size.height forKey: resizeSaveKey];
     
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     
@@ -175,32 +174,6 @@ typedef enum
     fTorrents = [torrents retain];
     
     [self resetInfo];
-}
-
-#warning simplify?
-- (void) updateInfoStats
-{
-    switch ([fTabMatrix selectedTag])
-    {
-        case TAB_GENERAL_TAG:
-            [fGeneralViewController updateInfo];
-            break;
-        case TAB_ACTIVITY_TAG:
-            [fActivityViewController updateInfo];
-            break;
-        case TAB_TRACKERS_TAG:
-            [fTrackersViewController updateInfo];
-            break;
-        case TAB_PEERS_TAG:
-            [fPeersViewController updateInfo];
-            break;
-        case TAB_FILE_TAG:
-            [fFileViewController updateInfo];
-            break;
-        case TAB_OPTIONS_TAG:
-            [fOptionsViewController updateInfo];
-            break;
-    }
 }
 
 - (NSRect) windowWillUseStandardFrame: (NSWindow *) window defaultFrame: (NSRect) defaultFrame
@@ -263,7 +236,7 @@ typedef enum
                 break;
         }
         
-        NSView * oldView = [self tabViewForTag: oldTabTag];
+        NSView * oldView = [fViewController view];
         oldHeight = [oldView frame].size.height;
         if (oldResizeSaveKey)
             [[NSUserDefaults standardUserDefaults] setFloat: oldHeight forKey: oldResizeSaveKey];
@@ -286,6 +259,7 @@ typedef enum
                 [fGeneralViewController setInfoForTorrents: fTorrents];
             }
             
+            fViewController = fGeneralViewController;
             identifier = TAB_INFO_IDENT;
             title = NSLocalizedString(@"General Info", "Inspector -> title");
             break;
@@ -296,6 +270,7 @@ typedef enum
                 [fActivityViewController setInfoForTorrents: fTorrents];
             }
             
+            fViewController = fActivityViewController;
             identifier = TAB_ACTIVITY_IDENT;
             title = NSLocalizedString(@"Activity", "Inspector -> title");
             break;
@@ -306,6 +281,7 @@ typedef enum
                 [fTrackersViewController setInfoForTorrents: fTorrents];
             }
             
+            fViewController = fTrackersViewController;
             identifier = TAB_TRACKER_IDENT;
             title = NSLocalizedString(@"Trackers", "Inspector -> title");
             resizeSaveKey = @"InspectorContentHeightTracker";
@@ -317,6 +293,7 @@ typedef enum
                 [fPeersViewController setInfoForTorrents: fTorrents];
             }
             
+            fViewController = fPeersViewController;
             identifier = TAB_PEERS_IDENT;
             title = NSLocalizedString(@"Peers", "Inspector -> title");
             resizeSaveKey = @"InspectorContentHeightPeers";
@@ -328,6 +305,7 @@ typedef enum
                 [fFileViewController setInfoForTorrents: fTorrents];
             }
             
+            fViewController = fFileViewController;
             identifier = TAB_FILES_IDENT;
             title = NSLocalizedString(@"Files", "Inspector -> title");
             resizeSaveKey = @"InspectorContentHeightFiles";
@@ -339,6 +317,7 @@ typedef enum
                 [fOptionsViewController setInfoForTorrents: fTorrents];
             }
             
+            fViewController = fOptionsViewController;
             identifier = TAB_OPTIONS_IDENT;
             title = NSLocalizedString(@"Options", "Inspector -> title");
             break;
@@ -356,9 +335,9 @@ typedef enum
     //selected tab item
     [(InfoTabButtonCell *)[fTabMatrix selectedCell] setSelectedTab: YES];
     
-    NSView * view = [self tabViewForTag: fCurrentTabTag];
+    NSView * view = [fViewController view];
     
-    [self updateInfoStats];
+    [fViewController updateInfo];
     
     NSRect windowRect = [window frame], viewRect = [view frame];
     
@@ -418,6 +397,11 @@ typedef enum
     
     [fTabMatrix selectCellWithTag: tag];
     [self setTab: nil];
+}
+
+- (void) updateInfoStats
+{
+    [fViewController updateInfo];
 }
 
 - (void) updateOptions
@@ -567,36 +551,13 @@ typedef enum
     [fFileViewController setInfoForTorrents: fTorrents];
     [fOptionsViewController setInfoForTorrents: fTorrents];
     
-    [self updateInfoStats];
+    [fViewController updateInfo];
 }
 
 - (void) resetInfoForTorrent: (NSNotification *) notification
 {
     if (fTorrents && [fTorrents containsObject: [notification object]])
         [self resetInfo];
-}
-
-#warning should we use the view controllers directly
-- (NSView *) tabViewForTag: (NSInteger) tag
-{
-    switch (tag)
-    {
-        case TAB_GENERAL_TAG:
-            return [fGeneralViewController view];
-        case TAB_ACTIVITY_TAG:
-            return [fActivityViewController view];
-        case TAB_TRACKERS_TAG:
-            return [fTrackersViewController view];
-        case TAB_PEERS_TAG:
-            return [fPeersViewController view];
-        case TAB_FILE_TAG:
-            return [fFileViewController view];
-        case TAB_OPTIONS_TAG:
-            return [fOptionsViewController view];
-        default:
-            NSAssert1(NO, @"Unknown tab view for tag: %d", tag);
-            return nil;
-    }
 }
 
 @end
