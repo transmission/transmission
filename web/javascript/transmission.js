@@ -305,8 +305,10 @@ Transmission.prototype =
 			boundingRightPad:  20,
 			boundingBottomPad: 5,
 			onContextMenu:     function(e) {
-				tr.setSelectedTorrent( $(e.target).closest('.torrent')[0]._torrent, true );
-				return true;
+                var closestRow = $(e.target).closest('.torrent')[0]._torrent; 
+                if(!closestRow.isSelected()) 
+                    tr.setSelectedTorrent( closestRow, true );
+                return true;
 			}
 		});
 	},
