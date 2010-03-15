@@ -16,16 +16,16 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
 
-#include "favicon.h"
+#include "favicon.h" /* gtr_get_favicon() */
 #include "filter.h"
 #include "hig.h" /* GUI_PAD */
-#include "tr-core.h"
+#include "tr-core.h" /* MC_TORRENT_RAW */
 #include "util.h" /* gtr_idle_add() */
 
-#define DIRTY_KEY          "tr-filter-dirty"
+#define DIRTY_KEY          "tr-filter-dirty-key"
 #define SESSION_KEY        "tr-session-key"
-#define TEXT_KEY           "tr-filter-text"
-#define TEXT_MODE_KEY      "tr-filter-text-mode"
+#define TEXT_KEY           "tr-filter-text-key"
+#define TEXT_MODE_KEY      "tr-filter-text-mode-key"
 #define TORRENT_MODEL_KEY  "tr-filter-torrent-model-key"
 
 #if !GTK_CHECK_VERSION( 2,16,0 )
@@ -71,6 +71,7 @@ pstrcmp( const void * a, const void * b )
     return strcmp( *(const char**)a, *(const char**)b );
 }
 
+/* pattern-matching text; ie, legaltorrents.com */
 static char*
 get_host_from_url( const char * url )
 {
@@ -92,6 +93,7 @@ get_host_from_url( const char * url )
     return name;
 }
 
+/* human-readable name; ie, Legaltorrents */
 static char*
 get_name_from_host( const char * host )
 {
@@ -130,7 +132,9 @@ favicon_ready_cb( gpointer pixbuf, gpointer vreference )
         GtkTreeModel * model = gtk_tree_row_reference_get_model( reference );
 
         if( gtk_tree_model_get_iter( model, &iter, path ) )
-            gtk_tree_store_set( GTK_TREE_STORE( model ), &iter, CAT_FILTER_COL_PIXBUF, pixbuf, -1 );
+            gtk_tree_store_set( GTK_TREE_STORE( model ), &iter,
+                                CAT_FILTER_COL_PIXBUF, pixbuf,
+                                -1 );
 
         gtk_tree_path_free( path );
 
@@ -155,7 +159,8 @@ category_filter_model_update( GtkTreeStore * store )
     GtkTreeIter parent;
     GtkTreeModel * model = GTK_TREE_MODEL( store );
     GPtrArray * hosts = g_ptr_array_new( );
-    GHashTable * hosts_hash = g_hash_table_new_full( g_str_hash, g_str_equal, g_free, g_free );
+    GHashTable * hosts_hash = g_hash_table_new_full( g_str_hash, g_str_equal,
+                                                     g_free, g_free );
     GObject * o = G_OBJECT( store );
     GtkTreeModel * tmodel = GTK_TREE_MODEL(
                                     g_object_get_data( o, TORRENT_MODEL_KEY ) );
@@ -228,7 +233,7 @@ category_filter_model_update( GtkTreeStore * store )
     gtk_tree_model_iter_nth_child( model, &iter, NULL, 0 );
     category_model_update_count( store, &iter, all );
 
-    /* update the "public" count */
+    /* update the "public" subtree */
     gtk_tree_model_iter_nth_child( model, &parent, NULL, 2 );
     gtk_tree_model_iter_nth_child( model, &iter, &parent, 0 );
     category_model_update_count( store, &iter, public );
@@ -246,10 +251,7 @@ category_filter_model_update( GtkTreeStore * store )
 
     /* update the "hosts" subtree */
     gtk_tree_model_iter_nth_child( model, &parent, NULL, 4 );
-    i = 0;
-    n = hosts->len;
-    store_pos = 0;
-    for( ;; )
+    for( i=store_pos=0, n=hosts->len ; ; )
     {
         const gboolean new_hosts_done = i >= n;
         const gboolean old_hosts_done = !gtk_tree_model_iter_nth_child( model, &iter, &parent, store_pos );
@@ -390,10 +392,10 @@ category_filter_model_new( GtkTreeModel * tmodel )
 }
 
 static gboolean
-is_it_a_separator( GtkTreeModel * model, GtkTreeIter * iter, gpointer data UNUSED )
+is_it_a_separator( GtkTreeModel * m, GtkTreeIter * iter, gpointer data UNUSED )
 {
     int type;
-    gtk_tree_model_get( model, iter, CAT_FILTER_COL_TYPE, &type, -1 );
+    gtk_tree_model_get( m, iter, CAT_FILTER_COL_TYPE, &type, -1 );
     return type == CAT_FILTER_TYPE_SEPARATOR;
 }
 
@@ -401,7 +403,7 @@ static void
 category_model_update_idle( gpointer category_model )
 {
     GObject * o = G_OBJECT( category_model );
-    gboolean pending = GPOINTER_TO_INT( g_object_get_data( o, DIRTY_KEY ) );
+    const gboolean pending = g_object_get_data( o, DIRTY_KEY ) != NULL;
     if( !pending )
     {
         GSourceFunc func = (GSourceFunc) category_filter_model_update;
@@ -439,11 +441,11 @@ render_pixbuf_func( GtkCellLayout    * cell_layout UNUSED,
     g_object_set( cell_renderer, "width", type==CAT_FILTER_TYPE_HOST ? 20 : 0, NULL );
 }
 static void
-render_hit_count_func( GtkCellLayout    * cell_layout UNUSED,
-                       GtkCellRenderer  * cell_renderer,
-                       GtkTreeModel     * tree_model,
-                       GtkTreeIter      * iter,
-                       gpointer           data UNUSED )
+render_number_func( GtkCellLayout    * cell_layout UNUSED,
+                    GtkCellRenderer  * cell_renderer,
+                    GtkTreeModel     * tree_model,
+                    GtkTreeIter      * iter,
+                    gpointer           data UNUSED )
 {
     int count;
     char buf[512];
@@ -502,7 +504,7 @@ category_combo_box_new( GtkTreeModel * tmodel )
 
     r = number_renderer_new( );
     gtk_cell_layout_pack_end( GTK_CELL_LAYOUT( c ), r, TRUE );
-    gtk_cell_layout_set_cell_data_func( GTK_CELL_LAYOUT( c ), r, render_hit_count_func, NULL, NULL );
+    gtk_cell_layout_set_cell_data_func( GTK_CELL_LAYOUT( c ), r, render_number_func, NULL, NULL );
 
     g_signal_connect( tmodel, "row-changed",
                       G_CALLBACK( torrent_model_row_changed ), category_model );
@@ -513,10 +515,6 @@ category_combo_box_new( GtkTreeModel * tmodel )
 
     return c;
 }
-
-/***
-****
-***/
 
 static gboolean
 testCategory( GtkWidget * category_combo, tr_torrent * tor )
@@ -626,7 +624,7 @@ test_torrent_state( tr_torrent * tor, int type )
 
         case STATE_FILTER_ACTIVE:
             return ( st->peersSendingToUs > 0 )
-                || ( st->peersGettingFromUs > 0 );
+                || ( st->peersGettingFromUs > 0 )
                 || ( st->activity == TR_STATUS_CHECK );
 
         case STATE_FILTER_PAUSED:
@@ -667,7 +665,8 @@ static void
 status_model_update_count( GtkListStore * store, GtkTreeIter * iter, int n )
 {
     int count;
-    gtk_tree_model_get( GTK_TREE_MODEL( store ), iter, STATE_FILTER_COL_COUNT, &count, -1 );
+    GtkTreeModel * model = GTK_TREE_MODEL( store );
+    gtk_tree_model_get( model, iter, STATE_FILTER_COL_COUNT, &count, -1 );
     if( n != count )
         gtk_list_store_set( store, iter, STATE_FILTER_COL_COUNT, n, -1 );
 }
@@ -718,12 +717,15 @@ state_filter_model_new( GtkTreeModel * tmodel )
         { STATE_FILTER_ACTIVE, N_( "Active" ) },
         { STATE_FILTER_PAUSED, N_( "Paused" ) },
         { STATE_FILTER_QUEUED, N_( "Queued" ) },
-        { STATE_FILTER_CHECKING, N_( "Verifying" ) },
+        { STATE_FILTER_VERIFYING, N_( "Verifying" ) },
         { STATE_FILTER_ERROR, N_( "Error" ) }
     };
     GtkListStore * store;
 
-    store = gtk_list_store_new( STATE_FILTER_N_COLS, G_TYPE_STRING, G_TYPE_INT, G_TYPE_INT );
+    store = gtk_list_store_new( STATE_FILTER_N_COLS,
+                                G_TYPE_STRING,
+                                G_TYPE_INT,
+                                G_TYPE_INT );
     for( i=0, n=G_N_ELEMENTS(types); i<n; ++i )
         gtk_list_store_insert_with_values( store, NULL, -1,
                                            STATE_FILTER_COL_NAME, _( types[i].name ),
@@ -739,7 +741,7 @@ static void
 state_model_update_idle( gpointer state_model )
 {
     GObject * o = G_OBJECT( state_model );
-    gboolean pending = GPOINTER_TO_INT( g_object_get_data( o, DIRTY_KEY ) );
+    const gboolean pending = g_object_get_data( o, DIRTY_KEY ) != NULL;
     if( !pending )
     {
         GSourceFunc func = (GSourceFunc) state_filter_model_update;
@@ -784,7 +786,7 @@ state_combo_box_new( GtkTreeModel * tmodel )
 
     r = number_renderer_new( );
     gtk_cell_layout_pack_end( GTK_CELL_LAYOUT( c ), r, TRUE );
-    gtk_cell_layout_set_cell_data_func( GTK_CELL_LAYOUT( c ), r, render_hit_count_func, NULL, NULL );
+    gtk_cell_layout_set_cell_data_func( GTK_CELL_LAYOUT( c ), r, render_number_func, NULL, NULL );
 
     g_signal_connect( tmodel, "row-changed",
                       G_CALLBACK( state_torrent_model_row_changed ), state_model );
@@ -970,8 +972,9 @@ gtr_filter_bar_new( tr_session * session, GtkTreeModel * tmodel, GtkTreeModel **
     g_object_set( G_OBJECT( data->category ), "width-request", 170, NULL );
     g_object_set_data( G_OBJECT( gtk_combo_box_get_model( GTK_COMBO_BOX( data->category ) ) ), SESSION_KEY, session );
 
-    gtk_tree_model_filter_set_visible_func( GTK_TREE_MODEL_FILTER( data->filter_model ),
-                                            is_row_visible, data, g_free );
+    gtk_tree_model_filter_set_visible_func(
+        GTK_TREE_MODEL_FILTER( data->filter_model ),
+        is_row_visible, data, g_free );
 
     g_signal_connect( data->category, "changed", G_CALLBACK( selection_changed_cb ), data );
     g_signal_connect( data->state, "changed", G_CALLBACK( selection_changed_cb ), data );

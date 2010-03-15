@@ -10,11 +10,11 @@
  * $Id:$
  */
 
-#include <glib/gstdio.h> /* g_remove */
+#include <glib/gstdio.h> /* g_remove() */
 #include <gtk/gtk.h>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/web.h> /* tr_webRun */
+#include <libtransmission/web.h> /* tr_webRun() */
 
 #include "favicon.h"
 #include "util.h" /* gtr_mkdir_with_parents(), gtr_idle_add() */
@@ -35,7 +35,10 @@ favicon_get_cache_dir( void )
 
     if( dir == NULL )
     {
-        dir = g_build_filename( g_get_user_cache_dir(), "transmission", "favicons", NULL );
+        dir = g_build_filename( g_get_user_cache_dir(),
+                                "transmission",
+                                "favicons",
+                                NULL );
         gtr_mkdir_with_parents( dir, 0777 );
     }
 
@@ -63,9 +66,9 @@ favicon_load_from_data( const void * data, size_t len )
 
     if( len > 0 )
     {
-        GInputStream * input_stream = g_memory_input_stream_new_from_data( data, len, NULL );
-        pixbuf = gdk_pixbuf_new_from_stream_at_scale( input_stream, 16, 16, TRUE, NULL, NULL );
-        g_object_unref( input_stream );
+        GInputStream * i = g_memory_input_stream_new_from_data( data, len, NULL );
+        pixbuf = gdk_pixbuf_new_from_stream_at_scale( i, 16, 16, TRUE, NULL, NULL );
+        g_object_unref( i );
     }
 
     return pixbuf;
@@ -123,10 +126,10 @@ favicon_load_from_file( const char * host )
 }
     
 void
-gtr_get_favicon( tr_session * session,
-                 const char * host, 
-                 GFunc pixbuf_ready_func, 
-                 gpointer pixbuf_ready_func_data )
+gtr_get_favicon( tr_session  * session,
+                 const char  * host, 
+                 GFunc         pixbuf_ready_func, 
+                 gpointer      pixbuf_ready_func_data )
 {
     GdkPixbuf * pixbuf = favicon_load_from_file( host );
 
