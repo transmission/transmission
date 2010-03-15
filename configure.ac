@@ -501,22 +501,27 @@ echo "
 
 Configuration:
 
-   Source code location:                                       ${srcdir}
-   Compiler:                                                   ${CXX}
-   System or bundled libevent:                                 ${libevent_source}
+   Source code location:                              ${srcdir}
+   Compiler:                                          ${CXX}
+   System or bundled libevent:                        ${libevent_source}
 
-   Build Command-Line client:                                  ${build_cli}
+   Build Command-Line client:                         ${build_cli}
 
-   Build GTK+ client:                                          ${build_gtk}
-      optional dbus support:                                   ${use_dbus_glib}
-      optional gio for optional watchdir support:              ${use_gio}
-      optional libnotify for 'download completed' popups:      ${use_libnotify}
-      optional libcanberra for 'download completed' sounds:    ${use_canberra}
-      optional libgconf to tell GNOME we handle magnet links:  ${use_libgconf}
-      optional libappindicator for Ubuntu-style system tray:   ${use_libappindicator}
+   Build GTK+ client:                                 ${build_gtk}
 
-   Build Daemon:                                               ${build_daemon}
+      dbus support:                                   ${use_dbus_glib}
+      gio for watchdir support:                       ${use_gio}
+      libnotify for 'download completed' popups:      ${use_libnotify}
+      libcanberra for 'download completed' sounds:    ${use_canberra}
+      libgconf to tell GNOME we handle magnet links:  ${use_libgconf}
+      libappindicator for Ubuntu-style system tray:   ${use_libappindicator}
 
-   Build Mac client:                                           ${build_mac}
+      THESE ARE ALL OPTIONAL. If you're a packager
+      or user who doesn't want these dependencies,
+      use the ones you want and skip all the rest.
+
+   Build Daemon:                                      ${build_daemon}
+
+   Build Mac client:                                  ${build_mac}
 
 "
