@@ -91,6 +91,7 @@ EXTRA_DIST = \
     InfoPeersViewController.m \
     InfoTrackersViewController.h \
     InfoTrackersViewController.m \
+    InfoViewController.h \
     InfoWindowController.h \
     InfoWindowController.m \
     main.m \

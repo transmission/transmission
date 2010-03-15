@@ -1,4 +1,4 @@
-=== Transmission 1.92 (2010/03/11) ===
+=== Transmission 1.92 (2010/03/14) ===
 [http://trac.transmissionbt.com/query?milestone=1.92&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Fix possible data corruption issue caused by data sent by bad peers during endgame
