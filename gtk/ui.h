@@ -33,7 +33,7 @@ static const char * fallback_ui_file =
     "      <menuitem action='delete-torrent'/>\n"
     "    </menu>\n"
     "    <menu action='view-menu'>\n"
-    "      <menuitem action='minimal-view'/>\n"
+    "      <menuitem action='compact-view'/>\n"
     "      <separator/>\n"
     "      <menuitem action='show-toolbar'/>\n"
     "      <menuitem action='show-filterbar'/>\n"

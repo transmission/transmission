@@ -93,7 +93,7 @@ toggle_pref_cb( GtkToggleAction *  action,
 static GtkToggleActionEntry  pref_toggle_entries[] =
 {
     { "alt-speed-enabled", NULL, N_( "Enable Temporary Speed _Limits" ), NULL, NULL, G_CALLBACK( toggle_pref_cb ), FALSE },
-    { "minimal-view",      NULL, N_( "_Minimal View" ), "<alt>M", NULL, G_CALLBACK( toggle_pref_cb ), FALSE },
+    { "compact-view",      NULL, N_( "_Compact View" ), "<alt>C", NULL, G_CALLBACK( toggle_pref_cb ), FALSE },
     { "sort-reversed",     NULL, N_( "Re_verse Sort Order" ), NULL, NULL, G_CALLBACK( toggle_pref_cb ), FALSE },
     { "show-filterbar",    NULL, N_( "_Filterbar" ), NULL, NULL, G_CALLBACK( toggle_pref_cb ), FALSE },
     { "show-statusbar",    NULL, N_( "_Statusbar" ), NULL, NULL, G_CALLBACK( toggle_pref_cb ), FALSE },

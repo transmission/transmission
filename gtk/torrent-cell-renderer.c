@@ -29,12 +29,12 @@ enum
     P_UPLOAD_SPEED,
     P_DOWNLOAD_SPEED,
     P_BAR_HEIGHT,
-    P_MINIMAL
+    P_COMPACT
 };
 
 #define DEFAULT_BAR_HEIGHT 12
 #define SMALL_SCALE 0.9
-#define MINIMAL_ICON_SIZE GTK_ICON_SIZE_MENU
+#define COMPACT_ICON_SIZE GTK_ICON_SIZE_MENU
 #define FULL_ICON_SIZE GTK_ICON_SIZE_DND
 
 /***
@@ -314,7 +314,7 @@ struct TorrentCellRendererPrivate
     /* @see upload_speed */
     double download_speed;
 
-    gboolean minimal;
+    gboolean compact;
 };
 
 /***
@@ -350,7 +350,7 @@ get_text_renderer( const tr_stat * st, TorrentCellRenderer * r )
 ***/
 
 static void
-get_size_minimal( TorrentCellRenderer * cell,
+get_size_compact( TorrentCellRenderer * cell,
                   GtkWidget           * widget,
                   gint                * width,
                   gint                * height )
@@ -368,7 +368,7 @@ get_size_minimal( TorrentCellRenderer * cell,
     const tr_torrent * tor = p->tor;
     const tr_stat * st = tr_torrentStatCached( (tr_torrent*)tor );
 
-    icon = get_icon( tor, MINIMAL_ICON_SIZE, widget );
+    icon = get_icon( tor, COMPACT_ICON_SIZE, widget );
     name = tr_torrentInfo( tor )->name;
     status = getShortStatusString( tor, st, p->upload_speed, p->download_speed );
 
@@ -391,10 +391,11 @@ get_size_minimal( TorrentCellRenderer * cell,
     *** LAYOUT
     **/
 
+#define BAR_WIDTH 50
     if( width != NULL )
-        *width = cell->parent.xpad * 2 + icon_area.width + GUI_PAD + name_area.width + GUI_PAD + stat_area.width;
+        *width = cell->parent.xpad * 2 + icon_area.width + GUI_PAD + name_area.width + GUI_PAD + BAR_WIDTH + GUI_PAD + stat_area.width;
     if( height != NULL )
-        *height = cell->parent.ypad * 2 + name_area.height + p->bar_height;
+        *height = cell->parent.ypad * 2 + MAX( name_area.height, p->bar_height );
 
     /* cleanup */
     g_free( status );
@@ -481,8 +482,8 @@ torrent_cell_renderer_get_size( GtkCellRenderer  * cell,
         struct TorrentCellRendererPrivate * p = self->priv;
         int w, h;
 
-        if( p->minimal )
-            get_size_minimal( TORRENT_CELL_RENDERER( cell ), widget, &w, &h );
+        if( p->compact )
+            get_size_compact( TORRENT_CELL_RENDERER( cell ), widget, &w, &h );
         else
             get_size_full( TORRENT_CELL_RENDERER( cell ), widget, &w, &h );
 
@@ -503,7 +504,7 @@ torrent_cell_renderer_get_size( GtkCellRenderer  * cell,
 }
 
 static void
-render_minimal( TorrentCellRenderer   * cell,
+render_compact( TorrentCellRenderer   * cell,
                 GdkDrawable           * window,
                 GtkWidget             * widget,
                 GdkRectangle          * background_area,
@@ -529,7 +530,7 @@ render_minimal( TorrentCellRenderer   * cell,
     const double percentDone = MAX( 0.0, st->percentDone );
     const gboolean sensitive = active || st->error;
 
-    icon = get_icon( tor, MINIMAL_ICON_SIZE, widget );
+    icon = get_icon( tor, COMPACT_ICON_SIZE, widget );
     name = tr_torrentInfo( tor )->name;
     status = getShortStatusString( tor, st, p->upload_speed, p->download_speed );
 
@@ -547,6 +548,13 @@ render_minimal( TorrentCellRenderer   * cell,
     gtk_cell_renderer_get_size( text_renderer, widget, NULL, NULL, NULL, &w, &h );
     stat_area.width = w;
     stat_area.height = h;
+    prog_area.height = p->bar_height;
+
+    h = 1;
+    h = MAX( h, stat_area.height );
+    h = MAX( h, name_area.height );
+    h = MAX( h, icon_area.height );
+    h = MAX( h, prog_area.height );
 
     /**
     *** LAYOUT
@@ -560,22 +568,23 @@ render_minimal( TorrentCellRenderer   * cell,
 
     /* icon */
     icon_area.x = fill_area.x;
-    icon_area.y = fill_area.y + ( fill_area.height - icon_area.height ) / 2;
+    icon_area.y = fill_area.y;
+    icon_area.height = h;
+
+    /* progressbar */
+    prog_area.x = fill_area.x + fill_area.width - BAR_WIDTH;
+    prog_area.y = fill_area.y;
+    prog_area.width = BAR_WIDTH;
+    prog_area.height = h;
 
     /* short status (right justified) */
-    stat_area.x = fill_area.x + fill_area.width - stat_area.width;
-    stat_area.y = fill_area.y + ( name_area.height - stat_area.height ) / 2;
+    stat_area.x = prog_area.x - GUI_PAD - stat_area.width;
+    stat_area.y = fill_area.y + ( h - stat_area.height ) / 2;
 
     /* name */
     name_area.x = icon_area.x + icon_area.width + GUI_PAD;
-    name_area.y = fill_area.y;
+    name_area.y = fill_area.y + ( h - name_area.height ) / 2;
     name_area.width = stat_area.x - GUI_PAD - name_area.x;
-
-    /* progressbar */
-    prog_area.x = name_area.x;
-    prog_area.y = name_area.y + name_area.height;
-    prog_area.width = name_area.width + GUI_PAD + stat_area.width;
-    prog_area.height = p->bar_height;
 
     /**
     *** RENDER
@@ -583,12 +592,12 @@ render_minimal( TorrentCellRenderer   * cell,
 
     g_object_set( p->icon_renderer, "pixbuf", icon, "sensitive", sensitive, NULL );
     gtk_cell_renderer_render( p->icon_renderer, window, widget, &icon_area, &icon_area, &icon_area, flags );
+    g_object_set( p->progress_renderer, "value", (int)(percentDone*100.0), "text", NULL, "sensitive", sensitive, NULL );
+    gtk_cell_renderer_render( p->progress_renderer, window, widget, &prog_area, &prog_area, &prog_area, flags );
     g_object_set( text_renderer, "text", status, "scale", SMALL_SCALE, "sensitive", sensitive, "ellipsize", PANGO_ELLIPSIZE_END, NULL );
     gtk_cell_renderer_render( text_renderer, window, widget, &stat_area, &stat_area, &stat_area, flags );
     g_object_set( text_renderer, "text", name, "scale", 1.0, NULL );
     gtk_cell_renderer_render( text_renderer, window, widget, &name_area, &name_area, &name_area, flags );
-    g_object_set( p->progress_renderer, "value", (int)(percentDone*100.0), "text", "", "sensitive", sensitive, NULL );
-    gtk_cell_renderer_render( p->progress_renderer, window, widget, &prog_area, &prog_area, &prog_area, flags );
 
     /* cleanup */
     g_free( status );
@@ -724,8 +733,8 @@ torrent_cell_renderer_render( GtkCellRenderer       * cell,
     if( self && self->priv->tor )
     {
         struct TorrentCellRendererPrivate * p = self->priv;
-        if( p->minimal )
-            render_minimal( self, window, widget, background_area, cell_area, expose_area, flags );
+        if( p->compact )
+            render_compact( self, window, widget, background_area, cell_area, expose_area, flags );
         else
             render_full( self, window, widget, background_area, cell_area, expose_area, flags );
     }
@@ -750,7 +759,7 @@ torrent_cell_renderer_set_property( GObject      * object,
         case P_UPLOAD_SPEED:   p->upload_speed   = g_value_get_double( v ); break;
         case P_DOWNLOAD_SPEED: p->download_speed = g_value_get_double( v ); break;
         case P_BAR_HEIGHT:     p->bar_height     = g_value_get_int( v ); break;
-        case P_MINIMAL:        p->minimal        = g_value_get_boolean( v ); break;
+        case P_COMPACT:        p->compact        = g_value_get_boolean( v ); break;
         default: G_OBJECT_WARN_INVALID_PROPERTY_ID( object, property_id, pspec ); break;
     }
 }
@@ -770,7 +779,7 @@ torrent_cell_renderer_get_property( GObject     * object,
         case P_UPLOAD_SPEED:   g_value_set_double( v, p->upload_speed ); break;
         case P_DOWNLOAD_SPEED: g_value_set_double( v, p->download_speed ); break;
         case P_BAR_HEIGHT:     g_value_set_int( v, p->bar_height ); break;
-        case P_MINIMAL:        g_value_set_boolean( v, p->minimal ); break;
+        case P_COMPACT:        g_value_set_boolean( v, p->compact ); break;
         default: G_OBJECT_WARN_INVALID_PROPERTY_ID( object, property_id, pspec ); break;
     }
 }
@@ -835,9 +844,9 @@ torrent_cell_renderer_class_init( TorrentCellRendererClass * klass )
                                                       DEFAULT_BAR_HEIGHT,
                                                       G_PARAM_READWRITE ) );
 
-    g_object_class_install_property( gobject_class, P_MINIMAL,
-                                    g_param_spec_boolean( "minimal", NULL,
-                                                          "Minimal Mode",
+    g_object_class_install_property( gobject_class, P_COMPACT,
+                                    g_param_spec_boolean( "compact", NULL,
+                                                          "Compact Mode",
                                                           FALSE,
                                                           G_PARAM_READWRITE ) );
 }

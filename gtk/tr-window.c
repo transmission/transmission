@@ -177,9 +177,9 @@ prefsChanged( TrCore * core UNUSED,
 {
     PrivateData * p = get_private_data( GTK_WINDOW( wind ) );
 
-    if( !strcmp( key, PREF_KEY_MINIMAL_VIEW ) )
+    if( !strcmp( key, PREF_KEY_COMPACT_VIEW ) )
     {
-        g_object_set( p->renderer, "minimal", pref_flag_get( key ), NULL );
+        g_object_set( p->renderer, "compact", pref_flag_get( key ), NULL );
         /* since the cell size has changed, we need gtktreeview to revalidate
          * its fixed-height mode values.  Unfortunately there's not an API call
          * for that, but it *does* revalidate when it thinks the style's been tweaked */
@@ -748,7 +748,7 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
 
     /* listen for prefs changes that affect the window */
     p->core = core;
-    prefsChanged( core, PREF_KEY_MINIMAL_VIEW, self );
+    prefsChanged( core, PREF_KEY_COMPACT_VIEW, self );
     prefsChanged( core, PREF_KEY_FILTERBAR, self );
     prefsChanged( core, PREF_KEY_STATUSBAR, self );
     prefsChanged( core, PREF_KEY_STATUSBAR_STATS, self );
