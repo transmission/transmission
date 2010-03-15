@@ -436,7 +436,7 @@ render_pixbuf_func( GtkCellLayout    * cell_layout UNUSED,
 {
     int type;
     gtk_tree_model_get( tree_model, iter, CAT_FILTER_COL_TYPE, &type, -1 );
-    g_object_set( cell_renderer, "width", type==CAT_FILTER_TYPE_HOST ? 16 : 0, NULL );
+    g_object_set( cell_renderer, "width", type==CAT_FILTER_TYPE_HOST ? 20 : 0, NULL );
 }
 static void
 render_hit_count_func( GtkCellLayout    * cell_layout UNUSED,
@@ -590,7 +590,7 @@ enum
     STATE_FILTER_ACTIVE,
     STATE_FILTER_PAUSED,
     STATE_FILTER_QUEUED,
-    STATE_FILTER_CHECKING,
+    STATE_FILTER_VERIFYING,
     STATE_FILTER_ERROR,
     STATE_FILTER_SEPARATOR
 };
@@ -625,7 +625,9 @@ test_torrent_state( tr_torrent * tor, int type )
             return st->activity == TR_STATUS_SEED;
 
         case STATE_FILTER_ACTIVE:
-            return st->peersSendingToUs > 0 || st->peersGettingFromUs > 0;
+            return ( st->peersSendingToUs > 0 )
+                || ( st->peersGettingFromUs > 0 );
+                || ( st->activity == TR_STATUS_CHECK );
 
         case STATE_FILTER_PAUSED:
             return st->activity == TR_STATUS_STOPPED;
@@ -633,7 +635,7 @@ test_torrent_state( tr_torrent * tor, int type )
         case STATE_FILTER_QUEUED:
             return FALSE;
 
-        case STATE_FILTER_CHECKING:
+        case STATE_FILTER_VERIFYING:
             return ( st->activity == TR_STATUS_CHECK_WAIT )
                 || ( st->activity == TR_STATUS_CHECK );
 
@@ -965,7 +967,7 @@ gtr_filter_bar_new( tr_session * session, GtkTreeModel * tmodel, GtkTreeModel **
     data->entry = NULL;
     data->filter_model = gtk_tree_model_filter_new( tmodel, NULL );
 
-    g_object_set( G_OBJECT( data->category ), "width-request", 150, NULL );
+    g_object_set( G_OBJECT( data->category ), "width-request", 170, NULL );
     g_object_set_data( G_OBJECT( gtk_combo_box_get_model( GTK_COMBO_BOX( data->category ) ) ), SESSION_KEY, session );
 
     gtk_tree_model_filter_set_visible_func( GTK_TREE_MODEL_FILTER( data->filter_model ),
