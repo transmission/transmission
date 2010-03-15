@@ -55,8 +55,9 @@
 #define KEY_RATIOLIMIT_RATIO       "ratio-limit"
 #define KEY_RATIOLIMIT_MODE        "ratio-mode"
 
-#define KEY_PROGRESS_MTIMES   "mtimes"
-#define KEY_PROGRESS_BITFIELD "bitfield"
+#define KEY_PROGRESS_MTIMES    "mtimes"
+#define KEY_PROGRESS_BITFIELD  "bitfield"
+#define KEY_PROGRESS_HAVE      "have"
 
 enum
 {
@@ -396,7 +397,9 @@ saveProgress( tr_benc *          dict,
         tr_bencListAddInt( m, mtimes[i] );
     }
 
-    /* add the bitfield */
+    /* add the progress */
+    if( tor->completeness == TR_SEED )
+        tr_bencDictAddStr( p, KEY_PROGRESS_HAVE, "all" );
     bitfield = tr_cpBlockBitfield( &tor->completion );
     tr_bencDictAddRaw( p, KEY_PROGRESS_BITFIELD,
                        bitfield->bits, bitfield->byteCount );
@@ -414,6 +417,8 @@ loadProgress( tr_benc *    dict,
 
     if( tr_bencDictFindDict( dict, KEY_PROGRESS, &p ) )
     {
+        const char * err;
+        const char * str;
         const uint8_t * raw;
         size_t          rawlen;
         tr_benc *       m;
@@ -459,26 +464,28 @@ loadProgress( tr_benc *    dict,
                 tor, "Torrent needs to be verified - unable to find mtimes" );
         }
 
-        if( tr_bencDictFindRaw( p, KEY_PROGRESS_BITFIELD, &raw, &rawlen ) )
+        err = NULL;
+        if( tr_bencDictFindStr( p, KEY_PROGRESS_HAVE, &str ) )
+        {
+            if( !strcmp( str, "all" ) )
+                tr_cpSetHaveAll( &tor->completion );
+            else
+                err = "Invalid value for HAVE";
+        }
+        else if( tr_bencDictFindRaw( p, KEY_PROGRESS_BITFIELD, &raw, &rawlen ) )
         {
             tr_bitfield tmp;
             tmp.byteCount = rawlen;
             tmp.bitCount = tmp.byteCount * 8;
             tmp.bits = (uint8_t*) raw;
             if( !tr_cpBlockBitfieldSet( &tor->completion, &tmp ) )
-            {
-                tr_torrentUncheck( tor );
-                tr_tordbg(
-                    tor,
-                    "Torrent needs to be verified - error loading bitfield" );
-            }
+                err = "Error loading bitfield";
         }
-        else
-        {
+        else err = "Couldn't find 'have' or 'bitfield'";
+        if( err != NULL )
+        { 
             tr_torrentUncheck( tor );
-            tr_tordbg(
-                tor,
-                "Torrent needs to be verified - unable to find bitfield" );
+            tr_tordbg( tor, "Torrent needs to be verified - %s", err );
         }
 
         tr_free( curMTimes );

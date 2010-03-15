@@ -164,6 +164,24 @@ tr_cpBlockAdd( tr_completion * cp, tr_block_index_t block )
     }
 }
 
+
+void
+tr_cpSetHaveAll( tr_completion * cp )
+{
+    tr_piece_index_t i;
+    tr_torrent * tor = cp->tor;
+
+    tr_cpReset( cp );
+
+    cp->sizeNow = tor->info.totalSize;
+    tr_bitfieldAddRange( &cp->blockBitfield, 0, tor->blockCount );
+    tr_bitfieldAddRange( &cp->pieceBitfield, 0, tor->info.pieceCount );
+    for( i=0; i<tor->info.pieceCount; ++i )
+        cp->completeBlocks[i] = tr_torPieceCountBlocks( tor, i );
+    cp->sizeWhenDoneIsDirty = 1;
+    cp->haveValidIsDirty = 1;
+}
+
 /* Initialize a completion object from a bitfield indicating which blocks we have */
 tr_bool
 tr_cpBlockBitfieldSet( tr_completion * cp, tr_bitfield * blockBitfield )
