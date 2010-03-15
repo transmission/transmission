@@ -184,7 +184,7 @@ class TrMainWindow: public QMainWindow
         void setFilterbarVisible( bool );
         void setStatusbarVisible( bool );
         void setTrayIconVisible( bool );
-        void setMinimalView( bool );
+        void setCompactView( bool );
         void refreshActionSensitivity( );
         void wrongAuthentication( );
 

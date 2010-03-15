@@ -136,7 +136,7 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     connect( ui.action_TrayIcon, SIGNAL(toggled(bool)), this, SLOT(setTrayIconVisible(bool)));
     connect( ui.action_Filterbar, SIGNAL(toggled(bool)), this, SLOT(setFilterbarVisible(bool)));
     connect( ui.action_Statusbar, SIGNAL(toggled(bool)), this, SLOT(setStatusbarVisible(bool)));
-    connect( ui.action_MinimalView, SIGNAL(toggled(bool)), this, SLOT(setMinimalView(bool)));
+    connect( ui.action_CompactView, SIGNAL(toggled(bool)), this, SLOT(setCompactView(bool)));
     connect( ui.action_SortByActivity, SIGNAL(toggled(bool)), this, SLOT(onSortByActivityToggled(bool)));
     connect( ui.action_SortByAge,      SIGNAL(toggled(bool)), this, SLOT(onSortByAgeToggled(bool)));
     connect( ui.action_SortByETA,      SIGNAL(toggled(bool)), this, SLOT(onSortByETAToggled(bool)));
@@ -259,7 +259,7 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
              << Prefs :: STATUSBAR_STATS
              << Prefs :: TOOLBAR
              << Prefs :: ALT_SPEED_LIMIT_ENABLED
-             << Prefs :: MINIMAL_VIEW
+             << Prefs :: COMPACT_VIEW
              << Prefs :: DSPEED
              << Prefs :: DSPEED_ENABLED
              << Prefs :: USPEED
@@ -886,9 +886,9 @@ void TrMainWindow :: showSessionTransfer ( ) { myPrefs.set( Prefs::STATUSBAR_STA
 **/
 
 void
-TrMainWindow :: setMinimalView( bool visible )
+TrMainWindow :: setCompactView( bool visible )
 {
-    myPrefs.set( Prefs :: MINIMAL_VIEW, visible );
+    myPrefs.set( Prefs :: COMPACT_VIEW, visible );
 }
 void
 TrMainWindow :: setTrayIconVisible( bool visible )
@@ -1038,9 +1038,9 @@ TrMainWindow :: refreshPref( int key )
             myTrayIcon.setVisible( b );
             break;
 
-        case Prefs::MINIMAL_VIEW:
+        case Prefs::COMPACT_VIEW:
             b = myPrefs.getBool( key );
-            ui.action_MinimalView->setChecked( b );
+            ui.action_CompactView->setChecked( b );
             ui.listView->setItemDelegate( b ? myTorrentDelegateMin : myTorrentDelegate );
             ui.listView->reset( ); // force the rows to resize
             break;

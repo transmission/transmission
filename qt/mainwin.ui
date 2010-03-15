@@ -51,7 +51,7 @@
      <x>0</x>
      <y>0</y>
      <width>792</width>
-     <height>25</height>
+     <height>23</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -103,7 +103,7 @@
     <property name="title">
      <string>&amp;View</string>
     </property>
-    <addaction name="action_MinimalView"/>
+    <addaction name="action_CompactView"/>
     <addaction name="separator"/>
     <addaction name="action_Toolbar"/>
     <addaction name="action_Filterbar"/>
@@ -319,12 +319,18 @@
     <string>&amp;Preferences</string>
    </property>
   </action>
-  <action name="action_MinimalView">
+  <action name="action_CompactView">
    <property name="checkable">
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>&amp;Minimal View</string>
+    <string>&amp;Compact View</string>
+   </property>
+   <property name="iconText">
+    <string>Compact View</string>
+   </property>
+   <property name="toolTip">
+    <string>Compact View</string>
    </property>
    <property name="shortcut">
     <string>Alt+M</string>

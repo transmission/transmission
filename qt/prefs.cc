@@ -43,7 +43,7 @@ Prefs::PrefItem Prefs::myItems[] =
     { ASKQUIT, "prompt-before-exit", QVariant::Bool },
     { SORT_MODE, "sort-mode", TrTypes::SortModeType },
     { SORT_REVERSED, "sort-reversed", QVariant::Bool },
-    { MINIMAL_VIEW, "minimal-view", QVariant::Bool },
+    { COMPACT_VIEW, "compact-view", QVariant::Bool },
     { FILTERBAR, "show-filterbar", QVariant::Bool },
     { STATUSBAR, "show-statusbar", QVariant::Bool },
     { STATUSBAR_STATS, "statusbar-stats", QVariant::String },
@@ -256,7 +256,7 @@ Prefs :: initDefaults( tr_benc * d )
     tr_bencDictAddInt( d, keyStr(ASKQUIT), true );
     tr_bencDictAddStr( d, keyStr(SORT_MODE), "sort-by-name" );
     tr_bencDictAddInt( d, keyStr(SORT_REVERSED), false );
-    tr_bencDictAddInt( d, keyStr(MINIMAL_VIEW), false );
+    tr_bencDictAddInt( d, keyStr(COMPACT_VIEW), false );
     tr_bencDictAddInt( d, keyStr(START), true );
     tr_bencDictAddInt( d, keyStr(TRASH_ORIGINAL), false );
     tr_bencDictAddStr( d, keyStr(SESSION_REMOTE_HOST), "localhost" );
