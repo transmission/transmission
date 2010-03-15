@@ -58,26 +58,6 @@ gtk_tree_view_column_queue_resize( GtkTreeViewColumn * column ) /* yuck */
 
 #endif
 
-typedef enum
-{
-    FILTER_TEXT_MODE_NAME,
-    FILTER_TEXT_MODE_FILES,
-    FILTER_TEXT_MODE_TRACKER,
-    FILTER_TEXT_MODE_QTY
-}
-filter_text_mode_t;
-
-typedef enum
-{
-    FILTER_MODE_ALL,
-    FILTER_MODE_ACTIVE,
-    FILTER_MODE_DOWNLOADING,
-    FILTER_MODE_SEEDING,
-    FILTER_MODE_PAUSED,
-    FILTER_MODE_QTY
-}
-filter_mode_t;
-
 typedef struct
 {
     GtkWidget *           speedlimit_on_item[2];
@@ -103,10 +83,6 @@ typedef struct
     GtkTreeModel *        filter_model;
     TrCore *              core;
     gulong                pref_handler_id;
-    filter_mode_t         filter_mode;
-    filter_text_mode_t    filter_text_mode;
-    char *                filter_text;
-    GtkToggleButton     * filter_toggles[FILTER_MODE_QTY];
 }
 PrivateData;
 
@@ -241,7 +217,6 @@ privateFree( gpointer vprivate )
 {
     PrivateData * p = vprivate;
     g_signal_handler_disconnect( p->core, p->pref_handler_id );
-    g_free( p->filter_text );
     g_free( p );
 }
 
@@ -607,8 +582,6 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
     GSList      * l;
 
     p = g_new0( PrivateData, 1 );
-    p->filter_text_mode = FILTER_TEXT_MODE_NAME;
-    p->filter_text = NULL;
 
     /* make the window */
     self = gtk_window_new ( GTK_WINDOW_TOPLEVEL );
@@ -644,7 +617,9 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
     action_set_important( "show-torrent-properties", TRUE );
 
     /* filter */
-    h = filter = p->filter = gtr_filter_bar_new( tr_core_model( core ), &p->filter_model );
+    h = filter = p->filter = gtr_filter_bar_new( tr_core_session( core ),
+                                                 tr_core_model( core ),
+                                                 &p->filter_model );
     gtk_container_set_border_width( GTK_CONTAINER( h ), GUI_PAD_SMALL );
 
     /* status menu */

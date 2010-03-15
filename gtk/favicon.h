@@ -10,14 +10,15 @@
  * $Id:$
  */
 
-#ifndef GTR_FILTER_H
-#define GTR_FILTER_H
+#ifndef GTR_FAVICON_CACHE_H
+#define GTR_FAVICON_CACHE_H
 
 #include <gtk/gtk.h>
 #include <libtransmission/transmission.h>
 
-GtkWidget * gtr_filter_bar_new( tr_session     * session,
-                                GtkTreeModel   * torrent_model,
-                                GtkTreeModel  ** filter_model );
+void gtr_get_favicon( tr_session * session,
+                      const char * host,
+                      GFunc pixbuf_ready_func,
+                      gpointer pixbuf_ready_func_data );
 
 #endif

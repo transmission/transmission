@@ -16,12 +16,14 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
 
+#include "favicon.h"
 #include "filter.h"
 #include "hig.h" /* GUI_PAD */
 #include "tr-core.h"
 #include "util.h" /* gtr_idle_add() */
 
 #define DIRTY_KEY          "tr-filter-dirty"
+#define SESSION_KEY        "tr-session-key"
 #define TEXT_KEY           "tr-filter-text"
 #define TEXT_MODE_KEY      "tr-filter-text-mode"
 #define TORRENT_MODEL_KEY  "tr-filter-torrent-model-key"
@@ -59,6 +61,7 @@ enum
     CAT_FILTER_COL_COUNT, /* how many matches there are */
     CAT_FILTER_COL_TYPE,
     CAT_FILTER_COL_HOST, /* pattern-matching text; ie, legaltorrents.com */
+    CAT_FILTER_COL_PIXBUF,
     CAT_FILTER_N_COLS
 };
 
@@ -113,6 +116,28 @@ category_model_update_count( GtkTreeStore * store, GtkTreeIter * iter, int n )
     gtk_tree_model_get( model, iter, CAT_FILTER_COL_COUNT, &count, -1 );
     if( n != count )
         gtk_tree_store_set( store, iter, CAT_FILTER_COL_COUNT, n, -1 );
+}
+
+static void
+favicon_ready_cb( gpointer pixbuf, gpointer vreference )
+{
+    GtkTreeIter iter;
+    GtkTreeRowReference * reference = vreference;
+
+    if( pixbuf != NULL )
+    {
+        GtkTreePath * path = gtk_tree_row_reference_get_path( reference );
+        GtkTreeModel * model = gtk_tree_row_reference_get_model( reference );
+
+        if( gtk_tree_model_get_iter( model, &iter, path ) )
+            gtk_tree_store_set( GTK_TREE_STORE( model ), &iter, CAT_FILTER_COL_PIXBUF, pixbuf, -1 );
+
+        gtk_tree_path_free( path );
+
+        g_object_unref( pixbuf );
+    }
+
+    gtk_tree_row_reference_free( reference );
 }
 
 static gboolean
@@ -263,15 +288,23 @@ category_filter_model_update( GtkTreeStore * store )
             /* g_message( "removing row and incrementing i" ); */
             gtk_tree_store_remove( store, &iter );
         } else if( insert_row ) {
+            GtkTreeIter child;
+            GtkTreePath * path;
+            GtkTreeRowReference * reference;
+            tr_session * session = g_object_get_data( G_OBJECT( store ), SESSION_KEY );
             const char * host = hosts->pdata[i];
             char * name = get_name_from_host( host );
             const int count = *(int*)g_hash_table_lookup( hosts_hash, host );
-            gtk_tree_store_insert_with_values( store, NULL, &parent, store_pos,
+            gtk_tree_store_insert_with_values( store, &child, &parent, store_pos,
                 CAT_FILTER_COL_HOST, host,
                 CAT_FILTER_COL_NAME, name,
                 CAT_FILTER_COL_COUNT, count,
                 CAT_FILTER_COL_TYPE, CAT_FILTER_TYPE_HOST,
                 -1 );
+            path = gtk_tree_model_get_path( model, &child );
+            reference = gtk_tree_row_reference_new( model, path );
+            gtr_get_favicon( session, host, favicon_ready_cb, reference );
+            gtk_tree_path_free( path );
             g_free( name );
             ++store_pos;
             ++i;
@@ -302,7 +335,8 @@ category_filter_model_new( GtkTreeModel * tmodel )
                                 G_TYPE_STRING,
                                 G_TYPE_INT,
                                 G_TYPE_INT,
-                                G_TYPE_STRING );
+                                G_TYPE_STRING,
+                                GDK_TYPE_PIXBUF );
 
     gtk_tree_store_insert_with_values( store, NULL, NULL, -1,
         CAT_FILTER_COL_NAME, _( "All" ),
@@ -394,6 +428,17 @@ torrent_model_row_deleted_cb( GtkTreeModel * tmodel UNUSED,
 }
 
 static void
+render_pixbuf_func( GtkCellLayout    * cell_layout UNUSED,
+                    GtkCellRenderer  * cell_renderer,
+                    GtkTreeModel     * tree_model,
+                    GtkTreeIter      * iter,
+                    gpointer           data UNUSED )
+{
+    int type;
+    gtk_tree_model_get( tree_model, iter, CAT_FILTER_COL_TYPE, &type, -1 );
+    g_object_set( cell_renderer, "width", type==CAT_FILTER_TYPE_HOST ? 16 : 0, NULL );
+}
+static void
 render_hit_count_func( GtkCellLayout    * cell_layout UNUSED,
                        GtkCellRenderer  * cell_renderer,
                        GtkTreeModel     * tree_model,
@@ -440,6 +485,14 @@ category_combo_box_new( GtkTreeModel * tmodel )
     gtk_combo_box_set_row_separator_func( GTK_COMBO_BOX( c ),
                                           is_it_a_separator, NULL, NULL );
     gtk_combo_box_set_active( GTK_COMBO_BOX( c ), 0 );
+
+    r = gtk_cell_renderer_pixbuf_new( );
+    gtk_cell_layout_pack_start( GTK_CELL_LAYOUT( c ), r, FALSE );
+    gtk_cell_layout_set_cell_data_func( GTK_CELL_LAYOUT( c ), r, render_pixbuf_func, NULL, NULL );
+    gtk_cell_layout_set_attributes( GTK_CELL_LAYOUT( c ), r,
+                                    "pixbuf", CAT_FILTER_COL_PIXBUF,
+                                    NULL );
+    
 
     r = gtk_cell_renderer_text_new( );
     gtk_cell_layout_pack_start( GTK_CELL_LAYOUT( c ), r, FALSE );
@@ -888,7 +941,7 @@ selection_changed_cb( GtkComboBox * combo UNUSED, gpointer vdata )
 }
 
 GtkWidget *
-gtr_filter_bar_new( GtkTreeModel * tmodel, GtkTreeModel ** filter_model )
+gtr_filter_bar_new( tr_session * session, GtkTreeModel * tmodel, GtkTreeModel ** filter_model )
 {
     int i;
     GtkWidget * l;
@@ -913,6 +966,7 @@ gtr_filter_bar_new( GtkTreeModel * tmodel, GtkTreeModel ** filter_model )
     data->filter_model = gtk_tree_model_filter_new( tmodel, NULL );
 
     g_object_set( G_OBJECT( data->category ), "width-request", 150, NULL );
+    g_object_set_data( G_OBJECT( gtk_combo_box_get_model( GTK_COMBO_BOX( data->category ) ) ), SESSION_KEY, session );
 
     gtk_tree_model_filter_set_visible_func( GTK_TREE_MODEL_FILTER( data->filter_model ),
                                             is_row_visible, data, g_free );
