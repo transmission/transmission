@@ -60,28 +60,27 @@ favicon_save_cache_file( const char * host, const void * data, size_t len )
 }
 
 static GdkPixbuf*
-favicon_load_from_data( const void * data, size_t len )
+favicon_load_from_file( const char * host )
 {
-    GdkPixbuf * pixbuf = NULL;
-
-    if( len > 0 )
-    {
-        GInputStream * i = g_memory_input_stream_new_from_data( data, len, NULL );
-        pixbuf = gdk_pixbuf_new_from_stream_at_scale( i, 16, 16, TRUE, NULL, NULL );
-        g_object_unref( i );
-    }
-
+    char * filename = favicon_get_cache_filename( host );
+    GdkPixbuf * pixbuf = gdk_pixbuf_new_from_file_at_size( filename, 16, 16, NULL );
+    if( pixbuf == NULL ) /* bad file */
+        g_remove( filename );
+    g_free( filename );
     return pixbuf;
 }
 
 static gboolean
 favicon_web_done_idle_cb( gpointer vfav )
 {
+    GdkPixbuf * pixbuf = NULL;
     struct favicon_data * fav = vfav;
-    GdkPixbuf * pixbuf = favicon_load_from_data( fav->contents, fav->len );
 
-    if( pixbuf != NULL )
+    if( fav->len > 0 )
+    {
         favicon_save_cache_file( fav->host, fav->contents, fav->len );
+        pixbuf = favicon_load_from_file( fav->host );
+    }
 
     fav->func( pixbuf, fav->data );
 
@@ -103,26 +102,6 @@ favicon_web_done_cb( tr_session    * session UNUSED,
     fav->len = len;
 
     gtr_idle_add( favicon_web_done_idle_cb, fav );
-}
-    
-static GdkPixbuf*
-favicon_load_from_file( const char * host )
-{
-    gsize len;
-    char * data;
-    char * path = favicon_get_cache_filename( host );
-    GdkPixbuf * pixbuf = NULL;
-
-    if( g_file_get_contents( path, &data, &len, NULL ) )
-    {
-        pixbuf = favicon_load_from_data( data, len );
-        if( pixbuf == NULL ) /* bad file... delete it from the cache */
-            g_remove( path );
-        g_free( data );
-    }
-
-    g_free( path );
-    return pixbuf;
 }
     
 void
