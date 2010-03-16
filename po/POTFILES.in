@@ -5,6 +5,7 @@ gtk/conf.c
 gtk/details.c
 gtk/dialogs.c
 gtk/file-list.c
+gtk/filter.c
 gtk/hig.c
 gtk/main.c
 gtk/makemeta-ui.c
