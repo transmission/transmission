@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id:$
+ * $Id$
  */
 
 #include <glib/gstdio.h> /* g_remove() */
@@ -52,7 +52,7 @@ favicon_get_cache_filename( const char * host )
 }
 
 static void
-favicon_save_cache_file( const char * host, const void * data, size_t len )
+favicon_save_to_cache( const char * host, const void * data, size_t len )
 {
     char * filename = favicon_get_cache_filename( host );
     g_file_set_contents( filename, data, len, NULL );
@@ -60,7 +60,7 @@ favicon_save_cache_file( const char * host, const void * data, size_t len )
 }
 
 static GdkPixbuf*
-favicon_load_from_file( const char * host )
+favicon_load_from_cache( const char * host )
 {
     char * filename = favicon_get_cache_filename( host );
     GdkPixbuf * pixbuf = gdk_pixbuf_new_from_file_at_size( filename, 16, 16, NULL );
@@ -78,8 +78,8 @@ favicon_web_done_idle_cb( gpointer vfav )
 
     if( fav->len > 0 )
     {
-        favicon_save_cache_file( fav->host, fav->contents, fav->len );
-        pixbuf = favicon_load_from_file( fav->host );
+        favicon_save_to_cache( fav->host, fav->contents, fav->len );
+        pixbuf = favicon_load_from_cache( fav->host );
     }
 
     fav->func( pixbuf, fav->data );
@@ -110,7 +110,7 @@ gtr_get_favicon( tr_session  * session,
                  GFunc         pixbuf_ready_func, 
                  gpointer      pixbuf_ready_func_data )
 {
-    GdkPixbuf * pixbuf = favicon_load_from_file( host );
+    GdkPixbuf * pixbuf = favicon_load_from_cache( host );
 
     if( pixbuf != NULL )
     {
@@ -122,7 +122,7 @@ gtr_get_favicon( tr_session  * session,
         char * url = g_strdup_printf( "http://%s/favicon.ico", host );
 
         g_debug( "trying favicon from \"%s\"", url );
-        data  = g_new( struct favicon_data, 1 );
+        data = g_new( struct favicon_data, 1 );
         data->func = pixbuf_ready_func;
         data->data = pixbuf_ready_func_data;
         data->host = g_strdup( host );
