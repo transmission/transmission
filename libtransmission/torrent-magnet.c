@@ -222,7 +222,7 @@ tr_torrentSetMetadataPiece( tr_torrent  * tor, int piece, const void  * data, in
 
                     tr_bencFree( &newMetainfo );
                 }
-        
+
                 tr_bencFree( &infoDict );
                 tr_free( path );
             }

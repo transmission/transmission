@@ -45,7 +45,7 @@ test1( void )
     check( (int)tr_historyGet( h, 22000, 15000 ) == 2 )
     check( (int)tr_historyGet( h, 22000, 20000 ) == 2 )
     tr_historyFree( h );
-    
+
     return 0;
 }
 

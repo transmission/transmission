@@ -46,7 +46,7 @@ str_has_suffix( const char *str, const char *suffix )
 {
     const size_t str_len = strlen( str );
     const size_t suffix_len = strlen( suffix );
-    
+
     if( str_len < suffix_len )
         return FALSE;
 

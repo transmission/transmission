@@ -103,11 +103,11 @@ favicon_web_done_cb( tr_session    * session UNUSED,
 
     gtr_idle_add( favicon_web_done_idle_cb, fav );
 }
-    
+
 void
 gtr_get_favicon( tr_session  * session,
-                 const char  * host, 
-                 GFunc         pixbuf_ready_func, 
+                 const char  * host,
+                 GFunc         pixbuf_ready_func,
                  gpointer      pixbuf_ready_func_data )
 {
     GdkPixbuf * pixbuf = favicon_load_from_cache( host );

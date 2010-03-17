@@ -1258,7 +1258,7 @@ printDetails( tr_benc * top )
             if( tr_bencDictFindInt( t, "seedRatioMode", &i))
             {
                 switch( i ) {
-                    case TR_RATIOLIMIT_GLOBAL: 
+                    case TR_RATIOLIMIT_GLOBAL:
                         printf( "  Ratio Limit: Default\n" );
                         break;
                     case TR_RATIOLIMIT_SINGLE:

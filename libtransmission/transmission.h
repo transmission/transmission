@@ -554,7 +554,7 @@ void          tr_sessionSetProxyPassword( tr_session * session,
 ***
 **/
 
-/** @brief Used by tr_sessionGetStats() and tr_sessionGetCumulativeStats() to give bandwidth statistics */ 
+/** @brief Used by tr_sessionGetStats() and tr_sessionGetCumulativeStats() to give bandwidth statistics */
 typedef struct tr_session_stats
 {
     float       ratio;        /* TR_RATIO_INF, TR_RATIO_NA, or total up/down */
@@ -1043,7 +1043,7 @@ enum
 
 /**
  * @brief Tell transmsision where to find this torrent's local data.
- * 
+ *
  * if move_from_previous_location is `true', the torrent's incompleteDir
  * will be clobberred s.t. additional files being added will be saved
  * to the torrent's downloadDir.
@@ -1491,7 +1491,7 @@ typedef struct
 
     /* which tier this tracker is in */
     int tier;
-    
+
     /* used to match to a tr_tracker_info */
     uint32_t id;
 }

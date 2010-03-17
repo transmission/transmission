@@ -939,7 +939,7 @@ tr_urlIsValidTracker( const char * url )
     tr_bool valid;
     char * scheme = NULL;
 
-    valid = isValidURLChars( url ) 
+    valid = isValidURLChars( url )
          && !tr_urlParse( url, -1, &scheme, NULL, NULL, NULL )
          && ( scheme != NULL )
          && ( !strcmp(scheme,"http") || !strcmp(scheme,"https") );
@@ -955,7 +955,7 @@ tr_urlIsValid( const char * url )
     tr_bool valid;
     char * scheme = NULL;
 
-    valid = isValidURLChars( url ) 
+    valid = isValidURLChars( url )
          && !tr_urlParse( url, -1, &scheme, NULL, NULL, NULL )
          && ( scheme != NULL )
          && ( !strcmp(scheme,"http") || !strcmp(scheme,"https") || !strcmp(scheme,"ftp") || !strcmp(scheme,"sftp") );

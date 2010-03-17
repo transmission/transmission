@@ -139,16 +139,16 @@ tr_icon_new( TrCore * core)
         gtk_icon_info_free ( icon_info );
         icon_name = icon_is_builtin ? MY_NAME : TRAY_ICON;
     }
-    
+
     indicator = app_indicator_new( MY_NAME, icon_name, APP_INDICATOR_CATEGORY_SYSTEM_SERVICES );
     app_indicator_set_status( indicator, APP_INDICATOR_STATUS_ACTIVE );
     w = action_get_widget( "/icon-popup" );
     app_indicator_set_menu( indicator, GTK_MENU ( w ) );
 
     g_object_set_data( G_OBJECT( indicator ), "tr-core", core );
-    
+
     return indicator;
-}                       
+}
 #else
 gpointer
 tr_icon_new( TrCore * core )

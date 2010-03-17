@@ -315,7 +315,7 @@ category_filter_model_update( GtkTreeStore * store )
             ++i;
         }
     }
-    
+
     /* cleanup */
     g_ptr_array_free( hosts, TRUE );
     g_hash_table_unref( hosts_hash );
@@ -515,7 +515,7 @@ category_combo_box_new( GtkTreeModel * tmodel )
     gtk_cell_layout_set_attributes( GTK_CELL_LAYOUT( c ), r,
                                     "pixbuf", CAT_FILTER_COL_PIXBUF,
                                     NULL );
-    
+
 
     r = gtk_cell_renderer_text_new( );
     gtk_cell_layout_pack_start( GTK_CELL_LAYOUT( c ), r, FALSE );
@@ -913,7 +913,7 @@ filter_entry_changed( GtkEditable * e, gpointer filter_model )
 {
     char * pch;
     char * folded;
-    
+
     pch = gtk_editable_get_chars( e, 0, -1 );
     folded = g_utf8_casefold( pch, -1 );
     g_object_set_data_full( filter_model, TEXT_KEY, folded, g_free );
@@ -1065,7 +1065,7 @@ gtr_filter_bar_new( tr_session * session, GtkTreeModel * tmodel, GtkTreeModel **
         GtkWidget *  w = gtk_radio_menu_item_new_with_label ( sl, name );
         sl = gtk_radio_menu_item_get_group( GTK_RADIO_MENU_ITEM( w ) );
         g_object_set_data( G_OBJECT( w ), TEXT_MODE_KEY, GINT_TO_POINTER( i ) );
-        g_signal_connect( w, "toggled", G_CALLBACK( filter_text_toggled_cb ), data->filter_model );  
+        g_signal_connect( w, "toggled", G_CALLBACK( filter_text_toggled_cb ), data->filter_model );
         gtk_menu_shell_append( GTK_MENU_SHELL( menu ), w );
         gtk_widget_show( w );
     }

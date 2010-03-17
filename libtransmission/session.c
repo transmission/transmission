@@ -1211,7 +1211,7 @@ turtleCheckClock( tr_session * s, struct tr_turtle_info * t )
 }
 
 /* Called after the turtle's fields are loaded from an outside source.
- * It initializes the implementation fields 
+ * It initializes the implementation fields
  * and turns on turtle mode if the clock settings say to. */
 static void
 turtleBootstrap( tr_session * session, struct tr_turtle_info * turtle )

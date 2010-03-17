@@ -483,7 +483,7 @@ loadProgress( tr_benc *    dict,
         }
         else err = "Couldn't find 'have' or 'bitfield'";
         if( err != NULL )
-        { 
+        {
             tr_torrentUncheck( tor );
             tr_tordbg( tor, "Torrent needs to be verified - %s", err );
         }

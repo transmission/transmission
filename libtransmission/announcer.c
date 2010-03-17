@@ -887,7 +887,7 @@ tr_announcerResetTorrent( tr_announcer * announcer, tr_torrent * tor )
         tr_tier ** tiers = (tr_tier**) tr_ptrArrayPeek( &tor->tiers->tiers, &n );
         for( i=0; i<n; ++i ) {
             tr_tier * tier = tiers[i];
-            if( !tier->wasCopied )    
+            if( !tier->wasCopied )
                 tierAddAnnounce( tier, STARTED, now );
         }
     }
