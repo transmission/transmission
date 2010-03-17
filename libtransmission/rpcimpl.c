@@ -1202,6 +1202,10 @@ sessionSet( tr_session               * session,
         tr_sessionSetRatioLimit( session, d );
     if( tr_bencDictFindBool( args_in, "seedRatioLimited", &boolVal ) )
         tr_sessionSetRatioLimited( session, boolVal );
+    if( tr_bencDictFindBool( args_in, TR_PREFS_KEY_START, &boolVal ) )
+        tr_sessionSetPaused( session, !boolVal );
+    if( tr_bencDictFindBool( args_in, TR_PREFS_KEY_TRASH_ORIGINAL, &boolVal ) )
+        tr_sessionSetDeleteSource( session, boolVal );
     if( tr_bencDictFindInt( args_in, TR_PREFS_KEY_DSPEED, &i ) )
         tr_sessionSetSpeedLimit( session, TR_DOWN, i );
     if( tr_bencDictFindBool( args_in, TR_PREFS_KEY_DSPEED_ENABLED, &boolVal ) )
@@ -1306,6 +1310,8 @@ sessionGet( tr_session               * s,
     tr_bencDictAddInt ( d, "rpc-version-minimum", 1 );
     tr_bencDictAddReal( d, "seedRatioLimit", tr_sessionGetRatioLimit( s ) );
     tr_bencDictAddBool( d, "seedRatioLimited", tr_sessionIsRatioLimited( s ) );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_START, !tr_sessionGetPaused( s ) );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_TRASH_ORIGINAL, tr_sessionGetDeleteSource( s ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_USPEED, tr_sessionGetSpeedLimit( s, TR_UP ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_USPEED_ENABLED, tr_sessionIsSpeedLimited( s, TR_UP ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_DSPEED, tr_sessionGetSpeedLimit( s, TR_DOWN ) );

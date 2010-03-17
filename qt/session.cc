@@ -147,6 +147,8 @@ Session :: updatePref( int key )
         case Prefs :: USPEED:
         case Prefs :: DSPEED_ENABLED:
         case Prefs :: DSPEED:
+        case Prefs :: START:
+        case Prefs :: TRASH_ORIGINAL:
         case Prefs :: PEX_ENABLED:
         case Prefs :: PORT_FORWARDING:
         case Prefs :: PEER_PORT:

@@ -205,6 +205,8 @@ const char* tr_getDefaultDownloadDir( void );
 #define TR_PREFS_KEY_USPEED                     "speed-limit-up"
 #define TR_PREFS_KEY_UMASK                      "umask"
 #define TR_PREFS_KEY_UPLOAD_SLOTS_PER_TORRENT   "upload-slots-per-torrent"
+#define TR_PREFS_KEY_START                      "start-added-torrents"
+#define TR_PREFS_KEY_TRASH_ORIGINAL             "trash-original-torrent-files"
 
 
 /**
@@ -726,6 +728,11 @@ uint16_t   tr_sessionGetPeerLimitPerTorrent( const tr_session * );
 tr_priority_t   tr_torrentGetPriority( const tr_torrent * );
 void            tr_torrentSetPriority( tr_torrent *, tr_priority_t );
 
+void       tr_sessionSetPaused        ( tr_session *, tr_bool isPaused );
+tr_bool    tr_sessionGetPaused        ( const tr_session * );
+
+void       tr_sessionSetDeleteSource  ( tr_session *, tr_bool deleteSource );
+tr_bool    tr_sessionGetDeleteSource  ( const tr_session * );
 
 /**
  *  Load all the torrents in tr_getTorrentDir().

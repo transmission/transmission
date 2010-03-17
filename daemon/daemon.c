@@ -217,18 +217,34 @@ getConfigDir( int argc, const char ** argv )
 static void
 onFileAdded( tr_session * session, const char * dir, const char * file )
 {
-    if( strstr( file, ".torrent" ) != NULL )
+    char * filename = tr_buildPath( dir, file, NULL );
+    tr_ctor * ctor = tr_ctorNew( session );
+    int err = tr_ctorSetMetainfoFromFile( ctor, filename );
+
+    if( !err )
     {
-        char * filename = tr_buildPath( dir, file, NULL );
-        tr_ctor * ctor = tr_ctorNew( session );
+        tr_torrentNew( ctor, &err );
 
-        int err = tr_ctorSetMetainfoFromFile( ctor, filename );
-        if( !err )
-            tr_torrentNew( ctor, &err );
+        if( err == TR_PARSE_ERR )
+            tr_err( "Error parsing .torrent file \"%s\"", file );
+        else
+        {
+            tr_bool trash = FALSE;
+            int test = tr_ctorGetDeleteSource( ctor, &trash );
 
-        tr_ctorFree( ctor );
-        tr_free( filename );
+            tr_inf( "Parsing .torrent file successful \"%s\"", file );
+
+            if( !test && trash )
+            {
+                tr_inf( "Deleting input .torrent file \"%s\"", file );
+                if( remove( filename ) )
+                    tr_err( "Error deleting .torrent file: %s", tr_strerror( errno ) );
+            }
+        }
     }
+
+    tr_ctorFree( ctor );
+    tr_free( filename );
 }
 
 static void

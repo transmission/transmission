@@ -209,6 +209,10 @@ Let the current torrent(s) use the global seedratio settings
 Start the current torrent(s)
 .It Fl S Fl -stop
 Stop the current torrent(s) from downloading or seeding
+.It Fl -start-paused
+Start added torrents paused
+.It fl -no-start-paused
+Start added torrents unpaused
 .It Fl t Fl -torrent Ar all | id | torrent-hash
 Set the current torrent(s) for use by subsequent options.
 .Ar all
@@ -230,6 +234,10 @@ Limit the current torrent(s) upload speed to
 kilobytes per second.
 .It Fl TU Fl -no-torrent-uplimit
 Don't use the current torrent(s) upload limit.
+.It Fl -trash-torrent
+Delete torrents after adding
+.It Fl -no-trash-torrent
+Do not delete torrents after adding
 .It Fl hl Fl -honor-session
 Make the current torrent(s) honor the session limits.
 .It Fl HL Fl -no-honor-session

@@ -202,9 +202,6 @@ tr_prefs_init_defaults( tr_benc * d )
     tr_bencDictAddStr( d, PREF_KEY_SORT_MODE, "sort-by-name" );
     tr_bencDictAddBool( d, PREF_KEY_SORT_REVERSED, FALSE );
     tr_bencDictAddBool( d, PREF_KEY_COMPACT_VIEW, FALSE );
-
-    tr_bencDictAddBool( d, PREF_KEY_START, TRUE );
-    tr_bencDictAddBool( d, PREF_KEY_TRASH_ORIGINAL, FALSE );
 }
 
 static char*

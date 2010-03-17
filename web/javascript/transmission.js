@@ -630,7 +630,6 @@ Transmission.prototype =
 	{
 		// handle the clutch prefs locally
 		var tr = this;
-		tr.setPref( Prefs._AutoStart, $('#prefs_form #auto_start')[0].checked );
 		var rate = parseInt( $('#prefs_form #refresh_rate')[0].value );
 		if( rate != tr[Prefs._RefreshRate] ) {
 			tr.setPref( Prefs._RefreshRate, rate );
@@ -640,6 +639,7 @@ Transmission.prototype =
 		
 		// pass the new prefs upstream to the RPC server
 		var o = { };
+		o[RPC._StartAddedTorrent]    = $('#prefs_form #auto_start')[0].checked;
 		o[RPC._PeerPort]             = parseInt( $('#prefs_form #port')[0].value );
 		o[RPC._UpSpeedLimit]         = parseInt( $('#prefs_form #upload_rate')[0].value );
 		o[RPC._DownSpeedLimit]       = parseInt( $('#prefs_form #download_rate')[0].value );
@@ -925,7 +925,7 @@ Transmission.prototype =
 
 		$('div.download_location input')[0].value = prefs[RPC._DownloadDir];
 		$('div.port input')[0].value              = prefs[RPC._PeerPort];
-		$('div.auto_start input')[0].checked      = prefs[Prefs._AutoStart];
+		$('div.auto_start input')[0].checked      = prefs[RPC._StartAddedTorrent];
 		$('input#limit_download')[0].checked      = down_limited;
 		$('input#download_rate')[0].value         = down_limit;
 		$('input#limit_upload')[0].checked        = up_limited;
@@ -1631,7 +1631,7 @@ Transmission.prototype =
 		if (! confirmed) {
 				$('input#torrent_upload_file').attr('value', '');
 				$('input#torrent_upload_url').attr('value', '');
-				$('input#torrent_auto_start').attr('checked', this[Prefs._AutoStart]);
+				$('input#torrent_auto_start').attr('checked', $('#prefs_form #auto_start')[0].checked);
 				$('#upload_container').show();
 			if (!iPhone && Safari3) {
 				setTimeout("$('div#upload_container div.dialog_window').css('top', '0px');",10);

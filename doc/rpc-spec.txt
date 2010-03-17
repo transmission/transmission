@@ -387,38 +387,40 @@
 
 4.1.  Session Arguments
 
-   string                     | value type & description
-   ---------------------------+-------------------------------------------------
-   "alt-speed-down"           | number     max global download speed (in K/s)
-   "alt-speed-enabled"        | boolean    true means use the alt speeds
-   "alt-speed-time-begin"     | number     when to turn on alt speeds (units: minutes after midnight)
-   "alt-speed-time-enabled"   | boolean    true means the scheduled on/off times are used
-   "alt-speed-time-end"       | number     when to turn off alt speeds (units: same)
-   "alt-speed-time-day"       | number     what day(s) to turn on alt speeds (look at tr_sched_day)
-   "alt-speed-up"             | number     max global upload speed (in K/s)
-   "blocklist-enabled"        | boolean    true means enabled
-   "blocklist-size"           | number     number of rules in the blocklist
-   "download-dir"             | string     default path to download torrents
-   "dht-enabled"              | boolean    true means allow dht in public torrents
-   "encryption"               | string     "required", "preferred", "tolerated"
-   "incomplete-dir"           | string     path for incomplete torrents, when enabled
-   "incomplete-dir-enabled"   | boolean    true means keep torrents in incomplete-dir until done
-   "peer-limit-global"        | number     maximum global number of peers
-   "peer-limit-per-torrent"   | number     maximum global number of peers
-   "pex-enabled"              | boolean    true means allow pex in public torrents
-   "peer-port"                | number     port number
-   "peer-port-random-on-start"| boolean    true means pick a random peer port on launch
-   "port-forwarding-enabled"  | boolean    true means enabled
-   "rename-partial-files"     | boolean    true means append ".part" to incomplete files
-   "rpc-version"              | number     the current RPC API version
-   "rpc-version-minimum"      | number     the minimum RPC API version supported
-   "seedRatioLimit"           | double     the default seed ratio for torrents to use
-   "seedRatioLimited"         | boolean    true if seedRatioLimit is honored by default
-   "speed-limit-down"         | number     max global download speed (in K/s)
-   "speed-limit-down-enabled" | boolean    true means enabled
-   "speed-limit-up"           | number     max global upload speed (in K/s)
-   "speed-limit-up-enabled"   | boolean    true means enabled
-   "version"                  | string     long version string "$version ($revision)"
+   string                        | value type & description
+   ------------------------------+-------------------------------------------------
+   "alt-speed-down"              | number     max global download speed (in K/s)
+   "alt-speed-enabled"           | boolean    true means use the alt speeds
+   "alt-speed-time-begin"        | number     when to turn on alt speeds (units: minutes after midnight)
+   "alt-speed-time-enabled"      | boolean    true means the scheduled on/off times are used
+   "alt-speed-time-end"          | number     when to turn off alt speeds (units: same)
+   "alt-speed-time-day"          | number     what day(s) to turn on alt speeds (look at tr_sched_day)
+   "alt-speed-up"                | number     max global upload speed (in K/s)
+   "blocklist-enabled"           | boolean    true means enabled
+   "blocklist-size"              | number     number of rules in the blocklist
+   "download-dir"                | string     default path to download torrents
+   "dht-enabled"                 | boolean    true means allow dht in public torrents
+   "encryption"                  | string     "required", "preferred", "tolerated"
+   "incomplete-dir"              | string     path for incomplete torrents, when enabled
+   "incomplete-dir-enabled"      | boolean    true means keep torrents in incomplete-dir until done
+   "peer-limit-global"           | number     maximum global number of peers
+   "peer-limit-per-torrent"      | number     maximum global number of peers
+   "pex-enabled"                 | boolean    true means allow pex in public torrents
+   "peer-port"                   | number     port number
+   "peer-port-random-on-start"   | boolean    true means pick a random peer port on launch
+   "port-forwarding-enabled"     | boolean    true means enabled
+   "rename-partial-files"        | boolean    true means append ".part" to incomplete files
+   "rpc-version"                 | number     the current RPC API version
+   "rpc-version-minimum"         | number     the minimum RPC API version supported
+   "seedRatioLimit"              | double     the default seed ratio for torrents to use
+   "seedRatioLimited"            | boolean    true if seedRatioLimit is honored by default
+   "speed-limit-down"            | number     max global download speed (in K/s)
+   "speed-limit-down-enabled"    | boolean    true means enabled
+   "speed-limit-up"              | number     max global upload speed (in K/s)
+   "speed-limit-up-enabled"      | boolean    true means enabled
+   "start-added-torrents"        | boolean    true means added torrents will be started right away
+   "trash-original-torrent-files"| boolean    true means the .torrent file of added torrents will be deleted
+   "version"                     | string     long version string "$version ($revision)"
 
    "rpc-version" indicates the RPC interface version supported by the RPC server.
    It is incremented when a new version of Transmission changes the RPC interface.
@@ -585,3 +587,8 @@
          |         | yes       | torrent-get    | new trackerStats arg "lastAnnounceTimedOut"
    ------+---------+-----------+----------------+-------------------------------
    8     | 1.92    | yes       | torrent-get    | new trackerStats arg "lastScrapeTimedOut"
+   ------+---------+-----------+----------------+-------------------------------
+   9     | 2.00    | yes       | session-set    | new arg "start-added-torrents"
+         | 2.00    | yes       | session-set    | new arg "trash-original-torrent-files"
+         | 2.00    | yes       | session-get    | new arg "start-added-torrents"
+         | 2.00    | yes       | session-get    | new arg "trash-original-torrent-files"

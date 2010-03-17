@@ -452,7 +452,8 @@ tr_ctorNew( const tr_session * session )
 
     ctor->session = session;
     ctor->bandwidthPriority = TR_PRI_NORMAL;
-    tr_ctorSetPaused( ctor, TR_FALLBACK, FALSE );
+    tr_ctorSetPaused( ctor, TR_FALLBACK, tr_sessionGetPaused( session ) );
+    tr_ctorSetDeleteSource( ctor, tr_sessionGetDeleteSource( session ) );
     if( session != NULL ) {
         tr_ctorSetPeerLimit( ctor, TR_FALLBACK, session->peerLimitPerTorrent );
         tr_ctorSetDownloadDir( ctor, TR_FALLBACK, session->downloadDir );

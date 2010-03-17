@@ -92,6 +92,8 @@ struct tr_session
     tr_bool                      isIncompleteFileNamingEnabled;
     tr_bool                      isRatioLimited;
     tr_bool                      isIncompleteDirEnabled;
+    tr_bool                      pauseAddedTorrent;
+    tr_bool                      deleteSourceTorrent;
 
     tr_benc                      removedTorrents;
 

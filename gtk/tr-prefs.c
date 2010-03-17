@@ -290,11 +290,11 @@ torrentPage( GObject * core )
     hig_workarea_add_wide_control( t, &row, w );
 
     s = _( "_Start when added" );
-    w = new_check_button( s, PREF_KEY_START, core );
+    w = new_check_button( s, TR_PREFS_KEY_START, core );
     hig_workarea_add_wide_control( t, &row, w );
 
     s = _( "Mo_ve .torrent file to the trash" );
-    w = new_check_button( s, PREF_KEY_TRASH_ORIGINAL, core );
+    w = new_check_button( s, TR_PREFS_KEY_TRASH_ORIGINAL, core );
     hig_workarea_add_wide_control( t, &row, w );
 
     s = _( "Append \"._part\" to incomplete files' names" );
