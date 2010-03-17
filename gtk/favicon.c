@@ -19,14 +19,25 @@
 #include "favicon.h"
 #include "util.h" /* gtr_mkdir_with_parents(), gtr_idle_add() */
 
+#define IMAGE_TYPES 4
+static const char * image_types[IMAGE_TYPES] = { "ico", "png", "gif", "jpg" };
+
 struct favicon_data
 {
+    tr_session * session;
     GFunc func;
     gpointer data;
     char * host;
     char * contents;
     size_t len;
+    int type;
 };
+
+static char*
+get_url( const char * host, int image_type )
+{
+    return g_strdup_printf( "http://%s/favicon.%s", host, image_types[image_type] );
+}
 
 static char*
 favicon_get_cache_dir( void )
@@ -70,23 +81,49 @@ favicon_load_from_cache( const char * host )
     return pixbuf;
 }
 
+static void favicon_web_done_cb( tr_session*, long, const void*, size_t, void* );
+
 static gboolean
 favicon_web_done_idle_cb( gpointer vfav )
 {
     GdkPixbuf * pixbuf = NULL;
+    gboolean finished = FALSE;
     struct favicon_data * fav = vfav;
 
-    if( fav->len > 0 )
+    if( fav->len > 0 ) /* we got something... try to make a pixbuf from it */
     {
         favicon_save_to_cache( fav->host, fav->contents, fav->len );
         pixbuf = favicon_load_from_cache( fav->host );
+        finished = pixbuf != NULL;
     }
 
-    fav->func( pixbuf, fav->data );
+    if( !finished ) /* no pixbuf yet... */
+    {
+        if( ++fav->type == IMAGE_TYPES ) /* failure */
+        {
+            finished = TRUE;
+        }
+        else /* keep trying */
+        {
+            char * url = get_url( fav->host, fav->type );
 
-    g_free( fav->host );
-    g_free( fav->contents );
-    g_free( fav );
+            g_free( fav->contents );
+            fav->contents = NULL;
+            fav->len = 0;
+
+            tr_webRun( fav->session, url, NULL, favicon_web_done_cb, fav );
+            g_free( url );
+        }
+    }
+
+    if( finished )
+    {
+        fav->func( pixbuf, fav->data );
+        g_free( fav->host );
+        g_free( fav->contents );
+        g_free( fav );
+    }
+
     return FALSE;
 }
 
@@ -119,15 +156,16 @@ gtr_get_favicon( tr_session  * session,
     else
     {
         struct favicon_data * data;
-        char * url = g_strdup_printf( "http://%s/favicon.ico", host );
+        char * url = get_url( host, 0 );
 
-        g_debug( "trying favicon from \"%s\"", url );
         data = g_new( struct favicon_data, 1 );
+        data->session = session;
         data->func = pixbuf_ready_func;
         data->data = pixbuf_ready_func_data;
         data->host = g_strdup( host );
-        tr_webRun( session, url, NULL, favicon_web_done_cb, data );
+        data->type = 0;
 
+        tr_webRun( session, url, NULL, favicon_web_done_cb, data );
         g_free( url );
     }
 }
