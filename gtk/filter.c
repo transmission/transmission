@@ -189,10 +189,9 @@ category_filter_model_update( GtkTreeStore * store )
             int * count = g_hash_table_lookup( hosts_hash, key );
             if( count == NULL )
             {
-                char * k = g_strdup( key );
                 count = tr_new0( int, 1 );
-                g_hash_table_insert( hosts_hash, k, count );
-                g_ptr_array_add( hosts, k );
+                g_hash_table_insert( hosts_hash, g_strdup( key ), count );
+                g_ptr_array_add( hosts, g_strdup( key ) );
             }
 
             for( k=0; k<keyCount; ++k )
