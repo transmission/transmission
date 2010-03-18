@@ -317,9 +317,9 @@ category_filter_model_update( GtkTreeStore * store )
     }
 
     /* cleanup */
+    g_ptr_array_foreach( hosts, (GFunc)g_free, NULL );
     g_ptr_array_free( hosts, TRUE );
     g_hash_table_unref( hosts_hash );
-    g_ptr_array_foreach( hosts, (GFunc)g_free, NULL );
     return FALSE;
 }
 
