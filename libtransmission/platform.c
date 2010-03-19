@@ -516,10 +516,10 @@ tr_getDefaultDownloadDir( void )
 ***/
 
 static int
-isClutchDir( const char * path )
+isWebClientDir( const char * path )
 {
     struct stat sb;
-    char * tmp = tr_buildPath( path, "javascript", "transmission.js", NULL );
+    char * tmp = tr_buildPath( path, "index.html", NULL );
     const int ret = !stat( tmp, &sb );
     tr_inf( _( "Searching for web interface file \"%s\"" ), tmp );
     tr_free( tmp );
@@ -527,7 +527,7 @@ isClutchDir( const char * path )
 }
 
 const char *
-tr_getClutchDir( const tr_session * session UNUSED )
+tr_getWebClientDir( const tr_session * session UNUSED )
 {
     static char * s = NULL;
 
@@ -556,12 +556,12 @@ tr_getClutchDir( const tr_session * session UNUSED )
 
             s = tr_buildPath( appString, "Contents", "Resources", "web", NULL );
 
-            if( !isClutchDir( s ) ) {
+            if( !isWebClientDir( s ) ) {
                 tr_free( s );
 
                 /* Fallback to the Application Support folder */
                 s = tr_buildPath( tr_sessionGetConfigDir( session ), "web", NULL );
-                if( !isClutchDir( s ) ) {
+                if( !isWebClientDir( s ) ) {
                     tr_free( s );
                     s = NULL;
                 }
@@ -579,7 +579,7 @@ tr_getClutchDir( const tr_session * session UNUSED )
                 /* First, we should check personal AppData/Transmission/Web */
                 SHGetFolderPath( NULL, CSIDL_COMMON_APPDATA, NULL, 0, dir );
                 s = tr_buildPath( dir, "Transmission", "Web", NULL );
-                if( !isClutchDir( s ) ) {
+                if( !isWebClientDir( s ) ) {
                     tr_free( s );
                     s = NULL;
                 }
@@ -589,7 +589,7 @@ tr_getClutchDir( const tr_session * session UNUSED )
                 /* check personal AppData */
                 SHGetFolderPath( NULL, CSIDL_APPDATA, NULL, 0, dir );
                 s = tr_buildPath( dir, "Transmission", "Web", NULL );
-                if( !isClutchDir( s ) ) {
+                if( !isWebClientDir( s ) ) {
                     tr_free( s );
                     s = NULL;
                 }
@@ -599,7 +599,7 @@ tr_getClutchDir( const tr_session * session UNUSED )
                 /* check calling module place */
                 GetModuleFileName( GetModuleHandle( NULL ), dir, sizeof( dir ) );
                 s = tr_buildPath( dirname( dir ), "Web", NULL );
-                if( !isClutchDir( s ) ) {
+                if( !isWebClientDir( s ) ) {
                     tr_free( s );
                     s = NULL;
                 }
@@ -643,7 +643,7 @@ tr_getClutchDir( const tr_session * session UNUSED )
             /* walk through the candidates & look for a match */
             for( l=candidates; l; l=l->next ) {
                 char * path = tr_buildPath( l->data, "transmission", "web", NULL );
-                const int found = isClutchDir( path );
+                const int found = isWebClientDir( path );
                 if( found ) {
                     s = path;
                     break;
