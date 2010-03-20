@@ -112,8 +112,8 @@
         [paragraphStyle release];
         
         fBluePieceColor = [[NSColor colorWithCalibratedRed: 0.0 green: 0.4 blue: 0.8 alpha: 1.0] retain];
-        #warning show border in compact view
         fBarBorderColor = [[NSColor colorWithCalibratedWhite: 0.0 alpha: 0.2] retain];
+        fBarMinimalBorderColor = [[NSColor colorWithCalibratedWhite: 0.0 alpha: 0.015] retain];
     }
 	return self;
 }
@@ -503,7 +503,7 @@
     const BOOL minimal = [fDefaults boolForKey: @"SmallView"];
     
     const CGFloat piecesBarPercent = [(TorrentTableView *)[self controlView] piecesBarPercent];
-    if (piecesBarPercent > 0.0 && ([NSApp isOnSnowLeopardOrBetter] || !minimal))
+    if (piecesBarPercent > 0.0 && (!minimal || [NSApp isOnSnowLeopardOrBetter]))
     {
         NSRect piecesBarRect, regularBarRect;
         NSDivideRect(barRect, &piecesBarRect, &regularBarRect, floor(NSHeight(barRect) * PIECES_TOTAL_PERCENT * piecesBarPercent),
@@ -519,11 +519,9 @@
         [self drawRegularBar: barRect];
     }
     
-    if (!minimal)
-    {
-        [fBarBorderColor set];
-        [NSBezierPath strokeRect: NSInsetRect(barRect, 0.5, 0.5)];
-    }
+    NSColor * borderColor = minimal ? fBarMinimalBorderColor : fBarBorderColor;
+    [borderColor set];
+    [NSBezierPath strokeRect: NSInsetRect(barRect, 0.5, 0.5)];
 }
 
 - (void) drawRegularBar: (NSRect) barRect
@@ -657,7 +655,7 @@
     NSRect result;
     result.size = [string size];
     
-    result.origin.x = NSMaxX(bounds) - (NSWidth(result) + PADDING_HORIZONTAL);
+    result.origin.x = NSMaxX(bounds) - (NSWidth(result) + PADDING_HORIZONTAL * 2.0);
     result.origin.y = NSMinY(bounds) + PADDING_ABOVE_MIN_STATUS;
     
     return result;
@@ -712,12 +710,17 @@
 
 - (NSRect) barRectForBounds: (NSRect) bounds
 {
+    NSRect result;
     
     if ([fDefaults boolForKey: @"SmallView"])
-        return NSInsetRect(bounds, 2.0, 2.0);
+    {
+        result.origin.x = NSMinX(bounds) + IMAGE_SIZE_MIN + PADDING_BETWEEN_IMAGE_AND_BAR;
+        result.origin.y = NSMinY(bounds) + 3.0;
+        result.size.height = NSHeight(bounds) - 2.0 * 3.0;
+        result.size.width = NSMaxX(bounds) - NSMinX(result) - PADDING_HORIZONTAL;
+    }
     else
     {
-        NSRect result;
         result.size.height = BAR_HEIGHT;
         
         result.origin.x = NSMinX(bounds) + IMAGE_SIZE_REG + PADDING_BETWEEN_IMAGE_AND_BAR;
@@ -726,9 +729,9 @@
         
         result.size.width = floor(NSMaxX(bounds) - NSMinX(result) - PADDING_HORIZONTAL
                             - 2.0 * (PADDING_HORIZONTAL + NORMAL_BUTTON_WIDTH));
-        
-        return result;
     }
+    
+    return result;
 }
 
 - (NSRect) controlButtonRectForBounds: (NSRect) bounds
@@ -738,10 +741,15 @@
     result.size.width = NORMAL_BUTTON_WIDTH;
     result.origin.x = NSMaxX(bounds) - 2.0 * (PADDING_HORIZONTAL + NORMAL_BUTTON_WIDTH);
     
-    result.origin.y = NSMinY(bounds) + PADDING_ABOVE_TITLE;
     if (![fDefaults boolForKey: @"SmallView"])
-        result.origin.y += HEIGHT_TITLE - (NORMAL_BUTTON_WIDTH - BAR_HEIGHT) * 0.5
+        result.origin.y = NSMinY(bounds) + PADDING_ABOVE_TITLE + HEIGHT_TITLE - (NORMAL_BUTTON_WIDTH - BAR_HEIGHT) * 0.5
                             + PADDING_BETWEEN_TITLE_AND_PROGRESS + HEIGHT_STATUS + PADDING_BETWEEN_PROGRESS_AND_BAR;
+    else
+    {
+        #warning make constant
+        result.origin.y = NSMinY(bounds) + 6.0;
+        result.origin.x -= PADDING_HORIZONTAL;
+    }
     
     return result;
 }
@@ -753,10 +761,15 @@
     result.size.width = NORMAL_BUTTON_WIDTH;
     result.origin.x = NSMaxX(bounds) - (PADDING_HORIZONTAL + NORMAL_BUTTON_WIDTH);
     
-    result.origin.y = NSMinY(bounds) + PADDING_ABOVE_TITLE;
     if (![fDefaults boolForKey: @"SmallView"])
-        result.origin.y += HEIGHT_TITLE - (NORMAL_BUTTON_WIDTH - BAR_HEIGHT) * 0.5
+        result.origin.y = NSMinY(bounds) + PADDING_ABOVE_TITLE + HEIGHT_TITLE - (NORMAL_BUTTON_WIDTH - BAR_HEIGHT) * 0.5
                             + PADDING_BETWEEN_TITLE_AND_PROGRESS + HEIGHT_STATUS + PADDING_BETWEEN_PROGRESS_AND_BAR;
+    else
+    {
+        #warning make constant
+        result.origin.y = NSMinY(bounds) + 6.0;
+        result.origin.x -= PADDING_HORIZONTAL;
+    }
     
     return result;
 }

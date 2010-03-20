@@ -31,7 +31,7 @@
     BOOL fTracking, fMouseDownControlButton, fMouseDownRevealButton, fMouseDownActionButton,
             fHover, fHoverControl, fHoverReveal, fHoverAction;
     
-    NSColor * fBarBorderColor, * fBluePieceColor;
+    NSColor * fBarBorderColor, * fBluePieceColor, * fBarMinimalBorderColor;
 }
 
 - (NSRect) iconRectForBounds: (NSRect) bounds;
