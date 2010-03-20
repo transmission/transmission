@@ -24,8 +24,6 @@
 
 @interface ProgressGradients : NSObject
 
-+ (NSGradient *) progressGradientForRed: (CGFloat) redComponent green: (CGFloat) greenComponent blue: (CGFloat) blueComponent;
-
 + (NSGradient *) progressWhiteGradient;
 + (NSGradient *) progressGrayGradient;
 + (NSGradient *) progressLightGrayGradient;

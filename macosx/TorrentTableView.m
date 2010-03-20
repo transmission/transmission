@@ -66,6 +66,7 @@
         else
             fCollapsedGroups = [[NSMutableIndexSet alloc] init];
         
+        fMouseRow = -1;
         fMouseControlRow = -1;
         fMouseRevealRow = -1;
         fMouseActionRow = -1;
@@ -152,6 +153,7 @@
         [cell setRepresentedObject: item];
         
         const NSInteger row = [self rowForItem: item];
+        [cell setHover: row == fMouseRow];
         [cell setControlHover: row == fMouseControlRow];
         [cell setRevealHover: row == fMouseRevealRow];
         [cell setActionHover: row == fMouseActionRow];
@@ -226,7 +228,7 @@
 - (void) updateTrackingAreas
 {
     [super updateTrackingAreas];
-    [self removeButtonTrackingAreas];
+    [self removeTrackingAreas];
     
     NSRange rows = [self rowsInRect: [self visibleRect]];
     if (rows.length == 0)
@@ -244,8 +246,9 @@
     }
 }
 
-- (void) removeButtonTrackingAreas
+- (void) removeTrackingAreas
 {
+    fMouseRow = -1;
     fMouseControlRow = -1;
     fMouseRevealRow = -1;
     fMouseActionRow = -1;
@@ -255,6 +258,13 @@
         if ([area owner] == self && [[area userInfo] objectForKey: @"Row"])
             [self removeTrackingArea: area];
     }
+}
+
+- (void) setRowHover: (NSInteger) row
+{
+    fMouseRow = row;
+    if (row >= 0 && [fDefaults boolForKey: @"SmallView"])
+        [self setNeedsDisplayInRect: [self rectOfRow: row]];
 }
 
 - (void) setControlButtonHover: (NSInteger) row
@@ -291,8 +301,14 @@
             fMouseActionRow = rowVal;
         else if ([type isEqualToString: @"Control"])
             fMouseControlRow = rowVal;
-        else
+        else if ([type isEqualToString: @"Reveal"])
             fMouseRevealRow = rowVal;
+        else
+        {
+            fMouseRow = rowVal;
+            if (![fDefaults boolForKey: @"SmallView"])
+                return;
+        }
         
         [self setNeedsDisplayInRect: [self rectOfRow: rowVal]];
     }
@@ -310,8 +326,14 @@
             fMouseActionRow = -1;
         else if ([type isEqualToString: @"Control"])
             fMouseControlRow = -1;
-        else
+        else if ([type isEqualToString: @"Reveal"])
             fMouseRevealRow = -1;
+        else
+        {
+            fMouseRow = -1;
+            if (![fDefaults boolForKey: @"SmallView"])
+                return;
+        }
         
         [self setNeedsDisplayInRect: [self rectOfRow: [row integerValue]]];
     }
