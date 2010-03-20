@@ -263,7 +263,7 @@
 - (void) setRowHover: (NSInteger) row
 {
     fMouseRow = row;
-    if (row >= 0 && [fDefaults boolForKey: @"SmallView"])
+    if (row >= 0)
         [self setNeedsDisplayInRect: [self rectOfRow: row]];
 }
 

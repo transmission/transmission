@@ -228,39 +228,42 @@
 - (void) addTrackingAreasForView: (NSView *) controlView inRect: (NSRect) cellFrame withUserInfo: (NSDictionary *) userInfo
             mouseLocation: (NSPoint) mouseLocation
 {
-    NSTrackingAreaOptions options = NSTrackingEnabledDuringMouseDrag | NSTrackingMouseEnteredAndExited | NSTrackingActiveAlways;
+    const NSTrackingAreaOptions options = NSTrackingEnabledDuringMouseDrag | NSTrackingMouseEnteredAndExited | NSTrackingActiveAlways;
     
     //whole row
-    NSTrackingAreaOptions rowOptions = options;
-    if (NSMouseInRect(mouseLocation, cellFrame, [controlView isFlipped]))
+    if ([fDefaults boolForKey: @"SmallView"])
     {
-        rowOptions |= NSTrackingAssumeInside;
-        [(TorrentTableView *)controlView setRowHover: [[userInfo objectForKey: @"Row"] integerValue]];
+        NSTrackingAreaOptions rowOptions = options;
+        if (NSMouseInRect(mouseLocation, cellFrame, [controlView isFlipped]))
+        {
+            rowOptions |= NSTrackingAssumeInside;
+            [(TorrentTableView *)controlView setRowHover: [[userInfo objectForKey: @"Row"] integerValue]];
+        }
+        
+        NSMutableDictionary * rowInfo = [userInfo mutableCopy];
+        [rowInfo setObject: @"Row" forKey: @"Type"];
+        NSTrackingArea * area = [[NSTrackingArea alloc] initWithRect: cellFrame options: rowOptions owner: controlView userInfo: rowInfo];
+        [controlView addTrackingArea: area];
+        [rowInfo release];
+        [area release];
+        
+        //control button
+        NSRect controlButtonRect = [self controlButtonRectForBounds: cellFrame];
+        NSTrackingAreaOptions controlOptions = options;
+        if (NSMouseInRect(mouseLocation, controlButtonRect, [controlView isFlipped]))
+        {
+            controlOptions |= NSTrackingAssumeInside;
+            [(TorrentTableView *)controlView setControlButtonHover: [[userInfo objectForKey: @"Row"] integerValue]];
+        }
+        
+        NSMutableDictionary * controlInfo = [userInfo mutableCopy];
+        [controlInfo setObject: @"Control" forKey: @"Type"];
+        area = [[NSTrackingArea alloc] initWithRect: controlButtonRect options: controlOptions owner: controlView
+                                    userInfo: controlInfo];
+        [controlView addTrackingArea: area];
+        [controlInfo release];
+        [area release];
     }
-    
-    NSMutableDictionary * rowInfo = [userInfo mutableCopy];
-    [rowInfo setObject: @"Row" forKey: @"Type"];
-    NSTrackingArea * area = [[NSTrackingArea alloc] initWithRect: cellFrame options: rowOptions owner: controlView userInfo: rowInfo];
-    [controlView addTrackingArea: area];
-    [rowInfo release];
-    [area release];
-    
-    //control button
-    NSRect controlButtonRect = [self controlButtonRectForBounds: cellFrame];
-    NSTrackingAreaOptions controlOptions = options;
-    if (NSMouseInRect(mouseLocation, controlButtonRect, [controlView isFlipped]))
-    {
-        controlOptions |= NSTrackingAssumeInside;
-        [(TorrentTableView *)controlView setControlButtonHover: [[userInfo objectForKey: @"Row"] integerValue]];
-    }
-    
-    NSMutableDictionary * controlInfo = [userInfo mutableCopy];
-    [controlInfo setObject: @"Control" forKey: @"Type"];
-    area = [[NSTrackingArea alloc] initWithRect: controlButtonRect options: controlOptions owner: controlView
-                                userInfo: controlInfo];
-    [controlView addTrackingArea: area];
-    [controlInfo release];
-    [area release];
     
     //reveal button
     NSRect revealButtonRect = [self revealButtonRectForBounds: cellFrame];
@@ -273,7 +276,7 @@
     
     NSMutableDictionary * revealInfo = [userInfo mutableCopy];
     [revealInfo setObject: @"Reveal" forKey: @"Type"];
-    area = [[NSTrackingArea alloc] initWithRect: revealButtonRect options: revealOptions owner: controlView userInfo: revealInfo];
+    NSTrackingArea * area = [[NSTrackingArea alloc] initWithRect: revealButtonRect options: revealOptions owner: controlView userInfo: revealInfo];
     [controlView addTrackingArea: area];
     [revealInfo release];
     [area release];
