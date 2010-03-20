@@ -28,7 +28,7 @@
 
 + (NSGradient *) progressGradientForRed: (CGFloat) redComponent green: (CGFloat) greenComponent blue: (CGFloat) blueComponent
 {
-    const CGFloat alpha = [[NSUserDefaults standardUserDefaults] boolForKey: @"SmallView"] ? 0.075 : 1.0;
+    const CGFloat alpha = [[NSUserDefaults standardUserDefaults] boolForKey: @"SmallView"] ? 0.085 : 1.0;
     
     NSColor * baseColor = [NSColor colorWithCalibratedRed: redComponent green: greenComponent blue: blueComponent alpha: alpha];
     
