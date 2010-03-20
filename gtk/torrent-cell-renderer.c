@@ -147,17 +147,18 @@ getShortTransferString( const tr_torrent  * tor,
         tr_strlspeed( upStr, uploadSpeed, sizeof( upStr ) );
 
     if( haveDown && haveUp )
-        /* Translators: "speed|" is here for disambiguation.
-         * Please remove it from your translation.
-         * %1$s is the download speed
-           %2$s is the upload speed */
-        g_snprintf( buf, buflen, Q_( "speed|Down: %1$s, Up: %2$s" ), downStr, upStr );
+        /* 1==down speed, 2==down arrow, 3==up speed, 4==down arrow */
+        g_snprintf( buf, buflen, _( "%1$s %2$s, %3$s %4$s" ),
+                    gtr_get_unicode_string( GTR_UNICODE_DOWN ), downStr,
+                    gtr_get_unicode_string( GTR_UNICODE_UP ), upStr );
     else if( haveDown )
-        /* download speed */
-        g_snprintf( buf, buflen, _( "Down: %s" ), downStr );
+        /* bandwidth speed + unicode arrow */
+        g_snprintf( buf, buflen, _( "%1$s %2$s" ),
+                    gtr_get_unicode_string( GTR_UNICODE_DOWN ), downStr );
     else if( haveUp )
-        /* upload speed */
-        g_snprintf( buf, buflen, _( "Up: %s" ), upStr );
+        /* bandwidth speed + unicode arrow */
+        g_snprintf( buf, buflen, _( "%1$s %2$s" ),
+                    gtr_get_unicode_string( GTR_UNICODE_UP ), upStr );
     else if( tr_torrentHasMetadata( tor ) )
         /* the torrent isn't uploading or downloading */
         g_strlcpy( buf, _( "Idle" ), buflen );
@@ -198,7 +199,7 @@ getShortStatusString( const tr_torrent  * tor,
             if( torStat->activity != TR_STATUS_DOWNLOAD )
             {
                 tr_strlratio( buf, torStat->ratio, sizeof( buf ) );
-                g_string_append_printf( gstr, _( "Ratio: %s" ), buf );
+                g_string_append_printf( gstr, _( "Ratio %s" ), buf );
                 g_string_append( gstr, ", " );
             }
             getShortTransferString( tor, torStat, uploadSpeed, downloadSpeed, buf, sizeof( buf ) );

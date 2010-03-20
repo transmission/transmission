@@ -88,11 +88,21 @@ gtr_lockfile( const char * filename )
 ****
 ***/
 
+const char*
+gtr_get_unicode_string( int i )
+{
+    switch( i ) {
+        case GTR_UNICODE_UP:   return "\xE2\x86\x91";
+        case GTR_UNICODE_DOWN: return "\xE2\x86\x93";
+        case GTR_UNICODE_INF:  return "\xE2\x88\x9E";
+        default:               return "err";
+    }
+}
 
 char*
 tr_strlratio( char * buf, double ratio, size_t buflen )
 {
-    return tr_strratio( buf, buflen, ratio, "\xE2\x88\x9E" );
+    return tr_strratio( buf, buflen, ratio, gtr_get_unicode_string( GTR_UNICODE_INF ) );
 }
 
 #define KILOBYTE_FACTOR 1024.0

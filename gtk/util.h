@@ -21,6 +21,15 @@
  #define UNUSED G_GNUC_UNUSED
 #endif
 
+enum
+{
+    GTR_UNICODE_UP,
+    GTR_UNICODE_DOWN,
+    GTR_UNICODE_INF
+};
+const char * gtr_get_unicode_string( int );
+
+
 /* return a human-readable string for the size given in bytes. */
 char* tr_strlsize( char * buf, guint64  size, size_t buflen );
 
