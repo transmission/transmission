@@ -498,8 +498,10 @@
 
 - (void) drawBar: (NSRect) barRect
 {
+    const BOOL minimal = [fDefaults boolForKey: @"SmallView"];
+    
     const CGFloat piecesBarPercent = [(TorrentTableView *)[self controlView] piecesBarPercent];
-    if (piecesBarPercent > 0.0)
+    if (piecesBarPercent > 0.0 && ([NSApp isOnSnowLeopardOrBetter] || !minimal))
     {
         NSRect piecesBarRect, regularBarRect;
         NSDivideRect(barRect, &piecesBarRect, &regularBarRect, floor(NSHeight(barRect) * PIECES_TOTAL_PERCENT * piecesBarPercent),
@@ -515,7 +517,7 @@
         [self drawRegularBar: barRect];
     }
     
-    if (![fDefaults boolForKey: @"SmallView"])
+    if (!minimal)
     {
         [fBarBorderColor set];
         [NSBezierPath strokeRect: NSInsetRect(barRect, 0.5, 0.5)];
@@ -639,7 +641,12 @@
     [torrent setPreviousFinishedPieces: [finishedIndexes count] > 0 ? finishedIndexes : nil]; //don't bother saving if none are complete
     
     //actually draw image
-    [bitmap drawInRect: barRect];
+    if ([NSApp isOnSnowLeopardOrBetter])
+        [bitmap drawInRect: barRect fromRect: NSZeroRect operation: NSCompositeSourceOver
+            fraction: ([fDefaults boolForKey: @"SmallView"] ? 0.125 : 1.0) respectFlipped: YES hints: nil];
+    else
+        [bitmap drawInRect: barRect];
+
     [bitmap release];
 }
 
