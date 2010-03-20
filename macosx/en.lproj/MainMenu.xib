@@ -13,10 +13,10 @@
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
 			<integer value="21"/>
-			<integer value="1480"/>
-			<integer value="81"/>
+			<integer value="302"/>
 			<integer value="456"/>
 			<integer value="1936"/>
+			<integer value="1480"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1228,7 +1228,7 @@ IDIwMTAAA</bytes>
 								<bool key="EncodedWithXMLCoder">YES</bool>
 								<object class="NSMenuItem" id="16273325">
 									<reference key="NSMenu" ref="284921107"/>
-									<string key="NSTitle">Minimal View</string>
+									<string key="NSTitle">Compact View</string>
 									<string key="NSKeyEquiv">t</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
