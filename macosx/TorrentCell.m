@@ -325,6 +325,9 @@
     
     const BOOL minimal = [fDefaults boolForKey: @"SmallView"];
     
+    //bar
+    [self drawBar: [self barRectForBounds: cellFrame]];
+    
     //group coloring
     const NSRect iconRect = [self iconRectForBounds: cellFrame];
     
@@ -373,9 +376,6 @@
                                         ERROR_IMAGE_SIZE, ERROR_IMAGE_SIZE);
         [self drawImage: [NSImage imageNamed: [NSApp isOnSnowLeopardOrBetter] ? NSImageNameCaution : @"Error.png"] inRect: errorRect];
     }
-    
-    //bar
-    [self drawBar: [self barRectForBounds: cellFrame]];
     
     //text color
     NSColor * titleColor, * statusColor;
@@ -710,25 +710,23 @@
 
 - (NSRect) barRectForBounds: (NSRect) bounds
 {
-    const BOOL minimal = [fDefaults boolForKey: @"SmallView"];
     
-    NSRect result;
-    result.size.height = BAR_HEIGHT;
-    result.origin.x = NSMinX(bounds) + (minimal ? IMAGE_SIZE_MIN : IMAGE_SIZE_REG) + PADDING_BETWEEN_IMAGE_AND_BAR;
-    
-    result.origin.y = NSMinY(bounds) + PADDING_ABOVE_TITLE;
-    if (minimal)
-#warning make const
-        result.origin.y += 2.0;
+    if ([fDefaults boolForKey: @"SmallView"])
+        return NSInsetRect(bounds, 2.0, 2.0);
     else
-        result.origin.y += HEIGHT_TITLE + PADDING_BETWEEN_TITLE_AND_PROGRESS + HEIGHT_STATUS + PADDING_BETWEEN_PROGRESS_AND_BAR;
-    
-    result.size.width = NSMaxX(bounds) - NSMinX(result) - PADDING_HORIZONTAL;
-    if (!minimal)
-        result.size.width -= 2.0 * (PADDING_HORIZONTAL + NORMAL_BUTTON_WIDTH);
-    result.size.width = floor(NSWidth(result));
-    
-    return result;
+    {
+        NSRect result;
+        result.size.height = BAR_HEIGHT;
+        
+        result.origin.x = NSMinX(bounds) + IMAGE_SIZE_REG + PADDING_BETWEEN_IMAGE_AND_BAR;
+        result.origin.y = NSMinY(bounds) + PADDING_ABOVE_TITLE + HEIGHT_TITLE + PADDING_BETWEEN_TITLE_AND_PROGRESS
+                            + HEIGHT_STATUS + PADDING_BETWEEN_PROGRESS_AND_BAR;
+        
+        result.size.width = floor(NSMaxX(bounds) - NSMinX(result) - PADDING_HORIZONTAL
+                            - 2.0 * (PADDING_HORIZONTAL + NORMAL_BUTTON_WIDTH));
+        
+        return result;
+    }
 }
 
 - (NSRect) controlButtonRectForBounds: (NSRect) bounds
