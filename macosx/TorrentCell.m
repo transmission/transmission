@@ -112,7 +112,7 @@
         [paragraphStyle release];
         
         fBluePieceColor = [[NSColor colorWithCalibratedRed: 0.0 green: 0.4 blue: 0.8 alpha: 1.0] retain];
-        fBarBorderColor = [[NSColor colorWithCalibratedWhite: 0.0 alpha: 0.2 * 0.075] retain];
+        fBarBorderColor = [[NSColor colorWithCalibratedWhite: 0.0 alpha: 0.2] retain];
     }
 	return self;
 }
@@ -515,7 +515,7 @@
         [self drawRegularBar: barRect];
     }
     
-    if ([fDefaults boolForKey: @"SmallView"])
+    if (![fDefaults boolForKey: @"SmallView"])
     {
         [fBarBorderColor set];
         [NSBezierPath strokeRect: NSInsetRect(barRect, 0.5, 0.5)];
