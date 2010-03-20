@@ -112,6 +112,7 @@
         [paragraphStyle release];
         
         fBluePieceColor = [[NSColor colorWithCalibratedRed: 0.0 green: 0.4 blue: 0.8 alpha: 1.0] retain];
+        #warning show border in compact view
         fBarBorderColor = [[NSColor colorWithCalibratedWhite: 0.0 alpha: 0.2] retain];
     }
 	return self;
@@ -326,7 +327,8 @@
     const BOOL minimal = [fDefaults boolForKey: @"SmallView"];
     
     //bar
-    [self drawBar: [self barRectForBounds: cellFrame]];
+    if (!minimal || [self backgroundStyle] != NSBackgroundStyleDark)
+        [self drawBar: [self barRectForBounds: cellFrame]];
     
     //group coloring
     const NSRect iconRect = [self iconRectForBounds: cellFrame];
