@@ -840,14 +840,8 @@
 
 - (NSString *) minimalStatusString
 {
-    NSString * buttonString;
-    if ((buttonString = [self buttonString]))
-        return buttonString;
-    else
-    {
-        Torrent * torrent = [self representedObject];
-        return [fDefaults boolForKey: @"DisplaySmallStatusRegular"] ? [torrent shortStatusString] : [torrent remainingTimeString];
-    }
+    Torrent * torrent = [self representedObject];
+    return [fDefaults boolForKey: @"DisplaySmallStatusRegular"] ? [torrent shortStatusString] : [torrent remainingTimeString];
 }
 
 - (void) drawImage: (NSImage *) image inRect: (NSRect) rect
