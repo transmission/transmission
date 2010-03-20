@@ -396,13 +396,16 @@
     [fStatusAttributes setObject: statusColor forKey: NSForegroundColorAttributeName];
     
     //minimal status
-    NSRect minimalStatusRect;
-    if (minimal && !fHover)
+    CGFloat minimalTitleRightBound;
+    if (minimal)
     {
         NSAttributedString * minimalString = [self attributedStatusString: [self minimalStatusString]];
-        minimalStatusRect = [self rectForMinimalStatusWithString: minimalString inBounds: cellFrame];
+        NSRect minimalStatusRect = [self rectForMinimalStatusWithString: minimalString inBounds: cellFrame];
         
-        [minimalString drawInRect: minimalStatusRect];
+        if (!fHover)
+            [minimalString drawInRect: minimalStatusRect];
+        
+        minimalTitleRightBound = NSMinX(minimalStatusRect);
     }
     
     //progress
@@ -440,7 +443,7 @@
         
         const NSRect controlRect = [self controlButtonRectForBounds: cellFrame];
         [self drawImage: controlImage inRect: controlRect];
-        minimalStatusRect = controlRect; //used for limiting title width
+        minimalTitleRightBound = MIN(minimalTitleRightBound, NSMinX(controlRect));
         
         //reveal button
         NSString * revealImageString;
@@ -472,7 +475,7 @@
     
     //title
     NSAttributedString * titleString = [self attributedTitle];
-    NSRect titleRect = [self rectForTitleWithString: titleString withRightBound: NSMinX(minimalStatusRect) inBounds: cellFrame];
+    NSRect titleRect = [self rectForTitleWithString: titleString withRightBound: minimalTitleRightBound inBounds: cellFrame];
     [titleString drawInRect: titleRect];
     
     //priority icon
