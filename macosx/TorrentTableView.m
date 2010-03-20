@@ -230,7 +230,7 @@
     [super updateTrackingAreas];
     [self removeTrackingAreas];
     
-    NSRange rows = [self rowsInRect: [self visibleRect]];
+    const NSRange rows = [self rowsInRect: [self visibleRect]];
     if (rows.length == 0)
         return;
     
@@ -262,6 +262,8 @@
 
 - (void) setRowHover: (NSInteger) row
 {
+    NSAssert([fDefaults boolForKey: @"SmallView"], @"cannot set a hover row when not in compact view");
+    
     fMouseRow = row;
     if (row >= 0)
         [self setNeedsDisplayInRect: [self rectOfRow: row]];

@@ -55,7 +55,6 @@
 #define PADDING_BETWEEN_TITLE_AND_MIN_STATUS 2.0
 #define PADDING_BETWEEN_TITLE_AND_PROGRESS 1.0
 #define PADDING_BETWEEN_PROGRESS_AND_BAR 2.0
-#define PADDING_BETWEEN_TITLE_AND_BAR_MIN 3.0
 #define PADDING_BETWEEN_BAR_AND_STATUS 2.0
 
 #define PIECES_TOTAL_PERCENT 0.6
@@ -69,7 +68,7 @@
 - (void) drawPiecesBar: (NSRect) barRect;
 
 - (NSRect) rectForMinimalStatusWithString: (NSAttributedString *) string inBounds: (NSRect) bounds;
-- (NSRect) rectForTitleWithString: (NSAttributedString *) string basedOnMinimalStatusRect: (NSRect) statusRect inBounds: (NSRect) bounds;
+- (NSRect) rectForTitleWithString: (NSAttributedString *) string withRightBound: (CGFloat) rightBound inBounds: (NSRect) bounds;
 - (NSRect) rectForProgressWithStringInBounds: (NSRect) bounds;
 - (NSRect) rectForStatusWithStringInBounds: (NSRect) bounds;
 - (NSRect) barRectForBounds: (NSRect) bounds;
@@ -276,7 +275,8 @@
     
     NSMutableDictionary * revealInfo = [userInfo mutableCopy];
     [revealInfo setObject: @"Reveal" forKey: @"Type"];
-    NSTrackingArea * area = [[NSTrackingArea alloc] initWithRect: revealButtonRect options: revealOptions owner: controlView userInfo: revealInfo];
+    NSTrackingArea * area = [[NSTrackingArea alloc] initWithRect: revealButtonRect options: revealOptions owner: controlView
+                                userInfo: revealInfo];
     [controlView addTrackingArea: area];
     [revealInfo release];
     [area release];
@@ -405,27 +405,6 @@
         [minimalString drawInRect: minimalStatusRect];
     }
     
-    //title
-    NSAttributedString * titleString = [self attributedTitle];
-    NSRect titleRect = [self rectForTitleWithString: titleString basedOnMinimalStatusRect: minimalStatusRect inBounds: cellFrame];
-    [titleString drawInRect: titleRect];
-    
-    //priority icon
-    if ([torrent priority] != TR_PRI_NORMAL)
-    {
-        NSImage * priorityImage = [torrent priority] == TR_PRI_HIGH ? [NSImage imageNamed: @"PriorityHigh.png"]
-                                                                    : [NSImage imageNamed: @"PriorityLow.png"];
-        //take line out completely when 10.6-only
-        priorityImage = [NSApp isOnSnowLeopardOrBetter] ? [priorityImage retain] : [priorityImage copy];
-        
-        NSRect priorityRect = NSMakeRect(NSMaxX(titleRect) + PADDING_BETWEEN_TITLE_AND_PRIORITY,
-                                        NSMidY(titleRect) - PRIORITY_ICON_HEIGHT  * 0.5,
-                                        PRIORITY_ICON_WIDTH, PRIORITY_ICON_HEIGHT);
-        
-        [self drawImage: priorityImage inRect: priorityRect];
-        [priorityImage release];
-    }
-    
     //progress
     if (!minimal)
     {
@@ -459,7 +438,9 @@
                 controlImage = [NSImage imageNamed: [@"Resume" stringByAppendingString: controlImageSuffix]];
         }
         
-        [self drawImage: controlImage inRect: [self controlButtonRectForBounds: cellFrame]];
+        const NSRect controlRect = [self controlButtonRectForBounds: cellFrame];
+        [self drawImage: controlImage inRect: controlRect];
+        minimalStatusRect = controlRect; //used for limiting title width
         
         //reveal button
         NSString * revealImageString;
@@ -487,6 +468,27 @@
             NSImage * actionImage = [NSImage imageNamed: actionImageString];
             [self drawImage: actionImage inRect: [self actionButtonRectForBounds: cellFrame]];
         }
+    }
+    
+    //title
+    NSAttributedString * titleString = [self attributedTitle];
+    NSRect titleRect = [self rectForTitleWithString: titleString withRightBound: NSMinX(minimalStatusRect) inBounds: cellFrame];
+    [titleString drawInRect: titleRect];
+    
+    //priority icon
+    if ([torrent priority] != TR_PRI_NORMAL)
+    {
+        NSImage * priorityImage = [torrent priority] == TR_PRI_HIGH ? [NSImage imageNamed: @"PriorityHigh.png"]
+                                                                    : [NSImage imageNamed: @"PriorityLow.png"];
+        //take line out completely when 10.6-only
+        priorityImage = [NSApp isOnSnowLeopardOrBetter] ? [priorityImage retain] : [priorityImage copy];
+        
+        NSRect priorityRect = NSMakeRect(NSMaxX(titleRect) + PADDING_BETWEEN_TITLE_AND_PRIORITY,
+                                        NSMidY(titleRect) - PRIORITY_ICON_HEIGHT  * 0.5,
+                                        PRIORITY_ICON_WIDTH, PRIORITY_ICON_HEIGHT);
+        
+        [self drawImage: priorityImage inRect: priorityRect];
+        [priorityImage release];
     }
     
     //status
@@ -664,7 +666,7 @@
     return result;
 }
 
-- (NSRect) rectForTitleWithString: (NSAttributedString *) string basedOnMinimalStatusRect: (NSRect) statusRect inBounds: (NSRect) bounds
+- (NSRect) rectForTitleWithString: (NSAttributedString *) string withRightBound: (CGFloat) rightBound inBounds: (NSRect) bounds
 {
     const BOOL minimal = [fDefaults boolForKey: @"SmallView"];
     
@@ -674,9 +676,11 @@
                         + (minimal ? IMAGE_SIZE_MIN : IMAGE_SIZE_REG) + PADDING_BETWEEN_IMAGE_AND_TITLE;
     
     result.size.height = HEIGHT_TITLE;
-    result.size.width = NSMaxX(bounds) - NSMinX(result) - PADDING_HORIZONTAL;
     if (minimal)
-        result.size.width -= PADDING_BETWEEN_TITLE_AND_MIN_STATUS + NSWidth(statusRect);
+        result.size.width = rightBound - NSMinX(result) - PADDING_BETWEEN_TITLE_AND_MIN_STATUS;
+    else
+        result.size.width = NSMaxX(bounds) - NSMinX(result) - PADDING_HORIZONTAL;
+    
     if ([[self representedObject] priority] != TR_PRI_NORMAL)
     {
         result.size.width -= PRIORITY_ICON_WIDTH + PADDING_BETWEEN_TITLE_AND_PRIORITY;
