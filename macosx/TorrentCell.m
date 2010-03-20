@@ -330,7 +330,7 @@
     const BOOL minimal = [fDefaults boolForKey: @"SmallView"];
     
     //bar
-    if (!minimal || [self backgroundStyle] != NSBackgroundStyleDark)
+    if (!minimal || ![self isHighlighted])
         [self drawBar: [self barRectForBounds: cellFrame]];
     
     //group coloring
