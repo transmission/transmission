@@ -55,6 +55,7 @@
 #define PADDING_BETWEEN_TITLE_AND_PROGRESS 1.0
 #define PADDING_BETWEEN_PROGRESS_AND_BAR 2.0
 #define PADDING_BETWEEN_BAR_AND_STATUS 2.0
+#define PADDING_BETWEEN_BAR_AND_EDGE_MIN 3.0
 
 #define PIECES_TOTAL_PERCENT 0.6
 
@@ -729,9 +730,8 @@
     if ([fDefaults boolForKey: @"SmallView"])
     {
         result.origin.x = NSMinX(bounds) + IMAGE_SIZE_MIN + PADDING_BETWEEN_IMAGE_AND_BAR;
-        #warning use constant
-        result.origin.y = NSMinY(bounds) + 3.0;
-        result.size.height = NSHeight(bounds) - 2.0 * 3.0;
+        result.origin.y = NSMinY(bounds) + PADDING_BETWEEN_BAR_AND_EDGE_MIN;
+        result.size.height = NSHeight(bounds) - 2.0 * PADDING_BETWEEN_BAR_AND_EDGE_MIN;
         result.size.width = NSMaxX(bounds) - NSMinX(result) - PADDING_HORIZONTAL;
     }
     else
