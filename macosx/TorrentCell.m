@@ -49,10 +49,9 @@
 #define PADDING_HORIZONTAL 3.0
 #define PADDING_BETWEEN_IMAGE_AND_TITLE 5.0
 #define PADDING_BETWEEN_IMAGE_AND_BAR 7.0
-#define PADDING_BETWEEN_TITLE_AND_PRIORITY 4.0
+#define PADDING_BETWEEN_TITLE_AND_PRIORITY 3.0
 #define PADDING_ABOVE_TITLE 4.0
-#define PADDING_ABOVE_MIN_STATUS 6.0
-#define PADDING_BETWEEN_TITLE_AND_MIN_STATUS 2.0
+#define PADDING_BETWEEN_TITLE_AND_MIN_STATUS 3.0
 #define PADDING_BETWEEN_TITLE_AND_PROGRESS 1.0
 #define PADDING_BETWEEN_PROGRESS_AND_BAR 2.0
 #define PADDING_BETWEEN_BAR_AND_STATUS 2.0
@@ -121,7 +120,7 @@
 {
     const CGFloat imageSize = [fDefaults boolForKey: @"SmallView"] ? IMAGE_SIZE_MIN : IMAGE_SIZE_REG;
     
-    return NSMakeRect(NSMinX(bounds) + PADDING_HORIZONTAL, floor(NSMidY(bounds) - imageSize * 0.5),
+    return NSMakeRect(NSMinX(bounds) + PADDING_HORIZONTAL, ceil(NSMidY(bounds) - imageSize * 0.5),
                         imageSize, imageSize);
 }
 
@@ -664,7 +663,7 @@
     result.size = [string size];
     
     result.origin.x = NSMaxX(bounds) - (NSWidth(result) + PADDING_HORIZONTAL * 2.0);
-    result.origin.y = NSMinY(bounds) + PADDING_ABOVE_MIN_STATUS;
+    result.origin.y = ceil(NSMidY(bounds) - NSHeight(result) * 0.5);
     
     return result;
 }
@@ -674,15 +673,20 @@
     const BOOL minimal = [fDefaults boolForKey: @"SmallView"];
     
     NSRect result;
-    result.origin.y = NSMinY(bounds) + PADDING_ABOVE_TITLE;
     result.origin.x = NSMinX(bounds) + PADDING_HORIZONTAL
                         + (minimal ? IMAGE_SIZE_MIN : IMAGE_SIZE_REG) + PADDING_BETWEEN_IMAGE_AND_TITLE;
-    
     result.size.height = HEIGHT_TITLE;
+    
     if (minimal)
+    {
+        result.origin.y = ceil(NSMidY(bounds) - NSHeight(result) * 0.5);
         result.size.width = rightBound - NSMinX(result) - PADDING_BETWEEN_TITLE_AND_MIN_STATUS;
+    }
     else
+    {
+        result.origin.y = NSMinY(bounds) + PADDING_ABOVE_TITLE;
         result.size.width = NSMaxX(bounds) - NSMinX(result) - PADDING_HORIZONTAL;
+    }
     
     if ([[self representedObject] priority] != TR_PRI_NORMAL)
     {
@@ -725,6 +729,7 @@
     if ([fDefaults boolForKey: @"SmallView"])
     {
         result.origin.x = NSMinX(bounds) + IMAGE_SIZE_MIN + PADDING_BETWEEN_IMAGE_AND_BAR;
+        #warning use constant
         result.origin.y = NSMinY(bounds) + 3.0;
         result.size.height = NSHeight(bounds) - 2.0 * 3.0;
         result.size.width = NSMaxX(bounds) - NSMinX(result) - PADDING_HORIZONTAL;
@@ -756,8 +761,7 @@
                             + PADDING_BETWEEN_TITLE_AND_PROGRESS + HEIGHT_STATUS + PADDING_BETWEEN_PROGRESS_AND_BAR;
     else
     {
-        #warning make constant
-        result.origin.y = NSMinY(bounds) + 6.0;
+        result.origin.y = ceil(NSMidY(bounds) - NSHeight(result) * 0.5);
         result.origin.x -= PADDING_HORIZONTAL;
     }
     
@@ -776,8 +780,7 @@
                             + PADDING_BETWEEN_TITLE_AND_PROGRESS + HEIGHT_STATUS + PADDING_BETWEEN_PROGRESS_AND_BAR;
     else
     {
-        #warning make constant
-        result.origin.y = NSMinY(bounds) + 6.0;
+        result.origin.y = ceil(NSMidY(bounds) - NSHeight(result) * 0.5);
         result.origin.x -= PADDING_HORIZONTAL;
     }
     
