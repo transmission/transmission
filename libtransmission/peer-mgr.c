@@ -83,7 +83,7 @@ enum
     MINIMUM_RECONNECT_INTERVAL_SECS = 5,
 
     /** how long we'll let requests we've made linger before we cancel them */
-    REQUEST_TTL_SECS = 60,
+    REQUEST_TTL_SECS = 120,
 
     CANCEL_HISTORY_SEC = 120
 };
