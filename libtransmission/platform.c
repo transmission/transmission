@@ -544,27 +544,38 @@ tr_getWebClientDir( const tr_session * session UNUSED )
         else
         {
 
-#ifdef SYS_DARWIN /* on Mac, look in the app package first, then the Application Support folder (for daemon, etc) */
+#ifdef SYS_DARWIN /* on Mac, look in the Application Support folder first, then in the app bundle. */
 
-            CFURLRef appURL = CFBundleCopyBundleURL( CFBundleGetMainBundle( ) );
-            CFStringRef appRef = CFURLCopyFileSystemPath( appURL,
-                                                         kCFURLPOSIXPathStyle );
-            const char * appString = CFStringGetCStringPtr( appRef,
-                                         CFStringGetFastestEncoding( appRef ) );
-            CFRelease( appURL );
-            CFRelease( appRef );
-
-            s = tr_buildPath( appString, "Contents", "Resources", "web", NULL );
+            /* Look in the Application Support folder */
+            s = tr_buildPath( tr_sessionGetConfigDir( session ), "web", NULL );
 
             if( !isWebClientDir( s ) ) {
                 tr_free( s );
 
-                /* Fallback to the Application Support folder */
-                s = tr_buildPath( tr_sessionGetConfigDir( session ), "web", NULL );
+                CFURLRef appURL = CFBundleCopyBundleURL( CFBundleGetMainBundle( ) );
+                CFStringRef appRef = CFURLCopyFileSystemPath( appURL,
+                                                              kCFURLPOSIXPathStyle );
+                CFIndex appLength = CFStringGetMaximumSizeForEncoding( CFStringGetLength(appRef),
+                                                                       CFStringGetFastestEncoding( appRef ));
+
+                char * appString = tr_malloc( appLength + 1 );
+                tr_bool success = CFStringGetCString( appRef,
+                                              appString,
+                                              appLength + 1,
+                                              CFStringGetFastestEncoding( appRef ));
+                assert( success );
+
+                CFRelease( appURL );
+                CFRelease( appRef );
+
+                /* Fallback to the app bundle */
+                s = tr_buildPath( appString, "Contents", "Resources", "web", NULL );
                 if( !isWebClientDir( s ) ) {
                     tr_free( s );
                     s = NULL;
                 }
+
+                tr_free( appString );
             }
 
 #elif defined( WIN32 )
