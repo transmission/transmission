@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2009 by Juliusz Chroboczek
+Copyright (c) 2010 by Juliusz Chroboczek
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -262,9 +262,9 @@ static struct timeval now;
 static time_t mybucket_grow_time, mybucket6_grow_time;
 static time_t expire_stuff_time;
 
-#define MAX_LEAKY_BUCKET_TOKENS 40
-static time_t leaky_bucket_time;
-static int leaky_bucket_tokens;
+#define MAX_TOKEN_BUCKET_TOKENS 40
+static time_t token_bucket_time;
+static int token_bucket_tokens;
 
 FILE *dht_debug = NULL;
 
@@ -988,7 +988,7 @@ search_step(struct search *sr, dht_callback *callback, void *closure)
                 /* A proposed extension to the protocol consists in
                    omitting the token when storage tables are full.  While
                    I don't think this makes a lot of sense -- just sending
-                   a positive reply is just as good, let's deal with it. */
+                   a positive reply is just as good --, let's deal with it. */
                 if(n->token_len == 0)
                     n->acked = 1;
                 if(!n->acked) {
@@ -1592,8 +1592,8 @@ dht_init(int s, int s6, const unsigned char *id, const unsigned char *v)
 
     next_blacklisted = 0;
 
-    leaky_bucket_time = now.tv_sec;
-    leaky_bucket_tokens = MAX_LEAKY_BUCKET_TOKENS;
+    token_bucket_time = now.tv_sec;
+    token_bucket_tokens = MAX_TOKEN_BUCKET_TOKENS;
 
     memset(secret, 0, sizeof(secret));
     rc = rotate_secrets();
@@ -1655,18 +1655,18 @@ dht_uninit(int dofree)
 /* Rate control for requests we receive. */
 
 static int
-leaky_bucket(void)
+token_bucket(void)
 {
-    if(leaky_bucket_tokens == 0) {
-        leaky_bucket_tokens = MIN(MAX_LEAKY_BUCKET_TOKENS,
-                                  4 * (now.tv_sec - leaky_bucket_time));
-        leaky_bucket_time = now.tv_sec;
+    if(token_bucket_tokens == 0) {
+        token_bucket_tokens = MIN(MAX_TOKEN_BUCKET_TOKENS,
+                                  4 * (now.tv_sec - token_bucket_time));
+        token_bucket_time = now.tv_sec;
     }
 
-    if(leaky_bucket_tokens == 0)
+    if(token_bucket_tokens == 0)
         return 0;
 
-    leaky_bucket_tokens--;
+    token_bucket_tokens--;
     return 1;
 }
 
@@ -1869,7 +1869,7 @@ dht_periodic(int available, time_t *tosleep,
 
         if(message > REPLY) {
             /* Rate limit requests. */
-            if(!leaky_bucket()) {
+            if(!token_bucket()) {
                 debugf("Dropping request due to rate limiting.\n");
                 goto dontread;
             }
@@ -2373,11 +2373,6 @@ send_nodes_peers(struct sockaddr *sa, int salen,
 
     rc = snprintf(buf + i, 2048 - i, "d1:rd2:id20:"); INC(i, rc, 2048);
     COPY(buf, i, myid, 20, 2048);
-    if(token_len > 0) {
-        rc = snprintf(buf + i, 2048 - i, "5:token%d:", token_len);
-        INC(i, rc, 2048);
-        COPY(buf, i, token, token_len, 2048);
-    }
     if(nodes_len > 0) {
         rc = snprintf(buf + i, 2048 - i, "5:nodes%d:", nodes_len);
         INC(i, rc, 2048);
@@ -2387,6 +2382,11 @@ send_nodes_peers(struct sockaddr *sa, int salen,
          rc = snprintf(buf + i, 2048 - i, "6:nodes6%d:", nodes6_len);
          INC(i, rc, 2048);
          COPY(buf, i, nodes6, nodes6_len, 2048);
+    }
+    if(token_len > 0) {
+        rc = snprintf(buf + i, 2048 - i, "5:token%d:", token_len);
+        INC(i, rc, 2048);
+        COPY(buf, i, token, token_len, 2048);
     }
 
     if(st && st->numpeers > 0) {

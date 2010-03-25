@@ -1,3 +1,7 @@
+25 March 2010: dht-0.14
+
+  * Fixed ordering of entries in parameter dictionaries.
+
 15 December 2009: dht-0.13
 
   * Implemented protection against incorrect addresses in the DHT.
