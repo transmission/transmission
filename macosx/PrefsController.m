@@ -556,6 +556,11 @@ tr_session * fHandle;
         NSLocalizedString(@"Last updated", "Prefs -> blocklist -> message"), updatedDateString]];
 }
 
+- (void) setAutoStartDownloads: (id) sender
+{
+    tr_sessionSetPaused(fHandle, ![fDefaults boolForKey: @"AutoStartDownload"]);
+}
+
 - (void) applySpeedSettings: (id) sender
 {
     tr_sessionLimitSpeed(fHandle, TR_UP, [fDefaults boolForKey: @"CheckUpload"]);
@@ -1141,6 +1146,10 @@ tr_session * fHandle;
     //dht
     const BOOL dht = tr_sessionIsDHTEnabled(fHandle);
     [fDefaults setBool: dht forKey: @"DHTGlobal"];
+    
+    //auto start
+    const BOOL autoStart = !tr_sessionGetPaused(fHandle);
+    [fDefaults setBool: autoStart forKey: @"AutoStartDownload"];
     
     //port
     const tr_port port = tr_sessionGetPeerPort(fHandle);

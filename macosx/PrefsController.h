@@ -92,6 +92,8 @@
 - (void) setBlocklistAutoUpdate: (id) sender;
 - (void) updateBlocklistFields;
 
+- (void) setAutoStartDownloads: (id) sender;
+
 - (void) setBadge: (id) sender;
 
 - (void) resetWarnings: (id) sender;
