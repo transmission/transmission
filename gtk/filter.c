@@ -601,89 +601,89 @@ testCategory( GtkWidget * category_combo, tr_torrent * tor )
 
 /***
 ****
-****  STATES
+****  ACTIVITY
 ****
 ***/
 
 enum
 {
-    STATE_FILTER_ALL,
-    STATE_FILTER_DOWNLOADING,
-    STATE_FILTER_SEEDING,
-    STATE_FILTER_ACTIVE,
-    STATE_FILTER_PAUSED,
-    STATE_FILTER_QUEUED,
-    STATE_FILTER_VERIFYING,
-    STATE_FILTER_ERROR,
-    STATE_FILTER_SEPARATOR
+    ACTIVITY_FILTER_ALL,
+    ACTIVITY_FILTER_DOWNLOADING,
+    ACTIVITY_FILTER_SEEDING,
+    ACTIVITY_FILTER_ACTIVE,
+    ACTIVITY_FILTER_PAUSED,
+    ACTIVITY_FILTER_QUEUED,
+    ACTIVITY_FILTER_VERIFYING,
+    ACTIVITY_FILTER_ERROR,
+    ACTIVITY_FILTER_SEPARATOR
 };
 
 enum
 {
-    STATE_FILTER_COL_NAME,
-    STATE_FILTER_COL_COUNT,
-    STATE_FILTER_COL_TYPE,
-    STATE_FILTER_N_COLS
+    ACTIVITY_FILTER_COL_NAME,
+    ACTIVITY_FILTER_COL_COUNT,
+    ACTIVITY_FILTER_COL_TYPE,
+    ACTIVITY_FILTER_N_COLS
 };
 
 static gboolean
-state_is_it_a_separator( GtkTreeModel * m, GtkTreeIter * i, gpointer d UNUSED )
+activity_is_it_a_separator( GtkTreeModel * m, GtkTreeIter * i, gpointer d UNUSED )
 {
     int type;
-    gtk_tree_model_get( m, i, STATE_FILTER_COL_TYPE, &type, -1 );
-    return type == STATE_FILTER_SEPARATOR;
+    gtk_tree_model_get( m, i, ACTIVITY_FILTER_COL_TYPE, &type, -1 );
+    return type == ACTIVITY_FILTER_SEPARATOR;
 }
 
 static gboolean
-test_torrent_state( tr_torrent * tor, int type )
+test_torrent_activity( tr_torrent * tor, int type )
 {
     const tr_stat * st = tr_torrentStat( tor );
 
     switch( type )
     {
-        case STATE_FILTER_DOWNLOADING:
+        case ACTIVITY_FILTER_DOWNLOADING:
             return st->activity == TR_STATUS_DOWNLOAD;
 
-        case STATE_FILTER_SEEDING:
+        case ACTIVITY_FILTER_SEEDING:
             return st->activity == TR_STATUS_SEED;
 
-        case STATE_FILTER_ACTIVE:
+        case ACTIVITY_FILTER_ACTIVE:
             return ( st->peersSendingToUs > 0 )
                 || ( st->peersGettingFromUs > 0 )
                 || ( st->activity == TR_STATUS_CHECK );
 
-        case STATE_FILTER_PAUSED:
+        case ACTIVITY_FILTER_PAUSED:
             return st->activity == TR_STATUS_STOPPED;
 
-        case STATE_FILTER_QUEUED:
+        case ACTIVITY_FILTER_QUEUED:
             return FALSE;
 
-        case STATE_FILTER_VERIFYING:
+        case ACTIVITY_FILTER_VERIFYING:
             return ( st->activity == TR_STATUS_CHECK_WAIT )
                 || ( st->activity == TR_STATUS_CHECK );
 
-        case STATE_FILTER_ERROR:
+        case ACTIVITY_FILTER_ERROR:
             return st->error != 0;
 
-        default: /* STATE_FILTER_ALL */
+        default: /* ACTIVITY_FILTER_ALL */
             return TRUE;
 
     }
 }
 
 static gboolean
-testState( GtkWidget * state_combo, tr_torrent * tor )
+testActivity( GtkWidget * activity_combo, tr_torrent * tor )
 {
     int type;
     GtkTreeIter iter;
-    GtkComboBox * combo = GTK_COMBO_BOX( state_combo );
+    GtkComboBox * combo = GTK_COMBO_BOX( activity_combo );
     GtkTreeModel * model = gtk_combo_box_get_model( combo );
 
     if( !gtk_combo_box_get_active_iter( combo, &iter ) )
         return TRUE;
 
-    gtk_tree_model_get( model, &iter, STATE_FILTER_COL_TYPE, &type, -1 );
-    return test_torrent_state( tor, type );
+    gtk_tree_model_get( model, &iter, ACTIVITY_FILTER_COL_TYPE, &type, -1 );
+    return test_torrent_activity( tor, type );
 }
 
 static void
@@ -691,13 +691,13 @@ status_model_update_count( GtkListStore * store, GtkTreeIter * iter, int n )
 {
     int count;
     GtkTreeModel * model = GTK_TREE_MODEL( store );
-    gtk_tree_model_get( model, iter, STATE_FILTER_COL_COUNT, &count, -1 );
+    gtk_tree_model_get( model, iter, ACTIVITY_FILTER_COL_COUNT, &count, -1 );
     if( n != count )
-        gtk_list_store_set( store, iter, STATE_FILTER_COL_COUNT, n, -1 );
+        gtk_list_store_set( store, iter, ACTIVITY_FILTER_COL_COUNT, n, -1 );
 }
 
 static void
-state_filter_model_update( GtkListStore * store )
+activity_filter_model_update( GtkListStore * store )
 {
     GtkTreeIter iter;
     GtkTreeModel * model = GTK_TREE_MODEL( store );
@@ -712,13 +712,13 @@ state_filter_model_update( GtkListStore * store )
         int type;
         GtkTreeIter torrent_iter;
 
-        gtk_tree_model_get( model, &iter, STATE_FILTER_COL_TYPE, &type, -1 );
+        gtk_tree_model_get( model, &iter, ACTIVITY_FILTER_COL_TYPE, &type, -1 );
 
         hits = 0;
         if( gtk_tree_model_get_iter_first( tmodel, &torrent_iter )) do {
             tr_torrent * tor;
             gtk_tree_model_get( tmodel, &torrent_iter, MC_TORRENT_RAW, &tor, -1 );
-            if( test_torrent_state( tor, type ) )
+            if( test_torrent_activity( tor, type ) )
                 ++hits;
         } while( gtk_tree_model_iter_next( tmodel, &torrent_iter ) );
 
@@ -728,87 +728,87 @@ state_filter_model_update( GtkListStore * store )
 }
 
 static GtkTreeModel *
-state_filter_model_new( GtkTreeModel * tmodel )
+activity_filter_model_new( GtkTreeModel * tmodel )
 {
     int i, n;
     struct {
         int type;
         const char * name;
     } types[] = {
-        { STATE_FILTER_ALL, N_( "All" ) },
-        { STATE_FILTER_SEPARATOR, NULL },
-        { STATE_FILTER_DOWNLOADING, N_( "Downloading" ) },
-        { STATE_FILTER_SEEDING, N_( "Seeding" ) },
-        { STATE_FILTER_ACTIVE, N_( "Active" ) },
-        { STATE_FILTER_PAUSED, N_( "Paused" ) },
-        { STATE_FILTER_QUEUED, N_( "Queued" ) },
-        { STATE_FILTER_VERIFYING, N_( "Verifying" ) },
-        { STATE_FILTER_ERROR, N_( "Error" ) }
+        { ACTIVITY_FILTER_ALL, N_( "All" ) },
+        { ACTIVITY_FILTER_SEPARATOR, NULL },
+        { ACTIVITY_FILTER_DOWNLOADING, N_( "Downloading" ) },
+        { ACTIVITY_FILTER_SEEDING, N_( "Seeding" ) },
+        { ACTIVITY_FILTER_ACTIVE, N_( "Active" ) },
+        { ACTIVITY_FILTER_PAUSED, N_( "Paused" ) },
+        { ACTIVITY_FILTER_QUEUED, N_( "Queued" ) },
+        { ACTIVITY_FILTER_VERIFYING, N_( "Verifying" ) },
+        { ACTIVITY_FILTER_ERROR, N_( "Error" ) }
     };
     GtkListStore * store;
 
-    store = gtk_list_store_new( STATE_FILTER_N_COLS,
+    store = gtk_list_store_new( ACTIVITY_FILTER_N_COLS,
                                 G_TYPE_STRING,
                                 G_TYPE_INT,
                                 G_TYPE_INT );
     for( i=0, n=G_N_ELEMENTS(types); i<n; ++i )
         gtk_list_store_insert_with_values( store, NULL, -1,
-            STATE_FILTER_COL_NAME, _( types[i].name ),
-            STATE_FILTER_COL_TYPE, types[i].type,
+            ACTIVITY_FILTER_COL_NAME, _( types[i].name ),
+            ACTIVITY_FILTER_COL_TYPE, types[i].type,
             -1 );
 
     g_object_set_data( G_OBJECT( store ), TORRENT_MODEL_KEY, tmodel );
-    state_filter_model_update( store );
+    activity_filter_model_update( store );
     return GTK_TREE_MODEL( store );
 }
 
 static void
-state_model_update_idle( gpointer state_model )
+activity_model_update_idle( gpointer activity_model )
 {
-    GObject * o = G_OBJECT( state_model );
+    GObject * o = G_OBJECT( activity_model );
     const gboolean pending = g_object_get_data( o, DIRTY_KEY ) != NULL;
     if( !pending )
     {
-        GSourceFunc func = (GSourceFunc) state_filter_model_update;
+        GSourceFunc func = (GSourceFunc) activity_filter_model_update;
         g_object_set_data( o, DIRTY_KEY, GINT_TO_POINTER(1) );
-        gtr_idle_add( func, state_model );
+        gtr_idle_add( func, activity_model );
     }
 }
 
 static void
-state_torrent_model_row_changed( GtkTreeModel  * tmodel UNUSED,
-                                 GtkTreePath   * path UNUSED,
-                                 GtkTreeIter   * iter UNUSED,
-                                 gpointer        state_model )
+activity_torrent_model_row_changed( GtkTreeModel  * tmodel UNUSED,
+                                    GtkTreePath   * path UNUSED,
+                                    GtkTreeIter   * iter UNUSED,
+                                    gpointer        activity_model )
 {
-    state_model_update_idle( state_model );
+    activity_model_update_idle( activity_model );
 }
 
 static void
-state_torrent_model_row_deleted_cb( GtkTreeModel  * tmodel UNUSED,
-                                    GtkTreePath   * path UNUSED,
-                                    gpointer        state_model )
+activity_torrent_model_row_deleted_cb( GtkTreeModel  * tmodel UNUSED,
+                                       GtkTreePath   * path UNUSED,
+                                       gpointer        activity_model )
 {
-    state_model_update_idle( state_model );
+    activity_model_update_idle( activity_model );
 }
 
 static GtkWidget *
-state_combo_box_new( GtkTreeModel * tmodel )
+activity_combo_box_new( GtkTreeModel * tmodel )
 {
     GtkWidget * c;
     GtkCellRenderer * r;
-    GtkTreeModel * state_model;
+    GtkTreeModel * activity_model;
 
-    state_model = state_filter_model_new( tmodel );
-    c = gtk_combo_box_new_with_model( state_model );
+    activity_model = activity_filter_model_new( tmodel );
+    c = gtk_combo_box_new_with_model( activity_model );
     gtk_combo_box_set_row_separator_func( GTK_COMBO_BOX( c ),
-                                          state_is_it_a_separator, NULL, NULL );
+                                       activity_is_it_a_separator, NULL, NULL );
     gtk_combo_box_set_active( GTK_COMBO_BOX( c ), 0 );
 
     r = gtk_cell_renderer_text_new( );
     gtk_cell_layout_pack_start( GTK_CELL_LAYOUT( c ), r, TRUE );
     gtk_cell_layout_set_attributes( GTK_CELL_LAYOUT( c ), r,
-                                    "text", STATE_FILTER_COL_NAME,
+                                    "text", ACTIVITY_FILTER_COL_NAME,
                                     NULL );
 
     r = number_renderer_new( );
@@ -817,11 +817,14 @@ state_combo_box_new( GtkTreeModel * tmodel )
                                         render_number_func, NULL, NULL );
 
     g_signal_connect( tmodel, "row-changed",
-                      G_CALLBACK( state_torrent_model_row_changed ), state_model );
+                      G_CALLBACK( activity_torrent_model_row_changed ),
+                      activity_model );
     g_signal_connect( tmodel, "row-inserted",
-                      G_CALLBACK( state_torrent_model_row_changed ), state_model );
+                      G_CALLBACK( activity_torrent_model_row_changed ),
+                      activity_model );
     g_signal_connect( tmodel, "row-deleted",
-                      G_CALLBACK( state_torrent_model_row_deleted_cb ), state_model );
+                      G_CALLBACK( activity_torrent_model_row_deleted_cb ),
+                      activity_model );
 
     return c;
 }
@@ -937,7 +940,7 @@ filter_text_toggled_cb( GtkCheckMenuItem * menu_item, gpointer filter_model )
 
 struct filter_data
 {
-    GtkWidget * state;
+    GtkWidget * activity;
     GtkWidget * category;
     GtkWidget * entry;
     GtkTreeModel * filter_model;
@@ -958,7 +961,7 @@ is_row_visible( GtkTreeModel * model, GtkTreeIter * iter, gpointer vdata )
     mode = GPOINTER_TO_INT( g_object_get_data( o, TEXT_MODE_KEY ) );
 
     return ( tor != NULL ) && testCategory( data->category, tor )
-                           && testState( data->state, tor )
+                           && testActivity( data->activity, tor )
                            && testText( tor, text, mode );
 }
 
@@ -978,7 +981,7 @@ gtr_filter_bar_new( tr_session * session, GtkTreeModel * tmodel, GtkTreeModel **
     GtkWidget * h;
     GtkWidget * s;
     GtkWidget * menu;
-    GtkWidget * state;
+    GtkWidget * activity;
     GtkWidget * category;
     GSList * sl;
     const char * str;
@@ -989,7 +992,7 @@ gtr_filter_bar_new( tr_session * session, GtkTreeModel * tmodel, GtkTreeModel **
 
 
     data = g_new( struct filter_data, 1 );
-    data->state = state = state_combo_box_new( tmodel );
+    data->activity = activity = activity_combo_box_new( tmodel );
     data->category = category = category_combo_box_new( tmodel );
     data->entry = NULL;
     data->filter_model = gtk_tree_model_filter_new( tmodel, NULL );
@@ -1002,7 +1005,7 @@ gtr_filter_bar_new( tr_session * session, GtkTreeModel * tmodel, GtkTreeModel **
         is_row_visible, data, g_free );
 
     g_signal_connect( data->category, "changed", G_CALLBACK( selection_changed_cb ), data );
-    g_signal_connect( data->state, "changed", G_CALLBACK( selection_changed_cb ), data );
+    g_signal_connect( data->activity, "changed", G_CALLBACK( selection_changed_cb ), data );
 
 
     h = gtk_hbox_new( FALSE, GUI_PAD_SMALL );
@@ -1021,9 +1024,9 @@ gtr_filter_bar_new( tr_session * session, GtkTreeModel * tmodel, GtkTreeModel **
     gtk_widget_set_size_request( w, 0u, GUI_PAD_BIG );
     gtk_box_pack_start( GTK_BOX( h ), w, FALSE, FALSE, 0 );
 
-    /* add the state combobox */
-    str = _( "_State:" );
-    w = state;
+    /* add the activity combobox */
+    str = _( "_Activity:" );
+    w = activity;
     l = gtk_label_new( NULL );
     gtk_label_set_markup_with_mnemonic( GTK_LABEL( l ), str );
     gtk_label_set_mnemonic_widget( GTK_LABEL( l ), w );
