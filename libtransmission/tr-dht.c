@@ -101,7 +101,7 @@ bootstrap_af(tr_session *session)
 }
 
 static void
-bootstrap_from_name( const char *name, short int port, int af )
+bootstrap_from_name( const char *name, tr_port port, int af )
 {
     struct addrinfo hints, *info, *infop;
     char pp[10];
@@ -111,7 +111,7 @@ bootstrap_from_name( const char *name, short int port, int af )
     hints.ai_socktype = SOCK_DGRAM;
     hints.ai_family = af;
     /* No, just passing p + 1 to gai won't work. */
-    tr_snprintf(pp, sizeof(pp), "%d", port);
+    tr_snprintf(pp, sizeof(pp), "%d", (int)port);
 
     rc = getaddrinfo(name, pp, &hints, &info);
     if(rc != 0) {
