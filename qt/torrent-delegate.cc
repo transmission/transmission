@@ -116,7 +116,7 @@ TorrentDelegate :: progressString( const Torrent& tor ) const
     }
 
     /* add time when downloading */
-    if( hasSeedRatio || tor.isDownloading( ) )
+    if( ( hasSeedRatio && tor.isSeeding( ) ) || tor.isDownloading( ) )
     {
         str += tr( " - " );
         if( tor.hasETA( ) )
