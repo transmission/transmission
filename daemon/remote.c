@@ -1871,7 +1871,6 @@ tr_curl_easy_init( struct evbuffer * writebuf )
     curl_easy_setopt( curl, CURLOPT_POST, 1 );
     curl_easy_setopt( curl, CURLOPT_NETRC, CURL_NETRC_OPTIONAL );
     curl_easy_setopt( curl, CURLOPT_HTTPAUTH, CURLAUTH_ANY );
-    curl_easy_setopt( curl, CURLOPT_TIMEOUT, 300L );
     curl_easy_setopt( curl, CURLOPT_VERBOSE, debug );
     curl_easy_setopt( curl, CURLOPT_ENCODING, "" ); /* "" tells curl to fill in the blanks with what it was compiled to support */
     if( netrc )
@@ -1887,6 +1886,14 @@ tr_curl_easy_init( struct evbuffer * writebuf )
     return curl;
 }
 
+static long
+getTimeoutSecs( const char * req )
+{
+  if( strstr( req, "\"method\":\"blocklist-update\"" ) != NULL )
+    return 300L;
+
+  return 60L; /* default value */
+}
 
 static int
 processRequests( const char *  host,
@@ -1912,6 +1919,7 @@ processRequests( const char *  host,
         }
 
         curl_easy_setopt( curl, CURLOPT_POSTFIELDS, reqs[i] );
+        curl_easy_setopt( curl, CURLOPT_TIMEOUT, getTimeoutSecs( reqs[i] ) );
 
         if( debug )
             fprintf( stderr, "posting:\n--------\n%s\n--------\n", reqs[i] );
