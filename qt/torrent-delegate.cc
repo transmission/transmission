@@ -93,8 +93,8 @@ TorrentDelegate :: progressString( const Torrent& tor ) const
                   .arg( Utils::sizeToString( tor.sizeWhenDone( ) ) )
                   .arg( tor.percentDone( ) * 100.0, 0, 'f', 2 )
                   .arg( Utils::sizeToString( tor.uploadedEver( ) ) )
-                  .arg( Utils::ratioToString( tor.ratio( ) )
-                  .arg( Utils::ratioToString( seedRatio ) ) );
+                  .arg( Utils::ratioToString( tor.ratio( ) ) )
+                  .arg( Utils::ratioToString( seedRatio ) );
         }
         else
         {
