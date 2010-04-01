@@ -99,7 +99,7 @@
         fDefaults = [NSUserDefaults standardUserDefaults];
         
         NSMutableParagraphStyle * paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
-        [paragraphStyle setLineBreakMode: NSLineBreakByTruncatingTail];
+        [paragraphStyle setLineBreakMode: NSLineBreakByTruncatingMiddle];
         
         fTitleAttributes = [[NSMutableDictionary alloc] initWithCapacity: 3];
         [fTitleAttributes setObject: [NSFont messageFontOfSize: 12.0] forKey: NSFontAttributeName];

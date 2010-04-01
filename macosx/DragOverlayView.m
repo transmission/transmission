@@ -42,7 +42,7 @@
                 * smallFont = [NSFont systemFontOfSize: 14.0];
         
         NSMutableParagraphStyle * paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
-        [paragraphStyle setLineBreakMode: NSLineBreakByTruncatingTail];
+        [paragraphStyle setLineBreakMode: NSLineBreakByTruncatingMiddle];
         
         fMainLineAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
                                 [NSColor whiteColor], NSForegroundColorAttributeName,
