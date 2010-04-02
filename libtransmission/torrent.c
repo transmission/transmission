@@ -1052,6 +1052,8 @@ tr_torrentStat( tr_torrent * tor )
             break;
     }
 
+    s->finished = s->percentDone == 1.0 && checkSeedRatio && (s->ratio >= seedRatio || s->ratio == TR_RATIO_INF);
+
     if( !checkSeedRatio || s->ratio >= seedRatio || s->ratio == TR_RATIO_INF )
         s->percentRatio = 1.0;
     else if( s->ratio == TR_RATIO_NA )
@@ -1375,6 +1377,10 @@ torrentStart( tr_torrent * tor )
 
     if( !tor->isRunning )
     {
+        /* allow finished torrents to be resumed */
+        if( tor->stats.finished )
+            tr_torrentSetRatioMode( tor, TR_RATIOLIMIT_UNLIMITED );
+
         tr_verifyRemove( tor );
 
         /* corresponds to the peer_id sent as a tracker request parameter.
@@ -2614,9 +2620,6 @@ tr_torrentCheckSeedRatio( tr_torrent * tor )
         if( ratio >= seedRatio || ratio == TR_RATIO_INF )
         {
             tr_torrentStop( tor );
-
-            /* set to no ratio limit to allow easy restarting */
-            tr_torrentSetRatioMode( tor, TR_RATIOLIMIT_UNLIMITED );
 
             /* maybe notify the client */
             if( tor->ratio_limit_hit_func != NULL )

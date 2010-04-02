@@ -153,6 +153,7 @@
    haveValid                   | number                      | tr_stat
    honorsSessionLimits         | boolean                     | tr_torrent
    id                          | number                      | tr_torrent
+   isFinished                  | boolean                     | tr_stat
    isPrivate                   | boolean                     | tr_torrent
    leftUntilDone               | number                      | tr_stat
    magnetLink                  | number                      | n/a
@@ -590,5 +591,4 @@
    ------+---------+-----------+----------------+-------------------------------
    9     | 2.00    | yes       | session-set    | new arg "start-added-torrents"
          | 2.00    | yes       | session-set    | new arg "trash-original-torrent-files"
-         | 2.00    | yes       | session-get    | new arg "start-added-torrents"
-         | 2.00    | yes       | session-get    | new arg "trash-original-torrent-files"
+         | 2.00    | yes       | torrent-get    | new arg "isFinished"

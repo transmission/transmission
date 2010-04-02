@@ -47,7 +47,7 @@
     NSIndexSet * fPreviousFinishedIndexes;
     NSDate * fPreviousFinishedIndexesDate;
     
-    BOOL fFinishedSeeding, fWaitToStart, fStalled;
+    BOOL fWaitToStart, fStalled;
     
     NSInteger fGroupValue;
     
@@ -161,6 +161,7 @@
 - (BOOL) isCheckingWaiting;
 - (BOOL) allDownloaded;
 - (BOOL) isComplete;
+- (BOOL) isFinishedSeeding;
 - (BOOL) isError;
 - (BOOL) isAnyErrorOrWarning;
 - (NSString *) errorMessage;

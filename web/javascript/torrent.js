@@ -42,7 +42,7 @@ Torrent._DynamicFields = [ 'downloadedEver', 'error', 'errorString', 'eta',
     'haveUnchecked', 'haveValid', 'leftUntilDone', 'metadataPercentComplete', 'peersConnected',
     'peersGettingFromUs', 'peersSendingToUs', 'rateDownload', 'rateUpload',
     'recheckProgress', 'sizeWhenDone', 'status', 'trackerStats',
-    'uploadedEver', 'uploadRatio', 'seedRatioLimit', 'seedRatioMode', 'downloadDir' ]
+    'uploadedEver', 'uploadRatio', 'seedRatioLimit', 'seedRatioMode', 'downloadDir', 'isFinished' ]
 
 Torrent.prototype =
 {
@@ -243,7 +243,8 @@ Torrent.prototype =
 		switch( this.state() ) {
 			case Torrent._StatusSeeding:        return 'Seeding';
 			case Torrent._StatusDownloading:    return 'Downloading';
-			case Torrent._StatusPaused:         return 'Paused';
+			case Torrent._StatusPaused:         return this._isFinishedSeeding ? 'Seeding complete'
+                                                                               : 'Paused';
 			case Torrent._StatusChecking:       return 'Verifying local data';
 			case Torrent._StatusWaitingToCheck: return 'Waiting to verify';
 			default:                            return 'error';
@@ -391,6 +392,7 @@ Torrent.prototype =
 		this._state                   = data.status;
 		this._download_dir            = data.downloadDir;
 		this._metadataPercentComplete = data.metadataPercentComplete;
+		this._isFinishedSeeding       = data.isFinished;
 
 		if (data.fileStats)
 			this.refreshFileModel( data );

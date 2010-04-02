@@ -1821,6 +1821,10 @@ typedef struct tr_stat
 
     /** The last time we uploaded or downloaded piece data on this torrent. */
     time_t    activityDate;
+    
+    /** A torrent is considered finished if it has met its seed ratio.
+        As a result, only paused torrent can be finished. */
+    tr_bool   finished;
 }
 tr_stat;
 
