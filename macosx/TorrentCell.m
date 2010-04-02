@@ -246,24 +246,24 @@
         [controlView addTrackingArea: area];
         [rowInfo release];
         [area release];
-        
-        //control button
-        NSRect controlButtonRect = [self controlButtonRectForBounds: cellFrame];
-        NSTrackingAreaOptions controlOptions = options;
-        if (NSMouseInRect(mouseLocation, controlButtonRect, [controlView isFlipped]))
-        {
-            controlOptions |= NSTrackingAssumeInside;
-            [(TorrentTableView *)controlView setControlButtonHover: [[userInfo objectForKey: @"Row"] integerValue]];
-        }
-        
-        NSMutableDictionary * controlInfo = [userInfo mutableCopy];
-        [controlInfo setObject: @"Control" forKey: @"Type"];
-        area = [[NSTrackingArea alloc] initWithRect: controlButtonRect options: controlOptions owner: controlView
-                                    userInfo: controlInfo];
-        [controlView addTrackingArea: area];
-        [controlInfo release];
-        [area release];
     }
+    
+    //control button
+    NSRect controlButtonRect = [self controlButtonRectForBounds: cellFrame];
+    NSTrackingAreaOptions controlOptions = options;
+    if (NSMouseInRect(mouseLocation, controlButtonRect, [controlView isFlipped]))
+    {
+        controlOptions |= NSTrackingAssumeInside;
+        [(TorrentTableView *)controlView setControlButtonHover: [[userInfo objectForKey: @"Row"] integerValue]];
+    }
+    
+    NSMutableDictionary * controlInfo = [userInfo mutableCopy];
+    [controlInfo setObject: @"Control" forKey: @"Type"];
+    NSTrackingArea * area = [[NSTrackingArea alloc] initWithRect: controlButtonRect options: controlOptions owner: controlView
+                                userInfo: controlInfo];
+    [controlView addTrackingArea: area];
+    [controlInfo release];
+    [area release];
     
     //reveal button
     NSRect revealButtonRect = [self revealButtonRectForBounds: cellFrame];
@@ -276,7 +276,7 @@
     
     NSMutableDictionary * revealInfo = [userInfo mutableCopy];
     [revealInfo setObject: @"Reveal" forKey: @"Type"];
-    NSTrackingArea * area = [[NSTrackingArea alloc] initWithRect: revealButtonRect options: revealOptions owner: controlView
+    area = [[NSTrackingArea alloc] initWithRect: revealButtonRect options: revealOptions owner: controlView
                                 userInfo: revealInfo];
     [controlView addTrackingArea: area];
     [revealInfo release];
