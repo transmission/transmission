@@ -288,6 +288,9 @@ int trashDataFile(const char * filename)
     {
         tr_torrentStart(fHandle);
         [self update];
+        
+        //capture, specifically, ratio setting changing to unlimited
+        [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptions" object: nil];
     }
 }
 

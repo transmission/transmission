@@ -651,7 +651,7 @@
     //actually draw image
     if ([NSApp isOnSnowLeopardOrBetter])
         [bitmap drawInRect: barRect fromRect: NSZeroRect operation: NSCompositeSourceOver
-            fraction: ([fDefaults boolForKey: @"SmallView"] ? 0.2 : 1.0) respectFlipped: YES hints: nil];
+            fraction: ([fDefaults boolForKey: @"SmallView"] ? 0.25 : 1.0) respectFlipped: YES hints: nil];
     else
         [bitmap drawInRect: barRect];
 

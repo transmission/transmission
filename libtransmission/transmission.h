@@ -1823,7 +1823,7 @@ typedef struct tr_stat
     time_t    activityDate;
     
     /** A torrent is considered finished if it has met its seed ratio.
-        As a result, only paused torrent can be finished. */
+        As a result, only paused torrents can be finished. */
     tr_bool   finished;
 }
 tr_stat;
