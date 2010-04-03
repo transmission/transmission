@@ -42,9 +42,11 @@ Prefs::PrefItem Prefs::myItems[] =
     { SORT_MODE, "sort-mode", TrTypes::SortModeType },
     { SORT_REVERSED, "sort-reversed", QVariant::Bool },
     { COMPACT_VIEW, "compact-view", QVariant::Bool },
+    { SHOW_BACKUP_TRACKERS, "show-backup-trackers", QVariant::Bool },
     { FILTERBAR, "show-filterbar", QVariant::Bool },
     { STATUSBAR, "show-statusbar", QVariant::Bool },
     { STATUSBAR_STATS, "statusbar-stats", QVariant::String },
+    { SHOW_TRACKER_SCRAPES, "show-tracker-scrapes", QVariant::Bool },
     { TOOLBAR, "show-toolbar" , QVariant::Bool },
     { BLOCKLIST_DATE, "blocklist-date", QVariant::DateTime },
     { BLOCKLIST_UPDATES_ENABLED, "blocklist-updates-enabled" , QVariant::Bool },
@@ -239,6 +241,8 @@ Prefs :: initDefaults( tr_benc * d )
     tr_bencDictAddInt( d, keyStr(BLOCKLIST_DATE), 0 );
     tr_bencDictAddInt( d, keyStr(BLOCKLIST_UPDATES_ENABLED), true );
     tr_bencDictAddStr( d, keyStr(OPEN_DIALOG_FOLDER), QDir::home().absolutePath().toLatin1() );
+    tr_bencDictAddInt( d, keyStr(SHOW_BACKUP_TRACKERS), false );
+    tr_bencDictAddInt( d, keyStr(SHOW_TRACKER_SCRAPES), false );
     tr_bencDictAddInt( d, keyStr(TOOLBAR), true );
     tr_bencDictAddInt( d, keyStr(FILTERBAR), true );
     tr_bencDictAddInt( d, keyStr(STATUSBAR), true );

@@ -85,6 +85,7 @@ Torrent :: myProperties[] =
     { UPLOADED_EVER, "uploadedEver", QVariant::ULongLong, STAT },
     { FAILED_EVER, "corruptEver", QVariant::ULongLong, STAT_EXTRA },
     { TRACKERS, "trackers", QVariant::StringList, INFO },
+    { TRACKERSTATS, "trackerStats", TrTypes::TrackerStatsList, STAT_EXTRA },
     { MIME_ICON, "ccc", QVariant::Icon, DERIVED },
     { SEED_RATIO_LIMIT, "seedRatioLimit", QVariant::Double, STAT_EXTRA },
     { SEED_RATIO_MODE, "seedRatioMode", QVariant::Int, STAT_EXTRA },
@@ -98,14 +99,7 @@ Torrent :: myProperties[] =
     { IS_PRIVATE, "isPrivate", QVariant::Bool, INFO },
     { COMMENT, "comment", QVariant::String, INFO },
     { CREATOR, "creator", QVariant::String, INFO },
-    { LAST_ANNOUNCE_TIME, "lastAnnounceTime", QVariant::DateTime, STAT_EXTRA },
-    { LAST_SCRAPE_TIME, "lastScrapeTime", QVariant::DateTime, STAT_EXTRA },
     { MANUAL_ANNOUNCE_TIME, "manualAnnounceTime", QVariant::DateTime, STAT_EXTRA },
-    { NEXT_ANNOUNCE_TIME, "nextAnnounceTime", QVariant::DateTime, STAT_EXTRA },
-    { NEXT_SCRAPE_TIME, "nextScrapeTime", QVariant::DateTime, STAT_EXTRA },
-    { SCRAPE_RESPONSE, "scrapeResponse", QVariant::String, STAT_EXTRA },
-    { ANNOUNCE_RESPONSE, "announceResponse", QVariant::String, STAT_EXTRA },
-    { ANNOUNCE_URL, "announceURL", QVariant::String, STAT_EXTRA },
     { PEERS, "peers", TrTypes::PeerList, STAT_EXTRA },
     { TORRENT_FILE, "torrentFile", QVariant::String, STAT_EXTRA },
     { BANDWIDTH_PRIORITY, "bandwidthPriority", QVariant::Int, STAT_EXTRA }
@@ -553,6 +547,72 @@ Torrent :: update( tr_benc * d )
             myValues[TRACKERS].setValue( list );
             changed = true;
         }
+    }
+
+    tr_benc * trackerStats;
+    if( tr_bencDictFindList( d, "trackerStats", &trackerStats ) ) {
+        tr_benc * child;
+        TrackerStatsList  trackerStatsList;
+        int childNum = 0;
+        while(( child = tr_bencListChild( trackerStats, childNum++ ))) {
+            tr_bool b;
+            int64_t i;
+            const char * str;
+            TrackerStat trackerStat;
+            if( tr_bencDictFindStr( child, "announce", &str ) )
+                trackerStat.announce = QString::fromUtf8( str );
+            if( tr_bencDictFindInt( child, "announceState", &i ) )
+                trackerStat.announceState = i;
+            if( tr_bencDictFindInt( child, "downloadCount", &i ) )
+                trackerStat.downloadCount = i;
+            if( tr_bencDictFindBool( child, "hasAnnounced", &b ) )
+                trackerStat.hasAnnounced = b;
+            if( tr_bencDictFindBool( child, "hasScraped", &b ) )
+                trackerStat.hasScraped = b;
+            if( tr_bencDictFindStr( child, "host", &str ) )
+                trackerStat.host = QString::fromUtf8( str );
+            if( tr_bencDictFindInt( child, "id", &i ) )
+                trackerStat.id = i;
+            if( tr_bencDictFindBool( child, "isBackup", &b ) )
+                trackerStat.isBackup = b;
+            if( tr_bencDictFindInt( child, "lastAnnouncePeerCount", &i ) )
+                trackerStat.lastAnnouncePeerCount = i;
+            if( tr_bencDictFindInt( child, "lastAnnounceResult", &i ) )
+                trackerStat.lastAnnounceResult = i;
+            if( tr_bencDictFindInt( child, "lastAnnounceStartTime", &i ) )
+                trackerStat.lastAnnounceStartTime = i;
+            if( tr_bencDictFindBool( child, "lastAnnounceSucceeded", &b ) )
+                trackerStat.lastAnnounceSucceeded = b;
+            if( tr_bencDictFindInt( child, "lastAnnounceTime", &i ) )
+                trackerStat.lastAnnounceTime = i;
+            if( tr_bencDictFindBool( child, "lastAnnounceTimedOut", &b ) )
+                trackerStat.lastAnnounceTimedOut = b;
+            if( tr_bencDictFindStr( child, "lastScrapeResult", &str ) )
+                trackerStat.lastScrapeResult = QString::fromUtf8( str );
+            if( tr_bencDictFindInt( child, "lastScrapeStartTime", &i ) )
+                trackerStat.lastScrapeStartTime = i;
+            if( tr_bencDictFindBool( child, "lastScrapeSucceeded", &b ) )
+                trackerStat.lastScrapeSucceeded = b;
+            if( tr_bencDictFindInt( child, "lastScrapeTime", &i ) )
+                trackerStat.lastScrapeTime = i;
+            if( tr_bencDictFindBool( child, "lastScrapeTimedOut", &b ) )
+                trackerStat.lastScrapeTimedOut = b;
+            if( tr_bencDictFindInt( child, "leecherCount", &i ) )
+                trackerStat.leecherCount = i;
+            if( tr_bencDictFindInt( child, "nextAnnounceTime", &i ) )
+                trackerStat.nextAnnounceTime = i;
+            if( tr_bencDictFindInt( child, "nextScrapeTime", &i ) )
+                trackerStat.nextScrapeTime = i;
+            if( tr_bencDictFindInt( child, "scrapeState", &i ) )
+                trackerStat.scrapeState = i;
+            if( tr_bencDictFindInt( child, "seederCount", &i ) )
+                trackerStat.seederCount = i;
+            if( tr_bencDictFindInt( child, "tier", &i ) )
+                trackerStat.tier = i;
+            trackerStatsList << trackerStat;
+        }
+        myValues[TRACKERSTATS].setValue( trackerStatsList );
+        changed = true;
     }
 
     tr_benc * peers;

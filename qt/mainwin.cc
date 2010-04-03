@@ -638,7 +638,7 @@ void
 TrMainWindow :: openProperties( )
 {
     if( myDetailsDialog == 0 ) {
-        myDetailsDialog = new Details( mySession, myModel, this );
+        myDetailsDialog = new Details( mySession, myPrefs, myModel, this );
         connect( myDetailsDialog, SIGNAL(destroyed(QObject*)), this, SLOT(onDetailsDestroyed()));
     }
 

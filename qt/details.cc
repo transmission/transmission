@@ -44,6 +44,7 @@
 #include "details.h"
 #include "file-tree.h"
 #include "hig.h"
+#include "prefs.h"
 #include "session.h"
 #include "squeezelabel.h"
 #include "torrent.h"
@@ -117,9 +118,10 @@ class PeerItem: public QTreeWidgetItem
 ****
 ***/
 
-Details :: Details( Session& session, TorrentModel& model, QWidget * parent ):
+Details :: Details( Session& session, Prefs& prefs, TorrentModel& model, QWidget * parent ):
     QDialog( parent, Qt::Dialog ),
     mySession( session ),
+    myPrefs( prefs ),
     myModel( model ),
     myHavePendingRefresh( false )
 {
@@ -189,6 +191,13 @@ Details :: setIds( const QSet<int>& ids )
 /***
 ****
 ***/
+
+QString
+Details :: timeToStringRounded( int seconds )
+{
+    if( seconds > 60 ) seconds -= ( seconds % 60 );
+    return Utils::timeToString ( seconds );
+}
 
 void
 Details :: onTimer( )
@@ -587,122 +596,142 @@ Details :: refresh( )
 
     // tracker tab
     //
+    QMap<QString,QTreeWidgetItem*> trackers2;
+    QList<QTreeWidgetItem*> newItems2;
     const time_t now( time( 0 ) );
+    const bool showBackup = myPrefs.getBool( Prefs::SHOW_BACKUP_TRACKERS );
+    const bool showScrape = myPrefs.getBool( Prefs::SHOW_TRACKER_SCRAPES );
+    foreach( const Torrent * t, torrents )
+    {
+        const QString idStr( QString::number( t->id( ) ) );
+        TrackerStatsList trackerStats = t->trackerStats( );
 
-    // myScrapeTimePrevLabel
-    if( torrents.empty( ) )
-        string = none;
-    else {
-        QDateTime latest = torrents[0]->lastScrapeTime();
-        foreach( const Torrent * t, torrents ) {
-            const QDateTime e = t->lastScrapeTime();
-            if( latest < e )
-                latest = e;
-        }
-        string = latest.toString();
-    }
-    myScrapeTimePrevLabel->setText( string );
+        foreach( const TrackerStat& trackerStat, trackerStats )
+        {
+            const QString key( idStr + ":" + QString::number(trackerStat.id) );
+            QTreeWidgetItem * item = (QTreeWidgetItem*) myTrackerStats.value( key, 0 );
+            QString str;
 
-    // myScrapeResponseLabel
-    if( torrents.empty( ) )
-        string = none;
-    else {
-        string = torrents[0]->scrapeResponse( );
-        foreach( const Torrent * t, torrents ) {
-           if( string != t->scrapeResponse( ) ) {
-               string = mixed;
-               break;
-           }
-        }
-    }
-    myScrapeResponseLabel->setText( string );
-
-    // myScrapeTimeNextLabel
-    if( torrents.empty( ) )
-        string = none;
-    else {
-        QDateTime soonest = torrents[0]->nextScrapeTime( );
-        foreach( const Torrent * t, torrents ) {
-            const QDateTime e = t->nextScrapeTime( );
-            if( soonest > e )
-                soonest = e;
-        }
-        string = Utils::timeToString( soonest.toTime_t() - now );
-    }
-    myScrapeTimeNextLabel->setText( string );
-
-    // myAnnounceTimePrevLabel
-    if( torrents.empty( ) )
-        string = none;
-    else {
-        QDateTime latest = torrents[0]->lastAnnounceTime();
-        foreach( const Torrent * t, torrents ) {
-            const QDateTime e = t->lastAnnounceTime();
-            if( latest < e )
-                latest = e;
-        }
-        string = latest.toString();
-    }
-    myAnnounceTimePrevLabel->setText( string );
-
-    // myAnnounceTimeNextLabel
-    if( torrents.empty( ) )
-        string = none;
-    else {
-        QDateTime soonest = torrents[0]->nextAnnounceTime( );
-        foreach( const Torrent * t, torrents ) {
-            const QDateTime e = t->nextAnnounceTime( );
-            if( soonest > e )
-                soonest = e;
-        }
-        string = Utils::timeToString( soonest.toTime_t() - now );
-    }
-    myAnnounceTimeNextLabel->setText( string );
-
-    // myAnnounceManualLabel
-    if( torrents.empty( ) )
-        string = none;
-    else {
-        QDateTime soonest = torrents[0]->nextAnnounceTime( );
-        foreach( const Torrent * t, torrents ) {
-            const QDateTime e = t->nextAnnounceTime( );
-            if( soonest > e )
-                soonest = e;
-        }
-        if( soonest <= QDateTime::currentDateTime( ) )
-            string = tr( "Now" );
-        else
-            string = Utils::timeToString( soonest.toTime_t() - now );
-    }
-    myAnnounceManualLabel->setText( string );
-
-    // myAnnounceResponseLabel
-    if( torrents.empty( ) )
-        string = none;
-    else {
-        string = torrents[0]->announceResponse( );
-        foreach( const Torrent * t, torrents ) {
-           if( string != t->announceResponse( ) ) {
-               string = mixed;
-               break;
-           }
-        }
-    }
-    myAnnounceResponseLabel->setText( string );
-
-    // myTrackerLabel
-    if( torrents.empty( ) )
-        string = none;
-    else {
-        string = QUrl(torrents[0]->announceUrl()).host();
-        foreach( const Torrent * t, torrents ) {
-            if( string != QUrl(t->announceUrl()).host() ) {
-                string = mixed;
-                break;
+            if( item == 0 ) // new tracker
+            {
+                item = new QTreeWidgetItem( myTrackerTree );
+                newItems2 << item;
             }
+            str = trackerStat.host;
+            if( showBackup || !trackerStat.isBackup)
+            {
+                if( trackerStat.hasAnnounced )
+                {
+                    const QString tstr( timeToStringRounded( now - trackerStat.lastAnnounceTime ) );
+                    str += "\n";
+                    if( trackerStat.lastAnnounceSucceeded )
+                    {
+                        str += tr( "Got a list of %1 peers %2 ago" )
+                            .arg( trackerStat.lastAnnouncePeerCount )
+                            .arg( tstr );
+                    }
+                    else if( trackerStat.lastAnnounceTimedOut )
+                    {
+                        str += tr( "Peer list request timed out %1 ago; will retry" )
+                            .arg( tstr );
+                    }
+                    else
+                    {
+                        str += tr( "Got an error %1 ago" )
+                            .arg( tstr );
+                    }
+                }
+                switch( trackerStat.announceState )
+                {
+                    case TR_TRACKER_INACTIVE:
+                        if( trackerStat.hasAnnounced )
+                        {
+                            str += "\n";
+                            str += tr( "No updates scheduled" );
+                        }
+                        break;
+                    case TR_TRACKER_WAITING:
+                        {
+                            const QString tstr( timeToStringRounded( trackerStat.nextAnnounceTime - now ) );
+                            str += "\n";
+                            str += tr( "Asking for more peers in %1" )
+                                .arg( tstr );
+                        }
+                        break;
+                    case TR_TRACKER_QUEUED:
+                        str += "\n";
+                        str += tr( "Queued to ask for more peers" );
+                        break;
+                    case TR_TRACKER_ACTIVE:
+                        {
+                            const QString tstr( timeToStringRounded( now - trackerStat.lastAnnounceStartTime ) );
+                            str += "\n";
+                            str += tr( "Asking for more peers now... %1" )
+                                .arg( tstr );
+                        }
+                        break;
+                }
+                if( showScrape )
+                {
+                    if( trackerStat.hasScraped )
+                    {
+                        const QString tstr( timeToStringRounded( now - trackerStat.lastScrapeTime ) );
+                        str += "\n";
+                        if( trackerStat.lastScrapeSucceeded )
+                        {
+                            str += tr( "Tracker had %1 seeders and %2 leechers %3 ago" )
+                                .arg( trackerStat.seederCount )
+                                .arg( trackerStat.leecherCount )
+                                .arg( tstr );
+                        }
+                        else
+                        {
+                            str += tr( "Got a scrape error %1 ago" )
+                                .arg( tstr );
+                        }
+                    }
+                    switch( trackerStat.scrapeState )
+                    {
+                        case TR_TRACKER_INACTIVE:
+                            break;
+                        case TR_TRACKER_WAITING:
+                            {
+                                const QString tstr( timeToStringRounded( trackerStat.nextScrapeTime - now ) );
+                                str += "\n";
+                                str += tr( "Asking for peer counts in %1" )
+                                    .arg( tstr );
+                            }
+                            break;
+                        case TR_TRACKER_QUEUED:
+                            str += "\n";
+                            str += tr( "Queued to ask for peer counts" );
+                            break;
+                        case TR_TRACKER_ACTIVE:
+                            {
+                                const QString tstr( timeToStringRounded( now - trackerStat.lastScrapeStartTime ) );
+                                str += "\n";
+                                str += tr( "Asking for peer counts now... %1" )
+                                    .arg( tstr );
+                            }
+                            break;
+                    }
+                }
+            }
+
+            item->setText( 0, str );
+
+            trackers2.insert( key, item );
         }
     }
-    myTrackerLabel->setText( string );
+    myTrackerTree->addTopLevelItems( newItems2 );
+    foreach( QString key, myTrackerStats.keys() ) {
+        if( !trackers2.contains( key ) ) { // tracker has disappeared
+            QTreeWidgetItem * item = myTrackerStats.value( key, 0 );
+            myTrackerTree->takeTopLevelItem( myTrackerTree->indexOfTopLevelItem( item ) );
+            delete item;
+        }
+    }
+    myTrackerStats = trackers2;
 
     ///
     ///  Peers tab
@@ -848,6 +877,18 @@ Details :: createInfoTab( )
 /***
 ****
 ***/
+
+void
+Details :: onShowBackupTrackersToggled( bool val )
+{
+    myPrefs.set( Prefs::SHOW_BACKUP_TRACKERS, val );
+}
+
+void
+Details :: onShowTrackerScrapesToggled( bool val )
+{
+    myPrefs.set( Prefs::SHOW_TRACKER_SCRAPES, val );
+}
 
 void
 Details :: onHonorsSessionLimitsToggled( bool val )
@@ -1012,24 +1053,36 @@ Details :: createOptionsTab( )
 QWidget *
 Details :: createTrackerTab( )
 {
-    HIG * hig = new HIG( );
+    QCheckBox * c;
+    QWidget * top = new QWidget;
+    QVBoxLayout * v = new QVBoxLayout( top );
 
-    hig->addSectionTitle( tr( "Scrape" ) );
-    hig->addRow( tr( "Last scrape at:" ), myScrapeTimePrevLabel = new SqueezeLabel );
-    hig->addRow( tr( "Tracker responded:" ), myScrapeResponseLabel = new SqueezeLabel );
-    hig->addRow( tr( "Next scrape in:" ), myScrapeTimeNextLabel = new SqueezeLabel );
-    hig->addSectionDivider( );
-    hig->addSectionTitle( tr( "Announce" ) );
-    hig->addRow( tr( "Tracker:" ), myTrackerLabel = new SqueezeLabel );
-    hig->addRow( tr( "Last announce at:" ), myAnnounceTimePrevLabel = new SqueezeLabel );
-    hig->addRow( tr( "Tracker responded:" ), myAnnounceResponseLabel = new SqueezeLabel );
-    hig->addRow( tr( "Next announce in:" ), myAnnounceTimeNextLabel = new SqueezeLabel );
-    hig->addRow( tr( "Manual announce allowed in:" ), myAnnounceManualLabel = new SqueezeLabel );
-    hig->finish( );
+    v->setSpacing( HIG :: PAD_BIG );
+    v->setContentsMargins( HIG::PAD_BIG, HIG::PAD_BIG, HIG::PAD_BIG, HIG::PAD_BIG );
 
-    myTrackerLabel->setScaledContents( true );
+    QStringList headers;
+    headers << tr("Trackers");
+    myTrackerTree = new QTreeWidget;
+    myTrackerTree->setHeaderLabels( headers );
+    myTrackerTree->setSelectionMode( QTreeWidget::NoSelection );
+    myTrackerTree->setRootIsDecorated( false );
+    myTrackerTree->setTextElideMode( Qt::ElideRight );
+    myTrackerTree->setAlternatingRowColors( true );
+    v->addWidget( myTrackerTree, 1 );
 
-    return hig;
+    c = new QCheckBox( tr( "Show &more details" ) );
+    c->setChecked( myPrefs.getBool( Prefs::SHOW_TRACKER_SCRAPES ) );
+    myShowTrackerScrapesCheck = c;
+    v->addWidget( c, 1 );
+    connect( c, SIGNAL(clicked(bool)), this, SLOT(onShowTrackerScrapesToggled(bool)) );
+
+    c = new QCheckBox( tr( "Show &backup trackers" ) );
+    c->setChecked( myPrefs.getBool( Prefs::SHOW_BACKUP_TRACKERS ) );
+    myShowBackupTrackersCheck = c;
+    v->addWidget( c, 1 );
+    connect( c, SIGNAL(clicked(bool)), this, SLOT(onShowBackupTrackersToggled(bool)) );
+
+    return top;
 }
 
 /***
