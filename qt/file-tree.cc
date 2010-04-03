@@ -86,7 +86,7 @@ FileTreeItem :: data( int column ) const
     QVariant value;
 
     switch( column ) {
-        case COL_NAME: value.setValue( name() ); break;
+        case COL_NAME: value.setValue( fileSizeName( ) ); break;
         case COL_PROGRESS: value.setValue( progress( ) ); break;
         case COL_WANTED: value.setValue( isSubtreeWanted( ) ); break;
         case COL_PRIORITY: value.setValue( priorityString( ) ); break;
@@ -114,6 +114,16 @@ FileTreeItem :: progress( ) const
     if( total )
         d = have / (double)total;
     return d;
+}
+
+QString
+FileTreeItem :: fileSizeName( ) const
+{
+    uint64_t have(0), total(0);
+    QString str;
+    getSubtreeSize( have, total );
+    str = QString( name() + " (%1)" ).arg( Utils::sizeToString( total ) );
+    return str;
 }
 
 bool
