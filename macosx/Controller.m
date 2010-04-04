@@ -1214,14 +1214,11 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) resumeAllTorrents: (id) sender
 {
-    NSMutableArray * torrents = [NSMutableArray arrayWithArray: fTorrents];
+    NSMutableArray * torrents = [NSMutableArray arrayWithCapacity: [fTorrents count]];
     
-    if (![fDefaults boolForKey: @"ResumeAllIncludesFinished"])
-    {
-        for (NSInteger i = [torrents count]-1; i >=0; --i)
-            if ([[torrents objectAtIndex: i] isFinishedSeeding])
-                [torrents removeObjectAtIndex: i];
-    }
+    for (Torrent * torrent in fTorrents)
+        if (![torrent isFinishedSeeding])
+            [torrents addObject: torrent];
     
     [self resumeTorrents: torrents];
 }
@@ -3857,8 +3854,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     if (action == @selector(resumeAllTorrents:))
     {
         for (Torrent * torrent in fTorrents)
-            if (![torrent isActive] && ![torrent waitingToStart]
-                && (![torrent isFinishedSeeding] || [fDefaults boolForKey: @"ResumeAllIncludesFinished"]))
+            if (![torrent isActive] && ![torrent waitingToStart] && ![torrent isFinishedSeeding])
                 return YES;
         return NO;
     }
