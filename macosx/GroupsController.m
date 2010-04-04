@@ -267,7 +267,7 @@ GroupsController * fGroupsInstance = nil;
     }
     
     [fGroups addObject: [NSMutableDictionary dictionaryWithObjectsAndKeys: [NSNumber numberWithInteger: index], @"Index",
-                            [NSColor cyanColor], @"Color", @"", @"Name", nil]];
+                            [NSColor colorWithCalibratedRed: 0.0 green: 0.65 blue: 1.0 alpha: 1.0], @"Color", @"", @"Name", nil]];
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGroups" object: self];
     [self saveGroups];
