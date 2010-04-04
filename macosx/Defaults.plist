@@ -130,6 +130,8 @@
 	<integer>2</integer>
 	<key>RenamePartialFiles</key>
 	<true/>
+	<key>ResumeAllIncludesFinished</key>
+	<false/>
 	<key>RPC</key>
 	<false/>
 	<key>RPCAuthorize</key>
