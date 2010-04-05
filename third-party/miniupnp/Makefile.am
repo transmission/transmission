@@ -3,6 +3,7 @@ noinst_LIBRARIES = libminiupnp.a
 AM_CFLAGS = @PTHREAD_CFLAGS@ -DNDEBUG
 
 libminiupnp_a_SOURCES = \
+    connecthostport.c \
     igd_desc_parse.c \
     minisoap.c \
     minissdpc.c \
@@ -15,6 +16,7 @@ libminiupnp_a_SOURCES = \
 noinst_HEADERS = \
     bsdqueue.h \
     codelength.h \
+    connecthostport.h \
     declspec.h \
     igd_desc_parse.h \
     minisoap.h \
