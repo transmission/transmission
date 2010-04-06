@@ -245,9 +245,10 @@ Details :: refresh( )
     if( torrents.empty( ) )
         string = none;
     else {
+        const tr_torrent_activity activity = torrents[0]->getActivity( );
         string = torrents[0]->activityString( );
-        foreach( const Torrent* t, torrents ) {
-            if( string != t->activityString( ) ) {
+        foreach( const Torrent * t, torrents ) {
+            if( activity != t->getActivity( ) ) {
                 string = mixed;
                 break;
             }
@@ -340,7 +341,7 @@ Details :: refresh( )
                 allPaused = false;
         }
         if( allPaused )
-            string = tr( "Stopped" );
+            string = torrents[0]->activityString( );
         else if( baseline.isNull( ) )
             string = mixed;
         else
