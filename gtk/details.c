@@ -695,13 +695,9 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
         str = none;
     else {
         const time_t baseline = stats[0]->startDate;
-        tr_bool allFinished = stats[0]->finished;
-        for( i=1; i<n; ++i ) {
+        for( i=1; i<n; ++i )
             if( baseline != stats[i]->startDate )
                 break;
-            if( !stats[i]->finished )
-                allFinished = FALSE;
-        }
         if( i != n )
             str = mixed;
         else if( ( baseline<=0 ) || ( stats[0]->activity == TR_STATUS_STOPPED ) )
