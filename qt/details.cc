@@ -255,6 +255,7 @@ Details :: refresh( )
         }
     }
     myStateLabel->setText( string );
+    const QString stateString = string;
 
     // myHaveLabel
     double sizeWhenDone = 0;
@@ -341,7 +342,7 @@ Details :: refresh( )
                 allPaused = false;
         }
         if( allPaused )
-            string = torrents[0]->activityString( );
+            string = stateString; // paused || finished
         else if( baseline.isNull( ) )
             string = mixed;
         else
