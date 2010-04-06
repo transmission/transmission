@@ -1135,14 +1135,29 @@ int trashDataFile(const char * filename)
     switch (fStat->activity)
     {
         case TR_STATUS_STOPPED:
-            return NSLocalizedString(@"Paused", "Torrent -> status string");
+        {
+            NSString * string = NSLocalizedString(@"Paused", "Torrent -> status string");
+            
+            NSString * extra = nil;
+            if (fWaitToStart)
+            {
+                extra = ![self allDownloaded]
+                        ? NSLocalizedString(@"Waiting to download", "Torrent -> status string")
+                        : NSLocalizedString(@"Waiting to seed", "Torrent -> status string");
+            }
+            else if ([self isFinishedSeeding])
+                extra = NSLocalizedString(@"Seeding complete", "Torrent -> status string");
+            else;
+        
+            return extra ? [string stringByAppendingFormat: @" (%@)", extra] : string;
+        }
+        
+        case TR_STATUS_CHECK_WAIT:
+            return [NSLocalizedString(@"Waiting to check existing data", "Torrent -> status string") stringByAppendingEllipsis];
 
         case TR_STATUS_CHECK:
             return [NSString localizedStringWithFormat: @"%@ (%.2f%%)",
                     NSLocalizedString(@"Checking existing data", "Torrent -> status string"), 100.0 * [self checkingProgress]];
-        
-        case TR_STATUS_CHECK_WAIT:
-            return [NSLocalizedString(@"Waiting to check existing data", "Torrent -> status string") stringByAppendingEllipsis];
 
         case TR_STATUS_DOWNLOAD:
             return NSLocalizedString(@"Downloading", "Torrent -> status string");
