@@ -591,4 +591,6 @@
    ------+---------+-----------+----------------+-------------------------------
    9     | 2.00    | yes       | session-set    | new arg "start-added-torrents"
          | 2.00    | yes       | session-set    | new arg "trash-original-torrent-files"
+         | 2.00    | yes       | session-get    | new arg "start-added-torrents"
+         | 2.00    | yes       | session-get    | new arg "trash-original-torrent-files"
          | 2.00    | yes       | torrent-get    | new arg "isFinished"
