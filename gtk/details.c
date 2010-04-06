@@ -676,15 +676,15 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     if( n < 1 )
         str = none;
     else {
-        const tr_torrent_activity a = stats[0]->activity;
-        const tr_bool f = stats[0]->finished;
-        str = activityString( a, f );
+        const tr_torrent_activity activity = stats[0]->activity;
+        tr_bool allFinished = stats[0]->finished;
         for( i=1; i<n; ++i ) {
-            if( ( stats[i]->activity != a ) || ( stats[i]->finished != f ) ) {
-                str = mixed;
+            if( activity != stats[i]->activity )
                 break;
-            }
+            if( !stats[i]->finished )
+                allFinished = FALSE;
         }
+        str = i<n ? mixed : activityString( activity, allFinished );
     }
     stateString = str;
     gtr_label_set_text( GTK_LABEL( di->state_lb ), str );
@@ -694,18 +694,18 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     if( n < 1 )
         str = none;
     else {
-        tr_bool allPaused = TRUE;
-        time_t baseline = stats[0]->startDate;
+        const time_t baseline = stats[0]->startDate;
+        tr_bool allFinished = stats[0]->finished;
         for( i=1; i<n; ++i ) {
             if( baseline != stats[i]->startDate )
-                baseline = 0;
-            if( stats[i]->activity != TR_STATUS_STOPPED )
-                allPaused = FALSE;
+                break;
+            if( !stats[i]->finished )
+                allFinished = FALSE;
         }
-        if( allPaused )
-            str = stateString; // paused || finished
-        else if( !baseline )
+        if( i != n )
             str = mixed;
+        else if( ( baseline<=0 ) || ( stats[0]->activity == TR_STATUS_STOPPED ) )
+            str = stateString;
         else
             str = tr_strltime( buf, time(NULL)-baseline, sizeof( buf ) );
     }
