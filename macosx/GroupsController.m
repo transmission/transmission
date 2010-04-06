@@ -251,11 +251,11 @@ GroupsController * fGroupsInstance = nil;
 - (void) addNewGroup
 {
     //find the lowest index
-    NSMutableIndexSet * indexSet = [NSMutableIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fGroups count]+1)]; //candidates
+    NSMutableIndexSet * candidates = [NSMutableIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fGroups count]+1)];
     for (NSDictionary * dict in fGroups)
-        [indexSet removeIndex: [[dict objectForKey: @"Index"] integerValue]];
+        [candidates removeIndex: [[dict objectForKey: @"Index"] integerValue]];
     
-    const NSInteger index = [indexSet firstIndex];
+    const NSInteger index = [candidates firstIndex];
     
     [fGroups addObject: [NSMutableDictionary dictionaryWithObjectsAndKeys: [NSNumber numberWithInteger: index], @"Index",
                             [NSColor colorWithCalibratedRed: 0.0 green: 0.65 blue: 1.0 alpha: 1.0], @"Color", @"", @"Name", nil]];

@@ -49,7 +49,6 @@
 - (void) updateInfo;
 
 - (void) setPiecesView: (id) sender;
-- (void) setPiecesViewForAvailable: (BOOL) available;
 - (void) clearView;
 
 @end

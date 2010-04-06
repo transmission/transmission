@@ -35,6 +35,8 @@
 
 - (void) setupInfo;
 
+- (void) updatePiecesView;
+
 @end
 
 @implementation InfoActivityViewController
@@ -49,8 +51,15 @@
     return self;
 }
 
+- (void) awakeFromNib
+{
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updatePiecesView) name: @"UpdatePiecesView" object: nil];
+}
+
 - (void) dealloc
 {
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    
     [fTorrents release];
     
     [super dealloc];
@@ -140,16 +149,9 @@
 
 - (void) setPiecesView: (id) sender
 {
-    [self setPiecesViewForAvailable: [sender selectedSegment] == PIECES_CONTROL_AVAILABLE];
-}
-
-- (void) setPiecesViewForAvailable: (BOOL) available
-{
-    [fPiecesControl setSelected: available forSegment: PIECES_CONTROL_AVAILABLE];
-    [fPiecesControl setSelected: !available forSegment: PIECES_CONTROL_PROGRESS];
-    
-    [[NSUserDefaults standardUserDefaults] setBool: available forKey: @"PiecesViewShowAvailability"];
-    [fPiecesView updateView];
+    const BOOL availability = [sender selectedSegment] == PIECES_CONTROL_AVAILABLE;
+    [[NSUserDefaults standardUserDefaults] setBool: availability forKey: @"PiecesViewShowAvailability"];
+    [self updatePiecesView];
 }
 
 - (void) clearView
@@ -195,14 +197,25 @@
         
         [fDateAddedField setObjectValue: [torrent dateAdded]];
         
-        BOOL piecesAvailableSegment = [[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"];
+        const BOOL piecesAvailableSegment = [[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"];
         [fPiecesControl setSelected: piecesAvailableSegment forSegment: PIECES_CONTROL_AVAILABLE];
         [fPiecesControl setSelected: !piecesAvailableSegment forSegment: PIECES_CONTROL_PROGRESS];
         [fPiecesControl setEnabled: YES];
+        
         [fPiecesView setTorrent: torrent];
     }
     
     fSet = YES;
+}
+
+- (void) updatePiecesView
+{
+    const BOOL piecesAvailableSegment = [[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"];
+    
+    [fPiecesControl setSelected: piecesAvailableSegment forSegment: PIECES_CONTROL_AVAILABLE];
+    [fPiecesControl setSelected: !piecesAvailableSegment forSegment: PIECES_CONTROL_PROGRESS];
+    
+    [fPiecesView updateView];
 }
 
 @end

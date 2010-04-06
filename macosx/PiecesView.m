@@ -209,10 +209,11 @@ enum
 
 - (void) mouseDown: (NSEvent *) event
 {
-    #warning fix
-    /*if (fTorrent)
-        [[[self window] windowController] setPiecesViewForAvailable:
-            ![[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"]];*/
+    const BOOL availability = ![[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"];
+    [[NSUserDefaults standardUserDefaults] setBool: availability forKey: @"PiecesViewShowAvailability"];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdatePiecesView" object: self];
+    
     [super mouseDown: event];
 }
 
