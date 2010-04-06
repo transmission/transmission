@@ -65,8 +65,6 @@ const tr_stat *tr_torrent_stat( TrTorrent *tor );
 
 const tr_info *tr_torrent_info( TrTorrent *tor );
 
-char*          tr_torrent_status_str( TrTorrent * tor );
-
 void           tr_torrent_delete_files( TrTorrent * tor );
 
 void           tr_torrent_open_folder( TrTorrent * tor );

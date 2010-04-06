@@ -182,14 +182,6 @@ TorrentDelegate :: shortStatusString( const Torrent& tor ) const
 
     switch( tor.getActivity( ) )
     {
-        case TR_STATUS_STOPPED:
-            str = tr( "Paused" );
-            break;
-
-        case TR_STATUS_CHECK_WAIT:
-            str = tr( "Waiting to verify local data" );
-            break;
-
         case TR_STATUS_CHECK:
             str = tr( "Verifying local data (%1% tested)" ).arg( tor.getVerifyProgress()*100.0, 0, 'f', 1 );
             break;
@@ -202,6 +194,7 @@ TorrentDelegate :: shortStatusString( const Torrent& tor ) const
             break;
 
         default:
+            str = tor.activityString( );
             break;
     }
 

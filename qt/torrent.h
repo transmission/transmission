@@ -159,6 +159,7 @@ class Torrent: public QObject
             HONORS_SESSION_LIMITS,
             PEER_LIMIT,
             HASH_STRING,
+            IS_FINISHED,
             IS_PRIVATE,
             COMMENT,
             CREATOR,
@@ -293,6 +294,7 @@ class Torrent: public QObject
     public:
         QString activityString( ) const;
         tr_torrent_activity getActivity( ) const { return (tr_torrent_activity) getInt( ACTIVITY ); }
+        bool isFinished( ) const { return getBool( IS_FINISHED ); }
         bool isPaused( ) const { return getActivity( ) == TR_STATUS_STOPPED; }
         bool isVerifying( ) const { return getActivity( ) == TR_STATUS_CHECK; }
         bool isDownloading( ) const { return getActivity( ) == TR_STATUS_DOWNLOAD; }

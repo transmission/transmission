@@ -96,6 +96,7 @@ Torrent :: myProperties[] =
     { HONORS_SESSION_LIMITS, "honorsSessionLimits", QVariant::Bool, STAT_EXTRA },
     { PEER_LIMIT, "peer-limit", QVariant::Int, STAT_EXTRA },
     { HASH_STRING, "hashString", QVariant::String, INFO },
+    { IS_FINISHED, "isFinished", QVariant::Bool, STAT },
     { IS_PRIVATE, "isPrivate", QVariant::Bool, INFO },
     { COMMENT, "comment", QVariant::String, INFO },
     { CREATOR, "creator", QVariant::String, INFO },
@@ -675,7 +676,7 @@ Torrent :: activityString( ) const
         case TR_STATUS_CHECK:      str = tr( "Verifying local data" ); break;
         case TR_STATUS_DOWNLOAD:   str = tr( "Downloading" ); break;
         case TR_STATUS_SEED:       str = tr( "Seeding" ); break;
-        case TR_STATUS_STOPPED:    str = tr( "Paused" ); break;
+        case TR_STATUS_STOPPED:    str = isFinished() ? tr( "Finished" ): tr( "Paused" ); break;
     }
 
     return str;

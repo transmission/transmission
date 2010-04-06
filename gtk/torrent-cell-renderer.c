@@ -202,7 +202,10 @@ getShortStatusString( const tr_torrent  * tor,
     switch( torStat->activity )
     {
         case TR_STATUS_STOPPED:
-            g_string_assign( gstr, _( "Paused" ) );
+            if( torStat->finished )
+                g_string_assign( gstr, _( "Finished" ) );
+            else
+                g_string_assign( gstr, _( "Paused" ) );
             break;
 
         case TR_STATUS_CHECK_WAIT:

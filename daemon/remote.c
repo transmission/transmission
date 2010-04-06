@@ -337,6 +337,7 @@ static const char * details_keys[] = {
     "haveValid",
     "honorsSessionLimits",
     "id",
+    "isFinished",
     "isPrivate",
     "leftUntilDone",
     "name",
@@ -369,6 +370,7 @@ static const char * list_keys[] = {
     "errorString",
     "eta",
     "id",
+    "isFinished",
     "leftUntilDone",
     "name",
     "peersGettingFromUs",
@@ -1008,6 +1010,7 @@ static char*
 getStatusString( tr_benc * t, char * buf, size_t buflen )
 {
     int64_t status;
+    tr_bool boolVal;
 
     if( !tr_bencDictFindInt( t, "status", &status ) )
     {
@@ -1016,7 +1019,10 @@ getStatusString( tr_benc * t, char * buf, size_t buflen )
     else switch( status )
     {
         case TR_STATUS_STOPPED:
-            tr_strlcpy( buf, "Stopped", buflen );
+            if( tr_bencDictFindBool( t, "isFinished", &boolVal ) && boolVal )
+                tr_strlcpy( buf, "Finished", buflen );
+            else
+                tr_strlcpy( buf, "Stopped", buflen );
             break;
 
         case TR_STATUS_CHECK_WAIT:
