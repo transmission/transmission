@@ -1,4 +1,4 @@
-$Id: Changelog.txt,v 1.110 2010/04/05 12:09:51 nanard Exp $
+$Id: Changelog.txt,v 1.111 2010/04/05 20:36:59 nanard Exp $
 miniUPnP client Changelog.
 
 2010/04/05:
@@ -7,6 +7,8 @@ miniUPnP client Changelog.
   Use getnameinfo() instead of inet_ntop or inet_ntoa
   Work to make miniupnpc IPV6 compatible...
   Add java test code.
+  Big changes in order to support device having both WANIPConnection
+  and WANPPPConnection.
 
 2010/04/04:
   Use getaddrinfo() instead of gethostbyname() in miniwget.

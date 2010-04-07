@@ -1,4 +1,4 @@
-/* $Id: miniupnpc.c,v 1.77 2010/04/05 12:34:05 nanard Exp $ */
+/* $Id: miniupnpc.c,v 1.78 2010/04/05 20:36:59 nanard Exp $ */
 /* Project : miniupnp
  * Author : Thomas BERNARD
  * copyright (c) 2005-2010 Thomas Bernard
@@ -653,9 +653,9 @@ LIBSPEC void GetUPNPUrls(struct UPNPUrls * urls, struct IGDdatas * data,
 		n1 = strlen(descURL);
 	n1 += 2;	/* 1 byte more for Null terminator, 1 byte for '/' if needed */
 	n2 = n1; n3 = n1;
-	n1 += strlen(data->scpdurl);
-	n2 += strlen(data->controlurl);
-	n3 += strlen(data->controlurl_CIF);
+	n1 += strlen(data->first.scpdurl);
+	n2 += strlen(data->first.controlurl);
+	n3 += strlen(data->CIF.controlurl);
 
 	urls->ipcondescURL = (char *)malloc(n1);
 	urls->controlURL = (char *)malloc(n2);
@@ -670,19 +670,19 @@ LIBSPEC void GetUPNPUrls(struct UPNPUrls * urls, struct IGDdatas * data,
 	strncpy(urls->controlURL, urls->ipcondescURL, n2);
 	strncpy(urls->controlURL_CIF, urls->ipcondescURL, n3);
 	
-	url_cpy_or_cat(urls->ipcondescURL, data->scpdurl, n1);
+	url_cpy_or_cat(urls->ipcondescURL, data->first.scpdurl, n1);
 
-	url_cpy_or_cat(urls->controlURL, data->controlurl, n2);
+	url_cpy_or_cat(urls->controlURL, data->first.controlurl, n2);
 
-	url_cpy_or_cat(urls->controlURL_CIF, data->controlurl_CIF, n3);
+	url_cpy_or_cat(urls->controlURL_CIF, data->CIF.controlurl, n3);
 
 #ifdef DEBUG
-	printf("urls->ipcondescURL='%s' %d n1=%d\n", urls->ipcondescURL,
-	       strlen(urls->ipcondescURL), n1);
-	printf("urls->controlURL='%s' %d n2=%d\n", urls->controlURL,
-	       strlen(urls->controlURL), n2);
-	printf("urls->controlURL_CIF='%s' %d n3=%d\n", urls->controlURL_CIF,
-	       strlen(urls->controlURL_CIF), n3);
+	printf("urls->ipcondescURL='%s' %u n1=%d\n", urls->ipcondescURL,
+	       (unsigned)strlen(urls->ipcondescURL), n1);
+	printf("urls->controlURL='%s' %u n2=%d\n", urls->controlURL,
+	       (unsigned)strlen(urls->controlURL), n2);
+	printf("urls->controlURL_CIF='%s' %u n3=%d\n", urls->controlURL_CIF,
+	       (unsigned)strlen(urls->controlURL_CIF), n3);
 #endif
 }
 
@@ -755,7 +755,7 @@ UPNPIGD_IsConnected(struct UPNPUrls * urls, struct IGDdatas * data)
 	char status[64];
 	unsigned int uptime;
 	status[0] = '\0';
-	UPNP_GetStatusInfo(urls->controlURL, data->servicetype,
+	UPNP_GetStatusInfo(urls->controlURL, data->first.servicetype,
 	                   status, &uptime, NULL);
 	if(0 == strcmp("Connected", status))
 	{
@@ -812,7 +812,7 @@ UPNP_GetValidIGD(struct UPNPDev * devlist,
 				parserootdesc(descXML, descXMLsize, data);
 				free(descXML);
 				descXML = NULL;
-				if(0==strcmp(data->servicetype_CIF,
+				if(0==strcmp(data->CIF.servicetype,
 				   "urn:schemas-upnp-org:service:WANCommonInterfaceConfig:1")
 				   || state >= 3 )
 				{
@@ -826,6 +826,25 @@ UPNP_GetValidIGD(struct UPNPDev * devlist,
 				  if((state >= 2) || UPNPIGD_IsConnected(urls, data))
 					return state;
 				  FreeUPNPUrls(urls);
+				  if(data->second.servicetype[0] != '\0') {
+#ifdef DEBUG
+				    printf("We tried %s, now we try %s !\n",
+				           data->first.servicetype, data->second.servicetype);
+#endif
+				    /* swaping WANPPPConnection and WANIPConnection ! */
+				    memcpy(&data->tmp, &data->first, sizeof(struct IGDdatas_service));
+				    memcpy(&data->first, &data->second, sizeof(struct IGDdatas_service));
+				    memcpy(&data->second, &data->tmp, sizeof(struct IGDdatas_service));
+				    GetUPNPUrls(urls, data, dev->descURL);
+#ifdef DEBUG
+				    printf("UPNPIGD_IsConnected(%s) = %d\n",
+				       urls->controlURL,
+			           UPNPIGD_IsConnected(urls, data));
+#endif
+				    if((state >= 2) || UPNPIGD_IsConnected(urls, data))
+					  return state;
+				    FreeUPNPUrls(urls);
+				  }
 				}
 				memset(data, 0, sizeof(struct IGDdatas));
 			}
