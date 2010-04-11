@@ -492,6 +492,28 @@ onAddURLResponse( GtkDialog * dialog, int response, gpointer user_data )
         gtk_widget_destroy( GTK_WIDGET( dialog ) );
 }
 
+static void
+paste_clipboard_url_into_entry( GtkWidget * e )
+{
+  size_t i;
+
+  char * text[] = {
+    gtk_clipboard_wait_for_text( gtk_clipboard_get( GDK_SELECTION_PRIMARY ) ),
+    gtk_clipboard_wait_for_text( gtk_clipboard_get( GDK_SELECTION_CLIPBOARD ) )
+  };
+
+  for( i=0; i<G_N_ELEMENTS(text); ++i ) {
+      char * s = text[i];
+      if( s && ( gtr_is_supported_url( s ) || gtr_is_magnet_link( s ) ) ) {
+          gtk_entry_set_text( GTK_ENTRY( e ), s );
+          break;
+      }
+  }
+
+  for( i=0; i<G_N_ELEMENTS(text); ++i )
+    g_free( text[i] );
+}
+
 GtkWidget*
 addURLDialog( GtkWindow * parent, TrCore * core )
 {
@@ -515,6 +537,7 @@ addURLDialog( GtkWindow * parent, TrCore * core )
     t = hig_workarea_create( );
     hig_workarea_add_section_title( t, &row, _( "Add torrent from URL" ) );
     e = gtk_entry_new( );
+    paste_clipboard_url_into_entry( e );
     g_object_set_data( G_OBJECT( w ), "url-entry", e );
     hig_workarea_add_row( t, &row, _( "_URL" ), e, NULL );
 
