@@ -93,7 +93,7 @@
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="814218719">
 								<int key="NSCellFlags">67239488</int>
-								<int key="NSCellFlags2">272631808</int>
+								<int key="NSCellFlags2">272632320</int>
 								<string key="NSContents">File Name</string>
 								<object class="NSFont" key="NSSupport">
 									<string key="NSName">LucidaGrande</string>
