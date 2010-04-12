@@ -27,6 +27,8 @@ EXTRA_DIST = \
     zh_TW.lproj \
     AboutWindowController.h \
     AboutWindowController.m \
+    AddMagnetWindowController.h \
+    AddMagnetWindowController.m \
     AddWindowController.h \
     AddWindowController.m \
     Badger.h \

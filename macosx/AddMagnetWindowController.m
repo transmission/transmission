@@ -1,7 +1,7 @@
 /******************************************************************************
  * $Id$
  *
- * Copyright (c) 2008-2010 Transmission authors and contributors
+ * Copyright (c) 2010 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -22,23 +22,18 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#import "AddWindowController.h"
+#import "AddMagnetWindowController.h"
 #import "Controller.h"
 #import "ExpandedPathToIconTransformer.h"
-#import "FileOutlineController.h"
 #import "GroupsController.h"
 #import "NSStringAdditions.h"
 #import "Torrent.h"
-
-#define UPDATE_SECONDS 1.0
 
 #define POPUP_PRIORITY_HIGH 0
 #define POPUP_PRIORITY_NORMAL 1
 #define POPUP_PRIORITY_LOW 2
 
-@interface AddWindowController (Private)
-
-- (void) updateFiles;
+@interface AddMagnetWindowController (Private)
 
 - (void) confirmAdd;
 
@@ -53,49 +48,32 @@
 
 @end
 
-@implementation AddWindowController
+@implementation AddMagnetWindowController
 
-- (id) initWithTorrent: (Torrent *) torrent destination: (NSString *) path lockDestination: (BOOL) lockDestination
-    controller: (Controller *) controller torrentFile: (NSString *) torrentFile
-    deleteTorrent: (BOOL) deleteTorrent canToggleDelete: (BOOL) canToggleDelete
+- (id) initWithTorrent: (Torrent *) torrent destination: (NSString *) path controller: (Controller *) controller
 {
-    if ((self = [super initWithWindowNibName: @"AddWindow"]))
+    if ((self = [super initWithWindowNibName: @"AddMagnetWindow"]))
     {
         fTorrent = torrent;
         fDestination = [[path stringByExpandingTildeInPath] retain];
-        fLockDestination = lockDestination;
         
         fController = controller;
         
-        fTorrentFile = [[torrentFile stringByExpandingTildeInPath] retain];
-        
-        fDeleteTorrentInitial = deleteTorrent;
-        fDeleteEnableInitial = canToggleDelete;
-        
         fGroupValue = [torrent groupValue];
-        
-        [fVerifyIndicator setUsesThreadedAnimation: YES];
     }
     return self;
 }
 
 - (void) awakeFromNib
 {
-    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateStatusField:)
-        name: @"TorrentFileCheckChange" object: fTorrent];
-    
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateGroupMenu:)
         name: @"UpdateGroups" object: nil];
-    
-    [fFileController setTorrent: fTorrent];
     
     NSString * name = [fTorrent name];
     [[self window] setTitle: name];
     [fNameField setStringValue: name];
     
     [fIconView setImage: [fTorrent icon]];
-    
-    [self updateStatusField: nil];
     
     [self setGroupsMenu];
     [fGroupPopUp selectItemWithTag: fGroupValue];
@@ -112,9 +90,6 @@
     
     [fStartCheck setState: [[NSUserDefaults standardUserDefaults] boolForKey: @"AutoStartDownload"] ? NSOnState : NSOffState];
     
-    [fDeleteCheck setState: fDeleteTorrentInitial ? NSOnState : NSOffState];
-    [fDeleteCheck setEnabled: fDeleteEnableInitial];
-    
     if (fDestination)
         [self setDestinationPath: fDestination];
     else
@@ -122,10 +97,6 @@
         [fLocationField setStringValue: @""];
         [fLocationImageView setImage: nil];
     }
-    
-    fTimer = [NSTimer scheduledTimerWithTimeInterval: UPDATE_SECONDS target: self
-                selector: @selector(updateFiles) userInfo: nil repeats: YES];
-    [self updateFiles];
 }
 
 - (void) windowDidLoad
@@ -139,10 +110,7 @@
 {
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     
-    [fTimer invalidate];
-    
     [fDestination release];
-    [fTorrentFile release];
     
     [super dealloc];
 }
@@ -199,19 +167,8 @@
 //only called on cancel
 - (BOOL) windowShouldClose: (id) window
 {
-    [fTimer invalidate];
-    fTimer = nil;
-    
-    [fFileController setTorrent: nil]; //avoid a crash when window tries to update
-    
-    [fController askOpenConfirmed: self add: NO];
+    [fController askOpenMagnetConfirmed: self add: NO];
     return YES;
-}
-
-- (void) verifyLocalData: (id) sender
-{
-    [fTorrent resetCache];
-    [self updateFiles];
 }
 
 - (void) changePriority: (id) sender
@@ -227,27 +184,6 @@
     [fTorrent setPriority: priority];
 }
 
-- (void) updateStatusField: (NSNotification *) notification
-{
-    NSString * statusString = [NSString stringForFileSize: [fTorrent size]];
-    if ([fTorrent isFolder])
-    {
-        NSString * fileString;
-        NSInteger count = [fTorrent fileCount];
-        if (count != 1)
-            fileString = [NSString stringWithFormat: NSLocalizedString(@"%d files", "Add torrent -> info"), count];
-        else
-            fileString = NSLocalizedString(@"1 file", "Add torrent -> info");
-        
-        NSString * selectedString = [NSString stringWithFormat: NSLocalizedString(@"%@ selected", "Add torrent -> info"),
-                                        [NSString stringForFileSize: [fTorrent totalSizeSelected]]];
-        
-        statusString = [NSString stringWithFormat: @"%@, %@ (%@)", fileString, statusString, selectedString];
-    }
-    
-    [fStatusField setStringValue: statusString];
-}
-
 - (void) updateGroupMenu: (NSNotification *) notification
 {
     [self setGroupsMenu];
@@ -260,47 +196,15 @@
 
 @end
 
-@implementation AddWindowController (Private)
-
-- (void) updateFiles
-{
-    [fTorrent update];
-    
-    [fFileController reloadData];
-    
-    if ([fTorrent isChecking])
-    {
-        const BOOL waiting = [fTorrent isCheckingWaiting];
-        [fVerifyIndicator setIndeterminate: waiting];
-        if (!waiting)
-            [fVerifyIndicator setDoubleValue: [fTorrent checkingProgress]];
-        else
-            [fVerifyIndicator startAnimation: self];
-        
-        [fVerifyIndicator setHidden: NO];
-    }
-    else
-    {
-        [fVerifyIndicator stopAnimation: self];
-        [fVerifyIndicator setHidden: YES];
-    }
-}
+@implementation AddMagnetWindowController (Private)
 
 - (void) confirmAdd
 {
-    [fTimer invalidate];
-    fTimer = nil;
-    
     [fTorrent setWaitToStart: [fStartCheck state] == NSOnState];
     [fTorrent setGroupValue: fGroupValue];
     
-    if (fTorrentFile && [fDeleteCheck state] == NSOnState)
-        [Torrent trashFile: fTorrentFile];
-    
-    [fFileController setTorrent: nil]; //avoid a crash when window tries to update
-    
     [self close];
-    [fController askOpenConfirmed: self add: YES]; //ensure last, since it releases this controller
+    [fController askOpenMagnetConfirmed: self add: YES]; //ensure last, since it releases this controller
 }
 
 - (void) setDestinationPath: (NSString *) destination
@@ -325,10 +229,7 @@
 - (void) folderChoiceClosed: (NSOpenPanel *) openPanel returnCode: (NSInteger) code contextInfo: (void *) contextInfo
 {
     if (code == NSOKButton)
-    {
-        fLockDestination = NO;
         [self setDestinationPath: [[openPanel filenames] objectAtIndex: 0]];
-    }
     else
     {
         if (!fDestination)
@@ -347,14 +248,11 @@
     NSInteger previousGroup = fGroupValue;
     fGroupValue = [sender tag];
     
-    if (!fLockDestination)
-    {
-        if ([[GroupsController groups] usesCustomDownloadLocationForIndex: fGroupValue])
-            [self setDestinationPath: [[GroupsController groups] customDownloadLocationForIndex: fGroupValue]];
-        else if ([fDestination isEqualToString: [[GroupsController groups] customDownloadLocationForIndex: previousGroup]])
-            [self setDestinationPath: [[NSUserDefaults standardUserDefaults] stringForKey: @"DownloadFolder"]];
-        else;
-    }
+    if ([[GroupsController groups] usesCustomDownloadLocationForIndex: fGroupValue])
+        [self setDestinationPath: [[GroupsController groups] customDownloadLocationForIndex: fGroupValue]];
+    else if ([fDestination isEqualToString: [[GroupsController groups] customDownloadLocationForIndex: previousGroup]])
+        [self setDestinationPath: [[NSUserDefaults standardUserDefaults] stringForKey: @"DownloadFolder"]];
+    else;
 }
 
 - (void) sameNameAlertDidEnd: (NSAlert *) alert returnCode: (NSInteger) returnCode contextInfo: (void *) contextInfo

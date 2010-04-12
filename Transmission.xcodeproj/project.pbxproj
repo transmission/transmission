@@ -100,6 +100,8 @@
 		A21A9BE2106D86A800F1C3C1 /* TrackerNode.m in Sources */ = {isa = PBXBuildFile; fileRef = A21A9BE1106D86A800F1C3C1 /* TrackerNode.m */; };
 		A21A9D41106EC2E800F1C3C1 /* TrackerCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A21A9D40106EC2E800F1C3C1 /* TrackerCell.m */; };
 		A21DFF100A292B2B007C5F76 /* Transfers.png in Resources */ = {isa = PBXBuildFile; fileRef = A21DFF0F0A292B2B007C5F76 /* Transfers.png */; };
+		A21F15AC11729A8B00CF5A9C /* AddMagnetWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A21F15AA11729A8B00CF5A9C /* AddMagnetWindowController.m */; };
+		A21F15AD11729A9F00CF5A9C /* AddMagnetWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A21F1538117299F100CF5A9C /* AddMagnetWindow.xib */; };
 		A21FBBAB0EDA78C300BC3C51 /* bandwidth.h in Headers */ = {isa = PBXBuildFile; fileRef = A21FBBA90EDA78C300BC3C51 /* bandwidth.h */; };
 		A21FBBAC0EDA78C300BC3C51 /* bandwidth.c in Sources */ = {isa = PBXBuildFile; fileRef = A21FBBAA0EDA78C300BC3C51 /* bandwidth.c */; };
 		A22180980D148A71007D09ED /* GroupsPrefsController.m in Sources */ = {isa = PBXBuildFile; fileRef = A22180970D148A71007D09ED /* GroupsPrefsController.m */; };
@@ -537,6 +539,9 @@
 		A21A9D3F106EC2E800F1C3C1 /* TrackerCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TrackerCell.h; path = macosx/TrackerCell.h; sourceTree = "<group>"; };
 		A21A9D40106EC2E800F1C3C1 /* TrackerCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TrackerCell.m; path = macosx/TrackerCell.m; sourceTree = "<group>"; };
 		A21DFF0F0A292B2B007C5F76 /* Transfers.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Transfers.png; path = macosx/Images/Transfers.png; sourceTree = "<group>"; };
+		A21F1539117299F100CF5A9C /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = macosx/en.lproj/AddMagnetWindow.xib; sourceTree = "<group>"; };
+		A21F15AA11729A8B00CF5A9C /* AddMagnetWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AddMagnetWindowController.m; path = macosx/AddMagnetWindowController.m; sourceTree = "<group>"; };
+		A21F15AB11729A8B00CF5A9C /* AddMagnetWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AddMagnetWindowController.h; path = macosx/AddMagnetWindowController.h; sourceTree = "<group>"; };
 		A21FBBA90EDA78C300BC3C51 /* bandwidth.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bandwidth.h; path = libtransmission/bandwidth.h; sourceTree = "<group>"; };
 		A21FBBAA0EDA78C300BC3C51 /* bandwidth.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bandwidth.c; path = libtransmission/bandwidth.c; sourceTree = "<group>"; };
 		A22180960D148A71007D09ED /* GroupsPrefsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GroupsPrefsController.h; path = macosx/GroupsPrefsController.h; sourceTree = "<group>"; };
@@ -975,6 +980,8 @@
 				A28F4F760E085BDC003A3882 /* ColorTextField.m */,
 				A26AF2820D2DC27C00FF7140 /* AddWindowController.h */,
 				A26AF2830D2DC27C00FF7140 /* AddWindowController.m */,
+				A21F15AB11729A8B00CF5A9C /* AddMagnetWindowController.h */,
+				A21F15AA11729A8B00CF5A9C /* AddMagnetWindowController.m */,
 				A25E74450AF5089E006F11AE /* ExpandedPathToPathTransformer.h */,
 				A25E74440AF5089E006F11AE /* ExpandedPathToPathTransformer.m */,
 				A25E74470AF5089E006F11AE /* ExpandedPathToIconTransformer.h */,
@@ -1074,6 +1081,7 @@
 				A23F4FF00D1D98AD002FCB97 /* PrefsWindow.xib */,
 				A29576010D11D63C0093B167 /* Creator.xib */,
 				A26AF27C0D2DBDDF00FF7140 /* AddWindow.xib */,
+				A21F1538117299F100CF5A9C /* AddMagnetWindow.xib */,
 				A215BF5B0F02EBB800350CDB /* GroupRules.xib */,
 				A233BD320D8C6585007EE7B4 /* MessageWindow.xib */,
 				A233BD680D8CF2C7007EE7B4 /* StatsWindow.xib */,
@@ -1914,6 +1922,7 @@
 				A209EBD91142F52B002B02D1 /* InfoFileView.xib in Resources */,
 				A209EC12114301C6002B02D1 /* InfoOptionsView.xib in Resources */,
 				A209ECA2114319C3002B02D1 /* InfoWindow.xib in Resources */,
+				A21F15AD11729A9F00CF5A9C /* AddMagnetWindow.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2099,6 +2108,7 @@
 				A209EB9D1142E59A002B02D1 /* InfoPeersViewController.m in Sources */,
 				A209EBCE1142F2B4002B02D1 /* InfoFileViewController.m in Sources */,
 				A209EBF91142FEEE002B02D1 /* InfoOptionsViewController.m in Sources */,
+				A21F15AC11729A8B00CF5A9C /* AddMagnetWindowController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2268,6 +2278,14 @@
 				A2DC1E4710E6731000DFB18C /* zh_CN */,
 			);
 			name = GroupRules.xib;
+			sourceTree = "<group>";
+		};
+		A21F1538117299F100CF5A9C /* AddMagnetWindow.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A21F1539117299F100CF5A9C /* en */,
+			);
+			name = AddMagnetWindow.xib;
 			sourceTree = "<group>";
 		};
 		A22A8D540AEEAFA5007E9CB9 /* Localizable.strings */ = {

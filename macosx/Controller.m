@@ -37,6 +37,7 @@
 #import "GroupsController.h"
 #import "AboutWindowController.h"
 #import "AddWindowController.h"
+#import "AddMagnetWindowController.h"
 #import "MessageWindowController.h"
 #import "ButtonToolbarItem.h"
 #import "GroupToolbarItem.h"
@@ -941,6 +942,26 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [self updateTorrentsInQueue];
 }
 
+- (void) askOpenConfirmed: (AddWindowController *) addController add: (BOOL) add
+{
+    Torrent * torrent = [addController torrent];
+    [addController release];
+    
+    if (add)
+    {
+        [torrent update];
+        [fTorrents addObject: torrent];
+        [torrent release];
+        
+        [self updateTorrentsInQueue];
+    }
+    else
+    {
+        [torrent closeRemoveTorrent];
+        [torrent release];
+    }
+}
+
 - (void) openMagnet: (NSString *) address
 {
     tr_torrent * duplicateTorrent;
@@ -959,25 +980,37 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         return;
     }
     
-    #warning show add window perhaps?
+    //determine download location
+    NSString * location = nil;
+    if ([fDefaults boolForKey: @"DownloadLocationConstant"])
+        location = [[fDefaults stringForKey: @"DownloadFolder"] stringByExpandingTildeInPath];
     
     //change the location if the group calls for it (this has to wait until after the torrent is created)
     if ([[GroupsController groups] usesCustomDownloadLocationForIndex: [torrent groupValue]])
     {
-        NSString * location = [[GroupsController groups] customDownloadLocationForIndex: [torrent groupValue]];
+        location = [[GroupsController groups] customDownloadLocationForIndex: [torrent groupValue]];
         [torrent changeDownloadFolderBeforeUsing: location];
     }
     
-    [torrent setWaitToStart: [fDefaults boolForKey: @"AutoStartDownload"]];
-    
-    [torrent update];
-    [fTorrents addObject: torrent];
-    [torrent release];
+    if ([fDefaults boolForKey: @"DownloadAsk"] || !location)
+    {
+        AddMagnetWindowController * addController = [[AddMagnetWindowController alloc] initWithTorrent: torrent destination: location
+                                                        controller: self];
+        [addController showWindow: self];
+    }
+    else
+    {
+        [torrent setWaitToStart: [fDefaults boolForKey: @"AutoStartDownload"]];
+        
+        [torrent update];
+        [fTorrents addObject: torrent];
+        [torrent release];
+    }
 
     [self updateTorrentsInQueue];
 }
 
-- (void) askOpenConfirmed: (AddWindowController *) addController add: (BOOL) add
+- (void) askOpenMagnetConfirmed: (AddMagnetWindowController *) addController add: (BOOL) add
 {
     Torrent * torrent = [addController torrent];
     [addController release];

@@ -1,7 +1,7 @@
 /******************************************************************************
  * $Id$
  *
- * Copyright (c) 2008-2010 Transmission authors and contributors
+ * Copyright (c) 2010 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -25,34 +25,24 @@
 #import <Cocoa/Cocoa.h>
 
 @class Controller;
-@class FileOutlineController;
 @class Torrent;
 
-@interface AddWindowController : NSWindowController
+@interface AddMagnetWindowController : NSWindowController
 {
     IBOutlet NSImageView * fIconView, * fLocationImageView;
-    IBOutlet NSTextField * fNameField, * fStatusField, * fLocationField;
-    IBOutlet NSButton * fStartCheck, * fDeleteCheck;
+    IBOutlet NSTextField * fNameField, * fLocationField;
+    IBOutlet NSButton * fStartCheck;
     IBOutlet NSPopUpButton * fGroupPopUp, * fPriorityPopUp;
-    IBOutlet NSProgressIndicator * fVerifyIndicator;
-    
-    IBOutlet FileOutlineController * fFileController;
     
     Controller * fController;
     
     Torrent * fTorrent;
-    NSString * fDestination, * fTorrentFile;
-    BOOL fLockDestination;
+    NSString * fDestination;
     
-    BOOL fDeleteTorrentInitial, fDeleteEnableInitial;
     NSInteger fGroupValue;
-    
-    NSTimer * fTimer;
 }
 
-- (id) initWithTorrent: (Torrent *) torrent destination: (NSString *) path lockDestination: (BOOL) lockDestination
-    controller: (Controller *) controller torrentFile: (NSString *) torrentFile
-    deleteTorrent: (BOOL) deleteTorrent canToggleDelete: (BOOL) canToggleDelete;
+- (id) initWithTorrent: (Torrent *) torrent destination: (NSString *) path controller: (Controller *) controller;
 
 - (Torrent *) torrent;
 
@@ -61,11 +51,7 @@
 - (void) add: (id) sender;
 - (void) cancelAdd: (id) sender;
 
-- (void) verifyLocalData: (id) sender;
-
 - (void) changePriority: (id) sender;
-
-- (void) updateStatusField: (NSNotification *) notification;
 
 - (void) updateGroupMenu: (NSNotification *) notification;
 
