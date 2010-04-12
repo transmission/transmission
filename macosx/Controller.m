@@ -992,7 +992,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [torrent changeDownloadFolderBeforeUsing: location];
     }
     
-    if ([fDefaults boolForKey: @"DownloadAsk"] || !location)
+    if ([fDefaults boolForKey: @"MagnetOpenAsk"] || !location)
     {
         AddMagnetWindowController * addController = [[AddMagnetWindowController alloc] initWithTorrent: torrent destination: location
                                                         controller: self];

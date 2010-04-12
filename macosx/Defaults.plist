@@ -82,6 +82,8 @@
 	<false/>
 	<key>InspectorSelected</key>
 	<string>Info</string>
+	<key>MagnetOpenAsk</key>
+	<true/>
 	<key>MessageLevel</key>
 	<integer>1</integer>
 	<key>MoveChoice</key>
