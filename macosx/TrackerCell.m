@@ -224,12 +224,24 @@ NSMutableSet * fTrackerIconLoading;
 {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     
+    //try favicon.ico
     NSURL * favIconUrl = [NSURL URLWithString: [baseAddress stringByAppendingPathComponent: @"favicon.ico"]];
     
     NSURLRequest * request = [NSURLRequest requestWithURL: favIconUrl cachePolicy: NSURLRequestUseProtocolCachePolicy
                                 timeoutInterval: 30.0];
     NSData * iconData = [NSURLConnection sendSynchronousRequest: request returningResponse: NULL error: NULL];
     NSImage * icon = [[NSImage alloc] initWithData: iconData];
+    
+    //try favicon.png
+    if (!icon)
+    {
+        favIconUrl = [NSURL URLWithString: [baseAddress stringByAppendingPathComponent: @"favicon.png"]];
+        
+        request = [NSURLRequest requestWithURL: favIconUrl cachePolicy: NSURLRequestUseProtocolCachePolicy
+                    timeoutInterval: 30.0];
+        iconData = [NSURLConnection sendSynchronousRequest: request returningResponse: NULL error: NULL];
+        icon = [[NSImage alloc] initWithData: iconData];
+    }
     
     if (icon)
     {
