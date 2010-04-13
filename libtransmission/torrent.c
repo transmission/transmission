@@ -1052,7 +1052,7 @@ tr_torrentStat( tr_torrent * tor )
             break;
     }
 
-    s->finished = s->percentDone == 1.0 && checkSeedRatio && (s->ratio >= seedRatio || s->ratio == TR_RATIO_INF);
+    s->finished = !s->leftUntilDone && checkSeedRatio && (s->ratio >= seedRatio || s->ratio == TR_RATIO_INF);
 
     if( !checkSeedRatio || s->ratio >= seedRatio || s->ratio == TR_RATIO_INF )
         s->percentRatio = 1.0;
