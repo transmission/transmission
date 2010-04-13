@@ -1,4 +1,4 @@
-/* $Id: miniupnpc.c,v 1.78 2010/04/05 20:36:59 nanard Exp $ */
+/* $Id: miniupnpc.c,v 1.80 2010/04/12 20:39:41 nanard Exp $ */
 /* Project : miniupnp
  * Author : Thomas BERNARD
  * copyright (c) 2005-2010 Thomas Bernard
@@ -14,10 +14,6 @@
 #ifndef __BSD_VISIBLE
 #define __BSD_VISIBLE 1
 #endif
-#endif
-
-#ifdef __APPLE__
-#define _DARWIN_C_SOURCE
 #endif
 
 #include <stdlib.h>
@@ -172,14 +168,14 @@ getContentLengthAndHeaderLength(char * p, int n,
 	}
 }
 
-/* simpleUPnPcommand :
+/* simpleUPnPcommand2 :
  * not so simple !
  * return values :
  *   0 - OK
  *  -1 - error */
-int simpleUPnPcommand(int s, const char * url, const char * service,
-                      const char * action, struct UPNParg * args,
-                      char * buffer, int * bufsize)
+static int simpleUPnPcommand2(int s, const char * url, const char * service,
+		       const char * action, struct UPNParg * args,
+		       char * buffer, int * bufsize, const char * httpversion)
 {
 	char hostname[MAXHOSTNAMELEN+1];
 	unsigned short port = 0;
@@ -267,7 +263,7 @@ int simpleUPnPcommand(int s, const char * url, const char * service,
 		}
 	}
 
-	n = soapPostSubmit(s, path, hostname, port, soapact, soapbody);
+	n = soapPostSubmit(s, path, hostname, port, soapact, soapbody, httpversion);
 	if(n<=0) {
 #ifdef DEBUG
 		printf("Error sending SOAP request\n");
@@ -298,6 +294,30 @@ int simpleUPnPcommand(int s, const char * url, const char * service,
 	
 	closesocket(s);
 	return 0;
+}
+
+/* simpleUPnPcommand :
+ * not so simple !
+ * return values :
+ *   0 - OK
+ *  -1 - error */
+int simpleUPnPcommand(int s, const char * url, const char * service,
+		       const char * action, struct UPNParg * args,
+		       char * buffer, int * bufsize)
+{
+	int result;
+	int origbufsize = *bufsize;
+
+	result = simpleUPnPcommand2(s, url, service, action, args, buffer, bufsize, "1.0");
+	if (result < 0 || *bufsize == 0)
+	{
+#if DEBUG
+	    printf("Error or no result from SOAP request; retrying with HTTP/1.1\n");
+#endif
+		*bufsize = origbufsize;
+		result = simpleUPnPcommand2(s, url, service, action, args, buffer, bufsize, "1.1");
+	}
+	return result;
 }
 
 /* parseMSEARCHReply()
@@ -589,8 +609,21 @@ LIBSPEC struct UPNPDev * upnpDiscover(int delay, const char * multicastif,
 		parseMSEARCHReply(bufr, n, &descURL, &urlsize, &st, &stsize);
 		if(st&&descURL)
 		{
-			/*printf("M-SEARCH Reply:\nST: %.*s\nLocation: %.*s\n",
-			       stsize, st, urlsize, descURL); */
+#ifdef DEBUG
+			printf("M-SEARCH Reply:\nST: %.*s\nLocation: %.*s\n",
+			       stsize, st, urlsize, descURL);
+#endif
+			for(tmp=devlist; tmp; tmp = tmp->pNext) {
+				if(memcmp(tmp->descURL, descURL, urlsize) == 0 &&
+				   tmp->descURL[urlsize] == '\0' &&
+				   memcmp(tmp->st, st, stsize) == 0 &&
+				   tmp->st[stsize] == '\0')
+					break;
+			}
+			/* at the exit of the loop above, tmp is null if
+			 * no duplicate device was found */
+			if(tmp)
+				continue;
 			tmp = (struct UPNPDev *)malloc(sizeof(struct UPNPDev)+urlsize+stsize);
 			tmp->pNext = devlist;
 			tmp->descURL = tmp->buffer;

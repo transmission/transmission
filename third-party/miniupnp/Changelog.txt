@@ -1,5 +1,12 @@
-$Id: Changelog.txt,v 1.111 2010/04/05 20:36:59 nanard Exp $
+$Id: Changelog.txt,v 1.113 2010/04/12 20:39:40 nanard Exp $
 miniUPnP client Changelog.
+
+2010/04/12:
+  Retrying with HTTP/1.1 if HTTP/1.0 failed. see
+  http://miniupnp.tuxfamily.org/forum/viewtopic.php?p=1703
+
+2010/04/07:
+  avoid returning duplicates in upnpDiscover()
 
 2010/04/05:
   Create a connecthostport.h/.c with connecthostport() function

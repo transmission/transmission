@@ -1,4 +1,4 @@
-/* $Id: miniwget.c,v 1.36 2010/04/05 12:34:05 nanard Exp $ */
+/* $Id: miniwget.c,v 1.37 2010/04/12 20:39:42 nanard Exp $ */
 /* Project : miniupnp
  * Author : Thomas Bernard
  * Copyright (c) 2005-2010 Thomas Bernard
@@ -41,13 +41,13 @@
 #include "miniwget.h"
 #include "connecthostport.h"
 
-/* miniwget2() :
+/* miniwget3() :
  * do all the work.
  * Return NULL if something failed. */
 static void *
-miniwget2(const char * url, const char * host,
+miniwget3(const char * url, const char * host,
 		  unsigned short port, const char * path,
-		  int * size, char * addr_str, int addr_str_len)
+		  int * size, char * addr_str, int addr_str_len, const char * httpversion)
 {
 	char buf[2048];
     int s;
@@ -103,13 +103,13 @@ miniwget2(const char * url, const char * host,
 	}
 
 	len = snprintf(buf, sizeof(buf),
-                 "GET %s HTTP/1.0\r\n"
+                 "GET %s HTTP/%s\r\n"
 			     "Host: %s:%d\r\n"
 				 "Connection: Close\r\n"
 				 "User-Agent: " OS_STRING ", UPnP/1.0, MiniUPnPc/" MINIUPNPC_VERSION_STRING "\r\n"
 
 				 "\r\n",
-		    path, host, port);
+			   path, httpversion, host, port);
 	sent = 0;
 	/* sending the HTTP request */
 	while(sent < len)
@@ -175,6 +175,30 @@ miniwget2(const char * url, const char * host,
 		return respbuffer;
 	}
 }
+
+/* miniwget2() :
+ * Call miniwget3(); retry with HTTP/1.1 if 1.0 fails. */
+static void *
+miniwget2(const char * url, const char * host,
+		  unsigned short port, const char * path,
+		  int * size, char * addr_str, int addr_str_len)
+{
+	char * respbuffer;
+
+	respbuffer = miniwget3(url, host, port, path, size, addr_str, addr_str_len, "1.0");
+	if (*size == 0)
+	{
+#ifdef DEBUG
+		printf("Retrying with HTTP/1.1\n");
+#endif
+		free(respbuffer);
+		respbuffer = miniwget3(url, host, port, path, size, addr_str, addr_str_len, "1.1");
+	}
+	return respbuffer;
+}
+
+
+
 
 /* parseURL()
  * arguments :
