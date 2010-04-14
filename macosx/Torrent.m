@@ -286,6 +286,7 @@ int trashDataFile(const char * filename)
     
     if (![self isActive] && [self alertForRemainingDiskSpace])
     {
+        tr_torinf( fHandle, "restarting via startTransfer" );
         tr_torrentStart(fHandle);
         [self update];
         
@@ -316,7 +317,10 @@ int trashDataFile(const char * filename)
 - (void) wakeUp
 {
     if (fResumeOnWake)
+    {
+        tr_torinf( fHandle, "restarting because of wakeUp" );
         tr_torrentStart(fHandle);
+    }
 }
 
 - (void) manualAnnounce

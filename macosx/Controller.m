@@ -1284,7 +1284,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 {
     //iterate through instead of all at once to ensure no conflicts
     for (Torrent * torrent in torrents)
+    {
+        tr_inf( "restarting a torrent in resumeTorrentsNoWait" );
         [torrent startTransfer];
+    }
     
     [self updateUI];
     [self applyFilter: nil];
@@ -1823,6 +1826,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             {
                 if (desiredDownloadActive > 0)
                 {
+                    tr_inf( "restarting download torrent in mac queue" );
                     [torrent startTransfer];
                     if ([torrent isActive])
                         --desiredDownloadActive;
@@ -1833,6 +1837,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             {
                 if (desiredSeedActive > 0)
                 {
+                    tr_inf( "restarting seed torrent in mac queue" );
                     [torrent startTransfer];
                     if ([torrent isActive])
                         --desiredSeedActive;
