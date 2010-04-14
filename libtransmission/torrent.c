@@ -288,16 +288,20 @@ tr_torrentGetSeedRatio( const tr_torrent * tor, double * ratio )
 /* returns true if the seed ratio applies --
  * it applies if the torrent's a seed AND it has a seed ratio set */
 static tr_bool
-tr_torrentGetSeedRatioBytes( tr_torrent * tor, uint64_t * setmeLeft, uint64_t * setmeGoal )
+tr_torrentGetSeedRatioBytes( tr_torrent  * tor,
+                             uint64_t    * setmeLeft,
+                             uint64_t    * setmeGoal )
 {
     double seedRatio;
     tr_bool seedRatioApplies = FALSE;
 
     if( tr_torrentGetSeedRatio( tor, &seedRatio ) )
     {
-        const uint64_t upEver = tor->uploadedCur + tor->uploadedPrev;
-        const uint64_t goal = seedRatio * tr_cpSizeWhenDone ( &tor->completion );
-        if( setmeLeft ) *setmeLeft = goal > upEver ? goal - upEver : 0;
+        const uint64_t u = tor->uploadedCur + tor->uploadedPrev;
+        const uint64_t d = tor->downloadedCur + tor->downloadedPrev;
+        const uint64_t baseline = d ? d : tr_cpSizeWhenDone( &tor->completion );
+        const uint64_t goal = baseline * seedRatio;
+        if( setmeLeft ) *setmeLeft = goal > u ? goal - u : 0;
         if( setmeGoal ) *setmeGoal = goal;
         seedRatioApplies = tr_torrentIsSeed( tor );
     }
