@@ -378,7 +378,7 @@ int trashDataFile(const char * filename)
 
 - (CGFloat) progressStopRatio
 {
-    return fStat->percentRatio;
+    return fStat->seedRatioPercentDone;
 }
 
 - (BOOL) usesSpeedLimit: (BOOL) upload
