@@ -285,6 +285,50 @@ tr_torrentGetSeedRatio( const tr_torrent * tor, double * ratio )
     return isLimited;
 }
 
+/* returns true if the seed ratio applies --
+ * it applies if the torrent's a seed AND it has a seed ratio set */
+static tr_bool
+tr_torrentGetSeedRatioBytes( tr_torrent * tor, uint64_t * setmeLeft, uint64_t * setmeGoal )
+{
+    double seedRatio;
+    tr_bool seedRatioApplies = FALSE;
+
+    if( tr_torrentGetSeedRatio( tor, &seedRatio ) )
+    {
+        const uint64_t upEver = tor->uploadedCur + tor->uploadedPrev;
+        const uint64_t goal = seedRatio * tr_cpSizeWhenDone ( &tor->completion );
+        if( setmeLeft ) *setmeLeft = goal > upEver ? goal - upEver : 0;
+        if( setmeGoal ) *setmeGoal = goal;
+        seedRatioApplies = tr_torrentIsSeed( tor );
+    }
+
+    return seedRatioApplies;
+}
+
+static tr_bool
+tr_torrentIsSeedRatioDone( tr_torrent * tor )
+{
+    uint64_t bytesLeft;
+    return tr_torrentGetSeedRatioBytes( tor, &bytesLeft, NULL ) && !bytesLeft;
+}
+
+void
+tr_torrentCheckSeedRatio( tr_torrent * tor )
+{
+    assert( tr_isTorrent( tor ) );
+
+    /* if we're seeding and we've reached our seed ratio limit, stop the torrent */
+    if( tor->isRunning && tr_torrentIsSeedRatioDone( tor ) )
+    {
+        tr_torrentStop( tor );
+
+        /* maybe notify the client */
+        if( tor->ratio_limit_hit_func != NULL )
+            tor->ratio_limit_hit_func( tor, tor->ratio_limit_hit_func_user_data );
+    }
+}
+
+
 /***
 ****
 ***/
@@ -918,9 +962,10 @@ tr_torrentStat( tr_torrent * tor )
     tr_stat *               s;
     int                     usableSeeds;
     uint64_t                now;
-    double                  downloadedForRatio, seedRatio=0;
     double                  d;
-    tr_bool                 checkSeedRatio;
+    uint64_t                seedRatioBytesLeft;
+    uint64_t                seedRatioBytesGoal;
+    tr_bool                 seedRatioApplies;
 
     if( !tor )
         return NULL;
@@ -1000,10 +1045,11 @@ tr_torrentStat( tr_torrent * tor )
         tr_bitfieldFree( peerPieces );
     }
 
-    downloadedForRatio = s->downloadedEver ? s->downloadedEver : s->haveValid;
-    s->ratio = tr_getRatio( s->uploadedEver, downloadedForRatio );
+    s->ratio = tr_getRatio( s->uploadedEver,
+                            s->downloadedEver ? s->downloadedEver : s->haveValid );
 
-    checkSeedRatio = tr_torrentGetSeedRatio( tor, &seedRatio );
+    seedRatioApplies = tr_torrentGetSeedRatioBytes( tor, &seedRatioBytesLeft,
+                                                         &seedRatioBytesGoal );
 
     switch( s->activity )
     {
@@ -1028,38 +1074,37 @@ tr_torrentStat( tr_torrent * tor )
                 s->eta = s->leftUntilDone / tor->etaDLSpeed / 1024.0;
             break;
 
-        case TR_STATUS_SEED:
-            if( checkSeedRatio )
-            {
+        case TR_STATUS_SEED: {
+            if( !seedRatioApplies )
+                s->eta = TR_ETA_NOT_AVAIL;
+            else {
                 if( ( tor->etaULSpeedCalculatedAt + 800 ) < now ) {
                     tor->etaULSpeed = ( ( tor->etaULSpeedCalculatedAt + 4000 ) < now )
                         ? s->pieceUploadSpeed /* if no recent previous speed, no need to smooth */
                         : 0.8*tor->etaULSpeed + 0.2*s->pieceUploadSpeed; /* smooth across 5 readings */
                     tor->etaULSpeedCalculatedAt = now;
                 }
-
                 if( s->pieceUploadSpeed < 0.1 )
                     s->eta = TR_ETA_UNKNOWN;
                 else
-                    s->eta = (downloadedForRatio * (seedRatio - s->ratio)) / tor->etaULSpeed / 1024.0;
+                    s->eta = seedRatioBytesLeft / tor->etaULSpeed / 1024.0;
             }
-            else
-                s->eta = TR_ETA_NOT_AVAIL;
             break;
+        }
 
         default:
             s->eta = TR_ETA_NOT_AVAIL;
             break;
     }
 
-    s->finished = !s->leftUntilDone && checkSeedRatio && (s->ratio >= seedRatio || s->ratio == TR_RATIO_INF);
+    s->finished = seedRatioApplies && !seedRatioBytesLeft;
 
-    if( !checkSeedRatio || s->ratio >= seedRatio || s->ratio == TR_RATIO_INF )
-        s->percentRatio = 1.0;
-    else if( s->ratio == TR_RATIO_NA )
-        s->percentRatio = 0.0;
+    if( !seedRatioApplies || s->finished )
+        s->seedRatioPercentDone = 1;
+    else if( !seedRatioBytesGoal ) /* impossible? safeguard for div by zero */
+        s->seedRatioPercentDone = 0;
     else
-        s->percentRatio = s->ratio / seedRatio;
+        s->seedRatioPercentDone = (double)(seedRatioBytesGoal - seedRatioBytesLeft) / seedRatioBytesGoal;
 
     tr_torrentUnlock( tor );
 
@@ -1378,7 +1423,7 @@ torrentStart( tr_torrent * tor )
     if( !tor->isRunning )
     {
         /* allow finished torrents to be resumed */
-        if( tor->stats.finished )
+        if( tr_torrentIsSeedRatioDone( tor ) )
             tr_torrentSetRatioMode( tor, TR_RATIOLIMIT_UNLIMITED );
 
         tr_verifyRemove( tor );
@@ -2591,41 +2636,6 @@ tr_torrentSetLocation( tr_torrent  * tor,
     data->setme_state = setme_state;
     data->setme_progress = setme_progress;
     tr_runInEventThread( tor->session, setLocation, data );
-}
-
-/***
-****
-***/
-
-void
-tr_torrentCheckSeedRatio( tr_torrent * tor )
-{
-    double seedRatio;
-
-    assert( tr_isTorrent( tor ) );
-
-    /* if we're seeding and we've reached our seed ratio limit, stop the torrent */
-    if( tor->isRunning && tr_torrentIsSeed( tor ) && tr_torrentGetSeedRatio( tor, &seedRatio ) )
-    {
-        const uint64_t up = tor->uploadedCur + tor->uploadedPrev;
-        uint64_t down = tor->downloadedCur + tor->downloadedPrev;
-        double ratio;
-
-        /* maybe we're the initial seeder and never downloaded anything... */
-        if( down == 0 )
-            down = tr_cpHaveValid( &tor->completion );
-
-        ratio = tr_getRatio( up, down );
-
-        if( ratio >= seedRatio || ratio == TR_RATIO_INF )
-        {
-            tr_torrentStop( tor );
-
-            /* maybe notify the client */
-            if( tor->ratio_limit_hit_func != NULL )
-                tor->ratio_limit_hit_func( tor, tor->ratio_limit_hit_func_user_data );
-        }
-    }
 }
 
 /***
