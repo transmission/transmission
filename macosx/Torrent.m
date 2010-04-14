@@ -286,7 +286,7 @@ int trashDataFile(const char * filename)
     
     if (![self isActive] && [self alertForRemainingDiskSpace])
     {
-        tr_ninf( tr_info(fHandle)->name, "restarting via startTransfer" );
+        tr_ninf( fInfo->name, "restarting via startTransfer" );
         tr_torrentStart(fHandle);
         [self update];
         
@@ -318,7 +318,7 @@ int trashDataFile(const char * filename)
 {
     if (fResumeOnWake)
     {
-        tr_ninf( tr_info(fHandle)->name, "restarting because of wakeUp" );
+        tr_ninf( fInfo->name, "restarting because of wakeUp" );
         tr_torrentStart(fHandle);
     }
 }
