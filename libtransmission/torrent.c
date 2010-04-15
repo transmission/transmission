@@ -202,7 +202,6 @@ tr_torrentSetRatioMode( tr_torrent *  tor, tr_ratiolimit mode )
     if( mode != tor->ratioLimitMode )
     {
         tor->ratioLimitMode = mode;
-        tor->needsSeedRatioCheck = TRUE;
 
         tr_torrentSetDirty( tor );
     }
@@ -224,8 +223,6 @@ tr_torrentSetRatioLimit( tr_torrent * tor, double desiredRatio )
     if( (int)(desiredRatio*100.0) != (int)(tor->desiredRatio*100.0) )
     {
         tor->desiredRatio = desiredRatio;
-
-        tor->needsSeedRatioCheck = TRUE;
 
         tr_torrentSetDirty( tor );
     }
@@ -321,7 +318,7 @@ tr_torrentCheckSeedRatio( tr_torrent * tor )
 {
     assert( tr_isTorrent( tor ) );
 
-    /* if we're seeding and we've reached our seed ratio limit, stop the torrent */
+    /* if we're seeding and reach our seed ratio limit, stop the torrent */
     if( tor->isRunning && tr_torrentIsSeedRatioDone( tor ) )
     {
         tr_torinf( tor, "Seed ratio reached; pausing torrent" );
@@ -1394,7 +1391,6 @@ checkAndStartImpl( void * vtor )
     {
         const time_t now = tr_time( );
         tor->isRunning = TRUE;
-        tor->needsSeedRatioCheck = TRUE;
         tor->error = TR_STAT_OK;
         tor->errorString[0] = '\0';
         tor->completeness = tr_cpGetStatus( &tor->completion );
@@ -1713,7 +1709,6 @@ tr_torrentRecheckCompleteness( tr_torrent * tor )
         }
 
         tor->completeness = completeness;
-        tor->needsSeedRatioCheck = TRUE;
         tr_fdTorrentClose( tor->session, tor->uniqueId );
 
         /* if the torrent is a seed now,
@@ -1896,7 +1891,6 @@ tr_torrentInitFileDLs( tr_torrent      * tor,
             setFileDND( tor, files[i], doDownload );
 
     tr_cpInvalidateDND( &tor->completion );
-    tor->needsSeedRatioCheck = TRUE;
 
     tr_torrentUnlock( tor );
 }

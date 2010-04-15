@@ -1312,8 +1312,6 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
             if( peer && e->wasPieceData )
                 peer->atom->piece_data_time = now;
 
-            tor->needsSeedRatioCheck = TRUE;
-
             break;
         }
 
@@ -3296,12 +3294,8 @@ bandwidthPulse( int foo UNUSED, short bar UNUSED, void * vmgr )
 
     /* possibly stop torrents that have seeded enough */
     tor = NULL;
-    while(( tor = tr_torrentNext( mgr->session, tor ))) {
-        if( tor->needsSeedRatioCheck ) {
-            tor->needsSeedRatioCheck = FALSE;
-            tr_torrentCheckSeedRatio( tor );
-        }
-    }
+    while(( tor = tr_torrentNext( mgr->session, tor )))
+        tr_torrentCheckSeedRatio( tor );
 
     /* run the completeness check for any torrents that need it */
     tor = NULL;

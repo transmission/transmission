@@ -1020,22 +1020,12 @@ tr_sessionGetPortForwarding( const tr_session * session )
 ****
 ***/
 
-static void
-updateSeedRatio( tr_session * session )
-{
-    tr_torrent * tor = NULL;
-
-    while(( tor = tr_torrentNext( session, tor )))
-        tor->needsSeedRatioCheck = TRUE;
-}
-
 void
 tr_sessionSetRatioLimited( tr_session * session, tr_bool isLimited )
 {
     assert( tr_isSession( session ) );
 
     session->isRatioLimited = isLimited;
-    updateSeedRatio( session );
 }
 
 void
@@ -1044,7 +1034,6 @@ tr_sessionSetRatioLimit( tr_session * session, double desiredRatio )
     assert( tr_isSession( session ) );
 
     session->desiredRatio = desiredRatio;
-    updateSeedRatio( session );
 }
 
 tr_bool
