@@ -273,7 +273,7 @@ tr_sessionGetDefaultSettings( const char * configDir, tr_benc * d )
     tr_bencDictAddBool( d, TR_PREFS_KEY_RENAME_PARTIAL_FILES,     TRUE );
     tr_bencDictAddBool( d, TR_PREFS_KEY_RPC_AUTH_REQUIRED,        FALSE );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_RPC_BIND_ADDRESS,         "0.0.0.0" );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_RPC_ENABLED,              TRUE );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_RPC_ENABLED,              FALSE );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_RPC_PASSWORD,             "" );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_RPC_USERNAME,             "" );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_RPC_WHITELIST,            TR_DEFAULT_RPC_WHITELIST );
