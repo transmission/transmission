@@ -25,6 +25,10 @@
 #include "version.h" /* User-Agent */
 #include "web.h"
 
+#if LIBCURL_VERSION_NUM >= 0x070F06 /* CURLOPT_SOCKOPT* was added in 7.15.6 */
+ #define USE_LIBCURL_SOCKOPT
+#endif
+
 enum
 {
     THREADFUNC_MAX_SLEEP_MSEC = 1000,
@@ -96,6 +100,7 @@ writeFunc( void * ptr, size_t size, size_t nmemb, void * vtask )
     return byteCount;
 }
 
+#ifdef USE_LIBCURL_SOCKOPT
 static int
 sockoptfunction( void * vtask, curl_socket_t fd, curlsocktype purpose UNUSED )
 {
@@ -115,6 +120,7 @@ sockoptfunction( void * vtask, curl_socket_t fd, curlsocktype purpose UNUSED )
     /* return nonzero if this function encountered an error */
     return 0;
 }
+#endif
 
 static int
 getCurlProxyType( tr_proxy_type t )
@@ -159,8 +165,10 @@ createEasy( tr_session * s, struct tr_web * w, struct tr_web_task * task )
     curl_easy_setopt( e, CURLOPT_MAXREDIRS, -1L );
     curl_easy_setopt( e, CURLOPT_NOSIGNAL, 1L );
     curl_easy_setopt( e, CURLOPT_PRIVATE, task );
+#ifdef USE_LIBCURL_SOCKOPT
     curl_easy_setopt( e, CURLOPT_SOCKOPTFUNCTION, sockoptfunction );
     curl_easy_setopt( e, CURLOPT_SOCKOPTDATA, task );
+#endif
     curl_easy_setopt( e, CURLOPT_SSL_VERIFYHOST, 0L );
     curl_easy_setopt( e, CURLOPT_SSL_VERIFYPEER, 0L );
     curl_easy_setopt( e, CURLOPT_TIMEOUT, getTimeoutFromURL( task->url ) );
