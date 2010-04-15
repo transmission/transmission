@@ -153,6 +153,26 @@ test2( void )
     return 0;
 }
 
+static int
+test3( void )
+{
+    const char * in = "{ \"error\": 2,"
+                      "  \"errorString\": \"torrent not registered with this tracker 6UHsVW'*C\","
+                      "  \"eta\": 262792,"
+                      "  \"id\": 25,"
+                      "  \"leftUntilDone\": 2275655680 }";
+    tr_benc top;
+    const char * str;
+
+    const int err = tr_jsonParse( NULL, in, strlen( in ), &top, NULL );
+    check( !err );
+    check( tr_bencDictFindStr( &top, "errorString", &str ) );
+    check( !strcmp( str, "torrent not registered with this tracker 6UHsVW'*C" ) );
+
+    tr_bencFree( &top );
+    return 0;
+}
+
 int
 main( void )
 {
@@ -165,6 +185,9 @@ main( void )
         return i;
 
     if( ( i = test2( ) ) )
+        return i;
+
+    if( ( i = test3( ) ) )
         return i;
 
     return 0;
