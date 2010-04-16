@@ -138,7 +138,7 @@ MyApp :: MyApp( int& argc, char ** argv ):
     if( username != 0 )
         myPrefs->set( Prefs::SESSION_REMOTE_USERNAME, username );
     if( password != 0 )
-        myPrefs->set( Prefs::SESSION_REMOTE_USERNAME, password );
+        myPrefs->set( Prefs::SESSION_REMOTE_PASSWORD, password );
     if( ( host != 0 ) || ( port != 0 ) || ( username != 0 ) || ( password != 0 ) )
         myPrefs->set( Prefs::SESSION_IS_REMOTE, true );
 
