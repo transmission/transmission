@@ -29,7 +29,7 @@
 
 @interface AddMagnetWindowController : NSWindowController
 {
-    IBOutlet NSImageView * fIconView, * fLocationImageView;
+    IBOutlet NSImageView * fLocationImageView;
     IBOutlet NSTextField * fNameField, * fLocationField;
     IBOutlet NSButton * fStartCheck;
     IBOutlet NSPopUpButton * fGroupPopUp, * fPriorityPopUp;

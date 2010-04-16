@@ -72,8 +72,7 @@
     NSString * name = [fTorrent name];
     [[self window] setTitle: name];
     [fNameField setStringValue: name];
-    
-    [fIconView setImage: [fTorrent icon]];
+    [fNameField setToolTip: name];
     
     [self setGroupsMenu];
     [fGroupPopUp selectItemWithTag: fGroupValue];

@@ -92,6 +92,7 @@
     NSString * name = [fTorrent name];
     [[self window] setTitle: name];
     [fNameField setStringValue: name];
+    [fNameField setToolTip: name];
     
     [fIconView setImage: [fTorrent icon]];
     
