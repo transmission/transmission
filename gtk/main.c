@@ -735,15 +735,14 @@ tr_window_present( GtkWindow * window )
 }
 
 static void
-toggleMainWindow( struct cbdata * cbdata,
-                  gboolean        doPresent )
+toggleMainWindow( struct cbdata * cbdata )
 {
     GtkWindow * window = GTK_WINDOW( cbdata->wind );
     const int   doShow = cbdata->isIconified;
     static int  x = 0;
     static int  y = 0;
 
-    if( doShow || doPresent )
+    if( doShow )
     {
         cbdata->isIconified = 0;
         gtk_window_set_skip_taskbar_hint( window, FALSE );
@@ -1692,11 +1691,7 @@ doAction( const char * action_name, gpointer user_data )
     }
     else if( !strcmp( action_name, "toggle-main-window" ) )
     {
-        toggleMainWindow( data, FALSE );
-    }
-    else if( !strcmp( action_name, "present-main-window" ) )
-    {
-        toggleMainWindow( data, TRUE );
+        toggleMainWindow( data );
     }
     else g_error ( "Unhandled action: %s", action_name );
 
