@@ -1577,6 +1577,8 @@ closeTorrent( void * vtor )
     tr_bencDictAddInt( d, "id", tor->uniqueId );
     tr_bencDictAddInt( d, "date", tr_time( ) );
 
+    tr_torinf( tor, _( "Removing torrent" ) );
+
     stopTorrent( tor );
 
     if( tor->isDeleting )
