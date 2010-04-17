@@ -22,9 +22,8 @@
 #endif
 
 /* Determine the integer type use to parse non-floating point numbers */
-#include <stdarg.h> /* some 1.4.x versions of evutil.h need this */
-#include <evutil.h>
-typedef ev_int64_t JSON_int_t;
+#include <inttypes.h>
+typedef int64_t JSON_int_t;
 
 
 #ifdef __cplusplus

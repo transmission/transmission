@@ -1,7 +1,3 @@
-/* JSON_parser.c */
-
-/* 2007-08-24 */
-
 /*
 Copyright (c) 2005 JSON.org
 
@@ -27,11 +23,16 @@ SOFTWARE.
 */
 
 /*
-    Callbacks, comments, Unicode handling by Jean Gressmann (jean@0x42.de), 2007-2009.
-    
-    For the added features the license above applies also.
+    Callbacks, comments, Unicode handling by Jean Gressmann (jean@0x42.de), 2007-2010.
     
     Changelog:
+        2010-03-25
+            Fixed buffer overrun in grow_parse_buffer & cleaned up code.
+            
+        2009-10-19
+            Replaced long double in JSON_value_struct with double after reports 
+            of strtold being broken on some platforms (charles@transmissionbt.com).
+            
         2009-05-17 
             Incorporated benrudiak@googlemail.com fix for UTF16 decoding.
             
@@ -67,11 +68,14 @@ SOFTWARE.
 #include <string.h>
 #include <locale.h>
 
+#include <evutil.h> /* evutil_strtoll() */
+
 #include "JSON_parser.h"
 
 #ifdef _MSC_VER
 #   if _MSC_VER >= 1400 /* Visual Studio 2005 and up */
 #      pragma warning(disable:4996) /* unsecure sscanf */
+#      pragma warning(disable:4127) /* conditional expression is constant */
 #   endif
 #endif
 
@@ -154,7 +158,7 @@ enum classes {
     NR_CLASSES
 };
 
-static const int ascii_class[128] = {
+static const signed char ascii_class[128] = {
 /*
     This array maps the 128 ASCII characters into character classes.
     The remaining Unicode characters should be mapped to C_ETC.
@@ -243,7 +247,7 @@ enum actions
 };
 
 
-static const int state_transition_table[NR_STATES][NR_CLASSES] = {
+static const signed char state_transition_table[NR_STATES][NR_CLASSES] = {
 /*
     The state transition table takes the current state and the current symbol,
     and returns either a new state or an action. An action is represented as a
@@ -326,7 +330,7 @@ push(JSON_parser jc, int mode)
         }
     }
     
-    jc->stack[jc->top] = mode;
+    jc->stack[jc->top] = (signed char)mode;
     return true;
 }
 
@@ -438,8 +442,8 @@ new_JSON_parser(JSON_config* config)
     /* set up callback, comment & float handling */
     jc->callback = config->callback;
     jc->ctx = config->callback_ctx;
-    jc->allow_comments = config->allow_comments != 0;
-    jc->handle_floats_manually = config->handle_floats_manually != 0;
+    jc->allow_comments = (signed char)config->allow_comments != 0;
+    jc->handle_floats_manually = (signed char)config->handle_floats_manually != 0;
     
     /* set up decimal point */
     jc->decimal_point = *localeconv()->decimal_point;
@@ -449,20 +453,20 @@ new_JSON_parser(JSON_config* config)
 
 static void grow_parse_buffer(JSON_parser jc)
 {
-    size_t bytes_to_allocate;
+    assert(jc->parse_buffer_capacity > 0);
+
     jc->parse_buffer_capacity *= 2;
-    bytes_to_allocate = jc->parse_buffer_capacity * sizeof(jc->parse_buffer[0]);
     if (jc->parse_buffer == &jc->static_parse_buffer[0]) {
-        jc->parse_buffer = (char*)malloc(bytes_to_allocate);
+        jc->parse_buffer = (char*)malloc(jc->parse_buffer_capacity);
         memcpy(jc->parse_buffer, jc->static_parse_buffer, jc->parse_buffer_count);
     } else {
-        jc->parse_buffer = (char*)realloc(jc->parse_buffer, bytes_to_allocate);
+        jc->parse_buffer = (char*)realloc(jc->parse_buffer, jc->parse_buffer_capacity);
     }
 }
 
 #define parse_buffer_push_back_char(jc, c)\
     do {\
-        if (jc->parse_buffer_count + 1 >= jc->parse_buffer_capacity) grow_parse_buffer(jc);\
+        if (jc->parse_buffer_count + 2 >= jc->parse_buffer_capacity) grow_parse_buffer(jc);\
         jc->parse_buffer[jc->parse_buffer_count++] = c;\
         jc->parse_buffer[jc->parse_buffer_count]   = 0;\
     } while (0)
@@ -492,8 +496,6 @@ static int parse_parse_buffer(JSON_parser jc)
                         value.vu.str.value = jc->parse_buffer;
                         value.vu.str.length = jc->parse_buffer_count;
                     } else { 
-                        /*sscanf(jc->parse_buffer, "%Lf", &value.vu.float_value);*/
-                        
                         /* not checking with end pointer b/c there may be trailing ws */
                         value.vu.float_value = strtod(jc->parse_buffer, NULL);
                     }
@@ -573,7 +575,7 @@ static int decode_unicode_char(JSON_parser jc)
             trail_bytes = 1;
         } else if (IS_HIGH_SURROGATE(uc)) {
             /* save the high surrogate and wait for the low surrogate */
-            jc->utf16_high_surrogate = uc;
+            jc->utf16_high_surrogate = (UTF16)uc;
             return true;
         } else if (IS_LOW_SURROGATE(uc)) {
             /* low surrogate without a preceding high surrogate */
@@ -691,7 +693,7 @@ JSON_parser_char(JSON_parser jc, int next_char)
 /*
     Change the state.
 */
-        jc->state = next_state;
+        jc->state = (signed char)next_state;
     } else {
 /*
     Or perform one of the actions.
@@ -999,7 +1001,6 @@ int JSON_parser_is_legal_white_space_string(const char* s)
     
     return true;
 }
-
 
 
 void init_JSON_config(JSON_config* config)
