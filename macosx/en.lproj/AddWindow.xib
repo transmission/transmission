@@ -573,9 +573,9 @@
 											<reference key="NSNextResponder" ref="946207297"/>
 											<int key="NSvFlags">1292</int>
 											<object class="NSPSMatrix" key="NSDrawMatrix"/>
-											<string key="NSFrame">{{160, 52}, {16, 16}}</string>
+											<string key="NSFrame">{{18, 31}, {135, 12}}</string>
 											<reference key="NSSuperview" ref="946207297"/>
-											<int key="NSpiFlags">28936</int>
+											<int key="NSpiFlags">24842</int>
 											<double key="NSMaxValue">1</double>
 										</object>
 										<object class="NSTextField" id="485847244">
@@ -1157,13 +1157,13 @@
 							<reference ref="1049508202"/>
 							<reference ref="224369214"/>
 							<reference ref="711151157"/>
-							<reference ref="744550600"/>
 							<reference ref="485847244"/>
 							<reference ref="38073450"/>
 							<reference ref="1065995789"/>
 							<reference ref="1059202456"/>
 							<reference ref="726814345"/>
 							<reference ref="698797028"/>
+							<reference ref="744550600"/>
 						</object>
 						<reference key="parent" ref="1006"/>
 					</object>
@@ -1356,6 +1356,7 @@
 					<string>1.windowTemplate.minSize</string>
 					<string>10.IBPluginDependency</string>
 					<string>10.ImportedFromIB2</string>
+					<string>100.IBPluginDependency</string>
 					<string>11.IBPluginDependency</string>
 					<string>11.ImportedFromIB2</string>
 					<string>12.IBPluginDependency</string>
@@ -1446,6 +1447,7 @@
 					<string>{422, 300}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
