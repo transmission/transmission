@@ -172,9 +172,15 @@ tr_pex * tr_peerMgrArrayToPex( const void * array,
                                size_t       arrayLen,
                                size_t      * setme_pex_count );
 
+/**
+ * @param seedProbability [0..100] for likelihood that the peer is a seed; -1 for unknown
+ */
 void tr_peerMgrAddPex( tr_torrent     * tor,
                        uint8_t          from,
-                       const tr_pex   * pex );
+                       const tr_pex   * pex,
+                       int8_t           seedProbability );
+
+void tr_peerMgrMarkAllAsSeeds( tr_torrent * tor );
 
 void tr_peerMgrSetBlame( tr_torrent        * tor,
                          tr_piece_index_t    pieceIndex,

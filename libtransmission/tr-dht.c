@@ -613,7 +613,7 @@ callback( void *ignore UNUSED, int event,
             else
                 pex = tr_peerMgrCompact6ToPex(data, data_len, NULL, 0, &n);
             for( i=0; i<n; ++i )
-                tr_peerMgrAddPex( tor, TR_PEER_FROM_DHT, pex+i );
+                tr_peerMgrAddPex( tor, TR_PEER_FROM_DHT, pex+i, -1 );
             tr_free(pex);
             tr_tordbg(tor, "Learned %d%s peers from DHT",
                       (int)n,

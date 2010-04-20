@@ -116,7 +116,7 @@ addPeers( tr_torrent * tor, const uint8_t * buf, int buflen )
         memcpy( &pex, buf + ( i * sizeof( tr_pex ) ), sizeof( tr_pex ) );
         if( tr_isPex( &pex ) )
         {
-            tr_peerMgrAddPex( tor, TR_PEER_FROM_RESUME, &pex );
+            tr_peerMgrAddPex( tor, TR_PEER_FROM_RESUME, &pex, -1 );
             ++numAdded;
         }
     }

@@ -596,24 +596,23 @@ publishWarning( tr_tier * tier, const char * msg )
 }
 
 static int
-publishNewPeers( tr_tier * tier, tr_bool allAreSeeds,
+publishNewPeers( tr_tier * tier, int seeds, int leechers,
                  const void * compact, int compactLen )
 {
     tr_tracker_event e = emptyEvent;
 
     e.messageType = TR_TRACKER_PEERS;
-    e.allAreSeeds = allAreSeeds;
+    e.seedProbability = seeds+leechers ? (int)((100.0*seeds)/(seeds+leechers)) : -1;
     e.compact = compact;
     e.compactLen = compactLen;
 
-    if( compactLen )
-        tr_publisherPublish( &tier->tor->tiers->publisher, tier, &e );
+    tr_publisherPublish( &tier->tor->tiers->publisher, tier, &e );
 
     return compactLen / 6;
 }
 
 static int
-publishNewPeersCompact( tr_tier * tier, tr_bool allAreSeeds,
+publishNewPeersCompact( tr_tier * tier, int seeds, int leechers,
                         const void * compact, int compactLen )
 {
     int i;
@@ -639,7 +638,7 @@ publishNewPeersCompact( tr_tier * tier, tr_bool allAreSeeds,
         compactWalk += 6;
     }
 
-    publishNewPeers( tier, allAreSeeds, array, arrayLen );
+    publishNewPeers( tier, seeds, leechers, array, arrayLen );
 
     tr_free( array );
 
@@ -647,7 +646,7 @@ publishNewPeersCompact( tr_tier * tier, tr_bool allAreSeeds,
 }
 
 static int
-publishNewPeersCompact6( tr_tier * tier, tr_bool allAreSeeds,
+publishNewPeersCompact6( tr_tier * tier, int seeds, int leechers,
                          const void * compact, int compactLen )
 {
     int i;
@@ -671,7 +670,8 @@ publishNewPeersCompact6( tr_tier * tier, tr_bool allAreSeeds,
         memcpy( walk + sizeof( addr ), &port, 2 );
         walk += sizeof( tr_address ) + 2;
     }
-    publishNewPeers( tier, allAreSeeds, array, arrayLen );
+
+    publishNewPeers( tier, seeds, leechers, array, arrayLen );
     tr_free( array );
 
     return peerCount;
@@ -1201,7 +1201,6 @@ parseAnnounceResponse( tr_tier     * tier,
     if( bencLoaded && tr_bencIsDict( &benc ) )
     {
         int peerCount = 0;
-        int incomplete = -1;
         size_t rawlen;
         int64_t i;
         tr_benc * tmp;
@@ -1245,16 +1244,18 @@ parseAnnounceResponse( tr_tier     * tier,
             tier->currentTracker->tracker_id = tr_strdup( str );
         }
 
-        if( tr_bencDictFindInt( &benc, "complete", &i ) )
-        {
+        if( !tr_bencDictFindInt( &benc, "complete", &i ) )
+            tier->currentTracker->seederCount = 0;
+        else {
             ++scrapeFields;
             tier->currentTracker->seederCount = i;
         }
 
-        if( tr_bencDictFindInt( &benc, "incomplete", &i ) )
-        {
+        if( !tr_bencDictFindInt( &benc, "incomplete", &i ) )
+            tier->currentTracker->leecherCount = 0;
+        else {
             ++scrapeFields;
-            tier->currentTracker->leecherCount = incomplete = i;
+            tier->currentTracker->leecherCount = i;
         }
 
         if( tr_bencDictFindInt( &benc, "downloaded", &i ) )
@@ -1266,17 +1267,19 @@ parseAnnounceResponse( tr_tier     * tier,
         if( tr_bencDictFindRaw( &benc, "peers", &raw, &rawlen ) )
         {
             /* "compact" extension */
-            const int allAreSeeds = incomplete == 0;
-            peerCount += publishNewPeersCompact( tier, allAreSeeds, raw, rawlen );
+            const int seeders = tier->currentTracker->seederCount;
+            const int leechers = tier->currentTracker->leecherCount;
+            peerCount += publishNewPeersCompact( tier, seeders, leechers, raw, rawlen );
             gotPeers = TRUE;
         }
         else if( tr_bencDictFindList( &benc, "peers", &tmp ) )
         {
             /* original version of peers */
-            const tr_bool allAreSeeds = incomplete == 0;
+            const int seeders = tier->currentTracker->seederCount;
+            const int leechers = tier->currentTracker->leecherCount;
             size_t byteCount = 0;
             uint8_t * array = parseOldPeers( tmp, &byteCount );
-            peerCount += publishNewPeers( tier, allAreSeeds, array, byteCount );
+            peerCount += publishNewPeers( tier, seeders, leechers, array, byteCount );
             gotPeers = TRUE;
             tr_free( array );
         }
@@ -1284,8 +1287,9 @@ parseAnnounceResponse( tr_tier     * tier,
         if( tr_bencDictFindRaw( &benc, "peers6", &raw, &rawlen ) )
         {
             /* "compact" extension */
-            const tr_bool allAreSeeds = incomplete == 0;
-            peerCount += publishNewPeersCompact6( tier, allAreSeeds, raw, rawlen );
+            const int seeders = tier->currentTracker->seederCount;
+            const int leechers = tier->currentTracker->leecherCount;
+            peerCount += publishNewPeersCompact6( tier, seeders, leechers, raw, rawlen );
             gotPeers = TRUE;
         }
 

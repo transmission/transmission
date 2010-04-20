@@ -354,27 +354,28 @@ onTrackerResponse( void * tracker UNUSED,
                    void * vevent,
                    void * user_data )
 {
-    tr_torrent *       tor = user_data;
+    tr_torrent * tor = user_data;
     tr_tracker_event * event = vevent;
 
     switch( event->messageType )
     {
         case TR_TRACKER_PEERS:
         {
-            size_t   i, n;
+            size_t i, n;
+            const int seedProbability = event->seedProbability;
+            const tr_bool allAreSeeds = seedProbability == 100;
             tr_pex * pex = tr_peerMgrArrayToPex( event->compact,
                                                  event->compactLen, &n );
-             if( event->allAreSeeds )
+             if( allAreSeeds )
                 tr_tordbg( tor, "Got %d seeds from tracker", (int)n );
             else
                 tr_tordbg( tor, "Got %d peers from tracker", (int)n );
 
             for( i = 0; i < n; ++i )
-            {
-                if( event->allAreSeeds )
-                    pex[i].flags |= ADDED_F_SEED_FLAG;
-                tr_peerMgrAddPex( tor, TR_PEER_FROM_TRACKER, pex + i );
-            }
+                tr_peerMgrAddPex( tor, TR_PEER_FROM_TRACKER, pex+i, seedProbability );
+
+            if( allAreSeeds && tr_torrentIsPrivate( tor ) )
+                tr_peerMgrMarkAllAsSeeds( tor );
 
             tr_free( pex );
             break;

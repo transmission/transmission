@@ -32,6 +32,7 @@ typedef struct tr_handshake tr_handshake;
 /* returns true on success, false on error */
 typedef tr_bool ( *handshakeDoneCB )( struct tr_handshake * handshake,
                                       struct tr_peerIo *    io,
+                                      tr_bool               readAnythingFromPeer,
                                       tr_bool               isConnected,
                                       const uint8_t *       peerId,
                                       void *                userData );
