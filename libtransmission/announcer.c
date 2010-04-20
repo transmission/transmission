@@ -1201,7 +1201,6 @@ parseAnnounceResponse( tr_tier     * tier,
     if( bencLoaded && tr_bencIsDict( &benc ) )
     {
         int peerCount = 0;
-        int incomplete = -1;
         size_t rawlen;
         int64_t i;
         tr_benc * tmp;
@@ -1245,16 +1244,18 @@ parseAnnounceResponse( tr_tier     * tier,
             tier->currentTracker->tracker_id = tr_strdup( str );
         }
 
-        if( tr_bencDictFindInt( &benc, "complete", &i ) )
-        {
+        if( !tr_bencDictFindInt( &benc, "complete", &i ) )
+            tier->currentTracker->seederCount = 0;
+        else {
             ++scrapeFields;
             tier->currentTracker->seederCount = i;
         }
 
-        if( tr_bencDictFindInt( &benc, "incomplete", &i ) )
-        {
+        if( !tr_bencDictFindInt( &benc, "incomplete", &i ) )
+            tier->currentTracker->leecherCount = 0;
+        else {
             ++scrapeFields;
-            tier->currentTracker->leecherCount = incomplete = i;
+            tier->currentTracker->leecherCount = i;
         }
 
         if( tr_bencDictFindInt( &benc, "downloaded", &i ) )
@@ -1266,14 +1267,14 @@ parseAnnounceResponse( tr_tier     * tier,
         if( tr_bencDictFindRaw( &benc, "peers", &raw, &rawlen ) )
         {
             /* "compact" extension */
-            const int allAreSeeds = incomplete == 0;
+            const tr_bool allAreSeeds = !tier->currentTracker->leecherCount;
             peerCount += publishNewPeersCompact( tier, allAreSeeds, raw, rawlen );
             gotPeers = TRUE;
         }
         else if( tr_bencDictFindList( &benc, "peers", &tmp ) )
         {
             /* original version of peers */
-            const tr_bool allAreSeeds = incomplete == 0;
+            const tr_bool allAreSeeds = !tier->currentTracker->leecherCount;
             size_t byteCount = 0;
             uint8_t * array = parseOldPeers( tmp, &byteCount );
             peerCount += publishNewPeers( tier, allAreSeeds, array, byteCount );
@@ -1284,7 +1285,7 @@ parseAnnounceResponse( tr_tier     * tier,
         if( tr_bencDictFindRaw( &benc, "peers6", &raw, &rawlen ) )
         {
             /* "compact" extension */
-            const tr_bool allAreSeeds = incomplete == 0;
+            const tr_bool allAreSeeds = !tier->currentTracker->leecherCount;
             peerCount += publishNewPeersCompact6( tier, allAreSeeds, raw, rawlen );
             gotPeers = TRUE;
         }
