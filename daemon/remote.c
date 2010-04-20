@@ -324,6 +324,7 @@ static const char * details_keys[] = {
     "corruptEver",
     "creator",
     "dateCreated",
+    "desiredAvailable",
     "doneDate",
     "downloadDir",
     "downloadedEver",
@@ -1275,12 +1276,22 @@ printDetails( tr_benc * top )
                 printf( "  Have: %s (%s verified)\n", buf, buf2 );
             }
 
-            if( tr_bencDictFindInt( t, "sizeWhenDone", &i )
-              && tr_bencDictFindInt( t, "totalSize", &j ) )
+            if( tr_bencDictFindInt( t, "sizeWhenDone", &i ) )
             {
-                strlsize( buf, j, sizeof( buf ) );
-                strlsize( buf2, i, sizeof( buf2 ) );
-                printf( "  Total size: %s (%s wanted)\n", buf, buf2 );
+                if( i < 1 )
+                    printf( "  Availability: None\n" );
+                if( tr_bencDictFindInt( t, "desiredAvailable", &j)
+                    && tr_bencDictFindInt( t, "leftUntilDone", &k) )
+                {
+                    j += i - k;
+                    printf( "  Availability: %.1f%%\n", ( 100 * j ) / (double) i );
+                }
+                if( tr_bencDictFindInt( t, "totalSize", &j ) )
+                {
+                    strlsize( buf2, i, sizeof( buf2 ) );
+                    strlsize( buf, j, sizeof( buf ) );
+                    printf( "  Total size: %s (%s wanted)\n", buf, buf2 );
+                }
             }
             if( tr_bencDictFindInt( t, "downloadedEver", &i )
               && tr_bencDictFindInt( t, "uploadedEver", &j ) )
