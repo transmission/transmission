@@ -34,15 +34,31 @@
 ****
 ***/
 
+char*
+tr_metainfoGetBasename( const tr_info * inf )
+{
+    char *ret, *pch, *name;
+
+    name = tr_strdup( inf->name );
+    for( pch=name; pch && *pch; ++pch )
+        if( *pch == '/' )
+            *pch = '_';
+   
+    ret = tr_strdup_printf( "%s.%16.16s", name, inf->hashString );
+
+    tr_free( name );
+    return ret;
+}
+
 static char*
 getTorrentFilename( const tr_session * session,
                     const tr_info *   inf )
 {
-    return tr_strdup_printf( "%s%c%s.%16.16s.torrent",
-                             tr_getTorrentDir( session ),
-                             TR_PATH_DELIMITER,
-                             inf->name,
-                             inf->hashString );
+    char * base = tr_metainfoGetBasename( inf );
+    char * filename = tr_strdup_printf( "%s" TR_PATH_DELIMITER_STR "%s.torrent",
+                                        tr_getTorrentDir( session ), base );
+    tr_free( base );
+    return filename;
 }
 
 static char*

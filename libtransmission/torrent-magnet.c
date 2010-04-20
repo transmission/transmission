@@ -75,8 +75,8 @@ tr_torrentSetMetadataSizeHint( tr_torrent * tor, int size )
         {
             int i;
             struct tr_incomplete_metadata * m;
-            int n = ( size + ( METADATA_PIECE_SIZE - 1 ) ) / METADATA_PIECE_SIZE;
-            dbgmsg( tor, "there are %d pieces", n );
+            const int n = ( size + ( METADATA_PIECE_SIZE - 1 ) ) / METADATA_PIECE_SIZE;
+            dbgmsg( tor, "metadata is %d bytes in %d pieces", size, n );
 
             m = tr_new( struct tr_incomplete_metadata, 1 );
             m->pieceCount = n;
