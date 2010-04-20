@@ -289,6 +289,12 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         tr_bencDictAddInt(&settings, TR_PREFS_KEY_USPEED, [fDefaults integerForKey: @"UploadLimit"]);
         tr_bencDictAddBool(&settings, TR_PREFS_KEY_USPEED_ENABLED, [fDefaults boolForKey: @"CheckUpload"]);
         
+        //hidden prefs
+        if ([fDefaults objectForKey: @"BindAddressIPv4"])
+            tr_bencDictAddStr(&settings, TR_PREFS_KEY_BIND_ADDRESS_IPV4,  [[fDefaults stringForKey: @"BindAddressIPv4"] UTF8String]); 
+        if ([fDefaults objectForKey: @"BindAddressIPv6"])
+            tr_bencDictAddStr(&settings, TR_PREFS_KEY_BIND_ADDRESS_IPV6,  [[fDefaults stringForKey: @"BindAddressIPv6"] UTF8String]);
+        
         tr_bencDictAddBool(&settings, TR_PREFS_KEY_BLOCKLIST_ENABLED, [fDefaults boolForKey: @"Blocklist"]);
         tr_bencDictAddBool(&settings, TR_PREFS_KEY_DHT_ENABLED, [fDefaults boolForKey: @"DHTGlobal"]);
         tr_bencDictAddStr(&settings, TR_PREFS_KEY_DOWNLOAD_DIR, [[[fDefaults stringForKey: @"DownloadFolder"]
