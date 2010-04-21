@@ -900,10 +900,10 @@ torrent_cell_renderer_init( GTypeInstance *  instance,
     p->progress_renderer = gtk_cell_renderer_progress_new(  );
     p->icon_renderer = gtk_cell_renderer_pixbuf_new(  );
     g_object_set( p->text_renderer_err, "foreground", "red", NULL );
-    tr_object_ref_sink( p->text_renderer );
-    tr_object_ref_sink( p->text_renderer_err );
-    tr_object_ref_sink( p->progress_renderer );
-    tr_object_ref_sink( p->icon_renderer );
+    gtr_object_ref_sink( p->text_renderer );
+    gtr_object_ref_sink( p->text_renderer_err );
+    gtr_object_ref_sink( p->progress_renderer );
+    gtr_object_ref_sink( p->icon_renderer );
 
     p->bar_height = DEFAULT_BAR_HEIGHT;
 }

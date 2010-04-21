@@ -464,7 +464,7 @@ on_tree_view_button_released( GtkWidget *      view,
 }
 
 gpointer
-tr_object_ref_sink( gpointer object )
+gtr_object_ref_sink( gpointer object )
 {
 #if GLIB_CHECK_VERSION( 2, 10, 0 )
     g_object_ref_sink( object );
@@ -476,7 +476,7 @@ tr_object_ref_sink( gpointer object )
 }
 
 int
-tr_file_trash_or_remove( const char * filename )
+gtr_file_trash_or_remove( const char * filename )
 {
     if( filename && *filename )
     {

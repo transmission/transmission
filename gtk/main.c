@@ -401,6 +401,21 @@ signal_handler( int sig )
     }
 }
 
+struct remove_torrent_idle_data
+{
+    TrCore * core;
+    int id;
+};
+
+static gboolean
+remove_torrent_idle( gpointer gdata )
+{
+    struct remove_torrent_idle_data * data = gdata;
+    tr_core_remove_torrent_from_id( data->core, data->id, FALSE );
+    g_free( data );
+    return FALSE; /* tell g_idle not to call this func twice */
+}
+
 static void
 setupsighandlers( void )
 {
@@ -414,6 +429,7 @@ onRPCChanged( tr_session            * session,
               struct tr_torrent     * tor,
               void                  * gdata )
 {
+    tr_rpc_callback_status status = TR_RPC_OK;
     struct cbdata * cbdata = gdata;
     gdk_threads_enter( );
 
@@ -423,9 +439,14 @@ onRPCChanged( tr_session            * session,
             tr_core_add_torrent( cbdata->core, tr_torrent_new_preexisting( tor ), TRUE );
             break;
 
-        case TR_RPC_TORRENT_REMOVING:
-            tr_core_torrent_destroyed( cbdata->core, tr_torrentId( tor ) );
+        case TR_RPC_TORRENT_REMOVING: {
+            struct remove_torrent_idle_data * data = g_new0( struct remove_torrent_idle_data, 1 );
+            data->id = tr_torrentId( tor );
+            data->core = cbdata->core;
+            gtr_idle_add( remove_torrent_idle, data );
+            status = TR_RPC_NOREMOVE;
             break;
+        }
 
         case TR_RPC_SESSION_CHANGED:
             tr_sessionGetSettings( session, pref_get_all( ) );
@@ -440,7 +461,7 @@ onRPCChanged( tr_session            * session,
     }
 
     gdk_threads_leave( );
-    return TR_RPC_OK;
+    return status;
 }
 
 static GSList *
@@ -1438,21 +1459,21 @@ msgwinclosed( void )
 }
 
 static void
-accumulateSelectedTorrents( GtkTreeModel *      model,
+accumulateSelectedTorrents( GtkTreeModel * model,
                             GtkTreePath  * path UNUSED,
-                            GtkTreeIter *       iter,
-                            gpointer            gdata )
+                            GtkTreeIter  * iter,
+                            gpointer       gdata )
 {
-    GSList **   data = ( GSList** ) gdata;
-    TrTorrent * tor = NULL;
+    GSList ** data = ( GSList** ) gdata;
+    TrTorrent * gtor = NULL;
 
-    gtk_tree_model_get( model, iter, MC_TORRENT, &tor, -1 );
-    *data = g_slist_prepend( *data, tor );
+    gtk_tree_model_get( model, iter, MC_TORRENT, &gtor, -1 );
+    *data = g_slist_prepend( *data, gtor );
+    g_object_unref( G_OBJECT( gtor ) );
 }
 
 static void
-removeSelected( struct cbdata * data,
-                gboolean        delete_files )
+removeSelected( struct cbdata * data, gboolean delete_files )
 {
     GSList *           l = NULL;
     GtkTreeSelection * s = tr_window_get_selection( data->wind );

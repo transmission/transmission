@@ -133,8 +133,8 @@ addResponseCB( GtkDialog * dialog,
             tr_core_add_torrent( data->core, data->gtor, FALSE );
 
             if( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( data->trash_check ) ) )
+                gtr_file_trash_or_remove( data->filename );
 
-                tr_file_trash_or_remove( data->filename );
             save_recent_destination( data->core, data->downloadDir );
         }
     }

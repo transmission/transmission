@@ -90,15 +90,6 @@ tr_torrent_dispose( GObject * o )
     parent->dispose( o );
 }
 
-void
-tr_torrent_clear( TrTorrent * tor )
-{
-    g_return_if_fail( tor );
-    g_return_if_fail( tor->priv );
-
-    tor->priv->handle = NULL;
-}
-
 static void
 tr_torrent_class_init( gpointer              g_class,
                        gpointer g_class_data UNUSED )
@@ -209,7 +200,7 @@ tr_torrent_new_ctor( tr_session   * session,
 
         /* #1294: don't delete the source .torrent file if it's our internal copy */
         if( !is_internal )
-            tr_file_trash_or_remove( source );
+            gtr_file_trash_or_remove( source );
     }
 
     return tor ? maketorrent( tor ) : NULL;
@@ -221,12 +212,6 @@ tr_torrent_set_remove_flag( TrTorrent * gtor,
 {
     if( !isDisposed( gtor ) )
         gtor->priv->do_remove = do_remove;
-}
-
-void
-tr_torrent_delete_files( TrTorrent * gtor )
-{
-    tr_torrentDeleteLocalData( tr_torrent_handle( gtor ), tr_file_trash_or_remove );
 }
 
 void

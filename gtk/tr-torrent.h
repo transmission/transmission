@@ -57,15 +57,11 @@ TrTorrentClass;
 
 GType          tr_torrent_get_type( void );
 
-void           tr_torrent_clear( TrTorrent * tor );
-
 tr_torrent *   tr_torrent_handle( TrTorrent *tor );
 
 const tr_stat *tr_torrent_stat( TrTorrent *tor );
 
 const tr_info *tr_torrent_info( TrTorrent *tor );
-
-void           tr_torrent_delete_files( TrTorrent * tor );
 
 void           tr_torrent_open_folder( TrTorrent * tor );
 

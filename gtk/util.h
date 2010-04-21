@@ -117,7 +117,7 @@ void gtr_toolbar_set_orientation( GtkToolbar * tb, GtkOrientation orientation );
 void gtr_widget_set_tooltip_text( GtkWidget * w, const char * tip );
 
 /* backwards-compatible wrapper around g_object_ref_sink() */
-gpointer tr_object_ref_sink( gpointer object );
+gpointer gtr_object_ref_sink( gpointer object );
 
 /***
 ****
@@ -162,6 +162,6 @@ gboolean on_tree_view_button_released( GtkWidget      * view,
 
 
 /* move a file to the trashcan if GIO is available; otherwise, delete it */
-int tr_file_trash_or_remove( const char * filename );
+int gtr_file_trash_or_remove( const char * filename );
 
 #endif /* GTR_UTIL_H */

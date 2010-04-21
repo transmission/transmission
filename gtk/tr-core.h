@@ -159,12 +159,9 @@ void     tr_core_torrents_added( TrCore * self );
 *******
 ******/
 
-/* we've gotten notice from RPC that a torrent has been destroyed;
-   update our gui accordingly */
-void  tr_core_torrent_destroyed( TrCore * self, int torrentId );
-
 /* remove a torrent */
-void  tr_core_remove_torrent( TrCore * self, TrTorrent * gtor, int deleteFiles );
+void  tr_core_remove_torrent( TrCore * self, TrTorrent * gtor, gboolean deleteFiles );
+void  tr_core_remove_torrent_from_id( TrCore * self, int id, gboolean deleteFiles );
 
 /* update the model with current torrent status */
 void  tr_core_update( TrCore * self );

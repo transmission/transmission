@@ -1181,48 +1181,40 @@ findTorrentInModel( TrCore *      core,
 }
 
 void
-tr_core_torrent_destroyed( TrCore * core,
-                           int      id )
+tr_core_remove_torrent( TrCore * core, TrTorrent * gtor, gboolean deleteFiles )
+{
+    const tr_torrent * tor = tr_torrent_handle( gtor );
+
+    if( tor != NULL )
+        tr_core_remove_torrent_from_id( core, tr_torrentId( tor ), deleteFiles );
+}
+
+void
+tr_core_remove_torrent_from_id( TrCore * core, int id, gboolean deleteFiles )
 {
     GtkTreeIter iter;
 
     if( findTorrentInModel( core, id, &iter ) )
     {
-        TrTorrent * gtor;
+        TrTorrent * gtor = NULL;
+        tr_torrent * tor = NULL;
         GtkTreeModel * model = tr_core_model( core );
-        gtk_tree_model_get( model, &iter, MC_TORRENT, &gtor, -1 );
-        tr_torrent_clear( gtor );
+
+        gtk_tree_model_get( model, &iter, MC_TORRENT, &gtor,
+                                          MC_TORRENT_RAW, &tor,
+                                          -1 );
+
+        /* remove from the gui */
         gtk_list_store_remove( GTK_LIST_STORE( model ), &iter );
-        g_object_unref( G_OBJECT( gtor ) );
-    }
-}
 
-void
-tr_core_remove_torrent( TrCore *    core,
-                        TrTorrent * gtor,
-                        int         deleteFiles )
-{
-    const tr_torrent * tor = tr_torrent_handle( gtor );
+        /* maybe delete the downloaded files */
+        if( deleteFiles )
+            tr_torrentDeleteLocalData( tor, gtr_file_trash_or_remove );
 
-    if( tor )
-    {
-        int         id = tr_torrentId( tor );
-        GtkTreeIter iter;
-        if( findTorrentInModel( core, id, &iter ) )
-        {
-            GtkTreeModel * model = tr_core_model( core );
-
-            /* remove from the gui */
-            gtk_list_store_remove( GTK_LIST_STORE( model ), &iter );
-
-            /* maybe delete the downloaded files */
-            if( deleteFiles )
-                tr_torrent_delete_files( gtor );
-
-            /* remove the torrent */
-            tr_torrent_set_remove_flag( gtor, TRUE );
-            g_object_unref( G_OBJECT( gtor ) );
-        }
+        /* remove the torrent */
+        tr_torrent_set_remove_flag( gtor, TRUE );
+        g_warn_if_fail( G_OBJECT( gtor )->ref_count == 1 );
+        g_object_unref( G_OBJECT( gtor ) ); /* remove the last refcount */
     }
 }
 
