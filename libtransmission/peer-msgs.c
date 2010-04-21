@@ -1069,7 +1069,7 @@ parseUtPex( tr_peermsgs * msgs, int msglen, struct evbuffer * inbuf )
             for( i=0; i<n; ++i )
             {
                 int seedProbability = -1;
-                if( added_f_len < n ) seedProbability = ( added_f[i] & ADDED_F_SEED_FLAG ) ? 100 : 0;
+                if( i < added_f_len ) seedProbability = ( added_f[i] & ADDED_F_SEED_FLAG ) ? 100 : 0;
                 tr_peerMgrAddPex( tor, TR_PEER_FROM_PEX, pex+i, seedProbability );
             }
 
@@ -1090,7 +1090,7 @@ parseUtPex( tr_peermsgs * msgs, int msglen, struct evbuffer * inbuf )
             for( i=0; i<n; ++i )
             {
                 int seedProbability = -1;
-                if( added_f_len < n ) seedProbability = ( added_f[i] & ADDED_F_SEED_FLAG ) ? 100 : 0;
+                if( i < added_f_len ) seedProbability = ( added_f[i] & ADDED_F_SEED_FLAG ) ? 100 : 0;
                 tr_peerMgrAddPex( tor, TR_PEER_FROM_PEX, pex+i, seedProbability );
             }
 

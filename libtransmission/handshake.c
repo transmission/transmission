@@ -1143,7 +1143,8 @@ tr_handshakeDone( tr_handshake * handshake,
 void
 tr_handshakeAbort( tr_handshake * handshake )
 {
-    tr_handshakeDone( handshake, FALSE );
+    if( handshake != NULL )
+        tr_handshakeDone( handshake, FALSE );
 }
 
 static void
