@@ -74,12 +74,20 @@ watchdir_new_impl( dtr_watchdir * w )
     int i;
     DIR * odir;
     w->inotify_fd = inotify_init( );
-    tr_inf( "Using inotify to watch directory \"%s\"", w->dir );
-    i = inotify_add_watch( w->inotify_fd, w->dir, DTR_INOTIFY_MASK );
+
+    if( w->inotify_fd < 0 )
+    {
+        i = -1;
+    }
+    else
+    {
+        tr_inf( "Using inotify to watch directory \"%s\"", w->dir );
+        i = inotify_add_watch( w->inotify_fd, w->dir, DTR_INOTIFY_MASK );
+    }
 
     if( i < 0 )
     {
-        tr_err( "Unable to watch \"%s\": %s", w->dir, strerror (errno) );
+        tr_err( "Unable to watch \"%s\": %s", w->dir, strerror( errno ) );
     }
     else if(( odir = opendir( w->dir )))
     {
@@ -105,8 +113,12 @@ watchdir_new_impl( dtr_watchdir * w )
 static void
 watchdir_free_impl( dtr_watchdir * w )
 {
-    inotify_rm_watch( w->inotify_fd, DTR_INOTIFY_MASK );
-    close( w->inotify_fd );
+    if( w->inotify_fd >= 0 )
+    {
+        inotify_rm_watch( w->inotify_fd, DTR_INOTIFY_MASK );
+
+        close( w->inotify_fd );
+    }
 }
 static void
 watchdir_update_impl( dtr_watchdir * w )
