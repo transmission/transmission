@@ -193,7 +193,7 @@ typedef struct tr_torrent_peers
     /* An arbitrary metric of how congested the downloads are.
      * Based on how many of requests are cancelled and how many are completed.
      * Lower values indicate less congestion. */
-    double                     downloadCongestion;
+    double                     cancelRate;
 }
 Torrent;
 
@@ -2401,7 +2401,7 @@ rechokeDownloads( Torrent * t )
          *
          * We're working on 2. here, so we need to ignore unresponsive
          * peers in our calculations lest they confuse Transmission into
-         * think it's hit its bandwidth cap.
+         * thinking it's hit its bandwidth cap.
          */
         for( i=0; i<peerCount; ++i )
         {
@@ -2430,25 +2430,30 @@ rechokeDownloads( Torrent * t )
         }
         else
         {
-            const double c = ( cancels * 30.0 ) / blocks;
-                 if( c > 5   ) maxPeers = t->interestedCount * 0.7;
-            else if( c > 3   ) maxPeers = t->interestedCount * 0.8;
-            else if( c > 1   ) maxPeers = t->interestedCount * 0.9;
-            else if( c > 0.5 ) maxPeers = t->interestedCount;
-            else               maxPeers = t->interestedCount + 1;
+            const double cancelRate = cancels / (double)(cancels + blocks);
+                 if( cancelRate >= 0.20 ) maxPeers = t->interestedCount * 0.7;
+            else if( cancelRate >= 0.10 ) maxPeers = t->interestedCount * 0.8;
+            else if( cancelRate >= 0.05 ) maxPeers = t->interestedCount * 0.9;
+            else if( cancelRate >= 0.01 ) maxPeers = t->interestedCount;
+            else                          maxPeers = t->interestedCount + 1;
 
             /* if things are getting worse, don't add more peers */
-            if( ( t->downloadCongestion > 0.1 ) && ( c > t->downloadCongestion ) )
+            if( ( t->cancelRate > 0.01 ) && ( cancelRate > t->cancelRate ) )
                 maxPeers = MIN( maxPeers, t->interestedCount );
 
-            t->downloadCongestion = c;
-/*fprintf( stderr, "OVERALL TORRENT DOWNLOAD CONGESTION: %.3f... num allowed goes from %d to %d\n", c, t->interestedCount, maxPeers );*/
+            t->cancelRate = cancelRate;
+
+            tordbg( t, "cancel rate is %.3f -- changing the "
+                       "number of peers we're interested in from %d to %d",
+                       cancelRate, t->interestedCount, maxPeers );
         }
     }
 
     /* don't let the previous paragraph's number tweaking go too far... */
-    maxPeers = MAX( maxPeers, MIN_INTERESTING_PEERS );
-    maxPeers = MIN( maxPeers, t->tor->maxConnectedPeers );
+    if( maxPeers < MIN_INTERESTING_PEERS )
+        maxPeers = MIN_INTERESTING_PEERS;
+    if( maxPeers > t->tor->maxConnectedPeers )
+        maxPeers = t->tor->maxConnectedPeers;
 
     /* separate the peers into "good" (ones with a low cancel-to-block ratio),
      * untested peers, and "bad" (ones with a high cancel-to-block ratio).
@@ -2472,7 +2477,7 @@ rechokeDownloads( Torrent * t )
                 good[goodCount++] = peer;
             else if( !blocks )
                 bad[badCount++] = peer;
-            else if( ( ( cancels * 10.0 ) / blocks ) < 1.0 )
+            else if( ( cancels * 10 ) < blocks )
                 good[goodCount++] = peer;
             else
                 bad[badCount++] = peer;
@@ -3426,7 +3431,8 @@ initiateConnection( tr_peerMgr * mgr, Torrent * t, struct peer_atom * atom )
 
         assert( tr_peerIoGetTorrentHash( io ) );
 
-        tr_peerIoUnref( io ); /* balanced by the implicit ref in tr_peerIoNewOutgoing() */
+        tr_peerIoUnref( io ); /* balanced by the initial ref
+                                 in tr_peerIoNewOutgoing() */
 
         tr_ptrArrayInsertSorted( &t->outgoingHandshakes, handshake,
                                  handshakeCompare );
