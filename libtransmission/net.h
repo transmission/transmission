@@ -115,6 +115,8 @@ int  tr_netAccept( tr_session * session,
 int  tr_netSetTOS( int s,
                    int tos );
 
+int tr_netSetCongestionControl( int s, const char *algorithm );
+
 void tr_netClose( tr_session * session, int s );
 
 void tr_netCloseSocket( int fd );

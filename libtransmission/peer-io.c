@@ -374,9 +374,21 @@ tr_peerIoNew( tr_session       * session,
     assert( tr_isBool( isSeed ) );
     assert( tr_amInEventThread( session ) );
 
-    if( socket >= 0 )
+    if( socket >= 0 ) {
         tr_netSetTOS( socket, session->peerSocketTOS );
-
+        if( session->peer_congestion_algorithm &&
+            session->peer_congestion_algorithm[0] ) {
+            int rc;
+            rc = tr_netSetCongestionControl( socket,
+                                             session->peer_congestion_algorithm );
+            if(rc < 0) {
+                tr_ninf( "Net",
+                         "Couldn't set congestion control algorithm: %s\n",
+                         strerror(errno));
+            }
+        }
+    }
+    
     io = tr_new0( tr_peerIo, 1 );
     io->magicNumber = MAGIC_NUMBER;
     io->refCount = 1;
@@ -646,6 +658,18 @@ tr_peerIoReconnect( tr_peerIo * io )
     if( io->socket >= 0 )
     {
         tr_netSetTOS( io->socket, session->peerSocketTOS );
+        if( session->peer_congestion_algorithm &&
+            session->peer_congestion_algorithm[0] ) {
+            int rc;
+            rc = tr_netSetCongestionControl( io->socket,
+                                             session->peer_congestion_algorithm );
+            if(rc < 0) {
+                tr_ninf( "Net",
+                         "Couldn't set congestion control algorithm: %s\n",
+                         strerror(errno));
+            }
+        }
+
         return 0;
     }
 

@@ -178,6 +178,7 @@ const char* tr_getDefaultDownloadDir( void );
 #define TR_PREFS_KEY_PEER_PORT_RANDOM_LOW       "peer-port-random-low"
 #define TR_PREFS_KEY_PEER_PORT_RANDOM_HIGH      "peer-port-random-high"
 #define TR_PREFS_KEY_PEER_SOCKET_TOS            "peer-socket-tos"
+#define TR_PREFS_KEY_PEER_CONGESTION_ALGORITHM  "peer-congestion-algorithm"
 #define TR_PREFS_KEY_PEX_ENABLED                "pex-enabled"
 #define TR_PREFS_KEY_PORT_FORWARDING            "port-forwarding-enabled"
 #define TR_PREFS_KEY_PROXY_AUTH_ENABLED         "proxy-auth-enabled"

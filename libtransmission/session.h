@@ -124,6 +124,7 @@ struct tr_session
 
     int                          proxyPort;
     int                          peerSocketTOS;
+    char *                       peer_congestion_algorithm;
 
     int                          torrentCount;
     tr_torrent *                 torrentList;
