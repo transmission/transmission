@@ -568,11 +568,12 @@ PrefsDialog :: createTorrentsTab( )
         hig->addWideControl( checkBoxNew( tr( "Mo&ve .torrent file to the trash" ), Prefs::TRASH_ORIGINAL ) );
         hig->addWideControl( checkBoxNew( tr( "Append \".&part\" to incomplete files' names" ), Prefs::RENAME_PARTIAL_FILES ) );
 
+        myIncompleteCheckbox = checkBoxNew( tr( "Keep &incomplete files in:" ), Prefs::INCOMPLETE_DIR_ENABLED );
         b = myIncompleteButton = new QPushButton;
         b->setIcon( folderPixmap );
         b->setStyleSheet( "text-align: left; padding-left: 5; padding-right: 5" );
-        connect( b, SIGNAL(clicked(bool)), this, SLOT(onDestinationClicked(void)) );
-        hig->addRow( tr( "Keep &incomplete files in:" ), b );
+        connect( b, SIGNAL(clicked(bool)), this, SLOT(onIncompleteClicked(void)) );
+        hig->addRow( myIncompleteCheckbox, b );
 
         b = myDestinationButton = new QPushButton;
         b->setIcon( folderPixmap );

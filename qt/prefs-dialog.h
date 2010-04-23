@@ -96,6 +96,7 @@ class PrefsDialog: public QDialog
         QLabel * myPortLabel;
         QPushButton * myPortButton;
         QPushButton * myWatchButton;
+        QCheckBox * myIncompleteCheckbox;
         QPushButton * myIncompleteButton;
         QPushButton * myDestinationButton;
         QWidgetList myWebWidgets;
