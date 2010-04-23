@@ -331,6 +331,27 @@ decode_uri( const char * uri )
     return ret;
 }
 
+/* pattern-matching text; ie, legaltorrents.com */
+char*
+gtr_get_host_from_url( const char * url )
+{
+    char * h = NULL;
+    char * name;
+    const char * first_dot;
+    const char * last_dot;
+
+    tr_urlParse( url, -1, NULL, &h, NULL, NULL );
+    first_dot = strchr( h, '.' );
+    last_dot = strrchr( h, '.' );
+
+    if( ( first_dot ) && ( last_dot ) && ( first_dot != last_dot ) )
+        name = g_strdup( first_dot + 1 );
+    else
+        name = g_strdup( h );
+
+    tr_free( h );
+    return name;
+}
 
 gboolean
 gtr_is_supported_url( const char * str )

@@ -62,6 +62,9 @@ char* gtr_localtime2( char * buf, time_t time, size_t buflen );
 ****
 ***/
 
+/* http://www.legaltorrents.com/some/announce/url --> legaltorrents.com */
+char* gtr_get_host_from_url( const char * url );
+
 gboolean gtr_is_supported_url( const char * str );
 
 gboolean gtr_is_magnet_link( const char * str );

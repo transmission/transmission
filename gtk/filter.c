@@ -71,28 +71,6 @@ pstrcmp( const void * a, const void * b )
     return strcmp( *(const char**)a, *(const char**)b );
 }
 
-/* pattern-matching text; ie, legaltorrents.com */
-static char*
-get_host_from_url( const char * url )
-{
-    char * h = NULL;
-    char * name;
-    const char * first_dot;
-    const char * last_dot;
-
-    tr_urlParse( url, -1, NULL, &h, NULL, NULL );
-    first_dot = strchr( h, '.' );
-    last_dot = strrchr( h, '.' );
-
-    if( ( first_dot ) && ( last_dot ) && ( first_dot != last_dot ) )
-        name = g_strdup( first_dot + 1 );
-    else
-        name = g_strdup( h );
-
-    tr_free( h );
-    return name;
-}
-
 /* human-readable name; ie, Legaltorrents */
 static char*
 get_name_from_host( const char * host )
@@ -185,7 +163,7 @@ category_filter_model_update( GtkTreeStore * store )
         for( i=0, n=inf->trackerCount; i<n; ++i )
         {
             int k;
-            char * key = get_host_from_url( inf->trackers[i].announce );
+            char * key = gtr_get_host_from_url( inf->trackers[i].announce );
             int * count = g_hash_table_lookup( hosts_hash, key );
             if( count == NULL )
             {
@@ -580,7 +558,7 @@ testCategory( GtkWidget * category_combo, tr_torrent * tor )
             char * host;
             gtk_tree_model_get( model, &iter, CAT_FILTER_COL_HOST, &host, -1 );
             for( i=0; i<inf->trackerCount; ++i ) {
-                char * tmp = get_host_from_url( inf->trackers[i].announce );
+                char * tmp = gtr_get_host_from_url( inf->trackers[i].announce );
                 const gboolean hit = !strcmp( tmp, host );
                 g_free( tmp );
                 if( hit )

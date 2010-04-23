@@ -169,3 +169,14 @@ gtr_get_favicon( tr_session  * session,
         g_free( url );
     }
 }
+
+void
+gtr_get_favicon_from_url( tr_session  * session,
+                          const char  * url,
+                          GFunc         pixbuf_ready_func,
+                          gpointer      pixbuf_ready_func_data )
+{
+    char * host = gtr_get_host_from_url( url );
+    gtr_get_favicon( session, host, pixbuf_ready_func, pixbuf_ready_func_data );
+    g_free( host );
+}

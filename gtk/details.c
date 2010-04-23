@@ -23,6 +23,7 @@
 
 #include "actions.h"
 #include "details.h"
+#include "favicon.h" /* gtr_get_favicon() */
 #include "file-list.h"
 #include "hig.h"
 #include "tr-prefs.h"
@@ -1885,6 +1886,7 @@ enum
   TRACKER_COL_BACKUP,
   TRACKER_COL_TORRENT_NAME,
   TRACKER_COL_TRACKER_NAME,
+  TRACKER_COL_FAVICON,
   TRACKER_N_COLS
 };
 
@@ -1927,6 +1929,30 @@ populate_tracker_buffer( GtkTextBuffer * buffer, const tr_torrent * tor )
 #define TORRENT_PTR_KEY "torrent-pointer"
 
 static void
+favicon_ready_cb( gpointer pixbuf, gpointer vreference )
+{
+    GtkTreeIter iter;
+    GtkTreeRowReference * reference = vreference;
+
+    if( pixbuf != NULL )
+    {
+        GtkTreePath * path = gtk_tree_row_reference_get_path( reference );
+        GtkTreeModel * model = gtk_tree_row_reference_get_model( reference );
+
+        if( gtk_tree_model_get_iter( model, &iter, path ) )
+            gtk_list_store_set( GTK_LIST_STORE( model ), &iter,
+                                TRACKER_COL_FAVICON, pixbuf,
+                                -1 );
+
+        gtk_tree_path_free( path );
+
+        g_object_unref( pixbuf );
+    }
+
+    gtk_tree_row_reference_free( reference );
+}
+
+static void
 refreshTracker( struct DetailsImpl * di, tr_torrent ** torrents, int n )
 {
     int i;
@@ -1957,7 +1983,8 @@ refreshTracker( struct DetailsImpl * di, tr_torrent ** torrents, int n )
                                                     G_TYPE_STRING,
                                                     G_TYPE_BOOLEAN,
                                                     G_TYPE_STRING,
-                                                    G_TYPE_STRING );
+                                                    G_TYPE_STRING,
+                                                    GDK_TYPE_PIXBUF );
 
         filter = gtk_tree_model_filter_new( GTK_TREE_MODEL( store ), NULL );
         gtk_tree_model_filter_set_visible_func( GTK_TREE_MODEL_FILTER( filter ),
@@ -1979,6 +2006,8 @@ refreshTracker( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     model = GTK_TREE_MODEL( store );
     if( n && !gtk_tree_model_get_iter_first( model, &iter ) )
     {
+        tr_session * session = tr_core_session( di->core );
+
         for( i=0; i<n; ++i )
         {
             int j;
@@ -1987,12 +2016,23 @@ refreshTracker( struct DetailsImpl * di, tr_torrent ** torrents, int n )
             const tr_info * inf = tr_torrentInfo( tor );
 
             for( j=0; j<statCount[i]; ++j )
+            {
+                GtkTreePath * path;
+                GtkTreeRowReference * reference;
+                const tr_tracker_stat * st = &stats[i][j];
+
                 gtk_list_store_insert_with_values( store, &iter, -1,
                     TRACKER_COL_TORRENT_ID, torrentId,
                     TRACKER_COL_TRACKER_INDEX, j,
                     TRACKER_COL_TORRENT_NAME, inf->name,
-                    TRACKER_COL_TRACKER_NAME, stats[i][j].host,
+                    TRACKER_COL_TRACKER_NAME, st->host,
                     -1 );
+
+                path = gtk_tree_model_get_path( model, &iter );
+                reference = gtk_tree_row_reference_new( model, path );
+                gtr_get_favicon_from_url( session, st->announce, favicon_ready_cb, reference );
+                gtk_tree_path_free( path );
+            }
         }
     }
 
@@ -2170,9 +2210,10 @@ static GtkWidget*
 tracker_page_new( struct DetailsImpl * di )
 {
     gboolean b;
-    GtkWidget *vbox, *sw, *w, *v, *hbox;
     GtkCellRenderer *r;
     GtkTreeViewColumn *c;
+    GtkWidget *vbox, *sw, *w, *v, *hbox;
+    const int pad = ( GUI_PAD + GUI_PAD_BIG ) / 2;
 
     vbox = gtk_vbox_new( FALSE, GUI_PAD );
     gtk_container_set_border_width( GTK_CONTAINER( vbox ), GUI_PAD_BIG );
@@ -2183,13 +2224,20 @@ tracker_page_new( struct DetailsImpl * di )
     g_signal_connect( v, "button-release-event",
                       G_CALLBACK( on_tree_view_button_released ), NULL );
     gtk_tree_view_set_rules_hint( GTK_TREE_VIEW( v ), TRUE );
-    r = gtk_cell_renderer_text_new( );
-    g_object_set( r, "ellipsize", PANGO_ELLIPSIZE_END, NULL );
-    c = gtk_tree_view_column_new_with_attributes( _( "Trackers" ), r, "markup", TRACKER_COL_TEXT, NULL );
+
+    c = gtk_tree_view_column_new( );
+    gtk_tree_view_column_set_title( c, _( "Trackers" ) );
     gtk_tree_view_append_column( GTK_TREE_VIEW( v ), c );
-    g_object_set( G_OBJECT( r ), "ypad", (GUI_PAD+GUI_PAD_BIG)/2,
-                                 "xpad", (GUI_PAD+GUI_PAD_BIG)/2,
-                                 NULL );
+
+    r = gtk_cell_renderer_pixbuf_new( );
+    g_object_set( r, "width", 20 + (GUI_PAD_SMALL*2), "xpad", GUI_PAD_SMALL, "ypad", pad, "yalign", 0.0f, NULL );
+    gtk_tree_view_column_pack_start( c, r, FALSE );
+    gtk_tree_view_column_add_attribute( c, r, "pixbuf", TRACKER_COL_FAVICON );
+
+    r = gtk_cell_renderer_text_new( );
+    g_object_set( G_OBJECT( r ), "ellipsize", PANGO_ELLIPSIZE_END, "xpad", GUI_PAD_SMALL, "ypad", pad, NULL );
+    gtk_tree_view_column_pack_start( c, r, TRUE );
+    gtk_tree_view_column_add_attribute( c, r, "markup", TRACKER_COL_TEXT );
 
     sw = gtk_scrolled_window_new( NULL, NULL );
     gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( sw ),
