@@ -14,8 +14,10 @@
 #define GTR_RELOCATE_H
 
 #include <gtk/gtk.h>
-#include <libtransmission/transmission.h>
+#include "tr-core.h"
 
-GtkWidget * gtr_relocate_dialog_new( GtkWindow * parent, tr_torrent * tor );
+GtkWidget * gtr_relocate_dialog_new( GtkWindow * parent,
+                                     TrCore    * core,
+                                     GSList    * torrentIds );
 
 #endif

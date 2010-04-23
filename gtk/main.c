@@ -321,9 +321,9 @@ refreshActions( struct cbdata * data )
     action_sensitize( "remove-torrent", counts.totalCount != 0 );
     action_sensitize( "delete-torrent", counts.totalCount != 0 );
     action_sensitize( "verify-torrent", counts.totalCount != 0 );
+    action_sensitize( "relocate-torrent", counts.totalCount != 0 );
     action_sensitize( "show-torrent-properties", counts.totalCount != 0 );
     action_sensitize( "open-torrent-folder", counts.totalCount == 1 );
-    action_sensitize( "relocate-torrent", counts.totalCount == 1 );
     action_sensitize( "copy-magnet-link-to-clipboard", counts.totalCount == 1 );
 
     canUpdate = 0;
@@ -1599,11 +1599,11 @@ doAction( const char * action_name, gpointer user_data )
     }
     else if( !strcmp( action_name, "relocate-torrent" ) )
     {
-        tr_torrent * tor = getFirstSelectedTorrent( data );
-        if( tor != NULL )
+        GSList * ids = getSelectedTorrentIds( data );
+        if( ids != NULL )
         {
             GtkWindow * parent = GTK_WINDOW( data->wind );
-            GtkWidget * w = gtr_relocate_dialog_new( parent, tor );
+            GtkWidget * w = gtr_relocate_dialog_new( parent, data->core, ids );
             gtk_widget_show( w );
         }
     }

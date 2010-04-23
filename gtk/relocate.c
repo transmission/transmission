@@ -20,43 +20,88 @@
 #include "relocate.h"
 #include "util.h"
 
+#define DATA_KEY "gtr-relocate-data"
+
 static char * previousLocation = NULL;
 
-struct UpdateData
+struct relocate_dialog_data
 {
-    GtkDialog * dialog;
-    GtkDialog * moving_dialog;
     int done;
+    tr_bool do_move;
+    TrCore * core;
+    GSList * torrent_ids;
+    GtkWidget * message_dialog;
+    GtkWidget * chooser_dialog;
 };
+
+static void
+data_free( gpointer gdata )
+{
+    struct relocate_dialog_data * data = gdata;
+    g_slist_free( data->torrent_ids );
+    g_free( data );
+}
+
+/***
+****
+***/
+
+static void
+startMovingNextTorrent( struct relocate_dialog_data * data )
+{
+    char * str;
+    const int id = GPOINTER_TO_INT( data->torrent_ids->data );
+
+    tr_session * session = tr_core_session( data->core );
+
+    tr_torrent * tor = tr_torrentFindFromId( session, id );
+    if( tor != NULL )
+        tr_torrentSetLocation( tor, previousLocation, data->do_move, NULL, &data->done );
+
+    data->torrent_ids = g_slist_delete_link( data->torrent_ids,
+                                             data->torrent_ids );
+
+    str = g_strdup_printf( _( "Moving \"%s\"" ), tr_torrentInfo(tor)->name );
+    gtk_message_dialog_set_markup( GTK_MESSAGE_DIALOG( data->message_dialog ), str );
+    g_free( str );
+}
 
 /* every once in awhile, check to see if the move is done.
  * if so, delete the dialog */
 static gboolean
 onTimer( gpointer gdata )
 {
-    struct UpdateData * data = gdata;
+    struct relocate_dialog_data * data = gdata;
     const int done = data->done;
 
     if( done == TR_LOC_ERROR )
     {
         const int flags = GTK_DIALOG_MODAL
                         | GTK_DIALOG_DESTROY_WITH_PARENT;
-        GtkWidget * w = gtk_message_dialog_new( GTK_WINDOW( data->moving_dialog ),
+        GtkWidget * w = gtk_message_dialog_new( GTK_WINDOW( data->message_dialog ),
                                                 flags,
                                                 GTK_MESSAGE_ERROR,
                                                 GTK_BUTTONS_CLOSE,
                                                 "%s",
                                                 _( "Couldn't move torrent" ) );
         gtk_dialog_run( GTK_DIALOG( w ) );
-        gtk_widget_destroy( GTK_WIDGET( data->moving_dialog ) );
+        gtk_widget_destroy( GTK_WIDGET( data->message_dialog ) );
+        return FALSE;
     }
-    else if( done != TR_LOC_MOVING )
+    else if( done == TR_LOC_DONE )
     {
-        gtk_widget_destroy( GTK_WIDGET( data->dialog ) );
-        g_free( data );
+        if( data->torrent_ids != NULL )
+        {
+            startMovingNextTorrent( data );
+        }
+        else
+        {
+            gtk_widget_destroy( GTK_WIDGET( data->chooser_dialog ) );
+            return FALSE;
+        }
     }
 
-    return !done;
+    return TRUE; /* keep looping */
 }
 
 static void
@@ -64,38 +109,34 @@ onResponse( GtkDialog * dialog, int response, gpointer unused UNUSED )
 {
     if( response == GTK_RESPONSE_APPLY )
     {
-        struct UpdateData * updateData;
-
         GtkWidget * w;
         GObject * d = G_OBJECT( dialog );
-        tr_torrent * tor = g_object_get_data( d, "torrent" );
+        struct relocate_dialog_data * data = g_object_get_data( d, DATA_KEY );
         GtkFileChooser * chooser = g_object_get_data( d, "chooser" );
         GtkToggleButton * move_tb = g_object_get_data( d, "move_rb" );
         char * location = gtk_file_chooser_get_filename( chooser );
-        const gboolean do_move = gtk_toggle_button_get_active( move_tb );
+
+        data->do_move = gtk_toggle_button_get_active( move_tb );
 
         /* pop up a dialog saying that the work is in progress */
         w = gtk_message_dialog_new( GTK_WINDOW( dialog ),
                                     GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL,
                                     GTK_MESSAGE_INFO,
                                     GTK_BUTTONS_CLOSE,
-                                    _( "Moving \"%s\"" ),
-                                    tr_torrentInfo(tor)->name );
+                                    NULL );
         gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG( w ), _( "This may take a moment..." ) );
         gtk_dialog_set_response_sensitive( GTK_DIALOG( w ), GTK_RESPONSE_CLOSE, FALSE );
         gtk_widget_show( w );
 
-        /* start the move and periodically check its status */
-        updateData = g_new( struct UpdateData, 1 );
-        updateData->dialog = dialog;
-        updateData->moving_dialog = GTK_DIALOG( w );
-        updateData->done = FALSE;
-        tr_torrentSetLocation( tor, location, do_move, NULL, &updateData->done );
-        gtr_timeout_add_seconds( 1, onTimer, updateData );
-
         /* remember this location so that it can be the default next time */
         g_free( previousLocation );
         previousLocation = location;
+
+        /* start the move and periodically check its status */
+        data->message_dialog = w;
+        data->done = TR_LOC_DONE;
+        onTimer( data );
+        gtr_timeout_add_seconds( 1, onTimer, data );
     }
     else
     {
@@ -104,12 +145,15 @@ onResponse( GtkDialog * dialog, int response, gpointer unused UNUSED )
 }
 
 GtkWidget*
-gtr_relocate_dialog_new( GtkWindow * parent, tr_torrent * tor )
+gtr_relocate_dialog_new( GtkWindow * parent,
+                         TrCore    * core,
+                         GSList    * torrent_ids )
 {
     int row;
     GtkWidget * w;
     GtkWidget * d;
     GtkWidget * t;
+    struct relocate_dialog_data * data;
 
     d = gtk_dialog_new_with_buttons( _( "Set Torrent Location" ), parent,
                                      GTK_DIALOG_DESTROY_WITH_PARENT |
@@ -118,7 +162,6 @@ gtr_relocate_dialog_new( GtkWindow * parent, tr_torrent * tor )
                                      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                      GTK_STOCK_APPLY, GTK_RESPONSE_APPLY,
                                      NULL );
-    g_object_set_data( G_OBJECT( d ), "torrent", tor );
     gtk_dialog_set_default_response( GTK_DIALOG( d ),
                                      GTK_RESPONSE_CANCEL );
     gtk_dialog_set_alternative_button_order( GTK_DIALOG( d ),
@@ -145,6 +188,12 @@ gtr_relocate_dialog_new( GtkWindow * parent, tr_torrent * tor )
     hig_workarea_finish( t, &row );
     gtk_widget_show_all( t );
     gtk_box_pack_start( GTK_BOX( GTK_DIALOG( d )->vbox ), t, TRUE, TRUE, 0 );
+
+    data = g_new0( struct relocate_dialog_data, 1 );
+    data->core = core;
+    data->torrent_ids = torrent_ids;
+    data->chooser_dialog = d;
+    g_object_set_data_full( G_OBJECT( d ), DATA_KEY, data, data_free );
 
     return d;
 }
