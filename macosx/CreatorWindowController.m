@@ -322,9 +322,30 @@
     [fTrackerAddRemoveControl setEnabled: [fTrackerTable numberOfSelectedRows] > 0 forSegment: TRACKER_REMOVE_TAG];
 }
 
+- (void) copy: (id) sender
+{
+    NSArray * addresses = [fTrackers objectsAtIndexes: [fTrackerTable selectedRowIndexes]];
+    NSString * text = [addresses componentsJoinedByString: @"\n"];
+    
+    NSPasteboard * pb = [NSPasteboard generalPasteboard];
+    if ([NSApp isOnSnowLeopardOrBetter])
+    {
+        [pb clearContents];
+        [pb writeObjects: [NSArray arrayWithObject: text]];
+    }
+    else
+    {
+        [pb declareTypes: [NSArray arrayWithObject: NSStringPboardType] owner: nil];
+        [pb setString: text forType: NSStringPboardType];
+    }
+}
+
 - (BOOL) validateMenuItem: (NSMenuItem *) menuItem
 {
     const SEL action = [menuItem action];
+    
+    if (action == @selector(copy:))
+        return [[self window] firstResponder] == fTrackerTable && [fTrackerTable numberOfSelectedRows] > 0;
     
     if (action == @selector(paste:))
         return [[self window] firstResponder] == fTrackerTable
