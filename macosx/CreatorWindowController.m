@@ -25,7 +25,9 @@
 #import "CreatorWindowController.h"
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
-#import "utils.h" //tr_urlIsValidTracker
+
+#import "transmission.h" // required by utils.h
+#import "utils.h" // tr_urlIsValidTracker()
 
 #define TRACKER_ADD_TAG 0
 #define TRACKER_REMOVE_TAG 1

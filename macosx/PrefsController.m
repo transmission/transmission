@@ -30,6 +30,8 @@
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "UKKQueue.h"
+
+#import "transmission.h"
 #import "utils.h"
 
 #import <Sparkle/Sparkle.h>

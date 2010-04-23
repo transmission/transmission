@@ -25,7 +25,9 @@
 #import "TrackerCell.h"
 #import "NSApplicationAdditions.h"
 #import "TrackerNode.h"
-#import "utils.h"
+
+#import "transmission.h" // required by utils.h
+#import "utils.h" //tr_addressIsIP()
 
 #define PADDING_HORIZONAL 3.0
 #define PADDING_STATUS_HORIZONAL 3.0

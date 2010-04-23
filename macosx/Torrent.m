@@ -27,7 +27,9 @@
 #import "FileListNode.h"
 #import "NSStringAdditions.h"
 #import "TrackerNode.h"
-#import "utils.h" //tr_new
+
+#import "transmission.h" // required by utils.h
+#import "utils.h" // tr_new()
 
 @interface Torrent (Private)
 

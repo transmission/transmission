@@ -52,6 +52,8 @@
 #import "NSStringAdditions.h"
 #import "ExpandedPathToPathTransformer.h"
 #import "ExpandedPathToIconTransformer.h"
+
+#import "transmission.h"
 #import "bencode.h"
 #import "utils.h"
 

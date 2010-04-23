@@ -26,6 +26,8 @@
 #import "NSStringAdditions.h"
 #import "PiecesView.h"
 #import "Torrent.h"
+
+#include "transmission.h" // required by utils.h
 #include "utils.h" //tr_getRatio()
 
 #define PIECES_CONTROL_PROGRESS 0
