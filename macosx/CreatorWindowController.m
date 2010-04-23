@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #import "CreatorWindowController.h"
+#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "utils.h" //tr_urlIsValidTracker
 
@@ -319,6 +320,69 @@
 - (void) tableViewSelectionDidChange: (NSNotification *) notification
 {
     [fTrackerAddRemoveControl setEnabled: [fTrackerTable numberOfSelectedRows] > 0 forSegment: TRACKER_REMOVE_TAG];
+}
+
+- (BOOL) validateMenuItem: (NSMenuItem *) menuItem
+{
+    const SEL action = [menuItem action];
+    
+    if (action == @selector(paste:))
+        return [[self window] firstResponder] == fTrackerTable
+            && ([NSApp isOnSnowLeopardOrBetter]
+                ? [[NSPasteboard generalPasteboard] canReadObjectForClasses: [NSArray arrayWithObject: [NSString class]] options: nil]
+                : [[NSPasteboard generalPasteboard] availableTypeFromArray: [NSArray arrayWithObject: NSStringPboardType]] != nil);
+    
+    return YES;
+}
+
+- (void) paste: (id) sender
+{
+    NSMutableArray * tempTrackers = [NSMutableArray array];
+    
+    if ([NSApp isOnSnowLeopardOrBetter])
+    {
+        NSArray * items = [[NSPasteboard generalPasteboard] readObjectsForClasses:
+                            [NSArray arrayWithObject: [NSString class]] options: nil];
+        NSAssert(items != nil, @"no string items to paste; should not be able to call this method");
+        
+        for (NSString * pbItem in items)
+        {
+            for (NSString * tracker in [pbItem componentsSeparatedByString: @"\n"])
+                [tempTrackers addObject: tracker];
+        }
+    }
+    else
+    {
+        NSString * pbItem =[[NSPasteboard generalPasteboard] stringForType: NSStringPboardType];
+        NSAssert(pbItem != nil, @"no string items to paste; should not be able to call this method");
+        
+        for (NSString * tracker in [pbItem componentsSeparatedByString: @"\n"])
+            [tempTrackers addObject: tracker];
+    }
+    
+    BOOL added = NO;
+    
+    for (NSString * tracker in tempTrackers)
+    {
+        tracker = [tracker stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        
+        if ([tracker rangeOfString: @"://"].location == NSNotFound)
+            tracker = [@"http://" stringByAppendingString: tracker];
+        
+        if (tr_urlIsValidTracker([tracker UTF8String]))
+        {
+            [fTrackers addObject: tracker];
+            added = YES;
+        }
+    }
+    
+    if (added)
+    {
+        [fTrackerTable deselectAll: self];
+        [fTrackerTable reloadData];
+    }
+    else
+        NSBeep();
 }
 
 @end
