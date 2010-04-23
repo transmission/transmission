@@ -21,8 +21,8 @@
 #include <unistd.h>
 #include <dirent.h>
 
-#include "crypto.h" /* tr_sha1 */
 #include "transmission.h"
+#include "crypto.h" /* tr_sha1 */
 #include "session.h"
 #include "bencode.h"
 #include "makemeta.h"

@@ -27,6 +27,7 @@
 
 #include <event.h>
 
+#include "transmission.h"
 #include "crypto.h"
 #include "utils.h"
 

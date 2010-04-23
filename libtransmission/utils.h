@@ -20,8 +20,6 @@
 #include <stdlib.h> /* malloc() */
 #include <time.h> /* time_t */
 
-#include "transmission.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif

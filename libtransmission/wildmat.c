@@ -37,12 +37,10 @@
 **  on.
 */
 
+#include "transmission.h"
 #include "utils.h"
 
-#define TRUE			1
-#define FALSE			0
-#define ABORT			-1
-
+#define ABORT -1
 
     /* What character marks an inverted character class? */
 #define NEGATE_CLASS		'^'
