@@ -12,16 +12,14 @@
 
 /* thanks amc1! */
 
-#include <ctype.h> /* isprint */
+#include <ctype.h> /* isprint() */
 #include <stdio.h>
-#include <stdlib.h> /* strtol */
+#include <stdlib.h> /* strtol() */
 #include <string.h>
-
-#include <event.h> /* evbuffer */
 
 #include "transmission.h"
 #include "clients.h"
-#include "utils.h"
+#include "utils.h" /* tr_snprintf(), tr_strlcpy() */
 
 static int
 charint( char ch )
