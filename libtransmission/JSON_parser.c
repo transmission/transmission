@@ -68,6 +68,7 @@ SOFTWARE.
 #include <string.h>
 #include <locale.h>
 
+#include <stdarg.h> /* some 1.4.x versions of evutil.h need this */
 #include <evutil.h> /* evutil_strtoll() */
 
 #include "JSON_parser.h"
