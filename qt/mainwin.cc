@@ -20,6 +20,7 @@
 #include <QHBoxLayout>
 #include <QInputDialog>
 #include <QLabel>
+#include <QMessageBox>
 #include <QSignalMapper>
 #include <QSize>
 #include <QStyle>
@@ -843,12 +844,12 @@ TrMainWindow :: pauseAll( )
 void
 TrMainWindow :: removeSelected( )
 {
-    mySession.removeTorrents( getSelectedTorrents( ), false );
+    removeTorrents( false );
 }
 void
 TrMainWindow :: deleteSelected( )
 {
-    mySession.removeTorrents( getSelectedTorrents( ), true );
+    removeTorrents( true );
 }
 void
 TrMainWindow :: verifySelected( )
@@ -1143,6 +1144,98 @@ TrMainWindow :: addTorrent( const QString& filename )
         o->show( );
         QApplication :: alert( o );
     }
+}
+
+void
+TrMainWindow :: removeTorrents( const bool deleteFiles )
+{
+    QSet<int> ids;
+    QMessageBox msgBox( this );
+    QString primary_text, secondary_text;
+    int incomplete = 0;
+    int connected  = 0;
+    int count;
+
+    foreach( QModelIndex index, ui.listView->selectionModel( )->selectedRows( ) )
+    {
+        const Torrent * tor( index.model()->data( index, TorrentModel::TorrentRole ).value<const Torrent*>( ) );
+        ids.insert( tor->id( ) );
+        if( tor->connectedPeers( ) )
+            ++connected;
+        if( !tor->isDone( ) )
+            ++incomplete;
+    }
+
+    if( ids.isEmpty() )
+        return;
+    count = ids.size();
+
+    if( !deleteFiles )
+    {
+        primary_text = ( count == 1 )
+            ? tr( "Remove torrent?" )
+            : tr( "Remove %1 torrents?" ).arg( count );
+    }
+    else
+    {
+        primary_text = ( count == 1 )
+            ? tr( "Delete this torrent's downloaded files?" )
+            : tr( "Delete these %1 torrents' downloaded files?" ).arg( count );
+    }
+
+    if( !incomplete && !connected )
+    {
+        secondary_text = ( count == 1 )
+            ? tr( "Once removed, continuing the transfer will require the torrent file or magnet link." )
+            : tr( "Once removed, continuing the transfers will require the torrent files or magnet links." );
+    }
+    else if( count == incomplete )
+    {
+        secondary_text = ( count == 1 )
+            ? tr( "This torrent has not finished downloading." )
+            : tr( "These torrents have not finished downloading." );
+    }
+    else if( count == connected )
+    {
+        secondary_text = ( count == 1 )
+            ? tr( "This torrent is connected to peers." )
+            : tr( "These torrents are connected to peers." );
+    }
+    else
+    {
+        if( connected )
+        {
+            secondary_text = ( connected == 1 )
+                ? tr( "One of these torrents is connected to peers." )
+                : tr( "Some of these torrents are connected to peers." );
+        }
+
+        if( connected && incomplete )
+        {
+            secondary_text += "\n";
+        }
+
+        if( incomplete )
+        {
+            secondary_text += ( incomplete == 1 )
+                ? tr( "One of these torrents has not finished downloading." )
+                : tr( "Some of these torrents have not finished downloading." );
+        }
+    }
+
+    msgBox.setWindowTitle( QString(" ") );
+    msgBox.setText( QString( "<big><b>%1</big></b>" ).arg( primary_text ) );
+    msgBox.setInformativeText( secondary_text );
+    msgBox.setStandardButtons( QMessageBox::Ok | QMessageBox::Cancel );
+    msgBox.setDefaultButton( QMessageBox::Cancel );
+    msgBox.setIcon( QMessageBox::Question );
+    /* hack needed to keep the dialog from being too narrow */
+    QGridLayout* layout = (QGridLayout*)msgBox.layout();
+    QSpacerItem* spacer = new QSpacerItem( 450, 0, QSizePolicy::Minimum, QSizePolicy::Expanding );
+    layout->addItem( spacer, layout->rowCount(), 0, 1, layout->columnCount() );
+
+    if( msgBox.exec() == QMessageBox::Ok )
+        mySession.removeTorrents( ids, deleteFiles );
 }
 
 /***

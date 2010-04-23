@@ -115,6 +115,7 @@ class TrMainWindow: public QMainWindow
         void trayActivated( QSystemTrayIcon::ActivationReason );
         void refreshPref( int key );
         void addTorrents( const QStringList& filenames );
+        void removeTorrents( const bool deleteFiles );
         void openHelp( );
         void openFolder( );
         void copyMagnetLinkToClipboard( );
