@@ -102,7 +102,6 @@ int trashDataFile(const char * filename)
     return self;
 }
 
-#warning need location (and use it)?
 - (id) initWithMagnetAddress: (NSString *) address location: (NSString *) location lib: (tr_session *) lib
 {
     self = [self initWithPath: nil hash: nil torrentStruct: nil magnetAddress: address

@@ -981,17 +981,17 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         return;
     }
     
-    Torrent * torrent;
-    if (!(torrent = [[Torrent alloc] initWithMagnetAddress: address location: nil lib: fLib]))
-    {
-        [self invalidOpenMagnetAlert: address];
-        return;
-    }
-    
     //determine download location
     NSString * location = nil;
     if ([fDefaults boolForKey: @"DownloadLocationConstant"])
         location = [[fDefaults stringForKey: @"DownloadFolder"] stringByExpandingTildeInPath];
+    
+    Torrent * torrent;
+    if (!(torrent = [[Torrent alloc] initWithMagnetAddress: address location: location lib: fLib]))
+    {
+        [self invalidOpenMagnetAlert: address];
+        return;
+    }
     
     //change the location if the group calls for it (this has to wait until after the torrent is created)
     if ([[GroupsController groups] usesCustomDownloadLocationForIndex: [torrent groupValue]])
