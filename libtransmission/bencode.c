@@ -1358,7 +1358,6 @@ jsonStringFunc( const tr_benc * val, void * vdata )
     {
         switch( *it )
         {
-            case '/': evbuffer_add( data->out, "\\/", 2 ); break;
             case '\b': evbuffer_add( data->out, "\\b", 2 ); break;
             case '\f': evbuffer_add( data->out, "\\f", 2 ); break;
             case '\n': evbuffer_add( data->out, "\\n", 2 ); break;
