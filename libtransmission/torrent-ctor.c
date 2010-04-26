@@ -430,7 +430,6 @@ isPriority( int i )
 void
 tr_ctorSetBandwidthPriority( tr_ctor * ctor, tr_priority_t priority )
 {
-fprintf( stderr, "in tr_ctorSetPriority with %d\n", (int)priority );
     if( isPriority( priority ) )
         ctor->bandwidthPriority = priority;
 }
