@@ -10,8 +10,9 @@
  * $Id$
  */
 
+#include <ctype.h> /* isprint() */
 #include <stdio.h>
-#include <stdlib.h> /* free */
+#include <stdlib.h> /* free() */
 #include <string.h>
 
 #ifdef WIN32
@@ -234,7 +235,8 @@ _tr_blocklistSetContent( tr_blocklist * b,
     FILE *       in;
     FILE *       out;
     char *       line;
-    int          lineCount = 0;
+    int          inCount = 0;
+    int          outCount = 0;
     const char * err_fmt = _( "Couldn't read \"%1$s\": %2$s" );
 
     if( !filename )
@@ -262,11 +264,23 @@ _tr_blocklistSetContent( tr_blocklist * b,
 
     while( !fggets( &line, in ) )
     {
+        const char * pch;
         char * rangeBegin;
         char * rangeEnd;
         char * crpos;
         tr_address  addr;
         struct tr_ip_range range;
+
+        ++inCount;
+
+        for( pch=line; pch && *pch; ++pch )
+            if( !isprint( *pch ) )
+                break;
+        if( !pch || *pch ) {
+            tr_err( "skipping line #%d which contains nonprintable characters\n", inCount );
+            free( line );
+            continue;
+        }
 
         rangeBegin = strrchr( line, ':' );
         if( !rangeBegin ){ free( line ); continue; }
@@ -296,12 +310,12 @@ _tr_blocklistSetContent( tr_blocklist * b,
             break;
         }
 
-        ++lineCount;
+        ++outCount;
     }
 
     {
         char * base = tr_basename( b->filename );
-        tr_inf( _( "Blocklist \"%1$s\" updated with %2$'d entries" ), base, lineCount );
+        tr_inf( _( "Blocklist \"%1$s\" updated with %2$'d entries" ), base, outCount );
         tr_free( base );
     }
 
@@ -311,6 +325,6 @@ _tr_blocklistSetContent( tr_blocklist * b,
 
     blocklistLoad( b );
 
-    return lineCount;
+    return outCount;
 }
 
