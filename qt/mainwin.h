@@ -91,6 +91,9 @@ class TrMainWindow: public QMainWindow
         void updateNetworkIcon( );
         QWidgetList myHidden;
 
+    public slots:
+        void openURL( QString );
+
     private slots:
         void onDetailsDestroyed( );
         void onShowModeClicked( );

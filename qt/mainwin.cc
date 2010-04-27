@@ -1115,12 +1115,19 @@ TrMainWindow :: openTorrent( )
 void
 TrMainWindow :: openURL( )
 {
+    QString tmp;
+    openURL( tmp );
+}
+
+void
+TrMainWindow :: openURL( QString url )
+{
     bool ok;
     const QString key = QInputDialog::getText( this,
                                                tr( "Add URL or Magnet Link" ),
                                                tr( "Add URL or Magnet Link" ),
                                                QLineEdit::Normal,
-                                               QString( ),
+                                               url,
                                                &ok );
     if( ok && !key.isEmpty( ) )
         mySession.addTorrent( key );

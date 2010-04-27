@@ -14,6 +14,9 @@
 #include <ctime>
 #include <iostream>
 
+#include <QDBusConnection>
+#include <QDBusError>
+#include <QDBusMessage>
 #include <QDialogButtonBox>
 #include <QIcon>
 #include <QLabel>
@@ -26,6 +29,7 @@
 #include <libtransmission/version.h>
 
 #include "app.h"
+#include "dbus-adaptor.h"
 #include "mainwin.h"
 #include "options.h"
 #include "prefs.h"
@@ -37,6 +41,10 @@
 
 namespace
 {
+    const char * DBUS_SERVICE     ( "com.transmissionbt.Transmission"  );
+    const char * DBUS_OBJECT_PATH ( "/com/transmissionbt/Transmission" );
+    const char * DBUS_INTERFACE   ( "com.transmissionbt.Transmission"  );
+
     const char * MY_NAME( "transmission" );
 
     const tr_option opts[] =
@@ -218,6 +226,14 @@ MyApp :: MyApp( int& argc, char ** argv ):
 
     for( QStringList::const_iterator it=filenames.begin(), end=filenames.end(); it!=end; ++it )
         mySession->addTorrent( *it );
+
+    // register as the dbus handler for Transmission
+    new TrDBusAdaptor( this );
+    QDBusConnection bus = QDBusConnection::sessionBus();
+    if (!bus.registerService("com.transmissionbt.Transmission"))
+        fprintf(stderr, "%s\n", qPrintable(bus.lastError().message()));
+    if( !bus.registerObject( "/com/transmissionbt/Transmission", this ))
+        fprintf(stderr, "%s\n", qPrintable(bus.lastError().message()));
 }
 
 void
@@ -298,19 +314,29 @@ MyApp :: refreshTorrents( )
     }
 }
 
+/***
+****
+***/
+
 void
-MyApp :: addTorrent( const QString& filename )
+MyApp :: addTorrent( const QString& key )
 {
-    if( myPrefs->getBool( Prefs :: OPTIONS_PROMPT ) ) {
-        Options * o = new Options( *mySession, *myPrefs, filename, myWindow );
+    if( !myPrefs->getBool( Prefs :: OPTIONS_PROMPT ) )
+        mySession->addTorrent( key );
+    else if( !QFile( key ).exists( ) )
+        myWindow->openURL( key );
+    else {
+        Options * o = new Options( *mySession, *myPrefs, key, myWindow );
         o->show( );
-        QApplication :: alert( o );
-    } else {
-        mySession->addTorrent( filename );
-        QApplication :: alert ( myWindow );
     }
+    raise( );
 }
 
+void
+MyApp :: raise( )
+{
+    QApplication :: alert ( myWindow );
+}
 
 /***
 ****
@@ -319,6 +345,50 @@ MyApp :: addTorrent( const QString& filename )
 int
 main( int argc, char * argv[] )
 {
+    // find .torrents, URLs, magnet links, etc in the command-line args
+    int c;
+    QStringList addme;
+    const char * optarg;
+    char ** argvv = argv;
+    while( ( c = tr_getopt( getUsage( ), argc, (const char **)argvv, opts, &optarg ) ) )
+        if( c == TR_OPT_UNK )
+            addme.append( optarg );
+
+    // try to delegate the work to an existing copy of Transmission
+    // before starting ourselves...
+    bool delegated = false;
+    QDBusConnection bus = QDBusConnection::sessionBus();
+    for( int i=0, n=addme.size(); i<n; ++i )
+    {
+        const QString key = addme[i];
+
+        QDBusMessage request = QDBusMessage::createMethodCall( DBUS_SERVICE,
+                                                               DBUS_OBJECT_PATH,
+                                                               DBUS_INTERFACE,
+                                                               "AddMetainfo" );
+        QList<QVariant> arguments;
+        arguments.push_back( QVariant( key ) );
+        request.setArguments( arguments );
+
+        QDBusMessage response = bus.call( request );
+        arguments = response.arguments( );
+        delegated |= (arguments.size()==1) && arguments[0].toBool();
+    }
+    if( addme.empty() )
+    {
+        QDBusMessage request = QDBusMessage::createMethodCall( DBUS_SERVICE,
+                                                               DBUS_OBJECT_PATH,
+                                                               DBUS_INTERFACE,
+                                                               "PresentWindow" );
+        QDBusMessage response = bus.call( request );
+        QList<QVariant> arguments = response.arguments( );
+        delegated |= (arguments.size()==1) && arguments[0].toBool();
+    }
+
+    if( delegated )
+        return 0;
+
+    tr_optind = 1;
     MyApp app( argc, argv );
     return app.exec( );
 }
