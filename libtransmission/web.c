@@ -55,10 +55,8 @@ enum
 struct tr_web
 {
     int close_mode;
-    tr_bool haveAddr;
     tr_list * tasks;
     tr_lock * taskLock;
-    tr_address addr;
 };
 
 
@@ -139,8 +137,9 @@ getTimeoutFromURL( const char * url )
 }
 
 static CURL *
-createEasy( tr_session * s, struct tr_web * w, struct tr_web_task * task )
+createEasy( tr_session * s, struct tr_web_task * task )
 {
+    const tr_address * addr;
     CURL * e = curl_easy_init( );
     const long verbose = getenv( "TR_CURL_VERBOSE" ) != NULL;
 
@@ -177,8 +176,10 @@ createEasy( tr_session * s, struct tr_web * w, struct tr_web_task * task )
     curl_easy_setopt( e, CURLOPT_VERBOSE, verbose );
     curl_easy_setopt( e, CURLOPT_WRITEDATA, task );
     curl_easy_setopt( e, CURLOPT_WRITEFUNCTION, writeFunc );
-    if( w->haveAddr )
-        curl_easy_setopt( e, CURLOPT_INTERFACE, tr_ntop_non_ts( &w->addr ) );
+
+    if(( addr = tr_sessionGetPublicAddress( s, TR_AF_INET )))
+        curl_easy_setopt( e, CURLOPT_INTERFACE, tr_ntop_non_ts( addr ) );
+
     if( task->range )
         curl_easy_setopt( e, CURLOPT_RANGE, task->range );
 
@@ -235,16 +236,6 @@ tr_webRun( tr_session         * session,
     }
 }
 
-void
-tr_webSetInterface( tr_session * session, const tr_address * addr )
-{
-    struct tr_web * web = session->web;
-
-    if( web != NULL )
-        if(( web->haveAddr = ( addr != NULL )))
-            web->addr = *addr;
-}
-
 static void
 tr_webThreadFunc( void * vsession )
 {
@@ -282,7 +273,7 @@ tr_webThreadFunc( void * vsession )
         tr_lockLock( web->taskLock );
         while(( task = tr_list_pop_front( &web->tasks )))
         {
-            curl_multi_add_handle( multi, createEasy( session, web, task ));
+            curl_multi_add_handle( multi, createEasy( session, task ));
             /*fprintf( stderr, "adding a task.. taskCount is now %d\n", taskCount );*/
             ++taskCount;
         }
