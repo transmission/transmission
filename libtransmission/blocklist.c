@@ -274,7 +274,7 @@ _tr_blocklistSetContent( tr_blocklist * b,
         ++inCount;
 
         for( pch=line; pch && *pch; ++pch )
-            if( !isprint( *pch ) )
+            if( !isprint( *pch ) && ( *pch != '\r' ) && ( *pch != '\n' ) )
                 break;
         if( !pch || *pch ) {
             tr_err( "skipping line #%d which contains nonprintable characters\n", inCount );
