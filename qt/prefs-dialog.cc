@@ -267,12 +267,12 @@ PrefsDialog :: createSpeedTab( )
     HIG * hig = new HIG( this );
     hig->addSectionTitle( tr( "Speed Limits" ) );
 
-        l = checkBoxNew( tr( "Limit &download speed (KB/s):" ), Prefs::DSPEED_ENABLED );
+        l = checkBoxNew( tr( "Limit &download speed (KiB/s):" ), Prefs::DSPEED_ENABLED );
         r = spinBoxNew( Prefs::DSPEED, 0, INT_MAX, 5 );
         hig->addRow( l, r );
         enableBuddyWhenChecked( qobject_cast<QCheckBox*>(l), r );
 
-        l = checkBoxNew( tr( "Limit &upload speed (KB/s):" ), Prefs::USPEED_ENABLED );
+        l = checkBoxNew( tr( "Limit &upload speed (KiB/s):" ), Prefs::USPEED_ENABLED );
         r = spinBoxNew( Prefs::USPEED, 0, INT_MAX, 5 );
         hig->addRow( l, r );
         enableBuddyWhenChecked( qobject_cast<QCheckBox*>(l), r );
@@ -293,11 +293,11 @@ PrefsDialog :: createSpeedTab( )
         QString s = tr( "<small>Override normal speed limits manually or at scheduled times</small>" );
         hig->addWideControl( new QLabel( s ) );
 
-        s = tr( "Limit d&ownload speed (KB/s):" );
+        s = tr( "Limit d&ownload speed (KiB/s):" );
         r = spinBoxNew( Prefs :: ALT_SPEED_LIMIT_DOWN, 0, INT_MAX, 5 );
         hig->addRow( s, r );
 
-        s = tr( "Limit u&pload speed (KB/s):" );
+        s = tr( "Limit u&pload speed (KiB/s):" );
         r = spinBoxNew( Prefs :: ALT_SPEED_LIMIT_UP, 0, INT_MAX, 5 );
         hig->addRow( s, r );
 

@@ -438,7 +438,7 @@ Torrent.prototype =
 				break;
 
 			case Torrent._StatusDownloading:
-				// 'Downloading from 36 of 40 peers - DL: 60.2 KB/s UL: 4.3 KB/s'
+				// 'Downloading from 36 of 40 peers - DL: 60.2 KiB/s UL: 4.3 KiB/s'
 				c = 'Downloading from ';
 				c += this.peersSendingToUs();
 				c += ' of ';
@@ -451,7 +451,7 @@ Torrent.prototype =
 				break;
 
 			case Torrent._StatusSeeding:
-				// 'Seeding to 13 of 22 peers - UL: 36.2 KB/s'
+				// 'Seeding to 13 of 22 peers - UL: 36.2 KiB/s'
 				c = 'Seeding to ';
 				c += this.peersGettingFromUs();
 				c += ' of ';
@@ -519,7 +519,7 @@ Torrent.prototype =
 			}
 			
 			// Create the 'progress details' label
-			// Eg: '101 MB of 631 MB (16.02%) - 2 hr remaining'
+			// Eg: '101 MiB of 631 MiB (16.02%) - 2 hr remaining'
 			c = Math.formatBytes( this._sizeWhenDone - this._leftUntilDone );
 			c += ' of ';
 			c += Math.formatBytes( this._sizeWhenDone );
@@ -560,7 +560,7 @@ Torrent.prototype =
 			}
 
 			// Create the 'progress details' label
-			// Eg: '698.05 MB, uploaded 8.59 GB (Ratio: 12.3)'
+			// Eg: '698.05 MiB, uploaded 8.59 GiB (Ratio: 12.3)'
 			c = Math.formatBytes( this._size );
 			c += ', uploaded ';
 			c += Math.formatBytes( this._upload_total );

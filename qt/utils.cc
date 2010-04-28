@@ -51,17 +51,17 @@ Utils :: sizeToString( double size )
         if( size < (int64_t)MEGABYTE_FACTOR )
         {
             displayed_size = (double)size / KILOBYTE_FACTOR;
-            str = tr( "%L1 KB" ).arg( displayed_size,  0, 'f', 1 );
+            str = tr( "%L1 KiB" ).arg( displayed_size,  0, 'f', 1 );
         }
         else if( size < (int64_t)GIGABYTE_FACTOR )
         {
             displayed_size = (double)size / MEGABYTE_FACTOR;
-            str = tr( "%L1 MB" ).arg( displayed_size,  0, 'f', 1 );
+            str = tr( "%L1 MiB" ).arg( displayed_size,  0, 'f', 1 );
         }
         else
         {
             displayed_size = (double) size / GIGABYTE_FACTOR;
-            str = tr( "%L1 GB" ).arg( displayed_size,  0, 'f', 1 );
+            str = tr( "%L1 GiB" ).arg( displayed_size,  0, 'f', 1 );
         }
     }
 
@@ -143,12 +143,12 @@ Utils :: speedToString( const Speed& speed )
     const double kbps( speed.kbps( ) );
     QString str;
 
-    if( kbps < 1000.0 )  /* 0.0 KB to 999.9 KB */
-        str = tr( "%L1 KB/s" ).arg( kbps, 0, 'f', 1 );
-    else if( kbps < 102400.0 ) /* 0.98 MB to 99.99 MB */
-        str = tr( "%L1 MB/s" ).arg( kbps/1024.0, 0, 'f', 2 );
+    if( kbps < 1000.0 )  /* 0.0 KiB to 999.9 KiB */
+        str = tr( "%L1 KiB/s" ).arg( kbps, 0, 'f', 1 );
+    else if( kbps < 102400.0 ) /* 0.98 MiB to 99.99 MiB */
+        str = tr( "%L1 MiB/s" ).arg( kbps/1024.0, 0, 'f', 2 );
     else // insane speeds
-        str = tr( "%L1 GB/s" ).arg( kbps/(1024.0*1024.0), 0, 'f', 1 );
+        str = tr( "%L1 GiB/s" ).arg( kbps/(1024.0*1024.0), 0, 'f', 1 );
 
     return str;
 }

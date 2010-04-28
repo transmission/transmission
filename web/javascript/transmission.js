@@ -943,12 +943,12 @@ Transmission.prototype =
 
 		if (!iPhone)
 		{
-			setInnerHTML( $('#limited_download_rate')[0], 'Limit (' + down_limit + ' KB/s)' );
+			setInnerHTML( $('#limited_download_rate')[0], 'Limit (' + down_limit + ' KiB/s)' );
 			var key = down_limited ? '#limited_download_rate'
 			                       : '#unlimited_download_rate';
 			$(key).deselectMenuSiblings().selectMenuItem();
 		
-			setInnerHTML( $('#limited_upload_rate')[0], 'Limit (' + up_limit + ' KB/s)' );
+			setInnerHTML( $('#limited_upload_rate')[0], 'Limit (' + up_limit + ' KiB/s)' );
 			key = up_limited ? '#limited_upload_rate'
 			                 : '#unlimited_upload_rate';
 			$(key).deselectMenuSiblings().selectMenuItem();
@@ -1053,7 +1053,7 @@ Transmission.prototype =
 					$element.deselectMenuSiblings().selectMenuItem();
 					args[RPC._DownSpeedLimited] = false;
 				} else {
-					setInnerHTML( $('#limited_download_rate')[0], 'Limit (' + rate + ' KB/s)' );
+					setInnerHTML( $('#limited_download_rate')[0], 'Limit (' + rate + ' KiB/s)' );
 					$('#limited_download_rate').deselectMenuSiblings().selectMenuItem();
 					$('div.preference input#download_rate')[0].value = rate;
 					args[RPC._DownSpeedLimit] = parseInt( rate );
@@ -1071,7 +1071,7 @@ Transmission.prototype =
 					$element.deselectMenuSiblings().selectMenuItem();
 					args[RPC._UpSpeedLimited] = false;
 				} else {
-					setInnerHTML( $('#limited_upload_rate')[0], 'Limit (' + rate + ' KB/s)' );
+					setInnerHTML( $('#limited_upload_rate')[0], 'Limit (' + rate + ' KiB/s)' );
 					$('#limited_upload_rate').deselectMenuSiblings().selectMenuItem();
 					$('div.preference input#upload_rate')[0].value = rate;
 					args[RPC._UpSpeedLimit] = parseInt( rate );

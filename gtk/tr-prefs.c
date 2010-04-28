@@ -1198,14 +1198,14 @@ bandwidthPage( GObject * core )
     t = hig_workarea_create( );
     hig_workarea_add_section_title( t, &row, _( "Speed Limits" ) );
 
-        s = _( "Limit _download speed (KB/s):" );
+        s = _( "Limit _download speed (KiB/s):" );
         w = new_check_button( s, TR_PREFS_KEY_DSPEED_ENABLED, core );
         w2 = new_spin_button( TR_PREFS_KEY_DSPEED, core, 0, INT_MAX, 5 );
         gtk_widget_set_sensitive( GTK_WIDGET( w2 ), pref_flag_get( TR_PREFS_KEY_DSPEED_ENABLED ) );
         g_signal_connect( w, "toggled", G_CALLBACK( target_cb ), w2 );
         hig_workarea_add_row_w( t, &row, w, w2, NULL );
 
-        s = _( "Limit _upload speed (KB/s):" );
+        s = _( "Limit _upload speed (KiB/s):" );
         w = new_check_button( s, TR_PREFS_KEY_USPEED_ENABLED, core );
         w2 = new_spin_button( TR_PREFS_KEY_USPEED, core, 0, INT_MAX, 5 );
         gtk_widget_set_sensitive( GTK_WIDGET( w2 ), pref_flag_get( TR_PREFS_KEY_USPEED_ENABLED ) );
@@ -1230,11 +1230,11 @@ bandwidthPage( GObject * core )
         gtk_misc_set_alignment( GTK_MISC( w ), 0.5f, 0.5f );
         hig_workarea_add_wide_control( t, &row, w );
 
-        s = _( "Limit do_wnload speed (KB/s):" );
+        s = _( "Limit do_wnload speed (KiB/s):" );
         w = new_spin_button( TR_PREFS_KEY_ALT_SPEED_DOWN, core, 0, INT_MAX, 5 );
         hig_workarea_add_row( t, &row, s, w, NULL );
 
-        s = _( "Limit u_pload speed (KB/s):" );
+        s = _( "Limit u_pload speed (KiB/s):" );
         w = new_spin_button( TR_PREFS_KEY_ALT_SPEED_UP, core, 0, INT_MAX, 5 );
         hig_workarea_add_row( t, &row, s, w, NULL );
 

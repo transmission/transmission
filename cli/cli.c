@@ -61,7 +61,7 @@ static const struct tr_option options[] =
     { 'b', "blocklist",            "Enable peer blocklists", "b",  0, NULL        },
     { 'B', "no-blocklist",         "Disable peer blocklists", "B",  0, NULL        },
     { 'c', "comment",              "Set the new torrent's comment", "c",  1, "<comment>" },
-    { 'd', "downlimit",            "Set max download speed in KB/s", "d",  1, "<speed>"   },
+    { 'd', "downlimit",            "Set max download speed in KiB/s", "d",  1, "<speed>"   },
     { 'D', "no-downlimit",         "Don't limit the download speed", "D",  0, NULL        },
     { 910, "encryption-required",  "Encrypt all peer connections", "er", 0, NULL        },
     { 911, "encryption-preferred", "Prefer encrypted peer connections", "ep", 0, NULL        },
@@ -76,7 +76,7 @@ static const struct tr_option options[] =
     { 'r', "private",              "Set the new torrent's 'private' flag", "r",  0, NULL        },
     { 's', "scrape",               "Scrape the torrent and exit", "s",  0, NULL        },
     { 't', "tos", "Peer socket TOS (0 to 255, default=" TR_DEFAULT_PEER_SOCKET_TOS_STR ")", "t", 1, "<tos>" },
-    { 'u', "uplimit",              "Set max upload speed in KB/s", "u",  1, "<speed>"   },
+    { 'u', "uplimit",              "Set max upload speed in KiB/s", "u",  1, "<speed>"   },
     { 'U', "no-uplimit",           "Don't limit the upload speed", "U",  0, NULL        },
     { 'v', "verify",               "Verify the specified torrent", "v",  0, NULL        },
     { 'w', "download-dir",         "Where to save downloaded data", "w",  1, "<path>"    },
@@ -257,8 +257,8 @@ getStatusStr( const tr_stat * st,
         tr_strlratio( ratioStr, st->ratio, sizeof( ratioStr ) );
         tr_snprintf(
             buf, buflen,
-            "Progress: %.1f%%, dl from %d of %d peers (%.0f KB/s), "
-            "ul to %d (%.0f KB/s) [%s]",
+            "Progress: %.1f%%, dl from %d of %d peers (%.0f KiB/s), "
+            "ul to %d (%.0f KiB/s) [%s]",
             tr_truncd( 100 * st->percentDone, 1 ),
             st->peersSendingToUs,
             st->peersConnected,
@@ -273,7 +273,7 @@ getStatusStr( const tr_stat * st,
         tr_strlratio( ratioStr, st->ratio, sizeof( ratioStr ) );
         tr_snprintf(
             buf, buflen,
-            "Seeding, uploading to %d of %d peer(s), %.0f KB/s [%s]",
+            "Seeding, uploading to %d of %d peer(s), %.0f KiB/s [%s]",
             st->peersGettingFromUs, st->peersConnected,
             st->pieceUploadSpeed, ratioStr );
     }

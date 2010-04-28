@@ -134,17 +134,17 @@ tr_strlsize( char *  buf,
         if( size < (guint64)MEGABYTE_FACTOR )
         {
             displayed_size = (gdouble) size / KILOBYTE_FACTOR;
-            g_snprintf( buf, buflen, _( "%'.1f KB" ), displayed_size );
+            g_snprintf( buf, buflen, _( "%'.1f KiB" ), displayed_size );
         }
         else if( size < (guint64)GIGABYTE_FACTOR )
         {
             displayed_size = (gdouble) size / MEGABYTE_FACTOR;
-            g_snprintf( buf, buflen, _( "%'.1f MB" ), displayed_size );
+            g_snprintf( buf, buflen, _( "%'.1f MiB" ), displayed_size );
         }
         else
         {
             displayed_size = (gdouble) size / GIGABYTE_FACTOR;
-            g_snprintf( buf, buflen, _( "%'.1f GB" ), displayed_size );
+            g_snprintf( buf, buflen, _( "%'.1f GiB" ), displayed_size );
         }
     }
 #endif
@@ -158,14 +158,14 @@ tr_strlspeed( char * buf,
 {
     const double speed = kb_sec;
 
-    if( speed < 1000.0 )  /* 0.0 KB to 999.9 KB */
-        g_snprintf( buf, buflen, _( "%'.1f KB/s" ), speed );
-    else if( speed < 102400.0 ) /* 0.98 MB to 99.99 MB */
-        g_snprintf( buf, buflen, _( "%'.2f MB/s" ), ( speed / KILOBYTE_FACTOR ) );
-    else if( speed < 1024000.0 ) /* 100.0 MB to 999.9 MB */
-        g_snprintf( buf, buflen, _( "%'.1f MB/s" ), ( speed / MEGABYTE_FACTOR ) );
+    if( speed < 1000.0 )  /* 0.0 KiB to 999.9 KiB */
+        g_snprintf( buf, buflen, _( "%'.1f KiB/s" ), speed );
+    else if( speed < 102400.0 ) /* 0.98 MiB to 99.99 MiB */
+        g_snprintf( buf, buflen, _( "%'.2f MiB/s" ), ( speed / KILOBYTE_FACTOR ) );
+    else if( speed < 1024000.0 ) /* 100.0 MiB to 999.9 MiB */
+        g_snprintf( buf, buflen, _( "%'.1f MiB/s" ), ( speed / MEGABYTE_FACTOR ) );
     else /* insane speeds */
-        g_snprintf( buf, buflen, _( "%'.2f GB/s" ), ( speed / GIGABYTE_FACTOR ) );
+        g_snprintf( buf, buflen, _( "%'.2f GiB/s" ), ( speed / GIGABYTE_FACTOR ) );
 
     return buf;
 }

@@ -175,8 +175,6 @@ removeResponse( GtkDialog * dialog,
 
     if( response == GTK_RESPONSE_ACCEPT )
         removeTorrents( data );
-    else
-        g_slist_foreach( data->torrents, (GFunc)g_object_unref, NULL );
 
     gtk_widget_destroy( GTK_WIDGET( dialog ) );
     g_slist_free( data->torrents );

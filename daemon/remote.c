@@ -65,8 +65,8 @@ static tr_option opts[] =
     { 'a', "add",                   "Add torrent files by filename or URL", "a",  0, NULL },
     { 970, "alt-speed",             "Use the alternate Limits", "as",  0, NULL },
     { 971, "no-alt-speed",          "Don't use the alternate Limits", "AS",  0, NULL },
-    { 972, "alt-speed-downlimit",   "max alternate download speed (in KB/s)", "asd",  1, "<speed>" },
-    { 973, "alt-speed-uplimit",     "max alternate upload speed (in KB/s)", "asu",  1, "<speed>" },
+    { 972, "alt-speed-downlimit",   "max alternate download speed (in KiB/s)", "asd",  1, "<speed>" },
+    { 973, "alt-speed-uplimit",     "max alternate upload speed (in KiB/s)", "asu",  1, "<speed>" },
     { 974, "alt-speed-scheduler",   "Use the scheduled on/off times", "asc",  0, NULL },
     { 975, "no-alt-speed-scheduler","Don't use the scheduled on/off times", "ASC",  0, NULL },
     { 976, "alt-speed-time-begin",  "Time to start using the alt speed limits (in hhmm)", NULL,  1, "<time>" },
@@ -76,7 +76,7 @@ static tr_option opts[] =
     { 'c', "incomplete-dir",        "Where to store new torrents until they're complete", "c", 1, "<dir>" },
     { 'C', "no-incomplete-dir",     "Don't store incomplete torrents in a different location", "C", 0, NULL },
     { 'b', "debug",                 "Print debugging information", "b",  0, NULL },
-    { 'd', "downlimit",             "Set the maximum global download speed in KB/s", "d",  1, "<speed>" },
+    { 'd', "downlimit",             "Set the maximum global download speed in KiB/s", "d",  1, "<speed>" },
     { 'D', "no-downlimit",          "Don't limit the global download speed", "D",  0, NULL },
     { 910, "encryption-required",   "Encrypt all peer connections", "er", 0, NULL },
     { 911, "encryption-preferred",  "Prefer encrypted peer connections", "ep", 0, NULL },
@@ -118,13 +118,13 @@ static tr_option opts[] =
     { 991, "no-start-paused",       "Start added torrents unpaused", NULL, 0, NULL },
     { 992, "trash-torrent",         "Delete torrents after adding", NULL, 0, NULL },
     { 993, "no-trash-torrent",      "Do not delete torrents after adding", NULL, 0, NULL },
-    { 980, "torrent-downlimit",     "Set the maximum download speed for the current torrent(s) in KB/s", "td",  1, "<speed>" },
+    { 980, "torrent-downlimit",     "Set the maximum download speed for the current torrent(s) in KiB/s", "td",  1, "<speed>" },
     { 981, "no-torrent-downlimit",  "Don't limit the download speed for the current torrent(s)", "TD",  0, NULL },
-    { 982, "torrent-uplimit",       "Set the maximum upload speed for the current torrent(s) in KB/s", "tu",  1, "<speed>" },
+    { 982, "torrent-uplimit",       "Set the maximum upload speed for the current torrent(s) in KiB/s", "tu",  1, "<speed>" },
     { 983, "no-torrent-uplimit",    "Don't limit the upload speed for the current torrent(s)", "TU",  0, NULL },
     { 984, "honor-session",         "Make the current torrent(s) honor the session limits", "hl",  0, NULL },
     { 985, "no-honor-session",      "Make the current torrent(s) not honor the session limits", "HL",  0, NULL },
-    { 'u', "uplimit",               "Set the maximum global upload speed in KB/s", "u",  1, "<speed>" },
+    { 'u', "uplimit",               "Set the maximum global upload speed in KiB/s", "u",  1, "<speed>" },
     { 'U', "no-uplimit",            "Don't limit the global upload speed", "U",  0, NULL },
     { 'v', "verify",                "Verify the current torrent(s)", "v",  0, NULL },
     { 'V', "version",               "Show version number and exit", "V", 0, NULL },
@@ -991,17 +991,17 @@ strlsize( char *  buf, int64_t size, size_t  buflen )
         if( size < (int64_t)MEGABYTE_FACTOR )
         {
             displayed_size = (double) size / KILOBYTE_FACTOR;
-            tr_snprintf( buf, buflen, "%'.1f KB", displayed_size );
+            tr_snprintf( buf, buflen, "%'.1f KiB", displayed_size );
         }
         else if( size < (int64_t)GIGABYTE_FACTOR )
         {
             displayed_size = (double) size / MEGABYTE_FACTOR;
-            tr_snprintf( buf, buflen, "%'.1f MB", displayed_size );
+            tr_snprintf( buf, buflen, "%'.1f MiB", displayed_size );
         }
         else
         {
             displayed_size = (double) size / GIGABYTE_FACTOR;
-            tr_snprintf( buf, buflen, "%'.1f GB", displayed_size );
+            tr_snprintf( buf, buflen, "%'.1f GiB", displayed_size );
         }
     }
     return buf;
@@ -1133,23 +1133,23 @@ printSession( tr_benc * top )
                 printf( "  Default seed ratio limit: %s\n", buf );
 
                 if( altEnabled )
-                    tr_snprintf( buf, sizeof( buf ), "%"PRId64" KB/s", altUp );
+                    tr_snprintf( buf, sizeof( buf ), "%"PRId64" KiB/s", altUp );
                 else if( upEnabled )
-                    tr_snprintf( buf, sizeof( buf ), "%"PRId64" KB/s", upLimit );
+                    tr_snprintf( buf, sizeof( buf ), "%"PRId64" KiB/s", upLimit );
                 else
                     tr_strlcpy( buf, "Unlimited", sizeof( buf ) );
-                printf( "  Upload speed limit: %s  (%s limit: %"PRId64" KB/s; %s turtle limit: %"PRId64" KB/s)\n",
+                printf( "  Upload speed limit: %s  (%s limit: %"PRId64" KiB/s; %s turtle limit: %"PRId64" KiB/s)\n",
                         buf,
                         (upEnabled?"Enabled":"Disabled"), upLimit,
                         (altEnabled?"Enabled":"Disabled"), altUp );
 
                 if( altEnabled )
-                    tr_snprintf( buf, sizeof( buf ), "%"PRId64" KB/s", altDown );
+                    tr_snprintf( buf, sizeof( buf ), "%"PRId64" KiB/s", altDown );
                 else if( downEnabled )
-                    tr_snprintf( buf, sizeof( buf ), "%"PRId64" KB/s", downLimit );
+                    tr_snprintf( buf, sizeof( buf ), "%"PRId64" KiB/s", downLimit );
                 else
                     tr_strlcpy( buf, "Unlimited", sizeof( buf ) );
-                printf( "  Download speed limit: %s  (%s limit: %"PRId64" KB/s; %s turtle limit: %"PRId64" KB/s)\n",
+                printf( "  Download speed limit: %s  (%s limit: %"PRId64" KiB/s; %s turtle limit: %"PRId64" KiB/s)\n",
                         buf,
                         (downEnabled?"Enabled":"Disabled"), downLimit,
                         (altEnabled?"Enabled":"Disabled"), altDown );
@@ -1265,9 +1265,9 @@ printDetails( tr_benc * top )
             if( tr_bencDictFindInt( t, "eta", &i ) )
                 printf( "  ETA: %s\n", tr_strltime( buf, i, sizeof( buf ) ) );
             if( tr_bencDictFindInt( t, "rateDownload", &i ) )
-                printf( "  Download Speed: %.1f KB/s\n", i / 1024.0 );
+                printf( "  Download Speed: %.1f KiB/s\n", i / 1024.0 );
             if( tr_bencDictFindInt( t, "rateUpload", &i ) )
-                printf( "  Upload Speed: %.1f KB/s\n", i / 1024.0 );
+                printf( "  Upload Speed: %.1f KiB/s\n", i / 1024.0 );
             if( tr_bencDictFindInt( t, "haveUnchecked", &i )
               && tr_bencDictFindInt( t, "haveValid", &j ) )
             {
@@ -1539,7 +1539,7 @@ printDetails( tr_benc * top )
             {
                 printf( "  Download Limit: " );
                 if( boolVal )
-                    printf( "%" PRId64 " KB/s\n", i );
+                    printf( "%" PRId64 " KiB/s\n", i );
                 else
                     printf( "Unlimited\n" );
             }
@@ -1548,7 +1548,7 @@ printDetails( tr_benc * top )
             {
                 printf( "  Upload Limit: " );
                 if( boolVal )
-                    printf( "%" PRId64 " KB/s\n", i );
+                    printf( "%" PRId64 " KiB/s\n", i );
                 else
                     printf( "Unlimited\n" );
             }

@@ -451,7 +451,7 @@ options_page_new( struct DetailsImpl * d )
     tag = g_signal_connect( tb, "toggled", G_CALLBACK( global_speed_toggled_cb ), d );
     d->honorLimitsCheckTag = tag;
 
-    tb = gtk_check_button_new_with_mnemonic( _( "Limit _download speed (KB/s):" ) );
+    tb = gtk_check_button_new_with_mnemonic( _( "Limit _download speed (KiB/s):" ) );
     gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( tb ), FALSE );
     d->downLimitedCheck = tb;
     tag = g_signal_connect( tb, "toggled", G_CALLBACK( down_speed_toggled_cb ), d );
@@ -463,7 +463,7 @@ options_page_new( struct DetailsImpl * d )
     hig_workarea_add_row_w( t, &row, tb, w, NULL );
     d->downLimitSpin = w;
 
-    tb = gtk_check_button_new_with_mnemonic( _( "Limit _upload speed (KB/s):" ) );
+    tb = gtk_check_button_new_with_mnemonic( _( "Limit _upload speed (KiB/s):" ) );
     d->upLimitedCheck = tb;
     tag = g_signal_connect( tb, "toggled", G_CALLBACK( up_speed_toggled_cb ), d );
     d->upLimitedCheckTag = tag;

@@ -109,7 +109,7 @@ function setInnerHTML( e, html )
 
 /*
  *   Converts file & folder byte size values to more
- *   readable values (bytes, KB, MB, GB or TB).
+ *   readable values (bytes, KiB, MiB, GiB or TiB).
  *
  *   @param integer bytes
  *   @returns string
@@ -118,30 +118,30 @@ Math.formatBytes = function(bytes) {
     var size;
     var unit;
 
-    // Terabytes (TB).
+    // Terabytes (TiB).
     if ( bytes >= 1099511627776 ) {
         size = bytes / 1099511627776;
-		unit = ' TB';
+        unit = ' TiB';
 
-    // Gigabytes (GB).
+    // Gigabytes (GiB).
     } else if ( bytes >= 1073741824 ) {
         size = bytes / 1073741824;
-		unit = ' GB';
+        unit = ' GiB';
 
-    // Megabytes (MB).
+    // Megabytes (MiB).
     } else if ( bytes >= 1048576 ) {
         size = bytes / 1048576;
-		unit = ' MB';
+        unit = ' MiB';
 
-    // Kilobytes (KB).
+    // Kilobytes (KiB).
     } else if ( bytes >= 1024 ) {
         size = bytes / 1024;
-		unit = ' KB';
+        unit = ' KiB';
 
-    // The file is less than one KB
+    // The file is less than one KiB
     } else {
         size = bytes;
-		unit = ' bytes';
+        unit = ' bytes';
     }
 	
 	// Single-digit numbers have greater precision
