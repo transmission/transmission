@@ -4,10 +4,10 @@
  #pragma align 4 (tr_icon_logo)
 #endif
 #ifdef __GNUC__
-static const guint8 tr_icon_logo[] __attribute__ ( ( __aligned__ ( 4 ) ) )
+static const guint8 tr_icon_logo_48[] __attribute__ ( ( __aligned__ ( 4 ) ) )
     =
 #else
-static const guint8 tr_icon_logo[] =
+static const guint8 tr_icon_logo_48[] =
 #endif
     { ""
   /* Pixbuf magic (0x47646b50) */

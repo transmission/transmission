@@ -23,7 +23,8 @@
 #include "tr-prefs.h"
 #include "lock.h"
 
-#include "logo.h"
+#include "logo-24.h"
+#include "logo-48.h"
 #include "ratio-icon.h"
 #include "options-icon.h"
 #include "turtles.h"
@@ -143,14 +144,14 @@ BuiltinIconInfo;
 
 static const BuiltinIconInfo my_fallback_icons[] =
 {
-    { tr_icon_logo, WINDOW_ICON         },
-    { tr_icon_logo, TRAY_ICON           },
-    { tr_icon_logo, NOTIFICATION_ICON   },
-    { tr_icon_lock, "transmission-lock" },
-    { options_icon, "options"           },
-    { blue_turtle,  "alt-speed-on"      },
-    { grey_turtle,  "alt-speed-off"     },
-    { ratio_icon,   "ratio"             }
+    { tr_icon_logo_48,  WINDOW_ICON          },
+    { tr_icon_logo_24,  TRAY_ICON            },
+    { tr_icon_logo_48,  NOTIFICATION_ICON    },
+    { tr_icon_lock,     "transmission-lock"  },
+    { options_icon,     "options"            },
+    { blue_turtle,      "alt-speed-on"       },
+    { grey_turtle,      "alt-speed-off"      },
+    { ratio_icon,       "ratio"              }
 };
 
 static void
