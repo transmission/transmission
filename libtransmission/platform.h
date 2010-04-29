@@ -29,7 +29,7 @@
  #include <windows.h>
  #define MAX_PATH_LENGTH  MAX_PATH
 #else
- #define MAX_PATH_LENGTH  2048
+ #define MAX_PATH_LENGTH  4096
 #endif
 
 /**
