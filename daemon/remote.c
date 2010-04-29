@@ -246,8 +246,6 @@ static tr_option opts[] =
     { 991, "no-start-paused",       "Start added torrents unpaused", NULL, 0, NULL },
     { 992, "trash-torrent",         "Delete torrents after adding", NULL, 0, NULL },
     { 993, "no-trash-torrent",      "Do not delete torrents after adding", NULL, 0, NULL },
-    { 982, "torrent-uplimit",       "Set the maximum upload speed for the current torrent(s) in KiB/s", "tu",  1, "<speed>" },
-    { 983, "no-torrent-uplimit",    "Don't limit the upload speed for the current torrent(s)", "TU",  0, NULL },
     { 984, "honor-session",         "Make the current torrent(s) honor the session limits", "hl",  0, NULL },
     { 985, "no-honor-session",      "Make the current torrent(s) not honor the session limits", "HL",  0, NULL },
     { 'u', "uplimit",               "Set the max upload speed in KiB/s for the current torrent(s) or globally", "u", 1, "<speed>" },
