@@ -940,7 +940,7 @@ tr_torrentSetVerifyState( tr_torrent * tor, tr_verify_state state )
     tor->anyDate = tr_time( );
 }
 
-tr_torrent_activity
+static tr_torrent_activity
 tr_torrentGetActivity( tr_torrent * tor )
 {
     assert( tr_isTorrent( tor ) );
@@ -1713,11 +1713,13 @@ tr_torrentRecheckCompleteness( tr_torrent * tor )
         tor->completeness = completeness;
         tr_fdTorrentClose( tor->session, tor->uniqueId );
 
-        /* if the torrent is a seed now,
-         * and the files used to be in the incompleteDir,
-         * then move them to the destination directory */
-        if( tr_torrentIsSeed( tor ) && ( tor->currentDir == tor->incompleteDir ) )
-            tr_torrentSetLocation( tor, tor->downloadDir, TRUE, NULL, NULL );
+        if( tr_torrentIsSeed( tor ) )
+        {
+            tr_torrentCheckSeedRatio( tor );
+
+            if( tor->currentDir == tor->incompleteDir )
+                tr_torrentSetLocation( tor, tor->downloadDir, TRUE, NULL, NULL );
+        }
 
         fireCompletenessChange( tor, completeness );
 
