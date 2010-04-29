@@ -183,6 +183,105 @@ getUsage( void )
                 "See the man page for detailed explanations and many examples.";
 }
 
+/***
+****
+****  Command-Line Arguments
+****
+***/
+
+static tr_option opts[] =
+{
+    { 'a', "add",                   "Add torrent files by filename or URL", "a",  0, NULL },
+    { 970, "alt-speed",             "Use the alternate Limits", "as",  0, NULL },
+    { 971, "no-alt-speed",          "Don't use the alternate Limits", "AS",  0, NULL },
+    { 972, "alt-speed-downlimit",   "max alternate download speed (in KiB/s)", "asd",  1, "<speed>" },
+    { 973, "alt-speed-uplimit",     "max alternate upload speed (in KiB/s)", "asu",  1, "<speed>" },
+    { 974, "alt-speed-scheduler",   "Use the scheduled on/off times", "asc",  0, NULL },
+    { 975, "no-alt-speed-scheduler","Don't use the scheduled on/off times", "ASC",  0, NULL },
+    { 976, "alt-speed-time-begin",  "Time to start using the alt speed limits (in hhmm)", NULL,  1, "<time>" },
+    { 977, "alt-speed-time-end",    "Time to stop using the alt speed limits (in hhmm)", NULL,  1, "<time>" },
+    { 978, "alt-speed-days",        "Numbers for any/all days of the week - eg. \"1-7\"", NULL,  1, "<days>" },
+    { 963, "blocklist-update",      "Blocklist update", NULL, 0, NULL },
+    { 'c', "incomplete-dir",        "Where to store new torrents until they're complete", "c", 1, "<dir>" },
+    { 'C', "no-incomplete-dir",     "Don't store incomplete torrents in a different location", "C", 0, NULL },
+    { 'b', "debug",                 "Print debugging information", "b",  0, NULL },
+    { 'd', "downlimit",             "Set the max download speed in KiB/s for the current torrent(s) or globally", "u", 1, "<speed>" },
+    { 'D', "no-downlimit",          "Disable max download speed for the current torrent(s) or globally", "U", 0, NULL },
+    { 910, "encryption-required",   "Encrypt all peer connections", "er", 0, NULL },
+    { 911, "encryption-preferred",  "Prefer encrypted peer connections", "ep", 0, NULL },
+    { 912, "encryption-tolerated",  "Prefer unencrypted peer connections", "et", 0, NULL },
+    { 'f', "files",                 "List the current torrent(s)' files", "f",  0, NULL },
+    { 'g', "get",                   "Mark files for download", "g",  1, "<files>" },
+    { 'G', "no-get",                "Mark files for not downloading", "G",  1, "<files>" },
+    { 'i', "info",                  "Show the current torrent(s)' details", "i",  0, NULL },
+    { 920, "session-info",          "Show the session's details", "si", 0, NULL },
+    { 921, "session-stats",         "Show the session's statistics", "st", 0, NULL },
+    { 'l', "list",                  "List all torrents", "l",  0, NULL },
+    { 960, "move",                  "Move current torrent's data to a new folder", NULL, 1, "<path>" },
+    { 961, "find",                  "Tell Transmission where to find a torrent's data", NULL, 1, "<path>" },
+    { 'm', "portmap",               "Enable portmapping via NAT-PMP or UPnP", "m",  0, NULL },
+    { 'M', "no-portmap",            "Disable portmapping", "M",  0, NULL },
+    { 'n', "auth",                  "Set authentication info", "n",  1, "<user:pass>" },
+    { 'N', "netrc",                 "Set authentication info from a .netrc file", "N",  1, "<filename>" },
+    { 'o', "dht",                   "Enable distributed hash tables (DHT)", "o", 0, NULL },
+    { 'O', "no-dht",                "Disable distributed hash tables (DHT)", "O", 0, NULL },
+    { 'p', "port",                  "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "p", 1, "<port>" },
+    { 962, "port-test",             "Port testing", "pt", 0, NULL },
+    { 'P', "random-port",           "Random port for incomping peers", "P", 0, NULL },
+    { 900, "priority-high",         "Set the files' priorities as high", "ph", 1, "<files>" },
+    { 901, "priority-normal",       "Set the files' priorities as normal", "pn", 1, "<files>" },
+    { 902, "priority-low",          "Set the files' priorities as low", "pl", 1, "<files>" },
+    { 'r', "remove",                "Remove the current torrent(s)", "r",  0, NULL },
+    { 930, "peers",                 "Set the maximum number of peers for the current torrent(s) or globally", "pr", 1, "<max>" },
+    { 'R', "remove-and-delete",     "Remove the current torrent(s) and delete local data", NULL, 0, NULL },
+    { 950, "seedratio",             "Let the current torrent(s) seed until a specific ratio", "sr", 1, "ratio" },
+    { 951, "seedratio-default",     "Let the current torrent(s) use the global seedratio settings", "srd", 0, NULL },
+    { 952, "no-seedratio",          "Let the current torrent(s) seed regardless of ratio", "SR", 0, NULL },
+    { 953, "global-seedratio",      "All torrents, unless overridden by a per-torrent setting, should seed until a specific ratio", "gsr", 1, "ratio" },
+    { 954, "no-global-seedratio",   "All torrents, unless overridden by a per-torrent setting, should seed regardless of ratio", "GSR", 0, NULL },
+    { 's', "start",                 "Start the current torrent(s)", "s",  0, NULL },
+    { 'S', "stop",                  "Stop the current torrent(s)", "S",  0, NULL },
+    { 't', "torrent",               "Set the current torrent(s)", "t",  1, "<torrent>" },
+    { 990, "start-paused",          "Start added torrents paused", NULL, 0, NULL },
+    { 991, "no-start-paused",       "Start added torrents unpaused", NULL, 0, NULL },
+    { 992, "trash-torrent",         "Delete torrents after adding", NULL, 0, NULL },
+    { 993, "no-trash-torrent",      "Do not delete torrents after adding", NULL, 0, NULL },
+    { 982, "torrent-uplimit",       "Set the maximum upload speed for the current torrent(s) in KiB/s", "tu",  1, "<speed>" },
+    { 983, "no-torrent-uplimit",    "Don't limit the upload speed for the current torrent(s)", "TU",  0, NULL },
+    { 984, "honor-session",         "Make the current torrent(s) honor the session limits", "hl",  0, NULL },
+    { 985, "no-honor-session",      "Make the current torrent(s) not honor the session limits", "HL",  0, NULL },
+    { 'u', "uplimit",               "Set the max upload speed in KiB/s for the current torrent(s) or globally", "u", 1, "<speed>" },
+    { 'U', "no-uplimit",            "Disable max upload speed for the current torrent(s) or globally", "U", 0, NULL },
+    { 'v', "verify",                "Verify the current torrent(s)", "v",  0, NULL },
+    { 'V', "version",               "Show version number and exit", "V", 0, NULL },
+    { 'w', "download-dir",          "When adding a new torrent, set its download folder.  Otherwise, set the default download folder", "w",  1, "<path>" },
+    { 'x', "pex",                   "Enable peer exchange (PEX)", "x",  0, NULL },
+    { 'X', "no-pex",                "Disable peer exchange (PEX)", "X",  0, NULL },
+    { 940, "peer-info",             "List the current torrent(s)' peers", "pi",  0, NULL },
+    {   0, NULL,                    NULL, NULL, 0, NULL }
+};
+
+static void
+showUsage( void )
+{
+    tr_getopt_usage( MY_NAME, getUsage( ), opts );
+}
+
+static int
+numarg( const char * arg )
+{
+    char *     end = NULL;
+    const long num = strtol( arg, &end, 10 );
+
+    if( *end )
+    {
+        fprintf( stderr, "Not a number: \"%s\"\n", arg );
+        showUsage( );
+        exit( EXIT_FAILURE );
+    }
+    return num;
+}
+
 enum
 {
     MODE_TORRENT_START         = (1<<0),
@@ -238,7 +337,6 @@ getOptMode( int val )
         case 910: /* encryption-required */
         case 911: /* encryption-preferred */
         case 912: /* encryption-tolerated */
-        case 931: /* global-peers */
         case 953: /* global-seedratio */
         case 954: /* no-global-seedratio */
         case 990: /* start-paused */
@@ -247,7 +345,6 @@ getOptMode( int val )
         case 993: /* no-trash-torrent */
             return MODE_SESSION_SET;
 
-        case 930: /* peers */
         case 950: /* seedratio */
         case 951: /* seedratio-default */
         case 952: /* no-seedratio */
@@ -278,6 +375,7 @@ getOptMode( int val )
         case 'D': /* no download speed limit */
         case 'u': /* upload speed limit */
         case 'U': /* no upload speed limit */
+        case 930: /* peers */
             return MODE_SESSION_SET | MODE_TORRENT_SET;
 
         case 's': /* start */
@@ -313,100 +411,6 @@ getOptMode( int val )
             assert( "unrecognized argument" && 0 );
             return 0;
     }
-}
-
-static tr_option opts[] =
-{
-    { 'a', "add",                   "Add torrent files by filename or URL", "a",  0, NULL },
-    { 970, "alt-speed",             "Use the alternate Limits", "as",  0, NULL },
-    { 971, "no-alt-speed",          "Don't use the alternate Limits", "AS",  0, NULL },
-    { 972, "alt-speed-downlimit",   "max alternate download speed (in KiB/s)", "asd",  1, "<speed>" },
-    { 973, "alt-speed-uplimit",     "max alternate upload speed (in KiB/s)", "asu",  1, "<speed>" },
-    { 974, "alt-speed-scheduler",   "Use the scheduled on/off times", "asc",  0, NULL },
-    { 975, "no-alt-speed-scheduler","Don't use the scheduled on/off times", "ASC",  0, NULL },
-    { 976, "alt-speed-time-begin",  "Time to start using the alt speed limits (in hhmm)", NULL,  1, "<time>" },
-    { 977, "alt-speed-time-end",    "Time to stop using the alt speed limits (in hhmm)", NULL,  1, "<time>" },
-    { 978, "alt-speed-days",        "Numbers for any/all days of the week - eg. \"1-7\"", NULL,  1, "<days>" },
-    { 963, "blocklist-update",      "Blocklist update", NULL, 0, NULL },
-    { 'c', "incomplete-dir",        "Where to store new torrents until they're complete", "c", 1, "<dir>" },
-    { 'C', "no-incomplete-dir",     "Don't store incomplete torrents in a different location", "C", 0, NULL },
-    { 'b', "debug",                 "Print debugging information", "b",  0, NULL },
-    { 'd', "downlimit",             "Set the maximum global download speed in KiB/s", "d",  1, "<speed>" },
-    { 'D', "no-downlimit",          "Don't limit the global download speed", "D",  0, NULL },
-    { 910, "encryption-required",   "Encrypt all peer connections", "er", 0, NULL },
-    { 911, "encryption-preferred",  "Prefer encrypted peer connections", "ep", 0, NULL },
-    { 912, "encryption-tolerated",  "Prefer unencrypted peer connections", "et", 0, NULL },
-    { 'f', "files",                 "List the current torrent(s)' files", "f",  0, NULL },
-    { 'g', "get",                   "Mark files for download", "g",  1, "<files>" },
-    { 'G', "no-get",                "Mark files for not downloading", "G",  1, "<files>" },
-    { 'i', "info",                  "Show the current torrent(s)' details", "i",  0, NULL },
-    { 920, "session-info",          "Show the session's details", "si", 0, NULL },
-    { 921, "session-stats",         "Show the session's statistics", "st", 0, NULL },
-    { 'l', "list",                  "List all torrents", "l",  0, NULL },
-    { 960, "move",                  "Move current torrent's data to a new folder", NULL, 1, "<path>" },
-    { 961, "find",                  "Tell Transmission where to find a torrent's data", NULL, 1, "<path>" },
-    { 'm', "portmap",               "Enable portmapping via NAT-PMP or UPnP", "m",  0, NULL },
-    { 'M', "no-portmap",            "Disable portmapping", "M",  0, NULL },
-    { 'n', "auth",                  "Set authentication info", "n",  1, "<username:password>" },
-    { 'N', "netrc",                 "Set authentication info from a .netrc file", "N",  1, "<filename>" },
-    { 'o', "dht",                   "Enable distributed hash tables (DHT)", "o", 0, NULL },
-    { 'O', "no-dht",                "Disable distributed hash tables (DHT)", "O", 0, NULL },
-    { 'p', "port",                  "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "p", 1, "<port>" },
-    { 962, "port-test",             "Port testing", "pt", 0, NULL },
-    { 'P', "random-port",           "Random port for incomping peers", "P", 0, NULL },
-    { 900, "priority-high",         "Set the files' priorities as high", "ph", 1, "<files>" },
-    { 901, "priority-normal",       "Set the files' priorities as normal", "pn", 1, "<files>" },
-    { 902, "priority-low",          "Set the files' priorities as low", "pl", 1, "<files>" },
-    { 'r', "remove",                "Remove the current torrent(s)", "r",  0, NULL },
-    { 930, "peers",                 "Set the current torrent(s)' maximum number of peers each", "pr", 1, "<max>" },
-    { 931, "global-peers",          "Set the global maximum number of peers", "gpr", 1, "<max>" },
-    { 'R', "remove-and-delete",     "Remove the current torrent(s) and delete local data", NULL, 0, NULL },
-    { 950, "seedratio",             "Let the current torrent(s) seed until a specific ratio", "sr", 1, "ratio" },
-    { 951, "seedratio-default",     "Let the current torrent(s) use the global seedratio settings", "srd", 0, NULL },
-    { 952, "no-seedratio",          "Let the current torrent(s) seed regardless of ratio", "SR", 0, NULL },
-    { 953, "global-seedratio",      "All torrents, unless overridden by a per-torrent setting, should seed until a specific ratio", "gsr", 1, "ratio" },
-    { 954, "no-global-seedratio",   "All torrents, unless overridden by a per-torrent setting, should seed regardless of ratio", "GSR", 0, NULL },
-    { 's', "start",                 "Start the current torrent(s)", "s",  0, NULL },
-    { 'S', "stop",                  "Stop the current torrent(s)", "S",  0, NULL },
-    { 't', "torrent",               "Set the current torrent(s)", "t",  1, "<torrent>" },
-    { 990, "start-paused",          "Start added torrents paused", NULL, 0, NULL },
-    { 991, "no-start-paused",       "Start added torrents unpaused", NULL, 0, NULL },
-    { 992, "trash-torrent",         "Delete torrents after adding", NULL, 0, NULL },
-    { 993, "no-trash-torrent",      "Do not delete torrents after adding", NULL, 0, NULL },
-    { 982, "torrent-uplimit",       "Set the maximum upload speed for the current torrent(s) in KiB/s", "tu",  1, "<speed>" },
-    { 983, "no-torrent-uplimit",    "Don't limit the upload speed for the current torrent(s)", "TU",  0, NULL },
-    { 984, "honor-session",         "Make the current torrent(s) honor the session limits", "hl",  0, NULL },
-    { 985, "no-honor-session",      "Make the current torrent(s) not honor the session limits", "HL",  0, NULL },
-    { 'u', "uplimit",               "Set the maximum global upload speed in KiB/s", "u",  1, "<speed>" },
-    { 'U', "no-uplimit",            "Don't limit the global upload speed", "U",  0, NULL },
-    { 'v', "verify",                "Verify the current torrent(s)", "v",  0, NULL },
-    { 'V', "version",               "Show version number and exit", "V", 0, NULL },
-    { 'w', "download-dir",          "Set the default download folder", "w",  1, "<path>" },
-    { 'x', "pex",                   "Enable peer exchange (PEX)", "x",  0, NULL },
-    { 'X', "no-pex",                "Disable peer exchange (PEX)", "X",  0, NULL },
-    { 940, "peer-info",             "List the current torrent(s)' peers", "pi",  0, NULL },
-    {   0, NULL,                    NULL, NULL, 0, NULL }
-};
-
-static void
-showUsage( void )
-{
-    tr_getopt_usage( MY_NAME, getUsage( ), opts );
-}
-
-static int
-numarg( const char * arg )
-{
-    char *     end = NULL;
-    const long num = strtol( arg, &end, 10 );
-
-    if( *end )
-    {
-        fprintf( stderr, "Not a number: \"%s\"\n", arg );
-        showUsage( );
-        exit( EXIT_FAILURE );
-    }
-    return num;
 }
 
 static tr_bool debug = 0;
@@ -1813,8 +1817,6 @@ processArgs( const char * host, int port, int argc, const char ** argv )
                           break;
                 case 'X': tr_bencDictAddBool( args, TR_PREFS_KEY_PEX_ENABLED, FALSE );
                           break;
-                case 931: tr_bencDictAddInt( args, TR_PREFS_KEY_PEER_LIMIT_GLOBAL, atoi(optarg) );
-                          break;
                 case 953: tr_bencDictAddReal( args, "seedRatioLimit", atof(optarg) );
                           tr_bencDictAddBool( args, "seedRatioLimited", TRUE );
                           break;
@@ -1870,6 +1872,11 @@ processArgs( const char * host, int port, int argc, const char ** argv )
                           else
                               tr_bencDictAddBool( sargs, TR_PREFS_KEY_USPEED_ENABLED, TRUE );
                           break;
+                case 930: if( targs )
+                              tr_bencDictAddInt( targs, "peer-limit", atoi(optarg) );
+                          else
+                              tr_bencDictAddInt( sargs, TR_PREFS_KEY_PEER_LIMIT_GLOBAL, atoi(optarg) );
+                          break;
                 default:  assert( "unhandled value" && 0 );
                           break;
             }
@@ -1880,8 +1887,6 @@ processArgs( const char * host, int port, int argc, const char ** argv )
 
             switch( c )
             {
-                case 930: tr_bencDictAddInt( args, "peer-limit", atoi(optarg) );
-                          break;
                 case 950: tr_bencDictAddReal( args, "seedRatioLimit", atof(optarg) );
                           tr_bencDictAddInt( args, "seedRatioMode", TR_RATIOLIMIT_SINGLE );
                           break;
