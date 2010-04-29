@@ -901,7 +901,7 @@ Session :: addTorrent( QString key, QString localPath )
     if( !keyHandled ) {
         const QByteArray tmp = key.toUtf8();
         tr_bencDictAddRaw( args, "metainfo", tmp.constData(), tmp.length() );
-        keyHandled; // treat it as base64
+        keyHandled = true; // treat it as base64
     }
 
     exec( &top );

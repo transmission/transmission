@@ -339,9 +339,8 @@ refreshActions( struct cbdata * data )
     }
 
     {
-        tr_session * session = tr_core_session( data->core );
-        const int active = tr_sessionGetActiveTorrentCount( session );
-        const int total = tr_sessionCountTorrents( session );
+        const int total = tr_core_get_torrent_count( data->core );
+        const int active = tr_core_get_active_torrent_count( data->core );
         action_sensitize( "pause-all-torrents", active != 0 );
         action_sensitize( "start-all-torrents", active != total );
     }

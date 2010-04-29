@@ -199,6 +199,8 @@ const struct tr_address*  tr_sessionGetPublicAddress( const tr_session *, int tr
 
 struct tr_bindsockets * tr_sessionGetBindSockets( tr_session * );
 
+int tr_sessionCountTorrents( const tr_session * session ); 
+
 enum
 {
     SESSION_MAGIC_NUMBER = 3845,

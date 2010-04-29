@@ -2391,18 +2391,3 @@ tr_sessionSetProxyPassword( tr_session * session,
         session->proxyPassword = tr_strdup( password );
     }
 }
-
-int
-tr_sessionGetActiveTorrentCount( tr_session * session )
-{
-    int ret = 0;
-    tr_torrent * tor = NULL;
-
-    assert( tr_isSession( session ) );
-
-    while(( tor = tr_torrentNext( session, tor )))
-        if( tr_torrentGetActivity( tor ) != TR_STATUS_STOPPED )
-            ++ret;
-
-    return ret;
-}

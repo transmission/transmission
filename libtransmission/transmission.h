@@ -635,8 +635,6 @@ tr_port_forwarding;
 
 tr_port_forwarding tr_sessionGetPortForwarding( const tr_session * session );
 
-int tr_sessionCountTorrents( const tr_session * session );
-
 typedef enum
 {
     TR_CLIENT_TO_PEER = 0, TR_UP = 0,
@@ -743,8 +741,6 @@ tr_bool    tr_sessionGetDeleteSource  ( const tr_session * );
 tr_torrent ** tr_sessionLoadTorrents( tr_session  * session,
                                       tr_ctor     * ctor,
                                       int         * setmeCount );
-
-int tr_sessionGetActiveTorrentCount( tr_session * session );
 
 /** @} */
 
@@ -1648,8 +1644,6 @@ typedef enum
     TR_STATUS_STOPPED      = ( 1 << 4 )  /* Torrent is stopped */
 }
 tr_torrent_activity;
-
-tr_torrent_activity tr_torrentGetActivity( tr_torrent * );
 
 enum
 {

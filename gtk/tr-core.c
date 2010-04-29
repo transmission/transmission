@@ -1417,15 +1417,9 @@ tr_core_set_hibernation_allowed( TrCore * core,
 static void
 maybeInhibitHibernation( TrCore * core )
 {
-    gboolean inhibit = pref_flag_get( PREF_KEY_INHIBIT_HIBERNATION );
-
-    /* always allow hibernation when all the torrents are paused */
-    if( inhibit ) {
-        tr_session * session = tr_core_session( core );
-
-        if( tr_sessionGetActiveTorrentCount( session ) == 0 )
-            inhibit = FALSE;
-    }
+    /* inhibit if it's enabled *AND* all the torrents are paused */
+    const gboolean inhibit = pref_flag_get( PREF_KEY_INHIBIT_HIBERNATION )
+                          && ( tr_core_get_active_torrent_count( core ) == 0 );
 
     tr_core_set_hibernation_allowed( core, !inhibit );
 }
@@ -1685,5 +1679,31 @@ tr_core_torrent_changed( TrCore * core, int id )
         }
     }
     while( gtk_tree_model_iter_next( model, &iter ) );
+}
+
+int
+tr_core_get_torrent_count( TrCore * core )
+{
+    return gtk_tree_model_iter_n_children( tr_core_model( core ), NULL );
+}
+
+int
+tr_core_get_active_torrent_count( TrCore * core )
+{
+    GtkTreeIter iter;
+    GtkTreeModel * model = tr_core_model( core );
+    int activeCount = 0;
+
+    if( gtk_tree_model_get_iter_first( model, &iter ) ) do
+    {
+        int activity;
+        gtk_tree_model_get( model, &iter, MC_ACTIVITY, &activity, -1 );
+
+        if( activity != TR_STATUS_STOPPED )
+            ++activeCount;
+    }
+    while( gtk_tree_model_iter_next( model, &iter ) );
+
+    return activeCount;
 }
 

@@ -173,7 +173,7 @@ getTorrents( tr_session * session,
     else /* all of them */
     {
         tr_torrent * tor = NULL;
-        const int    n = tr_sessionCountTorrents( session );
+        const int n = tr_sessionCountTorrents( session );
         torrents = tr_new0( tr_torrent *, n );
         while( ( tor = tr_torrentNext( session, tor ) ) )
             torrents[torrentCount++] = tor;
