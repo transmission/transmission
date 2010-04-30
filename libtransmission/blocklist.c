@@ -264,7 +264,6 @@ _tr_blocklistSetContent( tr_blocklist * b,
 
     while( !fggets( &line, in ) )
     {
-        const char * pch;
         char * rangeBegin;
         char * rangeEnd;
         char * crpos;
@@ -272,15 +271,6 @@ _tr_blocklistSetContent( tr_blocklist * b,
         struct tr_ip_range range;
 
         ++inCount;
-
-        for( pch=line; pch && *pch; ++pch )
-            if( !isprint( *pch ) && ( *pch != '\r' ) && ( *pch != '\n' ) )
-                break;
-        if( !pch || *pch ) {
-            tr_err( "skipping line #%d which contains nonprintable characters\n", inCount );
-            free( line );
-            continue;
-        }
 
         rangeBegin = strrchr( line, ':' );
         if( !rangeBegin ){ free( line ); continue; }
@@ -293,14 +283,22 @@ _tr_blocklistSetContent( tr_blocklist * b,
             *crpos = '\0';
 
         if( !tr_pton( rangeBegin, &addr ) )
-            tr_err( "blocklist skipped invalid address [%s]\n", rangeBegin );
+        {
+            printf( "error rangeBegin: %s", line );
+            tr_err( _( "blocklist skipped invalid address at line %d" ), inCount );
+            free( line );
+            continue;
+        }
         range.begin = ntohl( addr.addr.addr4.s_addr );
 
         if( !tr_pton( rangeEnd, &addr ) )
-            tr_err( "blocklist skipped invalid address [%s]\n", rangeEnd );
+        {
+            printf( "error rangeEnd: %s", line );
+            tr_err( _( "blocklist skipped invalid address at line %d" ), inCount );
+            free( line );
+            continue;
+        }
         range.end = ntohl( addr.addr.addr4.s_addr );
-
-        free( line );
 
         if( fwrite( &range, sizeof( struct tr_ip_range ), 1, out ) != 1 )
         {
@@ -318,7 +316,6 @@ _tr_blocklistSetContent( tr_blocklist * b,
         tr_inf( _( "Blocklist \"%1$s\" updated with %2$'d entries" ), base, outCount );
         tr_free( base );
     }
-
 
     fclose( out );
     fclose( in );
