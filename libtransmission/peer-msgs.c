@@ -1205,6 +1205,20 @@ updatePeerProgress( tr_peermsgs * msgs )
 }
 
 static void
+prefetchPieces( tr_peermsgs *msgs )
+{
+    int i;
+
+    /* Maintain 12 prefetched blocks per unchoked peer */
+    for( i=msgs->prefetchCount; i<msgs->peer->pendingReqsToClient && i<12; ++i )
+    {
+        const struct peer_request * req = msgs->peerAskedFor + i;
+        tr_ioPrefetch( msgs->torrent, req->index, req->offset, req->length );
+        ++msgs->prefetchCount;
+    }
+}
+
+static void
 peerMadeRequest( tr_peermsgs *               msgs,
                  const struct peer_request * req )
 {
@@ -1226,10 +1240,12 @@ peerMadeRequest( tr_peermsgs *               msgs,
     else
         allow = TRUE;
 
-    if( allow )
+    if( allow ) {
         msgs->peerAskedFor[msgs->peer->pendingReqsToClient++] = *req;
-    else if( fext )
+        prefetchPieces( msgs );
+    } else if( fext ) {
         protocolSendReject( msgs, req );
+    }
 }
 
 static tr_bool
@@ -1770,20 +1786,6 @@ updateBlockRequests( tr_peermsgs * msgs )
         }
 
         tr_free( blocks );
-    }
-}
-
-static void
-prefetchPieces( tr_peermsgs *msgs )
-{
-    int i;
-
-    /* Maintain 12 prefetched blocks per unchoked peer */
-    for( i=msgs->prefetchCount; i<msgs->peer->pendingReqsToClient && i<12; ++i )
-    {
-        const struct peer_request * req = msgs->peerAskedFor + i;
-        tr_ioPrefetch( msgs->torrent, req->index, req->offset, req->length );
-        ++msgs->prefetchCount;
     }
 }
 
