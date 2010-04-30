@@ -300,6 +300,8 @@ _tr_blocklistSetContent( tr_blocklist * b,
         }
         range.end = ntohl( addr.addr.addr4.s_addr );
 
+        free( line );
+
         if( fwrite( &range, sizeof( struct tr_ip_range ), 1, out ) != 1 )
         {
             tr_err( _(
