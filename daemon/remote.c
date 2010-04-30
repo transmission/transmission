@@ -205,7 +205,7 @@ static tr_option opts[] =
     { 'c', "incomplete-dir",        "Where to store new torrents until they're complete", "c", 1, "<dir>" },
     { 'C', "no-incomplete-dir",     "Don't store incomplete torrents in a different location", "C", 0, NULL },
     { 'b', "debug",                 "Print debugging information", "b",  0, NULL },
-    { 'd', "downlimit",             "Set the max download speed in KiB/s for the current torrent(s) or globally", "u", 1, "<speed>" },
+    { 'd', "downlimit",             "Set the max download speed in KiB/s for the current torrent(s) or globally", "d", 1, "<speed>" },
     { 'D', "no-downlimit",          "Disable max download speed for the current torrent(s) or globally", "U", 0, NULL },
     { 910, "encryption-required",   "Encrypt all peer connections", "er", 0, NULL },
     { 911, "encryption-preferred",  "Prefer encrypted peer connections", "ep", 0, NULL },
