@@ -265,7 +265,7 @@ use_libappindicator=no
 use_libnotify=no
 use_dbus_glib=no
 use_canberra=no
-use_libgconf=no
+use_gconf2=no
 if test "x$want_gtk" = "xyes" ; then
     if test "x$have_gtk" = "xyes"; then
       build_gtk=yes
@@ -339,20 +339,20 @@ if test "x$build_gtk" = "xyes"; then
         fi
     fi
 
-    PKG_CHECK_MODULES([LIBGCONF],
+    PKG_CHECK_MODULES([GCONF2],
                       [gconf-2.0 >= $GCONF2_MINIMUM],
-                      [have_libgconf=yes],
-                      [have_libgconf=no])
+                      [have_gconf2=yes],
+                      [have_gconf2=no])
     AC_ARG_ENABLE([gconf2], 
-                  AS_HELP_STRING([--enable-libgconf],[enable GConf support]),, 
-                  [enable_libgconf=yes]) 
-    if test "x$havelibgconf" = "xyes" ; then
-        if test "x$enable_libgconf" = "xyes"; then
-            use_libgconf=yes
-            AC_DEFINE([HAVE_LIBGCONF], 1) 
+                  AS_HELP_STRING([--enable-gconf2],[enable GConf support]),, 
+                  [enable_gconf2=yes]) 
+    if test "x$have_gconf2" = "xyes" ; then
+        if test "x$enable_gconf2" = "xyes"; then
+            use_gconf2=yes
+            AC_DEFINE([HAVE_GCONF2], 1) 
         else
-            LIBGCONF_CFLAGS=
-            LIBGCONF_LIBS=
+            GCONF2_CFLAGS=
+            GCONF2_LIBS=
         fi
     fi
 
@@ -522,7 +522,7 @@ Configuration:
       optional gio for optional watchdir support:              ${use_gio}
       optional libnotify for 'download completed' popups:      ${use_libnotify}
       optional libcanberra for 'download completed' sounds:    ${use_canberra}
-      optional libgconf to tell GNOME we handle magnet links:  ${use_libgconf}
+      optional gconf2 to tell GNOME we handle magnet links:    ${use_gconf2}
       optional libappindicator for Ubuntu-style system tray:   ${use_libappindicator}
 
    Build Daemon:                                               ${build_daemon}

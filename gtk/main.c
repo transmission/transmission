@@ -227,7 +227,7 @@ static gboolean       updatemodel( gpointer gdata );
 ****
 ***/
 
-#ifdef HAVE_LIBGCONF
+#ifdef HAVE_GCONF2
  #include <gconf/gconf.h>
  #include <gconf/gconf-client.h>
 #endif
@@ -235,7 +235,7 @@ static gboolean       updatemodel( gpointer gdata );
 static void
 registerMagnetLinkHandler( void )
 {
-#ifdef HAVE_LIBGCONF
+#ifdef HAVE_GCONF2
     GError * err;
     GConfValue * value;
     GConfClient * client = gconf_client_get_default( );
