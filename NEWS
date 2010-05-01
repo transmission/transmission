@@ -4,22 +4,21 @@
   * Fix rare crash when some peers disconnected unexpectedly
   * Fix bug which didn't parse scheduled speed limit dates correctly
   * Fix bug that broke magnet links whose names contained slashes
-  * Fix bug that crashed when updating the blocklist when the disk is full
+  * Fix crash when updating the blocklist when the disk is full
   * Fix slow file preallocation on Unix systems not using ext3/ext4
   * Fix regression which broke the "bind-address-ipv4" configuration setting
   * For better security, Web client connctions are disabled by default
-  * Upgrade to dht-0.14
   * Upgrade to miniupnp 1.4
-  * Transmission builds out-of-the-box with Curl 7.15.5.  (Hello CentOS!)
+  * Transmission builds out-of-the-box with Curl 7.15.5. (Hello CentOS!)
 ==== GTK+ ====
   * Use the size for the system tray icon
 ==== Qt ====
-  * Fix bug that crashed when removing mor than one torrent at once
+  * Fix bug that crashed when removing more than one torrent at once
   * Fix bug when parsing the remote password from the command line
   * Add support for the "incomplete directory" in the preferences dialog
   * Don't show "time remaining" for paused torrents
 ==== Daemon ====
-  * Fix bug parsing RPC requests setting which files to not download
+  * Fix bug parsing RPC requests when setting which files to not download
   * Fix possible crash when using inotify for the daemon's watchdir
   * Fix bugs in the configure script
   * Fix bug updating the blocklist over RPC
