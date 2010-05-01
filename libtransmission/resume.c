@@ -17,8 +17,9 @@
 #include "transmission.h"
 #include "bencode.h"
 #include "completion.h"
+#include "metainfo.h" /* tr_metainfoGetBasename() */
 #include "peer-mgr.h" /* pex */
-#include "platform.h" /* tr_getResumeDir */
+#include "platform.h" /* tr_getResumeDir() */
 #include "resume.h"
 #include "session.h"
 #include "torrent.h"
@@ -66,11 +67,11 @@ enum
 static char*
 getResumeFilename( const tr_torrent * tor )
 {
-    return tr_strdup_printf( "%s%c%s.%16.16s.resume",
-                             tr_getResumeDir( tor->session ),
-                             TR_PATH_DELIMITER,
-                             tr_torrentName( tor ),
-                             tor->info.hashString );
+    char * base = tr_metainfoGetBasename( tr_torrentInfo( tor ) );
+    char * filename = tr_strdup_printf( "%s" TR_PATH_DELIMITER_STR "%s.resume",
+                                        tr_getResumeDir( tor->session ), base );
+    tr_free( base );
+    return filename;
 }
 
 /***
