@@ -220,6 +220,8 @@
 		A2DA362A0CBC674900C2ED41 /* InfoActivity.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DA36270CBC674900C2ED41 /* InfoActivity.png */; };
 		A2DA362B0CBC674900C2ED41 /* InfoFiles.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DA36280CBC674900C2ED41 /* InfoFiles.png */; };
 		A2DA362C0CBC674900C2ED41 /* InfoPeers.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DA36290CBC674900C2ED41 /* InfoPeers.png */; };
+		A2DDA068118C5CEB009E7F37 /* connecthostport.c in Sources */ = {isa = PBXBuildFile; fileRef = A2DDA067118C5CEB009E7F37 /* connecthostport.c */; };
+		A2DDA06A118C5CF2009E7F37 /* connecthostport.h in Headers */ = {isa = PBXBuildFile; fileRef = A2DDA069118C5CF2009E7F37 /* connecthostport.h */; };
 		A2DF37070C220D03006523C1 /* CreatorWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2DF37050C220D03006523C1 /* CreatorWindowController.m */; };
 		A2DF58580DE4B2B0000795D5 /* JSON_parser.c in Sources */ = {isa = PBXBuildFile; fileRef = A2DF576A0DE468C6000795D5 /* JSON_parser.c */; };
 		A2DF58590DE4B2B1000795D5 /* JSON_parser.h in Headers */ = {isa = PBXBuildFile; fileRef = A2DF576B0DE468C6000795D5 /* JSON_parser.h */; };
@@ -724,6 +726,8 @@
 		A2DC1E4A10E6731000DFB18C /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh_CN; path = macosx/zh_CN.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A2DC1E4B10E6731000DFB18C /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = zh_CN; path = macosx/zh_CN.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		A2DC1E4C10E6731000DFB18C /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = zh_CN; path = macosx/zh_CN.lproj/PrefsWindow.xib; sourceTree = "<group>"; };
+		A2DDA067118C5CEB009E7F37 /* connecthostport.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = connecthostport.c; path = "third-party/miniupnp/connecthostport.c"; sourceTree = "<group>"; };
+		A2DDA069118C5CF2009E7F37 /* connecthostport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = connecthostport.h; path = "third-party/miniupnp/connecthostport.h"; sourceTree = "<group>"; };
 		A2DF37040C220D03006523C1 /* CreatorWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CreatorWindowController.h; path = macosx/CreatorWindowController.h; sourceTree = "<group>"; };
 		A2DF37050C220D03006523C1 /* CreatorWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CreatorWindowController.m; path = macosx/CreatorWindowController.m; sourceTree = "<group>"; };
 		A2DF576A0DE468C6000795D5 /* JSON_parser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = JSON_parser.c; path = libtransmission/JSON_parser.c; sourceTree = "<group>"; };
@@ -1317,6 +1321,7 @@
 		BE1183410CE15DF00002D0F3 /* libminiupnp */ = {
 			isa = PBXGroup;
 			children = (
+				A2DDA067118C5CEB009E7F37 /* connecthostport.c */,
 				BE1183610CE160D50002D0F3 /* igd_desc_parse.c */,
 				BE1183620CE160D50002D0F3 /* minixml.c */,
 				BE1183630CE160D50002D0F3 /* miniwget.c */,
@@ -1326,6 +1331,7 @@
 				BE1183670CE160D50002D0F3 /* upnpcommands.c */,
 				BE1183680CE160D50002D0F3 /* miniupnpc.c */,
 				BE11834D0CE160C50002D0F3 /* bsdqueue.h */,
+				A2DDA069118C5CF2009E7F37 /* connecthostport.h */,
 				BE11834E0CE160C50002D0F3 /* declspec.h */,
 				BE11834F0CE160C50002D0F3 /* igd_desc_parse.h */,
 				BE1183500CE160C50002D0F3 /* minixml.h */,
@@ -1526,6 +1532,7 @@
 				BE1183600CE160C50002D0F3 /* minissdpc.h in Headers */,
 				A254853C0EB66CD4004539DA /* codelength.h in Headers */,
 				A2F8CD430F3D0F4A00DB356A /* miniupnpcstrings.h in Headers */,
+				A2DDA06A118C5CF2009E7F37 /* connecthostport.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2052,6 +2059,7 @@
 				BE11836E0CE160D50002D0F3 /* upnpreplyparse.c in Sources */,
 				BE11836F0CE160D50002D0F3 /* upnpcommands.c in Sources */,
 				BE1183700CE160D50002D0F3 /* miniupnpc.c in Sources */,
+				A2DDA068118C5CEB009E7F37 /* connecthostport.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
