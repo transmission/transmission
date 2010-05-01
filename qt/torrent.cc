@@ -388,8 +388,8 @@ Torrent :: compareETA( const Torrent& that ) const
     const bool haveA( hasETA( ) );
     const bool haveB( that.hasETA( ) );
     if( haveA && haveB ) return getETA() - that.getETA();
-    if( haveA ) return -1;
-    if( haveB ) return 1;
+    if( haveA ) return 1;
+    if( haveB ) return -1;
     return 0;
 }
 
