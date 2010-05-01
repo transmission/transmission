@@ -19,14 +19,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-02-10 20:02-0600\n"
-"PO-Revision-Date: 2010-02-28 10:21+0000\n"
-"Last-Translator: Milo Casagrande <milo@casagrande.name>\n"
+"PO-Revision-Date: 2010-03-30 21:31+0000\n"
+"Last-Translator: Luca Ferretti <elle.uca@ubuntu-it.org>\n"
 "Language-Team: Italian <tp@lists.linux.it>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2010-03-12 01:52+0000\n"
+"X-Launchpad-Export-Date: 2010-05-01 04:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:54
@@ -283,7 +283,7 @@ msgstr "Aggiungi un torrent"
 
 #: ../gtk/add-dialog.c:458 ../gtk/tr-prefs.c:288
 msgid "Show _options dialog"
-msgstr "Mostrare il dialogo delle _opzioni"
+msgstr "Mostrare il _dialogo delle opzioni"
 
 #: ../gtk/add-dialog.c:514
 msgid "Add URL"
@@ -357,7 +357,7 @@ msgstr "Connessioni ai nodi"
 
 #: ../gtk/details.c:519
 msgid "_Maximum peers:"
-msgstr "Numero _massimo di nodi:"
+msgstr "N_umero massimo di nodi:"
 
 #: ../gtk/details.c:538 ../gtk/torrent-cell-renderer.c:185
 msgid "Waiting to verify local data"
@@ -617,17 +617,17 @@ msgstr "Mostra _maggiori dettagli"
 #: ../gtk/details.c:1701
 #, c-format
 msgid "Got a list of %1$s%2$'d peers%3$s %4$s ago"
-msgstr ""
+msgstr "Ottenuto un elenco di %1$s%2$'d nodi%3$s %4$s fa"
 
 #: ../gtk/details.c:1705
 #, c-format
 msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
-msgstr ""
+msgstr "Richiesta elenco nodi%1$sscaduta%2$s %3$s fa; attendere"
 
 #: ../gtk/details.c:1708
 #, c-format
 msgid "Got an error %1$s\"%2$s\"%3$s %4$s ago"
-msgstr ""
+msgstr "Ottenuto un errore %1$s«%2$s»%3$s %4$s fa"
 
 #: ../gtk/details.c:1717
 msgid "No updates scheduled"
@@ -1345,11 +1345,11 @@ msgstr "A_ggiungere automaticamente i torrent da:"
 
 #: ../gtk/tr-prefs.c:300
 msgid "Append \"._part\" to incomplete files' names"
-msgstr "Aggiungere «._part» ai nomi dei file non completati"
+msgstr "Aggiungere «.part» ai _nomi dei file non completati"
 
 #: ../gtk/tr-prefs.c:304
 msgid "Keep _incomplete torrents in:"
-msgstr "Mantenere i torrent non c_ompleti in:"
+msgstr "Mantenere i _torrent non completi in:"
 
 #: ../gtk/tr-prefs.c:312
 msgid "Save to _Location:"
@@ -1902,6 +1902,9 @@ msgid ""
 "This magnet link appears to be intended for something other than BitTorrent. "
 " BitTorrent magnet links have a section containing \"%s\"."
 msgstr ""
+"Questo collegamento magnetico sembra essere destinato a qualcosa di diverso "
+"da BitTorrent. I collegamenti magnetici BitTorrent presentano una sezione "
+"contenente «%s»."
 
 #. did caller give us an uninitialized val?
 #: ../libtransmission/bencode.c:1092
@@ -2008,7 +2011,7 @@ msgstr "Impossibile eseguire il bind alla porta %d su %s: %s"
 #: ../libtransmission/net.c:367
 #, c-format
 msgid "Couldn't bind port %d on %s: %s (%s)"
-msgstr ""
+msgstr "Impossibile eseguire il bind per la porta %d su %s: %s (%s)"
 
 #: ../libtransmission/port-forwarding.c:31
 msgid "Port Forwarding"

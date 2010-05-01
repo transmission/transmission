@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-02-10 20:02-0600\n"
-"PO-Revision-Date: 2009-08-08 03:57+0000\n"
+"PO-Revision-Date: 2010-03-20 04:25+0000\n"
 "Last-Translator: baurzhan.m <Unknown>\n"
 "Language-Team: Kazakh <kk_KZ@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2010-03-12 01:52+0000\n"
+"X-Launchpad-Export-Date: 2010-05-01 04:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:54
@@ -56,7 +56,7 @@ msgstr "Ө_лшемі ойынша сұрыптау"
 
 #: ../gtk/actions.c:79
 msgid "_Show Transmission"
-msgstr ""
+msgstr "Transmission-ды _көрсету"
 
 #: ../gtk/actions.c:80
 msgid "Message _Log"
@@ -116,11 +116,11 @@ msgstr ""
 
 #: ../gtk/actions.c:112
 msgid "Add _URL..."
-msgstr ""
+msgstr "_Сілтемені қосу..."
 
 #: ../gtk/actions.c:112
 msgid "Add URL..."
-msgstr ""
+msgstr "Сілтемені қосу..."
 
 #: ../gtk/actions.c:113 ../gtk/actions.c:114
 msgid "Add a torrent"
@@ -128,7 +128,7 @@ msgstr "Торрент қосу"
 
 #: ../gtk/actions.c:114
 msgid "_Add File..."
-msgstr ""
+msgstr "_Файлды қосу..."
 
 #: ../gtk/actions.c:115
 msgid "_Start"
@@ -273,15 +273,15 @@ msgstr ""
 
 #: ../gtk/add-dialog.c:514
 msgid "Add URL"
-msgstr ""
+msgstr "URL қосу"
 
 #: ../gtk/add-dialog.c:527
 msgid "Add torrent from URL"
-msgstr ""
+msgstr "Торрентті URL сілтемеден қосу"
 
 #: ../gtk/add-dialog.c:530
 msgid "_URL"
-msgstr ""
+msgstr "_URL сілтеме"
 
 #: ../gtk/conf.c:62 ../libtransmission/fdlimit.c:358
 #: ../libtransmission/metainfo.c:99 ../libtransmission/utils.c:608
@@ -398,7 +398,7 @@ msgstr "%1$s жасаған, %2$s"
 
 #: ../gtk/details.c:696
 msgid "Unknown"
-msgstr ""
+msgstr "Белгісіз"
 
 #: ../gtk/details.c:724
 #, c-format
@@ -425,7 +425,7 @@ msgstr "%1$s (%2$.1f%%)"
 #: ../gtk/details.c:778
 #, c-format
 msgid "%1$.1f%%"
-msgstr ""
+msgstr "%1$.1f%%"
 
 #: ../gtk/details.c:796
 #, c-format
@@ -455,7 +455,7 @@ msgstr "Бар:"
 
 #: ../gtk/details.c:904
 msgid "Availability:"
-msgstr ""
+msgstr "Қол жетерлігі:"
 
 #: ../gtk/details.c:908 ../gtk/stats.c:168 ../gtk/stats.c:180
 msgid "Downloaded:"
@@ -479,7 +479,7 @@ msgstr "Жұмыс уақыты:"
 
 #: ../gtk/details.c:928
 msgid "Remaining time:"
-msgstr ""
+msgstr "Қалған уақыт:"
 
 #: ../gtk/details.c:932
 msgid "Last activity:"
@@ -539,11 +539,11 @@ msgstr "%"
 
 #: ../gtk/details.c:1064
 msgid "Up Reqs"
-msgstr ""
+msgstr "Шығ. сұран."
 
 #: ../gtk/details.c:1066
 msgid "Dn Reqs"
-msgstr ""
+msgstr "Кір. сұран."
 
 #: ../gtk/details.c:1067
 msgid "Status"
@@ -595,7 +595,7 @@ msgstr "Торап қабылдау режимінде жұмыс істеп т�
 
 #: ../gtk/details.c:1627 ../gtk/details.c:2086
 msgid "Show _more details"
-msgstr ""
+msgstr "_Көбірек ақпарат шығару"
 
 #: ../gtk/details.c:1701
 #, c-format
@@ -614,7 +614,7 @@ msgstr ""
 
 #: ../gtk/details.c:1717
 msgid "No updates scheduled"
-msgstr ""
+msgstr "Жоспарланған жаңартулар жоқ"
 
 #: ../gtk/details.c:1723
 #, c-format
@@ -660,7 +660,7 @@ msgstr ""
 
 #: ../gtk/details.c:2011
 msgid "Edit Trackers"
-msgstr ""
+msgstr "Трекерлерді түзету"
 
 #: ../gtk/details.c:2023
 msgid "Tracker Announce URLs"
@@ -678,7 +678,7 @@ msgstr "Трекерлер"
 
 #: ../gtk/details.c:2093
 msgid "_Edit Trackers"
-msgstr ""
+msgstr "Трекерле_рді түзету"
 
 #: ../gtk/details.c:2101
 msgid "Show _backup trackers"
@@ -818,10 +818,12 @@ msgid ""
 "Transmission is already running, but is not responding.  To start a new "
 "session, you must first close the existing Transmission process."
 msgstr ""
+"Transmission жұмыс істеп жатыр, бірақ жауап бермейді. Жаңа сеанспен жұмыс "
+"істеу үшін, бар үрдісті жабуыңыз қажет."
 
 #: ../gtk/main.c:626
 msgid "Transmission cannot be started."
-msgstr ""
+msgstr "Transmission жұмысты бастай алмай жатыр."
 
 #: ../gtk/main.c:708
 msgid ""

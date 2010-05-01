@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-02-10 20:02-0600\n"
-"PO-Revision-Date: 2010-02-25 19:43+0000\n"
-"Last-Translator: Николић Мирослав <miroslavnikolic@rocketmail.com>\n"
+"PO-Revision-Date: 2010-03-30 18:18+0000\n"
+"Last-Translator: voja15 <Unknown>\n"
 "Language-Team: Serbian <sr@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2010-03-12 01:52+0000\n"
+"X-Launchpad-Export-Date: 2010-05-01 04:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:54
@@ -145,7 +145,7 @@ msgstr "_Статистике"
 
 #: ../gtk/actions.c:117
 msgid "_Donate"
-msgstr ""
+msgstr "_Донирај"
 
 #: ../gtk/actions.c:118
 msgid "_Verify Local Data"
@@ -909,11 +909,12 @@ msgstr "Права копирања 2005-2009 Трансмишн пројека�
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
-"  Milan https://launchpad.net/~milanp\n"
+"  Milan Pužić https://launchpad.net/~milanp\n"
 "  Miloš Popović https://launchpad.net/~gpopac\n"
 "  Vladimir Lazic https://launchpad.net/~vlazic\n"
 "  momcilo https://launchpad.net/~momcilo-majic\n"
-"  Николић Мирослав https://launchpad.net/~lipek"
+"  voja15 https://launchpad.net/~vojajanjic\n"
+"  Мирослав Николић https://launchpad.net/~lipek"
 
 #: ../gtk/makemeta-ui.c:75
 #, c-format

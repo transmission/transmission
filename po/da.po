@@ -41,14 +41,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-02-10 20:02-0600\n"
-"PO-Revision-Date: 2010-01-10 14:39+0000\n"
-"Last-Translator: AJenbo <anders@jenbo.dk>\n"
+"PO-Revision-Date: 2010-04-29 00:07+0000\n"
+"Last-Translator: Ask Hjorth Larsen <asklarsen@gmail.com>\n"
 "Language-Team: Danish <dansk@dansk-gruppen.dk>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2010-03-12 01:52+0000\n"
+"X-Launchpad-Export-Date: 2010-05-01 04:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:54
@@ -1265,7 +1265,7 @@ msgstr "Fejl: %s"
 msgid "Downloading from %1$'d of %2$'d connected peer"
 msgid_plural "Downloading from %1$'d of %2$'d connected peers"
 msgstr[0] "Downloader fra %1$'d af %2$'d forbundet peer"
-msgstr[1] "Downloader fra %1$'d af %2$'d forbundede peers"
+msgstr[1] "Downloader fra %1$'d af %2$'d forbundne peers"
 
 #: ../gtk/torrent-cell-renderer.c:263
 #, c-format

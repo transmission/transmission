@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-02-10 20:02-0600\n"
-"PO-Revision-Date: 2010-03-11 13:53+0000\n"
-"Last-Translator: Jonhard Sørensen <Unknown>\n"
+"PO-Revision-Date: 2010-04-13 19:18+0000\n"
+"Last-Translator: Gunleif Joensen <Unknown>\n"
 "Language-Team: Faroese <fo@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2010-03-12 01:53+0000\n"
+"X-Launchpad-Export-Date: 2010-05-01 04:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:54
@@ -72,7 +72,7 @@ msgstr "_Minstasýni"
 
 #: ../gtk/actions.c:97
 msgid "Re_verse Sort Order"
-msgstr ""
+msgstr "_Vend Flokkingar Skipan"
 
 #: ../gtk/actions.c:98
 msgid "_Filterbar"
@@ -180,43 +180,43 @@ msgstr "Set _Pláss"
 
 #: ../gtk/actions.c:123
 msgid "Remove torrent"
-msgstr ""
+msgstr "Tak burtur torrent"
 
 #: ../gtk/actions.c:124
 msgid "_Delete Files and Remove"
-msgstr ""
+msgstr "_Strika fílur og tak burtur"
 
 #: ../gtk/actions.c:125
 msgid "_New..."
-msgstr ""
+msgstr "_Nýggj..."
 
 #: ../gtk/actions.c:125
 msgid "Create a torrent"
-msgstr ""
+msgstr "Stovna ein torrent"
 
 #: ../gtk/actions.c:126
 msgid "_Quit"
-msgstr ""
+msgstr "_Gevst"
 
 #: ../gtk/actions.c:127
 msgid "Select _All"
-msgstr ""
+msgstr "Vel _Allar"
 
 #: ../gtk/actions.c:128
 msgid "Dese_lect All"
-msgstr ""
+msgstr "Fráve_lj Allar"
 
 #: ../gtk/actions.c:130
 msgid "Torrent properties"
-msgstr ""
+msgstr "Torrent eginleikar"
 
 #: ../gtk/actions.c:131
 msgid "_Open Folder"
-msgstr ""
+msgstr "_Lat upp faladara"
 
 #: ../gtk/actions.c:133
 msgid "_Contents"
-msgstr ""
+msgstr "_Innihald"
 
 #: ../gtk/actions.c:134
 msgid "Ask Tracker for _More Peers"
@@ -224,16 +224,16 @@ msgstr ""
 
 #: ../gtk/add-dialog.c:247
 msgid "Torrent files"
-msgstr ""
+msgstr "Torrent fílur"
 
 #: ../gtk/add-dialog.c:252
 msgid "All files"
-msgstr ""
+msgstr "Allar fílur"
 
 #. make the dialog
 #: ../gtk/add-dialog.c:278
 msgid "Torrent Options"
-msgstr ""
+msgstr "Torrent kostir"
 
 #: ../gtk/add-dialog.c:301 ../gtk/tr-prefs.c:296
 msgid "Mo_ve .torrent file to the trash"
@@ -245,11 +245,11 @@ msgstr ""
 
 #: ../gtk/add-dialog.c:318
 msgid "_Torrent file:"
-msgstr ""
+msgstr "_Torrent fíla:"
 
 #: ../gtk/add-dialog.c:322
 msgid "Select Source File"
-msgstr ""
+msgstr "Vel keldufílu"
 
 #: ../gtk/add-dialog.c:333
 msgid "_Destination folder:"
@@ -288,22 +288,22 @@ msgstr ""
 #: ../libtransmission/utils.c:619
 #, c-format
 msgid "Couldn't create \"%1$s\": %2$s"
-msgstr ""
+msgstr "Kundi ikki stovana \"%1$s\": %2$s"
 
 #: ../gtk/conf.c:87 ../libtransmission/fdlimit.c:386
 #, c-format
 msgid "Couldn't open \"%1$s\": %2$s"
-msgstr ""
+msgstr "Kundi ikki lata upp \"%1$s\": %2$s"
 
 #: ../gtk/conf.c:92
 #, c-format
 msgid "%s is already running."
-msgstr ""
+msgstr "%s koyrir longu"
 
 #: ../gtk/conf.c:450 ../gtk/conf.c:455
 #, c-format
 msgid "Importing \"%s\""
-msgstr ""
+msgstr "Flyti inn \"%s\""
 
 #: ../gtk/details.c:446 ../gtk/tr-prefs.c:1417
 msgid "Speed"
@@ -884,6 +884,7 @@ msgstr ""
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
+"  Gunleif Joensen https://launchpad.net/~gunleif\n"
 "  Jonhard Sørensen https://launchpad.net/~jonhardsorensen"
 
 #: ../gtk/makemeta-ui.c:75
@@ -2048,7 +2049,7 @@ msgstr ""
 
 #: ../libtransmission/utils.c:502
 msgid "Not a regular file"
-msgstr ""
+msgstr "Ikki ein vanlig fíla"
 
 #: ../libtransmission/utils.c:520
 msgid "Memory allocation failed"
@@ -2058,7 +2059,7 @@ msgstr ""
 #: ../libtransmission/utils.c:618
 #, c-format
 msgid "File \"%s\" is in the way"
-msgstr ""
+msgstr "Fíla \"%s\" er í vegin"
 
 #: ../libtransmission/verify.c:235
 msgid "Verifying torrent"

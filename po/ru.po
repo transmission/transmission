@@ -10,15 +10,15 @@ msgstr ""
 "Project-Id-Version: Transmission HEAD\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-02-10 20:02-0600\n"
-"PO-Revision-Date: 2010-03-08 06:27+0000\n"
-"Last-Translator: Victor N. <Unknown>\n"
+"PO-Revision-Date: 2010-04-15 17:25+0000\n"
+"Last-Translator: Sergey Sedov <Unknown>\n"
 "Language-Team: Russian <gnome-cyr@gnome.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2010-03-12 01:52+0000\n"
+"X-Launchpad-Export-Date: 2010-05-01 04:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Country: RUSSIAN FEDERATION\n"
 "X-Poedit-Language: Russian\n"
@@ -435,7 +435,7 @@ msgstr "%1$s (%2$.1f%%)"
 #: ../gtk/details.c:778
 #, c-format
 msgid "%1$.1f%%"
-msgstr ""
+msgstr "%1$.1f%%"
 
 #: ../gtk/details.c:796
 #, c-format
@@ -610,17 +610,18 @@ msgstr "Показать _больше сведений"
 #: ../gtk/details.c:1701
 #, c-format
 msgid "Got a list of %1$s%2$'d peers%3$s %4$s ago"
-msgstr ""
+msgstr "Получен список %1$s%2$'d пиров%3$s %4$s"
 
 #: ../gtk/details.c:1705
 #, c-format
 msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
 msgstr ""
+"Время запроса списка клиентов %1$s истекло %2$s %3$s назад; повтор попытки"
 
 #: ../gtk/details.c:1708
 #, c-format
 msgid "Got an error %1$s\"%2$s\"%3$s %4$s ago"
-msgstr ""
+msgstr "Ошибка %1$s\"%2$s\"%3$s %4$s"
 
 #: ../gtk/details.c:1717
 msgid "No updates scheduled"
@@ -648,7 +649,7 @@ msgstr "На трекере было %s%'d раздающих и %'d прини�
 #: ../gtk/details.c:1746
 #, c-format
 msgid "Got a scrape error \"%s%s%s\" %s ago"
-msgstr "Получена ошибка при запросе к трекере \"%s%s%s\" %s назад"
+msgstr "Получена ошибка при запросе к трекеру \"%s%s%s\" %s назад"
 
 #: ../gtk/details.c:1756
 #, c-format
@@ -945,12 +946,14 @@ msgstr ""
 "  Novikov Andrey https://launchpad.net/~envek\n"
 "  Oleg Koptev https://launchpad.net/~koptev-oleg\n"
 "  Pavel Dmitriev https://launchpad.net/~dmitrievp\n"
+"  Pavel Kurashov https://launchpad.net/~pavell\n"
 "  Pavels Sevcuks https://launchpad.net/~stlwrt\n"
 "  Phenomen https://launchpad.net/~xphenomen\n"
 "  Sergei Medvedev https://launchpad.net/~smedvedeff\n"
 "  Sergey \"Shnatsel\" Davidoff https://launchpad.net/~shnatsel\n"
 "  Sergey Sedov https://launchpad.net/~serg-sedov\n"
 "  Shu https://launchpad.net/~shugod\n"
+"  Vadim Rutkovsky https://launchpad.net/~roignac\n"
 "  Victor N. https://launchpad.net/~d447224\n"
 "  meating https://launchpad.net/~unrealjke\n"
 "  ttg https://launchpad.net/~xvttgvx\n"
@@ -1375,7 +1378,7 @@ msgstr "Автоматически _добавлять торренты из:"
 
 #: ../gtk/tr-prefs.c:300
 msgid "Append \"._part\" to incomplete files' names"
-msgstr ""
+msgstr "Добавлять \"._part\" к именам незавершенных файлов"
 
 #: ../gtk/tr-prefs.c:304
 msgid "Keep _incomplete torrents in:"
@@ -1946,7 +1949,7 @@ msgstr "Некорректные метаданные"
 #: ../libtransmission/bencode.c:1644
 #, c-format
 msgid "Saved \"%s\""
-msgstr ""
+msgstr "Сохранение \"%s\""
 
 #: ../libtransmission/bencode.c:1649 ../libtransmission/bencode.c:1656
 #: ../libtransmission/blocklist.c:294
@@ -1957,7 +1960,7 @@ msgstr "Не удалось сохранить файл «%1$s»: %2$s"
 #: ../libtransmission/bencode.c:1663 ../libtransmission/bencode.c:1673
 #, c-format
 msgid "Couldn't save temporary file \"%1$s\": %2$s"
-msgstr ""
+msgstr "Не удалось сохранить временный файл \"%1$s\": %2$s"
 
 #: ../libtransmission/blocklist.c:78 ../libtransmission/blocklist.c:238
 #: ../libtransmission/utils.c:488

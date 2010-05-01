@@ -3,14 +3,14 @@ msgstr ""
 "Project-Id-Version: Transmission 0.81\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-02-10 20:02-0600\n"
-"PO-Revision-Date: 2010-02-26 19:35+0000\n"
-"Last-Translator: Daniel Schury <Surst@gmx.net>\n"
+"PO-Revision-Date: 2010-03-28 13:37+0000\n"
+"Last-Translator: Martin Lettner <m.lettner@gmail.com>\n"
 "Language-Team: Michael Färber <0102@gmx.at>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2010-03-12 01:53+0000\n"
+"X-Launchpad-Export-Date: 2010-05-01 04:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:54
@@ -1316,7 +1316,7 @@ msgstr "BitTorrent-Aktivität"
 
 #: ../gtk/tr-core.c:1353
 msgid "Disallowing desktop hibernation"
-msgstr "Desktop-Ruhezustand verbieten"
+msgstr "Ruhezustand der Arbeitsumgebung verbieten"
 
 #: ../gtk/tr-core.c:1356
 #, c-format
@@ -1325,7 +1325,7 @@ msgstr "Ruhezustand konnte nicht deaktivieren werden: %s"
 
 #: ../gtk/tr-core.c:1380
 msgid "Allowing desktop hibernation"
-msgstr "Desktop-Ruhezustand erlauben"
+msgstr "Ruhezustand der Arbeitsumgebung erlauben"
 
 #: ../gtk/tr-icon.c:89 ../gtk/tr-icon.c:104
 #, c-format

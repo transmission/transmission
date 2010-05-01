@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-02-10 20:02-0600\n"
-"PO-Revision-Date: 2010-02-24 19:43+0000\n"
-"Last-Translator: Adrian Guniš <andygun696@gmail.com>\n"
+"PO-Revision-Date: 2010-04-22 00:53+0000\n"
+"Last-Translator: Roman Horník <Unknown>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2010-03-12 01:52+0000\n"
+"X-Launchpad-Export-Date: 2010-05-01 04:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:54
@@ -543,11 +543,11 @@ msgstr "%"
 
 #: ../gtk/details.c:1064
 msgid "Up Reqs"
-msgstr ""
+msgstr "Žádosti o upload"
 
 #: ../gtk/details.c:1066
 msgid "Dn Reqs"
-msgstr ""
+msgstr "Žádosti o download"
 
 #: ../gtk/details.c:1067
 msgid "Status"
@@ -604,7 +604,7 @@ msgstr "Zobrazit _více podrobností"
 #: ../gtk/details.c:1701
 #, c-format
 msgid "Got a list of %1$s%2$'d peers%3$s %4$s ago"
-msgstr ""
+msgstr "Seznam %1$s%2$'d peerů získán před %3$s %4$s"
 
 #: ../gtk/details.c:1705
 #, c-format
@@ -614,7 +614,7 @@ msgstr ""
 #: ../gtk/details.c:1708
 #, c-format
 msgid "Got an error %1$s\"%2$s\"%3$s %4$s ago"
-msgstr ""
+msgstr "Chyba obdržená před %1$s\"%2$s\"%3$s %4$s"
 
 #: ../gtk/details.c:1717
 msgid "No updates scheduled"
@@ -637,26 +637,26 @@ msgstr "Žádá se o více protějšků... <small>%s</small>"
 #: ../gtk/details.c:1742
 #, c-format
 msgid "Tracker had %s%'d seeders and %'d leechers%s %s ago"
-msgstr ""
+msgstr "%s%'d seederů a %'d leecherů měl tracker před %s %s"
 
 #: ../gtk/details.c:1746
 #, c-format
 msgid "Got a scrape error \"%s%s%s\" %s ago"
-msgstr ""
+msgstr "Chyba scrape \"%s%s%s\" obdržena před %s"
 
 #: ../gtk/details.c:1756
 #, c-format
 msgid "Asking for peer counts in %s"
-msgstr ""
+msgstr "Dotaz na počet protějšků za %s"
 
 #: ../gtk/details.c:1760
 msgid "Queued to ask for peer counts"
-msgstr ""
+msgstr "Ve frontě s požadavkem k počtu peerů"
 
 #: ../gtk/details.c:1765
 #, c-format
 msgid "Asking for peer counts now... <small>%s</small>"
-msgstr ""
+msgstr "Nyní se dotazuji na aktuální počet protějšků... <small>%s</small>"
 
 #: ../gtk/details.c:1978
 msgid "List contains invalid URLs"
@@ -700,7 +700,7 @@ msgstr "Protějšky"
 
 #: ../gtk/details.c:2188
 msgid "File listing not available for combined torrent properties"
-msgstr ""
+msgstr "Ve vlastnostech kombinovaných torrentů není seznam souborů dostupný"
 
 #: ../gtk/details.c:2192 ../gtk/makemeta-ui.c:402 ../gtk/tr-window.c:855
 msgid "Files"
@@ -806,6 +806,8 @@ msgstr "Průběh"
 msgid ""
 "Got signal %d; trying to shut down cleanly.  Do it again if it gets stuck."
 msgstr ""
+"Obdržel jsem signál %d; zkuste mne ukončit klasickým, čistým způsobem. Budu-"
+"li trucovat, zkuste to znovu."
 
 #: ../gtk/main.c:493
 msgid "Start with all torrents paused"
@@ -1219,12 +1221,12 @@ msgstr "Poměr: %s"
 #: ../gtk/torrent-cell-renderer.c:230
 #, c-format
 msgid "Tracker gave a warning: \"%s\""
-msgstr ""
+msgstr "Tracker oznámil varování: \"%s\""
 
 #: ../gtk/torrent-cell-renderer.c:231
 #, c-format
 msgid "Tracker gave an error: \"%s\""
-msgstr ""
+msgstr "Tracker oznámil chybu: \"%s\""
 
 #: ../gtk/torrent-cell-renderer.c:232
 #, c-format
@@ -1326,7 +1328,7 @@ msgstr "Automaticky přid_at torrenty z:"
 
 #: ../gtk/tr-prefs.c:300
 msgid "Append \"._part\" to incomplete files' names"
-msgstr ""
+msgstr "Přidat \"._part\" za názvy nekompletních souborů"
 
 #: ../gtk/tr-prefs.c:304
 msgid "Keep _incomplete torrents in:"

@@ -3,14 +3,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-02-10 20:02-0600\n"
-"PO-Revision-Date: 2009-09-29 18:36+0000\n"
+"PO-Revision-Date: 2010-03-15 11:53+0000\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2010-03-12 01:52+0000\n"
+"X-Launchpad-Export-Date: 2010-05-01 04:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Language: Hebrew\n"
 
@@ -52,7 +52,7 @@ msgstr "מיון לפי גו_דל"
 
 #: ../gtk/actions.c:79
 msgid "_Show Transmission"
-msgstr ""
+msgstr "ה_צגת Transmission"
 
 #: ../gtk/actions.c:80
 msgid "Message _Log"
@@ -112,11 +112,11 @@ msgstr ""
 
 #: ../gtk/actions.c:112
 msgid "Add _URL..."
-msgstr ""
+msgstr "הוספת _כתובת..."
 
 #: ../gtk/actions.c:112
 msgid "Add URL..."
-msgstr ""
+msgstr "הוספת כתובת..."
 
 #: ../gtk/actions.c:113 ../gtk/actions.c:114
 msgid "Add a torrent"
@@ -124,7 +124,7 @@ msgstr "הוסף טורנט"
 
 #: ../gtk/actions.c:114
 msgid "_Add File..."
-msgstr ""
+msgstr "הוספת _קובץ..."
 
 #: ../gtk/actions.c:115
 msgid "_Start"
@@ -140,7 +140,7 @@ msgstr "_סטטיסטיקה"
 
 #: ../gtk/actions.c:117
 msgid "_Donate"
-msgstr ""
+msgstr "_תרומה"
 
 #: ../gtk/actions.c:118
 msgid "_Verify Local Data"
@@ -233,7 +233,7 @@ msgstr "אפשרויות טורנט"
 
 #: ../gtk/add-dialog.c:301 ../gtk/tr-prefs.c:296
 msgid "Mo_ve .torrent file to the trash"
-msgstr ""
+msgstr "העברת קובץ .torret אל הא_שפה"
 
 #: ../gtk/add-dialog.c:303 ../gtk/tr-prefs.c:292
 msgid "_Start when added"
@@ -265,19 +265,19 @@ msgstr "הוסף טורנט"
 
 #: ../gtk/add-dialog.c:458 ../gtk/tr-prefs.c:288
 msgid "Show _options dialog"
-msgstr ""
+msgstr "הצגת חלון הא_פשרויות"
 
 #: ../gtk/add-dialog.c:514
 msgid "Add URL"
-msgstr ""
+msgstr "הוספת כתובת"
 
 #: ../gtk/add-dialog.c:527
 msgid "Add torrent from URL"
-msgstr ""
+msgstr "הוספת טורנט מכתובת"
 
 #: ../gtk/add-dialog.c:530
 msgid "_URL"
-msgstr ""
+msgstr "_כתובת"
 
 #: ../gtk/conf.c:62 ../libtransmission/fdlimit.c:358
 #: ../libtransmission/metainfo.c:99 ../libtransmission/utils.c:608
@@ -307,7 +307,7 @@ msgstr "מהירות"
 
 #: ../gtk/details.c:448
 msgid "Honor global _limits"
-msgstr ""
+msgstr "כיבוד _הגבלות גלובליות"
 
 #: ../gtk/details.c:453 ../gtk/tr-prefs.c:1201
 msgid "Limit _download speed (KB/s):"
@@ -351,7 +351,7 @@ msgstr ""
 
 #: ../gtk/details.c:540
 msgid "Downloading"
-msgstr ""
+msgstr "בתהליכי הורדה"
 
 #: ../gtk/details.c:541
 msgid "Seeding"
@@ -380,17 +380,17 @@ msgstr "טורנט ציבורי"
 #: ../gtk/details.c:610
 #, c-format
 msgid "Created by %1$s"
-msgstr ""
+msgstr "נוצר על ידי %1$s"
 
 #: ../gtk/details.c:612
 #, c-format
 msgid "Created on %1$s"
-msgstr ""
+msgstr "נוצר בתאריך %1$s"
 
 #: ../gtk/details.c:614
 #, c-format
 msgid "Created by %1$s on %2$s"
-msgstr ""
+msgstr "נוצר על ידי %1$s ב־%2$s"
 
 #: ../gtk/details.c:696
 msgid "Unknown"
@@ -493,7 +493,7 @@ msgstr "פרטים"
 
 #: ../gtk/details.c:946
 msgid "Location:"
-msgstr ""
+msgstr "מיקום:‏‪"
 
 #: ../gtk/details.c:953
 msgid "Hash:"
@@ -676,7 +676,7 @@ msgstr "טקראקרים"
 
 #: ../gtk/details.c:2093
 msgid "_Edit Trackers"
-msgstr ""
+msgstr "_עריכת טראקרים"
 
 #: ../gtk/details.c:2101
 msgid "Show _backup trackers"
@@ -908,7 +908,7 @@ msgstr ""
 #: ../gtk/makemeta-ui.c:81
 #, c-format
 msgid "Cancelled"
-msgstr ""
+msgstr "בוטל"
 
 #: ../gtk/makemeta-ui.c:83
 #, c-format
@@ -978,7 +978,7 @@ msgstr ""
 
 #: ../gtk/makemeta-ui.c:460
 msgid "Co_mment:"
-msgstr ""
+msgstr "ה_ערה:"
 
 #: ../gtk/makemeta-ui.c:469
 msgid "_Private torrent"
@@ -1039,7 +1039,7 @@ msgstr "פתח תיקייה"
 
 #: ../gtk/notify.c:159
 msgid "Torrent Added"
-msgstr ""
+msgstr "נוסף טורנט"
 
 #: ../gtk/relocate.c:68
 #, c-format
@@ -1310,7 +1310,7 @@ msgstr "הגבלות"
 
 #: ../gtk/tr-prefs.c:341 ../gtk/tr-prefs.c:1426
 msgid "Desktop"
-msgstr ""
+msgstr "שולחן העבודה"
 
 #: ../gtk/tr-prefs.c:343
 msgid "Inhibit _hibernation when torrents are active"
@@ -1368,11 +1368,11 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:516
 msgid "Blocklist"
-msgstr ""
+msgstr "רשימת החסומים"
 
 #: ../gtk/tr-prefs.c:522
 msgid "_Update"
-msgstr ""
+msgstr "_עדכון"
 
 #: ../gtk/tr-prefs.c:532
 msgid "Enable _automatic updates"
@@ -1446,7 +1446,7 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:866
 msgid "Addresses:"
-msgstr ""
+msgstr "כתובות:"
 
 #: ../gtk/tr-prefs.c:982 ../gtk/tr-window.c:855
 msgid "Tracker"
@@ -1470,11 +1470,11 @@ msgstr "_סוג הפרוקסי:"
 
 #: ../gtk/tr-prefs.c:1138
 msgid "Every Day"
-msgstr ""
+msgstr "כל יום"
 
 #: ../gtk/tr-prefs.c:1139
 msgid "Weekdays"
-msgstr ""
+msgstr "ימות השבוע"
 
 #: ../gtk/tr-prefs.c:1140
 msgid "Weekends"
@@ -1482,35 +1482,35 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:1141
 msgid "Sunday"
-msgstr ""
+msgstr "יום ראשון"
 
 #: ../gtk/tr-prefs.c:1142
 msgid "Monday"
-msgstr ""
+msgstr "יום שני"
 
 #: ../gtk/tr-prefs.c:1143
 msgid "Tuesday"
-msgstr ""
+msgstr "יום שלישי"
 
 #: ../gtk/tr-prefs.c:1144
 msgid "Wednesday"
-msgstr ""
+msgstr "יום רביעי"
 
 #: ../gtk/tr-prefs.c:1145
 msgid "Thursday"
-msgstr ""
+msgstr "יום חמישי"
 
 #: ../gtk/tr-prefs.c:1146
 msgid "Friday"
-msgstr ""
+msgstr "יום שישי"
 
 #: ../gtk/tr-prefs.c:1147
 msgid "Saturday"
-msgstr ""
+msgstr "שבת"
 
 #: ../gtk/tr-prefs.c:1199
 msgid "Speed Limits"
-msgstr ""
+msgstr "מגבלות מהירות"
 
 #: ../gtk/tr-prefs.c:1219
 msgid "Temporary Speed Limits"

@@ -12,14 +12,14 @@ msgstr ""
 "Project-Id-Version: Transmission\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-02-10 20:02-0600\n"
-"PO-Revision-Date: 2010-02-14 22:13+0000\n"
+"PO-Revision-Date: 2010-04-30 17:50+0000\n"
 "Last-Translator: Miguel Anxo Bouzada <mbouzada@gmail.com>\n"
 "Language-Team: Galician <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2010-03-12 01:52+0000\n"
+"X-Launchpad-Export-Date: 2010-05-01 04:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Language: Galician\n"
 
@@ -221,7 +221,7 @@ msgstr "_Abrir cartafol"
 
 #: ../gtk/actions.c:133
 msgid "_Contents"
-msgstr "_Contidos"
+msgstr "Índ_ice"
 
 #: ../gtk/actions.c:134
 msgid "Ask Tracker for _More Peers"
@@ -607,17 +607,18 @@ msgstr "Mostrar _máis detalles"
 #: ../gtk/details.c:1701
 #, c-format
 msgid "Got a list of %1$s%2$'d peers%3$s %4$s ago"
-msgstr ""
+msgstr "Ten unha lista de %1$s%2$'d pares%3$s fai %4$s"
 
 #: ../gtk/details.c:1705
 #, c-format
 msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
 msgstr ""
+"Lista de solicitude de pares %1$stempo esgotado%2$s fai %3$s; tenteo de novo"
 
 #: ../gtk/details.c:1708
 #, c-format
 msgid "Got an error %1$s\"%2$s\"%3$s %4$s ago"
-msgstr ""
+msgstr "Ten un erro %1$s\"%2$s\"%3$s fai %4$s"
 
 #: ../gtk/details.c:1717
 msgid "No updates scheduled"
@@ -1876,6 +1877,8 @@ msgid ""
 "This magnet link appears to be intended for something other than BitTorrent. "
 " BitTorrent magnet links have a section containing \"%s\"."
 msgstr ""
+"Esta ligazón Magnet semella que non está destinada a BitTorrent.As ligazóns "
+"Magnet de BitTorrent teñen unha sección que conten «%s»."
 
 #. did caller give us an uninitialized val?
 #: ../libtransmission/bencode.c:1092
@@ -1885,7 +1888,7 @@ msgstr "Os metadatos non son correctos"
 #: ../libtransmission/bencode.c:1644
 #, c-format
 msgid "Saved \"%s\""
-msgstr ""
+msgstr "«%s» gardado"
 
 #: ../libtransmission/bencode.c:1649 ../libtransmission/bencode.c:1656
 #: ../libtransmission/blocklist.c:294
@@ -1896,7 +1899,7 @@ msgstr "Non se pode gardar o ficheiro «%1$s»: %2$s"
 #: ../libtransmission/bencode.c:1663 ../libtransmission/bencode.c:1673
 #, c-format
 msgid "Couldn't save temporary file \"%1$s\": %2$s"
-msgstr ""
+msgstr "Non se puido gardar o ficheiro temporal «%1$s»: %2$s"
 
 #: ../libtransmission/blocklist.c:78 ../libtransmission/blocklist.c:238
 #: ../libtransmission/utils.c:488
@@ -1980,7 +1983,7 @@ msgstr "Non se pode conectar ao porto %d en %s: %s"
 #: ../libtransmission/net.c:367
 #, c-format
 msgid "Couldn't bind port %d on %s: %s (%s)"
-msgstr ""
+msgstr "Non se pode vincular ao porto %d en %s: %s (%s)"
 
 #: ../libtransmission/port-forwarding.c:31
 msgid "Port Forwarding"

@@ -12,14 +12,14 @@ msgstr ""
 "Project-Id-Version: es\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-02-10 20:02-0600\n"
-"PO-Revision-Date: 2010-03-09 20:01+0000\n"
+"PO-Revision-Date: 2010-04-23 21:18+0000\n"
 "Last-Translator: Fernando Muñoz <munozferna@gmail.com>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2010-03-12 01:52+0000\n"
+"X-Launchpad-Export-Date: 2010-05-01 04:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Country: SPAIN\n"
 "X-Poedit-Language: Spanish\n"
@@ -50,7 +50,7 @@ msgstr "Ordenar por _rastreador"
 
 #: ../gtk/actions.c:60
 msgid "Sort by A_ge"
-msgstr "Ordenar por an_tigüedad"
+msgstr "Ordenar por _antigüedad"
 
 #: ../gtk/actions.c:61
 msgid "Sort by Time _Left"
@@ -70,7 +70,7 @@ msgstr "_Registro de mensajes"
 
 #: ../gtk/actions.c:95
 msgid "Enable Temporary Speed _Limits"
-msgstr "Activar _límite de velocidad temporalmente"
+msgstr "Activar _límites de velocidad temporales"
 
 #: ../gtk/actions.c:96
 msgid "_Minimal View"
@@ -78,7 +78,7 @@ msgstr "Vista _mínima"
 
 #: ../gtk/actions.c:97
 msgid "Re_verse Sort Order"
-msgstr "Inver_tir el orden"
+msgstr "In_vertir el orden"
 
 #: ../gtk/actions.c:98
 msgid "_Filterbar"
@@ -267,7 +267,7 @@ msgstr "Seleccionar carpeta de destino"
 
 #: ../gtk/add-dialog.c:359 ../gtk/details.c:477
 msgid "Torrent _priority:"
-msgstr "_Prioridad de torrent"
+msgstr "_Prioridad del torrent:"
 
 #: ../gtk/add-dialog.c:441
 msgid "Add a Torrent"
@@ -608,17 +608,19 @@ msgstr "Mostrar _más detalles"
 #: ../gtk/details.c:1701
 #, c-format
 msgid "Got a list of %1$s%2$'d peers%3$s %4$s ago"
-msgstr ""
+msgstr "Se obtuvo una lista de %1$s%2$'d pares hace %3$s %4$s"
 
 #: ../gtk/details.c:1705
 #, c-format
 msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
 msgstr ""
+"La petición de lista de pares %1$sagotó su tiempo de espera hace%2$s %3$s; "
+"reintentando"
 
 #: ../gtk/details.c:1708
 #, c-format
 msgid "Got an error %1$s\"%2$s\"%3$s %4$s ago"
-msgstr ""
+msgstr "Obtuvo un error hace %1$s\"%2$s\"%3$s %4$s"
 
 #: ../gtk/details.c:1717
 msgid "No updates scheduled"
@@ -641,12 +643,12 @@ msgstr "Buscando más pares... <small>%s</small>"
 #: ../gtk/details.c:1742
 #, c-format
 msgid "Tracker had %s%'d seeders and %'d leechers%s %s ago"
-msgstr ""
+msgstr "El rastreador tenía %s%'d sembradores y %'d sanguijuelas%s hace %s"
 
 #: ../gtk/details.c:1746
 #, c-format
 msgid "Got a scrape error \"%s%s%s\" %s ago"
-msgstr ""
+msgstr "Se obtuvo un error de raspado \"%s%s%s\" hace %s"
 
 #: ../gtk/details.c:1756
 #, c-format
@@ -655,7 +657,7 @@ msgstr "Preguntando por conteo de pares en %s"
 
 #: ../gtk/details.c:1760
 msgid "Queued to ask for peer counts"
-msgstr ""
+msgstr "Encolado para preguntar el recuento de pares"
 
 #: ../gtk/details.c:1765
 #, c-format
@@ -668,7 +670,7 @@ msgstr "La lista contiene URLs invalidas"
 
 #: ../gtk/details.c:2011
 msgid "Edit Trackers"
-msgstr ""
+msgstr "Editar rastreadores"
 
 #: ../gtk/details.c:2023
 msgid "Tracker Announce URLs"
@@ -690,7 +692,7 @@ msgstr "Rastreadores"
 
 #: ../gtk/details.c:2093
 msgid "_Edit Trackers"
-msgstr ""
+msgstr "_Editar rastreadores"
 
 #: ../gtk/details.c:2101
 msgid "Show _backup trackers"
@@ -807,6 +809,8 @@ msgstr "Progreso"
 msgid ""
 "Got signal %d; trying to shut down cleanly.  Do it again if it gets stuck."
 msgstr ""
+"Se obtuvo señal %d; al tratar de apagar limpiamente. Hágalo nuevamente si se "
+"queda congelado."
 
 #: ../gtk/main.c:493
 msgid "Start with all torrents paused"
@@ -837,10 +841,12 @@ msgid ""
 "Transmission is already running, but is not responding.  To start a new "
 "session, you must first close the existing Transmission process."
 msgstr ""
+"Transmission está corriendo pero no responde. Para iniciar una nueva sesión "
+"debe cerrar el proceso existente de Transmission."
 
 #: ../gtk/main.c:626
 msgid "Transmission cannot be started."
-msgstr ""
+msgstr "No se pudo iniciar Transmission."
 
 #: ../gtk/main.c:708
 msgid ""
@@ -913,6 +919,7 @@ msgstr ""
 "  Antonio Maldonado https://launchpad.net/~a.m.\n"
 "  Carlos Zúñiga https://launchpad.net/~carlos-zun\n"
 "  Chaoxic https://launchpad.net/~chaotic-harmony\n"
+"  Cristian AB https://launchpad.net/~cristian-a-b\n"
 "  Daniel Artamendi https://launchpad.net/~danimon\n"
 "  Dante Díaz https://launchpad.net/~dante\n"
 "  Darío Ortega https://launchpad.net/~dario.ortega\n"
@@ -924,6 +931,7 @@ msgstr ""
 "  Fernando Muñoz https://launchpad.net/~munozferna\n"
 "  Francisco José Rey https://launchpad.net/~fcojreyg\n"
 "  Francisco Vila https://launchpad.net/~francisco-vila\n"
+"  FreeFri https://launchpad.net/~freefri\n"
 "  Gabriel https://launchpad.net/~galvarez-mdp\n"
 "  Gabriel Ruiz https://launchpad.net/~anakron\n"
 "  Guillermo González Díez https://launchpad.net/~ibrotha-deactivatedaccount\n"
@@ -939,6 +947,7 @@ msgstr ""
 "  Jorge_C https://launchpad.net/~jorgecanardo\n"
 "  Joseph https://launchpad.net/~josephmail7\n"
 "  Juan Alfredo Salas Santillana https://launchpad.net/~ratasxy\n"
+"  Juan Eduardo Riva https://launchpad.net/~juaneduardoriva\n"
 "  Julián Alarcón https://launchpad.net/~alarconj\n"
 "  Kevin https://launchpad.net/~kevin64-deactivatedaccount\n"
 "  Kislev https://launchpad.net/~1hrevs-launchpad-deactivatedaccount\n"
@@ -971,7 +980,7 @@ msgstr ""
 #: ../gtk/makemeta-ui.c:75
 #, c-format
 msgid "Creating \"%s\""
-msgstr ""
+msgstr "Creando «%s»"
 
 #: ../gtk/makemeta-ui.c:77
 #, c-format
@@ -986,7 +995,7 @@ msgstr "Error: URL de anuncio incorrecta «%s»"
 #: ../gtk/makemeta-ui.c:81
 #, c-format
 msgid "Cancelled"
-msgstr ""
+msgstr "Cancelado"
 
 #: ../gtk/makemeta-ui.c:83
 #, c-format
@@ -1027,8 +1036,8 @@ msgstr[1] "%1$s; %2$'d archivos"
 #, c-format
 msgid "%1$'d Piece @ %2$s"
 msgid_plural "%1$'d Pieces @ %2$s"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$'d parte @ %2$s"
+msgstr[1] "%1$'d partes @ %2$s"
 
 #: ../gtk/makemeta-ui.c:404
 msgid "Sa_ve to:"
@@ -1056,7 +1065,7 @@ msgstr "Ras_treadores"
 
 #: ../gtk/makemeta-ui.c:460
 msgid "Co_mment:"
-msgstr ""
+msgstr "Co_mentario:"
 
 #: ../gtk/makemeta-ui.c:469
 msgid "_Private torrent"
@@ -1065,7 +1074,7 @@ msgstr "Torrent _privado"
 #: ../gtk/msgwin.c:84
 #, c-format
 msgid "Couldn't save \"%s\""
-msgstr ""
+msgstr "No se puede guardar «%s»"
 
 #: ../gtk/msgwin.c:135
 msgid "Save Log"
@@ -1101,7 +1110,7 @@ msgstr "Nivel"
 
 #: ../gtk/notify.c:121
 msgid "Download complete"
-msgstr ""
+msgstr "Descarga finalizada"
 
 #: ../gtk/notify.c:131
 msgid "Torrent Complete"
@@ -1146,7 +1155,7 @@ msgstr "_Mover de la carpeta actual"
 
 #: ../gtk/relocate.c:128
 msgid "Local data is _already there"
-msgstr "Los d_atos locales están todavía aquí"
+msgstr "Los d_atos locales están ya aquí"
 
 #: ../gtk/stats.c:76 ../gtk/stats.c:175
 #, c-format
@@ -1169,7 +1178,7 @@ msgstr ""
 
 #: ../gtk/stats.c:119 ../gtk/stats.c:151
 msgid "_Reset"
-msgstr ""
+msgstr "_Restablecer"
 
 #: ../gtk/stats.c:147 ../gtk/tr-window.c:999
 msgid "Statistics"
@@ -1273,17 +1282,17 @@ msgstr "Proporción: %s"
 #: ../gtk/torrent-cell-renderer.c:230
 #, c-format
 msgid "Tracker gave a warning: \"%s\""
-msgstr ""
+msgstr "El rastreador dio un aviso: «%s»"
 
 #: ../gtk/torrent-cell-renderer.c:231
 #, c-format
 msgid "Tracker gave an error: \"%s\""
-msgstr ""
+msgstr "El rastreador dio un error: «%s»"
 
 #: ../gtk/torrent-cell-renderer.c:232
 #, c-format
 msgid "Error: %s"
-msgstr ""
+msgstr "Error : %s"
 
 #: ../gtk/torrent-cell-renderer.c:252
 #, c-format
@@ -1296,8 +1305,8 @@ msgstr[1] "Descargando desde %1$'d de %2$'d pares conectados"
 #, c-format
 msgid "Downloading metadata from %1$'d peer (%2$d%% done)"
 msgid_plural "Downloading metadata from %1$'d peers (%2$d%% done)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Descargando metadatos del par %1$'d  (%2$d%% completado)"
+msgstr[1] "Descargando metadatos de los pares %1$'d  (%2$d%% completado)"
 
 #: ../gtk/torrent-cell-renderer.c:274 ../gtk/tr-torrent.c:258
 #, c-format
@@ -1377,7 +1386,7 @@ msgstr "_Añadir torrents automáticamente desde:"
 
 #: ../gtk/tr-prefs.c:300
 msgid "Append \"._part\" to incomplete files' names"
-msgstr ""
+msgstr "Añade «._part» a los nombres de archivos incompletos"
 
 #: ../gtk/tr-prefs.c:304
 msgid "Keep _incomplete torrents in:"
@@ -1930,6 +1939,8 @@ msgid ""
 "This magnet link appears to be intended for something other than BitTorrent. "
 " BitTorrent magnet links have a section containing \"%s\"."
 msgstr ""
+"Este enlace magnético parece que no está destinado a BitTorrent. Los enlaces "
+"magnéticos de BitTorrent tienen una sección que contiene «%s»."
 
 #. did caller give us an uninitialized val?
 #: ../libtransmission/bencode.c:1092
@@ -1939,7 +1950,7 @@ msgstr "Metadatos inválidos"
 #: ../libtransmission/bencode.c:1644
 #, c-format
 msgid "Saved \"%s\""
-msgstr ""
+msgstr "«%s» guardado"
 
 #: ../libtransmission/bencode.c:1649 ../libtransmission/bencode.c:1656
 #: ../libtransmission/blocklist.c:294
@@ -1950,7 +1961,7 @@ msgstr "No se pudo guardar el archivo «%1$s»: %2$s"
 #: ../libtransmission/bencode.c:1663 ../libtransmission/bencode.c:1673
 #, c-format
 msgid "Couldn't save temporary file \"%1$s\": %2$s"
-msgstr ""
+msgstr "No se pudo guardar el archivo temporal «%1$s»: %2$s"
 
 #: ../libtransmission/blocklist.c:78 ../libtransmission/blocklist.c:238
 #: ../libtransmission/utils.c:488
@@ -2025,7 +2036,7 @@ msgstr ""
 
 #: ../libtransmission/net.c:360
 msgid "Is another copy of Transmission already running?"
-msgstr ""
+msgstr "¿Hay otra copia de Transmission ya ejecutándose?"
 
 #: ../libtransmission/net.c:365
 #, c-format
@@ -2035,7 +2046,7 @@ msgstr "No se pudo enlazar el puerto %d en %s: %s"
 #: ../libtransmission/net.c:367
 #, c-format
 msgid "Couldn't bind port %d on %s: %s (%s)"
-msgstr ""
+msgstr "No se pudo vincular al puerto %d en %s: %s (%s)"
 
 #: ../libtransmission/port-forwarding.c:31
 msgid "Port Forwarding"

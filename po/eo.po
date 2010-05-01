@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-02-10 20:02-0600\n"
-"PO-Revision-Date: 2010-01-22 20:07+0000\n"
+"PO-Revision-Date: 2010-04-10 11:02+0000\n"
 "Last-Translator: Kristjan <Unknown>\n"
 "Language-Team: Esperanto <eo@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2010-03-12 01:52+0000\n"
+"X-Launchpad-Export-Date: 2010-05-01 04:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:54
@@ -40,7 +40,7 @@ msgstr "Origi laŭ stato"
 
 #: ../gtk/actions.c:59
 msgid "Sort by T_racker"
-msgstr "Origi laŭ ŝanĝospu_rilo"
+msgstr "Ordigu laŭ ku_nordiga servilo"
 
 #: ../gtk/actions.c:60
 msgid "Sort by A_ge"
@@ -104,7 +104,7 @@ msgstr "Ordigi torentojn laŭ"
 
 #: ../gtk/actions.c:109
 msgid "_Edit"
-msgstr "_Redakti"
+msgstr "_Modifi"
 
 #: ../gtk/actions.c:110
 msgid "_Help"
@@ -220,7 +220,7 @@ msgstr "_Enhavoj"
 
 #: ../gtk/actions.c:134
 msgid "Ask Tracker for _More Peers"
-msgstr "_Peti Kunordigan Servilon pri pli Kundividantoj"
+msgstr "_Peti por pli da samtavolanoj al la kunordiga Servilo"
 
 #: ../gtk/add-dialog.c:247
 msgid "Torrent files"
@@ -315,23 +315,23 @@ msgstr "ĝenerala _limoj"
 
 #: ../gtk/details.c:453 ../gtk/tr-prefs.c:1201
 msgid "Limit _download speed (KB/s):"
-msgstr "Limigi _elŝutrapidon (KB/s):"
+msgstr "Limigi _elŝutrapidon (kB/s):"
 
 #: ../gtk/details.c:465 ../gtk/tr-prefs.c:1208
 msgid "Limit _upload speed (KB/s):"
-msgstr "Limigi _alŝutrapidon (KB/s):"
+msgstr "Limigi _alŝutrapidon (kB/s):"
 
 #: ../gtk/details.c:481
 msgid "Seed-Until Ratio"
-msgstr "Fontsendi -Ĝis Proporcio"
+msgstr "Fontsendi ĝis proporcio"
 
 #: ../gtk/details.c:483
 msgid "Use _global settings"
-msgstr "Uzi _ĝeneralan agordoj"
+msgstr "Uzi _ĝeneralajn agordojn"
 
 #: ../gtk/details.c:491
 msgid "Seed _regardless of ratio"
-msgstr "Fontsendi _sen gravi proporcion"
+msgstr "Fontsendi _sen konsideri proporcion"
 
 #: ../gtk/details.c:500 ../gtk/tr-prefs.c:317
 msgid "_Seed torrent until its ratio reaches:"
@@ -339,7 +339,7 @@ msgstr "_Fontsendi torenton ĝis ĝia proporcio atingas:"
 
 #: ../gtk/details.c:516
 msgid "Peer Connections"
-msgstr "Samtavolanaj Konektoj"
+msgstr "Samtavolaj konektoj"
 
 #: ../gtk/details.c:519
 msgid "_Maximum peers:"
@@ -355,15 +355,15 @@ msgstr "Kontrolante lokan datumon"
 
 #: ../gtk/details.c:540
 msgid "Downloading"
-msgstr "Elŝutante"
+msgstr "Elŝutas"
 
 #: ../gtk/details.c:541
 msgid "Seeding"
-msgstr "Fontsendante"
+msgstr "Fontsendas"
 
 #: ../gtk/details.c:542 ../gtk/torrent-cell-renderer.c:181
 msgid "Paused"
-msgstr "Paŭzita"
+msgstr "Paŭzigita"
 
 #: ../gtk/details.c:562 ../gtk/util.c:108 ../libtransmission/utils.c:1322
 msgid "None"
@@ -375,7 +375,7 @@ msgstr "Miksita"
 
 #: ../gtk/details.c:585
 msgid "Private to this tracker -- DHT and PEX disabled"
-msgstr "Privata por tiu kunordiga servilo -- DHT kaj PEX malaktiva"
+msgstr "Privata por tiu ĉi kunordiga servilo -- DHT kaj PEX malŝaltitaj"
 
 #: ../gtk/details.c:587
 msgid "Public torrent"
@@ -427,7 +427,7 @@ msgstr "%1$s (%2$.1f%%)"
 #: ../gtk/details.c:778
 #, c-format
 msgid "%1$.1f%%"
-msgstr ""
+msgstr "%1$.1f%%"
 
 #: ../gtk/details.c:796
 #, c-format
@@ -441,7 +441,7 @@ msgstr "Aktiva nun"
 #: ../gtk/details.c:873
 #, c-format
 msgid "%1$s ago"
-msgstr "%1$s antaŭ"
+msgstr "Antaŭ %1$s"
 
 #: ../gtk/details.c:892
 msgid "Activity"
@@ -449,7 +449,7 @@ msgstr "Aktiveco"
 
 #: ../gtk/details.c:896
 msgid "Torrent size:"
-msgstr "Torent-grandeco:"
+msgstr "Torent-grando:"
 
 #: ../gtk/details.c:900
 msgid "Have:"
@@ -457,7 +457,7 @@ msgstr "Posedata:"
 
 #: ../gtk/details.c:904
 msgid "Availability:"
-msgstr ""
+msgstr "Havebla:"
 
 #: ../gtk/details.c:908 ../gtk/stats.c:168 ../gtk/stats.c:180
 msgid "Downloaded:"
@@ -469,7 +469,7 @@ msgstr "Alŝutita:"
 
 #: ../gtk/details.c:916 ../gtk/stats.c:170 ../gtk/stats.c:182
 msgid "Ratio:"
-msgstr "Rilatumo:"
+msgstr "Proporcio:"
 
 #: ../gtk/details.c:920
 msgid "State:"
@@ -477,7 +477,7 @@ msgstr "Stato:"
 
 #: ../gtk/details.c:924
 msgid "Running time:"
-msgstr "Funkciada tempo:"
+msgstr "Funkcia tempo:"
 
 #: ../gtk/details.c:928
 msgid "Remaining time:"
@@ -541,11 +541,11 @@ msgstr "%"
 
 #: ../gtk/details.c:1064
 msgid "Up Reqs"
-msgstr ""
+msgstr "Alpetoj"
 
 #: ../gtk/details.c:1066
 msgid "Dn Reqs"
-msgstr ""
+msgstr "Elpetoj"
 
 #: ../gtk/details.c:1067
 msgid "Status"
@@ -557,7 +557,7 @@ msgstr "Optimisma malsufokado"
 
 #: ../gtk/details.c:1387
 msgid "Downloading from this peer"
-msgstr "Elŝutante el tiu samtavolano"
+msgstr "Elŝutas el tiu samtavolano"
 
 #: ../gtk/details.c:1388
 msgid "We would download from this peer if they would let us"
@@ -565,11 +565,11 @@ msgstr "Ni elŝutus el tiu samtavolano se ili permesus nin"
 
 #: ../gtk/details.c:1389
 msgid "Uploading to peer"
-msgstr "Alŝutanta al samtavolano"
+msgstr "Alŝutas al samtavolano"
 
 #: ../gtk/details.c:1390
 msgid "We would upload to this peer if they asked"
-msgstr "Ni alŝutus al tiu se ili petus"
+msgstr "Ni alŝutus al tiu samtavolano se ili petus"
 
 #: ../gtk/details.c:1391
 msgid "Peer has unchoked us, but we're not interested"
@@ -577,7 +577,7 @@ msgstr "Samtavolano malsufokis nin, sed ni ne interesiĝas"
 
 #: ../gtk/details.c:1392
 msgid "We unchoked this peer, but they're not interested"
-msgstr "Ni malsufokis tiun samtavolano, sed ili ne interesiĝas"
+msgstr "Ni malsufokis tiun samtavolanon, sed ili ne interesiĝas"
 
 #: ../gtk/details.c:1393
 msgid "Encrypted connection"
@@ -585,11 +585,11 @@ msgstr "Ĉifrita konekto"
 
 #: ../gtk/details.c:1394
 msgid "Peer was discovered through Peer Exchange (PEX)"
-msgstr "Samtavolano trovita per Samtavolana Interŝanĝo (PEX)"
+msgstr "Trovis samtavolanon per Samtavolana Interŝanĝo (PEX)"
 
 #: ../gtk/details.c:1395
 msgid "Peer was discovered through DHT"
-msgstr "Samtavolano estas trovita per DHT"
+msgstr "Trovis samtavolanon per DHT"
 
 #: ../gtk/details.c:1396
 msgid "Peer is an incoming connection"
@@ -602,12 +602,13 @@ msgstr ""
 #: ../gtk/details.c:1701
 #, c-format
 msgid "Got a list of %1$s%2$'d peers%3$s %4$s ago"
-msgstr ""
+msgstr "Ricevis liston da %1$s%2$'d samtavolanoj%3$s antaŭ %4$s"
 
 #: ../gtk/details.c:1705
 #, c-format
 msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
 msgstr ""
+"Peto por listo da samtavolanoj %1$seltempiĝis%2$s antaŭ %3$s; reprovos"
 
 #: ../gtk/details.c:1708
 #, c-format
@@ -621,16 +622,16 @@ msgstr ""
 #: ../gtk/details.c:1723
 #, c-format
 msgid "Asking for more peers in %s"
-msgstr ""
+msgstr "Petos por pli da samtavolanoj post %s"
 
 #: ../gtk/details.c:1727
 msgid "Queued to ask for more peers"
-msgstr ""
+msgstr "Enviciĝis peto por pli da samtavolanoj"
 
 #: ../gtk/details.c:1732
 #, c-format
 msgid "Asking for more peers now... <small>%s</small>"
-msgstr ""
+msgstr "Nun petas por pli da samtavolanoj... <small>%s</small>"
 
 #: ../gtk/details.c:1742
 #, c-format
@@ -645,16 +646,16 @@ msgstr ""
 #: ../gtk/details.c:1756
 #, c-format
 msgid "Asking for peer counts in %s"
-msgstr ""
+msgstr "Petas por nombro da samtavolanoj post %s"
 
 #: ../gtk/details.c:1760
 msgid "Queued to ask for peer counts"
-msgstr ""
+msgstr "Enviciĝis peto por nombro da samtavolanoj"
 
 #: ../gtk/details.c:1765
 #, c-format
 msgid "Asking for peer counts now... <small>%s</small>"
-msgstr ""
+msgstr "Nun petas por nombro da samtavolanoj... <small>%s</small>"
 
 #: ../gtk/details.c:1978
 msgid "List contains invalid URLs"
@@ -662,7 +663,7 @@ msgstr ""
 
 #: ../gtk/details.c:2011
 msgid "Edit Trackers"
-msgstr ""
+msgstr "Redakti ŝanĝospurilojn"
 
 #: ../gtk/details.c:2023
 msgid "Tracker Announce URLs"
@@ -676,11 +677,11 @@ msgstr ""
 
 #: ../gtk/details.c:2068 ../gtk/details.c:2182
 msgid "Trackers"
-msgstr "Kunordigaj serviloj"
+msgstr "Ŝanĝospuriloj"
 
 #: ../gtk/details.c:2093
 msgid "_Edit Trackers"
-msgstr ""
+msgstr "_Redakti ŝanĝospurilojn"
 
 #: ../gtk/details.c:2101
 msgid "Show _backup trackers"
@@ -745,14 +746,14 @@ msgstr[1] "Ĉi tiuj torentoj ne fine elŝutis"
 #: ../gtk/dialogs.c:261
 msgid "This torrent is connected to peers."
 msgid_plural "These torrents are connected to peers."
-msgstr[0] "Ĉi tiu torento estas konektata al samtavolanoj."
-msgstr[1] "Ĉi tiuj torentoj estas konektataj al samtavolanoj."
+msgstr[0] "Ĉi tiu torento estas konektita al samtavolanoj."
+msgstr[1] "Ĉi tiuj torentoj estas konektitaj al samtavolanoj."
 
 #: ../gtk/dialogs.c:268
 msgid "One of these torrents is connected to peers."
 msgid_plural "Some of these torrents are connected to peers."
-msgstr[0] "Unu el tiuj torentoj estas konektata al samtavolanoj."
-msgstr[1] "Kelkaj el tiuj torentoj estas konektata al samtavolanoj."
+msgstr[0] "Unu el tiuj torentoj estas konektita al samtavolanoj."
+msgstr[1] "Kelkaj el tiuj torentoj estas konektitaj al samtavolanoj."
 
 #: ../gtk/dialogs.c:275
 msgid "One of these torrents has not finished downloading."
@@ -850,7 +851,7 @@ msgstr "<b>Fermas Konektojn</b>"
 
 #: ../gtk/main.c:892
 msgid "Sending upload/download totals to tracker..."
-msgstr "Sendas al/elŝuta statistikon al la kunordiga servilo..."
+msgstr "Sendas al/elŝuta statistikon al la ŝanĝospurilo..."
 
 #: ../gtk/main.c:897
 msgid "_Quit Now"
@@ -885,6 +886,7 @@ msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
 "  Brian Croom https://launchpad.net/~aikoniv\n"
+"  Emmanuel Gil Peyrot https://launchpad.net/~linkmauve\n"
 "  Kristjan https://launchpad.net/~kristjan-eo\n"
 "  Leif Arne Storset https://launchpad.net/~lastorset\n"
 "  Lucas Larson https://launchpad.net/~lucaslarson\n"
@@ -947,8 +949,8 @@ msgstr "Neniu fonto elektita"
 #, c-format
 msgid "%1$s; %2$'d File"
 msgid_plural "%1$s; %2$'d Files"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s; %2$'d dosiero"
+msgstr[1] "%1$s; %2$'d dosieroj"
 
 #: ../gtk/makemeta-ui.c:304
 #, c-format
@@ -959,7 +961,7 @@ msgstr[1] ""
 
 #: ../gtk/makemeta-ui.c:404
 msgid "Sa_ve to:"
-msgstr ""
+msgstr "Konservi kiel:"
 
 #: ../gtk/makemeta-ui.c:410
 msgid "Source F_older:"
@@ -975,15 +977,15 @@ msgstr "<i>Niniu fonto elektita</i>"
 
 #: ../gtk/makemeta-ui.c:436
 msgid "Properties"
-msgstr ""
+msgstr "Agordoj"
 
 #: ../gtk/makemeta-ui.c:438
 msgid "_Trackers:"
-msgstr ""
+msgstr "_Ŝanĝospuriloj:"
 
 #: ../gtk/makemeta-ui.c:460
 msgid "Co_mment:"
-msgstr ""
+msgstr "Ko_mento:"
 
 #: ../gtk/makemeta-ui.c:469
 msgid "_Private torrent"
@@ -992,7 +994,7 @@ msgstr "_Privata torento"
 #: ../gtk/msgwin.c:84
 #, c-format
 msgid "Couldn't save \"%s\""
-msgstr ""
+msgstr "Ne eblis konservi „%s“"
 
 #: ../gtk/msgwin.c:135
 msgid "Save Log"
@@ -1094,7 +1096,7 @@ msgstr ""
 
 #: ../gtk/stats.c:119 ../gtk/stats.c:151
 msgid "_Reset"
-msgstr ""
+msgstr "_Restarigu"
 
 #: ../gtk/stats.c:147 ../gtk/tr-window.c:999
 msgid "Statistics"
@@ -1208,7 +1210,7 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:232
 #, c-format
 msgid "Error: %s"
-msgstr ""
+msgstr "Eraro: %s"
 
 #: ../gtk/torrent-cell-renderer.c:252
 #, c-format
@@ -1221,8 +1223,8 @@ msgstr[1] "Elŝutas de %1$'d el %2$'d konektitaj samtavolanoj"
 #, c-format
 msgid "Downloading metadata from %1$'d peer (%2$d%% done)"
 msgid_plural "Downloading metadata from %1$'d peers (%2$d%% done)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Elŝutas metadatumojn el %1$'d samtavolano (%2$d%% preta)"
+msgstr[1] "Elŝutas metadatumojn el %1$'d samtavolanoj (%2$d%% preta)"
 
 #: ../gtk/torrent-cell-renderer.c:274 ../gtk/tr-torrent.c:258
 #, c-format
@@ -1396,18 +1398,18 @@ msgstr "_Ĉifrada reĝimo:"
 
 #: ../gtk/tr-prefs.c:545
 msgid "Use PE_X to find more peers"
-msgstr "Uzi PE_X por serĉi pli da kundividantoj"
+msgstr "Uzi PE_X por serĉi pli da samtavolanoj"
 
 #: ../gtk/tr-prefs.c:547
 msgid ""
 "PEX is a tool for exchanging peer lists with the peers you're connected to."
 msgstr ""
-"PEX estas ilo por interŝanĝi kundividantajn listojn inter la kundividantoj "
-"kiuj vi estas konektata."
+"PEX estas ilo por interŝanĝi samtavolanajn listojn inter la samtavolanoj al "
+"kiuj vi estas konektita."
 
 #: ../gtk/tr-prefs.c:551
 msgid "Use _DHT to find more peers"
-msgstr "Uzi _DHT por serĉi pli da kundividantoj"
+msgstr "Uzi _DHT por serĉi pli da samtavolanoj"
 
 #: ../gtk/tr-prefs.c:553
 msgid "DHT is a tool for finding peers without a tracker."
@@ -1460,11 +1462,11 @@ msgstr "Adresoj:"
 
 #: ../gtk/tr-prefs.c:982 ../gtk/tr-window.c:855
 msgid "Tracker"
-msgstr "Kunordiga Servilo"
+msgstr "Ŝanĝospurilo"
 
 #: ../gtk/tr-prefs.c:984
 msgid "Connect to tracker via a pro_xy"
-msgstr "Konekti al kunordiga servilo per pro_kurilo"
+msgstr "Konekti al ŝanĝospurilo per pro_kurilo"
 
 #: ../gtk/tr-prefs.c:989
 msgid "Proxy _server:"
@@ -1524,11 +1526,11 @@ msgstr "Rapidecaj Limoj"
 
 #: ../gtk/tr-prefs.c:1219
 msgid "Temporary Speed Limits"
-msgstr "Provizora Rapidecaj Limoj"
+msgstr "Provizoraj rapidec-limoj"
 
 #: ../gtk/tr-prefs.c:1226
 msgid "Override normal speed limits manually or at scheduled times"
-msgstr "Transpasi normajn rapidecajn limojn permane aŭ en tempplanoj"
+msgstr "Transpasi normajn rapidec-limojn mane aŭ je planitaj tempoj"
 
 #: ../gtk/tr-prefs.c:1233
 msgid "Limit do_wnload speed (KB/s):"
@@ -1568,7 +1570,7 @@ msgstr "<i>Atestante...</i>"
 
 #: ../gtk/tr-prefs.c:1350
 msgid "Incoming Peers"
-msgstr "Alvenintaj \tSamtavolanoj"
+msgstr "Alvenintaj samtavolanoj"
 
 #: ../gtk/tr-prefs.c:1352
 msgid "_Port for incoming connections:"
@@ -1588,7 +1590,7 @@ msgstr "Elekti _iun ajn pordon ĉiufoje ke Transmission estas iniciata"
 
 #: ../gtk/tr-prefs.c:1379
 msgid "Maximum peers per _torrent:"
-msgstr "Maks. nombro da samtavolano por torento:"
+msgstr "Maks. nombro da samtavolanoj por torento:"
 
 #: ../gtk/tr-prefs.c:1381
 msgid "Maximum peers _overall:"
@@ -1655,8 +1657,8 @@ msgid ""
 "Click to disable Temporary Speed Limits\n"
 "(%1$s down, %2$s up)"
 msgstr ""
-"Klaku por malŝalti Provizoran Rapidecan Limojn\n"
-"(%1$s elŝuto, %2$s alŝuto)"
+"Klaku por malŝalti provizorajn ramidec-limojn\n"
+"(Elŝuto %1$s, alŝuto %2$s)"
 
 #: ../gtk/tr-window.c:339
 #, c-format
@@ -1664,13 +1666,13 @@ msgid ""
 "Click to enable Temporary Speed Limits\n"
 "(%1$s down, %2$s up)"
 msgstr ""
-"Klaku por ŝalti Provizoran Rapidecan Limojn\n"
-"(%1$s elŝuto, %2$s alŝuto)"
+"Klaku por ŝalti provizorajn rapidec-limojn\n"
+"(Elŝuto %1$s, alŝuto %2$s)"
 
 #: ../gtk/tr-window.c:597
 #, c-format
 msgid "Tracker will allow requests in %s"
-msgstr "Kunordiga servilo permesos petojn post %s"
+msgstr "Ŝanĝospurilo permesos petojn post %s"
 
 #: ../gtk/tr-window.c:668
 msgid "Unlimited"
@@ -1678,7 +1680,7 @@ msgstr "Senlima"
 
 #: ../gtk/tr-window.c:735
 msgid "Seed Forever"
-msgstr "Fontsendi Eterne"
+msgstr "Fontsendi eterne"
 
 #: ../gtk/tr-window.c:773
 msgid "Limit Download Speed"
@@ -1690,7 +1692,7 @@ msgstr "Limigi Alŝutan Rapideco"
 
 #: ../gtk/tr-window.c:784
 msgid "Stop Seeding at Ratio"
-msgstr "Ĉesi Fontsendado je Proporcio"
+msgstr "Ĉesi fontsendado je proporcio"
 
 #: ../gtk/tr-window.c:818
 #, c-format
@@ -1705,22 +1707,22 @@ msgstr "Ĉiuj"
 #. show only torrents that have connected peers
 #: ../gtk/tr-window.c:846
 msgid "_Active"
-msgstr "_Aktiva"
+msgstr "_Aktivaj"
 
 #. show only torrents that are trying to download
 #: ../gtk/tr-window.c:848
 msgid "_Downloading"
-msgstr "_Elŝutanta"
+msgstr "_Elŝutantaj"
 
 #. show only torrents that are trying to upload
 #: ../gtk/tr-window.c:850
 msgid "_Seeding"
-msgstr "_Fontsendanta"
+msgstr "_Fontsendantaj"
 
 #. show only torrents that are paused
 #: ../gtk/tr-window.c:852
 msgid "_Paused"
-msgstr "_Paŭzigita"
+msgstr "_Paŭzigitaj"
 
 #: ../gtk/tr-window.c:1066
 msgid "999.9 KB/s"
@@ -2004,7 +2006,7 @@ msgstr "Kunordiga servila averto: \"%s\""
 #: ../libtransmission/torrent.c:343
 #, c-format
 msgid "Tracker error: \"%s\""
-msgstr "Kunordiga servila eraro: \"%s\""
+msgstr "Ŝanĝospuril-eraro: \"%s\""
 
 #: ../libtransmission/torrent.c:1330
 msgid ""

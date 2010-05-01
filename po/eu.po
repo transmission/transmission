@@ -8,28 +8,27 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-02-10 20:02-0600\n"
-"PO-Revision-Date: 2009-11-23 11:30+0000\n"
-"Last-Translator: Launchpad Translations Administrators "
-"<rosetta@launchpad.net>\n"
+"PO-Revision-Date: 2010-03-28 11:09+0000\n"
+"Last-Translator: Oier Mees <Unknown>\n"
 "Language-Team: Basque <eu@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2010-03-12 01:52+0000\n"
+"X-Launchpad-Export-Date: 2010-05-01 04:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:54
 msgid "Sort by _Activity"
-msgstr ""
+msgstr "_Aktibitatearen arabera sailkatu"
 
 #: ../gtk/actions.c:55
 msgid "Sort by _Name"
-msgstr ""
+msgstr "_Izenaren arabera sailkatu"
 
 #: ../gtk/actions.c:56
 msgid "Sort by _Progress"
-msgstr ""
+msgstr "_Progresuaren arabera sailkatu"
 
 #: ../gtk/actions.c:57
 msgid "Sort by Rati_o"
@@ -49,11 +48,11 @@ msgstr ""
 
 #: ../gtk/actions.c:61
 msgid "Sort by Time _Left"
-msgstr ""
+msgstr "Geratzen den denboraren arabera sailkatu"
 
 #: ../gtk/actions.c:62
 msgid "Sort by Si_ze"
-msgstr ""
+msgstr "Tamainaren arabera sailkatu"
 
 #: ../gtk/actions.c:79
 msgid "_Show Transmission"
@@ -885,6 +884,8 @@ msgstr ""
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
+"  Oier Mees https://launchpad.net/~oier\n"
+"  OrE https://launchpad.net/~dwarfnauko\n"
 "  overmind https://launchpad.net/~overmind"
 
 #: ../gtk/makemeta-ui.c:75

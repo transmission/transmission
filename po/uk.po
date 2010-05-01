@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-02-10 20:02-0600\n"
-"PO-Revision-Date: 2010-02-10 21:26+0000\n"
-"Last-Translator: Vitaliy Khmelivsky <Unknown>\n"
+"PO-Revision-Date: 2010-04-14 16:17+0000\n"
+"Last-Translator: banza <Unknown>\n"
 "Language-Team: Ukrainian <uk@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2010-03-12 01:53+0000\n"
+"X-Launchpad-Export-Date: 2010-05-01 04:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:54
@@ -430,7 +430,7 @@ msgstr "%1$s (%2$.1f%%)"
 #: ../gtk/details.c:778
 #, c-format
 msgid "%1$.1f%%"
-msgstr ""
+msgstr "%1$.1f%%"
 
 #: ../gtk/details.c:796
 #, c-format
@@ -460,7 +460,7 @@ msgstr "Маємо:"
 
 #: ../gtk/details.c:904
 msgid "Availability:"
-msgstr ""
+msgstr "Доступність:"
 
 #: ../gtk/details.c:908 ../gtk/stats.c:168 ../gtk/stats.c:180
 msgid "Downloaded:"
@@ -605,17 +605,17 @@ msgstr "Детальніше"
 #: ../gtk/details.c:1701
 #, c-format
 msgid "Got a list of %1$s%2$'d peers%3$s %4$s ago"
-msgstr ""
+msgstr "Список пірів отриманий з %1$s%2$'d %3$s %4$s годин тому"
 
 #: ../gtk/details.c:1705
 #, c-format
 msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
-msgstr ""
+msgstr "Запит списку пірів %1$sминуло%2$s %3$s; повтор"
 
 #: ../gtk/details.c:1708
 #, c-format
 msgid "Got an error %1$s\"%2$s\"%3$s %4$s ago"
-msgstr ""
+msgstr "Отримана помилка %1$s\"%2$s\"%3$s %4$s тому"
 
 #: ../gtk/details.c:1717
 msgid "No updates scheduled"
@@ -652,12 +652,12 @@ msgstr "Нові піри буде перевірено через %s"
 
 #: ../gtk/details.c:1760
 msgid "Queued to ask for peer counts"
-msgstr ""
+msgstr "У черзі на запит пірів"
 
 #: ../gtk/details.c:1765
 #, c-format
 msgid "Asking for peer counts now... <small>%s</small>"
-msgstr ""
+msgstr "Йде запит пірів... <small>%s</small>"
 
 #: ../gtk/details.c:1978
 msgid "List contains invalid URLs"
@@ -909,12 +909,13 @@ msgstr ""
 "Launchpad Contributions:\n"
 "  Ailandar https://launchpad.net/~ailandar\n"
 "  Alexandr Shapoval https://launchpad.net/~rain534\n"
-"  Brabadu https://launchpad.net/~boryslavlarin\n"
 "  Roman M. Tuz https://launchpad.net/~tuzr\n"
 "  Serhey Kusyumoff (Сергій Кусюмов) https://launchpad.net/~sergemine\n"
 "  Valdemar1982 https://launchpad.net/~zvolodymyr\n"
 "  Vitaliy Khmelivsky https://launchpad.net/~motorrola\n"
 "  atany https://launchpad.net/~ye-gorshkov\n"
+"  banza https://launchpad.net/~banza\n"
+"  brabadu https://launchpad.net/~boryslavlarin\n"
 "  mikhalek https://launchpad.net/~mikhalek\n"
 "  Сергій Матрунчик (SkyMan) https://launchpad.net/~skymanphp"
 
@@ -1094,7 +1095,7 @@ msgstr "Торрент розташовано в:"
 
 #: ../gtk/relocate.c:125
 msgid "_Move from the current folder"
-msgstr "Перенести з цієх папки"
+msgstr "Перенести зі старої теки у вказану"
 
 #: ../gtk/relocate.c:128
 msgid "Local data is _already there"
@@ -1333,7 +1334,7 @@ msgstr "Автоматично _додавати торенти із:"
 
 #: ../gtk/tr-prefs.c:300
 msgid "Append \"._part\" to incomplete files' names"
-msgstr ""
+msgstr "Додавати в назву незавершених файлів \"._part\""
 
 #: ../gtk/tr-prefs.c:304
 msgid "Keep _incomplete torrents in:"
@@ -1896,6 +1897,8 @@ msgid ""
 "This magnet link appears to be intended for something other than BitTorrent. "
 " BitTorrent magnet links have a section containing \"%s\"."
 msgstr ""
+"Це посилання призначене для чогось іншого, а не для BitTorrent. BitTorrent "
+"посилання повинне містити секцію \"%s\"."
 
 #. did caller give us an uninitialized val?
 #: ../libtransmission/bencode.c:1092
@@ -1905,7 +1908,7 @@ msgstr "Помилкові метадані"
 #: ../libtransmission/bencode.c:1644
 #, c-format
 msgid "Saved \"%s\""
-msgstr ""
+msgstr "Збережено \"%s\""
 
 #: ../libtransmission/bencode.c:1649 ../libtransmission/bencode.c:1656
 #: ../libtransmission/blocklist.c:294
@@ -1916,7 +1919,7 @@ msgstr "Неможливо зберегти \"%1$s\": %2$s"
 #: ../libtransmission/bencode.c:1663 ../libtransmission/bencode.c:1673
 #, c-format
 msgid "Couldn't save temporary file \"%1$s\": %2$s"
-msgstr ""
+msgstr "Неможливо зберегти тимчасовий файл \"%1$s\": %2$s"
 
 #: ../libtransmission/blocklist.c:78 ../libtransmission/blocklist.c:238
 #: ../libtransmission/utils.c:488
@@ -1991,7 +1994,7 @@ msgstr ""
 
 #: ../libtransmission/net.c:360
 msgid "Is another copy of Transmission already running?"
-msgstr ""
+msgstr "Перевірте чи не запущена інша копія Transmission?"
 
 #: ../libtransmission/net.c:365
 #, c-format
@@ -2001,7 +2004,7 @@ msgstr "Не вдається присвоїти порт %d на %s: %s"
 #: ../libtransmission/net.c:367
 #, c-format
 msgid "Couldn't bind port %d on %s: %s (%s)"
-msgstr ""
+msgstr "Неможливо під'єднатися до порту %d на %s: %s (%s)"
 
 #: ../libtransmission/port-forwarding.c:31
 msgid "Port Forwarding"

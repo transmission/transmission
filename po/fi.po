@@ -7,14 +7,14 @@ msgstr ""
 "Project-Id-Version: fi\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-02-10 20:02-0600\n"
-"PO-Revision-Date: 2010-02-19 19:23+0000\n"
-"Last-Translator: Saku Laukkanen <nollapiste@nettikirje.fi>\n"
+"PO-Revision-Date: 2010-04-07 11:49+0000\n"
+"Last-Translator: Elias Julkunen <elias.julkunen@gmail.com>\n"
 "Language-Team: -\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2010-03-12 01:52+0000\n"
+"X-Launchpad-Export-Date: 2010-05-01 04:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:54
@@ -427,7 +427,7 @@ msgstr "%1$s (%2$.1f%%)"
 #: ../gtk/details.c:778
 #, c-format
 msgid "%1$.1f%%"
-msgstr ""
+msgstr "%1$.1f%%"
 
 #: ../gtk/details.c:796
 #, c-format
@@ -608,11 +608,12 @@ msgstr ""
 #, c-format
 msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
 msgstr ""
+"Vertaislistapyyntö %1$saikakatkaistiin%2$s %3$s sitten; yritetään uudestaan"
 
 #: ../gtk/details.c:1708
 #, c-format
 msgid "Got an error %1$s\"%2$s\"%3$s %4$s ago"
-msgstr ""
+msgstr "Tarkastele virhettä %1$s\"%2$s\"%3$s %4$s sitten"
 
 #: ../gtk/details.c:1717
 msgid "No updates scheduled"
@@ -700,6 +701,8 @@ msgstr "Vertaiset"
 #: ../gtk/details.c:2188
 msgid "File listing not available for combined torrent properties"
 msgstr ""
+"Tiedostojen luettelointi ei ole käytettävissä yhdistettyjen torrenttien "
+"ominaisuuksissa"
 
 #: ../gtk/details.c:2192 ../gtk/makemeta-ui.c:402 ../gtk/tr-window.c:855
 msgid "Files"
@@ -907,6 +910,7 @@ msgstr ""
 "  Juhana Uuttu https://launchpad.net/~rexroom\n"
 "  Saku Laukkanen https://launchpad.net/~nollapiste\n"
 "  Timo Jyrinki https://launchpad.net/~timo-jyrinki\n"
+"  Tomi I. https://launchpad.net/~tomii\n"
 "  Tuomas Aavikko https://launchpad.net/~taavikko\n"
 "  papukaija https://launchpad.net/~papukaija\n"
 "  tommi svanbäck https://launchpad.net/~svabari"
@@ -1320,7 +1324,7 @@ msgstr "Lisää torrentit _automaattisesti kansiosta:"
 
 #: ../gtk/tr-prefs.c:300
 msgid "Append \"._part\" to incomplete files' names"
-msgstr ""
+msgstr "Lisää \"._part\"-pääte keskeneräisten tiedostojen nimiin"
 
 #: ../gtk/tr-prefs.c:304
 msgid "Keep _incomplete torrents in:"
@@ -1871,6 +1875,8 @@ msgid ""
 "This magnet link appears to be intended for something other than BitTorrent. "
 " BitTorrent magnet links have a section containing \"%s\"."
 msgstr ""
+"Tämä magnet-linkki näyttäisi olevan tarkoitettu jollekkin muulle kuin "
+"BitTorrent-ohjelmalle. BitTorrent magnet -linkki sisältää osion \"%s\"."
 
 #. did caller give us an uninitialized val?
 #: ../libtransmission/bencode.c:1092
@@ -1891,7 +1897,7 @@ msgstr "Tiedostoa \"%1$s\" ei voitu tallentaa: %2$s"
 #: ../libtransmission/bencode.c:1663 ../libtransmission/bencode.c:1673
 #, c-format
 msgid "Couldn't save temporary file \"%1$s\": %2$s"
-msgstr ""
+msgstr "Väliaikaistiedostoa \"%1$s\" ei voitu tallentaa: %2$s"
 
 #: ../libtransmission/blocklist.c:78 ../libtransmission/blocklist.c:238
 #: ../libtransmission/utils.c:488

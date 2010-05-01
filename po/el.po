@@ -7,14 +7,14 @@ msgstr ""
 "Project-Id-Version: el\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-02-10 20:02-0600\n"
-"PO-Revision-Date: 2010-01-26 12:18+0000\n"
+"PO-Revision-Date: 2010-03-23 14:27+0000\n"
 "Last-Translator: George Kontis <giormatsis@gmail.com>\n"
 "Language-Team: Greek <team@gnome.gr>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2010-03-12 01:52+0000\n"
+"X-Launchpad-Export-Date: 2010-05-01 04:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:54
@@ -426,7 +426,7 @@ msgstr "%1$s (%2$.1f%%)"
 #: ../gtk/details.c:778
 #, c-format
 msgid "%1$.1f%%"
-msgstr ""
+msgstr "%1$.1f%%"
 
 #: ../gtk/details.c:796
 #, c-format
@@ -456,7 +456,7 @@ msgstr "Έχουμε:"
 
 #: ../gtk/details.c:904
 msgid "Availability:"
-msgstr ""
+msgstr "Διαθεσιμότητα:"
 
 #: ../gtk/details.c:908 ../gtk/stats.c:168 ../gtk/stats.c:180
 msgid "Downloaded:"
@@ -601,12 +601,12 @@ msgstr "O ομότιμος χρήστης είναι μια εισερχόμεν
 
 #: ../gtk/details.c:1627 ../gtk/details.c:2086
 msgid "Show _more details"
-msgstr ""
+msgstr "Εμφάνιση _περισσότερων λεπτομερειών"
 
 #: ../gtk/details.c:1701
 #, c-format
 msgid "Got a list of %1$s%2$'d peers%3$s %4$s ago"
-msgstr ""
+msgstr "Λήφθηκε μια λίστα %1$s%2$'d ομότιμων χρηστών%3$s %4$s πρίν"
 
 #: ../gtk/details.c:1705
 #, c-format
@@ -616,16 +616,16 @@ msgstr ""
 #: ../gtk/details.c:1708
 #, c-format
 msgid "Got an error %1$s\"%2$s\"%3$s %4$s ago"
-msgstr ""
+msgstr "Παρουσιάστηκε  ένα σφάλμα %1$s\"%2$s\"%3$s %4$s πρίν"
 
 #: ../gtk/details.c:1717
 msgid "No updates scheduled"
-msgstr ""
+msgstr "Δεν έχει προγραμματιστεί καμία ενημέρωση"
 
 #: ../gtk/details.c:1723
 #, c-format
 msgid "Asking for more peers in %s"
-msgstr ""
+msgstr "Ζήτηση περισσότερων ομότιμων χρηστών σε %s"
 
 #: ../gtk/details.c:1727
 msgid "Queued to ask for more peers"
@@ -635,11 +635,12 @@ msgstr ""
 #, c-format
 msgid "Asking for more peers now... <small>%s</small>"
 msgstr ""
+"Ζητώντας για περισσότερους ομότιμους χρήστες τώρα... <small>%s</small>"
 
 #: ../gtk/details.c:1742
 #, c-format
 msgid "Tracker had %s%'d seeders and %'d leechers%s %s ago"
-msgstr ""
+msgstr "Ο ανιχνευτής έχει %s%'d seeders και %'d leechers%s %s πριν"
 
 #: ../gtk/details.c:1746
 #, c-format
@@ -658,7 +659,7 @@ msgstr ""
 #: ../gtk/details.c:1765
 #, c-format
 msgid "Asking for peer counts now... <small>%s</small>"
-msgstr ""
+msgstr "Ζητώντας για μέτρημα ομότιμων χρηστών τώρα... <small>%s</small>"
 
 #: ../gtk/details.c:1978
 msgid "List contains invalid URLs"
@@ -670,7 +671,7 @@ msgstr "Επεξεργασία Ιχνηλατών"
 
 #: ../gtk/details.c:2023
 msgid "Tracker Announce URLs"
-msgstr ""
+msgstr "URLs Αναφοράς Ανιχνευτή"
 
 #: ../gtk/details.c:2026 ../gtk/makemeta-ui.c:453
 msgid ""
@@ -688,7 +689,7 @@ msgstr "_Επεξεργασία Ιχνηλατών"
 
 #: ../gtk/details.c:2101
 msgid "Show _backup trackers"
-msgstr ""
+msgstr "Εμφάνιση _αντίγραφων ασφαλείας ανιχνευτών"
 
 #: ../gtk/details.c:2174 ../gtk/msgwin.c:179
 msgid "Information"
@@ -847,10 +848,15 @@ msgid ""
 "\n"
 "You probably knew this, so we won't tell you again."
 msgstr ""
+"Το Transmission είναι ένα πρόγραμμα διαμοιρασμού αρχείων. Όταν εκτελείτε ένα "
+"αρχείο torrent, τα δεδομένα του θα γίνουν διαθέσιμα για αποστολή σε άλλους. "
+"Φυσικά, ότι περιεχόμενο διαμοιράζεστε είναι αποκλειστικά δική σας ευθύνη.\n"
+"\n"
+"Πιθανών το ξέρατε αυτό, για αυτό δεν θα σας το ξαναπούμε."
 
 #: ../gtk/main.c:710
 msgid "I _Accept"
-msgstr ""
+msgstr "Απο_δοχή"
 
 #: ../gtk/main.c:888
 msgid "<b>Closing Connections</b>"
@@ -906,6 +912,7 @@ msgstr ""
 "  Michalis Ntovas https://launchpad.net/~michalisntovas\n"
 "  Nikos Charonitakis https://launchpad.net/~charosn\n"
 "  Spiros Georgaras https://launchpad.net/~sngeorgaras\n"
+"  Thomas Dislis https://launchpad.net/~mparmpathomas\n"
 "  agerom https://launchpad.net/~agerom\n"
 "  j0hn aka c7p https://launchpad.net/~j0hn-07-\n"
 "  msrowley https://launchpad.net/~msrowley\n"
@@ -915,17 +922,17 @@ msgstr ""
 #: ../gtk/makemeta-ui.c:75
 #, c-format
 msgid "Creating \"%s\""
-msgstr ""
+msgstr "Δημιουργώντας \"%s\""
 
 #: ../gtk/makemeta-ui.c:77
 #, c-format
 msgid "Created \"%s\"!"
-msgstr ""
+msgstr "Δημιουργήθηκαν \"%s\"!"
 
 #: ../gtk/makemeta-ui.c:79
 #, c-format
 msgid "Error: invalid announce URL \"%s\""
-msgstr ""
+msgstr "Σφάλμα: άκυρη αναφορά URL \"%s\""
 
 #: ../gtk/makemeta-ui.c:81
 #, c-format
@@ -946,7 +953,7 @@ msgstr "Σφάλμα κατά την εγγραφή του \"%s\": %s"
 #: ../gtk/makemeta-ui.c:102
 #, c-format
 msgid "Scanned %s"
-msgstr ""
+msgstr "%s Ανιχνεύθηκαν"
 
 #: ../gtk/makemeta-ui.c:167 ../gtk/makemeta-ui.c:389
 msgid "New Torrent"
@@ -964,15 +971,15 @@ msgstr "Δεν έχει επιλεγεί καμία πηγή"
 #, c-format
 msgid "%1$s; %2$'d File"
 msgid_plural "%1$s; %2$'d Files"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s; %2$'d Αρχείο"
+msgstr[1] "%1$s; %2$'d Αρχεία"
 
 #: ../gtk/makemeta-ui.c:304
 #, c-format
 msgid "%1$'d Piece @ %2$s"
 msgid_plural "%1$'d Pieces @ %2$s"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$'d Κομμάτι @ %2$s"
+msgstr[1] "%1$'d Κομμάτια @ %2$s"
 
 #: ../gtk/makemeta-ui.c:404
 msgid "Sa_ve to:"
@@ -980,11 +987,11 @@ msgstr "Αποθή_κευση σε:"
 
 #: ../gtk/makemeta-ui.c:410
 msgid "Source F_older:"
-msgstr ""
+msgstr "Πηγαίος Φ_άκελος:"
 
 #: ../gtk/makemeta-ui.c:421
 msgid "Source _File:"
-msgstr ""
+msgstr "Πηγαίο _Αρχείο:"
 
 #: ../gtk/makemeta-ui.c:432
 msgid "<i>No source selected</i>"
@@ -1238,8 +1245,9 @@ msgstr[1] "Γίνεται λήψη από %1$'d από %2$'d συνδεδεμέ�
 #, c-format
 msgid "Downloading metadata from %1$'d peer (%2$d%% done)"
 msgid_plural "Downloading metadata from %1$'d peers (%2$d%% done)"
-msgstr[0] ""
+msgstr[0] "Λήψη μεταδεδομένων από %1$'d ομότιμο χρήστη (%2$d%% ολοκληρώθηκε)"
 msgstr[1] ""
+"Λήψη μεταδεδομένων από %1$'d ομότιμους χρήστες (%2$d%% ολοκληρώθηκε)"
 
 #: ../gtk/torrent-cell-renderer.c:274 ../gtk/tr-torrent.c:258
 #, c-format
@@ -1885,7 +1893,7 @@ msgstr "Μη έγκυρα μεταδεδομένα"
 #: ../libtransmission/bencode.c:1644
 #, c-format
 msgid "Saved \"%s\""
-msgstr ""
+msgstr "Αποθηκευμένο \"%s\""
 
 #: ../libtransmission/bencode.c:1649 ../libtransmission/bencode.c:1656
 #: ../libtransmission/blocklist.c:294
@@ -1896,7 +1904,7 @@ msgstr "Αδύνατη η αποθήκευση του αρχείου \"%1$s\": %
 #: ../libtransmission/bencode.c:1663 ../libtransmission/bencode.c:1673
 #, c-format
 msgid "Couldn't save temporary file \"%1$s\": %2$s"
-msgstr ""
+msgstr "Αδύνατη  η αποθήκευση του προσωρινού αρχείου \"%1$s\": %2$s"
 
 #: ../libtransmission/blocklist.c:78 ../libtransmission/blocklist.c:238
 #: ../libtransmission/utils.c:488
@@ -1970,7 +1978,7 @@ msgstr "Αδυναμία σύνδεσης της υποδοχής %d στο %s, 
 
 #: ../libtransmission/net.c:360
 msgid "Is another copy of Transmission already running?"
-msgstr ""
+msgstr "Μήπως ένα ακόμα αντίγραφο του Transmission τρέχει ήδη;"
 
 #: ../libtransmission/net.c:365
 #, c-format

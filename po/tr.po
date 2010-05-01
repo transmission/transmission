@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-02-10 20:02-0600\n"
-"PO-Revision-Date: 2010-02-27 10:58+0000\n"
-"Last-Translator: Yalçın Can <Unknown>\n"
+"PO-Revision-Date: 2010-03-30 14:36+0000\n"
+"Last-Translator: Yiğit Ateş <yigitates52@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2010-03-12 01:52+0000\n"
+"X-Launchpad-Export-Date: 2010-05-01 04:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:54
@@ -425,7 +425,7 @@ msgstr "%1$s (%2$.1f%%)"
 #: ../gtk/details.c:778
 #, c-format
 msgid "%1$.1f%%"
-msgstr ""
+msgstr "%1$.1f%%"
 
 #: ../gtk/details.c:796
 #, c-format
@@ -455,7 +455,7 @@ msgstr "Eldeki:"
 
 #: ../gtk/details.c:904
 msgid "Availability:"
-msgstr ""
+msgstr "Ulaşılabilirlik"
 
 #: ../gtk/details.c:908 ../gtk/stats.c:168 ../gtk/stats.c:180
 msgid "Downloaded:"
@@ -600,17 +600,17 @@ msgstr "Daha _fazla detay göster"
 #: ../gtk/details.c:1701
 #, c-format
 msgid "Got a list of %1$s%2$'d peers%3$s %4$s ago"
-msgstr ""
+msgstr "%1$s%2$'d eşdeğerlerinin bir listesi %3$s %4$s önce alındı"
 
 #: ../gtk/details.c:1705
 #, c-format
 msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
-msgstr ""
+msgstr "Eş listesi istemi %1$szaman aşımı%2$s %3$s önce; yeniden denenecek"
 
 #: ../gtk/details.c:1708
 #, c-format
 msgid "Got an error %1$s\"%2$s\"%3$s %4$s ago"
-msgstr ""
+msgstr "%1$s\"%2$s\"%3$s %4$s önce bir hata alındı"
 
 #: ../gtk/details.c:1717
 msgid "No updates scheduled"
@@ -891,6 +891,8 @@ msgstr ""
 "Launchpad Contributions:\n"
 "  Ali ARISOY https://launchpad.net/~e166110\n"
 "  Attila C. YILMAZLAR https://launchpad.net/~attilayilmazlar\n"
+"  Bugra Gokalp Okcu https://launchpad.net/~bugra\n"
+"  Can Bülbül https://launchpad.net/~a.bulbul\n"
 "  Can Kaya https://launchpad.net/~ckaya\n"
 "  Emre Ayca https://launchpad.net/~anatolica\n"
 "  Gökhan KILINÇ https://launchpad.net/~kilincgokhan\n"
@@ -1857,6 +1859,8 @@ msgid ""
 "This magnet link appears to be intended for something other than BitTorrent. "
 " BitTorrent magnet links have a section containing \"%s\"."
 msgstr ""
+"Bu mıknatıs bağlantı BitTorrent'ten başka birşey için gibi gözüküyor. "
+"BitTorrent mıknatıs linkleri \"%s\" içeren bir bölüme sahiptir."
 
 #. did caller give us an uninitialized val?
 #: ../libtransmission/bencode.c:1092
@@ -1961,7 +1965,7 @@ msgstr "%d bağlantı noktası %s: %s 'e bağlanamadı"
 #: ../libtransmission/net.c:367
 #, c-format
 msgid "Couldn't bind port %d on %s: %s (%s)"
-msgstr ""
+msgstr "%d portu %s e bağlanamaz: %s (%s)"
 
 #: ../libtransmission/port-forwarding.c:31
 msgid "Port Forwarding"

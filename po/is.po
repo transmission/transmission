@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-02-10 20:02-0600\n"
-"PO-Revision-Date: 2009-11-18 06:40+0000\n"
-"Last-Translator: Rúnar Freyr Þorsteinsson <runarf@hive.is>\n"
+"PO-Revision-Date: 2010-04-18 20:59+0000\n"
+"Last-Translator: Samúel Jón Gunnarsson <sammi@villingaholt.nu>\n"
 "Language-Team: Icelandic <is@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2010-03-12 01:52+0000\n"
+"X-Launchpad-Export-Date: 2010-05-01 04:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:54
@@ -144,7 +144,7 @@ msgstr "_Tölfræði"
 
 #: ../gtk/actions.c:117
 msgid "_Donate"
-msgstr ""
+msgstr "_Styðja"
 
 #: ../gtk/actions.c:118
 msgid "_Verify Local Data"
@@ -273,7 +273,7 @@ msgstr ""
 
 #: ../gtk/add-dialog.c:514
 msgid "Add URL"
-msgstr ""
+msgstr "Bæta við vefslóð"
 
 #: ../gtk/add-dialog.c:527
 msgid "Add torrent from URL"
@@ -281,7 +281,7 @@ msgstr ""
 
 #: ../gtk/add-dialog.c:530
 msgid "_URL"
-msgstr ""
+msgstr "_Slóð"
 
 #: ../gtk/conf.c:62 ../libtransmission/fdlimit.c:358
 #: ../libtransmission/metainfo.c:99 ../libtransmission/utils.c:608
@@ -427,7 +427,7 @@ msgstr "%1$s (%2$.1f%%)"
 #: ../gtk/details.c:778
 #, c-format
 msgid "%1$.1f%%"
-msgstr ""
+msgstr "%1$.1f%%"
 
 #: ../gtk/details.c:796
 #, c-format
@@ -457,7 +457,7 @@ msgstr "Heimkomið:"
 
 #: ../gtk/details.c:904
 msgid "Availability:"
-msgstr ""
+msgstr "Aðgengileiki:"
 
 #: ../gtk/details.c:908 ../gtk/stats.c:168 ../gtk/stats.c:180
 msgid "Downloaded:"
@@ -892,17 +892,18 @@ msgstr ""
 "  Freyr Gunnar Ólafsson https://launchpad.net/~gnarlin\n"
 "  Hlini Melsteð https://launchpad.net/~hlini\n"
 "  Rúnar Freyr Þorsteinsson https://launchpad.net/~runarf\n"
+"  Samúel Jón Gunnarsson https://launchpad.net/~sammi\n"
 "  Tryggvi Björgvinsson https://launchpad.net/~tryggvib"
 
 #: ../gtk/makemeta-ui.c:75
 #, c-format
 msgid "Creating \"%s\""
-msgstr ""
+msgstr "Stofna \"%s\""
 
 #: ../gtk/makemeta-ui.c:77
 #, c-format
 msgid "Created \"%s\"!"
-msgstr ""
+msgstr "Stofnaði \"%s\"!"
 
 #: ../gtk/makemeta-ui.c:79
 #, c-format
