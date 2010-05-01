@@ -321,7 +321,7 @@ tr_ctorSetDownloadDir( tr_ctor *    ctor,
     args->downloadDir = NULL;
     args->isSet_downloadDir = 0;
 
-    if( directory )
+    if( directory && *directory )
     {
         args->isSet_downloadDir = 1;
         args->downloadDir = tr_strdup( directory );
