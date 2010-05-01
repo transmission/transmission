@@ -1083,6 +1083,7 @@ Transmission.prototype =
 
 				// The 'reverse sort' option state can be toggled independently of the other options
 				if ($element.is('#reverse_sort_order')) {
+					if(!$element.is('#reverse_sort_order.active')) break;
 					var dir;
 					if ($element.menuItemIsSelected()) {
 						$element.deselectMenuItem();
