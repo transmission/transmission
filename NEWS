@@ -1,3 +1,30 @@
+=== Transmission 1.93 (2010/05/01) ===
+[http://trac.transmissionbt.com/query?milestone=1.93&group=component&groupdesc=1&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Fix rare crash when some peers disconnected unexpectedly
+  * Fix bug which didn't parse scheduled speed limit dates correctly
+  * Fix bug that broke magnet links whose names contained slashes
+  * Fix crash when updating the blocklist when the disk is full
+  * Fix slow file preallocation on Unix systems not using ext3/ext4
+  * Fix regression which broke the "bind-address-ipv4" configuration setting
+  * For better security, Web client connctions are disabled by default
+  * Upgrade to miniupnpc-1.4
+  * Transmission builds out-of-the-box with Curl 7.15.5. (Hello CentOS!)
+==== GTK+ ====
+  * Use the size for the system tray icon
+==== Qt ====
+  * Fix bug that crashed when removing more than one torrent at once
+  * Fix bug when parsing the remote password from the command line
+  * Add support for the "incomplete directory" in the preferences dialog
+  * Don't show "time remaining" for paused torrents
+==== Daemon ====
+  * Fix bug parsing RPC requests when setting which files to not download
+  * Fix possible crash when using inotify for the daemon's watchdir
+  * Fix bugs in the configure script
+  * Fix bug updating the blocklist over RPC
+==== Web Client ====
+  * Fix bug that broke the "reverse sort order" menu checkbox
+
 === Transmission 1.92 (2010/03/14) ===
 [http://trac.transmissionbt.com/query?milestone=1.92&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== All Platforms ====
