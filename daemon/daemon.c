@@ -119,6 +119,7 @@ gotsig( int sig )
             const char * configDir = tr_sessionGetConfigDir( mySession );
             tr_inf( "Reloading settings from \"%s\"", configDir );
             tr_bencInitDict( &settings, 0 );
+            tr_bencDictAddBool( &settings, TR_PREFS_KEY_RPC_ENABLED, TRUE );
             tr_sessionLoadSettings( &settings, configDir, MY_NAME );
             tr_sessionSet( mySession, &settings );
             tr_bencFree( &settings );
@@ -297,6 +298,7 @@ main( int argc, char ** argv )
 
     /* load settings from defaults + config file */
     tr_bencInitDict( &settings, 0 );
+    tr_bencDictAddBool( &settings, TR_PREFS_KEY_RPC_ENABLED, TRUE );
     configDir = getConfigDir( argc, (const char**)argv );
     loaded = tr_sessionLoadSettings( &settings, configDir, MY_NAME );
 
