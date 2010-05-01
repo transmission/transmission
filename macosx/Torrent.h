@@ -183,6 +183,7 @@
 - (NSInteger) totalPeersCache;
 - (NSInteger) totalPeersPex;
 - (NSInteger) totalPeersDHT;
+- (NSInteger) totalPeersLocal;
 - (NSInteger) totalPeersLTEP;
 - (NSInteger) totalPeersKnown;
 
