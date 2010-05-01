@@ -641,10 +641,10 @@ tr_peerIoReconnect( tr_peerIo * io )
     io->socket = tr_netOpenPeerSocket( session, &io->addr, io->port, io->isSeed );
     event_set( &io->event_read, io->socket, EV_READ, event_read_cb, io );
     event_set( &io->event_write, io->socket, EV_WRITE, event_write_cb, io );
-    event_enable( io, pendingEvents );
 
     if( io->socket >= 0 )
     {
+        event_enable( io, pendingEvents );
         tr_netSetTOS( io->socket, session->peerSocketTOS );
         return 0;
     }
