@@ -1,145 +1,79 @@
-/* $Id: miniwget.c,v 1.31 2009/12/04 11:29:19 nanard Exp $ */
+/* $Id: miniwget.c,v 1.37 2010/04/12 20:39:42 nanard Exp $ */
 /* Project : miniupnp
  * Author : Thomas Bernard
- * Copyright (c) 2005-2009 Thomas Bernard
+ * Copyright (c) 2005-2010 Thomas Bernard
  * This software is subject to the conditions detailed in the
- * LICENCE file provided in this distribution.
- * */
+ * LICENCE file provided in this distribution. */
+ 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "miniupnpc.h"
 #ifdef WIN32
 #include <winsock2.h>
+#include <ws2tcpip.h>
 #include <io.h>
 #define MAXHOSTNAMELEN 64
 #define MIN(x,y) (((x)<(y))?(x):(y))
 #define snprintf _snprintf
-#define herror
 #define socklen_t int
-#else
+#else /* #ifdef WIN32 */
 #include <unistd.h>
 #include <sys/param.h>
 #if defined(__amigaos__) && !defined(__amigaos4__)
 #define socklen_t int
-#else
+#else /* #if defined(__amigaos__) && !defined(__amigaos4__) */
 #include <sys/select.h>
-#endif
+#endif /* #else defined(__amigaos__) && !defined(__amigaos4__) */
 #include <sys/socket.h>
-#include <netdb.h>
-#include <netinet/in.h>
 #include <arpa/inet.h>
-#include <errno.h>
-#include <time.h>
+#include <netdb.h>
 #define closesocket close
+/* defining MINIUPNPC_IGNORE_EINTR enable the ignore of interruptions
+ * during the connect() call */
 #define MINIUPNPC_IGNORE_EINTR
-#endif
+#endif /* #else WIN32 */
 #if defined(__sun) || defined(sun)
 #define MIN(x,y) (((x)<(y))?(x):(y))
-#endif
-#if defined(__amigaos__) || defined(__amigaos4__)
-#define herror(A) printf("%s\n", A)
 #endif
 
 #include "miniupnpcstrings.h"
 #include "miniwget.h"
+#include "connecthostport.h"
 
-/* miniwget2() :
- * */
+/* miniwget3() :
+ * do all the work.
+ * Return NULL if something failed. */
 static void *
-miniwget2(const char * url, const char * host,
+miniwget3(const char * url, const char * host,
 		  unsigned short port, const char * path,
-		  int * size, char * addr_str, int addr_str_len)
+		  int * size, char * addr_str, int addr_str_len, const char * httpversion)
 {
 	char buf[2048];
     int s;
-	struct sockaddr_in dest;
-	struct hostent *hp;
 	int n;
 	int len;
 	int sent;
-#ifdef MINIUPNPC_SET_SOCKET_TIMEOUT
-	struct timeval timeout;
-#endif
+
 	*size = 0;
-	hp = gethostbyname(host);
-	if(hp==NULL)
-	{
-		herror(host);
-		return NULL;
-	}
-	/*  memcpy((char *)&dest.sin_addr, hp->h_addr, hp->h_length);  */
-	memcpy(&dest.sin_addr, hp->h_addr, sizeof(dest.sin_addr));
-	memset(dest.sin_zero, 0, sizeof(dest.sin_zero));
-	s = socket(PF_INET, SOCK_STREAM, 0);
+	s = connecthostport(host, port);
 	if(s < 0)
-	{
-		perror("socket");
 		return NULL;
-	}
-#ifdef MINIUPNPC_SET_SOCKET_TIMEOUT
-	/* setting a 3 seconds timeout for the connect() call */
-	timeout.tv_sec = 3;
-	timeout.tv_usec = 0;
-	if(setsockopt(s, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(struct timeval)) < 0)
-	{
-		perror("setsockopt");
-	}
-	timeout.tv_sec = 3;
-	timeout.tv_usec = 0;
-	if(setsockopt(s, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(struct timeval)) < 0)
-	{
-		perror("setsockopt");
-	}
-#endif
-	dest.sin_family = AF_INET;
-	dest.sin_port = htons(port);
-	n = connect(s, (struct sockaddr *)&dest, sizeof(struct sockaddr_in));
-#ifdef MINIUPNPC_IGNORE_EINTR
-	while(n < 0 && errno == EINTR)
-	{
-		socklen_t len;
-		fd_set wset;
-		int err;
-		FD_ZERO(&wset);
-		FD_SET(s, &wset);
-		if((n = select(s + 1, NULL, &wset, NULL, NULL)) == -1 && errno == EINTR)
-			continue;
-		/*len = 0;*/
-		/*n = getpeername(s, NULL, &len);*/
-		len = sizeof(err);
-		if(getsockopt(s, SOL_SOCKET, SO_ERROR, &err, &len) < 0) {
-			perror("getsockopt");
-			closesocket(s);
-			return NULL;
-		}
-		if(err != 0) {
-			errno = err;
-			n = -1;
-		}
-	}
-#endif
-	if(n<0)
-	{
-		perror("connect");
-		closesocket(s);
-		return NULL;
-	}
 
 	/* get address for caller ! */
 	if(addr_str)
 	{
-		struct sockaddr_in saddr;
+		struct sockaddr saddr;
 		socklen_t saddrlen;
 
 		saddrlen = sizeof(saddr);
-		if(getsockname(s, (struct sockaddr *)&saddr, &saddrlen) < 0)
+		if(getsockname(s, &saddr, &saddrlen) < 0)
 		{
 			perror("getsockname");
 		}
 		else
 		{
-#if defined(WIN32) || (defined(__amigaos__) && !defined(__amigaos4__))
+#if defined(__amigaos__) && !defined(__amigaos4__)
 	/* using INT WINAPI WSAAddressToStringA(LPSOCKADDR, DWORD, LPWSAPROTOCOL_INFOA, LPSTR, LPDWORD);
      * But his function make a string with the port :  nn.nn.nn.nn:port */
 /*		if(WSAAddressToStringA((SOCKADDR *)&saddr, sizeof(saddr),
@@ -147,9 +81,20 @@ miniwget2(const char * url, const char * host,
 		{
 		    printf("WSAAddressToStringA() failed : %d\n", WSAGetLastError());
 		}*/
-			strncpy(addr_str, inet_ntoa(saddr.sin_addr), addr_str_len);
+			strncpy(addr_str, inet_ntoa(((struct sockaddr_in *)&saddr)->sin_addr), addr_str_len);
 #else
-			inet_ntop(AF_INET, &saddr.sin_addr, addr_str, addr_str_len);
+			/*inet_ntop(AF_INET, &saddr.sin_addr, addr_str, addr_str_len);*/
+			n = getnameinfo(&saddr, saddrlen,
+			                addr_str, addr_str_len,
+			                NULL, 0,
+			                NI_NUMERICHOST | NI_NUMERICSERV);
+			if(n != 0) {
+#ifdef WIN32
+				fprintf(stderr, "getnameinfo() failed : %d\n", n);
+#else
+				fprintf(stderr, "getnameinfo() failed : %s\n", gai_strerror(n));
+#endif
+			}
 #endif
 		}
 #ifdef DEBUG
@@ -158,13 +103,13 @@ miniwget2(const char * url, const char * host,
 	}
 
 	len = snprintf(buf, sizeof(buf),
-                 "GET %s HTTP/1.0\r\n"
+                 "GET %s HTTP/%s\r\n"
 			     "Host: %s:%d\r\n"
 				 "Connection: Close\r\n"
 				 "User-Agent: " OS_STRING ", UPnP/1.0, MiniUPnPc/" MINIUPNPC_VERSION_STRING "\r\n"
 
 				 "\r\n",
-		    path, host, port);
+			   path, httpversion, host, port);
 	sent = 0;
 	/* sending the HTTP request */
 	while(sent < len)
@@ -230,6 +175,30 @@ miniwget2(const char * url, const char * host,
 		return respbuffer;
 	}
 }
+
+/* miniwget2() :
+ * Call miniwget3(); retry with HTTP/1.1 if 1.0 fails. */
+static void *
+miniwget2(const char * url, const char * host,
+		  unsigned short port, const char * path,
+		  int * size, char * addr_str, int addr_str_len)
+{
+	char * respbuffer;
+
+	respbuffer = miniwget3(url, host, port, path, size, addr_str, addr_str_len, "1.0");
+	if (*size == 0)
+	{
+#ifdef DEBUG
+		printf("Retrying with HTTP/1.1\n");
+#endif
+		free(respbuffer);
+		respbuffer = miniwget3(url, host, port, path, size, addr_str, addr_str_len, "1.1");
+	}
+	return respbuffer;
+}
+
+
+
 
 /* parseURL()
  * arguments :

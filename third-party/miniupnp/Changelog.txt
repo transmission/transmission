@@ -1,8 +1,27 @@
-$Id: Changelog.txt,v 1.105 2010/01/06 10:03:53 nanard Exp $
+$Id: Changelog.txt,v 1.113 2010/04/12 20:39:40 nanard Exp $
 miniUPnP client Changelog.
 
+2010/04/12:
+  Retrying with HTTP/1.1 if HTTP/1.0 failed. see
+  http://miniupnp.tuxfamily.org/forum/viewtopic.php?p=1703
+
+2010/04/07:
+  avoid returning duplicates in upnpDiscover()
+
+2010/04/05:
+  Create a connecthostport.h/.c with connecthostport() function
+  and use it in miniwget and miniupnpc.
+  Use getnameinfo() instead of inet_ntop or inet_ntoa
+  Work to make miniupnpc IPV6 compatible...
+  Add java test code.
+  Big changes in order to support device having both WANIPConnection
+  and WANPPPConnection.
+
+2010/04/04:
+  Use getaddrinfo() instead of gethostbyname() in miniwget.
+
 2010/01/06:
-  #define _DARWIN_C_SOURCE for macosx
+  #define _DARWIN_C_SOURCE for Mac OS X
 
 2009/12/19:
   Improve MinGW32 build

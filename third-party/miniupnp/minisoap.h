@@ -1,4 +1,4 @@
-/* $Id: minisoap.h,v 1.3 2006/11/19 22:32:34 nanard Exp $ */
+/* $Id: minisoap.h,v 1.4 2010/04/12 20:39:41 nanard Exp $ */
 /* Project : miniupnp
  * Author : Thomas Bernard
  * Copyright (c) 2005 Thomas Bernard
@@ -9,7 +9,7 @@
 
 /*int httpWrite(int, const char *, int, const char *);*/
 int soapPostSubmit(int, const char *, const char *, unsigned short,
-				   const char *, const char *);
+		   const char *, const char *, const char *);
 
 #endif
 
