@@ -12,6 +12,7 @@
 
 #include <assert.h>
 #include <ctype.h> /* isdigit */
+#include <errno.h>
 #include <stdlib.h> /* strtol */
 #include <string.h> /* strcmp */
 #include <unistd.h> /* unlink */
@@ -898,26 +899,44 @@ gotNewBlocklist( tr_session       * session,
         tr_snprintf( result, sizeof( result ), "http error %ld: %s",
                      response_code, tr_webGetResponseStr( response_code ) );
     }
-    else /* success */
+    else /* successfully fetched the blocklist... */
     {
-        int ruleCount;
-        char * filename = tr_buildPath( tr_sessionGetConfigDir( session ), "blocklist.tmp", NULL );
-        FILE * fp;
+        const char * configDir = tr_sessionGetConfigDir( session );
+        char * filename = tr_buildPath( configDir, "blocklist.tmp", NULL );
+        FILE * fp = fopen( filename, "w+" );
 
-        /* download a new blocklist */
-        fp = fopen( filename, "w+" );
-        fwrite( response, 1, response_byte_count, fp );
-        fclose( fp );
+        if( fp == NULL )
+        {
+            tr_snprintf( result, sizeof( result ),
+                         _( "Couldn't save file \"%1$s\": %2$s" ),
+                         filename, tr_strerror( errno ) );
+        }
+        else
+        {
+            const size_t n = fwrite( response, 1, response_byte_count, fp );
+            fclose( fp );
 
-        /* feed it to the session */
-        ruleCount = tr_blocklistSetContent( session, filename );
+            if( n != response_byte_count )
+            {
+                tr_snprintf( result, sizeof( result ),
+                             _( "Couldn't save file \"%1$s\": %2$s" ),
+                             filename, tr_strerror( errno ) );
+            }
+            else
+            {
+                /* feed it to the session */
+                const int ruleCount = tr_blocklistSetContent( session, filename );
 
-        /* give the client a response */
-        tr_bencDictAddInt( data->args_out, "blocklist-size", ruleCount );
-        tr_snprintf( result, sizeof( result ), "success" );
+                /* give the client a response */
+                tr_bencDictAddInt( data->args_out, "blocklist-size", ruleCount );
+                tr_snprintf( result, sizeof( result ), "success" );
+            }
+
+            /* cleanup */
+            unlink( filename );
+        }
 
         /* cleanup */
-        unlink( filename );
         tr_free( filename );
     }
 
