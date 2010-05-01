@@ -2780,6 +2780,7 @@ reconnectTorrent( Torrent * t )
                     tordbg( t, "peerIo not created; marking peer %s as unreachable",
                             tr_atomAddrStr( atom ) );
                     atom->myflags |= MYFLAG_UNREACHABLE;
+                    atom->numFails++;
                 }
                 else
                 {
