@@ -446,9 +446,11 @@ event_enable( tr_peerIo * io, short event )
     assert( tr_amInEventThread( io->session ) );
     assert( io->session != NULL );
     assert( io->session->events != NULL );
-    assert( io->socket >= 0 );
     assert( event_initialized( &io->event_read ) );
     assert( event_initialized( &io->event_write ) );
+
+    if( io->socket < 0 )
+        return;
 
     if( ( event & EV_READ ) && ! ( io->pendingEvents & EV_READ ) )
     {
