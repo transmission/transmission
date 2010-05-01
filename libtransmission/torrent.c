@@ -940,7 +940,7 @@ tr_torrentSetVerifyState( tr_torrent * tor, tr_verify_state state )
     tor->anyDate = tr_time( );
 }
 
-static tr_torrent_activity
+tr_torrent_activity
 tr_torrentGetActivity( tr_torrent * tor )
 {
     assert( tr_isTorrent( tor ) );
@@ -1400,6 +1400,7 @@ checkAndStartImpl( void * vtor )
         tr_announcerTorrentStarted( tor );
         tor->dhtAnnounceAt = now + tr_cryptoWeakRandInt( 20 );
         tor->dhtAnnounce6At = now + tr_cryptoWeakRandInt( 20 );
+        tor->ldsAnnounceAt = now;
         tr_peerMgrStartTorrent( tor );
     }
 

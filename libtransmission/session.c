@@ -42,6 +42,7 @@
 #include "stats.h"
 #include "torrent.h"
 #include "tr-dht.h"
+#include "tr-lds.h"
 #include "trevent.h"
 #include "utils.h"
 #include "verify.h"
@@ -244,6 +245,7 @@ tr_sessionGetDefaultSettings( const char * configDir UNUSED, tr_benc * d )
     tr_bencDictReserve( d, 35 );
     tr_bencDictAddBool( d, TR_PREFS_KEY_BLOCKLIST_ENABLED,        FALSE );
     tr_bencDictAddBool( d, TR_PREFS_KEY_DHT_ENABLED,              TRUE );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_LDS_ENABLED,              FALSE );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_DOWNLOAD_DIR,             tr_getDefaultDownloadDir( ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_DSPEED,                   100 );
     tr_bencDictAddBool( d, TR_PREFS_KEY_DSPEED_ENABLED,           FALSE );
@@ -306,6 +308,7 @@ tr_sessionGetSettings( tr_session * s, struct tr_benc * d )
     tr_bencDictReserve( d, 30 );
     tr_bencDictAddBool( d, TR_PREFS_KEY_BLOCKLIST_ENABLED,        tr_blocklistIsEnabled( s ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_DHT_ENABLED,              s->isDHTEnabled );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_LDS_ENABLED,              s->isLDSEnabled );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_DOWNLOAD_DIR,             s->downloadDir );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_DSPEED,                   tr_sessionGetSpeedLimit( s, TR_DOWN ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_DSPEED_ENABLED,           tr_sessionIsSpeedLimited( s, TR_DOWN ) );
@@ -625,6 +628,14 @@ tr_sessionInitImpl( void * vdata )
         tr_dhtInit( session, &session->public_ipv4->addr );
     }
 
+    if( session->isLDSEnabled )
+    {
+        if( tr_ldsInit( session, &session->public_ipv4->addr ) )
+            tr_ninf( "LDS", "Local Peer Discovery active" );
+    }
+    else
+        tr_ndbg( "LDS", "Local Peer Discovery disabled" );
+
     /* cleanup */
     tr_bencFree( &settings );
     data->done = TRUE;
@@ -667,6 +678,8 @@ sessionSetImpl( void * vdata )
         tr_sessionSetPexEnabled( session, boolVal );
     if( tr_bencDictFindBool( settings, TR_PREFS_KEY_DHT_ENABLED, &boolVal ) )
         tr_sessionSetDHTEnabled( session, boolVal );
+    if( tr_bencDictFindBool( settings, TR_PREFS_KEY_LDS_ENABLED, &boolVal ) )
+        tr_sessionSetLDSEnabled( session, boolVal );
     if( tr_bencDictFindInt( settings, TR_PREFS_KEY_ENCRYPTION, &i ) )
         tr_sessionSetEncryption( session, i );
     if( tr_bencDictFindInt( settings, TR_PREFS_KEY_PEER_SOCKET_TOS, &i ) )
@@ -1551,6 +1564,9 @@ sessionCloseImpl( void * vsession )
 
     free_incoming_peer_port( session );
 
+    if( session->isLDSEnabled )
+        tr_ldsUninit( session );
+
     if( session->isDHTEnabled )
         tr_dhtUninit( session );
 
@@ -1783,6 +1799,29 @@ tr_sessionSetDHTEnabled( tr_session * session, tr_bool enabled )
 
     if( ( enabled != 0 ) != ( session->isDHTEnabled != 0 ) )
         tr_runInEventThread( session, toggleDHTImpl, session );
+}
+
+void
+tr_sessionSetLDSEnabled( tr_session * session,
+                         tr_bool      enabled )
+{
+    assert( tr_isSession( session ) );
+
+    session->isLDSEnabled = ( enabled != 0 );
+}
+
+tr_bool
+tr_sessionIsLDSEnabled( const tr_session * session )
+{
+    assert( tr_isSession( session ) );
+
+    return session->isLDSEnabled;
+}
+
+tr_bool
+tr_sessionAllowsLDS( const tr_session * session )
+{
+    return tr_sessionIsLDSEnabled( session );
 }
 
 /***

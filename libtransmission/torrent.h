@@ -130,6 +130,8 @@ tr_verify_state;
 void             tr_torrentSetVerifyState( tr_torrent      * tor,
                                            tr_verify_state   state );
 
+tr_torrent_activity tr_torrentGetActivity( tr_torrent * tor );
+
 struct tr_incomplete_metadata;
 
 /** @brief Torrent object */
@@ -197,6 +199,8 @@ struct tr_torrent
     time_t                     dhtAnnounce6At;
     tr_bool                    dhtAnnounceInProgress;
     tr_bool                    dhtAnnounce6InProgress;
+    
+    time_t                     ldsAnnounceAt;
 
     uint64_t                   downloadedCur;
     uint64_t                   downloadedPrev;
@@ -327,6 +331,13 @@ static inline tr_bool tr_torrentAllowsDHT( const tr_torrent * tor )
 {
     return ( tor != NULL )
         && ( tr_sessionAllowsDHT( tor->session ) )
+        && ( !tr_torrentIsPrivate( tor ) );
+}
+
+static inline tr_bool tr_torrentAllowsLDS( const tr_torrent * tor )
+{
+    return ( tor != NULL )
+        && ( tr_sessionAllowsLDS( tor->session ) )
         && ( !tr_torrentIsPrivate( tor ) );
 }
 
