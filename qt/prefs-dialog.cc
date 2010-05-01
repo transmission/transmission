@@ -451,7 +451,7 @@ PrefsDialog :: createPrivacyTab( )
     hig->addSectionTitle( tr( "Blocklist" ) );
     QHBoxLayout * h = new QHBoxLayout( );
     QIcon i( style()->standardIcon( QStyle::StandardPixmap( QStyle::SP_BrowserReload ) ) );
-    QPushButton * w = new QPushButton( i, tr( "&Update blocklist" ) );
+    QWidget * w = new QPushButton( i, tr( "&Update blocklist" ) );
     connect( w, SIGNAL(clicked(bool)), this, SLOT(onUpdateBlocklistClicked()));
     myBlockWidgets << w;
     QWidget * l = checkBoxNew( "", Prefs::BLOCKLIST_ENABLED );
@@ -473,8 +473,12 @@ PrefsDialog :: createPrivacyTab( )
     hig->addSectionDivider( );
     hig->addSectionTitle( tr( "Privacy" ) );
     hig->addRow( tr( "&Encryption mode:" ), box );
-    hig->addWideControl( checkBoxNew( tr( "Use PE&X to find more peers" ), Prefs::PEX_ENABLED ) );
-    hig->addWideControl( checkBoxNew( tr( "Use &DHT to find more peers" ), Prefs::DHT_ENABLED ) );
+    hig->addWideControl( w = checkBoxNew( tr( "Use PE&X to find more peers" ), Prefs::PEX_ENABLED ) );
+    w->setToolTip( tr( "PEX is a tool for exchanging peer lists with the peers you're connected to." ) );
+    hig->addWideControl( w = checkBoxNew( tr( "Use &DHT to find more peers" ), Prefs::DHT_ENABLED ) );
+    w->setToolTip( tr( "DHT is a tool for finding peers without a tracker." ) );
+    hig->addWideControl( w = checkBoxNew( tr( "Use &LDS to find local peers" ), Prefs::LDS_ENABLED ) );
+    w->setToolTip( tr( "LDS is a tool for finding peers on your local network." ) );
 
     hig->finish( );
     updateBlocklistCheckBox( );

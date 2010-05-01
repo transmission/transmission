@@ -255,6 +255,8 @@ static tr_option opts[] =
     { 'w', "download-dir",          "When adding a new torrent, set its download folder.  Otherwise, set the default download folder", "w",  1, "<path>" },
     { 'x', "pex",                   "Enable peer exchange (PEX)", "x",  0, NULL },
     { 'X', "no-pex",                "Disable peer exchange (PEX)", "X",  0, NULL },
+    { 'z', "lds",                   "Enable local peer discovery (LDS)", "z",  0, NULL },
+    { 'Z', "no-lds",                "Disable local peer discovery (LDS)", "Z",  0, NULL },
     { 940, "peer-info",             "List the current torrent(s)' peers", "pi",  0, NULL },
     {   0, NULL,                    NULL, NULL, 0, NULL }
 };
@@ -323,6 +325,8 @@ getOptMode( int val )
         case 'P': /* random incoming peer port */
         case 'x': /* pex */
         case 'X': /* no-pex */
+        case 'z': /* lds */
+        case 'Z': /* no-lds */
         case 970: /* alt-speed */
         case 971: /* no-alt-speed */
         case 972: /* alt-speed-downlimit */
@@ -1814,6 +1818,10 @@ processArgs( const char * host, int port, int argc, const char ** argv )
                 case 'x': tr_bencDictAddBool( args, TR_PREFS_KEY_PEX_ENABLED, TRUE );
                           break;
                 case 'X': tr_bencDictAddBool( args, TR_PREFS_KEY_PEX_ENABLED, FALSE );
+                          break;
+                case 'z': tr_bencDictAddBool( args, TR_PREFS_KEY_LDS_ENABLED, TRUE );
+                          break;
+                case 'Z': tr_bencDictAddBool( args, TR_PREFS_KEY_LDS_ENABLED, FALSE );
                           break;
                 case 953: tr_bencDictAddReal( args, "seedRatioLimit", atof(optarg) );
                           tr_bencDictAddBool( args, "seedRatioLimited", TRUE );

@@ -1221,6 +1221,10 @@ prefschanged( TrCore * core UNUSED,
     {
         tr_sessionSetDHTEnabled( tr, pref_flag_get( key ) );
     }
+    else if( !strcmp( key, TR_PREFS_KEY_LDS_ENABLED ) )
+    {
+        tr_sessionSetLDSEnabled( tr, pref_flag_get( key ) );
+    }
     else if( !strcmp( key, TR_PREFS_KEY_RPC_PORT ) )
     {
         tr_sessionSetRPCPort( tr, pref_int_get( key ) );
