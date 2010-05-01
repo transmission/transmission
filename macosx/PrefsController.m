@@ -481,6 +481,11 @@ tr_session * fHandle;
     tr_sessionSetDHTEnabled(fHandle, [fDefaults boolForKey: @"DHTGlobal"]);
 }
 
+- (void) setLDS: (id) sender
+{
+    tr_sessionSetLDSEnabled(fHandle, [fDefaults boolForKey: @"LocalPeerDiscoveryGlobal"]);
+}
+
 - (void) setEncryptionMode: (id) sender
 {
     const tr_encryption_mode mode = [fDefaults boolForKey: @"EncryptionPrefer"] ? 
@@ -1149,6 +1154,10 @@ tr_session * fHandle;
     const BOOL dht = tr_sessionIsDHTEnabled(fHandle);
     [fDefaults setBool: dht forKey: @"DHTGlobal"];
     
+    //dht
+    const BOOL lds = tr_sessionIsLDSEnabled(fHandle);
+    [fDefaults setBool: lds forKey: @"LocalPeerDiscovery"];
+    
     //auto start
     const BOOL autoStart = !tr_sessionGetPaused(fHandle);
     [fDefaults setBool: autoStart forKey: @"AutoStartDownload"];
@@ -1230,6 +1239,8 @@ tr_session * fHandle;
         //pex handled by bindings
         
         //dht handled by bindings
+        
+        //lds handled by bindings
         
         [fPortField setIntValue: port];
         //port forwarding (nat) handled by bindings

@@ -84,6 +84,7 @@
 
 - (void) setPEX: (id) sender;
 - (void) setDHT: (id) sender;
+- (void) setLDS: (id) sender;
 
 - (void) setEncryptionMode: (id) sender;
 

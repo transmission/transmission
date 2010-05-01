@@ -82,6 +82,8 @@
 	<false/>
 	<key>InspectorSelected</key>
 	<string>Info</string>
+	<key>LocalPeerDiscoveryGlobal</key>
+	<false/>
 	<key>MagnetOpenAsk</key>
 	<true/>
 	<key>MessageLevel</key>
