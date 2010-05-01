@@ -624,6 +624,7 @@ tr_sessionInitImpl( void * vdata )
 }
 
 static void turtleBootstrap( tr_session *, struct tr_turtle_info * );
+static void setPeerPort( tr_session * session, tr_port port );
 
 static void
 sessionSetImpl( void * vdata )
@@ -727,7 +728,7 @@ sessionSetImpl( void * vdata )
         tr_sessionSetPeerPortRandomOnStart( session, boolVal );
     if( !tr_bencDictFindInt( settings, TR_PREFS_KEY_PEER_PORT, &i ) )
         i = session->peerPort;
-    tr_sessionSetPeerPort( session, boolVal ? getRandomPort( session ) : i );
+    setPeerPort( session, boolVal ? getRandomPort( session ) : i );
     if( tr_bencDictFindBool( settings, TR_PREFS_KEY_PORT_FORWARDING, &boolVal ) )
         tr_sessionSetPortForwardingEnabled( session, boolVal );
 
@@ -938,7 +939,7 @@ tr_sessionIsLocked( const tr_session * session )
  **********************************************************************/
 
 static void
-setPeerPort( void * session )
+peerPortChanged( void * session )
 {
     tr_torrent * tor = NULL;
 
@@ -952,6 +953,14 @@ setPeerPort( void * session )
         tr_torrentChangeMyPort( tor );
 }
 
+static void
+setPeerPort( tr_session * session, tr_port port )
+{
+    session->peerPort = port;
+
+    tr_runInEventThread( session, peerPortChanged, session );
+}
+
 void
 tr_sessionSetPeerPort( tr_session * session, tr_port port )
 {
@@ -959,9 +968,7 @@ tr_sessionSetPeerPort( tr_session * session, tr_port port )
 
     if( session->peerPort != port )
     {
-        session->peerPort = port;
-
-        tr_runInEventThread( session, setPeerPort, session );
+        setPeerPort( session, port );
     }
 }
 
