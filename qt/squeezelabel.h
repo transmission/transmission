@@ -53,6 +53,7 @@ public:
     SqueezeLabel(const QString& text, QWidget *parent = 0);
 
 protected:
+    void init();
     void paintEvent(QPaintEvent *event);
 
 };
