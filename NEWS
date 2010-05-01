@@ -1,4 +1,4 @@
-=== Transmission 1.93 (2010/05/xx) ===
+=== Transmission 1.93 (2010/05/01) ===
 [http://trac.transmissionbt.com/query?milestone=1.93&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Fix rare crash when some peers disconnected unexpectedly
