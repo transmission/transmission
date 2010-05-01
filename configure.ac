@@ -293,10 +293,13 @@ if test "x$build_gtk" = "xyes"; then
                   AS_HELP_STRING([--enable-libnotify],[enable notifications]),, 
                   [enable_libnotify=yes]) 
     use_libnotify=no
-    if test "x$enable_libnotify" = "xyes" ; then
-        if test "x$have_libnotify" = "xyes"; then
+    if test "x$have_libnotify" = "xyes"; then
+        if test "x$enable_libnotify" = "xyes" ; then
             use_libnotify=yes
             AC_DEFINE([HAVE_LIBNOTIFY], 1) 
+        else
+            LIBNOTIFY_CFLAGS=
+            LIBNOTIFY_LIBS=
         fi
     fi
 
@@ -309,12 +312,13 @@ if test "x$build_gtk" = "xyes"; then
                   AS_HELP_STRING([--enable-libappindicator],[enable AppIndicator support]),, 
                   [enable_libappindicator=yes])
     use_libappindicator=no
-    if test "x$enable_libappindicator" = "xyes" ; then
-        if test "x$have_libappindicator" = "xyes"; then
+    if test "x$have_libappindicator" = "xyes"; then
+        if test "x$enable_libappindicator" = "xyes" ; then
             use_libappindicator=yes
-            AC_SUBST(LIBAPPINDICATOR_LIBS) 
-            AC_SUBST(LIBAPPINDICATOR_CFLAGS) 
             AC_DEFINE([HAVE_LIBAPPINDICATOR], 1) 
+        else
+            LIBAPPINDICATOR_CFLAGS=
+            LIBAPPINDICATOR_LIBS=
         fi
     fi
 
@@ -325,10 +329,13 @@ if test "x$build_gtk" = "xyes"; then
     AC_ARG_ENABLE([libcanberra], 
                   AS_HELP_STRING([--enable-libcanberra],[enable sounds]),, 
                   [enable_libcanberra=yes]) 
-    if test "x$enable_libcanberra" = "xyes" ; then
-        if test "x$have_libcanberra" = "xyes"; then
+    if test "x$have_libcanberra" = "xyes"; then
+        if test "x$enable_libcanberra" = "xyes" ; then
             use_canberra=yes
             AC_DEFINE([HAVE_LIBCANBERRA], 1) 
+        else
+            LIBCANBERRA_CFLAGS=
+            LIBCANBERRA_LIBS=
         fi
     fi
 
@@ -339,10 +346,13 @@ if test "x$build_gtk" = "xyes"; then
     AC_ARG_ENABLE([gconf2], 
                   AS_HELP_STRING([--enable-libgconf],[enable GConf support]),, 
                   [enable_libgconf=yes]) 
-    if test "x$enable_libgconf" = "xyes" ; then
-        if test "x$have_libgconf" = "xyes"; then
+    if test "x$havelibgconf" = "xyes" ; then
+        if test "x$enable_libgconf" = "xyes"; then
             use_libgconf=yes
             AC_DEFINE([HAVE_LIBGCONF], 1) 
+        else
+            LIBGCONF_CFLAGS=
+            LIBGCONF_LIBS=
         fi
     fi
 
