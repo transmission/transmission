@@ -441,11 +441,10 @@ tr_netClose( tr_session * session, int s )
 }
 
 /*
-   get_source_address(), get_name_source_address(), and
-   global_unicast_address() were written by Juliusz Chroboczek,
-   and are covered under the same license as dht.c.
-   Please feel free to copy them into your software
-   if it can help unbreaking the double-stack Internet. */
+   get_source_address() and global_unicast_address() were written by
+   Juliusz Chroboczek, and are covered under the same license as dht.c.
+   Please feel free to copy them into your software if it can help
+   unbreaking the double-stack Internet. */
 
 /* Get the source address used for a given destination address.  Since
    there is no official interface to get this information, we create
@@ -483,41 +482,6 @@ get_source_address( const struct sockaddr  * dst,
     return -1;
 }
 
-/* Like above, but for a given DNS name. */
-static int
-get_name_source_address(int af, const char *name,
-                        struct sockaddr *src, socklen_t *src_len)
-{
-    struct addrinfo hints, *info, *infop;
-    int rc;
-
-    memset(&hints, 0, sizeof(hints));
-    hints.ai_family = af;
-    hints.ai_socktype = SOCK_DGRAM;
-
-    rc = getaddrinfo(name, "80", &hints, &info);
-    if(rc != 0) {
-        errno = ENOENT;
-        return -1;
-    }
-
-    rc = -1;
-    errno = ENOENT;
-    infop = info;
-    while(infop) {
-        if(infop->ai_addr->sa_family == af) {
-            rc = get_source_address(infop->ai_addr, infop->ai_addrlen,
-                                    src, src_len);
-            if(rc >= 0)
-                break;
-        }
-        infop = infop->ai_next;
-    }
-
-    freeaddrinfo(info);
-    return rc;
-}
-
 /* We all hate NATs. */
 static int
 global_unicast_address(struct sockaddr *sa)
@@ -545,16 +509,37 @@ static int
 tr_globalAddress( int af, void *addr, int *addr_len )
 {
     struct sockaddr_storage ss;
-    socklen_t ss_len = sizeof(ss);
+    socklen_t sslen = sizeof(ss);
+    struct sockaddr_in sin;
+    struct sockaddr_in6 sin6;
+    struct sockaddr *sa;
+    socklen_t salen;
     int rc;
 
-    /* This should be a name with both IPv4 and IPv6 addresses. */
-    rc = get_name_source_address( af, "www.transmissionbt.com",
-                                  (struct sockaddr*)&ss, &ss_len );
-    /* In case Charles removes IPv6 from his website. */
-    if( rc < 0 )
-        rc = get_name_source_address(  af, "www.ietf.org",
-                                      (struct sockaddr*)&ss, &ss_len );
+    switch(af) {
+    case AF_INET:
+        memset(&sin, 0, sizeof(sin));
+        sin.sin_family = AF_INET;
+        inet_pton(AF_INET, "91.121.74.28", &sin.sin_addr);
+        sin.sin_port = htons(6969);
+        sa = (struct sockaddr*)&sin;
+        salen = sizeof(sin);
+        break;
+    case AF_INET6:
+        memset(&sin6, 0, sizeof(sin6));
+        sin6.sin6_family = AF_INET6;
+        /* In order for address selection to work right, this should be
+           a native IPv6 address, not Teredo or 6to4. */
+        inet_pton(AF_INET6, "2001:1890:1112:1::20", &sin6.sin6_addr);
+        sin6.sin6_port = htons(6969);
+        sa = (struct sockaddr*)&sin6;
+        salen = sizeof(sin6);
+        break;
+    default:
+        return -1;
+    }
+
+    rc = get_source_address( sa, salen, (struct sockaddr*)&ss, &sslen );
 
     if( rc < 0 )
         return -1;
