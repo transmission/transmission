@@ -1652,13 +1652,13 @@ tr_torrent_activity;
 
 enum
 {
-    TR_PEER_FROM_INCOMING  = 0,  /* connections made to the listening port */
-    TR_PEER_FROM_TRACKER   = 1,  /* peers received from a tracker */
-    TR_PEER_FROM_LDS       = 2,  /* peers discovered by local announcements */
-    TR_PEER_FROM_DHT       = 3,  /* peers learnt from the DHT */
-    TR_PEER_FROM_RESUME    = 4,  /* peers read from the .resume file */
-    TR_PEER_FROM_PEX       = 5,  /* peers discovered via PEX */
-    TR_PEER_FROM_LTEP      = 6,  /* peer address provided in an LTEP handshake */
+    TR_PEER_FROM_INCOMING  = 0, /* connections made to the listening port */
+    TR_PEER_FROM_LDS,           /* peers discovered by local announcements */
+    TR_PEER_FROM_TRACKER,       /* peers received from a tracker */
+    TR_PEER_FROM_DHT,           /* peers learnt from the DHT */
+    TR_PEER_FROM_RESUME,        /* peers read from the .resume file */
+    TR_PEER_FROM_PEX,           /* peers discovered via PEX */
+    TR_PEER_FROM_LTEP,          /* peer address provided in an LTEP handshake */
     TR_PEER_FROM__MAX
 };
 
