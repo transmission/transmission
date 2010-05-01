@@ -399,6 +399,7 @@
    "alt-speed-up"                | number     max global upload speed (in K/s)
    "blocklist-enabled"           | boolean    true means enabled
    "blocklist-size"              | number     number of rules in the blocklist
+   "config-dir"                  | string     location of transmission's configuration directory
    "download-dir"                | string     default path to download torrents
    "dht-enabled"                 | boolean    true means allow dht in public torrents
    "encryption"                  | string     "required", "preferred", "tolerated"
