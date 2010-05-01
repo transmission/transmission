@@ -27,7 +27,7 @@
 
 #include "transmission.h"
 #include "bandwidth.h"
-#include "list.h" /* __tr_list */
+#include "list.h" /* tr_list */
 #include "net.h" /* tr_address */
 
 struct evbuffer;
@@ -106,7 +106,7 @@ typedef struct tr_peerIo
 
     struct evbuffer     * inbuf;
     struct evbuffer     * outbuf;
-    struct __tr_list      outbuf_datatypes; /* struct tr_datatype */
+    struct tr_list      * outbuf_datatypes; /* struct tr_datatype */
 
     struct event          event_read;
     struct event          event_write;
