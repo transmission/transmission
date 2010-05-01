@@ -231,12 +231,11 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         NSAlert * alert = [[NSAlert alloc] init];
         [alert addButtonWithTitle: NSLocalizedString(@"I Accept", "Legal alert -> button")];
         [alert addButtonWithTitle: NSLocalizedString(@"Quit", "Legal alert -> button")];
-        [alert setMessageText: NSLocalizedString(@"Hear ye, hear ye!", "Legal alert -> title")];
-        [alert setInformativeText: [NSString stringWithFormat: @"%@\n\n%@",
-            NSLocalizedString(@"Transmission is a file-sharing program. When you run a torrent, its data will"
-            " be made available to others by means of upload."
-            " And of course, any content you choose to share is your sole responsibility.", "Legal alert -> message"),
-            NSLocalizedString(@"You probably knew this already, so we won't tell you again.", "Legal alert -> message")]];
+        [alert setMessageText: NSLocalizedString(@"Welcome to Transmission", "Legal alert -> title")];
+        [alert setInformativeText: NSLocalizedString(@"Transmission is a file-sharing program."
+            " When you run a torrent, its data will be made available to others by means of upload."
+            " You and you alone are fully responsible for exercising proper judgement and abiding by your local laws.",
+            "Legal alert -> message")];
         [alert setAlertStyle: NSInformationalAlertStyle];
         
         if ([alert runModal] == NSAlertSecondButtonReturn)
