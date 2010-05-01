@@ -214,12 +214,16 @@ open_incoming_peer_port( tr_session * session )
 const tr_address*
 tr_sessionGetPublicAddress( const tr_session * session, int tr_af_type )
 {
+    const struct tr_bindinfo * bindinfo;
+
     switch( tr_af_type )
     {
-        case TR_AF_INET: return &session->public_ipv4->addr;
-        case TR_AF_INET6: return &session->public_ipv6->addr; break;
-        default: return NULL;
+        case TR_AF_INET:  bindinfo = session->public_ipv4; break;
+        case TR_AF_INET6: bindinfo = session->public_ipv6; break;
+        default:          bindinfo = NULL;                 break;
     }
+
+    return bindinfo ? &bindinfo->addr : NULL;
 }
 
 /***
@@ -707,7 +711,6 @@ sessionSetImpl( void * vdata )
         b.addr = tr_inaddr_any;
     b.socket = -1;
     session->public_ipv4 = tr_memdup( &b, sizeof( struct tr_bindinfo ) );
-    tr_webSetInterface( session, &session->public_ipv4->addr );
 
     str = TR_PREFS_KEY_BIND_ADDRESS_IPV6;
     tr_bencDictFindStr( settings, TR_PREFS_KEY_BIND_ADDRESS_IPV6, &str );
