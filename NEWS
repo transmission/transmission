@@ -1,4 +1,4 @@
-=== Transmission 1.93 (2010/04/xx) ===
+=== Transmission 1.93 (2010/05/xx) ===
 [http://trac.transmissionbt.com/query?milestone=1.93&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Fix rare crash when some peers disconnected unexpectedly
@@ -8,7 +8,7 @@
   * Fix slow file preallocation on Unix systems not using ext3/ext4
   * Fix regression which broke the "bind-address-ipv4" configuration setting
   * For better security, Web client connctions are disabled by default
-  * Upgrade to miniupnp 1.4
+  * Upgrade to miniupnpc-1.4
   * Transmission builds out-of-the-box with Curl 7.15.5. (Hello CentOS!)
 ==== GTK+ ====
   * Use the size for the system tray icon
