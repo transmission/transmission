@@ -11,7 +11,7 @@
  */
 
 #include <stdio.h>
-#include <stdlib.h> /* free */
+#include <stdlib.h> /* free() */
 #include <string.h>
 
 #ifdef WIN32
@@ -234,7 +234,8 @@ _tr_blocklistSetContent( tr_blocklist * b,
     FILE *       in;
     FILE *       out;
     char *       line;
-    int          lineCount = 0;
+    int          inCount = 0;
+    int          outCount = 0;
     const char * err_fmt = _( "Couldn't read \"%1$s\": %2$s" );
 
     if( !filename )
@@ -268,6 +269,8 @@ _tr_blocklistSetContent( tr_blocklist * b,
         tr_address  addr;
         struct tr_ip_range range;
 
+        ++inCount;
+
         rangeBegin = strrchr( line, ':' );
         if( !rangeBegin ){ free( line ); continue; }
         ++rangeBegin;
@@ -279,11 +282,19 @@ _tr_blocklistSetContent( tr_blocklist * b,
             *crpos = '\0';
 
         if( !tr_pton( rangeBegin, &addr ) )
-            tr_err( "blocklist skipped invalid address [%s]\n", rangeBegin );
+        {
+            tr_err( _( "blocklist skipped invalid address at line %d" ), inCount );
+            free( line );
+            continue;
+        }
         range.begin = ntohl( addr.addr.addr4.s_addr );
 
         if( !tr_pton( rangeEnd, &addr ) )
-            tr_err( "blocklist skipped invalid address [%s]\n", rangeEnd );
+        {
+            tr_err( _( "blocklist skipped invalid address at line %d" ), inCount );
+            free( line );
+            continue;
+        }
         range.end = ntohl( addr.addr.addr4.s_addr );
 
         free( line );
@@ -296,21 +307,20 @@ _tr_blocklistSetContent( tr_blocklist * b,
             break;
         }
 
-        ++lineCount;
+        ++outCount;
     }
 
     {
         char * base = tr_basename( b->filename );
-        tr_inf( _( "Blocklist \"%1$s\" updated with %2$'d entries" ), base, lineCount );
+        tr_inf( _( "Blocklist \"%1$s\" updated with %2$'d entries" ), base, outCount );
         tr_free( base );
     }
-
 
     fclose( out );
     fclose( in );
 
     blocklistLoad( b );
 
-    return lineCount;
+    return outCount;
 }
 
