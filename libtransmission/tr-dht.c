@@ -248,39 +248,62 @@ dht_bootstrap(void *closure)
    IPv6 address, if I may say so myself. */
 
 static int
-rebind_ipv6(int force)
+rebind_ipv6(void)
 {
     struct sockaddr_in6 sin6;
     const unsigned char *ipv6 = tr_globalIPv6();
     static unsigned char *last_bound = NULL;
-    int rc;
+    int s, rc;
+    int one = 1;
 
-    if(dht6_socket < 0)
+    /* We currently have no way to enable or disable IPv6 once the DHT has
+       been initialised.  Oh, well. */
+    if(dht6_socket < 0 || ipv6 == NULL) {
+        if(last_bound) {
+            free(last_bound);
+            last_bound = NULL;
+        }
+        return 0;
+    }
+
+    if(last_bound != NULL && memcmp(ipv6, last_bound, 16) == 0)
         return 0;
 
-    if(!force &&
-       ((ipv6 == NULL && last_bound == NULL) ||
-        (ipv6 != NULL && last_bound != NULL &&
-         memcmp(ipv6, last_bound, 16) == 0)))
-        return 0;
+    s = socket(PF_INET6, SOCK_DGRAM, 0);
+    if(s < 0)
+        return -1;
+
+#ifdef IPV6_V6ONLY
+        /* Since we always open an IPv4 socket on the same port, this
+           shouldn't matter.  But I'm superstitious. */
+        setsockopt(s, IPPROTO_IPV6, IPV6_V6ONLY, &one, sizeof(one));
+#endif
 
     memset(&sin6, 0, sizeof(sin6));
     sin6.sin6_family = AF_INET6;
     if(ipv6)
         memcpy(&sin6.sin6_addr, ipv6, 16);
     sin6.sin6_port = htons(dht_port);
-    rc = bind(dht6_socket, (struct sockaddr*)&sin6, sizeof(sin6));
+    rc = bind(s, (struct sockaddr*)&sin6, sizeof(sin6));
 
-    if(last_bound)
-        free(last_bound);
-    last_bound = NULL;
+    if(rc < 0)
+        return -1;
 
-    if(rc >= 0 && ipv6) {
-        last_bound = malloc(16);
-        if(last_bound)
-            memcpy(last_bound, ipv6, 16);
+    if(dht6_socket < 0) {
+        dht6_socket = s;
+    } else {
+        rc = dup2(s, dht6_socket);
+        close(s);
+        if(rc < 0)
+            return -1;
     }
-    return rc;
+
+    if(last_bound == NULL)
+        last_bound = malloc(16);
+    if(last_bound)
+        memcpy(last_bound, ipv6, 16);
+
+    return 1;
 }
 
 int
@@ -318,22 +341,8 @@ tr_dhtInit(tr_session *ss, const tr_address * tr_addr)
     if(rc < 0)
         goto fail;
 
-    if(tr_globalIPv6()) {
-        int one = 1;
-        dht6_socket = socket(PF_INET6, SOCK_DGRAM, 0);
-        if(dht6_socket < 0)
-            goto fail;
-
-#ifdef IPV6_V6ONLY
-        /* Since we always open an IPv4 socket on the same port, this
-           shouldn't matter.  But I'm superstitious. */
-        setsockopt(dht6_socket, IPPROTO_IPV6, IPV6_V6ONLY,
-                   &one, sizeof(one));
-#endif
-
-        rebind_ipv6(1);
-
-    }
+    if(tr_globalIPv6())
+        rebind_ipv6();
 
     if( getenv( "TR_DHT_VERBOSE" ) != NULL )
         dht_debug = stderr;
@@ -698,8 +707,8 @@ event_callback(int s, short type, void *ignore UNUSED )
     /* Only do this once in a while.  Counting rather than measuring time
        avoids a system call. */
     count++;
-    if(count >= 128) {
-        rebind_ipv6(0);
+    if(count >= 20) {
+        rebind_ipv6();
         count = 0;
     }
 
