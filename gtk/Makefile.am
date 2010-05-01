@@ -46,7 +46,8 @@ noinst_HEADERS = \
     icons.h \
     file-list.h \
     lock.h \
-    logo.h \
+    logo-24.h \
+    logo-48.h \
     makemeta-ui.h \
     msgwin.h \
     notify.h \
