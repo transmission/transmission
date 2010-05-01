@@ -207,7 +207,7 @@ MyApp :: MyApp( int& argc, char ** argv ):
         QDialog * dialog = new QDialog( myWindow );
         dialog->setModal( true );
         QVBoxLayout * v = new QVBoxLayout( dialog );
-        QLabel * l = new QLabel( tr( "Transmission is a file sharing program.  When you run a torrent, its data will be made available to others by means of upload.  And of course, any content you share is your sole responsibility.\n\nYou probably knew this, so we won't tell you again." ) );
+        QLabel * l = new QLabel( tr( "Transmission is a file-sharing program.  When you run a torrent, its data will be made available to others by means of upload.  You and you alone are fully responsible for exercising proper judgement and abiding by your local laws." ) );
         l->setWordWrap( true );
         v->addWidget( l );
         QDialogButtonBox * box = new QDialogButtonBox;
