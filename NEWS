@@ -7,8 +7,8 @@
   * Fix crash when updating the blocklist when the disk is full
   * Fix slow file preallocation on Unix systems not using ext3/ext4
   * Fix regression which broke the "bind-address-ipv4" configuration setting
-  * For better security, Web client connctions are disabled by default
-  * Upgrade to miniupnpc-1.4
+  * For better security, Web client connections are disabled by default
+  * Update to miniupnpc-1.4
   * Transmission builds out-of-the-box with Curl 7.15.5. (Hello CentOS!)
 ==== GTK+ ====
   * Use the size for the system tray icon
