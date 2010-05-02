@@ -10,7 +10,6 @@
  * $Id$
  */
 
-#include <ctype.h> /* isprint() */
 #include <stdio.h>
 #include <stdlib.h> /* free() */
 #include <string.h>
@@ -285,6 +284,7 @@ _tr_blocklistSetContent( tr_blocklist * b,
         if( !tr_pton( rangeBegin, &addr ) )
         {
             printf( "error rangeBegin: %s", line );
+            /* don't try to display the actual lines - it causes issues */
             tr_err( _( "blocklist skipped invalid address at line %d" ), inCount );
             free( line );
             continue;
@@ -294,6 +294,7 @@ _tr_blocklistSetContent( tr_blocklist * b,
         if( !tr_pton( rangeEnd, &addr ) )
         {
             printf( "error rangeEnd: %s", line );
+            /* don't try to display the actual lines - it causes issues */
             tr_err( _( "blocklist skipped invalid address at line %d" ), inCount );
             free( line );
             continue;

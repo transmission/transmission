@@ -118,6 +118,10 @@ BlocklistDownloader * fDownloader = nil;
 
 - (void) download: (NSURLDownload *) download didFailWithError: (NSError *) error
 {
+    #warning remove
+    NSLog(@"%@", [error localizedDescription]);
+    NSLog(@"%@", [error localizedFailureReason]);
+    NSLog(@"%@", [error localizedRecoverySuggestion]);
     [fViewController setFailed: [error localizedDescription]];
     
     [[BlocklistScheduler scheduler] updateSchedule];
@@ -145,7 +149,7 @@ BlocklistDownloader * fDownloader = nil;
     NSURLRequest * request = [NSURLRequest requestWithURL: [NSURL URLWithString: LIST_URL]];
     
     fDownload = [[NSURLDownload alloc] initWithRequest: request delegate: self];
-    [fDownload setDestination: [NSTemporaryDirectory() stringByAppendingPathComponent: FILE_NAME] allowOverwrite: NO];
+    [fDownload setDestination: [NSTemporaryDirectory() stringByAppendingPathComponent: FILE_NAME] allowOverwrite: YES];
 }
 
 - (void) finishDownloadSuccess
