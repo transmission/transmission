@@ -248,7 +248,7 @@ dht_bootstrap(void *closure)
    IPv6 address, if I may say so myself. */
 
 static int
-rebind_ipv6(void)
+rebind_ipv6(tr_bool force)
 {
     struct sockaddr_in6 sin6;
     const unsigned char *ipv6 = tr_globalIPv6();
@@ -258,7 +258,7 @@ rebind_ipv6(void)
 
     /* We currently have no way to enable or disable IPv6 once the DHT has
        been initialised.  Oh, well. */
-    if(dht6_socket < 0 || ipv6 == NULL) {
+    if(ipv6 == NULL || (!force && dht6_socket < 0)) {
         if(last_bound) {
             free(last_bound);
             last_bound = NULL;
@@ -342,7 +342,7 @@ tr_dhtInit(tr_session *ss, const tr_address * tr_addr)
         goto fail;
 
     if(tr_globalIPv6())
-        rebind_ipv6();
+        rebind_ipv6(TRUE);
 
     if( getenv( "TR_DHT_VERBOSE" ) != NULL )
         dht_debug = stderr;
@@ -708,7 +708,7 @@ event_callback(int s, short type, void *ignore UNUSED )
        avoids a system call. */
     count++;
     if(count >= 20) {
-        rebind_ipv6();
+        rebind_ipv6(FALSE);
         count = 0;
     }
 
