@@ -1863,7 +1863,7 @@ processArgs( const char * host, int port, int argc, const char ** argv )
                 case 'D': if( targs )
                               tr_bencDictAddBool( targs, "downloadLimited", FALSE );
                           else
-                              tr_bencDictAddBool( sargs, TR_PREFS_KEY_DSPEED_ENABLED, TRUE );
+                              tr_bencDictAddBool( sargs, TR_PREFS_KEY_DSPEED_ENABLED, FALSE );
                           break;
                 case 'u': if( targs ) {
                               tr_bencDictAddInt( targs, "uploadLimit", numarg( optarg ) );
@@ -1876,7 +1876,7 @@ processArgs( const char * host, int port, int argc, const char ** argv )
                 case 'U': if( targs )
                               tr_bencDictAddBool( targs, "uploadLimited", FALSE );
                           else
-                              tr_bencDictAddBool( sargs, TR_PREFS_KEY_USPEED_ENABLED, TRUE );
+                              tr_bencDictAddBool( sargs, TR_PREFS_KEY_USPEED_ENABLED, FALSE );
                           break;
                 case 930: if( targs )
                               tr_bencDictAddInt( targs, "peer-limit", atoi(optarg) );
