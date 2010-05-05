@@ -13,7 +13,6 @@
 #include <assert.h>
 #include <ctype.h> /* isdigit() */
 #include <errno.h>
-#include <limits.h> /* PATH_MAX */
 #include <math.h> /* fabs() */
 #include <stdio.h>
 #include <stdlib.h> /* realpath() */
@@ -32,6 +31,7 @@
 #include "bencode.h"
 #include "json.h"
 #include "list.h"
+#include "platform.h" /* MAX_PATH_LEN */
 #include "ptrarray.h"
 #include "utils.h" /* tr_new(), tr_free() */
 
@@ -1621,7 +1621,7 @@ tr_bencToFile( const tr_benc * top, tr_fmt_mode mode, const char * filename )
     char * tmp;
     int fd;
     int err = 0;
-    char buf[PATH_MAX];
+    char buf[MAX_PATH_LENGTH];
 
     /* follow symlinks to find the "real" file, to make sure the temporary
      * we build with mkstemp() is created on the right partition */
