@@ -623,7 +623,6 @@ PrefsDialog :: PrefsDialog( Session& session, Prefs& prefs, QWidget * parent ):
     connect( buttons, SIGNAL(rejected()), this, SLOT(hide()) ); // "close" triggers rejected
     myLayout->addWidget( buttons );
 
-    connect( &myPrefs, SIGNAL(changed(int)), this, SLOT(updatePref(int)));
     connect( &mySession, SIGNAL(sessionUpdated()), this, SLOT(sessionUpdated()));
 
     QList<int> keys;

@@ -127,7 +127,7 @@ FileTreeItem :: fileSizeName( ) const
 }
 
 bool
-FileTreeItem :: update( int index, bool wanted, int priority, uint64_t totalSize, uint64_t haveSize )
+FileTreeItem :: update( int index, bool wanted, int priority, uint64_t totalSize, uint64_t haveSize, bool torrentChanged )
 {
     bool changed = false;
 
@@ -136,12 +136,12 @@ FileTreeItem :: update( int index, bool wanted, int priority, uint64_t totalSize
         myIndex = index;
         changed = true;
     }
-    if( myIsWanted != wanted )
+    if( torrentChanged && myIsWanted != wanted )
     {
         myIsWanted = wanted;
         changed = true;
     }
-    if( myPriority != priority )
+    if( torrentChanged && myPriority != priority )
     {
         myPriority = priority;
         changed = true;
@@ -413,7 +413,8 @@ FileTreeModel :: addFile( int                   index,
                           int                   priority,
                           uint64_t              size,
                           uint64_t              have,
-                          QList<QModelIndex>  & rowsAdded )
+                          QList<QModelIndex>  & rowsAdded,
+                          bool                  torrentChanged )
 {
     FileTreeItem * i( rootItem );
 
@@ -433,7 +434,7 @@ FileTreeModel :: addFile( int                   index,
     }
 
     if( i != rootItem )
-        if( i->update( index, wanted, priority, size, have ) )
+        if( i->update( index, wanted, priority, size, have, torrentChanged ) )
             dataChanged( indexOf( i, 0 ), indexOf( i, NUM_COLUMNS-1 ) );
 }
 
@@ -647,9 +648,15 @@ FileTreeView :: eventFilter( QObject * o, QEvent * event )
 void
 FileTreeView :: update( const FileList& files )
 {
+    update( files, true );
+}
+
+void
+FileTreeView :: update( const FileList& files, bool torrentChanged )
+{
     foreach( const TrFile file, files ) {
         QList<QModelIndex> added;
-        myModel.addFile( file.index, file.filename, file.wanted, file.priority, file.size, file.have, added );
+        myModel.addFile( file.index, file.filename, file.wanted, file.priority, file.size, file.have, added, torrentChanged );
         foreach( QModelIndex i, added )
             expand( i );
     }

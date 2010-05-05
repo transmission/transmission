@@ -69,6 +69,7 @@ class Details: public QDialog
         TorrentModel& myModel;
         QSet<int> myIds;
         QTimer myTimer;
+        bool myChangedTorrents;
         bool myHavePendingRefresh;
 
         QLabel * myStateLabel;

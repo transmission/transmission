@@ -123,6 +123,7 @@ Details :: Details( Session& session, Prefs& prefs, TorrentModel& model, QWidget
     mySession( session ),
     myPrefs( prefs ),
     myModel( model ),
+    myChangedTorrents( false ),
     myHavePendingRefresh( false )
 {
     QVBoxLayout * layout = new QVBoxLayout( this );
@@ -163,6 +164,8 @@ Details :: setIds( const QSet<int>& ids )
 {
     if( ids == myIds )
         return;
+
+    myChangedTorrents = true;
 
     // stop listening to the old torrents
     foreach( int id, myIds ) {
@@ -534,7 +537,7 @@ Details :: refresh( )
     ///  Options Tab
     ///
 
-    if( !torrents.empty( ) )
+    if( myChangedTorrents && !torrents.empty( ) )
     {
         int i;
         const Torrent * baseline = *torrents.begin();
@@ -832,10 +835,13 @@ Details :: refresh( )
     myPeers = peers2;
 
     if( single )
-        myFileTreeView->update( torrents[0]->files( ) );
+    {
+        myFileTreeView->update( torrents[0]->files( ) , myChangedTorrents );
+    }
     else
         myFileTreeView->clear( );
 
+    myChangedTorrents = false;
     myHavePendingRefresh = false;
     foreach( QWidget * w, myWidgets )
         w->setEnabled( true );
