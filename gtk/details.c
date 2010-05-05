@@ -993,10 +993,10 @@ info_page_new( struct DetailsImpl * di )
         /* comment */
         b = di->comment_buffer = gtk_text_buffer_new( NULL );
         w = gtk_text_view_new_with_buffer( b );
-        gtk_widget_set_size_request( w, 350u, 50u );
         gtk_text_view_set_wrap_mode( GTK_TEXT_VIEW( w ), GTK_WRAP_WORD );
         gtk_text_view_set_editable( GTK_TEXT_VIEW( w ), FALSE );
         sw = gtk_scrolled_window_new( NULL, NULL );
+        gtk_widget_set_size_request( sw, 350, 36 );
         gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( sw ),
                                         GTK_POLICY_AUTOMATIC,
                                         GTK_POLICY_AUTOMATIC );
