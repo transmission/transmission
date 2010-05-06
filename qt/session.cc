@@ -141,6 +141,7 @@ Session :: updatePref( int key )
         case Prefs :: DOWNLOAD_DIR:
         case Prefs :: INCOMPLETE_DIR:
         case Prefs :: INCOMPLETE_DIR_ENABLED:
+        case Prefs :: LDS_ENABLED:
         case Prefs :: PEER_LIMIT_GLOBAL:
         case Prefs :: PEER_LIMIT_TORRENT:
         case Prefs :: USPEED_ENABLED:
