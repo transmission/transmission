@@ -86,7 +86,7 @@ namespace
 TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& model, bool minimized ):
     myLastFullUpdateTime( 0 ),
     mySessionDialog( new SessionDialog( session, prefs, this ) ),
-    myPrefsDialog( new PrefsDialog( session, prefs, this ) ),
+    myPrefsDialog( 0 ),
     myAboutDialog( new AboutDialog( this ) ),
     myStatsDialog( new StatsDialog( session, this ) ),
     myDetailsDialog( 0 ),
@@ -159,7 +159,7 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     connect( ui.action_AddFile, SIGNAL(triggered()), this, SLOT(openTorrent()));
     connect( ui.action_AddURL, SIGNAL(triggered()), this, SLOT(openURL()));
     connect( ui.action_New, SIGNAL(triggered()), this, SLOT(newTorrent()));
-    connect( ui.action_Preferences, SIGNAL(triggered()), myPrefsDialog, SLOT(show()));
+    connect( ui.action_Preferences, SIGNAL(triggered()), this, SLOT(openPreferences()));
     connect( ui.action_Statistics, SIGNAL(triggered()), myStatsDialog, SLOT(show()));
     connect( ui.action_About, SIGNAL(triggered()), myAboutDialog, SLOT(show()));
     connect( ui.action_Contents, SIGNAL(triggered()), this, SLOT(openHelp()));
@@ -628,6 +628,23 @@ TrMainWindow :: setSortAscendingPref( bool b )
 /****
 *****
 ****/
+
+void
+TrMainWindow :: onPrefsDestroyed( )
+{
+    myPrefsDialog = 0;
+}
+
+void
+TrMainWindow :: openPreferences( )
+{
+    if( myPrefsDialog == 0 ) {
+        myPrefsDialog = new PrefsDialog( mySession, myPrefs, this );
+        connect( myPrefsDialog, SIGNAL(destroyed(QObject*)), this, SLOT(onPrefsDestroyed()));
+    }
+
+    myPrefsDialog->show( );
+}
 
 void
 TrMainWindow :: onDetailsDestroyed( )

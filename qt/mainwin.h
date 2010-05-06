@@ -95,6 +95,8 @@ class TrMainWindow: public QMainWindow
         void openURL( QString );
 
     private slots:
+        void onPrefsDestroyed( );
+        void openPreferences( );
         void onDetailsDestroyed( );
         void onShowModeClicked( );
         void showAll( );
