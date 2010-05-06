@@ -67,7 +67,7 @@
 #include "transmission.h"
 #include "fdlimit.h"
 #include "net.h"
-#include "platform.h" /* MAX_PATH_LENGTH, TR_PATH_DELIMITER */
+#include "platform.h" /* TR_MAX_PATH, TR_PATH_DELIMITER */
 #include "session.h"
 #include "torrent.h" /* tr_isTorrent() */
 #include "utils.h"
@@ -87,7 +87,7 @@ struct tr_openfile
     tr_bool          isWritable;
     int              torrentId;
     tr_file_index_t  fileNum;
-    char             filename[MAX_PATH_LENGTH];
+    char             filename[TR_MAX_PATH];
     int              fd;
     uint64_t         date;
 };

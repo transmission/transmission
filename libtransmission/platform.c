@@ -277,7 +277,7 @@ getOldConfigDir( void )
         SHGetFolderPath( NULL, CSIDL_APPDATA, NULL, 0, appdata );
         path = tr_buildPath( appdata, "Transmission", NULL );
 #elif defined( __HAIKU__ )
-        char buf[MAX_PATH_LENGTH];
+        char buf[TR_PATH_MAX];
         find_directory( B_USER_SETTINGS_DIRECTORY, -1, true, buf, sizeof(buf) );
         path = tr_buildPath( buf, "Transmission", NULL );
 #else
@@ -436,11 +436,11 @@ tr_getDefaultConfigDir( const char * appname )
             s = tr_buildPath( getHomeDir( ), "Library", "Application Support",
                               appname, NULL );
 #elif defined( WIN32 )
-            char appdata[MAX_PATH]; /* SHGetFolderPath() requires MAX_PATH */
+            char appdata[TR_MAX_PATH]; /* SHGetFolderPath() requires MAX_PATH */
             SHGetFolderPath( NULL, CSIDL_APPDATA, NULL, 0, appdata );
             s = tr_buildPath( appdata, appname, NULL );
 #elif defined( __HAIKU__ )
-            char buf[MAX_PATH_LENGTH];
+            char buf[TR_MAX_PATH];
             find_directory( B_USER_SETTINGS_DIRECTORY, -1, true, buf, sizeof(buf) );
             s = tr_buildPath( buf, appname, NULL );
 #else

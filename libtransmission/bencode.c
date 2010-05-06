@@ -1621,7 +1621,7 @@ tr_bencToFile( const tr_benc * top, tr_fmt_mode mode, const char * filename )
     char * tmp;
     int fd;
     int err = 0;
-    char buf[MAX_PATH_LENGTH];
+    char buf[TR_MAX_PATH];
 
     /* follow symlinks to find the "real" file, to make sure the temporary
      * we build with mkstemp() is created on the right partition */
