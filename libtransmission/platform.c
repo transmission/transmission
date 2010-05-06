@@ -440,7 +440,7 @@ tr_getDefaultConfigDir( const char * appname )
             SHGetFolderPath( NULL, CSIDL_APPDATA, NULL, 0, appdata );
             s = tr_buildPath( appdata, appname, NULL );
 #elif defined( __HAIKU__ )
-            char buf[TR_MAX_PATH];
+            char buf[TR_PATH_MAX];
             find_directory( B_USER_SETTINGS_DIRECTORY, -1, true, buf, sizeof(buf) );
             s = tr_buildPath( buf, appname, NULL );
 #else

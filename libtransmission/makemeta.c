@@ -315,7 +315,7 @@ getFileInfo( const char *                     topFile,
     tr_bencInitList( uninitialized_path, n );
     for( prev = pch = file->filename + topLen; ; ++pch )
     {
-        char buf[TR_MAX_PATH];
+        char buf[TR_PATH_MAX];
 
         if( *pch && *pch != TR_PATH_DELIMITER )
             continue;
