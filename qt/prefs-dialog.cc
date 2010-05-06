@@ -620,8 +620,9 @@ PrefsDialog :: PrefsDialog( Session& session, Prefs& prefs, QWidget * parent ):
     myLayout->addWidget( t );
 
     QDialogButtonBox * buttons = new QDialogButtonBox( QDialogButtonBox::Close, Qt::Horizontal, this );
-    connect( buttons, SIGNAL(rejected()), this, SLOT(deleteLater()) ); // "close" triggers rejected
+    connect( buttons, SIGNAL(rejected()), this, SLOT(close()) ); // "close" triggers rejected
     myLayout->addWidget( buttons );
+    QWidget::setAttribute( Qt::WA_DeleteOnClose, true );
 
     connect( &mySession, SIGNAL(sessionUpdated()), this, SLOT(sessionUpdated()));
 

@@ -145,8 +145,9 @@ Details :: Details( Session& session, Prefs& prefs, TorrentModel& model, QWidget
     layout->addWidget( t );
 
     QDialogButtonBox * buttons = new QDialogButtonBox( QDialogButtonBox::Close, Qt::Horizontal, this );
-    connect( buttons, SIGNAL(rejected()), this, SLOT(deleteLater()));
+    connect( buttons, SIGNAL(rejected()), this, SLOT(close()));
     layout->addWidget( buttons );
+    QWidget::setAttribute( Qt::WA_DeleteOnClose, true );
 
     connect( &myTimer, SIGNAL(timeout()), this, SLOT(onTimer()));
 
@@ -835,9 +836,7 @@ Details :: refresh( )
     myPeers = peers2;
 
     if( single )
-    {
         myFileTreeView->update( torrents[0]->files( ) , myChangedTorrents );
-    }
     else
         myFileTreeView->clear( );
 
