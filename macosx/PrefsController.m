@@ -481,9 +481,9 @@ tr_session * fHandle;
     tr_sessionSetDHTEnabled(fHandle, [fDefaults boolForKey: @"DHTGlobal"]);
 }
 
-- (void) setLDS: (id) sender
+- (void) setLDP: (id) sender
 {
-    tr_sessionSetLDSEnabled(fHandle, [fDefaults boolForKey: @"LocalPeerDiscoveryGlobal"]);
+    tr_sessionSetLDPEnabled(fHandle, [fDefaults boolForKey: @"LocalPeerDiscoveryGlobal"]);
 }
 
 - (void) setEncryptionMode: (id) sender
@@ -1155,7 +1155,7 @@ tr_session * fHandle;
     [fDefaults setBool: dht forKey: @"DHTGlobal"];
     
     //dht
-    const BOOL lds = tr_sessionIsLDSEnabled(fHandle);
+    const BOOL lds = tr_sessionIsLDPEnabled(fHandle);
     [fDefaults setBool: lds forKey: @"LocalPeerDiscovery"];
     
     //auto start
