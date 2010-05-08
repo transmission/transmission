@@ -200,7 +200,7 @@ struct tr_torrent
     tr_bool                    dhtAnnounceInProgress;
     tr_bool                    dhtAnnounce6InProgress;
     
-    time_t                     ldsAnnounceAt;
+    time_t                     lpdAnnounceAt;
 
     uint64_t                   downloadedCur;
     uint64_t                   downloadedPrev;
@@ -334,10 +334,10 @@ static inline tr_bool tr_torrentAllowsDHT( const tr_torrent * tor )
         && ( !tr_torrentIsPrivate( tor ) );
 }
 
-static inline tr_bool tr_torrentAllowsLDS( const tr_torrent * tor )
+static inline tr_bool tr_torrentAllowsLPD( const tr_torrent * tor )
 {
     return ( tor != NULL )
-        && ( tr_sessionAllowsLDS( tor->session ) )
+        && ( tr_sessionAllowsLPD( tor->session ) )
         && ( !tr_torrentIsPrivate( tor ) );
 }
 

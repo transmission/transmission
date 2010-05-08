@@ -97,7 +97,7 @@ class Prefs: public QObject
             TRASH_ORIGINAL,
             PEX_ENABLED,
             DHT_ENABLED,
-            LDS_ENABLED,
+            LPD_ENABLED,
             PORT_FORWARDING,
             PROXY_AUTH_ENABLED,
             PREALLOCATION,

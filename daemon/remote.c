@@ -255,8 +255,8 @@ static tr_option opts[] =
     { 'w', "download-dir",          "When adding a new torrent, set its download folder.  Otherwise, set the default download folder", "w",  1, "<path>" },
     { 'x', "pex",                   "Enable peer exchange (PEX)", "x",  0, NULL },
     { 'X', "no-pex",                "Disable peer exchange (PEX)", "X",  0, NULL },
-    { 'z', "lds",                   "Enable local peer discovery (LDS)", "z",  0, NULL },
-    { 'Z', "no-lds",                "Disable local peer discovery (LDS)", "Z",  0, NULL },
+    { 'z', "lds",                   "Enable local peer discovery (LPD)", "z",  0, NULL },
+    { 'Z', "no-lds",                "Disable local peer discovery (LPD)", "Z",  0, NULL },
     { 940, "peer-info",             "List the current torrent(s)' peers", "pi",  0, NULL },
     {   0, NULL,                    NULL, NULL, 0, NULL }
 };
@@ -1343,7 +1343,7 @@ printSession( tr_benc * top )
             printf( "  Portforwarding enabled: %s\n", ( boolVal ? "Yes" : "No" ) );
         if( tr_bencDictFindBool( args, TR_PREFS_KEY_DHT_ENABLED, &boolVal ) )
             printf( "  Distributed hash table enabled: %s\n", ( boolVal ? "Yes" : "No" ) );
-        if( tr_bencDictFindBool( args, TR_PREFS_KEY_LDS_ENABLED, &boolVal ) )
+        if( tr_bencDictFindBool( args, TR_PREFS_KEY_LPD_ENABLED, &boolVal ) )
             printf( "  Local peer discovery enabled: %s\n", ( boolVal ? "Yes" : "No" ) );
         if( tr_bencDictFindBool( args, TR_PREFS_KEY_PEX_ENABLED, &boolVal ) )
             printf( "  Peer exchange allowed: %s\n", ( boolVal ? "Yes" : "No" ) );
@@ -1823,9 +1823,9 @@ processArgs( const char * host, int port, int argc, const char ** argv )
                           break;
                 case 'X': tr_bencDictAddBool( args, TR_PREFS_KEY_PEX_ENABLED, FALSE );
                           break;
-                case 'z': tr_bencDictAddBool( args, TR_PREFS_KEY_LDS_ENABLED, TRUE );
+                case 'z': tr_bencDictAddBool( args, TR_PREFS_KEY_LPD_ENABLED, TRUE );
                           break;
-                case 'Z': tr_bencDictAddBool( args, TR_PREFS_KEY_LDS_ENABLED, FALSE );
+                case 'Z': tr_bencDictAddBool( args, TR_PREFS_KEY_LPD_ENABLED, FALSE );
                           break;
                 case 953: tr_bencDictAddReal( args, "seedRatioLimit", atof(optarg) );
                           tr_bencDictAddBool( args, "seedRatioLimited", TRUE );

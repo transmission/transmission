@@ -55,7 +55,7 @@ libtransmission_a_SOURCES = \
     torrent-ctor.c \
     torrent-magnet.c \
     tr-dht.c \
-    tr-lds.c \
+    tr-lpd.c \
     tr-getopt.c \
     trevent.c \
     upnp.c \
@@ -108,7 +108,7 @@ noinst_HEADERS = \
     tr-getopt.h \
     transmission.h \
     tr-dht.h \
-    tr-lds.h \
+    tr-lpd.h \
     trevent.h \
     upnp.h \
     utils.h \

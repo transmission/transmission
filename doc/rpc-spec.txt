@@ -405,7 +405,7 @@
    "encryption"                  | string     "required", "preferred", "tolerated"
    "incomplete-dir"              | string     path for incomplete torrents, when enabled
    "incomplete-dir-enabled"      | boolean    true means keep torrents in incomplete-dir until done
-   "lds-enabled"                 | boolean    true means allow lds in public torrents
+   "lpd-enabled"                 | boolean    true means allow Local Peer Discovery in public torrents
    "peer-limit-global"           | number     maximum global number of peers
    "peer-limit-per-torrent"      | number     maximum global number of peers
    "pex-enabled"                 | boolean    true means allow pex in public torrents

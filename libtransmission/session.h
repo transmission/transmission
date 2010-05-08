@@ -84,7 +84,7 @@ struct tr_session
     tr_bool                      isPortRandom;
     tr_bool                      isPexEnabled;
     tr_bool                      isDHTEnabled;
-    tr_bool                      isLDSEnabled;
+    tr_bool                      isLPDEnabled;
     tr_bool                      isBlocklistEnabled;
     tr_bool                      isProxyEnabled;
     tr_bool                      isProxyAuthEnabled;
@@ -180,7 +180,7 @@ struct tr_session
 
 tr_bool      tr_sessionAllowsDHT( const tr_session * session );
 
-tr_bool      tr_sessionAllowsLDS( const tr_session * session );
+tr_bool      tr_sessionAllowsLPD( const tr_session * session );
 
 const char * tr_sessionFindTorrentFile( const tr_session * session,
                                         const char *       hashString );

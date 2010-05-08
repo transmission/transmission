@@ -20,19 +20,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef _TR_LDS_H
-#define _TR_LDS_H
+#ifndef _TR_LPD_H
+#define _TR_LPD_H
 
 /* $Id$ */
 
-int tr_ldsInit( tr_session*, tr_address* );
-void tr_ldsUninit( tr_session* );
+int tr_lpdInit( tr_session*, tr_address* );
+void tr_lpdUninit( tr_session* );
 
-tr_bool tr_ldsEnabled( const tr_session* );
+tr_bool tr_lpdEnabled( const tr_session* );
 
-tr_bool tr_ldsSendAnnounce( const tr_torrent* );
+tr_bool tr_lpdSendAnnounce( const tr_torrent* );
 
-int tr_ldsAnnounceMore( const time_t, const int );
+int tr_lpdAnnounceMore( const time_t, const int );
 
 /**
 * @defgroup Preproc Helper macros
@@ -53,5 +53,5 @@ int tr_ldsAnnounceMore( const time_t, const int );
 /**
 * @} */
 
-#endif /* _TR_LDS_H */
+#endif /* _TR_LPD_H */
 

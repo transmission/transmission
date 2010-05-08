@@ -164,7 +164,7 @@ const char* tr_getDefaultDownloadDir( void );
 #define TR_PREFS_KEY_BIND_ADDRESS_IPV6          "bind-address-ipv6"
 #define TR_PREFS_KEY_BLOCKLIST_ENABLED          "blocklist-enabled"
 #define TR_PREFS_KEY_DHT_ENABLED                "dht-enabled"
-#define TR_PREFS_KEY_LDS_ENABLED                "lds-enabled"
+#define TR_PREFS_KEY_LPD_ENABLED                "lpd-enabled"
 #define TR_PREFS_KEY_DOWNLOAD_DIR               "download-dir"
 #define TR_PREFS_KEY_ENCRYPTION                 "encryption"
 #define TR_PREFS_KEY_INCOMPLETE_DIR             "incomplete-dir"
@@ -592,9 +592,9 @@ tr_bool            tr_sessionIsDHTEnabled( const tr_session * session );
 
 void               tr_sessionSetDHTEnabled( tr_session * session, tr_bool );
 
-tr_bool            tr_sessionIsLDSEnabled( const tr_session * session );
+tr_bool            tr_sessionIsLPDEnabled( const tr_session * session );
 
-void               tr_sessionSetLDSEnabled( tr_session * session, tr_bool enabled );
+void               tr_sessionSetLPDEnabled( tr_session * session, tr_bool enabled );
 
 void               tr_sessionSetLazyBitfieldEnabled( tr_session * session,
                                                      tr_bool       enabled );
@@ -1653,7 +1653,7 @@ tr_torrent_activity;
 enum
 {
     TR_PEER_FROM_INCOMING  = 0, /* connections made to the listening port */
-    TR_PEER_FROM_LDS,           /* peers discovered by local announcements */
+    TR_PEER_FROM_LPD,           /* peers discovered by local announcements */
     TR_PEER_FROM_TRACKER,       /* peers received from a tracker */
     TR_PEER_FROM_DHT,           /* peers learnt from the DHT */
     TR_PEER_FROM_RESUME,        /* peers read from the .resume file */

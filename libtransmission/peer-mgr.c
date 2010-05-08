@@ -1508,7 +1508,7 @@ getDefaultShelfLife( uint8_t from )
         case TR_PEER_FROM_DHT      : return 60 * 60 * 3;
         case TR_PEER_FROM_PEX      : return 60 * 60 * 2;
         case TR_PEER_FROM_RESUME   : return 60 * 60;
-        case TR_PEER_FROM_LDS      : return 10 * 60;
+        case TR_PEER_FROM_LPD      : return 10 * 60;
         default                    : return 60 * 60;
     }
 }

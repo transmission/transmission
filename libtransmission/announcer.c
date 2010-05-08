@@ -24,7 +24,7 @@
 #include "publish.h"
 #include "session.h"
 #include "tr-dht.h"
-#include "tr-lds.h"
+#include "tr-lpd.h"
 #include "torrent.h"
 #include "utils.h"
 #include "web.h"
@@ -69,7 +69,7 @@ enum
     UPKEEP_INTERVAL_SECS = 1,
 
     /* this is an upper limit for the frequency of LDS announces */
-    LDS_HOUSEKEEPING_INTERVAL_SECS = 30
+    LPD_HOUSEKEEPING_INTERVAL_SECS = 30
 
 };
 
@@ -206,7 +206,7 @@ typedef struct tr_announcer
     tr_session * session;
     struct event * upkeepTimer;
     int slotsAvailable;
-    time_t ldsHouseKeepingAt;
+    time_t lpdHouseKeepingAt;
 }
 tr_announcer;
 
@@ -254,7 +254,7 @@ tr_announcerInit( tr_session * session )
     tr_announcer * a;
 
     const time_t relaxUntil =
-        calcRescheduleWithJitter( LDS_HOUSEKEEPING_INTERVAL_SECS / 3 );
+        calcRescheduleWithJitter( LPD_HOUSEKEEPING_INTERVAL_SECS / 3 );
 
     assert( tr_isSession( session ) );
 
@@ -263,7 +263,7 @@ tr_announcerInit( tr_session * session )
     a->stops = TR_PTR_ARRAY_INIT;
     a->session = session;
     a->slotsAvailable = MAX_CONCURRENT_TASKS;
-    a->ldsHouseKeepingAt = relaxUntil;
+    a->lpdHouseKeepingAt = relaxUntil;
     a->upkeepTimer = tr_new0( struct event, 1 );
     evtimer_set( a->upkeepTimer, onUpkeepTimer, a );
     tr_timerAdd( a->upkeepTimer, UPKEEP_INTERVAL_SECS, 0 );
@@ -1907,13 +1907,13 @@ fprintf( stderr, "[%s] announce.c has %d requests ready to send (announce: %d, s
     }
 
     /* Local Peer Discovery */
-    if( announcer->ldsHouseKeepingAt <= now )
+    if( announcer->lpdHouseKeepingAt <= now )
     {
-        tr_ldsAnnounceMore( now, LDS_HOUSEKEEPING_INTERVAL_SECS );
+        tr_lpdAnnounceMore( now, LPD_HOUSEKEEPING_INTERVAL_SECS );
 
         /* reschedule more LDS announces for ( the future + jitter ) */
-        announcer->ldsHouseKeepingAt =
-            calcRescheduleWithJitter( LDS_HOUSEKEEPING_INTERVAL_SECS );
+        announcer->lpdHouseKeepingAt =
+            calcRescheduleWithJitter( LPD_HOUSEKEEPING_INTERVAL_SECS );
     }
 }
 

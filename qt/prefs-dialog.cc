@@ -477,8 +477,8 @@ PrefsDialog :: createPrivacyTab( )
     w->setToolTip( tr( "PEX is a tool for exchanging peer lists with the peers you're connected to." ) );
     hig->addWideControl( w = checkBoxNew( tr( "Use &DHT to find more peers" ), Prefs::DHT_ENABLED ) );
     w->setToolTip( tr( "DHT is a tool for finding peers without a tracker." ) );
-    hig->addWideControl( w = checkBoxNew( tr( "Use &LDS to find local peers" ), Prefs::LDS_ENABLED ) );
-    w->setToolTip( tr( "LDS is a tool for finding peers on your local network." ) );
+    hig->addWideControl( w = checkBoxNew( tr( "Use &Local Peer Discovery to find more peers" ), Prefs::LPD_ENABLED ) );
+    w->setToolTip( tr( "LPD is a tool for finding peers on your local network." ) );
 
     hig->finish( );
     updateBlocklistCheckBox( );

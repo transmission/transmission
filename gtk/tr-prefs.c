@@ -554,9 +554,9 @@ privacyPage( GObject * core )
     gtr_widget_set_tooltip_text( w, s );
     hig_workarea_add_wide_control( t, &row, w );
 
-    s = _( "Use LDS to find local peers" );
-    w = new_check_button( s, TR_PREFS_KEY_LDS_ENABLED, core );
-    s = _( "LDS is a tool for finding peers on your local network." );
+    s = _( "Use Local Peer Discovery to find more peers" );
+    w = new_check_button( s, TR_PREFS_KEY_LPD_ENABLED, core );
+    s = _( "LPD is a tool for finding peers on your local network." );
     gtr_widget_set_tooltip_text( w, s );
     hig_workarea_add_wide_control( t, &row, w );
 

@@ -1400,7 +1400,7 @@ checkAndStartImpl( void * vtor )
         tr_announcerTorrentStarted( tor );
         tor->dhtAnnounceAt = now + tr_cryptoWeakRandInt( 20 );
         tor->dhtAnnounce6At = now + tr_cryptoWeakRandInt( 20 );
-        tor->ldsAnnounceAt = now;
+        tor->lpdAnnounceAt = now;
         tr_peerMgrStartTorrent( tor );
     }
 

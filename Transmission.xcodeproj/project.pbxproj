@@ -104,8 +104,8 @@
 		A21F15AD11729A9F00CF5A9C /* AddMagnetWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A21F1538117299F100CF5A9C /* AddMagnetWindow.xib */; };
 		A21FBBAB0EDA78C300BC3C51 /* bandwidth.h in Headers */ = {isa = PBXBuildFile; fileRef = A21FBBA90EDA78C300BC3C51 /* bandwidth.h */; };
 		A21FBBAC0EDA78C300BC3C51 /* bandwidth.c in Sources */ = {isa = PBXBuildFile; fileRef = A21FBBAA0EDA78C300BC3C51 /* bandwidth.c */; };
-		A220EC5B118C8A060022B4BE /* tr-lds.c in Sources */ = {isa = PBXBuildFile; fileRef = A220EC59118C8A060022B4BE /* tr-lds.c */; };
-		A220EC5C118C8A060022B4BE /* tr-lds.h in Headers */ = {isa = PBXBuildFile; fileRef = A220EC5A118C8A060022B4BE /* tr-lds.h */; };
+		A220EC5B118C8A060022B4BE /* tr-lpd.c in Sources */ = {isa = PBXBuildFile; fileRef = A220EC59118C8A060022B4BE /* tr-lpd.c */; };
+		A220EC5C118C8A060022B4BE /* tr-lpd.h in Headers */ = {isa = PBXBuildFile; fileRef = A220EC5A118C8A060022B4BE /* tr-lpd.h */; };
 		A22180980D148A71007D09ED /* GroupsPrefsController.m in Sources */ = {isa = PBXBuildFile; fileRef = A22180970D148A71007D09ED /* GroupsPrefsController.m */; };
 		A221DCC8104B3660008A642D /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A221DCC7104B3660008A642D /* Quartz.framework */; };
 		A222E9870E6B21D9009FB003 /* BlocklistDownloaderViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A222E9860E6B21D9009FB003 /* BlocklistDownloaderViewController.m */; };
@@ -546,8 +546,8 @@
 		A21F15AB11729A8B00CF5A9C /* AddMagnetWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AddMagnetWindowController.h; path = macosx/AddMagnetWindowController.h; sourceTree = "<group>"; };
 		A21FBBA90EDA78C300BC3C51 /* bandwidth.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bandwidth.h; path = libtransmission/bandwidth.h; sourceTree = "<group>"; };
 		A21FBBAA0EDA78C300BC3C51 /* bandwidth.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bandwidth.c; path = libtransmission/bandwidth.c; sourceTree = "<group>"; };
-		A220EC59118C8A060022B4BE /* tr-lds.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "tr-lds.c"; path = "libtransmission/tr-lds.c"; sourceTree = "<group>"; };
-		A220EC5A118C8A060022B4BE /* tr-lds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "tr-lds.h"; path = "libtransmission/tr-lds.h"; sourceTree = "<group>"; };
+		A220EC59118C8A060022B4BE /* tr-lpd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "tr-lpd.c"; path = "libtransmission/tr-lpd.c"; sourceTree = "<group>"; };
+		A220EC5A118C8A060022B4BE /* tr-lpd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "tr-lpd.h"; path = "libtransmission/tr-lpd.h"; sourceTree = "<group>"; };
 		A22180960D148A71007D09ED /* GroupsPrefsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GroupsPrefsController.h; path = macosx/GroupsPrefsController.h; sourceTree = "<group>"; };
 		A22180970D148A71007D09ED /* GroupsPrefsController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GroupsPrefsController.m; path = macosx/GroupsPrefsController.m; sourceTree = "<group>"; };
 		A221DCC7104B3660008A642D /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = /System/Library/Frameworks/Quartz.framework; sourceTree = "<absolute>"; };
@@ -1212,8 +1212,8 @@
 				0A6169A60FE5C9A200C66CE6 /* bitfield.h */,
 				A22CFCA60FC24ED80009BD3E /* tr-dht.c */,
 				A22CFCA70FC24ED80009BD3E /* tr-dht.h */,
-				A220EC59118C8A060022B4BE /* tr-lds.c */,
-				A220EC5A118C8A060022B4BE /* tr-lds.h */,
+				A220EC59118C8A060022B4BE /* tr-lpd.c */,
+				A220EC5A118C8A060022B4BE /* tr-lpd.h */,
 				A2AAB65B0DE0CF6200E04DDA /* rpcimpl.c */,
 				A2AAB6590DE0CF6200E04DDA /* rpcimpl.h */,
 				A2AAB6580DE0CF6200E04DDA /* rpc-server.c */,
@@ -1569,7 +1569,7 @@
 				4D80185A10BBC0B0008A4AF2 /* magnet.h in Headers */,
 				A209EE5D1144B51E002B02D1 /* history.h in Headers */,
 				A247A443114C701800547DFC /* InfoViewController.h in Headers */,
-				A220EC5C118C8A060022B4BE /* tr-lds.h in Headers */,
+				A220EC5C118C8A060022B4BE /* tr-lpd.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2040,7 +2040,7 @@
 				4D8017EA10BBC073008A4AF2 /* torrent-magnet.c in Sources */,
 				4D80185910BBC0B0008A4AF2 /* magnet.c in Sources */,
 				A209EE5C1144B51E002B02D1 /* history.c in Sources */,
-				A220EC5B118C8A060022B4BE /* tr-lds.c in Sources */,
+				A220EC5B118C8A060022B4BE /* tr-lpd.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
