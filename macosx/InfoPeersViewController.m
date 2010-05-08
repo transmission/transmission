@@ -386,7 +386,7 @@
             case TR_PEER_FROM_RESUME:
                 [components addObject: NSLocalizedString(@"From: cache", "Inspector -> Peers tab -> table row tooltip")];
                 break;
-            case TR_PEER_FROM_LDP:
+            case TR_PEER_FROM_LPD:
                 [components addObject: NSLocalizedString(@"From: local peer discovery", "Inspector -> Peers tab -> table row tooltip")];
                 break;
             case TR_PEER_FROM_PEX:
