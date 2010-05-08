@@ -92,6 +92,8 @@ class Prefs: public QObject
             PEER_PORT_RANDOM_ON_START,
             PEER_PORT_RANDOM_LOW,
             PEER_PORT_RANDOM_HIGH,
+            SCRIPT_TORRENT_DONE_ENABLED,
+            SCRIPT_TORRENT_DONE_FILENAME,
             SOCKET_TOS,
             START,
             TRASH_ORIGINAL,

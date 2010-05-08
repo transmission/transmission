@@ -52,6 +52,8 @@ class PrefsDialog: public QDialog
         void sessionUpdated( );
         void onWatchClicked( );
         void onWatchSelected( const QStringList& );
+        void onScriptClicked( );
+        void onScriptSelected( const QStringList& );
         void onIncompleteClicked( );
         void onIncompleteSelected( const QStringList& );
         void onDestinationClicked( );
@@ -96,6 +98,8 @@ class PrefsDialog: public QDialog
         QLabel * myPortLabel;
         QPushButton * myPortButton;
         QPushButton * myWatchButton;
+        QPushButton * myTorrentDoneScriptFilename;
+        QCheckBox * myTorrentDoneScriptCheckbox;
         QCheckBox * myIncompleteCheckbox;
         QPushButton * myIncompleteButton;
         QPushButton * myDestinationButton;

@@ -1230,6 +1230,10 @@ sessionSet( tr_session               * session,
         tr_sessionSetRatioLimited( session, boolVal );
     if( tr_bencDictFindBool( args_in, TR_PREFS_KEY_START, &boolVal ) )
         tr_sessionSetPaused( session, !boolVal );
+    if( tr_bencDictFindStr( args_in, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_FILENAME, &str ) )
+        tr_sessionSetTorrentDoneScript( session, str );
+    if( tr_bencDictFindBool( args_in, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED, &boolVal ) )
+        tr_sessionSetTorrentDoneScriptEnabled( session, boolVal );
     if( tr_bencDictFindBool( args_in, TR_PREFS_KEY_TRASH_ORIGINAL, &boolVal ) )
         tr_sessionSetDeleteSource( session, boolVal );
     if( tr_bencDictFindInt( args_in, TR_PREFS_KEY_DSPEED, &i ) )
@@ -1343,6 +1347,8 @@ sessionGet( tr_session               * s,
     tr_bencDictAddBool( d, TR_PREFS_KEY_USPEED_ENABLED, tr_sessionIsSpeedLimited( s, TR_UP ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_DSPEED, tr_sessionGetSpeedLimit( s, TR_DOWN ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_DSPEED_ENABLED, tr_sessionIsSpeedLimited( s, TR_DOWN ) );
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_FILENAME, tr_sessionGetTorrentDoneScript( s ) );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED, tr_sessionIsTorrentDoneScriptEnabled( s ) );
     tr_bencDictAddStr ( d, "version", LONG_VERSION_STRING );
     switch( tr_sessionGetEncryption( s ) ) {
         case TR_CLEAR_PREFERRED: str = "tolerated"; break;

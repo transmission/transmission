@@ -88,6 +88,7 @@ struct tr_session
     tr_bool                      isBlocklistEnabled;
     tr_bool                      isProxyEnabled;
     tr_bool                      isProxyAuthEnabled;
+    tr_bool                      isTorrentDoneScriptEnabled;
     tr_bool                      isClosed;
     tr_bool                      useLazyBitfield;
     tr_bool                      isIncompleteFileNamingEnabled;
@@ -129,6 +130,8 @@ struct tr_session
 
     int                          torrentCount;
     tr_torrent *                 torrentList;
+
+    char *                       torrentDoneScript;
 
     char *                       tag;
     char *                       configDir;

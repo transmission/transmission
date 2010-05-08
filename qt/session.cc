@@ -128,32 +128,34 @@ Session :: updatePref( int key )
 {
     if( myPrefs.isCore( key ) ) switch( key )
     {
-        case Prefs :: ALT_SPEED_LIMIT_UP:
         case Prefs :: ALT_SPEED_LIMIT_DOWN:
         case Prefs :: ALT_SPEED_LIMIT_ENABLED:
         case Prefs :: ALT_SPEED_LIMIT_TIME_BEGIN:
-        case Prefs :: ALT_SPEED_LIMIT_TIME_END:
-        case Prefs :: ALT_SPEED_LIMIT_TIME_ENABLED:
         case Prefs :: ALT_SPEED_LIMIT_TIME_DAY:
-        case Prefs :: BLOCKLIST_ENABLED:
+        case Prefs :: ALT_SPEED_LIMIT_TIME_ENABLED:
+        case Prefs :: ALT_SPEED_LIMIT_TIME_END:
+        case Prefs :: ALT_SPEED_LIMIT_UP:
         case Prefs :: BLOCKLIST_DATE:
+        case Prefs :: BLOCKLIST_ENABLED:
         case Prefs :: DHT_ENABLED:
         case Prefs :: DOWNLOAD_DIR:
+        case Prefs :: DSPEED:
+        case Prefs :: DSPEED_ENABLED:
         case Prefs :: INCOMPLETE_DIR:
         case Prefs :: INCOMPLETE_DIR_ENABLED:
         case Prefs :: LPD_ENABLED:
         case Prefs :: PEER_LIMIT_GLOBAL:
         case Prefs :: PEER_LIMIT_TORRENT:
-        case Prefs :: USPEED_ENABLED:
-        case Prefs :: USPEED:
-        case Prefs :: DSPEED_ENABLED:
-        case Prefs :: DSPEED:
-        case Prefs :: START:
-        case Prefs :: TRASH_ORIGINAL:
-        case Prefs :: PEX_ENABLED:
-        case Prefs :: PORT_FORWARDING:
         case Prefs :: PEER_PORT:
         case Prefs :: PEER_PORT_RANDOM_ON_START:
+        case Prefs :: PEX_ENABLED:
+        case Prefs :: PORT_FORWARDING:
+        case Prefs :: SCRIPT_TORRENT_DONE_ENABLED:
+        case Prefs :: SCRIPT_TORRENT_DONE_FILENAME:
+        case Prefs :: START:
+        case Prefs :: TRASH_ORIGINAL:
+        case Prefs :: USPEED:
+        case Prefs :: USPEED_ENABLED:
             sessionSet( myPrefs.keyStr(key), myPrefs.variant(key) );
             break;
 

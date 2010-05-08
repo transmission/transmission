@@ -223,29 +223,35 @@ new_entry( const char * key,
 }
 
 static void
-chosen_cb( GtkFileChooser * w,
-           gpointer         core )
+chosen_cb( GtkFileChooser * w, gpointer core )
 {
     const char * key = g_object_get_data( G_OBJECT( w ), PREF_KEY );
-    char *       value = gtk_file_chooser_get_filename( GTK_FILE_CHOOSER( w ) );
-
+    char * value = gtk_file_chooser_get_filename( GTK_FILE_CHOOSER( w ) );
     tr_core_set_pref( TR_CORE( core ), key, value );
     g_free( value );
 }
 
 static GtkWidget*
-new_path_chooser_button( const char * key,
-                         gpointer     core )
+new_path_chooser_button( const char * key, gpointer core )
 {
-    GtkWidget *  w = gtk_file_chooser_button_new(
-        NULL,
-        GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER );
+    GtkWidget *  w = gtk_file_chooser_button_new( NULL, GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER );
     const char * path = pref_string_get( key );
-
-    g_object_set_data_full( G_OBJECT( w ), PREF_KEY, g_strdup(
-                                key ), g_free );
+    g_object_set_data_full( G_OBJECT( w ), PREF_KEY, g_strdup( key ), g_free );
     g_signal_connect( w, "selection-changed", G_CALLBACK( chosen_cb ), core );
-    gtk_file_chooser_set_current_folder( GTK_FILE_CHOOSER( w ), path );
+    if( path != NULL )
+        gtk_file_chooser_set_current_folder( GTK_FILE_CHOOSER( w ), path );
+    return w;
+}
+
+static GtkWidget*
+new_file_chooser_button( const char * key, gpointer core )
+{
+    GtkWidget *  w = gtk_file_chooser_button_new( NULL, GTK_FILE_CHOOSER_ACTION_OPEN );
+    const char * path = pref_string_get( key );
+    g_object_set_data_full( G_OBJECT( w ), PREF_KEY, g_strdup( key ), g_free );
+    if( path != NULL )
+        gtk_file_chooser_set_filename( GTK_FILE_CHOOSER( w ), path );
+    g_signal_connect( w, "selection-changed", G_CALLBACK( chosen_cb ), core );
     return w;
 }
 
@@ -301,6 +307,9 @@ torrentPage( GObject * core )
     w = new_check_button( s, TR_PREFS_KEY_RENAME_PARTIAL_FILES, core );
     hig_workarea_add_wide_control( t, &row, w );
 
+    w = new_path_chooser_button( TR_PREFS_KEY_DOWNLOAD_DIR, core );
+    hig_workarea_add_row( t, &row, _( "Save to _Location:" ), w, NULL );
+
     s = _( "Keep _incomplete torrents in:" );
     l = new_check_button( s, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED, core );
     w = new_path_chooser_button( TR_PREFS_KEY_INCOMPLETE_DIR, core );
@@ -308,8 +317,12 @@ torrentPage( GObject * core )
     g_signal_connect( l, "toggled", G_CALLBACK( target_cb ), w );
     hig_workarea_add_row_w( t, &row, l, w, NULL );
 
-    w = new_path_chooser_button( TR_PREFS_KEY_DOWNLOAD_DIR, core );
-    hig_workarea_add_row( t, &row, _( "Save to _Location:" ), w, NULL );
+    s = _( "Call scrip_t when torrent is completed:" );
+    l = new_check_button( s, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED, core );
+    w = new_file_chooser_button( TR_PREFS_KEY_SCRIPT_TORRENT_DONE_FILENAME, core );
+    gtk_widget_set_sensitive( GTK_WIDGET( w ), pref_flag_get( TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED ) );
+    g_signal_connect( l, "toggled", G_CALLBACK( target_cb ), w );
+    hig_workarea_add_row_w( t, &row, l, w, NULL );
 
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title( t, &row, _( "Limits" ) );

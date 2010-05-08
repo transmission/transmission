@@ -490,6 +490,26 @@ PrefsDialog :: createPrivacyTab( )
 ***/
 
 void
+PrefsDialog :: onScriptClicked( void )
+{
+    const QString title = tr( "Select \"Torrent Done\" Script" );
+    const QString path = myPrefs.getString( Prefs::SCRIPT_TORRENT_DONE_FILENAME );
+    QFileDialog * d = new QFileDialog( this, title, path );
+    d->setFileMode( QFileDialog::ExistingFiles );
+    connect( d, SIGNAL(filesSelected(const QStringList&)),
+             this, SLOT(onScriptSelected(const QStringList&)) );
+    d->show( );
+}
+
+void
+PrefsDialog :: onScriptSelected( const QStringList& list )
+{
+    if( list.size() == 1 )
+        myPrefs.set( Prefs::Prefs::SCRIPT_TORRENT_DONE_FILENAME, list.first( ) );
+}
+
+
+void
 PrefsDialog :: onIncompleteClicked( void )
 {
     const QString title = tr( "Select Incomplete Directory" );
@@ -554,6 +574,8 @@ PrefsDialog :: createTorrentsTab( )
     const QFileIconProvider iconProvider;
     const QIcon folderIcon = iconProvider.icon( QFileIconProvider::Folder );
     const QPixmap folderPixmap = folderIcon.pixmap( iconSize );
+    const QIcon fileIcon = iconProvider.icon( QFileIconProvider::File );
+    const QPixmap filePixmap = fileIcon.pixmap( iconSize );
 
     QWidget *l, *r;
     HIG * hig = new HIG( this );
@@ -572,12 +594,21 @@ PrefsDialog :: createTorrentsTab( )
         hig->addWideControl( checkBoxNew( tr( "Mo&ve .torrent file to the trash" ), Prefs::TRASH_ORIGINAL ) );
         hig->addWideControl( checkBoxNew( tr( "Append \".&part\" to incomplete files' names" ), Prefs::RENAME_PARTIAL_FILES ) );
 
-        myIncompleteCheckbox = checkBoxNew( tr( "Keep &incomplete files in:" ), Prefs::INCOMPLETE_DIR_ENABLED );
+        l = myIncompleteCheckbox = checkBoxNew( tr( "Keep &incomplete files in:" ), Prefs::INCOMPLETE_DIR_ENABLED );
         b = myIncompleteButton = new QPushButton;
         b->setIcon( folderPixmap );
         b->setStyleSheet( "text-align: left; padding-left: 5; padding-right: 5" );
         connect( b, SIGNAL(clicked(bool)), this, SLOT(onIncompleteClicked(void)) );
         hig->addRow( myIncompleteCheckbox, b );
+        enableBuddyWhenChecked( qobject_cast<QCheckBox*>(l), b );
+
+        l = myTorrentDoneScriptCheckbox = checkBoxNew( tr( "Call scrip&t when torrent is completed" ), Prefs::SCRIPT_TORRENT_DONE_ENABLED );
+        b = myTorrentDoneScriptFilename = new QPushButton;
+        b->setIcon( filePixmap );
+        b->setStyleSheet( "text-align: left; padding-left: 5; padding-right: 5" );
+        connect( b, SIGNAL(clicked(bool)), this, SLOT(onScriptClicked(void)) );
+        hig->addRow( myTorrentDoneScriptCheckbox, b );
+        enableBuddyWhenChecked( qobject_cast<QCheckBox*>(l), b );
 
         b = myDestinationButton = new QPushButton;
         b->setIcon( folderPixmap );

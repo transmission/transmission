@@ -1689,6 +1689,34 @@ tr_torrentClearRatioLimitHitCallback( tr_torrent * torrent )
     tr_torrentSetRatioLimitHitCallback( torrent, NULL, NULL );
 }
 
+
+static void
+torrentCallScript( tr_torrent * tor, const char * script )
+{
+    assert( tr_isTorrent( tor ) );
+
+    if( script && *script )
+    {
+        char buf[128];
+        const time_t now = tr_time( );
+
+#ifdef HAVE_CLEARENV
+        clearenv( );
+#endif
+
+        tr_snprintf( buf, sizeof( buf ), "%d", tr_torrentId( tor ) );
+        setenv( "TR_TORRENT_ID", buf, 1 );
+        setenv( "TR_TORRENT_NAME", tr_torrentName( tor ), 1 );
+        setenv( "TR_TORRENT_DIR", tor->currentDir, 1 );
+        setenv( "TR_TORRENT_HASH", tor->info.hashString, 1 );
+        ctime_r( &now, buf );
+        *strchr( buf,'\n' ) = '\0';
+        setenv( "TR_TIME_LOCALTIME", buf, 1 );
+        tr_torinf( tor, "Calling script \"%s\"", script );
+        system( script );
+    }
+}
+
 void
 tr_torrentRecheckCompleteness( tr_torrent * tor )
 {
@@ -1720,6 +1748,9 @@ tr_torrentRecheckCompleteness( tr_torrent * tor )
 
             if( tor->currentDir == tor->incompleteDir )
                 tr_torrentSetLocation( tor, tor->downloadDir, TRUE, NULL, NULL );
+
+            if( tr_sessionIsTorrentDoneScriptEnabled( tor->session ) )
+                torrentCallScript( tor, tr_sessionGetTorrentDoneScript( tor->session ) );
         }
 
         fireCompletenessChange( tor, completeness );

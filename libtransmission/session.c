@@ -283,6 +283,8 @@ tr_sessionGetDefaultSettings( const char * configDir UNUSED, tr_benc * d )
     tr_bencDictAddStr ( d, TR_PREFS_KEY_RPC_WHITELIST,            TR_DEFAULT_RPC_WHITELIST );
     tr_bencDictAddBool( d, TR_PREFS_KEY_RPC_WHITELIST_ENABLED,    TRUE );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_RPC_PORT,                 atoi( TR_DEFAULT_RPC_PORT_STR ) );
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_FILENAME, "" );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED, FALSE );
     tr_bencDictAddBool( d, TR_PREFS_KEY_ALT_SPEED_ENABLED,        FALSE );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_UP,             50 ); /* half the regular */
     tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_DOWN,           50 ); /* half the regular */
@@ -348,6 +350,8 @@ tr_sessionGetSettings( tr_session * s, struct tr_benc * d )
     tr_bencDictAddStr ( d, TR_PREFS_KEY_RPC_USERNAME,             tr_sessionGetRPCUsername( s ) );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_RPC_WHITELIST,            tr_sessionGetRPCWhitelist( s ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_RPC_WHITELIST_ENABLED,    tr_sessionGetRPCWhitelistEnabled( s ) );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED, tr_sessionIsTorrentDoneScriptEnabled( s ) );
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_FILENAME, tr_sessionGetTorrentDoneScript( s ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_ALT_SPEED_ENABLED,        tr_sessionUsesAltSpeed( s ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_UP,             tr_sessionGetAltSpeed( s, TR_UP ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_DOWN,           tr_sessionGetAltSpeed( s, TR_DOWN ) );
@@ -801,6 +805,15 @@ sessionSetImpl( void * vdata )
     if( tr_bencDictFindBool( settings, TR_PREFS_KEY_ALT_SPEED_ENABLED, &boolVal ) )
         turtle->isEnabled = boolVal;
     turtleBootstrap( session, turtle );
+
+    /**
+    ***  Scripts
+    **/
+
+    if( tr_bencDictFindBool( settings, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED, &boolVal ) )
+        tr_sessionSetTorrentDoneScriptEnabled( session, boolVal );
+    if( tr_bencDictFindStr( settings, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_FILENAME, &str ) )
+        tr_sessionSetTorrentDoneScript( session, str );
 
     data->done = TRUE;
 }
@@ -1669,6 +1682,7 @@ tr_sessionClose( tr_session * session )
         tr_bencFree( session->metainfoLookup );
         tr_free( session->metainfoLookup );
     }
+    tr_free( session->torrentDoneScript );
     tr_free( session->buffer );
     tr_free( session->tag );
     tr_free( session->configDir );
@@ -2429,5 +2443,46 @@ tr_sessionSetProxyPassword( tr_session * session,
     {
         tr_free( session->proxyPassword );
         session->proxyPassword = tr_strdup( password );
+    }
+}
+
+/****
+*****
+****/
+
+tr_bool
+tr_sessionIsTorrentDoneScriptEnabled( const tr_session * session )
+{
+    assert( tr_isSession( session ) );
+
+    return session->isTorrentDoneScriptEnabled;
+}
+
+void
+tr_sessionSetTorrentDoneScriptEnabled( tr_session * session, tr_bool isEnabled )
+{
+    assert( tr_isSession( session ) );
+    assert( tr_isBool( isEnabled ) );
+
+    session->isTorrentDoneScriptEnabled = isEnabled;
+}
+
+const char *
+tr_sessionGetTorrentDoneScript( const tr_session * session )
+{
+    assert( tr_isSession( session ) );
+
+    return session->torrentDoneScript;
+}
+
+void
+tr_sessionSetTorrentDoneScript( tr_session * session, const char * scriptFilename )
+{
+    assert( tr_isSession( session ) );
+
+    if( session->torrentDoneScript != scriptFilename )
+    {
+        tr_free( session->torrentDoneScript );
+        session->torrentDoneScript = tr_strdup( scriptFilename );
     }
 }
