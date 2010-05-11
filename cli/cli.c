@@ -47,7 +47,6 @@ static sig_atomic_t gotsig           = 0;
 static sig_atomic_t manualUpdate     = 0;
 
 static const char * torrentPath  = NULL;
-static const char * finishCall   = NULL;
 static const char * sourceFile   = NULL;
 static const char * comment      = NULL;
 
@@ -135,14 +134,6 @@ escape( char *          out,
             out += tr_snprintf( out, 4, "%%%02X", (unsigned int)*in++ );
 
     *out = '\0';
-}
-
-static void
-torrentCompletenessChanged( tr_torrent       * torrent       UNUSED,
-                            tr_completeness    completeness  UNUSED,
-                            void             * user_data     UNUSED )
-{
-    system( finishCall );
 }
 
 static tr_bool waitingOnWeb;
@@ -453,7 +444,6 @@ main( int     argc,
 #ifndef WIN32
     signal( SIGHUP, sigHandler );
 #endif
-    tr_torrentSetCompletenessCallback( tor, torrentCompletenessChanged, NULL );
     tr_torrentStart( tor );
 
     if( verify )
@@ -548,7 +538,8 @@ parseCommandLine( tr_benc * d, int argc, const char ** argv )
                       break;
             case 'D': tr_bencDictAddBool( d, TR_PREFS_KEY_DSPEED_ENABLED, FALSE );
                       break;
-            case 'f': finishCall = optarg;
+            case 'f': tr_bencDictAddStr( d, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_FILENAME, optarg );
+                      tr_bencDictAddBool( d, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED, TRUE );
                       break;
             case 'g': /* handled above */
                       break;
