@@ -1453,6 +1453,20 @@ onAnnounceDone( tr_session   * session,
             tierAddAnnounce( tier, announceEvent, now + interval );
             tier->manualAnnounceAllowedAt = now + tier->announceMinIntervalSec;
         }
+        else if( ( responseCode == 404 ) || ( 500 <= responseCode && responseCode <= 599 ) )
+        {
+            /* 404: The requested resource could not be found but may be
+             * available again in the future.  Subsequent requests by
+             * the client are permissible. */
+
+            /* 5xx: indicate cases in which the server is aware that it
+             * has erred or is incapable of performing the request.
+             * So we pause a bit and try again. */
+
+            const int interval = getRetryInterval( tier->currentTracker->host );
+            tier->manualAnnounceAllowedAt = ~(time_t)0;
+            tierAddAnnounce( tier, announceEvent, now + interval );
+        }
         else if( 400 <= responseCode && responseCode <= 499 )
         {
             /* The request could not be understood by the server due to
@@ -1462,16 +1476,6 @@ onAnnounceDone( tr_session   * session,
                 publishErrorMessageAndStop( tier, _( "Tracker returned a 4xx message" ) );
             tier->announceAt = 0;
             tier->manualAnnounceAllowedAt = ~(time_t)0;
-        }
-        else if( 500 <= responseCode && responseCode <= 599 )
-        {
-            /* Response status codes beginning with the digit "5" indicate
-             * cases in which the server is aware that it has erred or is
-             * incapable of performing the request.  So we pause a bit and
-             * try again. */
-            const int interval = getRetryInterval( tier->currentTracker->host );
-            tier->manualAnnounceAllowedAt = ~(time_t)0;
-            tierAddAnnounce( tier, announceEvent, now + interval );
         }
         else
         {
