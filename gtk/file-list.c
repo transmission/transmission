@@ -42,7 +42,6 @@ enum
     FC_HAVE,
     FC_PRIORITY,
     FC_ENABLED,
-    FC_IS_FILE,
     N_FILE_COLS
 };
 
@@ -89,16 +88,15 @@ refreshFilesForeach( GtkTreeModel * model,
                      gpointer       gdata )
 {
     FileData * data = gdata;
-    gboolean is_file;
     unsigned int index;
     uint64_t size;
     uint64_t old_have;
     int old_prog;
     int old_priority;
     int old_enabled;
+    const gboolean is_file = !gtk_tree_model_iter_has_child( model, iter );
 
-    gtk_tree_model_get( model, iter, FC_IS_FILE, &is_file,
-                                     FC_ENABLED, &old_enabled,
+    gtk_tree_model_get( model, iter, FC_ENABLED, &old_enabled,
                                      FC_PRIORITY, &old_priority,
                                      FC_INDEX, &index,
                                      FC_HAVE, &old_have,
@@ -253,18 +251,16 @@ getSelectedFilesForeach( GtkTreeModel * model,
                          GtkTreeIter  * iter,
                          gpointer       gdata )
 {
-    struct ActiveData * data = gdata;
-    unsigned int        i;
-    gboolean            is_file = FALSE;
-    gboolean            is_active = FALSE;
+    const gboolean is_file = !gtk_tree_model_iter_has_child( model, iter );
 
-    /* active == if it's selected, or any ancestor is selected */
-    gtk_tree_model_get( model, iter, FC_IS_FILE, &is_file,
-                                     FC_INDEX, &i,
-                                     -1 );
     if( is_file )
     {
-        is_active = gtk_tree_selection_iter_is_selected( data->sel, iter );
+        struct ActiveData * data = gdata;
+    
+        /* active means: if it's selected or any ancestor is selected */
+
+        gboolean is_active = gtk_tree_selection_iter_is_selected( data->sel, iter );
+
         if( !is_active )
         {
             GtkTreeIter walk = *iter;
@@ -275,10 +271,14 @@ getSelectedFilesForeach( GtkTreeModel * model,
                 walk = parent;
             }
         }
-    }
 
-    if( is_active )
-        g_array_append_val( data->array, i );
+        if( is_active )
+        {
+            unsigned int i;
+            gtk_tree_model_get( model, iter, FC_INDEX, &i, -1 );
+            g_array_append_val( data->array, i );
+        }
+    }
 
     return FALSE; /* keep walking */
 }
@@ -306,16 +306,19 @@ getSubtreeForeach( GtkTreeModel   * model,
                    GtkTreeIter    * iter,
                    gpointer         gdata )
 {
-    struct SubtreeForeachData * data = gdata;
-    unsigned int i;
-    gboolean is_file = FALSE;
+    const gboolean is_file = !gtk_tree_model_iter_has_child( model, iter );
 
-    gtk_tree_model_get( model, iter, FC_IS_FILE, &is_file,
-                                     FC_INDEX, &i,
-                                     -1 );
     if( is_file )
+    {
+        struct SubtreeForeachData * data = gdata;
+
         if( !gtk_tree_path_compare( path, data->path ) || gtk_tree_path_is_descendant( path, data->path ) )
+        {
+            unsigned int i;
+            gtk_tree_model_get( model, iter, FC_INDEX, &i, -1 );
             g_array_append_val( data->array, i );
+        }
+    }
 
     return FALSE; /* keep walking */
 }
@@ -399,7 +402,6 @@ buildTree( GNode * node, gpointer gdata )
                                        FC_ICON, icon,
                                        FC_PRIORITY, priority,
                                        FC_ENABLED, enabled,
-                                       FC_IS_FILE, isLeaf,
                                        -1 );
 #else
     gtk_tree_store_append( build->store, &child_iter, build->iter );
@@ -410,7 +412,6 @@ buildTree( GNode * node, gpointer gdata )
                         FC_ICON, icon,
                         FC_PRIORITY, priority,
                         FC_ENABLED, enabled,
-                        FC_IS_FILE, isLeaf,
                         -1 );
 #endif
 
@@ -459,11 +460,7 @@ file_list_set_torrent( GtkWidget * w, int torrentId )
                                  G_TYPE_UINT64,    /* size */
                                  G_TYPE_UINT64,    /* have */
                                  G_TYPE_INT,       /* priority */
-                                 G_TYPE_INT,       /* dl enabled */
-                                 G_TYPE_BOOLEAN,   /* is file */
-                                 G_TYPE_UINT64,    /* sub size */
-                                 G_TYPE_UINT64,    /* sub have */
-                                 G_TYPE_INT );     /* sub state */
+                                 G_TYPE_INT );     /* dl enabled */
 
     data->store = store;
     data->model = GTK_TREE_MODEL( store );
