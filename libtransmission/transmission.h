@@ -1184,10 +1184,10 @@ enum
  *
  * @param priority must be one of TR_PRI_NORMAL, _HIGH, or _LOW
  */
-void tr_torrentSetFilePriorities( tr_torrent       * torrent,
-                                  tr_file_index_t  * files,
-                                  tr_file_index_t    fileCount,
-                                  tr_priority_t      priority );
+void tr_torrentSetFilePriorities( tr_torrent             * torrent,
+                                  const tr_file_index_t  * files,
+                                  tr_file_index_t          fileCount,
+                                  tr_priority_t            priority );
 
 /**
  * @brief Get this torrent's file priorities.
@@ -1199,10 +1199,10 @@ void tr_torrentSetFilePriorities( tr_torrent       * torrent,
 tr_priority_t*  tr_torrentGetFilePriorities( const tr_torrent * torrent );
 
 /** @brief Set a batch of files to be downloaded or not. */
-void tr_torrentSetFileDLs( tr_torrent       * torrent,
-                           tr_file_index_t  * files,
-                           tr_file_index_t    fileCount,
-                           tr_bool            do_download );
+void tr_torrentSetFileDLs( tr_torrent             * torrent,
+                           const tr_file_index_t  * files,
+                           tr_file_index_t          fileCount,
+                           tr_bool                  do_download );
 
 
 const tr_info * tr_torrentInfo( const tr_torrent * torrent );

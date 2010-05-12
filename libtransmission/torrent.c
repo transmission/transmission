@@ -43,6 +43,7 @@
 #include "trevent.h" /* tr_runInEventThread() */
 #include "utils.h"
 #include "verify.h"
+#include "version.h"
 
 enum
 {
@@ -1704,6 +1705,8 @@ torrentCallScript( tr_torrent * tor, const char * script )
         clearenv( );
 #endif
 
+        setenv( "TR_APP_VERSION", SHORT_VERSION_STRING, 1 );
+
         tr_snprintf( buf, sizeof( buf ), "%d", tr_torrentId( tor ) );
         setenv( "TR_TORRENT_ID", buf, 1 );
         setenv( "TR_TORRENT_NAME", tr_torrentName( tor ), 1 );
@@ -1816,10 +1819,10 @@ tr_torrentInitFilePriority( tr_torrent *    tor,
 }
 
 void
-tr_torrentSetFilePriorities( tr_torrent *      tor,
-                             tr_file_index_t * files,
-                             tr_file_index_t   fileCount,
-                             tr_priority_t     priority )
+tr_torrentSetFilePriorities( tr_torrent             * tor,
+                             const tr_file_index_t  * files,
+                             tr_file_index_t          fileCount,
+                             tr_priority_t            priority )
 {
     tr_file_index_t i;
     assert( tr_isTorrent( tor ) );
@@ -1911,10 +1914,10 @@ setFileDND( tr_torrent * tor, tr_file_index_t fileIndex, int doDownload )
 }
 
 void
-tr_torrentInitFileDLs( tr_torrent      * tor,
-                       tr_file_index_t * files,
-                       tr_file_index_t   fileCount,
-                       tr_bool           doDownload )
+tr_torrentInitFileDLs( tr_torrent             * tor,
+                       const tr_file_index_t  * files,
+                       tr_file_index_t          fileCount,
+                       tr_bool                  doDownload )
 {
     tr_file_index_t i;
 
@@ -1932,10 +1935,10 @@ tr_torrentInitFileDLs( tr_torrent      * tor,
 }
 
 void
-tr_torrentSetFileDLs( tr_torrent *      tor,
-                      tr_file_index_t * files,
-                      tr_file_index_t   fileCount,
-                      tr_bool           doDownload )
+tr_torrentSetFileDLs( tr_torrent             * tor,
+                      const tr_file_index_t  * files,
+                      tr_file_index_t          fileCount,
+                      tr_bool                  doDownload )
 {
     assert( tr_isTorrent( tor ) );
     tr_torrentLock( tor );
