@@ -1055,19 +1055,11 @@ tr_core_add_from_url( TrCore * core, const char * url )
 
         err = tr_ctorSetMetainfoFromMagnetLink( ctor, url );
 
-        if( err )
-        {
+        if( !err )
+            tr_core_add_ctor( core, ctor );
+        else {
             gtr_unrecognized_url_dialog( NULL, url );
             tr_ctorFree( ctor );
-        }
-        else
-        {
-            tr_session * session = tr_core_session( core );
-            TrTorrent * gtor = tr_torrent_new_ctor( session, ctor, &err );
-            if( !err )
-                tr_core_add_torrent( core, gtor, FALSE );
-            else
-                g_message( "tr_torrent_new_ctor err %d", err );
         }
 
         g_free( tmp );
