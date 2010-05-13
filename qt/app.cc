@@ -225,7 +225,7 @@ MyApp :: MyApp( int& argc, char ** argv ):
     }
 
     for( QStringList::const_iterator it=filenames.begin(), end=filenames.end(); it!=end; ++it )
-        mySession->addTorrent( *it );
+        addTorrent( *it );
 
     // register as the dbus handler for Transmission
     new TrDBusAdaptor( this );
@@ -322,13 +322,19 @@ void
 MyApp :: addTorrent( const QString& key )
 {
     if( !myPrefs->getBool( Prefs :: OPTIONS_PROMPT ) )
+    {
         mySession->addTorrent( key );
-    else if( !QFile( key ).exists( ) )
-        myWindow->openURL( key );
-    else {
+    }
+    else if( Utils::isMagnetLink( key ) || QFile( key ).exists( ) )
+    {
         Options * o = new Options( *mySession, *myPrefs, key, myWindow );
         o->show( );
     }
+    else if( Utils::isURL( key ) )
+    {
+        myWindow->openURL( key );
+    }
+
     raise( );
 }
 

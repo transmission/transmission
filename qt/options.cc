@@ -38,6 +38,7 @@
 #include "prefs.h"
 #include "session.h"
 #include "torrent.h"
+#include "utils.h"
 
 /***
 ****
@@ -214,7 +215,11 @@ Options :: reload( )
     clearVerify( );
 
     tr_ctor * ctor = tr_ctorNew( 0 );
-    tr_ctorSetMetainfoFromFile( ctor, myFile.toUtf8().constData() );
+    if( Utils::isMagnetLink( myFile ) )
+        tr_ctorSetMetainfoFromMagnetLink( ctor, myFile.toUtf8().constData() );
+    else
+        tr_ctorSetMetainfoFromFile( ctor, myFile.toUtf8().constData() );
+
     const int err = tr_torrentParse( ctor, &myInfo );
     myHaveInfo = !err;
     tr_ctorFree( ctor );
@@ -275,14 +280,18 @@ Options :: onAccepted( )
         tr_bencDictAddStr( args, "download-dir", myDestination.absolutePath().toUtf8().constData() );
 
     // "metainfo"
-    QFile file( myFile );
-    file.open( QIODevice::ReadOnly );
-    const QByteArray metainfo( file.readAll( ) );
-    file.close( );
-    int base64Size = 0;
-    char * base64 = tr_base64_encode( metainfo.constData(), metainfo.size(), &base64Size );
-    tr_bencDictAddRaw( args, "metainfo", base64, base64Size );
-    tr_free( base64 );
+    if( Utils::isMagnetLink( myFile ) || Utils::isURL( myFile ) )
+        tr_bencDictAddStr( args, "filename", myFile.toUtf8().constData() );
+    else {
+        QFile file( myFile );
+        file.open( QIODevice::ReadOnly );
+        const QByteArray metainfo( file.readAll( ) );
+        file.close( );
+        int base64Size = 0;
+        char * base64 = tr_base64_encode( metainfo.constData(), metainfo.size(), &base64Size );
+        tr_bencDictAddRaw( args, "metainfo", base64, base64Size );
+        tr_free( base64 );
+    }
 
     // paused
     tr_bencDictAddBool( args, "paused", !myStartCheck->isChecked( ) );
@@ -326,6 +335,7 @@ Options :: onAccepted( )
                  fileAdded, SLOT(executed(int64_t,const QString&, struct tr_benc*)));
     }
 
+std::cerr << tr_bencToStr(&top,TR_FMT_JSON,NULL) << std::endl;
     mySession.exec( &top );
 
     tr_bencFree( &top );

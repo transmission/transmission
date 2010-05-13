@@ -37,6 +37,16 @@ class Utils: public QObject
         // meh
         static void toStderr( const QString& qstr );
 
+        /// 
+        /// URLs
+        ///
+
+        static bool isMagnetLink( const QString& s ) { return s.startsWith( "magnet:?" ); }
+
+        static bool isURL( const QString& s ) { return s.startsWith( "http://" )
+                                                    || s.startsWith( "https://" )
+                                                    || s.startsWith( "ftp://" ); }
+
 };
 
 #endif

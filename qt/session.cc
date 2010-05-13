@@ -35,6 +35,7 @@
 #include "session.h"
 #include "session-dialog.h"
 #include "torrent.h"
+#include "utils.h"
 
 // #define DEBUG_HTTP
 
@@ -865,10 +866,7 @@ namespace
 {
     bool isLink( const QString& str )
     {
-        return str.startsWith( "magnet:?" )
-            || str.startsWith( "http://" )
-            || str.startsWith( "https://" )
-            || str.startsWith( "ftp://" );
+        return Utils::isMagnetLink(str) || Utils::isURL(str);
     }
 }
 
