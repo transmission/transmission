@@ -1101,7 +1101,9 @@ tr_torrentStat( tr_torrent * tor )
             break;
     }
 
-    s->finished = seedRatioApplies && !seedRatioBytesLeft;
+    /* s->haveValid is here to make sure a torrent isn't marked 'finished'
+     * when the user hits "uncheck all" prior to starting the torrent... */
+    s->finished = seedRatioApplies && !seedRatioBytesLeft && s->haveValid;
 
     if( !seedRatioApplies || s->finished )
         s->seedRatioPercentDone = 1;
