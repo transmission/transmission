@@ -85,8 +85,8 @@ static const struct tr_option options[] =
     { 800, "paused", "Pause all torrents on startup", NULL, 0, NULL },
     { 'o', "dht", "Enable distributed hash tables (DHT)", "o", 0, NULL },
     { 'O', "no-dht", "Disable distributed hash tables (DHT)", "O", 0, NULL },
-    { 'z', "lds", "Enable local peer discovery (LPD)", "z", 0, NULL },
-    { 'Z', "no-lds", "Disable local peer discovery (LPD)", "Z", 0, NULL },
+    { 'y', "lpd", "Enable local peer discovery (LPD)", "y", 0, NULL },
+    { 'Y', "no-lpd", "Disable local peer discovery (LPD)", "Y", 0, NULL },
     { 'P', "peerport", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "P", 1, "<port>" },
     { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", 0, NULL },
     { 'M', "no-portmap", "Disable portmapping", "M", 0, NULL },
@@ -408,9 +408,9 @@ main( int argc, char ** argv )
 	    case 954:
 		      tr_bencDictAddBool( &settings, TR_PREFS_KEY_RATIO_ENABLED, FALSE );
 		      break;
-	    case 'z': tr_bencDictAddBool( &settings, TR_PREFS_KEY_LPD_ENABLED, TRUE );
+	    case 'y': tr_bencDictAddBool( &settings, TR_PREFS_KEY_LPD_ENABLED, TRUE );
 		      break;
-	    case 'Z': tr_bencDictAddBool( &settings, TR_PREFS_KEY_LPD_ENABLED, FALSE );
+	    case 'Y': tr_bencDictAddBool( &settings, TR_PREFS_KEY_LPD_ENABLED, FALSE );
 		      break;
             default:  showUsage( );
                       break;
