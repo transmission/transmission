@@ -213,22 +213,6 @@ category_filter_model_update( GtkTreeStore * store )
     /* skip separator */
     gtk_tree_model_iter_next( model, &top );
 
-    /* update the "public" subtree */
-    gtk_tree_model_iter_next( model, &top );
-    gtk_tree_model_iter_children( model, &iter, &top );
-    category_model_update_count( store, &iter, public );
-    gtk_tree_model_iter_next( model, &iter );
-    category_model_update_count( store, &iter, private );
-
-    /* update the "priority" subtree */
-    gtk_tree_model_iter_next( model, &top );
-    gtk_tree_model_iter_children( model, &iter, &top );
-    category_model_update_count( store, &iter, high );
-    gtk_tree_model_iter_next( model, &iter );
-    category_model_update_count( store, &iter, normal );
-    gtk_tree_model_iter_next( model, &iter );
-    category_model_update_count( store, &iter, low );
-
     /* update the "hosts" subtree */
     gtk_tree_model_iter_next( model, &top );
     for( i=store_pos=0, n=hosts->len ; ; )
@@ -293,6 +277,22 @@ category_filter_model_update( GtkTreeStore * store )
         }
     }
 
+    /* update the "public" subtree */
+    gtk_tree_model_iter_next( model, &top );
+    gtk_tree_model_iter_children( model, &iter, &top );
+    category_model_update_count( store, &iter, public );
+    gtk_tree_model_iter_next( model, &iter );
+    category_model_update_count( store, &iter, private );
+
+    /* update the "priority" subtree */
+    gtk_tree_model_iter_next( model, &top );
+    gtk_tree_model_iter_children( model, &iter, &top );
+    category_model_update_count( store, &iter, high );
+    gtk_tree_model_iter_next( model, &iter );
+    category_model_update_count( store, &iter, normal );
+    gtk_tree_model_iter_next( model, &iter );
+    category_model_update_count( store, &iter, low );
+
     /* cleanup */
     g_ptr_array_foreach( hosts, (GFunc)g_free, NULL );
     g_ptr_array_free( hosts, TRUE );
@@ -318,6 +318,12 @@ category_filter_model_new( GtkTreeModel * tmodel )
         -1 );
     gtk_tree_store_insert_with_values( store, NULL, NULL, -1,
         CAT_FILTER_COL_TYPE, CAT_FILTER_TYPE_SEPARATOR,
+        -1 );
+
+    gtk_tree_store_insert_with_values( store, &iter, NULL, -1,
+        CAT_FILTER_COL_NAME, _( "Trackers" ),
+        CAT_FILTER_COL_COUNT, invisible_number,
+        CAT_FILTER_COL_TYPE, CAT_FILTER_TYPE_PARENT,
         -1 );
 
     gtk_tree_store_insert_with_values( store, &iter, NULL, -1,
@@ -350,12 +356,6 @@ category_filter_model_new( GtkTreeModel * tmodel )
     gtk_tree_store_insert_with_values( store, NULL, &iter, -1,
         CAT_FILTER_COL_NAME, _( "Low" ),
         CAT_FILTER_COL_TYPE, CAT_FILTER_TYPE_PRI_LOW,
-        -1 );
-
-    gtk_tree_store_insert_with_values( store, &iter, NULL, -1,
-        CAT_FILTER_COL_NAME, _( "Trackers" ),
-        CAT_FILTER_COL_COUNT, invisible_number,
-        CAT_FILTER_COL_TYPE, CAT_FILTER_TYPE_PARENT,
         -1 );
 
     g_object_set_data( G_OBJECT( store ), TORRENT_MODEL_KEY, tmodel );
@@ -988,9 +988,9 @@ gtr_filter_bar_new( tr_session * session, GtkTreeModel * tmodel, GtkTreeModel **
 
     h = gtk_hbox_new( FALSE, GUI_PAD_SMALL );
 
-    /* add the category combobox */
-    str = _( "_Category:" );
-    w = category;
+    /* add the activity combobox */
+    str = _( "_Show:" );
+    w = activity;
     l = gtk_label_new( NULL );
     gtk_label_set_markup_with_mnemonic( GTK_LABEL( l ), str );
     gtk_label_set_mnemonic_widget( GTK_LABEL( l ), w );
@@ -1002,13 +1002,8 @@ gtr_filter_bar_new( tr_session * session, GtkTreeModel * tmodel, GtkTreeModel **
     gtk_widget_set_size_request( w, 0u, GUI_PAD_BIG );
     gtk_box_pack_start( GTK_BOX( h ), w, FALSE, FALSE, 0 );
 
-    /* add the activity combobox */
-    str = _( "_Activity:" );
-    w = activity;
-    l = gtk_label_new( NULL );
-    gtk_label_set_markup_with_mnemonic( GTK_LABEL( l ), str );
-    gtk_label_set_mnemonic_widget( GTK_LABEL( l ), w );
-    gtk_box_pack_start( GTK_BOX( h ), l, FALSE, FALSE, 0 );
+    /* add the category combobox */
+    w = category;
     gtk_box_pack_start( GTK_BOX( h ), w, TRUE, TRUE, 0 );
 
     /* add a spacer */
