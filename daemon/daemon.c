@@ -338,13 +338,11 @@ main( int argc, char ** argv )
                       break;
             case 'C': tr_bencDictAddBool( &settings, PREF_KEY_DIR_WATCH_ENABLED, FALSE );
                       break;
-	    case 941:
-        	      tr_bencDictAddStr( &settings, TR_PREFS_KEY_INCOMPLETE_DIR, optarg );
-		      tr_bencDictAddBool( &settings, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED, TRUE );
-		      break;
-	    case 942:
-		      tr_bencDictAddBool( &settings, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED, FALSE );
-		      break;
+            case 941: tr_bencDictAddStr( &settings, TR_PREFS_KEY_INCOMPLETE_DIR, optarg );
+                      tr_bencDictAddBool( &settings, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED, TRUE );
+                      break;
+            case 942: tr_bencDictAddBool( &settings, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED, FALSE );
+                      break;
             case 'd': dumpSettings = TRUE;
                       break;
             case 'e': logfile = fopen( optarg, "a+" );
@@ -355,15 +353,13 @@ main( int argc, char ** argv )
                       break;
             case 'g': /* handled above */
                       break;
-	    case 'V': /* version */
-		      fprintf(stderr, "Transmission %s\n", LONG_VERSION_STRING);
-		      exit( 0 );
-	    case 'o':
-		      tr_bencDictAddBool( &settings, TR_PREFS_KEY_DHT_ENABLED, TRUE );
-		      break;
-	    case 'O':
-		      tr_bencDictAddBool( &settings, TR_PREFS_KEY_DHT_ENABLED, FALSE );
-		      break;
+            case 'V': /* version */
+                      fprintf(stderr, "Transmission %s\n", LONG_VERSION_STRING);
+                      exit( 0 );
+            case 'o': tr_bencDictAddBool( &settings, TR_PREFS_KEY_DHT_ENABLED, TRUE );
+                      break;
+            case 'O': tr_bencDictAddBool( &settings, TR_PREFS_KEY_DHT_ENABLED, FALSE );
+                      break;
             case 'p': tr_bencDictAddInt( &settings, TR_PREFS_KEY_RPC_PORT, atoi( optarg ) );
                       break;
             case 't': tr_bencDictAddBool( &settings, TR_PREFS_KEY_RPC_AUTH_REQUIRED, TRUE );
@@ -394,21 +390,16 @@ main( int argc, char ** argv )
                       break;
             case 912: tr_bencDictAddInt( &settings, TR_PREFS_KEY_ENCRYPTION, TR_CLEAR_PREFERRED );
                       break;
-            case 'i':
-                      tr_bencDictAddStr( &settings, TR_PREFS_KEY_BIND_ADDRESS_IPV4, optarg );
+            case 'i': tr_bencDictAddStr( &settings, TR_PREFS_KEY_BIND_ADDRESS_IPV4, optarg );
                       break;
-            case 'I':
-                      tr_bencDictAddStr( &settings, TR_PREFS_KEY_BIND_ADDRESS_IPV6, optarg );
+            case 'I': tr_bencDictAddStr( &settings, TR_PREFS_KEY_BIND_ADDRESS_IPV6, optarg );
                       break;
-            case 'r':
-                      tr_bencDictAddStr( &settings, TR_PREFS_KEY_RPC_BIND_ADDRESS, optarg );
+            case 'r': tr_bencDictAddStr( &settings, TR_PREFS_KEY_RPC_BIND_ADDRESS, optarg );
                       break;
-            case 953:
-                      tr_bencDictAddReal( &settings, TR_PREFS_KEY_RATIO, atof(optarg) );
+            case 953: tr_bencDictAddReal( &settings, TR_PREFS_KEY_RATIO, atof(optarg) );
                       tr_bencDictAddBool( &settings, TR_PREFS_KEY_RATIO_ENABLED, TRUE );
                       break;
-            case 954:
-                      tr_bencDictAddBool( &settings, TR_PREFS_KEY_RATIO_ENABLED, FALSE );
+            case 954: tr_bencDictAddBool( &settings, TR_PREFS_KEY_RATIO_ENABLED, FALSE );
                       break;
             case 'x': pid_filename = optarg;
                       break;
