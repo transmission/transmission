@@ -43,6 +43,7 @@
 static tr_bool paused = FALSE;
 static tr_bool closing = FALSE;
 static tr_session * mySession = NULL;
+static const char * pid_filename = NULL;
 
 /***
 ****  Config File
@@ -100,6 +101,7 @@ static const struct tr_option options[] =
     { 'r', "rpc-bind-address", "Where to listen for RPC connections", "r", 1, "<ipv4 address>" },
     { 953, "global-seedratio", "All torrents, unless overridden by a per-torrent setting, should seed until a specific ratio", "gsr", 1, "ratio" },
     { 954, "no-global-seedratio", "All torrents, unless overridden by a per-torrent setting, should seed regardless of ratio", "GSR", 0, NULL },
+    { 'x', "pid-file", "Enable PID file", "x", 1, "<pid-file>" },
     { 0, NULL, NULL, NULL, 0, NULL }
 };
 
@@ -401,17 +403,19 @@ main( int argc, char ** argv )
             case 'r':
                       tr_bencDictAddStr( &settings, TR_PREFS_KEY_RPC_BIND_ADDRESS, optarg );
                       break;
-	    case 953:
-		      tr_bencDictAddReal( &settings, TR_PREFS_KEY_RATIO, atof(optarg) );
-		      tr_bencDictAddBool( &settings, TR_PREFS_KEY_RATIO_ENABLED, TRUE );
-		      break;
-	    case 954:
-		      tr_bencDictAddBool( &settings, TR_PREFS_KEY_RATIO_ENABLED, FALSE );
-		      break;
-	    case 'y': tr_bencDictAddBool( &settings, TR_PREFS_KEY_LPD_ENABLED, TRUE );
-		      break;
-	    case 'Y': tr_bencDictAddBool( &settings, TR_PREFS_KEY_LPD_ENABLED, FALSE );
-		      break;
+            case 953:
+                      tr_bencDictAddReal( &settings, TR_PREFS_KEY_RATIO, atof(optarg) );
+                      tr_bencDictAddBool( &settings, TR_PREFS_KEY_RATIO_ENABLED, TRUE );
+                      break;
+            case 954:
+                      tr_bencDictAddBool( &settings, TR_PREFS_KEY_RATIO_ENABLED, FALSE );
+                      break;
+            case 'x': pid_filename = optarg;
+                      break;
+            case 'y': tr_bencDictAddBool( &settings, TR_PREFS_KEY_LPD_ENABLED, TRUE );
+                      break;
+            case 'Y': tr_bencDictAddBool( &settings, TR_PREFS_KEY_LPD_ENABLED, FALSE );
+                      break;
             default:  showUsage( );
                       break;
         }
@@ -447,6 +451,14 @@ main( int argc, char ** argv )
     tr_ninf( NULL, "Using settings from \"%s\"", configDir );
     tr_sessionSaveSettings( mySession, configDir, &settings );
 
+    if( pid_filename != NULL ) {
+        FILE * fp = fopen( pid_filename, "w+" );
+        if( fp != NULL ) {
+            fprintf( fp, "%d", (int)getpid() );
+            fclose( fp );
+        }
+    }
+
     if( tr_bencDictFindBool( &settings, TR_PREFS_KEY_RPC_AUTH_REQUIRED, &boolVal ) && boolVal )
         tr_ninf( MY_NAME, "requiring authentication" );
 
@@ -478,7 +490,7 @@ main( int argc, char ** argv )
 
 #ifdef HAVE_SYSLOG
     if( !foreground )
-        openlog( MY_NAME, LOG_CONS, LOG_DAEMON );
+        openlog( MY_NAME, LOG_CONS|LOG_PID, LOG_DAEMON );
 #endif
 
     while( !closing ) {
