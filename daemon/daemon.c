@@ -309,6 +309,7 @@ main( int argc, char ** argv )
     const char * configDir = NULL;
     dtr_watchdir * watchdir = NULL;
     FILE * logfile = NULL;
+    tr_bool pidfile_created = FALSE;
 
     signal( SIGINT, gotsig );
     signal( SIGTERM, gotsig );
@@ -442,11 +443,14 @@ main( int argc, char ** argv )
     tr_ninf( NULL, "Using settings from \"%s\"", configDir );
     tr_sessionSaveSettings( mySession, configDir, &settings );
 
-    if( pid_filename != NULL ) {
+    if( pid_filename != NULL )
+    {
         FILE * fp = fopen( pid_filename, "w+" );
-        if( fp != NULL ) {
+        if( fp != NULL )
+        {
             fprintf( fp, "%d", (int)getpid() );
             fclose( fp );
+            pidfile_created = TRUE;
         }
     }
 
@@ -506,6 +510,8 @@ main( int argc, char ** argv )
     printf( " done.\n" );
 
     /* cleanup */
+    if( pidfile_created )
+        remove( pid_filename );
     tr_bencFree( &settings );
     return 0;
 }
