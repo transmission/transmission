@@ -450,8 +450,11 @@ main( int argc, char ** argv )
         {
             fprintf( fp, "%d", (int)getpid() );
             fclose( fp );
+            tr_inf( "Saved pidfile \"%s\"", pid_filename );
             pidfile_created = TRUE;
         }
+        else
+            tr_err( "Unable to save pidfile \"%s\": %s", pid_filename, strerror( errno ) );
     }
 
     if( tr_bencDictFindBool( &settings, TR_PREFS_KEY_RPC_AUTH_REQUIRED, &boolVal ) && boolVal )
