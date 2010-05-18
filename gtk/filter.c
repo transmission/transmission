@@ -601,6 +601,7 @@ enum
     ACTIVITY_FILTER_COL_NAME,
     ACTIVITY_FILTER_COL_COUNT,
     ACTIVITY_FILTER_COL_TYPE,
+    ACTIVITY_FILTER_COL_STOCK_ID,
     ACTIVITY_FILTER_N_COLS
 };
 
@@ -712,32 +713,55 @@ activity_filter_model_new( GtkTreeModel * tmodel )
     struct {
         int type;
         const char * name;
+        const char * stock_id;
     } types[] = {
-        { ACTIVITY_FILTER_ALL, N_( "All" ) },
-        { ACTIVITY_FILTER_SEPARATOR, NULL },
-        { ACTIVITY_FILTER_DOWNLOADING, N_( "Downloading" ) },
-        { ACTIVITY_FILTER_SEEDING, N_( "Seeding" ) },
-        { ACTIVITY_FILTER_ACTIVE, N_( "Active" ) },
-        { ACTIVITY_FILTER_PAUSED, N_( "Paused" ) },
-        { ACTIVITY_FILTER_QUEUED, N_( "Queued" ) },
-        { ACTIVITY_FILTER_VERIFYING, N_( "Verifying" ) },
-        { ACTIVITY_FILTER_ERROR, N_( "Error" ) }
+        { ACTIVITY_FILTER_ALL, N_( "All" ), NULL },
+        { ACTIVITY_FILTER_SEPARATOR, NULL, NULL },
+        { ACTIVITY_FILTER_ACTIVE, N_( "Active" ), GTK_STOCK_EXECUTE },
+        { ACTIVITY_FILTER_DOWNLOADING, N_( "Downloading" ), GTK_STOCK_GO_DOWN },
+        { ACTIVITY_FILTER_SEEDING, N_( "Seeding" ), GTK_STOCK_GO_UP },
+        { ACTIVITY_FILTER_PAUSED, N_( "Paused" ), GTK_STOCK_MEDIA_PAUSE },
+        { ACTIVITY_FILTER_QUEUED, N_( "Queued" ), NULL },
+        { ACTIVITY_FILTER_VERIFYING, N_( "Verifying" ), GTK_STOCK_REFRESH },
+        { ACTIVITY_FILTER_ERROR, N_( "Error" ), GTK_STOCK_DIALOG_ERROR }
     };
-    GtkListStore * store;
-
-    store = gtk_list_store_new( ACTIVITY_FILTER_N_COLS,
-                                G_TYPE_STRING,
-                                G_TYPE_INT,
-                                G_TYPE_INT );
+    GtkListStore * store = gtk_list_store_new( ACTIVITY_FILTER_N_COLS,
+                                               G_TYPE_STRING,
+                                               G_TYPE_INT,
+                                               G_TYPE_INT,
+                                               G_TYPE_STRING );
     for( i=0, n=G_N_ELEMENTS(types); i<n; ++i )
         gtk_list_store_insert_with_values( store, NULL, -1,
             ACTIVITY_FILTER_COL_NAME, _( types[i].name ),
             ACTIVITY_FILTER_COL_TYPE, types[i].type,
+            ACTIVITY_FILTER_COL_STOCK_ID, types[i].stock_id,
             -1 );
 
     g_object_set_data( G_OBJECT( store ), TORRENT_MODEL_KEY, tmodel );
     activity_filter_model_update( store );
     return GTK_TREE_MODEL( store );
+}
+
+static void
+render_activity_pixbuf_func( GtkCellLayout    * cell_layout UNUSED,
+                             GtkCellRenderer  * cell_renderer,
+                             GtkTreeModel     * tree_model,
+                             GtkTreeIter      * iter,
+                             gpointer           data UNUSED )
+{
+    int type;
+    int width;
+    int ypad;
+    const gboolean leaf = !gtk_tree_model_iter_has_child( tree_model, iter );
+
+    gtk_tree_model_get( tree_model, iter, ACTIVITY_FILTER_COL_TYPE, &type, -1 );
+    width = type == ACTIVITY_FILTER_ALL ? 0 : 20;
+    ypad = type == ACTIVITY_FILTER_ALL ? 0 : 5;
+
+    g_object_set( cell_renderer, "width", width,
+                                 "sensitive", leaf,
+                                 "ypad", ypad,
+                                 NULL );
 }
 
 static void
@@ -782,6 +806,14 @@ activity_combo_box_new( GtkTreeModel * tmodel )
     gtk_combo_box_set_row_separator_func( GTK_COMBO_BOX( c ),
                                        activity_is_it_a_separator, NULL, NULL );
     gtk_combo_box_set_active( GTK_COMBO_BOX( c ), 0 );
+
+    r = gtk_cell_renderer_pixbuf_new( );
+    gtk_cell_layout_pack_start( GTK_CELL_LAYOUT( c ), r, FALSE );
+    gtk_cell_layout_set_attributes( GTK_CELL_LAYOUT( c ), r,
+                                    "stock-id", ACTIVITY_FILTER_COL_STOCK_ID,
+                                    NULL );
+    gtk_cell_layout_set_cell_data_func( GTK_CELL_LAYOUT( c ), r,
+                                        render_activity_pixbuf_func, NULL, NULL );
 
     r = gtk_cell_renderer_text_new( );
     gtk_cell_layout_pack_start( GTK_CELL_LAYOUT( c ), r, TRUE );
