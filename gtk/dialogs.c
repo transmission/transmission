@@ -206,7 +206,7 @@ confirmRemove( GtkWindow * parent,
     GtkWidget *         d;
     const int           count = g_slist_length( torrents );
     struct count_data   counts;
-    const char        * primary_text;
+    GString           * primary_text;
     GString           * secondary_text;
     struct DeleteData * dd;
 
@@ -222,31 +222,29 @@ confirmRemove( GtkWindow * parent,
     counts.connected = 0;
     g_slist_foreach( torrents, countBusyTorrents, &counts );
 
-    if( !counts.incomplete && !counts.connected && !delete_files ) /* don't prompt boring torrents */
-    {
-        removeTorrents( dd );
-        g_free( dd );
-        return;
-    }
+    primary_text = g_string_new( NULL );
 
     if( !delete_files )
     {
-        primary_text = ngettext( "Remove torrent?",
-                                 "Remove torrents?",
-                                 count );
+        g_string_printf( primary_text, ngettext( "Remove torrent?",
+                                                 "Remove %d torrents?",
+                                                 count ), count );
     }
     else
     {
-        primary_text = ngettext( "Delete this torrent's downloaded files?",
-                                 "Delete these torrents' downloaded files?",
-                                 count );
+        g_string_printf( primary_text, ngettext( "Delete this torrent's downloaded files?",
+                                                 "Delete these %d torrents' downloaded files?",
+                                                 count ), count );
     }
 
     secondary_text = g_string_new( NULL );
 
     if( !counts.incomplete && !counts.connected )
     {
-        /* boring -- no secondary text needed */
+        g_string_assign( secondary_text, ngettext(
+                "Once removed, continuing the transfer will require the torrent file or magnet link.",
+                "Once removed, continuing the transfers will require the torrent files or magnet links.",
+                count ) );
     }
     else if( count == counts.incomplete )
     {
@@ -277,10 +275,10 @@ confirmRemove( GtkWindow * parent,
 
     d = gtk_message_dialog_new_with_markup( parent,
                                             GTK_DIALOG_DESTROY_WITH_PARENT,
-                                            GTK_MESSAGE_WARNING,
+                                            GTK_MESSAGE_QUESTION,
                                             GTK_BUTTONS_NONE,
                                             "<big><b>%s</b></big>",
-                                            primary_text );
+                                            primary_text->str );
     if( secondary_text->len )
         gtk_message_dialog_format_secondary_markup( GTK_MESSAGE_DIALOG( d ),
                                                     "%s", secondary_text->str );
@@ -298,5 +296,6 @@ confirmRemove( GtkWindow * parent,
     g_signal_connect( d, "response", G_CALLBACK( removeResponse ), dd );
     gtk_widget_show_all( d );
 
+    g_string_free( primary_text, TRUE );
     g_string_free( secondary_text, TRUE );
 }
