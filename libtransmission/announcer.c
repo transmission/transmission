@@ -617,13 +617,25 @@ publishWarning( tr_tier * tier, const char * msg )
 }
 
 static int
+getSeedProbability( int seeds, int leechers )
+{
+    if( !seeds )
+        return 0;
+
+    if( seeds>=0 && leechers>=0 )
+        return (int)((100.0*seeds)/(seeds+leechers));
+
+    return -1; /* unknown */
+}
+
+static int
 publishNewPeers( tr_tier * tier, int seeds, int leechers,
                  const void * compact, int compactLen )
 {
     tr_tracker_event e = emptyEvent;
 
     e.messageType = TR_TRACKER_PEERS;
-    e.seedProbability = seeds+leechers ? (int)((100.0*seeds)/(seeds+leechers)) : -1;
+    e.seedProbability = getSeedProbability( seeds, leechers );
     e.compact = compact;
     e.compactLen = compactLen;
 
