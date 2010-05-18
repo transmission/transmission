@@ -79,20 +79,19 @@ get_size_in_pixels( GtkWidget   * widget,
 
 
 static IconCache *
-icon_cache_new (GtkWidget * for_widget,
-		int         icon_size)
+icon_cache_new (GtkWidget * for_widget, int icon_size)
 {
     IconCache * icon_cache;
-	
+
     g_return_val_if_fail( for_widget != NULL, NULL );
-	
+
     icon_cache = g_new0( IconCache, 1 );
     icon_cache->icon_theme = gtk_icon_theme_get_for_screen( gtk_widget_get_screen( for_widget ));
     icon_cache->icon_size = get_size_in_pixels( for_widget, icon_size );
     icon_cache->cache = g_hash_table_new_full (g_str_hash, g_str_equal, NULL, g_object_unref);
-	
+
     g_hash_table_insert( icon_cache->cache, (void*)VOID_PIXBUF_KEY, create_void_pixbuf( icon_cache->icon_size, icon_cache->icon_size ));
-	
+
     return icon_cache;
 }
 
@@ -101,18 +100,18 @@ static const char *
 _icon_cache_get_icon_key( GIcon * icon )
 {
     const char * key = NULL;
-	
+
     if ( G_IS_THEMED_ICON( icon )) {
         char ** icon_names;
         char  * name;
-	
+
         g_object_get( icon, "names", &icon_names, NULL );
         name = g_strjoinv( ",", icon_names );
-		
+
         key = get_static_string( name );
-		
+
         g_free( name );
-        g_strfreev( icon_names );	
+        g_strfreev( icon_names );
     }
     else if ( G_IS_FILE_ICON( icon )) {
         GFile * file;
@@ -120,21 +119,21 @@ _icon_cache_get_icon_key( GIcon * icon )
 
         file = g_file_icon_get_file( G_FILE_ICON( icon ));
         filename = g_file_get_path( file );
-		
+
         key = get_static_string( filename );
-		
+
         g_free( filename );
         g_object_unref( file );
     }
-	
+
     return key;
 }
 
 
 static GdkPixbuf *
-get_themed_icon_pixbuf( GThemedIcon  *icon,
-		        int           size,
-		        GtkIconTheme *icon_theme )
+get_themed_icon_pixbuf( GThemedIcon   * icon,
+                        int             size,
+                        GtkIconTheme  * icon_theme )
 {
     char        ** icon_names = NULL;
     GtkIconInfo  * icon_info;
@@ -162,27 +161,24 @@ get_themed_icon_pixbuf( GThemedIcon  *icon,
 
 
 static GdkPixbuf *
-get_file_icon_pixbuf( GFileIcon *icon,
-		      int        size )
+get_file_icon_pixbuf( GFileIcon * icon, int size )
 {
     GFile     * file;
     char      * filename;
     GdkPixbuf * pixbuf;
-	
+
     file = g_file_icon_get_file( icon );
     filename = g_file_get_path( file );
     pixbuf = gdk_pixbuf_new_from_file_at_size( filename, size, -1, NULL );
     g_free( filename );
     g_object_unref( file );
-	
+
     return pixbuf;
 }
 
 
 static GdkPixbuf *
-_get_icon_pixbuf( GIcon        *icon,
-		  int           size,
-		  GtkIconTheme *theme )
+_get_icon_pixbuf( GIcon * icon, int size, GtkIconTheme * theme )
 {
     if ( icon == NULL )
         return NULL;
@@ -195,8 +191,7 @@ _get_icon_pixbuf( GIcon        *icon,
 
 
 static GdkPixbuf *
-icon_cache_get_mime_type_icon( IconCache  * icon_cache,
-		               const char * mime_type )
+icon_cache_get_mime_type_icon( IconCache * icon_cache, const char * mime_type )
 {
     GIcon      * icon;
     const char * key = NULL;
@@ -204,7 +199,7 @@ icon_cache_get_mime_type_icon( IconCache  * icon_cache,
 
     icon = g_content_type_get_icon( mime_type );
     key = _icon_cache_get_icon_key( icon );
-	
+
     if (key == NULL)
         key = VOID_PIXBUF_KEY;
 
@@ -220,15 +215,14 @@ icon_cache_get_mime_type_icon( IconCache  * icon_cache,
         g_hash_table_insert( icon_cache->cache, (gpointer) key, g_object_ref( pixbuf ) );
 
     g_object_unref( G_OBJECT( icon ) );
-	
+
     return pixbuf;
 }
 
 #else /* USE_GIO_ICONS */
 
 static GdkPixbuf *
-icon_cache_get_mime_type_icon( IconCache  * icon_cache,
-		               const char * mime_type )
+icon_cache_get_mime_type_icon( IconCache * icon_cache, const char * mime_type )
 {
     GdkPixbuf  * pixbuf;
     const char * stock_name;
@@ -274,7 +268,7 @@ get_mime_type_icon( const char   * mime_type,
         case GTK_ICON_SIZE_DND:             n = 5; break;
         case GTK_ICON_SIZE_DIALOG:          n = 6; break;
         default /*GTK_ICON_SIZE_INVALID*/:  n = 0; break;
-    }	
+    }
 
     if( icon_cache[n] == NULL )
         icon_cache[n] = icon_cache_new( for_widget, icon_size );
