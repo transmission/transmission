@@ -531,38 +531,6 @@ tr_torrentInitFilePieces( tr_torrent * tor )
     tr_free( firstFiles );
 }
 
-int
-tr_torrentPromoteTracker( tr_torrent * tor,
-                          int          pos )
-{
-    int i;
-    int tier;
-
-    assert( tor );
-    assert( ( 0 <= pos ) && ( pos < tor->info.trackerCount ) );
-
-    /* the tier of the tracker we're promoting */
-    tier = tor->info.trackers[pos].tier;
-
-    /* find the index of that tier's first tracker */
-    for( i = 0; i < tor->info.trackerCount; ++i )
-        if( tor->info.trackers[i].tier == tier )
-            break;
-
-    assert( i < tor->info.trackerCount );
-
-    /* promote the tracker at `pos' to the front of the tier */
-    if( i != pos )
-    {
-        const tr_tracker_info tmp = tor->info.trackers[i];
-        tor->info.trackers[i] = tor->info.trackers[pos];
-        tor->info.trackers[pos] = tmp;
-    }
-
-    /* return the new position of the tracker that started out at [pos] */
-    return i;
-}
-
 static void torrentStart( tr_torrent * tor );
 
 /**

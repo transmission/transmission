@@ -101,9 +101,6 @@ void             tr_torrentSetFileChecked( tr_torrent       * tor,
 
 void             tr_torrentUncheck( tr_torrent * tor );
 
-int              tr_torrentPromoteTracker( tr_torrent   * tor,
-                                           int            trackerIndex );
-
 time_t*          tr_torrentGetMTimes( const tr_torrent  * tor,
                                       size_t            * setmeCount );
 
