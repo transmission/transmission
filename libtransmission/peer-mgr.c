@@ -3330,6 +3330,10 @@ comparePeerCandidates( const void * va, const void * vb )
     if(( i = compareSeedProbabilities( a->atom->seedProbability, b->atom->seedProbability )))
         return i;
 
+    /* prefer peers that we got from more trusted sources */
+    if( a->atom->from != b->atom->from )
+        return a->atom->from < b->atom->from ? -1 : 1;
+
     /* salt */
     return a->salt - b->salt;
 }
