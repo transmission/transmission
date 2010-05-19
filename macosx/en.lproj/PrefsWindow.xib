@@ -4536,10 +4536,6 @@ AAABAAAAAQ</bytes>
 				<string key="NSExtension">NSResponder</string>
 			</object>
 			<object class="NSUserDefaultsController" id="356871564">
-				<object class="NSMutableArray" key="NSDeclaredKeys">
-					<bool key="EncodedWithXMLCoder">YES</bool>
-					<string>LocalPeerDiscoveryGlobal</string>
-				</object>
 				<bool key="NSSharedInstance">YES</bool>
 			</object>
 			<object class="NSCustomObject" id="981493640">
@@ -7885,14 +7881,6 @@ AAABAAAAAQ</bytes>
 					<int key="connectionID">1950</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">setLDS:</string>
-						<reference key="source" ref="511492310"/>
-						<reference key="destination" ref="1042006550"/>
-					</object>
-					<int key="connectionID">1955</int>
-				</object>
-				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
 						<string key="label">value: values.LocalPeerDiscoveryGlobal</string>
 						<reference key="source" ref="1042006550"/>
@@ -7907,6 +7895,14 @@ AAABAAAAAQ</bytes>
 						</object>
 					</object>
 					<int key="connectionID">1956</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">setLPD:</string>
+						<reference key="source" ref="511492310"/>
+						<reference key="destination" ref="1042006550"/>
+					</object>
+					<int key="connectionID">1957</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -11965,7 +11961,7 @@ AAABAAAAAQ</bytes>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">1956</int>
+			<int key="maxID">1957</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -12139,7 +12135,7 @@ AAABAAAAAQ</bytes>
 							<string>setDownloadLocation:</string>
 							<string>setEncryptionMode:</string>
 							<string>setGlobalLimit:</string>
-							<string>setLDS:</string>
+							<string>setLPD:</string>
 							<string>setNat:</string>
 							<string>setPEX:</string>
 							<string>setPeersGlobal:</string>

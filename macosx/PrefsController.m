@@ -1155,8 +1155,8 @@ tr_session * fHandle;
     [fDefaults setBool: dht forKey: @"DHTGlobal"];
     
     //dht
-    const BOOL lds = tr_sessionIsLPDEnabled(fHandle);
-    [fDefaults setBool: lds forKey: @"LocalPeerDiscovery"];
+    const BOOL lpd = tr_sessionIsLPDEnabled(fHandle);
+    [fDefaults setBool: lpd forKey: @"LocalPeerDiscovery"];
     
     //auto start
     const BOOL autoStart = !tr_sessionGetPaused(fHandle);
@@ -1240,7 +1240,7 @@ tr_session * fHandle;
         
         //dht handled by bindings
         
-        //lds handled by bindings
+        //lpd handled by bindings
         
         [fPortField setIntValue: port];
         //port forwarding (nat) handled by bindings
