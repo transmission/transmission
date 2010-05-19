@@ -581,7 +581,7 @@ getTier( tr_announcer * announcer, int torrentId, int tierId )
 ****  PUBLISH
 ***/
 
-static const tr_tracker_event emptyEvent = { 0, NULL, NULL, 0, 0 };
+static const tr_tracker_event emptyEvent = { 0, NULL, NULL, NULL, 0, 0 };
 
 static void
 publishMessage( tr_tier * tier, const char * msg, int type )
@@ -592,6 +592,7 @@ publishMessage( tr_tier * tier, const char * msg, int type )
         tr_tracker_event event = emptyEvent;
         event.messageType = type;
         event.text = msg;
+        event.tracker = tier->currentTracker ? tier->currentTracker->announce : NULL;
         tr_publisherPublish( &tiers->publisher, tier, &event );
     }
 }

@@ -141,6 +141,7 @@ struct tr_torrent
 
     tr_stat_errtype          error;
     char                     errorString[128];
+    char                     errorTracker[128];
 
     uint8_t                  obfuscatedHash[SHA_DIGEST_LENGTH];
 

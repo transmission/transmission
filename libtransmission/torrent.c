@@ -347,8 +347,19 @@ tr_torrentSetLocalError( tr_torrent * tor, const char * fmt, ... )
 
     va_start( ap, fmt );
     tor->error = TR_STAT_LOCAL_ERROR;
+    tor->errorTracker[0] = '\0';
     evutil_vsnprintf( tor->errorString, sizeof( tor->errorString ), fmt, ap );
     va_end( ap );
+}
+
+static void
+tr_torrentClearError( tr_torrent * tor )
+{
+    assert( tr_isTorrent( tor ) );
+
+    tor->error = TR_STAT_OK;
+    tor->errorString[0] = '\0';
+    tor->errorTracker[0] = '\0';
 }
 
 static void
@@ -386,21 +397,20 @@ onTrackerResponse( void * tracker UNUSED,
         case TR_TRACKER_WARNING:
             tr_torerr( tor, _( "Tracker warning: \"%s\"" ), event->text );
             tor->error = TR_STAT_TRACKER_WARNING;
+            tr_strlcpy( tor->errorTracker, event->tracker, sizeof( tor->errorTracker ) );
             tr_strlcpy( tor->errorString, event->text, sizeof( tor->errorString ) );
             break;
 
         case TR_TRACKER_ERROR:
             tr_torerr( tor, _( "Tracker error: \"%s\"" ), event->text );
             tor->error = TR_STAT_TRACKER_ERROR;
+            tr_strlcpy( tor->errorTracker, event->tracker, sizeof( tor->errorTracker ) );
             tr_strlcpy( tor->errorString, event->text, sizeof( tor->errorString ) );
             break;
 
         case TR_TRACKER_ERROR_CLEAR:
             if( tor->error != TR_STAT_LOCAL_ERROR )
-            {
-                tor->error = TR_STAT_OK;
-                tor->errorString[0] = '\0';
-            }
+                tr_torrentClearError( tor );
             break;
     }
 }
@@ -1363,10 +1373,9 @@ checkAndStartImpl( void * vtor )
     {
         const time_t now = tr_time( );
         tor->isRunning = TRUE;
-        tor->error = TR_STAT_OK;
-        tor->errorString[0] = '\0';
         tor->completeness = tr_cpGetStatus( &tor->completion );
         tor->startDate = tor->anyDate = now;
+        tr_torrentClearError( tor );
 
         tr_torrentResetTransferStats( tor );
         tr_announcerTorrentStarted( tor );
@@ -2209,6 +2218,22 @@ tr_torrentSetAnnounceList( tr_torrent             * tor,
 
         /* cleanup */
         tr_bencFree( &metainfo );
+
+        /* if we had a tracker-related error on this torrent,
+         * and that tracker's been removed,
+         * then clear the error */
+        if(    ( tor->error == TR_STAT_TRACKER_WARNING )
+            || ( tor->error == TR_STAT_TRACKER_ERROR ) )
+        {
+            tr_bool clear = TRUE;
+
+            for( i=0; clear && i<trackerCount; ++i )
+                if( !strcmp( trackers[i].announce, tor->errorTracker ) )
+                    clear = FALSE;
+
+            if( clear )
+                tr_torrentClearError( tor );
+        }
 
         /* tell the announcer to reload this torrent's tracker list */
         tr_announcerResetTorrent( tor->session->announcer, tor );

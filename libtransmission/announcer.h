@@ -43,7 +43,8 @@ typedef struct
     TrackerEventType    messageType;
 
     /* for TR_TRACKER_WARNING and TR_TRACKER_ERROR */
-    const char *  text;
+    const char * text;
+    const char * tracker;
 
     /* for TR_TRACKER_PEERS */
     const uint8_t *  compact;
