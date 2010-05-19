@@ -13,8 +13,6 @@
 #include <assert.h>
 #include <limits.h>
 
-#include "event.h"
-
 #include "transmission.h"
 #include "bandwidth.h"
 #include "crypto.h"

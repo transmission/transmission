@@ -9,14 +9,12 @@
  * $Id$
  */
 
-#include <stdlib.h> /* for abs() */
-#include <limits.h> /* for INT_MAX */
-#include <sys/types.h> /* for event.h, as well as netinet/in.h on some platforms
-                         */
 #include <assert.h>
 #include <inttypes.h> /* uint8_t */
-#include <string.h> /* memcpy */
+#include <limits.h> /* for INT_MAX */
 #include <stdarg.h>
+#include <stdlib.h> /* for abs() */
+#include <string.h> /* memcpy */
 
 #include <openssl/bn.h>
 #include <openssl/dh.h>
@@ -24,8 +22,6 @@
 #include <openssl/rc4.h>
 #include <openssl/sha.h>
 #include <openssl/rand.h>
-
-#include <event.h>
 
 #include "transmission.h"
 #include "crypto.h"

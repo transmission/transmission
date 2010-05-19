@@ -16,8 +16,6 @@
 #include <string.h>
 #include <stdio.h> /* printf */
 
-#include <event.h> /* evbuffer */
-
 #include "JSON_parser.h"
 
 #include "transmission.h"

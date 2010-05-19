@@ -22,7 +22,8 @@
 #include <string.h> /* memcmp */
 #include <stdlib.h> /* qsort */
 
-#include <event.h> /* evbuffer */
+#include <stdarg.h> /* some 1.4.x versions of evutil.h need this */
+#include <evutil.h> /* evutil_vsnprintf() */
 
 #include "transmission.h"
 #include "announcer.h"

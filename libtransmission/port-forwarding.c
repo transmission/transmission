@@ -16,6 +16,8 @@
 
 #include <sys/types.h>
 
+#include <event.h>
+
 #include "transmission.h"
 #include "natpmp.h"
 #include "net.h"
