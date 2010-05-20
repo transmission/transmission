@@ -202,33 +202,15 @@ AC_CHECK_LIB([rt],
              [libevent_extra_libs="-lrt"],
              [libevent_extra_libs=""])
 
-dnl build our copy of libevent whether we use it or not,
-dnl because "make dist" needs its Makefiles to exist, and
-dnl AM_CONDITIONAL + AC_CONFIG_SUBDIRS don't seem to play nice
-AC_CONFIG_SUBDIRS([third-party/libevent])
-libevent_source=bundled
+dnl libevent
 AC_CHECK_LIB([event],[evutil_vsnprintf],
-             [libevent_found=yes],
-             [libevent_found=no],
+             [],
+             [AC_MSG_ERROR(libevent not found!)],
              [$libevent_extra_libs])
-AC_CHECK_HEADER([event-config.h],
-                [libevent_headers_found=yes],
-                [libevent_headers_found=no])
-libevent_source=bundled
-if test "x$libevent_found" = "xyes" ; then
-    if test "x$libevent_headers_found" = "xyes"; then
-        libevent_source=system
-    fi
-fi
-if test "x$libevent_source" = "xbundled"; then
-    AC_MSG_WARN([using our own libevent from third-party/libevent/])
-    AC_MSG_WARN([if you are cross-compiling this is probably NOT what you want.])
-    LIBEVENT_CFLAGS="-I\$(top_srcdir)/third-party/libevent -I\$(top_builddir)/third-party/libevent"
-    LIBEVENT_LIBS="\$(top_builddir)/third-party/libevent/libevent.la"
-else
-    LIBEVENT_CFLAGS=""
-    LIBEVENT_LIBS="-levent $libevent_extra_libs"
-fi
+AC_CHECK_HEADER([event-config.h],[],
+                [AC_MSG_ERROR(event-config.h not found!)])
+LIBEVENT_CFLAGS=""
+LIBEVENT_LIBS="-levent $libevent_extra_libs"
 AC_ARG_VAR([LIBEVENT_CFLAGS], [C compiler flags for LIBEVENT, overriding pkg-config])dnl
 AC_ARG_VAR([LIBEVENT_LIBS], [linker flags for LIBEVENT, overriding pkg-config])dnl
 
@@ -513,7 +495,6 @@ Configuration:
 
    Source code location:                              ${srcdir}
    Compiler:                                          ${CXX}
-   System or bundled libevent:                        ${libevent_source}
 
    Build Command-Line client:                         ${build_cli}
 
