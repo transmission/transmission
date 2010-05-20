@@ -493,7 +493,6 @@ category_combo_box_new( GtkTreeModel * tmodel )
                                     "pixbuf", CAT_FILTER_COL_PIXBUF,
                                     NULL );
 
-
     r = gtk_cell_renderer_text_new( );
     gtk_cell_layout_pack_start( GTK_CELL_LAYOUT( c ), r, FALSE );
     gtk_cell_layout_set_attributes( GTK_CELL_LAYOUT( c ), r,
@@ -756,7 +755,7 @@ render_activity_pixbuf_func( GtkCellLayout    * cell_layout UNUSED,
 
     gtk_tree_model_get( tree_model, iter, ACTIVITY_FILTER_COL_TYPE, &type, -1 );
     width = type == ACTIVITY_FILTER_ALL ? 0 : 20;
-    ypad = type == ACTIVITY_FILTER_ALL ? 0 : 5;
+    ypad = type == ACTIVITY_FILTER_ALL ? 0 : 2;
 
     g_object_set( cell_renderer, "width", width,
                                  "sensitive", leaf,
