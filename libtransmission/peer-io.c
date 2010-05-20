@@ -713,42 +713,6 @@ tr_peerIoSetPeersId( tr_peerIo *     io,
 ***
 **/
 
-void
-tr_peerIoEnableFEXT( tr_peerIo * io,
-                     tr_bool     flag )
-{
-    assert( tr_isPeerIo( io ) );
-    assert( tr_isBool( flag ) );
-
-    dbgmsg( io, "setting FEXT support flag to %d", (flag!=0) );
-    io->fastExtensionSupported = flag;
-}
-
-void
-tr_peerIoEnableLTEP( tr_peerIo  * io,
-                     tr_bool      flag )
-{
-    assert( tr_isPeerIo( io ) );
-    assert( tr_isBool( flag ) );
-
-    dbgmsg( io, "setting LTEP support flag to %d", (flag!=0) );
-    io->extendedProtocolSupported = flag;
-}
-
-void
-tr_peerIoEnableDHT( tr_peerIo * io, tr_bool flag )
-{
-    assert( tr_isPeerIo( io ) );
-    assert( tr_isBool( flag ) );
-
-    dbgmsg( io, "setting DHT support flag to %d", (flag!=0) );
-    io->dhtSupported = flag;
-}
-
-/**
-***
-**/
-
 static size_t
 getDesiredOutputBufferSize( const tr_peerIo * io, uint64_t now )
 {

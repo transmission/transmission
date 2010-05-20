@@ -149,30 +149,30 @@ tr_bool     tr_isPeerIo         ( const tr_peerIo         * io );
 ***
 **/
 
-void        tr_peerIoEnableLTEP( tr_peerIo * io, tr_bool flag );
-
-static inline tr_bool tr_peerIoSupportsLTEP( const tr_peerIo * io )
+static inline void tr_peerIoEnableFEXT( tr_peerIo * io, tr_bool flag )
 {
-    assert( tr_isPeerIo( io ) );
-
-    return io->extendedProtocolSupported;
+    io->fastExtensionSupported = flag;
 }
-
-void        tr_peerIoEnableFEXT( tr_peerIo * io, tr_bool flag );
-
 static inline tr_bool tr_peerIoSupportsFEXT( const tr_peerIo * io )
 {
-    assert( tr_isPeerIo( io ) );
-
     return io->fastExtensionSupported;
 }
 
-void        tr_peerIoEnableDHT( tr_peerIo * io, tr_bool flag );
+static inline void tr_peerIoEnableLTEP( tr_peerIo * io, tr_bool flag )
+{
+    io->extendedProtocolSupported = flag;
+}
+static inline tr_bool tr_peerIoSupportsLTEP( const tr_peerIo * io )
+{
+    return io->extendedProtocolSupported;
+}
 
+static inline void tr_peerIoEnableDHT( tr_peerIo * io, tr_bool flag )
+{
+    io->dhtSupported = flag;
+}
 static inline tr_bool tr_peerIoSupportsDHT( const tr_peerIo * io )
 {
-    assert( tr_isPeerIo( io ) );
-
     return io->dhtSupported;
 }
 
