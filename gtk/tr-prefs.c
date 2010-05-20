@@ -1383,12 +1383,12 @@ peerPage( GObject * core )
     data->prefsTag = g_signal_connect( TR_CORE( core ), "prefs-changed", G_CALLBACK( onCorePrefsChanged ), data );
     g_object_weak_ref( G_OBJECT( t ), peerPageDestroyed, data );
 
-    s = _( "Use UPnP or NAT-PMP port _forwarding from my router" );
-    w = new_check_button( s, TR_PREFS_KEY_PORT_FORWARDING, core );
+    s = _( "Pick a _random port on startup" );
+    w = new_check_button( s, TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START, core );
     hig_workarea_add_wide_control( t, &row, w );
 
-    s = _( "Pick a _random port every time Transmission is started" );
-    w = new_check_button( s, TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START, core );
+    s = _( "Use UPnP or NAT-PMP port _forwarding from my router" );
+    w = new_check_button( s, TR_PREFS_KEY_PORT_FORWARDING, core );
     hig_workarea_add_wide_control( t, &row, w );
 
     hig_workarea_add_section_divider( t, &row );
