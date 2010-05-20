@@ -13,6 +13,7 @@
   * Allow trackers to be pasted into the Create Window
 ==== GTK+ ====
   * New filterbar to filter by tracker, private/public, etc.
+  * Compact View replaces Minimal View, taking up considerably less space
   * Show the Torrent Options dialog when adding magnet links
   * "Set Location" now supports moving multiple torrents at once
   * The Properties window now fits on low resolution screens
@@ -23,6 +24,7 @@
   * Show file sizes in the file tree
   * Added a confirm dialog when removing torrents
 ==== Daemon ====
+  * Let users specify a script to be invoked when a torrent finishes downloading
   * Better support for adding per-torrent settings when adding a new torrent
   * Optional pidfile support
 ==== Web Client ====
