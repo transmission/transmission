@@ -196,12 +196,6 @@ preallocateFileFull( const char * filename, uint64_t length )
     return success;
 }
 
-tr_bool
-tr_preallocate_file( const char * filename, uint64_t length )
-{
-    return preallocateFileFull( filename, length );
-}
-
 /* Like pread and pwrite, except that the position is undefined afterwards.
    And of course they are not thread-safe. */
 
