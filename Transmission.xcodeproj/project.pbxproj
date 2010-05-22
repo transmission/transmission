@@ -507,7 +507,6 @@
 		A209EAC31142CF28002B02D1 /* InfoActivityViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InfoActivityViewController.m; path = macosx/InfoActivityViewController.m; sourceTree = "<group>"; };
 		A209EAC41142CF28002B02D1 /* InfoGeneralViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InfoGeneralViewController.h; path = macosx/InfoGeneralViewController.h; sourceTree = "<group>"; };
 		A209EAC51142CF28002B02D1 /* InfoGeneralViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InfoGeneralViewController.m; path = macosx/InfoGeneralViewController.m; sourceTree = "<group>"; };
-		A209EAE91142D294002B02D1 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = macosx/en.lproj/InfoActivityView.xib; sourceTree = "<group>"; };
 		A209EAEB1142D294002B02D1 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = macosx/en.lproj/InfoGeneralView.xib; sourceTree = "<group>"; };
 		A209EAFF1142D3A5002B02D1 /* InfoTrackersViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InfoTrackersViewController.h; path = macosx/InfoTrackersViewController.h; sourceTree = "<group>"; };
 		A209EB001142D3A5002B02D1 /* InfoTrackersViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InfoTrackersViewController.m; path = macosx/InfoTrackersViewController.m; sourceTree = "<group>"; };
@@ -548,6 +547,11 @@
 		A21FBBAA0EDA78C300BC3C51 /* bandwidth.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bandwidth.c; path = libtransmission/bandwidth.c; sourceTree = "<group>"; };
 		A220EC59118C8A060022B4BE /* tr-lpd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "tr-lpd.c"; path = "libtransmission/tr-lpd.c"; sourceTree = "<group>"; };
 		A220EC5A118C8A060022B4BE /* tr-lpd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "tr-lpd.h"; path = "libtransmission/tr-lpd.h"; sourceTree = "<group>"; };
+		A220EE6611A8382C0022B4BE /* de */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = de; path = macosx/de.lproj/AddMagnetWindow.xib; sourceTree = "<group>"; };
+		A220EE6911A838450022B4BE /* de */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = de; path = macosx/de.lproj/InfoActivityView.xib; sourceTree = "<group>"; };
+		A220EE6A11A838640022B4BE /* de */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = de; path = macosx/de.lproj/InfoGeneralView.xib; sourceTree = "<group>"; };
+		A220EE6B11A838750022B4BE /* de */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = de; path = macosx/de.lproj/InfoOptionsView.xib; sourceTree = "<group>"; };
+		A220EE9B11A841F50022B4BE /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = macosx/en.lproj/InfoActivityView.xib; sourceTree = "<group>"; };
 		A22180960D148A71007D09ED /* GroupsPrefsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GroupsPrefsController.h; path = macosx/GroupsPrefsController.h; sourceTree = "<group>"; };
 		A22180970D148A71007D09ED /* GroupsPrefsController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GroupsPrefsController.m; path = macosx/GroupsPrefsController.m; sourceTree = "<group>"; };
 		A221DCC7104B3660008A642D /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = /System/Library/Frameworks/Quartz.framework; sourceTree = "<absolute>"; };
@@ -2250,7 +2254,8 @@
 		A209EAE81142D294002B02D1 /* InfoActivityView.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				A209EAE91142D294002B02D1 /* en */,
+				A220EE9B11A841F50022B4BE /* en */,
+				A220EE6911A838450022B4BE /* de */,
 			);
 			name = InfoActivityView.xib;
 			sourceTree = "<group>";
@@ -2259,6 +2264,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				A209EAEB1142D294002B02D1 /* en */,
+				A220EE6A11A838640022B4BE /* de */,
 			);
 			name = InfoGeneralView.xib;
 			sourceTree = "<group>";
@@ -2267,6 +2273,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				A209EC13114301C6002B02D1 /* en */,
+				A220EE6B11A838750022B4BE /* de */,
 			);
 			name = InfoOptionsView.xib;
 			sourceTree = "<group>";
@@ -2292,6 +2299,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				A21F1539117299F100CF5A9C /* en */,
+				A220EE6611A8382C0022B4BE /* de */,
 			);
 			name = AddMagnetWindow.xib;
 			sourceTree = "<group>";
