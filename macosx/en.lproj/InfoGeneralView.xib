@@ -86,8 +86,8 @@
 						<reference key="NSSuperview" ref="923140800"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="437884172">
-							<int key="NSCellFlags">67239424</int>
-							<int key="NSCellFlags2">272629760</int>
+							<int key="NSCellFlags">67239488</int>
+							<int key="NSCellFlags2">272631808</int>
 							<string key="NSContents"/>
 							<reference key="NSSupport" ref="26"/>
 							<string key="NSPlaceholderString">N/A</string>
@@ -173,8 +173,8 @@
 						<reference key="NSSuperview" ref="923140800"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="229545903">
-							<int key="NSCellFlags">67239424</int>
-							<int key="NSCellFlags2">272629760</int>
+							<int key="NSCellFlags">67239488</int>
+							<int key="NSCellFlags2">272631808</int>
 							<string key="NSContents"/>
 							<reference key="NSSupport" ref="26"/>
 							<string key="NSPlaceholderString">N/A</string>
@@ -1058,7 +1058,7 @@
 					<string>InfoTextField</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>{{164, 466}, {350, 210}}</string>
+					<string>{{389, 674}, {350, 210}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>{{519, 533}, {350, 268}}</string>

@@ -130,8 +130,8 @@
 							<reference key="NSSuperview" ref="429007171"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="615989236">
-								<int key="NSCellFlags">67239424</int>
-								<int key="NSCellFlags2">272629760</int>
+								<int key="NSCellFlags">67239488</int>
+								<int key="NSCellFlags2">272631808</int>
 								<string key="NSContents">info</string>
 								<object class="NSFont" key="NSSupport">
 									<string key="NSName">LucidaGrande</string>
