@@ -218,7 +218,7 @@ tr_pread( int fd, void *buf, size_t count, off_t offset )
 }
 
 ssize_t
-tr_pwrite( int fd, void *buf, size_t count, off_t offset )
+tr_pwrite( int fd, const void *buf, size_t count, off_t offset )
 {
 #ifdef HAVE_PWRITE
     return pwrite( fd, buf, count, offset );
