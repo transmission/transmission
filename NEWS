@@ -23,10 +23,13 @@
   * Show all active trackers in the tracker display list
   * Show file sizes in the file tree
   * Added a confirm dialog when removing torrents
+  * Properties and torrent options no longer jump around while editing
 ==== Daemon ====
   * Let users specify a script to be invoked when a torrent finishes downloading
   * Better support for adding per-torrent settings when adding a new torrent
   * Optional pidfile support
+  * Option to start torrents paused
+  * Option to delete .torrent files from watch directory
 ==== Web Client ====
   * The context menu now works when multiple rows are selected
   * Show ETA for seeding torrents that have a seed ratio set
