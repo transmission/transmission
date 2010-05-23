@@ -9,7 +9,7 @@
 ==== Mac ====
   * Compact View replaces Minimal View, taking up considerably less space
   * Show an Add Transfer window when adding magnet links
-  * The "Resume All" button now ignores finished transfers 
+  * "Resume All" now ignores finished transfers 
   * Allow trackers to be pasted into the Create Window
 ==== GTK+ ====
   * New filterbar to filter by tracker, private/public, etc.
