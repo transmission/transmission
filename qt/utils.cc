@@ -77,12 +77,22 @@ Utils :: ratioToString( double ratio )
         buf = tr( "None" );
     else if( (int)ratio == TR_RATIO_INF )
         buf = QString::fromUtf8( "\xE2\x88\x9E" );
-    else if( ratio < 10.0 )
-        buf.sprintf( "%'.2f", ratio );
-    else if( ratio < 100.0 )
-        buf.sprintf( "%'.1f", ratio );
     else
-        buf.sprintf( "%'.0f", ratio );
+    {
+        QStringList temp;
+
+        temp = QString().sprintf( "%f", ratio ).split( "." );
+        if( ratio < 100.0 )
+        {
+            if( ratio < 10.0 )
+                temp[1].truncate( 2 );
+            else
+                temp[1].truncate( 1 );
+            buf = temp.join( "." );
+        }
+        else
+            buf = QString( temp[0] );
+    }
 
     return buf;
 
