@@ -536,7 +536,10 @@ FileTreeDelegate :: paint( QPainter                    * painter,
         if( index.model()->hasChildren( index ) )
             icon = style->standardIcon( QStyle::StandardPixmap( QStyle::SP_DirOpenIcon ) );
         else
-            icon = Utils :: guessMimeIcon( index.model()->data(index).toString( ) );
+        {
+            QString name = index.model()->data(index).toString();
+            icon = Utils :: guessMimeIcon( name.left( name.lastIndexOf( " (" ) ) );
+        }
         icon.paint( painter, iconArea, Qt::AlignCenter, QIcon::Normal, QIcon::On );
 
         // draw the name
