@@ -175,23 +175,29 @@ Utils :: guessMimeIcon( const QString& filename )
         suffixes[DISK] << "iso";
 
         fileIcons[DOCUMENT] = QtIconLoader :: icon( "text-x-generic", fallback );
-        suffixes[DOCUMENT] << "txt" << "doc" << "pdf" << "rtf" << "htm" << "html";
+        suffixes[DOCUMENT] << "abw" << "csv" << "doc" << "dvi" << "htm" << "html" << "ini" << "log"
+                           << "odp" << "ods" << "odt" << "pdf" << "ppt" << "ps" << "rtf" << "tex"
+                           << "txt" << "xml";
 
         fileIcons[PICTURE]  = QtIconLoader :: icon( "image-x-generic", fallback );
-        suffixes[PICTURE] << "jpg" << "jpeg" << "png" << "gif" << "tiff" << "pcx";
+        suffixes[PICTURE] << "bmp" << "gif" << "jpg" << "jpeg" << "pcx" << "png" << "psd" << "raw"
+                          << "tga" << "tiff";
 
         fileIcons[VIDEO] = QtIconLoader :: icon( "video-x-generic", fallback );
-        suffixes[VIDEO] << "avi" << "mpeg" << "mp4" << "mkv" << "mov";
+        suffixes[VIDEO] << "3gp" << "asf" << "avi" << "mov" << "mpeg" << "mpg" << "mp4" << "mkv"
+                        << "mov" << "ogm" << "ogv" << "qt" << "rm" << "wmv";
 
         fileIcons[ARCHIVE]  = QtIconLoader :: icon( "package-x-generic", fallback );
-        suffixes[ARCHIVE] << "rar" << "zip" << "sft" << "tar" << "7z" << "cbz";
+        suffixes[ARCHIVE] << "7z" << "ace" << "bz2" << "cbz" << "gz" << "gzip" << "lzma" << "rar"
+                          << "sft" << "tar" << "zip";
 
         fileIcons[AUDIO] = QtIconLoader :: icon( "audio-x-generic", fallback );
-        suffixes[AUDIO] << "aiff" << "au" << "m3u" << "mp2" << "wav" << "mp3" << "ape" << "mid"
-                        << "aac" << "ogg" << "ra" << "ram" << "flac" << "mpc" << "shn";
+        suffixes[AUDIO] << "aac" << "ac3" << "aiff" << "ape" << "au" << "flac" << "m3u" << "m4a"
+                        << "mid" << "midi" << "mp2" << "mp3" << "mpc" << "nsf" << "oga" << "ogg"
+                        << "ra" << "ram" << "shn" << "voc" << "wav" << "wma";
 
         fileIcons[APP] = QtIconLoader :: icon( "application-x-executable", fallback );
-        suffixes[APP] << "exe";
+        suffixes[APP] << "bat" << "cmd" << "com" << "exe";
     }
 
     QString suffix( QFileInfo( filename ).suffix( ).toLower( ) );
