@@ -202,15 +202,26 @@ AC_CHECK_LIB([rt],
              [libevent_extra_libs="-lrt"],
              [libevent_extra_libs=""])
 
+
 dnl libevent
-AC_CHECK_LIB([event],[evutil_vsnprintf],
-             [],
-             [AC_MSG_ERROR(libevent not found!)],
-             [$libevent_extra_libs])
-AC_CHECK_HEADER([event-config.h],[],
-                [AC_MSG_ERROR(event-config.h not found!)])
-LIBEVENT_CFLAGS=""
-LIBEVENT_LIBS="-levent $libevent_extra_libs"
+dnl if the user specified LIBEVENT_LIBS or
+if test -n "$LIBEVENT_LIBS"; then
+    user_specified_libevent=yes
+elif test -n "$LIBEVENT_CFLAGS"; then
+    user_specified_libevent=yes
+fi
+if test "x$user_specified_libevent" == "xyes"; then
+    AC_MSG_NOTICE([Using user-specified LIBEVENT_LIBS and LIBEVENT_CFLAGS])
+else
+    AC_CHECK_LIB([event],[evutil_vsnprintf],
+                 [],
+                 [AC_MSG_ERROR(libevent not found!)],
+                 [$libevent_extra_libs])
+    AC_CHECK_HEADER([event-config.h],[],
+                    [AC_MSG_ERROR(event-config.h not found!)])
+    LIBEVENT_CFLAGS=""
+    LIBEVENT_LIBS="-levent $libevent_extra_libs"
+fi
 AC_ARG_VAR([LIBEVENT_CFLAGS], [C compiler flags for LIBEVENT, overriding pkg-config])dnl
 AC_ARG_VAR([LIBEVENT_LIBS], [linker flags for LIBEVENT, overriding pkg-config])dnl
 
@@ -500,16 +511,14 @@ Configuration:
 
    Build GTK+ client:                                 ${build_gtk}
 
-      dbus support:                                   ${use_dbus_glib}
-      gio for watchdir support:                       ${use_gio}
-      libnotify for 'download completed' popups:      ${use_libnotify}
-      libcanberra for 'download completed' sounds:    ${use_canberra}
-      gconf2 to tell GNOME we handle magnet links:    ${use_gconf2}
-      libappindicator for Ubuntu-style system tray:   ${use_libappindicator}
+     Optional dependencies for GTK+ client:
 
-      THESE ARE ALL OPTIONAL. If you're a packager
-      or user who doesn't want these dependencies,
-      use the ones you want and skip all the rest.
+      * dbus support:                                 ${use_dbus_glib}
+      * gio for watchdir support:                     ${use_gio}
+      * libnotify for 'download completed' popups:    ${use_libnotify}
+      * libcanberra for 'download completed' sounds:  ${use_canberra}
+      * gconf2 to register as a magnet link handler:  ${use_gconf2}
+      * libappindicator for an Ubuntu-style tray:     ${use_libappindicator}
 
    Build Daemon:                                      ${build_daemon}
 
