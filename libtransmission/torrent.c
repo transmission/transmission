@@ -1692,7 +1692,7 @@ torrentCallScript( tr_torrent * tor, const char * script )
         setenv( "TR_TORRENT_NAME", tr_torrentName( tor ), 1 );
         setenv( "TR_TORRENT_DIR", tor->currentDir, 1 );
         setenv( "TR_TORRENT_HASH", tor->info.hashString, 1 );
-        ctime_r( &now, buf );
+        tr_strlcpy( buf, ctime( &now ), sizeof( buf ) );
         *strchr( buf,'\n' ) = '\0';
         setenv( "TR_TIME_LOCALTIME", buf, 1 );
         tr_torinf( tor, "Calling script \"%s\"", script );
