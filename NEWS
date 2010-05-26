@@ -4,6 +4,7 @@
   * "Local Peer Discovery" for finding peers on the local network
   * Optimize peer connections and requests based on available bandwidth
   * Smarter heuristics when deciding which peers to try connecting to first
+  * Faster verification of local data
   * Use IEC standard units (KiB, MiB, GiB) instead of (KB, MB, GB)
   * Better handling of 404 tracker errors
 ==== Mac ====
