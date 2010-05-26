@@ -63,6 +63,8 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
     const int64_t buflen = 1024 * 128; /* 128 KiB buffer */
     uint8_t * buffer = tr_valloc( buflen );
 
+    tr_torrentUncheck( tor );
+
     SHA1_Init( &sha );
 
     while( !*stopFlag && ( pieceIndex < tor->info.pieceCount ) )
