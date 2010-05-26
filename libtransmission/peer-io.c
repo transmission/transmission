@@ -31,6 +31,7 @@
 #include "crypto.h"
 #include "list.h"
 #include "net.h"
+#include "peer-common.h" /* MAX_BLOCK_SIZE */
 #include "peer-io.h"
 #include "trevent.h" /* tr_runInEventThread() */
 #include "utils.h"
@@ -720,11 +721,10 @@ getDesiredOutputBufferSize( const tr_peerIo * io, uint64_t now )
      * being large enough to hold the next 20 seconds' worth of input,
      * or a few blocks, whichever is bigger.
      * It's okay to tweak this as needed */
-    const double maxBlockSize = 16 * 1024; /* 16 KiB is from BT spec */
     const double currentSpeed = tr_bandwidthGetPieceSpeed( &io->bandwidth, now, TR_UP );
     const double period = 15; /* arbitrary */
     const double numBlocks = 3.5; /* the 3 is arbitrary; the .5 is to leave room for messages */
-    return MAX( maxBlockSize*numBlocks, currentSpeed*1024*period );
+    return MAX( MAX_BLOCK_SIZE*numBlocks, currentSpeed*1024*period );
 }
 
 size_t

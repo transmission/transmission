@@ -82,8 +82,6 @@ enum
 
     METADATA_REQQ           = 64,
 
-    MAX_BLOCK_SIZE          = ( 1024 * 16 ),
-
     /* used in lowering the outMessages queue period */
     IMMEDIATE_PRIORITY_INTERVAL_SECS = 0,
     HIGH_PRIORITY_INTERVAL_SECS = 2,

@@ -11,7 +11,7 @@
  */
 
 #ifndef __TRANSMISSION__
-#error only libtransmission should #include this header.
+ #error only libtransmission should #include this header.
 #endif
 
 #ifndef TR_PEER_H
@@ -33,7 +33,13 @@ enum
     /** when we're making requests from another peer,
         batch them together to send enough requests to
         meet our bandwidth goals for the next N seconds */
-    REQUEST_BUF_SECS = 10
+    REQUEST_BUF_SECS = 10,
+
+    /** this is the maximum size of a block request.
+        most bittorrent clients will reject requests
+        larger than this size. */
+    MAX_BLOCK_SIZE = ( 1024 * 16 )
+    
 };
 
 typedef enum

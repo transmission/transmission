@@ -35,6 +35,7 @@
 #include "fdlimit.h" /* tr_fdTorrentClose */
 #include "magnet.h"
 #include "metainfo.h"
+#include "peer-common.h" /* MAX_BLOCK_SIZE */
 #include "peer-mgr.h"
 #include "platform.h" /* TR_PATH_DELIMITER_STR */
 #include "ptrarray.h"
@@ -45,11 +46,6 @@
 #include "utils.h"
 #include "verify.h"
 #include "version.h"
-
-enum
-{
-    MAX_BLOCK_SIZE = 1024 * 16
-};
 
 /***
 ****
