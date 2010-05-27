@@ -556,6 +556,10 @@
 		A220EED211AB3F9B0022B4BE /* it */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = it; path = macosx/it.lproj/InfoActivityView.xib; sourceTree = "<group>"; };
 		A220EED311AB3F9B0022B4BE /* it */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = it; path = macosx/it.lproj/InfoGeneralView.xib; sourceTree = "<group>"; };
 		A220EED411AB3F9B0022B4BE /* it */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = it; path = macosx/it.lproj/InfoOptionsView.xib; sourceTree = "<group>"; };
+		A220EED911AE95CE0022B4BE /* es */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = es; path = macosx/es.lproj/AddMagnetWindow.xib; sourceTree = "<group>"; };
+		A220EEDA11AE95CE0022B4BE /* es */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = es; path = macosx/es.lproj/InfoActivityView.xib; sourceTree = "<group>"; };
+		A220EEDB11AE95CE0022B4BE /* es */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = es; path = macosx/es.lproj/InfoGeneralView.xib; sourceTree = "<group>"; };
+		A220EEDC11AE95CE0022B4BE /* es */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = es; path = macosx/es.lproj/InfoOptionsView.xib; sourceTree = "<group>"; };
 		A22180960D148A71007D09ED /* GroupsPrefsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GroupsPrefsController.h; path = macosx/GroupsPrefsController.h; sourceTree = "<group>"; };
 		A22180970D148A71007D09ED /* GroupsPrefsController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GroupsPrefsController.m; path = macosx/GroupsPrefsController.m; sourceTree = "<group>"; };
 		A221DCC7104B3660008A642D /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = /System/Library/Frameworks/Quartz.framework; sourceTree = "<absolute>"; };
@@ -2261,6 +2265,7 @@
 				A220EE9B11A841F50022B4BE /* en */,
 				A220EE6911A838450022B4BE /* de */,
 				A220EED211AB3F9B0022B4BE /* it */,
+				A220EEDA11AE95CE0022B4BE /* es */,
 			);
 			name = InfoActivityView.xib;
 			sourceTree = "<group>";
@@ -2271,6 +2276,7 @@
 				A209EAEB1142D294002B02D1 /* en */,
 				A220EE6A11A838640022B4BE /* de */,
 				A220EED311AB3F9B0022B4BE /* it */,
+				A220EEDB11AE95CE0022B4BE /* es */,
 			);
 			name = InfoGeneralView.xib;
 			sourceTree = "<group>";
@@ -2281,6 +2287,7 @@
 				A209EC13114301C6002B02D1 /* en */,
 				A220EE6B11A838750022B4BE /* de */,
 				A220EED411AB3F9B0022B4BE /* it */,
+				A220EEDC11AE95CE0022B4BE /* es */,
 			);
 			name = InfoOptionsView.xib;
 			sourceTree = "<group>";
@@ -2308,6 +2315,7 @@
 				A21F1539117299F100CF5A9C /* en */,
 				A220EE6611A8382C0022B4BE /* de */,
 				A220EED011AB3F8F0022B4BE /* it */,
+				A220EED911AE95CE0022B4BE /* es */,
 			);
 			name = AddMagnetWindow.xib;
 			sourceTree = "<group>";
