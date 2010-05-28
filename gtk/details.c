@@ -578,6 +578,16 @@ gtr_text_buffer_set_text( GtkTextBuffer * b, const char * str )
     g_free( old_str );
 }
 
+static char*
+get_short_date_string( time_t t )
+{
+    char buf[64];
+    struct tm tm;
+    tr_localtime_r( &t, &tm );
+    strftime( buf, sizeof( buf ), "%d %b %Y", &tm );
+    return g_locale_to_utf8( buf, -1, NULL, NULL, NULL );
+};
+
 static void
 refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
 {
@@ -618,12 +628,12 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     if( n<=0 )
         str = none;
     else {
-        char datestr[64];
         const char * creator = infos[0]->creator ? infos[0]->creator : "";
         const time_t date = infos[0]->dateCreated;
+        char * datestr = get_short_date_string( date );
         gboolean mixed_creator = FALSE;
         gboolean mixed_date = FALSE;
-        gtr_localtime2( datestr, date, sizeof( datestr ) );
+
         for( i=1; i<n; ++i ) {
             mixed_creator |= strcmp( creator, infos[i]->creator ? infos[i]->creator : "" );
             mixed_date |= ( date != infos[i]->dateCreated );
@@ -639,6 +649,8 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
                 g_snprintf( buf, sizeof( buf ), _( "Created by %1$s on %2$s" ), creator, datestr );
             str = buf;
         }
+
+        g_free( datestr );
     }
     gtr_label_set_text( GTK_LABEL( di->origin_lb ), str );
 

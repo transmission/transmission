@@ -55,9 +55,6 @@ char* tr_strltime( char * buf, int secs, size_t buflen );
 /* similar to asctime, but is utf8-clean */
 char* gtr_localtime( time_t time );
 
-/* similar to asctime, but is utf8-clean */
-char* gtr_localtime2( char * buf, time_t time, size_t buflen );
-
 /***
 ****
 ***/
