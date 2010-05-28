@@ -61,7 +61,7 @@ enum
     MAX_TRACKER_RESPONSE_TIME_SECS = ( 60 * 2 ),
 
     /* the value of the 'numwant' argument passed in tracker requests. */
-    NUMWANT = 200,
+    NUMWANT = 80,
 
     /* how long to put slow (nonresponsive) trackers in the penalty box */
     SLOW_HOST_PENALTY_SECS = ( 60 * 10 ),

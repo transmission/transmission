@@ -1670,8 +1670,8 @@ enum
     TR_PEER_FROM_INCOMING  = 0, /* connections made to the listening port */
     TR_PEER_FROM_LPD,           /* peers found by local announcements */
     TR_PEER_FROM_TRACKER,       /* peers found from a tracker */
-    TR_PEER_FROM_PEX,           /* peers found from PEX */
     TR_PEER_FROM_DHT,           /* peers found from the DHT */
+    TR_PEER_FROM_PEX,           /* peers found from PEX */
     TR_PEER_FROM_RESUME,        /* peers found in the .resume file */
     TR_PEER_FROM_LTEP,          /* peer address provided in an LTEP handshake */
     TR_PEER_FROM__MAX
