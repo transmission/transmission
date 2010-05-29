@@ -571,9 +571,18 @@ main( int argc, char ** argv )
          * if that goes well, then our work is done. */
         GSList * l;
         gboolean delegated = FALSE;
+        const gboolean trash_originals = pref_flag_get( TR_PREFS_KEY_TRASH_ORIGINAL );
 
-        for( l = argfiles; l; l = l->next )
-            delegated |= gtr_dbus_add_torrent( l->data );
+        for( l=argfiles; l!=NULL; l=l->next )
+        {
+            const char * filename = l->data;
+            const gboolean added = gtr_dbus_add_torrent( filename );
+
+            if( added && trash_originals )
+                gtr_file_trash_or_remove( filename );
+
+            delegated |= added;
+        }
 
         if( delegated ) {
             g_slist_foreach( argfiles, (GFunc)g_free, NULL );
