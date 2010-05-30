@@ -218,10 +218,18 @@ void
 tr_torrent_open_folder( TrTorrent * gtor )
 {
     const tr_torrent * tor =  tr_torrent_handle( gtor );
-    const tr_info * info = tr_torrent_info( gtor );
-    const gboolean single = info->fileCount == 1;
-    char * path = single ? g_build_filename( tr_torrentGetCurrentDir( tor ), NULL )
-                         : g_build_filename( tr_torrentGetCurrentDir( tor ), info->name, NULL );
-    gtr_open_file( path );
-    g_free( path );
+
+    if( tor != NULL )
+    {
+        const tr_info * info = tr_torrent_info( gtor );
+        const gboolean single = info->fileCount == 1;
+        const char * currentDir = tr_torrentGetCurrentDir( tor );
+        if( single )
+            gtr_open_file( currentDir );
+        else {
+            char * path = g_build_filename( currentDir, info->name, NULL );
+            gtr_open_file( path );
+            g_free( path );
+        }
+    }
 }
