@@ -1949,11 +1949,11 @@ processArgs( const char * host, int port, int argc, const char ** argv )
                 case 902: addFiles( args, "priority-low", optarg );
                           break;
                 case 700: tr_bencDictAddInt( args, "bandwidthPriority",  1 );
-                           break;
+                          break;
                 case 701: tr_bencDictAddInt( args, "bandwidthPriority",  0 );
-                           break;
+                          break;
                 case 702: tr_bencDictAddInt( args, "bandwidthPriority", -1 );
-                           break;
+                          break;
                 default:  assert( "unhandled value" && 0 );
                           break;
             }
