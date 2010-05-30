@@ -2152,7 +2152,7 @@ main( int argc, char ** argv )
     if( host == NULL )
         host = tr_strdup( DEFAULT_HOST );
 
-    processArgs( host, port, argc, (const char**)argv );
+    exit_status = processArgs( host, port, argc, (const char**)argv );
 
     tr_free( host );
     return exit_status;
