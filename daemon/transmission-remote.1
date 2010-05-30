@@ -35,9 +35,12 @@ and
 .Op Fl N Ar netrc
 .Op Fl o | O
 .Op Fl p Ar port
-.Op Fl ph Ar files
-.Op Fl pl Ar files
-.Op Fl pn Ar files
+.Op Fl th
+.Op Fl tn
+.Op Fl tl
+.Op Fl fh Ar files
+.Op Fl fl Ar files
+.Op Fl fn Ar files
 .Op Fl pr Ar peers
 .Op Fl r
 .Op Fl R
@@ -177,7 +180,13 @@ Disable distribued hash table (DHT).
 Set the
 .Ar port
 for use when listening for incoming peer connections
-.It Fl pn Fl -priority-normal Ar all | file-index | files
+.It Fl tn Fl -torrent-priority-normal
+Mark the current torrent(s) as normal priority.
+.It Fl tn Fl -torrent-priority-high
+Mark the current torrent(s) as high priority.
+.It Fl tn Fl -torrent-priority-low
+Mark the current torrent(s) as low priority.
+.It Fl fn Fl -file-priority-normal Ar all | file-index | files
 Mark file(s) as normal priority.
 .Ar all
 marks all of the torrent's files as normal priority,
@@ -186,9 +195,9 @@ sets a single file's priority as normal, and
 .Ar files
 sets multiple files' priorities as normal,
 such as "\-pn1,3-5" to normalize files #1, #3, #4, and #5.
-.It Fl ph Fl -priority-high Ar all | file-index | files
+.It Fl fh Fl -file-priority-high Ar all | file-index | files
 Mark file(s) as high priority.
-.It Fl pl Fl -priority-low Ar all | file-index | files
+.It Fl fl Fl -file-priority-low Ar all | file-index | files
 Mark file(s) as low priority.
 .It Fl pr Fl -peers Ar number
 Set the maximum number of peers.

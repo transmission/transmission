@@ -228,9 +228,12 @@ static tr_option opts[] =
     { 'p', "port",                   "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "p", 1, "<port>" },
     { 962, "port-test",              "Port testing", "pt", 0, NULL },
     { 'P', "random-port",            "Random port for incomping peers", "P", 0, NULL },
-    { 900, "priority-high",          "Set the files' priorities as high", "ph", 1, "<files>" },
-    { 901, "priority-normal",        "Set the files' priorities as normal", "pn", 1, "<files>" },
-    { 902, "priority-low",           "Set the files' priorities as low", "pl", 1, "<files>" },
+    { 900, "file-priority-high",     "Set the files' priorities as high", "fh", 1, "<files>" },
+    { 901, "file-priority-normal",   "Set the files' priorities as normal", "fn", 1, "<files>" },
+    { 902, "file-priority-low",      "Set the files' priorities as low", "fl", 1, "<files>" },
+    { 700, "torrent-priority-high",  "Set the current torrent(s)' priorities as high", "th", 0, NULL },
+    { 701, "torrent-priority-normal","Set the current torrent(s)' priorities as normal", "tn", 0, NULL },
+    { 702, "torrent-priority-low",   "Set the current torrent(s)' priorities as low", "tl", 0, NULL },
     { 'r', "remove",                 "Remove the current torrent(s)", "r",  0, NULL },
     { 930, "peers",                  "Set the maximum number of peers for the current torrent(s) or globally", "pr", 1, "<max>" },
     { 'R', "remove-and-delete",      "Remove the current torrent(s) and delete local data", NULL, 0, NULL },
@@ -363,9 +366,12 @@ getOptMode( int val )
 
         case 'g': /* get */
         case 'G': /* no-get */
-        case 900: /* priority-high */
-        case 901: /* priority-normal */
-        case 902: /* priority-low */
+        case 700: /* torrent priority-high */
+        case 701: /* torrent priority-normal */
+        case 702: /* torrent priority-low */
+        case 900: /* file priority-high */
+        case 901: /* file priority-normal */
+        case 902: /* file priority-low */
             return MODE_TORRENT_SET | MODE_TORRENT_ADD;
 
         case 961: /* find */
@@ -1942,6 +1948,12 @@ processArgs( const char * host, int port, int argc, const char ** argv )
                           break;
                 case 902: addFiles( args, "priority-low", optarg );
                           break;
+                case 700: tr_bencDictAddInt( args, "bandwidthPriority",  1 );
+                           break;
+                case 701: tr_bencDictAddInt( args, "bandwidthPriority",  0 );
+                           break;
+                case 702: tr_bencDictAddInt( args, "bandwidthPriority", -1 );
+                           break;
                 default:  assert( "unhandled value" && 0 );
                           break;
             }
