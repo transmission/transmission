@@ -767,7 +767,7 @@ int trashDataFile(const char * filename)
 
 - (CGFloat) progress
 {
-    return .9999999;//fStat->percentComplete;
+    return fStat->percentComplete;
 }
 
 - (CGFloat) progressDone
