@@ -91,7 +91,7 @@ TorrentDelegate :: progressString( const Torrent& tor ) const
             str = tr( "%1 of %2 (%3%), uploaded %4 (Ratio: %5 Goal: %6)" )
                   .arg( Utils::sizeToString( haveTotal ) )
                   .arg( Utils::sizeToString( tor.totalSize( ) ) )
-                  .arg( tor.percentDone( ) * 100.0, 0, 'f', 2 )
+                  .arg( tor.percentComplete( ) * 100.0, 0, 'f', 2 )
                   .arg( Utils::sizeToString( tor.uploadedEver( ) ) )
                   .arg( Utils::ratioToString( tor.ratio( ) ) )
                   .arg( Utils::ratioToString( seedRatio ) );
@@ -106,7 +106,7 @@ TorrentDelegate :: progressString( const Torrent& tor ) const
             str = tr( "%1 of %2 (%3%), uploaded %4 (Ratio: %5)" )
                   .arg( Utils::sizeToString( haveTotal ) )
                   .arg( Utils::sizeToString( tor.totalSize( ) ) )
-                  .arg( tor.percentDone( ) * 100.0, 0, 'f', 2 )
+                  .arg( tor.percentComplete( ) * 100.0, 0, 'f', 2 )
                   .arg( Utils::sizeToString( tor.uploadedEver( ) ) )
                   .arg( Utils::ratioToString( tor.ratio( ) ) );
         }

@@ -253,6 +253,7 @@ class Torrent: public QObject
         bool hasMetadata( ) const { return getDouble( METADATA_PERCENT_DONE ) >= 1.0; }
         int  pieceCount( ) const { return getInt( PIECE_COUNT ); }
         double ratio( ) const { return getDouble( RATIO ); }
+        double percentComplete( ) const { return haveTotal() / (double)totalSize(); }
         double percentDone( ) const { return getDouble( PERCENT_DONE ); }
         double metadataPercentDone( ) const { return getDouble( METADATA_PERCENT_DONE ); }
         uint64_t downloadedEver( ) const { return getSize( DOWNLOADED_EVER ); }
