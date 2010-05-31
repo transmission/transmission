@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include <sys/socket.h> /* socket(), bind() */
 #include <unistd.h> /* close() */
 #include <fcntl.h> /* fcntl(), O_NONBLOCK */
-#include <ctype.h>
+#include <ctype.h> /* toupper() */
 
 /* third party */
 #include <event.h>
@@ -429,6 +429,7 @@ static inline void lpd_consistencyCheck( void )
 */
 tr_bool tr_lpdSendAnnounce( const tr_torrent* t )
 {
+    size_t i;
     const char fmt[] =
         "BT-SEARCH * HTTP/%u.%u" CRLF
         "Host: %s:%u" CRLF
@@ -444,7 +445,7 @@ tr_bool tr_lpdSendAnnounce( const tr_torrent* t )
         return FALSE;
 
     /* make sure the hash string is normalized, just in case */
-    for( size_t i = 0; i < sizeof hashString; i++ )
+    for( i = 0; i < sizeof hashString; i++ )
         hashString[i] = toupper( t->info.hashString[i] );
 
     /* prepare a zero-terminated announce message */
