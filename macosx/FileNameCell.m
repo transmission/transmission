@@ -29,6 +29,9 @@
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 
+#import "transmission.h" // required by utils.h
+#import "utils.h"
+
 #define PADDING_HORIZONAL 2.0
 #define IMAGE_FOLDER_SIZE 16.0
 #define IMAGE_ICON_SIZE 32.0
@@ -203,7 +206,8 @@
     FileListNode * node = (FileListNode *)[self objectValue];
     
     const CGFloat progress = [torrent fileProgress: node];
-    NSString * percentString = progress == 1.0 ? @"100%" : [NSString localizedStringWithFormat: @"%.2f%%", progress * 100.0];
+    NSString * percentString = progress == 1.0 ? @"100%"
+                                : [NSString localizedStringWithFormat: @"%.2f%%", tr_truncd(progress * 100.0, 2)];
     
     NSString * status = [NSString stringWithFormat: NSLocalizedString(@"%@ of %@",
                             "Inspector -> Files tab -> file status string"), percentString, [NSString stringForFileSize: [node size]]];

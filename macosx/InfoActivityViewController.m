@@ -124,11 +124,13 @@
         
         [fStateField setStringValue: [torrent stateString]];
         
+        #warning simplify
         if ([torrent isFolder])
             [fProgressField setStringValue: [NSString localizedStringWithFormat: NSLocalizedString(@"%.2f%% (%.2f%% selected)",
-                "Inspector -> Activity tab -> progress"), 100.0 * [torrent progress], 100.0 * [torrent progressDone]]];
+                "Inspector -> Activity tab -> progress"), tr_truncd(100.0 * [torrent progress], 2),
+                tr_truncd(100.0 * [torrent progressDone], 2)]];
         else
-            [fProgressField setStringValue: [NSString localizedStringWithFormat: @"%.2f%%", 100.0 * [torrent progress]]];
+            [fProgressField setStringValue: [NSString localizedStringWithFormat: @"%.2f%%", tr_truncd(100.0 * [torrent progress], 2)]];
             
         [fRatioField setStringValue: [NSString stringForRatio: [torrent ratio]]];
         

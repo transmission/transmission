@@ -767,7 +767,7 @@ int trashDataFile(const char * filename)
 
 - (CGFloat) progress
 {
-    return fStat->percentComplete;
+    return .9999999;//fStat->percentComplete;
 }
 
 - (CGFloat) progressDone
@@ -929,7 +929,7 @@ int trashDataFile(const char * filename)
     {
         NSString * progressString = fStat->metadataPercentComplete > 0.0
                     ? [NSString localizedStringWithFormat: NSLocalizedString(@"%.2f%% of torrent metadata retrieved",
-                        "Torrent -> progress string"), 100.0 * fStat->metadataPercentComplete]
+                        "Torrent -> progress string"), tr_truncd(100.0 * fStat->metadataPercentComplete, 2)]
                     : NSLocalizedString(@"torrent metadata needed", "Torrent -> progress string");
         
         return [NSString stringWithFormat: @"%@ - %@", NSLocalizedString(@"Magnetized transfer", "Torrent -> progress string"),
@@ -954,7 +954,7 @@ int trashDataFile(const char * filename)
             progress = 100.0 * [self progress];
         }
         
-        string = [NSString localizedStringWithFormat: @"%@ (%.2f%%)", string, progress];
+        string = [NSString localizedStringWithFormat: @"%@ (%.2f%%)", string, tr_truncd(progress, 2)];
     }
     else
     {
@@ -969,7 +969,8 @@ int trashDataFile(const char * filename)
                 downloadString = [NSString stringWithFormat: NSLocalizedString(@"%@ of %@", "Torrent -> progress string"),
                                     [NSString stringForFileSize: [self haveTotal]], [NSString stringForFileSize: [self size]]];
                 
-                downloadString = [NSString localizedStringWithFormat: @"%@ (%.2f%%)", downloadString, 100.0 * [self progress]];
+                downloadString = [NSString localizedStringWithFormat: @"%@ (%.2f%%)",
+                                    downloadString, tr_truncd(100.0 * [self progress], 2)];
             }
         }
         else
@@ -1030,7 +1031,8 @@ int trashDataFile(const char * filename)
 
             case TR_STATUS_CHECK:
                 string = [NSString localizedStringWithFormat: @"%@ (%.2f%%)",
-                            NSLocalizedString(@"Checking existing data", "Torrent -> status string"), 100.0 * [self checkingProgress]];
+                            NSLocalizedString(@"Checking existing data", "Torrent -> status string"),
+                                tr_truncd(100.0 * [self checkingProgress], 2)];
                 break;
 
             case TR_STATUS_DOWNLOAD:
@@ -1109,7 +1111,8 @@ int trashDataFile(const char * filename)
 
         case TR_STATUS_CHECK:
             string = [NSString localizedStringWithFormat: @"%@ (%.2f%%)",
-                        NSLocalizedString(@"Checking existing data", "Torrent -> status string"), 100.0 * [self checkingProgress]];
+                        NSLocalizedString(@"Checking existing data", "Torrent -> status string"),
+                            tr_truncd(100.0 * [self checkingProgress], 2)];
             break;
         
         case TR_STATUS_DOWNLOAD:
@@ -1162,7 +1165,8 @@ int trashDataFile(const char * filename)
 
         case TR_STATUS_CHECK:
             return [NSString localizedStringWithFormat: @"%@ (%.2f%%)",
-                    NSLocalizedString(@"Checking existing data", "Torrent -> status string"), 100.0 * [self checkingProgress]];
+                    NSLocalizedString(@"Checking existing data", "Torrent -> status string"),
+                        tr_truncd(100.0 * [self checkingProgress], 2)];
 
         case TR_STATUS_DOWNLOAD:
             return NSLocalizedString(@"Downloading", "Torrent -> status string");

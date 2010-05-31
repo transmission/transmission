@@ -25,6 +25,9 @@
 #import "PeerProgressIndicatorCell.h"
 #import "NSApplicationAdditions.h"
 
+#import "transmission.h" // required by utils.h
+#import "utils.h"
+
 @implementation PeerProgressIndicatorCell
 
 - (id) copyWithZone: (NSZone *) zone
@@ -60,7 +63,8 @@
             [paragraphStyle release];
         }
         
-        [[NSString localizedStringWithFormat: @"%.1f%%", [self floatValue] * 100.0] drawInRect: cellFrame withAttributes: fAttributes];
+        [[NSString localizedStringWithFormat: @"%.1f%%", tr_truncd([self floatValue] * 100.0, 1)] drawInRect: cellFrame
+            withAttributes: fAttributes];
     }
     else
     {
