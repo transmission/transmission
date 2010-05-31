@@ -227,6 +227,79 @@ _tr_blocklistHasAddress( tr_blocklist     * b,
     return range != NULL;
 }
 
+/*
+ * level1 format: "comment:x.x.x.x-y.y.y.y"
+ */
+static tr_bool
+parseLine1( const char * line, struct tr_ip_range * range )
+{
+    char * walk;
+    int b[4];
+    int e[4];
+    char str[64];
+    tr_address addr;
+
+    walk = strrchr( line, ':' );
+    if( !walk )
+        return FALSE;
+    ++walk; /* walk past the colon */
+
+    if( sscanf( walk, "%d.%d.%d.%d-%d.%d.%d.%d",
+                &b[0], &b[1], &b[2], &b[3],
+                &e[0], &e[1], &e[2], &e[3] ) != 8 )
+        return FALSE;
+
+    tr_snprintf( str, sizeof( str ), "%d.%d.%d.%d", b[0], b[1], b[2], b[3] );
+    if( tr_pton( str, &addr ) == NULL )
+        return FALSE;
+    range->begin = ntohl( addr.addr.addr4.s_addr );
+
+    tr_snprintf( str, sizeof( str ), "%d.%d.%d.%d", e[0], e[1], e[2], e[3] );
+    if( tr_pton( str, &addr ) == NULL )
+        return FALSE;
+    range->end = ntohl( addr.addr.addr4.s_addr );
+
+    return TRUE;
+}
+
+/*
+ * "000.000.000.000 - 000.255.255.255 , 000 , invalid ip"
+ */
+static tr_bool
+parseLine2( const char * line, struct tr_ip_range * range )
+{
+    int unk;
+    int a[4];
+    int b[4];
+    char str[32];
+    tr_address addr;
+
+    if( sscanf( line, "%3d.%3d.%3d.%3d - %3d.%3d.%3d.%3d , %3d , ",
+                &a[0], &a[1], &a[2], &a[3],
+                &b[0], &b[1], &b[2], &b[3],
+                &unk ) != 9 )
+        return FALSE;
+
+    tr_snprintf( str, sizeof(str), "%d.%d.%d.%d", a[0], a[1], a[2], a[3] );
+    if( tr_pton( str, &addr ) == NULL )
+        return FALSE;
+    range->begin = ntohl( addr.addr.addr4.s_addr );
+
+    tr_snprintf( str, sizeof(str), "%d.%d.%d.%d", b[0], b[1], b[2], b[3] );
+    if( tr_pton( str, &addr ) == NULL )
+        return FALSE;
+    range->end = ntohl( addr.addr.addr4.s_addr );
+
+    return TRUE;
+}
+
+static int
+parseLine( const char * line, struct tr_ip_range * range )
+{
+    return parseLine1( line, range )
+        || parseLine2( line, range );
+}
+
 int
 _tr_blocklistSetContent( tr_blocklist * b,
                          const char *   filename )
@@ -263,50 +336,28 @@ _tr_blocklistSetContent( tr_blocklist * b,
 
     while( !fggets( &line, in ) )
     {
-        char * rangeBegin;
-        char * rangeEnd;
-        char * crpos;
-        tr_address  addr;
+        char * walk;
         struct tr_ip_range range;
 
         ++inCount;
 
-        rangeBegin = strrchr( line, ':' );
-        if( !rangeBegin ){ free( line ); continue; }
-        ++rangeBegin;
+        /* zap the linefeed */
+        if(( walk = strchr( line, '\r' ))) *walk = '\0'; 
+        if(( walk = strchr( line, '\n' ))) *walk = '\0'; 
 
-        rangeEnd = strchr( rangeBegin, '-' );
-        if( !rangeEnd ){ free( line ); continue; }
-        *rangeEnd++ = '\0';
-        if(( crpos = strchr( rangeEnd, '\r' )))
-            *crpos = '\0';
-
-        if( !tr_pton( rangeBegin, &addr ) )
+        if( !parseLine( line, &range ) )
         {
-            printf( "error rangeBegin: %s", line );
             /* don't try to display the actual lines - it causes issues */
             tr_err( _( "blocklist skipped invalid address at line %d" ), inCount );
             free( line );
             continue;
         }
-        range.begin = ntohl( addr.addr.addr4.s_addr );
-
-        if( !tr_pton( rangeEnd, &addr ) )
-        {
-            printf( "error rangeEnd: %s", line );
-            /* don't try to display the actual lines - it causes issues */
-            tr_err( _( "blocklist skipped invalid address at line %d" ), inCount );
-            free( line );
-            continue;
-        }
-        range.end = ntohl( addr.addr.addr4.s_addr );
 
         free( line );
 
         if( fwrite( &range, sizeof( struct tr_ip_range ), 1, out ) != 1 )
         {
-            tr_err( _(
-                       "Couldn't save file \"%1$s\": %2$s" ), b->filename,
+            tr_err( _( "Couldn't save file \"%1$s\": %2$s" ), b->filename,
                    tr_strerror( errno ) );
             break;
         }
