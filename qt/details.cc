@@ -496,6 +496,7 @@ Details :: refresh( )
         }
     }
     myCommentBrowser->setText( string );
+    myCommentBrowser->setMaximumHeight( QWIDGETSIZE_MAX );
 
     // myOriginLabel
     if( torrents.empty( ) )
@@ -885,8 +886,7 @@ Details :: createInfoTab( )
     hig->addRow( tr( "Origin:" ), myOriginLabel = new SqueezeLabel );
     hig->addRow( tr( "Comment:" ), myCommentBrowser = new QTextBrowser );
     const int h = QFontMetrics(myCommentBrowser->font()).lineSpacing() * 4;
-    myCommentBrowser->setMinimumHeight( h );
-    myCommentBrowser->setMaximumHeight( h );
+    myCommentBrowser->setFixedHeight( h );
 
     hig->finish( );
 
