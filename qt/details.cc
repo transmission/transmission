@@ -281,32 +281,36 @@ Details :: refresh( )
     int64_t haveVerified = 0;
     int64_t haveUnverified = 0;
     int64_t verifiedPieces = 0;
-    foreach( const Torrent * t, torrents ) {
-        if( t->hasMetadata( ) ) {
-            haveTotal += t->haveTotal( );
-            haveUnverified += t->haveUnverified( );
-            const uint64_t v = t->haveVerified( );
-            haveVerified += v;
-            verifiedPieces += v / t->pieceSize( );
-            sizeWhenDone += t->sizeWhenDone( );
-            leftUntilDone += t->leftUntilDone( );
-            available += t->sizeWhenDone() - t->leftUntilDone() + t->desiredAvailable();
-        }
-    }
-    if( !haveVerified && !haveUnverified )
+    if( torrents.empty( ) )
         string = none;
     else {
-        const double d = 100.0 * ( sizeWhenDone ? ( sizeWhenDone - leftUntilDone ) / sizeWhenDone : 1 );
-        QString pct = locale.toString( d, 'f', 2 );
-        if( !haveUnverified )
-            string = tr( "%1 (%2%)" )
-                         .arg( Utils :: sizeToString( haveVerified + haveUnverified ) )
-                         .arg( pct );
-        else
-            string = tr( "%1 (%2%); %3 Unverified" )
-                         .arg( Utils :: sizeToString( haveVerified + haveUnverified ) )
-                         .arg( pct )
-                         .arg( Utils :: sizeToString( haveUnverified ) );
+        foreach( const Torrent * t, torrents ) {
+            if( t->hasMetadata( ) ) {
+                haveTotal += t->haveTotal( );
+                haveUnverified += t->haveUnverified( );
+                const uint64_t v = t->haveVerified( );
+                haveVerified += v;
+                verifiedPieces += v / t->pieceSize( );
+                sizeWhenDone += t->sizeWhenDone( );
+                leftUntilDone += t->leftUntilDone( );
+                available += t->sizeWhenDone() - t->leftUntilDone() + t->desiredAvailable();
+            }
+        }
+        if( !haveVerified && !haveUnverified )
+            string = none;
+        else {
+            const double d = 100.0 * ( sizeWhenDone ? ( sizeWhenDone - leftUntilDone ) / sizeWhenDone : 1 );
+            QString pct = locale.toString( d, 'f', 2 );
+            if( !haveUnverified )
+                string = tr( "%1 (%2%)" )
+                             .arg( Utils :: sizeToString( haveVerified + haveUnverified ) )
+                             .arg( pct );
+            else
+                string = tr( "%1 (%2%); %3 Unverified" )
+                             .arg( Utils :: sizeToString( haveVerified + haveUnverified ) )
+                             .arg( pct )
+                             .arg( Utils :: sizeToString( haveUnverified ) );
+        }
     }
     myHaveLabel->setText( string );
 
@@ -318,10 +322,10 @@ Details :: refresh( )
     myAvailabilityLabel->setText( string );
 
     // myDownloadedLabel
+    uint64_t d = 0, f = 0;
     if( torrents.empty( ) )
         string = none;
     else {
-        uint64_t d=0, f=0;
         foreach( const Torrent * t, torrents ) {
             d += t->downloadedEver( );
             f += t->failedEver( );
@@ -335,13 +339,39 @@ Details :: refresh( )
     }
     myDownloadedLabel->setText( string );
 
-    uint64_t sum = 0;
-    foreach( const Torrent * t, torrents ) sum += t->uploadedEver( );
-    myUploadedLabel->setText( Utils::sizeToString( sum ) );
+    uint64_t u = 0;
+    if( torrents.empty( ) )
+        string = none;
+    else {
+        foreach( const Torrent * t, torrents ) u += t->uploadedEver( );
+        string = QString( Utils::sizeToString( u ) );
+    }
+    myUploadedLabel->setText( string );
 
-    double d = 0;
-    foreach( const Torrent *t, torrents ) d += t->ratio( );
-    myRatioLabel->setText( Utils :: ratioToString( d / n ) );
+    if( torrents.empty( ) )
+        string = none;
+    else if( torrents.length() == 1 )
+        string = QString( Utils :: ratioToString( torrents.first()->ratio() ) );
+    else {
+        bool isMixed = false;
+        int ratioType = torrents.first()->ratio();
+        if( ratioType > 0 ) ratioType = 0;
+        foreach( const Torrent *t, torrents )
+        {
+            if( ratioType != ( t->ratio() >= 0 ? 0 : t->ratio() ) )
+            {
+                isMixed = true;
+                break;
+            }
+        }
+        if( isMixed )
+            string = mixed;
+        else if( ratioType < 0 )
+            string = QString( Utils :: ratioToString( ratioType ) );
+        else
+            string = QString( Utils :: ratioToString( (double)u / d ) );
+    }
+    myRatioLabel->setText( string );
 
     const QDateTime qdt_now = QDateTime::currentDateTime( );
 
