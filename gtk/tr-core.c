@@ -958,6 +958,7 @@ tr_core_add_ctor( TrCore * core, tr_ctor * ctor )
 gboolean
 tr_core_add_metainfo( TrCore      * core,
                       const char  * payload,
+                      const char  * filename,
                       gboolean    * setme_handled,
                       GError     ** gerr UNUSED )
 {
@@ -972,23 +973,38 @@ tr_core_add_metainfo( TrCore      * core,
         tr_core_add_from_url( core, payload );
         *setme_handled = TRUE;
     }
-    else /* base64-encoded metainfo */
+    else
     {
-        int file_length;
         tr_ctor * ctor;
-        char * file_contents;
-        gboolean do_prompt = pref_flag_get( PREF_KEY_OPTIONS_PROMPT );
+        gboolean has_metainfo = FALSE;
+        const gboolean do_prompt = pref_flag_get( PREF_KEY_OPTIONS_PROMPT );
 
+        /* create the constructor */
         ctor = tr_ctorNew( session );
         tr_core_apply_defaults( ctor );
 
-        file_contents = tr_base64_decode( payload, -1, &file_length );
-        tr_ctorSetMetainfo( ctor, (const uint8_t*)file_contents, file_length );
-        add_ctor( core, ctor, do_prompt, TRUE );
+        if( !has_metainfo && g_file_test( filename, G_FILE_TEST_IS_REGULAR ) )
+        {
+            /* set the metainfo from a local file */
+            has_metainfo = !tr_ctorSetMetainfoFromFile( ctor, filename );
+        }
 
-        tr_free( file_contents );
-        tr_core_torrents_added( core );
-        *setme_handled = TRUE;
+        if( !has_metainfo )
+        {
+            /* base64-encoded metainfo */
+            int file_length;
+            char * file_contents = tr_base64_decode( payload, -1, &file_length );
+            has_metainfo = !tr_ctorSetMetainfo( ctor, (const uint8_t*)file_contents, file_length );
+            tr_free( file_contents );
+        }
+
+        if( has_metainfo )
+        {
+            add_ctor( core, ctor, do_prompt, TRUE );
+            tr_core_torrents_added( core );
+        }
+
+        *setme_handled = has_metainfo;
     }
 
     return TRUE;

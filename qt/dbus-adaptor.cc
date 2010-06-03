@@ -10,6 +10,7 @@
  * $Id:$
  */
 
+#include <QFile>
 #include "app.h"
 #include "dbus-adaptor.h"
 
@@ -27,8 +28,8 @@ TrDBusAdaptor :: PresentWindow( )
 }
 
 bool
-TrDBusAdaptor :: AddMetainfo( const QString& str )
+TrDBusAdaptor :: AddMetainfo( const QString& payload, const QString& filename )
 {
-    myApp->addTorrent( str );
+    myApp->addTorrent( QFile(filename).exists() ? filename : payload );
     return true;
 }
