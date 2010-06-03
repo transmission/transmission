@@ -1723,6 +1723,12 @@ tr_torrentRecheckCompleteness( tr_torrent * tor )
 
         if( tr_torrentIsSeed( tor ) )
         {
+            if( recentChange )
+            {
+                tr_announcerTorrentCompleted( tor );
+                tor->doneDate = tor->anyDate = tr_time( );
+            }
+
             tr_torrentCheckSeedRatio( tor );
 
             if( tor->currentDir == tor->incompleteDir )
@@ -1733,13 +1739,6 @@ tr_torrentRecheckCompleteness( tr_torrent * tor )
         }
 
         fireCompletenessChange( tor, completeness );
-
-        if( recentChange && tr_torrentIsSeed( tor ) )
-        {
-            tr_announcerTorrentCompleted( tor );
-
-            tor->doneDate = tor->anyDate = tr_time( );
-        }
 
         tr_torrentSetDirty( tor );
     }
