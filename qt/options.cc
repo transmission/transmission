@@ -335,7 +335,7 @@ Options :: onAccepted( )
                  fileAdded, SLOT(executed(int64_t,const QString&, struct tr_benc*)));
     }
 
-std::cerr << tr_bencToStr(&top,TR_FMT_JSON,NULL) << std::endl;
+//std::cerr << tr_bencToStr(&top,TR_FMT_JSON,NULL) << std::endl;
     mySession.exec( &top );
 
     tr_bencFree( &top );
