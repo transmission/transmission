@@ -15,7 +15,9 @@
 #include <QApplication>
 #include <QDataStream>
 #include <QFile>
+#include <QFileDialog>
 #include <QFileInfo>
+#include <QInputDialog>
 #include <QObject>
 #include <QSet>
 #include <QStyle>
@@ -25,6 +27,24 @@
 
 #include "qticonloader.h"
 #include "utils.h"
+
+QString
+Utils :: remoteFileChooser( QWidget * parent, const QString& title, const QString& myPath, bool dir, bool local )
+{
+    QString path;
+
+    if( local )
+    {
+        if( dir )
+            path = QFileDialog::getExistingDirectory( parent, title, myPath );
+        else
+            path = QFileDialog::getOpenFileName( parent, title, myPath );
+    }
+    else
+        path = QInputDialog::getText( parent, title, tr( "Enter a location:" ), QLineEdit::Normal, myPath, NULL );
+
+    return path;
+}
 
 #define KILOBYTE_FACTOR 1024.0
 #define MEGABYTE_FACTOR ( 1024.0 * 1024.0 )

@@ -51,13 +51,10 @@ class PrefsDialog: public QDialog
         void altSpeedDaysEdited( int );
         void sessionUpdated( );
         void onWatchClicked( );
-        void onWatchSelected( const QStringList& );
         void onScriptClicked( );
-        void onScriptSelected( const QStringList& );
         void onIncompleteClicked( );
-        void onIncompleteSelected( const QStringList& );
         void onDestinationClicked( );
-        void onDestinationSelected( const QStringList& );
+        void onLocationSelected( const QString&, int key );
         void onPortTested( bool );
         void onPortTest( );
 
@@ -98,7 +95,7 @@ class PrefsDialog: public QDialog
         QLabel * myPortLabel;
         QPushButton * myPortButton;
         QPushButton * myWatchButton;
-        QPushButton * myTorrentDoneScriptFilename;
+        QPushButton * myTorrentDoneScriptButton;
         QCheckBox * myTorrentDoneScriptCheckbox;
         QCheckBox * myIncompleteCheckbox;
         QPushButton * myIncompleteButton;

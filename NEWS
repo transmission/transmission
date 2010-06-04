@@ -26,6 +26,8 @@
   * Show file sizes in the file tree
   * Added a confirm dialog when removing torrents
   * Properties and torrent options no longer jump around while editing
+  * Allow setting locations for remote sessions
+  * Miscellaneous UI fixes
 ==== Daemon ====
   * Let users specify a script to be invoked when a torrent finishes downloading
   * Better support for adding per-torrent settings when adding a new torrent

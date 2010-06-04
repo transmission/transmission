@@ -20,17 +20,20 @@
 class QPushButton;
 class QRadioButton;
 class Session;
+class Torrent;
+class TorrentModel;
 
 class RelocateDialog: public QDialog
 {
         Q_OBJECT
 
     private:
-        static QString myPath;
+        QString myPath;
         static bool myMoveFlag;
 
     private:
         Session & mySession;
+        TorrentModel& myModel;
         QSet<int> myIds;
         QPushButton * myDirButton;
         QRadioButton * myMoveRadio;
@@ -42,7 +45,7 @@ class RelocateDialog: public QDialog
         void onMoveToggled( bool );
 
     public:
-        RelocateDialog( Session&, const QSet<int>& ids, QWidget * parent = 0 );
+        RelocateDialog( Session&, TorrentModel&, const QSet<int>& ids, QWidget * parent = 0 );
         ~RelocateDialog( ) { }
 };
 

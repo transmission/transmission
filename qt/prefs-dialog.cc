@@ -18,7 +18,6 @@
 #include <QCoreApplication>
 #include <QDialogButtonBox>
 #include <QDoubleSpinBox>
-#include <QFileDialog>
 #include <QFileIconProvider>
 #include <QFileInfo>
 #include <QHBoxLayout>
@@ -42,6 +41,7 @@
 #include "prefs-dialog.h"
 #include "qticonloader.h"
 #include "session.h"
+#include "utils.h"
 
 /***
 ****
@@ -493,78 +493,51 @@ void
 PrefsDialog :: onScriptClicked( void )
 {
     const QString title = tr( "Select \"Torrent Done\" Script" );
-    const QString path = myPrefs.getString( Prefs::SCRIPT_TORRENT_DONE_FILENAME );
-    QFileDialog * d = new QFileDialog( this, title, path );
-    d->setFileMode( QFileDialog::ExistingFiles );
-    connect( d, SIGNAL(filesSelected(const QStringList&)),
-             this, SLOT(onScriptSelected(const QStringList&)) );
-    d->show( );
-}
+    const QString myPath = myPrefs.getString( Prefs::SCRIPT_TORRENT_DONE_FILENAME );
+    const QString path = Utils::remoteFileChooser( this, title, myPath, false, mySession.isServer() );
 
-void
-PrefsDialog :: onScriptSelected( const QStringList& list )
-{
-    if( list.size() == 1 )
-        myPrefs.set( Prefs::Prefs::SCRIPT_TORRENT_DONE_FILENAME, list.first( ) );
+    if( !path.isEmpty() )
+        onLocationSelected( path, Prefs::SCRIPT_TORRENT_DONE_FILENAME );
 }
-
 
 void
 PrefsDialog :: onIncompleteClicked( void )
 {
     const QString title = tr( "Select Incomplete Directory" );
-    const QString path = myPrefs.getString( Prefs::INCOMPLETE_DIR );
-    QFileDialog * d = new QFileDialog( this, title, path );
-    d->setFileMode( QFileDialog::Directory );
-    connect( d, SIGNAL(filesSelected(const QStringList&)),
-             this, SLOT(onIncompleteSelected(const QStringList&)) );
-    d->show( );
-}
+    const QString myPath = myPrefs.getString( Prefs::INCOMPLETE_DIR );
+    const QString path = Utils::remoteFileChooser( this, title, myPath, true, mySession.isServer() );
 
-void
-PrefsDialog :: onIncompleteSelected( const QStringList& list )
-{
-    if( list.size() == 1 )
-        myPrefs.set( Prefs::INCOMPLETE_DIR, list.first( ) );
+    if( !path.isEmpty() )
+        onLocationSelected( path, Prefs::INCOMPLETE_DIR );
 }
-
 
 void
 PrefsDialog :: onWatchClicked( void )
 {
     const QString title = tr( "Select Watch Directory" );
-    const QString path = myPrefs.getString( Prefs::DIR_WATCH );
-    QFileDialog * d = new QFileDialog( this, title, path );
-    d->setFileMode( QFileDialog::Directory );
-    connect( d, SIGNAL(filesSelected(const QStringList&)),
-             this, SLOT(onWatchSelected(const QStringList&)) );
-    d->show( );
-}
+    const QString myPath = myPrefs.getString( Prefs::DIR_WATCH );
+    const QString path = Utils::remoteFileChooser( this, title, myPath, true, true );
 
-void
-PrefsDialog :: onWatchSelected( const QStringList& list )
-{
-    if( list.size() == 1 )
-        myPrefs.set( Prefs::DIR_WATCH, list.first( ) );
+    if( !path.isEmpty() )
+        onLocationSelected( path, Prefs::DIR_WATCH );
 }
 
 void
 PrefsDialog :: onDestinationClicked( void )
 {
     const QString title = tr( "Select Destination" );
-    const QString path = myPrefs.getString( Prefs::DOWNLOAD_DIR );
-    QFileDialog * d = new QFileDialog( this, title, path );
-    d->setFileMode( QFileDialog::Directory );
-    connect( d, SIGNAL(filesSelected(const QStringList&)),
-             this, SLOT(onDestinationSelected(const QStringList&)) );
-    d->show( );
+    const QString myPath = myPrefs.getString( Prefs::DOWNLOAD_DIR );
+    const QString path = Utils::remoteFileChooser( this, title, myPath, true, mySession.isServer() );
+
+    if( !path.isEmpty() )
+        onLocationSelected( path, Prefs::DOWNLOAD_DIR );
 }
 
 void
-PrefsDialog :: onDestinationSelected( const QStringList& list )
+PrefsDialog :: onLocationSelected( const QString& path, int key )
 {
-    if( list.size() == 1 )
-        myPrefs.set( Prefs::DOWNLOAD_DIR, list.first( ) );
+    myPrefs.set( key, path );
+    updatePref( key );
 }
 
 QWidget *
@@ -603,7 +576,7 @@ PrefsDialog :: createTorrentsTab( )
         enableBuddyWhenChecked( qobject_cast<QCheckBox*>(l), b );
 
         l = myTorrentDoneScriptCheckbox = checkBoxNew( tr( "Call scrip&t when torrent is completed" ), Prefs::SCRIPT_TORRENT_DONE_ENABLED );
-        b = myTorrentDoneScriptFilename = new QPushButton;
+        b = myTorrentDoneScriptButton = new QPushButton;
         b->setIcon( filePixmap );
         b->setStyleSheet( "text-align: left; padding-left: 5; padding-right: 5" );
         connect( b, SIGNAL(clicked(bool)), this, SLOT(onScriptClicked(void)) );
