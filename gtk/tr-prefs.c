@@ -279,7 +279,7 @@ torrentPage( GObject * core )
     GtkWidget *  l;
 
     t = hig_workarea_create( );
-    hig_workarea_add_section_title( t, &row, _( "Adding Torrents" ) );
+    hig_workarea_add_section_title( t, &row, _( "Adding" ) );
 
 #ifdef HAVE_GIO
     s = _( "Automatically _add torrents from:" );
@@ -303,6 +303,9 @@ torrentPage( GObject * core )
     w = new_check_button( s, TR_PREFS_KEY_TRASH_ORIGINAL, core );
     hig_workarea_add_wide_control( t, &row, w );
 
+    hig_workarea_add_section_divider( t, &row );
+    hig_workarea_add_section_title( t, &row, _( "Downloading" ) );
+
     s = _( "Append \"._part\" to incomplete files' names" );
     w = new_check_button( s, TR_PREFS_KEY_RENAME_PARTIAL_FILES, core );
     hig_workarea_add_wide_control( t, &row, w );
@@ -325,7 +328,7 @@ torrentPage( GObject * core )
     hig_workarea_add_row_w( t, &row, l, w, NULL );
 
     hig_workarea_add_section_divider( t, &row );
-    hig_workarea_add_section_title( t, &row, _( "Limits" ) );
+    hig_workarea_add_section_title( t, &row, _( "Seeding" ) );
 
     s = _( "_Seed torrent until its ratio reaches:" );
     w = new_check_button( s, TR_PREFS_KEY_RATIO_ENABLED, core );
