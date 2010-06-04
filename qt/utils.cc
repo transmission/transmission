@@ -59,7 +59,7 @@ Utils :: sizeToString( double size )
     {
         str = tr( "None" );
     }
-    else if( size < 1024.0 )
+    else if( size < KILOBYTE_FACTOR )
     {
         const int i = (int)size;
         str = tr( "%Ln byte(s)", 0, i );
@@ -176,9 +176,9 @@ Utils :: speedToString( const Speed& speed )
     if( kbps < 1000.0 )  /* 0.0 KiB to 999.9 KiB */
         str = tr( "%L1 KiB/s" ).arg( kbps, 0, 'f', 1 );
     else if( kbps < 102400.0 ) /* 0.98 MiB to 99.99 MiB */
-        str = tr( "%L1 MiB/s" ).arg( kbps/1024.0, 0, 'f', 2 );
+        str = tr( "%L1 MiB/s" ).arg( kbps / KILOBYTE_FACTOR, 0, 'f', 2 );
     else // insane speeds
-        str = tr( "%L1 GiB/s" ).arg( kbps/(1024.0*1024.0), 0, 'f', 1 );
+        str = tr( "%L1 GiB/s" ).arg( kbps / MEGABYTE_FACTOR, 0, 'f', 1 );
 
     return str;
 }
