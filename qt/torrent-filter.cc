@@ -45,11 +45,6 @@ TorrentFilter :: refreshPref( int key )
     switch( key )
     {
         case Prefs :: FILTER_MODE:
-            if( rowCount( ) > 0 )
-            {
-                invalidateFilter( );
-                break;
-            }
             invalidateFilter( );
             /* force a re-sort */
             sort( 0, !myPrefs.getBool(Prefs::SORT_REVERSED) ? Qt::AscendingOrder : Qt::DescendingOrder );
