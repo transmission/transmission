@@ -124,7 +124,7 @@ MyApp :: MyApp( int& argc, char ** argv ):
             case 'u': username = optarg; break;
             case 'w': password = optarg; break;
             case 'm': minimized = true; break;
-            case 'v':        Utils::toStderr( QObject::tr( "transmission %1" ).arg( LONG_VERSION_STRING ) ); exit( 0 ); break;
+            case 'v':        Utils::toStderr( QObject::tr( "transmission %1" ).arg( LONG_VERSION_STRING ) ); ::exit( 0 ); break;
             case TR_OPT_ERR: Utils::toStderr( QObject::tr( "Invalid option" ) ); showUsage( ); break;
             default:         filenames.append( optarg ); break;
         }
