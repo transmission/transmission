@@ -11,14 +11,13 @@ CONFIG += qt qdbus thread debug link_pkgconfig
 QT += network
 PKGCONFIG = fontconfig libcurl openssl
 
-LIBS += -levent -lrt
-
 TRANSMISSION_TOP = ..
 INCLUDEPATH += $${TRANSMISSION_TOP}
 LIBS += $${TRANSMISSION_TOP}/libtransmission/libtransmission.a
 LIBS += $${TRANSMISSION_TOP}/third-party/dht/libdht.a
 LIBS += $${TRANSMISSION_TOP}/third-party/miniupnp/libminiupnp.a
 LIBS += $${TRANSMISSION_TOP}/third-party/libnatpmp/libnatpmp.a
+LIBS += -levent
 
 TRANSLATIONS += transmission_en.ts transmission_ru.ts
 
