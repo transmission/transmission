@@ -23,10 +23,6 @@ AC_PROG_LIBTOOL
 
 if test m4_substr(peer_id_prefix,6,1) = "0"; then
   supported_build=yes
-  if test "x$GCC" = "xyes" ; then
-    CFLAGS="$CFLAGS -g -O3 "
-    CXXFLAGS="$CXXFLAGS -g -O3 "
-  fi
   CPPFLAGS="$CPPFLAGS -DNDEBUG"
 else
   supported_build=no
