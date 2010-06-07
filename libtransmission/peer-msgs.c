@@ -2348,6 +2348,8 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
     if( tr_peerIoSupportsLTEP( peer->io ) )
         sendLtepHandshake( m );
 
+    tellPeerWhatWeHave( m );
+
     if( tr_dhtEnabled( torrent->session ) && tr_peerIoSupportsDHT( peer->io ))
     {
         /* Only send PORT over IPv6 when the IPv6 DHT is running (BEP-32). */
@@ -2356,8 +2358,6 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
             protocolSendPort( m, tr_dhtPort( torrent->session ) );
         }
     }
-
-    tellPeerWhatWeHave( m );
 
     tr_peerIoSetIOFuncs( m->peer->io, canRead, didWrite, gotError, m );
     updateDesiredRequestCount( m, tr_date( ) );
