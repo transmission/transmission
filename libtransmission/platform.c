@@ -339,11 +339,11 @@ moveFiles( const char * oldDir,
             struct dirent * dirp;
             while( ( dirp = readdir( dirh ) ) )
             {
-                if( strcmp( dirp->d_name,
-                            "." ) && strcmp( dirp->d_name, ".." ) )
+                const char * name = dirp->d_name;
+                if( name && strcmp( name, "." ) && strcmp( name, ".." ) )
                 {
-                    char * o = tr_buildPath( oldDir, dirp->d_name, NULL );
-                    char * n = tr_buildPath( newDir, dirp->d_name, NULL );
+                    char * o = tr_buildPath( oldDir, name, NULL );
+                    char * n = tr_buildPath( newDir, name, NULL );
                     rename( o, n );
                     ++count;
                     tr_free( n );

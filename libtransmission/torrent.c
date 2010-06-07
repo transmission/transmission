@@ -2376,7 +2376,7 @@ walkLocalData( const tr_torrent * tor,
             struct dirent *d;
             tr_ptrArrayInsertSorted( folders, tr_strdup( buf ), vstrcmp );
             for( d = readdir( odir ); d != NULL; d = readdir( odir ) )
-                if( d->d_name && d->d_name[0] != '.' ) /* skip dotfiles */
+                if( d->d_name && strcmp( d->d_name, "." ) && strcmp( d->d_name, ".." ) )
                     walkLocalData( tor, root, buf, d->d_name, torrentFiles, folders, dirtyFolders );
             closedir( odir );
         }

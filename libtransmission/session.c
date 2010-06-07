@@ -1720,8 +1720,7 @@ tr_sessionLoadTorrents( tr_session * session,
         struct dirent *d;
         for( d = readdir( odir ); d != NULL; d = readdir( odir ) )
         {
-            if( d->d_name && d->d_name[0] != '.' ) /* skip dotfiles, ., and ..
-                                                     */
+            if( tr_str_has_suffix( d->d_name, ".torrent" ) )
             {
                 tr_torrent * tor;
                 char * path = tr_buildPath( dirname, d->d_name, NULL );
@@ -2103,7 +2102,7 @@ metainfoLookupInit( tr_session * session )
         struct dirent *d;
         while(( d = readdir( odir )))
         {
-            if( d->d_name && d->d_name[0] != '.' )
+            if( tr_str_has_suffix( d->d_name, ".torrent" ) )
             {
                 tr_info inf;
                 char * path = tr_buildPath( dirname, d->d_name, NULL );

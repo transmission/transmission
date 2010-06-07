@@ -773,6 +773,25 @@ tr_strstrip( char * str )
     return str;
 }
 
+tr_bool
+tr_str_has_suffix( const char *str, const char *suffix )
+{
+    size_t str_len;
+    size_t suffix_len;
+
+    if( !str )
+        return FALSE;
+    if( !suffix )
+        return TRUE;
+
+    str_len = strlen( str );
+    suffix_len = strlen( suffix );
+    if( str_len < suffix_len )
+        return FALSE;
+
+    return !strncasecmp( str + str_len - suffix_len, suffix, suffix_len );
+}
+
 /****
 *****
 ****/
