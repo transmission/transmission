@@ -824,6 +824,13 @@ Session :: updateInfo( tr_benc * d )
         }
     }
 
+    tr_bool b;
+    double x;
+    if( tr_bencDictFindBool( d, "seedRatioLimited", &b ) )
+        myPrefs.set( Prefs::RATIO_ENABLED, b ? true : false );
+    if( tr_bencDictFindReal( d, "seedRatioLimit", &x ) )
+        myPrefs.set( Prefs::RATIO, x );
+
     /* Use the C API to get settings that, for security reasons, aren't supported by RPC */
     if( mySession != 0 )
     {
