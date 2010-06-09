@@ -1,7 +1,7 @@
-/* $Id: upnpcommands.h,v 1.17 2009/04/17 21:21:19 nanard Exp $ */
+/* $Id: upnpcommands.h,v 1.18 2010/06/09 10:59:09 nanard Exp $ */
 /* Miniupnp project : http://miniupnp.free.fr/
  * Author : Thomas Bernard
- * Copyright (c) 2005-2008 Thomas Bernard
+ * Copyright (c) 2005-2010 Thomas Bernard
  * This software is subject to the conditions detailed in the
  * LICENCE file provided within this distribution */
 #ifndef __UPNPCOMMANDS_H__
@@ -14,6 +14,7 @@
 #define UPNPCOMMAND_SUCCESS (0)
 #define UPNPCOMMAND_UNKNOWN_ERROR (-1)
 #define UPNPCOMMAND_INVALID_ARGS (-2)
+#define UPNPCOMMAND_HTTP_ERROR (-3)
 
 #ifdef __cplusplus
 extern "C" {
