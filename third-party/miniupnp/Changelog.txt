@@ -1,5 +1,15 @@
-$Id: Changelog.txt,v 1.113 2010/04/12 20:39:40 nanard Exp $
+$Id: Changelog.txt,v 1.117 2010/06/09 10:59:08 nanard Exp $
 miniUPnP client Changelog.
+
+2010/06/09:
+  update to python module to match modification made on 2010/04/05
+  update to Java test code to match modification made on 2010/04/05
+  all UPNP_* function now return an error if the SOAP request failed
+  at HTTP level.
+
+2010/04/17:
+  Using GetBestRoute() under win32 in order to find the
+  right interface to use.
 
 2010/04/12:
   Retrying with HTTP/1.1 if HTTP/1.0 failed. see
