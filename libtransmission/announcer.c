@@ -1229,6 +1229,13 @@ parseAnnounceResponse( tr_tier     * tier,
     int scrapeFields = 0;
     const int bencLoaded = !tr_bencLoad( response, responseLen, &benc, NULL );
 
+    if( getenv( "TR_CURL_VERBOSE" ) != NULL )
+    {
+        char * str = tr_bencToStr( &benc, TR_FMT_JSON, NULL );
+        fprintf( stderr, "Announce response:\n< %s\n", str );
+        tr_free( str );
+    }
+
     dbgmsg( tier, "response len: %d, isBenc: %d", (int)responseLen, (int)bencLoaded );
     publishErrorClear( tier );
     if( bencLoaded && tr_bencIsDict( &benc ) )
