@@ -207,7 +207,7 @@ watchdir_update_impl( dtr_watchdir * w )
 
             if( !name || *name=='.' ) /* skip dotfiles */
                 continue;
-            if( !str_has_suffix( name, ".torrent" ) ) /* skip non-torrents */
+            if( !tr_str_has_suffix( name, ".torrent" ) ) /* skip non-torrents */
                 continue;
 
             len = strlen( name );
