@@ -695,6 +695,10 @@
 		A27476FF0CC38EE6003CC76D /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = macosx/es.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A27477010CC38EE6003CC76D /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = macosx/es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A277DA090C693D9C00DA2CD4 /* ActionOn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionOn.png; path = macosx/Images/ActionOn.png; sourceTree = "<group>"; };
+		A279E3D011C3BDC300D48B1F /* nl */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nl; path = macosx/nl.lproj/AddMagnetWindow.xib; sourceTree = "<group>"; };
+		A279E3D111C3BDC300D48B1F /* nl */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nl; path = macosx/nl.lproj/InfoActivityView.xib; sourceTree = "<group>"; };
+		A279E3D211C3BDC300D48B1F /* nl */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nl; path = macosx/nl.lproj/InfoGeneralView.xib; sourceTree = "<group>"; };
+		A279E3D311C3BDC300D48B1F /* nl */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nl; path = macosx/nl.lproj/InfoOptionsView.xib; sourceTree = "<group>"; };
 		A27F0F310E19AD9800B2DB97 /* TorrentGroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TorrentGroup.h; path = macosx/TorrentGroup.h; sourceTree = "<group>"; };
 		A27F0F320E19AD9800B2DB97 /* TorrentGroup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TorrentGroup.m; path = macosx/TorrentGroup.m; sourceTree = "<group>"; };
 		A28393F910D54A35005C0240 /* de */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = de; path = macosx/de.lproj/AddWindow.xib; sourceTree = "<group>"; };
@@ -2295,6 +2299,7 @@
 				A2613F8D11B3359100472893 /* pt */,
 				A2613F9511B3383200472893 /* pt_PT */,
 				A2B9F90411BD10BE003FC8CA /* fr */,
+				A279E3D111C3BDC300D48B1F /* nl */,
 			);
 			name = InfoActivityView.xib;
 			sourceTree = "<group>";
@@ -2310,6 +2315,7 @@
 				A2613F8E11B3359100472893 /* pt */,
 				A2613F9611B3383200472893 /* pt_PT */,
 				A2B9F90511BD10BE003FC8CA /* fr */,
+				A279E3D211C3BDC300D48B1F /* nl */,
 			);
 			name = InfoGeneralView.xib;
 			sourceTree = "<group>";
@@ -2325,6 +2331,7 @@
 				A2613F8F11B3359100472893 /* pt */,
 				A2613F9711B3383200472893 /* pt_PT */,
 				A2B9F90611BD10BE003FC8CA /* fr */,
+				A279E3D311C3BDC300D48B1F /* nl */,
 			);
 			name = InfoOptionsView.xib;
 			sourceTree = "<group>";
@@ -2358,6 +2365,7 @@
 				A2613F8C11B3359100472893 /* pt */,
 				A2613F9111B3383200472893 /* pt_PT */,
 				A2B9F90311BD10BE003FC8CA /* fr */,
+				A279E3D011C3BDC300D48B1F /* nl */,
 			);
 			name = AddMagnetWindow.xib;
 			sourceTree = "<group>";

@@ -2,16 +2,17 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">10C540</string>
-		<string key="IBDocument.InterfaceBuilderVersion">740</string>
-		<string key="IBDocument.AppKitVersion">1038.25</string>
-		<string key="IBDocument.HIToolboxVersion">458.00</string>
+		<string key="IBDocument.SystemVersion">10D573</string>
+		<string key="IBDocument.InterfaceBuilderVersion">762</string>
+		<string key="IBDocument.AppKitVersion">1038.29</string>
+		<string key="IBDocument.HIToolboxVersion">460.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">740</string>
+			<string key="NS.object.0">762</string>
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
+			<integer value="6"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -50,7 +51,7 @@
 				<string key="NSWindowContentMaxSize">{1.79769e+308, 1.79769e+308}</string>
 				<string key="NSWindowContentMinSize">{440, 350}</string>
 				<object class="NSView" key="NSWindowView" id="755547124">
-					<nil key="NSNextResponder"/>
+					<reference key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
 					<object class="NSMutableArray" key="NSSubviews">
 						<bool key="EncodedWithXMLCoder">YES</bool>
@@ -165,7 +166,6 @@
 													<string>Apple PNG pasteboard type</string>
 													<string>Apple URL pasteboard type</string>
 													<string>CorePasteboardFlavorType 0x6D6F6F76</string>
-													<string>CorePasteboardFlavorType 0x75726C20</string>
 													<string>NSColor pasteboard type</string>
 													<string>NSFilenamesPboardType</string>
 													<string>NSStringPboardType</string>
@@ -201,7 +201,7 @@
 												<int key="NSTCFlags">1</int>
 											</object>
 											<object class="NSTextViewSharedData" key="NSSharedData">
-												<int key="NSFlags">11239</int>
+												<int key="NSFlags">3971</int>
 												<int key="NSTextCheckingTypes">0</int>
 												<nil key="NSMarkedAttributes"/>
 												<object class="NSColor" key="NSBackgroundColor" id="885755327">
@@ -464,7 +464,7 @@
 								<reference key="NSControlView" ref="22400418"/>
 								<int key="NSButtonFlags">1211912703</int>
 								<int key="NSButtonFlags2">2</int>
-								<object class="NSCustomResource" key="NSNormalImage" id="333601210">
+								<object class="NSCustomResource" key="NSNormalImage" id="262462894">
 									<string key="NSClassName">NSImage</string>
 									<string key="NSResourceName">NSSwitch</string>
 								</object>
@@ -549,7 +549,7 @@
 								<reference key="NSControlView" ref="631380462"/>
 								<int key="NSButtonFlags">1211912703</int>
 								<int key="NSButtonFlags2">2</int>
-								<reference key="NSNormalImage" ref="333601210"/>
+								<reference key="NSNormalImage" ref="262462894"/>
 								<reference key="NSAlternateImage" ref="610539586"/>
 								<string key="NSAlternateContents"/>
 								<string key="NSKeyEquivalent"/>
@@ -741,6 +741,7 @@
 						</object>
 					</object>
 					<string key="NSFrameSize">{488, 392}</string>
+					<reference key="NSSuperview"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1680, 1028}}</string>
 				<string key="NSMinSize">{440, 372}</string>
@@ -1539,9 +1540,9 @@
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>{{139, 364}, {488, 392}}</string>
+					<string>{{139, 499}, {488, 392}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{139, 364}, {488, 392}}</string>
+					<string>{{139, 499}, {488, 392}}</string>
 					<integer value="1"/>
 					<integer value="1"/>
 					<string>{{432, 603}, {480, 313}}</string>
@@ -1625,11 +1626,15 @@
 							<string>addRemoveTracker:</string>
 							<string>cancelCreateProgress:</string>
 							<string>cancelCreateWindow:</string>
+							<string>copy:</string>
 							<string>create:</string>
+							<string>paste:</string>
 							<string>setLocation:</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -2336,6 +2341,7 @@
 			</object>
 		</object>
 		<int key="IBDocument.localizationMode">0</int>
+		<string key="IBDocument.TargetRuntimeIdentifier">IBCocoaFramework</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencies">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.macosx</string>
 			<integer value="1050" key="NS.object.0"/>
@@ -2351,5 +2357,24 @@
 		<bool key="IBDocument.PluginDeclaredDependenciesTrackSystemTargetVersion">YES</bool>
 		<string key="IBDocument.LastKnownRelativeProjectPath">../../Transmission.xcodeproj</string>
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
+		<object class="NSMutableDictionary" key="IBDocument.LastKnownImageSizes">
+			<bool key="EncodedWithXMLCoder">YES</bool>
+			<object class="NSArray" key="dict.sortedKeys">
+				<bool key="EncodedWithXMLCoder">YES</bool>
+				<string>NSAddTemplate</string>
+				<string>NSApplicationIcon</string>
+				<string>NSRemoveTemplate</string>
+				<string>NSSwitch</string>
+				<string>TransmissionDocument.icns</string>
+			</object>
+			<object class="NSMutableArray" key="dict.values">
+				<bool key="EncodedWithXMLCoder">YES</bool>
+				<string>{8, 8}</string>
+				<string>{128, 128}</string>
+				<string>{8, 8}</string>
+				<string>{15, 15}</string>
+				<string>{128, 128}</string>
+			</object>
+		</object>
 	</data>
 </archive>
