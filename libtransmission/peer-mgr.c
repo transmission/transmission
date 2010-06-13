@@ -3285,10 +3285,12 @@ compareSeedProbabilities( int a, int b )
        2. prefer leechers to unknown
        3. prefer unknown to seeds (FIXME: this is a simplistic test) */
     if( a == 100 ) a = 101;
+    else if( a == -1 ) a = 100;
+
     if( b == 100 ) b = 101;
-    if( a == -1 ) a = 100;
-    if( b == -1 ) b = 100;
-    return a - b;
+    else if( b == -1 ) b = 100;
+
+    return a > b ? 1 : -1;
 }
 
 static tr_bool
