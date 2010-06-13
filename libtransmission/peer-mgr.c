@@ -3271,11 +3271,16 @@ isPeerCandidate( const tr_torrent * tor, const struct peer_atom * atom, const ti
 
 struct peer_candidate
 {
+    int from;
     int salt;
+    int priority;
+    int seedProbability;
+    int wasRecentlyStarted;
+    time_t lastConnectionAt;
+    time_t lastConnectionAttemptAt;
     tr_torrent * tor;
     struct peer_atom * atom;
-    tr_priority_t priority;
-    tr_bool wasRecentlyStarted;
+    
 };
 
 static int
@@ -3309,14 +3314,14 @@ comparePeerCandidates( const void * va, const void * vb )
     const struct peer_candidate * b = vb;
 
     /* prefer peers we've connected to, or never tried, over peers we failed to connect to. */
-    af = a->atom->lastConnectionAt < a->atom->lastConnectionAttemptAt;
-    bf = b->atom->lastConnectionAt < b->atom->lastConnectionAttemptAt;
+    af = a->lastConnectionAt < a->lastConnectionAttemptAt;
+    bf = b->lastConnectionAt < b->lastConnectionAttemptAt;
     if( af != bf )
         return af ? 1 : -1;
 
     /* prefer the one we attempted least recently (to cycle through all peers) */
-    if( a->atom->lastConnectionAttemptAt != b->atom->lastConnectionAttemptAt )
-        return a->atom->lastConnectionAttemptAt < b->atom->lastConnectionAttemptAt ? -1 : 1;
+    if( a->lastConnectionAttemptAt != b->lastConnectionAttemptAt )
+        return a->lastConnectionAttemptAt < b->lastConnectionAttemptAt ? -1 : 1;
 
     /* prefer peers belonging to a torrent of a higher priority */
     if( a->priority != b->priority )
@@ -3327,12 +3332,12 @@ comparePeerCandidates( const void * va, const void * vb )
         return a->wasRecentlyStarted ? -1 : 1;
 
     /* prefer peers that we might have a chance of uploading to */
-    if(( i = compareSeedProbabilities( a->atom->seedProbability, b->atom->seedProbability )))
+    if(( i = compareSeedProbabilities( a->seedProbability, b->seedProbability )))
         return i;
 
     /* prefer peers that we got from more trusted sources */
-    if( a->atom->from != b->atom->from )
-        return a->atom->from < b->atom->from ? -1 : 1;
+    if( a->from != b->from )
+        return a->from < b->from ? -1 : 1;
 
     /* salt */
     return a->salt - b->salt;
@@ -3395,9 +3400,13 @@ getPeerCandidates( tr_session * session, int * candidateCount )
             {
                 walk->tor = tor;
                 walk->atom = atom;
+                walk->from = atom->from;
                 walk->salt = tr_cryptoWeakRandInt( 4096 );
                 walk->priority = tr_torrentGetPriority( tor );
+                walk->seedProbability = atom->seedProbability;
                 walk->wasRecentlyStarted = torrentWasRecentlyStarted( tor );
+                walk->lastConnectionAt = atom->lastConnectionAt;
+                walk->lastConnectionAttemptAt = atom->lastConnectionAttemptAt;
                 ++walk;
             }
         }
