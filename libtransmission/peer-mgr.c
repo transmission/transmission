@@ -3274,6 +3274,8 @@ struct peer_candidate
     int salt;
     tr_torrent * tor;
     struct peer_atom * atom;
+    tr_priority_t priority;
+    tr_bool wasRecentlyStarted;
 };
 
 static int
@@ -3299,7 +3301,7 @@ torrentWasRecentlyStarted( const tr_torrent * tor )
 static int
 comparePeerCandidates( const void * va, const void * vb )
 {
-    int i, ai, bi;
+    int i;
     tr_bool af, bf;
     const struct peer_candidate * a = va;
     const struct peer_candidate * b = vb;
@@ -3315,16 +3317,12 @@ comparePeerCandidates( const void * va, const void * vb )
         return a->atom->lastConnectionAttemptAt < b->atom->lastConnectionAttemptAt ? -1 : 1;
 
     /* prefer peers belonging to a torrent of a higher priority */
-    ai = tr_torrentGetPriority( a->tor );
-    bi = tr_torrentGetPriority( b->tor );
-    if( ai != bi )
-        return ai > bi ? -1 : 1;
+    if( a->priority != b->priority )
+        return a->priority > b->priority ? -1 : 1;
 
     /* prefer recently-started torrents */
-    af = torrentWasRecentlyStarted( a->tor );
-    bf = torrentWasRecentlyStarted( a->tor );
-    if( af != bf )
-        return af ? -1 : 1;
+    if( a->wasRecentlyStarted != b->wasRecentlyStarted )
+        return a->wasRecentlyStarted ? -1 : 1;
 
     /* prefer peers that we might have a chance of uploading to */
     if(( i = compareSeedProbabilities( a->atom->seedProbability, b->atom->seedProbability )))
@@ -3396,6 +3394,8 @@ getPeerCandidates( tr_session * session, int * candidateCount )
                 walk->tor = tor;
                 walk->atom = atom;
                 walk->salt = tr_cryptoWeakRandInt( 4096 );
+                walk->priority = tr_torrentGetPriority( tor );
+                walk->wasRecentlyStarted = torrentWasRecentlyStarted( tor );
                 ++walk;
             }
         }
