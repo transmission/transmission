@@ -7,894 +7,973 @@ msgid ""
 msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2010-02-10 20:02-0600\n"
-"PO-Revision-Date: 2010-02-20 21:29+0000\n"
-"Last-Translator: Jonhard Sørensen <Unknown>\n"
+"POT-Creation-Date: 2010-05-20 11:39-0500\n"
+"PO-Revision-Date: 2010-05-14 14:34+0000\n"
+"Last-Translator: Gunleif Joensen <Unknown>\n"
 "Language-Team: Faroese <fo@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2010-02-22 01:53+0000\n"
+"X-Launchpad-Export-Date: 2010-06-13 18:01+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
-#: ../gtk/actions.c:54
+#: ../gtk/actions.c:55
 msgid "Sort by _Activity"
 msgstr "Flokka eftir _Virksemi"
 
-#: ../gtk/actions.c:55
+#: ../gtk/actions.c:56
 msgid "Sort by _Name"
 msgstr "Flokka eftir _Navni"
 
-#: ../gtk/actions.c:56
+#: ../gtk/actions.c:57
 msgid "Sort by _Progress"
 msgstr "Flokka eftir _Framgongd"
 
-#: ../gtk/actions.c:57
+#: ../gtk/actions.c:58
 msgid "Sort by Rati_o"
 msgstr "Flokka eftir Lutf_all"
 
-#: ../gtk/actions.c:58
+#: ../gtk/actions.c:59
 msgid "Sort by Stat_e"
 msgstr "Flokka eftir Støð_u"
 
-#: ../gtk/actions.c:59
-msgid "Sort by T_racker"
-msgstr ""
-
 #: ../gtk/actions.c:60
+msgid "Sort by T_racker"
+msgstr "Flokka eftir Leita_ra"
+
+#: ../gtk/actions.c:61
 msgid "Sort by A_ge"
 msgstr "Flokka eftir A_ldri"
 
-#: ../gtk/actions.c:61
+#: ../gtk/actions.c:62
 msgid "Sort by Time _Left"
 msgstr "Flokka eftir Tíð _Eftir"
 
-#: ../gtk/actions.c:62
+#: ../gtk/actions.c:63
 msgid "Sort by Si_ze"
 msgstr "Flokka eftir Stø_dd"
 
-#: ../gtk/actions.c:79
+#: ../gtk/actions.c:80
 msgid "_Show Transmission"
 msgstr "_Vís Transmission"
 
-#: ../gtk/actions.c:80
+#: ../gtk/actions.c:81
 msgid "Message _Log"
-msgstr ""
+msgstr "Boð _gerðalisti"
 
-#: ../gtk/actions.c:95
+#: ../gtk/actions.c:96
 msgid "Enable Temporary Speed _Limits"
 msgstr "Gilda Fyribils Ferð _Mark"
 
-#: ../gtk/actions.c:96
-msgid "_Minimal View"
-msgstr "_Minstasýni"
-
 #: ../gtk/actions.c:97
-msgid "Re_verse Sort Order"
+msgid "_Compact View"
 msgstr ""
 
 #: ../gtk/actions.c:98
-msgid "_Filterbar"
-msgstr ""
+msgid "Re_verse Sort Order"
+msgstr "_Vend Flokkingar Skipan"
 
 #: ../gtk/actions.c:99
-msgid "_Statusbar"
-msgstr ""
+msgid "_Filterbar"
+msgstr "_Filturbummur"
 
 #: ../gtk/actions.c:100
-msgid "_Toolbar"
-msgstr ""
+msgid "_Statusbar"
+msgstr "_Støðubummur"
 
-#: ../gtk/actions.c:105
+#: ../gtk/actions.c:101
+msgid "_Toolbar"
+msgstr "Tólbummur"
+
+#: ../gtk/actions.c:106
 msgid "_File"
 msgstr "_Fíla"
 
-#: ../gtk/actions.c:106
-msgid "_Torrent"
-msgstr ""
-
 #: ../gtk/actions.c:107
+msgid "_Torrent"
+msgstr "_Torrent"
+
+#: ../gtk/actions.c:108
 msgid "_View"
 msgstr "_Sýn"
 
-#: ../gtk/actions.c:108
-msgid "_Sort Torrents By"
-msgstr ""
-
 #: ../gtk/actions.c:109
+msgid "_Sort Torrents By"
+msgstr "_Flokka torrentar eftir"
+
+#: ../gtk/actions.c:110
 msgid "_Edit"
 msgstr "_Rætta"
 
-#: ../gtk/actions.c:110
+#: ../gtk/actions.c:111
 msgid "_Help"
 msgstr "_Hjálp"
 
-#: ../gtk/actions.c:111
+#: ../gtk/actions.c:112
 msgid "Copy _Magnet Link to Clipboard"
-msgstr ""
+msgstr "Avrita _Magnet Leinkju á setiborðið"
 
-#: ../gtk/actions.c:112
+#: ../gtk/actions.c:113
 msgid "Add _URL..."
-msgstr ""
+msgstr "Legg til _URL..."
 
-#: ../gtk/actions.c:112
+#: ../gtk/actions.c:113
 msgid "Add URL..."
-msgstr ""
+msgstr "Legg til URL..."
 
-#: ../gtk/actions.c:113 ../gtk/actions.c:114
+#: ../gtk/actions.c:114 ../gtk/actions.c:115
 msgid "Add a torrent"
 msgstr "Legg afturat ein torrent"
 
-#: ../gtk/actions.c:114
+#: ../gtk/actions.c:115
 msgid "_Add File..."
 msgstr "_Legg afturat Fílu"
 
-#: ../gtk/actions.c:115
+#: ../gtk/actions.c:116
 msgid "_Start"
 msgstr "_Byrja"
 
-#: ../gtk/actions.c:115
+#: ../gtk/actions.c:116
 msgid "Start torrent"
 msgstr "Byrja torrent"
 
-#: ../gtk/actions.c:116
-msgid "_Statistics"
-msgstr ""
-
 #: ../gtk/actions.c:117
-msgid "_Donate"
-msgstr ""
+msgid "_Statistics"
+msgstr "_Hagtøl"
 
 #: ../gtk/actions.c:118
+msgid "_Donate"
+msgstr "_Gev"
+
+#: ../gtk/actions.c:119
 msgid "_Verify Local Data"
-msgstr ""
+msgstr "_Vátta Staðbundna Dáta"
 
-#: ../gtk/actions.c:119
+#: ../gtk/actions.c:120
 msgid "_Pause"
-msgstr ""
+msgstr "_Pausa"
 
-#: ../gtk/actions.c:119
+#: ../gtk/actions.c:120
 msgid "Pause torrent"
-msgstr ""
+msgstr "Pausa torrent"
 
-#: ../gtk/actions.c:120
+#: ../gtk/actions.c:121
 msgid "_Pause All"
-msgstr ""
+msgstr "_Pausa Alt"
 
-#: ../gtk/actions.c:120
+#: ../gtk/actions.c:121
 msgid "Pause all torrents"
-msgstr ""
-
-#: ../gtk/actions.c:121
-msgid "_Start All"
-msgstr ""
-
-#: ../gtk/actions.c:121
-msgid "Start all torrents"
-msgstr ""
+msgstr "Pausa allar torrentar"
 
 #: ../gtk/actions.c:122
-msgid "Set _Location"
-msgstr ""
+msgid "_Start All"
+msgstr "_Starta Øll"
+
+#: ../gtk/actions.c:122
+msgid "Start all torrents"
+msgstr "Starta allar torrentar"
 
 #: ../gtk/actions.c:123
-msgid "Remove torrent"
-msgstr ""
+msgid "Set _Location"
+msgstr "Set _Pláss"
 
 #: ../gtk/actions.c:124
+msgid "Remove torrent"
+msgstr "Tak burtur torrent"
+
+#: ../gtk/actions.c:125
 msgid "_Delete Files and Remove"
-msgstr ""
-
-#: ../gtk/actions.c:125
-msgid "_New..."
-msgstr ""
-
-#: ../gtk/actions.c:125
-msgid "Create a torrent"
-msgstr ""
+msgstr "_Strika fílur og tak burtur"
 
 #: ../gtk/actions.c:126
-msgid "_Quit"
-msgstr ""
+msgid "_New..."
+msgstr "_Nýggj..."
+
+#: ../gtk/actions.c:126
+msgid "Create a torrent"
+msgstr "Stovna ein torrent"
 
 #: ../gtk/actions.c:127
-msgid "Select _All"
-msgstr ""
+msgid "_Quit"
+msgstr "_Gevst"
 
 #: ../gtk/actions.c:128
-msgid "Dese_lect All"
-msgstr ""
+msgid "Select _All"
+msgstr "Vel _Allar"
 
-#: ../gtk/actions.c:130
-msgid "Torrent properties"
-msgstr ""
+#: ../gtk/actions.c:129
+msgid "Dese_lect All"
+msgstr "Fráve_lj Allar"
 
 #: ../gtk/actions.c:131
-msgid "_Open Folder"
-msgstr ""
+msgid "Torrent properties"
+msgstr "Torrent eginleikar"
 
-#: ../gtk/actions.c:133
-msgid "_Contents"
-msgstr ""
+#: ../gtk/actions.c:132
+msgid "_Open Folder"
+msgstr "_Lat upp skjáttu"
 
 #: ../gtk/actions.c:134
+msgid "_Contents"
+msgstr "_Innihald"
+
+#: ../gtk/actions.c:135
 msgid "Ask Tracker for _More Peers"
-msgstr ""
+msgstr "Spyr leitaran um _fleiri javnlíkar"
 
-#: ../gtk/add-dialog.c:247
+#: ../gtk/add-dialog.c:240
 msgid "Torrent files"
-msgstr ""
+msgstr "Torrent fílur"
 
-#: ../gtk/add-dialog.c:252
+#: ../gtk/add-dialog.c:245
 msgid "All files"
-msgstr ""
+msgstr "Allar fílur"
 
 #. make the dialog
-#: ../gtk/add-dialog.c:278
+#: ../gtk/add-dialog.c:272
 msgid "Torrent Options"
-msgstr ""
+msgstr "Torrent kostir"
 
-#: ../gtk/add-dialog.c:301 ../gtk/tr-prefs.c:296
+#: ../gtk/add-dialog.c:295 ../gtk/tr-prefs.c:302
 msgid "Mo_ve .torrent file to the trash"
-msgstr ""
+msgstr "_Flyt .torrentfílu í ruskspannina"
 
-#: ../gtk/add-dialog.c:303 ../gtk/tr-prefs.c:292
+#: ../gtk/add-dialog.c:297 ../gtk/tr-prefs.c:298
 msgid "_Start when added"
-msgstr ""
+msgstr "Byrja tá lagt verður til"
 
-#: ../gtk/add-dialog.c:318
+#: ../gtk/add-dialog.c:312
 msgid "_Torrent file:"
-msgstr ""
+msgstr "_Torrent fíla:"
 
-#: ../gtk/add-dialog.c:322
+#: ../gtk/add-dialog.c:316
 msgid "Select Source File"
-msgstr ""
+msgstr "Vel keldufílu"
 
-#: ../gtk/add-dialog.c:333
+#: ../gtk/add-dialog.c:327
 msgid "_Destination folder:"
-msgstr ""
+msgstr "_Málskjátta:"
 
-#: ../gtk/add-dialog.c:337
+#: ../gtk/add-dialog.c:331
 msgid "Select Destination Folder"
-msgstr ""
+msgstr "Vel málskjátu"
 
-#: ../gtk/add-dialog.c:359 ../gtk/details.c:477
+#: ../gtk/add-dialog.c:353 ../gtk/details.c:478
 msgid "Torrent _priority:"
-msgstr ""
+msgstr "Torrent _raðfesti"
 
-#: ../gtk/add-dialog.c:441
+#: ../gtk/add-dialog.c:437
 msgid "Add a Torrent"
-msgstr ""
+msgstr "Legg ein torrent til"
 
-#: ../gtk/add-dialog.c:458 ../gtk/tr-prefs.c:288
+#: ../gtk/add-dialog.c:454 ../gtk/tr-prefs.c:294
 msgid "Show _options dialog"
-msgstr ""
+msgstr "Vís _innstillingasamrøðu"
 
-#: ../gtk/add-dialog.c:514
+#: ../gtk/add-dialog.c:532
 msgid "Add URL"
-msgstr ""
+msgstr "Legg il URL"
 
-#: ../gtk/add-dialog.c:527
+#: ../gtk/add-dialog.c:545
 msgid "Add torrent from URL"
-msgstr ""
+msgstr "Legg torrent til frá URL"
 
-#: ../gtk/add-dialog.c:530
+#: ../gtk/add-dialog.c:549
 msgid "_URL"
-msgstr ""
+msgstr "_URL"
 
-#: ../gtk/conf.c:62 ../libtransmission/fdlimit.c:358
-#: ../libtransmission/metainfo.c:99 ../libtransmission/utils.c:608
-#: ../libtransmission/utils.c:619
+#: ../gtk/conf.c:62 ../libtransmission/fdlimit.c:341
+#: ../libtransmission/metainfo.c:115 ../libtransmission/utils.c:604
+#: ../libtransmission/utils.c:615
 #, c-format
 msgid "Couldn't create \"%1$s\": %2$s"
-msgstr ""
+msgstr "Kundi ikki stovana \"%1$s\": %2$s"
 
-#: ../gtk/conf.c:87 ../libtransmission/fdlimit.c:386
+#: ../gtk/conf.c:87 ../libtransmission/fdlimit.c:369
 #, c-format
 msgid "Couldn't open \"%1$s\": %2$s"
-msgstr ""
+msgstr "Kundi ikki lata upp \"%1$s\": %2$s"
 
 #: ../gtk/conf.c:92
 #, c-format
 msgid "%s is already running."
-msgstr ""
+msgstr "%s koyrir longu"
 
-#: ../gtk/conf.c:450 ../gtk/conf.c:455
+#: ../gtk/conf.c:447 ../gtk/conf.c:452
 #, c-format
 msgid "Importing \"%s\""
-msgstr ""
+msgstr "Flyti inn \"%s\""
 
-#: ../gtk/details.c:446 ../gtk/tr-prefs.c:1417
+#: ../gtk/details.c:447 ../gtk/tr-prefs.c:1436
 msgid "Speed"
-msgstr ""
+msgstr "Ferð"
 
-#: ../gtk/details.c:448
+#: ../gtk/details.c:449
 msgid "Honor global _limits"
 msgstr ""
 
-#: ../gtk/details.c:453 ../gtk/tr-prefs.c:1201
-msgid "Limit _download speed (KB/s):"
+#: ../gtk/details.c:454 ../gtk/tr-prefs.c:1220
+msgid "Limit _download speed (KiB/s):"
 msgstr ""
 
-#: ../gtk/details.c:465 ../gtk/tr-prefs.c:1208
-msgid "Limit _upload speed (KB/s):"
+#: ../gtk/details.c:466 ../gtk/tr-prefs.c:1227
+msgid "Limit _upload speed (KiB/s):"
 msgstr ""
 
-#: ../gtk/details.c:481
+#: ../gtk/details.c:482
 msgid "Seed-Until Ratio"
-msgstr ""
+msgstr "Fræa intil hettað lutfall"
 
-#: ../gtk/details.c:483
+#: ../gtk/details.c:484
 msgid "Use _global settings"
-msgstr ""
+msgstr "Nýt _heiltøka innstilling"
 
-#: ../gtk/details.c:491
+#: ../gtk/details.c:492
 msgid "Seed _regardless of ratio"
-msgstr ""
+msgstr "Fræa óansæð lutfall"
 
-#: ../gtk/details.c:500 ../gtk/tr-prefs.c:317
+#: ../gtk/details.c:501 ../gtk/tr-prefs.c:330
 msgid "_Seed torrent until its ratio reaches:"
-msgstr ""
+msgstr "Fræa torrent inntil lutfallið nær:"
 
-#: ../gtk/details.c:516
+#: ../gtk/details.c:517
 msgid "Peer Connections"
-msgstr ""
+msgstr "Samlíka-sambindingar"
 
-#: ../gtk/details.c:519
+#: ../gtk/details.c:520
 msgid "_Maximum peers:"
-msgstr ""
+msgstr "_Mesta tal av samlíkum"
 
-#: ../gtk/details.c:538 ../gtk/torrent-cell-renderer.c:185
+#: ../gtk/details.c:540 ../gtk/torrent-cell-renderer.c:212
 msgid "Waiting to verify local data"
 msgstr ""
 
-#: ../gtk/details.c:539
+#: ../gtk/details.c:541
 msgid "Verifying local data"
 msgstr ""
 
-#: ../gtk/details.c:540
+#: ../gtk/details.c:542 ../gtk/filter.c:720
 msgid "Downloading"
-msgstr ""
+msgstr "Taki niður"
 
-#: ../gtk/details.c:541
+#: ../gtk/details.c:543 ../gtk/filter.c:721
 msgid "Seeding"
+msgstr "Fræi"
+
+#: ../gtk/details.c:544 ../gtk/torrent-cell-renderer.c:206
+msgid "Finished"
 msgstr ""
 
-#: ../gtk/details.c:542 ../gtk/torrent-cell-renderer.c:181
+#: ../gtk/details.c:544 ../gtk/filter.c:722 ../gtk/torrent-cell-renderer.c:208
 msgid "Paused"
-msgstr ""
+msgstr "Steðga"
 
-#: ../gtk/details.c:562 ../gtk/util.c:108 ../libtransmission/utils.c:1322
+#: ../gtk/details.c:586 ../gtk/util.c:116 ../libtransmission/utils.c:1355
 msgid "None"
-msgstr ""
+msgstr "Eingin"
 
-#: ../gtk/details.c:563 ../gtk/file-list.c:586
+#: ../gtk/details.c:587 ../gtk/file-list.c:585
 msgid "Mixed"
-msgstr ""
+msgstr "Blandað"
 
-#: ../gtk/details.c:585
+#: ../gtk/details.c:610
 msgid "Private to this tracker -- DHT and PEX disabled"
 msgstr ""
 
-#: ../gtk/details.c:587
+#: ../gtk/details.c:612
 msgid "Public torrent"
-msgstr ""
+msgstr "Almennur torrent"
 
-#: ../gtk/details.c:610
+#: ../gtk/details.c:635
 #, c-format
 msgid "Created by %1$s"
-msgstr ""
+msgstr "Stovnaður av %1$s"
 
-#: ../gtk/details.c:612
+#: ../gtk/details.c:637
 #, c-format
 msgid "Created on %1$s"
-msgstr ""
+msgstr "Stovnaður tann %1$s"
 
-#: ../gtk/details.c:614
+#: ../gtk/details.c:639
 #, c-format
 msgid "Created by %1$s on %2$s"
-msgstr ""
+msgstr "Stovnaður av %1$s tann %2$s"
 
-#: ../gtk/details.c:696
+#: ../gtk/details.c:723
 msgid "Unknown"
-msgstr ""
+msgstr "Ókent"
 
-#: ../gtk/details.c:724
+#: ../gtk/details.c:751
 #, c-format
 msgid "%1$s (%2$'d piece @ %3$s)"
 msgid_plural "%1$s (%2$'d pieces @ %3$s)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s (%2$'d partur @ %3$s)"
+msgstr[1] "%1$s (%2$'d partar @ %3$s)"
 
-#: ../gtk/details.c:730
+#: ../gtk/details.c:757
 #, c-format
 msgid "%1$s (%2$'d piece)"
 msgid_plural "%1$s (%2$'d pieces)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s (%2$'d partur)"
+msgstr[1] "%1$s (%2$'d partar)"
 
-#: ../gtk/details.c:765
+#: ../gtk/details.c:792
 #, c-format
 msgid "%1$s (%2$.1f%%); %3$s Unverified"
-msgstr ""
+msgstr "%1$s (%2$.1f%%); %3$s ikki sannað"
 
-#: ../gtk/details.c:767
+#: ../gtk/details.c:794
 #, c-format
 msgid "%1$s (%2$.1f%%)"
-msgstr ""
+msgstr "%1$s (%2$.1f%%)"
 
-#: ../gtk/details.c:778
+#: ../gtk/details.c:805
 #, c-format
 msgid "%1$.1f%%"
-msgstr ""
+msgstr "%1$.1f%%"
 
-#: ../gtk/details.c:796
+#: ../gtk/details.c:823
 #, c-format
 msgid "%1$s (+%2$s corrupt)"
-msgstr ""
-
-#: ../gtk/details.c:869
-msgid "Active now"
-msgstr ""
-
-#: ../gtk/details.c:873
-#, c-format
-msgid "%1$s ago"
-msgstr ""
-
-#: ../gtk/details.c:892
-msgid "Activity"
-msgstr ""
+msgstr "%1$s (+%2$s spillt)"
 
 #: ../gtk/details.c:896
-msgid "Torrent size:"
-msgstr ""
+msgid "Active now"
+msgstr "Virkin nú"
 
 #: ../gtk/details.c:900
+#, c-format
+msgid "%1$s ago"
+msgstr "%1$s síðani"
+
+#: ../gtk/details.c:919
+msgid "Activity"
+msgstr "Virksemi"
+
+#: ../gtk/details.c:923
+msgid "Torrent size:"
+msgstr "Torrent stødd:"
+
+#: ../gtk/details.c:927
 msgid "Have:"
-msgstr ""
+msgstr "Havi:"
 
-#: ../gtk/details.c:904
+#: ../gtk/details.c:931
 msgid "Availability:"
-msgstr ""
+msgstr "Tøki:"
 
-#: ../gtk/details.c:908 ../gtk/stats.c:168 ../gtk/stats.c:180
+#: ../gtk/details.c:935 ../gtk/stats.c:168 ../gtk/stats.c:180
 msgid "Downloaded:"
-msgstr ""
+msgstr "Niðurtikið:"
 
-#: ../gtk/details.c:912 ../gtk/stats.c:166 ../gtk/stats.c:178
+#: ../gtk/details.c:939 ../gtk/stats.c:166 ../gtk/stats.c:178
 msgid "Uploaded:"
-msgstr ""
+msgstr "Uppsent"
 
-#: ../gtk/details.c:916 ../gtk/stats.c:170 ../gtk/stats.c:182
+#: ../gtk/details.c:943 ../gtk/stats.c:170 ../gtk/stats.c:182
 msgid "Ratio:"
-msgstr ""
+msgstr "Lutfall:"
 
-#: ../gtk/details.c:920
+#: ../gtk/details.c:947
 msgid "State:"
-msgstr ""
+msgstr "Standur:"
 
-#: ../gtk/details.c:924
+#: ../gtk/details.c:951
 msgid "Running time:"
-msgstr ""
+msgstr "Koyritíð:"
 
-#: ../gtk/details.c:928
+#: ../gtk/details.c:955
 msgid "Remaining time:"
-msgstr ""
+msgstr "Eftirverandi tíð:"
 
-#: ../gtk/details.c:932
+#: ../gtk/details.c:959
 msgid "Last activity:"
-msgstr ""
-
-#: ../gtk/details.c:936
-msgid "Error:"
-msgstr ""
-
-#: ../gtk/details.c:940
-msgid "Details"
-msgstr ""
-
-#: ../gtk/details.c:946
-msgid "Location:"
-msgstr ""
-
-#: ../gtk/details.c:953
-msgid "Hash:"
-msgstr ""
-
-#: ../gtk/details.c:958
-msgid "Privacy:"
-msgstr ""
+msgstr "Virkin seinast:"
 
 #: ../gtk/details.c:963
-msgid "Origin:"
-msgstr ""
+msgid "Error:"
+msgstr "Villa:"
+
+#: ../gtk/details.c:967
+msgid "Details"
+msgstr "Nærri greining"
+
+#: ../gtk/details.c:973
+msgid "Location:"
+msgstr "Stað:"
 
 #: ../gtk/details.c:980
+msgid "Hash:"
+msgstr "Brongl:"
+
+#: ../gtk/details.c:985
+msgid "Privacy:"
+msgstr "Privatlív:"
+
+#: ../gtk/details.c:990
+msgid "Origin:"
+msgstr "Uppruni:"
+
+#: ../gtk/details.c:1007
 msgid "Comment:"
-msgstr ""
+msgstr "Viðmerking:"
 
-#: ../gtk/details.c:1012
+#: ../gtk/details.c:1039
 msgid "Webseeds"
-msgstr ""
+msgstr "Vevfræarar"
 
-#: ../gtk/details.c:1014 ../gtk/details.c:1058
+#: ../gtk/details.c:1041 ../gtk/details.c:1093
 msgid "Down"
-msgstr ""
+msgstr "Niður"
 
-#: ../gtk/details.c:1056
+#: ../gtk/details.c:1091
 msgid "Address"
-msgstr ""
+msgstr "Bústaður"
 
-#: ../gtk/details.c:1060
+#: ../gtk/details.c:1095
 msgid "Up"
-msgstr ""
+msgstr "Upp"
 
-#: ../gtk/details.c:1061
+#: ../gtk/details.c:1096
 msgid "Client"
-msgstr ""
+msgstr "Viðskiftari"
 
-#: ../gtk/details.c:1062
+#: ../gtk/details.c:1097
 msgid "%"
-msgstr ""
+msgstr "%"
 
-#: ../gtk/details.c:1064
+#: ../gtk/details.c:1099
 msgid "Up Reqs"
-msgstr ""
+msgstr "Upp ombøn"
 
-#: ../gtk/details.c:1066
+#: ../gtk/details.c:1101
 msgid "Dn Reqs"
+msgstr "Niður ombøn"
+
+#: ../gtk/details.c:1103
+msgid "Dn Blocks"
 msgstr ""
 
-#: ../gtk/details.c:1067
+#: ../gtk/details.c:1105
+msgid "Up Blocks"
+msgstr ""
+
+#: ../gtk/details.c:1107
+msgid "We Cancelled"
+msgstr ""
+
+#: ../gtk/details.c:1109
+msgid "They Cancelled"
+msgstr ""
+
+#: ../gtk/details.c:1110
 msgid "Status"
-msgstr ""
+msgstr "Støða"
 
-#: ../gtk/details.c:1386
+#: ../gtk/details.c:1469
 msgid "Optimistic unchoke"
 msgstr ""
 
-#: ../gtk/details.c:1387
+#: ../gtk/details.c:1470
 msgid "Downloading from this peer"
-msgstr ""
+msgstr "Niðurtaki frá hesum janlíka"
 
-#: ../gtk/details.c:1388
+#: ../gtk/details.c:1471
 msgid "We would download from this peer if they would let us"
-msgstr ""
+msgstr "Vit vildu niðurtiki frá hesum janlíka, um tey lótu okkum"
 
-#: ../gtk/details.c:1389
+#: ../gtk/details.c:1472
 msgid "Uploading to peer"
-msgstr ""
+msgstr "Uppsendi til javnlíka"
 
-#: ../gtk/details.c:1390
+#: ../gtk/details.c:1473
 msgid "We would upload to this peer if they asked"
-msgstr ""
+msgstr "Vit vildu uppsent til henda javnlíka, um tey spurdu"
 
-#: ../gtk/details.c:1391
+#: ../gtk/details.c:1474
 msgid "Peer has unchoked us, but we're not interested"
 msgstr ""
 
-#: ../gtk/details.c:1392
+#: ../gtk/details.c:1475
 msgid "We unchoked this peer, but they're not interested"
 msgstr ""
 
-#: ../gtk/details.c:1393
+#: ../gtk/details.c:1476
 msgid "Encrypted connection"
-msgstr ""
+msgstr "Bronglað samband"
 
-#: ../gtk/details.c:1394
+#: ../gtk/details.c:1477
 msgid "Peer was discovered through Peer Exchange (PEX)"
 msgstr ""
 
-#: ../gtk/details.c:1395
+#: ../gtk/details.c:1478
 msgid "Peer was discovered through DHT"
-msgstr ""
+msgstr "Javnlíki varð funnin ígjøgnum DHT"
 
-#: ../gtk/details.c:1396
+#: ../gtk/details.c:1479
 msgid "Peer is an incoming connection"
-msgstr ""
+msgstr "Javnlíki er eitt inngangandi samband"
 
-#: ../gtk/details.c:1627 ../gtk/details.c:2086
+#: ../gtk/details.c:1734 ../gtk/details.c:2254
 msgid "Show _more details"
 msgstr ""
 
-#: ../gtk/details.c:1701
+#: ../gtk/details.c:1808
 #, c-format
 msgid "Got a list of %1$s%2$'d peers%3$s %4$s ago"
-msgstr ""
+msgstr "Fekk ein lista við %1$s%2$'d javnlíkum%3$s %4$s síðani"
 
-#: ../gtk/details.c:1705
+#: ../gtk/details.c:1812
 #, c-format
 msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
 msgstr ""
 
-#: ../gtk/details.c:1708
+#: ../gtk/details.c:1815
 #, c-format
 msgid "Got an error %1$s\"%2$s\"%3$s %4$s ago"
-msgstr ""
+msgstr "Fekk eina villu %1$s\"%2$s\"%3$s %4$s síðani"
 
-#: ../gtk/details.c:1717
+#: ../gtk/details.c:1824
 msgid "No updates scheduled"
-msgstr ""
+msgstr "Ongar ætlaðar dagføringar"
 
-#: ../gtk/details.c:1723
+#: ../gtk/details.c:1830
 #, c-format
 msgid "Asking for more peers in %s"
-msgstr ""
+msgstr "Spyr eftir fleiri samlíkar um %s"
 
-#: ../gtk/details.c:1727
+#: ../gtk/details.c:1834
 msgid "Queued to ask for more peers"
-msgstr ""
+msgstr "Í bíðirøð til at biða um fleiri samlíkar"
 
-#: ../gtk/details.c:1732
+#: ../gtk/details.c:1839
 #, c-format
 msgid "Asking for more peers now... <small>%s</small>"
-msgstr ""
+msgstr "Biði um fleiri javnlíkar nú.. .<small>%s</small>"
 
-#: ../gtk/details.c:1742
+#: ../gtk/details.c:1849
 #, c-format
 msgid "Tracker had %s%'d seeders and %'d leechers%s %s ago"
-msgstr ""
+msgstr "Leitarin hevði %s%'d fræarar og %'d snýkar%s %s síðani"
 
-#: ../gtk/details.c:1746
+#: ../gtk/details.c:1853
 #, c-format
 msgid "Got a scrape error \"%s%s%s\" %s ago"
 msgstr ""
 
-#: ../gtk/details.c:1756
+#: ../gtk/details.c:1863
 #, c-format
 msgid "Asking for peer counts in %s"
-msgstr ""
+msgstr "Spyr eftir tal á samlíkum um %s"
 
-#: ../gtk/details.c:1760
+#: ../gtk/details.c:1867
 msgid "Queued to ask for peer counts"
-msgstr ""
+msgstr "Í kø til at spyrja um atl á samlíkum"
 
-#: ../gtk/details.c:1765
+#: ../gtk/details.c:1872
 #, c-format
 msgid "Asking for peer counts now... <small>%s</small>"
-msgstr ""
+msgstr "Spyrji um tal á samlíkumnú... <small>%s</small>"
 
-#: ../gtk/details.c:1978
+#: ../gtk/details.c:2131
 msgid "List contains invalid URLs"
-msgstr ""
+msgstr "Listin inniheldur ólógligar URL'ur"
 
-#: ../gtk/details.c:2011
+#: ../gtk/details.c:2171
 msgid "Edit Trackers"
-msgstr ""
+msgstr "Ritstjórna leitarar"
 
-#: ../gtk/details.c:2023
+#: ../gtk/details.c:2183
 msgid "Tracker Announce URLs"
 msgstr ""
 
-#: ../gtk/details.c:2026 ../gtk/makemeta-ui.c:453
+#: ../gtk/details.c:2186 ../gtk/makemeta-ui.c:453
 msgid ""
 "To add a backup URL, add it on the line after the primary URL.\n"
 "To add another primary URL, add it after a blank line."
 msgstr ""
 
-#: ../gtk/details.c:2068 ../gtk/details.c:2182
+#: ../gtk/details.c:2229 ../gtk/details.c:2350 ../gtk/filter.c:324
 msgid "Trackers"
-msgstr ""
+msgstr "Leitarar"
 
-#: ../gtk/details.c:2093
+#: ../gtk/details.c:2261
 msgid "_Edit Trackers"
-msgstr ""
+msgstr "_Ritstjórna leitarar"
 
-#: ../gtk/details.c:2101
+#: ../gtk/details.c:2269
 msgid "Show _backup trackers"
-msgstr ""
+msgstr "Vís _eykaleitarar"
 
-#: ../gtk/details.c:2174 ../gtk/msgwin.c:179
+#: ../gtk/details.c:2342 ../gtk/msgwin.c:179
 msgid "Information"
-msgstr ""
+msgstr "Upplýsing"
 
-#: ../gtk/details.c:2178
+#: ../gtk/details.c:2346
 msgid "Peers"
-msgstr ""
+msgstr "Javnlíkar"
 
-#: ../gtk/details.c:2188
+#: ../gtk/details.c:2356
 msgid "File listing not available for combined torrent properties"
-msgstr ""
+msgstr "Fílulistin er ikki tøkur til samanlagdar torrenteginleikar"
 
-#: ../gtk/details.c:2192 ../gtk/makemeta-ui.c:402 ../gtk/tr-window.c:855
+#: ../gtk/details.c:2360 ../gtk/filter.c:999 ../gtk/makemeta-ui.c:402
 msgid "Files"
-msgstr ""
+msgstr "Fílur"
 
-#: ../gtk/details.c:2197 ../gtk/tr-window.c:958
+#: ../gtk/details.c:2365 ../gtk/tr-window.c:651
 msgid "Options"
-msgstr ""
+msgstr "Kostir"
 
-#: ../gtk/details.c:2224
+#: ../gtk/details.c:2392
 #, c-format
 msgid "%s Properties"
-msgstr ""
+msgstr "%s Eginleikar"
 
-#: ../gtk/details.c:2235
+#: ../gtk/details.c:2403
 #, c-format
 msgid "%'d Torrent Properties"
-msgstr ""
+msgstr "%'d Torrent eginleikar"
 
 #: ../gtk/dialogs.c:121
 msgid "<big><b>Quit Transmission?</b></big>"
-msgstr ""
+msgstr "<big><b>Enda sending?</b></big>"
 
 #: ../gtk/dialogs.c:133
 msgid "_Don't ask me again"
-msgstr ""
+msgstr "_Spyr meg ikki aftur"
 
-#: ../gtk/dialogs.c:236
+#: ../gtk/dialogs.c:229
+#, c-format
 msgid "Remove torrent?"
-msgid_plural "Remove torrents?"
+msgid_plural "Remove %d torrents?"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/dialogs.c:242
+#: ../gtk/dialogs.c:235
+#, c-format
 msgid "Delete this torrent's downloaded files?"
-msgid_plural "Delete these torrents' downloaded files?"
+msgid_plural "Delete these %d torrents' downloaded files?"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/dialogs.c:255
+#: ../gtk/dialogs.c:245
+msgid ""
+"Once removed, continuing the transfer will require the torrent file or "
+"magnet link."
+msgid_plural ""
+"Once removed, continuing the transfers will require the torrent files or "
+"magnet links."
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/dialogs.c:251
 msgid "This torrent has not finished downloading."
 msgid_plural "These torrents have not finished downloading."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Hesin torrent hevur fullgjørt niðurtøkuna."
+msgstr[1] "Hesir terrentar hava fullgjørt niðurtøkurnar."
 
-#: ../gtk/dialogs.c:261
+#: ../gtk/dialogs.c:257
 msgid "This torrent is connected to peers."
 msgid_plural "These torrents are connected to peers."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Hesin terrenturin er sambundin við samlíkum."
+msgstr[1] "Hesir torrentar eru sambundnir við samlíkum."
 
-#: ../gtk/dialogs.c:268
+#: ../gtk/dialogs.c:264
 msgid "One of these torrents is connected to peers."
 msgid_plural "Some of these torrents are connected to peers."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Ein av hesum torrentunum er sambundin við samlíkum."
+msgstr[1] "Nakrir av hesum torrentunum eru sambundnir við samlíkum."
 
-#: ../gtk/dialogs.c:275
+#: ../gtk/dialogs.c:271
 msgid "One of these torrents has not finished downloading."
 msgid_plural "Some of these torrents have not finished downloading."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Ein av hesum torrentunum hevur ikki fullgjørt niðurtøkuna."
+msgstr[1] "Nakrir av hesum torrentunum hava ikki fullgjør niðurtøkurnar."
 
-#: ../gtk/file-list.c:583 ../gtk/util.c:691
+#: ../gtk/file-list.c:582 ../gtk/filter.c:349 ../gtk/util.c:692
 msgid "High"
-msgstr ""
+msgstr "Høgt"
 
-#: ../gtk/file-list.c:584 ../gtk/util.c:692
+#: ../gtk/file-list.c:583 ../gtk/filter.c:353 ../gtk/util.c:693
 msgid "Normal"
-msgstr ""
+msgstr "Vanligt"
 
-#: ../gtk/file-list.c:585 ../gtk/util.c:693
+#: ../gtk/file-list.c:584 ../gtk/filter.c:357 ../gtk/util.c:694
 msgid "Low"
-msgstr ""
+msgstr "Lágt"
 
 #. add "enabled" column
-#: ../gtk/file-list.c:613 ../gtk/file-list.c:746
+#: ../gtk/file-list.c:612 ../gtk/file-list.c:745
 msgid "Download"
-msgstr ""
+msgstr "Tak niður"
 
 #. add priority column
-#: ../gtk/file-list.c:614 ../gtk/file-list.c:760
+#: ../gtk/file-list.c:613 ../gtk/file-list.c:759 ../gtk/filter.c:344
 msgid "Priority"
-msgstr ""
+msgstr "Raðfesti"
 
-#: ../gtk/file-list.c:718
+#: ../gtk/file-list.c:717
 msgid "File"
-msgstr ""
+msgstr "Fíla"
 
 #. add "progress" column
-#: ../gtk/file-list.c:733
+#: ../gtk/file-list.c:732
 msgid "Progress"
+msgstr "Framgongd"
+
+#: ../gtk/filter.c:316 ../gtk/filter.c:717
+msgid "All"
 msgstr ""
 
-#: ../gtk/main.c:394
+#: ../gtk/filter.c:330 ../gtk/tr-prefs.c:552 ../gtk/tr-prefs.c:1439
+msgid "Privacy"
+msgstr "Privatlív"
+
+#: ../gtk/filter.c:335
+msgid "Public"
+msgstr ""
+
+#: ../gtk/filter.c:339
+msgid "Private"
+msgstr ""
+
+#: ../gtk/filter.c:719
+msgid "Active"
+msgstr ""
+
+#: ../gtk/filter.c:723
+msgid "Queued"
+msgstr ""
+
+#: ../gtk/filter.c:724
+msgid "Verifying"
+msgstr ""
+
+#: ../gtk/filter.c:725 ../gtk/msgwin.c:178
+msgid "Error"
+msgstr "Villa"
+
+#: ../gtk/filter.c:999 ../gtk/msgwin.c:258
+msgid "Name"
+msgstr "Navn"
+
+#: ../gtk/filter.c:999 ../gtk/tr-prefs.c:1001
+msgid "Tracker"
+msgstr "Leitari"
+
+#. add the activity combobox
+#: ../gtk/filter.c:1023
+msgid "_Show:"
+msgstr ""
+
+#: ../gtk/main.c:393
 #, c-format
 msgid ""
 "Got signal %d; trying to shut down cleanly.  Do it again if it gets stuck."
 msgstr ""
 
-#: ../gtk/main.c:493
+#: ../gtk/main.c:516
 msgid "Start with all torrents paused"
-msgstr ""
+msgstr "Byra við øllum torrentunum steðgaðum"
 
-#: ../gtk/main.c:495
+#: ../gtk/main.c:518
 msgid "Show version number and exit"
-msgstr ""
+msgstr "Vís útgávunummar og far út"
 
-#: ../gtk/main.c:499
+#: ../gtk/main.c:522
 msgid "Start minimized in notification area"
 msgstr ""
 
-#: ../gtk/main.c:502
+#: ../gtk/main.c:525
 msgid "Where to look for configuration files"
-msgstr ""
+msgstr "Hvar skal hyggjast eftir samansetingafílum"
 
-#: ../gtk/main.c:511 ../gtk/transmission.desktop.in.h:3
+#: ../gtk/main.c:534 ../gtk/transmission.desktop.in.h:3
 msgid "Transmission"
-msgstr ""
+msgstr "Transmission"
 
-#: ../gtk/main.c:518
+#: ../gtk/main.c:541
 msgid "[torrent files or urls]"
-msgstr ""
+msgstr "[torrentfílur ella url]"
 
-#: ../gtk/main.c:572
+#: ../gtk/main.c:595
 msgid ""
 "Transmission is already running, but is not responding.  To start a new "
 "session, you must first close the existing Transmission process."
 msgstr ""
+"Transmission koyrir longu, men svarar ikki. Fyri at byrja eina nýggja setu, "
+"mást tú fyrst sløkkja núverandi Transmission-tilgongd."
 
-#: ../gtk/main.c:626
+#: ../gtk/main.c:649
 msgid "Transmission cannot be started."
-msgstr ""
+msgstr "Transmission kann ikki byrja."
 
-#: ../gtk/main.c:708
+#: ../gtk/main.c:731
 msgid ""
-"Transmission is a file sharing program.  When you run a torrent, its data "
-"will be made available to others by means of upload.  And of course, any "
-"content you share is your sole responsibility.\n"
-"\n"
-"You probably knew this, so we won't tell you again."
+"Transmission is a file-sharing program.  When you run a torrent, its data "
+"will be made available to others by means of upload.  You and you alone are "
+"fully responsible for exercising proper judgement and abiding by your local "
+"laws."
 msgstr ""
 
-#: ../gtk/main.c:710
+#: ../gtk/main.c:733
 msgid "I _Accept"
-msgstr ""
+msgstr "Eg _játti"
 
-#: ../gtk/main.c:888
+#: ../gtk/main.c:910
 msgid "<b>Closing Connections</b>"
-msgstr ""
+msgstr "<b>Loysi sambindingar</b>"
 
-#: ../gtk/main.c:892
+#: ../gtk/main.c:914
 msgid "Sending upload/download totals to tracker..."
-msgstr ""
+msgstr "Sendi samanroknað uppsent/niðurtikið til leitara..."
 
-#: ../gtk/main.c:897
+#: ../gtk/main.c:919
 msgid "_Quit Now"
-msgstr ""
+msgstr "_Sløkk nú"
 
-#: ../gtk/main.c:1057
+#: ../gtk/main.c:1079
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kundi ikki leggja ein spiltan torrent til"
+msgstr[1] "Kundi ikki leggja spiltar torrentar til"
 
-#: ../gtk/main.c:1064
+#: ../gtk/main.c:1086
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kundi ikki leggja til tvinnar torrentar"
+msgstr[1] "Kundi ikki leggja til tvinnar torrentar"
 
-#: ../gtk/main.c:1354
+#: ../gtk/main.c:1394
 msgid "A fast and easy BitTorrent client"
-msgstr ""
+msgstr "Ein skjótir og nemmur BitTorrent-viðskiftari"
 
-#: ../gtk/main.c:1359
+#: ../gtk/main.c:1399
 msgid "Copyright 2005-2009 The Transmission Project"
-msgstr ""
+msgstr "Upphavsrættur 2005-2009 Transmission verkætlanin"
 
 #. Translators: translate "translator-credits" as
 #. your name
 #. to have it appear in the credits in the "About"
 #. dialog
-#: ../gtk/main.c:1370
+#: ../gtk/main.c:1410
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
+"  Gunleif Joensen https://launchpad.net/~gunleif\n"
 "  Jonhard Sørensen https://launchpad.net/~jonhardsorensen"
 
 #: ../gtk/makemeta-ui.c:75
 #, c-format
 msgid "Creating \"%s\""
-msgstr ""
+msgstr "Stovni \"%s\""
 
 #: ../gtk/makemeta-ui.c:77
 #, c-format
 msgid "Created \"%s\"!"
-msgstr ""
+msgstr "Stovnaði \"%s\"!"
 
 #: ../gtk/makemeta-ui.c:79
 #, c-format
@@ -904,165 +983,161 @@ msgstr ""
 #: ../gtk/makemeta-ui.c:81
 #, c-format
 msgid "Cancelled"
-msgstr ""
+msgstr "Ógildað"
 
 #: ../gtk/makemeta-ui.c:83
 #, c-format
 msgid "Error reading \"%s\": %s"
-msgstr ""
+msgstr "Villa við lesing av \"%s\": %s"
 
 #: ../gtk/makemeta-ui.c:85
 #, c-format
 msgid "Error writing \"%s\": %s"
-msgstr ""
+msgstr "Villa við skriving av \"%s\": %s"
 
 #. how much data we've scanned through to generate checksums
 #: ../gtk/makemeta-ui.c:102
 #, c-format
 msgid "Scanned %s"
-msgstr ""
+msgstr "Skannað %s"
 
 #: ../gtk/makemeta-ui.c:167 ../gtk/makemeta-ui.c:389
 msgid "New Torrent"
-msgstr ""
+msgstr "Nýggjan torrent"
 
 #: ../gtk/makemeta-ui.c:183
 msgid "Creating torrent..."
-msgstr ""
+msgstr "Stovni torent..."
 
 #: ../gtk/makemeta-ui.c:292
 msgid "No source selected"
-msgstr ""
+msgstr "Eingin kelda er vald"
 
 #: ../gtk/makemeta-ui.c:298
 #, c-format
 msgid "%1$s; %2$'d File"
 msgid_plural "%1$s; %2$'d Files"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s; %2$'d Fíla"
+msgstr[1] "%1$s; %2$'d Fílur"
 
 #: ../gtk/makemeta-ui.c:304
 #, c-format
 msgid "%1$'d Piece @ %2$s"
 msgid_plural "%1$'d Pieces @ %2$s"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$'d Partur @ %2$s"
+msgstr[1] "%1$'d Partar @ %2$s"
 
 #: ../gtk/makemeta-ui.c:404
 msgid "Sa_ve to:"
-msgstr ""
+msgstr "_Goym til:"
 
 #: ../gtk/makemeta-ui.c:410
 msgid "Source F_older:"
-msgstr ""
+msgstr "_Keldu skjátta:"
 
 #: ../gtk/makemeta-ui.c:421
 msgid "Source _File:"
-msgstr ""
+msgstr "Keldu _fíla:"
 
 #: ../gtk/makemeta-ui.c:432
 msgid "<i>No source selected</i>"
-msgstr ""
+msgstr "<i>Eingin kelda er vald</i>"
 
 #: ../gtk/makemeta-ui.c:436
 msgid "Properties"
-msgstr ""
+msgstr "Eginleikar"
 
 #: ../gtk/makemeta-ui.c:438
 msgid "_Trackers:"
-msgstr ""
+msgstr "_Leitarar:"
 
 #: ../gtk/makemeta-ui.c:460
 msgid "Co_mment:"
-msgstr ""
+msgstr "Við_merking:"
 
 #: ../gtk/makemeta-ui.c:469
 msgid "_Private torrent"
-msgstr ""
+msgstr "_Privatur torrentur"
 
 #: ../gtk/msgwin.c:84
 #, c-format
 msgid "Couldn't save \"%s\""
-msgstr ""
+msgstr "Kundi ikki goyma \"%s\""
 
 #: ../gtk/msgwin.c:135
 msgid "Save Log"
-msgstr ""
-
-#: ../gtk/msgwin.c:178
-msgid "Error"
-msgstr ""
+msgstr "Goym gerðarbók"
 
 #: ../gtk/msgwin.c:180
 msgid "Debug"
-msgstr ""
+msgstr "Kemba"
 
 #: ../gtk/msgwin.c:254
 msgid "Time"
-msgstr ""
-
-#: ../gtk/msgwin.c:258 ../gtk/tr-window.c:855
-msgid "Name"
-msgstr ""
+msgstr "Tíð"
 
 #: ../gtk/msgwin.c:262
 msgid "Message"
-msgstr ""
+msgstr "Boð"
 
 #: ../gtk/msgwin.c:438
 msgid "Message Log"
-msgstr ""
+msgstr "Boð gerðarboð"
 
 #: ../gtk/msgwin.c:472
 msgid "Level"
-msgstr ""
+msgstr "Støði"
 
 #: ../gtk/notify.c:121
 msgid "Download complete"
-msgstr ""
+msgstr "Niðurtøka fullgjørd"
 
 #: ../gtk/notify.c:131
 msgid "Torrent Complete"
-msgstr ""
+msgstr "Torrentur er fullgjørdur"
 
 #: ../gtk/notify.c:140
 msgid "Open File"
-msgstr ""
+msgstr "Lat upp fílu"
 
 #: ../gtk/notify.c:145
 msgid "Open Folder"
-msgstr ""
+msgstr "Lat upp skjáttu"
 
 #: ../gtk/notify.c:159
 msgid "Torrent Added"
-msgstr ""
+msgstr "Torrentur lagdur til"
 
-#: ../gtk/relocate.c:68
+#: ../gtk/relocate.c:64
 #, c-format
 msgid "Moving \"%s\""
+msgstr "Flyti \"%s\""
+
+#: ../gtk/relocate.c:86
+msgid "Couldn't move torrent"
 msgstr ""
 
-#: ../gtk/relocate.c:70
+#: ../gtk/relocate.c:127
 msgid "This may take a moment..."
-msgstr ""
+msgstr "Hettar kann taka sína tíð..."
 
-#: ../gtk/relocate.c:99 ../gtk/relocate.c:121
+#: ../gtk/relocate.c:158 ../gtk/relocate.c:179
 msgid "Set Torrent Location"
-msgstr ""
+msgstr "Se torrentstað"
 
-#: ../gtk/relocate.c:117
+#: ../gtk/relocate.c:175
 msgid "Location"
-msgstr ""
+msgstr "Staður"
 
-#: ../gtk/relocate.c:124
+#: ../gtk/relocate.c:182
 msgid "Torrent _location:"
-msgstr ""
+msgstr "Torrent _staður:"
 
-#: ../gtk/relocate.c:125
+#: ../gtk/relocate.c:183
 msgid "_Move from the current folder"
-msgstr ""
+msgstr "_Fly úr núverandi skjáttu"
 
-#: ../gtk/relocate.c:128
+#: ../gtk/relocate.c:186
 msgid "Local data is _already there"
 msgstr ""
 
@@ -1070,38 +1145,40 @@ msgstr ""
 #, c-format
 msgid "Started %'d time"
 msgid_plural "Started %'d times"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Byrja %'d ferð"
+msgstr[1] "Byrjaðir %'d ferð"
 
 #: ../gtk/stats.c:107
 msgid "Reset your statistics?"
-msgstr ""
+msgstr "Endurstilla tíni hagtøl?"
 
 #: ../gtk/stats.c:108
 msgid ""
 "These statistics are for your information only.  Resetting them doesn't "
 "affect the statistics logged by your BitTorrent trackers."
 msgstr ""
+"Hesi hagtøl eru einans til tína kunning. At endurseta tey, ávirkar ikki "
+"hagtøl gerðlistað av tínum BitTorrent leitarum."
 
 #: ../gtk/stats.c:119 ../gtk/stats.c:151
 msgid "_Reset"
-msgstr ""
+msgstr "_Endurstilla"
 
-#: ../gtk/stats.c:147 ../gtk/tr-window.c:999
+#: ../gtk/stats.c:147 ../gtk/tr-window.c:692
 msgid "Statistics"
-msgstr ""
+msgstr "Hagfrøði"
 
 #: ../gtk/stats.c:164
 msgid "Current Session"
-msgstr ""
+msgstr "Núverandi seta"
 
 #: ../gtk/stats.c:172 ../gtk/stats.c:184
 msgid "Duration:"
-msgstr ""
+msgstr "Longd:"
 
 #: ../gtk/stats.c:174
 msgid "Total"
-msgstr ""
+msgstr "Í alt"
 
 #. %1$s is how much we've got,
 #. %2$s is how much we'll have when done,
@@ -1109,6 +1186,17 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:63
 #, c-format
 msgid "%1$s of %2$s (%3$.2f%%)"
+msgstr "%1$s of %2$s (%3$.2f%%)"
+
+#. %1$s is how much we've got,
+#. %2$s is the torrent's total size,
+#. %3$.2f%% is a percentage of the two,
+#. %4$s is how much we've uploaded,
+#. %5$s is our upload-to-download ratio,
+#. %6$s is the ratio we want to reach before we stop uploading
+#: ../gtk/torrent-cell-renderer.c:79
+#, c-format
+msgid "%1$s of %2$s (%3$.2f%%), uploaded %4$s (Ratio: %5$s Goal: %6$s)"
 msgstr ""
 
 #. %1$s is how much we've got,
@@ -1116,115 +1204,104 @@ msgstr ""
 #. %3$.2f%% is a percentage of the two,
 #. %4$s is how much we've uploaded,
 #. %5$s is our upload-to-download ratio
-#: ../gtk/torrent-cell-renderer.c:76
+#: ../gtk/torrent-cell-renderer.c:95
 #, c-format
 msgid "%1$s of %2$s (%3$.2f%%), uploaded %4$s (Ratio: %5$s)"
-msgstr ""
+msgstr "%1$s of %2$s (%3$.2f%%), upsent %4$s (Lutfall: %5$s)"
 
 #. %1$s is the torrent's total size,
 #. %2$s is how much we've uploaded,
 #. %3$s is our upload-to-download ratio,
-#. $4$s is the ratio we want to reach before we stop uploading
-#: ../gtk/torrent-cell-renderer.c:90
+#. %4$s is the ratio we want to reach before we stop uploading
+#: ../gtk/torrent-cell-renderer.c:112
 #, c-format
 msgid "%1$s, uploaded %2$s (Ratio: %3$s Goal: %4$s)"
-msgstr ""
+msgstr "%1$s, uppsent %2$s (Lutfall: %3$s Mál: %4$s)"
 
 #. %1$s is the torrent's total size,
 #. %2$s is how much we've uploaded,
 #. %3$s is our upload-to-download ratio
-#: ../gtk/torrent-cell-renderer.c:102
+#: ../gtk/torrent-cell-renderer.c:124
 #, c-format
 msgid "%1$s, uploaded %2$s (Ratio: %3$s)"
-msgstr ""
+msgstr "%1$s, uppsent %2$s (lutfall: %3$s)"
 
-#: ../gtk/torrent-cell-renderer.c:116 ../gtk/tr-torrent.c:246
-#, c-format
+#: ../gtk/torrent-cell-renderer.c:139
 msgid "Remaining time unknown"
-msgstr ""
+msgstr "Ókend íð eftir"
 
 #. time remaining
-#: ../gtk/torrent-cell-renderer.c:122
+#: ../gtk/torrent-cell-renderer.c:145
 #, c-format
 msgid "%s remaining"
+msgstr "%s eftir"
+
+#. 1==down speed, 2==down arrow, 3==up speed, 4==down arrow
+#: ../gtk/torrent-cell-renderer.c:174
+#, c-format
+msgid "%1$s %2$s, %3$s %4$s"
 msgstr ""
 
-#. Translators: "speed|" is here for disambiguation.
-#. * Please remove it from your translation.
-#. * %1$s is the download speed
-#. %2$s is the upload speed
-#: ../gtk/torrent-cell-renderer.c:154
+#. bandwidth speed + unicode arrow
+#: ../gtk/torrent-cell-renderer.c:179 ../gtk/torrent-cell-renderer.c:183
 #, c-format
-msgid "speed|Down: %1$s, Up: %2$s"
-msgstr ""
-
-#. download speed
-#: ../gtk/torrent-cell-renderer.c:157
-#, c-format
-msgid "Down: %s"
-msgstr ""
-
-#. upload speed
-#: ../gtk/torrent-cell-renderer.c:160
-#, c-format
-msgid "Up: %s"
+msgid "%1$s %2$s"
 msgstr ""
 
 #. the torrent isn't uploading or downloading
-#: ../gtk/torrent-cell-renderer.c:163 ../gtk/tr-icon.c:73
+#: ../gtk/torrent-cell-renderer.c:187 ../gtk/tr-icon.c:75
 msgid "Idle"
-msgstr ""
+msgstr "Óvirkin"
 
-#: ../gtk/torrent-cell-renderer.c:190 ../gtk/tr-torrent.c:239
+#: ../gtk/torrent-cell-renderer.c:217
 #, c-format
 msgid "Verifying local data (%.1f%% tested)"
 msgstr ""
 
-#: ../gtk/torrent-cell-renderer.c:201 ../gtk/tr-window.c:1137
-#: ../gtk/tr-window.c:1165
+#: ../gtk/torrent-cell-renderer.c:228
 #, c-format
-msgid "Ratio: %s"
+msgid "Ratio %s"
 msgstr ""
 
-#: ../gtk/torrent-cell-renderer.c:230
+#: ../gtk/torrent-cell-renderer.c:257
 #, c-format
 msgid "Tracker gave a warning: \"%s\""
-msgstr ""
+msgstr "Leitarin sendi eina ávaring: \"%s\""
 
-#: ../gtk/torrent-cell-renderer.c:231
+#: ../gtk/torrent-cell-renderer.c:258
 #, c-format
 msgid "Tracker gave an error: \"%s\""
-msgstr ""
+msgstr "Leitarin sendi eina villu: \"%s\""
 
-#: ../gtk/torrent-cell-renderer.c:232
+#: ../gtk/torrent-cell-renderer.c:259
 #, c-format
 msgid "Error: %s"
-msgstr ""
+msgstr "Villa: %s"
 
-#: ../gtk/torrent-cell-renderer.c:252
+#: ../gtk/torrent-cell-renderer.c:279
 #, c-format
 msgid "Downloading from %1$'d of %2$'d connected peer"
 msgid_plural "Downloading from %1$'d of %2$'d connected peers"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Niðurtaki frá %1$'d av %2$'d sambundnum javnlíka"
+msgstr[1] "Niðurtaki frá %1$'d av %2$'d sambundnum javnlíkum"
 
-#: ../gtk/torrent-cell-renderer.c:263
+#: ../gtk/torrent-cell-renderer.c:290
 #, c-format
 msgid "Downloading metadata from %1$'d peer (%2$d%% done)"
 msgid_plural "Downloading metadata from %1$'d peers (%2$d%% done)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/torrent-cell-renderer.c:274 ../gtk/tr-torrent.c:258
+#: ../gtk/torrent-cell-renderer.c:301
 #, c-format
 msgid "Seeding to %1$'d of %2$'d connected peer"
 msgid_plural "Seeding to %1$'d of %2$'d connected peers"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Fræi til %1$'d av %2$'d sambunum javnlíka"
+msgstr[1] "Fræi %1$'d av %2$'d sambundnum javnlíkum"
 
 #: ../gtk/tracker-list.c:344
 msgid "Tier"
-msgstr ""
+msgstr "Lag"
 
 #: ../gtk/tracker-list.c:350
 msgid "Announce URL"
@@ -1232,7 +1309,7 @@ msgstr ""
 
 #: ../gtk/transmission.desktop.in.h:1
 msgid "BitTorrent Client"
-msgstr ""
+msgstr "BitTorrent-viðskiftari"
 
 #: ../gtk/transmission.desktop.in.h:2
 msgid "Download and share files over BitTorrent"
@@ -1240,596 +1317,574 @@ msgstr ""
 
 #: ../gtk/transmission.desktop.in.h:4
 msgid "Transmission BitTorrent Client"
-msgstr ""
+msgstr "Transmission BitTorrent-viðskiftari"
+
+#: ../gtk/tr-core.c:1327
+msgid "Transmission Bittorrent Client"
+msgstr "Transmission Bittorrentviðskiftari"
+
+#: ../gtk/tr-core.c:1328
+msgid "BitTorrent Activity"
+msgstr "BitTorrent virkni"
 
 #: ../gtk/tr-core.c:1340
-msgid "Transmission Bittorrent Client"
-msgstr ""
-
-#: ../gtk/tr-core.c:1341
-msgid "BitTorrent Activity"
-msgstr ""
-
-#: ../gtk/tr-core.c:1353
 msgid "Disallowing desktop hibernation"
-msgstr ""
+msgstr "Forar skriviborðs dvalastand"
 
-#: ../gtk/tr-core.c:1356
+#: ../gtk/tr-core.c:1343
 #, c-format
 msgid "Couldn't disable desktop hibernation: %s"
 msgstr ""
 
-#: ../gtk/tr-core.c:1380
+#: ../gtk/tr-core.c:1367
 msgid "Allowing desktop hibernation"
-msgstr ""
+msgstr "Loyvir skriviborðs dvalastand"
 
-#: ../gtk/tr-icon.c:89 ../gtk/tr-icon.c:104
+#: ../gtk/tr-icon.c:91 ../gtk/tr-icon.c:106
 #, c-format
 msgid "(Limit: %s)"
-msgstr ""
+msgstr "(Mark: %s)"
 
 #. %1$s: current upload speed
 #. * %2$s: current upload limit, if any
 #. * %3$s: current download speed
 #. * %4$s: current download limit, if any
-#: ../gtk/tr-icon.c:111
+#: ../gtk/tr-icon.c:113
 #, c-format
 msgid ""
 "Transmission\n"
 "Up: %1$s %2$s\n"
 "Down: %3$s %4$s"
 msgstr ""
+"Transmission\n"
+"Upp: %1$s %2$s\n"
+"Niður: %3$s %4$s"
 
-#: ../gtk/tr-prefs.c:276
+#: ../gtk/tr-prefs.c:282
 msgid "Adding Torrents"
-msgstr ""
+msgstr "Leggi til torrentar"
 
-#: ../gtk/tr-prefs.c:279
+#: ../gtk/tr-prefs.c:285
 msgid "Automatically _add torrents from:"
-msgstr ""
+msgstr "Sjalvvirkandi legg torrent_ar til úr:"
 
-#: ../gtk/tr-prefs.c:300
+#: ../gtk/tr-prefs.c:306
 msgid "Append \"._part\" to incomplete files' names"
 msgstr ""
 
-#: ../gtk/tr-prefs.c:304
-msgid "Keep _incomplete torrents in:"
-msgstr ""
-
-#: ../gtk/tr-prefs.c:312
+#: ../gtk/tr-prefs.c:311
 msgid "Save to _Location:"
+msgstr "Goym á hesum _staði:"
+
+#: ../gtk/tr-prefs.c:313
+msgid "Keep _incomplete torrents in:"
+msgstr "Varðveit ófullgjørdar torrentar í:"
+
+#: ../gtk/tr-prefs.c:320
+msgid "Call scrip_t when torrent is completed:"
 msgstr ""
 
-#: ../gtk/tr-prefs.c:315 ../gtk/tr-prefs.c:1376
+#: ../gtk/tr-prefs.c:328 ../gtk/tr-prefs.c:1395
 msgid "Limits"
-msgstr ""
+msgstr "Mørk"
 
-#: ../gtk/tr-prefs.c:341 ../gtk/tr-prefs.c:1426
+#: ../gtk/tr-prefs.c:354 ../gtk/tr-prefs.c:1445
 msgid "Desktop"
-msgstr ""
+msgstr "Skriviborð"
 
-#: ../gtk/tr-prefs.c:343
+#: ../gtk/tr-prefs.c:356
 msgid "Inhibit _hibernation when torrents are active"
-msgstr ""
+msgstr "Forða _dvala tá torrentar eru virknir"
 
-#: ../gtk/tr-prefs.c:347
+#: ../gtk/tr-prefs.c:360
 msgid "Show Transmission icon in the _notification area"
 msgstr ""
 
-#: ../gtk/tr-prefs.c:351
+#: ../gtk/tr-prefs.c:364
 msgid "Show _popup notifications"
-msgstr ""
+msgstr "Vís _støkkmyndafráboðanir"
 
-#: ../gtk/tr-prefs.c:356
+#: ../gtk/tr-prefs.c:369
 msgid "Play _sound when downloads are complete"
-msgstr ""
+msgstr "Avspæl ljóð, tá ið niðurtøkur eru liðnar"
 
-#: ../gtk/tr-prefs.c:384
+#: ../gtk/tr-prefs.c:397
 #, c-format
 msgid "Enable _blocklist (contains %'d rule)"
 msgid_plural "Enable _blocklist (contains %'d rules)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/tr-prefs.c:414
+#: ../gtk/tr-prefs.c:427
 #, c-format
 msgid "Blocklist now has %'d rule."
 msgid_plural "Blocklist now has %'d rules."
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/tr-prefs.c:418
+#: ../gtk/tr-prefs.c:431
 msgid "<b>Update succeeded!</b>"
-msgstr ""
+msgstr "<b>Dagføring fullgjørd!</b>"
 
-#: ../gtk/tr-prefs.c:433
+#: ../gtk/tr-prefs.c:446
 msgid "Update Blocklist"
 msgstr ""
 
-#: ../gtk/tr-prefs.c:435
+#: ../gtk/tr-prefs.c:448
 msgid "Getting new blocklist..."
 msgstr ""
 
-#: ../gtk/tr-prefs.c:470
+#: ../gtk/tr-prefs.c:483
 msgid "Allow encryption"
-msgstr ""
+msgstr "Loyva bronglan"
 
-#: ../gtk/tr-prefs.c:471
+#: ../gtk/tr-prefs.c:484
 msgid "Prefer encryption"
 msgstr ""
 
-#: ../gtk/tr-prefs.c:472
+#: ../gtk/tr-prefs.c:485
 msgid "Require encryption"
-msgstr ""
+msgstr "Krev bronglan"
 
-#: ../gtk/tr-prefs.c:516
+#: ../gtk/tr-prefs.c:529
 msgid "Blocklist"
 msgstr ""
 
-#: ../gtk/tr-prefs.c:522
+#: ../gtk/tr-prefs.c:535
 msgid "_Update"
-msgstr ""
-
-#: ../gtk/tr-prefs.c:532
-msgid "Enable _automatic updates"
-msgstr ""
-
-#: ../gtk/tr-prefs.c:539 ../gtk/tr-prefs.c:1420
-msgid "Privacy"
-msgstr ""
-
-#: ../gtk/tr-prefs.c:541
-msgid "_Encryption mode:"
-msgstr ""
+msgstr "_Dagfør"
 
 #: ../gtk/tr-prefs.c:545
-msgid "Use PE_X to find more peers"
-msgstr ""
+msgid "Enable _automatic updates"
+msgstr "Gild_a sválvirknar dagføringar til"
 
-#: ../gtk/tr-prefs.c:547
+#: ../gtk/tr-prefs.c:554
+msgid "_Encryption mode:"
+msgstr "_Bronglustandur:"
+
+#: ../gtk/tr-prefs.c:558
+msgid "Use PE_X to find more peers"
+msgstr "Nýt PE_X til at finna fleiri javnlíkar"
+
+#: ../gtk/tr-prefs.c:560
 msgid ""
 "PEX is a tool for exchanging peer lists with the peers you're connected to."
 msgstr ""
+"PEX er eitt amboð til at býta um javníkalistar, við teimum javnlíkum íð tú "
+"er sambundin við."
 
-#: ../gtk/tr-prefs.c:551
+#: ../gtk/tr-prefs.c:564
 msgid "Use _DHT to find more peers"
-msgstr ""
+msgstr "Nýt _DHT til at finna fleiri javnlíkar"
 
-#: ../gtk/tr-prefs.c:553
+#: ../gtk/tr-prefs.c:566
 msgid "DHT is a tool for finding peers without a tracker."
+msgstr "DHT er eitt amboð til at finna fleiri javnlíkar, uttan ein leitara."
+
+#: ../gtk/tr-prefs.c:570
+msgid "Use Local Peer Discovery to find more peers"
 msgstr ""
 
-#: ../gtk/tr-prefs.c:774
-msgid "Web Client"
+#: ../gtk/tr-prefs.c:572
+msgid "LPD is a tool for finding peers on your local network."
 msgstr ""
+
+#: ../gtk/tr-prefs.c:793
+msgid "Web Client"
+msgstr "Vev-viðskiftari"
 
 #. "enabled" checkbutton
-#: ../gtk/tr-prefs.c:777
+#: ../gtk/tr-prefs.c:796
 msgid "_Enable web client"
-msgstr ""
+msgstr "Virkja v_evviðskiftara"
 
-#: ../gtk/tr-prefs.c:783
+#: ../gtk/tr-prefs.c:802
 msgid "_Open web client"
-msgstr ""
+msgstr "Lat _upp vevviðskiftara"
 
-#: ../gtk/tr-prefs.c:792
+#: ../gtk/tr-prefs.c:811
 msgid "Listening _port:"
-msgstr ""
+msgstr "Lurti _portur:"
 
 #. require authentication
-#: ../gtk/tr-prefs.c:796 ../gtk/tr-prefs.c:1013
+#: ../gtk/tr-prefs.c:815 ../gtk/tr-prefs.c:1032
 msgid "Use _authentication"
-msgstr ""
+msgstr "Nýt váttan"
 
 #. username
-#: ../gtk/tr-prefs.c:804 ../gtk/tr-prefs.c:1019
+#: ../gtk/tr-prefs.c:823 ../gtk/tr-prefs.c:1038
 msgid "_Username:"
-msgstr ""
+msgstr "_Brúkaranavn:"
 
 #. password
-#: ../gtk/tr-prefs.c:811 ../gtk/tr-prefs.c:1025
+#: ../gtk/tr-prefs.c:830 ../gtk/tr-prefs.c:1044
 msgid "Pass_word:"
-msgstr ""
+msgstr "_Atlát"
 
 #. require authentication
-#: ../gtk/tr-prefs.c:819
+#: ../gtk/tr-prefs.c:838
 msgid "Only allow these IP a_ddresses to connect:"
-msgstr ""
+msgstr "Loyv einans sambinding við hesar IP-bústaðir:"
 
-#: ../gtk/tr-prefs.c:844
+#: ../gtk/tr-prefs.c:863
 msgid "IP addresses may use wildcards, such as 192.168.*.*"
-msgstr ""
+msgstr "IP-bústaðir kunnu nýta algildistekn, t.d. 192.168.*.*"
 
-#: ../gtk/tr-prefs.c:866
+#: ../gtk/tr-prefs.c:885
 msgid "Addresses:"
-msgstr ""
+msgstr "Bústaðir:"
 
-#: ../gtk/tr-prefs.c:982 ../gtk/tr-window.c:855
-msgid "Tracker"
-msgstr ""
-
-#: ../gtk/tr-prefs.c:984
+#: ../gtk/tr-prefs.c:1003
 msgid "Connect to tracker via a pro_xy"
 msgstr ""
 
-#: ../gtk/tr-prefs.c:989
+#: ../gtk/tr-prefs.c:1008
 msgid "Proxy _server:"
-msgstr ""
+msgstr "Staðgongu_ambætari:"
 
-#: ../gtk/tr-prefs.c:997
+#: ../gtk/tr-prefs.c:1016
 msgid "Proxy _port:"
-msgstr ""
+msgstr "Staðgongu_portur:"
 
-#: ../gtk/tr-prefs.c:1000
+#: ../gtk/tr-prefs.c:1019
 msgid "Proxy _type:"
 msgstr ""
 
-#: ../gtk/tr-prefs.c:1138
+#: ../gtk/tr-prefs.c:1157
 msgid "Every Day"
-msgstr ""
+msgstr "Hvønn dag"
 
-#: ../gtk/tr-prefs.c:1139
+#: ../gtk/tr-prefs.c:1158
 msgid "Weekdays"
-msgstr ""
+msgstr "Gerðandisdagar"
 
-#: ../gtk/tr-prefs.c:1140
+#: ../gtk/tr-prefs.c:1159
 msgid "Weekends"
-msgstr ""
+msgstr "Vikuskifti"
 
-#: ../gtk/tr-prefs.c:1141
+#: ../gtk/tr-prefs.c:1160
 msgid "Sunday"
-msgstr ""
+msgstr "sunnudagur"
 
-#: ../gtk/tr-prefs.c:1142
+#: ../gtk/tr-prefs.c:1161
 msgid "Monday"
-msgstr ""
+msgstr "mánadagur"
 
-#: ../gtk/tr-prefs.c:1143
+#: ../gtk/tr-prefs.c:1162
 msgid "Tuesday"
-msgstr ""
+msgstr "týsdagur"
 
-#: ../gtk/tr-prefs.c:1144
+#: ../gtk/tr-prefs.c:1163
 msgid "Wednesday"
-msgstr ""
+msgstr "mikudagur"
 
-#: ../gtk/tr-prefs.c:1145
+#: ../gtk/tr-prefs.c:1164
 msgid "Thursday"
-msgstr ""
+msgstr "hósdagur"
 
-#: ../gtk/tr-prefs.c:1146
+#: ../gtk/tr-prefs.c:1165
 msgid "Friday"
-msgstr ""
+msgstr "fríggjadagur"
 
-#: ../gtk/tr-prefs.c:1147
+#: ../gtk/tr-prefs.c:1166
 msgid "Saturday"
-msgstr ""
+msgstr "leygardagur"
 
-#: ../gtk/tr-prefs.c:1199
+#: ../gtk/tr-prefs.c:1218
 msgid "Speed Limits"
-msgstr ""
+msgstr "Ferðmørk"
 
-#: ../gtk/tr-prefs.c:1219
+#: ../gtk/tr-prefs.c:1238
 msgid "Temporary Speed Limits"
-msgstr ""
+msgstr "Fyribils ferðmørk"
 
-#: ../gtk/tr-prefs.c:1226
+#: ../gtk/tr-prefs.c:1245
 msgid "Override normal speed limits manually or at scheduled times"
 msgstr ""
 
-#: ../gtk/tr-prefs.c:1233
-msgid "Limit do_wnload speed (KB/s):"
+#: ../gtk/tr-prefs.c:1252
+msgid "Limit do_wnload speed (KiB/s):"
 msgstr ""
 
-#: ../gtk/tr-prefs.c:1237
-msgid "Limit u_pload speed (KB/s):"
+#: ../gtk/tr-prefs.c:1256
+msgid "Limit u_pload speed (KiB/s):"
 msgstr ""
 
-#: ../gtk/tr-prefs.c:1241
+#: ../gtk/tr-prefs.c:1260
 msgid "_Scheduled times:"
-msgstr ""
+msgstr "_Skrásettar tíðir:"
 
-#: ../gtk/tr-prefs.c:1246
+#: ../gtk/tr-prefs.c:1265
 msgid " _to "
-msgstr ""
+msgstr " _til "
 
-#: ../gtk/tr-prefs.c:1257
+#: ../gtk/tr-prefs.c:1276
 msgid "_On days:"
-msgstr ""
+msgstr "Á døgum:"
 
-#: ../gtk/tr-prefs.c:1291 ../gtk/tr-prefs.c:1357
+#: ../gtk/tr-prefs.c:1310 ../gtk/tr-prefs.c:1376
 msgid "Status unknown"
-msgstr ""
+msgstr "Standur ókendur"
 
-#: ../gtk/tr-prefs.c:1313
+#: ../gtk/tr-prefs.c:1332
 msgid "Port is <b>open</b>"
-msgstr ""
+msgstr "Portur er <b>opið</b>"
 
-#: ../gtk/tr-prefs.c:1313
+#: ../gtk/tr-prefs.c:1332
 msgid "Port is <b>closed</b>"
-msgstr ""
+msgstr "Portur er <b>læst</b>"
 
-#: ../gtk/tr-prefs.c:1327
+#: ../gtk/tr-prefs.c:1346
 msgid "<i>Testing...</i>"
-msgstr ""
+msgstr "<i>Royni...</i>"
 
-#: ../gtk/tr-prefs.c:1350
+#: ../gtk/tr-prefs.c:1369
 msgid "Incoming Peers"
-msgstr ""
+msgstr "Ingangandi javnlíkar"
 
-#: ../gtk/tr-prefs.c:1352
+#: ../gtk/tr-prefs.c:1371
 msgid "_Port for incoming connections:"
-msgstr ""
+msgstr "_Portur til ingangandi javnlíkar:"
 
-#: ../gtk/tr-prefs.c:1360
+#: ../gtk/tr-prefs.c:1379
 msgid "Te_st Port"
+msgstr "_Royn portur"
+
+#: ../gtk/tr-prefs.c:1386
+msgid "Pick a _random port on startup"
 msgstr ""
 
-#: ../gtk/tr-prefs.c:1367
+#: ../gtk/tr-prefs.c:1390
 msgid "Use UPnP or NAT-PMP port _forwarding from my router"
 msgstr ""
 
-#: ../gtk/tr-prefs.c:1371
-msgid "Pick a _random port every time Transmission is started"
-msgstr ""
-
-#: ../gtk/tr-prefs.c:1379
+#: ../gtk/tr-prefs.c:1398
 msgid "Maximum peers per _torrent:"
-msgstr ""
+msgstr "Mest loyvda tal á javnlíkum, fyri hvønn torrent:"
 
-#: ../gtk/tr-prefs.c:1381
+#: ../gtk/tr-prefs.c:1400
 msgid "Maximum peers _overall:"
-msgstr ""
+msgstr "Mest loyvda tal á javnlíkum, í alt:"
 
-#: ../gtk/tr-prefs.c:1399
+#: ../gtk/tr-prefs.c:1418
 msgid "Transmission Preferences"
-msgstr ""
+msgstr "Transmission innstillingar"
 
-#: ../gtk/tr-prefs.c:1414
+#: ../gtk/tr-prefs.c:1433
 msgid "Torrents"
-msgstr ""
+msgstr "Torrentar"
 
-#: ../gtk/tr-prefs.c:1423
+#: ../gtk/tr-prefs.c:1442
 msgid "Network"
-msgstr ""
+msgstr "Net"
 
-#: ../gtk/tr-prefs.c:1429
+#: ../gtk/tr-prefs.c:1448
 msgid "Web"
-msgstr ""
+msgstr "Net"
 
-#: ../gtk/tr-prefs.c:1432
+#: ../gtk/tr-prefs.c:1451
 msgid "Proxy"
-msgstr ""
+msgstr "Umboð"
 
-#: ../gtk/tr-torrent.c:233
-#, c-format
-msgid "Waiting to verify local data (%.1f%% tested)"
-msgstr ""
-
-#. %s is # of minutes
-#: ../gtk/tr-torrent.c:252
-#, c-format
-msgid "%1$s remaining"
-msgstr ""
-
-#: ../gtk/tr-torrent.c:265 ../libtransmission/port-forwarding.c:176
-msgid "Stopped"
-msgstr ""
-
-#: ../gtk/tr-window.c:189
+#: ../gtk/tr-window.c:136
 msgid "Torrent"
-msgstr ""
+msgstr "Torrent"
 
-#: ../gtk/tr-window.c:306
+#: ../gtk/tr-window.c:239
 msgid "Total Ratio"
-msgstr ""
+msgstr "Heildarlutfall"
 
-#: ../gtk/tr-window.c:307
+#: ../gtk/tr-window.c:240
 msgid "Session Ratio"
-msgstr ""
+msgstr "Setu lutfall"
 
-#: ../gtk/tr-window.c:308
+#: ../gtk/tr-window.c:241
 msgid "Total Transfer"
-msgstr ""
+msgstr "Heildarflutningur"
 
-#: ../gtk/tr-window.c:309
+#: ../gtk/tr-window.c:242
 msgid "Session Transfer"
-msgstr ""
+msgstr "Setuflutningur"
 
-#: ../gtk/tr-window.c:338
+#: ../gtk/tr-window.c:271
 #, c-format
 msgid ""
 "Click to disable Temporary Speed Limits\n"
 "(%1$s down, %2$s up)"
 msgstr ""
+"Klikkja fyri at ógilda fyribils ferðmark\n"
+"(%1$s niður, %2$s upp)"
 
-#: ../gtk/tr-window.c:339
+#: ../gtk/tr-window.c:272
 #, c-format
 msgid ""
 "Click to enable Temporary Speed Limits\n"
 "(%1$s down, %2$s up)"
 msgstr ""
+"Klikkja fyri at gilda fyribils ferðmark\n"
+"(%1$s niður, %2$s upp)"
 
-#: ../gtk/tr-window.c:597
+#: ../gtk/tr-window.c:339
 #, c-format
 msgid "Tracker will allow requests in %s"
 msgstr ""
 
-#: ../gtk/tr-window.c:668
+#: ../gtk/tr-window.c:410
 msgid "Unlimited"
-msgstr ""
+msgstr "Óavmarkað"
 
-#: ../gtk/tr-window.c:735
+#: ../gtk/tr-window.c:477
 msgid "Seed Forever"
-msgstr ""
+msgstr "Fræa í allar avur"
 
-#: ../gtk/tr-window.c:773
+#: ../gtk/tr-window.c:515
 msgid "Limit Download Speed"
-msgstr ""
+msgstr "Avmarka niðurtøkuferð"
 
-#: ../gtk/tr-window.c:777
+#: ../gtk/tr-window.c:519
 msgid "Limit Upload Speed"
-msgstr ""
+msgstr "Avmarka uppsendingaferð"
 
-#: ../gtk/tr-window.c:784
+#: ../gtk/tr-window.c:526
 msgid "Stop Seeding at Ratio"
-msgstr ""
+msgstr "Steðga fræan við  lutfallinum"
 
-#: ../gtk/tr-window.c:818
+#: ../gtk/tr-window.c:560
 #, c-format
 msgid "Stop at Ratio (%s)"
+msgstr "Steðga við lutfalinum (%s)"
+
+#: ../gtk/tr-window.c:737
+msgid "999.9 KiB/s"
 msgstr ""
 
-#. show all torrents
-#: ../gtk/tr-window.c:844
-msgid "A_ll"
-msgstr ""
-
-#. show only torrents that have connected peers
-#: ../gtk/tr-window.c:846
-msgid "_Active"
-msgstr ""
-
-#. show only torrents that are trying to download
-#: ../gtk/tr-window.c:848
-msgid "_Downloading"
-msgstr ""
-
-#. show only torrents that are trying to upload
-#: ../gtk/tr-window.c:850
-msgid "_Seeding"
-msgstr ""
-
-#. show only torrents that are paused
-#: ../gtk/tr-window.c:852
-msgid "_Paused"
-msgstr ""
-
-#: ../gtk/tr-window.c:1066
-msgid "999.9 KB/s"
-msgstr ""
-
-#: ../gtk/tr-window.c:1111
+#: ../gtk/tr-window.c:781
 #, c-format
 msgid "%1$'d of %2$'d Torrent"
 msgid_plural "%1$'d of %2$'d Torrents"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$'d av %2$'d Torrenti"
+msgstr[1] "%1$'d av %2$'d Torrentum"
 
-#: ../gtk/tr-window.c:1117
+#: ../gtk/tr-window.c:787
 #, c-format
 msgid "%'d Torrent"
 msgid_plural "%'d Torrents"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%'d Torrentur"
+msgstr[1] "%'d Torrentar"
 
-#: ../gtk/tr-window.c:1148 ../gtk/tr-window.c:1159
+#: ../gtk/tr-window.c:807 ../gtk/tr-window.c:835
+#, c-format
+msgid "Ratio: %s"
+msgstr "Lutfall: %s"
+
+#: ../gtk/tr-window.c:818 ../gtk/tr-window.c:829
 #, c-format
 msgid "size|Down: %1$s, Up: %2$s"
-msgstr ""
+msgstr "stødd|Niður: %1$s, Upp: %2$s"
 
-#: ../gtk/util.c:119
+#: ../gtk/util.c:118
 #, c-format
 msgid "%'u byte"
 msgid_plural "%'u bytes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%'u být"
+msgstr[1] "%'u být"
 
-#: ../gtk/util.c:127
+#: ../gtk/util.c:120
 #, c-format
-msgid "%'.1f KB"
+msgid "%'.1f KiB"
 msgstr ""
 
-#: ../gtk/util.c:132
+#: ../gtk/util.c:122
 #, c-format
-msgid "%'.1f MB"
+msgid "%'.1f MiB"
 msgstr ""
 
-#: ../gtk/util.c:137
+#: ../gtk/util.c:124
 #, c-format
-msgid "%'.1f GB"
+msgid "%'.1f GiB"
 msgstr ""
 
-#. 0.0 KB to 999.9 KB
-#: ../gtk/util.c:152
+#. 0.0 KiB to 999.9 KiB
+#: ../gtk/util.c:134
 #, c-format
-msgid "%'.1f KB/s"
+msgid "%'.1f KiB/s"
 msgstr ""
 
-#. 0.98 MB to 99.99 MB
-#: ../gtk/util.c:154
+#. 0.98 MiB to 99.99 MiB
+#: ../gtk/util.c:136
 #, c-format
-msgid "%'.2f MB/s"
+msgid "%'.2f MiB/s"
 msgstr ""
 
-#. 100.0 MB to 999.9 MB
-#: ../gtk/util.c:156
+#. 100.0 MiB to 999.9 MiB
+#: ../gtk/util.c:138
 #, c-format
-msgid "%'.1f MB/s"
+msgid "%'.1f MiB/s"
 msgstr ""
 
 #. insane speeds
-#: ../gtk/util.c:158
+#: ../gtk/util.c:140
 #, c-format
-msgid "%'.2f GB/s"
+msgid "%'.2f GiB/s"
 msgstr ""
 
-#: ../gtk/util.c:179
+#: ../gtk/util.c:159
 #, c-format
 msgid "%'d day"
 msgid_plural "%'d days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%'d dagur"
+msgstr[1] "%'d dagar"
 
-#: ../gtk/util.c:181
+#: ../gtk/util.c:161
 #, c-format
 msgid "%'d hour"
 msgid_plural "%'d hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%'d tími"
+msgstr[1] "%'d tímar"
 
-#: ../gtk/util.c:184
+#: ../gtk/util.c:164
 #, c-format
 msgid "%'d minute"
 msgid_plural "%'d minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%'d minuttur"
+msgstr[1] "%'d minuttir"
 
-#: ../gtk/util.c:186
+#: ../gtk/util.c:166
 #, c-format
 msgid "%'d second"
 msgid_plural "%'d seconds"
-msgstr[0] ""
-msgstr[1] ""
-
-#: ../gtk/util.c:378
-#, c-format
-msgid "The torrent file \"%s\" contains invalid data."
-msgstr ""
+msgstr[0] "%'d sekund"
+msgstr[1] "%'d sekundir"
 
 #: ../gtk/util.c:379
 #, c-format
-msgid "The torrent file \"%s\" is already in use."
-msgstr ""
+msgid "The torrent file \"%s\" contains invalid data."
+msgstr "Torrentfilan \"%s\" inniheldur ólógligar dátur."
 
 #: ../gtk/util.c:380
+#, c-format
+msgid "The torrent file \"%s\" is already in use."
+msgstr "Torrentfílan \"%s\" er í nýtlsu."
+
+#: ../gtk/util.c:381
 #, c-format
 msgid "The torrent file \"%s\" encountered an unknown error."
 msgstr ""
 
-#: ../gtk/util.c:388
+#: ../gtk/util.c:389
 msgid "Error opening torrent"
-msgstr ""
+msgstr "Villa við upplatan av torrenti"
 
-#: ../gtk/util.c:832
+#: ../gtk/util.c:833
 msgid "Unrecognized URL"
 msgstr ""
 
-#: ../gtk/util.c:834
+#: ../gtk/util.c:835
 #, c-format
 msgid "Transmission doesn't know how to use \"%s\""
-msgstr ""
+msgstr "Transmission veit ikki, hvussu ein nýtur \"%s\""
 
-#: ../gtk/util.c:839
+#: ../gtk/util.c:840
 #, c-format
 msgid ""
 "This magnet link appears to be intended for something other than BitTorrent. "
@@ -1837,58 +1892,64 @@ msgid ""
 msgstr ""
 
 #. did caller give us an uninitialized val?
-#: ../libtransmission/bencode.c:1092
+#: ../libtransmission/bencode.c:1093
 msgid "Invalid metadata"
 msgstr ""
 
-#: ../libtransmission/bencode.c:1644
+#: ../libtransmission/bencode.c:1651
 #, c-format
 msgid "Saved \"%s\""
-msgstr ""
+msgstr "Goymdi \"%s\""
 
-#: ../libtransmission/bencode.c:1649 ../libtransmission/bencode.c:1656
-#: ../libtransmission/blocklist.c:294
+#: ../libtransmission/bencode.c:1656 ../libtransmission/bencode.c:1663
+#: ../libtransmission/blocklist.c:309
 #, c-format
 msgid "Couldn't save file \"%1$s\": %2$s"
-msgstr ""
+msgstr "Kundi ikki goyma fíluna \"%1$s\": %2$s"
 
-#: ../libtransmission/bencode.c:1663 ../libtransmission/bencode.c:1673
+#: ../libtransmission/bencode.c:1670 ../libtransmission/bencode.c:1680
 #, c-format
 msgid "Couldn't save temporary file \"%1$s\": %2$s"
-msgstr ""
+msgstr "Kundi ikki goyma fyribilsfíluna \"%1$s\": %2$s"
 
-#: ../libtransmission/blocklist.c:78 ../libtransmission/blocklist.c:238
-#: ../libtransmission/utils.c:488
+#: ../libtransmission/blocklist.c:78 ../libtransmission/blocklist.c:239
+#: ../libtransmission/utils.c:484
 #, c-format
 msgid "Couldn't read \"%1$s\": %2$s"
-msgstr ""
+msgstr "Kundi ikki lesa \"%1$s\": %2$s"
 
 #: ../libtransmission/blocklist.c:110
 #, c-format
 msgid "Blocklist \"%s\" contains %'zu entries"
 msgstr ""
 
-#: ../libtransmission/blocklist.c:304
+#. don't try to display the actual lines - it causes issues
+#: ../libtransmission/blocklist.c:288 ../libtransmission/blocklist.c:298
+#, c-format
+msgid "blocklist skipped invalid address at line %d"
+msgstr ""
+
+#: ../libtransmission/blocklist.c:319
 #, c-format
 msgid "Blocklist \"%1$s\" updated with %2$'d entries"
 msgstr ""
 
-#: ../libtransmission/fdlimit.c:369
+#: ../libtransmission/fdlimit.c:352
 #, c-format
 msgid "Preallocated file \"%s\""
-msgstr ""
+msgstr "Forútluta fíla \"%s\""
 
-#: ../libtransmission/fdlimit.c:652
+#: ../libtransmission/fdlimit.c:635
 #, c-format
 msgid "Couldn't create socket: %s"
-msgstr ""
+msgstr "Kundi ikki stovna sokkul: %s"
 
 #: ../libtransmission/makemeta.c:60
 #, c-format
 msgid "Torrent Creator is skipping file \"%s\": %s"
 msgstr ""
 
-#: ../libtransmission/metainfo.c:563
+#: ../libtransmission/metainfo.c:579
 #, c-format
 msgid "Invalid metadata entry \"%s\""
 msgstr ""
@@ -1900,7 +1961,7 @@ msgstr ""
 #: ../libtransmission/natpmp.c:67
 #, c-format
 msgid "%s succeeded (%d)"
-msgstr ""
+msgstr "%s eydnaðist (%d)"
 
 #: ../libtransmission/natpmp.c:137
 #, c-format
@@ -1917,104 +1978,120 @@ msgstr ""
 msgid "Port %d forwarded successfully"
 msgstr ""
 
-#: ../libtransmission/net.c:286
+#: ../libtransmission/net.c:301
 #, c-format
 msgid "Couldn't set source address %s on %d: %s"
 msgstr ""
 
-#: ../libtransmission/net.c:302
+#: ../libtransmission/net.c:317
 #, c-format
 msgid "Couldn't connect socket %d to %s, port %d (errno %d - %s)"
 msgstr ""
 
-#: ../libtransmission/net.c:360
+#: ../libtransmission/net.c:375
 msgid "Is another copy of Transmission already running?"
-msgstr ""
+msgstr "Er eitt annað avrita av Transmission longu í gongd?"
 
-#: ../libtransmission/net.c:365
+#: ../libtransmission/net.c:380
 #, c-format
 msgid "Couldn't bind port %d on %s: %s"
 msgstr ""
 
-#: ../libtransmission/net.c:367
+#: ../libtransmission/net.c:382
 #, c-format
 msgid "Couldn't bind port %d on %s: %s (%s)"
 msgstr ""
 
-#: ../libtransmission/port-forwarding.c:31
+#: ../libtransmission/port-forwarding.c:33
 msgid "Port Forwarding"
-msgstr ""
-
-#: ../libtransmission/port-forwarding.c:58
-msgid "Starting"
-msgstr ""
-
-#: ../libtransmission/port-forwarding.c:59
-msgid "Forwarded"
-msgstr ""
+msgstr "Portursendursending"
 
 #: ../libtransmission/port-forwarding.c:60
-msgid "Stopping"
-msgstr ""
+msgid "Starting"
+msgstr "Byrji"
 
 #: ../libtransmission/port-forwarding.c:61
-msgid "Not forwarded"
-msgstr ""
+msgid "Forwarded"
+msgstr "Endursent"
 
-#: ../libtransmission/port-forwarding.c:85 ../libtransmission/torrent.c:1642
+#: ../libtransmission/port-forwarding.c:62
+msgid "Stopping"
+msgstr "Steðgi"
+
+#: ../libtransmission/port-forwarding.c:63
+msgid "Not forwarded"
+msgstr "Ikki endursent"
+
+#: ../libtransmission/port-forwarding.c:87 ../libtransmission/torrent.c:1720
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
-msgstr ""
+msgstr "Standur broyttur úr \"%1$s\" til \"%2$s\""
+
+#: ../libtransmission/port-forwarding.c:178
+msgid "Stopped"
+msgstr "Stoppað"
 
 #. first %s is the application name
 #. second %s is the version number
-#: ../libtransmission/session.c:611
+#: ../libtransmission/session.c:622
 #, c-format
 msgid "%s %s started"
+msgstr "%s %s byrjað"
+
+#: ../libtransmission/session.c:636
+msgid "Local Peer Discovery disabled"
 msgstr ""
 
-#: ../libtransmission/session.c:1629
+#: ../libtransmission/session.c:638
+msgid "Local Peer Discovery active"
+msgstr ""
+
+#: ../libtransmission/session.c:1748
 #, c-format
 msgid "Loaded %d torrents"
-msgstr ""
+msgstr "Løddi %d torrentar"
 
-#: ../libtransmission/torrent.c:337
+#: ../libtransmission/torrent.c:398
 #, c-format
 msgid "Tracker warning: \"%s\""
-msgstr ""
+msgstr "Leitara ávaring: \"%s\""
 
-#: ../libtransmission/torrent.c:343
+#: ../libtransmission/torrent.c:405
 #, c-format
 msgid "Tracker error: \"%s\""
-msgstr ""
+msgstr "Leitaravilla: \"%s\""
 
-#: ../libtransmission/torrent.c:1330
+#: ../libtransmission/torrent.c:1369
 msgid ""
 "No data found!  Reconnect any disconnected drives, use \"Set Location\", or "
 "restart the torrent to re-download."
 msgstr ""
 
-#: ../libtransmission/torrent.c:1407
+#: ../libtransmission/torrent.c:1452
 msgid ""
 "Can't find local data.  Try \"Set Location\" to find it, or restart the "
 "torrent to re-download."
 msgstr ""
 
-#: ../libtransmission/torrent.c:1568
+#: ../libtransmission/torrent.c:1562
+msgid "Removing torrent"
+msgstr ""
+
+#: ../libtransmission/torrent.c:1616
 msgid "Done"
-msgstr ""
+msgstr "Liðugt"
 
-#: ../libtransmission/torrent.c:1571
+#: ../libtransmission/torrent.c:1619
 msgid "Complete"
-msgstr ""
+msgstr "Fullgjørt"
 
-#: ../libtransmission/torrent.c:1574
+#: ../libtransmission/torrent.c:1622
 msgid "Incomplete"
-msgstr ""
+msgstr "Ófullgjørt"
 
 #: ../libtransmission/upnp.c:26
 msgid "Port Forwarding (UPnP)"
-msgstr ""
+msgstr "Portursendursending (UPnP)"
 
 #: ../libtransmission/upnp.c:104
 #, c-format
@@ -2029,7 +2106,7 @@ msgstr ""
 #: ../libtransmission/upnp.c:144
 #, c-format
 msgid "Port %d isn't forwarded"
-msgstr ""
+msgstr "Portur %d verður ikki endursent"
 
 #: ../libtransmission/upnp.c:158
 #, c-format
@@ -2044,26 +2121,26 @@ msgstr ""
 
 #: ../libtransmission/upnp.c:197
 msgid "Port forwarding successful!"
-msgstr ""
+msgstr "Portursendursending eydnaðist"
 
-#: ../libtransmission/utils.c:502
+#: ../libtransmission/utils.c:498
 msgid "Not a regular file"
-msgstr ""
+msgstr "Ikki ein vanlig fíla"
 
-#: ../libtransmission/utils.c:520
+#: ../libtransmission/utils.c:516
 msgid "Memory allocation failed"
-msgstr ""
+msgstr "Minnisútlutan miseydnaðist"
 
 #. Node exists but isn't a folder
-#: ../libtransmission/utils.c:618
+#: ../libtransmission/utils.c:614
 #, c-format
 msgid "File \"%s\" is in the way"
-msgstr ""
+msgstr "Fíla \"%s\" er í vegin"
 
 #: ../libtransmission/verify.c:235
 msgid "Verifying torrent"
-msgstr ""
+msgstr "Sanni torrent"
 
 #: ../libtransmission/verify.c:305
 msgid "Queued for verification"
-msgstr ""
+msgstr "Í kø til sanning"
