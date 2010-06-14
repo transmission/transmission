@@ -118,6 +118,7 @@ struct peer_atom
     uint8_t     myflags;            /* flags that aren't defined in added_f */
     uint8_t     uploadOnly;         /* UPLOAD_ONLY_ */
     int8_t      seedProbability;    /* how likely is this to be a seed... [0..100] or -1 for unknown */
+    int8_t      blocklisted;        /* -1 for unknown, TRUE for blocklisted, FALSE for not blocklisted */
 
     tr_port     port;
     uint16_t    numFails;
@@ -543,6 +544,41 @@ clientIsUploadingTo( const tr_peer * peer )
 {
     return peer->peerIsInterested && !peer->peerIsChoked;
 }
+
+/***
+****
+***/
+
+void
+tr_peerMgrOnBlocklistChanged( tr_peerMgr * mgr )
+{
+    tr_torrent * tor = NULL;
+    tr_session * session = mgr->session;
+
+    /* we cache whether or not a peer is blocklisted...
+       since the blocklist has changed, erase that cached value */
+    while(( tor = tr_torrentNext( session, tor )))
+    {
+        int i;
+        Torrent * t = tor->torrentPeers;
+        const int n = tr_ptrArraySize( &t->pool );
+        for( i=0; i<n; ++i ) {
+            struct peer_atom * atom = tr_ptrArrayNth( &t->pool, i );
+            atom->blocklisted = -1;
+        }
+    }
+}
+
+static tr_bool
+isAtomBlocklisted( tr_session * session, struct peer_atom * atom )
+{
+    if( atom->blocklisted < 0 )
+        atom->blocklisted = tr_sessionIsAddressBlocked( session, &atom->addr );
+
+    assert( tr_isBool( atom->blocklisted ) );
+    return atom->blocklisted;
+}
+
 
 /***
 ****
@@ -1539,6 +1575,7 @@ ensureAtomExists( Torrent           * t,
         a->flags = flags;
         a->from = from;
         a->shelf_date = tr_time( ) + getDefaultShelfLife( from ) + jitter;
+        a->blocklisted = -1;
         atomSetSeedProbability( a, seedProbability );
         tr_ptrArrayInsertSorted( &t->pool, a, compareAtomsByAddress );
 
@@ -3244,7 +3281,7 @@ isBandwidthMaxedOut( const tr_bandwidth * b,
 
 /* is this atom someone that we'd want to initiate a connection to? */
 static tr_bool
-isPeerCandidate( const tr_torrent * tor, const struct peer_atom * atom, const time_t now )
+isPeerCandidate( const tr_torrent * tor, struct peer_atom * atom, const time_t now )
 {
     /* not if they're banned... */
     if( atom->myflags & MYFLAG_BANNED )
@@ -3260,8 +3297,7 @@ isPeerCandidate( const tr_torrent * tor, const struct peer_atom * atom, const ti
             return FALSE;
  
     /* not if they're blocklisted */
-    /* FIXME: maybe we should remove this atom altogether? */
-    if( tr_sessionIsAddressBlocked( tor->session, &atom->addr ) )
+    if( isAtomBlocklisted( tor->session, atom ) )
         return FALSE;
 
     /* not if we've already got a connection to them...  */

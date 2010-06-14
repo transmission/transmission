@@ -1989,6 +1989,8 @@ tr_sessionReloadBlocklists( tr_session * session )
 {
     closeBlocklists( session );
     loadBlocklists( session );
+
+    tr_peerMgrOnBlocklistChanged( session->peerMgr );
 }
 
 int
