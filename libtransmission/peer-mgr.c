@@ -3287,15 +3287,15 @@ isPeerCandidate( const tr_torrent * tor, struct peer_atom * atom, const time_t n
     if( atom->myflags & MYFLAG_BANNED )
         return FALSE;
 
-    /* not if we just tried them already */
-    if( ( now - atom->time ) < getReconnectIntervalSecs( atom, now ) )
-        return FALSE;
-
     /* not if we're both seeds */
     if( tr_torrentIsSeed( tor ) )
         if( atomIsSeed( atom ) || ( atom->uploadOnly == UPLOAD_ONLY_YES ) )
             return FALSE;
  
+    /* not if we just tried them already */
+    if( ( now - atom->time ) < getReconnectIntervalSecs( atom, now ) )
+        return FALSE;
+
     /* not if they're blocklisted */
     if( isAtomBlocklisted( tor->session, atom ) )
         return FALSE;
@@ -3320,7 +3320,7 @@ torrentWasRecentlyStarted( const tr_torrent * tor )
     return difftime( tr_time( ), tor->startDate ) < 120;
 }
 
-static uint64_t
+static inline uint64_t
 addValToKey( uint64_t value, int width, uint64_t addme )
 {
     value = (value << (uint64_t)width);
