@@ -3271,8 +3271,9 @@ isPeerCandidate( const tr_torrent * tor, const struct peer_atom * atom, const ti
 
 struct peer_candidate
 {
+    uint64_t score;
     int from;
-    int salt;
+    uint8_t salt;
     int priority;
     int seedProbability;
     int wasRecentlyStarted;
@@ -3280,7 +3281,6 @@ struct peer_candidate
     time_t lastConnectionAttemptAt;
     tr_torrent * tor;
     struct peer_atom * atom;
-    
 };
 
 static int
@@ -3295,7 +3295,9 @@ compareSeedProbabilities( int a, int b )
     if( b == 100 ) b = 101;
     else if( b == -1 ) b = 100;
 
-    return a > b ? 1 : -1;
+    if( a > b ) return 1;
+    if( a < b ) return -1;
+    return 0;
 }
 
 static tr_bool
@@ -3304,43 +3306,156 @@ torrentWasRecentlyStarted( const tr_torrent * tor )
     return difftime( tr_time( ), tor->startDate ) < 120;
 }
 
-/* sort an array of peer candidates */
+static int loud = FALSE;
+
+static inline uint64_t
+addValToKey( uint64_t value, int width, uint64_t addme )
+{
+if(loud) fprintf( stderr, "old value %"PRIu64"... width %d, addme %d\n", value, width, (int)addme );
+    value = (value << (uint64_t)width);
+if(loud) fprintf( stderr, "mid value %"PRIu64"\n", value );
+    value |= addme;
+if(loud) fprintf( stderr, "new value %"PRIu64"\n", value );
+    return value;
+}
+
+/* smaller value is better */
+static uint64_t
+getPeerCandidateScore( const tr_torrent * tor, const struct peer_atom * atom, uint8_t salt  )
+{
+    uint64_t i;
+    uint64_t score = 0;
+    const tr_bool failed = atom->lastConnectionAt < atom->lastConnectionAttemptAt;
+
+    /* prefer peers we've connected to, or never tried, over peers we failed to connect to. */
+    i = failed ? 1 : 0;
+    score = addValToKey( score, 1, i );
+
+    /* prefer the one we attempted least recently (to cycle through all peers) */
+    i = atom->lastConnectionAttemptAt;
+    score = addValToKey( score, 32, i );
+
+    /* prefer peers belonging to a torrent of a higher priority */
+    switch( tr_torrentGetPriority( tor ) ) {
+        case TR_PRI_HIGH:    i = 0; break;
+        case TR_PRI_NORMAL:  i = 1; break;
+        case TR_PRI_LOW:     i = 2; break;
+    }
+    score = addValToKey( score, 4, i );
+
+    /* prefer recently-started torrents */
+    i = torrentWasRecentlyStarted( tor ) ? 0 : 1;
+    score = addValToKey( score, 1, i );
+
+    /* prefer peers that we might have a chance of uploading to...
+       so lower seed probability is better */
+    if( atom->seedProbability == 100 ) i = 101;
+    else if( atom->seedProbability == -1 ) i = 100;
+    else i = atom->seedProbability;
+    score = addValToKey( score, 8, i );
+
+    /* Prefer peers that we got from more trusted sources.
+     * lower `from' values indicate more trusted sources */
+    score = addValToKey( score, 4, atom->from );
+
+    /* salt */
+    score = addValToKey( score, 8, salt );
+
+    return score;
+}
+
 static int
-comparePeerCandidates( const void * va, const void * vb )
+oldComparePeerCandidates( const void * va, const void * vb )
 {
     int i;
-    tr_bool af, bf;
     const struct peer_candidate * a = va;
     const struct peer_candidate * b = vb;
 
     /* prefer peers we've connected to, or never tried, over peers we failed to connect to. */
-    af = a->lastConnectionAt < a->lastConnectionAttemptAt;
-    bf = b->lastConnectionAt < b->lastConnectionAttemptAt;
-    if( af != bf )
-        return af ? 1 : -1;
+    const tr_bool a_failed = a->atom->lastConnectionAt < a->atom->lastConnectionAttemptAt;
+    const tr_bool b_failed = b->atom->lastConnectionAt < b->atom->lastConnectionAttemptAt;
+    if( a_failed != b_failed ) {
+if(loud) fprintf( stderr, "old: a_failed %d\n", (int)a_failed );
+if(loud) fprintf( stderr, "old: b_failed %d\n", (int)b_failed );
+        return a_failed ? 1 : -1;
+    }
 
     /* prefer the one we attempted least recently (to cycle through all peers) */
-    if( a->lastConnectionAttemptAt != b->lastConnectionAttemptAt )
+    if( a->lastConnectionAttemptAt != b->lastConnectionAttemptAt ) {
+if(loud) fprintf( stderr, "old: a->lastConnectionAttemptAt %u\n", (unsigned int)a->lastConnectionAttemptAt );
+if(loud) fprintf( stderr, "old: b->lastConnectionAttemptAt %u\n", (unsigned int)b->lastConnectionAttemptAt );
         return a->lastConnectionAttemptAt < b->lastConnectionAttemptAt ? -1 : 1;
+    }
 
     /* prefer peers belonging to a torrent of a higher priority */
-    if( a->priority != b->priority )
+    if( a->priority != b->priority ) {
+if(loud) fprintf( stderr, "old: a->priority %d\n", (int)a->priority );
+if(loud) fprintf( stderr, "old: b->priority %d\n", (int)b->priority );
         return a->priority > b->priority ? -1 : 1;
+    }
 
     /* prefer recently-started torrents */
-    if( a->wasRecentlyStarted != b->wasRecentlyStarted )
+    if( a->wasRecentlyStarted != b->wasRecentlyStarted ) {
+if(loud) fprintf( stderr, "old: a->wasRecentlyStarted %d\n", (int)a->wasRecentlyStarted );
+if(loud) fprintf( stderr, "old: b->wasRecentlyStarted %d\n", (int)b->wasRecentlyStarted );
         return a->wasRecentlyStarted ? -1 : 1;
+     }
 
     /* prefer peers that we might have a chance of uploading to */
-    if(( i = compareSeedProbabilities( a->seedProbability, b->seedProbability )))
+    if(( i = compareSeedProbabilities( a->seedProbability, b->seedProbability ))) {
+if(loud) fprintf( stderr, "old: a->seedProbability %d\n", (int)a->seedProbability );
+if(loud) fprintf( stderr, "old: b->seedProbability %d\n", (int)b->seedProbability );
         return i;
+    }
 
     /* prefer peers that we got from more trusted sources */
-    if( a->from != b->from )
+    if( a->from != b->from ) {
+if(loud) fprintf( stderr, "old: a->from %d\n", (int)a->from );
+if(loud) fprintf( stderr, "old: b->from %d\n", (int)b->from );
         return a->from < b->from ? -1 : 1;
+    }
 
     /* salt */
-    return a->salt - b->salt;
+if(loud) fprintf( stderr, "old: a->salt %d\n", (int)a->salt );
+if(loud) fprintf( stderr, "old: b->salt %d\n", (int)b->salt );
+    if( a->salt != b->salt )
+        return a->salt < b->salt ? -1 : 1;
+
+    return 0;
+}
+
+/* sort an array of peer candidates */
+static int
+comparePeerCandidates( const void * va, const void * vb )
+{
+    int ret;
+    int oldret;
+    const struct peer_candidate * a = va;
+    const struct peer_candidate * b = vb;
+
+    if( a->score != b->score )
+        ret = a->score < b->score ? -1 : 1;
+    else
+        ret = 0;
+    
+    oldret = oldComparePeerCandidates( va, vb );
+
+    if( ret != oldret ) {
+        loud = TRUE;
+        oldret = oldComparePeerCandidates( va, vb );
+        fprintf( stderr, "ccc =========================\n" );
+        fprintf( stderr, "oldret %d\n", oldret );
+        fprintf( stderr, "ret %d\n", ret );
+        fprintf( stderr, "a score %"PRIu64"\n", a->score );
+        fprintf( stderr, "b score %"PRIu64"\n", b->score );
+        fprintf( stderr, "generating a score\n" );
+        getPeerCandidateScore( a->tor, a->atom, a->salt );
+        fprintf( stderr, "generating b bcore\n" );
+        getPeerCandidateScore( b->tor, b->atom, b->salt );
+        assert( 0 );
+    }
+
+    return ret;
 }
 
 /** @return an array of all the atoms we might want to connect to */
@@ -3402,6 +3517,7 @@ getPeerCandidates( tr_session * session, int * candidateCount )
                 walk->atom = atom;
                 walk->from = atom->from;
                 walk->salt = tr_cryptoWeakRandInt( 4096 );
+                walk->score = getPeerCandidateScore( tor, atom, walk->salt );
                 walk->priority = tr_torrentGetPriority( tor );
                 walk->seedProbability = atom->seedProbability;
                 walk->wasRecentlyStarted = torrentWasRecentlyStarted( tor );
