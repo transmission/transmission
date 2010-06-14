@@ -271,10 +271,12 @@ handshakeCompare( const void * a, const void * b )
     return handshakeCompareToAddr( a, tr_handshakeGetAddr( b, NULL ) );
 }
 
-static tr_handshake*
-getExistingHandshake( tr_ptrArray      * handshakes,
-                      const tr_address * addr )
+static inline tr_handshake*
+getExistingHandshake( tr_ptrArray * handshakes, const tr_address * addr )
 {
+    if( tr_ptrArrayEmpty( handshakes ) )
+        return NULL;
+
     return tr_ptrArrayFindSorted( handshakes, addr, handshakeCompareToAddr );
 }
 
@@ -566,7 +568,7 @@ atomSetSeed( struct peer_atom * atom )
     atomSetSeedProbability( atom, 100 );
 }
 
-static tr_bool
+static inline tr_bool
 atomIsSeed( const struct peer_atom * atom )
 {
     return atom->seedProbability == 100;
@@ -3244,10 +3246,6 @@ isBandwidthMaxedOut( const tr_bandwidth * b,
 static tr_bool
 isPeerCandidate( const tr_torrent * tor, const struct peer_atom * atom, const time_t now )
 {
-    /* not if we've already got a connection to them... */
-    if( peerIsInUse( tor->torrentPeers, atom ) )
-        return FALSE;
-
     /* not if they're banned... */
     if( atom->myflags & MYFLAG_BANNED )
         return FALSE;
@@ -3264,6 +3262,10 @@ isPeerCandidate( const tr_torrent * tor, const struct peer_atom * atom, const ti
     /* not if they're blocklisted */
     /* FIXME: maybe we should remove this atom altogether? */
     if( tr_sessionIsAddressBlocked( tor->session, &atom->addr ) )
+        return FALSE;
+
+    /* not if we've already got a connection to them...  */
+    if( peerIsInUse( tor->torrentPeers, atom ) )
         return FALSE;
 
     return TRUE;
@@ -3342,8 +3344,8 @@ comparePeerCandidates( const void * va, const void * vb )
     const struct peer_candidate * a = va;
     const struct peer_candidate * b = vb;
 
-    if( a->score != b->score )
-        return a->score < b->score ? -1 : 1;
+    if( a->score < b->score ) return -1;
+    if( a->score > b->score ) return 1;
 
     return 0;
 }
