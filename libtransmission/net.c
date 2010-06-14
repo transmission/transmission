@@ -189,9 +189,6 @@ tr_compareAddresses( const tr_address * a, const tr_address * b)
 {
     static const int sizes[2] = { sizeof(struct in_addr), sizeof(struct in6_addr) };
 
-    assert( tr_isAddress( a ) );
-    assert( tr_isAddress( b ) );
-
     /* IPv6 addresses are always "greater than" IPv4 */
     if( a->type != b->type )
         return a->type == TR_AF_INET ? 1 : -1;
