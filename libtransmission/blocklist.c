@@ -27,8 +27,6 @@
 #include <unistd.h>
 #include <assert.h>
 
-#include "ggets.h"
-
 #include "transmission.h"
 #include "platform.h"
 #include "blocklist.h"
@@ -304,11 +302,11 @@ int
 _tr_blocklistSetContent( tr_blocklist * b,
                          const char *   filename )
 {
-    FILE *       in;
-    FILE *       out;
-    char *       line;
-    int          inCount = 0;
-    int          outCount = 0;
+    FILE * in;
+    FILE * out;
+    int inCount = 0;
+    int outCount = 0;
+    char line[2048];
     const char * err_fmt = _( "Couldn't read \"%1$s\": %2$s" );
 
     if( !filename )
@@ -334,7 +332,7 @@ _tr_blocklistSetContent( tr_blocklist * b,
         return 0;
     }
 
-    while( !fggets( &line, in ) )
+    while( fgets( line, sizeof( line ), in ) != NULL )
     {
         char * walk;
         struct tr_ip_range range;
@@ -349,11 +347,8 @@ _tr_blocklistSetContent( tr_blocklist * b,
         {
             /* don't try to display the actual lines - it causes issues */
             tr_err( _( "blocklist skipped invalid address at line %d" ), inCount );
-            free( line );
             continue;
         }
-
-        free( line );
 
         if( fwrite( &range, sizeof( struct tr_ip_range ), 1, out ) != 1 )
         {

@@ -26,7 +26,6 @@ libtransmission_a_SOURCES = \
     ConvertUTF.c \
     crypto.c \
     fdlimit.c \
-    ggets.c \
     handshake.c \
     history.c \
     inout.c \
@@ -77,7 +76,6 @@ noinst_HEADERS = \
     crypto.h \
     completion.h \
     fdlimit.h \
-    ggets.h \
     handshake.h \
     history.h \
     inout.h \
