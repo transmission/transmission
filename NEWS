@@ -3,7 +3,7 @@
 ==== All Platforms ====
   * "Local Peer Discovery" for finding peers on the local network
   * Optimize download requests for the bandwidth available
-  * Smarter rules when deciding the order to connect to peers
+  * Smarter heuristics when deciding the order to connect to peers
   * Faster verification of local data
   * Faster startup
   * Support more blocklist file formats
@@ -15,7 +15,7 @@
   * "Resume All" now ignores finished transfers 
   * Allow trackers to be pasted into the Create Window
   * European Portuguese localization
-  * Removed Simplified Chinese localization because of lack of localizer
+  * Removed Traditional Chinese localization because of lack of localizer
 ==== GTK+ ====
   * New filterbar to filter by tracker, private/public, etc.
   * Compact View replaces Minimal View, taking up considerably less space
