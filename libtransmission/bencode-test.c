@@ -483,6 +483,7 @@ testBool( void )
     check( tr_bencDictFindInt( &top, "key4", &intVal ) )
     check( intVal )
 
+    tr_bencFree( &top );
     return 0;
 }
 
