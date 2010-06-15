@@ -644,9 +644,15 @@ main( int argc, char ** argv )
         tr_sessionSetRPCCallback( session, onRPCChanged, cbdata );
 
         /* on startup, check & see if it's time to update the blocklist */
-        if( pref_flag_get( PREF_KEY_BLOCKLIST_UPDATES_ENABLED )
-            && ( time( NULL ) - pref_int_get( "blocklist-date" ) > ( 60 * 60 * 24 * 7 ) ) )
-                tr_core_blocklist_update( cbdata->core );
+        if( pref_flag_get( TR_PREFS_KEY_BLOCKLIST_ENABLED ) ) {
+            if( pref_flag_get( PREF_KEY_BLOCKLIST_UPDATES_ENABLED ) ) {
+                const int64_t last_time = pref_int_get( "blocklist-date" );
+                const int SECONDS_IN_A_WEEK = 7 * 24 * 60 * 60;
+                const time_t now = time( NULL );
+                if( last_time + SECONDS_IN_A_WEEK < now )
+                    tr_core_blocklist_update( cbdata->core );
+            }
+        }
 
         /* if there's no magnet link handler registered, register us */
         registerMagnetLinkHandler( );
