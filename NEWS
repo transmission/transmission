@@ -1,21 +1,22 @@
 === Transmission 2.00 (2010/xx/yy) ===
 [http://trac.transmissionbt.com/query?milestone=2.00&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== All Platforms ====
-  * "Local Peer Discovery" for finding peers on the local network
-  * Optimize peer connections and requests based on available bandwidth
-  * Smarter heuristics when deciding which peers to try connecting to first
+  * New "Local Peer Discovery" for finding peers on the local network
+  * Optimize download requests for the bandwidth available
+  * Smarter rules when deciding peers to try connecting to first
   * Faster verification of local data
+  * Faster startup
   * Support more blocklist file formats
   * Use IEC standard units (KiB, MiB, GiB) instead of (KB, MB, GB)
   * Better handling of 404 tracker errors
 ==== Mac ====
-  * Compact View replaces Minimal View, taking up considerably less space
+  * Compact View replaces Minimal View and uses less space
   * Show an Add Transfer window when adding magnet links
   * "Resume All" now ignores finished transfers 
   * Allow trackers to be pasted into the Create Window
 ==== GTK+ ====
   * New filterbar to filter by tracker, private/public, etc.
-  * Compact View replaces Minimal View, taking up considerably less space
+  * Compact View replaces Minimal View and uses less space
   * Show the Torrent Options dialog when adding magnet links
   * "Set Location" now supports moving multiple torrents at once
   * The Properties window now fits on low resolution screens
