@@ -1,7 +1,7 @@
 === Transmission 2.00 (2010/xx/yy) ===
 [http://trac.transmissionbt.com/query?milestone=2.00&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== All Platforms ====
-  * New "Local Peer Discovery" for finding peers on the local network
+  * "Local Peer Discovery" for finding peers on the local network
   * Optimize download requests for the bandwidth available
   * Smarter rules when deciding the order to connect to peers
   * Faster verification of local data
