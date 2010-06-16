@@ -1,0 +1,44 @@
+.Dd June 9, 2010
+.Dt TRANSMISSION-CREATE 1
+.Os
+.Sh NAME
+.Nm transmission-create
+.Nd command-line utility to create .torrent files
+.Sh SYNOPSIS
+.Bk -words
+.Nm
+.Op Fl h 
+.Op Fl p 
+.Op Fl o Ar file
+.Op Fl c Ar comment
+.Op Fl t Ar tracker
+.Op Ar source file or directory
+.Ek
+.Sh DESCRIPTION
+.Nm
+creates BitTorrent .torrent files from the command line
+.Sh OPTIONS
+.Bl -tag -width Ds
+.It Fl h Fl -help
+Show a short help page and exit.
+.It Fl p Fl -private
+Flag the torrent as intended for use on private trackers.
+.It Fl c Fl -comment
+Add a comment to the torrent file.
+.It Fl t Fl -tracker
+Add a tracker's
+.Ar announce URL
+to the .torrent.  Most torrents will have at least one
+.Ar announce URL.
+To add more than one, use this option multiple times.
+
+.Sh AUTHORS
+.An -nosplit
+.An Charles Kerr
+.Sh SEE ALSO
+.Xr transmission-daemon 1 ,
+.Xr transmission-gtk 1 ,
+.Xr transmission-edit 1 , 
+.Xr transmission-show 1
+.Pp
+http://www.transmissionbt.com/

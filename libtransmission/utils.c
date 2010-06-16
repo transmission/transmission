@@ -114,11 +114,7 @@ tr_getLog( void )
 void
 tr_setMessageLevel( int level )
 {
-    tr_lockLock( messageLock );
-
     messageLevel = MAX( 0, level );
-
-    tr_lockUnlock( messageLock );
 }
 
 int

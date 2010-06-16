@@ -24,18 +24,6 @@
 .Bk -words
 .Fl h
 .Nm
-.Fl i
-.Ar torrent-file
-.Nm
-.Fl s
-.Ar torrent-file
-.Nm
-.Fl n Ar sourcefile
-.Op Fl a Ar url
-.Op Fl c Ar comment
-.Op Fl r
-.Ar new-torrent-file
-.Nm
 .Op Fl b | B
 .Op Fl d Ar number | Fl D
 .Op Fl er | ep | et
@@ -58,15 +46,11 @@ scripting capabilities.
 .Pp
 The options are as follows:
 .Bl -tag -width Ds
-.It Fl a, Fl -announce Ar announce-url
-When creating a new torrent, set its announce URL
 .It Fl b Fl -blocklist
 Enable peer blocklists.  Transmission understands the bluetack blocklist file format.
 New blocklists can be added by copying them into the config-dir's "blocklists" subdirectory.
 .It Fl B Fl -no-blocklist
 Disble blocklists.
-.It Fl c, Fl -comment Ar comment-text
-When creating a new torrent, set its comment field
 .It Fl d, -downlimit Ar number
 Set the maximum download speed in KB/s
 .It Fl D, -no-downlimit
@@ -84,8 +68,6 @@ Where to look for configuration files.  This can be used to swap between using t
 See http://trac.transmissionbt.com/wiki/ConfigFiles for more information.
 .It Fl h, Fl -help
 Prints a short usage summary.
-.It Fl i, Fl -info
-Shows torrent details and exit
 .It Fl m, Fl -portmap
 Enable portmapping via NAT-PMP or UPnP
 .It Fl M, Fl -no-portmap
@@ -94,10 +76,6 @@ Disable portmapping
 Create torrent from the specified file or directory
 .It Fl p, -port Ar port
 Set the port to listen for incoming peers. (Default: 51413)
-.It Fl r, Fl -private
-When creating a new torrent, set its 'private' flag
-.It Fl s, -scrape
-Print the current number of seeders and leechers for the specified torrent
 .It Fl t, -tos
 Set the peer socket TOS for local router-based traffic shaping.
 .It Fl u, -uplimit Ar number

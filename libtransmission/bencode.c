@@ -423,6 +423,19 @@ tr_bencListChild( tr_benc * val,
     return ret;
 }
 
+int
+tr_bencListRemove( tr_benc * list, size_t i )
+{
+    if( tr_bencIsList( list ) && ( i < list->val.l.count ) )
+    {
+        tr_bencFree( &list->val.l.vals[i] );
+        tr_removeElementFromArray( list->val.l.vals, i, sizeof( tr_benc ), list->val.l.count-- );
+        return 1;
+    }
+
+    return 0;
+}
+
 static void
 tr_benc_warning( const char * err )
 {

@@ -156,6 +156,8 @@ size_t    tr_bencListSize( const tr_benc * list );
 
 tr_benc * tr_bencListChild( tr_benc * list, size_t n );
 
+int       tr_bencListRemove( tr_benc *, size_t n );
+
 /***
 ****
 ***/
