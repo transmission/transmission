@@ -73,8 +73,8 @@ TorrentDelegate :: progressString( const Torrent& tor ) const
     if( isMagnet ) // magnet link with no metadata
     {
         /* %1 is the percentage of torrent metadata downloaded */
-        str = tr( "Magnetized transfer - retrieving metadata ( %1% )" )
-            .arg( tor.metadataPercentDone() );
+        str = tr( "Magnetized transfer - retrieving metadata (%1%)" )
+            .arg( tor.metadataPercentDone() * 100.0, 0, 'f', 2 );
     }
     else if( !isDone ) // downloading
     {
