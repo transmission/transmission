@@ -1264,7 +1264,10 @@ TrMainWindow :: removeTorrents( const bool deleteFiles )
     layout->addItem( spacer, layout->rowCount(), 0, 1, layout->columnCount() );
 
     if( msgBox->exec() == QMessageBox::Ok )
+    {
+        ui.listView->selectionModel()->clear();
         mySession.removeTorrents( ids, deleteFiles );
+    }
 }
 
 /***
