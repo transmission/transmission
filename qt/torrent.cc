@@ -87,8 +87,8 @@ Torrent :: myProperties[] =
     { TRACKERS, "trackers", QVariant::StringList, INFO },
     { TRACKERSTATS, "trackerStats", TrTypes::TrackerStatsList, STAT_EXTRA },
     { MIME_ICON, "ccc", QVariant::Icon, DERIVED },
-    { SEED_RATIO_LIMIT, "seedRatioLimit", QVariant::Double, STAT_EXTRA },
-    { SEED_RATIO_MODE, "seedRatioMode", QVariant::Int, STAT_EXTRA },
+    { SEED_RATIO_LIMIT, "seedRatioLimit", QVariant::Double, STAT },
+    { SEED_RATIO_MODE, "seedRatioMode", QVariant::Int, STAT },
     { DOWN_LIMIT, "downloadLimit", QVariant::Int, STAT_EXTRA }, /* KiB/s */
     { DOWN_LIMITED, "downloadLimited", QVariant::Bool, STAT_EXTRA },
     { UP_LIMIT, "uploadLimit", QVariant::Int, STAT_EXTRA }, /* KiB/s */
