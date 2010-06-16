@@ -62,6 +62,7 @@ TorrentDelegate :: margin( const QStyle& style ) const
 QString
 TorrentDelegate :: progressString( const Torrent& tor ) const
 {
+    const bool isMagnet( !tor.hasMetadata( ) );
     const bool isDone( tor.isDone( ) );
     const bool isSeed( tor.isSeed( ) );
     const uint64_t haveTotal( tor.haveTotal( ) );
@@ -69,7 +70,13 @@ TorrentDelegate :: progressString( const Torrent& tor ) const
     double seedRatio;
     const bool hasSeedRatio( tor.getSeedRatio( seedRatio ) );
 
-    if( !isDone ) // downloading
+    if( isMagnet ) // magnet link with no metadata
+    {
+        /* %1 is the percentage of torrent metadata downloaded */
+        str = tr( "Magnetized transfer - retrieving metadata ( %1% )" )
+            .arg( tor.metadataPercentDone() );
+    }
+    else if( !isDone ) // downloading
     {
         /* %1 is how much we've got,
            %2 is how much we'll have when done,
@@ -386,12 +393,13 @@ TorrentDelegate :: drawTorrent( QPainter * painter, const QStyleOptionViewItem& 
     painter->drawText( statusArea, 0, statusFM.elidedText( statusStr, Qt::ElideRight, statusArea.width( ) ) );
     painter->setFont( progressFont );
     painter->drawText( progArea, 0, progressFM.elidedText( progressStr, Qt::ElideRight, progArea.width( ) ) );
+    const bool isMagnet( !tor.hasMetadata( ) );
     myProgressBarStyle->rect = barArea;
     myProgressBarStyle->direction = option.direction;
     myProgressBarStyle->palette = option.palette;
     myProgressBarStyle->palette.setCurrentColorGroup( cg );
     myProgressBarStyle->state = progressBarState;
-    myProgressBarStyle->progress = int(myProgressBarStyle->minimum + ((tor.percentDone() * (myProgressBarStyle->maximum - myProgressBarStyle->minimum))));
+    myProgressBarStyle->progress = int(myProgressBarStyle->minimum + (((isMagnet ? tor.metadataPercentDone() : tor.percentDone()) * (myProgressBarStyle->maximum - myProgressBarStyle->minimum))));
     style->drawControl( QStyle::CE_ProgressBar, myProgressBarStyle, painter );
 
     painter->restore( );

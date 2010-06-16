@@ -140,6 +140,7 @@ TorrentModel :: updateTorrents( tr_benc * torrents, bool isCompleteList )
 {
     QList<Torrent*> newTorrents;
     QSet<int> oldIds( getIds( ) );
+    QSet<int> addIds;
     QSet<int> newIds;
     int updatedCount = 0;
 
@@ -159,6 +160,8 @@ TorrentModel :: updateTorrents( tr_benc * torrents, bool isCompleteList )
                 {
                     tor = new Torrent( myPrefs, id );
                     tor->update( child );
+                    if( !tor->hasMetadata() )
+                        tor->setMagnet( true );
                     newTorrents.append( tor );
                     connect( tor, SIGNAL(torrentChanged(int)), this, SLOT(onTorrentChanged(int)));
                 }
@@ -166,6 +169,11 @@ TorrentModel :: updateTorrents( tr_benc * torrents, bool isCompleteList )
                 {
                     tor->update( child );
                     ++updatedCount;
+                    if( tor->isMagnet() && tor->hasMetadata() )
+                    {
+                        addIds.insert( tor->id() );
+                        tor->setMagnet( false );
+                    }
                 }
             }
         }
@@ -181,12 +189,13 @@ TorrentModel :: updateTorrents( tr_benc * torrents, bool isCompleteList )
 
         foreach( Torrent * tor, newTorrents ) {
             addTorrent( tor );
-            ids.insert( tor->id( ) );
+            addIds.insert( tor->id( ) );
         }
         endInsertRows( );
-
-        emit torrentsAdded( ids );
     }
+
+    if( !addIds.isEmpty() )
+        emit torrentsAdded( addIds );
 
     if( isCompleteList )
     {

@@ -198,6 +198,8 @@ class Torrent: public QObject
 
         static Property myProperties[];
 
+        bool magnetTorrent;
+
     public:
         typedef QList<const char*> KeyList;
         static const KeyList& getInfoKeys( );
@@ -251,6 +253,7 @@ class Torrent: public QObject
         uint64_t leftUntilDone( ) const { return getSize( LEFT_UNTIL_DONE ); }
         uint64_t pieceSize( ) const { return getSize( PIECE_SIZE ); }
         bool hasMetadata( ) const { return getDouble( METADATA_PERCENT_DONE ) >= 1.0; }
+        bool isMagnet( ) const { return magnetTorrent; }
         int  pieceCount( ) const { return getInt( PIECE_COUNT ); }
         double ratio( ) const { return getDouble( RATIO ); }
         double percentComplete( ) const { return haveTotal() / (double)totalSize(); }
@@ -305,6 +308,7 @@ class Torrent: public QObject
 
     public:
         void update( tr_benc * dict );
+        void setMagnet( bool magnet ) { magnetTorrent = magnet; }
 
     private:
         const char * getMimeTypeString( ) const;

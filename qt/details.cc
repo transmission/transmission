@@ -207,7 +207,17 @@ void
 Details :: onTimer( )
 {
     if( !myIds.empty( ) )
+    {
+        QSet<int> infos;
+        foreach( int id, myIds ) {
+            const Torrent * tor = myModel.getTorrentFromId( id );
+            if( tor->isMagnet() )
+                infos.insert( tor->id() );
+        }
+        if( !infos.isEmpty() )
+            mySession.initTorrents( infos );
         mySession.refreshExtraStats( myIds );
+    }
 }
 
 void

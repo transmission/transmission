@@ -52,7 +52,8 @@ TorrentDelegateMin :: sizeHint( const QStyleOptionViewItem& option, const Torren
 
     QFont nameFont( option.font );
     const QFontMetrics nameFM( nameFont );
-    const QString nameStr( tor.name( ) );
+    const bool isMagnet( !tor.hasMetadata( ) );
+    const QString nameStr = (isMagnet ? progressString( tor ) : tor.name( ) );
     const QSize nameSize( nameFM.size( 0, nameStr ) );
 
     QFont statusFont( option.font );
@@ -76,7 +77,8 @@ TorrentDelegateMin :: drawTorrent( QPainter * painter, const QStyleOptionViewIte
 
     QFont nameFont( option.font );
     const QFontMetrics nameFM( nameFont );
-    const QString nameStr( tor.name( ) );
+    const bool isMagnet( !tor.hasMetadata( ) );
+    const QString nameStr = (isMagnet ? progressString( tor ) : tor.name( ) );
     const QSize nameSize( nameFM.size( 0, nameStr ) );
 
     QFont statusFont( option.font );
@@ -153,7 +155,7 @@ TorrentDelegateMin :: drawTorrent( QPainter * painter, const QStyleOptionViewIte
     myProgressBarStyle->palette = option.palette;
     myProgressBarStyle->palette.setCurrentColorGroup( cg );
     myProgressBarStyle->state = progressBarState;
-    myProgressBarStyle->progress = int(myProgressBarStyle->minimum + ((tor.percentDone() * (myProgressBarStyle->maximum - myProgressBarStyle->minimum))));
+    myProgressBarStyle->progress = int(myProgressBarStyle->minimum + (((isMagnet ? tor.metadataPercentDone() : tor.percentDone()) * (myProgressBarStyle->maximum - myProgressBarStyle->minimum))));
     style->drawControl( QStyle::CE_ProgressBar, myProgressBarStyle, painter );
 
     painter->restore( );
