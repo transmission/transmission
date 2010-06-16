@@ -17,8 +17,8 @@
 #include <QSet>
 #include <QBuffer>
 #include <QFileInfoList>
+#include <QNetworkAccessManager>
 #include <QString>
-#include <QHttp>
 #include <QUrl>
 
 #include <libtransmission/transmission.h>
@@ -31,6 +31,13 @@ extern "C"
 }
 
 class Prefs;
+
+struct Reply
+{
+    QNetworkReply * networkReply;
+    QBuffer * buffer;
+};
+typedef QList<Reply> ReplyList;
 
 class Session: public QObject
 {
@@ -75,7 +82,7 @@ class Session: public QObject
         static void localSessionCallback( tr_session *, const char *, size_t, void * );
 
     public:
-        void exec( const char * request );
+        void exec( const char * json );
         void exec( const struct tr_benc * request );
 
     public:
@@ -116,8 +123,7 @@ class Session: public QObject
         void refreshExtraStats( const QSet<int>& ids );
 
     private slots:
-        void onRequestStarted( int id );
-        void onRequestFinished( int id, bool error );
+        void onFinished( QNetworkReply * reply );
 
     signals:
         void executed( int64_t tag, const QString& result, struct tr_benc * arguments );
@@ -140,8 +146,8 @@ class Session: public QObject
         QString myConfigDir;
         QString mySessionId;
         QUrl myUrl;
-        QBuffer myBuffer;
-        QHttp myHttp;
+        QNetworkAccessManager myNAM;
+        ReplyList myReplies;
         struct tr_session_stats myStats;
         struct tr_session_stats myCumulativeStats;
         QString mySessionVersion;
