@@ -1,4 +1,4 @@
-=== Transmission 2.00 (2010/xx/yy) ===
+=== Transmission 2.00 (2010/06/15) ===
 [http://trac.transmissionbt.com/query?milestone=2.00&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * "Local Peer Discovery" for finding peers on the local network
