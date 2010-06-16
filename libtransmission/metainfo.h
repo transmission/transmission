@@ -25,7 +25,6 @@ tr_bool  tr_metainfoParse( const tr_session     * session,
                            const struct tr_benc * benc,
                            tr_info              * setmeInfo,
                            tr_bool              * setmeHasInfoDict,
-                           int                  * setmeInfoDictOffset,
                            int                  * setmeInfoDictLength );
 
 void tr_metainfoRemoveSaved( const tr_session * session,

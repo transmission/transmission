@@ -95,8 +95,54 @@ tr_torrentSetMetadataSizeHint( tr_torrent * tor, int size )
     }
 }
 
+static int
+findInfoDictOffset( const tr_torrent * tor )
+{
+    size_t fileLen;
+    uint8_t * fileContents;
+    int offset = 0;
+
+    /* load the file, and find the info dict's offset inside the file */
+    if(( fileContents = tr_loadFile( tor->info.torrent, &fileLen )))
+    {
+        tr_benc top;
+
+        if( !tr_bencParse( fileContents, fileContents + fileLen, &top, NULL ) )
+        {
+            tr_benc * infoDict;
+
+            if( tr_bencDictFindDict( &top, "info", &infoDict ) )
+            {
+                int infoLen;
+                char * infoContents = tr_bencToStr( infoDict, TR_FMT_BENC, &infoLen );
+                const uint8_t * i = (const uint8_t*) tr_memmem( (char*)fileContents, fileLen, infoContents, infoLen );
+                offset = i == NULL ? i - fileContents : 0;
+                tr_free( infoContents );
+            }
+
+            tr_bencFree( &top );
+        }
+
+        tr_free( fileContents );
+    }
+
+    return offset;
+}
+
+static void
+ensureInfoDictOffsetIsCached( tr_torrent * tor )
+{
+    assert( tr_torrentHasMetadata( tor ) );
+
+    if( !tor->infoDictOffsetIsCached )
+    {
+        tor->infoDictOffset = findInfoDictOffset( tor );
+        tor->infoDictOffsetIsCached = TRUE;
+    }
+}
+
 void*
-tr_torrentGetMetadataPiece( const tr_torrent * tor, int piece, int * len )
+tr_torrentGetMetadataPiece( tr_torrent * tor, int piece, int * len )
 {
     char * ret = NULL;
 
@@ -104,9 +150,16 @@ tr_torrentGetMetadataPiece( const tr_torrent * tor, int piece, int * len )
     assert( piece >= 0 );
     assert( len != NULL );
 
-    if( tor->infoDictLength > 0 )
+    if( tr_torrentHasMetadata( tor ) )
     {
-        FILE * fp = fopen( tor->info.torrent, "rb" );
+        FILE * fp;
+
+        ensureInfoDictOffsetIsCached( tor );
+
+        assert( tor->infoDictLength > 0 );
+        assert( tor->infoDictOffset >= 0 );
+
+        fp = fopen( tor->info.torrent, "rb" );
         if( fp != NULL )
         {
             const int o = piece  * METADATA_PIECE_SIZE;
@@ -208,8 +261,7 @@ tr_torrentSetMetadataPiece( tr_torrent  * tor, int piece, const void  * data, in
                     dbgmsg( tor, "Saving completed metadata to \"%s\"", path );
                     tr_bencMergeDicts( tr_bencDictAddDict( &newMetainfo, "info", 0 ), &infoDict );
 
-                    success = tr_metainfoParse( tor->session, &newMetainfo, &tor->info,
-                                                &hasInfo, &tor->infoDictOffset, &tor->infoDictLength );
+                    success = tr_metainfoParse( tor->session, &newMetainfo, &tor->info, &hasInfo, &tor->infoDictLength );
 
                     assert( hasInfo );
                     assert( success );

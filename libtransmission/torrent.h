@@ -165,10 +165,13 @@ struct tr_torrent
     /* Where the files are when the torrent is incomplete */
     char * incompleteDir;
 
-    /* Length, in bytes, of the "info" dict in the .torrent file */
+    /* Length, in bytes, of the "info" dict in the .torrent file. */
     int infoDictLength;
 
-    /* Offset, in bytes, of the beginning of the "info" dict in the .torrent file */
+    /* Offset, in bytes, of the beginning of the "info" dict in the .torrent file.
+     *
+     * Used by the torrent-magnet code for serving metainfo to peers.
+     * This field is lazy-generated and might not be initialized yet. */
     int infoDictOffset;
 
     /* Where the files are now.
@@ -231,6 +234,8 @@ struct tr_torrent
     tr_bool                    isDeleting;
     tr_bool                    startAfterVerify;
     tr_bool                    isDirty;
+
+    tr_bool                    infoDictOffsetIsCached;
 
     uint16_t                   maxConnectedPeers;
 

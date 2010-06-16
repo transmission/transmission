@@ -737,7 +737,7 @@ torrentInit( tr_torrent * tor, const tr_ctor * ctor )
 
 static tr_parse_result
 torrentParseImpl( const tr_ctor * ctor, tr_info * setmeInfo,
-                  tr_bool * setmeHasInfo, int * dictOffset, int * dictLength )
+                  tr_bool * setmeHasInfo, int * dictLength )
 {
     int             doFree;
     tr_bool         didParse;
@@ -755,7 +755,7 @@ torrentParseImpl( const tr_ctor * ctor, tr_info * setmeInfo,
         return TR_PARSE_ERR;
 
     didParse = tr_metainfoParse( session, metainfo, setmeInfo,
-                                 &hasInfo, dictOffset, dictLength );
+                                 &hasInfo, dictLength );
     doFree = didParse && ( setmeInfo == &tmp );
 
     if( !didParse )
@@ -779,13 +779,13 @@ torrentParseImpl( const tr_ctor * ctor, tr_info * setmeInfo,
 tr_parse_result
 tr_torrentParse( const tr_ctor * ctor, tr_info * setmeInfo )
 {
-    return torrentParseImpl( ctor, setmeInfo, NULL, NULL, NULL );
+    return torrentParseImpl( ctor, setmeInfo, NULL, NULL );
 }
 
 tr_torrent *
 tr_torrentNew( const tr_ctor * ctor, int * setmeError )
 {
-    int off, len;
+    int len;
     tr_bool hasInfo;
     tr_info tmpInfo;
     tr_parse_result r;
@@ -794,16 +794,13 @@ tr_torrentNew( const tr_ctor * ctor, int * setmeError )
     assert( ctor != NULL );
     assert( tr_isSession( tr_ctorGetSession( ctor ) ) );
 
-    r = torrentParseImpl( ctor, &tmpInfo, &hasInfo, &off, &len );
+    r = torrentParseImpl( ctor, &tmpInfo, &hasInfo, &len );
     if( r == TR_PARSE_OK )
     {
         tor = tr_new0( tr_torrent, 1 );
         tor->info = tmpInfo;
         if( hasInfo )
-        {
-            tor->infoDictOffset = off;
             tor->infoDictLength = len;
-        }
         torrentInit( tor, ctor );
     }
     else
@@ -2195,7 +2192,7 @@ tr_torrentSetAnnounceList( tr_torrent             * tor,
         /* try to parse it back again, to make sure it's good */
         memset( &tmpInfo, 0, sizeof( tr_info ) );
         if( tr_metainfoParse( tor->session, &metainfo, &tmpInfo,
-                              &hasInfo, &tor->infoDictOffset, &tor->infoDictLength ) )
+                              &hasInfo, &tor->infoDictLength ) )
         {
             /* it's good, so keep these new trackers and free the old ones */
 
