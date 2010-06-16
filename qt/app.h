@@ -46,6 +46,7 @@ class MyApp: public QApplication
 
     private slots:
         void consentGiven( );
+        void onSessionSourceChanged( );
         void refreshPref( int key );
         void refreshTorrents( );
 

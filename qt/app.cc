@@ -159,6 +159,8 @@ MyApp :: MyApp( int& argc, char ** argv ):
     connect( mySession, SIGNAL(torrentsUpdated(tr_benc*,bool)), myModel, SLOT(updateTorrents(tr_benc*,bool)) );
     connect( mySession, SIGNAL(torrentsUpdated(tr_benc*,bool)), myWindow, SLOT(refreshActionSensitivity()) );
     connect( mySession, SIGNAL(torrentsRemoved(tr_benc*)), myModel, SLOT(removeTorrents(tr_benc*)) );
+    // when the session source gets changed, request a full refresh
+    connect( mySession, SIGNAL(sourceChanged()), this, SLOT(onSessionSourceChanged()) );
     // when the model sees a torrent for the first time, ask the session for full info on it
     connect( myModel, SIGNAL(torrentsAdded(QSet<int>)), mySession, SLOT(initTorrents(QSet<int>)) );
 
@@ -297,6 +299,14 @@ MyApp :: maybeUpdateBlocklist( )
          mySession->updateBlocklist( );
          myPrefs->set( Prefs :: BLOCKLIST_DATE, now );
      }
+}
+
+void
+MyApp :: onSessionSourceChanged( )
+{
+    mySession->initTorrents( );
+    mySession->refreshSessionStats( );
+    mySession->refreshSessionInfo( );
 }
 
 void
