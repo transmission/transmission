@@ -23,6 +23,7 @@
 
 #include "transmission.h"
 #include "crypto.h" /* tr_sha1 */
+#include "fdlimit.h" /* tr_open_file_for_scanning() */
 #include "session.h"
 #include "bencode.h"
 #include "makemeta.h"
@@ -203,7 +204,7 @@ getHashInfo( tr_metainfo_builder * b )
     uint8_t *buf;
     uint64_t totalRemain;
     uint64_t off = 0;
-    FILE *   fp;
+    int fd;
 
     if( !b->totalSize )
         return ret;
@@ -211,8 +212,8 @@ getHashInfo( tr_metainfo_builder * b )
     buf = tr_valloc( b->pieceSize );
     b->pieceIndex = 0;
     totalRemain = b->totalSize;
-    fp = fopen( b->files[fileIndex].filename, "rb" );
-    if( !fp )
+    fd = tr_open_file_for_scanning( b->files[fileIndex].filename );
+    if( fd < 0 )
     {
         b->my_errno = errno;
         tr_strlcpy( b->errfile,
@@ -236,19 +237,19 @@ getHashInfo( tr_metainfo_builder * b )
         {
             const uint64_t n_this_pass =
                 MIN( ( b->files[fileIndex].size - off ), pieceRemain );
-            fread( bufptr, 1, n_this_pass, fp );
+            read( fd, bufptr, n_this_pass );
             bufptr += n_this_pass;
             off += n_this_pass;
             pieceRemain -= n_this_pass;
             if( off == b->files[fileIndex].size )
             {
                 off = 0;
-                fclose( fp );
-                fp = NULL;
+                tr_close_file( fd );
+                fd = -1;
                 if( ++fileIndex < b->fileCount )
                 {
-                    fp = fopen( b->files[fileIndex].filename, "rb" );
-                    if( !fp )
+                    fd = tr_open_file_for_scanning( b->files[fileIndex].filename );
+                    if( fd < 0 )
                     {
                         b->my_errno = errno;
                         tr_strlcpy( b->errfile,
@@ -282,8 +283,8 @@ getHashInfo( tr_metainfo_builder * b )
           || ( walk - ret == (int)( SHA_DIGEST_LENGTH * b->pieceCount ) ) );
     assert( b->abortFlag || !totalRemain );
 
-    if( fp )
-        fclose( fp );
+    if( fd >= 0 )
+        tr_close_file( fd );
 
     tr_free( buf );
     return ret;
