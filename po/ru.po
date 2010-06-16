@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: Transmission HEAD\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-05-20 11:39-0500\n"
-"PO-Revision-Date: 2010-05-30 12:12+0000\n"
+"PO-Revision-Date: 2010-06-15 17:28+0000\n"
 "Last-Translator: Sergey \"Shnatsel\" Davidoff <Shnatsel@gmail.com>\n"
 "Language-Team: Russian <gnome-cyr@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2010-06-13 18:01+0000\n"
+"X-Launchpad-Export-Date: 2010-06-16 00:16+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Country: RUSSIAN FEDERATION\n"
 "X-Poedit-Language: Russian\n"
@@ -74,7 +74,7 @@ msgstr "Включить временные ограничения по _ско�
 
 #: ../gtk/actions.c:97
 msgid "_Compact View"
-msgstr ""
+msgstr "_Компактный Вид"
 
 #: ../gtk/actions.c:98
 msgid "Re_verse Sort Order"
@@ -118,7 +118,7 @@ msgstr "_Справка"
 
 #: ../gtk/actions.c:112
 msgid "Copy _Magnet Link to Clipboard"
-msgstr "Скопировать magnet-ссылку  в буфер обмена"
+msgstr ""
 
 #: ../gtk/actions.c:113
 msgid "Add _URL..."
@@ -321,11 +321,11 @@ msgstr "Учитывать глобальные ограничени_я"
 
 #: ../gtk/details.c:454 ../gtk/tr-prefs.c:1220
 msgid "Limit _download speed (KiB/s):"
-msgstr ""
+msgstr "Ограничить скорость загрузки (Кб/с):"
 
 #: ../gtk/details.c:466 ../gtk/tr-prefs.c:1227
 msgid "Limit _upload speed (KiB/s):"
-msgstr ""
+msgstr "Ограничить скорость раздачи (Кб/с):"
 
 #: ../gtk/details.c:482
 msgid "Seed-Until Ratio"
@@ -429,7 +429,7 @@ msgstr[2] "%1$s (%2$'d частей)"
 #: ../gtk/details.c:792
 #, c-format
 msgid "%1$s (%2$.1f%%); %3$s Unverified"
-msgstr "%1$s (%2$.1f%%); %3$s Непроверено"
+msgstr "%1$s (%2$.1f%%); %3$s не проверено"
 
 #: ../gtk/details.c:794
 #, c-format
@@ -630,7 +630,7 @@ msgstr "Показать _больше сведений"
 #: ../gtk/details.c:1808
 #, c-format
 msgid "Got a list of %1$s%2$'d peers%3$s %4$s ago"
-msgstr "Получен список %1$s%2$'d узлов%3$s %4$s назад"
+msgstr "Получен список %1$s%2$'d участников%3$s %4$s назад"
 
 #: ../gtk/details.c:1812
 #, c-format
@@ -760,15 +760,17 @@ msgstr "_Больше не спрашивать"
 #, c-format
 msgid "Remove torrent?"
 msgid_plural "Remove %d torrents?"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Удалить торрент?"
+msgstr[1] "Удалить торренты?"
+msgstr[2] "Удалить торренты?"
 
 #: ../gtk/dialogs.c:235
 #, c-format
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these %d torrents' downloaded files?"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Удалить загруженные файлы этого торрента?"
+msgstr[1] "Удалить загруженные файлы этих торрентов?"
+msgstr[2] "Удалить загруженные файлы этих торрентов?"
 
 #: ../gtk/dialogs.c:245
 msgid ""
@@ -849,23 +851,23 @@ msgstr "Конфиденциальность"
 
 #: ../gtk/filter.c:335
 msgid "Public"
-msgstr ""
+msgstr "Публичный"
 
 #: ../gtk/filter.c:339
 msgid "Private"
-msgstr ""
+msgstr "Закрытый"
 
 #: ../gtk/filter.c:719
 msgid "Active"
-msgstr ""
+msgstr "Активен"
 
 #: ../gtk/filter.c:723
 msgid "Queued"
-msgstr ""
+msgstr "В очереди"
 
 #: ../gtk/filter.c:724
 msgid "Verifying"
-msgstr ""
+msgstr "Проверяется"
 
 #: ../gtk/filter.c:725 ../gtk/msgwin.c:178
 msgid "Error"
@@ -1186,7 +1188,7 @@ msgstr "Перемещаю \"%s\""
 
 #: ../gtk/relocate.c:86
 msgid "Couldn't move torrent"
-msgstr ""
+msgstr "Не удалось переместить торрент"
 
 #: ../gtk/relocate.c:127
 msgid "This may take a moment..."

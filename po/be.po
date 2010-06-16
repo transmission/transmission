@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-05-20 11:39-0500\n"
-"PO-Revision-Date: 2010-06-13 17:57+0000\n"
+"PO-Revision-Date: 2010-06-14 12:41+0000\n"
 "Last-Translator: Mikola Tsekhan <mail@tsekhan.com>\n"
 "Language-Team: Belarusian <be@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Launchpad-Export-Date: 2010-06-13 18:00+0000\n"
+"X-Launchpad-Export-Date: 2010-06-16 00:16+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:55
@@ -596,7 +596,7 @@ msgstr "Магчымае высыланьне зьвестак гэтаму ву
 
 #: ../gtk/details.c:1474
 msgid "Peer has unchoked us, but we're not interested"
-msgstr ""
+msgstr "Вузел згодны перадаваць зьвесткі, але мы не зацікаўлены"
 
 #: ../gtk/details.c:1475
 msgid "We unchoked this peer, but they're not interested"
@@ -690,13 +690,15 @@ msgstr "Рэдагаваць трэкеры"
 
 #: ../gtk/details.c:2183
 msgid "Tracker Announce URLs"
-msgstr ""
+msgstr "Трэкер абвясьціў URL'ы"
 
 #: ../gtk/details.c:2186 ../gtk/makemeta-ui.c:453
 msgid ""
 "To add a backup URL, add it on the line after the primary URL.\n"
 "To add another primary URL, add it after a blank line."
 msgstr ""
+"Каб дадаць рэзервовы URL, дадайце яго пасьля асноўнага URL у тым жа радку.\n"
+"Каб дадаць яшчэ адзін асноўны URL, дадайце яго ў новым радку."
 
 #: ../gtk/details.c:2229 ../gtk/details.c:2350 ../gtk/filter.c:324
 msgid "Trackers"
@@ -704,11 +706,11 @@ msgstr "Трэкеры"
 
 #: ../gtk/details.c:2261
 msgid "_Edit Trackers"
-msgstr ""
+msgstr "_Рэдагаваць трэкеры"
 
 #: ../gtk/details.c:2269
 msgid "Show _backup trackers"
-msgstr ""
+msgstr "_Паказаць рэзервовыя трэкеры"
 
 #: ../gtk/details.c:2342 ../gtk/msgwin.c:179
 msgid "Information"
@@ -716,11 +718,11 @@ msgstr "Інфармацыя"
 
 #: ../gtk/details.c:2346
 msgid "Peers"
-msgstr ""
+msgstr "Вузлы"
 
 #: ../gtk/details.c:2356
 msgid "File listing not available for combined torrent properties"
-msgstr ""
+msgstr "Сьпіс файлаў недаступны адначасова для некалькіх торэнтаў"
 
 #: ../gtk/details.c:2360 ../gtk/filter.c:999 ../gtk/makemeta-ui.c:402
 msgid "Files"
@@ -738,11 +740,11 @@ msgstr "Уласьцівасьці %s"
 #: ../gtk/details.c:2403
 #, c-format
 msgid "%'d Torrent Properties"
-msgstr ""
+msgstr "%'d Уласьцівасьці торэнта"
 
 #: ../gtk/dialogs.c:121
 msgid "<big><b>Quit Transmission?</b></big>"
-msgstr ""
+msgstr "<big><b>Выйсьці з Transmission?</b></big>"
 
 #: ../gtk/dialogs.c:133
 msgid "_Don't ask me again"
@@ -752,15 +754,17 @@ msgstr "_Болей не пытаць"
 #, c-format
 msgid "Remove torrent?"
 msgid_plural "Remove %d torrents?"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Выдаліць торэнт?"
+msgstr[1] "Выдаліць торэнты?"
+msgstr[2] "Выдаліць торэнты?"
 
 #: ../gtk/dialogs.c:235
 #, c-format
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these %d torrents' downloaded files?"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Выдаліць сьцягнутыя файлы гэтага торэнта?"
+msgstr[1] "Выдаліць сьцягнутыя файлы гэтых торэнтаў?"
+msgstr[2] "Выдаліць сьцягнутыя файлы гэтых торэнтаў?"
 
 #: ../gtk/dialogs.c:245
 msgid ""
@@ -775,26 +779,30 @@ msgstr[1] ""
 #: ../gtk/dialogs.c:251
 msgid "This torrent has not finished downloading."
 msgid_plural "These torrents have not finished downloading."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Сцягваньне гэтага торэнта ня скончанае."
+msgstr[1] "Сцягваньне гэтых торэнтаў ня скончанае."
+msgstr[2] "Сцягваньне гэтых торэнтаў ня скончанае."
 
 #: ../gtk/dialogs.c:257
 msgid "This torrent is connected to peers."
 msgid_plural "These torrents are connected to peers."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Гэты торэнт спалучаны з вузламі."
+msgstr[1] "Гэтыя торэнты спалучаныя з вузламі."
+msgstr[2] "Гэтыя торэнты спалучаныя з вузламі."
 
 #: ../gtk/dialogs.c:264
 msgid "One of these torrents is connected to peers."
 msgid_plural "Some of these torrents are connected to peers."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Адзін з гэтых торэнтаў далучаны да вузлоў."
+msgstr[1] "Некаторыя з гэтых торэнтаў далучаны да вузлоў."
+msgstr[2] "Некаторыя з гэтых торэнтаў далучаны да вузлоў."
 
 #: ../gtk/dialogs.c:271
 msgid "One of these torrents has not finished downloading."
 msgid_plural "Some of these torrents have not finished downloading."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Загрузка аднаго з гэтых торэнтаў ня скончана."
+msgstr[1] "Загрузка некаторых з гэтых торэнтаў ня скончана."
+msgstr[2] "Загрузка некаторых з гэтых торэнтаў ня скончана."
 
 #: ../gtk/file-list.c:582 ../gtk/filter.c:349 ../gtk/util.c:692
 msgid "High"
@@ -825,11 +833,11 @@ msgstr "Файл"
 #. add "progress" column
 #: ../gtk/file-list.c:732
 msgid "Progress"
-msgstr ""
+msgstr "Прагрэс"
 
 #: ../gtk/filter.c:316 ../gtk/filter.c:717
 msgid "All"
-msgstr ""
+msgstr "Усе"
 
 #: ../gtk/filter.c:330 ../gtk/tr-prefs.c:552 ../gtk/tr-prefs.c:1439
 msgid "Privacy"
@@ -837,23 +845,23 @@ msgstr "Прыватнасьць"
 
 #: ../gtk/filter.c:335
 msgid "Public"
-msgstr ""
+msgstr "Публічны"
 
 #: ../gtk/filter.c:339
 msgid "Private"
-msgstr ""
+msgstr "Прыватны"
 
 #: ../gtk/filter.c:719
 msgid "Active"
-msgstr ""
+msgstr "Дзейны"
 
 #: ../gtk/filter.c:723
 msgid "Queued"
-msgstr ""
+msgstr "У чарзе"
 
 #: ../gtk/filter.c:724
 msgid "Verifying"
-msgstr ""
+msgstr "Праверка"
 
 #: ../gtk/filter.c:725 ../gtk/msgwin.c:178
 msgid "Error"
@@ -870,47 +878,51 @@ msgstr "Трэкер"
 #. add the activity combobox
 #: ../gtk/filter.c:1023
 msgid "_Show:"
-msgstr ""
+msgstr "_Паказаць:"
 
 #: ../gtk/main.c:393
 #, c-format
 msgid ""
 "Got signal %d; trying to shut down cleanly.  Do it again if it gets stuck."
 msgstr ""
+"Атрыманы сыгнал %d; спроба карэктнага выключэньня. Паўтарыце яшчэ раз, калі "
+"не атрымалася."
 
 #: ../gtk/main.c:516
 msgid "Start with all torrents paused"
-msgstr ""
+msgstr "Пачаць з прыпыненымі торэнтамі"
 
 #: ../gtk/main.c:518
 msgid "Show version number and exit"
-msgstr ""
+msgstr "Паказаць нумар вэрсіі й выйсьці"
 
 #: ../gtk/main.c:522
 msgid "Start minimized in notification area"
-msgstr ""
+msgstr "Уключаць згорнутым у прасторы паведамленьняў"
 
 #: ../gtk/main.c:525
 msgid "Where to look for configuration files"
-msgstr ""
+msgstr "Дзе шукаць файлы канфігурацыі"
 
 #: ../gtk/main.c:534 ../gtk/transmission.desktop.in.h:3
 msgid "Transmission"
-msgstr ""
+msgstr "Transmission"
 
 #: ../gtk/main.c:541
 msgid "[torrent files or urls]"
-msgstr ""
+msgstr "[торэнт-файлы або спасылкі]"
 
 #: ../gtk/main.c:595
 msgid ""
 "Transmission is already running, but is not responding.  To start a new "
 "session, you must first close the existing Transmission process."
 msgstr ""
+"Transmission ужо працуе, але не адказвае. Для пачатку новага сэанса працы, "
+"вы павінны закрыць існуючы працэс."
 
 #: ../gtk/main.c:649
 msgid "Transmission cannot be started."
-msgstr ""
+msgstr "Transmission ня можа стартаваць."
 
 #: ../gtk/main.c:731
 msgid ""
@@ -922,39 +934,41 @@ msgstr ""
 
 #: ../gtk/main.c:733
 msgid "I _Accept"
-msgstr ""
+msgstr "Я _згодны"
 
 #: ../gtk/main.c:910
 msgid "<b>Closing Connections</b>"
-msgstr ""
+msgstr "<b>Зачыненьне спалучэньняў</b>"
 
 #: ../gtk/main.c:914
 msgid "Sending upload/download totals to tracker..."
-msgstr ""
+msgstr "Высыланьне зьвестак пра высланае й атрыманае да трэкера..."
 
 #: ../gtk/main.c:919
 msgid "_Quit Now"
-msgstr ""
+msgstr "_Выйсьці зараз"
 
 #: ../gtk/main.c:1079
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Не ўдалося дадаць пашкоджаны торэнт"
+msgstr[1] "Не ўдалося дадаць пашкоджаныя торэнты"
+msgstr[2] "Не ўдалося дадаць пашкоджаныя торэнты"
 
 #: ../gtk/main.c:1086
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Не ўдалося дадаць дублюючыся торэнт"
+msgstr[1] "Не ўдалося дадаць дублюючыеся торэнты"
+msgstr[2] "Не ўдалося дадаць дублюючыеся торэнты"
 
 #: ../gtk/main.c:1394
 msgid "A fast and easy BitTorrent client"
-msgstr ""
+msgstr "Хуткі й просты BitTorrent-кліент"
 
 #: ../gtk/main.c:1399
 msgid "Copyright 2005-2009 The Transmission Project"
-msgstr ""
+msgstr "Аўтарскія правы 2005-2009 Праект Transmission"
 
 #. Translators: translate "translator-credits" as
 #. your name
@@ -971,38 +985,38 @@ msgstr ""
 #: ../gtk/makemeta-ui.c:75
 #, c-format
 msgid "Creating \"%s\""
-msgstr ""
+msgstr "Ствараецца «%s»"
 
 #: ../gtk/makemeta-ui.c:77
 #, c-format
 msgid "Created \"%s\"!"
-msgstr ""
+msgstr "Створаны «%s»!"
 
 #: ../gtk/makemeta-ui.c:79
 #, c-format
 msgid "Error: invalid announce URL \"%s\""
-msgstr ""
+msgstr "Памылка: «%s» — ня URL анонсаў"
 
 #: ../gtk/makemeta-ui.c:81
 #, c-format
 msgid "Cancelled"
-msgstr ""
+msgstr "Скасавана"
 
 #: ../gtk/makemeta-ui.c:83
 #, c-format
 msgid "Error reading \"%s\": %s"
-msgstr ""
+msgstr "Памылка чытаньня «%s»: %s"
 
 #: ../gtk/makemeta-ui.c:85
 #, c-format
 msgid "Error writing \"%s\": %s"
-msgstr ""
+msgstr "Памылка запісу «%s»: %s"
 
 #. how much data we've scanned through to generate checksums
 #: ../gtk/makemeta-ui.c:102
 #, c-format
 msgid "Scanned %s"
-msgstr ""
+msgstr "Праверана %s"
 
 #: ../gtk/makemeta-ui.c:167 ../gtk/makemeta-ui.c:389
 msgid "New Torrent"
@@ -1010,11 +1024,11 @@ msgstr "Новы торэнт"
 
 #: ../gtk/makemeta-ui.c:183
 msgid "Creating torrent..."
-msgstr ""
+msgstr "Стварэньне торэнту..."
 
 #: ../gtk/makemeta-ui.c:292
 msgid "No source selected"
-msgstr ""
+msgstr "Крыніца не абраная"
 
 #: ../gtk/makemeta-ui.c:298
 #, c-format
