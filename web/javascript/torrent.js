@@ -39,8 +39,8 @@ Torrent._MetaDataFields = [ 'addedDate', 'comment', 'creator', 'dateCreated',
 		'isPrivate', 'name', 'totalSize', 'pieceCount', 'pieceSize' ]
 
 Torrent._DynamicFields = [ 'downloadedEver', 'error', 'errorString', 'eta',
-    'haveUnchecked', 'haveValid', 'leftUntilDone', 'metadataPercentComplete', 'peersConnected',
-    'peersGettingFromUs', 'peersSendingToUs', 'rateDownload', 'rateUpload',
+    'haveUnchecked', 'haveValid', 'leftUntilDone', 'metadataPercentComplete', 'peers',
+    'peersConnected', 'peersGettingFromUs', 'peersSendingToUs', 'rateDownload', 'rateUpload',
     'recheckProgress', 'sizeWhenDone', 'status', 'trackerStats', 'desiredAvailable',
     'uploadedEver', 'uploadRatio', 'seedRatioLimit', 'seedRatioMode', 'downloadDir', 'isFinished' ]
 
@@ -383,6 +383,7 @@ Torrent.prototype =
 		this._seed_ratio_mode         = data.seedRatioMode;
 		this._download_speed          = data.rateDownload;
 		this._upload_speed            = data.rateUpload;
+		this._peers                   = data.peers;
 		this._peers_connected         = data.peersConnected;
 		this._peers_getting_from_us   = data.peersGettingFromUs;
 		this._peers_sending_to_us     = data.peersSendingToUs;
