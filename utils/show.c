@@ -179,10 +179,16 @@ doScrape( const tr_info * inf )
         CURL * curl;
         CURLcode res;
         struct evbuffer * buf;
-        const char * url = inf->trackers[i].scrape;
+        const char * scrape = inf->trackers[i].scrape;
+        char * url;
 
-        if( url == NULL )
+        if( scrape == NULL )
             continue;
+
+        url = tr_strdup_printf( "%s%cinfo_hash=%s",
+                                scrape,
+                                strchr( scrape, '?' ) ? '&' : '?',
+                                inf->hashEscaped );
 
         printf( "%s ... ", url );
         fflush( stdout );
@@ -244,8 +250,9 @@ doScrape( const tr_info * inf )
             }
         }
 
-        evbuffer_free( buf );
         curl_easy_cleanup( curl );
+        evbuffer_free( buf );
+        tr_free( url );
     }
 }
 
