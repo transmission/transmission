@@ -7,6 +7,7 @@ dist_data_DATA = \
   info_activity.png \
   info_files.png \
   info_general.png \
+  info_peers.png \
   info_trackers.png \
   tab_backgrounds.png \
   toolbar_buttons.png \
