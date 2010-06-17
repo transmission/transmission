@@ -339,6 +339,7 @@ Prefs._ShowInspector      = 'show_inspector';
 
 Prefs._FilterMode         = 'filter';
 Prefs._FilterAll          = 'all';
+Prefs._FilterActive       = 'active';
 Prefs._FilterSeeding      = 'seeding';
 Prefs._FilterDownloading  = 'downloading';
 Prefs._FilterPaused       = 'paused';

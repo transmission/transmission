@@ -221,6 +221,9 @@ Torrent.prototype =
 	downloadTotal: function() { return this._download_total; },
 	hash: function() { return this._hashString; },
 	id: function() { return this._id; },
+	isActiveFilter: function() { return this.peersGettingFromUs() > 0
+					|| this.peersSendingToUs() > 0
+					|| this.state() == Torrent._StatusChecking; },
 	isActive: function() { return this.state() != Torrent._StatusPaused; },
 	isDownloading: function() { return this.state() == Torrent._StatusDownloading; },
 	isSeeding: function() { return this.state() == Torrent._StatusSeeding; },
@@ -667,6 +670,9 @@ Torrent.prototype =
 		
 		switch( filter )
 		{
+			case Prefs._FilterActive:
+				pass = this.isActiveFilter();
+				break;
 			case Prefs._FilterSeeding:
 				pass = this.isSeeding();
 				break;

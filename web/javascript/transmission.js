@@ -41,6 +41,7 @@ Transmission.prototype =
 		$('#resume_selected_link').bind('click', function(e){ tr.startSelectedClicked(e); });
 		$('#remove_link').bind('click',  function(e){ tr.removeClicked(e); });
 		$('#filter_all_link').parent().bind('click', function(e){ tr.showAllClicked(e); });
+		$('#filter_active_link').parent().bind('click', function(e){ tr.showActiveClicked(e); });
 		$('#filter_downloading_link').parent().bind('click', function(e){ tr.showDownloadingClicked(e); });
 		$('#filter_seeding_link').parent().bind('click', function(e){ tr.showSeedingClicked(e); });
 		$('#filter_paused_link').parent().bind('click', function(e){ tr.showPausedClicked(e); });
@@ -765,6 +766,7 @@ Transmission.prototype =
 		var c;
 		switch( mode ) {
 			case Prefs._FilterAll:         c = '#filter_all_link'; break;
+			case Prefs._FilterActive:      c = '#filter_active_link'; break;
 			case Prefs._FilterSeeding:     c = '#filter_seeding_link'; break;
 			case Prefs._FilterDownloading: c = '#filter_downloading_link'; break;
 			case Prefs._FilterPaused:      c = '#filter_paused_link'; break;
@@ -778,6 +780,9 @@ Transmission.prototype =
 	},
 	showAllClicked: function( event ) {	
 		this.setFilter( Prefs._FilterAll );
+	},
+	showActiveClicked: function( event ) {
+		this.setFilter( Prefs._FilterActive );
 	},
 	showDownloadingClicked: function( event ) {
 		this.setFilter( Prefs._FilterDownloading );
