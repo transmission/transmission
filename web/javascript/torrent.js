@@ -88,8 +88,9 @@ Torrent.prototype =
 		top_e.id = 'torrent_' + data.id;
 		top_e._torrent = this;
 		var element = $(top_e);
-                $(element).bind('dblclick', function(e) { transmission.toggleInspector(); });
+		$(element).bind('dblclick', function(e) { transmission.toggleInspector(); });
 		element._torrent = this;
+		element._id = this._id;
 		this._element = element;
 		this._controller = controller;
 		controller._rows.push( element );
