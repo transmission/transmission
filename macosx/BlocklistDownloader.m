@@ -118,10 +118,6 @@ BlocklistDownloader * fDownloader = nil;
 
 - (void) download: (NSURLDownload *) download didFailWithError: (NSError *) error
 {
-    #warning remove
-    NSLog(@"%@", [error localizedDescription]);
-    NSLog(@"%@", [error localizedFailureReason]);
-    NSLog(@"%@", [error localizedRecoverySuggestion]);
     [fViewController setFailed: [error localizedDescription]];
     
     [[BlocklistScheduler scheduler] updateSchedule];
