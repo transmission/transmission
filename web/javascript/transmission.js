@@ -1050,6 +1050,15 @@ Transmission.prototype =
 					$('div#stats_container h2.dialog_heading').show();
 					tr.showStatsDialog( );
 				}
+				else if ($element[0].id == 'compact_view') {
+					this[Prefs._CompactDisplayState] = !this[Prefs._CompactDisplayState];
+					if(this[Prefs._CompactDisplayState]) 
+						$element.selectMenuItem();
+					else
+						$element.deselectMenuItem();
+					this.setDisplayMode( this[Prefs._CompactDisplayState] );
+					// Redraw html here
+				}
 				break;
 			
 			// Limit the download rate
@@ -1093,7 +1102,7 @@ Transmission.prototype =
 
 				// The 'reverse sort' option state can be toggled independently of the other options
 				if ($element.is('#reverse_sort_order')) {
-                                        if(!$element.is('#reverse_sort_order.active')) break;
+                    if(!$element.is('#reverse_sort_order.active')) break;
 					var dir;
 					if ($element.menuItemIsSelected()) {
 						$element.deselectMenuItem();
@@ -1627,6 +1636,16 @@ Transmission.prototype =
 		});
 
 		return removedAny;
+	},
+	
+	setDisplayMode: function( iscompact )
+	{
+		var torrents = this.getAllTorrents();
+
+		for( var i=0; torrents[i]; ++i )
+		{
+		    torrents[i].setListDisplayElements(this[Prefs._CompactDisplayState]);
+		}
 	},
 
 	/*

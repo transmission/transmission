@@ -358,6 +358,7 @@ Prefs._SortByState        = 'state';
 Prefs._SortByTracker      = 'tracker';
 
 Prefs._TurtleState        = 'turtle-state';
+Prefs._CompactDisplayState= 'compact_display_state';
 
 Prefs._Defaults =
 {
@@ -367,7 +368,8 @@ Prefs._Defaults =
 	'show_inspector': false,
 	'sort_direction': 'ascending',
 	'sort_method': 'name',
-	'turtle-state' : false
+	'turtle-state' : false,
+	'compact_display_state' : false
 };
 
 /*

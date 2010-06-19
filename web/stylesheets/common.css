@@ -370,6 +370,8 @@ ul.torrent_list li {
 	vertical-align: middle;
 	-moz-user-select: none;
 	-webkit-user-select: none;
+	
+	overflow: hidden;
 }
 
 ul.torrent_list li.torrent {
@@ -402,6 +404,12 @@ ul.torrent_list li.torrent div.torrent_name {
 	margin-bottom: 2px;
 }
 
+ul.torrent_list li.torrent div.torrent_name.compact {
+	float: left;
+	z-index: 1;
+	position: absolute;
+}
+
 ul.torrent_list li.torrent.selected div.torrent_name {
 	color: #fff;
 }
@@ -409,6 +417,23 @@ ul.torrent_list li.torrent.selected div.torrent_name {
 ul.torrent_list li.torrent div.torrent_progress_details,
 ul.torrent_list li.torrent div.torrent_peer_details {
 	font-size: 1em;
+}
+
+ul.torrent_list li.torrent div.torrent_progress_details.compact,
+ul.torrent_list li.torrent div.torrent_peer_details.compact {
+	padding-top: 3px;
+	float: left;
+	
+}
+ul.torrent_list li.torrent div.torrent_progress_details.compact {
+	float: right;
+}
+
+ul.torrent_list li.torrent div.torrent_progress_bar_container.compact {
+	position: absolute;
+	left: 5px;
+	right: 35px;
+	opacity:0.4;
 }
 
 ul.torrent_list li.torrent div.torrent_progress_bar {
@@ -423,7 +448,7 @@ ul.torrent_list li.torrent div.torrent_progress_bar {
 	background-color: transparent;
 }
 
-ul.torrent_list li.torrent div.torrent_progress_bar.complete {
+ul.torrent_list li.torrent div.torrent_progress_bar.compact {
 	background-position: left -10px;
 	border: 1px solid #29AD35;
 }
@@ -437,6 +462,11 @@ ul.torrent_list li.torrent div.torrent_progress_bar.in_progress {
 	background-position: left 0px;
 	border: 1px solid #3F79EE;
 	border-right: none;
+}
+
+ul.torrent_list li.torrent div.torrent_progress_bar.incomplete.compact {
+	background: none;
+	border: none;
 }
 
 ul.torrent_list li.torrent div.torrent_progress_bar.incomplete {
@@ -488,6 +518,10 @@ li.torrent a div {
 	background: url('../images/buttons/torrent_buttons.png');
 	height: 14px;
 	width: 14px;
+}
+
+li.torrent a div.compact {
+	top: 0px;
 }
 
 li.torrent a div.torrent_pause {
