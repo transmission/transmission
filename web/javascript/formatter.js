@@ -14,16 +14,6 @@ Transmission.fmt = (function()
 	var MB_str = 'MiB';
 	var GB_str = 'GiB';
 
-	/**
-	 * Round a number to a specified number of decimal places, stripping trailing zeroes
-	 * @param number floatnum
-	 * @param number precision
-	 * @returns number
-	 */
-	var roundWithPrecision = function(floatnum, precision) {
-		return Math.round ( floatnum * Math.pow ( 10, precision ) ) / Math.pow ( 10, precision );
-	};
-
 	return {
 		MODE_IEC: 1,
 		MODE_SI: 2,
@@ -46,7 +36,6 @@ Transmission.fmt = (function()
 			}
 		},
 
-
 		/**
 		 * Formats the bytes into a string value with B, KiB, MiB, or GiB units.
 		 *
@@ -62,20 +51,19 @@ Transmission.fmt = (function()
 				return bytes.toFixed(0) + ' B';
 
 			if( bytes < ( KB_val * 100 ) )
-				return roundWithPrecision(bytes/KB_val, 2) + ' ' + KB_str;
+				return Math.roundWithPrecision(bytes/KB_val, 2) + ' ' + KB_str;
 			if( bytes < MB_val )
-				return roundWithPrecision(bytes/KB_val, 1) + ' ' + KB_str;
+				return Math.roundWithPrecision(bytes/KB_val, 1) + ' ' + KB_str;
 
 			if( bytes < ( MB_val * 100 ) )
-				return roundWithPrecision(bytes/MB_val, 2) + ' ' + MB_str;
+				return Math.roundWithPrecision(bytes/MB_val, 2) + ' ' + MB_str;
 			if( bytes < GB_val )
-				return roundWithPrecision(bytes/MB_val, 1) + ' ' + MB_str;
-
+				return Math.roundWithPrecision(bytes/MB_val, 1) + ' ' + MB_str;
 
 			if( bytes < ( GB_val * 100 ) )
-				return roundWithPrecision(bytes/GB_val, 2) + ' ' + GB_str;
+				return Math.roundWithPrecision(bytes/GB_val, 2) + ' ' + GB_str;
 			else
-				return roundWithPrecision(bytes/GB_val, 1) + ' ' + GB_str;
+				return Math.roundWithPrecision(bytes/GB_val, 1) + ' ' + GB_str;
 		},
 
 		speed: function( bytes )
