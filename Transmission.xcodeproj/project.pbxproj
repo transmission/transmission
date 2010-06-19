@@ -17,7 +17,6 @@
 		3C7A11990D0B2EE300B5701F /* natpmp.c in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A11930D0B2EE300B5701F /* natpmp.c */; };
 		3C7A119A0D0B2EE300B5701F /* natpmp.h in Headers */ = {isa = PBXBuildFile; fileRef = 3C7A11940D0B2EE300B5701F /* natpmp.h */; };
 		4394AC670C74FB6000F367E8 /* ptrarray.c in Sources */ = {isa = PBXBuildFile; fileRef = 4394AC640C74FB6000F367E8 /* ptrarray.c */; };
-		4394AC680C74FB6000F367E8 /* publish.c in Sources */ = {isa = PBXBuildFile; fileRef = 4394AC650C74FB6000F367E8 /* publish.c */; };
 		4D043A7F090AE979009FEDA8 /* TransmissionDocument.icns in Resources */ = {isa = PBXBuildFile; fileRef = 4D043A7E090AE979009FEDA8 /* TransmissionDocument.icns */; };
 		4D118E1A08CB46B20033958F /* PrefsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D118E1908CB46B20033958F /* PrefsController.m */; };
 		4D1838DD09DEC0E80047D688 /* libtransmission.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D18389709DEC0030047D688 /* libtransmission.a */; };
@@ -33,7 +32,6 @@
 		4D36BA790CA2F00800A63CA5 /* peer-msgs.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D36BA6A0CA2F00800A63CA5 /* peer-msgs.c */; };
 		4D36BA7A0CA2F00800A63CA5 /* peer-msgs.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D36BA6B0CA2F00800A63CA5 /* peer-msgs.h */; };
 		4D36BA7B0CA2F00800A63CA5 /* ptrarray.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D36BA6C0CA2F00800A63CA5 /* ptrarray.h */; };
-		4D36BA7C0CA2F00800A63CA5 /* publish.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D36BA6D0CA2F00800A63CA5 /* publish.h */; };
 		4D36BBC90CA309AA00A63CA5 /* evutil.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D36BBC80CA309AA00A63CA5 /* evutil.c */; };
 		4D3EA0AA08AE13C600EA10C2 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D3EA0A908AE13C600EA10C2 /* IOKit.framework */; };
 		4D4ADFC70DA1631500A68297 /* blocklist.c in Sources */ = {isa = PBXBuildFile; fileRef = A2D3078E0D9EC45F0051FD27 /* blocklist.c */; };
@@ -434,7 +432,6 @@
 		3C7A11930D0B2EE300B5701F /* natpmp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = natpmp.c; path = "third-party/libnatpmp/natpmp.c"; sourceTree = "<group>"; };
 		3C7A11940D0B2EE300B5701F /* natpmp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = natpmp.h; path = "third-party/libnatpmp/natpmp.h"; sourceTree = "<group>"; };
 		4394AC640C74FB6000F367E8 /* ptrarray.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = ptrarray.c; path = libtransmission/ptrarray.c; sourceTree = "<group>"; };
-		4394AC650C74FB6000F367E8 /* publish.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = publish.c; path = libtransmission/publish.c; sourceTree = "<group>"; };
 		4D043A7E090AE979009FEDA8 /* TransmissionDocument.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = TransmissionDocument.icns; path = macosx/Images/TransmissionDocument.icns; sourceTree = "<group>"; };
 		4D118E1808CB46B20033958F /* PrefsController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PrefsController.h; path = macosx/PrefsController.h; sourceTree = "<group>"; };
 		4D118E1908CB46B20033958F /* PrefsController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PrefsController.m; path = macosx/PrefsController.m; sourceTree = "<group>"; };
@@ -454,7 +451,6 @@
 		4D36BA6A0CA2F00800A63CA5 /* peer-msgs.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = "peer-msgs.c"; path = "libtransmission/peer-msgs.c"; sourceTree = "<group>"; };
 		4D36BA6B0CA2F00800A63CA5 /* peer-msgs.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = "peer-msgs.h"; path = "libtransmission/peer-msgs.h"; sourceTree = "<group>"; };
 		4D36BA6C0CA2F00800A63CA5 /* ptrarray.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ptrarray.h; path = libtransmission/ptrarray.h; sourceTree = "<group>"; };
-		4D36BA6D0CA2F00800A63CA5 /* publish.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = publish.h; path = libtransmission/publish.h; sourceTree = "<group>"; };
 		4D36BBC80CA309AA00A63CA5 /* evutil.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = evutil.c; path = "third-party/libevent/evutil.c"; sourceTree = "<group>"; };
 		4D3EA0A908AE13C600EA10C2 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
 		4D6DAAC4090CE00500F43C22 /* RevealOff.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = RevealOff.png; path = macosx/Images/RevealOff.png; sourceTree = "<group>"; };
@@ -1271,11 +1267,9 @@
 				A292A6E50DFB45EC004B9C0A /* webseed.c */,
 				A292A6E60DFB45EC004B9C0A /* webseed.h */,
 				4D36BA6C0CA2F00800A63CA5 /* ptrarray.h */,
-				4D36BA6D0CA2F00800A63CA5 /* publish.h */,
 				A24621350C769CF400088E81 /* trevent.h */,
 				A24621360C769CF400088E81 /* trevent.c */,
 				4394AC640C74FB6000F367E8 /* ptrarray.c */,
-				4394AC650C74FB6000F367E8 /* publish.c */,
 				D4AF3B2D0C41F7A500D46B6B /* list.c */,
 				D4AF3B2E0C41F7A500D46B6B /* list.h */,
 				A2BE9C4E0C1E4ADA002D16E6 /* makemeta.c */,
@@ -1585,7 +1579,6 @@
 				4D36BA780CA2F00800A63CA5 /* peer-mgr.h in Headers */,
 				4D36BA7A0CA2F00800A63CA5 /* peer-msgs.h in Headers */,
 				4D36BA7B0CA2F00800A63CA5 /* ptrarray.h in Headers */,
-				4D36BA7C0CA2F00800A63CA5 /* publish.h in Headers */,
 				A25D2CBE0CF4C73E0096A262 /* stats.h in Headers */,
 				A29DF8BA0DB2544C00D04E5A /* resume.h in Headers */,
 				A29DF8BB0DB2544C00D04E5A /* torrent.h in Headers */,
@@ -2050,7 +2043,6 @@
 				A2BE9C520C1E4AF5002D16E6 /* makemeta.c in Sources */,
 				D4AF3B2F0C41F7A500D46B6B /* list.c in Sources */,
 				4394AC670C74FB6000F367E8 /* ptrarray.c in Sources */,
-				4394AC680C74FB6000F367E8 /* publish.c in Sources */,
 				A24621420C769D0900088E81 /* trevent.c in Sources */,
 				4D36BA6F0CA2F00800A63CA5 /* crypto.c in Sources */,
 				4D36BA720CA2F00800A63CA5 /* handshake.c in Sources */,
