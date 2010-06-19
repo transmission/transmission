@@ -194,7 +194,6 @@ struct tr_torrent
     tr_completeness            completeness;
 
     struct tr_torrent_tiers  * tiers;
-    struct tr_publisher_tag  * tiersSubscription;
 
     time_t                     dhtAnnounceAt;
     time_t                     dhtAnnounce6At;

@@ -360,13 +360,8 @@ tr_torrentClearError( tr_torrent * tor )
 }
 
 static void
-onTrackerResponse( void * tracker UNUSED,
-                   void * vevent,
-                   void * user_data )
+onTrackerResponse( tr_torrent * tor, const tr_tracker_event * event, void * unused UNUSED )
 {
-    tr_torrent * tor = user_data;
-    tr_tracker_event * event = vevent;
-
     switch( event->messageType )
     {
         case TR_TRACKER_PEERS:
@@ -727,8 +722,7 @@ torrentInit( tr_torrent * tor, const tr_ctor * ctor )
         }
     }
 
-    tor->tiers = tr_announcerAddTorrent( tor->session->announcer, tor );
-    tor->tiersSubscription = tr_announcerSubscribe( tor->tiers, onTrackerResponse, tor );
+    tor->tiers = tr_announcerAddTorrent( tor->session->announcer, tor, onTrackerResponse, NULL );
 
     if( doStart )
         torrentStart( tor );
@@ -1314,7 +1308,6 @@ freeTorrent( tr_torrent * tor )
 
     tr_cpDestruct( &tor->completion );
 
-    tr_announcerUnsubscribe( tor->tiers, tor->tiersSubscription );
     tr_announcerRemoveTorrent( session->announcer, tor );
 
     tr_bitfieldDestruct( &tor->checkedPieces );

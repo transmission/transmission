@@ -21,7 +21,6 @@
 #include "crypto.h"
 #include "net.h"
 #include "ptrarray.h"
-#include "publish.h"
 #include "session.h"
 #include "tr-dht.h"
 #include "tr-lpd.h"
@@ -530,7 +529,8 @@ tierAddTracker( tr_announcer * announcer,
 typedef struct tr_torrent_tiers
 {
     tr_ptrArray tiers;
-    tr_publisher publisher;
+    tr_tracker_callback * callback;
+    void * callbackData;
 }
 tr_torrent_tiers;
 
@@ -539,14 +539,12 @@ tiersNew( void )
 {
     tr_torrent_tiers * tiers = tr_new0( tr_torrent_tiers, 1 );
     tiers->tiers = TR_PTR_ARRAY_INIT;
-    tiers->publisher = TR_PUBLISHER_INIT;
     return tiers;
 }
 
 static void
 tiersFree( tr_torrent_tiers * tiers )
 {
-    tr_publisherDestruct( &tiers->publisher );
     tr_ptrArrayDestruct( &tiers->tiers, tierFree );
     tr_free( tiers );
 }
@@ -593,7 +591,9 @@ publishMessage( tr_tier * tier, const char * msg, int type )
         event.messageType = type;
         event.text = msg;
         event.tracker = tier->currentTracker ? tier->currentTracker->announce : NULL;
-        tr_publisherPublish( &tiers->publisher, tier, &event );
+
+        if( tiers->callback != NULL )
+            tiers->callback( tier->tor, &event, tiers->callbackData );
     }
 }
 
@@ -640,7 +640,8 @@ publishNewPeers( tr_tier * tier, int seeds, int leechers,
     e.compact = compact;
     e.compactLen = compactLen;
 
-    tr_publisherPublish( &tier->tor->tiers->publisher, tier, &e );
+    if( tier->tor->tiers->callback != NULL )
+        tier->tor->tiers->callback( tier->tor, &e, NULL );
 
     return compactLen / 6;
 }
@@ -844,7 +845,8 @@ addTorrentToTier( tr_announcer * announcer, tr_torrent_tiers * tiers, tr_torrent
 }
 
 tr_torrent_tiers *
-tr_announcerAddTorrent( tr_announcer * announcer, tr_torrent * tor )
+tr_announcerAddTorrent( tr_announcer * announcer, tr_torrent * tor,
+                        tr_tracker_callback * callback, void * callbackData )
 {
     tr_torrent_tiers * tiers;
 
@@ -852,6 +854,8 @@ tr_announcerAddTorrent( tr_announcer * announcer, tr_torrent * tor )
     assert( tr_isTorrent( tor ) );
 
     tiers = tiersNew( );
+    tiers->callback = callback;
+    tiers->callbackData = callbackData;
 
     addTorrentToTier( announcer, tiers, tor );
 
@@ -927,22 +931,6 @@ tr_announcerResetTorrent( tr_announcer * announcer, tr_torrent * tor )
 
     /* cleanup */
     tr_ptrArrayDestruct( &oldTiers, tierFree );
-}
-
-tr_publisher_tag
-tr_announcerSubscribe( struct tr_torrent_tiers   * tiers,
-                       tr_delivery_func            func,
-                       void                      * userData )
-{
-    return tr_publisherSubscribe( &tiers->publisher, func, userData );
-}
-
-void
-tr_announcerUnsubscribe( struct tr_torrent_tiers  * tiers,
-                         tr_publisher_tag           tag )
-{
-    if( tiers )
-        tr_publisherUnsubscribe( &tiers->publisher, tag );
 }
 
 static tr_bool

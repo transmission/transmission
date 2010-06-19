@@ -201,7 +201,8 @@ struct tr_peermsgs
 
     tr_torrent *           torrent;
 
-    tr_publisher           publisher;
+    tr_peer_callback      * callback;
+    void                  * callbackData;
 
     struct evbuffer *      outMessages; /* all the non-piece messages */
 
@@ -470,7 +471,8 @@ publish( tr_peermsgs * msgs, tr_peer_event * e )
     assert( msgs->peer );
     assert( msgs->peer->msgs == msgs );
 
-    tr_publisherPublish( &msgs->publisher, msgs->peer, e );
+    if( msgs->callback != NULL )
+        msgs->callback( msgs->peer, e, msgs->callbackData );
 }
 
 static void
@@ -2315,11 +2317,10 @@ pexPulse( int foo UNUSED, short bar UNUSED, void * vmsgs )
 **/
 
 tr_peermsgs*
-tr_peerMsgsNew( struct tr_torrent * torrent,
-                struct tr_peer    * peer,
-                tr_delivery_func    func,
-                void              * userData,
-                tr_publisher_tag  * setme )
+tr_peerMsgsNew( struct tr_torrent    * torrent,
+                struct tr_peer       * peer,
+                tr_peer_callback     * callback,
+                void                 * callbackData )
 {
     tr_peermsgs * m;
 
@@ -2327,7 +2328,8 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
     assert( peer->io );
 
     m = tr_new0( tr_peermsgs, 1 );
-    m->publisher = TR_PUBLISHER_INIT;
+    m->callback = callback;
+    m->callbackData = callbackData;
     m->peer = peer;
     m->torrent = torrent;
     m->peer->clientIsChoked = 1;
@@ -2342,8 +2344,6 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
     evtimer_set( &m->pexTimer, pexPulse, m );
     tr_timerAdd( &m->pexTimer, PEX_INTERVAL_SECS, 0 );
     peer->msgs = m;
-
-    *setme = tr_publisherSubscribe( &m->publisher, func, userData );
 
     if( tr_peerIoSupportsLTEP( peer->io ) )
         sendLtepHandshake( m );
@@ -2371,7 +2371,6 @@ tr_peerMsgsFree( tr_peermsgs* msgs )
     if( msgs )
     {
         evtimer_del( &msgs->pexTimer );
-        tr_publisherDestruct( &msgs->publisher );
 
         evbuffer_free( msgs->incoming.block );
         evbuffer_free( msgs->outMessages );
@@ -2381,11 +2380,4 @@ tr_peerMsgsFree( tr_peermsgs* msgs )
         memset( msgs, ~0, sizeof( tr_peermsgs ) );
         tr_free( msgs );
     }
-}
-
-void
-tr_peerMsgsUnsubscribe( tr_peermsgs *    peer,
-                        tr_publisher_tag tag )
-{
-    tr_publisherUnsubscribe( &peer->publisher, tag );
 }

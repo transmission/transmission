@@ -18,7 +18,6 @@
 #define _TR_ANNOUNCER_H_
 
 #include "transmission.h"
-#include "publish.h"
 
 struct tr_announcer;
 struct tr_torrent_tiers;
@@ -55,6 +54,10 @@ typedef struct
 }
 tr_tracker_event;
 
+typedef void tr_tracker_callback ( tr_torrent              * tor,
+                                   const tr_tracker_event  * event,
+                                   void                    * client_data );
+
 /**
 ***  Session ctor/dtor
 **/
@@ -67,19 +70,14 @@ void tr_announcerClose( tr_session * );
 ***  For torrent customers
 **/
 
-struct tr_torrent_tiers * tr_announcerAddTorrent( struct tr_announcer  *,
-                                                  tr_torrent           * );
+struct tr_torrent_tiers * tr_announcerAddTorrent( struct tr_announcer *,
+                                                  tr_torrent          * torrent,
+                                                  tr_tracker_callback * cb,
+                                                  void                * cbdata );
 
 tr_bool tr_announcerHasBacklog( const struct tr_announcer * );
 
 void tr_announcerResetTorrent( struct tr_announcer*, tr_torrent* );
-
-tr_publisher_tag tr_announcerSubscribe( struct tr_torrent_tiers  * tiers,
-                                        tr_delivery_func           func,
-                                        void                     * userData );
-
-void tr_announcerUnsubscribe( struct tr_torrent_tiers  * tiers,
-                              tr_publisher_tag           tag );
 
 void tr_announcerRemoveTorrent( struct tr_announcer * ,
                                 tr_torrent          * );

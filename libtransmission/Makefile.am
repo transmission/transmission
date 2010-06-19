@@ -44,7 +44,6 @@ libtransmission_a_SOURCES = \
     platform.c \
     port-forwarding.c \
     ptrarray.c \
-    publish.c \
     ratecontrol.c \
     resume.c \
     rpcimpl.c \
@@ -96,7 +95,6 @@ noinst_HEADERS = \
     platform.h \
     port-forwarding.h \
     ptrarray.h \
-    publish.h \
     ratecontrol.h \
     resume.h \
     rpcimpl.h \

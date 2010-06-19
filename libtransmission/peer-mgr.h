@@ -28,7 +28,6 @@
 #include "history.h"
 #include "net.h"
 #include "peer-common.h" /* struct peer_request */
-#include "publish.h" /* tr_publisher_tag */
 
 /**
  * @addtogroup peers Peers
@@ -124,7 +123,6 @@ typedef struct tr_peer
     tr_recentHistory       * cancelsSentToPeer;
 
     struct tr_peermsgs     * msgs;
-    tr_publisher_tag         msgsTag;
 }
 tr_peer;
 

@@ -392,10 +392,7 @@ peerDestructor( Torrent * t, tr_peer * peer )
     peerDeclinedAllRequests( t, peer );
 
     if( peer->msgs != NULL )
-    {
-        tr_peerMsgsUnsubscribe( peer->msgs, peer->msgsTag );
         tr_peerMsgsFree( peer->msgs );
-    }
 
     tr_peerIoClear( peer->io );
     tr_peerIoUnref( peer->io ); /* balanced by the ref in handshakeDoneCB() */
@@ -457,7 +454,7 @@ torrentDestructor( void * vt )
     tr_free( t );
 }
 
-static void peerCallbackFunc( void * vpeer, void * vevent, void * vt );
+static void peerCallbackFunc( tr_peer *, const tr_peer_event *, void * );
 
 static Torrent*
 torrentConstructor( tr_peerMgr * manager,
@@ -1338,11 +1335,9 @@ peerDeclinedAllRequests( Torrent * t, const tr_peer * peer )
 }
 
 static void
-peerCallbackFunc( void * vpeer, void * vevent, void * vt )
+peerCallbackFunc( tr_peer * peer, const tr_peer_event * e, void * vt )
 {
-    tr_peer * peer = vpeer; /* may be NULL if peer is a webseed */
     Torrent * t = vt;
-    const tr_peer_event * e = vevent;
 
     torrentLock( t );
 
@@ -1706,7 +1701,7 @@ myHandshakeDoneCB( tr_handshake  * handshake,
                 peer->io = tr_handshakeStealIO( handshake ); /* this steals its refcount too, which is
                                                                 balanced by our unref in peerDestructor()  */
                 tr_peerIoSetParent( peer->io, t->tor->bandwidth );
-                tr_peerMsgsNew( t->tor, peer, peerCallbackFunc, t, &peer->msgsTag );
+                tr_peerMsgsNew( t->tor, peer, peerCallbackFunc, t );
 
                 success = TRUE;
             }

@@ -20,12 +20,11 @@
 typedef struct tr_webseed tr_webseed;
 
 #include "peer-common.h"
-#include "publish.h"
 
 tr_webseed* tr_webseedNew( struct tr_torrent * torrent,
-                           const char *        url,
-                           tr_delivery_func    delivery_func,
-                           void *              delivery_userdata );
+                           const char        * url,
+                           tr_peer_callback  * callback,
+                           void              * callback_data );
 
 void        tr_webseedFree( tr_webseed * );
 

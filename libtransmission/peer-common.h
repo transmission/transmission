@@ -84,6 +84,12 @@ typedef struct
 }
 tr_peer_event;
 
+struct tr_peer;
+
+typedef void tr_peer_callback( struct tr_peer      * peer,
+                              const tr_peer_event  * event,
+                              void                 * client_data );
+
 #ifdef WIN32
  #define EMSGSIZE WSAEMSGSIZE
 #endif
