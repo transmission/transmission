@@ -238,7 +238,7 @@ addURL( tr_benc * metainfo, const char * url )
 
         tier = tr_bencListAddList( announce_list, 1 );
         tr_bencListAddStr( tier, url );
-        printf( "\tAdded \"%s\" to \"announce-list\" tier %d\n", url, tr_bencListSize( announce_list ) );
+        printf( "\tAdded \"%s\" to \"announce-list\" tier %zu\n", url, tr_bencListSize( announce_list ) );
         changed = TRUE;
     }
 
