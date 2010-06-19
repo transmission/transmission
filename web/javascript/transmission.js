@@ -881,8 +881,8 @@ Transmission.prototype =
 			w.addClass('turtleDisabled');
 			t = "Click to enable Temporary Speed Limits";
 		}
-		t += " (" + this._prefs[RPC._TurtleUpSpeedLimit] + " kB/s up, "
-		          + this._prefs[RPC._TurtleDownSpeedLimit] + " kB/s down)";
+		t += " (" + Transmission.fmt.speed(this._prefs[RPC._TurtleUpSpeedLimit]) + " up, "
+		          + Transmission.fmt.speed(this._prefs[RPC._TurtleDownSpeedLimit]) + " down)";
 		w.attr( 'title', t );
 	},
 
@@ -950,12 +950,12 @@ Transmission.prototype =
 
 		if (!iPhone)
 		{
-			setInnerHTML( $('#limited_download_rate')[0], 'Limit (' + down_limit + ' KiB/s)' );
+			setInnerHTML( $('#limited_download_rate')[0], 'Limit (' + Transmission.fmt.speed(down_limit) + ')' );
 			var key = down_limited ? '#limited_download_rate'
 			                       : '#unlimited_download_rate';
 			$(key).deselectMenuSiblings().selectMenuItem();
 		
-			setInnerHTML( $('#limited_upload_rate')[0], 'Limit (' + up_limit + ' KiB/s)' );
+			setInnerHTML( $('#limited_download_rate')[0], 'Limit (' + Transmission.fmt.speed(up_limit) + ')' );
 			key = up_limited ? '#limited_upload_rate'
 			                 : '#unlimited_upload_rate';
 			$(key).deselectMenuSiblings().selectMenuItem();
@@ -1002,15 +1002,15 @@ Transmission.prototype =
 		var session = stats["current-stats"];
 		var total = stats["cumulative-stats"];
 
-		setInnerHTML( $('#stats_session_uploaded')[0], Math.formatBytes(session["uploadedBytes"]) );
-		setInnerHTML( $('#stats_session_downloaded')[0], Math.formatBytes(session["downloadedBytes"]) );
+		setInnerHTML( $('#stats_session_uploaded')[0], Transmission.fmt.size(session["uploadedBytes"]) );
+		setInnerHTML( $('#stats_session_downloaded')[0], Transmission.fmt.size(session["downloadedBytes"]) );
 		setInnerHTML( $('#stats_session_ratio')[0], Math.ratio(session["uploadedBytes"],session["downloadedBytes"]));
-		setInnerHTML( $('#stats_session_duration')[0], Math.formatSeconds(session["secondsActive"]) );
+		setInnerHTML( $('#stats_session_duration')[0], Transmission.fmt.timeInterval(session["secondsActive"]) );
 		setInnerHTML( $('#stats_total_count')[0], total["sessionCount"] + " times" );
-		setInnerHTML( $('#stats_total_uploaded')[0], Math.formatBytes(total["uploadedBytes"]) );
-		setInnerHTML( $('#stats_total_downloaded')[0], Math.formatBytes(total["downloadedBytes"]) );
+		setInnerHTML( $('#stats_total_uploaded')[0], Transmission.fmt.size(total["uploadedBytes"]) );
+		setInnerHTML( $('#stats_total_downloaded')[0], Transmission.fmt.size(total["downloadedBytes"]) );
 		setInnerHTML( $('#stats_total_ratio')[0], Math.ratio(total["uploadedBytes"],total["downloadedBytes"]));
-		setInnerHTML( $('#stats_total_duration')[0], Math.formatSeconds(total["secondsActive"]) );
+		setInnerHTML( $('#stats_total_duration')[0], Transmission.fmt.timeInterval(total["secondsActive"]) );
 	},
 
 	setSearch: function( search ) {
@@ -1069,7 +1069,7 @@ Transmission.prototype =
 					$element.deselectMenuSiblings().selectMenuItem();
 					args[RPC._DownSpeedLimited] = false;
 				} else {
-					setInnerHTML( $('#limited_download_rate')[0], 'Limit (' + rate + ' KiB/s)' );
+					setInnerHTML( $('#limited_download_rate')[0], 'Limit (' + Transmission.fmt.speed(rate) + ')' );
 					$('#limited_download_rate').deselectMenuSiblings().selectMenuItem();
 					$('div.preference input#download_rate')[0].value = rate;
 					args[RPC._DownSpeedLimit] = parseInt( rate );
@@ -1087,7 +1087,7 @@ Transmission.prototype =
 					$element.deselectMenuSiblings().selectMenuItem();
 					args[RPC._UpSpeedLimited] = false;
 				} else {
-					setInnerHTML( $('#limited_upload_rate')[0], 'Limit (' + rate + ' KiB/s)' );
+					setInnerHTML( $('#limited_upload_rate')[0], 'Limit (' + Transmission.fmt.speed(rate) + ')' );
 					$('#limited_upload_rate').deselectMenuSiblings().selectMenuItem();
 					$('div.preference input#upload_rate')[0].value = rate;
 					args[RPC._UpSpeedLimit] = parseInt( rate );
@@ -1153,7 +1153,7 @@ Transmission.prototype =
 		var comment = 'N/A';
 		var download_dir = 'N/A';
 		var date_created = 'N/A';
-		var error = '';
+		var error = 'None';
 		var hash = 'N/A';
 		var have_public = false;
 		var have_private = false;
@@ -1226,8 +1226,8 @@ Transmission.prototype =
 				download_dir = t._download_dir;
 
 			hash = t.hash();
-			pieces = t._pieceCount + ', ' + Math.formatBytes(t._pieceSize);
-			date_created = Math.formatTimestamp( t._creator_date );
+			pieces = t._pieceCount + ', ' + Transmission.fmt.size(t._pieceSize);
+			date_created = Transmission.fmt.timestamp( t._creator_date );
 		}
 
 		for( var i=0, t; t=torrents[i]; ++i ) {
@@ -1259,17 +1259,17 @@ Transmission.prototype =
 		else if( have_public ) private_string = 'Public Torrent';	
 
 		setInnerHTML( tab.name, name );
-		setInnerHTML( tab.size, torrents.length ? Math.formatBytes( total_size ) : na );
+		setInnerHTML( tab.size, torrents.length ? Transmission.fmt.size( total_size ) : na );
 		setInnerHTML( tab.pieces, pieces );
 		setInnerHTML( tab.hash, hash );
 		setInnerHTML( tab.state, total_state );
-		setInnerHTML( tab.download_speed, torrents.length ? Math.formatBytes( total_download_speed ) + '/s' : na );
-		setInnerHTML( tab.upload_speed, torrents.length ? Math.formatBytes( total_upload_speed ) + '/s' : na );
-		setInnerHTML( tab.uploaded, torrents.length ? Math.formatBytes( total_upload ) : na );
-		setInnerHTML( tab.downloaded, torrents.length ? Math.formatBytes( total_download ) : na );
+		setInnerHTML( tab.download_speed, torrents.length ? Transmission.fmt.speed( total_download_speed ) : na );
+		setInnerHTML( tab.upload_speed, torrents.length ? Transmission.fmt.speed( total_upload_speed ) : na );
+		setInnerHTML( tab.uploaded, torrents.length ? Transmission.fmt.size( total_upload ) : na );
+		setInnerHTML( tab.downloaded, torrents.length ? Transmission.fmt.size( total_download ) : na );
 		setInnerHTML( tab.availability, torrents.length ? Math.ratio( total_availability*100, sizeWhenDone ) + '%' : na );
 		setInnerHTML( tab.ratio, torrents.length ? Math.ratio( total_upload, total_download ) : na );
-		setInnerHTML( tab.have, torrents.length ? Math.formatBytes(total_completed) + ' (' + Math.formatBytes(total_verified) + ' verified)' : na );
+		setInnerHTML( tab.have, torrents.length ? Transmission.fmt.size(total_completed) + ' (' + Transmission.fmt.size(total_verified) + ' verified)' : na );
 		setInnerHTML( tab.upload_to, torrents.length ? total_upload_peers : na );
 		setInnerHTML( tab.download_from, torrents.length ? total_download_peers : na );
 		setInnerHTML( tab.secure, private_string );
@@ -1325,8 +1325,8 @@ Transmission.prototype =
 				var parity = ((i+1) % 2 == 0 ? 'even' : 'odd');
 				html += '<tr class="inspector_peer_entry ' + parity + '">';
 				html += '<td>' + (peer.isEncrypted ? '<img src="images/graphics/lock_icon.png" alt="Encrypted"/>' : '') + '</td>';
-				html += '<td>' + (peer.rateToPeer ? Math.formatBytes(peer.rateToPeer) + '/s' : '') + '</td>';
-				html += '<td>' + (peer.rateToClient ? Math.formatBytes(peer.rateToClient) + '/s' : '') + '</td>';
+				html += '<td>' + Transmission.fmt.speed(peer.rateToPeer) + '</td>';
+				html += '<td>' + Transmission.fmt.speed(peer.rateToClient) + '</td>';
 				html += '<td class="percentCol">' + Math.floor(peer.progress*100) + '%' + '</td>';
 				html += '<td>' + peer.flagStr + '</td>';
 				html += '<td>' + peer.address + '</td>';
@@ -1378,7 +1378,7 @@ Transmission.prototype =
 		var lastAnnounceLabel = 'Last Announce';
 		var lastAnnounce = 'N/A';
 		if (tracker.hasAnnounced) {
-			var lastAnnounceTime = Math.formatTimestamp(tracker.lastAnnounceTime);
+			var lastAnnounceTime = Transmission.fmt.timestamp(tracker.lastAnnounceTime);
 			if (tracker.lastAnnounceSucceeded) {
 				lastAnnounce = lastAnnounceTime;
 				lastAnnounce += ' (got ' + tracker.lastAnnouncePeerCount + ' peer';
@@ -1403,7 +1403,7 @@ Transmission.prototype =
 				if(timeUntilAnnounce < 0){
 					timeUntilAnnounce = 0;
 				}
-				announceState = 'Next announce in ' + Math.formatSeconds(timeUntilAnnounce);
+				announceState = 'Next announce in ' + Transmission.fmt.timeInterval(timeUntilAnnounce);
 				break;
 			case Torrent._TrackerQueued:
 				announceState = 'Announce is queued';
@@ -1423,7 +1423,7 @@ Transmission.prototype =
 		var lastScrapeLabel = 'Last Scrape';
 		var lastScrape = 'N/A';
 		if (tracker.hasScraped) {
-			var lastScrapeTime = Math.formatTimestamp(tracker.lastScrapeTime);
+			var lastScrapeTime = Transmission.fmt.timestamp(tracker.lastScrapeTime);
 			if (tracker.lastScrapeSucceeded) {
 				lastScrape = lastScrapeTime;
 			} else {
@@ -1685,12 +1685,12 @@ Transmission.prototype =
 		setInnerHTML( $('#torrent_global_transfer')[0], s );
 		
 		// update the speeds
-		s = Math.formatBytes( upSpeed ) + '/s';
+		s = Transmission.fmt.speed( upSpeed );
 		if( iPhone ) s = 'UL: ' + s;
 		setInnerHTML( $('#torrent_global_upload')[0], s );
 		
 		// download speeds
-		s = Math.formatBytes( downSpeed ) + '/s';
+		s = Transmission.fmt.speed( downSpeed );
 		if( iPhone ) s = 'DL: ' + s;
 		setInnerHTML( $('#torrent_global_download')[0], s );
 	},

@@ -435,6 +435,13 @@ Torrent.prototype =
 		return null;
 	},
 
+	formatUL: function() {
+		return 'UL: ' + Transmission.fmt.speed(this._upload_speed);
+	},
+	formatDL: function() {
+		return 'DL: ' + Transmission.fmt.speed(this._download_speed);
+	},
+
 	getPeerDetails: function()
 	{
 		var c;
@@ -453,39 +460,33 @@ Torrent.prototype =
 
 			case Torrent._StatusDownloading:
 				if(compact_mode){
-					c = 'DL: '
-					c += Math.formatBytes(this._download_speed);
-					c += '/s UL: ';
-					c += Math.formatBytes(this._upload_speed);
-					c += '/s';
+					c = this.formatDL();
+					c += ' ';
+					c += this.formatUL();
 				} else {
 					// 'Downloading from 36 of 40 peers - DL: 60.2 KiB/s UL: 4.3 KiB/s'
 					c = 'Downloading from ';
 					c += this.peersSendingToUs();
 					c += ' of ';
 					c += this._peers_connected;
-					c += ' peers - DL: ';
-					c += Math.formatBytes(this._download_speed);
-					c += '/s UL: ';
-					c += Math.formatBytes(this._upload_speed);
-					c += '/s';
+					c += ' peers - ';
+					c = this.formatDL();
+					c += ' ';
+					c += this.formatUL();
 				}
 				break;
 
 			case Torrent._StatusSeeding:
 				if(compact_mode){
-					c = 'UL: '
-					c += Math.formatBytes(this._upload_speed);
-					c += '/s';
+					c += this.formatUL();
 				} else {
 					// 'Seeding to 13 of 22 peers - UL: 36.2 KiB/s'
 					c = 'Seeding to ';
 					c += this.peersGettingFromUs();
 					c += ' of ';
 					c += this._peers_connected;
-					c += ' peers - UL: ';
-					c += Math.formatBytes(this._upload_speed);
-					c += '/s';
+					c += ' peers - ';
+					c += this.formatUL();
 				}
 				break;
 
@@ -555,14 +556,14 @@ Torrent.prototype =
 				if (this._eta < 0 || this._eta >= Torrent._InfiniteTimeRemaining )
 					eta += 'remaining time unknown';
 				else
-					eta += Math.formatSeconds(this._eta) + ' remaining';
+					eta += Transmission.fmt.timeInterval(this._eta) + ' remaining';
 			}
 			
 			// Create the 'progress details' label
 			// Eg: '101 MiB of 631 MiB (16.02%) - 2 hr remaining'
-			c = Math.formatBytes( this._sizeWhenDone - this._leftUntilDone );
+			c = Transmission.fmt.size( this._sizeWhenDone - this._leftUntilDone );
 			c += ' of ';
-			c += Math.formatBytes( this._sizeWhenDone );
+			c += Transmission.fmt.size( this._sizeWhenDone );
 			c += ' (';
 			c += this.getPercentDoneStr();
 			c += '%)';
@@ -596,14 +597,14 @@ Torrent.prototype =
 				if (this._eta < 0 || this._eta >= Torrent._InfiniteTimeRemaining )
 					eta += 'remaining time unknown';
 				else
-					eta += Math.formatSeconds(this._eta) + ' remaining';
+					eta += Transmission.fmt.timeInterval(this._eta) + ' remaining';
 			}
 
 			// Create the 'progress details' label
 			// Eg: '698.05 MiB, uploaded 8.59 GiB (Ratio: 12.3)'
-			c = Math.formatBytes( this._size );
+			c = Transmission.fmt.size( this._size );
 			c += ', uploaded ';
-			c += Math.formatBytes( this._upload_total );
+			c += Transmission.fmt.size( this._upload_total );
 			c += ' (Ratio ';
 			if(this._upload_ratio > -1)
 				c += Math.round(this._upload_ratio*100)/100;
@@ -957,9 +958,9 @@ TorrentFile.prototype = {
 	},
 	
 	refreshProgressHTML: function() {
-		var c = Math.formatBytes(this._done);
+		var c = Transmission.fmt.size(this._done);
 		c += ' of ';
-		c += Math.formatBytes(this._size);
+		c += Transmission.fmt.size(this._size);
 		c += ' (';
 		c += Math.ratio(100 * this._done, this._size);
 		c += '%)';
