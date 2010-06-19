@@ -163,6 +163,7 @@ const char* tr_getDefaultDownloadDir( void );
 #define TR_PREFS_KEY_BIND_ADDRESS_IPV4             "bind-address-ipv4"
 #define TR_PREFS_KEY_BIND_ADDRESS_IPV6             "bind-address-ipv6"
 #define TR_PREFS_KEY_BLOCKLIST_ENABLED             "blocklist-enabled"
+#define TR_PREFS_KEY_MAX_CACHE_SIZE_MiB            "cache-size-MiB"
 #define TR_PREFS_KEY_DHT_ENABLED                   "dht-enabled"
 #define TR_PREFS_KEY_LPD_ENABLED                   "lpd-enabled"
 #define TR_PREFS_KEY_DOWNLOAD_DIR                  "download-dir"
@@ -586,26 +587,23 @@ void tr_sessionClearStats( tr_session * session );
  * PEX is always disabled in private torrents regardless of this.
  * In public torrents, PEX is enabled by default.
  */
-void tr_sessionSetPexEnabled( tr_session  * session, tr_bool isEnabled );
+void     tr_sessionSetPexEnabled( tr_session  * session, tr_bool isEnabled );
+tr_bool  tr_sessionIsPexEnabled( const tr_session * session );
 
-tr_bool            tr_sessionIsPexEnabled( const tr_session * session );
+tr_bool  tr_sessionIsDHTEnabled( const tr_session * session );
+void     tr_sessionSetDHTEnabled( tr_session * session, tr_bool );
 
-tr_bool            tr_sessionIsDHTEnabled( const tr_session * session );
+tr_bool  tr_sessionIsLPDEnabled( const tr_session * session );
+void     tr_sessionSetLPDEnabled( tr_session * session, tr_bool enabled );
 
-void               tr_sessionSetDHTEnabled( tr_session * session, tr_bool );
+void     tr_sessionSetCacheLimit( tr_session * session, double MiB );
+double   tr_sessionGetCacheLimit( const tr_session * session );
 
-tr_bool            tr_sessionIsLPDEnabled( const tr_session * session );
-
-void               tr_sessionSetLPDEnabled( tr_session * session, tr_bool enabled );
-
-void               tr_sessionSetLazyBitfieldEnabled( tr_session * session,
-                                                     tr_bool       enabled );
-
-tr_bool            tr_sessionIsLazyBitfieldEnabled( const tr_session * session );
+void     tr_sessionSetLazyBitfieldEnabled( tr_session * session, tr_bool enabled );
+tr_bool  tr_sessionIsLazyBitfieldEnabled( const tr_session * session );
 
 tr_encryption_mode tr_sessionGetEncryption( tr_session * session );
-
-void               tr_sessionSetEncryption( tr_session          * session,
+void               tr_sessionSetEncryption( tr_session * session,
                                             tr_encryption_mode    mode );
 
 

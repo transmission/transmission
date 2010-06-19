@@ -28,6 +28,7 @@
 #include "bandwidth.h"
 #include "bencode.h"
 #include "blocklist.h"
+#include "cache.h"
 #include "crypto.h"
 #include "fdlimit.h"
 #include "list.h"
@@ -51,7 +52,9 @@
 
 enum
 {
-    SAVE_INTERVAL_SECS = 120
+    SAVE_INTERVAL_SECS = 120,
+
+    DEFAULT_CACHE_SIZE_MiB = 2 /* 2 MiB */
 };
 
 
@@ -242,8 +245,9 @@ tr_sessionGetDefaultSettings( const char * configDir UNUSED, tr_benc * d )
 {
     assert( tr_bencIsDict( d ) );
 
-    tr_bencDictReserve( d, 35 );
+    tr_bencDictReserve( d, 60 );
     tr_bencDictAddBool( d, TR_PREFS_KEY_BLOCKLIST_ENABLED,        FALSE );
+    tr_bencDictAddReal( d, TR_PREFS_KEY_MAX_CACHE_SIZE_MiB,       DEFAULT_CACHE_SIZE_MiB );
     tr_bencDictAddBool( d, TR_PREFS_KEY_DHT_ENABLED,              TRUE );
     tr_bencDictAddBool( d, TR_PREFS_KEY_LPD_ENABLED,              FALSE );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_DOWNLOAD_DIR,             tr_getDefaultDownloadDir( ) );
@@ -307,8 +311,9 @@ tr_sessionGetSettings( tr_session * s, struct tr_benc * d )
 {
     assert( tr_bencIsDict( d ) );
 
-    tr_bencDictReserve( d, 30 );
+    tr_bencDictReserve( d, 60 );
     tr_bencDictAddBool( d, TR_PREFS_KEY_BLOCKLIST_ENABLED,        tr_blocklistIsEnabled( s ) );
+    tr_bencDictAddReal( d, TR_PREFS_KEY_MAX_CACHE_SIZE_MiB,       tr_cacheGetLimit( s->cache ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_DHT_ENABLED,              s->isDHTEnabled );
     tr_bencDictAddBool( d, TR_PREFS_KEY_LPD_ENABLED,              s->isLPDEnabled );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_DOWNLOAD_DIR,             s->downloadDir );
@@ -506,6 +511,7 @@ tr_sessionInit( const char  * tag,
     session = tr_new0( tr_session, 1 );
     session->bandwidth = tr_bandwidthNew( session, NULL );
     session->lock = tr_lockNew( );
+    session->cache = tr_cacheNew( DEFAULT_CACHE_SIZE_MiB );
     session->tag = tr_strdup( tag );
     session->magicNumber = SESSION_MAGIC_NUMBER;
     session->buffer = tr_valloc( SESSION_BUFFER_SIZE );
@@ -671,6 +677,8 @@ sessionSetImpl( void * vdata )
     }
 
     /* misc features */
+    if( tr_bencDictFindReal( settings, TR_PREFS_KEY_MAX_CACHE_SIZE_MiB, &d ) )
+        tr_sessionSetCacheLimit( session, d );
     if( tr_bencDictFindBool( settings, TR_PREFS_KEY_LAZY_BITFIELD, &boolVal ) )
         tr_sessionSetLazyBitfieldEnabled( session, boolVal );
     if( tr_bencDictFindInt( settings, TR_PREFS_KEY_PEER_LIMIT_TORRENT, &i ) )
@@ -1605,6 +1613,8 @@ sessionCloseImpl( void * vsession )
         tr_torrentFree( torrents[i] );
     tr_free( torrents );
 
+    tr_cacheFree( session->cache );
+    session->cache = NULL;
     tr_announcerClose( session );
     tr_statsClose( session );
     tr_peerMgrFree( session->peerMgr );
@@ -1832,6 +1842,26 @@ tr_bool
 tr_sessionAllowsLPD( const tr_session * session )
 {
     return tr_sessionIsLPDEnabled( session );
+}
+
+/***
+****
+***/
+
+void
+tr_sessionSetCacheLimit( tr_session * session, double maxMiB )
+{
+    assert( tr_isSession( session ) );
+
+    tr_cacheSetLimit( session->cache, maxMiB );
+}
+
+double
+tr_sessionGetCacheLimit( const tr_session * session )
+{
+    assert( tr_isSession( session ) );
+
+    return tr_cacheGetLimit( session->cache );
 }
 
 /***

@@ -21,6 +21,7 @@ and
 .Op Fl b
 .Op Fl c Ar path | Fl C
 .Op Fl d Ar number | Fl D
+.Op Fl e Ar size
 .Op Fl er | ep | et
 .Op Fl f
 .Op Fl g Ar files
@@ -124,6 +125,8 @@ If current torrent(s) are selected this operates on them.  Otherwise, it changes
 .It Fl D Fl -no-downlimit
 Disable download speed limits.
 If current torrent(s) are selected this operates on them.  Otherwise, it changes the global setting.
+.It Fl e Fl -cache Ar size
+Set the session's maximum memory cache size in MiB.  This cache is used to reduce disk IO.
 .It Fl er Fl -encryption-required
 Encrypt all peer connections.
 .It Fl ep Fl -encryption-preferred

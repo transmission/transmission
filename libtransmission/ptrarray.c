@@ -102,7 +102,7 @@ tr_ptrArrayPop( tr_ptrArray* t )
     return ret;
 }
 
-static void
+void
 tr_ptrArrayErase( tr_ptrArray * t,
                   int           begin,
                   int           end )
@@ -123,7 +123,7 @@ tr_ptrArrayErase( tr_ptrArray * t,
 ***
 **/
 
-static int
+int
 tr_ptrArrayLowerBound( const tr_ptrArray *                t,
                        const void *                       ptr,
                        int                 compare( const void *,
@@ -184,7 +184,7 @@ tr_ptrArrayInsertSorted( tr_ptrArray * t,
     const int pos = tr_ptrArrayLowerBound( t, ptr, compare, NULL );
     const int ret = tr_ptrArrayInsert( t, ptr, pos );
 
-    assertSortedAndUnique( t, compare );
+    //assertSortedAndUnique( t, compare );
     return ret;
 }
 

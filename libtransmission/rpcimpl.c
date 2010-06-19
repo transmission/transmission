@@ -1184,6 +1184,8 @@ sessionSet( tr_session               * session,
 
     assert( idle_data == NULL );
 
+    if( tr_bencDictFindReal( args_in, TR_PREFS_KEY_MAX_CACHE_SIZE_MiB, &d ) )
+        tr_sessionSetCacheLimit( session, d );
     if( tr_bencDictFindInt( args_in, TR_PREFS_KEY_ALT_SPEED_UP, &i ) )
         tr_sessionSetAltSpeed( session, TR_UP, i );
     if( tr_bencDictFindInt( args_in, TR_PREFS_KEY_ALT_SPEED_DOWN, &i ) )
@@ -1323,6 +1325,7 @@ sessionGet( tr_session               * s,
     tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_TIME_DAY,tr_sessionGetAltSpeedDay(s) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED, tr_sessionUsesAltSpeedTime(s) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_BLOCKLIST_ENABLED, tr_blocklistIsEnabled( s ) );
+    tr_bencDictAddReal( d, TR_PREFS_KEY_MAX_CACHE_SIZE_MiB, tr_sessionGetCacheLimit( s ) );
     tr_bencDictAddInt ( d, "blocklist-size", tr_blocklistGetRuleCount( s ) );
     tr_bencDictAddStr ( d, "config-dir", tr_sessionGetConfigDir( s ) );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_DOWNLOAD_DIR, tr_sessionGetDownloadDir( s ) );

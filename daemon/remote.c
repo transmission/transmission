@@ -207,6 +207,7 @@ static tr_option opts[] =
     { 'b', "debug",                  "Print debugging information", "b",  0, NULL },
     { 'd', "downlimit",              "Set the max download speed in KiB/s for the current torrent(s) or globally", "d", 1, "<speed>" },
     { 'D', "no-downlimit",           "Disable max download speed for the current torrent(s) or globally", "D", 0, NULL },
+    { 'e', "cache",                  "Set the maximum size of the session's memory cache (in MiB)", "e", 1, "<size>" },
     { 910, "encryption-required",    "Encrypt all peer connections", "er", 0, NULL },
     { 911, "encryption-preferred",   "Prefer encrypted peer connections", "ep", 0, NULL },
     { 912, "encryption-tolerated",   "Prefer unencrypted peer connections", "et", 0, NULL },
@@ -322,6 +323,7 @@ getOptMode( int val )
 
         case 'c': /* incomplete-dir */
         case 'C': /* no-incomplete-dir */
+        case 'e': /* cache */
         case 'm': /* portmap */
         case 'M': /* "no-portmap */
         case 'o': /* dht */
@@ -1329,9 +1331,11 @@ printSession( tr_benc * top )
     tr_benc *args;
     if( ( tr_bencDictFindDict( top, "arguments", &args ) ) )
     {
+        double d;
         const char * str;
         int64_t      i;
         tr_bool      boolVal;
+        char buf[64];
 
         printf( "VERSION\n" );
         if( tr_bencDictFindStr( args,  "version", &str ) )
@@ -1359,6 +1363,8 @@ printSession( tr_benc * top )
             printf( "  Peer exchange allowed: %s\n", ( boolVal ? "Yes" : "No" ) );
         if( tr_bencDictFindStr( args,  TR_PREFS_KEY_ENCRYPTION, &str ) )
             printf( "  Encryption: %s\n", str );
+        if( tr_bencDictFindReal( args, TR_PREFS_KEY_MAX_CACHE_SIZE_MiB, &d ) )
+            printf( "  Maximum memory cache size: %s\n", strlsize( buf, d*MiB, sizeof( buf ) ) );
         printf( "\n" );
 
         {
@@ -1815,6 +1821,8 @@ processArgs( const char * host, int port, int argc, const char ** argv )
                           tr_bencDictAddBool( args, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED, TRUE );
                           break;
                 case 'C': tr_bencDictAddBool( args, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED, FALSE );
+                          break;
+                case 'e': tr_bencDictAddReal( args, TR_PREFS_KEY_MAX_CACHE_SIZE_MiB, atof(optarg) );
                           break;
                 case 910: tr_bencDictAddStr( args, TR_PREFS_KEY_ENCRYPTION, "required" );
                           break;

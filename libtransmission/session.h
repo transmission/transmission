@@ -40,6 +40,7 @@ struct tr_address;
 struct tr_announcer;
 struct tr_bandwidth;
 struct tr_bindsockets;
+struct tr_cache;
 struct tr_fdInfo;
 
 struct tr_turtle_info
@@ -148,6 +149,8 @@ struct tr_session
     struct tr_list *             blocklists;
     struct tr_peerMgr *          peerMgr;
     struct tr_shared *           shared;
+
+    struct tr_cache *            cache;
 
     struct tr_lock *             lock;
 

@@ -26,9 +26,11 @@
 #include <openssl/sha.h>
 
 #include "transmission.h"
+#include "cache.h"
 #include "crypto.h"
 #include "fdlimit.h"
 #include "inout.h"
+#include "peer-common.h" /* MAX_BLOCK_SIZE */
 #include "platform.h"
 #include "stats.h"
 #include "torrent.h"
@@ -83,6 +85,9 @@ readOrWriteBytes( tr_session       * session,
     int             fd = -1;
     int             err = 0;
     const tr_bool doWrite = ioMode >= TR_IO_WRITE;
+
+if( doWrite )
+    fprintf( stderr, "in file %s at offset %zu, writing %zu bytes; file length is %zu\n", file->name, (size_t)fileOffset, buflen, (size_t)file->length );
 
     assert( fileIndex < info->fileCount );
     assert( !file->length || ( fileOffset < file->length ) );
@@ -223,8 +228,8 @@ readOrWritePiece( tr_torrent       * tor,
 
     if( pieceIndex >= tor->info.pieceCount )
         return EINVAL;
-    if( pieceOffset + buflen > tr_torPieceCountBytes( tor, pieceIndex ) )
-        return EINVAL;
+    //if( pieceOffset + buflen > tr_torPieceCountBytes( tor, pieceIndex ) )
+    //    return EINVAL;
 
     tr_ioFindFileLocation( tor, pieceIndex, pieceOffset,
                            &fileIndex, &fileOffset );
@@ -237,6 +242,7 @@ readOrWritePiece( tr_torrent       * tor,
         err = readOrWriteBytes( tor->session, tor, ioMode, fileIndex, fileOffset, buf, bytesThisPass );
         buf += bytesThisPass;
         buflen -= bytesThisPass;
+//fprintf( stderr, "++fileIndex to %d\n", (int)fileIndex );
         ++fileIndex;
         fileOffset = 0;
 
@@ -295,8 +301,8 @@ recalculateHash( tr_torrent       * tor,
     size_t   bytesLeft;
     uint32_t offset = 0;
     tr_bool  success = TRUE;
-    uint8_t * buffer = tr_sessionGetBuffer( tor->session );
-    const size_t buflen = SESSION_BUFFER_SIZE;
+    const size_t buflen = MAX_BLOCK_SIZE;
+    uint8_t * buffer = tr_new( uint8_t, buflen );
     SHA_CTX  sha;
 
     assert( tor != NULL );
@@ -313,7 +319,7 @@ recalculateHash( tr_torrent       * tor,
     while( bytesLeft )
     {
         const int len = MIN( bytesLeft, buflen );
-        success = !tr_ioRead( tor, pieceIndex, offset, len, buffer );
+        success = !tr_cacheReadBlock( tor->session->cache, tor, pieceIndex, offset, len, buffer );
         if( !success )
             break;
         SHA1_Update( &sha, buffer, len );
@@ -324,7 +330,7 @@ recalculateHash( tr_torrent       * tor,
     if( success )
         SHA1_Final( setme, &sha );
 
-    tr_sessionReleaseBuffer( tor->session );
+    tr_free( buffer );
     return success;
 }
 

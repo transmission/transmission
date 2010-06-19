@@ -399,6 +399,7 @@
    "alt-speed-up"                | number     max global upload speed (in K/s)
    "blocklist-enabled"           | boolean    true means enabled
    "blocklist-size"              | number     number of rules in the blocklist
+   "cache-size-MiB"              | number     size (in MiB) of the disk cache
    "config-dir"                  | string     location of transmission's configuration directory
    "download-dir"                | string     default path to download torrents
    "dht-enabled"                 | boolean    true means allow dht in public torrents
@@ -597,4 +598,5 @@
          | 2.00    | yes       | session-set    | new arg "trash-original-torrent-files"
          | 2.00    | yes       | session-get    | new arg "start-added-torrents"
          | 2.00    | yes       | session-get    | new arg "trash-original-torrent-files"
+         | 2.00    | yes       | session-get    | new arg "cache-size-MiB"
          | 2.00    | yes       | torrent-get    | new arg "isFinished"

@@ -21,6 +21,7 @@ libtransmission_a_SOURCES = \
     bencode.c \
     bitfield.c \
     blocklist.c \
+    cache.c \
     clients.c \
     completion.c \
     ConvertUTF.c \
@@ -71,6 +72,7 @@ noinst_HEADERS = \
     bitfield.h \
     bitset.h \
     blocklist.h \
+    cache.h \
     clients.h \
     ConvertUTF.h \
     crypto.h \

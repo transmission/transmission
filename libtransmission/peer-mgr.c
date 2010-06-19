@@ -21,6 +21,7 @@
 #include "bandwidth.h"
 #include "bencode.h"
 #include "blocklist.h"
+#include "cache.h"
 #include "clients.h"
 #include "completion.h"
 #include "crypto.h"
@@ -1498,9 +1499,13 @@ peerCallbackFunc( void * vpeer, void * vevent, void * vt )
 
                         for( fileIndex=0; fileIndex<tor->info.fileCount; ++fileIndex ) {
                             const tr_file * file = &tor->info.files[fileIndex];
-                            if( ( file->firstPiece <= p ) && ( p <= file->lastPiece ) )
-                                if( tr_cpFileIsComplete( &tor->completion, fileIndex ) )
+                            if( ( file->firstPiece <= p ) && ( p <= file->lastPiece ) ) {
+                                if( tr_cpFileIsComplete( &tor->completion, fileIndex ) ) {
+fprintf( stderr, "flushing complete file %d (%s)\n", fileIndex, tor->info.files[fileIndex].name );
+                                    tr_cacheFlushFile( tor->session->cache, tor, fileIndex );
                                     tr_torrentFileCompleted( tor, fileIndex );
+                                }
+                            }
                         }
 
                         pieceListRemovePiece( t, p );

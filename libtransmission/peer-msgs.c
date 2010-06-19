@@ -22,9 +22,9 @@
 
 #include "transmission.h"
 #include "bencode.h"
+#include "cache.h"
 #include "completion.h"
 #include "crypto.h"
-#include "inout.h"
 #ifdef WIN32
 #include "net.h" /* for ECONN */
 #endif
@@ -1211,7 +1211,7 @@ prefetchPieces( tr_peermsgs *msgs )
     for( i=msgs->prefetchCount; i<msgs->peer->pendingReqsToClient && i<12; ++i )
     {
         const struct peer_request * req = msgs->peerAskedFor + i;
-        tr_ioPrefetch( msgs->torrent, req->index, req->offset, req->length );
+        tr_cachePrefetchBlock( getSession(msgs)->cache, msgs->torrent, req->index, req->offset, req->length );
         ++msgs->prefetchCount;
     }
 }
@@ -1601,7 +1601,7 @@ clientGotBlock( tr_peermsgs *               msgs,
     ***  Save the block
     **/
 
-    if(( err = tr_ioWrite( tor, req->index, req->offset, req->length, data )))
+    if(( err = tr_cacheWriteBlock( getSession(msgs)->cache, tor, req->index, req->offset, req->length, data )))
         return err;
 
     addPeerToBlamefield( msgs, req->index );
@@ -1913,7 +1913,7 @@ fillOutputBuffer( tr_peermsgs * msgs, time_t now )
             tr_peerIoWriteUint32( io, out, req.index );
             tr_peerIoWriteUint32( io, out, req.offset );
 
-            err = tr_ioRead( msgs->torrent, req.index, req.offset, req.length, EVBUFFER_DATA(out)+EVBUFFER_LENGTH(out) );
+            err = tr_cacheReadBlock( getSession(msgs)->cache, msgs->torrent, req.index, req.offset, req.length, EVBUFFER_DATA(out)+EVBUFFER_LENGTH(out) );
             if( err )
             {
                 if( fext )
