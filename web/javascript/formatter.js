@@ -88,7 +88,6 @@ Transmission.fmt = (function()
 
 		timeInterval: function( seconds )
 		{
-			return 'Hello';
 			var result;
 			var days = Math.floor(seconds / 86400);
 			var hours = Math.floor((seconds % 86400) / 3600);
