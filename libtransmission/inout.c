@@ -86,8 +86,8 @@ readOrWriteBytes( tr_session       * session,
     int             err = 0;
     const tr_bool doWrite = ioMode >= TR_IO_WRITE;
 
-if( doWrite )
-    fprintf( stderr, "in file %s at offset %zu, writing %zu bytes; file length is %zu\n", file->name, (size_t)fileOffset, buflen, (size_t)file->length );
+//if( doWrite )
+//    fprintf( stderr, "in file %s at offset %zu, writing %zu bytes; file length is %zu\n", file->name, (size_t)fileOffset, buflen, (size_t)file->length );
 
     assert( fileIndex < info->fileCount );
     assert( !file->length || ( fileOffset < file->length ) );
