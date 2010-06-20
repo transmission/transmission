@@ -1103,19 +1103,19 @@ tr_session * fHandle;
 
 - (void) helpForPeers: (id) sender
 {
-    [[NSHelpManager sharedHelpManager] openHelpAnchor: @"PeersPrefs"
+    [[NSHelpManager sharedHelpManager] openHelpAnchor: @"peers"
         inBook: [[NSBundle mainBundle] objectForInfoDictionaryKey: @"CFBundleHelpBookName"]];
 }
 
 - (void) helpForNetwork: (id) sender
 {
-    [[NSHelpManager sharedHelpManager] openHelpAnchor: @"NetworkPrefs"
+    [[NSHelpManager sharedHelpManager] openHelpAnchor: @"network"
         inBook: [[NSBundle mainBundle] objectForInfoDictionaryKey: @"CFBundleHelpBookName"]];
 }
 
 - (void) helpForRemote: (id) sender
 {
-    [[NSHelpManager sharedHelpManager] openHelpAnchor: @"RemotePrefs"
+    [[NSHelpManager sharedHelpManager] openHelpAnchor: @"remote"
         inBook: [[NSBundle mainBundle] objectForInfoDictionaryKey: @"CFBundleHelpBookName"]];
 }
 
