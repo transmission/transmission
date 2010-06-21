@@ -1,0 +1,33 @@
+.Dd June 9, 2010
+.Dt TRANSMISSION-SHOW 1
+.Os
+.Sh NAME
+.Nm transmission-show
+.Nd command-line utility to show .torrent file metadata
+.Sh SYNOPSIS
+.Bk -words
+.Nm
+.Op Fl h
+.Op Fl s
+.Op Ar torrentfile
+.Ek
+.Sh DESCRIPTION
+.Nm
+shows BitTorrent .torrent file metadata
+.Sh OPTIONS
+.Bl -tag -width Ds
+.It Fl h Fl -help
+Show a short help page and exit.
+.It Fl s Fl -scrape
+Ask the torrent's trackers how many peers are in the torrent's swarm
+.El
+.Sh AUTHORS
+.An -nosplit
+.An Charles Kerr
+.Sh SEE ALSO
+.Xr transmission-daemon 1 ,
+.Xr transmission-gtk 1 ,
+.Xr transmission-create 1 ,
+.Xr transmission-edit 1
+.Pp
+http://www.transmissionbt.com/

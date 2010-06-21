@@ -20,7 +20,8 @@ transmission_show_SOURCES = show.c
 
 dist_man_MANS = \
     transmission-create.1 \
-    transmission-edit.1
+    transmission-edit.1 \
+    transmission-show.1
 
 transmission_create_LDADD = \
     $(top_builddir)/libtransmission/libtransmission.a \
