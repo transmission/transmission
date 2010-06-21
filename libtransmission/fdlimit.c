@@ -306,6 +306,11 @@ tr_close_file( int fd )
     posix_fadvise( fd, 0, 0, POSIX_FADV_DONTNEED );
     errno = err;
 #endif
+#ifdef SYS_DARWIN
+    /* it's unclear to me from the man pages if this actually flushes out the cache,
+     * but it couldn't hurt... */
+    fcntl( fd, F_NOCACHE, 1 );
+#endif
     close( fd );
 }
 
