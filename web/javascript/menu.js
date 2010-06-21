@@ -7,16 +7,16 @@
  */
 
 Menu = {
-	
+
 	context: {
-		
+
 		menu_style: {
 			width: '310px',
 			backgroundColor: '#fff',
 			border: 'none',
 			padding: '5px 0',
 			textAlign: 'left'},
-		
+
 		item_style: {
 			backgroundColor: 'transparent',
 			margin: '0',
@@ -25,12 +25,12 @@ Menu = {
 			fontSize: '14px',
 			cursor: 'default',
 			border: 'none'},
-		
+
 		item_hover_style: {
 			backgroundColor: '#24e',
 			color: '#fff',
 			border: 'none'},
-		
+
 		item_disabled_style: {
 			backgroundColor: 'transparent',
 			margin: '0',
@@ -40,6 +40,6 @@ Menu = {
 			cursor: 'default',
 			border: 'none'}
 	}
-	
-	
+
+
 }

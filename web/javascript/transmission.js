@@ -27,12 +27,12 @@ Transmission.prototype =
 		this._current_search         = '';
 		this._torrents               = { };
 		this._rows                   = [ ];
-	
+
 		// Initialize the clutch preferences
 		Prefs.getClutchPrefs( this );
-		
+
 		this.preloadImages();
-		
+
 		// Set up user events
 		var tr = this;
 		$('#pause_all_link').bind('click', function(e){ tr.stopAllClicked(e); });
@@ -68,7 +68,7 @@ Transmission.prototype =
 			$('#torrent_container').bind('click', function(e){ tr.deselectAll( true ); });
 			$('#filter_toggle_link').bind('click', function(e){ tr.toggleFilterClicked(e); });
 			$('#inspector_link').bind('click', function(e){ tr.toggleInspectorClicked(e); });
-		
+
 			this.setupSearchBox();
 			this.createContextMenu();
 			this.createSettingsMenu();
@@ -113,13 +113,13 @@ Transmission.prototype =
 		this._inspector._info_tab.uploaded = $(ti+'uploaded')[0];
 		this._inspector._info_tab.upload_speed = $(ti+'upload_speed')[0];
 		this._inspector._info_tab.upload_to = $(ti+'upload_to')[0];
-		
+
 		// Setup the preference box
 		this.setupPrefConstraints();
-		
+
 		// Setup the prefs gui
 		this.initializeSettings( );
-		
+
 		// Get preferences & torrents from the daemon
 		var tr = this;
 		var async = false;
@@ -210,14 +210,14 @@ Transmission.prototype =
 		// include transmenu js to save some bandwidth; if we
 		// start using prefs on iPhone we need to weed
 		// transmenu refs out of that too.
-		
+
 		$('#filter_' + this[Prefs._FilterMode] + '_link').parent().addClass('selected');
-		
+
 		if (!iPhone) $('#sort_by_' + this[Prefs._SortMethod] ).selectMenuItem();
-		
+
 		if (!iPhone && ( this[Prefs._SortDirection] == Prefs._SortDescending ) )
 			$('#reverse_sort_order').selectMenuItem();
-		
+
 		if( this[Prefs._ShowFilter] )
 			this.showFilter( );
 
@@ -295,7 +295,7 @@ Transmission.prototype =
 			context_select_all:        function(e){ tr.contextSelectAll(e); },
 			context_deselect_all:      function(e){ tr.contextDeselectAll(e); }
 		};
-		
+
 		// Setup the context menu
 		$('ul#torrent_list').contextMenu('torrent_context_menu', {
 			bindings:          bindings,
@@ -308,10 +308,10 @@ Transmission.prototype =
 			boundingRightPad:  20,
 			boundingBottomPad: 5,
 			onContextMenu:     function(e) {
-                var closestRow = $(e.target).closest('.torrent')[0]._torrent; 
-                if(!closestRow.isSelected()) 
-                    tr.setSelectedTorrent( closestRow, true );
-                return true;
+				var closestRow = $(e.target).closest('.torrent')[0]._torrent;
+				if(!closestRow.isSelected())
+					tr.setSelectedTorrent( closestRow, true );
+				return true;
 			}
 		});
 	},
@@ -326,7 +326,7 @@ Transmission.prototype =
 			direction: 'up',
 			onClick: function(e){ return tr.processSettingsMenuEvent(e); }
 		});
-		
+
 		$('#unlimited_download_rate').selectMenuItem();
 		$('#unlimited_upload_rate').selectMenuItem();
 	},
@@ -381,7 +381,7 @@ Transmission.prototype =
 				s.push( row );
 		return s;
 	},
-	
+
 	getDeselectedTorrents: function() {
 		var visible_torrent_ids = jQuery.map(this.getVisibleTorrents(), function(t) { return t.id(); } );
 		var s = [ ];
@@ -392,7 +392,7 @@ Transmission.prototype =
 		} );
 		return s;
 	},
-	
+
 	getVisibleRows: function()
 	{
 		var rows = [ ];
@@ -537,7 +537,7 @@ Transmission.prototype =
 		var sel = tr.getSelectedTorrents( );
 		var rows = tr.getVisibleRows( );
 		var i = -1;
-		
+
 		if( event.keyCode == 40 ) // down arrow
 		{
 			var t = sel.length ? sel[sel.length-1] : null;
@@ -639,7 +639,7 @@ Transmission.prototype =
 			tr.togglePeriodicRefresh( false );
 			tr.togglePeriodicRefresh( true );
 		}
-		
+
 		// pass the new prefs upstream to the RPC server
 		var o = { };
 		o[RPC._StartAddedTorrent]    = $('#prefs_form #auto_start')[0].checked;
@@ -660,7 +660,7 @@ Transmission.prototype =
 		o[RPC._TurtleTimeDay]        = parseInt( $('#prefs_form #turtle_days').val() );
 
 		tr.remote.savePrefs( o );
-		
+
 		tr.hidePrefsDialog( );
 	},
 
@@ -668,7 +668,7 @@ Transmission.prototype =
 		this.hideStatsDialog( );
 	},
 
-	removeClicked: function( event ) {	
+	removeClicked: function( event ) {
 		var tr = this;
 		if( tr.isButtonEnabled( event ) ) {
 			tr.removeSelectedTorrents( );
@@ -684,7 +684,7 @@ Transmission.prototype =
 
 	inspectorTabClicked: function(event, tab) {
 		if (iPhone) event.stopPropagation();
-		
+
 		// Select the clicked tab, unselect the others,
 		// and display the appropriate info
 		var tab_ids = $(tab).parent('#inspector_tabs').find('.inspector_tab').map(
@@ -700,7 +700,7 @@ Transmission.prototype =
 			}
 		}
 		this.hideiPhoneAddressbar();
-	
+
 		this.updateVisibleFileLists();
 		this.updatePeersLists();
 		this.updateTrackersLists();
@@ -780,7 +780,7 @@ Transmission.prototype =
 		this.setPref( Prefs._FilterMode, mode );
 		this.refilter( );
 	},
-	showAllClicked: function( event ) {	
+	showAllClicked: function( event ) {
 		this.setFilter( Prefs._FilterAll );
 	},
 	showActiveClicked: function( event ) {
@@ -789,7 +789,7 @@ Transmission.prototype =
 	showDownloadingClicked: function( event ) {
 		this.setFilter( Prefs._FilterDownloading );
 	},
-	showSeedingClicked: function(event) {	
+	showSeedingClicked: function(event) {
 		this.setFilter( Prefs._FilterSeeding );
 	},
 	showPausedClicked: function(event) {
@@ -954,7 +954,7 @@ Transmission.prototype =
 			var key = down_limited ? '#limited_download_rate'
 			                       : '#unlimited_download_rate';
 			$(key).deselectMenuSiblings().selectMenuItem();
-		
+
 			setInnerHTML( $('#limited_download_rate')[0], 'Limit (' + Transmission.fmt.speed(up_limit) + ')' );
 			key = up_limited ? '#limited_upload_rate'
 			                 : '#unlimited_upload_rate';
@@ -1034,10 +1034,10 @@ Transmission.prototype =
 	processSettingsMenuEvent: function(event) {
 		var tr = this;
 		var $element = $(event.target);
-		
+
 		// Figure out which menu has been clicked
 		switch ($element.parent()[0].id) {
-			
+
 			// Display the preferences dialog
 			case 'footer_super_menu':
 				if ($element[0].id == 'preferences') {
@@ -1052,7 +1052,7 @@ Transmission.prototype =
 				}
 				else if ($element[0].id == 'compact_view') {
 					this[Prefs._CompactDisplayState] = !this[Prefs._CompactDisplayState];
-					if(this[Prefs._CompactDisplayState]) 
+					if(this[Prefs._CompactDisplayState])
 						$element.selectMenuItem();
 					else
 						$element.deselectMenuItem();
@@ -1060,7 +1060,7 @@ Transmission.prototype =
 					// Redraw html here
 				}
 				break;
-			
+
 			// Limit the download rate
 			case 'footer_download_rate_menu':
 				var args = { };
@@ -1078,7 +1078,7 @@ Transmission.prototype =
 				$('div.preference input#limit_download')[0].checked = args[RPC._DownSpeedLimited];
 				tr.remote.savePrefs( args );
 				break;
-			
+
 			// Limit the upload rate
 			case 'footer_upload_rate_menu':
 				var args = { };
@@ -1096,13 +1096,13 @@ Transmission.prototype =
 				$('div.preference input#limit_upload')[0].checked = args[RPC._UpSpeedLimited];
 				tr.remote.savePrefs( args );
 				break;
-			
+
 			// Sort the torrent list
 			case 'footer_sort_menu':
 
 				// The 'reverse sort' option state can be toggled independently of the other options
 				if ($element.is('#reverse_sort_order')) {
-                    if(!$element.is('#reverse_sort_order.active')) break;
+					if(!$element.is('#reverse_sort_order.active')) break;
 					var dir;
 					if ($element.menuItemIsSelected()) {
 						$element.deselectMenuItem();
@@ -1175,9 +1175,9 @@ Transmission.prototype =
 		var total_verified = 0;
 		var na = 'N/A';
 		var tab = this._inspector._info_tab;
-		
+
 		$("#torrent_inspector_size, .inspector_row div").css('color', '#222');
-		
+
 		if( torrents.length == 0 )
 		{
 			setInnerHTML( tab.name, 'No Selection' );
@@ -1256,7 +1256,7 @@ Transmission.prototype =
 		var private_string = '';
 		if( have_private && have_public ) private_string = 'Mixed';
 		else if( have_private ) private_string = 'Private Torrent';
-		else if( have_public ) private_string = 'Public Torrent';	
+		else if( have_public ) private_string = 'Public Torrent';
 
 		setInnerHTML( tab.name, name );
 		setInnerHTML( tab.size, torrents.length ? Transmission.fmt.size( total_size ) : na );
@@ -1289,7 +1289,7 @@ Transmission.prototype =
 	fileListIsVisible: function() {
 		return this._inspector_tab_files.className.indexOf('selected') != -1;
 	},
-	
+
 	updateVisibleFileLists: function() {
 		if( this.fileListIsVisible( ) === true ) {
 			var selected = this.getSelectedTorrents();
@@ -1443,7 +1443,7 @@ Transmission.prototype =
 		else
 			this.showInspector( );
 	},
-	
+
 	showInspector: function() {
 		$('#torrent_inspector').show();
 		if (iPhone) {
@@ -1468,7 +1468,7 @@ Transmission.prototype =
 	hideInspector: function() {
 
 		$('#torrent_inspector').hide();
-		
+
 		if (iPhone) {
 			this.deselectAll( );
 			$('body.inspector_showing').removeClass('inspector_showing');
@@ -1479,10 +1479,10 @@ Transmission.prototype =
 			$('#torrent_container')[0].style.right = '0px';
 			setInnerHTML( $('ul li#context_toggle_inspector')[0], 'Show Inspector' );
 		}
-		
+
 		this.setPref( Prefs._ShowInspector, false );
 	},
-	
+
 	/*
 	 * Toggle the visibility of the filter bar
 	 */
@@ -1499,7 +1499,7 @@ Transmission.prototype =
 		$('#torrent_filter_bar').show();
 		this.setPref( Prefs._ShowFilter, true );
 	},
-	
+
 	hideFilter: function()
 	{
 		var container_top = parseInt($('#torrent_container').css('top')) - $('#torrent_filter_bar').height() - 1;
@@ -1533,7 +1533,7 @@ Transmission.prototype =
 	refreshTorrents: function(ids) {
 		var tr = this;
 		if (!ids)
-		  ids = 'recently-active';
+			ids = 'recently-active';
 
 		this.remote.getUpdatedDataFor(ids, function(active, removed){ tr.updateTorrentsData(active, removed); });
 	},
@@ -1545,12 +1545,12 @@ Transmission.prototype =
 		jQuery.each( updated, function() {
 			var t = tr._torrents[this.id];
 			if (t){
-		    t.refresh(this);
-		    if(t.isSelected())
-		      refresh_files_for.push(t.id());
-		  }
-		  else
-		    new_torrent_ids.push(this.id);
+				t.refresh(this);
+				if(t.isSelected())
+					refresh_files_for.push(t.id());
+			}
+			else
+				new_torrent_ids.push(this.id);
 		} );
 
 		if(refresh_files_for.length > 0)
@@ -1597,8 +1597,8 @@ Transmission.prototype =
 			this._torrents[new_torrent.id()] = new_torrent;
 		}
 
-                this._inspector_file_list.appendChild( fileFragment );
-                this._torrent_list.appendChild( transferFragment );
+		this._inspector_file_list.appendChild( fileFragment );
+		this._torrent_list.appendChild( transferFragment );
 
 		this.refilter( );
 	},
@@ -1637,14 +1637,14 @@ Transmission.prototype =
 
 		return removedAny;
 	},
-	
+
 	setDisplayMode: function( iscompact )
 	{
 		var torrents = this.getAllTorrents();
 
 		for( var i=0; torrents[i]; ++i )
 		{
-		    torrents[i].setListDisplayElements(this[Prefs._CompactDisplayState]);
+			torrents[i].setListDisplayElements(this[Prefs._CompactDisplayState]);
 		}
 	},
 
@@ -1667,7 +1667,7 @@ Transmission.prototype =
 		var torrents = this.getAllTorrents();
 		var torrentCount = torrents.length;
 		var visibleCount = this.getVisibleTorrents().length;
-		
+
 		// calculate the overall speed
 		var upSpeed = 0;
 		var downSpeed = 0;
@@ -1675,7 +1675,7 @@ Transmission.prototype =
 			upSpeed += row.uploadSpeed( );
 			downSpeed += row.downloadSpeed( );
 		}
-		
+
 		// update torrent count label
 		var s;
 		if( torrentCount == visibleCount )
@@ -1683,12 +1683,12 @@ Transmission.prototype =
 		else
 			s = visibleCount + ' of ' + torrentCount + ' Transfers';
 		setInnerHTML( $('#torrent_global_transfer')[0], s );
-		
+
 		// update the speeds
 		s = Transmission.fmt.speed( upSpeed );
 		if( iPhone ) s = 'UL: ' + s;
 		setInnerHTML( $('#torrent_global_upload')[0], s );
-		
+
 		// download speeds
 		s = Transmission.fmt.speed( downSpeed );
 		if( iPhone ) s = 'DL: ' + s;
@@ -1710,7 +1710,7 @@ Transmission.prototype =
 			if (!iPhone && Safari3) {
 				setTimeout("$('div#upload_container div.dialog_window').css('top', '0px');",10);
 			}
-			
+
 		// Submit the upload form
 		} else {
 			var tr = this;

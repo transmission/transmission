@@ -17,39 +17,39 @@ if (iPhone) var scroll_timeout;
 
 function testSafari3()
 {
-    var minimum = new Array(521,0);
-    var webKitFields = RegExp("( AppleWebKit/)([^ ]+)").exec(navigator.userAgent);
-    if (!webKitFields || webKitFields.length < 3) return false;
-    var version = webKitFields[2].split(".");
-    for (var i = 0; i < minimum.length; i++) {
-        var toInt = parseInt(version[i]);
-        var versionField = isNaN(toInt) ? 0 : toInt;
-        var minimumField = minimum[i];
+	var minimum = new Array(521,0);
+	var webKitFields = RegExp("( AppleWebKit/)([^ ]+)").exec(navigator.userAgent);
+	if (!webKitFields || webKitFields.length < 3) return false;
+	var version = webKitFields[2].split(".");
+	for (var i = 0; i < minimum.length; i++) {
+		var toInt = parseInt(version[i]);
+		var versionField = isNaN(toInt) ? 0 : toInt;
+		var minimumField = minimum[i];
 
-        if (versionField > minimumField) return true;
-        if (versionField < minimumField) return false;
-    }
-    return true;
+		if (versionField > minimumField) return true;
+		if (versionField < minimumField) return false;
+	}
+	return true;
 };
 
 $(document).ready( function() {
 	// Initialise the dialog controller
 	dialog = new Dialog();
-	
+
 	// Initialise the main Transmission controller
 	transmission = new Transmission();
 
 	// IE specific fixes here
 	if ($.browser.msie) {
 		try {
-		  document.execCommand("BackgroundImageCache", false, true);
+			document.execCommand("BackgroundImageCache", false, true);
 		} catch(err) {}
 		$('.dialog_container').css('height',$(window).height()+'px');
 	}
 
 	if ($.browser.safari) {
 		// Move search field's margin down for the styled input
-		$('#torrent_search').css('margin-top', 3);		
+		$('#torrent_search').css('margin-top', 3);
 	}
 	if (!Safari3 && !iPhone) {
 		// Fix for non-Safari-3 browsers: dark borders to replace shadows.
@@ -116,7 +116,7 @@ function setInnerHTML( e, html )
  *   @returns float
  */
 Math.roundWithPrecision = function(floatnum, precision) {
-    return Math.round ( floatnum * Math.pow ( 10, precision ) ) / Math.pow ( 10, precision );
+	return Math.round ( floatnum * Math.pow ( 10, precision ) ) / Math.pow ( 10, precision );
 };
 
 
@@ -150,9 +150,9 @@ String.prototype.trim = function () {
  */
 String.prototype.compareTo = function( that ) {
 	// FIXME: how to fold these two comparisons together?
-        if( this < that ) return -1;
-        if( this > that ) return 1;
-        return 0;
+	if( this < that ) return -1;
+	if( this > that ) return 1;
+	return 0;
 }
 
 /**
@@ -187,7 +187,7 @@ function Prefs() { }
 Prefs.prototype = { };
 
 Prefs._RefreshRate        = 'refresh_rate';
-Prefs._SessionRefreshRate        = 'session_refresh_rate';
+Prefs._SessionRefreshRate = 'session_refresh_rate';
 
 Prefs._ShowFilter         = 'show_filter';
 
@@ -255,8 +255,8 @@ Prefs.getValue = function( key, fallback )
 	if( Prefs._Defaults[key] == undefined )
 		console.warn( "unrecognized preference key '%s'", key );
 
-        var lines = document.cookie.split( ';' );
-        for( var i=0, len=lines.length; !val && i<len; ++i ) {
+	var lines = document.cookie.split( ';' );
+	for( var i=0, len=lines.length; !val && i<len; ++i ) {
 		var line = lines[i].trim( );
 		var delim = line.indexOf( '=' );
 		if( ( delim == key.length ) && line.indexOf( key ) == 0 )

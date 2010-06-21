@@ -7,16 +7,16 @@
  */
 
 function Dialog(){
-    this.initialize();
+	this.initialize();
 }
 
 Dialog.prototype = {
 
-    /*
-     * Constructor
-     */
-    initialize: function() {
-		
+	/*
+	 * Constructor
+	 */
+	initialize: function() {
+
 		/*
 		 * Private Interface Variables
 		 */
@@ -27,21 +27,17 @@ Dialog.prototype = {
 		this._confirm_button = $('#dialog_confirm_button');
 		this._callback_function = '';
 		this._callback_data = null;
-		
+
 		// Observe the buttons
 		this._cancel_button.bind('click', {dialog: this}, this.onCancelClicked );
 		this._confirm_button.bind('click', {dialog: this}, this.onConfirmClicked );
 	},
 
-
-
-
-
-    /*--------------------------------------------
-     *
-     *  E V E N T   F U N C T I O N S
-     *
-     *--------------------------------------------*/
+	/*--------------------------------------------
+	 *
+	 *  E V E N T   F U N C T I O N S
+	 *
+	 *--------------------------------------------*/
 
 	hideDialog: function( )
 	{
@@ -68,16 +64,16 @@ Dialog.prototype = {
 		dialog.hideDialog( );
 	},
 
-    /*--------------------------------------------
-     *
-     *  I N T E R F A C E   F U N C T I O N S
-     *
-     *--------------------------------------------*/
+	/*--------------------------------------------
+	 *
+	 *  I N T E R F A C E   F U N C T I O N S
+	 *
+	 *--------------------------------------------*/
 
-    /*
-     * Display a confirm dialog
-     */
-    confirm: function(dialog_heading, dialog_message, confirm_button_label, callback_function, callback_data, cancel_button_label) {
+	/*
+	 * Display a confirm dialog
+	 */
+	confirm: function(dialog_heading, dialog_message, confirm_button_label, callback_function, callback_data, cancel_button_label) {
 		if (!iPhone && Safari3) {
 			$('div#upload_container div.dialog_window').css('top', '-205px');
 			$('div#prefs_container div.dialog_window').css('top', '-425px');
@@ -102,11 +98,11 @@ Dialog.prototype = {
 			setTimeout("$('div#dialog_container div.dialog_window').css('top', '0px');",10);
 		}
 	},
- 
-    /*
-     * Display an alert dialog
-     */
-    alert: function(dialog_heading, dialog_message, cancel_button_label) {
+
+	/*
+	 * Display an alert dialog
+	 */
+	alert: function(dialog_heading, dialog_message, cancel_button_label) {
 		if (!iPhone && Safari3) {
 			$('div#upload_container div.dialog_window').css('top', '-205px');
 			$('div#prefs_container div.dialog_window').css('top', '-425px');
@@ -142,6 +138,6 @@ Dialog.prototype = {
 			this._container.show();
 		}
 	}
-	
+
 
 }

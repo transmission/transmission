@@ -212,7 +212,7 @@ div.torrent_global_details div#torrent_global_transfer {
 	float: left;
 }
 
-div.torrent_global_details div#torrent_global_upload, 
+div.torrent_global_details div#torrent_global_upload,
 div.torrent_global_details div#torrent_global_download {
 	float: right;
 	padding-left: 13px;
@@ -329,7 +329,7 @@ div#torrent_filter_bar input#torrent_search {
 	div#torrent_filter_bar input#torrent_search.blur {
 		border-color: #CCC;
 	}
-} 
+}
 
 div#torrent_filter_bar input#torrent_search.blur {
 	color: #999;
@@ -370,7 +370,6 @@ ul.torrent_list li {
 	vertical-align: middle;
 	-moz-user-select: none;
 	-webkit-user-select: none;
-	
 	overflow: hidden;
 }
 
@@ -423,7 +422,6 @@ ul.torrent_list li.torrent div.torrent_progress_details.compact,
 ul.torrent_list li.torrent div.torrent_peer_details.compact {
 	padding-top: 3px;
 	float: left;
-	
 }
 ul.torrent_list li.torrent div.torrent_progress_details.compact {
 	float: right;
@@ -810,7 +808,7 @@ div.inspector_torrent_file_list_entry_progress {
 	font-size: 1em;
 	color: #666;
 	margin-left: 20px;
-} 
+}
 div.file_wanted_control {
 	background-position: left -19px;
 	float: left;
@@ -868,8 +866,8 @@ div.file_priority_control.low:hover {
 }
 ul.single_file li.inspector_torrent_file_list_entry>.file_priority_control,
 li.inspector_torrent_file_list_entry.complete div.file_priority_control {
-  background-position: left -57px;
-  cursor: default;
+	background-position: left -57px;
+	cursor: default;
 }
 
 /*--------------------------------------
@@ -985,7 +983,7 @@ div.dialog_container div.dialog_window {
 		margin-top: 71px;
 		z-index: 2
 	}
-} 
+}
 
 div#prefs_container div.dialog_window {
 	width: 410px;
@@ -1269,10 +1267,10 @@ div#prefs_container div#pref_error {
 }
 
 #transmission_version{
-  position: absolute;
-  bottom: 10px;
-  left:   10px;
-  color:  #999;
+	position: absolute;
+	bottom: 10px;
+	left:   10px;
+	color:  #999;
 }
 
 /*--------------------------------------

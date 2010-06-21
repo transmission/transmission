@@ -94,13 +94,13 @@ Torrent.prototype =
 		this._element = element;
 		this._controller = controller;
 		controller._rows.push( element );
-		
+
 		// Create the 'name' <div>
 		var e = document.createElement( 'div' );
 		e.className = 'torrent_name';
 		top_e.appendChild( e );
 		element._name_container = e;
-		
+
 		// Create the 'peer details' <div>
 		e = document.createElement( 'div' );
 		e.className = 'torrent_peer_details';
@@ -118,14 +118,14 @@ Torrent.prototype =
 		e.style.width = '0%';
 		top_a.appendChild( e );
 		element._progress_complete_container = e;
-			
+
 		// Create the 'incomplete' bar (initially hidden)
 		e = document.createElement( 'div' );
 		e.className = 'torrent_progress_bar incomplete';
 		e.style.display = 'none';
 		top_a.appendChild( e );
 		element._progress_incomplete_container = e;
-		
+
 		//Add the progress bar container to the torrent
 		top_e.appendChild(top_a);
 
@@ -145,10 +145,10 @@ Torrent.prototype =
 		e.className = 'torrent_progress_details';
 		top_e.appendChild( e );
 		element._progress_details_container = e;
-		
+
 		// Set the torrent click observer
 		element.bind('click', function(e){ element._torrent.clickTorrent(e) });
-		
+
 		// Safari hack - first torrent needs to be moved down for some reason. Seems to be ok when
 		// using <li>'s in straight html, but adding through the DOM gets a bit odd.
 		if ($.browser.safari)
@@ -158,11 +158,11 @@ Torrent.prototype =
 
 		// Update all the labels etc
 		this.refresh(data);
-		
+
 		// insert the element
 		transferListParent.appendChild(top_e);
 	},
-	
+
 	initializeTorrentFilesInspectorGroup: function( fileListParent ) {
 		var e = document.createElement( 'ul' );
 		e.className = 'inspector_torrent_file_list inspector_group';
@@ -170,11 +170,11 @@ Torrent.prototype =
 		fileListParent.appendChild( e );
 		this._fileList = e;
 	},
-	
+
 	fileList: function() {
 		return $(this._fileList);
 	},
-	
+
 	buildTrackerStats: function(trackerStats) {
 		result = [];
 		for( var i=0, tracker; tracker=trackerStats[i]; ++i ) {
@@ -208,7 +208,7 @@ Torrent.prototype =
 	 *  S E T T E R S   /   G E T T E R S
 	 *
 	 *--------------------------------------------*/
-	
+
 	/* Return the DOM element for this torrent (a <LI> element) */
 	element: function() {
 		return this._element;
@@ -255,8 +255,7 @@ Torrent.prototype =
 		switch( this.state() ) {
 			case Torrent._StatusSeeding:        return 'Seeding';
 			case Torrent._StatusDownloading:    return 'Downloading';
-			case Torrent._StatusPaused:         return this._isFinishedSeeding ? 'Seeding complete'
-                                                                               : 'Paused';
+			case Torrent._StatusPaused:         return this._isFinishedSeeding ? 'Seeding complete' : 'Paused';
 			case Torrent._StatusChecking:       return 'Verifying local data';
 			case Torrent._StatusWaitingToCheck: return 'Waiting to verify';
 			default:                            return 'error';
@@ -280,13 +279,13 @@ Torrent.prototype =
 			default:                      return -1;
 		}
 	},
-	
+
 	/*--------------------------------------------
 	 *
 	 *  E V E N T   F U N C T I O N S
 	 *
 	 *--------------------------------------------*/
-	
+
 	/*
 	 * Process a click event on this torrent
 	 */
@@ -299,7 +298,7 @@ Torrent.prototype =
 		$('#jqContextMenu').hide();
 
 		var torrent = this;
-		
+
 		// 'Apple' button emulation on PC :
 		// Need settable meta-key and ctrl-key variables for mac emulation
 		var meta_key = event.metaKey;
@@ -308,35 +307,35 @@ Torrent.prototype =
 			meta_key = true;
 			ctrl_key = false;
 		}
-		
+
 		// Shift-Click - Highlight a range between this torrent and the last-clicked torrent
 		if (iPhone) {
 			if ( torrent.isSelected() )
 				torrent._controller.showInspector();
 			torrent._controller.setSelectedTorrent( torrent, true );
-		
+
 		} else if (event.shiftKey) {
 			torrent._controller.selectRange( torrent, true );
 			// Need to deselect any selected text
 			window.focus();
-		
+
 		// Apple-Click, not selected
 		} else if (!torrent.isSelected() && meta_key) {
 			torrent._controller.selectTorrent( torrent, true );
-			
+
 		// Regular Click, not selected
 		} else if (!torrent.isSelected()) {
 			torrent._controller.setSelectedTorrent( torrent, true );
-		
-		// Apple-Click, selected	
+
+		// Apple-Click, selected
 		} else if (torrent.isSelected() && meta_key) {
 			torrent._controller.deselectTorrent( torrent, true );
-			
+
 		// Regular Click, selected
 		} else if (torrent.isSelected()) {
 			torrent._controller.setSelectedTorrent( torrent, true );
 		}
-		
+
 		torrent._controller.setLastTorrentClicked(torrent);
 	},
 
@@ -368,7 +367,7 @@ Torrent.prototype =
 		this.refreshFileView();
 		this.refreshHTML( );
 	},
-	
+
 	refresh: function(data) {
 		this.refreshData( data );
 		this.refreshHTML( );
@@ -514,13 +513,13 @@ Torrent.prototype =
 		} else {
 			root._peer_details_container.style.display = 'block';
 		}
-		
+
 		root._progress_details_container.className = 'torrent_progress_details'+compact
 		root._progress_bar_container.className = 'torrent_progress_bar_container'+compact;
 		root._name_container.className = 'torrent_name'+compact;
-		
+
 		setInnerHTML( root._name_container, this._name );
-		
+
 		// Add the progress bar
 		var notDone = this._leftUntilDone > 0;
 
@@ -549,7 +548,7 @@ Torrent.prototype =
 		else if( notDone )
 		{
 			var eta = '';
-			
+
 			if( this.isActive( ) )
 			{
 				eta = ' - ';
@@ -558,7 +557,7 @@ Torrent.prototype =
 				else
 					eta += Transmission.fmt.timeInterval(this._eta) + ' remaining';
 			}
-			
+
 			// Create the 'progress details' label
 			// Eg: '101 MiB of 631 MiB (16.02%) - 2 hr remaining'
 			c = Transmission.fmt.size( this._sizeWhenDone - this._leftUntilDone );
@@ -569,10 +568,10 @@ Torrent.prototype =
 			c += '%)';
 			c += eta;
 			progress_details = c;
-		
+
 			// Figure out the percent completed
 			var css_completed_width = Math.floor( this.getPercentDone() * 100 * MaxBarWidth ) / 100;
-			
+
 			// Update the 'in progress' bar
 			e = root._progress_complete_container;
 			c = 'torrent_progress_bar'+compact;
@@ -580,7 +579,7 @@ Torrent.prototype =
 			if(css_completed_width === 0) { c += ' empty'; }
 			e.className = c;
 			e.style.width = css_completed_width + '%';
-			
+
 			// Update the 'incomplete' bar
 			e = root._progress_incomplete_container;
 			e.className = 'torrent_progress_bar incomplete'
@@ -645,12 +644,12 @@ Torrent.prototype =
 			e = root._progress_complete_container;
 			e.className = 'torrent_progress_bar ' + status;
 		}
-		
+
 		// Update the progress details
 		if(compact_mode)
 			progress_details = this.getPeerDetails();
 		setInnerHTML( root._progress_details_container, progress_details );
-		
+
 		// Update the peer details and pause/resume button
 		e = root._pause_resume_button_image;
 		if ( this.state() === Torrent._StatusPaused ) {
@@ -660,10 +659,10 @@ Torrent.prototype =
 			e.alt = 'Pause';
 			e.className = "torrent_pause"+compact;
 		}
-		
+
 		setInnerHTML( root._peer_details_container, this.getPeerDetails( ) );
-	
-		this.refreshFileView( );	
+
+		this.refreshFileView( );
 	},
 
 	refreshFileView: function() {
@@ -707,7 +706,7 @@ Torrent.prototype =
 	test: function( filter, search )
 	{
 		var pass = false;
-		
+
 		switch( filter )
 		{
 			case Prefs._FilterActive:
@@ -726,13 +725,13 @@ Torrent.prototype =
 				pass = true;
 				break;
 		}
-		
+
 		if( !pass )
 			return false;
-		
+
 		if( !search || !search.length )
 			return pass;
-		
+
 		return this._name_lc.indexOf( search.toLowerCase() ) !== -1;
 	}
 };
@@ -802,10 +801,10 @@ Torrent.sortTorrents = function( torrents, sortMethod, sortDirection )
 			console.warn( "unknown sort method: " + sortMethod );
 			break;
 	}
-	
+
 	if( sortDirection === Prefs._SortDescending )
 		torrents.reverse( );
-	
+
 	return torrents;
 };
 
@@ -868,7 +867,7 @@ TorrentFile.prototype = {
 		li.appendChild(pri_div);
 		li.appendChild(file_div);
 		li.appendChild(prog_div);
-		
+
 		this._element = li;
 		this._priority_control = pri_div;
 		this._progress = $(prog_div);
@@ -886,7 +885,7 @@ TorrentFile.prototype = {
 	isEditable: function () {
 		return (this._torrent._file_model.length>1) && !this.isDone();
 	},
-	
+
 	readAttributes: function(file_data) {
 		if( file_data.index !== undefined && file_data.index !== this._index ) {
 			this._index = file_data.index;
@@ -909,15 +908,15 @@ TorrentFile.prototype = {
 			this._dirty = true;
 		}
 	},
-	
+
 	element: function() {
 		return $(this._element);
 	},
-	
+
 	domElement: function() {
 		return this._element;
 	},
-	
+
 	setPriority: function(prio) {
 		if (this.isEditable()) {
 			var cmd;
@@ -931,23 +930,23 @@ TorrentFile.prototype = {
 			this._torrent._controller.changeFileCommand( cmd, this._torrent, this );
 		}
 	},
-	
+
 	setWanted: function(wanted, process) {
 		this._dirty = true;
 		this._wanted = wanted;
 		if(!iPhone)
-		  this.element().toggleClass( 'skip', !wanted );
+			this.element().toggleClass( 'skip', !wanted );
 		if (process) {
 			var command = wanted ? 'files-wanted' : 'files-unwanted';
 			this._torrent._controller.changeFileCommand(command, this._torrent, this);
 		}
 	},
-	
+
 	toggleWanted: function() {
 		if (this.isEditable())
 			this.setWanted( !this._wanted, true );
 	},
-	
+
 	refreshHTML: function() {
 		if( this._dirty ) {
 			this._dirty = false;
@@ -956,7 +955,7 @@ TorrentFile.prototype = {
 			this.refreshPriorityHTML();
 		}
 	},
-	
+
 	refreshProgressHTML: function() {
 		var c = Transmission.fmt.size(this._done);
 		c += ' of ';
@@ -966,7 +965,7 @@ TorrentFile.prototype = {
 		c += '%)';
 		setInnerHTML(this._progress[0], c);
 	},
-	
+
 	refreshWantedHTML: function() {
 		var e = this.domElement();
 		var c = e.classNameConst;
@@ -974,7 +973,7 @@ TorrentFile.prototype = {
 		if(this.isDone()) { c += ' complete'; }
 		e.className = c;
 	},
-	
+
 	refreshPriorityHTML: function() {
 		var e = this._priority_control;
 		var c = e.classNameConst;
@@ -985,11 +984,11 @@ TorrentFile.prototype = {
 		}
 		e.className = c;
 	},
-	
+
 	fileWantedControlClicked: function(event) {
 		this.toggleWanted();
 	},
-	
+
 	filePriorityControlClicked: function(event, element) {
 		var x = event.pageX;
 		while (element !== null) {

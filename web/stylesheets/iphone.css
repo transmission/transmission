@@ -394,7 +394,7 @@ div#dialog_message.dialog_message {
 }
 
 #torrent_upload_file, label[for="torrent_upload_file"]{
-  display:none;
+	display:none;
 }
 
 h2.dialog_heading {
@@ -559,7 +559,7 @@ div#prefs_container a {
 	text-align: centre;
 	float: right;
 	padding-right: 10px;
-	padding-top: 12px; 
+	padding-top: 12px;
 }
 
 div#torrent_inspector {
@@ -596,7 +596,7 @@ div#inspector_tabs {
 }
 .inspector_tab {
 	float: left;
- 	height: 17px;
+	height: 17px;
 	background: transparent url('../images/buttons/tab_backgrounds.png') left -1px repeat-x;
 	border: 1px solid #888;
 	margin: 0px 1px;
@@ -613,7 +613,7 @@ div#inspector_tabs {
 .inspector_group {
 	display: table;
 	width: 100%;
- 	border-top: 1px solid #888;
+	border-top: 1px solid #888;
 	margin: 10px 0px;
 	padding: 10px 0px;
 }
@@ -742,7 +742,7 @@ div.inspector_torrent_file_list_entry_progress {
 	font-size: 1em;
 	color: #666;
 	margin-left: 20px;
-} 
+}
 div.file_wanted_control {
 	background-position: left -19px;
 	float: left;

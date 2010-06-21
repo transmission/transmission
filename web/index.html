@@ -12,8 +12,8 @@
 		<link media="only screen and (max-device-width: 480px)" href="./stylesheets/iphone.css" type= "text/css" rel="stylesheet" />
 		<link media="screen and (min-device-width: 481px)" href="./stylesheets/common.css" type="text/css" rel="stylesheet" />
 		<!--[if IE]>
-		  <link media="screen" href="./stylesheets/common.css" type="text/css" rel="stylesheet" />
-		  <link media="screen" href="./stylesheets/ieAll.css" type="text/css" rel="stylesheet" />
+			<link media="screen" href="./stylesheets/common.css" type="text/css" rel="stylesheet" />
+			<link media="screen" href="./stylesheets/ieAll.css" type="text/css" rel="stylesheet" />
 		<![endif]-->
 		<!--[if IE 6]><link media="screen" href="./stylesheets/ie6.css" type="text/css" rel="stylesheet" /><![endif]-->
 		<!--[if IE 7]><link media="screen" href="./stylesheets/ie7.css" type="text/css" rel="stylesheet" /><![endif]-->
@@ -33,38 +33,39 @@
 	<body id="transmission_body">
 
 		<div class="torrent_global_menu">
-			 <ul>    
-				 <li id="open"><div id="open_link"><div class="toolbar_image"></div>Open</div></li>
-				 <li id="remove" class="disabled"><div id="remove_link"><div class="toolbar_image"></div>Remove</div></li>
-				 <li class="divider">&nbsp;</li>
-				 <li id="pause_selected" class="disabled"><div id="pause_selected_link"><div class="toolbar_image"></div>Pause</div></li>
-				 <li id="resume_selected" class="disabled"><div id="resume_selected_link"><div class="toolbar_image"></div>Resume</div></li>
-				 <li class="divider">&nbsp;</li>
-				 <li id="pause_all" class="disabled"><div id="pause_all_link"><div class="toolbar_image"></div>Pause All</div></li>
-				 <li id="resume_all" class="disabled"><div id="resume_all_link"><div class="toolbar_image"></div>Resume All</div></li>
-				 <li id="inspector"><div id="inspector_link"><div class="toolbar_image"></div>Inspector</div></li>
-				 <li id="filter"><div id="filter_toggle_link"><div class="toolbar_image"></div>Filter</div></li>
-			 </ul>
+			<ul>
+				<li id="open"><div id="open_link"><div class="toolbar_image"></div>Open</div></li>
+				<li id="remove" class="disabled"><div id="remove_link"><div class="toolbar_image"></div>Remove</div></li>
+				<li class="divider">&nbsp;</li>
+				<li id="pause_selected" class="disabled"><div id="pause_selected_link"><div class="toolbar_image"></div>Pause</div></li>
+				<li id="resume_selected" class="disabled"><div id="resume_selected_link"><div class="toolbar_image"></div>Resume</div></li>
+				<li class="divider">&nbsp;</li>
+				<li id="pause_all" class="disabled"><div id="pause_all_link"><div class="toolbar_image"></div>Pause All</div></li>
+				<li id="resume_all" class="disabled"><div id="resume_all_link"><div class="toolbar_image"></div>Resume All</div></li>
+				<li id="inspector"><div id="inspector_link"><div class="toolbar_image"></div>Inspector</div></li>
+				<li id="filter"><div id="filter_toggle_link"><div class="toolbar_image"></div>Filter</div></li>
+			</ul>
 		</div>
-		
+
 		<div class="torrent_global_details">
 			<div id="torrent_global_transfer">0 Transfers</div>
 			<div id="torrent_global_upload">0 B/s</div>
 			<div id="torrent_global_download">0 B/s</div>
 		</div>
-		
+
 		<div id="torrent_filter_bar">
-			<ul>    
-				 <li><a href="#all" id="filter_all_link" class="active">All</a></li>
-				 <li><a href="#active" id="filter_active_link">Active</a></li>
-				 <li><a href="#downloading" id="filter_downloading_link">Downloading</a></li>
-				 <li><a href="#seeding" id="filter_seeding_link">Seeding</a></li>
-				 <li><a href="#paused" id="filter_paused_link">Paused</a></li>
+			<ul>
+				<li><a href="#all" id="filter_all_link" class="active">All</a></li>
+				<li><a href="#active" id="filter_active_link">Active</a></li>
+				<li><a href="#downloading" id="filter_downloading_link">Downloading</a></li>
+				<li><a href="#seeding" id="filter_seeding_link">Seeding</a></li>
+				<li><a href="#paused" id="filter_paused_link">Paused</a></li>
 			</ul>
-                        <input type="search" id="torrent_search" placeholder="Filter" results="0" />
+			<input type="search" id="torrent_search" placeholder="Filter" results="0" />
 		</div>
+
 		<div id="torrent_inspector" style="display:none;">
-			
+
 			<div style="display:none;" class="inspector_close" id="inspector_close"><img id="inspector_close_image" src="./images/buttons/cancel.png"/></div>
 
 			<div id="inspector_tabs">
@@ -74,12 +75,12 @@
 				<div class="inspector_tab" id="inspector_tab_trackers"><a href="#trackers"><img src="images/buttons/info_trackers.png" alt="Trackers"/></a></div>
 				<div class="inspector_tab" id="inspector_tab_files"><a href="#files"><img src="images/buttons/info_files.png" alt="Files"/></a></div>
 			</div>
-			
+
 			<div id="inspector_header">
 				<h1 id="torrent_inspector_name"></h1>
 				<span id="torrent_inspector_size"></span>
 			</div>
-			
+
 			<div class="inspector_container" id="inspector_tab_info_container">
 				<div class="inspector_group">
 					<div class="inspector_group_label">Information</div>
@@ -100,7 +101,7 @@
 						<div id="torrent_inspector_comment"></div>
 					</div>
 				</div><!-- class="inspector_group"-->
-				
+
 				<div class="inspector_group">
 					<div class="inspector_group_label">Created By</div>
 					<div class="inspector_row">
@@ -121,7 +122,7 @@
 					</div>
 				</div><!-- class="inspector_group"-->
 			</div><!-- id="inspector_tab_info_container" -->
-			
+
 			<div style="display:none;" class="inspector_container" id="inspector_tab_activity_container">
 
 				<div class="inspector_group">
@@ -167,7 +168,7 @@
 						<div id="torrent_inspector_upload_speed">N/A</div>
 					</div>
 				</div><!-- class="inspector_group"-->
-				
+
 				<div class="inspector_group">
 					<div class="inspector_group_label">Peers</div>
 					<div class="inspector_row">
@@ -201,13 +202,11 @@
 			</div><!-- id="inspector_tab_files_container" -->
 
 		</div>
-		
+
 		<div id="torrent_container">
 			<ul class="torrent_list" id="torrent_list"><li style="display: none;"></li></ul>
 		</div>
-		
-		
-		
+
 		<div class="dialog_container" id="dialog_container" style="display:none;">
 			<div class="dialog_top_bar"></div>
 			<div class="dialog_window">
@@ -215,10 +214,10 @@
 				<h2 class="dialog_heading" id="dialog_heading"></h2>
 				<div class="dialog_message" id="dialog_message"></div>
 				<a href="#confirm" id="dialog_confirm_button">Confirm</a>
-				<a href="#cancel" id="dialog_cancel_button">Cancel</a>			
-        	</div>
+				<a href="#cancel" id="dialog_cancel_button">Cancel</a>
+			</div>
 		</div>
-		
+
 		<div class="dialog_container" id="prefs_container" style="display:none;">
 			<div class="dialog_top_bar"></div>
 			<div class="dialog_window">
@@ -381,14 +380,14 @@
 				<a href="#close" id="stats_close_button">Close</a>
 			</div>
 		</div>
-		
+
 		<div class="dialog_container" id="upload_container" style="display:none;">
 			<div class="dialog_top_bar"></div>
 			<div class="dialog_window">
 				<img src="images/graphics/logo.png" alt="Transmission Logo" />
 				<h2 class="dialog_heading">Upload Torrent Files</h2>
-				<form action="#" method="post" id="torrent_upload_form" 
-					enctype="multipart/form-data" target="torrent_upload_frame">  
+				<form action="#" method="post" id="torrent_upload_form"
+					enctype="multipart/form-data" target="torrent_upload_frame">
 					<div class="dialog_message">
 						<label for="torrent_upload_file">Please select a torrent file to upload:</label>
 							<input type="file" name="torrent_files[]" id="torrent_upload_file" multiple="multiple" />
@@ -402,8 +401,9 @@
 				</form>
 			</div>
 		</div>
-		<div class="torrent_footer">	
-			<div id="disk_space_container"></div>	
+
+		<div class="torrent_footer">
+			<div id="disk_space_container"></div>
 			<ul id="settings_menu">
 				<li id="button">&nbsp;
 					<ul id="footer_super_menu">
@@ -471,8 +471,8 @@
 			<div id="turtle_button">&nbsp;</div>
 			<div style="clear: both; visibility: hidden;"></div>
 		</div>
-		
-<div class="contextMenu" id="torrent_context_menu">
+
+		<div class="contextMenu" id="torrent_context_menu">
 			<ul>
 				<li id="context_pause_selected" class="disabled context_pause_selected">Pause Selected</li>
 				<li id="context_resume_selected" class="disabled context_resume_selected">Resume Selected</li>
@@ -488,7 +488,7 @@
 				<li id="context_deselect_all" class="context_deselect_all">Deselect All</li>
 			</ul>
 		</div>
-		
+
 		<iframe name="torrent_upload_frame" id="torrent_upload_frame" src="about:blank" ></iframe>
 	</body>
 </html>
