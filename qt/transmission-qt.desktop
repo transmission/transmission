@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Qtransmission Bittorrent Client
+GenericName=BitTorrent Client
+Comment=Download and share files over BitTorrent
+Exec=transmission-qt %F
+Icon=transmission-qt
+Terminal=false
+Type=Application
+MimeType=application/x-bittorrent;
+Categories=Network;FileTransfer;P2P;Qt;

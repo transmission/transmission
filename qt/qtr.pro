@@ -1,7 +1,7 @@
-TARGET = qtr
+TARGET = transmission-qt
 NAME = "Transmission"
 DESCRIPTION = "Transmission: a fast, easy, and free BitTorrent client"
-VERSION = 1.60
+VERSION = 2.00
 LICENSE = "GPL"
 
 target.path = /bin
