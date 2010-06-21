@@ -98,8 +98,10 @@ extern "C" {
 #endif
 
 /* #define DISABLE_GETTEXT */
-#if defined(TR_EMBEDDED) && !defined(DISABLE_GETTEXT)
- #define DISABLE_GETTEXT
+#ifndef DISABLE_GETTEXT
+ #if defined(WIN32) || defined(TR_EMBEDDED)
+   #define DISABLE_GETTEXT
+ #endif
 #endif
 #ifdef DISABLE_GETTEXT
  const char * tr_strip_positional_args( const char * fmt );
@@ -545,6 +547,9 @@ static inline time_t tr_time( void ) { return transmission_now; }
 
 /** @brief Private libtransmission function to update tr_time()'s counter */
 static inline void tr_timeUpdate( time_t now ) { transmission_now = now; }
+
+/** @brief Portability wrapper for realpath() that uses the system implementation if available */
+char* tr_realpath( const char *path, char * resolved_path );
 
 /***
 ****

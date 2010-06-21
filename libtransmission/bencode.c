@@ -18,6 +18,11 @@
 #include <stdlib.h> /* realpath() */
 #include <string.h>
 
+#ifdef WIN32
+ #include <fcntl.h>
+ #define fsync(fd) _commit(fd)
+#endif
+
 #include <sys/types.h> /* stat() */
 #include <sys/stat.h> /* stat() */
 #include <locale.h>
@@ -1638,7 +1643,7 @@ tr_bencToFile( const tr_benc * top, tr_fmt_mode mode, const char * filename )
 
     /* follow symlinks to find the "real" file, to make sure the temporary
      * we build with mkstemp() is created on the right partition */
-    if( realpath( filename, buf ) != NULL )
+    if( tr_realpath( filename, buf ) != NULL )
         filename = buf;
 
     /* if the file already exists, try to move it out of the way & keep it as a backup */

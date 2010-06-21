@@ -125,7 +125,7 @@ preallocateFileFull( const char * filename, uint64_t length )
 
 #ifdef WIN32
 
-    HANDLE hFile = CreateFile( filename, GENERIC_WRITE, 0, 0, CREATE_NEW, 0, 0 );
+    HANDLE hFile = CreateFile( filename, GENERIC_WRITE, 0, 0, CREATE_NEW, FILE_FLAG_RANDOM_ACCESS, 0 );
     if( hFile != INVALID_HANDLE_VALUE )
     {
         LARGE_INTEGER li;

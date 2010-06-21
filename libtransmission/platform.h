@@ -26,8 +26,8 @@
 #endif
 
 #ifdef WIN32
- #include <windows.h> /* MAX_PATH */
- #define TR_PATH_MAX MAX_PATH
+ #include <windef.h> /* MAX_PATH */
+ #define TR_PATH_MAX (MAX_PATH + 1)
 #else
  #include <limits.h> /* PATH_MAX */
  #ifdef PATH_MAX

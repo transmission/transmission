@@ -346,7 +346,7 @@ sendYa( tr_handshake * handshake )
 
     /* send it */
     setReadState( handshake, AWAITING_YB );
-    tr_peerIoWrite( handshake->io, outbuf, walk-outbuf, FALSE );
+    tr_peerIoWrite( handshake->io, outbuf, walk - outbuf, FALSE );
 }
 
 static uint32_t

@@ -859,7 +859,7 @@ portTested( tr_session       * session UNUSED,
 
     if( response_code != 200 )
     {
-        tr_snprintf( result, sizeof( result ), "http error %ld: %s",
+        tr_snprintf( result, sizeof( result ), "portTested: http error %ld: %s",
                      response_code, tr_webGetResponseStr( response_code ) );
     }
     else /* success */
@@ -901,14 +901,14 @@ gotNewBlocklist( tr_session       * session,
 
     if( response_code != 200 )
     {
-        tr_snprintf( result, sizeof( result ), "http error %ld: %s",
+        tr_snprintf( result, sizeof( result ), "gotNewBlocklist: http error %ld: %s",
                      response_code, tr_webGetResponseStr( response_code ) );
     }
     else /* successfully fetched the blocklist... */
     {
         const char * configDir = tr_sessionGetConfigDir( session );
         char * filename = tr_buildPath( configDir, "blocklist.tmp", NULL );
-        FILE * fp = fopen( filename, "w+" );
+        FILE * fp = fopen( filename, "wb+" );
 
         if( fp == NULL )
         {
@@ -1022,7 +1022,7 @@ gotMetadataFromURL( tr_session       * session UNUSED,
     else
     {
         char result[1024];
-        tr_snprintf( result, sizeof( result ), "http error %ld: %s",
+        tr_snprintf( result, sizeof( result ), "gotMetadataFromURL: http error %ld: %s",
                      response_code, tr_webGetResponseStr( response_code ) );
         tr_idle_function_done( data->data, result );
     }

@@ -193,7 +193,7 @@ dht_bootstrap(void *closure)
             tr_buildPath(cl->session->configDir, "dht.bootstrap", NULL);
 
         if(bootstrap_file)
-            f = fopen(bootstrap_file, "r");
+            f = fopen(bootstrap_file, "rb");
         if(f != NULL) {
             tr_ninf("DHT", "Attempting manual bootstrap");
             for(;;) {
