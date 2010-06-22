@@ -1004,12 +1004,12 @@ Transmission.prototype =
 
 		setInnerHTML( $('#stats_session_uploaded')[0], Transmission.fmt.size(session["uploadedBytes"]) );
 		setInnerHTML( $('#stats_session_downloaded')[0], Transmission.fmt.size(session["downloadedBytes"]) );
-		setInnerHTML( $('#stats_session_ratio')[0], Math.ratio(session["uploadedBytes"],session["downloadedBytes"]));
+		setInnerHTML( $('#stats_session_ratio')[0], Transmission.fmt.ratioString(Math.ratio(session["uploadedBytes"],session["downloadedBytes"])));
 		setInnerHTML( $('#stats_session_duration')[0], Transmission.fmt.timeInterval(session["secondsActive"]) );
 		setInnerHTML( $('#stats_total_count')[0], total["sessionCount"] + " times" );
 		setInnerHTML( $('#stats_total_uploaded')[0], Transmission.fmt.size(total["uploadedBytes"]) );
 		setInnerHTML( $('#stats_total_downloaded')[0], Transmission.fmt.size(total["downloadedBytes"]) );
-		setInnerHTML( $('#stats_total_ratio')[0], Math.ratio(total["uploadedBytes"],total["downloadedBytes"]));
+		setInnerHTML( $('#stats_total_ratio')[0], Transmission.fmt.ratioString(Math.ratio(total["uploadedBytes"],total["downloadedBytes"])));
 		setInnerHTML( $('#stats_total_duration')[0], Transmission.fmt.timeInterval(total["secondsActive"]) );
 	},
 
@@ -1267,14 +1267,14 @@ Transmission.prototype =
 		setInnerHTML( tab.upload_speed, torrents.length ? Transmission.fmt.speed( total_upload_speed ) : na );
 		setInnerHTML( tab.uploaded, torrents.length ? Transmission.fmt.size( total_upload ) : na );
 		setInnerHTML( tab.downloaded, torrents.length ? Transmission.fmt.size( total_download ) : na );
-		setInnerHTML( tab.availability, torrents.length ? Math.ratio( total_availability*100, sizeWhenDone ) + '%' : na );
-		setInnerHTML( tab.ratio, torrents.length ? Math.ratio( total_upload, total_download ) : na );
+		setInnerHTML( tab.availability, torrents.length ? Transmission.fmt.percentString(Math.ratio( total_availability*100, sizeWhenDone )) + '%' : na );
+		setInnerHTML( tab.ratio, torrents.length ? Transmission.fmt.ratioString(Math.ratio( total_upload, total_download )) : na );
 		setInnerHTML( tab.have, torrents.length ? Transmission.fmt.size(total_completed) + ' (' + Transmission.fmt.size(total_verified) + ' verified)' : na );
 		setInnerHTML( tab.upload_to, torrents.length ? total_upload_peers : na );
 		setInnerHTML( tab.download_from, torrents.length ? total_download_peers : na );
 		setInnerHTML( tab.secure, private_string );
 		setInnerHTML( tab.creator_date, date_created );
-		setInnerHTML( tab.progress, torrents.length ? Math.ratio( sizeDone*100, sizeWhenDone ) + '%' : na );
+		setInnerHTML( tab.progress, torrents.length ? Transmission.fmt.percentString(Math.ratio( sizeDone*100, sizeWhenDone )) + '%' : na );
 		setInnerHTML( tab.comment, comment == na ? comment : comment.replace(/\//g, '/&#8203;') );
 		setInnerHTML( tab.creator, creator );
 		setInnerHTML( tab.download_dir, download_dir == na ? download_dir : download_dir.replace(/([\/_\.])/g, "$1&#8203;") );

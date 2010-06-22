@@ -246,8 +246,7 @@ Torrent.prototype =
 		return ( this._sizeWhenDone - this._leftUntilDone ) / this._sizeWhenDone;
 	},
 	getPercentDoneStr: function() {
-		return Math.floor(100 * Math.ratio( 100 * ( this._sizeWhenDone - this._leftUntilDone ),
-		                           this._sizeWhenDone )) / 100;
+		return Transmission.fmt.percentString( 100 * this.getPercentDone() );
 	},
 	size: function() { return this._size; },
 	state: function() { return this._state; },
@@ -492,7 +491,7 @@ Torrent.prototype =
 			case Torrent._StatusChecking:
 				// 'Verifying local data (40% tested)'
 				c = 'Verifying local data (';
-				c += Math.roundWithPrecision( 100.0 * this._recheckProgress, 0 );
+				c += Transmission.fmt.percentString( 100.0 * this._recheckProgress );
 				c += '% tested)';
 				break;
 		}
@@ -529,9 +528,9 @@ Torrent.prototype =
 			notDone = false ;
 
 		if( this.needsMetaData() ){
-			var metaPercentComplete = this._metadataPercentComplete * 1000 / 100
+			var metaPercentComplete = this._metadataPercentComplete * 100;
 			progress_details = "Magnetized transfer - retrieving metadata (";
-			progress_details += metaPercentComplete;
+			progress_details += Transmission.fmt.percentString( metaPercentComplete );
 			progress_details += "%)";
 
 			var empty = "";
@@ -543,7 +542,6 @@ Torrent.prototype =
 			root._progress_incomplete_container.style.width = 100 - metaPercentComplete + "%"
 			root._progress_incomplete_container.className = 'torrent_progress_bar incomplete compact meta'+compact;
 			root._progress_incomplete_container.style.display = 'block';
-
 		}
 		else if( notDone )
 		{
@@ -570,7 +568,7 @@ Torrent.prototype =
 			progress_details = c;
 
 			// Figure out the percent completed
-			var css_completed_width = Math.floor( this.getPercentDone() * 100 * MaxBarWidth ) / 100;
+			var css_completed_width = ( this.getPercentDone() * MaxBarWidth ).toTruncFixed( 2 );
 
 			// Update the 'in progress' bar
 			e = root._progress_complete_container;
@@ -600,17 +598,26 @@ Torrent.prototype =
 			}
 
 			// Create the 'progress details' label
-			// Eg: '698.05 MiB, uploaded 8.59 GiB (Ratio: 12.3)'
-			c = Transmission.fmt.size( this._size );
+			// Partial seed
+			if( this._size != this._sizeWhenDone ) {
+				// Eg: '127.21 MiB of 698.05 MiB (18.2%)'
+				c = Transmission.fmt.size( this._sizeWhenDone );
+				c += ' of ';
+				c += Transmission.fmt.size( this._size );
+				c += ' (';
+				c += Transmission.fmt.percentString( 100.0 * this._sizeWhenDone / this._size );
+				c += '%)';
+			}
+			// Regular seed
+			else {
+				// Eg: '698.05 MiB'
+				c = Transmission.fmt.size( this._size );
+			}
+			// Eg:', uploaded 8.59 GiB (Ratio: 12.3)'
 			c += ', uploaded ';
 			c += Transmission.fmt.size( this._upload_total );
 			c += ' (Ratio ';
-			if(this._upload_ratio > -1)
-				c += Math.round(this._upload_ratio*100)/100;
-			else if(this._upload_ratio == -2)
-				c += 'Inf';
-			else
-				c += '0';
+			c += Transmission.fmt.ratioString( this._upload_ratio );
 			c += ')';
 			c += eta;
 			progress_details = c;
@@ -961,7 +968,7 @@ TorrentFile.prototype = {
 		c += ' of ';
 		c += Transmission.fmt.size(this._size);
 		c += ' (';
-		c += Math.ratio(100 * this._done, this._size);
+		c += this._size ? Transmission.fmt.percentString(100 * this._done / this._size) : '100';
 		c += '%)';
 		setInnerHTML(this._progress[0], c);
 	},

@@ -39,6 +39,8 @@ enum
 };
 const char * gtr_get_unicode_string( int );
 
+/* return a percent formatted string of either x.xx, xx.x or xxx */
+char* tr_strlpercent( char * buf, double x, size_t buflen );
 
 /* return a human-readable string for the size given in bytes. */
 char* tr_strlsize( char * buf, guint64  size, size_t buflen );

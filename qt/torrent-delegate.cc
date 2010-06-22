@@ -74,7 +74,7 @@ TorrentDelegate :: progressString( const Torrent& tor ) const
     {
         /* %1 is the percentage of torrent metadata downloaded */
         str = tr( "Magnetized transfer - retrieving metadata (%1%)" )
-            .arg( tor.metadataPercentDone() * 100.0, 0, 'f', 2 );
+            .arg( Utils::percentToString( tor.metadataPercentDone() * 100.0 ) );
     }
     else if( !isDone ) // downloading
     {
@@ -83,7 +83,7 @@ TorrentDelegate :: progressString( const Torrent& tor ) const
            %3 is a percentage of the two */
         str = tr( "%1 of %2 (%3%)" ).arg( Utils::sizeToString( haveTotal ) )
                                     .arg( Utils::sizeToString( tor.sizeWhenDone( ) ) )
-                                    .arg( tor.percentDone( ) * 100.0, 0, 'f', 2 );
+                                    .arg( Utils::percentToString( tor.percentDone( ) * 100.0 ) );
     }
     else if( !isSeed ) // partial seed
     {
@@ -98,7 +98,7 @@ TorrentDelegate :: progressString( const Torrent& tor ) const
             str = tr( "%1 of %2 (%3%), uploaded %4 (Ratio: %5 Goal: %6)" )
                   .arg( Utils::sizeToString( haveTotal ) )
                   .arg( Utils::sizeToString( tor.totalSize( ) ) )
-                  .arg( tor.percentComplete( ) * 100.0, 0, 'f', 2 )
+                  .arg( Utils::percentToString( tor.percentComplete( ) * 100.0 ) )
                   .arg( Utils::sizeToString( tor.uploadedEver( ) ) )
                   .arg( Utils::ratioToString( tor.ratio( ) ) )
                   .arg( Utils::ratioToString( seedRatio ) );
@@ -113,7 +113,7 @@ TorrentDelegate :: progressString( const Torrent& tor ) const
             str = tr( "%1 of %2 (%3%), uploaded %4 (Ratio: %5)" )
                   .arg( Utils::sizeToString( haveTotal ) )
                   .arg( Utils::sizeToString( tor.totalSize( ) ) )
-                  .arg( tor.percentComplete( ) * 100.0, 0, 'f', 2 )
+                  .arg( Utils::percentToString( tor.percentComplete( ) * 100.0 ) )
                   .arg( Utils::sizeToString( tor.uploadedEver( ) ) )
                   .arg( Utils::ratioToString( tor.ratio( ) ) );
         }
@@ -190,7 +190,7 @@ TorrentDelegate :: shortStatusString( const Torrent& tor ) const
     switch( tor.getActivity( ) )
     {
         case TR_STATUS_CHECK:
-            str = tr( "Verifying local data (%1% tested)" ).arg( tor.getVerifyProgress()*100.0, 0, 'f', 1 );
+            str = tr( "Verifying local data (%1% tested)" ).arg( Utils::percentToString( tor.getVerifyProgress()*100.0 ) );
             break;
 
         case TR_STATUS_DOWNLOAD:
@@ -231,7 +231,7 @@ TorrentDelegate :: statusString( const Torrent& tor ) const
                         .arg( tor.peersWeAreDownloadingFrom( ) );
             else
                 str = tr( "Downloading metadata from %n peer(s) (%1% done)", 0, tor.peersWeAreDownloadingFrom( ) )
-                        .arg( int(100.0 * tor.metadataPercentDone( ) ) );
+                        .arg( Utils::percentToString( 100.0 * tor.metadataPercentDone( ) ) );
             break;
 
         case TR_STATUS_SEED:

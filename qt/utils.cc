@@ -47,7 +47,7 @@ Utils :: remoteFileChooser( QWidget * parent, const QString& title, const QStrin
 }
 
 QString
-Utils :: sizeToString( double  bytes )
+Utils :: sizeToString( double bytes )
 {
     if( !bytes )
         return tr( "None" );
@@ -71,33 +71,17 @@ Utils :: speedToString( const Speed& speed )
 }
 
 QString
+Utils :: percentToString( double x )
+{
+    char buf[128];
+    return QString( tr_strpercent( buf, x, sizeof(buf) ) );
+}
+
+QString
 Utils :: ratioToString( double ratio )
 {
-    QString buf;
-
-    if( (int)ratio == TR_RATIO_NA )
-        buf = tr( "None" );
-    else if( (int)ratio == TR_RATIO_INF )
-        buf = QString::fromUtf8( "\xE2\x88\x9E" );
-    else
-    {
-        QStringList temp;
-
-        temp = QString().sprintf( "%f", ratio ).split( "." );
-        if( ratio < 100.0 )
-        {
-            if( ratio < 10.0 )
-                temp[1].truncate( 2 );
-            else
-                temp[1].truncate( 1 );
-            buf = temp.join( "." );
-        }
-        else
-            buf = QString( temp[0] );
-    }
-
-    return buf;
-
+    char buf[128];
+    return QString::fromUtf8( tr_strratio( buf, sizeof(buf), ratio, "\xE2\x88\x9E" ) );
 }
 
 QString

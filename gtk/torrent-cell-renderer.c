@@ -49,7 +49,7 @@ getProgressString( const tr_torrent * tor,
     const int      isDone = torStat->leftUntilDone == 0;
     const uint64_t haveTotal = torStat->haveUnchecked + torStat->haveValid;
     const int      isSeed = torStat->haveValid >= info->totalSize;
-    char           buf1[32], buf2[32], buf3[32], buf4[32], buf5[32];
+    char           buf1[32], buf2[32], buf3[32], buf4[32], buf5[32], buf6[32];
     char *         str;
     double         seedRatio;
     const gboolean hasSeedRatio = tr_torrentGetSeedRatio( tor, &seedRatio );
@@ -59,11 +59,11 @@ getProgressString( const tr_torrent * tor,
         str = g_strdup_printf(
             /* %1$s is how much we've got,
                %2$s is how much we'll have when done,
-               %3$.2f%% is a percentage of the two */
-            _( "%1$s of %2$s (%3$.2f%%)" ),
+               %3$s%% is a percentage of the two */
+            _( "%1$s of %2$s (%3$s%%)" ),
             tr_strlsize( buf1, haveTotal, sizeof( buf1 ) ),
             tr_strlsize( buf2, torStat->sizeWhenDone, sizeof( buf2 ) ),
-            tr_truncd( torStat->percentDone * 100.0, 2 ) );
+            tr_strlpercent( buf3, torStat->percentDone * 100.0, sizeof( buf3 ) ) );
     }
     else if( !isSeed ) /* partial seeds */
     {
@@ -72,32 +72,32 @@ getProgressString( const tr_torrent * tor,
             str = g_strdup_printf(
                 /* %1$s is how much we've got,
                    %2$s is the torrent's total size,
-                   %3$.2f%% is a percentage of the two,
+                   %3$s%% is a percentage of the two,
                    %4$s is how much we've uploaded,
                    %5$s is our upload-to-download ratio,
                    %6$s is the ratio we want to reach before we stop uploading */
-                _( "%1$s of %2$s (%3$.2f%%), uploaded %4$s (Ratio: %5$s Goal: %6$s)" ),
+                _( "%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s Goal: %6$s)" ),
                 tr_strlsize( buf1, haveTotal, sizeof( buf1 ) ),
                 tr_strlsize( buf2, info->totalSize, sizeof( buf2 ) ),
-                tr_truncd( torStat->percentComplete * 100.0, 2 ),
-                tr_strlsize( buf3, torStat->uploadedEver, sizeof( buf3 ) ),
-                tr_strlratio( buf4, torStat->ratio, sizeof( buf4 ) ),
-                tr_strlratio( buf5, seedRatio, sizeof( buf5 ) ) );
+                tr_strlpercent( buf3, torStat->percentComplete * 100.0, sizeof( buf3 ) ),
+                tr_strlsize( buf4, torStat->uploadedEver, sizeof( buf4 ) ),
+                tr_strlratio( buf5, torStat->ratio, sizeof( buf5 ) ),
+                tr_strlratio( buf6, seedRatio, sizeof( buf6 ) ) );
         }
         else
         {
             str = g_strdup_printf(
                 /* %1$s is how much we've got,
                    %2$s is the torrent's total size,
-                   %3$.2f%% is a percentage of the two,
+                   %3$s%% is a percentage of the two,
                    %4$s is how much we've uploaded,
                    %5$s is our upload-to-download ratio */
-                _( "%1$s of %2$s (%3$.2f%%), uploaded %4$s (Ratio: %5$s)" ),
+                _( "%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s)" ),
                 tr_strlsize( buf1, haveTotal, sizeof( buf1 ) ),
                 tr_strlsize( buf2, info->totalSize, sizeof( buf2 ) ),
-                tr_truncd( torStat->percentComplete * 100.0, 2 ),
-                tr_strlsize( buf3, torStat->uploadedEver, sizeof( buf3 ) ),
-                tr_strlratio( buf4, torStat->ratio, sizeof( buf4 ) ) );
+                tr_strlpercent( buf3, torStat->percentComplete * 100.0, sizeof( buf3 ) ),
+                tr_strlsize( buf4, torStat->uploadedEver, sizeof( buf4 ) ),
+                tr_strlratio( buf5, torStat->ratio, sizeof( buf5 ) ) );
         }
     }
     else /* seeding */

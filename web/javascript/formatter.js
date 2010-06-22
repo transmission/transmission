@@ -18,6 +18,30 @@ Transmission.fmt = (function()
 		MODE_IEC: 1,
 		MODE_SI: 2,
 
+		/*
+		 *   Format a percentage to a string
+		 */
+		percentString: function( x ) {
+			if( x < 10.0 )
+				return x.toTruncFixed( 2 );
+			else if( x < 100.0 )
+				return x.toTruncFixed( 1 );
+			else
+				return x.toTruncFixed( 0 );
+		},
+
+		/*
+		 *   Format a ratio to a string
+		 */
+		ratioString: function( x ) {
+			if( x ==  -1 )
+				return "None";
+			else if( x == -2 )
+				return '&infin;';
+			else
+				return this.percentString( x );
+		},
+
 		setMode: function( mode ) {
 			if( mode == MODE_IEC ) {
 				this.KB_val = 1024;

@@ -114,6 +114,12 @@ static const double MiB = 1024.0 * 1024.0;
 static const double GiB = 1024.0 * 1024.0 * 1024.0;
 
 static char*
+strlpercent( char * buf, double x, size_t buflen )
+{
+    return tr_strpercent( buf, x, buflen );
+}
+
+static char*
 strlratio2( char * buf, double ratio, size_t buflen )
 {
     return tr_strratio( buf, buflen, ratio, "Inf" );
@@ -785,7 +791,7 @@ printDetails( tr_benc * top )
             if( tr_bencDictFindInt( t, "sizeWhenDone", &i )
               && tr_bencDictFindInt( t, "leftUntilDone", &j ) )
             {
-                strlratio( buf, 100.0 * ( i - j ), i, sizeof( buf ) );
+                strlpercent( buf, 100.0 * ( i - j ) / i, sizeof( buf ) );
                 printf( "  Percent Done: %s%%\n", buf );
             }
 
@@ -811,7 +817,8 @@ printDetails( tr_benc * top )
                     && tr_bencDictFindInt( t, "leftUntilDone", &k) )
                 {
                     j += i - k;
-                    printf( "  Availability: %.1f%%\n", ( 100 * j ) / (double) i );
+                    strlpercent( buf, 100.0 * j / i, sizeof( buf ) );
+                    printf( "  Availability: %s%%\n", buf );
                 }
                 if( tr_bencDictFindInt( t, "totalSize", &j ) )
                 {

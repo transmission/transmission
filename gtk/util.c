@@ -106,6 +106,12 @@ tr_strlratio( char * buf, double ratio, size_t buflen )
 }
 
 char*
+tr_strlpercent( char * buf, double x, size_t buflen )
+{
+    return tr_strpercent( buf, x, buflen );
+}
+
+char*
 tr_strlsize( char * buf, guint64 bytes, size_t buflen )
 {
     if( !bytes )

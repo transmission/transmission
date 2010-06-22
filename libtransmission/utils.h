@@ -494,6 +494,9 @@ int* tr_parseNumberRange( const char * str,
  */
 double tr_truncd( double x, int decimal_places );
 
+/* return a percent formatted string of either x.xx, xx.x or xxx */
+char* tr_strpercent( char * buf, double x, size_t buflen );
+
 /**
  * @param buf the buffer to write the string to
  * @param buflef buf's size
@@ -501,6 +504,9 @@ double tr_truncd( double x, int decimal_places );
  * @param the string represntation of "infinity"
  */
 char* tr_strratio( char * buf, size_t buflen, double ratio, const char * infinity ) TR_GNUC_NONNULL(1,4);
+
+/* return a truncated double as a string */
+char* tr_strtruncd( char * buf, double x, int precision, size_t buflen );
 
 /** @brief Portability wrapper for localtime_r() that uses the system implementation if available */
 struct tm * tr_localtime_r( const time_t *_clock, struct tm *_result );
