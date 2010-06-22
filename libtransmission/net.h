@@ -31,9 +31,7 @@
 
 #ifdef WIN32
  #include <inttypes.h>
- #include <winsock2.h>
- #include <WS2tcpip.h>
- typedef int socklen_t;
+ #include <ws2tcpip.h>
 #else
  #include <sys/types.h>
  #include <sys/socket.h>
@@ -42,6 +40,7 @@
 #endif
 
 #ifdef WIN32
+ #define EADDRINUSE              WSAEADDRINUSE
  #define ECONNREFUSED            WSAECONNREFUSED
  #define ECONNRESET              WSAECONNRESET
  #define EHOSTUNREACH            WSAEHOSTUNREACH

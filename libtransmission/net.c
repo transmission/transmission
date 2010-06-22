@@ -32,8 +32,8 @@
 #include <sys/types.h>
 
 #ifdef WIN32
- #include <winsock2.h> /* inet_addr */
- #include <WS2tcpip.h>
+ #define _WIN32_WINNT   0x0501
+ #include <ws2tcpip.h>
 #else
  #include <sys/socket.h>
  #include <netinet/in.h>

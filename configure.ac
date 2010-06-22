@@ -407,7 +407,7 @@ case $host_os in
      have_msw="yes"
      CXXFLAGS="$CXXFLAGS -mms-bitfields -mwin32 -mwindows"
      CPPFLAGS="$CPPFLAGS -DWIN32 -D_WIN32 -DWIN32_LEAN_AND_MEAN"
-     LIBS="$LIBS -lshell32 -lws2_32"
+     LIBS="$LIBS -liphlpapi -lshell32 -lws2_32"
      transmissionlocaledir="locale"
      if test -z "$host_alias"; then
        hostaliaswindres=

@@ -1658,6 +1658,15 @@ tr_torrentClearRatioLimitHitCallback( tr_torrent * torrent )
     tr_torrentSetRatioLimitHitCallback( torrent, NULL, NULL );
 }
 
+static void
+tr_setenv( const char * name, const char * value, tr_bool override )
+{
+#ifdef WIN32
+    putenv( tr_strdup_printf( "%s=%s", name, value ) ); /* leaks memory... */
+#else
+    setenv( name, value, override );
+#endif
+}
 
 static void
 torrentCallScript( tr_torrent * tor, const char * script )
@@ -1673,16 +1682,16 @@ torrentCallScript( tr_torrent * tor, const char * script )
         clearenv( );
 #endif
 
-        setenv( "TR_APP_VERSION", SHORT_VERSION_STRING, 1 );
+        tr_setenv( "TR_APP_VERSION", SHORT_VERSION_STRING, 1 );
 
         tr_snprintf( buf, sizeof( buf ), "%d", tr_torrentId( tor ) );
-        setenv( "TR_TORRENT_ID", buf, 1 );
-        setenv( "TR_TORRENT_NAME", tr_torrentName( tor ), 1 );
-        setenv( "TR_TORRENT_DIR", tor->currentDir, 1 );
-        setenv( "TR_TORRENT_HASH", tor->info.hashString, 1 );
+        tr_setenv( "TR_TORRENT_ID", buf, 1 );
+        tr_setenv( "TR_TORRENT_NAME", tr_torrentName( tor ), 1 );
+        tr_setenv( "TR_TORRENT_DIR", tor->currentDir, 1 );
+        tr_setenv( "TR_TORRENT_HASH", tor->info.hashString, 1 );
         tr_strlcpy( buf, ctime( &now ), sizeof( buf ) );
         *strchr( buf,'\n' ) = '\0';
-        setenv( "TR_TIME_LOCALTIME", buf, 1 );
+        tr_setenv( "TR_TIME_LOCALTIME", buf, 1 );
         tr_torinf( tor, "Calling script \"%s\"", script );
         system( script );
     }
