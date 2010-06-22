@@ -569,6 +569,12 @@ char* tr_formatter_size( char * buf, uint64_t bytes, size_t buflen );
 /* format a speed into a user-readable string. */
 char* tr_formatter_speed( char * buf, uint64_t bytes_per_second, size_t buflen );
 
+enum { TR_FMT_B, TR_FMT_KB, TR_FMT_MB, TR_FMT_GB };
+/* return the human-readable unit initialized by tr_formatter_size_init() */
+const char* tr_formatter_size_units( int size );
+/* return the human-readable unit initialized by tr_formatter_speed_init() */
+const char* tr_formatter_speed_units( int size );
+
 /***
 ****
 ***/
