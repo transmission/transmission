@@ -76,12 +76,12 @@ Utils :: sizeToString( double size )
         else if( size < (int64_t)GIGABYTE_FACTOR )
         {
             displayed_size = (double)size / MEGABYTE_FACTOR;
-            str = tr( "%L1 MiB" ).arg( displayed_size,  0, 'f', 2 );
+            str = tr( "%L1 MiB" ).arg( displayed_size,  0, 'f', 1 );
         }
         else
         {
             displayed_size = (double) size / GIGABYTE_FACTOR;
-            str = tr( "%L1 GiB" ).arg( displayed_size,  0, 'f', 3 );
+            str = tr( "%L1 GiB" ).arg( displayed_size,  0, 'f', 1 );
         }
     }
 
