@@ -105,39 +105,26 @@ tr_strlratio( char * buf, double ratio, size_t buflen )
     return tr_strratio( buf, buflen, ratio, gtr_get_unicode_string( GTR_UNICODE_INF ) );
 }
 
-static double KiB = 1024.0;
-static double MiB = ( 1024.0 * 1024.0 );
-static double GiB = ( 1024.0 * 1024.0 * 1024.0 );
-
 char*
 tr_strlsize( char * buf, guint64 bytes, size_t buflen )
 {
     if( !bytes )
         g_strlcpy( buf, _( "None" ), buflen );
-    else if( bytes < KiB )
-        g_snprintf( buf, buflen, ngettext( "%'u byte", "%'u bytes", (guint)bytes ), (guint)bytes );
-    else if( bytes < MiB )
-        g_snprintf( buf, buflen, _( "%'.1f KiB" ), bytes / KiB );
-    else if( bytes < GiB )
-        g_snprintf( buf, buflen, _( "%'.1f MiB" ), bytes / MiB );
     else
-        g_snprintf( buf, buflen, _( "%'.1f GiB" ), bytes / GiB );
+        tr_formatter_size( buf, bytes, buflen );
+
     return buf;
 }
 
 char*
 tr_strlspeed( char * buf, double kb_sec, size_t buflen )
 {
-    const double speed = kb_sec;
+    const int64_t bytes_per_second = kb_sec * 1024.0;
 
-    if( speed < 1000.0 )  /* 0.0 KiB to 999.9 KiB */
-        g_snprintf( buf, buflen, _( "%'.1f KiB/s" ), speed );
-    else if( speed < 102400.0 ) /* 0.98 MiB to 99.99 MiB */
-        g_snprintf( buf, buflen, _( "%'.2f MiB/s" ), ( speed / KiB ) );
-    else if( speed < 1024000.0 ) /* 100.0 MiB to 999.9 MiB */
-        g_snprintf( buf, buflen, _( "%'.1f MiB/s" ), ( speed / MiB ) );
-    else /* insane speeds */
-        g_snprintf( buf, buflen, _( "%'.2f GiB/s" ), ( speed / GiB ) );
+    if( bytes_per_second < 1 )
+        g_strlcpy( buf, _( "None" ), buflen );
+    else
+        tr_formatter_speed( buf, bytes_per_second, buflen );
 
     return buf;
 }

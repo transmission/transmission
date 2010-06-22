@@ -532,6 +532,8 @@ main( int argc, char ** argv )
     bind_textdomain_codeset( domain, "UTF-8" );
     textdomain( domain );
     g_set_application_name( _( "Transmission" ) );
+    tr_formatter_size_init( 1024, _("B"), _("KiB"), _("MiB"), _("GiB") );
+    tr_formatter_speed_init( 1024, _("B/s"), _("KiB/s"), _("MiB/s"), _("GiB/s") );
 
     /* initialize gtk */
     if( !g_thread_supported( ) )

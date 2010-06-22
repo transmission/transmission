@@ -62,39 +62,6 @@ parseCommandLine( int argc, const char ** argv )
     return 0;
 }
 
-static const double KiB = 1024.0;
-static const double MiB = 1024.0 * 1024.0;
-static const double GiB = 1024.0 * 1024.0 * 1024.0;
-
-static char*
-strlsize( char *  buf, int64_t size, size_t  buflen )
-{
-    if( !size )
-        tr_strlcpy( buf, "None", buflen );
-    else if( size < (int64_t)KiB )
-        tr_snprintf( buf, buflen, "%'" PRId64 " bytes", (int64_t)size );
-    else
-    {
-        double displayed_size;
-        if( size < (int64_t)MiB )
-        {
-            displayed_size = (double) size / KiB;
-            tr_snprintf( buf, buflen, "%'.1f KiB", displayed_size );
-        }
-        else if( size < (int64_t)GiB )
-        {
-            displayed_size = (double) size / MiB;
-            tr_snprintf( buf, buflen, "%'.1f MiB", displayed_size );
-        }
-        else
-        {
-            displayed_size = (double) size / GiB;
-            tr_snprintf( buf, buflen, "%'.1f GiB", displayed_size );
-        }
-    }
-    return buf;
-}
-
 static void
 showInfo( const tr_info * inf )
 {
@@ -119,8 +86,8 @@ showInfo( const tr_info * inf )
     if( inf->comment && *inf->comment )
         printf( "  Comment: %s\n", inf->comment );
     printf( "  Piece Count: %d\n", inf->pieceCount );
-    printf( "  Piece Size: %s\n", strlsize( buf, inf->pieceSize, sizeof( buf ) ) );
-    printf( "  Total Size: %s\n", strlsize( buf, inf->totalSize, sizeof( buf ) ) );
+    printf( "  Piece Size: %s\n", tr_formatter_size( buf, inf->pieceSize, sizeof( buf ) ) );
+    printf( "  Total Size: %s\n", tr_formatter_size( buf, inf->totalSize, sizeof( buf ) ) );
     printf( "  Privacy: %s\n", inf->isPrivate ? "Private torrent" : "Public torrent" );
 
     /**
@@ -145,7 +112,7 @@ showInfo( const tr_info * inf )
 
     printf( "\nFILES\n\n" );
     for( i=0; i<(int)inf->fileCount; ++i )
-        printf( "  %s (%s)\n", inf->files[i].name, strlsize( buf, inf->files[i].length, sizeof( buf ) ) );
+        printf( "  %s (%s)\n", inf->files[i].name, tr_formatter_size( buf, inf->files[i].length, sizeof( buf ) ) );
 }
 
 static size_t
@@ -264,6 +231,8 @@ main( int argc, char * argv[] )
     tr_ctor * ctor;
 
     tr_setMessageLevel( TR_MSG_ERR );
+    tr_formatter_size_init ( 1024, _("B"), _("KiB"), _("MiB"), _("GiB") );
+    tr_formatter_speed_init( 1024, _("B/s"), _("KiB/s"), _("MiB/s"), _("GiB/s") );
 
     if( parseCommandLine( argc, (const char**)argv ) )
         return EXIT_FAILURE;

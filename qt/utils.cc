@@ -23,7 +23,7 @@
 #include <QStyle>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h>
+#include <libtransmission/utils.h> // tr_formatter
 
 #include "qticonloader.h"
 #include "utils.h"
@@ -46,46 +46,28 @@ Utils :: remoteFileChooser( QWidget * parent, const QString& title, const QStrin
     return path;
 }
 
-#define KILOBYTE_FACTOR 1024.0
-#define MEGABYTE_FACTOR ( 1024.0 * 1024.0 )
-#define GIGABYTE_FACTOR ( 1024.0 * 1024.0 * 1024.0 )
+QString
+Utils :: sizeToString( double  bytes )
+{
+    if( !bytes )
+        return tr( "None" );
+    else {
+        char buf[128];
+        tr_formatter_size( buf, bytes, sizeof( buf ) );
+        return buf;
+    }
+}
 
 QString
-Utils :: sizeToString( double size )
+Utils :: speedToString( const Speed& speed )
 {
-    QString str;
-
-    if( !size )
-    {
-        str = tr( "None" );
+    if( speed.isZero( ) )
+        return tr( "None" );
+    else {
+        char buf[128];
+        tr_formatter_speed( buf, speed.bps( ), sizeof( buf ) );
+        return buf;
     }
-    else if( size < KILOBYTE_FACTOR )
-    {
-        const int i = (int)size;
-        str = tr( "%Ln byte(s)", 0, i );
-    }
-    else
-    {
-        double displayed_size;
-
-        if( size < (int64_t)MEGABYTE_FACTOR )
-        {
-            displayed_size = (double)size / KILOBYTE_FACTOR;
-            str = tr( "%L1 KiB" ).arg( displayed_size,  0, 'f', 1 );
-        }
-        else if( size < (int64_t)GIGABYTE_FACTOR )
-        {
-            displayed_size = (double)size / MEGABYTE_FACTOR;
-            str = tr( "%L1 MiB" ).arg( displayed_size,  0, 'f', 1 );
-        }
-        else
-        {
-            displayed_size = (double) size / GIGABYTE_FACTOR;
-            str = tr( "%L1 GiB" ).arg( displayed_size,  0, 'f', 1 );
-        }
-    }
-
-    return str;
 }
 
 QString
@@ -163,22 +145,6 @@ Utils :: timeToString( int seconds )
     {
         str = s;
     }
-
-    return str;
-}
-
-QString
-Utils :: speedToString( const Speed& speed )
-{
-    const double kbps( speed.kbps( ) );
-    QString str;
-
-    if( kbps < 1000.0 )  /* 0.0 KiB to 999.9 KiB */
-        str = tr( "%L1 KiB/s" ).arg( kbps, 0, 'f', 1 );
-    else if( kbps < 102400.0 ) /* 0.98 MiB to 99.99 MiB */
-        str = tr( "%L1 MiB/s" ).arg( kbps / KILOBYTE_FACTOR, 0, 'f', 2 );
-    else // insane speeds
-        str = tr( "%L1 GiB/s" ).arg( kbps / MEGABYTE_FACTOR, 0, 'f', 1 );
 
     return str;
 }

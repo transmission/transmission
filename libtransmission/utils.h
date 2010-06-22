@@ -555,6 +555,24 @@ char* tr_realpath( const char *path, char * resolved_path );
 ****
 ***/
 
+/* example: tr_formatter_size_init( 1024, _("B"), _("KiB"), _("MiB"), _("GiB") ); */
+
+void tr_formatter_size_init( double kilo, const char * b, const char * kb,
+                                          const char * mb, const char * gb );
+
+void tr_formatter_speed_init( double kilo, const char * b, const char * kb,
+                                           const char * mb, const char * gb );
+
+/* format a size into a user-readable string. */
+char* tr_formatter_size( char * buf, uint64_t bytes, size_t buflen );
+
+/* format a speed into a user-readable string. */
+char* tr_formatter_speed( char * buf, uint64_t bytes_per_second, size_t buflen );
+
+/***
+****
+***/
+
 #ifdef __cplusplus
 }
 #endif
