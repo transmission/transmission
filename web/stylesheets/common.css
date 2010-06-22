@@ -608,6 +608,11 @@ div#inspector_tabs {
 	margin: 10px 0px;
 	padding: 10px 0px;
 }
+.inspector_torrent_label {
+	display: table-caption;
+	font-size: 1.2em;
+	font-weight: bold;
+}
 .inspector_group_label {
 	display: table-header-group;
 	font-weight: bold;
@@ -705,7 +710,7 @@ tr.inspector_peer_entry.odd {
 
 ul.tier_list {
 	width: 100%;
-	margin: 10px 0 0 0;
+	margin: 2px 0 8px 0;
 	padding-left: 0px;
 	text-align: left;
 	display: block;

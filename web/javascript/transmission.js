@@ -1310,30 +1310,41 @@ Transmission.prototype =
 		var tr = this;
 		var html = '';
 		var torrents = this.getSelectedTorrents( );
-		if( $(this._inspector_peers_list).is(':visible') && torrents.length == 1 ) {
-			html += '<div class="inspector_group"><table class="peer_list">';
-			html += '<tr class="inspector_peer_entry even">';
-			html += '<th class="encryptedCol"></th>';
-			html += '<th class="upCol">Up</th>';
-			html += '<th class="downCol">Down</th>';
-			html += '<th class="percentCol">%</th>';
-			html += '<th class="statusCol">Status</th>';
-			html += '<th class="addressCol">Address</th>';
-			html += '<th class="clientCol">Client</th>';
-			html += '</tr>';
-			for( var i=0, peer; peer=torrents[0]._peers[i]; ++i ) {
-				var parity = ((i+1) % 2 == 0 ? 'even' : 'odd');
-				html += '<tr class="inspector_peer_entry ' + parity + '">';
-				html += '<td>' + (peer.isEncrypted ? '<img src="images/graphics/lock_icon.png" alt="Encrypted"/>' : '') + '</td>';
-				html += '<td>' + Transmission.fmt.speed(peer.rateToPeer) + '</td>';
-				html += '<td>' + Transmission.fmt.speed(peer.rateToClient) + '</td>';
-				html += '<td class="percentCol">' + Math.floor(peer.progress*100) + '%' + '</td>';
-				html += '<td>' + peer.flagStr + '</td>';
-				html += '<td>' + peer.address + '</td>';
-				html += '<td>' + peer.clientName + '</td>';
+		if( $(this._inspector_peers_list).is(':visible') ) {
+			for( var k=0, torrent; torrent=torrents[k]; ++k ) {
+				html += '<div class="inspector_group">';
+				if( torrents.length > 1 ) {
+					html += '<div class="inspector_torrent_label">';
+					html += torrent._name + '</div>';
+				}
+				if( torrent._peers.length == 0 ) {
+					html += '<br></div>'; // firefox won't paint the top border if the div is empty
+					continue;
+				}
+				html += '<table class="peer_list">';
+				html += '<tr class="inspector_peer_entry even">';
+				html += '<th class="encryptedCol"></th>';
+				html += '<th class="upCol">Up</th>';
+				html += '<th class="downCol">Down</th>';
+				html += '<th class="percentCol">%</th>';
+				html += '<th class="statusCol">Status</th>';
+				html += '<th class="addressCol">Address</th>';
+				html += '<th class="clientCol">Client</th>';
 				html += '</tr>';
+				for( var i=0, peer; peer=torrent._peers[i]; ++i ) {
+					var parity = ((i+1) % 2 == 0 ? 'even' : 'odd');
+					html += '<tr class="inspector_peer_entry ' + parity + '">';
+					html += '<td>' + (peer.isEncrypted ? '<img src="images/graphics/lock_icon.png" alt="Encrypted"/>' : '') + '</td>';
+					html += '<td>' + Transmission.fmt.speed(peer.rateToPeer) + '</td>';
+					html += '<td>' + Transmission.fmt.speed(peer.rateToClient) + '</td>';
+					html += '<td class="percentCol">' + Math.floor(peer.progress*100) + '%' + '</td>';
+					html += '<td>' + peer.flagStr + '</td>';
+					html += '<td>' + peer.address + '</td>';
+					html += '<td>' + peer.clientName + '</td>';
+					html += '</tr>';
+				}
+				html += '</table></div>';
 			}
-			html += '</table></div>';
 		}
 		setInnerHTML(this._inspector_peers_list, html);
 	},
@@ -1345,30 +1356,39 @@ Transmission.prototype =
 		var html = '';
 		var na = 'N/A';
 		var torrents = this.getSelectedTorrents( );
-		if( $(this._inspector_trackers_list).is(':visible') && torrents.length == 1 ) {
-			for( var i=0, tier; tier=torrents[0]._trackerStats[i]; ++i ) {
-				html += '<div class="inspector_group"><div class="inspector_group_label">';
-				html += 'Tier ' + (i + 1) + '</div><ul class="tier_list">';
-				for( var j=0, tracker; tracker=tier[j]; ++j ) {
-					var lastAnnounceStatusHash = tr.lastAnnounceStatus(tracker);
-					var announceState = tr.announceState(tracker);
-					var lastScrapeStatusHash = tr.lastScrapeStatus(tracker);
-
-					// Display construction
-					var parity = ((j+1) % 2 == 0 ? 'even' : 'odd');
-					html += '<li class="inspector_tracker_entry ' + parity + '"><div class="tracker_host" title="' + tracker.announce + '">';
-					html += tracker.host + '</div>';
-					html += '<div class="tracker_activity">';
-					html += '<div>' + lastAnnounceStatusHash['label'] + ': ' + lastAnnounceStatusHash['value'] + '</div>';
-					html += '<div>' + announceState + '</div>';
-					html += '<div>' + lastScrapeStatusHash['label'] + ': ' + lastScrapeStatusHash['value'] + '</div>';
-					html += '</div><table class="tracker_stats">';
-					html += '<tr><th>Seeders:</th><td>' + (tracker.seederCount > -1 ? tracker.seederCount : na) + '</td></tr>';
-					html += '<tr><th>Leechers:</th><td>' + (tracker.leecherCount > -1 ? tracker.leecherCount : na) + '</td></tr>';
-					html += '<tr><th>Downloads:</th><td>' + (tracker.downloadCount > -1 ? tracker.downloadCount : na)+ '</td></tr>';
-					html += '</table></li>';
+		if( $(this._inspector_trackers_list).is(':visible') ) {
+			for( var k=0, torrent; torrent = torrents[k]; ++k ) {
+				html += '<div class="inspector_group">';
+				if( torrents.length > 1 ) {
+					html += '<div class="inspector_torrent_label">';
+					html += torrent._name + '</div>';
 				}
-				html += '</ul></div>';
+				for( var i=0, tier; tier=torrent._trackerStats[i]; ++i ) {
+					html += '<div class="inspector_group_label">';
+					html += 'Tier ' + (i + 1) + '</div>';
+					html += '<ul class="tier_list">';
+					for( var j=0, tracker; tracker=tier[j]; ++j ) {
+						var lastAnnounceStatusHash = tr.lastAnnounceStatus(tracker);
+						var announceState = tr.announceState(tracker);
+						var lastScrapeStatusHash = tr.lastScrapeStatus(tracker);
+
+						// Display construction
+						var parity = ((j+1) % 2 == 0 ? 'even' : 'odd');
+						html += '<li class="inspector_tracker_entry ' + parity + '"><div class="tracker_host" title="' + tracker.announce + '">';
+						html += tracker.host + '</div>';
+						html += '<div class="tracker_activity">';
+						html += '<div>' + lastAnnounceStatusHash['label'] + ': ' + lastAnnounceStatusHash['value'] + '</div>';
+						html += '<div>' + announceState + '</div>';
+						html += '<div>' + lastScrapeStatusHash['label'] + ': ' + lastScrapeStatusHash['value'] + '</div>';
+						html += '</div><table class="tracker_stats">';
+						html += '<tr><th>Seeders:</th><td>' + (tracker.seederCount > -1 ? tracker.seederCount : na) + '</td></tr>';
+						html += '<tr><th>Leechers:</th><td>' + (tracker.leecherCount > -1 ? tracker.leecherCount : na) + '</td></tr>';
+						html += '<tr><th>Downloads:</th><td>' + (tracker.downloadCount > -1 ? tracker.downloadCount : na)+ '</td></tr>';
+						html += '</table></li>';
+					}
+					html += '</ul>';
+				}
+				html += '</div>';
 			}
 		}
 		setInnerHTML(this._inspector_trackers_list, html);
