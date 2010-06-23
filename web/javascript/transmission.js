@@ -1335,8 +1335,8 @@ Transmission.prototype =
 					var parity = ((i+1) % 2 == 0 ? 'even' : 'odd');
 					html += '<tr class="inspector_peer_entry ' + parity + '">';
 					html += '<td>' + (peer.isEncrypted ? '<img src="images/graphics/lock_icon.png" alt="Encrypted"/>' : '') + '</td>';
-					html += '<td>' + Transmission.fmt.speed(peer.rateToPeer) + '</td>';
-					html += '<td>' + Transmission.fmt.speed(peer.rateToClient) + '</td>';
+					html += '<td>' + ( peer.rateToPeer ? Transmission.fmt.speed(peer.rateToPeer) : '' ) + '</td>';
+					html += '<td>' + ( peer.rateToClient ? Transmission.fmt.speed(peer.rateToClient) : '' ) + '</td>';
 					html += '<td class="percentCol">' + Math.floor(peer.progress*100) + '%' + '</td>';
 					html += '<td>' + peer.flagStr + '</td>';
 					html += '<td>' + peer.address + '</td>';
