@@ -453,7 +453,7 @@ gtr_object_ref_sink( gpointer object )
 int
 gtr_file_trash_or_remove( const char * filename )
 {
-    if( filename && *filename )
+    if( filename && g_file_test( filename, G_FILE_TEST_EXISTS ) )
     {
         gboolean trashed = FALSE;
 #ifdef HAVE_GIO
