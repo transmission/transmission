@@ -2145,17 +2145,37 @@ tr_torrentGetMTimes( const tr_torrent * tor, size_t * setme_n )
 ****
 ***/
 
+static int
+compareTrackerByTier( const void * va, const void * vb )
+{
+    const tr_tracker_info * a = va;
+    const tr_tracker_info * b = vb;
+
+    /* sort by tier */
+    if( a->tier != b->tier )
+        return a->tier - b->tier;
+
+    /* get the effects of a stable sort by comparing the two elements' addresses */
+    return a - b;
+}
+
 tr_bool
 tr_torrentSetAnnounceList( tr_torrent             * tor,
-                           const tr_tracker_info  * trackers,
+                           const tr_tracker_info  * trackers_in,
                            int                      trackerCount )
 {
     int i;
     tr_benc metainfo;
     tr_bool ok = TRUE;
+    tr_tracker_info * trackers;
+
     tr_torrentLock( tor );
 
     assert( tr_isTorrent( tor ) );
+
+    /* ensure the trackers' tiers are in ascending order */
+    trackers = tr_memdup( trackers_in, sizeof( tr_tracker_info ) * trackerCount );
+    qsort( trackers, trackerCount, sizeof( tr_tracker_info ), compareTrackerByTier );
 
     /* look for bad URLs */
     for( i=0; ok && i<trackerCount; ++i )
@@ -2236,6 +2256,8 @@ tr_torrentSetAnnounceList( tr_torrent             * tor,
     }
 
     tr_torrentUnlock( tor );
+
+    tr_free( trackers );
     return ok;
 }
 
