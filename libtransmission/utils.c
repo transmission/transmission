@@ -1580,7 +1580,12 @@ formatter_get_size_str( const struct formatter_units * u,
 
     value = bytes / unit->value;
     units = unit->name;
-    precision = value < 100 ? 2 : 1;
+    if( unit->value == 1 )
+        precision = 0;
+    else if( value < 100 )
+        precision = 2;
+    else
+        precision = 1;
     tr_snprintf( buf, buflen, "%.*f %s", precision, value, units );
     return buf;
 }
