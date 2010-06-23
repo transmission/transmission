@@ -2604,6 +2604,29 @@ isNew( const tr_peer * peer )
     return peer && peer->io && tr_peerIoGetAge( peer->io ) < 45;
 }
 
+/* get a rate for deciding which peers to choke and unchoke. */
+static int
+getRate( const tr_torrent * tor, struct peer_atom * atom, uint64_t now )
+{
+    double KiB_s;
+
+    if( tr_torrentIsSeed( tor ) )
+        KiB_s = tr_peerGetPieceSpeed( atom->peer, now, TR_CLIENT_TO_PEER );
+
+    /* downloading a private torrent... take upload speed into account
+     * because there may only be a small window of opportunity to share */
+    else if( tr_torrentIsPrivate( tor ) )
+        KiB_s = tr_peerGetPieceSpeed( atom->peer, now, TR_PEER_TO_CLIENT )
+              + tr_peerGetPieceSpeed( atom->peer, now, TR_CLIENT_TO_PEER );
+
+    /* downloading a public torrent */
+    else
+        KiB_s = tr_peerGetPieceSpeed( atom->peer, now, TR_PEER_TO_CLIENT );
+
+    /* convert it to bytes per second */
+    return (int)( KiB_s * 1024 );
+}
+
 static void
 rechokeUploads( Torrent * t, const uint64_t now )
 {
@@ -2640,7 +2663,7 @@ rechokeUploads( Torrent * t, const uint64_t now )
             n->peer         = peer;
             n->isInterested = peer->peerIsInterested;
             n->isChoked     = peer->peerIsChoked;
-            n->rate         = tr_peerGetPieceSpeed( peer, now, TR_CLIENT_TO_PEER ) * 1024;
+            n->rate         = getRate( t->tor, atom, now );
         }
     }
 
