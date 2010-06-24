@@ -1365,6 +1365,14 @@ tr_truncd( double x, int decimal_places )
 }
 
 char*
+tr_strtruncd( char * buf, double x, int precision, size_t buflen )
+{
+    tr_snprintf( buf, buflen, "%.*f", precision, tr_truncd( x, precision ) );
+
+    return buf;
+}
+
+char*
 tr_strpercent( char * buf, double x, size_t buflen )
 {
     if( x < 10.0 )
@@ -1385,14 +1393,6 @@ tr_strratio( char * buf, size_t buflen, double ratio, const char * infinity )
         tr_strlcpy( buf, infinity, buflen );
     else
         tr_strpercent( buf, ratio, buflen );
-    return buf;
-}
-
-char*
-tr_strtruncd( char * buf, double x, int precision, size_t buflen )
-{
-    tr_snprintf( buf, buflen, "%.*f", precision, tr_truncd( x, precision ) );
-
     return buf;
 }
 
