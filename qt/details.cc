@@ -1166,6 +1166,7 @@ Details :: createPeersTab( )
     myPeerTree->setHeaderLabels( headers );
     myPeerTree->setColumnWidth( 0, 20 );
     myPeerTree->setSortingEnabled( true );
+    myPeerTree->sortByColumn( COL_ADDRESS, Qt::AscendingOrder );
     myPeerTree->setRootIsDecorated( false );
     myPeerTree->setTextElideMode( Qt::ElideRight );
     v->addWidget( myPeerTree, 1 );
