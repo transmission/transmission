@@ -253,6 +253,8 @@ tr_torrentSetMetadataPiece( tr_torrent  * tor, int piece, const void  * data, in
                 if( !tr_bencLoadFile( &newMetainfo, TR_FMT_BENC, path ) )
                 {
                     tr_bool hasInfo;
+                    tr_info info;
+                    int infoDictLength;
 
                     /* remove any old .torrent and .resume files */
                     remove( path );
@@ -261,16 +263,27 @@ tr_torrentSetMetadataPiece( tr_torrent  * tor, int piece, const void  * data, in
                     dbgmsg( tor, "Saving completed metadata to \"%s\"", path );
                     tr_bencMergeDicts( tr_bencDictAddDict( &newMetainfo, "info", 0 ), &infoDict );
 
-                    success = tr_metainfoParse( tor->session, &newMetainfo, &tor->info, &hasInfo, &tor->infoDictLength );
+                    memset( &info, 0, sizeof( tr_info ) );
+                    success = tr_metainfoParse( tor->session, &newMetainfo, &info, &hasInfo, &infoDictLength );
 
-                    assert( hasInfo );
-                    assert( success );
+                    if( success && !tr_getBlockSize( info.pieceSize ) )
+                    {
+                        tr_torrentSetLocalError( tor, _( "Magnet torrent's metadata is not usable" ) );
+                        success = FALSE;
+                    }
 
-                    /* save the new .torrent file */
-                    tr_bencToFile( &newMetainfo, TR_FMT_BENC, tor->info.torrent );
-                    tr_sessionSetTorrentFile( tor->session, tor->info.hashString, tor->info.torrent );
-                    tr_torrentGotNewInfoDict( tor );
-                    tr_torrentSetDirty( tor );
+                    if( success )
+                    {
+                        /* keep the new info */
+                        tor->info = info;
+                        tor->infoDictLength = infoDictLength;
+
+                        /* save the new .torrent file */
+                        tr_bencToFile( &newMetainfo, TR_FMT_BENC, tor->info.torrent );
+                        tr_sessionSetTorrentFile( tor->session, tor->info.hashString, tor->info.torrent );
+                        tr_torrentGotNewInfoDict( tor );
+                        tr_torrentSetDirty( tor );
+                    }
 
                     tr_bencFree( &newMetainfo );
                 }
