@@ -1394,7 +1394,7 @@ tr_moveFile( const char * oldpath, const char * newpath, tr_bool * renamed )
     char * buf;
     struct stat st;
     off_t bytesLeft;
-    off_t buflen;
+    const off_t buflen = 1024 * 128; /* 128 KiB buffer */
 
     /* make sure the old file exists */
     if( stat( oldpath, &st ) ) {
@@ -1429,7 +1429,6 @@ tr_moveFile( const char * oldpath, const char * newpath, tr_bool * renamed )
     /* copy the file */
     in = tr_open_file_for_scanning( oldpath );
     out = tr_open_file_for_writing( newpath );
-    buflen = stat( newpath, &st ) ? 4096 : st.st_blksize;
     buf = tr_valloc( buflen );
     while( bytesLeft > 0 )
     {
