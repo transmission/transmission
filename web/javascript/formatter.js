@@ -72,22 +72,22 @@ Transmission.fmt = (function()
 				return 'None';
 
 			if( bytes < KB_val )
-				return bytes.toFixed(0) + ' B';
+				return bytes.toFixed(10) + ' B';
 
 			if( bytes < ( KB_val * 100 ) )
-				return Math.roundWithPrecision(bytes/KB_val, 2) + ' ' + KB_str;
+				return (bytes/KB_val).toFixed(2) + ' ' + KB_str;
 			if( bytes < MB_val )
-				return Math.roundWithPrecision(bytes/KB_val, 1) + ' ' + KB_str;
+				return (bytes/KB_val).toFixed(1) + ' ' + KB_str;
 
 			if( bytes < ( MB_val * 100 ) )
-				return Math.roundWithPrecision(bytes/MB_val, 2) + ' ' + MB_str;
+				return (bytes/MB_val).toFixed(2) + ' ' + MB_str;
 			if( bytes < GB_val )
-				return Math.roundWithPrecision(bytes/MB_val, 1) + ' ' + MB_str;
+				return (bytes/MB_val).toFixed(1) + ' ' + MB_str;
 
 			if( bytes < ( GB_val * 100 ) )
-				return Math.roundWithPrecision(bytes/GB_val, 2) + ' ' + GB_str;
+				return (bytes/GB_val).toFixed(2) + ' ' + GB_str;
 			else
-				return Math.roundWithPrecision(bytes/GB_val, 1) + ' ' + GB_str;
+				return (bytes/GB_val).toFixed(1) + ' ' + GB_str;
 		},
 
 		speed: function( bytes )

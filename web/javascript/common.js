@@ -108,18 +108,6 @@ function setInnerHTML( e, html )
 };
 
 /*
- *   Round a float to a specified number of decimal
- *   places, stripping trailing zeroes
- *
- *   @param float floatnum
- *   @param integer precision
- *   @returns float
- */
-Math.roundWithPrecision = function(floatnum, precision) {
-	return Math.round( floatnum * Math.pow ( 10, precision ) ) / Math.pow( 10, precision );
-};
-
-/*
  *   Given a numerator and denominator, return a ratio string
  */
 Math.ratio = function( numerator, denominator ) {
