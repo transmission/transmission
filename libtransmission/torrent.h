@@ -384,6 +384,8 @@ const char * tr_torrentName( const tr_torrent * tor )
     return tor->info.name;
 }
 
+uint32_t tr_getBlockSize( uint32_t pieceSize );
+
 /**
  * Tell the tr_torrent that one of its files has become complete
  */
