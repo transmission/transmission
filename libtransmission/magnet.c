@@ -151,8 +151,13 @@ tr_magnetParse( const char * uri )
             if( ( keylen==2 ) && !memcmp( key, "dn", 2 ) )
                 displayName = tr_http_unescape( val, vallen );
 
-            if( ( keylen==2 ) && !memcmp( key, "tr", 2 ) && ( trCount < MAX_TRACKERS ) )
-                tr[trCount++] = tr_http_unescape( val, vallen );
+            if( trCount < MAX_TRACKERS ) {
+                int i;
+                if( ( keylen==2 ) && !memcmp( key, "tr", 2 ) )
+                    tr[trCount++] = tr_http_unescape( val, vallen );
+                else if( ( sscanf( key, "tr.%d=", &i ) == 1 ) && ( i > 0 ) ) /* ticket #3341 */
+                    tr[trCount++] = tr_http_unescape( val, vallen );
+            }
 
             if( ( keylen==2 ) && !memcmp( key, "ws", 2 ) && ( wsCount < MAX_TRACKERS ) )
                 ws[wsCount++] = tr_http_unescape( val, vallen );
