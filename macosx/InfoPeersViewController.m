@@ -358,8 +358,9 @@
             [components addObject: [peer objectForKey: @"Name"]];
         
         const CGFloat progress = [[peer objectForKey: @"Progress"] floatValue];
-        NSString * progressString = [NSString localizedStringWithFormat: NSLocalizedString(@"Progress: %.1f%%",
-                                        "Inspector -> Peers tab -> table row tooltip"), tr_truncd(progress * 100.0, 1)];
+        NSString * progressString = [NSString stringWithFormat: NSLocalizedString(@"Progress: %@",
+                                        "Inspector -> Peers tab -> table row tooltip"),
+                                        [NSString percentString: progress longDecimals: NO]];
         if (progress < 1.0 && [[peer objectForKey: @"Seed"] boolValue])
             progressString = [progressString stringByAppendingFormat: @" (%@)", NSLocalizedString(@"Partial Seed",
                                 "Inspector -> Peers tab -> table row tooltip")];

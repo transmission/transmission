@@ -206,8 +206,7 @@
     FileListNode * node = (FileListNode *)[self objectValue];
     
     const CGFloat progress = [torrent fileProgress: node];
-    NSString * percentString = progress == 1.0 ? @"100%"
-                                : [NSString localizedStringWithFormat: @"%.2f%%", tr_truncd(progress * 100.0, 2)];
+    NSString * percentString = [NSString percentString: [self floatValue] longDecimals: YES];
     
     NSString * status = [NSString stringWithFormat: NSLocalizedString(@"%@ of %@",
                             "Inspector -> Files tab -> file status string"), percentString, [NSString stringForFileSize: [node size]]];

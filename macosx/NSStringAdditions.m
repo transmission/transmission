@@ -116,6 +116,16 @@
     }
 }
 
++ (NSString *) percentString: (CGFloat) progress longDecimals: (BOOL) longDecimals
+{
+    if (progress >= 1.0)
+        return @"100%";
+    else if (longDecimals)
+        return [NSString localizedStringWithFormat: @"%.2f%%", tr_truncd(progress * 100.0, 2)];
+    else
+        return [NSString localizedStringWithFormat: @"%.1f%%", tr_truncd(progress * 100.0, 1)];
+}
+
 + (NSString *) timeString: (uint64_t) seconds showSeconds: (BOOL) showSeconds
 {
     return [NSString timeString: seconds showSeconds: showSeconds maxFields: NSUIntegerMax];
