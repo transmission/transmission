@@ -72,7 +72,7 @@ Transmission.fmt = (function()
 				return 'None';
 
 			if( bytes < KB_val )
-				return bytes.toFixed(10) + ' B';
+				return bytes.toFixed(0) + ' B';
 
 			if( bytes < ( KB_val * 100 ) )
 				return (bytes/KB_val).toFixed(2) + ' ' + KB_str;
