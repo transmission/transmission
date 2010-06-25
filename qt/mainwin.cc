@@ -438,8 +438,8 @@ QWidget *
 TrMainWindow :: createStatusBar( )
 {
     QMenu * m;
-    QLabel *l, *l2;
-    QWidget *w;
+    QLabel * l;
+    QWidget * w;
     QHBoxLayout * h;
     QPushButton * p;
     QActionGroup * a;
@@ -500,27 +500,29 @@ TrMainWindow :: createStatusBar( )
         l = myStatsLabel = new QLabel( this );
         h->addWidget( l );
 
-        w = new QWidget( this );
-        w->setMinimumSize( HIG::PAD_BIG, 1 );
-        w->setMaximumSize( HIG::PAD_BIG, 1 );
-        h->addWidget( w );
-        l = new QLabel( this );
-        l->setPixmap( getStockIcon( "go-down", QStyle::SP_ArrowDown ).pixmap( smallIconSize ) );
-        h->addWidget( l );
-        l2 = myDownloadSpeedLabel = new QLabel( this );
-        h->addWidget( l2 );
-        myDownStatusWidgets << w << l << l2;
+    h->addSpacing( HIG::PAD_BIG );
 
         w = new QWidget( this );
         w->setMinimumSize( HIG::PAD_BIG, 1 );
         w->setMaximumSize( HIG::PAD_BIG, 1 );
         h->addWidget( w );
+        l = myDownloadSpeedLabel = new QLabel( this );
+        h->addWidget( l );
+        l = new QLabel( this );
+        l->setPixmap( getStockIcon( "go-down", QStyle::SP_ArrowDown ).pixmap( smallIconSize ) );
+        h->addWidget( l );
+
+    h->addSpacing( HIG::PAD_BIG );
+
+        w = new QWidget( this );
+        w->setMinimumSize( HIG::PAD_BIG, 1 );
+        w->setMaximumSize( HIG::PAD_BIG, 1 );
+        h->addWidget( w );
+        l = myUploadSpeedLabel = new QLabel;
+        h->addWidget( l );
         l = new QLabel;
         l->setPixmap( getStockIcon( "go-up", QStyle::SP_ArrowUp ).pixmap( smallIconSize ) );
         h->addWidget( l );
-        l2 = myUploadSpeedLabel = new QLabel;
-        h->addWidget( l2 );
-        myUpStatusWidgets << w << l << l2;
 
     return top;
 }
@@ -733,8 +735,6 @@ TrMainWindow :: refreshStatusBar( )
     const Speed down( myModel.getDownloadSpeed( ) );
     myUploadSpeedLabel->setText( Utils :: speedToString( up ) );
     myDownloadSpeedLabel->setText( Utils :: speedToString( down ) );
-    foreach( QWidget * w, myUpStatusWidgets ) w->setVisible( !up.isZero( ) );
-    foreach( QWidget * w, myDownStatusWidgets ) w->setVisible( !down.isZero( ) );
 
     myNetworkLabel->setVisible( !mySession.isServer( ) );
 
