@@ -1530,7 +1530,7 @@ processResponse( const char * host, int port, const void * response, size_t len 
                         && tr_bencDictFindDict( b, "torrent-added", &b )
                         && tr_bencDictFindInt( b, "id", &i ) )
                     tr_snprintf( id, sizeof(id), "%"PRId64, i );
-                break;
+                /* fall-through to default: to give success or failure msg */
             }
 
             default:
