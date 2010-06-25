@@ -18,6 +18,8 @@
  #include <w32api.h>
  #define WINVER  WindowsXP
  #include <windows.h>
+ #define PROT_READ      PAGE_READONLY
+ #define MAP_PRIVATE    FILE_MAP_COPY
 #endif
 
 #ifndef WIN32

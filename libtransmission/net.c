@@ -64,8 +64,8 @@ const tr_address tr_in6addr_any = { TR_AF_INET6, { IN6ADDR_ANY_INIT } };
 const tr_address tr_inaddr_any = { TR_AF_INET, { { { { INADDR_ANY, 0x00, 0x00, 0x00 } } } } };
 
 #ifdef WIN32
-static const char *
-inet_ntop( int af, const void *src, char *dst, socklen_t cnt )
+const char *
+inet_ntop( int af, const void * src, char * dst, socklen_t cnt )
 {
     if (af == AF_INET)
     {
@@ -90,33 +90,47 @@ inet_ntop( int af, const void *src, char *dst, socklen_t cnt )
     return NULL;
 }
 
-static int
-inet_pton(int af, const char *src, void *dst)
+int
+inet_pton( int af, const char * src, void * dst )
 {
-    struct addrinfo hints;
-    struct addrinfo *res;
-    struct addrinfo *ressave;
+    struct addrinfo hints, *res, *ressave;
+    struct sockaddr_in * s4;
+    struct sockaddr_in6 * s6;
 
-    memset(&hints, 0, sizeof(struct addrinfo));
+    memset( &hints, 0, sizeof( struct addrinfo ));
     hints.ai_family = af;
+    hints.ai_flags = AI_NUMERICHOST;
 
-    if (getaddrinfo(src, NULL, &hints, &res) != 0)
-        return -1;
+    if( getaddrinfo( src, NULL, &hints, &res ) ) {
+        if( WSAGetLastError() == WSAHOST_NOT_FOUND )
+            return 0;
+        else {
+            errno = EAFNOSUPPORT;
+            return -1;
+        }
+    }
 
     ressave = res;
-
-    while (res)
-    {
-        memcpy(dst, res->ai_addr, res->ai_addrlen);
+    while( res ) {
+        switch (res->ai_family) {
+            case AF_INET:
+                s4 = (struct sockaddr_in *) res->ai_addr;
+                memcpy( dst, &s4->sin_addr, sizeof( struct in_addr ) );
+                break;
+            case AF_INET6:
+                s6 = (struct sockaddr_in6 *) res->ai_addr;
+                memcpy( dst, &s6->sin6_addr, sizeof( struct in6_addr ) );
+                break;
+            default: /* AF_UNSPEC, AF_NETBIOS */
+                break;
+        }
         res = res->ai_next;
     }
 
     freeaddrinfo(ressave);
-    return 0;
+    return 1;
 }
-
 #endif
-
 
 void
 tr_netInit( void )

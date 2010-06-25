@@ -11,6 +11,7 @@
  */
 
 #include <assert.h>
+#include <errno.h> /* error codes ERANGE, ... */
 #include <string.h> /* memcpy, memcmp, strstr */
 #include <stdlib.h> /* qsort */
 
