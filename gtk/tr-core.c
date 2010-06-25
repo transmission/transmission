@@ -1019,8 +1019,7 @@ struct url_dialog_data
     TrCore * core;
     tr_ctor * ctor;
     char * url;
-    char * error;
-    int response_code;
+    long response_code;
 };
 
 static gboolean

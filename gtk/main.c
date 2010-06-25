@@ -1501,13 +1501,12 @@ accumulateSelectedTorrents( GtkTreeModel * model,
 static void
 removeSelected( struct cbdata * data, gboolean delete_files )
 {
-    GSList *           l = NULL;
+    GSList * l = NULL;
     GtkTreeSelection * s = tr_window_get_selection( data->wind );
 
     gtk_tree_selection_selected_foreach( s, accumulateSelectedTorrents, &l );
-    gtk_tree_selection_unselect_all( s );
-    if( l )
-    {
+
+    if( l != NULL ) {
         l = g_slist_reverse( l );
         confirmRemove( data->wind, data->core, l, delete_files );
     }
