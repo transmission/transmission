@@ -304,7 +304,17 @@ tr_webThreadFunc( void * vsession )
             t.tv_sec =  usec / 1000000;
             t.tv_usec = usec % 1000000;
 
+#ifdef WIN32
+            /* see ticket #3311, comments 16-18 */
+            if( !r_fd_set.fd_count && !w_fd.set.fd_count && !c_fd_set.fd_count )
+                tr_wait( msec );
+            else
+                select( 0, r_fd_set.fd_count ? &r_fd_set : NULL,
+                           w_fd.set.fd_count ? &w_fd_set : NULL,
+                           c_fd.set.fd_count ? &c_fd_set : NULL, &t );
+#else
             select( max_fd+1, &r_fd_set, &w_fd_set, &c_fd_set, &t );
+#endif
         }
 
         /* call curl_multi_perform() */
