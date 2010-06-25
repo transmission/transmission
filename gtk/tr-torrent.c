@@ -156,9 +156,10 @@ notifyInMainThread( gpointer user_data )
 static void
 completenessChangedCallback( tr_torrent       * tor,
                              tr_completeness    completeness,
+                             tr_bool            wasRunning,
                              void *             user_data )
 {
-    if( ( completeness != TR_LEECH ) && ( tr_torrentStat( tor )->sizeWhenDone != 0 ) )
+    if( wasRunning && ( completeness != TR_LEECH ) && ( tr_torrentStat( tor )->sizeWhenDone != 0 ) )
         gtr_idle_add( notifyInMainThread, user_data );
 }
 

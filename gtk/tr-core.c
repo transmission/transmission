@@ -1018,40 +1018,53 @@ struct url_dialog_data
 {
     TrCore * core;
     tr_ctor * ctor;
-    GtkDialog * dialog;
+    char * url;
+    char * error;
+    int response_code;
 };
 
 static gboolean
 onURLDoneIdle( gpointer vdata )
 {
     struct url_dialog_data * data = vdata;
-    tr_core_add_ctor( data->core, data->ctor );
+
+    if( data->response_code != 200 )
+    {
+        gtr_http_failure_dialog( NULL, data->url, data->response_code );
+    }
+    else
+    {
+        const gboolean doPrompt = pref_flag_get( PREF_KEY_OPTIONS_PROMPT );
+        const gboolean doNotify = FALSE;
+        const int err = add_ctor( data->core, data->ctor, doPrompt, doNotify );
+
+        if( err == TR_PARSE_ERR )
+            tr_core_errsig( data->core, TR_PARSE_ERR, data->url );
+
+        tr_core_torrents_added( data->core );
+    }
+
+    /* cleanup */
+    g_free( data->url );
     g_free( data );
     return FALSE;
 }
 
 static void
-onURLDone( tr_session       * session,
-           long               response_code UNUSED,
-           const void       * response,
-           size_t             response_byte_count,
-           void             * vdata )
+onURLDone( tr_session   * session,
+           long           response_code,
+           const void   * response,
+           size_t         response_byte_count,
+           void         * vdata )
 {
     struct url_dialog_data * data = vdata;
-    tr_ctor * ctor = tr_ctorNew( session );
 
-    /* FIME: error dialog */
+    data->response_code = response_code;
+    data->ctor = tr_ctorNew( session );
+    tr_core_apply_defaults( data->ctor );
+    tr_ctorSetMetainfo( data->ctor, response, response_byte_count );
 
-    if( tr_ctorSetMetainfo( ctor, response, response_byte_count ) )
-    {
-        tr_ctorFree( ctor );
-        g_free( data );
-    }
-    else /* move the work back to the gtk thread */
-    {
-        data->ctor = ctor;
-        gtr_idle_add( onURLDoneIdle, data );
-    }
+    gtr_idle_add( onURLDoneIdle, data );
 }
 
 void
@@ -1084,6 +1097,7 @@ tr_core_add_from_url( TrCore * core, const char * url )
     {
         struct url_dialog_data * data = g_new( struct url_dialog_data, 1 );
         data->core = core;
+        data->url = g_strdup( url );
         tr_webRun( session, url, NULL, onURLDone, data );
     }
 }
