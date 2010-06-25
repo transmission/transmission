@@ -390,16 +390,6 @@ main( int argc, char * argv[] )
         arguments = response.arguments( );
         delegated |= (arguments.size()==1) && arguments[0].toBool();
     }
-    if( addme.empty() )
-    {
-        QDBusMessage request = QDBusMessage::createMethodCall( DBUS_SERVICE,
-                                                               DBUS_OBJECT_PATH,
-                                                               DBUS_INTERFACE,
-                                                               "PresentWindow" );
-        QDBusMessage response = bus.call( request );
-        QList<QVariant> arguments = response.arguments( );
-        delegated |= (arguments.size()==1) && arguments[0].toBool();
-    }
 
     if( delegated )
         return 0;
