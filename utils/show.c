@@ -231,8 +231,8 @@ main( int argc, char * argv[] )
     tr_ctor * ctor;
 
     tr_setMessageLevel( TR_MSG_ERR );
-    tr_formatter_size_init ( 1024, _("B"), _("KiB"), _("MiB"), _("GiB") );
-    tr_formatter_speed_init( 1024, _("B/s"), _("KiB/s"), _("MiB/s"), _("GiB/s") );
+    tr_formatter_size_init ( 1024, "B", "KiB", "MiB", "GiB" );
+    tr_formatter_speed_init( 1024, "B/s", "KiB/s", "MiB/s", "GiB/s" );
 
     if( parseCommandLine( argc, (const char**)argv ) )
         return EXIT_FAILURE;
