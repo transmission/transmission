@@ -88,6 +88,8 @@ extern "C" {
 ****
 ***/
 
+const char * tr_strip_positional_args( const char * fmt );
+
 #if !defined( _ )
  #if defined( HAVE_LIBINTL_H ) && !defined( SYS_DARWIN )
   #include <libintl.h>
@@ -104,7 +106,6 @@ extern "C" {
  #endif
 #endif
 #ifdef DISABLE_GETTEXT
- const char * tr_strip_positional_args( const char * fmt );
  #undef _
  #define _( a ) tr_strip_positional_args( a )
 #endif

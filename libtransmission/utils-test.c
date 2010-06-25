@@ -103,6 +103,28 @@ test_bitfields( void )
 }
 
 static int
+test_strip_positional_args( void )
+{
+    const char * in;
+    const char * out;
+    const char * expected;
+
+    in = "Hello %1$s foo %2$.*f";
+    expected = "Hello %s foo %.*f";
+    out = tr_strip_positional_args( in );
+    check( out != NULL )
+    check( !strcmp( out, expected ) )
+
+    in = "Hello %1$'d foo %2$'f";
+    expected = "Hello %d foo %f";
+    out = tr_strip_positional_args( in );
+    check( out != NULL )
+    check( !strcmp( out, expected ) )
+
+    return 0;
+}
+
+static int
 test_strstrip( void )
 {
     char *in, *out;
@@ -391,6 +413,8 @@ main( void )
     if( ( i = test_hex( ) ) )
         return i;
     if( ( i = test_lowerbound( ) ) )
+        return i;
+    if( ( i = test_strip_positional_args( ) ) )
         return i;
     if( ( i = test_strstrip( ) ) )
         return i;

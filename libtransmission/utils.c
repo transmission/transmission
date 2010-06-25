@@ -404,8 +404,6 @@ tr_set_compare( const void * va,
 ****
 ***/
 
-#ifdef DISABLE_GETTEXT
-
 const char*
 tr_strip_positional_args( const char* str )
 {
@@ -424,22 +422,24 @@ tr_strip_positional_args( const char* str )
     for( out = buf; *str; ++str )
     {
         *out++ = *str;
+
         if( ( *str == '%' ) && isdigit( str[1] ) )
         {
             const char * tmp = str + 1;
             while( isdigit( *tmp ) )
                 ++tmp;
-
             if( *tmp == '$' )
-                str = tmp;
+                str = tmp[1]=='\'' ? tmp+1 : tmp;
         }
+
+        if( ( *str == '%' ) && ( str[1] == '\'' ) )
+            str = str + 1;
+ 
     }
     *out = '\0';
 
     return strcmp( buf, in ) ? buf : in;
 }
-
-#endif
 
 /**
 ***
