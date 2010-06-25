@@ -230,6 +230,7 @@ struct tr_torrent
     void                             * ratio_limit_hit_func_user_data;
 
     tr_bool                    isRunning;
+    tr_bool                    isStopping;
     tr_bool                    isDeleting;
     tr_bool                    startAfterVerify;
     tr_bool                    isDirty;

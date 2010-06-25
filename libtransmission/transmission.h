@@ -1274,8 +1274,13 @@ typedef enum
 }
 tr_completeness;
 
+/**
+ * @param wasPaused whether or not the torrent was in a paused state when
+ *                  it changed its completeness state
+ */
 typedef void ( tr_torrent_completeness_func )( tr_torrent       * torrent,
                                                tr_completeness    completeness,
+                                               tr_bool            wasPaused,
                                                void             * user_data );
 
 typedef void ( tr_torrent_ratio_limit_hit_func )( tr_torrent   * torrent,

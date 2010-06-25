@@ -221,9 +221,10 @@ torrentStop( tr_session               * session,
     for( i = 0; i < torrentCount; ++i )
     {
         tr_torrent * tor = torrents[i];
+
         if( tor->isRunning )
         {
-            tr_torrentStop( tor );
+            tor->isStopping = TRUE;
             notify( session, TR_RPC_TORRENT_STOPPED, tor );
         }
     }
