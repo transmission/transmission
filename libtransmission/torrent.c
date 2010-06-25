@@ -1616,7 +1616,7 @@ getCompletionString( int type )
 static void
 fireCompletenessChange( tr_torrent       * tor,
                         tr_completeness    status,
-                        tr_bool            wasPaused )
+                        tr_bool            wasRunning )
 {
     assert( tr_isTorrent( tor ) );
     assert( ( status == TR_LEECH )
@@ -1624,7 +1624,7 @@ fireCompletenessChange( tr_torrent       * tor,
          || ( status == TR_PARTIAL_SEED ) );
 
     if( tor->completeness_func )
-        tor->completeness_func( tor, status, wasPaused,
+        tor->completeness_func( tor, status, wasRunning,
                                 tor->completeness_func_user_data );
 }
 
@@ -1704,7 +1704,7 @@ torrentCallScript( tr_torrent * tor, const char * script )
 void
 tr_torrentRecheckCompleteness( tr_torrent * tor )
 {
-    tr_bool wasPaused;
+    tr_bool wasRunning;
     tr_completeness completeness;
 
     assert( tr_isTorrent( tor ) );
@@ -1712,7 +1712,7 @@ tr_torrentRecheckCompleteness( tr_torrent * tor )
     tr_torrentLock( tor );
 
     completeness = tr_cpGetStatus( &tor->completion );
-    wasPaused = tor->isRunning;
+    wasRunning = tor->isRunning;
 
     if( completeness != tor->completeness )
     {
@@ -1745,7 +1745,7 @@ tr_torrentRecheckCompleteness( tr_torrent * tor )
                 torrentCallScript( tor, tr_sessionGetTorrentDoneScript( tor->session ) );
         }
 
-        fireCompletenessChange( tor, wasPaused, completeness );
+        fireCompletenessChange( tor, wasRunning, completeness );
 
         tr_torrentSetDirty( tor );
     }
