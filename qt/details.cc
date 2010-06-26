@@ -924,6 +924,7 @@ Details :: createInfoTab( )
     hig->addRow( tr( "Hash:" ), myHashLabel = new SqueezeLabel );
     hig->addRow( tr( "Privacy:" ), myPrivacyLabel = new SqueezeLabel );
     hig->addRow( tr( "Origin:" ), myOriginLabel = new SqueezeLabel );
+    myOriginLabel->setMinimumWidth( 325 ); // stop long origin strings from resizing the widgit
     hig->addRow( tr( "Comment:" ), myCommentBrowser = new QTextBrowser );
     const int h = QFontMetrics(myCommentBrowser->font()).lineSpacing() * 4;
     myCommentBrowser->setFixedHeight( h );
