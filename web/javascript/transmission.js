@@ -1565,10 +1565,15 @@ Transmission.prototype =
 				removedAny = true;
 				var e = torrent.element();
 				if( e ) {
-					var row_index = tr.getTorrentIndex(tr._rows, torrent);
-					//if torrent is not currently visible then delete a hidden row
-					//otherwise the row model gets corrupted because no row gets deleted
-					if( row_index == null ) row_index = tr._rows.length - 1;
+					var row_index;
+					for( var i=0, row; row = tr._rows[i]; ++i ) {
+						if( row._id == torrent._id )
+						{
+							row_index = i;
+							e = tr._rows[row_index];
+							break;
+						}
+					}
 					delete e._torrent; //remove circular refernce to help IE garbage collect
 					tr._rows.splice(row_index, 1)
 					e.remove();
