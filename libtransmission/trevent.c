@@ -210,7 +210,6 @@ static void
 libeventThreadFunc( void * veh )
 {
     tr_event_handle * eh = veh;
-    tr_dbg( "Starting libevent thread" );
 
 #ifndef WIN32
     /* Don't exit when writing on a broken socket */
