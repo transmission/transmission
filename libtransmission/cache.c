@@ -32,6 +32,7 @@ struct cache_block
     uint32_t offset;
     uint32_t length;
 
+    time_t time;
     tr_block_index_t block;
 
     uint8_t * buf;
@@ -53,9 +54,16 @@ struct tr_cache
 *****
 ****/
 
+struct run_info
+{
+  time_t  last_block_time;
+  tr_bool is_aligned;
+};
+
+
 /* return a count of how many contiguous blocks there are starting at this pos */
 static int
-getBlockRun( const tr_cache * cache, int pos )
+getBlockRun( const tr_cache * cache, int pos, struct run_info * info )
 {
     int i;
     const int n = tr_ptrArraySize( &cache->blocks );
@@ -67,35 +75,69 @@ getBlockRun( const tr_cache * cache, int pos )
         const struct cache_block * b = blocks[i];
         if( b->block != block ) break;
         if( b->tor != ref->tor ) break;
-//fprintf( stderr, "pos %d tor %d block %zu\n", i, b->tor->uniqueId, (size_t)b->block );
+//fprintf( stderr, "pos %d tor %d block %zu time %zu\n", i, b->tor->uniqueId, (size_t)b->block, (size_t)b->time );
     }
 
 //fprintf( stderr, "run is %d long from [%d to %d)\n", (int)(i-pos), i, (int)pos );
+    if( info != NULL ) {
+        info->last_block_time = blocks[i-1]->time;
+        info->is_aligned = (blocks[pos]->block % 2 == 0) ? TRUE : FALSE;
+    }
+
     return i-pos;
 }
 
-/* return the starting index of the longest contiguous run of blocks */
+/* return the starting index of the longest contiguous run of blocks BUT:
+ *   1 - Length of run must be even.
+ *   2 - Run must begin with a even block.
+ *   3 - Oldest run is preferred.
+ */
 static int
-findLargestChunk( tr_cache * cache, int * setme_n )
+findChunk2Discard( tr_cache * cache, int * setme_n )
 {
     const int n = tr_ptrArraySize( &cache->blocks );
     int pos;
     int bestpos = 0;
-    int bestlen = getBlockRun( cache, bestpos );
+    unsigned bestlen = 1;
+    unsigned jump;
+    time_t oldest_time = ~0;
+    struct run_info run;
 
-    for( pos=bestlen; pos<n; )
+    for( pos=0; pos<n; pos+=jump )
     {
-        const int len = getBlockRun( cache, pos );
+        unsigned len = getBlockRun( cache, pos, &run );
+        jump = len;
+
+        /* shortcut */
+        if( len < bestlen )
+            continue;
+
+        /* check alignment */
+        if( len % 2 == 0 ) {
+            if( !run.is_aligned )
+                /* Let it grow. Otherwise we contribute to fragmentation */
+                continue;
+        } else {
+            if( len != 1 ) {
+                --len;
+                if( !run.is_aligned ) {
+                    ++pos;
+                    --jump;
+                }
+            }
+        }
 
         if( bestlen < len ) {
             bestlen = len;
             bestpos = pos;
+            oldest_time = run.last_block_time;
+        } else if( (bestlen == len) && (oldest_time > run.last_block_time) ) {
+            bestpos = pos;
+            oldest_time = run.last_block_time;
         }
-
-        pos += len;
     }
 
-//fprintf( stderr, "LONGEST run is %d long from [%d to %d)\n", bestlen, bestpos, bestpos+bestlen );
+//fprintf( stderr, "DISCARDED run is %d long from [%d to %d)\n", bestlen, bestpos, bestpos+bestlen );
     *setme_n = bestlen;
     return bestpos;
 }
@@ -146,7 +188,7 @@ cacheTrim( tr_cache * cache )
     while( !err && ( tr_ptrArraySize( &cache->blocks ) > cache->maxBlocks ) )
     {
         int n;
-        const int i = findLargestChunk( cache, &n );
+        const int i = findChunk2Discard( cache, &n );
         err = flushContiguous( cache, i, n );
     }
 
@@ -158,9 +200,9 @@ cacheTrim( tr_cache * cache )
 ***/
 
 static int
-getMaxBlocks( size_t maxMiB )
+getMaxBlocks( double maxMiB )
 {
-    const double maxBytes = maxMiB * 1024 * 1024;
+    const double maxBytes = maxMiB * (1024 * 1024);
     return maxBytes / MAX_BLOCK_SIZE;
 }
 
@@ -182,7 +224,7 @@ tr_cacheGetLimit( const tr_cache * cache )
 tr_cache *
 tr_cacheNew( double maxMiB )
 {
-    tr_cache * cache = tr_new( tr_cache, 1 );
+    tr_cache * cache = tr_new0( tr_cache, 1 );
     cache->blocks = TR_PTR_ARRAY_INIT;
     cache->maxBlocks = getMaxBlocks( maxMiB );
     return cache;
@@ -214,10 +256,7 @@ cache_block_compare( const void * va, const void * vb )
     if( a->block != b->block )
         return a->block < b->block ? -1 : 1;
 
-    if( a->block < b->block ) return -1;
-    if( a->block > b->block ) return  1;
-
-    /* they'r eequal */
+    /* they're equal */
     return 0;
 }
 
@@ -254,6 +293,8 @@ tr_cacheWriteBlock( tr_cache         * cache,
         cb->buf = NULL;
         tr_ptrArrayInsertSorted( &cache->blocks, cb, cache_block_compare );
     }
+
+    cb->time = tr_time();
 
     tr_free( cb->buf );
     cb->buf = tr_memdup( writeme, cb->length );
@@ -328,7 +369,7 @@ tr_cacheFlushFile( tr_cache * cache, tr_torrent * torrent, tr_file_index_t i )
         const struct cache_block * b = tr_ptrArrayNth( &cache->blocks, pos );
         if( b->tor != torrent ) break;
         if( ( b->block < begin ) || ( b->block >= end ) ) break;
-        err = flushContiguous( cache, pos, getBlockRun( cache, pos ) );
+        err = flushContiguous( cache, pos, getBlockRun( cache, pos, NULL ) );
     }
 
     return err;
@@ -345,7 +386,7 @@ tr_cacheFlushTorrent( tr_cache * cache, tr_torrent * torrent )
     {
         const struct cache_block * b = tr_ptrArrayNth( &cache->blocks, pos );
         if( b->tor != torrent ) break;
-        err = flushContiguous( cache, pos, getBlockRun( cache, pos ) );
+        err = flushContiguous( cache, pos, getBlockRun( cache, pos, NULL ) );
     }
 
     return err;
