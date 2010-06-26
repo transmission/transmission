@@ -97,6 +97,9 @@ Array.prototype.clone = function () {
  */
 function setInnerHTML( e, html )
 {
+	if( e == undefined )
+		return;
+
 	/* innerHTML is listed as a string, but the browser seems to change it.
 	 * For example, "&infin;" gets changed to "∞" somewhere down the line.
 	 * So, let's use an arbitrary  different field to test our state... */
