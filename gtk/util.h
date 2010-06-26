@@ -128,6 +128,9 @@ void gtr_toolbar_set_orientation( GtkToolbar * tb, GtkOrientation orientation );
 /* backwards-compatible wrapper around gtk_widget_set_tooltip_text() */
 void gtr_widget_set_tooltip_text( GtkWidget * w, const char * tip );
 
+/* backwards-compatible wrapper around gtk_widget_get_realized() */
+gboolean gtr_widget_get_realized( GtkWidget * w );
+
 /* backwards-compatible wrapper around g_object_ref_sink() */
 gpointer gtr_object_ref_sink( gpointer object );
 
