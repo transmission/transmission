@@ -40,7 +40,7 @@ AM_CONDITIONAL(TR_UNSTABLE, test "x$supported_build" = "xno")
 ##
 CURL_MINIMUM=7.15.4
 AC_SUBST(CURL_MINIMUM)
-LIBEVENT_MINIMUM=1.4.5
+LIBEVENT_MINIMUM=1.4.9
 AC_SUBST(LIBEVENT_MINIUM)
 OPENSSL_MINIMUM=0.9.4
 AC_SUBST(OPENSSL_MINIMUM)
@@ -211,7 +211,7 @@ if test "x$user_specified_libevent" == "xyes"; then
 else
     AC_CHECK_LIB([event],[evutil_vsnprintf],
                  [],
-                 [AC_MSG_ERROR(libevent not found!)],
+                 [AC_MSG_ERROR(libevent $LIBEVENT_MINIMUM or higher not found!)],
                  [$libevent_extra_libs])
     AC_CHECK_HEADER([event-config.h],[],
                     [AC_MSG_ERROR(event-config.h not found!)])
