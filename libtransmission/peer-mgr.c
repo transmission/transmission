@@ -2498,30 +2498,41 @@ rechokeDownloads( Torrent * t )
     /* separate the peers into "good" (ones with a low cancel-to-block ratio),
      * untested peers, and "bad" (ones with a high cancel-to-block ratio).
      * That's the order in which we'll choose who to show interest in */
-    for( i=0; i<peerCount; ++i )
     {
-        tr_peer * peer = tr_ptrArrayNth( &t->peers, i );
+        /* Randomize the peer array so the peers in the three groups will be unsorted... */
+        int n = peerCount;
+        tr_peer ** peers = tr_memdup( tr_ptrArrayBase( &t->peers ), n * sizeof( tr_peer * ) );
 
-        if( !isPeerInteresting( t->tor, peer ) )
+        while( n > 0 )
         {
-            tr_peerMsgsSetInterested( peer->msgs, FALSE );
-        }
-        else
-        {
-            const int blocks = tr_historyGet( peer->blocksSentToClient, now, msec );
-            const int cancels = tr_historyGet( peer->cancelsSentToPeer, now, msec );
+            const int i = tr_cryptoWeakRandInt( n );
+            tr_peer * peer = tr_ptrArrayNth( &t->peers, i );
 
-            if( !blocks && !cancels )
-                untested[untestedCount++] = peer;
-            else if( !cancels )
-                good[goodCount++] = peer;
-            else if( !blocks )
-                bad[badCount++] = peer;
-            else if( ( cancels * 10 ) < blocks )
-                good[goodCount++] = peer;
+            if( !isPeerInteresting( t->tor, peer ) )
+            {
+                tr_peerMsgsSetInterested( peer->msgs, FALSE );
+            }
             else
-                bad[badCount++] = peer;
+            {
+                const int blocks = tr_historyGet( peer->blocksSentToClient, now, msec );
+                const int cancels = tr_historyGet( peer->cancelsSentToPeer, now, msec );
+
+                if( !blocks && !cancels )
+                    untested[untestedCount++] = peer;
+                else if( !cancels )
+                    good[goodCount++] = peer;
+                else if( !blocks )
+                    bad[badCount++] = peer;
+                else if( ( cancels * 10 ) < blocks )
+                    good[goodCount++] = peer;
+                else
+                    bad[badCount++] = peer;
+            }
+
+            tr_removeElementFromArray( peers, i, sizeof(tr_peer*), n-- );
         }
+
+        tr_free( peers );
     }
 
     t->interestedCount = 0;
