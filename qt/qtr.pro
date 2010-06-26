@@ -7,6 +7,10 @@ LICENSE = "GPL"
 target.path = /bin
 INSTALLS += target
 
+unix: INSTALLS += man
+man.path = /share/man/man1/
+man.files = transmission-qt.1
+
 CONFIG += qt qdbus thread debug link_pkgconfig
 QT += network
 PKGCONFIG = fontconfig libcurl openssl dbus-1
