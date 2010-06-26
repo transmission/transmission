@@ -42,6 +42,7 @@ struct Peer
     QString clientName;
     bool clientIsChoked;
     bool clientIsInterested;
+    QString flagStr;
     bool isDownloadingFrom;
     bool isEncrypted;
     bool isIncoming;
