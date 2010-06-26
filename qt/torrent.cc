@@ -635,6 +635,8 @@ Torrent :: update( tr_benc * d )
                 peer.clientIsChoked = b;
             if( tr_bencDictFindBool( child, "clientIsInterested", &b ) )
                 peer.clientIsInterested = b;
+            if( tr_bencDictFindStr( child, "flagStr", &str ) )
+                peer.flagStr = QString::fromUtf8( str );
             if( tr_bencDictFindBool( child, "isDownloadingFrom", &b ) )
                 peer.isDownloadingFrom = b;
             if( tr_bencDictFindBool( child, "isEncrypted", &b ) )

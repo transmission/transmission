@@ -216,6 +216,7 @@
                       | clientName              | string     | tr_peer_stat
                       | clientIsChoked          | boolean    | tr_peer_stat
                       | clientIsInterested      | boolean    | tr_peer_stat
+                      | flagStr                 | string     | tr_peer_stat
                       | isDownloadingFrom       | boolean    | tr_peer_stat
                       | isEncrypted             | boolean    | tr_peer_stat
                       | isIncoming              | boolean    | tr_peer_stat
