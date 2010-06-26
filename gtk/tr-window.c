@@ -885,3 +885,18 @@ tr_window_get_selection( TrWindow * w )
     return get_private_data( w )->selection;
 }
 
+void
+tr_window_set_busy( TrWindow * w, gboolean isBusy )
+{
+    if( w && gtk_widget_get_realized( GTK_WIDGET( w ) ) )
+    {    
+        GdkDisplay * display = gtk_widget_get_display( GTK_WIDGET( w ) );
+        GdkCursor * cursor = isBusy ? gdk_cursor_new_for_display( display, GDK_WATCH ) : NULL;
+
+        gdk_window_set_cursor( GTK_WIDGET(w)->window, cursor );
+        gdk_display_flush( display );
+
+        if( cursor )
+            gdk_cursor_unref( cursor ); 
+    }
+}

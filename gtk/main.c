@@ -676,6 +676,12 @@ main( int argc, char ** argv )
 }
 
 static void
+onCoreBusy( TrCore * core UNUSED, gboolean busy, struct cbdata * c )
+{
+    tr_window_set_busy( c->wind, busy );
+}
+
+static void
 appsetup( TrWindow *      wind,
           GSList *        torrentFiles,
           struct cbdata * cbdata,
@@ -703,13 +709,11 @@ appsetup( TrWindow *      wind,
     actions_set_core( cbdata->core );
 
     /* set up core handlers */
-    g_signal_connect( cbdata->core, "error", G_CALLBACK( coreerr ), cbdata );
-    g_signal_connect( cbdata->core, "add-torrent-prompt",
-                      G_CALLBACK( onAddTorrent ), cbdata );
-    g_signal_connect_swapped( cbdata->core, "quit",
-                              G_CALLBACK( wannaquit ), cbdata );
-    g_signal_connect( cbdata->core, "prefs-changed",
-                      G_CALLBACK( prefschanged ), cbdata );
+    g_signal_connect( cbdata->core, "busy", G_CALLBACK( onCoreBusy ), cbdata );
+    g_signal_connect( cbdata->core, "add-error", G_CALLBACK( coreerr ), cbdata );
+    g_signal_connect( cbdata->core, "add-prompt", G_CALLBACK( onAddTorrent ), cbdata );
+    g_signal_connect( cbdata->core, "prefs-changed", G_CALLBACK( prefschanged ), cbdata );
+    g_signal_connect_swapped( cbdata->core, "quit", G_CALLBACK( wannaquit ), cbdata );
 
     /* add torrents from command-line and saved state */
     tr_core_load( cbdata->core, forcepause );
@@ -1013,8 +1017,6 @@ gotdrag( GtkWidget         * widget UNUSED,
                 while( g_str_has_prefix( filename, "//" ) )
                     ++filename;
             }
-
-            g_debug( "got from drag: [%s]", filename );
 
             if( g_file_test( filename, G_FILE_TEST_EXISTS ) )
                 paths = g_slist_prepend( paths, g_strdup( filename ) );

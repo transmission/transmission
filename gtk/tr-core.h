@@ -43,43 +43,13 @@
                                                          TR_CORE_TYPE, \
                                                          TrCoreClass )
 
-typedef struct TrCore
+typedef struct _TrCore
 {
-    GObject    parent;
+    GObject parent;
+
     struct TrCorePrivate  * priv;
 }
 TrCore;
-
-typedef struct TrCoreClass
-{
-    GObjectClass    parent;
-
-    /* "blocklist-updated" signal with a callback type of
-        void (*callback )( TrCore*, int ruleCount, gpointer userData ). */
-    int blocklistSignal;
-
-    /* "port-tested" signal with a callback type of
-       void( *callback )( TrCore*, gboolean isOpen, gpointer userData ). */
-    int portSignal;
-
-    /* "error" signal with a callback type of
-       void( *callback )( TrCore*, enum tr_core_err, const char * humanReadable, gpointer userData ). */
-    int errsig;
-
-    /* "add-torrent-prompt" signal with a callback type of
-       void ( *callback)( TrCore *, gpointer ctor, gpointer userData )
-       The handler assumes ownership of ctor and must free when done */
-    int promptsig;
-
-    /* "quit" signal:
-       void handler( TrCore *, gpointer ) */
-    int quitsig;
-
-    /* "prefs-changed" signal:
-       void handler( TrCore *, int, gpointer ) */
-    int prefsig;
-}
-TrCoreClass;
 
 enum tr_core_err
 {
@@ -87,6 +57,20 @@ enum tr_core_err
     TR_CORE_ERR_ADD_TORRENT_DUP  = TR_PARSE_DUPLICATE,
     TR_CORE_ERR_NO_MORE_TORRENTS = 1000 /* finished adding a batch */
 };
+
+typedef struct _TrCoreClass
+{
+    GObjectClass parent_class;
+
+    void (* add_error)         (TrCore*, enum tr_core_err, const char * name);
+    void (* add_prompt)        (TrCore*, gpointer ctor);
+    void (* blocklist_updated) (TrCore*, int ruleCount );
+    void (* busy)              (TrCore*, gboolean isBusy);
+    void (* prefs_changed)     (TrCore*, const char* key);
+    void (* port_tested)       (TrCore*, gboolean isOpen);
+    void (* quit)              (TrCore*);
+}
+TrCoreClass;
 
 GType          tr_core_get_type( void );
 

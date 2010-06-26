@@ -21,8 +21,8 @@
 
 #include "conf.h"
 #include "hig.h"
-#include "msgwin.h"
 #include "tr-core.h"
+#include "msgwin.h"
 #include "tr-prefs.h"
 #include "util.h"
 
