@@ -1179,7 +1179,7 @@ void
 TrMainWindow :: removeTorrents( const bool deleteFiles )
 {
     QSet<int> ids;
-    QMessageBox * msgBox = new QMessageBox( this );
+    QMessageBox msgBox( this );
     QString primary_text, secondary_text;
     int incomplete = 0;
     int connected  = 0;
@@ -1252,18 +1252,18 @@ TrMainWindow :: removeTorrents( const bool deleteFiles )
         }
     }
 
-    msgBox->setWindowTitle( QString(" ") );
-    msgBox->setText( QString( "<big><b>%1</big></b>" ).arg( primary_text ) );
-    msgBox->setInformativeText( secondary_text );
-    msgBox->setStandardButtons( QMessageBox::Ok | QMessageBox::Cancel );
-    msgBox->setDefaultButton( QMessageBox::Cancel );
-    msgBox->setIcon( QMessageBox::Question );
+    msgBox.setWindowTitle( QString(" ") );
+    msgBox.setText( QString( "<big><b>%1</big></b>" ).arg( primary_text ) );
+    msgBox.setInformativeText( secondary_text );
+    msgBox.setStandardButtons( QMessageBox::Ok | QMessageBox::Cancel );
+    msgBox.setDefaultButton( QMessageBox::Cancel );
+    msgBox.setIcon( QMessageBox::Question );
     /* hack needed to keep the dialog from being too narrow */
-    QGridLayout* layout = (QGridLayout*)msgBox->layout();
+    QGridLayout* layout = (QGridLayout*)msgBox.layout();
     QSpacerItem* spacer = new QSpacerItem( 450, 0, QSizePolicy::Minimum, QSizePolicy::Expanding );
     layout->addItem( spacer, layout->rowCount(), 0, 1, layout->columnCount() );
 
-    if( msgBox->exec() == QMessageBox::Ok )
+    if( msgBox.exec() == QMessageBox::Ok )
     {
         ui.listView->selectionModel()->clear();
         mySession.removeTorrents( ids, deleteFiles );
