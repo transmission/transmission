@@ -15,11 +15,11 @@
 
 #include <ctime>
 #include <QCheckBox>
-#include <QFileDialog>
 #include <QLineEdit>
 #include <QIcon>
 #include <QMainWindow>
 #include <QMap>
+#include <QPushButton>
 #include <QSet>
 #include <QSystemTrayIcon>
 #include <QTimer>
@@ -60,7 +60,6 @@ class TrMainWindow: public QMainWindow
         QDialog * myAboutDialog;
         QDialog * myStatsDialog;
         Details * myDetailsDialog;
-        QFileDialog * myFileDialog;
         QCheckBox * myFileDialogOptionsCheck;
         QSystemTrayIcon myTrayIcon;
         TorrentFilter myFilterModel;

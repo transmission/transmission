@@ -90,7 +90,6 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     myAboutDialog( new AboutDialog( this ) ),
     myStatsDialog( new StatsDialog( session, this ) ),
     myDetailsDialog( 0 ),
-    myFileDialog( 0 ),
     myFilterModel( prefs ),
     myTorrentDelegate( new TorrentDelegate( this ) ),
     myTorrentDelegateMin( new TorrentDelegateMin( this ) ),
@@ -1112,24 +1111,21 @@ TrMainWindow :: newTorrent( )
 void
 TrMainWindow :: openTorrent( )
 {
-    if( myFileDialog == 0 )
-    {
-        myFileDialog = new QFileDialog( this,
-                                        tr( "Add Torrent" ),
-                                        myPrefs.getString( Prefs::OPEN_DIALOG_FOLDER ),
-                                        tr( "Torrent Files (*.torrent);;All Files (*.*)" ) );
-        myFileDialog->setFileMode( QFileDialog::ExistingFiles );
+    QFileDialog * myFileDialog;
+    myFileDialog = new QFileDialog( this,
+                                    tr( "Add Torrent" ),
+                                    myPrefs.getString( Prefs::OPEN_DIALOG_FOLDER ),
+                                    tr( "Torrent Files (*.torrent);;All Files (*.*)" ) );
+    myFileDialog->setFileMode( QFileDialog::ExistingFiles );
 
+    QCheckBox * button = new QCheckBox( tr( "Show &options dialog" ) );
+    button->setChecked( myPrefs.getBool( Prefs::OPTIONS_PROMPT ) );
+    QGridLayout * layout = dynamic_cast<QGridLayout*>(myFileDialog->layout());
+    layout->addWidget( button, layout->rowCount( ), 0, 1, -1, Qt::AlignLeft );
+    myFileDialogOptionsCheck = button;
 
-        QCheckBox * button = new QCheckBox( tr( "Show &options dialog" ) );
-        button->setChecked( myPrefs.getBool( Prefs::OPTIONS_PROMPT ) );
-        QGridLayout * layout = dynamic_cast<QGridLayout*>(myFileDialog->layout());
-        layout->addWidget( button, layout->rowCount( ), 0, 1, -1, Qt::AlignLeft );
-        myFileDialogOptionsCheck = button;
-
-        connect( myFileDialog, SIGNAL(filesSelected(const QStringList&)),
-                 this, SLOT(addTorrents(const QStringList&)));
-    }
+    connect( myFileDialog, SIGNAL(filesSelected(const QStringList&)),
+             this, SLOT(addTorrents(const QStringList&)));
 
     myFileDialog->show( );
 }
