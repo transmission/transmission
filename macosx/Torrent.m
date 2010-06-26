@@ -43,7 +43,7 @@
 - (void) insertPath: (NSMutableArray *) components forParent: (FileListNode *) parent fileSize: (uint64_t) size
     index: (NSInteger) index flatList: (NSMutableArray *) flatFileList;
 
-- (void) completenessChange: (NSNumber *) status;
+- (void) completenessChange: (NSDictionary *) statusInfo;
 - (void) ratioLimitHit;
 - (void) metadataRetrieved;
 
@@ -53,10 +53,11 @@
 
 @end
 
-void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, void * torrentData)
+void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, tr_bool wasRunning, void * torrentData)
 {
-    [(Torrent *)torrentData performSelectorOnMainThread: @selector(completenessChange:)
-        withObject: [[NSNumber alloc] initWithInt: status] waitUntilDone: NO];
+    NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys: [NSNumber numberWithInt: status], @"Status",
+                            [NSNumber numberWithBool: wasRunning], @"WasRunning", nil];
+    [(Torrent *)torrentData performSelectorOnMainThread: @selector(completenessChange:) withObject: dict waitUntilDone: NO];
 }
 
 void ratioLimitHitCallback(tr_torrent * torrent, void * torrentData)
@@ -1747,22 +1748,24 @@ int trashDataFile(const char * filename)
 }
 
 //status has been retained
-- (void) completenessChange: (NSNumber *) status
+- (void) completenessChange: (NSDictionary *) statusInfo
 {
     fStat = tr_torrentStat(fHandle); //don't call update yet to avoid auto-stop
     
-    switch ([status intValue])
+    switch ([[statusInfo objectForKey: @"Status"] intValue])
     {
         case TR_SEED:
         case TR_PARTIAL_SEED:
-            [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFinishedDownloading" object: self];
+            //simpler to create a new dictionary than to use statusInfo - avoids retention chicanery 
+            [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFinishedDownloading" object: self 
+                userInfo: [NSDictionary dictionaryWithObject: [statusInfo objectForKey: @"WasRunning"] forKey: @"WasRunning"]];
             break;
         
         case TR_LEECH:
             [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentRestartedDownloading" object: self];
             break;
     }
-    [status release];
+    [statusInfo release];
     
     [self update];
     [self updateTimeMachineExclude];

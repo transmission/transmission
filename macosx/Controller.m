@@ -1888,7 +1888,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 {
     Torrent * torrent = [notification object];
     
-    if ([torrent isActive])
+    if ([[[notification userInfo] objectForKey: @"WasRunning"] boolValue])
     {
         if (!fSoundPlaying && [fDefaults boolForKey: @"PlayDownloadSound"])
         {
@@ -1918,7 +1918,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [[NSDistributedNotificationCenter defaultCenter] postNotificationName: @"com.apple.DownloadFileFinished"
             object: [torrent dataLocation]];
         
-        if ([fDefaults boolForKey: @"QueueSeed"] && [self numToStartFromQueue: NO] == 0)
+        if ([torrent isActive] && [fDefaults boolForKey: @"QueueSeed"] && [self numToStartFromQueue: NO] == 0)
         {
             [torrent stopTransfer];
             [torrent setWaitToStart: YES];
@@ -1931,13 +1931,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 - (void) torrentRestartedDownloading: (NSNotification *) notification
 {
     Torrent * torrent = [notification object];
-    if ([torrent isActive])
+    if ([torrent isActive] && [fDefaults boolForKey: @"Queue"] && [self numToStartFromQueue: YES] == 0)
     {
-        if ([fDefaults boolForKey: @"Queue"] && [self numToStartFromQueue: YES] == 0)
-        {
-            [torrent stopTransfer];
-            [torrent setWaitToStart: YES];
-        }
+        [torrent stopTransfer];
+        [torrent setWaitToStart: YES];
     }
     
     [self updateTorrentsInQueue];

@@ -321,7 +321,7 @@ tr_torrentCheckSeedRatio( tr_torrent * tor )
     {
         tr_torinf( tor, "Seed ratio reached; pausing torrent" );
 
-        tr_torrentStop( tor );
+        tor->isStopping = TRUE;
 
         /* maybe notify the client */
         if( tor->ratio_limit_hit_func != NULL )
@@ -346,6 +346,9 @@ tr_torrentSetLocalError( tr_torrent * tor, const char * fmt, ... )
     tor->errorTracker[0] = '\0';
     evutil_vsnprintf( tor->errorString, sizeof( tor->errorString ), fmt, ap );
     va_end( ap );
+
+    if( tor->isRunning )
+        tor->isStopping = TRUE;
 }
 
 static void
@@ -1360,7 +1363,6 @@ checkAndStartImpl( void * vtor )
     if( tor->preVerifyTotal && !tr_cpHaveTotal( &tor->completion ) )
     {
         tr_torrentSetLocalError( tor, _( "No data found!  Reconnect any disconnected drives, use \"Set Location\", or restart the torrent to re-download." ) );
-        tr_torrentStop( tor );
     }
     else
     {
@@ -1443,7 +1445,6 @@ torrentRecheckDoneImpl( void * vtor )
     if( tor->preVerifyTotal && !tr_cpHaveTotal( &tor->completion ) )
     {
         tr_torrentSetLocalError( tor, _( "Can't find local data.  Try \"Set Location\" to find it, or restart the torrent to re-download." ) );
-        tr_torrentStop( tor );
     }
     else if( tor->startAfterVerify )
     {
@@ -1533,6 +1534,7 @@ tr_torrentStop( tr_torrent * tor )
         tr_sessionLock( tor->session );
 
         tor->isRunning = 0;
+        tor->isStopping = 0;
         tr_torrentSetDirty( tor );
         tr_runInEventThread( tor->session, stopTorrent, tor );
 
@@ -1618,7 +1620,8 @@ getCompletionString( int type )
 
 static void
 fireCompletenessChange( tr_torrent       * tor,
-                        tr_completeness    status )
+                        tr_completeness    status,
+                        tr_bool            wasRunning )
 {
     assert( tr_isTorrent( tor ) );
     assert( ( status == TR_LEECH )
@@ -1626,7 +1629,8 @@ fireCompletenessChange( tr_torrent       * tor,
          || ( status == TR_PARTIAL_SEED ) );
 
     if( tor->completeness_func )
-        tor->completeness_func( tor, status, tor->completeness_func_user_data );
+        tor->completeness_func( tor, status, wasRunning,
+                                tor->completeness_func_user_data );
 }
 
 void
@@ -1696,6 +1700,7 @@ torrentCallScript( tr_torrent * tor, const char * script )
 void
 tr_torrentRecheckCompleteness( tr_torrent * tor )
 {
+    tr_bool wasRunning;
     tr_completeness completeness;
 
     assert( tr_isTorrent( tor ) );
@@ -1703,6 +1708,7 @@ tr_torrentRecheckCompleteness( tr_torrent * tor )
     tr_torrentLock( tor );
 
     completeness = tr_cpGetStatus( &tor->completion );
+    wasRunning = tor->isRunning;
 
     if( completeness != tor->completeness )
     {
@@ -1735,7 +1741,7 @@ tr_torrentRecheckCompleteness( tr_torrent * tor )
                 torrentCallScript( tor, tr_sessionGetTorrentDoneScript( tor->session ) );
         }
 
-        fireCompletenessChange( tor, completeness );
+        fireCompletenessChange( tor, wasRunning, completeness );
 
         tr_torrentSetDirty( tor );
     }

@@ -3131,10 +3131,11 @@ bandwidthPulse( int foo UNUSED, short bar UNUSED, void * vmgr )
         }
     }
 
-    /* possibly stop torrents that have an error */
+    /* stop torrents that are ready to stop, but couldn't be stopped earlier
+    * during the peer-io callback call chain */
     tor = NULL;
     while(( tor = tr_torrentNext( mgr->session, tor )))
-        if( tor->isRunning && ( tor->error == TR_STAT_LOCAL_ERROR ))
+        if( tor->isStopping )
             tr_torrentStop( tor );
 
     reconnectPulse( 0, 0, mgr );
