@@ -169,6 +169,24 @@ Session :: updatePref( int key )
             sessionSet( "seedRatioLimited", myPrefs.variant(key) );
             break;
 
+        case Prefs :: ENCRYPTION:
+            {
+                const int i = myPrefs.variant(key).toInt();
+                switch( i )
+                {
+                    case 0:
+                        sessionSet( myPrefs.keyStr(key), "tolerated" );
+                        break;
+                    case 1:
+                        sessionSet( myPrefs.keyStr(key), "preferred" );
+                        break;
+                    case 2:
+                        sessionSet( myPrefs.keyStr(key), "required" );
+                        break;
+                }
+                break;
+            }
+
         case Prefs :: RPC_AUTH_REQUIRED:
             if( mySession )
                 tr_sessionSetRPCEnabled( mySession, myPrefs.getBool(key) );
@@ -800,6 +818,21 @@ Session :: updateInfo( tr_benc * d )
 
         if( !b )
             continue;
+
+        if( i == Prefs :: ENCRYPTION )
+        {
+            const char * val;
+            if( tr_bencGetStr( b, &val ) )
+            {
+                if( !qstrcmp( val , "required" ) )
+                    myPrefs.set( i, 2 );
+                else if( !qstrcmp( val , "preferred" ) )
+                    myPrefs.set( i, 1 );
+                else if( !qstrcmp( val , "tolerated" ) )
+                    myPrefs.set( i, 0 );
+            }
+            continue;
+        }
 
         switch( myPrefs.type( i ) )
         {
