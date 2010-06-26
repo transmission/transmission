@@ -3393,6 +3393,10 @@ getPeerCandidateScore( const tr_torrent * tor, const struct peer_atom * atom, ui
     i = torrentWasRecentlyStarted( tor ) ? 0 : 1;
     score = addValToKey( score, 1, i );
 
+    /* prefer torrents we're downloading with */
+    i = tr_torrentIsSeed( tor ) ? 1 : 0;
+    score = addValToKey( score, 1, i );
+
     /* prefer peers that we might have a chance of uploading to...
        so lower seed probability is better */
     if( atom->seedProbability == 100 ) i = 101;
