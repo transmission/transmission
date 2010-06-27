@@ -21,6 +21,8 @@
   * Use flagStr in the status field of the peer list 
   * Request a full refresh when changing the session source
   * After removing a torrent list jumps to the very top 
+==== Web Client ====
+  * Fix display bug caused by removal of a torrent hidden by the current torrent filter
 
 === Transmission 2.00 (2010/06/15) ===
 [http://trac.transmissionbt.com/query?milestone=2.00&group=component&groupdesc=1&order=severity All tickets closed by this release]
