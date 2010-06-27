@@ -1,15 +1,15 @@
 === Transmission 2.01 (2010/06/26) ===
 [http://trac.transmissionbt.com/query?milestone=2.01&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== All Platforms ====
-  * Better tracker announce management of incomplete-dir torrents
-  * Speed up moving local data from one disk to another 
+  * Better tracker announce management when completed torrents are moved from the incomplete directory
+  * Speed up moving local data from one disk to another
   * Better parsing of nonstandard magnet links
 ==== Mac ====
-  * If the seed ratio is already met when download completes, the Mac callback options do not occur 
-  * Help buttons in Preferences no longer work 
+  * If the seed ratio is already met when download completes, still show the Growl notification and download-complete sound
+  * Fix the Help buttons in the preferences window
 ==== GTK+ ====
-  * Faster .torrent file parsing
-  * Magnet Link options dialog does not respect setting. 
+  * Faster torrent file parsing
+  * Fix the magnet link options dialog does not respect setting
   * Add an error popup if "Add URL" fails
 ==== Qt ====
   * Fix crash after getting magnet torrent metadata
@@ -17,12 +17,12 @@
   * Fix "add torrent" dialog bug on KDE desktops that popped up previous torrents
   * Fix 2.00 bug that prevented multiple instances from being run
   * Fix remote mode bug that kept the torrent list from being shown
-  * Support encryption preferences in the Preferences dialog
-  * Use flagStr in the status field of the peer list 
+  * Support encryption settings in the preferences dialog
+  * Use flagStr in the status field of the peer list
   * Request a full refresh when changing the session source
-  * After removing a torrent list jumps to the very top 
+  * Fix the torrent list jumping to the top when a torrent is removed
 ==== Web Client ====
-  * Fix display bug caused by removal of a torrent hidden by the current torrent filter
+  * Fix display bug caused by removal of a torrent hidden by the current filter
 
 === Transmission 2.00 (2010/06/15) ===
 [http://trac.transmissionbt.com/query?milestone=2.00&group=component&groupdesc=1&order=severity All tickets closed by this release]
@@ -62,7 +62,7 @@
   * Better support for adding per-torrent settings when adding a new torrent
   * Optional pidfile support
   * Option to start torrents paused
-  * Option to delete .torrent files from watch directory
+  * Option to delete torrent files from watch directory
 ==== Web Client ====
   * The context menu now works when multiple rows are selected
   * Show ETA for seeding torrents that have a seed ratio set
