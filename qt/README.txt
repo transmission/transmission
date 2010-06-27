@@ -1,18 +1,12 @@
-STATUS
-
-   This application is very new and is in beta.  There may be bugs!
-   Also, the name "QTransmission" is a placeholder.
-
 VOLUNTEERS WANTED
 
    - If you find a bug, please report it at http://trac.transmissionbt.com/
    - New translations are encouraged
    - Windows devs: it would be interesting to see if/how this works on Windows
-   - Suggestions for a better name than "QTransmission" would be good ;)
     
-ABOUT QTRANSMISSION
+ABOUT TRANSMISSION-QT
 
-   QTransmission is a GUI for Transmission loosely based on the GTK+ client.
+   Transmission-qt is a GUI for Transmission loosely based on the GTK+ client.
 
    This is the only Transmission client that can act as its own self-contained
    session (as the GTK+ and Mac clients do), and can also connect to a remote
@@ -37,13 +31,10 @@ BUILDING
 
    1. Prerequisites: Qt >= 4.x and its development packages
    2. Build Transmission as normal
-   3. If you want to use the OS'es libevent, edit qtr.pro:
-      - LIBS += $${TRANSMISSION_TOP}/third-party/libevent/.libs/libevent.a
-      + LIBS += -levent
-   4. If you built Transmission without DHT, edit qtr.pro:
+   3. If you built Transmission without DHT, edit qtr.pro:
       - LIBS += $${TRANSMISSION_TOP}/third-party/dht/libdht.a
-   5. In the qt/ directory, type "qmake-qt4 qtr.pro"
-   6. In the qt/ directory, type "make"
-   7. In the qt/ directory, as root, type "INSTALL_ROOT=/usr make install"
+   4. In the qt/ directory, type "qmake-qt4 qtr.pro"
+   5. In the qt/ directory, type "make"
+   6. In the qt/ directory, as root, type "INSTALL_ROOT=/usr make install"
       (Feel free to replace /usr with /usr/local or /opt or whatever)
 
