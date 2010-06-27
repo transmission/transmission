@@ -11,6 +11,7 @@
  */
 
 #include <assert.h>
+#include <limits.h> /* INT_MAX */
 #include <string.h> /* memcpy, memcmp, strstr */
 #include <stdlib.h> /* qsort */
 
@@ -2577,6 +2578,7 @@ struct ChokeData
     tr_bool         isInterested;
     tr_bool         isChoked;
     int             rate;
+    int             salt;
     tr_peer *       peer;
 };
 
@@ -2592,6 +2594,9 @@ compareChoke( const void * va,
 
     if( a->isChoked != b->isChoked ) /* prefer unchoked */
         return a->isChoked ? 1 : -1;
+
+    if( a->salt != b->salt ) /* random order */
+        return a->salt - b->salt;
 
     return 0;
 }
@@ -2640,6 +2645,7 @@ rechokeUploads( Torrent * t, const uint64_t now )
             n->isInterested = peer->peerIsInterested;
             n->isChoked     = peer->peerIsChoked;
             n->rate         = tr_peerGetPieceSpeed( peer, now, TR_CLIENT_TO_PEER ) * 1024;
+            n->salt         = tr_cryptoWeakRandInt( INT_MAX );
         }
     }
 
