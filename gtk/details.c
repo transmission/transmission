@@ -1607,11 +1607,13 @@ setPeerViewColumns( GtkTreeView * peer_view )
 
             case PEER_COL_DOWNLOAD_RATE_STRING:
                 r = gtk_cell_renderer_text_new( );
+                g_object_set( G_OBJECT( r ), "xalign", 1.0f, NULL );
                 c = gtk_tree_view_column_new_with_attributes( t, r, "text", col, NULL );
                 sort_col = PEER_COL_DOWNLOAD_RATE_DOUBLE;
                 break;
             case PEER_COL_UPLOAD_RATE_STRING:
                 r = gtk_cell_renderer_text_new( );
+                g_object_set( G_OBJECT( r ), "xalign", 1.0f, NULL );
                 c = gtk_tree_view_column_new_with_attributes( t, r, "text", col, NULL );
                 sort_col = PEER_COL_UPLOAD_RATE_DOUBLE;
                 break;
