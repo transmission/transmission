@@ -61,16 +61,6 @@ tr_completion * tr_cpConstruct( tr_completion *, tr_torrent * );
 
 tr_completion * tr_cpDestruct( tr_completion * );
 
-static inline tr_completion* tr_cpNew( tr_torrent * tor )
-{
-    return tr_cpConstruct( tr_new0( tr_completion, 1 ), tor );
-}
-
-static inline void tr_cpFree( tr_completion * cp )
-{
-    tr_free( tr_cpDestruct( cp ) );
-}
-
 /**
 *** General
 **/
