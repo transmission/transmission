@@ -1161,16 +1161,12 @@ initPeerRow( GtkListStore        * store,
              const tr_peer_stat  * peer )
 {
     int q[4];
-    char up_speed[128];
-    char down_speed[128];
     char collated_name[128];
     const char * client = peer->client;
 
     if( !client || !strcmp( client, "Unknown Client" ) )
         client = "";
 
-    tr_strlspeed( up_speed, peer->rateToPeer, sizeof( up_speed ) );
-    tr_strlspeed( down_speed, peer->rateToClient, sizeof( down_speed ) );
     if( sscanf( peer->addr, "%d.%d.%d.%d", q, q+1, q+2, q+3 ) != 4 )
         g_strlcpy( collated_name, peer->addr, sizeof( collated_name ) );
     else

@@ -38,7 +38,6 @@ int tr_open_file_for_writing( const char * filename );
 
 void tr_close_file( int fd );
 
-int64_t tr_lseek( int fd, int64_t offset, int whence );
 ssize_t tr_pread(int fd, void *buf, size_t count, off_t offset);
 ssize_t tr_pwrite(int fd, const void *buf, size_t count, off_t offset);
 int tr_prefetch(int fd, off_t offset, size_t count);
