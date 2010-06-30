@@ -752,6 +752,221 @@ setFileDLs( tr_torrent * tor,
     return errmsg;
 }
 
+static tr_bool
+findTrackerById( const tr_info * inf,
+                 uint32_t id,
+                 int * index )
+{
+    int i;
+    tr_bool found = FALSE;
+
+    for( i = 0; i < inf->trackerCount; ++i )
+    {
+        const tr_tracker_info * t = &inf->trackers[i];
+        if( t->id == id )
+        {
+            if( index ) *index = i;
+            found = TRUE;
+            break;
+        }
+    }
+
+    return found;
+}
+
+static tr_bool
+findTrackerByURL( const tr_info * inf,
+                  const char * url,
+                  int * index )
+{
+    int i;
+    tr_bool found = FALSE;
+
+    for( i = 0; i < inf->trackerCount; ++i )
+    {
+        const tr_tracker_info * t = &inf->trackers[i];
+        if( !strcmp( t->announce, url ) )
+        {
+            if( index ) *index = i;
+            found = TRUE;
+            break;
+        }
+    }
+
+    return found;
+}
+
+static const char*
+addTracker( tr_torrent * tor,
+            tr_benc    * tracker )
+{
+    int i;
+    int64_t tmp;
+    tr_bool duplicate = FALSE;
+    const char * errmsg = NULL;
+    const char * announce;
+    const tr_info * inf = tr_torrentInfo( tor );
+
+    if( !tr_bencDictFindStr( tracker, "announce", &announce ) )
+        return "no announce url supplied";
+
+    duplicate = findTrackerByURL( inf, announce, NULL );
+
+    if( !duplicate )
+    {
+        int tier, trackerCount;
+        tr_tracker_info * trackers = tr_new0( tr_tracker_info, inf->trackerCount + 1 );
+
+        if( tr_bencDictFindInt( tracker, "tier", &tmp ) )
+            tier = (int)tmp;
+        else
+            tier = -1;
+
+        for( i = 0; i < inf->trackerCount; ++i )
+        {
+            const tr_tracker_info * t = &inf->trackers[i];
+            trackers[i].tier = t->tier;
+            trackers[i].announce = tr_strdup( t->announce );
+        }
+        trackers[i].tier = tier < 0 ? trackers[i-1].tier + 1 : tier;
+        trackers[i].announce = tr_strdup( announce );
+        trackerCount = inf->trackerCount + 1;
+
+        if( !tr_torrentSetAnnounceList( tor, trackers, trackerCount ) )
+            errmsg = "tracker URL was invalid";
+
+        for( i = 0; i < trackerCount; ++i )
+            tr_free( trackers[i].announce );
+        tr_free( trackers );
+    }
+    else
+        errmsg = "tracker already exists";
+
+    return errmsg;
+}
+
+static const char*
+editTracker( tr_torrent * tor,
+             tr_benc    * tracker )
+{
+    int trackerIndex;
+    int64_t tmp;
+    tr_bool found = FALSE;
+    const char * errmsg = NULL;
+    const char * announce;
+    const tr_info * inf = tr_torrentInfo( tor );
+
+    if( tr_bencDictFindInt( tracker, "id", &tmp ) )
+        found = findTrackerById( inf, (uint32_t)tmp, &trackerIndex );
+    else if( tr_bencDictFindStr( tracker, "announce", &announce ) )
+        found = findTrackerByURL( inf, announce, &trackerIndex );
+    else
+        errmsg = "no tracker supplied";
+
+    if( found )
+    {
+        int tier;
+        const char * new;
+        tr_bool rename = FALSE;
+        tr_bool move = FALSE;
+
+        if( tr_bencDictFindStr( tracker, "announce-new", &new ) )
+        {
+            rename = !findTrackerByURL( inf, new, NULL );
+            if( !rename )
+                errmsg = "tracker already exists";
+        }
+        if( tr_bencDictFindInt( tracker, "tier", &tmp ) )
+        {
+            tier = (int)tmp;
+            move = TRUE;
+        }
+
+        if( ( rename || move ) && !errmsg )
+        {
+            int i, trackerCount;
+            tr_tracker_info * trackers = tr_new0( tr_tracker_info, inf->trackerCount );
+
+            for( i = 0; i < inf->trackerCount; ++i )
+            {
+                const tr_tracker_info * t = &inf->trackers[i];
+                if( i != trackerIndex )
+                {
+                    trackers[i].tier = t->tier;
+                    trackers[i].announce = tr_strdup( t->announce );
+                }
+                else
+                {
+                    trackers[i].tier = move ? tier : t->tier;
+                    trackers[i].announce = tr_strdup( rename ? new : t->announce );
+                }
+            }
+            trackerCount = i;
+
+            if( !tr_torrentSetAnnounceList( tor, trackers, trackerCount ) )
+                errmsg = "error setting announce list";
+
+            for( i = 0; i < trackerCount; ++i )
+                tr_free( trackers[i].announce );
+            tr_free( trackers );
+        }
+        else if( !errmsg )
+            errmsg = "no operation supplied";
+    }
+    else
+        errmsg = "tracker doesn't exists";
+
+    return errmsg;
+}
+
+static const char*
+removeTracker( tr_torrent * tor,
+               tr_benc * tracker  )
+{
+    int trackerIndex;
+    int64_t tmp;
+    tr_bool found = FALSE;
+    const char * errmsg = NULL;
+    const char * announce;
+    const tr_info * inf = tr_torrentInfo( tor );
+
+    if( tr_bencDictFindInt( tracker, "id", &tmp ) )
+        found = findTrackerById( inf, (uint32_t)tmp, &trackerIndex );
+    else if( tr_bencDictFindStr( tracker, "announce", &announce ) )
+        found = findTrackerByURL( inf, announce, &trackerIndex );
+    else
+        errmsg = "no tracker supplied";
+
+    if( found )
+    {
+        int i, j, trackerCount;
+        tr_tracker_info * trackers = tr_new0( tr_tracker_info, inf->trackerCount - 1 );
+
+        for( i = 0, j = 0; i < inf->trackerCount; ++i )
+        {
+            if( i != trackerIndex )
+            {
+                const tr_tracker_info * t = &inf->trackers[i];
+                trackers[j].tier = t->tier;
+                trackers[j].announce = tr_strdup( t->announce );
+                ++j;
+            }
+        }
+        trackerCount = j;
+
+        if( !tr_torrentSetAnnounceList( tor, trackers, trackerCount ) )
+            errmsg = "error setting announce list";
+
+        for( i = 0; i < trackerCount; ++i )
+            tr_free( trackers[i].announce );
+        tr_free( trackers );
+    }
+    else
+        errmsg = "tracker doesn't exists";
+
+    return errmsg;
+}
+
 static const char*
 torrentSet( tr_session               * session,
             tr_benc                  * args_in,
@@ -769,6 +984,7 @@ torrentSet( tr_session               * session,
         int64_t      tmp;
         double       d;
         tr_benc *    files;
+        tr_benc *    tracker;
         tr_bool      boolVal;
         tr_torrent * tor = torrents[i];
 
@@ -801,6 +1017,12 @@ torrentSet( tr_session               * session,
             tr_torrentSetRatioLimit( tor, d );
         if( tr_bencDictFindInt( args_in, "seedRatioMode", &tmp ) )
             tr_torrentSetRatioMode( tor, tmp );
+        if( !errmsg && tr_bencDictFindDict( args_in, "trackerAdd", &tracker ) )
+            errmsg = addTracker( tor, tracker );
+        if( !errmsg && tr_bencDictFindDict( args_in, "trackerEdit", &tracker ) )
+            errmsg = editTracker( tor, tracker );
+        if( !errmsg && tr_bencDictFindDict( args_in, "trackerRemove", &tracker ) )
+            errmsg = removeTracker( tor, tracker );
         notify( session, TR_RPC_TORRENT_CHANGED, tor );
     }
 

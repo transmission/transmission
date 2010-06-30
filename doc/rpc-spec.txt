@@ -102,8 +102,31 @@
    "priority-normal"     | array      indices of normal-priority file(s)
    "seedRatioLimit"      | double     session seeding ratio
    "seedRatioMode"       | number     which ratio to use.  See tr_ratiolimit
+   "trackerAdd"          | object     (see below)
+   "trackerEdit"         | object     (see below)
+   "trackerRemove"       | object     (see below)
    "uploadLimit"         | number     maximum upload speed (in K/s)
    "uploadLimited"       | boolean    true if "uploadLimit" is honored
+                         |
+   ----------------------+---------------------------------+
+   trackerAdd            | an object containing:           |
+                         +-----------------------+---------+
+                         | announce              | string  | announce URL of the tracker
+                         | tier (optional)       | number  | tier to add the tracker to
+   ----------------------+---------------------------------+
+   trackerEdit           | an object containing:           |
+                         +-----------------------+---------+
+                         | announce (or id)      | string  | announce URL of the tracker to modify
+                         | id (or announce)      | number  | trackerId of the tracker to modify (see trackerStats)
+                         +-----------------------+---------+
+                         | announce-new          | string  | new announce URL for the tracker
+                         | tier                  | number  | tier to change the tracker to
+   ----------------------+---------------------------------+
+   trackerRemove         | an object containing:           |
+                         +-----------------------+---------+
+                         | announce (or id)      | string  | announce URL of the tracker to remove
+                         | id (or announce)      | number  | trackerId of the tracker to remove (see trackerStats)
+                         +-----------------------+---------+
 
    Just as an empty "ids" value is shorthand for "all ids", using an empty array
    for "files-wanted", "files-unwanted", "priority-high", "priority-low", or
@@ -601,3 +624,7 @@
          | 2.00    | yes       | session-get    | new arg "trash-original-torrent-files"
          | 2.00    | yes       | session-get    | new arg "cache-size-MiB"
          | 2.00    | yes       | torrent-get    | new arg "isFinished"
+   ------+---------+-----------+----------------+-------------------------------
+   10    | 2.10    | yes       | torrent-set    | new arg "trackerAdd"
+         | 2.10    | yes       | torrent-set    | new arg "trackerEdit"
+         | 2.10    | yes       | torrent-set    | new arg "trackerRemove"
