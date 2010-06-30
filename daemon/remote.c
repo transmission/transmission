@@ -244,6 +244,8 @@ static tr_option opts[] =
     { 952, "no-seedratio",           "Let the current torrent(s) seed regardless of ratio", "SR", 0, NULL },
     { 953, "global-seedratio",       "All torrents, unless overridden by a per-torrent setting, should seed until a specific ratio", "gsr", 1, "ratio" },
     { 954, "no-global-seedratio",    "All torrents, unless overridden by a per-torrent setting, should seed regardless of ratio", "GSR", 0, NULL },
+    { 710, "tracker-add",            "Add a tracker to a torrent", "ta", 1, "<tracker>" },
+    { 712, "tracker-remove",         "Remove a tracker from a torrent", "tr", 1, "<trackerId>" },
     { 's', "start",                  "Start the current torrent(s)", "s",  0, NULL },
     { 'S', "stop",                   "Stop the current torrent(s)", "S",  0, NULL },
     { 't', "torrent",                "Set the current torrent(s)", "t",  1, "<torrent>" },
@@ -355,6 +357,7 @@ getOptMode( int val )
         case 993: /* no-trash-torrent */
             return MODE_SESSION_SET;
 
+        case 712: /* tracker-remove */
         case 950: /* seedratio */
         case 951: /* seedratio-default */
         case 952: /* no-seedratio */
@@ -370,6 +373,7 @@ getOptMode( int val )
         case 700: /* torrent priority-high */
         case 701: /* torrent priority-normal */
         case 702: /* torrent priority-low */
+        case 710: /* tracker-add */
         case 900: /* file priority-high */
         case 901: /* file priority-normal */
         case 902: /* file priority-low */
@@ -1934,6 +1938,12 @@ processArgs( const char * host, int port, int argc, const char ** argv )
 
             switch( c )
             {
+                case 712:
+                    {
+                        tr_benc * trackers = tr_bencDictAddDict( args, "trackerRemove", 1 );
+                        tr_bencDictAddInt( trackers, "id", atoi(optarg) );
+                        break;
+                    }
                 case 950: tr_bencDictAddReal( args, "seedRatioLimit", atof(optarg) );
                           tr_bencDictAddInt( args, "seedRatioMode", TR_RATIOLIMIT_SINGLE );
                           break;
@@ -1976,6 +1986,12 @@ processArgs( const char * host, int port, int argc, const char ** argv )
                           break;
                 case 702: tr_bencDictAddInt( args, "bandwidthPriority", -1 );
                           break;
+                case 710:
+                     {
+                         tr_benc * trackers = tr_bencDictAddDict( args, "trackerAdd", 1 );
+                         tr_bencDictAddStr( trackers, "announce", optarg );
+                         break;
+                     }
                 default:  assert( "unhandled value" && 0 );
                           break;
             }
