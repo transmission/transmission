@@ -511,7 +511,7 @@ static int tr_lpdConsiderAnnounce( tr_pex* peer, const char* const msg )
             return 0;
 
         /* determine announced peer port, refuse if value too large */
-        if( sscanf( value, "%u", &peerPort ) != 1 || peerPort > (in_port_t)-1 )
+        if( sscanf( value, "%d", &peerPort ) != 1 || peerPort > (in_port_t)-1 )
             return 0;
 
         peer->port = htons( peerPort );

@@ -118,15 +118,15 @@ void tr_msgInit( void );
 
 #define TR_MAX_MSG_LOG 10000
 
-extern int messageLevel;
+extern tr_msg_level messageLevel;
 
-static inline tr_bool tr_msgLoggingIsActive( int level )
+static inline tr_bool tr_msgLoggingIsActive( tr_msg_level level )
 {
     return messageLevel >= level;
 }
 
 void tr_msg( const char * file, int line,
-             int level,
+             tr_msg_level level,
              const char * torrent,
              const char * fmt, ... ) TR_GNUC_PRINTF( 5, 6 );
 

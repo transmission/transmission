@@ -185,8 +185,8 @@ struct tr_torrent
     uint32_t                   lastBlockSize;
     uint32_t                   lastPieceSize;
 
-    uint32_t                   blockCountInPiece;
-    uint32_t                   blockCountInLastPiece;
+    uint16_t                   blockCountInPiece;
+    uint16_t                   blockCountInLastPiece;
 
     struct tr_completion       completion;
 
@@ -273,7 +273,7 @@ tr_torBlockPiece( const tr_torrent * tor, const tr_block_index_t block )
 }
 
 /* how many blocks are in this piece? */
-static inline uint32_t
+static inline uint16_t
 tr_torPieceCountBlocks( const tr_torrent * tor, const tr_piece_index_t piece )
 {
     return piece == tor->info.pieceCount - 1 ? tor->blockCountInLastPiece

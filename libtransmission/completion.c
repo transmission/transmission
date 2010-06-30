@@ -186,7 +186,7 @@ tr_cpSetHaveAll( tr_completion * cp )
 tr_bool
 tr_cpBlockBitfieldSet( tr_completion * cp, tr_bitfield * blockBitfield )
 {
-    int success = FALSE;
+    tr_bool success = FALSE;
 
     assert( cp );
     assert( blockBitfield );
@@ -198,7 +198,7 @@ tr_cpBlockBitfieldSet( tr_completion * cp, tr_bitfield * blockBitfield )
         tr_block_index_t b = 0;
         tr_piece_index_t p = 0;
         uint32_t pieceBlock = 0;
-        uint32_t completeBlocksInPiece = 0;
+        uint16_t completeBlocksInPiece = 0;
         tr_block_index_t completeBlocksInTorrent = 0;
         uint32_t blocksInCurrentPiece = tr_torPieceCountBlocks( cp->tor, p );
 

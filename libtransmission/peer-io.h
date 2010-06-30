@@ -77,11 +77,11 @@ typedef struct tr_peerIo
 
     tr_priority_t         priority;
 
-    int                   pendingEvents;
+    short int             pendingEvents;
 
     int                   magicNumber;
 
-    uint8_t               encryptionMode;
+    uint32_t              encryptionMode;
     tr_bool               isSeed;
 
     tr_port               port;
@@ -276,10 +276,10 @@ typedef enum
 }
 EncryptionMode;
 
-void      tr_peerIoSetEncryption( tr_peerIo * io,
-                                  int         encryptionMode );
+void tr_peerIoSetEncryption( tr_peerIo * io, uint32_t encryptionMode );
 
-static inline tr_bool tr_peerIoIsEncrypted( const tr_peerIo * io )
+static inline tr_bool
+tr_peerIoIsEncrypted( const tr_peerIo * io )
 {
     return ( io != NULL ) && ( io->encryptionMode == PEER_ENCRYPTION_RC4 );
 }

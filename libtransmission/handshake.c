@@ -99,6 +99,8 @@ enum
 #define HANDSHAKE_SET_EXTPREF( reserved, val ) ( ( reserved )[5] |= 0x03 &\
                                                                     ( val ) )
 
+typedef uint8_t handshake_state_t;
+
 struct tr_handshake
 {
     tr_bool               haveReadAnythingFromPeer;
@@ -108,7 +110,7 @@ struct tr_handshake
     tr_crypto *           crypto;
     tr_session *          session;
     uint8_t               mySecret[KEY_LEN];
-    uint8_t               state;
+    handshake_state_t     state;
     tr_encryption_mode    encryptionMode;
     uint16_t              pad_c_len;
     uint16_t              pad_d_len;
@@ -155,7 +157,7 @@ enum
     } while( 0 )
 
 static const char*
-getStateName( short state )
+getStateName( const handshake_state_t state )
 {
     const char * str = "f00!";
 
@@ -198,16 +200,14 @@ getStateName( short state )
 }
 
 static void
-setState( tr_handshake * handshake,
-          short          state )
+setState( tr_handshake * handshake, handshake_state_t state )
 {
     dbgmsg( handshake, "setting to state [%s]", getStateName( state ) );
     handshake->state = state;
 }
 
 static void
-setReadState( tr_handshake * handshake,
-              int            state )
+setReadState( tr_handshake * handshake, handshake_state_t state )
 {
     setState( handshake, state );
 }
@@ -588,8 +588,7 @@ readPadD( tr_handshake *    handshake,
     tr_peerIoReadBytes( handshake->io, inbuf, tmp, needlen );
     tr_free( tmp );
 
-    tr_peerIoSetEncryption( handshake->io,
-                            handshake->crypto_select );
+    tr_peerIoSetEncryption( handshake->io, handshake->crypto_select );
 
     setState( handshake, AWAITING_HANDSHAKE );
     return READ_NOW;
@@ -725,7 +724,7 @@ static int
 readPeerId( tr_handshake    * handshake,
             struct evbuffer * inbuf )
 {
-    int  peerIsGood;
+    tr_bool peerIsGood;
     char client[128];
     tr_torrent * tor;
     const uint8_t * tor_peer_id;
@@ -746,7 +745,7 @@ readPeerId( tr_handshake    * handshake,
     tor = tr_torrentFindFromHash( handshake->session, tr_peerIoGetTorrentHash( handshake->io ) );
     tor_peer_id = tor && tor->peer_id ? tor->peer_id : tr_getPeerId( );
     peerIsGood = memcmp( peer_id, tor_peer_id, PEER_ID_LEN ) != 0;
-    dbgmsg( handshake, "isPeerGood == %d", peerIsGood );
+    dbgmsg( handshake, "isPeerGood == %d", (int)peerIsGood );
     return tr_handshakeDone( handshake, peerIsGood );
 }
 
@@ -965,7 +964,7 @@ readIA( tr_handshake *    handshake,
      * PadD is reserved for future extensions to the handshake...
      * standard practice at this time is for it to be zero-length */
     {
-        const int len = 0;
+        const uint16_t len = 0;
         tr_peerIoWriteUint16( handshake->io, outbuf, len );
     }
 
@@ -1096,19 +1095,18 @@ canRead( struct tr_peerIo * io, void * arg, size_t * piece )
     return ret;
 }
 
-static int
-fireDoneFunc( tr_handshake * handshake,
-              tr_bool        isConnected )
+static tr_bool
+fireDoneFunc( tr_handshake * handshake, tr_bool isConnected )
 {
     const uint8_t * peer_id = isConnected && handshake->havePeerID
                             ? tr_peerIoGetPeersId( handshake->io )
                             : NULL;
-    const int success = ( *handshake->doneCB )( handshake,
-                                                handshake->io,
-                                                handshake->haveReadAnythingFromPeer,
-                                                isConnected,
-                                                peer_id,
-                                                handshake->doneUserData );
+    const tr_bool success = ( *handshake->doneCB )( handshake,
+                                                    handshake->io,
+                                                    handshake->haveReadAnythingFromPeer,
+                                                    isConnected,
+                                                    peer_id,
+                                                    handshake->doneUserData );
 
     return success;
 }

@@ -65,8 +65,7 @@ isSomething( const tr_benc * val )
 }
 
 static void
-tr_bencInit( tr_benc * val,
-             int       type )
+tr_bencInit( tr_benc * val, char type )
 {
     memset( val, 0, sizeof( *val ) );
     val->type = type;
@@ -468,10 +467,9 @@ tr_bencGetInt( const tr_benc * val,
 }
 
 tr_bool
-tr_bencGetStr( const tr_benc * val,
-               const char **   setme )
+tr_bencGetStr( const tr_benc * val, const char ** setme )
 {
-    const int success = tr_bencIsString( val );
+    const tr_bool success = tr_bencIsString( val );
 
     if( success )
         *setme = getStr( val );

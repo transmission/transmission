@@ -634,7 +634,7 @@ tr_peerIoClear( tr_peerIo * io )
 int
 tr_peerIoReconnect( tr_peerIo * io )
 {
-    int pendingEvents;
+    short int pendingEvents;
     tr_session * session;
 
     assert( tr_isPeerIo( io ) );
@@ -745,8 +745,7 @@ tr_peerIoGetWriteBufferSpace( const tr_peerIo * io, uint64_t now )
 **/
 
 void
-tr_peerIoSetEncryption( tr_peerIo * io,
-                        int         encryptionMode )
+tr_peerIoSetEncryption( tr_peerIo * io, uint32_t encryptionMode )
 {
     assert( tr_isPeerIo( io ) );
     assert( encryptionMode == PEER_ENCRYPTION_NONE

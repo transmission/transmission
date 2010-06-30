@@ -60,7 +60,7 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
     tr_piece_index_t pieceIndex = 0;
     const time_t begin = tr_time( );
     time_t end;
-    const int64_t buflen = 1024 * 128; /* 128 KiB buffer */
+    const size_t buflen = 1024 * 128; /* 128 KiB buffer */
     uint8_t * buffer = tr_valloc( buflen );
 
     tr_torrentUncheck( tor );
@@ -69,9 +69,9 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
 
     while( !*stopFlag && ( pieceIndex < tor->info.pieceCount ) )
     {
-        int64_t leftInPiece;
-        int64_t leftInFile;
-        int64_t bytesThisPass;
+        uint32_t leftInPiece;
+        uint32_t bytesThisPass;
+        uint64_t leftInFile;
         const tr_file * file = &tor->info.files[fileIndex];
 
         /* if we're starting a new piece... */
@@ -101,7 +101,7 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
         /* read a bit */
         if( fd >= 0 ) {
             const ssize_t numRead = tr_pread( fd, buffer, bytesThisPass, filePos );
-            if( numRead == bytesThisPass )
+            if( numRead == (ssize_t)bytesThisPass )
                 SHA1_Update( &sha, buffer, numRead );
             if( numRead > 0 ) {
                 pieceBytesRead += numRead;

@@ -56,7 +56,7 @@
 
 time_t transmission_now = 0;
 
-int                   messageLevel = TR_MSG_INF;
+tr_msg_level messageLevel = TR_MSG_INF;
 static tr_lock *      messageLock = NULL;
 static tr_bool        messageQueuing = FALSE;
 static tr_msg_list *  messageQueue = NULL;
@@ -114,12 +114,12 @@ tr_getLog( void )
 }
 
 void
-tr_setMessageLevel( int level )
+tr_setMessageLevel( tr_msg_level level )
 {
-    messageLevel = MAX( 0, level );
+    messageLevel = level;
 }
 
-int
+tr_msg_level
 tr_getMessageLevel( void )
 {
     return messageLevel;
@@ -255,7 +255,8 @@ tr_deepLog( const char  * file,
 
 void
 tr_msg( const char * file, int line,
-        int level, const char * name,
+        tr_msg_level level,
+        const char * name,
         const char * fmt, ... )
 {
     const int err = errno; /* message logging shouldn't affect errno */
@@ -463,7 +464,7 @@ tr_loadFile( const char * path,
     struct stat  sb;
     int fd;
     ssize_t n;
-    const char * err_fmt = _( "Couldn't read \"%1$s\": %2$s" );
+    const char * const err_fmt = _( "Couldn't read \"%1$s\": %2$s" );
 
     /* try to stat the file */
     errno = 0;
@@ -500,7 +501,7 @@ tr_loadFile( const char * path,
         errno = err;
         return NULL;
     }
-    n = read( fd, buf, sb.st_size );
+    n = read( fd, buf, (size_t)sb.st_size );
     if( n == -1 )
     {
         const int err = errno;
@@ -1391,7 +1392,7 @@ tr_moveFile( const char * oldpath, const char * newpath, tr_bool * renamed )
     char * buf;
     struct stat st;
     off_t bytesLeft;
-    const off_t buflen = 1024 * 128; /* 128 KiB buffer */
+    const size_t buflen = 1024 * 128; /* 128 KiB buffer */
 
     /* make sure the old file exists */
     if( stat( oldpath, &st ) ) {

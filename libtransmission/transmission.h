@@ -771,20 +771,22 @@ void tr_sessionSetTorrentDoneScript( tr_session *, const char * scriptFilename )
 ** Message Logging
 */
 
-enum
+typedef enum
 {
     TR_MSG_ERR = 1,
     TR_MSG_INF = 2,
     TR_MSG_DBG = 3
-};
-void tr_setMessageLevel( int );
+}
+tr_msg_level;
 
-int  tr_getMessageLevel( void );
+void tr_setMessageLevel( tr_msg_level );
+
+tr_msg_level tr_getMessageLevel( void );
 
 typedef struct tr_msg_list
 {
     /* TR_MSG_ERR, TR_MSG_INF, or TR_MSG_DBG */
-    uint8_t level;
+    tr_msg_level level;
 
     /* The line number in the source file where this message originated */
     int line;

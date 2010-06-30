@@ -368,12 +368,12 @@ tr_cryptoRandBuf( void * buf, size_t len )
 char*
 tr_ssha1( const void * plaintext )
 {
+    enum { saltval_len = 8,
+           salter_len  = 64 };
     static const char * salter = "0123456789"
                                  "abcdefghijklmnopqrstuvwxyz"
                                  "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                  "./";
-    const size_t salter_len = 64;
-    const size_t saltval_len = 8;
 
     size_t i;
     char salt[saltval_len];
