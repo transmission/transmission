@@ -21,27 +21,27 @@
 #endif
 
 #include <assert.h>
-#include <ctype.h> /* isalpha, tolower */
+#include <ctype.h> /* isalpha(), tolower() */
 #include <errno.h>
-#include <math.h> /* pow */
+#include <math.h> /* pow(), fabs() */
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h> /* strerror, memset, memmem */
+#include <string.h> /* strerror(), memset(), memmem() */
 
-#include <libgen.h> /* basename */
+#include <libgen.h> /* basename() */
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h> /* usleep, stat, getcwd, getpagesize */
+#include <unistd.h> /* usleep(), stat(), getcwd(), getpagesize() */
 
 #include "event.h"
 
 #ifdef WIN32
  #include <w32api.h>
- #define WINVER WindowsXP /* freeaddrinfo(),getaddrinfo(),getnameinfo() */
- #include <direct.h> /* _getcwd */
- #include <windows.h> /* Sleep */
+ #define WINVER WindowsXP /* freeaddrinfo(), getaddrinfo(), getnameinfo() */
+ #include <direct.h> /* _getcwd() */
+ #include <windows.h> /* Sleep() */
 #endif
 
 #include "transmission.h"
@@ -861,14 +861,13 @@ tr_strlcpy( char *       dst,
 ***/
 
 double
-tr_getRatio( double numerator,
-             double denominator )
+tr_getRatio( double numerator, double denominator )
 {
     double ratio;
 
-    if( denominator )
+    if( fabs(denominator) > 0.01 )
         ratio = numerator / denominator;
-    else if( numerator )
+    else if( fabs(numerator) > 0.01 )
         ratio = TR_RATIO_INF;
     else
         ratio = TR_RATIO_NA;
