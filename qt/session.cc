@@ -419,6 +419,20 @@ Session :: torrentSet( const QSet<int>& ids, const QString& key, const QList<int
 }
 
 void
+Session :: torrentSet( const QSet<int>& ids, const QString& key, const tr_benc * value )
+{
+    tr_benc top;
+    tr_bencInitDict( &top, 2 );
+    tr_bencDictAddStr( &top, "method", "torrent-set" );
+    tr_benc * args( tr_bencDictAddDict( &top, "arguments", 2 ) );
+    addOptionalIds( args, ids );
+    tr_benc * child( tr_bencDictAdd( args, key.toUtf8().constData() ) );
+    memcpy( child, value, sizeof(tr_benc) );
+    exec( &top );
+    tr_bencFree( &top );
+}
+
+void
 Session :: torrentSetLocation( const QSet<int>& ids, const QString& location, bool doMove )
 {
     tr_benc top;

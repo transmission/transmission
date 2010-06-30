@@ -45,7 +45,6 @@ class Prefs: public QObject
             SORT_MODE,
             SORT_REVERSED,
             COMPACT_VIEW,
-            SHOW_BACKUP_TRACKERS,
             FILTERBAR,
             STATUSBAR,
             STATUSBAR_STATS,
