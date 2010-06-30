@@ -322,7 +322,7 @@ static inline void tr_free( void * p )
  * @param byteCount the number of bytes to copy
  * @return a newly-allocated copy of `src' that can be freed with tr_free()
  */
-static inline void* tr_memdup( const void * src, int byteCount )
+static inline void* tr_memdup( const void * src, size_t byteCount )
 {
     return memcpy( tr_malloc( byteCount ), src, byteCount );
 }
@@ -353,7 +353,7 @@ char* tr_strndup( const void * in, int len ) TR_GNUC_MALLOC;
  */
 static inline char* tr_strdup( const void * in )
 {
-    return tr_strndup( in, in ? strlen( (const char *) in ) : 0 );
+    return tr_strndup( in, in ? (int)strlen((const char *)in) : 0 );
 }
 
 /** @brief similar to bsearch() but returns the index of the lower bound */
@@ -521,10 +521,10 @@ int tr_moveFile( const char * oldpath, const char * newpath,
                  tr_bool * renamed ) TR_GNUC_NONNULL(1,2);
 
 /** @brief convenience function to remove an item from an array */
-static inline void tr_removeElementFromArray( void   * array,
-                                              int      index_to_remove,
-                                              size_t   sizeof_element,
-                                              size_t   nmemb )
+static inline void tr_removeElementFromArray( void         * array,
+                                              unsigned int   index_to_remove,
+                                              size_t         sizeof_element,
+                                              size_t         nmemb )
 {
     char * a = (char*) array;
 

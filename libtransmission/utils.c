@@ -122,35 +122,19 @@ tr_setMessageLevel( int level )
 int
 tr_getMessageLevel( void )
 {
-    int ret;
-    tr_lockLock( messageLock );
-
-    ret = messageLevel;
-
-    tr_lockUnlock( messageLock );
-    return ret;
+    return messageLevel;
 }
 
 void
 tr_setMessageQueuing( tr_bool enabled )
 {
-    tr_lockLock( messageLock );
-
     messageQueuing = enabled;
-
-    tr_lockUnlock( messageLock );
 }
 
 tr_bool
 tr_getMessageQueuing( void )
 {
-    int ret;
-    tr_lockLock( messageLock );
-
-    ret = messageQueuing;
-
-    tr_lockUnlock( messageLock );
-    return ret;
+    return messageQueuing != 0;
 }
 
 tr_msg_list *
