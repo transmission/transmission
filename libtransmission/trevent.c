@@ -95,10 +95,9 @@ static int
 piperead( int s, char *buf, int len )
 {
     int ret = recv(s, buf, len, 0);
-    int werror = 0;
 
     if (ret < 0) {
-        werror= WSAGetLastError();
+        const int werror= WSAGetLastError();
         switch(werror) {
           /* simplified error mapping (not valid for connect) */
             case WSAEWOULDBLOCK:

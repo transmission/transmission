@@ -24,7 +24,7 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <io.h>
-#include <IPHlpApi.h>
+#include <iphlpapi.h>
 #define snprintf _snprintf
 #if defined(_MSC_VER) && (_MSC_VER >= 1400)
 #define strncasecmp _memicmp

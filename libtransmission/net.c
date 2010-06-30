@@ -147,6 +147,18 @@ tr_netInit( void )
     }
 }
 
+char *
+tr_net_strerror( char * buf, size_t buflen, int err )
+{
+    *buf = '\0';
+#ifdef WIN32
+    FormatMessage( FORMAT_MESSAGE_FROM_SYSTEM, NULL, e, 0, buf, buflen, NULL );
+#else
+    tr_strlcpy( buf, tr_strerror( err ), buflen );
+#endif
+    return buf;
+}
+
 const char *
 tr_ntop( const tr_address * src, char * dst, int size )
 {

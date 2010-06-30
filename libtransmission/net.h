@@ -122,6 +122,12 @@ void tr_netCloseSocket( int fd );
 
 void tr_netInit( void );
 
+/**
+ * @brief get a human-representable string representing the network error.
+ * @param err an errno on Unix/Linux and an WSAError on win32)
+ */
+char* tr_net_strerror( char * buf, size_t buflen, int err );
+
 const unsigned char *tr_globalIPv6( void );
 
 #if defined( WIN32) && !defined(QT_DLL)

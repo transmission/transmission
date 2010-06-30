@@ -25,14 +25,24 @@ THE SOFTWARE.
 #include <stdio.h>
 
 /* posix */
-#include <netinet/in.h> /* sockaddr_in */
 #include <signal.h> /* sig_atomic_t */
 #include <sys/time.h>
-#include <sys/types.h>
-#include <sys/socket.h> /* socket(), bind() */
 #include <unistd.h> /* close() */
 #include <fcntl.h> /* fcntl(), O_NONBLOCK */
 #include <ctype.h> /* toupper() */
+#ifdef WIN32
+  #include <w32api.h>
+  #define WINDOWS  WindowsXP  /* freeaddrinfo(),getaddrinfo(),getnameinfo() */
+  #include <inttypes.h>
+  #include <ws2tcpip.h>
+  typedef uint16_t in_port_t;			/* all missing */
+  extern int fcntl (int fd, int cmd, ...);
+  #define O_NONBLOCK	04000
+#else
+  #include <sys/types.h>
+  #include <sys/socket.h> /* socket(), bind() */
+  #include <netinet/in.h> /* sockaddr_in */
+#endif
 
 /* third party */
 #include <event.h>
@@ -246,6 +256,14 @@ static int lpd_extractParam( const char* const str, const char* const name, int 
 * @brief Configures additional capabilities for a socket */
 static inline int lpd_configureSocket( int sock, int add )
 {
+#ifdef WIN32
+    unsigned long flags = 1;
+
+    if (add != O_NONBLOCK)
+        return -1;		/* not supported */
+    if (ioctlsocket(sock, FIONBIO, &flags) == SOCKET_ERROR)
+        return -1;
+#else
     /* read-modify-write socket flags */
     int flags = fcntl( sock, F_GETFL );
 
@@ -254,6 +272,7 @@ static inline int lpd_configureSocket( int sock, int add )
 
     if( fcntl( sock, F_SETFL, add | flags ) == -1 )
         return -1;
+#endif
 
     return add;
 }

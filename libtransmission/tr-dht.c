@@ -87,12 +87,11 @@ bootstrap_done( tr_session *session, int af )
 }
 
 static void
-nap( int roughly )
+nap( int roughly_sec )
 {
-    struct timeval tv;
-    tv.tv_sec = roughly / 2 + tr_cryptoWeakRandInt( roughly );
-    tv.tv_usec = tr_cryptoWeakRandInt( 1000000 );
-    select( 0, NULL, NULL, NULL, &tv );
+    const int roughly_msec = roughly_sec * 1000;
+    const int msec = roughly_msec/2 + tr_cryptoWeakRandInt(roughly_msec);
+    tr_wait_msec( msec );
 }
 
 static int
