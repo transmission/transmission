@@ -544,6 +544,7 @@ addURLDialog( GtkWindow * parent, TrCore * core )
     t = hig_workarea_create( );
     hig_workarea_add_section_title( t, &row, _( "Add torrent from URL" ) );
     e = gtk_entry_new( );
+    gtk_widget_set_size_request( e, 400, -1 );
     paste_clipboard_url_into_entry( e );
     g_object_set_data( G_OBJECT( w ), "url-entry", e );
     hig_workarea_add_row( t, &row, _( "_URL" ), e, NULL );
