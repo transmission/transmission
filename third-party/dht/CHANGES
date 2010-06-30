@@ -1,3 +1,7 @@
+1 July 2010: dht-0.15
+
+  * Port to Windows, for the needs of Transmission.
+
 25 March 2010: dht-0.14
 
   * Fixed ordering of entries in parameter dictionaries.
