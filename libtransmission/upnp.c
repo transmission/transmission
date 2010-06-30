@@ -77,6 +77,14 @@ tr_upnpClose( tr_upnp * handle )
 ***
 **/
 
+enum
+{
+  UPNP_IGD_NONE = 0,
+  UPNP_IGD_VALID_CONNECTED = 1,
+  UPNP_IGD_VALID_NOT_CONNECTED = 2,
+  UPNP_IGD_INVALID = 3
+};
+
 int
 tr_upnpPulse( tr_upnp * handle,
               int       port,
@@ -98,7 +106,7 @@ tr_upnpPulse( tr_upnp * handle,
         }
         errno = 0;
         if( UPNP_GetValidIGD( devlist, &handle->urls, &handle->data,
-                             handle->lanaddr, sizeof( handle->lanaddr ) ) )
+                             handle->lanaddr, sizeof( handle->lanaddr ) ) == UPNP_IGD_VALID_CONNECTED )
         {
             tr_ninf( getKey( ), _(
                          "Found Internet Gateway Device \"%s\"" ),
