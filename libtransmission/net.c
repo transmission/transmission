@@ -152,7 +152,7 @@ tr_net_strerror( char * buf, size_t buflen, int err )
 {
     *buf = '\0';
 #ifdef WIN32
-    FormatMessage( FORMAT_MESSAGE_FROM_SYSTEM, NULL, e, 0, buf, buflen, NULL );
+    FormatMessage( FORMAT_MESSAGE_FROM_SYSTEM, NULL, err, 0, buf, buflen, NULL );
 #else
     tr_strlcpy( buf, tr_strerror( err ), buflen );
 #endif

@@ -256,6 +256,7 @@ tr_select( int nfds,
 #ifdef WIN32
     if( !r_fd_set->fd_count && !w_fd_set->fd_count && !c_fd_set->fd_count )
     {
+        const long int msec = t->tv_sec*1000 + t->tv_usec/1000;
         tr_wait_msec( msec );
     }
     else if( select( 0, r_fd_set->fd_count ? r_fd_set : NULL,

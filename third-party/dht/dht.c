@@ -66,6 +66,7 @@ THE SOFTWARE.
 #ifdef WIN32
 
 #define EAFNOSUPPORT WSAEAFNOSUPPORT
+#define EAGAIN WSAEWOULDBLOCK
 static int
 set_nonblocking(int fd, int nonblocking)
 {
