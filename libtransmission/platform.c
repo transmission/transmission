@@ -69,14 +69,13 @@ tr_getCurrentThread( void )
 #endif
 }
 
-static int
-tr_areThreadsEqual( tr_thread_id a,
-                    tr_thread_id b )
+static tr_bool
+tr_areThreadsEqual( tr_thread_id a, tr_thread_id b )
 {
 #ifdef WIN32
     return a == b;
 #else
-    return pthread_equal( a, b );
+    return pthread_equal( a, b ) != 0;
 #endif
 }
 
@@ -91,7 +90,7 @@ struct tr_thread
 #endif
 };
 
-int
+tr_bool
 tr_amInThread( const tr_thread * t )
 {
     return tr_areThreadsEqual( tr_getCurrentThread( ), t->thread );

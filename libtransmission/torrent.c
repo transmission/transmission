@@ -1172,7 +1172,7 @@ tr_torrentFiles( const tr_torrent * tor,
     for( i=0; i<n; ++i, ++walk ) {
         const uint64_t b = isSeed ? tor->info.files[i].length : fileBytesCompleted( tor, i );
         walk->bytesCompleted = b;
-        walk->progress = tor->info.files[i].length > 0 ? ( (float)b / tor->info.files[i].length ) : 1.0;
+        walk->progress = tor->info.files[i].length > 0 ? ( b / tor->info.files[i].length ) : 1.0;
     }
 
     if( fileCount )
@@ -1842,8 +1842,10 @@ setFileDND( tr_torrent * tor, tr_file_index_t fileIndex, int doDownload )
 {
     tr_file *        file;
     const int8_t     dnd = !doDownload;
-    tr_piece_index_t firstPiece, firstPieceDND;
-    tr_piece_index_t lastPiece, lastPieceDND;
+    tr_piece_index_t firstPiece;
+    int8_t           firstPieceDND;
+    tr_piece_index_t lastPiece;
+    int8_t           lastPieceDND;
     tr_file_index_t  i;
 
     assert( tr_isTorrent( tor ) );
