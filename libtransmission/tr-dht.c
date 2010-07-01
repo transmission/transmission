@@ -543,7 +543,7 @@ tr_dhtStatus( tr_session * session, int af, int * nodes_return )
 
     tr_runInEventThread( session, getstatus, &closure );
     while( closure.status < 0 )
-        tr_wait_msec( 10 /*msec*/ );
+        tr_wait_msec( 50 /*msec*/ );
 
     if( nodes_return )
         *nodes_return = closure.count;

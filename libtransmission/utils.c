@@ -797,7 +797,7 @@ tr_wait_msec( long int msec )
 #else
     struct timespec ts;
     ts.tv_sec = msec / 1000;
-    ts.tv_sec = ( msec % 1000 ) * 1000000;
+    ts.tv_nsec = ( msec % 1000 ) * 1000000;
     nanosleep( &ts, NULL );
 #endif
 }
