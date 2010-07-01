@@ -95,9 +95,8 @@ getBlockRun( const tr_cache * cache, int pos, struct run_info * info )
 }
 
 /* return the starting index of the longest contiguous run of blocks BUT:
- *   1 - Length of run must be even.
- *   2 - Run must begin with a even block.
- *   3 - Oldest run is preferred.
+ *   - Run should begin with a even block and length of run should be even.
+ *   - Oldest run is preferred.
  */
 static int
 findChunk2Discard( tr_cache * cache, int * setme_n )
@@ -107,7 +106,7 @@ findChunk2Discard( tr_cache * cache, int * setme_n )
     int bestpos = 0;
     unsigned bestlen = 1;
     unsigned jump;
-    time_t oldest_time = ~0;
+    time_t oldest_time = tr_time() + 1;
     struct run_info run;
 
     for( pos=0; pos<n; pos+=jump )
@@ -121,9 +120,15 @@ findChunk2Discard( tr_cache * cache, int * setme_n )
 
         /* check alignment */
         if( len % 2 == 0 ) {
-            if( !run.is_aligned )
+            if( !run.is_aligned ) {
                 /* Let it grow. Otherwise we contribute to fragmentation */
+                if( bestlen == 1) {
+                    /* But if all other blocks are non-contiguous, we prefer this one */
+                    bestpos = pos;
+                    oldest_time = cache->maxBlocks - len;
+                }
                 continue;
+            }
         } else {
             if( len != 1 ) {
                 --len;
