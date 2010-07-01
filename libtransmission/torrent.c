@@ -1841,7 +1841,7 @@ static void
 setFileDND( tr_torrent * tor, tr_file_index_t fileIndex, int doDownload )
 {
     tr_file *        file;
-    const uint8_t    dnd = !doDownload;
+    const int8_t     dnd = !doDownload;
     tr_piece_index_t firstPiece, firstPieceDND;
     tr_piece_index_t lastPiece, lastPieceDND;
     tr_file_index_t  i;

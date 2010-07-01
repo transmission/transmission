@@ -464,7 +464,7 @@ int  tr_urlParse( const char * url,
 
 /** @brief return TR_RATIO_NA, TR_RATIO_INF, or a number in [0..1]
     @return TR_RATIO_NA, TR_RATIO_INF, or a number in [0..1] */
-double tr_getRatio( double numerator, double denominator );
+double tr_getRatio( uint64_t numerator, uint64_t denominator );
 
 /**
  * @brief Given a string like "1-4" or "1-4,6,9,14-51", this returns a

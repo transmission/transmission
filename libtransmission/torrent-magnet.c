@@ -348,10 +348,10 @@ tr_torrentGetNextMetadataRequest( tr_torrent * tor, time_t now, int * setme_piec
     return have_request;
 }
 
-float
+double
 tr_torrentGetMetadataPercent( const tr_torrent * tor )
 {
-    float ret;
+    double ret;
 
     if( tr_torrentHasMetadata( tor ) )
         ret = 1.0;
@@ -360,7 +360,7 @@ tr_torrentGetMetadataPercent( const tr_torrent * tor )
         if( m == NULL )
             ret = 0.0;
         else
-            ret = (m->pieceCount - m->piecesNeededCount) / (float)m->pieceCount;
+            ret = (m->pieceCount - m->piecesNeededCount) / (double)m->pieceCount;
     }
 
     return ret;

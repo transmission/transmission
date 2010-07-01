@@ -276,8 +276,10 @@ tr_torBlockPiece( const tr_torrent * tor, const tr_block_index_t block )
 static inline uint16_t
 tr_torPieceCountBlocks( const tr_torrent * tor, const tr_piece_index_t piece )
 {
-    return piece == tor->info.pieceCount - 1 ? tor->blockCountInLastPiece
-                                             : tor->blockCountInPiece;
+    if( piece + 1 == tor->info.pieceCount )
+        return tor->blockCountInLastPiece;
+    else
+        return tor->blockCountInPiece;
 }
 
 /* how many bytes are in this piece? */

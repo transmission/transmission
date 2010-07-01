@@ -866,13 +866,13 @@ tr_strlcpy( char *       dst,
 ***/
 
 double
-tr_getRatio( double numerator, double denominator )
+tr_getRatio( uint64_t numerator, uint64_t denominator )
 {
     double ratio;
 
-    if( fabs(denominator) > 0.01 )
-        ratio = numerator / denominator;
-    else if( fabs(numerator) > 0.01 )
+    if( denominator > 0 )
+        ratio = numerator / (double)denominator;
+    else if( numerator > 0 )
         ratio = TR_RATIO_INF;
     else
         ratio = TR_RATIO_NA;
