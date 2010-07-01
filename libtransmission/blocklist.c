@@ -79,8 +79,9 @@ blocklistClose( tr_blocklist * b )
 static void
 blocklistLoad( tr_blocklist * b )
 {
-    int          fd;
-    struct stat  st;
+    int fd;
+    size_t byteCount;
+    struct stat st;
     const char * err_fmt = _( "Couldn't read \"%1$s\": %2$s" );
 
     blocklistClose( b );
@@ -95,7 +96,8 @@ blocklistLoad( tr_blocklist * b )
         return;
     }
 
-    b->rules = mmap( NULL, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0 );
+    byteCount = (size_t) st.st_size;
+    b->rules = mmap( NULL, byteCount, PROT_READ, MAP_PRIVATE, fd, 0 );
     if( !b->rules )
     {
         tr_err( err_fmt, b->filename, tr_strerror( errno ) );
@@ -103,9 +105,9 @@ blocklistLoad( tr_blocklist * b )
         return;
     }
 
-    b->byteCount = st.st_size;
-    b->ruleCount = st.st_size / sizeof( struct tr_ip_range );
     b->fd = fd;
+    b->byteCount = byteCount;
+    b->ruleCount = byteCount / sizeof( struct tr_ip_range );
 
     {
         char * base = tr_basename( b->filename );
@@ -145,8 +147,7 @@ blocklistDelete( tr_blocklist * b )
 ***/
 
 tr_blocklist *
-_tr_blocklistNew( const char * filename,
-                  int          isEnabled )
+_tr_blocklistNew( const char * filename, tr_bool isEnabled )
 {
     tr_blocklist * b;
 

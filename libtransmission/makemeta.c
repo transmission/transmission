@@ -88,12 +88,12 @@ getFiles( const char *      dir,
     return list;
 }
 
-static int
+static uint32_t
 bestPieceSize( uint64_t totalSize )
 {
-    const uint64_t GiB = 1073741824;
-    const uint64_t MiB = 1048576;
-    const uint64_t KiB = 1024;
+    const uint32_t GiB = 1073741824;
+    const uint32_t MiB = 1048576;
+    const uint32_t KiB = 1024;
 
     if( totalSize >=   ( 2 * GiB ) ) return 2 * MiB;
     if( totalSize >=   ( 1 * GiB ) ) return 1 * MiB;
@@ -226,21 +226,19 @@ getHashInfo( tr_metainfo_builder * b )
     }
     while( totalRemain )
     {
-        uint8_t *      bufptr = buf;
-        const uint64_t thisPieceSize =
-            MIN( (uint32_t)b->pieceSize, totalRemain );
-        uint64_t       pieceRemain = thisPieceSize;
+        uint8_t * bufptr = buf;
+        const uint32_t thisPieceSize = (uint32_t) MIN( b->pieceSize, totalRemain );
+        uint32_t leftInPiece = thisPieceSize;
 
         assert( b->pieceIndex < b->pieceCount );
 
-        while( pieceRemain )
+        while( leftInPiece )
         {
-            const uint64_t n_this_pass =
-                MIN( ( b->files[fileIndex].size - off ), pieceRemain );
+            const size_t n_this_pass = (size_t) MIN( ( b->files[fileIndex].size - off ), leftInPiece );
             read( fd, bufptr, n_this_pass );
             bufptr += n_this_pass;
             off += n_this_pass;
-            pieceRemain -= n_this_pass;
+            leftInPiece -= n_this_pass;
             if( off == b->files[fileIndex].size )
             {
                 off = 0;
@@ -265,7 +263,7 @@ getHashInfo( tr_metainfo_builder * b )
         }
 
         assert( bufptr - buf == (int)thisPieceSize );
-        assert( pieceRemain == 0 );
+        assert( leftInPiece == 0 );
         tr_sha1( walk, buf, thisPieceSize, NULL );
         walk += SHA_DIGEST_LENGTH;
 
