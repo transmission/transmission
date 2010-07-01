@@ -552,7 +552,7 @@ PrefsDialog :: createTorrentsTab( )
 
     QWidget *l, *r;
     HIG * hig = new HIG( this );
-    hig->addSectionTitle( tr( "Adding Torrents" ) );
+    hig->addSectionTitle( tr( "Adding" ) );
 
         l = checkBoxNew( tr( "Automatically &add torrents from:" ), Prefs::DIR_WATCH_ENABLED );
         QPushButton * b = myWatchButton = new QPushButton;
@@ -565,6 +565,10 @@ PrefsDialog :: createTorrentsTab( )
         hig->addWideControl( checkBoxNew( tr( "Show &options dialog" ), Prefs::OPTIONS_PROMPT ) );
         hig->addWideControl( checkBoxNew( tr( "&Start when added" ), Prefs::START ) );
         hig->addWideControl( checkBoxNew( tr( "Mo&ve .torrent file to the trash" ), Prefs::TRASH_ORIGINAL ) );
+
+    hig->addSectionDivider( );
+    hig->addSectionTitle( tr( "Downloading" ) );
+
         hig->addWideControl( checkBoxNew( tr( "Append \".&part\" to incomplete files' names" ), Prefs::RENAME_PARTIAL_FILES ) );
 
         l = myIncompleteCheckbox = checkBoxNew( tr( "Keep &incomplete files in:" ), Prefs::INCOMPLETE_DIR_ENABLED );
@@ -590,7 +594,7 @@ PrefsDialog :: createTorrentsTab( )
         hig->addRow( tr( "Save to &Location:" ), b );
 
     hig->addSectionDivider( );
-    hig->addSectionTitle( tr( "Limits" ) );
+    hig->addSectionTitle( tr( "Seeding" ) );
 
         l = checkBoxNew( tr( "&Seed torrent until its ratio reaches:" ), Prefs::RATIO_ENABLED );
         r = doubleSpinBoxNew( Prefs::RATIO, 0, INT_MAX, 0.5, 2 );
