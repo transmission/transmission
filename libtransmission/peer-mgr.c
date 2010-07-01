@@ -1498,7 +1498,6 @@ peerCallbackFunc( tr_peer * peer, const tr_peer_event * e, void * vt )
                             const tr_file * file = &tor->info.files[fileIndex];
                             if( ( file->firstPiece <= p ) && ( p <= file->lastPiece ) ) {
                                 if( tr_cpFileIsComplete( &tor->completion, fileIndex ) ) {
-fprintf( stderr, "flushing complete file %d (%s)\n", fileIndex, tor->info.files[fileIndex].name );
                                     tr_cacheFlushFile( tor->session->cache, tor, fileIndex );
                                     tr_torrentFileCompleted( tor, fileIndex );
                                 }

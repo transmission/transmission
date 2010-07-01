@@ -20,6 +20,13 @@
 
 #define MY_NAME "Cache"
 
+#define dbgmsg( ... ) \
+    do { \
+        if( tr_deepLoggingIsActive( ) ) \
+            tr_deepLog( __FILE__, __LINE__, MY_NAME, __VA_ARGS__ ); \
+    } while( 0 )
+
+
 /****
 *****
 ****/
@@ -156,7 +163,7 @@ flushContiguous( tr_cache * cache, int pos, int n )
     const tr_piece_index_t piece = b->piece;
     const uint32_t offset        = b->offset;
 
-//fprintf( stderr, "flushing %d contiguous blocks from [%d to %d)\n", n, pos, n+pos );
+//fprintf( stderr, "flushing %d contiguous blocks [%d-%d) from cache to disk\n", n, pos, n+pos );
 
     for( i=pos; i<pos+n; ++i ) {
         b = blocks[i];
@@ -361,7 +368,7 @@ tr_cacheFlushFile( tr_cache * cache, tr_torrent * torrent, tr_file_index_t i )
     const tr_block_index_t begin = tr_torPieceFirstBlock( torrent, file->firstPiece );
     const tr_block_index_t end  = tr_torPieceFirstBlock( torrent, file->lastPiece ) + tr_torPieceCountBlocks( torrent, file->lastPiece );
     const int pos = findPiece( cache, torrent, file->firstPiece );
-//fprintf( stderr, "flushing file %d, which is blocks [%zu...%zu)\n", (int)i, (size_t)begin, (size_t)end );
+    dbgmsg( "flushing file %d from cache to disk: blocks [%zu...%zu)", (int)i, (size_t)begin, (size_t)end );
 
     /* flush out all the blocks in that file */
     while( !err && ( pos < tr_ptrArraySize( &cache->blocks ) ) )
