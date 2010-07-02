@@ -28,12 +28,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h> /* strerror, memset, memmem */
+#include <time.h> /* nanosleep() */
 
 #include <libgen.h> /* basename */
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h> /* usleep, stat, getcwd, getpagesize */
+#include <unistd.h> /* stat(), getcwd(), getpagesize() */
 
 #include "event.h"
 
@@ -806,12 +807,15 @@ tr_date( void )
 }
 
 void
-tr_wait_msec( uint64_t delay_milliseconds )
+tr_wait_msec( long int msec )
 {
 #ifdef WIN32
-    Sleep( (DWORD)delay_milliseconds );
+    Sleep( (DWORD)msec );
 #else
-    usleep( 1000 * delay_milliseconds );
+    struct timespec ts;
+    ts.tv_sec = msec / 1000;
+    ts.tv_nsec = ( msec % 1000 ) * 1000000;
+    nanosleep( &ts, NULL );
 #endif
 }
 

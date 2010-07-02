@@ -265,7 +265,7 @@ void tr_timerAddMsec( struct event * timer, int milliseconds ) TR_GNUC_NONNULL(1
 uint64_t tr_date( void );
 
 /** @brief sleep the specified number of milliseconds */
-void tr_wait_msec( uint64_t delay_milliseconds );
+void tr_wait_msec( long int delay_milliseconds );
 
 /**
  * @brief make a copy of 'str' whose non-utf8 content has been corrected or stripped
