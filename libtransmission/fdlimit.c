@@ -394,6 +394,21 @@ TrOpenFile( tr_session             * session,
     }
 #endif
 
+#if defined( SYS_DARWIN )  
+    /** 
+     * 1. Enable readahead for reasons described above w/POSIX_FADV_SEQUENTIAL. 
+     * 2. Disable OS-level caching due to user reports of adverse effects of 
+     *    excessive inactive memory.
+     * It's okay for this to fail silently, so don't let it affect errno 
+     */ 
+    {
+        const int err = errno; 
+        fcntl( file->fd, F_NOCACHE, 1 );  
+        fcntl( file->fd, F_RDAHEAD, 1 );  
+        errno = err; 
+    }
+#endif
+
     return 0;
 }
 
