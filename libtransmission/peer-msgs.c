@@ -1700,26 +1700,26 @@ updateDesiredRequestCount( tr_peermsgs * msgs, uint64_t now )
     }
     else
     {
-        int irate;
         int estimatedBlocksInPeriod;
-        double rate;
+        int rate_Bps;
+        int irate_Bps;
         const int floor = 4;
         const int seconds = REQUEST_BUF_SECS;
 
         /* Get the rate limit we should use.
          * FIXME: this needs to consider all the other peers as well... */
-        rate = tr_peerGetPieceSpeed( msgs->peer, now, TR_PEER_TO_CLIENT );
+        rate_Bps = tr_peerGetPieceSpeed_Bps( msgs->peer, now, TR_PEER_TO_CLIENT );
         if( tr_torrentUsesSpeedLimit( torrent, TR_PEER_TO_CLIENT ) )
-            rate = MIN( rate, tr_torrentGetSpeedLimit( torrent, TR_PEER_TO_CLIENT ) );
+            rate_Bps = MIN( rate_Bps, tr_torrentGetSpeedLimit_Bps( torrent, TR_PEER_TO_CLIENT ) );
 
         /* honor the session limits, if enabled */
         if( tr_torrentUsesSessionLimits( torrent ) )
-            if( tr_sessionGetActiveSpeedLimit( torrent->session, TR_PEER_TO_CLIENT, &irate ) )
-                rate = MIN( rate, irate );
+            if( tr_sessionGetActiveSpeedLimit_Bps( torrent->session, TR_PEER_TO_CLIENT, &irate_Bps ) )
+                rate_Bps = MIN( rate_Bps, irate_Bps );
 
         /* use this desired rate to figure out how
          * many requests we should send to this peer */
-        estimatedBlocksInPeriod = ( rate * seconds * 1024 ) / torrent->blockSize;
+        estimatedBlocksInPeriod = ( rate_Bps * seconds ) / torrent->blockSize;
         msgs->desiredRequestCount = MAX( floor, estimatedBlocksInPeriod );
 
         /* honor the peer's maximum request count, if specified */

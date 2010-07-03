@@ -35,10 +35,36 @@
 #include <libtransmission/version.h>
 #include <libtransmission/web.h> /* tr_webRun */
 
+/***
+****
+***/
+
+#define MEM_K 1024
+#define MEM_B_STR "B"
+#define MEM_K_STR "KiB"
+#define MEM_M_STR "MiB"
+#define MEM_G_STR "GiB"
+
+#define DISK_K 1000
+#define DISK_B_STR "B"
+#define DISK_K_STR "kB"
+#define DISK_M_STR "MB"
+#define DISK_G_STR "GB"
+
+#define SPEED_K 1000
+#define SPEED_B_STR "B/s"
+#define SPEED_K_STR "kB/s"
+#define SPEED_M_STR "MB/s"
+#define SPEED_G_STR "GB/s"
+
+/***
+****
+***/
+
 #define LINEWIDTH 80
 #define MY_NAME "transmissioncli"
 
-static tr_bool verify           = 0;
+static tr_bool verify                = 0;
 static sig_atomic_t gotsig           = 0;
 static sig_atomic_t manualUpdate     = 0;
 
@@ -46,20 +72,20 @@ static const char * torrentPath  = NULL;
 
 static const struct tr_option options[] =
 {
-    { 'b', "blocklist",            "Enable peer blocklists", "b",  0, NULL        },
-    { 'B', "no-blocklist",         "Disable peer blocklists", "B",  0, NULL        },
-    { 'd', "downlimit",            "Set max download speed in KiB/s", "d",  1, "<speed>"   },
-    { 'D', "no-downlimit",         "Don't limit the download speed", "D",  0, NULL        },
-    { 910, "encryption-required",  "Encrypt all peer connections", "er", 0, NULL        },
-    { 911, "encryption-preferred", "Prefer encrypted peer connections", "ep", 0, NULL        },
-    { 912, "encryption-tolerated", "Prefer unencrypted peer connections", "et", 0, NULL        },
+    { 'b', "blocklist",            "Enable peer blocklists", "b",  0, NULL },
+    { 'B', "no-blocklist",         "Disable peer blocklists", "B",  0, NULL },
+    { 'd', "downlimit",            "Set max download speed in "SPEED_K_STR, "d",  1, "<speed>" },
+    { 'D', "no-downlimit",         "Don't limit the download speed", "D",  0, NULL },
+    { 910, "encryption-required",  "Encrypt all peer connections", "er", 0, NULL },
+    { 911, "encryption-preferred", "Prefer encrypted peer connections", "ep", 0, NULL },
+    { 912, "encryption-tolerated", "Prefer unencrypted peer connections", "et", 0, NULL },
     { 'f', "finish",               "Run a script when the torrent finishes", "f", 1, "<script>" },
     { 'g', "config-dir",           "Where to find configuration files", "g", 1, "<path>" },
-    { 'm', "portmap",              "Enable portmapping via NAT-PMP or UPnP", "m",  0, NULL        },
-    { 'M', "no-portmap",           "Disable portmapping", "M",  0, NULL        },
+    { 'm', "portmap",              "Enable portmapping via NAT-PMP or UPnP", "m",  0, NULL },
+    { 'M', "no-portmap",           "Disable portmapping", "M",  0, NULL },
     { 'p', "port", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "p", 1, "<port>" },
     { 't', "tos", "Peer socket TOS (0 to 255, default=" TR_DEFAULT_PEER_SOCKET_TOS_STR ")", "t", 1, "<tos>" },
-    { 'u', "uplimit",              "Set max upload speed in KiB/s", "u",  1, "<speed>"   },
+    { 'u', "uplimit",              "Set max upload speed in "SPEED_K_STR, "u",  1, "<speed>"   },
     { 'U', "no-uplimit",           "Don't limit the upload speed", "U",  0, NULL        },
     { 'v', "verify",               "Verify the specified torrent", "v",  0, NULL        },
     { 'w', "download-dir",         "Where to save downloaded data", "w",  1, "<path>"    },
@@ -127,29 +153,35 @@ getStatusStr( const tr_stat * st,
     }
     else if( st->activity & TR_STATUS_DOWNLOAD )
     {
+        char upStr[80];
+        char dnStr[80];
         char ratioStr[80];
+
+        tr_formatter_speed( upStr, st->pieceUploadSpeed_Bps, sizeof( upStr ) );
+        tr_formatter_speed( dnStr, st->pieceDownloadSpeed_Bps, sizeof( dnStr ) );
         tr_strlratio( ratioStr, st->ratio, sizeof( ratioStr ) );
-        tr_snprintf(
-            buf, buflen,
-            "Progress: %.1f%%, dl from %d of %d peers (%.0f KiB/s), "
-            "ul to %d (%.0f KiB/s) [%s]",
+
+        tr_snprintf( buf, buflen,
+            "Progress: %.1f%%, "
+            "dl from %d of %d peers (%s), "
+            "ul to %d (%s) "
+            "[%s]",
             tr_truncd( 100 * st->percentDone, 1 ),
-            st->peersSendingToUs,
-            st->peersConnected,
-            st->pieceDownloadSpeed,
-            st->peersGettingFromUs,
-            st->pieceUploadSpeed,
+            st->peersSendingToUs, st->peersConnected, upStr,
+            st->peersGettingFromUs, dnStr,
             ratioStr );
     }
     else if( st->activity & TR_STATUS_SEED )
     {
+        char upStr[80];
         char ratioStr[80];
+
+        tr_formatter_speed( upStr, st->pieceUploadSpeed_Bps, sizeof( upStr ) );
         tr_strlratio( ratioStr, st->ratio, sizeof( ratioStr ) );
-        tr_snprintf(
-            buf, buflen,
-            "Seeding, uploading to %d of %d peer(s), %.0f KiB/s [%s]",
-            st->peersGettingFromUs, st->peersConnected,
-            st->pieceUploadSpeed, ratioStr );
+
+        tr_snprintf( buf, buflen,
+                     "Seeding, uploading to %d of %d peer(s), %s [%s]",
+                     st->peersGettingFromUs, st->peersConnected, upStr, ratioStr );
     }
     else *buf = '\0';
 }
@@ -178,8 +210,7 @@ getConfigDir( int argc, const char ** argv )
 }
 
 int
-main( int     argc,
-      char ** argv )
+main( int argc, char ** argv )
 {
     int           error;
     tr_session  * h;
@@ -189,6 +220,10 @@ main( int     argc,
     const char  * configDir;
     uint8_t     * fileContents;
     size_t        fileLength;
+
+    tr_formatter_mem_init( MEM_K, MEM_B_STR, MEM_K_STR, MEM_M_STR, MEM_G_STR );
+    tr_formatter_size_init( DISK_K,DISK_B_STR, DISK_K_STR, DISK_M_STR, DISK_G_STR );
+    tr_formatter_speed_init( SPEED_K, SPEED_B_STR, SPEED_K_STR, SPEED_M_STR, SPEED_G_STR );
 
     printf( "Transmission %s - http://www.transmissionbt.com/\n",
             LONG_VERSION_STRING );
@@ -323,7 +358,7 @@ parseCommandLine( tr_benc * d, int argc, const char ** argv )
                       break;
             case 'B': tr_bencDictAddBool( d, TR_PREFS_KEY_BLOCKLIST_ENABLED, FALSE );
                       break;
-            case 'd': tr_bencDictAddInt ( d, TR_PREFS_KEY_DSPEED, atoi( optarg ) );
+            case 'd': tr_bencDictAddInt ( d, TR_PREFS_KEY_DSPEED_Bps, atoi( optarg ) * SPEED_K );
                       tr_bencDictAddBool( d, TR_PREFS_KEY_DSPEED_ENABLED, TRUE );
                       break;
             case 'D': tr_bencDictAddBool( d, TR_PREFS_KEY_DSPEED_ENABLED, FALSE );
@@ -341,7 +376,7 @@ parseCommandLine( tr_benc * d, int argc, const char ** argv )
                       break;
             case 't': tr_bencDictAddInt( d, TR_PREFS_KEY_PEER_SOCKET_TOS, atoi( optarg ) );
                       break;
-            case 'u': tr_bencDictAddInt( d, TR_PREFS_KEY_USPEED, atoi( optarg ) );
+            case 'u': tr_bencDictAddInt( d, TR_PREFS_KEY_USPEED_Bps, atoi( optarg ) * SPEED_K );
                       tr_bencDictAddBool( d, TR_PREFS_KEY_USPEED_ENABLED, TRUE );
                       break;
             case 'U': tr_bencDictAddBool( d, TR_PREFS_KEY_USPEED_ENABLED, FALSE );

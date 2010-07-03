@@ -24,6 +24,7 @@
 #include "file-tree.h"
 #include "hig.h"
 #include "torrent.h" // FileList
+#include "units.h"
 #include "utils.h" // mime icons
 
 enum
@@ -122,7 +123,7 @@ FileTreeItem :: fileSizeName( ) const
     uint64_t have(0), total(0);
     QString str;
     getSubtreeSize( have, total );
-    str = QString( name() + " (%1)" ).arg( Utils::sizeToString( total ) );
+    str = QString( name() + " (%1)" ).arg( Units::sizeToString( total ) );
     return str;
 }
 

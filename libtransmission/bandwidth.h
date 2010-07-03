@@ -32,7 +32,7 @@ struct tr_peerIo;
  * it's included in the header for inlining and composition. */
 enum
 {
-    HISTORY_MSEC = 2000,
+    HISTORY_MSEC = 2000u,
     INTERVAL_MSEC = HISTORY_MSEC,
     GRANULARITY_MSEC = 200,
     HISTORY_SIZE = ( INTERVAL_MSEC / GRANULARITY_MSEC ),
@@ -53,8 +53,8 @@ struct tr_band
 {
     tr_bool isLimited;
     tr_bool honorParentLimits;
-    size_t bytesLeft;
-    double desiredSpeed;
+    unsigned int bytesLeft;
+    unsigned int desiredSpeed_Bps;
     struct bratecontrol raw;
     struct bratecontrol piece;
 };
@@ -147,29 +147,28 @@ static inline tr_bool tr_isBandwidth( const tr_bandwidth  * b )
 ******/
 
 /**
- * @brief Set the desired speed (in KiB/s) for this bandwidth subtree.
+ * @brief Set the desired speed for this bandwidth subtree.
  * @see tr_bandwidthAllocate
  * @see tr_bandwidthGetDesiredSpeed
  */
-static inline tr_bool tr_bandwidthSetDesiredSpeed( tr_bandwidth        * bandwidth,
-                                                      tr_direction          dir,
-                                                      double                desiredSpeed )
+static inline tr_bool tr_bandwidthSetDesiredSpeed_Bps( tr_bandwidth        * bandwidth,
+                                                       tr_direction          dir,
+                                                       unsigned int          desiredSpeed )
 {
-    double * value = &bandwidth->band[dir].desiredSpeed;
-    const tr_bool didChange = (int)(desiredSpeed*1024.0) != (int)(*value*1024.0);
+    unsigned int * value = &bandwidth->band[dir].desiredSpeed_Bps;
+    const tr_bool didChange = desiredSpeed != *value;
     *value = desiredSpeed;
     return didChange;
 }
 
 /**
- * @brief Get the desired speed (in KiB/s) for ths bandwidth subtree.
+ * @brief Get the desired speed for the bandwidth subtree.
  * @see tr_bandwidthSetDesiredSpeed
  */
 static inline double
-tr_bandwidthGetDesiredSpeed( const tr_bandwidth  * bandwidth,
-                             tr_direction          dir )
+tr_bandwidthGetDesiredSpeed_Bps( const tr_bandwidth  * bandwidth, tr_direction dir )
 {
-    return bandwidth->band[dir].desiredSpeed;
+    return bandwidth->band[dir].desiredSpeed_Bps;
 }
 
 /**
@@ -199,28 +198,28 @@ static inline tr_bool tr_bandwidthIsLimited( const tr_bandwidth  * bandwidth,
  */
 void    tr_bandwidthAllocate          ( tr_bandwidth        * bandwidth,
                                         tr_direction          direction,
-                                        int                   period_msec );
+                                        unsigned int          period_msec );
 
 /**
  * @brief clamps byteCount down to a number that this bandwidth will allow to be consumed
  */
-size_t  tr_bandwidthClamp             ( const tr_bandwidth  * bandwidth,
+unsigned int  tr_bandwidthClamp       ( const tr_bandwidth  * bandwidth,
                                         tr_direction          direction,
-                                        size_t                byteCount );
+                                        unsigned int          byteCount );
 
 /******
 *******
 ******/
 
 /** @brief Get the raw total of bytes read or sent by this bandwidth subtree. */
-double tr_bandwidthGetRawSpeed( const tr_bandwidth  * bandwidth,
-                                const uint64_t        now,
-                                const tr_direction    direction );
+unsigned int tr_bandwidthGetRawSpeed_Bps( const tr_bandwidth  * bandwidth,
+                                           const uint64_t        now,
+                                           const tr_direction    direction );
 
 /** @brief Get the number of piece data bytes read or sent by this bandwidth subtree. */
-double tr_bandwidthGetPieceSpeed( const tr_bandwidth  * bandwidth,
-                                  const uint64_t        now,
-                                  const tr_direction    direction );
+unsigned int tr_bandwidthGetPieceSpeed_Bps( const tr_bandwidth  * bandwidth,
+                                            const uint64_t        now,
+                                            const tr_direction    direction );
 
 /**
  * @brief Notify the bandwidth object that some of its allocated bandwidth has been consumed.

@@ -51,7 +51,7 @@
 #include "torrent-model.h"
 #include "triconpushbutton.h"
 #include "ui_mainwin.h"
-#include "utils.h"
+#include "units.h"
 #include "qticonloader.h"
 
 #define PREFS_KEY "prefs-key";
@@ -549,15 +549,16 @@ TrMainWindow :: createOptionsMenu( )
         a->setProperty( PREF_VARIANTS_KEY, QVariantList() << Prefs::DSPEED_ENABLED << false );
         g->addAction( a );
         connect( a, SIGNAL(triggered(bool)), this, SLOT(onSetPrefs(bool)) );
-        a = myDlimitOnAction = sub->addAction( tr( "Limited at %1" ).arg( Utils::speedToString( Speed::fromKbps( currentVal ) ) ) );
+        a = myDlimitOnAction = sub->addAction( tr( "Limited at %1" ).arg( Units::speedToString( Speed::fromBps( currentVal ) ) ) );
         a->setCheckable( true );
         a->setProperty( PREF_VARIANTS_KEY, QVariantList() << Prefs::DSPEED << currentVal << Prefs::DSPEED_ENABLED << true );
         g->addAction( a );
         connect( a, SIGNAL(triggered(bool)), this, SLOT(onSetPrefs(bool)) );
         sub->addSeparator( );
         foreach( int i, stockSpeeds ) {
-            a = sub->addAction( Utils::speedToString( Speed::fromKbps(i) ) );
-            a->setProperty( PREF_VARIANTS_KEY, QVariantList() << Prefs::DSPEED << i << Prefs::DSPEED_ENABLED << true );
+            const int Bps = i * Units::speed_K;
+            a = sub->addAction( Units::speedToString( Speed::fromBps( Bps ) ) );
+            a->setProperty( PREF_VARIANTS_KEY, QVariantList() << Prefs::DSPEED << Bps << Prefs::DSPEED_ENABLED << true );
             connect( a, SIGNAL(triggered(bool)), this, SLOT(onSetPrefs()));
         }
 
@@ -569,15 +570,16 @@ TrMainWindow :: createOptionsMenu( )
         a->setProperty( PREF_VARIANTS_KEY, QVariantList() << Prefs::USPEED_ENABLED << false );
         g->addAction( a );
         connect( a, SIGNAL(triggered(bool)), this, SLOT(onSetPrefs(bool)) );
-        a = myUlimitOnAction = sub->addAction( tr( "Limited at %1" ).arg( Utils::speedToString( Speed::fromKbps( currentVal ) ) ) );
+        a = myUlimitOnAction = sub->addAction( tr( "Limited at %1" ).arg( Units::speedToString( Speed::fromBps( currentVal ) ) ) );
         a->setCheckable( true );
         a->setProperty( PREF_VARIANTS_KEY, QVariantList() << Prefs::USPEED << currentVal << Prefs::USPEED_ENABLED << true );
         g->addAction( a );
         connect( a, SIGNAL(triggered(bool)), this, SLOT(onSetPrefs(bool)) );
         sub->addSeparator( );
         foreach( int i, stockSpeeds ) {
-            a = sub->addAction( Utils::speedToString( Speed::fromKbps(i) ) );
-            a->setProperty( PREF_VARIANTS_KEY, QVariantList() << Prefs::USPEED << i << Prefs::USPEED_ENABLED << true );
+            const int Bps = i * Units::speed_K;
+            a = sub->addAction( Units::speedToString( Speed::fromBps( Bps ) ) );
+            a->setProperty( PREF_VARIANTS_KEY, QVariantList() << Prefs::USPEED << Bps << Prefs::USPEED_ENABLED << true );
             connect( a, SIGNAL(triggered(bool)), this, SLOT(onSetPrefs()));
         }
 
@@ -591,14 +593,14 @@ TrMainWindow :: createOptionsMenu( )
         a->setProperty( PREF_VARIANTS_KEY, QVariantList() << Prefs::RATIO_ENABLED << false );
         g->addAction( a );
         connect( a, SIGNAL(triggered(bool)), this, SLOT(onSetPrefs(bool)) );
-        a = myRatioOnAction = sub->addAction( tr( "Stop at Ratio (%1)" ).arg( Utils::ratioToString( d ) ) );
+        a = myRatioOnAction = sub->addAction( tr( "Stop at Ratio (%1)" ).arg( Units::ratioToString( d ) ) );
         a->setCheckable( true );
         a->setProperty( PREF_VARIANTS_KEY, QVariantList() << Prefs::RATIO << d << Prefs::RATIO_ENABLED << true );
         g->addAction( a );
         connect( a, SIGNAL(triggered(bool)), this, SLOT(onSetPrefs(bool)) );
         sub->addSeparator( );
         foreach( double i, stockRatios ) {
-            a = sub->addAction( Utils::ratioToString( i ) );
+            a = sub->addAction( Units::ratioToString( i ) );
             a->setProperty( PREF_VARIANTS_KEY, QVariantList() << Prefs::RATIO << i << Prefs::RATIO_ENABLED << true );
             connect( a, SIGNAL(triggered(bool)), this, SLOT(onSetPrefs()));
         }
@@ -733,8 +735,8 @@ TrMainWindow :: refreshStatusBar( )
 {
     const Speed up( myModel.getUploadSpeed( ) );
     const Speed down( myModel.getDownloadSpeed( ) );
-    myUploadSpeedLabel->setText( Utils :: speedToString( up ) );
-    myDownloadSpeedLabel->setText( Utils :: speedToString( down ) );
+    myUploadSpeedLabel->setText( Units :: speedToString( up ) );
+    myDownloadSpeedLabel->setText( Units :: speedToString( down ) );
 
     myNetworkLabel->setVisible( !mySession.isServer( ) );
 
@@ -743,23 +745,23 @@ TrMainWindow :: refreshStatusBar( )
 
     if( mode == "session-ratio" )
     {
-        str = tr( "Ratio: %1" ).arg( Utils :: ratioToString( mySession.getStats().ratio ) );
+        str = tr( "Ratio: %1" ).arg( Units :: ratioToString( mySession.getStats().ratio ) );
     }
     else if( mode == "session-transfer" )
     {
         const tr_session_stats& stats( mySession.getStats( ) );
-        str = tr( "Down: %1, Up: %2" ).arg( Utils :: sizeToString( stats.downloadedBytes ) )
-                                      .arg( Utils :: sizeToString( stats.uploadedBytes ) );
+        str = tr( "Down: %1, Up: %2" ).arg( Units :: sizeToString( stats.downloadedBytes ) )
+                                      .arg( Units :: sizeToString( stats.uploadedBytes ) );
     }
     else if( mode == "total-transfer" )
     {
         const tr_session_stats& stats( mySession.getCumulativeStats( ) );
-        str = tr( "Down: %1, Up: %2" ).arg( Utils :: sizeToString( stats.downloadedBytes ) )
-                                      .arg( Utils :: sizeToString( stats.uploadedBytes ) );
+        str = tr( "Down: %1, Up: %2" ).arg( Units :: sizeToString( stats.downloadedBytes ) )
+                                      .arg( Units :: sizeToString( stats.uploadedBytes ) );
     }
     else // default is "total-ratio"
     {
-        str = tr( "Ratio: %1" ).arg( Utils :: ratioToString( mySession.getCumulativeStats().ratio ) );
+        str = tr( "Ratio: %1" ).arg( Units :: ratioToString( mySession.getCumulativeStats().ratio ) );
     }
 
     myStatsLabel->setText( str );
@@ -1011,7 +1013,7 @@ TrMainWindow :: refreshPref( int key )
             break;
 
         case Prefs::DSPEED:
-            myDlimitOnAction->setText( tr( "Limited at %1" ).arg( Utils::speedToString( Speed::fromKbps( myPrefs.get<int>(key) ) ) ) );
+            myDlimitOnAction->setText( tr( "Limited at %1" ).arg( Units::speedToString( Speed::fromBps( myPrefs.get<int>(key) ) ) ) );
             break;
 
         case Prefs::USPEED_ENABLED:
@@ -1019,7 +1021,7 @@ TrMainWindow :: refreshPref( int key )
             break;
 
         case Prefs::USPEED:
-            myUlimitOnAction->setText( tr( "Limited at %1" ).arg( Utils::speedToString( Speed::fromKbps( myPrefs.get<int>(key) ) ) ) );
+            myUlimitOnAction->setText( tr( "Limited at %1" ).arg( Units::speedToString( Speed::fromBps( myPrefs.get<int>(key) ) ) ) );
             break;
 
         case Prefs::RATIO_ENABLED:
@@ -1027,7 +1029,7 @@ TrMainWindow :: refreshPref( int key )
             break;
 
         case Prefs::RATIO:
-            myRatioOnAction->setText( tr( "Stop at Ratio (%1)" ).arg( Utils::ratioToString( myPrefs.get<double>(key) ) ) );
+            myRatioOnAction->setText( tr( "Stop at Ratio (%1)" ).arg( Units::ratioToString( myPrefs.get<double>(key) ) ) );
             break;
 
         case Prefs::FILTER_MODE:
@@ -1085,10 +1087,10 @@ TrMainWindow :: refreshPref( int key )
             myAltSpeedButton->setIcon( b ? mySpeedModeOnIcon : mySpeedModeOffIcon );
             const QString fmt = b ? tr( "Click to disable Temporary Speed Limits\n(%1 down, %2 up)" )
                                   : tr( "Click to enable Temporary Speed Limits\n(%1 down, %2 up)" );
-            const Speed d = Speed::fromKbps( myPrefs.getInt( Prefs::ALT_SPEED_LIMIT_DOWN ) );
-            const Speed u = Speed::fromKbps( myPrefs.getInt( Prefs::ALT_SPEED_LIMIT_UP ) );
-            myAltSpeedButton->setToolTip( fmt.arg( Utils::speedToString( d ) )
-                                             .arg( Utils::speedToString( u ) ) );
+            const Speed d = Speed::fromBps( myPrefs.getInt( Prefs::ALT_SPEED_LIMIT_DOWN ) );
+            const Speed u = Speed::fromBps( myPrefs.getInt( Prefs::ALT_SPEED_LIMIT_UP ) );
+            myAltSpeedButton->setToolTip( fmt.arg( Units::speedToString( d ) )
+                                             .arg( Units::speedToString( u ) ) );
             break;
         }
 
@@ -1293,7 +1295,7 @@ TrMainWindow :: updateNetworkIcon( )
     myNetworkLabel->setPixmap( pixmap );
     myNetworkLabel->setToolTip( isSending || isReading
         ? tr( "Transmission server is responding" )
-        : tr( "Last response from server was %1 ago" ).arg( Utils::timeToString( now-std::max(myLastReadTime,myLastSendTime))));
+        : tr( "Last response from server was %1 ago" ).arg( Units::timeToString( now-std::max(myLastReadTime,myLastSendTime))));
 }
 
 void

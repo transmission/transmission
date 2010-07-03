@@ -52,7 +52,7 @@
 #include "squeezelabel.h"
 #include "torrent.h"
 #include "torrent-model.h"
-#include "utils.h"
+#include "units.h"
 
 class Prefs;
 class Session;
@@ -214,7 +214,7 @@ QString
 Details :: timeToStringRounded( int seconds )
 {
     if( seconds > 60 ) seconds -= ( seconds % 60 );
-    return Utils::timeToString ( seconds );
+    return Units::timeToString ( seconds );
 }
 
 void
@@ -323,16 +323,16 @@ Details :: refresh( )
             string = none;
         else {
             const double d = 100.0 * ( sizeWhenDone ? ( sizeWhenDone - leftUntilDone ) / sizeWhenDone : 1 );
-            QString pct = Utils::percentToString( d );
+            QString pct = Units::percentToString( d );
             if( !haveUnverified )
                 string = tr( "%1 (%2%)" )
-                             .arg( Utils :: sizeToString( haveVerified + haveUnverified ) )
+                             .arg( Units::sizeToString( haveVerified + haveUnverified ) )
                              .arg( pct );
             else
                 string = tr( "%1 (%2%); %3 Unverified" )
-                             .arg( Utils :: sizeToString( haveVerified + haveUnverified ) )
+                             .arg( Units::sizeToString( haveVerified + haveUnverified ) )
                              .arg( pct )
-                             .arg( Utils :: sizeToString( haveUnverified ) );
+                             .arg( Units::sizeToString( haveUnverified ) );
         }
     }
     myHaveLabel->setText( string );
@@ -344,7 +344,7 @@ Details :: refresh( )
         if( sizeWhenDone == 0 )
             string = none;
         else
-            string = QString( "%1%" ).arg( Utils::percentToString( ( 100.0 * available ) / sizeWhenDone ) );
+            string = QString( "%1%" ).arg( Units::percentToString( ( 100.0 * available ) / sizeWhenDone ) );
     }
     myAvailabilityLabel->setText( string );
 
@@ -357,8 +357,8 @@ Details :: refresh( )
             d += t->downloadedEver( );
             f += t->failedEver( );
         }
-        const QString dstr = Utils::sizeToString( d );
-        const QString fstr = Utils::sizeToString( f );
+        const QString dstr = Units::sizeToString( d );
+        const QString fstr = Units::sizeToString( f );
         if( f )
             string = tr( "%1 (+%2 corrupt)" ).arg( dstr ).arg( fstr );
         else
@@ -371,14 +371,14 @@ Details :: refresh( )
         string = none;
     else {
         foreach( const Torrent * t, torrents ) u += t->uploadedEver( );
-        string = QString( Utils::sizeToString( u ) );
+        string = QString( Units::sizeToString( u ) );
     }
     myUploadedLabel->setText( string );
 
     if( torrents.empty( ) )
         string = none;
     else if( torrents.length() == 1 )
-        string = QString( Utils :: ratioToString( torrents.first()->ratio() ) );
+        string = Units::ratioToString( torrents.first()->ratio() );
     else {
         bool isMixed = false;
         int ratioType = torrents.first()->ratio();
@@ -394,9 +394,9 @@ Details :: refresh( )
         if( isMixed )
             string = mixed;
         else if( ratioType < 0 )
-            string = QString( Utils :: ratioToString( ratioType ) );
+            string = Units::ratioToString( ratioType );
         else
-            string = QString( Utils :: ratioToString( (double)u / d ) );
+            string = Units::ratioToString( (double)u / d );
     }
     myRatioLabel->setText( string );
 
@@ -419,7 +419,7 @@ Details :: refresh( )
         else if( baseline.isNull( ) )
             string = mixed;
         else
-            string = Utils::timeToString( baseline.secsTo( qdt_now ) );
+            string = Units::timeToString( baseline.secsTo( qdt_now ) );
     }
     myRunTimeLabel->setText( string );
 
@@ -440,7 +440,7 @@ Details :: refresh( )
             if( baseline < 0 )
                 string = tr( "Unknown" );
             else
-                string = Utils::timeToString( baseline );
+                string = Units::timeToString( baseline );
        }
     }
     myETALabel->setText( string );
@@ -460,7 +460,7 @@ Details :: refresh( )
         if( seconds < 5 )
             string = tr( "Active now" );
         else
-            string = tr( "%1 ago" ).arg( Utils::timeToString( seconds ) );
+            string = tr( "%1 ago" ).arg( Units::timeToString( seconds ) );
     }
     myLastActivityLabel->setText( string );
 
@@ -502,11 +502,11 @@ Details :: refresh( )
             string = none;
         else if( pieceSize > 0 )
             string = tr( "%1 (%Ln pieces @ %2)", "", pieces )
-                     .arg( Utils::sizeToString( size ) )
-                     .arg( Utils::sizeToString( pieceSize ) );
+                     .arg( Units::sizeToString( size ) )
+                     .arg( Units::memToString( pieceSize ) );
         else
             string = tr( "%1 (%Ln pieces)", "", pieces )
-                     .arg( Utils::sizeToString( size ) );
+                     .arg( Units::sizeToString( size ) );
     }
     mySizeLabel->setText( string );
 
@@ -636,11 +636,11 @@ Details :: refresh( )
         myBandwidthPriorityCombo->blockSignals( false );
 
         mySingleDownSpin->blockSignals( true );
-        mySingleDownSpin->setValue( int(tor->downloadLimit().kbps()) );
+        mySingleDownSpin->setValue( tor->downloadLimit().Bps() / Units::speed_K );
         mySingleDownSpin->blockSignals( false );
 
         mySingleUpSpin->blockSignals( true );
-        mySingleUpSpin->setValue( int(tor->uploadLimit().kbps()) );
+        mySingleUpSpin->setValue( tor->uploadLimit().Bps() / Units::speed_K );
         mySingleUpSpin->blockSignals( false );
 
         myPeerLimitSpin->blockSignals( true );
@@ -910,8 +910,8 @@ Details :: refresh( )
             if( !codeTip.isEmpty() )
                 codeTip.resize( codeTip.size()-1 ); // eat the trailing linefeed
 
-            item->setText( COL_UP, peer.rateToPeer.isZero() ? "" : Utils::speedToString( peer.rateToPeer ) );
-            item->setText( COL_DOWN, peer.rateToClient.isZero() ? "" : Utils::speedToString( peer.rateToClient ) );
+            item->setText( COL_UP, peer.rateToPeer.isZero() ? "" : Units::speedToString( peer.rateToPeer ) );
+            item->setText( COL_DOWN, peer.rateToClient.isZero() ? "" : Units::speedToString( peer.rateToClient ) );
             item->setText( COL_PERCENT, peer.progress > 0 ? QString( "%1%" ).arg( (int)( peer.progress * 100.0 ) ) : "" );
             item->setText( COL_STATUS, code );
             item->setToolTip( COL_STATUS, codeTip );
@@ -1010,7 +1010,7 @@ Details :: onDownloadLimitedToggled( bool val )
 void
 Details :: onDownloadLimitChanged( int val )
 {
-    mySession.torrentSet( myIds, "downloadLimit", val );
+    mySession.torrentSet( myIds, "downloadLimit", val * Units::speed_K  );
 }
 void
 Details :: onUploadLimitedToggled( bool val )
@@ -1020,7 +1020,7 @@ Details :: onUploadLimitedToggled( bool val )
 void
 Details :: onUploadLimitChanged( int val )
 {
-    mySession.torrentSet( myIds, "uploadLimit", val );
+    mySession.torrentSet( myIds, "uploadLimit", val * Units::speed_K );
 }
 
 #define RATIO_KEY "seedRatioMode"
@@ -1191,7 +1191,7 @@ Details :: createOptionsTab( )
     hig->addWideControl( c );
     connect( c, SIGNAL(clicked(bool)), this, SLOT(onHonorsSessionLimitsToggled(bool)) );
 
-    c = new QCheckBox( tr( "Limit &download speed (KiB/s):" ) );
+    c = new QCheckBox( tr( "Limit &download speed (%1):" ).arg( Units::speed_K_str ) );
     mySingleDownCheck = c;
     s = new QSpinBox( );
     mySingleDownSpin = s;
@@ -1201,7 +1201,7 @@ Details :: createOptionsTab( )
     connect( c, SIGNAL(clicked(bool)), this, SLOT(onDownloadLimitedToggled(bool)) );
     connect( s, SIGNAL(valueChanged(int)), this, SLOT(onDownloadLimitChanged(int)));
 
-    c = new QCheckBox( tr( "Limit &upload speed (KiB/s):" ) );
+    c = new QCheckBox( tr( "Limit &upload speed (%1):" ).arg( Units::speed_K_str ) );
     mySingleUpCheck = c;
     s = new QSpinBox( );
     mySingleUpSpin = s;

@@ -46,7 +46,7 @@ struct tr_fdInfo;
 struct tr_turtle_info
 {
     /* TR_UP and TR_DOWN speed limits */
-    int speedLimit[2];
+    int speedLimit_Bps[2];
 
     /* is turtle mode on right now? */
     tr_bool isEnabled;
@@ -102,7 +102,7 @@ struct tr_session
 
     int                          umask;
 
-    int                          speedLimit[2];
+    int                          speedLimit_Bps[2];
     tr_bool                      speedLimitEnabled[2];
 
     struct tr_turtle_info        turtle;

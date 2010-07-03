@@ -30,7 +30,7 @@
 #include "utils.h"
 
 /* return the xfer rate over the last `interval' seconds in KiB/sec */
-static float
+static int
 rateForInterval( const tr_ratecontrol * r,
                  int                    interval_msec,
                  uint64_t               now )
@@ -50,17 +50,17 @@ rateForInterval( const tr_ratecontrol * r,
         if( i == r->newest ) break; /* we've come all the way around */
     }
 
-    return ( bytes / 1024.0 ) * ( 1000.0 / interval_msec );
+    return bytes * ( 1000.0 / interval_msec );
 }
 
 /***
 ****
 ***/
 
-float
-tr_rcRate( const tr_ratecontrol * r, uint64_t now )
+int
+tr_rcRate_Bps( const tr_ratecontrol * r, uint64_t now )
 {
-    float ret = 0.0f;
+    int ret = 0;
 
     if( r )
         ret = rateForInterval( r, TR_RC_HISTORY_MSEC, now );

@@ -1065,7 +1065,7 @@ tr_base64_encode( const void * input, int length, int * setme_len )
         BUF_MEM * bptr;
 
         if( length < 1 )
-            length = strlen( input );
+            length = (int)strlen( input );
 
         bmem = BIO_new( BIO_s_mem( ) );
         b64 = BIO_new( BIO_f_base64( ) );
@@ -1469,7 +1469,7 @@ tr_valloc( size_t bufLen )
 
     if( !pageSize ) {
 #ifdef HAVE_GETPAGESIZE
-        pageSize = getpagesize();
+        pageSize = (size_t) getpagesize();
 #else /* guess */
         pageSize = 4096;
 #endif
@@ -1516,7 +1516,7 @@ tr_realpath( const char * path, char * resolved_path )
 struct formatter_unit
 {
     char * name;
-    double value;
+    unsigned int value;
 };
   
 struct formatter_units
@@ -1524,9 +1524,11 @@ struct formatter_units
     struct formatter_unit units[4];
 };
 
+enum { TR_FMT_B, TR_FMT_KB, TR_FMT_MB, TR_FMT_GB };
+
 static void
 formatter_init( struct formatter_units * units,
-                double kilo,
+                unsigned int kilo,
                 const char * b, const char * kb,
                 const char * mb, const char * gb )
 {
@@ -1537,19 +1539,10 @@ formatter_init( struct formatter_units * units,
     units->units[TR_FMT_KB].value = kilo;
 
     units->units[TR_FMT_MB].name = tr_strdup( mb );
-    units->units[TR_FMT_MB].value = pow( kilo, 2 );
+    units->units[TR_FMT_MB].value = kilo * kilo;
 
     units->units[TR_FMT_GB].name = tr_strdup( gb );
-    units->units[TR_FMT_GB].value = pow( kilo, 3 );
-}
-
-static const char*
-tr_formatter_units( const struct formatter_units * u, int size )
-{
-    assert( u != NULL );
-    assert( 0<=size && size<4 );
-
-    return u->units[size].name;
+    units->units[TR_FMT_GB].value = kilo * kilo * kilo;
 }
 
 static char*
@@ -1566,7 +1559,7 @@ formatter_get_size_str( const struct formatter_units * u,
     else if( bytes < u->units[3].value ) unit = &u->units[2];
     else                                 unit = &u->units[3];
 
-    value = bytes / unit->value;
+    value = (double)bytes / unit->value;
     units = unit->name;
     if( unit->value == 1 )
         precision = 0;
@@ -1581,8 +1574,9 @@ formatter_get_size_str( const struct formatter_units * u,
 static struct formatter_units size_units;
 
 void
-tr_formatter_size_init( double kilo, const char * b, const char * kb,
-                                     const char * mb, const char * gb )
+tr_formatter_size_init( unsigned int kilo,
+                        const char * b, const char * kb,
+                        const char * mb, const char * gb )
 {
     formatter_init( &size_units, kilo, b, kb, mb, gb );
 }
@@ -1593,17 +1587,12 @@ tr_formatter_size( char * buf, uint64_t bytes, size_t buflen )
     return formatter_get_size_str( &size_units, buf, bytes, buflen );
 }
 
-const char*
-tr_formatter_size_units( int i )
-{
-    return tr_formatter_units( &size_units, i );
-}
-
 static struct formatter_units speed_units;
 
 void
-tr_formatter_speed_init( double kilo, const char * b, const char * kb,
-                                      const char * mb, const char * gb )
+tr_formatter_speed_init( unsigned int kilo,
+                         const char * b, const char * kb,
+                         const char * mb, const char * gb )
 {
     formatter_init( &speed_units, kilo, b, kb, mb, gb );
 }
@@ -1614,8 +1603,24 @@ tr_formatter_speed( char * buf, uint64_t bytes_per_second, size_t buflen )
     return formatter_get_size_str( &speed_units, buf, bytes_per_second, buflen );
 }
 
-const char*
-tr_formatter_speed_units( int i )
+unsigned int
+tr_formatter_speed_k( void )
 {
-    return tr_formatter_units( &speed_units, i );
+    return speed_units.units[TR_FMT_KB].value;
+}
+
+static struct formatter_units mem_units;
+
+void
+tr_formatter_mem_init( unsigned int kilo,
+                       const char * b, const char * kb,
+                       const char * mb, const char * gb )
+{
+    formatter_init( &mem_units, kilo, b, kb, mb, gb );
+}
+
+char*
+tr_formatter_mem( char * buf, uint64_t bytes_per_second, size_t buflen )
+{
+    return formatter_get_size_str( &mem_units, buf, bytes_per_second, buflen );
 }

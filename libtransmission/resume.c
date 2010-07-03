@@ -46,7 +46,8 @@
 #define KEY_RATIOLIMIT          "ratio-limit"
 #define KEY_UPLOADED            "uploaded"
 
-#define KEY_SPEED                  "speed"
+#define KEY_SPEED_KiBps            "speed"
+#define KEY_SPEED_Bps              "speed-Bps"
 #define KEY_USE_GLOBAL_SPEED_LIMIT "use-global-speed-limit"
 #define KEY_USE_SPEED_LIMIT        "use-speed-limit"
 #define KEY_SPEEDLIMIT_DOWN_SPEED  "down-speed"
@@ -269,7 +270,7 @@ static void
 saveSingleSpeedLimit( tr_benc * d, const tr_torrent * tor, tr_direction dir )
 {
     tr_bencDictReserve( d, 3 );
-    tr_bencDictAddInt( d, KEY_SPEED, tr_torrentGetSpeedLimit( tor, dir ) );
+    tr_bencDictAddInt( d, KEY_SPEED_Bps, tr_torrentGetSpeedLimit_Bps( tor, dir ) );
     tr_bencDictAddBool( d, KEY_USE_GLOBAL_SPEED_LIMIT, tr_torrentUsesSessionLimits( tor ) );
     tr_bencDictAddBool( d, KEY_USE_SPEED_LIMIT, tr_torrentUsesSpeedLimit( tor, dir ) );
 }
@@ -295,8 +296,10 @@ loadSingleSpeedLimit( tr_benc * d, tr_direction dir, tr_torrent * tor )
     int64_t i;
     tr_bool boolVal;
 
-    if( tr_bencDictFindInt( d, KEY_SPEED, &i ) )
-        tr_torrentSetSpeedLimit( tor, dir, i );
+    if( tr_bencDictFindInt( d, KEY_SPEED_Bps, &i ) )
+        tr_torrentSetSpeedLimit_Bps( tor, dir, i );
+    else if( tr_bencDictFindInt( d, KEY_SPEED_KiBps, &i ) )
+        tr_torrentSetSpeedLimit_Bps( tor, dir, i*1024 );
 
     if( tr_bencDictFindBool( d, KEY_USE_SPEED_LIMIT, &boolVal ) )
         tr_torrentUseSpeedLimit( tor, dir, boolVal );
@@ -334,13 +337,13 @@ loadSpeedLimits( tr_benc * dict, tr_torrent * tor )
 
         int64_t i;
         if( tr_bencDictFindInt( d, KEY_SPEEDLIMIT_DOWN_SPEED, &i ) )
-            tr_torrentSetSpeedLimit( tor, TR_DOWN, i );
+            tr_torrentSetSpeedLimit_Bps( tor, TR_DOWN, i*1024 );
         if( tr_bencDictFindInt( d, KEY_SPEEDLIMIT_DOWN_MODE, &i ) ) {
             tr_torrentUseSpeedLimit( tor, TR_DOWN, i==TR_SPEEDLIMIT_SINGLE );
             tr_torrentUseSessionLimits( tor, i==TR_SPEEDLIMIT_GLOBAL );
          }
         if( tr_bencDictFindInt( d, KEY_SPEEDLIMIT_UP_SPEED, &i ) )
-            tr_torrentSetSpeedLimit( tor, TR_UP, i );
+            tr_torrentSetSpeedLimit_Bps( tor, TR_UP, i*1024 );
         if( tr_bencDictFindInt( d, KEY_SPEEDLIMIT_UP_MODE, &i ) ) {
             tr_torrentUseSpeedLimit( tor, TR_UP, i==TR_SPEEDLIMIT_SINGLE );
             tr_torrentUseSessionLimits( tor, i==TR_SPEEDLIMIT_GLOBAL );

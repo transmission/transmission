@@ -7,16 +7,20 @@
 
 Transmission.fmt = (function()
 {
-	var KB_val = 1024;
-	var MB_val = 1024 * 1024;
-	var GB_val = 1024 * 1024 * 1024;
-	var KB_str = 'KiB';
-	var MB_str = 'MiB';
-	var GB_str = 'GiB';
+	var speed_B_str = 'B';
+	var speed_K_str = 'kB/s';
+	var speed_M_str = 'MB/s';
+	var speed_G_str = 'GB/s';
+
+	var size_B_str = 'B';
+	var size_K_str = 'KiB';
+	var size_M_str = 'MiB';
+	var size_G_str = 'GiB';
 
 	return {
-		MODE_IEC: 1,
-		MODE_SI: 2,
+		speed_K: 1000,
+
+		size_K: 1024,
 
 		/*
 		 *   Format a percentage to a string
@@ -42,24 +46,6 @@ Transmission.fmt = (function()
 				return this.percentString( x );
 		},
 
-		setMode: function( mode ) {
-			if( mode == MODE_IEC ) {
-				this.KB_val = 1024;
-				this.MB_val = this.KB_val * 1024;
-				this.GB_val = this.MB_val * 1024;
-				this.KB_str = 'KiB';
-				this.MB_str = 'MiB';
-				this.GB_str = 'GiB';
-			} else {
-				this.KB_val = 1000;
-				this.MB_val = this.KB_val * 1000;
-				this.GB_val = this.MB_val * 1000;
-				this.KB_str = 'kB';
-				this.MB_str = 'MB';
-				this.GB_str = 'GB';
-			}
-		},
-
 		/**
 		 * Formats the bytes into a string value with B, KiB, MiB, or GiB units.
 		 *
@@ -68,34 +54,57 @@ Transmission.fmt = (function()
 		 */
 		size: function( bytes )
 		{
+			var size_K = this.size_K;
+			var size_M = size_K * size_K;
+			var size_G = size_K * size_K * size_K;
+
 			if( !bytes )
 				return 'None';
+			if( bytes < size_K )
+				return bytes.toTruncFixed(0) + size_B_str;
 
-			if( bytes < KB_val )
-				return bytes.toFixed(0) + ' B';
+			if( bytes < ( size_K * 100 ) )
+				return (bytes/size_K).toTruncFixed(2) + ' ' + size_K_str;
+			if( bytes < size_M )
+				return (bytes/size_K).toTruncFixed(1) + ' ' + size_K_str;
 
-			if( bytes < ( KB_val * 100 ) )
-				return (bytes/KB_val).toFixed(2) + ' ' + KB_str;
-			if( bytes < MB_val )
-				return (bytes/KB_val).toFixed(1) + ' ' + KB_str;
+			if( bytes < ( size_M * 100 ) )
+				return (bytes/size_M).toTruncFixed(2) + ' ' + size_M_str;
+			if( bytes < size_G )
+				return (bytes/size_M).toTruncFixed(1) + ' ' + size_M_str;
 
-			if( bytes < ( MB_val * 100 ) )
-				return (bytes/MB_val).toFixed(2) + ' ' + MB_str;
-			if( bytes < GB_val )
-				return (bytes/MB_val).toFixed(1) + ' ' + MB_str;
-
-			if( bytes < ( GB_val * 100 ) )
-				return (bytes/GB_val).toFixed(2) + ' ' + GB_str;
+			if( bytes < ( size_G * 100 ) )
+				return (bytes/size_G).toTruncFixed(2) + ' ' + size_G_str;
 			else
-				return (bytes/GB_val).toFixed(1) + ' ' + GB_str;
+				return (bytes/size_G).toTruncFixed(1) + ' ' + size_G_str;
 		},
 
 		speed: function( bytes )
 		{
-			if( !bytes )
+			var speed_K = this.speed_K;
+			var speed_M = speed_K * speed_K;
+			var speed_G = speed_K * speed_K * speed_K;
+
+			if( bytes==undefined || bytes==0 )
 				return 'None';
+
+			if( bytes < speed_K )
+				return bytes.toTruncFixed(0) + ' ' + speed_B_str;
+
+			if( bytes < ( speed_K * 100 ) )
+				return (bytes/speed_K).toTruncFixed(2) + ' ' + speed_K_str;
+			if( bytes < speed_M )
+				return (bytes/speed_K).toTruncFixed(1) + ' ' + speed_K_str;
+
+			if( bytes < ( speed_M * 100 ) )
+				return (bytes/speed_M).toTruncFixed(2) + ' ' + speed_M_str;
+			if( bytes < speed_G )
+				return (bytes/speed_M).toTruncFixed(1) + ' ' + speed_M_str;
+
+			if( bytes < ( speed_G * 100 ) )
+				return (bytes/speed_G).toTruncFixed(2) + ' ' + speed_G_str;
 			else
-				return this.size( bytes ) + '/s';
+				return (bytes/speed_G).toTruncFixed(1) + ' ' + speed_G_str;
 		},
 
 		timeInterval: function( seconds )

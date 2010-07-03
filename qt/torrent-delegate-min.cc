@@ -26,7 +26,6 @@
 #include "torrent.h"
 #include "torrent-delegate-min.h"
 #include "torrent-model.h"
-#include "utils.h"
 
 enum
 {

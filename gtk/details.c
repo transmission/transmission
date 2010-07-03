@@ -219,10 +219,10 @@ refreshOptions( struct DetailsImpl * di, tr_torrent ** torrents, int n )
 
     /* downLimitSpin */
     if( n ) {
-        const int baseline = tr_torrentGetSpeedLimit( torrents[0], TR_DOWN );
+        const int baseline = tr_torrentGetSpeedLimit_Bps( torrents[0], TR_DOWN ) / speed_K;
         int i;
         for( i=1; i<n; ++i )
-            if( baseline != tr_torrentGetSpeedLimit( torrents[i], TR_DOWN ) )
+            if( baseline != ( tr_torrentGetSpeedLimit_Bps( torrents[i], TR_DOWN )  / speed_K ) )
                 break;
         if( i == n )
             set_int_spin_if_different( di->downLimitSpin,
@@ -243,10 +243,10 @@ refreshOptions( struct DetailsImpl * di, tr_torrent ** torrents, int n )
 
     /* upLimitSpin */
     if( n ) {
-        const int baseline = tr_torrentGetSpeedLimit( torrents[0], TR_UP );
+        const int baseline = tr_torrentGetSpeedLimit_Bps( torrents[0], TR_UP ) / speed_K;
         int i;
         for( i=1; i<n; ++i )
-            if( baseline != tr_torrentGetSpeedLimit( torrents[i], TR_UP ) )
+            if( baseline != ( tr_torrentGetSpeedLimit_Bps( torrents[i], TR_UP ) / speed_K ) )
                 break;
         if( i == n )
             set_int_spin_if_different( di->upLimitSpin,
@@ -439,6 +439,7 @@ options_page_new( struct DetailsImpl * d )
 {
     guint tag;
     int row;
+    char buf[128];
     const char *s;
     GtkWidget *t, *w, *tb, *h;
 
@@ -451,7 +452,8 @@ options_page_new( struct DetailsImpl * d )
     tag = g_signal_connect( tb, "toggled", G_CALLBACK( global_speed_toggled_cb ), d );
     d->honorLimitsCheckTag = tag;
 
-    tb = gtk_check_button_new_with_mnemonic( _( "Limit _download speed (KiB/s):" ) );
+    g_snprintf( buf, sizeof( buf ), _( "Limit _download speed (%s):" ), _(speed_K_str) );
+    tb = gtk_check_button_new_with_mnemonic( buf );
     gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( tb ), FALSE );
     d->downLimitedCheck = tb;
     tag = g_signal_connect( tb, "toggled", G_CALLBACK( down_speed_toggled_cb ), d );
@@ -463,7 +465,8 @@ options_page_new( struct DetailsImpl * d )
     hig_workarea_add_row_w( t, &row, tb, w, NULL );
     d->downLimitSpin = w;
 
-    tb = gtk_check_button_new_with_mnemonic( _( "Limit _upload speed (KiB/s):" ) );
+    g_snprintf( buf, sizeof( buf ), _( "Limit _upload speed (%s):" ), _(speed_K_str) );
+    tb = gtk_check_button_new_with_mnemonic( buf );
     d->upLimitedCheck = tb;
     tag = g_signal_connect( tb, "toggled", G_CALLBACK( up_speed_toggled_cb ), d );
     d->upLimitedCheckTag = tag;
@@ -758,7 +761,7 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
             str = none;
         else if( pieceSize >= 0 ) {
             char piecebuf[128];
-            tr_strlsize( piecebuf, (uint64_t)pieceSize, sizeof( piecebuf ) );
+            tr_formatter_mem( piecebuf, pieceSize, sizeof( piecebuf ) );
             g_snprintf( buf, sizeof( buf ),
                         ngettext( "%1$s (%2$'d piece @ %3$s)",
                                   "%1$s (%2$'d pieces @ %3$s)", pieces ),
@@ -1041,7 +1044,7 @@ enum
     WEBSEED_COL_KEY,
     WEBSEED_COL_WAS_UPDATED,
     WEBSEED_COL_URL,
-    WEBSEED_COL_DOWNLOAD_RATE_DOUBLE,
+    WEBSEED_COL_DOWNLOAD_RATE_INT,
     WEBSEED_COL_DOWNLOAD_RATE_STRING,
     N_WEBSEED_COLS
 };
@@ -1052,7 +1055,7 @@ getWebseedColumnNames( int column )
     switch( column )
     {
         case WEBSEED_COL_URL: return _( "Webseeds" );
-        case WEBSEED_COL_DOWNLOAD_RATE_DOUBLE:
+        case WEBSEED_COL_DOWNLOAD_RATE_INT:
         case WEBSEED_COL_DOWNLOAD_RATE_STRING: return _( "Down" );
         default: return "";
     }
@@ -1065,7 +1068,7 @@ webseed_model_new( void )
                                G_TYPE_STRING,   /* key */
                                G_TYPE_BOOLEAN,  /* was-updated */
                                G_TYPE_STRING,   /* url */
-                               G_TYPE_DOUBLE,   /* download rate double */
+                               G_TYPE_INT,      /* download rate int */
                                G_TYPE_STRING ); /* download rate string */
 }
 
@@ -1075,9 +1078,9 @@ enum
     PEER_COL_WAS_UPDATED,
     PEER_COL_ADDRESS,
     PEER_COL_ADDRESS_COLLATED,
-    PEER_COL_DOWNLOAD_RATE_DOUBLE,
+    PEER_COL_DOWNLOAD_RATE_INT,
     PEER_COL_DOWNLOAD_RATE_STRING,
-    PEER_COL_UPLOAD_RATE_DOUBLE,
+    PEER_COL_UPLOAD_RATE_INT,
     PEER_COL_UPLOAD_RATE_STRING,
     PEER_COL_CLIENT,
     PEER_COL_PROGRESS,
@@ -1105,9 +1108,9 @@ getPeerColumnName( int column )
     {
         case PEER_COL_ADDRESS: return _( "Address" );
         case PEER_COL_DOWNLOAD_RATE_STRING:
-        case PEER_COL_DOWNLOAD_RATE_DOUBLE: return _( "Down" );
+        case PEER_COL_DOWNLOAD_RATE_INT: return _( "Down" );
         case PEER_COL_UPLOAD_RATE_STRING:
-        case PEER_COL_UPLOAD_RATE_DOUBLE: return _( "Up" );
+        case PEER_COL_UPLOAD_RATE_INT: return _( "Up" );
         case PEER_COL_CLIENT: return _( "Client" );
         case PEER_COL_PROGRESS: return _( "%" );
         case PEER_COL_UPLOAD_REQUEST_COUNT_INT:
@@ -1135,9 +1138,9 @@ peer_store_new( void )
                                G_TYPE_BOOLEAN,  /* was-updated */
                                G_TYPE_STRING,   /* address */
                                G_TYPE_STRING,   /* collated address */
-                               G_TYPE_FLOAT,    /* download speed float */
+                               G_TYPE_INT,      /* download speed int */
                                G_TYPE_STRING,   /* download speed string */
-                               G_TYPE_FLOAT,    /* upload speed float */
+                               G_TYPE_INT,      /* upload speed int */
                                G_TYPE_STRING,   /* upload speed string  */
                                G_TYPE_STRING,   /* client */
                                G_TYPE_INT,      /* progress [0..100] */
@@ -1164,16 +1167,12 @@ initPeerRow( GtkListStore        * store,
              const tr_peer_stat  * peer )
 {
     int q[4];
-    char up_speed[128];
-    char down_speed[128];
     char collated_name[128];
     const char * client = peer->client;
 
     if( !client || !strcmp( client, "Unknown Client" ) )
         client = "";
 
-    tr_strlspeed( up_speed, peer->rateToPeer, sizeof( up_speed ) );
-    tr_strlspeed( down_speed, peer->rateToClient, sizeof( down_speed ) );
     if( sscanf( peer->addr, "%d.%d.%d.%d", q, q+1, q+2, q+3 ) != 4 )
         g_strlcpy( collated_name, peer->addr, sizeof( collated_name ) );
     else
@@ -1203,13 +1202,13 @@ refreshPeerRow( GtkListStore        * store,
     char cancelled_by_peer[64];
     char cancelled_by_client[64];
 
-    if( peer->rateToPeer > 0.01 )
-        tr_strlspeed( up_speed, peer->rateToPeer, sizeof( up_speed ) );
+    if( peer->rateToPeer_Bps > 0 )
+        tr_formatter_speed( up_speed, peer->rateToPeer_Bps, sizeof( up_speed ) );
     else
         *up_speed = '\0';
 
-    if( peer->rateToClient > 0.01 )
-        tr_strlspeed( down_speed, peer->rateToClient, sizeof( down_speed ) );
+    if( peer->rateToClient_Bps > 0 )
+        tr_formatter_speed( down_speed, peer->rateToClient_Bps, sizeof( down_speed ) );
     else
         *down_speed = '\0';
 
@@ -1249,9 +1248,9 @@ refreshPeerRow( GtkListStore        * store,
                         PEER_COL_UPLOAD_REQUEST_COUNT_STRING, up_count,
                         PEER_COL_DOWNLOAD_REQUEST_COUNT_INT, peer->pendingReqsToPeer,
                         PEER_COL_DOWNLOAD_REQUEST_COUNT_STRING, down_count,
-                        PEER_COL_DOWNLOAD_RATE_DOUBLE, peer->rateToClient,
+                        PEER_COL_DOWNLOAD_RATE_INT, peer->rateToClient_Bps,
                         PEER_COL_DOWNLOAD_RATE_STRING, down_speed,
-                        PEER_COL_UPLOAD_RATE_DOUBLE, peer->rateToPeer,
+                        PEER_COL_UPLOAD_RATE_INT, peer->rateToPeer_Bps,
                         PEER_COL_UPLOAD_RATE_STRING, up_speed,
                         PEER_COL_STATUS, peer->flagStr,
                         PEER_COL_WAS_UPDATED, TRUE,
@@ -1397,7 +1396,7 @@ refreshWebseedList( struct DetailsImpl * di, tr_torrent ** torrents, int n )
         int j;
         const tr_torrent * tor = torrents[i];
         const tr_info * inf = tr_torrentInfo( tor );
-        float * speeds = tr_torrentWebSpeeds( tor );
+        int * speeds_Bps = tr_torrentWebSpeeds_Bps( tor );
         for( j=0; j<inf->webseedCount; ++j ) {
             char buf[128];
             char key[256];
@@ -1408,17 +1407,17 @@ refreshWebseedList( struct DetailsImpl * di, tr_torrent ** torrents, int n )
             ref = g_hash_table_lookup( hash, key );
             p = gtk_tree_row_reference_get_path( ref );
             gtk_tree_model_get_iter( model, &iter, p );
-            if( speeds[j] > 0.01 )
-                tr_strlspeed( buf, speeds[j], sizeof( buf ) );
+            if( speeds_Bps[j] > 0 )
+                tr_formatter_speed( buf, speeds_Bps[j], sizeof( buf ) );
             else
                 *buf = '\0';
-            gtk_list_store_set( store, &iter, WEBSEED_COL_DOWNLOAD_RATE_DOUBLE, (double)speeds[j],
+            gtk_list_store_set( store, &iter, WEBSEED_COL_DOWNLOAD_RATE_INT, speeds_Bps[j],
                                               WEBSEED_COL_DOWNLOAD_RATE_STRING, buf,
                                               WEBSEED_COL_WAS_UPDATED, TRUE,
                                               -1 );
             gtk_tree_path_free( p );
         }
-        tr_free( speeds );
+        tr_free( speeds_Bps );
     }
 
     /* step 4: remove webseeds that have disappeared */
@@ -1612,13 +1611,13 @@ setPeerViewColumns( GtkTreeView * peer_view )
                 r = gtk_cell_renderer_text_new( );
                 g_object_set( G_OBJECT( r ), "xalign", 1.0f, NULL );
                 c = gtk_tree_view_column_new_with_attributes( t, r, "text", col, NULL );
-                sort_col = PEER_COL_DOWNLOAD_RATE_DOUBLE;
+                sort_col = PEER_COL_DOWNLOAD_RATE_INT;
                 break;
             case PEER_COL_UPLOAD_RATE_STRING:
                 r = gtk_cell_renderer_text_new( );
                 g_object_set( G_OBJECT( r ), "xalign", 1.0f, NULL );
                 c = gtk_tree_view_column_new_with_attributes( t, r, "text", col, NULL );
-                sort_col = PEER_COL_UPLOAD_RATE_DOUBLE;
+                sort_col = PEER_COL_UPLOAD_RATE_INT;
                 break;
 
             case PEER_COL_STATUS:
@@ -1687,7 +1686,7 @@ peer_page_new( struct DetailsImpl * di )
     str = getWebseedColumnNames( WEBSEED_COL_DOWNLOAD_RATE_STRING );
     r = gtk_cell_renderer_text_new( );
     c = gtk_tree_view_column_new_with_attributes( str, r, "text", WEBSEED_COL_DOWNLOAD_RATE_STRING, NULL );
-    gtk_tree_view_column_set_sort_column_id( c, WEBSEED_COL_DOWNLOAD_RATE_DOUBLE );
+    gtk_tree_view_column_set_sort_column_id( c, WEBSEED_COL_DOWNLOAD_RATE_INT );
     gtk_tree_view_append_column( GTK_TREE_VIEW( v ), c );
 
     w = gtk_scrolled_window_new( NULL, NULL );

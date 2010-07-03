@@ -66,7 +66,7 @@ guessPacketOverhead( size_t d )
      */
     const double assumed_payload_data_rate = 94.0;
 
-    return (size_t)( d * ( 100.0 / assumed_payload_data_rate ) - d );
+    return (unsigned int)( d * ( 100.0 / assumed_payload_data_rate ) - d );
 }
 
 /**
@@ -90,14 +90,14 @@ struct tr_datatype
 ***/
 
 static void
-didWriteWrapper( tr_peerIo * io, size_t bytes_transferred )
+didWriteWrapper( tr_peerIo * io, unsigned int bytes_transferred )
 {
      while( bytes_transferred && tr_isPeerIo( io ) )
      {
         struct tr_datatype * next = io->outbuf_datatypes->data;
 
-        const size_t payload = MIN( next->length, bytes_transferred );
-        const size_t overhead = guessPacketOverhead( payload );
+        const unsigned int payload = MIN( next->length, bytes_transferred );
+        const unsigned int overhead = guessPacketOverhead( payload );
 
         tr_bandwidthUsed( &io->bandwidth, TR_UP, payload, next->isPieceData );
 
@@ -206,10 +206,10 @@ event_read_cb( int fd, short event UNUSED, void * vio )
     tr_peerIo * io = vio;
 
     /* Limit the input buffer to 256K, so it doesn't grow too large */
-    size_t howmuch;
+    unsigned int howmuch;
+    unsigned int curlen;
     const tr_direction dir = TR_DOWN;
-    const size_t max = 256 * 1024;
-    size_t curlen;
+    const unsigned int max = 256 * 1024;
 
     assert( tr_isPeerIo( io ) );
 
@@ -229,7 +229,7 @@ event_read_cb( int fd, short event UNUSED, void * vio )
     }
 
     EVUTIL_SET_SOCKET_ERROR( 0 );
-    res = evbuffer_read( io->inbuf, fd, howmuch );
+    res = evbuffer_read( io->inbuf, fd, (int)howmuch );
     e = EVUTIL_SOCKET_ERROR( );
 
     if( res > 0 )
@@ -282,7 +282,7 @@ tr_evbuffer_write( tr_peerIo * io, int fd, size_t howmuch )
     dbgmsg( io, "wrote %d to peer (%s)", n, (n==-1?tr_net_strerror(errstr,sizeof(errstr),e):"") );
 
     if( n > 0 )
-        evbuffer_drain( buffer, n );
+        evbuffer_drain( buffer, (size_t)n );
 
     /* keep the iobuf's excess capacity from growing too large */
     if( EVBUFFER_LENGTH( io->outbuf ) == 0 ) {
@@ -716,17 +716,18 @@ tr_peerIoSetPeersId( tr_peerIo *     io,
 ***
 **/
 
-static size_t
+static unsigned int
 getDesiredOutputBufferSize( const tr_peerIo * io, uint64_t now )
 {
     /* this is all kind of arbitrary, but what seems to work well is
      * being large enough to hold the next 20 seconds' worth of input,
      * or a few blocks, whichever is bigger.
      * It's okay to tweak this as needed */
-    const double currentSpeed = tr_bandwidthGetPieceSpeed( &io->bandwidth, now, TR_UP );
-    const double period = 15; /* arbitrary */
-    const double numBlocks = 3.5; /* the 3 is arbitrary; the .5 is to leave room for messages */
-    return MAX( MAX_BLOCK_SIZE*numBlocks, currentSpeed*1024*period );
+    const unsigned int currentSpeed_Bps = tr_bandwidthGetPieceSpeed_Bps( &io->bandwidth, now, TR_UP );
+    const unsigned int period = 15u; /* arbitrary */
+    /* the 3 is arbitrary; the .5 is to leave room for messages */
+    static const unsigned int ceiling =  (unsigned int)( MAX_BLOCK_SIZE * 3.5 );
+    return MAX( ceiling, currentSpeed_Bps*period );
 }
 
 size_t
@@ -882,7 +883,7 @@ tr_peerIoTryRead( tr_peerIo * io, size_t howmuch )
         int e;
 
         EVUTIL_SET_SOCKET_ERROR( 0 );
-        res = evbuffer_read( io->inbuf, io->socket, howmuch );
+        res = evbuffer_read( io->inbuf, io->socket, (int)howmuch );
         e = EVUTIL_SOCKET_ERROR( );
 
         dbgmsg( io, "read %d from peer (%s)", res, (res==-1?strerror(e):"") );

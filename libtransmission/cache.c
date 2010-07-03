@@ -48,8 +48,8 @@ struct cache_block
 struct tr_cache
 {
     tr_ptrArray blocks;
-    int maxBlocks;
-    size_t maxMiB;
+    int max_blocks;
+    size_t max_bytes;
 
     size_t disk_writes;
     size_t disk_write_bytes;
@@ -197,7 +197,7 @@ cacheTrim( tr_cache * cache )
 {
     int err = 0;
 
-    while( !err && ( tr_ptrArraySize( &cache->blocks ) > cache->maxBlocks ) )
+    while( !err && ( tr_ptrArraySize( &cache->blocks ) > cache->max_blocks ) )
     {
         int n;
         const int i = findChunk2Discard( cache, &n );
@@ -212,33 +212,38 @@ cacheTrim( tr_cache * cache )
 ***/
 
 static int
-getMaxBlocks( double maxMiB )
+getMaxBlocks( int64_t max_bytes )
 {
-    const double maxBytes = maxMiB * (1024 * 1024);
-    return maxBytes / MAX_BLOCK_SIZE;
+    return max_bytes / (double)MAX_BLOCK_SIZE;
 }
 
 int
-tr_cacheSetLimit( tr_cache * cache, double maxMiB )
+tr_cacheSetLimit( tr_cache * cache, int64_t max_bytes )
 {
-    cache->maxMiB = maxMiB;
-    cache->maxBlocks = getMaxBlocks( maxMiB );
-    tr_ndbg( MY_NAME, "Maximum cache size set to %.2f MiB (%d blocks)", maxMiB, cache->maxBlocks );
+    char buf[128];
+
+    cache->max_bytes = max_bytes;
+    cache->max_blocks = getMaxBlocks( max_bytes );
+
+    tr_formatter_mem( buf, cache->max_bytes, sizeof( buf ) );
+    tr_ndbg( MY_NAME, "Maximum cache size set to %s (%d blocks)", buf, cache->max_blocks );
+
     return cacheTrim( cache );
 }
 
-double
+int64_t
 tr_cacheGetLimit( const tr_cache * cache )
 {
-    return cache->maxMiB;
+    return cache->max_bytes;
 }
 
 tr_cache *
-tr_cacheNew( double maxMiB )
+tr_cacheNew( int64_t max_bytes )
 {
     tr_cache * cache = tr_new0( tr_cache, 1 );
     cache->blocks = TR_PTR_ARRAY_INIT;
-    cache->maxBlocks = getMaxBlocks( maxMiB );
+    cache->max_bytes = max_bytes;
+    cache->max_blocks = getMaxBlocks( max_bytes );
     return cache;
 }
 

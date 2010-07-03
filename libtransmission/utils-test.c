@@ -327,11 +327,11 @@ test_array( void )
     int array[10] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
     int n = sizeof( array ) / sizeof( array[0] );
 
-    tr_removeElementFromArray( array, 5, sizeof( int ), n-- );
+    tr_removeElementFromArray( array, 5u, sizeof( int ), n-- );
     for( i=0; i<n; ++i )
         check( array[i] == ( i<5 ? i : i+1 ) );
 
-    tr_removeElementFromArray( array, 0, sizeof( int ), n-- );
+    tr_removeElementFromArray( array, 0u, sizeof( int ), n-- );
     for( i=0; i<n; ++i )
         check( array[i] == ( i<4 ? i+1 : i+2 ) );
 

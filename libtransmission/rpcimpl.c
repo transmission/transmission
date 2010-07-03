@@ -442,8 +442,8 @@ addPeers( const tr_torrent * tor,
         tr_bencDictAddBool( d, "peerIsInterested", peer->peerIsInterested );
         tr_bencDictAddInt ( d, "port", peer->port );
         tr_bencDictAddReal( d, "progress", peer->progress );
-        tr_bencDictAddInt ( d, "rateToClient", (int)( peer->rateToClient * 1024.0 ) );
-        tr_bencDictAddInt ( d, "rateToPeer", (int)( peer->rateToPeer * 1024.0 ) );
+        tr_bencDictAddInt ( d, "rateToClient", peer->rateToClient_Bps );
+        tr_bencDictAddInt ( d, "rateToPeer", peer->rateToPeer_Bps );
     }
 
     tr_torrentPeersFree( peers, peerCount );
@@ -484,7 +484,7 @@ addField( const tr_torrent * tor, tr_benc * d, const char * key )
     else if( tr_streq( key, keylen, "downloadedEver" ) )
         tr_bencDictAddInt( d, key, st->downloadedEver );
     else if( tr_streq( key, keylen, "downloadLimit" ) )
-        tr_bencDictAddInt( d, key, tr_torrentGetSpeedLimit( tor, TR_DOWN ) );
+        tr_bencDictAddInt( d, key, tr_torrentGetSpeedLimit_Bps( tor, TR_DOWN ) );
     else if( tr_streq( key, keylen, "downloadLimited" ) )
         tr_bencDictAddBool( d, key, tr_torrentUsesSpeedLimit( tor, TR_DOWN ) );
     else if( tr_streq( key, keylen, "error" ) )
@@ -569,9 +569,9 @@ addField( const tr_torrent * tor, tr_benc * d, const char * key )
             tr_bencListAddInt( p, inf->files[i].priority );
     }
     else if( tr_streq( key, keylen, "rateDownload" ) )
-        tr_bencDictAddInt( d, key, (int)( st->pieceDownloadSpeed * 1024 ) );
+        tr_bencDictAddInt( d, key, st->pieceDownloadSpeed_Bps );
     else if( tr_streq( key, keylen, "rateUpload" ) )
-        tr_bencDictAddInt( d, key, (int)( st->pieceUploadSpeed * 1024 ) );
+        tr_bencDictAddInt( d, key, st->pieceUploadSpeed_Bps );
     else if( tr_streq( key, keylen, "recheckProgress" ) )
         tr_bencDictAddReal( d, key, st->recheckProgress );
     else if( tr_streq( key, keylen, "seedRatioLimit" ) )
@@ -599,7 +599,7 @@ addField( const tr_torrent * tor, tr_benc * d, const char * key )
     else if( tr_streq( key, keylen, "uploadedEver" ) )
         tr_bencDictAddInt( d, key, st->uploadedEver );
     else if( tr_streq( key, keylen, "uploadLimit" ) )
-        tr_bencDictAddInt( d, key, tr_torrentGetSpeedLimit( tor, TR_UP ) );
+        tr_bencDictAddInt( d, key, tr_torrentGetSpeedLimit_Bps( tor, TR_UP ) );
     else if( tr_streq( key, keylen, "uploadLimited" ) )
         tr_bencDictAddBool( d, key, tr_torrentUsesSpeedLimit( tor, TR_UP ) );
     else if( tr_streq( key, keylen, "uploadRatio" ) )
@@ -1004,13 +1004,13 @@ torrentSet( tr_session               * session,
         if( !errmsg && tr_bencDictFindList( args_in, "priority-normal", &files ) )
             errmsg = setFilePriorities( tor, TR_PRI_NORMAL, files );
         if( tr_bencDictFindInt( args_in, "downloadLimit", &tmp ) )
-            tr_torrentSetSpeedLimit( tor, TR_DOWN, tmp );
+            tr_torrentSetSpeedLimit_Bps( tor, TR_DOWN, tmp );
         if( tr_bencDictFindBool( args_in, "downloadLimited", &boolVal ) )
             tr_torrentUseSpeedLimit( tor, TR_DOWN, boolVal );
         if( tr_bencDictFindBool( args_in, "honorsSessionLimits", &boolVal ) )
             tr_torrentUseSessionLimits( tor, boolVal );
         if( tr_bencDictFindInt( args_in, "uploadLimit", &tmp ) )
-            tr_torrentSetSpeedLimit( tor, TR_UP, tmp );
+            tr_torrentSetSpeedLimit_Bps( tor, TR_UP, tmp );
         if( tr_bencDictFindBool( args_in, "uploadLimited", &boolVal ) )
             tr_torrentUseSpeedLimit( tor, TR_UP, boolVal );
         if( tr_bencDictFindReal( args_in, "seedRatioLimit", &d ) )
@@ -1407,12 +1407,12 @@ sessionSet( tr_session               * session,
 
     assert( idle_data == NULL );
 
-    if( tr_bencDictFindReal( args_in, TR_PREFS_KEY_MAX_CACHE_SIZE_MiB, &d ) )
+    if( tr_bencDictFindInt( args_in, TR_PREFS_KEY_MAX_CACHE_SIZE, &i ) )
         tr_sessionSetCacheLimit( session, d );
-    if( tr_bencDictFindInt( args_in, TR_PREFS_KEY_ALT_SPEED_UP, &i ) )
-        tr_sessionSetAltSpeed( session, TR_UP, i );
-    if( tr_bencDictFindInt( args_in, TR_PREFS_KEY_ALT_SPEED_DOWN, &i ) )
-        tr_sessionSetAltSpeed( session, TR_DOWN, i );
+    if( tr_bencDictFindInt( args_in, TR_PREFS_KEY_ALT_SPEED_UP_Bps, &i ) )
+        tr_sessionSetAltSpeed_Bps( session, TR_UP, i );
+    if( tr_bencDictFindInt( args_in, TR_PREFS_KEY_ALT_SPEED_DOWN_Bps, &i ) )
+        tr_sessionSetAltSpeed_Bps( session, TR_DOWN, i );
     if( tr_bencDictFindBool( args_in, TR_PREFS_KEY_ALT_SPEED_ENABLED, &boolVal ) )
         tr_sessionUseAltSpeed( session, boolVal );
     if( tr_bencDictFindInt( args_in, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN, &i ) )
@@ -1461,12 +1461,12 @@ sessionSet( tr_session               * session,
         tr_sessionSetTorrentDoneScriptEnabled( session, boolVal );
     if( tr_bencDictFindBool( args_in, TR_PREFS_KEY_TRASH_ORIGINAL, &boolVal ) )
         tr_sessionSetDeleteSource( session, boolVal );
-    if( tr_bencDictFindInt( args_in, TR_PREFS_KEY_DSPEED, &i ) )
-        tr_sessionSetSpeedLimit( session, TR_DOWN, i );
+    if( tr_bencDictFindInt( args_in, TR_PREFS_KEY_DSPEED_Bps, &i ) )
+        tr_sessionSetSpeedLimit_Bps( session, TR_DOWN, i );
     if( tr_bencDictFindBool( args_in, TR_PREFS_KEY_DSPEED_ENABLED, &boolVal ) )
         tr_sessionLimitSpeed( session, TR_DOWN, boolVal );
-    if( tr_bencDictFindInt( args_in, TR_PREFS_KEY_USPEED, &i ) )
-        tr_sessionSetSpeedLimit( session, TR_UP, i );
+    if( tr_bencDictFindInt( args_in, TR_PREFS_KEY_USPEED_Bps, &i ) )
+        tr_sessionSetSpeedLimit_Bps( session, TR_UP, i );
     if( tr_bencDictFindBool( args_in, TR_PREFS_KEY_USPEED_ENABLED, &boolVal ) )
         tr_sessionLimitSpeed( session, TR_UP, boolVal );
     if( tr_bencDictFindStr( args_in, TR_PREFS_KEY_ENCRYPTION, &str ) ) {
@@ -1508,10 +1508,10 @@ sessionStats( tr_session               * session,
     tr_sessionGetCumulativeStats( session, &cumulativeStats );
 
     tr_bencDictAddInt( args_out, "activeTorrentCount", running );
-    tr_bencDictAddInt( args_out, "downloadSpeed", (int)( tr_sessionGetPieceSpeed( session, TR_DOWN ) * 1024 ) );
+    tr_bencDictAddInt( args_out, "downloadSpeed", tr_sessionGetPieceSpeed_Bps( session, TR_DOWN ) );
     tr_bencDictAddInt( args_out, "pausedTorrentCount", total - running );
     tr_bencDictAddInt( args_out, "torrentCount", total );
-    tr_bencDictAddInt( args_out, "uploadSpeed", (int)( tr_sessionGetPieceSpeed( session, TR_UP ) * 1024 ) );
+    tr_bencDictAddInt( args_out, "uploadSpeed", tr_sessionGetPieceSpeed_Bps( session, TR_UP ) );
 
     d = tr_bencDictAddDict( args_out, "cumulative-stats", 5 );
     tr_bencDictAddInt( d, "downloadedBytes", cumulativeStats.downloadedBytes );
@@ -1540,15 +1540,15 @@ sessionGet( tr_session               * s,
     tr_benc *    d = args_out;
 
     assert( idle_data == NULL );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_UP, tr_sessionGetAltSpeed(s,TR_UP) );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_DOWN, tr_sessionGetAltSpeed(s,TR_DOWN) );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_UP_Bps, tr_sessionGetAltSpeed_Bps(s,TR_UP) );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_DOWN_Bps, tr_sessionGetAltSpeed_Bps(s,TR_DOWN) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_ALT_SPEED_ENABLED, tr_sessionUsesAltSpeed(s) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN, tr_sessionGetAltSpeedBegin(s) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_TIME_END,tr_sessionGetAltSpeedEnd(s) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_TIME_DAY,tr_sessionGetAltSpeedDay(s) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED, tr_sessionUsesAltSpeedTime(s) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_BLOCKLIST_ENABLED, tr_blocklistIsEnabled( s ) );
-    tr_bencDictAddReal( d, TR_PREFS_KEY_MAX_CACHE_SIZE_MiB, tr_sessionGetCacheLimit( s ) );
+    tr_bencDictAddReal( d, TR_PREFS_KEY_MAX_CACHE_SIZE, tr_sessionGetCacheLimit( s ) );
     tr_bencDictAddInt ( d, "blocklist-size", tr_blocklistGetRuleCount( s ) );
     tr_bencDictAddStr ( d, "config-dir", tr_sessionGetConfigDir( s ) );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_DOWNLOAD_DIR, tr_sessionGetDownloadDir( s ) );
@@ -1569,9 +1569,9 @@ sessionGet( tr_session               * s,
     tr_bencDictAddBool( d, "seedRatioLimited", tr_sessionIsRatioLimited( s ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_START, !tr_sessionGetPaused( s ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_TRASH_ORIGINAL, tr_sessionGetDeleteSource( s ) );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_USPEED, tr_sessionGetSpeedLimit( s, TR_UP ) );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_USPEED_Bps, tr_sessionGetSpeedLimit_Bps( s, TR_UP ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_USPEED_ENABLED, tr_sessionIsSpeedLimited( s, TR_UP ) );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_DSPEED, tr_sessionGetSpeedLimit( s, TR_DOWN ) );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_DSPEED_Bps, tr_sessionGetSpeedLimit_Bps( s, TR_DOWN ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_DSPEED_ENABLED, tr_sessionIsSpeedLimited( s, TR_DOWN ) );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_FILENAME, tr_sessionGetTorrentDoneScript( s ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED, tr_sessionIsTorrentDoneScriptEnabled( s ) );

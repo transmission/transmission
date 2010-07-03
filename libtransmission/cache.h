@@ -23,7 +23,7 @@ typedef struct tr_cache tr_cache;
 ****
 ***/
 
-tr_cache * tr_cacheNew( double max_MiB );
+tr_cache * tr_cacheNew( int64_t max_bytes );
 
 void tr_cacheFree( tr_cache * );
 
@@ -31,9 +31,9 @@ void tr_cacheFree( tr_cache * );
 ****
 ***/
 
-int tr_cacheSetLimit( tr_cache * cache, double max_MiB );
+int tr_cacheSetLimit( tr_cache * cache, int64_t max_bytes );
 
-double tr_cacheGetLimit( const tr_cache * );
+int64_t tr_cacheGetLimit( const tr_cache * );
 
 int tr_cacheWriteBlock( tr_cache         * cache,
                         tr_torrent       * torrent,

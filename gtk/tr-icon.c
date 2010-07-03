@@ -15,6 +15,8 @@
 #ifdef HAVE_LIBAPPINDICATOR
  #include <libappindicator/app-indicator.h>
 #endif
+#include <libtransmission/transmission.h>
+#include <libtransmission/utils.h>
 #include "actions.h"
 #include "tr-icon.h"
 #include "util.h"
@@ -65,7 +67,7 @@ popup( GtkStatusIcon *       self,
 void
 tr_icon_refresh( gpointer vicon )
 {
-    double d;
+    int Bps;
     int limit;
     char up[64];
     char upLimit[64];
@@ -77,13 +79,14 @@ tr_icon_refresh( gpointer vicon )
     tr_session * session = tr_core_session( g_object_get_data( G_OBJECT( icon ), "tr-core" ) );
 
     /* up */
-    if(((d = tr_sessionGetRawSpeed( session, TR_UP ))) < 0.1 )
+    Bps = tr_sessionGetRawSpeed_Bps( session, TR_UP );
+    if( Bps < 1 )
         g_strlcpy( up, idle, sizeof( up ) );
     else
-        tr_strlspeed( up, d, sizeof( up ) );
+        tr_formatter_speed( up, Bps, sizeof( up ) );
 
     /* up limit */
-    if( !tr_sessionGetActiveSpeedLimit( session, TR_UP, &limit ) )
+    if( !tr_sessionGetActiveSpeedLimit_Bps( session, TR_UP, &limit ) )
         *upLimit = '\0';
     else {
         char buf[64];
@@ -92,13 +95,14 @@ tr_icon_refresh( gpointer vicon )
     }
 
     /* down */
-    if(((d = tr_sessionGetRawSpeed( session, TR_DOWN ))) < 0.1 )
+    Bps = tr_sessionGetRawSpeed_Bps( session, TR_DOWN );
+    if( Bps < 1 )
         g_strlcpy( down, idle, sizeof( down ) );
     else
-        tr_strlspeed( down, d, sizeof( down ) );
+        tr_formatter_speed( down, Bps, sizeof( down ) );
 
     /* down limit */
-    if( !tr_sessionGetActiveSpeedLimit( session, TR_DOWN, &limit ) )
+    if( !tr_sessionGetActiveSpeedLimit_Bps( session, TR_DOWN, &limit ) )
         *downLimit = '\0';
     else {
         char buf[64];

@@ -28,6 +28,10 @@
 #include "qticonloader.h"
 #include "utils.h"
 
+/***
+****
+***/
+
 QString
 Utils :: remoteFileChooser( QWidget * parent, const QString& title, const QString& myPath, bool dir, bool local )
 {
@@ -44,93 +48,6 @@ Utils :: remoteFileChooser( QWidget * parent, const QString& title, const QStrin
         path = QInputDialog::getText( parent, title, tr( "Enter a location:" ), QLineEdit::Normal, myPath, NULL );
 
     return path;
-}
-
-QString
-Utils :: sizeToString( double bytes )
-{
-    if( !bytes )
-        return tr( "None" );
-    else {
-        char buf[128];
-        tr_formatter_size( buf, bytes, sizeof( buf ) );
-        return buf;
-    }
-}
-
-QString
-Utils :: speedToString( const Speed& speed )
-{
-    if( speed.isZero( ) )
-        return tr( "None" );
-    else {
-        char buf[128];
-        tr_formatter_speed( buf, speed.bps( ), sizeof( buf ) );
-        return buf;
-    }
-}
-
-QString
-Utils :: percentToString( double x )
-{
-    char buf[128];
-    return QString( tr_strpercent( buf, x, sizeof(buf) ) );
-}
-
-QString
-Utils :: ratioToString( double ratio )
-{
-    char buf[128];
-    return QString::fromUtf8( tr_strratio( buf, sizeof(buf), ratio, "\xE2\x88\x9E" ) );
-}
-
-QString
-Utils :: timeToString( int seconds )
-{
-    int days, hours, minutes;
-    QString d, h, m, s;
-    QString str;
-
-    if( seconds < 0 )
-        seconds = 0;
-
-    days = seconds / 86400;
-    hours = ( seconds % 86400 ) / 3600;
-    minutes = ( seconds % 3600 ) / 60;
-    seconds %= 60;
-
-    d = tr( "%Ln day(s)", 0, days );
-    h = tr( "%Ln hour(s)", 0, hours );
-    m = tr( "%Ln minute(s)", 0, minutes );
-    s = tr( "%Ln second(s)", 0, seconds );
-
-    if( days )
-    {
-        if( days >= 4 || !hours )
-            str = d;
-        else
-            str = tr( "%1, %2" ).arg( d ).arg( h );
-    }
-    else if( hours )
-    {
-        if( hours >= 4 || !minutes )
-            str = h;
-        else
-            str = tr( "%1, %2" ).arg( h ).arg( m );
-    }
-    else if( minutes )
-    {
-        if( minutes >= 4 || !seconds )
-            str = m;
-        else
-            str = tr( "%1, %2" ).arg( m ).arg( s );
-    }
-    else
-    {
-        str = s;
-    }
-
-    return str;
 }
 
 void

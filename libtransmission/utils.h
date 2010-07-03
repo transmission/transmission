@@ -564,23 +564,26 @@ char* tr_realpath( const char *path, char * resolved_path );
 
 /* example: tr_formatter_size_init( 1024, _("B"), _("KiB"), _("MiB"), _("GiB") ); */
 
-void tr_formatter_size_init( double kilo, const char * b, const char * kb,
-                                          const char * mb, const char * gb );
+void tr_formatter_size_init( unsigned int kilo, const char * b, const char * kb,
+                                                const char * mb, const char * gb );
 
-void tr_formatter_speed_init( double kilo, const char * b, const char * kb,
-                                           const char * mb, const char * gb );
+void tr_formatter_speed_init( unsigned int kilo, const char * b, const char * kb,
+                                                 const char * mb, const char * gb );
 
-/* format a size into a user-readable string. */
-char* tr_formatter_size( char * buf, uint64_t bytes, size_t buflen );
+void tr_formatter_mem_init( unsigned int kilo, const char * b, const char * kb,
+                                               const char * mb, const char * gb );
 
 /* format a speed into a user-readable string. */
 char* tr_formatter_speed( char * buf, uint64_t bytes_per_second, size_t buflen );
 
-enum { TR_FMT_B, TR_FMT_KB, TR_FMT_MB, TR_FMT_GB };
-/* return the human-readable unit initialized by tr_formatter_size_init() */
-const char* tr_formatter_size_units( int size );
-/* return the human-readable unit initialized by tr_formatter_speed_init() */
-const char* tr_formatter_speed_units( int size );
+/* format a file size into a user-readable string. */
+char* tr_formatter_size( char * buf, uint64_t bytes, size_t buflen );
+
+/* format a memory size into a user-readable string. */
+char* tr_formatter_mem( char * buf, uint64_t bytes, size_t buflen );
+
+unsigned int tr_formatter_speed_k( void );
+
 
 /***
 ****

@@ -89,7 +89,7 @@
    string                | value type & description
    ----------------------+-------------------------------------------------
    "bandwidthPriority"   | number     this torrent's bandwidth tr_priority_t
-   "downloadLimit"       | number     maximum download speed (in K/s)
+   "downloadLimit"       | number     maximum download speed (bytes per second)
    "downloadLimited"     | boolean    true if "downloadLimit" is honored
    "files-wanted"        | array      indices of file(s) to download
    "files-unwanted"      | array      indices of file(s) to not download
@@ -105,7 +105,7 @@
    "trackerAdd"          | object     (see below)
    "trackerEdit"         | object     (see below)
    "trackerRemove"       | object     (see below)
-   "uploadLimit"         | number     maximum upload speed (in K/s)
+   "uploadLimit"         | number     maximum upload speed (bytes per second)
    "uploadLimited"       | boolean    true if "uploadLimit" is honored
                          |
    ----------------------+---------------------------------+
@@ -150,6 +150,10 @@
    (2) If the request's "ids" field was "recently-active",
        a "removed" array of torrent-id numbers of recently-removed
        torrents.
+
+   Note: For more information on what these fields mean, see the comments
+   in libtransmission/transmission.h.  The "source" column here
+   corresponds to the data structure there.
 
    key                         | type                        | source 
    ----------------------------+-----------------------------+---------
@@ -414,16 +418,16 @@
 
    string                        | value type & description
    ------------------------------+-------------------------------------------------
-   "alt-speed-down"              | number     max global download speed (in K/s)
+   "alt-speed-down"              | number     max global download speed (in bytes per second)
    "alt-speed-enabled"           | boolean    true means use the alt speeds
    "alt-speed-time-begin"        | number     when to turn on alt speeds (units: minutes after midnight)
    "alt-speed-time-enabled"      | boolean    true means the scheduled on/off times are used
    "alt-speed-time-end"          | number     when to turn off alt speeds (units: same)
    "alt-speed-time-day"          | number     what day(s) to turn on alt speeds (look at tr_sched_day)
-   "alt-speed-up"                | number     max global upload speed (in K/s)
+   "alt-speed-up"                | number     max global upload speed (in bytes per second)
    "blocklist-enabled"           | boolean    true means enabled
    "blocklist-size"              | number     number of rules in the blocklist
-   "cache-size-MiB"              | number     size (in MiB) of the disk cache
+   "cache-size"                  | number     maximum size (in bytes) of the disk cache
    "config-dir"                  | string     location of transmission's configuration directory
    "download-dir"                | string     default path to download torrents
    "dht-enabled"                 | boolean    true means allow dht in public torrents
@@ -444,9 +448,9 @@
    "script-torrent-done-enabled" | boolean    whether or not to call the "done" script
    "seedRatioLimit"              | double     the default seed ratio for torrents to use
    "seedRatioLimited"            | boolean    true if seedRatioLimit is honored by default
-   "speed-limit-down"            | number     max global download speed (in K/s)
+   "speed-limit-down"            | number     max global download speed (in bytes per second)
    "speed-limit-down-enabled"    | boolean    true means enabled
-   "speed-limit-up"              | number     max global upload speed (in K/s)
+   "speed-limit-up"              | number     max global upload speed (in bytes per second)
    "speed-limit-up-enabled"      | boolean    true means enabled
    "start-added-torrents"        | boolean    true means added torrents will be started right away
    "trash-original-torrent-files"| boolean    true means the .torrent file of added torrents will be deleted
@@ -619,12 +623,22 @@
    8     | 1.92    | yes       | torrent-get    | new trackerStats arg "lastScrapeTimedOut"
    ------+---------+-----------+----------------+-------------------------------
    9     | 2.00    | yes       | session-set    | new arg "start-added-torrents"
-         | 2.00    | yes       | session-set    | new arg "trash-original-torrent-files"
-         | 2.00    | yes       | session-get    | new arg "start-added-torrents"
-         | 2.00    | yes       | session-get    | new arg "trash-original-torrent-files"
-         | 2.00    | yes       | session-get    | new arg "cache-size-MiB"
-         | 2.00    | yes       | torrent-get    | new arg "isFinished"
+         |         | yes       | session-set    | new arg "trash-original-torrent-files"
+         |         | yes       | session-get    | new arg "start-added-torrents"
+         |         | yes       | session-get    | new arg "trash-original-torrent-files"
+         |         | yes       | torrent-get    | new arg "isFinished"
    ------+---------+-----------+----------------+-------------------------------
-   10    | 2.10    | yes       | torrent-set    | new arg "trackerAdd"
-         | 2.10    | yes       | torrent-set    | new arg "trackerEdit"
-         | 2.10    | yes       | torrent-set    | new arg "trackerRemove"
+   10    | 2.10    |        NO | torrent-get    | arg "downloadLimit"    is now bytes per second
+         |         |        NO | torrent-get    | arg "uploadLimit"      is now bytes per second
+         |         |        NO | session-get    | arg "speed-limit-down" is now bytes per second
+         |         |        NO | session-get    | arg "speed-limit-up"   is now bytes per second
+         |         |        NO | session-get    | arg "alt-speed-up"     is now bytes per second
+         |         |        NO | session-get    | arg "alt-speed-down"   is now bytes per second
+         |         | yes       | session-get    | new arg "cache-size"
+         |         | yes       | session-set    | new arg "trash-original-torrent-files"
+         |         | yes       | session-get    | new arg "start-added-torrents"
+         |         | yes       | session-get    | new arg "trash-original-torrent-files"
+         |         | yes       | torrent-get    | new arg "isFinished"
+         |         | yes       | torrent-set    | new arg "trackerAdd"
+         |         | yes       | torrent-set    | new arg "trackerEdit"
+         |         | yes       | torrent-set    | new arg "trackerRemove"

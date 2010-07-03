@@ -2250,33 +2250,33 @@ tr_peerMgrTorrentStats( tr_torrent       * tor,
     managerUnlock( t->manager );
 }
 
-float
-tr_peerMgrGetWebseedSpeed( const tr_torrent * tor, uint64_t now )
+int
+tr_peerMgrGetWebseedSpeed_Bps( const tr_torrent * tor, uint64_t now )
 {
     int i;
-    float tmp;
-    float ret = 0;
+    int tmp;
+    int ret = 0;
 
     const Torrent * t = tor->torrentPeers;
     const int n = tr_ptrArraySize( &t->webseeds );
     const tr_webseed ** webseeds = (const tr_webseed**) tr_ptrArrayBase( &t->webseeds );
 
     for( i=0; i<n; ++i )
-        if( tr_webseedGetSpeed( webseeds[i], now, &tmp ) )
+        if( tr_webseedGetSpeed_Bps( webseeds[i], now, &tmp ) )
             ret += tmp;
 
     return ret;
 }
 
 
-float*
-tr_peerMgrWebSpeeds( const tr_torrent * tor )
+int*
+tr_peerMgrWebSpeeds_Bps( const tr_torrent * tor )
 {
     const Torrent * t = tor->torrentPeers;
     const tr_webseed ** webseeds;
     int i;
     int webseedCount;
-    float * ret;
+    int * ret;
     uint64_t now;
 
     assert( t->manager );
@@ -2285,21 +2285,21 @@ tr_peerMgrWebSpeeds( const tr_torrent * tor )
     webseeds = (const tr_webseed**) tr_ptrArrayBase( &t->webseeds );
     webseedCount = tr_ptrArraySize( &t->webseeds );
     assert( webseedCount == tor->info.webseedCount );
-    ret = tr_new0( float, webseedCount );
+    ret = tr_new0( int, webseedCount );
     now = tr_date( );
 
     for( i=0; i<webseedCount; ++i )
-        if( !tr_webseedGetSpeed( webseeds[i], now, &ret[i] ) )
+        if( !tr_webseedGetSpeed_Bps( webseeds[i], now, &ret[i] ) )
             ret[i] = -1.0;
 
     managerUnlock( t->manager );
     return ret;
 }
 
-double
-tr_peerGetPieceSpeed( const tr_peer * peer, uint64_t now, tr_direction direction )
+int
+tr_peerGetPieceSpeed_Bps( const tr_peer * peer, uint64_t now, tr_direction direction )
 {
-    return peer->io ? tr_peerIoGetPieceSpeed( peer->io, now, direction ) : 0.0;
+    return peer->io ? tr_peerIoGetPieceSpeed_Bps( peer->io, now, direction ) : 0.0;
 }
 
 
@@ -2336,8 +2336,8 @@ tr_peerMgrPeerStats( const tr_torrent    * tor,
         stat->from                = atom->from;
         stat->progress            = peer->progress;
         stat->isEncrypted         = tr_peerIoIsEncrypted( peer->io ) ? 1 : 0;
-        stat->rateToPeer          = tr_peerGetPieceSpeed( peer, now, TR_CLIENT_TO_PEER );
-        stat->rateToClient        = tr_peerGetPieceSpeed( peer, now, TR_PEER_TO_CLIENT );
+        stat->rateToPeer_Bps      = tr_peerGetPieceSpeed_Bps( peer, now, TR_CLIENT_TO_PEER );
+        stat->rateToClient_Bps    = tr_peerGetPieceSpeed_Bps( peer, now, TR_PEER_TO_CLIENT );
         stat->peerIsChoked        = peer->peerIsChoked;
         stat->peerIsInterested    = peer->peerIsInterested;
         stat->clientIsChoked      = peer->clientIsChoked;
@@ -2613,23 +2613,23 @@ isNew( const tr_peer * peer )
 static int
 getRate( const tr_torrent * tor, struct peer_atom * atom, uint64_t now )
 {
-    double KiB_s;
+    int Bps;
 
     if( tr_torrentIsSeed( tor ) )
-        KiB_s = tr_peerGetPieceSpeed( atom->peer, now, TR_CLIENT_TO_PEER );
+        Bps = tr_peerGetPieceSpeed_Bps( atom->peer, now, TR_CLIENT_TO_PEER );
 
     /* downloading a private torrent... take upload speed into account
      * because there may only be a small window of opportunity to share */
     else if( tr_torrentIsPrivate( tor ) )
-        KiB_s = tr_peerGetPieceSpeed( atom->peer, now, TR_PEER_TO_CLIENT )
-              + tr_peerGetPieceSpeed( atom->peer, now, TR_CLIENT_TO_PEER );
+        Bps = tr_peerGetPieceSpeed_Bps( atom->peer, now, TR_PEER_TO_CLIENT )
+            + tr_peerGetPieceSpeed_Bps( atom->peer, now, TR_CLIENT_TO_PEER );
 
     /* downloading a public torrent */
     else
-        KiB_s = tr_peerGetPieceSpeed( atom->peer, now, TR_PEER_TO_CLIENT );
+        Bps = tr_peerGetPieceSpeed_Bps( atom->peer, now, TR_PEER_TO_CLIENT );
 
     /* convert it to bytes per second */
-    return (int)( KiB_s * 1024 );
+    return Bps;
 }
 
 static void
@@ -2995,8 +2995,8 @@ sortPeersByLivelinessImpl( tr_peer  ** peers,
         l->doPurge = p->doPurge;
         l->pieceDataTime = p->atom->piece_data_time;
         l->time = p->atom->time;
-        l->speed = 1024.0 * (   tr_peerGetPieceSpeed( p, now, TR_UP )
-                              + tr_peerGetPieceSpeed( p, now, TR_DOWN ) );
+        l->speed = tr_peerGetPieceSpeed_Bps( p, now, TR_UP )
+                 + tr_peerGetPieceSpeed_Bps( p, now, TR_DOWN );
         if( clientData )
             l->clientData = clientData[i];
     }
@@ -3315,8 +3315,8 @@ isBandwidthMaxedOut( const tr_bandwidth * b,
     if( !tr_bandwidthIsLimited( b, dir ) )
         return FALSE;
     else {
-        const double got = tr_bandwidthGetPieceSpeed( b, now_msec, dir );
-        const double want = tr_bandwidthGetDesiredSpeed( b, dir );
+        const int got = tr_bandwidthGetPieceSpeed_Bps( b, now_msec, dir );
+        const int want = tr_bandwidthGetDesiredSpeed_Bps( b, dir );
         return got >= want;
     }
 }

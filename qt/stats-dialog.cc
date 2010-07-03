@@ -18,7 +18,7 @@
 #include "hig.h"
 #include "session.h"
 #include "stats-dialog.h"
-#include "utils.h"
+#include "units.h"
 
 enum
 {
@@ -85,15 +85,15 @@ StatsDialog :: updateStats( )
     const struct tr_session_stats& current( mySession.getStats( ) );
     const struct tr_session_stats& total( mySession.getCumulativeStats( ) );
 
-    myCurrentUp->setText( Utils :: sizeToString( current.uploadedBytes ) );
-    myCurrentDown->setText( Utils :: sizeToString( current.downloadedBytes ) );
-    myCurrentRatio->setText( Utils :: ratioToString( current.ratio ) );
-    myCurrentDuration->setText( Utils :: timeToString( current.secondsActive ) );
+    myCurrentUp->setText( Units::sizeToString( current.uploadedBytes ) );
+    myCurrentDown->setText( Units::sizeToString( current.downloadedBytes ) );
+    myCurrentRatio->setText( Units::ratioToString( current.ratio ) );
+    myCurrentDuration->setText( Units::timeToString( current.secondsActive ) );
 
-    myTotalUp->setText( Utils :: sizeToString( total.uploadedBytes ) );
-    myTotalDown->setText( Utils :: sizeToString( total.downloadedBytes ) );
-    myTotalRatio->setText( Utils :: ratioToString( total.ratio ) );
-    myTotalDuration->setText( Utils :: timeToString( total.secondsActive ) );
+    myTotalUp->setText( Units::sizeToString( total.uploadedBytes ) );
+    myTotalDown->setText( Units::sizeToString( total.downloadedBytes ) );
+    myTotalRatio->setText( Units::ratioToString( total.ratio ) );
+    myTotalDuration->setText( Units::timeToString( total.secondsActive ) );
 
     myStartCount->setText( tr( "Started %n time(s)", 0, total.sessionCount ) );
 }

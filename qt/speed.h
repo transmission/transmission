@@ -16,20 +16,20 @@
 class Speed
 {
     private:
-        double _kbps;
-        Speed( double kbps ): _kbps(kbps) { }
+        int _Bps;
+        Speed( int Bps ): _Bps(Bps) { }
     public:
-        Speed( ): _kbps(0) { }
-        double kbps( ) const { return _kbps; }
-        double bps( ) const { return kbps()*1024.0; }
-        bool isZero( ) const { return _kbps < 0.001; }
-        static Speed fromKbps( double kbps ) { return Speed( kbps ); }
-        static Speed fromBps( double bps ) { return Speed( bps/1024.0 ); }
-        void setKbps( double kbps ) { _kbps = kbps; }
-        void setBps( double bps ) { _kbps = bps/1024.0; }
-        Speed operator+( const Speed& that ) const { return Speed( kbps() + that.kbps() ); }
-        Speed& operator+=( const Speed& that ) { _kbps += that._kbps; return *this; }
-        bool operator<( const Speed& that ) const { return kbps() < that.kbps(); }
+        Speed( ): _Bps(0) { }
+        double KiBps( ) const { return _Bps/1024.0; }
+        int Bps( ) const { return _Bps; }
+        bool isZero( ) const { return _Bps == 0; }
+        static Speed fromKiBps( double KiBps ) { return Speed( KiBps*1024 ); }
+        static Speed fromBps( int Bps ) { return Speed( Bps ); }
+        void setKiBps( double KiBps ) { setBps( KiBps*1024 ); }
+        void setBps( double Bps ) { _Bps = Bps; }
+        Speed& operator+=( const Speed& that ) { _Bps += that._Bps; return *this; }
+        Speed operator+( const Speed& that ) const { return Speed( _Bps + that._Bps ); }
+        bool operator<( const Speed& that ) const { return _Bps < that._Bps; }
 };
 
 #endif

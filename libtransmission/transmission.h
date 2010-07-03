@@ -156,8 +156,8 @@ const char* tr_getDefaultDownloadDir( void );
 #define TR_DEFAULT_PEER_LIMIT_TORRENT_STR        "60"
 
 #define TR_PREFS_KEY_ALT_SPEED_ENABLED             "alt-speed-enabled"
-#define TR_PREFS_KEY_ALT_SPEED_UP                  "alt-speed-up"
-#define TR_PREFS_KEY_ALT_SPEED_DOWN                "alt-speed-down"
+#define TR_PREFS_KEY_ALT_SPEED_UP_Bps              "alt-speed-up-Bps"
+#define TR_PREFS_KEY_ALT_SPEED_DOWN_Bps            "alt-speed-down-Bps"
 #define TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN          "alt-speed-time-begin"
 #define TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED        "alt-speed-time-enabled"
 #define TR_PREFS_KEY_ALT_SPEED_TIME_END            "alt-speed-time-end"
@@ -165,7 +165,7 @@ const char* tr_getDefaultDownloadDir( void );
 #define TR_PREFS_KEY_BIND_ADDRESS_IPV4             "bind-address-ipv4"
 #define TR_PREFS_KEY_BIND_ADDRESS_IPV6             "bind-address-ipv6"
 #define TR_PREFS_KEY_BLOCKLIST_ENABLED             "blocklist-enabled"
-#define TR_PREFS_KEY_MAX_CACHE_SIZE_MiB            "cache-size-MiB"
+#define TR_PREFS_KEY_MAX_CACHE_SIZE                "cache-size-bytes"
 #define TR_PREFS_KEY_DHT_ENABLED                   "dht-enabled"
 #define TR_PREFS_KEY_LPD_ENABLED                   "lpd-enabled"
 #define TR_PREFS_KEY_DOWNLOAD_DIR                  "download-dir"
@@ -206,10 +206,10 @@ const char* tr_getDefaultDownloadDir( void );
 #define TR_PREFS_KEY_SCRIPT_TORRENT_DONE_FILENAME  "script-torrent-done-filename"
 #define TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED   "script-torrent-done-enabled"
 #define TR_PREFS_KEY_RPC_WHITELIST                 "rpc-whitelist"
-#define TR_PREFS_KEY_DSPEED                        "speed-limit-down"
+#define TR_PREFS_KEY_DSPEED_Bps                    "speed-limit-down-Bps"
 #define TR_PREFS_KEY_DSPEED_ENABLED                "speed-limit-down-enabled"
+#define TR_PREFS_KEY_USPEED_Bps                    "speed-limit-up-Bps"
 #define TR_PREFS_KEY_USPEED_ENABLED                "speed-limit-up-enabled"
-#define TR_PREFS_KEY_USPEED                        "speed-limit-up"
 #define TR_PREFS_KEY_UMASK                         "umask"
 #define TR_PREFS_KEY_UPLOAD_SLOTS_PER_TORRENT      "upload-slots-per-torrent"
 #define TR_PREFS_KEY_START                         "start-added-torrents"
@@ -598,8 +598,8 @@ void     tr_sessionSetDHTEnabled( tr_session * session, tr_bool );
 tr_bool  tr_sessionIsLPDEnabled( const tr_session * session );
 void     tr_sessionSetLPDEnabled( tr_session * session, tr_bool enabled );
 
-void     tr_sessionSetCacheLimit( tr_session * session, double MiB );
-double   tr_sessionGetCacheLimit( const tr_session * session );
+void     tr_sessionSetCacheLimit( tr_session * session, int64_t bytes );
+int64_t  tr_sessionGetCacheLimit( const tr_session * session );
 
 void     tr_sessionSetLazyBitfieldEnabled( tr_session * session, tr_bool enabled );
 tr_bool  tr_sessionIsLazyBitfieldEnabled( const tr_session * session );
@@ -657,8 +657,8 @@ tr_direction;
 ****  Primary session speed limits
 ***/
 
-void     tr_sessionSetSpeedLimit      ( tr_session *, tr_direction, int KB_s );
-int      tr_sessionGetSpeedLimit      ( const tr_session *, tr_direction );
+void tr_sessionSetSpeedLimit_Bps( tr_session *, tr_direction, int Bps );
+int tr_sessionGetSpeedLimit_Bps( const tr_session *, tr_direction );
 
 void     tr_sessionLimitSpeed         ( tr_session *, tr_direction, tr_bool );
 tr_bool  tr_sessionIsSpeedLimited     ( const tr_session *, tr_direction );
@@ -668,8 +668,8 @@ tr_bool  tr_sessionIsSpeedLimited     ( const tr_session *, tr_direction );
 ****  Alternative speed limits that are used during scheduled times
 ***/
 
-void     tr_sessionSetAltSpeed        ( tr_session *, tr_direction, int KB_s );
-int      tr_sessionGetAltSpeed        ( const tr_session *, tr_direction );
+void tr_sessionSetAltSpeed_Bps( tr_session *, tr_direction, int Bps );
+int  tr_sessionGetAltSpeed_Bps( const tr_session *, tr_direction );
 
 void     tr_sessionUseAltSpeed        ( tr_session *, tr_bool );
 tr_bool  tr_sessionUsesAltSpeed       ( const tr_session * );
@@ -706,18 +706,16 @@ void     tr_sessionClearAltSpeedFunc  ( tr_session * );
 void     tr_sessionSetAltSpeedFunc    ( tr_session *, tr_altSpeedFunc *, void * );
 
 
-tr_bool      tr_sessionGetActiveSpeedLimit( const tr_session  * session,
+tr_bool  tr_sessionGetActiveSpeedLimit_Bps( const tr_session  * session,
                                             tr_direction        dir,
                                             int               * setme );
-
 
 /***
 ****
 ***/
 
-double     tr_sessionGetRawSpeed      ( const tr_session *, tr_direction );
-double     tr_sessionGetPieceSpeed    ( const tr_session *, tr_direction );
-
+int        tr_sessionGetRawSpeed_Bps  ( const tr_session *, tr_direction );
+int        tr_sessionGetPieceSpeed_Bps( const tr_session *, tr_direction );
 
 void       tr_sessionSetRatioLimited  ( tr_session *, tr_bool isLimited );
 tr_bool    tr_sessionIsRatioLimited   ( const tr_session * );
@@ -1126,8 +1124,8 @@ char* tr_torrentFindFile( const tr_torrent * tor, tr_file_index_t fileNo );
 ****
 ***/
 
-void     tr_torrentSetSpeedLimit      ( tr_torrent *, tr_direction, int KB_s );
-int      tr_torrentGetSpeedLimit      ( const tr_torrent *, tr_direction );
+void     tr_torrentSetSpeedLimit_Bps  ( tr_torrent *, tr_direction, int KB_s );
+int      tr_torrentGetSpeedLimit_Bps  ( const tr_torrent *, tr_direction );
 
 void     tr_torrentUseSpeedLimit      ( tr_torrent *, tr_direction, tr_bool );
 tr_bool  tr_torrentUsesSpeedLimit     ( const tr_torrent *, tr_direction );
@@ -1382,8 +1380,8 @@ typedef struct tr_peer_stat
     char     flagStr[32];
 
     float    progress;
-    float    rateToPeer;
-    float    rateToClient;
+    int      rateToPeer_Bps;
+    int      rateToClient_Bps;
 
 
 /***
@@ -1546,7 +1544,7 @@ void tr_torrentTrackersFree( tr_tracker_stat * trackerStats,
  *         return -1 instead of 0 KiB/s.
  *         NOTE: always free this array with tr_free() when you're done with it.
  */
-float*         tr_torrentWebSpeeds( const tr_torrent * torrent );
+int*  tr_torrentWebSpeeds_Bps( const tr_torrent * torrent );
 
 typedef struct tr_file_stat
 {
@@ -1746,21 +1744,21 @@ typedef struct tr_stat
         Range is [0..1] */
     double seedRatioPercentDone;
 
-    /** Speed all data being sent for this torrent. (KiB/s)
+    /** Speed all data being sent for this torrent.
         This includes piece data, protocol messages, and TCP overhead */
-    double rawUploadSpeed;
+    int rawUploadSpeed_Bps;
 
-    /** Speed all data being received for this torrent. (KiB/s)
+    /** Speed all data being received for this torrent.
         This includes piece data, protocol messages, and TCP overhead */
-    double rawDownloadSpeed;
+    int rawDownloadSpeed_Bps;
 
-    /** Speed all piece being sent for this torrent. (KiB/s)
+    /** Speed all piece being sent for this torrent.
         This ONLY counts piece data. */
-    double pieceUploadSpeed;
+    int pieceUploadSpeed_Bps;
 
-    /** Speed all piece being received for this torrent. (KiB/s)
+    /** Speed all piece being received for this torrent.
         This ONLY counts piece data. */
-    double pieceDownloadSpeed;
+    int pieceDownloadSpeed_Bps;
 
 #define TR_ETA_NOT_AVAIL -1
 #define TR_ETA_UNKNOWN -2

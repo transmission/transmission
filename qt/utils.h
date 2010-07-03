@@ -26,13 +26,9 @@ class Utils: public QObject
     public:
         Utils( ) { }
         virtual ~Utils( ) { }
+
     public:
         static QString remoteFileChooser( QWidget * parent, const QString& title, const QString& myPath, bool dir, bool local );
-        static QString sizeToString( double bytes );
-        static QString speedToString( const Speed& speed );
-        static QString percentToString( double x );
-        static QString ratioToString( double ratio );
-        static QString timeToString( int seconds );
         static const QIcon& guessMimeIcon( const QString& filename );
 
         // meh

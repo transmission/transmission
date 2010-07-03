@@ -532,8 +532,9 @@ main( int argc, char ** argv )
     bind_textdomain_codeset( domain, "UTF-8" );
     textdomain( domain );
     g_set_application_name( _( "Transmission" ) );
-    tr_formatter_size_init( 1024, _("B"), _("KiB"), _("MiB"), _("GiB") );
-    tr_formatter_speed_init( 1024, _("B/s"), _("KiB/s"), _("MiB/s"), _("GiB/s") );
+    tr_formatter_mem_init( mem_K, _(mem_B_str), _(mem_K_str), _(mem_M_str), _(mem_G_str) );
+    tr_formatter_size_init( disk_K, _(disk_B_str), _(disk_K_str), _(disk_M_str), _(disk_G_str) );
+    tr_formatter_speed_init( speed_K, _(speed_B_str), _(speed_K_str), _(speed_M_str), _(speed_G_str) );
 
     /* initialize gtk */
     if( !g_thread_supported( ) )
@@ -1202,17 +1203,17 @@ prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
     {
         tr_sessionLimitSpeed( tr, TR_DOWN, pref_flag_get( key ) );
     }
-    else if( !strcmp( key, TR_PREFS_KEY_DSPEED ) )
+    else if( !strcmp( key, TR_PREFS_KEY_DSPEED_Bps ) )
     {
-        tr_sessionSetSpeedLimit( tr, TR_DOWN, pref_int_get( key ) );
+        tr_sessionSetSpeedLimit_Bps( tr, TR_DOWN, pref_int_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_USPEED_ENABLED ) )
     {
         tr_sessionLimitSpeed( tr, TR_UP, pref_flag_get( key ) );
     }
-    else if( !strcmp( key, TR_PREFS_KEY_USPEED ) )
+    else if( !strcmp( key, TR_PREFS_KEY_USPEED_Bps ) )
     {
-        tr_sessionSetSpeedLimit( tr, TR_UP, pref_int_get( key ) );
+        tr_sessionSetSpeedLimit_Bps( tr, TR_UP, pref_int_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_RATIO_ENABLED ) )
     {
@@ -1298,13 +1299,13 @@ prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
     {
         tr_sessionSetProxyPort( tr, pref_int_get( key ) );
     }
-    else if( !strcmp( key, TR_PREFS_KEY_ALT_SPEED_UP ) )
+    else if( !strcmp( key, TR_PREFS_KEY_ALT_SPEED_UP_Bps ) )
     {
-        tr_sessionSetAltSpeed( tr, TR_UP, pref_int_get( key ) );
+        tr_sessionSetAltSpeed_Bps( tr, TR_UP, pref_int_get( key ) );
     }
-    else if( !strcmp( key, TR_PREFS_KEY_ALT_SPEED_DOWN ) )
+    else if( !strcmp( key, TR_PREFS_KEY_ALT_SPEED_DOWN_Bps ) )
     {
-        tr_sessionSetAltSpeed( tr, TR_DOWN, pref_int_get( key ) );
+        tr_sessionSetAltSpeed_Bps( tr, TR_DOWN, pref_int_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_ALT_SPEED_ENABLED ) )
     {

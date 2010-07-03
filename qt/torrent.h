@@ -284,8 +284,8 @@ class Torrent: public QObject
         double getVerifyProgress( ) const { return getDouble( PERCENT_VERIFIED ); }
         bool hasFileSubstring( const QString& substr ) const;
         bool hasTrackerSubstring( const QString& substr ) const;
-        Speed uploadLimit( ) const { return Speed::fromKbps( getInt( UP_LIMIT ) ); }
-        Speed downloadLimit( ) const { return Speed::fromKbps( getInt( DOWN_LIMIT ) ); }
+        Speed uploadLimit( ) const { return Speed::fromBps( getInt( UP_LIMIT ) ); }
+        Speed downloadLimit( ) const { return Speed::fromBps( getInt( DOWN_LIMIT ) ); }
         bool uploadIsLimited( ) const { return getBool( UP_LIMITED ); }
         bool downloadIsLimited( ) const { return getBool( DOWN_LIMITED ); }
         bool honorsSessionLimits( ) const { return getBool( HONORS_SESSION_LIMITS ); }

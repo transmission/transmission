@@ -41,6 +41,44 @@
 #include "tr-prefs.h"
 #include "util.h"
 
+/***
+****  UNITS
+***/
+
+const int mem_K = 1024;
+/* abbreviation for bytes */
+const char * mem_B_str = N_("B");
+/* abbreviation IEC base 2 units kilobyte */
+const char * mem_K_str = N_("KiB");
+/* abbreviation IEC base 2 units megabyte */
+const char * mem_M_str = N_("MiB");
+/* abbreviation IEC base 2 units gigabyte */
+const char * mem_G_str = N_("GiB");
+
+const int disk_K = 1000;
+/* abbreviation for bytes */
+const char * disk_B_str = N_("B");
+/* abbreviation for SI base 10 kilobyte */
+const char * disk_K_str = N_("kB");
+/* abbreviation for SI base 10 megabyte */
+const char * disk_M_str = N_("MB");
+/* abbreviation for SI base 10 gigabyte */
+const char * disk_G_str = N_("GB");
+
+const int speed_K = 1000;
+/* abbreviation for bytes per second */
+const char * speed_B_str = N_("B/s");
+/* abbreviation for kilobytes per second */
+const char * speed_K_str = N_("kB/s");
+/* abbreviation for megabytes per second */
+const char * speed_M_str = N_("MB/s");
+/* abbreviation for gigabytes per second */
+const char * speed_G_str = N_("GB/s");
+
+/***
+****
+***/
+
 gtr_lockfile_state_t
 gtr_lockfile( const char * filename )
 {
@@ -124,10 +162,8 @@ tr_strlsize( char * buf, guint64 bytes, size_t buflen )
 }
 
 char*
-tr_strlspeed( char * buf, double kb_sec, size_t buflen )
+tr_strlspeed( char * buf, int bytes_per_second, size_t buflen )
 {
-    const int64_t bytes_per_second = kb_sec * 1024.0;
-
     if( bytes_per_second < 1 )
         g_strlcpy( buf, _( "None" ), buflen );
     else

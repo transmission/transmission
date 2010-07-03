@@ -41,6 +41,7 @@
 #include "prefs-dialog.h"
 #include "qticonloader.h"
 #include "session.h"
+#include "units.h"
 #include "utils.h"
 
 /***
@@ -50,6 +51,7 @@
 namespace
 {
     const char * PREF_KEY( "pref-key" );
+    const char * MULTIPLIER_KEY( "multiplier-key" );
 };
 
 void
@@ -81,13 +83,14 @@ void
 PrefsDialog :: spinBoxChangedIdle( )
 {
     const QObject * spin( sender()->property( "SPIN" ).value<QObject*>( ) );
-    const int key( spin->property( PREF_KEY ).toInt( ) );
+    const int key = spin->property( PREF_KEY ).toInt( );
+    const int multiplier = spin->property( MULTIPLIER_KEY ).toInt( );
 
     const QDoubleSpinBox * d = qobject_cast<const QDoubleSpinBox*>( spin );
     if( d != 0 )
-        myPrefs.set( key, d->value( ) );
+        myPrefs.set( key, multiplier * d->value( ) );
     else
-        myPrefs.set( key, qobject_cast<const QSpinBox*>(spin)->value( ) );
+        myPrefs.set( key, multiplier * qobject_cast<const QSpinBox*>(spin)->value( ) );
 }
 
 void
@@ -113,13 +116,14 @@ PrefsDialog :: spinBoxChanged( int value )
 }
 
 QSpinBox *
-PrefsDialog :: spinBoxNew( int key, int low, int high, int step )
+PrefsDialog :: spinBoxNew( int key, int low, int high, int step, int multiplier )
 {
     QSpinBox * spin = new QSpinBox( );
     spin->setRange( low, high );
     spin->setSingleStep( step );
-    spin->setValue( myPrefs.getInt( key ) );
+    spin->setValue( myPrefs.getInt( key ) / multiplier );
     spin->setProperty( PREF_KEY, key );
+    spin->setProperty( MULTIPLIER_KEY, multiplier );
     connect( spin, SIGNAL(valueChanged(int)), this, SLOT(spinBoxChanged(int)));
     myWidgets.insert( key, spin );
     return spin;
@@ -134,14 +138,15 @@ PrefsDialog :: doubleSpinBoxChanged( double value )
 }
 
 QDoubleSpinBox *
-PrefsDialog :: doubleSpinBoxNew( int key, double low, double high, double step, int decimals )
+PrefsDialog :: doubleSpinBoxNew( int key, double low, double high, double step, int decimals, int multiplier )
 {
     QDoubleSpinBox * spin = new QDoubleSpinBox( );
     spin->setRange( low, high );
     spin->setSingleStep( step );
     spin->setDecimals( decimals );
-    spin->setValue( myPrefs.getDouble( key ) );
+    spin->setValue( myPrefs.getDouble( key ) / multiplier );
     spin->setProperty( PREF_KEY, key );
+    spin->setProperty( MULTIPLIER_KEY, multiplier );
     connect( spin, SIGNAL(valueChanged(double)), this, SLOT(doubleSpinBoxChanged(double)));
     myWidgets.insert( key, spin );
     return spin;
@@ -267,13 +272,13 @@ PrefsDialog :: createSpeedTab( )
     HIG * hig = new HIG( this );
     hig->addSectionTitle( tr( "Speed Limits" ) );
 
-        l = checkBoxNew( tr( "Limit &download speed (KiB/s):" ), Prefs::DSPEED_ENABLED );
-        r = spinBoxNew( Prefs::DSPEED, 0, INT_MAX, 5 );
+        l = checkBoxNew( tr( "Limit &download speed (%1):" ).arg( Units::speed_K_str ), Prefs::DSPEED_ENABLED );
+        r = spinBoxNew( Prefs::DSPEED, 0, INT_MAX, 5, Units::speed_K );
         hig->addRow( l, r );
         enableBuddyWhenChecked( qobject_cast<QCheckBox*>(l), r );
 
-        l = checkBoxNew( tr( "Limit &upload speed (KiB/s):" ), Prefs::USPEED_ENABLED );
-        r = spinBoxNew( Prefs::USPEED, 0, INT_MAX, 5 );
+        l = checkBoxNew( tr( "Limit &upload speed (%1):" ).arg( Units::speed_K_str ), Prefs::USPEED_ENABLED );
+        r = spinBoxNew( Prefs::USPEED, 0, INT_MAX, 5, Units::speed_K );
         hig->addRow( l, r );
         enableBuddyWhenChecked( qobject_cast<QCheckBox*>(l), r );
 
@@ -293,12 +298,12 @@ PrefsDialog :: createSpeedTab( )
         QString s = tr( "<small>Override normal speed limits manually or at scheduled times</small>" );
         hig->addWideControl( new QLabel( s ) );
 
-        s = tr( "Limit d&ownload speed (KiB/s):" );
-        r = spinBoxNew( Prefs :: ALT_SPEED_LIMIT_DOWN, 0, INT_MAX, 5 );
+        s = tr( "Limit d&ownload speed (%1):" ).arg( Units::speed_K_str );
+        r = spinBoxNew( Prefs :: ALT_SPEED_LIMIT_DOWN, 0, INT_MAX, 5, Units::speed_K );
         hig->addRow( s, r );
 
-        s = tr( "Limit u&pload speed (KiB/s):" );
-        r = spinBoxNew( Prefs :: ALT_SPEED_LIMIT_UP, 0, INT_MAX, 5 );
+        s = tr( "Limit u&pload speed (%1):" ).arg( Units::speed_K_str );
+        r = spinBoxNew( Prefs :: ALT_SPEED_LIMIT_UP, 0, INT_MAX, 5, Units::speed_K );
         hig->addRow( s, r );
 
         QCheckBox * c = checkBoxNew( tr( "&Scheduled times:" ), Prefs::ALT_SPEED_LIMIT_TIME_ENABLED );
