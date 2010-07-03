@@ -1151,7 +1151,7 @@ fileBytesCompleted( const tr_torrent * tor, tr_file_index_t index )
 
             /* the last block */
             if( tr_cpBlockIsCompleteFast( &tor->completion, lastBlock ) )
-                total += ( f->offset + f->length ) - ( tor->blockSize * lastBlock );
+                total += ( f->offset + f->length ) - ( (uint64_t)tor->blockSize * lastBlock );
         }
     }
 
