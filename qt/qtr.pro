@@ -31,11 +31,11 @@ TRANSLATIONS += transmission_en.ts transmission_ru.ts
 FORMS += mainwin.ui
 RESOURCES += application.qrc
 SOURCES += about.cc app.cc dbus-adaptor.cc details.cc file-tree.cc filters.cc \
-           hig.cc license.cc mainwin.cc make-dialog.cc options.cc prefs.cc \
-           prefs-dialog.cc qticonloader.cc relocate.cc session.cc \
+           formatter.cc hig.cc license.cc mainwin.cc make-dialog.cc options.cc \
+           prefs.cc prefs-dialog.cc qticonloader.cc relocate.cc session.cc \
            session-dialog.cc squeezelabel.cc stats-dialog.cc torrent.cc \
            torrent-delegate.cc torrent-delegate-min.cc torrent-filter.cc \
-           torrent-model.cc triconpushbutton.cc units.cc utils.cc watchdir.cc
+           torrent-model.cc triconpushbutton.cc utils.cc watchdir.cc
 HEADERS += $$replace(SOURCES, .cc, .h)
 HEADERS += speed.h types.h
 

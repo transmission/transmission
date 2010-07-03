@@ -19,14 +19,14 @@
 
 class Speed;
 
-class Units: public QObject
+class Formatter: public QObject
 {
         Q_OBJECT
 
     public:
 
-        Units( ) { }
-        virtual ~Units( ) { }
+        Formatter( ) { }
+        virtual ~Formatter( ) { }
 
     public:
 

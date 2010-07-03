@@ -34,10 +34,10 @@
 #include <libtransmission/makemeta.h>
 #include <libtransmission/utils.h>
 
+#include "formatter.h"
 #include "hig.h"
 #include "make-dialog.h"
 #include "session.h"
-#include "units.h"
 
 /***
 ****
@@ -282,10 +282,10 @@ MakeDialog :: onSourceChanged( )
         QString files = tr( "%Ln File(s)", 0, myBuilder->fileCount );
         QString pieces = tr( "%Ln Piece(s)", 0, myBuilder->pieceCount );
         text = tr( "%1 in %2; %3 @ %4" )
-                 .arg( Units::sizeToString( myBuilder->totalSize ) )
+                 .arg( Formatter::sizeToString( myBuilder->totalSize ) )
                  .arg( files )
                  .arg( pieces )
-                 .arg( Units::sizeToString( myBuilder->pieceSize ) );
+                 .arg( Formatter::sizeToString( myBuilder->pieceSize ) );
     }
 
     mySourceLabel->setText( text );

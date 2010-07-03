@@ -15,10 +15,10 @@
 #include <QTimer>
 #include <QVBoxLayout>
 
+#include "formatter.h"
 #include "hig.h"
 #include "session.h"
 #include "stats-dialog.h"
-#include "units.h"
 
 enum
 {
@@ -85,15 +85,15 @@ StatsDialog :: updateStats( )
     const struct tr_session_stats& current( mySession.getStats( ) );
     const struct tr_session_stats& total( mySession.getCumulativeStats( ) );
 
-    myCurrentUp->setText( Units::sizeToString( current.uploadedBytes ) );
-    myCurrentDown->setText( Units::sizeToString( current.downloadedBytes ) );
-    myCurrentRatio->setText( Units::ratioToString( current.ratio ) );
-    myCurrentDuration->setText( Units::timeToString( current.secondsActive ) );
+    myCurrentUp->setText( Formatter::sizeToString( current.uploadedBytes ) );
+    myCurrentDown->setText( Formatter::sizeToString( current.downloadedBytes ) );
+    myCurrentRatio->setText( Formatter::ratioToString( current.ratio ) );
+    myCurrentDuration->setText( Formatter::timeToString( current.secondsActive ) );
 
-    myTotalUp->setText( Units::sizeToString( total.uploadedBytes ) );
-    myTotalDown->setText( Units::sizeToString( total.downloadedBytes ) );
-    myTotalRatio->setText( Units::ratioToString( total.ratio ) );
-    myTotalDuration->setText( Units::timeToString( total.secondsActive ) );
+    myTotalUp->setText( Formatter::sizeToString( total.uploadedBytes ) );
+    myTotalDown->setText( Formatter::sizeToString( total.downloadedBytes ) );
+    myTotalRatio->setText( Formatter::ratioToString( total.ratio ) );
+    myTotalDuration->setText( Formatter::timeToString( total.secondsActive ) );
 
     myStartCount->setText( tr( "Started %n time(s)", 0, total.sessionCount ) );
 }

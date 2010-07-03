@@ -15,37 +15,37 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h> // tr_formatter
 
+#include "formatter.h"
 #include "speed.h"
-#include "units.h"
 
 /***
 ****  Constants
 ***/
 
-const int     Units :: speed_K     = 1000;
-const QString Units :: speed_B_str = "B/s";
-const QString Units :: speed_K_str = "kB/s";
-const QString Units :: speed_M_str = "MB/s";
-const QString Units :: speed_G_str = "GB/s";
+const int     Formatter :: speed_K     = 1000;
+const QString Formatter :: speed_B_str = "B/s";
+const QString Formatter :: speed_K_str = "kB/s";
+const QString Formatter :: speed_M_str = "MB/s";
+const QString Formatter :: speed_G_str = "GB/s";
 
-const int     Units :: size_K     = 1000;
-const QString Units :: size_B_str = "B";
-const QString Units :: size_K_str = "kB";
-const QString Units :: size_M_str = "MB";
-const QString Units :: size_G_str = "GB";
+const int     Formatter :: size_K     = 1000;
+const QString Formatter :: size_B_str = "B";
+const QString Formatter :: size_K_str = "kB";
+const QString Formatter :: size_M_str = "MB";
+const QString Formatter :: size_G_str = "GB";
 
-const int     Units :: mem_K     = 1024;
-const QString Units :: mem_B_str = "B";
-const QString Units :: mem_K_str = "KiB";
-const QString Units :: mem_M_str = "MiB";
-const QString Units :: mem_G_str = "GiB";
+const int     Formatter :: mem_K     = 1024;
+const QString Formatter :: mem_B_str = "B";
+const QString Formatter :: mem_K_str = "KiB";
+const QString Formatter :: mem_M_str = "MiB";
+const QString Formatter :: mem_G_str = "GiB";
 
 /***
 ****
 ***/
 
 QString
-Units :: memToString( double bytes )
+Formatter :: memToString( double bytes )
 {
     if( !bytes )
         return tr( "None" );
@@ -57,7 +57,7 @@ Units :: memToString( double bytes )
 }
 
 QString
-Units :: sizeToString( double bytes )
+Formatter :: sizeToString( double bytes )
 {
     if( !bytes )
         return tr( "None" );
@@ -69,7 +69,7 @@ Units :: sizeToString( double bytes )
 }
 
 QString
-Units :: speedToString( const Speed& speed )
+Formatter :: speedToString( const Speed& speed )
 {
     if( speed.isZero( ) )
         return tr( "None" );
@@ -81,21 +81,21 @@ Units :: speedToString( const Speed& speed )
 }
 
 QString
-Units :: percentToString( double x )
+Formatter :: percentToString( double x )
 {
     char buf[128];
     return QString( tr_strpercent( buf, x, sizeof(buf) ) );
 }
 
 QString
-Units :: ratioToString( double ratio )
+Formatter :: ratioToString( double ratio )
 {
     char buf[128];
     return QString::fromUtf8( tr_strratio( buf, sizeof(buf), ratio, "\xE2\x88\x9E" ) );
 }
 
 QString
-Units :: timeToString( int seconds )
+Formatter :: timeToString( int seconds )
 {
     int days, hours, minutes;
     QString d, h, m, s;

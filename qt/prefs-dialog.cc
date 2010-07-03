@@ -36,12 +36,12 @@
 #include <QTimer>
 #include <QVBoxLayout>
 
+#include "formatter.h"
 #include "hig.h"
 #include "prefs.h"
 #include "prefs-dialog.h"
 #include "qticonloader.h"
 #include "session.h"
-#include "units.h"
 #include "utils.h"
 
 /***
@@ -272,13 +272,13 @@ PrefsDialog :: createSpeedTab( )
     HIG * hig = new HIG( this );
     hig->addSectionTitle( tr( "Speed Limits" ) );
 
-        l = checkBoxNew( tr( "Limit &download speed (%1):" ).arg( Units::speed_K_str ), Prefs::DSPEED_ENABLED );
-        r = spinBoxNew( Prefs::DSPEED, 0, INT_MAX, 5, Units::speed_K );
+        l = checkBoxNew( tr( "Limit &download speed (%1):" ).arg( Formatter::speed_K_str ), Prefs::DSPEED_ENABLED );
+        r = spinBoxNew( Prefs::DSPEED, 0, INT_MAX, 5, Formatter::speed_K );
         hig->addRow( l, r );
         enableBuddyWhenChecked( qobject_cast<QCheckBox*>(l), r );
 
-        l = checkBoxNew( tr( "Limit &upload speed (%1):" ).arg( Units::speed_K_str ), Prefs::USPEED_ENABLED );
-        r = spinBoxNew( Prefs::USPEED, 0, INT_MAX, 5, Units::speed_K );
+        l = checkBoxNew( tr( "Limit &upload speed (%1):" ).arg( Formatter::speed_K_str ), Prefs::USPEED_ENABLED );
+        r = spinBoxNew( Prefs::USPEED, 0, INT_MAX, 5, Formatter::speed_K );
         hig->addRow( l, r );
         enableBuddyWhenChecked( qobject_cast<QCheckBox*>(l), r );
 
@@ -298,12 +298,12 @@ PrefsDialog :: createSpeedTab( )
         QString s = tr( "<small>Override normal speed limits manually or at scheduled times</small>" );
         hig->addWideControl( new QLabel( s ) );
 
-        s = tr( "Limit d&ownload speed (%1):" ).arg( Units::speed_K_str );
-        r = spinBoxNew( Prefs :: ALT_SPEED_LIMIT_DOWN, 0, INT_MAX, 5, Units::speed_K );
+        s = tr( "Limit d&ownload speed (%1):" ).arg( Formatter::speed_K_str );
+        r = spinBoxNew( Prefs :: ALT_SPEED_LIMIT_DOWN, 0, INT_MAX, 5, Formatter::speed_K );
         hig->addRow( s, r );
 
-        s = tr( "Limit u&pload speed (%1):" ).arg( Units::speed_K_str );
-        r = spinBoxNew( Prefs :: ALT_SPEED_LIMIT_UP, 0, INT_MAX, 5, Units::speed_K );
+        s = tr( "Limit u&pload speed (%1):" ).arg( Formatter::speed_K_str );
+        r = spinBoxNew( Prefs :: ALT_SPEED_LIMIT_UP, 0, INT_MAX, 5, Formatter::speed_K );
         hig->addRow( s, r );
 
         QCheckBox * c = checkBoxNew( tr( "&Scheduled times:" ), Prefs::ALT_SPEED_LIMIT_TIME_ENABLED );

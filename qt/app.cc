@@ -31,13 +31,13 @@
 
 #include "app.h"
 #include "dbus-adaptor.h"
+#include "formatter.h"
 #include "mainwin.h"
 #include "options.h"
 #include "prefs.h"
 #include "session.h"
 #include "session-dialog.h"
 #include "torrent-model.h"
-#include "units.h"
 #include "utils.h"
 #include "watchdir.h"
 
@@ -100,21 +100,21 @@ MyApp :: MyApp( int& argc, char ** argv ):
     installTranslator( t );
 
     // initialize the units formatter
-    tr_formatter_mem_init( Units::mem_K,
-                           qPrintable( Units::mem_B_str ),
-                           qPrintable( Units::mem_K_str ),
-                           qPrintable( Units::mem_M_str ),
-                           qPrintable( Units::mem_G_str ) );
-    tr_formatter_size_init( Units::size_K,
-                            qPrintable( Units::size_B_str ),
-                            qPrintable( Units::size_K_str ),
-                            qPrintable( Units::size_M_str ),
-                            qPrintable( Units::size_G_str ) );
-    tr_formatter_speed_init( Units::speed_K,
-                             qPrintable( Units::speed_B_str ),
-                             qPrintable( Units::speed_K_str ),
-                             qPrintable( Units::speed_M_str ),
-                             qPrintable( Units::speed_G_str ) );
+    tr_formatter_mem_init( Formatter::mem_K,
+                           qPrintable( Formatter::mem_B_str ),
+                           qPrintable( Formatter::mem_K_str ),
+                           qPrintable( Formatter::mem_M_str ),
+                           qPrintable( Formatter::mem_G_str ) );
+    tr_formatter_size_init( Formatter::size_K,
+                            qPrintable( Formatter::size_B_str ),
+                            qPrintable( Formatter::size_K_str ),
+                            qPrintable( Formatter::size_M_str ),
+                            qPrintable( Formatter::size_G_str ) );
+    tr_formatter_speed_init( Formatter::speed_K,
+                             qPrintable( Formatter::speed_B_str ),
+                             qPrintable( Formatter::speed_K_str ),
+                             qPrintable( Formatter::speed_M_str ),
+                             qPrintable( Formatter::speed_G_str ) );
 
     // set the default icon
     QIcon icon;
