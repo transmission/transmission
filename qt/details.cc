@@ -688,6 +688,9 @@ Details :: refresh( )
             const QString tierKey( QString::number(trackerStat.tier) );
             QTreeWidgetItem * tier = (QTreeWidgetItem*) myTrackerTiers.value( tierKey, 0 );
 
+            if( tier == 0 ) // check if has tier been created this pass
+                tier = (QTreeWidgetItem*) trackerTiers.value( tierKey, 0 );
+
             if( tier == 0 ) // new tier
             {
                 QFont tierFont;
