@@ -1161,15 +1161,20 @@ Details :: removeTracker( const QTreeWidgetItem * item )
 void
 Details :: onRemoveTrackerPushed( )
 {
-    const QTreeWidgetItem * item = myTrackerTree->selectedItems().first();
-    const bool isTier = item->data( 0, TRACKERID ).toInt() == -1;
-    if( isTier )
-    {
-        for( int i = 0; i < item->childCount(); ++i )
-            removeTracker( item->child( i ) );
+    const QList<QTreeWidgetItem*> items = myTrackerTree->selectedItems();
+    QSet<int> removedTiers;
+    foreach( const QTreeWidgetItem * item, items ) {
+        const bool isTier = item->data( 0, TRACKERID ).toInt() == -1;
+        const int curTier = item->data( 0, TRACKERTIER ).toInt();
+        if( isTier )
+        {
+            removedTiers << curTier;
+            for( int i = 0; i < item->childCount(); ++i )
+                removeTracker( item->child( i ) );
+        }
+        else if( !removedTiers.contains( curTier ) ) // skip trackers removed by clearing a tier
+            removeTracker( item );
     }
-    else
-        removeTracker( item );
 }
 
 QWidget *
@@ -1288,7 +1293,7 @@ Details :: createTrackerTab( )
     headers << tr("Trackers");
     myTrackerTree = new QTreeWidget;
     myTrackerTree->setHeaderLabels( headers );
-    myTrackerTree->setSelectionMode( QTreeWidget::SingleSelection );
+    myTrackerTree->setSelectionMode( QTreeWidget::ExtendedSelection );
     myTrackerTree->setRootIsDecorated( false );
     myTrackerTree->setIndentation( 2 );
     myTrackerTree->setItemsExpandable( false );
