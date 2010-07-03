@@ -125,7 +125,7 @@ findChunk2Discard( tr_cache * cache, int * setme_n )
                 if( bestlen == 1) {
                     /* But if all other blocks are non-contiguous, we prefer this one */
                     bestpos = pos;
-                    oldest_time = cache->maxBlocks - len;
+                    oldest_time = cache->max_blocks - len;
                 }
                 continue;
             }

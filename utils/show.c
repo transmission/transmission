@@ -249,9 +249,9 @@ main( int argc, char * argv[] )
     tr_ctor * ctor;
 
     tr_setMessageLevel( TR_MSG_ERR );
-    tr_formatter_mem_init  ( MEM_K, MEM_B_STR, MEM_K_STR, MEM_G_STR );
-    tr_formatter_size_init ( DISK_K, DISK_B_STR, DIST_K_STR, DISK_G_STR );
-    tr_formatter_size_init ( SPEED_K, SPEED_B_STR, SPEED_K_STR, SPEED_G_STR );
+    tr_formatter_mem_init  ( MEM_K, MEM_B_STR, MEM_K_STR, MEM_M_STR, MEM_G_STR );
+    tr_formatter_size_init ( DISK_K, DISK_B_STR, DISK_K_STR, DISK_M_STR, DISK_G_STR );
+    tr_formatter_size_init ( SPEED_K, SPEED_B_STR, SPEED_K_STR, SPEED_M_STR, SPEED_G_STR );
 
     if( parseCommandLine( argc, (const char**)argv ) )
         return EXIT_FAILURE;
