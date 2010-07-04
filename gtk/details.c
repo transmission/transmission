@@ -457,7 +457,7 @@ options_page_new( struct DetailsImpl * d )
     tag = g_signal_connect( tb, "toggled", G_CALLBACK( down_speed_toggled_cb ), d );
     d->downLimitedCheckTag = tag;
 
-    w = gtk_spin_button_new_with_range( 1, INT_MAX, 5 );
+    w = gtk_spin_button_new_with_range( 0, INT_MAX, 5 );
     tag = g_signal_connect( w, "value-changed", G_CALLBACK( down_speed_spun_cb ), d );
     d->downLimitSpinTag = tag;
     hig_workarea_add_row_w( t, &row, tb, w, NULL );
@@ -468,7 +468,7 @@ options_page_new( struct DetailsImpl * d )
     tag = g_signal_connect( tb, "toggled", G_CALLBACK( up_speed_toggled_cb ), d );
     d->upLimitedCheckTag = tag;
 
-    w = gtk_spin_button_new_with_range( 1, INT_MAX, 5 );
+    w = gtk_spin_button_new_with_range( 0, INT_MAX, 5 );
     tag = g_signal_connect( w, "value-changed", G_CALLBACK( up_speed_spun_cb ), d );
     d->upLimitSpinTag = tag;
     hig_workarea_add_row_w( t, &row, tb, w, NULL );
