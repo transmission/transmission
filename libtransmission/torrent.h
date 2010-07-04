@@ -210,9 +210,9 @@ struct tr_torrent
     uint64_t                   corruptPrev;
 
     uint64_t                   etaDLSpeedCalculatedAt;
-    int                        etaDLSpeed_Bps;
+    double                     etaDLSpeed_KBps;
     uint64_t                   etaULSpeedCalculatedAt;
-    int                        etaULSpeed_Bps;
+    double                     etaULSpeed_KBps;
 
     time_t                     addedDate;
     time_t                     activityDate;
@@ -420,5 +420,9 @@ char* tr_torrentBuildPartial( const tr_torrent *, tr_file_index_t fileNo );
 /* for when the info dict has been fundamentally changed wrt files,
  * piece size, etc. such as in BEP 9 where peers exchange metadata */
 void tr_torrentGotNewInfoDict( tr_torrent * tor );
+
+void tr_torrentSetSpeedLimit_Bps  ( tr_torrent *, tr_direction, int Bps );
+int tr_torrentGetSpeedLimit_Bps  ( const tr_torrent *, tr_direction );
+
 
 #endif

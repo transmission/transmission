@@ -225,7 +225,7 @@ tr_cacheSetLimit( tr_cache * cache, int64_t max_bytes )
     cache->max_bytes = max_bytes;
     cache->max_blocks = getMaxBlocks( max_bytes );
 
-    tr_formatter_mem( buf, cache->max_bytes, sizeof( buf ) );
+    tr_formatter_mem_B( buf, cache->max_bytes, sizeof( buf ) );
     tr_ndbg( MY_NAME, "Maximum cache size set to %s (%d blocks)", buf, cache->max_blocks );
 
     return cacheTrim( cache );

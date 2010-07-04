@@ -104,8 +104,8 @@ showInfo( const tr_info * inf )
     if( inf->comment && *inf->comment )
         printf( "  Comment: %s\n", inf->comment );
     printf( "  Piece Count: %d\n", inf->pieceCount );
-    printf( "  Piece Size: %s\n", tr_formatter_mem( buf, inf->pieceSize, sizeof( buf ) ) );
-    printf( "  Total Size: %s\n", tr_formatter_size( buf, inf->totalSize, sizeof( buf ) ) );
+    printf( "  Piece Size: %s\n", tr_formatter_mem_B( buf, inf->pieceSize, sizeof( buf ) ) );
+    printf( "  Total Size: %s\n", tr_formatter_size_B( buf, inf->totalSize, sizeof( buf ) ) );
     printf( "  Privacy: %s\n", inf->isPrivate ? "Private torrent" : "Public torrent" );
 
     /**
@@ -130,7 +130,7 @@ showInfo( const tr_info * inf )
 
     printf( "\nFILES\n\n" );
     for( i=0; i<(int)inf->fileCount; ++i )
-        printf( "  %s (%s)\n", inf->files[i].name, tr_formatter_size( buf, inf->files[i].length, sizeof( buf ) ) );
+        printf( "  %s (%s)\n", inf->files[i].name, tr_formatter_size_B( buf, inf->files[i].length, sizeof( buf ) ) );
 }
 
 static size_t

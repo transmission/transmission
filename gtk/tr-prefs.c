@@ -30,7 +30,6 @@
 ***
 **/
 
-#define MULTIPLIER_KEY "multiplier-key"
 #define PREF_KEY "pref-key"
 
 static void
@@ -106,16 +105,15 @@ spun_cb_idle( gpointer spin )
     {
         /* update the core */
         const char * key = g_object_get_data( o, PREF_KEY );
-        const int multiplier = GPOINTER_TO_INT( g_object_get_data( o, MULTIPLIER_KEY ) );
 
         if (data->isDouble)
         {
-            const double value = gtk_spin_button_get_value( GTK_SPIN_BUTTON( spin ) ) * multiplier;
+            const double value = gtk_spin_button_get_value( GTK_SPIN_BUTTON( spin ) );
             tr_core_set_pref_double( TR_CORE( data->core ), key, value );
         }
         else
         {
-            const int value = gtk_spin_button_get_value_as_int( GTK_SPIN_BUTTON( spin ) ) * multiplier;
+            const int value = gtk_spin_button_get_value_as_int( GTK_SPIN_BUTTON( spin ) );
             tr_core_set_pref_int( TR_CORE( data->core ), key, value );
         }
 
@@ -164,16 +162,14 @@ spun_cb_double( GtkSpinButton * w, gpointer core )
 static GtkWidget*
 new_spin_button( const char * key,
                  gpointer     core,
-                 int          multiplier,
                  int          low,
                  int          high,
                  int          step )
 {
     GtkWidget * w = gtk_spin_button_new_with_range( low, high, step );
-    g_object_set_data( G_OBJECT( w ), MULTIPLIER_KEY, GINT_TO_POINTER( multiplier ) );
     g_object_set_data_full( G_OBJECT( w ), PREF_KEY, g_strdup( key ), g_free );
     gtk_spin_button_set_digits( GTK_SPIN_BUTTON( w ), 0 );
-    gtk_spin_button_set_value( GTK_SPIN_BUTTON( w ), pref_int_get( key ) / multiplier );
+    gtk_spin_button_set_value( GTK_SPIN_BUTTON( w ), pref_int_get( key ) );
     g_signal_connect( w, "value-changed", G_CALLBACK( spun_cb_int ), core );
     return w;
 }
@@ -181,13 +177,11 @@ new_spin_button( const char * key,
 static GtkWidget*
 new_spin_button_double( const char * key,
                        gpointer      core,
-                       int           multiplier,
                        double        low,
                        double        high,
                        double        step )
 {
     GtkWidget * w = gtk_spin_button_new_with_range( low, high, step );
-    g_object_set_data( G_OBJECT( w ), MULTIPLIER_KEY, GINT_TO_POINTER( multiplier ) );
     g_object_set_data_full( G_OBJECT( w ), PREF_KEY, g_strdup( key ), g_free );
     gtk_spin_button_set_digits( GTK_SPIN_BUTTON( w ), 2 );
     gtk_spin_button_set_value( GTK_SPIN_BUTTON( w ), pref_double_get( key ) );
@@ -329,7 +323,7 @@ torrentPage( GObject * core )
 
     s = _( "_Seed torrent until its ratio reaches:" );
     w = new_check_button( s, TR_PREFS_KEY_RATIO_ENABLED, core );
-    w2 = new_spin_button_double( TR_PREFS_KEY_RATIO, core, 1, 0, INT_MAX, .05 );
+    w2 = new_spin_button_double( TR_PREFS_KEY_RATIO, core, 0, INT_MAX, .05 );
     gtk_widget_set_sensitive( GTK_WIDGET( w2 ), pref_flag_get( TR_PREFS_KEY_RATIO_ENABLED ) );
     g_signal_connect( w, "toggled", G_CALLBACK( target_cb ), w2 );
     hig_workarea_add_row_w( t, &row, w, w2, NULL );
@@ -806,7 +800,7 @@ webPage( GObject * core )
     hig_workarea_add_wide_control( t, &row, h );
 
     /* port */
-    w = new_spin_button( TR_PREFS_KEY_RPC_PORT, core, 1, 0, USHRT_MAX, 1 );
+    w = new_spin_button( TR_PREFS_KEY_RPC_PORT, core, 0, USHRT_MAX, 1 );
     page->widgets = g_slist_append( page->widgets, w );
     w = hig_workarea_add_row( t, &row, _( "Listening _port:" ), w, NULL );
     page->widgets = g_slist_append( page->widgets, w );
@@ -1011,7 +1005,7 @@ trackerPage( GObject * core )
     w = hig_workarea_add_row( t, &row, s, w, NULL );
     page->proxy_widgets = g_slist_append( page->proxy_widgets, w );
 
-    w = new_spin_button( TR_PREFS_KEY_PROXY_PORT, core, 1, 0, USHRT_MAX, 1 );
+    w = new_spin_button( TR_PREFS_KEY_PROXY_PORT, core, 0, USHRT_MAX, 1 );
     page->proxy_widgets = g_slist_append( page->proxy_widgets, w );
     w = hig_workarea_add_row( t, &row, _( "Proxy _port:" ), w, NULL );
     page->proxy_widgets = g_slist_append( page->proxy_widgets, w );
@@ -1219,14 +1213,14 @@ bandwidthPage( GObject * core )
 
         g_snprintf( buf, sizeof( buf ), _( "Limit _download speed (%s):" ), _(speed_K_str) );
         w = new_check_button( buf, TR_PREFS_KEY_DSPEED_ENABLED, core );
-        w2 = new_spin_button( TR_PREFS_KEY_DSPEED_Bps, core, speed_K, 0, INT_MAX, 5 );
+        w2 = new_spin_button( TR_PREFS_KEY_DSPEED_KBps, core, 0, INT_MAX, 5 );
         gtk_widget_set_sensitive( GTK_WIDGET( w2 ), pref_flag_get( TR_PREFS_KEY_DSPEED_ENABLED ) );
         g_signal_connect( w, "toggled", G_CALLBACK( target_cb ), w2 );
         hig_workarea_add_row_w( t, &row, w, w2, NULL );
 
         g_snprintf( buf, sizeof( buf ), _( "Limit _upload speed (%s):" ), _(speed_K_str) );
         w = new_check_button( buf, TR_PREFS_KEY_USPEED_ENABLED, core );
-        w2 = new_spin_button( TR_PREFS_KEY_USPEED_Bps, core, speed_K, 0, INT_MAX, 5 );
+        w2 = new_spin_button( TR_PREFS_KEY_USPEED_KBps, core, 0, INT_MAX, 5 );
         gtk_widget_set_sensitive( GTK_WIDGET( w2 ), pref_flag_get( TR_PREFS_KEY_USPEED_ENABLED ) );
         g_signal_connect( w, "toggled", G_CALLBACK( target_cb ), w2 );
         hig_workarea_add_row_w( t, &row, w, w2, NULL );
@@ -1250,11 +1244,11 @@ bandwidthPage( GObject * core )
         hig_workarea_add_wide_control( t, &row, w );
 
         g_snprintf( buf, sizeof( buf ), _( "Limit do_wnload speed (%s):" ), _(speed_K_str) );
-        w = new_spin_button( TR_PREFS_KEY_ALT_SPEED_DOWN_Bps, core, speed_K, 0, INT_MAX, 5 );
+        w = new_spin_button( TR_PREFS_KEY_ALT_SPEED_DOWN_KBps, core, 0, INT_MAX, 5 );
         hig_workarea_add_row( t, &row, buf, w, NULL );
 
         g_snprintf( buf, sizeof( buf ), _( "Limit u_pload speed (%s):" ), _(speed_K_str) );
-        w = new_spin_button( TR_PREFS_KEY_ALT_SPEED_UP_Bps, core, speed_K, 0, INT_MAX, 5 );
+        w = new_spin_button( TR_PREFS_KEY_ALT_SPEED_UP_KBps, core, 0, INT_MAX, 5 );
         hig_workarea_add_row( t, &row, buf, w, NULL );
 
         s = _( "_Scheduled times:" );
@@ -1369,7 +1363,7 @@ peerPage( GObject * core )
     hig_workarea_add_section_title( t, &row, _( "Incoming Peers" ) );
 
     s = _( "_Port for incoming connections:" );
-    w = data->portSpin = new_spin_button( TR_PREFS_KEY_PEER_PORT, core, 1, 1, USHRT_MAX, 1 );
+    w = data->portSpin = new_spin_button( TR_PREFS_KEY_PEER_PORT, core, 1, USHRT_MAX, 1 );
     hig_workarea_add_row( t, &row, s, w, NULL );
 
     h = gtk_hbox_new( FALSE, GUI_PAD_BIG );
@@ -1394,9 +1388,9 @@ peerPage( GObject * core )
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title( t, &row, _( "Limits" ) );
 
-    w = new_spin_button( TR_PREFS_KEY_PEER_LIMIT_TORRENT, core, 1, 1, 300, 5 );
+    w = new_spin_button( TR_PREFS_KEY_PEER_LIMIT_TORRENT, core, 1, 300, 5 );
     hig_workarea_add_row( t, &row, _( "Maximum peers per _torrent:" ), w, NULL );
-    w = new_spin_button( TR_PREFS_KEY_PEER_LIMIT_GLOBAL, core, 1, 1, 3000, 5 );
+    w = new_spin_button( TR_PREFS_KEY_PEER_LIMIT_GLOBAL, core, 1, 3000, 5 );
     hig_workarea_add_row( t, &row, _( "Maximum peers _overall:" ), w, NULL );
 
     hig_workarea_finish( t, &row );

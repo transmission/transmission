@@ -55,7 +55,7 @@ enum
 {
     SAVE_INTERVAL_SECS = 120,
 
-    DEFAULT_CACHE_SIZE_BYTES = ( 2 * 1024 * 1024 ) /* 2 MiB */
+    DEFAULT_CACHE_SIZE_MB = 2
 };
 
 
@@ -241,44 +241,18 @@ tr_sessionGetPublicAddress( const tr_session * session, int tr_af_type )
  #define TR_DEFAULT_ENCRYPTION   TR_ENCRYPTION_PREFERRED
 #endif
 
-static tr_bool
-getSpeedFromDict( tr_benc * dict, const char * key_in, int64_t * Bps )
-{
-    int64_t i;
-    char key[256];
-
-    /* 1. look for it ending in -Bps */
-    tr_snprintf( key, sizeof( key ), "%s-Bps", key_in );
-    if( tr_bencDictFindInt( dict, key, &i ) ) {
-        *Bps = i;
-        return TRUE;
-    }
-
-    /* 2. look for it an old entry without the -Bps suffix.
-          if found, interpret that to be either kB/s or KiB/s
-          based on the formatter settings in utils */
-    if( tr_bencDictFindInt( dict, key_in, &i ) ) {
-        *Bps = i * tr_formatter_speed_k( );
-        return TRUE;
-    }
-
-    return FALSE;
-}
-
 void
 tr_sessionGetDefaultSettings( const char * configDir UNUSED, tr_benc * d )
 {
-    const int speed_K = tr_formatter_speed_k( );
-
     assert( tr_bencIsDict( d ) );
 
     tr_bencDictReserve( d, 60 );
     tr_bencDictAddBool( d, TR_PREFS_KEY_BLOCKLIST_ENABLED,        FALSE );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_MAX_CACHE_SIZE,           DEFAULT_CACHE_SIZE_BYTES );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_MAX_CACHE_SIZE_MB,        DEFAULT_CACHE_SIZE_MB );
     tr_bencDictAddBool( d, TR_PREFS_KEY_DHT_ENABLED,              TRUE );
     tr_bencDictAddBool( d, TR_PREFS_KEY_LPD_ENABLED,              FALSE );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_DOWNLOAD_DIR,             tr_getDefaultDownloadDir( ) );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_DSPEED_Bps,               100 * speed_K );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_DSPEED_KBps,              100 );
     tr_bencDictAddBool( d, TR_PREFS_KEY_DSPEED_ENABLED,           FALSE );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_ENCRYPTION,               TR_DEFAULT_ENCRYPTION );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_INCOMPLETE_DIR,           tr_getDefaultDownloadDir( ) );
@@ -317,13 +291,13 @@ tr_sessionGetDefaultSettings( const char * configDir UNUSED, tr_benc * d )
     tr_bencDictAddStr ( d, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_FILENAME, "" );
     tr_bencDictAddBool( d, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED, FALSE );
     tr_bencDictAddBool( d, TR_PREFS_KEY_ALT_SPEED_ENABLED,        FALSE );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_UP_Bps,         50 * speed_K ); /* half the regular */
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_DOWN_Bps,       50 * speed_K ); /* half the regular */
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_UP_KBps,        50 ); /* half the regular */
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_DOWN_KBps,      50 ); /* half the regular */
     tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN,     540 ); /* 9am */
     tr_bencDictAddBool( d, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED,   FALSE );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_TIME_END,       1020 ); /* 5pm */
     tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_TIME_DAY,       TR_SCHED_ALL );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_USPEED_Bps,               100 * speed_K );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_USPEED_KBps,              100 );
     tr_bencDictAddBool( d, TR_PREFS_KEY_USPEED_ENABLED,           FALSE );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_UMASK,                    022 );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_UPLOAD_SLOTS_PER_TORRENT, 14 );
@@ -340,11 +314,11 @@ tr_sessionGetSettings( tr_session * s, struct tr_benc * d )
 
     tr_bencDictReserve( d, 60 );
     tr_bencDictAddBool( d, TR_PREFS_KEY_BLOCKLIST_ENABLED,        tr_blocklistIsEnabled( s ) );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_MAX_CACHE_SIZE,           tr_cacheGetLimit( s->cache ) );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_MAX_CACHE_SIZE_MB,        tr_cacheGetLimit( s->cache ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_DHT_ENABLED,              s->isDHTEnabled );
     tr_bencDictAddBool( d, TR_PREFS_KEY_LPD_ENABLED,              s->isLPDEnabled );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_DOWNLOAD_DIR,             s->downloadDir );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_DSPEED_Bps,               tr_sessionGetSpeedLimit_Bps( s, TR_DOWN ) );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_DSPEED_KBps,              tr_sessionGetSpeedLimit_KBps( s, TR_DOWN ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_DSPEED_ENABLED,           tr_sessionIsSpeedLimited( s, TR_DOWN ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_ENCRYPTION,               s->encryptionMode );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_INCOMPLETE_DIR,           tr_sessionGetIncompleteDir( s ) );
@@ -385,13 +359,13 @@ tr_sessionGetSettings( tr_session * s, struct tr_benc * d )
     tr_bencDictAddBool( d, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED, tr_sessionIsTorrentDoneScriptEnabled( s ) );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_FILENAME, tr_sessionGetTorrentDoneScript( s ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_ALT_SPEED_ENABLED,        tr_sessionUsesAltSpeed( s ) );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_UP_Bps,         tr_sessionGetAltSpeed_Bps( s, TR_UP ) );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_DOWN_Bps,       tr_sessionGetAltSpeed_Bps( s, TR_DOWN ) );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_UP_KBps,         tr_sessionGetAltSpeed_KBps( s, TR_UP ) );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_DOWN_KBps,       tr_sessionGetAltSpeed_KBps( s, TR_DOWN ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN,     tr_sessionGetAltSpeedBegin( s ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED,   tr_sessionUsesAltSpeedTime( s ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_TIME_END,       tr_sessionGetAltSpeedEnd( s ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_TIME_DAY,       tr_sessionGetAltSpeedDay( s ) );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_USPEED_Bps,               tr_sessionGetSpeedLimit_Bps( s, TR_UP ) );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_USPEED_KBps,               tr_sessionGetSpeedLimit_KBps( s, TR_UP ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_USPEED_ENABLED,           tr_sessionIsSpeedLimited( s, TR_UP ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_UMASK,                    s->umask );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_UPLOAD_SLOTS_PER_TORRENT, s->uploadSlotsPerTorrent );
@@ -538,7 +512,7 @@ tr_sessionInit( const char  * tag,
     session = tr_new0( tr_session, 1 );
     session->bandwidth = tr_bandwidthNew( session, NULL );
     session->lock = tr_lockNew( );
-    session->cache = tr_cacheNew( DEFAULT_CACHE_SIZE_BYTES );
+    session->cache = tr_cacheNew( 1024*1024*2 );
     session->tag = tr_strdup( tag );
     session->magicNumber = SESSION_MAGIC_NUMBER;
     session->buffer = tr_valloc( SESSION_BUFFER_SIZE );
@@ -704,8 +678,8 @@ sessionSetImpl( void * vdata )
     }
 
     /* misc features */
-    if( tr_bencDictFindInt( settings, TR_PREFS_KEY_MAX_CACHE_SIZE, &i ) )
-        tr_sessionSetCacheLimit( session, i );
+    if( tr_bencDictFindInt( settings, TR_PREFS_KEY_MAX_CACHE_SIZE_MB, &i ) )
+        tr_sessionSetCacheLimit_MB( session, i );
     if( tr_bencDictFindBool( settings, TR_PREFS_KEY_LAZY_BITFIELD, &boolVal ) )
         tr_sessionSetLazyBitfieldEnabled( session, boolVal );
     if( tr_bencDictFindInt( settings, TR_PREFS_KEY_PEER_LIMIT_TORRENT, &i ) )
@@ -805,13 +779,13 @@ sessionSetImpl( void * vdata )
     if( tr_bencDictFindInt( settings, TR_PREFS_KEY_UPLOAD_SLOTS_PER_TORRENT, &i ) )
         session->uploadSlotsPerTorrent = i;
 
-    if( getSpeedFromDict( settings, "speed-limit-up", &i ) )
-        tr_sessionSetSpeedLimit_Bps( session, TR_UP, i );
+    if( tr_bencDictFindInt( settings, TR_PREFS_KEY_USPEED_KBps, &i ) )
+        tr_sessionSetSpeedLimit_KBps( session, TR_UP, i );
     if( tr_bencDictFindBool( settings, TR_PREFS_KEY_USPEED_ENABLED, &boolVal ) )
         tr_sessionLimitSpeed( session, TR_UP, boolVal );
 
-    if( getSpeedFromDict( settings, "speed-limit-down", &i ) )
-        tr_sessionSetSpeedLimit_Bps( session, TR_DOWN, i );
+    if( tr_bencDictFindInt( settings, TR_PREFS_KEY_DSPEED_KBps, &i ) )
+        tr_sessionSetSpeedLimit_KBps( session, TR_DOWN, i );
     if( tr_bencDictFindBool( settings, TR_PREFS_KEY_DSPEED_ENABLED, &boolVal ) )
         tr_sessionLimitSpeed( session, TR_DOWN, boolVal );
 
@@ -825,10 +799,10 @@ sessionSetImpl( void * vdata )
     **/
 
     /* update the turtle mode's fields */
-    if( getSpeedFromDict( settings, "alt-speed-up", &i ) )
-        turtle->speedLimit_Bps[TR_UP] = i;
-    if( getSpeedFromDict( settings, "alt-speed-down", &i ) )
-        turtle->speedLimit_Bps[TR_DOWN] = i;
+    if( tr_bencDictFindInt( settings, TR_PREFS_KEY_ALT_SPEED_UP_KBps, &i ) )
+        turtle->speedLimit_Bps[TR_UP] = toSpeedBytes( i );
+    if( tr_bencDictFindInt( settings, TR_PREFS_KEY_ALT_SPEED_DOWN_KBps, &i ) )
+        turtle->speedLimit_Bps[TR_DOWN] = toSpeedBytes( i );
     if( tr_bencDictFindInt( settings, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN, &i ) )
         turtle->beginMinute = i;
     if( tr_bencDictFindInt( settings, TR_PREFS_KEY_ALT_SPEED_TIME_END, &i ) )
@@ -1127,7 +1101,7 @@ tr_sessionGetRatioLimit( const tr_session * session )
 ***/
 
 tr_bool
-tr_sessionGetActiveSpeedLimit_Bps( const tr_session * session, tr_direction dir, int * setme )
+tr_sessionGetActiveSpeedLimit_Bps( const tr_session * session, tr_direction dir, int * setme_Bps )
 {
     int isLimited = TRUE;
 
@@ -1135,13 +1109,23 @@ tr_sessionGetActiveSpeedLimit_Bps( const tr_session * session, tr_direction dir,
         return FALSE;
 
     if( tr_sessionUsesAltSpeed( session ) )
-        *setme = tr_sessionGetAltSpeed_Bps( session, dir );
+        *setme_Bps = tr_sessionGetAltSpeed_Bps( session, dir );
     else if( tr_sessionIsSpeedLimited( session, dir ) )
-        *setme = tr_sessionGetSpeedLimit_Bps( session, dir );
+        *setme_Bps = tr_sessionGetSpeedLimit_Bps( session, dir );
     else
         isLimited = FALSE;
 
     return isLimited;
+}
+tr_bool
+tr_sessionGetActiveSpeedLimit_KBps( const tr_session  * session,
+                                    tr_direction        dir,
+                                    double            * setme_KBps )
+{
+    int Bps;
+    const tr_bool is_active = tr_sessionGetActiveSpeedLimit_Bps( session, dir, &Bps );
+    *setme_KBps = toSpeedKBps( Bps );
+    return is_active;
 }
 
 static void
@@ -1304,6 +1288,11 @@ tr_sessionSetSpeedLimit_Bps( tr_session * s, tr_direction d, int Bps )
 
     updateBandwidth( s, d );
 }
+void
+tr_sessionSetSpeedLimit_KBps( tr_session * s, tr_direction d, int KBps )
+{
+    tr_sessionSetSpeedLimit_Bps( s, d, toSpeedBytes( KBps ) );
+}
 
 int
 tr_sessionGetSpeedLimit_Bps( const tr_session * s, tr_direction d )
@@ -1312,6 +1301,11 @@ tr_sessionGetSpeedLimit_Bps( const tr_session * s, tr_direction d )
     assert( tr_isDirection( d ) );
 
     return s->speedLimit_Bps[d];
+}
+int
+tr_sessionGetSpeedLimit_KBps( const tr_session * s, tr_direction d )
+{
+    return toSpeedKBps( tr_sessionGetSpeedLimit_Bps( s, d ) );
 }
 
 void
@@ -1351,6 +1345,12 @@ tr_sessionSetAltSpeed_Bps( tr_session * s, tr_direction d, int Bps )
     updateBandwidth( s, d );
 }
 
+void
+tr_sessionSetAltSpeed_KBps( tr_session * s, tr_direction d, int KBps )
+{
+    tr_sessionSetAltSpeed_Bps( s, d, toSpeedBytes( KBps ) );
+}
+
 int
 tr_sessionGetAltSpeed_Bps( const tr_session * s, tr_direction d )
 {
@@ -1358,6 +1358,11 @@ tr_sessionGetAltSpeed_Bps( const tr_session * s, tr_direction d )
     assert( tr_isDirection( d ) );
 
     return s->turtle.speedLimit_Bps[d];
+}
+int
+tr_sessionGetAltSpeed_KBps( const tr_session * s, tr_direction d )
+{
+    return toSpeedKBps( tr_sessionGetAltSpeed_Bps( s, d ) );
 }
 
 static void
@@ -1566,14 +1571,25 @@ tr_sessionGetDeleteSource( const tr_session * session )
 int
 tr_sessionGetPieceSpeed_Bps( const tr_session * session, tr_direction dir )
 {
-    return tr_isSession( session ) ? tr_bandwidthGetPieceSpeed_Bps( session->bandwidth, 0, dir ) : 0.0;
+    return tr_isSession( session ) ? tr_bandwidthGetPieceSpeed_Bps( session->bandwidth, 0, dir ) : 0;
+}
+double
+tr_sessionGetPieceSpeed_KBps( const tr_session * session, tr_direction dir )
+{
+    return toSpeedKBps( tr_sessionGetPieceSpeed_Bps( session, dir ) );
 }
 
 int
 tr_sessionGetRawSpeed_Bps( const tr_session * session, tr_direction dir )
 {
-    return tr_isSession( session ) ? tr_bandwidthGetRawSpeed_Bps( session->bandwidth, 0, dir ) : 0.0;
+    return tr_isSession( session ) ? tr_bandwidthGetRawSpeed_Bps( session->bandwidth, 0, dir ) : 0;
 }
+double
+tr_sessionGetRawSpeed_KBps( const tr_session * session, tr_direction dir )
+{
+    return toSpeedKBps( tr_sessionGetRawSpeed_Bps( session, dir ) );
+}
+
 
 int
 tr_sessionCountTorrents( const tr_session * session )
@@ -1876,20 +1892,31 @@ tr_sessionAllowsLPD( const tr_session * session )
 ***/
 
 void
-tr_sessionSetCacheLimit( tr_session * session, int64_t max_bytes )
+tr_sessionSetCacheLimit_B( tr_session * session, uint64_t max_bytes )
 {
     assert( tr_isSession( session ) );
 
     tr_cacheSetLimit( session->cache, max_bytes );
 }
+void
+tr_sessionSetCacheLimit_MB( tr_session * session, int MB )
+{
+    tr_sessionSetCacheLimit_B( session, toMemBytes( MB ) );
+}
 
-int64_t
-tr_sessionGetCacheLimit( const tr_session * session )
+uint64_t
+tr_sessionGetCacheLimit_B( const tr_session * session )
 {
     assert( tr_isSession( session ) );
 
     return tr_cacheGetLimit( session->cache );
 }
+int
+tr_sessionGetCacheLimit_MB( const tr_session * session )
+{
+    return toMemMB( tr_sessionGetCacheLimit_B( session ) );
+}
+
 
 /***
 ****

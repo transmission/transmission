@@ -776,8 +776,8 @@ tr_core_init( GTypeInstance *  instance,
                       G_TYPE_STRING,    /* collated name */
                       TR_TORRENT_TYPE,  /* TrTorrent object */
                       G_TYPE_POINTER,   /* tr_torrent* */
-                      G_TYPE_INT,       /* tr_stat.pieceUploadSpeed_Bps */
-                      G_TYPE_INT,       /* tr_stat.pieceDownloadSpeed_Bps */
+                      G_TYPE_DOUBLE,    /* tr_stat.pieceUploadSpeed_KBps */
+                      G_TYPE_DOUBLE,    /* tr_stat.pieceDownloadSpeed_KBps */
                       G_TYPE_INT };     /* tr_stat.status */
 
     p = self->priv = G_TYPE_INSTANCE_GET_PRIVATE( self,
@@ -920,8 +920,8 @@ tr_core_add_torrent( TrCore     * self,
                                        MC_NAME_COLLATED, collated,
                                        MC_TORRENT,       gtor,
                                        MC_TORRENT_RAW,   tor,
-                                       MC_SPEED_UP,      st->pieceUploadSpeed_Bps,
-                                       MC_SPEED_DOWN,    st->pieceDownloadSpeed_Bps,
+                                       MC_SPEED_UP,      st->pieceUploadSpeed_KBps,
+                                       MC_SPEED_DOWN,    st->pieceDownloadSpeed_KBps,
                                        MC_ACTIVITY,      st->activity,
                                        -1 );
 
@@ -1322,8 +1322,8 @@ update_foreach( GtkTreeModel * model,
                 gpointer       data UNUSED )
 {
     int oldActivity, newActivity;
-    int oldUpSpeed, newUpSpeed;
-    int oldDownSpeed, newDownSpeed;
+    double oldUpSpeed, newUpSpeed;
+    double oldDownSpeed, newDownSpeed;
     const tr_stat * st;
     TrTorrent * gtor;
 
@@ -1338,14 +1338,14 @@ update_foreach( GtkTreeModel * model,
     /* get the new states */
     st = tr_torrentStat( tr_torrent_handle( gtor ) );
     newActivity = st->activity;
-    newUpSpeed = st->pieceUploadSpeed_Bps;
-    newDownSpeed = st->pieceDownloadSpeed_Bps;
+    newUpSpeed = st->pieceUploadSpeed_KBps;
+    newDownSpeed = st->pieceDownloadSpeed_KBps;
 
     /* updating the model triggers off resort/refresh,
        so don't do it unless something's actually changed... */
-    if( ( newActivity  != oldActivity  ) ||
-        ( newUpSpeed   != oldUpSpeed   ) ||
-        ( newDownSpeed != oldDownSpeed ) )
+    if( ( newActivity  != oldActivity  )
+        || gtr_compare_double( newUpSpeed, oldUpSpeed, 3 )
+        || gtr_compare_double( newDownSpeed, oldDownSpeed, 3 ) )
     {
         gtk_list_store_set( GTK_LIST_STORE( model ), iter,
                             MC_ACTIVITY, newActivity,
@@ -1575,7 +1575,7 @@ tr_core_set_pref_double( TrCore *     self,
 {
     const double oldval = pref_double_get( key );
 
-    if( oldval != newval )
+    if( gtr_compare_double( oldval, newval, 4 ) )
     {
         pref_double_set( key, newval );
         commitPrefsChange( self, key );

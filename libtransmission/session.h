@@ -29,6 +29,7 @@
 
 #include "bencode.h"
 #include "bitfield.h"
+#include "utils.h"
 
 typedef enum { TR_NET_OK, TR_NET_ERROR, TR_NET_WAIT } tr_tristate_t;
 
@@ -247,5 +248,34 @@ static inline tr_bool tr_isPriority( tr_priority_t p )
         || ( p == TR_PRI_NORMAL )
         || ( p == TR_PRI_HIGH );
 }
+
+/***
+****
+***/
+
+static inline unsigned int toSpeedBytes ( unsigned int KBps ) { return KBps * tr_speed_K; }
+static inline double       toSpeedKBps  ( unsigned int Bps )  { return Bps / (double)tr_speed_K; }
+
+static inline uint64_t toMemBytes ( unsigned int MB ) { uint64_t B = tr_mem_K * tr_mem_K; B *= MB; return B; }
+static inline int      toMemMB    ( uint64_t B )      { return B / tr_mem_K; }
+
+/**
+**/
+
+void     tr_sessionSetCacheLimit_B ( tr_session * session, uint64_t B );
+uint64_t tr_sessionGetCacheLimit_B ( const tr_session * session );
+
+int  tr_sessionGetSpeedLimit_Bps( const tr_session *, tr_direction );
+int  tr_sessionGetAltSpeed_Bps  ( const tr_session *, tr_direction );
+int  tr_sessionGetRawSpeed_Bps  ( const tr_session *, tr_direction );
+int  tr_sessionGetPieceSpeed_Bps( const tr_session *, tr_direction );
+
+void tr_sessionSetSpeedLimit_Bps( tr_session *, tr_direction, int Bps );
+void tr_sessionSetAltSpeed_Bps  ( tr_session *, tr_direction, int Bps );
+
+tr_bool  tr_sessionGetActiveSpeedLimit_Bps( const tr_session  * session,
+                                            tr_direction        dir,
+                                            int               * setme );
+
 
 #endif

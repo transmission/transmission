@@ -2269,14 +2269,14 @@ tr_peerMgrGetWebseedSpeed_Bps( const tr_torrent * tor, uint64_t now )
 }
 
 
-int*
-tr_peerMgrWebSpeeds_Bps( const tr_torrent * tor )
+double*
+tr_peerMgrWebSpeeds_KBps( const tr_torrent * tor )
 {
     const Torrent * t = tor->torrentPeers;
     const tr_webseed ** webseeds;
     int i;
     int webseedCount;
-    int * ret;
+    double * ret;
     uint64_t now;
 
     assert( t->manager );
@@ -2285,12 +2285,16 @@ tr_peerMgrWebSpeeds_Bps( const tr_torrent * tor )
     webseeds = (const tr_webseed**) tr_ptrArrayBase( &t->webseeds );
     webseedCount = tr_ptrArraySize( &t->webseeds );
     assert( webseedCount == tor->info.webseedCount );
-    ret = tr_new0( int, webseedCount );
+    ret = tr_new0( double, webseedCount );
     now = tr_date( );
 
-    for( i=0; i<webseedCount; ++i )
-        if( !tr_webseedGetSpeed_Bps( webseeds[i], now, &ret[i] ) )
+    for( i=0; i<webseedCount; ++i ) {
+        int Bps;
+        if( tr_webseedGetSpeed_Bps( webseeds[i], now, &Bps ) )
+            ret[i] = Bps / (double)tr_speed_K;
+        else
             ret[i] = -1.0;
+    }
 
     managerUnlock( t->manager );
     return ret;
@@ -2336,8 +2340,8 @@ tr_peerMgrPeerStats( const tr_torrent    * tor,
         stat->from                = atom->from;
         stat->progress            = peer->progress;
         stat->isEncrypted         = tr_peerIoIsEncrypted( peer->io ) ? 1 : 0;
-        stat->rateToPeer_Bps      = tr_peerGetPieceSpeed_Bps( peer, now, TR_CLIENT_TO_PEER );
-        stat->rateToClient_Bps    = tr_peerGetPieceSpeed_Bps( peer, now, TR_PEER_TO_CLIENT );
+        stat->rateToPeer_KBps     = toSpeedKBps( tr_peerGetPieceSpeed_Bps( peer, now, TR_CLIENT_TO_PEER ) );
+        stat->rateToClient_KBps   = toSpeedKBps( tr_peerGetPieceSpeed_Bps( peer, now, TR_PEER_TO_CLIENT ) );
         stat->peerIsChoked        = peer->peerIsChoked;
         stat->peerIsInterested    = peer->peerIsInterested;
         stat->clientIsChoked      = peer->clientIsChoked;

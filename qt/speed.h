@@ -23,7 +23,7 @@ class Speed
         double KiBps( ) const { return _Bps/1024.0; }
         int Bps( ) const { return _Bps; }
         bool isZero( ) const { return _Bps == 0; }
-        static Speed fromKiBps( double KiBps ) { return Speed( KiBps*1024 ); }
+        static Speed fromKBps( double KBps );
         static Speed fromBps( int Bps ) { return Speed( Bps ); }
         void setKiBps( double KiBps ) { setBps( KiBps*1024 ); }
         void setBps( double Bps ) { _Bps = Bps; }

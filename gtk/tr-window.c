@@ -205,8 +205,8 @@ prefsChanged( TrCore * core UNUSED,
         tr_window_update( (TrWindow*)wind );
     }
     else if( !strcmp( key, TR_PREFS_KEY_ALT_SPEED_ENABLED ) ||
-             !strcmp( key, TR_PREFS_KEY_ALT_SPEED_UP_Bps ) ||
-             !strcmp( key, TR_PREFS_KEY_ALT_SPEED_DOWN_Bps ) )
+             !strcmp( key, TR_PREFS_KEY_ALT_SPEED_UP_KBps ) ||
+             !strcmp( key, TR_PREFS_KEY_ALT_SPEED_DOWN_KBps ) )
     {
         syncAltSpeedButton( p );
     }
@@ -266,8 +266,8 @@ syncAltSpeedButton( PrivateData * p )
     const char * stock = b ? "alt-speed-on" : "alt-speed-off";
     GtkWidget * w = p->alt_speed_button;
 
-    tr_strlspeed( u, pref_int_get( TR_PREFS_KEY_ALT_SPEED_UP_Bps ), sizeof( u ) );
-    tr_strlspeed( d, pref_int_get( TR_PREFS_KEY_ALT_SPEED_DOWN_Bps ), sizeof( d ) );
+    tr_formatter_speed_KBps( u, pref_int_get( TR_PREFS_KEY_ALT_SPEED_UP_KBps ), sizeof( u ) );
+    tr_formatter_speed_KBps( d, pref_int_get( TR_PREFS_KEY_ALT_SPEED_DOWN_KBps ), sizeof( d ) );
     fmt = b ? _( "Click to disable Temporary Speed Limits\n(%1$s down, %2$s up)" )
             : _( "Click to enable Temporary Speed Limits\n(%1$s down, %2$s up)" );
     str = g_strdup_printf( fmt, d, u );
@@ -388,11 +388,11 @@ onSpeedSet( GtkCheckMenuItem * check, gpointer vp )
     const char * key;
     PrivateData * p = vp;
     GObject * o = G_OBJECT( check );
-    const int Bps = GPOINTER_TO_INT( g_object_get_data( o, SPEED_KEY ) ) * speed_K;
+    const int KBps = GPOINTER_TO_INT( g_object_get_data( o, SPEED_KEY ) );
     tr_direction dir = GPOINTER_TO_INT( g_object_get_data( o, DIRECTION_KEY ) );
 
-    key = dir==TR_UP ? TR_PREFS_KEY_USPEED_Bps : TR_PREFS_KEY_DSPEED_Bps;
-    tr_core_set_pref_int( p->core, key, Bps );
+    key = dir==TR_UP ? TR_PREFS_KEY_USPEED_KBps : TR_PREFS_KEY_DSPEED_KBps;
+    tr_core_set_pref_int( p->core, key, KBps );
 
     key = dir==TR_UP ? TR_PREFS_KEY_USPEED_ENABLED : TR_PREFS_KEY_DSPEED_ENABLED;
     tr_core_set_pref_bool( p->core, key, TRUE );
@@ -541,7 +541,7 @@ onOptionsClicked( GtkButton * button UNUSED, gpointer vp )
     PrivateData * p = vp;
 
     w = p->speedlimit_on_item[TR_DOWN];
-    tr_strlspeed( buf1, pref_int_get( TR_PREFS_KEY_DSPEED_Bps ), sizeof( buf1 ) );
+    tr_formatter_speed_KBps( buf1, pref_int_get( TR_PREFS_KEY_DSPEED_KBps ), sizeof( buf1 ) );
     gtk_label_set_text( GTK_LABEL( gtk_bin_get_child( GTK_BIN( w ) ) ), buf1 );
 
     b = pref_flag_get( TR_PREFS_KEY_DSPEED_ENABLED );
@@ -549,7 +549,7 @@ onOptionsClicked( GtkButton * button UNUSED, gpointer vp )
     gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM( w ), TRUE );
 
     w = p->speedlimit_on_item[TR_UP];
-    tr_strlspeed( buf1, pref_int_get( TR_PREFS_KEY_USPEED_Bps ), sizeof( buf1 ) );
+    tr_formatter_speed_KBps( buf1, pref_int_get( TR_PREFS_KEY_USPEED_KBps ), sizeof( buf1 ) );
     gtk_label_set_text( GTK_LABEL( gtk_bin_get_child( GTK_BIN( w ) ) ), buf1 );
 
     b = pref_flag_get( TR_PREFS_KEY_USPEED_ENABLED );
@@ -842,13 +842,13 @@ updateSpeeds( PrivateData * p )
     if( session != NULL )
     {
         char buf[128];
-        int up=0, down=0;
+        double up=0, down=0;
         GtkTreeIter iter;
         GtkTreeModel * model = tr_core_model( p->core );
 
         if( gtk_tree_model_get_iter_first( model, &iter ) ) do
         {
-            int u, d;
+            double u, d;
             gtk_tree_model_get( model, &iter, MC_SPEED_UP, &u,
                                               MC_SPEED_DOWN, &d,
                                               -1 );
@@ -857,10 +857,10 @@ updateSpeeds( PrivateData * p )
         }
         while( gtk_tree_model_iter_next( model, &iter ) );
 
-        tr_strlspeed( buf, down, sizeof( buf ) );
+        tr_formatter_speed_KBps( buf, down, sizeof( buf ) );
         gtk_label_set_text( GTK_LABEL( p->dl_lb ), buf );
 
-        tr_strlspeed( buf, up, sizeof( buf ) );
+        tr_formatter_speed_KBps( buf, up, sizeof( buf ) );
         gtk_label_set_text( GTK_LABEL( p->ul_lb ), buf );
     }
 }

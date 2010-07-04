@@ -12,6 +12,7 @@
 
 #include <ctype.h> /* isxdigit() */
 #include <errno.h>
+#include <math.h> /* pow() */
 #include <stdlib.h> /* free() */
 #include <string.h> /* strcmp() */
 
@@ -127,6 +128,20 @@ gtr_lockfile( const char * filename )
 ****
 ***/
 
+int
+gtr_compare_double( const double a, const double b, int decimal_places )
+{
+    const int64_t ia = (int64_t)(a * pow( 10, decimal_places ) );
+    const int64_t ib = (int64_t)(b * pow( 10, decimal_places ) );
+    if( ia < ib ) return -1;
+    if( ia > ib ) return  1; 
+    return 0;
+}
+
+/***
+****
+***/
+
 const char*
 gtr_get_unicode_string( int i )
 {
@@ -156,7 +171,7 @@ tr_strlsize( char * buf, guint64 bytes, size_t buflen )
     if( !bytes )
         g_strlcpy( buf, _( "None" ), buflen );
     else
-        tr_formatter_size( buf, bytes, buflen );
+        tr_formatter_size_B( buf, bytes, buflen );
 
     return buf;
 }
@@ -167,7 +182,7 @@ tr_strlspeed( char * buf, int bytes_per_second, size_t buflen )
     if( bytes_per_second < 1 )
         g_strlcpy( buf, _( "None" ), buflen );
     else
-        tr_formatter_speed( buf, bytes_per_second, buflen );
+        tr_formatter_speed_Bps( buf, bytes_per_second, buflen );
 
     return buf;
 }

@@ -67,8 +67,8 @@ popup( GtkStatusIcon *       self,
 void
 tr_icon_refresh( gpointer vicon )
 {
-    int Bps;
-    int limit;
+    double KBps;
+    double limit;
     char up[64];
     char upLimit[64];
     char down[64];
@@ -79,34 +79,34 @@ tr_icon_refresh( gpointer vicon )
     tr_session * session = tr_core_session( g_object_get_data( G_OBJECT( icon ), "tr-core" ) );
 
     /* up */
-    Bps = tr_sessionGetRawSpeed_Bps( session, TR_UP );
-    if( Bps < 1 )
+    KBps = tr_sessionGetRawSpeed_KBps( session, TR_UP );
+    if( KBps < 0.001 )
         g_strlcpy( up, idle, sizeof( up ) );
     else
-        tr_formatter_speed( up, Bps, sizeof( up ) );
+        tr_formatter_speed_KBps( up, KBps, sizeof( up ) );
 
     /* up limit */
-    if( !tr_sessionGetActiveSpeedLimit_Bps( session, TR_UP, &limit ) )
+    if( !tr_sessionGetActiveSpeedLimit_KBps( session, TR_UP, &limit ) )
         *upLimit = '\0';
     else {
         char buf[64];
-        tr_strlspeed( buf, limit, sizeof( buf ) );
+        tr_formatter_speed_KBps( buf, limit, sizeof( buf ) );
         g_snprintf( upLimit, sizeof( upLimit ), _( "(Limit: %s)" ), buf );
     }
 
     /* down */
-    Bps = tr_sessionGetRawSpeed_Bps( session, TR_DOWN );
-    if( Bps < 1 )
+    KBps = tr_sessionGetRawSpeed_KBps( session, TR_DOWN );
+    if( KBps < 0.001 )
         g_strlcpy( down, idle, sizeof( down ) );
     else
-        tr_formatter_speed( down, Bps, sizeof( down ) );
+        tr_formatter_speed_KBps( down, KBps, sizeof( down ) );
 
     /* down limit */
-    if( !tr_sessionGetActiveSpeedLimit_Bps( session, TR_DOWN, &limit ) )
+    if( !tr_sessionGetActiveSpeedLimit_KBps( session, TR_DOWN, &limit ) )
         *downLimit = '\0';
     else {
         char buf[64];
-        tr_strlspeed( buf, limit, sizeof( buf ) );
+        tr_formatter_speed_KBps( buf, limit, sizeof( buf ) );
         g_snprintf( downLimit, sizeof( downLimit ), _( "(Limit: %s)" ), buf );
     }
 

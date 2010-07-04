@@ -140,13 +140,13 @@ strlratio2( char * buf, double ratio, size_t buflen )
 }
 
 static char*
-strlratio( char * buf, double numerator, double denominator, size_t buflen )
+strlratio( char * buf, int64_t numerator, int64_t denominator, size_t buflen )
 {
     double ratio;
 
-    if( denominator )
-        ratio = numerator / denominator;
-    else if( numerator )
+    if( denominator != 0 )
+        ratio = numerator / (double)denominator;
+    else if( numerator != 0 )
         ratio = TR_RATIO_INF;
     else
         ratio = TR_RATIO_NA;
@@ -160,7 +160,7 @@ strlmem( char * buf, int64_t bytes, size_t buflen )
     if( !bytes )
         tr_strlcpy( buf, "None", buflen );
     else
-        tr_formatter_mem( buf, bytes, buflen );
+        tr_formatter_mem_B( buf, bytes, buflen );
 
     return buf;
 }
@@ -171,18 +171,7 @@ strlsize( char * buf, int64_t bytes, size_t buflen )
     if( !bytes )
         tr_strlcpy( buf, "None", buflen );
     else
-        tr_formatter_size( buf, bytes, buflen );
-
-    return buf;
-}
-
-static char*
-strlspeed( char * buf, int64_t bytes_per_second, size_t buflen )
-{
-    if( !bytes_per_second )
-        tr_strlcpy( buf, "None", buflen );
-    else
-        tr_formatter_speed( buf, bytes_per_second, buflen );
+        tr_formatter_size_B( buf, bytes, buflen );
 
     return buf;
 }
@@ -831,9 +820,9 @@ printDetails( tr_benc * top )
             if( tr_bencDictFindInt( t, "eta", &i ) )
                 printf( "  ETA: %s\n", tr_strltime( buf, i, sizeof( buf ) ) );
             if( tr_bencDictFindInt( t, "rateDownload", &i ) )
-                printf( "  Download Speed: %s\n", strlspeed( buf, i, sizeof( buf ) ) );
+                printf( "  Download Speed: %s\n", tr_formatter_speed_KBps( buf, i, sizeof( buf ) ) );
             if( tr_bencDictFindInt( t, "rateUpload", &i ) )
-                printf( "  Upload Speed: %s\n", strlspeed( buf, i, sizeof( buf ) ) );
+                printf( "  Upload Speed: %s\n", tr_formatter_speed_KBps( buf, i, sizeof( buf ) ) );
             if( tr_bencDictFindInt( t, "haveUnchecked", &i )
               && tr_bencDictFindInt( t, "haveValid", &j ) )
             {
@@ -1106,7 +1095,7 @@ printDetails( tr_benc * top )
             {
                 printf( "  Download Limit: " );
                 if( boolVal )
-                    printf( "%s\n", strlspeed( buf, i, sizeof( buf ) ) );
+                    printf( "%s\n", tr_formatter_speed_KBps( buf, i, sizeof( buf ) ) );
                 else
                     printf( "Unlimited\n" );
             }
@@ -1115,7 +1104,7 @@ printDetails( tr_benc * top )
             {
                 printf( "  Upload Limit: " );
                 if( boolVal )
-                    printf( "%s\n", strlspeed( buf, i, sizeof( buf ) ) );
+                    printf( "%s\n", tr_formatter_speed_KBps( buf, i, sizeof( buf ) ) );
                 else
                     printf( "Unlimited\n" );
             }
@@ -1240,8 +1229,8 @@ printPeersImpl( tr_benc * peers )
         {
             printf( "%-20s  %-12s  %-5.1f %6.1f  %6.1f  %s\n",
                     address, flagstr, (progress*100.0),
-                    rateToClient / (double)SPEED_K,
-                    rateToPeer / (double)SPEED_K,
+                    (double)rateToClient,
+                    (double)rateToPeer,
                     client );
         }
     }
@@ -1399,8 +1388,8 @@ printSession( tr_benc * top )
             printf( "  Peer exchange allowed: %s\n", ( boolVal ? "Yes" : "No" ) );
         if( tr_bencDictFindStr( args,  TR_PREFS_KEY_ENCRYPTION, &str ) )
             printf( "  Encryption: %s\n", str );
-        if( tr_bencDictFindInt( args, TR_PREFS_KEY_MAX_CACHE_SIZE, &i ) )
-            printf( "  Maximum memory cache size: %s\n", strlsize( buf, i, sizeof( buf ) ) );
+        if( tr_bencDictFindInt( args, TR_PREFS_KEY_MAX_CACHE_SIZE_MB, &i ) )
+            printf( "  Maximum memory cache size: %s\n", tr_formatter_mem_MB( buf, i, sizeof( buf ) ) );
         printf( "\n" );
 
         {
@@ -1408,17 +1397,17 @@ printSession( tr_benc * top )
             int64_t altDown, altUp, altBegin, altEnd, altDay, upLimit, downLimit, peerLimit;
             double seedRatioLimit;
 
-            if( tr_bencDictFindInt ( args, TR_PREFS_KEY_ALT_SPEED_DOWN_Bps, &altDown ) &&
+            if( tr_bencDictFindInt ( args, TR_PREFS_KEY_ALT_SPEED_DOWN_KBps, &altDown ) &&
                 tr_bencDictFindBool( args, TR_PREFS_KEY_ALT_SPEED_ENABLED, &altEnabled ) &&
                 tr_bencDictFindInt ( args, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN, &altBegin ) &&
                 tr_bencDictFindBool( args, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED, &altTimeEnabled ) &&
                 tr_bencDictFindInt ( args, TR_PREFS_KEY_ALT_SPEED_TIME_END, &altEnd ) &&
                 tr_bencDictFindInt ( args, TR_PREFS_KEY_ALT_SPEED_TIME_DAY, &altDay ) &&
-                tr_bencDictFindInt ( args, TR_PREFS_KEY_ALT_SPEED_UP_Bps, &altUp ) &&
+                tr_bencDictFindInt ( args, TR_PREFS_KEY_ALT_SPEED_UP_KBps, &altUp ) &&
                 tr_bencDictFindInt ( args, TR_PREFS_KEY_PEER_LIMIT_GLOBAL, &peerLimit ) &&
-                tr_bencDictFindInt ( args, TR_PREFS_KEY_DSPEED_Bps, &downLimit ) &&
+                tr_bencDictFindInt ( args, TR_PREFS_KEY_DSPEED_KBps, &downLimit ) &&
                 tr_bencDictFindBool( args, TR_PREFS_KEY_DSPEED_ENABLED, &downEnabled ) &&
-                tr_bencDictFindInt ( args, TR_PREFS_KEY_USPEED_Bps, &upLimit ) &&
+                tr_bencDictFindInt ( args, TR_PREFS_KEY_USPEED_KBps, &upLimit ) &&
                 tr_bencDictFindBool( args, TR_PREFS_KEY_USPEED_ENABLED, &upEnabled ) &&
                 tr_bencDictFindReal( args, "seedRatioLimit", &seedRatioLimit ) &&
                 tr_bencDictFindBool( args, "seedRatioLimited", &seedRatioLimited) )
@@ -1437,30 +1426,30 @@ printSession( tr_benc * top )
                 printf( "  Default seed ratio limit: %s\n", buf );
 
                 if( altEnabled )
-                    strlspeed( buf, altUp, sizeof( buf ) );
+                    tr_formatter_speed_KBps( buf, altUp, sizeof( buf ) );
                 else if( upEnabled )
-                    strlspeed( buf, upLimit, sizeof( buf ) );
+                    tr_formatter_speed_KBps( buf, upLimit, sizeof( buf ) );
                 else
                     tr_strlcpy( buf, "Unlimited", sizeof( buf ) );
                 printf( "  Upload speed limit: %s  (%s limit: %s; %s turtle limit: %s)\n",
                         buf,
                         upEnabled ? "Enabled" : "Disabled",
-                        strlspeed( buf2, upLimit, sizeof( buf2 ) ),
+                        tr_formatter_speed_KBps( buf2, upLimit, sizeof( buf2 ) ),
                         altEnabled ? "Enabled" : "Disabled",
-                        strlspeed( buf3, altUp, sizeof( buf3 ) ) );
+                        tr_formatter_speed_KBps( buf3, altUp, sizeof( buf3 ) ) );
 
                 if( altEnabled )
-                    strlspeed( buf, altDown, sizeof( buf ) );
+                    tr_formatter_speed_KBps( buf, altDown, sizeof( buf ) );
                 else if( downEnabled )
-                    strlspeed( buf, downLimit, sizeof( buf ) );
+                    tr_formatter_speed_KBps( buf, downLimit, sizeof( buf ) );
                 else
                     tr_strlcpy( buf, "Unlimited", sizeof( buf ) );
                 printf( "  Download speed limit: %s  (%s limit: %s; %s turtle limit: %s)\n",
                         buf,
                         downEnabled ? "Enabled" : "Disabled",
-                        strlspeed( buf2, downLimit, sizeof( buf2 ) ),
+                        tr_formatter_speed_KBps( buf2, downLimit, sizeof( buf2 ) ),
                         altEnabled ? "Enabled" : "Disabled",
-                        strlspeed( buf2, altDown, sizeof( buf2 ) ) );
+                        tr_formatter_speed_KBps( buf2, altDown, sizeof( buf2 ) ) );
 
                 if( altTimeEnabled ) {
                     printf( "  Turtle schedule: %02d:%02d - %02d:%02d  ",
@@ -1845,9 +1834,9 @@ processArgs( const char * host, int port, int argc, const char ** argv )
                           break;
                 case 971: tr_bencDictAddBool( args, TR_PREFS_KEY_ALT_SPEED_ENABLED, FALSE );
                           break;
-                case 972: tr_bencDictAddInt( args, TR_PREFS_KEY_ALT_SPEED_DOWN_Bps, numarg( optarg ) * SPEED_K );
+                case 972: tr_bencDictAddInt( args, TR_PREFS_KEY_ALT_SPEED_DOWN_KBps, numarg( optarg ) );
                           break;
-                case 973: tr_bencDictAddInt( args, TR_PREFS_KEY_ALT_SPEED_UP_Bps, numarg( optarg ) * SPEED_K );
+                case 973: tr_bencDictAddInt( args, TR_PREFS_KEY_ALT_SPEED_UP_KBps, numarg( optarg ) );
                           break;
                 case 974: tr_bencDictAddBool( args, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED, TRUE );
                           break;
@@ -1864,7 +1853,7 @@ processArgs( const char * host, int port, int argc, const char ** argv )
                           break;
                 case 'C': tr_bencDictAddBool( args, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED, FALSE );
                           break;
-                case 'e': tr_bencDictAddReal( args, TR_PREFS_KEY_MAX_CACHE_SIZE, atof(optarg) * MEM_K * MEM_K );
+                case 'e': tr_bencDictAddReal( args, TR_PREFS_KEY_MAX_CACHE_SIZE_MB, atof(optarg) );
                           break;
                 case 910: tr_bencDictAddStr( args, TR_PREFS_KEY_ENCRYPTION, "required" );
                           break;
@@ -1922,10 +1911,10 @@ processArgs( const char * host, int port, int argc, const char ** argv )
             switch( c )
             {
                 case 'd': if( targs ) {
-                              tr_bencDictAddInt( targs, "downloadLimit", numarg( optarg ) * SPEED_K );
+                              tr_bencDictAddInt( targs, "downloadLimit", numarg( optarg ) );
                               tr_bencDictAddBool( targs, "downloadLimited", TRUE );
                           } else {
-                              tr_bencDictAddInt( sargs, TR_PREFS_KEY_DSPEED_Bps, numarg( optarg ) * SPEED_K  );
+                              tr_bencDictAddInt( sargs, TR_PREFS_KEY_DSPEED_KBps, numarg( optarg ) );
                               tr_bencDictAddBool( sargs, TR_PREFS_KEY_DSPEED_ENABLED, TRUE );
                           }
                           break;
@@ -1935,10 +1924,10 @@ processArgs( const char * host, int port, int argc, const char ** argv )
                               tr_bencDictAddBool( sargs, TR_PREFS_KEY_DSPEED_ENABLED, FALSE );
                           break;
                 case 'u': if( targs ) {
-                              tr_bencDictAddInt( targs, "uploadLimit", numarg( optarg ) * SPEED_K );
+                              tr_bencDictAddInt( targs, "uploadLimit", numarg( optarg ) );
                               tr_bencDictAddBool( targs, "uploadLimited", TRUE );
                           } else {
-                              tr_bencDictAddInt( sargs, TR_PREFS_KEY_USPEED_Bps, numarg( optarg ) * SPEED_K );
+                              tr_bencDictAddInt( sargs, TR_PREFS_KEY_USPEED_KBps, numarg( optarg ) );
                               tr_bencDictAddBool( sargs, TR_PREFS_KEY_USPEED_ENABLED, TRUE );
                           }
                           break;

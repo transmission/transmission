@@ -157,8 +157,8 @@ getStatusStr( const tr_stat * st,
         char dnStr[80];
         char ratioStr[80];
 
-        tr_formatter_speed( upStr, st->pieceUploadSpeed_Bps, sizeof( upStr ) );
-        tr_formatter_speed( dnStr, st->pieceDownloadSpeed_Bps, sizeof( dnStr ) );
+        tr_formatter_speed_KBps( upStr, st->pieceUploadSpeed_KBps, sizeof( upStr ) );
+        tr_formatter_speed_KBps( dnStr, st->pieceDownloadSpeed_KBps, sizeof( dnStr ) );
         tr_strlratio( ratioStr, st->ratio, sizeof( ratioStr ) );
 
         tr_snprintf( buf, buflen,
@@ -176,7 +176,7 @@ getStatusStr( const tr_stat * st,
         char upStr[80];
         char ratioStr[80];
 
-        tr_formatter_speed( upStr, st->pieceUploadSpeed_Bps, sizeof( upStr ) );
+        tr_formatter_speed_KBps( upStr, st->pieceUploadSpeed_KBps, sizeof( upStr ) );
         tr_strlratio( ratioStr, st->ratio, sizeof( ratioStr ) );
 
         tr_snprintf( buf, buflen,
@@ -358,7 +358,7 @@ parseCommandLine( tr_benc * d, int argc, const char ** argv )
                       break;
             case 'B': tr_bencDictAddBool( d, TR_PREFS_KEY_BLOCKLIST_ENABLED, FALSE );
                       break;
-            case 'd': tr_bencDictAddInt ( d, TR_PREFS_KEY_DSPEED_Bps, atoi( optarg ) * SPEED_K );
+            case 'd': tr_bencDictAddInt ( d, TR_PREFS_KEY_DSPEED_KBps, atoi( optarg ) );
                       tr_bencDictAddBool( d, TR_PREFS_KEY_DSPEED_ENABLED, TRUE );
                       break;
             case 'D': tr_bencDictAddBool( d, TR_PREFS_KEY_DSPEED_ENABLED, FALSE );
@@ -376,7 +376,7 @@ parseCommandLine( tr_benc * d, int argc, const char ** argv )
                       break;
             case 't': tr_bencDictAddInt( d, TR_PREFS_KEY_PEER_SOCKET_TOS, atoi( optarg ) );
                       break;
-            case 'u': tr_bencDictAddInt( d, TR_PREFS_KEY_USPEED_Bps, atoi( optarg ) * SPEED_K );
+            case 'u': tr_bencDictAddInt( d, TR_PREFS_KEY_USPEED_KBps, atoi( optarg ) );
                       tr_bencDictAddBool( d, TR_PREFS_KEY_USPEED_ENABLED, TRUE );
                       break;
             case 'U': tr_bencDictAddBool( d, TR_PREFS_KEY_USPEED_ENABLED, FALSE );

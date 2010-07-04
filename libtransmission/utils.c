@@ -1582,45 +1582,46 @@ tr_formatter_size_init( unsigned int kilo,
 }
 
 char*
-tr_formatter_size( char * buf, uint64_t bytes, size_t buflen )
+tr_formatter_size_B( char * buf, uint64_t bytes, size_t buflen )
 {
     return formatter_get_size_str( &size_units, buf, bytes, buflen );
 }
 
 static struct formatter_units speed_units;
 
+unsigned int tr_speed_K = 0u;
+
 void
 tr_formatter_speed_init( unsigned int kilo,
                          const char * b, const char * kb,
                          const char * mb, const char * gb )
 {
+    tr_speed_K = kilo;
     formatter_init( &speed_units, kilo, b, kb, mb, gb );
 }
 
 char*
-tr_formatter_speed( char * buf, uint64_t bytes_per_second, size_t buflen )
+tr_formatter_speed_Bps( char * buf, uint64_t bytes_per_second, size_t buflen )
 {
-    return formatter_get_size_str( &speed_units, buf, bytes_per_second, buflen );
-}
-
-unsigned int
-tr_formatter_speed_k( void )
-{
-    return speed_units.units[TR_FMT_KB].value;
+    formatter_get_size_str( &speed_units, buf, bytes_per_second, buflen );
+    return buf;
 }
 
 static struct formatter_units mem_units;
 
+unsigned int tr_mem_K = 0u;
+ 
 void
 tr_formatter_mem_init( unsigned int kilo,
                        const char * b, const char * kb,
                        const char * mb, const char * gb )
 {
+    tr_mem_K = kilo;
     formatter_init( &mem_units, kilo, b, kb, mb, gb );
 }
 
 char*
-tr_formatter_mem( char * buf, uint64_t bytes_per_second, size_t buflen )
+tr_formatter_mem_B( char * buf, uint64_t bytes_per_second, size_t buflen )
 {
     return formatter_get_size_str( &mem_units, buf, bytes_per_second, buflen );
 }

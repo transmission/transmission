@@ -219,10 +219,10 @@ refreshOptions( struct DetailsImpl * di, tr_torrent ** torrents, int n )
 
     /* downLimitSpin */
     if( n ) {
-        const int baseline = tr_torrentGetSpeedLimit_Bps( torrents[0], TR_DOWN ) / speed_K;
+        const int baseline = tr_torrentGetSpeedLimit_KBps( torrents[0], TR_DOWN );
         int i;
         for( i=1; i<n; ++i )
-            if( baseline != ( tr_torrentGetSpeedLimit_Bps( torrents[i], TR_DOWN )  / speed_K ) )
+            if( baseline != ( tr_torrentGetSpeedLimit_KBps( torrents[i], TR_DOWN ) ) )
                 break;
         if( i == n )
             set_int_spin_if_different( di->downLimitSpin,
@@ -243,10 +243,10 @@ refreshOptions( struct DetailsImpl * di, tr_torrent ** torrents, int n )
 
     /* upLimitSpin */
     if( n ) {
-        const int baseline = tr_torrentGetSpeedLimit_Bps( torrents[0], TR_UP ) / speed_K;
+        const int baseline = tr_torrentGetSpeedLimit_KBps( torrents[0], TR_UP );
         int i;
         for( i=1; i<n; ++i )
-            if( baseline != ( tr_torrentGetSpeedLimit_Bps( torrents[i], TR_UP ) / speed_K ) )
+            if( baseline != ( tr_torrentGetSpeedLimit_KBps( torrents[i], TR_UP ) ) )
                 break;
         if( i == n )
             set_int_spin_if_different( di->upLimitSpin,
@@ -600,8 +600,8 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     const char * mixed = _( "Mixed" );
     const char * stateString;
     char buf[512];
-    double available = 0;
-    double sizeWhenDone = 0;
+    uint64_t available = 0;
+    uint64_t sizeWhenDone = 0;
     const tr_stat ** stats = g_new( const tr_stat*, n );
     const tr_info ** infos = g_new( const tr_info*, n );
     for( i=0; i<n; ++i ) {
@@ -761,7 +761,7 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
             str = none;
         else if( pieceSize >= 0 ) {
             char piecebuf[128];
-            tr_formatter_mem( piecebuf, pieceSize, sizeof( piecebuf ) );
+            tr_formatter_mem_B( piecebuf, pieceSize, sizeof( piecebuf ) );
             g_snprintf( buf, sizeof( buf ),
                         ngettext( "%1$s (%2$'d piece @ %3$s)",
                                   "%1$s (%2$'d pieces @ %3$s)", pieces ),
@@ -782,16 +782,15 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     if( n <= 0 )
         str = none;
     else {
-        double leftUntilDone = 0;
-        double haveUnchecked = 0;
-        double haveValid = 0;
-        double verifiedPieces = 0;
+        uint64_t leftUntilDone = 0;
+        uint64_t haveUnchecked = 0;
+        uint64_t haveValid = 0;
+        uint32_t verifiedPieces = 0;
         for( i=0; i<n; ++i ) {
             const tr_stat * st = stats[i];
-            const double v = st->haveValid;
             haveUnchecked += st->haveUnchecked;
-            haveValid += v;
-            verifiedPieces += v / tr_torrentInfo(torrents[i])->pieceSize;
+            haveValid += st->haveValid;
+            verifiedPieces += st->haveValid / tr_torrentInfo(torrents[i])->pieceSize;
             sizeWhenDone += st->sizeWhenDone;
             leftUntilDone += st->leftUntilDone;
             available += st->sizeWhenDone - st->leftUntilDone + st->desiredAvailable;
@@ -1044,7 +1043,7 @@ enum
     WEBSEED_COL_KEY,
     WEBSEED_COL_WAS_UPDATED,
     WEBSEED_COL_URL,
-    WEBSEED_COL_DOWNLOAD_RATE_INT,
+    WEBSEED_COL_DOWNLOAD_RATE_DOUBLE,
     WEBSEED_COL_DOWNLOAD_RATE_STRING,
     N_WEBSEED_COLS
 };
@@ -1055,7 +1054,7 @@ getWebseedColumnNames( int column )
     switch( column )
     {
         case WEBSEED_COL_URL: return _( "Webseeds" );
-        case WEBSEED_COL_DOWNLOAD_RATE_INT:
+        case WEBSEED_COL_DOWNLOAD_RATE_DOUBLE:
         case WEBSEED_COL_DOWNLOAD_RATE_STRING: return _( "Down" );
         default: return "";
     }
@@ -1078,9 +1077,9 @@ enum
     PEER_COL_WAS_UPDATED,
     PEER_COL_ADDRESS,
     PEER_COL_ADDRESS_COLLATED,
-    PEER_COL_DOWNLOAD_RATE_INT,
+    PEER_COL_DOWNLOAD_RATE_DOUBLE,
     PEER_COL_DOWNLOAD_RATE_STRING,
-    PEER_COL_UPLOAD_RATE_INT,
+    PEER_COL_UPLOAD_RATE_DOUBLE,
     PEER_COL_UPLOAD_RATE_STRING,
     PEER_COL_CLIENT,
     PEER_COL_PROGRESS,
@@ -1108,9 +1107,9 @@ getPeerColumnName( int column )
     {
         case PEER_COL_ADDRESS: return _( "Address" );
         case PEER_COL_DOWNLOAD_RATE_STRING:
-        case PEER_COL_DOWNLOAD_RATE_INT: return _( "Down" );
+        case PEER_COL_DOWNLOAD_RATE_DOUBLE: return _( "Down" );
         case PEER_COL_UPLOAD_RATE_STRING:
-        case PEER_COL_UPLOAD_RATE_INT: return _( "Up" );
+        case PEER_COL_UPLOAD_RATE_DOUBLE: return _( "Up" );
         case PEER_COL_CLIENT: return _( "Client" );
         case PEER_COL_PROGRESS: return _( "%" );
         case PEER_COL_UPLOAD_REQUEST_COUNT_INT:
@@ -1138,9 +1137,9 @@ peer_store_new( void )
                                G_TYPE_BOOLEAN,  /* was-updated */
                                G_TYPE_STRING,   /* address */
                                G_TYPE_STRING,   /* collated address */
-                               G_TYPE_INT,      /* download speed int */
+                               G_TYPE_DOUBLE,   /* download speed int */
                                G_TYPE_STRING,   /* download speed string */
-                               G_TYPE_INT,      /* upload speed int */
+                               G_TYPE_DOUBLE,   /* upload speed int */
                                G_TYPE_STRING,   /* upload speed string  */
                                G_TYPE_STRING,   /* client */
                                G_TYPE_INT,      /* progress [0..100] */
@@ -1202,13 +1201,13 @@ refreshPeerRow( GtkListStore        * store,
     char cancelled_by_peer[64];
     char cancelled_by_client[64];
 
-    if( peer->rateToPeer_Bps > 0 )
-        tr_formatter_speed( up_speed, peer->rateToPeer_Bps, sizeof( up_speed ) );
+    if( peer->rateToPeer_KBps > 0.01 )
+        tr_formatter_speed_KBps( up_speed, peer->rateToPeer_KBps, sizeof( up_speed ) );
     else
         *up_speed = '\0';
 
-    if( peer->rateToClient_Bps > 0 )
-        tr_formatter_speed( down_speed, peer->rateToClient_Bps, sizeof( down_speed ) );
+    if( peer->rateToClient_KBps > 0 )
+        tr_formatter_speed_KBps( down_speed, peer->rateToClient_KBps, sizeof( down_speed ) );
     else
         *down_speed = '\0';
 
@@ -1248,9 +1247,9 @@ refreshPeerRow( GtkListStore        * store,
                         PEER_COL_UPLOAD_REQUEST_COUNT_STRING, up_count,
                         PEER_COL_DOWNLOAD_REQUEST_COUNT_INT, peer->pendingReqsToPeer,
                         PEER_COL_DOWNLOAD_REQUEST_COUNT_STRING, down_count,
-                        PEER_COL_DOWNLOAD_RATE_INT, peer->rateToClient_Bps,
+                        PEER_COL_DOWNLOAD_RATE_DOUBLE, peer->rateToClient_KBps,
                         PEER_COL_DOWNLOAD_RATE_STRING, down_speed,
-                        PEER_COL_UPLOAD_RATE_INT, peer->rateToPeer_Bps,
+                        PEER_COL_UPLOAD_RATE_DOUBLE, peer->rateToPeer_KBps,
                         PEER_COL_UPLOAD_RATE_STRING, up_speed,
                         PEER_COL_STATUS, peer->flagStr,
                         PEER_COL_WAS_UPDATED, TRUE,
@@ -1396,7 +1395,7 @@ refreshWebseedList( struct DetailsImpl * di, tr_torrent ** torrents, int n )
         int j;
         const tr_torrent * tor = torrents[i];
         const tr_info * inf = tr_torrentInfo( tor );
-        int * speeds_Bps = tr_torrentWebSpeeds_Bps( tor );
+        double * speeds_KBps = tr_torrentWebSpeeds_KBps( tor );
         for( j=0; j<inf->webseedCount; ++j ) {
             char buf[128];
             char key[256];
@@ -1407,17 +1406,17 @@ refreshWebseedList( struct DetailsImpl * di, tr_torrent ** torrents, int n )
             ref = g_hash_table_lookup( hash, key );
             p = gtk_tree_row_reference_get_path( ref );
             gtk_tree_model_get_iter( model, &iter, p );
-            if( speeds_Bps[j] > 0 )
-                tr_formatter_speed( buf, speeds_Bps[j], sizeof( buf ) );
+            if( speeds_KBps[j] > 0 )
+                tr_formatter_speed_Bps( buf, speeds_KBps[j], sizeof( buf ) );
             else
                 *buf = '\0';
-            gtk_list_store_set( store, &iter, WEBSEED_COL_DOWNLOAD_RATE_INT, speeds_Bps[j],
+            gtk_list_store_set( store, &iter, WEBSEED_COL_DOWNLOAD_RATE_DOUBLE, speeds_KBps[j],
                                               WEBSEED_COL_DOWNLOAD_RATE_STRING, buf,
                                               WEBSEED_COL_WAS_UPDATED, TRUE,
                                               -1 );
             gtk_tree_path_free( p );
         }
-        tr_free( speeds_Bps );
+        tr_free( speeds_KBps );
     }
 
     /* step 4: remove webseeds that have disappeared */
@@ -1611,13 +1610,13 @@ setPeerViewColumns( GtkTreeView * peer_view )
                 r = gtk_cell_renderer_text_new( );
                 g_object_set( G_OBJECT( r ), "xalign", 1.0f, NULL );
                 c = gtk_tree_view_column_new_with_attributes( t, r, "text", col, NULL );
-                sort_col = PEER_COL_DOWNLOAD_RATE_INT;
+                sort_col = PEER_COL_DOWNLOAD_RATE_DOUBLE;
                 break;
             case PEER_COL_UPLOAD_RATE_STRING:
                 r = gtk_cell_renderer_text_new( );
                 g_object_set( G_OBJECT( r ), "xalign", 1.0f, NULL );
                 c = gtk_tree_view_column_new_with_attributes( t, r, "text", col, NULL );
-                sort_col = PEER_COL_UPLOAD_RATE_INT;
+                sort_col = PEER_COL_UPLOAD_RATE_DOUBLE;
                 break;
 
             case PEER_COL_STATUS:
@@ -1686,7 +1685,7 @@ peer_page_new( struct DetailsImpl * di )
     str = getWebseedColumnNames( WEBSEED_COL_DOWNLOAD_RATE_STRING );
     r = gtk_cell_renderer_text_new( );
     c = gtk_tree_view_column_new_with_attributes( str, r, "text", WEBSEED_COL_DOWNLOAD_RATE_STRING, NULL );
-    gtk_tree_view_column_set_sort_column_id( c, WEBSEED_COL_DOWNLOAD_RATE_INT );
+    gtk_tree_view_column_set_sort_column_id( c, WEBSEED_COL_DOWNLOAD_RATE_DOUBLE );
     gtk_tree_view_append_column( GTK_TREE_VIEW( v ), c );
 
     w = gtk_scrolled_window_new( NULL, NULL );

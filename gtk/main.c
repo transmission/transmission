@@ -1203,17 +1203,17 @@ prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
     {
         tr_sessionLimitSpeed( tr, TR_DOWN, pref_flag_get( key ) );
     }
-    else if( !strcmp( key, TR_PREFS_KEY_DSPEED_Bps ) )
+    else if( !strcmp( key, TR_PREFS_KEY_DSPEED_KBps ) )
     {
-        tr_sessionSetSpeedLimit_Bps( tr, TR_DOWN, pref_int_get( key ) );
+        tr_sessionSetSpeedLimit_KBps( tr, TR_DOWN, pref_int_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_USPEED_ENABLED ) )
     {
         tr_sessionLimitSpeed( tr, TR_UP, pref_flag_get( key ) );
     }
-    else if( !strcmp( key, TR_PREFS_KEY_USPEED_Bps ) )
+    else if( !strcmp( key, TR_PREFS_KEY_USPEED_KBps ) )
     {
-        tr_sessionSetSpeedLimit_Bps( tr, TR_UP, pref_int_get( key ) );
+        tr_sessionSetSpeedLimit_KBps( tr, TR_UP, pref_int_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_RATIO_ENABLED ) )
     {
@@ -1299,13 +1299,13 @@ prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
     {
         tr_sessionSetProxyPort( tr, pref_int_get( key ) );
     }
-    else if( !strcmp( key, TR_PREFS_KEY_ALT_SPEED_UP_Bps ) )
+    else if( !strcmp( key, TR_PREFS_KEY_ALT_SPEED_UP_KBps ) )
     {
-        tr_sessionSetAltSpeed_Bps( tr, TR_UP, pref_int_get( key ) );
+        tr_sessionSetAltSpeed_KBps( tr, TR_UP, pref_int_get( key ) );
     }
-    else if( !strcmp( key, TR_PREFS_KEY_ALT_SPEED_DOWN_Bps ) )
+    else if( !strcmp( key, TR_PREFS_KEY_ALT_SPEED_DOWN_KBps ) )
     {
-        tr_sessionSetAltSpeed_Bps( tr, TR_DOWN, pref_int_get( key ) );
+        tr_sessionSetAltSpeed_KBps( tr, TR_DOWN, pref_int_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_ALT_SPEED_ENABLED ) )
     {

@@ -44,6 +44,16 @@ const QString Formatter :: mem_G_str = "GiB";
 ****
 ***/
 
+Speed
+Speed :: fromKBps( double KBps )
+{
+    return KBps * Formatter::speed_K;
+}
+
+/***
+****
+***/
+
 QString
 Formatter :: memToString( double bytes )
 {
@@ -51,7 +61,7 @@ Formatter :: memToString( double bytes )
         return tr( "None" );
     else {
         char buf[128];
-        tr_formatter_mem( buf, bytes, sizeof( buf ) );
+        tr_formatter_mem_B( buf, bytes, sizeof( buf ) );
         return buf;
     }
 }
@@ -63,7 +73,7 @@ Formatter :: sizeToString( double bytes )
         return tr( "None" );
     else {
         char buf[128];
-        tr_formatter_size( buf, bytes, sizeof( buf ) );
+        tr_formatter_size_B( buf, bytes, sizeof( buf ) );
         return buf;
     }
 }
@@ -75,7 +85,7 @@ Formatter :: speedToString( const Speed& speed )
         return tr( "None" );
     else {
         char buf[128];
-        tr_formatter_speed( buf, speed.Bps( ), sizeof( buf ) );
+        tr_formatter_speed_KBps( buf, speed.Bps( ), sizeof( buf ) );
         return buf;
     }
 }

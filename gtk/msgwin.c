@@ -37,12 +37,12 @@ enum
 
 struct MsgData
 {
-    TrCore *        core;
-    GtkTreeView *   view;
-    GtkListStore *  store;
-    GtkTreeModel *  filter;
-    GtkTreeModel *  sort;
-    int             maxLevel;
+    TrCore        * core;
+    GtkTreeView   * view;
+    GtkListStore  * store;
+    GtkTreeModel  * filter;
+    GtkTreeModel  * sort;
+    tr_msg_level    maxLevel;
     gboolean        isPaused;
     guint           refresh_tag;
 };

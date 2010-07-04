@@ -26,6 +26,7 @@
 #define TR_WINDOW_H
 
 #include <gtk/gtk.h>
+#include <libtransmission/utils.h> /* tr_formatter_speed_KBps() */
 #include "tr-core.h"
 
 typedef GtkWindow TrWindow;

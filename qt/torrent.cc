@@ -53,8 +53,8 @@ Torrent :: Property
 Torrent :: myProperties[] =
 {
     { ID, "id", QVariant::Int, INFO, },
-    { UPLOAD_SPEED, "rateUpload", QVariant::Int, STAT } /* B/s */,
-    { DOWNLOAD_SPEED, "rateDownload", QVariant::Int, STAT }, /* B/s */
+    { UPLOAD_SPEED, "rateUpload", QVariant::Double, STAT } /* KBps */,
+    { DOWNLOAD_SPEED, "rateDownload", QVariant::Double, STAT }, /* KBps */
     { DOWNLOAD_DIR, "downloadDir", QVariant::String, STAT },
     { ACTIVITY, "status", QVariant::Int, STAT },
     { NAME, "name", QVariant::String, INFO },
@@ -89,9 +89,9 @@ Torrent :: myProperties[] =
     { MIME_ICON, "ccc", QVariant::Icon, DERIVED },
     { SEED_RATIO_LIMIT, "seedRatioLimit", QVariant::Double, STAT },
     { SEED_RATIO_MODE, "seedRatioMode", QVariant::Int, STAT },
-    { DOWN_LIMIT, "downloadLimit", QVariant::Int, STAT_EXTRA }, /* KiB/s */
+    { DOWN_LIMIT, "downloadLimit", QVariant::Int, STAT_EXTRA }, /* KB/s */
     { DOWN_LIMITED, "downloadLimited", QVariant::Bool, STAT_EXTRA },
-    { UP_LIMIT, "uploadLimit", QVariant::Int, STAT_EXTRA }, /* KiB/s */
+    { UP_LIMIT, "uploadLimit", QVariant::Int, STAT_EXTRA }, /* KB/s */
     { UP_LIMITED, "uploadLimited", QVariant::Bool, STAT_EXTRA },
     { HONORS_SESSION_LIMITS, "honorsSessionLimits", QVariant::Bool, STAT_EXTRA },
     { PEER_LIMIT, "peer-limit", QVariant::Int, STAT_EXTRA },
@@ -653,10 +653,10 @@ Torrent :: update( tr_benc * d )
                 peer.port = i;
             if( tr_bencDictFindReal( child, "progress", &d ) )
                 peer.progress = d;
-            if( tr_bencDictFindInt( child, "rateToClient", &i ) )
-                peer.rateToClient = Speed::fromBps( i );
-            if( tr_bencDictFindInt( child, "rateToPeer", &i ) )
-                peer.rateToPeer = Speed::fromBps( i );
+            if( tr_bencDictFindReal( child, "rateToClient", &d ) )
+                peer.rateToClient = Speed::fromKBps( d );
+            if( tr_bencDictFindReal( child, "rateToPeer", &d ) )
+                peer.rateToPeer = Speed::fromKBps( d );
             peerList << peer;
         }
         myValues[PEERS].setValue( peerList );

@@ -138,6 +138,11 @@ tr_torrentSetSpeedLimit_Bps( tr_torrent * tor, tr_direction dir, int Bps )
     if( tr_bandwidthSetDesiredSpeed_Bps( tor->bandwidth, dir, Bps ) )
         tr_torrentSetDirty( tor );
 }
+void
+tr_torrentSetSpeedLimit_KBps( tr_torrent * tor, tr_direction dir, int KBps )
+{
+    tr_torrentSetSpeedLimit_Bps( tor, dir, toSpeedBytes( KBps ) );
+}
 
 int
 tr_torrentGetSpeedLimit_Bps( const tr_torrent * tor, tr_direction dir )
@@ -146,6 +151,11 @@ tr_torrentGetSpeedLimit_Bps( const tr_torrent * tor, tr_direction dir )
     assert( tr_isDirection( dir ) );
 
     return tr_bandwidthGetDesiredSpeed_Bps( tor->bandwidth, dir );
+}
+int
+tr_torrentGetSpeedLimit_KBps( const tr_torrent * tor, tr_direction dir )
+{
+    return toSpeedKBps( tr_torrentGetSpeedLimit_Bps( tor, dir ) );
 }
 
 void
@@ -968,10 +978,10 @@ tr_torrentStat( tr_torrent * tor )
 
     now = tr_date( );
     d = tr_peerMgrGetWebseedSpeed_Bps( tor, now );
-    s->rawUploadSpeed_Bps     = tr_bandwidthGetRawSpeed_Bps  ( tor->bandwidth, now, TR_UP );
-    s->pieceUploadSpeed_Bps   = tr_bandwidthGetPieceSpeed_Bps( tor->bandwidth, now, TR_UP );
-    s->rawDownloadSpeed_Bps   = d + tr_bandwidthGetRawSpeed_Bps  ( tor->bandwidth, now, TR_DOWN );
-    s->pieceDownloadSpeed_Bps = d + tr_bandwidthGetPieceSpeed_Bps( tor->bandwidth, now, TR_DOWN );
+    s->rawUploadSpeed_KBps     = toSpeedKBps( tr_bandwidthGetRawSpeed_Bps  ( tor->bandwidth, now, TR_UP ) );
+    s->pieceUploadSpeed_KBps   = toSpeedKBps( tr_bandwidthGetPieceSpeed_Bps( tor->bandwidth, now, TR_UP ) );
+    s->rawDownloadSpeed_KBps   = toSpeedKBps( d + tr_bandwidthGetRawSpeed_Bps  ( tor->bandwidth, now, TR_DOWN ) );
+    s->pieceDownloadSpeed_KBps = toSpeedKBps( d + tr_bandwidthGetPieceSpeed_Bps( tor->bandwidth, now, TR_DOWN ) );
 
     usableSeeds += tor->info.webseedCount;
 
@@ -1032,18 +1042,18 @@ tr_torrentStat( tr_torrent * tor )
 
         case TR_STATUS_DOWNLOAD:
             if( ( tor->etaDLSpeedCalculatedAt + 800 ) < now ) {
-                tor->etaDLSpeed_Bps = ( ( tor->etaDLSpeedCalculatedAt + 4000 ) < now )
-                    ? s->pieceDownloadSpeed_Bps /* if no recent previous speed, no need to smooth */
-                    : ((tor->etaDLSpeed_Bps*4) + s->pieceDownloadSpeed_Bps)/5; /* smooth across 5 readings */
+                tor->etaDLSpeed_KBps = ( ( tor->etaDLSpeedCalculatedAt + 4000 ) < now )
+                    ? s->pieceDownloadSpeed_KBps /* if no recent previous speed, no need to smooth */
+                    : ((tor->etaDLSpeed_KBps*4.0) + s->pieceDownloadSpeed_KBps)/5.0; /* smooth across 5 readings */
                 tor->etaDLSpeedCalculatedAt = now;
             }
 
             if( s->leftUntilDone > s->desiredAvailable )
                 s->eta = TR_ETA_NOT_AVAIL;
-            else if( s->pieceDownloadSpeed_Bps < 1 )
+            else if( tor->etaDLSpeed_KBps < 1 )
                 s->eta = TR_ETA_UNKNOWN;
             else
-                s->eta = s->leftUntilDone / tor->etaDLSpeed_Bps;
+                s->eta = s->leftUntilDone / toSpeedBytes(tor->etaDLSpeed_KBps);
             break;
 
         case TR_STATUS_SEED: {
@@ -1051,15 +1061,15 @@ tr_torrentStat( tr_torrent * tor )
                 s->eta = TR_ETA_NOT_AVAIL;
             else {
                 if( ( tor->etaULSpeedCalculatedAt + 800 ) < now ) {
-                    tor->etaULSpeed_Bps = ( ( tor->etaULSpeedCalculatedAt + 4000 ) < now )
-                        ? s->pieceUploadSpeed_Bps /* if no recent previous speed, no need to smooth */
-                        : ((tor->etaULSpeed_Bps*4) + s->pieceUploadSpeed_Bps)/5; /* smooth across 5 readings */
+                    tor->etaULSpeed_KBps = ( ( tor->etaULSpeedCalculatedAt + 4000 ) < now )
+                        ? s->pieceUploadSpeed_KBps /* if no recent previous speed, no need to smooth */
+                        : ((tor->etaULSpeed_KBps*4.0) + s->pieceUploadSpeed_KBps)/5.0; /* smooth across 5 readings */
                     tor->etaULSpeedCalculatedAt = now;
                 }
-                if( s->pieceUploadSpeed_Bps < 1 )
+                if( tor->etaULSpeed_KBps < 1 )
                     s->eta = TR_ETA_UNKNOWN;
                 else
-                    s->eta = seedRatioBytesLeft / tor->etaULSpeed_Bps;
+                    s->eta = seedRatioBytesLeft / toSpeedBytes(tor->etaULSpeed_KBps);
             }
             break;
         }
@@ -1193,10 +1203,10 @@ tr_torrentFilesFree( tr_file_stat *            files,
 ****
 ***/
 
-int*
-tr_torrentWebSpeeds_Bps( const tr_torrent * tor )
+double*
+tr_torrentWebSpeeds_KBps( const tr_torrent * tor )
 {
-    return tr_isTorrent( tor ) ? tr_peerMgrWebSpeeds_Bps( tor ) : NULL;
+    return tr_isTorrent( tor ) ? tr_peerMgrWebSpeeds_KBps( tor ) : NULL;
 }
 
 tr_peer_stat *

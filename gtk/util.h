@@ -77,6 +77,10 @@ char* tr_strltime( char * buf, int secs, size_t buflen );
 /* similar to asctime, but is utf8-clean */
 char* gtr_localtime( time_t time );
 
+
+int gtr_compare_double( const double a, const double b, int decimal_places );
+
+
 /***
 ****
 ***/

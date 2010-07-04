@@ -227,7 +227,7 @@ struct tr_peer_stat* tr_peerMgrPeerStats( const tr_torrent * tor,
 
 int tr_peerMgrGetWebseedSpeed_Bps( const tr_torrent * tor, uint64_t now );
 
-int* tr_peerMgrWebSpeeds_Bps( const tr_torrent * tor );
+double* tr_peerMgrWebSpeeds_KBps( const tr_torrent * tor );
 
 
 int tr_peerGetPieceSpeed_Bps( const tr_peer    * peer,

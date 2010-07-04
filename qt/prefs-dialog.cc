@@ -51,7 +51,6 @@
 namespace
 {
     const char * PREF_KEY( "pref-key" );
-    const char * MULTIPLIER_KEY( "multiplier-key" );
 };
 
 void
@@ -84,13 +83,12 @@ PrefsDialog :: spinBoxChangedIdle( )
 {
     const QObject * spin( sender()->property( "SPIN" ).value<QObject*>( ) );
     const int key = spin->property( PREF_KEY ).toInt( );
-    const int multiplier = spin->property( MULTIPLIER_KEY ).toInt( );
 
     const QDoubleSpinBox * d = qobject_cast<const QDoubleSpinBox*>( spin );
     if( d != 0 )
-        myPrefs.set( key, multiplier * d->value( ) );
+        myPrefs.set( key, d->value( ) );
     else
-        myPrefs.set( key, multiplier * qobject_cast<const QSpinBox*>(spin)->value( ) );
+        myPrefs.set( key, qobject_cast<const QSpinBox*>(spin)->value( ) );
 }
 
 void
@@ -116,14 +114,13 @@ PrefsDialog :: spinBoxChanged( int value )
 }
 
 QSpinBox *
-PrefsDialog :: spinBoxNew( int key, int low, int high, int step, int multiplier )
+PrefsDialog :: spinBoxNew( int key, int low, int high, int step )
 {
     QSpinBox * spin = new QSpinBox( );
     spin->setRange( low, high );
     spin->setSingleStep( step );
-    spin->setValue( myPrefs.getInt( key ) / multiplier );
+    spin->setValue( myPrefs.getInt( key ) );
     spin->setProperty( PREF_KEY, key );
-    spin->setProperty( MULTIPLIER_KEY, multiplier );
     connect( spin, SIGNAL(valueChanged(int)), this, SLOT(spinBoxChanged(int)));
     myWidgets.insert( key, spin );
     return spin;
@@ -138,15 +135,13 @@ PrefsDialog :: doubleSpinBoxChanged( double value )
 }
 
 QDoubleSpinBox *
-PrefsDialog :: doubleSpinBoxNew( int key, double low, double high, double step, int decimals, int multiplier )
+PrefsDialog :: doubleSpinBoxNew( int key, double low, double high, double step, int decimals )
 {
     QDoubleSpinBox * spin = new QDoubleSpinBox( );
     spin->setRange( low, high );
     spin->setSingleStep( step );
     spin->setDecimals( decimals );
-    spin->setValue( myPrefs.getDouble( key ) / multiplier );
     spin->setProperty( PREF_KEY, key );
-    spin->setProperty( MULTIPLIER_KEY, multiplier );
     connect( spin, SIGNAL(valueChanged(double)), this, SLOT(doubleSpinBoxChanged(double)));
     myWidgets.insert( key, spin );
     return spin;
@@ -273,12 +268,12 @@ PrefsDialog :: createSpeedTab( )
     hig->addSectionTitle( tr( "Speed Limits" ) );
 
         l = checkBoxNew( tr( "Limit &download speed (%1):" ).arg( Formatter::speed_K_str ), Prefs::DSPEED_ENABLED );
-        r = spinBoxNew( Prefs::DSPEED, 0, INT_MAX, 5, Formatter::speed_K );
+        r = spinBoxNew( Prefs::DSPEED, 0, INT_MAX, 5 );
         hig->addRow( l, r );
         enableBuddyWhenChecked( qobject_cast<QCheckBox*>(l), r );
 
         l = checkBoxNew( tr( "Limit &upload speed (%1):" ).arg( Formatter::speed_K_str ), Prefs::USPEED_ENABLED );
-        r = spinBoxNew( Prefs::USPEED, 0, INT_MAX, 5, Formatter::speed_K );
+        r = spinBoxNew( Prefs::USPEED, 0, INT_MAX, 5 );
         hig->addRow( l, r );
         enableBuddyWhenChecked( qobject_cast<QCheckBox*>(l), r );
 
@@ -299,11 +294,11 @@ PrefsDialog :: createSpeedTab( )
         hig->addWideControl( new QLabel( s ) );
 
         s = tr( "Limit d&ownload speed (%1):" ).arg( Formatter::speed_K_str );
-        r = spinBoxNew( Prefs :: ALT_SPEED_LIMIT_DOWN, 0, INT_MAX, 5, Formatter::speed_K );
+        r = spinBoxNew( Prefs :: ALT_SPEED_LIMIT_DOWN, 0, INT_MAX, 5 );
         hig->addRow( s, r );
 
         s = tr( "Limit u&pload speed (%1):" ).arg( Formatter::speed_K_str );
-        r = spinBoxNew( Prefs :: ALT_SPEED_LIMIT_UP, 0, INT_MAX, 5, Formatter::speed_K );
+        r = spinBoxNew( Prefs :: ALT_SPEED_LIMIT_UP, 0, INT_MAX, 5 );
         hig->addRow( s, r );
 
         QCheckBox * c = checkBoxNew( tr( "&Scheduled times:" ), Prefs::ALT_SPEED_LIMIT_TIME_ENABLED );

@@ -279,13 +279,13 @@ class Torrent: public QObject
         bool isUploading( ) const { return peersWeAreUploadingTo( ) > 0; }
         int connectedPeers( ) const { return getInt( PEERS_CONNECTED ); }
         int connectedPeersAndWebseeds( ) const { return connectedPeers( ) + getInt( WEBSEEDS_SENDING_TO_US ); }
-        Speed downloadSpeed( ) const { return Speed::fromBps( getInt( DOWNLOAD_SPEED ) ); }
-        Speed uploadSpeed( ) const { return Speed::fromBps( getInt( UPLOAD_SPEED ) ); }
+        Speed downloadSpeed( ) const { return Speed::fromKBps( getDouble( DOWNLOAD_SPEED ) ); }
+        Speed uploadSpeed( ) const { return Speed::fromKBps( getDouble( UPLOAD_SPEED ) ); }
         double getVerifyProgress( ) const { return getDouble( PERCENT_VERIFIED ); }
         bool hasFileSubstring( const QString& substr ) const;
         bool hasTrackerSubstring( const QString& substr ) const;
-        Speed uploadLimit( ) const { return Speed::fromBps( getInt( UP_LIMIT ) ); }
-        Speed downloadLimit( ) const { return Speed::fromBps( getInt( DOWN_LIMIT ) ); }
+        Speed uploadLimit( ) const { return Speed::fromKBps( getInt( UP_LIMIT ) ); }
+        Speed downloadLimit( ) const { return Speed::fromKBps( getInt( DOWN_LIMIT ) ); }
         bool uploadIsLimited( ) const { return getBool( UP_LIMITED ); }
         bool downloadIsLimited( ) const { return getBool( DOWN_LIMITED ); }
         bool honorsSessionLimits( ) const { return getBool( HONORS_SESSION_LIMITS ); }

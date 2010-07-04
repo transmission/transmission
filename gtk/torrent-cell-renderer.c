@@ -154,8 +154,8 @@ getProgressString( const tr_torrent * tor,
 static char*
 getShortTransferString( const tr_torrent  * tor,
                         const tr_stat     * torStat,
-                        int                 uploadSpeed_Bps,
-                        int                 downloadSpeed_Bps,
+                        double              uploadSpeed_KBps,
+                        double              downloadSpeed_KBps,
                         char              * buf,
                         size_t              buflen )
 {
@@ -165,9 +165,9 @@ getShortTransferString( const tr_torrent  * tor,
     const int haveUp = haveMeta && torStat->peersGettingFromUs > 0;
 
     if( haveDown )
-        tr_strlspeed( downStr, downloadSpeed_Bps, sizeof( downStr ) );
+        tr_formatter_speed_KBps( downStr, downloadSpeed_KBps, sizeof( downStr ) );
     if( haveUp )
-        tr_strlspeed( upStr, uploadSpeed_Bps, sizeof( upStr ) );
+        tr_formatter_speed_KBps( upStr, uploadSpeed_KBps, sizeof( upStr ) );
 
     if( haveDown && haveUp )
         /* 1==down speed, 2==down arrow, 3==up speed, 4==down arrow */
@@ -194,8 +194,8 @@ getShortTransferString( const tr_torrent  * tor,
 static char*
 getShortStatusString( const tr_torrent  * tor,
                       const tr_stat     * torStat,
-                      int                 uploadSpeed_Bps,
-                      int                 downloadSpeed_Bps )
+                      double              uploadSpeed_KBps,
+                      double              downloadSpeed_KBps )
 {
     GString * gstr = g_string_new( NULL );
 
@@ -228,7 +228,7 @@ getShortStatusString( const tr_torrent  * tor,
                 g_string_append_printf( gstr, _( "Ratio %s" ), buf );
                 g_string_append( gstr, ", " );
             }
-            getShortTransferString( tor, torStat, uploadSpeed_Bps, downloadSpeed_Bps, buf, sizeof( buf ) );
+            getShortTransferString( tor, torStat, uploadSpeed_KBps, downloadSpeed_KBps, buf, sizeof( buf ) );
             g_string_append( gstr, buf );
             break;
         }
@@ -243,8 +243,8 @@ getShortStatusString( const tr_torrent  * tor,
 static char*
 getStatusString( const tr_torrent  * tor,
                  const tr_stat     * torStat,
-                 const int           uploadSpeed_Bps,
-                 const int           downloadSpeed_Bps )
+                 const double        uploadSpeed_KBps,
+                 const double        downloadSpeed_KBps )
 {
     const int isActive = torStat->activity != TR_STATUS_STOPPED;
     const int isChecking = torStat->activity == TR_STATUS_CHECK
@@ -265,7 +265,7 @@ getStatusString( const tr_torrent  * tor,
         case TR_STATUS_CHECK_WAIT:
         case TR_STATUS_CHECK:
         {
-            char * pch = getShortStatusString( tor, torStat, uploadSpeed_Bps, downloadSpeed_Bps );
+            char * pch = getShortStatusString( tor, torStat, uploadSpeed_KBps, downloadSpeed_KBps );
             g_string_assign( gstr, pch );
             g_free( pch );
             break;
@@ -309,7 +309,7 @@ getStatusString( const tr_torrent  * tor,
     if( isActive && !isChecking )
     {
         char buf[256];
-        getShortTransferString( tor, torStat, uploadSpeed_Bps, downloadSpeed_Bps, buf, sizeof( buf ) );
+        getShortTransferString( tor, torStat, uploadSpeed_KBps, downloadSpeed_KBps, buf, sizeof( buf ) );
         if( *buf )
             g_string_append_printf( gstr, " - %s", buf );
     }
@@ -336,10 +336,10 @@ struct TorrentCellRendererPrivate
        control when the speed displays get updated.  this is done to keep
        the individual torrents' speeds and the status bar's overall speed
        in sync even if they refresh at slightly different times */
-    int upload_speed_Bps;
+    double upload_speed_KBps;
 
     /* @see upload_speed_Bps */
-    int download_speed_Bps;
+    double download_speed_KBps;
 
     gboolean compact;
 };
@@ -397,7 +397,7 @@ get_size_compact( TorrentCellRenderer * cell,
 
     icon = get_icon( tor, COMPACT_ICON_SIZE, widget );
     name = tr_torrentInfo( tor )->name;
-    status = getShortStatusString( tor, st, p->upload_speed_Bps, p->download_speed_Bps );
+    status = getShortStatusString( tor, st, p->upload_speed_KBps, p->download_speed_KBps );
 
     /* get the idealized cell dimensions */
     g_object_set( p->icon_renderer, "pixbuf", icon, NULL );
@@ -455,7 +455,7 @@ get_size_full( TorrentCellRenderer * cell,
 
     icon = get_icon( tor, FULL_ICON_SIZE, widget );
     name = inf->name;
-    status = getStatusString( tor, st, p->upload_speed_Bps, p->download_speed_Bps );
+    status = getStatusString( tor, st, p->upload_speed_KBps, p->download_speed_KBps );
     progress = getProgressString( tor, inf, st );
 
     /* get the idealized cell dimensions */
@@ -559,7 +559,7 @@ render_compact( TorrentCellRenderer   * cell,
 
     icon = get_icon( tor, COMPACT_ICON_SIZE, widget );
     name = tr_torrentInfo( tor )->name;
-    status = getShortStatusString( tor, st, p->upload_speed_Bps, p->download_speed_Bps );
+    status = getShortStatusString( tor, st, p->upload_speed_KBps, p->download_speed_KBps );
 
     /* get the cell dimensions */
     g_object_set( p->icon_renderer, "pixbuf", icon, NULL );
@@ -663,7 +663,7 @@ render_full( TorrentCellRenderer   * cell,
 
     icon = get_icon( tor, FULL_ICON_SIZE, widget );
     name = inf->name;
-    status = getStatusString( tor, st, p->upload_speed_Bps, p->download_speed_Bps );
+    status = getStatusString( tor, st, p->upload_speed_KBps, p->download_speed_KBps );
     progress = getProgressString( tor, inf, st );
 
     /* get the idealized cell dimensions */
@@ -782,11 +782,11 @@ torrent_cell_renderer_set_property( GObject      * object,
 
     switch( property_id )
     {
-        case P_TORRENT:        p->tor                = g_value_get_pointer( v ); break;
-        case P_UPLOAD_SPEED:   p->upload_speed_Bps   = g_value_get_int( v ); break;
-        case P_DOWNLOAD_SPEED: p->download_speed_Bps = g_value_get_int( v ); break;
-        case P_BAR_HEIGHT:     p->bar_height         = g_value_get_int( v ); break;
-        case P_COMPACT:        p->compact            = g_value_get_boolean( v ); break;
+        case P_TORRENT:        p->tor                 = g_value_get_pointer( v ); break;
+        case P_UPLOAD_SPEED:   p->upload_speed_KBps   = g_value_get_double( v ); break;
+        case P_DOWNLOAD_SPEED: p->download_speed_KBps = g_value_get_double( v ); break;
+        case P_BAR_HEIGHT:     p->bar_height          = g_value_get_int( v ); break;
+        case P_COMPACT:        p->compact             = g_value_get_boolean( v ); break;
         default: G_OBJECT_WARN_INVALID_PROPERTY_ID( object, property_id, pspec ); break;
     }
 }
@@ -803,8 +803,8 @@ torrent_cell_renderer_get_property( GObject     * object,
     switch( property_id )
     {
         case P_TORRENT:        g_value_set_pointer( v, p->tor ); break;
-        case P_UPLOAD_SPEED:   g_value_set_int( v, p->upload_speed_Bps ); break;
-        case P_DOWNLOAD_SPEED: g_value_set_int( v, p->download_speed_Bps ); break;
+        case P_UPLOAD_SPEED:   g_value_set_double( v, p->upload_speed_KBps ); break;
+        case P_DOWNLOAD_SPEED: g_value_set_double( v, p->download_speed_KBps ); break;
         case P_BAR_HEIGHT:     g_value_set_int( v, p->bar_height ); break;
         case P_COMPACT:        g_value_set_boolean( v, p->compact ); break;
         default: G_OBJECT_WARN_INVALID_PROPERTY_ID( object, property_id, pspec ); break;
@@ -853,16 +853,16 @@ torrent_cell_renderer_class_init( TorrentCellRendererClass * klass )
                                                           G_PARAM_READWRITE ) );
 
     g_object_class_install_property( gobject_class, P_UPLOAD_SPEED,
-                                    g_param_spec_int( "piece-upload-speed", NULL,
-                                                      "tr_stat.pieceUploadSpeed_Bps",
-                                                      0, INT_MAX, 0,
-                                                      G_PARAM_READWRITE ) );
+                                    g_param_spec_double( "piece-upload-speed", NULL,
+                                                         "tr_stat.pieceUploadSpeed_KBps",
+                                                         0, INT_MAX, 0,
+                                                         G_PARAM_READWRITE ) );
 
     g_object_class_install_property( gobject_class, P_DOWNLOAD_SPEED,
-                                    g_param_spec_int( "piece-download-speed", NULL,
-                                                      "tr_stat.pieceDownloadSpeed_Bps",
-                                                      0, INT_MAX, 0,
-                                                      G_PARAM_READWRITE ) );
+                                    g_param_spec_double( "piece-download-speed", NULL,
+                                                         "tr_stat.pieceDownloadSpeed_KBps",
+                                                         0, INT_MAX, 0,
+                                                         G_PARAM_READWRITE ) );
 
     g_object_class_install_property( gobject_class, P_BAR_HEIGHT,
                                     g_param_spec_int( "bar-height", NULL,

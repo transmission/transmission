@@ -23,8 +23,6 @@
 
 #include <libtransmission/transmission.h>
 
-#include "speed.h"
-
 extern "C"
 {
     struct tr_benc;

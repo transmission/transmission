@@ -64,9 +64,9 @@ class PrefsDialog: public QDialog
         void onBlocklistUpdated( int n );
 
     private:
-        QDoubleSpinBox * doubleSpinBoxNew( int key, double low, double high, double step, int decimals, int multiplier=1 );
+        QDoubleSpinBox * doubleSpinBoxNew( int key, double low, double high, double step, int decimals );
         QCheckBox * checkBoxNew( const QString& text, int key );
-        QSpinBox * spinBoxNew( int key, int low, int high, int step, int multiplier=1 );
+        QSpinBox * spinBoxNew( int key, int low, int high, int step );
         QTimeEdit * timeEditNew( int key );
         QLineEdit * lineEditNew( int key, int mode = 0 );
         void enableBuddyWhenChecked( QCheckBox *, QWidget * );
