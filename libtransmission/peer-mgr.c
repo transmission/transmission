@@ -3329,15 +3329,15 @@ isBandwidthMaxedOut( const tr_bandwidth * b,
 static tr_bool
 isPeerCandidate( const tr_torrent * tor, struct peer_atom * atom, const time_t now )
 {
-    /* not if they're banned... */
-    if( atom->myflags & MYFLAG_BANNED )
-        return FALSE;
-
     /* not if we're both seeds */
     if( tr_torrentIsSeed( tor ) )
         if( atomIsSeed( atom ) || ( atom->uploadOnly == UPLOAD_ONLY_YES ) )
             return FALSE;
- 
+
+    /* not if we've already got a connection to them...  */
+    if( peerIsInUse( tor->torrentPeers, atom ) )
+        return FALSE;
+
     /* not if we just tried them already */
     if( ( now - atom->time ) < getReconnectIntervalSecs( atom, now ) )
         return FALSE;
@@ -3346,8 +3346,8 @@ isPeerCandidate( const tr_torrent * tor, struct peer_atom * atom, const time_t n
     if( isAtomBlocklisted( tor->session, atom ) )
         return FALSE;
 
-    /* not if we've already got a connection to them...  */
-    if( peerIsInUse( tor->torrentPeers, atom ) )
+    /* not if they're banned... */
+    if( atom->myflags & MYFLAG_BANNED )
         return FALSE;
 
     return TRUE;
@@ -3465,6 +3465,7 @@ getPeerCandidates( tr_session * session, int * candidateCount )
     while(( tor = tr_torrentNext( session, tor )))
         n += tr_ptrArraySize( &tor->torrentPeers->pool );
     walk = candidates = tr_new( struct peer_candidate, n );
+fprintf( stderr, "nCandidates is %d\n", (int)n );
 
     /* populate the candidate array */
     tor = NULL;
@@ -3501,6 +3502,7 @@ getPeerCandidates( tr_session * session, int * candidateCount )
     }
 
     *candidateCount = walk - candidates;
+fprintf( stderr, "candidateCount is %d\n", (int)(*candidateCount) );
     if( *candidateCount > 1 )
         qsort( candidates, *candidateCount, sizeof( struct peer_candidate ), comparePeerCandidates );
     return candidates;
