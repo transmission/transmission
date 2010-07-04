@@ -224,6 +224,8 @@ Transmission.prototype =
 		if( !iPhone && this[Prefs._ShowInspector] )
 			this.showInspector( );
 
+		if( !iPhone && this[Prefs._CompactDisplayState] )
+			$('#compact_view').selectMenuItem();
 	},
 
 	/*
@@ -1061,13 +1063,12 @@ Transmission.prototype =
 					tr.showStatsDialog( );
 				}
 				else if ($element[0].id == 'compact_view') {
-					this[Prefs._CompactDisplayState] = !this[Prefs._CompactDisplayState];
+					this.setPref( Prefs._CompactDisplayState, !this[Prefs._CompactDisplayState])
 					if(this[Prefs._CompactDisplayState])
 						$element.selectMenuItem();
 					else
 						$element.deselectMenuItem();
-					this.setDisplayMode( this[Prefs._CompactDisplayState] );
-					// Redraw html here
+					this.refreshDisplay( );
 				}
 				break;
 
@@ -1670,14 +1671,11 @@ Transmission.prototype =
 		return removedAny;
 	},
 
-	setDisplayMode: function( iscompact )
+	refreshDisplay: function( )
 	{
-		var torrents = this.getAllTorrents();
-
+		var torrents = this.getVisibleTorrents();
 		for( var i=0; torrents[i]; ++i )
-		{
-			torrents[i].setListDisplayElements(this[Prefs._CompactDisplayState]);
-		}
+			torrents[i].refreshHTML();
 	},
 
 	/*

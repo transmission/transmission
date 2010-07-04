@@ -476,7 +476,7 @@ Torrent.prototype =
 
 			case Torrent._StatusSeeding:
 				if(compact_mode){
-					c += this.formatUL();
+					c = this.formatUL();
 				} else {
 					// 'Seeding to 13 of 22 peers - UL: 36.2 KiB/s'
 					c = 'Seeding to ';
