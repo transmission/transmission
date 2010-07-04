@@ -124,13 +124,11 @@ tr_icon_refresh( gpointer vicon )
 }
 #endif
 
-#ifdef HAVE_LIBAPPINDICATOR
-gpointer
-tr_icon_new( TrCore * core)
+static const char *
+getIconName( void )
 {
-    GtkWidget * w;
     const char * icon_name;
-    AppIndicator * indicator;
+
     GtkIconTheme * theme = gtk_icon_theme_get_default( );
 
     /* if the tray's icon is a 48x48 file, use it;
@@ -144,22 +142,28 @@ tr_icon_new( TrCore * core)
         icon_name = icon_is_builtin ? MY_NAME : TRAY_ICON;
     }
 
-    indicator = app_indicator_new( MY_NAME, icon_name, APP_INDICATOR_CATEGORY_SYSTEM_SERVICES );
+    return icon_name;
+}
+
+#ifdef HAVE_LIBAPPINDICATOR
+gpointer
+tr_icon_new( TrCore * core)
+{
+    GtkWidget * w;
+    const char * icon_name = getIconName( );
+    AppIndicator * indicator = app_indicator_new( MY_NAME, icon_name, APP_INDICATOR_CATEGORY_SYSTEM_SERVICES );
     app_indicator_set_status( indicator, APP_INDICATOR_STATUS_ACTIVE );
     w = action_get_widget( "/icon-popup" );
     app_indicator_set_menu( indicator, GTK_MENU ( w ) );
-
     g_object_set_data( G_OBJECT( indicator ), "tr-core", core );
-
     return indicator;
 }
 #else
 gpointer
 tr_icon_new( TrCore * core )
 {
-    const char * icon_name = TRAY_ICON;
+    const char * icon_name = getIconName( );
     GtkStatusIcon * icon = gtk_status_icon_new_from_icon_name( icon_name );
-
     g_signal_connect( icon, "activate", G_CALLBACK( activated ), NULL );
     g_signal_connect( icon, "popup-menu", G_CALLBACK( popup ), NULL );
     g_object_set_data( G_OBJECT( icon ), "tr-core", core );
