@@ -3465,7 +3465,6 @@ getPeerCandidates( tr_session * session, int * candidateCount )
     while(( tor = tr_torrentNext( session, tor )))
         n += tr_ptrArraySize( &tor->torrentPeers->pool );
     walk = candidates = tr_new( struct peer_candidate, n );
-fprintf( stderr, "nCandidates is %d\n", (int)n );
 
     /* populate the candidate array */
     tor = NULL;
@@ -3502,7 +3501,6 @@ fprintf( stderr, "nCandidates is %d\n", (int)n );
     }
 
     *candidateCount = walk - candidates;
-fprintf( stderr, "candidateCount is %d\n", (int)(*candidateCount) );
     if( *candidateCount > 1 )
         qsort( candidates, *candidateCount, sizeof( struct peer_candidate ), comparePeerCandidates );
     return candidates;
