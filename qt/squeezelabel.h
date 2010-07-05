@@ -54,8 +54,7 @@ public:
 
 protected:
     void init();
-    void paintEvent(QPaintEvent *event);
-
+    void paintEvent(QPaintEvent* paintEvent);
 };
 
 #endif // SQUEEZELABEL_H
