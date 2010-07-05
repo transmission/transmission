@@ -122,7 +122,17 @@ struct tr_session
 
     int                          uploadSlotsPerTorrent;
 
-    tr_port                      peerPort;
+    /* The open port on the local machine for incoming peer requests */
+    tr_port                      private_peer_port;
+
+    /**
+     * The open port on the public device for incoming peer requests.
+     * This is usually the same as private_peer_port but can differ
+     * if the public device is a router and it decides to use a different
+     * port than the one requested by Transmission.
+     */
+    tr_port                      public_peer_port;
+
     tr_port                      randomPortLow;
     tr_port                      randomPortHigh;
 
@@ -184,6 +194,12 @@ struct tr_session
 
     tr_bool bufferInUse;
 };
+
+static inline tr_port
+tr_sessionGetPublicPeerPort( const tr_session * session )
+{
+    return session->public_peer_port;
+}
 
 tr_bool      tr_sessionAllowsDHT( const tr_session * session );
 

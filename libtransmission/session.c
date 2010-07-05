@@ -199,16 +199,16 @@ open_incoming_peer_port( tr_session * session )
 
     /* bind an ipv4 port to listen for incoming peers... */
     b = session->public_ipv4;
-    b->socket = tr_netBindTCP( &b->addr, session->peerPort, FALSE );
+    b->socket = tr_netBindTCP( &b->addr, session->private_peer_port, FALSE );
     if( b->socket >= 0 ) {
         event_set( &b->ev, b->socket, EV_READ | EV_PERSIST, accept_incoming_peer, session );
         event_add( &b->ev, NULL );
     }
 
     /* and do the exact same thing for ipv6, if it's supported... */
-    if( tr_net_hasIPv6( session->peerPort ) ) {
+    if( tr_net_hasIPv6( session->private_peer_port ) ) {
         b = session->public_ipv6;
-        b->socket = tr_netBindTCP( &b->addr, session->peerPort, FALSE );
+        b->socket = tr_netBindTCP( &b->addr, session->private_peer_port, FALSE );
         if( b->socket >= 0 ) {
             event_set( &b->ev, b->socket, EV_READ | EV_PERSIST, accept_incoming_peer, session );
             event_add( &b->ev, NULL );
@@ -762,7 +762,7 @@ sessionSetImpl( void * vdata )
     if( tr_bencDictFindBool( settings, TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START, &boolVal ) )
         tr_sessionSetPeerPortRandomOnStart( session, boolVal );
     if( !tr_bencDictFindInt( settings, TR_PREFS_KEY_PEER_PORT, &i ) )
-        i = session->peerPort;
+        i = session->private_peer_port;
     setPeerPort( session, boolVal ? getRandomPort( session ) : i );
     if( tr_bencDictFindBool( settings, TR_PREFS_KEY_PORT_FORWARDING, &boolVal ) )
         tr_sessionSetPortForwardingEnabled( session, boolVal );
@@ -1000,7 +1000,8 @@ peerPortChanged( void * session )
 static void
 setPeerPort( tr_session * session, tr_port port )
 {
-    session->peerPort = port;
+    session->private_peer_port = port;
+    session->public_peer_port = port;
 
     tr_runInEventThread( session, peerPortChanged, session );
 }
@@ -1010,7 +1011,7 @@ tr_sessionSetPeerPort( tr_session * session, tr_port port )
 {
     assert( tr_isSession( session ) );
 
-    if( session->peerPort != port )
+    if( session->private_peer_port != port )
     {
         setPeerPort( session, port );
     }
@@ -1021,7 +1022,7 @@ tr_sessionGetPeerPort( const tr_session * session )
 {
     assert( tr_isSession( session ) );
 
-    return session->peerPort;
+    return session->private_peer_port;
 }
 
 tr_port
@@ -1030,7 +1031,7 @@ tr_sessionSetPeerPortRandom( tr_session * session )
     assert( tr_isSession( session ) );
 
     tr_sessionSetPeerPort( session, getRandomPort( session ) );
-    return session->peerPort;
+    return session->private_peer_port;
 }
 
 void
