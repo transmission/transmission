@@ -532,9 +532,9 @@ main( int argc, char ** argv )
     bind_textdomain_codeset( domain, "UTF-8" );
     textdomain( domain );
     g_set_application_name( _( "Transmission" ) );
-    tr_formatter_mem_init( mem_K, _(mem_B_str), _(mem_K_str), _(mem_M_str), _(mem_G_str) );
-    tr_formatter_size_init( disk_K, _(disk_B_str), _(disk_K_str), _(disk_M_str), _(disk_G_str) );
-    tr_formatter_speed_init( speed_K, _(speed_B_str), _(speed_K_str), _(speed_M_str), _(speed_G_str) );
+    tr_formatter_mem_init( mem_K, _(mem_K_str), _(mem_M_str), _(mem_G_str), _(mem_T_str) );
+    tr_formatter_size_init( disk_K, _(disk_K_str), _(disk_M_str), _(disk_G_str), _(disk_T_str) );
+    tr_formatter_speed_init( speed_K, _(speed_K_str), _(speed_M_str), _(speed_G_str), _(speed_T_str) );
 
     /* initialize gtk */
     if( !g_thread_supported( ) )

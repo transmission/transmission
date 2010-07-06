@@ -1516,7 +1516,7 @@ tr_realpath( const char * path, char * resolved_path )
 struct formatter_unit
 {
     char * name;
-    unsigned int value;
+    unsigned long value;
 };
   
 struct formatter_units
@@ -1524,25 +1524,29 @@ struct formatter_units
     struct formatter_unit units[4];
 };
 
-enum { TR_FMT_B, TR_FMT_KB, TR_FMT_MB, TR_FMT_GB };
+enum { TR_FMT_KB, TR_FMT_MB, TR_FMT_GB, TR_FMT_TB };
 
 static void
 formatter_init( struct formatter_units * units,
                 unsigned int kilo,
-                const char * b, const char * kb,
-                const char * mb, const char * gb )
+                const char * kb, const char * mb,
+                const char * gb, const char * tb )
 {
-    units->units[TR_FMT_B].name = tr_strdup( b );
-    units->units[TR_FMT_B].value = 1;
-
+    unsigned long value = kilo;
     units->units[TR_FMT_KB].name = tr_strdup( kb );
-    units->units[TR_FMT_KB].value = kilo;
+    units->units[TR_FMT_KB].value = value;
 
+    value *= kilo;
     units->units[TR_FMT_MB].name = tr_strdup( mb );
-    units->units[TR_FMT_MB].value = kilo * kilo;
+    units->units[TR_FMT_MB].value = value;
 
+    value *= kilo;
     units->units[TR_FMT_GB].name = tr_strdup( gb );
-    units->units[TR_FMT_GB].value = kilo * kilo * kilo;
+    units->units[TR_FMT_GB].value = value;
+
+    value *= kilo;
+    units->units[TR_FMT_TB].name = tr_strdup( tb );
+    units->units[TR_FMT_TB].value = value;
 }
 
 static char*

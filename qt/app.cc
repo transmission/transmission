@@ -101,20 +101,20 @@ MyApp :: MyApp( int& argc, char ** argv ):
 
     // initialize the units formatter
     tr_formatter_mem_init( Formatter::mem_K,
-                           qPrintable( Formatter::mem_B_str ),
                            qPrintable( Formatter::mem_K_str ),
                            qPrintable( Formatter::mem_M_str ),
-                           qPrintable( Formatter::mem_G_str ) );
+                           qPrintable( Formatter::mem_G_str ),
+                           qPrintable( Formatter::mem_T_str ) );
     tr_formatter_size_init( Formatter::size_K,
-                            qPrintable( Formatter::size_B_str ),
                             qPrintable( Formatter::size_K_str ),
                             qPrintable( Formatter::size_M_str ),
-                            qPrintable( Formatter::size_G_str ) );
+                            qPrintable( Formatter::size_G_str ),
+                            qPrintable( Formatter::size_T_str ) );
     tr_formatter_speed_init( Formatter::speed_K,
-                             qPrintable( Formatter::speed_B_str ),
                              qPrintable( Formatter::speed_K_str ),
                              qPrintable( Formatter::speed_M_str ),
-                             qPrintable( Formatter::speed_G_str ) );
+                             qPrintable( Formatter::speed_G_str ),
+                             qPrintable( Formatter::speed_T_str ) );
 
     // set the default icon
     QIcon icon;

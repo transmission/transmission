@@ -20,22 +20,22 @@
 #include <libtransmission/transmission.h>
 
 extern const int mem_K;
-extern const char * mem_B_str;
 extern const char * mem_K_str;
 extern const char * mem_M_str;
 extern const char * mem_G_str;
+extern const char * mem_T_str;
 
 extern const int disk_K;
-extern const char * disk_B_str;
 extern const char * disk_K_str;
 extern const char * disk_M_str;
 extern const char * disk_G_str;
+extern const char * disk_T_str;
 
 extern const int speed_K;
-extern const char * speed_B_str;
 extern const char * speed_K_str;
 extern const char * speed_M_str;
 extern const char * speed_G_str;
+extern const char * speed_T_str;
 
 /* portability wrapper around g_warn_if_fail() for older versions of glib */
 #ifdef g_warn_if_fail

@@ -47,34 +47,22 @@
 ***/
 
 const int mem_K = 1024;
-/* abbreviation for bytes */
-const char * mem_B_str = N_("B");
-/* abbreviation IEC base 2 units kilobyte */
 const char * mem_K_str = N_("KiB");
-/* abbreviation IEC base 2 units megabyte */
 const char * mem_M_str = N_("MiB");
-/* abbreviation IEC base 2 units gigabyte */
 const char * mem_G_str = N_("GiB");
+const char * mem_T_str = N_("TiB");
 
 const int disk_K = 1000;
-/* abbreviation for bytes */
-const char * disk_B_str = N_("B");
-/* abbreviation for SI base 10 kilobyte */
 const char * disk_K_str = N_("kB");
-/* abbreviation for SI base 10 megabyte */
 const char * disk_M_str = N_("MB");
-/* abbreviation for SI base 10 gigabyte */
 const char * disk_G_str = N_("GB");
+const char * disk_T_str = N_("TB");
 
 const int speed_K = 1000;
-/* abbreviation for bytes per second */
-const char * speed_B_str = N_("B/s");
-/* abbreviation for kilobytes per second */
 const char * speed_K_str = N_("kB/s");
-/* abbreviation for megabytes per second */
 const char * speed_M_str = N_("MB/s");
-/* abbreviation for gigabytes per second */
 const char * speed_G_str = N_("GB/s");
+const char * speed_T_str = N_("TB/s");
 
 /***
 ****

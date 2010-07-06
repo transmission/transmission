@@ -23,22 +23,22 @@
 ***/
 
 const int     Formatter :: speed_K     = 1000;
-const QString Formatter :: speed_B_str = "B/s";
 const QString Formatter :: speed_K_str = "kB/s";
 const QString Formatter :: speed_M_str = "MB/s";
 const QString Formatter :: speed_G_str = "GB/s";
+const QString Formatter :: speed_T_str = "TB/s";
 
 const int     Formatter :: size_K     = 1000;
-const QString Formatter :: size_B_str = "B";
 const QString Formatter :: size_K_str = "kB";
 const QString Formatter :: size_M_str = "MB";
 const QString Formatter :: size_G_str = "GB";
+const QString Formatter :: size_T_str = "TB";
 
 const int     Formatter :: mem_K     = 1024;
-const QString Formatter :: mem_B_str = "B";
 const QString Formatter :: mem_K_str = "KiB";
 const QString Formatter :: mem_M_str = "MiB";
 const QString Formatter :: mem_G_str = "GiB";
+const QString Formatter :: mem_T_str = "TiB";
 
 /***
 ****

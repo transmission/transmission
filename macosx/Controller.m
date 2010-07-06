@@ -337,9 +337,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         tr_bencFree(&settings);
         
         #warning localize and make consistent
-        tr_formatter_size_init(1024, "bytes", "KB", "MB", "GB");
-        tr_formatter_speed_init(1024, "B/s", "KB/s", "MB/s", "GB/s");
-        tr_formatter_mem_init(1024, "bytes", "KB", "MB", "GB");
+        tr_formatter_size_init(1024, "KB", "MB", "GB", "TB");
+        tr_formatter_speed_init(1024, "B/s", "KB/s", "MB/s", "GB/s", "TB/s");
+        tr_formatter_mem_init(1024, "KB", "MB", "GB", "TB");
         
         [NSApp setDelegate: self];
         
