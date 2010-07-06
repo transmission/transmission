@@ -360,7 +360,7 @@ Details :: refresh( )
 
     if( torrents.empty( ) )
         string = none;
-    else if( torrents.length() == 1 )
+    else if( torrents.count() == 1 )
         string = QString( Utils :: ratioToString( torrents.first()->ratio() ) );
     else {
         bool isMixed = false;
