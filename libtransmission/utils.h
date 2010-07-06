@@ -562,16 +562,16 @@ char* tr_realpath( const char *path, char * resolved_path );
 ****
 ***/
 
-/* example: tr_formatter_size_init( 1024, _("B"), _("KiB"), _("MiB"), _("GiB") ); */
+/* example: tr_formatter_size_init( 1024, _("KiB"), _("MiB"), _("GiB"), _("TiB") ); */
 
-void tr_formatter_size_init( unsigned int kilo, const char * b, const char * kb,
-                                                const char * mb, const char * gb );
+void tr_formatter_size_init( unsigned int kilo, const char * kb, const char * mb,
+                                                const char * gb, const char * tb );
 
-void tr_formatter_speed_init( unsigned int kilo, const char * b, const char * kb,
-                                                 const char * mb, const char * gb );
+void tr_formatter_speed_init( unsigned int kilo, const char * kb, const char * mb,
+                                                 const char * gb, const char * tb );
 
-void tr_formatter_mem_init( unsigned int kilo, const char * b, const char * kb,
-                                               const char * mb, const char * gb );
+void tr_formatter_mem_init( unsigned int kilo, const char * kb, const char * mb,
+                                               const char * gb, const char * tb );
 
 /* format a speed into a user-readable string. */
 extern unsigned int tr_speed_K;

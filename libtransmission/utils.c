@@ -1579,10 +1579,10 @@ static struct formatter_units size_units;
 
 void
 tr_formatter_size_init( unsigned int kilo,
-                        const char * b, const char * kb,
-                        const char * mb, const char * gb )
+                        const char * kb, const char * mb,
+                        const char * gb, const char * tb )
 {
-    formatter_init( &size_units, kilo, b, kb, mb, gb );
+    formatter_init( &size_units, kilo, kb, mb, gb, tb );
 }
 
 char*
@@ -1597,11 +1597,11 @@ unsigned int tr_speed_K = 0u;
 
 void
 tr_formatter_speed_init( unsigned int kilo,
-                         const char * b, const char * kb,
-                         const char * mb, const char * gb )
+                         const char * kb, const char * mb,
+                         const char * gb, const char * tb )
 {
     tr_speed_K = kilo;
-    formatter_init( &speed_units, kilo, b, kb, mb, gb );
+    formatter_init( &speed_units, kilo, kb, mb, gb, tb );
 }
 
 char*
@@ -1617,11 +1617,11 @@ unsigned int tr_mem_K = 0u;
  
 void
 tr_formatter_mem_init( unsigned int kilo,
-                       const char * b, const char * kb,
-                       const char * mb, const char * gb )
+                       const char * kb, const char * mb,
+                       const char * gb, const char * tb )
 {
     tr_mem_K = kilo;
-    formatter_init( &mem_units, kilo, b, kb, mb, gb );
+    formatter_init( &mem_units, kilo, kb, mb, gb, tb );
 }
 
 char*
