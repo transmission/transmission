@@ -63,6 +63,8 @@ SqueezeLabel::SqueezeLabel(QWidget *parent) : QLabel(parent)
 
 void SqueezeLabel::paintEvent(QPaintEvent* paintEvent)
 {
+    Q_UNUSED(paintEvent);
+
     QPainter painter(this);
     QFontMetrics fm = fontMetrics();
     QStyleOption opt;
