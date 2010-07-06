@@ -883,9 +883,9 @@ int trashDataFile(const char * filename)
         [dict setObject: [NSString stringWithUTF8String: peer->flagStr] forKey: @"Flags"];
         
         if (peer->isUploadingTo)
-            [dict setObject: [NSNumber numberWithFloat: peer->rateToPeer_KBps] forKey: @"UL To Rate"];
+            [dict setObject: [NSNumber numberWithDouble: peer->rateToPeer_KBps] forKey: @"UL To Rate"];
         if (peer->isDownloadingFrom)
-            [dict setObject: [NSNumber numberWithFloat: peer->rateToClient_KBps] forKey: @"DL From Rate"];
+            [dict setObject: [NSNumber numberWithDouble: peer->rateToClient_KBps] forKey: @"DL From Rate"];
         
         [peerDicts addObject: dict];
     }
