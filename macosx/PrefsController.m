@@ -571,18 +571,18 @@ tr_session * fHandle;
 - (void) applySpeedSettings: (id) sender
 {
     tr_sessionLimitSpeed(fHandle, TR_UP, [fDefaults boolForKey: @"CheckUpload"]);
-    tr_sessionSetSpeedLimit(fHandle, TR_UP, [fDefaults integerForKey: @"UploadLimit"]);
+    tr_sessionSetSpeedLimit_KBps(fHandle, TR_UP, [fDefaults integerForKey: @"UploadLimit"]);
     
     tr_sessionLimitSpeed(fHandle, TR_DOWN, [fDefaults boolForKey: @"CheckDownload"]);
-    tr_sessionSetSpeedLimit(fHandle, TR_DOWN, [fDefaults integerForKey: @"DownloadLimit"]);
+    tr_sessionSetSpeedLimit_KBps(fHandle, TR_DOWN, [fDefaults integerForKey: @"DownloadLimit"]);
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"SpeedLimitUpdate" object: nil];
 }
 
 - (void) applyAltSpeedSettings
 {
-    tr_sessionSetAltSpeed(fHandle, TR_UP, [fDefaults integerForKey: @"SpeedLimitUploadLimit"]);
-    tr_sessionSetAltSpeed(fHandle, TR_DOWN, [fDefaults integerForKey: @"SpeedLimitDownloadLimit"]);
+    tr_sessionSetAltSpeed_KBps(fHandle, TR_UP, [fDefaults integerForKey: @"SpeedLimitUploadLimit"]);
+    tr_sessionSetAltSpeed_KBps(fHandle, TR_DOWN, [fDefaults integerForKey: @"SpeedLimitDownloadLimit"]);
         
     [[NSNotificationCenter defaultCenter] postNotificationName: @"SpeedLimitUpdate" object: nil];
 }
@@ -1180,14 +1180,14 @@ tr_session * fHandle;
     const BOOL downLimitEnabled = tr_sessionIsSpeedLimited(fHandle, TR_DOWN);
     [fDefaults setBool: downLimitEnabled forKey: @"CheckDownload"];
     
-    const int downLimit = tr_sessionGetSpeedLimit(fHandle, TR_DOWN);
+    const int downLimit = tr_sessionGetSpeedLimit_KBps(fHandle, TR_DOWN);
     [fDefaults setInteger: downLimit forKey: @"DownloadLimit"];
     
     //speed limit - up
     const BOOL upLimitEnabled = tr_sessionIsSpeedLimited(fHandle, TR_UP);
     [fDefaults setBool: upLimitEnabled forKey: @"CheckUpload"];
     
-    const int upLimit = tr_sessionGetSpeedLimit(fHandle, TR_UP);
+    const int upLimit = tr_sessionGetSpeedLimit_KBps(fHandle, TR_UP);
     [fDefaults setInteger: upLimit forKey: @"UploadLimit"];
     
     //alt speed limit enabled
@@ -1195,11 +1195,11 @@ tr_session * fHandle;
     [fDefaults setBool: useAltSpeed forKey: @"SpeedLimit"];
     
     //alt speed limit - down
-    const int downLimitAlt = tr_sessionGetAltSpeed(fHandle, TR_DOWN);
+    const int downLimitAlt = tr_sessionGetAltSpeed_KBps(fHandle, TR_DOWN);
     [fDefaults setInteger: downLimitAlt forKey: @"SpeedLimitDownloadLimit"];
     
     //alt speed limit - up
-    const int upLimitAlt = tr_sessionGetAltSpeed(fHandle, TR_UP);
+    const int upLimitAlt = tr_sessionGetAltSpeed_KBps(fHandle, TR_UP);
     [fDefaults setInteger: upLimitAlt forKey: @"SpeedLimitUploadLimit"];
     
     //alt speed limit schedule

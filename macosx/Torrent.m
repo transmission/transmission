@@ -399,12 +399,12 @@ int trashDataFile(const char * filename)
 
 - (NSInteger) speedLimit: (BOOL) upload
 {
-    return tr_torrentGetSpeedLimit(fHandle, upload ? TR_UP : TR_DOWN);
+    return tr_torrentGetSpeedLimit_KBps(fHandle, upload ? TR_UP : TR_DOWN);
 }
 
 - (void) setSpeedLimit: (NSInteger) limit upload: (BOOL) upload
 {
-    tr_torrentSetSpeedLimit(fHandle, upload ? TR_UP : TR_DOWN, limit);
+    tr_torrentSetSpeedLimit_KBps(fHandle, upload ? TR_UP : TR_DOWN, limit);
 }
 
 - (BOOL) usesGlobalSpeedLimit
@@ -883,9 +883,9 @@ int trashDataFile(const char * filename)
         [dict setObject: [NSString stringWithUTF8String: peer->flagStr] forKey: @"Flags"];
         
         if (peer->isUploadingTo)
-            [dict setObject: [NSNumber numberWithFloat: peer->rateToPeer] forKey: @"UL To Rate"];
+            [dict setObject: [NSNumber numberWithFloat: peer->rateToPeer_KBps] forKey: @"UL To Rate"];
         if (peer->isDownloadingFrom)
-            [dict setObject: [NSNumber numberWithFloat: peer->rateToClient] forKey: @"DL From Rate"];
+            [dict setObject: [NSNumber numberWithFloat: peer->rateToClient_KBps] forKey: @"DL From Rate"];
         
         [peerDicts addObject: dict];
     }
@@ -904,7 +904,7 @@ int trashDataFile(const char * filename)
 {
     NSMutableArray * webSeeds = [NSMutableArray arrayWithCapacity: fInfo->webseedCount];
     
-    float * dlSpeeds = tr_torrentWebSpeeds(fHandle);
+    double * dlSpeeds = tr_torrentWebSpeeds_KBps(fHandle);
     
     for (NSInteger i = 0; i < fInfo->webseedCount; i++)
     {
@@ -1230,12 +1230,12 @@ int trashDataFile(const char * filename)
 
 - (CGFloat) downloadRate
 {
-    return fStat->pieceDownloadSpeed;
+    return fStat->pieceDownloadSpeed_KBps;
 }
 
 - (CGFloat) uploadRate
 {
-    return fStat->pieceUploadSpeed;
+    return fStat->pieceUploadSpeed_KBps;
 }
 
 - (CGFloat) totalRate

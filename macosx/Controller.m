@@ -273,8 +273,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         if (!usesSpeedLimitSched)
             tr_bencDictAddBool(&settings, TR_PREFS_KEY_ALT_SPEED_ENABLED, [fDefaults boolForKey: @"SpeedLimit"]);
         
-        tr_bencDictAddInt(&settings, TR_PREFS_KEY_ALT_SPEED_UP, [fDefaults integerForKey: @"SpeedLimitUploadLimit"]);
-        tr_bencDictAddInt(&settings, TR_PREFS_KEY_ALT_SPEED_DOWN, [fDefaults integerForKey: @"SpeedLimitDownloadLimit"]);
+        tr_bencDictAddInt(&settings, TR_PREFS_KEY_ALT_SPEED_UP_KBps, [fDefaults integerForKey: @"SpeedLimitUploadLimit"]);
+        tr_bencDictAddInt(&settings, TR_PREFS_KEY_ALT_SPEED_DOWN_KBps, [fDefaults integerForKey: @"SpeedLimitDownloadLimit"]);
         
         tr_bencDictAddBool(&settings, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED, [fDefaults boolForKey: @"SpeedLimitAuto"]);
         tr_bencDictAddInt(&settings, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN, [PrefsController dateToTimeSum:
@@ -285,9 +285,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         tr_bencDictAddBool(&settings, TR_PREFS_KEY_START, [fDefaults boolForKey: @"AutoStartDownload"]);
         
-        tr_bencDictAddInt(&settings, TR_PREFS_KEY_DSPEED, [fDefaults integerForKey: @"DownloadLimit"]);
+        tr_bencDictAddInt(&settings, TR_PREFS_KEY_DSPEED_KBps, [fDefaults integerForKey: @"DownloadLimit"]);
         tr_bencDictAddBool(&settings, TR_PREFS_KEY_DSPEED_ENABLED, [fDefaults boolForKey: @"CheckDownload"]);
-        tr_bencDictAddInt(&settings, TR_PREFS_KEY_USPEED, [fDefaults integerForKey: @"UploadLimit"]);
+        tr_bencDictAddInt(&settings, TR_PREFS_KEY_USPEED_KBps, [fDefaults integerForKey: @"UploadLimit"]);
         tr_bencDictAddBool(&settings, TR_PREFS_KEY_USPEED_ENABLED, [fDefaults boolForKey: @"CheckUpload"]);
         
         //hidden prefs
@@ -335,6 +335,11 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         fLib = tr_sessionInit("macosx", configDir, YES, &settings);
         tr_bencFree(&settings);
+        
+        #warning localize and make consistent
+        tr_formatter_size_init(1024, "bytes", "KB", "MB", "GB");
+        tr_formatter_speed_init(1024, "B/s", "KB/s", "MB/s", "GB/s");
+        tr_formatter_mem_init(1024, "bytes", "KB", "MB", "GB");
         
         [NSApp setDelegate: self];
         
@@ -1698,8 +1703,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             if (![fStatusBar isHidden])
             {
                 //set rates
-                [fTotalDLField setStringValue: [NSString stringForSpeed: tr_sessionGetPieceSpeed(fLib, TR_DOWN)]];
-                [fTotalULField setStringValue: [NSString stringForSpeed: tr_sessionGetPieceSpeed(fLib, TR_UP)]];
+                [fTotalDLField setStringValue: [NSString stringForSpeed: tr_sessionGetPieceSpeed_KBps(fLib, TR_DOWN)]];
+                [fTotalULField setStringValue: [NSString stringForSpeed: tr_sessionGetPieceSpeed_KBps(fLib, TR_UP)]];
                 
                 //set status button text
                 NSString * statusLabel = [fDefaults stringForKey: @"StatusLabel"], * statusString;

@@ -657,7 +657,7 @@ tr_direction;
 ****  Primary session speed limits
 ***/
 
-void tr_sessionSetSpeedLimit_KBps( tr_session *, tr_direction, int Bps );
+void tr_sessionSetSpeedLimit_KBps( tr_session *, tr_direction, int KBps );
 int tr_sessionGetSpeedLimit_KBps( const tr_session *, tr_direction );
 
 void     tr_sessionLimitSpeed         ( tr_session *, tr_direction, tr_bool );
