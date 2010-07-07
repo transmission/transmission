@@ -475,7 +475,7 @@ main( int argc, char ** argv )
 
     pid_filename = NULL;
     tr_bencDictFindStr( &settings, PREF_KEY_PIDFILE, &pid_filename );
-    if( pid_filename != NULL )
+    if( pid_filename && *pid_filename )
     {
         FILE * fp = fopen( pid_filename, "w+" );
         if( fp != NULL )
