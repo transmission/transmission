@@ -388,6 +388,15 @@ tr_realMakeMetaInfo( tr_metainfo_builder * builder )
 
     tr_bencInitDict( &top, 6 );
 
+    if( !builder->fileCount || !builder->totalSize ||
+        !builder->pieceSize || !builder->pieceCount )
+    {
+        builder->errfile[0] = '\0';
+        builder->my_errno = ENOENT;
+        builder->result = TR_MAKEMETA_IO_READ;
+        builder->isDone = TRUE;
+    }
+
     if( !builder->result && builder->trackerCount )
     {
         int       prevTier = -1;
@@ -514,8 +523,7 @@ tr_makeMetaInfo( tr_metainfo_builder *   builder,
     builder->pieceIndex = 0;
     builder->trackerCount = trackerCount;
     builder->trackers = tr_new0( tr_tracker_info, builder->trackerCount );
-    for( i = 0; i < builder->trackerCount; ++i )
-    {
+    for( i = 0; i < builder->trackerCount; ++i ) {
         builder->trackers[i].tier = trackers[i].tier;
         builder->trackers[i].announce = tr_strdup( trackers[i].announce );
     }

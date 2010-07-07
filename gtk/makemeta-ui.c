@@ -17,6 +17,7 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/makemeta.h>
+#include <libtransmission/utils.h> /* tr_formatter_mem_B() */
 
 #include "conf.h"
 #include "hig.h"
@@ -67,8 +68,8 @@ onProgressDialogRefresh( gpointer data )
     const tr_metainfo_builder * b = ui->builder;
     GtkDialog * d = GTK_DIALOG( ui->progress_dialog );
     GtkProgressBar * p = GTK_PROGRESS_BAR( ui->progress_bar );
-    const double fraction = (double)b->pieceIndex / b->pieceCount;
-        char * base = g_path_get_basename( b->top );
+    const double fraction = b->pieceCount ? ((double)b->pieceIndex / b->pieceCount) : 0;
+    char * base = g_path_get_basename( b->top );
 
     /* progress label */
     if( !b->isDone )
@@ -300,7 +301,8 @@ updatePiecesLabel( MakeMetaUI * ui )
                                                 builder->fileCount ),
                                 buf, builder->fileCount );
         g_string_append( gstr, "; " );
-        tr_strlsize( buf, builder->pieceSize, sizeof( buf ) );
+  
+        tr_formatter_mem_B( buf, builder->pieceSize, sizeof( buf ) );
         g_string_append_printf( gstr, ngettext( "%1$'d Piece @ %2$s",
                                                 "%1$'d Pieces @ %2$s",
                                                 builder->pieceCount ),
