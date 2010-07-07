@@ -389,6 +389,15 @@ tr_realMakeMetaInfo( tr_metainfo_builder * builder )
 
     tr_bencInitDict( &top, 6 );
 
+    if( !builder->fileCount || !builder->totalSize ||
+        !builder->pieceSize || !builder->pieceCount )
+    {
+        builder->errfile[0] = '\0';
+        builder->my_errno = ENOENT;
+        builder->result = TR_MAKEMETA_IO_READ;
+        builder->isDone = TRUE;
+    }
+
     if( !builder->result && builder->trackerCount )
     {
         int       prevTier = -1;

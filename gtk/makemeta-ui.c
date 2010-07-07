@@ -67,7 +67,7 @@ onProgressDialogRefresh( gpointer data )
     const tr_metainfo_builder * b = ui->builder;
     GtkDialog * d = GTK_DIALOG( ui->progress_dialog );
     GtkProgressBar * p = GTK_PROGRESS_BAR( ui->progress_bar );
-    const double fraction = (double)b->pieceIndex / b->pieceCount;
+    const double fraction = b->pieceCount ? ((double)b->pieceIndex / b->pieceCount) : 0;
         char * base = g_path_get_basename( b->top );
 
     /* progress label */
