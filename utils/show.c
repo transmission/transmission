@@ -253,7 +253,7 @@ main( int argc, char * argv[] )
     tr_setMessageLevel( TR_MSG_ERR );
     tr_formatter_mem_init  ( MEM_K, MEM_K_STR, MEM_M_STR, MEM_G_STR, MEM_T_STR );
     tr_formatter_size_init ( DISK_K, DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR );
-    tr_formatter_size_init ( SPEED_K, SPEED_K_STR, SPEED_M_STR, SPEED_G_STR, SPEED_T_STR );
+    tr_formatter_speed_init ( SPEED_K, SPEED_K_STR, SPEED_M_STR, SPEED_G_STR, SPEED_T_STR );
 
     if( parseCommandLine( argc, (const char**)argv ) )
         return EXIT_FAILURE;
