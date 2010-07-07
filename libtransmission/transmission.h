@@ -1714,7 +1714,7 @@ typedef struct tr_stat
 
     /** A warning or error message regarding the torrent.
         @see error */
-    char errorString[128];
+    char errorString[512];
 
     /** When tr_stat.status is TR_STATUS_CHECK or TR_STATUS_CHECK_WAIT,
         this is the percentage of how much of the files has been
