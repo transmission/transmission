@@ -821,10 +821,10 @@ printDetails( tr_benc * top )
 
             if( tr_bencDictFindInt( t, "eta", &i ) )
                 printf( "  ETA: %s\n", tr_strltime( buf, i, sizeof( buf ) ) );
-            if( tr_bencDictFindInt( t, "rateDownload", &i ) )
-                printf( "  Download Speed: %s\n", tr_formatter_speed_KBps( buf, i, sizeof( buf ) ) );
-            if( tr_bencDictFindInt( t, "rateUpload", &i ) )
-                printf( "  Upload Speed: %s\n", tr_formatter_speed_KBps( buf, i, sizeof( buf ) ) );
+            if( tr_bencDictFindReal( t, "rateDownload", &d ) )
+                printf( "  Download Speed: %s\n", tr_formatter_speed_KBps( buf, d, sizeof( buf ) ) );
+            if( tr_bencDictFindReal( t, "rateUpload", &d ) )
+                printf( "  Upload Speed: %s\n", tr_formatter_speed_KBps( buf, d, sizeof( buf ) ) );
             if( tr_bencDictFindInt( t, "haveUnchecked", &i )
               && tr_bencDictFindInt( t, "haveValid", &j ) )
             {
@@ -1282,7 +1282,8 @@ printTorrentList( tr_benc * top )
       && ( tr_bencDictFindList( args, "torrents", &list ) ) )
     {
         int i, n;
-        int64_t total_up = 0, total_down = 0, total_size = 0;
+        int64_t total_size=0;
+        double total_up=0, total_down=0;
         char haveStr[32];
 
         printf( "%-4s   %-4s  %9s  %-8s  %6s  %6s  %-5s  %-11s  %s\n",
@@ -1291,17 +1292,17 @@ printTorrentList( tr_benc * top )
 
         for( i = 0, n = tr_bencListSize( list ); i < n; ++i )
         {
-            int64_t      id, eta, status, up, down;
+            int64_t      id, eta, status;
             int64_t      sizeWhenDone, leftUntilDone;
-            double       ratio;
+            double       ratio, up, down;
             const char * name;
             tr_benc *   d = tr_bencListChild( list, i );
             if( tr_bencDictFindInt( d, "eta", &eta )
               && tr_bencDictFindInt( d, "id", &id )
               && tr_bencDictFindInt( d, "leftUntilDone", &leftUntilDone )
               && tr_bencDictFindStr( d, "name", &name )
-              && tr_bencDictFindInt( d, "rateDownload", &down )
-              && tr_bencDictFindInt( d, "rateUpload", &up )
+              && tr_bencDictFindReal( d, "rateDownload", &down )
+              && tr_bencDictFindReal( d, "rateUpload", &up )
               && tr_bencDictFindInt( d, "sizeWhenDone", &sizeWhenDone )
               && tr_bencDictFindInt( d, "status", &status )
               && tr_bencDictFindReal( d, "uploadRatio", &ratio ) )
@@ -1334,8 +1335,8 @@ printTorrentList( tr_benc * top )
                     doneStr,
                     haveStr,
                     etaStr,
-                    up / (double)SPEED_K,
-                    down / (double)SPEED_K,
+                    up,
+                    down,
                     strlratio2( ratioStr, ratio, sizeof( ratioStr ) ),
                     getStatusString( d, statusStr, sizeof( statusStr ) ),
                     name );
@@ -1348,8 +1349,8 @@ printTorrentList( tr_benc * top )
 
         printf( "Sum:         %9s            %6.1f  %6.1f\n",
                 strlsize( haveStr, total_size, sizeof( haveStr ) ),
-                total_up / (double)SPEED_K,
-                total_down / (double)SPEED_K );
+                total_up,
+                total_down );
     }
 }
 
