@@ -39,6 +39,7 @@
 
 #define PREF_KEY_DIR_WATCH          "watch-dir"
 #define PREF_KEY_DIR_WATCH_ENABLED  "watch-dir-enabled"
+#define PREF_KEY_PIDFILE            "pidfile"
 
 #define MEM_K 1024
 #define MEM_K_STR "KiB"
@@ -63,7 +64,6 @@
 static tr_bool paused = FALSE;
 static tr_bool closing = FALSE;
 static tr_session * mySession = NULL;
-static const char * pid_filename = NULL;
 
 /***
 ****  Config File
@@ -333,6 +333,7 @@ main( int argc, char ** argv )
     tr_bool foreground = FALSE;
     tr_bool dumpSettings = FALSE;
     const char * configDir = NULL;
+    const char * pid_filename;
     dtr_watchdir * watchdir = NULL;
     FILE * logfile = NULL;
     tr_bool pidfile_created = FALSE;
@@ -428,7 +429,7 @@ main( int argc, char ** argv )
                       break;
             case 954: tr_bencDictAddBool( &settings, TR_PREFS_KEY_RATIO_ENABLED, FALSE );
                       break;
-            case 'x': pid_filename = optarg;
+            case 'x': tr_bencDictAddStr( &settings, PREF_KEY_PIDFILE, optarg );
                       break;
             case 'y': tr_bencDictAddBool( &settings, TR_PREFS_KEY_LPD_ENABLED, TRUE );
                       break;
@@ -472,6 +473,8 @@ main( int argc, char ** argv )
     tr_ninf( NULL, "Using settings from \"%s\"", configDir );
     tr_sessionSaveSettings( mySession, configDir, &settings );
 
+    pid_filename = NULL;
+    tr_bencDictFindStr( &settings, PREF_KEY_PIDFILE, &pid_filename );
     if( pid_filename != NULL )
     {
         FILE * fp = fopen( pid_filename, "w+" );
