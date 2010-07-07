@@ -30,7 +30,6 @@
 #include "crypto.h"
 #include "fdlimit.h"
 #include "inout.h"
-#include "peer-common.h" /* MAX_BLOCK_SIZE */
 #include "platform.h"
 #include "stats.h"
 #include "torrent.h"
@@ -289,8 +288,8 @@ recalculateHash( tr_torrent       * tor,
     size_t   bytesLeft;
     uint32_t offset = 0;
     tr_bool  success = TRUE;
-    const size_t buflen = MAX_BLOCK_SIZE;
-    uint8_t * buffer = tr_new( uint8_t, buflen );
+    const size_t buflen = 1024 * 256; /* 256 KiB buffer */
+    void * buffer = tr_valloc( buflen );
     SHA_CTX  sha;
 
     assert( tor != NULL );
