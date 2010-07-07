@@ -273,13 +273,10 @@ static inline unsigned int toSpeedBytes ( unsigned int KBps ) { return KBps * tr
 static inline double       toSpeedKBps  ( unsigned int Bps )  { return Bps / (double)tr_speed_K; }
 
 static inline uint64_t toMemBytes ( unsigned int MB ) { uint64_t B = tr_mem_K * tr_mem_K; B *= MB; return B; }
-static inline int      toMemMB    ( uint64_t B )      { return B / tr_mem_K; }
+static inline int      toMemMB    ( uint64_t B )      { return B / ( tr_mem_K * tr_mem_K ); }
 
 /**
 **/
-
-void     tr_sessionSetCacheLimit_B ( tr_session * session, uint64_t B );
-uint64_t tr_sessionGetCacheLimit_B ( const tr_session * session );
 
 int  tr_sessionGetSpeedLimit_Bps( const tr_session *, tr_direction );
 int  tr_sessionGetAltSpeed_Bps  ( const tr_session *, tr_direction );

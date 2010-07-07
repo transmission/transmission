@@ -314,7 +314,7 @@ tr_sessionGetSettings( tr_session * s, struct tr_benc * d )
 
     tr_bencDictReserve( d, 60 );
     tr_bencDictAddBool( d, TR_PREFS_KEY_BLOCKLIST_ENABLED,        tr_blocklistIsEnabled( s ) );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_MAX_CACHE_SIZE_MB,        tr_cacheGetLimit( s->cache ) );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_MAX_CACHE_SIZE_MB,        tr_sessionGetCacheLimit_MB( s ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_DHT_ENABLED,              s->isDHTEnabled );
     tr_bencDictAddBool( d, TR_PREFS_KEY_LPD_ENABLED,              s->isLPDEnabled );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_DOWNLOAD_DIR,             s->downloadDir );
@@ -1893,31 +1893,20 @@ tr_sessionAllowsLPD( const tr_session * session )
 ***/
 
 void
-tr_sessionSetCacheLimit_B( tr_session * session, uint64_t max_bytes )
+tr_sessionSetCacheLimit_MB( tr_session * session, int max_bytes )
 {
     assert( tr_isSession( session ) );
 
-    tr_cacheSetLimit( session->cache, max_bytes );
-}
-void
-tr_sessionSetCacheLimit_MB( tr_session * session, int MB )
-{
-    tr_sessionSetCacheLimit_B( session, toMemBytes( MB ) );
+    tr_cacheSetLimit( session->cache, toMemBytes( max_bytes ) );
 }
 
-uint64_t
-tr_sessionGetCacheLimit_B( const tr_session * session )
-{
-    assert( tr_isSession( session ) );
-
-    return tr_cacheGetLimit( session->cache );
-}
 int
 tr_sessionGetCacheLimit_MB( const tr_session * session )
 {
-    return toMemMB( tr_sessionGetCacheLimit_B( session ) );
-}
+    assert( tr_isSession( session ) );
 
+    return toMemMB( tr_cacheGetLimit( session->cache ) );
+}
 
 /***
 ****
