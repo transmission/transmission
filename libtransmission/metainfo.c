@@ -169,7 +169,7 @@ getfile( char ** setme, const char * root, tr_benc * path )
             }
         }
 
-        *setme = tr_utf8clean( (char*)EVBUFFER_DATA( buf ), EVBUFFER_LENGTH( buf ), NULL );
+        *setme = tr_utf8clean( (char*)EVBUFFER_DATA( buf ), EVBUFFER_LENGTH( buf ) );
         /* fprintf( stderr, "[%s]\n", *setme ); */
         evbuffer_free( buf );
         success = TRUE;
@@ -412,7 +412,6 @@ tr_metainfoParseImpl( const tr_session  * session,
     tr_benc *       d;
     tr_benc *       infoDict = NULL;
     tr_benc *       meta = (tr_benc *) meta_in;
-    tr_bool         err;
     tr_bool         b;
     tr_bool         isMagnet = FALSE;
 
@@ -471,7 +470,7 @@ tr_metainfoParseImpl( const tr_session  * session,
         if( !str || !*str )
             return "name";
         tr_free( inf->name );
-        inf->name = tr_utf8clean( str, -1, &err );
+        inf->name = tr_utf8clean( str, -1 );
     }
 
     /* comment */
@@ -479,14 +478,14 @@ tr_metainfoParseImpl( const tr_session  * session,
         if( !tr_bencDictFindStr( meta, "comment", &str ) )
             str = "";
     tr_free( inf->comment );
-    inf->comment = tr_utf8clean( str, -1, &err );
+    inf->comment = tr_utf8clean( str, -1 );
 
     /* created by */
     if( !tr_bencDictFindStr( meta, "created by.utf-8", &str ) )
         if( !tr_bencDictFindStr( meta, "created by", &str ) )
             str = "";
     tr_free( inf->creator );
-    inf->creator = tr_utf8clean( str, -1, &err );
+    inf->creator = tr_utf8clean( str, -1 );
 
     /* creation date */
     if( !tr_bencDictFindInt( meta, "creation date", &i ) )

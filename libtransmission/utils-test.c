@@ -152,36 +152,31 @@ test_utf8( void )
 {
     const char * in;
     char * out;
-    tr_bool err;
 
     in = "hello world";
-    out = tr_utf8clean( in, -1, &err );
-    check( err == FALSE )
+    out = tr_utf8clean( in, -1 );
     check( out != NULL )
     check( !strcmp( out, in ) )
     tr_free( out );
 
     in = "hello world";
-    out = tr_utf8clean( in, 5, &err );
-    check( err == FALSE )
+    out = tr_utf8clean( in, 5 );
     check( out != NULL )
     check( !strcmp( out, "hello" ) )
     tr_free( out );
 
     /* this version is not utf-8 */
     in = "Трудно быть Богом";
-    out = tr_utf8clean( in, 17, &err );
+    out = tr_utf8clean( in, 17 );
     check( out != NULL )
-    check( err != 0 )
     check( strlen( out ) == 17 )
     check( tr_utf8_validate( out, -1, NULL ) )
     tr_free( out );
 
     /* same string, but utf-8 clean */
     in = "Г’Г°ГіГ¤Г­Г® ГЎГ»ГІГј ГЃГ®ГЈГ®Г¬";
-    out = tr_utf8clean( in, -1, &err );
+    out = tr_utf8clean( in, -1 );
     check( out != NULL )
-    check( !err );
     check( tr_utf8_validate( out, -1, NULL ) )
     check ( !strcmp( in, out ) )
     tr_free( out );
