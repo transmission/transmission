@@ -22,32 +22,69 @@
 ****  Constants
 ***/
 
-const int     Formatter :: speed_K     = 1000;
-const QString Formatter :: speed_K_str = "kB/s";
-const QString Formatter :: speed_M_str = "MB/s";
-const QString Formatter :: speed_G_str = "GB/s";
-const QString Formatter :: speed_T_str = "TB/s";
+namespace
+{
+    unsigned int speed_K;
+    unsigned int mem_K;
+    unsigned int size_K;
+}
 
-const int     Formatter :: size_K     = 1000;
-const QString Formatter :: size_K_str = "kB";
-const QString Formatter :: size_M_str = "MB";
-const QString Formatter :: size_G_str = "GB";
-const QString Formatter :: size_T_str = "TB";
+QString Formatter::unitStrings[3][4];
 
-const int     Formatter :: mem_K     = 1024;
-const QString Formatter :: mem_K_str = "KiB";
-const QString Formatter :: mem_M_str = "MiB";
-const QString Formatter :: mem_G_str = "GiB";
-const QString Formatter :: mem_T_str = "TiB";
+void
+Formatter :: initUnits( )
+{
+    speed_K = 1000;
+    unitStrings[SPEED][B]  = tr(  "B/s" );
+    unitStrings[SPEED][KB] = tr( "kB/s" );
+    unitStrings[SPEED][MB] = tr( "MB/s" );
+    unitStrings[SPEED][GB] = tr( "GB/s" );
+    unitStrings[SPEED][TB] = tr( "TB/s" );
+    tr_formatter_speed_init( speed_K,
+                             qPrintable( unitStrings[SPEED][KB] ),
+                             qPrintable( unitStrings[SPEED][MB] ),
+                             qPrintable( unitStrings[SPEED][GB] ),
+                             qPrintable( unitStrings[SPEED][TB] ) );
+
+    size_K = 1000;
+    unitStrings[SIZE][B]  = tr(  "B" );
+    unitStrings[SIZE][KB] = tr( "KB" );
+    unitStrings[SIZE][MB] = tr( "MB" );
+    unitStrings[SIZE][GB] = tr( "GB" );
+    unitStrings[SIZE][TB] = tr( "TB" );
+    tr_formatter_size_init( size_K,
+                            qPrintable( unitStrings[SIZE][KB] ),
+                            qPrintable( unitStrings[SIZE][MB] ),
+                            qPrintable( unitStrings[SIZE][GB] ),
+                            qPrintable( unitStrings[SIZE][TB] ) );
+
+    mem_K = 1024;
+    unitStrings[MEM][B]  = tr(   "B" );
+    unitStrings[MEM][KB] = tr( "KiB" );
+    unitStrings[MEM][MB] = tr( "MiB" );
+    unitStrings[MEM][GB] = tr( "GiB" );
+    unitStrings[MEM][TB] = tr( "TiB" );
+    tr_formatter_mem_init( mem_K,
+                           qPrintable( unitStrings[MEM][KB] ),
+                           qPrintable( unitStrings[MEM][MB] ),
+                           qPrintable( unitStrings[MEM][GB] ),
+                           qPrintable( unitStrings[MEM][TB] ) );
+}
 
 /***
 ****
 ***/
 
+double
+Speed :: KBps( ) const
+{
+    return _Bps / speed_K;
+}
+
 Speed
 Speed :: fromKBps( double KBps )
 {
-    return KBps * Formatter::speed_K;
+    return KBps * speed_K;
 }
 
 /***

@@ -39,23 +39,14 @@ class Formatter: public QObject
 
     public:
 
-        static const int speed_K;
-        static const QString speed_K_str;
-        static const QString speed_M_str;
-        static const QString speed_G_str;
-        static const QString speed_T_str;
+        typedef enum { B, KB, MB, GB, TB } Size;
+        typedef enum { SPEED, SIZE, MEM } Type;
+        static QString unitStr( Type t, Size s ) { return unitStrings[t][s]; }
+        static void initUnits( );
 
-        static const int size_K;
-        static const QString size_K_str;
-        static const QString size_M_str;
-        static const QString size_G_str;
-        static const QString size_T_str;
+    private:
 
-        static const int mem_K;
-        static const QString mem_K_str;
-        static const QString mem_M_str;
-        static const QString mem_G_str;
-        static const QString mem_T_str;
+        static QString unitStrings[3][4];
 };
 
 #endif

@@ -636,11 +636,11 @@ Details :: refresh( )
         myBandwidthPriorityCombo->blockSignals( false );
 
         mySingleDownSpin->blockSignals( true );
-        mySingleDownSpin->setValue( tor->downloadLimit().Bps() / Formatter::speed_K );
+        mySingleDownSpin->setValue( tor->downloadLimit().KBps() );
         mySingleDownSpin->blockSignals( false );
 
         mySingleUpSpin->blockSignals( true );
-        mySingleUpSpin->setValue( tor->uploadLimit().Bps() / Formatter::speed_K );
+        mySingleUpSpin->setValue( tor->uploadLimit().KBps() );
         mySingleUpSpin->blockSignals( false );
 
         myPeerLimitSpin->blockSignals( true );
@@ -1013,7 +1013,7 @@ Details :: onDownloadLimitedToggled( bool val )
 void
 Details :: onDownloadLimitChanged( int val )
 {
-    mySession.torrentSet( myIds, "downloadLimit", val * Formatter::speed_K  );
+    mySession.torrentSet( myIds, "downloadLimit", val );
 }
 void
 Details :: onUploadLimitedToggled( bool val )
@@ -1023,7 +1023,7 @@ Details :: onUploadLimitedToggled( bool val )
 void
 Details :: onUploadLimitChanged( int val )
 {
-    mySession.torrentSet( myIds, "uploadLimit", val * Formatter::speed_K );
+    mySession.torrentSet( myIds, "uploadLimit", val );
 }
 
 #define RATIO_KEY "seedRatioMode"
@@ -1190,6 +1190,7 @@ Details :: createOptionsTab( )
     QHBoxLayout * h;
     QRadioButton * r;
     QDoubleSpinBox * ds;
+    const QString speed_K_str = Formatter::unitStr( Formatter::SPEED, Formatter::KB );
 
     HIG * hig = new HIG( this );
     hig->addSectionTitle( tr( "Speed" ) );
@@ -1199,7 +1200,7 @@ Details :: createOptionsTab( )
     hig->addWideControl( c );
     connect( c, SIGNAL(clicked(bool)), this, SLOT(onHonorsSessionLimitsToggled(bool)) );
 
-    c = new QCheckBox( tr( "Limit &download speed (%1):" ).arg( Formatter::speed_K_str ) );
+    c = new QCheckBox( tr( "Limit &download speed (%1):" ).arg( speed_K_str ) );
     mySingleDownCheck = c;
     s = new QSpinBox( );
     mySingleDownSpin = s;
@@ -1209,7 +1210,7 @@ Details :: createOptionsTab( )
     connect( c, SIGNAL(clicked(bool)), this, SLOT(onDownloadLimitedToggled(bool)) );
     connect( s, SIGNAL(valueChanged(int)), this, SLOT(onDownloadLimitChanged(int)));
 
-    c = new QCheckBox( tr( "Limit &upload speed (%1):" ).arg( Formatter::speed_K_str ) );
+    c = new QCheckBox( tr( "Limit &upload speed (%1):" ).arg( speed_K_str ) );
     mySingleUpCheck = c;
     s = new QSpinBox( );
     mySingleUpSpin = s;
