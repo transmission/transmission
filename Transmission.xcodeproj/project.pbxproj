@@ -190,6 +190,10 @@
 		A28F4F770E085BDC003A3882 /* ColorTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = A28F4F760E085BDC003A3882 /* ColorTextField.m */; };
 		A292A6E80DFB45FC004B9C0A /* webseed.c in Sources */ = {isa = PBXBuildFile; fileRef = A292A6E50DFB45EC004B9C0A /* webseed.c */; };
 		A29576030D11D63C0093B167 /* Creator.xib in Resources */ = {isa = PBXBuildFile; fileRef = A29576010D11D63C0093B167 /* Creator.xib */; };
+		A296EFB811E56254004A2781 /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A296EFB711E56254004A2781 /* libiconv.dylib */; };
+		A296EFB911E5626F004A2781 /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A296EFB711E56254004A2781 /* libiconv.dylib */; };
+		A296EFBA11E56277004A2781 /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A296EFB711E56254004A2781 /* libiconv.dylib */; };
+		A296EFBB11E56283004A2781 /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A296EFB711E56254004A2781 /* libiconv.dylib */; };
 		A29AF4F70D01BADC00D097EC /* DownArrowTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = A29AF4F60D01BADC00D097EC /* DownArrowTemplate.png */; };
 		A29AF4F90D01BAEB00D097EC /* UpArrowTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = A29AF4F80D01BAEB00D097EC /* UpArrowTemplate.png */; };
 		A29B0C270BD15FEF0006F230 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = A2F8951E0A2D4BA500ED2127 /* Credits.rtf */; };
@@ -721,6 +725,7 @@
 		A292A6E40DFB45E5004B9C0A /* peer-common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "peer-common.h"; path = "libtransmission/peer-common.h"; sourceTree = "<group>"; };
 		A292A6E50DFB45EC004B9C0A /* webseed.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = webseed.c; path = libtransmission/webseed.c; sourceTree = "<group>"; };
 		A292A6E60DFB45EC004B9C0A /* webseed.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = webseed.h; path = libtransmission/webseed.h; sourceTree = "<group>"; };
+		A296EFB711E56254004A2781 /* libiconv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.dylib; path = usr/lib/libiconv.dylib; sourceTree = SDKROOT; };
 		A29AF4F60D01BADC00D097EC /* DownArrowTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = DownArrowTemplate.png; path = macosx/Images/DownArrowTemplate.png; sourceTree = "<group>"; };
 		A29AF4F80D01BAEB00D097EC /* UpArrowTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = UpArrowTemplate.png; path = macosx/Images/UpArrowTemplate.png; sourceTree = "<group>"; };
 		A29C8B340ACC6EB3000ED9F9 /* PortChecker.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PortChecker.h; path = macosx/PortChecker.h; sourceTree = "<group>"; };
@@ -911,6 +916,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A296EFB911E5626F004A2781 /* libiconv.dylib in Frameworks */,
 				4D9A2BF009E16D21002D0FF9 /* libtransmission.a in Frameworks */,
 				4D9A2BF909E16D4F002D0FF9 /* libcrypto.0.9.7.dylib in Frameworks */,
 				A22E59A70DC11A1D00F4BE15 /* libcurl.4.dylib in Frameworks */,
@@ -932,6 +938,7 @@
 				A2E669790F5B8E5A00B4251A /* Security.framework in Frameworks */,
 				A22CFB820FB66EF30009BD3E /* Carbon.framework in Frameworks */,
 				A221DCC8104B3660008A642D /* Quartz.framework in Frameworks */,
+				A296EFB811E56254004A2781 /* libiconv.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -972,6 +979,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A296EFBA11E56277004A2781 /* libiconv.dylib in Frameworks */,
 				BEFC1C040C07753100B0BB3C /* libcrypto.0.9.7.dylib in Frameworks */,
 				BEFC1C050C07753500B0BB3C /* libtransmission.a in Frameworks */,
 				A22E59A80DC11A1F00F4BE15 /* libcurl.4.dylib in Frameworks */,
@@ -983,6 +991,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A296EFBB11E56283004A2781 /* libiconv.dylib in Frameworks */,
 				BEFC1CF40C07822400B0BB3C /* libcrypto.0.9.7.dylib in Frameworks */,
 				BEFC1D2D0C0783D900B0BB3C /* libtransmission.a in Frameworks */,
 				A22E59A90DC11A2000F4BE15 /* libcurl.4.dylib in Frameworks */,
@@ -1350,6 +1359,7 @@
 			children = (
 				4D2617F709DECE3D00D08EFA /* libcrypto.0.9.7.dylib */,
 				A29EBE700DC06068006CEE80 /* libcurl.4.dylib */,
+				A296EFB711E56254004A2781 /* libiconv.dylib */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
