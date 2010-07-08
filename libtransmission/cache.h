@@ -58,6 +58,7 @@ int tr_cachePrefetchBlock( tr_cache         * cache,
 /***
 ****
 ***/
+int tr_cacheFlushDone( tr_cache * cache );
 
 int tr_cacheFlushTorrent( tr_cache    * cache,
                           tr_torrent  * torrent );

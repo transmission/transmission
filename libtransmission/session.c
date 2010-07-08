@@ -359,13 +359,13 @@ tr_sessionGetSettings( tr_session * s, struct tr_benc * d )
     tr_bencDictAddBool( d, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED, tr_sessionIsTorrentDoneScriptEnabled( s ) );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_FILENAME, tr_sessionGetTorrentDoneScript( s ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_ALT_SPEED_ENABLED,        tr_sessionUsesAltSpeed( s ) );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_UP_KBps,         tr_sessionGetAltSpeed_KBps( s, TR_UP ) );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_DOWN_KBps,       tr_sessionGetAltSpeed_KBps( s, TR_DOWN ) );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_UP_KBps,        tr_sessionGetAltSpeed_KBps( s, TR_UP ) );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_DOWN_KBps,      tr_sessionGetAltSpeed_KBps( s, TR_DOWN ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN,     tr_sessionGetAltSpeedBegin( s ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED,   tr_sessionUsesAltSpeedTime( s ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_TIME_END,       tr_sessionGetAltSpeedEnd( s ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_TIME_DAY,       tr_sessionGetAltSpeedDay( s ) );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_USPEED_KBps,               tr_sessionGetSpeedLimit_KBps( s, TR_UP ) );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_USPEED_KBps,              tr_sessionGetSpeedLimit_KBps( s, TR_UP ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_USPEED_ENABLED,           tr_sessionIsSpeedLimited( s, TR_UP ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_UMASK,                    s->umask );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_UPLOAD_SLOTS_PER_TORRENT, s->uploadSlotsPerTorrent );
@@ -470,6 +470,9 @@ onSaveTimer( int foo UNUSED, short bar UNUSED, void * vsession )
 {
     tr_torrent * tor = NULL;
     tr_session * session = vsession;
+
+    if( tr_cacheFlushDone( session->cache ) )
+        tr_err( "Error while flushing completed pieces from cache" );
 
     while(( tor = tr_torrentNext( session, tor )))
         tr_torrentSave( tor );
