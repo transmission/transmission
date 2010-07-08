@@ -63,11 +63,15 @@
                             [NSFont messageFontOfSize: 12.0], NSFontAttributeName,
                             paragraphStyle, NSParagraphStyleAttributeName, nil];
         
+        NSMutableParagraphStyle * statusParagraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+        [statusParagraphStyle setLineBreakMode: NSLineBreakByTruncatingTail];
+        
         fStatusAttributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
                                 [NSFont messageFontOfSize: 9.0], NSFontAttributeName,
-                                paragraphStyle, NSParagraphStyleAttributeName, nil];
+                                statusParagraphStyle, NSParagraphStyleAttributeName,  nil];
         
         [paragraphStyle release];
+        [statusParagraphStyle release];
     }
     return self;
 }
@@ -160,14 +164,15 @@
     {
         result.origin.x = NSMinX(bounds) + PADDING_HORIZONAL + IMAGE_ICON_SIZE + PADDING_BETWEEN_IMAGE_AND_TITLE;
         result.origin.y = NSMinY(bounds) + PADDING_ABOVE_TITLE_FILE;
+        result.size.width = NSMaxX(bounds) - NSMinX(result) - PADDING_HORIZONAL;
     }
     else
     {
         result.origin.x = NSMinX(bounds) + PADDING_HORIZONAL + IMAGE_FOLDER_SIZE + PADDING_BETWEEN_IMAGE_AND_TITLE;
         result.origin.y = NSMidY(bounds) - titleSize.height * 0.5;
+        result.size.width = MIN(titleSize.width, NSMaxX(bounds) - NSMinX(result) - PADDING_HORIZONAL);
     }
     result.size.height = titleSize.height;
-    result.size.width = MIN(titleSize.width, NSMaxX(bounds) - NSMinX(result) - PADDING_HORIZONAL);
     
     return result;
 }
@@ -179,17 +184,17 @@
     NSRect result;
     if (![(FileListNode *)[self objectValue] isFolder])
     {
-        result.origin.x = NSMinX(bounds) + PADDING_HORIZONAL + IMAGE_ICON_SIZE + PADDING_BETWEEN_IMAGE_AND_TITLE;
+        result.origin.x = NSMinX(titleRect);
         result.origin.y = NSMaxY(bounds) - PADDING_BELOW_STATUS_FILE - statusSize.height;
+        result.size.width = NSWidth(titleRect);
     }
     else
     {
         result.origin.x = NSMaxX(titleRect) + PADDING_BETWEEN_NAME_AND_FOLDER_STATUS;
         result.origin.y = NSMaxY(titleRect) - statusSize.height - 1.0;
+        result.size.width = NSMaxX(bounds) - NSMaxX(titleRect) - PADDING_HORIZONAL;
     }
-        
     result.size.height = statusSize.height;
-    result.size.width = NSMaxX(bounds) - NSMaxX(result) - PADDING_HORIZONAL;
     
     return result;
 }
@@ -206,8 +211,7 @@
     FileListNode * node = (FileListNode *)[self objectValue];
     
     const CGFloat progress = [torrent fileProgress: node];
-    NSString * percentString = progress == 1.0 ? @"100%"
-                                : [NSString localizedStringWithFormat: @"%.2f%%", tr_truncd(progress * 100.0, 2)];
+    NSString * percentString = [NSString percentString: progress longDecimals: YES];
     
     NSString * status = [NSString stringWithFormat: NSLocalizedString(@"%@ of %@",
                             "Inspector -> Files tab -> file status string"), percentString, [NSString stringForFileSize: [node size]]];
