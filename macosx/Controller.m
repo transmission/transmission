@@ -333,13 +333,13 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         tr_bencDictAddStr(&settings, TR_PREFS_KEY_RPC_USERNAME,  [[fDefaults stringForKey: @"RPCUsername"] UTF8String]);
         tr_bencDictAddBool(&settings, TR_PREFS_KEY_RPC_WHITELIST_ENABLED,  [fDefaults boolForKey: @"RPCUseWhitelist"]);
         
-        fLib = tr_sessionInit("macosx", configDir, YES, &settings);
-        tr_bencFree(&settings);
-        
         #warning localize and make consistent
         tr_formatter_size_init(1024, "KB", "MB", "GB", "TB");
         tr_formatter_speed_init(1024, "KB/s", "MB/s", "GB/s", "TB/s");
         tr_formatter_mem_init(1024, "KB", "MB", "GB", "TB");
+        
+        fLib = tr_sessionInit("macosx", configDir, YES, &settings);
+        tr_bencFree(&settings);
         
         [NSApp setDelegate: self];
         
