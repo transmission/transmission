@@ -1645,7 +1645,23 @@ tr_formatter_speed_init( unsigned int kilo,
 char*
 tr_formatter_speed_Bps( char * buf, uint64_t bytes_per_second, size_t buflen )
 {
-    formatter_get_size_str( &speed_units, buf, bytes_per_second, buflen );
+    const double K = speed_units.units[TR_FMT_KB].value;
+    double speed = bytes_per_second / K;
+
+    if( speed <= 999.95 ) /* 0.0 KB to 999.9 KB */
+        tr_snprintf( buf, buflen, "%.2f %s", speed, speed_units.units[TR_FMT_KB].name );
+    else {
+        speed /= K;
+        if( speed <= 99.995 ) /* 0.98 MB to 99.99 MB */
+            tr_snprintf( buf, buflen, "%.2f %s", speed, speed_units.units[TR_FMT_MB].name );
+        else if (speed <= 999.95) /* 100.0 MB to 999.9 MB */
+            tr_snprintf( buf, buflen, "%.1f %s", speed, speed_units.units[TR_FMT_MB].name );
+        else {
+            speed /= K;
+            tr_snprintf( buf, buflen, "%.1f %s", speed, speed_units.units[TR_FMT_GB].name );
+        }
+    }
+
     return buf;
 }
 
