@@ -63,8 +63,12 @@ struct tr_cache
 
 struct run_info
 {
-  time_t  last_block_time;
-  tr_bool is_aligned;
+  int       pos;
+  int       rank;
+  time_t    last_block_time;
+  tr_bool   is_multi_piece;
+  tr_bool   is_piece_done;
+  unsigned  len;
 };
 
 
@@ -87,75 +91,68 @@ getBlockRun( const tr_cache * cache, int pos, struct run_info * info )
 
 //fprintf( stderr, "run is %d long from [%d to %d)\n", (int)(i-pos), i, (int)pos );
     if( info != NULL ) {
-        info->last_block_time = blocks[i-1]->time;
-        info->is_aligned = (blocks[pos]->block % 2 == 0) ? TRUE : FALSE;
+        const struct cache_block * b = blocks[i-1];
+        info->last_block_time = b->time;
+        info->is_piece_done = tr_cpPieceIsComplete( &b->tor->completion, b->piece );
+        info->is_multi_piece = b->piece != blocks[pos]->piece ? TRUE : FALSE;
+        info->len = i - pos;
+        info->pos = pos;
     }
 
     return i-pos;
 }
 
-/* return the starting index of the longest contiguous run of blocks BUT:
- *   - Run should begin with a even block and length of run should be even.
- *   - Oldest run is preferred.
- */
 static int
-findChunk2Discard( tr_cache * cache, int * setme_n )
+compareRuns( const void * va, const void * vb )
+{
+    const struct run_info a = *(const struct run_info*)va;
+    const struct run_info b = *(const struct run_info*)vb;
+    return b.rank - a.rank;
+}
+
+enum
+{
+    MULTIFLAG   = 0x1000,
+    DONEFLAG    = 0x2000,
+    SESSIONFLAG = 0x4000
+};
+/* Calculte runs
+ *   - Stale runs, runs sitting in cache for a long time or runs not growing, get priority.
+ */
+static void
+calcRuns( tr_cache * cache, struct run_info * runs )
 {
     const int n = tr_ptrArraySize( &cache->blocks );
-    int pos;
-    int bestpos = 0;
-    unsigned bestlen = 1;
-    unsigned jump;
-    time_t oldest_time = tr_time() + 1;
-    struct run_info run;
+    int i = 0, pos;
+    const time_t now = tr_time();
 
-    for( pos=0; pos<n; pos+=jump )
+    for( pos = 0; pos < n; pos += runs[i++].len )
     {
-        unsigned len = getBlockRun( cache, pos, &run );
-        jump = len;
+        int rank = getBlockRun( cache, pos, &runs[i] );
 
-        /* shortcut */
-        if( len < bestlen )
-            continue;
+        /* This adds ~2 to the relative length of a run for every minute it has
+         * languished in the cache. */
+        rank += ( now - runs[i].last_block_time ) / 32;
 
-        /* check alignment */
-        if( len % 2 == 0 ) {
-            if( !run.is_aligned ) {
-                /* Let it grow. Otherwise we contribute to fragmentation */
-                if( bestlen == 1) {
-                    /* But if all other blocks are non-contiguous, we prefer this one */
-                    bestpos = pos;
-                    oldest_time = cache->max_blocks - len;
-                }
-                continue;
-            }
-        } else {
-            if( len != 1 ) {
-                --len;
-                if( !run.is_aligned ) {
-                    ++pos;
-                    --jump;
-                }
-            }
-        }
+        /* Flushing stale blocks should be a top priority as the probability of them
+         * growing is very small, for blocks on piece boundaries, and nonexistant for
+         * blocks inside pieces. */
+        rank |= runs[i].is_piece_done ? DONEFLAG : 0;
 
-        if( bestlen < len ) {
-            bestlen = len;
-            bestpos = pos;
-            oldest_time = run.last_block_time;
-        } else if( (bestlen == len) && (oldest_time > run.last_block_time) ) {
-            bestpos = pos;
-            oldest_time = run.last_block_time;
-        }
+        /* Move the multi piece runs higher */
+        rank |= runs[i].is_multi_piece ? MULTIFLAG : 0;
+
+        runs[i].rank = rank;
+//fprintf(stderr,"block run at pos %d of length %d and age %ld adjusted +%d\n",runs[i].pos,runs[i].len,now-runs[i].last_block_time,rank-runs[i].len);
     }
 
-//fprintf( stderr, "DISCARDED run is %d long from [%d to %d)\n", bestlen, bestpos, bestpos+bestlen );
-    *setme_n = bestlen;
-    return bestpos;
+    //fprintf( stderr, "%d block runs\n", i-1 );
+    qsort( runs, i, sizeof( struct run_info ), compareRuns );
+    //return i;
 }
 
 static int
-flushContiguous( tr_cache * cache, int pos, int n )
+flushContiguous( tr_cache * cache, int pos, int n, int rank )
 {
     int i;
     int err = 0;
@@ -180,7 +177,7 @@ flushContiguous( tr_cache * cache, int pos, int n )
     tr_ptrArrayErase( &cache->blocks, pos, pos+n );
 
     tr_tordbg( tor, "Writing to disk piece %d, offset %d, len %d", (int)piece, (int)offset, (int)(walk-buf) );
-    tr_ndbg( MY_NAME, "Removing %d blocks from cache; %d left", n, tr_ptrArraySize(&cache->blocks) );
+    tr_ndbg( MY_NAME, "Removing %d blocks from cache, rank: %d - %d left", n, rank, tr_ptrArraySize(&cache->blocks) );
     //fprintf( stderr, "%s - Writing to disk piece %d, offset %d, len %d\n", tr_torrentName(tor), (int)piece, (int)offset, (int)(walk-buf) );
     //fprintf( stderr, "%s - Removing %d blocks from cache; %d left\n", MY_NAME, n, tr_ptrArraySize(&cache->blocks) );
 
@@ -193,15 +190,39 @@ flushContiguous( tr_cache * cache, int pos, int n )
 }
 
 static int
+flushRuns( tr_cache * cache, struct run_info * runs, int n )
+{
+    int i, j, err = 0;
+
+    for( i = 0; !err && i < n; ++i )
+    {
+        err = flushContiguous( cache, runs[i].pos, runs[i].len, runs[i].rank );
+        for( j = i + 1; j < n; ++j )
+            if( runs[j].pos > runs[i].pos )
+                runs[j].pos -= runs[i].len;
+    }
+
+    return err;
+}
+
+static int
 cacheTrim( tr_cache * cache )
 {
     int err = 0;
 
-    while( !err && ( tr_ptrArraySize( &cache->blocks ) > cache->max_blocks ) )
+    if( tr_ptrArraySize( &cache->blocks ) > cache->max_blocks )
     {
-        int n;
-        const int i = findChunk2Discard( cache, &n );
-        err = flushContiguous( cache, i, n );
+        /* Amount of cache that should be removed by the flush. This influences how large
+         * runs can grow as well as how often flushes will happen. */
+        const int cacheCutoff = 1 + cache->max_blocks / 4;
+        struct run_info * runs = tr_new( struct run_info, tr_ptrArraySize( &cache->blocks ) );
+        int i = 0, j = 0;
+
+        calcRuns( cache, runs );
+        while( j < cacheCutoff )
+            j += runs[i++].len;
+        err = flushRuns( cache, runs, i );
+        tr_free( runs );
     }
 
     return err;
@@ -370,6 +391,25 @@ findPiece( tr_cache * cache, tr_torrent * torrent, tr_piece_index_t piece )
     return tr_ptrArrayLowerBound( &cache->blocks, &key, cache_block_compare, NULL );
 }
 
+int tr_cacheFlushDone( tr_cache * cache )
+{
+    int err = 0;
+
+    if( tr_ptrArraySize( &cache->blocks ) > 0 )
+    {
+        struct run_info * runs = tr_new0( struct run_info, tr_ptrArraySize( &cache->blocks ) );
+        int i = 0;
+
+        calcRuns( cache, runs );
+        while( runs[i].is_piece_done || runs[i].is_multi_piece )
+            runs[i++].rank |= SESSIONFLAG;
+        err = flushRuns( cache, runs, i );
+        tr_free( runs );
+    }
+
+    return err;
+}
+
 int
 tr_cacheFlushFile( tr_cache * cache, tr_torrent * torrent, tr_file_index_t i )
 {
@@ -386,7 +426,7 @@ tr_cacheFlushFile( tr_cache * cache, tr_torrent * torrent, tr_file_index_t i )
         const struct cache_block * b = tr_ptrArrayNth( &cache->blocks, pos );
         if( b->tor != torrent ) break;
         if( ( b->block < begin ) || ( b->block >= end ) ) break;
-        err = flushContiguous( cache, pos, getBlockRun( cache, pos, NULL ) );
+        err = flushContiguous( cache, pos, getBlockRun( cache, pos, NULL ), 0 );
     }
 
     return err;
@@ -403,7 +443,7 @@ tr_cacheFlushTorrent( tr_cache * cache, tr_torrent * torrent )
     {
         const struct cache_block * b = tr_ptrArrayNth( &cache->blocks, pos );
         if( b->tor != torrent ) break;
-        err = flushContiguous( cache, pos, getBlockRun( cache, pos, NULL ) );
+        err = flushContiguous( cache, pos, getBlockRun( cache, pos, NULL ), 0 );
     }
 
     return err;
