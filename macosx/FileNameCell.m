@@ -71,6 +71,7 @@
                                 statusParagraphStyle, NSParagraphStyleAttributeName,  nil];
         
         [paragraphStyle release];
+        [statusParagraphStyle release];
     }
     return self;
 }
