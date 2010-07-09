@@ -11,7 +11,6 @@
  */
 
 #include <assert.h>
-#include <math.h> /* ceil() */
 #include <stddef.h>
 #include <stdio.h> /* sscanf */
 #include <stdlib.h>
@@ -1192,54 +1191,38 @@ refreshPeerRow( GtkListStore        * store,
                 GtkTreeIter         * iter,
                 const tr_peer_stat  * peer )
 {
-    char up_speed[64];
-    char down_speed[64];
-    char up_count[64];
-    char down_count[64];
-    char blocks_to_peer[64];
-    char blocks_to_client[64];
-    char cancelled_by_peer[64];
-    char cancelled_by_client[64];
+    char up_speed[64] = { '\0' };
+    char down_speed[64] = { '\0' };
+    char up_count[64] = { '\0' };
+    char down_count[64] = { '\0' };
+    char blocks_to_peer[64] = { '\0' };
+    char blocks_to_client[64] = { '\0' };
+    char cancelled_by_peer[64] = { '\0' };
+    char cancelled_by_client[64] = { '\0' };
 
     if( peer->rateToPeer_KBps > 0.01 )
         tr_formatter_speed_KBps( up_speed, peer->rateToPeer_KBps, sizeof( up_speed ) );
-    else
-        *up_speed = '\0';
 
     if( peer->rateToClient_KBps > 0 )
         tr_formatter_speed_KBps( down_speed, peer->rateToClient_KBps, sizeof( down_speed ) );
-    else
-        *down_speed = '\0';
 
     if( peer->pendingReqsToPeer > 0 )
         g_snprintf( down_count, sizeof( down_count ), "%d", peer->pendingReqsToPeer );
-    else
-        *down_count = '\0';
 
     if( peer->pendingReqsToClient > 0 )
         g_snprintf( up_count, sizeof( down_count ), "%d", peer->pendingReqsToClient );
-    else
-        *up_count = '\0';
 
     if( peer->blocksToPeer > 0 )
         g_snprintf( blocks_to_peer, sizeof( blocks_to_peer ), "%"PRIu32, peer->blocksToPeer );
-    else
-        *blocks_to_peer = '\0';
 
     if( peer->blocksToClient > 0 )
         g_snprintf( blocks_to_client, sizeof( blocks_to_client ), "%"PRIu32, peer->blocksToClient );
-    else
-        *blocks_to_client = '\0';
 
     if( peer->cancelsToPeer > 0 )
         g_snprintf( cancelled_by_client, sizeof( cancelled_by_client ), "%"PRIu32, peer->cancelsToPeer );
-    else
-        *cancelled_by_client = '\0';
 
     if( peer->cancelsToClient > 0 )
         g_snprintf( cancelled_by_peer, sizeof( cancelled_by_peer ), "%"PRIu32, peer->cancelsToClient );
-    else
-        *cancelled_by_peer = '\0';
 
     gtk_list_store_set( store, iter,
                         PEER_COL_PROGRESS, (int)( 100.0 * peer->progress ),
@@ -1407,7 +1390,7 @@ refreshWebseedList( struct DetailsImpl * di, tr_torrent ** torrents, int n )
             p = gtk_tree_row_reference_get_path( ref );
             gtk_tree_model_get_iter( model, &iter, p );
             if( speeds_KBps[j] > 0 )
-                tr_formatter_speed_Bps( buf, speeds_KBps[j], sizeof( buf ) );
+                tr_formatter_speed_KBps( buf, speeds_KBps[j], sizeof( buf ) );
             else
                 *buf = '\0';
             gtk_list_store_set( store, &iter, WEBSEED_COL_DOWNLOAD_RATE_DOUBLE, speeds_KBps[j],

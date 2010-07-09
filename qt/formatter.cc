@@ -122,7 +122,7 @@ Formatter :: speedToString( const Speed& speed )
         return tr( "None" );
     else {
         char buf[128];
-        tr_formatter_speed_KBps( buf, speed.Bps( ), sizeof( buf ) );
+        tr_formatter_speed_KBps( buf, speed.KBps( ), sizeof( buf ) );
         return buf;
     }
 }

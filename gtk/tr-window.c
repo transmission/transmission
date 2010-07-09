@@ -403,7 +403,7 @@ createSpeedMenu( PrivateData * p, tr_direction dir )
 {
     int i, n;
     GtkWidget *w, *m;
-    const int speeds[] = { 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750 };
+    const int speeds_KBps[] = { 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750 };
 
     m = gtk_menu_new( );
 
@@ -424,13 +424,13 @@ createSpeedMenu( PrivateData * p, tr_direction dir )
     w = gtk_separator_menu_item_new( );
     gtk_menu_shell_append( GTK_MENU_SHELL( m ), w );
 
-    for( i=0, n=G_N_ELEMENTS(speeds); i<n; ++i )
+    for( i=0, n=G_N_ELEMENTS(speeds_KBps); i<n; ++i )
     {
         char buf[128];
-        tr_strlspeed( buf, speeds[i] * speed_K, sizeof( buf ) );
+        tr_formatter_speed_KBps( buf, speeds_KBps[i], sizeof( buf ) );
         w = gtk_menu_item_new_with_label( buf );
         g_object_set_data( G_OBJECT( w ), DIRECTION_KEY, GINT_TO_POINTER( dir ) );
-        g_object_set_data( G_OBJECT( w ), SPEED_KEY, GINT_TO_POINTER( speeds[i] ) );
+        g_object_set_data( G_OBJECT( w ), SPEED_KEY, GINT_TO_POINTER( speeds_KBps[i] ) );
         g_signal_connect( w, "activate", G_CALLBACK(onSpeedSet), p );
         gtk_menu_shell_append( GTK_MENU_SHELL( m ), w );
     }

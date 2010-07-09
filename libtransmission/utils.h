@@ -572,26 +572,21 @@ void tr_formatter_speed_init( unsigned int kilo, const char * kb, const char * m
 void tr_formatter_mem_init( unsigned int kilo, const char * kb, const char * mb,
                                                const char * gb, const char * tb );
 
-/* format a speed into a user-readable string. */
 extern unsigned int tr_speed_K;
-char* tr_formatter_speed_Bps( char * buf, uint64_t Bps, size_t buflen );
-static inline char* tr_formatter_speed_KBps( char * buf, double KBps, size_t buflen ) { return tr_formatter_speed_Bps( buf, KBps * tr_speed_K, buflen ); }
-static inline char* tr_formatter_speed_MBps( char * buf, double MBps, size_t buflen ) { return tr_formatter_speed_Bps( buf, MBps * tr_speed_K * tr_speed_K, buflen ); }
-static inline char* tr_formatter_speed_GBps( char * buf, double GBps, size_t buflen ) { return tr_formatter_speed_Bps( buf, GBps * tr_speed_K * tr_speed_K * tr_speed_K, buflen ); }
-
-/* format a memory size into a user-readable string. */
 extern unsigned int tr_mem_K;
-char* tr_formatter_mem_B( char * buf, uint64_t bytes, size_t buflen );
-static inline char* tr_formatter_mem_KB( char * buf, double KBps, size_t buflen ) { return tr_formatter_mem_B( buf, KBps * tr_mem_K, buflen ); }
-static inline char* tr_formatter_mem_MB( char * buf, double MBps, size_t buflen ) { return tr_formatter_mem_B( buf, MBps * tr_mem_K * tr_mem_K, buflen ); }
-static inline char* tr_formatter_mem_GB( char * buf, double GBps, size_t buflen ) { return tr_formatter_mem_B( buf, GBps * tr_mem_K * tr_mem_K * tr_mem_K, buflen ); }
-
-/* format a file size into a user-readable string. */
 extern unsigned int tr_size_K;
+
+/* format a speed from KBps into a user-readable string. */
+char* tr_formatter_speed_KBps( char * buf, double KBps, size_t buflen );
+
+/* format a memory size from bytes into a user-readable string. */
+char* tr_formatter_mem_B( char * buf, uint64_t bytes, size_t buflen );
+
+/* format a memory size from MB into a user-readable string. */
+static inline char* tr_formatter_mem_MB( char * buf, double MBps, size_t buflen ) { return tr_formatter_mem_B( buf, MBps * tr_mem_K * tr_mem_K, buflen ); }
+
+/* format a file size from bytes into a user-readable string. */
 char* tr_formatter_size_B( char * buf, uint64_t bytes, size_t buflen );
-static inline char* tr_formatter_size_KB( char * buf, double KBps, size_t buflen ) { return tr_formatter_size_B( buf, KBps * tr_size_K, buflen ); }
-static inline char* tr_formatter_size_MB( char * buf, double MBps, size_t buflen ) { return tr_formatter_size_B( buf, MBps * tr_size_K * tr_size_K, buflen ); }
-static inline char* tr_formatter_size_GB( char * buf, double GBps, size_t buflen ) { return tr_formatter_size_B( buf, GBps * tr_size_K * tr_size_K * tr_size_K, buflen ); }
 
 
 /***

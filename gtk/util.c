@@ -165,17 +165,6 @@ tr_strlsize( char * buf, guint64 bytes, size_t buflen )
 }
 
 char*
-tr_strlspeed( char * buf, int bytes_per_second, size_t buflen )
-{
-    if( bytes_per_second < 1 )
-        g_strlcpy( buf, _( "None" ), buflen );
-    else
-        tr_formatter_speed_Bps( buf, bytes_per_second, buflen );
-
-    return buf;
-}
-
-char*
 tr_strltime( char * buf, int seconds, size_t buflen )
 {
     int  days, hours, minutes;

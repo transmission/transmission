@@ -1643,10 +1643,10 @@ tr_formatter_speed_init( unsigned int kilo,
 }
 
 char*
-tr_formatter_speed_Bps( char * buf, uint64_t bytes_per_second, size_t buflen )
+tr_formatter_speed_KBps( char * buf, double KBps, size_t buflen )
 {
     const double K = speed_units.units[TR_FMT_KB].value;
-    double speed = bytes_per_second / K;
+    double speed = KBps;
 
     if( speed <= 999.95 ) /* 0.0 KB to 999.9 KB */
         tr_snprintf( buf, buflen, "%.2f %s", speed, speed_units.units[TR_FMT_KB].name );

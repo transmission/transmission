@@ -65,9 +65,6 @@ char* tr_strlpercent( char * buf, double x, size_t buflen );
 /* return a human-readable string for the size given in bytes. */
 char* tr_strlsize( char * buf, guint64  size, size_t buflen );
 
-/* return a human-readable string for the transfer rate given in Bps. */
-char* tr_strlspeed( char * buf, int bytes_per_second, size_t buflen );
-
 /* return a human-readable string for the given ratio. */
 char* tr_strlratio( char * buf, double ratio, size_t buflen );
 
