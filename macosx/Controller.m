@@ -333,10 +333,20 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         tr_bencDictAddStr(&settings, TR_PREFS_KEY_RPC_USERNAME,  [[fDefaults stringForKey: @"RPCUsername"] UTF8String]);
         tr_bencDictAddBool(&settings, TR_PREFS_KEY_RPC_WHITELIST_ENABLED,  [fDefaults boolForKey: @"RPCUseWhitelist"]);
         
-        #warning localize and make consistent
-        tr_formatter_size_init(1024, "KB", "MB", "GB", "TB");
-        tr_formatter_speed_init(1024, "KB/s", "MB/s", "GB/s", "TB/s");
-        tr_formatter_mem_init(1024, "KB", "MB", "GB", "TB");
+        tr_formatter_size_init(1024, [NSLocalizedString(@"KB", "File size - kilobytes") UTF8String],
+                                    [NSLocalizedString(@"MB", "File size - megabytes") UTF8String],
+                                    [NSLocalizedString(@"GB", "File size - gigabytes") UTF8String],
+                                    [NSLocalizedString(@"TB", "File size - terabytes") UTF8String]);
+
+        tr_formatter_speed_init(1024, [NSLocalizedString(@"KB/s", "Transfer speed (kilobytes per second)") UTF8String],
+                                    [NSLocalizedString(@"MB/s", "Transfer speed (megabytes per second)") UTF8String],
+                                    [NSLocalizedString(@"GB/s", "Transfer speed (gigabytes per second)") UTF8String],
+                                    [NSLocalizedString(@"TB/s", "Transfer speed (terabytes per second)") UTF8String]); //why not?
+
+        tr_formatter_mem_init(1024, [NSLocalizedString(@"KB", "Memory size - kilobytes") UTF8String],
+                                    [NSLocalizedString(@"MB", "Memory size - megabytes") UTF8String],
+                                    [NSLocalizedString(@"GB", "Memory size - gigabytes") UTF8String],
+                                    [NSLocalizedString(@"TB", "Memory size - terabytes") UTF8String]);
         
         fLib = tr_sessionInit("macosx", configDir, YES, &settings);
         tr_bencFree(&settings);
