@@ -1823,9 +1823,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             downloadText = NSLocalizedString(@"unlimited", "Status Bar -> speed tooltip");
     }
     
-    uploadText = [NSLocalizedString(@"Total upload rate", "Status Bar -> speed tooltip")
+    uploadText = [NSLocalizedString(@"Global upload limit", "Status Bar -> speed tooltip")
                     stringByAppendingFormat: @": %@", uploadText];
-    downloadText = [NSLocalizedString(@"Total download rate", "Status Bar -> speed tooltip")
+    downloadText = [NSLocalizedString(@"Global download limit", "Status Bar -> speed tooltip")
                     stringByAppendingFormat: @": %@", downloadText];
     
     [fTotalULField setToolTip: uploadText];
