@@ -642,11 +642,10 @@ Transmission.prototype =
 			tr.togglePeriodicRefresh( true );
 		}
 
-		var speed_K = Transmission.fmt.speed_K;
-		var up_bytes        = parseInt( $('#prefs_form #upload_rate'  )[0].value ) * speed_K;
-		var dn_bytes        = parseInt( $('#prefs_form #download_rate')[0].value ) * speed_K;
-                var turtle_up_bytes = parseInt( $('#prefs_form #turtle_upload_rate'  )[0].value ) * speed_K;
-                var turtle_dn_bytes = parseInt( $('#prefs_form #turtle_download_rate')[0].value ) * speed_K;
+		var up_bytes        = parseInt( $('#prefs_form #upload_rate'  )[0].value );
+		var dn_bytes        = parseInt( $('#prefs_form #download_rate')[0].value );
+		var turtle_up_bytes = parseInt( $('#prefs_form #turtle_upload_rate'  )[0].value );
+		var turtle_dn_bytes = parseInt( $('#prefs_form #turtle_download_rate')[0].value );
 
 		// pass the new prefs upstream to the RPC server
 		var o = { };
@@ -936,12 +935,10 @@ Transmission.prototype =
 
 		var up_limited        = prefs[RPC._UpSpeedLimited];
 		var dn_limited        = prefs[RPC._DownSpeedLimited];
-		var up_limit_b        = prefs[RPC._UpSpeedLimit];
-		var dn_limit_b        = prefs[RPC._DownSpeedLimit];
-		var up_limit_k        = up_limit_b                       / Transmission.fmt.speed_K;
-		var dn_limit_k        = dn_limit_b                       / Transmission.fmt.speed_K;
-		var turtle_up_limit_k = prefs[RPC._TurtleUpSpeedLimit]   / Transmission.fmt.speed_K;
-		var turtle_dn_limit_k = prefs[RPC._TurtleDownSpeedLimit] / Transmission.fmt.speed_K;
+		var up_limit_k        = prefs[RPC._UpSpeedLimit];
+		var dn_limit_k        = prefs[RPC._DownSpeedLimit];
+		var turtle_up_limit_k = prefs[RPC._TurtleUpSpeedLimit];
+		var turtle_dn_limit_k = prefs[RPC._TurtleDownSpeedLimit];
 
 		$('div.download_location input')[0].value = prefs[RPC._DownloadDir];
 		$('div.port input')[0].value              = prefs[RPC._PeerPort];
@@ -962,12 +959,12 @@ Transmission.prototype =
 
 		if (!iPhone)
 		{
-			setInnerHTML( $('#limited_download_rate')[0], 'Limit (' + Transmission.fmt.speed(dn_limit_b) + ')' );
+			setInnerHTML( $('#limited_download_rate')[0], 'Limit (' + Transmission.fmt.speed(dn_limit_k) + ')' );
 			var key = dn_limited ? '#limited_download_rate'
 			                       : '#unlimited_download_rate';
 			$(key).deselectMenuSiblings().selectMenuItem();
 
-			setInnerHTML( $('#limited_upload_rate')[0], 'Limit (' + Transmission.fmt.speed(up_limit_b) + ')' );
+			setInnerHTML( $('#limited_upload_rate')[0], 'Limit (' + Transmission.fmt.speed(up_limit_k) + ')' );
 			key = up_limited ? '#limited_upload_rate'
 			                 : '#unlimited_upload_rate';
 			$(key).deselectMenuSiblings().selectMenuItem();
@@ -1080,11 +1077,11 @@ Transmission.prototype =
 					args[RPC._DownSpeedLimited] = false;
 				} else {
 					var rate_str = ($element[0].innerHTML).replace(/[^0-9]/ig, '');
-					var rate_b = parseInt( rate_str ) * Transmission.fmt.speed_K;
-					setInnerHTML( $('#limited_download_rate')[0], 'Limit (' + Transmission.fmt.speed(rate_b) + ')' );
+					var rate_val = parseInt( rate_str );
+					setInnerHTML( $('#limited_download_rate')[0], 'Limit (' + Transmission.fmt.speed(rate_val) + ')' );
 					$('#limited_download_rate').deselectMenuSiblings().selectMenuItem();
 					$('div.preference input#download_rate')[0].value = rate_str;
-					args[RPC._DownSpeedLimit] = rate_b;
+					args[RPC._DownSpeedLimit] = rate_val;
 					args[RPC._DownSpeedLimited] = true;
 				}
 				$('div.preference input#limit_download')[0].checked = args[RPC._DownSpeedLimited];
@@ -1099,11 +1096,11 @@ Transmission.prototype =
 					args[RPC._UpSpeedLimited] = false;
 				} else {
 					var rate_str = ($element[0].innerHTML).replace(/[^0-9]/ig, '');
-					var rate_b = parseInt( rate_str ) * Transmission.fmt.speed_K;
-					setInnerHTML( $('#limited_upload_rate')[0], 'Limit (' + Transmission.fmt.speed(rate_b) + ')' );
+					var rate_val = parseInt( rate_str );
+					setInnerHTML( $('#limited_upload_rate')[0], 'Limit (' + Transmission.fmt.speed(rate_val) + ')' );
 					$('#limited_upload_rate').deselectMenuSiblings().selectMenuItem();
 					$('div.preference input#upload_rate')[0].value = rate_str;
-					args[RPC._UpSpeedLimit] = rate_b;
+					args[RPC._UpSpeedLimit] = rate_val;
 					args[RPC._UpSpeedLimited] = true;
 				}
 				$('div.preference input#limit_upload')[0].checked = args[RPC._UpSpeedLimited];
@@ -1239,7 +1236,7 @@ Transmission.prototype =
 				download_dir = t._download_dir;
 
 			hash = t.hash();
-			pieces = t._pieceCount + ', ' + Transmission.fmt.size(t._pieceSize);
+			pieces = t._pieceCount + ' pieces @ ' + Transmission.fmt.mem(t._pieceSize);
 			date_created = Transmission.fmt.timestamp( t._creator_date );
 		}
 

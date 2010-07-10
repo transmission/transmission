@@ -52,11 +52,11 @@ const char * mem_M_str = N_("MiB");
 const char * mem_G_str = N_("GiB");
 const char * mem_T_str = N_("TiB");
 
-const int disk_K = 1000;
-const char * disk_K_str = N_("kB");
-const char * disk_M_str = N_("MB");
-const char * disk_G_str = N_("GB");
-const char * disk_T_str = N_("TB");
+const int disk_K = 1024;
+const char * disk_K_str = N_("KiB");
+const char * disk_M_str = N_("MiB");
+const char * disk_G_str = N_("GiB");
+const char * disk_T_str = N_("TiB");
 
 const int speed_K = 1000;
 const char * speed_K_str = N_("kB/s");

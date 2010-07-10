@@ -1554,7 +1554,7 @@ tr_realpath( const char * path, char * resolved_path )
 struct formatter_unit
 {
     char * name;
-    unsigned long value;
+    uint64_t value;
 };
   
 struct formatter_units
@@ -1570,7 +1570,7 @@ formatter_init( struct formatter_units * units,
                 const char * kb, const char * mb,
                 const char * gb, const char * tb )
 {
-    unsigned long value = kilo;
+    uint64_t value = kilo;
     units->units[TR_FMT_KB].name = tr_strdup( kb );
     units->units[TR_FMT_KB].value = value;
 

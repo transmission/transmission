@@ -7,20 +7,29 @@
 
 Transmission.fmt = (function()
 {
+	var speed_K = 1000;
 	var speed_B_str = 'B';
 	var speed_K_str = 'kB/s';
 	var speed_M_str = 'MB/s';
 	var speed_G_str = 'GB/s';
+	var speed_T_str = 'TB/s';
 
+	var size_K = 1024;
 	var size_B_str = 'B';
 	var size_K_str = 'KiB';
 	var size_M_str = 'MiB';
 	var size_G_str = 'GiB';
+	var size_T_str = 'TiB';
+
+	var mem_K = 1024;
+	var mem_B_str = 'B';
+	var mem_K_str = 'KiB';
+	var mem_M_str = 'MiB';
+	var mem_G_str = 'GiB';
+	var mem_T_str = 'TiB';
 
 	return {
-		speed_K: 1000,
 
-		size_K: 1024,
 
 		/*
 		 *   Format a percentage to a string
@@ -47,64 +56,100 @@ Transmission.fmt = (function()
 		},
 
 		/**
-		 * Formats the bytes into a string value with B, KiB, MiB, or GiB units.
-		 *
+		 * Formats the a memory size into a human-readable string
 		 * @param {Number} bytes the filesize in bytes
-		 * @return {String} formatted string with B, KiB, MiB or GiB units.
+		 * @return {String} human-readable string
+		 */
+		mem: function( bytes )
+		{
+			if( bytes < mem_K )
+				return bytes + ' ' + mem_B_str;
+
+			var convertedSize;
+			var unit;
+
+			if( bytes < Math.pow( mem_K, 2 ) )
+			{
+				convertedSize = bytes / mem_K;
+				unit = mem_K_str;
+			}
+			else if( bytes < Math.pow( mem_K, 3 ) )
+			{
+				convertedSize = bytes / Math.pow( mem_K, 2 );
+				unit = mem_M_str;
+			}
+			else if( bytes < Math.pow( mem_K, 4 ) )
+			{
+				convertedSize = bytes / Math.pow( mem_K, 3 );
+				unit = mem_G_str;
+			}
+			else
+			{
+				convertedSize = bytes / Math.pow( mem_K, 4 );
+				unit = mem_T_str;
+			}
+
+			// try to have at least 3 digits and at least 1 decimal
+			return convertedSize <= 9.995 ? convertedSize.toTruncFixed(2) + ' ' + unit
+			                              : convertedSize.toTruncFixed(1) + ' ' + unit;
+		},
+
+		/**
+		 * Formats the a disk capacity or file size into a human-readable string
+		 * @param {Number} bytes the filesize in bytes
+		 * @return {String} human-readable string
 		 */
 		size: function( bytes )
 		{
-			var size_K = this.size_K;
-			var size_M = size_K * size_K;
-			var size_G = size_K * size_K * size_K;
-
-			if( !bytes )
-				return 'None';
 			if( bytes < size_K )
-				return bytes.toTruncFixed(0) + size_B_str;
+				return bytes + ' ' + size_B_str;
 
-			if( bytes < ( size_K * 100 ) )
-				return (bytes/size_K).toTruncFixed(2) + ' ' + size_K_str;
-			if( bytes < size_M )
-				return (bytes/size_K).toTruncFixed(1) + ' ' + size_K_str;
+			var convertedSize;
+			var unit;
 
-			if( bytes < ( size_M * 100 ) )
-				return (bytes/size_M).toTruncFixed(2) + ' ' + size_M_str;
-			if( bytes < size_G )
-				return (bytes/size_M).toTruncFixed(1) + ' ' + size_M_str;
-
-			if( bytes < ( size_G * 100 ) )
-				return (bytes/size_G).toTruncFixed(2) + ' ' + size_G_str;
+			if( bytes < Math.pow( size_K, 2 ) )
+			{
+				convertedSize = bytes / size_K;
+				unit = size_K_str;
+			}
+			else if( bytes < Math.pow( size_K, 3 ) )
+			{
+				convertedSize = bytes / Math.pow( size_K, 2 );
+				unit = size_M_str;
+			}
+			else if( bytes < Math.pow( size_K, 4 ) )
+			{
+				convertedSize = bytes / Math.pow( size_K, 3 );
+				unit = size_G_str;
+			}
 			else
-				return (bytes/size_G).toTruncFixed(1) + ' ' + size_G_str;
+			{
+				convertedSize = bytes / Math.pow( size_K, 4 );
+				unit = size_T_str;
+			}
+
+			// try to have at least 3 digits and at least 1 decimal
+			return convertedSize <= 9.995 ? convertedSize.toTruncFixed(2) + ' ' + unit
+			                              : convertedSize.toTruncFixed(1) + ' ' + unit;
 		},
 
-		speed: function( bytes )
+		speed: function( KBps )
 		{
-			var speed_K = this.speed_K;
-			var speed_M = speed_K * speed_K;
-			var speed_G = speed_K * speed_K * speed_K;
+			var speed = KBps;
 
-			if( bytes==undefined || bytes==0 )
-				return 'None';
+			if (speed <= 999.95) // 0 KBps to 999.9 K
+				return speed.toTruncFixed(1) + ' ' + speed_K_str;
 
-			if( bytes < speed_K )
-				return bytes.toTruncFixed(0) + ' ' + speed_B_str;
+			speed /= speed_K;
 
-			if( bytes < ( speed_K * 100 ) )
-				return (bytes/speed_K).toTruncFixed(2) + ' ' + speed_K_str;
-			if( bytes < speed_M )
-				return (bytes/speed_K).toTruncFixed(1) + ' ' + speed_K_str;
+			if (speed <= 99.995) // 1 M to 99.99 M
+				return speed.toTruncFixed(2) + ' ' + speed_M_str;
+			if (speed <= 999.95) // 100 M to 999.9 M
+				return speed.toTruncFixed(1) + ' ' + speed_M_str;
 
-			if( bytes < ( speed_M * 100 ) )
-				return (bytes/speed_M).toTruncFixed(2) + ' ' + speed_M_str;
-			if( bytes < speed_G )
-				return (bytes/speed_M).toTruncFixed(1) + ' ' + speed_M_str;
-
-			if( bytes < ( speed_G * 100 ) )
-				return (bytes/speed_G).toTruncFixed(2) + ' ' + speed_G_str;
-			else
-				return (bytes/speed_G).toTruncFixed(1) + ' ' + speed_G_str;
+			// insane speeds
+			speed /= speed_K;
+			return speed.toTruncFixed(2) + ' ' + speed_G_str;
 		},
 
 		timeInterval: function( seconds )
