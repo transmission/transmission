@@ -347,7 +347,7 @@ tr_cryptoWeakRandInt( int upperBound )
 
     if( !init )
     {
-        srand( tr_date( ) );
+        srand( tr_time_msec( ) );
         init = TRUE;
     }
 

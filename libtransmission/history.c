@@ -44,7 +44,7 @@ unsigned int
 tr_historyGet( const tr_recentHistory * h, uint64_t now, unsigned int msec )
 {
     unsigned int n = 0;
-    const uint64_t cutoff = (now?now:tr_date()) - msec;
+    const uint64_t cutoff = (now?now:tr_time_msec()) - msec;
     int i = h->newest;
 
     for( ;; )

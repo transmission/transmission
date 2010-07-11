@@ -39,14 +39,14 @@ void tr_historyFree( tr_recentHistory * );
 
 /**
  * @brief add a counter to the recent history object.
- * @param when the current time in msec, such as from tr_date()
+ * @param when the current time in msec, such as from tr_time_msec()
  * @param n how many items to add to the history's counter
  */
 void tr_historyAdd( tr_recentHistory *, uint64_t when, unsigned int n );
 
 /**
  * @brief count how many events have occurred in the last N seconds.
- * @param when the current time in msec, such as from tr_date()
+ * @param when the current time in msec, such as from tr_time_msec()
  * @param seconds how many seconds to count back through.
  */
 unsigned int tr_historyGet( const tr_recentHistory *, uint64_t when, unsigned int seconds );

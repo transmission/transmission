@@ -36,7 +36,7 @@ rateForInterval( const tr_ratecontrol * r,
                  uint64_t               now )
 {
     uint64_t       bytes = 0;
-    const uint64_t cutoff = (now?now:tr_date()) - interval_msec;
+    const uint64_t cutoff = (now?now:tr_time_msec()) - interval_msec;
     int            i = r->newest;
 
     for( ; ; )
@@ -76,7 +76,7 @@ void
 tr_rcTransferred( tr_ratecontrol * r,
                   size_t           size )
 {
-    const uint64_t now = tr_date ( );
+    const uint64_t now = tr_time_msec ( );
 
     if( r->transfers[r->newest].date + TR_RC_GRANULARITY_MSEC >= now )
         r->transfers[r->newest].size += size;

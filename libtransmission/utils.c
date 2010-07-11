@@ -785,7 +785,7 @@ tr_str_has_suffix( const char *str, const char *suffix )
 ****/
 
 uint64_t
-tr_date( void )
+tr_time_msec( void )
 {
     struct timeval tv;
 

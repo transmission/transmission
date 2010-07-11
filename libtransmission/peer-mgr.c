@@ -1183,7 +1183,7 @@ refillUpkeep( int foo UNUSED, short bar UNUSED, void * vmgr )
     managerLock( mgr );
 
     now = tr_time( );
-    now_msec = tr_date( );
+    now_msec = tr_time_msec( );
     too_old = now - REQUEST_TTL_SECS;
 
     tor = NULL;
@@ -1437,7 +1437,7 @@ peerCallbackFunc( tr_peer * peer, const tr_peer_event * e, void * vt )
             pieceListRemoveRequest( t, block );
 
             if( peer != NULL )
-                tr_historyAdd( peer->blocksSentToClient, tr_date( ), 1 );
+                tr_historyAdd( peer->blocksSentToClient, tr_time_msec( ), 1 );
 
             if( tr_cpBlockIsComplete( &tor->completion, block ) )
             {
@@ -2286,7 +2286,7 @@ tr_peerMgrWebSpeeds_KBps( const tr_torrent * tor )
     webseedCount = tr_ptrArraySize( &t->webseeds );
     assert( webseedCount == tor->info.webseedCount );
     ret = tr_new0( double, webseedCount );
-    now = tr_date( );
+    now = tr_time_msec( );
 
     for( i=0; i<webseedCount; ++i ) {
         int Bps;
@@ -2324,7 +2324,7 @@ tr_peerMgrPeerStats( const tr_torrent    * tor,
     size = tr_ptrArraySize( &t->peers );
     peers = (const tr_peer**) tr_ptrArrayBase( &t->peers );
     ret = tr_new0( tr_peer_stat, size );
-    now = tr_date( );
+    now = tr_time_msec( );
 
     for( i=0; i<size; ++i )
     {
@@ -2417,7 +2417,7 @@ static void
 rechokeDownloads( Torrent * t )
 {
     int i;
-    const uint64_t now = tr_date( );
+    const uint64_t now = tr_time_msec( );
     const int msec = 60 * 1000;
     const int MIN_INTERESTING_PEERS = 5;
     const int peerCount = tr_ptrArraySize( &t->peers );
@@ -2743,7 +2743,7 @@ rechokePulse( int foo UNUSED, short bar UNUSED, void * vmgr )
     tr_peerMgr * mgr = vmgr;
     managerLock( mgr );
 
-    now = tr_date( );
+    now = tr_time_msec( );
     while(( tor = tr_torrentNext( mgr->session, tor ))) {
         if( tor->isRunning ) {
             rechokeUploads( tor->torrentPeers, now );
@@ -2852,7 +2852,7 @@ getPeersToClose( Torrent * t, tr_close_type_t closeType, const time_t now, int *
         if( shouldPeerBeClosed( t, peers[i], peerCount, now ) == closeType )
             ret[outsize++] = peers[i];
 
-    sortPeersByLivelinessReverse ( ret, NULL, outsize, tr_date( ) );
+    sortPeersByLivelinessReverse ( ret, NULL, outsize, tr_time_msec( ) );
 
     *setmeSize = outsize;
     return ret;
@@ -3100,7 +3100,7 @@ reconnectPulse( int foo UNUSED, short bar UNUSED, void * vmgr )
 {
     tr_torrent * tor;
     tr_peerMgr * mgr = vmgr;
-    const uint64_t now = tr_date( );
+    const uint64_t now = tr_time_msec( );
 
     /**
     ***  enforce the per-session and per-torrent peer limits
@@ -3445,7 +3445,7 @@ getPeerCandidates( tr_session * session, int * candidateCount )
     struct peer_candidate * candidates;
     struct peer_candidate * walk;
     const time_t now = tr_time( );
-    const uint64_t now_msec = tr_date( );
+    const uint64_t now_msec = tr_time_msec( );
     /* leave 5% of connection slots for incoming connections -- ticket #2609 */
     const int maxCandidates = tr_sessionGetPeerLimit( session ) * 0.95;
 

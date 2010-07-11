@@ -474,7 +474,7 @@ tr_fdFileGetCached( tr_session       * session,
 
     if( ( match != NULL ) && ( !doWrite || match->isWritable ) )
     {
-        match->date = tr_date( );
+        match->date = tr_time_msec( );
         return match->fd;
     }
 
@@ -532,7 +532,7 @@ tr_fdFileCheckout( tr_session             * session,
     dbgmsg( "it's not already open.  looking for an open slot or an old file." );
     while( winner < 0 )
     {
-        uint64_t date = tr_date( ) + 1;
+        uint64_t date = tr_time_msec( ) + 1;
 
         /* look for the file that's been open longest */
         for( i=0; i<gFd->openFileLimit; ++i )
@@ -582,7 +582,7 @@ tr_fdFileCheckout( tr_session             * session,
     dbgmsg( "checking out '%s' in slot %d", filename, winner );
     o->torrentId = torrentId;
     o->fileNum = fileNum;
-    o->date = tr_date( );
+    o->date = tr_time_msec( );
     return o->fd;
 }
 

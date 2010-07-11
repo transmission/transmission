@@ -34,7 +34,7 @@ static unsigned int
 getSpeed_Bps( const struct bratecontrol * r, unsigned int interval_msec, uint64_t now )
 {
     uint64_t       bytes = 0;
-    const uint64_t cutoff = (now?now:tr_date()) - interval_msec;
+    const uint64_t cutoff = (now?now:tr_time_msec()) - interval_msec;
     int            i = r->newest;
 
     for( ;; )
@@ -381,5 +381,5 @@ tr_bandwidthUsed( tr_bandwidth  * b,
                   size_t          byteCount,
                   tr_bool         isPieceData )
 {
-    bandwidthUsedImpl( b, dir, byteCount, isPieceData, tr_date( ) );
+    bandwidthUsedImpl( b, dir, byteCount, isPieceData, tr_time_msec( ) );
 }

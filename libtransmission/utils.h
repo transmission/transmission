@@ -265,7 +265,7 @@ void tr_timerAddMsec( struct event * timer, int milliseconds ) TR_GNUC_NONNULL(1
 
 
 /** @brief return the current date in milliseconds */
-uint64_t tr_date( void );
+uint64_t tr_time_msec( void );
 
 /** @brief sleep the specified number of milliseconds */
 void tr_wait_msec( long int delay_milliseconds );
