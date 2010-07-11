@@ -446,7 +446,7 @@ ul.torrent_list li.torrent div.torrent_progress_bar {
 	background-color: transparent;
 }
 
-ul.torrent_list li.torrent div.torrent_progress_bar.compact {
+ul.torrent_list li.torrent div.torrent_progress_bar.complete {
 	background-position: left -10px;
 	border: 1px solid #29AD35;
 }
