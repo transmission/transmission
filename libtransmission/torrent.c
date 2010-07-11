@@ -1742,8 +1742,6 @@ tr_torrentRecheckCompleteness( tr_torrent * tor )
                 tor->doneDate = tor->anyDate = tr_time( );
             }
 
-            tr_torrentCheckSeedRatio( tor );
-
             if( tor->currentDir == tor->incompleteDir )
                 tr_torrentSetLocation( tor, tor->downloadDir, TRUE, NULL, NULL );
 
