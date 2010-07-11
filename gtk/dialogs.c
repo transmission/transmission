@@ -64,20 +64,7 @@ quitresp( GtkWidget * widget,
     gtk_widget_destroy( widget );
 }
 
-static gboolean
-countActiveTorrents( GtkTreeModel *       model,
-                     GtkTreePath   * path UNUSED,
-                     GtkTreeIter *        iter,
-                     gpointer             activeTorrentCount )
-{
-    int activity = -1;
-    gtk_tree_model_get( model, iter, MC_ACTIVITY, &activity, -1 );
-    if( activity != TR_STATUS_STOPPED )
-        *(int*)activeTorrentCount += 1;
-    return FALSE; /* keep iterating */
-}
-
-void
+GtkWidget *
 askquit( TrCore *       core,
          GtkWindow *    parent,
          callbackfunc_t func,
@@ -87,25 +74,6 @@ askquit( TrCore *       core,
     GtkWidget *       w;
     GtkWidget *       wind;
     GtkWidget *       dontask;
-    GtkTreeModel *    model;
-    int               activeTorrentCount;
-
-    /* if the user doesn't want to be asked, don't ask */
-    if( !pref_flag_get( PREF_KEY_ASKQUIT ) )
-    {
-        func( cbdata );
-        return;
-    }
-
-    /* if there aren't any active torrents, don't ask */
-    model = tr_core_model( core );
-    activeTorrentCount = 0;
-    gtk_tree_model_foreach( model, countActiveTorrents, &activeTorrentCount );
-    if( !activeTorrentCount )
-    {
-        func( cbdata );
-        return;
-    }
 
     stuff          = g_new( struct quitdata, 1 );
     stuff->func    = func;
@@ -142,6 +110,8 @@ askquit( TrCore *       core,
     gtk_widget_grab_focus( w );
 
     gtk_widget_show_all( wind );
+
+    return wind;
 }
 
 /***

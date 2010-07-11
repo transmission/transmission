@@ -34,10 +34,10 @@
 typedef void ( *callbackfunc_t )( gpointer );
 
 /* prompt if the user wants to quit, calls func with cbdata if they do */
-void askquit( TrCore          * core,
-              GtkWindow       * parent,
-              callbackfunc_t    func,
-              gpointer          cbdata );
+GtkWidget *  askquit( TrCore          * core,
+                      GtkWindow       * parent,
+                      callbackfunc_t    func,
+                      gpointer          cbdata );
 
 void confirmRemove( GtkWindow * parent,
                     TrCore    * core,
