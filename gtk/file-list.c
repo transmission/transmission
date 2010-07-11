@@ -587,6 +587,64 @@ renderPriority( GtkTreeViewColumn  * column UNUSED,
     g_object_set( renderer, "text", text, NULL );
 }
 
+/* build a filename from tr_torrentGetCurrentDir() + the model's FC_LABELs */
+static char*
+buildFilename( tr_torrent * tor, GtkTreeModel * model,
+               GtkTreePath * path, GtkTreeIter * iter )
+{
+    char * ret;
+    GtkTreeIter child;
+    GtkTreeIter parent = *iter;
+    int n = gtk_tree_path_get_depth( path );
+    char ** tokens = g_new0( char*, n + 2 );
+    tokens[0] = g_strdup( tr_torrentGetCurrentDir( tor ) );
+    do {
+        child = parent;
+        gtk_tree_model_get( model, &child, FC_LABEL, &tokens[n--], -1 );
+    } while( gtk_tree_model_iter_parent( model, &parent, &child ) );
+    ret = g_build_filenamev( tokens );
+    g_strfreev( tokens );
+    return ret;
+}
+
+static gboolean
+onRowActivated( GtkTreeView * view, GtkTreePath * path,
+                GtkTreeViewColumn * col UNUSED, gpointer gdata )
+{
+    gboolean handled = FALSE;
+    FileData * data = gdata;
+    tr_torrent * tor = tr_torrentFindFromId( tr_core_session( data->core ), data->torrentId );
+
+    if( tor != NULL )
+    {
+        GtkTreeIter iter;
+        GtkTreeModel * model = gtk_tree_view_get_model( view );
+
+        if( gtk_tree_model_get_iter( model, &iter, path ) )
+        {
+            int prog;
+            char * filename = buildFilename( tor, model, path, &iter );
+            gtk_tree_model_get( model, &iter, FC_PROG, &prog, -1 );
+
+            /* if the file's not done, walk up the directory tree until we find
+             * an ancestor that exists, and open that instead */
+            if( filename && ( prog<100 || !g_file_test( filename, G_FILE_TEST_EXISTS ) ) ) do
+            {
+                char * tmp = g_path_get_dirname( filename );
+                g_free( filename );
+                filename = tmp;
+            }
+            while( filename && *filename && !g_file_test( filename, G_FILE_TEST_EXISTS ) );
+
+            if(( handled = filename && *filename ))
+                gtr_open_file( filename );
+        }
+    }
+
+    return handled;
+}
+
+
 static gboolean
 onViewButtonPressed( GtkWidget * w, GdkEventButton * event, gpointer gdata )
 {
@@ -700,6 +758,8 @@ file_list_new( TrCore * core, int torrentId )
     gtk_container_set_border_width( GTK_CONTAINER( view ), GUI_PAD_BIG );
     g_signal_connect( view, "button-press-event",
                       G_CALLBACK( onViewButtonPressed ), data );
+    g_signal_connect( view, "row_activated",
+                      G_CALLBACK( onRowActivated ), data );
     g_signal_connect( view, "button-release-event",
                       G_CALLBACK( on_tree_view_button_released ), NULL );
 
