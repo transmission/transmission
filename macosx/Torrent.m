@@ -1479,6 +1479,9 @@ int trashDataFile(const char * filename)
 
 - (NSInteger) stalledMinutes
 {
+    if (fStat->idleSecs == -1)
+        return -1;
+    
     return fStat->idleSecs / 60;
 }
 
