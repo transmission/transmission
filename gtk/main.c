@@ -305,11 +305,12 @@ accumulateCanUpdateForeach( GtkTreeModel *      model,
     *(int*)accumulated_status |= tr_torrentCanManualUpdate( tor );
 }
 
-static void
-refreshActions( struct cbdata * data )
+static gboolean
+refreshActions( gpointer gdata )
 {
     int canUpdate;
     struct counts_data counts;
+    struct cbdata * data = gdata;
     GtkTreeSelection * s = data->sel;
 
     counts.activeCount = 0;
@@ -344,12 +345,14 @@ refreshActions( struct cbdata * data )
         action_sensitize( "pause-all-torrents", active != 0 );
         action_sensitize( "start-all-torrents", active != total );
     }
+
+    return FALSE;
 }
 
 static void
 selectionChangedCB( GtkTreeSelection * s UNUSED, gpointer data )
 {
-    refreshActions( data );
+    gtr_idle_add( refreshActions, data );
 }
 
 static void
