@@ -1001,6 +1001,11 @@ tr_torrentStat( tr_torrent * tor )
     s->doneDate     = tor->doneDate;
     s->startDate    = tor->startDate;
 
+    if (s->activity == TR_STATUS_DOWNLOAD || s->activity == TR_STATUS_SEED)
+        s->idleSecs = difftime(tr_time(), tor->anyDate);
+    else
+        s->idleSecs = -1;
+
     s->corruptEver     = tor->corruptCur    + tor->corruptPrev;
     s->downloadedEver  = tor->downloadedCur + tor->downloadedPrev;
     s->uploadedEver    = tor->uploadedCur   + tor->uploadedPrev;

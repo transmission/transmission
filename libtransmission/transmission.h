@@ -1843,6 +1843,10 @@ typedef struct tr_stat
     /** The last time we uploaded or downloaded piece data on this torrent. */
     time_t    activityDate;
     
+    /** Number of seconds since the last activity (or since started).
+        -1 if activity is not seeding or downloading. */
+    int    idleSecs;
+    
     /** A torrent is considered finished if it has met its seed ratio.
         As a result, only paused torrents can be finished. */
     tr_bool   finished;
