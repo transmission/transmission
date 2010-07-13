@@ -1473,7 +1473,7 @@ tr_moveFile( const char * oldpath, const char * newpath, tr_bool * renamed )
     while( bytesLeft > 0 )
     {
         ssize_t bytesWritten;
-        const off_t bytesThisPass = MIN( bytesLeft, buflen );
+        const off_t bytesThisPass = MIN( bytesLeft, (off_t)buflen );
         const int numRead = read( in, buf, bytesThisPass );
         if( numRead < 0 )
             break;
