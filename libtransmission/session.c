@@ -999,9 +999,7 @@ setPeerPort( tr_session * session, tr_port port )
 void
 tr_sessionSetPeerPort( tr_session * session, tr_port port )
 {
-    assert( tr_isSession( session ) );
-
-    if( session->peerPort != port )
+    if( tr_isSession( session ) && ( session->peerPort != port ) )
     {
         setPeerPort( session, port );
     }
@@ -1010,9 +1008,7 @@ tr_sessionSetPeerPort( tr_session * session, tr_port port )
 tr_port
 tr_sessionGetPeerPort( const tr_session * session )
 {
-    assert( tr_isSession( session ) );
-
-    return session->peerPort;
+    return tr_isSession( session ) ? session->peerPort : 0;
 }
 
 tr_port
