@@ -1012,9 +1012,7 @@ setPeerPort( tr_session * session, tr_port port )
 void
 tr_sessionSetPeerPort( tr_session * session, tr_port port )
 {
-    assert( tr_isSession( session ) );
-
-    if( session->private_peer_port != port )
+    if( tr_isSession( session ) && ( session->private_peer_port != port ) )
     {
         setPeerPort( session, port );
     }
@@ -1023,9 +1021,7 @@ tr_sessionSetPeerPort( tr_session * session, tr_port port )
 tr_port
 tr_sessionGetPeerPort( const tr_session * session )
 {
-    assert( tr_isSession( session ) );
-
-    return session->private_peer_port;
+    return tr_isSession( session ) ? session->private_peer_port : 0;
 }
 
 tr_port
