@@ -522,6 +522,7 @@ Transmission.prototype =
 	{
 		this.updateButtonStates();
 		this.updateInspector();
+		this.updateSelectedData();
 	},
 
 	/*--------------------------------------------
@@ -830,6 +831,38 @@ Transmission.prototype =
 	},
 
 	/*
+	 * Turn the periodic ajax torrents refresh on & off for the selected torrents
+	 */
+	periodicTorrentUpdate: function( ids ) {
+		var tr = this;
+		if( ids ) {
+			var curIds = this._extra_data_ids;
+			if( curIds == null )
+				curIds = [ ];
+			if( ids.length == curIds.length ) {
+				var duplicate = true;
+				for(var i = 0; i < ids.length; i++ ) {
+					if( ids[i] != curIds[i] ) {
+						duplicate = false;
+						break;
+					}
+				}
+				if( duplicate ) return;
+			}
+			tr.refreshTorrents(ids);
+			clearInterval(this._metadata_refresh);
+			// sanity check
+			if( !this[Prefs._RefreshRate] ) this[Prefs._RefreshRate] = 5;
+			this._metadata_refresh = setInterval(function(){ tr.refreshTorrents(ids); }, this[Prefs._RefreshRate] * 1000 );
+			this._extra_data_ids = ids;
+		} else {
+			clearInterval(this._metadata_refresh);
+			this._metadata_refresh = null;
+			this._extra_data_ids = null;
+		}
+	},
+
+	/*
 	 * Turn the periodic ajax session refresh on & off
 	 */
 	togglePeriodicSessionRefresh: function(state) {
@@ -874,6 +907,15 @@ Transmission.prototype =
 		var args = { };
 		args[RPC._TurtleState] = this[Prefs._TurtleState];
 		this.remote.savePrefs( args );
+	},
+
+	updateSelectedData: function()
+	{
+		var ids = jQuery.map(this.getSelectedTorrents( ), function(t) { return t.id(); } );
+		if( ids.length > 0 )
+			this.periodicTorrentUpdate( ids );
+		else
+			this.periodicTorrentUpdate( false );
 	},
 
 	updateTurtleButton: function() {
