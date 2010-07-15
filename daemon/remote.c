@@ -1856,7 +1856,7 @@ processArgs( const char * host, int port, int argc, const char ** argv )
                           break;
                 case 'C': tr_bencDictAddBool( args, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED, FALSE );
                           break;
-                case 'e': tr_bencDictAddReal( args, TR_PREFS_KEY_MAX_CACHE_SIZE_MB, atof(optarg) );
+                case 'e': tr_bencDictAddInt( args, TR_PREFS_KEY_MAX_CACHE_SIZE_MB, atoi(optarg) );
                           break;
                 case 910: tr_bencDictAddStr( args, TR_PREFS_KEY_ENCRYPTION, "required" );
                           break;
