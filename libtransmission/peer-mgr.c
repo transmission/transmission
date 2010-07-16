@@ -3165,7 +3165,7 @@ bandwidthPulse( int foo UNUSED, short bar UNUSED, void * vmgr )
     /* possibly stop torrents that have seeded enough */
     tor = NULL;
     while(( tor = tr_torrentNext( mgr->session, tor )))
-        tr_torrentCheckSeedRatio( tor );
+        tr_torrentCheckSeedLimit( tor );
 
     /* run the completeness check for any torrents that need it */
     tor = NULL;

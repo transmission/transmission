@@ -107,7 +107,7 @@ static inline double tr_cpPercentDone( const tr_completion * cp )
 {
     const double ratio = tr_getRatio( cp->sizeNow, tr_cpSizeWhenDone( cp ) );
     const int iratio = (int)ratio;
-    return ((iratio == TR_RATIO_NA) || (iratio == TR_RATIO_INF)) ? 0.0f : ratio;
+    return ((iratio == TR_RATIO_NA) || (iratio == TR_RATIO_INF)) ? 0.0 : ratio;
 }
 
 /**

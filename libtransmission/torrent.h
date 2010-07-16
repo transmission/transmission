@@ -107,7 +107,7 @@ time_t*          tr_torrentGetMTimes( const tr_torrent  * tor,
 tr_torrent*      tr_torrentNext( tr_session  * session,
                                  tr_torrent  * current );
 
-void             tr_torrentCheckSeedRatio( tr_torrent * tor );
+void             tr_torrentCheckSeedLimit( tr_torrent * tor );
 
 /** save a torrent's .resume file if it's changed since the last time it was saved */
 void             tr_torrentSave( tr_torrent * tor );
@@ -229,6 +229,9 @@ struct tr_torrent
     tr_torrent_ratio_limit_hit_func  * ratio_limit_hit_func;
     void                             * ratio_limit_hit_func_user_data;
 
+    tr_torrent_inactive_limit_hit_func  * inactive_limit_hit_func;
+    void                                * inactive_limit_hit_func_user_data;
+
     tr_bool                    isRunning;
     tr_bool                    isStopping;
     tr_bool                    isDeleting;
@@ -254,6 +257,9 @@ struct tr_torrent
 
     double                     desiredRatio;
     tr_ratiolimit              ratioLimitMode;
+
+    uint64_t                   inactiveLimitMinutes;
+    tr_inactvelimit            inactiveLimitMode;
 
     uint64_t                   preVerifyTotal;
 };

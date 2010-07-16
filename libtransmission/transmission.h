@@ -170,6 +170,8 @@ const char* tr_getDefaultDownloadDir( void );
 #define TR_PREFS_KEY_LPD_ENABLED                   "lpd-enabled"
 #define TR_PREFS_KEY_DOWNLOAD_DIR                  "download-dir"
 #define TR_PREFS_KEY_ENCRYPTION                    "encryption"
+#define TR_PREFS_KEY_INACTIVE_LIMIT                "inactive-limit"
+#define TR_PREFS_KEY_INACTIVE_LIMIT_ENABLED        "inactive-limit-enabled"
 #define TR_PREFS_KEY_INCOMPLETE_DIR                "incomplete-dir"
 #define TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED        "incomplete-dir-enabled"
 #define TR_PREFS_KEY_LAZY_BITFIELD                 "lazy-bitfield-enabled"
@@ -723,6 +725,12 @@ tr_bool    tr_sessionIsRatioLimited   ( const tr_session * );
 void       tr_sessionSetRatioLimit    ( tr_session *, double desiredRatio );
 double     tr_sessionGetRatioLimit    ( const tr_session * );
 
+void       tr_sessionSetInactivityLimited  ( tr_session *, tr_bool isLimited );
+tr_bool    tr_sessionIsInactivityLimited   ( const tr_session * );
+
+void       tr_sessionSetInactiveLimit      ( tr_session *, uint64_t inactivityMinutes );
+uint64_t   tr_sessionGetInactiveLimit      ( const tr_session * );
+
 void       tr_sessionSetPeerLimit( tr_session *, uint16_t maxGlobalPeers );
 uint16_t   tr_sessionGetPeerLimit( const tr_session * );
 
@@ -1159,6 +1167,32 @@ double        tr_torrentGetRatioLimit( const tr_torrent  * tor );
 
 tr_bool       tr_torrentGetSeedRatio( const tr_torrent *, double * ratio );
 
+
+/****
+*****  Inactive Time Limits
+****/
+
+typedef enum
+{
+    TR_INACTIVELIMIT_GLOBAL    = 0, /* follow the global settings */
+    TR_INACTIVELIMIT_SINGLE    = 1, /* override the global settings, seeding until a certain inactive time */
+    TR_INACTIVELIMIT_UNLIMITED = 2  /* override the global settings, seeding regardless of activity */
+}
+tr_inactvelimit;
+
+void          tr_torrentSetInactiveMode( tr_torrent         * tor,
+                                         tr_inactvelimit      mode );
+
+tr_ratiolimit tr_torrentGetInactiveMode( const tr_torrent   * tor );
+
+void          tr_torrentSetInactiveLimit( tr_torrent        * tor,
+                                          uint64_t            inactiveMinutes );
+
+uint64_t      tr_torrentGetInactiveLimit( const tr_torrent  * tor );
+
+
+tr_bool       tr_torrentGetSeedInactive( const tr_torrent *, uint64_t * inactiveMinutes );
+
 /****
 *****  Peer Limits
 ****/
@@ -1288,6 +1322,10 @@ typedef void ( tr_torrent_completeness_func )( tr_torrent       * torrent,
 typedef void ( tr_torrent_ratio_limit_hit_func )( tr_torrent   * torrent,
                                                   void         * user_data );
 
+typedef void ( tr_torrent_inactive_limit_hit_func )( tr_torrent   * torrent,
+                                                    void         * user_data );
+
+
 /**
  * Register to be notified whenever a torrent's "completeness"
  * changes.  This will be called, for example, when a torrent
@@ -1336,6 +1374,20 @@ void tr_torrentSetRatioLimitHitCallback(
      void                           * user_data );
 
 void tr_torrentClearRatioLimitHitCallback( tr_torrent * torrent );
+
+/**
+ * Register to be notified whenever a torrent's inactivity limit
+ * has been hit. This will be called when the seeding torrent's
+ * idle time has met or exceeded the designated inactivity limit.
+ *
+ * Has the same restrictions as tr_torrentSetCompletenessCallback
+ */
+void tr_torrentSetInactivityLimitHitCallback(
+     tr_torrent                          * torrent,
+     tr_torrent_inactive_limit_hit_func  func,
+     void                                * user_data );
+
+void tr_torrentClearInactiveLimitHitCallback( tr_torrent * torrent );
 
 
 /**
@@ -1846,7 +1898,7 @@ typedef struct tr_stat
     /** Number of seconds since the last activity (or since started).
         -1 if activity is not seeding or downloading. */
     int    idleSecs;
-    
+
     /** A torrent is considered finished if it has met its seed ratio.
         As a result, only paused torrents can be finished. */
     tr_bool   finished;

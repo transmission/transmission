@@ -37,7 +37,7 @@
     NSString * fInitialString;
     
     IBOutlet NSPopUpButton * fFolderPopUp, * fIncompleteFolderPopUp, * fImportFolderPopUp;
-    IBOutlet NSTextField * fRatioStopField, * fQueueDownloadField, * fQueueSeedField, * fStalledField;
+    IBOutlet NSTextField * fRatioStopField, * fInactiveStopField, * fQueueDownloadField, * fQueueSeedField, * fStalledField;
 
     IBOutlet NSTextField * fUploadField, * fDownloadField,
                         * fSpeedLimitUploadField, * fSpeedLimitDownloadField;
@@ -115,8 +115,11 @@
 - (void) setRenamePartialFiles: (id) sender;
 
 - (void) applyRatioSetting: (id) sender;
-- (void) updateRatioStopField;
 - (void) setRatioStop: (id) sender;
+- (void) updateRatioStopField;
+
+- (void) applyInactiveStopSetting: (id) sender;
+- (void) setInactiveStop: (id) sender;
 
 - (void) applySpeedSettings: (id) sender;
 - (void) applyAltSpeedSettings;

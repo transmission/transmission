@@ -139,20 +139,28 @@
     [fGlobalLimitCheck setState: globalUseSpeedLimit];
     [fGlobalLimitCheck setEnabled: YES];
     
-    //get ratio info
+    //get ratio and inactive info
     enumerator = [fTorrents objectEnumerator];
     torrent = [enumerator nextObject]; //first torrent
     
-    NSInteger checkRatio = [torrent ratioSetting];
+    NSInteger checkRatio = [torrent ratioSetting], checkInactive = [torrent inactiveSetting];
     CGFloat ratioLimit = [torrent ratioLimit];
+    NSUInteger inactiveLimit = [torrent inactiveLimitMinutes];
     
-    while ((torrent = [enumerator nextObject]) && (checkRatio != INVALID || ratioLimit != INVALID))
+    while ((torrent = [enumerator nextObject])
+            && (checkRatio != INVALID || ratioLimit != INVALID || checkInactive != INVALID || inactiveLimit != INVALID))
     {
         if (checkRatio != INVALID && checkRatio != [torrent ratioSetting])
             checkRatio = INVALID;
         
         if (ratioLimit != INVALID && ratioLimit != [torrent ratioLimit])
             ratioLimit = INVALID;
+        
+        if (checkInactive != INVALID && checkInactive != [torrent inactiveSetting])
+            checkInactive = INVALID;
+        
+        if (inactiveLimit != INVALID && inactiveLimit != [torrent inactiveLimitMinutes])
+            inactiveLimit = INVALID;
     }
     
     //set ratio view
@@ -173,6 +181,25 @@
         [fRatioLimitField setFloatValue: ratioLimit];
     else
         [fRatioLimitField setStringValue: @""];
+    
+    //set inactive view
+    if (checkInactive == TR_INACTIVELIMIT_SINGLE)
+        index = OPTION_POPUP_LIMIT;
+    else if (checkInactive == TR_INACTIVELIMIT_UNLIMITED)
+        index = OPTION_POPUP_NO_LIMIT;
+    else if (checkInactive == TR_INACTIVELIMIT_GLOBAL)
+        index = OPTION_POPUP_GLOBAL;
+    else
+        index = -1;
+    [fInactivePopUp selectItemAtIndex: index];
+    [fInactivePopUp setEnabled: YES];
+    
+    [fInactiveLimitField setHidden: checkInactive != TR_INACTIVELIMIT_SINGLE];
+    if (inactiveLimit != INVALID)
+        [fInactiveLimitField setIntegerValue: inactiveLimit];
+    else
+        [fInactiveLimitField setStringValue: @""];
+    [fInactiveLimitLabel setHidden: checkInactive != TR_INACTIVELIMIT_SINGLE];
     
     //get priority info
     enumerator = [fTorrents objectEnumerator];
@@ -298,10 +325,51 @@
 
 - (void) setRatioLimit: (id) sender
 {
-    CGFloat limit = [sender floatValue];
+    const CGFloat limit = [sender floatValue];
     
     for (Torrent * torrent in fTorrents)
         [torrent setRatioLimit: limit];
+}
+
+- (void) setInactiveSetting: (id) sender
+{
+    NSInteger setting;
+    bool single = NO;
+    switch ([sender indexOfSelectedItem])
+    {
+        case OPTION_POPUP_LIMIT:
+            setting = TR_INACTIVELIMIT_SINGLE;
+            single = YES;
+            break;
+        case OPTION_POPUP_NO_LIMIT:
+            setting = TR_INACTIVELIMIT_UNLIMITED;
+            break;
+        case OPTION_POPUP_GLOBAL:
+            setting = TR_INACTIVELIMIT_GLOBAL;
+            break;
+        default:
+            NSAssert1(NO, @"Unknown option selected in inactive popup: %d", [sender indexOfSelectedItem]);
+            return;
+    }
+    
+    for (Torrent * torrent in fTorrents)
+        [torrent setInactiveSetting: setting];
+    
+    [fInactiveLimitField setHidden: !single];
+    [fInactiveLimitLabel setHidden: !single];
+    if (single)
+    {
+        [fInactiveLimitField selectText: self];
+        [[[self view] window] makeKeyAndOrderFront: self];
+    }
+}
+
+- (void) setInactiveLimit: (id) sender
+{
+    const NSUInteger limit = [sender integerValue];
+    
+    for (Torrent * torrent in fTorrents)
+        [torrent setInactiveLimitMinutes: limit];
 }
 
 - (void) setPriority: (id) sender
@@ -387,6 +455,12 @@
         [fRatioPopUp selectItemAtIndex: -1];
         [fRatioLimitField setHidden: YES];
         [fRatioLimitField setStringValue: @""];
+        
+        [fInactivePopUp setEnabled: NO];
+        [fInactivePopUp selectItemAtIndex: -1];
+        [fInactiveLimitField setHidden: YES];
+        [fInactiveLimitField setStringValue: @""];
+        [fInactiveLimitLabel setHidden: YES];
         
         [fPeersConnectField setEnabled: NO];
         [fPeersConnectField setStringValue: @""];

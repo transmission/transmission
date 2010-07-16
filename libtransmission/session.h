@@ -95,6 +95,7 @@ struct tr_session
     tr_bool                      useLazyBitfield;
     tr_bool                      isIncompleteFileNamingEnabled;
     tr_bool                      isRatioLimited;
+    tr_bool                      isInactivityLimited;
     tr_bool                      isIncompleteDirEnabled;
     tr_bool                      pauseAddedTorrent;
     tr_bool                      deleteSourceTorrent;
@@ -184,6 +185,8 @@ struct tr_session
     struct tr_bandwidth        * bandwidth;
 
     double                       desiredRatio;
+    
+    uint64_t                     inactiveLimitMinutes;
 
     struct tr_bindinfo         * public_ipv4;
     struct tr_bindinfo         * public_ipv6;
