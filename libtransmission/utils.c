@@ -1528,7 +1528,6 @@ tr_valloc( size_t bufLen )
     if( !buf )
         buf = malloc( allocLen );
 
-    tr_dbg( "tr_valloc(%zu) allocating %zu bytes", bufLen, allocLen );
     return buf;
 }
 
