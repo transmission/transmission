@@ -8,55 +8,55 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-05-20 11:39-0500\n"
-"PO-Revision-Date: 2009-11-25 00:03+0000\n"
-"Last-Translator: Xuacu Saturio <xuacusk8@gmail.com>\n"
+"PO-Revision-Date: 2010-06-27 20:53+0000\n"
+"Last-Translator: Iñigo Varela <malditoastur@gmail.com>\n"
 "Language-Team: Asturian <ast@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2010-06-16 00:16+0000\n"
+"X-Launchpad-Export-Date: 2010-07-19 18:20+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:55
 msgid "Sort by _Activity"
-msgstr "Ordenar por _Actividá"
+msgstr "Axeitar por _Actividá"
 
 #: ../gtk/actions.c:56
 msgid "Sort by _Name"
-msgstr "Ordenar por _Nome"
+msgstr "Axeitar por _Nome"
 
 #: ../gtk/actions.c:57
 msgid "Sort by _Progress"
-msgstr "Ordenar por _Progresu"
+msgstr "Axeitar por _Progresu"
 
 #: ../gtk/actions.c:58
 msgid "Sort by Rati_o"
-msgstr ""
+msgstr "_Axeitar por ratio"
 
 #: ../gtk/actions.c:59
 msgid "Sort by Stat_e"
-msgstr ""
+msgstr "Axeitar por _estáu"
 
 #: ../gtk/actions.c:60
 msgid "Sort by T_racker"
-msgstr ""
+msgstr "Axeitar por _rastreador"
 
 #: ../gtk/actions.c:61
 msgid "Sort by A_ge"
-msgstr "Ordenar por E_dá"
+msgstr "Axeitar por E_dá"
 
 #: ../gtk/actions.c:62
 msgid "Sort by Time _Left"
-msgstr ""
+msgstr "Axeitar por tiempu re_stante"
 
 #: ../gtk/actions.c:63
 msgid "Sort by Si_ze"
-msgstr "Ordenar por Tama_ñu"
+msgstr "Axeitar por Tama_ñu"
 
 #: ../gtk/actions.c:80
 msgid "_Show Transmission"
-msgstr ""
+msgstr "Amo_sar Transmission"
 
 #: ../gtk/actions.c:81
 msgid "Message _Log"
@@ -64,19 +64,19 @@ msgstr "_Rexistru de mensaxes"
 
 #: ../gtk/actions.c:96
 msgid "Enable Temporary Speed _Limits"
-msgstr ""
+msgstr "Activar _llímites temporales de velocidá"
 
 #: ../gtk/actions.c:97
 msgid "_Compact View"
-msgstr ""
+msgstr "Vista _compauta"
 
 #: ../gtk/actions.c:98
 msgid "Re_verse Sort Order"
-msgstr ""
+msgstr "Inver_tir l'orde"
 
 #: ../gtk/actions.c:99
 msgid "_Filterbar"
-msgstr "Barra de _fieltru"
+msgstr "Barra de _peñera"
 
 #: ../gtk/actions.c:100
 msgid "_Statusbar"
@@ -96,11 +96,11 @@ msgstr "_Torrent"
 
 #: ../gtk/actions.c:108
 msgid "_View"
-msgstr "_Agüeyar"
+msgstr "_Ver"
 
 #: ../gtk/actions.c:109
 msgid "_Sort Torrents By"
-msgstr "_Ordenar torrents por"
+msgstr "_Axeitar torrents por"
 
 #: ../gtk/actions.c:110
 msgid "_Edit"
@@ -112,15 +112,15 @@ msgstr "_Aida"
 
 #: ../gtk/actions.c:112
 msgid "Copy _Magnet Link to Clipboard"
-msgstr ""
+msgstr "Copiar enllaz _Magnet al cartafueyu"
 
 #: ../gtk/actions.c:113
 msgid "Add _URL..."
-msgstr ""
+msgstr "Amestar _URL..."
 
 #: ../gtk/actions.c:113
 msgid "Add URL..."
-msgstr ""
+msgstr "Amestar URL…"
 
 #: ../gtk/actions.c:114 ../gtk/actions.c:115
 msgid "Add a torrent"
@@ -128,7 +128,7 @@ msgstr "Amestar un torrent"
 
 #: ../gtk/actions.c:115
 msgid "_Add File..."
-msgstr ""
+msgstr "_Amestar ficheru…"
 
 #: ../gtk/actions.c:116
 msgid "_Start"
@@ -144,7 +144,7 @@ msgstr "E_stadístiques"
 
 #: ../gtk/actions.c:118
 msgid "_Donate"
-msgstr ""
+msgstr "_Donar"
 
 #: ../gtk/actions.c:119
 msgid "_Verify Local Data"
@@ -237,7 +237,7 @@ msgstr "Opciones Torrent"
 
 #: ../gtk/add-dialog.c:295 ../gtk/tr-prefs.c:302
 msgid "Mo_ve .torrent file to the trash"
-msgstr ""
+msgstr "Mo_ver ficheru .torrent a la papelera"
 
 #: ../gtk/add-dialog.c:297 ../gtk/tr-prefs.c:298
 msgid "_Start when added"
@@ -261,7 +261,7 @@ msgstr "Seleicionar Carpeta Destinu"
 
 #: ../gtk/add-dialog.c:353 ../gtk/details.c:478
 msgid "Torrent _priority:"
-msgstr ""
+msgstr "_Prioridá de torrent:"
 
 #: ../gtk/add-dialog.c:437
 msgid "Add a Torrent"
@@ -269,19 +269,19 @@ msgstr "Amestar un Torrent"
 
 #: ../gtk/add-dialog.c:454 ../gtk/tr-prefs.c:294
 msgid "Show _options dialog"
-msgstr ""
+msgstr "Amosar el diálogu _opciones"
 
 #: ../gtk/add-dialog.c:532
 msgid "Add URL"
-msgstr ""
+msgstr "Amestar URL"
 
 #: ../gtk/add-dialog.c:545
 msgid "Add torrent from URL"
-msgstr ""
+msgstr "Amestar torrent dende URL"
 
 #: ../gtk/add-dialog.c:549
 msgid "_URL"
-msgstr ""
+msgstr "_URL"
 
 #: ../gtk/conf.c:62 ../libtransmission/fdlimit.c:341
 #: ../libtransmission/metainfo.c:115 ../libtransmission/utils.c:604
@@ -298,7 +298,7 @@ msgstr "Nun puede abrise \"%1$s\": %2$s"
 #: ../gtk/conf.c:92
 #, c-format
 msgid "%s is already running."
-msgstr "%s ya ta executándose."
+msgstr "%s yá ta executándose."
 
 #: ../gtk/conf.c:447 ../gtk/conf.c:452
 #, c-format
@@ -315,7 +315,7 @@ msgstr "Cumplir _llimites globales"
 
 #: ../gtk/details.c:454 ../gtk/tr-prefs.c:1220
 msgid "Limit _download speed (KiB/s):"
-msgstr ""
+msgstr "Llimitar velocidá de _descarga (KiB/s):"
 
 #: ../gtk/details.c:466 ../gtk/tr-prefs.c:1227
 msgid "Limit _upload speed (KiB/s):"
@@ -327,7 +327,7 @@ msgstr "Semar en rellación"
 
 #: ../gtk/details.c:484
 msgid "Use _global settings"
-msgstr ""
+msgstr "Usar configuración _global"
 
 #: ../gtk/details.c:492
 msgid "Seed _regardless of ratio"
@@ -335,7 +335,7 @@ msgstr "Sema_r ensin importar la rellación"
 
 #: ../gtk/details.c:501 ../gtk/tr-prefs.c:330
 msgid "_Seed torrent until its ratio reaches:"
-msgstr ""
+msgstr "_Compartir torrent fasta algamar la proporción:"
 
 #: ../gtk/details.c:517
 msgid "Peer Connections"
@@ -363,7 +363,7 @@ msgstr "Semando"
 
 #: ../gtk/details.c:544 ../gtk/torrent-cell-renderer.c:206
 msgid "Finished"
-msgstr ""
+msgstr "Fináu"
 
 #: ../gtk/details.c:544 ../gtk/filter.c:722 ../gtk/torrent-cell-renderer.c:208
 msgid "Paused"
@@ -388,17 +388,17 @@ msgstr "Torrent públicu"
 #: ../gtk/details.c:635
 #, c-format
 msgid "Created by %1$s"
-msgstr ""
+msgstr "Creáu por %1$s"
 
 #: ../gtk/details.c:637
 #, c-format
 msgid "Created on %1$s"
-msgstr ""
+msgstr "Creáu en %1$s"
 
 #: ../gtk/details.c:639
 #, c-format
 msgid "Created by %1$s on %2$s"
-msgstr ""
+msgstr "Creáu por %1$s en %2$s"
 
 #: ../gtk/details.c:723
 msgid "Unknown"
@@ -408,44 +408,44 @@ msgstr "Desconocíu"
 #, c-format
 msgid "%1$s (%2$'d piece @ %3$s)"
 msgid_plural "%1$s (%2$'d pieces @ %3$s)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s (%2$'d parte @ %3$s)"
+msgstr[1] "%1$s (%2$'d partes @ %3$s)"
 
 #: ../gtk/details.c:757
 #, c-format
 msgid "%1$s (%2$'d piece)"
 msgid_plural "%1$s (%2$'d pieces)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s (%2$'d parte)"
+msgstr[1] "%1$s (%2$'d partes)"
 
 #: ../gtk/details.c:792
 #, c-format
 msgid "%1$s (%2$.1f%%); %3$s Unverified"
-msgstr ""
+msgstr "%1$s (%2$.1f%%); %3$s Non verificáu"
 
 #: ../gtk/details.c:794
 #, c-format
 msgid "%1$s (%2$.1f%%)"
-msgstr ""
+msgstr "%1$s (%2$.1f%%)"
 
 #: ../gtk/details.c:805
 #, c-format
 msgid "%1$.1f%%"
-msgstr ""
+msgstr "%1$.1f%%"
 
 #: ../gtk/details.c:823
 #, c-format
 msgid "%1$s (+%2$s corrupt)"
-msgstr ""
+msgstr "%1$s (+%2$s corruptu)"
 
 #: ../gtk/details.c:896
 msgid "Active now"
-msgstr ""
+msgstr "Activar agora"
 
 #: ../gtk/details.c:900
 #, c-format
 msgid "%1$s ago"
-msgstr ""
+msgstr "fai %1$s"
 
 #: ../gtk/details.c:919
 msgid "Activity"
@@ -453,7 +453,7 @@ msgstr "Xera"
 
 #: ../gtk/details.c:923
 msgid "Torrent size:"
-msgstr ""
+msgstr "Tamañu de Torrent:"
 
 #: ../gtk/details.c:927
 msgid "Have:"
@@ -461,7 +461,7 @@ msgstr "Tien:"
 
 #: ../gtk/details.c:931
 msgid "Availability:"
-msgstr ""
+msgstr "Disponibilidá:"
 
 #: ../gtk/details.c:935 ../gtk/stats.c:168 ../gtk/stats.c:180
 msgid "Downloaded:"
@@ -469,7 +469,7 @@ msgstr "Baxao:"
 
 #: ../gtk/details.c:939 ../gtk/stats.c:166 ../gtk/stats.c:178
 msgid "Uploaded:"
-msgstr "Subio:"
+msgstr "Xubío:"
 
 #: ../gtk/details.c:943 ../gtk/stats.c:170 ../gtk/stats.c:182
 msgid "Ratio:"
@@ -481,15 +481,15 @@ msgstr "Estáu:"
 
 #: ../gtk/details.c:951
 msgid "Running time:"
-msgstr ""
+msgstr "Tiempu d'execución:"
 
 #: ../gtk/details.c:955
 msgid "Remaining time:"
-msgstr ""
+msgstr "Tiempu restante:"
 
 #: ../gtk/details.c:959
 msgid "Last activity:"
-msgstr ""
+msgstr "Cabera actividá:"
 
 #: ../gtk/details.c:963
 msgid "Error:"
@@ -501,7 +501,7 @@ msgstr "Detáis"
 
 #: ../gtk/details.c:973
 msgid "Location:"
-msgstr ""
+msgstr "Allugamientu:"
 
 #: ../gtk/details.c:980
 msgid "Hash:"
@@ -513,7 +513,7 @@ msgstr "Privacidá:"
 
 #: ../gtk/details.c:990
 msgid "Origin:"
-msgstr ""
+msgstr "Orixe:"
 
 #: ../gtk/details.c:1007
 msgid "Comment:"
@@ -545,19 +545,19 @@ msgstr "%"
 
 #: ../gtk/details.c:1099
 msgid "Up Reqs"
-msgstr ""
+msgstr "Pet. xuba"
 
 #: ../gtk/details.c:1101
 msgid "Dn Reqs"
-msgstr ""
+msgstr "Pet. descarga"
 
 #: ../gtk/details.c:1103
 msgid "Dn Blocks"
-msgstr ""
+msgstr "Bloques desc"
 
 #: ../gtk/details.c:1105
 msgid "Up Blocks"
-msgstr ""
+msgstr "Bloques xub"
 
 #: ../gtk/details.c:1107
 msgid "We Cancelled"
@@ -617,12 +617,12 @@ msgstr "Peer ye una conexón entrante"
 
 #: ../gtk/details.c:1734 ../gtk/details.c:2254
 msgid "Show _more details"
-msgstr ""
+msgstr "Amosar _más detalles"
 
 #: ../gtk/details.c:1808
 #, c-format
 msgid "Got a list of %1$s%2$'d peers%3$s %4$s ago"
-msgstr ""
+msgstr "Obtúvose una llista de %1$s%2$'d pares fai %3$s %4$s"
 
 #: ../gtk/details.c:1812
 #, c-format
@@ -632,40 +632,40 @@ msgstr ""
 #: ../gtk/details.c:1815
 #, c-format
 msgid "Got an error %1$s\"%2$s\"%3$s %4$s ago"
-msgstr ""
+msgstr "Obtuvo un fallu fai %1$s\"%2$s\"%3$s %4$s"
 
 #: ../gtk/details.c:1824
 msgid "No updates scheduled"
-msgstr ""
+msgstr "Nun hai anovamientos programaos"
 
 #: ../gtk/details.c:1830
 #, c-format
 msgid "Asking for more peers in %s"
-msgstr ""
+msgstr "Pidiendo más pares en %s"
 
 #: ../gtk/details.c:1834
 msgid "Queued to ask for more peers"
-msgstr ""
+msgstr "Posáu pa pidir más pares"
 
 #: ../gtk/details.c:1839
 #, c-format
 msgid "Asking for more peers now... <small>%s</small>"
-msgstr ""
+msgstr "Guetando más pares... <small>%s</small>"
 
 #: ../gtk/details.c:1849
 #, c-format
 msgid "Tracker had %s%'d seeders and %'d leechers%s %s ago"
-msgstr ""
+msgstr "El rastreador tenía %s%'d semadores y %'d sanixueles%s fai %s"
 
 #: ../gtk/details.c:1853
 #, c-format
 msgid "Got a scrape error \"%s%s%s\" %s ago"
-msgstr ""
+msgstr "Obtúvose un fallu de raspiáu \"%s%s%s\" fai %s"
 
 #: ../gtk/details.c:1863
 #, c-format
 msgid "Asking for peer counts in %s"
-msgstr ""
+msgstr "Entrugando por contéu de pares en %s"
 
 #: ../gtk/details.c:1867
 msgid "Queued to ask for peer counts"
@@ -1205,7 +1205,7 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:95
 #, c-format
 msgid "%1$s of %2$s (%3$.2f%%), uploaded %4$s (Ratio: %5$s)"
-msgstr "%1$s de %2$s (%3$.2f%%), subio %4$s (Ratiu: %5$s)"
+msgstr "%1$s de %2$s (%3$.2f%%), xubío %4$s (Ratiu: %5$s)"
 
 #. %1$s is the torrent's total size,
 #. %2$s is how much we've uploaded,
@@ -1222,7 +1222,7 @@ msgstr "%1$s, xubío %2$s (Rellación: %3$s Oxetivu: %4$s)"
 #: ../gtk/torrent-cell-renderer.c:124
 #, c-format
 msgid "%1$s, uploaded %2$s (Ratio: %3$s)"
-msgstr "%1$s, subio %2$s (Ratio: %3$s)"
+msgstr "%1$s, xubío %2$s (Ratio: %3$s)"
 
 #: ../gtk/torrent-cell-renderer.c:139
 msgid "Remaining time unknown"
@@ -1232,7 +1232,7 @@ msgstr "Tiempu restante desconocíu"
 #: ../gtk/torrent-cell-renderer.c:145
 #, c-format
 msgid "%s remaining"
-msgstr "%s restante"
+msgstr "%s restantes"
 
 #. 1==down speed, 2==down arrow, 3==up speed, 4==down arrow
 #: ../gtk/torrent-cell-renderer.c:174
@@ -1280,8 +1280,8 @@ msgstr ""
 #, c-format
 msgid "Downloading from %1$'d of %2$'d connected peer"
 msgid_plural "Downloading from %1$'d of %2$'d connected peers"
-msgstr[0] "Baxando dende %1$'d de %2$'d par conectau"
-msgstr[1] "Baxando dende %1$'d de %2$'d pares conectaos"
+msgstr[0] "Baxando dende %1$'d de %2$'d par coneutáu"
+msgstr[1] "Baxando dende %1$'d de %2$'d pares coneutaos"
 
 #: ../gtk/torrent-cell-renderer.c:290
 #, c-format
@@ -1769,7 +1769,7 @@ msgstr "Ratiu: %s"
 #: ../gtk/tr-window.c:818 ../gtk/tr-window.c:829
 #, c-format
 msgid "size|Down: %1$s, Up: %2$s"
-msgstr "tamañu|Baxada: %1$s, Xubida: %2$s"
+msgstr "tamañu|Baxada: %1$s, Xuba: %2$s"
 
 #: ../gtk/util.c:118
 #, c-format

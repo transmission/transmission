@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-05-20 11:39-0500\n"
-"PO-Revision-Date: 2010-01-09 09:17+0000\n"
-"Last-Translator: Zack Blair <Unknown>\n"
+"PO-Revision-Date: 2010-07-08 09:05+0000\n"
+"Last-Translator: issyl0 <isabell121@gmail.com>\n"
 "Language-Team: English (Canada) <en_CA@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2010-06-16 00:16+0000\n"
+"X-Launchpad-Export-Date: 2010-07-19 18:20+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:55
@@ -56,7 +56,7 @@ msgstr "Sort by Si_ze"
 
 #: ../gtk/actions.c:80
 msgid "_Show Transmission"
-msgstr ""
+msgstr "_Show Transmission"
 
 #: ../gtk/actions.c:81
 msgid "Message _Log"
@@ -64,11 +64,11 @@ msgstr "Message _Log"
 
 #: ../gtk/actions.c:96
 msgid "Enable Temporary Speed _Limits"
-msgstr ""
+msgstr "Enable Temporary Speed _Limits"
 
 #: ../gtk/actions.c:97
 msgid "_Compact View"
-msgstr ""
+msgstr "_Compact View"
 
 #: ../gtk/actions.c:98
 msgid "Re_verse Sort Order"
@@ -112,15 +112,15 @@ msgstr "_Help"
 
 #: ../gtk/actions.c:112
 msgid "Copy _Magnet Link to Clipboard"
-msgstr ""
+msgstr "Copy _Magnet Link to Clipboard"
 
 #: ../gtk/actions.c:113
 msgid "Add _URL..."
-msgstr ""
+msgstr "Add _URL..."
 
 #: ../gtk/actions.c:113
 msgid "Add URL..."
-msgstr ""
+msgstr "Add URL..."
 
 #: ../gtk/actions.c:114 ../gtk/actions.c:115
 msgid "Add a torrent"
@@ -128,7 +128,7 @@ msgstr "Add a torrent"
 
 #: ../gtk/actions.c:115
 msgid "_Add File..."
-msgstr ""
+msgstr "_Add File..."
 
 #: ../gtk/actions.c:116
 msgid "_Start"
@@ -144,7 +144,7 @@ msgstr "_Statistics"
 
 #: ../gtk/actions.c:118
 msgid "_Donate"
-msgstr ""
+msgstr "_Donate"
 
 #: ../gtk/actions.c:119
 msgid "_Verify Local Data"
@@ -237,7 +237,7 @@ msgstr "Torrent Options"
 
 #: ../gtk/add-dialog.c:295 ../gtk/tr-prefs.c:302
 msgid "Mo_ve .torrent file to the trash"
-msgstr ""
+msgstr "Mo_ve .torrent file to the trash"
 
 #: ../gtk/add-dialog.c:297 ../gtk/tr-prefs.c:298
 msgid "_Start when added"
@@ -269,19 +269,19 @@ msgstr "Add a Torrent"
 
 #: ../gtk/add-dialog.c:454 ../gtk/tr-prefs.c:294
 msgid "Show _options dialog"
-msgstr ""
+msgstr "Show _options dialogue"
 
 #: ../gtk/add-dialog.c:532
 msgid "Add URL"
-msgstr ""
+msgstr "Add URL"
 
 #: ../gtk/add-dialog.c:545
 msgid "Add torrent from URL"
-msgstr ""
+msgstr "Add torrent from URL"
 
 #: ../gtk/add-dialog.c:549
 msgid "_URL"
-msgstr ""
+msgstr "_URL"
 
 #: ../gtk/conf.c:62 ../libtransmission/fdlimit.c:341
 #: ../libtransmission/metainfo.c:115 ../libtransmission/utils.c:604
@@ -315,11 +315,11 @@ msgstr "Honour global _limits"
 
 #: ../gtk/details.c:454 ../gtk/tr-prefs.c:1220
 msgid "Limit _download speed (KiB/s):"
-msgstr ""
+msgstr "Limit _download speed (KiB/s):"
 
 #: ../gtk/details.c:466 ../gtk/tr-prefs.c:1227
 msgid "Limit _upload speed (KiB/s):"
-msgstr ""
+msgstr "Limit _upload speed (KiB/s):"
 
 #: ../gtk/details.c:482
 msgid "Seed-Until Ratio"
@@ -363,7 +363,7 @@ msgstr "Seeding"
 
 #: ../gtk/details.c:544 ../gtk/torrent-cell-renderer.c:206
 msgid "Finished"
-msgstr ""
+msgstr "Finished"
 
 #: ../gtk/details.c:544 ../gtk/filter.c:722 ../gtk/torrent-cell-renderer.c:208
 msgid "Paused"
@@ -431,7 +431,7 @@ msgstr "%1$s (%2$.1f%%)"
 #: ../gtk/details.c:805
 #, c-format
 msgid "%1$.1f%%"
-msgstr ""
+msgstr "%1$.1f%%"
 
 #: ../gtk/details.c:823
 #, c-format
@@ -461,7 +461,7 @@ msgstr "Have:"
 
 #: ../gtk/details.c:931
 msgid "Availability:"
-msgstr ""
+msgstr "Availability:"
 
 #: ../gtk/details.c:935 ../gtk/stats.c:168 ../gtk/stats.c:180
 msgid "Downloaded:"
@@ -485,7 +485,7 @@ msgstr "Running time:"
 
 #: ../gtk/details.c:955
 msgid "Remaining time:"
-msgstr ""
+msgstr "Time remaining:"
 
 #: ../gtk/details.c:959
 msgid "Last activity:"
@@ -545,27 +545,27 @@ msgstr "%"
 
 #: ../gtk/details.c:1099
 msgid "Up Reqs"
-msgstr ""
+msgstr "Up Reqs"
 
 #: ../gtk/details.c:1101
 msgid "Dn Reqs"
-msgstr ""
+msgstr "Dn Reqs"
 
 #: ../gtk/details.c:1103
 msgid "Dn Blocks"
-msgstr ""
+msgstr "Dn Blocks"
 
 #: ../gtk/details.c:1105
 msgid "Up Blocks"
-msgstr ""
+msgstr "Up Blocks"
 
 #: ../gtk/details.c:1107
 msgid "We Cancelled"
-msgstr ""
+msgstr "We Cancelled"
 
 #: ../gtk/details.c:1109
 msgid "They Cancelled"
-msgstr ""
+msgstr "They Cancelled"
 
 #: ../gtk/details.c:1110
 msgid "Status"
@@ -617,72 +617,72 @@ msgstr "Peer is an incoming connection"
 
 #: ../gtk/details.c:1734 ../gtk/details.c:2254
 msgid "Show _more details"
-msgstr ""
+msgstr "Show _more details"
 
 #: ../gtk/details.c:1808
 #, c-format
 msgid "Got a list of %1$s%2$'d peers%3$s %4$s ago"
-msgstr ""
+msgstr "Got a list of %1$s%2$'d peers%3$s %4$s ago"
 
 #: ../gtk/details.c:1812
 #, c-format
 msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
-msgstr ""
+msgstr "Peer list request %1$stimed out%2$s %3$s ago; will retry"
 
 #: ../gtk/details.c:1815
 #, c-format
 msgid "Got an error %1$s\"%2$s\"%3$s %4$s ago"
-msgstr ""
+msgstr "Got an error %1$s\"%2$s\"%3$s %4$s ago"
 
 #: ../gtk/details.c:1824
 msgid "No updates scheduled"
-msgstr ""
+msgstr "No updates scheduled"
 
 #: ../gtk/details.c:1830
 #, c-format
 msgid "Asking for more peers in %s"
-msgstr ""
+msgstr "Asking for more peers in %s"
 
 #: ../gtk/details.c:1834
 msgid "Queued to ask for more peers"
-msgstr ""
+msgstr "Queued to ask for more peers"
 
 #: ../gtk/details.c:1839
 #, c-format
 msgid "Asking for more peers now... <small>%s</small>"
-msgstr ""
+msgstr "Asking for more peers now... <small>%s</small>"
 
 #: ../gtk/details.c:1849
 #, c-format
 msgid "Tracker had %s%'d seeders and %'d leechers%s %s ago"
-msgstr ""
+msgstr "Tracker had %s%'d seeders and %'d leechers%s %s ago"
 
 #: ../gtk/details.c:1853
 #, c-format
 msgid "Got a scrape error \"%s%s%s\" %s ago"
-msgstr ""
+msgstr "Got a scrape error \"%s%s%s\" %s ago"
 
 #: ../gtk/details.c:1863
 #, c-format
 msgid "Asking for peer counts in %s"
-msgstr ""
+msgstr "Asking for peer counts in %s"
 
 #: ../gtk/details.c:1867
 msgid "Queued to ask for peer counts"
-msgstr ""
+msgstr "Queued to ask for peer counts"
 
 #: ../gtk/details.c:1872
 #, c-format
 msgid "Asking for peer counts now... <small>%s</small>"
-msgstr ""
+msgstr "Asking for peer counts now... <small>%s</small>"
 
 #: ../gtk/details.c:2131
 msgid "List contains invalid URLs"
-msgstr ""
+msgstr "List contains invalid URLs"
 
 #: ../gtk/details.c:2171
 msgid "Edit Trackers"
-msgstr ""
+msgstr "Edit Trackers"
 
 #: ../gtk/details.c:2183
 msgid "Tracker Announce URLs"

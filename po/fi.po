@@ -7,14 +7,14 @@ msgstr ""
 "Project-Id-Version: fi\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-05-20 11:39-0500\n"
-"PO-Revision-Date: 2010-04-07 11:49+0000\n"
+"PO-Revision-Date: 2010-07-08 19:42+0000\n"
 "Last-Translator: Elias Julkunen <elias.julkunen@gmail.com>\n"
 "Language-Team: -\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2010-06-16 00:16+0000\n"
+"X-Launchpad-Export-Date: 2010-07-19 18:20+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:55
@@ -67,7 +67,7 @@ msgstr "Käytä väliaikaisia nopeus_rajoituksia"
 
 #: ../gtk/actions.c:97
 msgid "_Compact View"
-msgstr ""
+msgstr "_Tiivis näkymä"
 
 #: ../gtk/actions.c:98
 msgid "Re_verse Sort Order"
@@ -199,7 +199,7 @@ msgstr "_Poistu"
 
 #: ../gtk/actions.c:128
 msgid "Select _All"
-msgstr "Valitse _Kaikki"
+msgstr "Valitse _kaikki"
 
 #: ../gtk/actions.c:129
 msgid "Dese_lect All"
@@ -314,11 +314,11 @@ msgstr "Noudata yleisiä _rajoituksia"
 
 #: ../gtk/details.c:454 ../gtk/tr-prefs.c:1220
 msgid "Limit _download speed (KiB/s):"
-msgstr ""
+msgstr "Rajoita _latausnopeutta (KiB/s):"
 
 #: ../gtk/details.c:466 ../gtk/tr-prefs.c:1227
 msgid "Limit _upload speed (KiB/s):"
-msgstr ""
+msgstr "Rajoita _lähetysnopeutta (KiB/s):"
 
 #: ../gtk/details.c:482
 msgid "Seed-Until Ratio"
@@ -362,7 +362,7 @@ msgstr "Jaetaan"
 
 #: ../gtk/details.c:544 ../gtk/torrent-cell-renderer.c:206
 msgid "Finished"
-msgstr ""
+msgstr "Valmis"
 
 #: ../gtk/details.c:544 ../gtk/filter.c:722 ../gtk/torrent-cell-renderer.c:208
 msgid "Paused"
@@ -561,11 +561,11 @@ msgstr ""
 
 #: ../gtk/details.c:1107
 msgid "We Cancelled"
-msgstr ""
+msgstr "Me peruutimme"
 
 #: ../gtk/details.c:1109
 msgid "They Cancelled"
-msgstr ""
+msgstr "He peruuttivat"
 
 #: ../gtk/details.c:1110
 msgid "Status"
@@ -622,7 +622,7 @@ msgstr "Näytä _enemmän tietoja"
 #: ../gtk/details.c:1808
 #, c-format
 msgid "Got a list of %1$s%2$'d peers%3$s %4$s ago"
-msgstr ""
+msgstr "Saatiin lista %1$s%2$'d vertaisesta%3$s %4$s sitten"
 
 #: ../gtk/details.c:1812
 #, c-format
@@ -754,15 +754,15 @@ msgstr "_Älä kysy uudelleen"
 #, c-format
 msgid "Remove torrent?"
 msgid_plural "Remove %d torrents?"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Poistetaanko torrent?"
+msgstr[1] "Poistetaanko %d torrenttia?"
 
 #: ../gtk/dialogs.c:235
 #, c-format
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these %d torrents' downloaded files?"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Poistetaanko tämän torrentin ladatut tiedostot?"
+msgstr[1] "Poistetaanko näiden %d torrentin ladatut tiedostot?"
 
 #: ../gtk/dialogs.c:245
 msgid ""
@@ -772,7 +772,11 @@ msgid_plural ""
 "Once removed, continuing the transfers will require the torrent files or "
 "magnet links."
 msgstr[0] ""
+"Kun poistettu, siirron jatkaminen vaatii torrent-tiedoston tai "
+"magneettilinkin."
 msgstr[1] ""
+"Kun poistettu, siirtojen jatkaminen vaatii torrent-tiedostot tai "
+"magneettilinkit."
 
 #: ../gtk/dialogs.c:251
 msgid "This torrent has not finished downloading."
@@ -831,7 +835,7 @@ msgstr "Tila"
 
 #: ../gtk/filter.c:316 ../gtk/filter.c:717
 msgid "All"
-msgstr ""
+msgstr "Kaikki"
 
 #: ../gtk/filter.c:330 ../gtk/tr-prefs.c:552 ../gtk/tr-prefs.c:1439
 msgid "Privacy"
@@ -839,23 +843,23 @@ msgstr "Tietosuoja"
 
 #: ../gtk/filter.c:335
 msgid "Public"
-msgstr ""
+msgstr "Julkinen"
 
 #: ../gtk/filter.c:339
 msgid "Private"
-msgstr ""
+msgstr "Yksityinen"
 
 #: ../gtk/filter.c:719
 msgid "Active"
-msgstr ""
+msgstr "Aktiivinen"
 
 #: ../gtk/filter.c:723
 msgid "Queued"
-msgstr ""
+msgstr "Jonossa"
 
 #: ../gtk/filter.c:724
 msgid "Verifying"
-msgstr ""
+msgstr "Tarkistetaan"
 
 #: ../gtk/filter.c:725 ../gtk/msgwin.c:178
 msgid "Error"
@@ -872,7 +876,7 @@ msgstr "Seurantapalvelin"
 #. add the activity combobox
 #: ../gtk/filter.c:1023
 msgid "_Show:"
-msgstr ""
+msgstr "_Näytä:"
 
 #: ../gtk/main.c:393
 #, c-format
@@ -980,6 +984,7 @@ msgstr ""
 "  Jaakko Huhtala https://launchpad.net/~jaakko-huhtala\n"
 "  Juhana Uuttu https://launchpad.net/~rexroom\n"
 "  Saku Laukkanen https://launchpad.net/~nollapiste\n"
+"  Tiigon https://launchpad.net/~tiigon\n"
 "  Timo Jyrinki https://launchpad.net/~timo-jyrinki\n"
 "  Tomi I. https://launchpad.net/~tomii\n"
 "  Tuomas Aavikko https://launchpad.net/~taavikko\n"
@@ -1136,7 +1141,7 @@ msgstr "Siirretään \"%s\""
 
 #: ../gtk/relocate.c:86
 msgid "Couldn't move torrent"
-msgstr ""
+msgstr "Torrenttia ei voitu siirtää"
 
 #: ../gtk/relocate.c:127
 msgid "This may take a moment..."
@@ -1218,7 +1223,7 @@ msgstr "%1$s /%2$s (%3$.2f%%)"
 #: ../gtk/torrent-cell-renderer.c:79
 #, c-format
 msgid "%1$s of %2$s (%3$.2f%%), uploaded %4$s (Ratio: %5$s Goal: %6$s)"
-msgstr ""
+msgstr "%1$s / %2$s (%3$.2f%%), lähetetty %4$s (Sudhe: %5$s Maali: %6$s)"
 
 #. %1$s is how much we've got,
 #. %2$s is the torrent's total size,
@@ -1261,13 +1266,13 @@ msgstr "%s jäljellä"
 #: ../gtk/torrent-cell-renderer.c:174
 #, c-format
 msgid "%1$s %2$s, %3$s %4$s"
-msgstr ""
+msgstr "%1$s %2$s, %3$s %4$s"
 
 #. bandwidth speed + unicode arrow
 #: ../gtk/torrent-cell-renderer.c:179 ../gtk/torrent-cell-renderer.c:183
 #, c-format
 msgid "%1$s %2$s"
-msgstr ""
+msgstr "%1$s %2$s"
 
 #. the torrent isn't uploading or downloading
 #: ../gtk/torrent-cell-renderer.c:187 ../gtk/tr-icon.c:75
@@ -1282,7 +1287,7 @@ msgstr "Tarkistetaan paikallista dataa (%.1f%% testattu)"
 #: ../gtk/torrent-cell-renderer.c:228
 #, c-format
 msgid "Ratio %s"
-msgstr ""
+msgstr "Suhde %s"
 
 #: ../gtk/torrent-cell-renderer.c:257
 #, c-format
@@ -1403,7 +1408,7 @@ msgstr "Säilytä _keskeneräiset torrentit kansiossa:"
 
 #: ../gtk/tr-prefs.c:320
 msgid "Call scrip_t when torrent is completed:"
-msgstr ""
+msgstr "Suorita skri_pti, kun torrent on valmis:"
 
 #: ../gtk/tr-prefs.c:328 ../gtk/tr-prefs.c:1395
 msgid "Limits"
@@ -1504,10 +1509,11 @@ msgstr "DHT:n avulla voit löytää vertaisia ilman seurantapalvelinta"
 #: ../gtk/tr-prefs.c:570
 msgid "Use Local Peer Discovery to find more peers"
 msgstr ""
+"Käytä paikallista vertaisten etsintää (LPD) uusien vertaisten löytämiseksi"
 
 #: ../gtk/tr-prefs.c:572
 msgid "LPD is a tool for finding peers on your local network."
-msgstr ""
+msgstr "LPD etsii vertaisia lähiverkostasi."
 
 #: ../gtk/tr-prefs.c:793
 msgid "Web Client"
@@ -1625,11 +1631,11 @@ msgstr "Korvaa normaalit siirtorajoitukset käsin tai ajastettuina aikoina"
 
 #: ../gtk/tr-prefs.c:1252
 msgid "Limit do_wnload speed (KiB/s):"
-msgstr ""
+msgstr "Rajoita _latausnopeutta (KiB/s):"
 
 #: ../gtk/tr-prefs.c:1256
 msgid "Limit u_pload speed (KiB/s):"
-msgstr ""
+msgstr "Rajoita lähetys_nopeutta (KiB/s):"
 
 #: ../gtk/tr-prefs.c:1260
 msgid "_Scheduled times:"
@@ -1673,7 +1679,7 @@ msgstr "_Kokeile porttia"
 
 #: ../gtk/tr-prefs.c:1386
 msgid "Pick a _random port on startup"
-msgstr ""
+msgstr "Valitse _satunnainen portti käynnistyksen ytheydessä"
 
 #: ../gtk/tr-prefs.c:1390
 msgid "Use UPnP or NAT-PMP port _forwarding from my router"
@@ -1777,7 +1783,7 @@ msgstr "Pysäytä suhteessa (%s)"
 
 #: ../gtk/tr-window.c:737
 msgid "999.9 KiB/s"
-msgstr ""
+msgstr "999.9 KiB/s"
 
 #: ../gtk/tr-window.c:781
 #, c-format
@@ -1813,41 +1819,41 @@ msgstr[1] "%'u tavua"
 #: ../gtk/util.c:120
 #, c-format
 msgid "%'.1f KiB"
-msgstr ""
+msgstr "%'.1f KiB"
 
 #: ../gtk/util.c:122
 #, c-format
 msgid "%'.1f MiB"
-msgstr ""
+msgstr "%'.1f MiB"
 
 #: ../gtk/util.c:124
 #, c-format
 msgid "%'.1f GiB"
-msgstr ""
+msgstr "%'.1f GiB"
 
 #. 0.0 KiB to 999.9 KiB
 #: ../gtk/util.c:134
 #, c-format
 msgid "%'.1f KiB/s"
-msgstr ""
+msgstr "%'.1f KiB/s"
 
 #. 0.98 MiB to 99.99 MiB
 #: ../gtk/util.c:136
 #, c-format
 msgid "%'.2f MiB/s"
-msgstr ""
+msgstr "%'.2f MiB/s"
 
 #. 100.0 MiB to 999.9 MiB
 #: ../gtk/util.c:138
 #, c-format
 msgid "%'.1f MiB/s"
-msgstr ""
+msgstr "%'.1f MiB/s"
 
 #. insane speeds
 #: ../gtk/util.c:140
 #, c-format
 msgid "%'.2f GiB/s"
-msgstr ""
+msgstr "%'.2f GiB/s"
 
 #: ../gtk/util.c:159
 #, c-format
@@ -1950,7 +1956,7 @@ msgstr "Estolista \"%s\" sisältää %'zu merkintää"
 #: ../libtransmission/blocklist.c:288 ../libtransmission/blocklist.c:298
 #, c-format
 msgid "blocklist skipped invalid address at line %d"
-msgstr ""
+msgstr "estolista ohitti virheellisen osoitteen rivillä %d"
 
 #: ../libtransmission/blocklist.c:319
 #, c-format
@@ -2025,7 +2031,7 @@ msgstr "Porttia %d ei voitu asettaa %s:lle: %s"
 #: ../libtransmission/net.c:382
 #, c-format
 msgid "Couldn't bind port %d on %s: %s (%s)"
-msgstr ""
+msgstr "Porttia %d ei voitu asettaa %s:lle: %s (%s)"
 
 #: ../libtransmission/port-forwarding.c:33
 msgid "Port Forwarding"
@@ -2065,11 +2071,11 @@ msgstr "%s %s käynnistettiin"
 
 #: ../libtransmission/session.c:636
 msgid "Local Peer Discovery disabled"
-msgstr ""
+msgstr "Paikallinen vertaisten etsintä pois käytöstä"
 
 #: ../libtransmission/session.c:638
 msgid "Local Peer Discovery active"
-msgstr ""
+msgstr "Paikallinen vertaisten etsintä käytössä"
 
 #: ../libtransmission/session.c:1748
 #, c-format
@@ -2104,7 +2110,7 @@ msgstr ""
 
 #: ../libtransmission/torrent.c:1562
 msgid "Removing torrent"
-msgstr ""
+msgstr "Poistetaan torrenttia"
 
 #: ../libtransmission/torrent.c:1616
 msgid "Done"

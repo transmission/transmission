@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-05-20 11:39-0500\n"
-"PO-Revision-Date: 2010-05-16 08:10+0000\n"
-"Last-Translator: ironic <fatih@ubuntu-tr.org>\n"
+"PO-Revision-Date: 2010-07-18 19:45+0000\n"
+"Last-Translator: Yiğit Ateş <yigitates52@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2010-06-16 00:16+0000\n"
+"X-Launchpad-Export-Date: 2010-07-19 18:20+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:55
@@ -68,7 +68,7 @@ msgstr "Geçici Hız _Limitlerini Etkinleştir"
 
 #: ../gtk/actions.c:97
 msgid "_Compact View"
-msgstr ""
+msgstr "_Sıkışık Görünüm"
 
 #: ../gtk/actions.c:98
 msgid "Re_verse Sort Order"
@@ -176,7 +176,7 @@ msgstr "Tüm torrentleri başlat"
 
 #: ../gtk/actions.c:123
 msgid "Set _Location"
-msgstr "Konum_Belirle"
+msgstr "Konum _Belirle"
 
 #: ../gtk/actions.c:124
 msgid "Remove torrent"
@@ -212,7 +212,7 @@ msgstr "Torrent özellikleri"
 
 #: ../gtk/actions.c:132
 msgid "_Open Folder"
-msgstr "_Klasör Aç"
+msgstr "Dizin _Aç"
 
 #: ../gtk/actions.c:134
 msgid "_Contents"
@@ -253,7 +253,7 @@ msgstr "Kaynak Dosyasını Seç"
 
 #: ../gtk/add-dialog.c:327
 msgid "_Destination folder:"
-msgstr "_Hedef Dizin:"
+msgstr "_Hedef dizin:"
 
 #: ../gtk/add-dialog.c:331
 msgid "Select Destination Folder"
@@ -315,11 +315,11 @@ msgstr "Genel _sınırlara uy"
 
 #: ../gtk/details.c:454 ../gtk/tr-prefs.c:1220
 msgid "Limit _download speed (KiB/s):"
-msgstr ""
+msgstr "İ_ndirme hızını sınırla (KiB/s):"
 
 #: ../gtk/details.c:466 ../gtk/tr-prefs.c:1227
 msgid "Limit _upload speed (KiB/s):"
-msgstr ""
+msgstr "_Gönderme hızını sınırla (KiB/s):"
 
 #: ../gtk/details.c:482
 msgid "Seed-Until Ratio"
@@ -363,7 +363,7 @@ msgstr "Dağıtım"
 
 #: ../gtk/details.c:544 ../gtk/torrent-cell-renderer.c:206
 msgid "Finished"
-msgstr ""
+msgstr "Bitti"
 
 #: ../gtk/details.c:544 ../gtk/filter.c:722 ../gtk/torrent-cell-renderer.c:208
 msgid "Paused"
@@ -559,11 +559,11 @@ msgstr ""
 
 #: ../gtk/details.c:1107
 msgid "We Cancelled"
-msgstr ""
+msgstr "İptal Edildi"
 
 #: ../gtk/details.c:1109
 msgid "They Cancelled"
-msgstr ""
+msgstr "Karşı Taraf İptal Etti"
 
 #: ../gtk/details.c:1110
 msgid "Status"
@@ -823,7 +823,7 @@ msgstr "İlerleme"
 
 #: ../gtk/filter.c:316 ../gtk/filter.c:717
 msgid "All"
-msgstr ""
+msgstr "Tümü"
 
 #: ../gtk/filter.c:330 ../gtk/tr-prefs.c:552 ../gtk/tr-prefs.c:1439
 msgid "Privacy"
@@ -831,23 +831,23 @@ msgstr "Gizlilik"
 
 #: ../gtk/filter.c:335
 msgid "Public"
-msgstr ""
+msgstr "Herkese görünür"
 
 #: ../gtk/filter.c:339
 msgid "Private"
-msgstr ""
+msgstr "Özel"
 
 #: ../gtk/filter.c:719
 msgid "Active"
-msgstr ""
+msgstr "Etkin"
 
 #: ../gtk/filter.c:723
 msgid "Queued"
-msgstr ""
+msgstr "Kuyrukta"
 
 #: ../gtk/filter.c:724
 msgid "Verifying"
-msgstr ""
+msgstr "Doğrulanıyor"
 
 #: ../gtk/filter.c:725 ../gtk/msgwin.c:178
 msgid "Error"
@@ -864,7 +864,7 @@ msgstr "İzleyici"
 #. add the activity combobox
 #: ../gtk/filter.c:1023
 msgid "_Show:"
-msgstr ""
+msgstr "_Göster"
 
 #: ../gtk/main.c:393
 #, c-format
@@ -1135,7 +1135,7 @@ msgstr "\"%s\" taşınıyor"
 
 #: ../gtk/relocate.c:86
 msgid "Couldn't move torrent"
-msgstr ""
+msgstr "Torrent taşınamadı"
 
 #: ../gtk/relocate.c:127
 msgid "This may take a moment..."

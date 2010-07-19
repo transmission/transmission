@@ -12,14 +12,14 @@ msgstr ""
 "Project-Id-Version: es\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-05-20 11:39-0500\n"
-"PO-Revision-Date: 2010-06-11 17:25+0000\n"
-"Last-Translator: DiegoJ <diegojromerolopez@gmail.com>\n"
+"PO-Revision-Date: 2010-06-30 06:21+0000\n"
+"Last-Translator: Paco Molinero <paco@byasl.com>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2010-06-16 00:16+0000\n"
+"X-Launchpad-Export-Date: 2010-07-19 18:20+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Country: SPAIN\n"
 "X-Poedit-Language: Spanish\n"
@@ -559,11 +559,11 @@ msgstr "Pet. descarga"
 
 #: ../gtk/details.c:1103
 msgid "Dn Blocks"
-msgstr ""
+msgstr "Bloques abajo"
 
 #: ../gtk/details.c:1105
 msgid "Up Blocks"
-msgstr ""
+msgstr "Bloques arriba"
 
 #: ../gtk/details.c:1107
 msgid "We Cancelled"
@@ -653,7 +653,7 @@ msgstr "Pidiendo más pares en %s"
 
 #: ../gtk/details.c:1834
 msgid "Queued to ask for more peers"
-msgstr "Pausado para pedir más pares"
+msgstr "Encolado para pedir más pares"
 
 #: ../gtk/details.c:1839
 #, c-format
@@ -716,7 +716,7 @@ msgstr "_Editar rastreadores"
 
 #: ../gtk/details.c:2269
 msgid "Show _backup trackers"
-msgstr "Mostrar trackers de _respaldo"
+msgstr "Mostrar rastreadores de res_paldo"
 
 #: ../gtk/details.c:2342 ../gtk/msgwin.c:179
 msgid "Information"
@@ -768,8 +768,8 @@ msgstr[1] "¿Eliminar %d torrents?"
 #, c-format
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these %d torrents' downloaded files?"
-msgstr[0] "¿Eliminar archivos descargados por este torrent?"
-msgstr[1] "¿Eliminar archivos descargados por estos torrents?"
+msgstr[0] "¿Eliminar los archivos descargados por este torrent?"
+msgstr[1] "¿Eliminar los archivos descargados por estos torrents?"
 
 #: ../gtk/dialogs.c:245
 msgid ""
@@ -779,7 +779,11 @@ msgid_plural ""
 "Once removed, continuing the transfers will require the torrent files or "
 "magnet links."
 msgstr[0] ""
+"Una vez eliminado, continuar la transferencia que requiere el archivo "
+"torrent o enlace imán."
 msgstr[1] ""
+"Una vez eliminado, continuar las transferencias que requieren los archivos "
+"torrent o enlaces imán."
 
 #: ../gtk/dialogs.c:251
 msgid "This torrent has not finished downloading."
@@ -1120,15 +1124,15 @@ msgstr[1] "%1$'d partes @ %2$s"
 
 #: ../gtk/makemeta-ui.c:404
 msgid "Sa_ve to:"
-msgstr "Guardar en:"
+msgstr "G_uardar en:"
 
 #: ../gtk/makemeta-ui.c:410
 msgid "Source F_older:"
-msgstr "Carpeta fuente:"
+msgstr "Carpeta f_uente:"
 
 #: ../gtk/makemeta-ui.c:421
 msgid "Source _File:"
-msgstr "Archivo fuente:"
+msgstr "Archivo _fuente:"
 
 #: ../gtk/makemeta-ui.c:432
 msgid "<i>No source selected</i>"
@@ -1140,7 +1144,7 @@ msgstr "Propiedades"
 
 #: ../gtk/makemeta-ui.c:438
 msgid "_Trackers:"
-msgstr "Ras_treadores"
+msgstr "Ras_treadores:"
 
 #: ../gtk/makemeta-ui.c:460
 msgid "Co_mment:"
@@ -1222,7 +1226,7 @@ msgstr "Ubicación"
 
 #: ../gtk/relocate.c:182
 msgid "Torrent _location:"
-msgstr "_Ubicación del torrent"
+msgstr "Ubicación de_l torrent:"
 
 #: ../gtk/relocate.c:183
 msgid "_Move from the current folder"
@@ -1248,8 +1252,8 @@ msgid ""
 "These statistics are for your information only.  Resetting them doesn't "
 "affect the statistics logged by your BitTorrent trackers."
 msgstr ""
-"Estas estadísticas son solo para su información. Reiniciarlas no afectara "
-"las estadísticas colectadas por los rastreadores BitTorrent."
+"Estas estadísticas son sólo para su información. Reiniciarlas no afectará "
+"las estadísticas registradas por los rastreadores BitTorrent."
 
 #: ../gtk/stats.c:119 ../gtk/stats.c:151
 msgid "_Reset"
@@ -1368,7 +1372,7 @@ msgstr "El rastreador dio un error: «%s»"
 #: ../gtk/torrent-cell-renderer.c:259
 #, c-format
 msgid "Error: %s"
-msgstr "Error : %s"
+msgstr "Error: %s"
 
 #: ../gtk/torrent-cell-renderer.c:279
 #, c-format
@@ -1544,7 +1548,7 @@ msgstr "Lista de bloqueo"
 
 #: ../gtk/tr-prefs.c:535
 msgid "_Update"
-msgstr "_Actualizar"
+msgstr "Act_ualizar"
 
 #: ../gtk/tr-prefs.c:545
 msgid "Enable _automatic updates"
@@ -1588,7 +1592,7 @@ msgstr "Cliente web"
 #. "enabled" checkbutton
 #: ../gtk/tr-prefs.c:796
 msgid "_Enable web client"
-msgstr "_Activar cliente web"
+msgstr "Activar cli_ente web"
 
 #: ../gtk/tr-prefs.c:802
 msgid "_Open web client"
@@ -1616,7 +1620,7 @@ msgstr "Contra_seña:"
 #. require authentication
 #: ../gtk/tr-prefs.c:838
 msgid "Only allow these IP a_ddresses to connect:"
-msgstr "_Permitir la conexión sólo a estas direcciones IP:"
+msgstr "Permitir la conexión sólo a estas _direcciones IP:"
 
 #: ../gtk/tr-prefs.c:863
 msgid "IP addresses may use wildcards, such as 192.168.*.*"
@@ -2023,7 +2027,7 @@ msgstr "La lista de bloqueo «%s» contiene %'zu entradas"
 #: ../libtransmission/blocklist.c:288 ../libtransmission/blocklist.c:298
 #, c-format
 msgid "blocklist skipped invalid address at line %d"
-msgstr ""
+msgstr "dirección inválida de la lista de bloques omitida en la línea %d"
 
 #: ../libtransmission/blocklist.c:319
 #, c-format
@@ -2043,7 +2047,7 @@ msgstr "No se ha podido crear el zócalo: %s"
 #: ../libtransmission/makemeta.c:60
 #, c-format
 msgid "Torrent Creator is skipping file \"%s\": %s"
-msgstr "El creador del torrent está omitiendo el archivo \"%s\": %s"
+msgstr "El creador del torrent está omitiendo el archivo «%s»: %s"
 
 #: ../libtransmission/metainfo.c:579
 #, c-format
@@ -2151,12 +2155,12 @@ msgstr "Cargados %d torrents"
 #: ../libtransmission/torrent.c:398
 #, c-format
 msgid "Tracker warning: \"%s\""
-msgstr "Aviso del rastreador: \"%s\""
+msgstr "Aviso del rastreador: «%s»"
 
 #: ../libtransmission/torrent.c:405
 #, c-format
 msgid "Tracker error: \"%s\""
-msgstr "Error del rastreador: \"%s\""
+msgstr "Error del rastreador: «%s»"
 
 #: ../libtransmission/torrent.c:1369
 msgid ""
@@ -2212,7 +2216,7 @@ msgstr "El puerto %d no está siendo redirigido"
 #: ../libtransmission/upnp.c:158
 #, c-format
 msgid "Stopping port forwarding through \"%s\", service \"%s\""
-msgstr "Parando reenvío de puertos a través de \"%s\", servicio \"%s\""
+msgstr "Parando reenvío de puertos a través de «%s», servicio «%s»"
 
 #: ../libtransmission/upnp.c:192
 #, c-format

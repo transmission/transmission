@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2010-06-16 00:16+0000\n"
+"X-Launchpad-Export-Date: 2010-07-19 18:20+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:55
@@ -957,6 +957,7 @@ msgstr ""
 "  Krit Marukawisutthigul https://launchpad.net/~kritmaru\n"
 "  SiraNokyoongtong https://launchpad.net/~gumara\n"
 "  Supasate Choochaisri https://launchpad.net/~kaizerwing\n"
+"  Teedev https://launchpad.net/~teedev\n"
 "  Thanakrit Chomphuming https://launchpad.net/~jernghan\n"
 "  Tharawut Paripaiboon https://launchpad.net/~xcession"
 

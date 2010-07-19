@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-05-20 11:39-0500\n"
-"PO-Revision-Date: 2010-05-15 12:20+0000\n"
-"Last-Translator: banza <Unknown>\n"
+"PO-Revision-Date: 2010-06-30 21:15+0000\n"
+"Last-Translator: Bogdan B Serdenko <Unknown>\n"
 "Language-Team: Ukrainian <uk@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2010-06-16 00:16+0000\n"
+"X-Launchpad-Export-Date: 2010-07-19 18:20+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:55
@@ -69,7 +69,7 @@ msgstr "Встановити тимчасове обмеження швидко�
 
 #: ../gtk/actions.c:97
 msgid "_Compact View"
-msgstr ""
+msgstr "_Стислий вигляд"
 
 #: ../gtk/actions.c:98
 msgid "Re_verse Sort Order"
@@ -316,11 +316,11 @@ msgstr "Не робити цьому торренту виключень із з
 
 #: ../gtk/details.c:454 ../gtk/tr-prefs.c:1220
 msgid "Limit _download speed (KiB/s):"
-msgstr ""
+msgstr "Обмежити швидкість_завантаження"
 
 #: ../gtk/details.c:466 ../gtk/tr-prefs.c:1227
 msgid "Limit _upload speed (KiB/s):"
-msgstr ""
+msgstr "Обмежити швидкість_вивантаження"
 
 #: ../gtk/details.c:482
 msgid "Seed-Until Ratio"
@@ -364,7 +364,7 @@ msgstr "Поширюється"
 
 #: ../gtk/details.c:544 ../gtk/torrent-cell-renderer.c:206
 msgid "Finished"
-msgstr ""
+msgstr "Завершено"
 
 #: ../gtk/details.c:544 ../gtk/filter.c:722 ../gtk/torrent-cell-renderer.c:208
 msgid "Paused"
@@ -484,7 +484,7 @@ msgstr "Стан:"
 
 #: ../gtk/details.c:951
 msgid "Running time:"
-msgstr "Час рооти:"
+msgstr "Тривалість роботи:"
 
 #: ../gtk/details.c:955
 msgid "Remaining time:"
@@ -556,11 +556,11 @@ msgstr "Завант"
 
 #: ../gtk/details.c:1103
 msgid "Dn Blocks"
-msgstr ""
+msgstr "Блоки завантаження"
 
 #: ../gtk/details.c:1105
 msgid "Up Blocks"
-msgstr ""
+msgstr "Блоки вивантаження"
 
 #: ../gtk/details.c:1107
 msgid "We Cancelled"
@@ -977,6 +977,7 @@ msgstr ""
 "Launchpad Contributions:\n"
 "  Ailandar https://launchpad.net/~ailandar\n"
 "  Alexandr Shapoval https://launchpad.net/~rain534\n"
+"  Bogdan B Serdenko https://launchpad.net/~sebo23-gmail\n"
 "  Roman M. Tuz https://launchpad.net/~tuzr\n"
 "  Serhey Kusyumoff (Сергій Кусюмов) https://launchpad.net/~sergemine\n"
 "  Valdemar1982 https://launchpad.net/~zvolodymyr\n"
@@ -1182,12 +1183,12 @@ msgid ""
 "These statistics are for your information only.  Resetting them doesn't "
 "affect the statistics logged by your BitTorrent trackers."
 msgstr ""
-"Ці данні - для вашаго сласного використання, їх видалення не вплине на дінні "
+"Ці данні - для вашого сласного використання, їх видалення не вплине на данні "
 "трекерів"
 
 #: ../gtk/stats.c:119 ../gtk/stats.c:151
 msgid "_Reset"
-msgstr "Видалити дінні"
+msgstr "видалити данні"
 
 #: ../gtk/stats.c:147 ../gtk/tr-window.c:692
 msgid "Statistics"

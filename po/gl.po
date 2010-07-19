@@ -12,14 +12,14 @@ msgstr ""
 "Project-Id-Version: Transmission\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-05-20 11:39-0500\n"
-"PO-Revision-Date: 2010-05-22 09:06+0000\n"
+"PO-Revision-Date: 2010-06-25 14:22+0000\n"
 "Last-Translator: Miguel Anxo Bouzada <mbouzada@gmail.com>\n"
 "Language-Team: Galician <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2010-06-16 00:16+0000\n"
+"X-Launchpad-Export-Date: 2010-07-19 18:20+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Language: Galician\n"
 
@@ -73,7 +73,7 @@ msgstr "Activar temporalmente os _límites de velocidade"
 
 #: ../gtk/actions.c:97
 msgid "_Compact View"
-msgstr ""
+msgstr "Vista _compacta"
 
 #: ../gtk/actions.c:98
 msgid "Re_verse Sort Order"
@@ -320,11 +320,11 @@ msgstr "_Limites globais de honra"
 
 #: ../gtk/details.c:454 ../gtk/tr-prefs.c:1220
 msgid "Limit _download speed (KiB/s):"
-msgstr ""
+msgstr "Limitar a velocidade de _descarga (KiB/s):"
 
 #: ../gtk/details.c:466 ../gtk/tr-prefs.c:1227
 msgid "Limit _upload speed (KiB/s):"
-msgstr ""
+msgstr "Limitar a velocidade de _envío (KiB/s):"
 
 #: ../gtk/details.c:482
 msgid "Seed-Until Ratio"

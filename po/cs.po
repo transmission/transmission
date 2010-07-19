@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-05-20 11:39-0500\n"
-"PO-Revision-Date: 2010-04-22 00:53+0000\n"
+"PO-Revision-Date: 2010-07-04 02:30+0000\n"
 "Last-Translator: Roman Horník <Unknown>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2010-06-16 00:16+0000\n"
+"X-Launchpad-Export-Date: 2010-07-19 18:20+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:55
@@ -68,7 +68,7 @@ msgstr "Povolit dočasné _omezení rychlosti"
 
 #: ../gtk/actions.c:97
 msgid "_Compact View"
-msgstr ""
+msgstr "_Zjednodušený pohled"
 
 #: ../gtk/actions.c:98
 msgid "Re_verse Sort Order"
@@ -315,11 +315,11 @@ msgstr "_Dodržovat globální omezení"
 
 #: ../gtk/details.c:454 ../gtk/tr-prefs.c:1220
 msgid "Limit _download speed (KiB/s):"
-msgstr ""
+msgstr "Omezit rychlost _stahování (KiB/s):"
 
 #: ../gtk/details.c:466 ../gtk/tr-prefs.c:1227
 msgid "Limit _upload speed (KiB/s):"
-msgstr ""
+msgstr "Omezit rychlost o_desílání (KiB/s):"
 
 #: ../gtk/details.c:482
 msgid "Seed-Until Ratio"
@@ -363,7 +363,7 @@ msgstr "Sdílení"
 
 #: ../gtk/details.c:544 ../gtk/torrent-cell-renderer.c:206
 msgid "Finished"
-msgstr ""
+msgstr "Dokončeno"
 
 #: ../gtk/details.c:544 ../gtk/filter.c:722 ../gtk/torrent-cell-renderer.c:208
 msgid "Paused"
@@ -555,19 +555,19 @@ msgstr "Žádosti o download"
 
 #: ../gtk/details.c:1103
 msgid "Dn Blocks"
-msgstr ""
+msgstr "Dn bloky"
 
 #: ../gtk/details.c:1105
 msgid "Up Blocks"
-msgstr ""
+msgstr "Up bloky"
 
 #: ../gtk/details.c:1107
 msgid "We Cancelled"
-msgstr ""
+msgstr "My jsme zrušili"
 
 #: ../gtk/details.c:1109
 msgid "They Cancelled"
-msgstr ""
+msgstr "Oni zrušili"
 
 #: ../gtk/details.c:1110
 msgid "Status"
@@ -752,15 +752,17 @@ msgstr "_Neptat se znovu"
 #, c-format
 msgid "Remove torrent?"
 msgid_plural "Remove %d torrents?"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Odstranit torrent?"
+msgstr[1] "Odstranit %d torrenty?"
+msgstr[2] "Odstranit %d torrentů?"
 
 #: ../gtk/dialogs.c:235
 #, c-format
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these %d torrents' downloaded files?"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Smazat stažené soubory tohoto torrentu?"
+msgstr[1] "Smazat stažené soubory těchto %d torrentů?"
+msgstr[2] "Smazat stažené soubory těchto %d torrentů?"
 
 #: ../gtk/dialogs.c:245
 msgid ""
@@ -833,7 +835,7 @@ msgstr "Průběh"
 
 #: ../gtk/filter.c:316 ../gtk/filter.c:717
 msgid "All"
-msgstr ""
+msgstr "Vše"
 
 #: ../gtk/filter.c:330 ../gtk/tr-prefs.c:552 ../gtk/tr-prefs.c:1439
 msgid "Privacy"
@@ -841,23 +843,23 @@ msgstr "Soukromí"
 
 #: ../gtk/filter.c:335
 msgid "Public"
-msgstr ""
+msgstr "Veřejný"
 
 #: ../gtk/filter.c:339
 msgid "Private"
-msgstr ""
+msgstr "Soukromý"
 
 #: ../gtk/filter.c:719
 msgid "Active"
-msgstr ""
+msgstr "Aktivní"
 
 #: ../gtk/filter.c:723
 msgid "Queued"
-msgstr ""
+msgstr "Ve frontě"
 
 #: ../gtk/filter.c:724
 msgid "Verifying"
-msgstr ""
+msgstr "Ověřování"
 
 #: ../gtk/filter.c:725 ../gtk/msgwin.c:178
 msgid "Error"
@@ -874,7 +876,7 @@ msgstr "Tracker"
 #. add the activity combobox
 #: ../gtk/filter.c:1023
 msgid "_Show:"
-msgstr ""
+msgstr "_Zobrazit:"
 
 #: ../gtk/main.c:393
 #, c-format
@@ -1134,7 +1136,7 @@ msgstr "Přesouvá se \"%s\""
 
 #: ../gtk/relocate.c:86
 msgid "Couldn't move torrent"
-msgstr ""
+msgstr "Nelze přesunout torrent"
 
 #: ../gtk/relocate.c:127
 msgid "This may take a moment..."
@@ -1217,7 +1219,7 @@ msgstr "%1$s z %2$s (%3$.2f%%)"
 #: ../gtk/torrent-cell-renderer.c:79
 #, c-format
 msgid "%1$s of %2$s (%3$.2f%%), uploaded %4$s (Ratio: %5$s Goal: %6$s)"
-msgstr ""
+msgstr "%1$s of %2$s (%3$.2f%%), odesláno %4$s (Poměr: %5$s Cíl: %6$s)"
 
 #. %1$s is how much we've got,
 #. %2$s is the torrent's total size,
@@ -1260,13 +1262,13 @@ msgstr "zbývá %s"
 #: ../gtk/torrent-cell-renderer.c:174
 #, c-format
 msgid "%1$s %2$s, %3$s %4$s"
-msgstr ""
+msgstr "%1$s %2$s, %3$s %4$s"
 
 #. bandwidth speed + unicode arrow
 #: ../gtk/torrent-cell-renderer.c:179 ../gtk/torrent-cell-renderer.c:183
 #, c-format
 msgid "%1$s %2$s"
-msgstr ""
+msgstr "%1$s %2$s"
 
 #. the torrent isn't uploading or downloading
 #: ../gtk/torrent-cell-renderer.c:187 ../gtk/tr-icon.c:75
@@ -1281,7 +1283,7 @@ msgstr "Ověřování místních dat (ověřeno %.1f%%)"
 #: ../gtk/torrent-cell-renderer.c:228
 #, c-format
 msgid "Ratio %s"
-msgstr ""
+msgstr "Poměr %s"
 
 #: ../gtk/torrent-cell-renderer.c:257
 #, c-format
@@ -1405,7 +1407,7 @@ msgstr "Ponechat _neúplné torrenty v:"
 
 #: ../gtk/tr-prefs.c:320
 msgid "Call scrip_t when torrent is completed:"
-msgstr ""
+msgstr "Spustit skrip_t, když je torrent dokončený:"
 
 #: ../gtk/tr-prefs.c:328 ../gtk/tr-prefs.c:1395
 msgid "Limits"
@@ -1630,11 +1632,11 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:1252
 msgid "Limit do_wnload speed (KiB/s):"
-msgstr ""
+msgstr "Omezení rychlosti sta_hování (KiB/s):"
 
 #: ../gtk/tr-prefs.c:1256
 msgid "Limit u_pload speed (KiB/s):"
-msgstr ""
+msgstr "Omezení rychlosti odesí_lání (KiB/s):"
 
 #: ../gtk/tr-prefs.c:1260
 msgid "_Scheduled times:"
@@ -1678,7 +1680,7 @@ msgstr "O_testovat port"
 
 #: ../gtk/tr-prefs.c:1386
 msgid "Pick a _random port on startup"
-msgstr ""
+msgstr "Při startu použít _náhodný port"
 
 #: ../gtk/tr-prefs.c:1390
 msgid "Use UPnP or NAT-PMP port _forwarding from my router"
@@ -1782,7 +1784,7 @@ msgstr "Zastavit při poměru (%s)"
 
 #: ../gtk/tr-window.c:737
 msgid "999.9 KiB/s"
-msgstr ""
+msgstr "999.9 KiB/s"
 
 #: ../gtk/tr-window.c:781
 #, c-format
@@ -1821,17 +1823,17 @@ msgstr[2] "%'u bajtů"
 #: ../gtk/util.c:120
 #, c-format
 msgid "%'.1f KiB"
-msgstr ""
+msgstr "%'.1f KiB"
 
 #: ../gtk/util.c:122
 #, c-format
 msgid "%'.1f MiB"
-msgstr ""
+msgstr "%'.1f MiB"
 
 #: ../gtk/util.c:124
 #, c-format
 msgid "%'.1f GiB"
-msgstr ""
+msgstr "%'.1f GiB"
 
 #. 0.0 KiB to 999.9 KiB
 #: ../gtk/util.c:134
@@ -1843,19 +1845,19 @@ msgstr ""
 #: ../gtk/util.c:136
 #, c-format
 msgid "%'.2f MiB/s"
-msgstr ""
+msgstr "%'.2f MiB/s"
 
 #. 100.0 MiB to 999.9 MiB
 #: ../gtk/util.c:138
 #, c-format
 msgid "%'.1f MiB/s"
-msgstr ""
+msgstr "%'.1f MiB/s"
 
 #. insane speeds
 #: ../gtk/util.c:140
 #, c-format
 msgid "%'.2f GiB/s"
-msgstr ""
+msgstr "%'.2f GiB/s"
 
 #: ../gtk/util.c:159
 #, c-format
@@ -2112,7 +2114,7 @@ msgstr ""
 
 #: ../libtransmission/torrent.c:1562
 msgid "Removing torrent"
-msgstr ""
+msgstr "Odstraňování torrentu"
 
 #: ../libtransmission/torrent.c:1616
 msgid "Done"

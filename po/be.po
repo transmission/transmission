@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-05-20 11:39-0500\n"
-"PO-Revision-Date: 2010-06-14 12:41+0000\n"
+"PO-Revision-Date: 2010-07-13 11:46+0000\n"
 "Last-Translator: Mikola Tsekhan <mail@tsekhan.com>\n"
 "Language-Team: Belarusian <be@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Launchpad-Export-Date: 2010-06-16 00:16+0000\n"
+"X-Launchpad-Export-Date: 2010-07-19 18:20+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:55
@@ -564,11 +564,11 @@ msgstr ""
 
 #: ../gtk/details.c:1107
 msgid "We Cancelled"
-msgstr ""
+msgstr "Скасавана Вамі"
 
 #: ../gtk/details.c:1109
 msgid "They Cancelled"
-msgstr ""
+msgstr "Скасавана іншымі ўдзельнікамі"
 
 #: ../gtk/details.c:1110
 msgid "Status"
@@ -931,6 +931,9 @@ msgid ""
 "fully responsible for exercising proper judgement and abiding by your local "
 "laws."
 msgstr ""
+"Transmission — праграма абмена файламі. Калі Вы спампоўваеце тарэнт, яго "
+"зьвесткі робяцца даступнымі для запампоўкі з Вашага кампутара іншым людзям. "
+"Вы й толькі Вы адказваеце за выкананьне дзейных заканадаўстваў."
 
 #: ../gtk/main.c:733
 msgid "I _Accept"
@@ -1034,52 +1037,54 @@ msgstr "Крыніца не абраная"
 #, c-format
 msgid "%1$s; %2$'d File"
 msgid_plural "%1$s; %2$'d Files"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s; %2$'d файл"
+msgstr[1] "%1$s; %2$'d файлы"
+msgstr[2] "%1$s; %2$'d файлаў"
 
 #: ../gtk/makemeta-ui.c:304
 #, c-format
 msgid "%1$'d Piece @ %2$s"
 msgid_plural "%1$'d Pieces @ %2$s"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$'d частка па %2$s"
+msgstr[1] "%1$'d часткі па %2$s"
+msgstr[2] "%1$'d частак па %2$s"
 
 #: ../gtk/makemeta-ui.c:404
 msgid "Sa_ve to:"
-msgstr ""
+msgstr "_Захаваць у:"
 
 #: ../gtk/makemeta-ui.c:410
 msgid "Source F_older:"
-msgstr ""
+msgstr "Зыходны каталёг:"
 
 #: ../gtk/makemeta-ui.c:421
 msgid "Source _File:"
-msgstr ""
+msgstr "Зыходны _файл:"
 
 #: ../gtk/makemeta-ui.c:432
 msgid "<i>No source selected</i>"
-msgstr ""
+msgstr "<i>Крыніца не абраная</i>"
 
 #: ../gtk/makemeta-ui.c:436
 msgid "Properties"
-msgstr ""
+msgstr "Налады"
 
 #: ../gtk/makemeta-ui.c:438
 msgid "_Trackers:"
-msgstr ""
+msgstr "_Трэкеры:"
 
 #: ../gtk/makemeta-ui.c:460
 msgid "Co_mment:"
-msgstr ""
+msgstr "Ка_мэнтар:"
 
 #: ../gtk/makemeta-ui.c:469
 msgid "_Private torrent"
-msgstr ""
+msgstr "_Прыватны тарэнт"
 
 #: ../gtk/msgwin.c:84
 #, c-format
 msgid "Couldn't save \"%s\""
-msgstr ""
+msgstr "Немагчыма захаваць «%s»"
 
 #: ../gtk/msgwin.c:135
 msgid "Save Log"
@@ -1099,7 +1104,7 @@ msgstr "Паведамленьне"
 
 #: ../gtk/msgwin.c:438
 msgid "Message Log"
-msgstr ""
+msgstr "Гісторыя паведамленьняў"
 
 #: ../gtk/msgwin.c:472
 msgid "Level"
@@ -1107,11 +1112,11 @@ msgstr "Узровень"
 
 #: ../gtk/notify.c:121
 msgid "Download complete"
-msgstr ""
+msgstr "Сьцягваньне скончанае"
 
 #: ../gtk/notify.c:131
 msgid "Torrent Complete"
-msgstr ""
+msgstr "Тарэнт сьцягнуты"
 
 #: ../gtk/notify.c:140
 msgid "Open File"
@@ -1123,24 +1128,24 @@ msgstr "Адкрыць тэчку"
 
 #: ../gtk/notify.c:159
 msgid "Torrent Added"
-msgstr ""
+msgstr "Тарэнт дададзены"
 
 #: ../gtk/relocate.c:64
 #, c-format
 msgid "Moving \"%s\""
-msgstr ""
+msgstr "Перасоўваньне «%s»"
 
 #: ../gtk/relocate.c:86
 msgid "Couldn't move torrent"
-msgstr ""
+msgstr "Ня ўдалося перасунуць тарэнт"
 
 #: ../gtk/relocate.c:127
 msgid "This may take a moment..."
-msgstr ""
+msgstr "Гэта можа заняць некаторы час..."
 
 #: ../gtk/relocate.c:158 ../gtk/relocate.c:179
 msgid "Set Torrent Location"
-msgstr ""
+msgstr "Вызначыць месцазнаходжаньне тарэнтаў"
 
 #: ../gtk/relocate.c:175
 msgid "Location"
@@ -1148,36 +1153,39 @@ msgstr "Месца"
 
 #: ../gtk/relocate.c:182
 msgid "Torrent _location:"
-msgstr ""
+msgstr "Месцазнаходжаньне _тарэнтаў:"
 
 #: ../gtk/relocate.c:183
 msgid "_Move from the current folder"
-msgstr ""
+msgstr "_Перасунуць зь бягучага каталёга"
 
 #: ../gtk/relocate.c:186
 msgid "Local data is _already there"
-msgstr ""
+msgstr "Лякальныя даньні ўжо на _мейсцы"
 
 #: ../gtk/stats.c:76 ../gtk/stats.c:175
 #, c-format
 msgid "Started %'d time"
 msgid_plural "Started %'d times"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Стартавана %'d раз"
+msgstr[1] "Стартавана %'d разы"
+msgstr[2] "Стартавана %'d разоў"
 
 #: ../gtk/stats.c:107
 msgid "Reset your statistics?"
-msgstr ""
+msgstr "Скінуць Вашу статыстыку?"
 
 #: ../gtk/stats.c:108
 msgid ""
 "These statistics are for your information only.  Resetting them doesn't "
 "affect the statistics logged by your BitTorrent trackers."
 msgstr ""
+"Гэтая статыстыка прызначана толькі для інфармаваньня Вас. Яе скідваньне не "
+"паўплывае на статыстыку, якую вядуць трэкеры."
 
 #: ../gtk/stats.c:119 ../gtk/stats.c:151
 msgid "_Reset"
-msgstr ""
+msgstr "_Скінуць"
 
 #: ../gtk/stats.c:147 ../gtk/tr-window.c:692
 msgid "Statistics"
@@ -1193,7 +1201,7 @@ msgstr "Працягласьць"
 
 #: ../gtk/stats.c:174
 msgid "Total"
-msgstr ""
+msgstr "Агулам"
 
 #. %1$s is how much we've got,
 #. %2$s is how much we'll have when done,
@@ -1212,7 +1220,7 @@ msgstr "%1$s з %2$s (%3$.2f%%)"
 #: ../gtk/torrent-cell-renderer.c:79
 #, c-format
 msgid "%1$s of %2$s (%3$.2f%%), uploaded %4$s (Ratio: %5$s Goal: %6$s)"
-msgstr ""
+msgstr "%1$s з %2$s (%3$.2f%%), выслана %4$s (Рэйтынг: %5$s Мэта: %6$s)"
 
 #. %1$s is how much we've got,
 #. %2$s is the torrent's total size,
@@ -1222,7 +1230,7 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:95
 #, c-format
 msgid "%1$s of %2$s (%3$.2f%%), uploaded %4$s (Ratio: %5$s)"
-msgstr ""
+msgstr "%1$s з %2$s (%3$.2f%%), выслана %4$s (Рэйтынг: %5$s)"
 
 #. %1$s is the torrent's total size,
 #. %2$s is how much we've uploaded,
@@ -1231,7 +1239,7 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:112
 #, c-format
 msgid "%1$s, uploaded %2$s (Ratio: %3$s Goal: %4$s)"
-msgstr ""
+msgstr "%1$s, выслана %2$s (Рэйтынг: %3$s, Мэтавы рэйтынг: %4$s)"
 
 #. %1$s is the torrent's total size,
 #. %2$s is how much we've uploaded,
@@ -1239,11 +1247,11 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:124
 #, c-format
 msgid "%1$s, uploaded %2$s (Ratio: %3$s)"
-msgstr ""
+msgstr "%1$s, выслана %2$s (Рэйтынг: %3$s)"
 
 #: ../gtk/torrent-cell-renderer.c:139
 msgid "Remaining time unknown"
-msgstr ""
+msgstr "Застаўшыся час невядомы"
 
 #. time remaining
 #: ../gtk/torrent-cell-renderer.c:145
@@ -1255,13 +1263,13 @@ msgstr "засталося %s"
 #: ../gtk/torrent-cell-renderer.c:174
 #, c-format
 msgid "%1$s %2$s, %3$s %4$s"
-msgstr ""
+msgstr "%1$s %2$s, %3$s %4$s"
 
 #. bandwidth speed + unicode arrow
 #: ../gtk/torrent-cell-renderer.c:179 ../gtk/torrent-cell-renderer.c:183
 #, c-format
 msgid "%1$s %2$s"
-msgstr ""
+msgstr "%1$s %2$s"
 
 #. the torrent isn't uploading or downloading
 #: ../gtk/torrent-cell-renderer.c:187 ../gtk/tr-icon.c:75

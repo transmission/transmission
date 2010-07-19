@@ -3,14 +3,14 @@ msgstr ""
 "Project-Id-Version: Transmission 0.81\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-05-20 11:39-0500\n"
-"PO-Revision-Date: 2010-03-28 13:37+0000\n"
+"PO-Revision-Date: 2010-06-19 12:49+0000\n"
 "Last-Translator: Martin Lettner <m.lettner@gmail.com>\n"
 "Language-Team: Michael Färber <0102@gmx.at>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2010-06-16 00:16+0000\n"
+"X-Launchpad-Export-Date: 2010-07-19 18:20+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:55
@@ -59,15 +59,15 @@ msgstr "_Nachrichtenprotokoll"
 
 #: ../gtk/actions.c:96
 msgid "Enable Temporary Speed _Limits"
-msgstr "_Temporäre Geschwindigkeitsbeschränkung aktivieren"
+msgstr "_Temporäre Geschwindigkeitsbeschränkungen aktivieren"
 
 #: ../gtk/actions.c:97
 msgid "_Compact View"
-msgstr ""
+msgstr "_Kompakte Darstellung"
 
 #: ../gtk/actions.c:98
 msgid "Re_verse Sort Order"
-msgstr "Reihenfolge _umkehren"
+msgstr "Sortierreihenfolge _umkehren"
 
 #: ../gtk/actions.c:99
 msgid "_Filterbar"
@@ -91,7 +91,7 @@ msgstr "_Torrent"
 
 #: ../gtk/actions.c:108
 msgid "_View"
-msgstr "_Anzeige"
+msgstr "_Ansicht"
 
 #: ../gtk/actions.c:109
 msgid "_Sort Torrents By"
@@ -147,7 +147,7 @@ msgstr "Lokale Daten _überprüfen"
 
 #: ../gtk/actions.c:120
 msgid "_Pause"
-msgstr "_Pause"
+msgstr "_Anhalten"
 
 #: ../gtk/actions.c:120
 msgid "Pause torrent"
@@ -187,7 +187,7 @@ msgstr "_Neu..."
 
 #: ../gtk/actions.c:126
 msgid "Create a torrent"
-msgstr "Neuen Torrent erstellen"
+msgstr "Torrent erstellen"
 
 #: ../gtk/actions.c:127
 msgid "_Quit"
@@ -215,7 +215,7 @@ msgstr "_Inhalte"
 
 #: ../gtk/actions.c:135
 msgid "Ask Tracker for _More Peers"
-msgstr "Tracker um _mehr Peers bitten"
+msgstr "Mehr Peers vom _Tracker anfordern"
 
 #: ../gtk/add-dialog.c:240
 msgid "Torrent files"
@@ -310,11 +310,11 @@ msgstr "Globale Be_grenzungen beachten"
 
 #: ../gtk/details.c:454 ../gtk/tr-prefs.c:1220
 msgid "Limit _download speed (KiB/s):"
-msgstr ""
+msgstr "_Empfangsgeschwindigkeit beschränken (KiB/s):"
 
 #: ../gtk/details.c:466 ../gtk/tr-prefs.c:1227
 msgid "Limit _upload speed (KiB/s):"
-msgstr ""
+msgstr "_Verteilungsgeschwindigkeit beschränken (KiB/s):"
 
 #: ../gtk/details.c:482
 msgid "Seed-Until Ratio"
@@ -350,15 +350,15 @@ msgstr "Lokale Daten werden geprüft"
 
 #: ../gtk/details.c:542 ../gtk/filter.c:720
 msgid "Downloading"
-msgstr "Wird heruntergeladen"
+msgstr "Herunterladen"
 
 #: ../gtk/details.c:543 ../gtk/filter.c:721
 msgid "Seeding"
-msgstr "Verteile"
+msgstr "Verteilen"
 
 #: ../gtk/details.c:544 ../gtk/torrent-cell-renderer.c:206
 msgid "Finished"
-msgstr ""
+msgstr "Abgeschlossen"
 
 #: ../gtk/details.c:544 ../gtk/filter.c:722 ../gtk/torrent-cell-renderer.c:208
 msgid "Paused"
@@ -548,19 +548,19 @@ msgstr "Anfragen runter"
 
 #: ../gtk/details.c:1103
 msgid "Dn Blocks"
-msgstr ""
+msgstr "Blöcke hoch"
 
 #: ../gtk/details.c:1105
 msgid "Up Blocks"
-msgstr ""
+msgstr "Blöcke runter"
 
 #: ../gtk/details.c:1107
 msgid "We Cancelled"
-msgstr ""
+msgstr "Von uns abgebrochen"
 
 #: ../gtk/details.c:1109
 msgid "They Cancelled"
-msgstr ""
+msgstr "Von ihnen abgebrochen"
 
 #: ../gtk/details.c:1110
 msgid "Status"
@@ -752,15 +752,15 @@ msgstr "_Nicht wieder nachfragen"
 #, c-format
 msgid "Remove torrent?"
 msgid_plural "Remove %d torrents?"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Torrent entfernen?"
+msgstr[1] "%d Torrents entfernen?"
 
 #: ../gtk/dialogs.c:235
 #, c-format
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these %d torrents' downloaded files?"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Heruntergeladene Dateien dieses Torrents löschen?"
+msgstr[1] "Heruntergeladene Dateien dieser %d Torrents löschen?"
 
 #: ../gtk/dialogs.c:245
 msgid ""
@@ -770,7 +770,11 @@ msgid_plural ""
 "Once removed, continuing the transfers will require the torrent files or "
 "magnet links."
 msgstr[0] ""
+"Nach Entfernen wird eine Torrentdatei oder ein Magnet-Link zur Fortführung "
+"der Übertragung benötigt."
 msgstr[1] ""
+"Nach Entfernen werden Torrentdateien oder Magnet-Links zur Fortführung der "
+"Übertragung benötigt."
 
 #: ../gtk/dialogs.c:251
 msgid "This torrent has not finished downloading."
@@ -831,7 +835,7 @@ msgstr "Fortschritt"
 
 #: ../gtk/filter.c:316 ../gtk/filter.c:717
 msgid "All"
-msgstr ""
+msgstr "Alle"
 
 #: ../gtk/filter.c:330 ../gtk/tr-prefs.c:552 ../gtk/tr-prefs.c:1439
 msgid "Privacy"
@@ -839,23 +843,23 @@ msgstr "Privatsphäre"
 
 #: ../gtk/filter.c:335
 msgid "Public"
-msgstr ""
+msgstr "Öffentlich"
 
 #: ../gtk/filter.c:339
 msgid "Private"
-msgstr ""
+msgstr "Privat"
 
 #: ../gtk/filter.c:719
 msgid "Active"
-msgstr ""
+msgstr "Aktiv"
 
 #: ../gtk/filter.c:723
 msgid "Queued"
-msgstr ""
+msgstr "Warteschlange"
 
 #: ../gtk/filter.c:724
 msgid "Verifying"
-msgstr ""
+msgstr "Überprüfen"
 
 #: ../gtk/filter.c:725 ../gtk/msgwin.c:178
 msgid "Error"
@@ -872,7 +876,7 @@ msgstr "Tracker"
 #. add the activity combobox
 #: ../gtk/filter.c:1023
 msgid "_Show:"
-msgstr ""
+msgstr "_Zeigen:"
 
 #: ../gtk/main.c:393
 #, c-format
@@ -925,6 +929,11 @@ msgid ""
 "fully responsible for exercising proper judgement and abiding by your local "
 "laws."
 msgstr ""
+"Transmission ist eine Anwendung, um Dateien zu verteilen. Wenn Sie einen "
+"Torrent betreiben, werden dessen Daten anderen Nutzern über "
+"Verteilmechanismen zur Verfügung gestellt. Sie und nur Sie sind für die "
+"Einhaltung der für Sie geltenden Gesetze und eine vernünftige Anwendung der "
+"Technologie verantwortlich."
 
 #: ../gtk/main.c:733
 msgid "I _Accept"
@@ -1167,7 +1176,7 @@ msgstr "\"%s\" wird verschoben"
 
 #: ../gtk/relocate.c:86
 msgid "Couldn't move torrent"
-msgstr ""
+msgstr "Torrent konnte nicht verschoben werden"
 
 #: ../gtk/relocate.c:127
 msgid "This may take a moment..."
@@ -1250,6 +1259,7 @@ msgstr "%1$s von %2$s (%3$.2f%%)"
 #, c-format
 msgid "%1$s of %2$s (%3$.2f%%), uploaded %4$s (Ratio: %5$s Goal: %6$s)"
 msgstr ""
+"%1$s von %2$s (%3$.2f%%), hochgeladen %4$s (Verhältnis: %5$s Ziel: %6$s)"
 
 #. %1$s is how much we've got,
 #. %2$s is the torrent's total size,
@@ -1292,13 +1302,13 @@ msgstr "%s verbleibend"
 #: ../gtk/torrent-cell-renderer.c:174
 #, c-format
 msgid "%1$s %2$s, %3$s %4$s"
-msgstr ""
+msgstr "%1$s %2$s, %3$s %4$s"
 
 #. bandwidth speed + unicode arrow
 #: ../gtk/torrent-cell-renderer.c:179 ../gtk/torrent-cell-renderer.c:183
 #, c-format
 msgid "%1$s %2$s"
-msgstr ""
+msgstr "%1$s %2$s"
 
 #. the torrent isn't uploading or downloading
 #: ../gtk/torrent-cell-renderer.c:187 ../gtk/tr-icon.c:75
@@ -1313,7 +1323,7 @@ msgstr "Lokale Dateien überprüfen (%.1f%% getestet)"
 #: ../gtk/torrent-cell-renderer.c:228
 #, c-format
 msgid "Ratio %s"
-msgstr ""
+msgstr "Verhältnis %s"
 
 #: ../gtk/torrent-cell-renderer.c:257
 #, c-format
@@ -1436,7 +1446,7 @@ msgstr "_Unvollständige Torrents verbleiben in:"
 
 #: ../gtk/tr-prefs.c:320
 msgid "Call scrip_t when torrent is completed:"
-msgstr ""
+msgstr "Skrip_t ausführen, wenn Torrent abgeschlossen:"
 
 #: ../gtk/tr-prefs.c:328 ../gtk/tr-prefs.c:1395
 msgid "Limits"
@@ -1536,11 +1546,11 @@ msgstr "Mit DHT können Peers ohne Tracker gefunden werden."
 
 #: ../gtk/tr-prefs.c:570
 msgid "Use Local Peer Discovery to find more peers"
-msgstr ""
+msgstr "»Local Peer Discovery« verwenden, um weitere Peers zu finden"
 
 #: ../gtk/tr-prefs.c:572
 msgid "LPD is a tool for finding peers on your local network."
-msgstr ""
+msgstr "Mit LPD können Peers im lokalen Netz gefunden werden."
 
 #: ../gtk/tr-prefs.c:793
 msgid "Web Client"
@@ -1659,11 +1669,11 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:1252
 msgid "Limit do_wnload speed (KiB/s):"
-msgstr ""
+msgstr "E_mpfangsgeschwindigkeit beschränken (KiB/s):"
 
 #: ../gtk/tr-prefs.c:1256
 msgid "Limit u_pload speed (KiB/s):"
-msgstr ""
+msgstr "V_erteilungsgeschwindigkeit beschränken (KiB/s):"
 
 #: ../gtk/tr-prefs.c:1260
 msgid "_Scheduled times:"
@@ -1707,7 +1717,7 @@ msgstr "Port _testen"
 
 #: ../gtk/tr-prefs.c:1386
 msgid "Pick a _random port on startup"
-msgstr ""
+msgstr "Beim Start einen _zufälligen Port wählen"
 
 #: ../gtk/tr-prefs.c:1390
 msgid "Use UPnP or NAT-PMP port _forwarding from my router"
@@ -1811,7 +1821,7 @@ msgstr "Stoppen bei Verhältnis (%s)"
 
 #: ../gtk/tr-window.c:737
 msgid "999.9 KiB/s"
-msgstr ""
+msgstr "999,9 KiB/s"
 
 #: ../gtk/tr-window.c:781
 #, c-format
@@ -1847,41 +1857,41 @@ msgstr[1] "%'u Byte"
 #: ../gtk/util.c:120
 #, c-format
 msgid "%'.1f KiB"
-msgstr ""
+msgstr "%'.1f KiB"
 
 #: ../gtk/util.c:122
 #, c-format
 msgid "%'.1f MiB"
-msgstr ""
+msgstr "%'.1f MiB"
 
 #: ../gtk/util.c:124
 #, c-format
 msgid "%'.1f GiB"
-msgstr ""
+msgstr "%'.1f GiB"
 
 #. 0.0 KiB to 999.9 KiB
 #: ../gtk/util.c:134
 #, c-format
 msgid "%'.1f KiB/s"
-msgstr ""
+msgstr "%'.1f KiB/s"
 
 #. 0.98 MiB to 99.99 MiB
 #: ../gtk/util.c:136
 #, c-format
 msgid "%'.2f MiB/s"
-msgstr ""
+msgstr "%'.2f MiB/s"
 
 #. 100.0 MiB to 999.9 MiB
 #: ../gtk/util.c:138
 #, c-format
 msgid "%'.1f MiB/s"
-msgstr ""
+msgstr "%'.1f MiB/s"
 
 #. insane speeds
 #: ../gtk/util.c:140
 #, c-format
 msgid "%'.2f GiB/s"
-msgstr ""
+msgstr "%'.2f GiB/s"
 
 #: ../gtk/util.c:159
 #, c-format
@@ -1985,6 +1995,7 @@ msgstr "Blockierliste »%s« enthält %'zu Einträge"
 #, c-format
 msgid "blocklist skipped invalid address at line %d"
 msgstr ""
+"Ungültige Adresse in der Blockierliste auf Zeile %d wird übersprungen"
 
 #: ../libtransmission/blocklist.c:319
 #, c-format
@@ -2098,11 +2109,11 @@ msgstr "%s %s gestarted"
 
 #: ../libtransmission/session.c:636
 msgid "Local Peer Discovery disabled"
-msgstr ""
+msgstr "»Local Peer Discovery« deaktiviert"
 
 #: ../libtransmission/session.c:638
 msgid "Local Peer Discovery active"
-msgstr ""
+msgstr "»Local Peer Discovery« aktiv"
 
 #: ../libtransmission/session.c:1748
 #, c-format
@@ -2138,7 +2149,7 @@ msgstr ""
 
 #: ../libtransmission/torrent.c:1562
 msgid "Removing torrent"
-msgstr ""
+msgstr "Torrent wird entfernt"
 
 #: ../libtransmission/torrent.c:1616
 msgid "Done"

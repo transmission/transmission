@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-05-20 11:39-0500\n"
-"PO-Revision-Date: 2010-04-07 10:52+0000\n"
-"Last-Translator: JC Brand <Unknown>\n"
+"PO-Revision-Date: 2010-06-23 08:29+0000\n"
+"Last-Translator: Fredre Hattingh <hattingh.fredre@gmail.com>\n"
 "Language-Team: Afrikaans <af@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2010-06-16 00:16+0000\n"
+"X-Launchpad-Export-Date: 2010-07-19 18:20+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:55
@@ -32,7 +32,7 @@ msgstr "Sorteer volgens _Vordering"
 
 #: ../gtk/actions.c:58
 msgid "Sort by Rati_o"
-msgstr ""
+msgstr "Sorteer volgens Verh_ouding"
 
 #: ../gtk/actions.c:59
 msgid "Sort by Stat_e"
@@ -56,7 +56,7 @@ msgstr ""
 
 #: ../gtk/actions.c:80
 msgid "_Show Transmission"
-msgstr ""
+msgstr "_Wys Transmission"
 
 #: ../gtk/actions.c:81
 msgid "Message _Log"
@@ -64,11 +64,11 @@ msgstr "Boodskap_logboek"
 
 #: ../gtk/actions.c:96
 msgid "Enable Temporary Speed _Limits"
-msgstr ""
+msgstr "Aktiveer tydelike Spoed _Limiete"
 
 #: ../gtk/actions.c:97
 msgid "_Compact View"
-msgstr ""
+msgstr "_Kompakte Aansig"
 
 #: ../gtk/actions.c:98
 msgid "Re_verse Sort Order"
@@ -76,7 +76,7 @@ msgstr ""
 
 #: ../gtk/actions.c:99
 msgid "_Filterbar"
-msgstr ""
+msgstr "_Filter Balk"
 
 #: ../gtk/actions.c:100
 msgid "_Statusbar"
@@ -961,6 +961,7 @@ msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
 "  Adriaan Joubert https://launchpad.net/~adie90\n"
+"  Fredre Hattingh https://launchpad.net/~fredre\n"
 "  JC Brand https://launchpad.net/~jancarel"
 
 #: ../gtk/makemeta-ui.c:75

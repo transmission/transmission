@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-05-20 11:39-0500\n"
-"PO-Revision-Date: 2010-05-04 20:24+0000\n"
+"PO-Revision-Date: 2010-07-07 22:09+0000\n"
 "Last-Translator: Saša Teković <Unknown>\n"
 "Language-Team: Croatian <hr@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2010-06-16 00:16+0000\n"
+"X-Launchpad-Export-Date: 2010-07-19 18:20+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:55
@@ -69,7 +69,7 @@ msgstr "Omogući privremena _ograničenja brzina"
 
 #: ../gtk/actions.c:97
 msgid "_Compact View"
-msgstr ""
+msgstr "_Kompaktni prikaz"
 
 #: ../gtk/actions.c:98
 msgid "Re_verse Sort Order"
@@ -316,11 +316,11 @@ msgstr "Poštuj globalna _ograničenja"
 
 #: ../gtk/details.c:454 ../gtk/tr-prefs.c:1220
 msgid "Limit _download speed (KiB/s):"
-msgstr ""
+msgstr "Ograniči _brzinu preuzimanja (KiB/s):"
 
 #: ../gtk/details.c:466 ../gtk/tr-prefs.c:1227
 msgid "Limit _upload speed (KiB/s):"
-msgstr ""
+msgstr "Ograniči _brzinu slanja (KiB/s):"
 
 #: ../gtk/details.c:482
 msgid "Seed-Until Ratio"
@@ -364,7 +364,7 @@ msgstr "Dijeljenje"
 
 #: ../gtk/details.c:544 ../gtk/torrent-cell-renderer.c:206
 msgid "Finished"
-msgstr ""
+msgstr "Dovršeno"
 
 #: ../gtk/details.c:544 ../gtk/filter.c:722 ../gtk/torrent-cell-renderer.c:208
 msgid "Paused"
@@ -556,19 +556,19 @@ msgstr "Zahtjevi preuzimanja"
 
 #: ../gtk/details.c:1103
 msgid "Dn Blocks"
-msgstr ""
+msgstr "Preuzeti blokovi"
 
 #: ../gtk/details.c:1105
 msgid "Up Blocks"
-msgstr ""
+msgstr "Poslani blokovi"
 
 #: ../gtk/details.c:1107
 msgid "We Cancelled"
-msgstr ""
+msgstr "Mi smo otkazali"
 
 #: ../gtk/details.c:1109
 msgid "They Cancelled"
-msgstr ""
+msgstr "Oni su otkazali"
 
 #: ../gtk/details.c:1110
 msgid "Status"
@@ -754,15 +754,17 @@ msgstr "_Ne pitaj me opet"
 #, c-format
 msgid "Remove torrent?"
 msgid_plural "Remove %d torrents?"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Ukloniti torrent?"
+msgstr[1] "Ukloniti %d torrenta?"
+msgstr[2] "Ukloniti %d torrenata?"
 
 #: ../gtk/dialogs.c:235
 #, c-format
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these %d torrents' downloaded files?"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Obrisati preuzete datoteke ovog torrenta?"
+msgstr[1] "Obrisati preuzete datoteke ova %d torrenta?"
+msgstr[2] "Obrisati preuzete datoteke ovih %d torrenata?"
 
 #: ../gtk/dialogs.c:245
 msgid ""
@@ -772,7 +774,14 @@ msgid_plural ""
 "Once removed, continuing the transfers will require the torrent files or "
 "magnet links."
 msgstr[0] ""
+"Nakon brisanja, nastavak transfera će zahtijevati torrent datoteku ili "
+"magnet poveznicu."
 msgstr[1] ""
+"Nakon brisanja, nastavak transfera će zahtijevati torrent datoteku ili "
+"magnet poveznicu."
+msgstr[2] ""
+"Nakon brisanja, nastavak transfera će zahtijevati torrent datoteku ili "
+"magnet poveznicu."
 
 #: ../gtk/dialogs.c:251
 msgid "This torrent has not finished downloading."
@@ -835,7 +844,7 @@ msgstr "Napredak"
 
 #: ../gtk/filter.c:316 ../gtk/filter.c:717
 msgid "All"
-msgstr ""
+msgstr "Sve"
 
 #: ../gtk/filter.c:330 ../gtk/tr-prefs.c:552 ../gtk/tr-prefs.c:1439
 msgid "Privacy"
@@ -843,23 +852,23 @@ msgstr "Privatnost"
 
 #: ../gtk/filter.c:335
 msgid "Public"
-msgstr ""
+msgstr "Javni"
 
 #: ../gtk/filter.c:339
 msgid "Private"
-msgstr ""
+msgstr "Privatni"
 
 #: ../gtk/filter.c:719
 msgid "Active"
-msgstr ""
+msgstr "Aktivan"
 
 #: ../gtk/filter.c:723
 msgid "Queued"
-msgstr ""
+msgstr "Na čekanju"
 
 #: ../gtk/filter.c:724
 msgid "Verifying"
-msgstr ""
+msgstr "Provjera"
 
 #: ../gtk/filter.c:725 ../gtk/msgwin.c:178
 msgid "Error"
@@ -876,7 +885,7 @@ msgstr "Pratitelj"
 #. add the activity combobox
 #: ../gtk/filter.c:1023
 msgid "_Show:"
-msgstr ""
+msgstr "_Prikaži:"
 
 #: ../gtk/main.c:393
 #, c-format
@@ -929,6 +938,10 @@ msgid ""
 "fully responsible for exercising proper judgement and abiding by your local "
 "laws."
 msgstr ""
+"Transmission je program za dijeljenje datoteka.  Kad pokrenete torrent, "
+"njegovi podaci su dostupni ostalima pomoću slanja.  Vi, i samo vi, ste u "
+"potpunosti odgovorni za primjenu ispravne procjene i poštovanje vaših "
+"lokalnih zakona."
 
 #: ../gtk/main.c:733
 msgid "I _Accept"
@@ -1132,7 +1145,7 @@ msgstr "Premještanje \"%s\""
 
 #: ../gtk/relocate.c:86
 msgid "Couldn't move torrent"
-msgstr ""
+msgstr "Premještanje torrenta nije moguće"
 
 #: ../gtk/relocate.c:127
 msgid "This may take a moment..."
@@ -1215,7 +1228,7 @@ msgstr "%1$s od %2$s (%3$.2f%%)"
 #: ../gtk/torrent-cell-renderer.c:79
 #, c-format
 msgid "%1$s of %2$s (%3$.2f%%), uploaded %4$s (Ratio: %5$s Goal: %6$s)"
-msgstr ""
+msgstr "%1$s of %2$s (%3$.2f%%), poslano %4$s (Omjer: %5$s Cilj: %6$s)"
 
 #. %1$s is how much we've got,
 #. %2$s is the torrent's total size,
@@ -1258,13 +1271,13 @@ msgstr "%s preostalo"
 #: ../gtk/torrent-cell-renderer.c:174
 #, c-format
 msgid "%1$s %2$s, %3$s %4$s"
-msgstr ""
+msgstr "%1$s %2$s, %3$s %4$s"
 
 #. bandwidth speed + unicode arrow
 #: ../gtk/torrent-cell-renderer.c:179 ../gtk/torrent-cell-renderer.c:183
 #, c-format
 msgid "%1$s %2$s"
-msgstr ""
+msgstr "%1$s %2$s"
 
 #. the torrent isn't uploading or downloading
 #: ../gtk/torrent-cell-renderer.c:187 ../gtk/tr-icon.c:75
@@ -1279,7 +1292,7 @@ msgstr "Provjera lokalnih podataka (%.1f%% testirano)"
 #: ../gtk/torrent-cell-renderer.c:228
 #, c-format
 msgid "Ratio %s"
-msgstr ""
+msgstr "Omjer %s"
 
 #: ../gtk/torrent-cell-renderer.c:257
 #, c-format
@@ -1403,7 +1416,7 @@ msgstr "Čuvaj _nedovršene torrente u:"
 
 #: ../gtk/tr-prefs.c:320
 msgid "Call scrip_t when torrent is completed:"
-msgstr ""
+msgstr "Pozovi skrip_tu kad se torrent dovrši:"
 
 #: ../gtk/tr-prefs.c:328 ../gtk/tr-prefs.c:1395
 msgid "Limits"
@@ -1504,11 +1517,11 @@ msgstr "DHT je alat za pronalaženje točaka bez pratitelja."
 
 #: ../gtk/tr-prefs.c:570
 msgid "Use Local Peer Discovery to find more peers"
-msgstr ""
+msgstr "Koristi Local Peer Discovery za pronalazak dodatnih točaka"
 
 #: ../gtk/tr-prefs.c:572
 msgid "LPD is a tool for finding peers on your local network."
-msgstr ""
+msgstr "LPD je alat za pronalazak točaka u vašoj lokalnoj mreži."
 
 #: ../gtk/tr-prefs.c:793
 msgid "Web Client"
@@ -1625,11 +1638,11 @@ msgstr "Premosti normalna brzinska ograničenja ručno ili u zakazana vremena"
 
 #: ../gtk/tr-prefs.c:1252
 msgid "Limit do_wnload speed (KiB/s):"
-msgstr ""
+msgstr "Ograniči brzinu pr_euzimanja (KiB/s):"
 
 #: ../gtk/tr-prefs.c:1256
 msgid "Limit u_pload speed (KiB/s):"
-msgstr ""
+msgstr "Ograniči brzinu s_lanja (KiB/s):"
 
 #: ../gtk/tr-prefs.c:1260
 msgid "_Scheduled times:"
@@ -1673,7 +1686,7 @@ msgstr "Te_stiraj ulaz"
 
 #: ../gtk/tr-prefs.c:1386
 msgid "Pick a _random port on startup"
-msgstr ""
+msgstr "Odaberi  _nasumičan port pri pokretanju"
 
 #: ../gtk/tr-prefs.c:1390
 msgid "Use UPnP or NAT-PMP port _forwarding from my router"
@@ -1777,7 +1790,7 @@ msgstr "Zaustavi pri omjeru (%s)"
 
 #: ../gtk/tr-window.c:737
 msgid "999.9 KiB/s"
-msgstr ""
+msgstr "999.9 KiB/s"
 
 #: ../gtk/tr-window.c:781
 #, c-format
@@ -1816,41 +1829,41 @@ msgstr[2] "%'u bajtova"
 #: ../gtk/util.c:120
 #, c-format
 msgid "%'.1f KiB"
-msgstr ""
+msgstr "%'.1f KiB"
 
 #: ../gtk/util.c:122
 #, c-format
 msgid "%'.1f MiB"
-msgstr ""
+msgstr "%'.1f MiB"
 
 #: ../gtk/util.c:124
 #, c-format
 msgid "%'.1f GiB"
-msgstr ""
+msgstr "%'.1f GiB"
 
 #. 0.0 KiB to 999.9 KiB
 #: ../gtk/util.c:134
 #, c-format
 msgid "%'.1f KiB/s"
-msgstr ""
+msgstr "%'.1f KiB/s"
 
 #. 0.98 MiB to 99.99 MiB
 #: ../gtk/util.c:136
 #, c-format
 msgid "%'.2f MiB/s"
-msgstr ""
+msgstr "%'.2f MiB/s"
 
 #. 100.0 MiB to 999.9 MiB
 #: ../gtk/util.c:138
 #, c-format
 msgid "%'.1f MiB/s"
-msgstr ""
+msgstr "%'.1f MiB/s"
 
 #. insane speeds
 #: ../gtk/util.c:140
 #, c-format
 msgid "%'.2f GiB/s"
-msgstr ""
+msgstr "%'.2f GiB/s"
 
 #: ../gtk/util.c:159
 #, c-format
@@ -1957,7 +1970,7 @@ msgstr "Popis blokiranih \"%s\" sadrži %'zu unosa"
 #: ../libtransmission/blocklist.c:288 ../libtransmission/blocklist.c:298
 #, c-format
 msgid "blocklist skipped invalid address at line %d"
-msgstr ""
+msgstr "popis blokiranja preskočio neispravnu adresu u retku %d"
 
 #: ../libtransmission/blocklist.c:319
 #, c-format
@@ -2070,11 +2083,11 @@ msgstr "%s %s pokrenuto"
 
 #: ../libtransmission/session.c:636
 msgid "Local Peer Discovery disabled"
-msgstr ""
+msgstr "Local Peed Discovery onemogućen"
 
 #: ../libtransmission/session.c:638
 msgid "Local Peer Discovery active"
-msgstr ""
+msgstr "Local Peer Discovery aktivan"
 
 #: ../libtransmission/session.c:1748
 #, c-format
@@ -2110,7 +2123,7 @@ msgstr ""
 
 #: ../libtransmission/torrent.c:1562
 msgid "Removing torrent"
-msgstr ""
+msgstr "Uklanjanje torrenta"
 
 #: ../libtransmission/torrent.c:1616
 msgid "Done"

@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2010-06-16 00:16+0000\n"
+"X-Launchpad-Export-Date: 2010-07-19 18:20+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:55
@@ -961,9 +961,9 @@ msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
 "  Mikel Alzibar https://launchpad.net/~mikelalzibar\n"
+"  Misterio https://launchpad.net/~misterio\n"
 "  Oier Mees https://launchpad.net/~oier\n"
-"  OrE https://launchpad.net/~dwarfnauko\n"
-"  nehyx https://launchpad.net/~danielruiz"
+"  OrE https://launchpad.net/~dwarfnauko"
 
 #: ../gtk/makemeta-ui.c:75
 #, c-format

@@ -9,14 +9,14 @@ msgstr ""
 "Project-Id-Version: Transmission HEAD\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-05-20 11:39-0500\n"
-"PO-Revision-Date: 2010-06-10 11:13+0000\n"
+"PO-Revision-Date: 2010-06-25 11:39+0000\n"
 "Last-Translator: Miro Hadzhiev (Хаджиев) <extigyro@gmail.com>\n"
 "Language-Team: Bulgarian <bg@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2010-06-16 00:16+0000\n"
+"X-Launchpad-Export-Date: 2010-07-19 18:20+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:55
@@ -157,7 +157,7 @@ msgstr "_Паузиране"
 
 #: ../gtk/actions.c:120
 msgid "Pause torrent"
-msgstr "Прекъсване на торента"
+msgstr "Паузиране на торента"
 
 #: ../gtk/actions.c:121
 msgid "_Pause All"
@@ -185,11 +185,11 @@ msgstr "Премахване на торента"
 
 #: ../gtk/actions.c:125
 msgid "_Delete Files and Remove"
-msgstr "_Изтриване на файлове и премахване"
+msgstr "_Изтриване на файловете и премахване"
 
 #: ../gtk/actions.c:126
 msgid "_New..."
-msgstr "_Създаване на нов..."
+msgstr "_Нов…"
 
 #: ../gtk/actions.c:126
 msgid "Create a torrent"
@@ -221,11 +221,11 @@ msgstr "_Съдържание"
 
 #: ../gtk/actions.c:135
 msgid "Ask Tracker for _More Peers"
-msgstr "Питане на тракер за _повече постове"
+msgstr "Питане на тракера за _повече посредници"
 
 #: ../gtk/add-dialog.c:240
 msgid "Torrent files"
-msgstr "Файлове с описания на потоци"
+msgstr "Торент файлове"
 
 #: ../gtk/add-dialog.c:245
 msgid "All files"
@@ -250,15 +250,15 @@ msgstr "_Торент файл:"
 
 #: ../gtk/add-dialog.c:316
 msgid "Select Source File"
-msgstr "Избиране на изходен файл"
+msgstr "Избиране на начален файл"
 
 #: ../gtk/add-dialog.c:327
 msgid "_Destination folder:"
-msgstr "Папка на _записване:"
+msgstr "Папка на _запазване:"
 
 #: ../gtk/add-dialog.c:331
 msgid "Select Destination Folder"
-msgstr "Избиране на папка на записване"
+msgstr "Избиране на папка на запазване"
 
 #: ../gtk/add-dialog.c:353 ../gtk/details.c:478
 msgid "Torrent _priority:"
@@ -324,7 +324,7 @@ msgstr ""
 
 #: ../gtk/details.c:482
 msgid "Seed-Until Ratio"
-msgstr "Разпръскване до коефициент"
+msgstr "Разпространяване до коефициент"
 
 #: ../gtk/details.c:484
 msgid "Use _global settings"
@@ -332,19 +332,19 @@ msgstr "Използване на _общи настройки"
 
 #: ../gtk/details.c:492
 msgid "Seed _regardless of ratio"
-msgstr "Разпръскване _независимо от коефициента"
+msgstr "Разпространяване _независимо от коефициента"
 
 #: ../gtk/details.c:501 ../gtk/tr-prefs.c:330
 msgid "_Seed torrent until its ratio reaches:"
-msgstr "_Разпръскване докато коефициента не достигне:"
+msgstr "_Разпространяване, докато коефициента не достигне:"
 
 #: ../gtk/details.c:517
 msgid "Peer Connections"
-msgstr "Връзки с постове"
+msgstr "Връзки със съседи"
 
 #: ../gtk/details.c:520
 msgid "_Maximum peers:"
-msgstr "_Максимално пиъри:"
+msgstr "_Максимално посредници:"
 
 #: ../gtk/details.c:540 ../gtk/torrent-cell-renderer.c:212
 msgid "Waiting to verify local data"
@@ -360,7 +360,7 @@ msgstr "Изтегляне"
 
 #: ../gtk/details.c:543 ../gtk/filter.c:721
 msgid "Seeding"
-msgstr "Качване"
+msgstr "Разпространяване"
 
 #: ../gtk/details.c:544 ../gtk/torrent-cell-renderer.c:206
 msgid "Finished"
@@ -522,7 +522,7 @@ msgstr "Коментар:"
 
 #: ../gtk/details.c:1039
 msgid "Webseeds"
-msgstr "Уеб посявки"
+msgstr "Уеб разпространявания"
 
 #: ../gtk/details.c:1041 ../gtk/details.c:1093
 msgid "Down"
@@ -578,27 +578,27 @@ msgstr "Оптимистично потискане"
 
 #: ../gtk/details.c:1470
 msgid "Downloading from this peer"
-msgstr "Изтегляне от този пиър"
+msgstr "Изтегляне от този посредник"
 
 #: ../gtk/details.c:1471
 msgid "We would download from this peer if they would let us"
-msgstr "Бихме теглили от този пиър, ако ни позволят"
+msgstr "От този посредник би се теглило, ако Ви позволи"
 
 #: ../gtk/details.c:1472
 msgid "Uploading to peer"
-msgstr "Качване на пиър"
+msgstr "Качване към посредник"
 
 #: ../gtk/details.c:1473
 msgid "We would upload to this peer if they asked"
-msgstr "Бихме качвали към този пиър, ако ни помолят"
+msgstr "Бихме качвали към този посредник, ако Ви помолят"
 
 #: ../gtk/details.c:1474
 msgid "Peer has unchoked us, but we're not interested"
-msgstr "Пиъря спра дани потиска, но не сме заинтересувани"
+msgstr "Посредникът спря забавянето, но вече няма полза от него"
 
 #: ../gtk/details.c:1475
 msgid "We unchoked this peer, but they're not interested"
-msgstr "Спряхме да потискаме този пиър, но той вече не е заинтересуван"
+msgstr "Спряно е забавянето към този посредник, но той не реагира"
 
 #: ../gtk/details.c:1476
 msgid "Encrypted connection"
@@ -606,7 +606,7 @@ msgstr "Криптирана връзка"
 
 #: ../gtk/details.c:1477
 msgid "Peer was discovered through Peer Exchange (PEX)"
-msgstr "Беше разкрит пиър през размяна на пиър (PEX)"
+msgstr "Посредникът бе открит чрез размяна на посредници (PEX)"
 
 #: ../gtk/details.c:1478
 msgid "Peer was discovered through DHT"
@@ -614,7 +614,7 @@ msgstr "Посредникът бе открит чрез DHT"
 
 #: ../gtk/details.c:1479
 msgid "Peer is an incoming connection"
-msgstr "Пиъра е входяща връзка"
+msgstr "Посредникът е входяща връзка"
 
 #: ../gtk/details.c:1734 ../gtk/details.c:2254
 msgid "Show _more details"
@@ -658,7 +658,7 @@ msgstr "Незабавна заявка за още посредници… <sma
 #: ../gtk/details.c:1849
 #, c-format
 msgid "Tracker had %s%'d seeders and %'d leechers%s %s ago"
-msgstr "В тракера имаше %s%'d сеячи и %'d търсачи%s, преди %s"
+msgstr "В тракера имаше %s%'d разпространители и %'d консуматори%s, преди %s"
 
 #: ../gtk/details.c:1853
 #, c-format
@@ -668,16 +668,16 @@ msgstr "Възникна циклична грешка преди \"%s%s%s\" %s"
 #: ../gtk/details.c:1863
 #, c-format
 msgid "Asking for peer counts in %s"
-msgstr ""
+msgstr "Заявка за броя на посредници в %s"
 
 #: ../gtk/details.c:1867
 msgid "Queued to ask for peer counts"
-msgstr ""
+msgstr "Поставяне на заявка за броя на посредници в опашката"
 
 #: ../gtk/details.c:1872
 #, c-format
 msgid "Asking for peer counts now... <small>%s</small>"
-msgstr ""
+msgstr "Незабавна заявка за броя на посредници… <small>%s</small>"
 
 #: ../gtk/details.c:2131
 msgid "List contains invalid URLs"
@@ -717,7 +717,7 @@ msgstr "Информация"
 
 #: ../gtk/details.c:2346
 msgid "Peers"
-msgstr "Пиъри"
+msgstr "Посредници"
 
 #: ../gtk/details.c:2356
 msgid "File listing not available for combined torrent properties"
@@ -782,14 +782,14 @@ msgstr[1] "Тези торенти не са завършили изтеглян
 #: ../gtk/dialogs.c:257
 msgid "This torrent is connected to peers."
 msgid_plural "These torrents are connected to peers."
-msgstr[0] "Този торент е свързан към пиъри."
-msgstr[1] "Тези торенти са свързани към пиъри."
+msgstr[0] "Има посредници, свързани към торента."
+msgstr[1] "Има посредници, свързани към торентите."
 
 #: ../gtk/dialogs.c:264
 msgid "One of these torrents is connected to peers."
 msgid_plural "Some of these torrents are connected to peers."
-msgstr[0] "Един от тези торенти е свързан към пиъри."
-msgstr[1] "Някои от тези торенти е свързан към пиъри."
+msgstr[0] "Има посредници, свързани към един от тези торенти."
+msgstr[1] "Има посредници, свързани към някои от тези торенти."
 
 #: ../gtk/dialogs.c:271
 msgid "One of these torrents has not finished downloading."
@@ -830,7 +830,7 @@ msgstr "Напредък"
 
 #: ../gtk/filter.c:316 ../gtk/filter.c:717
 msgid "All"
-msgstr ""
+msgstr "Всички"
 
 #: ../gtk/filter.c:330 ../gtk/tr-prefs.c:552 ../gtk/tr-prefs.c:1439
 msgid "Privacy"
@@ -838,23 +838,23 @@ msgstr "Поверителност"
 
 #: ../gtk/filter.c:335
 msgid "Public"
-msgstr ""
+msgstr "Публични"
 
 #: ../gtk/filter.c:339
 msgid "Private"
-msgstr ""
+msgstr "Лични"
 
 #: ../gtk/filter.c:719
 msgid "Active"
-msgstr ""
+msgstr "Активни"
 
 #: ../gtk/filter.c:723
 msgid "Queued"
-msgstr ""
+msgstr "Изчакващи"
 
 #: ../gtk/filter.c:724
 msgid "Verifying"
-msgstr ""
+msgstr "Проверка"
 
 #: ../gtk/filter.c:725 ../gtk/msgwin.c:178
 msgid "Error"
@@ -878,6 +878,8 @@ msgstr ""
 msgid ""
 "Got signal %d; trying to shut down cleanly.  Do it again if it gets stuck."
 msgstr ""
+"Получен е сигнал %d. Опит за нормално спиране на програмата. Ако не се "
+"получи, пратете сигнала отново."
 
 #: ../gtk/main.c:516
 msgid "Start with all torrents paused"
@@ -889,7 +891,7 @@ msgstr "Показване на номер на версията при затв
 
 #: ../gtk/main.c:522
 msgid "Start minimized in notification area"
-msgstr ""
+msgstr "Стартиране в минимизирано състояние в областта за уведомяване"
 
 #: ../gtk/main.c:525
 msgid "Where to look for configuration files"
@@ -901,17 +903,19 @@ msgstr "BitTorrent клиент (Transmission)"
 
 #: ../gtk/main.c:541
 msgid "[torrent files or urls]"
-msgstr ""
+msgstr "[торент файлове или уеб адреси]"
 
 #: ../gtk/main.c:595
 msgid ""
 "Transmission is already running, but is not responding.  To start a new "
 "session, you must first close the existing Transmission process."
 msgstr ""
+"Transmission е стартиран, но не отговаря. За да стартирате нова сесия, "
+"трябва да затворите съществуващия процес на Transmission."
 
 #: ../gtk/main.c:649
 msgid "Transmission cannot be started."
-msgstr ""
+msgstr "Transmission не може да бъде стартиран."
 
 #: ../gtk/main.c:731
 msgid ""
@@ -955,7 +959,7 @@ msgstr "Бърз и лесен BitTorrent клиент"
 
 #: ../gtk/main.c:1399
 msgid "Copyright 2005-2009 The Transmission Project"
-msgstr "Авторски права 2005-2009 The Transmission Project"
+msgstr "Авторски права 2005-2009 Проект Transmission"
 
 #. Translators: translate "translator-credits" as
 #. your name
@@ -1296,22 +1300,22 @@ msgstr ""
 #, c-format
 msgid "Downloading from %1$'d of %2$'d connected peer"
 msgid_plural "Downloading from %1$'d of %2$'d connected peers"
-msgstr[0] "Изтегляне от %1$'d с %2$'d свързан пиър"
-msgstr[1] "Изтегляне от %1$'d с %2$'d свързани пиъри"
+msgstr[0] "Изтегляне от %1$'d с %2$'d свързан посредник"
+msgstr[1] "Изтегляне от %1$'d с %2$'d свързани посредници"
 
 #: ../gtk/torrent-cell-renderer.c:290
 #, c-format
 msgid "Downloading metadata from %1$'d peer (%2$d%% done)"
 msgid_plural "Downloading metadata from %1$'d peers (%2$d%% done)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Изтегляне на метаданните от %1$'d посредник (завършени %2$d%%)"
+msgstr[1] "Изтегляне на метаданните от %1$'d посредник (завършени %2$d%%)"
 
 #: ../gtk/torrent-cell-renderer.c:301
 #, c-format
 msgid "Seeding to %1$'d of %2$'d connected peer"
 msgid_plural "Seeding to %1$'d of %2$'d connected peers"
-msgstr[0] "Изпращане на %1$'d с %2$'d свързан пиър"
-msgstr[1] "Изпращане на %1$'d с %2$'d свързани пиъри"
+msgstr[0] "Изпращане на %1$'d с %2$'d свързан посредник"
+msgstr[1] "Изпращане на %1$'d с %2$'d свързани посредници"
 
 #: ../gtk/tracker-list.c:344
 msgid "Tier"
@@ -1408,7 +1412,7 @@ msgstr "Плот"
 
 #: ../gtk/tr-prefs.c:356
 msgid "Inhibit _hibernation when torrents are active"
-msgstr ""
+msgstr "Забраняване на дълбоко _заспиване, когато има активни торенти"
 
 #: ../gtk/tr-prefs.c:360
 msgid "Show Transmission icon in the _notification area"
@@ -1478,28 +1482,32 @@ msgstr "_Режим:"
 
 #: ../gtk/tr-prefs.c:558
 msgid "Use PE_X to find more peers"
-msgstr ""
+msgstr "Използване на P_EX, за да се намерят повече посредници"
 
 #: ../gtk/tr-prefs.c:560
 msgid ""
 "PEX is a tool for exchanging peer lists with the peers you're connected to."
 msgstr ""
+"PEX е средство за размяна на списъци с посредниците, към които сте свързани."
 
 #: ../gtk/tr-prefs.c:564
 msgid "Use _DHT to find more peers"
-msgstr ""
+msgstr "Използване на _DHT, за да се намерят повече посредници"
 
 #: ../gtk/tr-prefs.c:566
 msgid "DHT is a tool for finding peers without a tracker."
-msgstr ""
+msgstr "DHT е средство за намиране на посредници без употребата на тракер."
 
 #: ../gtk/tr-prefs.c:570
 msgid "Use Local Peer Discovery to find more peers"
 msgstr ""
+"Използване Локално откриване на посредници (LPD), за да намерите повече "
+"посредници"
 
 #: ../gtk/tr-prefs.c:572
 msgid "LPD is a tool for finding peers on your local network."
 msgstr ""
+"ЛОП (LPD) е средство за намиране на посредници във вашата локална мрежа."
 
 #: ../gtk/tr-prefs.c:793
 msgid "Web Client"
@@ -1613,6 +1621,7 @@ msgstr "Временно ограничение на скоростта"
 #: ../gtk/tr-prefs.c:1245
 msgid "Override normal speed limits manually or at scheduled times"
 msgstr ""
+"Пренебрегване на ограниченията в скоростта ръчно или в определено време"
 
 #: ../gtk/tr-prefs.c:1252
 msgid "Limit do_wnload speed (KiB/s):"
@@ -1652,7 +1661,7 @@ msgstr "<i>Тестване...</i>"
 
 #: ../gtk/tr-prefs.c:1369
 msgid "Incoming Peers"
-msgstr "Входящи пиъри"
+msgstr "Входящи посредници"
 
 #: ../gtk/tr-prefs.c:1371
 msgid "_Port for incoming connections:"
@@ -1673,11 +1682,11 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:1398
 msgid "Maximum peers per _torrent:"
-msgstr "Най-голям брой на постове за _поток:"
+msgstr "Най-голям брой посредници за _торент:"
 
 #: ../gtk/tr-prefs.c:1400
 msgid "Maximum peers _overall:"
-msgstr "Най-голям брой на постове като _цяло:"
+msgstr "Най-голям брой посредници из_цяло:"
 
 #: ../gtk/tr-prefs.c:1418
 msgid "Transmission Preferences"
@@ -1748,7 +1757,7 @@ msgstr "Неограничено"
 
 #: ../gtk/tr-window.c:477
 msgid "Seed Forever"
-msgstr "Постоянно разпръскване"
+msgstr "Постоянно разпространяване"
 
 #: ../gtk/tr-window.c:515
 msgid "Limit Download Speed"
@@ -1760,7 +1769,7 @@ msgstr "Ограничаване на скоростта на качване"
 
 #: ../gtk/tr-window.c:526
 msgid "Stop Seeding at Ratio"
-msgstr "Спиране на разпръскването при коефициент"
+msgstr "Спиране на разпространяването при коефициент"
 
 #: ../gtk/tr-window.c:560
 #, c-format
@@ -2053,11 +2062,11 @@ msgstr "%s %s е стартирана"
 
 #: ../libtransmission/session.c:636
 msgid "Local Peer Discovery disabled"
-msgstr ""
+msgstr "ЛОП (LPD) забранено"
 
 #: ../libtransmission/session.c:638
 msgid "Local Peer Discovery active"
-msgstr ""
+msgstr "ЛОП (LPD) разрешено"
 
 #: ../libtransmission/session.c:1748
 #, c-format
