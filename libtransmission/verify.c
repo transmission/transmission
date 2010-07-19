@@ -184,6 +184,7 @@ struct verify_node
 {
     tr_torrent *         torrent;
     tr_verify_done_cb    verify_done_cb;
+    uint64_t             current_size;
 };
 
 static void
@@ -252,26 +253,38 @@ verifyThreadFunc( void * unused UNUSED )
     tr_lockUnlock( getVerifyLock( ) );
 }
 
-static tr_bool
-torrentHasAnyLocalData( const tr_torrent * tor )
+static uint64_t
+getCurrentSize( tr_torrent * tor )
 {
     tr_file_index_t i;
-    tr_bool hasAny = FALSE;
+    uint64_t byte_count = 0;
     const tr_file_index_t n = tor->info.fileCount;
 
-    assert( tr_isTorrent( tor ) );
-
-    for( i=0; i<n && !hasAny; ++i )
+    for( i=0; i<n; ++i )
     {
         struct stat sb;
-        char * path = tr_torrentFindFile( tor, i );
-        if( ( path != NULL ) && !stat( path, &sb ) && ( sb.st_size > 0 ) )
-            hasAny = TRUE;
-        tr_free( path );
+        char * filename = tr_torrentFindFile( tor, i );
+
+        sb.st_size = 0;
+        if( filename && !stat( filename, &sb ) )
+            byte_count += sb.st_size;
+
+        tr_free( filename );
     }
 
-    return hasAny;
+    return byte_count;
 }
+
+static int 
+compareVerifyBySize( const void * va, const void * vb ) 
+{ 
+    const struct verify_node * a = va; 
+    const struct verify_node * b = vb; 
+
+    if( a->current_size < b->current_size ) return -1;
+    if( a->current_size > b->current_size ) return  1;
+    return 0;
+} 
 
 void
 tr_verifyAdd( tr_torrent *      tor,
@@ -284,38 +297,44 @@ tr_verifyAdd( tr_torrent *      tor,
         /* doesn't need to be checked... */
         fireCheckDone( tor, verify_done_cb );
     }
-    else if( !torrentHasAnyLocalData( tor ) )
-    {
-        /* we haven't downloaded anything for this torrent yet...
-         * no need to leave it waiting in the back of the queue.
-         * we can mark it as all-missing from here and fire
-         * the "done" callback */
-        const tr_bool hadAny = tr_cpHaveTotal( &tor->completion ) != 0;
-        tr_piece_index_t i;
-        for( i=0; i<tor->info.pieceCount; ++i ) {
-            tr_torrentSetHasPiece( tor, i, FALSE );
-            tr_torrentSetPieceChecked( tor, i, TRUE );
-        }
-        if( hadAny ) /* if we thought we had some, flag as dirty */
-            tr_torrentSetDirty( tor );
-        fireCheckDone( tor, verify_done_cb );
-    }
     else
     {
-        struct verify_node * node;
+        const uint64_t current_size = getCurrentSize( tor );
 
-        tr_torinf( tor, "%s", _( "Queued for verification" ) );
+        if( !current_size )
+        {
+            /* we haven't downloaded anything for this torrent yet...
+             * no need to leave it waiting in the back of the queue.
+             * we can mark it as all-missing from here and fire
+             * the "done" callback */
+            const tr_bool hadAny = tr_cpHaveTotal( &tor->completion ) != 0;
+            tr_piece_index_t i;
+            for( i=0; i<tor->info.pieceCount; ++i ) {
+                tr_torrentSetHasPiece( tor, i, FALSE );
+                tr_torrentSetPieceChecked( tor, i, TRUE );
+            }
+            if( hadAny ) /* if we thought we had some, flag as dirty */
+                tr_torrentSetDirty( tor );
+            fireCheckDone( tor, verify_done_cb );
+        }
+        else
+        {
+            struct verify_node * node;
 
-        node = tr_new( struct verify_node, 1 );
-        node->torrent = tor;
-        node->verify_done_cb = verify_done_cb;
+            tr_torinf( tor, "%s", _( "Queued for verification" ) );
 
-        tr_lockLock( getVerifyLock( ) );
-        tr_torrentSetVerifyState( tor, TR_VERIFY_WAIT );
-        tr_list_append( &verifyList, node );
-        if( verifyThread == NULL )
-            verifyThread = tr_threadNew( verifyThreadFunc, NULL );
-        tr_lockUnlock( getVerifyLock( ) );
+            node = tr_new( struct verify_node, 1 );
+            node->torrent = tor;
+            node->verify_done_cb = verify_done_cb;
+            node->current_size = current_size;
+
+            tr_lockLock( getVerifyLock( ) );
+            tr_torrentSetVerifyState( tor, TR_VERIFY_WAIT );
+            tr_list_insert_sorted( &verifyList, node, compareVerifyBySize );
+            if( verifyThread == NULL )
+                verifyThread = tr_threadNew( verifyThreadFunc, NULL );
+            tr_lockUnlock( getVerifyLock( ) );
+        }
     }
 }
 
