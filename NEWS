@@ -1,3 +1,22 @@
+=== Transmission 2.02 (2010/07/19) ===
+[http://trac.transmissionbt.com/query?milestone=2.02&group=component&groupdesc=1&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Fix NAT-PMP port forwarding issue on some systems
+  * Fix filename errors for torrents whose files are encoded in ISO-8859-1
+  * Fix rare crash on shutdown
+  * Fix the RPC server's redirect URL to allow HTTPS proxies like stunnel
+  * Replace less-portable calls with posix nanosleep()
+==== Mac ====
+  * Use F_NOCACHE to keep "inactive memory" in check
+=== GTK+ ====
+  * Fix crash when opening the Properties dialog on a magnet link without metainfo
+  * Fix crash when removing multiple torrents at once
+  * Allow individual torrents' download speed limits to be set to zero
+  * Fix translation error with some error messages
+==== Qt ====
+  * Fix CPU spike when opening the Properties dialog
+  * Fix compilation issue with Qt < 4.5
+
 === Transmission 2.01 (2010/06/26) ===
 [http://trac.transmissionbt.com/query?milestone=2.01&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== All Platforms ====
