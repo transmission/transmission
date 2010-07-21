@@ -1,7 +1,7 @@
 === Transmission 2.03 (2010/07/21) ===
 [http://trac.transmissionbt.com/query?milestone=2.03&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== Mac ====
-  * Fix bug where new transfers could not be added
+  * Fix 2.02 bug where new transfers could not be added and the inspector would not appear
 
 === Transmission 2.02 (2010/07/19) ===
 [http://trac.transmissionbt.com/query?milestone=2.02&group=component&groupdesc=1&order=severity All tickets closed by this release]
