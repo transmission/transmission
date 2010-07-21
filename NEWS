@@ -8,7 +8,7 @@
   * Replace less-portable calls with posix nanosleep()
 ==== Mac ====
   * Use F_NOCACHE to keep "inactive memory" in check
-=== GTK+ ====
+==== GTK+ ====
   * Fix crash when opening the Properties dialog on a magnet link without metainfo
   * Fix crash when removing multiple torrents at once
   * Allow individual torrents' download speed limits to be set to zero
