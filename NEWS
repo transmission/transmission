@@ -1,4 +1,9 @@
-=== Transmission 2.02 (2010/07/18) ===
+=== Transmission 2.03 (2010/07/21) ===
+[http://trac.transmissionbt.com/query?milestone=2.03&group=component&groupdesc=1&order=severity All tickets closed by this release]
+==== Mac ====
+  * Fix bug where new transfers could not be added
+
+=== Transmission 2.02 (2010/07/19) ===
 [http://trac.transmissionbt.com/query?milestone=2.02&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Fix NAT-PMP port forwarding issue on some systems
@@ -8,7 +13,7 @@
   * Replace less-portable calls with posix nanosleep()
 ==== Mac ====
   * Use F_NOCACHE to keep "inactive memory" in check
-=== GTK+ ====
+==== GTK+ ====
   * Fix crash when opening the Properties dialog on a magnet link without metainfo
   * Fix crash when removing multiple torrents at once
   * Allow individual torrents' download speed limits to be set to zero
