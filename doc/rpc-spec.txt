@@ -202,8 +202,8 @@
    pieceCount                  | number                      | tr_info
    pieceSize                   | number                      | tr_info
    priorities                  | array (see below)           | n/a
-   rateDownload (B/s)          | number                      | tr_stat
-   rateUpload (B/s)            | number                      | tr_stat
+   rateDownload (KBps)         | double                      | tr_stat
+   rateUpload (KBps)           | double                      | tr_stat
    recheckProgress             | double                      | tr_stat
    seedInactiveLimit           | number                      | tr_torrent
    seedInactiveMode            | number                      | tr_inactvelimit
@@ -256,8 +256,8 @@
                       | peerIsInterested        | boolean    | tr_peer_stat
                       | port                    | number     | tr_peer_stat
                       | progress                | double     | tr_peer_stat
-                      | rateToClient (B/s)      | number     | tr_peer_stat
-                      | rateToPeer (B/s)        | number     | tr_peer_stat
+                      | rateToClient (KBps)     | double     | tr_peer_stat
+                      | rateToPeer (KBps)       | double     | tr_peer_stat
    -------------------+--------------------------------------+
    peersFrom          | an object containing:                |
                       +-------------------------+------------+

@@ -484,7 +484,7 @@ addField( const tr_torrent * tor, tr_benc * d, const char * key )
     else if( tr_streq( key, keylen, "downloadedEver" ) )
         tr_bencDictAddInt( d, key, st->downloadedEver );
     else if( tr_streq( key, keylen, "downloadLimit" ) )
-        tr_bencDictAddReal( d, key, tr_torrentGetSpeedLimit_KBps( tor, TR_DOWN ) );
+        tr_bencDictAddInt( d, key, tr_torrentGetSpeedLimit_KBps( tor, TR_DOWN ) );
     else if( tr_streq( key, keylen, "downloadLimited" ) )
         tr_bencDictAddBool( d, key, tr_torrentUsesSpeedLimit( tor, TR_DOWN ) );
     else if( tr_streq( key, keylen, "error" ) )
