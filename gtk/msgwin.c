@@ -55,10 +55,10 @@ static struct tr_msg_list * myHead = NULL;
 ***/
 
 static void
-level_combo_changed_cb( GtkWidget * w, gpointer gdata )
+level_combo_changed_cb( GtkComboBox * combo_box, gpointer gdata )
 {
     struct MsgData * data = gdata;
-    const int level = gtr_combo_box_get_active_val( w );
+    const int level = gtr_combo_box_get_active_enum( combo_box );
 
     tr_setMessageLevel( level );
     tr_core_set_pref_int( data->core, TR_PREFS_KEY_MSGLEVEL, level );
@@ -365,7 +365,7 @@ debug_level_combo_new( void )
                                             _( "Information" ), TR_MSG_INF,
                                             _( "Debug" ),       TR_MSG_DBG,
                                             NULL );
-    gtr_combo_box_set_active_val( w, pref_int_get( TR_PREFS_KEY_MSGLEVEL ) );
+    gtr_combo_box_set_active_enum( GTK_COMBO_BOX( w ), pref_int_get( TR_PREFS_KEY_MSGLEVEL ) );
     return w;
 }
 

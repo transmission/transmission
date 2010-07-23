@@ -653,17 +653,16 @@ gtr_button_new_from_stock( const char * stock,
 ***/
 
 void
-gtr_combo_box_set_active_val( GtkWidget * w, int value )
+gtr_combo_box_set_active_enum( GtkComboBox * combo_box, int value )
 {
     int i;
     int currentValue;
     const int column = 0;
     GtkTreeIter iter;
-    GtkComboBox * combobox = GTK_COMBO_BOX( w );
-    GtkTreeModel * model = gtk_combo_box_get_model( combobox );
+    GtkTreeModel * model = gtk_combo_box_get_model( combo_box );
 
     /* do the value and current value match? */
-    if( gtk_combo_box_get_active_iter( combobox, &iter ) ) {
+    if( gtk_combo_box_get_active_iter( combo_box, &iter ) ) {
         gtk_tree_model_get( model, &iter, column, &currentValue, -1 );
         if( currentValue == value )
             return;
@@ -674,7 +673,7 @@ gtr_combo_box_set_active_val( GtkWidget * w, int value )
     while(( gtk_tree_model_iter_nth_child( model, &iter, NULL, i++ ))) {
         gtk_tree_model_get( model, &iter, column, &currentValue, -1 );
         if( currentValue == value ) {
-            gtk_combo_box_set_active_iter( combobox, &iter );
+            gtk_combo_box_set_active_iter( combo_box, &iter );
             return;
         }
     }
@@ -713,11 +712,10 @@ gtr_combo_box_new_enum( const char * text_1, ... )
 }
 
 int
-gtr_combo_box_get_active_val( GtkWidget * w )
+gtr_combo_box_get_active_enum( GtkComboBox * combo_box )
 {
     int value = 0;
     GtkTreeIter iter;
-    GtkComboBox * combo_box = GTK_COMBO_BOX( w );
 
     if( gtk_combo_box_get_active_iter( combo_box, &iter ) )
         gtk_tree_model_get( gtk_combo_box_get_model( combo_box ), &iter, 0, &value, -1 );

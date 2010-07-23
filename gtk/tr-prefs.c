@@ -448,10 +448,10 @@ onBlocklistUpdate( GtkButton * w, gpointer gdata )
 }
 
 static void
-onIntComboChanged( GtkComboBox * w, gpointer core )
+onIntComboChanged( GtkComboBox * combo_box, gpointer core )
 {
-    const int val = gtr_combo_box_get_active_val( GTK_WIDGET( w ) );
-    const char * key = g_object_get_data( G_OBJECT( w ), PREF_KEY );
+    const int val = gtr_combo_box_get_active_enum( combo_box );
+    const char * key = g_object_get_data( G_OBJECT( combo_box ), PREF_KEY );
     tr_core_set_pref_int( TR_CORE( core ), key, val );
 }
 
@@ -462,7 +462,7 @@ new_encryption_combo( GObject * core, const char * key )
                                             _( "Prefer encryption" ),  TR_ENCRYPTION_PREFERRED,
                                             _( "Require encryption" ), TR_ENCRYPTION_REQUIRED,
                                             NULL );
-    gtr_combo_box_set_active_val( w, pref_int_get( key ) );
+    gtr_combo_box_set_active_enum( GTK_COMBO_BOX( w ), pref_int_get( key ) );
     g_object_set_data_full( G_OBJECT( w ), PREF_KEY, tr_strdup( key ), g_free );
     g_signal_connect( w, "changed", G_CALLBACK( onIntComboChanged ), core );
     return w;
@@ -917,7 +917,7 @@ proxy_combo_box_new( GObject * core, const char * key )
                                              "SOCKS4", TR_PROXY_SOCKS4,
                                              "SOCKS5", TR_PROXY_SOCKS5,
                                              NULL );
-    gtr_combo_box_set_active_val( w, pref_int_get( key ) );
+    gtr_combo_box_set_active_enum( GTK_COMBO_BOX( w ), pref_int_get( key ) );
     g_object_set_data_full( G_OBJECT( w ), PREF_KEY, tr_strdup( key ), g_free );
     g_signal_connect( w, "changed", G_CALLBACK( onIntComboChanged ), core );
     return w;
@@ -1083,7 +1083,7 @@ new_week_combo( GObject * core, const char * key )
                                             _( "Friday" ),    TR_SCHED_FRI,
                                             _( "Saturday" ),  TR_SCHED_SAT,
                                             NULL );
-    gtr_combo_box_set_active_val( w, pref_int_get( key ) );
+    gtr_combo_box_set_active_enum( GTK_COMBO_BOX( w ), pref_int_get( key ) );
     g_object_set_data_full( G_OBJECT( w ), PREF_KEY, tr_strdup( key ), g_free );
     g_signal_connect( w, "changed", G_CALLBACK( onIntComboChanged ), core );
     return w;

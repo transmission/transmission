@@ -261,7 +261,7 @@ refreshOptions( struct DetailsImpl * di, tr_torrent ** torrents, int n )
                 break;
         if( i == n ) {
             g_signal_handler_block( di->bandwidthCombo, di->bandwidthComboTag );
-            gtr_priority_combo_set_value( di->bandwidthCombo, baseline );
+            gtr_priority_combo_set_value( GTK_COMBO_BOX( di->bandwidthCombo ), baseline );
             g_signal_handler_unblock( di->bandwidthCombo, di->bandwidthComboTag );
         }
         else
@@ -418,9 +418,9 @@ max_peers_spun_cb( GtkSpinButton * s, struct DetailsImpl * di )
 }
 
 static void
-onPriorityChanged( GtkComboBox * w, struct DetailsImpl * di )
+onPriorityChanged( GtkComboBox * combo_box, struct DetailsImpl * di )
 {
-    const tr_priority_t priority = gtr_priority_combo_get_value( GTK_WIDGET( w ) );
+    const tr_priority_t priority = gtr_priority_combo_get_value( combo_box );
     torrent_set_int( di, "bandwidthPriority", priority );
 }
 
