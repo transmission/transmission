@@ -100,7 +100,9 @@
    "priority-high"       | array      indices of high-priority file(s)
    "priority-low"        | array      indices of low-priority file(s)
    "priority-normal"     | array      indices of normal-priority file(s)
-   "seedRatioLimit"      | double     session seeding ratio
+   "seedInactiveLimit"   | number     torrent-level number of minutes of seeding inactivity
+   "seedInactiveMode"    | number     which seeding inactivity to use.  See tr_inactvelimit
+   "seedRatioLimit"      | double     torrent-level seeding ratio
    "seedRatioMode"       | number     which ratio to use.  See tr_ratiolimit
    "trackerAdd"          | object     (see below)
    "trackerEdit"         | object     (see below)
@@ -140,7 +142,7 @@
 
    Request arguments:
 
-   (1) An opional "ids" array as described in 3.1.
+   (1) An optional "ids" array as described in 3.1.
    (2) A required "fields" array of keys. (see list below)
 
    Response arguments:
@@ -203,6 +205,8 @@
    rateDownload (B/s)          | number                      | tr_stat
    rateUpload (B/s)            | number                      | tr_stat
    recheckProgress             | double                      | tr_stat
+   seedInactiveLimit           | number                      | tr_torrent
+   seedInactiveMode            | number                      | tr_inactvelimit
    seedRatioLimit              | double                      | tr_torrent
    seedRatioMode               | number                      | tr_ratiolimit
    sizeWhenDone                | number                      | tr_stat
@@ -416,45 +420,47 @@
 
 4.1.  Session Arguments
 
-   string                        | value type & description
-   ------------------------------+-------------------------------------------------
-   "alt-speed-down"              | number     max global download speed (KBps)
-   "alt-speed-enabled"           | boolean    true means use the alt speeds
-   "alt-speed-time-begin"        | number     when to turn on alt speeds (units: minutes after midnight)
-   "alt-speed-time-enabled"      | boolean    true means the scheduled on/off times are used
-   "alt-speed-time-end"          | number     when to turn off alt speeds (units: same)
-   "alt-speed-time-day"          | number     what day(s) to turn on alt speeds (look at tr_sched_day)
-   "alt-speed-up"                | number     max global upload speed (KBps)
-   "blocklist-enabled"           | boolean    true means enabled
-   "blocklist-size"              | number     number of rules in the blocklist
-   "cache-size"                  | number     maximum size of the disk cache (MB)
-   "config-dir"                  | string     location of transmission's configuration directory
-   "download-dir"                | string     default path to download torrents
-   "dht-enabled"                 | boolean    true means allow dht in public torrents
-   "encryption"                  | string     "required", "preferred", "tolerated"
-   "incomplete-dir"              | string     path for incomplete torrents, when enabled
-   "incomplete-dir-enabled"      | boolean    true means keep torrents in incomplete-dir until done
-   "lpd-enabled"                 | boolean    true means allow Local Peer Discovery in public torrents
-   "peer-limit-global"           | number     maximum global number of peers
-   "peer-limit-per-torrent"      | number     maximum global number of peers
-   "pex-enabled"                 | boolean    true means allow pex in public torrents
-   "peer-port"                   | number     port number
-   "peer-port-random-on-start"   | boolean    true means pick a random peer port on launch
-   "port-forwarding-enabled"     | boolean    true means enabled
-   "rename-partial-files"        | boolean    true means append ".part" to incomplete files
-   "rpc-version"                 | number     the current RPC API version
-   "rpc-version-minimum"         | number     the minimum RPC API version supported
-   "script-torrent-done-filename"| string     filename of the script to run
-   "script-torrent-done-enabled" | boolean    whether or not to call the "done" script
-   "seedRatioLimit"              | double     the default seed ratio for torrents to use
-   "seedRatioLimited"            | boolean    true if seedRatioLimit is honored by default
-   "speed-limit-down"            | number     max global download speed (KBps)
-   "speed-limit-down-enabled"    | boolean    true means enabled
-   "speed-limit-up"              | number     max global upload speed (KBps)
-   "speed-limit-up-enabled"      | boolean    true means enabled
-   "start-added-torrents"        | boolean    true means added torrents will be started right away
-   "trash-original-torrent-files"| boolean    true means the .torrent file of added torrents will be deleted
-   "version"                     | string     long version string "$version ($revision)"
+   string                           | value type & description
+   ---------------------------------+-------------------------------------------------
+   "alt-speed-down"                 | number     max global download speed (KBps)
+   "alt-speed-enabled"              | boolean    true means use the alt speeds
+   "alt-speed-time-begin"           | number     when to turn on alt speeds (units: minutes after midnight)
+   "alt-speed-time-enabled"         | boolean    true means the scheduled on/off times are used
+   "alt-speed-time-end"             | number     when to turn off alt speeds (units: same)
+   "alt-speed-time-day"             | number     what day(s) to turn on alt speeds (look at tr_sched_day)
+   "alt-speed-up"                   | number     max global upload speed (KBps)
+   "blocklist-enabled"              | boolean    true means enabled
+   "blocklist-size"                 | number     number of rules in the blocklist
+   "cache-size"                     | number     maximum size of the disk cache (MB)
+   "config-dir"                     | string     location of transmission's configuration directory
+   "download-dir"                   | string     default path to download torrents
+   "dht-enabled"                    | boolean    true means allow dht in public torrents
+   "encryption"                     | string     "required", "preferred", "tolerated"
+   "inactive-seeding-limit"         | number     the default seed inactivity limit for torrents to use
+   "inactive-seeding-limit-enabled" | boolean    true if the seeding inactivity limit is honored by default
+   "incomplete-dir"                 | string     path for incomplete torrents, when enabled
+   "incomplete-dir-enabled"         | boolean    true means keep torrents in incomplete-dir until done
+   "lpd-enabled"                    | boolean    true means allow Local Peer Discovery in public torrents
+   "peer-limit-global"              | number     maximum global number of peers
+   "peer-limit-per-torrent"         | number     maximum global number of peers
+   "pex-enabled"                    | boolean    true means allow pex in public torrents
+   "peer-port"                      | number     port number
+   "peer-port-random-on-start"      | boolean    true means pick a random peer port on launch
+   "port-forwarding-enabled"        | boolean    true means enabled
+   "rename-partial-files"           | boolean    true means append ".part" to incomplete files
+   "rpc-version"                    | number     the current RPC API version
+   "rpc-version-minimum"            | number     the minimum RPC API version supported
+   "script-torrent-done-filename"   | string     filename of the script to run
+   "script-torrent-done-enabled"    | boolean    whether or not to call the "done" script
+   "seedRatioLimit"                 | double     the default seed ratio for torrents to use
+   "seedRatioLimited"               | boolean    true if seedRatioLimit is honored by default
+   "speed-limit-down"               | number     max global download speed (KBps)
+   "speed-limit-down-enabled"       | boolean    true means enabled
+   "speed-limit-up"                 | number     max global upload speed (KBps)
+   "speed-limit-up-enabled"         | boolean    true means enabled
+   "start-added-torrents"           | boolean    true means added torrents will be started right away
+   "trash-original-torrent-files"   | boolean    true means the .torrent file of added torrents will be deleted
+   "version"                        | string     long version string "$version ($revision)"
 
    "rpc-version" indicates the RPC interface version supported by the RPC server.
    It is incremented when a new version of Transmission changes the RPC interface.
@@ -630,9 +636,16 @@
    ------+---------+-----------+----------------+-------------------------------
    10    | 2.10    | yes       | session-get    | new arg "cache-size"
          |         | yes       | session-set    | new arg "trash-original-torrent-files"
-         |         | yes       | session-get    | new arg "start-added-torrents"
          |         | yes       | session-get    | new arg "trash-original-torrent-files"
          |         | yes       | torrent-get    | new arg "isFinished"
          |         | yes       | torrent-set    | new arg "trackerAdd"
          |         | yes       | torrent-set    | new arg "trackerEdit"
          |         | yes       | torrent-set    | new arg "trackerRemove"
+         |         | yes       | session-set    | new arg "inactive-seeding-limit"
+         |         | yes       | session-set    | new arg "inactive-seeding-limit-enabled"
+         |         | yes       | session-get    | new arg "inactive-seeding-limit"
+         |         | yes       | session-get    | new arg "inactive-seeding-limit-enabled"
+         |         | yes       | torrent-set    | new arg "seedInactiveLimit"
+         |         | yes       | torrent-set    | new arg "seedInactiveMode"
+         |         | yes       | torrent-get    | new arg "seedInactiveLimit"
+         |         | yes       | torrent-get    | new arg "seedInactiveMode"
