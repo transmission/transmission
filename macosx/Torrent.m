@@ -393,12 +393,12 @@ int trashDataFile(const char * filename)
     return fStat->seedRatioPercentDone;
 }
 
-- (tr_inactvelimit) inactiveSetting
+- (tr_inactivelimit) inactiveSetting
 {
     return tr_torrentGetInactiveMode(fHandle);
 }
 
-- (void) setInactiveSetting: (tr_inactvelimit) setting
+- (void) setInactiveSetting: (tr_inactivelimit) setting
 {
     tr_torrentSetInactiveMode(fHandle, setting);
 }

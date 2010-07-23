@@ -98,8 +98,8 @@
 - (BOOL) seedRatioSet;
 - (CGFloat) progressStopRatio;
 
-- (tr_inactvelimit) inactiveSetting;
-- (void) setInactiveSetting: (tr_inactvelimit) setting;
+- (tr_inactivelimit) inactiveSetting;
+- (void) setInactiveSetting: (tr_inactivelimit) setting;
 - (NSUInteger) inactiveLimitMinutes;
 - (void) setInactiveLimitMinutes: (NSUInteger) limit;
 - (BOOL) seedInactiveLimitSet;

@@ -328,7 +328,7 @@ tr_torrentIsSeedRatioDone( tr_torrent * tor )
 ***/
 
 void
-tr_torrentSetInactiveMode( tr_torrent *  tor, tr_inactvelimit mode )
+tr_torrentSetInactiveMode( tr_torrent *  tor, tr_inactivelimit mode )
 {
     assert( tr_isTorrent( tor ) );
     assert( mode==TR_INACTIVELIMIT_GLOBAL || mode==TR_INACTIVELIMIT_SINGLE || mode==TR_INACTIVELIMIT_UNLIMITED  );
@@ -341,7 +341,7 @@ tr_torrentSetInactiveMode( tr_torrent *  tor, tr_inactvelimit mode )
     }
 }
 
-tr_ratiolimit
+tr_inactivelimit
 tr_torrentGetInactiveMode( const tr_torrent * tor )
 {
     assert( tr_isTorrent( tor ) );

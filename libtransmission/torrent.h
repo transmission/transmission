@@ -259,7 +259,7 @@ struct tr_torrent
     tr_ratiolimit              ratioLimitMode;
 
     uint64_t                   inactiveLimitMinutes;
-    tr_inactvelimit            inactiveLimitMode;
+    tr_inactivelimit           inactiveLimitMode;
 
     uint64_t                   preVerifyTotal;
 };

@@ -1178,20 +1178,20 @@ typedef enum
     TR_INACTIVELIMIT_SINGLE    = 1, /* override the global settings, seeding until a certain inactive time */
     TR_INACTIVELIMIT_UNLIMITED = 2  /* override the global settings, seeding regardless of activity */
 }
-tr_inactvelimit;
+tr_inactivelimit;
 
-void          tr_torrentSetInactiveMode( tr_torrent         * tor,
-                                         tr_inactvelimit      mode );
+void             tr_torrentSetInactiveMode( tr_torrent         * tor,
+                                            tr_inactivelimit      mode );
 
-tr_ratiolimit tr_torrentGetInactiveMode( const tr_torrent   * tor );
+tr_inactivelimit tr_torrentGetInactiveMode( const tr_torrent   * tor );
 
-void          tr_torrentSetInactiveLimit( tr_torrent        * tor,
+void             tr_torrentSetInactiveLimit( tr_torrent        * tor,
                                           uint64_t            inactiveMinutes );
 
-uint64_t      tr_torrentGetInactiveLimit( const tr_torrent  * tor );
+uint64_t         tr_torrentGetInactiveLimit( const tr_torrent  * tor );
 
 
-tr_bool       tr_torrentGetSeedInactive( const tr_torrent *, uint64_t * inactiveMinutes );
+tr_bool          tr_torrentGetSeedInactive( const tr_torrent *, uint64_t * inactiveMinutes );
 
 /****
 *****  Peer Limits
