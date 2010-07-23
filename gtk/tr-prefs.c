@@ -321,9 +321,9 @@ torrentPage( GObject * core )
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title( t, &row, _( "Seeding" ) );
 
-    s = _( "_Seed torrent until its ratio reaches:" );
+    s = _( "Stop seeding at _ratio:" );
     w = new_check_button( s, TR_PREFS_KEY_RATIO_ENABLED, core );
-    w2 = new_spin_button_double( TR_PREFS_KEY_RATIO, core, 0, INT_MAX, .05 );
+    w2 = new_spin_button_double( TR_PREFS_KEY_RATIO, core, 0, 1000, .05 );
     gtk_widget_set_sensitive( GTK_WIDGET( w2 ), pref_flag_get( TR_PREFS_KEY_RATIO_ENABLED ) );
     g_signal_connect( w, "toggled", G_CALLBACK( target_cb ), w2 );
     hig_workarea_add_row_w( t, &row, w, w2, NULL );
@@ -450,58 +450,21 @@ onBlocklistUpdate( GtkButton * w, gpointer gdata )
 static void
 onIntComboChanged( GtkComboBox * w, gpointer core )
 {
-    GtkTreeIter iter;
-
-    if( gtk_combo_box_get_active_iter( w, &iter ) )
-    {
-        int val = 0;
-        const char * key = g_object_get_data( G_OBJECT( w ), PREF_KEY );
-        gtk_tree_model_get( gtk_combo_box_get_model( w ), &iter, 0, &val, -1 );
-        tr_core_set_pref_int( TR_CORE( core ), key, val );
-    }
+    const int val = gtr_combo_box_get_active_val( GTK_WIDGET( w ) );
+    const char * key = g_object_get_data( G_OBJECT( w ), PREF_KEY );
+    tr_core_set_pref_int( TR_CORE( core ), key, val );
 }
 
 static GtkWidget*
 new_encryption_combo( GObject * core, const char * key )
 {
-    int i;
-    int selIndex;
-    GtkWidget * w;
-    GtkCellRenderer * r;
-    GtkListStore * store;
-    const int currentValue = pref_int_get( key );
-    const struct {
-        int value;
-        const char * text;
-    } items[] = {
-        { TR_CLEAR_PREFERRED,      N_( "Allow encryption" )  },
-        { TR_ENCRYPTION_PREFERRED, N_( "Prefer encryption" ) },
-        { TR_ENCRYPTION_REQUIRED,  N_( "Require encryption" )  }
-    };
-
-    /* build a store for encryption */
-    selIndex = -1;
-    store = gtk_list_store_new( 2, G_TYPE_INT, G_TYPE_STRING );
-    for( i=0; i<(int)G_N_ELEMENTS(items); ++i ) {
-        GtkTreeIter iter;
-        gtk_list_store_append( store, &iter );
-        gtk_list_store_set( store, &iter, 0, items[i].value, 1, _( items[i].text ), -1 );
-        if( items[i].value == currentValue )
-            selIndex = i;
-    }
-
-    /* build the widget */
-    w = gtk_combo_box_new_with_model( GTK_TREE_MODEL( store ) );
-    r = gtk_cell_renderer_text_new( );
-    gtk_cell_layout_pack_start( GTK_CELL_LAYOUT( w ), r, TRUE );
-    gtk_cell_layout_set_attributes( GTK_CELL_LAYOUT( w ), r, "text", 1, NULL );
+    GtkWidget * w = gtr_combo_box_new_enum( _( "Allow encryption" ),   TR_CLEAR_PREFERRED,
+                                            _( "Prefer encryption" ),  TR_ENCRYPTION_PREFERRED,
+                                            _( "Require encryption" ), TR_ENCRYPTION_REQUIRED,
+                                            NULL );
+    gtr_combo_box_set_active_val( w, pref_int_get( key ) );
     g_object_set_data_full( G_OBJECT( w ), PREF_KEY, tr_strdup( key ), g_free );
-    if( selIndex >= 0 )
-        gtk_combo_box_set_active( GTK_COMBO_BOX( w ), selIndex );
     g_signal_connect( w, "changed", G_CALLBACK( onIntComboChanged ), core );
-
-    /* cleanup */
-    g_object_unref( G_OBJECT( store ) );
     return w;
 }
 
@@ -911,7 +874,6 @@ webPage( GObject * core )
 
 struct ProxyPage
 {
-    TrCore *  core;
     GSList *  proxy_widgets;
     GSList *  proxy_auth_widgets;
 };
@@ -948,34 +910,17 @@ proxyPageFree( gpointer gpage )
     g_free( page );
 }
 
-static GtkTreeModel*
-proxyTypeModelNew( void )
+static GtkWidget*
+proxy_combo_box_new( GObject * core, const char * key )
 {
-    GtkTreeIter    iter;
-    GtkListStore * store = gtk_list_store_new( 2, G_TYPE_STRING, G_TYPE_INT );
-
-    gtk_list_store_append( store, &iter );
-    gtk_list_store_set( store, &iter, 0, "HTTP", 1, TR_PROXY_HTTP, -1 );
-    gtk_list_store_append( store, &iter );
-    gtk_list_store_set( store, &iter, 0, "SOCKS4", 1, TR_PROXY_SOCKS4, -1 );
-    gtk_list_store_append( store, &iter );
-    gtk_list_store_set( store, &iter, 0, "SOCKS5", 1, TR_PROXY_SOCKS5, -1 );
-    return GTK_TREE_MODEL( store );
-}
-
-static void
-onProxyTypeChanged( GtkComboBox * w,
-                    gpointer      gpage )
-{
-    GtkTreeIter iter;
-
-    if( gtk_combo_box_get_active_iter( w, &iter ) )
-    {
-        struct ProxyPage * page = gpage;
-        int type = TR_PROXY_HTTP;
-        gtk_tree_model_get( gtk_combo_box_get_model( w ), &iter, 1, &type, -1 );
-        tr_core_set_pref_int( TR_CORE( page->core ), TR_PREFS_KEY_PROXY_TYPE, type );
-    }
+    GtkWidget * w =  gtr_combo_box_new_enum( "HTTP",   TR_PROXY_HTTP,
+                                             "SOCKS4", TR_PROXY_SOCKS4,
+                                             "SOCKS5", TR_PROXY_SOCKS5,
+                                             NULL );
+    gtr_combo_box_set_active_val( w, pref_int_get( key ) );
+    g_object_set_data_full( G_OBJECT( w ), PREF_KEY, tr_strdup( key ), g_free );
+    g_signal_connect( w, "changed", G_CALLBACK( onIntComboChanged ), core );
+    return w;
 }
 
 static GtkWidget*
@@ -985,11 +930,7 @@ trackerPage( GObject * core )
     const char *       s;
     GtkWidget *        t;
     GtkWidget *        w;
-    GtkTreeModel *     m;
-    GtkCellRenderer *  r;
     struct ProxyPage * page = tr_new0( struct ProxyPage, 1 );
-
-    page->core = TR_CORE( core );
 
     t = hig_workarea_create( );
     hig_workarea_add_section_title ( t, &row, _( "Tracker" ) );
@@ -1011,14 +952,7 @@ trackerPage( GObject * core )
     page->proxy_widgets = g_slist_append( page->proxy_widgets, w );
 
     s = _( "Proxy _type:" );
-    m = proxyTypeModelNew( );
-    w = gtk_combo_box_new_with_model( m );
-    r = gtk_cell_renderer_text_new( );
-    gtk_cell_layout_pack_start( GTK_CELL_LAYOUT( w ), r, TRUE );
-    gtk_cell_layout_set_attributes( GTK_CELL_LAYOUT( w ), r, "text", 0, NULL );
-    gtk_combo_box_set_active( GTK_COMBO_BOX( w ), pref_int_get( TR_PREFS_KEY_PROXY_TYPE ) );
-    g_signal_connect( w, "changed", G_CALLBACK( onProxyTypeChanged ), page );
-    g_object_unref( G_OBJECT( m ) );
+    w = proxy_combo_box_new( core, TR_PREFS_KEY_PROXY_TYPE );
     page->proxy_widgets = g_slist_append( page->proxy_widgets, w );
     w = hig_workarea_add_row( t, &row, s, w, NULL );
     page->proxy_widgets = g_slist_append( page->proxy_widgets, w );
@@ -1138,51 +1072,20 @@ new_time_combo( GObject *    core,
 static GtkWidget*
 new_week_combo( GObject * core, const char * key )
 {
-    int i;
-    int selIndex;
-    GtkWidget * w;
-    GtkCellRenderer * r;
-    GtkListStore * store;
-    const int currentValue = pref_int_get( key );
-    const struct {
-        int value;
-        const char * text;
-    } items[] = {
-        { TR_SCHED_ALL,     N_( "Every Day" ) },
-        { TR_SCHED_WEEKDAY, N_( "Weekdays" ) },
-        { TR_SCHED_WEEKEND, N_( "Weekends" ) },
-        { TR_SCHED_SUN,     N_( "Sunday" ) },
-        { TR_SCHED_MON,     N_( "Monday" ) },
-        { TR_SCHED_TUES,    N_( "Tuesday" ) },
-        { TR_SCHED_WED,     N_( "Wednesday" ) },
-        { TR_SCHED_THURS,   N_( "Thursday" ) },
-        { TR_SCHED_FRI,     N_( "Friday" ) },
-        { TR_SCHED_SAT,     N_( "Saturday" ) }
-    };
-
-    /* build a store for the days of the week */
-    selIndex = -1;
-    store = gtk_list_store_new( 2, G_TYPE_INT, G_TYPE_STRING );
-    for( i=0; i<(int)G_N_ELEMENTS(items); ++i ) {
-        GtkTreeIter iter;
-        gtk_list_store_append( store, &iter );
-        gtk_list_store_set( store, &iter, 0, items[i].value, 1, _( items[i].text ), -1 );
-        if( items[i].value == currentValue )
-            selIndex = i;
-    }
-
-    /* build the widget */
-    w = gtk_combo_box_new_with_model( GTK_TREE_MODEL( store ) );
-    r = gtk_cell_renderer_text_new( );
-    gtk_cell_layout_pack_start( GTK_CELL_LAYOUT( w ), r, TRUE );
-    gtk_cell_layout_set_attributes( GTK_CELL_LAYOUT( w ), r, "text", 1, NULL );
+    GtkWidget * w = gtr_combo_box_new_enum( _( "Every Day" ), TR_SCHED_ALL,
+                                            _( "Weekdays" ),  TR_SCHED_WEEKDAY,
+                                            _( "Weekends" ),  TR_SCHED_WEEKEND,
+                                            _( "Sunday" ),    TR_SCHED_SUN,
+                                            _( "Monday" ),    TR_SCHED_MON,
+                                            _( "Tuesday" ),   TR_SCHED_TUES,
+                                            _( "Wednesday" ), TR_SCHED_WED,
+                                            _( "Thursday" ),  TR_SCHED_THURS,
+                                            _( "Friday" ),    TR_SCHED_FRI,
+                                            _( "Saturday" ),  TR_SCHED_SAT,
+                                            NULL );
+    gtr_combo_box_set_active_val( w, pref_int_get( key ) );
     g_object_set_data_full( G_OBJECT( w ), PREF_KEY, tr_strdup( key ), g_free );
-    if( selIndex >= 0 )
-        gtk_combo_box_set_active( GTK_COMBO_BOX( w ), selIndex );
     g_signal_connect( w, "changed", G_CALLBACK( onIntComboChanged ), core );
-
-    /* cleanup */
-    g_object_unref( G_OBJECT( store ) );
     return w;
 }
 

@@ -168,11 +168,13 @@ GtkWidget * gtr_button_new_from_stock( const char * stock,
 ****
 ***/
 
-void gtr_priority_combo_set_value( GtkWidget * w, tr_priority_t );
-
-tr_priority_t gtr_priority_combo_get_value( GtkWidget * w );
-
 GtkWidget * gtr_priority_combo_new( void );
+#define gtr_priority_combo_get_value(w) gtr_combo_box_get_active_val(w)
+#define gtr_priority_combo_set_value(w,val) gtr_combo_box_set_active_val(w,val)
+
+GtkWidget * gtr_combo_box_new_enum( const char * text_1, ... );
+int gtr_combo_box_get_active_val( GtkWidget * w );
+void gtr_combo_box_set_active_val( GtkWidget * w, int value );
 
 /***
 ****

@@ -13,6 +13,7 @@
 #include <ctype.h> /* isxdigit() */
 #include <errno.h>
 #include <math.h> /* pow() */
+#include <stdarg.h>
 #include <stdlib.h> /* free() */
 #include <string.h> /* strcmp() */
 
@@ -652,7 +653,7 @@ gtr_button_new_from_stock( const char * stock,
 ***/
 
 void
-gtr_priority_combo_set_value( GtkWidget * w, tr_priority_t value )
+gtr_combo_box_set_active_val( GtkWidget * w, int value )
 {
     int i;
     int currentValue;
@@ -679,8 +680,40 @@ gtr_priority_combo_set_value( GtkWidget * w, tr_priority_t value )
     }
 }
 
-tr_priority_t
-gtr_priority_combo_get_value( GtkWidget * w )
+
+GtkWidget *
+gtr_combo_box_new_enum( const char * text_1, ... )
+{
+    GtkWidget * w;
+    GtkCellRenderer * r;
+    GtkListStore * store;
+    va_list vl;
+    const char * text;
+    va_start( vl, text_1 );
+
+    store = gtk_list_store_new( 2, G_TYPE_INT, G_TYPE_STRING );
+
+    text = text_1;
+    if( text != NULL ) do
+    {
+        const int val = va_arg( vl, int );
+        gtk_list_store_insert_with_values( store, NULL, INT_MAX, 0, val, 1, text, -1 );
+        text = va_arg( vl, const char * );
+    }
+    while( text != NULL );
+
+    w = gtk_combo_box_new_with_model( GTK_TREE_MODEL( store ) );
+    r = gtk_cell_renderer_text_new( );
+    gtk_cell_layout_pack_start( GTK_CELL_LAYOUT( w ), r, TRUE );
+    gtk_cell_layout_set_attributes( GTK_CELL_LAYOUT( w ), r, "text", 1, NULL );
+
+    /* cleanup */
+    g_object_unref( store );
+    return w;
+}
+
+int
+gtr_combo_box_get_active_val( GtkWidget * w )
 {
     int value = 0;
     GtkTreeIter iter;
@@ -695,36 +728,10 @@ gtr_priority_combo_get_value( GtkWidget * w )
 GtkWidget *
 gtr_priority_combo_new( void )
 {
-    int i;
-    GtkWidget * w;
-    GtkCellRenderer * r;
-    GtkListStore * store;
-    const struct {
-        int value;
-        const char * text;
-    } items[] = {
-        { TR_PRI_HIGH,   N_( "High" )  },
-        { TR_PRI_NORMAL, N_( "Normal" ) },
-        { TR_PRI_LOW,    N_( "Low" )  }
-    };
-
-    store = gtk_list_store_new( 2, G_TYPE_INT, G_TYPE_STRING );
-    for( i=0; i<(int)G_N_ELEMENTS(items); ++i ) {
-        GtkTreeIter iter;
-        gtk_list_store_append( store, &iter );
-        gtk_list_store_set( store, &iter, 0, items[i].value,
-                                          1, _( items[i].text ),
-                                         -1 );
-    }
-
-    w = gtk_combo_box_new_with_model( GTK_TREE_MODEL( store ) );
-    r = gtk_cell_renderer_text_new( );
-    gtk_cell_layout_pack_start( GTK_CELL_LAYOUT( w ), r, TRUE );
-    gtk_cell_layout_set_attributes( GTK_CELL_LAYOUT( w ), r, "text", 1, NULL );
-
-    /* cleanup */
-    g_object_unref( store );
-    return w;
+    return gtr_combo_box_new_enum( _( "High" ),   TR_PRI_HIGH,
+                                   _( "Normal" ), TR_PRI_NORMAL,
+                                   _( "Low" ),    TR_PRI_LOW,
+                                   NULL );
 }
 
 /***
