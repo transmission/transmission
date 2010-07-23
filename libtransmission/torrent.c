@@ -1794,7 +1794,7 @@ tr_torrentSetInactiveLimitHitCallback( tr_torrent                        * tor,
 }
 
 void
-tr_torrentClearInactivityLimitHitCallback( tr_torrent * torrent )
+tr_torrentClearInactiveLimitHitCallback( tr_torrent * torrent )
 {
     tr_torrentSetInactiveLimitHitCallback( torrent, NULL, NULL );
 }
