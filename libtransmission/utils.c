@@ -1386,7 +1386,7 @@ double
 tr_truncd( double x, int decimal_places )
 {
     const int i = (int) pow( 10, decimal_places );  
-    double x2 = (int)(x*i);
+    const double x2 = (int64_t)(x * i);
     return x2 / i;
 }
 
