@@ -29,7 +29,7 @@ namespace
     unsigned int size_K;
 }
 
-QString Formatter::unitStrings[3][4];
+QString Formatter::unitStrings[3][5];
 
 void
 Formatter :: initUnits( )

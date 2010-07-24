@@ -30,6 +30,7 @@
 enum
 {
    GUI_PAD = 6,
+   BAR_WIDTH = 50,
    BAR_HEIGHT = 12,
    LINE_SPACING = 4
 };
@@ -37,8 +38,7 @@ enum
 /***
 ****
 ****   +---------+-----------------------------------------------+
-****   |  Icon   |   Title                   shortStatusString   |
-****   |  Icon   |   [ Progressbar.......................... ]   |
+****   |  Icon   |   Title      shortStatusString [Progressbar]  |
 ****   +-------- +-----------------------------------------------+
 ****
 ***/
@@ -63,8 +63,10 @@ TorrentDelegateMin :: sizeHint( const QStyleOptionViewItem& option, const Torren
 
     const QSize m( margin( *style ) );
 
-    return QSize( m.width() + iconSize + GUI_PAD + nameSize.width() + GUI_PAD + statusSize.width() + m.width(),
-                  m.height() + nameSize.height() + LINE_SPACING + BAR_HEIGHT  + m.height() );
+    return QSize( m.width()*2 + iconSize + GUI_PAD + nameSize.width()
+                                         + GUI_PAD + statusSize.width()
+                                         + GUI_PAD + BAR_WIDTH,
+                  m.height()*2 + std::max( nameSize.height(), (int)BAR_HEIGHT ) );
 }
 
 void
@@ -126,18 +128,18 @@ TorrentDelegateMin :: drawTorrent( QPainter * painter, const QStyleOptionViewIte
                           fillArea.y( ) + ( fillArea.height( ) - iconSize ) / 2,
                           iconSize,
                           iconSize );
-    const QRect statusArea( fillArea.width( ) - statusSize.width( ),
-                            fillArea.top( ) + ((nameSize.height()-statusSize.height())/2),
-                            statusSize.width( ),
-                            statusSize.height( ) );
+    const QRect barArea( fillArea.x( ) + fillArea.width( ) - BAR_WIDTH,
+                         fillArea.y( ) + ( fillArea.height( ) - BAR_HEIGHT ) / 2,
+                         BAR_WIDTH,
+                         BAR_HEIGHT );
+    const QRect statusArea( barArea.x( ) - GUI_PAD - statusSize.width( ),
+                            fillArea.y( ),
+                            fillArea.width( ),
+                            fillArea.height( ) );
     const QRect nameArea( iconArea.x( ) + iconArea.width( ) + GUI_PAD,
                           fillArea.y( ),
-                          fillArea.width( ) - statusArea.width( ) - (GUI_PAD*2) - iconArea.width( ),
-                          nameSize.height( ) );
-    const QRect barArea( nameArea.left( ),
-                         nameArea.bottom( ),
-                         statusArea.right( ) - nameArea.left( ),
-                         BAR_HEIGHT );
+                          statusArea.x( ) - ( iconArea.x( ) + iconArea.width( ) + GUI_PAD * 2 ),
+                          fillArea.height( ) );
 
     // render
     if( tor.hasError( ) )

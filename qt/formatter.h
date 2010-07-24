@@ -46,7 +46,7 @@ class Formatter: public QObject
 
     private:
 
-        static QString unitStrings[3][4];
+        static QString unitStrings[3][5];
 };
 
 #endif
