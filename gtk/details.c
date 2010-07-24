@@ -278,7 +278,7 @@ refreshOptions( struct DetailsImpl * di, tr_torrent ** torrents, int n )
             GtkWidget * w = di->ratio_combo;
             g_signal_handler_block( w, di->ratio_combo_tag );
             gtr_combo_box_set_active_enum( GTK_COMBO_BOX( w ), baseline );
-            gtk_widget_set_visible( di->ratio_spin, baseline == TR_RATIOLIMIT_SINGLE );
+            gtr_widget_set_visible( di->ratio_spin, baseline == TR_RATIOLIMIT_SINGLE );
             g_signal_handler_unblock( w, di->ratio_combo_tag );
         }
     }
@@ -300,7 +300,7 @@ refreshOptions( struct DetailsImpl * di, tr_torrent ** torrents, int n )
             GtkWidget * w = di->idle_combo;
             g_signal_handler_block( w, di->idle_combo_tag );
             gtr_combo_box_set_active_enum( GTK_COMBO_BOX( w ), baseline );
-            gtk_widget_set_visible( di->idle_spin, baseline == TR_IDLELIMIT_SINGLE );
+            gtr_widget_set_visible( di->idle_spin, baseline == TR_IDLELIMIT_SINGLE );
             g_signal_handler_unblock( w, di->idle_combo_tag );
         }
     }

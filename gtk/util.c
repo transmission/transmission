@@ -760,6 +760,19 @@ gtr_widget_get_realized( GtkWidget * w )
 }
 
 void
+gtr_widget_set_visible( GtkWidget * w, gboolean b )
+{
+#if GTK_CHECK_VERSION( 2,18,0 )
+    gtk_widget_set_visible( w, b );
+#else
+    if( b )
+        gtk_widget_show( w );
+    else
+        gtk_widget_hide( w );
+#endif
+}
+
+void
 gtr_toolbar_set_orientation( GtkToolbar      * toolbar,
                              GtkOrientation    orientation )
 {
