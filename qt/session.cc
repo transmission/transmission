@@ -144,6 +144,8 @@ Session :: updatePref( int key )
         case Prefs :: DOWNLOAD_DIR:
         case Prefs :: DSPEED:
         case Prefs :: DSPEED_ENABLED:
+        case Prefs :: IDLE_LIMIT:
+        case Prefs :: IDLE_LIMIT_ENABLED:
         case Prefs :: INCOMPLETE_DIR:
         case Prefs :: INCOMPLETE_DIR_ENABLED:
         case Prefs :: LPD_ENABLED:

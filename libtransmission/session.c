@@ -255,8 +255,8 @@ tr_sessionGetDefaultSettings( const char * configDir UNUSED, tr_benc * d )
     tr_bencDictAddInt ( d, TR_PREFS_KEY_DSPEED_KBps,              100 );
     tr_bencDictAddBool( d, TR_PREFS_KEY_DSPEED_ENABLED,           FALSE );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_ENCRYPTION,               TR_DEFAULT_ENCRYPTION );
-    tr_bencDictAddReal( d, TR_PREFS_KEY_INACTIVE_LIMIT,           30 );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_INACTIVE_LIMIT_ENABLED,   FALSE );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_IDLE_LIMIT,               30 );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_IDLE_LIMIT_ENABLED,       FALSE );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_INCOMPLETE_DIR,           tr_getDefaultDownloadDir( ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED,   FALSE );
     tr_bencDictAddBool( d, TR_PREFS_KEY_LAZY_BITFIELD,            TRUE );
@@ -323,8 +323,8 @@ tr_sessionGetSettings( tr_session * s, struct tr_benc * d )
     tr_bencDictAddInt ( d, TR_PREFS_KEY_DSPEED_KBps,              tr_sessionGetSpeedLimit_KBps( s, TR_DOWN ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_DSPEED_ENABLED,           tr_sessionIsSpeedLimited( s, TR_DOWN ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_ENCRYPTION,               s->encryptionMode );
-    tr_bencDictAddInt(  d, TR_PREFS_KEY_INACTIVE_LIMIT,           s->inactiveLimitMinutes );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_INACTIVE_LIMIT_ENABLED,   s->isInactivityLimited );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_IDLE_LIMIT,               tr_sessionGetIdleLimit( s ) );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_IDLE_LIMIT_ENABLED,       tr_sessionIsIdleLimited( s ) );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_INCOMPLETE_DIR,           tr_sessionGetIncompleteDir( s ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED,   tr_sessionIsIncompleteDirEnabled( s ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_LAZY_BITFIELD,            s->useLazyBitfield );
@@ -801,10 +801,10 @@ sessionSetImpl( void * vdata )
     if( tr_bencDictFindBool( settings, TR_PREFS_KEY_RATIO_ENABLED, &boolVal ) )
         tr_sessionSetRatioLimited( session, boolVal );
 
-    if( tr_bencDictFindInt( settings, TR_PREFS_KEY_INACTIVE_LIMIT, &i ) )
-        tr_sessionSetInactiveLimit( session, i );
-    if( tr_bencDictFindBool( settings, TR_PREFS_KEY_INACTIVE_LIMIT_ENABLED, &boolVal ) )
-        tr_sessionSetInactivityLimited( session, boolVal );
+    if( tr_bencDictFindInt( settings, TR_PREFS_KEY_IDLE_LIMIT, &i ) )
+        tr_sessionSetIdleLimit( session, i );
+    if( tr_bencDictFindBool( settings, TR_PREFS_KEY_IDLE_LIMIT_ENABLED, &boolVal ) )
+        tr_sessionSetIdleLimited( session, boolVal );
 
     /**
     ***  Turtle Mode
@@ -1108,35 +1108,35 @@ tr_sessionGetRatioLimit( const tr_session * session )
 ***/
 
 void
-tr_sessionSetInactivityLimited( tr_session * session, tr_bool isLimited )
+tr_sessionSetIdleLimited( tr_session * session, tr_bool isLimited )
 {
     assert( tr_isSession( session ) );
 
-    session->isInactivityLimited = isLimited;
+    session->isIdleLimited = isLimited;
 }
 
 void
-tr_sessionSetInactiveLimit( tr_session * session, uint64_t inactivityMinutes )
+tr_sessionSetIdleLimit( tr_session * session, uint16_t inactivityMinutes )
 {
     assert( tr_isSession( session ) );
 
-    session->inactiveLimitMinutes = inactivityMinutes;
+    session->idleLimitMinutes = inactivityMinutes;
 }
 
 tr_bool
-tr_sessionIsInactivityLimited( const tr_session  * session )
+tr_sessionIsIdleLimited( const tr_session  * session )
 {
     assert( tr_isSession( session ) );
 
-    return session->isInactivityLimited;
+    return session->isIdleLimited;
 }
 
-uint64_t
-tr_sessionGetInactiveLimit( const tr_session * session )
+uint16_t
+tr_sessionGetIdleLimit( const tr_session * session )
 {
     assert( tr_isSession( session ) );
 
-    return session->inactiveLimitMinutes;
+    return session->idleLimitMinutes;
 }
 
 /***

@@ -100,8 +100,8 @@
    "priority-high"       | array      indices of high-priority file(s)
    "priority-low"        | array      indices of low-priority file(s)
    "priority-normal"     | array      indices of normal-priority file(s)
-   "seedInactiveLimit"   | number     torrent-level number of minutes of seeding inactivity
-   "seedInactiveMode"    | number     which seeding inactivity to use.  See tr_inactvelimit
+   "seedIdleLimit"       | number     torrent-level number of minutes of seeding inactivity
+   "seedIdleMode"        | number     which seeding inactivity to use.  See tr_inactvelimit
    "seedRatioLimit"      | double     torrent-level seeding ratio
    "seedRatioMode"       | number     which ratio to use.  See tr_ratiolimit
    "trackerAdd"          | object     (see below)
@@ -205,8 +205,8 @@
    rateDownload (KBps)         | double                      | tr_stat
    rateUpload (KBps)           | double                      | tr_stat
    recheckProgress             | double                      | tr_stat
-   seedInactiveLimit           | number                      | tr_torrent
-   seedInactiveMode            | number                      | tr_inactvelimit
+   seedIdleLimit               | number                      | tr_torrent
+   seedIdleMode                | number                      | tr_inactvelimit
    seedRatioLimit              | double                      | tr_torrent
    seedRatioMode               | number                      | tr_ratiolimit
    sizeWhenDone                | number                      | tr_stat
@@ -645,7 +645,5 @@
          |         | yes       | session-set    | new arg "inactive-seeding-limit-enabled"
          |         | yes       | session-get    | new arg "inactive-seeding-limit"
          |         | yes       | session-get    | new arg "inactive-seeding-limit-enabled"
-         |         | yes       | torrent-set    | new arg "seedInactiveLimit"
-         |         | yes       | torrent-set    | new arg "seedInactiveMode"
-         |         | yes       | torrent-get    | new arg "seedInactiveLimit"
-         |         | yes       | torrent-get    | new arg "seedInactiveMode"
+         |         | yes       | torrent-set    | new arg "seedIdleLimit"
+         |         | yes       | torrent-set    | new arg "seedIdleMode"

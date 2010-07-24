@@ -1229,7 +1229,7 @@ Details :: createOptionsTab( )
     myBandwidthPriorityCombo = m;
 
     hig->addSectionDivider( );
-    hig->addSectionTitle( tr( "Seed-Until Ratio" ) );
+    hig->addSectionTitle( tr( "Seeding Limits" ) );
 
     r = new QRadioButton( tr( "Use &global settings" ) );
     r->setProperty( RATIO_KEY, TR_RATIOLIMIT_GLOBAL );

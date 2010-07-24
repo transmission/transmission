@@ -229,8 +229,8 @@ struct tr_torrent
     tr_torrent_ratio_limit_hit_func  * ratio_limit_hit_func;
     void                             * ratio_limit_hit_func_user_data;
 
-    tr_torrent_inactive_limit_hit_func  * inactive_limit_hit_func;
-    void                                * inactive_limit_hit_func_user_data;
+    tr_torrent_idle_limit_hit_func  * idle_limit_hit_func;
+    void                            * idle_limit_hit_func_user_data;
 
     tr_bool                    isRunning;
     tr_bool                    isStopping;
@@ -258,8 +258,8 @@ struct tr_torrent
     double                     desiredRatio;
     tr_ratiolimit              ratioLimitMode;
 
-    uint64_t                   inactiveLimitMinutes;
-    tr_inactivelimit           inactiveLimitMode;
+    uint16_t                   idleLimitMinutes;
+    tr_idlelimit               idleLimitMode;
 
     uint64_t                   preVerifyTotal;
 };

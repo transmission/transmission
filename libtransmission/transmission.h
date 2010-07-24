@@ -170,8 +170,8 @@ const char* tr_getDefaultDownloadDir( void );
 #define TR_PREFS_KEY_LPD_ENABLED                   "lpd-enabled"
 #define TR_PREFS_KEY_DOWNLOAD_DIR                  "download-dir"
 #define TR_PREFS_KEY_ENCRYPTION                    "encryption"
-#define TR_PREFS_KEY_INACTIVE_LIMIT                "inactive-seeding-limit"
-#define TR_PREFS_KEY_INACTIVE_LIMIT_ENABLED        "inactive-seeding-limit-enabled"
+#define TR_PREFS_KEY_IDLE_LIMIT                    "idle-seeding-limit"
+#define TR_PREFS_KEY_IDLE_LIMIT_ENABLED            "idle-seeding-limit-enabled"
 #define TR_PREFS_KEY_INCOMPLETE_DIR                "incomplete-dir"
 #define TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED        "incomplete-dir-enabled"
 #define TR_PREFS_KEY_LAZY_BITFIELD                 "lazy-bitfield-enabled"
@@ -725,11 +725,11 @@ tr_bool    tr_sessionIsRatioLimited   ( const tr_session * );
 void       tr_sessionSetRatioLimit    ( tr_session *, double desiredRatio );
 double     tr_sessionGetRatioLimit    ( const tr_session * );
 
-void       tr_sessionSetInactivityLimited  ( tr_session *, tr_bool isLimited );
-tr_bool    tr_sessionIsInactivityLimited   ( const tr_session * );
+void       tr_sessionSetIdleLimited  ( tr_session *, tr_bool isLimited );
+tr_bool    tr_sessionIsIdleLimited   ( const tr_session * );
 
-void       tr_sessionSetInactiveLimit      ( tr_session *, uint64_t inactivityMinutes );
-uint64_t   tr_sessionGetInactiveLimit      ( const tr_session * );
+void       tr_sessionSetIdleLimit ( tr_session *, uint16_t idleMinutes );
+uint16_t   tr_sessionGetIdleLimit ( const tr_session * );
 
 void       tr_sessionSetPeerLimit( tr_session *, uint16_t maxGlobalPeers );
 uint16_t   tr_sessionGetPeerLimit( const tr_session * );
@@ -1169,29 +1169,29 @@ tr_bool       tr_torrentGetSeedRatio( const tr_torrent *, double * ratio );
 
 
 /****
-*****  Inactive Time Limits
+*****  Idle Time Limits
 ****/
 
 typedef enum
 {
-    TR_INACTIVELIMIT_GLOBAL    = 0, /* follow the global settings */
-    TR_INACTIVELIMIT_SINGLE    = 1, /* override the global settings, seeding until a certain inactive time */
-    TR_INACTIVELIMIT_UNLIMITED = 2  /* override the global settings, seeding regardless of activity */
+    TR_IDLELIMIT_GLOBAL    = 0, /* follow the global settings */
+    TR_IDLELIMIT_SINGLE    = 1, /* override the global settings, seeding until a certain idle time */
+    TR_IDLELIMIT_UNLIMITED = 2  /* override the global settings, seeding regardless of activity */
 }
-tr_inactivelimit;
+tr_idlelimit;
 
-void             tr_torrentSetInactiveMode( tr_torrent         * tor,
-                                            tr_inactivelimit      mode );
+void          tr_torrentSetIdleMode ( tr_torrent         * tor,
+                                      tr_idlelimit         mode );
 
-tr_inactivelimit tr_torrentGetInactiveMode( const tr_torrent   * tor );
+tr_idlelimit  tr_torrentGetIdleMode ( const tr_torrent   * tor );
 
-void             tr_torrentSetInactiveLimit( tr_torrent        * tor,
-                                          uint64_t            inactiveMinutes );
+void          tr_torrentSetIdleLimit( tr_torrent         * tor,
+                                      uint16_t             idleMinutes );
 
-uint64_t         tr_torrentGetInactiveLimit( const tr_torrent  * tor );
+uint16_t      tr_torrentGetIdleLimit( const tr_torrent   * tor );
 
 
-tr_bool          tr_torrentGetSeedInactive( const tr_torrent *, uint64_t * inactiveMinutes );
+tr_bool       tr_torrentGetSeedIdle( const tr_torrent *, uint16_t * idleMinutes );
 
 /****
 *****  Peer Limits
@@ -1322,8 +1322,8 @@ typedef void ( tr_torrent_completeness_func )( tr_torrent       * torrent,
 typedef void ( tr_torrent_ratio_limit_hit_func )( tr_torrent   * torrent,
                                                   void         * user_data );
 
-typedef void ( tr_torrent_inactive_limit_hit_func )( tr_torrent   * torrent,
-                                                    void         * user_data );
+typedef void ( tr_torrent_idle_limit_hit_func )( tr_torrent   * torrent,
+                                                 void         * user_data );
 
 
 /**
@@ -1384,10 +1384,10 @@ void tr_torrentClearRatioLimitHitCallback( tr_torrent * torrent );
  */
 void tr_torrentSetInactivityLimitHitCallback(
      tr_torrent                          * torrent,
-     tr_torrent_inactive_limit_hit_func  func,
+     tr_torrent_idle_limit_hit_func        func,
      void                                * user_data );
 
-void tr_torrentClearInactiveLimitHitCallback( tr_torrent * torrent );
+void tr_torrentClearIdleLimitHitCallback( tr_torrent * torrent );
 
 
 /**

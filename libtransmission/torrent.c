@@ -328,68 +328,68 @@ tr_torrentIsSeedRatioDone( tr_torrent * tor )
 ***/
 
 void
-tr_torrentSetInactiveMode( tr_torrent *  tor, tr_inactivelimit mode )
+tr_torrentSetIdleMode( tr_torrent *  tor, tr_idlelimit mode )
 {
     assert( tr_isTorrent( tor ) );
-    assert( mode==TR_INACTIVELIMIT_GLOBAL || mode==TR_INACTIVELIMIT_SINGLE || mode==TR_INACTIVELIMIT_UNLIMITED  );
+    assert( mode==TR_IDLELIMIT_GLOBAL || mode==TR_IDLELIMIT_SINGLE || mode==TR_IDLELIMIT_UNLIMITED  );
 
-    if( mode != tor->inactiveLimitMode )
+    if( mode != tor->idleLimitMode )
     {
-        tor->inactiveLimitMode = mode;
+        tor->idleLimitMode = mode;
 
         tr_torrentSetDirty( tor );
     }
 }
 
-tr_inactivelimit
-tr_torrentGetInactiveMode( const tr_torrent * tor )
+tr_idlelimit
+tr_torrentGetIdleMode( const tr_torrent * tor )
 {
     assert( tr_isTorrent( tor ) );
 
-    return tor->inactiveLimitMode;
+    return tor->idleLimitMode;
 }
 
 void
-tr_torrentSetInactiveLimit( tr_torrent * tor, uint64_t inactiveMinutes)
+tr_torrentSetIdleLimit( tr_torrent * tor, uint16_t idleMinutes )
 {
     assert( tr_isTorrent( tor ) );
 
-    if( inactiveMinutes > 0 )
+    if( idleMinutes > 0 )
     {
-        tor->inactiveLimitMinutes = inactiveMinutes;
+        tor->idleLimitMinutes = idleMinutes;
 
         tr_torrentSetDirty( tor );
     }
 }
 
-uint64_t
-tr_torrentGetInactiveLimit( const tr_torrent * tor )
+uint16_t
+tr_torrentGetIdleLimit( const tr_torrent * tor )
 {
     assert( tr_isTorrent( tor ) );
 
-    return tor->inactiveLimitMinutes;
+    return tor->idleLimitMinutes;
 }
 
 tr_bool
-tr_torrentGetSeedInactive( const tr_torrent * tor, uint64_t * inactiveMinutes )
+tr_torrentGetSeedIdle( const tr_torrent * tor, uint16_t * idleMinutes )
 {
     tr_bool isLimited;
 
-    switch( tr_torrentGetInactiveMode( tor ) )
+    switch( tr_torrentGetIdleMode( tor ) )
     {
-        case TR_INACTIVELIMIT_SINGLE:
+        case TR_IDLELIMIT_SINGLE:
             isLimited = TRUE;
-            if( inactiveMinutes )
-                *inactiveMinutes = tr_torrentGetInactiveLimit( tor );
+            if( idleMinutes )
+                *idleMinutes = tr_torrentGetIdleLimit( tor );
             break;
 
-        case TR_INACTIVELIMIT_GLOBAL:
-            isLimited = tr_sessionIsInactivityLimited( tor->session );
-            if( isLimited && inactiveMinutes )
-                *inactiveMinutes = tr_sessionGetInactiveLimit( tor->session );
+        case TR_IDLELIMIT_GLOBAL:
+            isLimited = tr_sessionIsIdleLimited( tor->session );
+            if( isLimited && idleMinutes )
+                *idleMinutes = tr_sessionGetIdleLimit( tor->session );
             break;
 
-        default: /* TR_INACTIVELIMIT_UNLIMITED */
+        default: /* TR_IDLELIMIT_UNLIMITED */
             isLimited = FALSE;
             break;
     }
@@ -398,12 +398,12 @@ tr_torrentGetSeedInactive( const tr_torrent * tor, uint64_t * inactiveMinutes )
 }
 
 static tr_bool
-tr_torrentIsSeedInactiveLimitDone( tr_torrent * tor )
+tr_torrentIsSeedIdleLimitDone( tr_torrent * tor )
 {
-    uint64_t inactiveMinutes;
+    uint16_t idleMinutes;
 #warning can this use the idleSecs from tr_stat?
-    return tr_torrentGetSeedInactive( tor, &inactiveMinutes )
-        && difftime(tr_time(), MAX(tor->startDate, tor->activityDate)) >= inactiveMinutes * 60;
+    return tr_torrentGetSeedIdle( tor, &idleMinutes )
+        && difftime(tr_time(), MAX(tor->startDate, tor->activityDate)) >= idleMinutes * 60u;
 }
 
 /***
@@ -430,15 +430,15 @@ tr_torrentCheckSeedLimit( tr_torrent * tor )
             tor->ratio_limit_hit_func( tor, tor->ratio_limit_hit_func_user_data );
     }
     /* if we're seeding and reach our inactiviy limit, stop the torrent */
-    else if( tr_torrentIsSeedInactiveLimitDone( tor ) )
+    else if( tr_torrentIsSeedIdleLimitDone( tor ) )
     {
         tr_torinf( tor, "Seeding inactivity limit reached; pausing torrent" );
 
         tor->isStopping = TRUE;
 
         /* maybe notify the client */
-        if( tor->inactive_limit_hit_func != NULL )
-            tor->inactive_limit_hit_func( tor, tor->inactive_limit_hit_func_user_data );
+        if( tor->idle_limit_hit_func != NULL )
+            tor->idle_limit_hit_func( tor, tor->idle_limit_hit_func_user_data );
     }
 }
 
@@ -808,10 +808,10 @@ torrentInit( tr_torrent * tor, const tr_ctor * ctor )
         tr_torrentSetRatioLimit( tor, tr_sessionGetRatioLimit( tor->session ) );
     }
 
-    if( !( loaded & TR_FR_INACTIVELIMIT ) )
+    if( !( loaded & TR_FR_IDLELIMIT ) )
     {
-        tr_torrentSetInactiveMode( tor, TR_INACTIVELIMIT_GLOBAL );
-        tr_torrentSetInactiveLimit( tor, tr_sessionGetInactiveLimit( tor->session ) );
+        tr_torrentSetIdleMode( tor, TR_IDLELIMIT_GLOBAL );
+        tr_torrentSetIdleLimit( tor, tr_sessionGetIdleLimit( tor->session ) );
     }
 
     {
@@ -1782,21 +1782,21 @@ tr_torrentClearRatioLimitHitCallback( tr_torrent * torrent )
     tr_torrentSetRatioLimitHitCallback( torrent, NULL, NULL );
 }
 
-void
-tr_torrentSetInactiveLimitHitCallback( tr_torrent                        * tor,
-                                       tr_torrent_inactive_limit_hit_func  func,
-                                       void                              * user_data )
+static void
+tr_torrentSetIdleLimitHitCallback( tr_torrent                    * tor,
+                                   tr_torrent_idle_limit_hit_func  func,
+                                   void                          * user_data )
 {
     assert( tr_isTorrent( tor ) );
 
-    tor->inactive_limit_hit_func = func;
-    tor->inactive_limit_hit_func_user_data = user_data;
+    tor->idle_limit_hit_func = func;
+    tor->idle_limit_hit_func_user_data = user_data;
 }
 
 void
-tr_torrentClearInactiveLimitHitCallback( tr_torrent * torrent )
+tr_torrentClearIdleLimitHitCallback( tr_torrent * torrent )
 {
-    tr_torrentSetInactiveLimitHitCallback( torrent, NULL, NULL );
+    tr_torrentSetIdleLimitHitCallback( torrent, NULL, NULL );
 }
 
 static void

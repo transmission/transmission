@@ -1257,6 +1257,14 @@ prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
     {
         tr_sessionSetRatioLimit( tr, pref_double_get( key ) );
     }
+    else if( !strcmp( key, TR_PREFS_KEY_IDLE_LIMIT ) )
+    {
+        tr_sessionSetIdleLimit( tr, pref_int_get( key ) );
+    }
+    else if( !strcmp( key, TR_PREFS_KEY_IDLE_LIMIT_ENABLED ) )
+    {
+        tr_sessionSetIdleLimited( tr, pref_flag_get( key ) );
+    }
     else if( !strcmp( key, TR_PREFS_KEY_PORT_FORWARDING ) )
     {
         tr_sessionSetPortForwardingEnabled( tr, pref_flag_get( key ) );

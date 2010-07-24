@@ -595,10 +595,15 @@ PrefsDialog :: createTorrentsTab( )
         hig->addRow( tr( "Save to &Location:" ), b );
 
     hig->addSectionDivider( );
-    hig->addSectionTitle( tr( "Seeding" ) );
+    hig->addSectionTitle( tr( "Seeding Limits" ) );
 
-        l = checkBoxNew( tr( "&Seed torrent until its ratio reaches:" ), Prefs::RATIO_ENABLED );
+        l = checkBoxNew( tr( "Stop seeding at &ratio:" ), Prefs::RATIO_ENABLED );
         r = doubleSpinBoxNew( Prefs::RATIO, 0, INT_MAX, 0.5, 2 );
+        hig->addRow( l, r );
+        enableBuddyWhenChecked( qobject_cast<QCheckBox*>(l), r );
+
+        l = checkBoxNew( tr( "Stop seeding if idle for &N minutes:" ), Prefs::IDLE_LIMIT_ENABLED );
+        r = spinBoxNew( Prefs::IDLE_LIMIT, 1, INT_MAX, 5 );
         hig->addRow( l, r );
         enableBuddyWhenChecked( qobject_cast<QCheckBox*>(l), r );
 

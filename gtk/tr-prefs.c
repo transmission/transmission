@@ -319,12 +319,19 @@ torrentPage( GObject * core )
     hig_workarea_add_row_w( t, &row, l, w, NULL );
 
     hig_workarea_add_section_divider( t, &row );
-    hig_workarea_add_section_title( t, &row, _( "Seeding" ) );
+    hig_workarea_add_section_title( t, &row, _( "Seeding Limits" ) );
 
     s = _( "Stop seeding at _ratio:" );
     w = new_check_button( s, TR_PREFS_KEY_RATIO_ENABLED, core );
     w2 = new_spin_button_double( TR_PREFS_KEY_RATIO, core, 0, 1000, .05 );
     gtk_widget_set_sensitive( GTK_WIDGET( w2 ), pref_flag_get( TR_PREFS_KEY_RATIO_ENABLED ) );
+    g_signal_connect( w, "toggled", G_CALLBACK( target_cb ), w2 );
+    hig_workarea_add_row_w( t, &row, w, w2, NULL );
+
+    s = _( "Stop seeding if idle for _N minutes:" );
+    w = new_check_button( s, TR_PREFS_KEY_IDLE_LIMIT_ENABLED, core );
+    w2 = new_spin_button( TR_PREFS_KEY_IDLE_LIMIT, core, 1, 9999, 5 );
+    gtk_widget_set_sensitive( GTK_WIDGET( w2 ), pref_flag_get( TR_PREFS_KEY_IDLE_LIMIT_ENABLED ) );
     g_signal_connect( w, "toggled", G_CALLBACK( target_cb ), w2 );
     hig_workarea_add_row_w( t, &row, w, w2, NULL );
 

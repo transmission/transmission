@@ -574,10 +574,10 @@ addField( const tr_torrent * tor, tr_benc * d, const char * key )
         tr_bencDictAddReal( d, key, st->pieceUploadSpeed_KBps );
     else if( tr_streq( key, keylen, "recheckProgress" ) )
         tr_bencDictAddReal( d, key, st->recheckProgress );
-    else if( tr_streq( key, keylen, "seedInactiveLimit" ) )
-        tr_bencDictAddInt( d, key, tr_torrentGetInactiveLimit( tor ) );
-    else if( tr_streq( key, keylen, "seedInactiveMode" ) )
-        tr_bencDictAddInt( d, key, tr_torrentGetInactiveMode( tor ) );
+    else if( tr_streq( key, keylen, "seedIdleLimit" ) )
+        tr_bencDictAddInt( d, key, tr_torrentGetIdleLimit( tor ) );
+    else if( tr_streq( key, keylen, "seedIdleMode" ) )
+        tr_bencDictAddInt( d, key, tr_torrentGetIdleMode( tor ) );
     else if( tr_streq( key, keylen, "seedRatioLimit" ) )
         tr_bencDictAddReal( d, key, tr_torrentGetRatioLimit( tor ) );
     else if( tr_streq( key, keylen, "seedRatioMode" ) )
@@ -1017,10 +1017,10 @@ torrentSet( tr_session               * session,
             tr_torrentSetSpeedLimit_KBps( tor, TR_UP, tmp );
         if( tr_bencDictFindBool( args_in, "uploadLimited", &boolVal ) )
             tr_torrentUseSpeedLimit( tor, TR_UP, boolVal );
-        if( tr_bencDictFindInt( args_in, "seedInactiveLimit", &tmp ) )
-            tr_torrentSetInactiveLimit( tor, tmp );
-        if( tr_bencDictFindInt( args_in, "seedInactiveMode", &tmp ) )
-            tr_torrentSetInactiveMode( tor, tmp );
+        if( tr_bencDictFindInt( args_in, "seedIdleLimit", &tmp ) )
+            tr_torrentSetIdleLimit( tor, tmp );
+        if( tr_bencDictFindInt( args_in, "seedIdleMode", &tmp ) )
+            tr_torrentSetIdleMode( tor, tmp );
         if( tr_bencDictFindReal( args_in, "seedRatioLimit", &d ) )
             tr_torrentSetRatioLimit( tor, d );
         if( tr_bencDictFindInt( args_in, "seedRatioMode", &tmp ) )
@@ -1461,10 +1461,10 @@ sessionSet( tr_session               * session,
         tr_sessionSetRatioLimit( session, d );
     if( tr_bencDictFindBool( args_in, "seedRatioLimited", &boolVal ) )
         tr_sessionSetRatioLimited( session, boolVal );
-    if( tr_bencDictFindInt( args_in, TR_PREFS_KEY_INACTIVE_LIMIT, &i ) )
-        tr_sessionSetInactiveLimit( session, i );
-    if( tr_bencDictFindBool( args_in, TR_PREFS_KEY_INACTIVE_LIMIT_ENABLED, &boolVal ) )
-        tr_sessionSetInactivityLimited( session, boolVal );
+    if( tr_bencDictFindInt( args_in, TR_PREFS_KEY_IDLE_LIMIT, &i ) )
+        tr_sessionSetIdleLimit( session, i );
+    if( tr_bencDictFindBool( args_in, TR_PREFS_KEY_IDLE_LIMIT_ENABLED, &boolVal ) )
+        tr_sessionSetIdleLimited( session, boolVal );
     if( tr_bencDictFindBool( args_in, TR_PREFS_KEY_START, &boolVal ) )
         tr_sessionSetPaused( session, !boolVal );
     if( tr_bencDictFindStr( args_in, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_FILENAME, &str ) )
@@ -1579,8 +1579,8 @@ sessionGet( tr_session               * s,
     tr_bencDictAddInt ( d, "rpc-version-minimum", RPC_VERSION_MIN );
     tr_bencDictAddReal( d, "seedRatioLimit", tr_sessionGetRatioLimit( s ) );
     tr_bencDictAddBool( d, "seedRatioLimited", tr_sessionIsRatioLimited( s ) );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_INACTIVE_LIMIT, tr_sessionGetInactiveLimit( s ) );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_INACTIVE_LIMIT_ENABLED, tr_sessionIsInactivityLimited( s ) );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_IDLE_LIMIT, tr_sessionGetIdleLimit( s ) );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_IDLE_LIMIT_ENABLED, tr_sessionIsIdleLimited( s ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_START, !tr_sessionGetPaused( s ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_TRASH_ORIGINAL, tr_sessionGetDeleteSource( s ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_USPEED_KBps, tr_sessionGetSpeedLimit_KBps( s, TR_UP ) );

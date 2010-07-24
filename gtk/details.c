@@ -34,33 +34,30 @@ struct DetailsImpl
 {
     GtkWidget * dialog;
 
-    GtkWidget * peersPage;
-    GtkWidget * trackerPage;
-    GtkWidget * activityPage;
+    GtkWidget * honor_limits_check;
+    GtkWidget * up_limited_check;
+    GtkWidget * up_limit_sping;
+    GtkWidget * down_limited_check;
+    GtkWidget * down_limit_spin;
+    GtkWidget * bandwidth_combo;
 
-    GtkWidget * honorLimitsCheck;
-    GtkWidget * upLimitedCheck;
-    GtkWidget * upLimitSpin;
-    GtkWidget * downLimitedCheck;
-    GtkWidget * downLimitSpin;
-    GtkWidget * bandwidthCombo;
-    GtkWidget * seedGlobalRadio;
-    GtkWidget * seedForeverRadio;
-    GtkWidget * seedCustomRadio;
-    GtkWidget * seedCustomSpin;
-    GtkWidget * maxPeersSpin;
+    GtkWidget * ratio_combo;
+    GtkWidget * ratio_spin;
+    GtkWidget * idle_combo;
+    GtkWidget * idle_spin;
+    GtkWidget * max_peers_spin;
 
-    guint honorLimitsCheckTag;
-    guint upLimitedCheckTag;
-    guint downLimitedCheckTag;
-    guint downLimitSpinTag;
-    guint upLimitSpinTag;
-    guint bandwidthComboTag;
-    guint seedForeverRadioTag;
-    guint seedGlobalRadioTag;
-    guint seedCustomRadioTag;
-    guint seedCustomSpinTag;
-    guint maxPeersSpinTag;
+    guint honor_limits_check_tag;
+    guint up_limited_check_tag;
+    guint down_limited_check_tag;
+    guint down_limit_spin_tag;
+    guint up_limit_spin_tag;
+    guint bandwidth_combo_tag;
+    guint ratio_combo_tag;
+    guint ratio_spin_tag;
+    guint idle_combo_tag;
+    guint idle_spin_tag;
+    guint max_peers_spin_tag;
 
     GtkWidget * size_lb;
     GtkWidget * state_lb;
@@ -192,7 +189,7 @@ refreshOptions( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     ****  Options Page
     ***/
 
-    /* honorLimitsCheck */
+    /* honor_limits_check */
     if( n ) {
         const tr_bool baseline = tr_torrentUsesSessionLimits( torrents[0] );
         int i;
@@ -200,11 +197,11 @@ refreshOptions( struct DetailsImpl * di, tr_torrent ** torrents, int n )
             if( baseline != tr_torrentUsesSessionLimits( torrents[i] ) )
                 break;
         if( i == n )
-            set_togglebutton_if_different( di->honorLimitsCheck,
-                                           di->honorLimitsCheckTag, baseline );
+            set_togglebutton_if_different( di->honor_limits_check,
+                                           di->honor_limits_check_tag, baseline );
     }
 
-    /* downLimitedCheck */
+    /* down_limited_check */
     if( n ) {
         const tr_bool baseline = tr_torrentUsesSpeedLimit( torrents[0], TR_DOWN );
         int i;
@@ -212,11 +209,11 @@ refreshOptions( struct DetailsImpl * di, tr_torrent ** torrents, int n )
             if( baseline != tr_torrentUsesSpeedLimit( torrents[i], TR_DOWN ) )
                 break;
         if( i == n )
-            set_togglebutton_if_different( di->downLimitedCheck,
-                                           di->downLimitedCheckTag, baseline );
+            set_togglebutton_if_different( di->down_limited_check,
+                                           di->down_limited_check_tag, baseline );
     }
 
-    /* downLimitSpin */
+    /* down_limit_spin */
     if( n ) {
         const int baseline = tr_torrentGetSpeedLimit_KBps( torrents[0], TR_DOWN );
         int i;
@@ -224,11 +221,11 @@ refreshOptions( struct DetailsImpl * di, tr_torrent ** torrents, int n )
             if( baseline != ( tr_torrentGetSpeedLimit_KBps( torrents[i], TR_DOWN ) ) )
                 break;
         if( i == n )
-            set_int_spin_if_different( di->downLimitSpin,
-                                       di->downLimitSpinTag, baseline );
+            set_int_spin_if_different( di->down_limit_spin,
+                                       di->down_limit_spin_tag, baseline );
     }
 
-    /* upLimitedCheck */
+    /* up_limited_check */
     if( n ) {
         const tr_bool baseline = tr_torrentUsesSpeedLimit( torrents[0], TR_UP );
         int i;
@@ -236,11 +233,11 @@ refreshOptions( struct DetailsImpl * di, tr_torrent ** torrents, int n )
             if( baseline != tr_torrentUsesSpeedLimit( torrents[i], TR_UP ) )
                 break;
         if( i == n )
-            set_togglebutton_if_different( di->upLimitedCheck,
-                                           di->upLimitedCheckTag, baseline );
+            set_togglebutton_if_different( di->up_limited_check,
+                                           di->up_limited_check_tag, baseline );
     }
 
-    /* upLimitSpin */
+    /* up_limit_sping */
     if( n ) {
         const int baseline = tr_torrentGetSpeedLimit_KBps( torrents[0], TR_UP );
         int i;
@@ -248,11 +245,11 @@ refreshOptions( struct DetailsImpl * di, tr_torrent ** torrents, int n )
             if( baseline != ( tr_torrentGetSpeedLimit_KBps( torrents[i], TR_UP ) ) )
                 break;
         if( i == n )
-            set_int_spin_if_different( di->upLimitSpin,
-                                       di->upLimitSpinTag, baseline );
+            set_int_spin_if_different( di->up_limit_sping,
+                                       di->up_limit_spin_tag, baseline );
     }
 
-    /* bandwidthCombo */
+    /* bandwidth_combo */
     if( n ) {
         const int baseline = tr_torrentGetPriority( torrents[0] );
         int i;
@@ -260,50 +257,64 @@ refreshOptions( struct DetailsImpl * di, tr_torrent ** torrents, int n )
             if( baseline != tr_torrentGetPriority( torrents[i] ) )
                 break;
         if( i == n ) {
-            g_signal_handler_block( di->bandwidthCombo, di->bandwidthComboTag );
-            gtr_priority_combo_set_value( GTK_COMBO_BOX( di->bandwidthCombo ), baseline );
-            g_signal_handler_unblock( di->bandwidthCombo, di->bandwidthComboTag );
+            GtkWidget * w = di->bandwidth_combo;
+            g_signal_handler_block( w, di->bandwidth_combo_tag );
+            gtr_priority_combo_set_value( GTK_COMBO_BOX( w ), baseline );
+            g_signal_handler_unblock( w, di->bandwidth_combo_tag );
         }
         else
-            unset_combo( di->bandwidthCombo, di->bandwidthComboTag );
+            unset_combo( di->bandwidth_combo, di->bandwidth_combo_tag );
     }
 
-    /* seedGlobalRadio */
-    /* seedForeverRadio */
-    /* seedCustomRadio */
+    /* ratio_combo */
+    /* ratio_spin */
     if( n ) {
-        guint t;
-        const int baseline = tr_torrentGetRatioMode( torrents[0] );
         int i;
+        const int baseline = tr_torrentGetRatioMode( torrents[0] );
         for( i=1; i<n; ++i )
             if( baseline != (int)tr_torrentGetRatioMode( torrents[i] ) )
                 break;
         if( i == n ) {
-            GtkWidget * w;
-            switch( baseline ) {
-                case TR_RATIOLIMIT_SINGLE: w = di->seedCustomRadio;
-                                           t = di->seedCustomRadioTag; break;
-                case TR_RATIOLIMIT_UNLIMITED: w = di->seedForeverRadio;
-                                              t = di->seedForeverRadioTag; break;
-                default /*TR_RATIOLIMIT_GLOBAL*/: w = di->seedGlobalRadio;
-                                                  t = di->seedGlobalRadioTag; break;
-            }
-            set_togglebutton_if_different( w, t, TRUE );
+            GtkWidget * w = di->ratio_combo;
+            g_signal_handler_block( w, di->ratio_combo_tag );
+            gtr_combo_box_set_active_enum( GTK_COMBO_BOX( w ), baseline );
+            gtk_widget_set_visible( di->ratio_spin, baseline == TR_RATIOLIMIT_SINGLE );
+            g_signal_handler_unblock( w, di->ratio_combo_tag );
         }
     }
-
-    /* seedCustomSpin */
     if( n ) {
         const double baseline = tr_torrentGetRatioLimit( torrents[0] );
-        set_double_spin_if_different( di->seedCustomSpin,
-                                      di->seedCustomSpinTag, baseline );
+        set_double_spin_if_different( di->ratio_spin,
+                                      di->ratio_spin_tag, baseline );
     }
 
-    /* maxPeersSpin */
+    /* idle_combo */
+    /* idle_spin */
+    if( n ) {
+        int i;
+        const int baseline = tr_torrentGetIdleMode( torrents[0] );
+        for( i=1; i<n; ++i )
+            if( baseline != (int)tr_torrentGetIdleMode( torrents[i] ) )
+                break;
+        if( i == n ) {
+            GtkWidget * w = di->idle_combo;
+            g_signal_handler_block( w, di->idle_combo_tag );
+            gtr_combo_box_set_active_enum( GTK_COMBO_BOX( w ), baseline );
+            gtk_widget_set_visible( di->idle_spin, baseline == TR_IDLELIMIT_SINGLE );
+            g_signal_handler_unblock( w, di->idle_combo_tag );
+        }
+    }
+    if( n ) {
+        const int baseline = tr_torrentGetIdleLimit( torrents[0] );
+        set_int_spin_if_different( di->idle_spin,
+                                   di->idle_spin_tag, baseline );
+    }
+
+    /* max_peers_spin */
     if( n ) {
         const int baseline = tr_torrentGetPeerLimit( torrents[0] );
-        set_int_spin_if_different( di->maxPeersSpin,
-                                   di->maxPeersSpinTag, baseline );
+        set_int_spin_if_different( di->max_peers_spin,
+                                   di->max_peers_spin_tag, baseline );
     }
 }
 
@@ -379,19 +390,6 @@ global_speed_toggled_cb( GtkToggleButton * tb, gpointer d )
     torrent_set_bool( d, "honorsSessionLimits", gtk_toggle_button_get_active( tb ) );
 }
 
-#define RATIO_KEY "ratio-mode"
-
-static void
-ratio_mode_changed_cb( GtkToggleButton * tb, struct DetailsImpl * d )
-{
-    if( gtk_toggle_button_get_active( tb ) )
-    {
-        GObject * o = G_OBJECT( tb );
-        const int mode = GPOINTER_TO_INT( g_object_get_data( o, RATIO_KEY ) );
-        torrent_set_int( d, "seedRatioMode", mode );
-    }
-}
-
 static void
 up_speed_spun_cb( GtkSpinButton * s, struct DetailsImpl * di )
 {
@@ -405,10 +403,15 @@ down_speed_spun_cb( GtkSpinButton * s, struct DetailsImpl * di )
 }
 
 static void
+idle_spun_cb( GtkSpinButton * s, struct DetailsImpl * di )
+{
+    torrent_set_int( di, "seedInactiveLimit", gtk_spin_button_get_value_as_int( s ) );
+}
+
+static void
 ratio_spun_cb( GtkSpinButton * s, struct DetailsImpl * di )
 {
     torrent_set_real( di, "seedRatioLimit", gtk_spin_button_get_value( s ) );
-    gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( di->seedCustomRadio ), TRUE );
 }
 
 static void
@@ -428,10 +431,43 @@ static GtkWidget*
 new_priority_combo( struct DetailsImpl * di )
 {
     GtkWidget * w = gtr_priority_combo_new( );
-    di->bandwidthComboTag = g_signal_connect( w, "changed", G_CALLBACK( onPriorityChanged ), di );
+    di->bandwidth_combo_tag = g_signal_connect( w, "changed", G_CALLBACK( onPriorityChanged ), di );
     return w;
 }
 
+static void refresh( struct DetailsImpl * di );
+
+#define ARG_KEY "arg-key"
+
+static void
+onComboEnumChanged( GtkComboBox * combo_box, struct DetailsImpl * di )
+{
+    const char * key = g_object_get_data( G_OBJECT( combo_box ), ARG_KEY );
+    torrent_set_int( di, key, gtr_combo_box_get_active_enum( combo_box ) );
+    refresh( di );
+}
+
+static GtkWidget*
+ratio_combo_new( void )
+{
+    GtkWidget * w = gtr_combo_box_new_enum( _( "Use global settings" ),       TR_RATIOLIMIT_GLOBAL,
+                                            _( "Seed regardless of ratio" ),  TR_RATIOLIMIT_UNLIMITED,
+                                            _( "Stop seeding at ratio:" ),    TR_RATIOLIMIT_SINGLE,
+                                            NULL );
+    g_object_set_data_full( G_OBJECT( w ), ARG_KEY, g_strdup( "seedRatioMode" ), g_free );
+    return w;
+}
+
+static GtkWidget*
+idle_combo_new( void )
+{
+    GtkWidget * w = gtr_combo_box_new_enum ( _( "Use global settings" ),                 TR_IDLELIMIT_GLOBAL,
+                                             _( "Seed regardless of activity" ),         TR_IDLELIMIT_UNLIMITED,
+                                             _( "Stop seeding if idle for N minutes:" ), TR_IDLELIMIT_SINGLE,
+                                             NULL );
+    g_object_set_data_full( G_OBJECT( w ), ARG_KEY, g_strdup( "seedIdleMode" ), g_free );
+    return w;
+}
 
 static GtkWidget*
 options_page_new( struct DetailsImpl * d )
@@ -439,7 +475,6 @@ options_page_new( struct DetailsImpl * d )
     guint tag;
     int row;
     char buf[128];
-    const char *s;
     GtkWidget *t, *w, *tb, *h;
 
     row = 0;
@@ -447,73 +482,60 @@ options_page_new( struct DetailsImpl * d )
     hig_workarea_add_section_title( t, &row, _( "Speed" ) );
 
     tb = hig_workarea_add_wide_checkbutton( t, &row, _( "Honor global _limits" ), 0 );
-    d->honorLimitsCheck = tb;
+    d->honor_limits_check = tb;
     tag = g_signal_connect( tb, "toggled", G_CALLBACK( global_speed_toggled_cb ), d );
-    d->honorLimitsCheckTag = tag;
+    d->honor_limits_check_tag = tag;
 
     g_snprintf( buf, sizeof( buf ), _( "Limit _download speed (%s):" ), _(speed_K_str) );
     tb = gtk_check_button_new_with_mnemonic( buf );
     gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( tb ), FALSE );
-    d->downLimitedCheck = tb;
+    d->down_limited_check = tb;
     tag = g_signal_connect( tb, "toggled", G_CALLBACK( down_speed_toggled_cb ), d );
-    d->downLimitedCheckTag = tag;
+    d->down_limited_check_tag = tag;
 
     w = gtk_spin_button_new_with_range( 0, INT_MAX, 5 );
     tag = g_signal_connect( w, "value-changed", G_CALLBACK( down_speed_spun_cb ), d );
-    d->downLimitSpinTag = tag;
+    d->down_limit_spin_tag = tag;
     hig_workarea_add_row_w( t, &row, tb, w, NULL );
-    d->downLimitSpin = w;
+    d->down_limit_spin = w;
 
     g_snprintf( buf, sizeof( buf ), _( "Limit _upload speed (%s):" ), _(speed_K_str) );
     tb = gtk_check_button_new_with_mnemonic( buf );
-    d->upLimitedCheck = tb;
+    d->up_limited_check = tb;
     tag = g_signal_connect( tb, "toggled", G_CALLBACK( up_speed_toggled_cb ), d );
-    d->upLimitedCheckTag = tag;
+    d->up_limited_check_tag = tag;
 
     w = gtk_spin_button_new_with_range( 0, INT_MAX, 5 );
     tag = g_signal_connect( w, "value-changed", G_CALLBACK( up_speed_spun_cb ), d );
-    d->upLimitSpinTag = tag;
+    d->up_limit_spin_tag = tag;
     hig_workarea_add_row_w( t, &row, tb, w, NULL );
-    d->upLimitSpin = w;
+    d->up_limit_sping = w;
 
     w = new_priority_combo( d );
     hig_workarea_add_row( t, &row, _( "Torrent _priority:" ), w, NULL );
-    d->bandwidthCombo = w;
+    d->bandwidth_combo = w;
 
     hig_workarea_add_section_divider( t, &row );
-    hig_workarea_add_section_title( t, &row, _( "Seed-Until Ratio" ) );
-
-    s = _( "Use _global settings" );
-    w = gtk_radio_button_new_with_mnemonic( NULL, s );
-    hig_workarea_add_wide_control( t, &row, w );
-    g_object_set_data( G_OBJECT( w ), RATIO_KEY, GINT_TO_POINTER( TR_RATIOLIMIT_GLOBAL ) );
-    tag = g_signal_connect( w, "toggled", G_CALLBACK( ratio_mode_changed_cb ), d );
-    d->seedGlobalRadio = w;
-    d->seedGlobalRadioTag = tag;
-
-    s = _( "Seed _regardless of ratio" );
-    w = gtk_radio_button_new_with_mnemonic_from_widget( GTK_RADIO_BUTTON( w ), s );
-    hig_workarea_add_wide_control( t, &row, w );
-    g_object_set_data( G_OBJECT( w ), RATIO_KEY, GINT_TO_POINTER( TR_RATIOLIMIT_UNLIMITED ) );
-    tag = g_signal_connect( w, "toggled", G_CALLBACK( ratio_mode_changed_cb ), d );
-    d->seedForeverRadio = w;
-    d->seedForeverRadioTag = tag;
+    hig_workarea_add_section_title( t, &row, _( "Seeding Limits" ) );
 
     h = gtk_hbox_new( FALSE, GUI_PAD );
-    s = _( "_Seed torrent until its ratio reaches:" );
-    w = gtk_radio_button_new_with_mnemonic_from_widget( GTK_RADIO_BUTTON( w ), s );
-    d->seedCustomRadio = w;
-    g_object_set_data( G_OBJECT( w ), RATIO_KEY, GINT_TO_POINTER( TR_RATIOLIMIT_SINGLE ) );
-    tag = g_signal_connect( w, "toggled", G_CALLBACK( ratio_mode_changed_cb ), d );
-    d->seedCustomRadioTag = tag;
+    w = d->ratio_combo = ratio_combo_new( );
+    d->ratio_combo_tag = g_signal_connect( w, "changed", G_CALLBACK( onComboEnumChanged ), d );
+    gtk_box_pack_start( GTK_BOX( h ), w, TRUE, TRUE, 0 );
+    w = d->ratio_spin = gtk_spin_button_new_with_range( 0, 1000, .05 );
+    gtk_entry_set_width_chars( GTK_ENTRY( w ), 7 );
+    d->ratio_spin_tag = g_signal_connect( w, "value-changed", G_CALLBACK( ratio_spun_cb ), d );
     gtk_box_pack_start( GTK_BOX( h ), w, FALSE, FALSE, 0 );
-    w = gtk_spin_button_new_with_range( 0, INT_MAX, .05 );
-    gtk_spin_button_set_digits( GTK_SPIN_BUTTON( w ), 2 );
-    tag = g_signal_connect( w, "value-changed", G_CALLBACK( ratio_spun_cb ), d );
+    hig_workarea_add_row( t, &row, _( "Ratio:" ), h, NULL );
+
+    h = gtk_hbox_new( FALSE, GUI_PAD );
+    w = d->idle_combo = idle_combo_new( );
+    d->idle_combo_tag = g_signal_connect( w, "changed", G_CALLBACK( onComboEnumChanged ), d );
+    gtk_box_pack_start( GTK_BOX( h ), w, TRUE, TRUE, 0 );
+    w = d->idle_spin = gtk_spin_button_new_with_range( 1, INT_MAX, 5 );
+    d->idle_spin_tag = g_signal_connect( w, "value-changed", G_CALLBACK( idle_spun_cb ), d );
     gtk_box_pack_start( GTK_BOX( h ), w, FALSE, FALSE, 0 );
-    hig_workarea_add_wide_control( t, &row, h );
-    d->seedCustomSpin = w;
-    d->seedCustomSpinTag = tag;
+    hig_workarea_add_row( t, &row, _( "_Idle:" ), h, NULL );
 
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title( t, &row, _( "Peer Connections" ) );
@@ -521,8 +543,8 @@ options_page_new( struct DetailsImpl * d )
     w = gtk_spin_button_new_with_range( 1, 3000, 5 );
     hig_workarea_add_row( t, &row, _( "_Maximum peers:" ), w, w );
     tag = g_signal_connect( w, "value-changed", G_CALLBACK( max_peers_spun_cb ), d );
-    d->maxPeersSpin = w;
-    d->maxPeersSpinTag = tag;
+    d->max_peers_spin = w;
+    d->max_peers_spin_tag = tag;
 
     hig_workarea_finish( t, &row );
     return t;
@@ -1067,7 +1089,7 @@ webseed_model_new( void )
                                G_TYPE_STRING,   /* key */
                                G_TYPE_BOOLEAN,  /* was-updated */
                                G_TYPE_STRING,   /* url */
-                               G_TYPE_INT,      /* download rate int */
+                               G_TYPE_DOUBLE,   /* download rate double */
                                G_TYPE_STRING ); /* download rate string */
 }
 
@@ -2068,8 +2090,6 @@ refreshTracker( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     g_free( stats );
     g_free( statCount );
 }
-
-static void refresh( struct DetailsImpl * di );
 
 static void
 onScrapeToggled( GtkToggleButton * button, struct DetailsImpl * di )
