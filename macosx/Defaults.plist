@@ -76,9 +76,9 @@
 	<integer>-2</integer>
 	<key>FilterSearchType</key>
 	<string>Name</string>
-	<key>InactiveLimitCheck</key>
+	<key>IdleLimitCheck</key>
 	<false/>
-	<key>InactiveLimitMinutes</key>
+	<key>IdleLimitMinutes</key>
 	<integer>30</integer>
 	<key>IncompleteDownloadFolder</key>
 	<string>~/Downloads</string>

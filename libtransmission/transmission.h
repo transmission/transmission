@@ -1376,13 +1376,13 @@ void tr_torrentSetRatioLimitHitCallback(
 void tr_torrentClearRatioLimitHitCallback( tr_torrent * torrent );
 
 /**
- * Register to be notified whenever a torrent's inactivity limit
+ * Register to be notified whenever a torrent's idle limit
  * has been hit. This will be called when the seeding torrent's
- * idle time has met or exceeded the designated inactivity limit.
+ * idle time has met or exceeded the designated idle limit.
  *
  * Has the same restrictions as tr_torrentSetCompletenessCallback
  */
-void tr_torrentSetInactivityLimitHitCallback(
+void tr_torrentSetIdleLimitHitCallback(
      tr_torrent                          * torrent,
      tr_torrent_idle_limit_hit_func        func,
      void                                * user_data );

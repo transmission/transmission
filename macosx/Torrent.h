@@ -98,11 +98,11 @@
 - (BOOL) seedRatioSet;
 - (CGFloat) progressStopRatio;
 
-- (tr_inactivelimit) inactiveSetting;
-- (void) setInactiveSetting: (tr_inactivelimit) setting;
-- (NSUInteger) inactiveLimitMinutes;
-- (void) setInactiveLimitMinutes: (NSUInteger) limit;
-- (BOOL) seedInactiveLimitSet;
+- (tr_idlelimit) idleSetting;
+- (void) setIdleSetting: (tr_idlelimit) setting;
+- (NSUInteger) idleLimitMinutes;
+- (void) setIdleLimitMinutes: (NSUInteger) limit;
+- (BOOL) seedIdleLimitSet;
 
 - (BOOL) usesSpeedLimit: (BOOL) upload;
 - (void) setUseSpeedLimit: (BOOL) use upload: (BOOL) upload;

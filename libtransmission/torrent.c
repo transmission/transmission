@@ -432,7 +432,7 @@ tr_torrentCheckSeedLimit( tr_torrent * tor )
     /* if we're seeding and reach our inactiviy limit, stop the torrent */
     else if( tr_torrentIsSeedIdleLimitDone( tor ) )
     {
-        tr_torinf( tor, "Seeding inactivity limit reached; pausing torrent" );
+        tr_torinf( tor, "Seeding idle limit reached; pausing torrent" );
 
         tor->isStopping = TRUE;
 
@@ -1141,7 +1141,7 @@ tr_torrentStat( tr_torrent * tor )
     s->ratio = tr_getRatio( s->uploadedEver,
                             s->downloadedEver ? s->downloadedEver : s->haveValid );
 
-    #warning account for inactivity limit?
+    #warning account for idle limit?
     seedRatioApplies = tr_torrentGetSeedRatioBytes( tor, &seedRatioBytesLeft,
                                                          &seedRatioBytesGoal );
 
@@ -1169,7 +1169,7 @@ tr_torrentStat( tr_torrent * tor )
             break;
 
         case TR_STATUS_SEED: {
-            #warning do something for inactivity?
+            #warning do something for idle?
             if( !seedRatioApplies )
                 s->eta = TR_ETA_NOT_AVAIL;
             else {
@@ -1192,7 +1192,7 @@ tr_torrentStat( tr_torrent * tor )
             break;
     }
 
-    #warning (maybe) do something for inactivity?
+    #warning (maybe) do something for idle?
     /* s->haveValid is here to make sure a torrent isn't marked 'finished'
      * when the user hits "uncheck all" prior to starting the torrent... */
     s->finished = seedRatioApplies && !seedRatioBytesLeft && s->haveValid;
@@ -1782,7 +1782,7 @@ tr_torrentClearRatioLimitHitCallback( tr_torrent * torrent )
     tr_torrentSetRatioLimitHitCallback( torrent, NULL, NULL );
 }
 
-static void
+void
 tr_torrentSetIdleLimitHitCallback( tr_torrent                    * tor,
                                    tr_torrent_idle_limit_hit_func  func,
                                    void                          * user_data )

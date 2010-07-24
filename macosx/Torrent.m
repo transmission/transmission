@@ -45,7 +45,7 @@
 
 - (void) completenessChange: (NSDictionary *) statusInfo;
 - (void) ratioLimitHit;
-- (void) inactiveLimitHit;
+- (void) idleLimitHit;
 - (void) metadataRetrieved;
 
 - (NSString *) etaString;
@@ -66,9 +66,9 @@ void ratioLimitHitCallback(tr_torrent * torrent, void * torrentData)
     [(Torrent *)torrentData performSelectorOnMainThread: @selector(ratioLimitHit) withObject: nil waitUntilDone: NO];
 }
 
-void inactiveLimitHitCallback(tr_torrent * torrent, void * torrentData)
+void idleLimitHitCallback(tr_torrent * torrent, void * torrentData)
 {
-    [(Torrent *)torrentData performSelectorOnMainThread: @selector(inactiveLimitHit) withObject: nil waitUntilDone: NO];
+    [(Torrent *)torrentData performSelectorOnMainThread: @selector(idleLimitHit) withObject: nil waitUntilDone: NO];
 }
 
 void metadataCallback(tr_torrent * torrent, void * torrentData)
@@ -393,30 +393,30 @@ int trashDataFile(const char * filename)
     return fStat->seedRatioPercentDone;
 }
 
-- (tr_inactivelimit) inactiveSetting
+- (tr_idlelimit) idleSetting
 {
-    return tr_torrentGetInactiveMode(fHandle);
+    return tr_torrentGetIdleMode(fHandle);
 }
 
-- (void) setInactiveSetting: (tr_inactivelimit) setting
+- (void) setIdleSetting: (tr_idlelimit) setting
 {
-    tr_torrentSetInactiveMode(fHandle, setting);
+    tr_torrentSetIdleMode(fHandle, setting);
 }
 
-- (NSUInteger) inactiveLimitMinutes
+- (NSUInteger) idleLimitMinutes
 {
-    return tr_torrentGetInactiveLimit(fHandle);
+    return tr_torrentGetIdleLimit(fHandle);
 }
 
-- (void) setInactiveLimitMinutes: (NSUInteger) limit
+- (void) setIdleLimitMinutes: (NSUInteger) limit
 {
-    NSAssert(limit > 0, @"Inactive limit must be greater than zero");
-    tr_torrentSetInactiveLimit(fHandle, limit);
+    NSAssert(limit > 0, @"Idle limit must be greater than zero");
+    tr_torrentSetIdleLimit(fHandle, limit);
 }
 
-- (BOOL) seedInactiveLimitSet
+- (BOOL) seedIdleLimitSet
 {
-    return tr_torrentGetSeedInactive(fHandle, NULL);
+    return tr_torrentGetSeedIdle(fHandle, NULL);
 }
 
 - (BOOL) usesSpeedLimit: (BOOL) upload
@@ -1646,7 +1646,7 @@ int trashDataFile(const char * filename)
     
     tr_torrentSetCompletenessCallback(fHandle, completenessChangeCallback, self);
     tr_torrentSetRatioLimitHitCallback(fHandle, ratioLimitHitCallback, self);
-    tr_torrentSetInactiveLimitHitCallback(fHandle, inactiveLimitHitCallback, self);
+    tr_torrentSetIdleLimitHitCallback(fHandle, idleLimitHitCallback, self);
     tr_torrentSetMetadataCallback(fHandle, metadataCallback, self);
     
     fHashString = [[NSString alloc] initWithUTF8String: fInfo->hashString];
@@ -1802,7 +1802,7 @@ int trashDataFile(const char * filename)
     [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentStoppedForRatio" object: self];
 }
 
-- (void) inactiveLimitHit
+- (void) idleLimitHit
 {
     fStat = tr_torrentStat(fHandle);
     

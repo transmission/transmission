@@ -1116,11 +1116,11 @@ tr_sessionSetIdleLimited( tr_session * session, tr_bool isLimited )
 }
 
 void
-tr_sessionSetIdleLimit( tr_session * session, uint16_t inactivityMinutes )
+tr_sessionSetIdleLimit( tr_session * session, uint16_t idleMinutes )
 {
     assert( tr_isSession( session ) );
 
-    session->idleLimitMinutes = inactivityMinutes;
+    session->idleLimitMinutes = idleMinutes;
 }
 
 tr_bool

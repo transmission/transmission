@@ -1134,43 +1134,43 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">fInactivePopUp</string>
-						<reference key="source" ref="1001"/>
-						<reference key="destination" ref="110760088"/>
-					</object>
-					<int key="connectionID">93</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">fInactiveLimitField</string>
+						<string key="label">fIdleLimitField</string>
 						<reference key="source" ref="1001"/>
 						<reference key="destination" ref="317277208"/>
 					</object>
-					<int key="connectionID">94</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">setInactiveLimit:</string>
-						<reference key="source" ref="1001"/>
-						<reference key="destination" ref="317277208"/>
-					</object>
-					<int key="connectionID">95</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">setInactiveSetting:</string>
-						<reference key="source" ref="1001"/>
-						<reference key="destination" ref="110760088"/>
-					</object>
-					<int key="connectionID">96</int>
+					<int key="connectionID">102</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">fInactiveLimitLabel</string>
+						<string key="label">fIdleLimitLabel</string>
 						<reference key="source" ref="1001"/>
 						<reference key="destination" ref="706967535"/>
 					</object>
-					<int key="connectionID">101</int>
+					<int key="connectionID">103</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fIdlePopUp</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="110760088"/>
+					</object>
+					<int key="connectionID">104</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">setIdleLimit:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="317277208"/>
+					</object>
+					<int key="connectionID">105</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">setIdleSetting:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="110760088"/>
+					</object>
+					<int key="connectionID">106</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -1930,7 +1930,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">101</int>
+			<int key="maxID">106</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -1950,8 +1950,8 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>setInactiveLimit:</string>
-							<string>setInactiveSetting:</string>
+							<string>setIdleLimit:</string>
+							<string>setIdleSetting:</string>
 							<string>setPeersConnectLimit:</string>
 							<string>setPriority:</string>
 							<string>setRatioLimit:</string>
@@ -1981,10 +1981,11 @@
 							<string>fDownloadLimitField</string>
 							<string>fDownloadLimitLabel</string>
 							<string>fGlobalLimitCheck</string>
-							<string>fInactiveLimitField</string>
-							<string>fInactiveLimitLabel</string>
-							<string>fInactivePopUp</string>
+							<string>fIdleLimitField</string>
+							<string>fIdleLimitLabel</string>
+							<string>fIdlePopUp</string>
 							<string>fPeersConnectField</string>
+							<string>fPeersConnectLabel</string>
 							<string>fPriorityPopUp</string>
 							<string>fRatioLimitField</string>
 							<string>fRatioPopUp</string>
@@ -2001,6 +2002,7 @@
 							<string>NSTextField</string>
 							<string>NSTextField</string>
 							<string>NSPopUpButton</string>
+							<string>NSTextField</string>
 							<string>NSTextField</string>
 							<string>NSPopUpButton</string>
 							<string>NSTextField</string>

@@ -139,16 +139,16 @@
     [fGlobalLimitCheck setState: globalUseSpeedLimit];
     [fGlobalLimitCheck setEnabled: YES];
     
-    //get ratio and inactive info
+    //get ratio and idle info
     enumerator = [fTorrents objectEnumerator];
     torrent = [enumerator nextObject]; //first torrent
     
-    NSInteger checkRatio = [torrent ratioSetting], checkInactive = [torrent inactiveSetting];
+    NSInteger checkRatio = [torrent ratioSetting], checkIdle = [torrent idleSetting];
     CGFloat ratioLimit = [torrent ratioLimit];
-    NSUInteger inactiveLimit = [torrent inactiveLimitMinutes];
+    NSUInteger idleLimit = [torrent idleLimitMinutes];
     
     while ((torrent = [enumerator nextObject])
-            && (checkRatio != INVALID || ratioLimit != INVALID || checkInactive != INVALID || inactiveLimit != INVALID))
+            && (checkRatio != INVALID || ratioLimit != INVALID || checkIdle != INVALID || idleLimit != INVALID))
     {
         if (checkRatio != INVALID && checkRatio != [torrent ratioSetting])
             checkRatio = INVALID;
@@ -156,11 +156,11 @@
         if (ratioLimit != INVALID && ratioLimit != [torrent ratioLimit])
             ratioLimit = INVALID;
         
-        if (checkInactive != INVALID && checkInactive != [torrent inactiveSetting])
-            checkInactive = INVALID;
+        if (checkIdle != INVALID && checkIdle != [torrent idleSetting])
+            checkIdle = INVALID;
         
-        if (inactiveLimit != INVALID && inactiveLimit != [torrent inactiveLimitMinutes])
-            inactiveLimit = INVALID;
+        if (idleLimit != INVALID && idleLimit != [torrent idleLimitMinutes])
+            idleLimit = INVALID;
     }
     
     //set ratio view
@@ -182,24 +182,24 @@
     else
         [fRatioLimitField setStringValue: @""];
     
-    //set inactive view
-    if (checkInactive == TR_INACTIVELIMIT_SINGLE)
+    //set idle view
+    if (checkIdle == TR_IDLELIMIT_SINGLE)
         index = OPTION_POPUP_LIMIT;
-    else if (checkInactive == TR_INACTIVELIMIT_UNLIMITED)
+    else if (checkIdle == TR_IDLELIMIT_UNLIMITED)
         index = OPTION_POPUP_NO_LIMIT;
-    else if (checkInactive == TR_INACTIVELIMIT_GLOBAL)
+    else if (checkIdle == TR_IDLELIMIT_GLOBAL)
         index = OPTION_POPUP_GLOBAL;
     else
         index = -1;
-    [fInactivePopUp selectItemAtIndex: index];
-    [fInactivePopUp setEnabled: YES];
+    [fIdlePopUp selectItemAtIndex: index];
+    [fIdlePopUp setEnabled: YES];
     
-    [fInactiveLimitField setHidden: checkInactive != TR_INACTIVELIMIT_SINGLE];
-    if (inactiveLimit != INVALID)
-        [fInactiveLimitField setIntegerValue: inactiveLimit];
+    [fIdleLimitField setHidden: checkIdle != TR_IDLELIMIT_SINGLE];
+    if (idleLimit != INVALID)
+        [fIdleLimitField setIntegerValue: idleLimit];
     else
-        [fInactiveLimitField setStringValue: @""];
-    [fInactiveLimitLabel setHidden: checkInactive != TR_INACTIVELIMIT_SINGLE];
+        [fIdleLimitField setStringValue: @""];
+    [fIdleLimitLabel setHidden: checkIdle != TR_IDLELIMIT_SINGLE];
     
     //get priority info
     enumerator = [fTorrents objectEnumerator];
@@ -331,45 +331,45 @@
         [torrent setRatioLimit: limit];
 }
 
-- (void) setInactiveSetting: (id) sender
+- (void) setIdleSetting: (id) sender
 {
     NSInteger setting;
     bool single = NO;
     switch ([sender indexOfSelectedItem])
     {
         case OPTION_POPUP_LIMIT:
-            setting = TR_INACTIVELIMIT_SINGLE;
+            setting = TR_IDLELIMIT_SINGLE;
             single = YES;
             break;
         case OPTION_POPUP_NO_LIMIT:
-            setting = TR_INACTIVELIMIT_UNLIMITED;
+            setting = TR_IDLELIMIT_UNLIMITED;
             break;
         case OPTION_POPUP_GLOBAL:
-            setting = TR_INACTIVELIMIT_GLOBAL;
+            setting = TR_IDLELIMIT_GLOBAL;
             break;
         default:
-            NSAssert1(NO, @"Unknown option selected in inactive popup: %d", [sender indexOfSelectedItem]);
+            NSAssert1(NO, @"Unknown option selected in idle popup: %d", [sender indexOfSelectedItem]);
             return;
     }
     
     for (Torrent * torrent in fTorrents)
-        [torrent setInactiveSetting: setting];
+        [torrent setIdleSetting: setting];
     
-    [fInactiveLimitField setHidden: !single];
-    [fInactiveLimitLabel setHidden: !single];
+    [fIdleLimitField setHidden: !single];
+    [fIdleLimitLabel setHidden: !single];
     if (single)
     {
-        [fInactiveLimitField selectText: self];
+        [fIdleLimitField selectText: self];
         [[[self view] window] makeKeyAndOrderFront: self];
     }
 }
 
-- (void) setInactiveLimit: (id) sender
+- (void) setIdleLimit: (id) sender
 {
     const NSUInteger limit = [sender integerValue];
     
     for (Torrent * torrent in fTorrents)
-        [torrent setInactiveLimitMinutes: limit];
+        [torrent setIdleLimitMinutes: limit];
 }
 
 - (void) setPriority: (id) sender
@@ -456,11 +456,11 @@
         [fRatioLimitField setHidden: YES];
         [fRatioLimitField setStringValue: @""];
         
-        [fInactivePopUp setEnabled: NO];
-        [fInactivePopUp selectItemAtIndex: -1];
-        [fInactiveLimitField setHidden: YES];
-        [fInactiveLimitField setStringValue: @""];
-        [fInactiveLimitLabel setHidden: YES];
+        [fIdlePopUp setEnabled: NO];
+        [fIdlePopUp selectItemAtIndex: -1];
+        [fIdleLimitField setHidden: YES];
+        [fIdleLimitField setStringValue: @""];
+        [fIdleLimitLabel setHidden: YES];
         
         [fPeersConnectField setEnabled: NO];
         [fPeersConnectField setStringValue: @""];

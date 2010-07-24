@@ -4656,6 +4656,10 @@ AAABAAAAAQ</bytes>
 				<string key="NSExtension">NSResponder</string>
 			</object>
 			<object class="NSUserDefaultsController" id="356871564">
+				<object class="NSMutableArray" key="NSDeclaredKeys">
+					<bool key="EncodedWithXMLCoder">YES</bool>
+					<string>IdleLimitCheck</string>
+				</object>
 				<bool key="NSSharedInstance">YES</bool>
 			</object>
 			<object class="NSCustomObject" id="981493640">
@@ -8057,60 +8061,60 @@ AAABAAAAAQ</bytes>
 					<int key="connectionID">1971</int>
 				</object>
 				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fIdleStopField</string>
+						<reference key="source" ref="511492310"/>
+						<reference key="destination" ref="430240209"/>
+					</object>
+					<int key="connectionID">1979</int>
+				</object>
+				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">applyInactiveStopSetting:</string>
+						<string key="label">applyIdleStopSetting:</string>
 						<reference key="source" ref="511492310"/>
 						<reference key="destination" ref="457261886"/>
 					</object>
-					<int key="connectionID">1972</int>
+					<int key="connectionID">1980</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">setIdleStop:</string>
+						<reference key="source" ref="511492310"/>
+						<reference key="destination" ref="430240209"/>
+					</object>
+					<int key="connectionID">1981</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
-						<string key="label">value: values.InactiveLimitCheck</string>
+						<string key="label">value: values.IdleLimitCheck</string>
 						<reference key="source" ref="457261886"/>
 						<reference key="destination" ref="356871564"/>
 						<object class="NSNibBindingConnector" key="connector">
 							<reference key="NSSource" ref="457261886"/>
 							<reference key="NSDestination" ref="356871564"/>
-							<string key="NSLabel">value: values.InactiveLimitCheck</string>
+							<string key="NSLabel">value: values.IdleLimitCheck</string>
 							<string key="NSBinding">value</string>
-							<string key="NSKeyPath">values.InactiveLimitCheck</string>
+							<string key="NSKeyPath">values.IdleLimitCheck</string>
 							<int key="NSNibBindingConnectorVersion">2</int>
 						</object>
 					</object>
-					<int key="connectionID">1973</int>
+					<int key="connectionID">1982</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
-						<string key="label">enabled: values.InactiveLimitCheck</string>
+						<string key="label">enabled: values.IdleLimitCheck</string>
 						<reference key="source" ref="430240209"/>
 						<reference key="destination" ref="356871564"/>
 						<object class="NSNibBindingConnector" key="connector">
 							<reference key="NSSource" ref="430240209"/>
 							<reference key="NSDestination" ref="356871564"/>
-							<string key="NSLabel">enabled: values.InactiveLimitCheck</string>
+							<string key="NSLabel">enabled: values.IdleLimitCheck</string>
 							<string key="NSBinding">enabled</string>
-							<string key="NSKeyPath">values.InactiveLimitCheck</string>
+							<string key="NSKeyPath">values.IdleLimitCheck</string>
 							<int key="NSNibBindingConnectorVersion">2</int>
 						</object>
 					</object>
-					<int key="connectionID">1974</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">setInactiveStop:</string>
-						<reference key="source" ref="511492310"/>
-						<reference key="destination" ref="430240209"/>
-					</object>
-					<int key="connectionID">1975</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">fInactiveStopField</string>
-						<reference key="source" ref="511492310"/>
-						<reference key="destination" ref="430240209"/>
-					</object>
-					<int key="connectionID">1976</int>
+					<int key="connectionID">1983</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -12255,7 +12259,7 @@ AAABAAAAAQ</bytes>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">1976</int>
+			<int key="maxID">1983</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -12403,7 +12407,7 @@ AAABAAAAAQ</bytes>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>addRemoveRPCIP:</string>
-							<string>applyInactiveStopSetting:</string>
+							<string>applyIdleStopSetting:</string>
 							<string>applyRatioSetting:</string>
 							<string>applySpeedSettings:</string>
 							<string>folderSheetShow:</string>
@@ -12430,7 +12434,7 @@ AAABAAAAAQ</bytes>
 							<string>setDownloadLocation:</string>
 							<string>setEncryptionMode:</string>
 							<string>setGlobalLimit:</string>
-							<string>setInactiveStop:</string>
+							<string>setIdleStop:</string>
 							<string>setLPD:</string>
 							<string>setNat:</string>
 							<string>setPEX:</string>
@@ -12540,8 +12544,8 @@ AAABAAAAAQ</bytes>
 							<string>fFolderPopUp</string>
 							<string>fGeneralView</string>
 							<string>fGroupsView</string>
+							<string>fIdleStopField</string>
 							<string>fImportFolderPopUp</string>
-							<string>fInactiveStopField</string>
 							<string>fIncompleteFolderPopUp</string>
 							<string>fNatCheck</string>
 							<string>fNetworkView</string>
@@ -12581,8 +12585,8 @@ AAABAAAAAQ</bytes>
 							<string>NSPopUpButton</string>
 							<string>NSView</string>
 							<string>NSView</string>
-							<string>NSPopUpButton</string>
 							<string>NSTextField</string>
+							<string>NSPopUpButton</string>
 							<string>NSPopUpButton</string>
 							<string>NSButton</string>
 							<string>NSView</string>

@@ -183,8 +183,8 @@ tr_session * fHandle;
     //set stop ratio
     [fRatioStopField setFloatValue: [fDefaults floatForKey: @"RatioLimit"]];
     
-    //set inactive seeding minutes
-    [fInactiveStopField setIntegerValue: [fDefaults integerForKey: @"InactiveLimitMinutes"]];
+    //set idle seeding minutes
+    [fIdleStopField setIntegerValue: [fDefaults integerForKey: @"IdleLimitMinutes"]];
     
     //set limits
     [self updateLimitFields];
@@ -611,17 +611,17 @@ tr_session * fHandle;
     [self applyRatioSetting: nil];
 }
 
-- (void) applyInactiveStopSetting: (id) sender
+- (void) applyIdleStopSetting: (id) sender
 {
-    tr_sessionSetInactivityLimited(fHandle, [fDefaults boolForKey: @"InactiveLimitCheck"]);
-    tr_sessionSetInactiveLimit(fHandle, [fDefaults integerForKey: @"InactiveLimitMinutes"]);
+    tr_sessionSetIdleLimited(fHandle, [fDefaults boolForKey: @"IdleLimitCheck"]);
+    tr_sessionSetIdleLimit(fHandle, [fDefaults integerForKey: @"IdleLimitMinutes"]);
 }
 
-- (void) setInactiveStop: (id) sender
+- (void) setIdleStop: (id) sender
 {
-    [fDefaults setInteger: [sender integerValue] forKey: @"InactiveLimitMinutes"];
+    [fDefaults setInteger: [sender integerValue] forKey: @"IdleLimitMinutes"];
     
-    [self applyInactiveStopSetting: nil];
+    [self applyIdleStopSetting: nil];
 }
 
 - (void) updateLimitFields
@@ -1241,12 +1241,12 @@ tr_session * fHandle;
     const float ratioLimit = tr_sessionGetRatioLimit(fHandle);
     [fDefaults setFloat: ratioLimit forKey: @"RatioLimit"];
     
-    //inactive seed limit
-    const BOOL inactivityLimited = tr_sessionIsInactivityLimited(fHandle);
-    [fDefaults setBool: inactivityLimited forKey: @"InactiveLimitCheck"];
+    //Idle seed limit
+    const BOOL idleLimited = tr_sessionIsIdleLimited(fHandle);
+    [fDefaults setBool: idleLimited forKey: @"IdleLimitCheck"];
     
-    const NSUInteger inactiveLimitMin = tr_sessionGetInactiveLimit(fHandle);
-    [fDefaults setInteger: inactiveLimitMin forKey: @"InactiveLimitMinutes"];
+    const NSUInteger idleLimitMin = tr_sessionGetIdleLimit(fHandle);
+    [fDefaults setInteger: idleLimitMin forKey: @"IdleLimitMinutes"];
     
     //update gui if loaded
     if (fHasLoaded)
@@ -1287,8 +1287,8 @@ tr_session * fHandle;
         //ratio limit enabled handled by bindings
         [fRatioStopField setFloatValue: ratioLimit];
         
-        //inactivity limit enabled handled by bindings
-        [fInactiveStopField setIntegerValue: inactiveLimitMin];
+        //idle limit enabled handled by bindings
+        [fIdleStopField setIntegerValue: idleLimitMin];
     }
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"SpeedLimitUpdate" object: nil];
