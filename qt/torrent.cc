@@ -89,6 +89,8 @@ Torrent :: myProperties[] =
     { MIME_ICON, "ccc", QVariant::Icon, DERIVED },
     { SEED_RATIO_LIMIT, "seedRatioLimit", QVariant::Double, STAT },
     { SEED_RATIO_MODE, "seedRatioMode", QVariant::Int, STAT },
+    { SEED_IDLE_LIMIT, "seedIdleLimit", QVariant::Int, STAT_EXTRA },
+    { SEED_IDLE_MODE, "seedIdleMode", QVariant::Int, STAT_EXTRA },
     { DOWN_LIMIT, "downloadLimit", QVariant::Int, STAT_EXTRA }, /* KB/s */
     { DOWN_LIMITED, "downloadLimited", QVariant::Bool, STAT_EXTRA },
     { UP_LIMIT, "uploadLimit", QVariant::Int, STAT_EXTRA }, /* KB/s */

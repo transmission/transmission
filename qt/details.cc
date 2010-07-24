@@ -646,28 +646,38 @@ Details :: refresh( )
         myPeerLimitSpin->blockSignals( true );
         myPeerLimitSpin->setValue( tor->peerLimit() );
         myPeerLimitSpin->blockSignals( false );
+    }
 
-        // ratio radios
-        uniform = true;
-        baselineInt = tor->seedRatioMode( );
+    {
+        const Torrent * tor;
+
+        // ratio
+        bool uniform = true;
+        int baselineInt = torrents[0]->seedRatioMode( );
         foreach( tor, torrents ) if( baselineInt != tor->seedRatioMode( ) ) { uniform = false; break; }
-        if( !uniform ) {
-            mySeedGlobalRadio->setChecked( false );
-            mySeedCustomRadio->setChecked( false );
-            mySeedForeverRadio->setChecked( false );
-        } else {
-            QRadioButton * rb;
-            switch( baselineInt ) {
-                case TR_RATIOLIMIT_GLOBAL:    rb = mySeedGlobalRadio; break;
-                case TR_RATIOLIMIT_SINGLE:    rb = mySeedCustomRadio; break;
-                case TR_RATIOLIMIT_UNLIMITED: rb = mySeedForeverRadio; break;
-            }
-            rb->setChecked( true );
-        }
 
-        mySeedCustomSpin->blockSignals( true );
-        mySeedCustomSpin->setValue( tor->seedRatioLimit( ) );
-        mySeedCustomSpin->blockSignals( false );
+        myRatioCombo->blockSignals( true );
+        myRatioCombo->setCurrentIndex( uniform ? myRatioCombo->findData( baselineInt ) : -1 );
+        myRatioSpin->setVisible( uniform && ( baselineInt == TR_RATIOLIMIT_SINGLE ) );
+        myRatioCombo->blockSignals( false );
+
+        myRatioSpin->blockSignals( true );
+        myRatioSpin->setValue( tor->seedRatioLimit( ) );
+        myRatioSpin->blockSignals( false );
+
+        // idle
+        uniform = true;
+        baselineInt = torrents[0]->seedIdleMode( );
+        foreach( tor, torrents ) if( baselineInt != tor->seedIdleMode( ) ) { uniform = false; break; }
+
+        myIdleCombo->blockSignals( true );
+        myIdleCombo->setCurrentIndex( uniform ? myIdleCombo->findData( baselineInt ) : -1 );
+        myIdleSpin->setVisible( uniform && ( baselineInt == TR_RATIOLIMIT_SINGLE ) );
+        myIdleCombo->blockSignals( false );
+
+        myIdleSpin->blockSignals( true );
+        myIdleSpin->setValue( tor->seedIdleLimit( ) );
+        myIdleSpin->blockSignals( false );
     }
 
     // tracker tab
@@ -1026,28 +1036,30 @@ Details :: onUploadLimitChanged( int val )
     mySession.torrentSet( myIds, "uploadLimit", val );
 }
 
-#define RATIO_KEY "seedRatioMode"
-
 void
-Details :: onSeedUntilChanged( bool b )
+Details :: onIdleModeChanged( int index )
 {
-    if( b )
-        mySession.torrentSet( myIds, RATIO_KEY, sender()->property(RATIO_KEY).toInt() );
+    const int val = myIdleCombo->itemData( index ).toInt( );
+    mySession.torrentSet( myIds, "seedIdleMode", val );
 }
 
 void
-Details :: onSeedRatioLimitChanged( double val )
+Details :: onIdleLimitChanged( int val )
 {
-    QSet<int> ids;
+    mySession.torrentSet( myIds, "seedIdleLimit", val );
+}
 
-    foreach( int id, myIds ) {
-        const Torrent * tor = myModel.getTorrentFromId( id );
-        if( tor && tor->seedRatioLimit( ) )
-            ids.insert( id );
-    }
+void
+Details :: onRatioModeChanged( int index )
+{
+    const int val = myRatioCombo->itemData( index ).toInt( );
+    mySession.torrentSet( myIds, "seedRatioMode", val );
+}
 
-    if( !ids.empty( ) )
-        mySession.torrentSet( ids, "seedRatioLimit", val );
+void
+Details :: onRatioLimitChanged( double val )
+{
+    mySession.torrentSet( myIds, "seedRatioLimit", val );
 }
 
 void
@@ -1183,12 +1195,10 @@ Details :: onRemoveTrackerPushed( )
 QWidget *
 Details :: createOptionsTab( )
 {
-    //QWidget * l;
     QSpinBox * s;
     QCheckBox * c;
     QComboBox * m;
     QHBoxLayout * h;
-    QRadioButton * r;
     QDoubleSpinBox * ds;
     const QString speed_K_str = Formatter::unitStr( Formatter::SPEED, Formatter::KB );
 
@@ -1231,31 +1241,34 @@ Details :: createOptionsTab( )
     hig->addSectionDivider( );
     hig->addSectionTitle( tr( "Seeding Limits" ) );
 
-    r = new QRadioButton( tr( "Use &global settings" ) );
-    r->setProperty( RATIO_KEY, TR_RATIOLIMIT_GLOBAL );
-    connect( r, SIGNAL(clicked(bool)), this, SLOT(onSeedUntilChanged(bool)));
-    mySeedGlobalRadio = r;
-    hig->addWideControl( r );
-
-    r = new QRadioButton( tr( "Seed &regardless of ratio" ) );
-    r->setProperty( RATIO_KEY, TR_RATIOLIMIT_UNLIMITED );
-    connect( r, SIGNAL(clicked(bool)), this, SLOT(onSeedUntilChanged(bool)));
-    mySeedForeverRadio = r;
-    hig->addWideControl( r );
+    h = new QHBoxLayout( );
+    h->setSpacing( HIG :: PAD );
+    m = new QComboBox;
+    m->addItem( tr( "Use Global Settings" ),      TR_RATIOLIMIT_GLOBAL );
+    m->addItem( tr( "Seed regardless of ratio" ), TR_RATIOLIMIT_UNLIMITED );
+    m->addItem( tr( "Stop seeding at ratio:" ),   TR_RATIOLIMIT_SINGLE );
+    connect( m, SIGNAL(currentIndexChanged(int)), this, SLOT(onRatioModeChanged(int)));
+    h->addWidget( myRatioCombo = m );
+    ds = new QDoubleSpinBox( );
+    ds->setRange( 0.5, INT_MAX );
+    connect( ds, SIGNAL(valueChanged(double)), this, SLOT(onRatioLimitChanged(double)));
+    h->addWidget( myRatioSpin = ds );
+    hig->addRow( tr( "&Ratio:" ), h, m );
 
     h = new QHBoxLayout( );
     h->setSpacing( HIG :: PAD );
-    r = new QRadioButton( tr( "&Seed torrent until its ratio reaches:" ) );
-    r->setProperty( RATIO_KEY, TR_RATIOLIMIT_SINGLE );
-    connect( r, SIGNAL(clicked(bool)), this, SLOT(onSeedUntilChanged(bool)));
-    mySeedCustomRadio = r;
-    h->addWidget( r );
-    ds = new QDoubleSpinBox( );
-    ds->setRange( 0.5, INT_MAX );
-    connect( ds, SIGNAL(valueChanged(double)), this, SLOT(onSeedRatioLimitChanged(double)));
-    mySeedCustomSpin = ds;
-    h->addWidget( ds );
-    hig->addWideControl( h );
+    m = new QComboBox;
+    m->addItem( tr( "Use Global Settings" ),                 TR_IDLELIMIT_GLOBAL );
+    m->addItem( tr( "Seed regardless of activity" ),         TR_IDLELIMIT_UNLIMITED );
+    m->addItem( tr( "Stop seeding if idle for N minutes:" ), TR_IDLELIMIT_SINGLE );
+    connect( m, SIGNAL(currentIndexChanged(int)), this, SLOT(onIdleModeChanged(int)));
+    h->addWidget( myIdleCombo = m );
+    s = new QSpinBox( );
+    s->setRange( 1, 9999 );
+    connect( s, SIGNAL(valueChanged(int)), this, SLOT(onIdleLimitChanged(int)));
+    h->addWidget( myIdleSpin = s );
+    hig->addRow( tr( "&Idle:" ), h, m );
+
 
     hig->addSectionDivider( );
     hig->addSectionTitle( tr( "Peer Connections" ) );

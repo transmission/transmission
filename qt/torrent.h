@@ -153,6 +153,8 @@ class Torrent: public QObject
             MIME_ICON,
             SEED_RATIO_LIMIT,
             SEED_RATIO_MODE,
+            SEED_IDLE_LIMIT,
+            SEED_IDLE_MODE,
             DOWN_LIMIT,
             DOWN_LIMITED,
             UP_LIMIT,
@@ -292,6 +294,8 @@ class Torrent: public QObject
         int peerLimit( ) const { return getInt( PEER_LIMIT ); }
         double seedRatioLimit( ) const { return getDouble( SEED_RATIO_LIMIT ); }
         tr_ratiolimit seedRatioMode( ) const { return (tr_ratiolimit) getInt( SEED_RATIO_MODE ); }
+        int seedIdleLimit( ) const { return getInt( SEED_IDLE_LIMIT ); }
+        tr_idlelimit seedIdleMode( ) const { return (tr_idlelimit) getInt( SEED_IDLE_MODE ); }
         TrackerStatsList trackerStats( ) const{ return myValues[TRACKERSTATS].value<TrackerStatsList>(); }
         PeerList peers( ) const{ return myValues[PEERS].value<PeerList>(); }
         const FileList& files( ) const { return myFiles; }

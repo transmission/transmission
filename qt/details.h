@@ -103,10 +103,10 @@ class Details: public QDialog
         QPushButton * myRemoveTrackerButton;
         QSpinBox * mySingleDownSpin;
         QSpinBox * mySingleUpSpin;
-        QRadioButton * mySeedGlobalRadio;
-        QRadioButton * mySeedForeverRadio;
-        QRadioButton * mySeedCustomRadio;
-        QDoubleSpinBox * mySeedCustomSpin;
+        QComboBox * myRatioCombo;
+        QDoubleSpinBox * myRatioSpin;
+        QComboBox * myIdleCombo;
+        QSpinBox * myIdleSpin;
         QSpinBox * myPeerLimitSpin;
         QComboBox * myBandwidthPriorityCombo;
 
@@ -144,8 +144,10 @@ class Details: public QDialog
         void onDownloadLimitChanged( int );
         void onUploadLimitedToggled( bool );
         void onUploadLimitChanged( int );
-        void onSeedUntilChanged( bool );
-        void onSeedRatioLimitChanged( double );
+        void onRatioModeChanged( int );
+        void onRatioLimitChanged( double );
+        void onIdleModeChanged( int );
+        void onIdleLimitChanged( int );
         void onShowTrackerScrapesToggled( bool );
         void onTrackerSelectionChanged( );
         void onAddTrackerPushed( );
