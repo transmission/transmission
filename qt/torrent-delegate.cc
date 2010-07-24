@@ -160,6 +160,8 @@ TorrentDelegate :: progressString( const Torrent& tor ) const
 QString
 TorrentDelegate :: shortTransferString( const Torrent& tor ) const
 {
+    static const QChar upArrow( 0x2191 );
+    static const QChar downArrow( 0x2193 );
     const bool haveMeta( tor.hasMetadata( ) );
     const bool haveDown( haveMeta && tor.peersWeAreDownloadingFrom( ) > 0 );
     const bool haveUp( haveMeta && tor.peersWeAreUploadingTo( ) > 0 );
@@ -171,11 +173,11 @@ TorrentDelegate :: shortTransferString( const Torrent& tor ) const
         upStr = Formatter::speedToString( tor.uploadSpeed( ) );
 
     if( haveDown && haveUp )
-        str = tr( "Down: %1, Up: %2" ).arg(downStr).arg(upStr);
+        str = tr( "%1 %2, %3 %4" ).arg(downArrow).arg(downStr).arg(upArrow).arg(upStr);
     else if( haveDown )
-        str = tr( "Down: %1" ).arg( downStr );
+        str = tr( "%1 %2" ).arg(downArrow).arg(downStr);
     else if( haveUp )
-        str = tr( "Up: %1" ).arg( upStr );
+        str = tr( "%1 %2" ).arg(upArrow).arg(upStr);
     else if( tor.hasMetadata( ) )
         str = tr( "Idle" );
 
