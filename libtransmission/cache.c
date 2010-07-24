@@ -152,7 +152,7 @@ calcRuns( tr_cache * cache, struct run_info * runs )
 }
 
 static int
-flushContiguous( tr_cache * cache, int pos, int n, int rank )
+flushContiguous( tr_cache * cache, int pos, int n )
 {
     int i;
     int err = 0;
@@ -198,7 +198,7 @@ flushRuns( tr_cache * cache, struct run_info * runs, int n )
 
     for( i = 0; !err && i < n; ++i )
     {
-        err = flushContiguous( cache, runs[i].pos, runs[i].len, runs[i].rank );
+        err = flushContiguous( cache, runs[i].pos, runs[i].len );
         for( j = i + 1; j < n; ++j )
             if( runs[j].pos > runs[i].pos )
                 runs[j].pos -= runs[i].len;
@@ -428,7 +428,7 @@ tr_cacheFlushFile( tr_cache * cache, tr_torrent * torrent, tr_file_index_t i )
         const struct cache_block * b = tr_ptrArrayNth( &cache->blocks, pos );
         if( b->tor != torrent ) break;
         if( ( b->block < begin ) || ( b->block >= end ) ) break;
-        err = flushContiguous( cache, pos, getBlockRun( cache, pos, NULL ), 0 );
+        err = flushContiguous( cache, pos, getBlockRun( cache, pos, NULL ) );
     }
 
     return err;
@@ -445,7 +445,7 @@ tr_cacheFlushTorrent( tr_cache * cache, tr_torrent * torrent )
     {
         const struct cache_block * b = tr_ptrArrayNth( &cache->blocks, pos );
         if( b->tor != torrent ) break;
-        err = flushContiguous( cache, pos, getBlockRun( cache, pos, NULL ), 0 );
+        err = flushContiguous( cache, pos, getBlockRun( cache, pos, NULL ) );
     }
 
     return err;
