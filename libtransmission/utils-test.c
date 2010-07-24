@@ -353,20 +353,30 @@ test_url( void )
     return 0;
 }
 
+static int
+test_truncd( void )
+{
+    char buf[32];
+
+    tr_snprintf( buf, sizeof( buf ), "%.2f%%", 99.999 );
+    check( !strcmp( buf, "100.00%" ) );
+
+    tr_snprintf( buf, sizeof( buf ), "%.2f%%", tr_truncd( 99.999, 2 ) );
+    check( !strcmp( buf, "99.99%" ) );
+
+    tr_snprintf( buf, sizeof( buf ), "%.4f", tr_truncd( 403650.656250, 4 ) );
+    check( !strcmp( buf, "403650.6562" ) );
+
+    return 0;
+}
+
 int
 main( void )
 {
-    char buf[32];
     char *in, *out;
     int   len;
     int   i;
     int   l;
-
-    /* tr_truncd */
-    tr_snprintf( buf, sizeof( buf ), "%.2f%%", 99.999 );
-    check( !strcmp( buf, "100.00%" ) );
-    tr_snprintf( buf, sizeof( buf ), "%.2f%%", tr_truncd( 99.999, 2 ) );
-    check( !strcmp( buf, "99.99%" ) );
 
     /* base64 */
     out = tr_base64_encode( "YOYO!", -1, &len );
@@ -400,6 +410,8 @@ main( void )
     if( ( i = test_array( ) ) )
         return i;
     if( ( i = test_url( ) ) )
+        return i;
+    if( ( i = test_truncd( ) ) )
         return i;
 
     /* test that tr_cryptoRandInt() stays in-bounds */
