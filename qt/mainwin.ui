@@ -333,7 +333,7 @@
     <string>Compact View</string>
    </property>
    <property name="shortcut">
-    <string>Alt+M</string>
+    <string>Alt+C</string>
    </property>
   </action>
   <action name="action_Toolbar">
