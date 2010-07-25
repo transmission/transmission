@@ -27,7 +27,7 @@ class Speed
         bool isZero( ) const { return _Bps == 0; }
         static Speed fromKBps( double KBps );
         static Speed fromBps( int Bps ) { return Speed( Bps ); }
-        void setBps( double Bps ) { _Bps = Bps; }
+        void setBps( int Bps ) { _Bps = Bps; }
         Speed& operator+=( const Speed& that ) { _Bps += that._Bps; return *this; }
         Speed operator+( const Speed& that ) const { return Speed( _Bps + that._Bps ); }
         bool operator<( const Speed& that ) const { return _Bps < that._Bps; }

@@ -381,7 +381,7 @@ Details :: refresh( )
         string = Formatter::ratioToString( torrents.first()->ratio() );
     else {
         bool isMixed = false;
-        int ratioType = torrents.first()->ratio();
+        int ratioType = (int) torrents.first()->ratio();
         if( ratioType > 0 ) ratioType = 0;
         foreach( const Torrent *t, torrents )
         {
@@ -636,11 +636,11 @@ Details :: refresh( )
         myBandwidthPriorityCombo->blockSignals( false );
 
         mySingleDownSpin->blockSignals( true );
-        mySingleDownSpin->setValue( tor->downloadLimit().KBps() );
+        mySingleDownSpin->setValue( (int)tor->downloadLimit().KBps() );
         mySingleDownSpin->blockSignals( false );
 
         mySingleUpSpin->blockSignals( true );
-        mySingleUpSpin->setValue( tor->uploadLimit().KBps() );
+        mySingleUpSpin->setValue( (int)tor->uploadLimit().KBps() );
         mySingleUpSpin->blockSignals( false );
 
         myPeerLimitSpin->blockSignals( true );

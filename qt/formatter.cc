@@ -84,7 +84,7 @@ Speed :: KBps( ) const
 Speed
 Speed :: fromKBps( double KBps )
 {
-    return KBps * speed_K;
+    return int( KBps * speed_K );
 }
 
 /***
@@ -92,7 +92,7 @@ Speed :: fromKBps( double KBps )
 ***/
 
 QString
-Formatter :: memToString( double bytes )
+Formatter :: memToString( uint64_t bytes )
 {
     if( !bytes )
         return tr( "None" );
@@ -104,7 +104,7 @@ Formatter :: memToString( double bytes )
 }
 
 QString
-Formatter :: sizeToString( double bytes )
+Formatter :: sizeToString( uint64_t bytes )
 {
     if( !bytes )
         return tr( "None" );
