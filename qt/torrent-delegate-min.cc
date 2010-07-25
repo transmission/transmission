@@ -23,6 +23,9 @@
 #include <QPixmapCache>
 #include <QStyleOptionProgressBarV2>
 
+#include <libtransmission/transmission.h>
+#include <libtransmission/utils.h>
+
 #include "torrent.h"
 #include "torrent-delegate-min.h"
 #include "torrent-model.h"
@@ -133,7 +136,7 @@ TorrentDelegateMin :: drawTorrent( QPainter * painter, const QStyleOptionViewIte
                          BAR_WIDTH,
                          BAR_HEIGHT );
     const QRect statusArea( barArea.x( ) - GUI_PAD - statusSize.width( ),
-                            fillArea.y( ),
+                            fillArea.y( ) + ( fillArea.height( ) - statusSize.height( ) ) / 2,
                             fillArea.width( ),
                             fillArea.height( ) );
     const QRect nameArea( iconArea.x( ) + iconArea.width( ) + GUI_PAD,
@@ -156,6 +159,10 @@ TorrentDelegateMin :: drawTorrent( QPainter * painter, const QStyleOptionViewIte
     myProgressBarStyle->palette = option.palette;
     myProgressBarStyle->palette.setCurrentColorGroup( cg );
     myProgressBarStyle->state = progressBarState;
+    char buf[32];
+    tr_snprintf( buf, sizeof( buf ), "%d%%", (int)tr_truncd( 100.0 * tor.percentDone( ), 0 ) );
+    myProgressBarStyle->text = buf;
+    myProgressBarStyle->textVisible = true;
     myProgressBarStyle->progress = int(myProgressBarStyle->minimum + (((isMagnet ? tor.metadataPercentDone() : tor.percentDone()) * (myProgressBarStyle->maximum - myProgressBarStyle->minimum))));
     style->drawControl( QStyle::CE_ProgressBar, myProgressBarStyle, painter );
 
