@@ -51,7 +51,6 @@ class Favicons: public QObject
         QString getHost( const QUrl& url );
 
         QString getCacheDir( );
-
         void ensureCacheDirHasBeenScanned( );
 
     private slots:

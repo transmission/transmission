@@ -10,8 +10,6 @@
  * $Id$
  */
 
-#include <iostream>
-
 #include <QDesktopServices>
 #include <QDir>
 #include <QNetworkAccessManager>
@@ -23,14 +21,6 @@
 /***
 ****
 ***/
-
-QString
-Favicons :: getCacheDir( )
-{
-    const QString base = QDesktopServices::storageLocation( QDesktopServices::CacheLocation );
-    return QDir( base ).absoluteFilePath( "favicons" );
-};
-
 
 Favicons :: Favicons( )
 {
@@ -47,6 +37,13 @@ Favicons :: ~Favicons( )
 ****
 ***/
 
+QString
+Favicons :: getCacheDir( )
+{
+    const QString base = QDesktopServices::storageLocation( QDesktopServices::CacheLocation );
+    return QDir( base ).absoluteFilePath( "favicons" );
+}
+
 void
 Favicons :: ensureCacheDirHasBeenScanned( )
 {
@@ -58,6 +55,7 @@ Favicons :: ensureCacheDirHasBeenScanned( )
    
         QDir cacheDir( getCacheDir( ) );
         cacheDir.mkpath( cacheDir.absolutePath( ) );
+
         QStringList files = cacheDir.entryList( QDir::Files|QDir::Readable );
         foreach( QString file, files ) {
             QPixmap pixmap;
@@ -90,22 +88,20 @@ Favicons :: find( const QUrl& url )
 }
 
 void
-Favicons :: add( const QUrl& url_in )
+Favicons :: add( const QUrl& url )
 {
     ensureCacheDirHasBeenScanned( );
 
-    const QString host = getHost(url_in);
-    if( !myPixmaps.contains(host) && !myPending.contains(host) )
+    const QString host = getHost( url );
+    if( !myPixmaps.contains( host ) && !myPending.contains( host ) )
     {
-        const int IMAGE_TYPES = 4;
-        const QString image_types[IMAGE_TYPES] = { "ico", "png", "gif", "jpg" };
-
         myPending.append( host ); 
-        for( int i=0; i<IMAGE_TYPES; ++i )
-        {
-            QString url( "http://" + host + "/favicon." + image_types[i]);
-            myNAM->get( QNetworkRequest( url ) );
-        }
+
+        const QString path = "http://" + host + "/favicon.";
+        QStringList suffixes;
+        suffixes << "ico" << "png" << "gif" << "jpg";
+        foreach( QString suffix, suffixes )
+            myNAM->get( QNetworkRequest( path + suffix ) );
     }
 }
 
@@ -113,13 +109,11 @@ void
 Favicons :: onRequestFinished( QNetworkReply * reply )
 {
     const QString host = reply->url().host();
-
     myPending.removeAll( host );
-
-    const QByteArray content = reply->readAll( );
 
     QPixmap pixmap;
 
+    const QByteArray content = reply->readAll( );
     if( !reply->error( ) )
         pixmap.loadFromData( content );
 
