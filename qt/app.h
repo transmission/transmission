@@ -15,6 +15,7 @@
 
 #include <QApplication>
 #include <QTimer>
+#include "favicon.h"
 
 class Prefs;
 class Session;
@@ -32,6 +33,9 @@ class MyApp: public QApplication
 
     public:
         void raise( );
+
+    public:
+        Favicons favicons;
 
     private:
         Prefs * myPrefs;

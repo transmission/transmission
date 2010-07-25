@@ -19,6 +19,7 @@
 #include <QSet>
 #include <QString>
 #include <QStyle>
+#include <QUrl>
 #include <QVariant>
 
 #include <libtransmission/transmission.h>
@@ -543,9 +544,12 @@ Torrent :: update( tr_benc * d )
         int i = 0;
         QStringList list;
         tr_benc * child;
-        while(( child = tr_bencListChild( trackers, i++ )))
-            if( tr_bencDictFindStr( child, "announce", &str ))
+        while(( child = tr_bencListChild( trackers, i++ ))) {
+            if( tr_bencDictFindStr( child, "announce", &str )) {
+                dynamic_cast<MyApp*>(QApplication::instance())->favicons.add( QUrl(str) );
                 list.append( QString::fromUtf8( str ) );
+            }
+        }
         if( myValues[TRACKERS] != list ) {
             myValues[TRACKERS].setValue( list );
             changed = true;
