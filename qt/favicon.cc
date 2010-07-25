@@ -93,10 +93,13 @@ Favicons :: add( const QUrl& url )
     ensureCacheDirHasBeenScanned( );
 
     const QString host = getHost( url );
-    if( !myPixmaps.contains( host ) && !myPending.contains( host ) )
-    {
-        myPending.append( host ); 
 
+    if( !myPixmaps.contains( host ) )
+    {
+        // add a placholder s.t. we only ping the server once per session
+        myPixmaps.insert( host, QPixmap( ) );
+
+        // try to download the favicon
         const QString path = "http://" + host + "/favicon.";
         QStringList suffixes;
         suffixes << "ico" << "png" << "gif" << "jpg";
@@ -109,7 +112,6 @@ void
 Favicons :: onRequestFinished( QNetworkReply * reply )
 {
     const QString host = reply->url().host();
-    myPending.removeAll( host );
 
     QPixmap pixmap;
 

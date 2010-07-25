@@ -19,7 +19,6 @@ class QUrl;
 
 #include <QMap>
 #include <QString>
-#include <QStringList>
 #include <QObject>
 #include <QPixmap>
 
@@ -44,7 +43,6 @@ class Favicons: public QObject
 
     private:
 
-        QStringList myPending;
         QNetworkAccessManager * myNAM;
         QMap<QString,QPixmap> myPixmaps;
 
