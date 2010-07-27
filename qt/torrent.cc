@@ -566,8 +566,10 @@ Torrent :: update( tr_benc * d )
             int64_t i;
             const char * str;
             TrackerStat trackerStat;
-            if( tr_bencDictFindStr( child, "announce", &str ) )
+            if( tr_bencDictFindStr( child, "announce", &str ) ) {
                 trackerStat.announce = QString::fromUtf8( str );
+                dynamic_cast<MyApp*>(QApplication::instance())->favicons.add( QUrl( trackerStat.announce ) );
+            }
             if( tr_bencDictFindInt( child, "announceState", &i ) )
                 trackerStat.announceState = i;
             if( tr_bencDictFindInt( child, "downloadCount", &i ) )
@@ -705,3 +707,11 @@ Torrent :: getError( ) const
 
     return s;
 }
+
+QPixmap
+TrackerStat :: getFavicon( ) const
+{
+    MyApp * myApp = dynamic_cast<MyApp*>(QApplication::instance());
+    return myApp->favicons.find( QUrl( announce ) );
+}
+

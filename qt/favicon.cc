@@ -97,7 +97,9 @@ Favicons :: add( const QUrl& url )
     if( !myPixmaps.contains( host ) )
     {
         // add a placholder s.t. we only ping the server once per session
-        myPixmaps.insert( host, QPixmap( ) );
+        QPixmap tmp( 16, 16 );
+        tmp.fill( Qt::transparent );
+        myPixmaps.insert( host, tmp );
 
         // try to download the favicon
         const QString path = "http://" + host + "/favicon.";

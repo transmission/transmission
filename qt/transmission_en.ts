@@ -37,88 +37,88 @@
 <context>
     <name>Details</name>
     <message>
-        <location filename="details.cc" line="145"/>
+        <location filename="details.cc" line="151"/>
         <source>Torrent Properties</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="149"/>
+        <location filename="details.cc" line="155"/>
         <source>Information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="151"/>
+        <location filename="details.cc" line="157"/>
         <source>Peers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="153"/>
+        <location filename="details.cc" line="159"/>
         <source>Tracker</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="155"/>
+        <location filename="details.cc" line="161"/>
         <source>Files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="157"/>
+        <location filename="details.cc" line="163"/>
         <source>Options</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="256"/>
+        <location filename="details.cc" line="287"/>
         <source>None</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="257"/>
+        <location filename="details.cc" line="288"/>
         <source>Mixed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="258"/>
-        <location filename="details.cc" line="441"/>
+        <location filename="details.cc" line="289"/>
+        <location filename="details.cc" line="472"/>
         <source>Unknown</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="290"/>
+        <location filename="details.cc" line="321"/>
         <source>Finished</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="292"/>
+        <location filename="details.cc" line="323"/>
         <source>Paused</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="328"/>
+        <location filename="details.cc" line="359"/>
         <source>%1 (%2%)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="332"/>
+        <location filename="details.cc" line="363"/>
         <source>%1 (%2%); %3 Unverified</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="363"/>
+        <location filename="details.cc" line="394"/>
         <source>%1 (+%2 corrupt)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="461"/>
+        <location filename="details.cc" line="492"/>
         <source>Active now</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="463"/>
+        <location filename="details.cc" line="494"/>
         <source>%1 ago</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="details.cc" line="504"/>
+        <location filename="details.cc" line="535"/>
         <source>%1 (%Ln pieces @ %2)</source>
         <translation>
             <numerusform>%1 (%Ln piece @ %2)</numerusform>
@@ -126,7 +126,7 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="details.cc" line="508"/>
+        <location filename="details.cc" line="539"/>
         <source>%1 (%Ln pieces)</source>
         <translation>
             <numerusform>%1 (%Ln piece)</numerusform>
@@ -134,353 +134,385 @@
         </translation>
     </message>
     <message>
-        <location filename="details.cc" line="532"/>
+        <location filename="details.cc" line="563"/>
         <source>Private to this tracker -- DHT and PEX disabled</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="533"/>
+        <location filename="details.cc" line="564"/>
         <source>Public torrent</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="572"/>
+        <location filename="details.cc" line="603"/>
         <source>Created by %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="574"/>
+        <location filename="details.cc" line="605"/>
         <source>Created on %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="576"/>
+        <location filename="details.cc" line="607"/>
         <source>Created by %1 on %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="735"/>
+        <location filename="details.cc" line="778"/>
         <source>Got a list of %1 peers %2 ago</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="741"/>
+        <location filename="details.cc" line="784"/>
         <source>Peer list request timed out %1 ago; will retry</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="746"/>
+        <location filename="details.cc" line="789"/>
         <source>Got an error %1 ago</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="756"/>
+        <location filename="details.cc" line="799"/>
         <source>No updates scheduled</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="763"/>
+        <location filename="details.cc" line="806"/>
         <source>Asking for more peers in %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="769"/>
+        <location filename="details.cc" line="812"/>
         <source>Queued to ask for more peers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="775"/>
+        <location filename="details.cc" line="818"/>
         <source>Asking for more peers now... %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="788"/>
+        <location filename="details.cc" line="831"/>
         <source>Tracker had %1 seeders and %2 leechers %3 ago</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="795"/>
+        <location filename="details.cc" line="838"/>
         <source>Got a scrape error %1 ago</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="807"/>
+        <location filename="details.cc" line="850"/>
         <source>Asking for peer counts in %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="813"/>
+        <location filename="details.cc" line="856"/>
         <source>Queued to ask for peer counts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="819"/>
+        <location filename="details.cc" line="862"/>
         <source>Asking for peer counts now... %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="883"/>
-        <location filename="details.cc" line="904"/>
+        <location filename="details.cc" line="926"/>
+        <location filename="details.cc" line="947"/>
         <source>Encrypted connection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="897"/>
+        <location filename="details.cc" line="940"/>
         <source>Optimistic unchoke</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="898"/>
+        <location filename="details.cc" line="941"/>
         <source>Downloading from this peer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="899"/>
+        <location filename="details.cc" line="942"/>
         <source>We would download from this peer if they would let us</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="900"/>
+        <location filename="details.cc" line="943"/>
         <source>Uploading to peer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="901"/>
+        <location filename="details.cc" line="944"/>
         <source>We would upload to this peer if they asked</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="902"/>
+        <location filename="details.cc" line="945"/>
         <source>Peer has unchoked us, but we&apos;re not interested</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="903"/>
+        <location filename="details.cc" line="946"/>
         <source>We unchoked this peer, but they&apos;re not interested</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="905"/>
+        <location filename="details.cc" line="948"/>
         <source>Peer was discovered through DHT</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="906"/>
+        <location filename="details.cc" line="949"/>
         <source>Peer was discovered through Peer Exchange (PEX)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="907"/>
+        <location filename="details.cc" line="950"/>
         <source>Peer is an incoming connection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="963"/>
+        <location filename="details.cc" line="1006"/>
         <source>Activity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="964"/>
+        <location filename="details.cc" line="1007"/>
         <source>Torrent size:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="965"/>
+        <location filename="details.cc" line="1008"/>
         <source>Have:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="966"/>
+        <location filename="details.cc" line="1009"/>
         <source>Availability:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="967"/>
+        <location filename="details.cc" line="1010"/>
         <source>Downloaded:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="968"/>
+        <location filename="details.cc" line="1011"/>
         <source>Uploaded:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="969"/>
+        <location filename="details.cc" line="1012"/>
         <source>Ratio:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="970"/>
+        <location filename="details.cc" line="1013"/>
         <source>State:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="971"/>
+        <location filename="details.cc" line="1014"/>
         <source>Running time:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="972"/>
+        <location filename="details.cc" line="1015"/>
         <source>Remaining time:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="973"/>
+        <location filename="details.cc" line="1016"/>
         <source>Last activity:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="974"/>
+        <location filename="details.cc" line="1017"/>
         <source>Error:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="978"/>
+        <location filename="details.cc" line="1021"/>
         <source>Details</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="979"/>
+        <location filename="details.cc" line="1022"/>
         <source>Location:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="980"/>
+        <location filename="details.cc" line="1023"/>
         <source>Hash:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="981"/>
+        <location filename="details.cc" line="1024"/>
         <source>Privacy:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="982"/>
+        <location filename="details.cc" line="1025"/>
         <source>Origin:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="984"/>
+        <location filename="details.cc" line="1027"/>
         <source>Comment:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="1100"/>
+        <location filename="details.cc" line="1125"/>
         <source>Add tracker announce URL </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="1124"/>
+        <location filename="details.cc" line="1137"/>
+        <location filename="details.cc" line="1165"/>
+        <source>Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="details.cc" line="1137"/>
+        <source>Tracker already exists.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="details.cc" line="1158"/>
         <source>Edit tracker announce URL </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="1196"/>
-        <source>Speed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="details.cc" line="1198"/>
-        <source>Honor global &amp;limits</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="details.cc" line="1203"/>
-        <source>Limit &amp;download speed (%1):</source>
+        <location filename="details.cc" line="1165"/>
+        <source>Invalid URL &quot;%1&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="details.cc" line="1213"/>
+        <source>Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="details.cc" line="1215"/>
+        <source>Honor global &amp;limits</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="details.cc" line="1220"/>
+        <source>Limit &amp;download speed (%1):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="details.cc" line="1230"/>
         <source>Limit &amp;upload speed (%1):</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="1224"/>
+        <location filename="details.cc" line="1241"/>
         <source>High</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="1225"/>
+        <location filename="details.cc" line="1242"/>
         <source>Normal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="1226"/>
+        <location filename="details.cc" line="1243"/>
         <source>Low</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="1228"/>
+        <location filename="details.cc" line="1245"/>
         <source>Torrent &amp;priority:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="1232"/>
-        <source>Seed-Until Ratio</source>
+        <location filename="details.cc" line="1249"/>
+        <source>Seeding Limits</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="1234"/>
-        <source>Use &amp;global settings</source>
+        <location filename="details.cc" line="1254"/>
+        <location filename="details.cc" line="1268"/>
+        <source>Use Global Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="1240"/>
-        <source>Seed &amp;regardless of ratio</source>
+        <location filename="details.cc" line="1255"/>
+        <source>Seed regardless of ratio</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="1248"/>
-        <source>&amp;Seed torrent until its ratio reaches:</source>
+        <location filename="details.cc" line="1256"/>
+        <source>Stop seeding at ratio:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="1261"/>
+        <location filename="details.cc" line="1263"/>
+        <source>&amp;Ratio:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="details.cc" line="1269"/>
+        <source>Seed regardless of activity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="details.cc" line="1270"/>
+        <source>Stop seeding if idle for N minutes:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="details.cc" line="1277"/>
+        <source>&amp;Idle:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="details.cc" line="1281"/>
         <source>Peer Connections</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="1267"/>
+        <location filename="details.cc" line="1287"/>
         <source>&amp;Maximum peers:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="1297"/>
-        <source>Trackers</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="details.cc" line="1340"/>
+        <location filename="details.cc" line="1359"/>
         <source>Show &amp;more details</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="1362"/>
+        <location filename="details.cc" line="1381"/>
         <source>Up</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="1362"/>
+        <location filename="details.cc" line="1381"/>
         <source>Down</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="1362"/>
+        <location filename="details.cc" line="1381"/>
         <source>%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="1362"/>
+        <location filename="details.cc" line="1381"/>
         <source>Status</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="1362"/>
+        <location filename="details.cc" line="1381"/>
         <source>Address</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="details.cc" line="1362"/>
+        <location filename="details.cc" line="1381"/>
         <source>Client</source>
         <translation type="unfinished"></translation>
     </message>
@@ -536,85 +568,85 @@
     <message>
         <location filename="formatter.cc" line="38"/>
         <source>B/s</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="formatter.cc" line="39"/>
         <source>kB/s</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="formatter.cc" line="40"/>
         <source>MB/s</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="formatter.cc" line="41"/>
         <source>GB/s</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="formatter.cc" line="42"/>
         <source>TB/s</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="formatter.cc" line="50"/>
         <location filename="formatter.cc" line="62"/>
         <source>B</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="formatter.cc" line="51"/>
         <source>KB</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="formatter.cc" line="52"/>
         <source>MB</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="formatter.cc" line="53"/>
         <source>GB</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="formatter.cc" line="54"/>
         <source>TB</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="formatter.cc" line="63"/>
         <source>KiB</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="formatter.cc" line="64"/>
         <source>MiB</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="formatter.cc" line="65"/>
         <source>GiB</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="formatter.cc" line="66"/>
         <source>TiB</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="formatter.cc" line="98"/>
         <location filename="formatter.cc" line="110"/>
         <location filename="formatter.cc" line="122"/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <location filename="formatter.cc" line="159"/>
         <source>%Ln day(s)</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%Ln day</numerusform>
             <numerusform>%Ln days</numerusform>
         </translation>
@@ -622,7 +654,7 @@
     <message numerus="yes">
         <location filename="formatter.cc" line="160"/>
         <source>%Ln hour(s)</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%Ln hour</numerusform>
             <numerusform>%Ln hours</numerusform>
         </translation>
@@ -630,7 +662,7 @@
     <message numerus="yes">
         <location filename="formatter.cc" line="161"/>
         <source>%Ln minute(s)</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%Ln minute</numerusform>
             <numerusform>%Ln minutes</numerusform>
         </translation>
@@ -638,7 +670,7 @@
     <message numerus="yes">
         <location filename="formatter.cc" line="162"/>
         <source>%Ln second(s)</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%Ln second</numerusform>
             <numerusform>%Ln seconds</numerusform>
         </translation>
@@ -648,7 +680,7 @@
         <location filename="formatter.cc" line="176"/>
         <location filename="formatter.cc" line="183"/>
         <source>%1, %2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -656,7 +688,7 @@
     <message>
         <location filename="license.cc" line="22"/>
         <source>License</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -894,7 +926,8 @@
     </message>
     <message>
         <location filename="mainwin.ui" line="336"/>
-        <source>Alt+M</source>
+        <source>Alt+C</source>
+        <oldsource>Alt+M</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1463,7 +1496,7 @@ To add another primary URL, add it after a blank line.</source>
     </message>
     <message>
         <location filename="prefs-dialog.cc" line="373"/>
-        <location filename="prefs-dialog.cc" line="730"/>
+        <location filename="prefs-dialog.cc" line="735"/>
         <source>Status unknown</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1501,7 +1534,6 @@ To add another primary URL, add it after a blank line.</source>
         <location filename="prefs-dialog.cc" line="417"/>
         <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rules.</source>
         <translation>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -1542,7 +1574,7 @@ To add another primary URL, add it after a blank line.</source>
     </message>
     <message>
         <location filename="prefs-dialog.cc" line="475"/>
-        <location filename="prefs-dialog.cc" line="625"/>
+        <location filename="prefs-dialog.cc" line="630"/>
         <source>Privacy</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1653,51 +1685,57 @@ To add another primary URL, add it after a blank line.</source>
     </message>
     <message>
         <location filename="prefs-dialog.cc" line="598"/>
-        <source>Seeding</source>
+        <source>Seeding Limits</source>
+        <oldsource>Seeding</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="prefs-dialog.cc" line="600"/>
-        <source>&amp;Seed torrent until its ratio reaches:</source>
+        <source>Stop seeding at &amp;ratio:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="620"/>
+        <location filename="prefs-dialog.cc" line="605"/>
+        <source>Stop seeding if idle for &amp;N minutes:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="prefs-dialog.cc" line="625"/>
         <source>Transmission Preferences</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="623"/>
+        <location filename="prefs-dialog.cc" line="628"/>
         <source>Torrents</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="624"/>
+        <location filename="prefs-dialog.cc" line="629"/>
         <source>Speed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="626"/>
+        <location filename="prefs-dialog.cc" line="631"/>
         <source>Network</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="627"/>
+        <location filename="prefs-dialog.cc" line="632"/>
         <source>Web</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="656"/>
+        <location filename="prefs-dialog.cc" line="661"/>
         <source>Not supported by remote sessions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="prefs-dialog.cc" line="682"/>
+        <location filename="prefs-dialog.cc" line="687"/>
         <source>Enable &amp;blocklist</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="prefs-dialog.cc" line="684"/>
+        <location filename="prefs-dialog.cc" line="689"/>
         <source>Enable &amp;blocklist (%Ln rules)</source>
         <translation>
             <numerusform>Enable &amp;blocklist (%Ln rule)</numerusform>
@@ -1761,7 +1799,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>Session</name>
     <message>
-        <location filename="session.cc" line="765"/>
+        <location filename="session.cc" line="769"/>
         <source>Add Torrent</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1868,47 +1906,47 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="torrent.cc" line="677"/>
+        <location filename="torrent.cc" line="683"/>
         <source>Waiting to verify local data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="torrent.cc" line="678"/>
+        <location filename="torrent.cc" line="684"/>
         <source>Verifying local data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="torrent.cc" line="679"/>
+        <location filename="torrent.cc" line="685"/>
         <source>Downloading</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="torrent.cc" line="680"/>
+        <location filename="torrent.cc" line="686"/>
         <source>Seeding</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="torrent.cc" line="681"/>
+        <location filename="torrent.cc" line="687"/>
         <source>Finished</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="torrent.cc" line="681"/>
+        <location filename="torrent.cc" line="687"/>
         <source>Paused</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="torrent.cc" line="694"/>
+        <location filename="torrent.cc" line="700"/>
         <source>Tracker gave a warning: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="torrent.cc" line="695"/>
+        <location filename="torrent.cc" line="701"/>
         <source>Tracker gave an error: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="torrent.cc" line="696"/>
+        <location filename="torrent.cc" line="702"/>
         <source>Error: %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1947,7 +1985,7 @@ To add another primary URL, add it after a blank line.</source>
     </message>
     <message>
         <location filename="torrent-delegate.cc" line="150"/>
-        <location filename="torrent-delegate.cc" line="250"/>
+        <location filename="torrent-delegate.cc" line="252"/>
         <source> - </source>
         <translation type="unfinished"></translation>
     </message>
@@ -1962,37 +2000,34 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="torrent-delegate.cc" line="174"/>
-        <source>Down: %1, Up: %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="torrent-delegate.cc" line="176"/>
-        <source>Down: %1</source>
+        <source>%1 %2, %3 %4</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="torrent-delegate.cc" line="178"/>
-        <source>Up: %1</source>
+        <location filename="torrent-delegate.cc" line="180"/>
+        <source>%1 %2</source>
+        <oldsource>Up: %1</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="torrent-delegate.cc" line="180"/>
+        <location filename="torrent-delegate.cc" line="182"/>
         <source>Idle</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="torrent-delegate.cc" line="193"/>
+        <location filename="torrent-delegate.cc" line="195"/>
         <source>Verifying local data (%1% tested)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="torrent-delegate.cc" line="199"/>
+        <location filename="torrent-delegate.cc" line="201"/>
         <source>Ratio: %1, </source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="torrent-delegate.cc" line="230"/>
+        <location filename="torrent-delegate.cc" line="232"/>
         <source>Downloading from %1 of %n connected peer(s)</source>
         <translation>
             <numerusform>Downloading from %1 peer</numerusform>
@@ -2000,15 +2035,14 @@ To add another primary URL, add it after a blank line.</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="torrent-delegate.cc" line="233"/>
+        <location filename="torrent-delegate.cc" line="235"/>
         <source>Downloading metadata from %n peer(s) (%1% done)</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="torrent-delegate.cc" line="238"/>
+        <location filename="torrent-delegate.cc" line="240"/>
         <source>Seeding to %1 of %n connected peer(s)</source>
         <translation>
             <numerusform>Seeding to %1 peer</numerusform>
@@ -2235,6 +2269,69 @@ To add another primary URL, add it after a blank line.</source>
             <numerusform>%L1 of %Ln Torrent</numerusform>
             <numerusform>%L1 of %Ln Torrents</numerusform>
         </translation>
+    </message>
+</context>
+<context>
+    <name>TrackerDelegate</name>
+    <message>
+        <location filename="tracker-delegate.cc" line="161"/>
+        <source>Got a list of %1%2 peers%3 %4 ago</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="tracker-delegate.cc" line="169"/>
+        <source>Peer list request timed out %1%2%3 ago; will retry</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="tracker-delegate.cc" line="176"/>
+        <source>Got an error %1&apos;%2&apos;%3 %4 ago</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="tracker-delegate.cc" line="189"/>
+        <source>No updates scheduled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="tracker-delegate.cc" line="196"/>
+        <source>Asking for more peers in %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="tracker-delegate.cc" line="202"/>
+        <source>Queued to ask for more peers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="tracker-delegate.cc" line="208"/>
+        <source>Asking for more peers now... &lt;small&gt;%1&lt;/small&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="tracker-delegate.cc" line="221"/>
+        <source>Tracker had %1%2 seeders%3 and %4%5 leechers%6 %7 ago</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="tracker-delegate.cc" line="232"/>
+        <source>Got a scrape error %1&apos;%2&apos;%3 %4 ago</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="tracker-delegate.cc" line="248"/>
+        <source>Asking for peer counts in %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="tracker-delegate.cc" line="254"/>
+        <source>Queued to ask for peer counts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="tracker-delegate.cc" line="261"/>
+        <source>Asking for peer counts now... &lt;small&gt;%1&lt;/small&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

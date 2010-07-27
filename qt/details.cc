@@ -12,7 +12,6 @@
 
 #include <cassert>
 #include <ctime>
-#include <iostream>
 
 #include <QCheckBox>
 #include <QComboBox>
@@ -26,12 +25,16 @@
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QInputDialog>
+#include <QItemSelectionModel>
 #include <QLabel>
+#include <QList>
+#include <QMap>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QRadioButton>
 #include <QResizeEvent>
 #include <QSpinBox>
+#include <QStringList>
 #include <QStyle>
 #include <QTabWidget>
 #include <QTextBrowser>
@@ -53,6 +56,8 @@
 #include "squeezelabel.h"
 #include "torrent.h"
 #include "torrent-model.h"
+#include "tracker-delegate.h"
+#include "tracker-model.h"
 
 class Prefs;
 class Session;
@@ -163,7 +168,13 @@ Details :: Details( Session& session, Prefs& prefs, TorrentModel& model, QWidget
     layout->addWidget( buttons );
     QWidget::setAttribute( Qt::WA_DeleteOnClose, true );
 
+    QList<int> initKeys;
+    initKeys << Prefs :: SHOW_TRACKER_SCRAPES;
+    foreach( int key, initKeys )
+        refreshPref( key );
+
     connect( &myTimer, SIGNAL(timeout()), this, SLOT(onTimer()));
+    connect( &myPrefs, SIGNAL(changed(int)), this, SLOT(refreshPref(int)) );
 
     onTimer( );
     myTimer.setSingleShot( false );
@@ -190,7 +201,6 @@ Details :: setIds( const QSet<int>& ids )
     }
 
     myFileTreeView->clear( );
-
     myIds = ids;
 
     // listen to the new torrents
@@ -206,6 +216,24 @@ Details :: setIds( const QSet<int>& ids )
     onTimer( );
 }
 
+void
+Details :: refreshPref( int key )
+{
+    QString str;
+
+    switch( key )
+    {
+        case Prefs::SHOW_TRACKER_SCRAPES:
+            myTrackerDelegate->setShowMore( myPrefs.getBool( key ) );
+            myTrackerView->update( );
+            break;
+
+        default:
+            break;
+    }
+}
+
+
 /***
 ****
 ***/
@@ -219,6 +247,12 @@ Details :: timeToStringRounded( int seconds )
 
 void
 Details :: onTimer( )
+{
+    getNewData( );
+}
+
+void
+Details :: getNewData( )
 {
     if( !myIds.empty( ) )
     {
@@ -680,190 +714,11 @@ Details :: refresh( )
         myIdleSpin->blockSignals( false );
     }
 
-    // tracker tab
-    //
-    QMap<QString,QTreeWidgetItem*> trackerTiers;
-    QMap<QString,QTreeWidgetItem*> trackerItems;
-    const time_t now( time( 0 ) );
-    const bool showScrape = myPrefs.getBool( Prefs::SHOW_TRACKER_SCRAPES );
-    foreach( const Torrent * t, torrents )
-    {
-        const QString idStr( QString::number( t->id( ) ) );
-        const TrackerStatsList trackerStats = t->trackerStats( );
+    ///
+    ///  Tracker tab
+    ///
 
-        foreach( const TrackerStat& trackerStat, trackerStats )
-        {
-            QFont font;
-            QString str;
-            const QString tierKey( QString::number(trackerStat.tier) );
-            QTreeWidgetItem * tier = (QTreeWidgetItem*) myTrackerTiers.value( tierKey, 0 );
-
-            if( tier == 0 ) // check if has tier been created this pass
-                tier = (QTreeWidgetItem*) trackerTiers.value( tierKey, 0 );
-
-            if( tier == 0 ) // new tier
-            {
-                QFont tierFont;
-                tier = new QTreeWidgetItem( myTrackerTree );
-                myTrackerTree->addTopLevelItem( tier );
-                str = "Tier: " + QString::number( trackerStat.tier + 1 );
-                tier->setText( 0, str );
-                tierFont.setBold( true );
-                tier->setFont( 0, tierFont );
-            }
-
-            const QString key( idStr + tierKey + ":" + QString::number( trackerStat.id ) );
-            QTreeWidgetItem * item = (QTreeWidgetItem*) myTrackerItems.value( key, 0 );
-
-            if( item == 0 ) // new tracker
-            {
-                item = new QTreeWidgetItem( tier );
-                tier->addChild( item );
-                if( tier->childCount() == 1 )
-                    tier->setExpanded( true );
-            }
-            str = trackerStat.host;
-
-            if( trackerStat.isBackup )
-            {
-                font.setItalic( true );
-                if( showScrape )
-                {
-                    str += "\n";
-                    str += "Tracker will be used as a backup";
-                }
-            }
-            else
-            {
-                font.setItalic( false );
-                if( trackerStat.hasAnnounced )
-                {
-                    const QString tstr( timeToStringRounded( now - trackerStat.lastAnnounceTime ) );
-                    str += "\n";
-                    if( trackerStat.lastAnnounceSucceeded )
-                    {
-                        str += tr( "Got a list of %1 peers %2 ago" )
-                            .arg( trackerStat.lastAnnouncePeerCount )
-                            .arg( tstr );
-                    }
-                    else if( trackerStat.lastAnnounceTimedOut )
-                    {
-                        str += tr( "Peer list request timed out %1 ago; will retry" )
-                            .arg( tstr );
-                    }
-                    else
-                    {
-                        str += tr( "Got an error %1 ago" )
-                            .arg( tstr );
-                    }
-                }
-                switch( trackerStat.announceState )
-                {
-                    case TR_TRACKER_INACTIVE:
-                        if( trackerStat.hasAnnounced )
-                        {
-                            str += "\n";
-                            str += tr( "No updates scheduled" );
-                        }
-                        break;
-                    case TR_TRACKER_WAITING:
-                        {
-                            const QString tstr( timeToStringRounded( trackerStat.nextAnnounceTime - now ) );
-                            str += "\n";
-                            str += tr( "Asking for more peers in %1" )
-                                .arg( tstr );
-                        }
-                        break;
-                    case TR_TRACKER_QUEUED:
-                        str += "\n";
-                        str += tr( "Queued to ask for more peers" );
-                        break;
-                    case TR_TRACKER_ACTIVE:
-                        {
-                            const QString tstr( timeToStringRounded( now - trackerStat.lastAnnounceStartTime ) );
-                            str += "\n";
-                            str += tr( "Asking for more peers now... %1" )
-                                .arg( tstr );
-                        }
-                        break;
-                }
-                if( showScrape )
-                {
-                    if( trackerStat.hasScraped )
-                    {
-                        const QString tstr( timeToStringRounded( now - trackerStat.lastScrapeTime ) );
-                        str += "\n";
-                        if( trackerStat.lastScrapeSucceeded )
-                        {
-                            str += tr( "Tracker had %1 seeders and %2 leechers %3 ago" )
-                                .arg( trackerStat.seederCount )
-                                .arg( trackerStat.leecherCount )
-                                .arg( tstr );
-                        }
-                        else
-                        {
-                            str += tr( "Got a scrape error %1 ago" )
-                                .arg( tstr );
-                        }
-                    }
-                    switch( trackerStat.scrapeState )
-                    {
-                        case TR_TRACKER_INACTIVE:
-                            break;
-                        case TR_TRACKER_WAITING:
-                            {
-                                const QString tstr( timeToStringRounded( trackerStat.nextScrapeTime - now ) );
-                                str += "\n";
-                                str += tr( "Asking for peer counts in %1" )
-                                    .arg( tstr );
-                            }
-                            break;
-                        case TR_TRACKER_QUEUED:
-                            str += "\n";
-                            str += tr( "Queued to ask for peer counts" );
-                            break;
-                        case TR_TRACKER_ACTIVE:
-                            {
-                                const QString tstr( timeToStringRounded( now - trackerStat.lastScrapeStartTime ) );
-                                str += "\n";
-                                str += tr( "Asking for peer counts now... %1" )
-                                    .arg( tstr );
-                            }
-                            break;
-                    }
-                }
-            }
-            item->setText( 0, str );
-            item->setFont( 0, font );
-            item->setData( 0, TRACKERID, trackerStat.id );
-            item->setData( 0, TRACKERURL, trackerStat.announce );
-            item->setData( 0, TRACKERTIER, trackerStat.tier );
-            item->setData( 0, TORRENTID, t->id() );
-
-            tier->setData( 0, TRACKERID, -1 );
-            tier->setData( 0, TRACKERURL, QString() );
-            tier->setData( 0, TRACKERTIER, trackerStat.tier );
-            tier->setData( 0, TORRENTID, torrents.count() > 1 ? -1 : t->id() );
-
-            trackerTiers.insert( tierKey, tier );
-            trackerItems.insert( key, item );
-        }
-    }
-    QList<QTreeWidgetItem*> tierList = trackerTiers.values();
-    QList<QTreeWidgetItem*> itemList = trackerItems.values();
-    for( int i = 0; i < myTrackerTree->topLevelItemCount(); ++i )
-    {
-        QTreeWidgetItem * tier = myTrackerTree->topLevelItem( i );
-        for( int j = 0; j < tier->childCount(); ++j )
-        {
-            if( !itemList.contains( tier->child( j ) ) ) // tracker has disappeared
-                delete tier->takeChild( j-- );
-        }
-        if( !tierList.contains( tier ) ) // tier has disappeared
-            delete myTrackerTree->takeTopLevelItem( i-- );
-    }
-    myTrackerTiers = trackerTiers;
-    myTrackerItems = trackerItems;
+    myTrackerModel->refresh( myModel, myIds );
 
     ///
     ///  Peers tab
@@ -1014,26 +869,31 @@ void
 Details :: onHonorsSessionLimitsToggled( bool val )
 {
     mySession.torrentSet( myIds, "honorsSessionLimits", val );
+    getNewData( );
 }
 void
 Details :: onDownloadLimitedToggled( bool val )
 {
     mySession.torrentSet( myIds, "downloadLimited", val );
+    getNewData( );
 }
 void
 Details :: onDownloadLimitChanged( int val )
 {
     mySession.torrentSet( myIds, "downloadLimit", val );
+    getNewData( );
 }
 void
 Details :: onUploadLimitedToggled( bool val )
 {
     mySession.torrentSet( myIds, "uploadLimited", val );
+    getNewData( );
 }
 void
 Details :: onUploadLimitChanged( int val )
 {
     mySession.torrentSet( myIds, "uploadLimit", val );
+    getNewData( );
 }
 
 void
@@ -1041,12 +901,14 @@ Details :: onIdleModeChanged( int index )
 {
     const int val = myIdleCombo->itemData( index ).toInt( );
     mySession.torrentSet( myIds, "seedIdleMode", val );
+    getNewData( );
 }
 
 void
 Details :: onIdleLimitChanged( int val )
 {
     mySession.torrentSet( myIds, "seedIdleLimit", val );
+    getNewData( );
 }
 
 void
@@ -1060,12 +922,14 @@ void
 Details :: onRatioLimitChanged( double val )
 {
     mySession.torrentSet( myIds, "seedRatioLimit", val );
+    getNewData( );
 }
 
 void
 Details :: onMaxPeersChanged( int val )
 {
     mySession.torrentSet( myIds, "peer-limit", val );
+    getNewData( );
 }
 
 void
@@ -1075,120 +939,114 @@ Details :: onBandwidthPriorityChanged( int index )
     {
         const int priority = myBandwidthPriorityCombo->itemData(index).toInt( );
         mySession.torrentSet( myIds, "bandwidthPriority", priority );
+        getNewData( );
     }
 }
 
 void
 Details :: onTrackerSelectionChanged( )
 {
-    const QList<QTreeWidgetItem*> items = myTrackerTree->selectedItems();
-    if( items.count() == 1 )
-        myEditTrackerButton->setEnabled( items.first()->data( 0, TRACKERID ).toInt() >= 0 );
+    const int selectionCount = myTrackerView->selectionModel()->selectedRows().size();
+    myEditTrackerButton->setEnabled( selectionCount == 1 );
+    myRemoveTrackerButton->setEnabled( selectionCount > 0 );
+}
+
+void
+Details :: onAddTrackerClicked( )
+{
+    bool ok = false;
+    const QString url = QInputDialog::getText( this,
+                                               tr( "Add URL " ),
+                                               tr( "Add tracker announce URL:" ),
+                                               QLineEdit::Normal, QString(), &ok );
+    if( !ok )
+    {
+        // user pressed "cancel" -- noop
+    }
+    else if( !QUrl(url).isValid( ) )
+    {
+        QMessageBox::warning( this, tr( "Error" ), tr( "Invalid URL \"%1\"" ).arg( url ) );
+    }
     else
-        myEditTrackerButton->setEnabled( false );
-    myRemoveTrackerButton->setEnabled( !items.isEmpty() );
-}
-
-bool
-Details :: findTrackerByURL( const QString& url, int torId )
-{
-    bool duplicate = false;
-    foreach( QTreeWidgetItem * tracker, myTrackerItems.values() )
     {
-        if( tracker->data( 0, TRACKERURL ).toString() == url &&
-          ( torId == -1 || tracker->data( 0, TORRENTID ).toInt() == torId ) )
+        QSet<int> ids;
+
+        foreach( int id, myIds )
+            if( myTrackerModel->find( id, url ) == -1 )
+                ids.insert( id );
+
+        if( ids.empty( ) ) // all the torrents already have this tracker
         {
-            duplicate = true;
-            break;
-        }
-    }
-    return duplicate;
-}
-
-void
-Details :: onAddTrackerPushed( )
-{
-    const QString urlString = QInputDialog::getText( this,
-                                                     tr( "Add tracker announce URL " ),
-                                                     NULL );
-    if( !urlString.isEmpty() )
-    {
-        if( !findTrackerByURL( urlString, -1 ) )
-        {
-            QByteArray url = urlString.toUtf8();
-            tr_benc top;
-
-            tr_bencInitDict( &top, 1 );
-            tr_bencDictAddStr( &top, "announce", url );
-
-            mySession.torrentSet( myIds, "trackerAdd", &top );
+            QMessageBox::warning( this, tr( "Error" ), tr( "Tracker already exists." ) );
         }
         else
-            QMessageBox::warning( this, "Error", "Tracker already exists." );
+        {
+            QStringList urls;
+            urls << url;
+            mySession.torrentSet( ids, "trackerAdd", urls );
+            getNewData( );
+        }
     }
 }
 
 void
-Details :: onEditTrackerPushed( )
+Details :: onEditTrackerClicked( )
 {
-    const QTreeWidgetItem * item = myTrackerTree->selectedItems().first();
-    const QString urlString = QInputDialog::getText( this,
-                                                     tr( "Edit tracker announce URL " ),
-                                                     NULL,
-                                                     QLineEdit::Normal,
-                                                     item->data( 0, TRACKERURL ).toString() );
-    if( !urlString.isEmpty() )
+    QItemSelectionModel * selectionModel = myTrackerView->selectionModel( );
+    QModelIndexList selectedRows = selectionModel->selectedRows( );
+    assert( selectedRows.size( ) == 1 );
+    QModelIndex i = selectionModel->currentIndex( );
+    const TrackerInfo trackerInfo = myTrackerModel->data( i, TrackerModel::TrackerRole ).value<TrackerInfo>();
+
+    bool ok = false;
+    const QString newval = QInputDialog::getText( this,
+                                                  tr( "Edit URL " ),
+                                                  tr( "Edit tracker announce URL:" ),
+                                                  QLineEdit::Normal,
+                                                  trackerInfo.st.announce, &ok );
+
+    if( !ok )
     {
-        const int torId = item->data( 0, TORRENTID ).toInt();
-        if( !findTrackerByURL( urlString, torId ) )
-        {
-            QByteArray url = urlString.toUtf8();
-            QSet<int> ids;
-            tr_benc top;
+        // user pressed "cancel" -- noop
+    }
+    else if( !QUrl(newval).isValid( ) )
+    {
+        QMessageBox::warning( this, tr( "Error" ), tr( "Invalid URL \"%1\"" ).arg( newval ) );
+    }
+    else
+    {
+        QSet<int> ids;
+        ids << trackerInfo.torrentId;
 
-            ids << torId;
-            tr_bencInitDict( &top, 2 );
-            tr_bencDictAddStr( &top, "announce", item->data( 0, TRACKERURL ).toByteArray() );
-            tr_bencDictAddStr( &top, "announce-new", url );
+        QStringList urls;
+        urls << trackerInfo.st.announce;
+        urls << newval;
 
-            mySession.torrentSet( ids, "trackerEdit", &top );
-        }
-        else
-            QMessageBox::warning( this, "Error", "Tracker already exists." );
+        mySession.torrentSet( ids, "trackerReplace", urls );
+        getNewData( );
     }
 }
 
 void
-Details :: removeTracker( const QTreeWidgetItem * item )
+Details :: onRemoveTrackerClicked( )
 {
-    QByteArray url = item->data( 0, TRACKERURL ).toByteArray();
-    const int torId = item->data( 0, TORRENTID ).toInt();
-    QSet<int> ids;
-    tr_benc top;
+    // make a map of torrentIds to announce URLs to remove
+    QItemSelectionModel * selectionModel = myTrackerView->selectionModel( );
+    QModelIndexList selectedRows = selectionModel->selectedRows( );
+    QMap<int,QStringList> torrentId_to_urls;
+    foreach( QModelIndex i, selectedRows )
+    {
+        const TrackerInfo inf = myTrackerModel->data( i, TrackerModel::TrackerRole ).value<TrackerInfo>();
+        torrentId_to_urls[ inf.torrentId ].append( inf.st.announce );
+    }
 
-    ids << torId;
-    tr_bencInitDict( &top, 1 );
-    tr_bencDictAddStr( &top, "announce", url );
-
-    mySession.torrentSet( ids, "trackerRemove", &top );
-}
-
-void
-Details :: onRemoveTrackerPushed( )
-{
-    const QList<QTreeWidgetItem*> items = myTrackerTree->selectedItems();
-    QSet<int> removedTiers;
-    foreach( const QTreeWidgetItem * item, items ) {
-        const bool isTier = item->data( 0, TRACKERID ).toInt() == -1;
-        const int curTier = item->data( 0, TRACKERTIER ).toInt();
-        if( isTier )
-        {
-            removedTiers << curTier;
-            for( int i = 0; i < item->childCount(); ++i )
-                removeTracker( item->child( i ) );
-        }
-        else if( !removedTiers.contains( curTier ) ) // skip trackers removed by clearing a tier
-            removeTracker( item );
+    // batch all of a tracker's torrents into one command
+    foreach( int id, torrentId_to_urls.keys( ) )
+    {
+        QSet<int> ids;
+        ids << id;
+        mySession.torrentSet( ids, "trackerRemove", torrentId_to_urls.value( id ) );
+        getNewData( );
     }
 }
 
@@ -1306,25 +1164,24 @@ Details :: createTrackerTab( )
 
     v2->setSpacing( HIG::PAD );
 
-    QStringList headers;
-    headers << tr("Trackers");
-    myTrackerTree = new QTreeWidget;
-    myTrackerTree->setHeaderLabels( headers );
-    myTrackerTree->setSelectionMode( QTreeWidget::ExtendedSelection );
-    myTrackerTree->setRootIsDecorated( false );
-    myTrackerTree->setIndentation( 2 );
-    myTrackerTree->setItemsExpandable( false );
-    myTrackerTree->setTextElideMode( Qt::ElideRight );
-    myTrackerTree->setAlternatingRowColors( true );
-    connect( myTrackerTree, SIGNAL(itemSelectionChanged()), this, SLOT(onTrackerSelectionChanged()));
-    h->addWidget( myTrackerTree, 1 );
+    myTrackerView = new QTreeView;
+    myTrackerView->setModel( myTrackerModel = new TrackerModel );
+    myTrackerView->setHeaderHidden( true );
+    myTrackerView->setSelectionMode( QTreeWidget::ExtendedSelection );
+    myTrackerView->setRootIsDecorated( false );
+    myTrackerView->setIndentation( 2 );
+    myTrackerView->setItemsExpandable( false );
+    myTrackerView->setAlternatingRowColors( true );
+    myTrackerView->setItemDelegate( myTrackerDelegate = new TrackerDelegate( ) );
+    connect( myTrackerView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(onTrackerSelectionChanged()));
+    h->addWidget( myTrackerView, 1 );
 
     p = new QPushButton();
     p->setIcon( getStockIcon( "list-add", QStyle::SP_DialogOpenButton ) );
     p->setToolTip( "Add Tracker" );
     myAddTrackerButton = p;
     v2->addWidget( p, 1 );
-    connect( p, SIGNAL(clicked(bool)), this, SLOT(onAddTrackerPushed()));
+    connect( p, SIGNAL(clicked(bool)), this, SLOT(onAddTrackerClicked()));
 
     p = new QPushButton();
     p->setIcon( getStockIcon( "document-properties", QStyle::SP_DesktopIcon ) );
@@ -1333,7 +1190,7 @@ Details :: createTrackerTab( )
     p->setEnabled( false );
     myEditTrackerButton = p;
     v2->addWidget( p, 1 );
-    connect( p, SIGNAL(clicked(bool)), this, SLOT(onEditTrackerPushed()));
+    connect( p, SIGNAL(clicked(bool)), this, SLOT(onEditTrackerClicked()));
 
     p = new QPushButton();
     p->setIcon( getStockIcon( "list-remove", QStyle::SP_TrashIcon ) );
@@ -1341,7 +1198,7 @@ Details :: createTrackerTab( )
     p->setEnabled( false );
     myRemoveTrackerButton = p;
     v2->addWidget( p, 1 );
-    connect( p, SIGNAL(clicked(bool)), this, SLOT(onRemoveTrackerPushed()));
+    connect( p, SIGNAL(clicked(bool)), this, SLOT(onRemoveTrackerClicked()));
 
     v2->addStretch( 1 );
 
@@ -1428,6 +1285,7 @@ Details :: onFilePriorityChanged( const QSet<int>& indices, int priority )
         default:           key = "priority-normal"; break;
     }
     mySession.torrentSet( myIds, key, indices.toList( ) );
+    getNewData( );
 }
 
 void
@@ -1435,4 +1293,5 @@ Details :: onFileWantedChanged( const QSet<int>& indices, bool wanted )
 {
     QString key( wanted ? "files-wanted" : "files-unwanted" );
     mySession.torrentSet( myIds, key, indices.toList( ) );
+    getNewData( );
 }

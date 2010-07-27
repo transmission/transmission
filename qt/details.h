@@ -36,19 +36,15 @@ class QTreeWidgetItem;
 class Session;
 class Torrent;
 class TorrentModel;
+class TrackerDelegate;
+class TrackerModel;
 
 class Details: public QDialog
 {
         Q_OBJECT
 
     private:
-        enum
-        {
-            TRACKERID = Qt::UserRole,
-            TRACKERURL,
-            TRACKERTIER,
-            TORRENTID
-        };
+        void getNewData( );
 
     private slots:
         void onTorrentChanged( );
@@ -71,8 +67,6 @@ class Details: public QDialog
         QString timeToStringRounded( int seconds );
         QString trimToDesiredWidth( const QString& str );
         void enableWhenChecked( QCheckBox *, QWidget * );
-        bool findTrackerByURL( const QString& url, int torId );
-        void removeTracker( const QTreeWidgetItem * item );
 
     private:
         Session& mySession;
@@ -126,16 +120,21 @@ class Details: public QDialog
         QLabel * myAnnounceResponseLabel;
         QLabel * myAnnounceManualLabel;
 
-        QTreeWidget * myTrackerTree;
+        TrackerModel * myTrackerModel;
+        TrackerDelegate * myTrackerDelegate;
+        QTreeView * myTrackerView;
+        //QMap<QString,QTreeWidgetItem*> myTrackerTiers;
+        //QMap<QString,QTreeWidgetItem*> myTrackerItems;
+
         QTreeWidget * myPeerTree;
-        QMap<QString,QTreeWidgetItem*> myTrackerTiers;
-        QMap<QString,QTreeWidgetItem*> myTrackerItems;
         QMap<QString,QTreeWidgetItem*> myPeers;
+
         QWidgetList myWidgets;
 
         FileTreeView * myFileTreeView;
 
     private slots:
+        void refreshPref( int key );
         void onBandwidthPriorityChanged( int );
         void onFilePriorityChanged( const QSet<int>& fileIndices, int );
         void onFileWantedChanged( const QSet<int>& fileIndices, bool );
@@ -150,9 +149,9 @@ class Details: public QDialog
         void onIdleLimitChanged( int );
         void onShowTrackerScrapesToggled( bool );
         void onTrackerSelectionChanged( );
-        void onAddTrackerPushed( );
-        void onEditTrackerPushed( );
-        void onRemoveTrackerPushed( );
+        void onAddTrackerClicked( );
+        void onEditTrackerClicked( );
+        void onRemoveTrackerClicked( );
         void onMaxPeersChanged( int );
         void refresh( );
 };

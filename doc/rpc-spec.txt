@@ -104,31 +104,11 @@
    "seedIdleMode"        | number     which seeding inactivity to use.  See tr_inactvelimit
    "seedRatioLimit"      | double     torrent-level seeding ratio
    "seedRatioMode"       | number     which ratio to use.  See tr_ratiolimit
-   "trackerAdd"          | object     (see below)
-   "trackerEdit"         | object     (see below)
-   "trackerRemove"       | object     (see below)
+   "trackerAdd"          | array      strings of URLs to add
+   "trackerRemove"       | array      strings of URLs to remove
+   "trackerReplace"      | array      pairs of old/new announce URLs
    "uploadLimit"         | number     maximum upload speed (KBps)
    "uploadLimited"       | boolean    true if "uploadLimit" is honored
-                         |
-   ----------------------+---------------------------------+
-   trackerAdd            | an object containing:           |
-                         +-----------------------+---------+
-                         | announce              | string  | announce URL of the tracker
-                         | tier (optional)       | number  | tier to add the tracker to
-   ----------------------+---------------------------------+
-   trackerEdit           | an object containing:           |
-                         +-----------------------+---------+
-                         | announce (or id)      | string  | announce URL of the tracker to modify
-                         | id (or announce)      | number  | trackerId of the tracker to modify (see trackerStats)
-                         +-----------------------+---------+
-                         | announce-new          | string  | new announce URL for the tracker
-                         | tier                  | number  | tier to change the tracker to
-   ----------------------+---------------------------------+
-   trackerRemove         | an object containing:           |
-                         +-----------------------+---------+
-                         | announce (or id)      | string  | announce URL of the tracker to remove
-                         | id (or announce)      | number  | trackerId of the tracker to remove (see trackerStats)
-                         +-----------------------+---------+
 
    Just as an empty "ids" value is shorthand for "all ids", using an empty array
    for "files-wanted", "files-unwanted", "priority-high", "priority-low", or

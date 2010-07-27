@@ -22,6 +22,7 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QSet>
+#include <QStringList>
 #include <QStyle>
 #include <QTextStream>
 
@@ -406,6 +407,21 @@ Session :: torrentSet( const QSet<int>& ids, const QString& key, bool value )
 }
 
 void
+Session :: torrentSet( const QSet<int>& ids, const QString& key, const QStringList& value )
+{
+    tr_benc top;
+    tr_bencInitDict( &top, 2 );
+    tr_bencDictAddStr( &top, "method", "torrent-set" );
+    tr_benc * args = tr_bencDictAddDict( &top, "arguments", 2 );
+    addOptionalIds( args, ids );
+    tr_benc * list( tr_bencDictAddList( args, key.toUtf8().constData(), value.size( ) ) );
+    foreach( const QString str, value )
+        tr_bencListAddStr( list, str.toUtf8().constData() );
+    exec( &top );
+    tr_bencFree( &top );
+}
+
+void
 Session :: torrentSet( const QSet<int>& ids, const QString& key, const QList<int>& value )
 {
     tr_benc top;
@@ -416,20 +432,6 @@ Session :: torrentSet( const QSet<int>& ids, const QString& key, const QList<int
     tr_benc * list( tr_bencDictAddList( args, key.toUtf8().constData(), value.size( ) ) );
     foreach( int i, value )
         tr_bencListAddInt( list, i );
-    exec( &top );
-    tr_bencFree( &top );
-}
-
-void
-Session :: torrentSet( const QSet<int>& ids, const QString& key, const tr_benc * value )
-{
-    tr_benc top;
-    tr_bencInitDict( &top, 2 );
-    tr_bencDictAddStr( &top, "method", "torrent-set" );
-    tr_benc * args( tr_bencDictAddDict( &top, "arguments", 2 ) );
-    addOptionalIds( args, ids );
-    tr_benc * child( tr_bencDictAdd( args, key.toUtf8().constData() ) );
-    memcpy( child, value, sizeof(tr_benc) );
     exec( &top );
     tr_bencFree( &top );
 }

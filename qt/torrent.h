@@ -34,6 +34,7 @@ extern "C"
 }
 
 class Prefs;
+class QPixmap;
 class QStyle;
 
 struct Peer
@@ -86,6 +87,7 @@ struct TrackerStat
     int scrapeState;
     int seederCount;
     int tier;
+    QPixmap getFavicon( ) const;
 };
 
 typedef QList<TrackerStat> TrackerStatsList;

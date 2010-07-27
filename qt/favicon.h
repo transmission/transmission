@@ -28,6 +28,10 @@ class Favicons: public QObject
 
     public:
 
+        static QString getHost( const QUrl& url );
+
+    public:
+
         Favicons();
         virtual ~Favicons();
 
@@ -45,8 +49,6 @@ class Favicons: public QObject
 
         QNetworkAccessManager * myNAM;
         QMap<QString,QPixmap> myPixmaps;
-
-        QString getHost( const QUrl& url );
 
         QString getCacheDir( );
         void ensureCacheDirHasBeenScanned( );
