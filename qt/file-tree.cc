@@ -588,7 +588,7 @@ FileTreeDelegate :: paint( QPainter                    * painter,
         p.state = option.state | QStyle::State_Small;
         p.direction = QApplication::layoutDirection();
         p.rect = option.rect;
-        p.rect.setSize( QSize( option.rect.width()-2, option.rect.height()-2 ) );
+        p.rect.setSize( QSize( option.rect.width()-2, option.rect.height()-8 ) );
         p.rect.moveCenter( option.rect.center( ) );
         p.fontMetrics = QApplication::fontMetrics();
         p.minimum = 0;
