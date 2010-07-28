@@ -15,12 +15,16 @@
 
 #include <QAbstractItemModel>
 #include <QObject>
+#include <QItemDelegate>
 #include <QList>
-#include <QString>
 #include <QSet>
+#include <QSize>
+#include <QString>
 #include <QTreeView>
 #include <QVariant>
-#include <QItemDelegate>
+
+class QSortFilterProxyModel;
+class QStyle;
 
 #include "torrent.h" // FileList
 
@@ -123,13 +127,12 @@ class FileTreeDelegate: public QItemDelegate
         Q_OBJECT
 
     public:
-
         FileTreeDelegate( QObject * parent=0 ): QItemDelegate( parent ) { }
         virtual ~FileTreeDelegate( ) { }
 
-        void paint( QPainter                   * painter,
-                    const QStyleOptionViewItem & option,
-                    const QModelIndex          & index ) const;
+    public:
+        virtual QSize sizeHint(const QStyleOptionViewItem&, const QModelIndex&) const;
+        virtual void paint(QPainter*, const QStyleOptionViewItem&, const QModelIndex&) const;
 };
 
 class FileTreeView: public QTreeView
@@ -152,7 +155,11 @@ class FileTreeView: public QTreeView
 
     private:
         FileTreeModel myModel;
+        QSortFilterProxyModel * myProxy;
         FileTreeDelegate myDelegate;
+
+    public slots:
+        void onClicked ( const QModelIndex & index );
 };
 
 #endif

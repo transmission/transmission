@@ -17,6 +17,7 @@
 #include <QHeaderView>
 #include <QPainter>
 #include <QResizeEvent>
+#include <QSortFilterProxyModel>
 #include <QStringList>
 
 #include <libtransmission/transmission.h> // priorities
@@ -505,13 +506,45 @@ FileTreeModel :: clicked( const QModelIndex& index )
 *****
 ****/
 
+QSize
+FileTreeDelegate :: sizeHint( const QStyleOptionViewItem& item, const QModelIndex& index ) const
+{
+    QSize size;
+
+    switch( index.column( ) )
+    {
+        case COL_NAME: {
+            const QFontMetrics fm( item.font );
+            const QString text = index.model()->data(index).toString();
+            const int iconSize = QApplication::style()->pixelMetric( QStyle::PM_SmallIconSize );
+            size.rwidth() = HIG::PAD_SMALL + iconSize;
+            size.rheight() = std::max( iconSize, fm.height( ) );
+            break;
+        }
+
+        case COL_PROGRESS:
+        case COL_WANTED:
+            size = QSize( 20, 1 );
+            break;
+
+        default: {
+            const QFontMetrics fm( item.font );
+            const QString text = index.model()->data(index).toString();
+            size = fm.size( 0, text );
+            break;
+        }
+    }
+
+    size.rheight() += 8; // make the spacing a little nicer
+    return size;
+}
+
 void
 FileTreeDelegate :: paint( QPainter                    * painter,
                            const QStyleOptionViewItem  & option,
                            const QModelIndex           & index ) const
 {
     const int column( index.column( ) );
-
 
     if( ( column != COL_PROGRESS ) && ( column != COL_WANTED ) && ( column != COL_NAME ) )
     {
@@ -594,27 +627,38 @@ FileTreeDelegate :: paint( QPainter                    * painter,
 FileTreeView :: FileTreeView( QWidget * parent ):
     QTreeView( parent ),
     myModel( this ),
+    myProxy( new QSortFilterProxyModel( ) ),
     myDelegate( this )
 {
+    setSortingEnabled( true );
     setAlternatingRowColors( true );
     setSelectionBehavior( QAbstractItemView::SelectRows );
     setSelectionMode( QAbstractItemView::ExtendedSelection );
-    setModel( &myModel );
+    myProxy->setSourceModel( &myModel );
+    setModel( myProxy );
     setItemDelegate( &myDelegate );
     setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+    sortByColumn( COL_NAME, Qt::AscendingOrder );
     installEventFilter( this );
 
     for( int i=0; i<=NUM_COLUMNS; ++i )
         header()->setResizeMode( i, QHeaderView::Fixed );
 
-    connect( this,     SIGNAL(clicked(const QModelIndex&)),
-             &myModel,   SLOT(clicked(const QModelIndex&)));
+    connect( this, SIGNAL(clicked(const QModelIndex&)),
+             this, SLOT(onClicked(const QModelIndex&)) );
 
     connect( &myModel, SIGNAL(priorityChanged(const QSet<int>&, int)),
              this,     SIGNAL(priorityChanged(const QSet<int>&, int)));
 
     connect( &myModel, SIGNAL(wantedChanged(const QSet<int>&, bool)),
              this,     SIGNAL(wantedChanged(const QSet<int>&, bool)));
+}
+
+void
+FileTreeView :: onClicked( const QModelIndex& proxyIndex )
+{
+    const QModelIndex modelIndex = myProxy->mapToSource( proxyIndex );
+    myModel.clicked( modelIndex );
 }
 
 bool
@@ -662,7 +706,7 @@ FileTreeView :: update( const FileList& files, bool torrentChanged )
         QList<QModelIndex> added;
         myModel.addFile( file.index, file.filename, file.wanted, file.priority, file.size, file.have, added, torrentChanged );
         foreach( QModelIndex i, added )
-            expand( i );
+            expand( myProxy->mapFromSource( i ) );
     }
 }
 
