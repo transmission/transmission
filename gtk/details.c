@@ -2238,6 +2238,7 @@ tracker_page_new( struct DetailsImpl * di )
     gtk_container_set_border_width( GTK_CONTAINER( vbox ), GUI_PAD_BIG );
 
     v = di->tracker_view = gtk_tree_view_new( );
+    gtk_tree_view_set_headers_visible( GTK_TREE_VIEW( v ), FALSE );
     g_signal_connect( v, "button-press-event",
                       G_CALLBACK( on_tree_view_button_pressed ), NULL );
     g_signal_connect( v, "button-release-event",
