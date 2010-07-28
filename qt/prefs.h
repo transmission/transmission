@@ -49,6 +49,7 @@ class Prefs: public QObject
             STATUSBAR,
             STATUSBAR_STATS,
             SHOW_TRACKER_SCRAPES,
+            SHOW_BACKUP_TRACKERS,
             TOOLBAR,
             BLOCKLIST_DATE,
             BLOCKLIST_UPDATES_ENABLED,

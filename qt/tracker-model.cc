@@ -63,8 +63,9 @@ TrackerModel :: data( const QModelIndex& index, int role ) const
 
 struct CompareTrackers {
     bool operator()( const TrackerInfo& a, const TrackerInfo& b ) const {
-        if( a.torrentId != b.torrentId ) return a.torrentId < b.torrentId;
-        if( a.st.tier != b.st.tier ) return a.st.tier < b.st.tier;
+        if( a.torrentId   != b.torrentId   ) return a.torrentId < b.torrentId;
+        if( a.st.tier     != b.st.tier     ) return a.st.tier < b.st.tier;
+        if( a.st.isBackup != b.st.isBackup ) return !a.st.isBackup;
         return a.st.announce < b.st.announce;
     }
 };

@@ -58,6 +58,7 @@
 #include "torrent-model.h"
 #include "tracker-delegate.h"
 #include "tracker-model.h"
+#include "tracker-model-filter.h"
 
 class Prefs;
 class Session;
@@ -169,7 +170,8 @@ Details :: Details( Session& session, Prefs& prefs, TorrentModel& model, QWidget
     QWidget::setAttribute( Qt::WA_DeleteOnClose, true );
 
     QList<int> initKeys;
-    initKeys << Prefs :: SHOW_TRACKER_SCRAPES;
+    initKeys << Prefs :: SHOW_TRACKER_SCRAPES
+             << Prefs :: SHOW_BACKUP_TRACKERS;
     foreach( int key, initKeys )
         refreshPref( key );
 
@@ -223,9 +225,13 @@ Details :: refreshPref( int key )
 
     switch( key )
     {
-        case Prefs::SHOW_TRACKER_SCRAPES:
+        case Prefs :: SHOW_TRACKER_SCRAPES:
             myTrackerDelegate->setShowMore( myPrefs.getBool( key ) );
-            myTrackerView->update( );
+            myTrackerView->reset( );
+            break;
+
+        case Prefs :: SHOW_BACKUP_TRACKERS:
+            myTrackerFilter->setShowBackupTrackers( myPrefs.getBool( key ) );
             break;
 
         default:
@@ -866,6 +872,12 @@ Details :: onShowTrackerScrapesToggled( bool val )
 }
 
 void
+Details :: onShowBackupTrackersToggled( bool val )
+{
+    myPrefs.set( Prefs::SHOW_BACKUP_TRACKERS, val );
+}
+
+void
 Details :: onHonorsSessionLimitsToggled( bool val )
 {
     mySession.torrentSet( myIds, "honorsSessionLimits", val );
@@ -996,7 +1008,7 @@ Details :: onEditTrackerClicked( )
     QModelIndexList selectedRows = selectionModel->selectedRows( );
     assert( selectedRows.size( ) == 1 );
     QModelIndex i = selectionModel->currentIndex( );
-    const TrackerInfo trackerInfo = myTrackerModel->data( i, TrackerModel::TrackerRole ).value<TrackerInfo>();
+    const TrackerInfo trackerInfo = myTrackerView->model()->data( i, TrackerModel::TrackerRole ).value<TrackerInfo>();
 
     bool ok = false;
     const QString newval = QInputDialog::getText( this,
@@ -1036,7 +1048,7 @@ Details :: onRemoveTrackerClicked( )
     QMap<int,QStringList> torrentId_to_urls;
     foreach( QModelIndex i, selectedRows )
     {
-        const TrackerInfo inf = myTrackerModel->data( i, TrackerModel::TrackerRole ).value<TrackerInfo>();
+        const TrackerInfo inf = myTrackerView->model()->data( i, TrackerModel::TrackerRole ).value<TrackerInfo>();
         torrentId_to_urls[ inf.torrentId ].append( inf.st.announce );
     }
 
@@ -1164,8 +1176,11 @@ Details :: createTrackerTab( )
 
     v2->setSpacing( HIG::PAD );
 
+    myTrackerModel = new TrackerModel;
+    myTrackerFilter = new TrackerModelFilter;
+    myTrackerFilter->setSourceModel( myTrackerModel );
     myTrackerView = new QTreeView;
-    myTrackerView->setModel( myTrackerModel = new TrackerModel );
+    myTrackerView->setModel( myTrackerFilter );
     myTrackerView->setHeaderHidden( true );
     myTrackerView->setSelectionMode( QTreeWidget::ExtendedSelection );
     myTrackerView->setRootIsDecorated( false );
@@ -1212,6 +1227,12 @@ Details :: createTrackerTab( )
     myShowTrackerScrapesCheck = c;
     v->addWidget( c, 1 );
     connect( c, SIGNAL(clicked(bool)), this, SLOT(onShowTrackerScrapesToggled(bool)) );
+
+    c = new QCheckBox( tr( "Show &backup trackers" ) );
+    c->setChecked( myPrefs.getBool( Prefs::SHOW_BACKUP_TRACKERS ) );
+    myShowBackupTrackersCheck = c;
+    v->addWidget( c, 1 );
+    connect( c, SIGNAL(clicked(bool)), this, SLOT(onShowBackupTrackersToggled(bool)) );
 
     return top;
 }

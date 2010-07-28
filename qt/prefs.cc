@@ -45,7 +45,8 @@ Prefs::PrefItem Prefs::myItems[] =
     { FILTERBAR, "show-filterbar", QVariant::Bool },
     { STATUSBAR, "show-statusbar", QVariant::Bool },
     { STATUSBAR_STATS, "statusbar-stats", QVariant::String },
-    { SHOW_TRACKER_SCRAPES, "show-tracker-scrapes", QVariant::Bool },
+    { SHOW_TRACKER_SCRAPES, "show-extra-peer-details", QVariant::Bool },
+    { SHOW_BACKUP_TRACKERS, "show-backup-trackers", QVariant::Bool },
     { TOOLBAR, "show-toolbar" , QVariant::Bool },
     { BLOCKLIST_DATE, "blocklist-date", QVariant::DateTime },
     { BLOCKLIST_UPDATES_ENABLED, "blocklist-updates-enabled" , QVariant::Bool },
@@ -239,33 +240,35 @@ Prefs :: ~Prefs( )
 void
 Prefs :: initDefaults( tr_benc * d )
 {
-    tr_bencDictAddStr( d, keyStr(DIR_WATCH), tr_getDefaultDownloadDir( ) );
-    tr_bencDictAddInt( d, keyStr(DIR_WATCH_ENABLED), false );
-    tr_bencDictAddInt( d, keyStr(INHIBIT_HIBERNATION), false );
-    tr_bencDictAddInt( d, keyStr(BLOCKLIST_DATE), 0 );
-    tr_bencDictAddInt( d, keyStr(BLOCKLIST_UPDATES_ENABLED), true );
-    tr_bencDictAddStr( d, keyStr(OPEN_DIALOG_FOLDER), QDir::home().absolutePath().toLatin1() );
-    tr_bencDictAddInt( d, keyStr(SHOW_TRACKER_SCRAPES), false );
-    tr_bencDictAddInt( d, keyStr(TOOLBAR), true );
-    tr_bencDictAddInt( d, keyStr(FILTERBAR), true );
-    tr_bencDictAddInt( d, keyStr(STATUSBAR), true );
-    tr_bencDictAddInt( d, keyStr(SHOW_TRAY_ICON), false );
-    tr_bencDictAddInt( d, keyStr(SHOW_DESKTOP_NOTIFICATION), true );
-    tr_bencDictAddStr( d, keyStr(STATUSBAR_STATS), "total-ratio" );
-    tr_bencDictAddInt( d, keyStr(OPTIONS_PROMPT), true );
-    tr_bencDictAddInt( d, keyStr(MAIN_WINDOW_HEIGHT), 500 );
-    tr_bencDictAddInt( d, keyStr(MAIN_WINDOW_WIDTH), 300 );
-    tr_bencDictAddInt( d, keyStr(MAIN_WINDOW_X), 50 );
-    tr_bencDictAddInt( d, keyStr(MAIN_WINDOW_Y), 50 );
-    tr_bencDictAddStr( d, keyStr(FILTER_MODE), "all" );
-    tr_bencDictAddStr( d, keyStr(MAIN_WINDOW_LAYOUT_ORDER), "menu,toolbar,filter,list,statusbar" );
-    tr_bencDictAddStr( d, keyStr(DOWNLOAD_DIR), tr_getDefaultDownloadDir( ) );
-    tr_bencDictAddInt( d, keyStr(ASKQUIT), true );
-    tr_bencDictAddStr( d, keyStr(SORT_MODE), "sort-by-name" );
-    tr_bencDictAddInt( d, keyStr(SORT_REVERSED), false );
-    tr_bencDictAddInt( d, keyStr(COMPACT_VIEW), false );
-    tr_bencDictAddStr( d, keyStr(SESSION_REMOTE_HOST), "localhost" );
-    tr_bencDictAddInt( d, keyStr(SESSION_REMOTE_PORT), atoi(TR_DEFAULT_RPC_PORT_STR) );
+    tr_bencDictAddStr ( d, keyStr(DIR_WATCH), tr_getDefaultDownloadDir( ) );
+    tr_bencDictAddBool( d, keyStr(DIR_WATCH_ENABLED), false );
+    tr_bencDictAddBool( d, keyStr(INHIBIT_HIBERNATION), false );
+    tr_bencDictAddInt ( d, keyStr(BLOCKLIST_DATE), 0 );
+    tr_bencDictAddBool( d, keyStr(BLOCKLIST_UPDATES_ENABLED), true );
+    tr_bencDictAddStr ( d, keyStr(OPEN_DIALOG_FOLDER), QDir::home().absolutePath().toLatin1() );
+    tr_bencDictAddInt ( d, keyStr(SHOW_TRACKER_SCRAPES), false );
+    tr_bencDictAddBool( d, keyStr(TOOLBAR), true );
+    tr_bencDictAddBool( d, keyStr(FILTERBAR), true );
+    tr_bencDictAddBool( d, keyStr(STATUSBAR), true );
+    tr_bencDictAddBool( d, keyStr(SHOW_TRAY_ICON), false );
+    tr_bencDictAddBool( d, keyStr(SHOW_DESKTOP_NOTIFICATION), true );
+    tr_bencDictAddStr ( d, keyStr(STATUSBAR_STATS), "total-ratio" );
+    tr_bencDictAddBool( d, keyStr(SHOW_TRACKER_SCRAPES), false );
+    tr_bencDictAddBool( d, keyStr(SHOW_BACKUP_TRACKERS), false );
+    tr_bencDictAddBool( d, keyStr(OPTIONS_PROMPT), true );
+    tr_bencDictAddInt ( d, keyStr(MAIN_WINDOW_HEIGHT), 500 );
+    tr_bencDictAddInt ( d, keyStr(MAIN_WINDOW_WIDTH), 300 );
+    tr_bencDictAddInt ( d, keyStr(MAIN_WINDOW_X), 50 );
+    tr_bencDictAddInt ( d, keyStr(MAIN_WINDOW_Y), 50 );
+    tr_bencDictAddStr ( d, keyStr(FILTER_MODE), "all" );
+    tr_bencDictAddStr ( d, keyStr(MAIN_WINDOW_LAYOUT_ORDER), "menu,toolbar,filter,list,statusbar" );
+    tr_bencDictAddStr ( d, keyStr(DOWNLOAD_DIR), tr_getDefaultDownloadDir( ) );
+    tr_bencDictAddBool( d, keyStr(ASKQUIT), true );
+    tr_bencDictAddStr ( d, keyStr(SORT_MODE), "sort-by-name" );
+    tr_bencDictAddBool( d, keyStr(SORT_REVERSED), false );
+    tr_bencDictAddBool( d, keyStr(COMPACT_VIEW), false );
+    tr_bencDictAddStr ( d, keyStr(SESSION_REMOTE_HOST), "localhost" );
+    tr_bencDictAddInt ( d, keyStr(SESSION_REMOTE_PORT), atoi(TR_DEFAULT_RPC_PORT_STR) );
     tr_bencDictAddBool( d, keyStr(SESSION_IS_REMOTE), false );
     tr_bencDictAddBool( d, keyStr(SESSION_REMOTE_AUTH), false );
     tr_bencDictAddBool( d, keyStr(USER_HAS_GIVEN_INFORMED_CONSENT), false );

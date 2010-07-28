@@ -36,8 +36,8 @@ SOURCES += about.cc app.cc dbus-adaptor.cc details.cc favicon.cc file-tree.cc \
            relocate.cc session.cc session-dialog.cc squeezelabel.cc \
            stats-dialog.cc torrent.cc torrent-delegate.cc \
            torrent-delegate-min.cc torrent-filter.cc torrent-model.cc \
-           tracker-delegate.cc tracker-model.cc triconpushbutton.cc \
-           utils.cc watchdir.cc
+           tracker-delegate.cc tracker-model.cc tracker-model-filter.cc \
+           triconpushbutton.cc utils.cc watchdir.cc
 HEADERS += $$replace(SOURCES, .cc, .h)
 HEADERS += speed.h types.h
 

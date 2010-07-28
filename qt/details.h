@@ -38,6 +38,7 @@ class Torrent;
 class TorrentModel;
 class TrackerDelegate;
 class TrackerModel;
+class TrackerModelFilter;
 
 class Details: public QDialog
 {
@@ -92,6 +93,7 @@ class Details: public QDialog
         QCheckBox * mySingleDownCheck;
         QCheckBox * mySingleUpCheck;
         QCheckBox * myShowTrackerScrapesCheck;
+        QCheckBox * myShowBackupTrackersCheck;
         QPushButton * myAddTrackerButton;
         QPushButton * myEditTrackerButton;
         QPushButton * myRemoveTrackerButton;
@@ -121,6 +123,7 @@ class Details: public QDialog
         QLabel * myAnnounceManualLabel;
 
         TrackerModel * myTrackerModel;
+        TrackerModelFilter * myTrackerFilter;
         TrackerDelegate * myTrackerDelegate;
         QTreeView * myTrackerView;
         //QMap<QString,QTreeWidgetItem*> myTrackerTiers;
@@ -148,6 +151,7 @@ class Details: public QDialog
         void onIdleModeChanged( int );
         void onIdleLimitChanged( int );
         void onShowTrackerScrapesToggled( bool );
+        void onShowBackupTrackersToggled( bool );
         void onTrackerSelectionChanged( );
         void onAddTrackerClicked( );
         void onEditTrackerClicked( );

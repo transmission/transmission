@@ -1,8 +1,7 @@
 VOLUNTEERS WANTED
 
+   - Qt developers and translators are needed
    - If you find a bug, please report it at http://trac.transmissionbt.com/
-   - New translations are encouraged
-   - Windows devs: it would be interesting to see if/how this works on Windows
     
 ABOUT TRANSMISSION-QT
 
@@ -27,14 +26,10 @@ ABOUT TRANSMISSION-QT
 
 BUILDING
 
-   This currently is a little awkward.  We're working on it...
-
    1. Prerequisites: Qt >= 4.4 and its development packages
    2. Build Transmission as normal
-   3. If you built Transmission without DHT, edit qtr.pro:
-      - LIBS += $${TRANSMISSION_TOP}/third-party/dht/libdht.a
-   4. In the qt/ directory, type "qmake-qt4 qtr.pro"
-   5. In the qt/ directory, type "make"
-   6. In the qt/ directory, as root, type "INSTALL_ROOT=/usr make install"
+   3. In the qt/ directory, type "qmake qtr.pro" or "qmake-qt4 qtr.pro"
+   4. In the qt/ directory, type "make"
+   5. In the qt/ directory, as root, type "INSTALL_ROOT=/usr make install"
       (Feel free to replace /usr with /usr/local or /opt or whatever)
 

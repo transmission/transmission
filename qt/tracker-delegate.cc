@@ -25,6 +25,9 @@
 #include <QTextDocument>
 #include <QUrl>
 
+#include <libtransmission/transmission.h>
+#include <libtransmission/utils.h>
+
 #include "favicon.h"
 #include "formatter.h"
 #include "torrent.h"
@@ -146,9 +149,12 @@ TrackerDelegate :: getText( const TrackerInfo& inf ) const
     const QString success_markup_end = "</span>";
 
     // hostname
-    const QString host = Favicons::getHost( QUrl( inf.st.announce ) );
     str += inf.st.isBackup ? "<i>" : "<b>";
-    str += host;
+    char * host = NULL;
+    int port = 0;
+    tr_urlParse( inf.st.announce.toUtf8().constData(), -1, NULL, &host, &port, NULL );
+    str += QString( "%1:%2" ).arg( host ).arg( port );
+    tr_free( host );
     if( !key.isEmpty( ) ) str += " - " + key;
     str += inf.st.isBackup ? "</i>" : "</b>";
 
@@ -169,14 +175,14 @@ TrackerDelegate :: getText( const TrackerInfo& inf ) const
             }
             else if( inf.st.lastAnnounceTimedOut )
             {
-                str += tr( "Peer list request timed out %1%2%3 ago; will retry" )
+                str += tr( "Peer list request %1timed out%2 %3 ago; will retry" )
                            .arg( timeout_markup_begin )
-                           .arg( tstr )
-                           .arg( timeout_markup_end );
+                           .arg( timeout_markup_end )
+                           .arg( tstr );
             }
             else
             {
-                str += tr( "Got an error %1'%2'%3 %4 ago" )
+                str += tr( "Got an error %1\"%2\"%3 %4 ago" )
                            .arg( err_markup_begin )
                            .arg( tstr )
                            .arg( err_markup_end )
@@ -187,7 +193,7 @@ TrackerDelegate :: getText( const TrackerInfo& inf ) const
         switch( inf.st.announceState )
         {
             case TR_TRACKER_INACTIVE:
-                if( inf.st.hasAnnounced ) {
+                if( !inf.st.hasAnnounced ) {
                     str += "<br/>\n";
                     str += tr( "No updates scheduled" );
                 }
@@ -232,7 +238,7 @@ TrackerDelegate :: getText( const TrackerInfo& inf ) const
                 }
                 else
                 {
-                    str += tr( "Got a scrape error %1'%2'%3 %4 ago" )
+                    str += tr( "Got a scrape error %1\"%2\"%3 %4 ago" )
                                .arg( err_markup_begin )
                                .arg( inf.st.lastScrapeResult )
                                .arg( err_markup_end )
@@ -270,35 +276,3 @@ TrackerDelegate :: getText( const TrackerInfo& inf ) const
 
     return str;
 }
-
-#if 0
-
-    if( inf.isBackup )
-        str += "<i>";
-    QString announce;
-    int announceState;
-    int downloadCount;
-    bool hasAnnounced; bool hasScraped;
-    QString host;
-    int id;
-    bool isBackup;
-    int lastAnnouncePeerCount;
-    int lastAnnounceResult;
-    int lastAnnounceStartTime;
-    bool lastAnnounceSucceeded;
-    int lastAnnounceTime;
-    bool lastAnnounceTimedOut;
-    QString lastScrapeResult;
-    int lastScrapeStartTime;
-    bool lastScrapeSucceeded;
-    int lastScrapeTime;
-    bool lastScrapeTimedOut;
-    int leecherCount;
-    int nextAnnounceTime;
-    int nextScrapeTime;
-    int scrapeState;
-    int seederCount;
-    int tier;
-
-}
-#endif
