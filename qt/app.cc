@@ -90,14 +90,15 @@ MyApp :: MyApp( int& argc, char ** argv ):
     setApplicationName( MY_NAME );
 
     // install the qt translator
-    QTranslator * t = new QTranslator( );
-    t->load( "qt_" + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
-    installTranslator( t );
+    QTranslator qtTranslator;
+    qtTranslator.load( "qt_" + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+    installTranslator( &qtTranslator );
 
     // install the transmission translator
-    t = new QTranslator( );
-    t->load( QString(MY_NAME) + "_" + QLocale::system().name() );
-    installTranslator( t );
+    QTranslator appTranslator;
+    appTranslator.load( QString(MY_NAME) + "_" + QLocale::system().name() );
+    installTranslator( &appTranslator );
+
     Formatter::initUnits( );
 
     // set the default icon

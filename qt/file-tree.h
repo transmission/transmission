@@ -141,7 +141,7 @@ class FileTreeView: public QTreeView
 
     public:
         FileTreeView( QWidget * parent=0 );
-        virtual ~FileTreeView( ) { }
+        virtual ~FileTreeView( );
         void clear( );
         void update( const FileList& files );
         void update( const FileList& files, bool torrentChanged );

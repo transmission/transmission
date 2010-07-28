@@ -185,6 +185,9 @@ Details :: Details( Session& session, Prefs& prefs, TorrentModel& model, QWidget
 
 Details :: ~Details( )
 {
+    myTrackerDelegate->deleteLater();
+    myTrackerFilter->deleteLater();
+    myTrackerModel->deleteLater();
 }
 
 void

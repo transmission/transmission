@@ -654,6 +654,11 @@ FileTreeView :: FileTreeView( QWidget * parent ):
              this,     SIGNAL(wantedChanged(const QSet<int>&, bool)));
 }
 
+FileTreeView :: ~FileTreeView( )
+{
+    myProxy->deleteLater();
+}
+
 void
 FileTreeView :: onClicked( const QModelIndex& proxyIndex )
 {
