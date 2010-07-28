@@ -59,11 +59,11 @@ const char * disk_M_str = N_("MiB");
 const char * disk_G_str = N_("GiB");
 const char * disk_T_str = N_("TiB");
 
-const int speed_K = 1000;
-const char * speed_K_str = N_("kB/s");
-const char * speed_M_str = N_("MB/s");
-const char * speed_G_str = N_("GB/s");
-const char * speed_T_str = N_("TB/s");
+const int speed_K = 1024;
+const char * speed_K_str = N_("KiB/s");
+const char * speed_M_str = N_("MiB/s");
+const char * speed_G_str = N_("GiB/s");
+const char * speed_T_str = N_("TiB/s");
 
 /***
 ****
