@@ -418,6 +418,19 @@ ul.torrent_list li.torrent div.torrent_peer_details {
 	font-size: 1em;
 }
 
+ul.torrent_list li.torrent div.torrent_progress_details.error {
+	color: #FF0000;
+}
+ul.torrent_list li.torrent.selected div.torrent_progress_details.error {
+	color: #FFF;
+}
+ul.torrent_list li.torrent div.torrent_peer_details.error {
+	color: #FF0000;
+}
+ul.torrent_list li.torrent.selected div.torrent_peer_details.error {
+	color: #FFF;
+}
+
 ul.torrent_list li.torrent div.torrent_progress_details.compact,
 ul.torrent_list li.torrent div.torrent_peer_details.compact {
 	padding-top: 3px;

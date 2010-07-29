@@ -652,9 +652,14 @@ Torrent.prototype =
 			e.className = 'torrent_progress_bar ' + status;
 		}
 
+		var hasError = this.getErrorMessage( ) != undefined;
 		// Update the progress details
-		if(compact_mode)
+		if(compact_mode){
 			progress_details = this.getPeerDetails();
+			$(root._progress_details_container).toggleClass('error',hasError);
+		} else {
+			$(root._peer_details_container).toggleClass('error',hasError);
+		}
 		setInnerHTML( root._progress_details_container, progress_details );
 
 		// Update the peer details and pause/resume button
