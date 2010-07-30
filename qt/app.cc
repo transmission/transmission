@@ -237,9 +237,11 @@ MyApp :: MyApp( int& argc, char ** argv ):
     new TrDBusAdaptor( this );
     QDBusConnection bus = QDBusConnection::sessionBus();
     if (!bus.registerService("com.transmissionbt.Transmission"))
-        fprintf(stderr, "%s\n", qPrintable(bus.lastError().message()));
+        if(bus.lastError().isValid())
+            std::cerr << qPrintable(bus.lastError().message()) << std::endl;
     if( !bus.registerObject( "/com/transmissionbt/Transmission", this ))
-        fprintf(stderr, "%s\n", qPrintable(bus.lastError().message()));
+        if(bus.lastError().isValid())
+            std::cerr << qPrintable(bus.lastError().message()) << std::endl;
 }
 
 void
