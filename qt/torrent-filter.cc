@@ -13,14 +13,15 @@
 #include <iostream>
 
 #include "filters.h"
+#include "hig.h"
 #include "prefs.h"
 #include "torrent.h"
 #include "torrent-filter.h"
 #include "torrent-model.h"
+#include "utils.h"
 
 TorrentFilter :: TorrentFilter( Prefs& prefs ):
-    myPrefs( prefs ),
-    myTextMode( FILTER_BY_NAME )
+    myPrefs( prefs )
 {
     // listen for changes to the preferences to know when to refilter / resort
     connect( &myPrefs, SIGNAL(changed(int)), this, SLOT(refreshPref(int)));
@@ -30,7 +31,9 @@ TorrentFilter :: TorrentFilter( Prefs& prefs ):
     // initialize our state from the current prefs
     QList<int> initKeys;
     initKeys << Prefs :: SORT_MODE
-             << Prefs :: FILTER_MODE;
+             << Prefs :: FILTER_MODE
+             << Prefs :: FILTER_TRACKERS
+             << Prefs :: FILTER_TEXT;
     foreach( int key, initKeys )
         refreshPref( key );
 }
@@ -44,41 +47,18 @@ TorrentFilter :: refreshPref( int key )
 {
     switch( key )
     {
+        case Prefs :: FILTER_TEXT:
         case Prefs :: FILTER_MODE:
+        case Prefs :: FILTER_TRACKERS:
             invalidateFilter( );
             /* force a re-sort */
             sort( 0, !myPrefs.getBool(Prefs::SORT_REVERSED) ? Qt::AscendingOrder : Qt::DescendingOrder );
+
         case Prefs :: SORT_MODE:
         case Prefs :: SORT_REVERSED:
             sort( 0, myPrefs.getBool(Prefs::SORT_REVERSED) ? Qt::AscendingOrder : Qt::DescendingOrder );
             invalidate( );
             break;
-    }
-}
-
-/***
-****
-***/
-
-void
-TorrentFilter :: setTextMode( int i )
-{
-    if( myTextMode != i )
-    {
-        myTextMode = TextMode( i );
-        invalidateFilter( );
-    }
-}
-
-void
-TorrentFilter :: setText( QString text )
-{
-    QString trimmed = text.trimmed( );
-
-    if( myText != trimmed )
-    {
-        myText = trimmed;
-        invalidateFilter( );
     }
 }
 
@@ -155,14 +135,18 @@ TorrentFilter :: lessThan( const QModelIndex& left, const QModelIndex& right ) c
 ***/
 
 bool
-TorrentFilter :: filterAcceptsRow( int sourceRow, const QModelIndex& sourceParent ) const
+TorrentFilter :: trackerFilterAcceptsTorrent( const Torrent * tor, const QString& tracker ) const
 {
-    QModelIndex childIndex = sourceModel()->index( sourceRow, 0, sourceParent );
-    const Torrent * tor = childIndex.model()->data( childIndex, TorrentModel::TorrentRole ).value<const Torrent*>();
-    const tr_torrent_activity activity = tor->getActivity( );
-    bool accepts;
+    return tracker.isEmpty() || tor->hasTrackerSubstring( tracker );
+}
 
-    switch( myPrefs.get<FilterMode>(Prefs::FILTER_MODE).mode() )
+bool
+TorrentFilter :: activityFilterAcceptsTorrent( const Torrent * tor, const FilterMode& m ) const
+{
+    bool accepts;
+    const tr_torrent_activity activity = tor->getActivity( );
+
+    switch( m.mode( ) )
     {
         case FilterMode::SHOW_ALL:
             accepts = true;
@@ -179,8 +163,44 @@ TorrentFilter :: filterAcceptsRow( int sourceRow, const QModelIndex& sourceParen
         case FilterMode::SHOW_PAUSED:
             accepts = activity == TR_STATUS_STOPPED;
             break;
+        case FilterMode::SHOW_QUEUED:
+            accepts = activity == TR_STATUS_CHECK_WAIT;
+            break;
+        case FilterMode::SHOW_VERIFYING:
+            accepts = activity == TR_STATUS_CHECK;
+            break;
+        case FilterMode::SHOW_ERROR:
+            accepts = tor->hasError( );
+            break;
     }
 
+    return accepts;
+}
+
+bool
+TorrentFilter :: filterAcceptsRow( int sourceRow, const QModelIndex& sourceParent ) const
+{
+    QModelIndex childIndex = sourceModel()->index( sourceRow, 0, sourceParent );
+    const Torrent * tor = childIndex.model()->data( childIndex, TorrentModel::TorrentRole ).value<const Torrent*>();
+    bool accepts = true;
+
+    if( accepts ) {
+        const FilterMode m = myPrefs.get<FilterMode>(Prefs::FILTER_MODE);
+        accepts = activityFilterAcceptsTorrent( tor, m );
+    }
+
+    if( accepts ) {
+        const QString trackers = myPrefs.getString(Prefs::FILTER_TRACKERS);
+        accepts = trackerFilterAcceptsTorrent( tor, trackers );
+    }
+
+    if( accepts ) {
+        const QString text = myPrefs.getString( Prefs::FILTER_TEXT );
+        if( !text.isEmpty( ) )
+            accepts = tor->name().contains( text, Qt::CaseInsensitive );
+    }
+
+#if 0
     if( accepts && !myText.isEmpty( ) ) switch( myTextMode )
     {
         case FILTER_BY_NAME:
@@ -193,6 +213,7 @@ TorrentFilter :: filterAcceptsRow( int sourceRow, const QModelIndex& sourceParen
             accepts = tor->hasTrackerSubstring( myText );
             break;
     }
+#endif
 
     return accepts;
 }
@@ -201,4 +222,21 @@ int
 TorrentFilter :: hiddenRowCount( ) const
 {
     return sourceModel()->rowCount( ) - rowCount( );
+}
+
+int
+TorrentFilter :: count( const FilterMode& mode ) const
+{
+    int count = 0;
+
+    for( int row=0; ; ++row ) {
+        QModelIndex index = sourceModel()->index( row, 0 );
+        if( !index.isValid( ) )
+            break;
+        const Torrent * tor = index.data( TorrentModel::TorrentRole ).value<const Torrent*>();
+        if( activityFilterAcceptsTorrent( tor, mode ) )
+            ++count;
+    }
+
+    return count;
 }

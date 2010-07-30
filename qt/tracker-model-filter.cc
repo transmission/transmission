@@ -31,6 +31,6 @@ TrackerModelFilter :: filterAcceptsRow( int                 sourceRow,
                                         const QModelIndex & sourceParent ) const
 {
     QModelIndex index = sourceModel()->index( sourceRow, 0, sourceParent );
-    const TrackerInfo trackerInfo = index.model()->data( index, TrackerModel::TrackerRole ).value<TrackerInfo>();
+    const TrackerInfo trackerInfo = index.data( TrackerModel::TrackerRole ).value<TrackerInfo>();
     return myShowBackups || !trackerInfo.st.isBackup;
 }

@@ -515,7 +515,7 @@ FileTreeDelegate :: sizeHint( const QStyleOptionViewItem& item, const QModelInde
     {
         case COL_NAME: {
             const QFontMetrics fm( item.font );
-            const QString text = index.model()->data(index).toString();
+            const QString text = index.data().toString();
             const int iconSize = QApplication::style()->pixelMetric( QStyle::PM_SmallIconSize );
             size.rwidth() = HIG::PAD_SMALL + iconSize;
             size.rheight() = std::max( iconSize, fm.height( ) );
@@ -529,7 +529,7 @@ FileTreeDelegate :: sizeHint( const QStyleOptionViewItem& item, const QModelInde
 
         default: {
             const QFontMetrics fm( item.font );
-            const QString text = index.model()->data(index).toString();
+            const QString text = index.data().toString();
             size = fm.size( 0, text );
             break;
         }
@@ -571,7 +571,7 @@ FileTreeDelegate :: paint( QPainter                    * painter,
             icon = style->standardIcon( QStyle::StandardPixmap( QStyle::SP_DirOpenIcon ) );
         else
         {
-            QString name = index.model()->data(index).toString();
+            QString name = index.data().toString();
             icon = Utils :: guessMimeIcon( name.left( name.lastIndexOf( " (" ) ) );
         }
         icon.paint( painter, iconArea, Qt::AlignCenter, QIcon::Normal, QIcon::On );
@@ -595,7 +595,7 @@ FileTreeDelegate :: paint( QPainter                    * painter,
         p.maximum = 100;
         p.textAlignment = Qt::AlignCenter;
         p.textVisible = true;
-        p.progress = (int)(100.0*index.model()->data(index).toDouble());
+        p.progress = (int)(100.0*index.data().toDouble());
         p.text = QString( ).sprintf( "%d%%", p.progress );
         style->drawControl( QStyle::CE_ProgressBar, &p, painter );
     }
@@ -607,7 +607,7 @@ FileTreeDelegate :: paint( QPainter                    * painter,
         o.rect.setSize( QSize( 20, option.rect.height( ) ) );
         o.rect.moveCenter( option.rect.center( ) );
         o.fontMetrics = QApplication::fontMetrics();
-        switch( index.model()->data(index).toInt() ) {
+        switch( index.data().toInt() ) {
             case Qt::Unchecked: o.state |= QStyle::State_Off; break;
             case Qt::Checked:   o.state |= QStyle::State_On; break;
             default:            o.state |= QStyle::State_NoChange;break;

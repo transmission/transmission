@@ -298,7 +298,7 @@ QSize
 TorrentDelegate :: sizeHint( const QStyleOptionViewItem  & option,
                              const QModelIndex           & index ) const
 {
-    const Torrent * tor( index.model()->data( index, TorrentModel::TorrentRole ).value<const Torrent*>() );
+    const Torrent * tor( index.data( TorrentModel::TorrentRole ).value<const Torrent*>() );
     return sizeHint( option, *tor );
 }
 
@@ -307,7 +307,7 @@ TorrentDelegate :: paint( QPainter                    * painter,
                           const QStyleOptionViewItem  & option,
                           const QModelIndex           & index) const
 {
-    const Torrent * tor( index.model()->data( index, TorrentModel::TorrentRole ).value<const Torrent*>() );
+    const Torrent * tor( index.data( TorrentModel::TorrentRole ).value<const Torrent*>() );
     painter->save( );
     painter->setClipRect( option.rect );
     drawBackground( painter, option, index );
