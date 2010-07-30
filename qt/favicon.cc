@@ -82,9 +82,21 @@ Favicons :: getHost( const QUrl& url )
 QPixmap
 Favicons :: find( const QUrl& url )
 {
+    return findFromHost( getHost( url ) );
+}
+
+namespace
+{
+    const QSize rightSize( 16, 16 );
+};
+
+QPixmap
+Favicons :: findFromHost( const QString& host )
+{
     ensureCacheDirHasBeenScanned( );
 
-    return myPixmaps[ getHost(url) ];
+    const QPixmap pixmap = myPixmaps[ host ];
+    return pixmap.size()==rightSize ? pixmap : pixmap.scaled(rightSize);
 }
 
 void
@@ -97,7 +109,7 @@ Favicons :: add( const QUrl& url )
     if( !myPixmaps.contains( host ) )
     {
         // add a placholder s.t. we only ping the server once per session
-        QPixmap tmp( 16, 16 );
+        QPixmap tmp( rightSize );
         tmp.fill( Qt::transparent );
         myPixmaps.insert( host, tmp );
 
