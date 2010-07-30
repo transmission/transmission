@@ -45,6 +45,7 @@ class QLabel;
 class QMenu;
 class QModelIndex;
 class QSortFilterProxyModel;
+class Filterbar;
 
 class TrMainWindow: public QMainWindow
 {
@@ -85,7 +86,6 @@ class TrMainWindow: public QMainWindow
         QIcon getStockIcon( const QString&, int fallback=-1 );
 
     private:
-        void setShowMode( int );
         QSet<int> getSelectedTorrents( ) const;
         void updateNetworkIcon( );
         QWidgetList myHidden;
@@ -97,15 +97,6 @@ class TrMainWindow: public QMainWindow
         void onPrefsDestroyed( );
         void openPreferences( );
         void onDetailsDestroyed( );
-        void onShowModeClicked( );
-        void showAll( );
-        void showActive( );
-        void showDownloading( );
-        void showSeeding( );
-        void showPaused( );
-        void filterByName( );
-        void filterByFiles( );
-        void filterByTracker( );
         void showTotalRatio( );
         void showTotalTransfer( );
         void showSessionRatio( );
@@ -148,11 +139,7 @@ class TrMainWindow: public QMainWindow
         void onSortByTrackerToggled  ( bool );
 
     private:
-        QWidget * createFilterBar( void );
         QWidget * myFilterBar;
-        QPushButton * myFilterButtons[FilterMode::NUM_MODES];
-        QPushButton * myFilterTextButton;
-        QLineEdit * myFilterTextLineEdit;
 
     private:
         QMenu * createOptionsMenu( void );

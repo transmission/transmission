@@ -33,6 +33,7 @@
 
 #include "about.h"
 #include "details.h"
+#include "filterbar.h"
 #include "filters.h"
 #include "formatter.h"
 #include "hig.h"
@@ -246,14 +247,13 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     ui.action_TrayIcon->setChecked( minimized || prefs.getBool( Prefs::SHOW_TRAY_ICON ) );
 
     ui.verticalLayout->addWidget( createStatusBar( ) );
-    ui.verticalLayout->insertWidget( 0, createFilterBar( ) );
+    ui.verticalLayout->insertWidget( 0, myFilterBar = new FilterBar( myPrefs, myModel, myFilterModel ) );
 
     QList<int> initKeys;
     initKeys << Prefs :: MAIN_WINDOW_X
              << Prefs :: SHOW_TRAY_ICON
              << Prefs :: SORT_REVERSED
              << Prefs :: SORT_MODE
-             << Prefs :: FILTER_MODE
              << Prefs :: FILTERBAR
              << Prefs :: STATUSBAR
              << Prefs :: STATUSBAR_STATS
@@ -351,88 +351,6 @@ TrMainWindow :: onSetPrefs( bool isChecked )
 }
 
 #define SHOW_KEY "show-mode"
-
-void
-TrMainWindow :: onShowModeClicked( )
-{
-    setShowMode( sender()->property(SHOW_KEY).toInt() );
-}
-
-QWidget *
-TrMainWindow :: createFilterBar( )
-{
-    int i;
-    QMenu * m;
-    QLineEdit * e;
-    QPushButton * p;
-    QHBoxLayout * h;
-    QActionGroup * a;
-    const int smallSize = style( )->pixelMetric( QStyle::PM_SmallIconSize, 0, this );
-    const QSize smallIconSize( smallSize, smallSize );
-
-    QWidget * top = myFilterBar = new QWidget;
-    h = new QHBoxLayout( top );
-    h->setContentsMargins( HIG::PAD_SMALL, HIG::PAD_SMALL, HIG::PAD_SMALL, HIG::PAD_SMALL );
-    h->setSpacing( HIG::PAD_SMALL );
-#ifdef Q_OS_MAC
-    top->setStyleSheet( "QPushButton{ "
-                        "  border-radius: 10px; "
-                        "  padding: 0 5px; "
-                        "  border: 1px none; "
-                        "} "
-                        "QPushButton:pressed, QPushButton:checked{ "
-                        "  border-width: 1px; "
-                        "  border-style: solid; "
-                        "  border-color: #5f5f5f #979797 #979797; "
-                        "  background-color: #979797; "
-                        "  color: white; "
-                        "} ");
-#endif
-
-        QList<QString> titles;
-        titles << tr( "A&ll" ) << tr( "&Active" ) << tr( "&Downloading" ) << tr( "&Seeding" ) << tr( "&Paused" );
-        for( i=0; i<titles.size(); ++i ) {
-            p = myFilterButtons[i] = new QPushButton( titles[i] );
-            p->setProperty( SHOW_KEY, i );
-            p->setFlat( true );
-            p->setCheckable( true );
-            p->setMaximumSize( calculateTextButtonSizeHint( p ) );
-            connect( p, SIGNAL(clicked()), this, SLOT(onShowModeClicked()));
-            h->addWidget( p );
-        }
-
-    h->addStretch( 1 );
-
-        a = new QActionGroup( this );
-        a->addAction( ui.action_FilterByName );
-        a->addAction( ui.action_FilterByFiles );
-        a->addAction( ui.action_FilterByTracker );
-        m = new QMenu( );
-        m->addAction( ui.action_FilterByName );
-        m->addAction( ui.action_FilterByFiles );
-        m->addAction( ui.action_FilterByTracker );
-        connect( ui.action_FilterByName, SIGNAL(triggered()), this, SLOT(filterByName()));
-        connect( ui.action_FilterByFiles, SIGNAL(triggered()), this, SLOT(filterByFiles()));
-        connect( ui.action_FilterByTracker, SIGNAL(triggered()), this, SLOT(filterByTracker()));
-        ui.action_FilterByName->setChecked( true );
-        p = myFilterTextButton = new TrIconPushButton;
-        p->setIcon( getStockIcon( "edit-find", QStyle::SP_ArrowForward ) );
-        p->setFlat( true );
-        p->setMenu( m );
-        h->addWidget( p );
-
-        e = myFilterTextLineEdit = new QLineEdit;
-        connect( e, SIGNAL(textChanged(QString)), &myFilterModel, SLOT(setText(QString)));
-        h->addWidget( e );
-
-        p = myFilterTextButton = new TrIconPushButton;
-        p->setIcon( getStockIcon( "edit-clear", QStyle::SP_DialogCloseButton ) );
-        p->setFlat( true );
-        connect( p, SIGNAL(clicked()), myFilterTextLineEdit, SLOT(clear()));
-        h->addWidget( p );
-
-    return top;
-}
 
 QWidget *
 TrMainWindow :: createStatusBar( )
@@ -835,7 +753,7 @@ TrMainWindow :: getSelectedTorrents( ) const
 
     foreach( QModelIndex index, ui.listView->selectionModel( )->selectedRows( ) )
     {
-        const Torrent * tor( index.model()->data( index, TorrentModel::TorrentRole ).value<const Torrent*>( ) );
+        const Torrent * tor( index.data( TorrentModel::TorrentRole ).value<const Torrent*>( ) );
         ids.insert( tor->id( ) );
     }
 
@@ -886,17 +804,6 @@ TrMainWindow :: reannounceSelected( )
 /**
 ***
 **/
-
-void TrMainWindow :: setShowMode     ( int i ) { myPrefs.set( Prefs::FILTER_MODE, FilterMode( i ) ); }
-void TrMainWindow :: showAll         ( ) { setShowMode( FilterMode :: SHOW_ALL ); }
-void TrMainWindow :: showActive      ( ) { setShowMode( FilterMode :: SHOW_ACTIVE ); }
-void TrMainWindow :: showDownloading ( ) { setShowMode( FilterMode :: SHOW_DOWNLOADING ); }
-void TrMainWindow :: showSeeding     ( ) { setShowMode( FilterMode :: SHOW_SEEDING ); }
-void TrMainWindow :: showPaused      ( ) { setShowMode( FilterMode :: SHOW_PAUSED ); }
-
-void TrMainWindow :: filterByName    ( ) { myFilterModel.setTextMode( TorrentFilter :: FILTER_BY_NAME ); }
-void TrMainWindow :: filterByTracker ( ) { myFilterModel.setTextMode( TorrentFilter :: FILTER_BY_TRACKER ); }
-void TrMainWindow :: filterByFiles   ( ) { myFilterModel.setTextMode( TorrentFilter :: FILTER_BY_FILES ); }
 
 void TrMainWindow :: showTotalRatio      ( ) { myPrefs.set( Prefs::STATUSBAR_STATS, "total-ratio"); }
 void TrMainWindow :: showTotalTransfer   ( ) { myPrefs.set( Prefs::STATUSBAR_STATS, "total-transfer"); }
@@ -953,8 +860,9 @@ TrMainWindow :: toggleWindows( bool doShow )
     {
         if ( !isVisible( ) ) show( );
         if ( isMinimized( ) ) showNormal( );
-        activateWindow( );
+        //activateWindow( );
         raise( );
+        QApplication::setActiveWindow( this );
     }
 }
 
@@ -1028,12 +936,6 @@ TrMainWindow :: refreshPref( int key )
 
         case Prefs::RATIO:
             myRatioOnAction->setText( tr( "Stop at Ratio (%1)" ).arg( Formatter::ratioToString( myPrefs.get<double>(key) ) ) );
-            break;
-
-        case Prefs::FILTER_MODE:
-            i = myPrefs.get<FilterMode>(key).mode( );
-            for( int j=0; j<FilterMode::NUM_MODES; ++j )
-                myFilterButtons[j]->setChecked( i==j );
             break;
 
         case Prefs::FILTERBAR:
@@ -1183,7 +1085,7 @@ TrMainWindow :: removeTorrents( const bool deleteFiles )
 
     foreach( QModelIndex index, ui.listView->selectionModel( )->selectedRows( ) )
     {
-        const Torrent * tor( index.model()->data( index, TorrentModel::TorrentRole ).value<const Torrent*>( ) );
+        const Torrent * tor( index.data( TorrentModel::TorrentRole ).value<const Torrent*>( ) );
         ids.insert( tor->id( ) );
         if( tor->connectedPeers( ) )
             ++connected;

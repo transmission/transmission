@@ -76,7 +76,7 @@ QSize
 TrackerDelegate :: sizeHint( const QStyleOptionViewItem  & option,
                              const QModelIndex           & index ) const
 {
-    const TrackerInfo trackerInfo = index.model()->data( index, TrackerModel::TrackerRole ).value<TrackerInfo>();
+    const TrackerInfo trackerInfo = index.data( TrackerModel::TrackerRole ).value<TrackerInfo>();
     return sizeHint( option, trackerInfo );
 }
 
@@ -85,7 +85,7 @@ TrackerDelegate :: paint( QPainter                    * painter,
                           const QStyleOptionViewItem  & option,
                           const QModelIndex           & index) const
 {
-    const TrackerInfo trackerInfo = index.model()->data( index, TrackerModel::TrackerRole ).value<TrackerInfo>();
+    const TrackerInfo trackerInfo = index.data( TrackerModel::TrackerRole ).value<TrackerInfo>();
     painter->save( );
     painter->setClipRect( option.rect );
     drawBackground( painter, option, index );

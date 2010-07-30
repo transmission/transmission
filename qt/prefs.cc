@@ -56,6 +56,8 @@ Prefs::PrefItem Prefs::myItems[] =
     { MAIN_WINDOW_X, "main-window-x", QVariant::Int },
     { MAIN_WINDOW_Y, "main-window-y", QVariant::Int },
     { FILTER_MODE, "filter-mode", TrTypes::FilterModeType },
+    { FILTER_TRACKERS, "filter-trackers", QVariant::String },
+    { FILTER_TEXT, "filter-text", QVariant::String },
     { SESSION_IS_REMOTE, "remote-session-enabled", QVariant::Bool },
     { SESSION_REMOTE_HOST, "remote-session-host", QVariant::String },
     { SESSION_REMOTE_PORT, "remote-session-port", QVariant::Int },
@@ -133,6 +135,10 @@ Prefs :: Prefs( const char * configDir ):
     for( int i=0; i<PREFS_COUNT; ++i )
         assert( myItems[i].id == i );
 
+    // these are the prefs that don't get saved to settings.json
+    // when the application exits.
+    myTemporaryPrefs << FILTER_TEXT;
+
     tr_benc top;
     tr_bencInitDict( &top, 0 );
     initDefaults( &top );
@@ -197,10 +203,16 @@ Prefs :: ~Prefs( )
         tr_bencInitDict( &top, PREFS_COUNT );
 
     /* merge our own settings with the ones already in the file */
-    for( int i=0; i<PREFS_COUNT; ++i ) {
+    for( int i=0; i<PREFS_COUNT; ++i )
+    {
+        if( myTemporaryPrefs.contains( i ) )
+            continue;
+
         const char * key = myItems[i].key;
         const QVariant& val = myValues[i];
-        switch( myItems[i].type ) {
+
+        switch( myItems[i].type )
+        {
             case QVariant::Int:
                 tr_bencDictAddInt( &top, key, val.toInt() );
                 break;

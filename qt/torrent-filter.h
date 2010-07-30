@@ -17,9 +17,12 @@
 #include <QMetaType>
 #include <QVariant>
 
+class QString;
+class QWidget;
 
-struct Prefs;
-struct QString;
+class FilterMode;
+class Prefs;
+class Torrent;
 
 class TorrentFilter: public QSortFilterProxyModel
 {
@@ -31,12 +34,7 @@ class TorrentFilter: public QSortFilterProxyModel
 
     public:
         enum TextMode { FILTER_BY_NAME, FILTER_BY_FILES, FILTER_BY_TRACKER };
-        TextMode getTextMode( ) const { return myTextMode; }
         int hiddenRowCount( ) const;
-
-    public slots:
-        void setTextMode( int textMode );
-        void setText( QString );
 
     private slots:
         void refreshPref( int key );
@@ -46,9 +44,14 @@ class TorrentFilter: public QSortFilterProxyModel
         virtual bool lessThan( const QModelIndex&, const QModelIndex& ) const;
 
     private:
+        bool activityFilterAcceptsTorrent( const Torrent * tor, const FilterMode& mode ) const;
+        bool trackerFilterAcceptsTorrent( const Torrent * tor, const QString& tracker ) const;
+
+    public:
+        int count( const FilterMode& ) const;
+
+    private:
         Prefs& myPrefs;
-        TextMode myTextMode;
-        QString myText;
 };
 
 #endif

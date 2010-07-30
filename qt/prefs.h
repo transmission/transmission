@@ -15,6 +15,7 @@
 
 #include <QDateTime>
 #include <QObject>
+#include <QSet>
 #include <QString>
 #include <QVariant>
 
@@ -59,6 +60,8 @@ class Prefs: public QObject
             MAIN_WINDOW_X,
             MAIN_WINDOW_Y,
             FILTER_MODE,
+            FILTER_TRACKERS,
+            FILTER_TEXT,
             SESSION_IS_REMOTE,
             SESSION_REMOTE_HOST,
             SESSION_REMOTE_PORT,
@@ -140,6 +143,7 @@ class Prefs: public QObject
         static PrefItem myItems[];
 
     private:
+        QSet<int> myTemporaryPrefs;
         QString myConfigDir;
         QVariant myValues[PREFS_COUNT];
         void initDefaults( struct tr_benc* );

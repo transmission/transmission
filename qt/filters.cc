@@ -12,12 +12,16 @@
 
 #include "filters.h"
 
-const QString FilterMode::names[NUM_MODES] = {
+const QString FilterMode::names[NUM_MODES] =
+{
     "show-all",
     "show-active",
     "show-downloading",
     "show-seeding",
-    "show-paused"
+    "show-paused",
+    "show-queued",
+    "show-verifying",
+    "show-error",
 };
 
 int

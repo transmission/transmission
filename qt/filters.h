@@ -25,7 +25,8 @@ class FilterMode
         FilterMode( int mode=SHOW_ALL ): myMode(mode) { }
         FilterMode( const QString& name ): myMode(modeFromName(name)) { }
         static const QString names[];
-        enum { SHOW_ALL, SHOW_ACTIVE, SHOW_DOWNLOADING, SHOW_SEEDING, SHOW_PAUSED, NUM_MODES };
+        enum { SHOW_ALL, SHOW_ACTIVE, SHOW_DOWNLOADING, SHOW_SEEDING, SHOW_PAUSED,
+               SHOW_QUEUED, SHOW_VERIFYING, SHOW_ERROR, NUM_MODES };
         static int modeFromName( const QString& name );
         static const QString& nameFromMode( int mode ) { return names[mode]; }
         int mode() const { return myMode; }

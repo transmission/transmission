@@ -119,7 +119,7 @@ TorrentModel :: onTorrentChanged( int torrentId )
     const int row( myIdToRow.value( torrentId, -1 ) );
     if( row >= 0 ) {
         QModelIndex qmi( index( row, 0 ) );
-        dataChanged( qmi, qmi );
+        emit dataChanged( qmi, qmi );
     }
 }
 
