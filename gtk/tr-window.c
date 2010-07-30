@@ -750,7 +750,6 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
     prefsChanged( core, PREF_KEY_STATUSBAR, self );
     prefsChanged( core, PREF_KEY_STATUSBAR_STATS, self );
     prefsChanged( core, PREF_KEY_TOOLBAR, self );
-    prefsChanged( core, PREF_KEY_FILTER_MODE, self );
     prefsChanged( core, TR_PREFS_KEY_ALT_SPEED_ENABLED, self );
     p->pref_handler_id = g_signal_connect( core, "prefs-changed",
                                            G_CALLBACK( prefsChanged ), self );
