@@ -363,6 +363,7 @@ compareByName( GtkTreeModel *             model,
     gtk_tree_model_get( model, a, MC_NAME_COLLATED, &ca, -1 );
     gtk_tree_model_get( model, b, MC_NAME_COLLATED, &cb, -1 );
     ret = strcmp( ca, cb );
+
     g_free( cb );
     g_free( ca );
     return ret;
@@ -876,33 +877,6 @@ tr_core_session( TrCore * core )
     return isDisposed( core ) ? NULL : core->priv->session;
 }
 
-static char*
-doCollate( const char * in )
-{
-    char * ret;
-    char * casefold;
-    const char * end = in ? in + strlen( in ) : NULL;
-
-    while( in < end )
-    {
-        const gunichar ch = g_utf8_get_char( in );
-        if( !g_unichar_isalnum ( ch ) ) /* eat everything before the first alnum
-                                          */
-            in += g_unichar_to_utf8( ch, NULL );
-        else
-            break;
-    }
-
-    if( in == end )
-        return g_strdup ( "" );
-
-    casefold = g_utf8_casefold( in, end - in );
-    ret = g_utf8_collate_key( casefold, -1 );
-    g_free( casefold );
-
-    return ret;
-}
-
 void
 tr_core_add_torrent( TrCore     * self,
                      TrTorrent  * gtor,
@@ -911,7 +885,7 @@ tr_core_add_torrent( TrCore     * self,
     const tr_info * inf = tr_torrent_info( gtor );
     const tr_stat * st = tr_torrent_stat( gtor );
     tr_torrent *    tor = tr_torrent_handle( gtor );
-    char *          collated = doCollate( inf->name );
+    char *          collated = g_utf8_strdown( inf->name, -1 );
     GtkListStore *  store = GTK_LIST_STORE( tr_core_model( self ) );
     GtkTreeIter     unused;
 
