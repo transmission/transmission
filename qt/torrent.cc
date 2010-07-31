@@ -85,7 +85,7 @@ Torrent :: myProperties[] =
     { DOWNLOADED_EVER, "downloadedEver", QVariant::ULongLong, STAT },
     { UPLOADED_EVER, "uploadedEver", QVariant::ULongLong, STAT },
     { FAILED_EVER, "corruptEver", QVariant::ULongLong, STAT_EXTRA },
-    { TRACKERS, "trackers", QVariant::StringList, INFO },
+    { TRACKERS, "trackers", QVariant::StringList, STAT },
     { TRACKERSTATS, "trackerStats", TrTypes::TrackerStatsList, STAT_EXTRA },
     { MIME_ICON, "ccc", QVariant::Icon, DERIVED },
     { SEED_RATIO_LIMIT, "seedRatioLimit", QVariant::Double, STAT },
