@@ -10,8 +10,6 @@
  * $Id$
  */
 
-#include <iostream>
-
 #include <QString>
 #include <QtGui>
 
@@ -37,6 +35,14 @@ enum
     ActivityRole,
     TrackerRole
 };
+
+namespace
+{
+    int getHSpacing( QWidget * w )
+    {
+        return qMax( 4, w->style()->pixelMetric( QStyle::PM_LayoutHorizontalSpacing, 0, w ) );
+    }
+}
 
 FilterBarComboBoxDelegate :: FilterBarComboBoxDelegate( QObject * parent, QComboBox * combo ):
     QItemDelegate( parent ),
@@ -80,7 +86,7 @@ FilterBarComboBoxDelegate :: paint( QPainter                    * painter,
         disabledOption.state &= ~( QStyle::State_Enabled | QStyle::State_Selected );
         QRect boundingBox = option.rect;
 
-        const int hmargin = myCombo->style()->pixelMetric( QStyle::PM_LayoutHorizontalSpacing, 0, myCombo );
+        const int hmargin = getHSpacing( myCombo );
         boundingBox.setLeft( boundingBox.left() + hmargin );
         boundingBox.setRight( boundingBox.right() - hmargin );
 
@@ -121,8 +127,7 @@ FilterBarComboBoxDelegate :: sizeHint( const QStyleOptionViewItem & option,
     else
     {
         QStyle * s = myCombo->style( );
-        const int hmargin = s->pixelMetric( QStyle::PM_LayoutHorizontalSpacing, 0, myCombo );
-
+        const int hmargin = getHSpacing( myCombo );
 
         QSize size = QItemDelegate::sizeHint( option, index );
         size.setHeight( qMax( size.height(), myCombo->iconSize().height() + 6 ) );
@@ -161,7 +166,7 @@ FilterBarComboBox :: paintEvent( QPaintEvent * e )
     {
         QStyle * s = style();
         QRect rect = s->subControlRect( QStyle::CC_ComboBox, &opt, QStyle::SC_ComboBoxEditField, this );
-        const int hmargin = s->pixelMetric( QStyle::PM_LayoutHorizontalSpacing, 0, this );
+        const int hmargin = getHSpacing( this );
         rect.setRight( rect.right() - hmargin );
 
         // draw the icon
