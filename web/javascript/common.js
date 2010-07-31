@@ -8,6 +8,7 @@
 
 var transmission;
 var dialog;
+var resizeTimer = null;
 // Test for a Webkit build that supports box-shadow: 521+ (release Safari 3 is
 // actually 523.10.3). We need 3.1 for CSS animation (dialog sheets) but as it
 // degrades gracefully let's not worry too much.
@@ -79,6 +80,13 @@ $(document).ready( function() {
 			$('body div#torrent_container').css('min-height', '338px');
 		$("label[for=torrent_upload_url]").text("URL: ");
 	}
+
+	// Add resize event handler with a timeout to handle browsers that fire a
+	// resize event for every pixel changed
+	$(window).bind('resize', function() {
+		if (resizeTimer) clearTimeout(resizeTimer);
+		resizeTimer = setTimeout('transmission.refreshDisplay()', 50)
+		});
 });
 
 /*

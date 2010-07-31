@@ -662,6 +662,14 @@ Torrent.prototype =
 		}
 		setInnerHTML( root._progress_details_container, progress_details );
 
+		if( compact ){
+			var width = root._progress_details_container.offsetLeft - root._name_container.offsetLeft;
+			root._name_container.style.width = width + 'px';
+		}
+		else {
+			root._name_container.style.width = '100%';
+		}
+
 		// Update the peer details and pause/resume button
 		e = root._pause_resume_button_image;
 		if ( this.state() === Torrent._StatusPaused ) {

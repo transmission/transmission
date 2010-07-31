@@ -397,8 +397,9 @@ ul.torrent_list li.torrent.selected {
 ul.torrent_list li.torrent div.torrent_name {
 	font-size: 1.3em;
 	font-weight: bold;
-	word-wrap: break-word;
 	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 	color: #222;
 	margin-bottom: 2px;
 }
@@ -407,6 +408,9 @@ ul.torrent_list li.torrent div.torrent_name.compact {
 	float: left;
 	z-index: 1;
 	position: absolute;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 ul.torrent_list li.torrent.selected div.torrent_name {
@@ -415,7 +419,11 @@ ul.torrent_list li.torrent.selected div.torrent_name {
 
 ul.torrent_list li.torrent div.torrent_progress_details,
 ul.torrent_list li.torrent div.torrent_peer_details {
+	clear: left;
 	font-size: 1em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 ul.torrent_list li.torrent div.torrent_progress_details.error {

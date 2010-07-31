@@ -1532,6 +1532,7 @@ Transmission.prototype =
 
 		this.setPref( Prefs._ShowInspector, true );
 		this.updateInspector( );
+		this.refreshDisplay( );
 	},
 
 	/*
@@ -1553,6 +1554,7 @@ Transmission.prototype =
 		}
 
 		this.setPref( Prefs._ShowInspector, false );
+		this.refreshDisplay( );
 	},
 
 	/*
@@ -1961,6 +1963,7 @@ Transmission.prototype =
 		this.setTorrentBgColors( );
 		this.updateStatusbar( );
 		this.selectionChanged( );
+		this.refreshDisplay( );
 	},
 
 	setEnabled: function( key, flag )
