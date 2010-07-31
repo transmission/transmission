@@ -10,6 +10,8 @@
  * $Id$
  */
 
+#include <iostream>
+
 #include <QString>
 #include <QtGui>
 
@@ -464,11 +466,14 @@ FilterBar :: refreshPref( int key )
 
         case Prefs :: FILTER_TRACKERS: {
             const QString tracker = myPrefs.getString( key );
-            QList<QStandardItem*> rows = myTrackerModel->findItems( tracker );
-            if( !rows.isEmpty( )  )
-                myTrackerCombo->setCurrentIndex( rows.first()->row() );
-            else if( myTorrents.rowCount( ) > 0 ) // uh-oh... we don't have this tracker anymore.  best use "show all" as a fallback
-                myPrefs.set( key, "" );
+            QModelIndexList indices = myTrackerModel->match( myTrackerModel->index(0,0), TrackerRole, tracker, 1, Qt::MatchFixedString );
+            if( !indices.isEmpty( )  )
+                myTrackerCombo->setCurrentIndex( indices.first().row() );
+            else { // hm, we don't seem to have this tracker anymore...
+                const bool isBootstrapping = myTrackerModel->rowCount( ) <= 2;
+                if( !isBootstrapping )
+                    myPrefs.set( key, "" );
+            }
             break;
         }
 
@@ -489,7 +494,15 @@ void
 FilterBar :: onTrackerIndexChanged( int i )
 {
     if( !myIsBootstrapping )
-        myPrefs.set( Prefs::FILTER_TRACKERS, myTrackerCombo->itemData( i, Qt::DisplayRole ).toString( ) );
+    {
+        QString str;
+        const bool isTracker = !myTrackerCombo->itemData(i,TrackerRole).toString().isEmpty();
+        if( isTracker )
+            str = myTrackerCombo->itemData(i,TrackerRole).toString();
+        else // show all
+            str = "";
+        myPrefs.set( Prefs::FILTER_TRACKERS, str );
+    }
 }
 
 void
