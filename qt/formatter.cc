@@ -78,7 +78,7 @@ Formatter :: initUnits( )
 double
 Speed :: KBps( ) const
 {
-    return _Bps / speed_K;
+    return _Bps / (double)speed_K;
 }
 
 Speed
