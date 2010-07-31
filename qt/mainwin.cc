@@ -13,25 +13,14 @@
 #include <cassert>
 #include <iostream>
 
-#include <QCheckBox>
-#include <QCloseEvent>
-#include <QDesktopServices>
-#include <QFileDialog>
-#include <QHBoxLayout>
-#include <QInputDialog>
-#include <QLabel>
-#include <QMessageBox>
-#include <QSignalMapper>
-#include <QSize>
-#include <QStyle>
-#include <QSystemTrayIcon>
-#include <QUrl>
+#include <QtGui>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
 
 #include "about.h"
+#include "app.h"
 #include "details.h"
 #include "filterbar.h"
 #include "filters.h"
@@ -103,6 +92,8 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     myLastReadTime( 0 ),
     myNetworkTimer( this )
 {
+    setAcceptDrops( true );
+
     QAction * sep = new QAction( this );
     sep->setSeparator( true );
 
@@ -1228,4 +1219,30 @@ TrMainWindow :: wrongAuthentication( )
 {
     mySession.stop( );
     mySessionDialog->show( );
+}
+
+/***
+****
+***/
+
+void
+TrMainWindow :: dragEnterEvent( QDragEnterEvent * event )
+{
+    const QMimeData * mime = event->mimeData( );
+
+    if( mime->hasFormat("application/x-bittorrent")
+            || mime->text().trimmed().endsWith(".torrent", Qt::CaseInsensitive) )
+        event->acceptProposedAction();
+}
+
+void
+TrMainWindow :: dropEvent( QDropEvent * event )
+{
+    QString key = event->mimeData()->text().trimmed();
+
+    const QUrl url( key );
+    if( url.scheme() == "file" )
+        key = QUrl::fromPercentEncoding( url.path().toUtf8( ) );
+
+    dynamic_cast<MyApp*>(QApplication::instance())->addTorrent( key );
 }

@@ -181,6 +181,10 @@ class TrMainWindow: public QMainWindow
     public:
         TrMainWindow( Session&, Prefs&, TorrentModel&, bool minized );
         virtual ~TrMainWindow( );
+
+    protected:
+        virtual void dragEnterEvent( QDragEnterEvent * );
+        virtual void dropEvent( QDropEvent * );
 };
 
 #endif
