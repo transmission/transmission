@@ -539,7 +539,6 @@ render_compact( TorrentCellRenderer   * cell,
                 GdkRectangle          * expose_area UNUSED,
                 GtkCellRendererState    flags )
 {
-    int w, h;
     GdkRectangle icon_area;
     GdkRectangle name_area;
     GdkRectangle stat_area;
@@ -561,56 +560,27 @@ render_compact( TorrentCellRenderer   * cell,
     name = tr_torrentInfo( tor )->name;
     status = getShortStatusString( tor, st, p->upload_speed_KBps, p->download_speed_KBps );
 
-    /* get the cell dimensions */
-    g_object_set( p->icon_renderer, "pixbuf", icon, NULL );
-    gtk_cell_renderer_get_size( p->icon_renderer, widget, NULL, NULL, NULL, &w, &h );
-    icon_area.width = w;
-    icon_area.height = h;
-    text_renderer = get_text_renderer( st, cell );
-    g_object_set( text_renderer, "text", name, "ellipsize", PANGO_ELLIPSIZE_NONE, "scale", 1.0, NULL );
-    gtk_cell_renderer_get_size( text_renderer, widget, NULL, NULL, NULL, &w, &h );
-    name_area.width = w;
-    name_area.height = h;
-    g_object_set( text_renderer, "text", status, "scale", SMALL_SCALE, NULL );
-    gtk_cell_renderer_get_size( text_renderer, widget, NULL, NULL, NULL, &w, &h );
-    stat_area.width = w;
-    stat_area.height = h;
-    prog_area.height = p->bar_height;
-
-    h = 1;
-    h = MAX( h, stat_area.height );
-    h = MAX( h, name_area.height );
-    h = MAX( h, icon_area.height );
-    h = MAX( h, prog_area.height );
-
-    /**
-    *** LAYOUT
-    **/
-
     fill_area = *background_area;
     fill_area.x += cell->parent.xpad;
     fill_area.y += cell->parent.ypad;
     fill_area.width -= cell->parent.xpad * 2;
     fill_area.height -= cell->parent.ypad * 2;
+    icon_area = name_area = stat_area = prog_area = fill_area;
 
-    /* icon */
+    g_object_set( p->icon_renderer, "pixbuf", icon, NULL );
+    gtk_cell_renderer_get_size( p->icon_renderer, widget, NULL, NULL, NULL, &icon_area.width, NULL );
+    text_renderer = get_text_renderer( st, cell );
+    g_object_set( text_renderer, "text", name, "ellipsize", PANGO_ELLIPSIZE_NONE, "scale", 1.0, NULL );
+    gtk_cell_renderer_get_size( text_renderer, widget, NULL, NULL, NULL, &name_area.width, NULL );
+    g_object_set( text_renderer, "text", status, "scale", SMALL_SCALE, NULL );
+    gtk_cell_renderer_get_size( text_renderer, widget, NULL, NULL, NULL, &stat_area.width, NULL );
+
     icon_area.x = fill_area.x;
-    icon_area.y = fill_area.y;
-    icon_area.height = h;
-
-    /* progressbar */
     prog_area.x = fill_area.x + fill_area.width - BAR_WIDTH;
-    prog_area.y = fill_area.y;
     prog_area.width = BAR_WIDTH;
-    prog_area.height = h;
-
-    /* short status (right justified) */
     stat_area.x = prog_area.x - GUI_PAD - stat_area.width;
-    stat_area.y = fill_area.y + ( h - stat_area.height ) / 2;
-
-    /* name */
     name_area.x = icon_area.x + icon_area.width + GUI_PAD;
-    name_area.y = fill_area.y + ( h - name_area.height ) / 2;
+    name_area.y = fill_area.y;
     name_area.width = stat_area.x - GUI_PAD - name_area.x;
 
     /**
