@@ -1349,8 +1349,8 @@ jsonRealFunc( const tr_benc * val, void * vdata )
     struct jsonWalk * data = vdata;
     char locale[128];
 
-    if( fabs( val->val.d ) < 0.00001 )
-        evbuffer_add( data->out, "0", 1 );
+    if( fabs( val->val.d - (int)val->val.d ) < 0.00001 )
+        evbuffer_add_printf( data->out, "%d", (int)val->val.d );
     else {
         /* json requires a '.' decimal point regardless of locale */
         tr_strlcpy( locale, setlocale( LC_NUMERIC, NULL ), sizeof( locale ) );
