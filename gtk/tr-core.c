@@ -542,16 +542,6 @@ tr_core_apply_defaults( tr_ctor * ctor )
     }
 }
 
-static int
-tr_strcmp( const void * a,
-           const void * b )
-{
-    if( a && b ) return strcmp( a, b );
-    if( a ) return 1;
-    if( b ) return -1;
-    return 0;
-}
-
 static char *
 torrentTrackerString( tr_torrent * tor )
 {
@@ -718,7 +708,7 @@ updateWatchDir( TrCore * core )
         PREF_KEY_DIR_WATCH_ENABLED );
     struct TrCorePrivate * p = TR_CORE( core )->priv;
 
-    if( p->monitor && ( !isEnabled || tr_strcmp( filename, p->monitor_path ) ) )
+    if( p->monitor && ( !isEnabled || gtr_strcmp0( filename, p->monitor_path ) ) )
     {
         g_signal_handler_disconnect( p->monitor, p->monitor_tag );
         g_free( p->monitor_path );
@@ -1339,7 +1329,7 @@ update_foreach( GtkTreeModel * model,
     if( ( newActivity  != oldActivity  )
         || ( newFinished != oldFinished )
         || ( newPriority != oldPriority )
-        || tr_strcmp( oldTrackers, newTrackers )
+        || gtr_strcmp0( oldTrackers, newTrackers )
         || gtr_compare_double( newUpSpeed, oldUpSpeed, 3 )
         || gtr_compare_double( newDownSpeed, oldDownSpeed, 3 ) )
     {
@@ -1534,7 +1524,7 @@ tr_core_set_pref( TrCore * self, const char * key, const char * newval )
 {
     const char * oldval = pref_string_get( key );
 
-    if( tr_strcmp( oldval, newval ) )
+    if( gtr_strcmp0( oldval, newval ) )
     {
         pref_string_set( key, newval );
         commitPrefsChange( self, key );
