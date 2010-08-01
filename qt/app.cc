@@ -249,8 +249,29 @@ MyApp :: MyApp( int& argc, char ** argv ):
 void
 MyApp :: torrentsAdded( QSet<int> torrents )
 {
-    myAddedTorrents += torrents;
-std::cerr << "added count is " << myAddedTorrents.size() << std::endl;
+    foreach( int id, torrents )
+    {
+        Torrent * tor = myModel->getTorrentFromId( id );
+        if( !tor->name().isEmpty( ) )
+            torrentChanged( id );
+        else // wait until the torrent's INFO fields are loaded
+            connect( tor, SIGNAL(torrentChanged(int)), this, SLOT(torrentChanged(int)) );
+    }
+}
+
+void
+MyApp :: torrentChanged( int id )
+{
+    Torrent * tor = myModel->getTorrentFromId( id );
+
+    if( tor && !tor->name().isEmpty() )
+    {
+        const int age_secs = tor->dateAdded().secsTo(QDateTime::currentDateTime());
+        if( age_secs < 30 )
+            notify( tr( "Torrent Added" ), tor->name( ) );
+
+        disconnect( tor, SIGNAL(torrentChanged(int)), this, SLOT(torrentChanged(int)) );
+    }
 }
 
 void
@@ -374,7 +395,7 @@ MyApp :: raise( )
 }
 
 bool
-MyApp :: notify( const QString& title, const QString& body, int timeout_msec ) const
+MyApp :: notify( const QString& title, const QString& body ) const
 {
     const QString dbusServiceName = "org.freedesktop.Notifications";
     const QString dbusInterfaceName = "org.freedesktop.Notifications";
@@ -439,6 +460,5 @@ main( int argc, char * argv[] )
 
     tr_optind = 1;
     MyApp app( argc, argv );
-    app.notify( "hello world", "this is a test" );
     return app.exec( );
 }
