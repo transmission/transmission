@@ -17,6 +17,7 @@
 #include "favicon.h"
 #include "filters.h"
 #include "filterbar.h"
+#include "hig.h"
 #include "prefs.h"
 #include "qticonloader.h"
 #include "torrent-filter.h"
@@ -40,7 +41,7 @@ namespace
 {
     int getHSpacing( QWidget * w )
     {
-        return qMax( 4, w->style()->pixelMetric( QStyle::PM_LayoutHorizontalSpacing, 0, w ) );
+        return qMax( int(HIG::PAD_SMALL), w->style()->pixelMetric( QStyle::PM_LayoutHorizontalSpacing, 0, w ) );
     }
 }
 
@@ -398,7 +399,7 @@ FilterBar :: FilterBar( Prefs& prefs, TorrentModel& torrents, TorrentFilter& fil
     myIsBootstrapping( true )
 {
     QHBoxLayout * h = new QHBoxLayout( this );
-    int hmargin = style()->pixelMetric( QStyle::PM_LayoutHorizontalSpacing );
+    const int hmargin = qMax( int(HIG::PAD), style()->pixelMetric( QStyle::PM_LayoutHorizontalSpacing ) );
 
     h->setSpacing( 0 );
     h->setContentsMargins( 2, 2, 2, 2 );
