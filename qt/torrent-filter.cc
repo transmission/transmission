@@ -144,7 +144,6 @@ bool
 TorrentFilter :: activityFilterAcceptsTorrent( const Torrent * tor, const FilterMode& m ) const
 {
     bool accepts;
-    const tr_torrent_activity activity = tor->getActivity( );
 
     switch( m.mode( ) )
     {
@@ -155,19 +154,22 @@ TorrentFilter :: activityFilterAcceptsTorrent( const Torrent * tor, const Filter
             accepts = tor->peersWeAreUploadingTo( ) > 0 || tor->peersWeAreDownloadingFrom( ) > 0 || tor->isVerifying( );
             break;
         case FilterMode::SHOW_DOWNLOADING:
-            accepts = activity == TR_STATUS_DOWNLOAD;
+            accepts = tor->isDownloading( );
             break;
         case FilterMode::SHOW_SEEDING:
-            accepts = activity == TR_STATUS_SEED;
+            accepts = tor->isSeeding( );
             break;
         case FilterMode::SHOW_PAUSED:
-            accepts = activity == TR_STATUS_STOPPED;
+            accepts = tor->isPaused( );
+            break;
+        case FilterMode::SHOW_FINISHED:
+            accepts = tor->isFinished( );
             break;
         case FilterMode::SHOW_QUEUED:
-            accepts = activity == TR_STATUS_CHECK_WAIT;
+            accepts = tor->isWaitingToVerify( );
             break;
         case FilterMode::SHOW_VERIFYING:
-            accepts = activity == TR_STATUS_CHECK;
+            accepts = tor->isVerifying( );
             break;
         case FilterMode::SHOW_ERROR:
             accepts = tor->hasError( );

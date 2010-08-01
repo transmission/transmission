@@ -197,6 +197,9 @@ enum
     MC_SPEED_UP,
     MC_SPEED_DOWN,
     MC_ACTIVITY,
+    MC_FINISHED,
+    MC_PRIORITY,
+    MC_TRACKERS,
     MC_ROW_COUNT
 };
 

@@ -243,6 +243,10 @@ FilterBar :: createActivityCombo( )
     row->setData( FilterMode::SHOW_PAUSED, ActivityRole );
     model->appendRow( row );
 
+    row = new QStandardItem( blankIcon, tr( "Finished" ) );
+    row->setData( FilterMode::SHOW_FINISHED, ActivityRole );
+    model->appendRow( row );
+
     row = new QStandardItem( blankIcon, tr( "Queued" ) );
     row->setData( FilterMode::SHOW_QUEUED, ActivityRole );
     model->appendRow( row );

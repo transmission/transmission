@@ -19,6 +19,7 @@ const QString FilterMode::names[NUM_MODES] =
     "show-downloading",
     "show-seeding",
     "show-paused",
+    "show-finished",
     "show-queued",
     "show-verifying",
     "show-error",
