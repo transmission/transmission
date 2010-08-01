@@ -184,7 +184,7 @@ TrackerDelegate :: getText( const TrackerInfo& inf ) const
             {
                 str += tr( "Got an error %1\"%2\"%3 %4 ago" )
                            .arg( err_markup_begin )
-                           .arg( tstr )
+                           .arg( inf.st.lastAnnounceResult )
                            .arg( err_markup_end )
                            .arg( tstr );
             }

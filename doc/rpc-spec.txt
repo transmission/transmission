@@ -276,7 +276,7 @@
                       | id                      | number     | tr_tracker_stat
                       | isBackup                | boolean    | tr_tracker_stat
                       | lastAnnouncePeerCount   | number     | tr_tracker_stat
-                      | lastAnnounceResult      | number     | tr_tracker_stat
+                      | lastAnnounceResult      | string     | tr_tracker_stat
                       | lastAnnounceStartTime   | number     | tr_tracker_stat
                       | lastAnnounceSucceeded   | boolean    | tr_tracker_stat
                       | lastAnnounceTime        | number     | tr_tracker_stat

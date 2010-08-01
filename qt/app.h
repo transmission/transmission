@@ -14,6 +14,7 @@
 #define QTR_APP_H
 
 #include <QApplication>
+#include <QSet>
 #include <QTimer>
 #include "favicon.h"
 
@@ -33,6 +34,7 @@ class MyApp: public QApplication
 
     public:
         void raise( );
+        bool notify( const QString& title, const QString& body, int timeout_msec=-1 ) const;
 
     public:
         Favicons favicons;
@@ -47,12 +49,14 @@ class MyApp: public QApplication
         QTimer myStatsTimer;
         QTimer mySessionTimer;
         time_t myLastFullUpdateTime;
+        QSet<int> myAddedTorrents;
 
     private slots:
         void consentGiven( );
         void onSessionSourceChanged( );
         void refreshPref( int key );
         void refreshTorrents( );
+        void torrentsAdded( QSet<int> );
 
     public slots:
         void addTorrent( const QString& );

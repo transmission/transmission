@@ -71,7 +71,7 @@ struct TrackerStat
     int id;
     bool isBackup;
     int lastAnnouncePeerCount;
-    int lastAnnounceResult;
+    QString lastAnnounceResult;
     int lastAnnounceStartTime;
     bool lastAnnounceSucceeded;
     int lastAnnounceTime;

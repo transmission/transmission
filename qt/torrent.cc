@@ -586,8 +586,8 @@ Torrent :: update( tr_benc * d )
                 trackerStat.isBackup = b;
             if( tr_bencDictFindInt( child, "lastAnnouncePeerCount", &i ) )
                 trackerStat.lastAnnouncePeerCount = i;
-            if( tr_bencDictFindInt( child, "lastAnnounceResult", &i ) )
-                trackerStat.lastAnnounceResult = i;
+            if( tr_bencDictFindStr( child, "lastAnnounceResult", &str ) )
+                trackerStat.lastAnnounceResult = str;
             if( tr_bencDictFindInt( child, "lastAnnounceStartTime", &i ) )
                 trackerStat.lastAnnounceStartTime = i;
             if( tr_bencDictFindBool( child, "lastAnnounceSucceeded", &b ) )

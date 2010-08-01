@@ -15,6 +15,7 @@
 #include <iostream>
 
 #include <QDBusConnection>
+#include <QDBusConnectionInterface>
 #include <QDBusError>
 #include <QDBusMessage>
 #include <QDialogButtonBox>
@@ -167,6 +168,7 @@ MyApp :: MyApp( int& argc, char ** argv ):
     connect( mySession, SIGNAL(sourceChanged()), this, SLOT(onSessionSourceChanged()) );
     // when the model sees a torrent for the first time, ask the session for full info on it
     connect( myModel, SIGNAL(torrentsAdded(QSet<int>)), mySession, SLOT(initTorrents(QSet<int>)) );
+    connect( myModel, SIGNAL(torrentsAdded(QSet<int>)), this, SLOT(torrentsAdded(QSet<int>)) );
 
     mySession->initTorrents( );
     mySession->refreshSessionStats( );
@@ -242,6 +244,13 @@ MyApp :: MyApp( int& argc, char ** argv ):
     if( !bus.registerObject( "/com/transmissionbt/Transmission", this ))
         if(bus.lastError().isValid())
             std::cerr << qPrintable(bus.lastError().message()) << std::endl;
+}
+
+void
+MyApp :: torrentsAdded( QSet<int> torrents )
+{
+    myAddedTorrents += torrents;
+std::cerr << "added count is " << myAddedTorrents.size() << std::endl;
 }
 
 void
@@ -354,10 +363,38 @@ MyApp :: addTorrent( const QString& key )
     raise( );
 }
 
+/***
+****
+***/
+
 void
 MyApp :: raise( )
 {
     QApplication :: alert ( myWindow );
+}
+
+bool
+MyApp :: notify( const QString& title, const QString& body, int timeout_msec ) const
+{
+    const QString dbusServiceName = "org.freedesktop.Notifications";
+    const QString dbusInterfaceName = "org.freedesktop.Notifications";
+    const QString dbusPath = "/org/freedesktop/Notifications";
+
+    QDBusMessage m = QDBusMessage::createMethodCall(dbusServiceName, dbusPath, dbusInterfaceName, "Notify");
+    QList<QVariant> args;
+    args.append( "Transmission" ); // app_name
+    args.append( 0U );             // replaces_id
+    args.append( "transmission" ); // icon
+    args.append( title );          // summary
+    args.append( body );           // body
+    args.append( QStringList( ) ); // actions - unused for plain passive popups
+    args.append( QVariantMap( ) ); // hints - unused atm
+    args.append( int32_t(-1) );    // use the default timeout period
+    m.setArguments( args );
+    QDBusMessage replyMsg = QDBusConnection::sessionBus().call(m);
+    //std::cerr << qPrintable(replyMsg.errorName()) << std::endl;
+    //std::cerr << qPrintable(replyMsg.errorMessage()) << std::endl;
+    return (replyMsg.type() == QDBusMessage::ReplyMessage) && !replyMsg.arguments().isEmpty();
 }
 
 /***
@@ -402,5 +439,6 @@ main( int argc, char * argv[] )
 
     tr_optind = 1;
     MyApp app( argc, argv );
+    app.notify( "hello world", "this is a test" );
     return app.exec( );
 }
