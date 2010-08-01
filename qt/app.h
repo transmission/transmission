@@ -16,8 +16,10 @@
 #include <QApplication>
 #include <QSet>
 #include <QTimer>
+
 #include "favicon.h"
 
+class AddData;
 class Prefs;
 class Session;
 class TorrentModel;
@@ -60,6 +62,7 @@ class MyApp: public QApplication
 
     public slots:
         void addTorrent( const QString& );
+        void addTorrent( const AddData& );
 
     private:
         void maybeUpdateBlocklist( );

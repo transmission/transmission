@@ -117,8 +117,7 @@ void     tr_core_add_list( TrCore *    self,
 
 /** @brief Add a torrent. */
 gboolean tr_core_add_metainfo( TrCore      * core,
-                               const char  * payload,
-                               const char  * optional_filename,
+                               const char  * base64_metainfo,
                                gboolean    * setme_success,
                                GError     ** err );
 

@@ -58,7 +58,7 @@ MakeDialog :: onNewButtonBoxClicked( QAbstractButton * button )
     {
         case QDialogButtonBox::Open:
 std::cerr << "calling mySession.addTorrent( " << qPrintable(myTarget) << ", " << qPrintable(QFileInfo(myBuilder->top).dir().path()) << ')' << std::endl;
-            mySession.addTorrent( myTarget, QFileInfo(myBuilder->top).dir().path() );
+            mySession.addNewlyCreatedTorrent( myTarget, QFileInfo(myBuilder->top).dir().path() );
             break;
         case QDialogButtonBox::Abort:
             myBuilder->abortFlag = true;

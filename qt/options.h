@@ -13,6 +13,8 @@
 #ifndef OPTIONS_DIALOG_H
 #define OPTIONS_DIALOG_H
 
+#include <iostream>
+
 #include <QDialog>
 #include <QEvent>
 #include <QString>
@@ -20,12 +22,14 @@
 #include <QVector>
 #include <QMap>
 #include <QPushButton>
+#include <QString>
 #include <QStringList>
 #include <QCryptographicHash>
 #include <QFile>
 #include <QTimer>
 
-#include "file-tree.h"
+#include "add-data.h" // AddData
+#include "file-tree.h" // FileList
 
 class FileTreeView;
 class Prefs;
@@ -39,21 +43,16 @@ class FileAdded: public QObject
 {
         Q_OBJECT
         const int64_t myTag;
+        QString myName;
         QString myDelFile;
 
     public:
-        FileAdded( int tag, const QString file ): myTag(tag), myDelFile(file) { }
+        FileAdded( int tag, const QString& name ): myTag(tag), myName(name) { }
         ~FileAdded( ) { }
+        void setFileToDelete( const QString& file ) { myDelFile = file; }
 
     public slots:
-        void executed( int64_t tag, const QString& result, struct tr_benc * arguments ) {
-            Q_UNUSED( arguments );
-            if( tag == myTag ) {
-                if( result == "success" )
-                    QFile( myDelFile ).remove( );
-                deleteLater();
-            }
-        }
+        void executed( int64_t tag, const QString& result, struct tr_benc * arguments );
 };
 
 class Options: public QDialog
@@ -61,7 +60,7 @@ class Options: public QDialog
         Q_OBJECT
 
     public:
-        Options( Session& session, const Prefs& prefs, const QString& filename, QWidget * parent = 0 );
+        Options( Session& session, const Prefs& prefs, const AddData& addme, QWidget * parent = 0 );
         ~Options( );
 
     private:
@@ -73,7 +72,7 @@ class Options: public QDialog
 
     private:
         Session& mySession;
-        QString myFile;
+        AddData myAdd;
         QDir myDestination;
         bool myHaveInfo;
         tr_info myInfo;

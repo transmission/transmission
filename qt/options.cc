@@ -13,6 +13,7 @@
 #include <cstdio>
 #include <iostream>
 
+#include <QApplication>
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDialogButtonBox>
@@ -22,6 +23,7 @@
 #include <QFileInfo>
 #include <QGridLayout>
 #include <QLabel>
+#include <QMessageBox>
 #include <QPushButton>
 #include <QResizeEvent>
 #include <QSet>
@@ -32,6 +34,7 @@
 #include <libtransmission/bencode.h>
 #include <libtransmission/utils.h> /* mime64 */
 
+#include "add-data.h"
 #include "file-tree.h"
 #include "hig.h"
 #include "options.h"
@@ -44,10 +47,39 @@
 ****
 ***/
 
-Options :: Options( Session& session, const Prefs& prefs, const QString& filename, QWidget * parent ):
+void
+FileAdded :: executed( int64_t tag, const QString& result, struct tr_benc * arguments )
+{
+    Q_UNUSED( arguments );
+
+    if( tag != myTag )
+        return;
+
+    if( result == "success" )
+        if( !myDelFile.isEmpty( ) )
+            QFile( myDelFile ).remove( );
+
+    if( result != "success" ) {
+        QString text = result;
+        for( int i=0, n=text.size(); i<n; ++i )
+            if( !i || text[i-1].isSpace() )
+                text[i] = text[i].toUpper();
+        QMessageBox::warning( QApplication::activeWindow(),
+                              tr( "Error Adding Torrent" ),
+                              QString("<p><b>%1</b></p><p>%2</p>").arg(text).arg(myName) );
+    }
+
+    deleteLater();
+}
+
+/***
+****
+***/
+
+Options :: Options( Session& session, const Prefs& prefs, const AddData& addme, QWidget * parent ):
     QDialog( parent, Qt::Dialog ),
     mySession( session ),
-    myFile( filename ),
+    myAdd( addme ),
     myHaveInfo( false ),
     myDestinationButton( 0 ),
     myVerifyButton( 0 ),
@@ -168,7 +200,17 @@ Options :: refreshButton( QPushButton * p, const QString& text, int width )
 void
 Options :: refreshFileButton( int width )
 {
-    refreshButton( myFileButton, QFileInfo(myFile).baseName(), width );
+    QString text;
+
+    switch( myAdd.type )
+    {
+        case AddData::FILENAME: text = QFileInfo(myAdd.filename).baseName(); break;
+        case AddData::URL:      text = myAdd.url.toString(); break;
+        case AddData::MAGNET:   text = myAdd.magnet; break;
+        default:                break;
+    }
+
+    refreshButton( myFileButton, text, width );
 }
 
 void
@@ -215,10 +257,13 @@ Options :: reload( )
     clearVerify( );
 
     tr_ctor * ctor = tr_ctorNew( 0 );
-    if( Utils::isMagnetLink( myFile ) )
-        tr_ctorSetMetainfoFromMagnetLink( ctor, myFile.toUtf8().constData() );
-    else
-        tr_ctorSetMetainfoFromFile( ctor, myFile.toUtf8().constData() );
+
+    switch( myAdd.type ) {
+        case AddData::MAGNET:   tr_ctorSetMetainfoFromMagnetLink( ctor, myAdd.magnet.toUtf8().constData() ); break;
+        case AddData::FILENAME: tr_ctorSetMetainfoFromFile( ctor, myAdd.filename.toUtf8().constData() ); break;
+        case AddData::METAINFO: tr_ctorSetMetainfo( ctor, (const uint8_t*)myAdd.metainfo.constData(), myAdd.metainfo.size() ); break;
+        default: break;
+    }
 
     const int err = tr_torrentParse( ctor, &myInfo );
     myHaveInfo = !err;
@@ -280,17 +325,25 @@ Options :: onAccepted( )
         tr_bencDictAddStr( args, "download-dir", myDestination.absolutePath().toUtf8().constData() );
 
     // "metainfo"
-    if( Utils::isMagnetLink( myFile ) || Utils::isURL( myFile ) )
-        tr_bencDictAddStr( args, "filename", myFile.toUtf8().constData() );
-    else {
-        QFile file( myFile );
-        file.open( QIODevice::ReadOnly );
-        const QByteArray metainfo( file.readAll( ) );
-        file.close( );
-        int base64Size = 0;
-        char * base64 = tr_base64_encode( metainfo.constData(), metainfo.size(), &base64Size );
-        tr_bencDictAddRaw( args, "metainfo", base64, base64Size );
-        tr_free( base64 );
+    switch( myAdd.type )
+    {
+        case AddData::MAGNET:
+            tr_bencDictAddStr( args, "filename", myAdd.magnet.toUtf8().constData() );
+            break;
+
+        case AddData::URL:
+            tr_bencDictAddStr( args, "filename", myAdd.url.toString().toUtf8().constData() );
+            break;
+
+        case AddData::FILENAME:
+        case AddData::METAINFO: {
+            const QByteArray b64 = myAdd.toBase64( );
+            tr_bencDictAddRaw( args, "metainfo", b64.constData(), b64.size() );
+            break;
+        }
+
+        default:
+            std::cerr << "unhandled AddData.type: " << myAdd.type << std::endl;
     }
 
     // paused
@@ -329,11 +382,11 @@ Options :: onAccepted( )
     }
 
     // maybe delete the source .torrent
-    if( myTrashCheck->isChecked( ) ) {
-        FileAdded * fileAdded = new FileAdded( tag, myFile );
-        connect( &mySession, SIGNAL(executed(int64_t,const QString&, struct tr_benc*)),
-                 fileAdded, SLOT(executed(int64_t,const QString&, struct tr_benc*)));
-    }
+    FileAdded * fileAdded = new FileAdded( tag, myAdd.readableName() );
+    if( myTrashCheck->isChecked( ) && ( myAdd.type==AddData::FILENAME ) )
+        fileAdded->setFileToDelete( myAdd.filename );
+    connect( &mySession, SIGNAL(executed(int64_t,const QString&, struct tr_benc*)),
+             fileAdded, SLOT(executed(int64_t,const QString&, struct tr_benc*)));
 
 //std::cerr << tr_bencToStr(&top,TR_FMT_JSON,NULL) << std::endl;
     mySession.exec( &top );
@@ -345,13 +398,16 @@ Options :: onAccepted( )
 void
 Options :: onFilenameClicked( )
 {
-    QFileDialog * d = new QFileDialog( this,
-                                       tr( "Add Torrent" ),
-                                       QFileInfo(myFile).absolutePath(),
-                                       tr( "Torrent Files (*.torrent);;All Files (*.*)" ) );
-    d->setFileMode( QFileDialog::ExistingFile );
-    connect( d, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onFilesSelected(const QStringList&)) );
-    d->show( );
+    if( myAdd.type == AddData::FILENAME )
+    {
+        QFileDialog * d = new QFileDialog( this,
+                                           tr( "Add Torrent" ),
+                                           QFileInfo(myAdd.filename).absolutePath(),
+                                           tr( "Torrent Files (*.torrent);;All Files (*.*)" ) );
+        d->setFileMode( QFileDialog::ExistingFile );
+        connect( d, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onFilesSelected(const QStringList&)) );
+        d->show( );
+    }
 }
 
 void
@@ -359,7 +415,7 @@ Options :: onFilesSelected( const QStringList& files )
 {
     if( files.size() == 1 )
     {
-        myFile = files.at( 0 );
+        myAdd.set( files.at(0) );
         refreshFileButton( );
         reload( );
     }

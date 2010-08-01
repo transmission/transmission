@@ -586,7 +586,6 @@ gtr_dbus_add_torrent( const char * filename )
         if( proxy )
             dbus_g_proxy_call( proxy, "AddMetainfo", &err,
                                G_TYPE_STRING, payload,
-                               G_TYPE_STRING, filename,
                                G_TYPE_INVALID,
                                G_TYPE_BOOLEAN, &handled,
                                G_TYPE_INVALID );

@@ -31,7 +31,7 @@ class TrDBusAdaptor: public QDBusAbstractAdaptor
 
   public slots:
     bool PresentWindow();
-    bool AddMetainfo( const QString& payload, const QString& filename );
+    bool AddMetainfo( const QString& );
 };
 
 #endif

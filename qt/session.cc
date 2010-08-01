@@ -33,6 +33,7 @@
 #include <libtransmission/utils.h> /* tr_free */
 #include <libtransmission/version.h> /* LONG_VERSION */
 
+#include "add-data.h"
 #include "prefs.h"
 #include "qticonloader.h"
 #include "session.h"
@@ -925,54 +926,38 @@ Session :: setBlocklistSize( int64_t i )
 }
 
 void
-Session :: addTorrent( QString filename )
+Session :: addTorrent( const AddData& addMe )
 {
-    addTorrent( filename, myPrefs.getString( Prefs::DOWNLOAD_DIR ) );
-}
+    const QByteArray b64 = addMe.toBase64();
 
-namespace
-{
-    bool isLink( const QString& str )
-    {
-        return Utils::isMagnetLink(str) || Utils::isURL(str);
+    tr_benc top, *args;
+    tr_bencInitDict( &top, 2 );
+    tr_bencDictAddStr( &top, "method", "torrent-add" );
+    args = tr_bencDictAddDict( &top, "arguments", 2 );
+    tr_bencDictAddBool( args, "paused", !myPrefs.getBool( Prefs::START ) );
+    switch( addMe.type ) {
+        case AddData::MAGNET:   tr_bencDictAddStr( args, "filename", addMe.magnet.toUtf8().constData() ); break;
+        case AddData::URL:      tr_bencDictAddStr( args, "filename", addMe.url.toString().toUtf8().constData() ); break;
+        case AddData::FILENAME: /* fall-through */
+        case AddData::METAINFO: tr_bencDictAddRaw( args, "metainfo", b64.constData(), b64.size() ); break;
+        default: std::cerr << "Unhandled AddData type: " << addMe.type << std::endl;
     }
+    exec( &top );
+    tr_bencFree( &top );
 }
 
 void
-Session :: addTorrent( QString key, QString localPath )
+Session :: addNewlyCreatedTorrent( const QString& filename, const QString& localPath )
 {
+    const QByteArray b64 = AddData(filename).toBase64();
+
     tr_benc top, *args;
     tr_bencInitDict( &top, 2 );
     tr_bencDictAddStr( &top, "method", "torrent-add" );
     args = tr_bencDictAddDict( &top, "arguments", 3 );
     tr_bencDictAddStr( args, "download-dir", qPrintable(localPath) );
     tr_bencDictAddBool( args, "paused", !myPrefs.getBool( Prefs::START ) );
-
-    // figure out what to do with "key"....
-    bool keyHandled = false;
-    if( !keyHandled && isLink( key  )) {
-        tr_bencDictAddStr( args, "filename", key.toUtf8().constData() );
-        keyHandled = true; // it's a URL or magnet link...
-    }
-    if( !keyHandled ) {
-        QFile file( key );
-        file.open( QIODevice::ReadOnly );
-        const QByteArray raw( file.readAll( ) );
-        file.close( );
-        if( !raw.isEmpty( ) ) {
-            int b64len = 0;
-            char * b64 = tr_base64_encode( raw.constData(), raw.size(), &b64len );
-            tr_bencDictAddRaw( args, "metainfo", b64, b64len  );
-            tr_free( b64 );
-            keyHandled = true; // it's a local file...
-        }
-    }
-    if( !keyHandled ) {
-        const QByteArray tmp = key.toUtf8();
-        tr_bencDictAddRaw( args, "metainfo", tmp.constData(), tmp.length() );
-        keyHandled = true; // treat it as base64
-    }
-
+    tr_bencDictAddRaw( args, "metainfo", b64.constData(), b64.size() );
     exec( &top );
     tr_bencFree( &top );
 }

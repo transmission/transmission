@@ -30,6 +30,7 @@
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
 
+#include "add-data.h"
 #include "app.h"
 #include "dbus-adaptor.h"
 #include "formatter.h"
@@ -238,12 +239,10 @@ MyApp :: MyApp( int& argc, char ** argv ):
     // register as the dbus handler for Transmission
     new TrDBusAdaptor( this );
     QDBusConnection bus = QDBusConnection::sessionBus();
-    if (!bus.registerService("com.transmissionbt.Transmission"))
-        if(bus.lastError().isValid())
-            std::cerr << qPrintable(bus.lastError().message()) << std::endl;
-    if( !bus.registerObject( "/com/transmissionbt/Transmission", this ))
-        if(bus.lastError().isValid())
-            std::cerr << qPrintable(bus.lastError().message()) << std::endl;
+    if( !bus.registerService( DBUS_SERVICE ) )
+        std::cerr << "couldn't register " << DBUS_SERVICE << std::endl;
+    if( !bus.registerObject( DBUS_OBJECT_PATH, this ) )
+        std::cerr << "couldn't register " << DBUS_OBJECT_PATH << std::endl;
 }
 
 void
@@ -367,18 +366,27 @@ MyApp :: refreshTorrents( )
 void
 MyApp :: addTorrent( const QString& key )
 {
+    const AddData addme( key );
+
+    if( addme.type != addme.NONE )
+        addTorrent( addme );
+}
+
+void
+MyApp :: addTorrent( const AddData& addme )
+{
     if( !myPrefs->getBool( Prefs :: OPTIONS_PROMPT ) )
     {
-        mySession->addTorrent( key );
+        mySession->addTorrent( addme );
     }
-    else if( Utils::isMagnetLink( key ) || QFile( key ).exists( ) )
+    else if( addme.type == addme.URL )
     {
-        Options * o = new Options( *mySession, *myPrefs, key, myWindow );
+        myWindow->openURL( addme.url.toString( ) );
+    }
+    else
+    {
+        Options * o = new Options( *mySession, *myPrefs, addme, myWindow );
         o->show( );
-    }
-    else if( Utils::isURL( key ) )
-    {
-        myWindow->openURL( key );
     }
 
     raise( );
@@ -440,17 +448,17 @@ main( int argc, char * argv[] )
     QDBusConnection bus = QDBusConnection::sessionBus();
     for( int i=0, n=addme.size(); i<n; ++i )
     {
-        const QString key = addme[i];
-
         QDBusMessage request = QDBusMessage::createMethodCall( DBUS_SERVICE,
                                                                DBUS_OBJECT_PATH,
                                                                DBUS_INTERFACE,
                                                                "AddMetainfo" );
         QList<QVariant> arguments;
-        arguments.push_back( QVariant( key ) );
+        arguments.push_back( AddData(addme[i]).toBase64().constData() );
         request.setArguments( arguments );
 
         QDBusMessage response = bus.call( request );
+        //std::cerr << qPrintable(response.errorName()) << std::endl;
+        //std::cerr << qPrintable(response.errorMessage()) << std::endl;
         arguments = response.arguments( );
         delegated |= (arguments.size()==1) && arguments[0].toBool();
     }

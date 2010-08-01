@@ -23,6 +23,8 @@
 
 class QStringList;
 
+class AddData;
+
 #include <libtransmission/transmission.h>
 
 extern "C"
@@ -112,8 +114,8 @@ class Session: public QObject
         void refreshActiveTorrents( );
         void refreshAllTorrents( );
         void initTorrents( const QSet<int>& ids = QSet<int>() );
-        void addTorrent( QString filename );
-        void addTorrent( QString filename, QString localPath );
+        void addNewlyCreatedTorrent( const QString& filename, const QString& localPath );
+        void addTorrent( const AddData& addme );
         void removeTorrents( const QSet<int>& torrentIds, bool deleteFiles=false );
         void verifyTorrents( const QSet<int>& torrentIds );
         void reannounceTorrents( const QSet<int>& torrentIds );
