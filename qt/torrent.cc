@@ -33,6 +33,7 @@
 
 
 Torrent :: Torrent( Prefs& prefs, int id ):
+    magnetTorrent( false ),
     myPrefs( prefs )
 {
     for( int i=0; i<PROPERTY_COUNT; ++i )
