@@ -57,7 +57,7 @@ void
 PrefsDialog :: checkBoxToggled( bool checked )
 {
     const int key( sender( )->property( PREF_KEY ).toInt( ) );
-    myPrefs.set( key, checked );
+    setPref( key, checked );
 }
 
 QCheckBox *
@@ -86,9 +86,9 @@ PrefsDialog :: spinBoxChangedIdle( )
 
     const QDoubleSpinBox * d = qobject_cast<const QDoubleSpinBox*>( spin );
     if( d != 0 )
-        myPrefs.set( key, d->value( ) );
+        setPref( key, d->value( ) );
     else
-        myPrefs.set( key, qobject_cast<const QSpinBox*>(spin)->value( ) );
+        setPref( key, qobject_cast<const QSpinBox*>(spin)->value( ) );
 }
 
 void
@@ -152,7 +152,7 @@ PrefsDialog :: timeChanged( const QTime& time )
 {
     const int key( sender()->property( PREF_KEY ).toInt( ) );
     const int seconds( QTime().secsTo( time ) );
-    myPrefs.set( key, seconds / 60 );
+    setPref( key, seconds / 60 );
 }
 
 QTimeEdit*
@@ -172,7 +172,7 @@ void
 PrefsDialog :: textChanged( const QString& text )
 {
     const int key( sender()->property( PREF_KEY ).toInt( ) );
-    myPrefs.set( key, text );
+    setPref( key, text );
 }
 
 QLineEdit*
@@ -255,7 +255,7 @@ void
 PrefsDialog :: altSpeedDaysEdited( int i )
 {
     const int value = qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
-    myPrefs.set( Prefs::ALT_SPEED_LIMIT_TIME_DAY, value );
+    setPref( Prefs::ALT_SPEED_LIMIT_TIME_DAY, value );
 }
 
 
@@ -458,7 +458,7 @@ void
 PrefsDialog :: encryptionEdited( int i )
 {
     const int value( qobject_cast<QComboBox*>(sender())->itemData(i).toInt( ) );
-    myPrefs.set( Prefs::ENCRYPTION, value );
+    setPref( Prefs::ENCRYPTION, value );
 }
 
 QWidget *
@@ -552,8 +552,7 @@ PrefsDialog :: onDestinationClicked( void )
 void
 PrefsDialog :: onLocationSelected( const QString& path, int key )
 {
-    myPrefs.set( key, path );
-    updatePref( key );
+    setPref( key, path );
 }
 
 QWidget *
@@ -668,7 +667,7 @@ PrefsDialog :: PrefsDialog( Session& session, Prefs& prefs, QWidget * parent ):
          << Prefs :: INCOMPLETE_DIR
          << Prefs :: INCOMPLETE_DIR_ENABLED;
     foreach( int key, keys )
-        updatePref( key );
+        refreshPref( key );
 
     // if it's a remote session, disable the preferences
     // that don't work in remote sessions
@@ -682,6 +681,13 @@ PrefsDialog :: PrefsDialog( Session& session, Prefs& prefs, QWidget * parent ):
 
 PrefsDialog :: ~PrefsDialog( )
 {
+}
+
+void
+PrefsDialog :: setPref( int key, const QVariant& v )
+{
+    myPrefs.set( key, v );
+    refreshPref( key );
 }
 
 /***
@@ -706,7 +712,7 @@ PrefsDialog :: updateBlocklistCheckBox( )
 }
 
 void
-PrefsDialog :: updatePref( int key )
+PrefsDialog :: refreshPref( int key )
 {
     switch( key )
     {

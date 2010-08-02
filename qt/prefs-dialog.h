@@ -46,7 +46,7 @@ class PrefsDialog: public QDialog
         void spinBoxChangedIdle( );
         void timeChanged( const QTime& );
         void textChanged( const QString& );
-        void updatePref( int key );
+        void refreshPref( int key );
         void encryptionEdited( int );
         void altSpeedDaysEdited( int );
         void sessionUpdated( );
@@ -77,6 +77,7 @@ class PrefsDialog: public QDialog
         ~PrefsDialog( );
 
     private:
+        void setPref( int key, const QVariant& v );
         bool isAllowed( int key ) const;
         QWidget * createTorrentsTab( );
         QWidget * createSpeedTab( );
