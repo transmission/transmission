@@ -55,7 +55,7 @@ AboutDialog :: AboutDialog( QWidget * parent ):
     l->setAlignment( Qt::AlignCenter );
     v->addWidget( l );
 
-    l = new QLabel( tr( "Copyright 2005-2009 The Transmission Project" ) );
+    l = new QLabel( tr( "Copyright (c) The Transmission Project" ) );
     l->setAlignment( Qt::AlignCenter );
     v->addWidget( l );
 

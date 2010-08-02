@@ -526,7 +526,7 @@ options_page_new( struct DetailsImpl * d )
     gtk_entry_set_width_chars( GTK_ENTRY( w ), 7 );
     d->ratio_spin_tag = g_signal_connect( w, "value-changed", G_CALLBACK( ratio_spun_cb ), d );
     gtk_box_pack_start( GTK_BOX( h ), w, FALSE, FALSE, 0 );
-    hig_workarea_add_row( t, &row, _( "Ratio:" ), h, NULL );
+    hig_workarea_add_row( t, &row, _( "_Ratio:" ), h, NULL );
 
     h = gtk_hbox_new( FALSE, GUI_PAD );
     w = d->idle_combo = idle_combo_new( );
