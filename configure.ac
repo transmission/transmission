@@ -474,7 +474,7 @@ AC_CONFIG_FILES([Makefile
                  transmission.spec
                  cli/Makefile
                  daemon/Makefile
-                 doc/Makefile
+                 extras/Makefile
                  libtransmission/Makefile
                  utils/Makefile
                  third-party/Makefile
