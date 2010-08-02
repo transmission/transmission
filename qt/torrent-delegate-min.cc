@@ -56,20 +56,20 @@ TorrentDelegateMin :: sizeHint( const QStyleOptionViewItem& option, const Torren
     const QFontMetrics nameFM( nameFont );
     const bool isMagnet( !tor.hasMetadata( ) );
     const QString nameStr = (isMagnet ? progressString( tor ) : tor.name( ) );
-    const QSize nameSize( nameFM.size( 0, nameStr ) );
+    const int nameWidth = nameFM.width( nameStr );
 
     QFont statusFont( option.font );
     statusFont.setPointSize( int( option.font.pointSize( ) * 0.85 ) );
     const QFontMetrics statusFM( statusFont );
     const QString statusStr( shortStatusString( tor ) );
-    const QSize statusSize( statusFM.size( 0, statusStr ) );
+    const int statusWidth = statusFM.width( statusStr );
 
     const QSize m( margin( *style ) );
 
-    return QSize( m.width()*2 + iconSize + GUI_PAD + nameSize.width()
-                                         + GUI_PAD + statusSize.width()
+    return QSize( m.width()*2 + iconSize + GUI_PAD + nameWidth
+                                         + GUI_PAD + statusWidth
                                          + GUI_PAD + BAR_WIDTH,
-                  m.height()*2 + std::max( nameSize.height(), (int)BAR_HEIGHT ) );
+                  m.height()*2 + std::max( nameFM.height(), (int)BAR_HEIGHT ) );
 }
 
 void
@@ -83,7 +83,6 @@ TorrentDelegateMin :: drawTorrent( QPainter * painter, const QStyleOptionViewIte
     const QFontMetrics nameFM( nameFont );
     const bool isMagnet( !tor.hasMetadata( ) );
     const QString nameStr = (isMagnet ? progressString( tor ) : tor.name( ) );
-    const QSize nameSize( nameFM.size( 0, nameStr ) );
 
     QFont statusFont( option.font );
     statusFont.setPointSize( int( option.font.pointSize( ) * 0.85 ) );

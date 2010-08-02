@@ -12,18 +12,9 @@
 
 #include <iostream>
 
-#include <QApplication>
-#include <QBrush>
-#include <QFont>
-#include <QFontMetrics>
-#include <QIcon>
-#include <QModelIndex>
 #include <QPainter>
 #include <QPixmap>
-#include <QPixmapCache>
-#include <QStyleOptionProgressBarV2>
 #include <QTextDocument>
-#include <QUrl>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>

@@ -278,18 +278,18 @@ TorrentDelegate :: sizeHint( const QStyleOptionViewItem& option, const Torrent& 
     nameFont.setWeight( QFont::Bold );
     const QFontMetrics nameFM( nameFont );
     const QString nameStr( tor.name( ) );
-    const QSize nameSize( nameFM.size( 0, nameStr ) );
+    const int nameWidth = nameFM.width( nameStr );
     QFont statusFont( option.font );
     statusFont.setPointSize( int( option.font.pointSize( ) * 0.9 ) );
     const QFontMetrics statusFM( statusFont );
     const QString statusStr( statusString( tor ) );
-    const QSize statusSize( statusFM.size( 0, statusStr ) );
+    const int statusWidth = statusFM.width( statusStr );
     QFont progressFont( statusFont );
     const QFontMetrics progressFM( progressFont );
     const QString progressStr( progressString( tor ) );
-    const QSize progressSize( progressFM.size( 0, progressStr ) );
+    const int progressWidth = progressFM.width( progressStr );
     const QSize m( margin( *style ) );
-    return QSize( m.width()*2 + iconSize + GUI_PAD + MAX3( nameSize.width(), statusSize.width(), progressSize.width() ),
+    return QSize( m.width()*2 + iconSize + GUI_PAD + MAX3( nameWidth, statusWidth, progressWidth ),
                   //m.height()*3 + nameFM.lineSpacing() + statusFM.lineSpacing()*2 + progressFM.lineSpacing() );
                   m.height()*3 + nameFM.lineSpacing() + statusFM.lineSpacing() + BAR_HEIGHT + progressFM.lineSpacing() );
 }
