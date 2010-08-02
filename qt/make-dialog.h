@@ -44,10 +44,15 @@ class MakeDialog: public QDialog
         void onProgress( );
 
         void onFolderClicked( );
+        void onFolderSelected( const QString& );
         void onFolderSelected( const QStringList& );
+
         void onFileClicked( );
+        void onFileSelected( const QString& );
         void onFileSelected( const QStringList& );
+
         void onDestinationClicked( );
+        void onDestinationSelected( const QString& );
         void onDestinationSelected( const QStringList& );
 
     private:
@@ -79,6 +84,10 @@ class MakeDialog: public QDialog
         QDialogButtonBox * myNewButtonBox;
         QDialog * myNewDialog;
         struct tr_metainfo_builder * myBuilder;
+
+    protected:
+        virtual void dragEnterEvent( QDragEnterEvent * );
+        virtual void dropEvent( QDropEvent * );
 
     public:
         MakeDialog( Session&, QWidget * parent = 0 );

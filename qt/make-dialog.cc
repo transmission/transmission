@@ -177,12 +177,15 @@ MakeDialog :: onFileClicked( )
 void
 MakeDialog :: onFileSelected( const QStringList& list )
 {
-    if( list.size() == 1 )
-    {
-        myFile = list.first( );
-        myFileButton->setText( QFileInfo(myFile).fileName() );
-        onSourceChanged( );
-    }
+    if( !list.empty( ) )
+        onFileSelected( list.front( ) );
+}
+void
+MakeDialog :: onFileSelected( const QString& filename )
+{
+    myFile = filename;
+    myFileButton->setText( QFileInfo(myFile).fileName() );
+    onSourceChanged( );
 }
 
 void
@@ -197,12 +200,15 @@ MakeDialog :: onFolderClicked( )
 void
 MakeDialog :: onFolderSelected( const QStringList& list )
 {
-    if( list.size() == 1 )
-    {
-        myFolder = list.first();
-        myFolderButton->setText( QFileInfo(myFolder).fileName() );
-        onSourceChanged( );
-    }
+    if( !list.empty( ) )
+        onFolderSelected( list.front( ) );
+}
+void
+MakeDialog :: onFolderSelected( const QString& filename )
+{
+    myFolder = filename;
+    myFolderButton->setText( QFileInfo(myFolder).fileName() );
+    onSourceChanged( );
 }
 
 void
@@ -217,11 +223,14 @@ MakeDialog :: onDestinationClicked( )
 void
 MakeDialog :: onDestinationSelected( const QStringList& list )
 {
-    if( list.size() == 1 )
-    {
-        myDestination = list.first( );
-        myDestinationButton->setText( QFileInfo(myDestination).fileName() );
-    }
+    if( !list.empty( ) )
+        onDestinationSelected( list.front() );
+}
+void
+MakeDialog :: onDestinationSelected( const QString& filename )
+{
+    myDestination = filename;
+    myDestinationButton->setText( QFileInfo(myDestination).fileName() );
 }
 
 void
@@ -306,6 +315,8 @@ MakeDialog :: MakeDialog( Session & session, QWidget * parent ):
     mySession( session ),
     myBuilder( 0 )
 {
+    setAcceptDrops( true );
+
     connect( &myTimer, SIGNAL(timeout()), this, SLOT(onProgress()) );
 
     setWindowTitle( tr( "New Torrent" ) );
@@ -395,4 +406,38 @@ MakeDialog :: ~MakeDialog( )
 {
     if( myBuilder )
         tr_metaInfoBuilderFree( myBuilder );
+}
+
+/***
+****
+***/
+
+void
+MakeDialog :: dragEnterEvent( QDragEnterEvent * event )
+{
+    const QMimeData * mime = event->mimeData( );
+
+    if( mime->urls().size() && QFile(mime->urls().front().path()).exists( ) )
+        event->acceptProposedAction();
+}
+
+void
+MakeDialog :: dropEvent( QDropEvent * event )
+{
+    const QString filename = event->mimeData()->urls().front().path();
+    const QFileInfo fileInfo( filename );
+
+    if( fileInfo.exists( ) )
+    {
+        if( fileInfo.isDir( ) )
+        {
+            myFolderRadio->setChecked( true );
+            onFolderSelected( filename  );
+        }
+        else // it's a file
+        {
+            myFileRadio->setChecked( true );
+            onFileSelected( filename );
+        }
+    }
 }
