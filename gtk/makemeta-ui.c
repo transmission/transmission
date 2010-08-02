@@ -381,14 +381,15 @@ getDefaultSavePath( void )
 
 static void
 on_drag_data_received( GtkWidget         * widget           UNUSED,
-                       GdkDragContext    * drag_context     UNUSED,
+                       GdkDragContext    * drag_context,
                        gint                x                UNUSED,
                        gint                y                UNUSED,
                        GtkSelectionData  * selection_data,
                        guint               info             UNUSED,
-                       guint               time             UNUSED,
+                       guint               time_,
                        gpointer            user_data )
 {
+    gboolean success = FALSE;
     MakeMetaUI * ui = user_data;
     char ** uris = gtk_selection_data_get_uris( selection_data );
 
@@ -402,18 +403,21 @@ on_drag_data_received( GtkWidget         * widget           UNUSED,
             /* a directory was dragged onto the dialog... */
             gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( ui->folder_radio ), TRUE );
             gtk_file_chooser_set_current_folder( GTK_FILE_CHOOSER( ui->folder_chooser ), filename );
+            success = TRUE;
         }
         else if( g_file_test( filename, G_FILE_TEST_IS_REGULAR ) )
         {
             /* a file was dragged on to the dialog... */
             gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( ui->file_radio ), TRUE );
             gtk_file_chooser_set_filename( GTK_FILE_CHOOSER( ui->file_chooser ), filename );
+            success = TRUE;
         }
 
         g_free( filename );
     }
 
     g_strfreev( uris );
+    gtk_drag_finish( drag_context, success, FALSE, time_ );
 }
 
 GtkWidget*

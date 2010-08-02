@@ -91,19 +91,6 @@ gboolean gtr_is_magnet_link( const char * str );
 
 gboolean gtr_is_hex_hashcode( const char * str );
 
-
-/* create a copy of a GSList of strings, this dups the actual strings too */
-GSList * dupstrlist( GSList * list );
-
-/* joins a GSList of strings into one string using an optional separator */
-char * joinstrlist( GSList *list, char *  sep );
-
-/* free a GSList of strings */
-void freestrlist( GSList *list );
-
-/* decodes a string that has been urlencoded */
-char * decode_uri( const char * uri );
-
 /***
 ****
 ***/

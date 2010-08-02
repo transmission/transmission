@@ -200,18 +200,6 @@ static void           winsetup( struct cbdata * cbdata,
 
 static void           wannaquit( gpointer vdata );
 
-static void           setupdrag( GtkWidget *    widget,
-                                 struct cbdata *data );
-
-static void           gotdrag( GtkWidget *       widget,
-                               GdkDragContext *  dc,
-                               gint              x,
-                               gint              y,
-                               GtkSelectionData *sel,
-                               guint             info,
-                               guint             time,
-                               gpointer          gdata );
-
 static void coreerr( TrCore *, guint, const char *, struct cbdata * );
 
 static void           onAddTorrent( TrCore *,
@@ -862,10 +850,54 @@ rowChangedCB( GtkTreeModel  * model UNUSED,
 }
 
 static void
-winsetup( struct cbdata * cbdata,
-          TrWindow *      wind )
+on_drag_data_received( GtkWidget         * widget          UNUSED,
+                       GdkDragContext    * drag_context,
+                       gint                x               UNUSED,
+                       gint                y               UNUSED,
+                       GtkSelectionData  * selection_data,
+                       guint               info            UNUSED,
+                       guint               time_,
+                       gpointer            gdata )
 {
-    GtkTreeModel *     model;
+    int i;
+    gboolean success = FALSE;
+    GSList * filenames = NULL;
+    struct cbdata * data = gdata;
+    char ** uris = gtk_selection_data_get_uris( selection_data );
+
+    /* try to add the filename URIs... */
+    for( i=0; uris && uris[i]; ++i )
+    {
+        const char * uri = uris[i];
+        char * filename = g_filename_from_uri( uri, NULL, NULL );
+
+        if( filename && g_file_test( filename, G_FILE_TEST_EXISTS ) )
+        {
+            filenames = g_slist_append( filenames, g_strdup( filename ) );
+            success = TRUE;
+        }
+        else if( tr_urlIsValid( uri ) )
+        {
+            tr_core_add_from_url( data->core, uri );
+            success = TRUE;
+        }
+    }
+
+    if( filenames )
+        tr_core_add_list_defaults( data->core, g_slist_reverse( filenames ), TRUE );
+
+    tr_core_torrents_added( data->core );
+    gtk_drag_finish( drag_context, success, FALSE, time_ );
+
+    /* cleanup */
+    g_strfreev( uris );
+}
+
+static void
+winsetup( struct cbdata * cbdata, TrWindow * wind )
+{
+    GtkWidget * w;
+    GtkTreeModel * model;
     GtkTreeSelection * sel;
 
     g_assert( NULL == cbdata->wind );
@@ -879,7 +911,11 @@ winsetup( struct cbdata * cbdata,
     g_signal_connect( wind, "delete-event", G_CALLBACK( winclose ), cbdata );
     refreshActions( cbdata );
 
-    setupdrag( GTK_WIDGET( wind ), cbdata );
+    /* register to handle URIs that get dragged onto our main window */
+    w = GTK_WIDGET( wind );
+    gtk_drag_dest_set( w, GTK_DEST_DEFAULT_ALL, NULL, 0, GDK_ACTION_COPY );
+    gtk_drag_dest_add_uri_targets( w );
+    g_signal_connect( w, "drag-data-received", G_CALLBACK(on_drag_data_received), cbdata );
 }
 
 static gboolean
@@ -993,103 +1029,6 @@ wannaquit( gpointer vdata )
 
     /* shut down libT */
     g_thread_create( sessionCloseThreadFunc, vdata, TRUE, NULL );
-}
-
-static void
-gotdrag( GtkWidget         * widget UNUSED,
-         GdkDragContext *           dc,
-         gint                x      UNUSED,
-         gint                y      UNUSED,
-         GtkSelectionData *         sel,
-         guint               info   UNUSED,
-         guint                      time,
-         gpointer                   gdata )
-{
-    struct cbdata * data = gdata;
-    GSList *        paths = NULL;
-    GSList *        freeme = NULL;
-
-#if 0
-    int             i;
-    char *          sele = gdk_atom_name( sel->selection );
-    char *          targ = gdk_atom_name( sel->target );
-    char *          type = gdk_atom_name( sel->type );
-
-    g_message( "dropped file: sel=%s targ=%s type=%s fmt=%i len=%i",
-               sele, targ, type, sel->format, sel->length );
-    g_free( sele );
-    g_free( targ );
-    g_free( type );
-    if( sel->format == 8 )
-    {
-        for( i = 0; i < sel->length; ++i )
-            fprintf( stderr, "%02X ", sel->data[i] );
-        fprintf( stderr, "\n" );
-    }
-#endif
-
-    if( ( sel->format == 8 )
-      && ( sel->selection == gdk_atom_intern( "XdndSelection", FALSE ) ) )
-    {
-        int      i;
-        char *   str = g_strndup( (char*)sel->data, sel->length );
-        gchar ** files = g_strsplit_set( str, "\r\n", -1 );
-        for( i = 0; files && files[i]; ++i )
-        {
-            char * filename;
-            if( !*files[i] ) /* empty filename... */
-                continue;
-
-            /* decode the filename */
-            filename = decode_uri( files[i] );
-            freeme = g_slist_prepend( freeme, filename );
-            if( !g_utf8_validate( filename, -1, NULL ) )
-                continue;
-
-            /* walk past "file://", if present */
-            if( g_str_has_prefix( filename, "file:" ) ) {
-                filename += 5;
-                while( g_str_has_prefix( filename, "//" ) )
-                    ++filename;
-            }
-
-            if( g_file_test( filename, G_FILE_TEST_EXISTS ) )
-                paths = g_slist_prepend( paths, g_strdup( filename ) );
-            else
-                tr_core_add_from_url( data->core, filename );
-        }
-
-        /* try to add any torrents we found */
-        if( paths )
-        {
-            paths = g_slist_reverse( paths );
-            tr_core_add_list_defaults( data->core, paths, TRUE );
-            tr_core_torrents_added( data->core );
-        }
-
-        freestrlist( freeme );
-        g_strfreev( files );
-        g_free( str );
-    }
-
-    gtk_drag_finish( dc, ( NULL != paths ), FALSE, time );
-}
-
-static void
-setupdrag( GtkWidget *    widget,
-           struct cbdata *data )
-{
-    GtkTargetEntry targets[] = {
-        { (char*)"STRING",          0, 0 },
-        { (char*)"text/plain",      0, 0 },
-        { (char*)"text/uri-list",   0, 0 },
-    };
-
-    g_signal_connect( widget, "drag_data_received", G_CALLBACK(
-                          gotdrag ), data );
-
-    gtk_drag_dest_set( widget, GTK_DEST_DEFAULT_ALL, targets,
-                       G_N_ELEMENTS( targets ), GDK_ACTION_COPY | GDK_ACTION_MOVE );
 }
 
 static void

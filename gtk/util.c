@@ -252,69 +252,6 @@ gtr_mkdir_with_parents( const char * path, int mode )
 #endif
 }
 
-GSList *
-dupstrlist( GSList * l )
-{
-    GSList * ret = NULL;
-
-    for( ; l != NULL; l = l->next )
-        ret = g_slist_prepend( ret, g_strdup( l->data ) );
-    return g_slist_reverse( ret );
-}
-
-char *
-joinstrlist( GSList *list,
-             char *  sep )
-{
-    GSList * l;
-    GString *gstr = g_string_new ( NULL );
-
-    for( l = list; l != NULL; l = l->next )
-    {
-        g_string_append ( gstr, (char*)l->data );
-        if( l->next != NULL )
-            g_string_append ( gstr, ( sep ) );
-    }
-    return g_string_free ( gstr, FALSE );
-}
-
-void
-freestrlist( GSList *list )
-{
-    g_slist_foreach ( list, (GFunc)g_free, NULL );
-    g_slist_free ( list );
-}
-
-char *
-decode_uri( const char * uri )
-{
-    gboolean in_query = FALSE;
-    char *   ret = g_new( char, strlen( uri ) + 1 );
-    char *   out = ret;
-
-    for( ; uri && *uri; )
-    {
-        char ch = *uri;
-        if( ch == '?' )
-            in_query = TRUE;
-        else if( ch == '+' && in_query )
-            ch = ' ';
-        else if( ch == '%' && isxdigit( (unsigned char)uri[1] )
-               && isxdigit( (unsigned char)uri[2] ) )
-        {
-            char buf[3] = { uri[1], uri[2], '\0' };
-            ch = (char) g_ascii_strtoull( buf, NULL, 16 );
-            uri += 2;
-        }
-
-        ++uri;
-        *out++ = ch;
-    }
-
-    *out = '\0';
-    return ret;
-}
-
 /* pattern-matching text; ie, legaltorrents.com */
 char*
 gtr_get_host_from_url( const char * url )

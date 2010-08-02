@@ -1209,10 +1209,15 @@ tr_core_add_list( TrCore       * core,
     GSList * l;
 
     for( l = torrentFiles; l != NULL; l = l->next )
-        add_filename( core, l->data, doStart, doPrompt, doNotify );
+    {
+        char * filename = l->data;
+        add_filename( core, filename, doStart, doPrompt, doNotify );
+        g_free( filename );
+    }
 
     tr_core_torrents_added( core );
-    freestrlist( torrentFiles );
+
+    g_slist_free( torrentFiles );
 }
 
 void
