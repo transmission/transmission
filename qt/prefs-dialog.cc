@@ -224,8 +224,7 @@ PrefsDialog :: createWebTab( Session& session )
     hig->addSectionTitle( tr( "Web Client" ) );
     QWidget * w;
     QHBoxLayout * h = new QHBoxLayout( );
-    QIcon i( style()->standardIcon( QStyle::StandardPixmap( QStyle::SP_DirOpenIcon ) ) );
-    QPushButton * b = new QPushButton( i, tr( "&Open web client" ) );
+    QPushButton * b = new QPushButton( tr( "&Open web client" ) );
     connect( b, SIGNAL(clicked()), &session, SLOT(launchWebInterface()) );
     h->addWidget( b, 0, Qt::AlignRight );
     QWidget * l = checkBoxNew( tr( "&Enable web client" ), Prefs::RPC_ENABLED );
@@ -294,7 +293,7 @@ PrefsDialog :: createSpeedTab( )
         QString s = tr( "<small>Override normal speed limits manually or at scheduled times</small>" );
         hig->addWideControl( new QLabel( s ) );
 
-        s = tr( "Limit d&ownload speed (%1):" ).arg( speed_K_str );
+        s = tr( "Limit do&wnload speed (%1):" ).arg( speed_K_str );
         r = spinBoxNew( Prefs :: ALT_SPEED_LIMIT_DOWN, 0, INT_MAX, 5 );
         hig->addRow( s, r );
 
@@ -343,6 +342,23 @@ PrefsDialog :: createSpeedTab( )
 ****
 ***/
 
+QWidget *
+PrefsDialog :: createDesktopTab( )
+{
+    HIG * hig = new HIG( this );
+    hig->addSectionTitle( tr( "Desktop" ) );
+
+    hig->addWideControl( checkBoxNew( tr( "Show Transmission icon in the &notification area" ), Prefs::SHOW_TRAY_ICON ) );
+    hig->addWideControl( checkBoxNew( tr( "Show &popup notifications" ), Prefs::SHOW_DESKTOP_NOTIFICATION ) );
+
+    hig->finish( );
+    return hig;
+}
+
+/***
+****
+***/
+
 void
 PrefsDialog :: onPortTested( bool isOpen )
 {
@@ -369,7 +385,7 @@ PrefsDialog :: createNetworkTab( )
 
     QSpinBox * s = spinBoxNew( Prefs::PEER_PORT, 1, 65535, 1 );
     QHBoxLayout * h = new QHBoxLayout( );
-    QPushButton * b = myPortButton = new QPushButton( tr( "&Test Port" ) );
+    QPushButton * b = myPortButton = new QPushButton( tr( "Te&st Port" ) );
     QLabel * l = myPortLabel = new QLabel( tr( "Status unknown" ) );
     h->addWidget( l );
     h->addSpacing( HIG :: PAD_BIG );
@@ -380,8 +396,8 @@ PrefsDialog :: createNetworkTab( )
 
     hig->addRow( tr( "&Port for incoming connections:" ), s );
     hig->addRow( "", h, 0 );
-    hig->addWideControl( checkBoxNew( tr( "Use UPnP or NAT-PMP port &forwarding from my router" ), Prefs::PORT_FORWARDING ) );
     hig->addWideControl( checkBoxNew( tr( "Pick a &random port every time Transmission is started" ), Prefs :: PEER_PORT_RANDOM_ON_START ) );
+    hig->addWideControl( checkBoxNew( tr( "Use UPnP or NAT-PMP port &forwarding from my router" ), Prefs::PORT_FORWARDING ) );
 
     hig->addSectionDivider( );
     hig->addSectionTitle( tr( "Limits" ) );
@@ -451,8 +467,7 @@ PrefsDialog :: createPrivacyTab( )
     HIG * hig = new HIG( this );
     hig->addSectionTitle( tr( "Blocklist" ) );
     QHBoxLayout * h = new QHBoxLayout( );
-    QIcon i( style()->standardIcon( QStyle::StandardPixmap( QStyle::SP_BrowserReload ) ) );
-    QWidget * w = new QPushButton( i, tr( "&Update blocklist" ) );
+    QWidget * w = new QPushButton( tr( "&Update" ) );
     connect( w, SIGNAL(clicked(bool)), this, SLOT(onUpdateBlocklistClicked()));
     myBlockWidgets << w;
     QWidget * l = checkBoxNew( "", Prefs::BLOCKLIST_ENABLED );
@@ -572,6 +587,12 @@ PrefsDialog :: createTorrentsTab( )
 
         hig->addWideControl( checkBoxNew( tr( "Append \".&part\" to incomplete files' names" ), Prefs::RENAME_PARTIAL_FILES ) );
 
+        b = myDestinationButton = new QPushButton;
+        b->setIcon( folderPixmap );
+        b->setStyleSheet( "text-align: left; padding-left: 5; padding-right: 5" );
+        connect( b, SIGNAL(clicked(bool)), this, SLOT(onDestinationClicked(void)) );
+        hig->addRow( tr( "Save to &Location:" ), b );
+
         l = myIncompleteCheckbox = checkBoxNew( tr( "Keep &incomplete files in:" ), Prefs::INCOMPLETE_DIR_ENABLED );
         b = myIncompleteButton = new QPushButton;
         b->setIcon( folderPixmap );
@@ -580,19 +601,13 @@ PrefsDialog :: createTorrentsTab( )
         hig->addRow( myIncompleteCheckbox, b );
         enableBuddyWhenChecked( qobject_cast<QCheckBox*>(l), b );
 
-        l = myTorrentDoneScriptCheckbox = checkBoxNew( tr( "Call scrip&t when torrent is completed" ), Prefs::SCRIPT_TORRENT_DONE_ENABLED );
+        l = myTorrentDoneScriptCheckbox = checkBoxNew( tr( "Call scrip&t when torrent is completed:" ), Prefs::SCRIPT_TORRENT_DONE_ENABLED );
         b = myTorrentDoneScriptButton = new QPushButton;
         b->setIcon( filePixmap );
         b->setStyleSheet( "text-align: left; padding-left: 5; padding-right: 5" );
         connect( b, SIGNAL(clicked(bool)), this, SLOT(onScriptClicked(void)) );
         hig->addRow( myTorrentDoneScriptCheckbox, b );
         enableBuddyWhenChecked( qobject_cast<QCheckBox*>(l), b );
-
-        b = myDestinationButton = new QPushButton;
-        b->setIcon( folderPixmap );
-        b->setStyleSheet( "text-align: left; padding-left: 5; padding-right: 5" );
-        connect( b, SIGNAL(clicked(bool)), this, SLOT(onDestinationClicked(void)) );
-        hig->addRow( tr( "Save to &Location:" ), b );
 
     hig->addSectionDivider( );
     hig->addSectionTitle( tr( "Seeding Limits" ) );
@@ -629,6 +644,7 @@ PrefsDialog :: PrefsDialog( Session& session, Prefs& prefs, QWidget * parent ):
     t->addTab( createSpeedTab( ),        tr( "Speed" ) );
     t->addTab( createPrivacyTab( ),      tr( "Privacy" ) );
     t->addTab( createNetworkTab( ),      tr( "Network" ) );
+    t->addTab( createDesktopTab( ),      tr( "Desktop" ) );
     t->addTab( createWebTab( session ),  tr( "Web" ) );
     //t->addTab( createTrackerTab( ),    tr( "Trackers" ) );
     myLayout->addWidget( t );

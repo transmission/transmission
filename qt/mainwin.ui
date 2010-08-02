@@ -96,6 +96,8 @@
     </property>
     <addaction name="action_Statistics"/>
     <addaction name="separator"/>
+    <addaction name="action_Donate"/>
+    <addaction name="separator"/>
     <addaction name="action_Contents"/>
     <addaction name="action_About"/>
    </widget>
@@ -108,7 +110,6 @@
     <addaction name="action_Toolbar"/>
     <addaction name="action_Filterbar"/>
     <addaction name="action_Statusbar"/>
-    <addaction name="action_TrayIcon"/>
     <addaction name="separator"/>
     <addaction name="action_SortByActivity"/>
     <addaction name="action_SortByAge"/>
@@ -464,6 +465,9 @@
    <property name="text">
     <string>&amp;Contents</string>
    </property>
+   <property name="shortcut">
+    <string>F1</string>
+   </property>
   </action>
   <action name="action_About">
    <property name="text">
@@ -571,6 +575,11 @@
   <action name="action_AddURL">
    <property name="text">
     <string>Add &amp;URL...</string>
+   </property>
+  </action>
+  <action name="action_Donate">
+   <property name="text">
+    <string>&amp;Donate</string>
    </property>
   </action>
  </widget>

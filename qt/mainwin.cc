@@ -125,7 +125,6 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
 
     // ui signals
     connect( ui.action_Toolbar, SIGNAL(toggled(bool)), this, SLOT(setToolbarVisible(bool)));
-    connect( ui.action_TrayIcon, SIGNAL(toggled(bool)), this, SLOT(setTrayIconVisible(bool)));
     connect( ui.action_Filterbar, SIGNAL(toggled(bool)), this, SLOT(setFilterbarVisible(bool)));
     connect( ui.action_Statusbar, SIGNAL(toggled(bool)), this, SLOT(setStatusbarVisible(bool)));
     connect( ui.action_CompactView, SIGNAL(toggled(bool)), this, SLOT(setCompactView(bool)));
@@ -152,6 +151,7 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     connect( ui.action_New, SIGNAL(triggered()), this, SLOT(newTorrent()));
     connect( ui.action_Preferences, SIGNAL(triggered()), this, SLOT(openPreferences()));
     connect( ui.action_Statistics, SIGNAL(triggered()), myStatsDialog, SLOT(show()));
+    connect( ui.action_Donate, SIGNAL(triggered()), this, SLOT(openDonate()));
     connect( ui.action_About, SIGNAL(triggered()), myAboutDialog, SLOT(show()));
     connect( ui.action_Contents, SIGNAL(triggered()), this, SLOT(openHelp()));
     connect( ui.action_OpenFolder, SIGNAL(triggered()), this, SLOT(openFolder()));
@@ -608,6 +608,12 @@ TrMainWindow :: copyMagnetLinkToClipboard( )
 }
 
 void
+TrMainWindow :: openDonate( )
+{
+    QDesktopServices :: openUrl( QUrl( "http://www.transmissionbt.com/donate.php" ) );
+}
+
+void
 TrMainWindow :: openHelp( )
 {
     const char * fmt = "http://www.transmissionbt.com/help/gtk/%d.%dx";
@@ -615,7 +621,7 @@ TrMainWindow :: openHelp( )
     sscanf( SHORT_VERSION_STRING, "%d.%d", &major, &minor );
     char url[128];
     tr_snprintf( url, sizeof( url ), fmt, major, minor/10 );
-    QDesktopServices :: openUrl( QUrl( QString( url ) ) );
+    QDesktopServices :: openUrl( QUrl( url ) );
 }
 
 void
@@ -814,11 +820,6 @@ void
 TrMainWindow :: setCompactView( bool visible )
 {
     myPrefs.set( Prefs :: COMPACT_VIEW, visible );
-}
-void
-TrMainWindow :: setTrayIconVisible( bool visible )
-{
-    myPrefs.set( Prefs :: SHOW_TRAY_ICON, visible );
 }
 void
 TrMainWindow :: toggleSpeedMode( )

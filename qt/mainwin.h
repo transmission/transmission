@@ -111,6 +111,7 @@ class TrMainWindow: public QMainWindow
         void refreshPref( int key );
         void addTorrents( const QStringList& filenames );
         void removeTorrents( const bool deleteFiles );
+        void openDonate( );
         void openHelp( );
         void openFolder( );
         void copyMagnetLinkToClipboard( );
@@ -173,7 +174,6 @@ class TrMainWindow: public QMainWindow
         void setToolbarVisible( bool );
         void setFilterbarVisible( bool );
         void setStatusbarVisible( bool );
-        void setTrayIconVisible( bool );
         void setCompactView( bool );
         void refreshActionSensitivity( );
         void wrongAuthentication( );

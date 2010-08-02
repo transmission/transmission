@@ -57,8 +57,8 @@ class MyApp: public QApplication
         void onSessionSourceChanged( );
         void refreshPref( int key );
         void refreshTorrents( );
-        void torrentsAdded( QSet<int> );
-        void torrentChanged( int );
+        void onTorrentsAdded( QSet<int> );
+        void onNewTorrentChanged( int );
 
     public slots:
         void addTorrent( const QString& );

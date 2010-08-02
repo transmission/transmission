@@ -169,7 +169,7 @@ MyApp :: MyApp( int& argc, char ** argv ):
     connect( mySession, SIGNAL(sourceChanged()), this, SLOT(onSessionSourceChanged()) );
     // when the model sees a torrent for the first time, ask the session for full info on it
     connect( myModel, SIGNAL(torrentsAdded(QSet<int>)), mySession, SLOT(initTorrents(QSet<int>)) );
-    connect( myModel, SIGNAL(torrentsAdded(QSet<int>)), this, SLOT(torrentsAdded(QSet<int>)) );
+    connect( myModel, SIGNAL(torrentsAdded(QSet<int>)), this, SLOT(onTorrentsAdded(QSet<int>)) );
 
     mySession->initTorrents( );
     mySession->refreshSessionStats( );
@@ -245,21 +245,25 @@ MyApp :: MyApp( int& argc, char ** argv ):
         std::cerr << "couldn't register " << DBUS_OBJECT_PATH << std::endl;
 }
 
+/* these two functions are for popping up desktop notification
+ * when new torrents are added */
 void
-MyApp :: torrentsAdded( QSet<int> torrents )
+MyApp :: onTorrentsAdded( QSet<int> torrents )
 {
+    if( !myPrefs->getBool( Prefs::SHOW_DESKTOP_NOTIFICATION ) )
+        return;
+
     foreach( int id, torrents )
     {
         Torrent * tor = myModel->getTorrentFromId( id );
         if( !tor->name().isEmpty( ) )
-            torrentChanged( id );
+            onNewTorrentChanged( id );
         else // wait until the torrent's INFO fields are loaded
-            connect( tor, SIGNAL(torrentChanged(int)), this, SLOT(torrentChanged(int)) );
+            connect( tor, SIGNAL(torrentChanged(int)), this, SLOT(onNewTorrentChanged(int)) );
     }
 }
-
 void
-MyApp :: torrentChanged( int id )
+MyApp :: onNewTorrentChanged( int id )
 {
     Torrent * tor = myModel->getTorrentFromId( id );
 
@@ -269,7 +273,7 @@ MyApp :: torrentChanged( int id )
         if( age_secs < 30 )
             notify( tr( "Torrent Added" ), tor->name( ) );
 
-        disconnect( tor, SIGNAL(torrentChanged(int)), this, SLOT(torrentChanged(int)) );
+        disconnect( tor, SIGNAL(torrentChanged(int)), this, SLOT(onNewTorrentChanged(int)) );
     }
 }
 
