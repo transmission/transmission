@@ -152,15 +152,6 @@ int gtr_strcmp0( const char * str1, const char * str2 );
 ****
 ***/
 
-/* create a button with the specified mnemonic and stock icon */
-GtkWidget * gtr_button_new_from_stock( const char * stock,
-                                       const char * mnemonic );
-
-
-/***
-****
-***/
-
 GtkWidget * gtr_priority_combo_new( void );
 #define gtr_priority_combo_get_value(w)     gtr_combo_box_get_active_enum(w)
 #define gtr_priority_combo_set_value(w,val) gtr_combo_box_set_active_enum(w,val)

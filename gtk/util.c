@@ -585,18 +585,6 @@ gtr_dbus_present_window( void )
     return success;
 }
 
-GtkWidget *
-gtr_button_new_from_stock( const char * stock,
-                           const char * mnemonic )
-{
-    GtkWidget * image = gtk_image_new_from_stock( stock,
-                                                  GTK_ICON_SIZE_BUTTON );
-    GtkWidget * button = gtk_button_new_with_mnemonic( mnemonic );
-
-    gtk_button_set_image( GTK_BUTTON( button ), image );
-    return button;
-}
-
 /***
 ****
 ***/

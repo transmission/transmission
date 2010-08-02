@@ -521,7 +521,6 @@ make_meta_ui( GtkWindow  * parent, TrCore * core )
 
     gtk_drag_dest_set( d, GTK_DEST_DEFAULT_ALL, NULL, 0, GDK_ACTION_COPY );
     gtk_drag_dest_add_uri_targets( d );
-    gtk_drag_dest_add_text_targets( d );
     g_signal_connect( d, "drag-data-received", G_CALLBACK( on_drag_data_received ), ui );
 
     return d;
