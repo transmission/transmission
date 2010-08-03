@@ -362,7 +362,7 @@ compareByName( GtkTreeModel *             model,
 
     gtk_tree_model_get( model, a, MC_NAME_COLLATED, &ca, -1 );
     gtk_tree_model_get( model, b, MC_NAME_COLLATED, &cb, -1 );
-    ret = strcmp( ca, cb );
+    ret = gtr_strcmp0( ca, cb );
 
     g_free( cb );
     g_free( ca );
@@ -893,11 +893,11 @@ tr_core_add_torrent( TrCore     * self,
 {
     const tr_info * inf = tr_torrent_info( gtor );
     const tr_stat * st = tr_torrent_stat( gtor );
-    tr_torrent *    tor = tr_torrent_handle( gtor );
-    char *          collated = g_utf8_strdown( inf->name, -1 );
-    char *          trackers = torrentTrackerString( tor );
+    tr_torrent * tor = tr_torrent_handle( gtor );
+    char *  collated = g_utf8_strdown( inf->name ? inf->name : "", -1 );
+    char *  trackers = torrentTrackerString( tor );
     GtkListStore *  store = GTK_LIST_STORE( tr_core_model( self ) );
-    GtkTreeIter     unused;
+    GtkTreeIter  unused;
 
     gtk_list_store_insert_with_values( store, &unused, 0,
                                        MC_NAME,          inf->name,

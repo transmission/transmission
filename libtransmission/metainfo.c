@@ -438,10 +438,14 @@ tr_metainfoParseImpl( const tr_session  * session,
             escape( inf->hashEscaped, inf->hash, SHA_DIGEST_LENGTH );
 
             /* maybe get the display name */
+          
             if( tr_bencDictFindStr( d, "display-name", &str ) ) {
                 tr_free( inf->name );
                 inf->name = tr_strdup( str );
             }
+
+            if( !inf->name )
+                inf->name = tr_strdup( inf->hashString );
         }
         else /* not a magnet link and has no info dict... */
         {
