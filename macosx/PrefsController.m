@@ -1156,7 +1156,7 @@ tr_session * fHandle;
     
     //dht
     const BOOL lpd = tr_sessionIsLPDEnabled(fHandle);
-    [fDefaults setBool: lpd forKey: @"LocalPeerDiscovery"];
+    [fDefaults setBool: lpd forKey: @"LocalPeerDiscoveryGlobal"];
     
     //auto start
     const BOOL autoStart = !tr_sessionGetPaused(fHandle);
