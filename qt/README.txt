@@ -24,7 +24,17 @@ ABOUT TRANSMISSION-QT
    The Qt client is also the most likely to wind up running on Windows,
    though that's not a high priority at the moment...
 
-BUILDING
+BUILDING ON WINDOWS
+
+   rb07 has a writeup of this on the Transmission wiki:
+   https://trac.transmissionbt.com/wiki/BuildingTransmissionQtWindows
+
+BUILDING ON OS X
+
+   nnc has a writeup of this on the Transmission wiki:
+   https://trac.transmissionbt.com/wiki/BuildingTransmissionQtMac
+
+BUILDING ON UNIX
 
    1. Prerequisites: Qt >= 4.4 and its development packages
    2. Build Transmission as normal
@@ -32,4 +42,4 @@ BUILDING
    4. In the qt/ directory, type "make"
    5. In the qt/ directory, as root, type "INSTALL_ROOT=/usr make install"
       (Feel free to replace /usr with /usr/local or /opt or whatever)
-
+ 
