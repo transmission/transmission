@@ -558,6 +558,15 @@ torrentTrackerString( tr_torrent * tor )
     return g_string_free( str, FALSE );
 }
 
+static gboolean
+isTorrentActive( tr_torrent * tor )
+{
+    const tr_stat * st = tr_torrentStat( tor );
+    return ( st->peersSendingToUs > 0 )
+        || ( st->peersGettingFromUs > 0 )
+        || ( st->activity == TR_STATUS_CHECK );
+}
+
 #ifdef HAVE_GIO
 
 struct watchdir_file
@@ -785,6 +794,7 @@ tr_core_init( GTypeInstance *  instance,
                       G_TYPE_POINTER,   /* tr_torrent* */
                       G_TYPE_DOUBLE,    /* tr_stat.pieceUploadSpeed_KBps */
                       G_TYPE_DOUBLE,    /* tr_stat.pieceDownloadSpeed_KBps */
+                      G_TYPE_BOOLEAN,   /* filter.c:ACTIVITY_FILTER_ACTIVE */
                       G_TYPE_INT,       /* tr_stat.activity */
                       G_TYPE_UCHAR,     /* tr_stat.finished */
                       G_TYPE_CHAR,      /* tr_priority_t */
@@ -906,6 +916,7 @@ tr_core_add_torrent( TrCore     * self,
                                        MC_TORRENT_RAW,   tor,
                                        MC_SPEED_UP,      st->pieceUploadSpeed_KBps,
                                        MC_SPEED_DOWN,    st->pieceDownloadSpeed_KBps,
+                                       MC_ACTIVE,        isTorrentActive( tor ),
                                        MC_ACTIVITY,      st->activity,
                                        MC_FINISHED,      st->finished,
                                        MC_PRIORITY,      tr_torrentGetPriority( tor ),
@@ -1304,6 +1315,7 @@ update_foreach( GtkTreeModel * model,
     char * oldTrackers, * newTrackers;
     double oldUpSpeed, newUpSpeed;
     double oldDownSpeed, newDownSpeed;
+    gboolean oldActive, newActive;
     const tr_stat * st;
     TrTorrent * gtor;
     tr_torrent * tor;
@@ -1311,6 +1323,7 @@ update_foreach( GtkTreeModel * model,
     /* get the old states */
     gtk_tree_model_get( model, iter,
                         MC_TORRENT, &gtor,
+                        MC_ACTIVE, &oldActive,
                         MC_ACTIVITY, &oldActivity,
                         MC_FINISHED, &oldFinished,
                         MC_PRIORITY, &oldPriority,
@@ -1322,6 +1335,7 @@ update_foreach( GtkTreeModel * model,
     /* get the new states */
     tor = tr_torrent_handle( gtor );
     st = tr_torrentStat( tor );
+    newActive = isTorrentActive( tor );
     newActivity = st->activity;
     newFinished = st->finished;
     newPriority = tr_torrentGetPriority( tor );
@@ -1331,7 +1345,8 @@ update_foreach( GtkTreeModel * model,
 
     /* updating the model triggers off resort/refresh,
        so don't do it unless something's actually changed... */
-    if( ( newActivity  != oldActivity  )
+    if( ( newActive != oldActive )
+        || ( newActivity  != oldActivity )
         || ( newFinished != oldFinished )
         || ( newPriority != oldPriority )
         || gtr_strcmp0( oldTrackers, newTrackers )
@@ -1339,6 +1354,7 @@ update_foreach( GtkTreeModel * model,
         || gtr_compare_double( newDownSpeed, oldDownSpeed, 3 ) )
     {
         gtk_list_store_set( GTK_LIST_STORE( model ), iter,
+                            MC_ACTIVE, newActive,
                             MC_ACTIVITY, newActivity,
                             MC_FINISHED, newFinished,
                             MC_PRIORITY, newPriority,
