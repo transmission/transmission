@@ -293,7 +293,7 @@ compareByName( GtkTreeModel *             model,
 
     gtk_tree_model_get( model, a, MC_NAME_COLLATED, &ca, -1 );
     gtk_tree_model_get( model, b, MC_NAME_COLLATED, &cb, -1 );
-    ret = strcmp( ca, cb );
+    ret = gtr_strcmp0( ca, cb );
     g_free( cb );
     g_free( ca );
     return ret;
@@ -472,16 +472,6 @@ tr_core_apply_defaults( tr_ctor * ctor )
     }
 }
 
-static int
-tr_strcmp( const void * a,
-           const void * b )
-{
-    if( a && b ) return strcmp( a, b );
-    if( a ) return 1;
-    if( b ) return -1;
-    return 0;
-}
-
 static char *
 torrentTrackerString( tr_torrent * tor )
 {
@@ -648,7 +638,7 @@ updateWatchDir( TrCore * core )
         PREF_KEY_DIR_WATCH_ENABLED );
     struct TrCorePrivate * p = TR_CORE( core )->priv;
 
-    if( p->monitor && ( !isEnabled || tr_strcmp( filename, p->monitor_path ) ) )
+    if( p->monitor && ( !isEnabled || gtr_strcmp0( filename, p->monitor_path ) ) )
     {
         g_signal_handler_disconnect( p->monitor, p->monitor_tag );
         g_free( p->monitor_path );
@@ -1298,12 +1288,12 @@ update_foreach( GtkTreeModel * model,
 
     /* updating the model triggers off resort/refresh,
        so don't do it unless something's actually changed... */
-    if( ( newActivity != oldActivity ) ||
+    if( ( newActivity != oldActivity )
         || ( newFinished != oldFinished )
         || ( newPriority != oldPriority )
-        || tr_strcmp( oldTrackers, newTrackers )
-        ( (int)(newUpSpeed*10.0) != (int)(oldUpSpeed*10.0) ) ||
-        ( (int)(newDownSpeed*10.0) != (int)(oldDownSpeed*10.0) ) )
+        || ( gtr_strcmp0( oldTrackers, newTrackers ) )
+        || ( (int)(newUpSpeed*10.0) != (int)(oldUpSpeed*10.0) )
+        || ( (int)(newDownSpeed*10.0) != (int)(oldDownSpeed*10.0) ) )
     {
         gtk_list_store_set( GTK_LIST_STORE( model ), iter,
                             MC_ACTIVITY, newActivity,
@@ -1499,7 +1489,7 @@ tr_core_set_pref( TrCore *     self,
 {
     const char * oldval = pref_string_get( key );
 
-    if( tr_strcmp( oldval, newval ) )
+    if( gtr_strcmp0( oldval, newval ) )
     {
         pref_string_set( key, newval );
         commitPrefsChange( self, key );
