@@ -546,13 +546,13 @@ static char *
 torrentTrackerString( tr_torrent * tor )
 {
     int i;
-    GString * str = g_string_new( "" );
+    GString * str = g_string_new( NULL );
     const tr_info * inf = tr_torrentInfo( tor );
 
     for( i = 0; i < inf->trackerCount; ++i )
     {
         const tr_tracker_info * t = &inf->trackers[i];
-        str = g_string_append( str, t->announce );
+        g_string_append( str, t->announce );
     }
 
     return g_string_free( str, FALSE );
