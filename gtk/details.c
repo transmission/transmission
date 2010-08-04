@@ -2152,7 +2152,6 @@ onEditTrackersResponse( GtkDialog * dialog, int response, gpointer data )
         {
             di->trackers = NULL;
             di->tracker_buffer = NULL;
-            tr_core_torrent_changed( di->core, tr_torrentId( tor ) );
         }
 
         /* cleanup */

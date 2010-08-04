@@ -589,6 +589,7 @@ enum
     ACTIVITY_FILTER_SEEDING,
     ACTIVITY_FILTER_ACTIVE,
     ACTIVITY_FILTER_PAUSED,
+    ACTIVITY_FILTER_FINISHED,
     ACTIVITY_FILTER_QUEUED,
     ACTIVITY_FILTER_VERIFYING,
     ACTIVITY_FILTER_ERROR,
@@ -633,19 +634,20 @@ test_torrent_activity( tr_torrent * tor, int type )
         case ACTIVITY_FILTER_PAUSED:
             return st->activity == TR_STATUS_STOPPED;
 
+        case ACTIVITY_FILTER_FINISHED:
+            return st->finished == TRUE;
+
         case ACTIVITY_FILTER_QUEUED:
-            return FALSE;
+            return st->activity == TR_STATUS_CHECK_WAIT;
 
         case ACTIVITY_FILTER_VERIFYING:
-            return ( st->activity == TR_STATUS_CHECK_WAIT )
-                || ( st->activity == TR_STATUS_CHECK );
+            return st->activity == TR_STATUS_CHECK ;
 
         case ACTIVITY_FILTER_ERROR:
             return st->error != 0;
 
         default: /* ACTIVITY_FILTER_ALL */
             return TRUE;
-
     }
 }
 
@@ -720,6 +722,7 @@ activity_filter_model_new( GtkTreeModel * tmodel )
         { ACTIVITY_FILTER_DOWNLOADING, N_( "Downloading" ), GTK_STOCK_GO_DOWN },
         { ACTIVITY_FILTER_SEEDING, N_( "Seeding" ), GTK_STOCK_GO_UP },
         { ACTIVITY_FILTER_PAUSED, N_( "Paused" ), GTK_STOCK_MEDIA_PAUSE },
+        { ACTIVITY_FILTER_FINISHED, N_( "Finished" ), NULL },
         { ACTIVITY_FILTER_QUEUED, N_( "Queued" ), NULL },
         { ACTIVITY_FILTER_VERIFYING, N_( "Verifying" ), GTK_STOCK_REFRESH },
         { ACTIVITY_FILTER_ERROR, N_( "Error" ), GTK_STOCK_DIALOG_ERROR }
