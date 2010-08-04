@@ -32,13 +32,6 @@ extern "C"
 
 class Prefs;
 
-struct Reply
-{
-    QNetworkReply * networkReply;
-    QBuffer * buffer;
-};
-typedef QList<Reply> ReplyList;
-
 class Session: public QObject
 {
         Q_OBJECT
@@ -94,6 +87,7 @@ class Session: public QObject
         void sendTorrentRequest( const char * request, const QSet<int>& torrentIds );
         static void updateStats( struct tr_benc * d, struct tr_session_stats * stats );
         void refreshTorrents( const QSet<int>& torrentIds );
+        QNetworkAccessManager * networkAccessManager( );
 
     public:
         void torrentSet( const QSet<int>& ids, const QString& key, bool val );
@@ -146,8 +140,7 @@ class Session: public QObject
         QString myConfigDir;
         QString mySessionId;
         QUrl myUrl;
-        QNetworkAccessManager myNAM;
-        ReplyList myReplies;
+        QNetworkAccessManager * myNAM;
         struct tr_session_stats myStats;
         struct tr_session_stats myCumulativeStats;
         QString mySessionVersion;
