@@ -615,9 +615,6 @@
          |         | yes       | torrent-get    | new arg "isFinished"
    ------+---------+-----------+----------------+-------------------------------
    10    | 2.10    | yes       | session-get    | new arg "cache-size"
-         |         | yes       | session-set    | new arg "trash-original-torrent-files"
-         |         | yes       | session-get    | new arg "trash-original-torrent-files"
-         |         | yes       | torrent-get    | new arg "isFinished"
          |         | yes       | torrent-set    | new arg "trackerAdd"
          |         | yes       | torrent-set    | new arg "trackerEdit"
          |         | yes       | torrent-set    | new arg "trackerRemove"
