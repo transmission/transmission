@@ -334,11 +334,10 @@ add_response( struct evhttp_request * req,
             server->stream.zalloc = (alloc_func) Z_NULL;
             server->stream.zfree = (free_func) Z_NULL;
             server->stream.opaque = (voidpf) Z_NULL;
-            server->stream.data_type = Z_ASCII;
 
             /* zlib's manual says: "Add 16 to windowBits to write a simple gzip header
              * and trailer around the compressed data instead of a zlib wrapper." */
-            deflateInit2( &server->stream, Z_BEST_COMPRESSION, Z_DEFLATED, 15+16, 9, Z_DEFAULT_STRATEGY );
+            deflateInit2( &server->stream, Z_DEFAULT_COMPRESSION, Z_DEFLATED, 15+16, 8, Z_DEFAULT_STRATEGY );
         }
 
         server->stream.next_in = (Bytef*) content;
