@@ -549,7 +549,27 @@ Options :: onTimeout( )
         myVerifyFilePos = 0;
     }
 
-    const bool done = myVerifyPieceIndex >= myInfo.pieceCount;
+    bool done = myVerifyPieceIndex >= myInfo.pieceCount;
+    if( done )
+    {
+        uint64_t have = 0;
+        foreach( const TrFile& f, myFiles )
+            have += f.have;
+
+        if( !have ) // everything failed
+        {
+            // did the user accidentally specify the child directory instead of the parent?
+            const QStringList tokens = QString(file->name).split('/');
+            if( !tokens.empty() && myDestination.dirName()==tokens.at(0) )
+            {
+                // move up one directory and try again
+                myDestination.cdUp( );
+                refreshDestinationButton( -1 );
+                onVerify( );
+                done = false;
+            }
+        }
+    }
 
     if( done )
         myVerifyTimer.stop( );
