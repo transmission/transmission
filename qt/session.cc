@@ -234,7 +234,8 @@ Session :: Session( const char * configDir, Prefs& prefs ):
     myBlocklistSize( -1 ),
     myPrefs( prefs ),
     mySession( 0 ),
-    myConfigDir( configDir )
+    myConfigDir( configDir ),
+    myNAM( 0 )
 {
     myStats.ratio = TR_RATIO_NA;
     myStats.uploadedBytes = 0;
@@ -244,14 +245,29 @@ Session :: Session( const char * configDir, Prefs& prefs ):
     myStats.secondsActive = 0;
     myCumulativeStats = myStats;
 
-    connect( &myNAM, SIGNAL(finished(QNetworkReply*)), this, SLOT(onFinished(QNetworkReply*)) );
-    connect( &myNAM, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)), this, SIGNAL(httpAuthenticationRequired()) );
     connect( &myPrefs, SIGNAL(changed(int)), this, SLOT(updatePref(int)) );
 }
 
 Session :: ~Session( )
 {
     stop( );
+}
+
+QNetworkAccessManager *
+Session :: networkAccessManager( )
+{
+    if( myNAM == 0 )
+    {
+        myNAM = new QNetworkAccessManager;
+
+        connect( myNAM, SIGNAL(finished(QNetworkReply*)),
+                 this, SLOT(onFinished(QNetworkReply*)) );
+
+        connect( myNAM, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)),
+                 this, SIGNAL(httpAuthenticationRequired()) );
+    }
+
+    return myNAM;
 }
 
 /***
@@ -261,8 +277,12 @@ Session :: ~Session( )
 void
 Session :: stop( )
 {
-    foreach( Reply myReply, myReplies )
-        myReply.networkReply->abort();
+    if( myNAM != 0 )
+    {
+        myNAM->deleteLater( );
+        myNAM = 0;
+    }
+
     myUrl.clear( );
 
     if( mySession )
@@ -284,20 +304,15 @@ Session :: start( )
 {
     if( myPrefs.get<bool>(Prefs::SESSION_IS_REMOTE) )
     {
-        const int port( myPrefs.get<int>(Prefs::SESSION_REMOTE_PORT) );
-        const bool auth( myPrefs.get<bool>(Prefs::SESSION_REMOTE_AUTH) );
-        const QString host( myPrefs.get<QString>(Prefs::SESSION_REMOTE_HOST) );
-        const QString user( myPrefs.get<QString>(Prefs::SESSION_REMOTE_USERNAME) );
-        const QString pass( myPrefs.get<QString>(Prefs::SESSION_REMOTE_PASSWORD) );
-
         QUrl url;
         url.setScheme( "http" );
-        url.setHost( host );
-        url.setPort( port );
+        url.setHost( myPrefs.get<QString>(Prefs::SESSION_REMOTE_HOST) );
+        url.setPort( myPrefs.get<int>(Prefs::SESSION_REMOTE_PORT) );
         url.setPath( "/transmission/rpc" );
-        if( auth ) {
-            url.setUserName( user );
-            url.setPassword( pass );
+        if( myPrefs.get<bool>(Prefs::SESSION_REMOTE_AUTH) )
+        {
+            url.setUserName( myPrefs.get<QString>(Prefs::SESSION_REMOTE_USERNAME) );
+            url.setPassword( myPrefs.get<QString>(Prefs::SESSION_REMOTE_PASSWORD) );
         }
         myUrl = url;
     }
@@ -602,6 +617,8 @@ Session :: localSessionCallback( tr_session * session, const char * json, size_t
     ((Session*)self)->parseResponse( json, len );
 }
 
+#define REQUEST_DATA_PROPERTY_KEY "requestData"
+
 void
 Session :: exec( const char * json )
 {
@@ -618,17 +635,12 @@ Session :: exec( const char * json )
         if( !mySessionId.isEmpty( ) )
             request.setRawHeader( TR_RPC_SESSION_ID_HEADER, mySessionId.toAscii() );
 
-        QBuffer * reqbuf = new QBuffer;
-        reqbuf->setData( QByteArray( json ) );
-
-        QNetworkReply * reply = myNAM.post( request, reqbuf );
+        const QByteArray requestData( json );
+        QNetworkReply * reply = networkAccessManager()->post( request, requestData );
+        reply->setProperty( REQUEST_DATA_PROPERTY_KEY, requestData );
         connect( reply, SIGNAL(downloadProgress(qint64,qint64)), this, SIGNAL(dataReadProgress()));
         connect( reply, SIGNAL(uploadProgress(qint64,qint64)), this, SIGNAL(dataSendProgress()));
 
-        Reply myReply;
-        myReply.networkReply = reply;
-        myReply.buffer = reqbuf;
-        myReplies << myReply;
 #ifdef DEBUG_HTTP
         std::cerr << "sending " << "POST " << qPrintable( myUrl.path() ) << std::endl;
         foreach( QByteArray b, request.rawHeaderList() )
@@ -644,17 +656,6 @@ Session :: exec( const char * json )
 void
 Session :: onFinished( QNetworkReply * reply )
 {
-    QBuffer * buffer;
-    for( QList<Reply>::iterator i = myReplies.begin(); i != myReplies.end(); ++i )
-    {
-        if( reply == i->networkReply )
-        {
-            buffer = i->buffer;
-            myReplies.erase( i );
-            break;
-        }
-    }
-
 #ifdef DEBUG_HTTP
     std::cerr << "http response header: " << std::endl;
     foreach( QByteArray b, reply->rawHeaderList() )
@@ -671,7 +672,7 @@ Session :: onFinished( QNetworkReply * reply )
         // we got a 409 telling us our session id has expired.
         // update it and resubmit the request.
         mySessionId = QString( reply->rawHeader( TR_RPC_SESSION_ID_HEADER ) );
-        exec( buffer->buffer().constData() );
+        exec( reply->property( REQUEST_DATA_PROPERTY_KEY ).toByteArray( ).constData( ) );
     }
     else if( reply->error() != QNetworkReply::NoError )
     {
@@ -686,7 +687,6 @@ Session :: onFinished( QNetworkReply * reply )
         parseResponse( json, jsonLength );
     }
 
-    delete buffer;
     reply->deleteLater();
 }
 
