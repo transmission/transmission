@@ -40,7 +40,8 @@
 #include "tr-prefs.h"
 #include "util.h"
 
-#define MY_NAME "transmission"
+#define MY_CONFIG_NAME "transmission"
+#define MY_READABLE_NAME "transmission-gtk"
 
 static char * gl_confdir = NULL;
 static char * gl_lockpath = NULL;
@@ -220,7 +221,7 @@ getPrefs( void )
     {
         tr_bencInitDict( &settings, 0 );
         tr_prefs_init_defaults( &settings );
-        tr_sessionLoadSettings( &settings, gl_confdir, MY_NAME );
+        tr_sessionLoadSettings( &settings, gl_confdir, MY_CONFIG_NAME );
         loaded = TRUE;
     }
 

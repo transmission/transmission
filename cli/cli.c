@@ -64,7 +64,8 @@
 ***/
 
 #define LINEWIDTH 80
-#define MY_NAME "transmissioncli"
+#define MY_CONFIG_NAME "transmission"
+#define MY_READABLE_NAME "transmission-cli"
 
 static tr_bool verify                = 0;
 static sig_atomic_t gotsig           = 0;
@@ -99,7 +100,7 @@ getUsage( void )
 {
     return "A fast and easy BitTorrent client\n"
            "\n"
-           "Usage: " MY_NAME " [options] <file|url|magnet>";
+           "Usage: " MY_READABLE_NAME " [options] <file|url|magnet>";
 }
 
 static int parseCommandLine( tr_benc*, int argc, const char ** argv );
@@ -206,7 +207,7 @@ getConfigDir( int argc, const char ** argv )
     tr_optind = ind;
 
     if( configDir == NULL )
-        configDir = tr_getDefaultConfigDir( MY_NAME );
+        configDir = tr_getDefaultConfigDir( MY_CONFIG_NAME );
 
     return configDir;
 }
@@ -232,14 +233,14 @@ main( int argc, char ** argv )
 
     /* user needs to pass in at least one argument */
     if( argc < 2 ) {
-        tr_getopt_usage( MY_NAME, getUsage( ), options );
+        tr_getopt_usage( MY_READABLE_NAME, getUsage( ), options );
         return EXIT_FAILURE;
     }
 
     /* load the defaults from config file + libtransmission defaults */
     tr_bencInitDict( &settings, 0 );
     configDir = getConfigDir( argc, (const char**)argv );
-    tr_sessionLoadSettings( &settings, configDir, MY_NAME );
+    tr_sessionLoadSettings( &settings, configDir, MY_CONFIG_NAME );
 
     /* the command line overrides defaults */
     if( parseCommandLine( &settings, argc, (const char**)argv ) )

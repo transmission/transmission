@@ -21,7 +21,7 @@
 #include "tr-icon.h"
 #include "util.h"
 
-#define MY_NAME "transmission"
+#define ICON_NAME "transmission"
 
 #ifndef STATUS_ICON_SUPPORTED
 
@@ -134,12 +134,12 @@ getIconName( void )
     /* if the tray's icon is a 48x48 file, use it;
      * otherwise, use the fallback builtin icon */
     if( !gtk_icon_theme_has_icon( theme, TRAY_ICON ) )
-        icon_name = MY_NAME;
+        icon_name = ICON_NAME;
     else {
         GtkIconInfo * icon_info = gtk_icon_theme_lookup_icon( theme, TRAY_ICON, 48, GTK_ICON_LOOKUP_USE_BUILTIN );
         const gboolean icon_is_builtin = gtk_icon_info_get_filename ( icon_info ) == NULL;
         gtk_icon_info_free ( icon_info );
-        icon_name = icon_is_builtin ? MY_NAME : TRAY_ICON;
+        icon_name = icon_is_builtin ? ICON_NAME : TRAY_ICON;
     }
 
     return icon_name;
@@ -151,7 +151,7 @@ tr_icon_new( TrCore * core)
 {
     GtkWidget * w;
     const char * icon_name = getIconName( );
-    AppIndicator * indicator = app_indicator_new( MY_NAME, icon_name, APP_INDICATOR_CATEGORY_SYSTEM_SERVICES );
+    AppIndicator * indicator = app_indicator_new( ICON_NAME, icon_name, APP_INDICATOR_CATEGORY_SYSTEM_SERVICES );
     app_indicator_set_status( indicator, APP_INDICATOR_STATUS_ACTIVE );
     w = action_get_widget( "/icon-popup" );
     app_indicator_set_menu( indicator, GTK_MENU ( w ) );
