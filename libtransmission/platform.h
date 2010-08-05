@@ -17,13 +17,8 @@
 #ifndef TR_PLATFORM_H
 #define TR_PLATFORM_H
 
-#if defined( WIN32 )
- #define TR_PATH_DELIMITER '\\'
- #define TR_PATH_DELIMITER_STR "\\"
-#else
- #define TR_PATH_DELIMITER '/'
- #define TR_PATH_DELIMITER_STR "/"
-#endif
+#define TR_PATH_DELIMITER '/'
+#define TR_PATH_DELIMITER_STR "/"
 
 #ifdef WIN32
  #include <windef.h> /* MAX_PATH */
