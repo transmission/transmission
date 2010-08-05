@@ -200,6 +200,8 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     connect( &myModel, SIGNAL(modelReset()), this, SLOT(onModelReset()));
     connect( &myModel, SIGNAL(rowsRemoved(const QModelIndex&,int,int)), this, SLOT(onModelReset()));
     connect( &myModel, SIGNAL(rowsInserted(const QModelIndex&,int,int)), this, SLOT(onModelReset()));
+    connect( &myModel, SIGNAL(dataChanged(const QModelIndex&,const QModelIndex&)), this, SLOT(refreshTrayIcon()));
+
     ui.listView->setModel( &myFilterModel );
     connect( ui.listView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&,const QItemSelection&)), this, SLOT(refreshActionSensitivity()));
 
@@ -274,6 +276,7 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     }
 
     refreshActionSensitivity( );
+    refreshTrayIcon( );
     refreshStatusBar( );
     refreshTitle( );
     refreshVisibleCount( );
@@ -317,6 +320,7 @@ TrMainWindow :: onModelReset( )
     refreshVisibleCount( );
     refreshActionSensitivity( );
     refreshStatusBar( );
+    refreshTrayIcon( );
 }
 
 /****
@@ -649,6 +653,23 @@ TrMainWindow :: refreshVisibleCount( )
 }
 
 void
+TrMainWindow :: refreshTrayIcon( )
+{
+    Speed u, d;
+    const QString idle = tr( "Idle" );
+
+    foreach( int id, myModel.getIds( ) ) {
+        const Torrent * tor = myModel.getTorrentFromId( id );
+        u += tor->uploadSpeed( );
+        d += tor->downloadSpeed( );
+    }
+
+    myTrayIcon.setToolTip( tr( "Transmission\nUp: %1\nDown: %2" )
+                           .arg( u.isZero() ? idle : Formatter::speedToString( u ) )
+                           .arg( d.isZero() ? idle : Formatter::speedToString( d ) ) );
+}
+
+void
 TrMainWindow :: refreshStatusBar( )
 {
     const Speed up( myModel.getUploadSpeed( ) );
@@ -957,6 +978,7 @@ TrMainWindow :: refreshPref( int key )
             b = myPrefs.getBool( key );
             ui.action_TrayIcon->setChecked( b );
             myTrayIcon.setVisible( b );
+            refreshTrayIcon( );
             break;
 
         case Prefs::COMPACT_VIEW:

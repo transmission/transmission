@@ -51,9 +51,9 @@ class TorrentModel: public QAbstractListModel
     public:
         Torrent* getTorrentFromId( int id );
         const Torrent* getTorrentFromId( int id ) const;
+        QSet<int> getIds( ) const;
 
     private:
-        QSet<int> getIds( ) const;
         void addTorrent( Torrent * );
 
     public:

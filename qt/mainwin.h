@@ -104,6 +104,7 @@ class TrMainWindow: public QMainWindow
         void refreshVisibleCount( );
         void refreshTitle( );
         void refreshStatusBar( );
+        void refreshTrayIcon( );
         void openTorrent( );
         void openURL( );
         void newTorrent( );
