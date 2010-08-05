@@ -384,7 +384,7 @@ if test "x$enable_nls" = "xyes" ; then
     use_nls=yes
     IT_PROG_INTLTOOL([0.35.0],[no-xml])
     AC_CHECK_HEADERS([libintl.h])
-    GETTEXT_PACKAGE=transmission
+    GETTEXT_PACKAGE=transmission-gtk
     AC_SUBST(GETTEXT_PACKAGE)
     AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE],["$GETTEXT_PACKAGE"],[Gettext package])
     AM_GLIB_GNU_GETTEXT
@@ -471,7 +471,7 @@ dnl
 dnl  Generate the output
 
 AC_CONFIG_FILES([Makefile
-                 transmission.spec
+                 transmission-gtk.spec
                  cli/Makefile
                  daemon/Makefile
                  extras/Makefile

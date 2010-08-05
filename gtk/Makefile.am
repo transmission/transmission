@@ -71,11 +71,11 @@ noinst_HEADERS = \
     ui.h \
     util.h
 
-bin_PROGRAMS = transmission
+bin_PROGRAMS = transmission-gtk
 
 dbus_generated_sources = tr-core-dbus.h
 
-transmission_SOURCES = \
+transmission_gtk_SOURCES = \
     actions.c \
     add-dialog.c \
     conf.c \
@@ -104,9 +104,9 @@ transmission_SOURCES = \
     util.c \
     $(dbus_generated_sources)
 
-dist_man_MANS = transmission.1
+dist_man_MANS = transmission-gtk.1
 
-transmission_LDADD = \
+transmission_gtk_LDADD = \
     $(top_builddir)/libtransmission/libtransmission.a \
     $(top_builddir)/third-party/miniupnp/libminiupnp.a \
     $(top_builddir)/third-party/libnatpmp/libnatpmp.a \
@@ -124,7 +124,7 @@ transmission_LDADD = \
     @ZLIB_LIBS@ \
     @PTHREAD_LIBS@
 
-DESKTOP_IN_FILES=transmission.desktop.in
+DESKTOP_IN_FILES=transmission-gtk.desktop.in
 DESKTOP_FILES=$(DESKTOP_IN_FILES:.desktop.in=.desktop)
 @INTLTOOL_DESKTOP_RULE@
 
@@ -141,7 +141,7 @@ EXTRA_DIST = \
     transmission.png
 
 DISTCLEANFILES = \
-    transmission.desktop
+    transmission-gtk.desktop
 
 CLEANFILES = $(dbus_generated_sources)
 
@@ -163,10 +163,10 @@ BUILT_SOURCES = \
 CLEANFILES += \
 	transmission.res
 
-transmission_LDADD += \
+transmission_gtk_LDADD += \
 	transmission.res
 
-transmission_LDFLAGS = \
+transmission_gtk_LDFLAGS = \
 	-mwindows
 
 else
