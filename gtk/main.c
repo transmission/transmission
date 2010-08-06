@@ -636,7 +636,7 @@ main( int argc, char ** argv )
         actions_init ( myUIManager, cbdata );
         gtk_ui_manager_add_ui_from_string ( myUIManager, fallback_ui_file, -1, NULL );
         gtk_ui_manager_ensure_update ( myUIManager );
-        gtk_window_set_default_icon_name ( MY_READABLE_NAME );
+        gtk_window_set_default_icon_name ( MY_CONFIG_NAME );
 
         /* create main window now to be a parent to any error dialogs */
         win = GTK_WINDOW( tr_window_new( myUIManager, cbdata->core ) );
@@ -1399,7 +1399,7 @@ about( GtkWindow * parent )
                            "website-label", website_url,
                            "copyright",
                            _( "Copyright (c) The Transmission Project" ),
-                           "logo-icon-name", MY_READABLE_NAME,
+                           "logo-icon-name", MY_CONFIG_NAME,
 #ifdef SHOW_LICENSE
                            "license", LICENSE,
                            "wrap-license", TRUE,
