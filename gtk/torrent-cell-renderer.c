@@ -170,7 +170,7 @@ getShortTransferString( const tr_torrent  * tor,
         tr_formatter_speed_KBps( upStr, uploadSpeed_KBps, sizeof( upStr ) );
 
     if( haveDown && haveUp )
-        /* 1==down speed, 2==down arrow, 3==up speed, 4==down arrow */
+        /* 1==down arrow, 2==down speed, 3==up arrow, 4==down speed */
         g_snprintf( buf, buflen, _( "%1$s %2$s, %3$s %4$s" ),
                     gtr_get_unicode_string( GTR_UNICODE_DOWN ), downStr,
                     gtr_get_unicode_string( GTR_UNICODE_UP ), upStr );
@@ -182,7 +182,7 @@ getShortTransferString( const tr_torrent  * tor,
         /* bandwidth speed + unicode arrow */
         g_snprintf( buf, buflen, _( "%1$s %2$s" ),
                     gtr_get_unicode_string( GTR_UNICODE_UP ), upStr );
-    else if( tr_torrentHasMetadata( tor ) )
+    else if( haveMeta )
         /* the torrent isn't uploading or downloading */
         g_strlcpy( buf, _( "Idle" ), buflen );
     else
