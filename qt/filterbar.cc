@@ -19,7 +19,6 @@
 #include "filterbar.h"
 #include "hig.h"
 #include "prefs.h"
-#include "qticonloader.h"
 #include "torrent-filter.h"
 #include "torrent-model.h"
 #include "utils.h"
@@ -228,19 +227,19 @@ FilterBar :: createActivityCombo( )
     model->appendRow( new QStandardItem ); // separator
     delegate->setSeparator( model, model->index( 1, 0 ) );
 
-    row = new QStandardItem( QtIconLoader::icon( "system-run" ), tr( "Active" ) );
+    row = new QStandardItem( QIcon::fromTheme( "system-run", blankIcon ), tr( "Active" ) );
     row->setData( FilterMode::SHOW_ACTIVE, ActivityRole );
     model->appendRow( row );
 
-    row = new QStandardItem( QtIconLoader::icon( "go-down" ), tr( "Downloading" ) );
+    row = new QStandardItem( QIcon::fromTheme( "go-down", blankIcon ), tr( "Downloading" ) );
     row->setData( FilterMode::SHOW_DOWNLOADING, ActivityRole );
     model->appendRow( row );
 
-    row = new QStandardItem( QtIconLoader::icon( "go-up" ), tr( "Seeding" ) );
+    row = new QStandardItem( QIcon::fromTheme( "go-up", blankIcon ), tr( "Seeding" ) );
     row->setData( FilterMode::SHOW_SEEDING, ActivityRole );
     model->appendRow( row );
 
-    row = new QStandardItem( QtIconLoader::icon( "media-playback-pause", blankIcon ), tr( "Paused" ) );
+    row = new QStandardItem( QIcon::fromTheme( "media-playback-pause", blankIcon ), tr( "Paused" ) );
     row->setData( FilterMode::SHOW_PAUSED, ActivityRole );
     model->appendRow( row );
 
@@ -252,11 +251,11 @@ FilterBar :: createActivityCombo( )
     row->setData( FilterMode::SHOW_QUEUED, ActivityRole );
     model->appendRow( row );
 
-    row = new QStandardItem( QtIconLoader::icon( "view-refresh", blankIcon ), tr( "Verifying" ) );
+    row = new QStandardItem( QIcon::fromTheme( "view-refresh", blankIcon ), tr( "Verifying" ) );
     row->setData( FilterMode::SHOW_VERIFYING, ActivityRole );
     model->appendRow( row );
 
-    row = new QStandardItem( QtIconLoader::icon( "dialog-error", blankIcon ), tr( "Error" ) );
+    row = new QStandardItem( QIcon::fromTheme( "dialog-error", blankIcon ), tr( "Error" ) );
     row->setData( FilterMode::SHOW_ERROR, ActivityRole );
     model->appendRow( row );
 
@@ -420,9 +419,7 @@ FilterBar :: FilterBar( Prefs& prefs, TorrentModel& torrents, TorrentFilter& fil
     connect( myLineEdit, SIGNAL(textChanged(QString)), this, SLOT(onTextChanged(QString)));
 
     QPushButton * p = new QPushButton;
-    QIcon icon = QtIconLoader::icon( "edit-clear" );
-    if( icon.isNull( ) )
-        icon = style()->standardIcon( QStyle::SP_DialogCloseButton );
+    QIcon icon = QIcon::fromTheme( "edit-clear", style()->standardIcon( QStyle::SP_DialogCloseButton ) );
     int iconSize = style()->pixelMetric( QStyle::PM_SmallIconSize );
     p->setIconSize( QSize( iconSize, iconSize ) );
     p->setIcon( icon );

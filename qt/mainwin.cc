@@ -42,19 +42,18 @@
 #include "torrent-model.h"
 #include "triconpushbutton.h"
 #include "ui_mainwin.h"
-#include "qticonloader.h"
 
 #define PREFS_KEY "prefs-key";
 
 QIcon
-TrMainWindow :: getStockIcon( const QString& freedesktop_name, int fallback )
+TrMainWindow :: getStockIcon( const QString& name, int fallback )
 {
-    QIcon fallbackIcon;
+    QIcon icon = QIcon::fromTheme( name );
 
-    if( fallback > 0 )
-        fallbackIcon = style()->standardIcon( QStyle::StandardPixmap( fallback ), 0, this );
+    if( icon.isNull( ) && ( fallback >= 0 ) )
+        icon = style()->standardIcon( QStyle::StandardPixmap( fallback ), 0, this );
 
-    return QtIconLoader::icon( freedesktop_name, fallbackIcon );
+    return icon;
 }
 
 namespace

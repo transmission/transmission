@@ -51,7 +51,6 @@
 #include "formatter.h"
 #include "hig.h"
 #include "prefs.h"
-#include "qticonloader.h"
 #include "session.h"
 #include "squeezelabel.h"
 #include "torrent.h"
@@ -130,12 +129,12 @@ class PeerItem: public QTreeWidgetItem
 QIcon
 Details :: getStockIcon( const QString& freedesktop_name, int fallback )
 {
-    QIcon fallbackIcon;
+    QIcon icon = QIcon::fromTheme( freedesktop_name );
 
-    if( fallback > 0 )
-        fallbackIcon = style()->standardIcon( QStyle::StandardPixmap( fallback ), 0, this );
+    if( icon.isNull( ) )
+        icon = style()->standardIcon( QStyle::StandardPixmap( fallback ), 0, this );
 
-    return QtIconLoader::icon( freedesktop_name, fallbackIcon );
+    return icon;
 }
 
 Details :: Details( Session& session, Prefs& prefs, TorrentModel& model, QWidget * parent ):

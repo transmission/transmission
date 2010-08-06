@@ -40,7 +40,6 @@
 #include "hig.h"
 #include "prefs.h"
 #include "prefs-dialog.h"
-#include "qticonloader.h"
 #include "session.h"
 #include "utils.h"
 
@@ -442,12 +441,6 @@ PrefsDialog :: onUpdateBlocklistClicked( )
                                          tr( "<b>Update Blocklist</b><p>Getting new blocklist..." ),
                                          QMessageBox::Close,
                                          this );
-    QPixmap pixmap;
-    QIcon icon = QtIconLoader :: icon( "dialog-information" );
-    if( !icon.isNull( ) ) {
-        const int size = style()->pixelMetric( QStyle::PM_LargeIconSize );
-        myBlocklistDialog->setIconPixmap( icon.pixmap( size, size ) );
-    }
     connect( myBlocklistDialog, SIGNAL(rejected()), this, SLOT(onUpdateBlocklistCancelled()) );
     connect( &mySession, SIGNAL(blocklistUpdated(int)), this, SLOT(onBlocklistUpdated(int))) ;
     myBlocklistDialog->show( );

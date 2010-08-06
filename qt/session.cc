@@ -35,7 +35,6 @@
 
 #include "add-data.h"
 #include "prefs.h"
-#include "qticonloader.h"
 #include "session.h"
 #include "session-dialog.h"
 #include "torrent.h"
@@ -771,12 +770,6 @@ Session :: parseResponse( const char * json, size_t jsonLength )
                                                            QString::fromUtf8(str),
                                                            QMessageBox::Close,
                                                            QApplication::activeWindow());
-                        QPixmap pixmap;
-                        QIcon icon = QtIconLoader :: icon( "dialog-information" );
-                        if( !icon.isNull( ) ) {
-                            const int size = QApplication::style()->pixelMetric( QStyle::PM_LargeIconSize );
-                            d->setIconPixmap( icon.pixmap( size, size ) );
-                        }
                         connect( d, SIGNAL(rejected()), d, SLOT(deleteLater()) );
                         d->show( );
                     }
