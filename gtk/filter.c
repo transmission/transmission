@@ -842,15 +842,23 @@ activity_combo_box_new( GtkTreeModel * tmodel )
 static gboolean
 testText( const tr_torrent * tor, const char * key )
 {
-    tr_file_index_t i;
     gboolean ret = FALSE;
-    const tr_info * inf = tr_torrentInfo( tor );
 
-    for( i=0; i<inf->fileCount && !ret; ++i )
+    if( !key || !*key )
     {
-        char * pch = g_utf8_casefold( inf->files[i].name, -1 );
-        ret = !key || strstr( pch, key ) != NULL;
-        g_free( pch );
+        ret = TRUE;
+    }
+    else
+    {
+        tr_file_index_t i;
+        const tr_info * inf = tr_torrentInfo( tor );
+
+        for( i=0; i<inf->fileCount && !ret; ++i )
+        {
+            char * pch = g_utf8_casefold( inf->files[i].name, -1 );
+            ret = !key || strstr( pch, key ) != NULL;
+            g_free( pch );
+        }
     }
 
     return ret;
@@ -870,6 +878,7 @@ filter_entry_changed( GtkEditable * e, gpointer filter_model )
 
     pch = gtk_editable_get_chars( e, 0, -1 );
     folded = g_utf8_casefold( pch, -1 );
+    g_strstrip( folded );
     g_object_set_data_full( filter_model, TEXT_KEY, folded, g_free );
     g_free( pch );
 
