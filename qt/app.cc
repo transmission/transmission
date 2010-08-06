@@ -457,7 +457,14 @@ main( int argc, char * argv[] )
                                                                DBUS_INTERFACE,
                                                                "AddMetainfo" );
         QList<QVariant> arguments;
-        arguments.push_back( AddData(addme[i]).toBase64().constData() );
+        AddData a( addme[i] );
+        switch( a.type ) {
+            case AddData::URL:      arguments.push_back( a.url.toString( ) ); break;
+            case AddData::MAGNET:   arguments.push_back( a.magnet ); break;
+            case AddData::FILENAME: arguments.push_back( a.toBase64().constData() ); break;
+            case AddData::METAINFO: arguments.push_back( a.toBase64().constData() ); break;
+            default:                break;
+        }
         request.setArguments( arguments );
 
         QDBusMessage response = bus.call( request );
