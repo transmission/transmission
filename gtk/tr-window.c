@@ -745,22 +745,20 @@ updateTorrentCount( PrivateData * p )
     if( p && p->core )
     {
         char      buf[512];
-        const int torrentCount = gtk_tree_model_iter_n_children(
-            tr_core_model( p->core ), NULL );
-        const int visibleCount = gtk_tree_model_iter_n_children(
-            p->filter_model, NULL );
+        const int torrentCount = gtk_tree_model_iter_n_children( tr_core_model( p->core ), NULL );
+        const int visibleCount = gtk_tree_model_iter_n_children( p->filter_model, NULL );
 
         if( !torrentCount )
             *buf = '\0';
         else if( torrentCount != visibleCount )
             g_snprintf( buf, sizeof( buf ),
-                        ngettext( "%1$'d of %2$'d Torrent",
-                                  "%1$'d of %2$'d Torrents",
-                                  torrentCount ),
+                        gtr_ngettext( "%1$'d of %2$'d Torrent",
+                                      "%1$'d of %2$'d Torrents",
+                                      torrentCount ),
                         visibleCount, torrentCount );
         else
             g_snprintf( buf, sizeof( buf ),
-                        ngettext( "%'d Torrent", "%'d Torrents", torrentCount ),
+                        gtr_ngettext( "%'d Torrent", "%'d Torrents", torrentCount ),
                         torrentCount );
         gtk_label_set_text( GTK_LABEL( p->gutter_lb ), buf );
     }

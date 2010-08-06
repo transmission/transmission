@@ -145,8 +145,11 @@ void gtr_widget_set_visible( GtkWidget *, gboolean );
 /* backwards-compatible wrapper around g_object_ref_sink() */
 gpointer gtr_object_ref_sink( gpointer object );
 
-/* backwards-comparible wrapper around g_strcmp0() */
+/* backwards-compatible wrapper around g_strcmp0() */
 int gtr_strcmp0( const char * str1, const char * str2 );
+
+/* backwards-compatible wrapper around g_dngettext() */
+const gchar* gtr_ngettext( const gchar*, const gchar*, gulong );
 
 /***
 ****

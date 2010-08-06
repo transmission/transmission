@@ -276,9 +276,9 @@ getStatusString( const tr_torrent  * tor,
             if( tr_torrentHasMetadata( tor ) )
             {
                 g_string_append_printf( gstr,
-                    ngettext( "Downloading from %1$'d of %2$'d connected peer",
-                              "Downloading from %1$'d of %2$'d connected peers",
-                              torStat->peersConnected ),
+                    gtr_ngettext( "Downloading from %1$'d of %2$'d connected peer",
+                                  "Downloading from %1$'d of %2$'d connected peers",
+                                  torStat->peersConnected ),
                     torStat->peersSendingToUs +
                     torStat->webseedsSendingToUs,
                     torStat->peersConnected +
@@ -287,9 +287,9 @@ getStatusString( const tr_torrent  * tor,
             else
             {
                 g_string_append_printf( gstr,
-                    ngettext( "Downloading metadata from %1$'d peer (%2$d%% done)",
-                              "Downloading metadata from %1$'d peers (%2$d%% done)",
-                              torStat->peersConnected ),
+                    gtr_ngettext( "Downloading metadata from %1$'d peer (%2$d%% done)",
+                                  "Downloading metadata from %1$'d peers (%2$d%% done)",
+                                  torStat->peersConnected ),
                     torStat->peersConnected + torStat->webseedsSendingToUs,
                     (int)(100.0*torStat->metadataPercentComplete) );
             }
@@ -298,9 +298,9 @@ getStatusString( const tr_torrent  * tor,
 
         case TR_STATUS_SEED:
             g_string_append_printf( gstr,
-                ngettext( "Seeding to %1$'d of %2$'d connected peer",
-                          "Seeding to %1$'d of %2$'d connected peers",
-                          torStat->peersConnected ),
+                gtr_ngettext( "Seeding to %1$'d of %2$'d connected peer",
+                              "Seeding to %1$'d of %2$'d connected peers",
+                              torStat->peersConnected ),
                 torStat->peersGettingFromUs,
                 torStat->peersConnected );
                 break;

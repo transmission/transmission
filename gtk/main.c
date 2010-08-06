@@ -1070,16 +1070,16 @@ showTorrentErrors( struct cbdata * cbdata )
 {
     if( cbdata->errqueue )
         flushAddTorrentErrors( GTK_WINDOW( cbdata->wind ),
-                               ngettext( "Couldn't add corrupt torrent",
-                                         "Couldn't add corrupt torrents",
-                                         g_slist_length( cbdata->errqueue ) ),
+                               gtr_ngettext( "Couldn't add corrupt torrent",
+                                             "Couldn't add corrupt torrents",
+                                             g_slist_length( cbdata->errqueue ) ),
                                &cbdata->errqueue );
 
     if( cbdata->dupqueue )
         flushAddTorrentErrors( GTK_WINDOW( cbdata->wind ),
-                               ngettext( "Couldn't add duplicate torrent",
-                                         "Couldn't add duplicate torrents",
-                                         g_slist_length( cbdata->dupqueue ) ),
+                               gtr_ngettext( "Couldn't add duplicate torrent",
+                                             "Couldn't add duplicate torrents",
+                                             g_slist_length( cbdata->dupqueue ) ),
                                &cbdata->dupqueue );
 }
 

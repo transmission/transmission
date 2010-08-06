@@ -73,8 +73,8 @@ updateStats( gpointer gdata )
              tr_strltime( buf, one.secondsActive, sizeof( buf ) ) );
     setLabelFromRatio( ui->one_ratio_lb, one.ratio );
 
-    fmt = ngettext( "Started %'d time", "Started %'d times",
-                    (int)all.sessionCount );
+    fmt = gtr_ngettext( "Started %'d time", "Started %'d times",
+                        (int)all.sessionCount );
     g_snprintf( buf, sizeof( buf ), fmt, (int)all.sessionCount );
     setLabel( ui->all_sessions_lb, buf );
     setLabel( ui->all_up_lb,

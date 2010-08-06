@@ -179,14 +179,10 @@ tr_strltime( char * buf, int seconds, size_t buflen )
     minutes = ( seconds % 3600 ) / 60;
     seconds = ( seconds % 3600 ) % 60;
 
-    g_snprintf( d, sizeof( d ), ngettext( "%'d day", "%'d days",
-                                          days ), days );
-    g_snprintf( h, sizeof( h ), ngettext( "%'d hour", "%'d hours",
-                                          hours ), hours );
-    g_snprintf( m, sizeof( m ),
-                ngettext( "%'d minute", "%'d minutes", minutes ), minutes );
-    g_snprintf( s, sizeof( s ),
-                ngettext( "%'d second", "%'d seconds", seconds ), seconds );
+    g_snprintf( d, sizeof( d ), gtr_ngettext( "%'d day", "%'d days", days ), days );
+    g_snprintf( h, sizeof( h ), gtr_ngettext( "%'d hour", "%'d hours", hours ), hours );
+    g_snprintf( m, sizeof( m ), gtr_ngettext( "%'d minute", "%'d minutes", minutes ), minutes );
+    g_snprintf( s, sizeof( s ), gtr_ngettext( "%'d second", "%'d seconds", seconds ), seconds );
 
     if( days )
     {
@@ -427,6 +423,18 @@ gtr_strcmp0( const char * str1, const char * str2 )
     if( str1 ) return 1;
     if( str2 ) return -1;
     return 0;
+#endif
+}
+
+const gchar *
+gtr_ngettext( const gchar * msgid,
+              const gchar * msgid_plural,
+              gulong n )
+{
+#if GLIB_CHECK_VERSION( 2, 18, 0 )
+    return g_dngettext( NULL, msgid, msgid_plural, n );
+#else
+    return ngettext( msgid, msgid_plural, n );
 #endif
 }
 
