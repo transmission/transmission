@@ -1,3 +1,18 @@
+=== Transmission 2.04 (2010/08/06) ===
+[http://trac.transmissionbt.com/query?milestone=2.04&group=component&groupdesc=1&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Fix display bug in tr_truncd()
+==== Mac ====
+  * Fix bug that didn't initiate Local Peer Discovery on startup
+  * Fix display bug in the blocklist update dialog
+==== GTK+ ====
+  * Torrent inaccurate "active torrent" counts in the filterbar 
+  * Fix display bug when displaying magnet links' names
+==== Qt ====
+  * Fix crash when accessing a password-protected remote session
+==== Web Client ====
+  * Fix bad redirect
+
 === Transmission 2.03 (2010/07/21) ===
 [http://trac.transmissionbt.com/query?milestone=2.03&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== Mac ====
