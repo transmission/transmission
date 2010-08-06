@@ -188,7 +188,6 @@ tr_prefs_init_defaults( tr_benc * d )
     tr_bencDictAddInt( d, PREF_KEY_MAIN_WINDOW_WIDTH, 300 );
     tr_bencDictAddInt( d, PREF_KEY_MAIN_WINDOW_X, 50 );
     tr_bencDictAddInt( d, PREF_KEY_MAIN_WINDOW_Y, 50 );
-    tr_bencDictAddStr( d, PREF_KEY_MAIN_WINDOW_LAYOUT_ORDER, "menu,toolbar,filter,list,statusbar" );
 
     str = NULL;
 #if GLIB_CHECK_VERSION( 2, 14, 0 )

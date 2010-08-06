@@ -705,27 +705,12 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
                                          GTK_SHADOW_IN );
     gtk_container_add( GTK_CONTAINER( w ), p->view );
 
-    /* layout the widgets */
-    {
-        const char * str = pref_string_get( PREF_KEY_MAIN_WINDOW_LAYOUT_ORDER );
-        char ** tokens = g_strsplit( str, ",", -1 );
-        for( i=0; tokens && tokens[i]; ++i )
-        {
-            const char * key = tokens[i];
-
-            if( !strcmp( key, "menu" ) )
-                gtk_box_pack_start( GTK_BOX( vbox ), mainmenu, FALSE, FALSE, 0 );
-            else if( !strcmp( key, "toolbar" ) )
-                gtk_box_pack_start( GTK_BOX( vbox ), toolbar, FALSE, FALSE, 0 );
-            else if( !strcmp( key, "filter" ) )
-                gtk_box_pack_start( GTK_BOX( vbox ), filter, FALSE, FALSE, 0 );
-            else if( !strcmp( key, "list" ) )
-                gtk_box_pack_start( GTK_BOX( vbox ), list, TRUE, TRUE, 0 );
-            else if( !strcmp( key, "statusbar" ) )
-                gtk_box_pack_start( GTK_BOX( vbox ), status, FALSE, FALSE, 0 );
-        }
-        g_strfreev( tokens );
-    }
+    /* lay out the widgets */
+    gtk_box_pack_start( GTK_BOX( vbox ), mainmenu, FALSE, FALSE, 0 );
+    gtk_box_pack_start( GTK_BOX( vbox ), toolbar, FALSE, FALSE, 0 );
+    gtk_box_pack_start( GTK_BOX( vbox ), filter, FALSE, FALSE, 0 );
+    gtk_box_pack_start( GTK_BOX( vbox ), list, TRUE, TRUE, 0 );
+    gtk_box_pack_start( GTK_BOX( vbox ), status, FALSE, FALSE, 0 );
 
     {
         /* this is to determine the maximum width/height for the label */

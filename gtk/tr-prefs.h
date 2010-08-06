@@ -42,7 +42,6 @@ GtkWidget * tr_prefs_dialog_new( GObject *   core,
 #define PREF_KEY_STATUSBAR_STATS                   "statusbar-stats"
 #define PREF_KEY_TOOLBAR                           "show-toolbar"
 #define PREF_KEY_BLOCKLIST_UPDATES_ENABLED         "blocklist-updates-enabled"
-#define PREF_KEY_MAIN_WINDOW_LAYOUT_ORDER          "main-window-layout-order"
 #define PREF_KEY_MAIN_WINDOW_HEIGHT                "main-window-height"
 #define PREF_KEY_MAIN_WINDOW_WIDTH                 "main-window-width"
 #define PREF_KEY_MAIN_WINDOW_X                     "main-window-x"
