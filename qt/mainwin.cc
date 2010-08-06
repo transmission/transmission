@@ -352,7 +352,6 @@ TrMainWindow :: createStatusBar( )
 {
     QMenu * m;
     QLabel * l;
-    QWidget * w;
     QHBoxLayout * h;
     QPushButton * p;
     QActionGroup * a;
@@ -413,12 +412,8 @@ TrMainWindow :: createStatusBar( )
         l = myStatsLabel = new QLabel( this );
         h->addWidget( l );
 
-    h->addSpacing( HIG::PAD_BIG );
+    h->addStretch( 1 );
 
-        w = new QWidget( this );
-        w->setMinimumSize( HIG::PAD_BIG, 1 );
-        w->setMaximumSize( HIG::PAD_BIG, 1 );
-        h->addWidget( w );
         l = myDownloadSpeedLabel = new QLabel( this );
         const int minimumSpeedWidth = l->fontMetrics().width( Formatter::speedToString(Speed::fromKBps(999.99)));
         l->setMinimumWidth( minimumSpeedWidth );
@@ -428,12 +423,8 @@ TrMainWindow :: createStatusBar( )
         l->setPixmap( getStockIcon( "go-down", QStyle::SP_ArrowDown ).pixmap( smallIconSize ) );
         h->addWidget( l );
 
-    h->addSpacing( HIG::PAD_BIG );
+    h->addStretch( 1 );
 
-        w = new QWidget( this );
-        w->setMinimumSize( HIG::PAD_BIG, 1 );
-        w->setMaximumSize( HIG::PAD_BIG, 1 );
-        h->addWidget( w );
         l = myUploadSpeedLabel = new QLabel;
         l->setMinimumWidth( minimumSpeedWidth );
         l->setAlignment( Qt::AlignRight|Qt::AlignVCenter );
