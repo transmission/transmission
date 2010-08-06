@@ -27,13 +27,6 @@
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
 
-#if !GTK_CHECK_VERSION( 2,16,0 )
- /* FIXME: when 2.16 has been out long enough, it would be really nice to
-  * get rid of this libsexy usage because of its makefile strangeness */
- #define USE_SEXY
- #include "sexy-icon-entry.h"
-#endif
-
 #include <libtransmission/transmission.h>
 
 #include "actions.h"

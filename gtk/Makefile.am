@@ -7,13 +7,6 @@ endif
 # these should go in GTK_EXTRA_CPPFLAGS at some point, but not yet because it breaks libnotify's headers
 # -DG_DISABLE_SINGLE_INCLUDES -DGTK_DISABLE_SINGLE_INCLUDES
 
-sexy-marshal.h:	marshal.list
-	glib-genmarshal --prefix=sexy_marshal ./marshal.list --header > sexy-marshal.h
-
-sexy-marshal.c:	marshal.list
-	echo '#include "sexy-marshal.h"' > sexy-marshal.c
-	glib-genmarshal --prefix=sexy_marshal ./marshal.list --body >> sexy-marshal.c
-
 AM_CPPFLAGS = \
     -I$(top_srcdir) \
     -DTRANSMISSIONLOCALEDIR=\""$(transmissionlocaledir)"\" \
@@ -57,8 +50,6 @@ noinst_HEADERS = \
     ratio-icon.h \
     relocate.h \
     stats.h \
-    sexy-icon-entry.h \
-    sexy-marshal.h \
     torrent-cell-renderer.h \
     tracker-list.h \
     tr-core.h \
@@ -91,8 +82,6 @@ transmission_gtk_SOURCES = \
     msgwin.c \
     notify.c \
     relocate.c \
-    sexy-icon-entry.c \
-    sexy-marshal.c \
     stats.c \
     torrent-cell-renderer.c \
     tracker-list.c \
@@ -156,8 +145,6 @@ transmission.res: transmission.rc
 	$(WINDRES) -J rc -i transmission.rc -O coff -o transmission.res
 
 BUILT_SOURCES = \
-	sexy-marshal.h \
-	sexy-marshal.c \
 	setransmission.res
 
 CLEANFILES += \
@@ -168,11 +155,5 @@ transmission_gtk_LDADD += \
 
 transmission_gtk_LDFLAGS = \
 	-mwindows
-
-else
-
-BUILT_SOURCES = \
-	sexy-marshal.h \
-	sexy-marshal.c
 
 endif
