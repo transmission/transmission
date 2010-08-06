@@ -708,10 +708,8 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
     {
         /* this is to determine the maximum width/height for the label */
         int w=0, h=0;
-        char buf[64];
         PangoLayout * pango_layout;
-        tr_formatter_speed_KBps( buf, 999.99, sizeof( buf ) );
-        pango_layout = gtk_widget_create_pango_layout( p->ul_lb, buf );
+        pango_layout = gtk_widget_create_pango_layout( p->ul_lb, "999.99 KiB/s" );
         pango_layout_get_pixel_size( pango_layout, &w, &h );
         gtk_widget_set_size_request( p->ul_lb, w, h );
         gtk_widget_set_size_request( p->dl_lb, w, h );
