@@ -111,7 +111,7 @@ blocklistLoad( tr_blocklist * b )
 
     {
         char * base = tr_basename( b->filename );
-        tr_inf( _( "Blocklist \"%s\" contains %'zu entries" ), base, b->ruleCount );
+        tr_inf( _( "Blocklist \"%s\" contains %zu entries" ), base, b->ruleCount );
         tr_free( base );
     }
 }
@@ -367,7 +367,7 @@ _tr_blocklistSetContent( tr_blocklist * b,
 
     {
         char * base = tr_basename( b->filename );
-        tr_inf( _( "Blocklist \"%s\" updated with %'d entries" ), base, outCount );
+        tr_inf( _( "Blocklist \"%s\" updated with %d entries" ), base, outCount );
         tr_free( base );
     }
 
