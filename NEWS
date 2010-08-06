@@ -3,11 +3,10 @@
 ==== All Platforms ====
   * Fix display bug in tr_truncd()
 ==== Mac ====
-  * Fix bug that didn't initiate Local Peer Discovery on startup
-  * Fix display bug in the blocklist update dialog
+  * Fix bug that caused Local Peer Discovery to always be disabled on startup
 ==== GTK+ ====
-  * Torrent inaccurate "active torrent" counts in the filterbar 
-  * Fix display bug when displaying magnet links' names
+  * Fix inaccurate "active torrent" counts in the filterbar 
+  * Fix display bug with magnet link names
 ==== Qt ====
   * Fix crash when accessing a password-protected remote session
 ==== Web Client ====
