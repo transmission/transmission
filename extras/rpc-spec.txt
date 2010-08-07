@@ -624,3 +624,5 @@
          |         | yes       | session-get    | new arg "inactive-seeding-limit-enabled"
          |         | yes       | torrent-set    | new arg "seedIdleLimit"
          |         | yes       | torrent-set    | new arg "seedIdleMode"
+         |         |        NO | torrent-get    | units for "rateDownload" changed from B to KB
+         |         |        NO | torrent-get    | units for "rateUpload" changed from B to KB
