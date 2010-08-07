@@ -1,8 +1,8 @@
 === Transmission 2.04 (2010/08/06) ===
 [http://trac.transmissionbt.com/query?milestone=2.04&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== All Platforms ====
+  * Improved shutdown time in some situations
   * Fix display bug in tr_truncd()
-  * Fix long shutdown time in some situations
 ==== Mac ====
   * Fix bug that caused Local Peer Discovery to always be disabled on startup
 ==== GTK+ ====
