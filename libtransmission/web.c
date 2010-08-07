@@ -133,11 +133,18 @@ getCurlProxyType( tr_proxy_type t )
 }
 
 static long
-getTimeoutFromURL( const char * url )
+getTimeoutFromURL( const struct tr_web_task * task )
 {
-    if( strstr( url, "scrape" ) != NULL ) return 30L;
-    if( strstr( url, "announce" ) != NULL ) return 90L;
-    return 240L;
+    long timeout;
+    const tr_session * session = task->session;
+
+    if( !session || session->isClosed ) timeout = 20L;
+    else if( strstr( task->url, "scrape" ) != NULL ) timeout = 30L;
+    else if( strstr( task->url, "announce" ) != NULL ) timeout = 90L;
+    else timeout = 240L;
+
+    fprintf( stderr, "timeout for [%s] is %ld\n", task->url, timeout );
+    return timeout;
 }
 
 static CURL *
@@ -174,7 +181,7 @@ createEasy( tr_session * s, struct tr_web_task * task )
 #endif
     curl_easy_setopt( e, CURLOPT_SSL_VERIFYHOST, 0L );
     curl_easy_setopt( e, CURLOPT_SSL_VERIFYPEER, 0L );
-    curl_easy_setopt( e, CURLOPT_TIMEOUT, getTimeoutFromURL( task->url ) );
+    curl_easy_setopt( e, CURLOPT_TIMEOUT, getTimeoutFromURL( task ) );
     curl_easy_setopt( e, CURLOPT_URL, task->url );
     curl_easy_setopt( e, CURLOPT_USERAGENT, TR_NAME "/" SHORT_VERSION_STRING );
     curl_easy_setopt( e, CURLOPT_VERBOSE, verbose );
@@ -310,6 +317,7 @@ tr_webThreadFunc( void * vsession )
         tr_lockLock( web->taskLock );
         while(( task = tr_list_pop_front( &web->tasks )))
         {
+            dbgmsg( "adding task to curl: [%s]\n", task->url );
             curl_multi_add_handle( multi, createEasy( session, task ));
             /*fprintf( stderr, "adding a task.. taskCount is now %d\n", taskCount );*/
             ++taskCount;
