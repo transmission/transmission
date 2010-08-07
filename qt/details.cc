@@ -1085,8 +1085,9 @@ Details :: createOptionsTab( )
     c = new QCheckBox( tr( "Limit &download speed (%1):" ).arg( speed_K_str ) );
     mySingleDownCheck = c;
     s = new QSpinBox( );
-    mySingleDownSpin = s;
+    s->setSingleStep( 5 );
     s->setRange( 0, INT_MAX );
+    mySingleDownSpin = s;
     hig->addRow( c, s );
     enableWhenChecked( c, s );
     connect( c, SIGNAL(clicked(bool)), this, SLOT(onDownloadLimitedToggled(bool)) );
@@ -1095,8 +1096,9 @@ Details :: createOptionsTab( )
     c = new QCheckBox( tr( "Limit &upload speed (%1):" ).arg( speed_K_str ) );
     mySingleUpCheck = c;
     s = new QSpinBox( );
-    mySingleUpSpin = s;
+    s->setSingleStep( 5 );
     s->setRange( 0, INT_MAX );
+    mySingleUpSpin = s;
     hig->addRow( c, s );
     enableWhenChecked( c, s );
     connect( c, SIGNAL(clicked(bool)), this, SLOT(onUploadLimitedToggled(bool)) );
@@ -1136,6 +1138,7 @@ Details :: createOptionsTab( )
     connect( m, SIGNAL(currentIndexChanged(int)), this, SLOT(onIdleModeChanged(int)));
     h->addWidget( myIdleCombo = m );
     s = new QSpinBox( );
+    s->setSingleStep( 5 );
     s->setRange( 1, 9999 );
     connect( s, SIGNAL(valueChanged(int)), this, SLOT(onIdleLimitChanged(int)));
     h->addWidget( myIdleSpin = s );
@@ -1146,6 +1149,7 @@ Details :: createOptionsTab( )
     hig->addSectionTitle( tr( "Peer Connections" ) );
 
     s = new QSpinBox( );
+    s->setSingleStep( 5 );
     s->setRange( 1, 300 );
     connect( s, SIGNAL(valueChanged(int)), this, SLOT(onMaxPeersChanged(int)));
     myPeerLimitSpin = s;
