@@ -1,0 +1,63 @@
+div.torrent_global_menu ul li {
+	width: 87px;
+}
+div#torrent_container {
+	overflow-x: hidden;
+}
+div#torrent_container ul li {
+	padding-right: 40px;
+}
+li.torrent .torrent_progress_bar.incomplete{
+  margin-right: 0 !important;
+}
+li.torrent a div {
+	right: -5px;
+	top: 2px;
+}
+
+div.torrent_footer ul#settings_menu li#button:active,
+div.torrent_footer ul#settings_menu li#button:hover {
+	background-position: -32px -75px;
+}
+.trans_menu li.main li {
+	width: auto;
+}
+.trans_menu li.active {
+	background-image: none !important;
+}
+.trans_menu .innerBox li.hover {
+	z-index: 1 !important; /* the hover z-index has to be below the normal one the hovering items may be drawn over a submenu */
+	background-color: #24e !important;
+	color: #fff !important;
+	text-shadow: none;
+	margin-bottom: 0px;
+	margin-top: 0px;
+}
+.trans_menu ul {
+	width: 210px;
+}
+.trans_menu li.separator {
+	line-height: 0px;
+	height: 1px !important;
+	font-size: 0px;
+	width: auto;
+}
+.trans_menu li, .trans_menu li.active {
+	position: relative;
+	width: auto;
+	zoom: 1.0;
+}
+.trans_menu li span.arrow {
+	position: absolute;
+	right: 3px; top: 0px;
+}
+.trans_menu ul ul {
+	margin-left: 0px !important;
+}
+.trans_menu li .innerBox .outerbox {
+	top: auto !important;
+	bottom: 0px !important;
+}
+.dialog_container{
+  z-index: 4
+}

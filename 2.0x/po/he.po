@@ -1,0 +1,2274 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: transmission\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-05-20 11:39-0500\n"
+"PO-Revision-Date: 2010-03-15 11:53+0000\n"
+"Last-Translator: Yaron <sh.yaron@gmail.com>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Launchpad-Export-Date: 2010-07-19 18:20+0000\n"
+"X-Generator: Launchpad (build Unknown)\n"
+"X-Poedit-Language: Hebrew\n"
+
+#: ../gtk/actions.c:55
+msgid "Sort by _Activity"
+msgstr "מיון לפי _פעילות"
+
+#: ../gtk/actions.c:56
+msgid "Sort by _Name"
+msgstr "מיון לפי _שם"
+
+#: ../gtk/actions.c:57
+msgid "Sort by _Progress"
+msgstr "מיון לפי _התקדמות"
+
+#: ../gtk/actions.c:58
+msgid "Sort by Rati_o"
+msgstr "מיון לפי י_חס"
+
+#: ../gtk/actions.c:59
+msgid "Sort by Stat_e"
+msgstr "מיון לפי מ_צב"
+
+#: ../gtk/actions.c:60
+msgid "Sort by T_racker"
+msgstr "מיון לפי ט_ראקר"
+
+#: ../gtk/actions.c:61
+msgid "Sort by A_ge"
+msgstr "מיון לפי גי_ל"
+
+#: ../gtk/actions.c:62
+msgid "Sort by Time _Left"
+msgstr "מיון לפי זמן _שעבר"
+
+#: ../gtk/actions.c:63
+msgid "Sort by Si_ze"
+msgstr "מיון לפי גו_דל"
+
+#: ../gtk/actions.c:80
+msgid "_Show Transmission"
+msgstr "ה_צגת Transmission"
+
+#: ../gtk/actions.c:81
+msgid "Message _Log"
+msgstr "יו_מן הודעות"
+
+#: ../gtk/actions.c:96
+msgid "Enable Temporary Speed _Limits"
+msgstr ""
+
+#: ../gtk/actions.c:97
+msgid "_Compact View"
+msgstr ""
+
+#: ../gtk/actions.c:98
+msgid "Re_verse Sort Order"
+msgstr "מיון בסדר ה_פוך"
+
+#: ../gtk/actions.c:99
+msgid "_Filterbar"
+msgstr "שורת _סינון"
+
+#: ../gtk/actions.c:100
+msgid "_Statusbar"
+msgstr "שורת _מצב"
+
+#: ../gtk/actions.c:101
+msgid "_Toolbar"
+msgstr "_סרגל כלים"
+
+#: ../gtk/actions.c:106
+msgid "_File"
+msgstr "_קובץ"
+
+#: ../gtk/actions.c:107
+msgid "_Torrent"
+msgstr "_טורנט"
+
+#: ../gtk/actions.c:108
+msgid "_View"
+msgstr "_תצוגה"
+
+#: ../gtk/actions.c:109
+msgid "_Sort Torrents By"
+msgstr "_מיון טורנטים לפי"
+
+#: ../gtk/actions.c:110
+msgid "_Edit"
+msgstr "_עריכה"
+
+#: ../gtk/actions.c:111
+msgid "_Help"
+msgstr "_עזרה"
+
+#: ../gtk/actions.c:112
+msgid "Copy _Magnet Link to Clipboard"
+msgstr ""
+
+#: ../gtk/actions.c:113
+msgid "Add _URL..."
+msgstr "הוספת _כתובת..."
+
+#: ../gtk/actions.c:113
+msgid "Add URL..."
+msgstr "הוספת כתובת..."
+
+#: ../gtk/actions.c:114 ../gtk/actions.c:115
+msgid "Add a torrent"
+msgstr "הוסף טורנט"
+
+#: ../gtk/actions.c:115
+msgid "_Add File..."
+msgstr "הוספת _קובץ..."
+
+#: ../gtk/actions.c:116
+msgid "_Start"
+msgstr "_התחל"
+
+#: ../gtk/actions.c:116
+msgid "Start torrent"
+msgstr "התחל טורנט"
+
+#: ../gtk/actions.c:117
+msgid "_Statistics"
+msgstr "_סטטיסטיקה"
+
+#: ../gtk/actions.c:118
+msgid "_Donate"
+msgstr "_תרומה"
+
+#: ../gtk/actions.c:119
+msgid "_Verify Local Data"
+msgstr "_בדוק נתונים מקומיים"
+
+#: ../gtk/actions.c:120
+msgid "_Pause"
+msgstr "_השהה"
+
+#: ../gtk/actions.c:120
+msgid "Pause torrent"
+msgstr "השהה טורנט"
+
+#: ../gtk/actions.c:121
+msgid "_Pause All"
+msgstr "ה_שהה הכול"
+
+#: ../gtk/actions.c:121
+msgid "Pause all torrents"
+msgstr "השהה את כל הטורנטים"
+
+#: ../gtk/actions.c:122
+msgid "_Start All"
+msgstr "ה_תחלת הכול"
+
+#: ../gtk/actions.c:122
+msgid "Start all torrents"
+msgstr "התחלת הורדת כל הטורנטים"
+
+#: ../gtk/actions.c:123
+msgid "Set _Location"
+msgstr "הגדרת _מיקום"
+
+#: ../gtk/actions.c:124
+msgid "Remove torrent"
+msgstr "הסר טורנט"
+
+#: ../gtk/actions.c:125
+msgid "_Delete Files and Remove"
+msgstr "_מחק קבצים והסר"
+
+#: ../gtk/actions.c:126
+msgid "_New..."
+msgstr "_חדש..."
+
+#: ../gtk/actions.c:126
+msgid "Create a torrent"
+msgstr "יצירת טורנט"
+
+#: ../gtk/actions.c:127
+msgid "_Quit"
+msgstr "י_ציאה"
+
+#: ../gtk/actions.c:128
+msgid "Select _All"
+msgstr "בחר _הכל"
+
+#: ../gtk/actions.c:129
+msgid "Dese_lect All"
+msgstr "בטל בחי_רה"
+
+#: ../gtk/actions.c:131
+msgid "Torrent properties"
+msgstr "מאפייני הטורנט"
+
+#: ../gtk/actions.c:132
+msgid "_Open Folder"
+msgstr "_פתח תיקייה"
+
+#: ../gtk/actions.c:134
+msgid "_Contents"
+msgstr "_תכנים"
+
+#: ../gtk/actions.c:135
+msgid "Ask Tracker for _More Peers"
+msgstr "בקש מהטראקר מקורות _נוספים"
+
+#: ../gtk/add-dialog.c:240
+msgid "Torrent files"
+msgstr "קבצי טורנט"
+
+#: ../gtk/add-dialog.c:245
+msgid "All files"
+msgstr "כל הקבצים"
+
+#. make the dialog
+#: ../gtk/add-dialog.c:272
+msgid "Torrent Options"
+msgstr "אפשרויות טורנט"
+
+#: ../gtk/add-dialog.c:295 ../gtk/tr-prefs.c:302
+msgid "Mo_ve .torrent file to the trash"
+msgstr "העברת קובץ .torret אל הא_שפה"
+
+#: ../gtk/add-dialog.c:297 ../gtk/tr-prefs.c:298
+msgid "_Start when added"
+msgstr "_התחל בהוספה"
+
+#: ../gtk/add-dialog.c:312
+msgid "_Torrent file:"
+msgstr "קובץ _טורנט"
+
+#: ../gtk/add-dialog.c:316
+msgid "Select Source File"
+msgstr "בחר קובץ מקור"
+
+#: ../gtk/add-dialog.c:327
+msgid "_Destination folder:"
+msgstr "_תיקיית יעד:"
+
+#: ../gtk/add-dialog.c:331
+msgid "Select Destination Folder"
+msgstr "בחר תיקיית יעד"
+
+#: ../gtk/add-dialog.c:353 ../gtk/details.c:478
+msgid "Torrent _priority:"
+msgstr "עדיפות ה_טורנט:"
+
+#: ../gtk/add-dialog.c:437
+msgid "Add a Torrent"
+msgstr "הוסף טורנט"
+
+#: ../gtk/add-dialog.c:454 ../gtk/tr-prefs.c:294
+msgid "Show _options dialog"
+msgstr "הצגת חלון הא_פשרויות"
+
+#: ../gtk/add-dialog.c:532
+msgid "Add URL"
+msgstr "הוספת כתובת"
+
+#: ../gtk/add-dialog.c:545
+msgid "Add torrent from URL"
+msgstr "הוספת טורנט מכתובת"
+
+#: ../gtk/add-dialog.c:549
+msgid "_URL"
+msgstr "_כתובת"
+
+#: ../gtk/conf.c:62 ../libtransmission/fdlimit.c:341
+#: ../libtransmission/metainfo.c:115 ../libtransmission/utils.c:604
+#: ../libtransmission/utils.c:615
+#, c-format
+msgid "Couldn't create \"%1$s\": %2$s"
+msgstr "לא ניתן ליצור \"%1$s\": %2$s"
+
+#: ../gtk/conf.c:87 ../libtransmission/fdlimit.c:369
+#, c-format
+msgid "Couldn't open \"%1$s\": %2$s"
+msgstr "לא ניתן לפתוח \"%1$s\": %2$s"
+
+#: ../gtk/conf.c:92
+#, c-format
+msgid "%s is already running."
+msgstr "%s כבר פעיל."
+
+#: ../gtk/conf.c:447 ../gtk/conf.c:452
+#, c-format
+msgid "Importing \"%s\""
+msgstr "ייבוא \"%s\" מתבצע"
+
+#: ../gtk/details.c:447 ../gtk/tr-prefs.c:1436
+msgid "Speed"
+msgstr "מהירות"
+
+#: ../gtk/details.c:449
+msgid "Honor global _limits"
+msgstr "כיבוד _הגבלות גלובליות"
+
+#: ../gtk/details.c:454 ../gtk/tr-prefs.c:1220
+msgid "Limit _download speed (KiB/s):"
+msgstr ""
+
+#: ../gtk/details.c:466 ../gtk/tr-prefs.c:1227
+msgid "Limit _upload speed (KiB/s):"
+msgstr ""
+
+#: ../gtk/details.c:482
+msgid "Seed-Until Ratio"
+msgstr "זריעה עד ליחס של"
+
+#: ../gtk/details.c:484
+msgid "Use _global settings"
+msgstr "שימוש בה_גדרות גלובליות"
+
+#: ../gtk/details.c:492
+msgid "Seed _regardless of ratio"
+msgstr ""
+
+#: ../gtk/details.c:501 ../gtk/tr-prefs.c:330
+msgid "_Seed torrent until its ratio reaches:"
+msgstr ""
+
+#: ../gtk/details.c:517
+msgid "Peer Connections"
+msgstr "חיבור מקורות"
+
+#: ../gtk/details.c:520
+msgid "_Maximum peers:"
+msgstr "_מקסימום מקורות:"
+
+#: ../gtk/details.c:540 ../gtk/torrent-cell-renderer.c:212
+msgid "Waiting to verify local data"
+msgstr "ממתין לבדיקת נתונים מקומיים"
+
+#: ../gtk/details.c:541
+msgid "Verifying local data"
+msgstr ""
+
+#: ../gtk/details.c:542 ../gtk/filter.c:720
+msgid "Downloading"
+msgstr "בתהליכי הורדה"
+
+#: ../gtk/details.c:543 ../gtk/filter.c:721
+msgid "Seeding"
+msgstr ""
+
+#: ../gtk/details.c:544 ../gtk/torrent-cell-renderer.c:206
+msgid "Finished"
+msgstr ""
+
+#: ../gtk/details.c:544 ../gtk/filter.c:722 ../gtk/torrent-cell-renderer.c:208
+msgid "Paused"
+msgstr "מושהה"
+
+#: ../gtk/details.c:586 ../gtk/util.c:116 ../libtransmission/utils.c:1355
+msgid "None"
+msgstr "ללא"
+
+#: ../gtk/details.c:587 ../gtk/file-list.c:585
+msgid "Mixed"
+msgstr "מעורב"
+
+#: ../gtk/details.c:610
+msgid "Private to this tracker -- DHT and PEX disabled"
+msgstr ""
+
+#: ../gtk/details.c:612
+msgid "Public torrent"
+msgstr "טורנט ציבורי"
+
+#: ../gtk/details.c:635
+#, c-format
+msgid "Created by %1$s"
+msgstr "נוצר על ידי %1$s"
+
+#: ../gtk/details.c:637
+#, c-format
+msgid "Created on %1$s"
+msgstr "נוצר בתאריך %1$s"
+
+#: ../gtk/details.c:639
+#, c-format
+msgid "Created by %1$s on %2$s"
+msgstr "נוצר על ידי %1$s ב־%2$s"
+
+#: ../gtk/details.c:723
+msgid "Unknown"
+msgstr "לא ידוע"
+
+#: ../gtk/details.c:751
+#, c-format
+msgid "%1$s (%2$'d piece @ %3$s)"
+msgid_plural "%1$s (%2$'d pieces @ %3$s)"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/details.c:757
+#, c-format
+msgid "%1$s (%2$'d piece)"
+msgid_plural "%1$s (%2$'d pieces)"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/details.c:792
+#, c-format
+msgid "%1$s (%2$.1f%%); %3$s Unverified"
+msgstr ""
+
+#: ../gtk/details.c:794
+#, c-format
+msgid "%1$s (%2$.1f%%)"
+msgstr ""
+
+#: ../gtk/details.c:805
+#, c-format
+msgid "%1$.1f%%"
+msgstr ""
+
+#: ../gtk/details.c:823
+#, c-format
+msgid "%1$s (+%2$s corrupt)"
+msgstr ""
+
+#: ../gtk/details.c:896
+msgid "Active now"
+msgstr ""
+
+#: ../gtk/details.c:900
+#, c-format
+msgid "%1$s ago"
+msgstr ""
+
+#: ../gtk/details.c:919
+msgid "Activity"
+msgstr "פעילות"
+
+#: ../gtk/details.c:923
+msgid "Torrent size:"
+msgstr ""
+
+#: ../gtk/details.c:927
+msgid "Have:"
+msgstr "יש לך:"
+
+#: ../gtk/details.c:931
+msgid "Availability:"
+msgstr ""
+
+#: ../gtk/details.c:935 ../gtk/stats.c:168 ../gtk/stats.c:180
+msgid "Downloaded:"
+msgstr "ירד:"
+
+#: ../gtk/details.c:939 ../gtk/stats.c:166 ../gtk/stats.c:178
+msgid "Uploaded:"
+msgstr "הועלה:"
+
+#: ../gtk/details.c:943 ../gtk/stats.c:170 ../gtk/stats.c:182
+msgid "Ratio:"
+msgstr "יחס שיתוף:"
+
+#: ../gtk/details.c:947
+msgid "State:"
+msgstr "מצב:"
+
+#: ../gtk/details.c:951
+msgid "Running time:"
+msgstr ""
+
+#: ../gtk/details.c:955
+msgid "Remaining time:"
+msgstr ""
+
+#: ../gtk/details.c:959
+msgid "Last activity:"
+msgstr ""
+
+#: ../gtk/details.c:963
+msgid "Error:"
+msgstr "שגיאה:"
+
+#: ../gtk/details.c:967
+msgid "Details"
+msgstr "פרטים"
+
+#: ../gtk/details.c:973
+msgid "Location:"
+msgstr "מיקום:‏‪"
+
+#: ../gtk/details.c:980
+msgid "Hash:"
+msgstr "גיבוב:"
+
+#: ../gtk/details.c:985
+msgid "Privacy:"
+msgstr "פרטיות:"
+
+#: ../gtk/details.c:990
+msgid "Origin:"
+msgstr ""
+
+#: ../gtk/details.c:1007
+msgid "Comment:"
+msgstr "הערה:"
+
+#: ../gtk/details.c:1039
+msgid "Webseeds"
+msgstr ""
+
+#: ../gtk/details.c:1041 ../gtk/details.c:1093
+msgid "Down"
+msgstr "מהירות הורדה"
+
+#: ../gtk/details.c:1091
+msgid "Address"
+msgstr "כתובת"
+
+#: ../gtk/details.c:1095
+msgid "Up"
+msgstr "מהירות העלאה"
+
+#: ../gtk/details.c:1096
+msgid "Client"
+msgstr "תוכנה"
+
+#: ../gtk/details.c:1097
+msgid "%"
+msgstr "%"
+
+#: ../gtk/details.c:1099
+msgid "Up Reqs"
+msgstr ""
+
+#: ../gtk/details.c:1101
+msgid "Dn Reqs"
+msgstr ""
+
+#: ../gtk/details.c:1103
+msgid "Dn Blocks"
+msgstr ""
+
+#: ../gtk/details.c:1105
+msgid "Up Blocks"
+msgstr ""
+
+#: ../gtk/details.c:1107
+msgid "We Cancelled"
+msgstr ""
+
+#: ../gtk/details.c:1109
+msgid "They Cancelled"
+msgstr ""
+
+#: ../gtk/details.c:1110
+msgid "Status"
+msgstr "מצב"
+
+#: ../gtk/details.c:1469
+msgid "Optimistic unchoke"
+msgstr ""
+
+#: ../gtk/details.c:1470
+msgid "Downloading from this peer"
+msgstr "מוריד מהמקור הזה"
+
+#: ../gtk/details.c:1471
+msgid "We would download from this peer if they would let us"
+msgstr "היינו מורידים מהעמית הזה אילו היה מתאפשר לנו"
+
+#: ../gtk/details.c:1472
+msgid "Uploading to peer"
+msgstr "מעלה למקור"
+
+#: ../gtk/details.c:1473
+msgid "We would upload to this peer if they asked"
+msgstr "היינו מעלים לעמית זה אילו היה מבקש"
+
+#: ../gtk/details.c:1474
+msgid "Peer has unchoked us, but we're not interested"
+msgstr ""
+
+#: ../gtk/details.c:1475
+msgid "We unchoked this peer, but they're not interested"
+msgstr ""
+
+#: ../gtk/details.c:1476
+msgid "Encrypted connection"
+msgstr "חיבור מוצפן"
+
+#: ../gtk/details.c:1477
+msgid "Peer was discovered through Peer Exchange (PEX)"
+msgstr ""
+
+#: ../gtk/details.c:1478
+msgid "Peer was discovered through DHT"
+msgstr ""
+
+#: ../gtk/details.c:1479
+msgid "Peer is an incoming connection"
+msgstr ""
+
+#: ../gtk/details.c:1734 ../gtk/details.c:2254
+msgid "Show _more details"
+msgstr ""
+
+#: ../gtk/details.c:1808
+#, c-format
+msgid "Got a list of %1$s%2$'d peers%3$s %4$s ago"
+msgstr ""
+
+#: ../gtk/details.c:1812
+#, c-format
+msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
+msgstr ""
+
+#: ../gtk/details.c:1815
+#, c-format
+msgid "Got an error %1$s\"%2$s\"%3$s %4$s ago"
+msgstr ""
+
+#: ../gtk/details.c:1824
+msgid "No updates scheduled"
+msgstr ""
+
+#: ../gtk/details.c:1830
+#, c-format
+msgid "Asking for more peers in %s"
+msgstr ""
+
+#: ../gtk/details.c:1834
+msgid "Queued to ask for more peers"
+msgstr ""
+
+#: ../gtk/details.c:1839
+#, c-format
+msgid "Asking for more peers now... <small>%s</small>"
+msgstr ""
+
+#: ../gtk/details.c:1849
+#, c-format
+msgid "Tracker had %s%'d seeders and %'d leechers%s %s ago"
+msgstr ""
+
+#: ../gtk/details.c:1853
+#, c-format
+msgid "Got a scrape error \"%s%s%s\" %s ago"
+msgstr ""
+
+#: ../gtk/details.c:1863
+#, c-format
+msgid "Asking for peer counts in %s"
+msgstr ""
+
+#: ../gtk/details.c:1867
+msgid "Queued to ask for peer counts"
+msgstr ""
+
+#: ../gtk/details.c:1872
+#, c-format
+msgid "Asking for peer counts now... <small>%s</small>"
+msgstr ""
+
+#: ../gtk/details.c:2131
+msgid "List contains invalid URLs"
+msgstr ""
+
+#: ../gtk/details.c:2171
+msgid "Edit Trackers"
+msgstr ""
+
+#: ../gtk/details.c:2183
+msgid "Tracker Announce URLs"
+msgstr ""
+
+#: ../gtk/details.c:2186 ../gtk/makemeta-ui.c:453
+msgid ""
+"To add a backup URL, add it on the line after the primary URL.\n"
+"To add another primary URL, add it after a blank line."
+msgstr ""
+
+#: ../gtk/details.c:2229 ../gtk/details.c:2350 ../gtk/filter.c:324
+msgid "Trackers"
+msgstr "טקראקרים"
+
+#: ../gtk/details.c:2261
+msgid "_Edit Trackers"
+msgstr "_עריכת טראקרים"
+
+#: ../gtk/details.c:2269
+msgid "Show _backup trackers"
+msgstr ""
+
+#: ../gtk/details.c:2342 ../gtk/msgwin.c:179
+msgid "Information"
+msgstr "נתונים"
+
+#: ../gtk/details.c:2346
+msgid "Peers"
+msgstr "מקורות"
+
+#: ../gtk/details.c:2356
+msgid "File listing not available for combined torrent properties"
+msgstr ""
+
+#: ../gtk/details.c:2360 ../gtk/filter.c:999 ../gtk/makemeta-ui.c:402
+msgid "Files"
+msgstr "קבצים"
+
+#: ../gtk/details.c:2365 ../gtk/tr-window.c:651
+msgid "Options"
+msgstr "אפשרויות"
+
+#: ../gtk/details.c:2392
+#, c-format
+msgid "%s Properties"
+msgstr ""
+
+#: ../gtk/details.c:2403
+#, c-format
+msgid "%'d Torrent Properties"
+msgstr ""
+
+#: ../gtk/dialogs.c:121
+msgid "<big><b>Quit Transmission?</b></big>"
+msgstr "<big><b>לצאת מ Transmission?</b></big>"
+
+#: ../gtk/dialogs.c:133
+msgid "_Don't ask me again"
+msgstr "_אל תישאל אתי שוב"
+
+#: ../gtk/dialogs.c:229
+#, c-format
+msgid "Remove torrent?"
+msgid_plural "Remove %d torrents?"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/dialogs.c:235
+#, c-format
+msgid "Delete this torrent's downloaded files?"
+msgid_plural "Delete these %d torrents' downloaded files?"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/dialogs.c:245
+msgid ""
+"Once removed, continuing the transfer will require the torrent file or "
+"magnet link."
+msgid_plural ""
+"Once removed, continuing the transfers will require the torrent files or "
+"magnet links."
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/dialogs.c:251
+msgid "This torrent has not finished downloading."
+msgid_plural "These torrents have not finished downloading."
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/dialogs.c:257
+msgid "This torrent is connected to peers."
+msgid_plural "These torrents are connected to peers."
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/dialogs.c:264
+msgid "One of these torrents is connected to peers."
+msgid_plural "Some of these torrents are connected to peers."
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/dialogs.c:271
+msgid "One of these torrents has not finished downloading."
+msgid_plural "Some of these torrents have not finished downloading."
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/file-list.c:582 ../gtk/filter.c:349 ../gtk/util.c:692
+msgid "High"
+msgstr "גבוהה"
+
+#: ../gtk/file-list.c:583 ../gtk/filter.c:353 ../gtk/util.c:693
+msgid "Normal"
+msgstr "נורמלית"
+
+#: ../gtk/file-list.c:584 ../gtk/filter.c:357 ../gtk/util.c:694
+msgid "Low"
+msgstr "נמוכה"
+
+#. add "enabled" column
+#: ../gtk/file-list.c:612 ../gtk/file-list.c:745
+msgid "Download"
+msgstr ""
+
+#. add priority column
+#: ../gtk/file-list.c:613 ../gtk/file-list.c:759 ../gtk/filter.c:344
+msgid "Priority"
+msgstr "עדיפות"
+
+#: ../gtk/file-list.c:717
+msgid "File"
+msgstr ""
+
+#. add "progress" column
+#: ../gtk/file-list.c:732
+msgid "Progress"
+msgstr ""
+
+#: ../gtk/filter.c:316 ../gtk/filter.c:717
+msgid "All"
+msgstr ""
+
+#: ../gtk/filter.c:330 ../gtk/tr-prefs.c:552 ../gtk/tr-prefs.c:1439
+msgid "Privacy"
+msgstr ""
+
+#: ../gtk/filter.c:335
+msgid "Public"
+msgstr ""
+
+#: ../gtk/filter.c:339
+msgid "Private"
+msgstr ""
+
+#: ../gtk/filter.c:719
+msgid "Active"
+msgstr ""
+
+#: ../gtk/filter.c:723
+msgid "Queued"
+msgstr ""
+
+#: ../gtk/filter.c:724
+msgid "Verifying"
+msgstr ""
+
+#: ../gtk/filter.c:725 ../gtk/msgwin.c:178
+msgid "Error"
+msgstr "שגיאה"
+
+#: ../gtk/filter.c:999 ../gtk/msgwin.c:258
+msgid "Name"
+msgstr "שם"
+
+#: ../gtk/filter.c:999 ../gtk/tr-prefs.c:1001
+msgid "Tracker"
+msgstr "טראקר"
+
+#. add the activity combobox
+#: ../gtk/filter.c:1023
+msgid "_Show:"
+msgstr ""
+
+#: ../gtk/main.c:393
+#, c-format
+msgid ""
+"Got signal %d; trying to shut down cleanly.  Do it again if it gets stuck."
+msgstr ""
+
+#: ../gtk/main.c:516
+msgid "Start with all torrents paused"
+msgstr "התחל עם כל הטורנטים מושהים"
+
+#: ../gtk/main.c:518
+msgid "Show version number and exit"
+msgstr ""
+
+#: ../gtk/main.c:522
+msgid "Start minimized in notification area"
+msgstr ""
+
+#: ../gtk/main.c:525
+msgid "Where to look for configuration files"
+msgstr ""
+
+#: ../gtk/main.c:534 ../gtk/transmission.desktop.in.h:3
+msgid "Transmission"
+msgstr "Transmission"
+
+#: ../gtk/main.c:541
+msgid "[torrent files or urls]"
+msgstr ""
+
+#: ../gtk/main.c:595
+msgid ""
+"Transmission is already running, but is not responding.  To start a new "
+"session, you must first close the existing Transmission process."
+msgstr ""
+
+#: ../gtk/main.c:649
+msgid "Transmission cannot be started."
+msgstr ""
+
+#: ../gtk/main.c:731
+msgid ""
+"Transmission is a file-sharing program.  When you run a torrent, its data "
+"will be made available to others by means of upload.  You and you alone are "
+"fully responsible for exercising proper judgement and abiding by your local "
+"laws."
+msgstr ""
+
+#: ../gtk/main.c:733
+msgid "I _Accept"
+msgstr ""
+
+#: ../gtk/main.c:910
+msgid "<b>Closing Connections</b>"
+msgstr "<b>סוגר חיבורים</b>"
+
+#: ../gtk/main.c:914
+msgid "Sending upload/download totals to tracker..."
+msgstr "שולח את נתוני ההעלאה/הורדה לטראקר..."
+
+#: ../gtk/main.c:919
+msgid "_Quit Now"
+msgstr "_לצאת עכשיו"
+
+#: ../gtk/main.c:1079
+msgid "Couldn't add corrupt torrent"
+msgid_plural "Couldn't add corrupt torrents"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/main.c:1086
+msgid "Couldn't add duplicate torrent"
+msgid_plural "Couldn't add duplicate torrents"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/main.c:1394
+msgid "A fast and easy BitTorrent client"
+msgstr "תוכנת ביטורנט קלה ופשוטה"
+
+#: ../gtk/main.c:1399
+msgid "Copyright 2005-2009 The Transmission Project"
+msgstr ""
+
+#. Translators: translate "translator-credits" as
+#. your name
+#. to have it appear in the credits in the "About"
+#. dialog
+#: ../gtk/main.c:1410
+msgid "translator-credits"
+msgstr ""
+"מארק קרפיבנר <mark125@gmail.com>\n"
+"\n"
+"Launchpad Contributions:\n"
+"  Eyal Levin https://launchpad.net/~eyalev\n"
+"  Ilan https://launchpad.net/~ilan\n"
+"  Liel Fridman https://launchpad.net/~lielft\n"
+"  Mark Krapivner https://launchpad.net/~mark125\n"
+"  Shahar Or https://launchpad.net/~dawnlight\n"
+"  Yaron https://launchpad.net/~sh-yaron\n"
+"  el.il https://launchpad.net/~el-il\n"
+"  nadavvadan https://launchpad.net/~nadavvadan"
+
+#: ../gtk/makemeta-ui.c:75
+#, c-format
+msgid "Creating \"%s\""
+msgstr ""
+
+#: ../gtk/makemeta-ui.c:77
+#, c-format
+msgid "Created \"%s\"!"
+msgstr ""
+
+#: ../gtk/makemeta-ui.c:79
+#, c-format
+msgid "Error: invalid announce URL \"%s\""
+msgstr ""
+
+#: ../gtk/makemeta-ui.c:81
+#, c-format
+msgid "Cancelled"
+msgstr "בוטל"
+
+#: ../gtk/makemeta-ui.c:83
+#, c-format
+msgid "Error reading \"%s\": %s"
+msgstr ""
+
+#: ../gtk/makemeta-ui.c:85
+#, c-format
+msgid "Error writing \"%s\": %s"
+msgstr ""
+
+#. how much data we've scanned through to generate checksums
+#: ../gtk/makemeta-ui.c:102
+#, c-format
+msgid "Scanned %s"
+msgstr ""
+
+#: ../gtk/makemeta-ui.c:167 ../gtk/makemeta-ui.c:389
+msgid "New Torrent"
+msgstr "טורנט חדש"
+
+#: ../gtk/makemeta-ui.c:183
+msgid "Creating torrent..."
+msgstr ""
+
+#: ../gtk/makemeta-ui.c:292
+msgid "No source selected"
+msgstr "לא נבחר מקור"
+
+#: ../gtk/makemeta-ui.c:298
+#, c-format
+msgid "%1$s; %2$'d File"
+msgid_plural "%1$s; %2$'d Files"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/makemeta-ui.c:304
+#, c-format
+msgid "%1$'d Piece @ %2$s"
+msgid_plural "%1$'d Pieces @ %2$s"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/makemeta-ui.c:404
+msgid "Sa_ve to:"
+msgstr ""
+
+#: ../gtk/makemeta-ui.c:410
+msgid "Source F_older:"
+msgstr ""
+
+#: ../gtk/makemeta-ui.c:421
+msgid "Source _File:"
+msgstr ""
+
+#: ../gtk/makemeta-ui.c:432
+msgid "<i>No source selected</i>"
+msgstr "<i>לא נבחר מקור</i>"
+
+#: ../gtk/makemeta-ui.c:436
+msgid "Properties"
+msgstr ""
+
+#: ../gtk/makemeta-ui.c:438
+msgid "_Trackers:"
+msgstr ""
+
+#: ../gtk/makemeta-ui.c:460
+msgid "Co_mment:"
+msgstr "ה_ערה:"
+
+#: ../gtk/makemeta-ui.c:469
+msgid "_Private torrent"
+msgstr "טורנט _פרטי"
+
+#: ../gtk/msgwin.c:84
+#, c-format
+msgid "Couldn't save \"%s\""
+msgstr ""
+
+#: ../gtk/msgwin.c:135
+msgid "Save Log"
+msgstr "שמור יומן"
+
+#: ../gtk/msgwin.c:180
+msgid "Debug"
+msgstr "ניפוי שגיאות"
+
+#: ../gtk/msgwin.c:254
+msgid "Time"
+msgstr "זמן"
+
+#: ../gtk/msgwin.c:262
+msgid "Message"
+msgstr "הודעה"
+
+#: ../gtk/msgwin.c:438
+msgid "Message Log"
+msgstr "יומן הודעות"
+
+#: ../gtk/msgwin.c:472
+msgid "Level"
+msgstr "רמה"
+
+#: ../gtk/notify.c:121
+msgid "Download complete"
+msgstr ""
+
+#: ../gtk/notify.c:131
+msgid "Torrent Complete"
+msgstr "טורנט הושלם"
+
+#: ../gtk/notify.c:140
+msgid "Open File"
+msgstr "פתח קובץ"
+
+#: ../gtk/notify.c:145
+msgid "Open Folder"
+msgstr "פתח תיקייה"
+
+#: ../gtk/notify.c:159
+msgid "Torrent Added"
+msgstr "נוסף טורנט"
+
+#: ../gtk/relocate.c:64
+#, c-format
+msgid "Moving \"%s\""
+msgstr ""
+
+#: ../gtk/relocate.c:86
+msgid "Couldn't move torrent"
+msgstr ""
+
+#: ../gtk/relocate.c:127
+msgid "This may take a moment..."
+msgstr ""
+
+#: ../gtk/relocate.c:158 ../gtk/relocate.c:179
+msgid "Set Torrent Location"
+msgstr ""
+
+#: ../gtk/relocate.c:175
+msgid "Location"
+msgstr "מיקום"
+
+#: ../gtk/relocate.c:182
+msgid "Torrent _location:"
+msgstr ""
+
+#: ../gtk/relocate.c:183
+msgid "_Move from the current folder"
+msgstr ""
+
+#: ../gtk/relocate.c:186
+msgid "Local data is _already there"
+msgstr ""
+
+#: ../gtk/stats.c:76 ../gtk/stats.c:175
+#, c-format
+msgid "Started %'d time"
+msgid_plural "Started %'d times"
+msgstr[0] "התחיל %'d פעמים"
+msgstr[1] "התחיל %'d פעמים"
+
+#: ../gtk/stats.c:107
+msgid "Reset your statistics?"
+msgstr ""
+
+#: ../gtk/stats.c:108
+msgid ""
+"These statistics are for your information only.  Resetting them doesn't "
+"affect the statistics logged by your BitTorrent trackers."
+msgstr ""
+
+#: ../gtk/stats.c:119 ../gtk/stats.c:151
+msgid "_Reset"
+msgstr ""
+
+#: ../gtk/stats.c:147 ../gtk/tr-window.c:692
+msgid "Statistics"
+msgstr "סטטיסטיקה"
+
+#: ../gtk/stats.c:164
+msgid "Current Session"
+msgstr "הפעלה נוכחית"
+
+#: ../gtk/stats.c:172 ../gtk/stats.c:184
+msgid "Duration:"
+msgstr "פעילות:"
+
+#: ../gtk/stats.c:174
+msgid "Total"
+msgstr "סך הכל"
+
+#. %1$s is how much we've got,
+#. %2$s is how much we'll have when done,
+#. %3$.2f%% is a percentage of the two
+#: ../gtk/torrent-cell-renderer.c:63
+#, c-format
+msgid "%1$s of %2$s (%3$.2f%%)"
+msgstr "%1$s מתוך %2$s (%3$.2f%%)"
+
+#. %1$s is how much we've got,
+#. %2$s is the torrent's total size,
+#. %3$.2f%% is a percentage of the two,
+#. %4$s is how much we've uploaded,
+#. %5$s is our upload-to-download ratio,
+#. %6$s is the ratio we want to reach before we stop uploading
+#: ../gtk/torrent-cell-renderer.c:79
+#, c-format
+msgid "%1$s of %2$s (%3$.2f%%), uploaded %4$s (Ratio: %5$s Goal: %6$s)"
+msgstr ""
+
+#. %1$s is how much we've got,
+#. %2$s is the torrent's total size,
+#. %3$.2f%% is a percentage of the two,
+#. %4$s is how much we've uploaded,
+#. %5$s is our upload-to-download ratio
+#: ../gtk/torrent-cell-renderer.c:95
+#, c-format
+msgid "%1$s of %2$s (%3$.2f%%), uploaded %4$s (Ratio: %5$s)"
+msgstr "%1$s מתוך %2$s (%3$.2f%%), הועלה %4$s (יחס שיתוף: %5$s)"
+
+#. %1$s is the torrent's total size,
+#. %2$s is how much we've uploaded,
+#. %3$s is our upload-to-download ratio,
+#. %4$s is the ratio we want to reach before we stop uploading
+#: ../gtk/torrent-cell-renderer.c:112
+#, c-format
+msgid "%1$s, uploaded %2$s (Ratio: %3$s Goal: %4$s)"
+msgstr ""
+
+#. %1$s is the torrent's total size,
+#. %2$s is how much we've uploaded,
+#. %3$s is our upload-to-download ratio
+#: ../gtk/torrent-cell-renderer.c:124
+#, c-format
+msgid "%1$s, uploaded %2$s (Ratio: %3$s)"
+msgstr "%1$s, הועלה %2$s (יחס שיתוף: %3$s)"
+
+#: ../gtk/torrent-cell-renderer.c:139
+msgid "Remaining time unknown"
+msgstr ""
+
+#. time remaining
+#: ../gtk/torrent-cell-renderer.c:145
+#, c-format
+msgid "%s remaining"
+msgstr "נותר %s"
+
+#. 1==down speed, 2==down arrow, 3==up speed, 4==down arrow
+#: ../gtk/torrent-cell-renderer.c:174
+#, c-format
+msgid "%1$s %2$s, %3$s %4$s"
+msgstr ""
+
+#. bandwidth speed + unicode arrow
+#: ../gtk/torrent-cell-renderer.c:179 ../gtk/torrent-cell-renderer.c:183
+#, c-format
+msgid "%1$s %2$s"
+msgstr ""
+
+#. the torrent isn't uploading or downloading
+#: ../gtk/torrent-cell-renderer.c:187 ../gtk/tr-icon.c:75
+msgid "Idle"
+msgstr "לא פעיל"
+
+#: ../gtk/torrent-cell-renderer.c:217
+#, c-format
+msgid "Verifying local data (%.1f%% tested)"
+msgstr "בודק נתונים מקומיים (%.1f%% נבדקו)"
+
+#: ../gtk/torrent-cell-renderer.c:228
+#, c-format
+msgid "Ratio %s"
+msgstr ""
+
+#: ../gtk/torrent-cell-renderer.c:257
+#, c-format
+msgid "Tracker gave a warning: \"%s\""
+msgstr ""
+
+#: ../gtk/torrent-cell-renderer.c:258
+#, c-format
+msgid "Tracker gave an error: \"%s\""
+msgstr ""
+
+#: ../gtk/torrent-cell-renderer.c:259
+#, c-format
+msgid "Error: %s"
+msgstr ""
+
+#: ../gtk/torrent-cell-renderer.c:279
+#, c-format
+msgid "Downloading from %1$'d of %2$'d connected peer"
+msgid_plural "Downloading from %1$'d of %2$'d connected peers"
+msgstr[0] "מוריד מ %1$'d מתוך %2$'d מקורות מחוברים"
+msgstr[1] "מוריד מ %1$'d מתוך %2$'d מקורות מחוברים"
+
+#: ../gtk/torrent-cell-renderer.c:290
+#, c-format
+msgid "Downloading metadata from %1$'d peer (%2$d%% done)"
+msgid_plural "Downloading metadata from %1$'d peers (%2$d%% done)"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/torrent-cell-renderer.c:301
+#, c-format
+msgid "Seeding to %1$'d of %2$'d connected peer"
+msgid_plural "Seeding to %1$'d of %2$'d connected peers"
+msgstr[0] "משתף אל %1$'d מתוך %2$'d מקורות מחוברים"
+msgstr[1] "משתף אל %1$'d מתוך %2$'d מקורות מחוברים"
+
+#: ../gtk/tracker-list.c:344
+msgid "Tier"
+msgstr ""
+
+#: ../gtk/tracker-list.c:350
+msgid "Announce URL"
+msgstr "כתובת קריאה"
+
+#: ../gtk/transmission.desktop.in.h:1
+msgid "BitTorrent Client"
+msgstr "תוכנת ביטורנט"
+
+#: ../gtk/transmission.desktop.in.h:2
+msgid "Download and share files over BitTorrent"
+msgstr "הורדה ושיתוף קבצים ברשת ביטורנט"
+
+#: ../gtk/transmission.desktop.in.h:4
+msgid "Transmission BitTorrent Client"
+msgstr "Transmission - תוכנת ביטורנט"
+
+#: ../gtk/tr-core.c:1327
+msgid "Transmission Bittorrent Client"
+msgstr "Transmission תוככנת ביטורנט"
+
+#: ../gtk/tr-core.c:1328
+msgid "BitTorrent Activity"
+msgstr "פעילות ביטורנט"
+
+#: ../gtk/tr-core.c:1340
+msgid "Disallowing desktop hibernation"
+msgstr ""
+
+#: ../gtk/tr-core.c:1343
+#, c-format
+msgid "Couldn't disable desktop hibernation: %s"
+msgstr ""
+
+#: ../gtk/tr-core.c:1367
+msgid "Allowing desktop hibernation"
+msgstr ""
+
+#: ../gtk/tr-icon.c:91 ../gtk/tr-icon.c:106
+#, c-format
+msgid "(Limit: %s)"
+msgstr ""
+
+#. %1$s: current upload speed
+#. * %2$s: current upload limit, if any
+#. * %3$s: current download speed
+#. * %4$s: current download limit, if any
+#: ../gtk/tr-icon.c:113
+#, c-format
+msgid ""
+"Transmission\n"
+"Up: %1$s %2$s\n"
+"Down: %3$s %4$s"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:282
+msgid "Adding Torrents"
+msgstr "מוסיף טורנטים"
+
+#: ../gtk/tr-prefs.c:285
+msgid "Automatically _add torrents from:"
+msgstr "אוטומטית _הוסף טורנטים מ:"
+
+#: ../gtk/tr-prefs.c:306
+msgid "Append \"._part\" to incomplete files' names"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:311
+msgid "Save to _Location:"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:313
+msgid "Keep _incomplete torrents in:"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:320
+msgid "Call scrip_t when torrent is completed:"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:328 ../gtk/tr-prefs.c:1395
+msgid "Limits"
+msgstr "הגבלות"
+
+#: ../gtk/tr-prefs.c:354 ../gtk/tr-prefs.c:1445
+msgid "Desktop"
+msgstr "שולחן העבודה"
+
+#: ../gtk/tr-prefs.c:356
+msgid "Inhibit _hibernation when torrents are active"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:360
+msgid "Show Transmission icon in the _notification area"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:364
+msgid "Show _popup notifications"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:369
+msgid "Play _sound when downloads are complete"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:397
+#, c-format
+msgid "Enable _blocklist (contains %'d rule)"
+msgid_plural "Enable _blocklist (contains %'d rules)"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/tr-prefs.c:427
+#, c-format
+msgid "Blocklist now has %'d rule."
+msgid_plural "Blocklist now has %'d rules."
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/tr-prefs.c:431
+msgid "<b>Update succeeded!</b>"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:446
+msgid "Update Blocklist"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:448
+msgid "Getting new blocklist..."
+msgstr ""
+
+#: ../gtk/tr-prefs.c:483
+msgid "Allow encryption"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:484
+msgid "Prefer encryption"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:485
+msgid "Require encryption"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:529
+msgid "Blocklist"
+msgstr "רשימת החסומים"
+
+#: ../gtk/tr-prefs.c:535
+msgid "_Update"
+msgstr "_עדכון"
+
+#: ../gtk/tr-prefs.c:545
+msgid "Enable _automatic updates"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:554
+msgid "_Encryption mode:"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:558
+msgid "Use PE_X to find more peers"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:560
+msgid ""
+"PEX is a tool for exchanging peer lists with the peers you're connected to."
+msgstr ""
+
+#: ../gtk/tr-prefs.c:564
+msgid "Use _DHT to find more peers"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:566
+msgid "DHT is a tool for finding peers without a tracker."
+msgstr ""
+
+#: ../gtk/tr-prefs.c:570
+msgid "Use Local Peer Discovery to find more peers"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:572
+msgid "LPD is a tool for finding peers on your local network."
+msgstr ""
+
+#: ../gtk/tr-prefs.c:793
+msgid "Web Client"
+msgstr ""
+
+#. "enabled" checkbutton
+#: ../gtk/tr-prefs.c:796
+msgid "_Enable web client"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:802
+msgid "_Open web client"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:811
+msgid "Listening _port:"
+msgstr ""
+
+#. require authentication
+#: ../gtk/tr-prefs.c:815 ../gtk/tr-prefs.c:1032
+msgid "Use _authentication"
+msgstr ""
+
+#. username
+#: ../gtk/tr-prefs.c:823 ../gtk/tr-prefs.c:1038
+msgid "_Username:"
+msgstr "שם _משתמש:"
+
+#. password
+#: ../gtk/tr-prefs.c:830 ../gtk/tr-prefs.c:1044
+msgid "Pass_word:"
+msgstr "סיס_מה:"
+
+#. require authentication
+#: ../gtk/tr-prefs.c:838
+msgid "Only allow these IP a_ddresses to connect:"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:863
+msgid "IP addresses may use wildcards, such as 192.168.*.*"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:885
+msgid "Addresses:"
+msgstr "כתובות:"
+
+#: ../gtk/tr-prefs.c:1003
+msgid "Connect to tracker via a pro_xy"
+msgstr "התחבר לטראקר דרך שרת פרוק_סי"
+
+#: ../gtk/tr-prefs.c:1008
+msgid "Proxy _server:"
+msgstr "_שרת לפרוקסי:"
+
+#: ../gtk/tr-prefs.c:1016
+msgid "Proxy _port:"
+msgstr "_פורט לפרוקסי:"
+
+#: ../gtk/tr-prefs.c:1019
+msgid "Proxy _type:"
+msgstr "_סוג הפרוקסי:"
+
+#: ../gtk/tr-prefs.c:1157
+msgid "Every Day"
+msgstr "כל יום"
+
+#: ../gtk/tr-prefs.c:1158
+msgid "Weekdays"
+msgstr "ימות השבוע"
+
+#: ../gtk/tr-prefs.c:1159
+msgid "Weekends"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:1160
+msgid "Sunday"
+msgstr "יום ראשון"
+
+#: ../gtk/tr-prefs.c:1161
+msgid "Monday"
+msgstr "יום שני"
+
+#: ../gtk/tr-prefs.c:1162
+msgid "Tuesday"
+msgstr "יום שלישי"
+
+#: ../gtk/tr-prefs.c:1163
+msgid "Wednesday"
+msgstr "יום רביעי"
+
+#: ../gtk/tr-prefs.c:1164
+msgid "Thursday"
+msgstr "יום חמישי"
+
+#: ../gtk/tr-prefs.c:1165
+msgid "Friday"
+msgstr "יום שישי"
+
+#: ../gtk/tr-prefs.c:1166
+msgid "Saturday"
+msgstr "שבת"
+
+#: ../gtk/tr-prefs.c:1218
+msgid "Speed Limits"
+msgstr "מגבלות מהירות"
+
+#: ../gtk/tr-prefs.c:1238
+msgid "Temporary Speed Limits"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:1245
+msgid "Override normal speed limits manually or at scheduled times"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:1252
+msgid "Limit do_wnload speed (KiB/s):"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:1256
+msgid "Limit u_pload speed (KiB/s):"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:1260
+msgid "_Scheduled times:"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:1265
+msgid " _to "
+msgstr ""
+
+#: ../gtk/tr-prefs.c:1276
+msgid "_On days:"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:1310 ../gtk/tr-prefs.c:1376
+msgid "Status unknown"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:1332
+msgid "Port is <b>open</b>"
+msgstr "הפורט <b>פתוח</b>"
+
+#: ../gtk/tr-prefs.c:1332
+msgid "Port is <b>closed</b>"
+msgstr "הפורט <b>סגור</b>"
+
+#: ../gtk/tr-prefs.c:1346
+msgid "<i>Testing...</i>"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:1369
+msgid "Incoming Peers"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:1371
+msgid "_Port for incoming connections:"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:1379
+msgid "Te_st Port"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:1386
+msgid "Pick a _random port on startup"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:1390
+msgid "Use UPnP or NAT-PMP port _forwarding from my router"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:1398
+msgid "Maximum peers per _torrent:"
+msgstr "מקסימום מקורות לכל _טורנט:"
+
+#: ../gtk/tr-prefs.c:1400
+msgid "Maximum peers _overall:"
+msgstr "מקסימום _מקורות:"
+
+#: ../gtk/tr-prefs.c:1418
+msgid "Transmission Preferences"
+msgstr "העדפות Transmission"
+
+#: ../gtk/tr-prefs.c:1433
+msgid "Torrents"
+msgstr "טורנטים"
+
+#: ../gtk/tr-prefs.c:1442
+msgid "Network"
+msgstr "רשת"
+
+#: ../gtk/tr-prefs.c:1448
+msgid "Web"
+msgstr "רשת"
+
+#: ../gtk/tr-prefs.c:1451
+msgid "Proxy"
+msgstr ""
+
+#: ../gtk/tr-window.c:136
+msgid "Torrent"
+msgstr "טורנט"
+
+#: ../gtk/tr-window.c:239
+msgid "Total Ratio"
+msgstr "סך הכל יחס שיתוף"
+
+#: ../gtk/tr-window.c:240
+msgid "Session Ratio"
+msgstr ""
+
+#: ../gtk/tr-window.c:241
+msgid "Total Transfer"
+msgstr "סך הכל הועבר"
+
+#: ../gtk/tr-window.c:242
+msgid "Session Transfer"
+msgstr ""
+
+#: ../gtk/tr-window.c:271
+#, c-format
+msgid ""
+"Click to disable Temporary Speed Limits\n"
+"(%1$s down, %2$s up)"
+msgstr ""
+
+#: ../gtk/tr-window.c:272
+#, c-format
+msgid ""
+"Click to enable Temporary Speed Limits\n"
+"(%1$s down, %2$s up)"
+msgstr ""
+
+#: ../gtk/tr-window.c:339
+#, c-format
+msgid "Tracker will allow requests in %s"
+msgstr "הטראקר יאפשר בקשות בעוד %s"
+
+#: ../gtk/tr-window.c:410
+msgid "Unlimited"
+msgstr ""
+
+#: ../gtk/tr-window.c:477
+msgid "Seed Forever"
+msgstr ""
+
+#: ../gtk/tr-window.c:515
+msgid "Limit Download Speed"
+msgstr ""
+
+#: ../gtk/tr-window.c:519
+msgid "Limit Upload Speed"
+msgstr ""
+
+#: ../gtk/tr-window.c:526
+msgid "Stop Seeding at Ratio"
+msgstr ""
+
+#: ../gtk/tr-window.c:560
+#, c-format
+msgid "Stop at Ratio (%s)"
+msgstr ""
+
+#: ../gtk/tr-window.c:737
+msgid "999.9 KiB/s"
+msgstr ""
+
+#: ../gtk/tr-window.c:781
+#, c-format
+msgid "%1$'d of %2$'d Torrent"
+msgid_plural "%1$'d of %2$'d Torrents"
+msgstr[0] "%1$'d מתוך %2$'d טורנטים"
+msgstr[1] "%1$'d מתוך %2$'d טורנטים"
+
+#: ../gtk/tr-window.c:787
+#, c-format
+msgid "%'d Torrent"
+msgid_plural "%'d Torrents"
+msgstr[0] "%'d טורנטים"
+msgstr[1] "%'d טורנטים"
+
+#: ../gtk/tr-window.c:807 ../gtk/tr-window.c:835
+#, c-format
+msgid "Ratio: %s"
+msgstr "יחס שיתוף: %s"
+
+#: ../gtk/tr-window.c:818 ../gtk/tr-window.c:829
+#, c-format
+msgid "size|Down: %1$s, Up: %2$s"
+msgstr "ירד: %1$s, הועלה: %2$s"
+
+#: ../gtk/util.c:118
+#, c-format
+msgid "%'u byte"
+msgid_plural "%'u bytes"
+msgstr[0] "%'u byte"
+msgstr[1] "%'u bytes"
+
+#: ../gtk/util.c:120
+#, c-format
+msgid "%'.1f KiB"
+msgstr ""
+
+#: ../gtk/util.c:122
+#, c-format
+msgid "%'.1f MiB"
+msgstr ""
+
+#: ../gtk/util.c:124
+#, c-format
+msgid "%'.1f GiB"
+msgstr ""
+
+#. 0.0 KiB to 999.9 KiB
+#: ../gtk/util.c:134
+#, c-format
+msgid "%'.1f KiB/s"
+msgstr ""
+
+#. 0.98 MiB to 99.99 MiB
+#: ../gtk/util.c:136
+#, c-format
+msgid "%'.2f MiB/s"
+msgstr ""
+
+#. 100.0 MiB to 999.9 MiB
+#: ../gtk/util.c:138
+#, c-format
+msgid "%'.1f MiB/s"
+msgstr ""
+
+#. insane speeds
+#: ../gtk/util.c:140
+#, c-format
+msgid "%'.2f GiB/s"
+msgstr ""
+
+#: ../gtk/util.c:159
+#, c-format
+msgid "%'d day"
+msgid_plural "%'d days"
+msgstr[0] "יום אחד"
+msgstr[1] "%'d ימים"
+
+#: ../gtk/util.c:161
+#, c-format
+msgid "%'d hour"
+msgid_plural "%'d hours"
+msgstr[0] "שעה אחת"
+msgstr[1] "%'d שעות"
+
+#: ../gtk/util.c:164
+#, c-format
+msgid "%'d minute"
+msgid_plural "%'d minutes"
+msgstr[0] "דקה אחת"
+msgstr[1] "%'d דקות"
+
+#: ../gtk/util.c:166
+#, c-format
+msgid "%'d second"
+msgid_plural "%'d seconds"
+msgstr[0] "שניה אחת"
+msgstr[1] "%'d שניות"
+
+#: ../gtk/util.c:379
+#, c-format
+msgid "The torrent file \"%s\" contains invalid data."
+msgstr "קובץ הטורנט \"%s\" מכיל נתונים לא תקינים."
+
+#: ../gtk/util.c:380
+#, c-format
+msgid "The torrent file \"%s\" is already in use."
+msgstr "קובץ הטורנט \"%s\" כבר בשימוש."
+
+#: ../gtk/util.c:381
+#, c-format
+msgid "The torrent file \"%s\" encountered an unknown error."
+msgstr "קובץ הטורנט \"%s\" ניתקע בשגיאה לא ידועה."
+
+#: ../gtk/util.c:389
+msgid "Error opening torrent"
+msgstr "שגיאה בפתיחת טורנט"
+
+#: ../gtk/util.c:833
+msgid "Unrecognized URL"
+msgstr ""
+
+#: ../gtk/util.c:835
+#, c-format
+msgid "Transmission doesn't know how to use \"%s\""
+msgstr ""
+
+#: ../gtk/util.c:840
+#, c-format
+msgid ""
+"This magnet link appears to be intended for something other than BitTorrent. "
+" BitTorrent magnet links have a section containing \"%s\"."
+msgstr ""
+
+#. did caller give us an uninitialized val?
+#: ../libtransmission/bencode.c:1093
+msgid "Invalid metadata"
+msgstr ""
+
+#: ../libtransmission/bencode.c:1651
+#, c-format
+msgid "Saved \"%s\""
+msgstr ""
+
+#: ../libtransmission/bencode.c:1656 ../libtransmission/bencode.c:1663
+#: ../libtransmission/blocklist.c:309
+#, c-format
+msgid "Couldn't save file \"%1$s\": %2$s"
+msgstr "לא ניתן לשמור קובץ \"%1$s\": %2$s"
+
+#: ../libtransmission/bencode.c:1670 ../libtransmission/bencode.c:1680
+#, c-format
+msgid "Couldn't save temporary file \"%1$s\": %2$s"
+msgstr ""
+
+#: ../libtransmission/blocklist.c:78 ../libtransmission/blocklist.c:239
+#: ../libtransmission/utils.c:484
+#, c-format
+msgid "Couldn't read \"%1$s\": %2$s"
+msgstr ""
+
+#: ../libtransmission/blocklist.c:110
+#, c-format
+msgid "Blocklist \"%s\" contains %'zu entries"
+msgstr ""
+
+#. don't try to display the actual lines - it causes issues
+#: ../libtransmission/blocklist.c:288 ../libtransmission/blocklist.c:298
+#, c-format
+msgid "blocklist skipped invalid address at line %d"
+msgstr ""
+
+#: ../libtransmission/blocklist.c:319
+#, c-format
+msgid "Blocklist \"%1$s\" updated with %2$'d entries"
+msgstr ""
+
+#: ../libtransmission/fdlimit.c:352
+#, c-format
+msgid "Preallocated file \"%s\""
+msgstr ""
+
+#: ../libtransmission/fdlimit.c:635
+#, c-format
+msgid "Couldn't create socket: %s"
+msgstr ""
+
+#: ../libtransmission/makemeta.c:60
+#, c-format
+msgid "Torrent Creator is skipping file \"%s\": %s"
+msgstr ""
+
+#: ../libtransmission/metainfo.c:579
+#, c-format
+msgid "Invalid metadata entry \"%s\""
+msgstr ""
+
+#: ../libtransmission/natpmp.c:30
+msgid "Port Forwarding (NAT-PMP)"
+msgstr "העברת פורטים (NAT-PMP)"
+
+#: ../libtransmission/natpmp.c:67
+#, c-format
+msgid "%s succeeded (%d)"
+msgstr "%s עבר (%d)"
+
+#: ../libtransmission/natpmp.c:137
+#, c-format
+msgid "Found public address \"%s\""
+msgstr "נמצא כתובת ציבורית \"%s\""
+
+#: ../libtransmission/natpmp.c:172
+#, c-format
+msgid "no longer forwarding port %d"
+msgstr "לא מעביר יותר את הפורט %d"
+
+#: ../libtransmission/natpmp.c:219
+#, c-format
+msgid "Port %d forwarded successfully"
+msgstr "הפורט %d הועבר בהצלחה"
+
+#: ../libtransmission/net.c:301
+#, c-format
+msgid "Couldn't set source address %s on %d: %s"
+msgstr ""
+
+#: ../libtransmission/net.c:317
+#, c-format
+msgid "Couldn't connect socket %d to %s, port %d (errno %d - %s)"
+msgstr ""
+
+#: ../libtransmission/net.c:375
+msgid "Is another copy of Transmission already running?"
+msgstr ""
+
+#: ../libtransmission/net.c:380
+#, c-format
+msgid "Couldn't bind port %d on %s: %s"
+msgstr ""
+
+#: ../libtransmission/net.c:382
+#, c-format
+msgid "Couldn't bind port %d on %s: %s (%s)"
+msgstr ""
+
+#: ../libtransmission/port-forwarding.c:33
+msgid "Port Forwarding"
+msgstr "העברת פורטים"
+
+#: ../libtransmission/port-forwarding.c:60
+msgid "Starting"
+msgstr "מתחיל"
+
+#: ../libtransmission/port-forwarding.c:61
+msgid "Forwarded"
+msgstr "מועבר"
+
+#: ../libtransmission/port-forwarding.c:62
+msgid "Stopping"
+msgstr "עוצר"
+
+#: ../libtransmission/port-forwarding.c:63
+msgid "Not forwarded"
+msgstr "לא מועבר"
+
+#: ../libtransmission/port-forwarding.c:87 ../libtransmission/torrent.c:1720
+#, c-format
+msgid "State changed from \"%1$s\" to \"%2$s\""
+msgstr ""
+
+#: ../libtransmission/port-forwarding.c:178
+msgid "Stopped"
+msgstr "נעצר"
+
+#. first %s is the application name
+#. second %s is the version number
+#: ../libtransmission/session.c:622
+#, c-format
+msgid "%s %s started"
+msgstr "%s %s התחיל"
+
+#: ../libtransmission/session.c:636
+msgid "Local Peer Discovery disabled"
+msgstr ""
+
+#: ../libtransmission/session.c:638
+msgid "Local Peer Discovery active"
+msgstr ""
+
+#: ../libtransmission/session.c:1748
+#, c-format
+msgid "Loaded %d torrents"
+msgstr "ניטענו %d טורנטים"
+
+#: ../libtransmission/torrent.c:398
+#, c-format
+msgid "Tracker warning: \"%s\""
+msgstr "אזהרת טראקר: \"%s\""
+
+#: ../libtransmission/torrent.c:405
+#, c-format
+msgid "Tracker error: \"%s\""
+msgstr "שגיאת טראקר: \"%s\""
+
+#: ../libtransmission/torrent.c:1369
+msgid ""
+"No data found!  Reconnect any disconnected drives, use \"Set Location\", or "
+"restart the torrent to re-download."
+msgstr ""
+
+#: ../libtransmission/torrent.c:1452
+msgid ""
+"Can't find local data.  Try \"Set Location\" to find it, or restart the "
+"torrent to re-download."
+msgstr ""
+
+#: ../libtransmission/torrent.c:1562
+msgid "Removing torrent"
+msgstr ""
+
+#: ../libtransmission/torrent.c:1616
+msgid "Done"
+msgstr "הושלם"
+
+#: ../libtransmission/torrent.c:1619
+msgid "Complete"
+msgstr "הסתיים"
+
+#: ../libtransmission/torrent.c:1622
+msgid "Incomplete"
+msgstr "לא שלם"
+
+#: ../libtransmission/upnp.c:26
+msgid "Port Forwarding (UPnP)"
+msgstr "העברת פורטים (UPnP)"
+
+#: ../libtransmission/upnp.c:104
+#, c-format
+msgid "Found Internet Gateway Device \"%s\""
+msgstr ""
+
+#: ../libtransmission/upnp.c:107
+#, c-format
+msgid "Local Address is \"%s\""
+msgstr "הכתובת המקומית היא \"%s\""
+
+#: ../libtransmission/upnp.c:144
+#, c-format
+msgid "Port %d isn't forwarded"
+msgstr ""
+
+#: ../libtransmission/upnp.c:158
+#, c-format
+msgid "Stopping port forwarding through \"%s\", service \"%s\""
+msgstr ""
+
+#: ../libtransmission/upnp.c:192
+#, c-format
+msgid ""
+"Port forwarding through \"%s\", service \"%s\".  (local address: %s:%d)"
+msgstr ""
+
+#: ../libtransmission/upnp.c:197
+msgid "Port forwarding successful!"
+msgstr "העברת פורטים הצליחה!"
+
+#: ../libtransmission/utils.c:498
+msgid "Not a regular file"
+msgstr "לא קובץ רגיל"
+
+#: ../libtransmission/utils.c:516
+msgid "Memory allocation failed"
+msgstr "הקצאת זיכרון נכשלה"
+
+#. Node exists but isn't a folder
+#: ../libtransmission/utils.c:614
+#, c-format
+msgid "File \"%s\" is in the way"
+msgstr ""
+
+#: ../libtransmission/verify.c:235
+msgid "Verifying torrent"
+msgstr ""
+
+#: ../libtransmission/verify.c:305
+msgid "Queued for verification"
+msgstr ""
+
+#~ msgid "Sort by _State"
+#~ msgstr "מיון לפי _מצב"
+
+#~ msgid "Sort by _Tracker"
+#~ msgstr "מיון לפי _טראקר"
+
+#~ msgid "_Main Window"
+#~ msgstr "_חלון ראשי"
+
+#~ msgid "_Minimal View"
+#~ msgstr "תצוגה _מינימלית"
+
+#~ msgid "_Reverse Sort Order"
+#~ msgstr "_הפוך את סדר המיון"
+
+#~ msgid "<b>Seeders:</b>"
+#~ msgstr "<b>משתפים:</b>"
+
+#~ msgid "<b>Leechers:</b>"
+#~ msgstr "<b>מורידים:</b>"
+
+#~ msgid "Pieces:"
+#~ msgstr "חלקים:"
+
+#~ msgid "Origins"
+#~ msgstr "מקור"
+
+#~ msgid "Creator:"
+#~ msgstr "יוצר:"
+
+#~ msgid "Date:"
+#~ msgstr "תאריך:"
+
+#~ msgid "Torrent file:"
+#~ msgstr "קובץ טורנט:"
+
+#~ msgid "Transfer"
+#~ msgstr "העברה"
+
+#~ msgid "Progress:"
+#~ msgstr "התקדמות:"
+
+#~ msgid "Failed DL:"
+#~ msgstr "הורדה פגומה:"
+
+#~ msgid "Dates"
+#~ msgstr "תאריכים"
+
+#~ msgid "Started at:"
+#~ msgstr "התחיל ב:"
+
+#~ msgid "Last activity at:"
+#~ msgstr "פעילות אחרונה ב:"
+
+#~ msgid "Scrape"
+#~ msgstr "עדכון"
+
+#~ msgid "Last scrape at:"
+#~ msgstr "תאריך עדכון:"
+
+#~ msgid "Tracker responded:"
+#~ msgstr "תגובת הטראקר:"
+
+#~ msgid "Next scrape in:"
+#~ msgstr "עדכון הבא ב:"
+
+#~ msgid "Announce"
+#~ msgstr "קריאה"
+
+#~ msgid "Tracker:"
+#~ msgstr "טראקר:"
+
+#~ msgid "Last announce at:"
+#~ msgstr "קריאה אחרונה:"
+
+#~ msgid "Next announce in:"
+#~ msgstr "קריאה הבאה ב:"
+
+#~ msgid "Manual announce allowed in:"
+#~ msgstr "קריאה ידנית תתאפשר בעוד:"
+
+#~ msgid "Start minimized in system tray"
+#~ msgstr "התחל ממוזער במגש המערכת"
+
+#~ msgid "Torrent creation cancelled"
+#~ msgstr "יצירת טורנט בוטלה"
+
+#, c-format
+#~ msgid "<i>%1$s; %2$'d File</i>"
+#~ msgid_plural "<i>%1$s; %2$'d Files</i>"
+#~ msgstr[0] "<i>%1$s; %2$'d קבצים</i>"
+#~ msgstr[1] "<i>%1$s; %2$'d קבצים</i>"
+
+#~ msgid "Commen_t:"
+#~ msgstr "הער_ה:"
+
+#, c-format
+#~ msgid "speed|Down: %1$s, Up: %2$s"
+#~ msgstr "הורדה: %1$s, העלאה: %2$s"
+
+#, c-format
+#~ msgid "Down: %s"
+#~ msgstr "הורדה: %s"
+
+#, c-format
+#~ msgid "Up: %s"
+#~ msgstr "העלאה: %s"
+
+#, c-format
+#~ msgid ""
+#~ "%1$'d Seeding, %2$'d Downloading\n"
+#~ "Down: %3$s, Up: %4$s"
+#~ msgstr ""
+#~ "%1$'d משתפים, %2$'d מורידים\n"
+#~ "מהירות הורדה: %3$s, מהירות העלאה: %4$s"
+
+#~ msgid "Mo_ve source files to Trash"
+#~ msgstr "הע_בר את קבצי המקור לאשפה"
+
+#~ msgid "Use peer e_xchange"
+#~ msgstr "שימוש חילופי מקורות"
+
+#~ msgid "A_ll"
+#~ msgstr "כו_לם"
+
+#~ msgid "_Active"
+#~ msgstr "_פעילים"
+
+#~ msgid "_Downloading"
+#~ msgstr "_מורידים"
+
+#~ msgid "_Seeding"
+#~ msgstr "_משתפים"
+
+#~ msgid "_Paused"
+#~ msgstr "_מושהים"

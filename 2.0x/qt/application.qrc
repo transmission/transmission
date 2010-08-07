@@ -1,0 +1,15 @@
+<RCC version="1.0">
+  <qresource prefix="icons" >
+    <file alias="ratio.png">icons/ratio.png</file>
+    <file alias="transmission-16.png">icons/hicolor_apps_16x16_transmission.png</file>
+    <file alias="transmission-22.png">icons/hicolor_apps_22x22_transmission.png</file>
+    <file alias="transmission-24.png">icons/hicolor_apps_24x24_transmission.png</file>
+    <file alias="transmission-32.png">icons/hicolor_apps_32x32_transmission.png</file>
+    <file alias="transmission-48.png">icons/hicolor_apps_48x48_transmission.png</file>
+    <file alias="alt-limit-off.png">icons/turtle-grey.png</file>
+    <file alias="alt-limit-on.png">icons/turtle-blue.png</file>
+    <file alias="encrypted.png">icons/lock.png</file>
+    <file alias="dance.gif">icons/dance.gif</file>
+    <file alias="options.png">icons/info-options.png</file>
+  </qresource>
+</RCC>

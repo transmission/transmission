@@ -1,0 +1,5 @@
+This file is here because I can never remember these commands...
+
+svn propset svn:keywords 'Date Rev Author Id' filename
+
+find . -type f \! -path \*.svn\* | xargs grep '\$Id\$'

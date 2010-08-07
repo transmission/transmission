@@ -1,0 +1,50 @@
+The Transmission Project
+http://www.transmissionbt.com/
+
+Lead Developers <dev@transmissionbt.com>
+  Charles Kerr <charles@transmissionbt.com>  (Daemon, Backend, GTK+ client)
+  Mitchell Livingston <livings124@transmissionbt.com>  (Mac OS X client)
+  Kevin Glowacz <kjg@transmissionbt.com> (Web client)
+
+Project Contributors
+  Tomas Carnecky  (Profiling, patches, and detection of sneaky bugs)
+  Juliusz Chroboczek  (DHT, network code, BitTorrent code improvements)
+  John Clay <john@transmissionbt.com> (Website maintenance and troubleshooting, Mac OS X help documentation)
+  Rashid Eissing  (Mac OS X Transfers preferences icon)
+  Hugo van Heuven, madebysofa  (Main icon design)
+  Kendall Hopkins <SoftwareElves@gmail.com>  (Web client)
+  Malcolm Jarvis <mjarvis@transmissionbt.com>  (Web client)
+  Daniel Lee (Patches)
+  Rick Patrick  (Mac OS X images)
+  Jonas Rask  (Mac OS X Globe icon)
+  Erick Turnquist  (IPv6 code, support)
+  Maarten Van Coile  (Wiki Wrangler, troubleshooting, support)
+
+Previous Developers
+  Eric Petit <eric@lapsus.org>  (Project originator)
+  Josh Elsasser <josh@elsasser.org>  (Daemon, Backend, GTK+ client)
+  Bryan Varner <bryan@varnernet.com>  (BeOS client)
+
+Mac OS X Translators, current release:
+  Jorge Carrasco  (Spanish)
+  Etienne Samson  (French)
+  Marco Cavazzuti  (Italian)
+  Anton Sotkov  (Russian)
+  Alexander Bykov  (Russian)
+  Maarten Van Coile  (Dutch)
+  Guilherme Fernandes  (Brazilian Portuguese)
+  Sven-S. Porst  (German)
+  Tianhao He  (Simplified Chinese)
+  SŽrgio Miranda  (European Portuguese)
+
+GTK+ Translators:
+  Hundreds of people in an ever-changing list.
+  See the po files for a full list.
+
+Third-Party Resources:
+  Nick Mathewson and Niels Provos for libevent. <http://monkey.org/~provos/libevent/>
+  Thomas Bernard for MiniUPnP and libnatpmp. <http://miniupnp.tuxfamily.org/>
+  The Growl Development Team for Growl. <http://growl.info/>
+  Andy Matuschak for Sparkle. <http://sparkle.andymatuschak.org/>
+  Christian Hammond for SexyIconEntry. <http://www.chipx86.com/wiki/Libsexy> 
+  M. Uli Kusterer for UKKQueue.

@@ -1,0 +1,2611 @@
+# slovak translation of transmission
+# Copyright (C) 2009 Free Software Foundation, Inc.
+# This file is distributed under the same license as the transmission package.
+# Miroslav Biňas <mirek@host.sk>, 2009.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: transmission\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-05-20 11:39-0500\n"
+"PO-Revision-Date: 2009-06-20 12:49+0000\n"
+"Last-Translator: pavolzetor <Unknown>\n"
+"Language-Team: Slovak <sk-i18n@lists.linux.sk>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 1 : (n>=2 && n<=4) ? 2 : 0;\n"
+"X-Launchpad-Export-Date: 2010-07-19 18:20+0000\n"
+"X-Generator: Launchpad (build Unknown)\n"
+"X-Poedit-Country: SLOVAKIA\n"
+"X-Poedit-Language: Slovak\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+#: ../gtk/details.c:586 ../gtk/util.c:116 ../libtransmission/utils.c:1355
+msgid "None"
+msgstr "Nič"
+
+#: ../gtk/actions.c:55
+msgid "Sort by _Activity"
+msgstr "Usporiadať podľa _aktivity"
+
+#: ../gtk/actions.c:56
+msgid "Sort by _Name"
+msgstr "Usporiadať podľa _názvu"
+
+#: ../gtk/actions.c:57
+msgid "Sort by _Progress"
+msgstr "Usporiadať podľa _priebehu"
+
+#: ../gtk/actions.c:58
+msgid "Sort by Rati_o"
+msgstr ""
+
+#: ../gtk/actions.c:59
+msgid "Sort by Stat_e"
+msgstr ""
+
+#: ../gtk/actions.c:60
+msgid "Sort by T_racker"
+msgstr ""
+
+#: ../gtk/actions.c:61
+msgid "Sort by A_ge"
+msgstr "Usporiadať podľa _veku"
+
+#: ../gtk/actions.c:62
+msgid "Sort by Time _Left"
+msgstr ""
+
+#: ../gtk/actions.c:63
+msgid "Sort by Si_ze"
+msgstr "Usporiadať podľa veľkos_ti"
+
+#: ../gtk/actions.c:80
+msgid "_Show Transmission"
+msgstr ""
+
+#: ../gtk/actions.c:81
+msgid "Message _Log"
+msgstr "_Záznamník"
+
+#: ../gtk/actions.c:96
+msgid "Enable Temporary Speed _Limits"
+msgstr ""
+
+#: ../gtk/actions.c:97
+msgid "_Compact View"
+msgstr ""
+
+#: ../gtk/actions.c:98
+msgid "Re_verse Sort Order"
+msgstr ""
+
+#: ../gtk/actions.c:99
+msgid "_Filterbar"
+msgstr "Panel _filtrov"
+
+#: ../gtk/actions.c:100
+msgid "_Statusbar"
+msgstr "_Stavový riadok"
+
+#: ../gtk/actions.c:101
+msgid "_Toolbar"
+msgstr "_Panel nástrojov"
+
+#: ../gtk/actions.c:106
+msgid "_File"
+msgstr "_Súbor"
+
+#: ../gtk/actions.c:107
+msgid "_Torrent"
+msgstr "_Torrent"
+
+#: ../gtk/actions.c:108
+msgid "_View"
+msgstr "_Zobraziť"
+
+#: ../gtk/actions.c:109
+msgid "_Sort Torrents By"
+msgstr "_Usporiadať podľa"
+
+#: ../gtk/actions.c:110
+msgid "_Edit"
+msgstr "_Upraviť"
+
+#: ../gtk/actions.c:111
+msgid "_Help"
+msgstr "_Pomocník"
+
+#: ../gtk/actions.c:112
+msgid "Copy _Magnet Link to Clipboard"
+msgstr ""
+
+#: ../gtk/actions.c:113
+msgid "Add _URL..."
+msgstr ""
+
+#: ../gtk/actions.c:113
+msgid "Add URL..."
+msgstr ""
+
+#: ../gtk/actions.c:114 ../gtk/actions.c:115
+msgid "Add a torrent"
+msgstr "Pridať torrent"
+
+#: ../gtk/actions.c:115
+msgid "_Add File..."
+msgstr ""
+
+#: ../gtk/actions.c:116
+msgid "_Start"
+msgstr "_Spustiť"
+
+#: ../gtk/actions.c:116
+msgid "Start torrent"
+msgstr "Spustiť torrent"
+
+#: ../gtk/actions.c:117
+msgid "_Statistics"
+msgstr "_Štatistiky"
+
+#: ../gtk/actions.c:118
+msgid "_Donate"
+msgstr ""
+
+#: ../gtk/actions.c:119
+msgid "_Verify Local Data"
+msgstr "_Skontrolovať lokálne dáta"
+
+#: ../gtk/actions.c:120
+msgid "_Pause"
+msgstr "_Pozastaviť"
+
+#: ../gtk/actions.c:120
+msgid "Pause torrent"
+msgstr "Pozastaviť torrent"
+
+#: ../gtk/actions.c:121
+msgid "_Pause All"
+msgstr "Všetko pozastaviť"
+
+#: ../gtk/actions.c:121
+msgid "Pause all torrents"
+msgstr "Pozastaviť všetky torrenty"
+
+#: ../gtk/actions.c:122
+msgid "_Start All"
+msgstr "_Spustiť všetko"
+
+#: ../gtk/actions.c:122
+msgid "Start all torrents"
+msgstr "Spustiť všetky torrenty"
+
+#: ../gtk/actions.c:123
+msgid "Set _Location"
+msgstr "Nastaviť _umiestnenie"
+
+#: ../gtk/actions.c:124
+msgid "Remove torrent"
+msgstr "Zmazať torrent"
+
+#: ../gtk/actions.c:125
+msgid "_Delete Files and Remove"
+msgstr "_Zmazať a odstrániť súbory"
+
+#: ../gtk/actions.c:126
+msgid "_New..."
+msgstr "_Nový..."
+
+#: ../gtk/actions.c:126
+msgid "Create a torrent"
+msgstr "Vytvoriť torrent"
+
+#: ../gtk/actions.c:127
+msgid "_Quit"
+msgstr "_Koniec"
+
+#: ../gtk/actions.c:128
+msgid "Select _All"
+msgstr "Vybrať všetko"
+
+#: ../gtk/actions.c:129
+msgid "Dese_lect All"
+msgstr "Odznačiť všetko"
+
+#: ../gtk/actions.c:131
+msgid "Torrent properties"
+msgstr "Vlastnosti torrentu"
+
+#: ../gtk/actions.c:132
+msgid "_Open Folder"
+msgstr "Otvoriť priečinok"
+
+#: ../gtk/actions.c:134
+msgid "_Contents"
+msgstr "_Obsah"
+
+#: ../gtk/actions.c:135
+msgid "Ask Tracker for _More Peers"
+msgstr "Požiadať tracker o viac klientov"
+
+#: ../gtk/add-dialog.c:240
+msgid "Torrent files"
+msgstr "Súbory torrentu"
+
+#: ../gtk/add-dialog.c:245
+msgid "All files"
+msgstr "Všetky súbory"
+
+#. make the dialog
+#: ../gtk/add-dialog.c:272
+msgid "Torrent Options"
+msgstr "Možnosti torrentu"
+
+#: ../gtk/add-dialog.c:295 ../gtk/tr-prefs.c:302
+msgid "Mo_ve .torrent file to the trash"
+msgstr ""
+
+#: ../gtk/add-dialog.c:297 ../gtk/tr-prefs.c:298
+msgid "_Start when added"
+msgstr "_Spustiť po pridaní"
+
+#: ../gtk/add-dialog.c:312
+msgid "_Torrent file:"
+msgstr "_Súbor s torrentom:"
+
+#: ../gtk/add-dialog.c:316
+msgid "Select Source File"
+msgstr "Vybrať zdrojový súbor"
+
+#: ../gtk/add-dialog.c:327
+msgid "_Destination folder:"
+msgstr "Cieľový priečinok"
+
+#: ../gtk/add-dialog.c:331
+msgid "Select Destination Folder"
+msgstr "Vybrať cieľový priečinok"
+
+#: ../gtk/add-dialog.c:353 ../gtk/details.c:478
+msgid "Torrent _priority:"
+msgstr ""
+
+#: ../gtk/add-dialog.c:437
+msgid "Add a Torrent"
+msgstr "Pridať torrent"
+
+#: ../gtk/add-dialog.c:454 ../gtk/tr-prefs.c:294
+msgid "Show _options dialog"
+msgstr ""
+
+#: ../gtk/add-dialog.c:532
+msgid "Add URL"
+msgstr ""
+
+#: ../gtk/add-dialog.c:545
+msgid "Add torrent from URL"
+msgstr ""
+
+#: ../gtk/add-dialog.c:549
+msgid "_URL"
+msgstr ""
+
+#: ../gtk/conf.c:62 ../libtransmission/fdlimit.c:341
+#: ../libtransmission/metainfo.c:115 ../libtransmission/utils.c:604
+#: ../libtransmission/utils.c:615
+#, c-format
+msgid "Couldn't create \"%1$s\": %2$s"
+msgstr "Nie je možné vytvoriť \"%1$s\": %2$s"
+
+#: ../gtk/conf.c:87 ../libtransmission/fdlimit.c:369
+#, c-format
+msgid "Couldn't open \"%1$s\": %2$s"
+msgstr "Nie je možné otvoriť \"%1$s\": %2$s"
+
+#: ../gtk/conf.c:92
+#, c-format
+msgid "%s is already running."
+msgstr "%s je už spustený."
+
+#: ../gtk/conf.c:447 ../gtk/conf.c:452
+#, c-format
+msgid "Importing \"%s\""
+msgstr "Importuje sa \"%s\""
+
+#: ../gtk/details.c:447 ../gtk/tr-prefs.c:1436
+msgid "Speed"
+msgstr "Rýchlosť"
+
+#: ../gtk/details.c:449
+msgid "Honor global _limits"
+msgstr "_Dodržiavať globálne obmedzenia"
+
+#: ../gtk/details.c:454 ../gtk/tr-prefs.c:1220
+msgid "Limit _download speed (KiB/s):"
+msgstr ""
+
+#: ../gtk/details.c:466 ../gtk/tr-prefs.c:1227
+msgid "Limit _upload speed (KiB/s):"
+msgstr ""
+
+#: ../gtk/details.c:482
+msgid "Seed-Until Ratio"
+msgstr "Odosielať až po pomer"
+
+#: ../gtk/details.c:484
+msgid "Use _global settings"
+msgstr ""
+
+#: ../gtk/details.c:492
+msgid "Seed _regardless of ratio"
+msgstr "Odosielať _bez ohľadu na pomer"
+
+#: ../gtk/details.c:501 ../gtk/tr-prefs.c:330
+msgid "_Seed torrent until its ratio reaches:"
+msgstr ""
+
+#: ../gtk/details.c:517
+msgid "Peer Connections"
+msgstr "Spojenia klientov"
+
+#: ../gtk/details.c:520
+msgid "_Maximum peers:"
+msgstr "_Maximálny počet klientov:"
+
+#: ../gtk/details.c:540 ../gtk/torrent-cell-renderer.c:212
+msgid "Waiting to verify local data"
+msgstr "Čaká sa na kontrolu lokálnych dát"
+
+#: ../gtk/details.c:541
+msgid "Verifying local data"
+msgstr "Kontrola sa lokálnych dát"
+
+#: ../gtk/details.c:542 ../gtk/filter.c:720
+msgid "Downloading"
+msgstr "Sťahuje sa"
+
+#: ../gtk/details.c:543 ../gtk/filter.c:721
+msgid "Seeding"
+msgstr "Odosiela sa"
+
+#: ../gtk/details.c:544 ../gtk/torrent-cell-renderer.c:206
+msgid "Finished"
+msgstr ""
+
+#: ../gtk/details.c:544 ../gtk/filter.c:722 ../gtk/torrent-cell-renderer.c:208
+msgid "Paused"
+msgstr "Pozastavený"
+
+#: ../gtk/details.c:587 ../gtk/file-list.c:585
+msgid "Mixed"
+msgstr "Zmiešaná"
+
+#: ../gtk/details.c:610
+msgid "Private to this tracker -- DHT and PEX disabled"
+msgstr "Len pre tento tracker -- DHT a PEX vypnuté"
+
+#: ../gtk/details.c:612
+msgid "Public torrent"
+msgstr "Verejný torrent"
+
+#: ../gtk/details.c:635
+#, c-format
+msgid "Created by %1$s"
+msgstr ""
+
+#: ../gtk/details.c:637
+#, c-format
+msgid "Created on %1$s"
+msgstr ""
+
+#: ../gtk/details.c:639
+#, c-format
+msgid "Created by %1$s on %2$s"
+msgstr ""
+
+#: ../gtk/details.c:723
+msgid "Unknown"
+msgstr "Neznámy"
+
+#: ../gtk/details.c:751
+#, c-format
+msgid "%1$s (%2$'d piece @ %3$s)"
+msgid_plural "%1$s (%2$'d pieces @ %3$s)"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/details.c:757
+#, c-format
+msgid "%1$s (%2$'d piece)"
+msgid_plural "%1$s (%2$'d pieces)"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/details.c:792
+#, c-format
+msgid "%1$s (%2$.1f%%); %3$s Unverified"
+msgstr ""
+
+#: ../gtk/details.c:794
+#, c-format
+msgid "%1$s (%2$.1f%%)"
+msgstr ""
+
+#: ../gtk/details.c:805
+#, c-format
+msgid "%1$.1f%%"
+msgstr ""
+
+#: ../gtk/details.c:823
+#, c-format
+msgid "%1$s (+%2$s corrupt)"
+msgstr ""
+
+#: ../gtk/details.c:896
+msgid "Active now"
+msgstr ""
+
+#: ../gtk/details.c:900
+#, c-format
+msgid "%1$s ago"
+msgstr ""
+
+#: ../gtk/details.c:919
+msgid "Activity"
+msgstr "Aktivita"
+
+#: ../gtk/details.c:923
+msgid "Torrent size:"
+msgstr ""
+
+#: ../gtk/details.c:927
+msgid "Have:"
+msgstr "Uložených:"
+
+#: ../gtk/details.c:931
+msgid "Availability:"
+msgstr ""
+
+#: ../gtk/details.c:935 ../gtk/stats.c:168 ../gtk/stats.c:180
+msgid "Downloaded:"
+msgstr "Stiahnutých:"
+
+#: ../gtk/details.c:939 ../gtk/stats.c:166 ../gtk/stats.c:178
+msgid "Uploaded:"
+msgstr "Odoslaných:"
+
+#: ../gtk/details.c:943 ../gtk/stats.c:170 ../gtk/stats.c:182
+msgid "Ratio:"
+msgstr "Pomer:"
+
+#: ../gtk/details.c:947
+msgid "State:"
+msgstr "Stav:"
+
+#: ../gtk/details.c:951
+msgid "Running time:"
+msgstr ""
+
+#: ../gtk/details.c:955
+msgid "Remaining time:"
+msgstr ""
+
+#: ../gtk/details.c:959
+msgid "Last activity:"
+msgstr ""
+
+#: ../gtk/details.c:963
+msgid "Error:"
+msgstr "Chyba:"
+
+#: ../gtk/details.c:967
+msgid "Details"
+msgstr "Detaily"
+
+#: ../gtk/details.c:973
+msgid "Location:"
+msgstr ""
+
+#: ../gtk/details.c:980
+msgid "Hash:"
+msgstr "Hash:"
+
+#: ../gtk/details.c:985
+msgid "Privacy:"
+msgstr "Prístup:"
+
+#: ../gtk/details.c:990
+msgid "Origin:"
+msgstr ""
+
+#: ../gtk/details.c:1007
+msgid "Comment:"
+msgstr "Komentár:"
+
+#: ../gtk/details.c:1039
+msgid "Webseeds"
+msgstr "Webové zdroje"
+
+#: ../gtk/details.c:1041 ../gtk/details.c:1093
+msgid "Down"
+msgstr "Down"
+
+#: ../gtk/details.c:1091
+msgid "Address"
+msgstr "Adresa"
+
+#: ../gtk/details.c:1095
+msgid "Up"
+msgstr "Up"
+
+#: ../gtk/details.c:1096
+msgid "Client"
+msgstr "Klient"
+
+#: ../gtk/details.c:1097
+msgid "%"
+msgstr "%"
+
+#: ../gtk/details.c:1099
+msgid "Up Reqs"
+msgstr ""
+
+#: ../gtk/details.c:1101
+msgid "Dn Reqs"
+msgstr ""
+
+#: ../gtk/details.c:1103
+msgid "Dn Blocks"
+msgstr ""
+
+#: ../gtk/details.c:1105
+msgid "Up Blocks"
+msgstr ""
+
+#: ../gtk/details.c:1107
+msgid "We Cancelled"
+msgstr ""
+
+#: ../gtk/details.c:1109
+msgid "They Cancelled"
+msgstr ""
+
+#: ../gtk/details.c:1110
+msgid "Status"
+msgstr "Stav"
+
+#: ../gtk/details.c:1469
+msgid "Optimistic unchoke"
+msgstr "Optimistické odblokovanie"
+
+#: ../gtk/details.c:1470
+msgid "Downloading from this peer"
+msgstr "Sťahuje sa od tohto klienta"
+
+#: ../gtk/details.c:1471
+msgid "We would download from this peer if they would let us"
+msgstr "Sťahovali by sme od tohto klienta, keby nám to dovolil"
+
+#: ../gtk/details.c:1472
+msgid "Uploading to peer"
+msgstr "Odosielanie klientovi"
+
+#: ../gtk/details.c:1473
+msgid "We would upload to this peer if they asked"
+msgstr "Odosielali by sme tomuto klientovi, keby o to požiadal"
+
+#: ../gtk/details.c:1474
+msgid "Peer has unchoked us, but we're not interested"
+msgstr "Klient nás odblokoval, ale nezaujíma nás to"
+
+#: ../gtk/details.c:1475
+msgid "We unchoked this peer, but they're not interested"
+msgstr "Odblokovali sme tohto klienta, ale nemá záujem"
+
+#: ../gtk/details.c:1476
+msgid "Encrypted connection"
+msgstr "Šifrované spojenie"
+
+#: ../gtk/details.c:1477
+msgid "Peer was discovered through Peer Exchange (PEX)"
+msgstr "Klient bol objavený prostredníctvom peer exchange (PEX)"
+
+#: ../gtk/details.c:1478
+msgid "Peer was discovered through DHT"
+msgstr "Rovesník bol nájdený pomocou DHT"
+
+#: ../gtk/details.c:1479
+msgid "Peer is an incoming connection"
+msgstr "Klient je prichádzajúce spojenie"
+
+#: ../gtk/details.c:1734 ../gtk/details.c:2254
+msgid "Show _more details"
+msgstr ""
+
+#: ../gtk/details.c:1808
+#, c-format
+msgid "Got a list of %1$s%2$'d peers%3$s %4$s ago"
+msgstr ""
+
+#: ../gtk/details.c:1812
+#, c-format
+msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
+msgstr ""
+
+#: ../gtk/details.c:1815
+#, c-format
+msgid "Got an error %1$s\"%2$s\"%3$s %4$s ago"
+msgstr ""
+
+#: ../gtk/details.c:1824
+msgid "No updates scheduled"
+msgstr ""
+
+#: ../gtk/details.c:1830
+#, c-format
+msgid "Asking for more peers in %s"
+msgstr ""
+
+#: ../gtk/details.c:1834
+msgid "Queued to ask for more peers"
+msgstr ""
+
+#: ../gtk/details.c:1839
+#, c-format
+msgid "Asking for more peers now... <small>%s</small>"
+msgstr ""
+
+#: ../gtk/details.c:1849
+#, c-format
+msgid "Tracker had %s%'d seeders and %'d leechers%s %s ago"
+msgstr ""
+
+#: ../gtk/details.c:1853
+#, c-format
+msgid "Got a scrape error \"%s%s%s\" %s ago"
+msgstr ""
+
+#: ../gtk/details.c:1863
+#, c-format
+msgid "Asking for peer counts in %s"
+msgstr ""
+
+#: ../gtk/details.c:1867
+msgid "Queued to ask for peer counts"
+msgstr ""
+
+#: ../gtk/details.c:1872
+#, c-format
+msgid "Asking for peer counts now... <small>%s</small>"
+msgstr ""
+
+#: ../gtk/details.c:2131
+msgid "List contains invalid URLs"
+msgstr ""
+
+#: ../gtk/details.c:2171
+msgid "Edit Trackers"
+msgstr ""
+
+#: ../gtk/details.c:2183
+msgid "Tracker Announce URLs"
+msgstr ""
+
+#: ../gtk/details.c:2186 ../gtk/makemeta-ui.c:453
+msgid ""
+"To add a backup URL, add it on the line after the primary URL.\n"
+"To add another primary URL, add it after a blank line."
+msgstr ""
+
+#: ../gtk/details.c:2229 ../gtk/details.c:2350 ../gtk/filter.c:324
+msgid "Trackers"
+msgstr "Trackery"
+
+#: ../gtk/details.c:2261
+msgid "_Edit Trackers"
+msgstr ""
+
+#: ../gtk/details.c:2269
+msgid "Show _backup trackers"
+msgstr ""
+
+#: ../gtk/details.c:2342 ../gtk/msgwin.c:179
+msgid "Information"
+msgstr "Podrobnosti"
+
+#: ../gtk/details.c:2346
+msgid "Peers"
+msgstr "Klienti"
+
+#: ../gtk/details.c:2356
+msgid "File listing not available for combined torrent properties"
+msgstr ""
+
+#: ../gtk/details.c:2360 ../gtk/filter.c:999 ../gtk/makemeta-ui.c:402
+msgid "Files"
+msgstr "Súbory"
+
+#: ../gtk/details.c:2365 ../gtk/tr-window.c:651
+msgid "Options"
+msgstr "Možnosti"
+
+#: ../gtk/details.c:2392
+#, c-format
+msgid "%s Properties"
+msgstr "Vlastnosti %s"
+
+#: ../gtk/details.c:2403
+#, c-format
+msgid "%'d Torrent Properties"
+msgstr "Vlastnosti torrentu %'d"
+
+#: ../gtk/dialogs.c:121
+msgid "<big><b>Quit Transmission?</b></big>"
+msgstr "<big><b>Vypnúť Transmission?</b></big>"
+
+#: ../gtk/dialogs.c:133
+msgid "_Don't ask me again"
+msgstr "_Viac sa už nepýtať"
+
+#: ../gtk/dialogs.c:229
+#, c-format
+msgid "Remove torrent?"
+msgid_plural "Remove %d torrents?"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/dialogs.c:235
+#, c-format
+msgid "Delete this torrent's downloaded files?"
+msgid_plural "Delete these %d torrents' downloaded files?"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/dialogs.c:245
+msgid ""
+"Once removed, continuing the transfer will require the torrent file or "
+"magnet link."
+msgid_plural ""
+"Once removed, continuing the transfers will require the torrent files or "
+"magnet links."
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/dialogs.c:251
+msgid "This torrent has not finished downloading."
+msgid_plural "These torrents have not finished downloading."
+msgstr[0] "Tieto torrenty sa ešte nestiahli."
+msgstr[1] "Tento torrent sa ešte nestiahol."
+msgstr[2] "Tieto torrenty sa ešte nestiahli."
+
+#: ../gtk/dialogs.c:257
+msgid "This torrent is connected to peers."
+msgid_plural "These torrents are connected to peers."
+msgstr[0] "Tieto torrenty sú pripojené k ďalším klientom."
+msgstr[1] "Tento torrent je pripojený k ďalším klientom."
+msgstr[2] "Tieto torrenty sú pripojené k ďalším klientom."
+
+#: ../gtk/dialogs.c:264
+msgid "One of these torrents is connected to peers."
+msgid_plural "Some of these torrents are connected to peers."
+msgstr[0] "Niektoré z týchto torrentov sú pripojené k ďalším klientom."
+msgstr[1] "Jeden z týchto torrentov je pripojený k ďalším klientom."
+msgstr[2] "Niektoré z týchto torrentov sú pripojené k ďalším klientom."
+
+#: ../gtk/dialogs.c:271
+msgid "One of these torrents has not finished downloading."
+msgid_plural "Some of these torrents have not finished downloading."
+msgstr[0] "Niektoré z týchto torrentov sa ešte nestiahli."
+msgstr[1] "Jeden z týchto torrentov sa ešte nestiahol."
+msgstr[2] "Niektoré z týchto torrentov sa ešte nestiahli."
+
+#: ../gtk/file-list.c:582 ../gtk/filter.c:349 ../gtk/util.c:692
+msgid "High"
+msgstr "Vysoká"
+
+#: ../gtk/file-list.c:583 ../gtk/filter.c:353 ../gtk/util.c:693
+msgid "Normal"
+msgstr "Normálna"
+
+#: ../gtk/file-list.c:584 ../gtk/filter.c:357 ../gtk/util.c:694
+msgid "Low"
+msgstr "Nízka"
+
+#. add "enabled" column
+#: ../gtk/file-list.c:612 ../gtk/file-list.c:745
+msgid "Download"
+msgstr "Stiahnuť"
+
+#. add priority column
+#: ../gtk/file-list.c:613 ../gtk/file-list.c:759 ../gtk/filter.c:344
+msgid "Priority"
+msgstr "Priorita"
+
+#: ../gtk/file-list.c:717
+msgid "File"
+msgstr "Súbor"
+
+#. add "progress" column
+#: ../gtk/file-list.c:732
+msgid "Progress"
+msgstr "Priebeh"
+
+#: ../gtk/filter.c:316 ../gtk/filter.c:717
+msgid "All"
+msgstr ""
+
+#: ../gtk/filter.c:330 ../gtk/tr-prefs.c:552 ../gtk/tr-prefs.c:1439
+msgid "Privacy"
+msgstr "Súkromie"
+
+#: ../gtk/filter.c:335
+msgid "Public"
+msgstr ""
+
+#: ../gtk/filter.c:339
+msgid "Private"
+msgstr ""
+
+#: ../gtk/filter.c:719
+msgid "Active"
+msgstr ""
+
+#: ../gtk/filter.c:723
+msgid "Queued"
+msgstr ""
+
+#: ../gtk/filter.c:724
+msgid "Verifying"
+msgstr ""
+
+#: ../gtk/filter.c:725 ../gtk/msgwin.c:178
+msgid "Error"
+msgstr "Chyba"
+
+#: ../gtk/filter.c:999 ../gtk/msgwin.c:258
+msgid "Name"
+msgstr "Názov"
+
+#: ../gtk/filter.c:999 ../gtk/tr-prefs.c:1001
+msgid "Tracker"
+msgstr "Tracker"
+
+#. add the activity combobox
+#: ../gtk/filter.c:1023
+msgid "_Show:"
+msgstr ""
+
+#: ../gtk/main.c:393
+#, c-format
+msgid ""
+"Got signal %d; trying to shut down cleanly.  Do it again if it gets stuck."
+msgstr ""
+
+#: ../gtk/main.c:516
+msgid "Start with all torrents paused"
+msgstr "Spustiť s pozastavenými všetkými torrentmi"
+
+#: ../gtk/main.c:518
+msgid "Show version number and exit"
+msgstr "Zobraziť číslo verzie a skončiť"
+
+#: ../gtk/main.c:522
+msgid "Start minimized in notification area"
+msgstr ""
+
+#: ../gtk/main.c:525
+msgid "Where to look for configuration files"
+msgstr "Kde hľadať konfiguračné súbory"
+
+#: ../gtk/main.c:534 ../gtk/transmission.desktop.in.h:3
+msgid "Transmission"
+msgstr "Transmission"
+
+#: ../gtk/main.c:541
+msgid "[torrent files or urls]"
+msgstr ""
+
+#: ../gtk/main.c:595
+msgid ""
+"Transmission is already running, but is not responding.  To start a new "
+"session, you must first close the existing Transmission process."
+msgstr ""
+
+#: ../gtk/main.c:649
+msgid "Transmission cannot be started."
+msgstr ""
+
+#: ../gtk/main.c:731
+msgid ""
+"Transmission is a file-sharing program.  When you run a torrent, its data "
+"will be made available to others by means of upload.  You and you alone are "
+"fully responsible for exercising proper judgement and abiding by your local "
+"laws."
+msgstr ""
+
+#: ../gtk/main.c:733
+msgid "I _Accept"
+msgstr ""
+
+#: ../gtk/main.c:910
+msgid "<b>Closing Connections</b>"
+msgstr "<b>Ukončovanie spojení</b>"
+
+#: ../gtk/main.c:914
+msgid "Sending upload/download totals to tracker..."
+msgstr "Odosielanie súčtu odosielania/sťahovania trackeru..."
+
+#: ../gtk/main.c:919
+msgid "_Quit Now"
+msgstr "_Ukončiť"
+
+#: ../gtk/main.c:1079
+msgid "Couldn't add corrupt torrent"
+msgid_plural "Couldn't add corrupt torrents"
+msgstr[0] "Nie je možné pridať poškodené torrenty"
+msgstr[1] "Nie je možné pridať poškodený torrent"
+msgstr[2] "Nie je možné pridať poškodené torrenty"
+
+#: ../gtk/main.c:1086
+msgid "Couldn't add duplicate torrent"
+msgid_plural "Couldn't add duplicate torrents"
+msgstr[0] "Nedajú sa pridať rovnaké torrenty"
+msgstr[1] "Nedá sa pridať rovnaký torrent"
+msgstr[2] "Nedajú sa pridať rovnaké torrenty"
+
+#: ../gtk/main.c:1394
+msgid "A fast and easy BitTorrent client"
+msgstr "Rýchly a jednoduchý BitTorrent klient"
+
+#: ../gtk/main.c:1399
+msgid "Copyright 2005-2009 The Transmission Project"
+msgstr "Copyright 2005-2009 Projekt Transmission"
+
+#. Translators: translate "translator-credits" as
+#. your name
+#. to have it appear in the credits in the "About"
+#. dialog
+#: ../gtk/main.c:1410
+msgid "translator-credits"
+msgstr ""
+"Launchpad Contributions:\n"
+"  Martin Šturcel https://launchpad.net/~martin-sturcel\n"
+"  Matej Krajčovič https://launchpad.net/~elbarto512\n"
+"  Roman Horník https://launchpad.net/~roman.hornik\n"
+"  helix84 https://launchpad.net/~helix84\n"
+"  milboy https://launchpad.net/~milboys\n"
+"  mirek https://launchpad.net/~bletvaska"
+
+#: ../gtk/makemeta-ui.c:75
+#, c-format
+msgid "Creating \"%s\""
+msgstr ""
+
+#: ../gtk/makemeta-ui.c:77
+#, c-format
+msgid "Created \"%s\"!"
+msgstr ""
+
+#: ../gtk/makemeta-ui.c:79
+#, c-format
+msgid "Error: invalid announce URL \"%s\""
+msgstr ""
+
+#: ../gtk/makemeta-ui.c:81
+#, c-format
+msgid "Cancelled"
+msgstr ""
+
+#: ../gtk/makemeta-ui.c:83
+#, c-format
+msgid "Error reading \"%s\": %s"
+msgstr ""
+
+#: ../gtk/makemeta-ui.c:85
+#, c-format
+msgid "Error writing \"%s\": %s"
+msgstr ""
+
+#. how much data we've scanned through to generate checksums
+#: ../gtk/makemeta-ui.c:102
+#, c-format
+msgid "Scanned %s"
+msgstr ""
+
+#: ../gtk/makemeta-ui.c:167 ../gtk/makemeta-ui.c:389
+msgid "New Torrent"
+msgstr "Nový torrent"
+
+#: ../gtk/makemeta-ui.c:183
+msgid "Creating torrent..."
+msgstr ""
+
+#: ../gtk/makemeta-ui.c:292
+msgid "No source selected"
+msgstr "Žiadny zdroj nebol vybraný"
+
+#: ../gtk/makemeta-ui.c:298
+#, c-format
+msgid "%1$s; %2$'d File"
+msgid_plural "%1$s; %2$'d Files"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/makemeta-ui.c:304
+#, c-format
+msgid "%1$'d Piece @ %2$s"
+msgid_plural "%1$'d Pieces @ %2$s"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/makemeta-ui.c:404
+msgid "Sa_ve to:"
+msgstr ""
+
+#: ../gtk/makemeta-ui.c:410
+msgid "Source F_older:"
+msgstr ""
+
+#: ../gtk/makemeta-ui.c:421
+msgid "Source _File:"
+msgstr ""
+
+#: ../gtk/makemeta-ui.c:432
+msgid "<i>No source selected</i>"
+msgstr "<i>Nebol zvolený žiadny zdroj</i>"
+
+#: ../gtk/makemeta-ui.c:436
+msgid "Properties"
+msgstr ""
+
+#: ../gtk/makemeta-ui.c:438
+msgid "_Trackers:"
+msgstr ""
+
+#: ../gtk/makemeta-ui.c:460
+msgid "Co_mment:"
+msgstr ""
+
+#: ../gtk/makemeta-ui.c:469
+msgid "_Private torrent"
+msgstr "_Súkromný torrent"
+
+#: ../gtk/msgwin.c:84
+#, c-format
+msgid "Couldn't save \"%s\""
+msgstr ""
+
+#: ../gtk/msgwin.c:135
+msgid "Save Log"
+msgstr "Uložiť záznamník"
+
+#: ../gtk/msgwin.c:180
+msgid "Debug"
+msgstr "Ladenie"
+
+#: ../gtk/msgwin.c:254
+msgid "Time"
+msgstr "Čas"
+
+#: ../gtk/msgwin.c:262
+msgid "Message"
+msgstr "Správa"
+
+#: ../gtk/msgwin.c:438
+msgid "Message Log"
+msgstr "Záznamník"
+
+#: ../gtk/msgwin.c:472
+msgid "Level"
+msgstr "Úroveň"
+
+#: ../gtk/notify.c:121
+msgid "Download complete"
+msgstr ""
+
+#: ../gtk/notify.c:131
+msgid "Torrent Complete"
+msgstr "Torrent bol dokončený"
+
+#: ../gtk/notify.c:140
+msgid "Open File"
+msgstr "Otvoriť súbor"
+
+#: ../gtk/notify.c:145
+msgid "Open Folder"
+msgstr "Otvoriť priečinok"
+
+#: ../gtk/notify.c:159
+msgid "Torrent Added"
+msgstr ""
+
+#: ../gtk/relocate.c:64
+#, c-format
+msgid "Moving \"%s\""
+msgstr ""
+
+#: ../gtk/relocate.c:86
+msgid "Couldn't move torrent"
+msgstr ""
+
+#: ../gtk/relocate.c:127
+msgid "This may take a moment..."
+msgstr ""
+
+#: ../gtk/relocate.c:158 ../gtk/relocate.c:179
+msgid "Set Torrent Location"
+msgstr ""
+
+#: ../gtk/relocate.c:175
+msgid "Location"
+msgstr "Umiestnenie"
+
+#: ../gtk/relocate.c:182
+msgid "Torrent _location:"
+msgstr ""
+
+#: ../gtk/relocate.c:183
+msgid "_Move from the current folder"
+msgstr ""
+
+#: ../gtk/relocate.c:186
+msgid "Local data is _already there"
+msgstr ""
+
+#: ../gtk/stats.c:76 ../gtk/stats.c:175
+#, c-format
+msgid "Started %'d time"
+msgid_plural "Started %'d times"
+msgstr[0] "Spustený %'d krát"
+msgstr[1] "Started %'d time"
+msgstr[2] "Started %'d times"
+
+#: ../gtk/stats.c:107
+msgid "Reset your statistics?"
+msgstr ""
+
+#: ../gtk/stats.c:108
+msgid ""
+"These statistics are for your information only.  Resetting them doesn't "
+"affect the statistics logged by your BitTorrent trackers."
+msgstr ""
+
+#: ../gtk/stats.c:119 ../gtk/stats.c:151
+msgid "_Reset"
+msgstr ""
+
+#: ../gtk/stats.c:147 ../gtk/tr-window.c:692
+msgid "Statistics"
+msgstr "Štatistiky"
+
+#: ../gtk/stats.c:164
+msgid "Current Session"
+msgstr "Aktuálna relácia"
+
+#: ../gtk/stats.c:172 ../gtk/stats.c:184
+msgid "Duration:"
+msgstr "Uplynulo:"
+
+#: ../gtk/stats.c:174
+msgid "Total"
+msgstr "Celkom"
+
+#. %1$s is how much we've got,
+#. %2$s is how much we'll have when done,
+#. %3$.2f%% is a percentage of the two
+#: ../gtk/torrent-cell-renderer.c:63
+#, c-format
+msgid "%1$s of %2$s (%3$.2f%%)"
+msgstr "%1$s z %2$s (%3$.2f%%)"
+
+#. %1$s is how much we've got,
+#. %2$s is the torrent's total size,
+#. %3$.2f%% is a percentage of the two,
+#. %4$s is how much we've uploaded,
+#. %5$s is our upload-to-download ratio,
+#. %6$s is the ratio we want to reach before we stop uploading
+#: ../gtk/torrent-cell-renderer.c:79
+#, c-format
+msgid "%1$s of %2$s (%3$.2f%%), uploaded %4$s (Ratio: %5$s Goal: %6$s)"
+msgstr ""
+
+#. %1$s is how much we've got,
+#. %2$s is the torrent's total size,
+#. %3$.2f%% is a percentage of the two,
+#. %4$s is how much we've uploaded,
+#. %5$s is our upload-to-download ratio
+#: ../gtk/torrent-cell-renderer.c:95
+#, c-format
+msgid "%1$s of %2$s (%3$.2f%%), uploaded %4$s (Ratio: %5$s)"
+msgstr "%1$s z %2$s (%3$.2f%%), odoslaných %4$s (Pomer: %5$s)"
+
+#. %1$s is the torrent's total size,
+#. %2$s is how much we've uploaded,
+#. %3$s is our upload-to-download ratio,
+#. %4$s is the ratio we want to reach before we stop uploading
+#: ../gtk/torrent-cell-renderer.c:112
+#, c-format
+msgid "%1$s, uploaded %2$s (Ratio: %3$s Goal: %4$s)"
+msgstr "%1$s, odoslaných %2$s (Pomer: %3$s Cieľ: %4$s)"
+
+#. %1$s is the torrent's total size,
+#. %2$s is how much we've uploaded,
+#. %3$s is our upload-to-download ratio
+#: ../gtk/torrent-cell-renderer.c:124
+#, c-format
+msgid "%1$s, uploaded %2$s (Ratio: %3$s)"
+msgstr "%1$s, odoslaných %2$s (Pomer: %3$s)"
+
+#: ../gtk/torrent-cell-renderer.c:139
+msgid "Remaining time unknown"
+msgstr "Zostávajúci čas je neznámy"
+
+#. time remaining
+#: ../gtk/torrent-cell-renderer.c:145
+#, c-format
+msgid "%s remaining"
+msgstr "Zostáva %s"
+
+#. 1==down speed, 2==down arrow, 3==up speed, 4==down arrow
+#: ../gtk/torrent-cell-renderer.c:174
+#, c-format
+msgid "%1$s %2$s, %3$s %4$s"
+msgstr ""
+
+#. bandwidth speed + unicode arrow
+#: ../gtk/torrent-cell-renderer.c:179 ../gtk/torrent-cell-renderer.c:183
+#, c-format
+msgid "%1$s %2$s"
+msgstr ""
+
+#. the torrent isn't uploading or downloading
+#: ../gtk/torrent-cell-renderer.c:187 ../gtk/tr-icon.c:75
+msgid "Idle"
+msgstr "Nečinný"
+
+#: ../gtk/torrent-cell-renderer.c:217
+#, c-format
+msgid "Verifying local data (%.1f%% tested)"
+msgstr "Kontrolujú sa lokálne dáta (%.1f%% skontrolovaných)"
+
+#: ../gtk/torrent-cell-renderer.c:228
+#, c-format
+msgid "Ratio %s"
+msgstr ""
+
+#: ../gtk/torrent-cell-renderer.c:257
+#, c-format
+msgid "Tracker gave a warning: \"%s\""
+msgstr ""
+
+#: ../gtk/torrent-cell-renderer.c:258
+#, c-format
+msgid "Tracker gave an error: \"%s\""
+msgstr ""
+
+#: ../gtk/torrent-cell-renderer.c:259
+#, c-format
+msgid "Error: %s"
+msgstr ""
+
+#: ../gtk/torrent-cell-renderer.c:279
+#, c-format
+msgid "Downloading from %1$'d of %2$'d connected peer"
+msgid_plural "Downloading from %1$'d of %2$'d connected peers"
+msgstr[0] "Sťahuje sa od %1$'d z celkového počtu %2$'d pripojených klientov"
+msgstr[1] "Sťahuje sa od %1$'d z celkovo %2$'d pripojeného klienta"
+msgstr[2] "Sťahuje sa od %1$'d z celkového počtu %2$'d pripojených klientov"
+
+#: ../gtk/torrent-cell-renderer.c:290
+#, c-format
+msgid "Downloading metadata from %1$'d peer (%2$d%% done)"
+msgid_plural "Downloading metadata from %1$'d peers (%2$d%% done)"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/torrent-cell-renderer.c:301
+#, c-format
+msgid "Seeding to %1$'d of %2$'d connected peer"
+msgid_plural "Seeding to %1$'d of %2$'d connected peers"
+msgstr[0] "Odosiela sa %1$'d z %2$'d pripojených klientov"
+msgstr[1] "Odosiela sa %1$'d z %2$'d pripojeného klienta"
+msgstr[2] "Odosiela sa %1$'d z %2$'d pripojených klientov"
+
+#: ../gtk/tracker-list.c:344
+msgid "Tier"
+msgstr "Úroveň"
+
+#: ../gtk/tracker-list.c:350
+msgid "Announce URL"
+msgstr "Oznamovacia URL"
+
+#: ../gtk/transmission.desktop.in.h:1
+msgid "BitTorrent Client"
+msgstr "BitTorrent klient"
+
+#: ../gtk/transmission.desktop.in.h:2
+msgid "Download and share files over BitTorrent"
+msgstr "Sťahujte a zdieľajte súbory cez BitTorrent"
+
+#: ../gtk/transmission.desktop.in.h:4
+msgid "Transmission BitTorrent Client"
+msgstr "BitTorrent klient Transmission"
+
+#: ../gtk/tr-core.c:1327
+msgid "Transmission Bittorrent Client"
+msgstr "Bittorrent klient Transmission"
+
+#: ../gtk/tr-core.c:1328
+msgid "BitTorrent Activity"
+msgstr "Aktivita BitTorrent-u"
+
+#: ../gtk/tr-core.c:1340
+msgid "Disallowing desktop hibernation"
+msgstr "Zakazuje sa uspanie počítača na disk"
+
+#: ../gtk/tr-core.c:1343
+#, c-format
+msgid "Couldn't disable desktop hibernation: %s"
+msgstr "Nepodarilo sa zakázať uspanie počítača na disk: %s"
+
+#: ../gtk/tr-core.c:1367
+msgid "Allowing desktop hibernation"
+msgstr "Povoľuje sa uspanie počítača na disk"
+
+#: ../gtk/tr-icon.c:91 ../gtk/tr-icon.c:106
+#, c-format
+msgid "(Limit: %s)"
+msgstr ""
+
+#. %1$s: current upload speed
+#. * %2$s: current upload limit, if any
+#. * %3$s: current download speed
+#. * %4$s: current download limit, if any
+#: ../gtk/tr-icon.c:113
+#, c-format
+msgid ""
+"Transmission\n"
+"Up: %1$s %2$s\n"
+"Down: %3$s %4$s"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:282
+msgid "Adding Torrents"
+msgstr "Pridávanie torrentov"
+
+#: ../gtk/tr-prefs.c:285
+msgid "Automatically _add torrents from:"
+msgstr "Automaticky _pridávať torrenty z:"
+
+#: ../gtk/tr-prefs.c:306
+msgid "Append \"._part\" to incomplete files' names"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:311
+msgid "Save to _Location:"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:313
+msgid "Keep _incomplete torrents in:"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:320
+msgid "Call scrip_t when torrent is completed:"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:328 ../gtk/tr-prefs.c:1395
+msgid "Limits"
+msgstr "Obmedzenia"
+
+#: ../gtk/tr-prefs.c:354 ../gtk/tr-prefs.c:1445
+msgid "Desktop"
+msgstr "Plocha"
+
+#: ../gtk/tr-prefs.c:356
+msgid "Inhibit _hibernation when torrents are active"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:360
+msgid "Show Transmission icon in the _notification area"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:364
+msgid "Show _popup notifications"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:369
+msgid "Play _sound when downloads are complete"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:397
+#, c-format
+msgid "Enable _blocklist (contains %'d rule)"
+msgid_plural "Enable _blocklist (contains %'d rules)"
+msgstr[0] "Povoliť zoznam _blokovaných (obsahuje %'d položiek)"
+msgstr[1] "Povoliť zoznam _blokovaných (obsahuje %'d položku)"
+msgstr[2] "Povoliť zoznam _blokovaných (obsahuje %'d položky)"
+
+#: ../gtk/tr-prefs.c:427
+#, c-format
+msgid "Blocklist now has %'d rule."
+msgid_plural "Blocklist now has %'d rules."
+msgstr[0] "Zoznam blokovaných má %'d pravidiel."
+msgstr[1] "Zoznam blokovaných má %'d pravidlo."
+msgstr[2] "Zoznam blokovaných má %'d pravidlá."
+
+#: ../gtk/tr-prefs.c:431
+msgid "<b>Update succeeded!</b>"
+msgstr "<b>Aktualizácia úspešná!</b>"
+
+#: ../gtk/tr-prefs.c:446
+msgid "Update Blocklist"
+msgstr "Aktualizovať zoznam blokovaných"
+
+#: ../gtk/tr-prefs.c:448
+msgid "Getting new blocklist..."
+msgstr "Získava sa nový zoznam blokovaných..."
+
+#: ../gtk/tr-prefs.c:483
+msgid "Allow encryption"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:484
+msgid "Prefer encryption"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:485
+msgid "Require encryption"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:529
+msgid "Blocklist"
+msgstr "Zoznam blokovaných"
+
+#: ../gtk/tr-prefs.c:535
+msgid "_Update"
+msgstr "_Aktualizovať"
+
+#: ../gtk/tr-prefs.c:545
+msgid "Enable _automatic updates"
+msgstr "Povoliť _automatické aktualizácie"
+
+#: ../gtk/tr-prefs.c:554
+msgid "_Encryption mode:"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:558
+msgid "Use PE_X to find more peers"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:560
+msgid ""
+"PEX is a tool for exchanging peer lists with the peers you're connected to."
+msgstr ""
+
+#: ../gtk/tr-prefs.c:564
+msgid "Use _DHT to find more peers"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:566
+msgid "DHT is a tool for finding peers without a tracker."
+msgstr ""
+
+#: ../gtk/tr-prefs.c:570
+msgid "Use Local Peer Discovery to find more peers"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:572
+msgid "LPD is a tool for finding peers on your local network."
+msgstr ""
+
+#: ../gtk/tr-prefs.c:793
+msgid "Web Client"
+msgstr ""
+
+#. "enabled" checkbutton
+#: ../gtk/tr-prefs.c:796
+msgid "_Enable web client"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:802
+msgid "_Open web client"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:811
+msgid "Listening _port:"
+msgstr "_Port pre prichádzajúce spojenie:"
+
+#. require authentication
+#: ../gtk/tr-prefs.c:815 ../gtk/tr-prefs.c:1032
+msgid "Use _authentication"
+msgstr ""
+
+#. username
+#: ../gtk/tr-prefs.c:823 ../gtk/tr-prefs.c:1038
+msgid "_Username:"
+msgstr "_Používateľské meno:"
+
+#. password
+#: ../gtk/tr-prefs.c:830 ../gtk/tr-prefs.c:1044
+msgid "Pass_word:"
+msgstr "_Heslo:"
+
+#. require authentication
+#: ../gtk/tr-prefs.c:838
+msgid "Only allow these IP a_ddresses to connect:"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:863
+msgid "IP addresses may use wildcards, such as 192.168.*.*"
+msgstr "IP adresy môžu používať wildcard-y, ako napr. 192.168.*.*"
+
+#: ../gtk/tr-prefs.c:885
+msgid "Addresses:"
+msgstr "Adresy:"
+
+#: ../gtk/tr-prefs.c:1003
+msgid "Connect to tracker via a pro_xy"
+msgstr "Pripojiť sa ku trackeru cez pro_xy"
+
+#: ../gtk/tr-prefs.c:1008
+msgid "Proxy _server:"
+msgstr "Proxy _server:"
+
+#: ../gtk/tr-prefs.c:1016
+msgid "Proxy _port:"
+msgstr "Proxy _port:"
+
+#: ../gtk/tr-prefs.c:1019
+msgid "Proxy _type:"
+msgstr "_Typ proxy:"
+
+#: ../gtk/tr-prefs.c:1157
+msgid "Every Day"
+msgstr "Každý deň"
+
+#: ../gtk/tr-prefs.c:1158
+msgid "Weekdays"
+msgstr "Dni v týždni"
+
+#: ../gtk/tr-prefs.c:1159
+msgid "Weekends"
+msgstr "Víkendy"
+
+#: ../gtk/tr-prefs.c:1160
+msgid "Sunday"
+msgstr "Nedeľa"
+
+#: ../gtk/tr-prefs.c:1161
+msgid "Monday"
+msgstr "Pondelok"
+
+#: ../gtk/tr-prefs.c:1162
+msgid "Tuesday"
+msgstr "Utorok"
+
+#: ../gtk/tr-prefs.c:1163
+msgid "Wednesday"
+msgstr "Streda"
+
+#: ../gtk/tr-prefs.c:1164
+msgid "Thursday"
+msgstr "Štvrtok"
+
+#: ../gtk/tr-prefs.c:1165
+msgid "Friday"
+msgstr "Piatok"
+
+#: ../gtk/tr-prefs.c:1166
+msgid "Saturday"
+msgstr "Sobota"
+
+#: ../gtk/tr-prefs.c:1218
+msgid "Speed Limits"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:1238
+msgid "Temporary Speed Limits"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:1245
+msgid "Override normal speed limits manually or at scheduled times"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:1252
+msgid "Limit do_wnload speed (KiB/s):"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:1256
+msgid "Limit u_pload speed (KiB/s):"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:1260
+msgid "_Scheduled times:"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:1265
+msgid " _to "
+msgstr ""
+
+#: ../gtk/tr-prefs.c:1276
+msgid "_On days:"
+msgstr "_V dňoch:"
+
+#: ../gtk/tr-prefs.c:1310 ../gtk/tr-prefs.c:1376
+msgid "Status unknown"
+msgstr "Neznámy stav"
+
+#: ../gtk/tr-prefs.c:1332
+msgid "Port is <b>open</b>"
+msgstr "Port je <b>otvorený</b>"
+
+#: ../gtk/tr-prefs.c:1332
+msgid "Port is <b>closed</b>"
+msgstr "Port je <b>zatvorený</b>"
+
+#: ../gtk/tr-prefs.c:1346
+msgid "<i>Testing...</i>"
+msgstr "<i>Testuje sa...</i>"
+
+#: ../gtk/tr-prefs.c:1369
+msgid "Incoming Peers"
+msgstr "Prichádzajúci klienti"
+
+#: ../gtk/tr-prefs.c:1371
+msgid "_Port for incoming connections:"
+msgstr "_Port pre prichádzajúce spojenia:"
+
+#: ../gtk/tr-prefs.c:1379
+msgid "Te_st Port"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:1386
+msgid "Pick a _random port on startup"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:1390
+msgid "Use UPnP or NAT-PMP port _forwarding from my router"
+msgstr "Použiť UPnP alebo NAT-PMP _presmerovanie portu z môjho smerovača"
+
+#: ../gtk/tr-prefs.c:1398
+msgid "Maximum peers per _torrent:"
+msgstr "Maximálny počet klientov na _torrent:"
+
+#: ../gtk/tr-prefs.c:1400
+msgid "Maximum peers _overall:"
+msgstr "Maximálny počet _všetkých klientov:"
+
+#: ../gtk/tr-prefs.c:1418
+msgid "Transmission Preferences"
+msgstr "Predvoľby"
+
+#: ../gtk/tr-prefs.c:1433
+msgid "Torrents"
+msgstr "Torrenty"
+
+#: ../gtk/tr-prefs.c:1442
+msgid "Network"
+msgstr "Sieť"
+
+#: ../gtk/tr-prefs.c:1448
+msgid "Web"
+msgstr "Web"
+
+#: ../gtk/tr-prefs.c:1451
+msgid "Proxy"
+msgstr ""
+
+#: ../gtk/tr-window.c:136
+msgid "Torrent"
+msgstr "Torrent"
+
+#: ../gtk/tr-window.c:239
+msgid "Total Ratio"
+msgstr "Celkový pomer"
+
+#: ../gtk/tr-window.c:240
+msgid "Session Ratio"
+msgstr "Pomer relácie"
+
+#: ../gtk/tr-window.c:241
+msgid "Total Transfer"
+msgstr "Celkový prenos"
+
+#: ../gtk/tr-window.c:242
+msgid "Session Transfer"
+msgstr "Prenos relácie"
+
+#: ../gtk/tr-window.c:271
+#, c-format
+msgid ""
+"Click to disable Temporary Speed Limits\n"
+"(%1$s down, %2$s up)"
+msgstr ""
+
+#: ../gtk/tr-window.c:272
+#, c-format
+msgid ""
+"Click to enable Temporary Speed Limits\n"
+"(%1$s down, %2$s up)"
+msgstr ""
+
+#: ../gtk/tr-window.c:339
+#, c-format
+msgid "Tracker will allow requests in %s"
+msgstr "Tracker dovolí požiadavky za %s"
+
+#: ../gtk/tr-window.c:410
+msgid "Unlimited"
+msgstr "Neobmedzene"
+
+#: ../gtk/tr-window.c:477
+msgid "Seed Forever"
+msgstr "Odosielať stále"
+
+#: ../gtk/tr-window.c:515
+msgid "Limit Download Speed"
+msgstr "Obmedziť rýchlosť sťahovania"
+
+#: ../gtk/tr-window.c:519
+msgid "Limit Upload Speed"
+msgstr "Obmedziť rýchlosť odosielania"
+
+#: ../gtk/tr-window.c:526
+msgid "Stop Seeding at Ratio"
+msgstr "Zastaviť odosielanie pri pomere"
+
+#: ../gtk/tr-window.c:560
+#, c-format
+msgid "Stop at Ratio (%s)"
+msgstr "Zastaviť pri pomere (%s)"
+
+#: ../gtk/tr-window.c:737
+msgid "999.9 KiB/s"
+msgstr ""
+
+#: ../gtk/tr-window.c:781
+#, c-format
+msgid "%1$'d of %2$'d Torrent"
+msgid_plural "%1$'d of %2$'d Torrents"
+msgstr[0] "%1$'d z %2$'d torrentov"
+msgstr[1] "%1$'d z %2$'d torrentu"
+msgstr[2] "%1$'d z %2$'d torrentov"
+
+#: ../gtk/tr-window.c:787
+#, c-format
+msgid "%'d Torrent"
+msgid_plural "%'d Torrents"
+msgstr[0] "%'d torrentov"
+msgstr[1] "%'d torrent"
+msgstr[2] "%'d torrenty"
+
+#: ../gtk/tr-window.c:807 ../gtk/tr-window.c:835
+#, c-format
+msgid "Ratio: %s"
+msgstr "Pomer: %s"
+
+#: ../gtk/tr-window.c:818 ../gtk/tr-window.c:829
+#, c-format
+msgid "size|Down: %1$s, Up: %2$s"
+msgstr "size|Down: %1$s, Up: %2$s"
+
+#: ../gtk/util.c:118
+#, c-format
+msgid "%'u byte"
+msgid_plural "%'u bytes"
+msgstr[0] "%'u bytov"
+msgstr[1] "%'u byte"
+msgstr[2] "%'u byty"
+
+#: ../gtk/util.c:120
+#, c-format
+msgid "%'.1f KiB"
+msgstr ""
+
+#: ../gtk/util.c:122
+#, c-format
+msgid "%'.1f MiB"
+msgstr ""
+
+#: ../gtk/util.c:124
+#, c-format
+msgid "%'.1f GiB"
+msgstr ""
+
+#. 0.0 KiB to 999.9 KiB
+#: ../gtk/util.c:134
+#, c-format
+msgid "%'.1f KiB/s"
+msgstr ""
+
+#. 0.98 MiB to 99.99 MiB
+#: ../gtk/util.c:136
+#, c-format
+msgid "%'.2f MiB/s"
+msgstr ""
+
+#. 100.0 MiB to 999.9 MiB
+#: ../gtk/util.c:138
+#, c-format
+msgid "%'.1f MiB/s"
+msgstr ""
+
+#. insane speeds
+#: ../gtk/util.c:140
+#, c-format
+msgid "%'.2f GiB/s"
+msgstr ""
+
+#: ../gtk/util.c:159
+#, c-format
+msgid "%'d day"
+msgid_plural "%'d days"
+msgstr[0] "%'d dní"
+msgstr[1] "%'d deň"
+msgstr[2] "%'d dni"
+
+#: ../gtk/util.c:161
+#, c-format
+msgid "%'d hour"
+msgid_plural "%'d hours"
+msgstr[0] "%'d hodín"
+msgstr[1] "%'d hodina"
+msgstr[2] "%'d hodiny"
+
+#: ../gtk/util.c:164
+#, c-format
+msgid "%'d minute"
+msgid_plural "%'d minutes"
+msgstr[0] "%'d minút"
+msgstr[1] "%'d minúta"
+msgstr[2] "%'d minúty"
+
+#: ../gtk/util.c:166
+#, c-format
+msgid "%'d second"
+msgid_plural "%'d seconds"
+msgstr[0] "%'d sekúnd"
+msgstr[1] "%'d sekunda"
+msgstr[2] "%'d sekundy"
+
+#: ../gtk/util.c:379
+#, c-format
+msgid "The torrent file \"%s\" contains invalid data."
+msgstr "Súbor s torrentom \"%s\" obsahuje neplatné dáta."
+
+#: ../gtk/util.c:380
+#, c-format
+msgid "The torrent file \"%s\" is already in use."
+msgstr "Súbor s torrentom \"%s\" sa už používa."
+
+#: ../gtk/util.c:381
+#, c-format
+msgid "The torrent file \"%s\" encountered an unknown error."
+msgstr "V súbore s torrentom \"%s\" došlo k neznámej chybe."
+
+#: ../gtk/util.c:389
+msgid "Error opening torrent"
+msgstr "Chyba pri otváraní torrentu."
+
+#: ../gtk/util.c:833
+msgid "Unrecognized URL"
+msgstr ""
+
+#: ../gtk/util.c:835
+#, c-format
+msgid "Transmission doesn't know how to use \"%s\""
+msgstr ""
+
+#: ../gtk/util.c:840
+#, c-format
+msgid ""
+"This magnet link appears to be intended for something other than BitTorrent. "
+" BitTorrent magnet links have a section containing \"%s\"."
+msgstr ""
+
+#. did caller give us an uninitialized val?
+#: ../libtransmission/bencode.c:1093
+msgid "Invalid metadata"
+msgstr "Nesprávne metadáta"
+
+#: ../libtransmission/bencode.c:1651
+#, c-format
+msgid "Saved \"%s\""
+msgstr ""
+
+#: ../libtransmission/bencode.c:1656 ../libtransmission/bencode.c:1663
+#: ../libtransmission/blocklist.c:309
+#, c-format
+msgid "Couldn't save file \"%1$s\": %2$s"
+msgstr "Nie je možné uložiť súbor \"%1$s\": %2$s"
+
+#: ../libtransmission/bencode.c:1670 ../libtransmission/bencode.c:1680
+#, c-format
+msgid "Couldn't save temporary file \"%1$s\": %2$s"
+msgstr ""
+
+#: ../libtransmission/blocklist.c:78 ../libtransmission/blocklist.c:239
+#: ../libtransmission/utils.c:484
+#, c-format
+msgid "Couldn't read \"%1$s\": %2$s"
+msgstr "Nepodarilo sa prečítať \"%1$s\": %2$s"
+
+#: ../libtransmission/blocklist.c:110
+#, c-format
+msgid "Blocklist \"%s\" contains %'zu entries"
+msgstr "Zoznam blokovaných \"%s\" obsahuje %'zu položiek"
+
+#. don't try to display the actual lines - it causes issues
+#: ../libtransmission/blocklist.c:288 ../libtransmission/blocklist.c:298
+#, c-format
+msgid "blocklist skipped invalid address at line %d"
+msgstr ""
+
+#: ../libtransmission/blocklist.c:319
+#, c-format
+msgid "Blocklist \"%1$s\" updated with %2$'d entries"
+msgstr "Zoznam blokovaných \"%1$s\" bol aktualizovaný o %2$'d položiek"
+
+#: ../libtransmission/fdlimit.c:352
+#, c-format
+msgid "Preallocated file \"%s\""
+msgstr "Vopred alokovaný súbor \"%s\""
+
+#: ../libtransmission/fdlimit.c:635
+#, c-format
+msgid "Couldn't create socket: %s"
+msgstr "Zlyhalo vytvorenie soketu: %s"
+
+#: ../libtransmission/makemeta.c:60
+#, c-format
+msgid "Torrent Creator is skipping file \"%s\": %s"
+msgstr "Pri vytváraní torrentu bol preskočený súbor \"%s\": %s"
+
+#: ../libtransmission/metainfo.c:579
+#, c-format
+msgid "Invalid metadata entry \"%s\""
+msgstr "Neplatné metadáta položky \"%s\""
+
+#: ../libtransmission/natpmp.c:30
+msgid "Port Forwarding (NAT-PMP)"
+msgstr "Presmerovanie portu (NAT-PMP)"
+
+#: ../libtransmission/natpmp.c:67
+#, c-format
+msgid "%s succeeded (%d)"
+msgstr "%s bol úspešný (%d)"
+
+#: ../libtransmission/natpmp.c:137
+#, c-format
+msgid "Found public address \"%s\""
+msgstr "Nájdená verejná adresa \"%s\""
+
+#: ../libtransmission/natpmp.c:172
+#, c-format
+msgid "no longer forwarding port %d"
+msgstr "port %d sa už viac nepresmerúva"
+
+#: ../libtransmission/natpmp.c:219
+#, c-format
+msgid "Port %d forwarded successfully"
+msgstr "Port %d bol úspešne presmerovaný"
+
+#: ../libtransmission/net.c:301
+#, c-format
+msgid "Couldn't set source address %s on %d: %s"
+msgstr "Nepodarilo sa nastaviť adresu zdroja %s na %d: %s"
+
+#: ../libtransmission/net.c:317
+#, c-format
+msgid "Couldn't connect socket %d to %s, port %d (errno %d - %s)"
+msgstr "Nie je možné pripojiť soket %d na %s, port %d (chyba č. %d - %s)"
+
+#: ../libtransmission/net.c:375
+msgid "Is another copy of Transmission already running?"
+msgstr ""
+
+#: ../libtransmission/net.c:380
+#, c-format
+msgid "Couldn't bind port %d on %s: %s"
+msgstr "Nepodarilo sa naviazať port %d na %s: %s"
+
+#: ../libtransmission/net.c:382
+#, c-format
+msgid "Couldn't bind port %d on %s: %s (%s)"
+msgstr ""
+
+#: ../libtransmission/port-forwarding.c:33
+msgid "Port Forwarding"
+msgstr "Presmerovanie portu"
+
+#: ../libtransmission/port-forwarding.c:60
+msgid "Starting"
+msgstr "Spúšťanie"
+
+#: ../libtransmission/port-forwarding.c:61
+msgid "Forwarded"
+msgstr "Presmerovaný"
+
+#: ../libtransmission/port-forwarding.c:62
+msgid "Stopping"
+msgstr "Zastavovanie"
+
+#: ../libtransmission/port-forwarding.c:63
+msgid "Not forwarded"
+msgstr "Nepresmerovaný"
+
+#: ../libtransmission/port-forwarding.c:87 ../libtransmission/torrent.c:1720
+#, c-format
+msgid "State changed from \"%1$s\" to \"%2$s\""
+msgstr "Stav sa zmenil zo stavu \"%1$s\" na \"%2$s\""
+
+#: ../libtransmission/port-forwarding.c:178
+msgid "Stopped"
+msgstr "Zastavený"
+
+#. first %s is the application name
+#. second %s is the version number
+#: ../libtransmission/session.c:622
+#, c-format
+msgid "%s %s started"
+msgstr "%s %s spustený"
+
+#: ../libtransmission/session.c:636
+msgid "Local Peer Discovery disabled"
+msgstr ""
+
+#: ../libtransmission/session.c:638
+msgid "Local Peer Discovery active"
+msgstr ""
+
+#: ../libtransmission/session.c:1748
+#, c-format
+msgid "Loaded %d torrents"
+msgstr "Počet načítaných torrentov je %d"
+
+#: ../libtransmission/torrent.c:398
+#, c-format
+msgid "Tracker warning: \"%s\""
+msgstr "Varovanie trackera: \"%s\""
+
+#: ../libtransmission/torrent.c:405
+#, c-format
+msgid "Tracker error: \"%s\""
+msgstr "Chyba trackera: \"%s\""
+
+#: ../libtransmission/torrent.c:1369
+msgid ""
+"No data found!  Reconnect any disconnected drives, use \"Set Location\", or "
+"restart the torrent to re-download."
+msgstr ""
+
+#: ../libtransmission/torrent.c:1452
+msgid ""
+"Can't find local data.  Try \"Set Location\" to find it, or restart the "
+"torrent to re-download."
+msgstr ""
+
+#: ../libtransmission/torrent.c:1562
+msgid "Removing torrent"
+msgstr ""
+
+#: ../libtransmission/torrent.c:1616
+msgid "Done"
+msgstr "Dokončený"
+
+#: ../libtransmission/torrent.c:1619
+msgid "Complete"
+msgstr "Úplne kompletný"
+
+#: ../libtransmission/torrent.c:1622
+msgid "Incomplete"
+msgstr "Nedokončený"
+
+#: ../libtransmission/upnp.c:26
+msgid "Port Forwarding (UPnP)"
+msgstr "Presmerovanie portu (UPnP)"
+
+#: ../libtransmission/upnp.c:104
+#, c-format
+msgid "Found Internet Gateway Device \"%s\""
+msgstr "Bolo nájdené zariadenie brány do internetu \"%s\""
+
+#: ../libtransmission/upnp.c:107
+#, c-format
+msgid "Local Address is \"%s\""
+msgstr "Lokálna adresa je \"%s\""
+
+#: ../libtransmission/upnp.c:144
+#, c-format
+msgid "Port %d isn't forwarded"
+msgstr "Port %d nie je presmerovaný"
+
+#: ../libtransmission/upnp.c:158
+#, c-format
+msgid "Stopping port forwarding through \"%s\", service \"%s\""
+msgstr "Zastavuje sa presmerovanie portu cez \"%s\", služba \"%s\""
+
+#: ../libtransmission/upnp.c:192
+#, c-format
+msgid ""
+"Port forwarding through \"%s\", service \"%s\".  (local address: %s:%d)"
+msgstr ""
+"Presmerovanie portu cez \"%s\", služba \"%s\". (lokálna adresa: %s:%d)"
+
+#: ../libtransmission/upnp.c:197
+msgid "Port forwarding successful!"
+msgstr "Port forwarding úspešný!"
+
+#: ../libtransmission/utils.c:498
+msgid "Not a regular file"
+msgstr "Nie je platný súbor"
+
+#: ../libtransmission/utils.c:516
+msgid "Memory allocation failed"
+msgstr "Alokácia pamäte zlyhala"
+
+#. Node exists but isn't a folder
+#: ../libtransmission/utils.c:614
+#, c-format
+msgid "File \"%s\" is in the way"
+msgstr "Súbor \"%s\" je na ceste"
+
+#: ../libtransmission/verify.c:235
+msgid "Verifying torrent"
+msgstr "Kontrola torrentu"
+
+#: ../libtransmission/verify.c:305
+msgid "Queued for verification"
+msgstr "Zaradený do fronty na kontrolu"
+
+#~ msgid "Transfer"
+#~ msgstr "Prenos"
+
+#~ msgid "Dates"
+#~ msgstr "Dátumy"
+
+#~ msgid "Now"
+#~ msgstr "Teraz"
+
+#~ msgid "Sort by _State"
+#~ msgstr "Usporiadať podľa _stavu"
+
+#~ msgid "Sort by _Tracker"
+#~ msgstr "Usporiadať podľa _trackeru"
+
+#~ msgid "_Main Window"
+#~ msgstr "_Hlavné okno"
+
+#~ msgid "_Minimal View"
+#~ msgstr "_Minimálny pohľad"
+
+#~ msgid "_Reverse Sort Order"
+#~ msgstr "_Obrátiť poradie usporiadania"
+
+#~ msgid "_Add..."
+#~ msgstr "_Pridať..."
+
+#~ msgid "_Move source file to Trash"
+#~ msgstr "_Presunúť súbor zdroja do koša"
+
+#~ msgid "Display _options dialog"
+#~ msgstr "Zobraziť dialóg _možností"
+
+#~ msgid "<b>Seeders:</b>"
+#~ msgstr "<b>Zdrojov:</b>"
+
+#~ msgid "<b>Leechers:</b>"
+#~ msgstr "<b>Sťahujúcich:</b>"
+
+#~ msgid "<b>Times Completed:</b>"
+#~ msgstr "<b>Dokončené:</b>"
+
+#, c-format
+#~ msgid "%'d Piece"
+#~ msgid_plural "%'d Pieces"
+#~ msgstr[0] "%'d dielov"
+#~ msgstr[1] "%'d Piece"
+#~ msgstr[2] "%'d Pieces"
+
+#, c-format
+#~ msgid "%1$s @ %2$s"
+#~ msgstr "%1$s @ %2$s"
+
+#~ msgid "Pieces:"
+#~ msgstr "Dielov:"
+
+#~ msgid "Private to this tracker -- PEX disabled"
+#~ msgstr "Privátny pre tento tracker -- PEX je zakázané"
+
+#~ msgid "Origins"
+#~ msgstr "Pôvod"
+
+#~ msgid "Creator:"
+#~ msgstr "Vytvoril:"
+
+#~ msgid "Date:"
+#~ msgstr "Dátum:"
+
+#~ msgid "Torrent file:"
+#~ msgstr "Súbor s torrentom:"
+
+#, c-format
+#~ msgid "%.1f%%"
+#~ msgstr "%.1f%%"
+
+#~ msgid "Progress:"
+#~ msgstr "Priebeh:"
+
+#~ msgid "Failed DL:"
+#~ msgstr "Chybný DL:"
+
+#~ msgid "Started at:"
+#~ msgstr "Spustené:"
+
+#~ msgid "Last activity at:"
+#~ msgstr "Posledná aktivita:"
+
+#~ msgid "Limit _download speed (KB/s):"
+#~ msgstr "Obmedziť rýchlosť _sťahovania (kB/s):"
+
+#~ msgid "Limit _upload speed (KB/s):"
+#~ msgstr "Obmedziť rýchlosť _odosielania (kB/s):"
+
+#~ msgid "Scrape"
+#~ msgstr "Scrape"
+
+#~ msgid "Last scrape at:"
+#~ msgstr "Posledný scrape:"
+
+#~ msgid "Tracker responded:"
+#~ msgstr "Odpoveď trackera:"
+
+#~ msgid "Next scrape in:"
+#~ msgstr "Nasledujúci scrape:"
+
+#~ msgid "Announce"
+#~ msgstr "Oznam"
+
+#~ msgid "Tracker:"
+#~ msgstr "Tracker:"
+
+#~ msgid "Last announce at:"
+#~ msgstr "Posledné oznámenie:"
+
+#~ msgid "Next announce in:"
+#~ msgstr "Nasledujúce oznámenie o:"
+
+#~ msgid "Manual announce allowed in:"
+#~ msgstr "Manuálne oznámenie povolené o:"
+
+#~ msgid "In progress"
+#~ msgstr "Prebieha"
+
+#~ msgid "Start minimized in system tray"
+#~ msgstr "Spustiť minimalizovaný v oblasti upozornení"
+
+#~ msgid "[torrent files]"
+#~ msgstr "[súbory torrentu]"
+
+#~ msgid "Torrent created!"
+#~ msgstr "Torrent bol vytvorený!"
+
+#, c-format
+#~ msgid "Torrent creation failed: %s"
+#~ msgstr "Zlyhalo vytvorenie torrentu: %s"
+
+#~ msgid "Invalid URL"
+#~ msgstr "Neplatné URL"
+
+#~ msgid "Torrent creation cancelled"
+#~ msgstr "Vytvorenie torrentu bolo zrušené"
+
+#, c-format
+#~ msgid "<i>%1$s; %2$'d File</i>"
+#~ msgid_plural "<i>%1$s; %2$'d Files</i>"
+#~ msgstr[0] "<i>%1$s; %2$'d súborov</i>"
+#~ msgstr[1] "<i>%1$s; %2$'d súbor</i>"
+#~ msgstr[2] "<i>%1$s; %2$'d súbory</i>"
+
+#~ msgid "Choose Directory"
+#~ msgstr "Zvoliť priečinok"
+
+#~ msgid "Choose File"
+#~ msgstr "Zvoliť súbor"
+
+#~ msgid "Source"
+#~ msgstr "Zdroj"
+
+#~ msgid "F_older"
+#~ msgstr "Priečin_ok"
+
+#~ msgid "<b>E_xtras</b>"
+#~ msgstr "<b>E_xtra</b>"
+
+#~ msgid "Commen_t:"
+#~ msgstr "Komen_tár:"
+
+#, c-format
+#~ msgid "speed|Down: %1$s, Up: %2$s"
+#~ msgstr "Down: %1$s, Up: %2$s"
+
+#, c-format
+#~ msgid "Down: %s"
+#~ msgstr "Down: %s"
+
+#, c-format
+#~ msgid "Up: %s"
+#~ msgstr "Up: %s"
+
+#, c-format
+#~ msgid ""
+#~ "%1$'d Seeding, %2$'d Downloading\n"
+#~ "Down: %3$s, Up: %4$s"
+#~ msgstr ""
+#~ "%1$'d odosielaných, %2$'d sťahovaných\n"
+#~ "Down: %3$s, Up: %4$s"
+
+#~ msgid "Mo_ve source files to Trash"
+#~ msgstr "Presunúť _zdrojové súbory do koša"
+
+#~ msgid "Use peer e_xchange"
+#~ msgstr "Použiť peer e_xchange"
+
+#~ msgid "Web Interface"
+#~ msgstr "Webové rozhranie"
+
+#~ msgid "_Enable web interface"
+#~ msgstr "_Povoliť webové rozhranie"
+
+#~ msgid "_Require username"
+#~ msgstr "_Vyžadovať prihlásenie"
+
+#~ msgid "Tracker Proxy"
+#~ msgstr "Proxy trackera"
+
+#~ msgid "_Authentication is required"
+#~ msgstr "_Vyžadovať autentifikáciu"
+
+#, c-format
+#~ msgid "Waiting to verify local data (%.1f%% tested)"
+#~ msgstr "Čakanie na skontrolovanie lokálnych dát (%.1f%% skontrolovaných)"
+
+#~ msgid "A_ll"
+#~ msgstr "_Všetky"
+
+#~ msgid "_Active"
+#~ msgstr "_Aktívne"
+
+#~ msgid "_Downloading"
+#~ msgstr "_Sťahované"
+
+#~ msgid "_Seeding"
+#~ msgstr "_Odosielané"
+
+#~ msgid "_Paused"
+#~ msgstr "_Pozastavené"
+
+#, c-format
+#~ msgid "%'.1f KB"
+#~ msgstr "%'.1f kB"
+
+#, c-format
+#~ msgid "%'.1f MB"
+#~ msgstr "%'.1f MB"
+
+#, c-format
+#~ msgid "%'.1f GB"
+#~ msgstr "%'.1f GB"
+
+#, c-format
+#~ msgid "%'.1f KB/s"
+#~ msgstr "%'.1f kB/s"
+
+#, c-format
+#~ msgid "%'.2f MB/s"
+#~ msgstr "%'.2f MB/s"
+
+#, c-format
+#~ msgid "%'.1f MB/s"
+#~ msgstr "%'.1f MB/s"
+
+#, c-format
+#~ msgid "%'.2f GB/s"
+#~ msgstr "%'.2f GB/s"
+
+#~ msgid "Couldn't read resume file"
+#~ msgstr "Nepodarilo sa prečítať súbor obnovenia"
+
+#, c-format
+#~ msgid "Got %d peers from tracker"
+#~ msgstr "Od trackeru bolo získaných %d klientov"
+
+#~ msgid "Show _icon in the desktop Notification Area"
+#~ msgstr "Zobraziť _ikonu v oblasti upozornení"
+
+#~ msgid "Only allow the following IP _addresses to connect:"
+#~ msgstr "Povoliť pripojenie iba z týchto IP _adries:"
+
+#~ msgid " and "
+#~ msgstr " a "
+
+#~ msgid "Limit u_pload speed (KB/s):"
+#~ msgstr "Obmedziť rýchlosť _odosielania (KB/s):"
+
+#, c-format
+#~ msgid "%1$s remaining"
+#~ msgstr "Zostáva %1$s"
+
+#~ msgid "Inhibit desktop _hibernation when torrents are active"
+#~ msgstr "Zabrániť _hibernácii počítača, keď sú torrenty aktívne"
+
+#~ msgid "Show desktop _notifications"
+#~ msgstr "Zobrazovať upozornenia na _ploche"
+
+#, c-format
+#~ msgid "Couldn't create \"%1$s\": parent folder \"%2$s\" does not exist"
+#~ msgstr "Nie je možné vytvoriť \"%1$s\": rodičovský priečinok %2$s neexistuje"
+
+#, c-format
+#~ msgid "Closing port %d on %s"
+#~ msgstr "Port %d na %s sa zatvára"
+
+#, c-format
+#~ msgid "Opened port %d on %s to listen for incoming peer connections"
+#~ msgstr "Port %d na %s je otvorený pre prichádzajúce spojenia od klientov"
+
+#, c-format
+#~ msgid ""
+#~ "Couldn't open port %d on %s to listen for incoming peer connections (errno "
+#~ "%d - %s)"
+#~ msgstr ""
+#~ "Nie je možné otvoriť port %d na %s pre prichádzajúce spojenia od klientov "
+#~ "(chyba č. %d - %s)"
+
+#~ msgid "_Open web interface"
+#~ msgstr "_Otvoriť webové rozhranie"
+
+#~ msgid "Destination:"
+#~ msgstr "Cieľ:"
+
+#~ msgid "Sort by _Ratio"
+#~ msgstr "Usporiadať podľa po_meru"
+
+#~ msgid "Sort by _ETA"
+#~ msgstr "Usporiadať podľa _ETA"
+
+#, c-format
+#~ msgid ""
+#~ "Use _Global setting  (currently: stop seeding when a torrent's ratio reaches "
+#~ "%.2f)"
+#~ msgstr ""
+#~ "Použiť _globálne nastavenie (aktuálne: zastaviť odosielanie torrentu pri "
+#~ "dosiahnutí pomeru %.2f)"
+
+#~ msgid "Use _Global setting  (currently: seed regardless of ratio)"
+#~ msgstr ""
+#~ "Použiť _globálne nastavenie (aktuálne: odosielať bez ohľadu na pomer)"
+
+#~ msgid "_Bandwidth priority:"
+#~ msgstr "Priorita šírky _pásma:"
+
+#~ msgid "_Stop seeding when a torrent's ratio reaches"
+#~ msgstr "_Zastaviť odosielanie torrentu pri dosiahnutí pomeru"
+
+#, c-format
+#~ msgid "%1$s (%2$s verified in %3$d piece)"
+#~ msgid_plural "%1$s (%2$s verified in %3$d pieces)"
+#~ msgstr[0] "%1$s (%2$s skontrolovaných v %3$d častiach)"
+#~ msgstr[1] "%1$s (%2$s skontrolovaných v %3$d časti)"
+#~ msgstr[2] "%1$s (%2$s skontrolovaných v %3$d častiach)"
+
+#~ msgid "Swarm speed:"
+#~ msgstr "Swarm rýchlosť:"
+
+#~ msgid "None sent"
+#~ msgstr "Nič neodoslané"
+
+#~ msgid "_Stop seeding torrents at ratio:"
+#~ msgstr "_Zastaviť odosielanie torrentov pri pomere:"
+
+#~ msgid "Plaintext Preferred"
+#~ msgstr "preferovať čistý text"
+
+#~ msgid "Encryption Preferred"
+#~ msgstr "preferovať šifrovanie"
+
+#~ msgid "Encryption Required"
+#~ msgstr "požadovať šifrovanie"
+
+#~ msgid "_Encryption mode"
+#~ msgstr "_Režim šifrovania"
+
+#~ msgid "Global Bandwidth Limits"
+#~ msgstr "Globálne obmedzenia šírky pásma"
+
+#~ msgid "Speed Limit Mode"
+#~ msgstr "Režim obmedzenia rýchlosti"
+
+#~ msgid "Limit do_wnload speed (KB/s):"
+#~ msgstr "Obmedziť rýchlosť _sťahovania (KB/s):"
+
+#~ msgid "When enabled, Speed Limit Mode overrides the Global Bandwidth Limits"
+#~ msgstr ""
+#~ "Keď je povolený, režim obmedzenia rýchlosti nahradí globálne obmedzenia "
+#~ "šírky pásma"
+
+#~ msgid "Use Speed Limit Mode between:"
+#~ msgstr "Použiť režim obmedzenia rýchlosti medzi:"
+
+#~ msgid "_Test Port"
+#~ msgstr "_Otestovať port"
+
+#~ msgid "Randomize the port every launch"
+#~ msgstr "Náhodný port pri každom spustení"
+
+#~ msgid "Click to disable Speed Limit Mode"
+#~ msgstr "Kliknite pre zakázanie režimu obmedzenia rýchlosti"
+
+#~ msgid "Click to enable Speed Limit Mode"
+#~ msgstr "Kliknite pre povolenie režimu obmedzenia rýchlosti"
+
+#, c-format
+#~ msgid "Checking to see if port %d is still open"
+#~ msgstr "Kontrola, či je port %d stále otvorený"
+
+#, c-format
+#~ msgid "%s is not a valid address"
+#~ msgstr "%s nie je platná adresa"
+
+#, c-format
+#~ msgid "%s is not an IPv4 address"
+#~ msgstr "%s nie je IPv4 adresa"
+
+#, c-format
+#~ msgid "%s is not an IPv6 address"
+#~ msgstr "%s nie je IPv6 adresa"
+
+#~ msgid "System does not seem to support IPv6. Not listening onan IPv6 address"
+#~ msgstr "Systém pravdepodobne nepodporuje IPv6. Nepočúva na IPv6 adrese."
+
+#~ msgid "Unable to get blocklist: %s"
+#~ msgstr "Nepodarilo sa získať zoznam blokovaných: %s"
+
+#~ msgid "Unable to get blocklist."
+#~ msgstr "Nepodarilo sa získať zoznam blokovaných."
+
+#~ msgid "Uncompressing blocklist..."
+#~ msgstr "Rozbaľuje sa zoznam blokovaných..."
+
+#~ msgid "Parsing blocklist..."
+#~ msgstr "Analyzuje sa zoznam blokovaných..."
+
+#~ msgid "Blocklist updated with %'d entries"
+#~ msgstr "Zoznam blokovaných bol aktualizovaný o %'d položiek"
+
+#~ msgid "Never"
+#~ msgstr "Nikdy"
+
+#~ msgid "%1$.1f%% (%2$.1f%% selected)"
+#~ msgstr "%1$.1f%% (%2$.1f%% vybraných)"
+
+#~ msgid "Completion"
+#~ msgstr "Dokončenie"
+
+#~ msgid "Beginning to use scheduled bandwidth limits"
+#~ msgstr "Začiatok používania plánovaného obmedzenia šírky pásma"
+
+#~ msgid "Ending use of scheduled bandwidth limits"
+#~ msgstr "Koniec používania plánovaného obmedzenia šírky pásma"
+
+#~ msgid "_Ignore unencrypted peers"
+#~ msgstr "_Ignorovať nešifrovaných klientov"
+
+#~ msgid "_Limit bandwidth between"
+#~ msgstr "_Obmedziť šírku pásma medzi"
+
+#~ msgid "Limit d_ownload speed (KB/s):"
+#~ msgstr "Obmedziť rýchlosť _sťahovania (KB/s):"
+
+#~ msgid "File \"%s\" is already open"
+#~ msgstr "Súbor \"%s\" je už otvorený"

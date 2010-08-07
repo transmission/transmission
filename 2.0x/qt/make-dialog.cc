@@ -1,0 +1,398 @@
+/*
+ * This file Copyright (C) 2009-2010 Mnemosyne LLC
+ *
+ * This file is licensed by the GPL version 2.  Works owned by the
+ * Transmission project are granted a special exemption to clause 2(b)
+ * so that the bulk of its code can remain under the MIT license.
+ * This exemption does not extend to derived works not owned by
+ * the Transmission project.
+ *
+ * $Id$
+ */
+
+#include <cassert>
+#include <iostream>
+
+#include <QCheckBox>
+#include <QDialogButtonBox>
+#include <QFileDialog>
+#include <QFileIconProvider>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QList>
+#include <QPlainTextEdit>
+#include <QProgressBar>
+#include <QPushButton>
+#include <QRadioButton>
+#include <QSize>
+#include <QStyle>
+#include <QTimer>
+#include <QVBoxLayout>
+
+#include <libtransmission/transmission.h>
+#include <libtransmission/makemeta.h>
+#include <libtransmission/utils.h>
+
+#include "hig.h"
+#include "make-dialog.h"
+#include "session.h"
+#include "utils.h"
+
+/***
+****
+***/
+
+void
+MakeDialog :: onNewDialogDestroyed( QObject * o )
+{
+    Q_UNUSED( o );
+
+    myTimer.stop( );
+}
+
+void
+MakeDialog :: onNewButtonBoxClicked( QAbstractButton * button )
+{
+    switch( myNewButtonBox->standardButton( button ) )
+    {
+        case QDialogButtonBox::Open:
+std::cerr << "calling mySession.addTorrent( " << qPrintable(myTarget) << ", " << qPrintable(QFileInfo(myBuilder->top).dir().path()) << ')' << std::endl;
+            mySession.addTorrent( myTarget, QFileInfo(myBuilder->top).dir().path() );
+            break;
+        case QDialogButtonBox::Abort:
+            myBuilder->abortFlag = true;
+            break;
+        default: // QDialogButtonBox::Ok:
+            break;
+
+    }
+    myNewDialog->deleteLater( );
+}
+
+void
+MakeDialog :: onProgress( )
+{
+    // progress bar
+    const tr_metainfo_builder * b = myBuilder;
+    const double denom = b->pieceCount ? b->pieceCount : 1;
+    myNewProgress->setValue( (int) ((100.0 * b->pieceIndex) / denom ) );
+
+    // progress label
+    const QString base( QFileInfo(b->top).baseName() );
+    QString str;
+    if( !b->isDone )
+        str = tr( "Creating \"%1\"" ).arg( base );
+    else if( b->result == TR_MAKEMETA_OK )
+        str = tr( "Created \"%1\"!" ).arg( base );
+    else if( b->result == TR_MAKEMETA_URL )
+        str = tr( "Error: invalid announce URL \"%1\"" ).arg( b->errfile );
+    else if( b->result == TR_MAKEMETA_CANCELLED )
+        str = tr( "Cancelled" );
+    else if( b->result == TR_MAKEMETA_IO_READ )
+        str = tr( "Error reading \"%1\": %2" ).arg( b->errfile ).arg( strerror(b->my_errno) );
+    else if( b->result == TR_MAKEMETA_IO_WRITE )
+        str = tr( "Error writing \"%1\": %2" ).arg( b->errfile ).arg( strerror(b->my_errno) );
+    myNewLabel->setText( str );
+
+    // buttons
+    (myNewButtonBox->button(QDialogButtonBox::Abort))->setEnabled( !b->isDone );
+    (myNewButtonBox->button(QDialogButtonBox::Ok))->setEnabled( b->isDone );
+    (myNewButtonBox->button(QDialogButtonBox::Open))->setEnabled( b->isDone && !b->result );
+}
+
+
+void
+MakeDialog :: makeTorrent( )
+{
+    if( !myBuilder )
+        return;
+
+    // get the tiers
+    int tier = 0;
+    QList<tr_tracker_info> trackers;
+    foreach( QString line, myTrackerEdit->toPlainText().split("\n") ) {
+        line = line.trimmed( );
+        if( line.isEmpty( ) )
+            ++tier;
+        else {
+            tr_tracker_info tmp;
+            tmp.announce = tr_strdup( line.toUtf8().constData( ) );
+            tmp.tier = tier;
+            trackers.append( tmp );
+        }
+    }
+
+    // pop up the dialog
+    QDialog * dialog = new QDialog( this );
+    dialog->setWindowTitle( tr( "New Torrent" ) );
+    myNewDialog = dialog;
+    QVBoxLayout * top = new QVBoxLayout( dialog );
+    top->addWidget(( myNewLabel = new QLabel));
+    top->addWidget(( myNewProgress = new QProgressBar ));
+    QDialogButtonBox * buttons = new QDialogButtonBox( QDialogButtonBox::Ok
+                                                     | QDialogButtonBox::Open
+                                                     | QDialogButtonBox::Abort );
+    myNewButtonBox = buttons;
+    connect( buttons, SIGNAL(clicked(QAbstractButton*)),
+             this, SLOT(onNewButtonBoxClicked(QAbstractButton*)) );
+    top->addWidget( buttons );
+    onProgress( );
+    dialog->show( );
+    connect( dialog, SIGNAL(destroyed(QObject*)),
+             this, SLOT(onNewDialogDestroyed(QObject*)) );
+    myTimer.start( 100 );
+
+    // the file to create
+    myTarget = QDir( myDestination ).filePath( QFileInfo(myBuilder->top).baseName() + ".torrent" );
+    std::cerr << qPrintable(myTarget) << std::endl;
+
+    // comment
+    QString comment;
+    if( myCommentCheck->isChecked() )
+        comment = myCommentEdit->text().toUtf8().constData();
+
+    // start making the torrent
+    tr_makeMetaInfo( myBuilder,
+                     myTarget.toUtf8().constData(),
+                     (trackers.isEmpty() ? 0 : &trackers.front()),
+                     trackers.size(),
+                     (comment.isEmpty() ? NULL : comment.toUtf8().constData()),
+                     myPrivateCheck->isChecked() );
+}
+
+/***
+****
+***/
+
+void
+MakeDialog :: onFileClicked( )
+{
+    QFileDialog * d = new QFileDialog( this, tr( "Select File" ) );
+    d->setFileMode( QFileDialog::ExistingFile );
+    connect( d, SIGNAL(filesSelected(const QStringList&)),
+             this, SLOT(onFileSelected(const QStringList&)) );
+    d->show( );
+}
+void
+MakeDialog :: onFileSelected( const QStringList& list )
+{
+    if( list.size() == 1 )
+    {
+        myFile = list.first( );
+        myFileButton->setText( QFileInfo(myFile).fileName() );
+        onSourceChanged( );
+    }
+}
+
+void
+MakeDialog :: onFolderClicked( )
+{
+    QFileDialog * d = new QFileDialog( this, tr( "Select Folder" ) );
+    d->setFileMode( QFileDialog::Directory );
+    connect( d, SIGNAL(filesSelected(const QStringList&)),
+             this, SLOT(onFolderSelected(const QStringList&)) );
+    d->show( );
+}
+void
+MakeDialog :: onFolderSelected( const QStringList& list )
+{
+    if( list.size() == 1 )
+    {
+        myFolder = list.first();
+        myFolderButton->setText( QFileInfo(myFolder).fileName() );
+        onSourceChanged( );
+    }
+}
+
+void
+MakeDialog :: onDestinationClicked( )
+{
+    QFileDialog * d = new QFileDialog( this, tr( "Select Folder" ) );
+    d->setFileMode( QFileDialog::Directory );
+    connect( d, SIGNAL(filesSelected(const QStringList&)),
+             this, SLOT(onDestinationSelected(const QStringList&)) );
+    d->show( );
+}
+void
+MakeDialog :: onDestinationSelected( const QStringList& list )
+{
+    if( list.size() == 1 )
+    {
+        myDestination = list.first( );
+        myDestinationButton->setText( QFileInfo(myDestination).fileName() );
+    }
+}
+
+void
+MakeDialog :: enableBuddyWhenChecked( QRadioButton * box, QWidget * buddy )
+{
+    connect( box, SIGNAL(toggled(bool)), buddy, SLOT(setEnabled(bool)) );
+    buddy->setEnabled( box->isChecked( ) );
+}
+void
+MakeDialog :: enableBuddyWhenChecked( QCheckBox * box, QWidget * buddy )
+{
+    connect( box, SIGNAL(toggled(bool)), buddy, SLOT(setEnabled(bool)) );
+    buddy->setEnabled( box->isChecked( ) );
+}
+
+QString
+MakeDialog :: getSource( ) const
+{
+    return myFileRadio->isChecked( ) ? myFile : myFolder;
+}
+
+void
+MakeDialog :: onButtonBoxClicked( QAbstractButton * button )
+{
+    switch( myButtonBox->standardButton( button ) )
+    {
+        case QDialogButtonBox::Ok:
+            makeTorrent( );
+            break;
+
+        default: // QDialogButtonBox::Close:
+            deleteLater( );
+            break;
+    }
+}
+
+/***
+****
+***/
+
+void
+MakeDialog :: onSourceChanged( )
+{
+    if( myBuilder )
+    {
+        tr_metaInfoBuilderFree( myBuilder );
+        myBuilder = 0;
+    }
+
+    const QString filename = getSource( );
+    if( !filename.isEmpty( ) )
+        myBuilder = tr_metaInfoBuilderCreate( filename.toUtf8().constData() );
+
+    QString text;
+    if( !myBuilder )
+        text = tr( "<i>No source selected<i>" );
+    else {
+        QString files = tr( "%Ln File(s)", 0, myBuilder->fileCount );
+        QString pieces = tr( "%Ln Piece(s)", 0, myBuilder->pieceCount );
+        text = tr( "%1 in %2; %3 @ %4" )
+                 .arg( Utils::sizeToString( myBuilder->totalSize ) )
+                 .arg( files )
+                 .arg( pieces )
+                 .arg( Utils::sizeToString( myBuilder->pieceSize ) );
+    }
+
+    mySourceLabel->setText( text );
+}
+
+
+// bah, there doesn't seem to be any cleaner way to override
+// QPlainTextEdit's default desire to be 12 lines tall
+class ShortPlainTextEdit: public QPlainTextEdit {
+    public:
+        virtual ~ShortPlainTextEdit( ) { }
+        ShortPlainTextEdit( QWidget * parent = 0 ): QPlainTextEdit(parent) { }
+        virtual QSize sizeHint ( ) const { return QSize( 256, 50 ); }
+};
+
+MakeDialog :: MakeDialog( Session & session, QWidget * parent ):
+    QDialog( parent, Qt::Dialog ),
+    mySession( session ),
+    myBuilder( 0 )
+{
+    connect( &myTimer, SIGNAL(timeout()), this, SLOT(onProgress()) );
+
+    setWindowTitle( tr( "New Torrent" ) );
+    QVBoxLayout * top = new QVBoxLayout( this );
+    top->setSpacing( HIG :: PAD );
+
+    HIG * hig = new HIG;
+    hig->setContentsMargins( 0, 0, 0, 0 );
+    hig->addSectionTitle( tr( "Files" ) );
+
+        QFileIconProvider iconProvider;
+        const int iconSize( style()->pixelMetric( QStyle::PM_SmallIconSize ) );
+        const QIcon folderIcon = iconProvider.icon( QFileIconProvider::Folder );
+        const QPixmap folderPixmap = folderIcon.pixmap( iconSize );
+        QPushButton * b = new QPushButton;
+        b->setIcon( folderPixmap );
+        b->setStyleSheet( "text-align: left; padding-left: 5; padding-right: 5" );
+        myDestination = QDir::homePath();
+        b->setText( myDestination );
+        connect( b, SIGNAL(clicked(bool)),
+                 this, SLOT(onDestinationClicked(void)) );
+        myDestinationButton = b;
+        hig->addRow( tr( "Sa&ve to:" ), b );
+
+        myFolderRadio = new QRadioButton( tr( "Source F&older:" ) );
+        connect( myFolderRadio, SIGNAL(toggled(bool)),
+                 this, SLOT(onSourceChanged()) );
+        myFolderButton = new QPushButton;
+        myFolderButton->setIcon( folderPixmap );
+        myFolderButton->setText( tr( "(None)" ) );
+        myFolderButton->setStyleSheet( "text-align: left; padding-left: 5; padding-right: 5" );
+        connect( myFolderButton, SIGNAL(clicked(bool)),
+                 this, SLOT(onFolderClicked(void)) );
+        hig->addRow( myFolderRadio, myFolderButton );
+        enableBuddyWhenChecked( myFolderRadio, myFolderButton );
+
+        const QIcon fileIcon = iconProvider.icon( QFileIconProvider::File );
+        const QPixmap filePixmap = fileIcon.pixmap( iconSize );
+        myFileRadio = new QRadioButton( tr( "Source &File:" ) );
+        myFileRadio->setChecked( true );
+        connect( myFileRadio, SIGNAL(toggled(bool)),
+                 this, SLOT(onSourceChanged()) );
+        myFileButton = new QPushButton;
+        myFileButton->setText( tr( "(None)" ) );
+        myFileButton->setIcon( filePixmap );
+        myFileButton->setStyleSheet( "text-align: left; padding-left: 5; padding-right: 5" );
+        connect( myFileButton, SIGNAL(clicked(bool)),
+                 this, SLOT(onFileClicked(void)) );
+        hig->addRow( myFileRadio, myFileButton );
+        enableBuddyWhenChecked( myFileRadio, myFileButton );
+
+        mySourceLabel = new QLabel( this );
+        hig->addRow( tr( "" ), mySourceLabel );
+
+    hig->addSectionDivider( );
+    hig->addSectionTitle( tr( "Properties" ) );
+
+        hig->addWideControl( myTrackerEdit = new ShortPlainTextEdit );
+        const int height = fontMetrics().size( 0, "\n\n\n\n" ).height( );
+        myTrackerEdit->setMinimumHeight( height );
+        hig->addTallRow( tr( "&Trackers:" ), myTrackerEdit );
+        QLabel * l = new QLabel( tr( "To add a backup URL, add it on the line after the primary URL.\nTo add another primary URL, add it after a blank line." ) );
+        l->setAlignment( Qt::AlignLeft );
+        hig->addRow( tr( "" ), l );
+        myTrackerEdit->resize( 500, height );
+
+        myCommentCheck = new QCheckBox( tr( "Co&mment" ) );
+        myCommentEdit = new QLineEdit( );
+        hig->addRow( myCommentCheck, myCommentEdit );
+        enableBuddyWhenChecked( myCommentCheck, myCommentEdit );
+
+        myPrivateCheck = hig->addWideCheckBox( tr( "&Private torrent" ), false );
+
+    hig->finish( );
+    top->addWidget( hig, 1 );
+
+    myButtonBox = new QDialogButtonBox( QDialogButtonBox::Ok
+                                      | QDialogButtonBox::Close );
+    connect( myButtonBox, SIGNAL(clicked(QAbstractButton*)),
+             this, SLOT(onButtonBoxClicked(QAbstractButton*)) );
+
+    top->addWidget( myButtonBox );
+    onSourceChanged( );
+}
+
+MakeDialog :: ~MakeDialog( )
+{
+    if( myBuilder )
+        tr_metaInfoBuilderFree( myBuilder );
+}

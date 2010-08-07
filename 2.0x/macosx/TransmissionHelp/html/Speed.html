@@ -1,0 +1,49 @@
+<html>
+
+	<head>
+		<META http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<link media="all" rel="stylesheet" href="../styles/TransBody.css" />
+		<title>Maximizing your download speed</title>
+	</head>
+	<body>
+		<div id="mainbox">
+			<div id="banner">
+				<a name="menus"></a>
+				<div id="machelp">
+				<a class="bread" href="../index.html">Transmission Help</a>
+				</div>
+				<div id="index">
+				<a class="leftborder" href="../html/Index2.html">Index</a></div>
+				</div>
+			</div>
+			<div id="pagetitle">
+				<h1>How do I maximize my download speed?</h1>
+			</div>
+				<ol>
+				<li>Make sure Transmission's <a href="portforward.html">port is forwarded</a>. Port forwarding makes it easier for others to connect to you, which therefore increases your speed.
+				<div summary="To do this" id="taskbox">
+					<p>If your router supports NAT-PMP, UPnP, or you have Apple AirPort, Transmission can do this automatically; just tick the checkbox in Preferences -> Network.
+				</div>
+				</li>
+				
+				<li>Make sure you cap your upload speed, so that it isn't flooded. A good rule of thumb is about 60-70% of your maximum upload bandwidth. This can be adjusted in Preferences -> Bandwidth, or in real time using the Action menu.
+				<div summary="To do this" id="taskbox">
+				<p>eg. If your upload connection is 256 Kilobits/sec, then you should cap it at 21 KB/sec ((<b>256</b> / 8) * 0.66 = <b>21</b>).
+				</div>
+				</li>
+				
+				<li><a href="gettingstarted.html#queue">Queue</a> your transfers. Transmission's queue preferences are located in Transfers -> Management.
+				<p>Remember, your download speed is proportional to how fast you upload. If there are many transfers running, then each transfer will only receive a small proportion of your upload bandwidth, reducing their respective download speeds.
+				To avoid spreading your upload too thinly, a good rule of thumb is to have at least 128 KBit/sec of upload bandwidth for every torrent you wish to run simultaneously.
+				
+				<div summary="To do this" id="taskbox">	
+					<p>eg. If your upload bandwidth is 256 KBit/sec, then you should only have two (<b>256</b>/128 = <b>2</b>) downloading transfers in the queue.
+				</div>
+				</li>
+				</ol>
+			</div>
+
+		</div>
+	</body>
+	
+</html>

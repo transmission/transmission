@@ -1,0 +1,43 @@
+<html>
+
+	<head>
+		<META http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<link media="all" rel="stylesheet" href="../styles/TransBody.css" />
+		<title>Tracker Information</title>
+	</head>
+	<body>
+		<div id="mainbox">
+		<div id="banner">
+				<a name="menus"></a>
+				<div id="machelp"><a class="bread" href="../index.html">Transmission Help</a>
+				</div>
+				<div id="index">
+				<a class="leftborder" href="../html/index2.html">Index</a></div>
+				</div>
+			</div>
+			<div id="pagetitle">
+				<h1>Can I add and remove trackers in my torrents? </h1>
+			</div>
+				<p>Yes. To add trackers to a currently running torrent, go to Inspector -> Tracker, and click the plus button (+). To remove them, click minus button (-). Multiple trackers can also be added to torrent files you create. Each newly-added tracker will be placed in a new tier.
+				<p>
+			<div id="pagetitle">
+				<h1>What is 'Tier 1', 'Tier 2', etc? </h1>
+			</div>
+				<p>Transmission supports multitracker torrents. All of a given torrent's trackers are divided into 'Tiers'. A tracker from each tier will be contacted simultaneously. Transmission randomly chooses a tracker from each tier until it finds one that works.
+				<p>
+			<div id="pagetitle">
+				<h1>What does 'announce' mean? </h1>
+			</div>
+				<p>When Transmission <i>announces</i>, it is updating its presence to the tracker and asking for more peers. This happens periodically, at the discretion of the tracker, however can be manually invoked via Transfers menu >> Update Tracker.
+				<p>
+			<div id="pagetitle">
+				<h1>What does 'scrape' mean? </h1>
+			</div>
+				<p><i>Scraping</i> the tracker simply means asking for information about the swarm itself. For example, the number of peers, seeds etc.
+				<p>
+
+
+		</div>
+	</body>
+	
+</html>

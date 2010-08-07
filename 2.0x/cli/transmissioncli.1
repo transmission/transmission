@@ -1,0 +1,138 @@
+.\"
+.\"  Copyright (c) Deanna Phillips <deanna@sdf.lonestar.org>
+.\" 
+.\"  Permission to use, copy, modify, and distribute this software for any
+.\"  purpose with or without fee is hereby granted, provided that the above
+.\"  copyright notice and this permission notice appear in all copies.
+.\" 
+.\"  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\"  WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\"  MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\"  ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\"  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\"  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\"  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd July 21, 2008
+.Dt TRANSMISSIONCLI 1
+.Os
+.Sh NAME
+.Nm transmissioncli
+.Nd a bittorrent client
+.Sh SYNOPSIS
+.Nm transmissioncli
+.Bk -words
+.Fl h
+.Nm
+.Fl i
+.Ar torrent-file
+.Nm
+.Fl s
+.Ar torrent-file
+.Nm
+.Fl n Ar sourcefile
+.Op Fl a Ar url
+.Op Fl c Ar comment
+.Op Fl r
+.Ar new-torrent-file
+.Nm
+.Op Fl b | B
+.Op Fl d Ar number | Fl D
+.Op Fl er | ep | et
+.Op Fl f Ar script
+.Op Fl g Ar directory
+.Op Fl h
+.Op Fl m | M
+.Op Fl p Ar port
+.Op Fl t
+.Op Fl u Ar number | Fl U
+.Op Fl v
+.Op Fl w Ar directory
+.Ar torrent-file
+.Ek
+.Sh DESCRIPTION
+The
+.Nm
+program is a lightweight, command-line BitTorrent client with
+scripting capabilities.
+.Pp
+The options are as follows:
+.Bl -tag -width Ds
+.It Fl a, Fl -announce Ar announce-url
+When creating a new torrent, set its announce URL
+.It Fl b Fl -blocklist
+Enable peer blocklists.  Transmission understands the bluetack blocklist file format.
+New blocklists can be added by copying them into the config-dir's "blocklists" subdirectory.
+.It Fl B Fl -no-blocklist
+Disble blocklists.
+.It Fl c, Fl -comment Ar comment-text
+When creating a new torrent, set its comment field
+.It Fl d, -downlimit Ar number
+Set the maximum download speed in KB/s
+.It Fl D, -no-downlimit
+Don't limit the download speed
+.It Fl er Fl -encryption-required
+Encrypt all peer connections.
+.It Fl ep Fl -encryption-preferred 
+Prefer encrypted peer connections.
+.It Fl et Fl -encryption-tolerated
+Prefer unencrypted peer connections.
+.It Fl f, -finish Ar script
+Set a script to run when the torrent finishes
+.It Fl g, Fl -config-dir Ar directory
+Where to look for configuration files.  This can be used to swap between using the cli, daemon, gtk, and qt clients.
+See http://trac.transmissionbt.com/wiki/ConfigFiles for more information.
+.It Fl h, Fl -help
+Prints a short usage summary.
+.It Fl i, Fl -info
+Shows torrent details and exit
+.It Fl m, Fl -portmap
+Enable portmapping via NAT-PMP or UPnP
+.It Fl M, Fl -no-portmap
+Disable portmapping
+.It Fl n, Fl -new Ar sourcefile
+Create torrent from the specified file or directory
+.It Fl p, -port Ar port
+Set the port to listen for incoming peers. (Default: 51413)
+.It Fl r, Fl -private
+When creating a new torrent, set its 'private' flag
+.It Fl s, -scrape
+Print the current number of seeders and leechers for the specified torrent
+.It Fl t, -tos
+Set the peer socket TOS for local router-based traffic shaping.
+.It Fl u, -uplimit Ar number
+Set the maximum upload speed in KB/s
+.It Fl U, -no-uplimit
+Don't limit the upload speed
+.It Fl v, Fl -verify
+Verify the torrent's downloaded data.
+.It Fl w, Fl -download-dir Ar directory
+Where to save downloaded data.
+.Sh SIGNALS
+In addition to these options, sending
+.Nm
+a SIGHUP signal will contact the tracker for more peers.
+.El
+.Sh FILES
+.Bl -tag -width Ds -compact
+.It ~/.config/transmission
+Directory where
+.Nm
+keeps torrent information for future seeding and resume operations.
+.El
+.Sh AUTHORS
+The
+.Nm
+program was written by 
+.An -nosplit
+.An Eric Petit ,
+.An Josh Elsasser ,
+.An Charles Kerr ,
+and
+.An Mitchell Livingston .
+.Sh SEE ALSO
+.Xr transmission 1 ,
+.Xr transmission-daemon 1 ,
+.Xr transmission-remote 1
+.Pp
+http://www.transmissionbt.com/

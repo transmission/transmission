@@ -1,0 +1,12 @@
+[Desktop Entry]
+_Name=Transmission
+_GenericName=BitTorrent Client
+_X-GNOME-FullName=Transmission BitTorrent Client
+_Comment=Download and share files over BitTorrent
+Exec=transmission %F
+Icon=transmission
+Terminal=false
+TryExec=transmission
+Type=Application
+MimeType=application/x-bittorrent;
+Categories=Network;FileTransfer;P2P;GTK;

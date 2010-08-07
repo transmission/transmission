@@ -1,0 +1,10 @@
+div#torrent_filter_bar input#torrent_search {
+	background: #FFF url('../images/graphics/filter_icon.png') top left no-repeat;
+	border: 1px solid #5D80A1;
+	margin-top: 3px;
+	padding: 1px 10px 1px 18px;
+	width: 76px;
+}
+div#torrent_filter_bar input#torrent_search.blur {
+	border-color: #CCC;
+}

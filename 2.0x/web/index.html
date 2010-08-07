@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="cache-control" content="Private" />
+		<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<link href="./images/favicon.ico" rel="icon" />
+		<link href="./images/favicon.png" rel="shortcut icon" />
+		<link rel="apple-touch-icon" href="./images/webclip-icon.png"/>
+		<script type="text/javascript" src="./javascript/jquery/jquery.min.js"></script>
+		<link media="only screen and (max-device-width: 480px)" href="./stylesheets/iphone.css" type= "text/css" rel="stylesheet" />
+		<link media="screen and (min-device-width: 481px)" href="./stylesheets/common.css" type="text/css" rel="stylesheet" />
+		<!--[if IE]>
+		  <link media="screen" href="./stylesheets/common.css" type="text/css" rel="stylesheet" />
+		  <link media="screen" href="./stylesheets/ieAll.css" type="text/css" rel="stylesheet" />
+		<![endif]-->
+		<!--[if IE 6]><link media="screen" href="./stylesheets/ie6.css" type="text/css" rel="stylesheet" /><![endif]-->
+		<!--[if IE 7]><link media="screen" href="./stylesheets/ie7.css" type="text/css" rel="stylesheet" /><![endif]-->
+		<script type="text/javascript" src="./javascript/jquery/jquery.transmenu.min.js"></script>
+		<script type="text/javascript" src="./javascript/jquery/jquery.contextmenu.min.js"></script>
+		<script type="text/javascript" src="./javascript/menu.js"></script>
+		<script type="text/javascript" src="./javascript/jquery/jquery.form.min.js"></script>
+		<script type="text/javascript" src="./javascript/jquery/json.min.js"></script>
+		<script type="text/javascript" src="./javascript/common.js"></script>
+		<script type="text/javascript" src="./javascript/transmission.remote.js"></script>
+		<script type="text/javascript" src="./javascript/transmission.js"></script>
+		<script type="text/javascript" src="./javascript/torrent.js"></script>
+		<script type="text/javascript" src="./javascript/dialog.js"></script>
+		<title>Transmission Web Interface</title>
+	</head>
+	<body id="transmission_body">
+
+		<div class="torrent_global_menu">
+			 <ul>    
+				 <li id="open"><div id="open_link"><div class="toolbar_image"></div>Open</div></li>
+				 <li id="remove" class="disabled"><div id="remove_link"><div class="toolbar_image"></div>Remove</div></li>
+				 <li class="divider">&nbsp;</li>
+				 <li id="pause_selected" class="disabled"><div id="pause_selected_link"><div class="toolbar_image"></div>Pause</div></li>
+				 <li id="resume_selected" class="disabled"><div id="resume_selected_link"><div class="toolbar_image"></div>Resume</div></li>
+				 <li class="divider">&nbsp;</li>
+				 <li id="pause_all" class="disabled"><div id="pause_all_link"><div class="toolbar_image"></div>Pause All</div></li>
+				 <li id="resume_all" class="disabled"><div id="resume_all_link"><div class="toolbar_image"></div>Resume All</div></li>
+				 <li id="inspector"><div id="inspector_link"><div class="toolbar_image"></div>Inspector</div></li>
+				 <li id="filter"><div id="filter_toggle_link"><div class="toolbar_image"></div>Filter</div></li>
+			 </ul>
+		</div>
+		
+		<div class="torrent_global_details">
+			<div id="torrent_global_transfer">0 Transfers</div>
+			<div id="torrent_global_upload">0 B/s</div>
+			<div id="torrent_global_download">0 B/s</div>
+		</div>
+		
+		<div id="torrent_filter_bar">
+			<ul>    
+				 <li><a href="#all" id="filter_all_link" class="active">All</a></li>
+				 <li><a href="#downloading" id="filter_downloading_link">Downloading</a></li>
+				 <li><a href="#seeding" id="filter_seeding_link">Seeding</a></li>
+				 <li><a href="#paused" id="filter_paused_link">Paused</a></li>
+			</ul>
+                        <input type="search" id="torrent_search" placeholder="Filter" results="0" />
+		</div>
+		<div id="torrent_inspector" style="display:none;">
+			
+			<div style="display:none;" class="inspector_close" id="inspector_close"><img id="inspector_close_image" src="./images/buttons/cancel.png"/></div>
+
+			<div id="inspector_tabs">
+				<div class="inspector_tab selected" id="inspector_tab_info"><a href="#info"><img src="images/buttons/info_general.png" alt="Information"/></a></div>
+				<div class="inspector_tab" id="inspector_tab_activity"><a href="#activity"><img src="images/buttons/info_activity.png" alt="Activity"/></a></div>
+				<div class="inspector_tab" id="inspector_tab_trackers"><a href="#trackers"><img src="images/buttons/info_trackers.png" alt="Trackers"/></a></div>
+				<div class="inspector_tab" id="inspector_tab_files"><a href="#files"><img src="images/buttons/info_files.png" alt="Files"/></a></div>
+			</div>
+			
+			<div id="inspector_header">
+				<h1 id="torrent_inspector_name"></h1>
+				<span id="torrent_inspector_size"></span>
+			</div>
+			
+			<div class="inspector_container" id="inspector_tab_info_container">
+				<div class="inspector_group">
+					<div class="inspector_group_label">Information</div>
+					<div class="inspector_row">
+						<div class="inspector_label">Pieces:</div>
+						<div id="torrent_inspector_pieces"></div>
+					</div>
+					<div class="inspector_row">
+						<div class="inspector_label">Hash:</div>
+						<div id="torrent_inspector_hash"></div>
+					</div>
+					<div class="inspector_row">
+						<div class="inspector_label">Secure:</div>
+						<div id="torrent_inspector_secure"></div>
+					</div>
+					<div class="inspector_row">
+						<div class="inspector_label">Comment:</div>
+						<div id="torrent_inspector_comment"></div>
+					</div>
+				</div><!-- class="inspector_group"-->
+				
+				<div class="inspector_group">
+					<div class="inspector_group_label">Created By</div>
+					<div class="inspector_row">
+						<div class="inspector_label">Creator:</div>
+						<div id="torrent_inspector_creator">N/A</div>
+					</div>
+					<div class="inspector_row">
+						<div class="inspector_label">Date:</div>
+						<div id="torrent_inspector_creator_date">N/A</div>
+					</div>
+				</div><!-- class="inspector_group"-->
+
+				<div class="inspector_group">
+					<div class="inspector_group_label">Where</div>
+					<div class="inspector_row">
+						<div class="inspector_label">Download Dir:</div>
+						<div id="torrent_inspector_download_dir">N/A</div>
+					</div>
+				</div><!-- class="inspector_group"-->
+			</div><!-- id="inspector_tab_info_container" -->
+			
+			<div style="display:none;" class="inspector_container" id="inspector_tab_activity_container">
+
+				<div class="inspector_group">
+					<div class="inspector_group_label">Activity</div>
+					<div class="inspector_row">
+						<div class="inspector_label">State:</div>
+						<div id="torrent_inspector_state">N/A</div>
+					</div>
+					<div class="inspector_row">
+						<div class="inspector_label">Progress:</div>
+						<div id="torrent_inspector_progress">N/A</div>
+					</div>
+					<div class="inspector_row">
+						<div class="inspector_label">Have:</div>
+						<div id="torrent_inspector_have">N/A</div>
+					</div>
+					<div class="inspector_row">
+						<div class="inspector_label">Availability:</div>
+						<div id="torrent_inspector_availability">N/A</div>
+					</div>
+					<div class="inspector_row">
+						<div class="inspector_label">Downloaded:</div>
+						<div id="torrent_inspector_downloaded">N/A</div>
+					</div>
+					<div class="inspector_row">
+						<div class="inspector_label">Uploaded:</div>
+						<div id="torrent_inspector_uploaded">N/A</div>
+					</div>
+					<div class="inspector_row">
+						<div class="inspector_label">Ratio:</div>
+						<div id="torrent_inspector_ratio">N/A</div>
+					</div>
+					<div class="inspector_row">
+						<div class="inspector_label">Error:</div>
+						<div id="torrent_inspector_error">N/A</div>
+					</div>
+					<div class="inspector_row">
+						<div class="inspector_label">DL Speed:</div>
+						<div id="torrent_inspector_download_speed">N/A</div>
+					</div>
+					<div class="inspector_row">
+						<div class="inspector_label">UL Speed:</div>
+						<div id="torrent_inspector_upload_speed">N/A</div>
+					</div>
+				</div><!-- class="inspector_group"-->
+				
+				<div class="inspector_group">
+					<div class="inspector_group_label">Peers</div>
+					<div class="inspector_row">
+						<div class="inspector_label">UL To:</div>
+						<div id="torrent_inspector_upload_to">N/A</div>
+					</div>
+					<div class="inspector_row">
+						<div class="inspector_label">DL From:</div>
+						<div id="torrent_inspector_download_from">N/A</div>
+					</div>
+				</div><!-- class="inspector_group"-->
+			</div><!-- id="inspector_tab_activity_container" -->
+
+			<div style="display:none;" class="inspector_container" id="inspector_tab_trackers_container">
+				<div id="inspector_trackers_list">
+				</div>
+			</div><!-- id="inspector_tab_trackers_container" -->
+
+			<div style="display:none;" class="inspector_container" id="inspector_tab_files_container">
+				<div id="inspector_file_list">
+					<ul id="select_all_button_container">
+						<li id="files_deselect_all" class="select_all_button">Deselect All</li>
+						<li id="files_select_all" class="select_all_button">Select All</li>
+					</ul>
+				</div>
+			</div><!-- id="inspector_tab_files_container" -->
+
+		</div>
+		
+		<div id="torrent_container">
+			<ul class="torrent_list" id="torrent_list"><li style="display: none;"></li></ul>
+		</div>
+		
+		
+		
+		<div class="dialog_container" id="dialog_container" style="display:none;">
+			<div class="dialog_top_bar"></div>
+			<div class="dialog_window">
+				<img src="images/graphics/logo.png" alt="Transmission Logo" />
+				<h2 class="dialog_heading" id="dialog_heading"></h2>
+				<div class="dialog_message" id="dialog_message"></div>
+				<a href="#confirm" id="dialog_confirm_button">Confirm</a>
+				<a href="#cancel" id="dialog_cancel_button">Cancel</a>			
+        	</div>
+		</div>
+		
+		<div class="dialog_container" id="prefs_container" style="display:none;">
+			<div class="dialog_top_bar"></div>
+			<div class="dialog_window">
+				<h2 class="dialog_heading">Preferences</h2>
+				<div id="pref_error"></div>
+				<form action="" id="prefs_form">
+					<div id="prefs_tabs">
+						<ul>
+							<li id="prefs_tab_general_tab" class="prefs_tab_enabled">General</li>
+							<li id="prefs_tab_speed_tab" class="prefs_tab_disabled">Speed</li>
+						</ul>
+						<div id="prefs_tab_general" class="prefs_tab">
+							<div class="preference download_location">
+								<label class="category">Add transfers:</label>
+								<div class="formdiv">
+									<label for="download_location" class="item">Download to:</label>
+									<input type="text" name="download_location" id="download_location"/>
+								</div>
+								<div class="formdiv checkbox auto_start">
+									<input type="checkbox" name="auto_start" id="auto_start"/>
+									<label for="auto_start" class="item">Start transfers when added</label>
+								</div>
+							</div>
+							<div class="preference port">
+								<label class="category">Network:</label>
+								<div class="formdiv">
+									<label for="port" class="item">Incoming TCP Port:</label>
+									<input type="text" id="port" name="port"/>
+								</div>
+							</div>
+							<div class="preference encryption">
+								<label class="category">Encryption:</label>
+								<div class="formdiv checkbox">
+									<input type="checkbox" name="encryption" id="encryption"/>
+									<label for="encryption" class="item">Ignore unencrypted peers</label>
+								</div>
+							</div>
+							<div class="preference web_gui">
+								<label class="category">Web Client:</label>
+								<div class="formdiv">
+									<label for="refresh_rate" class="item">Refresh Rate:</label>
+									<input type="text" name="refresh_rate" id="refresh_rate"/>
+									<label class="suffix">seconds</label>
+								</div>
+							</div>
+							<div style="clear: both; visibility: hidden;"></div>
+						</div>
+						<div id="prefs_tab_speed" class="prefs_tab" style="display: none;">
+							<div class="preference limit_total">
+								<label class="category">Speed Limits:</label>
+								<div class="formdiv checkbox">
+									<input type="checkbox" name="limit_download" id="limit_download"/>
+									<label for="limit_download" class="item">Download Rate:</label>
+									<input type="text" name="download_rate" id="download_rate"/>
+									<label class="suffix">KB/s</label>
+								</div>
+								<div class="formdiv checkbox">
+									<input type="checkbox" name="limit_upload" id="limit_upload"/>
+									<label for="limit_upload" class="item">Upload Rate:</label>
+									<input type="text" name="upload_rate" id="upload_rate"/>
+									<label class="suffix">KB/s</label>
+								</div>
+							</div>
+							<div class="preference limit_turtle">
+								<label class="category">Temporary Speed Limits: (Turtle)</label>
+								<label>Override normal speed limits manually or at scheduled times</label>
+								<div class="formdiv">
+									<label for="turtle_download_rate" class="item">Download Rate:</label>
+									<input type="text" name="turtle_download_rate" id="turtle_download_rate"/>
+									<label class="suffix">KB/s</label>
+								</div>
+								<div class="formdiv">
+									<label for="turtle_upload_rate" class="item">Upload Rate:</label>
+									<input type="text" name="turtle_upload_rate" id="turtle_upload_rate"/>
+									<label class="suffix">KB/s</label>
+								</div>
+								<div class="formdiv checkbox">
+									<input type="checkbox" name="turtle_schedule" id="turtle_schedule"/>
+									<label for="turtle_schedule" class="item">Scheduled times:</label>
+									<select name="turtle_start_time" id="turtle_start_time" size="1">
+									</select>
+									<select name="turtle_end_time" id="turtle_end_time" size="1">
+									</select>
+								</div>
+								<div class="formdiv">
+									<label for="turtle_days" class="item">On days:</label>
+									<select name="turtle_days" id="turtle_days" size="1">
+										<option value="127">Everyday</option>
+										<option value="62">Weekdays</option>
+										<option value="65">Weekends</option>
+										<option value="1">Sunday</option>
+										<option value="2">Monday</option>
+										<option value="4">Tuesday</option>
+										<option value="8">Wednesday</option>
+										<option value="16">Thursday</option>
+										<option value="32">Friday</option>
+										<option value="64">Saturday</option>
+									</select>
+								</div>
+							</div>
+							<div style="clear: both; visibility: hidden;"></div>
+						</div>
+					</div>
+					<span id="transmission_version"></span>
+					<a href="#save" id="prefs_save_button">Save</a>
+					<a href="#cancel" id="prefs_cancel_button">Cancel</a>
+				</form>
+			</div>
+		</div>
+
+		<div class="dialog_container" id="stats_container" style="display:none;">
+			<div class="dialog_top_bar"></div>
+			<div class="dialog_window">
+				<h2 class="dialog_heading">Statistics</h2>
+				<div id="stats_error"></div>
+				<div id="stats_info_container" class="stats_info_container">
+					<div class="stats_group">
+						<label class="category">Current Session:</label>
+						<div class="stats_row">
+							<div class="item">Uploaded:</div>
+							<div id="stats_session_uploaded"></div>
+						</div>
+						<div class="stats_row">
+							<div class="item">Downloaded:</div>
+							<div id="stats_session_downloaded"></div>
+						</div>
+						<div class="stats_row">
+							<div class="item">Ratio:</div>
+							<div id="stats_session_ratio"></div>
+						</div>
+						<div class="stats_row">
+							<div class="item">Duration:</div>
+							<div id="stats_session_duration"></div>
+						</div>
+					</div>
+					<div class="stats_group">
+						<label class="category">Total:</label>
+						<div class="stats_row">
+							<div class="item2">Started </div>
+							<div id="stats_total_count"></div>
+						</div>
+						<div class="stats_row">
+							<div class="item">Uploaded:</div>
+							<div id="stats_total_uploaded"></div>
+						</div>
+						<div class="stats_row">
+							<div class="item">Downloaded:</div>
+							<div id="stats_total_downloaded"></div>
+						</div>
+						<div class="stats_row">
+							<div class="item">Ratio:</div>
+							<div id="stats_total_ratio"></div>
+						</div>
+						<div class="stats_row">
+							<div class="item">Duration:</div>
+							<div id="stats_total_duration"></div>
+						</div>
+					</div>
+				</div>
+				<a href="#close" id="stats_close_button">Close</a>
+			</div>
+		</div>
+		
+		<div class="dialog_container" id="upload_container" style="display:none;">
+			<div class="dialog_top_bar"></div>
+			<div class="dialog_window">
+				<img src="images/graphics/logo.png" alt="Transmission Logo" />
+				<h2 class="dialog_heading">Upload Torrent Files</h2>
+				<form action="#" method="post" id="torrent_upload_form" 
+					enctype="multipart/form-data" target="torrent_upload_frame">  
+					<div class="dialog_message">
+						<label for="torrent_upload_file">Please select a torrent file to upload:</label>
+							<input type="file" name="torrent_files[]" id="torrent_upload_file" multiple="multiple" />
+						<label for="torrent_upload_url">Or enter a URL:</label>
+							<input type="text" id="torrent_upload_url"/>
+							<input type="checkbox" id="torrent_auto_start" />
+						<label for="torrent_auto_start" id="auto_start_label">Start when added</label>
+					</div>
+					<a href="#upload" id="upload_confirm_button">Upload</a>
+					<a href="#cancel" id="upload_cancel_button">Cancel</a>
+				</form>
+			</div>
+		</div>
+		<div class="torrent_footer">	
+			<div id="disk_space_container"></div>	
+			<ul id="settings_menu">
+				<li id="button">&nbsp;
+					<ul id="footer_super_menu">
+						<li id="preferences">Preferences</li>
+						<li id="statistics">Statistics</li>
+						<li class="separator"></li>
+						<li>Total Download Rate
+							<ul id="footer_download_rate_menu">
+								<li id="unlimited_download_rate">Unlimited</li>
+								<li id="limited_download_rate">Limit (10 KB/s)</li>
+								<li class="separator"></li>
+								<li>5 KB/s</li>
+								<li>10 KB/s</li>
+								<li>20 KB/s</li>
+								<li>30 KB/s</li>
+								<li>40 KB/s</li>
+								<li>50 KB/s</li>
+								<li>75 KB/s</li>
+								<li>100 KB/s</li>
+								<li>150 KB/s</li>
+								<li>200 KB/s</li>
+								<li>250 KB/s</li>
+								<li>500 KB/s</li>
+								<li>750 KB/s</li>
+							</ul>
+						</li>
+						<li>Total Upload Rate
+							<ul id="footer_upload_rate_menu">
+								<li id="unlimited_upload_rate">Unlimited</li>
+								<li id="limited_upload_rate">Limit (10 KB/s)</li>
+								<li class="separator"></li>
+								<li>5 KB/s</li>
+								<li>10 KB/s</li>
+								<li>20 KB/s</li>
+								<li>30 KB/s</li>
+								<li>40 KB/s</li>
+								<li>50 KB/s</li>
+								<li>75 KB/s</li>
+								<li>100 KB/s</li>
+								<li>150 KB/s</li>
+								<li>200 KB/s</li>
+								<li>250 KB/s</li>
+								<li>500 KB/s</li>
+								<li>750 KB/s</li>
+							</ul>
+						</li>
+						<li class="separator"></li>
+						<li>Sort Transfers By
+							<ul id="footer_sort_menu">
+								<li id="sort_by_activity">Activity</li>
+								<li id="sort_by_age">Age</li>
+								<li id="sort_by_name">Name</li>
+								<li id="sort_by_percent_completed">Progress</li>
+								<li id="sort_by_queue_order">Queue Order</li>
+								<li id="sort_by_state">State</li>
+								<li class="separator"></li>
+								<li id="reverse_sort_order">Reverse Sort Order</li>
+							</ul>
+						</li>
+					</ul>
+				</li>
+			</ul>
+			<div id="turtle_button">&nbsp;</div>
+			<div style="clear: both; visibility: hidden;"></div>
+		</div>
+		
+<div class="contextMenu" id="torrent_context_menu">
+			<ul>
+				<li id="context_pause_selected" class="disabled context_pause_selected">Pause Selected</li>
+				<li id="context_resume_selected" class="disabled context_resume_selected">Resume Selected</li>
+				<li class="separator"></li>
+				<li id="context_remove">Remove From List...</li>
+				<li id="context_removedata">Trash Data & Remove From List...</li>
+				<li class="separator"></li>
+				<li id="context_verify">Verify Local Data</li>
+				<li class="separator"></li>
+				<li id="context_toggle_inspector">Show Inspector</li>
+				<li class="separator"></li>
+				<li id="context_select_all" class="context_select_all">Select All</li>
+				<li id="context_deselect_all" class="context_deselect_all">Deselect All</li>
+			</ul>
+		</div>
+		
+		<iframe name="torrent_upload_frame" id="torrent_upload_frame" src="about:blank" ></iframe>
+	</body>
+</html>

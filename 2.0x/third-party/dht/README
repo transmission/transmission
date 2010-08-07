@@ -1,0 +1,195 @@
+The files dht.c and dht.h implement the variant of the Kademlia Distributed
+Hash Table (DHT) used in the Bittorrent network (``mainline'' variant).
+
+The file dht-example.c is a stand-alone program that participates in the
+DHT.  Another example is a patch against Transmission, which you might or
+might not be able to find somewhere.
+
+The code is designed to work well in both event-driven and threaded code.
+The caller, which is either an event-loop or a dedicated thread, must
+periodically call the function dht_periodic.  In addition, it must call
+dht_periodic whenever any data has arrived from the network.
+
+All functions return -1 in case of failure, in which case errno is set, or
+a positive value in case of success.
+
+Initialisation
+**************
+
+* dht_init
+
+This must be called before using the library.  You pass it a bound IPv4
+datagram socket, a bound IPv6 datagram socket, and your node id, a 20-octet
+array that should be globally unique.
+
+If you're on a multi-homed host, you should bind the sockets to one of your
+addresses.
+
+Node ids must be well distributed, so you cannot just use your Bittorrent
+id; you should either generate a truly random value (using plenty of
+entropy), or at least take the SHA-1 of something.  However, it is a good
+idea to keep the id stable, so you may want to store it in stable storage
+at client shutdown.
+
+ 
+* dht_uninit
+
+This may be called at the end of the session.  If dofree is true, it frees
+all the memory allocated for the DHT.  If dofree is false, this function
+currently does nothing.
+
+Bootstrapping
+*************
+
+The DHT needs to be taught a small number of contacts to begin functioning.
+You can hard-wire a small number of stable nodes in your application, but
+this obviously fails to scale.  You may save the list of known good nodes
+at shutdown, and restore it at restart.  You may also grab nodes from
+torrent files (the nodes field), and you may exchange contacts with other
+Bittorrent peers using the PORT extension.
+
+* dht_ping
+
+This is the main bootstrapping primitive.  You pass it an address at which
+you believe that a DHT node may be living, and a query will be sent.  If
+a node replies, and if there is space in the routing table, it will be
+inserted.
+
+* dht_insert_node
+
+This is a softer bootstrapping method, which doesn't actually send
+a query -- it only stores the node in the routing table for later use.  It
+is a good idea to use that when e.g. restoring your routing table from
+disk.
+
+Note that dht_insert_node requires that you supply a node id.  If the id
+turns out to be wrong, the DHT will eventually recover; still, inserting
+massive amounts of incorrect information into your routing table is
+certainly not a good idea.
+
+An additionaly difficulty with dht_insert_node is that, for various
+reasons, a Kademlia routing table cannot absorb nodes faster than a certain
+rate.  Dumping a large number of nodes into a table using dht_insert_node
+will probably cause most of these nodes to be discarded straight away.
+(The tolerable rate is difficult to estimate; it is probably on the order
+of one node every few seconds per node already in the table divided by 8,
+for some suitable value of 8.)
+
+Doing some work
+***************
+
+* dht_periodic
+
+This function should be called by your main loop periodically, and also
+whenever data is available on the socket.  The time after which
+dht_periodic should be called if no data is available is returned in the
+parameter tosleep.  (You do not need to be particularly accurate; actually,
+it is a good idea to be late by a random value.)
+
+The parameter available indicates whether any data is available on the
+socket.  If it is 0, dht_periodic will not try to read data; if it is 1, it
+will.
+
+Dht_periodic also takes a callback, which will be called whenever something
+interesting happens (see below).
+
+* dht_search
+
+This schedules a search for information about the info-hash specified in
+id.  If port is not 0, it specifies the TCP port on which the current peer
+is listening; in that case, when the search is complete it will be announced
+to the network.  The port is in host order, beware if you got it from
+a struct sockaddr_in.
+
+In either case, data is passed to the callback function as soon as it is
+available, possibly in multiple pieces.  The callback function will
+additionally be called when the search is complete.
+
+Up to DHT_MAX_SEARCHES (1024) searches can be in progress at a given time;
+any more, and dht_search will return -1.  If you specify a new search for
+the same info hash as a search still in progress, the previous search is
+combined with the new one -- you will only receive a completion indication
+once.
+
+Information queries
+*******************
+
+* dht_nodes
+
+This returns the number of known good, dubious and cached nodes in our
+routing table.  This can be used to decide whether it's reasonable to start
+a search; a search is likely to be successful as long as we have a few good
+nodes; however, in order to avoid overloading your bootstrap nodes, you may
+want to wait until good is at least 4 and good + doubtful is at least 30 or
+so.
+
+It also includes the number of nodes that recently send us an unsolicited
+request; this can be used to determine if the UDP port used for the DHT is
+firewalled.
+
+If you want to display a single figure to the user, you should display
+good + doubtful, which is the total number of nodes in your routing table.
+Some clients try to estimate the total number of nodes, but this doesn't
+make much sense -- since the result is exponential in the number of nodes
+in the routing table, small variations in the latter cause huge jumps in
+the former.
+
+* dht_get_nodes
+
+This retrieves the list of known good nodes, starting with the nodes in our
+own bucket.  It is a good idea to save the list of known good nodes at
+shutdown, and ping them at startup.
+
+* dht_dump_tables
+* dht_debug
+
+These are debugging aids.
+
+Functions provided by you
+*************************
+
+* The callback function
+
+The callback function is called with 5 arguments.  Closure is simply the
+value that you passed to dht_periodic.  Event is one of DHT_EVENT_VALUES or
+DHT_EVENT_VALUES6, which indicates that we have new values, or
+DHT_EVENT_SEARCH_DONE or DHT_EVENT_SEARCH_DONE6, which indicates that
+a search has completed.  In either case, info_hash is set to the info-hash
+of the search.
+
+In the case of DHT_EVENT_VALUES, data is a list of nodes in ``compact''
+format -- 6 or 18 bytes per node.  Its length in bytes is in data_len.
+
+* dht_hash
+
+This should compute a reasonably strong cryptographic hash of the passed
+values.  It should map cleanly to your favourite crypto toolkit's MD5 or
+SHA-1 function.
+
+* dht_random_bytes
+
+This should fill the supplied buffer with true random bytes.
+
+Final notes
+***********
+
+* NAT
+
+Nothing works well across NATs, but Kademlia is somewhat less impacted than
+many other protocols.  The implementation takes care to distinguish between
+unidirectional and bidirectional reachability, and NATed nodes will
+eventually fall out from other nodes' routing tables.
+
+While there is no periodic pinging in this implementation, maintaining
+a full routing table requires slightly more than one packet exchange per
+minute, even in a completely idle network; this should be sufficient to
+make most full cone NATs happy.
+
+* Missing functionality
+
+Some of the code has had very little testing.  If it breaks, you get to
+keep both pieces.
+
+
+                                        Juliusz Chroboczek
+                                        <jch@pps.jussieu.fr>

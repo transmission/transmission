@@ -1,0 +1,175 @@
+######################################################
+### ----- Message Stream Encryption protocol ----- ###
+### specification by Ludde/uau/The_8472/Parg/Nolar ###
+######################################################
+
+The following protocol describes a transparent wrapper for bidirectional
+data streams (e.g. TCP transports) that prevents passive eavesdroping
+and thus protocol or content identification.
+
+It is also designed to provide limited protection against active MITM attacks
+and portscanning by requiring a weak shared secret to complete the handshake.
+You should note that the major design goal was payload and protocol obfuscation,
+not peer authentication and data integrity verification. Thus it does not offer
+protection against adversaries which already know the necessary data to establish
+connections (that is IP/Port/Shared Secret/Payload protocol).
+
+To minimize the load on systems that employ this protocol fast cryptographic
+methods have been chosen over maximum-security algorithms.
+
+
+----------------
+- Declarations -
+----------------
+
+The entire handshake is in big-endian.
+The crypto handshake is transparent to the next upper protocol,
+thus the payload endianness doesn't matter.
+
+
+A is the initiator of the underlying transport (e.g. a TCP connection)
+B is the receiver
+
+##### DH Parameters
+
+Prime P is a 768 bit safe prime, "0xFFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD129024E088A67CC74020BBEA63B139B22514A08798E3404DDEF9519B3CD3A431B302B0A6DF25F14374FE1356D6D51C245E485B576625E7EC6F44C42E9A63A36210000000000090563"
+Generator G is "2"
+
+Xa and Xb are a variable size random integers. 
+They are the private key for each side and have to be discarded after
+the DH handshake is done. Minimum length is 128 bit. Anything beyond 180 bit
+is not believed to add any further security and only increases the necessary
+calculation time. You should use a length of 160bits whenever possible, lower
+values may be used when CPU time is scarce.
+
+Pubkey of A: Ya = (G^Xa) mod P
+Pubkey of B: Yb = (G^Xb) mod P
+
+DH secret: S = (Ya^Xb) mod P = (Yb^Xa) mod P
+
+P, S, Ya and Yb are 768bits long
+
+##### Constants/Variables
+
+
+PadA, PadB: Random data with a random length of 0 to 512 bytes each
+
+PadC, PadD: Arbitrary data with a length of 0 to 512 bytes, can be
+used to extend the crypto handshake in future versions.
+Current implementations may choose to set them to 0-length.
+For padding-only usage in the current version they should be zeroed.
+
+
+VC is a verification constant that is used to verify whether the other
+side knows S and SKEY and thus defeats replay attacks of the SKEY hash.
+As of this version VC is a String of 8 bytes set to 0x00.
+
+
+crypto_provide and crypto_select are a 32bit bitfields.
+As of now 0x01 means plaintext, 0x02 means RC4. (see Functions)
+The remaining bits are reserved for future use.
+
+The initiating peer A should provide all methods he supports in the bitfield,
+but he may choose only to provide higher encryption levels e.g. if  plaintext
+isn't sufficient for it's security needs.
+The responding peer B should set a bit corresponding to the single method
+which he selected from the provided ones.
+
+Bits with an unknown meaning in crypto_provide and crypto_select
+should be ignored as they might be used in future versions.
+
+
+
+
+
+SKEY = Stream Identifier/Shared secret used to drop connections early if we
+don't have a matching stream. It's additionally used to harden the protocol
+against MITM attacks and portscanning.
+Protocols w/o unique stream properties may use a constant.
+ Note: For BitTorrent, the SKEY should be the torrent info hash.
+
+
+IA = initial payload data from A
+may be 0-sized if you want to wait for the encryption negotation.
+
+Peer A may buffer up to 65535 bytes before or during the DH handshake to append
+it to the 3rd step. IA is considered as atomic and thus an implementation may
+not expect that anything is handed to the upper layer before IA is completely
+transmitted. Thus there must be no blocking operations within IA.
+
+Note, Example for Bittorrent:
+ After \19Bittorrent protocol + the BT handshake a block occurs since A waits
+ for B to send his handshake before A continues to send his bitfield,
+ thus IA can only include the prefix + the bt handshake but not the bitfield
+
+
+###### Functions
+
+len(X) specifies the length of X in 2 bytes.
+Thus the maximum length that can be specified is 65535 bytes, this is
+important for the IA block.
+
+
+ENCRYPT() is RC4, that uses one of the following keys to send data:
+"HASH('keyA', S, SKEY)" if you're A
+"HASH('keyB', S, SKEY)" if you're B
+The first 1024 bytes of the RC4 output are discarded.
+consecutive calls to ENCRYPT() by one side continue the encryption
+stream (no reinitialization, no keychange). They are only used to distinguish
+semantically seperate content. 
+
+
+ENCRYPT2() is the negotiated crypto method.
+Current options are:
+ 0x01 Plaintext. After the specified length (see IA/IB) each side sends unencrypted payload
+ 0x02 RC4-128. The ENCRYPT() RC4 encoding is continued (no reinitialization, no keychange)
+
+
+HASH() is SHA1 binary output (20 bytes)
+
+
+###### The handshake "packet" format
+
+
+The handshake is seperated into 5 blocking steps.
+
+1 A->B: Diffie Hellman Ya, PadA
+2 B->A: Diffie Hellman Yb, PadB
+3 A->B: HASH('req1', S), HASH('req2', SKEY) xor HASH('req3', S), ENCRYPT(VC, crypto_provide, len(PadC), PadC, len(IA)), ENCRYPT(IA)
+4 B->A: ENCRYPT(VC, crypto_select, len(padD), padD), ENCRYPT2(Payload Stream)
+5 A->B: ENCRYPT2(Payload Stream)
+
+
+Since the length of PadA and PadB are unknown
+B will be able to resynchronize on HASH('req1', S)
+A will be able to resynchronize on ENCRYPT(VC)
+
+
+##### Optional early termination conditions
+(should verified before the indicated step is started).
+
+If a fail-fast behavior is prefered the following conditions can be used to
+disconnect the peer immediately. If less recognizable patterns are preferred
+a peer may wait and disconnect at a later point. If any of these conditions
+are met the handshake can be considered as invalid.
+
+2 (termination by B)
+if A sent less than 96 Bytes within 30 seconds
+if A sent more than 608 bytes 
+
+3 (termination by A)
+if B sent less than 96 Bytes within 30 seconds
+if B sent more than 608 bytes
+
+4 (termination by B)
+if A didn't send the correct S hash within 628 bytes after the connection start (synchronisation point)
+if A didn't send a supported SKEY hash after the S hash
+if VC can't be decoded correctly after the SKEY hash
+if none of the crypto_provide options are supported or the bitfield is zeroed
+from here on it's up to the next protocol layer to terminate the connection
+
+5 (termination by A)
+if VC can't be decoded correctly within 616 bytes after the connection start (synchronisation point)
+if the selected crypto method wasn't provided
+from here on it's up to the next protocol layer to terminate the connection
+
