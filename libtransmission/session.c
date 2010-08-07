@@ -642,14 +642,10 @@ tr_sessionInitImpl( void * vdata )
     tr_sessionSet( session, &settings );
 
     if( session->isDHTEnabled )
-    {
         tr_dhtInit( session, &session->public_ipv4->addr );
-    }
 
-    if( !session->isLPDEnabled )
-        tr_ndbg( "LPD", _( "Local Peer Discovery disabled" ) );
-    else if( tr_lpdInit( session, &session->public_ipv4->addr ) )
-        tr_ninf( "LPD", _( "Local Peer Discovery active" ) );
+    if( session->isLPDEnabled )
+        tr_lpdInit( session, &session->public_ipv4->addr );
 
     /* cleanup */
     tr_bencFree( &settings );
@@ -1730,7 +1726,7 @@ tr_sessionClose( tr_session * session )
 
     assert( tr_isSession( session ) );
 
-    dbgmsg( "shutting down transmission session %p", session );
+    dbgmsg( "shutting down transmission session %p... now is %zu, deadline is %zu", session, (size_t)time(NULL), (size_t)deadline );
 
     /* close the session */
     tr_runInEventThread( session, sessionCloseImpl, session );
@@ -1747,8 +1743,8 @@ tr_sessionClose( tr_session * session )
     while( ( session->shared || session->web || session->announcer )
            && !deadlineReached( deadline ) )
     {
-        dbgmsg( "waiting on port unmap (%p) or announcer (%p)",
-                session->shared, session->announcer );
+        dbgmsg( "waiting on port unmap (%p) or announcer (%p)... now %zu deadline %zu",
+                session->shared, session->announcer, (size_t)time(NULL), (size_t)deadline );
         tr_wait_msec( 100 );
     }
 
@@ -1759,15 +1755,18 @@ tr_sessionClose( tr_session * session )
     while( session->events != NULL )
     {
         static tr_bool forced = FALSE;
-        dbgmsg( "waiting for libtransmission thread to finish" );
+        dbgmsg( "waiting for libtransmission thread to finish... now %zu deadline %zu", (size_t)time(NULL), (size_t)deadline );
         tr_wait_msec( 500 );
         if( deadlineReached( deadline ) && !forced )
         {
-            event_loopbreak( );
+            dbgmsg( "calling event_loopbreak()" );
             forced = TRUE;
-
-            if( time( NULL ) >= deadline + 3 )
-                break;
+            event_loopbreak( );
+        }
+        if( deadlineReached( deadline+3 ) )
+        {
+            dbgmsg( "deadline+3 reached... calling break...\n" );
+            break;
         }
     }
 
@@ -1909,13 +1908,29 @@ tr_sessionSetDHTEnabled( tr_session * session, tr_bool enabled )
         tr_runInEventThread( session, toggleDHTImpl, session );
 }
 
-void
-tr_sessionSetLPDEnabled( tr_session * session,
-                         tr_bool      enabled )
+static void
+toggleLPDImpl(  void * data )
 {
+    tr_session * session = data;
     assert( tr_isSession( session ) );
 
-    session->isLPDEnabled = ( enabled != 0 );
+    if( session->isLPDEnabled )
+        tr_lpdUninit( session );
+
+    session->isLPDEnabled = !session->isLPDEnabled;
+
+    if( session->isLPDEnabled )
+        tr_lpdInit( session, &session->public_ipv4->addr );
+}
+
+void
+tr_sessionSetLPDEnabled( tr_session * session, tr_bool enabled )
+{
+    assert( tr_isSession( session ) );
+    assert( tr_isBool( enabled ) );
+
+    if( ( enabled != 0 ) != ( session->isLPDEnabled != 0 ) )
+        tr_runInEventThread( session, toggleLPDImpl, session );
 }
 
 tr_bool
