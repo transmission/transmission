@@ -17,6 +17,7 @@
 #include <libtransmission/makemeta.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h>
+#include <libtransmission/version.h>
 
 #define MY_NAME "transmission-create"
 
@@ -24,6 +25,7 @@
 static tr_tracker_info trackers[MAX_TRACKERS];
 static int trackerCount = 0;
 static tr_bool isPrivate = FALSE;
+static tr_bool showVersion = FALSE;
 const char * comment = NULL;
 const char * outfile = NULL;
 const char * infile = NULL;
@@ -34,6 +36,7 @@ static tr_option options[] =
   { 'o', "outfile", "Save the generated .torrent to this filename", "o", 1, "<file>" },
   { 'c', "comment", "Add a comment", "c", 1, "<comment>" },
   { 't', "tracker", "Add a tracker's announce URL", "t", 1, "<url>" },
+  { 'V', "version", "Show version number and exit", "V", 0, NULL },
   { 0, NULL, NULL, NULL, 0, NULL }
 };
 
@@ -53,6 +56,7 @@ parseCommandLine( int argc, const char ** argv )
     {
         switch( c )
         {
+            case 'V': showVersion = TRUE; break;
             case 'p': isPrivate = TRUE; break;
             case 'o': outfile = optarg; break;
             case 'c': comment = optarg; break;
@@ -93,6 +97,11 @@ main( int argc, char * argv[] )
 
     if( parseCommandLine( argc, (const char**)argv ) )
         return EXIT_FAILURE;
+
+    if( showVersion ) {
+        fprintf( stderr, MY_NAME" "LONG_VERSION_STRING"\n" );
+        return 0;
+    }
 
     if( !infile )
     {

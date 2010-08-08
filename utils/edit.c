@@ -18,20 +18,23 @@
 #include <libtransmission/bencode.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h>
+#include <libtransmission/version.h>
 
 #define MY_NAME "transmission-edit"
 
-int fileCount = 0;
-const char ** files = NULL;
-const char * add = NULL;
-const char * deleteme = NULL;
-const char * replace[2] = { NULL, NULL };
+static int fileCount = 0;
+static tr_bool showVersion = FALSE;
+static const char ** files = NULL;
+static const char * add = NULL;
+static const char * deleteme = NULL;
+static const char * replace[2] = { NULL, NULL };
 
 static tr_option options[] =
 {
   { 'a', "add", "Add a tracker's announce URL", "a", 1, "<url>" },
   { 'd', "delete", "Delete a tracker's announce URL", "d", 1, "<url>" },
   { 'r', "replace", "Search and replace a substring in the announce URLs", "r", 1, "<old> <new>" },
+  { 'V', "version", "Show version number and exit", "V", 0, NULL },
   { 0, NULL, NULL, NULL, 0, NULL }
 };
 
@@ -59,6 +62,8 @@ parseCommandLine( int argc, const char ** argv )
                       c = tr_getopt( getUsage( ), argc, argv, options, &optarg );
                       if( c != TR_OPT_UNK ) return 1;
                       replace[1] = optarg;
+                      break;
+            case 'V': showVersion = TRUE;
                       break;
             case TR_OPT_UNK: files[fileCount++] = optarg; break;
             default: return 1;
@@ -257,6 +262,12 @@ main( int argc, char * argv[] )
 
     if( parseCommandLine( argc, (const char**)argv ) )
         return EXIT_FAILURE;
+
+    if( showVersion )
+    {
+        fprintf( stderr, MY_NAME" "LONG_VERSION_STRING"\n" );
+        return 0;
+    }
 
     if( fileCount < 1 )
     {
