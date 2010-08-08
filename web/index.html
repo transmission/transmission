@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		<meta http-equiv="cache-control" content="Private" />
-		<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
-		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta http-equiv="Cache-Control" content="Private">
+		<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+		<meta name="apple-mobile-web-app-capable" content="yes">
 		<link href="./images/favicon.ico" rel="icon" />
 		<link href="./images/favicon.png" rel="shortcut icon" />
 		<link rel="apple-touch-icon" href="./images/webclip-icon.png"/>
-		<script type="text/javascript" src="./javascript/jquery/jquery.min.js"></script>
+                <link type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="Stylesheet"/>
+                <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+                <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
 		<link media="only screen and (max-device-width: 480px)" href="./stylesheets/iphone.css" type= "text/css" rel="stylesheet" />
 		<link media="screen and (min-device-width: 481px)" href="./stylesheets/common.css" type="text/css" rel="stylesheet" />
 		<!--[if IE]>
@@ -21,12 +23,11 @@
 		<script type="text/javascript" src="./javascript/jquery/jquery.contextmenu.min.js"></script>
 		<script type="text/javascript" src="./javascript/menu.js"></script>
 		<script type="text/javascript" src="./javascript/jquery/jquery.form.min.js"></script>
-		<script type="text/javascript" src="./javascript/jquery/json.min.js"></script>
+		<script type="text/javascript" src="./javascript/jquery/json2.min.js"></script>
 		<script type="text/javascript" src="./javascript/common.js"></script>
 		<script type="text/javascript" src="./javascript/transmission.remote.js"></script>
 		<script type="text/javascript" src="./javascript/transmission.js"></script>
 		<script type="text/javascript" src="./javascript/torrent.js"></script>
-		<script type="text/javascript" src="./javascript/dialog.js"></script>
 		<script type="text/javascript" src="./javascript/formatter.js"></script>
 		<title>Transmission Web Interface</title>
 	</head>
@@ -204,181 +205,141 @@
 		</div>
 
 		<div id="torrent_container">
-			<ul class="torrent_list" id="torrent_list"><li style="display: none;"></li></ul>
+		<ul class="torrent_list" id="torrent_list"><li style="display: none;"></li></ul>
 		</div>
 
-		<div class="dialog_container" id="dialog_container" style="display:none;">
-			<div class="dialog_top_bar"></div>
-			<div class="dialog_window">
-				<img src="images/graphics/logo.png" alt="Transmission Logo" />
-				<h2 class="dialog_heading" id="dialog_heading"></h2>
-				<div class="dialog_message" id="dialog_message"></div>
-				<a href="#confirm" id="dialog_confirm_button">Confirm</a>
-				<a href="#cancel" id="dialog_cancel_button">Cancel</a>
-			</div>
+		<div id="dialog" style="display:none;">
+			<img src="images/graphics/logo.png" style="float:left; margin: 10px;"/>
+			<p id="dialog_body" style="text-align:left"></p>
 		</div>
 
-		<div class="dialog_container" id="prefs_container" style="display:none;">
-			<div class="dialog_top_bar"></div>
-			<div class="dialog_window">
-				<h2 class="dialog_heading">Preferences</h2>
-				<div id="pref_error"></div>
-				<form action="" id="prefs_form">
-					<div id="prefs_tabs">
-						<ul>
-							<li id="prefs_tab_general_tab" class="prefs_tab_enabled">General</li>
-							<li id="prefs_tab_speed_tab" class="prefs_tab_disabled">Speed</li>
-						</ul>
-						<div id="prefs_tab_general" class="prefs_tab">
-							<div class="preference download_location">
-								<label class="category">Add transfers:</label>
-								<div class="formdiv">
-									<label for="download_location" class="item">Download to:</label>
-									<input type="text" name="download_location" id="download_location"/>
-								</div>
-								<div class="formdiv checkbox auto_start">
-									<input type="checkbox" name="auto_start" id="auto_start"/>
-									<label for="auto_start" class="item">Start transfers when added</label>
-								</div>
-							</div>
-							<div class="preference port">
-								<label class="category">Network:</label>
-								<div class="formdiv">
-									<label for="port" class="item">Incoming TCP Port:</label>
-									<input type="text" id="port" name="port"/>
-								</div>
-							</div>
-							<div class="preference encryption">
-								<label class="category">Encryption:</label>
-								<div class="formdiv checkbox">
-									<input type="checkbox" name="encryption" id="encryption"/>
-									<label for="encryption" class="item">Ignore unencrypted peers</label>
-								</div>
-							</div>
-							<div class="preference web_gui">
-								<label class="category">Web Client:</label>
-								<div class="formdiv">
-									<label for="refresh_rate" class="item">Refresh Rate:</label>
-									<input type="text" name="refresh_rate" id="refresh_rate"/>
-									<label class="suffix">seconds</label>
-								</div>
-							</div>
-							<div style="clear: both; visibility: hidden;"></div>
-						</div>
-						<div id="prefs_tab_speed" class="prefs_tab" style="display: none;">
-							<div class="preference limit_total">
-								<label class="category">Speed Limits:</label>
-								<div class="formdiv checkbox">
-									<input type="checkbox" name="limit_download" id="limit_download"/>
-									<label for="limit_download" class="item">Download Rate:</label>
-									<input type="text" name="download_rate" id="download_rate"/>
-									<label class="suffix">kB/s</label>
-								</div>
-								<div class="formdiv checkbox">
-									<input type="checkbox" name="limit_upload" id="limit_upload"/>
-									<label for="limit_upload" class="item">Upload Rate:</label>
-									<input type="text" name="upload_rate" id="upload_rate"/>
-									<label class="suffix">kB/s</label>
-								</div>
-							</div>
-							<div class="preference limit_turtle">
-								<label class="category">Temporary Speed Limits: (Turtle)</label>
-								<label>Override normal speed limits manually or at scheduled times</label>
-								<div class="formdiv">
-									<label for="turtle_download_rate" class="item">Download Rate:</label>
-									<input type="text" name="turtle_download_rate" id="turtle_download_rate"/>
-									<label class="suffix">kB/s</label>
-								</div>
-								<div class="formdiv">
-									<label for="turtle_upload_rate" class="item">Upload Rate:</label>
-									<input type="text" name="turtle_upload_rate" id="turtle_upload_rate"/>
-									<label class="suffix">kB/s</label>
-								</div>
-								<div class="formdiv checkbox">
-									<input type="checkbox" name="turtle_schedule" id="turtle_schedule"/>
-									<label for="turtle_schedule" class="item">Scheduled times:</label>
-									<select name="turtle_start_time" id="turtle_start_time" size="1">
-									</select>
-									<select name="turtle_end_time" id="turtle_end_time" size="1">
-									</select>
-								</div>
-								<div class="formdiv">
-									<label for="turtle_days" class="item">On days:</label>
-									<select name="turtle_days" id="turtle_days" size="1">
-										<option value="127">Everyday</option>
-										<option value="62">Weekdays</option>
-										<option value="65">Weekends</option>
-										<option value="1">Sunday</option>
-										<option value="2">Monday</option>
-										<option value="4">Tuesday</option>
-										<option value="8">Wednesday</option>
-										<option value="16">Thursday</option>
-										<option value="32">Friday</option>
-										<option value="64">Saturday</option>
-									</select>
-								</div>
-							</div>
-							<div style="clear: both; visibility: hidden;"></div>
-						</div>
-					</div>
-					<span id="transmission_version"></span>
-					<a href="#save" id="prefs_save_button">Save</a>
-					<a href="#cancel" id="prefs_cancel_button">Cancel</a>
-				</form>
-			</div>
+		<div id="stats_dialog" style="display:none;">
+			<table>
+
+			<tr><td colspan="4" class="dialog_section_title">Current Session</td></tr>
+			<tr><td rowspan="5" class="dialog_col_1"></td><td></td><td rowspan="5" class="dialog_col_3"></td><td></td></tr>
+			<tr><td>Uploaded:</td><td id="stats_session_uploaded"></td></tr>
+			<tr><td>Downloaded:</td><td id="stats_session_downloaded"></td></tr>
+			<tr><td>Ratio:</td><td id="stats_session_ratio"></td></tr>
+			<tr><td>Duration:</td><td id="stats_session_duration"></td></tr>
+
+			<tr><td colspan="4" class="dialog_section_title">Total Session</td></tr>
+			<tr><td rowspan="6" class="dialog_col_1"></td><td></td><td rowspan="6" class="dialog_col_3"></td><td></td></tr>
+			<tr><td colspan="3" id="stats_total_count"></td></tr>
+			<tr><td>Uploaded:</td><td id="stats_total_uploaded"></td></tr>
+			<tr><td>Downloaded:</td><td id="stats_total_downloaded"></td></tr>
+			<tr><td>Ratio:</td><td id="stats_total_ratio"></td></tr>
+			<tr><td>Duration:</td><td id="stats_total_duration"></td></tr>
+			</table>
 		</div>
 
-		<div class="dialog_container" id="stats_container" style="display:none;">
-			<div class="dialog_top_bar"></div>
-			<div class="dialog_window">
-				<h2 class="dialog_heading">Statistics</h2>
-				<div id="stats_error"></div>
-				<div id="stats_info_container" class="stats_info_container">
-					<div class="stats_group">
-						<label class="category">Current Session:</label>
-						<div class="stats_row">
-							<div class="item">Uploaded:</div>
-							<div id="stats_session_uploaded"></div>
+		<div id="prefs_dialog" style="display:none;">
+			<form action="">
+			<div id="prefs_tabs">
+				<ul>
+					<li><a href="#prefs_tab_torrent">Torrents</a>
+					<li><a href="#prefs_tab_speed">Speed</a>
+					<li><a href="#prefs_tab_privacy">Privacy</a>
+					<li><a href="#prefs_tab_network">Network</a>
+				</ul>
+				<div id="prefs_tab_torrent">
+					<table>
+
+					<tr><td colspan="4" class="dialog_section_title">Adding</td></tr>
+					<tr><td rowspan="4" class="dialog_col_1"></td><td></td><td rowspan="4" class="dialog_col_3"></td><td></td></tr>
+					<tr><td>Save to Location:</td><td><input type="text" id="download-dir"/></td></tr>
+					<tr><td colspan="3"><input type="checkbox" id="auto-start"/>Start when added</td></tr>
+					<tr><td colspan="3"><input type="checkbox" id="rename-partial-files"/>Append ".part" to incomplete files' names</td></tr>
+
+					<tr><td colspan="4" class="dialog_section_title">Seeding Limits</td></tr>
+					<tr><td rowspan="3" class="dialog_col_1"></td><td></td><td rowspan="3" class="dialog_col_3"></td><td></td></tr>
+					<tr><td><input type="checkbox" id="seedRatioLimited"/>Stop seeding at ratio:</td><td><input type="text" id="seedRatioLimit"/></td></tr>
+					<tr><td><input type="checkbox" id="idle-seeding-limit-enabled"/>Stop seeding if idle for N minutes:</td><td><input type="text" id="idle-seeding-limit"/></td></tr>
+
+					</table>
+				</div>
+				<div id="prefs_tab_speed">
+					<table>
+
+					<tr><td colspan="4" class="dialog_section_title">Speed Limits</td></tr>
+					<tr><td rowspan="3" class="dialog_col_1"></td><td></td><td rowspan="3" class="dialog_col_3"></td><td></td></tr>
+					<tr><td><input type="checkbox" id="speed-limit-down-enabled"/>Limit download speed (KiB/s):</td><td><input type="text" id="speed-limit-down"></td></tr>
+					<tr><td><input type="checkbox" id="speed-limit-up-enabled"/>Limit upload speed (KiB/s):</td><td><input type="text" id="speed-limit-up"></td></tr>
+
+					<tr><td colspan="4" class="dialog_section_title">Temporary Speed Limits <img src="images/graphics/turtle.png"></td></tr>
+					<tr><td rowspan="6" class="dialog_col_1"></td><td></td><td rowspan="6" class="dialog_col_3"></td><td></td></tr>
+					<tr><td colspan="4"><i>Override normal speed limits manually or at scheduled times</i></td></tr>
+					<tr><td>Limit download speed (KiB/s):</td><td><input type="text" id="alt-speed-down"></td></tr>
+					<tr><td>Limit upload speed (KiB/s):</td><td><input type="text" id="alt-speed-up"></td></tr>
+					<tr><td><input type="checkbox" id="alt-speed-time-enabled"/>Scheduled times:</td>
+						<td><select id="alt-speed-time-begin" size="1"></select> to <select id="alt-speed-time-end" size="1"></select></td></tr>
+					<tr><td>On days:</td><td><select id="alt-speed-time-day" size="1">
+									<option value="127">Everyday</option>
+									<option value="62">Weekdays</option>
+									<option value="65">Weekends</option>
+									<option value="1">Sunday</option>
+									<option value="2">Monday</option>
+									<option value="4">Tuesday</option>
+									<option value="8">Wednesday</option>
+									<option value="16">Thursday</option>
+									<option value="32">Friday</option>
+									<option value="64">Saturday</option>
+								</select></td></tr>
+					</table>
+				</div>
+				<div id="prefs_tab_privacy">
+					<table>
+					<tr><td colspan="4"><div class="dialog_section_title">Blocklist</div></td></tr>
+					<tr><td rowspan="2" class="dialog_col_1"></td>
+						<td><input type="checkbox" id="blocklist-enabled">Enable blocklist (<span id="blocklist-size">0</span> rules)</td>
+						<td class="dialog_col_3"></td>
+						<td><button type="button" id="blocklist-update">Update</button><img id="blocklist-update-spinner" src="images/graphics/wait20.gif"></td></tr>
+					<tr><td colspan="4"><div class="dialog_section_title">Privacy</div></td></tr>
+					<tr><td rowspan="4" class="dialog_col_1"></td><td>Encryption mode:</td><td rowspan="4" class="dialog_col_3"></td><td><select id="encryption">
+						<option value="tolerated">Allow encryption</option>
+						<option value="preferred">Prefer encryption</option>
+						<option value="required">Require encryption</option>
+						</select></td></tr>
+					<tr><td colspan="3"><input type="checkbox" id="pex-enabled"/>Use PEX to find more peers</td></tr>
+					<tr><td colspan="3"><input type="checkbox" id="dht-enabled"/>Use DHT to find more peers</td></tr>
+					<tr><td colspan="3"><input type="checkbox" id="lpd-enabled"/>Use Local Peer Discovery to find more peers</td></tr>
+					</table>
+				</div>
+				<div id="prefs_tab_network">
+					<table>
+
+					<tr><td colspan="4" class="dialog_section_title">Incoming Peers</td></tr>
+					<tr><td rowspan="5" class="dialog_col_1"></td><td></td><td rowspan="5" class="dialog_col_3"></td><td></td></tr>
+					<tr><td>Port for incoming connections:</td><td><input type="text" id="peer-port"/></td></tr>
+					<tr><td></td><td><button type="button" id="port-test">Test</button>    <span id="port-status-label">Status Unknown</span> <img id="port-status-spinner" src="images/graphics/wait20.gif"></td></tr>
+					<tr><td colspan="3"><input type="checkbox" id="peer-port-random-on-start"/>Pick a random port every time Transmission is started</td></tr>
+					<tr><td colspan="3"><input type="checkbox" id="port-forwarding-enabled"/>Use UPnP or NAT-PMP port forwarding from my router</td></tr>
+
+					<tr><td colspan="4" class="dialog_section_title">Limits</td></tr>
+					<tr><td rowspan="3" class="dialog_col_1"></td><td></td><td rowspan="3" class="dialog_col_3"></td><td></td></tr>
+					<tr><td>Maximum peers per torrent:</td><td><input type="text" id="peer-limit-per-torrent"/></td></tr>
+					<tr><td>Maximum peers overall:</td><td><input type="text" id="peer-limit-global"/></td></tr>
+						
+					</table>
+				</div>
+<!-- <label for="port" class="item">Incoming TCP Port:</label>
+								<input type="text" id="port" name="port"/>
+							</div>
 						</div>
-						<div class="stats_row">
-							<div class="item">Downloaded:</div>
-							<div id="stats_session_downloaded"></div>
+						<div class="preference web_gui">
+							<label class="category">Web Client:</label>
+							<div class="formdiv">
+								<label for="refresh_rate" class="item">Refresh Rate:</label>
+								<input type="text" name="refresh_rate" id="refresh_rate"/>
+								<label class="suffix">seconds</label>
+							</div>
 						</div>
-						<div class="stats_row">
-							<div class="item">Ratio:</div>
-							<div id="stats_session_ratio"></div>
-						</div>
-						<div class="stats_row">
-							<div class="item">Duration:</div>
-							<div id="stats_session_duration"></div>
-						</div>
-					</div>
-					<div class="stats_group">
-						<label class="category">Total:</label>
-						<div class="stats_row">
-							<div class="item2">Started </div>
-							<div id="stats_total_count"></div>
-						</div>
-						<div class="stats_row">
-							<div class="item">Uploaded:</div>
-							<div id="stats_total_uploaded"></div>
-						</div>
-						<div class="stats_row">
-							<div class="item">Downloaded:</div>
-							<div id="stats_total_downloaded"></div>
-						</div>
-						<div class="stats_row">
-							<div class="item">Ratio:</div>
-							<div id="stats_total_ratio"></div>
-						</div>
-						<div class="stats_row">
-							<div class="item">Duration:</div>
-							<div id="stats_total_duration"></div>
-						</div>
+						<div style="clear: both; visibility: hidden;"></div>
 					</div>
 				</div>
-				<a href="#close" id="stats_close_button">Close</a>
+-->
 			</div>
+			</form>
 		</div>
 
 		<div class="dialog_container" id="upload_container" style="display:none;">

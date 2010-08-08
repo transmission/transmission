@@ -976,125 +976,30 @@ div.torrent_footer div#turtle_button {
  *
  *--------------------------------------*/
 
-div.dialog_container {
-	position: absolute;
-	top: 0;
-	left: 0px;
-	margin: 0px;
-	width: 100%;
-	height: 100%;
-	text-align: center;
-	color: black;
-	font-size: 1.1em;
-}
-
-div.dialog_container div.dialog_window {
-	background-color: #eee;
-	margin: 0 auto;
-	filter: alpha(opacity=95);
-	-moz-opacity: .95;
-	opacity: .95;
-	border-top: none;
-	text-align: left;
-	width: 420px;
-	z-index: 4;
-	overflow: hidden;
-	position: relative;
-	-webkit-box-shadow: 0 3px 6px rgba(0,0,0,0.7);
-	top: 80px;
-}
-@media screen and (-webkit-min-device-pixel-ratio:0) {
-	div.dialog_container div.dialog_window {
-		top: 0;
-		margin-top: 71px;
-		z-index: 2
-	}
-}
-
-div#prefs_container div.dialog_window {
-	width: 410px;
-	padding: 0 15px;
-}
-
-div#stats_container div.dialog_window {
-	width: 255px;
-	padding: 0 15px;
-}
-
-div.dialog_container div.dialog_window img {
-	margin: 20px 20px 0 20px;
-	float: left;
-}
-
-div.dialog_container div.dialog_window h2.dialog_heading {
-	display: block;
-	float: left;
-	width: 305px;
-	font-size: 1.2em;
-	color: black;
-	margin-top: 20px;
-}
-
-div.dialog_container div.dialog_window div.dialog_message {
-	float: left;
-	padding-left: 3px;
-	margin-left: -3px;
-	width: 305px;
-	overflow: hidden;
-}
-
-div.dialog_container div.dialog_window a {
-	display: block;
-	float: right;
-	margin: 10px 20px 10px -8px;
-	padding: 5px;
-	background-color: #EEE;
-	border: 1px solid #787878;
-	width: 50px;
-	height: 15px;
-	text-align: center;
-	font-weight: bold;
-	text-decoration: none;
-	color: #323232;
-	-webkit-appearance: button;
-	font: -webkit-control;
-	cursor: default;
-}
-
-div.dialog_container div.dialog_window a:hover,
-div.dialog_container div.dialog_window a:active {
-	background: #C0C8D6 url('../images/graphics/filter_bar.png') bottom repeat-x;
-}
-
-div#upload_container div.dialog_window div.dialog_message label {
+div#upload_container label {
 	margin-top: 15px;
 	display: block;
 }
 
-div#upload_container div.dialog_window div.dialog_message input {
+div#upload_container input {
 	width: 249px;
 	margin: 3px 0 0 0;
 	display: block;
 }
 
-div#upload_container div.dialog_window div.dialog_message input[type=text] {
+div#upload_container input[type=text] {
 	width: 245px;
 	padding: 2px;
 }
 
-div#upload_container div.dialog_window div.dialog_message input[type=checkbox] {
+div#upload_container input[type=checkbox] {
 	margin: 15px 3px 0 0;
 	display: inline;
 	width: auto;
 }
 
-div#upload_container div.dialog_window div.dialog_message #auto_start_label {
+div#upload_container #auto_start_label {
 	display: inline;
-}
-
-div.dialog_container div.dialog_window form {
-	margin: 0;
-	padding: 0px;
 }
 
 iframe#torrent_upload_frame {
@@ -1109,187 +1014,28 @@ iframe#torrent_upload_frame {
 	margin: 0;
 }
 
-div#prefs_container label {
-	display: block;
-	margin: 0 0 0 2px;
+#stats_dialog * {
+	text-align: left;
+}
+.dialog_section_title {
+	padding-top: 8px;
+	font-weight: bold;
+	text-align: left;
 }
 
-div#prefs_container label.category {
-	clear: both;
-	font-size: 1.2em;
+.dialog_col_1 {
+	width: 12px;
+}
+.dialog_col_3 {
+	width: 8px;
 }
 
-div#prefs_container label.item {
-	font-size: 11px !important;
-	margin: 0 5px 0 20px;
-	float: left;
-}
-
-div#prefs_container label.suffix {
-	margin: 0 5px 0 10px;
-	float: left;
-}
-
-div#prefs_container div.formdiv.checkbox label.item {
-	margin: 0 5px 0 2px;
-}
-
-div#prefs_container div.limit_total label.item {
-	width: 102px;
-}
-
-div#prefs_container div.limit_turtle label.item {
-	width: 120px;
-}
-
-div#prefs_container div.preference input[type=checkbox] {
-	float: left;
-	margin-left: 20px;
-	margin-top: 9px;
-}
-@-moz-document url-prefix() {
-	div#prefs_container div.preference input[type=checkbox] {
-		margin-top: 8px;
-	}
-}
-
-div#prefs_container div.preference input[type=text] {
-	width: 50px;
-	padding: 0px !important;
-	height: 18px;
-	margin-top: 2px;
-}
-
-div#prefs_container div.preference input {
-	float: left;
-}
-
-div#prefs_container div.download_location input {
-	width: 256px !important;
-}
-div#prefs_container div.download_location .checkbox input {
-	width: auto !important;
-}
-
-div#prefs_container div.formdiv {
-	clear: both;
-	line-height: 30px;
-}
-
-div#prefs_container a {
-	clear: left;
-	margin: 10px 5px 10px 7px;
-}
-
-div#prefs_container h2.dialog_heading {
-	display: none;
-}
-
-div#prefs_container div#prefs_tabs {
-	clear: both;
-}
-
-div#prefs_container div#prefs_tabs ul {
-	margin: 0;
-	padding: 0 0 0 10px;
-}
-div#prefs_container div#prefs_tabs ul li {
-	display: block;
-	float: left;
-	font-size: 1.2em;
-	color: #323232;
-	text-align: center;
-	padding: 2px 20px;
-	border-left: 1px solid #787878;
-	border-right: 1px solid #787878;
-	border-top: 1px solid #787878;
-	margin-bottom: -1px;
-}
-.prefs_tab_disabled {
-	background: #C0C8D6 url('../images/graphics/filter_bar.png') bottom repeat-x;
-	border-bottom: 1px solid #787878;
-}
-.prefs_tab_enabled {
-	background: none;
-	border-bottom: 1px solid #efefef;
-}
-div#stats_container h2.dialog_heading {
-	display: none;
-}
-div#stats_container div#stats_error {
-	display: none;
-	width: 395px;
-	margin: 6px auto 6px auto;
-	padding: 3px 0 3px 0;
-	border: 2px solid #cc3333;
-	color: #cc3333;
-	font-size: 1.2em;
+#prefs_dialog * {
+	text-align: left;
 	vertical-align: middle;
-	text-align: center;
-	height: 20px;
-	line-height: 20px;
-	background-color: #FFEFEF;
 }
-.stats_info_container {
-	clear: both;
-	padding: 0px 7px 0px 7px;
-}
-.stats_group {
-	display: table;
-	margin: 5px 0px 0px 0px;
-	padding: 5px 0px 0px 0px;
-	width: 100%;
-}
-.stats_row {
-	display: table-row;
-}
-.stats_row > div {
-	padding-top: 4px;
-}
-div#stats_container label.category {
-	clear: both;
-	font-size: 1.2em;
-	margin: 5px 0px;
-}
-div#stats_container div.item {
-	font-size: 11px !important;
-	margin: 0 5px 0 20px;
-	float: left;
-	width: 100px;
-}
-div#stats_container div.item2 {
-	font-size: 11px !important;
-	margin: 0 5px 0 20px;
-	float: left;
-}
-div#stats_container a {
-	clear: left;
-	margin: 10px 5px 10px 7px;
-}
-
-div.dialog_container div#prefs_tabs ul li.prefs_tab_disabled:hover,
-div.dialog_container div#prefs_tabs ul li.prefs_tab_disabled:active {
-	background: none;
-}
-div#prefs_container div#prefs_tabs div.prefs_tab {
-	border-top: 1px solid #787878;
-	clear: both;
-	padding: 7px;
-}
-
-div#prefs_container div#pref_error {
-	display: none;
-	width: 395px;
-	margin: 6px auto 6px auto;
-	padding: 3px 0 3px 0;
-	border: 2px solid #cc3333;
-	color: #cc3333;
-	font-size: 1.2em;
-	vertical-align: middle;
-	text-align: center;
-	height: 20px;
-	line-height: 20px;
-	background-color: #FFEFEF;
+#prefs_tabs {
+	border: 0px;
 }
 
 #transmission_version{
