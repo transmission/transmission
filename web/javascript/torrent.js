@@ -782,6 +782,11 @@ Torrent.compareByActivity = function( a, b ) {
 };
 
 /** Helper function for sortTorrents(). */
+Torrent.compareBySize = function( a, b ) {
+	return a.size() - b.size();
+}
+
+/** Helper function for sortTorrents(). */
 Torrent.compareByProgress = function( a, b ) {
 	if( a.getPercentDone() !== b.getPercentDone() )
 		return a.getPercentDone() - b.getPercentDone();
@@ -816,6 +821,9 @@ Torrent.sortTorrents = function( torrents, sortMethod, sortDirection )
 			break;
 		case Prefs._SortByName:
 			torrents.sort( this.compareByName );
+			break;
+		case Prefs._SortBySize:
+			torrents.sort( this.compareBySize );
 			break;
 		default:
 			console.warn( "unknown sort method: " + sortMethod );

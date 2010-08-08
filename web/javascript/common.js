@@ -181,7 +181,6 @@ function tellUser( primaryText, secondaryText )
 	$("#dialog_body").html("<p><b>" + primaryText + "</b></p><p>" + secondaryText + "</p>" );
 	$("#dialog" ).dialog( {
 		title: primaryText,
-		show: 'blind',
 		hide: 'blind',
 		buttons: { 'Close': function() { $(this).dialog('close'); } }
 	});
@@ -205,7 +204,6 @@ function askUser(dialog_heading, dialog_message, confirm_button_label,
 	};
 	$("#dialog" ).dialog( {
 		title: dialog_heading,
-		show: 'blind',
 		hide: 'blind',
 		buttons: myButtons
 	});
@@ -242,6 +240,7 @@ Prefs._SortByActivity     = 'activity';
 Prefs._SortByQueue        = 'queue_order';
 Prefs._SortByName         = 'name';
 Prefs._SortByProgress     = 'percent_completed';
+Prefs._SortBySize         = 'size';
 Prefs._SortByState        = 'state';
 Prefs._SortByTracker      = 'tracker';
 

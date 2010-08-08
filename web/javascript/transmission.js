@@ -909,7 +909,6 @@ Transmission.prototype =
 			resizable: !fullscreen,
 			draggable: !fullscreen,
                         title: 'Preferences',
-                        show: 'blind',
                         hide: 'blind',
                         buttons: { }
 		};
@@ -1069,7 +1068,6 @@ Transmission.prototype =
 		tr.togglePeriodicStatsRefresh(true);
                 $("#stats_dialog" ).dialog( {
                         title: 'Statistics',
-                        show: 'blind',
                         hide: 'blind',
 			width: 200,
                         buttons: {
