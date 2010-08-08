@@ -1066,17 +1066,17 @@ Transmission.prototype =
 		var tr = this;
 		tr.loadDaemonStats();
 		tr.togglePeriodicStatsRefresh(true);
-                $("#stats_dialog" ).dialog( {
-                        title: 'Statistics',
-                        hide: 'blind',
-			width: 200,
-                        buttons: {
+		$("#stats_dialog" ).dialog( {
+			title: 'Statistics',
+			hide: 'blind',
+			width: 266,
+			buttons: {
 				'Close': function() {
 					tr.togglePeriodicStatsRefresh(false);
 					$(this).dialog('close');
 				}
 			}
-                });
+		});
 	},
 
 	/*
