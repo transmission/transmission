@@ -892,36 +892,33 @@ Transmission.prototype =
 	 *
 	 *--------------------------------------------*/
 
-	showPrefsDialog: function( ) {
+	showPrefsDialog: function( )
+	{
 		var tr = this;
-		$("#update_blocklist_button").button();
-		$("#prefs_tabs").tabs();
-		var args = { };
-		if( iPhone ) { // tailor the dialog geometry for iPhone
-			$.extend( args, {
-				width: 320,
-				height: 360,
-				resizable: false,
-				draggable: false,
-				position: [ 0, 0 ]
-			} );
-		} else {
-			$.extend( args, {
-				width: 450,
-				height: 400
-			} );
-		}
-		$.extend( args, {
+
+		var preferredWidth = 450;
+		var preferredHeight = 400;
+		var windowWidth = $(window).width();
+		var windowHeight = $(window).height();
+		var fullscreen = (windowWidth<=preferredWidth) || (windowHeight<=preferredHeight);
+
+		var args = {
+			close: function(event, ui) { tr.togglePeriodicSessionRefresh( true ); },
+			width: fullscreen ? windowWidth : preferredWidth,
+			height: fullscreen ? windowHeight : preferredHeight,
+			resizable: !fullscreen,
+			draggable: !fullscreen,
                         title: 'Preferences',
                         show: 'blind',
                         hide: 'blind',
-                        buttons: {
-				'Close': function() {
-					$(this).dialog('close');
-					tr.togglePeriodicSessionRefresh( true );
-				}
-			}
-		} );
+                        buttons: { }
+		};
+
+		if( fullscreen )
+			args.position = [ 0, 0 ];
+		else
+			args.buttons = { 'Close': function() { $(this).dialog('close'); } };
+
                 $("#prefs_dialog" ).dialog( args );
 		tr.togglePeriodicSessionRefresh( false );
 	},
@@ -962,6 +959,9 @@ Transmission.prototype =
 	initPrefs: function( )
 	{
 		var tr = this;
+
+		$("#update_blocklist_button").button();
+		$("#prefs_tabs").tabs();
 
 		$.each( this.prefsKeys, function( index, key ) {
 			$(':input#'+key).change( function( e ) {
