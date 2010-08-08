@@ -206,6 +206,7 @@ Details :: setIds( const QSet<int>& ids )
 
     myFileTreeView->clear( );
     myIds = ids;
+    myTrackerModel->refresh( myModel, myIds );
 
     // listen to the new torrents
     foreach( int id, myIds ) {
