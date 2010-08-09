@@ -550,7 +550,7 @@ main( int argc, char ** argv )
 
     if( showversion )
     {
-        fprintf( stderr, "%s %s\n", g_get_application_name( ), LONG_VERSION_STRING );
+        fprintf( stderr, "%s %s\n", MY_READABLE_NAME, LONG_VERSION_STRING );
         return 0;
     }
 

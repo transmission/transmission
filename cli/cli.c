@@ -67,6 +67,7 @@
 #define MY_CONFIG_NAME "transmission"
 #define MY_READABLE_NAME "transmission-cli"
 
+static tr_bool showVersion = FALSE;
 static tr_bool verify                = 0;
 static sig_atomic_t gotsig           = 0;
 static sig_atomic_t manualUpdate     = 0;
@@ -91,6 +92,7 @@ static const struct tr_option options[] =
     { 'u', "uplimit",              "Set max upload speed in "SPEED_K_STR, "u",  1, "<speed>"   },
     { 'U', "no-uplimit",           "Don't limit the upload speed", "U",  0, NULL        },
     { 'v', "verify",               "Verify the specified torrent", "v",  0, NULL        },
+    { 'V', "version",              "Show version number and exit", "V", 0, NULL },
     { 'w', "download-dir",         "Where to save downloaded data", "w",  1, "<path>"    },
     { 0, NULL, NULL, NULL, 0, NULL }
 };
@@ -228,8 +230,14 @@ main( int argc, char ** argv )
     tr_formatter_size_init( DISK_K,DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR );
     tr_formatter_speed_init( SPEED_K, SPEED_K_STR, SPEED_M_STR, SPEED_G_STR, SPEED_T_STR );
 
-    printf( "Transmission %s - http://www.transmissionbt.com/\n",
-            LONG_VERSION_STRING );
+    printf( "%s %s\n", MY_READABLE_NAME, LONG_VERSION_STRING );
+
+    /* the command line overrides defaults */
+    if( parseCommandLine( &settings, argc, (const char**)argv ) )
+        return EXIT_FAILURE;
+
+    if( showVersion )
+        return 0;
 
     /* user needs to pass in at least one argument */
     if( argc < 2 ) {
@@ -241,10 +249,6 @@ main( int argc, char ** argv )
     tr_bencInitDict( &settings, 0 );
     configDir = getConfigDir( argc, (const char**)argv );
     tr_sessionLoadSettings( &settings, configDir, MY_CONFIG_NAME );
-
-    /* the command line overrides defaults */
-    if( parseCommandLine( &settings, argc, (const char**)argv ) )
-        return EXIT_FAILURE;
 
     /* Check the options for validity */
     if( !torrentPath ) {
@@ -390,7 +394,9 @@ parseCommandLine( tr_benc * d, int argc, const char ** argv )
                       break;
             case 'U': tr_bencDictAddBool( d, TR_PREFS_KEY_USPEED_ENABLED, FALSE );
                       break;
-            case 'v': verify = 1;
+            case 'v': verify = TRUE;
+                      break;
+            case 'V': showVersion = TRUE;
                       break;
             case 'w': tr_bencDictAddStr( d, TR_PREFS_KEY_DOWNLOAD_DIR, optarg );
                       break;

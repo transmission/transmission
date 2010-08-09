@@ -197,9 +197,9 @@ static const char*
 getUsage( void )
 {
     return
-        "Transmission " LONG_VERSION_STRING
-        "  http://www.transmissionbt.com/\n"
+        MY_NAME" "LONG_VERSION_STRING"\n"
         "A fast and easy BitTorrent client\n"
+        "http://www.transmissionbt.com/\n"
         "\n"
         "Usage: " MY_NAME
         " [host] [options]\n"
@@ -1828,7 +1828,7 @@ processArgs( const char * host, int port, int argc, const char ** argv )
                     break;
 
                 case 'V': /* show version number */
-                    fprintf( stderr, "Transmission %s\n", LONG_VERSION_STRING );
+                    fprintf( stderr, "%s %s\n", MY_NAME, LONG_VERSION_STRING );
                     exit( 0 );
                     break;
 

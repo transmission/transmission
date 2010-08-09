@@ -49,7 +49,9 @@ namespace
     const char * DBUS_OBJECT_PATH ( "/com/transmissionbt/Transmission" );
     const char * DBUS_INTERFACE   ( "com.transmissionbt.Transmission"  );
 
-    const char * MY_NAME( "transmission" );
+    const char * MY_CONFIG_NAME( "transmission" );
+    const char * MY_READABLE_NAME( "transmission-qt" );
+
 
     const tr_option opts[] =
     {
@@ -73,7 +75,7 @@ namespace
     void
     showUsage( void )
     {
-        tr_getopt_usage( MY_NAME, getUsage( ), opts );
+        tr_getopt_usage( MY_READABLE_NAME, getUsage( ), opts );
         exit( 0 );
     }
 
@@ -89,7 +91,7 @@ MyApp :: MyApp( int& argc, char ** argv ):
     QApplication( argc, argv ),
     myLastFullUpdateTime( 0 )
 {
-    setApplicationName( MY_NAME );
+    setApplicationName( MY_CONFIG_NAME );
 
     // install the qt translator
     QTranslator qtTranslator;
@@ -98,7 +100,7 @@ MyApp :: MyApp( int& argc, char ** argv ):
 
     // install the transmission translator
     QTranslator appTranslator;
-    appTranslator.load( QString(MY_NAME) + "_" + QLocale::system().name() );
+    appTranslator.load( QString(MY_READABLE_NAME) + "_" + QLocale::system().name() );
     installTranslator( &appTranslator );
 
     Formatter::initUnits( );
@@ -130,7 +132,7 @@ MyApp :: MyApp( int& argc, char ** argv ):
             case 'u': username = optarg; break;
             case 'w': password = optarg; break;
             case 'm': minimized = true; break;
-            case 'v':        Utils::toStderr( QObject::tr( "transmission %1" ).arg( LONG_VERSION_STRING ) ); ::exit( 0 ); break;
+            case 'v': std::cerr << MY_READABLE_NAME << ' ' << LONG_VERSION_STRING << std::endl; ::exit( 0 ); break;
             case TR_OPT_ERR: Utils::toStderr( QObject::tr( "Invalid option" ) ); showUsage( ); break;
             default:         filenames.append( optarg ); break;
         }
@@ -138,7 +140,7 @@ MyApp :: MyApp( int& argc, char ** argv ):
 
     // set the fallback config dir
     if( configDir == 0 )
-        configDir = tr_getDefaultConfigDir( MY_NAME );
+        configDir = tr_getDefaultConfigDir( MY_CONFIG_NAME );
 
     // is this the first time we've run transmission?
     const bool firstTime = !QFile(QDir(configDir).absoluteFilePath("settings.json")).exists();

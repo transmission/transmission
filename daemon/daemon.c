@@ -382,7 +382,7 @@ main( int argc, char ** argv )
             case 'g': /* handled above */
                       break;
             case 'V': /* version */
-                      fprintf(stderr, "Transmission %s\n", LONG_VERSION_STRING);
+                      fprintf(stderr, "%s %s\n", MY_NAME, LONG_VERSION_STRING);
                       exit( 0 );
             case 'o': tr_bencDictAddBool( &settings, TR_PREFS_KEY_DHT_ENABLED, TRUE );
                       break;
