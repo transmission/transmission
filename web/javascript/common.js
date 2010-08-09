@@ -229,6 +229,7 @@ Prefs._FilterActive       = 'active';
 Prefs._FilterSeeding      = 'seeding';
 Prefs._FilterDownloading  = 'downloading';
 Prefs._FilterPaused       = 'paused';
+Prefs._FilterFinished     = 'finished';
 
 Prefs._SortDirection      = 'sort_direction';
 Prefs._SortAscending      = 'ascending';

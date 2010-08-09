@@ -46,6 +46,7 @@ Transmission.prototype =
 		$('#filter_downloading_link').parent().bind('click', function(e){ tr.showDownloadingClicked(e); });
 		$('#filter_seeding_link').parent().bind('click', function(e){ tr.showSeedingClicked(e); });
 		$('#filter_paused_link').parent().bind('click', function(e){ tr.showPausedClicked(e); });
+		$('#filter_finished_link').parent().bind('click', function(e){ tr.showFinishedClicked(e); });
 		$('.inspector_tab').bind('click', function(e){ tr.inspectorTabClicked(e, this); });
 		$('.file_wanted_control').live('click', function(e){ tr.fileWantedClicked(e, this); });
 		$('.file_priority_control').live('click', function(e){ tr.filePriorityClicked(e, this); });
@@ -735,6 +736,7 @@ Transmission.prototype =
 			case Prefs._FilterSeeding:     c = '#filter_seeding_link'; break;
 			case Prefs._FilterDownloading: c = '#filter_downloading_link'; break;
 			case Prefs._FilterPaused:      c = '#filter_paused_link'; break;
+			case Prefs._FilterFinished:    c = '#filter_finished_link'; break;
 		}
 		$(c).parent().siblings().removeClass('selected');
 		$(c).parent().addClass('selected');
@@ -757,6 +759,9 @@ Transmission.prototype =
 	},
 	showPausedClicked: function(event) {
 		this.setFilter( Prefs._FilterPaused );
+	},
+	showFinishedClicked: function(event) {
+		this.setFilter( Prefs._FilterFinished );
 	},
 
 	/*

@@ -235,6 +235,7 @@ Torrent.prototype =
 					|| this.state() == Torrent._StatusChecking; },
 	isActive: function() { return this.state() != Torrent._StatusPaused; },
 	isDownloading: function() { return this.state() == Torrent._StatusDownloading; },
+	isFinished: function() { return this._isFinishedSeeding; },
 	isSeeding: function() { return this.state() == Torrent._StatusSeeding; },
 	name: function() { return this._name; },
 	peersSendingToUs: function() { return this._peers_sending_to_us; },
@@ -254,7 +255,7 @@ Torrent.prototype =
 		switch( this.state() ) {
 			case Torrent._StatusSeeding:        return 'Seeding';
 			case Torrent._StatusDownloading:    return 'Downloading';
-			case Torrent._StatusPaused:         return this._isFinishedSeeding ? 'Seeding complete' : 'Paused';
+			case Torrent._StatusPaused:         return this.isFinished() ? 'Seeding complete' : 'Paused';
 			case Torrent._StatusChecking:       return 'Verifying local data';
 			case Torrent._StatusWaitingToCheck: return 'Waiting to verify';
 			default:                            return 'error';
@@ -745,6 +746,9 @@ Torrent.prototype =
 				break;
 			case Prefs._FilterPaused:
 				pass = !this.isActive();
+				break;
+			case Prefs._FilterFinished:
+				pass = this.isFinished();
 				break;
 			default:
 				pass = true;
