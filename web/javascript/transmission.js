@@ -1428,7 +1428,7 @@ Transmission.prototype =
 					html += '<td class="percentCol">' + Math.floor(peer.progress*100) + '%' + '</td>';
 					html += '<td>' + peer.flagStr + '</td>';
 					html += '<td>' + peer.address + '</td>';
-					html += '<td>' + peer.clientName + '</td>';
+					html += '<td class="clientCol">' + peer.clientName + '</td>';
 					html += '</tr>';
 				}
 				html += '</table></div>';

@@ -309,12 +309,15 @@ div#torrent_filter_bar ul li.selected a {
 }
 
 div#torrent_filter_bar input#torrent_search {
-	float: right;
 	height: 15px;
 	width: 100px;
 	border: solid 0 #fff;
 	padding: 0 2px;
 	margin: 4px 5px 0 0;
+	position:absolute;
+	right: 0px;
+	top: 0px;
+	border-radius: 10px;
 }
 /* Safari-look filter input for Firefox */
 @-moz-document url-prefix() {
@@ -578,7 +581,7 @@ div#torrent_inspector {
 	top: 97px;
 	bottom: 22px;
 	right: 0px;
-	width: 500px;
+	width: 480px;
 	background-color: #ddd;
 	border-left: 1px solid #888;
 	z-index: 2;
@@ -671,6 +674,7 @@ table.peer_list {
 	text-align: left;
 	cursor: default;
 	clear: both;
+	table-layout: fixed;
 }
 
 .peer_list .encryptedCol {
@@ -704,6 +708,8 @@ table.peer_list {
 }
 
 .peer_list .clientCol {
+	white-space: nowrap;
+	overflow: hidden;
 	text-overflow: ellipsis;
 }
 
