@@ -208,6 +208,7 @@ div#torrent_filter_bar {
 	width: 100%;
 	z-index: 2;
 	text-align: center;
+	overflow: hidden;
 }
 
 div#torrent_filter_bar ul {
