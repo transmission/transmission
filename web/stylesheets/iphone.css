@@ -255,10 +255,6 @@ div#torrent_filter_bar ul li.selected a {
 	background-position: right top;
 }
 
-div#torrent_filter_bar .filter_finished_link {
-	display: none;
-}
-
 div#torrent_filter_bar ul li a.finished {
 	display: none;
 }
