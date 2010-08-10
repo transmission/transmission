@@ -143,7 +143,6 @@ getTimeoutFromURL( const struct tr_web_task * task )
     else if( strstr( task->url, "announce" ) != NULL ) timeout = 90L;
     else timeout = 240L;
 
-    fprintf( stderr, "timeout for [%s] is %ld\n", task->url, timeout );
     return timeout;
 }
 
