@@ -1817,6 +1817,8 @@ typedef struct tr_stat
     /** If downloading, estimated number of seconds left until the torrent is done.
         If seeding, estimated number of seconds left until seed ratio is reached. */
     int    eta;
+    /** If seeding, number of seconds left until the idle time limit is reached.. */
+    int    etaIdle;
 
     /** Number of peers that the tracker says this torrent has */
     int    peersKnown;

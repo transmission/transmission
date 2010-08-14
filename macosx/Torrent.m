@@ -357,6 +357,11 @@ int trashDataFile(const char * filename)
     return [NSString stringWithUTF8String: tr_torrentGetMagnetLink(fHandle)];
 }
 
+- (BOOL) seedLimitSet
+{
+    return tr_torrentGetSeedRatio(fHandle, NULL) || tr_torrentGetSeedIdle(fHandle, NULL);
+}
+
 - (CGFloat) ratio
 {
     return fStat->ratio;
@@ -383,11 +388,6 @@ int trashDataFile(const char * filename)
     tr_torrentSetRatioLimit(fHandle, limit);
 }
 
-- (BOOL) seedRatioSet
-{
-    return tr_torrentGetSeedRatio(fHandle, NULL);
-}
-
 - (CGFloat) progressStopRatio
 {
     return fStat->seedRatioPercentDone;
@@ -412,11 +412,6 @@ int trashDataFile(const char * filename)
 {
     NSAssert(limit > 0, @"Idle limit must be greater than zero");
     tr_torrentSetIdleLimit(fHandle, limit);
-}
-
-- (BOOL) seedIdleLimitSet
-{
-    return tr_torrentGetSeedIdle(fHandle, NULL);
 }
 
 - (BOOL) usesSpeedLimit: (BOOL) upload
@@ -821,11 +816,6 @@ int trashDataFile(const char * filename)
     return fStat->recheckProgress;
 }
 
-- (NSInteger) eta
-{
-    return fStat->eta;
-}
-
 - (CGFloat) availableDesired
 {
     return (CGFloat)fStat->desiredAvailable / [self sizeLeft];
@@ -1013,7 +1003,7 @@ int trashDataFile(const char * filename)
     }
     
     //add time when downloading or seed limit set
-    if (fStat->activity == TR_STATUS_DOWNLOAD || ([self isSeeding] && [self seedRatioSet]))
+    if (fStat->activity == TR_STATUS_DOWNLOAD || ([self isSeeding] && [self seedLimitSet]))
         string = [string stringByAppendingFormat: @" - %@", [self etaString]];
     
     return string;
@@ -1161,8 +1151,7 @@ int trashDataFile(const char * filename)
 
 - (NSString *) remainingTimeString
 {
-    #warning update?
-    if (fStat->activity == TR_STATUS_DOWNLOAD || ([self isSeeding] && [self seedRatioSet]))
+    if (fStat->activity == TR_STATUS_DOWNLOAD || ([self isSeeding] && [self seedLimitSet]))
         return [self etaString];
     else
         return [self shortStatusString];
@@ -1819,18 +1808,24 @@ int trashDataFile(const char * filename)
     [[NSNotificationCenter defaultCenter] postNotificationName: @"ResetInspector" object: self];
 }
 
+#warning don't show idle minutes when very large
 - (NSString *) etaString
 {
-    const NSInteger eta = [self eta];
-    switch (eta)
-    {
-        case TR_ETA_NOT_AVAIL:
-        case TR_ETA_UNKNOWN:
-            return NSLocalizedString(@"remaining time unknown", "Torrent -> eta string");
-        default:
-            return [NSString stringWithFormat: NSLocalizedString(@"%@ remaining", "Torrent -> eta string"),
-                        [NSString timeString: eta showSeconds: YES maxFields: 2]];
-    }
+    const BOOL etaReg = fStat->eta != TR_ETA_NOT_AVAIL && fStat->eta != TR_ETA_UNKNOWN;
+    const BOOL etaIdelSeed = fStat->etaIdle != TR_ETA_NOT_AVAIL && fStat->etaIdle != TR_ETA_UNKNOWN;
+    
+    NSInteger eta;
+    if (etaReg && etaIdelSeed)
+        eta = MIN(fStat->eta, fStat->etaIdle);
+    else if (etaReg)
+        eta = fStat->eta;
+    else if (etaIdelSeed)
+        eta = fStat->etaIdle;
+    else
+        return NSLocalizedString(@"remaining time unknown", "Torrent -> eta string");
+    
+    return [NSString stringWithFormat: NSLocalizedString(@"%@ remaining", "Torrent -> eta string"),
+            [NSString timeString: eta showSeconds: YES maxFields: 2]];
 }
 
 - (void) setTimeMachineExclude: (BOOL) exclude forPath: (NSString *) path

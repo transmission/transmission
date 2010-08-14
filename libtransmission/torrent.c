@@ -1056,6 +1056,7 @@ tr_torrentStat( tr_torrent * tor )
     uint64_t                seedRatioBytesLeft;
     uint64_t                seedRatioBytesGoal;
     tr_bool                 seedRatioApplies;
+    uint16_t                seedIdleMinutes;
 
     if( !tor )
         return NULL;
@@ -1141,7 +1142,6 @@ tr_torrentStat( tr_torrent * tor )
     s->ratio = tr_getRatio( s->uploadedEver,
                             s->downloadedEver ? s->downloadedEver : s->haveValid );
 
-    #warning account for idle limit?
     seedRatioApplies = tr_torrentGetSeedRatioBytes( tor, &seedRatioBytesLeft,
                                                          &seedRatioBytesGoal );
 
@@ -1166,10 +1166,11 @@ tr_torrentStat( tr_torrent * tor )
                 s->eta = TR_ETA_UNKNOWN;
             else
                 s->eta = s->leftUntilDone / toSpeedBytes(tor->etaDLSpeed_KBps);
+
+            s->etaIdle = TR_ETA_NOT_AVAIL;
             break;
 
         case TR_STATUS_SEED: {
-            #warning do something for idle?
             if( !seedRatioApplies )
                 s->eta = TR_ETA_NOT_AVAIL;
             else {
@@ -1184,11 +1185,17 @@ tr_torrentStat( tr_torrent * tor )
                 else
                     s->eta = seedRatioBytesLeft / toSpeedBytes(tor->etaULSpeed_KBps);
             }
+
+            if( tr_torrentGetSeedIdle( tor, &seedIdleMinutes ) )
+                s->etaIdle = seedIdleMinutes * 60 - s->idleSecs;
+            else
+                s->etaIdle = TR_ETA_NOT_AVAIL;
             break;
         }
 
         default:
             s->eta = TR_ETA_NOT_AVAIL;
+            s->etaIdle = TR_ETA_NOT_AVAIL;
             break;
     }
 
