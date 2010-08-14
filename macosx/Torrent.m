@@ -31,6 +31,8 @@
 #import "transmission.h" // required by utils.h
 #import "utils.h" // tr_new()
 
+#define ETA_IDLE_DISPLAY_MIN 2
+
 @interface Torrent (Private)
 
 - (id) initWithPath: (NSString *) path hash: (NSString *) hashString torrentStruct: (tr_torrent *) torrentStruct
@@ -48,6 +50,7 @@
 - (void) idleLimitHit;
 - (void) metadataRetrieved;
 
+- (BOOL) shouldShowEta;
 - (NSString *) etaString;
 
 - (void) setTimeMachineExclude: (BOOL) exclude forPath: (NSString *) path;
@@ -355,11 +358,6 @@ int trashDataFile(const char * filename)
 - (NSString *) magnetLink
 {
     return [NSString stringWithUTF8String: tr_torrentGetMagnetLink(fHandle)];
-}
-
-- (BOOL) seedLimitSet
-{
-    return tr_torrentGetSeedRatio(fHandle, NULL) || tr_torrentGetSeedIdle(fHandle, NULL);
 }
 
 - (CGFloat) ratio
@@ -1003,7 +1001,7 @@ int trashDataFile(const char * filename)
     }
     
     //add time when downloading or seed limit set
-    if (fStat->activity == TR_STATUS_DOWNLOAD || ([self isSeeding] && [self seedLimitSet]))
+    if ([self shouldShowEta])
         string = [string stringByAppendingFormat: @" - %@", [self etaString]];
     
     return string;
@@ -1151,7 +1149,7 @@ int trashDataFile(const char * filename)
 
 - (NSString *) remainingTimeString
 {
-    if (fStat->activity == TR_STATUS_DOWNLOAD || ([self isSeeding] && [self seedLimitSet]))
+    if ([self shouldShowEta])
         return [self etaString];
     else
         return [self shortStatusString];
@@ -1806,6 +1804,22 @@ int trashDataFile(const char * filename)
     [self createFileList];
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"ResetInspector" object: self];
+}
+
+- (BOOL) shouldShowEta
+{
+    if (fStat->activity == TR_STATUS_DOWNLOAD)
+        return YES;
+    else if ([self isSeeding])
+    {
+        if (tr_torrentGetSeedRatio(fHandle, NULL))
+            return YES;
+            
+        if (tr_torrentGetSeedIdle(fHandle, NULL))
+            return (fStat->etaIdle != TR_ETA_NOT_AVAIL && fStat->etaIdle != TR_ETA_UNKNOWN) && fStat->etaIdle < ETA_IDLE_DISPLAY_MIN * 60;
+    }
+    
+    return NO;
 }
 
 #warning don't show idle minutes when very large

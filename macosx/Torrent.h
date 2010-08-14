@@ -90,8 +90,6 @@
 - (BOOL) isMagnet;
 - (NSString *) magnetLink;
 
-- (BOOL) seedLimitSet;
-
 - (CGFloat) ratio;
 - (tr_ratiolimit) ratioSetting;
 - (void) setRatioSetting: (tr_ratiolimit) setting;
