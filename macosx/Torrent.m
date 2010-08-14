@@ -31,7 +31,7 @@
 #import "transmission.h" // required by utils.h
 #import "utils.h" // tr_new()
 
-#define ETA_IDLE_DISPLAY_MIN 2
+#define ETA_IDLE_DISPLAY_SEC (2*60)
 
 @interface Torrent (Private)
 
@@ -1816,24 +1816,24 @@ int trashDataFile(const char * filename)
             return YES;
             
         if (tr_torrentGetSeedIdle(fHandle, NULL))
-            return (fStat->etaIdle != TR_ETA_NOT_AVAIL && fStat->etaIdle != TR_ETA_UNKNOWN) && fStat->etaIdle < ETA_IDLE_DISPLAY_MIN * 60;
+            return (fStat->etaIdle != TR_ETA_NOT_AVAIL && fStat->etaIdle != TR_ETA_UNKNOWN) && fStat->etaIdle < ETA_IDLE_DISPLAY_SEC;
     }
     
     return NO;
 }
 
-#warning don't show idle minutes when very large
 - (NSString *) etaString
 {
     const BOOL etaReg = fStat->eta != TR_ETA_NOT_AVAIL && fStat->eta != TR_ETA_UNKNOWN;
-    const BOOL etaIdelSeed = fStat->etaIdle != TR_ETA_NOT_AVAIL && fStat->etaIdle != TR_ETA_UNKNOWN;
+    const BOOL etaIdleSeed = fStat->etaIdle != TR_ETA_NOT_AVAIL && fStat->etaIdle != TR_ETA_UNKNOWN
+                                && fStat->etaIdle < ETA_IDLE_DISPLAY_SEC;
     
     NSInteger eta;
-    if (etaReg && etaIdelSeed)
+    if (etaReg && etaIdleSeed)
         eta = MIN(fStat->eta, fStat->etaIdle);
     else if (etaReg)
         eta = fStat->eta;
-    else if (etaIdelSeed)
+    else if (etaIdleSeed)
         eta = fStat->etaIdle;
     else
         return NSLocalizedString(@"remaining time unknown", "Torrent -> eta string");
