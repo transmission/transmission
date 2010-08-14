@@ -1812,11 +1812,11 @@ int trashDataFile(const char * filename)
         return YES;
     else if ([self isSeeding])
     {
-        if (tr_torrentGetSeedRatio(fHandle, NULL))
+        if (fStat->eta != TR_ETA_NOT_AVAIL && fStat->eta != TR_ETA_UNKNOWN)
             return YES;
             
-        if (tr_torrentGetSeedIdle(fHandle, NULL))
-            return (fStat->etaIdle != TR_ETA_NOT_AVAIL && fStat->etaIdle != TR_ETA_UNKNOWN) && fStat->etaIdle < ETA_IDLE_DISPLAY_SEC;
+        if (fStat->etaIdle != TR_ETA_NOT_AVAIL && fStat->etaIdle < ETA_IDLE_DISPLAY_SEC)
+            return YES;
     }
     
     return NO;
@@ -1825,8 +1825,7 @@ int trashDataFile(const char * filename)
 - (NSString *) etaString
 {
     const BOOL etaReg = fStat->eta != TR_ETA_NOT_AVAIL && fStat->eta != TR_ETA_UNKNOWN;
-    const BOOL etaIdleSeed = fStat->etaIdle != TR_ETA_NOT_AVAIL && fStat->etaIdle != TR_ETA_UNKNOWN
-                                && fStat->etaIdle < ETA_IDLE_DISPLAY_SEC;
+    const BOOL etaIdleSeed = fStat->etaIdle != TR_ETA_NOT_AVAIL && fStat->etaIdle < ETA_IDLE_DISPLAY_SEC;
     
     NSInteger eta;
     if (etaReg && etaIdleSeed)
