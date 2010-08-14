@@ -1186,7 +1186,7 @@ tr_torrentStat( tr_torrent * tor )
                     s->eta = seedRatioBytesLeft / toSpeedBytes(tor->etaULSpeed_KBps);
             }
 
-            if( tr_torrentGetSeedIdle( tor, &seedIdleMinutes ) )
+            if( tor->etaULSpeed_KBps < 1 && tr_torrentGetSeedIdle( tor, &seedIdleMinutes ) )
                 s->etaIdle = seedIdleMinutes * 60 - s->idleSecs;
             else
                 s->etaIdle = TR_ETA_NOT_AVAIL;

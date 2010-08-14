@@ -534,6 +534,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [nc addObserver: self selector: @selector(torrentRestartedDownloading:)
                     name: @"TorrentRestartedDownloading" object: nil];
     
+    [nc addObserver: self selector: @selector(torrentFinishedSeeding:)
+                    name: @"TorrentFinishedSeeding" object: nil];
+    
     //avoids need of setting delegate
     [nc addObserver: self selector: @selector(torrentTableViewSelectionDidChange:)
                     name: NSOutlineViewSelectionDidChangeNotification object: fTableView];
@@ -549,10 +552,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     [nc addObserver: fWindow selector: @selector(makeKeyWindow)
                     name: @"MakeWindowKey" object: nil];
-    
-    //check if torrent should now start
-    [nc addObserver: self selector: @selector(torrentStoppedForRatio:)
-                    name: @"TorrentStoppedForRatio" object: nil];
     
     [nc addObserver: self selector: @selector(updateTorrentsInQueue)
                     name: @"UpdateQueue" object: nil];
@@ -1956,7 +1955,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [self updateTorrentsInQueue];
 }
 
-- (void) torrentStoppedForRatio: (NSNotification *) notification
+- (void) torrentFinishedSeeding: (NSNotification *) notification
 {
     Torrent * torrent = [notification object];
     

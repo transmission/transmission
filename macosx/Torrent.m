@@ -1786,15 +1786,14 @@ int trashDataFile(const char * filename)
 {
     fStat = tr_torrentStat(fHandle);
     
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentStoppedForRatio" object: self];
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFinishedSeeding" object: self];
 }
 
 - (void) idleLimitHit
 {
     fStat = tr_torrentStat(fHandle);
     
-    #warning fix
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentStoppedForRatio" object: self];
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFinishedSeeding" object: self];
 }
 
 - (void) metadataRetrieved
@@ -1812,9 +1811,11 @@ int trashDataFile(const char * filename)
         return YES;
     else if ([self isSeeding])
     {
-        if (fStat->eta != TR_ETA_NOT_AVAIL && fStat->eta != TR_ETA_UNKNOWN)
+        //ratio: show if it's set at all
+        if (tr_torrentGetSeedRatio(fHandle, NULL))
             return YES;
-            
+        
+        //idle: show only if remaining time is less than cap
         if (fStat->etaIdle != TR_ETA_NOT_AVAIL && fStat->etaIdle < ETA_IDLE_DISPLAY_SEC)
             return YES;
     }
@@ -1824,21 +1825,28 @@ int trashDataFile(const char * filename)
 
 - (NSString *) etaString
 {
-    const BOOL etaReg = fStat->eta != TR_ETA_NOT_AVAIL && fStat->eta != TR_ETA_UNKNOWN;
-    const BOOL etaIdleSeed = fStat->etaIdle != TR_ETA_NOT_AVAIL && fStat->etaIdle < ETA_IDLE_DISPLAY_SEC;
-    
     NSInteger eta;
-    if (etaReg && etaIdleSeed)
-        eta = MIN(fStat->eta, fStat->etaIdle);
-    else if (etaReg)
+    BOOL fromIdle;
+    //don't check for both, since if there's a regular ETA, the torrent isn't idle so it's meaningless
+    if (fStat->eta != TR_ETA_NOT_AVAIL && fStat->eta != TR_ETA_UNKNOWN)
+    {
         eta = fStat->eta;
-    else if (etaIdleSeed)
+        fromIdle = NO;
+    }
+    else if (fStat->etaIdle != TR_ETA_NOT_AVAIL && fStat->etaIdle < ETA_IDLE_DISPLAY_SEC)
+    {
         eta = fStat->etaIdle;
+        fromIdle = YES;
+    }
     else
         return NSLocalizedString(@"remaining time unknown", "Torrent -> eta string");
     
-    return [NSString stringWithFormat: NSLocalizedString(@"%@ remaining", "Torrent -> eta string"),
-            [NSString timeString: eta showSeconds: YES maxFields: 2]];
+    NSString * idleString = [NSString stringWithFormat: NSLocalizedString(@"%@ remaining", "Torrent -> eta string"),
+                                [NSString timeString: eta showSeconds: YES maxFields: 2]];
+    if (fromIdle)
+        idleString = [idleString stringByAppendingFormat: @" (%@)", NSLocalizedString(@"inactive", "Torrent -> eta string")];
+    
+    return idleString;
 }
 
 - (void) setTimeMachineExclude: (BOOL) exclude forPath: (NSString *) path

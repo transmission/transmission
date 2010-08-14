@@ -199,7 +199,7 @@ typedef enum
 
 - (void) torrentFinishedDownloading: (NSNotification *) notification;
 - (void) torrentRestartedDownloading: (NSNotification *) notification;
-- (void) torrentStoppedForRatio: (NSNotification *) notification;
+- (void) torrentFinishedSeeding: (NSNotification *) notification;
 
 - (void) updateTorrentHistory;
 
