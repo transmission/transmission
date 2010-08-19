@@ -415,7 +415,7 @@ tr_torrentCheckSeedLimit( tr_torrent * tor )
 {
     assert( tr_isTorrent( tor ) );
 
-    if( !tor->isRunning )
+    if( !tor->isRunning || !tr_torrentIsSeed( tor ) )
         return;
 
     /* if we're seeding and reach our seed ratio limit, stop the torrent */
