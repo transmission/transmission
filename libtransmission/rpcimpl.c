@@ -826,7 +826,7 @@ addTrackerUrls( tr_torrent * tor, tr_benc * urls )
         const char * announce = NULL;
 
         if(    tr_bencGetStr( val, &announce )
-            && tr_urlIsValid( announce )
+            && tr_urlIsValid( announce, -1 )
             && !findAnnounceUrl( trackers, n, announce, NULL ) )
         {
             trackers[n].tier = ++tier; /* add a new tier */
@@ -871,7 +871,7 @@ replaceTrackerUrls( tr_torrent * tor, tr_benc * urls )
         if(    tr_bencGetStr( pair[0], &oldval )
             && tr_bencGetStr( pair[1], &newval )
             && strcmp( oldval, newval )
-            && tr_urlIsValid( newval )
+            && tr_urlIsValid( newval, -1 )
             && findAnnounceUrl( trackers, n, oldval, &i ) )
         {
             tr_free( trackers[i].announce );

@@ -232,47 +232,68 @@ handle_upload( struct evhttp_request * req,
 
         if( !hasSessionId )
         {
-            send_simple_response( req, 409, NULL );
+            int code = 409;
+            const char * codetext = tr_webGetResponseStr( code );
+            struct evbuffer * body = evbuffer_new( );
+            evbuffer_add_printf( body, "%s", "{ \"success\": false, \"msg\": \"Bad Session-Id\" }" );;
+            evhttp_send_reply( req, code, codetext, body );
+            evbuffer_free( body );
         }
         else for( i=0; i<n; ++i )
         {
             struct tr_mimepart * p = tr_ptrArrayNth( &parts, i );
-            if( strstr( p->headers, "filename=\"" ) )
+            int body_len = p->body_len;
+            tr_benc top, *args;
+            tr_benc test;
+            tr_bool have_source = FALSE;
+            char * body = p->body;
+
+            if( body_len >= 2 && !memcmp( &body[body_len - 2], "\r\n", 2 ) )
+                body_len -= 2;
+
+            tr_bencInitDict( &top, 2 );
+            tr_bencDictAddStr( &top, "method", "torrent-add" );
+            args = tr_bencDictAddDict( &top, "arguments", 2 );
+            tr_bencDictAddBool( args, "paused", paused );
+
+            if( tr_urlIsValid( body, body_len ) )
             {
-                char * b64;
-                int body_len = p->body_len;
-                tr_benc top, *args;
-                const char * body = p->body;
-                struct evbuffer * json = evbuffer_new( );
-
-                if( body_len >= 2 && !memcmp( &body[body_len - 2], "\r\n", 2 ) )
-                    body_len -= 2;
-
-                tr_bencInitDict( &top, 2 );
-                args = tr_bencDictAddDict( &top, "arguments", 2 );
-                tr_bencDictAddStr( &top, "method", "torrent-add" );
-                b64 = tr_base64_encode( body, body_len, NULL );
+                tr_bencDictAddRaw( args, "filename", body, body_len );
+                have_source = TRUE;
+            }
+            else if( !tr_bencLoad( body, body_len, &test, NULL ) )
+            {
+                char * b64 = tr_base64_encode( body, body_len, NULL );
                 tr_bencDictAddStr( args, "metainfo", b64 );
-                tr_bencDictAddBool( args, "paused", paused );
-                tr_bencToBuf( &top, TR_FMT_JSON_LEAN, json );
+                tr_free( b64 );
+                have_source = TRUE;
+            }
+
+            if( have_source )
+            {
+                struct evbuffer * json = evbuffer_new( );
+                tr_bencToBuf( &top, TR_FMT_JSON, json );
                 tr_rpc_request_exec_json( server->session,
                                           EVBUFFER_DATA( json ),
                                           EVBUFFER_LENGTH( json ),
                                           NULL, NULL );
-
                 evbuffer_free( json );
-                tr_free( b64 );
-                tr_bencFree( &top );
             }
+
+            tr_bencFree( &top );
         }
 
         tr_ptrArrayDestruct( &parts, (PtrArrayForeachFunc)tr_mimepart_free );
 
-        /* use xml here because json responses to file uploads is trouble.
-         * see http://www.malsup.com/jquery/form/#sample7 for details */
-        evhttp_add_header( req->output_headers, "Content-Type",
-                           "text/xml; charset=UTF-8" );
-        send_simple_response( req, HTTP_OK, NULL );
+        /* send "success" response */
+        {
+            int code = HTTP_OK;
+            const char * codetext = tr_webGetResponseStr( code );
+            struct evbuffer * body = evbuffer_new( );
+            evbuffer_add_printf( body, "%s", "{ \"success\": true, \"msg\": \"Torrent Added\" }" );;
+            evhttp_send_reply( req, code, codetext, body );
+            evbuffer_free( body );
+        }
     }
 }
 
