@@ -449,7 +449,7 @@ tr_bool tr_addressIsIP( const char * address );
 tr_bool tr_urlIsValidTracker( const char * url ) TR_GNUC_NONNULL(1);
 
 /** @brief return TRUE if the url is a [ http, https, ftp, ftps ] url that Transmission understands */
-tr_bool tr_urlIsValid( const char * url ) TR_GNUC_NONNULL(1);
+tr_bool tr_urlIsValid( const char * url, int url_len ) TR_GNUC_NONNULL(1);
 
 /** @brief parse a URL into its component parts
     @return zero on success or an error number if an error occurred */

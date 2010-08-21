@@ -919,9 +919,10 @@ tr_hex_to_sha1( uint8_t * out, const char * in )
 ***/
 
 static tr_bool
-isValidURLChars( const char * url )
+isValidURLChars( const char * url, int url_len )
 {
     const char * c;
+    const char * end;
     static const char * rfc2396_valid_chars =
         "abcdefghijklmnopqrstuvwxyz" /* lowalpha */
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ" /* upalpha */
@@ -934,7 +935,7 @@ isValidURLChars( const char * url )
     if( url == NULL )
         return FALSE;
 
-    for( c = url; c && *c; ++c )
+    for( c=url, end=c+url_len; c && *c && c!=end; ++c )
         if( !strchr( rfc2396_valid_chars, *c ) )
             return FALSE;
 
@@ -947,9 +948,10 @@ tr_urlIsValidTracker( const char * url )
 {
     tr_bool valid;
     char * scheme = NULL;
+    const int len = url ? strlen(url) : 0;
 
-    valid = isValidURLChars( url )
-         && !tr_urlParse( url, -1, &scheme, NULL, NULL, NULL )
+    valid = isValidURLChars( url, len )
+         && !tr_urlParse( url, len, &scheme, NULL, NULL, NULL )
          && ( scheme != NULL )
          && ( !strcmp(scheme,"http") || !strcmp(scheme,"https") );
 
@@ -959,13 +961,15 @@ tr_urlIsValidTracker( const char * url )
 
 /** @brief return TRUE if the url is a http or https or ftp or sftp url that Transmission understands */
 tr_bool
-tr_urlIsValid( const char * url )
+tr_urlIsValid( const char * url, int url_len )
 {
     tr_bool valid;
     char * scheme = NULL;
+    if( ( url_len < 0 ) && ( url != NULL ) )
+        url_len = strlen( url );
 
-    valid = isValidURLChars( url )
-         && !tr_urlParse( url, -1, &scheme, NULL, NULL, NULL )
+    valid = isValidURLChars( url, url_len )
+         && !tr_urlParse( url, url_len, &scheme, NULL, NULL, NULL )
          && ( scheme != NULL )
          && ( !strcmp(scheme,"http") || !strcmp(scheme,"https") || !strcmp(scheme,"ftp") || !strcmp(scheme,"sftp") );
 
