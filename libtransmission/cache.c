@@ -118,8 +118,9 @@ enum
 };
 /* Calculte runs
  *   - Stale runs, runs sitting in cache for a long time or runs not growing, get priority.
+ *     Returns number of runs.
  */
-static void
+static int
 calcRuns( tr_cache * cache, struct run_info * runs )
 {
     const int n = tr_ptrArraySize( &cache->blocks );
@@ -146,9 +147,9 @@ calcRuns( tr_cache * cache, struct run_info * runs )
 //fprintf(stderr,"block run at pos %d of length %d and age %ld adjusted +%d\n",runs[i].pos,runs[i].len,now-runs[i].last_block_time,rank-runs[i].len);
     }
 
-    //fprintf( stderr, "%d block runs\n", i-1 );
+    //fprintf( stderr, "%d block runs\n", i );
     qsort( runs, i, sizeof( struct run_info ), compareRuns );
-    //return i;
+    return i;
 }
 
 static int
@@ -399,11 +400,11 @@ int tr_cacheFlushDone( tr_cache * cache )
 
     if( tr_ptrArraySize( &cache->blocks ) > 0 )
     {
-        struct run_info * runs = tr_new0( struct run_info, tr_ptrArraySize( &cache->blocks ) );
-        int i = 0;
+        struct run_info * runs = tr_new( struct run_info, tr_ptrArraySize( &cache->blocks ) );
+        int i = 0, n;
 
-        calcRuns( cache, runs );
-        while( runs[i].is_piece_done || runs[i].is_multi_piece )
+        n = calcRuns( cache, runs );
+        while( i < n && ( runs[i].is_piece_done || runs[i].is_multi_piece ) )
             runs[i++].rank |= SESSIONFLAG;
         err = flushRuns( cache, runs, i );
         tr_free( runs );
