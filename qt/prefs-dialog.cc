@@ -140,6 +140,7 @@ PrefsDialog :: doubleSpinBoxNew( int key, double low, double high, double step, 
     spin->setRange( low, high );
     spin->setSingleStep( step );
     spin->setDecimals( decimals );
+    spin->setValue( myPrefs.getDouble( key ) );
     spin->setProperty( PREF_KEY, key );
     connect( spin, SIGNAL(valueChanged(double)), this, SLOT(doubleSpinBoxChanged(double)));
     myWidgets.insert( key, spin );
