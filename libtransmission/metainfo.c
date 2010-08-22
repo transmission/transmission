@@ -360,11 +360,11 @@ geturllist( tr_info * inf,
             tr_benc * meta )
 {
     tr_benc * urls;
+    const char * url;
 
     if( tr_bencDictFindList( meta, "url-list", &urls ) )
     {
         int          i;
-        const char * url;
         const int    n = tr_bencListSize( urls );
 
         inf->webseedCount = 0;
@@ -373,6 +373,12 @@ geturllist( tr_info * inf,
         for( i = 0; i < n; ++i )
             if( tr_bencGetStr( tr_bencListChild( urls, i ), &url ) )
                 inf->webseeds[inf->webseedCount++] = tr_strdup( url );
+    }
+    else if( tr_bencDictFindStr( meta, "url-list", &url ) ) /* handle single items in webseeds */
+    {
+        inf->webseedCount = 1;
+        inf->webseeds = tr_new0( char*, 1 );
+        inf->webseeds[0] = tr_strdup( url );
     }
 }
 
