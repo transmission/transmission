@@ -416,8 +416,8 @@
    "download-dir"                   | string     default path to download torrents
    "dht-enabled"                    | boolean    true means allow dht in public torrents
    "encryption"                     | string     "required", "preferred", "tolerated"
-   "inactive-seeding-limit"         | number     the default seed inactivity limit for torrents to use
-   "inactive-seeding-limit-enabled" | boolean    true if the seeding inactivity limit is honored by default
+   "idle-seeding-limit"             | number     the default seed inactivity limit for torrents to use
+   "idle-seeding-limit-enabled"     | boolean    true if the seeding inactivity limit is honored by default
    "incomplete-dir"                 | string     path for incomplete torrents, when enabled
    "incomplete-dir-enabled"         | boolean    true means keep torrents in incomplete-dir until done
    "lpd-enabled"                    | boolean    true means allow Local Peer Discovery in public torrents
@@ -618,10 +618,10 @@
          |         | yes       | torrent-set    | new arg "trackerAdd"
          |         | yes       | torrent-set    | new arg "trackerEdit"
          |         | yes       | torrent-set    | new arg "trackerRemove"
-         |         | yes       | session-set    | new arg "inactive-seeding-limit"
-         |         | yes       | session-set    | new arg "inactive-seeding-limit-enabled"
-         |         | yes       | session-get    | new arg "inactive-seeding-limit"
-         |         | yes       | session-get    | new arg "inactive-seeding-limit-enabled"
+         |         | yes       | session-set    | new arg "idle-seeding-limit"
+         |         | yes       | session-set    | new arg "idle-seeding-limit-enabled"
+         |         | yes       | session-get    | new arg "idle-seeding-limit"
+         |         | yes       | session-get    | new arg "idle-seeding-limit-enabled"
          |         | yes       | torrent-set    | new arg "seedIdleLimit"
          |         | yes       | torrent-set    | new arg "seedIdleMode"
          |         |        NO | torrent-get    | units for "rateDownload" changed from B to KB
