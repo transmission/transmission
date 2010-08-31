@@ -387,7 +387,11 @@ is_rfc2396_alnum( char ch )
 {
     return ( '0' <= ch && ch <= '9' )
         || ( 'A' <= ch && ch <= 'Z' )
-        || ( 'a' <= ch && ch <= 'z' );
+        || ( 'a' <= ch && ch <= 'z' )
+        || ch == '.'
+        || ch == '-'
+        || ch == '_'
+        || ch == '~';
 }
 
 static void
@@ -399,7 +403,7 @@ escape( char * out, const uint8_t * in, size_t in_len ) /* rfc2396 */
         if( is_rfc2396_alnum( *in ) )
             *out++ = (char) *in++;
         else
-            out += tr_snprintf( out, 4, "%%%02X", (unsigned int)*in++ );
+            out += tr_snprintf( out, 4, "%%%02x", (unsigned int)*in++ );
 
     *out = '\0';
 }
