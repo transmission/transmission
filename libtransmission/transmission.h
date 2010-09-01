@@ -1472,18 +1472,18 @@ typedef enum
 {
     /* we won't (announce,scrape) this torrent to this tracker because
      * the torrent is stopped, or because of an error, or whatever */
-    TR_TRACKER_INACTIVE,
+    TR_TRACKER_INACTIVE = 0,
 
     /* we will (announce,scrape) this torrent to this tracker, and are
      * waiting for enough time to pass to satisfy the tracker's interval */
-    TR_TRACKER_WAITING,
+    TR_TRACKER_WAITING = 1,
 
     /* it's time to (announce,scrape) this torrent, and we're waiting on a
      * a free slot to open up in the announce manager */
-    TR_TRACKER_QUEUED,
+    TR_TRACKER_QUEUED = 2,
 
     /* we're (announcing,scraping) this torrent right now */
-    TR_TRACKER_ACTIVE
+    TR_TRACKER_ACTIVE = 3
 }
 tr_tracker_state;
 
@@ -1503,6 +1503,9 @@ typedef struct
 
     /* the full announce URL */
     char announce[1024];
+
+    /* the full scrape URL */
+    char scrape[1024];
 
     /* Transmission uses one tracker per tier,
      * and the others are kept as backups */

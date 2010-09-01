@@ -386,7 +386,7 @@ addTrackerStats( const tr_tracker_stat * st, int n, tr_benc * list )
     for( i=0; i<n; ++i )
     {
         const tr_tracker_stat * s = &st[i];
-        tr_benc * d = tr_bencListAddDict( list, 25 );
+        tr_benc * d = tr_bencListAddDict( list, 26 );
         tr_bencDictAddStr ( d, "announce", s->announce );
         tr_bencDictAddInt ( d, "announceState", s->announceState );
         tr_bencDictAddInt ( d, "downloadCount", s->downloadCount );
@@ -409,6 +409,7 @@ addTrackerStats( const tr_tracker_stat * st, int n, tr_benc * list )
         tr_bencDictAddInt ( d, "leecherCount", s->leecherCount );
         tr_bencDictAddInt ( d, "nextAnnounceTime", s->nextAnnounceTime );
         tr_bencDictAddInt ( d, "nextScrapeTime", s->nextScrapeTime );
+        tr_bencDictAddStr ( d, "scrape", s->scrape );
         tr_bencDictAddInt ( d, "scrapeState", s->scrapeState );
         tr_bencDictAddInt ( d, "seederCount", s->seederCount );
         tr_bencDictAddInt ( d, "tier", s->tier );

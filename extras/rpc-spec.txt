@@ -104,9 +104,9 @@
    "seedIdleMode"        | number     which seeding inactivity to use.  See tr_inactvelimit
    "seedRatioLimit"      | double     torrent-level seeding ratio
    "seedRatioMode"       | number     which ratio to use.  See tr_ratiolimit
-   "trackerAdd"          | array      strings of URLs to add
-   "trackerRemove"       | array      strings of URLs to remove
-   "trackerReplace"      | array      pairs of old/new announce URLs
+   "trackerAdd"          | array      strings of announce URLs to add
+   "trackerRemove"       | array      strings of announce URLs to remove
+   "trackerReplace"      | array      pairs of old/new announce announce URLs
    "uploadLimit"         | number     maximum upload speed (KBps)
    "uploadLimited"       | boolean    true if "uploadLimit" is honored
 
@@ -208,7 +208,6 @@
    -------------------+--------+-----------------------------+
    files              | array of objects, each containing:   |
                       +-------------------------+------------+
-                      | key                     | type       |
                       | bytesCompleted          | number     | tr_torrent
                       | length                  | number     | tr_info
                       | name                    | string     | tr_info
@@ -261,9 +260,9 @@
    trackers           | array of objects, each containing:   |
                       +-------------------------+------------+
                       | announce                | string     | tr_tracker_info
+                      | id                      | number     | tr_tracker_info
                       | scrape                  | string     | tr_tracker_info
                       | tier                    | number     | tr_tracker_info
-                      | id                      | number     | tr_tracker_info
    -------------------+--------------------------------------+
    trackerStats       | array of objects, each containing:   |
                       +-------------------------+------------+
@@ -289,6 +288,7 @@
                       | leecherCount            | number     | tr_tracker_stat
                       | nextAnnounceTime        | number     | tr_tracker_stat
                       | nextScrapeTime          | number     | tr_tracker_stat
+                      | scrape                  | string     | tr_tracker_stat
                       | scrapeState             | number     | tr_tracker_stat
                       | seederCount             | number     | tr_tracker_stat
                       | tier                    | number     | tr_tracker_stat
