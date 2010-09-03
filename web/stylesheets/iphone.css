@@ -197,6 +197,7 @@ div#torrent_filter_bar {
 	width: 100%;
 	z-index: 2;
 	text-align: center;
+	overflow: hidden;
 }
 
 div#torrent_filter_bar ul {
@@ -241,6 +242,10 @@ div#torrent_filter_bar ul li.selected {
 
 div#torrent_filter_bar ul li.selected a {
 	background-position: right top;
+}
+
+div#torrent_filter_bar ul li a.finished {
+	display: none;
 }
 
 div#torrent_filter_bar input#torrent_search {
