@@ -58,3 +58,6 @@ div.torrent_footer ul#settings_menu li#button:hover {
 	top: auto !important;
 	bottom: 0px !important;
 }
+.dialog_container{
+	z-index: 4
+}

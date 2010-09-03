@@ -67,8 +67,13 @@ TransmissionRemote.prototype =
 					: "";
 		if( !remote._error.length )
 			remote._error = 'Server not responding';
-		tellUser( 'Connection failed',
-			  'Could not connect to the server. You may need to reload the page to reconnect.' );
+
+		dialog.confirm('Connection Failed',
+			'Could not connect to the server. You may need to reload the page to reconnect.',
+			'Details',
+			'alert(remote._error);',
+			null,
+			'Dismiss');
 		remote._controller.togglePeriodicRefresh(false);
 		remote._controller.togglePeriodicSessionRefresh(false);
 	},
@@ -88,7 +93,7 @@ TransmissionRemote.prototype =
 			contentType: 'json',
 			dataType: 'json',
 			cache: false,
-			data: JSON.stringify(data),
+			data: $.toJSON(data),
 			beforeSend: function(XHR){ remote.appendSessionId(XHR) },
 			error: function(request, error_string, exception){ remote.ajaxError(request, error_string, exception, ajaxSettings) },
 			success: success,
@@ -109,19 +114,6 @@ TransmissionRemote.prototype =
 		var o = { method: 'session-stats' };
 		this.sendRequest( o, callback, async );
 	},
-
-	blocklistUpdate: function( callback, async ) {
-		var tr = this._controller;
-		var o = { method: 'blocklist-update' };
-		this.sendRequest( o, callback, async );
-	},
-
-	portTest: function( callback, async ) {
-		var tr = this._controller;
-		var o = { method: 'port-test' };
-		this.sendRequest( o, callback, async );
-	},
-
 
 	getInitialDataFor: function(torrent_ids, callback) {
 		var o = {

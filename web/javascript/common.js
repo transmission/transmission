@@ -7,6 +7,7 @@
  */
 
 var transmission;
+var dialog;
 var resizeTimer = null;
 // Test for a Webkit build that supports box-shadow: 521+ (release Safari 3 is
 // actually 523.10.3). We need 3.1 for CSS animation (dialog sheets) but as it
@@ -33,9 +34,19 @@ function testSafari3()
 };
 
 $(document).ready( function() {
+	// Initialise the dialog controller
+	dialog = new Dialog();
 
 	// Initialise the main Transmission controller
 	transmission = new Transmission();
+
+	// IE specific fixes here
+	if ($.browser.msie) {
+		try {
+			document.execCommand("BackgroundImageCache", false, true);
+		} catch(err) {}
+		$('.dialog_container').css('height',$(window).height()+'px');
+	}
 
 	if ($.browser.safari) {
 		// Move search field's margin down for the styled input
@@ -45,14 +56,20 @@ $(document).ready( function() {
 		// Fix for non-Safari-3 browsers: dark borders to replace shadows.
 		// Opera messes up the menu if we use a border on .trans_menu
 		// div.outerbox so use ul instead
-		$('.trans_menu ul, div#jqContextMenu').css('border', '1px solid #777');
+		$('.trans_menu ul, div#jqContextMenu, div.dialog_container div.dialog_window').css('border', '1px solid #777');
 		// and this kills the border we used to have
 		$('.trans_menu div.outerbox').css('border', 'none');
 	} else if (!iPhone) {
 		// Used for Safari 3.1 CSS animation. Degrades gracefully (so Safari 3
 		// test is good enough) but we delay our hide/unhide to wait for the
 		// scrolling - no point making other browsers wait.
-		$('div#upload_container').css('top', '-205px');
+		$('div#upload_container div.dialog_window').css('top', '-205px');
+		$('div#prefs_container div.dialog_window').css('top', '-425px');
+		$('div#dialog_container div.dialog_window').css('top', '-425px');
+		$('div.dialog_container div.dialog_window').css('-webkit-transition', 'top 0.3s');
+		// -webkit-appearance makes some links into buttons, but needs
+		// different padding.
+		$('div.dialog_container div.dialog_window a').css('padding', '2px 10px 3px');
 	}
 	if (iPhone){
 		window.onload = function(){ setTimeout(function() { window.scrollTo(0,1); },500); };
@@ -176,39 +193,6 @@ function changeTab(tab, id) {
 	}
 }
 
-function tellUser( primaryText, secondaryText )
-{
-	$("#dialog_body").html("<p><b>" + primaryText + "</b></p><p>" + secondaryText + "</p>" );
-	$("#dialog" ).dialog( {
-		title: primaryText,
-		hide: 'blind',
-		buttons: { 'Close': function() { $(this).dialog('close'); } }
-	});
-}
-
-/**
- * @brief Show a confirmation dialog
- */
-function askUser(dialog_heading, dialog_message, confirm_button_label,
-                 callback_function, callback_data,
-                 cancel_button_label)
-{
-	if( cancel_button_label == null )
-		cancel_button_label = 'Cancel';
-	$("#dialog_body").html("<p><b>" + dialog_heading + "</b></p><p>" + dialog_message + "</p>" );
-	var myButtons = { };
-	myButtons[cancel_button_label] = function() { $(this).dialog('close'); }
-	myButtons[confirm_button_label] = function() {
-		callback_function.call( null, callback_data );
-		$(this).dialog('close');
-	};
-	$("#dialog" ).dialog( {
-		title: dialog_heading,
-		hide: 'blind',
-		buttons: myButtons
-	});
-}
-
 /***
 ****  Preferences
 ***/
@@ -229,7 +213,6 @@ Prefs._FilterActive       = 'active';
 Prefs._FilterSeeding      = 'seeding';
 Prefs._FilterDownloading  = 'downloading';
 Prefs._FilterPaused       = 'paused';
-Prefs._FilterFinished     = 'finished';
 
 Prefs._SortDirection      = 'sort_direction';
 Prefs._SortAscending      = 'ascending';
@@ -241,10 +224,10 @@ Prefs._SortByActivity     = 'activity';
 Prefs._SortByQueue        = 'queue_order';
 Prefs._SortByName         = 'name';
 Prefs._SortByProgress     = 'percent_completed';
-Prefs._SortBySize         = 'size';
 Prefs._SortByState        = 'state';
 Prefs._SortByTracker      = 'tracker';
 
+Prefs._TurtleState        = 'turtle-state';
 Prefs._CompactDisplayState= 'compact_display_state';
 
 Prefs._Defaults =

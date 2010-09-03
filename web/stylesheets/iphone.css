@@ -26,22 +26,9 @@ body div#torrent_container {
 	min-height: 295px;
 }
 
-.ui-dialog-titlebar {
-        display: none;
+body div.dialog_container {
+	min-height: 291px;
 }
-.ui-dialog .ui-dialog-content {
-        padding: 0px;
-}
-.ui-tabs .ui-tabs-panel {
-        padding: 0px;
-}
-.dialog_col_1 {
-        width: 0px;
-}
-.dialog_col_3 {
-        width: 5px;
-}
-
 
 body div#torrent_inspector {
 	min-height: 323px;
@@ -51,11 +38,13 @@ body.landscape div#torrent_container {
 	min-height: 147px;
 }
 
-body.landscape body.landscape div#torrent_inspector {
+body.landscape div#dialog_container, body.landscape div#torrent_inspector {
 	min-height: 143px;
 }
 
 body.inspector_showing #torrent_filter_bar, body.inspector_showing #torrent_container,
+body.dialog_showing #torrent_filter_bar, body.dialog_showing #torrent_container, body.dialog_showing #torrent_inspector, body.dialog_showing #prefs_container,
+body.prefs_showing #torrent_inspector, body.prefs_showing #torrent_filter_bar, body.prefs_showing #torrent_container,
 body.open_showing #torrent_filter_bar, body.open_showing #torrent_container {
 	display: none !important;
 }
@@ -208,7 +197,6 @@ div#torrent_filter_bar {
 	width: 100%;
 	z-index: 2;
 	text-align: center;
-	overflow: hidden;
 }
 
 div#torrent_filter_bar ul {
@@ -253,10 +241,6 @@ div#torrent_filter_bar ul li.selected {
 
 div#torrent_filter_bar ul li.selected a {
 	background-position: right top;
-}
-
-div#torrent_filter_bar ul li a.finished {
-	display: none;
 }
 
 div#torrent_filter_bar input#torrent_search {
@@ -387,8 +371,181 @@ ul.torrent_list li.torrent div.torrent_progress_bar.incomplete {
 	margin-right: -10px;
 }
 
+div.dialog_container {
+	background: rgba(0,0,0,0.85);
+	color: white;
+	padding: 15px 10px;
+}
+
+div.dialog_container .dialog_window {
+	height: auto;
+	font-size: 13px;
+	text-shadow: black 1px 1px 1px !important;
+}
+
+div#dialog_message.dialog_message {
+	width: 280px;
+	margin: 10px auto 25px;
+	font-size: 13px;
+	line-height: 14px;
+	word-wrap: break-word;
+	overflow: hidden;
+	padding-bottom: 0;
+}
+
 #torrent_upload_file, label[for="torrent_upload_file"]{
 	display:none;
+}
+
+h2.dialog_heading {
+	text-align: center;
+	width: 300px;
+	margin: 0 auto;
+	font-size: 17px;
+}
+
+div.dialog_container a {
+	color: white;
+	padding: 7px 0;
+	background: #222;
+	text-decoration: none;
+	border: 2px solid white;
+	margin: 5px 5px 0;
+	font-weight: bold;
+	-webkit-border-radius: 16px;
+	display: inline-block;
+	width: 90px;
+	font-size: 12px;
+	text-align: center;
+}
+
+div.dialog_container a#dialog_cancel_button, div.dialog_container a#prefs_cancel_button {
+	left: 55px;
+}
+
+div.dialog_container a#dialog_confirm_button, div.dialog_container a#prefs_save_button {
+	right: 55px;
+	color: black;
+	text-shadow: none;
+	background: #fff;
+}
+
+#dialog_container div.dialog_window img {
+	margin: 5px auto 12px;
+}
+
+.landscape div.dialog_container a#dialog_cancel_button {
+	left: 155px;
+}
+
+.landscape div.dialog_container a#dialog_confirm_button {
+	right: 110px;
+}
+
+.landscape div.dialog_container img {
+	float: left !important;
+	margin: 0 0 0 50px;
+}
+
+.landscape h2#dialog_heading.dialog_heading {
+	margin: 5px auto 0;
+	margin-left: 150px;
+	text-align: left;
+}
+
+.landscape div#dialog_message.dialog_message {
+	width: 300px;
+	margin: 10px 0 20px 150px;
+	text-align: left;
+}
+
+/*--------------------------------------
+ *
+ * P R E F S   C O N T A I N E R
+ *
+ *--------------------------------------*/
+
+div#prefs_container {
+	text-align: left;
+}
+
+div#prefs_container label.item {
+	margin: 0 5px 0 15px;
+	float: left;
+}
+
+form#prefs_form {
+	height: 365px;
+	padding: 0 5px;
+}
+
+div#prefs_container label.suffix {
+	margin: 0 5px 0 10px;
+	float: left;
+}
+
+div#prefs_container input {
+	float: left;
+}
+
+div#prefs_container div.preference input[type=checkbox] {
+	margin: 3px 7px 0 16px;
+	width: 18px;
+	height: 18px;
+	clear: left;
+}
+
+div#prefs_container label {
+	line-height: 25px;
+	display: block;
+}
+
+div#prefs_container div.download_location label.item,
+div#prefs_container div.port label.item,
+div#prefs_container div.web_gui label.item {
+	width: 127px;
+	clear: left;
+}
+
+div#prefs_container div.auto_start label.item,
+div#prefs_container div.encryption label.item,
+div#prefs_container div.limit_total label.item {
+	margin: 0 5px 0 0;
+}
+
+div#prefs_container div.limit_total label.item {
+	width: 101px;
+}
+
+div#prefs_container div.preference input[type=text] {
+	padding: 2px 2px 1px;
+	text-shadow: none !important;
+	font-size: 13px;
+	width: 50px;
+}
+
+div#prefs_container div.download_location input {
+	position: absolute;
+	right: 20px;
+	left: 160px;
+	width: auto !important;
+}
+
+div#prefs_container label.category {
+	clear: both;
+	font-weight: bold;
+}
+
+div#prefs_container a {
+	margin-top: 42px !important;
+}
+
+.landscape div.dialog_container a#prefs_cancel_button {
+	left: 135px;
+}
+
+.landscape div.dialog_container a#prefs_save_button {
+	right: 135px;
 }
 
 /*--------------------------------------
@@ -676,7 +833,7 @@ div.torrent_footer a#preferences_link {
 	margin: 1px 0 0 6px;
 }
 
-body.prefs_showing div.torrent_footer a#preferences_link, div.torrent_footer a#preferences_link {
+body.prefs_showing div.torrent_footer a#preferences_link, body.dialog_showing div.torrent_footer a#preferences_link {
 	display: none;
 }
 

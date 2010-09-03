@@ -235,7 +235,6 @@ Torrent.prototype =
 					|| this.state() == Torrent._StatusChecking; },
 	isActive: function() { return this.state() != Torrent._StatusPaused; },
 	isDownloading: function() { return this.state() == Torrent._StatusDownloading; },
-	isFinished: function() { return this._isFinishedSeeding; },
 	isSeeding: function() { return this.state() == Torrent._StatusSeeding; },
 	name: function() { return this._name; },
 	peersSendingToUs: function() { return this._peers_sending_to_us; },
@@ -255,7 +254,7 @@ Torrent.prototype =
 		switch( this.state() ) {
 			case Torrent._StatusSeeding:        return 'Seeding';
 			case Torrent._StatusDownloading:    return 'Downloading';
-			case Torrent._StatusPaused:         return this.isFinished() ? 'Seeding complete' : 'Paused';
+			case Torrent._StatusPaused:         return this._isFinishedSeeding ? 'Seeding complete' : 'Paused';
 			case Torrent._StatusChecking:       return 'Verifying local data';
 			case Torrent._StatusWaitingToCheck: return 'Waiting to verify';
 			default:                            return 'error';
@@ -434,9 +433,6 @@ Torrent.prototype =
 		return null;
 	},
 
-	formatRatio: function() {
-		return 'Ratio: ' + Transmission.fmt.ratioString( this._upload_ratio );
-	},
 	formatUL: function() {
 		return 'UL: ' + Transmission.fmt.speed(this._upload_speed);
 	},
@@ -480,9 +476,7 @@ Torrent.prototype =
 
 			case Torrent._StatusSeeding:
 				if(compact_mode){
-					c = this.formatRatio();
-					c += ' ';
-					c += this.formatUL();
+					c = this.formatUL();
 				} else {
 					// 'Seeding to 13 of 22 peers - UL: 36.2 KiB/s'
 					c = 'Seeding to ';
@@ -622,8 +616,8 @@ Torrent.prototype =
 			// Eg:', uploaded 8.59 GiB (Ratio: 12.3)'
 			c += ', uploaded ';
 			c += Transmission.fmt.size( this._upload_total );
-			c += ' (';
-			c += this.formatRatio();
+			c += ' (Ratio ';
+			c += Transmission.fmt.ratioString( this._upload_ratio );
 			c += ')';
 			c += eta;
 			progress_details = c;
@@ -747,9 +741,6 @@ Torrent.prototype =
 			case Prefs._FilterPaused:
 				pass = !this.isActive();
 				break;
-			case Prefs._FilterFinished:
-				pass = this.isFinished();
-				break;
 			default:
 				pass = true;
 				break;
@@ -791,11 +782,6 @@ Torrent.compareByActivity = function( a, b ) {
 };
 
 /** Helper function for sortTorrents(). */
-Torrent.compareBySize = function( a, b ) {
-	return a.size() - b.size();
-}
-
-/** Helper function for sortTorrents(). */
 Torrent.compareByProgress = function( a, b ) {
 	if( a.getPercentDone() !== b.getPercentDone() )
 		return a.getPercentDone() - b.getPercentDone();
@@ -830,9 +816,6 @@ Torrent.sortTorrents = function( torrents, sortMethod, sortDirection )
 			break;
 		case Prefs._SortByName:
 			torrents.sort( this.compareByName );
-			break;
-		case Prefs._SortBySize:
-			torrents.sort( this.compareBySize );
 			break;
 		default:
 			console.warn( "unknown sort method: " + sortMethod );
