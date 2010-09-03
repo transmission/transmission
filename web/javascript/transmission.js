@@ -45,6 +45,7 @@ Transmission.prototype =
 		$('#filter_downloading_link').parent().bind('click', function(e){ tr.showDownloadingClicked(e); });
 		$('#filter_seeding_link').parent().bind('click', function(e){ tr.showSeedingClicked(e); });
 		$('#filter_paused_link').parent().bind('click', function(e){ tr.showPausedClicked(e); });
+                $('#filter_finished_link').parent().bind('click', function(e){ tr.showFinishedClicked(e); });
 		$('#prefs_save_button').bind('click', function(e) { tr.savePrefsClicked(e); return false;});
 		$('#prefs_cancel_button').bind('click', function(e){ tr.cancelPrefsClicked(e); return false; });
 		$('#stats_close_button').bind('click', function(e){ tr.closeStatsClicked(e); return false; });
@@ -780,6 +781,7 @@ Transmission.prototype =
 			case Prefs._FilterSeeding:     c = '#filter_seeding_link'; break;
 			case Prefs._FilterDownloading: c = '#filter_downloading_link'; break;
 			case Prefs._FilterPaused:      c = '#filter_paused_link'; break;
+			case Prefs._FilterFinished:    c = '#filter_finished_link'; break;
 		}
 		$(c).parent().siblings().removeClass('selected');
 		$(c).parent().addClass('selected');
@@ -802,6 +804,9 @@ Transmission.prototype =
 	},
 	showPausedClicked: function(event) {
 		this.setFilter( Prefs._FilterPaused );
+	},
+	showFinishedClicked: function(event) {
+		this.setFilter( Prefs._FilterFinished );
 	},
 
 	/*
@@ -1392,7 +1397,7 @@ Transmission.prototype =
 					html += '<td class="percentCol">' + Math.floor(peer.progress*100) + '%' + '</td>';
 					html += '<td>' + peer.flagStr + '</td>';
 					html += '<td>' + peer.address + '</td>';
-					html += '<td>' + peer.clientName + '</td>';
+					html += '<td class="clientCol">' + peer.clientName + '</td>';
 					html += '</tr>';
 				}
 				html += '</table></div>';
