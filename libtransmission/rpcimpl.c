@@ -443,8 +443,8 @@ addPeers( const tr_torrent * tor,
         tr_bencDictAddBool( d, "peerIsInterested", peer->peerIsInterested );
         tr_bencDictAddInt ( d, "port", peer->port );
         tr_bencDictAddReal( d, "progress", peer->progress );
-        tr_bencDictAddReal( d, "rateToClient", peer->rateToClient_KBps );
-        tr_bencDictAddReal( d, "rateToPeer", peer->rateToPeer_KBps );
+        tr_bencDictAddInt ( d, "rateToClient", toSpeedBytes( peer->rateToClient_KBps ) );
+        tr_bencDictAddInt ( d, "rateToPeer", toSpeedBytes( peer->rateToPeer_KBps ) );
     }
 
     tr_torrentPeersFree( peers, peerCount );
@@ -570,9 +570,9 @@ addField( const tr_torrent * tor, tr_benc * d, const char * key )
             tr_bencListAddInt( p, inf->files[i].priority );
     }
     else if( tr_streq( key, keylen, "rateDownload" ) )
-        tr_bencDictAddReal( d, key, st->pieceDownloadSpeed_KBps );
+        tr_bencDictAddInt( d, key, toSpeedBytes( st->pieceDownloadSpeed_KBps ) );
     else if( tr_streq( key, keylen, "rateUpload" ) )
-        tr_bencDictAddReal( d, key, st->pieceUploadSpeed_KBps );
+        tr_bencDictAddInt( d, key, toSpeedBytes( st->pieceUploadSpeed_KBps ) );
     else if( tr_streq( key, keylen, "recheckProgress" ) )
         tr_bencDictAddReal( d, key, st->recheckProgress );
     else if( tr_streq( key, keylen, "seedIdleLimit" ) )

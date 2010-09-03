@@ -283,8 +283,8 @@ class Torrent: public QObject
         bool isUploading( ) const { return peersWeAreUploadingTo( ) > 0; }
         int connectedPeers( ) const { return getInt( PEERS_CONNECTED ); }
         int connectedPeersAndWebseeds( ) const { return connectedPeers( ) + getInt( WEBSEEDS_SENDING_TO_US ); }
-        Speed downloadSpeed( ) const { return Speed::fromKBps( getDouble( DOWNLOAD_SPEED ) ); }
-        Speed uploadSpeed( ) const { return Speed::fromKBps( getDouble( UPLOAD_SPEED ) ); }
+        Speed downloadSpeed( ) const { return Speed::fromBps( getSize( DOWNLOAD_SPEED ) ); }
+        Speed uploadSpeed( ) const { return Speed::fromBps( getSize( UPLOAD_SPEED ) ); }
         double getVerifyProgress( ) const { return getDouble( PERCENT_VERIFIED ); }
         bool hasFileSubstring( const QString& substr ) const;
         bool hasTrackerSubstring( const QString& substr ) const;

@@ -182,8 +182,8 @@
    pieceCount                  | number                      | tr_info
    pieceSize                   | number                      | tr_info
    priorities                  | array (see below)           | n/a
-   rateDownload (KBps)         | double                      | tr_stat
-   rateUpload (KBps)           | double                      | tr_stat
+   rateDownload (B/s)          | number                      | tr_stat
+   rateUpload (B/s)            | number                      | tr_stat
    recheckProgress             | double                      | tr_stat
    seedIdleLimit               | number                      | tr_torrent
    seedIdleMode                | number                      | tr_inactvelimit
@@ -235,8 +235,8 @@
                       | peerIsInterested        | boolean    | tr_peer_stat
                       | port                    | number     | tr_peer_stat
                       | progress                | double     | tr_peer_stat
-                      | rateToClient (KBps)     | double     | tr_peer_stat
-                      | rateToPeer (KBps)       | double     | tr_peer_stat
+                      | rateToClient (B/s)      | number     | tr_peer_stat
+                      | rateToPeer (B/s)        | number     | tr_peer_stat
    -------------------+--------------------------------------+
    peersFrom          | an object containing:                |
                       +-------------------------+------------+
@@ -624,5 +624,3 @@
          |         | yes       | session-get    | new arg "idle-seeding-limit-enabled"
          |         | yes       | torrent-set    | new arg "seedIdleLimit"
          |         | yes       | torrent-set    | new arg "seedIdleMode"
-         |         |        NO | torrent-get    | units for "rateDownload" changed from B to KB
-         |         |        NO | torrent-get    | units for "rateUpload" changed from B to KB

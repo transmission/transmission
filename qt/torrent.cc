@@ -55,8 +55,8 @@ Torrent :: Property
 Torrent :: myProperties[] =
 {
     { ID, "id", QVariant::Int, INFO, },
-    { UPLOAD_SPEED, "rateUpload", QVariant::Double, STAT } /* KBps */,
-    { DOWNLOAD_SPEED, "rateDownload", QVariant::Double, STAT }, /* KBps */
+    { UPLOAD_SPEED, "rateUpload", QVariant::ULongLong, STAT } /* Bps */,
+    { DOWNLOAD_SPEED, "rateDownload", QVariant::ULongLong, STAT }, /* Bps */
     { DOWNLOAD_DIR, "downloadDir", QVariant::String, STAT },
     { ACTIVITY, "status", QVariant::Int, STAT },
     { NAME, "name", QVariant::String, INFO },
@@ -662,10 +662,10 @@ Torrent :: update( tr_benc * d )
                 peer.port = i;
             if( tr_bencDictFindReal( child, "progress", &d ) )
                 peer.progress = d;
-            if( tr_bencDictFindReal( child, "rateToClient", &d ) )
-                peer.rateToClient = Speed::fromKBps( d );
-            if( tr_bencDictFindReal( child, "rateToPeer", &d ) )
-                peer.rateToPeer = Speed::fromKBps( d );
+            if( tr_bencDictFindInt( child, "rateToClient", &i ) )
+                peer.rateToClient = Speed::fromBps( i );
+            if( tr_bencDictFindInt( child, "rateToPeer", &i ) )
+                peer.rateToPeer = Speed::fromBps( i );
             peerList << peer;
         }
         myValues[PEERS].setValue( peerList );
