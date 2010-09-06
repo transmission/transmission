@@ -135,7 +135,6 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     connect( ui.action_SortByRatio,    SIGNAL(toggled(bool)), this, SLOT(onSortByRatioToggled(bool)));
     connect( ui.action_SortBySize,     SIGNAL(toggled(bool)), this, SLOT(onSortBySizeToggled(bool)));
     connect( ui.action_SortByState,    SIGNAL(toggled(bool)), this, SLOT(onSortByStateToggled(bool)));
-    connect( ui.action_SortByTracker,  SIGNAL(toggled(bool)), this, SLOT(onSortByTrackerToggled(bool)));
     connect( ui.action_ReverseSortOrder, SIGNAL(toggled(bool)), this, SLOT(setSortAscendingPref(bool)));
     connect( ui.action_Start, SIGNAL(triggered()), this, SLOT(startSelected()));
     connect( ui.action_Pause, SIGNAL(triggered()), this, SLOT(pauseSelected()));
@@ -213,7 +212,6 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     actionGroup->addAction( ui.action_SortByRatio );
     actionGroup->addAction( ui.action_SortBySize );
     actionGroup->addAction( ui.action_SortByState );
-    actionGroup->addAction( ui.action_SortByTracker );
 
     QMenu * menu = new QMenu( );
     menu->addAction( ui.action_AddFile );
@@ -531,7 +529,6 @@ void TrMainWindow :: onSortByProgressToggled ( bool b ) { if( b ) setSortPref( S
 void TrMainWindow :: onSortByRatioToggled    ( bool b ) { if( b ) setSortPref( SortMode::SORT_BY_RATIO );    }
 void TrMainWindow :: onSortBySizeToggled     ( bool b ) { if( b ) setSortPref( SortMode::SORT_BY_SIZE );     }
 void TrMainWindow :: onSortByStateToggled    ( bool b ) { if( b ) setSortPref( SortMode::SORT_BY_STATE );    }
-void TrMainWindow :: onSortByTrackerToggled  ( bool b ) { if( b ) setSortPref( SortMode::SORT_BY_TRACKER );  }
 
 void
 TrMainWindow :: setSortAscendingPref( bool b )
@@ -919,7 +916,6 @@ TrMainWindow :: refreshPref( int key )
             ui.action_SortByRatio->setChecked    ( i == SortMode::SORT_BY_RATIO );
             ui.action_SortBySize->setChecked     ( i == SortMode::SORT_BY_SIZE );
             ui.action_SortByState->setChecked    ( i == SortMode::SORT_BY_STATE );
-            ui.action_SortByTracker->setChecked  ( i == SortMode::SORT_BY_TRACKER );
             break;
 
         case Prefs::DSPEED_ENABLED:

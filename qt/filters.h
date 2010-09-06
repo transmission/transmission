@@ -43,7 +43,7 @@ class SortMode
         static const QString names[];
         enum { SORT_BY_ACTIVITY, SORT_BY_AGE, SORT_BY_ETA, SORT_BY_NAME,
                SORT_BY_PROGRESS, SORT_BY_RATIO, SORT_BY_SIZE,
-               SORT_BY_STATE, SORT_BY_TRACKER, SORT_BY_ID, NUM_MODES };
+               SORT_BY_STATE, SORT_BY_ID, NUM_MODES };
         static int modeFromName( const QString& name );
         static const QString& nameFromMode( int mode );
         int mode() const { return myMode; }

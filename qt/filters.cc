@@ -43,7 +43,6 @@ const QString SortMode::names[NUM_MODES] = {
     "sort-by-ratio",
     "sort-by-size",
     "sort-by-state",
-    "sort-by-tracker",
     "sort-by-id"
 };
 

@@ -116,9 +116,6 @@ TorrentFilter :: lessThan( const QModelIndex& left, const QModelIndex& right ) c
         case SortMode :: SORT_BY_ETA:
             less = a->compareETA( *b );
             break;
-        case SortMode :: SORT_BY_TRACKER:
-            less = a->compareTracker( *b );
-            break;
         default:
             break;
     }

@@ -119,7 +119,6 @@
     <addaction name="action_SortBySize"/>
     <addaction name="action_SortByState"/>
     <addaction name="action_SortByETA"/>
-    <addaction name="action_SortByTracker"/>
     <addaction name="separator"/>
     <addaction name="action_ReverseSortOrder"/>
    </widget>

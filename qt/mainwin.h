@@ -138,7 +138,6 @@ class TrMainWindow: public QMainWindow
         void onSortByRatioToggled    ( bool );
         void onSortBySizeToggled     ( bool );
         void onSortByStateToggled    ( bool );
-        void onSortByTrackerToggled  ( bool );
 
     private:
         QWidget * myFilterBar;
