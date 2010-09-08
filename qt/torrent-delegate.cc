@@ -126,7 +126,7 @@ TorrentDelegate :: progressString( const Torrent& tor ) const
                %2 is how much we've uploaded,
                %3 is our upload-to-download ratio,
                %4 is the ratio we want to reach before we stop uploading */
-            str = tr( "%1, uploaded %2 (Ratio: %3 Goal %4)" )
+            str = tr( "%1, uploaded %2 (Ratio: %3 Goal: %4)" )
                   .arg( Formatter::sizeToString( haveTotal ) )
                   .arg( Formatter::sizeToString( tor.uploadedEver( ) ) )
                   .arg( Formatter::ratioToString( tor.ratio( ) ) )
