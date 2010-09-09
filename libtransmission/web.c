@@ -152,6 +152,7 @@ createEasy( tr_session * s, struct tr_web_task * task )
     const tr_address * addr;
     CURL * e = curl_easy_init( );
     const long verbose = getenv( "TR_CURL_VERBOSE" ) != NULL;
+    char * cookie_filename = tr_buildPath( s->configDir, "cookies.txt", NULL );          
 
     if( !task->range && s->isProxyEnabled ) {
         const long proxyType = getCurlProxyType( s->proxyType );
@@ -169,6 +170,7 @@ createEasy( tr_session * s, struct tr_web_task * task )
     }
 
     curl_easy_setopt( e, CURLOPT_AUTOREFERER, 1L );
+    curl_easy_setopt( e, CURLOPT_COOKIEFILE, cookie_filename ); 
     curl_easy_setopt( e, CURLOPT_ENCODING, "gzip;q=1.0, deflate, identity" );
     curl_easy_setopt( e, CURLOPT_FOLLOWLOCATION, 1L );
     curl_easy_setopt( e, CURLOPT_MAXREDIRS, -1L );
@@ -193,6 +195,7 @@ createEasy( tr_session * s, struct tr_web_task * task )
     if( task->range )
         curl_easy_setopt( e, CURLOPT_RANGE, task->range );
 
+    tr_free( cookie_filename ); 
     return e;
 }
 
