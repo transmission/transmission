@@ -2,6 +2,7 @@ datadir = ${datarootdir}/${PACKAGE_NAME}/${subdir}
 
 dist_data_DATA = \
   common.js \
+  dialog.js \
   formatter.js \
   menu.js \
   torrent.js \
