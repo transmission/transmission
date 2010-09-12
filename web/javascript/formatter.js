@@ -133,6 +133,16 @@ Transmission.fmt = (function()
 			                              : convertedSize.toTruncFixed(1) + ' ' + unit;
 		},
 
+		speedBps: function( Bps )
+		{
+			return this.speed( this.toKBps( Bps ) );
+		},
+
+		toKBps: function( Bps )
+		{
+			return Math.floor( Bps / speed_K );
+		},
+
 		speed: function( KBps )
 		{
 			var speed = KBps;

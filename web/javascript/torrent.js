@@ -435,10 +435,10 @@ Torrent.prototype =
 	},
 
 	formatUL: function() {
-		return 'UL: ' + Transmission.fmt.speed(this._upload_speed);
+		return 'UL: ' + Transmission.fmt.speedBps(this._upload_speed);
 	},
 	formatDL: function() {
-		return 'DL: ' + Transmission.fmt.speed(this._download_speed);
+		return 'DL: ' + Transmission.fmt.speedBps(this._download_speed);
 	},
 
 	getPeerDetails: function()

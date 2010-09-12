@@ -1320,8 +1320,8 @@ Transmission.prototype =
 		setInnerHTML( tab.pieces, pieces );
 		setInnerHTML( tab.hash, hash );
 		setInnerHTML( tab.state, total_state );
-		setInnerHTML( tab.download_speed, torrents.length ? Transmission.fmt.speed( total_download_speed ) : na );
-		setInnerHTML( tab.upload_speed, torrents.length ? Transmission.fmt.speed( total_upload_speed ) : na );
+		setInnerHTML( tab.download_speed, torrents.length ? Transmission.fmt.speedBps( total_download_speed ) : na );
+		setInnerHTML( tab.upload_speed, torrents.length ? Transmission.fmt.speedBps( total_upload_speed ) : na );
 		setInnerHTML( tab.uploaded, torrents.length ? Transmission.fmt.size( total_upload ) : na );
 		setInnerHTML( tab.downloaded, torrents.length ? Transmission.fmt.size( total_download ) : na );
 		setInnerHTML( tab.availability, torrents.length ? Transmission.fmt.percentString(Math.ratio( total_availability*100, sizeWhenDone )) + '%' : na );
@@ -1392,8 +1392,8 @@ Transmission.prototype =
 					var parity = ((i+1) % 2 == 0 ? 'even' : 'odd');
 					html += '<tr class="inspector_peer_entry ' + parity + '">';
 					html += '<td>' + (peer.isEncrypted ? '<img src="images/graphics/lock_icon.png" alt="Encrypted"/>' : '') + '</td>';
-					html += '<td>' + ( peer.rateToPeer ? Transmission.fmt.speed(peer.rateToPeer) : '' ) + '</td>';
-					html += '<td>' + ( peer.rateToClient ? Transmission.fmt.speed(peer.rateToClient) : '' ) + '</td>';
+					html += '<td>' + ( peer.rateToPeer ? Transmission.fmt.speedBps(peer.rateToPeer) : '' ) + '</td>';
+					html += '<td>' + ( peer.rateToClient ? Transmission.fmt.speedBps(peer.rateToClient) : '' ) + '</td>';
 					html += '<td class="percentCol">' + Math.floor(peer.progress*100) + '%' + '</td>';
 					html += '<td>' + peer.flagStr + '</td>';
 					html += '<td>' + peer.address + '</td>';
@@ -1761,12 +1761,12 @@ Transmission.prototype =
 		setInnerHTML( $('#torrent_global_transfer')[0], s );
 
 		// update the speeds
-		s = Transmission.fmt.speed( upSpeed );
+		s = Transmission.fmt.speedBps( upSpeed );
 		if( iPhone ) s = 'UL: ' + s;
 		setInnerHTML( $('#torrent_global_upload')[0], s );
 
 		// download speeds
-		s = Transmission.fmt.speed( downSpeed );
+		s = Transmission.fmt.speedBps( downSpeed );
 		if( iPhone ) s = 'DL: ' + s;
 		setInnerHTML( $('#torrent_global_download')[0], s );
 	},
