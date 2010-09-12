@@ -836,10 +836,10 @@ printDetails( tr_benc * top )
 
             if( tr_bencDictFindInt( t, "eta", &i ) )
                 printf( "  ETA: %s\n", tr_strltime( buf, i, sizeof( buf ) ) );
-            if( tr_bencDictFindReal( t, "rateDownload", &d ) )
-                printf( "  Download Speed: %s\n", tr_formatter_speed_KBps( buf, d, sizeof( buf ) ) );
-            if( tr_bencDictFindReal( t, "rateUpload", &d ) )
-                printf( "  Upload Speed: %s\n", tr_formatter_speed_KBps( buf, d, sizeof( buf ) ) );
+            if( tr_bencDictFindInt( t, "rateDownload", &i ) )
+                printf( "  Download Speed: %s\n", tr_formatter_speed_KBps( buf, i/(double)tr_speed_K, sizeof( buf ) ) );
+            if( tr_bencDictFindInt( t, "rateUpload", &i ) )
+                printf( "  Upload Speed: %s\n", tr_formatter_speed_KBps( buf, i/(double)tr_speed_K, sizeof( buf ) ) );
             if( tr_bencDictFindInt( t, "haveUnchecked", &i )
               && tr_bencDictFindInt( t, "haveValid", &j ) )
             {
@@ -1258,8 +1258,8 @@ printTorrentList( tr_benc * top )
 
         printf( "Sum:         %9s            %6.1f  %6.1f\n",
                 strlsize( haveStr, total_size, sizeof( haveStr ) ),
-                total_up,
-                total_down );
+                total_up/(double)tr_speed_K,
+                total_down/(double)tr_speed_K );
     }
 }
 
