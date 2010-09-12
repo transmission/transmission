@@ -48,7 +48,10 @@
 
 + (NSString *) stringForFileSize: (uint64_t) size
 {
-    if (size < 1024)
+    const CGFloat baseFloat = [NSApp isOnSnowLeopardOrBetter] ? 1000.0 : 1024.0;
+    const NSInteger baseInt = [NSApp isOnSnowLeopardOrBetter] ? 1000 : 1024;
+    
+    if (size < baseInt)
     {
         if (size != 1)
             return [NSString stringWithFormat: @"%lld %@", size, NSLocalizedString(@"bytes", "File size - bytes")];
@@ -58,24 +61,24 @@
 
     CGFloat convertedSize;
     NSString * unit;
-    if (size < pow(1024, 2))
+    if (size < pow(baseInt, 2))
     {
-        convertedSize = size / 1024.0;
+        convertedSize = size / baseFloat;
         unit = NSLocalizedString(@"KB", "File size - kilobytes");
     }
-    else if (size < pow(1024, 3))
+    else if (size < pow(baseInt, 3))
     {
-        convertedSize = size / (CGFloat)pow(1024, 2);
+        convertedSize = size / pow(baseFloat, 2);
         unit = NSLocalizedString(@"MB", "File size - megabytes");
     }
-    else if (size < pow(1024, 4))
+    else if (size < pow(baseInt, 4))
     {
-        convertedSize = size / (CGFloat)pow(1024, 3);
+        convertedSize = size / pow(baseFloat, 3);
         unit = NSLocalizedString(@"GB", "File size - gigabytes");
     }
     else
     {
-        convertedSize = size / (CGFloat)pow(1024, 4);
+        convertedSize = size / pow(baseFloat, 4);
         unit = NSLocalizedString(@"TB", "File size - terabytes");
     }
     
@@ -190,17 +193,19 @@
 
 + (NSString *) stringForSpeed: (CGFloat) speed kb: (NSString *) kb mb: (NSString *) mb gb: (NSString *) gb
 {
+    const CGFloat baseFloat = [NSApp isOnSnowLeopardOrBetter] ? 1000.0 : 1024.0;
+    
     if (speed <= 999.95) //0.0 KB/s to 999.9 KB/s
         return [NSString localizedStringWithFormat: @"%.1f %@", speed, kb];
     
-    speed /= 1024.0;
+    speed /= baseFloat;
     
-    if (speed <= 99.995) //0.98 MB/s to 99.99 MB/s
+    if (speed <= 99.995) //1.00 MB/s to 99.99 MB/s
         return [NSString localizedStringWithFormat: @"%.2f %@", speed, mb];
     else if (speed <= 999.95) //100.0 MB/s to 999.9 MB/s
         return [NSString localizedStringWithFormat: @"%.1f %@", speed, mb];
     else //insane speeds
-        return [NSString localizedStringWithFormat: @"%.2f %@", (speed / 1024.0), gb];
+        return [NSString localizedStringWithFormat: @"%.2f %@", (speed / baseFloat), gb];
 }
 
 @end
