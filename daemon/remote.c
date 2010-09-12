@@ -1201,17 +1201,17 @@ printTorrentList( tr_benc * top )
 
         for( i = 0, n = tr_bencListSize( list ); i < n; ++i )
         {
-            int64_t      id, eta, status;
+            int64_t      id, eta, status, up, down;
             int64_t      sizeWhenDone, leftUntilDone;
-            double       ratio, up, down;
+            double       ratio;
             const char * name;
             tr_benc *   d = tr_bencListChild( list, i );
             if( tr_bencDictFindInt( d, "eta", &eta )
               && tr_bencDictFindInt( d, "id", &id )
               && tr_bencDictFindInt( d, "leftUntilDone", &leftUntilDone )
               && tr_bencDictFindStr( d, "name", &name )
-              && tr_bencDictFindReal( d, "rateDownload", &down )
-              && tr_bencDictFindReal( d, "rateUpload", &up )
+              && tr_bencDictFindInt( d, "rateDownload", &down )
+              && tr_bencDictFindInt( d, "rateUpload", &up )
               && tr_bencDictFindInt( d, "sizeWhenDone", &sizeWhenDone )
               && tr_bencDictFindInt( d, "status", &status )
               && tr_bencDictFindReal( d, "uploadRatio", &ratio ) )
@@ -1244,8 +1244,8 @@ printTorrentList( tr_benc * top )
                     doneStr,
                     haveStr,
                     etaStr,
-                    up,
-                    down,
+                    up/(double)tr_speed_K,
+                    down/(double)tr_speed_K,
                     strlratio2( ratioStr, ratio, sizeof( ratioStr ) ),
                     getStatusString( d, statusStr, sizeof( statusStr ) ),
                     name );
