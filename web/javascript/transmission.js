@@ -924,20 +924,20 @@ Transmission.prototype =
 	},
 
 	updateTurtleButton: function() {
-		var w = $('#turtle_button');
 		var t;
+		var w = $('#turtle_button');
 		if ( this[Prefs._TurtleState] ) {
 			w.addClass('turtleEnabled');
 			w.removeClass('turtleDisabled');
-			t = "Click to disable Temporary Speed Limits";
+			t = [ 'Click to disable Temporary Speed Limits' ];
 		} else {
 			w.removeClass('turtleEnabled');
 			w.addClass('turtleDisabled');
-			t = "Click to enable Temporary Speed Limits";
+			t = [ 'Click to enable Temporary Speed Limits' ];
 		}
-		t += " (" + Transmission.fmt.speed(this._prefs[RPC._TurtleUpSpeedLimit]) + " up, "
-		          + Transmission.fmt.speed(this._prefs[RPC._TurtleDownSpeedLimit]) + " down)";
-		w.attr( 'title', t );
+		t.push( '(', Transmission.fmt.speed(this._prefs[RPC._TurtleUpSpeedLimit]), 'up,',
+		             Transmission.fmt.speed(this._prefs[RPC._TurtleDownSpeedLimit]), 'down)' );
+		w.attr( 'title', t.join(' ') );
 	},
 
 	/*--------------------------------------------
@@ -1006,12 +1006,12 @@ Transmission.prototype =
 
 		if (!iPhone)
 		{
-			setInnerHTML( $('#limited_download_rate')[0], 'Limit (' + Transmission.fmt.speed(dn_limit_k) + ')' );
+			setInnerHTML( $('#limited_download_rate')[0], [ 'Limit (', Transmission.fmt.speed(dn_limit_k), ')' ].join('') );
 			var key = dn_limited ? '#limited_download_rate'
 			                       : '#unlimited_download_rate';
 			$(key).deselectMenuSiblings().selectMenuItem();
 
-			setInnerHTML( $('#limited_upload_rate')[0], 'Limit (' + Transmission.fmt.speed(up_limit_k) + ')' );
+			setInnerHTML( $('#limited_upload_rate')[0], [ 'Limit (', Transmission.fmt.speed(up_limit_k), ')' ].join('') );
 			key = up_limited ? '#limited_upload_rate'
 			                 : '#unlimited_upload_rate';
 			$(key).deselectMenuSiblings().selectMenuItem();
@@ -1125,7 +1125,7 @@ Transmission.prototype =
 				} else {
 					var rate_str = ($element[0].innerHTML).replace(/[^0-9]/ig, '');
 					var rate_val = parseInt( rate_str );
-					setInnerHTML( $('#limited_download_rate')[0], 'Limit (' + Transmission.fmt.speed(rate_val) + ')' );
+					setInnerHTML( $('#limited_download_rate')[0], [ 'Limit (', Transmission.fmt.speed(rate_val), ')' ].join('') );
 					$('#limited_download_rate').deselectMenuSiblings().selectMenuItem();
 					$('div.preference input#download_rate')[0].value = rate_str;
 					args[RPC._DownSpeedLimit] = rate_val;
@@ -1144,7 +1144,7 @@ Transmission.prototype =
 				} else {
 					var rate_str = ($element[0].innerHTML).replace(/[^0-9]/ig, '');
 					var rate_val = parseInt( rate_str );
-					setInnerHTML( $('#limited_upload_rate')[0], 'Limit (' + Transmission.fmt.speed(rate_val) + ')' );
+					setInnerHTML( $('#limited_upload_rate')[0], [ 'Limit (', Transmission.fmt.speed(rate_val), ')' ].join('')  );
 					$('#limited_upload_rate').deselectMenuSiblings().selectMenuItem();
 					$('div.preference input#upload_rate')[0].value = rate_str;
 					args[RPC._UpSpeedLimit] = rate_val;
@@ -1283,7 +1283,7 @@ Transmission.prototype =
 				download_dir = t._download_dir;
 
 			hash = t.hash();
-			pieces = t._pieceCount + ' pieces @ ' + Transmission.fmt.mem(t._pieceSize);
+			pieces = [ t._pieceCount, 'pieces @', Transmission.fmt.mem(t._pieceSize) ].join(' ');
 			date_created = Transmission.fmt.timestamp( t._creator_date );
 		}
 
@@ -1365,65 +1365,63 @@ Transmission.prototype =
 
 	updatePeersLists: function() {
 		var tr = this;
-		var html = '';
+		var html = [ ];
 		var torrents = this.getSelectedTorrents( );
 		if( $(this._inspector_peers_list).is(':visible') ) {
 			for( var k=0, torrent; torrent=torrents[k]; ++k ) {
-				html += '<div class="inspector_group">';
+				html.push( '<div class="inspector_group">' );
 				if( torrents.length > 1 ) {
-					html += '<div class="inspector_torrent_label">';
-					html += torrent._name + '</div>';
+					html.push( '<div class="inspector_torrent_label">', torrent._name, '</div>' );
 				}
 				if( torrent._peers.length == 0 ) {
-					html += '<br></div>'; // firefox won't paint the top border if the div is empty
+					html.push( '<br></div>' ); // firefox won't paint the top border if the div is empty
 					continue;
 				}
-				html += '<table class="peer_list">';
-				html += '<tr class="inspector_peer_entry even">';
-				html += '<th class="encryptedCol"></th>';
-				html += '<th class="upCol">Up</th>';
-				html += '<th class="downCol">Down</th>';
-				html += '<th class="percentCol">%</th>';
-				html += '<th class="statusCol">Status</th>';
-				html += '<th class="addressCol">Address</th>';
-				html += '<th class="clientCol">Client</th>';
-				html += '</tr>';
+				html.push( '<table class="peer_list">',
+				           '<tr class="inspector_peer_entry even">',
+				           '<th class="encryptedCol"></th>',
+				           '<th class="upCol">Up</th>',
+				           '<th class="downCol">Down</th>',
+				           '<th class="percentCol">%</th>',
+				           '<th class="statusCol">Status</th>',
+				           '<th class="addressCol">Address</th>',
+				           '<th class="clientCol">Client</th>',
+				           '</tr>' );
 				for( var i=0, peer; peer=torrent._peers[i]; ++i ) {
 					var parity = ((i+1) % 2 == 0 ? 'even' : 'odd');
-					html += '<tr class="inspector_peer_entry ' + parity + '">';
-					html += '<td>' + (peer.isEncrypted ? '<img src="images/graphics/lock_icon.png" alt="Encrypted"/>' : '') + '</td>';
-					html += '<td>' + ( peer.rateToPeer ? Transmission.fmt.speedBps(peer.rateToPeer) : '' ) + '</td>';
-					html += '<td>' + ( peer.rateToClient ? Transmission.fmt.speedBps(peer.rateToClient) : '' ) + '</td>';
-					html += '<td class="percentCol">' + Math.floor(peer.progress*100) + '%' + '</td>';
-					html += '<td>' + peer.flagStr + '</td>';
-					html += '<td>' + peer.address + '</td>';
-					html += '<td class="clientCol">' + peer.clientName + '</td>';
-					html += '</tr>';
+					html.push( '<tr class="inspector_peer_entry ', parity, '">',
+					           '<td>', (peer.isEncrypted ? '<img src="images/graphics/lock_icon.png" alt="Encrypted"/>' : ''), '</td>',
+					           '<td>', ( peer.rateToPeer ? Transmission.fmt.speedBps(peer.rateToPeer) : '' ), '</td>',
+					           '<td>', ( peer.rateToClient ? Transmission.fmt.speedBps(peer.rateToClient) : '' ), '</td>',
+					           '<td class="percentCol">', Math.floor(peer.progress*100), '%', '</td>',
+					           '<td>', peer.flagStr, '</td>',
+					           '<td>', peer.address, '</td>',
+					           '<td class="clientCol">', peer.clientName, '</td>',
+					           '</tr>' );
 				}
-				html += '</table></div>';
+				html.push( '</table></div>' );
 			}
 		}
-		setInnerHTML(this._inspector_peers_list, html);
+		setInnerHTML(this._inspector_peers_list, html.join('') );
 	},
 
 	updateTrackersLists: function() {
 		// By building up the HTML as as string, then have the browser
 		// turn this into a DOM tree, this is a fast operation.
 		var tr = this;
-		var html = '';
+		var html = [ ];
 		var na = 'N/A';
 		var torrents = this.getSelectedTorrents( );
 		if( $(this._inspector_trackers_list).is(':visible') ) {
 			for( var k=0, torrent; torrent = torrents[k]; ++k ) {
-				html += '<div class="inspector_group">';
+				html.push( '<div class="inspector_group">' );
 				if( torrents.length > 1 ) {
-					html += '<div class="inspector_torrent_label">';
-					html += torrent._name + '</div>';
+					html.push( '<div class="inspector_torrent_label">', torrent._name, '</div>' );
 				}
 				for( var i=0, tier; tier=torrent._trackerStats[i]; ++i ) {
-					html += '<div class="inspector_group_label">';
-					html += 'Tier ' + (i + 1) + '</div>';
-					html += '<ul class="tier_list">';
+					html.push( '<div class="inspector_group_label">',
+					           'Tier ', (i + 1), '</div>',
+					           '<ul class="tier_list">' );
 					for( var j=0, tracker; tracker=tier[j]; ++j ) {
 						var lastAnnounceStatusHash = tr.lastAnnounceStatus(tracker);
 						var announceState = tr.announceState(tracker);
@@ -1431,42 +1429,39 @@ Transmission.prototype =
 
 						// Display construction
 						var parity = ((j+1) % 2 == 0 ? 'even' : 'odd');
-						html += '<li class="inspector_tracker_entry ' + parity + '"><div class="tracker_host" title="' + tracker.announce + '">';
-						html += tracker.host + '</div>';
-						html += '<div class="tracker_activity">';
-						html += '<div>' + lastAnnounceStatusHash['label'] + ': ' + lastAnnounceStatusHash['value'] + '</div>';
-						html += '<div>' + announceState + '</div>';
-						html += '<div>' + lastScrapeStatusHash['label'] + ': ' + lastScrapeStatusHash['value'] + '</div>';
-						html += '</div><table class="tracker_stats">';
-						html += '<tr><th>Seeders:</th><td>' + (tracker.seederCount > -1 ? tracker.seederCount : na) + '</td></tr>';
-						html += '<tr><th>Leechers:</th><td>' + (tracker.leecherCount > -1 ? tracker.leecherCount : na) + '</td></tr>';
-						html += '<tr><th>Downloads:</th><td>' + (tracker.downloadCount > -1 ? tracker.downloadCount : na)+ '</td></tr>';
-						html += '</table></li>';
+						html.push( '<li class="inspector_tracker_entry ', parity, '"><div class="tracker_host" title="', tracker.announce, '">',
+						           tracker.host, '</div>',
+						           '<div class="tracker_activity">',
+						           '<div>', lastAnnounceStatusHash['label'], ': ', lastAnnounceStatusHash['value'], '</div>',
+						           '<div>', announceState, '</div>',
+						           '<div>', lastScrapeStatusHash['label'], ': ', lastScrapeStatusHash['value'], '</div>',
+						           '</div><table class="tracker_stats">',
+						           '<tr><th>Seeders:</th><td>', (tracker.seederCount > -1 ? tracker.seederCount : na), '</td></tr>',
+						           '<tr><th>Leechers:</th><td>', (tracker.leecherCount > -1 ? tracker.leecherCount : na), '</td></tr>',
+						           '<tr><th>Downloads:</th><td>', (tracker.downloadCount > -1 ? tracker.downloadCount : na), '</td></tr>',
+						           '</table></li>' );
 					}
-					html += '</ul>';
+					html.push( '</ul>' );
 				}
-				html += '</div>';
+				html.push( '</div>' );
 			}
 		}
-		setInnerHTML(this._inspector_trackers_list, html);
+		setInnerHTML(this._inspector_trackers_list, html.join(''));
 	},
 
 	lastAnnounceStatus: function(tracker){
 		var lastAnnounceLabel = 'Last Announce';
-		var lastAnnounce = 'N/A';
+		var lastAnnounce = [ 'N/A' ];
 		if (tracker.hasAnnounced) {
 			var lastAnnounceTime = Transmission.fmt.timestamp(tracker.lastAnnounceTime);
 			if (tracker.lastAnnounceSucceeded) {
-				lastAnnounce = lastAnnounceTime;
-				lastAnnounce += ' (got ' + tracker.lastAnnouncePeerCount + ' peer';
-				if (tracker.lastAnnouncePeerCount != 1){ lastAnnounce += 's'; }
-				lastAnnounce += ')';
+				lastAnnounce = [ lastAnnounceTime, ' (got ',  Transmission.fmt.plural(tracker.lastAnnouncePeerCount, 'peer'), ')' ];
 			} else {
 				lastAnnounceLabel = 'Announce error';
-				lastAnnounce = (tracker.lastAnnounceResult ? tracker.lastAnnounceResult + ' - ' : '') + lastAnnounceTime;
+				lastAnnounce = [ (tracker.lastAnnounceResult ? (tracker.lastAnnounceResult + ' - ') : ''), lastAnnounceTime ];
 			}
 		}
-		return {'label':lastAnnounceLabel, 'value':lastAnnounce};
+		return { 'label':lastAnnounceLabel, 'value':lastAnnounce.join('') };
 	},
 
 	announceState: function(tracker){

@@ -458,21 +458,11 @@ Torrent.prototype =
 				break;
 
 			case Torrent._StatusDownloading:
-				if(compact_mode){
-					c = this.formatDL();
-					c += ' ';
-					c += this.formatUL();
-				} else {
-					// 'Downloading from 36 of 40 peers - DL: 60.2 KiB/s UL: 4.3 KiB/s'
-					c = 'Downloading from ';
-					c += this.peersSendingToUs();
-					c += ' of ';
-					c += this._peers_connected;
-					c += ' peers - ';
-					c = this.formatDL();
-					c += ' ';
-					c += this.formatUL();
-				}
+				var a = [ ];
+				if(!compact_mode)
+					a.push( 'Downloading from', this.peersSendingToUs(), 'of', this._peers_connected, 'peers', '-' );
+				a.push( this.formatDL(), this.formatUL() );
+				c = a.join(' ');
 				break;
 
 			case Torrent._StatusSeeding:
@@ -480,20 +470,13 @@ Torrent.prototype =
 					c = this.formatUL();
 				} else {
 					// 'Seeding to 13 of 22 peers - UL: 36.2 KiB/s'
-					c = 'Seeding to ';
-					c += this.peersGettingFromUs();
-					c += ' of ';
-					c += this._peers_connected;
-					c += ' peers - ';
-					c += this.formatUL();
+					c = [ 'Seeding to', this.peersGettingFromUs(), 'of', this._peers_connected, 'peers', '-', this.formatUL() ].join(' ');
 				}
 				break;
 
 			case Torrent._StatusChecking:
 				// 'Verifying local data (40% tested)'
-				c = 'Verifying local data (';
-				c += Transmission.fmt.percentString( 100.0 * this._recheckProgress );
-				c += '% tested)';
+				c = [ 'Verifying local data (', Transmission.fmt.percentString( 100.0 * this._recheckProgress ), '% tested)' ].join('');
 				break;
 		}
 		return c;

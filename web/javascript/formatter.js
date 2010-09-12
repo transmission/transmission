@@ -63,7 +63,7 @@ Transmission.fmt = (function()
 		mem: function( bytes )
 		{
 			if( bytes < mem_K )
-				return bytes + ' ' + mem_B_str;
+				return [ bytes, mem_B_str ].join(' ');
 
 			var convertedSize;
 			var unit;
@@ -90,8 +90,8 @@ Transmission.fmt = (function()
 			}
 
 			// try to have at least 3 digits and at least 1 decimal
-			return convertedSize <= 9.995 ? convertedSize.toTruncFixed(2) + ' ' + unit
-			                              : convertedSize.toTruncFixed(1) + ' ' + unit;
+			return convertedSize <= 9.995 ? [ convertedSize.toTruncFixed(2), unit ].join(' ')
+			                              : [ convertedSize.toTruncFixed(1), unit ].join(' ');
 		},
 
 		/**
@@ -102,7 +102,7 @@ Transmission.fmt = (function()
 		size: function( bytes )
 		{
 			if( bytes < size_K )
-				return bytes + ' ' + size_B_str;
+				return [ bytes, size_B_str ].join(' ');
 
 			var convertedSize;
 			var unit;
@@ -129,8 +129,8 @@ Transmission.fmt = (function()
 			}
 
 			// try to have at least 3 digits and at least 1 decimal
-			return convertedSize <= 9.995 ? convertedSize.toTruncFixed(2) + ' ' + unit
-			                              : convertedSize.toTruncFixed(1) + ' ' + unit;
+			return convertedSize <= 9.995 ? [ convertedSize.toTruncFixed(2), unit ].join(' ')
+			                              : [ convertedSize.toTruncFixed(1), unit ].join(' ');
 		},
 
 		speedBps: function( Bps )
@@ -148,18 +148,18 @@ Transmission.fmt = (function()
 			var speed = KBps;
 
 			if (speed <= 999.95) // 0 KBps to 999.9 K
-				return speed.toTruncFixed(1) + ' ' + speed_K_str;
+				return [ speed.toTruncFixed(1), speed_K_str ].join(' ');
 
 			speed /= speed_K;
 
 			if (speed <= 99.995) // 1 M to 99.99 M
-				return speed.toTruncFixed(2) + ' ' + speed_M_str;
+				return [ speed.toTruncFixed(2), speed_M_str ].join(' ');
 			if (speed <= 999.95) // 100 M to 999.9 M
-				return speed.toTruncFixed(1) + ' ' + speed_M_str;
+				return [ speed.toTruncFixed(1), speed_M_str ].join(' ');
 
 			// insane speeds
 			speed /= speed_K;
-			return speed.toTruncFixed(2) + ' ' + speed_G_str;
+			return [ speed.toTruncFixed(2), speed_G_str ].join(' ');
 		},
 
 		timeInterval: function( seconds )
@@ -171,21 +171,21 @@ Transmission.fmt = (function()
 			var seconds = Math.floor((seconds % 3600) % 60);
 
 			if (days > 0 && hours == 0)
-				result = days + ' days';
+				result = [ days, 'days' ];
 			else if (days > 0 && hours > 0)
-				result = days + ' days ' + hours + ' hr';
+				result = [ days, 'days', hours, 'hr' ];
 			else if (hours > 0 && minutes == 0)
-				result = hours + ' hr';
+				result = [ hours, 'hr' ];
 			else if (hours > 0 && minutes > 0)
-				result = hours + ' hr ' + minutes + ' min';
+				result = [ hours,'hr', minutes, 'min' ];
 			else if (minutes > 0 && seconds == 0)
-				result = minutes + ' min';
+				result = [ minutes, 'min' ];
 			else if (minutes > 0 && seconds > 0)
-				result = minutes + ' min ' + seconds + ' seconds';
+				result = [ minutes, 'min', seconds, 'seconds' ];
 			else
-				result = seconds + ' seconds';
+				result = [ seconds, 'seconds' ];
 
-			return result;
+			return result.join(' ');
 		},
 
 		timestamp: function( seconds )
@@ -239,6 +239,11 @@ Transmission.fmt = (function()
 			time = [hours, minutes, seconds].join(':');
 
 			return [date, time, period].join(' ');
+		},
+
+		plural: function( i, word )
+		{
+			return [ i, ' ', word, (word==1?'':'s') ].join('');
 		}
 	}
 })();
