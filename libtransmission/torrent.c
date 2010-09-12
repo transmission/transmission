@@ -771,7 +771,7 @@ torrentInit( tr_torrent * tor, const tr_ctor * ctor )
     tor->bandwidth->priority = tr_ctorGetBandwidthPriority( ctor );
 
     tor->error = TR_STAT_OK;
-    
+
     tor->finishedSeedingByIdle = FALSE;
 
     tr_peerMgrAddTorrent( session->peerMgr, tor );
@@ -1111,7 +1111,7 @@ tr_torrentStat( tr_torrent * tor )
     s->doneDate     = tor->doneDate;
     s->startDate    = tor->startDate;
 
-    if (s->activity == TR_STATUS_DOWNLOAD || s->activity == TR_STATUS_SEED)
+    if ((s->activity == TR_STATUS_DOWNLOAD || s->activity == TR_STATUS_SEED) && s->startDate != 0)
         s->idleSecs = difftime(tr_time(), MAX(s->startDate, s->activityDate));
     else
         s->idleSecs = -1;
