@@ -435,6 +435,7 @@ tr_torrentCheckSeedLimit( tr_torrent * tor )
         tr_torinf( tor, "Seeding idle limit reached; pausing torrent" );
 
         tor->isStopping = TRUE;
+        tor->finishedSeedingByIdle = TRUE;
 
         /* maybe notify the client */
         if( tor->idle_limit_hit_func != NULL )
@@ -770,6 +771,8 @@ torrentInit( tr_torrent * tor, const tr_ctor * ctor )
     tor->bandwidth->priority = tr_ctorGetBandwidthPriority( ctor );
 
     tor->error = TR_STAT_OK;
+    
+    tor->finishedSeedingByIdle = FALSE;
 
     tr_peerMgrAddTorrent( session->peerMgr, tor );
 
@@ -1199,10 +1202,9 @@ tr_torrentStat( tr_torrent * tor )
             break;
     }
 
-    #warning (maybe) do something for idle?
     /* s->haveValid is here to make sure a torrent isn't marked 'finished'
      * when the user hits "uncheck all" prior to starting the torrent... */
-    s->finished = seedRatioApplies && !seedRatioBytesLeft && s->haveValid;
+    s->finished = tor->finishedSeedingByIdle || (seedRatioApplies && !seedRatioBytesLeft && s->haveValid);
 
     if( !seedRatioApplies || s->finished )
         s->seedRatioPercentDone = 1;
@@ -1492,6 +1494,7 @@ checkAndStartImpl( void * vtor )
         tor->completeness = tr_cpGetStatus( &tor->completion );
         tor->startDate = tor->anyDate = now;
         tr_torrentClearError( tor );
+        tor->finishedSeedingByIdle = FALSE;
 
         tr_torrentResetTransferStats( tor );
         tr_announcerTorrentStarted( tor );

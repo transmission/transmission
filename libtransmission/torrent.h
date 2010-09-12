@@ -260,6 +260,7 @@ struct tr_torrent
 
     uint16_t                   idleLimitMinutes;
     tr_idlelimit               idleLimitMode;
+    tr_bool                    finishedSeedingByIdle;
 
     uint64_t                   preVerifyTotal;
 };
