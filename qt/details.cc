@@ -1035,11 +1035,9 @@ Details :: onEditTrackerClicked( )
         QSet<int> ids;
         ids << trackerInfo.torrentId;
 
-        QStringList urls;
-        urls << trackerInfo.st.announce;
-        urls << newval;
+        const QPair<int,QString> idUrl = qMakePair( trackerInfo.st.id, newval );
 
-        mySession.torrentSet( ids, "trackerReplace", urls );
+        mySession.torrentSet( ids, "trackerReplace", idUrl );
         getNewData( );
     }
 }
@@ -1050,21 +1048,23 @@ Details :: onRemoveTrackerClicked( )
     // make a map of torrentIds to announce URLs to remove
     QItemSelectionModel * selectionModel = myTrackerView->selectionModel( );
     QModelIndexList selectedRows = selectionModel->selectedRows( );
-    QMap<int,QStringList> torrentId_to_urls;
+    QMap<int,int> torrentId_to_trackerIds;
     foreach( QModelIndex i, selectedRows )
     {
         const TrackerInfo inf = myTrackerView->model()->data( i, TrackerModel::TrackerRole ).value<TrackerInfo>();
-        torrentId_to_urls[ inf.torrentId ].append( inf.st.announce );
+        torrentId_to_trackerIds.insertMulti( inf.torrentId, inf.st.id );
     }
 
     // batch all of a tracker's torrents into one command
-    foreach( int id, torrentId_to_urls.keys( ) )
+    foreach( int id, torrentId_to_trackerIds.uniqueKeys( ) )
     {
         QSet<int> ids;
         ids << id;
-        mySession.torrentSet( ids, "trackerRemove", torrentId_to_urls.value( id ) );
-        getNewData( );
+        mySession.torrentSet( ids, "trackerRemove", torrentId_to_trackerIds.values( id ) );
     }
+
+    selectionModel->clearSelection( );
+    getNewData( );
 }
 
 QWidget *

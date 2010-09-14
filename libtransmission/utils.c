@@ -1296,7 +1296,7 @@ parseNumberSection( const char * str, int len, struct number_range * setme )
     return success;
 }
 
-static int
+int
 compareInt( const void * va, const void * vb )
 {
     const int a = *(const int *)va;

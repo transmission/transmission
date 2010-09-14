@@ -97,6 +97,7 @@ class Session: public QObject
         void torrentSet( const QSet<int>& ids, const QString& key, double val );
         void torrentSet( const QSet<int>& ids, const QString& key, const QList<int>& val );
         void torrentSet( const QSet<int>& ids, const QString& key, const QStringList& val );
+        void torrentSet( const QSet<int>& ids, const QString& key, const QPair<int,QString>& val);
         void torrentSetLocation( const QSet<int>& ids, const QString& path, bool doMove );
 
 

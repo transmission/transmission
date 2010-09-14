@@ -847,7 +847,7 @@ addTrackerUrls( tr_torrent * tor, tr_benc * urls )
 }
 
 static const char*
-replaceTrackerUrls( tr_torrent * tor, tr_benc * urls )
+replaceTrackers( tr_torrent * tor, tr_benc * urls )
 {
     int i;
     tr_benc * pair[2];
@@ -866,17 +866,16 @@ replaceTrackerUrls( tr_torrent * tor, tr_benc * urls )
     while(((pair[0] = tr_bencListChild(urls,i))) &&
           ((pair[1] = tr_bencListChild(urls,i+1))))
     {
-        const char * oldval;
+        int64_t pos;
         const char * newval;
 
-        if(    tr_bencGetStr( pair[0], &oldval )
+        if(    tr_bencGetInt( pair[0], &pos )
             && tr_bencGetStr( pair[1], &newval )
-            && strcmp( oldval, newval )
             && tr_urlIsValid( newval, -1 )
-            && findAnnounceUrl( trackers, n, oldval, &i ) )
+            && pos < n )
         {
-            tr_free( trackers[i].announce );
-            trackers[i].announce = tr_strdup( newval );
+            tr_free( trackers[pos].announce );
+            trackers[pos].announce = tr_strdup( newval );
             changed = TRUE;
         }
 
@@ -893,10 +892,12 @@ replaceTrackerUrls( tr_torrent * tor, tr_benc * urls )
 }
 
 static const char*
-removeTrackerUrls( tr_torrent * tor, tr_benc * urls )
+removeTrackers( tr_torrent * tor, tr_benc * ids )
 {
     int i;
     int n;
+    int * tids;
+    int t = 0;
     tr_benc * val;
     tr_tracker_info * trackers;
     tr_bool changed = FALSE;
@@ -905,20 +906,27 @@ removeTrackerUrls( tr_torrent * tor, tr_benc * urls )
 
     /* make a working copy of the existing announce list */
     n = inf->trackerCount;
+    tids = tr_new0( int, n );
     trackers = tr_new0( tr_tracker_info, n );
     copyTrackers( trackers, inf->trackers, n );
 
     /* remove the ones specified in the urls list */
     i = 0;
-    while(( val = tr_bencListChild( urls, i++ ))) 
+    while(( val = tr_bencListChild( ids, i++ )))
     {
-        int pos;
-        const char * url;
-        if( tr_bencGetStr( val, &url ) && findAnnounceUrl( trackers, n, url, &pos ) )
-        {
-            tr_removeElementFromArray( trackers, pos, sizeof( tr_tracker_info ), n-- );
-            changed = TRUE;
-        }
+        int64_t pos;
+        if( tr_bencGetInt( val, &pos ) && pos < n )
+            tids[t++] = pos;
+    }
+
+    /* sort trackerIds because tr_removeElementFromArray changes indices as it removes */
+    qsort( tids, t, sizeof(int), compareInt );
+
+    /* remove from largest trackerId to smallest */
+    while( t-- )
+    {
+        tr_removeElementFromArray( trackers, tids[t], sizeof( tr_tracker_info ), n-- );
+        changed = TRUE;
     }
 
     if( !changed )
@@ -927,6 +935,7 @@ removeTrackerUrls( tr_torrent * tor, tr_benc * urls )
         errmsg = "error setting announce list";
 
     freeTrackers( trackers, n );
+    tr_free( tids );
     return errmsg;
 }
 
@@ -947,7 +956,7 @@ torrentSet( tr_session               * session,
         int64_t      tmp;
         double       d;
         tr_benc *    files;
-        tr_benc *    urls;
+        tr_benc *    trackers;
         tr_bool      boolVal;
         tr_torrent * tor = torrents[i];
 
@@ -984,12 +993,12 @@ torrentSet( tr_session               * session,
             tr_torrentSetRatioLimit( tor, d );
         if( tr_bencDictFindInt( args_in, "seedRatioMode", &tmp ) )
             tr_torrentSetRatioMode( tor, tmp );
-        if( !errmsg && tr_bencDictFindList( args_in, "trackerAdd", &urls ) )
-            errmsg = addTrackerUrls( tor, urls );
-        if( !errmsg && tr_bencDictFindList( args_in, "trackerRemove", &urls ) )
-            errmsg = removeTrackerUrls( tor, urls );
-        if( !errmsg && tr_bencDictFindList( args_in, "trackerReplace", &urls ) )
-            errmsg = replaceTrackerUrls( tor, urls );
+        if( !errmsg && tr_bencDictFindList( args_in, "trackerAdd", &trackers ) )
+            errmsg = addTrackerUrls( tor, trackers );
+        if( !errmsg && tr_bencDictFindList( args_in, "trackerRemove", &trackers ) )
+            errmsg = removeTrackers( tor, trackers );
+        if( !errmsg && tr_bencDictFindList( args_in, "trackerReplace", &trackers ) )
+            errmsg = replaceTrackers( tor, trackers );
         notify( session, TR_RPC_TORRENT_CHANGED, tor );
     }
 

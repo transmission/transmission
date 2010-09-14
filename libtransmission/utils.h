@@ -438,6 +438,8 @@ void tr_set_compare( const void * a, size_t aCount,
                      tr_set_func in_both_cb,
                      void * userData );
 
+int compareInt( const void * va, const void * vb );
+
 void tr_sha1_to_hex( char * out, const uint8_t * sha1 ) TR_GNUC_NONNULL(1,2);
 
 void tr_hex_to_sha1( uint8_t * out, const char * hex ) TR_GNUC_NONNULL(1,2);

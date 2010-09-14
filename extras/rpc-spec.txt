@@ -105,8 +105,8 @@
    "seedRatioLimit"      | double     torrent-level seeding ratio
    "seedRatioMode"       | number     which ratio to use.  See tr_ratiolimit
    "trackerAdd"          | array      strings of announce URLs to add
-   "trackerRemove"       | array      strings of announce URLs to remove
-   "trackerReplace"      | array      pairs of old/new announce announce URLs
+   "trackerRemove"       | array      ids of trackers to remove
+   "trackerReplace"      | array      pairs of <trackerId/new announce URLs>
    "uploadLimit"         | number     maximum upload speed (KBps)
    "uploadLimited"       | boolean    true if "uploadLimit" is honored
 
@@ -616,8 +616,8 @@
    ------+---------+-----------+----------------+-------------------------------
    10    | 2.10    | yes       | session-get    | new arg "cache-size"
          |         | yes       | torrent-set    | new arg "trackerAdd"
-         |         | yes       | torrent-set    | new arg "trackerEdit"
          |         | yes       | torrent-set    | new arg "trackerRemove"
+         |         | yes       | torrent-set    | new arg "trackerReplace"
          |         | yes       | session-set    | new arg "idle-seeding-limit"
          |         | yes       | session-set    | new arg "idle-seeding-limit-enabled"
          |         | yes       | session-get    | new arg "idle-seeding-limit"

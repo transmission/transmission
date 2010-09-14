@@ -1276,6 +1276,7 @@ printTrackersImpl( tr_benc * trackerStats )
         tr_bool hasAnnounced;
         tr_bool hasScraped;
         const char * host;
+        int64_t id;
         tr_bool isBackup;
         int64_t lastAnnouncePeerCount;
         const char * lastAnnounceResult;
@@ -1300,6 +1301,7 @@ printTrackersImpl( tr_benc * trackerStats )
             tr_bencDictFindBool( t, "hasAnnounced", &hasAnnounced ) &&
             tr_bencDictFindBool( t, "hasScraped", &hasScraped ) &&
             tr_bencDictFindStr ( t, "host", &host ) &&
+            tr_bencDictFindInt ( t, "id", &id ) &&
             tr_bencDictFindBool( t, "isBackup", &isBackup ) &&
             tr_bencDictFindInt ( t, "announceState", &announceState ) &&
             tr_bencDictFindInt ( t, "scrapeState", &scrapeState ) &&
@@ -1323,7 +1325,7 @@ printTrackersImpl( tr_benc * trackerStats )
             const time_t now = time( NULL );
 
             printf( "\n" );
-            printf( "  Tracker #%d: %s\n", (int)(i+1), host );
+            printf( "  Tracker %d: %s\n", (int)(id), host );
             if( isBackup )
                 printf( "  Backup on tier #%d\n", (int)tier );
             else
@@ -2035,8 +2037,8 @@ processArgs( const char * host, int port, int argc, const char ** argv )
             {
                 case 712:
                     {
-                        tr_benc * trackers = tr_bencDictAddDict( args, "trackerRemove", 1 );
-                        tr_bencDictAddInt( trackers, "id", atoi(optarg) );
+                        tr_benc * trackers = tr_bencDictAddList( args, "trackerRemove", 1 );
+                        tr_bencListAddInt( trackers, atoi(optarg) );
                         break;
                     }
                 case 950: tr_bencDictAddReal( args, "seedRatioLimit", atof(optarg) );
