@@ -499,8 +499,10 @@ Details :: refresh( )
             if( latest < dt )
                 latest = dt;
         }
-        const int seconds = latest.secsTo( qdt_now );
-        if( seconds < 5 )
+        const int seconds = latest.isValid() ? latest.secsTo( qdt_now ) : -1;
+        if( seconds < 0 )
+            string = none;
+        else if( seconds < 5 )
             string = tr( "Active now" );
         else
             string = tr( "%1 ago" ).arg( Formatter::timeToString( seconds ) );
