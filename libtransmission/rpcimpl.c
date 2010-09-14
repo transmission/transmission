@@ -896,8 +896,9 @@ removeTrackers( tr_torrent * tor, tr_benc * ids )
 {
     int i;
     int n;
-    int * tids;
     int t = 0;
+    int dup = -1;
+    int * tids;
     tr_benc * val;
     tr_tracker_info * trackers;
     tr_bool changed = FALSE;
@@ -919,13 +920,15 @@ removeTrackers( tr_torrent * tor, tr_benc * ids )
             tids[t++] = pos;
     }
 
-    /* sort trackerIds because tr_removeElementFromArray changes indices as it removes */
+    /* sort trackerIds and remove from largest to smallest so there is no need to recacluate array indicies */
     qsort( tids, t, sizeof(int), compareInt );
-
-    /* remove from largest trackerId to smallest */
     while( t-- )
     {
+        /* check for duplicates */
+        if( tids[t] == dup )
+            continue;
         tr_removeElementFromArray( trackers, tids[t], sizeof( tr_tracker_info ), n-- );
+        dup = tids[t];
         changed = TRUE;
     }
 
