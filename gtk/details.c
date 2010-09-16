@@ -1821,7 +1821,7 @@ buildTrackerSummary( const char * key, const tr_tracker_stat * st, gboolean show
 
     if( !st->isBackup )
     {
-        if( st->hasAnnounced )
+        if( st->hasAnnounced && st->announceState != TR_TRACKER_INACTIVE )
         {
             g_string_append_c( gstr, '\n' );
             tr_strltime_rounded( timebuf, now - st->lastAnnounceTime, sizeof( timebuf ) );
@@ -1840,10 +1840,8 @@ buildTrackerSummary( const char * key, const tr_tracker_stat * st, gboolean show
         switch( st->announceState )
         {
             case TR_TRACKER_INACTIVE:
-                if( !st->hasAnnounced ) {
-                    g_string_append_c( gstr, '\n' );
-                    g_string_append( gstr, _( "No updates scheduled" ) );
-                }
+                g_string_append_c( gstr, '\n' );
+                g_string_append( gstr, _( "No updates scheduled" ) );
                 break;
             case TR_TRACKER_WAITING:
                 tr_strltime_rounded( timebuf, st->nextAnnounceTime - now, sizeof( timebuf ) );

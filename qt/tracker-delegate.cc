@@ -152,7 +152,7 @@ TrackerDelegate :: getText( const TrackerInfo& inf ) const
     // announce & scrape info
     if( !inf.st.isBackup )
     {
-        if( inf.st.hasAnnounced )
+        if( inf.st.hasAnnounced && inf.st.announceState != TR_TRACKER_INACTIVE )
         {
             const QString tstr( timeToStringRounded( now - inf.st.lastAnnounceTime ) );
             str += "<br/>\n";
@@ -184,10 +184,8 @@ TrackerDelegate :: getText( const TrackerInfo& inf ) const
         switch( inf.st.announceState )
         {
             case TR_TRACKER_INACTIVE:
-                if( !inf.st.hasAnnounced ) {
-                    str += "<br/>\n";
-                    str += tr( "No updates scheduled" );
-                }
+                str += "<br/>\n";
+                str += tr( "No updates scheduled" );
                 break;
 
             case TR_TRACKER_WAITING: {

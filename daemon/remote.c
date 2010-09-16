@@ -1327,13 +1327,13 @@ printTrackersImpl( tr_benc * trackerStats )
             printf( "\n" );
             printf( "  Tracker %d: %s\n", (int)(id), host );
             if( isBackup )
-                printf( "  Backup on tier #%d\n", (int)tier );
+                printf( "  Backup on tier %d\n", (int)tier );
             else
-                printf( "  Active in tier #%d\n", (int)tier );
+                printf( "  Active in tier %d\n", (int)tier );
 
             if( !isBackup )
             {
-                if( hasAnnounced )
+                if( hasAnnounced && announceState != TR_TRACKER_INACTIVE )
                 {
                     tr_strltime( buf, now - lastAnnounceTime, sizeof( buf ) );
                     if( lastAnnounceSucceeded )
