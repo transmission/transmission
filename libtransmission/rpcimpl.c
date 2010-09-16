@@ -1491,10 +1491,10 @@ sessionStats( tr_session               * session,
     tr_sessionGetCumulativeStats( session, &cumulativeStats );
 
     tr_bencDictAddInt ( args_out, "activeTorrentCount", running );
-    tr_bencDictAddReal( args_out, "downloadSpeed", tr_sessionGetPieceSpeed_KBps( session, TR_DOWN ) );
+    tr_bencDictAddReal( args_out, "downloadSpeed", tr_sessionGetPieceSpeed_Bps( session, TR_DOWN ) );
     tr_bencDictAddInt ( args_out, "pausedTorrentCount", total - running );
     tr_bencDictAddInt ( args_out, "torrentCount", total );
-    tr_bencDictAddReal( args_out, "uploadSpeed", tr_sessionGetPieceSpeed_KBps( session, TR_UP ) );
+    tr_bencDictAddReal( args_out, "uploadSpeed", tr_sessionGetPieceSpeed_Bps( session, TR_UP ) );
 
     d = tr_bencDictAddDict( args_out, "cumulative-stats", 5 );
     tr_bencDictAddInt( d, "downloadedBytes", cumulativeStats.downloadedBytes );
