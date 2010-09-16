@@ -158,7 +158,7 @@ char*
 tr_strlsize( char * buf, guint64 bytes, size_t buflen )
 {
     if( !bytes )
-        g_strlcpy( buf, _( "None" ), buflen );
+        g_strlcpy( buf, _( "size|None" ), buflen );
     else
         tr_formatter_size_B( buf, bytes, buflen );
 
