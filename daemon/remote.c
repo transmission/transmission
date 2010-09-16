@@ -1085,20 +1085,20 @@ printPeersImpl( tr_benc * peers )
     {
         double progress;
         const char * address, * client, * flagstr;
-        double rateToClient, rateToPeer;
+        int64_t rateToClient, rateToPeer;
         tr_benc * d = tr_bencListChild( peers, i );
 
         if( tr_bencDictFindStr( d, "address", &address )
           && tr_bencDictFindStr( d, "clientName", &client )
           && tr_bencDictFindReal( d, "progress", &progress )
           && tr_bencDictFindStr( d, "flagStr", &flagstr )
-          && tr_bencDictFindReal( d, "rateToClient", &rateToClient )
-          && tr_bencDictFindReal( d, "rateToPeer", &rateToPeer ) )
+          && tr_bencDictFindInt( d, "rateToClient", &rateToClient )
+          && tr_bencDictFindInt( d, "rateToPeer", &rateToPeer ) )
         {
             printf( "%-20s  %-12s  %-5.1f %6.1f  %6.1f  %s\n",
                     address, flagstr, (progress*100.0),
-                    rateToClient,
-                    rateToPeer,
+                    rateToClient / (double)tr_speed_K,
+                    rateToPeer / (double)tr_speed_K,
                     client );
         }
     }
