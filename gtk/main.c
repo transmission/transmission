@@ -446,9 +446,35 @@ onRPCChanged( tr_session            * session,
             break;
         }
 
-        case TR_RPC_SESSION_CHANGED:
-            tr_sessionGetSettings( session, pref_get_all( ) );
+        case TR_RPC_SESSION_CHANGED: {
+            int i;
+            tr_benc tmp;
+            tr_benc * newval;
+            tr_benc * oldvals = pref_get_all( );
+            const char * key;
+            tr_bencInitDict( &tmp, 100 );
+            tr_sessionGetSettings( session, &tmp );
+            for( i=0; tr_bencDictChild( &tmp, i, &key, &newval ); ++i )
+            {
+                tr_bool changed;
+                tr_benc * oldval = tr_bencDictFind( oldvals, key );
+                if( !oldval )
+                    changed = TRUE;
+                else {
+                    char * a = tr_bencToStr( oldval, TR_FMT_BENC, NULL );
+                    char * b = tr_bencToStr( newval, TR_FMT_BENC, NULL );
+                    changed = strcmp( a, b ) != 0;
+                    tr_free( b );
+                    tr_free( a );
+                }
+
+                if( changed )
+                    prefschanged( cbdata->core, key, cbdata );
+            }
+            tr_sessionGetSettings( session, oldvals );
+            tr_bencFree( &tmp );
             break;
+        }
 
         case TR_RPC_TORRENT_CHANGED:
         case TR_RPC_TORRENT_MOVED:
