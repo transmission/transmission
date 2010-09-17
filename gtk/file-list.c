@@ -48,12 +48,10 @@ enum
 typedef struct
 {
     TrCore        * core;
-    tr_torrent    * tor;
     GtkWidget     * top;
     GtkWidget     * view;
     GtkTreeModel  * model; /* same object as store, but recast */
     GtkTreeStore  * store; /* same object as model, but recast */
-    tr_file_stat  * refresh_file_stat;
     int             torrentId;
     guint           timeout_tag;
 }
@@ -81,13 +79,25 @@ freeData( gpointer data )
 ****
 ***/
 
+struct RefreshData
+{
+    int sort_column_id;
+    gboolean resort_needed;
+
+    tr_file_stat  * refresh_file_stat;
+    tr_torrent * tor;
+
+    FileData * file_data;
+};
+
 static gboolean
 refreshFilesForeach( GtkTreeModel * model,
                      GtkTreePath  * path UNUSED,
                      GtkTreeIter  * iter,
                      gpointer       gdata )
 {
-    FileData * data = gdata;
+    struct RefreshData * refresh_data = gdata;
+    FileData * data = refresh_data->file_data;
     unsigned int index;
     uint64_t size;
     uint64_t old_have;
@@ -106,19 +116,38 @@ refreshFilesForeach( GtkTreeModel * model,
 
     if( is_file )
     {
-        tr_torrent * tor = data->tor;
+        tr_torrent * tor = refresh_data->tor;
         const tr_info * inf = tr_torrentInfo( tor );
         const int enabled = !inf->files[index].dnd;
         const int priority = inf->files[index].priority;
-        const uint64_t have = data->refresh_file_stat[index].bytesCompleted;
+        const uint64_t have = refresh_data->refresh_file_stat[index].bytesCompleted;
         const int prog = size ? (int)((100.0*have)/size) : 1;
 
         if( (priority!=old_priority) || (enabled!=old_enabled) || (have!=old_have) || (prog!=old_prog) )
+        {
+            /* Changing a value in the sort column can trigger a resort
+             * which breaks this foreach() call.  (See #3529)
+             * As a workaround: if that's about to happen, temporarily disable
+             * sorting until we finish walking the tree. */
+            if( !refresh_data->resort_needed )
+            {
+                if(( refresh_data->resort_needed =
+                    (( refresh_data->sort_column_id==FC_PRIORITY ) && ( priority!=old_priority )) ||
+                    (( refresh_data->sort_column_id==FC_ENABLED ) && ( enabled!=old_enabled ))))
+                {
+                    refresh_data->resort_needed = TRUE;
+                    gtk_tree_sortable_set_sort_column_id( GTK_TREE_SORTABLE( data->model ),
+                                                          GTK_TREE_SORTABLE_UNSORTED_SORT_COLUMN_ID,
+                                                          GTK_SORT_ASCENDING );
+                }
+            }
+
             gtk_tree_store_set( data->store, iter, FC_PRIORITY, priority,
                                                    FC_ENABLED, enabled,
                                                    FC_HAVE, have,
                                                    FC_PROG, prog,
                                                    -1 );
+        }
     }
     else
     {
@@ -216,15 +245,25 @@ refresh( FileData * data )
     }
     else
     {
+        GtkSortType order;
+        int sort_column_id;
         tr_file_index_t fileCount;
-        data->tor = tr_torrentFindFromId( session, data->torrentId );
-        data->refresh_file_stat = tr_torrentFiles( tor, &fileCount );
+        struct RefreshData refresh_data;
+        GtkTreeSortable * sortable = GTK_TREE_SORTABLE( data->model );
+        gtk_tree_sortable_get_sort_column_id( sortable, &sort_column_id, &order );
 
-        gtr_tree_model_foreach_postorder( data->model, refreshFilesForeach, data );
+        refresh_data.sort_column_id = sort_column_id;
+        refresh_data.resort_needed = FALSE;
+        refresh_data.refresh_file_stat = tr_torrentFiles( tor, &fileCount );
+        refresh_data.tor = tr_torrentFindFromId( session, data->torrentId );
+        refresh_data.file_data = data;
 
-        tr_torrentFilesFree( data->refresh_file_stat, fileCount );
-        data->refresh_file_stat = NULL;
-        data->tor = NULL;
+        gtr_tree_model_foreach_postorder( data->model, refreshFilesForeach, &refresh_data );
+
+        if( refresh_data.resort_needed )
+            gtk_tree_sortable_set_sort_column_id( sortable, sort_column_id, order );
+
+        tr_torrentFilesFree( refresh_data.refresh_file_stat, fileCount );
     }
 }
 
