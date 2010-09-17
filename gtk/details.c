@@ -62,7 +62,6 @@ struct DetailsImpl
     GtkWidget * size_lb;
     GtkWidget * state_lb;
     GtkWidget * have_lb;
-    GtkWidget * availability_lb;
     GtkWidget * dl_lb;
     GtkWidget * ul_lb;
     GtkWidget * ratio_lb;
@@ -621,7 +620,6 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     const char * no_torrent = _( "No Torrents Selected" );
     const char * stateString;
     char buf[512];
-    uint64_t available = 0;
     uint64_t sizeWhenDone = 0;
     const tr_stat ** stats = g_new( const tr_stat*, n );
     const tr_info ** infos = g_new( const tr_info*, n );
@@ -807,6 +805,7 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
         uint64_t haveUnchecked = 0;
         uint64_t haveValid = 0;
         uint32_t verifiedPieces = 0;
+        uint64_t available = 0;
         for( i=0; i<n; ++i ) {
             const tr_stat * st = stats[i];
             const tr_info * inf = infos[i];
@@ -817,34 +816,24 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
             leftUntilDone += st->leftUntilDone;
             available += st->sizeWhenDone - st->leftUntilDone + st->desiredAvailable;
         }
-        if( !haveValid && !haveUnchecked )
-            str = "";
-        else {
-            char buf2[32], unver[64], total[64];
+        {
+            char buf2[32], unver[64], total[64], avail[32];
+            const double d = ( 100.0 * available ) / sizeWhenDone;
             const double ratio = 100.0 * ( leftUntilDone ? ( haveValid + haveUnchecked ) / (double)sizeWhenDone : 1 );
+            tr_strlpercent( avail, d, sizeof( avail ) );
             tr_strlpercent( buf2, ratio, sizeof( buf2 ) );
             tr_strlsize( total, haveUnchecked + haveValid, sizeof( total ) );
             tr_strlsize( unver, haveUnchecked,             sizeof( unver ) );
-            if( haveUnchecked )
-                g_snprintf( buf, sizeof( buf ), _( "%1$s (%2$s%%); %3$s Unverified" ), total, buf2, unver );
-            else
+            if( !haveUnchecked && !leftUntilDone )
                 g_snprintf( buf, sizeof( buf ), _( "%1$s (%2$s%%)" ), total, buf2 );
+            else if( !haveUnchecked )
+                g_snprintf( buf, sizeof( buf ), _( "%1$s (%2$s%% of %3$s%% Available)" ), total, buf2, avail );
+            else
+                g_snprintf( buf, sizeof( buf ), _( "%1$s (%2$s%% of %3$s%% Available) + %4$s Unverified" ), total, buf2, avail, unver );
             str = buf;
         }
     }
     gtr_label_set_text( GTK_LABEL( di->have_lb ), str );
-
-    /* availability_lb */
-    if( !sizeWhenDone  )
-        str = "";
-    else {
-        char buf2[32];
-        const double d = ( 100.0 * available ) / sizeWhenDone;
-        tr_strlpercent( buf2, d, sizeof( buf2 ) );
-        g_snprintf( buf, sizeof( buf ), _( "%1$s%%" ), buf2 );
-        str = buf;
-    }
-    gtr_label_set_text( GTK_LABEL( di->availability_lb ), str );
 
     /* dl_lb */
     if( n <= 0 )
@@ -964,10 +953,6 @@ info_page_new( struct DetailsImpl * di )
         /* have */
         l = di->have_lb = gtk_label_new( NULL );
         hig_workarea_add_row( t, &row, _( "Have:" ), l, NULL );
-
-        /* availability */
-        l = di->availability_lb = gtk_label_new( NULL );
-        hig_workarea_add_row( t, &row, _( "Availability:" ), l, NULL );
 
         /* downloaded */
         l = di->dl_lb = gtk_label_new( NULL );

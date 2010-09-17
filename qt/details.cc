@@ -362,20 +362,37 @@ Details :: refresh( )
                 available += t->sizeWhenDone() - t->leftUntilDone() + t->desiredAvailable();
             }
         }
-        if( !haveVerified && !haveUnverified )
-            string = none;
-        else {
+        {
             const double d = 100.0 * ( sizeWhenDone ? ( sizeWhenDone - leftUntilDone ) / sizeWhenDone : 1 );
             QString pct = Formatter::percentToString( d );
-            if( !haveUnverified )
+            QString astr;
+
+            if( sizeWhenDone )
+                astr = Formatter::percentToString( ( 100.0 * available ) / sizeWhenDone );
+            else
+                astr = "100";
+
+            if( !haveUnverified && !leftUntilDone )
+            {
                 string = tr( "%1 (%2%)" )
                              .arg( Formatter::sizeToString( haveVerified + haveUnverified ) )
                              .arg( pct );
-            else
-                string = tr( "%1 (%2%); %3 Unverified" )
+            }
+            else if( !haveUnverified )
+            {
+                string = tr( "%1 (%2% of %3% Available)" )
                              .arg( Formatter::sizeToString( haveVerified + haveUnverified ) )
                              .arg( pct )
+                             .arg( astr );
+            }
+            else
+            {
+                string = tr( "%1 (%2% of %3% Available) + %4 Unverified" )
+                             .arg( Formatter::sizeToString( haveVerified + haveUnverified ) )
+                             .arg( pct )
+                             .arg( astr )
                              .arg( Formatter::sizeToString( haveUnverified ) );
+            }
         }
     }
     myHaveLabel->setText( string );
