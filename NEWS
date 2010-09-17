@@ -1,3 +1,40 @@
+=== Transmission 2.10 (2010/mm/dd) ===
+[http://trac.transmissionbt.com/query?milestone=2.10&group=component&groupdesc=1&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Add a small memory cache to reduce disk IO
+  * Add gzip compression support to the RPC server
+  * Add support for a cookies.txt file
+  * Minor CPU optimizations
+==== Mac ====
+  * Add support for stopping idle torrents
+  * Show file sizes and speeds in base 10 on Snow Leopard systems
+==== GTK+ ====
+  * Files and folders can be opened by clicking on them in the files list
+  * Update the GTK+ GUI when session changes are made via RPC
+  * Fix the Details dialog to fit on a netbook screen
+==== Qt ====
+  * Added tracker announce list editing
+  * New filterbar
+  * Improved display for showing a torrent's tracker announces
+  * Better DBUS integration
+  * Support adding torrents via drag-and-drop
+  * Add Desktop Notification for added/complete torrents
+  * Other minor improvements
+==== Web Client ====
+  * Added a peer list
+  * Added tracker announce list editing
+  * Added filter by activity
+  * Added sorting by size
+  * Added a compact view mode
+  * Added "Stop Ratio" functionality
+==== Daemon ====
+  * Allow the .pidfile location to be set in settings.json
+==== Utils ====
+  * New command-line utility, "transmission-edit", for editing .torrent files
+  * New command-line utility, "transmission-show", for viewing .torrent files
+  * New command-line utility, "transmission-create", for creating .torrent files
+
+
 === Transmission 2.04 (2010/08/06) ===
 [http://trac.transmissionbt.com/query?milestone=2.04&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== All Platforms ====
