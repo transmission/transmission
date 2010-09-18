@@ -24,7 +24,6 @@
   * Peer list added to the inspector
   * Tracker announce list editing
   * Compact view mode
-  * Seed ratio support
   * Support filtering by activity
   * Support sorting by size
 ==== Daemon ====
