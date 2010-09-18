@@ -23,7 +23,7 @@
 ==== Web Client ====
   * Peer list added to the inspector
   * Compact view mode
-  * Increase filtering options
+  * Support filtering by active and finished
   * Support sorting by size
 ==== Daemon ====
   * Allow the .pidfile location to be set in settings.json
