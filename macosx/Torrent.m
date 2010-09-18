@@ -986,9 +986,12 @@ int trashDataFile(const char * filename)
                 downloadString = [NSString stringWithFormat: NSLocalizedString(@"%@ selected", "Torrent -> progress string"),
                                     [NSString stringForFileSize: [self haveTotal]]];
             else
-                downloadString = [NSString stringWithFormat: NSLocalizedString(@"%@ of %@ (%@)", "Torrent -> progress string"),
-                                    [NSString stringForFileSize: [self haveTotal]], [NSString stringForFileSize: [self size]],
+            {
+                downloadString = [NSString stringWithFormat: NSLocalizedString(@"%@ of %@", "Torrent -> progress string"),
+                                    [NSString stringForFileSize: [self haveTotal]], [NSString stringForFileSize: [self size]]];
+                downloadString = [downloadString stringByAppendingFormat: @" (%@)",
                                     [NSString percentString: [self progress] longDecimals: YES]];
+            }
         }
         else
             downloadString = [NSString stringForFileSize: [self size]];
