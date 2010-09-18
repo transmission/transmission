@@ -9,27 +9,47 @@ Transmission.fmt = (function()
 {
 	var speed_K = 1000;
 	var speed_B_str = 'B';
-	var speed_K_str = 'kB/s';
+	var speed_K_str = 'KB/s';
 	var speed_M_str = 'MB/s';
 	var speed_G_str = 'GB/s';
 	var speed_T_str = 'TB/s';
 
 	var size_K = 1024;
 	var size_B_str = 'B';
-	var size_K_str = 'KiB';
-	var size_M_str = 'MiB';
-	var size_G_str = 'GiB';
-	var size_T_str = 'TiB';
+	var size_K_str = 'KB';
+	var size_M_str = 'MB';
+	var size_G_str = 'GB';
+	var size_T_str = 'TB';
 
 	var mem_K = 1024;
 	var mem_B_str = 'B';
-	var mem_K_str = 'KiB';
-	var mem_M_str = 'MiB';
-	var mem_G_str = 'GiB';
-	var mem_T_str = 'TiB';
+	var mem_K_str = 'KB';
+	var mem_M_str = 'MB';
+	var mem_G_str = 'GB';
+	var mem_T_str = 'TB';
 
 	return {
 
+		updateUnits: function( u )
+		{
+			speed_K     = u['speed-bytes'];
+			speed_K_str = u['speed-units'][0];
+			speed_M_str = u['speed-units'][1];
+			speed_G_str = u['speed-units'][2];
+			speed_T_str = u['speed-units'][3];
+
+			size_K     = u['size-bytes'];
+			size_K_str = u['size-units'][0];
+			size_M_str = u['size-units'][1];
+			size_G_str = u['size-units'][2];
+			size_T_str = u['size-units'][3];
+
+			mem_K     = u['memory-bytes'];
+			mem_K_str = u['memory-units'][0];
+			mem_M_str = u['memory-units'][1];
+			mem_G_str = u['memory-units'][2];
+			mem_T_str = u['memory-units'][3];
+		},
 
 		/*
 		 *   Format a percentage to a string

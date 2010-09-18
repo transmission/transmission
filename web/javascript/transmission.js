@@ -987,6 +987,9 @@ Transmission.prototype =
 		var turtle_up_limit_k = prefs[RPC._TurtleUpSpeedLimit];
 		var turtle_dn_limit_k = prefs[RPC._TurtleDownSpeedLimit];
 
+                if( prefs.units )
+                    Transmission.fmt.updateUnits( prefs.units );
+
 		$('div.download_location input')[0].value = prefs[RPC._DownloadDir];
 		$('div.port input')[0].value              = prefs[RPC._PeerPort];
 		$('div.auto_start input')[0].checked      = prefs[RPC._StartAddedTorrent];
@@ -1055,18 +1058,19 @@ Transmission.prototype =
 		// can't think of a reason to remember this
 		//this._stats = stats;
 
+		var fmt = Transmission.fmt;
 		var session = stats["current-stats"];
 		var total = stats["cumulative-stats"];
 
-		setInnerHTML( $('#stats_session_uploaded')[0], Transmission.fmt.size(session["uploadedBytes"]) );
-		setInnerHTML( $('#stats_session_downloaded')[0], Transmission.fmt.size(session["downloadedBytes"]) );
-		setInnerHTML( $('#stats_session_ratio')[0], Transmission.fmt.ratioString(Math.ratio(session["uploadedBytes"],session["downloadedBytes"])));
-		setInnerHTML( $('#stats_session_duration')[0], Transmission.fmt.timeInterval(session["secondsActive"]) );
+		setInnerHTML( $('#stats_session_uploaded')[0], fmt.size(session["uploadedBytes"]) );
+		setInnerHTML( $('#stats_session_downloaded')[0], fmt.size(session["downloadedBytes"]) );
+		setInnerHTML( $('#stats_session_ratio')[0], fmt.ratioString(Math.ratio(session["uploadedBytes"],session["downloadedBytes"])));
+		setInnerHTML( $('#stats_session_duration')[0], fmt.timeInterval(session["secondsActive"]) );
 		setInnerHTML( $('#stats_total_count')[0], total["sessionCount"] + " times" );
-		setInnerHTML( $('#stats_total_uploaded')[0], Transmission.fmt.size(total["uploadedBytes"]) );
-		setInnerHTML( $('#stats_total_downloaded')[0], Transmission.fmt.size(total["downloadedBytes"]) );
-		setInnerHTML( $('#stats_total_ratio')[0], Transmission.fmt.ratioString(Math.ratio(total["uploadedBytes"],total["downloadedBytes"])));
-		setInnerHTML( $('#stats_total_duration')[0], Transmission.fmt.timeInterval(total["secondsActive"]) );
+		setInnerHTML( $('#stats_total_uploaded')[0], fmt.size(total["uploadedBytes"]) );
+		setInnerHTML( $('#stats_total_downloaded')[0], fmt.size(total["downloadedBytes"]) );
+		setInnerHTML( $('#stats_total_ratio')[0], fmt.ratioString(Math.ratio(total["uploadedBytes"],total["downloadedBytes"])));
+		setInnerHTML( $('#stats_total_duration')[0], fmt.timeInterval(total["secondsActive"]) );
 	},
 
 	setSearch: function( search ) {
@@ -1311,27 +1315,28 @@ Transmission.prototype =
 		}
 
 		var private_string = '';
+		var fmt = Transmission.fmt;
 		if( have_private && have_public ) private_string = 'Mixed';
 		else if( have_private ) private_string = 'Private Torrent';
 		else if( have_public ) private_string = 'Public Torrent';
 
 		setInnerHTML( tab.name, name );
-		setInnerHTML( tab.size, torrents.length ? Transmission.fmt.size( total_size ) : na );
+		setInnerHTML( tab.size, torrents.length ? fmt.size( total_size ) : na );
 		setInnerHTML( tab.pieces, pieces );
 		setInnerHTML( tab.hash, hash );
 		setInnerHTML( tab.state, total_state );
-		setInnerHTML( tab.download_speed, torrents.length ? Transmission.fmt.speedBps( total_download_speed ) : na );
-		setInnerHTML( tab.upload_speed, torrents.length ? Transmission.fmt.speedBps( total_upload_speed ) : na );
-		setInnerHTML( tab.uploaded, torrents.length ? Transmission.fmt.size( total_upload ) : na );
-		setInnerHTML( tab.downloaded, torrents.length ? Transmission.fmt.size( total_download ) : na );
-		setInnerHTML( tab.availability, torrents.length ? Transmission.fmt.percentString(Math.ratio( total_availability*100, sizeWhenDone )) + '%' : na );
-		setInnerHTML( tab.ratio, torrents.length ? Transmission.fmt.ratioString(Math.ratio( total_upload, total_download )) : na );
-		setInnerHTML( tab.have, torrents.length ? Transmission.fmt.size(total_completed) + ' (' + Transmission.fmt.size(total_verified) + ' verified)' : na );
+		setInnerHTML( tab.download_speed, torrents.length ? fmt.speedBps( total_download_speed ) : na );
+		setInnerHTML( tab.upload_speed, torrents.length ? fmt.speedBps( total_upload_speed ) : na );
+		setInnerHTML( tab.uploaded, torrents.length ? fmt.size( total_upload ) : na );
+		setInnerHTML( tab.downloaded, torrents.length ? fmt.size( total_download ) : na );
+		setInnerHTML( tab.availability, torrents.length ? fmt.percentString(Math.ratio( total_availability*100, sizeWhenDone )) + '%' : na );
+		setInnerHTML( tab.ratio, torrents.length ? fmt.ratioString(Math.ratio( total_upload, total_download )) : na );
+		setInnerHTML( tab.have, torrents.length ? fmt.size(total_completed) + ' (' + fmt.size(total_verified) + ' verified)' : na );
 		setInnerHTML( tab.upload_to, torrents.length ? total_upload_peers : na );
 		setInnerHTML( tab.download_from, torrents.length ? total_download_peers : na );
 		setInnerHTML( tab.secure, private_string );
 		setInnerHTML( tab.creator_date, date_created );
-		setInnerHTML( tab.progress, torrents.length ? Transmission.fmt.percentString(Math.ratio( sizeDone*100, sizeWhenDone )) + '%' : na );
+		setInnerHTML( tab.progress, torrents.length ? fmt.percentString(Math.ratio( sizeDone*100, sizeWhenDone )) + '%' : na );
 		setInnerHTML( tab.comment, comment == na ? comment : comment.replace(/\//g, '/&#8203;') );
 		setInnerHTML( tab.creator, creator );
 		setInnerHTML( tab.download_dir, download_dir == na ? download_dir : download_dir.replace(/([\/_\.])/g, "$1&#8203;") );
@@ -1366,6 +1371,7 @@ Transmission.prototype =
 	updatePeersLists: function() {
 		var tr = this;
 		var html = [ ];
+		var fmt = Transmission.fmt;
 		var torrents = this.getSelectedTorrents( );
 		if( $(this._inspector_peers_list).is(':visible') ) {
 			for( var k=0, torrent; torrent=torrents[k]; ++k ) {
@@ -1391,8 +1397,8 @@ Transmission.prototype =
 					var parity = ((i+1) % 2 == 0 ? 'even' : 'odd');
 					html.push( '<tr class="inspector_peer_entry ', parity, '">',
 					           '<td>', (peer.isEncrypted ? '<img src="images/graphics/lock_icon.png" alt="Encrypted"/>' : ''), '</td>',
-					           '<td>', ( peer.rateToPeer ? Transmission.fmt.speedBps(peer.rateToPeer) : '' ), '</td>',
-					           '<td>', ( peer.rateToClient ? Transmission.fmt.speedBps(peer.rateToClient) : '' ), '</td>',
+					           '<td>', ( peer.rateToPeer ? fmt.speedBps(peer.rateToPeer) : '' ), '</td>',
+					           '<td>', ( peer.rateToClient ? fmt.speedBps(peer.rateToClient) : '' ), '</td>',
 					           '<td class="percentCol">', Math.floor(peer.progress*100), '%', '</td>',
 					           '<td>', peer.flagStr, '</td>',
 					           '<td>', peer.address, '</td>',

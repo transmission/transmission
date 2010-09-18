@@ -1520,7 +1520,7 @@ sessionGet( tr_session               * s,
             struct tr_rpc_idle_data  * idle_data UNUSED )
 {
     const char * str;
-    tr_benc *    d = args_out;
+    tr_benc * d = args_out;
 
     assert( idle_data == NULL );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_UP_KBps, tr_sessionGetAltSpeed_KBps(s,TR_UP) );
@@ -1560,6 +1560,7 @@ sessionGet( tr_session               * s,
     tr_bencDictAddBool( d, TR_PREFS_KEY_DSPEED_ENABLED, tr_sessionIsSpeedLimited( s, TR_DOWN ) );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_FILENAME, tr_sessionGetTorrentDoneScript( s ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED, tr_sessionIsTorrentDoneScriptEnabled( s ) );
+    tr_formatter_get_units( tr_bencDictAddDict( d, "units", 0 ) );
     tr_bencDictAddStr ( d, "version", LONG_VERSION_STRING );
     switch( tr_sessionGetEncryption( s ) ) {
         case TR_CLEAR_PREFERRED: str = "tolerated"; break;

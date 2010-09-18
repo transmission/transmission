@@ -50,6 +50,7 @@
 #endif
 
 #include "transmission.h"
+#include "bencode.h"
 #include "fdlimit.h"
 #include "ConvertUTF.h"
 #include "list.h"
@@ -1686,3 +1687,25 @@ tr_formatter_mem_B( char * buf, uint64_t bytes_per_second, size_t buflen )
 {
     return formatter_get_size_str( &mem_units, buf, bytes_per_second, buflen );
 }
+
+void
+tr_formatter_get_units( tr_benc * d )
+{
+    int i;
+    tr_benc * l;
+
+    tr_bencDictReserve( d, 6 );
+
+    tr_bencDictAddInt( d, "memory-bytes", mem_units.units[TR_FMT_KB].value );
+    l = tr_bencDictAddList( d, "memory-units", 4 );
+    for( i=0; i<4; i++ ) tr_bencListAddStr( l, mem_units.units[i].name );
+
+    tr_bencDictAddInt( d, "size-bytes",   size_units.units[TR_FMT_KB].value );
+    l = tr_bencDictAddList( d, "size-units", 4 );
+    for( i=0; i<4; i++ ) tr_bencListAddStr( l, size_units.units[i].name );
+
+    tr_bencDictAddInt( d, "speed-bytes",  speed_units.units[TR_FMT_KB].value );
+    l = tr_bencDictAddList( d, "speed-units", 4 );
+    for( i=0; i<4; i++ ) tr_bencListAddStr( l, speed_units.units[i].name );
+}
+
