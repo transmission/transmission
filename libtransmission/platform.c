@@ -134,8 +134,9 @@ tr_threadNew( void   ( *func )(void *),
         t->thread = (DWORD) id;
     }
 #else
-    pthread_create( &t->thread, NULL, ( void * ( * )(
-                                           void * ) )ThreadFunc, t );
+    pthread_create( &t->thread, NULL, (void*(*)(void*))ThreadFunc, t );
+    pthread_detach( t->thread );
+
 #endif
 
     return t;
