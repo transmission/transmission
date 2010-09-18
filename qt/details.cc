@@ -710,6 +710,7 @@ Details :: refresh( )
         myPeerLimitSpin->blockSignals( false );
     }
 
+    if( !torrents.empty( ) )
     {
         const Torrent * tor;
 
