@@ -22,9 +22,8 @@
   * Other minor improvements
 ==== Web Client ====
   * Peer list added to the inspector
-  * Tracker announce list editing
   * Compact view mode
-  * Support filtering by activity
+  * Increase filtering options
   * Support sorting by size
 ==== Daemon ====
   * Allow the .pidfile location to be set in settings.json
