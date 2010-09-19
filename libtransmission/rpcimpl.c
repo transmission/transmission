@@ -872,7 +872,8 @@ replaceTrackers( tr_torrent * tor, tr_benc * urls )
         if(    tr_bencGetInt( pair[0], &pos )
             && tr_bencGetStr( pair[1], &newval )
             && tr_urlIsValid( newval, -1 )
-            && pos < n )
+            && pos < n
+            && pos >= 0 )
         {
             tr_free( trackers[pos].announce );
             trackers[pos].announce = tr_strdup( newval );
@@ -916,7 +917,10 @@ removeTrackers( tr_torrent * tor, tr_benc * ids )
     while(( val = tr_bencListChild( ids, i++ )))
     {
         int64_t pos;
-        if( tr_bencGetInt( val, &pos ) && pos < n )
+
+        if(    tr_bencGetInt( val, &pos )
+            && pos < n
+            && pos >= 0 )
             tids[t++] = pos;
     }
 
