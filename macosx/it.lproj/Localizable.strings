@@ -1,10 +1,4 @@
-﻿/* Inspector -> Activity tab -> progress */
-"%.2f%% (%.2f%% selected)" = "%1$.2f%% (selezionati %2$.2f%%)";
-
-/* Torrent -> progress string */
-"%.2f%% of torrent metadata retrieved" = "recuperati %.2f%% metadati del torrent";
-
-/* Prefs -> blocklist -> message */
+﻿/* Prefs -> blocklist -> message */
 "%@ IP address rules in list" = "%@ regole indirizzi IP nella lista";
 
 /* Blocklist -> message
@@ -17,11 +11,16 @@
 /* Torrent -> progress string */
 "%@ of %@ selected" = "selezionati %1$@ su %2$@";
 
+/* Torrent -> progress string */
+"%@ of torrent metadata retrieved" = "recuperati %@ metadati del torrent";
+
 /* Torrent -> eta string */
 "%@ remaining" = "tempo richiesto %@";
 
 /* Add torrent -> info
+   Inspector -> Activity tab -> progress
    Torrent -> progress string */
+
 
 "%@ selected" = "selezionati %@";
 
@@ -247,9 +246,6 @@
 /* inspector -> peer table -> header tool tip */
 "Available" = "Disponibile";
 
-/* Transfer speed (Bytes per second) */
-"B/s" = "B/s";
-
 /* Preferences -> toolbar item title */
 "Bandwidth" = "Banda";
 
@@ -455,8 +451,13 @@
 /* Inspector -> Peers tab -> table row tooltip */
 "From: tracker" = "Da: tracker";
 
-/* File size - gigabytes */
+/* File size - gigabytes
+   Memory size - gigabytes */
+
 "GB" = "GB";
+
+/* Transfer speed (gigabytes per second) */
+"GB/s" = "GB/s";
 
 /* Preferences -> toolbar item title */
 "General" = "Generali";
@@ -465,6 +466,12 @@
    Inspector view -> title */
 
 "General Info" = "Informazioni generali";
+
+/* Status Bar -> speed tooltip */
+"Global download limit" = "Limite globale download";
+
+/* Status Bar -> speed tooltip */
+"Global upload limit" = "Limite globale upload";
 
 /* Tracker last announce */
 "got %d peers" = "presenti %d peer";
@@ -505,6 +512,9 @@
 /* Add torrent -> same name -> message */
 "If you are attempting to use already existing data, the root data directory should be inside the destination directory." = "Se stai cercando di utilizzare dati già esistenti, la cartella radice dei dati dovrebbe essere dentro la cartella di destinazione.";
 
+/* Torrent -> eta string */
+"inactive" = "inattivo";
+
 /* Message window -> level
    Message window -> level string */
 
@@ -519,8 +529,13 @@
 /* Download not a torrent -> message */
 "It appears that the file \"%@\" from %@ is not a torrent file." = "Sembra che il file \"%1$@\" da %2$@ non sia un file torrent.";
 
-/* File size - kilobytes */
+/* File size - kilobytes
+   Memory size - kilobytes */
+
 "KB" = "KB";
+
+/* Transfer speed (kilobytes per second) */
+"KB/s" = "KB/s";
 
 /* Tracker last announce */
 "Last Announce" = "Ultimo annuncio";
@@ -559,8 +574,13 @@
 
 "Magnetized transfer" = "Trasferimento magnetico";
 
-/* File size - megabytes */
+/* File size - megabytes
+   Memory size - megabytes */
+
 "MB" = "MB";
+
+/* Transfer speed (megabytes per second) */
+"MB/s" = "MB/s";
 
 /* Message window -> table column */
 "Message" = "Messaggio";
@@ -767,7 +787,7 @@
 "Program Started" = "Programma avviato";
 
 /* Inspector -> Peers tab -> table row tooltip */
-"Progress: %.1f%%" = "Progressione: %.1f%%";
+"Progress: %@" = "Progressione: %@";
 
 /* Inspector -> private torrent */
 "Public Torrent" = "Torrent pubblico";
@@ -957,8 +977,13 @@
 /* Donation beg -> title */
 "Support open-source indie software" = "Supporta il software open-source indipendente";
 
-/* File size - terabytes */
+/* File size - terabytes
+   Memory size - terabytes */
+
 "TB" = "TB";
+
+/* Transfer speed (terabytes per second) */
+"TB/s" = "TB/s";
 
 /* Create torrent -> directory doesn't exist warning -> title */
 "The chosen torrent file location does not exist." = "La posizione scelta per il file torrent non esiste.";
@@ -1066,14 +1091,8 @@
 /* Torrent -> progress string */
 "torrent metadata needed" = "necessari metadati torrent";
 
-/* Status Bar -> speed tooltip */
-"Total download rate" = "Velocità totale download";
-
 /* stats total */
 "Total N/A" = "Totale N/D";
-
-/* Status Bar -> speed tooltip */
-"Total upload rate" = "Velocità totale upload";
 
 /* Torrent -> status string */
 "Tracker returned error" = "Il tracker ha restituito un errore";
