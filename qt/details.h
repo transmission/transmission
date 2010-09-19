@@ -83,7 +83,6 @@ class Details: public QDialog
         QLabel * myAvailabilityLabel;
         QLabel * myDownloadedLabel;
         QLabel * myUploadedLabel;
-        QLabel * myRatioLabel;
         QLabel * myErrorLabel;
         QLabel * myRunTimeLabel;
         QLabel * myETALabel;

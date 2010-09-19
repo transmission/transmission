@@ -45,6 +45,7 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/bencode.h>
+#include <libtransmission/utils.h> // tr_getRatio()
 
 #include "details.h"
 #include "file-tree.h"
@@ -426,39 +427,20 @@ Details :: refresh( )
     }
     myDownloadedLabel->setText( string );
 
-    uint64_t u = 0;
     if( torrents.empty( ) )
         string = none;
     else {
-        foreach( const Torrent * t, torrents ) u += t->uploadedEver( );
-        string = QString( Formatter::sizeToString( u ) );
+        uint64_t u = 0;
+        uint64_t d = 0;
+        foreach( const Torrent * t, torrents ) {
+            u += t->uploadedEver( );
+            d += t->downloadedEver( );
+        }
+        string = tr( "%1 (Ratio: %2)" )
+                   .arg( Formatter::sizeToString( u ) )
+                   .arg( Formatter::ratioToString( tr_getRatio( u, d ) ) );
     }
     myUploadedLabel->setText( string );
-
-    if( torrents.empty( ) )
-        string = none;
-    else if( torrents.count() == 1 )
-        string = Formatter::ratioToString( torrents.first()->ratio() );
-    else {
-        bool isMixed = false;
-        int ratioType = (int) torrents.first()->ratio();
-        if( ratioType > 0 ) ratioType = 0;
-        foreach( const Torrent *t, torrents )
-        {
-            if( ratioType != ( t->ratio() >= 0 ? 0 : t->ratio() ) )
-            {
-                isMixed = true;
-                break;
-            }
-        }
-        if( isMixed )
-            string = mixed;
-        else if( ratioType < 0 )
-            string = Formatter::ratioToString( ratioType );
-        else
-            string = Formatter::ratioToString( (double)u / d );
-    }
-    myRatioLabel->setText( string );
 
     const QDateTime qdt_now = QDateTime::currentDateTime( );
 
@@ -860,7 +842,6 @@ Details :: createInfoTab( )
     hig->addRow( tr( "Availability:" ), myAvailabilityLabel = new SqueezeLabel );
     hig->addRow( tr( "Downloaded:" ), myDownloadedLabel = new SqueezeLabel );
     hig->addRow( tr( "Uploaded:" ), myUploadedLabel = new SqueezeLabel );
-    hig->addRow( tr( "Ratio:" ), myRatioLabel = new SqueezeLabel );
     hig->addRow( tr( "State:" ), myStateLabel = new SqueezeLabel );
     hig->addRow( tr( "Running time:" ), myRunTimeLabel = new SqueezeLabel );
     hig->addRow( tr( "Remaining time:" ), myETALabel = new SqueezeLabel );

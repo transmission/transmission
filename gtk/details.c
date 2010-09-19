@@ -64,7 +64,6 @@ struct DetailsImpl
     GtkWidget * have_lb;
     GtkWidget * dl_lb;
     GtkWidget * ul_lb;
-    GtkWidget * ratio_lb;
     GtkWidget * error_lb;
     GtkWidget * date_started_lb;
     GtkWidget * eta_lb;
@@ -860,26 +859,20 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     if( n <= 0 )
         str = no_torrent;
     else {
-        uint64_t sum = 0;
-        for( i=0; i<n; ++i ) sum += stats[i]->uploadedEver;
-        str = tr_strlsize( buf, sum, sizeof( buf ) );
-    }
-    gtr_label_set_text( GTK_LABEL( di->ul_lb ), str );
-
-
-    /* ratio */
-    if( n <= 0 )
-        str = no_torrent;
-    else {
         uint64_t up = 0;
         uint64_t down = 0;
+        char upstr[64];
+        char ratiostr[64];
         for( i=0; i<n; ++i ) {
             up += stats[i]->uploadedEver;
             down += stats[i]->downloadedEver;
         }
-        str = tr_strlratio( buf, tr_getRatio( up, down ), sizeof( buf ) );
+        tr_strlsize( upstr, up, sizeof( upstr ) );
+        tr_strlratio( ratiostr, tr_getRatio( up, down ), sizeof( ratiostr ) );
+        g_snprintf( buf, sizeof( buf ), _( "%s (Ratio: %s)" ), upstr, ratiostr );
+        str = buf;
     }
-    gtr_label_set_text( GTK_LABEL( di->ratio_lb ), str );
+    gtr_label_set_text( GTK_LABEL( di->ul_lb ), str );
 
     /* hash_lb */
     if( n <= 0 )
@@ -961,10 +954,6 @@ info_page_new( struct DetailsImpl * di )
         /* uploaded */
         l = di->ul_lb = gtk_label_new( NULL );
         hig_workarea_add_row( t, &row, _( "Uploaded:" ), l, NULL );
-
-        /* ratio */
-        l = di->ratio_lb = gtk_label_new( NULL );
-        hig_workarea_add_row( t, &row, _( "Ratio:" ), l, NULL );
 
         /* state */
         l = di->state_lb = gtk_label_new( NULL );
