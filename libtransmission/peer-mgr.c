@@ -2688,6 +2688,7 @@ rechokeUploads( Torrent * t, const uint64_t now )
             n->wasChoked    = peer->peerIsChoked;
             n->rate         = getRate( t->tor, atom, now );
             n->salt         = tr_cryptoWeakRandInt( INT_MAX );
+            n->isChoked     = TRUE;
         }
     }
 
