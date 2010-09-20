@@ -144,9 +144,6 @@ TorrentFilter :: activityFilterAcceptsTorrent( const Torrent * tor, const Filter
 
     switch( m.mode( ) )
     {
-        case FilterMode::SHOW_ALL:
-            accepts = true;
-            break;
         case FilterMode::SHOW_ACTIVE:
             accepts = tor->peersWeAreUploadingTo( ) > 0 || tor->peersWeAreDownloadingFrom( ) > 0 || tor->isVerifying( );
             break;
@@ -170,6 +167,9 @@ TorrentFilter :: activityFilterAcceptsTorrent( const Torrent * tor, const Filter
             break;
         case FilterMode::SHOW_ERROR:
             accepts = tor->hasError( );
+            break;
+        default: // FilterMode::SHOW_ALL
+            accepts = true;
             break;
     }
 

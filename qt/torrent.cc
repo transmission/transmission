@@ -342,7 +342,7 @@ Torrent :: getSeedRatio( double& ratio ) const
                 ratio = myPrefs.getDouble( Prefs :: RATIO );
             break;
 
-        case TR_RATIOLIMIT_UNLIMITED:
+        default: // TR_RATIOLIMIT_UNLIMITED:
             isLimited = false;
             break;
     }
