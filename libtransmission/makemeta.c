@@ -336,12 +336,15 @@ makeInfoDict( tr_benc *             dict,
 {
     uint8_t * pch;
     char    * base;
+    const tr_bool single_file_mode = ( builder->fileCount == 1 ) && ( strchr( builder->files[0].filename, '/' ) == NULL );
 
     tr_bencDictReserve( dict, 5 );
 
-    if( builder->fileCount == 1 )
+    if( single_file_mode )
+    {
         tr_bencDictAddInt( dict, "length", builder->files[0].size );
-    else
+    }
+    else /* multiple file mode */
     {
         uint32_t  i;
         tr_benc * list = tr_bencDictAddList( dict, "files",
