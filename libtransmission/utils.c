@@ -1385,8 +1385,9 @@ tr_parseNumberRange( const char * str_in, int len, int * setmeCount )
 double
 tr_truncd( double x, int decimal_places )
 {
-    const int i = (int) pow( 10, decimal_places );  
-    const double x2 = (int64_t)(x * i);
+    const int i = (int) pow( 10, decimal_places );
+    const double xup = x * i;
+    const double x2 = (int64_t)(xup);
     return x2 / i;
 }
 
@@ -1394,7 +1395,6 @@ char*
 tr_strtruncd( char * buf, double x, int precision, size_t buflen )
 {
     tr_snprintf( buf, buflen, "%.*f", precision, tr_truncd( x, precision ) );
-
     return buf;
 }
 
