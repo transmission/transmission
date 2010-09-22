@@ -27,6 +27,7 @@
 .Op Fl V
 .Op Fl w Ar download-dir
 .Op Fl e Ar logfile
+.Op Fl log-err | log-info | log-debug
 .Ek
 .Sh DESCRIPTION
 .Nm
@@ -117,6 +118,12 @@ Show version number and exit
 Where to store downloaded data.
 .It Fl e Fl -logfile
 Where to store transmission's log messages.
+.It Fl -log-err
+Show error messages
+.It Fl -log-info
+Show error and info messages
+.It Fl -log-debug
+Show error, info, and debug messages
 .El
 .Sh ENVIRONMENT
 .Bl -tag -width Fl
