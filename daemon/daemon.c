@@ -103,7 +103,7 @@ static const struct tr_option options[] =
     { 'u', "username", "Set username for authentication", "u", 1, "<username>" },
     { 'v', "password", "Set password for authentication", "v", 1, "<password>" },
     { 'V', "version", "Show version number and exit", "V", 0, NULL },
-    { 810, "log-err", "Show error messages", NULL, 0, NULL },
+    { 810, "log-error", "Show error messages", NULL, 0, NULL },
     { 811, "log-info", "Show error and info messages", NULL, 0, NULL },
     { 812, "log-debug", "Show error, info, and debug messages", NULL, 0, NULL },
     { 'w', "download-dir", "Where to save downloaded data", "w", 1, "<path>" },
