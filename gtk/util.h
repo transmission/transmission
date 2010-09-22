@@ -109,13 +109,15 @@ gtr_lockfile_state_t gtr_lockfile( const char * filename );
 ****
 ***/
 
+void        gtr_open_uri( const char * uri );
+
 void        gtr_open_file( const char * path );
 
 gboolean    gtr_dbus_add_torrent( const char * filename );
 
 gboolean    gtr_dbus_present_window( void );
 
-char*       gtr_get_help_url( void );
+const char* gtr_get_help_uri( void );
 
 /***
 ****

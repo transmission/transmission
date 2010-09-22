@@ -1394,11 +1394,9 @@ updatemodel( gpointer gdata )
 }
 
 static void
-aboutDialogActivateLink( GtkAboutDialog * dialog    UNUSED,
-                         const gchar *              link_,
-                         gpointer         user_data UNUSED )
+onUriClicked( GtkAboutDialog * u UNUSED, const gchar * uri, gpointer u2 UNUSED )
 {
-    gtr_open_file( link_ );
+    gtr_open_uri( uri );
 }
 
 static void
@@ -1412,17 +1410,17 @@ about( GtkWindow * parent )
         NULL
     };
 
-    const char *website_url = "http://www.transmissionbt.com/";
+    const char * website_uri = "http://www.transmissionbt.com/";
 
-    gtk_about_dialog_set_url_hook( aboutDialogActivateLink, NULL, NULL );
+    gtk_about_dialog_set_url_hook( onUriClicked, NULL, NULL );
 
     gtk_show_about_dialog( parent,
                            "name", g_get_application_name( ),
                            "comments",
                            _( "A fast and easy BitTorrent client" ),
                            "version", LONG_VERSION_STRING,
-                           "website", website_url,
-                           "website-label", website_url,
+                           "website", website_uri,
+                           "website-label", website_uri,
                            "copyright",
                            _( "Copyright (c) The Transmission Project" ),
                            "logo-icon-name", MY_CONFIG_NAME,
@@ -1615,7 +1613,7 @@ doAction( const char * action_name, gpointer user_data )
     }
     else if( !strcmp( action_name, "donate" ) )
     {
-        gtr_open_file( "http://www.transmissionbt.com/donate.php" );
+        gtr_open_uri( "http://www.transmissionbt.com/donate.php" );
     }
     else if( !strcmp( action_name, "pause-all-torrents" ) )
     {
@@ -1742,9 +1740,7 @@ doAction( const char * action_name, gpointer user_data )
     }
     else if( !strcmp ( action_name, "help" ) )
     {
-        char * url = gtr_get_help_url( );
-        gtr_open_file( url );
-        g_free( url );
+        gtr_open_uri( gtr_get_help_uri( ) );
     }
     else if( !strcmp( action_name, "toggle-main-window" ) )
     {

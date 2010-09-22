@@ -464,43 +464,65 @@ gtr_file_trash_or_remove( const char * filename )
     return 0;
 }
 
-char*
-gtr_get_help_url( void )
+const char*
+gtr_get_help_uri( void )
 {
-    const char * fmt = "http://www.transmissionbt.com/help/gtk/%d.%dx";
-    int          major, minor;
+    static char * uri = NULL;
 
-    sscanf( SHORT_VERSION_STRING, "%d.%d", &major, &minor );
-    return g_strdup_printf( fmt, major, minor / 10 );
+    if( !uri )
+    {
+        int major, minor;
+        const char * fmt = "http://www.transmissionbt.com/help/gtk/%d.%dx";
+        sscanf( SHORT_VERSION_STRING, "%d.%d", &major, &minor );
+        uri = g_strdup_printf( fmt, major, minor / 10 );
+    }
+
+    return uri;
 }
 
 void
 gtr_open_file( const char * path )
 {
-    if( path )
+    char * uri = NULL;
+
+#ifdef HAVE_GIO
+    GFile * file = g_file_new_for_path( path );
+    uri = g_file_get_uri( file );
+    g_object_unref( G_OBJECT( file ) );
+#else
+    if( g_path_is_absolute( path ) )
+        uri = g_strdup_printf( "file://%s", path );
+    else {
+        char * cwd = g_get_current_dir();
+        uri = g_strdup_printf( "file://%s/%s", cwd, path );
+        g_free( cwd );
+    }
+#endif
+
+    gtr_open_uri( uri );
+    g_free( uri );
+}
+
+void
+gtr_open_uri( const char * uri )
+{
+    if( uri )
     {
         gboolean opened = FALSE;
+
 #ifdef HAVE_GIO
         if( !opened )
-        {
-            GFile * file = g_file_new_for_path( path );
-            char *  uri = g_file_get_uri( file );
             opened = g_app_info_launch_default_for_uri( uri, NULL, NULL );
-            g_free( uri );
-            g_object_unref( G_OBJECT( file ) );
-        }
 #endif
-        if( !opened )
-        {
-            char * argv[] = { (char*)"xdg-open", (char*)path, NULL };
+
+        if( !opened ) {
+            char * argv[] = { (char*)"xdg-open", (char*)uri, NULL };
             opened = g_spawn_async( NULL, argv, NULL, G_SPAWN_SEARCH_PATH,
                                     NULL, NULL, NULL, NULL );
         }
 
         if( !opened )
-        {
-            g_message( "Unable to open \"%s\"", path );
-        }
+            g_message( "Unable to open \"%s\"", uri );
     }
 }
 

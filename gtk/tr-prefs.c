@@ -39,11 +39,9 @@ response_cb( GtkDialog *     dialog,
 {
     if( response == GTK_RESPONSE_HELP )
     {
-        char * base = gtr_get_help_url( );
-        char * url = g_strdup_printf( "%s/html/preferences.html", base );
-        gtr_open_file( url );
-        g_free( url );
-        g_free( base );
+        char * uri = g_strconcat( gtr_get_help_uri(), "/html/preferences.html", NULL );
+        gtr_open_uri( uri );
+        g_free( uri );
     }
 
     if( response == GTK_RESPONSE_CLOSE )
@@ -717,15 +715,13 @@ onWhitelistSelectionChanged( GtkTreeSelection * sel UNUSED,
 }
 
 static void
-onLaunchClutchCB( GtkButton * w UNUSED,
-                  gpointer data UNUSED )
+onLaunchClutchCB( GtkButton * w UNUSED, gpointer data UNUSED )
 {
-    int    port = pref_int_get( TR_PREFS_KEY_RPC_PORT );
-    char * url = g_strdup_printf( "http://localhost:%d/transmission/web",
-                                  port );
+    const int port = pref_int_get( TR_PREFS_KEY_RPC_PORT );
+    char * uri = g_strdup_printf( "http://localhost:%d/transmission/web", port );
 
-    gtr_open_file( url );
-    g_free( url );
+    gtr_open_uri( uri );
+    g_free( uri );
 }
 
 static void
