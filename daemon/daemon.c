@@ -85,6 +85,7 @@ getUsage( void )
 
 static const struct tr_option options[] =
 {
+
     { 'a', "allowed", "Allowed IP addresses.  (Default: " TR_DEFAULT_RPC_WHITELIST ")", "a", 1, "<list>" },
     { 'b', "blocklist", "Enable peer blocklists", "b", 0, NULL },
     { 'B', "no-blocklist", "Disable peer blocklists", "B", 0, NULL },
@@ -102,6 +103,9 @@ static const struct tr_option options[] =
     { 'u', "username", "Set username for authentication", "u", 1, "<username>" },
     { 'v', "password", "Set password for authentication", "v", 1, "<password>" },
     { 'V', "version", "Show version number and exit", "V", 0, NULL },
+    { 810, "log-err", "Show error messages", NULL, 0, NULL },
+    { 811, "log-info", "Show error and info messages", NULL, 0, NULL },
+    { 812, "log-debug", "Show error, info, and debug messages", NULL, 0, NULL },
     { 'w', "download-dir", "Where to save downloaded data", "w", 1, "<path>" },
     { 800, "paused", "Pause all torrents on startup", NULL, 0, NULL },
     { 'o', "dht", "Enable distributed hash tables (DHT)", "o", 0, NULL },
@@ -434,6 +438,12 @@ main( int argc, char ** argv )
             case 'y': tr_bencDictAddBool( &settings, TR_PREFS_KEY_LPD_ENABLED, TRUE );
                       break;
             case 'Y': tr_bencDictAddBool( &settings, TR_PREFS_KEY_LPD_ENABLED, FALSE );
+                      break;
+            case 810: tr_bencDictAddInt( &settings,  TR_PREFS_KEY_MSGLEVEL, TR_MSG_ERR );
+                      break;
+            case 811: tr_bencDictAddInt( &settings,  TR_PREFS_KEY_MSGLEVEL, TR_MSG_INF );
+                      break;
+            case 812: tr_bencDictAddInt( &settings,  TR_PREFS_KEY_MSGLEVEL, TR_MSG_DBG );
                       break;
             default:  showUsage( );
                       break;
