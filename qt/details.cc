@@ -229,10 +229,17 @@ Details :: refreshPref( int key )
 
     switch( key )
     {
-        case Prefs :: SHOW_TRACKER_SCRAPES:
+        case Prefs :: SHOW_TRACKER_SCRAPES: {
+            QItemSelectionModel * selectionModel( myTrackerView->selectionModel( ) );
+            const QItemSelection selection( selectionModel->selection( ) );
+            const QModelIndex currentIndex( selectionModel->currentIndex( ) );
             myTrackerDelegate->setShowMore( myPrefs.getBool( key ) );
+            selectionModel->clear( );
             myTrackerView->reset( );
+            selectionModel->select( selection, QItemSelectionModel::Select );
+            selectionModel->setCurrentIndex( currentIndex, QItemSelectionModel::NoUpdate );
             break;
+        }
 
         case Prefs :: SHOW_BACKUP_TRACKERS:
             myTrackerFilter->setShowBackupTrackers( myPrefs.getBool( key ) );
