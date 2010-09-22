@@ -114,8 +114,6 @@ const char * tr_strip_positional_args( const char * fmt );
 *****
 ****/
 
-void tr_msgInit( void );
-
 #define TR_MAX_MSG_LOG 10000
 
 extern tr_msg_level messageLevel;

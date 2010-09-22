@@ -62,8 +62,7 @@
 
 time_t transmission_now = 0;
 
-tr_msg_level messageLevel = TR_MSG_INF;
-static tr_lock *      messageLock = NULL;
+tr_msg_level messageLevel = TR_MSG_ERR;
 static tr_bool        messageQueuing = FALSE;
 static tr_msg_list *  messageQueue = NULL;
 static tr_msg_list ** messageQueueTail = &messageQueue;
@@ -79,15 +78,15 @@ static int            messageQueueCount = 0;
 ****
 ***/
 
-void
-tr_msgInit( void )
+static tr_lock*
+getMessageLock( void )
 {
-    const char * env = getenv( "TR_DEBUG" );
-    messageLevel = ( env ? atoi( env ) : 0 ) + 1;
-    messageLevel = MAX( 1, messageLevel );
+    static tr_lock * l = NULL;
 
-    if( messageLock == NULL )
-        messageLock = tr_lockNew( );
+    if( !l )
+        l = tr_lockNew( );
+
+    return l;
 }
 
 FILE*
@@ -147,7 +146,7 @@ tr_msg_list *
 tr_getQueuedMessages( void )
 {
     tr_msg_list * ret;
-    tr_lockLock( messageLock );
+    tr_lockLock( getMessageLock( ) );
 
     ret = messageQueue;
     messageQueue = NULL;
@@ -155,7 +154,7 @@ tr_getQueuedMessages( void )
 
     messageQueueCount = 0;
 
-    tr_lockUnlock( messageLock );
+    tr_lockUnlock( getMessageLock( ) );
     return ret;
 }
 
@@ -268,9 +267,7 @@ tr_msg( const char * file, int line,
     const int err = errno; /* message logging shouldn't affect errno */
     char buf[1024];
     va_list ap;
-
-    if( messageLock != NULL )
-        tr_lockLock( messageLock );
+    tr_lockLock( getMessageLock( ) );
 
     /* build the text message */
     *buf = '\0';
@@ -328,9 +325,7 @@ tr_msg( const char * file, int line,
         }
     }
 
-    if( messageLock != NULL )
-        tr_lockUnlock( messageLock );
-
+    tr_lockUnlock( getMessageLock( ) );
     errno = err;
 }
 
