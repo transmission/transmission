@@ -2035,12 +2035,8 @@ processArgs( const char * host, int port, int argc, const char ** argv )
 
             switch( c )
             {
-                case 712:
-                    {
-                        tr_benc * trackers = tr_bencDictAddList( args, "trackerRemove", 1 );
-                        tr_bencListAddInt( trackers, atoi(optarg) );
-                        break;
-                    }
+                case 712: tr_bencListAddInt( tr_bencDictAddList( args, "trackerRemove", 1 ), atoi( optarg ) );
+                          break;
                 case 950: tr_bencDictAddReal( args, "seedRatioLimit", atof(optarg) );
                           tr_bencDictAddInt( args, "seedRatioMode", TR_RATIOLIMIT_SINGLE );
                           break;
@@ -2083,12 +2079,8 @@ processArgs( const char * host, int port, int argc, const char ** argv )
                           break;
                 case 702: tr_bencDictAddInt( args, "bandwidthPriority", -1 );
                           break;
-                case 710:
-                     {
-                         tr_benc * trackers = tr_bencDictAddDict( args, "trackerAdd", 1 );
-                         tr_bencDictAddStr( trackers, "announce", optarg );
-                         break;
-                     }
+                case 710: tr_bencListAddStr( tr_bencDictAddList( args, "trackerAdd", 1 ), optarg );
+                          break;
                 default:  assert( "unhandled value" && 0 );
                           break;
             }
