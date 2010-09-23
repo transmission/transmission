@@ -1589,23 +1589,24 @@ static GHashTable * pendingRequests = NULL;
 static gboolean
 readResponseIdle( void * vresponse )
 {
-    GByteArray * response;
     tr_benc top;
     int64_t intVal;
-    int tag;
-    struct pending_request_data * data;
+    GByteArray * response = vresponse;
 
-    response = vresponse;
     tr_jsonParse( NULL, response->data, response->len, &top, NULL );
-    tr_bencDictFindInt( &top, "tag", &intVal );
-    tag = (int)intVal;
 
-    data = g_hash_table_lookup( pendingRequests, &tag );
-    if( data && data->responseFunc )
-        (*data->responseFunc)(data->core, &top, data->responseFuncUserData );
+    if( tr_bencDictFindInt( &top, "tag", &intVal ) )
+    {
+        const int tag = (int)intVal;
+        struct pending_request_data * data = g_hash_table_lookup( pendingRequests, &tag );
+        if( data ) {
+            if( data->responseFunc )
+                (*data->responseFunc)(data->core, &top, data->responseFuncUserData );
+            g_hash_table_remove( pendingRequests, &tag );
+        }
+    }
 
     tr_bencFree( &top );
-    g_hash_table_remove( pendingRequests, &tag );
     g_byte_array_free( response, TRUE );
     return FALSE;
 }
