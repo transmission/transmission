@@ -753,7 +753,7 @@ ul.tier_list {
 .tier_list .tracker_activity{
 	float: left;
 	color: #666;
-	width: 350px;
+	width: 330px;
 	display: table;
 	margin-top: 1px;
 }
