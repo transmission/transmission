@@ -20,6 +20,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+#ifndef __TRANSMISSION__
+ #error only libtransmission should #include this header.
+#endif
+
 #ifndef _TR_LPD_H
 #define _TR_LPD_H
 
