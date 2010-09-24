@@ -452,6 +452,8 @@ onRPCChanged( tr_session            * session,
             tr_benc * newval;
             tr_benc * oldvals = pref_get_all( );
             const char * key;
+            GSList * l;
+            GSList * changed_keys = NULL;
             tr_bencInitDict( &tmp, 100 );
             tr_sessionGetSettings( session, &tmp );
             for( i=0; tr_bencDictChild( &tmp, i, &key, &newval ); ++i )
@@ -469,9 +471,14 @@ onRPCChanged( tr_session            * session,
                 }
 
                 if( changed )
-                    prefschanged( cbdata->core, key, cbdata );
+                    changed_keys = g_slist_append( changed_keys, key );
             }
             tr_sessionGetSettings( session, oldvals );
+
+            for( l=changed_keys; l!=NULL; l=l->next )
+                prefschanged( cbdata->core, key, cbdata );
+
+            g_slist_free( changed_keys );
             tr_bencFree( &tmp );
             break;
         }
