@@ -9,6 +9,6 @@
     <file alias="alt-limit-off.png">icons/turtle-grey.png</file>
     <file alias="alt-limit-on.png">icons/turtle-blue.png</file>
     <file alias="encrypted.png">icons/lock.png</file>
-    <file alias="options.png">icons/info-options.png</file>
+    <file alias="utilities.png">icons/utilities.png</file>
   </qresource>
 </RCC>

@@ -361,8 +361,8 @@ TrMainWindow :: createStatusBar( )
     h->setSpacing( HIG::PAD_SMALL );
 
         p = myOptionsButton = new TrIconPushButton( this );
-        p->setIcon( QIcon( ":/icons/options.png" ) );
-        p->setIconSize( QPixmap( ":/icons/options.png" ).size() );
+        p->setIcon( QIcon( ":/icons/utilities.png" ) );
+        p->setIconSize( QPixmap( ":/icons/utilities.png" ).size() );
         p->setFlat( true );
         p->setMenu( createOptionsMenu( ) );
         h->addWidget( p );

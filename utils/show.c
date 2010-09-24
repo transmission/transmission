@@ -22,7 +22,7 @@
 #include <libtransmission/bencode.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h>
-#include <libtransmission/web.h> /* tr_webGetResponseStr */
+#include <libtransmission/web.h> /* tr_webGetResponseStr() */
 #include <libtransmission/version.h>
 
 #define MY_NAME "transmission-show"

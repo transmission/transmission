@@ -471,7 +471,7 @@ onRPCChanged( tr_session            * session,
                 }
 
                 if( changed )
-                    changed_keys = g_slist_append( changed_keys, key );
+                    changed_keys = g_slist_append( changed_keys, (gpointer)key );
             }
             tr_sessionGetSettings( session, oldvals );
 

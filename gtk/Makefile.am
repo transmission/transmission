@@ -36,18 +36,19 @@ noinst_HEADERS = \
     details.h \
     dialogs.h \
     favicon.h \
+    file-list.h \
     filter.h \
     hig.h \
     icons.h \
-    file-list.h \
-    lock.h \
-    logo-24.h \
-    logo-48.h \
+    icon-lock.h \
+    icon-logo-24.h \
+    icon-logo-48.h \
+    icon-ratio.h \
+    icon-turtle.h \
+    icon-utilities.h \
     makemeta-ui.h \
     msgwin.h \
     notify.h \
-    options-icon.h \
-    ratio-icon.h \
     relocate.h \
     stats.h \
     torrent-cell-renderer.h \
@@ -58,7 +59,6 @@ noinst_HEADERS = \
     tr-prefs.h \
     tr-torrent.h \
     tr-window.h \
-    turtles.h \
     ui.h \
     util.h
 

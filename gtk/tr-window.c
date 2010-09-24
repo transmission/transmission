@@ -640,7 +640,7 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
     gtk_container_set_border_width( GTK_CONTAINER( h ), GUI_PAD_SMALL );
 
         w = gtk_button_new( );
-        gtk_container_add( GTK_CONTAINER( w ), gtk_image_new_from_stock( "options", GTK_ICON_SIZE_SMALL_TOOLBAR ) );
+        gtk_container_add( GTK_CONTAINER( w ), gtk_image_new_from_stock( "utilities", GTK_ICON_SIZE_SMALL_TOOLBAR ) );
         gtr_widget_set_tooltip_text( w, _( "Options" ) );
         gtk_box_pack_start( GTK_BOX( h ), w, 0, 0, 0 );
         gtk_button_set_relief( GTK_BUTTON( w ), GTK_RELIEF_NONE );
