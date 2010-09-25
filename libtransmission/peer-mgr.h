@@ -234,6 +234,8 @@ int tr_peerGetPieceSpeed_Bps( const tr_peer    * peer,
                               uint64_t           now,
                               tr_direction       direction );
 
+void tr_peerMgrClearInterest( tr_torrent * tor );
+
 /* @} */
 
 #endif
