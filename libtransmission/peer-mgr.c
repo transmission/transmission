@@ -3276,13 +3276,11 @@ compareAtomPtrsByShelfDate( const void * va, const void *vb )
 static int
 getMaxAtomCount( const tr_torrent * tor )
 {
-    /* FIXME: this curve should be smoother... */
     const int n = tor->maxConnectedPeers;
-    if( n >= 200 ) return n * 1.5;
-    if( n >= 100 ) return n * 2;
-    if( n >=  50 ) return n * 3;
-    if( n >=  20 ) return n * 5;
-    return n * 10;
+    /* approximate fit of the old jump discontinuous function */
+    if( n >= 55 ) return     n + 150;
+    if( n >= 20 ) return 2 * n + 95;
+    return               4 * n + 55;
 }
 
 static void
