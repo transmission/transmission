@@ -156,6 +156,7 @@ main( int argc, char * argv[] )
     }
     putc( '\n', stdout );
 
+    tr_metaInfoBuilderFree( b );
     tr_free( out2 );
     return 0;
 }
