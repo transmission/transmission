@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2010-05-20 11:39-0500\n"
+"POT-Creation-Date: 2010-09-18 22:00-0500\n"
 "PO-Revision-Date: 2010-03-13 13:02+0000\n"
 "Last-Translator: Vilson Gjeci <vilsongjeci@gmail.com>\n"
 "Language-Team: Albanian <sq@li.org>\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2010-06-16 00:16+0000\n"
+"X-Launchpad-Export-Date: 2010-09-30 23:28+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:55
@@ -39,186 +39,182 @@ msgid "Sort by Stat_e"
 msgstr "Nis Sipas Gjend_jes"
 
 #: ../gtk/actions.c:60
-msgid "Sort by T_racker"
-msgstr "Nis Sipas G_jurmuesit"
-
-#: ../gtk/actions.c:61
 msgid "Sort by A_ge"
 msgstr "Renditi sipas _Moshës"
 
-#: ../gtk/actions.c:62
+#: ../gtk/actions.c:61
 msgid "Sort by Time _Left"
 msgstr "Nis Sipas Kohës së _Ngelur"
 
-#: ../gtk/actions.c:63
+#: ../gtk/actions.c:62
 msgid "Sort by Si_ze"
 msgstr "Rendit sipas Si_ze"
 
-#: ../gtk/actions.c:80
+#: ../gtk/actions.c:79
 msgid "_Show Transmission"
 msgstr "_Shfaq Transmission"
 
-#: ../gtk/actions.c:81
+#: ../gtk/actions.c:80
 msgid "Message _Log"
 msgstr "Mesazhe _Log"
 
-#: ../gtk/actions.c:96
+#: ../gtk/actions.c:95
 msgid "Enable Temporary Speed _Limits"
 msgstr "Aktivizo kufizim të _përkohshëm të shpejtësisë"
 
-#: ../gtk/actions.c:97
+#: ../gtk/actions.c:96
 msgid "_Compact View"
 msgstr ""
 
-#: ../gtk/actions.c:98
+#: ../gtk/actions.c:97
 msgid "Re_verse Sort Order"
 msgstr "Pë_rmbys Rendin e Nisjes"
 
-#: ../gtk/actions.c:99
+#: ../gtk/actions.c:98
 msgid "_Filterbar"
 msgstr "_Shiriti i Filtrimit"
 
-#: ../gtk/actions.c:100
+#: ../gtk/actions.c:99
 msgid "_Statusbar"
 msgstr "_Shtylla e gjëndjes"
 
-#: ../gtk/actions.c:101
+#: ../gtk/actions.c:100
 msgid "_Toolbar"
 msgstr "_Shtylla e vglave"
 
-#: ../gtk/actions.c:106
+#: ../gtk/actions.c:105
 msgid "_File"
 msgstr "_Skedar"
 
-#: ../gtk/actions.c:107
+#: ../gtk/actions.c:106
 msgid "_Torrent"
 msgstr "_Torrent"
 
-#: ../gtk/actions.c:108
+#: ../gtk/actions.c:107
 msgid "_View"
 msgstr "_Shfaq"
 
-#: ../gtk/actions.c:109
+#: ../gtk/actions.c:108
 msgid "_Sort Torrents By"
 msgstr "_Rendit Torrentet sipas"
 
-#: ../gtk/actions.c:110
+#: ../gtk/actions.c:109
 msgid "_Edit"
 msgstr "_Ndrysho"
 
-#: ../gtk/actions.c:111
+#: ../gtk/actions.c:110
 msgid "_Help"
 msgstr "_Ndihmë"
 
-#: ../gtk/actions.c:112
+#: ../gtk/actions.c:111
 msgid "Copy _Magnet Link to Clipboard"
 msgstr "Kopjo _lidhjen Magnet në Kujtesë"
 
-#: ../gtk/actions.c:113
+#: ../gtk/actions.c:112
 msgid "Add _URL..."
 msgstr "Shto _URL..."
 
-#: ../gtk/actions.c:113
+#: ../gtk/actions.c:112
 msgid "Add URL..."
 msgstr "Shto URL..."
 
-#: ../gtk/actions.c:114 ../gtk/actions.c:115
+#: ../gtk/actions.c:113 ../gtk/actions.c:114
 msgid "Add a torrent"
 msgstr "Shto nje torrent"
 
-#: ../gtk/actions.c:115
+#: ../gtk/actions.c:114
 msgid "_Add File..."
 msgstr "_Shto Skedar..."
 
-#: ../gtk/actions.c:116
+#: ../gtk/actions.c:115
 msgid "_Start"
 msgstr "_Fillo"
 
-#: ../gtk/actions.c:116
+#: ../gtk/actions.c:115
 msgid "Start torrent"
 msgstr "Nis torrentin"
 
-#: ../gtk/actions.c:117
+#: ../gtk/actions.c:116
 msgid "_Statistics"
 msgstr "_Statistika"
 
-#: ../gtk/actions.c:118
+#: ../gtk/actions.c:117
 msgid "_Donate"
 msgstr "_Dhuroni"
 
-#: ../gtk/actions.c:119
+#: ../gtk/actions.c:118
 msgid "_Verify Local Data"
 msgstr "_Verifiko te dhenat lokale"
 
-#: ../gtk/actions.c:120
+#: ../gtk/actions.c:119
 msgid "_Pause"
 msgstr "_Pauzë"
 
-#: ../gtk/actions.c:120
+#: ../gtk/actions.c:119
 msgid "Pause torrent"
 msgstr "Pauzo torrentin"
 
-#: ../gtk/actions.c:121
+#: ../gtk/actions.c:120
 msgid "_Pause All"
 msgstr "_Pauzo të Gjitha"
 
-#: ../gtk/actions.c:121
+#: ../gtk/actions.c:120
 msgid "Pause all torrents"
 msgstr "Në pauzë të gjithë torrentët"
 
-#: ../gtk/actions.c:122
+#: ../gtk/actions.c:121
 msgid "_Start All"
 msgstr "_Nisi Të Gjithë"
 
-#: ../gtk/actions.c:122
+#: ../gtk/actions.c:121
 msgid "Start all torrents"
 msgstr "Nisi të gjithë torrentët"
 
-#: ../gtk/actions.c:123
-msgid "Set _Location"
-msgstr "Vendos_Vendndodhjen"
+#: ../gtk/actions.c:122
+msgid "Set _Location..."
+msgstr ""
 
-#: ../gtk/actions.c:124
+#: ../gtk/actions.c:123
 msgid "Remove torrent"
 msgstr "Largo Torrentin"
 
-#: ../gtk/actions.c:125
+#: ../gtk/actions.c:124
 msgid "_Delete Files and Remove"
 msgstr "_Fshij skedaret dhe largoj"
 
-#: ../gtk/actions.c:126
+#: ../gtk/actions.c:125
 msgid "_New..."
 msgstr "_I Ri..."
 
-#: ../gtk/actions.c:126
+#: ../gtk/actions.c:125
 msgid "Create a torrent"
 msgstr "Krijo nje torrent"
 
-#: ../gtk/actions.c:127
+#: ../gtk/actions.c:126
 msgid "_Quit"
 msgstr "_Dil"
 
-#: ../gtk/actions.c:128
+#: ../gtk/actions.c:127
 msgid "Select _All"
 msgstr "Përzgjidhi të _Të gjitha"
 
-#: ../gtk/actions.c:129
+#: ../gtk/actions.c:128
 msgid "Dese_lect All"
 msgstr "Dese_leksiono Gjithçka"
 
-#: ../gtk/actions.c:131
+#: ../gtk/actions.c:130
 msgid "Torrent properties"
 msgstr "Parametrat e torrentit"
 
-#: ../gtk/actions.c:132
+#: ../gtk/actions.c:131
 msgid "_Open Folder"
 msgstr "_Hap kartelën"
 
-#: ../gtk/actions.c:134
+#: ../gtk/actions.c:133
 msgid "_Contents"
 msgstr "_Përmbajtja"
 
-#: ../gtk/actions.c:135
+#: ../gtk/actions.c:134
 msgid "Ask Tracker for _More Peers"
 msgstr "Kerkoj Gjurmuesit per _me shume shoke"
 
@@ -235,11 +231,11 @@ msgstr "Të gjithë skedaret"
 msgid "Torrent Options"
 msgstr "Opsionet e torrentit"
 
-#: ../gtk/add-dialog.c:295 ../gtk/tr-prefs.c:302
+#: ../gtk/add-dialog.c:295 ../gtk/tr-prefs.c:293
 msgid "Mo_ve .torrent file to the trash"
 msgstr "Lë_vize skedarin .torrent në kosh"
 
-#: ../gtk/add-dialog.c:297 ../gtk/tr-prefs.c:298
+#: ../gtk/add-dialog.c:297 ../gtk/tr-prefs.c:289
 msgid "_Start when added"
 msgstr "_Fillo kur te shtohet"
 
@@ -259,7 +255,7 @@ msgstr "_Folderi Destinues"
 msgid "Select Destination Folder"
 msgstr "Zgjedh Folderin Destinues"
 
-#: ../gtk/add-dialog.c:353 ../gtk/details.c:478
+#: ../gtk/add-dialog.c:353 ../gtk/details.c:514
 msgid "Torrent _priority:"
 msgstr "Prioriteti i _torrentit:"
 
@@ -267,7 +263,7 @@ msgstr "Prioriteti i _torrentit:"
 msgid "Add a Torrent"
 msgstr "Shto nje Torrent"
 
-#: ../gtk/add-dialog.c:454 ../gtk/tr-prefs.c:294
+#: ../gtk/add-dialog.c:454 ../gtk/tr-prefs.c:285
 msgid "Show _options dialog"
 msgstr "Shfaq dialogun e _opsioneve"
 
@@ -279,417 +275,425 @@ msgstr "Shto URL"
 msgid "Add torrent from URL"
 msgstr "Shto torrent nga URL"
 
-#: ../gtk/add-dialog.c:549
+#: ../gtk/add-dialog.c:550
 msgid "_URL"
 msgstr "_URL"
 
-#: ../gtk/conf.c:62 ../libtransmission/fdlimit.c:341
-#: ../libtransmission/metainfo.c:115 ../libtransmission/utils.c:604
-#: ../libtransmission/utils.c:615
+#: ../gtk/conf.c:63 ../libtransmission/fdlimit.c:346
+#: ../libtransmission/metainfo.c:115 ../libtransmission/utils.c:593
+#: ../libtransmission/utils.c:604
 #, c-format
 msgid "Couldn't create \"%1$s\": %2$s"
 msgstr "S'mund te krijoj \"%1$s\": %2$s"
 
-#: ../gtk/conf.c:87 ../libtransmission/fdlimit.c:369
+#: ../gtk/conf.c:88 ../libtransmission/fdlimit.c:374
 #, c-format
 msgid "Couldn't open \"%1$s\": %2$s"
 msgstr "S'mund te hape \"%1$s\": %2$s"
 
-#: ../gtk/conf.c:92
+#: ../gtk/conf.c:93
 #, c-format
 msgid "%s is already running."
 msgstr "%s eshte tanime i leshuar"
 
-#: ../gtk/conf.c:447 ../gtk/conf.c:452
+#: ../gtk/conf.c:427 ../gtk/conf.c:432
 #, c-format
 msgid "Importing \"%s\""
 msgstr "Duke Importuar \"%s\""
 
-#: ../gtk/details.c:447 ../gtk/tr-prefs.c:1436
+#: ../gtk/details.c:452 ../gtk/details.c:463
+msgid "Use global settings"
+msgstr ""
+
+#: ../gtk/details.c:453
+msgid "Seed regardless of ratio"
+msgstr ""
+
+#: ../gtk/details.c:454
+msgid "Stop seeding at ratio:"
+msgstr ""
+
+#: ../gtk/details.c:464
+msgid "Seed regardless of activity"
+msgstr ""
+
+#: ../gtk/details.c:465
+msgid "Stop seeding if idle for N minutes:"
+msgstr ""
+
+#: ../gtk/details.c:481 ../gtk/tr-prefs.c:1340
 msgid "Speed"
 msgstr "Shpejtësia"
 
-#: ../gtk/details.c:449
+#: ../gtk/details.c:483
 msgid "Honor global _limits"
 msgstr "Respekto kufizimet e _përgjithshme"
 
-#: ../gtk/details.c:454 ../gtk/tr-prefs.c:1220
-msgid "Limit _download speed (KiB/s):"
+#: ../gtk/details.c:488 ../gtk/tr-prefs.c:1124
+#, c-format
+msgid "Limit _download speed (%s):"
 msgstr ""
 
-#: ../gtk/details.c:466 ../gtk/tr-prefs.c:1227
-msgid "Limit _upload speed (KiB/s):"
+#: ../gtk/details.c:501 ../gtk/tr-prefs.c:1131
+#, c-format
+msgid "Limit _upload speed (%s):"
 msgstr ""
 
-#: ../gtk/details.c:482
-msgid "Seed-Until Ratio"
-msgstr "Shkalla e Dërgimit"
+#: ../gtk/details.c:518 ../gtk/tr-prefs.c:322
+msgid "Seeding Limits"
+msgstr ""
 
-#: ../gtk/details.c:484
-msgid "Use _global settings"
-msgstr "Përdor _parametrat globalë"
+#: ../gtk/details.c:528
+msgid "_Ratio:"
+msgstr ""
 
-#: ../gtk/details.c:492
-msgid "Seed _regardless of ratio"
-msgstr "Dërgo _pavarësisht nga shkalla"
+#: ../gtk/details.c:537
+msgid "_Idle:"
+msgstr ""
 
-#: ../gtk/details.c:501 ../gtk/tr-prefs.c:330
-msgid "_Seed torrent until its ratio reaches:"
-msgstr "_dërgo torrentin deri sa shkalla e tij të arrijë:"
-
-#: ../gtk/details.c:517
+#: ../gtk/details.c:540
 msgid "Peer Connections"
 msgstr "Lidhjet e shokeve"
 
-#: ../gtk/details.c:520
+#: ../gtk/details.c:543
 msgid "_Maximum peers:"
 msgstr "_Maksimumi i lidhjeve:"
 
-#: ../gtk/details.c:540 ../gtk/torrent-cell-renderer.c:212
+#: ../gtk/details.c:563 ../gtk/torrent-cell-renderer.c:212
 msgid "Waiting to verify local data"
 msgstr "Në pritje për verifikimin e të dhënave lokale"
 
-#: ../gtk/details.c:541
+#: ../gtk/details.c:564
 msgid "Verifying local data"
 msgstr "Duke verifikuar të dhënat lokale"
 
-#: ../gtk/details.c:542 ../gtk/filter.c:720
+#: ../gtk/details.c:565 ../gtk/filter.c:714 ../gtk/tr-prefs.c:298
 msgid "Downloading"
 msgstr "Duke Shkarkuar"
 
-#: ../gtk/details.c:543 ../gtk/filter.c:721
+#: ../gtk/details.c:566 ../gtk/filter.c:715
 msgid "Seeding"
 msgstr "Duke Dërguar"
 
-#: ../gtk/details.c:544 ../gtk/torrent-cell-renderer.c:206
+#: ../gtk/details.c:567 ../gtk/filter.c:717 ../gtk/torrent-cell-renderer.c:206
 msgid "Finished"
 msgstr ""
 
-#: ../gtk/details.c:544 ../gtk/filter.c:722 ../gtk/torrent-cell-renderer.c:208
+#: ../gtk/details.c:567 ../gtk/filter.c:716 ../gtk/torrent-cell-renderer.c:208
 msgid "Paused"
 msgstr "Në Pauzë"
 
-#: ../gtk/details.c:586 ../gtk/util.c:116 ../libtransmission/utils.c:1355
-msgid "None"
-msgstr "Asnje"
-
-#: ../gtk/details.c:587 ../gtk/file-list.c:585
+#: ../gtk/details.c:619 ../gtk/file-list.c:624
 msgid "Mixed"
 msgstr "Të Përziera"
 
-#: ../gtk/details.c:610
+#: ../gtk/details.c:620
+msgid "No Torrents Selected"
+msgstr ""
+
+#: ../gtk/details.c:642
 msgid "Private to this tracker -- DHT and PEX disabled"
 msgstr "Privat për këtë gjurmues -- DHT dhe PEX të çaktivizuar"
 
-#: ../gtk/details.c:612
+#: ../gtk/details.c:644
 msgid "Public torrent"
 msgstr "Torrent publik"
 
-#: ../gtk/details.c:635
+#: ../gtk/details.c:667
 #, c-format
 msgid "Created by %1$s"
 msgstr "Krijuar nga %1$s"
 
-#: ../gtk/details.c:637
+#: ../gtk/details.c:669
 #, c-format
 msgid "Created on %1$s"
 msgstr "Krijuar në %1$s"
 
-#: ../gtk/details.c:639
+#: ../gtk/details.c:671
 #, c-format
 msgid "Created by %1$s on %2$s"
 msgstr "Krijuar nga %1$s në %2$s"
 
-#: ../gtk/details.c:723
+#: ../gtk/details.c:757
 msgid "Unknown"
 msgstr "I/e panjohur"
 
-#: ../gtk/details.c:751
+#: ../gtk/details.c:828
 #, c-format
-msgid "%1$s (%2$'d piece @ %3$s)"
-msgid_plural "%1$s (%2$'d pieces @ %3$s)"
-msgstr[0] "%1$s (%2$'d copë @ %3$s)"
-msgstr[1] "%1$s (%2$'d copë @ %3$s)"
+msgid "%1$s (%2$s%%)"
+msgstr ""
 
-#: ../gtk/details.c:757
+#: ../gtk/details.c:830
 #, c-format
-msgid "%1$s (%2$'d piece)"
-msgid_plural "%1$s (%2$'d pieces)"
-msgstr[0] "%1$s (%2$'d copë)"
-msgstr[1] "%1$s (%2$'d copë)"
+msgid "%1$s (%2$s%% of %3$s%% Available)"
+msgstr ""
 
-#: ../gtk/details.c:792
+#: ../gtk/details.c:832
 #, c-format
-msgid "%1$s (%2$.1f%%); %3$s Unverified"
-msgstr "%1$s (%2$.1f%%); %3$s i Pa Verifikuar"
+msgid "%1$s (%2$s%% of %3$s%% Available) + %4$s Unverified"
+msgstr ""
 
-#: ../gtk/details.c:794
-#, c-format
-msgid "%1$s (%2$.1f%%)"
-msgstr "%1$s (%2$.1f%%)"
-
-#: ../gtk/details.c:805
-#, c-format
-msgid "%1$.1f%%"
-msgstr "%1$.1f%%"
-
-#: ../gtk/details.c:823
+#: ../gtk/details.c:851
 #, c-format
 msgid "%1$s (+%2$s corrupt)"
 msgstr "%1$s (+%2$s dëmtuar)"
 
-#: ../gtk/details.c:896
+#: ../gtk/details.c:907
+msgid "No errors"
+msgstr ""
+
+#: ../gtk/details.c:920
+msgid "Never"
+msgstr ""
+
+#: ../gtk/details.c:924
 msgid "Active now"
 msgstr "Aktiv tani"
 
-#: ../gtk/details.c:900
+#: ../gtk/details.c:928
 #, c-format
 msgid "%1$s ago"
 msgstr "%1$s më parë"
 
-#: ../gtk/details.c:919
+#: ../gtk/details.c:947
 msgid "Activity"
 msgstr "Aktiviteti"
 
-#: ../gtk/details.c:923
+#: ../gtk/details.c:951
 msgid "Torrent size:"
 msgstr "Përmasa e torrentit:"
 
-#: ../gtk/details.c:927
+#: ../gtk/details.c:955
 msgid "Have:"
 msgstr "Kam:"
 
-#: ../gtk/details.c:931
-msgid "Availability:"
-msgstr "Disponueshmëria:"
-
-#: ../gtk/details.c:935 ../gtk/stats.c:168 ../gtk/stats.c:180
+#: ../gtk/details.c:959 ../gtk/stats.c:168 ../gtk/stats.c:180
 msgid "Downloaded:"
 msgstr "Shkarkuar:"
 
-#: ../gtk/details.c:939 ../gtk/stats.c:166 ../gtk/stats.c:178
+#: ../gtk/details.c:963 ../gtk/stats.c:166 ../gtk/stats.c:178
 msgid "Uploaded:"
 msgstr "Ngarkuar:"
 
-#: ../gtk/details.c:943 ../gtk/stats.c:170 ../gtk/stats.c:182
+#: ../gtk/details.c:967 ../gtk/stats.c:170 ../gtk/stats.c:182
 msgid "Ratio:"
 msgstr "Raporti:"
 
-#: ../gtk/details.c:947
+#: ../gtk/details.c:971
 msgid "State:"
 msgstr "Gjendja:"
 
-#: ../gtk/details.c:951
+#: ../gtk/details.c:975
 msgid "Running time:"
 msgstr "Koha e nisjes:"
 
-#: ../gtk/details.c:955
+#: ../gtk/details.c:979
 msgid "Remaining time:"
 msgstr "Koha e ngelur:"
 
-#: ../gtk/details.c:959
+#: ../gtk/details.c:983
 msgid "Last activity:"
 msgstr "Aktiviteti i fundit:"
 
-#: ../gtk/details.c:963
+#: ../gtk/details.c:987
 msgid "Error:"
 msgstr "Gabim:"
 
-#: ../gtk/details.c:967
+#: ../gtk/details.c:991
 msgid "Details"
 msgstr "Detaje"
 
-#: ../gtk/details.c:973
+#: ../gtk/details.c:997
 msgid "Location:"
 msgstr "Vendndodhja:"
 
-#: ../gtk/details.c:980
+#: ../gtk/details.c:1004
 msgid "Hash:"
 msgstr "Hash:"
 
-#: ../gtk/details.c:985
+#: ../gtk/details.c:1009
 msgid "Privacy:"
 msgstr "Ruajtja e intimitetit:"
 
-#: ../gtk/details.c:990
+#: ../gtk/details.c:1014
 msgid "Origin:"
 msgstr "Origjina:"
 
-#: ../gtk/details.c:1007
+#: ../gtk/details.c:1031
 msgid "Comment:"
 msgstr "Koment:"
 
-#: ../gtk/details.c:1039
+#: ../gtk/details.c:1063
 msgid "Webseeds"
 msgstr "Dërguesit e rrjetit"
 
-#: ../gtk/details.c:1041 ../gtk/details.c:1093
+#: ../gtk/details.c:1065 ../gtk/details.c:1117
 msgid "Down"
 msgstr "Poshtë"
 
-#: ../gtk/details.c:1091
+#: ../gtk/details.c:1115
 msgid "Address"
 msgstr "Adresa"
 
-#: ../gtk/details.c:1095
+#: ../gtk/details.c:1119
 msgid "Up"
 msgstr "Lart"
 
-#: ../gtk/details.c:1096
+#: ../gtk/details.c:1120
 msgid "Client"
 msgstr "Klient"
 
-#: ../gtk/details.c:1097
+#: ../gtk/details.c:1121
 msgid "%"
 msgstr "%"
 
-#: ../gtk/details.c:1099
+#: ../gtk/details.c:1123
 msgid "Up Reqs"
 msgstr "Ngrije Kërkesën Lart"
 
-#: ../gtk/details.c:1101
+#: ../gtk/details.c:1125
 msgid "Dn Reqs"
 msgstr "Ule Kërkesën Poshtë"
 
-#: ../gtk/details.c:1103
+#: ../gtk/details.c:1127
 msgid "Dn Blocks"
 msgstr ""
 
-#: ../gtk/details.c:1105
+#: ../gtk/details.c:1129
 msgid "Up Blocks"
 msgstr ""
 
-#: ../gtk/details.c:1107
+#: ../gtk/details.c:1131
 msgid "We Cancelled"
 msgstr ""
 
-#: ../gtk/details.c:1109
+#: ../gtk/details.c:1133
 msgid "They Cancelled"
 msgstr ""
 
-#: ../gtk/details.c:1110
+#: ../gtk/details.c:1134
 msgid "Status"
 msgstr "Gjendja"
 
-#: ../gtk/details.c:1469
+#: ../gtk/details.c:1473
 msgid "Optimistic unchoke"
 msgstr "Hapje optimiste"
 
-#: ../gtk/details.c:1470
+#: ../gtk/details.c:1474
 msgid "Downloading from this peer"
 msgstr "Shkarko nga ky shoku"
 
-#: ../gtk/details.c:1471
+#: ../gtk/details.c:1475
 msgid "We would download from this peer if they would let us"
 msgstr "Ne duam te shkarkojme nga ky shoku nese ai na ler"
 
-#: ../gtk/details.c:1472
+#: ../gtk/details.c:1476
 msgid "Uploading to peer"
 msgstr "Ngarko tek shoku"
 
-#: ../gtk/details.c:1473
+#: ../gtk/details.c:1477
 msgid "We would upload to this peer if they asked"
 msgstr "Ne do te ngarkojme tek shoku nese na kerkon"
 
-#: ../gtk/details.c:1474
+#: ../gtk/details.c:1478
 msgid "Peer has unchoked us, but we're not interested"
 msgstr "Një lidhje na kërkon, por ne nuk jemi të interesuar"
 
-#: ../gtk/details.c:1475
+#: ../gtk/details.c:1479
 msgid "We unchoked this peer, but they're not interested"
 msgstr "Ne kemi kërkuar lidhjen, por ata nuk janë të interesuar"
 
-#: ../gtk/details.c:1476
+#: ../gtk/details.c:1480
 msgid "Encrypted connection"
 msgstr "Lidhe e enkryptuar"
 
-#: ../gtk/details.c:1477
+#: ../gtk/details.c:1481
 msgid "Peer was discovered through Peer Exchange (PEX)"
 msgstr "Shoket u gjeten nga Peer Exchange (PEX)"
 
-#: ../gtk/details.c:1478
+#: ../gtk/details.c:1482
 msgid "Peer was discovered through DHT"
 msgstr "Dhënësi u zbulua përmes DHT"
 
-#: ../gtk/details.c:1479
+#: ../gtk/details.c:1483
 msgid "Peer is an incoming connection"
 msgstr "Kjo është një lidhje në ardhje"
 
-#: ../gtk/details.c:1734 ../gtk/details.c:2254
+#: ../gtk/details.c:1740 ../gtk/details.c:2256
 msgid "Show _more details"
 msgstr "Shfaq _më tepër detaje"
 
-#: ../gtk/details.c:1808
+#: ../gtk/details.c:1814
 #, c-format
 msgid "Got a list of %1$s%2$'d peers%3$s %4$s ago"
 msgstr "Mora një listë të %1$s%2$'d burimeve%3$s %4$s më parë"
 
-#: ../gtk/details.c:1812
+#: ../gtk/details.c:1818
 #, c-format
 msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
 msgstr ""
 "Listë e kërkimit të burimeve %1$sskadoi%2$s %3$s më parë; do ta riprovoj"
 
-#: ../gtk/details.c:1815
+#: ../gtk/details.c:1821
 #, c-format
 msgid "Got an error %1$s\"%2$s\"%3$s %4$s ago"
 msgstr "Pata një gabim %1$s\"%2$s\"%3$s %4$s më parë"
 
-#: ../gtk/details.c:1824
+#: ../gtk/details.c:1829
 msgid "No updates scheduled"
 msgstr "Nuk janë skeduar përditësime"
 
-#: ../gtk/details.c:1830
+#: ../gtk/details.c:1834
 #, c-format
 msgid "Asking for more peers in %s"
 msgstr "Kërko për më tepër burime në %s"
 
-#: ../gtk/details.c:1834
+#: ../gtk/details.c:1838
 msgid "Queued to ask for more peers"
 msgstr "U nis kërkesa për më tepër burime"
 
-#: ../gtk/details.c:1839
+#: ../gtk/details.c:1843
 #, c-format
 msgid "Asking for more peers now... <small>%s</small>"
 msgstr "Duke kërkuar për më tepër burime tani... <small>%s</small>"
 
-#: ../gtk/details.c:1849
+#: ../gtk/details.c:1853
 #, c-format
 msgid "Tracker had %s%'d seeders and %'d leechers%s %s ago"
 msgstr "Gjurmuesi kishte %s%'d dërgues dhe %'d marrës%s %s më parë"
 
-#: ../gtk/details.c:1853
+#: ../gtk/details.c:1857
 #, c-format
 msgid "Got a scrape error \"%s%s%s\" %s ago"
 msgstr "Morra një gabim pavlefshmërie \"%s%s%s\" %s më parë"
 
-#: ../gtk/details.c:1863
+#: ../gtk/details.c:1867
 #, c-format
 msgid "Asking for peer counts in %s"
 msgstr "Duke kërkuar për një numër shokësh në %s"
 
-#: ../gtk/details.c:1867
+#: ../gtk/details.c:1871
 msgid "Queued to ask for peer counts"
 msgstr "Në pritje për të kërkuar për burime"
 
-#: ../gtk/details.c:1872
+#: ../gtk/details.c:1876
 #, c-format
 msgid "Asking for peer counts now... <small>%s</small>"
 msgstr "Duke kërkuar për burime tani... <small>%s</small>"
 
-#: ../gtk/details.c:2131
+#: ../gtk/details.c:2133
 msgid "List contains invalid URLs"
 msgstr "Lista përmban URL të pavlefshme"
 
-#: ../gtk/details.c:2171
+#: ../gtk/details.c:2172
 msgid "Edit Trackers"
 msgstr "Modifiko Gjurmuesit"
 
-#: ../gtk/details.c:2183
+#: ../gtk/details.c:2184
 msgid "Tracker Announce URLs"
 msgstr "URL-të e Shpalljes së Gjurmuesve"
 
-#: ../gtk/details.c:2186 ../gtk/makemeta-ui.c:453
+#: ../gtk/details.c:2187 ../gtk/makemeta-ui.c:500
 msgid ""
 "To add a backup URL, add it on the line after the primary URL.\n"
 "To add another primary URL, add it after a blank line."
@@ -698,183 +702,127 @@ msgstr ""
 "kryesore.\n"
 "Për të shtuar një URL tjetër parësore, shtojeni atë pas një rreshti bosh."
 
-#: ../gtk/details.c:2229 ../gtk/details.c:2350 ../gtk/filter.c:324
+#: ../gtk/details.c:2231 ../gtk/details.c:2352 ../gtk/filter.c:316
 msgid "Trackers"
 msgstr "Gjurmuesit"
 
-#: ../gtk/details.c:2261
+#: ../gtk/details.c:2263
 msgid "_Edit Trackers"
 msgstr "_Modifiko Gjurmuesit"
 
-#: ../gtk/details.c:2269
+#: ../gtk/details.c:2271
 msgid "Show _backup trackers"
 msgstr "Shfaq _gjurmuesit mbështetës"
 
-#: ../gtk/details.c:2342 ../gtk/msgwin.c:179
+#: ../gtk/details.c:2344 ../gtk/msgwin.c:365
 msgid "Information"
 msgstr "Informata"
 
-#: ../gtk/details.c:2346
+#: ../gtk/details.c:2348
 msgid "Peers"
 msgstr "Shoket"
 
-#: ../gtk/details.c:2356
+#: ../gtk/details.c:2358
 msgid "File listing not available for combined torrent properties"
 msgstr ""
 "Listimi i skedarëve nuk është i disponueshëm për parametrat e kombinuar të "
 "torrentëve"
 
-#: ../gtk/details.c:2360 ../gtk/filter.c:999 ../gtk/makemeta-ui.c:402
+#: ../gtk/details.c:2362 ../gtk/makemeta-ui.c:447
 msgid "Files"
 msgstr "Skedarë"
 
-#: ../gtk/details.c:2365 ../gtk/tr-window.c:651
+#: ../gtk/details.c:2367 ../gtk/tr-window.c:644
 msgid "Options"
 msgstr "Opsione"
 
-#: ../gtk/details.c:2392
+#: ../gtk/details.c:2394
 #, c-format
 msgid "%s Properties"
 msgstr "%s Parametrat"
 
-#: ../gtk/details.c:2403
+#: ../gtk/details.c:2405
 #, c-format
 msgid "%'d Torrent Properties"
 msgstr "%'d Parametrat e Torrentit"
 
-#: ../gtk/dialogs.c:121
+#: ../gtk/dialogs.c:89
 msgid "<big><b>Quit Transmission?</b></big>"
 msgstr "<big><b>Ler Transmission?</b></big>"
 
-#: ../gtk/dialogs.c:133
+#: ../gtk/dialogs.c:101
 msgid "_Don't ask me again"
 msgstr "_Mos me pyet me"
 
-#: ../gtk/dialogs.c:229
-#, c-format
-msgid "Remove torrent?"
-msgid_plural "Remove %d torrents?"
-msgstr[0] ""
-msgstr[1] ""
-
-#: ../gtk/dialogs.c:235
-#, c-format
-msgid "Delete this torrent's downloaded files?"
-msgid_plural "Delete these %d torrents' downloaded files?"
-msgstr[0] ""
-msgstr[1] ""
-
-#: ../gtk/dialogs.c:245
-msgid ""
-"Once removed, continuing the transfer will require the torrent file or "
-"magnet link."
-msgid_plural ""
-"Once removed, continuing the transfers will require the torrent files or "
-"magnet links."
-msgstr[0] ""
-msgstr[1] ""
-
-#: ../gtk/dialogs.c:251
-msgid "This torrent has not finished downloading."
-msgid_plural "These torrents have not finished downloading."
-msgstr[0] "Ky torrent nuk e ka mbaruar shkarkimin."
-msgstr[1] "Këta torrentë nuk e kanë mbaruar shkarkimin."
-
-#: ../gtk/dialogs.c:257
-msgid "This torrent is connected to peers."
-msgid_plural "These torrents are connected to peers."
-msgstr[0] "Ky torrent është i lidhur me të tjerët."
-msgstr[1] "Këta torrentë janë të lidhur me të tjerët."
-
-#: ../gtk/dialogs.c:264
-msgid "One of these torrents is connected to peers."
-msgid_plural "Some of these torrents are connected to peers."
-msgstr[0] "Një nga këta torrentë është i lidhur me të tjerët."
-msgstr[1] "Disa nga këta torrentë janë të lidhur me të tjerët."
-
-#: ../gtk/dialogs.c:271
-msgid "One of these torrents has not finished downloading."
-msgid_plural "Some of these torrents have not finished downloading."
-msgstr[0] "Një nga këta torrentë nuk e ka përfunduar shkarkimin."
-msgstr[1] "Disa nga këta torrentë nuk e kanë përfunduar shkarkimin."
-
-#: ../gtk/file-list.c:582 ../gtk/filter.c:349 ../gtk/util.c:692
+#: ../gtk/file-list.c:621 ../gtk/filter.c:341 ../gtk/util.c:674
 msgid "High"
 msgstr "I Lartë"
 
-#: ../gtk/file-list.c:583 ../gtk/filter.c:353 ../gtk/util.c:693
+#: ../gtk/file-list.c:622 ../gtk/filter.c:345 ../gtk/util.c:675
 msgid "Normal"
 msgstr "Normal"
 
-#: ../gtk/file-list.c:584 ../gtk/filter.c:357 ../gtk/util.c:694
+#: ../gtk/file-list.c:623 ../gtk/filter.c:349 ../gtk/util.c:676
 msgid "Low"
 msgstr "I Ulët"
 
 #. add "enabled" column
-#: ../gtk/file-list.c:612 ../gtk/file-list.c:745
+#: ../gtk/file-list.c:709 ../gtk/file-list.c:844
 msgid "Download"
 msgstr "Shkarkimi"
 
 #. add priority column
-#: ../gtk/file-list.c:613 ../gtk/file-list.c:759 ../gtk/filter.c:344
+#: ../gtk/file-list.c:710 ../gtk/file-list.c:858 ../gtk/filter.c:336
 msgid "Priority"
 msgstr "Përparësia"
 
-#: ../gtk/file-list.c:717
+#: ../gtk/file-list.c:816
 msgid "File"
 msgstr "Skedari"
 
 #. add "progress" column
-#: ../gtk/file-list.c:732
+#: ../gtk/file-list.c:831
 msgid "Progress"
 msgstr "Përparimi"
 
-#: ../gtk/filter.c:316 ../gtk/filter.c:717
+#: ../gtk/filter.c:308 ../gtk/filter.c:711
 msgid "All"
 msgstr ""
 
-#: ../gtk/filter.c:330 ../gtk/tr-prefs.c:552 ../gtk/tr-prefs.c:1439
+#: ../gtk/filter.c:322 ../gtk/tr-prefs.c:516 ../gtk/tr-prefs.c:1343
 msgid "Privacy"
 msgstr "Intimiteti"
 
-#: ../gtk/filter.c:335
+#: ../gtk/filter.c:327
 msgid "Public"
 msgstr ""
 
-#: ../gtk/filter.c:339
+#: ../gtk/filter.c:331
 msgid "Private"
 msgstr ""
 
-#: ../gtk/filter.c:719
+#: ../gtk/filter.c:713
 msgid "Active"
 msgstr ""
 
-#: ../gtk/filter.c:723
+#: ../gtk/filter.c:718
 msgid "Queued"
 msgstr ""
 
-#: ../gtk/filter.c:724
+#: ../gtk/filter.c:719
 msgid "Verifying"
 msgstr ""
 
-#: ../gtk/filter.c:725 ../gtk/msgwin.c:178
+#: ../gtk/filter.c:720 ../gtk/msgwin.c:364
 msgid "Error"
 msgstr "Gabim"
 
-#: ../gtk/filter.c:999 ../gtk/msgwin.c:258
-msgid "Name"
-msgstr "Emri"
-
-#: ../gtk/filter.c:999 ../gtk/tr-prefs.c:1001
-msgid "Tracker"
-msgstr "Gjurmues"
-
 #. add the activity combobox
-#: ../gtk/filter.c:1023
+#: ../gtk/filter.c:958
 msgid "_Show:"
 msgstr ""
 
-#: ../gtk/main.c:393
+#: ../gtk/main.c:392
 #, c-format
 msgid ""
 "Got signal %d; trying to shut down cleanly.  Do it again if it gets stuck."
@@ -882,31 +830,31 @@ msgstr ""
 "Morra sinjalin %d; po përpiqem ta mbyll pastër. Bëjeni përsëri nëse "
 "bllokohet."
 
-#: ../gtk/main.c:516
+#: ../gtk/main.c:541
 msgid "Start with all torrents paused"
 msgstr "Nise me të gjithë torrentët në pauzë"
 
-#: ../gtk/main.c:518
+#: ../gtk/main.c:543
 msgid "Show version number and exit"
 msgstr "Shfaq numrin e versionit dhe dil"
 
-#: ../gtk/main.c:522
+#: ../gtk/main.c:547
 msgid "Start minimized in notification area"
 msgstr "Nise të minimizuar në zonën e njoftimit"
 
-#: ../gtk/main.c:525
+#: ../gtk/main.c:550
 msgid "Where to look for configuration files"
 msgstr "Ku të shikojmë për skedarët e konfigurimit"
 
-#: ../gtk/main.c:534 ../gtk/transmission.desktop.in.h:3
+#: ../gtk/main.c:559 ../gtk/transmission-gtk.desktop.in.h:3
 msgid "Transmission"
 msgstr "Transmission"
 
-#: ../gtk/main.c:541
+#: ../gtk/main.c:569
 msgid "[torrent files or urls]"
 msgstr "[skedarët torrent apo url-të]"
 
-#: ../gtk/main.c:595
+#: ../gtk/main.c:632
 msgid ""
 "Transmission is already running, but is not responding.  To start a new "
 "session, you must first close the existing Transmission process."
@@ -915,11 +863,11 @@ msgstr ""
 "seksion të ri, ju duhet të mbyllni fillimisht proçesin ekzistues të "
 "Transmission."
 
-#: ../gtk/main.c:649
+#: ../gtk/main.c:692
 msgid "Transmission cannot be started."
 msgstr "Transmission nuk mund të nisë."
 
-#: ../gtk/main.c:731
+#: ../gtk/main.c:778
 msgid ""
 "Transmission is a file-sharing program.  When you run a torrent, its data "
 "will be made available to others by means of upload.  You and you alone are "
@@ -927,47 +875,35 @@ msgid ""
 "laws."
 msgstr ""
 
-#: ../gtk/main.c:733
+#: ../gtk/main.c:780
 msgid "I _Accept"
 msgstr "_Pranoj"
 
-#: ../gtk/main.c:910
+#: ../gtk/main.c:1029
 msgid "<b>Closing Connections</b>"
 msgstr "<b>Duke Mbyllur Lidhjet</b>"
 
-#: ../gtk/main.c:914
+#: ../gtk/main.c:1033
 msgid "Sending upload/download totals to tracker..."
 msgstr "Duke dërguar totalin e ngarkimeve/shkarkimeve tek gjurmuesi..."
 
-#: ../gtk/main.c:919
+#: ../gtk/main.c:1038
 msgid "_Quit Now"
 msgstr "_Dil Tani"
 
-#: ../gtk/main.c:1079
-msgid "Couldn't add corrupt torrent"
-msgid_plural "Couldn't add corrupt torrents"
-msgstr[0] "Nuk munda të shtoj torrentin e dëmtuar"
-msgstr[1] "Nuk munda të shtoj torrentët e dëmtuar"
-
-#: ../gtk/main.c:1086
-msgid "Couldn't add duplicate torrent"
-msgid_plural "Couldn't add duplicate torrents"
-msgstr[0] "Nuk mund të shtoj torrent të dyzuar"
-msgstr[1] "Nuk mund të shtoj torrenta të dyzuar"
-
-#: ../gtk/main.c:1394
+#: ../gtk/main.c:1422
 msgid "A fast and easy BitTorrent client"
 msgstr "Një klient BitTorrent i shpejtë dhe i lehtë"
 
-#: ../gtk/main.c:1399
-msgid "Copyright 2005-2009 The Transmission Project"
-msgstr "E Drejta e Autorit 2005-2009 Projekti Transmission"
+#: ../gtk/main.c:1427
+msgid "Copyright (c) The Transmission Project"
+msgstr ""
 
 #. Translators: translate "translator-credits" as
 #. your name
 #. to have it appear in the credits in the "About"
 #. dialog
-#: ../gtk/main.c:1410
+#: ../gtk/main.c:1438
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
@@ -975,126 +911,116 @@ msgstr ""
 "  Vilson Gjeci https://launchpad.net/~vilsongjeci\n"
 "  heroid https://launchpad.net/~heroid"
 
-#: ../gtk/makemeta-ui.c:75
+#: ../gtk/makemeta-ui.c:78
 #, c-format
 msgid "Creating \"%s\""
 msgstr "Duke krijuar \"%s\""
 
-#: ../gtk/makemeta-ui.c:77
+#: ../gtk/makemeta-ui.c:80
 #, c-format
 msgid "Created \"%s\"!"
 msgstr "U krijua \"%s\"!"
 
-#: ../gtk/makemeta-ui.c:79
+#: ../gtk/makemeta-ui.c:82
 #, c-format
 msgid "Error: invalid announce URL \"%s\""
 msgstr "Gabim: URL e pavlefshme njoftimi \"%s\""
 
-#: ../gtk/makemeta-ui.c:81
+#: ../gtk/makemeta-ui.c:84
 #, c-format
 msgid "Cancelled"
 msgstr "Anulluar"
 
-#: ../gtk/makemeta-ui.c:83
+#: ../gtk/makemeta-ui.c:86
 #, c-format
 msgid "Error reading \"%s\": %s"
 msgstr "Gabim në leximin \"%s\": %s"
 
-#: ../gtk/makemeta-ui.c:85
+#: ../gtk/makemeta-ui.c:88
 #, c-format
 msgid "Error writing \"%s\": %s"
 msgstr "Gabim në shkrimin \"%s\": %s"
 
 #. how much data we've scanned through to generate checksums
-#: ../gtk/makemeta-ui.c:102
+#: ../gtk/makemeta-ui.c:105
 #, c-format
 msgid "Scanned %s"
 msgstr "U skanua %s"
 
-#: ../gtk/makemeta-ui.c:167 ../gtk/makemeta-ui.c:389
+#: ../gtk/makemeta-ui.c:170 ../gtk/makemeta-ui.c:434
 msgid "New Torrent"
 msgstr "Torrent i Ri"
 
-#: ../gtk/makemeta-ui.c:183
+#: ../gtk/makemeta-ui.c:186
 msgid "Creating torrent..."
 msgstr "Duke krijuar torrentin..."
 
-#: ../gtk/makemeta-ui.c:292
+#: ../gtk/makemeta-ui.c:295
 msgid "No source selected"
 msgstr "Nuk është zgjedhur asnjë burim"
 
-#: ../gtk/makemeta-ui.c:298
-#, c-format
-msgid "%1$s; %2$'d File"
-msgid_plural "%1$s; %2$'d Files"
-msgstr[0] "%1$s; %2$'d Skedar"
-msgstr[1] "%1$s; %2$'d Skedarë"
-
-#: ../gtk/makemeta-ui.c:304
-#, c-format
-msgid "%1$'d Piece @ %2$s"
-msgid_plural "%1$'d Pieces @ %2$s"
-msgstr[0] "%1$'d Copë @ %2$s"
-msgstr[1] "%1$'d Copa @ %2$s"
-
-#: ../gtk/makemeta-ui.c:404
+#: ../gtk/makemeta-ui.c:449
 msgid "Sa_ve to:"
 msgstr "Ru_aje tek:"
 
-#: ../gtk/makemeta-ui.c:410
+#: ../gtk/makemeta-ui.c:455
 msgid "Source F_older:"
 msgstr "Dosja B_urim:"
 
-#: ../gtk/makemeta-ui.c:421
+#: ../gtk/makemeta-ui.c:467
 msgid "Source _File:"
 msgstr "Skedari _Burim:"
 
-#: ../gtk/makemeta-ui.c:432
+#: ../gtk/makemeta-ui.c:479
 msgid "<i>No source selected</i>"
 msgstr "<i>Asnjë burim nuk është zgjedhur</i>"
 
-#: ../gtk/makemeta-ui.c:436
+#: ../gtk/makemeta-ui.c:483
 msgid "Properties"
 msgstr "Parametrat"
 
-#: ../gtk/makemeta-ui.c:438
+#: ../gtk/makemeta-ui.c:485
 msgid "_Trackers:"
 msgstr "_Gjurmuesit:"
 
-#: ../gtk/makemeta-ui.c:460
+#: ../gtk/makemeta-ui.c:507
 msgid "Co_mment:"
 msgstr "Ko_ment:"
 
-#: ../gtk/makemeta-ui.c:469
+#: ../gtk/makemeta-ui.c:516
 msgid "_Private torrent"
 msgstr "_Torrent privat"
 
-#: ../gtk/msgwin.c:84
+#: ../gtk/msgwin.c:76
 #, c-format
 msgid "Couldn't save \"%s\""
 msgstr "Nuk mund të ruaj \"%s\""
 
-#: ../gtk/msgwin.c:135
+#: ../gtk/msgwin.c:127
 msgid "Save Log"
 msgstr "Ruaj Gjurmën"
 
-#: ../gtk/msgwin.c:180
-msgid "Debug"
-msgstr "Gjurmo Gabimin"
-
-#: ../gtk/msgwin.c:254
+#: ../gtk/msgwin.c:233
 msgid "Time"
 msgstr "Koha"
 
-#: ../gtk/msgwin.c:262
+#: ../gtk/msgwin.c:237
+msgid "Name"
+msgstr "Emri"
+
+#: ../gtk/msgwin.c:241
 msgid "Message"
 msgstr "Mesazhi"
 
-#: ../gtk/msgwin.c:438
+#: ../gtk/msgwin.c:366
+msgid "Debug"
+msgstr "Gjurmo Gabimin"
+
+#: ../gtk/msgwin.c:391
 msgid "Message Log"
 msgstr "Gjurma e Mesazhit"
 
-#: ../gtk/msgwin.c:472
+#: ../gtk/msgwin.c:425
 msgid "Level"
 msgstr "Niveli"
 
@@ -1151,13 +1077,6 @@ msgstr "_Lëvize nga folderi i tanishëm"
 msgid "Local data is _already there"
 msgstr "Të dhënat lokale janë _tashmë këtu"
 
-#: ../gtk/stats.c:76 ../gtk/stats.c:175
-#, c-format
-msgid "Started %'d time"
-msgid_plural "Started %'d times"
-msgstr[0] "U Nis %'d herë"
-msgstr[1] "U Nis %'d herë"
-
 #: ../gtk/stats.c:107
 msgid "Reset your statistics?"
 msgstr "Ti fshij statistikat e tua?"
@@ -1174,7 +1093,7 @@ msgstr ""
 msgid "_Reset"
 msgstr "_Fshiji"
 
-#: ../gtk/stats.c:147 ../gtk/tr-window.c:692
+#: ../gtk/stats.c:147 ../gtk/tr-window.c:682
 msgid "Statistics"
 msgstr "Statistikat"
 
@@ -1190,34 +1109,39 @@ msgstr "Kohëzgjatja:"
 msgid "Total"
 msgstr "Totali"
 
+#: ../gtk/stats.c:175
+#, c-format
+msgid "Started %'d time"
+msgstr ""
+
 #. %1$s is how much we've got,
 #. %2$s is how much we'll have when done,
-#. %3$.2f%% is a percentage of the two
+#. %3$s%% is a percentage of the two
 #: ../gtk/torrent-cell-renderer.c:63
 #, c-format
-msgid "%1$s of %2$s (%3$.2f%%)"
-msgstr "%1$s të %2$s (%3$.2f%%)"
+msgid "%1$s of %2$s (%3$s%%)"
+msgstr ""
 
 #. %1$s is how much we've got,
 #. %2$s is the torrent's total size,
-#. %3$.2f%% is a percentage of the two,
+#. %3$s%% is a percentage of the two,
 #. %4$s is how much we've uploaded,
 #. %5$s is our upload-to-download ratio,
 #. %6$s is the ratio we want to reach before we stop uploading
 #: ../gtk/torrent-cell-renderer.c:79
 #, c-format
-msgid "%1$s of %2$s (%3$.2f%%), uploaded %4$s (Ratio: %5$s Goal: %6$s)"
+msgid "%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s Goal: %6$s)"
 msgstr ""
 
 #. %1$s is how much we've got,
 #. %2$s is the torrent's total size,
-#. %3$.2f%% is a percentage of the two,
+#. %3$s%% is a percentage of the two,
 #. %4$s is how much we've uploaded,
 #. %5$s is our upload-to-download ratio
 #: ../gtk/torrent-cell-renderer.c:95
 #, c-format
-msgid "%1$s of %2$s (%3$.2f%%), uploaded %4$s (Ratio: %5$s)"
-msgstr "%1$s të %2$s (%3$.2f%%), u ngarkuan %4$s (Shkalla: %5$s)"
+msgid "%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s)"
+msgstr ""
 
 #. %1$s is the torrent's total size,
 #. %2$s is how much we've uploaded,
@@ -1246,7 +1170,7 @@ msgstr "Koha e ngelur nuk njihet"
 msgid "%s remaining"
 msgstr "%s ngelen"
 
-#. 1==down speed, 2==down arrow, 3==up speed, 4==down arrow
+#. 1==down arrow, 2==down speed, 3==up arrow, 4==down speed
 #: ../gtk/torrent-cell-renderer.c:174
 #, c-format
 msgid "%1$s %2$s, %3$s %4$s"
@@ -1259,7 +1183,7 @@ msgid "%1$s %2$s"
 msgstr ""
 
 #. the torrent isn't uploading or downloading
-#: ../gtk/torrent-cell-renderer.c:187 ../gtk/tr-icon.c:75
+#: ../gtk/torrent-cell-renderer.c:187 ../gtk/tr-icon.c:77
 msgid "Idle"
 msgstr "Në Pritje"
 
@@ -1288,27 +1212,6 @@ msgstr "Gjurmuesi dha një gabim: \"%s\""
 msgid "Error: %s"
 msgstr "Gabim: %s"
 
-#: ../gtk/torrent-cell-renderer.c:279
-#, c-format
-msgid "Downloading from %1$'d of %2$'d connected peer"
-msgid_plural "Downloading from %1$'d of %2$'d connected peers"
-msgstr[0] "Duke shkarkuar nga %1$'d prej %2$'d dhënës i lidhur"
-msgstr[1] "Duke shkarkuar nga %1$'d prej %2$'d dhënës të lidhur"
-
-#: ../gtk/torrent-cell-renderer.c:290
-#, c-format
-msgid "Downloading metadata from %1$'d peer (%2$d%% done)"
-msgid_plural "Downloading metadata from %1$'d peers (%2$d%% done)"
-msgstr[0] "Duke shkarkuar metadata nga %1$'d burimi (%2$d%% kryer)"
-msgstr[1] "Duke shkarkuar metadata nga %1$'d burimet (%2$d%% kryer)"
-
-#: ../gtk/torrent-cell-renderer.c:301
-#, c-format
-msgid "Seeding to %1$'d of %2$'d connected peer"
-msgid_plural "Seeding to %1$'d of %2$'d connected peers"
-msgstr[0] "Duke dërguar tek %1$'d nga %2$'d marrës i lidhur"
-msgstr[1] "Duke dërguar tek %1$'d nga %2$'d marrës të lidhur"
-
 #: ../gtk/tracker-list.c:344
 msgid "Tier"
 msgstr "Lidhësi"
@@ -1317,40 +1220,40 @@ msgstr "Lidhësi"
 msgid "Announce URL"
 msgstr "Lajmëro URL-në"
 
-#: ../gtk/transmission.desktop.in.h:1
+#: ../gtk/transmission-gtk.desktop.in.h:1
 msgid "BitTorrent Client"
 msgstr "BitTorrent Klient"
 
-#: ../gtk/transmission.desktop.in.h:2
+#: ../gtk/transmission-gtk.desktop.in.h:2
 msgid "Download and share files over BitTorrent"
 msgstr "Shkarko dhe shpërnda skedarët me BitTorrent"
 
-#: ../gtk/transmission.desktop.in.h:4
+#: ../gtk/transmission-gtk.desktop.in.h:4
 msgid "Transmission BitTorrent Client"
 msgstr "Transmission BitTorrent Klient"
 
-#: ../gtk/tr-core.c:1327
+#: ../gtk/tr-core.c:1411
 msgid "Transmission Bittorrent Client"
 msgstr "Transmission Bittorrent Klient"
 
-#: ../gtk/tr-core.c:1328
+#: ../gtk/tr-core.c:1412
 msgid "BitTorrent Activity"
 msgstr "Veprimtaria e BitTorrent"
 
-#: ../gtk/tr-core.c:1340
+#: ../gtk/tr-core.c:1424
 msgid "Disallowing desktop hibernation"
 msgstr "Moslejimi i hibernimit të desktopit"
 
-#: ../gtk/tr-core.c:1343
+#: ../gtk/tr-core.c:1427
 #, c-format
 msgid "Couldn't disable desktop hibernation: %s"
 msgstr "Nuk mundëm të çaktivizonim hibernimin e desktopit: %s"
 
-#: ../gtk/tr-core.c:1367
+#: ../gtk/tr-core.c:1451
 msgid "Allowing desktop hibernation"
 msgstr "Duke lejuar hibernimin e desktopit"
 
-#: ../gtk/tr-icon.c:91 ../gtk/tr-icon.c:106
+#: ../gtk/tr-icon.c:94 ../gtk/tr-icon.c:110
 #, c-format
 msgid "(Limit: %s)"
 msgstr "(Kufiri: %s)"
@@ -1359,7 +1262,7 @@ msgstr "(Kufiri: %s)"
 #. * %2$s: current upload limit, if any
 #. * %3$s: current download speed
 #. * %4$s: current download limit, if any
-#: ../gtk/tr-icon.c:113
+#: ../gtk/tr-icon.c:117
 #, c-format
 msgid ""
 "Transmission\n"
@@ -1370,355 +1273,355 @@ msgstr ""
 "Lart: %1$s %2$s\n"
 "Poshtë: %3$s %4$s"
 
-#: ../gtk/tr-prefs.c:282
-msgid "Adding Torrents"
-msgstr "Duke Shtuar Torrentë"
+#: ../gtk/tr-prefs.c:273
+msgid "Adding"
+msgstr ""
 
-#: ../gtk/tr-prefs.c:285
+#: ../gtk/tr-prefs.c:276
 msgid "Automatically _add torrents from:"
 msgstr "Automatikisht _shto torrentët nga:"
 
-#: ../gtk/tr-prefs.c:306
+#: ../gtk/tr-prefs.c:300
 msgid "Append \"._part\" to incomplete files' names"
 msgstr "Shto \"._part\" pas emrit të skedarëve të pa kompletuar"
 
-#: ../gtk/tr-prefs.c:311
+#: ../gtk/tr-prefs.c:305
 msgid "Save to _Location:"
 msgstr "Ruaje në _Vendndodhje:"
 
-#: ../gtk/tr-prefs.c:313
+#: ../gtk/tr-prefs.c:307
 msgid "Keep _incomplete torrents in:"
 msgstr "Mbaji _torrentët e pa kompletuar në:"
 
-#: ../gtk/tr-prefs.c:320
+#: ../gtk/tr-prefs.c:314
 msgid "Call scrip_t when torrent is completed:"
 msgstr ""
 
-#: ../gtk/tr-prefs.c:328 ../gtk/tr-prefs.c:1395
-msgid "Limits"
-msgstr "Kufizimet"
+#: ../gtk/tr-prefs.c:324
+msgid "Stop seeding at _ratio:"
+msgstr ""
 
-#: ../gtk/tr-prefs.c:354 ../gtk/tr-prefs.c:1445
+#: ../gtk/tr-prefs.c:331
+msgid "Stop seeding if idle for _N minutes:"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:355 ../gtk/tr-prefs.c:1349
 msgid "Desktop"
 msgstr "Desktopi"
 
-#: ../gtk/tr-prefs.c:356
+#: ../gtk/tr-prefs.c:357
 msgid "Inhibit _hibernation when torrents are active"
 msgstr "Pengo _hibernimin kur torrentët janë aktivë"
 
-#: ../gtk/tr-prefs.c:360
+#: ../gtk/tr-prefs.c:361
 msgid "Show Transmission icon in the _notification area"
 msgstr "Shfaq ikonën e Transmission në zonën e _njoftimit"
 
-#: ../gtk/tr-prefs.c:364
+#: ../gtk/tr-prefs.c:365
 msgid "Show _popup notifications"
 msgstr "Shfaq _njoftime kërcyese"
 
-#: ../gtk/tr-prefs.c:369
+#: ../gtk/tr-prefs.c:370
 msgid "Play _sound when downloads are complete"
 msgstr "Luaj _zë kur shkarkimet të kompletohen"
 
-#: ../gtk/tr-prefs.c:397
-#, c-format
-msgid "Enable _blocklist (contains %'d rule)"
-msgid_plural "Enable _blocklist (contains %'d rules)"
-msgstr[0] "Aktivizo _listën e bllokimit (përmban %'d rregull)"
-msgstr[1] "Aktivizo _listën e bllokimit (përmban %'d rregull)"
-
-#: ../gtk/tr-prefs.c:427
-#, c-format
-msgid "Blocklist now has %'d rule."
-msgid_plural "Blocklist now has %'d rules."
-msgstr[0] "Lista e bllokimit tani ka %'d rregull."
-msgstr[1] "Lista e bllokimit tani ka %'d rregulla."
-
-#: ../gtk/tr-prefs.c:431
+#: ../gtk/tr-prefs.c:432
 msgid "<b>Update succeeded!</b>"
 msgstr "<b>Përditësimi u krye me sukses!</b>"
 
-#: ../gtk/tr-prefs.c:446
+#: ../gtk/tr-prefs.c:447
 msgid "Update Blocklist"
 msgstr "Përditëso Listën e Bllokimeve"
 
-#: ../gtk/tr-prefs.c:448
+#: ../gtk/tr-prefs.c:449
 msgid "Getting new blocklist..."
 msgstr "Duke marrë listën e re të bllokimeve..."
 
-#: ../gtk/tr-prefs.c:483
+#: ../gtk/tr-prefs.c:468
 msgid "Allow encryption"
 msgstr "Lejo kriptimin"
 
-#: ../gtk/tr-prefs.c:484
+#: ../gtk/tr-prefs.c:469
 msgid "Prefer encryption"
 msgstr "Prefero kriptimin"
 
-#: ../gtk/tr-prefs.c:485
+#: ../gtk/tr-prefs.c:470
 msgid "Require encryption"
 msgstr "Kërko kriptimin"
 
-#: ../gtk/tr-prefs.c:529
+#: ../gtk/tr-prefs.c:493
 msgid "Blocklist"
 msgstr "Lista e Bllokimeve"
 
-#: ../gtk/tr-prefs.c:535
+#: ../gtk/tr-prefs.c:499
 msgid "_Update"
 msgstr "_Përditëso"
 
-#: ../gtk/tr-prefs.c:545
+#: ../gtk/tr-prefs.c:509
 msgid "Enable _automatic updates"
 msgstr "Aktivizo _përditësimet automatike"
 
-#: ../gtk/tr-prefs.c:554
+#: ../gtk/tr-prefs.c:518
 msgid "_Encryption mode:"
 msgstr "_Mënyra e kriptimit:"
 
-#: ../gtk/tr-prefs.c:558
+#: ../gtk/tr-prefs.c:522
 msgid "Use PE_X to find more peers"
 msgstr "Përdor PE_X për të gjetur më tepër burime"
 
-#: ../gtk/tr-prefs.c:560
+#: ../gtk/tr-prefs.c:524
 msgid ""
 "PEX is a tool for exchanging peer lists with the peers you're connected to."
 msgstr ""
 "PEX është një mjet për të shkëmbyer listën e burimeve me burimet me të cilat "
 "je lidhur."
 
-#: ../gtk/tr-prefs.c:564
+#: ../gtk/tr-prefs.c:528
 msgid "Use _DHT to find more peers"
 msgstr "Përdor _DHT për të gjetur më tepër burime"
 
-#: ../gtk/tr-prefs.c:566
+#: ../gtk/tr-prefs.c:530
 msgid "DHT is a tool for finding peers without a tracker."
 msgstr "DHT është një mjet për të gjetur burime pa një gjurmues."
 
-#: ../gtk/tr-prefs.c:570
-msgid "Use Local Peer Discovery to find more peers"
+#: ../gtk/tr-prefs.c:534
+msgid "Use _Local Peer Discovery to find more peers"
 msgstr ""
 
-#: ../gtk/tr-prefs.c:572
+#: ../gtk/tr-prefs.c:536
 msgid "LPD is a tool for finding peers on your local network."
 msgstr ""
 
-#: ../gtk/tr-prefs.c:793
+#: ../gtk/tr-prefs.c:757
 msgid "Web Client"
 msgstr "Web Klient"
 
 #. "enabled" checkbutton
-#: ../gtk/tr-prefs.c:796
+#: ../gtk/tr-prefs.c:760
 msgid "_Enable web client"
 msgstr "_Aktivizo web klient"
 
-#: ../gtk/tr-prefs.c:802
+#: ../gtk/tr-prefs.c:766
 msgid "_Open web client"
 msgstr "_Hape klientin web"
 
-#: ../gtk/tr-prefs.c:811
+#: ../gtk/tr-prefs.c:775
 msgid "Listening _port:"
 msgstr "Porti i _dëgjimit"
 
 #. require authentication
-#: ../gtk/tr-prefs.c:815 ../gtk/tr-prefs.c:1032
+#: ../gtk/tr-prefs.c:779 ../gtk/tr-prefs.c:967
 msgid "Use _authentication"
 msgstr "Përdor _identifikimin"
 
 #. username
-#: ../gtk/tr-prefs.c:823 ../gtk/tr-prefs.c:1038
+#: ../gtk/tr-prefs.c:787 ../gtk/tr-prefs.c:973
 msgid "_Username:"
 msgstr "_Emri i Përdoruesit:"
 
 #. password
-#: ../gtk/tr-prefs.c:830 ../gtk/tr-prefs.c:1044
+#: ../gtk/tr-prefs.c:794 ../gtk/tr-prefs.c:979
 msgid "Pass_word:"
 msgstr "Fjalë_kalimi:"
 
 #. require authentication
-#: ../gtk/tr-prefs.c:838
+#: ../gtk/tr-prefs.c:802
 msgid "Only allow these IP a_ddresses to connect:"
 msgstr "Lejo vetëm këto a_dresa IP që të lidhen:"
 
-#: ../gtk/tr-prefs.c:863
+#: ../gtk/tr-prefs.c:827
 msgid "IP addresses may use wildcards, such as 192.168.*.*"
 msgstr "Adresat IP mund të përdorin përgjithësime, si p.sh. 192.168.*.*"
 
-#: ../gtk/tr-prefs.c:885
+#: ../gtk/tr-prefs.c:849
 msgid "Addresses:"
 msgstr "Adresat:"
 
-#: ../gtk/tr-prefs.c:1003
+#: ../gtk/tr-prefs.c:943
+msgid "Tracker"
+msgstr "Gjurmues"
+
+#: ../gtk/tr-prefs.c:945
 msgid "Connect to tracker via a pro_xy"
 msgstr "Lidhu me gjurmuesin me anë të një pro_ksi"
 
-#: ../gtk/tr-prefs.c:1008
+#: ../gtk/tr-prefs.c:950
 msgid "Proxy _server:"
 msgstr "Serveri _proksi:"
 
-#: ../gtk/tr-prefs.c:1016
+#: ../gtk/tr-prefs.c:958
 msgid "Proxy _port:"
 msgstr "Porti _proksi:"
 
-#: ../gtk/tr-prefs.c:1019
+#: ../gtk/tr-prefs.c:961
 msgid "Proxy _type:"
 msgstr "Tipi i _proksit:"
 
-#: ../gtk/tr-prefs.c:1157
+#: ../gtk/tr-prefs.c:1082
 msgid "Every Day"
 msgstr "Çdo Ditë"
 
-#: ../gtk/tr-prefs.c:1158
+#: ../gtk/tr-prefs.c:1083
 msgid "Weekdays"
 msgstr "Gjatë Ditëve të Javës"
 
-#: ../gtk/tr-prefs.c:1159
+#: ../gtk/tr-prefs.c:1084
 msgid "Weekends"
 msgstr "Gjatë Fundjavës"
 
-#: ../gtk/tr-prefs.c:1160
+#: ../gtk/tr-prefs.c:1085
 msgid "Sunday"
 msgstr "Të Dielën"
 
-#: ../gtk/tr-prefs.c:1161
+#: ../gtk/tr-prefs.c:1086
 msgid "Monday"
 msgstr "Të Hënën"
 
-#: ../gtk/tr-prefs.c:1162
+#: ../gtk/tr-prefs.c:1087
 msgid "Tuesday"
 msgstr "Të Martën"
 
-#: ../gtk/tr-prefs.c:1163
+#: ../gtk/tr-prefs.c:1088
 msgid "Wednesday"
 msgstr "Të Mërkurën"
 
-#: ../gtk/tr-prefs.c:1164
+#: ../gtk/tr-prefs.c:1089
 msgid "Thursday"
 msgstr "Të Enjten"
 
-#: ../gtk/tr-prefs.c:1165
+#: ../gtk/tr-prefs.c:1090
 msgid "Friday"
 msgstr "Të Premten"
 
-#: ../gtk/tr-prefs.c:1166
+#: ../gtk/tr-prefs.c:1091
 msgid "Saturday"
 msgstr "Të Shtunën"
 
-#: ../gtk/tr-prefs.c:1218
+#: ../gtk/tr-prefs.c:1122
 msgid "Speed Limits"
 msgstr "Kufizimet e Shpejtësisë"
 
-#: ../gtk/tr-prefs.c:1238
+#: ../gtk/tr-prefs.c:1142
 msgid "Temporary Speed Limits"
 msgstr "Kufizimet e Përkohshme të Shpejtësisë"
 
-#: ../gtk/tr-prefs.c:1245
+#: ../gtk/tr-prefs.c:1149
 msgid "Override normal speed limits manually or at scheduled times"
 msgstr ""
 "Mbishkruaji kufizimet normale të shpejtësisë në mënyrë manuale ose në kohë "
 "të skeduar"
 
-#: ../gtk/tr-prefs.c:1252
-msgid "Limit do_wnload speed (KiB/s):"
+#: ../gtk/tr-prefs.c:1156
+#, c-format
+msgid "Limit do_wnload speed (%s):"
 msgstr ""
 
-#: ../gtk/tr-prefs.c:1256
-msgid "Limit u_pload speed (KiB/s):"
+#: ../gtk/tr-prefs.c:1160
+#, c-format
+msgid "Limit u_pload speed (%s):"
 msgstr ""
 
-#: ../gtk/tr-prefs.c:1260
+#: ../gtk/tr-prefs.c:1164
 msgid "_Scheduled times:"
 msgstr "_Koha e skeduar:"
 
-#: ../gtk/tr-prefs.c:1265
+#: ../gtk/tr-prefs.c:1169
 msgid " _to "
 msgstr " _tek "
 
-#: ../gtk/tr-prefs.c:1276
+#: ../gtk/tr-prefs.c:1180
 msgid "_On days:"
 msgstr "_Në ditët:"
 
-#: ../gtk/tr-prefs.c:1310 ../gtk/tr-prefs.c:1376
+#: ../gtk/tr-prefs.c:1214 ../gtk/tr-prefs.c:1280
 msgid "Status unknown"
 msgstr "Statusi i panjohur"
 
-#: ../gtk/tr-prefs.c:1332
+#: ../gtk/tr-prefs.c:1236
 msgid "Port is <b>open</b>"
 msgstr "Porti është i <b>hapur</b>"
 
-#: ../gtk/tr-prefs.c:1332
+#: ../gtk/tr-prefs.c:1236
 msgid "Port is <b>closed</b>"
 msgstr "Porti është i <b>mbyllur</b>"
 
-#: ../gtk/tr-prefs.c:1346
+#: ../gtk/tr-prefs.c:1250
 msgid "<i>Testing...</i>"
 msgstr "<i>Duke Testuar...</i>"
 
-#: ../gtk/tr-prefs.c:1369
+#: ../gtk/tr-prefs.c:1273
 msgid "Incoming Peers"
 msgstr "Lidhjet në ardhje"
 
-#: ../gtk/tr-prefs.c:1371
+#: ../gtk/tr-prefs.c:1275
 msgid "_Port for incoming connections:"
 msgstr "_Porti për lidhjet në ardhje:"
 
-#: ../gtk/tr-prefs.c:1379
+#: ../gtk/tr-prefs.c:1283
 msgid "Te_st Port"
 msgstr "Te_sto Portin"
 
-#: ../gtk/tr-prefs.c:1386
-msgid "Pick a _random port on startup"
-msgstr ""
+#: ../gtk/tr-prefs.c:1290
+msgid "Pick a _random port every time Transmission is started"
+msgstr "Merr një port të rastësishëm sa herë që nis Transmission"
 
-#: ../gtk/tr-prefs.c:1390
+#: ../gtk/tr-prefs.c:1294
 msgid "Use UPnP or NAT-PMP port _forwarding from my router"
 msgstr "Përdor UPnP ose NAT-PMP port _kalues nga ruteri im"
 
-#: ../gtk/tr-prefs.c:1398
+#: ../gtk/tr-prefs.c:1299
+msgid "Limits"
+msgstr "Kufizimet"
+
+#: ../gtk/tr-prefs.c:1302
 msgid "Maximum peers per _torrent:"
 msgstr "Maksimumi i lidhjeve për _torrent:"
 
-#: ../gtk/tr-prefs.c:1400
+#: ../gtk/tr-prefs.c:1304
 msgid "Maximum peers _overall:"
 msgstr "Maksimumi i lidhjeve _gjithsej:"
 
-#: ../gtk/tr-prefs.c:1418
+#: ../gtk/tr-prefs.c:1322
 msgid "Transmission Preferences"
 msgstr "Preferencat e Transmission"
 
-#: ../gtk/tr-prefs.c:1433
+#: ../gtk/tr-prefs.c:1337
 msgid "Torrents"
 msgstr "Torrentët"
 
-#: ../gtk/tr-prefs.c:1442
+#: ../gtk/tr-prefs.c:1346
 msgid "Network"
 msgstr "Rrjeti"
 
-#: ../gtk/tr-prefs.c:1448
+#: ../gtk/tr-prefs.c:1352
 msgid "Web"
 msgstr "Web"
 
-#: ../gtk/tr-prefs.c:1451
+#: ../gtk/tr-prefs.c:1355
 msgid "Proxy"
 msgstr "Proksi"
 
-#: ../gtk/tr-window.c:136
+#: ../gtk/tr-window.c:129
 msgid "Torrent"
 msgstr "Torrenti"
 
-#: ../gtk/tr-window.c:239
+#: ../gtk/tr-window.c:232
 msgid "Total Ratio"
 msgstr "Shkalla e Torrentit"
 
-#: ../gtk/tr-window.c:240
+#: ../gtk/tr-window.c:233
 msgid "Session Ratio"
 msgstr "Shkalla e Seksionit"
 
-#: ../gtk/tr-window.c:241
+#: ../gtk/tr-window.c:234
 msgid "Total Transfer"
 msgstr "Transferimet Totale"
 
-#: ../gtk/tr-window.c:242
+#: ../gtk/tr-window.c:235
 msgid "Session Transfer"
 msgstr "Transferimet e Seksionit"
 
-#: ../gtk/tr-window.c:271
+#: ../gtk/tr-window.c:264
 #, c-format
 msgid ""
 "Click to disable Temporary Speed Limits\n"
@@ -1727,7 +1630,7 @@ msgstr ""
 "Kliko për të çaktivizuar Kufizimet e Përkohshme të Shpejtësisë\n"
 "(%1$s shkarkim, %2$s ngarkim)"
 
-#: ../gtk/tr-window.c:272
+#: ../gtk/tr-window.c:265
 #, c-format
 msgid ""
 "Click to enable Temporary Speed Limits\n"
@@ -1736,167 +1639,121 @@ msgstr ""
 "Kliko për të aktivizuar Kufizimet e Përkohshme të Shpejtësisë\n"
 "(%1$s shkarkim, %2$s ngarkim)"
 
-#: ../gtk/tr-window.c:339
+#: ../gtk/tr-window.c:332
 #, c-format
 msgid "Tracker will allow requests in %s"
 msgstr "Gjurmuesi do të lejojë kërkesat në %s"
 
-#: ../gtk/tr-window.c:410
+#: ../gtk/tr-window.c:403
 msgid "Unlimited"
 msgstr "Pa Kufi"
 
-#: ../gtk/tr-window.c:477
+#: ../gtk/tr-window.c:470
 msgid "Seed Forever"
 msgstr "Dërgo Përgjithmonë"
 
-#: ../gtk/tr-window.c:515
+#: ../gtk/tr-window.c:508
 msgid "Limit Download Speed"
 msgstr "Kufizo Shpejtësinë e Shkarkimit"
 
-#: ../gtk/tr-window.c:519
+#: ../gtk/tr-window.c:512
 msgid "Limit Upload Speed"
 msgstr "Kufizo Shpejtësinë e Ngarkimit"
 
-#: ../gtk/tr-window.c:526
+#: ../gtk/tr-window.c:519
 msgid "Stop Seeding at Ratio"
 msgstr "Ndalo Dërgimin me Shkallë"
 
-#: ../gtk/tr-window.c:560
+#: ../gtk/tr-window.c:553
 #, c-format
 msgid "Stop at Ratio (%s)"
 msgstr "Ndalo në Shkallën (%s)"
 
-#: ../gtk/tr-window.c:737
-msgid "999.9 KiB/s"
-msgstr ""
-
-#: ../gtk/tr-window.c:781
-#, c-format
-msgid "%1$'d of %2$'d Torrent"
-msgid_plural "%1$'d of %2$'d Torrents"
-msgstr[0] "%1$'d e %2$'d Torrentit"
-msgstr[1] "%1$'d e %2$'d Torrentave"
-
-#: ../gtk/tr-window.c:787
-#, c-format
-msgid "%'d Torrent"
-msgid_plural "%'d Torrents"
-msgstr[0] "%'d Torrent"
-msgstr[1] "%'d Torrentë"
-
-#: ../gtk/tr-window.c:807 ../gtk/tr-window.c:835
+#: ../gtk/tr-window.c:779 ../gtk/tr-window.c:807
 #, c-format
 msgid "Ratio: %s"
 msgstr "Shkalla: %s"
 
-#: ../gtk/tr-window.c:818 ../gtk/tr-window.c:829
+#: ../gtk/tr-window.c:790 ../gtk/tr-window.c:801
 #, c-format
 msgid "size|Down: %1$s, Up: %2$s"
 msgstr "masa|Shkarkimi: %1$s, Ngarkimi: %2$s"
 
-#: ../gtk/util.c:118
-#, c-format
-msgid "%'u byte"
-msgid_plural "%'u bytes"
-msgstr[0] "%'u byte"
-msgstr[1] "%'u byte"
-
-#: ../gtk/util.c:120
-#, c-format
-msgid "%'.1f KiB"
+#: ../gtk/util.c:51 ../gtk/util.c:57
+msgid "KiB"
 msgstr ""
 
-#: ../gtk/util.c:122
-#, c-format
-msgid "%'.1f MiB"
+#: ../gtk/util.c:52 ../gtk/util.c:58
+msgid "MiB"
 msgstr ""
 
-#: ../gtk/util.c:124
-#, c-format
-msgid "%'.1f GiB"
+#: ../gtk/util.c:53 ../gtk/util.c:59
+msgid "GiB"
 msgstr ""
 
-#. 0.0 KiB to 999.9 KiB
-#: ../gtk/util.c:134
-#, c-format
-msgid "%'.1f KiB/s"
+#: ../gtk/util.c:54 ../gtk/util.c:60
+msgid "TiB"
 msgstr ""
 
-#. 0.98 MiB to 99.99 MiB
-#: ../gtk/util.c:136
-#, c-format
-msgid "%'.2f MiB/s"
+#: ../gtk/util.c:63
+msgid "KiB/s"
 msgstr ""
 
-#. 100.0 MiB to 999.9 MiB
-#: ../gtk/util.c:138
-#, c-format
-msgid "%'.1f MiB/s"
+#: ../gtk/util.c:64
+msgid "MiB/s"
 msgstr ""
 
-#. insane speeds
-#: ../gtk/util.c:140
-#, c-format
-msgid "%'.2f GiB/s"
+#: ../gtk/util.c:65
+msgid "GiB/s"
 msgstr ""
 
-#: ../gtk/util.c:159
-#, c-format
-msgid "%'d day"
-msgid_plural "%'d days"
-msgstr[0] "%'d ditë"
-msgstr[1] "%'d ditë"
+#: ../gtk/util.c:66
+msgid "TiB/s"
+msgstr ""
 
 #: ../gtk/util.c:161
-#, c-format
-msgid "%'d hour"
-msgid_plural "%'d hours"
-msgstr[0] "%'d orë"
-msgstr[1] "%'d orë"
+msgid "size|None"
+msgstr ""
 
-#: ../gtk/util.c:164
-#, c-format
-msgid "%'d minute"
-msgid_plural "%'d minutes"
-msgstr[0] "%'d minutë"
-msgstr[1] "%'d minuta"
-
-#: ../gtk/util.c:166
-#, c-format
-msgid "%'d second"
-msgid_plural "%'d seconds"
-msgstr[0] "%'d sekondë"
-msgstr[1] "%'d sekonda"
-
-#: ../gtk/util.c:379
+#: ../gtk/util.c:326
 #, c-format
 msgid "The torrent file \"%s\" contains invalid data."
 msgstr "Skedari torrent \"%s\" përmban të dhëna të pavlefshme."
 
-#: ../gtk/util.c:380
+#: ../gtk/util.c:327
 #, c-format
 msgid "The torrent file \"%s\" is already in use."
 msgstr "Skedari torrent \"%s\" është tashmë në përdorim."
 
-#: ../gtk/util.c:381
+#: ../gtk/util.c:328
 #, c-format
 msgid "The torrent file \"%s\" encountered an unknown error."
 msgstr "Skedari torrent \"%s\" hasi në një gabim të panjohur."
 
-#: ../gtk/util.c:389
+#: ../gtk/util.c:336
 msgid "Error opening torrent"
 msgstr "Gabim në hapjen e torrentit"
 
-#: ../gtk/util.c:833
+#: ../gtk/util.c:817
+#, c-format
+msgid "Error opening \"%s\""
+msgstr ""
+
+#: ../gtk/util.c:820
+#, c-format
+msgid "Server returned \"%1$ld %2$s\""
+msgstr ""
+
+#: ../gtk/util.c:840
 msgid "Unrecognized URL"
 msgstr "URL e panjohur"
 
-#: ../gtk/util.c:835
+#: ../gtk/util.c:842
 #, c-format
 msgid "Transmission doesn't know how to use \"%s\""
 msgstr "Transmission nuk di si ta përdorë \"%s\""
 
-#: ../gtk/util.c:840
+#: ../gtk/util.c:847
 #, c-format
 msgid ""
 "This magnet link appears to be intended for something other than BitTorrent. "
@@ -1906,64 +1763,64 @@ msgstr ""
 "lidhjet magnet BitTorrent kanë një seksion që përmban \"%s\"."
 
 #. did caller give us an uninitialized val?
-#: ../libtransmission/bencode.c:1093
+#: ../libtransmission/bencode.c:1110
 msgid "Invalid metadata"
 msgstr "Metadata të pavlefshme"
 
-#: ../libtransmission/bencode.c:1651
+#: ../libtransmission/bencode.c:1693
 #, c-format
 msgid "Saved \"%s\""
 msgstr "U ruajt \"%s\""
 
-#: ../libtransmission/bencode.c:1656 ../libtransmission/bencode.c:1663
-#: ../libtransmission/blocklist.c:309
+#: ../libtransmission/bencode.c:1698 ../libtransmission/bencode.c:1705
+#: ../libtransmission/blocklist.c:360
 #, c-format
 msgid "Couldn't save file \"%1$s\": %2$s"
 msgstr "Nuk mund të regjistrojmë skedarin \"%1$s\": %2$s"
 
-#: ../libtransmission/bencode.c:1670 ../libtransmission/bencode.c:1680
+#: ../libtransmission/bencode.c:1712 ../libtransmission/bencode.c:1722
 #, c-format
 msgid "Couldn't save temporary file \"%1$s\": %2$s"
 msgstr "Nuk munda ta ruaj skedarin e përkohshëm \"%1$s\": %2$s"
 
-#: ../libtransmission/blocklist.c:78 ../libtransmission/blocklist.c:239
-#: ../libtransmission/utils.c:484
+#: ../libtransmission/blocklist.c:85 ../libtransmission/blocklist.c:315
+#: ../libtransmission/utils.c:473
 #, c-format
 msgid "Couldn't read \"%1$s\": %2$s"
 msgstr "Nuk mund të lexojmë \"%1$s\": %2$s"
 
-#: ../libtransmission/blocklist.c:110
+#: ../libtransmission/blocklist.c:114
 #, c-format
-msgid "Blocklist \"%s\" contains %'zu entries"
-msgstr "Lista e bllokimeve \"%s\" përmban %'zu hyrje"
+msgid "Blocklist \"%s\" contains %zu entries"
+msgstr ""
 
 #. don't try to display the actual lines - it causes issues
-#: ../libtransmission/blocklist.c:288 ../libtransmission/blocklist.c:298
+#: ../libtransmission/blocklist.c:354
 #, c-format
 msgid "blocklist skipped invalid address at line %d"
 msgstr ""
 
-#: ../libtransmission/blocklist.c:319
+#: ../libtransmission/blocklist.c:370
 #, c-format
-msgid "Blocklist \"%1$s\" updated with %2$'d entries"
-msgstr "Lista e bllokimeve \"%1$s\" u përditësua me %2$'d hyrje"
+msgid "Blocklist \"%s\" updated with %d entries"
+msgstr ""
 
-#: ../libtransmission/fdlimit.c:352
+#: ../libtransmission/fdlimit.c:357
 #, c-format
 msgid "Preallocated file \"%s\""
 msgstr "Skedari i paravendosur \"%s\""
 
-#: ../libtransmission/fdlimit.c:635
+#: ../libtransmission/fdlimit.c:658
 #, c-format
 msgid "Couldn't create socket: %s"
 msgstr "Nuk mund të krijojmë socket: %s"
 
-#: ../libtransmission/makemeta.c:60
+#: ../libtransmission/makemeta.c:61
 #, c-format
 msgid "Torrent Creator is skipping file \"%s\": %s"
 msgstr "Krijuesi i Torrentëve po e anashkalon skedarin \"%s\": %s"
 
-#: ../libtransmission/metainfo.c:579
+#: ../libtransmission/metainfo.c:577
 #, c-format
 msgid "Invalid metadata entry \"%s\""
 msgstr "Hyrje e pavlefshme metadata \"%s\""
@@ -1972,7 +1829,7 @@ msgstr "Hyrje e pavlefshme metadata \"%s\""
 msgid "Port Forwarding (NAT-PMP)"
 msgstr "Kalimi i Portit (NAT-PMP)"
 
-#: ../libtransmission/natpmp.c:67
+#: ../libtransmission/natpmp.c:70
 #, c-format
 msgid "%s succeeded (%d)"
 msgstr "%s sukses (%d)"
@@ -1982,36 +1839,36 @@ msgstr "%s sukses (%d)"
 msgid "Found public address \"%s\""
 msgstr "U gjet adresa publike \"%s\""
 
-#: ../libtransmission/natpmp.c:172
+#: ../libtransmission/natpmp.c:173
 #, c-format
 msgid "no longer forwarding port %d"
 msgstr "nuk po e kalojmë më portin %d"
 
-#: ../libtransmission/natpmp.c:219
+#: ../libtransmission/natpmp.c:218
 #, c-format
 msgid "Port %d forwarded successfully"
 msgstr "Porti %d u kalua me sukses"
 
-#: ../libtransmission/net.c:301
+#: ../libtransmission/net.c:324
 #, c-format
 msgid "Couldn't set source address %s on %d: %s"
 msgstr "Nuk mund të vendosim adresë të burimit %s në %d: %s"
 
-#: ../libtransmission/net.c:317
+#: ../libtransmission/net.c:340
 #, c-format
 msgid "Couldn't connect socket %d to %s, port %d (errno %d - %s)"
 msgstr "Nuk mund të lidhim socket %d to %s, port %d (errno %d - %s)"
 
-#: ../libtransmission/net.c:375
+#: ../libtransmission/net.c:398
 msgid "Is another copy of Transmission already running?"
 msgstr "A është një kopje tjetër e Transmission tashmë e hapur?"
 
-#: ../libtransmission/net.c:380
+#: ../libtransmission/net.c:403
 #, c-format
 msgid "Couldn't bind port %d on %s: %s"
 msgstr "Nuk mund të qasim portin %d në %s: %s"
 
-#: ../libtransmission/net.c:382
+#: ../libtransmission/net.c:405
 #, c-format
 msgid "Couldn't bind port %d on %s: %s (%s)"
 msgstr "Nuk mund të lidh portin %d në %s: %s (%s)"
@@ -2036,46 +1893,38 @@ msgstr "Duke Ndalur"
 msgid "Not forwarded"
 msgstr "Nuk u kalua"
 
-#: ../libtransmission/port-forwarding.c:87 ../libtransmission/torrent.c:1720
+#: ../libtransmission/port-forwarding.c:93 ../libtransmission/torrent.c:1870
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
 msgstr "Gjendja ndryshoi nga \"%1$s\" në \"%2$s\""
 
-#: ../libtransmission/port-forwarding.c:178
+#: ../libtransmission/port-forwarding.c:184
 msgid "Stopped"
 msgstr "Të Ndalura"
 
 #. first %s is the application name
 #. second %s is the version number
-#: ../libtransmission/session.c:622
+#: ../libtransmission/session.c:636
 #, c-format
 msgid "%s %s started"
 msgstr "%s %s nisi"
 
-#: ../libtransmission/session.c:636
-msgid "Local Peer Discovery disabled"
-msgstr ""
-
-#: ../libtransmission/session.c:638
-msgid "Local Peer Discovery active"
-msgstr ""
-
-#: ../libtransmission/session.c:1748
+#: ../libtransmission/session.c:1844
 #, c-format
 msgid "Loaded %d torrents"
 msgstr "U ngarkuan %d torrentë"
 
-#: ../libtransmission/torrent.c:398
+#: ../libtransmission/torrent.c:505
 #, c-format
 msgid "Tracker warning: \"%s\""
 msgstr "Paralajmërim i gjurmuesit: \"%s\""
 
-#: ../libtransmission/torrent.c:405
+#: ../libtransmission/torrent.c:512
 #, c-format
 msgid "Tracker error: \"%s\""
 msgstr "Gabim i gjurmuesit: \"%s\""
 
-#: ../libtransmission/torrent.c:1369
+#: ../libtransmission/torrent.c:1488
 msgid ""
 "No data found!  Reconnect any disconnected drives, use \"Set Location\", or "
 "restart the torrent to re-download."
@@ -2083,7 +1932,7 @@ msgstr ""
 "Nuk u gjetën të dhëna! Rilidhni çdo draiv të shkëputur, përdorni \"Vendos "
 "Vendndodhjen\", ose riniseni torrentin për ta shkarkuar përsëri."
 
-#: ../libtransmission/torrent.c:1452
+#: ../libtransmission/torrent.c:1571
 msgid ""
 "Can't find local data.  Try \"Set Location\" to find it, or restart the "
 "torrent to re-download."
@@ -2091,19 +1940,19 @@ msgstr ""
 "Nuk mund të gjej të dhënat lokale. Provo  \"Vendos Vendndodhjen\" për ta "
 "gjetur atë, ose rinis torrentin për ta rishkarkuar."
 
-#: ../libtransmission/torrent.c:1562
+#: ../libtransmission/torrent.c:1682
 msgid "Removing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.c:1616
+#: ../libtransmission/torrent.c:1736
 msgid "Done"
 msgstr "U Bë"
 
-#: ../libtransmission/torrent.c:1619
+#: ../libtransmission/torrent.c:1739
 msgid "Complete"
 msgstr "I Kompletuar"
 
-#: ../libtransmission/torrent.c:1622
+#: ../libtransmission/torrent.c:1742
 msgid "Incomplete"
 msgstr "I Pakompletuar"
 
@@ -2111,54 +1960,58 @@ msgstr "I Pakompletuar"
 msgid "Port Forwarding (UPnP)"
 msgstr "Kalim i Portit (UPnP)"
 
-#: ../libtransmission/upnp.c:104
+#: ../libtransmission/upnp.c:112
 #, c-format
 msgid "Found Internet Gateway Device \"%s\""
 msgstr "U Gjet Pajisja Për Harje Në Internet \"%s\""
 
-#: ../libtransmission/upnp.c:107
+#: ../libtransmission/upnp.c:115
 #, c-format
 msgid "Local Address is \"%s\""
 msgstr "Adresa Lokale ësht[ \"%s\""
 
-#: ../libtransmission/upnp.c:144
+#: ../libtransmission/upnp.c:152
 #, c-format
 msgid "Port %d isn't forwarded"
 msgstr "Porti %d nuk është kaluar"
 
-#: ../libtransmission/upnp.c:158
+#: ../libtransmission/upnp.c:166
 #, c-format
 msgid "Stopping port forwarding through \"%s\", service \"%s\""
 msgstr "Duke ndaluar kalimin e portit përmes \"%s\", shërbimi \"%s\""
 
-#: ../libtransmission/upnp.c:192
+#: ../libtransmission/upnp.c:200
 #, c-format
 msgid ""
 "Port forwarding through \"%s\", service \"%s\".  (local address: %s:%d)"
 msgstr "Kalim i portit përmes \"%s\", shërbimi \"%s\" (adresa lokale: %s:%d)"
 
-#: ../libtransmission/upnp.c:197
+#: ../libtransmission/upnp.c:205
 msgid "Port forwarding successful!"
 msgstr "Kalimi i portit me sukses!"
 
-#: ../libtransmission/utils.c:498
+#: ../libtransmission/utils.c:487
 msgid "Not a regular file"
 msgstr "Nuk është një skedar i rregullt"
 
-#: ../libtransmission/utils.c:516
+#: ../libtransmission/utils.c:505
 msgid "Memory allocation failed"
 msgstr "Dhënia e kujtesës dështoi"
 
 #. Node exists but isn't a folder
-#: ../libtransmission/utils.c:614
+#: ../libtransmission/utils.c:603
 #, c-format
 msgid "File \"%s\" is in the way"
 msgstr "Skedari \"%s\" është rrugës"
 
-#: ../libtransmission/verify.c:235
+#: ../libtransmission/utils.c:1422
+msgid "None"
+msgstr "Asnje"
+
+#: ../libtransmission/verify.c:238
 msgid "Verifying torrent"
 msgstr "Duke verifikuar torrentin"
 
-#: ../libtransmission/verify.c:305
+#: ../libtransmission/verify.c:324
 msgid "Queued for verification"
 msgstr "E mbajtur për verifikim"
