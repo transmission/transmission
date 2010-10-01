@@ -1,6 +1,8 @@
 /*
  * icons.[ch] written by Paolo Bacchilega, who writes:
  * "There is no problem for me, you can license my code under whatever licence you wish :)"
+ *
+ * $Id$
  */
 
 #include <string.h> /* strcmp */

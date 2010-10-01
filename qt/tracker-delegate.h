@@ -7,7 +7,7 @@
  *
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
- * $Id: torrent-delegate.h 9868 2010-01-04 21:00:47Z charles $
+ * $Id$
  */
 
 #ifndef QTR_TORRENT_DELEGATE_H
