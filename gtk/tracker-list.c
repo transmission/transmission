@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: details.c 5987 2008-06-01 01:40:32Z charles $
+ * $Id$
  */
 
 #include <errno.h>

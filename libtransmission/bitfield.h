@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: utils.h 8685 2009-06-14 01:00:36Z charles $
+ * $Id$
  */
 
 #ifndef __TRANSMISSION__

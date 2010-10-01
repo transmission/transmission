@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: utils.c 8686 2009-06-14 01:01:46Z charles $
+ * $Id$
  */
 
 #include <assert.h>
