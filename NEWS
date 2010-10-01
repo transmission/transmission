@@ -3,7 +3,7 @@
 ==== All Platforms ====
   * Support for automatically stopping idle seeding torrents
   * Small memory cache to reduce disk IO
-  * gzip compression support to the RPC server
+  * gzip compression support added to the RPC server
   * Add support for a cookies.txt file
   * Minor CPU optimizations
 ==== Mac ====
