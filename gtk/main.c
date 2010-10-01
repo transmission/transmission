@@ -910,7 +910,7 @@ on_drag_data_received( GtkWidget         * widget          UNUSED,
             filenames = g_slist_append( filenames, g_strdup( filename ) );
             success = TRUE;
         }
-        else if( tr_urlIsValid( uri, -1 ) )
+        else if( tr_urlIsValid( uri, -1 ) || gtr_is_magnet_link( uri ) )
         {
             tr_core_add_from_url( data->core, uri );
             success = TRUE;
