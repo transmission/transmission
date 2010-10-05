@@ -85,7 +85,7 @@ AC_PROG_CXX
 AC_C_INLINE
 if test "x$GCC" = "xyes" ; then
 
-    CFLAGS="$CFLAGS -std=gnu99 -ggdb3 -Wall -W -Wpointer-arith -Wformat-security -Wcast-align -Wundef -Wcast-align -Wstrict-prototypes -Wmissing-declarations -Wmissing-format-attribute -Wredundant-decls -Wnested-externs -Wunused-parameter -Wwrite-strings -Wvariadic-macros -Waggregate-return -Winline -Wfloat-equal"
+    CFLAGS="$CFLAGS -std=gnu99 -ggdb3 -Wall -W -Wpointer-arith -Wformat-security -Wcast-align -Wundef -Wcast-align -Wstrict-prototypes -Wmissing-declarations -Wmissing-format-attribute -Wredundant-decls -Wnested-externs -Wunused-parameter -Wwrite-strings -Waggregate-return -Winline -Wfloat-equal"
 
     dnl figure out gcc version
     AC_MSG_CHECKING([gcc version])
@@ -98,6 +98,10 @@ if test "x$GCC" = "xyes" ; then
     if test $GCC_VERSION_NUM -ge 304; then
         dnl these were added in 3.4
         CFLAGS="$CFLAGS -Wextra -Wdeclaration-after-statement -Winit-self"
+    fi
+    if test $GCC_VERSION_NUM -ge 403; then
+        dnl these were added in 4.3
+        CFLAGS="$CFLAGS -Wvariadic-macros"
     fi
 fi
 
