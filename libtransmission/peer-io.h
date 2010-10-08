@@ -29,6 +29,7 @@
 #include "bandwidth.h"
 #include "list.h" /* tr_list */
 #include "net.h" /* tr_address */
+#include "utils.h" /* tr_time() */
 
 struct evbuffer;
 struct tr_bandwidth;
@@ -215,7 +216,7 @@ static inline tr_bool tr_peerIoIsIncoming( const tr_peerIo * io )
 
 static inline int    tr_peerIoGetAge( const tr_peerIo * io )
 {
-    return time( NULL ) - io->timeCreated;
+    return tr_time() - io->timeCreated;
 }
 
 
