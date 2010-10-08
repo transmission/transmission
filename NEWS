@@ -1,4 +1,4 @@
-=== Transmission 2.10 (2010/mm/dd) ===
+=== Transmission 2.10 (2010/10/07) ===
 [http://trac.transmissionbt.com/query?milestone=2.10&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Support for automatically stopping idle seeding torrents
