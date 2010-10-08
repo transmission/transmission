@@ -7,14 +7,14 @@ msgstr ""
 "Project-Id-Version: transmission-gtk\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-09-18 22:00-0500\n"
-"PO-Revision-Date: 2010-06-20 17:41+0000\n"
-"Last-Translator: Tiago Silva <Unknown>\n"
+"PO-Revision-Date: 2010-10-01 19:37+0000\n"
+"Last-Translator: Diogo Lavareda <diogolavareda9@hotmail.com>\n"
 "Language-Team: Portuguese <gnome_pt@yahoogroups.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2010-09-30 23:28+0000\n"
+"X-Launchpad-Export-Date: 2010-10-08 00:48+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:55
@@ -616,7 +616,7 @@ msgstr "Par descoberto por DHT"
 
 #: ../gtk/details.c:1483
 msgid "Peer is an incoming connection"
-msgstr "O par é uma ligação a entrar"
+msgstr "O par é uma ligação de entrada"
 
 #: ../gtk/details.c:1740 ../gtk/details.c:2256
 msgid "Show _more details"
@@ -625,17 +625,17 @@ msgstr "Mostrar _mais detalhes"
 #: ../gtk/details.c:1814
 #, c-format
 msgid "Got a list of %1$s%2$'d peers%3$s %4$s ago"
-msgstr ""
+msgstr "Tenho uma lista de %1$s%2$'d pares%3$s %4$s  atrás"
 
 #: ../gtk/details.c:1818
 #, c-format
 msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
-msgstr ""
+msgstr "Pedido de lista de pares %1$s caducada  há %2$s %3$s; nova tentativa"
 
 #: ../gtk/details.c:1821
 #, c-format
 msgid "Got an error %1$s\"%2$s\"%3$s %4$s ago"
-msgstr ""
+msgstr "Obteve um erro há %1$s\"%2$s\"%3$s %4$s"
 
 #: ../gtk/details.c:1829
 msgid "No updates scheduled"
@@ -807,7 +807,7 @@ msgstr ""
 
 #: ../gtk/filter.c:719
 msgid "Verifying"
-msgstr ""
+msgstr "A Verificar"
 
 #: ../gtk/filter.c:720 ../gtk/msgwin.c:364
 msgid "Error"
@@ -905,6 +905,7 @@ msgstr ""
 "Launchpad Contributions:\n"
 "  Carl Roberson https://launchpad.net/~carlrobers\n"
 "  Carlos Manuel https://launchpad.net/~crolidge\n"
+"  Diogo Lavareda https://launchpad.net/~diogolavareda\n"
 "  Filipe Gomes https://launchpad.net/~filipefgomes\n"
 "  Filipe Roque https://launchpad.net/~flip-roque\n"
 "  Fábio Domingos https://launchpad.net/~fabioandre-domingos\n"
@@ -1205,7 +1206,7 @@ msgstr "Verificando dados locais (%.1f%% testado)"
 #: ../gtk/torrent-cell-renderer.c:228
 #, c-format
 msgid "Ratio %s"
-msgstr ""
+msgstr "Racio %s"
 
 #: ../gtk/torrent-cell-renderer.c:257
 #, c-format
@@ -1769,6 +1770,8 @@ msgid ""
 "This magnet link appears to be intended for something other than BitTorrent. "
 " BitTorrent magnet links have a section containing \"%s\"."
 msgstr ""
+"Esta ligação magnética aparenta ter sido feita para algo mais que "
+"BitTorrent. As ligações magnéticas têm uma secção com \"%s\"."
 
 #. did caller give us an uninitialized val?
 #: ../libtransmission/bencode.c:1110
@@ -1778,7 +1781,7 @@ msgstr "Metadados inválidos"
 #: ../libtransmission/bencode.c:1693
 #, c-format
 msgid "Saved \"%s\""
-msgstr ""
+msgstr "Gravada \"%s\""
 
 #: ../libtransmission/bencode.c:1698 ../libtransmission/bencode.c:1705
 #: ../libtransmission/blocklist.c:360
@@ -1937,6 +1940,9 @@ msgid ""
 "No data found!  Reconnect any disconnected drives, use \"Set Location\", or "
 "restart the torrent to re-download."
 msgstr ""
+"Não foi possível encontrar dados. Volte a ligar unidades de disco "
+"desligadas, utilize \"Definir Localização\", ou reinicie o torrent para "
+"voltar a descarregar."
 
 #: ../libtransmission/torrent.c:1571
 msgid ""
@@ -1948,7 +1954,7 @@ msgstr ""
 
 #: ../libtransmission/torrent.c:1682
 msgid "Removing torrent"
-msgstr ""
+msgstr "Remover torrent"
 
 #: ../libtransmission/torrent.c:1736
 msgid "Done"
