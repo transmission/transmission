@@ -1,6 +1,7 @@
 AM_CPPFLAGS = -I@top_srcdir@
 
 AM_CFLAGS = \
+    @LIBEVENT_CFLAGS@ \
     @LIBCURL_CFLAGS@ \
     @OPENSSL_CFLAGS@ \
     @ZLIB_CFLAGS@ \
