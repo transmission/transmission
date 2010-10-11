@@ -24,7 +24,7 @@
 #include <assert.h>
 #include <ctype.h> /* isalpha(), tolower() */
 #include <errno.h>
-#include <math.h> /* pow(), fabs() */
+#include <math.h> /* pow(), fabs(), floor() */
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -1386,9 +1386,7 @@ double
 tr_truncd( double x, int decimal_places )
 {
     const int i = (int) pow( 10, decimal_places );
-    const double xup = x * i;
-    const double x2 = (int64_t)(xup);
-    return x2 / i;
+    return floor( x * i ) / i;
 }
 
 char*
