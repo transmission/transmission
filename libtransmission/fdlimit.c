@@ -231,7 +231,7 @@ tr_pwrite( int fd, const void *buf, size_t count, off_t offset )
 }
 
 int
-tr_prefetch( int fd, off_t offset, size_t count )
+tr_prefetch( int fd UNUSED, off_t offset UNUSED, size_t count UNUSED )
 {
 #ifdef HAVE_POSIX_FADVISE
     return posix_fadvise( fd, offset, count, POSIX_FADV_WILLNEED );

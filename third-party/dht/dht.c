@@ -380,7 +380,7 @@ is_martian(struct sockaddr *sa)
 /* Forget about the ``XOR-metric''.  An id is just a path from the
    root of the tree, so bits are numbered from the start. */
 
-static inline int
+static int
 id_cmp(const unsigned char *restrict id1, const unsigned char *restrict id2)
 {
     /* Memcmp is guaranteed to perform an unsigned comparison. */
@@ -1224,9 +1224,23 @@ static int
 storage_store(const unsigned char *id, struct sockaddr *sa)
 {
     int i, len;
-    struct storage *st = storage;
+    struct storage *st;
     unsigned char *ip;
     unsigned short port;
+
+    if(sa->sa_family == AF_INET) {
+        struct sockaddr_in *sin = (struct sockaddr_in*)sa;
+        ip = (unsigned char*)&sin->sin_addr;
+        len = 4;
+        port = ntohs(sin->sin_port);
+    } else if(sa->sa_family == AF_INET6) {
+        struct sockaddr_in6 *sin6 = (struct sockaddr_in6*)sa;
+        ip = (unsigned char*)&sin6->sin6_addr;
+        len = 16;
+        port = ntohs(sin6->sin6_port);
+    } else {
+        return -1;
+    }
 
     st = find_storage(id);
 
@@ -1239,18 +1253,6 @@ storage_store(const unsigned char *id, struct sockaddr *sa)
         st->next = storage;
         storage = st;
         numstorage++;
-    }
-
-    if(sa->sa_family == AF_INET) {
-        struct sockaddr_in *sin = (struct sockaddr_in*)sa;
-        ip = (unsigned char*)&sin->sin_addr;
-        len = 4;
-        port = ntohs(sin->sin_port);
-    } else if(sa->sa_family == AF_INET6) {
-        struct sockaddr_in6 *sin6 = (struct sockaddr_in6*)sa;
-        ip = (unsigned char*)&sin6->sin6_addr;
-        len = 16;
-        port = ntohs(sin6->sin6_port);
     }
 
     for(i = 0; i < st->numpeers; i++) {

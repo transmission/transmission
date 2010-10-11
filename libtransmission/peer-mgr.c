@@ -836,20 +836,15 @@ comparePieceByIndex( const void * va, const void * vb )
 static void
 pieceListSort( Torrent * t, int mode )
 {
-    int(*compar)(const void *, const void *);
-
     assert( mode==PIECES_SORTED_BY_INDEX
          || mode==PIECES_SORTED_BY_WEIGHT );
 
-    switch( mode ) {
-        case PIECES_SORTED_BY_WEIGHT: compar = comparePieceByWeight; break;
-        case PIECES_SORTED_BY_INDEX: compar = comparePieceByIndex; break;
-        default: assert( 0 && "unhandled" );  break;
-    }
-
     weightTorrent = t->tor;
-    qsort( t->pieces, t->pieceCount,
-           sizeof( struct weighted_piece ), compar );
+
+    if( mode == PIECES_SORTED_BY_WEIGHT )
+        qsort( t->pieces, t->pieceCount, sizeof( struct weighted_piece ), comparePieceByWeight );
+    else
+        qsort( t->pieces, t->pieceCount, sizeof( struct weighted_piece ), comparePieceByIndex );
 }
 
 static tr_bool
