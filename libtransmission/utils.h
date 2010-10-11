@@ -295,23 +295,13 @@ char* tr_utf8clean( const char * str, int len ) TR_GNUC_MALLOC;
 ***/
 
 /** @brief Portability wrapper around malloc() in which `0' is a safe argument */
-static inline void* tr_malloc( size_t size )
-{
-    return size ? malloc( size ) : NULL;
-}
+void* tr_malloc( size_t size );
 
 /** @brief Portability wrapper around calloc() in which `0' is a safe argument */
-static inline void* tr_malloc0( size_t size )
-{
-    return size ? calloc( 1, size ) : NULL;
-}
+void* tr_malloc0( size_t size );
 
 /** @brief Portability wrapper around free() in which `NULL' is a safe argument */
-static inline void tr_free( void * p )
-{
-    if( p != NULL )
-        free( p );
-}
+void tr_free( void * p );
 
 /**
  * @brief make a newly-allocated copy of a chunk of memory
@@ -319,10 +309,7 @@ static inline void tr_free( void * p )
  * @param byteCount the number of bytes to copy
  * @return a newly-allocated copy of `src' that can be freed with tr_free()
  */
-static inline void* tr_memdup( const void * src, size_t byteCount )
-{
-    return memcpy( tr_malloc( byteCount ), src, byteCount );
-}
+void* tr_memdup( const void * src, size_t byteCount );
 
 #define tr_new( struct_type, n_structs )           \
     ( (struct_type *) tr_malloc ( ( (size_t) sizeof ( struct_type ) ) * ( ( size_t) ( n_structs ) ) ) )
@@ -348,10 +335,7 @@ char* tr_strndup( const void * in, int len ) TR_GNUC_MALLOC;
  * @param in is a void* so that callers can pass in both signed & unsigned without a cast
  * @return a newly-allocated copy of `in' that can be freed with tr_free()
  */
-static inline char* tr_strdup( const void * in )
-{
-    return tr_strndup( in, in ? (int)strlen((const char *)in) : 0 );
-}
+char* tr_strdup( const void * in );
 
 /** @brief similar to bsearch() but returns the index of the lower bound */
 int tr_lowerBound( const void * key,
@@ -520,17 +504,10 @@ int tr_moveFile( const char * oldpath, const char * newpath,
                  tr_bool * renamed ) TR_GNUC_NONNULL(1,2);
 
 /** @brief convenience function to remove an item from an array */
-static inline void tr_removeElementFromArray( void         * array,
-                                              unsigned int   index_to_remove,
-                                              size_t         sizeof_element,
-                                              size_t         nmemb )
-{
-    char * a = (char*) array;
-
-    memmove( a + sizeof_element * index_to_remove,
-             a + sizeof_element * ( index_to_remove  + 1 ),
-             sizeof_element * ( --nmemb - index_to_remove ) );
-}
+void tr_removeElementFromArray( void         * array,
+                                unsigned int   index_to_remove,
+                                size_t         sizeof_element,
+                                size_t         nmemb );
 
 /***
 ****

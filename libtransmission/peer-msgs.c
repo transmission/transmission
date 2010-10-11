@@ -306,7 +306,7 @@ pokeBatchPeriod( tr_peermsgs * msgs,
     }
 }
 
-static inline void
+static void
 dbgOutMessageLen( tr_peermsgs * msgs )
 {
     dbgmsg( msgs, "outMessage size is now %zu", EVBUFFER_LENGTH( msgs->outMessages ) );

@@ -41,22 +41,7 @@ tr_bitsetDestructor( tr_bitset * b )
     tr_bitfieldDestruct( &b->bitfield );
 }
 
-static inline void
-tr_bitsetReserve( tr_bitset * b, size_t size )
-{
-    if( b->bitfield.bitCount < size )
-    {
-        tr_bitfield * tmp = tr_bitfieldDup( &b->bitfield );
-
-        tr_bitfieldDestruct( &b->bitfield );
-        tr_bitfieldConstruct( &b->bitfield, size );
-
-        if( ( tmp->bits != NULL ) && ( tmp->byteCount > 0 ) )
-            memcpy( b->bitfield.bits, tmp->bits, tmp->byteCount );
-
-        tr_bitfieldFree( tmp );
-    }
-}
+void tr_bitsetReserve( tr_bitset * b, size_t size );
 
 static inline tr_bool
 tr_bitsetHasFast( const tr_bitset * b, const size_t nth )

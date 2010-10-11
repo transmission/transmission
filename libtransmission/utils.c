@@ -333,6 +333,35 @@ tr_msg( const char * file, int line,
 ****
 ***/
 
+void*
+tr_malloc( size_t size )
+{
+    return size ? malloc( size ) : NULL;
+}
+
+void*
+tr_malloc0( size_t size )
+{
+    return size ? calloc( 1, size ) : NULL;
+}
+
+void
+tr_free( void * p )
+{
+    if( p != NULL )
+        free( p );
+}
+
+void*
+tr_memdup( const void * src, size_t byteCount )
+{
+    return memcpy( tr_malloc( byteCount ), src, byteCount );
+}
+
+/***
+****
+***/
+
 void
 tr_set_compare( const void * va,
                 size_t aCount,
@@ -659,6 +688,12 @@ tr_buildPath( const char *first_element, ... )
 /****
 *****
 ****/
+
+char*
+tr_strdup( const void * in )
+{
+    return tr_strndup( in, in ? (int)strlen((const char *)in) : 0 );
+}
 
 char*
 tr_strndup( const void * in, int len )
@@ -1127,6 +1162,19 @@ tr_base64_decode( const void * input,
 /***
 ****
 ***/
+
+void
+tr_removeElementFromArray( void         * array,
+                           unsigned int   index_to_remove,
+                           size_t         sizeof_element,
+                           size_t         nmemb )
+{
+    char * a = (char*) array;
+
+    memmove( a + sizeof_element * index_to_remove,
+             a + sizeof_element * ( index_to_remove  + 1 ),
+             sizeof_element * ( --nmemb - index_to_remove ) );
+}
 
 int
 tr_lowerBound( const void * key,

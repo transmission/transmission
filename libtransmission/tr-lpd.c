@@ -254,7 +254,8 @@ static int lpd_extractParam( const char* const str, const char* const name, int 
 
 /**
 * @brief Configures additional capabilities for a socket */
-static inline int lpd_configureSocket( int sock, int add )
+static int
+lpd_configureSocket( int sock, int add )
 {
 #ifdef WIN32
     unsigned long flags = 1;

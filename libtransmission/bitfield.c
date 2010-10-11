@@ -15,6 +15,7 @@
 
 #include "transmission.h"
 #include "bitfield.h"
+#include "bitset.h"
 
 tr_bitfield*
 tr_bitfieldConstruct( tr_bitfield * b, size_t bitCount )
@@ -208,4 +209,25 @@ tr_bitfieldCountTrueBits( const tr_bitfield* b )
         ret += trueBitCount[*it];
 
     return ret;
+}
+
+/***
+****
+***/
+
+void
+tr_bitsetReserve( tr_bitset * b, size_t size )
+{
+    if( b->bitfield.bitCount < size )
+    {
+        tr_bitfield * tmp = tr_bitfieldDup( &b->bitfield );
+
+        tr_bitfieldDestruct( &b->bitfield );
+        tr_bitfieldConstruct( &b->bitfield, size );
+
+        if( ( tmp->bits != NULL ) && ( tmp->byteCount > 0 ) )
+            memcpy( b->bitfield.bits, tmp->bits, tmp->byteCount );
+
+        tr_bitfieldFree( tmp );
+    }
 }

@@ -401,7 +401,6 @@ static tr_bool
 tr_torrentIsSeedIdleLimitDone( tr_torrent * tor )
 {
     uint16_t idleMinutes;
-#warning can this use the idleSecs from tr_stat?
     return tr_torrentGetSeedIdle( tor, &idleMinutes )
         && difftime(tr_time(), MAX(tor->startDate, tor->activityDate)) >= idleMinutes * 60u;
 }
