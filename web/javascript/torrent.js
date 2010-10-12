@@ -513,9 +513,9 @@ Torrent.prototype =
 
 		if( this.needsMetaData() ){
 			var metaPercentComplete = this._metadataPercentComplete * 100;
-			progress_details = "Magnetized transfer - retrieving metadata (";
-			progress_details += Transmission.fmt.percentString( metaPercentComplete );
-			progress_details += "%)";
+			progress_details = [ "Magnetized transfer - retrieving metadata (",
+			                     Transmission.fmt.percentString( metaPercentComplete ),
+			                     "%)" ].join('');
 
 			var empty = "";
 			if(metaPercentComplete == 0)
@@ -529,37 +529,30 @@ Torrent.prototype =
 		}
 		else if( notDone )
 		{
-			var eta = '';
-
-			if( this.isActive( ) )
-			{
-				eta = ' - ';
-				if (this._eta < 0 || this._eta >= Torrent._InfiniteTimeRemaining )
-					eta += 'remaining time unknown';
-				else
-					eta += Transmission.fmt.timeInterval(this._eta) + ' remaining';
-			}
-
 			// Create the 'progress details' label
 			// Eg: '101 MiB of 631 MiB (16.02%) - 2 hr remaining'
-			c = Transmission.fmt.size( this._sizeWhenDone - this._leftUntilDone );
-			c += ' of ';
-			c += Transmission.fmt.size( this._sizeWhenDone );
-			c += ' (';
-			c += this.getPercentDoneStr();
-			c += '%)';
-			c += eta;
-			progress_details = c;
+
+			c = [ Transmission.fmt.size( this._sizeWhenDone - this._leftUntilDone ),
+			      ' of ', Transmission.fmt.size( this._sizeWhenDone ),
+			      ' (', this.getPercentDoneStr(), '%)' ];
+			if( this.isActive( ) ) {
+				c.push( ' - ' );
+				if (this._eta < 0 || this._eta >= Torrent._InfiniteTimeRemaining )
+					c.push( 'remaining time unknown' );
+				else
+					c.push( Transmission.fmt.timeInterval(this._eta) + ' remaining' );
+			}
+			progress_details = c.join('');
 
 			// Figure out the percent completed
 			var css_completed_width = ( this.getPercentDone() * MaxBarWidth ).toTruncFixed( 2 );
 
 			// Update the 'in progress' bar
 			e = root._progress_complete_container;
-			c = 'torrent_progress_bar'+compact;
-			c += this.isActive() ? ' in_progress' : ' incomplete_stopped';
-			if(css_completed_width === 0) { c += ' empty'; }
-			e.className = c;
+			c = [ 'torrent_progress_bar'+compact,
+			      this.isActive() ? 'in_progress' : 'incomplete_stopped' ];
+			if(css_completed_width === 0) { c.push( 'empty' ); }
+			e.className = c.join(' ');
 			e.style.width = css_completed_width + '%';
 
 			// Update the 'incomplete' bar
@@ -570,41 +563,36 @@ Torrent.prototype =
 		}
 		else
 		{
-			var eta = '';
+			// Create the 'progress details' label
 
+			if( this._size == this._sizeWhenDone )
+			{
+				// seed: '698.05 MiB'
+				c = [ Transmission.fmt.size( this._size ) ];
+			}
+			else
+			{
+				// partial seed: '127.21 MiB of 698.05 MiB (18.2%)'
+				c = [ Transmission.fmt.size( this._sizeWhenDone ), ' of ', Transmission.fmt.size( this._size ),
+				      ' (', Transmission.fmt.percentString( 100.0 * this._sizeWhenDone / this._size ), '%)' ];
+			}
+
+			// append UL stats: ', uploaded 8.59 GiB (Ratio: 12.3)'
+			c.push( ', uploaded ', Transmission.fmt.size( this._upload_total ),
+			        ' (Ratio ', Transmission.fmt.ratioString( this._upload_ratio ), ')' );
+
+			// maybe append remaining time
 			if( this.isActive( ) && this.seedRatioLimit( ) > 0 )
 			{
-				eta = ' - ';
+				c.push(' - ');
+
 				if (this._eta < 0 || this._eta >= Torrent._InfiniteTimeRemaining )
-					eta += 'remaining time unknown';
+					c.push( 'remaining time unknown' );
 				else
-					eta += Transmission.fmt.timeInterval(this._eta) + ' remaining';
+					c.push( Transmission.fmt.timeInterval(this._eta), ' remaining' );
 			}
 
-			// Create the 'progress details' label
-			// Partial seed
-			if( this._size != this._sizeWhenDone ) {
-				// Eg: '127.21 MiB of 698.05 MiB (18.2%)'
-				c = Transmission.fmt.size( this._sizeWhenDone );
-				c += ' of ';
-				c += Transmission.fmt.size( this._size );
-				c += ' (';
-				c += Transmission.fmt.percentString( 100.0 * this._sizeWhenDone / this._size );
-				c += '%)';
-			}
-			// Regular seed
-			else {
-				// Eg: '698.05 MiB'
-				c = Transmission.fmt.size( this._size );
-			}
-			// Eg:', uploaded 8.59 GiB (Ratio: 12.3)'
-			c += ', uploaded ';
-			c += Transmission.fmt.size( this._upload_total );
-			c += ' (Ratio ';
-			c += Transmission.fmt.ratioString( this._upload_ratio );
-			c += ')';
-			c += eta;
-			progress_details = c;
+			progress_details = c.join('');
 
 			var status = this.isActive() ? 'complete' : 'complete_stopped';
 
@@ -964,32 +952,32 @@ TorrentFile.prototype = {
 	},
 
 	refreshProgressHTML: function() {
-		var c = Transmission.fmt.size(this._done);
-		c += ' of ';
-		c += Transmission.fmt.size(this._size);
-		c += ' (';
-		c += this._size ? Transmission.fmt.percentString(100 * this._done / this._size) : '100';
-		c += '%)';
+		var c = [ Transmission.fmt.size(this._done),
+		          ' of ',
+		          Transmission.fmt.size(this._size),
+		          ' (',
+		          this._size ? Transmission.fmt.percentString(100 * this._done / this._size) : '100',
+		          '%)' ].join('');
 		setInnerHTML(this._progress[0], c);
 	},
 
 	refreshWantedHTML: function() {
 		var e = this.domElement();
-		var c = e.classNameConst;
-		if(!this._wanted) { c += ' skip'; }
-		if(this.isDone()) { c += ' complete'; }
-		e.className = c;
+		var c = [ e.classNameConst ];
+		if(!this._wanted) { c.push( 'skip' ); }
+		if(this.isDone()) { c.push( 'complete' ); }
+		e.className = c.join(' ');
 	},
 
 	refreshPriorityHTML: function() {
 		var e = this._priority_control;
-		var c = e.classNameConst;
+		var c = [ e.classNameConst ];
 		switch( this._prio ) {
-			case 1: c += ' high'; break;
-			case -1: c += ' low'; break;
-			default: c += ' normal'; break;
+			case 1  : c.push( 'high'   ); break;
+			case -1 : c.push( 'low'    ); break;
+			default : c.push( 'normal' ); break;
 		}
-		e.className = c;
+		e.className = c.join(' ');
 	},
 
 	fileWantedControlClicked: function(event) {
