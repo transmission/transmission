@@ -17,6 +17,9 @@ user_agent_prefix=`grep m4_define configure.ac | sed "s/[][)(]/,/g" | grep user_
 
 peer_id_prefix=`grep m4_define configure.ac | sed "s/[][)(]/,/g" | grep peer_id_prefix  | cut -d , -f 6`
 
+major_version=`echo ${user_agent_prefix} | awk -F . '{print $1}'`
+minor_version=`echo ${user_agent_prefix} | awk -F . '{print $2 + 0}'`
+
 # If this is a svn tree, and svnversion is available in PATH, use it to
 # grab the version.
 if [ -d ".svn" ] && type svnversion >/dev/null 2>&1; then
@@ -34,6 +37,8 @@ cat > libtransmission/version.h.new << EOF
 #define SHORT_VERSION_STRING      "${user_agent_prefix}"
 #define LONG_VERSION_STRING       "${user_agent_prefix} (${svn_revision})"
 #define VERSION_STRING_INFOPLIST  ${user_agent_prefix}
+#define MAJOR_VERSION             ${major_version}
+#define MINOR_VERSION             ${minor_version}
 EOF
 
 # Add a release definition
