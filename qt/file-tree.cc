@@ -641,7 +641,7 @@ FileTreeView :: FileTreeView( QWidget * parent ):
     sortByColumn( COL_NAME, Qt::AscendingOrder );
     installEventFilter( this );
 
-    for( int i=0; i<=NUM_COLUMNS; ++i )
+    for( int i=0; i<NUM_COLUMNS; ++i )
         header()->setResizeMode( i, QHeaderView::Fixed );
 
     connect( this, SIGNAL(clicked(const QModelIndex&)),
