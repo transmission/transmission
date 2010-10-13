@@ -48,6 +48,10 @@ enum
     /* how frequently to change which peers are choked */
     RECHOKE_PERIOD_MSEC = ( 10 * 1000 ),
 
+    /* an optimistically unchoked peer is immune from rechoking
+       for this many calls to rechokeUploads(). */
+    OPTIMISTIC_UNCHOKE_MULTIPLIER = 4,
+
     /* how frequently to reallocate bandwidth */
     BANDWIDTH_PERIOD_MSEC = 500,
 
@@ -179,8 +183,10 @@ typedef struct tr_torrent_peers
     tr_ptrArray                webseeds; /* tr_webseed */
 
     tr_torrent               * tor;
-    tr_peer                  * optimistic; /* the optimistic peer, or NULL if none */
     struct tr_peerMgr        * manager;
+
+    tr_peer                  * optimistic; /* the optimistic peer, or NULL if none */
+    int                        optimisticUnchokeTimeScaler;
 
     tr_bool                    isRunning;
     tr_bool                    needsCompletenessCheck;
@@ -2709,6 +2715,13 @@ rechokeUploads( Torrent * t, const uint64_t now )
 
     assert( torrentIsLocked( t ) );
 
+    /* an optimistic unchoke peer's "optimistic"
+     * state lasts for N calls to rechokeUploads(). */
+    if( t->optimisticUnchokeTimeScaler > 0 )
+        t->optimisticUnchokeTimeScaler--;
+    else
+        t->optimistic = NULL;
+
     /* sort the peers by preference and rate */
     for( i = 0, size = 0; i < peerCount; ++i )
     {
@@ -2727,7 +2740,7 @@ rechokeUploads( Torrent * t, const uint64_t now )
         {
             tr_peerMsgsSetChoke( peer->msgs, TRUE );
         }
-        else
+        else if( peer != t->optimistic )
         {
             struct ChokeData * n = &choke[size++];
             n->peer         = peer;
@@ -2764,7 +2777,7 @@ rechokeUploads( Torrent * t, const uint64_t now )
     }
 
     /* optimistic unchoke */
-    if( !isMaxedOut && (i<size) )
+    if( !t->optimistic && !isMaxedOut && (i<size) )
     {
         int n;
         struct ChokeData * c;
@@ -2787,6 +2800,7 @@ rechokeUploads( Torrent * t, const uint64_t now )
             c = tr_ptrArrayNth( &randPool, tr_cryptoWeakRandInt( n ));
             c->isChoked = FALSE;
             t->optimistic = c->peer;
+            t->optimisticUnchokeTimeScaler = OPTIMISTIC_UNCHOKE_MULTIPLIER;
         }
 
         tr_ptrArrayDestruct( &randPool, NULL );
