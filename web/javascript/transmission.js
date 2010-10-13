@@ -1118,6 +1118,12 @@ Transmission.prototype =
 						$element.deselectMenuItem();
 					this.refreshDisplay( );
 				}
+				else if ($element[0].id == 'homepage') {
+					window.open('http://www.transmissionbt.com/');
+				}
+				else if ($element[0].id == 'tipjar') {
+					window.open('http://www.transmissionbt.com/donate.php');
+				}
 				break;
 
 			// Limit the download rate
