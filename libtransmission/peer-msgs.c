@@ -1213,8 +1213,11 @@ prefetchPieces( tr_peermsgs *msgs )
     for( i=msgs->prefetchCount; i<msgs->peer->pendingReqsToClient && i<12; ++i )
     {
         const struct peer_request * req = msgs->peerAskedFor + i;
-        tr_cachePrefetchBlock( getSession(msgs)->cache, msgs->torrent, req->index, req->offset, req->length );
-        ++msgs->prefetchCount;
+        if( requestIsValid( msgs, req ) )
+        {
+            tr_cachePrefetchBlock( getSession(msgs)->cache, msgs->torrent, req->index, req->offset, req->length );
+            ++msgs->prefetchCount;
+        }
     }
 }
 

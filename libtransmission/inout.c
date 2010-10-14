@@ -188,20 +188,6 @@ tr_ioFindFileLocation( const tr_torrent * tor,
     const tr_file * file;
 
     assert( tr_isTorrent( tor ) );
-
-if( offset >= tor->info.totalSize )
-{
-tr_file_index_t i;
-fprintf( stderr, "looking for torrent offset is %"PRIu64"\n", offset );
-fprintf( stderr, "total torrent size %"PRIu64"\n", tor->info.totalSize );
-fprintf( stderr, "pieceIndex %d\n", (int)pieceIndex );
-fprintf( stderr, "pieceOffset %d\n", (int)pieceOffset );
-fprintf( stderr, "piece size is %d\n", (int)tor->info.pieceSize );
-fprintf( stderr, "last piece size is %d\n", (int)tor->lastPieceSize );
-fprintf( stderr, "%u files\n", (unsigned int)tor->info.fileCount );
-for( i=0; i<tor->info.fileCount; ++i ) fprintf( stderr, "file #%u offset %"PRIu64" length %"PRIu64"\n", i, tor->info.files[i].offset, tor->info.files[i].length );
-}
-
     assert( offset < tor->info.totalSize );
 
     file = bsearch( &offset,
