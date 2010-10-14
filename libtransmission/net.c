@@ -237,7 +237,7 @@ tr_netSetTOS( int s, int tos )
 }
 
 int
-tr_netSetCongestionControl( int s, const char *algorithm )
+tr_netSetCongestionControl( int s UNUSED, const char *algorithm UNUSED )
 {
 #ifdef TCP_CONGESTION
     return setsockopt( s, IPPROTO_TCP, TCP_CONGESTION,
