@@ -821,14 +821,14 @@ toggleMainWindow( struct cbdata * cbdata )
         cbdata->isIconified = 0;
         gtk_window_set_skip_taskbar_hint( window, FALSE );
         gtk_window_move( window, x, y );
-        gtk_widget_show( GTK_WIDGET( window ) );
+        gtr_widget_set_visible( GTK_WIDGET( window ), TRUE );
         tr_window_present( window );
     }
     else
     {
         gtk_window_get_position( window, &x, &y );
         gtk_window_set_skip_taskbar_hint( window, TRUE );
-        gtk_widget_hide( GTK_WIDGET( window ) );
+        gtr_widget_set_visible( GTK_WIDGET( window ), FALSE );
         cbdata->isIconified = 1;
     }
 }

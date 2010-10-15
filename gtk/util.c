@@ -729,6 +729,21 @@ gtr_widget_get_realized( GtkWidget * w )
 void
 gtr_widget_set_visible( GtkWidget * w, gboolean b )
 {
+    /* toggle the transient children, too */
+    if( GTK_IS_WINDOW( w ) )
+    {
+        GList * l;
+        GList * windows = gtk_window_list_toplevels( );
+        GtkWindow * window = GTK_WINDOW( w );
+
+        for( l=windows; l!=NULL; l=l->next )
+            if( GTK_IS_WINDOW( l->data ) )
+                if( gtk_window_get_transient_for( GTK_WINDOW( l->data ) ) == window )
+                    gtr_widget_set_visible( GTK_WIDGET( l->data ), b );
+
+        g_list_free( windows );
+    }
+
 #if GTK_CHECK_VERSION( 2,18,0 )
     gtk_widget_set_visible( w, b );
 #else
