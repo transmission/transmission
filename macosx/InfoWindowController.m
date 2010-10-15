@@ -340,6 +340,14 @@ typedef enum
     [self setTab: nil];
 }
 
+- (void) swipeWithEvent:(NSEvent *) event
+{
+    if ([event deltaX] < 0.0)
+        [self setNextTab];
+    else if ([event deltaX] > 0.0)
+        [self setPreviousTab];
+}
+
 - (void) updateInfoStats
 {
     [fViewController updateInfo];
@@ -499,14 +507,6 @@ typedef enum
 {
     if (fTorrents && [fTorrents containsObject: [notification object]])
         [self resetInfo];
-}
-
-- (void) swipeWithEvent:(NSEvent *) event
-{
-    if ([event deltaX] < 0.0)
-        [self setNextTab];
-    else if ([event deltaX] > 0.0)
-        [self setPreviousTab];
 }
 
 @end
