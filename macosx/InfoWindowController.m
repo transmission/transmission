@@ -501,4 +501,12 @@ typedef enum
         [self resetInfo];
 }
 
+- (void) swipeWithEvent:(NSEvent *) event
+{
+    if ([event deltaX] < 0.0)
+        [self setNextTab];
+    else if ([event deltaX] > 0.0)
+        [self setPreviousTab];
+}
+
 @end
