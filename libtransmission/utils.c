@@ -1433,8 +1433,12 @@ tr_parseNumberRange( const char * str_in, int len, int * setmeCount )
 double
 tr_truncd( double x, int decimal_places )
 {
+    /* sigh... surely there's a better way to do this */
+    char buf[1024];
     const int i = (int) pow( 10, decimal_places );
-    return floor( x * i ) / i;
+    snprintf( buf, sizeof( buf ), "%f", x*i );
+    *strchr(buf,'.') = '\0';
+    return atof(buf) / i;
 }
 
 char*
