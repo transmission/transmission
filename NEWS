@@ -1,22 +1,22 @@
 === Transmission 2.11 (2010/10/xx) ===
 [http://trac.transmissionbt.com/query?milestone=2.11&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== All Platforms ====
-  * Fix a 2.10 crash in tr_ioFindFileLocation()
+  * Fix a 2.10 crash
   * Fix minor build issues on various platforms, particularly embedded systems
-  * Fix issue when saving bencode files on small hardware running uClibc
+  * Fix issue when saving bencoded files on small hardware running uClibc
   * Fix minor rounding issue when displaying percentages
   * Fix the optimistic unchoke interval
 ==== Mac ====
   * Swipe to change inspector tab
 ==== GTK+ ====
-  * Fix drag-and-dropping a magnet link onto the GTK+ client
+  * Fix drag-and-dropping a magnet link
   * Fix hiding dialogs when hiding Transmission in the notification area
 ==== Qt ====
   * Fix crash in the file tree
 ==== Daemon ====
   * Fix missing status message when using "transmission-remote --add"
 ==== Web Client ====
-  * Add a Transmission website link to the options menu
+  * Add Transmission website links to the action menu
 
 === Transmission 2.10 (2010/10/07) ===
 [http://trac.transmissionbt.com/query?milestone=2.10&group=component&groupdesc=1&order=severity All tickets closed by this release]
