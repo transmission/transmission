@@ -87,9 +87,9 @@ tr_peerIdNew( void )
 
     memcpy( buf, PEERID_PREFIX, 8 );
 
-    for( i = 8; i < 19; ++i )
-    {
-        val = tr_cryptoRandInt( base );
+    tr_cryptoRandBuf( buf+8, 11 );
+    for( i=8; i<19; ++i ) {
+        val = buf[i] % base;
         total += val;
         buf[i] = pool[val];
     }

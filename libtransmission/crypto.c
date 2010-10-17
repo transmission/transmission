@@ -376,12 +376,13 @@ tr_ssha1( const void * plaintext )
                                  "./";
 
     size_t i;
-    char salt[saltval_len];
+    unsigned char salt[saltval_len];
     uint8_t sha[SHA_DIGEST_LENGTH];
     char buf[2*SHA_DIGEST_LENGTH + saltval_len + 2];
 
+    tr_cryptoRandBuf( salt, saltval_len );
     for( i=0; i<saltval_len; ++i )
-        salt[i] = salter[ tr_cryptoRandInt( salter_len ) ];
+        salt[i] = salter[ salt[i] % salter_len ];
 
     tr_sha1( sha, plaintext, strlen( plaintext ), salt, saltval_len, NULL );
     tr_sha1_to_hex( &buf[1], sha );

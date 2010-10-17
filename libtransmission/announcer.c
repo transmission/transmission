@@ -315,7 +315,7 @@ typedef struct
      * to verify us if our IP address changes.
      * This is immutable for the life of the tracker object.
      * The +1 is for '\0' */
-    char key_param[KEYLEN + 1];
+    unsigned char key_param[KEYLEN + 1];
 }
 tr_tracker_item;
 
@@ -334,15 +334,16 @@ trackerItemCopyAttributes( tr_tracker_item * t, const tr_tracker_item * o )
 }
 
 static void
-generateKeyParam( char * msg, size_t msglen )
+generateKeyParam( unsigned char * msg, size_t msglen )
 {
     size_t i;
     const char * pool = "abcdefghijklmnopqrstuvwxyz0123456789";
     const int poolSize = 36;
 
+    tr_cryptoRandBuf( msg, msglen );
     for( i=0; i<msglen; ++i )
-        *msg++ = pool[tr_cryptoRandInt( poolSize )];
-    *msg = '\0';
+        msg[i] = pool[ msg[i] % poolSize ];
+    msg[msglen] = '\0';
 }
 
 static tr_tracker_item*
