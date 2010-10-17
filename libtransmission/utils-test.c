@@ -392,6 +392,9 @@ test_truncd( void )
     tr_snprintf( buf, sizeof( buf ), "%.2f", tr_truncd( 2.15, 2 ) );
     check( !strcmp( buf, "2.15" ) );
 
+    tr_snprintf( buf, sizeof( buf ), "%.2f", tr_truncd( 2.05, 2 ) );
+    check( !strcmp( buf, "2.05" ) );
+
     return 0;
 }
 
