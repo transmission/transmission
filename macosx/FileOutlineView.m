@@ -91,8 +91,7 @@
     const unichar firstChar = [[event charactersIgnoringModifiers] characterAtIndex: 0];
     
     //don't allow quick look on add window
-    #warning get rid of conversion of protocol and replace with @protocol(QLPreviewPanelDataSource)
-    if ([NSApp isOnSnowLeopardOrBetter] && firstChar == ' ' && [[[self window] windowController] conformsToProtocol: NSProtocolFromString(@"QLPreviewPanelDataSource")])
+    if ([NSApp isOnSnowLeopardOrBetter] && firstChar == ' ' && [[[self window] windowController] isKindOfClass: [InfoWindowController class]])
     {
         if ([[QLPreviewPanelSL sharedPreviewPanel] isVisible])
             [[QLPreviewPanelSL sharedPreviewPanel] orderOut: nil];
