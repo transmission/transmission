@@ -232,14 +232,6 @@ main( int argc, char ** argv )
 
     printf( "%s %s\n", MY_READABLE_NAME, LONG_VERSION_STRING );
 
-    /* the command line overrides defaults */
-    tr_bencInitDict( &settings, 0 );
-    if( parseCommandLine( &settings, argc, (const char**)argv ) )
-        return EXIT_FAILURE;
-
-    if( showVersion )
-        return 0;
-
     /* user needs to pass in at least one argument */
     if( argc < 2 ) {
         tr_getopt_usage( MY_READABLE_NAME, getUsage( ), options );
@@ -247,8 +239,16 @@ main( int argc, char ** argv )
     }
 
     /* load the defaults from config file + libtransmission defaults */
+    tr_bencInitDict( &settings, 0 );
     configDir = getConfigDir( argc, (const char**)argv );
     tr_sessionLoadSettings( &settings, configDir, MY_CONFIG_NAME );
+
+    /* the command line overrides defaults */
+    if( parseCommandLine( &settings, argc, (const char**)argv ) )
+        return EXIT_FAILURE;
+
+    if( showVersion )
+        return 0;
 
     /* Check the options for validity */
     if( !torrentPath ) {
