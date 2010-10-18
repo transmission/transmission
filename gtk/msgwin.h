@@ -13,6 +13,6 @@
 #ifndef TG_MSGWIN_H
 #define TG_MSGWIN_H
 
-GtkWidget * msgwin_new( TrCore * core );
+GtkWidget * msgwin_new( TrCore * core, GtkWindow * parent );
 
 #endif

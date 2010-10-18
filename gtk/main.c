@@ -1407,7 +1407,7 @@ onUriClicked( GtkAboutDialog * u UNUSED, const gchar * uri, gpointer u2 UNUSED )
 }
 
 static void
-about( GtkWindow * parent UNUSED )
+about( GtkWindow * parent )
 {
     GtkWidget * d;
     const char * website_uri = "http://www.transmissionbt.com/";
@@ -1437,9 +1437,9 @@ about( GtkWindow * parent UNUSED )
                       "wrap-license", TRUE,
 #endif
                       NULL );
-
-    gtk_dialog_run( GTK_DIALOG( d ) );
-    gtk_widget_destroy( d );
+    gtk_window_set_transient_for( GTK_WINDOW( d ), parent );
+    g_signal_connect_swapped( d, "response", G_CALLBACK (gtk_widget_destroy), d );
+    gtk_widget_show_all( d );
 }
 
 static void
@@ -1727,9 +1727,8 @@ doAction( const char * action_name, gpointer user_data )
     {
         if( !data->msgwin )
         {
-            GtkWidget * win = msgwin_new( data->core );
-            g_signal_connect( win, "destroy", G_CALLBACK( msgwinclosed ),
-                              NULL );
+            GtkWidget * win = msgwin_new( data->core, data->wind );
+            g_signal_connect( win, "destroy", G_CALLBACK( msgwinclosed ), NULL );
             data->msgwin = win;
         }
         else
