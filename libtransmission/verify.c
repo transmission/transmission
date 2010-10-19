@@ -100,12 +100,13 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
         /* read a bit */
         if( fd >= 0 ) {
             const ssize_t numRead = tr_pread( fd, buffer, bytesThisPass, filePos );
-            if( numRead == (ssize_t)bytesThisPass )
-                SHA1_Update( &sha, buffer, numRead );
+            if( numRead > 0 ) {
+                bytesThisPass = (uint32_t)numRead;
+                SHA1_Update( &sha, buffer, bytesThisPass );
 #if defined HAVE_POSIX_FADVISE && defined POSIX_FADV_DONTNEED
-            if( numRead > 0 )
                 posix_fadvise( fd, filePos, bytesThisPass, POSIX_FADV_DONTNEED );
 #endif
+            }
         }
 
         /* move our offsets */
