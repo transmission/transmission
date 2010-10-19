@@ -1531,7 +1531,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     {
         NSSavePanel * panel = [NSSavePanel savePanel];
         [panel setAllowedFileTypes: [NSArray arrayWithObjects: @"org.bittorrent.torrent", @"torrent", nil]];
-        [panel setCanSelectHiddenExtension: YES];
+        [panel setExtensionHidden: NO];
         
         [panel beginSheetForDirectory: nil file: [torrent name] modalForWindow: fWindow modalDelegate: self
             didEndSelector: @selector(saveTorrentCopySheetClosed:returnCode:contextInfo:) contextInfo: torrents];
