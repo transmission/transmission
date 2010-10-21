@@ -1,3 +1,4 @@
+#include <math.h>
 #include <stdio.h> /* fprintf */
 #include <string.h> /* strcmp */
 
@@ -379,6 +380,7 @@ static int
 test_truncd( void )
 {
     char buf[32];
+    const double nan = sqrt( -1 );
 
     tr_snprintf( buf, sizeof( buf ), "%.2f%%", 99.999 );
     check( !strcmp( buf, "100.00%" ) );
@@ -394,6 +396,15 @@ test_truncd( void )
 
     tr_snprintf( buf, sizeof( buf ), "%.2f", tr_truncd( 2.05, 2 ) );
     check( !strcmp( buf, "2.05" ) );
+
+    tr_snprintf( buf, sizeof( buf ), "%.2f", tr_truncd( 3.3333, 2 ) );
+    check( !strcmp( buf, "3.33" ) );
+
+    tr_snprintf( buf, sizeof( buf ), "%.0f", tr_truncd( 3.3333, 0 ) );
+    check( !strcmp( buf, "3" ) );
+
+    tr_snprintf( buf, sizeof( buf ), "%.2f", tr_truncd( nan, 2 ) );
+    check( !strcmp( buf, "nan" ) );
 
     return 0;
 }
