@@ -817,8 +817,8 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
         }
         {
             char buf2[32], unver[64], total[64], avail[32];
-            const double d = ( 100.0 * available ) / sizeWhenDone;
-            const double ratio = 100.0 * ( leftUntilDone ? ( haveValid + haveUnchecked ) / (double)sizeWhenDone : 1 );
+            const double d = sizeWhenDone ? ( 100.0 * available ) / sizeWhenDone : 0;
+            const double ratio = 100.0 * ( sizeWhenDone ? ( haveValid + haveUnchecked ) / (double)sizeWhenDone : 1 );
             tr_strlpercent( avail, d, sizeof( avail ) );
             tr_strlpercent( buf2, ratio, sizeof( buf2 ) );
             tr_strlsize( total, haveUnchecked + haveValid, sizeof( total ) );
