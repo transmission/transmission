@@ -44,6 +44,7 @@
 - (void) createFileList;
 - (void) insertPath: (NSMutableArray *) components forParent: (FileListNode *) parent fileSize: (uint64_t) size
     index: (NSInteger) index flatList: (NSMutableArray *) flatFileList;
+- (void) sortFileList: (NSMutableArray *) fileNodes;
 
 - (void) completenessChange: (NSDictionary *) statusInfo;
 - (void) ratioLimitHit;
@@ -1710,6 +1711,9 @@ int trashDataFile(const char * filename)
             }
         }
         
+        [self sortFileList: fileList];
+        [self sortFileList: flatFileList];
+        
         fFileList = [[NSArray alloc] initWithArray: fileList];
         fFlatFileList = [[NSArray alloc] initWithArray: flatFileList];
     }
@@ -1759,6 +1763,17 @@ int trashDataFile(const char * filename)
         [components removeObjectAtIndex: 0];
         [self insertPath: components forParent: node fileSize: size index: index flatList: flatFileList];
     }
+}
+
+- (void) sortFileList: (NSMutableArray *) fileNodes
+{
+    NSSortDescriptor * descriptor = [[[NSSortDescriptor alloc] initWithKey: @"name" ascending: YES
+                                            selector: @selector(compareFinder:)] autorelease];
+    [fileNodes sortUsingDescriptors: [NSArray arrayWithObject: descriptor]];
+    
+    for (FileListNode * node in fileNodes)
+        if ([node isFolder])
+            [self sortFileList: [node children]];
 }
 
 //status has been retained
