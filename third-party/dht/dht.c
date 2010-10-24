@@ -790,7 +790,7 @@ new_node(const unsigned char *id, struct sockaddr *sa, int salen, int confirm)
 
         if(split) {
             debugf("Splitting.\n");
-            b = split_bucket(b);
+            split_bucket(b);
             return new_node(id, sa, salen, confirm);
         }
 
@@ -1847,7 +1847,7 @@ dht_periodic(int available, time_t *tosleep,
         unsigned short port;
         unsigned char values[2048], values6[2048];
         int values_len = 2048, values6_len = 2048;
-        int want, want4, want6;
+        int want;
         struct sockaddr_storage source_storage;
         struct sockaddr *source = (struct sockaddr*)&source_storage;
         socklen_t sourcelen = sizeof(source_storage);
@@ -1916,14 +1916,6 @@ dht_periodic(int available, time_t *tosleep,
                 debugf("Dropping request due to rate limiting.\n");
                 goto dontread;
             }
-        }
-
-        if(want > 0) {
-            want4 = (want & WANT4);
-            want6 = (want & WANT6);
-        } else {
-            want4 = source->sa_family == AF_INET;
-            want6 = source->sa_family == AF_INET6;
         }
 
         switch(message) {
@@ -2870,8 +2862,10 @@ parse_message(const unsigned char *buf, int buflen,
             if(values6_len)
                 *values6_len = j6;
         } else {
-            *values_len = 0;
-            *values6_len = 0;
+            if(values_len)
+                *values_len = 0;
+            if(values6_len)
+                *values6_len = 0;
         }
     }
 

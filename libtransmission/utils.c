@@ -430,9 +430,9 @@ tr_strip_positional_args( const char* str )
     const size_t  len = strlen( str );
     char *        out;
 
-    if( bufsize < len )
+    if( !buf || ( bufsize < len ) )
     {
-        bufsize = len * 2;
+        bufsize = len * 2 + 1;
         buf = tr_renew( char, buf, bufsize );
     }
 

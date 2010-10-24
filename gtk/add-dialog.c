@@ -373,10 +373,6 @@ addSingleTorrentDialog( GtkWindow * parent, TrCore * core, tr_ctor * ctor )
     gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( w ), flag );
     gtk_table_attach( GTK_TABLE( t ), w, col, col + 2, row, row + 1, GTK_FILL, 0, 0, 0 );
 
-    ++row;
-    col = 0;
-    w = data->priority_combo;
-
     /* trigger sourceChanged, either directly or indirectly,
      * so that it creates the tor/gtor objects */
     w = source_chooser;

@@ -467,7 +467,7 @@ tr_http_escape( struct evbuffer  * out,
     if( ( len < 0 ) && ( str != NULL ) )
         len = strlen( str );
 
-    for( end=str+len; str!=end; ++str ) {
+    for( end=str+len; str && str!=end; ++str ) {
         if(    ( *str == ',' )
             || ( *str == '-' )
             || ( *str == '.' )

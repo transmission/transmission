@@ -133,7 +133,7 @@ tr_magnetParse( const char * uri )
             else
                 vallen = strlen( val );
 
-            if( ( keylen==2 ) && !memcmp( key, "xt", 2 ) && !memcmp( val, "urn:btih:", 9 ) )
+            if( ( keylen==2 ) && !memcmp( key, "xt", 2 ) && val && !memcmp( val, "urn:btih:", 9 ) )
             {
                 const char * hash = val + 9;
                 const int hashlen = vallen - 9;
