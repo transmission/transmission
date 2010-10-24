@@ -343,12 +343,12 @@ tr_bandwidthGetPieceSpeed_Bps( const tr_bandwidth * b, const uint64_t now, const
     return getSpeed_Bps( &b->band[dir].piece, HISTORY_MSEC, now );
 }
 
-static void
-bandwidthUsedImpl( tr_bandwidth  * b,
-                   tr_direction    dir,
-                   size_t          byteCount,
-                   tr_bool         isPieceData,
-                   uint64_t        now )
+void
+tr_bandwidthUsed( tr_bandwidth  * b,
+                  tr_direction    dir,
+                  size_t          byteCount,
+                  tr_bool         isPieceData,
+                  uint64_t        now )
 {
     struct tr_band * band;
 
@@ -372,14 +372,5 @@ fprintf( stderr, "%p consumed %5zu bytes of %5s data... was %6zu, now %6zu left\
         bytesUsed( now, &band->piece, byteCount );
 
     if( b->parent != NULL )
-        bandwidthUsedImpl( b->parent, dir, byteCount, isPieceData, now );
-}
-
-void
-tr_bandwidthUsed( tr_bandwidth  * b,
-                  tr_direction    dir,
-                  size_t          byteCount,
-                  tr_bool         isPieceData )
-{
-    bandwidthUsedImpl( b, dir, byteCount, isPieceData, tr_time_msec( ) );
+        tr_bandwidthUsed( b->parent, dir, byteCount, isPieceData, now );
 }

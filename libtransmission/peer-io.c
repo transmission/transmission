@@ -98,11 +98,12 @@ didWriteWrapper( tr_peerIo * io, unsigned int bytes_transferred )
 
         const unsigned int payload = MIN( next->length, bytes_transferred );
         const unsigned int overhead = guessPacketOverhead( payload );
+        const uint64_t now = tr_time_msec( );
 
-        tr_bandwidthUsed( &io->bandwidth, TR_UP, payload, next->isPieceData );
+        tr_bandwidthUsed( &io->bandwidth, TR_UP, payload, next->isPieceData, now );
 
         if( overhead > 0 )
-            tr_bandwidthUsed( &io->bandwidth, TR_UP, overhead, FALSE );
+            tr_bandwidthUsed( &io->bandwidth, TR_UP, overhead, FALSE, now );
 
         if( io->didWrite )
             io->didWrite( io, payload, next->isPieceData, io->userData );
@@ -149,11 +150,16 @@ canReadWrapper( tr_peerIo * io )
 
             assert( tr_isPeerIo( io ) );
 
-            if( piece )
-                tr_bandwidthUsed( &io->bandwidth, TR_DOWN, piece, TRUE );
+            if( piece || (piece!=used) )
+            {
+                const uint64_t now = tr_time_msec( );
 
-            if( used != piece )
-                tr_bandwidthUsed( &io->bandwidth, TR_DOWN, used - piece, FALSE );
+                if( piece )
+                    tr_bandwidthUsed( &io->bandwidth, TR_DOWN, piece, TRUE, now );
+
+                if( used != piece )
+                    tr_bandwidthUsed( &io->bandwidth, TR_DOWN, used - piece, FALSE, now );
+            }
 
             switch( ret )
             {

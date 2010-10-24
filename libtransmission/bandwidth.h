@@ -228,7 +228,8 @@ unsigned int tr_bandwidthGetPieceSpeed_Bps( const tr_bandwidth  * bandwidth,
 void    tr_bandwidthUsed              ( tr_bandwidth        * bandwidth,
                                         tr_direction          direction,
                                         size_t                byteCount,
-                                        tr_bool               isPieceData );
+                                        tr_bool               isPieceData,
+                                        uint64_t              now );
 
 /******
 *******
