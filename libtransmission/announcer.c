@@ -77,8 +77,8 @@ enum
 ***/
 
 static int
-compareTransfer( uint32_t a_uploaded, uint32_t a_downloaded,
-                 uint32_t b_uploaded, uint32_t b_downloaded )
+compareTransfer( uint64_t a_uploaded, uint64_t a_downloaded,
+                 uint64_t b_uploaded, uint64_t b_downloaded )
 {
     /* higher upload count goes first */
     if( a_uploaded != b_uploaded )
@@ -172,8 +172,8 @@ struct stop_message
 {
     tr_host * host;
     char * url;
-    uint32_t up;
-    uint32_t down;
+    uint64_t up;
+    uint64_t down;
 };
 
 static void
@@ -386,7 +386,7 @@ typedef struct
 {
     /* number of up/down/corrupt bytes since the last time we sent an
      * "event=stopped" message that was acknowledged by the tracker */
-    uint32_t byteCounts[3];
+    uint64_t byteCounts[3];
 
     tr_ptrArray trackers; /* tr_tracker_item */
     tr_tracker_item * currentTracker;
@@ -735,8 +735,8 @@ createAnnounceURL( const tr_announcer     * announcer,
                               "info_hash=%s"
                               "&peer_id=%s"
                               "&port=%d"
-                              "&uploaded=%" PRIu32
-                              "&downloaded=%" PRIu32
+                              "&uploaded=%" PRIu64
+                              "&downloaded=%" PRIu64
                               "&left=%" PRIu64
                               "&numwant=%d"
                               "&key=%s"
@@ -757,7 +757,7 @@ createAnnounceURL( const tr_announcer     * announcer,
         evbuffer_add_printf( buf, "&requirecrypto=1" );
 
     if( tier->byteCounts[TR_ANN_CORRUPT] )
-        evbuffer_add_printf( buf, "&corrupt=%" PRIu32, tier->byteCounts[TR_ANN_CORRUPT] );
+        evbuffer_add_printf( buf, "&corrupt=%" PRIu64, tier->byteCounts[TR_ANN_CORRUPT] );
 
     str = eventName;
     if( str && *str )
