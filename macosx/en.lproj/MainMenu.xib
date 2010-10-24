@@ -13,9 +13,7 @@
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
 			<integer value="1480"/>
-			<integer value="1936"/>
 			<integer value="2"/>
-			<integer value="169"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -61,7 +59,7 @@
 						<object class="NSPopUpButton" id="327116749">
 							<reference key="NSNextResponder" ref="303120456"/>
 							<int key="NSvFlags">292</int>
-							<string key="NSFrame">{{8, 2}, {36, 18}}</string>
+							<string key="NSFrame">{{6, 2}, {36, 18}}</string>
 							<reference key="NSSuperview" ref="303120456"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSPopUpButtonCell" key="NSCell" id="1063285887">
@@ -145,7 +143,7 @@
 						<object class="NSButton" id="673219624">
 							<reference key="NSNextResponder" ref="303120456"/>
 							<int key="NSvFlags">292</int>
-							<string key="NSFrame">{{47, 2}, {36, 18}}</string>
+							<string key="NSFrame">{{45, 2}, {36, 18}}</string>
 							<reference key="NSSuperview" ref="303120456"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="109224088">
@@ -173,7 +171,7 @@
 						<object class="NSTextField" id="403739499">
 							<reference key="NSNextResponder" ref="303120456"/>
 							<int key="NSvFlags">258</int>
-							<string key="NSFrame">{{90, 4}, {335, 14}}</string>
+							<string key="NSFrame">{{86, 4}, {339, 14}}</string>
 							<reference key="NSSuperview" ref="303120456"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="696487414">

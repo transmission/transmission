@@ -411,9 +411,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     #warning remove once localizations are updated for 2.2
     [fActionButton setBordered: NO];
-    [fActionButton setFrame: NSMakeRect(8.0, 2.0, 36.0, 18.0)];
+    [fActionButton setFrame: NSMakeRect(6.0, 2.0, 36.0, 18.0)];
     [fSpeedLimitButton setBordered: NO];
-    [fSpeedLimitButton setFrame: NSMakeRect(47.0, 2.0, 36.0, 18.0)];
+    [fSpeedLimitButton setFrame: NSMakeRect(45.0, 2.0, 36.0, 18.0)];
     
     //window min height
     NSSize contentMinSize = [fWindow contentMinSize];
