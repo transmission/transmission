@@ -409,6 +409,12 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     if ([fDefaults boolForKey: @"SmallView"])
         [fTableView setRowHeight: ROW_HEIGHT_SMALL];
     
+    #warning remove once localizations are updated for 2.2
+    [fActionButton setBordered: NO];
+    [fActionButton setFrame: NSMakeRect(8.0, 2.0, 36.0, 18.0)];
+    [fSpeedLimitButton setBordered: NO];
+    [fSpeedLimitButton setFrame: NSMakeRect(47.0, 2.0, 36.0, 18.0)];
+    
     //window min height
     NSSize contentMinSize = [fWindow contentMinSize];
     contentMinSize.height = [[fWindow contentView] frame].size.height - [[fTableView enclosingScrollView] frame].size.height
