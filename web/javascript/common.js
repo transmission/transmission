@@ -16,6 +16,16 @@ var Safari3 = testSafari3();
 var iPhone = RegExp("(iPhone|iPod)").test(navigator.userAgent);
 if (iPhone) var scroll_timeout;
 
+if(!Array.indexOf){
+	Array.prototype.indexOf = function(obj){
+		var i, len;
+		for(i=0, len=this.length; i<len; i++)
+			if(this[i]==obj)
+				return i;
+		return -1;
+	}
+}
+
 function testSafari3()
 {
 	var minimum = new Array(521,0);
