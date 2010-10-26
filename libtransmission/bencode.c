@@ -941,18 +941,16 @@ struct SaveNode
     int *            children;
 };
 
-static struct SaveNode*
-nodeNewDict( const tr_benc * val )
+static void
+nodeInitDict( struct SaveNode * node, const tr_benc * val )
 {
     int               i, j;
     int               nKeys;
-    struct SaveNode * node;
     struct KeyIndex * indices;
 
     assert( tr_bencIsDict( val ) );
 
     nKeys = val->val.l.count / 2;
-    node = tr_new0( struct SaveNode, 1 );
     node->val = val;
     node->children = tr_new0( int, nKeys * 2 );
 
@@ -973,53 +971,40 @@ nodeNewDict( const tr_benc * val )
 
     assert( node->childCount == nKeys * 2 );
     tr_free( indices );
-    return node;
 }
 
-static struct SaveNode*
-nodeNewList( const tr_benc * val )
+static void
+nodeInitList( struct SaveNode * node, const tr_benc * val )
 {
     int               i, n;
-    struct SaveNode * node;
 
     assert( tr_bencIsList( val ) );
 
     n = val->val.l.count;
-    node = tr_new0( struct SaveNode, 1 );
     node->val = val;
     node->childCount = n;
     node->children = tr_new0( int, n );
     for( i = 0; i < n; ++i ) /* a list's children don't need to be reordered */
         node->children[i] = i;
-
-    return node;
 }
 
-static struct SaveNode*
-nodeNewLeaf( const tr_benc * val )
+static void
+nodeInitLeaf( struct SaveNode * node, const tr_benc * val )
 {
-    struct SaveNode * node;
-
     assert( !isContainer( val ) );
 
-    node = tr_new0( struct SaveNode, 1 );
     node->val = val;
-    return node;
 }
 
-static struct SaveNode*
-nodeNew( const tr_benc * val )
+static void
+nodeInit( struct SaveNode * node, const tr_benc * val )
 {
-    struct SaveNode * node;
+    static const struct SaveNode INIT_NODE = { NULL, 0, 0, 0, NULL };
+    *node = INIT_NODE;
 
-    if( tr_bencIsList( val ) )
-        node = nodeNewList( val );
-    else if( tr_bencIsDict( val ) )
-        node = nodeNewDict( val );
-    else
-        node = nodeNewLeaf( val );
-
-    return node;
+         if( tr_bencIsList( val ) ) nodeInitList( node, val );
+    else if( tr_bencIsDict( val ) ) nodeInitDict( node, val );
+    else                            nodeInitLeaf( node, val );
 }
 
 typedef void ( *BencWalkFunc )( const tr_benc * val, void * user_data );
@@ -1045,13 +1030,15 @@ bencWalk( const tr_benc          * top,
           const struct WalkFuncs * walkFuncs,
           void                   * user_data )
 {
-    tr_ptrArray stack = TR_PTR_ARRAY_INIT;
+    int stackSize = 0;
+    int stackAlloc = 64;
+    struct SaveNode * stack = tr_new( struct SaveNode, stackAlloc );
 
-    tr_ptrArrayAppend( &stack, nodeNew( top ) );
+    nodeInit( &stack[stackSize++], top );
 
-    while( !tr_ptrArrayEmpty( &stack ) )
+    while( stackSize > 0 )
     {
-        struct SaveNode * node = tr_ptrArrayBack( &stack );
+        struct SaveNode * node = &stack[stackSize-1];
         const tr_benc *   val;
 
         if( !node->valIsVisited )
@@ -1068,9 +1055,8 @@ bencWalk( const tr_benc          * top,
         {
             if( isContainer( node->val ) )
                 walkFuncs->containerEndFunc( node->val, user_data );
-            tr_ptrArrayPop( &stack );
+            --stackSize;
             tr_free( node->children );
-            tr_free( node );
             continue;
         }
 
@@ -1093,17 +1079,27 @@ bencWalk( const tr_benc          * top,
                     break;
 
                 case TR_TYPE_LIST:
-                    if( val != node->val )
-                        tr_ptrArrayAppend( &stack, nodeNew( val ) );
-                    else
+                    if( val == node->val )
                         walkFuncs->listBeginFunc( val, user_data );
+                    else {
+                        if( stackAlloc == stackSize ) {
+                            stackAlloc *= 2;
+                            stack = tr_renew( struct SaveNode, stack, stackAlloc );
+                        }
+                        nodeInit( &stack[stackSize++], val );
+                    }
                     break;
 
                 case TR_TYPE_DICT:
-                    if( val != node->val )
-                        tr_ptrArrayAppend( &stack, nodeNew( val ) );
-                    else
+                    if( val == node->val )
                         walkFuncs->dictBeginFunc( val, user_data );
+                    else {
+                        if( stackAlloc == stackSize ) {
+                            stackAlloc *= 2;
+                            stack = tr_renew( struct SaveNode, stack, stackAlloc );
+                        }
+                        nodeInit( &stack[stackSize++], val );
+                    }
                     break;
 
                 default:
@@ -1113,7 +1109,7 @@ bencWalk( const tr_benc          * top,
             }
     }
 
-    tr_ptrArrayDestruct( &stack, NULL );
+    tr_free( stack );
 }
 
 /****
@@ -1191,42 +1187,35 @@ static const struct WalkFuncs saveFuncs = { saveIntFunc,
 ***/
 
 static void
-freeDummyFunc( const tr_benc * val UNUSED,
-               void * buf          UNUSED  )
+freeDummyFunc( const tr_benc * val UNUSED, void * buf UNUSED  )
 {}
 
 static void
-freeStringFunc( const tr_benc * val,
-                void *          freeme )
+freeStringFunc( const tr_benc * val, void * unused UNUSED )
 {
     if( stringIsAlloced( val ) )
-        tr_ptrArrayAppend( freeme, val->val.s.str.ptr );
+        tr_free( val->val.s.str.ptr );
 }
 
 static void
-freeContainerBeginFunc( const tr_benc * val,
-                        void *          freeme )
+freeContainerEndFunc( const tr_benc * val, void * unused UNUSED )
 {
-    tr_ptrArrayAppend( freeme, val->val.l.vals );
+    tr_free( val->val.l.vals );
 }
 
 static const struct WalkFuncs freeWalkFuncs = { freeDummyFunc,
                                                 freeDummyFunc,
                                                 freeDummyFunc,
                                                 freeStringFunc,
-                                                freeContainerBeginFunc,
-                                                freeContainerBeginFunc,
-                                                freeDummyFunc };
+                                                freeDummyFunc,
+                                                freeDummyFunc,
+                                                freeContainerEndFunc };
 
 void
 tr_bencFree( tr_benc * val )
 {
     if( isSomething( val ) )
-    {
-        tr_ptrArray a = TR_PTR_ARRAY_INIT;
-        bencWalk( val, &freeWalkFuncs, &a );
-        tr_ptrArrayDestruct( &a, tr_free );
-    }
+        bencWalk( val, &freeWalkFuncs, NULL );
 }
 
 /***
