@@ -28,7 +28,6 @@ THE SOFTWARE.
 #include <signal.h> /* sig_atomic_t */
 #include <sys/time.h>
 #include <unistd.h> /* close() */
-#include <fcntl.h> /* fcntl(), O_NONBLOCK */
 #include <ctype.h> /* toupper() */
 #ifdef WIN32
   #include <w32api.h>
@@ -36,8 +35,6 @@ THE SOFTWARE.
   #include <inttypes.h>
   #include <ws2tcpip.h>
   typedef uint16_t in_port_t;			/* all missing */
-  extern int fcntl (int fd, int cmd, ...);
-  #define O_NONBLOCK	04000
 #else
   #include <sys/types.h>
   #include <sys/socket.h> /* socket(), bind() */
@@ -46,6 +43,7 @@ THE SOFTWARE.
 
 /* third party */
 #include <event.h>
+#include <evutil.h>
 
 /* libT */
 #include "transmission.h"
@@ -251,33 +249,6 @@ static int lpd_extractParam( const char* const str, const char* const name, int 
 /**
 * @} */
 
-
-/**
-* @brief Configures additional capabilities for a socket */
-static int
-lpd_configureSocket( int sock, int add )
-{
-#ifdef WIN32
-    unsigned long flags = 1;
-
-    if (add != O_NONBLOCK)
-        return -1;		/* not supported */
-    if (ioctlsocket(sock, FIONBIO, &flags) == SOCKET_ERROR)
-        return -1;
-#else
-    /* read-modify-write socket flags */
-    int flags = fcntl( sock, F_GETFL );
-
-    if( flags < 0 )
-        return -1;
-
-    if( fcntl( sock, F_SETFL, add | flags ) == -1 )
-        return -1;
-#endif
-
-    return add;
-}
-
 /**
 * @brief Initializes Local Peer Discovery for this node
 *
@@ -310,8 +281,7 @@ int tr_lpdInit( tr_session* ss, tr_address* tr_addr UNUSED )
         if( lpd_socket < 0 )
             goto fail;
 
-        /* enable non-blocking operation */
-        if( lpd_configureSocket( lpd_socket, O_NONBLOCK ) < 0 )
+        if( evutil_make_socket_nonblocking( lpd_socket ) < 0 )
             goto fail;
 
         if( setsockopt( lpd_socket, SOL_SOCKET, SO_REUSEADDR,
@@ -350,8 +320,7 @@ int tr_lpdInit( tr_session* ss, tr_address* tr_addr UNUSED )
         if( lpd_socket2 < 0 )
             goto fail;
 
-        /* enable non-blocking operation */
-        if( lpd_configureSocket( lpd_socket2, O_NONBLOCK ) < 0 )
+        if( evutil_make_socket_nonblocking( lpd_socket2 ) < 0 )
             goto fail;
 
         /* configure outbound multicast TTL */
