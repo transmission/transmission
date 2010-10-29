@@ -872,121 +872,6 @@ webPage( GObject * core )
 }
 
 /****
-*****  Proxy Tab
-****/
-
-struct ProxyPage
-{
-    GSList *  proxy_widgets;
-    GSList *  proxy_auth_widgets;
-};
-
-static void
-refreshProxySensitivity( struct ProxyPage * p )
-{
-    GSList *       l;
-    const gboolean proxy_enabled = pref_flag_get( TR_PREFS_KEY_PROXY_ENABLED );
-    const gboolean proxy_auth_enabled = pref_flag_get( TR_PREFS_KEY_PROXY_AUTH_ENABLED );
-
-    for( l = p->proxy_widgets; l != NULL; l = l->next )
-        gtk_widget_set_sensitive( GTK_WIDGET( l->data ), proxy_enabled );
-
-    for( l = p->proxy_auth_widgets; l != NULL; l = l->next )
-        gtk_widget_set_sensitive( GTK_WIDGET( l->data ),
-                                  proxy_enabled && proxy_auth_enabled );
-}
-
-static void
-onProxyToggled( GtkToggleButton * tb UNUSED,
-                gpointer             user_data )
-{
-    refreshProxySensitivity( user_data );
-}
-
-static void
-proxyPageFree( gpointer gpage )
-{
-    struct ProxyPage * page = gpage;
-
-    g_slist_free( page->proxy_widgets );
-    g_slist_free( page->proxy_auth_widgets );
-    g_free( page );
-}
-
-static GtkWidget*
-proxy_combo_box_new( GObject * core, const char * key )
-{
-    GtkWidget * w =  gtr_combo_box_new_enum( "HTTP",   TR_PROXY_HTTP,
-                                             "SOCKS4", TR_PROXY_SOCKS4,
-                                             "SOCKS5", TR_PROXY_SOCKS5,
-                                             NULL );
-    gtr_combo_box_set_active_enum( GTK_COMBO_BOX( w ), pref_int_get( key ) );
-    g_object_set_data_full( G_OBJECT( w ), PREF_KEY, tr_strdup( key ), g_free );
-    g_signal_connect( w, "changed", G_CALLBACK( onIntComboChanged ), core );
-    return w;
-}
-
-static GtkWidget*
-trackerPage( GObject * core )
-{
-    int                row = 0;
-    const char *       s;
-    GtkWidget *        t;
-    GtkWidget *        w;
-    struct ProxyPage * page = tr_new0( struct ProxyPage, 1 );
-
-    t = hig_workarea_create( );
-    hig_workarea_add_section_title ( t, &row, _( "Tracker" ) );
-
-    s = _( "Connect to tracker via a pro_xy" );
-    w = new_check_button( s, TR_PREFS_KEY_PROXY_ENABLED, core );
-    g_signal_connect( w, "toggled", G_CALLBACK( onProxyToggled ), page );
-    hig_workarea_add_wide_control( t, &row, w );
-
-    s = _( "Proxy _server:" );
-    w = new_entry( TR_PREFS_KEY_PROXY, core );
-    page->proxy_widgets = g_slist_append( page->proxy_widgets, w );
-    w = hig_workarea_add_row( t, &row, s, w, NULL );
-    page->proxy_widgets = g_slist_append( page->proxy_widgets, w );
-
-    w = new_spin_button( TR_PREFS_KEY_PROXY_PORT, core, 0, USHRT_MAX, 1 );
-    page->proxy_widgets = g_slist_append( page->proxy_widgets, w );
-    w = hig_workarea_add_row( t, &row, _( "Proxy _port:" ), w, NULL );
-    page->proxy_widgets = g_slist_append( page->proxy_widgets, w );
-
-    s = _( "Proxy _type:" );
-    w = proxy_combo_box_new( core, TR_PREFS_KEY_PROXY_TYPE );
-    page->proxy_widgets = g_slist_append( page->proxy_widgets, w );
-    w = hig_workarea_add_row( t, &row, s, w, NULL );
-    page->proxy_widgets = g_slist_append( page->proxy_widgets, w );
-
-    s = _( "Use _authentication" );
-    w = new_check_button( s, TR_PREFS_KEY_PROXY_AUTH_ENABLED, core );
-    g_signal_connect( w, "toggled", G_CALLBACK( onProxyToggled ), page );
-    hig_workarea_add_wide_control( t, &row, w );
-    page->proxy_widgets = g_slist_append( page->proxy_widgets, w );
-
-    s = _( "_Username:" );
-    w = new_entry( TR_PREFS_KEY_PROXY_USERNAME, core );
-    page->proxy_auth_widgets = g_slist_append( page->proxy_auth_widgets, w );
-    w = hig_workarea_add_row( t, &row, s, w, NULL );
-    page->proxy_auth_widgets = g_slist_append( page->proxy_auth_widgets, w );
-
-    s = _( "Pass_word:" );
-    w = new_entry( TR_PREFS_KEY_PROXY_PASSWORD, core );
-    gtk_entry_set_visibility( GTK_ENTRY( w ), FALSE );
-    page->proxy_auth_widgets = g_slist_append( page->proxy_auth_widgets, w );
-    w = hig_workarea_add_row( t, &row, s, w, NULL );
-    page->proxy_auth_widgets = g_slist_append( page->proxy_auth_widgets, w );
-
-    hig_workarea_finish( t, &row );
-    g_object_set_data_full( G_OBJECT( t ), "page", page, proxyPageFree );
-
-    refreshProxySensitivity( page );
-    return t;
-}
-
-/****
 *****  Bandwidth Tab
 ****/
 
@@ -1346,9 +1231,6 @@ tr_prefs_dialog_new( GObject *   core,
     gtk_notebook_append_page( GTK_NOTEBOOK( n ),
                               webPage( core ),
                               gtk_label_new ( _( "Web" ) ) );
-    gtk_notebook_append_page( GTK_NOTEBOOK( n ),
-                              trackerPage( core ),
-                              gtk_label_new ( _( "Proxy" ) ) );
 
     g_signal_connect( d, "response", G_CALLBACK( response_cb ), core );
     gtk_box_pack_start( GTK_BOX( GTK_DIALOG( d )->vbox ), n, TRUE, TRUE, 0 );
