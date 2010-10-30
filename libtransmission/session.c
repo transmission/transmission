@@ -249,7 +249,7 @@ tr_sessionGetDefaultSettings( const char * configDir UNUSED, tr_benc * d )
     tr_bencDictReserve( d, 60 );
     tr_bencDictAddBool( d, TR_PREFS_KEY_BLOCKLIST_ENABLED,        FALSE );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_MAX_CACHE_SIZE_MB,        DEFAULT_CACHE_SIZE_MB );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_DHT_ENABLED,              FALSE );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_DHT_ENABLED,              TRUE );
     tr_bencDictAddBool( d, TR_PREFS_KEY_LPD_ENABLED,              FALSE );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_DOWNLOAD_DIR,             tr_getDefaultDownloadDir( ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_DSPEED_KBps,              100 );
