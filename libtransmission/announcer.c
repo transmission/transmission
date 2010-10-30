@@ -795,14 +795,6 @@ createAnnounceURL( const tr_announcer     * announcer,
 ****
 ***/
 
-static tr_bool
-announceURLIsSupported( const char * announce )
-{
-    return ( announce != NULL )
-        && ( ( strstr( announce, "http://" ) == announce ) ||
-             ( strstr( announce, "https://" ) == announce ) );
-}
-
 static void
 addTorrentToTier( tr_announcer * announcer, tr_torrent_tiers * tiers, tr_torrent * tor )
 {
@@ -814,7 +806,7 @@ addTorrentToTier( tr_announcer * announcer, tr_torrent_tiers * tiers, tr_torrent
     /* get the trackers that we support... */
     infos = tr_new0( const tr_tracker_info*, trackerCount );
     for( i=n=0; i<trackerCount; ++i )
-        if( announceURLIsSupported( trackers[i].announce ) )
+        if( tr_urlIsValidTracker( trackers[i].announce ) )
             infos[n++] = &trackers[i];
 
     /* build our private table of tiers... */
