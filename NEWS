@@ -1,3 +1,25 @@
+=== Transmission 2.12 (2010/xx/yy) ===
+[http://trac.transmissionbt.com/query?milestone=2.12&group=component&groupdesc=1&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Fix 2.10 build issue on uClibc systems
+  * Several small CPU speed improvements: faster benc parsing, and fewer calls to RNG and gettimeofday()
+  * Use slightly less bandwidth in DHT messages
+==== Mac ====
+  * Sort the file list alphabetically
+  * Fix bug that used the wrong default file extension in the "Save Torrent File As" dialog
+  * Streamline the bottom-left buttons
+  * Fix quicklook command when the inspector window has focus
+==== GTK+ ====
+  * Fix 2.11 crash when opening the Properties dialog on a magnet link torrent
+  * Fix 2.00 regression which failed to inhibit hibernation on laptops
+==== Qt ====
+  * Fix 2.10 build issue on Ubuntu
+==== CLI ====
+  * Fix 2.10 crash
+==== Web Client ====
+  * Upgrade to jQuery 1.4.3
+  * Fix 2.11 regression when using the web client on IE7 or IE8
+
 === Transmission 2.11 (2010/10/16) ===
 [http://trac.transmissionbt.com/query?milestone=2.11&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== All Platforms ====
