@@ -110,18 +110,6 @@
 	<true/>
 	<key>PlaySeedingSound</key>
 	<false/>
-	<key>Proxy</key>
-	<false/>
-	<key>ProxyAddress</key>
-	<string></string>
-	<key>ProxyAuthorize</key>
-	<false/>
-	<key>ProxyPort</key>
-	<integer>80</integer>
-	<key>ProxyType</key>
-	<string>HTTP</string>
-	<key>ProxyUsername</key>
-	<string></string>
 	<key>Queue</key>
 	<false/>
 	<key>QueueDownloadNumber</key>

@@ -39,10 +39,6 @@
 #define DOWNLOAD_FOLDER     0
 #define DOWNLOAD_TORRENT    2
 
-#define PROXY_HTTP      0
-#define PROXY_SOCKS4    1
-#define PROXY_SOCKS5    2
-
 #define RPC_IP_ADD_TAG      0
 #define RPC_IP_REMOVE_TAG   1
 
@@ -53,9 +49,6 @@
 #define TOOLBAR_PEERS       @"TOOLBAR_PEERS"
 #define TOOLBAR_NETWORK     @"TOOLBAR_NETWORK"
 #define TOOLBAR_REMOTE      @"TOOLBAR_REMOTE"
-
-#define PROXY_KEYCHAIN_SERVICE  "Transmission:Proxy"
-#define PROXY_KEYCHAIN_NAME     "Proxy"
 
 #define RPC_KEYCHAIN_SERVICE    "Transmission:Remote"
 #define RPC_KEYCHAIN_NAME       "Remote"
@@ -117,10 +110,6 @@ tr_session * fHandle;
         
         //set encryption
         [self setEncryptionMode: nil];
-        
-        //set proxy type
-        [self updateProxyType];
-        [self updateProxyPassword];
         
         //update rpc whitelist
         [self updateRPCPassword];
@@ -209,31 +198,6 @@ tr_session * fHandle;
     [fQueueDownloadField setIntValue: [fDefaults integerForKey: @"QueueDownloadNumber"]];
     [fQueueSeedField setIntValue: [fDefaults integerForKey: @"QueueSeedNumber"]];
     [fStalledField setIntValue: [fDefaults integerForKey: @"StalledMinutes"]];
-    
-    //set proxy type
-    [fProxyAddressField setStringValue: [fDefaults stringForKey: @"ProxyAddress"]];
-    NSInteger proxyType;
-    switch (tr_sessionGetProxyType(fHandle))
-    {
-        case TR_PROXY_SOCKS4:
-            proxyType = PROXY_SOCKS4;
-            break;
-        case TR_PROXY_SOCKS5:
-            proxyType = PROXY_SOCKS5;
-            break;
-        case TR_PROXY_HTTP:
-            proxyType = PROXY_HTTP;
-            break;
-        default:
-            NSAssert(NO, @"Unknown proxy type received");
-    }
-    [fProxyTypePopUp selectItemAtIndex: proxyType];
-    
-    //set proxy password - does NOT need to be released
-    [fProxyPasswordField setStringValue: [NSString stringWithUTF8String: tr_sessionGetProxyPassword(fHandle)]];
-    
-    //set proxy port
-    [fProxyPortField setIntValue: [fDefaults integerForKey: @"ProxyPort"]];
     
     //set blocklist
     [self updateBlocklistFields];
@@ -827,107 +791,6 @@ tr_session * fHandle;
 - (void) setAutoSize: (id) sender
 {
     [[NSNotificationCenter defaultCenter] postNotificationName: @"AutoSizeSettingChange" object: self];
-}
-
-- (void) setProxyEnabled: (id) sender
-{
-    tr_sessionSetProxyEnabled(fHandle, [fDefaults boolForKey: @"Proxy"]);
-}
-
-- (void) setProxyAddress: (id) sender
-{
-    NSString * address = [sender stringValue];
-    tr_sessionSetProxy(fHandle, [address UTF8String]);
-    [fDefaults setObject: address forKey: @"ProxyAddress"];
-}
-
-- (void) setProxyPort: (id) sender
-{
-    int port = [sender intValue];
-    [fDefaults setInteger: port forKey: @"ProxyPort"];
-    tr_sessionSetProxyPort(fHandle, port);
-}
-
-- (void) setProxyType: (id) sender
-{
-    NSString * type;
-    switch ([sender indexOfSelectedItem])
-    {
-        case PROXY_HTTP:
-            type = @"HTTP";
-            break;
-        case PROXY_SOCKS4:
-            type = @"SOCKS4";
-            break;
-        case PROXY_SOCKS5:
-            type = @"SOCKS5";
-            break;
-        default:
-            NSAssert1(NO, @"Unknown index %d received for proxy type", [sender indexOfSelectedItem]);
-    }
-    
-    [fDefaults setObject: type forKey: @"ProxyType"];
-    [self updateProxyType];
-}
-
-- (void) updateProxyType
-{
-    NSString * typeString = [fDefaults stringForKey: @"ProxyType"];
-    tr_proxy_type type;
-    if ([typeString isEqualToString: @"SOCKS4"])
-        type = TR_PROXY_SOCKS4;
-    else if ([typeString isEqualToString: @"SOCKS5"])
-        type = TR_PROXY_SOCKS5;
-    else
-    {
-        //safety
-        if (![typeString isEqualToString: @"HTTP"])
-        {
-            typeString = @"HTTP";
-            [fDefaults setObject: typeString forKey: @"ProxyType"];
-        }
-        type = TR_PROXY_HTTP;
-    }
-    
-    tr_sessionSetProxyType(fHandle, type);
-}
-
-- (void) setProxyAuthorize: (id) sender
-{
-    BOOL enable = [fDefaults boolForKey: @"ProxyAuthorize"];
-    tr_sessionSetProxyAuthEnabled(fHandle, enable);
-}
-
-- (void) setProxyUsername: (id) sender
-{
-    tr_sessionSetProxyUsername(fHandle, [[fDefaults stringForKey: @"ProxyUsername"] UTF8String]);
-}
-
-- (void) setProxyPassword: (id) sender
-{
-    const char * password = [[sender stringValue] UTF8String];
-    [self setKeychainPassword: password forService: PROXY_KEYCHAIN_SERVICE username: PROXY_KEYCHAIN_NAME];
-    
-    tr_sessionSetProxyPassword(fHandle, password);
-}
-
-- (void) updateProxyPassword
-{
-    UInt32 passwordLength;
-    const char * password = nil;
-    SecKeychainFindGenericPassword(NULL, strlen(PROXY_KEYCHAIN_SERVICE), PROXY_KEYCHAIN_SERVICE,
-        strlen(PROXY_KEYCHAIN_NAME), PROXY_KEYCHAIN_NAME, &passwordLength, (void **)&password, NULL);
-    
-    if (password != NULL)
-    {
-        char fullPassword[passwordLength+1];
-        strncpy(fullPassword, password, passwordLength);
-        fullPassword[passwordLength] = '\0';
-        SecKeychainItemFreeContent(NULL, (void *)password);
-        
-        tr_sessionSetProxyPassword(fHandle, fullPassword);
-        [fProxyPasswordField setStringValue: [NSString stringWithUTF8String: fullPassword]];
-    }
 }
 
 - (void) setRPCEnabled: (id) sender

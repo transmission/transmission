@@ -54,9 +54,6 @@
     NSTimer * fPortStatusTimer;
     int fPeerPort, fNatStatus;
     
-    IBOutlet NSTextField * fProxyAddressField, * fProxyPortField, * fProxyPasswordField;
-    IBOutlet NSPopUpButton * fProxyTypePopUp;
-    
     IBOutlet NSTextField * fRPCPortField, * fRPCPasswordField;
     IBOutlet NSTableView * fRPCWhitelistTable;
     NSMutableArray * fRPCWhitelistArray;
@@ -138,16 +135,6 @@
 - (void) importFolderSheetShow: (id) sender;
 
 - (void) setAutoSize: (id) sender;
-
-- (void) setProxyEnabled: (id) sender;
-- (void) setProxyAddress: (id) sender;
-- (void) setProxyPort: (id) sender;
-- (void) setProxyType: (id) sender;
-- (void) updateProxyType;
-- (void) setProxyAuthorize: (id) sender;
-- (void) setProxyUsername: (id) sender;
-- (void) setProxyPassword: (id) sender;
-- (void) updateProxyPassword;
 
 - (void) setRPCEnabled: (id) sender;
 - (void) linkWebUI: (id) sender;
