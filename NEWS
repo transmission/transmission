@@ -6,9 +6,8 @@
   * Use slightly less bandwidth in DHT messages
 ==== Mac ====
   * Sort the file list alphabetically
-  * Fix bug that used the wrong default file extension in the "Save Torrent File As" dialog
-  * Streamline the bottom-left buttons
-  * Fix quicklook command when the inspector window has focus
+  * Ensure the proper extension is used when saving the torrent file
+  * Allow the Quick Look command when the inspector window has focus
 ==== GTK+ ====
   * Fix 2.11 crash when opening the Properties dialog on a magnet link torrent
   * Fix 2.00 regression which failed to inhibit hibernation on laptops
