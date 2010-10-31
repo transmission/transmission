@@ -80,6 +80,7 @@ class Prefs: public QObject
             ALT_SPEED_LIMIT_TIME_ENABLED,
             ALT_SPEED_LIMIT_TIME_DAY,
             BLOCKLIST_ENABLED,
+            BLOCKLIST_URL,
             DSPEED,
             DSPEED_ENABLED,
             DOWNLOAD_DIR,

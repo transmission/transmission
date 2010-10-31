@@ -150,6 +150,8 @@ struct tr_session
     char *                       torrentDir;
     char *                       incompleteDir;
 
+    char *                       blocklist_url;
+
     struct tr_list *             blocklists;
     struct tr_peerMgr *          peerMgr;
     struct tr_shared *           shared;

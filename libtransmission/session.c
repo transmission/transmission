@@ -248,6 +248,7 @@ tr_sessionGetDefaultSettings( const char * configDir UNUSED, tr_benc * d )
 
     tr_bencDictReserve( d, 60 );
     tr_bencDictAddBool( d, TR_PREFS_KEY_BLOCKLIST_ENABLED,        FALSE );
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_BLOCKLIST_URL,            "http://www.example.com/blocklist" );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_MAX_CACHE_SIZE_MB,        DEFAULT_CACHE_SIZE_MB );
     tr_bencDictAddBool( d, TR_PREFS_KEY_DHT_ENABLED,              TRUE );
     tr_bencDictAddBool( d, TR_PREFS_KEY_LPD_ENABLED,              FALSE );
@@ -309,6 +310,7 @@ tr_sessionGetSettings( tr_session * s, struct tr_benc * d )
 
     tr_bencDictReserve( d, 60 );
     tr_bencDictAddBool( d, TR_PREFS_KEY_BLOCKLIST_ENABLED,        tr_blocklistIsEnabled( s ) );
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_BLOCKLIST_URL,            tr_blocklistGetURL( s ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_MAX_CACHE_SIZE_MB,        tr_sessionGetCacheLimit_MB( s ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_DHT_ENABLED,              s->isDHTEnabled );
     tr_bencDictAddBool( d, TR_PREFS_KEY_LPD_ENABLED,              s->isLPDEnabled );
@@ -685,6 +687,8 @@ sessionSetImpl( void * vdata )
         session->peer_congestion_algorithm = tr_strdup(str);
     if( tr_bencDictFindBool( settings, TR_PREFS_KEY_BLOCKLIST_ENABLED, &boolVal ) )
         tr_blocklistSetEnabled( session, boolVal );
+    if( tr_bencDictFindStr( settings, TR_PREFS_KEY_BLOCKLIST_URL, &str ) )
+        tr_blocklistSetURL( session, str );
     if( tr_bencDictFindBool( settings, TR_PREFS_KEY_START, &boolVal ) )
         tr_sessionSetPaused( session, !boolVal );
     if( tr_bencDictFindBool( settings, TR_PREFS_KEY_TRASH_ORIGINAL, &boolVal) )
@@ -1755,6 +1759,7 @@ tr_sessionClose( tr_session * session )
     tr_free( session->torrentDir );
     tr_free( session->downloadDir );
     tr_free( session->incompleteDir );
+    tr_free( session->blocklist_url );
     tr_free( session->peer_congestion_algorithm );
     tr_free( session );
 }
@@ -2141,7 +2146,7 @@ tr_blocklistSetContent( tr_session * session,
     tr_list * l;
     int ruleCount;
     tr_blocklist * b;
-    const char * defaultName = "level1.bin";
+    const char * defaultName = "blocklist.bin";
     tr_sessionLock( session );
 
     for( b = NULL, l = session->blocklists; !b && l; l = l->next )
@@ -2175,6 +2180,23 @@ tr_sessionIsAddressBlocked( const tr_session * session,
             return TRUE;
     return FALSE;
 }
+
+void
+tr_blocklistSetURL( tr_session * session, const char * url )
+{
+    if( session->blocklist_url != url )
+    {
+        tr_free( session->blocklist_url );
+        session->blocklist_url = tr_strdup( url );
+    }
+}
+
+const char *
+tr_blocklistGetURL ( const tr_session * session )
+{
+    return session->blocklist_url;
+}
+
 
 /***
 ****

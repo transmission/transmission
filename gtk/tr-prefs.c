@@ -245,8 +245,7 @@ new_file_chooser_button( const char * key, gpointer core )
 }
 
 static void
-target_cb( GtkWidget * tb,
-           gpointer    target )
+target_cb( GtkWidget * tb, gpointer target )
 {
     const gboolean b = gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( tb ) );
 
@@ -383,6 +382,7 @@ struct blocklist_data
     gulong      updateBlocklistTag;
     GtkWidget * updateBlocklistButton;
     GtkWidget * updateBlocklistDialog;
+    GtkWidget * label;
     GtkWidget * check;
     TrCore    * core;
 };
@@ -390,12 +390,14 @@ struct blocklist_data
 static void
 updateBlocklistText( GtkWidget * w, TrCore * core )
 {
+    char buf1[512];
+    char buf2[512];
     const int n = tr_blocklistGetRuleCount( tr_core_session( core ) );
-    char      buf[512];
-    g_snprintf( buf, sizeof( buf ),
-                gtr_ngettext( "Enable _blocklist (contains %'d rule)",
-                              "Enable _blocklist (contains %'d rules)", n ), n );
-    gtk_button_set_label( GTK_BUTTON( w ), buf );
+    g_snprintf( buf1, sizeof( buf1 ),
+                gtr_ngettext( "Blocklist contains %'d rule",
+                              "Blocklist contains %'d rules", n ), n );
+    g_snprintf( buf2, sizeof( buf2 ), "<i>%s</i>", buf1 );
+    gtk_label_set_markup( GTK_LABEL( w ), buf2 );
 }
 
 /* prefs dialog is being destroyed, so stop listening to blocklist updates */
@@ -429,7 +431,7 @@ onBlocklistUpdated( TrCore * core, int n, gpointer gdata )
     gtk_widget_set_sensitive( data->updateBlocklistButton, TRUE );
     gtk_message_dialog_set_markup( d, _( "<b>Update succeeded!</b>" ) );
     gtk_message_dialog_format_secondary_text( d, s, n );
-    updateBlocklistText( data->check, core );
+    updateBlocklistText( data->label, core );
 }
 
 /* user pushed a button to update the blocklist */
@@ -476,12 +478,13 @@ new_encryption_combo( GObject * core, const char * key )
 static GtkWidget*
 privacyPage( GObject * core )
 {
-    int                     row = 0;
-    const char *            s;
-    GtkWidget *             t;
-    GtkWidget *             w;
-    GtkWidget *             b;
-    GtkWidget *             h;
+    int row = 0;
+    const char * s;
+    GtkWidget * t;
+    GtkWidget * w;
+    GtkWidget * b;
+    GtkWidget * h;
+    GtkWidget * e;
     struct blocklist_data * data;
 
     data = g_new0( struct blocklist_data, 1 );
@@ -490,25 +493,32 @@ privacyPage( GObject * core )
     t = hig_workarea_create( );
     hig_workarea_add_section_title( t, &row, _( "Blocklist" ) );
 
-    w = new_check_button( "", TR_PREFS_KEY_BLOCKLIST_ENABLED, core );
+    b = new_check_button( _( "Enable _blocklist:" ), TR_PREFS_KEY_BLOCKLIST_ENABLED, core );
+    e = new_entry( TR_PREFS_KEY_BLOCKLIST_URL, core );
+    gtk_widget_set_size_request( e, 300, -1 );
+    hig_workarea_add_row_w( t, &row, b, e, NULL );
+    data->check = b;
+    g_signal_connect( b, "toggled", G_CALLBACK( target_cb ), e );
+    target_cb( b, e );
+
+    w = gtk_label_new( "" );
+    gtk_misc_set_alignment( GTK_MISC( w ), 0.0f, 0.5f );
     updateBlocklistText( w, TR_CORE( core ) );
+    data->label = w;
     h = gtk_hbox_new( FALSE, GUI_PAD_BIG );
     gtk_box_pack_start( GTK_BOX( h ), w, TRUE, TRUE, 0 );
     b = data->updateBlocklistButton = gtk_button_new_with_mnemonic( _( "_Update" ) );
-    data->check = w;
-    g_object_set_data( G_OBJECT( b ), "session",
-                      tr_core_session( TR_CORE( core ) ) );
+    g_object_set_data( G_OBJECT( b ), "session", tr_core_session( TR_CORE( core ) ) );
     g_signal_connect( b, "clicked", G_CALLBACK( onBlocklistUpdate ), data );
+    g_signal_connect( data->check, "toggled", G_CALLBACK( target_cb ), b ); target_cb( data->check, b );
     gtk_box_pack_start( GTK_BOX( h ), b, FALSE, FALSE, 0 );
-    g_signal_connect( w, "toggled", G_CALLBACK( target_cb ), b );
-    target_cb( w, b );
+    g_signal_connect( data->check, "toggled", G_CALLBACK( target_cb ), w ); target_cb( data->check, w );
     hig_workarea_add_wide_control( t, &row, h );
 
     s = _( "Enable _automatic updates" );
     w = new_check_button( s, PREF_KEY_BLOCKLIST_UPDATES_ENABLED, core );
     hig_workarea_add_wide_control( t, &row, w );
-    g_signal_connect( data->check, "toggled", G_CALLBACK( target_cb ), w );
-    target_cb( data->check, w );
+    g_signal_connect( data->check, "toggled", G_CALLBACK( target_cb ), w ); target_cb( data->check, w );
 
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title ( t, &row, _( "Privacy" ) );

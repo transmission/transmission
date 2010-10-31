@@ -231,7 +231,7 @@ _tr_blocklistHasAddress( tr_blocklist     * b,
 }
 
 /*
- * level1 format: "comment:x.x.x.x-y.y.y.y"
+ * bluetack format: "comment:x.x.x.x-y.y.y.y"
  */
 static tr_bool
 parseLine1( const char * line, struct tr_ip_range * range )

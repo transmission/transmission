@@ -157,6 +157,7 @@ const char* tr_getDefaultDownloadDir( void );
 #define TR_PREFS_KEY_BIND_ADDRESS_IPV4             "bind-address-ipv4"
 #define TR_PREFS_KEY_BIND_ADDRESS_IPV6             "bind-address-ipv6"
 #define TR_PREFS_KEY_BLOCKLIST_ENABLED             "blocklist-enabled"
+#define TR_PREFS_KEY_BLOCKLIST_URL                 "blocklist-url"
 #define TR_PREFS_KEY_MAX_CACHE_SIZE_MB             "cache-size-mb"
 #define TR_PREFS_KEY_DHT_ENABLED                   "dht-enabled"
 #define TR_PREFS_KEY_LPD_ENABLED                   "lpd-enabled"
@@ -778,14 +779,13 @@ void          tr_freeMessageList( tr_msg_list * freeme );
 /**
  * Specify a range of IPs for Transmission to block.
  *
- * filename must be an uncompressed ascii file,
- * using the same format as the bluetack level1 file.
+ * Filename must be an uncompressed ascii file.
  *
  * libtransmission does not keep a handle to `filename'
  * after this call returns, so the caller is free to
  * keep or delete `filename' as it wishes.
  * libtransmission makes its own copy of the file
- * massaged into a format easier to search.
+ * massaged into a binary format easier to search.
  *
  * The caller only needs to invoke this when the blocklist
  * has changed.
@@ -803,6 +803,12 @@ tr_bool tr_blocklistIsEnabled    ( const tr_session * session );
 
 void    tr_blocklistSetEnabled   ( tr_session       * session,
                                    tr_bool            isEnabled );
+
+/** @brief The blocklist that ges updated when an RPC client
+           invokes the "blocklist-update" method */
+void tr_blocklistSetURL         ( tr_session *, const char * url );
+
+const char * tr_blocklistGetURL ( const tr_session * );
 
 
 /** @} */

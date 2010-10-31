@@ -17,11 +17,16 @@
 #include <string.h> /* strcmp */
 #include <unistd.h> /* unlink */
 
+#ifdef HAVE_ZLIB
+ #include <zlib.h>
+#endif
+
 #include <event.h> /* evbuffer */
 
 #include "transmission.h"
 #include "bencode.h"
 #include "completion.h"
+#include "fdlimit.h"
 #include "json.h"
 #include "rpcimpl.h"
 #include "session.h"
@@ -1112,42 +1117,74 @@ gotNewBlocklist( tr_session       * session,
     }
     else /* successfully fetched the blocklist... */
     {
+        int fd;
         const char * configDir = tr_sessionGetConfigDir( session );
         char * filename = tr_buildPath( configDir, "blocklist.tmp", NULL );
-        FILE * fp = fopen( filename, "wb+" );
 
-        if( fp == NULL )
-        {
-            tr_snprintf( result, sizeof( result ),
-                         _( "Couldn't save file \"%1$s\": %2$s" ),
-                         filename, tr_strerror( errno ) );
+        errno = 0;
+
+        if( !errno ) {
+            fd = tr_open_file_for_writing( filename );
+            if( fd < 0 )
+                tr_snprintf( result, sizeof( result ), _( "Couldn't save file \"%1$s\": %2$s" ), filename, tr_strerror( errno ) );
         }
-        else
+
+        if( !errno ) {
+            const char * buf = response;
+            size_t buflen = response_byte_count;
+            while( buflen > 0 ) {
+                int n = write( fd, buf, buflen );
+                if( n < 0 ) {
+                    tr_snprintf( result, sizeof( result ), _( "Couldn't save file \"%1$s\": %2$s" ), filename, tr_strerror( errno ) );
+                    break;
+                }
+                buf += n;
+                buflen -= n;
+            }
+            tr_close_file( fd );
+        }
+
+#ifdef HAVE_ZLIB
+        if( !errno )
         {
-            const size_t n = fwrite( response, 1, response_byte_count, fp );
-            fclose( fp );
-
-            if( n != response_byte_count )
-            {
-                tr_snprintf( result, sizeof( result ),
-                             _( "Couldn't save file \"%1$s\": %2$s" ),
-                             filename, tr_strerror( errno ) );
+            char * filename2 = tr_buildPath( configDir, "blocklist.txt.tmp", NULL );
+            fd = tr_open_file_for_writing( filename2 );
+            if( fd < 0 )
+                tr_snprintf( result, sizeof( result ), _( "Couldn't save file \"%1$s\": %2$s" ), filename2, tr_strerror( errno ) );
+            else {
+                gzFile gzf = gzopen( filename, "r" );
+                if( gzf ) {
+                    const size_t buflen = 1024 * 128; /* 128 KiB buffer */
+                    uint8_t * buf = tr_valloc( buflen );
+                    for( ;; ) {
+                        int n = gzread( gzf, buf, buflen );
+                        if( n < 0 ) /* error */
+                            tr_snprintf( result, sizeof( result ), _( "Error reading \"%1$s\": %2$s" ), filename, gzerror( gzf, NULL ) );
+                        if( n < 1 ) /* error or EOF */
+                            break;
+                        if( write( fd, buf, n ) < 0 )
+                            tr_snprintf( result, sizeof( result ), _( "Couldn't save file \"%1$s\": %2$s" ), filename2, tr_strerror( errno ) );
+                    }
+                    tr_free( buf );
+                    gzclose( gzf );
+                }
+                tr_close_file( fd );
             }
-            else
-            {
-                /* feed it to the session */
-                const int ruleCount = tr_blocklistSetContent( session, filename );
 
-                /* give the client a response */
-                tr_bencDictAddInt( data->args_out, "blocklist-size", ruleCount );
-                tr_snprintf( result, sizeof( result ), "success" );
-            }
-
-            /* cleanup */
             unlink( filename );
+            tr_free( filename );
+            filename = filename2;
+        }
+#endif
+
+        if( !errno ) {
+            /* feed it to the session and give the client a response */
+            const int rule_count = tr_blocklistSetContent( session, filename );
+            tr_bencDictAddInt( data->args_out, "blocklist-size", rule_count );
+            tr_snprintf( result, sizeof( result ), "success" );
         }
 
-        /* cleanup */
+        unlink( filename );
         tr_free( filename );
     }
 
@@ -1160,8 +1197,7 @@ blocklistUpdate( tr_session               * session,
                  tr_benc                  * args_out UNUSED,
                  struct tr_rpc_idle_data  * idle_data )
 {
-    const char * url = "http://update.transmissionbt.com/level1";
-    tr_webRun( session, url, NULL, gotNewBlocklist, idle_data );
+    tr_webRun( session, session->blocklist_url, NULL, gotNewBlocklist, idle_data );
     return NULL;
 }
 
@@ -1408,6 +1444,8 @@ sessionSet( tr_session               * session,
         tr_sessionUseAltSpeedTime( session, boolVal );
     if( tr_bencDictFindBool( args_in, TR_PREFS_KEY_BLOCKLIST_ENABLED, &boolVal ) )
         tr_blocklistSetEnabled( session, boolVal );
+    if( tr_bencDictFindStr( args_in, TR_PREFS_KEY_BLOCKLIST_URL, &str ) )
+        tr_blocklistSetURL( session, str );
     if( tr_bencDictFindStr( args_in, TR_PREFS_KEY_DOWNLOAD_DIR, &str ) )
         tr_sessionSetDownloadDir( session, str );
     if( tr_bencDictFindStr( args_in, TR_PREFS_KEY_INCOMPLETE_DIR, &str ) )
@@ -1535,6 +1573,7 @@ sessionGet( tr_session               * s,
     tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_TIME_DAY,tr_sessionGetAltSpeedDay(s) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED, tr_sessionUsesAltSpeedTime(s) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_BLOCKLIST_ENABLED, tr_blocklistIsEnabled( s ) );
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_BLOCKLIST_URL, tr_blocklistGetURL( s ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_MAX_CACHE_SIZE_MB, tr_sessionGetCacheLimit_MB( s ) );
     tr_bencDictAddInt ( d, "blocklist-size", tr_blocklistGetRuleCount( s ) );
     tr_bencDictAddStr ( d, "config-dir", tr_sessionGetConfigDir( s ) );

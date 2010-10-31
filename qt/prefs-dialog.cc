@@ -458,20 +458,33 @@ PrefsDialog :: encryptionEdited( int i )
 QWidget *
 PrefsDialog :: createPrivacyTab( )
 {
+    QWidget * w;
     HIG * hig = new HIG( this );
+
     hig->addSectionTitle( tr( "Blocklist" ) );
-    QHBoxLayout * h = new QHBoxLayout( );
-    QWidget * w = new QPushButton( tr( "&Update" ) );
+
+    QWidget * l = checkBoxNew( "Enable &blocklist:", Prefs::BLOCKLIST_ENABLED );
+    QWidget * e = lineEditNew( Prefs::BLOCKLIST_URL );
+    myBlockWidgets << e;
+    hig->addRow( l, e );
+
+    l = myBlocklistLabel = new QLabel( "" );
+    myBlockWidgets << l;
+    w = new QPushButton( tr( "&Update" ) );
     connect( w, SIGNAL(clicked(bool)), this, SLOT(onUpdateBlocklistClicked()));
     myBlockWidgets << w;
-    QWidget * l = checkBoxNew( "", Prefs::BLOCKLIST_ENABLED );
+    QHBoxLayout * h = new QHBoxLayout( );
     h->addWidget( l );
     h->addStretch( 1 );
     h->addWidget( w );
     hig->addWideControl( h );
+
     l = checkBoxNew( tr( "Enable &automatic updates" ), Prefs::BLOCKLIST_UPDATES_ENABLED );
     myBlockWidgets << l;
     hig->addWideControl( l );
+
+    hig->addSectionDivider( );
+    hig->addSectionTitle( tr( "Privacy" ) );
 
     QComboBox * box = new QComboBox( );
     box->addItem( tr( "Allow encryption" ), 0 );
@@ -480,8 +493,6 @@ PrefsDialog :: createPrivacyTab( )
     myWidgets.insert( Prefs :: ENCRYPTION, box );
     connect( box, SIGNAL(activated(int)), this, SLOT(encryptionEdited(int)));
 
-    hig->addSectionDivider( );
-    hig->addSectionTitle( tr( "Privacy" ) );
     hig->addRow( tr( "&Encryption mode:" ), box );
     hig->addWideControl( w = checkBoxNew( tr( "Use PE&X to find more peers" ), Prefs::PEX_ENABLED ) );
     w->setToolTip( tr( "PEX is a tool for exchanging peer lists with the peers you're connected to." ) );
@@ -491,7 +502,7 @@ PrefsDialog :: createPrivacyTab( )
     w->setToolTip( tr( "LPD is a tool for finding peers on your local network." ) );
 
     hig->finish( );
-    updateBlocklistCheckBox( );
+    updateBlocklistLabel( );
     return hig;
 }
 
@@ -691,18 +702,14 @@ PrefsDialog :: setPref( int key, const QVariant& v )
 void
 PrefsDialog :: sessionUpdated( )
 {
-    updateBlocklistCheckBox( );
+    updateBlocklistLabel( );
 }
 
 void
-PrefsDialog :: updateBlocklistCheckBox( )
+PrefsDialog :: updateBlocklistLabel( )
 {
-    QCheckBox * box = qobject_cast<QCheckBox*>( myWidgets[Prefs::BLOCKLIST_ENABLED] );
     const int n = mySession.blocklistSize( );
-    if( n < 0 ) // unknown
-        box->setText( tr( "Enable &blocklist" ) );
-    else
-        box->setText( tr( "Enable &blocklist (%Ln rules)", 0, n ) );
+    myBlocklistLabel->setText( tr( "<i>Blocklist contains %Ln rules)", 0, n ) );
 }
 
 void

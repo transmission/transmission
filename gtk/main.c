@@ -1196,6 +1196,10 @@ prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
     {
         tr_blocklistSetEnabled( tr, pref_flag_get( key ) );
     }
+    else if( !strcmp( key, TR_PREFS_KEY_BLOCKLIST_URL ) )
+    {
+        tr_blocklistSetURL( tr, pref_string_get( key ) );
+    }
     else if( !strcmp( key, PREF_KEY_SHOW_TRAY_ICON ) )
     {
         const int show = pref_flag_get( key );
