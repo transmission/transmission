@@ -90,14 +90,6 @@ tr_preallocation_mode;
 
 typedef enum
 {
-    TR_PROXY_HTTP,
-    TR_PROXY_SOCKS4,
-    TR_PROXY_SOCKS5
-}
-tr_proxy_type;
-
-typedef enum
-{
     TR_CLEAR_PREFERRED,
     TR_ENCRYPTION_PREFERRED,
     TR_ENCRYPTION_REQUIRED
@@ -187,14 +179,7 @@ const char* tr_getDefaultDownloadDir( void );
 #define TR_PREFS_KEY_PEER_CONGESTION_ALGORITHM     "peer-congestion-algorithm"
 #define TR_PREFS_KEY_PEX_ENABLED                   "pex-enabled"
 #define TR_PREFS_KEY_PORT_FORWARDING               "port-forwarding-enabled"
-#define TR_PREFS_KEY_PROXY_AUTH_ENABLED            "proxy-auth-enabled"
 #define TR_PREFS_KEY_PREALLOCATION                 "preallocation"
-#define TR_PREFS_KEY_PROXY_ENABLED                 "proxy-enabled"
-#define TR_PREFS_KEY_PROXY_PASSWORD                "proxy-auth-password"
-#define TR_PREFS_KEY_PROXY_PORT                    "proxy-port"
-#define TR_PREFS_KEY_PROXY                         "proxy"
-#define TR_PREFS_KEY_PROXY_TYPE                    "proxy-type"
-#define TR_PREFS_KEY_PROXY_USERNAME                "proxy-auth-username"
 #define TR_PREFS_KEY_RATIO                         "ratio-limit"
 #define TR_PREFS_KEY_RATIO_ENABLED                 "ratio-limit-enabled"
 #define TR_PREFS_KEY_RENAME_PARTIAL_FILES          "rename-partial-files"
@@ -521,45 +506,6 @@ typedef tr_rpc_callback_status (*tr_rpc_func)(tr_session          * session,
 void tr_sessionSetRPCCallback( tr_session   * session,
                                tr_rpc_func    func,
                                void         * user_data );
-
-/**
-***
-**/
-
-tr_bool       tr_sessionIsProxyEnabled( const tr_session * );
-
-tr_bool       tr_sessionIsProxyAuthEnabled( const tr_session * );
-
-const char*   tr_sessionGetProxy( const tr_session * );
-
-tr_port       tr_sessionGetProxyPort( const tr_session * );
-
-tr_proxy_type tr_sessionGetProxyType( const tr_session * );
-
-const char*   tr_sessionGetProxyUsername( const tr_session * );
-
-const char*   tr_sessionGetProxyPassword( const tr_session * );
-
-void          tr_sessionSetProxyEnabled( tr_session * session,
-                                         tr_bool      isEnabled );
-
-void          tr_sessionSetProxyAuthEnabled( tr_session * session,
-                                             tr_bool      isEnabled );
-
-void          tr_sessionSetProxy( tr_session * session,
-                                  const char * proxy );
-
-void          tr_sessionSetProxyPort( tr_session * session,
-                                      tr_port      port );
-
-void          tr_sessionSetProxyType( tr_session    * session,
-                                      tr_proxy_type   proxy_type );
-
-void          tr_sessionSetProxyUsername( tr_session * session,
-                                          const char * username );
-
-void          tr_sessionSetProxyPassword( tr_session * session,
-                                          const char * password );
 
 /**
 ***

@@ -272,13 +272,6 @@ tr_sessionGetDefaultSettings( const char * configDir UNUSED, tr_benc * d )
     tr_bencDictAddBool( d, TR_PREFS_KEY_PEX_ENABLED,              TRUE );
     tr_bencDictAddBool( d, TR_PREFS_KEY_PORT_FORWARDING,          TRUE );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_PREALLOCATION,            TR_PREALLOCATE_SPARSE );
-    tr_bencDictAddStr ( d, TR_PREFS_KEY_PROXY,                    "" );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_PROXY_AUTH_ENABLED,       FALSE );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_PROXY_ENABLED,            FALSE );
-    tr_bencDictAddStr ( d, TR_PREFS_KEY_PROXY_PASSWORD,           "" );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_PROXY_PORT,               80 );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_PROXY_TYPE,               TR_PROXY_HTTP );
-    tr_bencDictAddStr ( d, TR_PREFS_KEY_PROXY_USERNAME,           "" );
     tr_bencDictAddReal( d, TR_PREFS_KEY_RATIO,                    2.0 );
     tr_bencDictAddBool( d, TR_PREFS_KEY_RATIO_ENABLED,            FALSE );
     tr_bencDictAddBool( d, TR_PREFS_KEY_RENAME_PARTIAL_FILES,     TRUE );
@@ -342,13 +335,6 @@ tr_sessionGetSettings( tr_session * s, struct tr_benc * d )
     tr_bencDictAddBool( d, TR_PREFS_KEY_PEX_ENABLED,              s->isPexEnabled );
     tr_bencDictAddBool( d, TR_PREFS_KEY_PORT_FORWARDING,          tr_sessionIsPortForwardingEnabled( s ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_PREALLOCATION,            s->preallocationMode );
-    tr_bencDictAddStr ( d, TR_PREFS_KEY_PROXY,                    s->proxy );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_PROXY_AUTH_ENABLED,       s->isProxyAuthEnabled );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_PROXY_ENABLED,            s->isProxyEnabled );
-    tr_bencDictAddStr ( d, TR_PREFS_KEY_PROXY_PASSWORD,           s->proxyPassword );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_PROXY_PORT,               s->proxyPort );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_PROXY_TYPE,               s->proxyType );
-    tr_bencDictAddStr ( d, TR_PREFS_KEY_PROXY_USERNAME,           s->proxyUsername );
     tr_bencDictAddReal( d, TR_PREFS_KEY_RATIO,                    s->desiredRatio );
     tr_bencDictAddBool( d, TR_PREFS_KEY_RATIO_ENABLED,            s->isRatioLimited );
     tr_bencDictAddBool( d, TR_PREFS_KEY_RENAME_PARTIAL_FILES,     tr_sessionIsIncompleteFileNamingEnabled( s ) );
@@ -715,22 +701,6 @@ sessionSetImpl( void * vdata )
         tr_sessionSetIncompleteDirEnabled( session, boolVal );
     if( tr_bencDictFindBool( settings, TR_PREFS_KEY_RENAME_PARTIAL_FILES, &boolVal ) )
         tr_sessionSetIncompleteFileNamingEnabled( session, boolVal );
-
-    /* proxies */
-    if( tr_bencDictFindBool( settings, TR_PREFS_KEY_PROXY_ENABLED, &boolVal ) )
-        tr_sessionSetProxyEnabled( session, boolVal );
-    if( tr_bencDictFindStr( settings, TR_PREFS_KEY_PROXY, &str ) )
-        tr_sessionSetProxy( session, str );
-    if( tr_bencDictFindInt( settings, TR_PREFS_KEY_PROXY_PORT, &i ) )
-        tr_sessionSetProxyPort( session, i );
-    if( tr_bencDictFindInt( settings, TR_PREFS_KEY_PROXY_TYPE, &i ) )
-        tr_sessionSetProxyType( session, i );
-    if( tr_bencDictFindBool( settings, TR_PREFS_KEY_PROXY_AUTH_ENABLED, &boolVal ) )
-        tr_sessionSetProxyAuthEnabled( session, boolVal );
-    if( tr_bencDictFindStr( settings, TR_PREFS_KEY_PROXY_USERNAME, &str ) )
-        tr_sessionSetProxyUsername( session, str );
-    if( tr_bencDictFindStr( settings, TR_PREFS_KEY_PROXY_PASSWORD, &str ) )
-        tr_sessionSetProxyPassword( session, str );
 
     /* rpc server */
     if( session->rpcServer != NULL ) /* close the old one */
@@ -1785,9 +1755,6 @@ tr_sessionClose( tr_session * session )
     tr_free( session->torrentDir );
     tr_free( session->downloadDir );
     tr_free( session->incompleteDir );
-    tr_free( session->proxy );
-    tr_free( session->proxyUsername );
-    tr_free( session->proxyPassword );
     tr_free( session->peer_congestion_algorithm );
     tr_free( session );
 }
@@ -2439,143 +2406,6 @@ tr_sessionGetRPCBindAddress( const tr_session * session )
     assert( tr_isSession( session ) );
 
     return tr_rpcGetBindAddress( session->rpcServer );
-}
-
-/***
-****
-***/
-
-tr_bool
-tr_sessionIsProxyEnabled( const tr_session * session )
-{
-    assert( tr_isSession( session ) );
-
-    return session->isProxyEnabled;
-}
-
-void
-tr_sessionSetProxyEnabled( tr_session * session,
-                           tr_bool      isEnabled )
-{
-    assert( tr_isSession( session ) );
-    assert( tr_isBool( isEnabled ) );
-
-    session->isProxyEnabled = isEnabled != 0;
-}
-
-tr_proxy_type
-tr_sessionGetProxyType( const tr_session * session )
-{
-    assert( tr_isSession( session ) );
-
-    return session->proxyType;
-}
-
-void
-tr_sessionSetProxyType( tr_session *  session,
-                        tr_proxy_type type )
-{
-    assert( tr_isSession( session ) );
-
-    session->proxyType = type;
-}
-
-const char*
-tr_sessionGetProxy( const tr_session * session )
-{
-    assert( tr_isSession( session ) );
-
-    return session->proxy;
-}
-
-tr_port
-tr_sessionGetProxyPort( const tr_session * session )
-{
-    assert( tr_isSession( session ) );
-
-    return session->proxyPort;
-}
-
-void
-tr_sessionSetProxy( tr_session * session,
-                    const char * proxy )
-{
-    assert( tr_isSession( session ) );
-
-    if( proxy != session->proxy )
-    {
-        tr_free( session->proxy );
-        session->proxy = tr_strdup( proxy );
-    }
-}
-
-void
-tr_sessionSetProxyPort( tr_session * session,
-                        tr_port      port )
-{
-    assert( tr_isSession( session ) );
-
-    session->proxyPort = port;
-}
-
-tr_bool
-tr_sessionIsProxyAuthEnabled( const tr_session * session )
-{
-    assert( tr_isSession( session ) );
-
-    return session->isProxyAuthEnabled;
-}
-
-void
-tr_sessionSetProxyAuthEnabled( tr_session * session,
-                               tr_bool      isEnabled )
-{
-    assert( tr_isSession( session ) );
-    assert( tr_isBool( isEnabled ) );
-
-    session->isProxyAuthEnabled = isEnabled != 0;
-}
-
-const char*
-tr_sessionGetProxyUsername( const tr_session * session )
-{
-    assert( tr_isSession( session ) );
-
-    return session->proxyUsername;
-}
-
-void
-tr_sessionSetProxyUsername( tr_session * session,
-                            const char * username )
-{
-    assert( tr_isSession( session ) );
-
-    if( username != session->proxyUsername )
-    {
-        tr_free( session->proxyUsername );
-        session->proxyUsername = tr_strdup( username );
-    }
-}
-
-const char*
-tr_sessionGetProxyPassword( const tr_session * session )
-{
-    assert( tr_isSession( session ) );
-
-    return session->proxyPassword;
-}
-
-void
-tr_sessionSetProxyPassword( tr_session * session,
-                            const char * password )
-{
-    assert( tr_isSession( session ) );
-
-    if( password != session->proxyPassword )
-    {
-        tr_free( session->proxyPassword );
-        session->proxyPassword = tr_strdup( password );
-    }
 }
 
 /****

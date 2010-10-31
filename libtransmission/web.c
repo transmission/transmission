@@ -124,14 +124,6 @@ sockoptfunction( void * vtask, curl_socket_t fd, curlsocktype purpose UNUSED )
 }
 #endif
 
-static int
-getCurlProxyType( tr_proxy_type t )
-{
-    if( t == TR_PROXY_SOCKS4 ) return CURLPROXY_SOCKS4;
-    if( t == TR_PROXY_SOCKS5 ) return CURLPROXY_SOCKS5;
-    return CURLPROXY_HTTP;
-}
-
 static long
 getTimeoutFromURL( const struct tr_web_task * task )
 {
@@ -153,21 +145,6 @@ createEasy( tr_session * s, struct tr_web_task * task )
     CURL * e = curl_easy_init( );
     const long verbose = getenv( "TR_CURL_VERBOSE" ) != NULL;
     char * cookie_filename = tr_buildPath( s->configDir, "cookies.txt", NULL );          
-
-    if( !task->range && s->isProxyEnabled ) {
-        const long proxyType = getCurlProxyType( s->proxyType );
-        curl_easy_setopt( e, CURLOPT_PROXY, s->proxy );
-        curl_easy_setopt( e, CURLOPT_PROXYAUTH, CURLAUTH_ANY );
-        curl_easy_setopt( e, CURLOPT_PROXYPORT, s->proxyPort );
-        curl_easy_setopt( e, CURLOPT_PROXYTYPE, proxyType );
-    }
-
-    if( !task->range && s->isProxyAuthEnabled ) {
-        char * str = tr_strdup_printf( "%s:%s", s->proxyUsername,
-                                                s->proxyPassword );
-        curl_easy_setopt( e, CURLOPT_PROXYUSERPWD, str );
-        tr_free( str );
-    }
 
     curl_easy_setopt( e, CURLOPT_AUTOREFERER, 1L );
     curl_easy_setopt( e, CURLOPT_COOKIEFILE, cookie_filename ); 
