@@ -16,7 +16,7 @@
 	<true/>
 	<key>BindPort</key>
 	<integer>51413</integer>
-	<key>Blocklist</key>
+	<key>BlocklistNew</key>
 	<false/>
 	<key>BlocklistAutoUpdate</key>
 	<false/>

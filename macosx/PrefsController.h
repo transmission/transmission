@@ -43,8 +43,8 @@
                         * fSpeedLimitUploadField, * fSpeedLimitDownloadField;
     IBOutlet NSPopUpButton * fAutoSpeedDayTypePopUp;
     
-    IBOutlet NSTextField * fPeersGlobalField, * fPeersTorrentField, * fBlocklistMessageField, * fBlocklistDateField;
-    IBOutlet NSButton * fBlocklistEnableCheck;
+    IBOutlet NSTextField * fPeersGlobalField, * fPeersTorrentField,
+                        * fBlocklistURLField, * fBlocklistMessageField, * fBlocklistDateField;
     
     PortChecker * fPortChecker;
     IBOutlet NSTextField * fPortField, * fPortStatusField;
@@ -86,6 +86,7 @@
 - (void) setEncryptionMode: (id) sender;
 
 - (void) setBlocklistEnabled: (id) sender;
+- (void) setBlocklistURL: (id) sender;
 - (void) updateBlocklist: (id) sender;
 - (void) setBlocklistAutoUpdate: (id) sender;
 - (void) updateBlocklistFields;

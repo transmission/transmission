@@ -462,11 +462,14 @@ tr_session * fHandle;
 
 - (void) setBlocklistEnabled: (id) sender
 {
-    const BOOL enable = [sender state] == NSOnState;
-    [fDefaults setBool: enable forKey: @"Blocklist"];
-    tr_blocklistSetEnabled(fHandle, enable);
+    tr_blocklistSetEnabled(fHandle, [fDefaults boolForKey: @"BlocklistNew"]);
     
     [[BlocklistScheduler scheduler] updateSchedule];
+}
+
+- (void) setBlocklistURL: (id) sender
+{
+    tr_blocklistSetURL(fHandle, [[fDefaults stringForKey: @"BlocklistURL"] UTF8String]);
 }
 
 - (void) updateBlocklist: (id) sender
@@ -497,9 +500,6 @@ tr_session * fHandle;
     else 
         [fBlocklistMessageField setStringValue: NSLocalizedString(@"A blocklist must first be downloaded",
             "Prefs -> blocklist -> message")];
-    
-    [fBlocklistEnableCheck setEnabled: exists];
-    [fBlocklistEnableCheck setState: exists && [fDefaults boolForKey: @"Blocklist"]];
     
     NSString * updatedDateString;
     if (exists)
@@ -1095,7 +1095,7 @@ tr_session * fHandle;
     
     //blocklist
     const BOOL blocklist = tr_blocklistIsEnabled(fHandle);
-    [fDefaults setBool: blocklist forKey: @"Blocklist"];
+    [fDefaults setBool: blocklist forKey: @"BlocklistNew"];
     
     //seed ratio
     const BOOL ratioLimited = tr_sessionIsRatioLimited(fHandle);

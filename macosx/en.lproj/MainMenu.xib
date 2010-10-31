@@ -12,8 +12,8 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="1480"/>
 			<integer value="2"/>
+			<integer value="1480"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -156,7 +156,7 @@
 									<int key="NSfFlags">3100</int>
 								</object>
 								<reference key="NSControlView" ref="673219624"/>
-								<int key="NSButtonFlags">-934526721</int>
+								<int key="NSButtonFlags">-935051009</int>
 								<int key="NSButtonFlags2">160</int>
 								<object class="NSCustomResource" key="NSNormalImage">
 									<string key="NSClassName">NSImage</string>
@@ -176,7 +176,7 @@
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="696487414">
 								<int key="NSCellFlags">67239488</int>
-								<int key="NSCellFlags2">138544128</int>
+								<int key="NSCellFlags2">138549248</int>
 								<string key="NSContents">999 of 999 transfers</string>
 								<object class="NSFont" key="NSSupport" id="660654866">
 									<string key="NSName">LucidaGrande</string>
