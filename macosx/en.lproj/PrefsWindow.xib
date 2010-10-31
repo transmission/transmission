@@ -3097,18 +3097,18 @@ AAABAAAAAQ</bytes>
 				<int key="NSvFlags">256</int>
 				<object class="NSMutableArray" key="NSSubviews">
 					<bool key="EncodedWithXMLCoder">YES</bool>
-					<object class="NSTextField" id="233107226">
+					<object class="NSTextField" id="552496111">
 						<reference key="NSNextResponder" ref="538122014"/>
 						<int key="NSvFlags">258</int>
 						<string key="NSFrame">{{191, 100}, {331, 22}}</string>
 						<reference key="NSSuperview" ref="538122014"/>
 						<bool key="NSEnabled">YES</bool>
-						<object class="NSTextFieldCell" key="NSCell" id="843389211">
+						<object class="NSTextFieldCell" key="NSCell" id="1062646585">
 							<int key="NSCellFlags">-1804468671</int>
 							<int key="NSCellFlags2">272630784</int>
 							<string key="NSContents"/>
 							<reference key="NSSupport" ref="86725571"/>
-							<reference key="NSControlView" ref="233107226"/>
+							<reference key="NSControlView" ref="552496111"/>
 							<bool key="NSDrawsBackground">YES</bool>
 							<reference key="NSBackgroundColor" ref="317620196"/>
 							<reference key="NSTextColor" ref="430340990"/>
@@ -3366,18 +3366,18 @@ AAABAAAAAQ</bytes>
 							<reference key="NSTextColor" ref="430340990"/>
 						</object>
 					</object>
-					<object class="NSTextField" id="558354371">
+					<object class="NSTextField" id="255099550">
 						<reference key="NSNextResponder" ref="538122014"/>
 						<int key="NSvFlags">256</int>
 						<string key="NSFrame">{{153, 102}, {33, 17}}</string>
 						<reference key="NSSuperview" ref="538122014"/>
 						<bool key="NSEnabled">YES</bool>
-						<object class="NSTextFieldCell" key="NSCell" id="468915348">
+						<object class="NSTextFieldCell" key="NSCell" id="880125969">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">4194304</int>
 							<string key="NSContents">URL:</string>
 							<reference key="NSSupport" ref="86725571"/>
-							<reference key="NSControlView" ref="558354371"/>
+							<reference key="NSControlView" ref="255099550"/>
 							<reference key="NSBackgroundColor" ref="977951849"/>
 							<reference key="NSTextColor" ref="400627124"/>
 						</object>
@@ -3502,13 +3502,13 @@ AAABAAAAAQ</bytes>
 					<object class="NSButton" id="902371491">
 						<reference key="NSNextResponder" ref="538122014"/>
 						<int key="NSvFlags">256</int>
-						<string key="NSFrame">{{135, 126}, {328, 18}}</string>
+						<string key="NSFrame">{{135, 126}, {289, 18}}</string>
 						<reference key="NSSuperview" ref="538122014"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="245208224">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">0</int>
-							<string key="NSContents">Prevent peers in blocklist peers from connecting</string>
+							<string key="NSContents">Prevent peers in blocklist from connecting</string>
 							<reference key="NSSupport" ref="86725571"/>
 							<reference key="NSControlView" ref="902371491"/>
 							<int key="NSButtonFlags">1211912703</int>
@@ -7382,10 +7382,10 @@ AAABAAAAAQ</bytes>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
 						<string key="label">enabled: values.BlocklistNew</string>
-						<reference key="source" ref="233107226"/>
+						<reference key="source" ref="552496111"/>
 						<reference key="destination" ref="356871564"/>
 						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="233107226"/>
+							<reference key="NSSource" ref="552496111"/>
 							<reference key="NSDestination" ref="356871564"/>
 							<string key="NSLabel">enabled: values.BlocklistNew</string>
 							<string key="NSBinding">enabled</string>
@@ -7414,10 +7414,10 @@ AAABAAAAAQ</bytes>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
 						<string key="label">enabled: values.BlocklistNew</string>
-						<reference key="source" ref="558354371"/>
+						<reference key="source" ref="255099550"/>
 						<reference key="destination" ref="356871564"/>
 						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="558354371"/>
+							<reference key="NSSource" ref="255099550"/>
 							<reference key="NSDestination" ref="356871564"/>
 							<string key="NSLabel">enabled: values.BlocklistNew</string>
 							<string key="NSBinding">enabled</string>
@@ -7431,7 +7431,7 @@ AAABAAAAAQ</bytes>
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">fBlocklistURLField</string>
 						<reference key="source" ref="511492310"/>
-						<reference key="destination" ref="233107226"/>
+						<reference key="destination" ref="552496111"/>
 					</object>
 					<int key="connectionID">1994</int>
 				</object>
@@ -7439,17 +7439,17 @@ AAABAAAAAQ</bytes>
 					<object class="IBActionConnection" key="connection">
 						<string key="label">setBlocklistURL:</string>
 						<reference key="source" ref="511492310"/>
-						<reference key="destination" ref="233107226"/>
+						<reference key="destination" ref="552496111"/>
 					</object>
 					<int key="connectionID">1995</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
 						<string key="label">value: values.BlocklistURL</string>
-						<reference key="source" ref="233107226"/>
+						<reference key="source" ref="552496111"/>
 						<reference key="destination" ref="356871564"/>
 						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="233107226"/>
+							<reference key="NSSource" ref="552496111"/>
 							<reference key="NSDestination" ref="356871564"/>
 							<string key="NSLabel">value: values.BlocklistURL</string>
 							<string key="NSBinding">value</string>
@@ -8838,8 +8838,8 @@ AAABAAAAAQ</bytes>
 							<reference ref="1064247210"/>
 							<reference ref="72739699"/>
 							<reference ref="1042006550"/>
-							<reference ref="233107226"/>
-							<reference ref="558354371"/>
+							<reference ref="552496111"/>
+							<reference ref="255099550"/>
 						</object>
 						<reference key="parent" ref="0"/>
 						<string key="objectName">Peers</string>
@@ -10100,31 +10100,31 @@ AAABAAAAAQ</bytes>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">1985</int>
-						<reference key="object" ref="233107226"/>
+						<reference key="object" ref="552496111"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="843389211"/>
+							<reference ref="1062646585"/>
 						</object>
 						<reference key="parent" ref="538122014"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">1986</int>
-						<reference key="object" ref="843389211"/>
-						<reference key="parent" ref="233107226"/>
+						<reference key="object" ref="1062646585"/>
+						<reference key="parent" ref="552496111"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">1987</int>
-						<reference key="object" ref="558354371"/>
+						<reference key="object" ref="255099550"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="468915348"/>
+							<reference ref="880125969"/>
 						</object>
 						<reference key="parent" ref="538122014"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">1988</int>
-						<reference key="object" ref="468915348"/>
-						<reference key="parent" ref="558354371"/>
+						<reference key="object" ref="880125969"/>
+						<reference key="parent" ref="255099550"/>
 					</object>
 				</object>
 			</object>
