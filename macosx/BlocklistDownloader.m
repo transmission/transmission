@@ -119,6 +119,7 @@ BlocklistDownloader * fDownloader = nil;
 {
     [fViewController setFailed: [error localizedDescription]];
     
+    [[NSUserDefaults standardUserDefaults] setObject: [NSDate date] forKey: @"BlocklistNewLastUpdate"];
     [[BlocklistScheduler scheduler] updateSchedule];
     
     fDownloader = nil;
@@ -171,7 +172,9 @@ BlocklistDownloader * fDownloader = nil;
                                         "blocklist fail message")];
     
     //update last updated date for schedule
-    [[NSUserDefaults standardUserDefaults] setObject: [NSDate date] forKey: @"BlocklistLastUpdate"];
+    NSDate * date = [NSDate date];
+    [[NSUserDefaults standardUserDefaults] setObject: date forKey: @"BlocklistNewLastUpdate"];
+    [[NSUserDefaults standardUserDefaults] setObject: date forKey: @"BlocklistNewLastUpdateSuccess"];
     [[BlocklistScheduler scheduler] updateSchedule];
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"BlocklistUpdated" object: nil];

@@ -504,7 +504,15 @@ tr_session * fHandle;
     NSString * updatedDateString;
     if (exists)
     {
-        NSDate * updatedDate = [fDefaults objectForKey: @"BlocklistLastUpdate"];
+        NSDate * updatedDate = [fDefaults objectForKey: @"BlocklistNewLastUpdateSuccess"];
+        //old format for update date pre-2.12
+        if (!updatedDate)
+        {
+            updatedDate = [fDefaults objectForKey: @"BlocklistLastUpdate"];
+            [fDefaults setObject: updatedDate forKey: @"BlocklistNewLastUpdateSuccess"];
+            [fDefaults removeObjectForKey: @"BlocklistLastUpdate"];
+        }
+        
         if (updatedDate)
         {
             if ([NSApp isOnSnowLeopardOrBetter])
