@@ -810,6 +810,9 @@ void tr_blocklistSetURL         ( tr_session *, const char * url );
 
 const char * tr_blocklistGetURL ( const tr_session * );
 
+/** @brief the file in the $config/blocklists/ directory that's
+           used by tr_blocklistSetContent() and "blocklist-update" */
+#define DEFAULT_BLOCKLIST_FILENAME "blocklist.bin"
 
 /** @} */
 

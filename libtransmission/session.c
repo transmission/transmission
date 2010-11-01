@@ -2140,13 +2140,12 @@ tr_blocklistExists( const tr_session * session )
 }
 
 int
-tr_blocklistSetContent( tr_session * session,
-                        const char * contentFilename )
+tr_blocklistSetContent( tr_session * session, const char * contentFilename )
 {
     tr_list * l;
     int ruleCount;
     tr_blocklist * b;
-    const char * defaultName = "blocklist.bin";
+    const char * defaultName = DEFAULT_BLOCKLIST_FILENAME;
     tr_sessionLock( session );
 
     for( b = NULL, l = session->blocklists; !b && l; l = l->next )
