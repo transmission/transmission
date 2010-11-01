@@ -107,7 +107,8 @@ tr_session * fHandle;
             NSString * blocklistDir = [NSHomeDirectory() stringByAppendingPathComponent:
                                         @"/Library/Application Support/Transmission/blocklists/"];
             [[NSFileManager defaultManager] moveItemAtPath: [blocklistDir stringByAppendingPathComponent: @"level1.bin"]
-                toPath: [blocklistDir stringByAppendingPathComponent: DEFAULT_BLOCKLIST_FILENAME] error: nil];
+                toPath: [blocklistDir stringByAppendingPathComponent: [NSString stringWithUTF8String: DEFAULT_BLOCKLIST_FILENAME]]
+                error: nil];
         }
         
         //save a new random port
