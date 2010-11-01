@@ -117,7 +117,9 @@ BlocklistDownloader * fDownloader = nil;
 
 - (void) download: (NSURLDownload *) download didFailWithError: (NSError *) error
 {
-    [fViewController setFailed: [error localizedDescription]];
+    const BOOL blankURL = [[[[download request] URL] absoluteString] isEqualToString: @""];
+    [fViewController setFailed: blankURL ? NSLocalizedString(@"An address of a blocklist is needed.", "blocklist fail message")
+                                    : [error localizedDescription]];
     
     [[NSUserDefaults standardUserDefaults] setObject: [NSDate date] forKey: @"BlocklistNewLastUpdate"];
     [[BlocklistScheduler scheduler] updateSchedule];
