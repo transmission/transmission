@@ -27,7 +27,7 @@
 #import "BlocklistScheduler.h"
 #import "PrefsController.h"
 
-#define FILE_NAME @"blocklist.tmp"
+#define FILE_NAME @"blocklist.temp"
 
 @interface BlocklistDownloader (Private)
 
@@ -145,11 +145,13 @@ BlocklistDownloader * fDownloader = nil;
     NSString * urlString = [[NSUserDefaults standardUserDefaults] stringForKey: @"BlocklistURL"];
     if (!urlString)
         urlString = @"";
+    else if (![urlString isEqualToString: @""] && [urlString rangeOfString: @"://"].location == NSNotFound)
+        urlString = [@"http://" stringByAppendingString: urlString];
     
     NSURLRequest * request = [NSURLRequest requestWithURL: [NSURL URLWithString: urlString]];
     
     fDownload = [[NSURLDownload alloc] initWithRequest: request delegate: self];
-    [fDownload setDestination: [NSTemporaryDirectory() stringByAppendingPathComponent: FILE_NAME] allowOverwrite: YES];
+    [fDownload setDestination: [NSTemporaryDirectory() stringByAppendingPathComponent: FILE_NAME] allowOverwrite: NO];
 }
 
 - (void) finishDownloadSuccess

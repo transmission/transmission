@@ -96,6 +96,20 @@ tr_session * fHandle;
             [fDefaults removeObjectForKey: @"DownloadChoice"];
         }
         
+        //check for old version blocklist (before 2.12)
+        NSDate * blocklistDate;
+        if ((blocklistDate = [fDefaults objectForKey: @"BlocklistLastUpdate"]))
+        {
+            [fDefaults setObject: blocklistDate forKey: @"BlocklistNewLastUpdateSuccess"];
+            [fDefaults setObject: blocklistDate forKey: @"BlocklistNewLastUpdate"];
+            [fDefaults removeObjectForKey: @"BlocklistLastUpdate"];
+            
+            NSString * blocklistDir = [NSHomeDirectory() stringByAppendingPathComponent:
+                                        @"/Library/Application Support/Transmission/blocklists/"];
+            [[NSFileManager defaultManager] moveItemAtPath: [blocklistDir stringByAppendingPathComponent: @"level1.bin"]
+                toPath: [blocklistDir stringByAppendingPathComponent: DEFAULT_BLOCKLIST_FILENAME] error: nil];
+        }
+        
         //save a new random port
         if ([fDefaults boolForKey: @"RandomPort"])
             [fDefaults setInteger: tr_sessionGetPeerPort(fHandle) forKey: @"BindPort"];
@@ -505,13 +519,6 @@ tr_session * fHandle;
     if (exists)
     {
         NSDate * updatedDate = [fDefaults objectForKey: @"BlocklistNewLastUpdateSuccess"];
-        //old format for update date pre-2.12
-        if (!updatedDate)
-        {
-            updatedDate = [fDefaults objectForKey: @"BlocklistLastUpdate"];
-            [fDefaults setObject: updatedDate forKey: @"BlocklistNewLastUpdateSuccess"];
-            [fDefaults removeObjectForKey: @"BlocklistLastUpdate"];
-        }
         
         if (updatedDate)
         {
