@@ -195,6 +195,9 @@
 /* Groups -> Button */
 "All Groups" = "Tutti i gruppi";
 
+/* blocklist fail message */
+"An address of a blocklist is needed." = "Occorre un indirizzo di una blocklist.";
+
 /* Create torrent -> failed -> warning */
 "An unknown error has occurred." = "Si è verificato un errore sconosciuto.";
 
@@ -1001,6 +1004,9 @@
    Move inside itself alert -> message */
 
 "The move operation of \"%@\" cannot be done." = "Impossibile eseguire l'operazione di spostamento di \"%@\".";
+
+/* blocklist fail message */
+"The specified blocklist file did not contain any valid rules." = "Il file di blocklist specificato non contiene alcuna regola valida.";
 
 /* Torrent download failed -> message */
 "The torrent could not be downloaded from %@: %@." = "Il torrent non può essere scaricato da %1$@: %2$@.";
