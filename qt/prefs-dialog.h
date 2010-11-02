@@ -85,7 +85,6 @@ class PrefsDialog: public QDialog
         QWidget * createNetworkTab( );
         QWidget * createDesktopTab( );
         QWidget * createWebTab( Session& );
-        QWidget * createTrackerTab( );
 
     private:
         typedef QMap<int,QWidget*> key2widget_t;

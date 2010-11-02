@@ -191,33 +191,6 @@ PrefsDialog :: lineEditNew( int key, int echoMode )
 ***/
 
 QWidget *
-PrefsDialog :: createTrackerTab( )
-{
-    QWidget *l, *r;
-    HIG * hig = new HIG( );
-    hig->addSectionTitle( tr( "Tracker Proxy" ) );
-    hig->addWideControl( l = checkBoxNew( tr( "Connect to tracker via a pro&xy" ), Prefs::PROXY_ENABLED ) );
-    myUnsupportedWhenRemote << l;
-    l = hig->addRow( tr( "Proxy &server:" ), r = lineEditNew( Prefs::PROXY ) );
-    myProxyWidgets << l << r;
-    l = hig->addRow( tr( "Proxy &port:" ), r = spinBoxNew( Prefs::PROXY_PORT, 1, 65535, 1 ) );
-    myProxyWidgets << l << r;
-    hig->addWideControl( l = checkBoxNew( tr( "Use &authentication" ), Prefs::PROXY_AUTH_ENABLED ) );
-    myProxyWidgets << l;
-    l = hig->addRow( tr( "&Username:" ), r = lineEditNew( Prefs::PROXY_USERNAME ) );
-    myProxyAuthWidgets << l << r;
-    l = hig->addRow( tr( "Pass&word:" ), r = lineEditNew( Prefs::PROXY_PASSWORD, QLineEdit::Password ) );
-    myProxyAuthWidgets << l << r;
-    myUnsupportedWhenRemote << myProxyAuthWidgets;
-    hig->finish( );
-    return hig;
-}
-
-/***
-****
-***/
-
-QWidget *
 PrefsDialog :: createWebTab( Session& session )
 {
     HIG * hig = new HIG( this );
@@ -650,7 +623,6 @@ PrefsDialog :: PrefsDialog( Session& session, Prefs& prefs, QWidget * parent ):
     t->addTab( createNetworkTab( ),      tr( "Network" ) );
     t->addTab( createDesktopTab( ),      tr( "Desktop" ) );
     t->addTab( createWebTab( session ),  tr( "Web" ) );
-    //t->addTab( createTrackerTab( ),    tr( "Trackers" ) );
     myLayout->addWidget( t );
 
     QDialogButtonBox * buttons = new QDialogButtonBox( QDialogButtonBox::Close, Qt::Horizontal, this );
@@ -662,7 +634,6 @@ PrefsDialog :: PrefsDialog( Session& session, Prefs& prefs, QWidget * parent ):
 
     QList<int> keys;
     keys << Prefs :: RPC_ENABLED
-         << Prefs :: PROXY_ENABLED
          << Prefs :: ALT_SPEED_LIMIT_ENABLED
          << Prefs :: ALT_SPEED_LIMIT_TIME_ENABLED
          << Prefs :: ENCRYPTION
@@ -726,15 +697,6 @@ PrefsDialog :: refreshPref( int key )
             foreach( QWidget * w, myWebWhitelistWidgets ) w->setEnabled( enabled && whitelist );
             foreach( QWidget * w, myWebAuthWidgets ) w->setEnabled( enabled && auth );
             foreach( QWidget * w, myWebWidgets ) w->setEnabled( enabled );
-            break;
-        }
-
-        case Prefs :: PROXY_ENABLED:
-        case Prefs :: PROXY_AUTH_ENABLED: {
-            const bool enabled( myPrefs.getBool( Prefs::PROXY_ENABLED ) );
-            const bool auth( myPrefs.getBool( Prefs::PROXY_AUTH_ENABLED ) );
-            foreach( QWidget * w, myProxyAuthWidgets ) w->setEnabled( enabled && auth );
-            foreach( QWidget * w, myProxyWidgets ) w->setEnabled( enabled );
             break;
         }
 
