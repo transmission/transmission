@@ -12,18 +12,9 @@ if [ -f /etc/debian_version ]; then
 	OS_VERSION=`cat /etc/debian_version`
 fi
 # use lsb_release (Linux Standard Base) when available
-LSB_RELEASE=`which lsb_release`
-if [ 0 -eq $? -a -x "${LSB_RELEASE}" ]; then
-	OS_NAME=`${LSB_RELEASE} -i -s`
-	OS_VERSION=`${LSB_RELEASE} -r -s`
-	case $OS_NAME in
-		Debian)
-			#OS_VERSION=`${LSB_RELEASE} -c -s`
-			;;
-		Ubuntu)
-			#OS_VERSION=`${LSB_RELEASE} -c -s`
-			;;
-	esac
+if os_name=`lsb_release -i -s 2>/dev/null`; then
+    OS_NAME=$os_name
+    OS_VERSION=`lsb_release -r -s`
 fi
 
 echo "Detected OS [$OS_NAME] version [$OS_VERSION]"
