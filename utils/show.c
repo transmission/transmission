@@ -85,11 +85,20 @@ parseCommandLine( int argc, const char ** argv )
     return 0;
 }
 
+static int
+compare_files_by_name( const void * va, const void * vb )
+{
+    const tr_file * a = *(const tr_file**)va;
+    const tr_file * b = *(const tr_file**)vb;
+    return strcmp( a->name, b->name );
+}
+
 static void
 showInfo( const tr_info * inf )
 {
     int i;
     char buf[128];
+    tr_file ** files;
     int prevTier = -1;
 
     /**
@@ -134,8 +143,13 @@ showInfo( const tr_info * inf )
     **/
 
     printf( "\nFILES\n\n" );
+    files = tr_new( tr_file*, inf->fileCount );
     for( i=0; i<(int)inf->fileCount; ++i )
-        printf( "  %s (%s)\n", inf->files[i].name, tr_formatter_size_B( buf, inf->files[i].length, sizeof( buf ) ) );
+        files[i] = &inf->files[i];
+    qsort( files, inf->fileCount, sizeof(tr_file*), compare_files_by_name );
+    for( i=0; i<(int)inf->fileCount; ++i )
+        printf( "  %s (%s)\n", files[i]->name, tr_formatter_size_B( buf, files[i]->length, sizeof( buf ) ) );
+    tr_free( files );
 }
 
 static size_t
