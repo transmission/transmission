@@ -20,8 +20,8 @@ BUILDING
 
   Building a Transmission release from the command line:
 
-    $ xz -d -c transmission-1.80.tar.xz | tar xf -
-    $ cd transmission-1.80
+    $ xz -d -c transmission-2.11.tar.xz | tar xf -
+    $ cd transmission-2.11
     $ ./configure
     $ make
     $ sudo make install
@@ -36,7 +36,7 @@ BUILDING
 
   Building Transmission from SVN (First Time):
 
-    $ svn co svn://svn.m0k.org/Transmission/trunk Transmission
+    $ svn co svn://svn.transmissionbt.org/Transmission/trunk Transmission
     $ cd Transmission
     $ ./autogen.sh
     $ make
