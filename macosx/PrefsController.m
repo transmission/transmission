@@ -1113,6 +1113,9 @@ tr_session * fHandle;
     const BOOL blocklist = tr_blocklistIsEnabled(fHandle);
     [fDefaults setBool: blocklist forKey: @"BlocklistNew"];
     
+    NSString * blocklistURL = [NSString stringWithUTF8String: tr_blocklistGetURL(fHandle)];
+    [fDefaults setObject: blocklistURL forKey: @"BlocklistURL"];
+    
     //seed ratio
     const BOOL ratioLimited = tr_sessionIsRatioLimited(fHandle);
     [fDefaults setBool: ratioLimited forKey: @"RatioCheck"];
