@@ -273,11 +273,18 @@ getCurrentSize( tr_torrent * tor )
 }
 
 static int 
-compareVerifyBySize( const void * va, const void * vb ) 
+compareVerifyByPriorityAndSize( const void * va, const void * vb ) 
 { 
     const struct verify_node * a = va; 
     const struct verify_node * b = vb; 
 
+    /* higher priority comes before lower priority */
+    const tr_priority_t pa =  tr_torrentGetPriority( a->torrent );
+    const tr_priority_t pb =  tr_torrentGetPriority( b->torrent );
+    if( pa != pb )
+        return pa > pb ? -1 : 1;
+
+    /* smaller size comes before larger size... smaller sizes are faster to verify */
     if( a->current_size < b->current_size ) return -1;
     if( a->current_size > b->current_size ) return  1;
     return 0;
@@ -327,7 +334,7 @@ tr_verifyAdd( tr_torrent *      tor,
 
             tr_lockLock( getVerifyLock( ) );
             tr_torrentSetVerifyState( tor, TR_VERIFY_WAIT );
-            tr_list_insert_sorted( &verifyList, node, compareVerifyBySize );
+            tr_list_insert_sorted( &verifyList, node, compareVerifyByPriorityAndSize );
             if( verifyThread == NULL )
                 verifyThread = tr_threadNew( verifyThreadFunc, NULL );
             tr_lockUnlock( getVerifyLock( ) );
