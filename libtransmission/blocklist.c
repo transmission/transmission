@@ -231,7 +231,9 @@ _tr_blocklistHasAddress( tr_blocklist     * b,
 }
 
 /*
- * bluetack format: "comment:x.x.x.x-y.y.y.y"
+ * P2P plaintext format: "comment:x.x.x.x-y.y.y.y"
+ * http://wiki.phoenixlabs.org/wiki/P2P_Format
+ * http://en.wikipedia.org/wiki/PeerGuardian#P2P_plaintext_format
  */
 static tr_bool
 parseLine1( const char * line, struct tr_ip_range * range )
@@ -266,7 +268,8 @@ parseLine1( const char * line, struct tr_ip_range * range )
 }
 
 /*
- * "000.000.000.000 - 000.255.255.255 , 000 , invalid ip"
+ * DAT format: "000.000.000.000 - 000.255.255.255 , 000 , invalid ip"
+ * http://wiki.phoenixlabs.org/wiki/DAT_Format
  */
 static tr_bool
 parseLine2( const char * line, struct tr_ip_range * range )
