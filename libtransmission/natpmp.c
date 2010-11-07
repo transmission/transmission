@@ -212,7 +212,7 @@ tr_natpmpPulse( struct tr_natpmp * nat, tr_port private_port, tr_bool is_enabled
         {
             nat->state = TR_NATPMP_IDLE;
             nat->is_mapped = TRUE;
-            nat->renew_time = tr_time( ) + LIFETIME_SECS;
+            nat->renew_time = tr_time( ) + ( resp.pnu.newportmapping.lifetime / 2 );
             nat->private_port = resp.pnu.newportmapping.privateport;
             nat->public_port = resp.pnu.newportmapping.mappedpublicport;
             tr_ninf( getKey( ), _( "Port %d forwarded successfully" ), nat->private_port );
