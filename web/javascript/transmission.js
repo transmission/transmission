@@ -60,6 +60,7 @@ Transmission.prototype =
 		$('#turtle_button').bind('click', function(e){ tr.toggleTurtleClicked(e); return false; });
 		$('#prefs_tab_general_tab').click(function(e){ changeTab(this, 'prefs_tab_general') });
 		$('#prefs_tab_speed_tab').click(function(e){ changeTab(this, 'prefs_tab_speed') });
+        $('#torrent_upload_form').submit(function(){ $('#upload_confirm_button').click(); return false; });
 
 		if (iPhone) {
 			$('#inspector_close').bind('click', function(e){ tr.hideInspector(); });
@@ -1791,6 +1792,7 @@ Transmission.prototype =
 				$('input#torrent_upload_url').attr('value', '');
 				$('input#torrent_auto_start').attr('checked', $('#prefs_form #auto_start')[0].checked);
 				$('#upload_container').show();
+                $('#torrent_upload_url').focus();
 			if (!iPhone && Safari3) {
 				setTimeout("$('div#upload_container div.dialog_window').css('top', '0px');",10);
 			}
