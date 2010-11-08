@@ -1,5 +1,5 @@
 === Transmission 2.12 (2010/xx/yy) ===
-[http://trac.transmissionbt.com/query?milestone=2.12&group=component&groupdesc=1&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=2.12&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Fix 2.10 build issue on uClibc systems
   * Several small CPU speed improvements: faster benc parsing, and fewer calls to RNG and gettimeofday()
@@ -20,7 +20,7 @@
   * Fix 2.11 regression when using the web client on IE7 or IE8
 
 === Transmission 2.11 (2010/10/16) ===
-[http://trac.transmissionbt.com/query?milestone=2.11&group=component&groupdesc=1&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=2.11&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Fix a 2.10 crash
   * Fix minor build issues on various platforms, particularly embedded systems
@@ -40,7 +40,7 @@
   * Add Transmission website links to the action menu
 
 === Transmission 2.10 (2010/10/07) ===
-[http://trac.transmissionbt.com/query?milestone=2.10&group=component&groupdesc=1&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=2.10&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Support for automatically stopping idle seeding torrents
   * Small memory cache to reduce disk IO
@@ -74,7 +74,7 @@
   * New command-line utility "transmission-create" for creating torrent files
 
 === Transmission 2.04 (2010/08/06) ===
-[http://trac.transmissionbt.com/query?milestone=2.04&group=component&groupdesc=1&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=2.04&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Improved shutdown time in some situations
   * Fix display bug in tr_truncd()
@@ -89,12 +89,12 @@
   * Fix bad redirect
 
 === Transmission 2.03 (2010/07/21) ===
-[http://trac.transmissionbt.com/query?milestone=2.03&group=component&groupdesc=1&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=2.03&group=component&order=severity All tickets closed by this release]
 ==== Mac ====
   * Fix 2.02 bug where new transfers could not be added and the inspector would not appear
 
 === Transmission 2.02 (2010/07/19) ===
-[http://trac.transmissionbt.com/query?milestone=2.02&group=component&groupdesc=1&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=2.02&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Fix NAT-PMP port forwarding issue on some systems
   * Fix filename errors for torrents whose files are encoded in ISO-8859-1
@@ -113,7 +113,7 @@
   * Fix compilation issue with Qt < 4.5
 
 === Transmission 2.01 (2010/06/26) ===
-[http://trac.transmissionbt.com/query?milestone=2.01&group=component&groupdesc=1&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=2.01&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Better tracker announce management when completed torrents are moved from the incomplete directory
   * Speed up moving local data from one disk to another
@@ -139,7 +139,7 @@
   * Fix display bug caused by removal of a torrent hidden by the current filter
 
 === Transmission 2.00 (2010/06/15) ===
-[http://trac.transmissionbt.com/query?milestone=2.00&group=component&groupdesc=1&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=2.00&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * "Local Peer Discovery" for finding peers on the local network
   * Optimize download requests for the bandwidth available
@@ -182,7 +182,7 @@
   * Show ETA for seeding torrents that have a seed ratio set
 
 === Transmission 1.93 (2010/05/01) ===
-[http://trac.transmissionbt.com/query?milestone=1.93&group=component&groupdesc=1&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=1.93&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Fix rare crash when some peers disconnected unexpectedly
   * Fix bug which didn't parse scheduled speed limit dates correctly
@@ -209,7 +209,7 @@
   * Fix bug that broke the "reverse sort order" menu checkbox
 
 === Transmission 1.92 (2010/03/14) ===
-[http://trac.transmissionbt.com/query?milestone=1.92&group=component&groupdesc=1&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=1.92&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Fix possible data corruption issue caused by data sent by bad peers during endgame
   * Fix potential buffer overflow when adding maliciously-crafted magnet links
@@ -232,7 +232,7 @@
   * Update to jQuery 1.4.2
 
 === Transmission 1.91 (2010/02/21) ===
-[http://trac.transmissionbt.com/query?milestone=1.91&group=component&groupdesc=1&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=1.91&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Fix 1.90 crash-on-startup bug that affected some users
   * Fix 1.90 bug that caused the "turtle mode" state to be forgotten between sessions
@@ -242,7 +242,7 @@
   * Fix 1.90 bug when removing trackers
 
 === Transmission 1.90 (2010/02/16) ===
-[http://trac.transmissionbt.com/query?milestone=1.90&group=component&groupdesc=1&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=1.90&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Add an option to disable the .part suffix for incomplete files
   * Add priority selector to GUI clients' add torrent windows
@@ -278,7 +278,7 @@
   * Fix bug that prevented torrents from being added via web browsers
 
 === Transmission 1.83 (2010/01/28) ===
-[http://trac.transmissionbt.com/query?milestone=1.83&group=component&groupdesc=1&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=1.83&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Fix 1.80 announce error that caused uploads and downloads to periodically freeze
   * Fix 1.80 announce timeout error that caused "no response from tracker" message
@@ -288,12 +288,12 @@
   * Fix 1.82 error when updating the blocklist
 
 === Transmission 1.82 (2010/01/23) ===
-[http://trac.transmissionbt.com/query?milestone=1.82&group=component&groupdesc=1&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=1.82&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * The 1.81 announce's "Host" HTTP header didn't contain the host's port number
 
 === Transmission 1.81 (2010/01/22) ===
-[http://trac.transmissionbt.com/query?milestone=1.81&group=component&groupdesc=1&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=1.81&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Fix 1.80 bug that misparsed some magnet links
   * Fix 1.80 bug that caused startup to be very sluggish for some people
@@ -302,7 +302,7 @@
   * Fix auto-grouping by file name
 
 === Transmission 1.80 (2010/01/20) ===
-[http://trac.transmissionbt.com/query?milestone=1.80&group=component&groupdesc=1&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=1.80&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Add support for magnet links
   * Add support for trackerless torrents
@@ -355,7 +355,7 @@
   * Fix bug that obscured part of the context menu
 
 === Transmission 1.77 (2010/01/04) ===
-[http://trac.transmissionbt.com/query?milestone=1.77&group=component&groupdesc=1&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=1.77&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Protect against potential data loss by maliciously-crafted torrent files
   * Fix minor build issues and packaging issues on various platforms
@@ -366,7 +366,7 @@
   * Fix GIcon memory leak
 
 === Transmission 1.76 (2009/10/24) ===
-[http://trac.transmissionbt.com/query?milestone=1.76&group=component&groupdesc=1&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=1.76&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Fix potential data loss when moving torrents to where they already are
   * Fix minor protocol error that didn't send a port message to some peers
@@ -392,7 +392,7 @@
   * Cannot open a torrent in KDE4 with right-clicking
 
 === Transmission 1.75 (2009/09/13) ===
-[http://trac.transmissionbt.com/query?milestone=1.75&group=component&groupdesc=1&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=1.75&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Don't wait so long on unresponsive trackers if there are other trackers to try
   * Adding corrupt/invalid torrents could crash Transmission
@@ -412,7 +412,7 @@
   * Fix clang build issue
 
 === Transmission 1.74 (2009/08/24) ===
-[http://trac.transmissionbt.com/query?milestone=1.74&group=component&groupdesc=1&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=1.74&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Better data recovery in the case of an OS or Transmission crash
   * If a data file is moved, stop the torrent instead of redownloading it
@@ -444,7 +444,7 @@
   * "Pause All" only appeared to pause torrents with peers until refresh
 
 === Transmission 1.73 (2009/07/18) ===
-[http://trac.transmissionbt.com/query?milestone=1.73&group=component&groupdesc=1&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=1.73&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Fix bug where user-configured peer limits could be exceeded
   * Use less memory in some high-peer situations
@@ -466,7 +466,7 @@
   * Some torrent files created with transmission-cli were invalid
 
 === Transmission 1.72 (2009/06/16) ===
-[http://trac.transmissionbt.com/query?milestone=1.72&group=component&groupdesc=1&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=1.72&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Fix 1.70 crash with assertion "tv->tv_usec >= 0"
   * Fix 1.70 crash with assertion "tr_peerIoSupportsFEXT( msgs->peer->io )"
@@ -485,7 +485,7 @@
   * Remote didn't always send the right Encoding header in requests
 
 === Transmission 1.71 (2009/06/07) ===
-[http://trac.transmissionbt.com/query?milestone=1.71&group=component&groupdesc=1&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=1.71&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Fix 1.70 bug that caused high CPU use in high-peer swarms
   * Fix 1.70 build problems with DHT and libevent
@@ -499,7 +499,7 @@
   * Fix 1.70 bug where some torrents appeared to be duplicates
 
 === Transmission 1.70 (2009/06/04) ===
-[http://trac.transmissionbt.com/query?milestone=1.70&group=component&groupdesc=1&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=1.70&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Distributed hash table (DHT) support for public torrents
   * Add option for moving and finding a torrent's data on the disk
@@ -540,7 +540,7 @@
   * Torrent comment box did not scroll, so long comments were partially hidden
 
 === Transmission 1.61 (2009/05/11) ===
-[http://trac.transmissionbt.com/query?milestone=1.61&group=component&groupdesc=1&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=1.61&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Close potential CSRF security hole for Web Client users
   * Fix locale error in the JSON parser
@@ -558,7 +558,7 @@
   * Fix locale error in the JSON parser
 
 === Transmission 1.60 (2009/05/04) ===
-[http://trac.transmissionbt.com/query?milestone=1.60&group=component&groupdesc=1&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=1.60&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Seed ratio limiting
   * Transfer prioritization
@@ -592,7 +592,7 @@
   * Fix "Remove Data" bug
 
 === Transmission 1.52 (2009/04/12) ===
-[http://trac.transmissionbt.com/query?milestone=1.52&group=component&groupdesc=1&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=1.52&group=component&order=severity All tickets closed by this release]
 ==== Mac ====
   * Improve interface responsiveness when downloading
 ==== GTK+ and Daemon ==== 
@@ -608,7 +608,7 @@
   * Better Internet Explorer support
 
 === Transmission 1.51 (2009/02/26) ===
-[http://trac.transmissionbt.com/query?milestone=1.51&group=component&groupdesc=1&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=1.51&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Fix configure script issues with non-gcc compilers and user-defined CFLAGS environment variables 
   * Decrease CPU usage in some situations
@@ -622,7 +622,7 @@
   * Layout fixes when viewed on an iPhone/iPod touch
 
 === Transmission 1.50 (2009/02/13) ===
-[http://trac.transmissionbt.com/query?milestone=1.50&group=component&groupdesc=1&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=1.50&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * IPv6 support for peers, and for trackers with explicit IPv6 addresses
   * Improved connectivity for encrypted peers
@@ -647,12 +647,12 @@
   * Add the ability to "remove local data" from the web client
 
 === Transmission 1.42 (2008/12/24) ===
-[http://trac.transmissionbt.com/query?milestone=1.42&group=component&groupdesc=1&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=1.42&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Fix 1.41 lockup issue
 
 === Transmission 1.41 (2008/12/23) ===
-[http://trac.transmissionbt.com/query?milestone=1.41&group=component&groupdesc=1&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=1.41&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Better peer management in large swarms
   * Support BitTorrent Enhancement Proposal (BEP) #21 "Extension for Partial Seeds"
@@ -679,7 +679,7 @@
   * Fix minor free-memory-read bug
 
 === Transmission 1.40 (2008/11/09) ===
-[http://trac.transmissionbt.com/query?milestone=1.40&group=component&groupdesc=1&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=1.40&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Tracker communication uses fewer resources
   * More accurate bandwidth limits
@@ -712,7 +712,7 @@
   * Windows portability
 
 === Transmission 1.34 (2008/09/16) ===
-[http://trac.transmissionbt.com/query?milestone=1.34&group=component&groupdesc=1&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=1.34&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Don't reconnect too frequently to the same peer
   * Webseed bug fix
@@ -733,7 +733,7 @@
   * Fix crash when creating a torrent file
 
 === Transmission 1.33 (2008/08/30) ===
-[http://trac.transmissionbt.com/query?milestone=1.33&group=component&groupdesc=1&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=1.33&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Fix crash from malicious torrent files with a piece size of zero
   * When creating new torrent files, change behavior that caused "Multi tracker torrents are not allowed" warning on one tracker
@@ -750,7 +750,7 @@
   * Fix error where some torrents opened via a web browser didn't appear
 
 === Transmission 1.32 (2008/08/08) ===
-[http://trac.transmissionbt.com/query?milestone=1.32&group=component&groupdesc=1&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=1.32&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Fix bug introduced in 1.30 that caused poor tracker communication
   * Creating torrent files for files >= 2 GB will result in 2 MB pieces
@@ -758,12 +758,12 @@
   * Fix bug where the proxy type was changed from SOCKS5 to SOCKS4 on launch
 
 === Transmission 1.31 (2008/08/06) ===
-[http://trac.transmissionbt.com/query?milestone=1.31&group=component&groupdesc=1&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=1.31&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Fix a crash caused by certain torrent files
 
 === Transmission 1.30 (2008/08/05) ===
-[http://trac.transmissionbt.com/query?milestone=1.30&group=component&groupdesc=1&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=1.30&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * The "Clutch" web interface is now bundled with Transmission (as a beta)
   * Ability to add and remove tracker addresses
@@ -789,7 +789,7 @@
   * Dozens of updated translations
 
 === Transmission 1.22 (2008/06/13) ===
-[http://trac.transmissionbt.com/query?milestone=1.22&group=component&groupdesc=1&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=1.22&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Fix two separate BitTorrent unchoke bugs that could affect performance
   * Transmission now builds correctly on Sun Studio
@@ -806,7 +806,7 @@
   * Fix scraping torrents with the -s command-line argument
 
 === Transmission 1.21 (2008/05/21) ===
-[http://trac.transmissionbt.com/query?milestone=1.21&group=component&groupdesc=1&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=1.21&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Fix rare crash-on-startup bug
   * Handle corrupt announce URLs in torrent files more gracefully
@@ -819,7 +819,7 @@
      Polish, Romanian, Thai, Turkish, and Traditional Chinese translations
 
 === Transmission 1.20 (2008/05/09) ===
-[http://trac.transmissionbt.com/query?milestone=1.20&group=component&groupdesc=1&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=1.20&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Support https tracker connections
   * IP blocking using the Bluetack Level1 blocklist
@@ -837,7 +837,7 @@
   * Vastly improved translations thanks to the Ubuntu translation team
 
 === Transmission 1.11 (2008/04/04) ===
-[http://trac.transmissionbt.com/query?milestone=1.11&group=component&groupdesc=1&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=1.11&group=component&order=severity All tickets closed by this release]
 ==== Mac ====
   * Fix scrape address visual glitch with the tracker inspector tab
   * Only make the progress status string clickable on multi-file torrents
@@ -846,7 +846,7 @@
   * Fix a couple of minor display issues
 
 === Transmission 1.10 (2008/03/28) ===
-[http://trac.transmissionbt.com/query?milestone=1.10&group=component&groupdesc=1&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=1.10&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Stop torrents when downloading and the disk becomes full
   * Removing a torrent also removes it from the cache
