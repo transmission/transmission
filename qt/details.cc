@@ -619,10 +619,12 @@ Details :: refresh( )
         }
         if( mixed_creator && mixed_date )
             string = mixed;
-        else if( mixed_date )
+        else if( mixed_date && !creator.isEmpty())
             string = tr( "Created by %1" ).arg( creator );
-        else if( mixed_creator || creator.isEmpty( ) )
+        else if( mixed_creator && !date.isEmpty())
             string = tr( "Created on %1" ).arg( date );
+        else if( creator.isEmpty() && date.isEmpty())
+            string = tr( "N/A" );
         else
             string = tr( "Created by %1 on %2" ).arg( creator ).arg( date );
     }

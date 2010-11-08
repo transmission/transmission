@@ -210,6 +210,9 @@ Transmission.fmt = (function()
 
 		timestamp: function( seconds )
 		{
+			if( !seconds )
+				return 'N/A';
+
 			var myDate = new Date(seconds*1000);
 			var now = new Date();
 
