@@ -39,7 +39,9 @@
         magnetAddress: (NSString *) magnetAddress lib: (tr_session *) lib
         waitToStart: (NSNumber *) waitToStart
         groupValue: (NSNumber *) groupValue
-        downloadFolder: (NSString *) downloadFolder legacyIncompleteFolder: (NSString *) incompleteFolder;
+        timeMachineExcludeLocation: (NSString *) timeMachineExclude
+        downloadFolder: (NSString *) downloadFolder
+        legacyIncompleteFolder: (NSString *) incompleteFolder;
 
 - (void) createFileList;
 - (void) insertPath: (NSMutableArray *) components forParent: (FileListNode *) parent fileSize: (uint64_t) size
@@ -94,7 +96,9 @@ int trashDataFile(const char * filename)
 {
     self = [self initWithPath: path hash: nil torrentStruct: NULL magnetAddress: nil lib: lib
             waitToStart: nil groupValue: nil
-            downloadFolder: location legacyIncompleteFolder: nil];
+            timeMachineExcludeLocation: nil
+            downloadFolder: location
+            legacyIncompleteFolder: nil];
     
     if (self)
     {
@@ -108,7 +112,9 @@ int trashDataFile(const char * filename)
 {
     self = [self initWithPath: nil hash: nil torrentStruct: torrentStruct magnetAddress: nil lib: lib
             waitToStart: nil groupValue: nil
-            downloadFolder: location legacyIncompleteFolder: nil];
+            timeMachineExcludeLocation: nil
+            downloadFolder: location
+            legacyIncompleteFolder: nil];
     
     return self;
 }
@@ -117,6 +123,7 @@ int trashDataFile(const char * filename)
 {
     self = [self initWithPath: nil hash: nil torrentStruct: nil magnetAddress: address
             lib: lib waitToStart: nil groupValue: nil
+            timeMachineExcludeLocation: nil
             downloadFolder: location legacyIncompleteFolder: nil];
     
     return self;
@@ -131,6 +138,7 @@ int trashDataFile(const char * filename)
                 lib: lib
                 waitToStart: [history objectForKey: @"WaitToStart"]
                 groupValue: [history objectForKey: @"GroupValue"]
+                timeMachineExcludeLocation: [history objectForKey: @"TimeMachineExcludeLocation"]
                 downloadFolder: [history objectForKey: @"DownloadFolder"] //upgrading from versions < 1.80
                 legacyIncompleteFolder: [[history objectForKey: @"UseIncompleteFolder"] boolValue] //upgrading from versions < 1.80
                                         ? [history objectForKey: @"IncompleteFolder"] : nil];
@@ -174,12 +182,17 @@ int trashDataFile(const char * filename)
 
 - (NSDictionary *) history
 {
-    return [NSDictionary dictionaryWithObjectsAndKeys:
-                [self torrentLocation], @"InternalTorrentPath",
-                [self hashString], @"TorrentHash",
-                [NSNumber numberWithBool: [self isActive]], @"Active",
-                [NSNumber numberWithBool: fWaitToStart], @"WaitToStart",
-                [NSNumber numberWithInt: fGroupValue], @"GroupValue", nil];
+    NSMutableDictionary * history = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                        [self torrentLocation], @"InternalTorrentPath",
+                                        [self hashString], @"TorrentHash",
+                                        [NSNumber numberWithBool: [self isActive]], @"Active",
+                                        [NSNumber numberWithBool: fWaitToStart], @"WaitToStart",
+                                        [NSNumber numberWithInt: fGroupValue], @"GroupValue", nil];
+    
+    if (fTimeMachineExclude)
+        [history setObject: fTimeMachineExclude forKey: @"TimeMachineExcludeLocation"];
+    
+    return history;
 }
 
 - (void) dealloc
@@ -216,7 +229,7 @@ int trashDataFile(const char * filename)
 
 - (void) closeRemoveTorrent
 {
-    //allow the file to be index by Time Machine
+    //allow the file to be indexed by Time Machine
     if (fTimeMachineExclude)
     {
         [self setTimeMachineExclude: NO forPath: fTimeMachineExclude];
@@ -1590,7 +1603,9 @@ int trashDataFile(const char * filename)
         magnetAddress: (NSString *) magnetAddress lib: (tr_session *) lib
         waitToStart: (NSNumber *) waitToStart
         groupValue: (NSNumber *) groupValue
-        downloadFolder: (NSString *) downloadFolder legacyIncompleteFolder: (NSString *) incompleteFolder
+        timeMachineExcludeLocation: (NSString *) timeMachineExclude
+        downloadFolder: (NSString *) downloadFolder
+        legacyIncompleteFolder: (NSString *) incompleteFolder
 {
     if (!(self = [super init]))
         return nil;
@@ -1654,7 +1669,7 @@ int trashDataFile(const char * filename)
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(checkGroupValueForRemoval:)
         name: @"GroupValueRemoved" object: nil];
     
-    fTimeMachineExclude = nil;
+    fTimeMachineExclude = [timeMachineExclude retain];
     [self update];
     
     return self;
