@@ -2329,7 +2329,6 @@ torrent_inspector_new( GtkWindow * parent, TrCore * core )
     gtk_window_set_role( GTK_WINDOW( d ), "tr-info" );
     g_signal_connect_swapped( d, "response",
                               G_CALLBACK( gtk_widget_destroy ), d );
-    gtk_dialog_set_has_separator( GTK_DIALOG( d ), FALSE );
     gtk_container_set_border_width( GTK_CONTAINER( d ), GUI_PAD );
     g_object_set_data_full( G_OBJECT( d ), DETAILS_KEY, di, details_free );
 

@@ -1217,7 +1217,6 @@ tr_prefs_dialog_new( GObject *   core,
                                      GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
                                      NULL );
     gtk_window_set_role( GTK_WINDOW( d ), "transmission-preferences-dialog" );
-    gtk_dialog_set_has_separator( GTK_DIALOG( d ), FALSE );
     gtk_container_set_border_width( GTK_CONTAINER( d ), GUI_PAD );
 
     n = gtk_notebook_new( );
