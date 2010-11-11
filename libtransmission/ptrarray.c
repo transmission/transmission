@@ -216,4 +216,3 @@ tr_ptrArrayRemoveSorted( tr_ptrArray * t,
     assertSortedAndUnique( t, compare );
     return ret;
 }
-

@@ -451,7 +451,7 @@ tr_strip_positional_args( const char* str )
 
         if( ( *str == '%' ) && ( str[1] == '\'' ) )
             str = str + 1;
- 
+
     }
     *out = '\0';
 
@@ -1222,7 +1222,7 @@ strip_non_utf8( const char * in, size_t inlen )
     const char * end;
     const char zero = '\0';
     struct evbuffer * buf = evbuffer_new( );
- 
+
     while( !tr_utf8_validate( in, inlen, &end ) )
     {
         const int good_len = end - in;
@@ -1232,7 +1232,7 @@ strip_non_utf8( const char * in, size_t inlen )
         in += ( good_len + 1 );
         evbuffer_add( buf, "?", 1 );
     }
- 
+
     evbuffer_add( buf, in, inlen );
     evbuffer_add( buf, &zero, 1 );
     ret = tr_memdup( EVBUFFER_DATA( buf ), EVBUFFER_LENGTH( buf ) );
@@ -1437,8 +1437,8 @@ tr_truncd( double x, int precision )
 {
     char * pt;
     char buf[128];
-    const int max_precision = (int) log10( 1.0 / DBL_EPSILON ) - 1; 
-    tr_snprintf( buf, sizeof( buf ), "%.*f", max_precision, x ); 
+    const int max_precision = (int) log10( 1.0 / DBL_EPSILON ) - 1;
+    tr_snprintf( buf, sizeof( buf ), "%.*f", max_precision, x );
     if(( pt = strstr( buf, localeconv()->decimal_point )))
         pt[precision ? precision+1 : 0] = '\0';
     return atof(buf);
@@ -1608,7 +1608,7 @@ struct formatter_unit
     char * name;
     uint64_t value;
 };
-  
+
 struct formatter_units
 {
     struct formatter_unit units[4];
@@ -1720,7 +1720,7 @@ tr_formatter_speed_KBps( char * buf, double KBps, size_t buflen )
 static struct formatter_units mem_units;
 
 unsigned int tr_mem_K = 0u;
- 
+
 void
 tr_formatter_mem_init( unsigned int kilo,
                        const char * kb, const char * mb,

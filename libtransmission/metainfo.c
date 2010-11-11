@@ -42,7 +42,7 @@ tr_metainfoGetBasename( const tr_info * inf )
     for( pch=name; pch && *pch; ++pch )
         if( *pch == '/' )
             *pch = '_';
-   
+
     ret = tr_strdup_printf( "%s.%16.16s", name, inf->hashString );
 
     tr_free( name );
@@ -447,7 +447,6 @@ tr_metainfoParseImpl( const tr_session  * session,
             escape( inf->hashEscaped, inf->hash, SHA_DIGEST_LENGTH );
 
             /* maybe get the display name */
-          
             if( tr_bencDictFindStr( d, "display-name", &str ) ) {
                 tr_free( inf->name );
                 inf->name = tr_strdup( str );

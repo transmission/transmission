@@ -386,7 +386,7 @@ add_response( struct evhttp_request * req,
             EVBUFFER_LENGTH( out ) = content_len - server->stream.avail_out;
 
 #if 0
-            fprintf( stderr, "compressed response is %.2f of original (raw==%zu bytes; compressed==%zu)\n", 
+            fprintf( stderr, "compressed response is %.2f of original (raw==%zu bytes; compressed==%zu)\n",
                              (double)EVBUFFER_LENGTH(out)/content_len,
                              content_len, EVBUFFER_LENGTH(out) );
 #endif

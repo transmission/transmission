@@ -303,7 +303,7 @@ cache_block_compare( const void * va, const void * vb )
 
 static struct cache_block *
 findBlock( tr_cache           * cache,
-           tr_torrent         * torrent, 
+           tr_torrent         * torrent,
            tr_piece_index_t     piece,
            uint32_t             offset )
 {

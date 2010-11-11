@@ -399,7 +399,7 @@ TrOpenFile( tr_session             * session,
     }
 #endif
 
-#if defined( SYS_DARWIN ) 
+#if defined( SYS_DARWIN )
     /**
      * 1. Enable readahead for reasons described above w/POSIX_FADV_SEQUENTIAL.
      *
@@ -411,8 +411,8 @@ TrOpenFile( tr_session             * session,
      */
     {
         const int err = errno;
-        fcntl( file->fd, F_NOCACHE, 1 ); 
-        fcntl( file->fd, F_RDAHEAD, 1 ); 
+        fcntl( file->fd, F_NOCACHE, 1 );
+        fcntl( file->fd, F_RDAHEAD, 1 );
         errno = err;
     }
 #endif

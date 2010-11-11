@@ -348,8 +348,8 @@ _tr_blocklistSetContent( tr_blocklist * b,
         ++inCount;
 
         /* zap the linefeed */
-        if(( walk = strchr( line, '\r' ))) *walk = '\0'; 
-        if(( walk = strchr( line, '\n' ))) *walk = '\0'; 
+        if(( walk = strchr( line, '\r' ))) *walk = '\0';
+        if(( walk = strchr( line, '\n' ))) *walk = '\0';
 
         if( !parseLine( line, &range ) )
         {

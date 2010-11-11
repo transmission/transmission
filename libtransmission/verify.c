@@ -272,11 +272,11 @@ getCurrentSize( tr_torrent * tor )
     return byte_count;
 }
 
-static int 
-compareVerifyByPriorityAndSize( const void * va, const void * vb ) 
-{ 
-    const struct verify_node * a = va; 
-    const struct verify_node * b = vb; 
+static int
+compareVerifyByPriorityAndSize( const void * va, const void * vb )
+{
+    const struct verify_node * a = va;
+    const struct verify_node * b = vb;
 
     /* higher priority comes before lower priority */
     const tr_priority_t pa =  tr_torrentGetPriority( a->torrent );
@@ -288,7 +288,7 @@ compareVerifyByPriorityAndSize( const void * va, const void * vb )
     if( a->current_size < b->current_size ) return -1;
     if( a->current_size > b->current_size ) return  1;
     return 0;
-} 
+}
 
 void
 tr_verifyAdd( tr_torrent *      tor,
