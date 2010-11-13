@@ -55,7 +55,10 @@ BlocklistScheduler * fScheduler = nil;
     
     [self cancelSchedule];
     
+    NSString * blocklistURL;
     if (![[NSUserDefaults standardUserDefaults] boolForKey: @"BlocklistNew"]
+        || !((blocklistURL = [[NSUserDefaults standardUserDefaults] stringForKey: @"BlocklistURL"]) &&
+                ![blocklistURL isEqualToString: @""])
         || ![[NSUserDefaults standardUserDefaults] boolForKey: @"BlocklistAutoUpdate"])
         return;
     
