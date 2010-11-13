@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-09-18 22:00-0500\n"
-"PO-Revision-Date: 2010-07-31 22:27+0000\n"
-"Last-Translator: ironic <ironic@ubuntu-tr.net>\n"
+"PO-Revision-Date: 2010-11-08 02:02+0000\n"
+"Last-Translator: nordstern <Unknown>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2010-10-08 00:48+0000\n"
+"X-Launchpad-Export-Date: 2010-11-13 19:56+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:55
@@ -172,7 +172,7 @@ msgstr "Tüm torrentleri başlat"
 
 #: ../gtk/actions.c:122
 msgid "Set _Location..."
-msgstr ""
+msgstr "_Bölgeyi Ayarla"
 
 #: ../gtk/actions.c:123
 msgid "Remove torrent"
@@ -303,23 +303,23 @@ msgstr "\"%s\" içe aktarılıyor"
 
 #: ../gtk/details.c:452 ../gtk/details.c:463
 msgid "Use global settings"
-msgstr ""
+msgstr "Genel ayarları kullan"
 
 #: ../gtk/details.c:453
 msgid "Seed regardless of ratio"
-msgstr ""
+msgstr "Gönderme oranı ne olursa olsun"
 
 #: ../gtk/details.c:454
 msgid "Stop seeding at ratio:"
-msgstr ""
+msgstr "Şu gönderme oranında durdur:"
 
 #: ../gtk/details.c:464
 msgid "Seed regardless of activity"
-msgstr ""
+msgstr "Etkinlik ne olursa olsun gönder"
 
 #: ../gtk/details.c:465
 msgid "Stop seeding if idle for N minutes:"
-msgstr ""
+msgstr "Eğer N dakika boş beklerse göndermeyi durdur"
 
 #: ../gtk/details.c:481 ../gtk/tr-prefs.c:1340
 msgid "Speed"
@@ -332,24 +332,24 @@ msgstr "Genel _sınırlara uy"
 #: ../gtk/details.c:488 ../gtk/tr-prefs.c:1124
 #, c-format
 msgid "Limit _download speed (%s):"
-msgstr ""
+msgstr "_İndirme hız limiti (%s):"
 
 #: ../gtk/details.c:501 ../gtk/tr-prefs.c:1131
 #, c-format
 msgid "Limit _upload speed (%s):"
-msgstr ""
+msgstr "Gönderme hız limiti  (%s):"
 
 #: ../gtk/details.c:518 ../gtk/tr-prefs.c:322
 msgid "Seeding Limits"
-msgstr ""
+msgstr "Yükleme Limitleri"
 
 #: ../gtk/details.c:528
 msgid "_Ratio:"
-msgstr ""
+msgstr "_Oran:"
 
 #: ../gtk/details.c:537
 msgid "_Idle:"
-msgstr ""
+msgstr "_Boşda:"
 
 #: ../gtk/details.c:540
 msgid "Peer Connections"
@@ -389,7 +389,7 @@ msgstr "Karıştırılmış"
 
 #: ../gtk/details.c:620
 msgid "No Torrents Selected"
-msgstr ""
+msgstr "Torrent seçilmedi"
 
 #: ../gtk/details.c:642
 msgid "Private to this tracker -- DHT and PEX disabled"
@@ -421,17 +421,17 @@ msgstr "Bilinmeyen"
 #: ../gtk/details.c:828
 #, c-format
 msgid "%1$s (%2$s%%)"
-msgstr ""
+msgstr "%1$s (%2$s%%)"
 
 #: ../gtk/details.c:830
 #, c-format
 msgid "%1$s (%2$s%% of %3$s%% Available)"
-msgstr ""
+msgstr "%1$s (%2$s%% of %3$s%% Erişilebilir)"
 
 #: ../gtk/details.c:832
 #, c-format
 msgid "%1$s (%2$s%% of %3$s%% Available) + %4$s Unverified"
-msgstr ""
+msgstr "%1$s (%2$s%% of %3$s%% Erişilebilir) + %4$s Doğrulanmadı"
 
 #: ../gtk/details.c:851
 #, c-format
@@ -440,11 +440,11 @@ msgstr "%1$s (+%2$s bozuk)"
 
 #: ../gtk/details.c:907
 msgid "No errors"
-msgstr ""
+msgstr "Hata yok"
 
 #: ../gtk/details.c:920
 msgid "Never"
-msgstr ""
+msgstr "Asla"
 
 #: ../gtk/details.c:924
 msgid "Active now"
@@ -897,7 +897,7 @@ msgstr "Hızlı ve kolay bir BitTorrent istemcisi"
 
 #: ../gtk/main.c:1427
 msgid "Copyright (c) The Transmission Project"
-msgstr ""
+msgstr "(c) Telif Hakkı Transmission projesine aittir."
 
 #. Translators: translate "translator-credits" as
 #. your name
@@ -915,12 +915,14 @@ msgstr ""
 "  Can Bülbül https://launchpad.net/~a.bulbul\n"
 "  Can Kaya https://launchpad.net/~ckaya\n"
 "  Emre Ayca https://launchpad.net/~anatolica\n"
+"  Engin BAHADIR https://launchpad.net/~enginbah\n"
 "  Gökhan KILINÇ https://launchpad.net/~kilincgokhan\n"
 "  Hakan Altindas https://launchpad.net/~hakanaltindas\n"
 "  Halil Kasap https://launchpad.net/~halil-kasap\n"
 "  Hasan Tayyar BEŞİK https://launchpad.net/~hasantayyar\n"
 "  Hasan Yılmaz https://launchpad.net/~hasanyilmaz\n"
 "  Holy Penguin https://launchpad.net/~holypenguin\n"
+"  Irfan Durmus https://launchpad.net/~irfandurmus\n"
 "  Meric Kutyar Gul https://launchpad.net/~meric\n"
 "  Mert Bozkurt https://launchpad.net/~aquacultural\n"
 "  Muhammed YÜRÜRDURMAZ https://launchpad.net/~myururdurmaz\n"
@@ -931,6 +933,7 @@ msgstr ""
 "  aylincan https://launchpad.net/~sevencan83\n"
 "  charles https://launchpad.net/~charles-rebelbase\n"
 "  ironic https://launchpad.net/~fatihbostanci\n"
+"  nordstern https://launchpad.net/~deran-delice\n"
 "  rayyildiz https://launchpad.net/~rayyildiz\n"
 "  webdr https://launchpad.net/~drumut\n"
 "  Özgür BASKIN https://launchpad.net/~ozgur-baskin"
@@ -1136,7 +1139,7 @@ msgstr "Toplam"
 #: ../gtk/stats.c:175
 #, c-format
 msgid "Started %'d time"
-msgstr ""
+msgstr "%'d kere başlanmış"
 
 #. %1$s is how much we've got,
 #. %2$s is how much we'll have when done,
@@ -1299,7 +1302,7 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:273
 msgid "Adding"
-msgstr ""
+msgstr "Ekleniyor"
 
 #: ../gtk/tr-prefs.c:276
 msgid "Automatically _add torrents from:"
@@ -1323,11 +1326,11 @@ msgstr "Torrent tamamlandığında be_tiği çağır"
 
 #: ../gtk/tr-prefs.c:324
 msgid "Stop seeding at _ratio:"
-msgstr ""
+msgstr "Şu oranda göndermeyi durdur:"
 
 #: ../gtk/tr-prefs.c:331
 msgid "Stop seeding if idle for _N minutes:"
-msgstr ""
+msgstr "Eğer _N dakika göndermezse durdur"
 
 #: ../gtk/tr-prefs.c:355 ../gtk/tr-prefs.c:1349
 msgid "Desktop"
@@ -1535,12 +1538,12 @@ msgstr "Normal hız sınırlarını elle veya belirlenmiş zamanlarda geçersiz 
 #: ../gtk/tr-prefs.c:1156
 #, c-format
 msgid "Limit do_wnload speed (%s):"
-msgstr ""
+msgstr "İn_dirme hız sınırı (%s):"
 
 #: ../gtk/tr-prefs.c:1160
 #, c-format
 msgid "Limit u_pload speed (%s):"
-msgstr ""
+msgstr "G_önderme hız sınırı (%s):"
 
 #: ../gtk/tr-prefs.c:1164
 msgid "_Scheduled times:"
@@ -1703,39 +1706,39 @@ msgstr "boyut|İnd: %1$s, Gön: %2$s"
 
 #: ../gtk/util.c:51 ../gtk/util.c:57
 msgid "KiB"
-msgstr ""
+msgstr "KB"
 
 #: ../gtk/util.c:52 ../gtk/util.c:58
 msgid "MiB"
-msgstr ""
+msgstr "MB"
 
 #: ../gtk/util.c:53 ../gtk/util.c:59
 msgid "GiB"
-msgstr ""
+msgstr "GB"
 
 #: ../gtk/util.c:54 ../gtk/util.c:60
 msgid "TiB"
-msgstr ""
+msgstr "TB"
 
 #: ../gtk/util.c:63
 msgid "KiB/s"
-msgstr ""
+msgstr "KB/sn"
 
 #: ../gtk/util.c:64
 msgid "MiB/s"
-msgstr ""
+msgstr "MB/sn"
 
 #: ../gtk/util.c:65
 msgid "GiB/s"
-msgstr ""
+msgstr "GB/sn"
 
 #: ../gtk/util.c:66
 msgid "TiB/s"
-msgstr ""
+msgstr "TB/sn"
 
 #: ../gtk/util.c:161
 msgid "size|None"
-msgstr ""
+msgstr "Boyut|Hiçbiri"
 
 #: ../gtk/util.c:326
 #, c-format
@@ -1759,12 +1762,12 @@ msgstr "Torrenti açmada hata"
 #: ../gtk/util.c:817
 #, c-format
 msgid "Error opening \"%s\""
-msgstr ""
+msgstr "\"%s\" açılırken hata"
 
 #: ../gtk/util.c:820
 #, c-format
 msgid "Server returned \"%1$ld %2$s\""
-msgstr ""
+msgstr "Sunucu yanıtı \"%1$ld %2$s\""
 
 #: ../gtk/util.c:840
 msgid "Unrecognized URL"

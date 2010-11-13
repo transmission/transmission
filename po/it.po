@@ -19,14 +19,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-09-18 22:00-0500\n"
-"PO-Revision-Date: 2010-09-30 19:45+0000\n"
+"PO-Revision-Date: 2010-11-12 20:42+0000\n"
 "Last-Translator: Luca Ferretti <elle.uca@ubuntu-it.org>\n"
 "Language-Team: Italian <tp@lists.linux.it>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2010-10-08 00:48+0000\n"
+"X-Launchpad-Export-Date: 2010-11-13 19:56+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:55
@@ -184,7 +184,7 @@ msgstr "Avvia tutti i torrent"
 
 #: ../gtk/actions.c:122
 msgid "Set _Location..."
-msgstr ""
+msgstr "Imposta posi_zione..."
 
 #: ../gtk/actions.c:123
 msgid "Remove torrent"
@@ -321,19 +321,19 @@ msgstr "Usa impostazioni globali"
 
 #: ../gtk/details.c:453
 msgid "Seed regardless of ratio"
-msgstr ""
+msgstr "Distribuisci senza tener conto del rapporto"
 
 #: ../gtk/details.c:454
 msgid "Stop seeding at ratio:"
-msgstr ""
+msgstr "Ferma la distribuzione al rapporto:"
 
 #: ../gtk/details.c:464
 msgid "Seed regardless of activity"
-msgstr ""
+msgstr "Distribuisci senza tener conto dell'attività"
 
 #: ../gtk/details.c:465
 msgid "Stop seeding if idle for N minutes:"
-msgstr ""
+msgstr "Ferma la distribuzione se inattivo per N minuti:"
 
 #: ../gtk/details.c:481 ../gtk/tr-prefs.c:1340
 msgid "Speed"
@@ -346,24 +346,24 @@ msgstr "Rispettare i _limiti globali"
 #: ../gtk/details.c:488 ../gtk/tr-prefs.c:1124
 #, c-format
 msgid "Limit _download speed (%s):"
-msgstr ""
+msgstr "_Limitare la velocità di ricezione (%s):"
 
 #: ../gtk/details.c:501 ../gtk/tr-prefs.c:1131
 #, c-format
 msgid "Limit _upload speed (%s):"
-msgstr ""
+msgstr "Li_mitare la velocità di invio (%s):"
 
 #: ../gtk/details.c:518 ../gtk/tr-prefs.c:322
 msgid "Seeding Limits"
-msgstr ""
+msgstr "Limiti di distribuzione"
 
 #: ../gtk/details.c:528
 msgid "_Ratio:"
-msgstr ""
+msgstr "_Rapporto:"
 
 #: ../gtk/details.c:537
 msgid "_Idle:"
-msgstr ""
+msgstr "_Inattività:"
 
 #: ../gtk/details.c:540
 msgid "Peer Connections"
@@ -435,7 +435,7 @@ msgstr "Sconosciuto"
 #: ../gtk/details.c:828
 #, c-format
 msgid "%1$s (%2$s%%)"
-msgstr ""
+msgstr "%1$s (%2$s%%)"
 
 #: ../gtk/details.c:830
 #, c-format
@@ -567,7 +567,7 @@ msgstr "Rich inv"
 
 #: ../gtk/details.c:1125
 msgid "Dn Reqs"
-msgstr "Rich scar"
+msgstr "Rich ric"
 
 #: ../gtk/details.c:1127
 msgid "Dn Blocks"
@@ -646,7 +646,7 @@ msgstr "Ottenuto un elenco di %1$s%2$'d nodi%3$s %4$s fa"
 #: ../gtk/details.c:1818
 #, c-format
 msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
-msgstr "Richiesta elenco nodi%1$sscaduta%2$s %3$s fa; attendere"
+msgstr "Richiesta elenco nodi %1$sscaduta%2$s %3$s fa; attendere"
 
 #: ../gtk/details.c:1821
 #, c-format
@@ -933,6 +933,7 @@ msgstr ""
 "  Damiano Di Carlo https://launchpad.net/~dldc\n"
 "  Fabrizio Papa https://launchpad.net/~fabri06\n"
 "  Federico \"Zio Vec\" Vecchio https://launchpad.net/~fedevecna\n"
+"  Fire https://launchpad.net/~redsoul\n"
 "  Francesco Baldini https://launchpad.net/~francesco-baldini\n"
 "  Guybrush88 https://launchpad.net/~erpizzo\n"
 "  Luca Ferretti https://launchpad.net/~elle.uca\n"
@@ -942,6 +943,7 @@ msgstr ""
 "  Nicola S. https://launchpad.net/~strambinico\n"
 "  Salvatore Udda https://launchpad.net/~udda\n"
 "  domenico https://launchpad.net/~cioffo88\n"
+"  flux https://launchpad.net/~luigimarco\n"
 "  ftaurino https://launchpad.net/~francesco-taurino\n"
 "  gdevitis https://launchpad.net/~gdevitis123\n"
 "  linuxenos https://launchpad.net/~linuxenos"
@@ -1338,11 +1340,11 @@ msgstr "_Eseguire uno script al completamento dei torrent:"
 
 #: ../gtk/tr-prefs.c:324
 msgid "Stop seeding at _ratio:"
-msgstr ""
+msgstr "Fermare la distribuzione al _rapporto:"
 
 #: ../gtk/tr-prefs.c:331
 msgid "Stop seeding if idle for _N minutes:"
-msgstr ""
+msgstr "Fermare la distribuzione se inattivo per N _minuti:"
 
 #: ../gtk/tr-prefs.c:355 ../gtk/tr-prefs.c:1349
 msgid "Desktop"
@@ -1425,7 +1427,7 @@ msgstr "DHT è uno strumento per trovare nodi senza un tracker."
 
 #: ../gtk/tr-prefs.c:534
 msgid "Use _Local Peer Discovery to find more peers"
-msgstr ""
+msgstr "Usare _Local Peer Discovery per trovare più nodi"
 
 #: ../gtk/tr-prefs.c:536
 msgid "LPD is a tool for finding peers on your local network."
@@ -1553,12 +1555,12 @@ msgstr ""
 #: ../gtk/tr-prefs.c:1156
 #, c-format
 msgid "Limit do_wnload speed (%s):"
-msgstr ""
+msgstr "Limitare la velocità di _ricezione (%s):"
 
 #: ../gtk/tr-prefs.c:1160
 #, c-format
 msgid "Limit u_pload speed (%s):"
-msgstr ""
+msgstr "Limitare la velocità di in_vio (%s):"
 
 #: ../gtk/tr-prefs.c:1164
 msgid "_Scheduled times:"
@@ -1845,7 +1847,7 @@ msgstr "ignorato indirizzo non valido nella blocklist alla riga %d"
 #: ../libtransmission/blocklist.c:370
 #, c-format
 msgid "Blocklist \"%s\" updated with %d entries"
-msgstr ""
+msgstr "Blocklist «%s» aggiornata con %d voci"
 
 #: ../libtransmission/fdlimit.c:357
 #, c-format

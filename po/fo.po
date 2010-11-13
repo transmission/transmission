@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-09-18 22:00-0500\n"
-"PO-Revision-Date: 2010-07-30 20:00+0000\n"
-"Last-Translator: Gunleif Joensen <Unknown>\n"
+"PO-Revision-Date: 2010-10-22 19:38+0000\n"
+"Last-Translator: Jonhard Sørensen <Unknown>\n"
 "Language-Team: Faroese <fo@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2010-10-08 00:48+0000\n"
+"X-Launchpad-Export-Date: 2010-11-13 19:56+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:55
@@ -341,7 +341,7 @@ msgstr ""
 
 #: ../gtk/details.c:518 ../gtk/tr-prefs.c:322
 msgid "Seeding Limits"
-msgstr ""
+msgstr "Seeding mørk"
 
 #: ../gtk/details.c:528
 msgid "_Ratio:"
@@ -888,7 +888,7 @@ msgstr "Ein skjótir og nemmur BitTorrent-viðskiftari"
 
 #: ../gtk/main.c:1427
 msgid "Copyright (c) The Transmission Project"
-msgstr ""
+msgstr "Copyright (c) The Transmission Project"
 
 #. Translators: translate "translator-credits" as
 #. your name
@@ -899,7 +899,8 @@ msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
 "  Gunleif Joensen https://launchpad.net/~gunleif\n"
-"  Jonhard Sørensen https://launchpad.net/~jonhardsorensen"
+"  Jonhard Sørensen https://launchpad.net/~jonhardsorensen\n"
+"  Jonhard Sørensen https://launchpad.net/~karlnils"
 
 #: ../gtk/makemeta-ui.c:78
 #, c-format
@@ -1673,31 +1674,31 @@ msgstr ""
 
 #: ../gtk/util.c:52 ../gtk/util.c:58
 msgid "MiB"
-msgstr ""
+msgstr "MiB"
 
 #: ../gtk/util.c:53 ../gtk/util.c:59
 msgid "GiB"
-msgstr ""
+msgstr "GiB"
 
 #: ../gtk/util.c:54 ../gtk/util.c:60
 msgid "TiB"
-msgstr ""
+msgstr "TiB"
 
 #: ../gtk/util.c:63
 msgid "KiB/s"
-msgstr ""
+msgstr "KiB/s"
 
 #: ../gtk/util.c:64
 msgid "MiB/s"
-msgstr ""
+msgstr "MiB/s"
 
 #: ../gtk/util.c:65
 msgid "GiB/s"
-msgstr ""
+msgstr "GiB/s"
 
 #: ../gtk/util.c:66
 msgid "TiB/s"
-msgstr ""
+msgstr "TiB/s"
 
 #: ../gtk/util.c:161
 msgid "size|None"

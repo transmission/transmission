@@ -1,17 +1,19 @@
+# Yaron Shahrabani <sh.yaron@gmail.com>, 2010.
 msgid ""
 msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-09-18 22:00-0500\n"
-"PO-Revision-Date: 2010-08-17 10:07+0000\n"
+"PO-Revision-Date: 2010-11-06 15:51+0000\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
-"Language-Team: \n"
+"Language-Team: Gezer (Hebrew)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2010-10-08 00:48+0000\n"
+"X-Launchpad-Export-Date: 2010-11-13 19:57+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
+"Language: he\n"
 "X-Poedit-Language: Hebrew\n"
 
 #: ../gtk/actions.c:55
@@ -56,15 +58,15 @@ msgstr "יו_מן הודעות"
 
 #: ../gtk/actions.c:95
 msgid "Enable Temporary Speed _Limits"
-msgstr ""
+msgstr "ה_פעלת מגבלות מהירות זמניות"
 
 #: ../gtk/actions.c:96
 msgid "_Compact View"
-msgstr ""
+msgstr "תצוגה _קומפקטית"
 
 #: ../gtk/actions.c:97
 msgid "Re_verse Sort Order"
-msgstr "מיון בסדר ה_פוך"
+msgstr "סידור בסדר ה_פוך"
 
 #: ../gtk/actions.c:98
 msgid "_Filterbar"
@@ -92,11 +94,11 @@ msgstr "_תצוגה"
 
 #: ../gtk/actions.c:108
 msgid "_Sort Torrents By"
-msgstr "_מיון טורנטים לפי"
+msgstr "_סידור טורנטים לפי"
 
 #: ../gtk/actions.c:109
 msgid "_Edit"
-msgstr "_עריכה"
+msgstr "ע_ריכה"
 
 #: ../gtk/actions.c:110
 msgid "_Help"
@@ -124,11 +126,11 @@ msgstr "הוספת _קובץ..."
 
 #: ../gtk/actions.c:115
 msgid "_Start"
-msgstr "_התחל"
+msgstr "ה_תחלה"
 
 #: ../gtk/actions.c:115
 msgid "Start torrent"
-msgstr "התחל טורנט"
+msgstr "התחלת טורנט"
 
 #: ../gtk/actions.c:116
 msgid "_Statistics"
@@ -140,23 +142,23 @@ msgstr "_תרומה"
 
 #: ../gtk/actions.c:118
 msgid "_Verify Local Data"
-msgstr "_בדוק נתונים מקומיים"
+msgstr "_בדיקת נתונים מקומיים"
 
 #: ../gtk/actions.c:119
 msgid "_Pause"
-msgstr "_השהה"
+msgstr "ה_שהיה"
 
 #: ../gtk/actions.c:119
 msgid "Pause torrent"
-msgstr "השהה טורנט"
+msgstr "השהיית טורנט"
 
 #: ../gtk/actions.c:120
 msgid "_Pause All"
-msgstr "ה_שהה הכול"
+msgstr "ה_שהיית הכול"
 
 #: ../gtk/actions.c:120
 msgid "Pause all torrents"
-msgstr "השהה את כל הטורנטים"
+msgstr "השהיית כל הטורנטים"
 
 #: ../gtk/actions.c:121
 msgid "_Start All"
@@ -168,15 +170,15 @@ msgstr "התחלת הורדת כל הטורנטים"
 
 #: ../gtk/actions.c:122
 msgid "Set _Location..."
-msgstr ""
+msgstr "ה_גדרת מיקום..."
 
 #: ../gtk/actions.c:123
 msgid "Remove torrent"
-msgstr "הסר טורנט"
+msgstr "הסרת טורנט"
 
 #: ../gtk/actions.c:124
 msgid "_Delete Files and Remove"
-msgstr "_מחק קבצים והסר"
+msgstr "_מחיקת הקבצים והסרה"
 
 #: ../gtk/actions.c:125
 msgid "_New..."
@@ -192,11 +194,11 @@ msgstr "י_ציאה"
 
 #: ../gtk/actions.c:127
 msgid "Select _All"
-msgstr "בחר _הכל"
+msgstr "בחירת _הכול"
 
 #: ../gtk/actions.c:128
 msgid "Dese_lect All"
-msgstr "בטל בחי_רה"
+msgstr "ביטול הבחי_רה"
 
 #: ../gtk/actions.c:130
 msgid "Torrent properties"
@@ -204,7 +206,7 @@ msgstr "מאפייני הטורנט"
 
 #: ../gtk/actions.c:131
 msgid "_Open Folder"
-msgstr "_פתח תיקייה"
+msgstr "_פתיחת תיקייה"
 
 #: ../gtk/actions.c:133
 msgid "_Contents"
@@ -212,11 +214,11 @@ msgstr "_תכנים"
 
 #: ../gtk/actions.c:134
 msgid "Ask Tracker for _More Peers"
-msgstr "בקש מהטראקר מקורות _נוספים"
+msgstr "בקשת מקורות _נוספים מהטראקר"
 
 #: ../gtk/add-dialog.c:240
 msgid "Torrent files"
-msgstr "קבצי טורנט"
+msgstr "קובצי טורנט"
 
 #: ../gtk/add-dialog.c:245
 msgid "All files"
@@ -229,11 +231,11 @@ msgstr "אפשרויות טורנט"
 
 #: ../gtk/add-dialog.c:295 ../gtk/tr-prefs.c:293
 msgid "Mo_ve .torrent file to the trash"
-msgstr "העברת קובץ .torret אל הא_שפה"
+msgstr "העברת קובץ ‎.torret אל הא_שפה"
 
 #: ../gtk/add-dialog.c:297 ../gtk/tr-prefs.c:289
 msgid "_Start when added"
-msgstr "_התחל בהוספה"
+msgstr "ה_תחלת ההוספה"
 
 #: ../gtk/add-dialog.c:312
 msgid "_Torrent file:"
@@ -241,7 +243,7 @@ msgstr "קובץ _טורנט"
 
 #: ../gtk/add-dialog.c:316
 msgid "Select Source File"
-msgstr "בחר קובץ מקור"
+msgstr "בחירת קובץ מקור"
 
 #: ../gtk/add-dialog.c:327
 msgid "_Destination folder:"
@@ -249,7 +251,7 @@ msgstr "_תיקיית יעד:"
 
 #: ../gtk/add-dialog.c:331
 msgid "Select Destination Folder"
-msgstr "בחר תיקיית יעד"
+msgstr "בחירת תיקיית יעד"
 
 #: ../gtk/add-dialog.c:353 ../gtk/details.c:514
 msgid "Torrent _priority:"
@@ -257,7 +259,7 @@ msgstr "עדיפות ה_טורנט:"
 
 #: ../gtk/add-dialog.c:437
 msgid "Add a Torrent"
-msgstr "הוסף טורנט"
+msgstr "הוספת טורנט"
 
 #: ../gtk/add-dialog.c:454 ../gtk/tr-prefs.c:285
 msgid "Show _options dialog"
@@ -295,11 +297,11 @@ msgstr "%s כבר פעיל."
 #: ../gtk/conf.c:427 ../gtk/conf.c:432
 #, c-format
 msgid "Importing \"%s\""
-msgstr "ייבוא \"%s\" מתבצע"
+msgstr "יבוא \"%s\" מתבצע"
 
 #: ../gtk/details.c:452 ../gtk/details.c:463
 msgid "Use global settings"
-msgstr ""
+msgstr "שימוש בהגדרות גלובליות"
 
 #: ../gtk/details.c:453
 msgid "Seed regardless of ratio"
@@ -328,12 +330,12 @@ msgstr "כיבוד _הגבלות גלובליות"
 #: ../gtk/details.c:488 ../gtk/tr-prefs.c:1124
 #, c-format
 msgid "Limit _download speed (%s):"
-msgstr ""
+msgstr "ה_גבלת מהירות ההורדה (%s):"
 
 #: ../gtk/details.c:501 ../gtk/tr-prefs.c:1131
 #, c-format
 msgid "Limit _upload speed (%s):"
-msgstr ""
+msgstr "הגבלת מהירות הה_עלאה (%s):"
 
 #: ../gtk/details.c:518 ../gtk/tr-prefs.c:322
 msgid "Seeding Limits"
@@ -341,11 +343,11 @@ msgstr ""
 
 #: ../gtk/details.c:528
 msgid "_Ratio:"
-msgstr ""
+msgstr "_יחס:"
 
 #: ../gtk/details.c:537
 msgid "_Idle:"
-msgstr ""
+msgstr "בהמ_תנה:"
 
 #: ../gtk/details.c:540
 msgid "Peer Connections"
@@ -361,7 +363,7 @@ msgstr "ממתין לבדיקת נתונים מקומיים"
 
 #: ../gtk/details.c:564
 msgid "Verifying local data"
-msgstr ""
+msgstr "הנתונים המקומיים בבדיקה"
 
 #: ../gtk/details.c:565 ../gtk/filter.c:714 ../gtk/tr-prefs.c:298
 msgid "Downloading"
@@ -373,7 +375,7 @@ msgstr ""
 
 #: ../gtk/details.c:567 ../gtk/filter.c:717 ../gtk/torrent-cell-renderer.c:206
 msgid "Finished"
-msgstr ""
+msgstr "הסתיים"
 
 #: ../gtk/details.c:567 ../gtk/filter.c:716 ../gtk/torrent-cell-renderer.c:208
 msgid "Paused"
@@ -385,11 +387,11 @@ msgstr "מעורב"
 
 #: ../gtk/details.c:620
 msgid "No Torrents Selected"
-msgstr ""
+msgstr "לא נבחרו טורנטים"
 
 #: ../gtk/details.c:642
 msgid "Private to this tracker -- DHT and PEX disabled"
-msgstr ""
+msgstr "פרטי לטראקר זה -- DHT ו־PEX מנוטרלים"
 
 #: ../gtk/details.c:644
 msgid "Public torrent"
@@ -417,12 +419,12 @@ msgstr "לא ידוע"
 #: ../gtk/details.c:828
 #, c-format
 msgid "%1$s (%2$s%%)"
-msgstr ""
+msgstr "%1$s (%2$s%%)"
 
 #: ../gtk/details.c:830
 #, c-format
 msgid "%1$s (%2$s%% of %3$s%% Available)"
-msgstr ""
+msgstr "%1$s (%2$s%% מתוך %3$s%% זמינים)"
 
 #: ../gtk/details.c:832
 #, c-format
@@ -436,20 +438,20 @@ msgstr ""
 
 #: ../gtk/details.c:907
 msgid "No errors"
-msgstr ""
+msgstr "אין שגיאות"
 
 #: ../gtk/details.c:920
 msgid "Never"
-msgstr ""
+msgstr "לעולם לא"
 
 #: ../gtk/details.c:924
 msgid "Active now"
-msgstr ""
+msgstr "פעיל כעת"
 
 #: ../gtk/details.c:928
 #, c-format
 msgid "%1$s ago"
-msgstr ""
+msgstr "לפני %1$s"
 
 #: ../gtk/details.c:947
 msgid "Activity"
@@ -457,7 +459,7 @@ msgstr "פעילות"
 
 #: ../gtk/details.c:951
 msgid "Torrent size:"
-msgstr ""
+msgstr "גודל הטורנט:"
 
 #: ../gtk/details.c:955
 msgid "Have:"
@@ -481,15 +483,15 @@ msgstr "מצב:"
 
 #: ../gtk/details.c:975
 msgid "Running time:"
-msgstr ""
+msgstr "זמן הפעילות:"
 
 #: ../gtk/details.c:979
 msgid "Remaining time:"
-msgstr ""
+msgstr "הזמן שנותר:"
 
 #: ../gtk/details.c:983
 msgid "Last activity:"
-msgstr ""
+msgstr "הפעילות האחרונה:"
 
 #: ../gtk/details.c:987
 msgid "Error:"
@@ -513,7 +515,7 @@ msgstr "פרטיות:"
 
 #: ../gtk/details.c:1014
 msgid "Origin:"
-msgstr ""
+msgstr "מקור:"
 
 #: ../gtk/details.c:1031
 msgid "Comment:"
@@ -696,7 +698,7 @@ msgstr ""
 
 #: ../gtk/details.c:2231 ../gtk/details.c:2352 ../gtk/filter.c:316
 msgid "Trackers"
-msgstr "טקראקרים"
+msgstr "טראקרים"
 
 #: ../gtk/details.c:2263
 msgid "_Edit Trackers"

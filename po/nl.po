@@ -15,14 +15,14 @@ msgstr ""
 "Project-Id-Version: Transmission 1.40b1 (7032)\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-09-18 22:00-0500\n"
-"PO-Revision-Date: 2010-06-13 19:25+0000\n"
+"PO-Revision-Date: 2010-10-13 19:38+0000\n"
 "Last-Translator: Arnout Lok <Unknown>\n"
 "Language-Team: vertaling@vrijschrift.org\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2010-10-08 00:48+0000\n"
+"X-Launchpad-Export-Date: 2010-11-13 19:57+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:55
@@ -179,7 +179,7 @@ msgstr "Alle torrents starten"
 
 #: ../gtk/actions.c:122
 msgid "Set _Location..."
-msgstr ""
+msgstr "_Locatie instellen…"
 
 #: ../gtk/actions.c:123
 msgid "Remove torrent"
@@ -310,23 +310,23 @@ msgstr "‘%s’ importeren"
 
 #: ../gtk/details.c:452 ../gtk/details.c:463
 msgid "Use global settings"
-msgstr ""
+msgstr "Globale instellingen gebruiken"
 
 #: ../gtk/details.c:453
 msgid "Seed regardless of ratio"
-msgstr ""
+msgstr "Seeden ongeacht ratio"
 
 #: ../gtk/details.c:454
 msgid "Stop seeding at ratio:"
-msgstr ""
+msgstr "Stoppen met seeden bij een ratio van:"
 
 #: ../gtk/details.c:464
 msgid "Seed regardless of activity"
-msgstr ""
+msgstr "Seeden ongeacht activiteit"
 
 #: ../gtk/details.c:465
 msgid "Stop seeding if idle for N minutes:"
-msgstr ""
+msgstr "Stoppen met seeden indien langer dan N minuten inactief:"
 
 #: ../gtk/details.c:481 ../gtk/tr-prefs.c:1340
 msgid "Speed"
@@ -339,24 +339,24 @@ msgstr "Globale _limieten aanhouden"
 #: ../gtk/details.c:488 ../gtk/tr-prefs.c:1124
 #, c-format
 msgid "Limit _download speed (%s):"
-msgstr ""
+msgstr "Do_wnloadsnelheid limiteren (%s):"
 
 #: ../gtk/details.c:501 ../gtk/tr-prefs.c:1131
 #, c-format
 msgid "Limit _upload speed (%s):"
-msgstr ""
+msgstr "U_ploadsnelheid limiteren (%s):"
 
 #: ../gtk/details.c:518 ../gtk/tr-prefs.c:322
 msgid "Seeding Limits"
-msgstr ""
+msgstr "Seedinglimieten"
 
 #: ../gtk/details.c:528
 msgid "_Ratio:"
-msgstr ""
+msgstr "_Ratio:"
 
 #: ../gtk/details.c:537
 msgid "_Idle:"
-msgstr ""
+msgstr "_Inactief:"
 
 #: ../gtk/details.c:540
 msgid "Peer Connections"
@@ -364,7 +364,7 @@ msgstr "Peerverbindingen"
 
 #: ../gtk/details.c:543
 msgid "_Maximum peers:"
-msgstr "_Maximaal aantal peers:"
+msgstr "_Maximum aantal peers:"
 
 #: ../gtk/details.c:563 ../gtk/torrent-cell-renderer.c:212
 msgid "Waiting to verify local data"
@@ -396,7 +396,7 @@ msgstr "Mix"
 
 #: ../gtk/details.c:620
 msgid "No Torrents Selected"
-msgstr ""
+msgstr "Geen torrents geselecteerd"
 
 #: ../gtk/details.c:642
 msgid "Private to this tracker -- DHT and PEX disabled"
@@ -428,17 +428,17 @@ msgstr "Onbekend"
 #: ../gtk/details.c:828
 #, c-format
 msgid "%1$s (%2$s%%)"
-msgstr ""
+msgstr "%1$s (%2$s%%)"
 
 #: ../gtk/details.c:830
 #, c-format
 msgid "%1$s (%2$s%% of %3$s%% Available)"
-msgstr ""
+msgstr "%1$s (%2$s%% van %3$s%% bechikbaar)"
 
 #: ../gtk/details.c:832
 #, c-format
 msgid "%1$s (%2$s%% of %3$s%% Available) + %4$s Unverified"
-msgstr ""
+msgstr "%1$s (%2$s%% van %3$s%% Available) + %4$s ongeverifiëerd"
 
 #: ../gtk/details.c:851
 #, c-format
@@ -447,11 +447,11 @@ msgstr "%1$s (+%2$s corrupt)"
 
 #: ../gtk/details.c:907
 msgid "No errors"
-msgstr ""
+msgstr "Geen fouten"
 
 #: ../gtk/details.c:920
 msgid "Never"
-msgstr ""
+msgstr "Nooit"
 
 #: ../gtk/details.c:924
 msgid "Active now"
@@ -904,7 +904,7 @@ msgstr "Een simpele en snelle BitTorrent-client"
 
 #: ../gtk/main.c:1427
 msgid "Copyright (c) The Transmission Project"
-msgstr ""
+msgstr "Copyright (c) Het Transmission-project"
 
 #. Translators: translate "translator-credits" as
 #. your name
@@ -1042,7 +1042,7 @@ msgstr "Berichtenlogboek"
 
 #: ../gtk/msgwin.c:425
 msgid "Level"
-msgstr "Niveau"
+msgstr "Informatieniveau:"
 
 #: ../gtk/notify.c:121
 msgid "Download complete"
@@ -1133,7 +1133,7 @@ msgstr "Totaal"
 #: ../gtk/stats.c:175
 #, c-format
 msgid "Started %'d time"
-msgstr ""
+msgstr "%'d keer gestart"
 
 #. %1$s is how much we've got,
 #. %2$s is how much we'll have when done,
@@ -1141,7 +1141,7 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:63
 #, c-format
 msgid "%1$s of %2$s (%3$s%%)"
-msgstr ""
+msgstr "%1$s van %2$s (%3$s%%)"
 
 #. %1$s is how much we've got,
 #. %2$s is the torrent's total size,
@@ -1152,7 +1152,7 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:79
 #, c-format
 msgid "%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s Goal: %6$s)"
-msgstr ""
+msgstr "%1$s van %2$s (%3$s%%), geüpload %4$s (ratio: %5$s doel: %6$s)"
 
 #. %1$s is how much we've got,
 #. %2$s is the torrent's total size,
@@ -1162,7 +1162,7 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:95
 #, c-format
 msgid "%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s)"
-msgstr ""
+msgstr "%1$s van %2$s (%3$s%%), geüpload %4$s (ratio: %5$s)"
 
 #. %1$s is the torrent's total size,
 #. %2$s is how much we've uploaded,
@@ -1296,7 +1296,7 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:273
 msgid "Adding"
-msgstr ""
+msgstr "Toevoegen"
 
 #: ../gtk/tr-prefs.c:276
 msgid "Automatically _add torrents from:"
@@ -1304,7 +1304,7 @@ msgstr "_Automatisch torrents toevoegen uit:"
 
 #: ../gtk/tr-prefs.c:300
 msgid "Append \"._part\" to incomplete files' names"
-msgstr "‘.pa_rt’ aan de naam van nog niet voltooide bestanden toevoegen"
+msgstr "‘.pa_rt’ aan de naam van niet voltooide bestanden toevoegen"
 
 #: ../gtk/tr-prefs.c:305
 msgid "Save to _Location:"
@@ -1312,7 +1312,7 @@ msgstr "Bestan_den opslaan in:"
 
 #: ../gtk/tr-prefs.c:307
 msgid "Keep _incomplete torrents in:"
-msgstr "Nog n_iet voltooide torrents bewaren in:"
+msgstr "N_iet voltooide torrents bewaren in:"
 
 #: ../gtk/tr-prefs.c:314
 msgid "Call scrip_t when torrent is completed:"
@@ -1320,11 +1320,11 @@ msgstr "Scrip_t starten zodra een torrent voltooid is:"
 
 #: ../gtk/tr-prefs.c:324
 msgid "Stop seeding at _ratio:"
-msgstr ""
+msgstr "Stoppen met seeden bij een _ratio van:"
 
 #: ../gtk/tr-prefs.c:331
 msgid "Stop seeding if idle for _N minutes:"
-msgstr ""
+msgstr "Stoppen met seeden indien langer dan _N minuten inactief:"
 
 #: ../gtk/tr-prefs.c:355 ../gtk/tr-prefs.c:1349
 msgid "Desktop"
@@ -1407,7 +1407,7 @@ msgstr "DHT wordt gebruikt om peers zonder tracker te vinden."
 
 #: ../gtk/tr-prefs.c:534
 msgid "Use _Local Peer Discovery to find more peers"
-msgstr ""
+msgstr "_Lokale peer-ontdekking gebruiken om meer peers te vinden"
 
 #: ../gtk/tr-prefs.c:536
 msgid "LPD is a tool for finding peers on your local network."
@@ -1450,11 +1450,11 @@ msgstr "_Wachtwoord:"
 #. require authentication
 #: ../gtk/tr-prefs.c:802
 msgid "Only allow these IP a_ddresses to connect:"
-msgstr "Alleen deze IP-_adressen toegang geven:"
+msgstr "Alleen de volgende IP-_adressen toegang geven:"
 
 #: ../gtk/tr-prefs.c:827
 msgid "IP addresses may use wildcards, such as 192.168.*.*"
-msgstr "IP-adressen mogen joker-tekens bevatten, zoals 192.168.*.*"
+msgstr "IP-adressen mogen jokertekens bevatten, zoals 192.168.*.*"
 
 #: ../gtk/tr-prefs.c:849
 msgid "Addresses:"
@@ -1535,12 +1535,12 @@ msgstr "Normale snelheidslimieten handmatig of op geplande tijden negeren"
 #: ../gtk/tr-prefs.c:1156
 #, c-format
 msgid "Limit do_wnload speed (%s):"
-msgstr ""
+msgstr "_Downloadsnelheid limiteren (%s):"
 
 #: ../gtk/tr-prefs.c:1160
 #, c-format
 msgid "Limit u_pload speed (%s):"
-msgstr ""
+msgstr "Upl_oadsnelheid limiteren (%s):"
 
 #: ../gtk/tr-prefs.c:1164
 msgid "_Scheduled times:"
@@ -1598,11 +1598,11 @@ msgstr "Limieten"
 
 #: ../gtk/tr-prefs.c:1302
 msgid "Maximum peers per _torrent:"
-msgstr "Maximaal aantal peers _per torrent:"
+msgstr "Maximum aantal peers _per torrent:"
 
 #: ../gtk/tr-prefs.c:1304
 msgid "Maximum peers _overall:"
-msgstr "_Globaal maximaal aantal peers:"
+msgstr "_Globaal maximum aantal peers:"
 
 # Geen toepassingsnaam gebruiken in dialoogvensters (Wouter Bolsterlee)
 #: ../gtk/tr-prefs.c:1322
@@ -1691,7 +1691,7 @@ msgstr "Stop seeden bij ratio"
 #: ../gtk/tr-window.c:553
 #, c-format
 msgid "Stop at Ratio (%s)"
-msgstr "Stop bij ratio (%s)"
+msgstr "Stoppen bij ratio %s"
 
 #: ../gtk/tr-window.c:779 ../gtk/tr-window.c:807
 #, c-format
@@ -1705,39 +1705,39 @@ msgstr "Down: %1$s, Up: %2$s"
 
 #: ../gtk/util.c:51 ../gtk/util.c:57
 msgid "KiB"
-msgstr ""
+msgstr "KiB"
 
 #: ../gtk/util.c:52 ../gtk/util.c:58
 msgid "MiB"
-msgstr ""
+msgstr "MiB"
 
 #: ../gtk/util.c:53 ../gtk/util.c:59
 msgid "GiB"
-msgstr ""
+msgstr "GiB"
 
 #: ../gtk/util.c:54 ../gtk/util.c:60
 msgid "TiB"
-msgstr ""
+msgstr "TiB"
 
 #: ../gtk/util.c:63
 msgid "KiB/s"
-msgstr ""
+msgstr "KiB/s"
 
 #: ../gtk/util.c:64
 msgid "MiB/s"
-msgstr ""
+msgstr "MiB/s"
 
 #: ../gtk/util.c:65
 msgid "GiB/s"
-msgstr ""
+msgstr "GiB/s"
 
 #: ../gtk/util.c:66
 msgid "TiB/s"
-msgstr ""
+msgstr "TiB/s"
 
 #: ../gtk/util.c:161
 msgid "size|None"
-msgstr ""
+msgstr "Geen"
 
 #: ../gtk/util.c:326
 #, c-format
@@ -1761,12 +1761,12 @@ msgstr "Fout bij openen torrent"
 #: ../gtk/util.c:817
 #, c-format
 msgid "Error opening \"%s\""
-msgstr ""
+msgstr "Kan ‘%s’ niet openen"
 
 #: ../gtk/util.c:820
 #, c-format
 msgid "Server returned \"%1$ld %2$s\""
-msgstr ""
+msgstr "Server antwoordde \"%1$ld %2$s\""
 
 #: ../gtk/util.c:840
 msgid "Unrecognized URL"
@@ -1816,7 +1816,7 @@ msgstr "Kan ‘%1$s’ niet lezen: %2$s"
 #: ../libtransmission/blocklist.c:114
 #, c-format
 msgid "Blocklist \"%s\" contains %zu entries"
-msgstr ""
+msgstr "Blokkadelijst ‘%s’ bevat %zu items"
 
 #. don't try to display the actual lines - it causes issues
 #: ../libtransmission/blocklist.c:354
@@ -1827,7 +1827,7 @@ msgstr "Ongeldig adres overgeslagen op regel %d in de blokkadelijst"
 #: ../libtransmission/blocklist.c:370
 #, c-format
 msgid "Blocklist \"%s\" updated with %d entries"
-msgstr ""
+msgstr "Blokkadelijst ‘%s’ bijgewerkt met %d items"
 
 #: ../libtransmission/fdlimit.c:357
 #, c-format

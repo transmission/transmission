@@ -12,14 +12,14 @@ msgstr ""
 "Project-Id-Version: es\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-09-18 22:00-0500\n"
-"PO-Revision-Date: 2010-06-30 06:21+0000\n"
-"Last-Translator: Paco Molinero <paco@byasl.com>\n"
+"PO-Revision-Date: 2010-10-12 09:18+0000\n"
+"Last-Translator: Monkey <monkey.libre@gmail.com>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2010-10-08 00:48+0000\n"
+"X-Launchpad-Export-Date: 2010-11-13 19:56+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Country: SPAIN\n"
 "X-Poedit-Language: Spanish\n"
@@ -427,17 +427,17 @@ msgstr "Desconocido"
 #: ../gtk/details.c:828
 #, c-format
 msgid "%1$s (%2$s%%)"
-msgstr ""
+msgstr "%1$s (%2$s%%)"
 
 #: ../gtk/details.c:830
 #, c-format
 msgid "%1$s (%2$s%% of %3$s%% Available)"
-msgstr ""
+msgstr "%1$s (%2$s%% de %3$s%% disponible)"
 
 #: ../gtk/details.c:832
 #, c-format
 msgid "%1$s (%2$s%% of %3$s%% Available) + %4$s Unverified"
-msgstr ""
+msgstr "%1$s (%2$s%% de %3$s%% Available) + %4$s sin verificar"
 
 #: ../gtk/details.c:851
 #, c-format
@@ -446,11 +446,11 @@ msgstr "%1$s (+%2$s corrupto)"
 
 #: ../gtk/details.c:907
 msgid "No errors"
-msgstr ""
+msgstr "Sin errores"
 
 #: ../gtk/details.c:920
 msgid "Never"
-msgstr ""
+msgstr "Nunca"
 
 #: ../gtk/details.c:924
 msgid "Active now"
@@ -1193,7 +1193,7 @@ msgstr "Total"
 #: ../gtk/stats.c:175
 #, c-format
 msgid "Started %'d time"
-msgstr ""
+msgstr "Iniciado %'d vez"
 
 #. %1$s is how much we've got,
 #. %2$s is how much we'll have when done,
@@ -1201,7 +1201,7 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:63
 #, c-format
 msgid "%1$s of %2$s (%3$s%%)"
-msgstr ""
+msgstr "%1$s de %2$s (%3$s%%)"
 
 #. %1$s is how much we've got,
 #. %2$s is the torrent's total size,
@@ -1762,35 +1762,35 @@ msgstr "Descarga: %1$s, Subida: %2$s"
 
 #: ../gtk/util.c:51 ../gtk/util.c:57
 msgid "KiB"
-msgstr ""
+msgstr "KiB"
 
 #: ../gtk/util.c:52 ../gtk/util.c:58
 msgid "MiB"
-msgstr ""
+msgstr "MiB"
 
 #: ../gtk/util.c:53 ../gtk/util.c:59
 msgid "GiB"
-msgstr ""
+msgstr "GiB"
 
 #: ../gtk/util.c:54 ../gtk/util.c:60
 msgid "TiB"
-msgstr ""
+msgstr "TiB"
 
 #: ../gtk/util.c:63
 msgid "KiB/s"
-msgstr ""
+msgstr "KiB/s"
 
 #: ../gtk/util.c:64
 msgid "MiB/s"
-msgstr ""
+msgstr "MiB/s"
 
 #: ../gtk/util.c:65
 msgid "GiB/s"
-msgstr ""
+msgstr "GiB/s"
 
 #: ../gtk/util.c:66
 msgid "TiB/s"
-msgstr ""
+msgstr "TiB/s"
 
 #: ../gtk/util.c:161
 msgid "size|None"
@@ -1818,7 +1818,7 @@ msgstr "Error al abrir el torrent"
 #: ../gtk/util.c:817
 #, c-format
 msgid "Error opening \"%s\""
-msgstr ""
+msgstr "Error al abrir «%s»"
 
 #: ../gtk/util.c:820
 #, c-format

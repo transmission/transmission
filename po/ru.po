@@ -10,19 +10,23 @@ msgstr ""
 "Project-Id-Version: Transmission HEAD\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-09-18 22:00-0500\n"
-"PO-Revision-Date: 2010-10-01 18:16+0000\n"
-"Last-Translator: Sergey \"Shnatsel\" Davidoff <Shnatsel@gmail.com>\n"
+"PO-Revision-Date: 2010-11-04 17:40+0000\n"
+"Last-Translator: Alexey Ivanov <alexey.ivanes@gmail.com>\n"
 "Language-Team: Russian <gnome-cyr@gnome.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2010-10-08 00:48+0000\n"
+"X-Launchpad-Export-Date: 2010-11-13 19:56+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Country: RUSSIAN FEDERATION\n"
 "X-Poedit-Language: Russian\n"
 "X-Poedit-SourceCharset: utf-8\n"
+
+#: ../gtk/util.c:161
+msgid "size|None"
+msgstr "N/A"
 
 #: ../gtk/actions.c:55
 msgid "Sort by _Activity"
@@ -418,7 +422,7 @@ msgstr "Создано %1$s"
 #: ../gtk/details.c:671
 #, c-format
 msgid "Created by %1$s on %2$s"
-msgstr "Создан %1$s на %2$s"
+msgstr "Создан %1$s %2$s"
 
 #: ../gtk/details.c:757
 msgid "Unknown"
@@ -450,7 +454,7 @@ msgstr "Ошибок нет"
 
 #: ../gtk/details.c:920
 msgid "Never"
-msgstr ""
+msgstr "Никогда"
 
 #: ../gtk/details.c:924
 msgid "Active now"
@@ -638,7 +642,7 @@ msgstr "Получен список %1$s%2$'d участников%3$s %4$s на
 #, c-format
 msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
 msgstr ""
-"Время запроса списка клиентов %1$s истекло %2$s %3$s назад; повтор попытки"
+"Время запроса списка узлов %1$s истекло %2$s %3$s назад; повтор попытки"
 
 #: ../gtk/details.c:1821
 #, c-format
@@ -960,6 +964,8 @@ msgstr ""
 "  Shu https://launchpad.net/~shu3k\n"
 "  Vadim Rutkovsky https://launchpad.net/~roignac\n"
 "  Victor N. https://launchpad.net/~d447224\n"
+"  ap0stol https://launchpad.net/~x777ozon\n"
+"  egor panfilov https://launchpad.net/~atom8bit\n"
 "  meating https://launchpad.net/~unrealjke\n"
 "  nickkon https://launchpad.net/~nickkon\n"
 "  ttg https://launchpad.net/~xvttgvx\n"
@@ -1170,7 +1176,7 @@ msgstr "Итого"
 #: ../gtk/stats.c:175
 #, c-format
 msgid "Started %'d time"
-msgstr ""
+msgstr "Запущено %'d раз"
 
 #. %1$s is how much we've got,
 #. %2$s is how much we'll have when done,
@@ -1333,7 +1339,7 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:273
 msgid "Adding"
-msgstr ""
+msgstr "Добавление"
 
 #: ../gtk/tr-prefs.c:276
 msgid "Automatically _add torrents from:"
@@ -1737,11 +1743,11 @@ msgstr "Принято: %1$s, Роздано: %2$s"
 
 #: ../gtk/util.c:51 ../gtk/util.c:57
 msgid "KiB"
-msgstr ""
+msgstr "КиБ"
 
 #: ../gtk/util.c:52 ../gtk/util.c:58
 msgid "MiB"
-msgstr ""
+msgstr "МиБ"
 
 #: ../gtk/util.c:53 ../gtk/util.c:59
 msgid "GiB"
@@ -1766,10 +1772,6 @@ msgstr "ГиБ/с"
 #: ../gtk/util.c:66
 msgid "TiB/s"
 msgstr "ТиБ/с"
-
-#: ../gtk/util.c:161
-msgid "size|None"
-msgstr "размер|не выбрано"
 
 #: ../gtk/util.c:326
 #, c-format

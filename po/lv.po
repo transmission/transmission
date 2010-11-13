@@ -9,14 +9,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-09-18 22:00-0500\n"
-"PO-Revision-Date: 2010-10-07 06:42+0000\n"
-"Last-Translator: HX_unbanned <Unknown>\n"
-"Language-Team: Latviešu <lata-l10n@googlegroups.com>\n"
+"PO-Revision-Date: 2010-10-22 18:04+0000\n"
+"Last-Translator: Tranzistors <Unknown>\n"
+"Language-Team: Latvian <lata-l10n@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2010-10-08 00:48+0000\n"
+"X-Launchpad-Export-Date: 2010-11-13 19:57+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:55
@@ -1392,10 +1392,11 @@ msgstr "DHT ir rīks, lai atrastu dalībniekus bez sekotāja."
 #: ../gtk/tr-prefs.c:534
 msgid "Use _Local Peer Discovery to find more peers"
 msgstr ""
+"Izmantot \"_lokālo dalībnieku atklāšanu\", lai atrastu vairāk dalībnieku"
 
 #: ../gtk/tr-prefs.c:536
 msgid "LPD is a tool for finding peers on your local network."
-msgstr ""
+msgstr "LDA ir rīks, vairāk dalībnieku atrašanai lokālajā tīkla."
 
 #: ../gtk/tr-prefs.c:757
 msgid "Web Client"
@@ -1522,7 +1523,7 @@ msgstr "Ierobežot lejup_lādes ātrumu (%s):"
 #: ../gtk/tr-prefs.c:1160
 #, c-format
 msgid "Limit u_pload speed (%s):"
-msgstr ""
+msgstr "Ierobežot augšu_pielādes ātrumu (%s):"
 
 #: ../gtk/tr-prefs.c:1164
 msgid "_Scheduled times:"
@@ -1795,7 +1796,7 @@ msgstr "Nevar nolasīt \"%1$s\": %2$s"
 #: ../libtransmission/blocklist.c:114
 #, c-format
 msgid "Blocklist \"%s\" contains %zu entries"
-msgstr ""
+msgstr "Bloķēšanas saraksts \"%s\" satur %zu ierakstus"
 
 #. don't try to display the actual lines - it causes issues
 #: ../libtransmission/blocklist.c:354
@@ -1806,7 +1807,7 @@ msgstr "nobloķēto saraksts izlaida nederīgu adresi uz līnijas %d"
 #: ../libtransmission/blocklist.c:370
 #, c-format
 msgid "Blocklist \"%s\" updated with %d entries"
-msgstr ""
+msgstr "Bloķēšanas saraksts \"%s\" atjaunināts ar %d ierakstiem"
 
 #: ../libtransmission/fdlimit.c:357
 #, c-format

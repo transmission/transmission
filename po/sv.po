@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-09-18 22:00-0500\n"
-"PO-Revision-Date: 2010-09-14 18:39+0000\n"
-"Last-Translator: Daniel Nylander <yeager@ubuntu.com>\n"
+"PO-Revision-Date: 2010-10-17 17:14+0000\n"
+"Last-Translator: David Bengtsson <Unknown>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2010-10-08 00:48+0000\n"
+"X-Launchpad-Export-Date: 2010-11-13 19:56+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:55
@@ -144,7 +144,7 @@ msgstr "_Donera"
 
 #: ../gtk/actions.c:118
 msgid "_Verify Local Data"
-msgstr "_Verifiera lokalt data"
+msgstr "_Verifiera lokala data"
 
 #: ../gtk/actions.c:119
 msgid "_Pause"
@@ -172,7 +172,7 @@ msgstr "Starta alla torrentfiler"
 
 #: ../gtk/actions.c:122
 msgid "Set _Location..."
-msgstr ""
+msgstr "Ställ in _plats..."
 
 #: ../gtk/actions.c:123
 msgid "Remove torrent"
@@ -303,23 +303,23 @@ msgstr "Importerar \"%s\""
 
 #: ../gtk/details.c:452 ../gtk/details.c:463
 msgid "Use global settings"
-msgstr ""
+msgstr "Använd globala inställningar"
 
 #: ../gtk/details.c:453
 msgid "Seed regardless of ratio"
-msgstr ""
+msgstr "Distribuera oavsett förhållande"
 
 #: ../gtk/details.c:454
 msgid "Stop seeding at ratio:"
-msgstr ""
+msgstr "Sluta distribuera vid förhållandet:"
 
 #: ../gtk/details.c:464
 msgid "Seed regardless of activity"
-msgstr ""
+msgstr "Distribuera oavsett aktivitet"
 
 #: ../gtk/details.c:465
 msgid "Stop seeding if idle for N minutes:"
-msgstr ""
+msgstr "Sluta distribuera om overksam i N minuter:"
 
 #: ../gtk/details.c:481 ../gtk/tr-prefs.c:1340
 msgid "Speed"
@@ -332,24 +332,24 @@ msgstr "Tillämpa allmänna _gränser"
 #: ../gtk/details.c:488 ../gtk/tr-prefs.c:1124
 #, c-format
 msgid "Limit _download speed (%s):"
-msgstr ""
+msgstr "Begränsa _hämtningshastighet (%s):"
 
 #: ../gtk/details.c:501 ../gtk/tr-prefs.c:1131
 #, c-format
 msgid "Limit _upload speed (%s):"
-msgstr ""
+msgstr "Begränsa _sändningshastighet (%s):"
 
 #: ../gtk/details.c:518 ../gtk/tr-prefs.c:322
 msgid "Seeding Limits"
-msgstr ""
+msgstr "Distribueringsgränser"
 
 #: ../gtk/details.c:528
 msgid "_Ratio:"
-msgstr ""
+msgstr "_Förhållande:"
 
 #: ../gtk/details.c:537
 msgid "_Idle:"
-msgstr ""
+msgstr "_Overksam:"
 
 #: ../gtk/details.c:540
 msgid "Peer Connections"
@@ -389,7 +389,7 @@ msgstr "Blandad"
 
 #: ../gtk/details.c:620
 msgid "No Torrents Selected"
-msgstr ""
+msgstr "Inga torrent-filer valda"
 
 #: ../gtk/details.c:642
 msgid "Private to this tracker -- DHT and PEX disabled"
@@ -421,7 +421,7 @@ msgstr "Okänt"
 #: ../gtk/details.c:828
 #, c-format
 msgid "%1$s (%2$s%%)"
-msgstr ""
+msgstr "%1$s (%2$s%%)"
 
 #: ../gtk/details.c:830
 #, c-format
@@ -440,11 +440,11 @@ msgstr "%1$s (+%2$s skadat)"
 
 #: ../gtk/details.c:907
 msgid "No errors"
-msgstr ""
+msgstr "Inga fel"
 
 #: ../gtk/details.c:920
 msgid "Never"
-msgstr ""
+msgstr "Aldrig"
 
 #: ../gtk/details.c:924
 msgid "Active now"
@@ -586,7 +586,7 @@ msgstr "Hämtar från denna klient"
 
 #: ../gtk/details.c:1475
 msgid "We would download from this peer if they would let us"
-msgstr "Vi skulle hämta från denna klient om de låter oss"
+msgstr "Vi skulle hämta från denna klient om de tillät oss"
 
 #: ../gtk/details.c:1476
 msgid "Uploading to peer"
@@ -898,7 +898,7 @@ msgstr "En snabb och enkel BitTorrent-klient"
 
 #: ../gtk/main.c:1427
 msgid "Copyright (c) The Transmission Project"
-msgstr ""
+msgstr "Copyright (c) The Transmission Project"
 
 #. Translators: translate "translator-credits" as
 #. your name
@@ -921,6 +921,7 @@ msgstr ""
 "  Martin Josefsson https://launchpad.net/~josefsson-martin\n"
 "  Michael Dundee https://launchpad.net/~dundee-michael\n"
 "  Mikael Olofsson https://launchpad.net/~michlos\n"
+"  Oscar Carlsson https://launchpad.net/~oscar-carlsson\n"
 "  Per Söderkvist https://launchpad.net/~sodper\n"
 "  Teodor Jönsson https://launchpad.net/~teodor-jonsson-sogeti\n"
 "  fabbylicious https://launchpad.net/~fabbylicious"
@@ -1126,7 +1127,7 @@ msgstr "Totalt"
 #: ../gtk/stats.c:175
 #, c-format
 msgid "Started %'d time"
-msgstr ""
+msgstr "Påbörjad %'d gång"
 
 #. %1$s is how much we've got,
 #. %2$s is how much we'll have when done,
@@ -1134,7 +1135,7 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:63
 #, c-format
 msgid "%1$s of %2$s (%3$s%%)"
-msgstr ""
+msgstr "%1$s av %2$s (%3$s%%)"
 
 #. %1$s is how much we've got,
 #. %2$s is the torrent's total size,
@@ -1145,7 +1146,7 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:79
 #, c-format
 msgid "%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s Goal: %6$s)"
-msgstr ""
+msgstr "%1$s av %2$s (%3$s%%), skickat %4$s (Förhållande: %5$s Mål: %6$s)"
 
 #. %1$s is how much we've got,
 #. %2$s is the torrent's total size,
@@ -1155,7 +1156,7 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:95
 #, c-format
 msgid "%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s)"
-msgstr ""
+msgstr "%1$s av %2$s (%3$s%%), skickat %4$s (Förhållande: %5$s)"
 
 #. %1$s is the torrent's total size,
 #. %2$s is how much we've uploaded,
@@ -1289,7 +1290,7 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:273
 msgid "Adding"
-msgstr ""
+msgstr "Lägger till"
 
 #: ../gtk/tr-prefs.c:276
 msgid "Automatically _add torrents from:"
@@ -1313,11 +1314,11 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:324
 msgid "Stop seeding at _ratio:"
-msgstr ""
+msgstr "Sluta distribuera vid _förhållandet:"
 
 #: ../gtk/tr-prefs.c:331
 msgid "Stop seeding if idle for _N minutes:"
-msgstr ""
+msgstr "Sluta distribuera om overksam i _N minuter:"
 
 #: ../gtk/tr-prefs.c:355 ../gtk/tr-prefs.c:1349
 msgid "Desktop"
@@ -1400,11 +1401,11 @@ msgstr "DHT är ett verktyg för att hitta klienter utan en bevakare."
 
 #: ../gtk/tr-prefs.c:534
 msgid "Use _Local Peer Discovery to find more peers"
-msgstr ""
+msgstr "Använd _Local Peer Discovery för att hitta fler klienter"
 
 #: ../gtk/tr-prefs.c:536
 msgid "LPD is a tool for finding peers on your local network."
-msgstr ""
+msgstr "LPD är ett verktyg för att hitta klienter på ditt lokala nätverk."
 
 #: ../gtk/tr-prefs.c:757
 msgid "Web Client"
@@ -1513,7 +1514,7 @@ msgstr "Lördag"
 
 #: ../gtk/tr-prefs.c:1122
 msgid "Speed Limits"
-msgstr "Hastighetsbegränsningar"
+msgstr "Hastighetsgränser"
 
 #: ../gtk/tr-prefs.c:1142
 msgid "Temporary Speed Limits"
@@ -1527,12 +1528,12 @@ msgstr ""
 #: ../gtk/tr-prefs.c:1156
 #, c-format
 msgid "Limit do_wnload speed (%s):"
-msgstr ""
+msgstr "Begränsa hä_mtningshastighet (%s):"
 
 #: ../gtk/tr-prefs.c:1160
 #, c-format
 msgid "Limit u_pload speed (%s):"
-msgstr ""
+msgstr "Begränsa s_ändningshastighet (%s):"
 
 #: ../gtk/tr-prefs.c:1164
 msgid "_Scheduled times:"
@@ -1695,35 +1696,35 @@ msgstr "Ner: %1$s, Upp: %2$s"
 
 #: ../gtk/util.c:51 ../gtk/util.c:57
 msgid "KiB"
-msgstr ""
+msgstr "KiB"
 
 #: ../gtk/util.c:52 ../gtk/util.c:58
 msgid "MiB"
-msgstr ""
+msgstr "MiB"
 
 #: ../gtk/util.c:53 ../gtk/util.c:59
 msgid "GiB"
-msgstr ""
+msgstr "GiB"
 
 #: ../gtk/util.c:54 ../gtk/util.c:60
 msgid "TiB"
-msgstr ""
+msgstr "TiB"
 
 #: ../gtk/util.c:63
 msgid "KiB/s"
-msgstr ""
+msgstr "KiB/s"
 
 #: ../gtk/util.c:64
 msgid "MiB/s"
-msgstr ""
+msgstr "MiB/s"
 
 #: ../gtk/util.c:65
 msgid "GiB/s"
-msgstr ""
+msgstr "GiB/s"
 
 #: ../gtk/util.c:66
 msgid "TiB/s"
-msgstr ""
+msgstr "TiB/s"
 
 #: ../gtk/util.c:161
 msgid "size|None"
@@ -1751,12 +1752,12 @@ msgstr "Fel vid öppning av torrentfil"
 #: ../gtk/util.c:817
 #, c-format
 msgid "Error opening \"%s\""
-msgstr ""
+msgstr "Fel vid öppnande av \"%s\""
 
 #: ../gtk/util.c:820
 #, c-format
 msgid "Server returned \"%1$ld %2$s\""
-msgstr ""
+msgstr "Servern returnerade \"%1$ld %2$s\""
 
 #: ../gtk/util.c:840
 msgid "Unrecognized URL"
@@ -1806,18 +1807,18 @@ msgstr "Kunde inte läsa \"%1$s\": %2$s"
 #: ../libtransmission/blocklist.c:114
 #, c-format
 msgid "Blocklist \"%s\" contains %zu entries"
-msgstr ""
+msgstr "Blockeringslistan \"%s\" innehåller %zu poster"
 
 #. don't try to display the actual lines - it causes issues
 #: ../libtransmission/blocklist.c:354
 #, c-format
 msgid "blocklist skipped invalid address at line %d"
-msgstr ""
+msgstr "Blockeringslistan hoppade över ogiltig adress på raden %d"
 
 #: ../libtransmission/blocklist.c:370
 #, c-format
 msgid "Blocklist \"%s\" updated with %d entries"
-msgstr ""
+msgstr "Blockeringslistan \"%s\" uppdaterad med %d poster"
 
 #: ../libtransmission/fdlimit.c:357
 #, c-format

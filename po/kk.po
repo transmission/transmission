@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-09-18 22:00-0500\n"
-"PO-Revision-Date: 2010-07-27 05:33+0000\n"
+"PO-Revision-Date: 2010-10-11 02:54+0000\n"
 "Last-Translator: Baurzhan Muftakhidinov <Unknown>\n"
 "Language-Team: Kazakh <kk_KZ@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2010-10-08 00:48+0000\n"
+"X-Launchpad-Export-Date: 2010-11-13 19:56+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gtk/actions.c:55
@@ -172,7 +172,7 @@ msgstr "Барлық торрентерді жіберу"
 
 #: ../gtk/actions.c:122
 msgid "Set _Location..."
-msgstr ""
+msgstr "_Орналасуын көрсету..."
 
 #: ../gtk/actions.c:123
 msgid "Remove torrent"
@@ -303,23 +303,23 @@ msgstr "\"%s\" импорттау"
 
 #: ../gtk/details.c:452 ../gtk/details.c:463
 msgid "Use global settings"
-msgstr ""
+msgstr "Жалпы баптауларды қолдану"
 
 #: ../gtk/details.c:453
 msgid "Seed regardless of ratio"
-msgstr ""
+msgstr "Рейтингті елемей, тарату"
 
 #: ../gtk/details.c:454
 msgid "Stop seeding at ratio:"
-msgstr ""
+msgstr "Рейтинг мәні келесіге жеткенде, таратуды тоқтату:"
 
 #: ../gtk/details.c:464
 msgid "Seed regardless of activity"
-msgstr ""
+msgstr "Белсенділікті елемей, тарату"
 
 #: ../gtk/details.c:465
 msgid "Stop seeding if idle for N minutes:"
-msgstr ""
+msgstr "N мин белсенді емес болса, таратуды тоқтату:"
 
 #: ../gtk/details.c:481 ../gtk/tr-prefs.c:1340
 msgid "Speed"
@@ -332,24 +332,24 @@ msgstr "Глобалды шектеу_лерді елемеу"
 #: ../gtk/details.c:488 ../gtk/tr-prefs.c:1124
 #, c-format
 msgid "Limit _download speed (%s):"
-msgstr ""
+msgstr "Қаб_ылдау жылдамдығын шектеу (%s):"
 
 #: ../gtk/details.c:501 ../gtk/tr-prefs.c:1131
 #, c-format
 msgid "Limit _upload speed (%s):"
-msgstr ""
+msgstr "Тар_ату жылдамдығын шектеу (%s):"
 
 #: ../gtk/details.c:518 ../gtk/tr-prefs.c:322
 msgid "Seeding Limits"
-msgstr ""
+msgstr "Тарату шектеулері"
 
 #: ../gtk/details.c:528
 msgid "_Ratio:"
-msgstr ""
+msgstr "_Рейтингі:"
 
 #: ../gtk/details.c:537
 msgid "_Idle:"
-msgstr ""
+msgstr "Кү_ту:"
 
 #: ../gtk/details.c:540
 msgid "Peer Connections"
@@ -389,7 +389,7 @@ msgstr "Аралас"
 
 #: ../gtk/details.c:620
 msgid "No Torrents Selected"
-msgstr ""
+msgstr "Таңдалған торренттер жоқ"
 
 #: ../gtk/details.c:642
 msgid "Private to this tracker -- DHT and PEX disabled"
@@ -421,17 +421,17 @@ msgstr "Белгісіз"
 #: ../gtk/details.c:828
 #, c-format
 msgid "%1$s (%2$s%%)"
-msgstr ""
+msgstr "%1$s (%2$s%%)"
 
 #: ../gtk/details.c:830
 #, c-format
 msgid "%1$s (%2$s%% of %3$s%% Available)"
-msgstr ""
+msgstr "%1$s (%2$s%% қолжетерлік, барлығы %3$s%%)"
 
 #: ../gtk/details.c:832
 #, c-format
 msgid "%1$s (%2$s%% of %3$s%% Available) + %4$s Unverified"
-msgstr ""
+msgstr "%1$s (%2$s%% қолжетерлік, барлығы %3$s%%) + %4$s расталмаған"
 
 #: ../gtk/details.c:851
 #, c-format
@@ -440,11 +440,11 @@ msgstr "%1$s (+%2$s қате)"
 
 #: ../gtk/details.c:907
 msgid "No errors"
-msgstr ""
+msgstr "Қателер жоқ"
 
 #: ../gtk/details.c:920
 msgid "Never"
-msgstr ""
+msgstr "Ешқашан"
 
 #: ../gtk/details.c:924
 msgid "Active now"
@@ -894,7 +894,7 @@ msgstr "Жылдам мен қарапайымBitTorrent қолданбасы"
 
 #: ../gtk/main.c:1427
 msgid "Copyright (c) The Transmission Project"
-msgstr ""
+msgstr "Copyright (c) The Transmission Project"
 
 #. Translators: translate "translator-credits" as
 #. your name
@@ -1108,7 +1108,7 @@ msgstr "Жалпы"
 #: ../gtk/stats.c:175
 #, c-format
 msgid "Started %'d time"
-msgstr ""
+msgstr "%'d рет іске қосылған"
 
 #. %1$s is how much we've got,
 #. %2$s is how much we'll have when done,
@@ -1116,7 +1116,7 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:63
 #, c-format
 msgid "%1$s of %2$s (%3$s%%)"
-msgstr ""
+msgstr "%1$s, барлығы %2$s (%3$s%%)"
 
 #. %1$s is how much we've got,
 #. %2$s is the torrent's total size,
@@ -1128,6 +1128,7 @@ msgstr ""
 #, c-format
 msgid "%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s Goal: %6$s)"
 msgstr ""
+"%1$s, барлығы %2$s (%3$s%%), %4$s таратылды (Рейтингі: %5$s Мақсаты: %6$s)"
 
 #. %1$s is how much we've got,
 #. %2$s is the torrent's total size,
@@ -1137,7 +1138,7 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:95
 #, c-format
 msgid "%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s)"
-msgstr ""
+msgstr "%1$s, барлығы %2$s (%3$s%%), %4$s таратылды (Рейтингі: %5$s)"
 
 #. %1$s is the torrent's total size,
 #. %2$s is how much we've uploaded,
@@ -1271,7 +1272,7 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:273
 msgid "Adding"
-msgstr ""
+msgstr "Қосу"
 
 #: ../gtk/tr-prefs.c:276
 msgid "Automatically _add torrents from:"
@@ -1295,11 +1296,11 @@ msgstr "Торрент аяқталған кезде скрипт_ті орын�
 
 #: ../gtk/tr-prefs.c:324
 msgid "Stop seeding at _ratio:"
-msgstr ""
+msgstr "Рейтинг _мәні келесідей болғанда, таратуды тоқтату:"
 
 #: ../gtk/tr-prefs.c:331
 msgid "Stop seeding if idle for _N minutes:"
-msgstr ""
+msgstr "N _мин белсенді емес болса, таратуды тоқтату:"
 
 #: ../gtk/tr-prefs.c:355 ../gtk/tr-prefs.c:1349
 msgid "Desktop"
@@ -1380,7 +1381,7 @@ msgstr "DHT - бұл трекерсіз-ақ тораптарды іздеу қ�
 
 #: ../gtk/tr-prefs.c:534
 msgid "Use _Local Peer Discovery to find more peers"
-msgstr ""
+msgstr "_Тораптарды табу үшін LPD қолдану"
 
 #: ../gtk/tr-prefs.c:536
 msgid "LPD is a tool for finding peers on your local network."
@@ -1507,12 +1508,12 @@ msgstr ""
 #: ../gtk/tr-prefs.c:1156
 #, c-format
 msgid "Limit do_wnload speed (%s):"
-msgstr ""
+msgstr "Қа_былдау жылдамдығын шектеу (%s):"
 
 #: ../gtk/tr-prefs.c:1160
 #, c-format
 msgid "Limit u_pload speed (%s):"
-msgstr ""
+msgstr "_Тарату жылдамдығын шектеу (%s):"
 
 #: ../gtk/tr-prefs.c:1164
 msgid "_Scheduled times:"
@@ -1674,39 +1675,39 @@ msgstr "Қабылданған: %1$s, Таратылған: %2$s"
 
 #: ../gtk/util.c:51 ../gtk/util.c:57
 msgid "KiB"
-msgstr ""
+msgstr "КиБ"
 
 #: ../gtk/util.c:52 ../gtk/util.c:58
 msgid "MiB"
-msgstr ""
+msgstr "МиБ"
 
 #: ../gtk/util.c:53 ../gtk/util.c:59
 msgid "GiB"
-msgstr ""
+msgstr "ГиБ"
 
 #: ../gtk/util.c:54 ../gtk/util.c:60
 msgid "TiB"
-msgstr ""
+msgstr "ТиБ"
 
 #: ../gtk/util.c:63
 msgid "KiB/s"
-msgstr ""
+msgstr "КиБ/с"
 
 #: ../gtk/util.c:64
 msgid "MiB/s"
-msgstr ""
+msgstr "МиБ/с"
 
 #: ../gtk/util.c:65
 msgid "GiB/s"
-msgstr ""
+msgstr "ГиБ/с"
 
 #: ../gtk/util.c:66
 msgid "TiB/s"
-msgstr ""
+msgstr "ТиБ/с"
 
 #: ../gtk/util.c:161
 msgid "size|None"
-msgstr ""
+msgstr "өлшему|таңдалмады"
 
 #: ../gtk/util.c:326
 #, c-format
@@ -1730,12 +1731,12 @@ msgstr "Торренті ашу қатесі"
 #: ../gtk/util.c:817
 #, c-format
 msgid "Error opening \"%s\""
-msgstr ""
+msgstr "\"%s\" ашу қатесі"
 
 #: ../gtk/util.c:820
 #, c-format
 msgid "Server returned \"%1$ld %2$s\""
-msgstr ""
+msgstr "Сервер \"%1$ld %2$s\" қайтарды"
 
 #: ../gtk/util.c:840
 msgid "Unrecognized URL"
@@ -1785,7 +1786,7 @@ msgstr "«%1$s» оқу мүмкін емес: %2$s"
 #: ../libtransmission/blocklist.c:114
 #, c-format
 msgid "Blocklist \"%s\" contains %zu entries"
-msgstr ""
+msgstr "\"%s\" блоктізімінде %zu жазба бар"
 
 #. don't try to display the actual lines - it causes issues
 #: ../libtransmission/blocklist.c:354
@@ -1796,7 +1797,7 @@ msgstr "блоктізімнің %d жолындағы қате адресті �
 #: ../libtransmission/blocklist.c:370
 #, c-format
 msgid "Blocklist \"%s\" updated with %d entries"
-msgstr ""
+msgstr "\"%s\" блоктізімі %d жазбамен жаңартылды"
 
 #: ../libtransmission/fdlimit.c:357
 #, c-format

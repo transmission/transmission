@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-09-18 22:00-0500\n"
-"PO-Revision-Date: 2010-08-23 18:25+0000\n"
+"PO-Revision-Date: 2010-11-08 16:42+0000\n"
 "Last-Translator: Andrej Znidarsic <andrej.znidarsic@gmail.com>\n"
 "Language-Team: Slovenian <sl@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 || "
 "n%100==4 ? 3 : 0);\n"
-"X-Launchpad-Export-Date: 2010-10-08 00:48+0000\n"
+"X-Launchpad-Export-Date: 2010-11-13 19:57+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Country: SLOVENIA\n"
 "X-Poedit-Language: Slovenian\n"
@@ -60,7 +60,7 @@ msgstr "_Pokaži program"
 
 #: ../gtk/actions.c:80
 msgid "Message _Log"
-msgstr "Dnevnik sporočil"
+msgstr "_Dnevnik sporočil"
 
 #: ../gtk/actions.c:95
 msgid "Enable Temporary Speed _Limits"
@@ -176,7 +176,7 @@ msgstr "Začni vse torrente"
 
 #: ../gtk/actions.c:122
 msgid "Set _Location..."
-msgstr ""
+msgstr "Nastavi _mesto ..."
 
 #: ../gtk/actions.c:123
 msgid "Remove torrent"
@@ -307,23 +307,23 @@ msgstr "Uvažanje \"%s\""
 
 #: ../gtk/details.c:452 ../gtk/details.c:463
 msgid "Use global settings"
-msgstr ""
+msgstr "Uporabi splošne nastavitve"
 
 #: ../gtk/details.c:453
 msgid "Seed regardless of ratio"
-msgstr ""
+msgstr "Sejanje ne glede na razmerje"
 
 #: ../gtk/details.c:454
 msgid "Stop seeding at ratio:"
-msgstr ""
+msgstr "Prenehaj sejanje pri razmerju:"
 
 #: ../gtk/details.c:464
 msgid "Seed regardless of activity"
-msgstr ""
+msgstr "Sejanje ne glede na dejavnost"
 
 #: ../gtk/details.c:465
 msgid "Stop seeding if idle for N minutes:"
-msgstr ""
+msgstr "Prenehaj sejati, če je torrent nedejaven N minut:"
 
 #: ../gtk/details.c:481 ../gtk/tr-prefs.c:1340
 msgid "Speed"
@@ -336,24 +336,24 @@ msgstr "Upoštevaj splošne _omejitve"
 #: ../gtk/details.c:488 ../gtk/tr-prefs.c:1124
 #, c-format
 msgid "Limit _download speed (%s):"
-msgstr ""
+msgstr "Omeji hitrost _prejema (%s):"
 
 #: ../gtk/details.c:501 ../gtk/tr-prefs.c:1131
 #, c-format
 msgid "Limit _upload speed (%s):"
-msgstr ""
+msgstr "Omeji hitrost p_ošiljanja (%s):"
 
 #: ../gtk/details.c:518 ../gtk/tr-prefs.c:322
 msgid "Seeding Limits"
-msgstr ""
+msgstr "Omejitve sejanja"
 
 #: ../gtk/details.c:528
 msgid "_Ratio:"
-msgstr ""
+msgstr "_Razmerje:"
 
 #: ../gtk/details.c:537
 msgid "_Idle:"
-msgstr ""
+msgstr "_Nedejavno:"
 
 #: ../gtk/details.c:540
 msgid "Peer Connections"
@@ -393,7 +393,7 @@ msgstr "Mešano"
 
 #: ../gtk/details.c:620
 msgid "No Torrents Selected"
-msgstr ""
+msgstr "Noben torrent ni izbran"
 
 #: ../gtk/details.c:642
 msgid "Private to this tracker -- DHT and PEX disabled"
@@ -425,17 +425,17 @@ msgstr "Neznano"
 #: ../gtk/details.c:828
 #, c-format
 msgid "%1$s (%2$s%%)"
-msgstr ""
+msgstr "%1$s (%2$s%%)"
 
 #: ../gtk/details.c:830
 #, c-format
 msgid "%1$s (%2$s%% of %3$s%% Available)"
-msgstr ""
+msgstr "%1$s (%2$s%% od %3$s%% na voljo)"
 
 #: ../gtk/details.c:832
 #, c-format
 msgid "%1$s (%2$s%% of %3$s%% Available) + %4$s Unverified"
-msgstr ""
+msgstr "%1$s (%2$s%% od %3$s%% na voljo) + %4$s nepreverjenih"
 
 #: ../gtk/details.c:851
 #, c-format
@@ -444,11 +444,11 @@ msgstr "%1$s (+%2$s pokvarjeno)"
 
 #: ../gtk/details.c:907
 msgid "No errors"
-msgstr ""
+msgstr "Brez napak"
 
 #: ../gtk/details.c:920
 msgid "Never"
-msgstr ""
+msgstr "Nikoli"
 
 #: ../gtk/details.c:924
 msgid "Active now"
@@ -900,7 +900,7 @@ msgstr "Hiter in preprost BitTorrent odjemalec"
 
 #: ../gtk/main.c:1427
 msgid "Copyright (c) The Transmission Project"
-msgstr ""
+msgstr "Avtorske pravice (c) The Transmission Project"
 
 #. Translators: translate "translator-credits" as
 #. your name
@@ -912,6 +912,8 @@ msgstr ""
 "Launchpad Contributions:\n"
 "  Andrej Znidarsic https://launchpad.net/~andrej.znidarsic\n"
 "  Dejan Dežman https://launchpad.net/~159643-gmail\n"
+"  Dražen Matešić https://launchpad.net/~crazylemon\n"
+"  Jan Jamšek https://launchpad.net/~j4n-j4m53k\n"
 "  Klemen Košir https://launchpad.net/~klemen913\n"
 "  Martin McDowell https://launchpad.net/~martin-mcdowell\n"
 "  Matej Urbančič https://launchpad.net/~mateju\n"
@@ -1120,7 +1122,7 @@ msgstr "Skupno"
 #: ../gtk/stats.c:175
 #, c-format
 msgid "Started %'d time"
-msgstr ""
+msgstr "Začeto %'d krat"
 
 #. %1$s is how much we've got,
 #. %2$s is how much we'll have when done,
@@ -1128,7 +1130,7 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:63
 #, c-format
 msgid "%1$s of %2$s (%3$s%%)"
-msgstr ""
+msgstr "%1$s od %2$s (%3$s%%)"
 
 #. %1$s is how much we've got,
 #. %2$s is the torrent's total size,
@@ -1139,7 +1141,7 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:79
 #, c-format
 msgid "%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s Goal: %6$s)"
-msgstr ""
+msgstr "%1$s od %2$s (%3$s%%), poslano %4$s (Razmerje: %5$s Cilj: %6$s)"
 
 #. %1$s is how much we've got,
 #. %2$s is the torrent's total size,
@@ -1149,7 +1151,7 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:95
 #, c-format
 msgid "%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s)"
-msgstr ""
+msgstr "%1$s od %2$s (%3$s%%), poslano %4$s (Razmerje: %5$s)"
 
 #. %1$s is the torrent's total size,
 #. %2$s is how much we've uploaded,
@@ -1283,7 +1285,7 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:273
 msgid "Adding"
-msgstr ""
+msgstr "Dodajanje"
 
 #: ../gtk/tr-prefs.c:276
 msgid "Automatically _add torrents from:"
@@ -1307,11 +1309,11 @@ msgstr "Klicanje skrip_te, ko je torrent končan:"
 
 #: ../gtk/tr-prefs.c:324
 msgid "Stop seeding at _ratio:"
-msgstr ""
+msgstr "Prenehaj sejati pri _razmerju:"
 
 #: ../gtk/tr-prefs.c:331
 msgid "Stop seeding if idle for _N minutes:"
-msgstr ""
+msgstr "Prenehaj sejanje, če je torrent nedejaven _N minut:"
 
 #: ../gtk/tr-prefs.c:355 ../gtk/tr-prefs.c:1349
 msgid "Desktop"
@@ -1393,7 +1395,7 @@ msgstr "DHT je orodje za iskanje soležnikov brez uporabe sledilnika."
 
 #: ../gtk/tr-prefs.c:534
 msgid "Use _Local Peer Discovery to find more peers"
-msgstr ""
+msgstr "Uporabi _Local Peer Discovery za iskanje več soležnikov"
 
 #: ../gtk/tr-prefs.c:536
 msgid "LPD is a tool for finding peers on your local network."
@@ -1519,12 +1521,12 @@ msgstr "Prepiši običajne omejitve hitrosti ročno ali ob navedenem času"
 #: ../gtk/tr-prefs.c:1156
 #, c-format
 msgid "Limit do_wnload speed (%s):"
-msgstr ""
+msgstr "Omeji hitrost pre_jema (%s):"
 
 #: ../gtk/tr-prefs.c:1160
 #, c-format
 msgid "Limit u_pload speed (%s):"
-msgstr ""
+msgstr "Omeji hitrost _pošiljanja (%s):"
 
 #: ../gtk/tr-prefs.c:1164
 msgid "_Scheduled times:"
@@ -1686,39 +1688,39 @@ msgstr "size|Prejemanje: %1$s, Pošiljanje: %2$s"
 
 #: ../gtk/util.c:51 ../gtk/util.c:57
 msgid "KiB"
-msgstr ""
+msgstr "KiB"
 
 #: ../gtk/util.c:52 ../gtk/util.c:58
 msgid "MiB"
-msgstr ""
+msgstr "MiB"
 
 #: ../gtk/util.c:53 ../gtk/util.c:59
 msgid "GiB"
-msgstr ""
+msgstr "GiB"
 
 #: ../gtk/util.c:54 ../gtk/util.c:60
 msgid "TiB"
-msgstr ""
+msgstr "TiB"
 
 #: ../gtk/util.c:63
 msgid "KiB/s"
-msgstr ""
+msgstr "KiB/s"
 
 #: ../gtk/util.c:64
 msgid "MiB/s"
-msgstr ""
+msgstr "MiB/s"
 
 #: ../gtk/util.c:65
 msgid "GiB/s"
-msgstr ""
+msgstr "GiB/s"
 
 #: ../gtk/util.c:66
 msgid "TiB/s"
-msgstr ""
+msgstr "TiB/s"
 
 #: ../gtk/util.c:161
 msgid "size|None"
-msgstr ""
+msgstr "velikost|Brez"
 
 #: ../gtk/util.c:326
 #, c-format
@@ -1742,12 +1744,12 @@ msgstr "Napaka pri odpiranju torrenta"
 #: ../gtk/util.c:817
 #, c-format
 msgid "Error opening \"%s\""
-msgstr ""
+msgstr "Napaka med odpiranjem \"%s\""
 
 #: ../gtk/util.c:820
 #, c-format
 msgid "Server returned \"%1$ld %2$s\""
-msgstr ""
+msgstr "Strežnik je vrnil \"%1$ld %2$s\""
 
 #: ../gtk/util.c:840
 msgid "Unrecognized URL"
@@ -1797,7 +1799,7 @@ msgstr "Ni mogoče prebrati \"%1$s\": %2$s"
 #: ../libtransmission/blocklist.c:114
 #, c-format
 msgid "Blocklist \"%s\" contains %zu entries"
-msgstr ""
+msgstr "Seznam blokiranih \"%s\" vsebuje %zu vnosov"
 
 #. don't try to display the actual lines - it causes issues
 #: ../libtransmission/blocklist.c:354
@@ -1808,7 +1810,7 @@ msgstr "Seznam blokiranih je izpustil neveljaven naslov %d"
 #: ../libtransmission/blocklist.c:370
 #, c-format
 msgid "Blocklist \"%s\" updated with %d entries"
-msgstr ""
+msgstr "Seznam blokiranih \"%s\" posodobljen z %d vnosi"
 
 #: ../libtransmission/fdlimit.c:357
 #, c-format
