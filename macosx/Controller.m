@@ -1318,6 +1318,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     [self updateUI];
     [self applyFilter: nil];
+    [[fWindow toolbar] validateVisibleItems];
     [self updateTorrentHistory];
 }
 
@@ -1341,6 +1342,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     [self updateUI];
     [self applyFilter: nil];
+    [[fWindow toolbar] validateVisibleItems];
     [self updateTorrentHistory];
 }
 
@@ -1673,6 +1675,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             [[QLPreviewPanelSL sharedPreviewPanel] reloadData];
         
     }
+    
+    [[fWindow toolbar] validateVisibleItems];
 }
 
 - (void) resetInfo
@@ -1876,6 +1880,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     [self updateUI];
     [self applyFilter: nil];
+    [[fWindow toolbar] validateVisibleItems];
     [self updateTorrentHistory];
 }
 
@@ -2928,6 +2933,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 - (void) torrentTableViewSelectionDidChange: (NSNotification *) notification
 {
     [self resetInfo];
+    [[fWindow toolbar] validateVisibleItems];
 }
 
 - (NSDragOperation) draggingEntered: (id <NSDraggingInfo>) info
@@ -3205,6 +3211,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
     [self showFilterBar: [fFilterBar isHidden] animate: YES];
     [fDefaults setBool: ![fFilterBar isHidden] forKey: @"FilterBar"];
+    [[fWindow toolbar] validateVisibleItems];
 }
 
 //doesn't save shown state
