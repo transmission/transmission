@@ -1693,7 +1693,7 @@ static void
 blocklistResponseFunc( TrCore * core, tr_benc * response, gpointer userData UNUSED )
 {
     tr_benc * args;
-    int64_t ruleCount = 0;
+    int64_t ruleCount = -1;
 
     if( tr_bencDictFindDict( response, "arguments", &args ) )
         tr_bencDictFindInt( args, "blocklist-size", &ruleCount );
