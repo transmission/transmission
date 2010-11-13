@@ -695,6 +695,25 @@ FileTreeView :: eventFilter( QObject * o, QEvent * event )
         return false;
     }
 
+    // handle using the keyboard to toggle the
+    // wanted/unwanted state or the file priority 
+    else if( event->type() == QEvent::KeyPress )
+    {
+        switch( dynamic_cast<QKeyEvent*>(event)->key() )
+        {
+            case Qt::Key_Space:
+                foreach( QModelIndex i, selectionModel()->selectedRows(COL_WANTED) )
+                    clicked( i );
+                return false;
+
+            case Qt::Key_Enter:
+            case Qt::Key_Return:
+                foreach( QModelIndex i, selectionModel()->selectedRows(COL_PRIORITY) )
+                    clicked( i );
+                return false;
+        }
+    }
+
     return false;
 }
 
