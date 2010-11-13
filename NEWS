@@ -1,9 +1,10 @@
 === Transmission 2.12 (2010/xx/yy) ===
 [http://trac.transmissionbt.com/query?milestone=2.12&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
-  * Fix 2.10 build issue on uClibc systems
-  * Several small CPU speed improvements: faster benc parsing, and fewer calls to RNG and gettimeofday()
+  * Make the blocklist URL user-configurable
+  * Several minor bugfixes and CPU speed improvements
   * Use slightly less bandwidth in DHT messages
+  * Fix 2.10 build issue on uClibc systems
 ==== Mac ====
   * Sort the file list alphabetically
   * Ensure the proper extension is used when saving the torrent file
