@@ -948,7 +948,7 @@ int trashDataFile(const char * filename)
         [dict setObject: [NSString stringWithUTF8String: fInfo->webseeds[i]] forKey: @"Address"];
         
         if (dlSpeeds[i] != -1.0)
-            [dict setObject: [NSNumber numberWithFloat: dlSpeeds[i]] forKey: @"DL From Rate"];
+            [dict setObject: [NSNumber numberWithDouble: dlSpeeds[i]] forKey: @"DL From Rate"];
         
         [webSeeds addObject: dict];
     }

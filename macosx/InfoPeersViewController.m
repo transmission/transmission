@@ -273,7 +273,7 @@
         if ([ident isEqualToString: @"DL From"])
         {
             NSNumber * rate;
-            return (rate = [webSeed objectForKey: @"DL From Rate"]) ? [NSString stringForSpeedAbbrev: [rate floatValue]] : @"";
+            return (rate = [webSeed objectForKey: @"DL From Rate"]) ? [NSString stringForSpeedAbbrev: [rate doubleValue]] : @"";
         }
         else
             return [webSeed objectForKey: @"Address"];
@@ -292,12 +292,12 @@
         else if ([ident isEqualToString: @"UL To"])
         {
             NSNumber * rate;
-            return (rate = [peer objectForKey: @"UL To Rate"]) ? [NSString stringForSpeedAbbrev: [rate floatValue]] : @"";
+            return (rate = [peer objectForKey: @"UL To Rate"]) ? [NSString stringForSpeedAbbrev: [rate doubleValue]] : @"";
         }
         else if ([ident isEqualToString: @"DL From"])
         {
             NSNumber * rate;
-            return (rate = [peer objectForKey: @"DL From Rate"]) ? [NSString stringForSpeedAbbrev: [rate floatValue]] : @"";
+            return (rate = [peer objectForKey: @"DL From Rate"]) ? [NSString stringForSpeedAbbrev: [rate doubleValue]] : @"";
         }
         else
             return [peer objectForKey: @"IP"];

@@ -640,7 +640,7 @@
         NSMenuItem * item;
         if ([menu numberOfItems] == 4)
         {
-            const CGFloat ratioLimitActionValue[] = { 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, -1.0 };
+            const float ratioLimitActionValue[] = { 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, -1.0 };
             
             for (NSInteger i = 0; ratioLimitActionValue[i] != -1.0; i++)
             {
@@ -849,7 +849,7 @@
     
     NSMutableArray * progressMarks = [NSMutableArray arrayWithCapacity: 16];
     for (NSAnimationProgress i = 0.0625; i <= 1.0; i += 0.0625)
-        [progressMarks addObject: [NSNumber numberWithFloat: i]];
+        [progressMarks addObject: [NSNumber numberWithDouble: i]];
     
     fPiecesBarAnimation = [[NSAnimation alloc] initWithDuration: TOGGLE_PROGRESS_SECONDS animationCurve: NSAnimationEaseIn];
     [fPiecesBarAnimation setAnimationBlockingMode: NSAnimationNonblocking];
