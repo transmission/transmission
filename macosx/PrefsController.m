@@ -503,11 +503,10 @@ tr_session * fHandle;
     
     if (exists)
     {
-        NSNumberFormatter * numberFormatter = [[NSNumberFormatter alloc] init];
+        NSNumberFormatter * numberFormatter = [[[NSNumberFormatter alloc] init] autorelease];
         [numberFormatter setNumberStyle: NSNumberFormatterDecimalStyle];
         [numberFormatter setMaximumFractionDigits: 0];
         NSString * countString = [numberFormatter stringFromNumber: [NSNumber numberWithInt: tr_blocklistGetRuleCount(fHandle)]];
-        [numberFormatter release];
         
         [fBlocklistMessageField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%@ IP address rules in list",
             "Prefs -> blocklist -> message"), countString]];

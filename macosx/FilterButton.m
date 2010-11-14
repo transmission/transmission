@@ -41,8 +41,14 @@
         return;
     
     fCount = count;
+    
+    NSNumberFormatter * numberFormatter = [[[NSNumberFormatter alloc] init] autorelease];
+    [numberFormatter setNumberStyle: NSNumberFormatterDecimalStyle];
+    [numberFormatter setMaximumFractionDigits: 0];
+    
     [self setToolTip: fCount == 1 ? NSLocalizedString(@"1 transfer", "Filter Button -> tool tip")
-        : [NSString stringWithFormat: NSLocalizedString(@"%d transfers", "Filter Bar Button -> tool tip"), fCount]];
+        : [NSString stringWithFormat: NSLocalizedString(@"%@ transfers", "Filter Bar Button -> tool tip"),
+            [numberFormatter stringFromNumber: [NSNumber numberWithUnsignedInteger: fCount]]]];
 }
 
 @end
