@@ -157,7 +157,8 @@
         NSString * fileString;
         NSInteger count = fInfo->fileCount;
         if (count != 1)
-            fileString = [NSString stringWithFormat: NSLocalizedString(@"%d files", "Create torrent -> info"), count];
+            fileString = [NSString stringWithFormat: NSLocalizedString(@"%@ files", "Create torrent -> info"),
+                            [NSString formattedUInteger: count]];
         else
             fileString = NSLocalizedString(@"1 file", "Create torrent -> info");
         statusString = [NSString stringWithFormat: @"%@, %@", fileString, statusString];

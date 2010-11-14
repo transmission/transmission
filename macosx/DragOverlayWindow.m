@@ -129,7 +129,8 @@
         if (fileCount == 1)
             fileString = NSLocalizedString(@"1 file", "Drag overlay -> torrents");
         else
-            fileString= [NSString stringWithFormat: NSLocalizedString(@"%d files", "Drag overlay -> torrents"), fileCount];
+            fileString= [NSString stringWithFormat: NSLocalizedString(@"%@ files", "Drag overlay -> torrents"),
+                            [NSString formattedUInteger: fileCount]];
         secondString = [NSString stringWithFormat: @"%@, %@", fileString, secondString];
     }
     
@@ -138,7 +139,8 @@
         icon = [[NSWorkspace sharedWorkspace] iconForFileType: folder ? NSFileTypeForHFSTypeCode('fldr') : [name pathExtension]];
     else
     {
-        name = [NSString stringWithFormat: NSLocalizedString(@"%d Torrent Files", "Drag overlay -> torrents"), count];
+        name = [NSString stringWithFormat: NSLocalizedString(@"%@ Torrent Files", "Drag overlay -> torrents"),
+                [NSString formattedUInteger: count]];
         secondString = [secondString stringByAppendingString: @" total"];
         icon = [NSImage imageNamed: @"TransmissionDocument.icns"];
     }

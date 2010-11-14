@@ -236,7 +236,8 @@
         NSString * fileString;
         NSInteger count = [fTorrent fileCount];
         if (count != 1)
-            fileString = [NSString stringWithFormat: NSLocalizedString(@"%d files", "Add torrent -> info"), count];
+            fileString = [NSString stringWithFormat: NSLocalizedString(@"%@ files", "Add torrent -> info"),
+                            [NSString formattedUInteger: count]];
         else
             fileString = NSLocalizedString(@"1 file", "Add torrent -> info");
         
