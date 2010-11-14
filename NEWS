@@ -2,7 +2,7 @@
 [http://trac.transmissionbt.com/query?milestone=2.12&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Make the blocklist URL user-configurable
-  * Several minor bugfixes and CPU speed improvements
+  * Several minor bug fixes and CPU speed improvements
   * Use slightly less bandwidth in DHT messages
   * Fix 2.10 build issue on uClibc systems
 ==== Mac ====
