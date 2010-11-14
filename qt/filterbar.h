@@ -71,6 +71,7 @@ class FilterBar: public QWidget
         QComboBox * createActivityCombo( );
         void recountSoon( );
         void refreshTrackers( );
+        QString getCountString( int n ) const;
 
     private:
         Prefs& myPrefs;
