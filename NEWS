@@ -82,7 +82,7 @@
 ==== Mac ====
   * Fix bug that caused Local Peer Discovery to always be disabled on startup
 ==== GTK+ ====
-  * Fix inaccurate "active torrent" counts in the filterbar 
+  * Fix inaccurate "active torrent" counts in the filterbar
   * Fix display bug with magnet link names
 ==== Qt ====
   * Fix crash when accessing a password-protected remote session
@@ -153,7 +153,7 @@
 ==== Mac ====
   * Compact View replaces Minimal View, taking up considerably less space
   * Show an Add Transfer window when adding magnet links
-  * "Resume All" now ignores finished transfers 
+  * "Resume All" now ignores finished transfers
   * Allow trackers to be pasted into the Create Window
   * European Portuguese localization
   * Removed Traditional Chinese localization because of lack of localizer
@@ -884,7 +884,7 @@
 ==== GTK+ ====
   * Fix small memory leak
   * GUI error when verifying local data
-==== CLI ====:
+==== CLI ====
   * Torrent creation error on non-absolute pathnames
 
 === Transmission 1.05 (2008/02/08) ===
@@ -974,7 +974,7 @@
   * Statistics window
   * Sort by total activity, progress, state, and tracker
   * Various other interface additions and improvements
-==== CLI ====:
+==== CLI ====
   * Restore `scrape' feature
 
 === Transmission 0.96 (2007/12/10) ===
@@ -1233,7 +1233,7 @@
 
 === Transmission 0.2 (2005/09/22) ===
 ==== All Platforms ====
-  * bug fixes
+  * Bug fixes
 ==== Mac ====
   * Users can now choose where the downloads are sent
 
