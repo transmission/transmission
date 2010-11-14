@@ -412,7 +412,7 @@
    "blocklist-url"                  | string     | location of the blocklist to use for "blocklist-update"
    "blocklist-enabled"              | boolean    | true means enabled
    "blocklist-size"                 | number     | number of rules in the blocklist
-   "cache-size"                     | number     | maximum size of the disk cache (MB)
+   "cache-size-mb"                  | number     | maximum size of the disk cache (MB)
    "config-dir"                     | string     | location of transmission's configuration directory
    "download-dir"                   | string     | default path to download torrents
    "dht-enabled"                    | boolean    | true means allow dht in public torrents
@@ -626,7 +626,7 @@
          |         | yes       | session-get    | new arg "trash-original-torrent-files"
          |         | yes       | torrent-get    | new arg "isFinished"
    ------+---------+-----------+----------------+-------------------------------
-   10    | 2.10    | yes       | session-get    | new arg "cache-size"
+   10    | 2.10    | yes       | session-get    | new arg "cache-size-mb"
          |         | yes       | torrent-set    | new arg "trackerAdd"
          |         | yes       | torrent-set    | new arg "trackerRemove"
          |         | yes       | torrent-set    | new arg "trackerReplace"
