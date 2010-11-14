@@ -1,4 +1,4 @@
-=== Transmission 2.12 (2010/xx/yy) ===
+=== Transmission 2.12 (2010/11/14) ===
 [http://trac.transmissionbt.com/query?milestone=2.12&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Make the blocklist URL user-configurable
