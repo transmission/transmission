@@ -46,6 +46,15 @@
 	return [self stringByAppendingString: [NSString ellipsis]];
 }
 
++ (NSString *) formattedUInteger: (NSUInteger) value
+{
+    NSNumberFormatter * numberFormatter = [[[NSNumberFormatter alloc] init] autorelease];
+    [numberFormatter setNumberStyle: NSNumberFormatterDecimalStyle];
+    [numberFormatter setMaximumFractionDigits: 0];
+    
+    return [numberFormatter stringFromNumber: [NSNumber numberWithUnsignedInteger: value]];
+}
+
 + (NSString *) stringForFileSize: (uint64_t) size
 {
     const CGFloat baseFloat = [NSApp isOnSnowLeopardOrBetter] ? 1000.0 : 1024.0;

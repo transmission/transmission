@@ -1785,15 +1785,11 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) setBottomCountText: (BOOL) filtering
 {
-    NSNumberFormatter * numberFormatter = [[[NSNumberFormatter alloc] init] autorelease];
-    [numberFormatter setNumberStyle: NSNumberFormatterDecimalStyle];
-    [numberFormatter setMaximumFractionDigits: 0];
-    
     NSString * totalTorrentsString;
     NSUInteger totalCount = [fTorrents count];
     if (totalCount != 1)
         totalTorrentsString = [NSString stringWithFormat: NSLocalizedString(@"%@ transfers", "Status bar transfer count"),
-                                [numberFormatter stringFromNumber: [NSNumber numberWithUnsignedInteger: totalCount]]];
+                                [NSString formattedUInteger: totalCount]];
     else
         totalTorrentsString = NSLocalizedString(@"1 transfer", "Status bar transfer count");
     
@@ -1804,8 +1800,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             count -= [fDisplayedTorrents count];
         
         totalTorrentsString = [NSString stringWithFormat: NSLocalizedString(@"%@ of %@", "Status bar transfer count"),
-                                [numberFormatter stringFromNumber: [NSNumber numberWithUnsignedInteger: count]],
-                                totalTorrentsString];
+                                [NSString formattedUInteger: count], totalTorrentsString];
     }
     
     [fTotalTorrentsField setStringValue: totalTorrentsString];
