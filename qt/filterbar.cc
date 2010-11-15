@@ -559,5 +559,5 @@ FilterBar :: recount ( )
 QString
 FilterBar :: getCountString( int n ) const
 {
-    return n>0 ? QString("%L1").arg(n) : QString();
+    return QString("%L1").arg(n);
 }
