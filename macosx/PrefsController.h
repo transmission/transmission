@@ -87,7 +87,6 @@
 - (void) setEncryptionMode: (id) sender;
 
 - (void) setBlocklistEnabled: (id) sender;
-- (void) setBlocklistURL: (id) sender;
 - (void) updateBlocklist: (id) sender;
 - (void) setBlocklistAutoUpdate: (id) sender;
 - (void) updateBlocklistFields;
