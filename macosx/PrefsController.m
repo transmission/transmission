@@ -215,9 +215,18 @@ tr_session * fHandle;
     [fStalledField setIntValue: [fDefaults integerForKey: @"StalledMinutes"]];
     
     //set blocklist
+    NSString * blocklistURL = [fDefaults stringForKey: @"BlocklistURL"];
+    if (blocklistURL)
+        [fBlocklistURLField setStringValue: blocklistURL];
+    
+    [self updateBlocklistButton];
     [self updateBlocklistFields];
+    
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateBlocklistFields)
         name: @"BlocklistUpdated" object: nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateBlocklistURLField)
+        name: NSControlTextDidChangeNotification object: fBlocklistURLField];
     
     //set rpc port
     [fRPCPortField setIntValue: [fDefaults integerForKey: @"RPCPort"]];
@@ -480,11 +489,8 @@ tr_session * fHandle;
     tr_blocklistSetEnabled(fHandle, [fDefaults boolForKey: @"BlocklistNew"]);
     
     [[BlocklistScheduler scheduler] updateSchedule];
-}
-
-- (void) setBlocklistURL: (id) sender
-{
-    tr_blocklistSetURL(fHandle, [[fDefaults stringForKey: @"BlocklistURL"] UTF8String]);
+    
+    [self updateBlocklistButton];
 }
 
 - (void) updateBlocklist: (id) sender
@@ -539,6 +545,24 @@ tr_session * fHandle;
     
     [fBlocklistDateField setStringValue: [NSString stringWithFormat: @"%@: %@",
         NSLocalizedString(@"Last updated", "Prefs -> blocklist -> message"), updatedDateString]];
+}
+
+- (void) updateBlocklistURLField
+{
+    NSString * blocklistString = [fBlocklistURLField stringValue];
+    
+    [fDefaults setObject: blocklistString forKey: @"BlocklistURL"];
+    tr_blocklistSetURL(fHandle, [blocklistString UTF8String]);
+    
+    [self updateBlocklistButton];
+}
+
+- (void) updateBlocklistButton
+{
+    NSString * blocklistString = [fDefaults objectForKey: @"BlocklistURL"];
+    const BOOL enable = (blocklistString && ![blocklistString isEqualToString: @""])
+                            && [fDefaults boolForKey: @"BlocklistNew"];
+    [fBlocklistButton setEnabled: enable];
 }
 
 - (void) setAutoStartDownloads: (id) sender
@@ -1159,6 +1183,8 @@ tr_session * fHandle;
         
         //speed limit schedule times and day handled by bindings
         
+        [fBlocklistURLField setStringValue: blocklistURL];
+        [self updateBlocklistButton];
         [self updateBlocklistFields];
         
         //ratio limit enabled handled by bindings

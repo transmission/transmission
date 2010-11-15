@@ -45,6 +45,7 @@
     
     IBOutlet NSTextField * fPeersGlobalField, * fPeersTorrentField,
                         * fBlocklistURLField, * fBlocklistMessageField, * fBlocklistDateField;
+    IBOutlet NSButton * fBlocklistButton;
     
     PortChecker * fPortChecker;
     IBOutlet NSTextField * fPortField, * fPortStatusField;
@@ -90,6 +91,8 @@
 - (void) updateBlocklist: (id) sender;
 - (void) setBlocklistAutoUpdate: (id) sender;
 - (void) updateBlocklistFields;
+- (void) updateBlocklistURLField;
+- (void) updateBlocklistButton;
 
 - (void) setAutoStartDownloads: (id) sender;
 
