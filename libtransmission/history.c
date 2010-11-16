@@ -10,6 +10,8 @@
  * $Id$
  */
 
+#include <assert.h>
+
 #include "transmission.h"
 #include "history.h"
 #include "utils.h"
@@ -17,21 +19,21 @@
 struct history_slice
 {
     unsigned int n;
-    uint64_t date;
+    time_t date;
 };
 
 struct tr_recentHistory
 {
     int newest;
     int sliceCount;
-    unsigned int precision_msec;
+    unsigned int precision;
     struct history_slice * slices;
 };
 
 void
-tr_historyAdd( tr_recentHistory * h, uint64_t now, unsigned int n )
+tr_historyAdd( tr_recentHistory * h, time_t now, unsigned int n )
 {
-    if( h->slices[h->newest].date + h->precision_msec >= now )
+    if( h->slices[h->newest].date + h->precision >= now )
         h->slices[h->newest].n += n;
     else {
         if( ++h->newest == h->sliceCount ) h->newest = 0;
@@ -41,10 +43,10 @@ tr_historyAdd( tr_recentHistory * h, uint64_t now, unsigned int n )
 }
 
 unsigned int
-tr_historyGet( const tr_recentHistory * h, uint64_t now, unsigned int msec )
+tr_historyGet( const tr_recentHistory * h, time_t now, unsigned int sec )
 {
     unsigned int n = 0;
-    const uint64_t cutoff = (now?now:tr_time_msec()) - msec;
+    const time_t cutoff = (now?now:tr_time()) - sec;
     int i = h->newest;
 
     for( ;; )
@@ -62,13 +64,15 @@ tr_historyGet( const tr_recentHistory * h, uint64_t now, unsigned int msec )
 }
 
 tr_recentHistory *
-tr_historyNew( unsigned int seconds, unsigned int bins_per_second )
+tr_historyNew( unsigned int seconds, unsigned int precision )
 {
     tr_recentHistory * h;
 
+    assert( precision <= seconds );
+
     h = tr_new0( tr_recentHistory, 1 );
-    h->precision_msec = 1000 / bins_per_second;
-    h->sliceCount = (int)(seconds * bins_per_second);
+    h->precision = precision;
+    h->sliceCount = seconds / precision;
     h->slices = tr_new0( struct history_slice, h->sliceCount );
 
     return h;

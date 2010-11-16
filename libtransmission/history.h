@@ -29,8 +29,8 @@ typedef struct tr_recentHistory tr_recentHistory;
 /**
  * @brief create a new tr_recentHistory object.
  * @param seconds how many seconds of history this object should remember
- * @param precision how precise the history should be, in fractions of a second.
- *        For a precision of 1/20th of a second, use a precision of 20.
+ * @param precision how precise the history should be, in seconds
+ *        For a precision of 10 seconds and a history of 2 minutes, makes 12 bins.
  */
 tr_recentHistory * tr_historyNew( unsigned int seconds, unsigned int precision );
 
@@ -39,16 +39,16 @@ void tr_historyFree( tr_recentHistory * );
 
 /**
  * @brief add a counter to the recent history object.
- * @param when the current time in msec, such as from tr_time_msec()
+ * @param when the current time in sec, such as from tr_time()
  * @param n how many items to add to the history's counter
  */
-void tr_historyAdd( tr_recentHistory *, uint64_t when, unsigned int n );
+void tr_historyAdd( tr_recentHistory *, time_t when, unsigned int n );
 
 /**
  * @brief count how many events have occurred in the last N seconds.
- * @param when the current time in msec, such as from tr_time_msec()
+ * @param when the current time in sec, such as from tr_time()
  * @param seconds how many seconds to count back through.
  */
-unsigned int tr_historyGet( const tr_recentHistory *, uint64_t when, unsigned int seconds );
+unsigned int tr_historyGet( const tr_recentHistory *, time_t when, unsigned int seconds );
 
 #endif

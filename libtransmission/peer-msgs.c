@@ -1458,7 +1458,7 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
             tr_peerIoReadUint32( msgs->peer->io, inbuf, &r.index );
             tr_peerIoReadUint32( msgs->peer->io, inbuf, &r.offset );
             tr_peerIoReadUint32( msgs->peer->io, inbuf, &r.length );
-            tr_historyAdd( msgs->peer->cancelsSentToClient, tr_time_msec( ), 1 );
+            tr_historyAdd( msgs->peer->cancelsSentToClient, tr_time( ), 1 );
             dbgmsg( msgs, "got a Cancel %u:%u->%u", r.index, r.offset, r.length );
 
             for( i=0; i<msgs->peer->pendingReqsToClient; ++i ) {
@@ -1933,7 +1933,7 @@ fillOutputBuffer( tr_peermsgs * msgs, time_t now )
                 tr_peerIoWriteBuf( io, out, TRUE );
                 bytesWritten += EVBUFFER_LENGTH( out );
                 msgs->clientSentAnythingAt = now;
-                tr_historyAdd( msgs->peer->blocksSentToPeer, tr_time_msec( ), 1 );
+                tr_historyAdd( msgs->peer->blocksSentToPeer, tr_time( ), 1 );
             }
 
             evbuffer_free( out );
