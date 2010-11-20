@@ -215,11 +215,12 @@
                 : NSLocalizedString(@"Upload speed", "Torrent table -> group row -> tooltip");
     else if (ident)
     {
-        NSInteger count = [[item torrents] count];
+        NSUInteger count = [[item torrents] count];
         if (count == 1)
             return NSLocalizedString(@"1 transfer", "Torrent table -> group row -> tooltip");
         else
-            return [NSString stringWithFormat: NSLocalizedString(@"%d transfers", "Torrent table -> group row -> tooltip"), count];
+            return [NSString stringWithFormat: NSLocalizedString(@"%@ transfers", "Torrent table -> group row -> tooltip"),
+                    [NSString formattedUInteger: count]];
     }
     else
         return nil;

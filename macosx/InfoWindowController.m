@@ -477,11 +477,12 @@ typedef enum
             if ([torrent isFolder])
             {
                 NSString * fileString;
-                const NSInteger fileCount = [torrent fileCount];
+                const NSUInteger fileCount = [torrent fileCount];
                 if (fileCount == 1)
                     fileString = NSLocalizedString(@"1 file", "Inspector -> selected torrents");
                 else
-                    fileString= [NSString stringWithFormat: NSLocalizedString(@"%d files", "Inspector -> selected torrents"), fileCount];
+                    fileString= [NSString stringWithFormat: NSLocalizedString(@"%@ files", "Inspector -> selected torrents"),
+                                    [NSString formattedUInteger: fileCount]];
                 basicString = [NSString stringWithFormat: @"%@, %@", fileString, basicString];
             }
             [fBasicInfoField setStringValue: basicString];

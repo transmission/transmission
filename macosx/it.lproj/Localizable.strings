@@ -51,7 +51,7 @@
 
 
 
-"%d files" = "%d file";
+"%@ files" = "%@ file";
 
 /* Inspector -> Peers tab -> peers */
 "%d incoming" = "%d in arrivo";
@@ -71,7 +71,7 @@
 "%d LTEP" = "%d LTEP";
 
 /* Inspector -> selected torrents */
-"%d magnetized transfers" = "%d trasferimenti magnetici";
+"%@ magnetized transfers" = "%@ trasferimenti magnetici";
 
 /* Status bar transfer count */
 "%d of %@" = "%1$d su %2$@";
@@ -86,10 +86,10 @@
 "%d Seeding" = "%d in seed";
 
 /* Drag overlay -> torrents */
-"%d Torrent Files" = "%d file torrent";
+"%@ Torrent Files" = "%@ file torrent";
 
 /* Inspector -> selected torrents */
-"%d Torrents Selected" = "%d torrent selezionati";
+"%@ Torrents Selected" = "%@ torrent selezionati";
 
 /* Inspector -> Peers tab -> peers */
 "%d tracker" = "%d tracker";
@@ -99,7 +99,7 @@
    Torrent table -> group row -> tooltip */
 
 
-"%d transfers" = "%d trasferimenti";
+"%@ transfers" = "%@ trasferimenti";
 
 /* Torrent -> status string */
 "%d web seeds" = "%d seed web";
@@ -107,7 +107,7 @@
 /* Inspector -> selected torrents
    stats -> bytes */
 
-"%llu bytes" = "%llu byte";
+"%@ bytes" = "%@ byte";
 
 /* stats window -> times opened */
 "%llu times" = "%llu volte";
