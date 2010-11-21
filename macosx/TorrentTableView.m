@@ -26,6 +26,7 @@
 #import "Controller.h"
 #import "FileListNode.h"
 #import "NSApplicationAdditions.h"
+#import "NSStringAdditions.h"
 #import "Torrent.h"
 #import "TorrentCell.h"
 #import "TorrentGroup.h"
