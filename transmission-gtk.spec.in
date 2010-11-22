@@ -49,7 +49,7 @@ make CFLAGS="$RPM_OPT_FLAGS"
 %install
 rm -rf $RPM_BUILD_ROOT
 make DESTDIR=$RPM_BUILD_ROOT install
-%find_lang %{name}
+%find_lang %{name}-gtk
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -57,7 +57,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %doc AUTHORS NEWS README
 %attr(755,root,root) %{_bindir}/%{name}*
-%{_datadir}/applications/%{name}.desktop
+%{_datadir}/applications/%{name}-gtk.desktop
 %{_datadir}/pixmaps/*
 %{_datadir}/icons/*
 %{_datadir}/%{name}/web/*
