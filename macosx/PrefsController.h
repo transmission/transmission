@@ -36,6 +36,9 @@
     
     NSString * fInitialString;
     
+    IBOutlet NSTextField * fCheckForUpdatesLabel;
+    IBOutlet NSButton * fCheckForUpdatesButton, * fCheckForUpdatesBetaButton;
+    
     IBOutlet NSPopUpButton * fFolderPopUp, * fIncompleteFolderPopUp, * fImportFolderPopUp;
     IBOutlet NSTextField * fRatioStopField, * fIdleStopField, * fQueueDownloadField, * fQueueSeedField, * fStalledField;
 
