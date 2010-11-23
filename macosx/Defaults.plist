@@ -50,6 +50,8 @@
 	<true/>
 	<key>DisplayStatusProgressSelected</key>
 	<false/>
+	<key>DoneScriptEnabled</key>
+	<false/>
 	<key>DownloadAsk</key>
 	<true/>
 	<key>DownloadAskManual</key>

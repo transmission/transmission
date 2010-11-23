@@ -39,7 +39,7 @@
     IBOutlet NSTextField * fCheckForUpdatesLabel;
     IBOutlet NSButton * fCheckForUpdatesButton, * fCheckForUpdatesBetaButton;
     
-    IBOutlet NSPopUpButton * fFolderPopUp, * fIncompleteFolderPopUp, * fImportFolderPopUp;
+    IBOutlet NSPopUpButton * fFolderPopUp, * fIncompleteFolderPopUp, * fImportFolderPopUp, * fDoneScriptPopUp;
     IBOutlet NSTextField * fRatioStopField, * fIdleStopField, * fQueueDownloadField, * fQueueSeedField, * fStalledField;
 
     IBOutlet NSTextField * fUploadField, * fDownloadField,
@@ -116,6 +116,9 @@
 - (void) setUseIncompleteFolder: (id) sender;
 
 - (void) setRenamePartialFiles: (id) sender;
+
+- (void) setDoneScriptEnabled: (id) sender;
+- (void) doneScriptSheetShow: (id) sender;
 
 - (void) applyRatioSetting: (id) sender;
 - (void) setRatioStop: (id) sender;
