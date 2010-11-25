@@ -40,8 +40,8 @@ fi
 cd "$ORIGDIR" || exit $?
 
 if test -z "$AUTOGEN_SUBDIR_MODE"; then
-	echo Running $srcdir/configure --enable-maintainer-mode "$@"
-        $srcdir/configure --enable-maintainer-mode "$@"
+	echo Running $srcdir/configure "$@"
+        $srcdir/configure "$@"
 
         echo 
         echo "Now type 'make' to compile $PROJECT."
