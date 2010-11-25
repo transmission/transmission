@@ -16,6 +16,7 @@
 #include <QApplication>
 #include <QSet>
 #include <QTimer>
+#include <QTranslator>
 
 #include "favicon.h"
 
@@ -51,6 +52,8 @@ class MyApp: public QApplication
         QTimer myStatsTimer;
         QTimer mySessionTimer;
         time_t myLastFullUpdateTime;
+        QTranslator qtTranslator;
+        QTranslator appTranslator;
 
     private slots:
         void consentGiven( );

@@ -26,7 +26,10 @@ win32:DEFINES += QT_DBUS
 win32:LIBS += -levent -lws2_32 -lintl
 win32:LIBS += -lidn -liconv -lwldap32 -liphlpapi
 
-TRANSLATIONS += transmission_en.ts transmission_es.ts transmission_pt_BR.ts transmission_ru.ts
+TRANSLATIONS += translations/transmission_en.ts \
+                translations/transmission_es.ts \
+                translations/transmission_pt_BR.ts \
+                translations/transmission_ru.ts
 
 FORMS += mainwin.ui
 RESOURCES += application.qrc

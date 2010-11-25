@@ -23,7 +23,6 @@
 #include <QLabel>
 #include <QLibraryInfo>
 #include <QRect>
-#include <QTranslator>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/tr-getopt.h>
@@ -94,13 +93,11 @@ MyApp :: MyApp( int& argc, char ** argv ):
     setApplicationName( MY_CONFIG_NAME );
 
     // install the qt translator
-    QTranslator qtTranslator;
     qtTranslator.load( "qt_" + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
     installTranslator( &qtTranslator );
 
     // install the transmission translator
-    QTranslator appTranslator;
-    appTranslator.load( QString(MY_READABLE_NAME) + "_" + QLocale::system().name() );
+    appTranslator.load( QString(MY_CONFIG_NAME) + "_" + QLocale::system().name(), QCoreApplication::applicationDirPath() + "/translations" );
     installTranslator( &appTranslator );
 
     Formatter::initUnits( );

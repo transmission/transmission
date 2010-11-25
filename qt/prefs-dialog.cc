@@ -280,7 +280,7 @@ PrefsDialog :: createSpeedTab( )
         QWidget * w = timeEditNew( Prefs :: ALT_SPEED_LIMIT_TIME_BEGIN );
         h->addWidget( w, 1 );
         mySchedWidgets << w;
-        QLabel * nd = new QLabel( "&to" );
+        QLabel * nd = new QLabel( tr("&to") );
         h->addWidget( nd );
         mySchedWidgets << nd;
         w = timeEditNew( Prefs :: ALT_SPEED_LIMIT_TIME_END );
@@ -436,7 +436,7 @@ PrefsDialog :: createPrivacyTab( )
 
     hig->addSectionTitle( tr( "Blocklist" ) );
 
-    QWidget * l = checkBoxNew( "Enable &blocklist:", Prefs::BLOCKLIST_ENABLED );
+    QWidget * l = checkBoxNew( tr("Enable &blocklist:"), Prefs::BLOCKLIST_ENABLED );
     QWidget * e = lineEditNew( Prefs::BLOCKLIST_URL );
     myBlockWidgets << e;
     hig->addRow( l, e );
