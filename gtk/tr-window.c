@@ -640,7 +640,7 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
     gtk_container_set_border_width( GTK_CONTAINER( h ), GUI_PAD_SMALL );
 
         w = gtk_button_new( );
-        gtk_container_add( GTK_CONTAINER( w ), gtk_image_new_from_stock( "utilities", GTK_ICON_SIZE_SMALL_TOOLBAR ) );
+        gtk_container_add( GTK_CONTAINER( w ), gtk_image_new_from_stock( "utilities", -1 ) );
         gtr_widget_set_tooltip_text( w, _( "Options" ) );
         gtk_box_pack_start( GTK_BOX( h ), w, 0, 0, 0 );
         gtk_button_set_relief( GTK_BUTTON( w ), GTK_RELIEF_NONE );
@@ -680,7 +680,7 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
         hbox = gtk_hbox_new( FALSE, GUI_PAD );
             w = gtk_button_new( );
             gtr_widget_set_tooltip_text( w, _( "Statistics" ) );
-            gtk_container_add( GTK_CONTAINER( w ), gtk_image_new_from_stock( "ratio", GTK_ICON_SIZE_SMALL_TOOLBAR ) );
+            gtk_container_add( GTK_CONTAINER( w ), gtk_image_new_from_stock( "ratio", -1 ) );
             gtk_button_set_relief( GTK_BUTTON( w ), GTK_RELIEF_NONE );
             g_signal_connect( w, "clicked", G_CALLBACK( onYinYangReleased ), p );
             gtk_box_pack_start( GTK_BOX( hbox ), w, FALSE, FALSE, 0 );
