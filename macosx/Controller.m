@@ -420,7 +420,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                                 + [fTableView rowHeight] + [fTableView intercellSpacing].height;
     [fWindow setContentMinSize: contentMinSize];
     [fWindow setContentBorderThickness: NSMinY([[fTableView enclosingScrollView] frame]) forEdge: NSMinYEdge];
-        
+    
+    [[fTotalDLField cell] setBackgroundStyle: NSBackgroundStyleRaised];
+    [[fTotalULField cell] setBackgroundStyle: NSBackgroundStyleRaised];
     [[fTotalTorrentsField cell] setBackgroundStyle: NSBackgroundStyleRaised];
     
     [self updateGroupsFilterButton];
