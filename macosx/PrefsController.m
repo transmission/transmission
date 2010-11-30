@@ -809,16 +809,13 @@ tr_session * fHandle;
 
 - (void) setDoneScriptEnabled: (id) sender
 {
-    if ([fDefaults boolForKey: @"DoneScriptEnabled"] && !fopen([[fDefaults stringForKey:@"DoneScriptPath"] UTF8String], "r"))
+    if ([fDefaults boolForKey: @"DoneScriptEnabled"] && ![[NSFileManager defaultManager] fileExistsAtPath: [fDefaults stringForKey:@"DoneScriptPath"]])
     {
         // enabled is set but script file doesn't exist, so prompt for one and disable until they pick one
         [fDefaults setBool: NO forKey: @"DoneScriptEnabled"];
         [self doneScriptSheetShow: sender];
     }
-    else
-    {
-        tr_sessionSetTorrentDoneScriptEnabled(fHandle, [fDefaults boolForKey: @"DoneScriptEnabled"]);
-    }
+    tr_sessionSetTorrentDoneScriptEnabled(fHandle, [fDefaults boolForKey: @"DoneScriptEnabled"]);
 }
 
 - (void) setAutoImport: (id) sender
@@ -1358,7 +1355,7 @@ tr_session * fHandle;
     {
         NSString * filePath = [[openPanel filenames] objectAtIndex: 0];
         
-        if (fopen([filePath UTF8String], "r")) // script file exists
+        if ([[NSFileManager defaultManager] fileExistsAtPath: filePath])  // script file exists
         {
             [fDefaults setObject: filePath forKey: @"DoneScriptPath"];
             [fDefaults setBool: YES forKey: @"DoneScriptEnabled"];
