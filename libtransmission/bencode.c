@@ -1667,7 +1667,6 @@ tr_bencToFile( const tr_benc * top, tr_fmt_mode mode, const char * filename )
     {
         int len;
         char * str = tr_bencToStr( top, mode, &len );
-        tr_dbg( "Writing %d bytes to temporary file \"%s\"", (int)len, tmp );
 
         if( write( fd, str, len ) == (ssize_t)len )
         {
@@ -1679,8 +1678,6 @@ tr_bencToFile( const tr_benc * top, tr_fmt_mode mode, const char * filename )
 
             if( !already_exists || !unlink( filename ) )
             {
-                tr_dbg( "Renaming \"%s\" as \"%s\"", tmp, filename );
-
                 if( !rename( tmp, filename ) )
                 {
                     tr_inf( _( "Saved \"%s\"" ), filename );
