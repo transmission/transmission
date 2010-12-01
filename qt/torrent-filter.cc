@@ -79,51 +79,47 @@ namespace
 bool
 TorrentFilter :: lessThan( const QModelIndex& left, const QModelIndex& right ) const
 {
+    int val = 0;
     const Torrent * a = sourceModel()->data( left, TorrentModel::TorrentRole ).value<const Torrent*>();
     const Torrent * b = sourceModel()->data( right, TorrentModel::TorrentRole ).value<const Torrent*>();
-    int less = 0;
 
     switch( myPrefs.get<SortMode>(Prefs::SORT_MODE).mode() )
     {
         case SortMode :: SORT_BY_SIZE:
-            less = compare( a->sizeWhenDone(), b->sizeWhenDone() );
+            if( !val ) val = compare( a->sizeWhenDone(), b->sizeWhenDone() );
             break;
         case SortMode :: SORT_BY_ACTIVITY:
-            less = compare( a->downloadSpeed() + a->uploadSpeed(), b->downloadSpeed() + b->uploadSpeed() );
-            if( !less )
-                less = compare( a->uploadedEver(), b->uploadedEver() );
+            if( !val ) val = compare( a->downloadSpeed() + a->uploadSpeed(), b->downloadSpeed() + b->uploadSpeed() );
+            if( !val ) val = compare( a->uploadedEver(), b->uploadedEver() );
             break;
         case SortMode :: SORT_BY_AGE:
-            less = compare( a->dateAdded().toTime_t(), b->dateAdded().toTime_t() );
+            val = compare( a->dateAdded().toTime_t(), b->dateAdded().toTime_t() );
             break;
         case SortMode :: SORT_BY_ID:
-            less = compare( a->id(), b->id() );
+            if( !val ) val = compare( a->id(), b->id() );
             break;
         case SortMode :: SORT_BY_STATE:
-            if( a->hasError() != b->hasError() )
-                less = a->hasError();
-            else
-                less = compare( a->getActivity(), b->getActivity() );
-            if( less )
-                break;
+            if( !val ) val = compare( a->hasError(), b->hasError() );
+            if( !val ) val = compare( a->getActivity(), b->getActivity() );
+            // fall through
         case SortMode :: SORT_BY_PROGRESS:
-            less = compare( a->percentDone(), b->percentDone() );
-            if( less )
-                break;
+            if( !val ) val = compare( a->percentComplete(), b->percentComplete() );
+            if( !val ) val = a->compareSeedRatio( *b );
+            // fall through
         case SortMode :: SORT_BY_RATIO:
-            less = a->compareRatio( *b );
+            if( !val ) val = a->compareRatio( *b );
             break;
         case SortMode :: SORT_BY_ETA:
-            less = a->compareETA( *b );
+            if( !val ) val = a->compareETA( *b );
             break;
         default:
             break;
     }
-    if( less == 0 )
-        less = -a->name().compare( b->name(), Qt::CaseInsensitive );
-    if( less == 0 )
-        less = compare( a->hashString(), b->hashString() );
-    return less < 0;
+    if( val == 0 )
+        val = -a->name().compare( b->name(), Qt::CaseInsensitive );
+    if( val == 0 )
+        val = compare( a->hashString(), b->hashString() );
+    return val < 0;
 }
 
 

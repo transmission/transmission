@@ -369,6 +369,20 @@ Torrent :: hasTrackerSubstring( const QString& substr ) const
 }
 
 int
+Torrent :: compareSeedRatio( const Torrent& that ) const
+{
+    double a;
+    double b;
+    const bool has_a = getSeedRatio( a );
+    const bool has_b = that.getSeedRatio( b );
+    if( !has_a && !has_b ) return 0;
+    if( !has_a || !has_b ) return has_a ? -1 : 1;
+    if( a < b ) return -1;
+    if( a > b ) return 1;
+    return 0;
+}
+
+int
 Torrent :: compareRatio( const Torrent& that ) const
 {
     const double a = ratio( );

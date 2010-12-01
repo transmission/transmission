@@ -268,6 +268,7 @@ class Torrent: public QObject
         uint64_t uploadedEver( ) const { return getSize( UPLOADED_EVER ); }
         uint64_t failedEver( ) const { return getSize( FAILED_EVER ); }
         int compareTracker( const Torrent& ) const;
+        int compareSeedRatio( const Torrent& ) const;
         int compareRatio( const Torrent& ) const;
         int compareETA( const Torrent& ) const;
         bool hasETA( ) const { return getETA( ) >= 0; }

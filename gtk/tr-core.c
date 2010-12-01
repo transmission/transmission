@@ -286,6 +286,22 @@ compareDouble( double a, double b )
 }
 
 static int
+compareUint64( uint64_t a, uint64_t b )
+{
+    if( a < b ) return -1;
+    if( a > b ) return 1;
+    return 0;
+}
+
+static int
+compareInt_( int a, int b )
+{
+    if( a < b ) return -1;
+    if( a > b ) return 1;
+    return 0;
+}
+
+static int
 compareRatio( double a, double b )
 {
     if( (int)a == TR_RATIO_INF && (int)b == TR_RATIO_INF ) return 0;
@@ -303,157 +319,148 @@ compareTime( time_t a, time_t b )
 }
 
 static int
-compareByRatio( GtkTreeModel  * model,
-                GtkTreeIter   * a,
-                GtkTreeIter   * b,
-                gpointer        user_data UNUSED )
+compareByName( GtkTreeModel * m, GtkTreeIter * a, GtkTreeIter * b, gpointer user_data UNUSED )
 {
-    tr_torrent *ta, *tb;
-    const tr_stat *sa, *sb;
+    int ret = 0;
 
-    gtk_tree_model_get( model, a, MC_TORRENT_RAW, &ta, -1 );
-    gtk_tree_model_get( model, b, MC_TORRENT_RAW, &tb, -1 );
+    if( !ret ) {
+        char *ca, *cb;
+        gtk_tree_model_get( m, a, MC_NAME_COLLATED, &ca, -1 );
+        gtk_tree_model_get( m, b, MC_NAME_COLLATED, &cb, -1 );
+        ret = gtr_strcmp0( ca, cb );
+        g_free( cb );
+        g_free( ca );
+    }
 
-    sa = tr_torrentStatCached( ta );
-    sb = tr_torrentStatCached( tb );
+    if( !ret ) {
+        tr_torrent * t;
+        const tr_info *ia, *ib;
+        gtk_tree_model_get( m, a, MC_TORRENT_RAW, &t, -1 );
+        ia = tr_torrentInfo( t );
+        gtk_tree_model_get( m, b, MC_TORRENT_RAW, &t, -1 );
+        ib = tr_torrentInfo( t );
+        ret = memcmp( ia->hash, ib->hash, SHA_DIGEST_LENGTH );
+    }
 
-    return compareRatio( sa->ratio, sb->ratio );
+    return ret;
 }
 
 static int
-compareByActivity( GtkTreeModel * model,
-                   GtkTreeIter  * a,
-                   GtkTreeIter  * b,
-                   gpointer       user_data UNUSED )
+compareByRatio( GtkTreeModel* m, GtkTreeIter * a, GtkTreeIter * b, gpointer user_data )
 {
-    int i;
+    int ret = 0;
+    tr_torrent *ta, *tb;
+    const tr_stat *sa, *sb;
+
+    gtk_tree_model_get( m, a, MC_TORRENT_RAW, &ta, -1 );
+    sa = tr_torrentStatCached( ta );
+    gtk_tree_model_get( m, b, MC_TORRENT_RAW, &tb, -1 );
+    sb = tr_torrentStatCached( tb );
+
+    if( !ret ) ret = compareRatio( sa->ratio, sb->ratio );
+    if( !ret ) ret = compareByName( m, a, b, user_data );
+    return ret;
+}
+
+static int
+compareByActivity( GtkTreeModel * m, GtkTreeIter * a, GtkTreeIter * b, gpointer user_data )
+{
+    int ret = 0;
     tr_torrent *ta, *tb;
     const tr_stat *sa, *sb;
     double aUp, aDown, bUp, bDown;
 
-    gtk_tree_model_get( model, a, MC_SPEED_UP, &aUp,
-                                  MC_SPEED_DOWN, &aDown,
-                                  MC_TORRENT_RAW, &ta,
-                                  -1 );
-    gtk_tree_model_get( model, b, MC_SPEED_UP, &bUp,
-                                  MC_SPEED_DOWN, &bDown,
-                                  MC_TORRENT_RAW, &tb,
-                                  -1 );
-
-    if(( i = compareDouble( aUp+aDown, bUp+bDown )))
-        return i;
-
+    gtk_tree_model_get( m, a, MC_SPEED_UP, &aUp,
+                              MC_SPEED_DOWN, &aDown,
+                              MC_TORRENT_RAW, &ta,
+                              -1 );
+    gtk_tree_model_get( m, b, MC_SPEED_UP, &bUp,
+                              MC_SPEED_DOWN, &bDown,
+                              MC_TORRENT_RAW, &tb,
+                              -1 );
     sa = tr_torrentStatCached( ta );
     sb = tr_torrentStatCached( tb );
-    if( sa->uploadedEver != sb->uploadedEver )
-        return sa->uploadedEver < sa->uploadedEver ? -1 : 1;
 
-    return 0;
-}
-
-static int
-compareByName( GtkTreeModel *             model,
-               GtkTreeIter *              a,
-               GtkTreeIter *              b,
-               gpointer         user_data UNUSED )
-{
-    int   ret;
-    char *ca, *cb;
-
-    gtk_tree_model_get( model, a, MC_NAME_COLLATED, &ca, -1 );
-    gtk_tree_model_get( model, b, MC_NAME_COLLATED, &cb, -1 );
-    ret = gtr_strcmp0( ca, cb );
-
-    g_free( cb );
-    g_free( ca );
+    if( !ret ) ret = compareDouble( aUp+aDown, bUp+bDown );
+    if( !ret ) ret = compareUint64( sa->uploadedEver, sb->uploadedEver );
+    if( !ret ) ret = compareByName( m, a, b, user_data );
     return ret;
 }
 
 static int
-compareByAge( GtkTreeModel * model,
-              GtkTreeIter  * a,
-              GtkTreeIter  * b,
-              gpointer       user_data UNUSED )
+compareByAge( GtkTreeModel * m, GtkTreeIter * a, GtkTreeIter * b, gpointer user_data )
 {
+    int ret = 0;
     tr_torrent *ta, *tb;
 
-    gtk_tree_model_get( model, a, MC_TORRENT_RAW, &ta, -1 );
-    gtk_tree_model_get( model, b, MC_TORRENT_RAW, &tb, -1 );
-    return compareTime( tr_torrentStatCached( ta )->addedDate,
-                        tr_torrentStatCached( tb )->addedDate );
+    gtk_tree_model_get( m, a, MC_TORRENT_RAW, &ta, -1 );
+    gtk_tree_model_get( m, b, MC_TORRENT_RAW, &tb, -1 );
+
+    if( !ret ) ret = compareTime( tr_torrentStatCached( ta )->addedDate, tr_torrentStatCached( tb )->addedDate );
+    if( !ret ) ret = compareByName( m, a, b, user_data );
+    return ret;
 }
 
 static int
-compareBySize( GtkTreeModel * model,
-               GtkTreeIter  * a,
-               GtkTreeIter  * b,
-               gpointer       user_data UNUSED )
+compareBySize( GtkTreeModel * m, GtkTreeIter * a, GtkTreeIter * b, gpointer user_data )
 {
+    int ret = 0;
     tr_torrent *t;
     const tr_info *ia, *ib;
 
-    gtk_tree_model_get( model, a, MC_TORRENT_RAW, &t, -1 );
+    gtk_tree_model_get( m, a, MC_TORRENT_RAW, &t, -1 );
     ia = tr_torrentInfo( t );
-    gtk_tree_model_get( model, b, MC_TORRENT_RAW, &t, -1 );
+    gtk_tree_model_get( m, b, MC_TORRENT_RAW, &t, -1 );
     ib = tr_torrentInfo( t );
 
-    if( ia->totalSize < ib->totalSize ) return 1;
-    if( ia->totalSize > ib->totalSize ) return -1;
-    return 0;
-}
-
-static int
-compareByProgress( GtkTreeModel *             model,
-                   GtkTreeIter *              a,
-                   GtkTreeIter *              b,
-                   gpointer         user_data UNUSED )
-{
-    int ret;
-    tr_torrent * t;
-    const tr_stat *sa, *sb;
-
-    gtk_tree_model_get( model, a, MC_TORRENT_RAW, &t, -1 );
-    sa = tr_torrentStatCached( t );
-    gtk_tree_model_get( model, b, MC_TORRENT_RAW, &t, -1 );
-    sb = tr_torrentStatCached( t );
-    ret = compareDouble( sa->percentDone, sb->percentDone );
-    if( !ret )
-        ret = compareRatio( sa->ratio, sb->ratio );
+    if( !ret ) ret = compareUint64( ia->totalSize, ib->totalSize );
+    if( !ret ) ret = compareByName( m, a, b, user_data );
     return ret;
 }
 
 static int
-compareByETA( GtkTreeModel * model,
-              GtkTreeIter  * a,
-              GtkTreeIter  * b,
-              gpointer       user_data UNUSED )
+compareByProgress( GtkTreeModel * m, GtkTreeIter * a, GtkTreeIter * b, gpointer user_data )
 {
-    tr_torrent *ta, *tb;
+    int ret = 0;
+    tr_torrent * t;
+    const tr_stat *sa, *sb;
 
-    gtk_tree_model_get( model, a, MC_TORRENT_RAW, &ta, -1 );
-    gtk_tree_model_get( model, b, MC_TORRENT_RAW, &tb, -1 );
+    gtk_tree_model_get( m, a, MC_TORRENT_RAW, &t, -1 );
+    sa = tr_torrentStatCached( t );
+    gtk_tree_model_get( m, b, MC_TORRENT_RAW, &t, -1 );
+    sb = tr_torrentStatCached( t );
 
-    return compareETA( tr_torrentStatCached( ta )->eta,
-                       tr_torrentStatCached( tb )->eta );
+    if( !ret ) ret = compareDouble( sa->percentComplete, sb->percentComplete );
+    if( !ret ) ret = compareDouble( sa->seedRatioPercentDone, sb->seedRatioPercentDone );
+    if( !ret ) ret = compareByRatio( m, a, b, user_data );
+    return ret;
 }
 
 static int
-compareByState( GtkTreeModel * model,
-                GtkTreeIter *  a,
-                GtkTreeIter *  b,
-                gpointer       user_data )
+compareByETA( GtkTreeModel * m, GtkTreeIter  * a, GtkTreeIter  * b, gpointer user_data )
 {
-    int sa, sb, ret;
+    int ret = 0;
+    tr_torrent *ta, *tb;
 
-    /* first by state */
-    gtk_tree_model_get( model, a, MC_ACTIVITY, &sa, -1 );
-    gtk_tree_model_get( model, b, MC_ACTIVITY, &sb, -1 );
-    ret = sa - sb;
+    gtk_tree_model_get( m, a, MC_TORRENT_RAW, &ta, -1 );
+    gtk_tree_model_get( m, b, MC_TORRENT_RAW, &tb, -1 );
 
-    /* second by progress */
-    if( !ret )
-        ret = compareByProgress( model, a, b, user_data );
+    if( !ret ) ret = compareETA( tr_torrentStatCached( ta )->eta, tr_torrentStatCached( tb )->eta );
+    if( !ret ) ret = compareByName( m, a, b, user_data );
+    return ret;
+}
 
+static int
+compareByState( GtkTreeModel * m, GtkTreeIter * a, GtkTreeIter * b, gpointer user_data )
+{
+    int ret = 0;
+    int sa, sb;
+
+    gtk_tree_model_get( m, a, MC_ACTIVITY, &sa, -1 );
+    gtk_tree_model_get( m, b, MC_ACTIVITY, &sb, -1 );
+
+    if( !ret ) ret = compareInt_( sa, sb );
+    if( !ret ) ret = compareByProgress( m, a, b, user_data );
     return ret;
 }
 
