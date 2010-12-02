@@ -10,5 +10,6 @@ dist_data_DATA = \
   info_peers.png \
   info_trackers.png \
   tab_backgrounds.png \
+  tab_backgrounds_highlight.png \
   toolbar_buttons.png \
   torrent_buttons.png
