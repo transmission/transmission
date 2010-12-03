@@ -605,14 +605,6 @@ publishErrorClear( tr_tier * tier )
 }
 
 static void
-publishErrorMessageAndStop( tr_tier * tier, const char * msg )
-{
-    tier->isRunning = FALSE;
-
-    publishMessage( tier, msg, TR_TRACKER_ERROR );
-}
-
-static void
 publishWarning( tr_tier * tier, const char * msg )
 {
     publishMessage( tier, msg, TR_TRACKER_WARNING );
@@ -1453,7 +1445,7 @@ onAnnounceDone( tr_session   * session,
             tierAddAnnounce( tier, announceEvent, now + interval );
             tier->manualAnnounceAllowedAt = now + tier->announceMinIntervalSec;
         }
-        else if( ( responseCode == 404 ) || ( 500 <= responseCode && responseCode <= 599 ) )
+        else if( 400 <= responseCode && responseCode <= 599 )
         {
             /* 404: The requested resource could not be found but may be
              * available again in the future.  Subsequent requests by
@@ -1463,19 +1455,15 @@ onAnnounceDone( tr_session   * session,
              * has erred or is incapable of performing the request.
              * So we pause a bit and try again. */
 
+            /* 4xx: The request could not be understood by the server due to
+             * malformed syntax. The client SHOULD NOT repeat the
+             * request without modifications... however, some trackers spit
+             * out 4xx messages too freely, so we can't disable reannounces
+             * altogether.  Use the same sliding scale that 404 and 5xx use. */
+             
             const int interval = getRetryInterval( tier->currentTracker->host );
             tier->manualAnnounceAllowedAt = ~(time_t)0;
             tierAddAnnounce( tier, announceEvent, now + interval );
-        }
-        else if( 400 <= responseCode && responseCode <= 499 )
-        {
-            /* The request could not be understood by the server due to
-             * malformed syntax. The client SHOULD NOT repeat the
-             * request without modifications. */
-            if( tr_torrentIsPrivate( tier->tor ) || ( tier->tor->info.trackerCount < 2 ) )
-                publishErrorMessageAndStop( tier, _( "Tracker returned a 4xx message" ) );
-            tier->announceAt = 0;
-            tier->manualAnnounceAllowedAt = ~(time_t)0;
         }
         else
         {
