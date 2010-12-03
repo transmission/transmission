@@ -501,6 +501,8 @@ tr_sessionInit( const char  * tag,
 
     assert( tr_bencIsDict( clientSettings ) );
 
+    tr_timeUpdate( time( NULL ) );
+
     /* initialize the bare skeleton of the session object */
     session = tr_new0( tr_session, 1 );
     session->bandwidth = tr_bandwidthNew( session, NULL );
