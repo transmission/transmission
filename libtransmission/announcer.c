@@ -604,13 +604,13 @@ publishErrorClear( tr_tier * tier )
     publishMessage( tier, NULL, TR_TRACKER_ERROR_CLEAR );
 }
 
-static void 
-publishErrorMessageAndStop( tr_tier * tier, const char * msg ) 
-{ 
-    tier->isRunning = FALSE; 
+static void
+publishErrorMessageAndStop( tr_tier * tier, const char * msg )
+{
+    tier->isRunning = FALSE;
 
-    publishMessage( tier, msg, TR_TRACKER_ERROR ); 
-} 
+    publishMessage( tier, msg, TR_TRACKER_ERROR );
+}
 
 static void
 publishWarning( tr_tier * tier, const char * msg )
@@ -1453,7 +1453,7 @@ onAnnounceDone( tr_session   * session,
             tierAddAnnounce( tier, announceEvent, now + interval );
             tier->manualAnnounceAllowedAt = now + tier->announceMinIntervalSec;
         }
-        else if( ( responseCode == 404 ) || ( 500 <= responseCode && responseCode <= 599 ) ) 
+        else if( ( responseCode == 404 ) || ( 500 <= responseCode && responseCode <= 599 ) )
         {
             /* 404: The requested resource could not be found but may be
              * available again in the future.  Subsequent requests by
@@ -1467,16 +1467,16 @@ onAnnounceDone( tr_session   * session,
             tier->manualAnnounceAllowedAt = ~(time_t)0;
             tierAddAnnounce( tier, announceEvent, now + interval );
         }
-        else if( 400 <= responseCode && responseCode <= 499 ) 
-        { 
-            /* The request could not be understood by the server due to 
-             * malformed syntax. The client SHOULD NOT repeat the 
-             * request without modifications. */ 
-            if( tr_torrentIsPrivate( tier->tor ) || ( tier->tor->info.trackerCount < 2 ) ) 
-                publishErrorMessageAndStop( tier, _( "Tracker returned a 4xx message" ) ); 
-            tier->announceAt = 0; 
-            tier->manualAnnounceAllowedAt = ~(time_t)0; 
-        } 
+        else if( 400 <= responseCode && responseCode <= 499 )
+        {
+            /* The request could not be understood by the server due to
+             * malformed syntax. The client SHOULD NOT repeat the
+             * request without modifications. */
+            if( tr_torrentIsPrivate( tier->tor ) || ( tier->tor->info.trackerCount < 2 ) )
+                publishErrorMessageAndStop( tier, _( "Tracker returned a 4xx message" ) );
+            tier->announceAt = 0;
+            tier->manualAnnounceAllowedAt = ~(time_t)0;
+        }
         else
         {
             /* WTF did we get?? */
