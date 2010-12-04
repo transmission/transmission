@@ -391,6 +391,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) awakeFromNib
 {
+    [fFilterBar setIsFilter: YES];
+    
     NSToolbar * toolbar = [[NSToolbar alloc] initWithIdentifier: @"TRMainToolbar"];
     [toolbar setDelegate: self];
     [toolbar setAllowsUserCustomization: YES];
@@ -420,6 +422,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                                 + [fTableView rowHeight] + [fTableView intercellSpacing].height;
     [fWindow setContentMinSize: contentMinSize];
     [fWindow setContentBorderThickness: NSMinY([[fTableView enclosingScrollView] frame]) forEdge: NSMinYEdge];
+    [fWindow setMovableByWindowBackground: YES];
     
     [[fTotalDLField cell] setBackgroundStyle: NSBackgroundStyleRaised];
     [[fTotalULField cell] setBackgroundStyle: NSBackgroundStyleRaised];

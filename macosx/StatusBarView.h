@@ -26,7 +26,11 @@
 
 @interface StatusBarView : NSView
 {
+    BOOL fIsFilter;
+    NSGradient * fInactiveGradient, * fFilterGradient;
     NSColor * fGrayBorderColor;
 }
+
+- (void) setIsFilter: (BOOL) isFilter;
 
 @end
