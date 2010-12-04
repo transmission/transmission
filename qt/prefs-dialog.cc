@@ -78,38 +78,15 @@ PrefsDialog :: enableBuddyWhenChecked( QCheckBox * box, QWidget * buddy )
 }
 
 void
-PrefsDialog :: spinBoxChangedIdle( )
+PrefsDialog :: spinBoxEditingFinished()
 {
-    const QObject * spin( sender()->property( "SPIN" ).value<QObject*>( ) );
+    const QObject * spin = sender();
     const int key = spin->property( PREF_KEY ).toInt( );
-
     const QDoubleSpinBox * d = qobject_cast<const QDoubleSpinBox*>( spin );
-    if( d != 0 )
+    if( d )
         setPref( key, d->value( ) );
     else
         setPref( key, qobject_cast<const QSpinBox*>(spin)->value( ) );
-}
-
-void
-PrefsDialog :: spinBoxChanged( int value )
-{
-    Q_UNUSED( value );
-
-    static const QString timerName( "TIMER_CHILD" );
-    QObject * o( sender( ) );
-
-    // user may be spinning through many values, so let's hold off
-    // for a moment to kekep from flooding a bunch of prefs changes
-    QTimer * timer( o->findChild<QTimer*>( timerName ) );
-    if( timer == 0 )
-    {
-        timer = new QTimer( o );
-        timer->setObjectName( timerName );
-        timer->setSingleShot( true );
-        timer->setProperty( "SPIN", qVariantFromValue( o ) );
-        connect( timer, SIGNAL(timeout()), this, SLOT(spinBoxChangedIdle()));
-    }
-    timer->start( 200 );
 }
 
 QSpinBox *
@@ -120,17 +97,9 @@ PrefsDialog :: spinBoxNew( int key, int low, int high, int step )
     spin->setSingleStep( step );
     spin->setValue( myPrefs.getInt( key ) );
     spin->setProperty( PREF_KEY, key );
-    connect( spin, SIGNAL(valueChanged(int)), this, SLOT(spinBoxChanged(int)));
+    connect( spin, SIGNAL(editingFinished()), this, SLOT(spinBoxEditingFinished()));
     myWidgets.insert( key, spin );
     return spin;
-}
-
-void
-PrefsDialog :: doubleSpinBoxChanged( double value )
-{
-    Q_UNUSED( value );
-
-    spinBoxChanged( 0 );
 }
 
 QDoubleSpinBox *
@@ -142,19 +111,24 @@ PrefsDialog :: doubleSpinBoxNew( int key, double low, double high, double step, 
     spin->setDecimals( decimals );
     spin->setValue( myPrefs.getDouble( key ) );
     spin->setProperty( PREF_KEY, key );
-    connect( spin, SIGNAL(valueChanged(double)), this, SLOT(doubleSpinBoxChanged(double)));
+    connect( spin, SIGNAL(editingFinished()), this, SLOT(spinBoxEditingFinished()));
     myWidgets.insert( key, spin );
     return spin;
 }
 
 void
-PrefsDialog :: timeChanged( const QTime& time )
+PrefsDialog :: timeEditingFinished( )
 {
-    const int key( sender()->property( PREF_KEY ).toInt( ) );
-    const int seconds( QTime().secsTo( time ) );
-    setPref( key, seconds / 60 );
+    QTimeEdit * e = qobject_cast<QTimeEdit*>(sender());
+    if( e )
+    {
+        const int key( e->property( PREF_KEY ).toInt( ) );
+        const QTime time( e->time( ) );
+        const int seconds( QTime().secsTo( time ) );
+std::cerr << "setPref to " << (seconds/60) << " minutes" << std::endl;
+        setPref( key, seconds / 60 );
+    }
 }
-
 QTimeEdit*
 PrefsDialog :: timeEditNew( int key )
 {
@@ -164,17 +138,21 @@ PrefsDialog :: timeEditNew( int key )
     e->setProperty( PREF_KEY, key );
     e->setTime( QTime().addSecs( minutes * 60 ) );
     myWidgets.insert( key, e );
-    connect( e, SIGNAL(timeChanged(const QTime&)), this, SLOT(timeChanged(const QTime&)) );
+    connect( e, SIGNAL(editingFinished()), this, SLOT(timeEditingFinished()) );
     return e;
 }
 
 void
-PrefsDialog :: textChanged( const QString& text )
+PrefsDialog :: lineEditingFinished( )
 {
-    const int key( sender()->property( PREF_KEY ).toInt( ) );
-    setPref( key, text );
+    QLineEdit * e = qobject_cast<QLineEdit*>(sender());
+    if( e && e->isModified( ) )
+    {
+        const int key( e->property( PREF_KEY ).toInt( ) );
+        const QString text( e->text() );
+        setPref( key, text );
+    }
 }
-
 QLineEdit*
 PrefsDialog :: lineEditNew( int key, int echoMode )
 {
@@ -182,7 +160,7 @@ PrefsDialog :: lineEditNew( int key, int echoMode )
     e->setProperty( PREF_KEY, key );
     e->setEchoMode( QLineEdit::EchoMode( echoMode ) );
     myWidgets.insert( key, e );
-    connect( e, SIGNAL(textChanged(const QString&)), this, SLOT(textChanged(const QString&)) );
+    connect( e, SIGNAL(editingFinished()), this, SLOT(lineEditingFinished()) );
     return e;
 }
 

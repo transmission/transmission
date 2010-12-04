@@ -41,11 +41,9 @@ class PrefsDialog: public QDialog
 
     private slots:
         void checkBoxToggled( bool checked );
-        void spinBoxChanged( int value );
-        void doubleSpinBoxChanged( double value );
-        void spinBoxChangedIdle( );
-        void timeChanged( const QTime& );
-        void textChanged( const QString& );
+        void spinBoxEditingFinished( );
+        void timeEditingFinished( );
+        void lineEditingFinished( );
         void refreshPref( int key );
         void encryptionEdited( int );
         void altSpeedDaysEdited( int );

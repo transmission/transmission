@@ -71,6 +71,8 @@ namespace
 {
     const int REFRESH_INTERVAL_MSEC = 4000;
 
+    const char * PREF_KEY( "pref-key" );
+
     enum // peer columns
     {
         COL_LOCK,
@@ -896,21 +898,22 @@ Details :: onDownloadLimitedToggled( bool val )
     getNewData( );
 }
 void
-Details :: onDownloadLimitChanged( int val )
+Details :: onSpinBoxEditingFinished( )
 {
-    mySession.torrentSet( myIds, "downloadLimit", val );
+    const QObject * spin = sender();
+    const QString key = spin->property( PREF_KEY ).toString( );
+    const QDoubleSpinBox * d = qobject_cast<const QDoubleSpinBox*>( spin );
+    if( d )
+        mySession.torrentSet( myIds, key, d->value( ) );
+    else
+        mySession.torrentSet( myIds, key, qobject_cast<const QSpinBox*>(spin)->value( ) );
     getNewData( );
 }
+
 void
 Details :: onUploadLimitedToggled( bool val )
 {
     mySession.torrentSet( myIds, "uploadLimited", val );
-    getNewData( );
-}
-void
-Details :: onUploadLimitChanged( int val )
-{
-    mySession.torrentSet( myIds, "uploadLimit", val );
     getNewData( );
 }
 
@@ -923,31 +926,10 @@ Details :: onIdleModeChanged( int index )
 }
 
 void
-Details :: onIdleLimitChanged( int val )
-{
-    mySession.torrentSet( myIds, "seedIdleLimit", val );
-    getNewData( );
-}
-
-void
 Details :: onRatioModeChanged( int index )
 {
     const int val = myRatioCombo->itemData( index ).toInt( );
     mySession.torrentSet( myIds, "seedRatioMode", val );
-}
-
-void
-Details :: onRatioLimitChanged( double val )
-{
-    mySession.torrentSet( myIds, "seedRatioLimit", val );
-    getNewData( );
-}
-
-void
-Details :: onMaxPeersChanged( int val )
-{
-    mySession.torrentSet( myIds, "peer-limit", val );
-    getNewData( );
 }
 
 void
@@ -1089,24 +1071,26 @@ Details :: createOptionsTab( )
     c = new QCheckBox( tr( "Limit &download speed (%1):" ).arg( speed_K_str ) );
     mySingleDownCheck = c;
     s = new QSpinBox( );
+    s->setProperty( PREF_KEY, QString( "downloadLimit" ) );
     s->setSingleStep( 5 );
     s->setRange( 0, INT_MAX );
     mySingleDownSpin = s;
     hig->addRow( c, s );
     enableWhenChecked( c, s );
     connect( c, SIGNAL(clicked(bool)), this, SLOT(onDownloadLimitedToggled(bool)) );
-    connect( s, SIGNAL(valueChanged(int)), this, SLOT(onDownloadLimitChanged(int)));
+    connect( s, SIGNAL(editingFinished()), this, SLOT(onSpinBoxEditingFinished()));
 
     c = new QCheckBox( tr( "Limit &upload speed (%1):" ).arg( speed_K_str ) );
     mySingleUpCheck = c;
     s = new QSpinBox( );
     s->setSingleStep( 5 );
     s->setRange( 0, INT_MAX );
+    s->setProperty( PREF_KEY, QString( "uploadLimit" ) );
     mySingleUpSpin = s;
     hig->addRow( c, s );
     enableWhenChecked( c, s );
     connect( c, SIGNAL(clicked(bool)), this, SLOT(onUploadLimitedToggled(bool)) );
-    connect( s, SIGNAL(valueChanged(int)), this, SLOT(onUploadLimitChanged(int)));
+    connect( s, SIGNAL(editingFinished()), this, SLOT(onSpinBoxEditingFinished()));
 
     m = new QComboBox;
     m->addItem( tr( "High" ),   TR_PRI_HIGH );
@@ -1129,7 +1113,8 @@ Details :: createOptionsTab( )
     h->addWidget( myRatioCombo = m );
     ds = new QDoubleSpinBox( );
     ds->setRange( 0.5, INT_MAX );
-    connect( ds, SIGNAL(valueChanged(double)), this, SLOT(onRatioLimitChanged(double)));
+    ds->setProperty( PREF_KEY, QString( "seedRatioLimit" ) );
+    connect( ds, SIGNAL(editingFinished()), this, SLOT(onSpinBoxEditingFinished()));
     h->addWidget( myRatioSpin = ds );
     hig->addRow( tr( "&Ratio:" ), h, m );
 
@@ -1144,7 +1129,8 @@ Details :: createOptionsTab( )
     s = new QSpinBox( );
     s->setSingleStep( 5 );
     s->setRange( 1, 9999 );
-    connect( s, SIGNAL(valueChanged(int)), this, SLOT(onIdleLimitChanged(int)));
+    s->setProperty( PREF_KEY, QString( "seedIdleLimit" ) );
+    connect( s, SIGNAL(editingFinished()), this, SLOT(onSpinBoxEditingFinished()));
     h->addWidget( myIdleSpin = s );
     hig->addRow( tr( "&Idle:" ), h, m );
 
@@ -1155,7 +1141,8 @@ Details :: createOptionsTab( )
     s = new QSpinBox( );
     s->setSingleStep( 5 );
     s->setRange( 1, 300 );
-    connect( s, SIGNAL(valueChanged(int)), this, SLOT(onMaxPeersChanged(int)));
+    s->setProperty( PREF_KEY, QString( "peer-limit" ) );
+    connect( s, SIGNAL(editingFinished()), this, SLOT(onSpinBoxEditingFinished()));
     myPeerLimitSpin = s;
     hig->addRow( tr( "&Maximum peers:" ), s );
 

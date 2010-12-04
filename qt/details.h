@@ -142,20 +142,16 @@ class Details: public QDialog
         void onFileWantedChanged( const QSet<int>& fileIndices, bool );
         void onHonorsSessionLimitsToggled( bool );
         void onDownloadLimitedToggled( bool );
-        void onDownloadLimitChanged( int );
+        void onSpinBoxEditingFinished( );
         void onUploadLimitedToggled( bool );
-        void onUploadLimitChanged( int );
         void onRatioModeChanged( int );
-        void onRatioLimitChanged( double );
         void onIdleModeChanged( int );
-        void onIdleLimitChanged( int );
         void onShowTrackerScrapesToggled( bool );
         void onShowBackupTrackersToggled( bool );
         void onTrackerSelectionChanged( );
         void onAddTrackerClicked( );
         void onEditTrackerClicked( );
         void onRemoveTrackerClicked( );
-        void onMaxPeersChanged( int );
         void refresh( );
 };
 
