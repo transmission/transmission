@@ -43,6 +43,10 @@
         NSColor * darkColor = [NSColor colorWithCalibratedRed: 220.0/255.0 green: 220.0/255.0 blue: 220.0/255.0 alpha: 1.0];
         fInactiveGradient = [[NSGradient alloc] initWithStartingColor: lightColor endingColor: darkColor];
         
+        lightColor = [NSColor colorWithCalibratedRed: 160.0/255.0 green: 160.0/255.0 blue: 160.0/255.0 alpha: 1.0];
+        darkColor = [NSColor colorWithCalibratedRed: 155.0/255.0 green: 155.0/255.0 blue: 155.0/255.0 alpha: 1.0];
+        fStatusGradient = [[NSGradient alloc] initWithStartingColor: lightColor endingColor: darkColor];
+        
         lightColor = [NSColor colorWithCalibratedRed: 235.0/255.0 green: 235.0/255.0 blue: 235.0/255.0 alpha: 1.0];
         darkColor = [NSColor colorWithCalibratedRed: 205.0/255.0 green: 205.0/255.0 blue: 205.0/255.0 alpha: 1.0];
         fFilterGradient = [[NSGradient alloc] initWithStartingColor: lightColor endingColor: darkColor];
@@ -58,6 +62,7 @@
 - (void) dealloc
 {
     [fGrayBorderColor release];
+    [fStatusGradient release];
     [fInactiveGradient release];
     [fFilterGradient release];
     [super dealloc];
@@ -116,8 +121,8 @@
         const BOOL active = [[self window] isMainWindow];
         
         NSInteger count = 0;
-        NSRect gridRects[active ? 3 : 2];
-        NSColor * colorRects[active ? 3 : 2];
+        NSRect gridRects[2];
+        NSColor * colorRects[2];
         
         NSRect lineBorderRect = NSMakeRect(NSMinX(rect), NSHeight([self bounds]) - 1.0, NSWidth(rect), 1.0);
         if (active)
@@ -145,11 +150,7 @@
         }
         
         if (active)
-        {
-            gridRects[count] = rect;
-            colorRects[count] = [NSColor colorWithCalibratedWhite: 0.59 alpha: 1.0];
-            ++count;
-        }
+            [fStatusGradient drawInRect: rect angle: 270.0];
         else
             [fInactiveGradient drawInRect: rect angle: 270.0];
         
