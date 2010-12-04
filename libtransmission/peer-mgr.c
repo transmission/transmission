@@ -202,12 +202,7 @@ typedef struct tr_torrent_peers
 
     int                        interestedCount;
     int                        maxPeers;
-    tr_recentHistory         * noBlocksCancelsCount;
-
-    /* An arbitrary metric of how congested the downloads are.
-     * Based on how many of requests are cancelled and how many are completed.
-     * Lower values indicate less congestion. */
-    double                     cancelRate;
+    time_t                     lastCancel;
 }
 Torrent;
 
@@ -460,7 +455,6 @@ torrentDestructor( void * vt )
     tr_ptrArrayDestruct( &t->pool, (PtrArrayForeachFunc)tr_free );
     tr_ptrArrayDestruct( &t->outgoingHandshakes, NULL );
     tr_ptrArrayDestruct( &t->peers, NULL );
-    tr_historyFree( t->noBlocksCancelsCount );
 
     tr_free( t->requests );
     tr_free( t->pieces );
@@ -483,7 +477,6 @@ torrentConstructor( tr_peerMgr * manager,
     t->peers = TR_PTR_ARRAY_INIT;
     t->webseeds = TR_PTR_ARRAY_INIT;
     t->outgoingHandshakes = TR_PTR_ARRAY_INIT;
-    t->noBlocksCancelsCount = tr_historyNew( NO_BLOCKS_CANCEL_HISTORY, ( RECHOKE_PERIOD_MSEC / 1000 ) );
 
     for( i = 0; i < tor->info.webseedCount; ++i )
     {
@@ -2072,6 +2065,7 @@ tr_peerMgrStartTorrent( tr_torrent * tor )
     ensureMgrTimersExist( t->manager );
 
     t->isRunning = TRUE;
+    t->maxPeers = t->tor->maxConnectedPeers;
 
     rechokePulse( 0, 0, t->manager );
     managerUnlock( t->manager );
@@ -2463,6 +2457,7 @@ rechokeDownloads( Torrent * t )
     {
         int blocks = 0;
         int cancels = 0;
+        time_t timeSinceCancel;
 
         /* Count up how many blocks & cancels each peer has.
          *
@@ -2491,62 +2486,34 @@ rechokeDownloads( Torrent * t )
             cancels += c;
         }
 
-        if( !t->maxPeers )
+        if( cancels > 0 )
         {
-            /* this is the torrent's first time to call this function...
-             * start off optimistically by allowing interest in many peers */
-            maxPeers = t->tor->maxConnectedPeers;
+            /* cancelRate: of the block requests we've recently made, the percentage we cancelled.
+             * higher values indicate more congestion. */
+            const double cancelRate = cancels / (double)(cancels + blocks);
+            const double mult = 1 - MIN( cancelRate, 0.5 );
+            maxPeers = t->interestedCount * mult;
+            tordbg( t, "cancel rate is %.3f -- reducing the "
+                       "number of peers we're interested in by %.0f percent",
+                       cancelRate, mult * 100 );
+            t->lastCancel = now;
         }
-        else if( !blocks && cancels )
+
+        timeSinceCancel = now - t->lastCancel;
+        if( timeSinceCancel )
         {
-            /* we've gotten cancels but zero blocks...
-             * something is seriously wrong.  throttle back sharply */
-            maxPeers = t->interestedCount * 0.5;
-        }
-        else if( blocks )
-        {
-            const double cancelRate = cancels / (double)(cancels + blocks );
-
-            /* if we're getting cancels then use interestedCount instead of
-             * maxPeers to scale faster */
-                 if( cancelRate >= 0.20 ) maxPeers = t->interestedCount * 0.7;
-            else if( cancelRate >= 0.10 ) maxPeers = t->interestedCount * 0.8;
-            else if( cancelRate >= 0.05 ) maxPeers = t->interestedCount * 0.9;
-            else if( cancelRate >= 0.01 ) maxPeers = t->interestedCount;
-            else                          maxPeers = t->maxPeers + 1;
-
-            /* if things are getting worse, don't add more peers */
-            if( ( t->cancelRate > 0.01 ) && ( cancelRate > t->cancelRate ) )
-                maxPeers = MIN( maxPeers, t->maxPeers );
-
-            t->cancelRate = cancelRate;
-
-            tordbg( t, "cancel rate is %.3f -- changing the "
-                       "number of peers we're interested in from %d to %d",
-                       cancelRate, t->maxPeers, maxPeers );
-        }
-        else
-        {
-            const unsigned maxCount = 10; /* maximum times in this block in the past two minutes */
-            tr_historyAdd( t->noBlocksCancelsCount, now, 1 );
-            if( tr_historyGet( t->noBlocksCancelsCount, now, NO_BLOCKS_CANCEL_HISTORY ) < maxCount )
-            {
-                /* no blocks and no cancels means either that the torrent
-                 * just started or peers are unresponsive/nonexistent,
-                 * either way there's nothing to do */
-                maxPeers = t->maxPeers;
-            }
-            else
-            {
-                /* we've been in here for a while so maybe the network is down or there are no
-                 * good peers. maximize the chance of connecting to a good peer
-                 * if/when they show up */
-                maxPeers = t->tor->maxConnectedPeers;
-            }
+            const int maxIncrease = 15;
+            const time_t maxHistory = 2 * CANCEL_HISTORY_SEC;
+            const double mult = MIN( timeSinceCancel, maxHistory ) / (double) maxHistory;
+            const int inc = maxIncrease * mult;
+            maxPeers = t->maxPeers + inc;
+            tordbg( t, "time since last cancel is %li -- increasing the "
+                       "number of peers we're interested in by %d",
+                       timeSinceCancel, inc );
         }
     }
 
-    /* don't let the previous paragraph's number tweaking go too far... */
+    /* don't let the previous section's number tweaking go too far... */
     if( maxPeers < MIN_INTERESTING_PEERS )
         maxPeers = MIN_INTERESTING_PEERS;
     if( maxPeers > t->tor->maxConnectedPeers )
