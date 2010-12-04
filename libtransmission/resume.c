@@ -542,13 +542,10 @@ tr_torrentSaveResume( tr_torrent * tor )
     tr_benc top;
     char * filename;
 
-
     if( !tr_isTorrent( tor ) )
         return;
 
-    tr_tordbg( tor, "Saving .resume file for \"%s\"", tr_torrentName( tor ) );
-
-    tr_bencInitDict( &top, 33 ); /* arbitrary "big enough" number */
+    tr_bencInitDict( &top, 50 ); /* arbitrary "big enough" number */
     tr_bencDictAddInt( &top, KEY_ACTIVITY_DATE, tor->activityDate );
     tr_bencDictAddInt( &top, KEY_ADDED_DATE, tor->addedDate );
     tr_bencDictAddInt( &top, KEY_CORRUPT, tor->corruptPrev + tor->corruptCur );
