@@ -99,7 +99,8 @@
         if (NSIntersectsRect(lineBorderRect, rect))
         {
             gridRects[count] = lineBorderRect;
-            colorRects[count] = fGrayBorderColor;
+            colorRects[count] = [[self window] isMainWindow] ? [NSColor colorWithCalibratedWhite: 0.25 alpha: 1.0]
+                                    : [NSColor colorWithCalibratedWhite: 0.5 alpha: 1.0];
             ++count;
             
             rect.origin.y += 1.0;
