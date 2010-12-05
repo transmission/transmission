@@ -206,7 +206,7 @@ if test -n "$LIBEVENT_LIBS"; then
 elif test -n "$LIBEVENT_CFLAGS"; then
     user_specified_libevent=yes
 fi
-if test "x$user_specified_libevent" == "xyes"; then
+if test "x$user_specified_libevent" = "xyes"; then
     AC_MSG_NOTICE([Using user-specified LIBEVENT_LIBS and LIBEVENT_CFLAGS])
 else
     AC_CHECK_LIB([event],[evutil_vsnprintf],
