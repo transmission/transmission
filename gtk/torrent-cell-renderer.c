@@ -520,13 +520,11 @@ torrent_cell_renderer_get_size( GtkCellRenderer  * cell,
         if( height )
             *height = h;
 
-        if( cell_area ) {
-            if( x_offset ) *x_offset = 0;
-            if( y_offset ) {
-                *y_offset = 0.5 * ( cell_area->height - ( h + ( 2 * cell->ypad ) ) );
-                *y_offset = MAX( *y_offset, 0 );
-            }
-        }
+        if( x_offset )
+            *x_offset = cell_area ? cell_area->x : 0;
+          
+        if( y_offset )
+            *x_offset = cell_area ? (int)((cell_area->height - (cell->ypad*2 +h)) / 2.0) : 0;
     }
 }
 
