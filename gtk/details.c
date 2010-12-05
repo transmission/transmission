@@ -972,8 +972,11 @@ info_page_new( struct DetailsImpl * di )
         hig_workarea_add_row( t, &row, _( "Last activity:" ), l, NULL );
 
         /* error */
-        l = di->error_lb = gtk_label_new( NULL );
+        l = g_object_new( GTK_TYPE_LABEL, "selectable", TRUE,
+                                          "ellipsize", PANGO_ELLIPSIZE_END,
+                                          NULL );
         hig_workarea_add_row( t, &row, _( "Error:" ), l, NULL );
+        di->error_lb = l;
 
 
     hig_workarea_add_section_divider( t, &row );
