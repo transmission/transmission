@@ -2379,6 +2379,30 @@ tr_peerMgrPeerStats( const tr_torrent    * tor,
 ***
 **/
 
+void
+tr_peerMgrClearInterest( tr_torrent * tor )
+{
+    int i;
+    Torrent * t;
+    int peerCount;
+
+    assert( tr_isTorrent( tor ) );
+
+    t = tor->torrentPeers;
+
+    torrentLock( t );
+
+    peerCount = tr_ptrArraySize( &t->peers );
+
+    for( i=0; i<peerCount; ++i )
+    {
+        const tr_peer * peer = tr_ptrArrayNth( &t->peers, i );
+        tr_peerMsgsSetInterested( peer->msgs, FALSE );
+    }
+
+    torrentUnlock( t );
+}
+
 /* do we still want this piece and does the peer have it? */
 static tr_bool
 isPieceInteresting( const tr_torrent * tor, const tr_peer * peer, tr_piece_index_t index )

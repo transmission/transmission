@@ -1475,8 +1475,10 @@ verifyTorrent( void * vtor )
 
     /* if the torrent's running, stop it & set the restart-after-verify flag */
     if( tor->startAfterVerify || tor->isRunning ) {
+        /* don't clobber isStopping */
+        const tr_bool startAfter = tor->isStopping ? FALSE : TRUE;
         tr_torrentStop( tor );
-        tor->startAfterVerify = TRUE;
+        tor->startAfterVerify = startAfter;
     }
 
     /* add the torrent to the recheck queue */
@@ -1700,7 +1702,6 @@ torrentCallScript( tr_torrent * tor, const char * script )
 void
 tr_torrentRecheckCompleteness( tr_torrent * tor )
 {
-    tr_bool wasRunning;
     tr_completeness completeness;
 
     assert( tr_isTorrent( tor ) );
@@ -1708,11 +1709,12 @@ tr_torrentRecheckCompleteness( tr_torrent * tor )
     tr_torrentLock( tor );
 
     completeness = tr_cpGetStatus( &tor->completion );
-    wasRunning = tor->isRunning;
 
     if( completeness != tor->completeness )
     {
         const int recentChange = tor->downloadedCur != 0;
+        const tr_bool wasLeeching = !tr_torrentIsSeed( tor );
+        const tr_bool wasRunning = tor->isRunning;
 
         if( recentChange )
         {
@@ -1730,6 +1732,15 @@ tr_torrentRecheckCompleteness( tr_torrent * tor )
             {
                 tr_announcerTorrentCompleted( tor );
                 tor->doneDate = tor->anyDate = tr_time( );
+            }
+
+            if( wasLeeching && wasRunning )
+            {
+                /* clear interested flag on all peers */
+                tr_peerMgrClearInterest( tor );
+
+                /* if completeness was TR_LEECH then the seed limit check will have been skipped in bandwidthPulse */
+                tr_torrentCheckSeedRatio( tor );
             }
 
             if( tor->currentDir == tor->incompleteDir )
