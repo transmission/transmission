@@ -2005,6 +2005,9 @@ refreshTracker( struct DetailsImpl * di, tr_torrent ** torrents, int n )
         di->trackers_filtered = filter;
 
         gtk_tree_view_set_model( GTK_TREE_VIEW( di->tracker_view ), filter );
+
+        g_object_unref( filter );
+        g_object_unref( store );
     }
 
     if( ( di->tracker_buffer == NULL ) && ( n == 1 ) )
