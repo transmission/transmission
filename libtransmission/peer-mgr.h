@@ -111,12 +111,6 @@ typedef struct tr_peer
 
     time_t                   chokeChangedAt;
 
-    time_t                   lastBlocksAtTime;
-    int                      blocksAt[60];
-
-    time_t                   lastCancelTime;
-    int                      cancelAt[60];
-
     tr_recentHistory       * blocksSentToClient;
     tr_recentHistory       * blocksSentToPeer;
 
