@@ -603,7 +603,7 @@ FileTreeView :: FileTreeView( QWidget * parent ):
     setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
     installEventFilter( this );
 
-    for( int i=0; i<=NUM_COLUMNS; ++i )
+    for( int i=0; i<NUM_COLUMNS; ++i )
         header()->setResizeMode( i, QHeaderView::Fixed );
 
     connect( this,     SIGNAL(clicked(const QModelIndex&)),
