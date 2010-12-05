@@ -1690,6 +1690,7 @@ processArgs( const char * host, int port, int argc, const char ** argv )
             switch( c )
             {
                 case 'a': /* add torrent */
+                    if( sset != 0 ) status |= flush( host, port, &sset );
                     if( tadd != 0 ) status |= flush( host, port, &tadd );
                     if( tset != 0 ) { addIdArg( tr_bencDictFind( tset, ARGUMENTS ), id ); status |= flush( host, port, &tset ); }
                     tadd = tr_new0( tr_benc, 1 );
