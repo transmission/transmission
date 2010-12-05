@@ -1060,12 +1060,19 @@ TrMainWindow :: refreshPref( int key )
             myTrayIcon.setVisible( b );
             break;
 
-        case Prefs::COMPACT_VIEW:
+        case Prefs::COMPACT_VIEW: {
+            QItemSelectionModel * selectionModel( ui.listView->selectionModel( ) );
+            const QItemSelection selection( selectionModel->selection( ) );
+            const QModelIndex currentIndex( selectionModel->currentIndex( ) );
             b = myPrefs.getBool( key );
             ui.action_CompactView->setChecked( b );
             ui.listView->setItemDelegate( b ? myTorrentDelegateMin : myTorrentDelegate );
+            selectionModel->clear( );
             ui.listView->reset( ); // force the rows to resize
+            selectionModel->select( selection, QItemSelectionModel::Select );
+            selectionModel->setCurrentIndex( currentIndex, QItemSelectionModel::NoUpdate );
             break;
+        }
 
         case Prefs::MAIN_WINDOW_X:
         case Prefs::MAIN_WINDOW_Y:

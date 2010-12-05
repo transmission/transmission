@@ -710,6 +710,7 @@ Details :: refresh( )
                         }
                         break;
                     case TR_TRACKER_WAITING:
+    if( !torrents.empty( ) )
                         {
                             const QString tstr( timeToStringRounded( trackerStat.nextAnnounceTime - now ) );
                             str += "\n";
