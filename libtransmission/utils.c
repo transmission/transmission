@@ -24,6 +24,8 @@
 #include <assert.h>
 #include <ctype.h> /* isalpha, tolower */
 #include <errno.h>
+#include <float.h> /* DBL_EPSILON */
+#include <locale.h> /* localeconv() */
 #include <math.h> /* pow */
 #include <stdarg.h>
 #include <stdio.h>
@@ -1401,11 +1403,15 @@ tr_parseNumberRange( const char * str_in, int len, int * setmeCount )
 ***/
 
 double
-tr_truncd( double x, int decimal_places )
+tr_truncd( double x, int precision )
 {
-    const int i = (int) pow( 10, decimal_places );  
-    const double x2 = (int64_t)(x * i);
-    return x2 / i;
+    char * pt;
+    char buf[128];
+    const int max_precision = (int) log10( 1.0 / DBL_EPSILON ) - 1;
+    tr_snprintf( buf, sizeof( buf ), "%.*f", max_precision, x );
+    if(( pt = strstr( buf, localeconv()->decimal_point )))
+        pt[precision ? precision+1 : 0] = '\0';
+    return atof(buf);
 }
 
 char*
