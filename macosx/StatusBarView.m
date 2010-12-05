@@ -24,37 +24,13 @@
 
 #import "StatusBarView.h"
 
-@interface StatusBarView (Private)
-
-- (void) reload;
-
-@end
-
 @implementation StatusBarView
 
 - (id) initWithFrame: (NSRect) rect
 {
     if ((self = [super initWithFrame: rect]))
     {
-        fIsFilter = NO;
         fGrayBorderColor = [[NSColor colorWithCalibratedRed: 171.0/255.0 green: 171.0/255.0 blue: 171.0/255.0 alpha: 1.0] retain];
-        
-        NSColor * lightColor = [NSColor colorWithCalibratedRed: 230.0/255.0 green: 230.0/255.0 blue: 230.0/255.0 alpha: 1.0];
-        NSColor * darkColor = [NSColor colorWithCalibratedRed: 220.0/255.0 green: 220.0/255.0 blue: 220.0/255.0 alpha: 1.0];
-        fInactiveGradient = [[NSGradient alloc] initWithStartingColor: lightColor endingColor: darkColor];
-        
-        lightColor = [NSColor colorWithCalibratedRed: 160.0/255.0 green: 160.0/255.0 blue: 160.0/255.0 alpha: 1.0];
-        darkColor = [NSColor colorWithCalibratedRed: 155.0/255.0 green: 155.0/255.0 blue: 155.0/255.0 alpha: 1.0];
-        fStatusGradient = [[NSGradient alloc] initWithStartingColor: lightColor endingColor: darkColor];
-        
-        lightColor = [NSColor colorWithCalibratedRed: 235.0/255.0 green: 235.0/255.0 blue: 235.0/255.0 alpha: 1.0];
-        darkColor = [NSColor colorWithCalibratedRed: 205.0/255.0 green: 205.0/255.0 blue: 205.0/255.0 alpha: 1.0];
-        fFilterGradient = [[NSGradient alloc] initWithStartingColor: lightColor endingColor: darkColor];
-        
-        [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(reload)
-            name: NSWindowDidBecomeMainNotification object: [self window]];
-        [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(reload)
-            name: NSWindowDidResignMainNotification object: [self window]];
     }
     return self;
 }
@@ -62,109 +38,41 @@
 - (void) dealloc
 {
     [fGrayBorderColor release];
-    [fStatusGradient release];
-    [fInactiveGradient release];
-    [fFilterGradient release];
     [super dealloc];
-}
-
-- (BOOL) mouseDownCanMoveWindow
-{
-    return !fIsFilter;
-}
-
-#warning get rid of asap
-- (void) setIsFilter: (BOOL) isFilter
-{
-    fIsFilter = isFilter;
 }
 
 - (void) drawRect: (NSRect) rect
 {
-    if (fIsFilter)
+    NSInteger count = 0;
+    NSRect gridRects[3];
+    NSColor * colorRects[3];
+    
+    NSRect lineBorderRect = NSMakeRect(NSMinX(rect), NSHeight([self bounds]) - 1.0, NSWidth(rect), 1.0);
+    if (NSIntersectsRect(lineBorderRect, rect))
     {
-        NSInteger count = 0;
-        NSRect gridRects[2];
-        NSColor * colorRects[2];
+        gridRects[count] = lineBorderRect;
+        colorRects[count] = [NSColor whiteColor];
+        ++count;
         
-        NSRect lineBorderRect = NSMakeRect(NSMinX(rect), NSHeight([self bounds]) - 1.0, NSWidth(rect), 1.0);
-        if ([[self window] isMainWindow])
-        {
-            if (NSIntersectsRect(lineBorderRect, rect))
-            {
-                gridRects[count] = lineBorderRect;
-                colorRects[count] = [NSColor whiteColor];
-                ++count;
-                
-                rect.size.height -= 1.0;
-            }
-        }
-        
-        lineBorderRect.origin.y = 0.0;
-        if (NSIntersectsRect(lineBorderRect, rect))
-        {
-            gridRects[count] = lineBorderRect;
-            colorRects[count] = [[self window] isMainWindow] ? [NSColor colorWithCalibratedWhite: 0.25 alpha: 1.0]
-                                    : [NSColor colorWithCalibratedWhite: 0.5 alpha: 1.0];
-            ++count;
-            
-            rect.origin.y += 1.0;
-            rect.size.height -= 1.0;
-        }
-        
-        NSRectFillListWithColors(gridRects, colorRects, count);
-        
-        [fFilterGradient drawInRect: rect angle: 270.0];
+        rect.size.height -= 1.0;
     }
-    else
+    
+    lineBorderRect.origin.y = 0.0;
+    if (NSIntersectsRect(lineBorderRect, rect))
     {
-        const BOOL active = [[self window] isMainWindow];
+        gridRects[count] = lineBorderRect;
+        colorRects[count] = fGrayBorderColor;
+        ++count;
         
-        NSInteger count = 0;
-        NSRect gridRects[2];
-        NSColor * colorRects[2];
-        
-        NSRect lineBorderRect = NSMakeRect(NSMinX(rect), NSHeight([self bounds]) - 1.0, NSWidth(rect), 1.0);
-        if (active)
-        {
-            if (NSIntersectsRect(lineBorderRect, rect))
-            {
-                gridRects[count] = lineBorderRect;
-                colorRects[count] = [NSColor colorWithCalibratedWhite: 0.75 alpha: 1.0];
-                ++count;
-                
-                rect.size.height -= 1.0;
-            }
-        }
-        
-        lineBorderRect.origin.y = 0.0;
-        if (NSIntersectsRect(lineBorderRect, rect))
-        {
-            gridRects[count] = lineBorderRect;
-            colorRects[count] = [[self window] isMainWindow] ? [NSColor colorWithCalibratedWhite: 0.25 alpha: 1.0]
-                                    : [NSColor colorWithCalibratedWhite: 0.5 alpha: 1.0];
-            ++count;
-            
-            rect.origin.y += 1.0;
-            rect.size.height -= 1.0;
-        }
-        
-        if (active)
-            [fStatusGradient drawInRect: rect angle: 270.0];
-        else
-            [fInactiveGradient drawInRect: rect angle: 270.0];
-        
-        NSRectFillListWithColors(gridRects, colorRects, count);
+        rect.origin.y += 1.0;
+        rect.size.height -= 1.0;
     }
-}
-
-@end
-
-@implementation StatusBarView (Private)
-
-- (void) reload
-{
-    [self setNeedsDisplay: YES];
+    
+    gridRects[count] = rect;
+    colorRects[count] = [NSColor controlColor];
+    ++count;
+    
+    NSRectFillListWithColors(gridRects, colorRects, count);
 }
 
 @end
