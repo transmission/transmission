@@ -116,7 +116,7 @@ findInfoDictOffset( const tr_torrent * tor )
                 int infoLen;
                 char * infoContents = tr_bencToStr( infoDict, TR_FMT_BENC, &infoLen );
                 const uint8_t * i = (const uint8_t*) tr_memmem( (char*)fileContents, fileLen, infoContents, infoLen );
-                offset = i == NULL ? i - fileContents : 0;
+                offset = i != NULL ? i - fileContents : 0;
                 tr_free( infoContents );
             }
 
