@@ -1680,10 +1680,6 @@ torrentCallScript( tr_torrent * tor, const char * script )
         char buf[128];
         const time_t now = tr_time( );
 
-#ifdef HAVE_CLEARENV
-        clearenv( );
-#endif
-
         setenv( "TR_APP_VERSION", SHORT_VERSION_STRING, 1 );
 
         tr_snprintf( buf, sizeof( buf ), "%d", tr_torrentId( tor ) );
