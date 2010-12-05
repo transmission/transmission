@@ -1406,6 +1406,7 @@ gtr_inhibit_hibernation( guint * cookie )
                                      G_TYPE_INVALID, /* sentinel - end of input args */
                                      G_TYPE_UINT, cookie,
                                      G_TYPE_INVALID /* senitnel - end of output args */ );
+
         if( success )
             tr_inf( "%s", _( "Disallowing desktop hibernation" ) );
         else
@@ -1479,11 +1480,12 @@ tr_core_set_hibernation_allowed( TrCore * core,
 static void
 maybeInhibitHibernation( TrCore * core )
 {
-    /* inhibit if it's enabled *AND* all the torrents are paused */
-    const gboolean inhibit = pref_flag_get( PREF_KEY_INHIBIT_HIBERNATION )
-                          && ( tr_core_get_active_torrent_count( core ) == 0 );
-
-    tr_core_set_hibernation_allowed( core, !inhibit );
+    /* hibernation is allowed if EITHER
+     * (a) the "inhibit" pref is turned off OR
+     * (b) there aren't any active torrents */
+    const gboolean hibernation_allowed = !pref_flag_get( PREF_KEY_INHIBIT_HIBERNATION )
+                                      || !tr_core_get_active_torrent_count( core );
+    tr_core_set_hibernation_allowed( core, hibernation_allowed );
 }
 
 /**
