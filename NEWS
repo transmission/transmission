@@ -1,3 +1,35 @@
+=== Transmission 2.05 (2010/12/05) ===
+Backport of 2.1x bugfixes for a maintenance 2.0x release.
+  * (2.0x) backport r11302 for #3620 "syntax error in configure.ac"
+  * (2.0x) backport r11383 for #3715 "README file is outdated"
+  * (2.0x cli) #3758: Syntax error in transmission-cli.1
+  * (2.0x daemon) #3508: --download-dir does not work properly
+  * (2.0x miniupnp) backport r11381 for #3707 "Remove dependancy to which."
+  * (2.0x qt) backport r11222 for #3496 "Crash when changing to/from compact mode"
+  * (2.0x qt) backport r11306 for #3627 "off-by-one in FileTreeView causes potential invalid memory read / crash"
+  * (2.0x qt) backport r11340 for #3650 "Link transmission-qt with libz explicitly"
+  * (2.0x qt) backport r11289 for #3593 "rpc authentication setting broken in qt client"
+  * (2.0x gtk) backport r10915 for #3380 "Increase size of 'Add URL' text field."
+  * (2.0x gtk) backport r11217 for #3529 "Slow priority-sorting in filelist"
+  * (2.0x gtk) backport r11267 for #3585 "possible rendering issue in torrent_cell_renderer_get_size()"
+  * (2.0x gtk) backport r11259 for #3619 "memory leak that may cause events to be fired to invalid listeners"
+  * (2.0x gtk) backport r11344 for #3639 "Hibernation inhibition broke in transmission-gtk 2.00"
+  * (2.0x gtk) backport r11439 for #3701 "Un-blur statusbar icons"
+  * (2.0x gtk) backport r11443 for #3777 "Ellipsize Error: line"
+  * (2.0x libT) backport r11449 for #3787 "'No Announce Scheduled' tracker error"
+  * (2.0x libT) backport r11264 for #3453 "Torrent does not stop when set per torrent seed ratio is reached before torrent is completed"
+  * (2.0x libT) backport r11226 for #3566 "Memory leak in libtransmission/torrent.c: refreshCurrentDir()"
+  * (2.0x libT) backport r11243 for #3571 "Torrent done script clears important env vars."
+  * (2.0x libT) backport r11295 for #3610 "Unused fields in tr_peer"
+  * (2.0x libT) backport r11304 for #3628 "remove dead variable pieceBytesRead from libtransmission/verify.c"
+  * (2.0x libT) backport r11357 for #3681 "tr-lpd.c's lpd_configureSocket() function is redundant"
+  * (2.0x libT) backport r11237 for #3539 "Transmission sending corrupt data in metadata exchange"
+  * (2.0x libT) backport r11300 for #3614 "Can't save benc files under uClibc 0.9.31"
+  * (2.0x libT) backport r11356 for #3678 "benc walking could be more efficient"
+  * (2.0x libT) backport r11359 for #3687 "The V=XXXX key/val pair in our DHT messages seems to have no purpose"
+  * (2.0x libT) backport tr_truncd() fix for #3521 "rounding issue in tr_truncd()"
+  * (2.0x web) backport r11309 and r11317 for #3630 "web client needs a link to Transmission's homepage"
+
 === Transmission 2.04 (2010/08/06) ===
 [http://trac.transmissionbt.com/query?milestone=2.04&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== All Platforms ====
