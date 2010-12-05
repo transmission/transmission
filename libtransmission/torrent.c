@@ -2798,13 +2798,12 @@ static void
 refreshCurrentDir( tr_torrent * tor )
 {
     const char * dir = NULL;
-    char * sub;
 
     if( tor->incompleteDir == NULL )
         dir = tor->downloadDir;
     else if( !tr_torrentHasMetadata( tor ) ) /* no files to find */
         dir = tor->incompleteDir;
-    else if( !tr_torrentFindFile2( tor, 0, &dir, &sub ) )
+    else if( !tr_torrentFindFile2( tor, 0, &dir, NULL ) )
         dir = tor->incompleteDir;
 
     assert( dir != NULL );
