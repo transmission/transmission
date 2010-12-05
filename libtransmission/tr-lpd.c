@@ -31,11 +31,11 @@ THE SOFTWARE.
 #include <sys/types.h>
 #include <sys/socket.h> /* socket(), bind() */
 #include <unistd.h> /* close() */
-#include <fcntl.h> /* fcntl(), O_NONBLOCK */
 #include <ctype.h> /* toupper() */
 
 /* third party */
 #include <event.h>
+#include <evutil.h>
 
 /* libT */
 #include "transmission.h"
@@ -243,22 +243,6 @@ static int lpd_extractParam( const char* const str, const char* const name, int 
 
 
 /**
-* @brief Configures additional capabilities for a socket */
-static inline int lpd_configureSocket( int sock, int add )
-{
-    /* read-modify-write socket flags */
-    int flags = fcntl( sock, F_GETFL );
-
-    if( flags < 0 )
-        return -1;
-
-    if( fcntl( sock, F_SETFL, add | flags ) == -1 )
-        return -1;
-
-    return add;
-}
-
-/**
 * @brief Initializes Local Peer Discovery for this node
 *
 * For the most part, this means setting up an appropriately configured multicast socket
@@ -291,7 +275,7 @@ int tr_lpdInit( tr_session* ss, tr_address* tr_addr UNUSED )
             goto fail;
 
         /* enable non-blocking operation */
-        if( lpd_configureSocket( lpd_socket, O_NONBLOCK ) < 0 )
+        if( evutil_make_socket_nonblocking( lpd_socket ) < 0 ) 
             goto fail;
 
         if( setsockopt( lpd_socket, SOL_SOCKET, SO_REUSEADDR,
@@ -331,7 +315,7 @@ int tr_lpdInit( tr_session* ss, tr_address* tr_addr UNUSED )
             goto fail;
 
         /* enable non-blocking operation */
-        if( lpd_configureSocket( lpd_socket2, O_NONBLOCK ) < 0 )
+        if( evutil_make_socket_nonblocking( lpd_socket2 ) < 0 ) 
             goto fail;
 
         /* configure outbound multicast TTL */
