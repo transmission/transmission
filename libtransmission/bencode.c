@@ -1639,10 +1639,13 @@ tr_bencToFile( const tr_benc * top, tr_fmt_mode mode, const char * filename )
 
         if( write( fd, str, len ) == (ssize_t)len )
         {
+            struct stat sb;
+            const tr_bool already_exists = !stat( filename, &sb ) && S_ISREG( sb.st_mode );
+
             fsync( fd );
             close( fd );
 
-            if( !unlink( filename ) || ( errno == ENOENT ) )
+            if( !already_exists || !unlink( filename ) )
             {
                 tr_dbg( "Renaming \"%s\" as \"%s\"", tmp, filename );
 
