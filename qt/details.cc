@@ -366,7 +366,8 @@ Details :: refresh( )
                 haveUnverified += t->haveUnverified( );
                 const uint64_t v = t->haveVerified( );
                 haveVerified += v;
-                verifiedPieces += v / t->pieceSize( );
+                if( t->pieceSize( ) )
+                    verifiedPieces += v / t->pieceSize( );
                 sizeWhenDone += t->sizeWhenDone( );
                 leftUntilDone += t->leftUntilDone( );
                 available += t->sizeWhenDone() - t->leftUntilDone() + t->desiredAvailable();

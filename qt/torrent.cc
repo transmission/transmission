@@ -537,8 +537,7 @@ Torrent :: update( tr_benc * d )
 
     if( tr_bencDictFindList( d, "fileStats", &files ) ) {
         const int n = tr_bencListSize( files );
-        assert( n == myFiles.size( ) );
-        for( int i=0; i<n; ++i ) {
+        for( int i=0; i<n && i<myFiles.size(); ++i ) {
             int64_t intVal;
             tr_bool boolVal;
             tr_benc * child = tr_bencListChild( files, i );
