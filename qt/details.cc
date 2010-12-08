@@ -296,6 +296,38 @@ Details :: onTorrentChanged( )
     }
 }
 
+namespace
+{
+    void setIfIdle( QComboBox * box, int i )
+    {
+        if( !box->hasFocus( ) )
+        {
+            box->blockSignals( true );
+            box->setCurrentIndex( i );
+            box->blockSignals( false );
+        }
+    }
+
+    void setIfIdle( QDoubleSpinBox * spin, double value )
+    {
+        if( !spin->hasFocus( ) )
+        {
+            spin->blockSignals( true );
+            spin->setValue( value );
+            spin->blockSignals( false );
+        }
+    }
+
+    void setIfIdle( QSpinBox * spin, int value )
+    {
+        if( !spin->hasFocus( ) )
+        {
+            spin->blockSignals( true );
+            spin->setValue( value );
+            spin->blockSignals( false );
+        }
+    }
+}
 
 void
 Details :: refresh( )
@@ -680,21 +712,11 @@ Details :: refresh( )
             i = myBandwidthPriorityCombo->findData( baselineInt );
         else
             i = -1;
-        myBandwidthPriorityCombo->blockSignals( true );
-        myBandwidthPriorityCombo->setCurrentIndex( i );
-        myBandwidthPriorityCombo->blockSignals( false );
+        setIfIdle( myBandwidthPriorityCombo, i );
 
-        mySingleDownSpin->blockSignals( true );
-        mySingleDownSpin->setValue( (int)tor->downloadLimit().KBps() );
-        mySingleDownSpin->blockSignals( false );
-
-        mySingleUpSpin->blockSignals( true );
-        mySingleUpSpin->setValue( (int)tor->uploadLimit().KBps() );
-        mySingleUpSpin->blockSignals( false );
-
-        myPeerLimitSpin->blockSignals( true );
-        myPeerLimitSpin->setValue( tor->peerLimit() );
-        myPeerLimitSpin->blockSignals( false );
+        setIfIdle( mySingleDownSpin, int(tor->downloadLimit().KBps()) );
+        setIfIdle( mySingleUpSpin, int(tor->uploadLimit().KBps()) );
+        setIfIdle( myPeerLimitSpin, tor->peerLimit() );
     }
 
     if( !torrents.empty( ) )
@@ -706,28 +728,20 @@ Details :: refresh( )
         int baselineInt = torrents[0]->seedRatioMode( );
         foreach( tor, torrents ) if( baselineInt != tor->seedRatioMode( ) ) { uniform = false; break; }
 
-        myRatioCombo->blockSignals( true );
-        myRatioCombo->setCurrentIndex( uniform ? myRatioCombo->findData( baselineInt ) : -1 );
+        setIfIdle( myRatioCombo, uniform ? myRatioCombo->findData( baselineInt ) : -1 );
         myRatioSpin->setVisible( uniform && ( baselineInt == TR_RATIOLIMIT_SINGLE ) );
-        myRatioCombo->blockSignals( false );
 
-        myRatioSpin->blockSignals( true );
-        myRatioSpin->setValue( tor->seedRatioLimit( ) );
-        myRatioSpin->blockSignals( false );
+        setIfIdle( myRatioSpin, tor->seedRatioLimit( ) );
 
         // idle
         uniform = true;
         baselineInt = torrents[0]->seedIdleMode( );
         foreach( tor, torrents ) if( baselineInt != tor->seedIdleMode( ) ) { uniform = false; break; }
 
-        myIdleCombo->blockSignals( true );
-        myIdleCombo->setCurrentIndex( uniform ? myIdleCombo->findData( baselineInt ) : -1 );
+        setIfIdle( myIdleCombo, uniform ? myIdleCombo->findData( baselineInt ) : -1 );
         myIdleSpin->setVisible( uniform && ( baselineInt == TR_RATIOLIMIT_SINGLE ) );
-        myIdleCombo->blockSignals( false );
 
-        myIdleSpin->blockSignals( true );
-        myIdleSpin->setValue( tor->seedIdleLimit( ) );
-        myIdleSpin->blockSignals( false );
+        setIfIdle( myIdleSpin, tor->seedIdleLimit( ) );
     }
 
     ///
