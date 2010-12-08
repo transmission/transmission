@@ -1,3 +1,22 @@
+=== Transmission 2.13 (2010/12/xx) ===
+[http://trac.transmissionbt.com/query?milestone=2.13&group=component&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Fix "No Announce Scheduled" tracker error
+  * Fix build error on Solaris 10
+  * Fix RPC documentation errors
+  * Fix minor packaging errors
+==== Mac ====
+  * Fix editing the Blocklist URL in the Preferences dialog
+  * Add option to run a script when a torrent finishes downloading
+==== GTK+ ====
+  * Unblur the statusbar icons
+  * Fix ellipsize error in the Torrent Properties dialog.
+==== Qt ====
+  * Fix crash when opening the Torrent Properties dialog on magnet links
+  * Fix "undo" error when making changes in the Torrent Properties dialog
+  * Add Brazillian Portuguese Translation
+  * Add Spanish (LAC) Translation
+
 === Transmission 2.12 (2010/11/14) ===
 [http://trac.transmissionbt.com/query?milestone=2.12&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
