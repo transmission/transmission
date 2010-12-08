@@ -772,6 +772,37 @@ tr_strerror( int i )
 *****
 ****/
 
+/* https://bugs.launchpad.net/percona-patches/+bug/526863/+attachment/1160199/+files/solaris_10_fix.patch */
+char*
+tr_strsep( char ** str, const char * delims )
+{
+#ifdef HAVE_STRSEP
+    return strsep( str, delims );
+#else
+    char *token;
+
+    if (*str == NULL) {
+        /* No more tokens */
+        return NULL;
+    }
+
+    token = *str;
+    while (**str != '\0') {
+        if (strchr(delims, **str) != NULL) {
+            **str = '\0';
+            (*str)++;
+            return token;
+        }
+        (*str)++;
+    }
+
+    /* There is not another token */
+    *str = NULL;
+
+    return token;
+#endif
+}
+
 char*
 tr_strstrip( char * str )
 {

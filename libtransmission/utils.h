@@ -392,6 +392,9 @@ tr_bool tr_str_has_suffix( const char *str, const char *suffix );
 const char* tr_memmem( const char * haystack, size_t haystack_len,
                        const char * needle, size_t needle_len );
 
+/** @brief Portability wrapper for strsep() that uses the system implementation if available */
+char* tr_strsep( char ** str, const char * delim );
+
 /***
 ****
 ***/

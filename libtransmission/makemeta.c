@@ -310,7 +310,7 @@ getFileInfo( const char *                     topFile,
         char * filename = tr_strdup( file->filename + offset );
         char * walk = filename;
         const char * token;
-        while(( token = strsep( &walk, TR_PATH_DELIMITER_STR )))
+        while(( token = tr_strsep( &walk, TR_PATH_DELIMITER_STR )))
             tr_bencListAddStr( uninitialized_path, token );
         tr_free( filename );
     }
