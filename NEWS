@@ -7,7 +7,7 @@
   * Fix minor packaging errors
 ==== Mac ====
   * Add option to run a script when torrents finish downloading
-  * Simplify editing the blacklist URL in the preferences window
+  * Simplify editing the blocklist URL in the preferences window
 ==== GTK+ ====
   * Unblur the statusbar icons
   * Fix truncation error in the Torrent Properties dialog.
