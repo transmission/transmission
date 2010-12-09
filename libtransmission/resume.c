@@ -60,7 +60,7 @@
 #define KEY_IDLELIMIT_MINS         "idle-limit"
 #define KEY_IDLELIMIT_MODE         "idle-mode"
 
-#define KEY_PROGRESS_MTIMES    "mtimes"
+#define KEY_PROGRESS_CHECKTIME "time-checked"
 #define KEY_PROGRESS_BITFIELD  "bitfield"
 #define KEY_PROGRESS_HAVE      "have"
 
@@ -415,7 +415,6 @@ saveProgress( tr_benc *          dict,
               const tr_torrent * tor )
 {
     size_t              i, n;
-    time_t *            mtimes;
     tr_benc *           p;
     tr_benc *           m;
     const tr_bitfield * bitfield;
@@ -423,15 +422,11 @@ saveProgress( tr_benc *          dict,
     p = tr_bencDictAdd( dict, KEY_PROGRESS );
     tr_bencInitDict( p, 2 );
 
-    /* add the mtimes */
-    mtimes = tr_torrentGetMTimes( tor, &n );
-    m = tr_bencDictAddList( p, KEY_PROGRESS_MTIMES, n );
-    for( i = 0; i < n; ++i )
-    {
-        if( !tr_torrentIsFileChecked( tor, i ) )
-            mtimes[i] = ~(time_t)0; /* force a recheck */
-        tr_bencListAddInt( m, mtimes[i] );
-    }
+    /* add each piece's timeChecked */
+    n = tor->info.pieceCount;
+    m = tr_bencDictAddList( p, KEY_PROGRESS_CHECKTIME, n );
+    for( i=0; i<n; ++i )
+        tr_bencListAddInt( m, tor->info.pieces[i].timeChecked );
 
     /* add the progress */
     if( tor->completeness == TR_SEED )
@@ -439,17 +434,18 @@ saveProgress( tr_benc *          dict,
     bitfield = tr_cpBlockBitfield( &tor->completion );
     tr_bencDictAddRaw( p, KEY_PROGRESS_BITFIELD,
                        bitfield->bits, bitfield->byteCount );
-
-    /* cleanup */
-    tr_free( mtimes );
 }
 
 static uint64_t
 loadProgress( tr_benc *    dict,
               tr_torrent * tor )
 {
+    size_t    i, n;
     uint64_t  ret = 0;
     tr_benc * p;
+
+    for( i=0, n=tor->info.pieceCount; i<n; ++i )
+        tor->info.pieces[i].timeChecked = 0;
 
     if( tr_bencDictFindDict( dict, KEY_PROGRESS, &p ) )
     {
@@ -458,47 +454,13 @@ loadProgress( tr_benc *    dict,
         const uint8_t * raw;
         size_t          rawlen;
         tr_benc *       m;
-        size_t          n;
-        time_t *        curMTimes = tr_torrentGetMTimes( tor, &n );
+        int64_t  timeChecked;
 
-        if( tr_bencDictFindList( p, KEY_PROGRESS_MTIMES, &m )
-          && ( n == tor->info.fileCount )
-          && ( n == tr_bencListSize( m ) ) )
-        {
-            size_t i;
-            for( i = 0; i < n; ++i )
-            {
-                int64_t tmp;
-                if( !tr_bencGetInt( tr_bencListChild( m, i ), &tmp ) )
-                {
-                    tr_tordbg(
-                        tor,
-                        "File #%zu needs to be verified - couldn't find benc entry",
-                        i );
-                    tr_torrentSetFileChecked( tor, i, FALSE );
-                }
-                else
-                {
-                    const time_t t = (time_t) tmp;
-                    if( t == curMTimes[i] )
-                        tr_torrentSetFileChecked( tor, i, TRUE );
-                    else
-                    {
-                        tr_tordbg(
-                            tor,
-                            "File #%zu needs to be verified - times %lu and %lu don't match",
-                            i, t, curMTimes[i] );
-                        tr_torrentSetFileChecked( tor, i, FALSE );
-                    }
-                }
-            }
-        }
-        else
-        {
-            tr_torrentUncheck( tor );
-            tr_tordbg(
-                tor, "Torrent needs to be verified - unable to find mtimes" );
-        }
+        /* load in the timestamp of when we last checked each piece */
+        if( tr_bencDictFindList( p, KEY_PROGRESS_CHECKTIME, &m ) )
+            for( i=0, n=tor->info.pieceCount; i<n; ++i )
+                if( tr_bencGetInt( tr_bencListChild( m, i ), &timeChecked ) )
+                    tor->info.pieces[i].timeChecked = (time_t)timeChecked;
 
         err = NULL;
         if( tr_bencDictFindStr( p, KEY_PROGRESS_HAVE, &str ) )
@@ -518,13 +480,10 @@ loadProgress( tr_benc *    dict,
                 err = "Error loading bitfield";
         }
         else err = "Couldn't find 'have' or 'bitfield'";
-        if( err != NULL )
-        {
-            tr_torrentUncheck( tor );
-            tr_tordbg( tor, "Torrent needs to be verified - %s", err );
-        }
 
-        tr_free( curMTimes );
+        if( err != NULL )
+            tr_tordbg( tor, "Torrent needs to be verified - %s", err );
+
         ret = TR_FR_PROGRESS;
     }
 

@@ -86,23 +86,10 @@ void             tr_torrentInitFilePriority( tr_torrent       * tor,
                                              tr_file_index_t    fileIndex,
                                              tr_priority_t      priority );
 
-int              tr_torrentCountUncheckedPieces( const tr_torrent * );
-
-tr_bool          tr_torrentIsFileChecked( const tr_torrent  * tor,
-                                          tr_file_index_t     file );
-
 void             tr_torrentSetPieceChecked( tr_torrent       * tor,
-                                            tr_piece_index_t   piece,
-                                            tr_bool            isChecked );
+                                            tr_piece_index_t   piece );
 
-void             tr_torrentSetFileChecked( tr_torrent       * tor,
-                                           tr_file_index_t    file,
-                                           tr_bool            isChecked );
-
-void             tr_torrentUncheck( tr_torrent * tor );
-
-time_t*          tr_torrentGetMTimes( const tr_torrent  * tor,
-                                      size_t            * setmeCount );
+void             tr_torrentSetChecked( tr_torrent * tor, time_t when );
 
 tr_torrent*      tr_torrentNext( tr_session  * session,
                                  tr_torrent  * current );
@@ -190,7 +177,6 @@ struct tr_torrent
 
     struct tr_completion       completion;
 
-    struct tr_bitfield         checkedPieces;
     tr_completeness            completeness;
 
     struct tr_torrent_tiers  * tiers;
@@ -261,8 +247,6 @@ struct tr_torrent
     uint16_t                   idleLimitMinutes;
     tr_idlelimit               idleLimitMode;
     tr_bool                    finishedSeedingByIdle;
-
-    uint64_t                   preVerifyTotal;
 };
 
 /* get the index of this piece's first block */
@@ -353,12 +337,6 @@ static inline tr_bool tr_torrentAllowsLPD( const tr_torrent * tor )
         && ( !tr_torrentIsPrivate( tor ) );
 }
 
-static inline tr_bool tr_torrentIsPieceChecked( const tr_torrent  * tor,
-                                                   tr_piece_index_t    i )
-{
-    return tr_bitfieldHasFast( &tor->checkedPieces, i );
-}
-
 /***
 ****
 ***/
@@ -430,6 +408,19 @@ void tr_torrentGotNewInfoDict( tr_torrent * tor );
 
 void tr_torrentSetSpeedLimit_Bps  ( tr_torrent *, tr_direction, int Bps );
 int tr_torrentGetSpeedLimit_Bps  ( const tr_torrent *, tr_direction );
+
+/**
+ * @return true if this piece needs to be tested
+ */
+tr_bool tr_torrentPieceNeedsCheck( const tr_torrent * tor, tr_piece_index_t pieceIndex );
+
+/**
+ * @brief Test a piece against its info dict checksum
+ * @return true if the piece's passes the checksum test
+ */ 
+tr_bool tr_torrentCheckPiece( tr_torrent * tor, tr_piece_index_t pieceIndex );
+
+uint64_t tr_torrentGetCurrentSizeOnDisk( const tr_torrent * tor );
 
 
 #endif

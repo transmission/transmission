@@ -1920,6 +1920,12 @@ fillOutputBuffer( tr_peermsgs * msgs, time_t now )
             tr_peerIoWriteUint32( io, out, req.offset );
 
             err = tr_cacheReadBlock( getSession(msgs)->cache, msgs->torrent, req.index, req.offset, req.length, EVBUFFER_DATA(out)+EVBUFFER_LENGTH(out) );
+
+            /* check the piece if it needs checking... */
+            if( !err && tr_torrentPieceNeedsCheck( msgs->torrent, req.index ) )
+                if(( err = !tr_torrentCheckPiece( msgs->torrent, req.index )))
+                    tr_torrentSetLocalError( msgs->torrent, _( "Piece #%zu is corrupt!  Please Verify Local Data." ), (size_t)piece );
+
             if( err )
             {
                 if( fext )

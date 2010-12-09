@@ -10,14 +10,9 @@
  * $Id$
  */
 
-#include <unistd.h> /* S_ISREG */
-#include <sys/stat.h>
-
 #ifdef HAVE_POSIX_FADVISE
  #define _XOPEN_SOURCE 600
-#endif
-#if defined(HAVE_POSIX_FADVISE) || defined(SYS_DARWIN)
- #include <fcntl.h> /* posix_fadvise() / fcntl() */
+ #include <fcntl.h> /* posix_fadvise() */
 #endif
 
 #include <openssl/sha.h>
@@ -25,13 +20,11 @@
 #include "transmission.h"
 #include "completion.h"
 #include "fdlimit.h"
-#include "inout.h"
 #include "list.h"
-#include "platform.h"
+#include "platform.h" /* tr_lock() */
 #include "torrent.h"
-#include "utils.h" /* tr_buildPath */
+#include "utils.h" /* tr_valloc(), tr_free() */
 #include "verify.h"
-
 
 /***
 ****
@@ -42,11 +35,10 @@ enum
     MSEC_TO_SLEEP_PER_SECOND_DURING_VERIFY = 100
 };
 
-/* #define STOPWATCH */
-
 static tr_bool
 verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
 {
+    time_t end;
     SHA_CTX sha;
     int fd = -1;
     int64_t filePos = 0;
@@ -58,14 +50,13 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
     tr_file_index_t prevFileIndex = !fileIndex;
     tr_piece_index_t pieceIndex = 0;
     const time_t begin = tr_time( );
-    time_t end;
     const size_t buflen = 1024 * 128; /* 128 KiB buffer */
     uint8_t * buffer = tr_valloc( buflen );
 
-    tr_torrentUncheck( tor );
-
     SHA1_Init( &sha );
 
+    tr_tordbg( tor, "%s", "[LAZY] verifying torrent..." );
+    tr_torrentSetChecked( tor, 0 );
     while( !*stopFlag && ( pieceIndex < tor->info.pieceCount ) )
     {
         uint32_t leftInPiece;
@@ -75,17 +66,13 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
 
         /* if we're starting a new piece... */
         if( piecePos == 0 )
-        {
             hadPiece = tr_cpPieceIsComplete( &tor->completion, pieceIndex );
-            /* fprintf( stderr, "starting piece %d of %d\n", (int)pieceIndex, (int)tor->info.pieceCount ); */
-        }
 
         /* if we're starting a new file... */
         if( !filePos && (fd<0) && (fileIndex!=prevFileIndex) )
         {
             char * filename = tr_torrentFindFile( tor, fileIndex );
             fd = filename == NULL ? -1 : tr_open_file_for_scanning( filename );
-            /* fprintf( stderr, "opening file #%d (%s) -- %d\n", fileIndex, filename, fd ); */
             tr_free( filename );
             prevFileIndex = fileIndex;
         }
@@ -95,7 +82,6 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
         leftInFile = file->length - filePos;
         bytesThisPass = MIN( leftInFile, leftInPiece );
         bytesThisPass = MIN( bytesThisPass, buflen );
-        /* fprintf( stderr, "reading this pass: %d\n", (int)bytesThisPass ); */
 
         /* read a bit */
         if( fd >= 0 ) {
@@ -124,17 +110,12 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
 
             SHA1_Final( hash, &sha );
             hasPiece = !memcmp( hash, tor->info.pieces[pieceIndex].hash, SHA_DIGEST_LENGTH );
-            /* fprintf( stderr, "do the hashes match? %s\n", (hasPiece?"yes":"no") ); */
 
-            if( hasPiece ) {
-                tr_torrentSetHasPiece( tor, pieceIndex, TRUE );
-                if( !hadPiece )
-                    changed = TRUE;
-            } else if( hadPiece ) {
-                tr_torrentSetHasPiece( tor, pieceIndex, FALSE );
-                changed = TRUE;
+            if( hasPiece || hadPiece ) {
+                tr_torrentSetHasPiece( tor, pieceIndex, hasPiece );
+                changed |= hasPiece != hadPiece;
             }
-            tr_torrentSetPieceChecked( tor, pieceIndex, TRUE );
+            tr_torrentSetPieceChecked( tor, pieceIndex );
             now = tr_time( );
             tor->anyDate = now;
 
@@ -153,12 +134,12 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
         /* if we're finishing a file... */
         if( leftInFile == 0 )
         {
-            /* fprintf( stderr, "closing file\n" ); */
             if( fd >= 0 ) { tr_close_file( fd ); fd = -1; }
             ++fileIndex;
             filePos = 0;
         }
     }
+    tr_tordbg( tor, "%s", "[LAZY] DONE verifying torrent..." );
 
     /* cleanup */
     if( fd >= 0 )
@@ -168,7 +149,8 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
     /* stopwatch */
     end = tr_time( );
     tr_tordbg( tor, "it took %d seconds to verify %"PRIu64" bytes (%"PRIu64" bytes per second)",
-               (int)(end-begin), tor->info.totalSize, (uint64_t)(tor->info.totalSize/(1+(end-begin))) );
+               (int)(end-begin), tor->info.totalSize,
+               (uint64_t)(tor->info.totalSize/(1+(end-begin))) );
 
     return changed;
 }
@@ -202,7 +184,6 @@ static tr_lock*
 getVerifyLock( void )
 {
     static tr_lock * lock = NULL;
-
     if( lock == NULL )
         lock = tr_lockNew( );
     return lock;
@@ -213,8 +194,8 @@ verifyThreadFunc( void * unused UNUSED )
 {
     for( ;; )
     {
-        int                  changed = 0;
-        tr_torrent         * tor;
+        int changed = 0;
+        tr_torrent * tor;
         struct verify_node * node;
 
         tr_lockLock( getVerifyLock( ) );
@@ -250,28 +231,6 @@ verifyThreadFunc( void * unused UNUSED )
     tr_lockUnlock( getVerifyLock( ) );
 }
 
-static uint64_t
-getCurrentSize( tr_torrent * tor )
-{
-    tr_file_index_t i;
-    uint64_t byte_count = 0;
-    const tr_file_index_t n = tor->info.fileCount;
-
-    for( i=0; i<n; ++i )
-    {
-        struct stat sb;
-        char * filename = tr_torrentFindFile( tor, i );
-
-        sb.st_size = 0;
-        if( filename && !stat( filename, &sb ) )
-            byte_count += sb.st_size;
-
-        tr_free( filename );
-    }
-
-    return byte_count;
-}
-
 static int
 compareVerifyByPriorityAndSize( const void * va, const void * vb )
 {
@@ -279,67 +238,36 @@ compareVerifyByPriorityAndSize( const void * va, const void * vb )
     const struct verify_node * b = vb;
 
     /* higher priority comes before lower priority */
-    const tr_priority_t pa =  tr_torrentGetPriority( a->torrent );
-    const tr_priority_t pb =  tr_torrentGetPriority( b->torrent );
+    const tr_priority_t pa = tr_torrentGetPriority( a->torrent );
+    const tr_priority_t pb = tr_torrentGetPriority( b->torrent );
     if( pa != pb )
         return pa > pb ? -1 : 1;
 
-    /* smaller size comes before larger size... smaller sizes are faster to verify */
+    /* smaller torrents come before larger ones because they verify faster */
     if( a->current_size < b->current_size ) return -1;
     if( a->current_size > b->current_size ) return  1;
     return 0;
 }
 
 void
-tr_verifyAdd( tr_torrent *      tor,
-              tr_verify_done_cb verify_done_cb )
+tr_verifyAdd( tr_torrent * tor, tr_verify_done_cb verify_done_cb )
 {
+    struct verify_node * node;
+
     assert( tr_isTorrent( tor ) );
+    tr_torinf( tor, "%s", _( "Queued for verification" ) );
 
-    if( tr_torrentCountUncheckedPieces( tor ) == 0 )
-    {
-        /* doesn't need to be checked... */
-        fireCheckDone( tor, verify_done_cb );
-    }
-    else
-    {
-        const uint64_t current_size = getCurrentSize( tor );
+    node = tr_new( struct verify_node, 1 );
+    node->torrent = tor;
+    node->verify_done_cb = verify_done_cb;
+    node->current_size = tr_torrentGetCurrentSizeOnDisk( tor );
 
-        if( !current_size )
-        {
-            /* we haven't downloaded anything for this torrent yet...
-             * no need to leave it waiting in the back of the queue.
-             * we can mark it as all-missing from here and fire
-             * the "done" callback */
-            const tr_bool hadAny = tr_cpHaveTotal( &tor->completion ) != 0;
-            tr_piece_index_t i;
-            for( i=0; i<tor->info.pieceCount; ++i ) {
-                tr_torrentSetHasPiece( tor, i, FALSE );
-                tr_torrentSetPieceChecked( tor, i, TRUE );
-            }
-            if( hadAny ) /* if we thought we had some, flag as dirty */
-                tr_torrentSetDirty( tor );
-            fireCheckDone( tor, verify_done_cb );
-        }
-        else
-        {
-            struct verify_node * node;
-
-            tr_torinf( tor, "%s", _( "Queued for verification" ) );
-
-            node = tr_new( struct verify_node, 1 );
-            node->torrent = tor;
-            node->verify_done_cb = verify_done_cb;
-            node->current_size = current_size;
-
-            tr_lockLock( getVerifyLock( ) );
-            tr_torrentSetVerifyState( tor, TR_VERIFY_WAIT );
-            tr_list_insert_sorted( &verifyList, node, compareVerifyByPriorityAndSize );
-            if( verifyThread == NULL )
-                verifyThread = tr_threadNew( verifyThreadFunc, NULL );
-            tr_lockUnlock( getVerifyLock( ) );
-        }
-    }
+    tr_lockLock( getVerifyLock( ) );
+    tr_torrentSetVerifyState( tor, TR_VERIFY_WAIT );
+    tr_list_insert_sorted( &verifyList, node, compareVerifyByPriorityAndSize );
+    if( verifyThread == NULL )
+        verifyThread = tr_threadNew( verifyThreadFunc, NULL );
+    tr_lockUnlock( getVerifyLock( ) );
 }
 
 static int

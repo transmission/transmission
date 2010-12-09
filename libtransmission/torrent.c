@@ -34,6 +34,7 @@
 #include "crypto.h" /* for tr_sha1 */
 #include "resume.h"
 #include "fdlimit.h" /* tr_fdTorrentClose */
+#include "inout.h" /* tr_ioTestPiece() */
 #include "magnet.h"
 #include "metainfo.h"
 #include "peer-common.h" /* MAX_BLOCK_SIZE */
@@ -459,6 +460,8 @@ tr_torrentSetLocalError( tr_torrent * tor, const char * fmt, ... )
     evutil_vsnprintf( tor->errorString, sizeof( tor->errorString ), fmt, ap );
     va_end( ap );
 
+    tr_torerr( tor, "%s", tor->errorString );
+
     if( tor->isRunning )
         tor->isStopping = TRUE;
 }
@@ -604,11 +607,11 @@ calculatePiecePriority( const tr_torrent * tor,
 static void
 tr_torrentInitFilePieces( tr_torrent * tor )
 {
-    tr_file_index_t  f;
+    int * firstFiles;
+    tr_file_index_t f;
     tr_piece_index_t p;
     uint64_t offset = 0;
     tr_info * inf = &tor->info;
-    int * firstFiles;
 
     /* assign the file offsets */
     for( f=0; f<inf->fileCount; ++f ) {
@@ -720,8 +723,6 @@ torrentInitFromInfo( tr_torrent * tor )
 
     tr_torrentInitFilePieces( tor );
 
-    tr_bitfieldConstruct( &tor->checkedPieces, tor->info.pieceCount );
-
     tor->completeness = tr_cpGetStatus( &tor->completion );
 }
 
@@ -735,12 +736,28 @@ tr_torrentGotNewInfoDict( tr_torrent * tor )
     tr_torrentFireMetadataCompleted( tor );
 }
 
+static tr_bool
+setLocalErrorIfFilesDisappeared( tr_torrent * tor )
+{
+    const tr_bool disappeared = ( tr_cpHaveTotal( &tor->completion ) > 0 ) && ( tr_torrentGetCurrentSizeOnDisk( tor ) == 0 );
+
+    if( disappeared )
+    {
+        tr_tordbg( tor, "%s", "[LAZY] uh oh, the files disappeared" );
+        tr_torrentSetLocalError( tor, "%s", _( "No data found!  Ensure your drives are connected or use \"Set Location\".  To re-download, remove the torrent and re-add it." ) );
+    }
+
+    return disappeared;
+}
+
 static void
 torrentInit( tr_torrent * tor, const tr_ctor * ctor )
 {
     int doStart;
     uint64_t loaded;
     const char * dir;
+    tr_bool isNewTorrent;
+    struct stat st;
     static int nextUniqueId = 1;
     tr_session * session = tr_ctorGetSession( ctor );
 
@@ -778,14 +795,13 @@ torrentInit( tr_torrent * tor, const tr_ctor * ctor )
     assert( !tor->downloadedCur );
     assert( !tor->uploadedCur );
 
-    tr_torrentUncheck( tor );
-
     tr_torrentSetAddedDate( tor, tr_time( ) ); /* this is a default value to be
                                                   overwritten by the resume file */
 
     torrentInitFromInfo( tor );
     loaded = tr_torrentLoadResume( tor, ~0, ctor );
     tor->completeness = tr_cpGetStatus( &tor->completion );
+    setLocalErrorIfFilesDisappeared( tor );
 
     tr_ctorInitTorrentPriorities( ctor, tor );
     tr_ctorInitTorrentWanted( ctor, tor );
@@ -829,6 +845,9 @@ torrentInit( tr_torrent * tor, const tr_ctor * ctor )
         ++session->torrentCount;
     }
 
+    /* if we don't have a local .torrent file already, assume the torrent is new */
+    isNewTorrent = stat( tor->info.torrent, &st );
+
     /* maybe save our own copy of the metainfo */
     if( tr_ctorGetSave( ctor ) )
     {
@@ -845,8 +864,15 @@ torrentInit( tr_torrent * tor, const tr_ctor * ctor )
 
     tor->tiers = tr_announcerAddTorrent( tor->session->announcer, tor, onTrackerResponse, NULL );
 
-    if( doStart )
+    if( isNewTorrent )
+    {
+        tor->startAfterVerify = doStart;
+        tr_torrentVerify( tor );
+    }
+    else if( doStart )
+    {
         torrentStart( tor );
+    }
 
     tr_sessionUnlock( session );
 }
@@ -1048,6 +1074,21 @@ tr_torrentGetActivity( tr_torrent * tor )
     return TR_STATUS_SEED;
 }
 
+static double
+getVerifyProgress( const tr_torrent * tor )
+{
+    tr_piece_index_t i, n;
+    tr_piece_index_t checked = 0;
+
+    assert( tr_isTorrent( tor ) );
+
+    for( i=0, n=tor->info.pieceCount; i!=n; ++i )
+        if( tor->info.pieces[i].timeChecked )
+            ++checked;
+
+    return checked / (double)tor->info.pieceCount;
+}
+
 const tr_stat *
 tr_torrentStat( tr_torrent * tor )
 {
@@ -1097,18 +1138,14 @@ tr_torrentStat( tr_torrent * tor )
     s->percentComplete = tr_cpPercentComplete ( &tor->completion );
     s->metadataPercentComplete = tr_torrentGetMetadataPercent( tor );
 
-    s->percentDone   = tr_cpPercentDone  ( &tor->completion );
-    s->leftUntilDone = tr_cpLeftUntilDone( &tor->completion );
-    s->sizeWhenDone  = tr_cpSizeWhenDone ( &tor->completion );
-
-    s->recheckProgress = s->activity == TR_STATUS_CHECK
-                       ? 1.0 - ( tr_torrentCountUncheckedPieces( tor ) / (float) tor->info.pieceCount )
-                       : 0.0;
-
-    s->activityDate = tor->activityDate;
-    s->addedDate    = tor->addedDate;
-    s->doneDate     = tor->doneDate;
-    s->startDate    = tor->startDate;
+    s->percentDone      = tr_cpPercentDone  ( &tor->completion );
+    s->leftUntilDone    = tr_cpLeftUntilDone( &tor->completion );
+    s->sizeWhenDone     = tr_cpSizeWhenDone ( &tor->completion );
+    s->recheckProgress  = s->activity == TR_STATUS_CHECK ? getVerifyProgress( tor ) : 0;
+    s->activityDate     = tor->activityDate;
+    s->addedDate        = tor->addedDate;
+    s->doneDate         = tor->doneDate;
+    s->startDate        = tor->startDate;
 
     if ((s->activity == TR_STATUS_DOWNLOAD || s->activity == TR_STATUS_SEED) && s->startDate != 0)
         s->idleSecs = difftime(tr_time(), MAX(s->startDate, s->activityDate));
@@ -1441,8 +1478,6 @@ freeTorrent( tr_torrent * tor )
 
     tr_announcerRemoveTorrent( session->announcer, tor );
 
-    tr_bitfieldDestruct( &tor->checkedPieces );
-
     tr_free( tor->downloadDir );
     tr_free( tor->incompleteDir );
     tr_free( tor->peer_id );
@@ -1472,47 +1507,54 @@ freeTorrent( tr_torrent * tor )
 **/
 
 static void
-checkAndStartImpl( void * vtor )
+torrentStartImpl( void * vtor )
 {
+    time_t now;
     tr_torrent * tor = vtor;
 
     assert( tr_isTorrent( tor ) );
 
     tr_sessionLock( tor->session );
 
-    /** If we had local data before, but it's disappeared,
-        stop the torrent and log an error. */
-    if( tor->preVerifyTotal && !tr_cpHaveTotal( &tor->completion ) )
-    {
-        tr_torrentSetLocalError( tor, "%s", _( "No data found!  Reconnect any disconnected drives, use \"Set Location\", or restart the torrent to re-download." ) );
-    }
-    else
-    {
-        const time_t now = tr_time( );
-        tor->isRunning = TRUE;
-        tor->completeness = tr_cpGetStatus( &tor->completion );
-        tor->startDate = tor->anyDate = now;
-        tr_torrentClearError( tor );
-        tor->finishedSeedingByIdle = FALSE;
+    tr_torrentRecheckCompleteness( tor );
 
-        tr_torrentResetTransferStats( tor );
-        tr_announcerTorrentStarted( tor );
-        tor->dhtAnnounceAt = now + tr_cryptoWeakRandInt( 20 );
-        tor->dhtAnnounce6At = now + tr_cryptoWeakRandInt( 20 );
-        tor->lpdAnnounceAt = now;
-        tr_peerMgrStartTorrent( tor );
-    }
+    now = tr_time( );
+    tor->isRunning = TRUE;
+    tor->completeness = tr_cpGetStatus( &tor->completion );
+    tor->startDate = tor->anyDate = now;
+    tr_torrentClearError( tor );
+    tor->finishedSeedingByIdle = FALSE;
+
+    tr_torrentResetTransferStats( tor );
+    tr_announcerTorrentStarted( tor );
+    tor->dhtAnnounceAt = now + tr_cryptoWeakRandInt( 20 );
+    tor->dhtAnnounce6At = now + tr_cryptoWeakRandInt( 20 );
+    tor->lpdAnnounceAt = now;
+    tr_peerMgrStartTorrent( tor );
 
     tr_sessionUnlock( tor->session );
 }
 
-static void
-checkAndStartCB( tr_torrent * tor )
+uint64_t
+tr_torrentGetCurrentSizeOnDisk( const tr_torrent * tor )
 {
-    assert( tr_isTorrent( tor ) );
-    assert( tr_isSession( tor->session ) );
+    tr_file_index_t i;
+    uint64_t byte_count = 0;
+    const tr_file_index_t n = tor->info.fileCount;
 
-    tr_runInEventThread( tor->session, checkAndStartImpl, tor );
+    for( i=0; i<n; ++i )
+    {
+        struct stat sb;
+        char * filename = tr_torrentFindFile( tor, i );
+
+        sb.st_size = 0;
+        if( filename && !stat( filename, &sb ) )
+            byte_count += sb.st_size;
+
+        tr_free( filename );
+    }
+
+    return byte_count;
 }
 
 static void
@@ -1520,32 +1562,35 @@ torrentStart( tr_torrent * tor )
 {
     assert( tr_isTorrent( tor ) );
 
+    /* already running... */
+    if( tor->isRunning )
+        return;
+
+    /* don't allow the torrent to be started if the files disappeared */
+    if( setLocalErrorIfFilesDisappeared( tor ) )
+        return;
+
+    /* otherwise, start it now... */
     tr_sessionLock( tor->session );
 
-    if( !tor->isRunning )
-    {
-        /* allow finished torrents to be resumed */
-        if( tr_torrentIsSeedRatioDone( tor ) )
-        {
-            tr_torinf( tor, "Restarted manually -- disabling its seed ratio" );
-            tr_torrentSetRatioMode( tor, TR_RATIOLIMIT_UNLIMITED );
-        }
-
-        tr_verifyRemove( tor );
-
-        /* corresponds to the peer_id sent as a tracker request parameter.
-         * one tracker admin says: "When the same torrent is opened and
-         * closed and opened again without quitting Transmission ...
-         * change the peerid. It would help sometimes if a stopped event
-         * was missed to ensure that we didn't think someone was cheating. */
-        tr_free( tor->peer_id );
-        tor->peer_id = tr_peerIdNew( );
-
-        tor->isRunning = 1;
-        tr_torrentSetDirty( tor );
-        tor->preVerifyTotal = tr_cpHaveTotal( &tor->completion );
-        tr_verifyAdd( tor, checkAndStartCB );
+    /* allow finished torrents to be resumed */
+    if( tr_torrentIsSeedRatioDone( tor ) ) {
+        tr_torinf( tor, _( "Restarted manually -- disabling its seed ratio" ) );
+        tr_torrentSetRatioMode( tor, TR_RATIOLIMIT_UNLIMITED );
     }
+
+    tr_verifyRemove( tor );
+
+    /* corresponds to the peer_id sent as a tracker request parameter.
+     * one tracker admin says: "When the same torrent is opened and
+     * closed and opened again without quitting Transmission ...
+     * change the peerid. It would help sometimes if a stopped event
+     * was missed to ensure that we didn't think someone was cheating. */
+    tr_free( tor->peer_id );
+    tor->peer_id = tr_peerIdNew( );
+    tor->isRunning = 1;
+    tr_torrentSetDirty( tor );
+    tr_runInEventThread( tor->session, torrentStartImpl, tor );
 
     tr_sessionUnlock( tor->session );
 }
@@ -1561,19 +1606,13 @@ static void
 torrentRecheckDoneImpl( void * vtor )
 {
     tr_torrent * tor = vtor;
-
     assert( tr_isTorrent( tor ) );
+
     tr_torrentRecheckCompleteness( tor );
 
-    if( tor->preVerifyTotal && !tr_cpHaveTotal( &tor->completion ) )
-    {
-        tr_torrentSetLocalError( tor, "%s", _( "Can't find local data.  Try \"Set Location\" to find it, or restart the torrent to re-download." ) );
-    }
-    else if( tor->startAfterVerify )
-    {
+    if( tor->startAfterVerify ) {
         tor->startAfterVerify = FALSE;
-
-        tr_torrentStart( tor );
+        torrentStart( tor );
     }
 }
 
@@ -1604,10 +1643,10 @@ verifyTorrent( void * vtor )
         tor->startAfterVerify = startAfter;
     }
 
-    /* add the torrent to the recheck queue */
-    tor->preVerifyTotal = tr_cpHaveTotal( &tor->completion );
-    tr_torrentUncheck( tor );
-    tr_verifyAdd( tor, torrentRecheckDoneCB );
+    if( setLocalErrorIfFilesDisappeared( tor ) )
+        tor->startAfterVerify = FALSE;
+    else
+        tr_verifyAdd( tor, torrentRecheckDoneCB );
 
     tr_sessionUnlock( tor->session );
 }
@@ -2208,96 +2247,88 @@ tr_pieceOffset( const tr_torrent * tor,
 ***/
 
 void
-tr_torrentSetPieceChecked( tr_torrent        * tor,
-                           tr_piece_index_t    piece,
-                           tr_bool             isChecked )
+tr_torrentSetPieceChecked( tr_torrent * tor, tr_piece_index_t pieceIndex )
 {
     assert( tr_isTorrent( tor ) );
+    assert( pieceIndex < tor->info.pieceCount );
 
-    if( isChecked )
-        tr_bitfieldAdd( &tor->checkedPieces, piece );
-    else
-        tr_bitfieldRem( &tor->checkedPieces, piece );
+    tr_tordbg( tor, "[LAZY] setting piece %zu timeChecked to now", (size_t)pieceIndex );
+    tor->info.pieces[pieceIndex].timeChecked = tr_time( );
 }
 
 void
-tr_torrentSetFileChecked( tr_torrent *    tor,
-                          tr_file_index_t fileIndex,
-                          tr_bool         isChecked )
+tr_torrentSetChecked( tr_torrent * tor, time_t when )
 {
-    const tr_file *        file = &tor->info.files[fileIndex];
-    const tr_piece_index_t begin = file->firstPiece;
-    const tr_piece_index_t end = file->lastPiece + 1;
+    tr_piece_index_t i, n;
 
     assert( tr_isTorrent( tor ) );
 
-    if( isChecked )
-        tr_bitfieldAddRange( &tor->checkedPieces, begin, end );
-    else
-        tr_bitfieldRemRange( &tor->checkedPieces, begin, end );
+    for( i=0, n=tor->info.pieceCount; i!=n; ++i )
+        tor->info.pieces[i].timeChecked = when;
 }
 
 tr_bool
-tr_torrentIsFileChecked( const tr_torrent * tor,
-                         tr_file_index_t    fileIndex )
+tr_torrentCheckPiece( tr_torrent * tor, tr_piece_index_t pieceIndex )
 {
-    const tr_file *        file = &tor->info.files[fileIndex];
-    const tr_piece_index_t begin = file->firstPiece;
-    const tr_piece_index_t end = file->lastPiece + 1;
-    tr_piece_index_t       i;
-    tr_bool                isChecked = TRUE;
+    const tr_bool pass = tr_ioTestPiece( tor, pieceIndex );
 
-    assert( tr_isTorrent( tor ) );
+    tr_tordbg( tor, "[LAZY] tr_torrentCheckPiece tested piece %zu, pass==%d", (size_t)pieceIndex, (int)pass );
+    tr_torrentSetHasPiece( tor, pieceIndex, pass );
+    tr_torrentSetPieceChecked( tor, pieceIndex );
+    tor->anyDate = tr_time( );
+    tr_torrentSetDirty( tor );
 
-    for( i = begin; isChecked && i < end; ++i )
-        if( !tr_torrentIsPieceChecked( tor, i ) )
-            isChecked = FALSE;
-
-    return isChecked;
+    return pass;
 }
 
-void
-tr_torrentUncheck( tr_torrent * tor )
+static time_t
+getFileMTime( const tr_torrent * tor, tr_file_index_t i )
 {
-    assert( tr_isTorrent( tor ) );
+    struct stat sb;
+    time_t mtime = 0;
+    char * path = tr_torrentFindFile( tor, i );
 
-    tr_bitfieldRemRange( &tor->checkedPieces, 0, tor->info.pieceCount );
-}
-
-int
-tr_torrentCountUncheckedPieces( const tr_torrent * tor )
-{
-    assert( tr_isTorrent( tor ) );
-
-    return tor->info.pieceCount - tr_bitfieldCountTrueBits( &tor->checkedPieces );
-}
-
-time_t*
-tr_torrentGetMTimes( const tr_torrent * tor, size_t * setme_n )
-{
-    size_t       i;
-    const size_t n = tor->info.fileCount;
-    time_t *     m = tr_new0( time_t, n );
-
-    assert( tr_isTorrent( tor ) );
-
-    for( i = 0; i < n; ++i )
+    if( ( path != NULL ) && !stat( path, &sb ) && S_ISREG( sb.st_mode ) )
     {
-        struct stat sb;
-        char * path = tr_torrentFindFile( tor, i );
-        if( ( path != NULL ) && !stat( path, &sb ) && S_ISREG( sb.st_mode ) )
-        {
 #ifdef SYS_DARWIN
-            m[i] = sb.st_mtimespec.tv_sec;
+        mtime = sb.st_mtimespec.tv_sec;
 #else
-            m[i] = sb.st_mtime;
+        mtime = sb.st_mtime;
 #endif
-        }
-        tr_free( path );
     }
 
-    *setme_n = n;
-    return m;
+    tr_free( path );
+    return mtime;
+}
+
+tr_bool
+tr_torrentPieceNeedsCheck( const tr_torrent * tor, tr_piece_index_t p )
+{
+    uint64_t unused;
+    tr_file_index_t f;
+    const tr_info * inf = tr_torrentInfo( tor );
+  
+    /* if we've never checked this piece, then it needs to be checked */ 
+    if( !inf->pieces[p].timeChecked ) {
+        tr_tordbg( tor, "[LAZY] piece %zu needs to be tested because it's never been tested", (size_t)p );
+        return TRUE;
+    }
+
+    /* If we think we've completed one of the files in this piece,
+     * but it's been modified since we last checked it,
+     * then it needs to be rechecked */
+    tr_ioFindFileLocation( tor, p, 0, &f, &unused );
+    for( ; f < inf->fileCount && pieceHasFile( p, &inf->files[f] ); ++f ) {
+        if( tr_cpFileIsComplete( &tor->completion, f ) ) {
+            if( getFileMTime( tor, f ) > inf->pieces[p].timeChecked ) {
+                tr_tordbg( tor, "[LAZY] piece %zu needs to be tested because file %zu mtime is newer than check time %zu", (size_t)p, (size_t)f, (size_t)inf->pieces[p].timeChecked );
+                return TRUE;
+            }
+        }
+    }
+
+    tr_tordbg( tor, "[LAZY] piece %zu does not need to be tested", (size_t)p );
+    return FALSE;
 }
 
 /***

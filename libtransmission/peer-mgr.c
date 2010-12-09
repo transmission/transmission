@@ -28,7 +28,6 @@
 #include "completion.h"
 #include "crypto.h"
 #include "handshake.h"
-#include "inout.h" /* tr_ioTestPiece */
 #include "net.h"
 #include "peer-io.h"
 #include "peer-mgr.h"
@@ -1453,7 +1452,9 @@ peerCallbackFunc( tr_peer * peer, const tr_peer_event * e, void * vt )
                 if( tr_cpPieceIsComplete( &tor->completion, e->pieceIndex ) )
                 {
                     const tr_piece_index_t p = e->pieceIndex;
-                    const tr_bool ok = tr_ioTestPiece( tor, p );
+                    const tr_bool ok = tr_torrentCheckPiece( tor, p );
+
+                    tr_tordbg( tor, "[LAZY] checked just-completed piece %zu", (size_t)p );
 
                     if( !ok )
                     {
@@ -1461,8 +1462,6 @@ peerCallbackFunc( tr_peer * peer, const tr_peer_event * e, void * vt )
                                    (unsigned long)p );
                     }
 
-                    tr_torrentSetHasPiece( tor, p, ok );
-                    tr_torrentSetPieceChecked( tor, p, TRUE );
                     tr_peerMgrSetBlame( tor, p, ok );
 
                     if( !ok )
