@@ -53,7 +53,7 @@
 
 enum
 {
-    SAVE_INTERVAL_SECS = 120,
+    SAVE_INTERVAL_SECS = 360,
 
     DEFAULT_CACHE_SIZE_MB = 2
 };
