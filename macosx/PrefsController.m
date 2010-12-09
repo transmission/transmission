@@ -1041,6 +1041,12 @@ tr_session * fHandle;
     [fRPCAddRemoveControl setEnabled: [fRPCWhitelistTable numberOfSelectedRows] > 0 forSegment: RPC_IP_REMOVE_TAG];
 }
 
+- (void) helpForScript: (id) sender
+{
+    [[NSHelpManager sharedHelpManager] openHelpAnchor: @"script"
+        inBook: [[NSBundle mainBundle] objectForInfoDictionaryKey: @"CFBundleHelpBookName"]];
+}
+
 - (void) helpForPeers: (id) sender
 {
     [[NSHelpManager sharedHelpManager] openHelpAnchor: @"peers"

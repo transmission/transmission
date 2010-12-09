@@ -157,6 +157,7 @@
 - (void) updateRPCWhitelist;
 - (void) addRemoveRPCIP: (id) sender;
 
+- (void) helpForScript: (id) sender;
 - (void) helpForPeers: (id) sender;
 - (void) helpForNetwork: (id) sender;
 - (void) helpForRemote: (id) sender;
