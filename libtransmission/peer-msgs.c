@@ -1924,7 +1924,7 @@ fillOutputBuffer( tr_peermsgs * msgs, time_t now )
             /* check the piece if it needs checking... */
             if( !err && tr_torrentPieceNeedsCheck( msgs->torrent, req.index ) )
                 if(( err = !tr_torrentCheckPiece( msgs->torrent, req.index )))
-                    tr_torrentSetLocalError( msgs->torrent, _( "Piece #%zu is corrupt!  Please Verify Local Data." ), (size_t)piece );
+                    tr_torrentSetLocalError( msgs->torrent, _( "Piece #%zu is corrupt!  Please Verify Local Data." ), (size_t)req.index );
 
             if( err )
             {
