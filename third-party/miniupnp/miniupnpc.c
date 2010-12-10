@@ -1,4 +1,4 @@
-/* $Id: miniupnpc.c,v 1.81 2010/04/17 22:07:59 nanard Exp $ */
+/* $Id: miniupnpc.c,v 1.83 2010/12/09 16:11:32 nanard Exp $ */
 /* Project : miniupnp
  * Author : Thomas BERNARD
  * copyright (c) 2005-2010 Thomas Bernard
@@ -99,6 +99,7 @@ LIBSPEC void parserootdesc(const char * buffer, int bufsize, struct IGDdatas * d
 #endif
 }
 
+#if 0
 /* getcontentlenfromline() : parse the Content-Length HTTP header line.
  * Content-length: nnn */
 static int getcontentlenfromline(const char * p, int n)
@@ -167,6 +168,7 @@ getContentLengthAndHeaderLength(char * p, int n,
 		}
 	}
 }
+#endif
 
 /* simpleUPnPcommand2 :
  * not so simple !
@@ -183,9 +185,9 @@ static int simpleUPnPcommand2(int s, const char * url, const char * service,
 	char soapact[128];
 	char soapbody[2048];
 	char * buf;
-	int buffree;
+	/*int buffree;*/
     int n;
-	int contentlen, headerlen;	/* for the response */
+	/*int contentlen, headerlen;*/	/* for the response */
 
 	snprintf(soapact, sizeof(soapact), "%s#%s", service, action);
 	if(args==NULL)
@@ -272,6 +274,7 @@ static int simpleUPnPcommand2(int s, const char * url, const char * service,
 		return -1;
 	}
 
+#if 0
 	contentlen = -1;
 	headerlen = -1;
 	buf = buffer;
@@ -291,7 +294,22 @@ static int simpleUPnPcommand2(int s, const char * url, const char * service,
 		if(contentlen > 0 && headerlen > 0 && *bufsize >= contentlen+headerlen)
 			break;
 	}
-	
+#endif
+	buf = getHTTPResponse(s, &n);
+	if(n > 0 && buf)
+	{
+		if(*bufsize > n)
+		{
+			memcpy(buffer, buf, n);
+			*bufsize = n;
+		}
+		else
+		{
+			memcpy(buffer, buf, *bufsize);
+		}
+		free(buf);
+		buf = 0;
+	}
 	closesocket(s);
 	return 0;
 }
@@ -306,8 +324,10 @@ int simpleUPnPcommand(int s, const char * url, const char * service,
 		       char * buffer, int * bufsize)
 {
 	int result;
-	int origbufsize = *bufsize;
+	/*int origbufsize = *bufsize;*/
 
+	result = simpleUPnPcommand2(s, url, service, action, args, buffer, bufsize, "1.1");
+/*
 	result = simpleUPnPcommand2(s, url, service, action, args, buffer, bufsize, "1.0");
 	if (result < 0 || *bufsize == 0)
 	{
@@ -317,6 +337,7 @@ int simpleUPnPcommand(int s, const char * url, const char * service,
 		*bufsize = origbufsize;
 		result = simpleUPnPcommand2(s, url, service, action, args, buffer, bufsize, "1.1");
 	}
+*/
 	return result;
 }
 

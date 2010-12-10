@@ -1,5 +1,19 @@
-$Id: Changelog.txt,v 1.117 2010/06/09 10:59:08 nanard Exp $
+$Id: Changelog.txt,v 1.122 2010/12/09 16:11:31 nanard Exp $
 miniUPnP client Changelog.
+
+2010/12/09:
+  new code for miniwget that handle Chunked transfer encoding
+  using getHTTPResponse() in SOAP call code
+
+2010/11/25:
+  changes to minissdpc.c to compile under Win32.
+  see http://miniupnp.tuxfamily.org/forum/viewtopic.php?t=729
+
+2010/09/17:
+  Various improvement to Makefile from Michał Górny
+
+2010/08/05:
+  Adding the script "external-ip.sh" from Reuben Hawkins
 
 2010/06/09:
   update to python module to match modification made on 2010/04/05

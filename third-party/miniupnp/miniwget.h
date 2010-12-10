@@ -1,4 +1,4 @@
-/* $Id: miniwget.h,v 1.5 2007/01/29 20:27:23 nanard Exp $ */
+/* $Id: miniwget.h,v 1.6 2010/12/09 16:11:33 nanard Exp $ */
 /* Project : miniupnp
  * Author : Thomas Bernard
  * Copyright (c) 2005 Thomas Bernard
@@ -13,6 +13,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+LIBSPEC void * getHTTPResponse(int s, int * size);
 
 LIBSPEC void * miniwget(const char *, int *);
 

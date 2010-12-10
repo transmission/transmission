@@ -1,4 +1,4 @@
-/* $Id: minissdpc.c,v 1.13 2009/12/04 16:57:29 nanard Exp $ */
+/* $Id: minissdpc.c,v 1.14 2010/11/25 09:57:25 nanard Exp $ */
 /* Project : miniupnp
  * Author : Thomas BERNARD
  * copyright (c) 2005-2009 Thomas Bernard
@@ -15,6 +15,8 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <io.h>
+#include <winsock.h>
+#include <stdint.h>
 #endif
 #if defined(__amigaos__) || defined(__amigaos4__)
 #include <sys/socket.h>
