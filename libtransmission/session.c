@@ -2471,3 +2471,13 @@ tr_sessionSetTorrentDoneScript( tr_session * session, const char * scriptFilenam
         session->torrentDoneScript = tr_strdup( scriptFilename );
     }
 }
+
+/***
+****
+***/
+
+void
+tr_sessionSetWebConfigFunc( tr_session * session, void (*func)(tr_session*, void*, const char* ) )
+{
+    session->curl_easy_config_func = func;
+}

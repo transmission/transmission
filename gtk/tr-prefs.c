@@ -1112,7 +1112,7 @@ onCorePrefsChanged( TrCore * core UNUSED, const char *  key, gpointer gdata )
 }
 
 static void
-peerPageDestroyed( gpointer gdata, GObject * dead UNUSED )
+networkPageDestroyed( gpointer gdata, GObject * dead UNUSED )
 {
     struct network_page_data * data = gdata;
     if( data->prefsTag > 0 )
@@ -1146,8 +1146,26 @@ onPortTest( GtkButton * button UNUSED, gpointer vdata )
     tr_core_port_test( data->core );
 }
 
+static void
+onGNOMEClicked( GtkButton * button, gpointer vdata UNUSED )
+{
+    GError * err = NULL;
+
+    if( !g_spawn_command_line_async( "gnome-network-properties", &err ) )
+    {
+        GtkWidget * d = gtk_message_dialog_new( GTK_WINDOW( gtk_widget_get_toplevel( GTK_WIDGET( button ) ) ),
+                                                GTK_DIALOG_DESTROY_WITH_PARENT,
+                                                GTK_MESSAGE_ERROR,
+                                                GTK_BUTTONS_CLOSE,
+                                                "%s", err->message );
+        g_signal_connect_swapped( d, "response", G_CALLBACK( gtk_widget_destroy ), d );
+        gtk_widget_show( d );
+        g_clear_error( &err );
+    }
+}
+
 static GtkWidget*
-peerPage( GObject * core )
+networkPage( GObject * core )
 {
     int                        row = 0;
     const char *               s;
@@ -1178,7 +1196,7 @@ peerPage( GObject * core )
     g_signal_connect( w, "clicked", G_CALLBACK(onPortTest), data );
     hig_workarea_add_row( t, &row, NULL, h, NULL );
     data->prefsTag = g_signal_connect( TR_CORE( core ), "prefs-changed", G_CALLBACK( onCorePrefsChanged ), data );
-    g_object_weak_ref( G_OBJECT( t ), peerPageDestroyed, data );
+    g_object_weak_ref( G_OBJECT( t ), networkPageDestroyed, data );
 
     s = _( "Pick a _random port every time Transmission is started" );
     w = new_check_button( s, TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START, core );
@@ -1195,6 +1213,13 @@ peerPage( GObject * core )
     hig_workarea_add_row( t, &row, _( "Maximum peers per _torrent:" ), w, NULL );
     w = new_spin_button( TR_PREFS_KEY_PEER_LIMIT_GLOBAL, core, 1, 3000, 5 );
     hig_workarea_add_row( t, &row, _( "Maximum peers _overall:" ), w, NULL );
+
+    hig_workarea_add_section_divider( t, &row );
+    hig_workarea_add_section_title( t, &row, _( "Options" ) );
+
+    w = gtk_button_new_with_mnemonic( _( "Launch GNOME Network Preferences" ) );
+    g_signal_connect( w, "clicked", G_CALLBACK( onGNOMEClicked ), data );
+    hig_workarea_add_row( t, &row, _( "Pro_xies:" ), w, NULL );
 
     hig_workarea_finish( t, &row );
     return t;
@@ -1234,7 +1259,7 @@ tr_prefs_dialog_new( GObject *   core,
                               privacyPage( core ),
                               gtk_label_new ( _( "Privacy" ) ) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ),
-                              peerPage( core ),
+                              networkPage( core ),
                               gtk_label_new ( _( "Network" ) ) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ),
                               desktopPage( core ),
