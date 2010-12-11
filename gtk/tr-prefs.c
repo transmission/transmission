@@ -269,6 +269,18 @@ torrentPage( GObject * core )
     t = hig_workarea_create( );
     hig_workarea_add_section_title( t, &row, _( "Adding" ) );
 
+    s = _( "_Start when added" );
+    w = new_check_button( s, TR_PREFS_KEY_START, core );
+    hig_workarea_add_wide_control( t, &row, w );
+
+    s = _( "Show _options dialog" );
+    w = new_check_button( s, PREF_KEY_OPTIONS_PROMPT, core );
+    hig_workarea_add_wide_control( t, &row, w );
+
+    s = _( "Mo_ve .torrent file to the trash" );
+    w = new_check_button( s, TR_PREFS_KEY_TRASH_ORIGINAL, core );
+    hig_workarea_add_wide_control( t, &row, w );
+
 #ifdef HAVE_GIO
     s = _( "Automatically _add torrents from:" );
     l = new_check_button( s, PREF_KEY_DIR_WATCH_ENABLED, core );
@@ -278,18 +290,6 @@ torrentPage( GObject * core )
     g_signal_connect( l, "toggled", G_CALLBACK( target_cb ), w );
     hig_workarea_add_row_w( t, &row, l, w, NULL );
 #endif
-
-    s = _( "Show _options dialog" );
-    w = new_check_button( s, PREF_KEY_OPTIONS_PROMPT, core );
-    hig_workarea_add_wide_control( t, &row, w );
-
-    s = _( "_Start when added" );
-    w = new_check_button( s, TR_PREFS_KEY_START, core );
-    hig_workarea_add_wide_control( t, &row, w );
-
-    s = _( "Mo_ve .torrent file to the trash" );
-    w = new_check_button( s, TR_PREFS_KEY_TRASH_ORIGINAL, core );
-    hig_workarea_add_wide_control( t, &row, w );
 
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title( t, &row, _( "Downloading" ) );
@@ -316,7 +316,7 @@ torrentPage( GObject * core )
     hig_workarea_add_row_w( t, &row, l, w, NULL );
 
     hig_workarea_add_section_divider( t, &row );
-    hig_workarea_add_section_title( t, &row, _( "Seeding Limits" ) );
+    hig_workarea_add_section_title( t, &row, _( "Seeding" ) );
 
     s = _( "Stop seeding at _ratio:" );
     w = new_check_button( s, TR_PREFS_KEY_RATIO_ENABLED, core );
@@ -780,7 +780,7 @@ webPage( GObject * core )
     /* port */
     w = new_spin_button( TR_PREFS_KEY_RPC_PORT, core, 0, USHRT_MAX, 1 );
     page->widgets = g_slist_append( page->widgets, w );
-    w = hig_workarea_add_row( t, &row, _( "Listening _port:" ), w, NULL );
+    w = hig_workarea_add_row( t, &row, _( "HTTP _port:" ), w, NULL );
     page->widgets = g_slist_append( page->widgets, w );
 
     /* require authentication */
@@ -1014,25 +1014,25 @@ bandwidthPage( GObject * core )
     t = hig_workarea_create( );
     hig_workarea_add_section_title( t, &row, _( "Speed Limits" ) );
 
-        g_snprintf( buf, sizeof( buf ), _( "Limit _download speed (%s):" ), _(speed_K_str) );
-        w = new_check_button( buf, TR_PREFS_KEY_DSPEED_ENABLED, core );
-        w2 = new_spin_button( TR_PREFS_KEY_DSPEED_KBps, core, 0, INT_MAX, 5 );
-        gtk_widget_set_sensitive( GTK_WIDGET( w2 ), pref_flag_get( TR_PREFS_KEY_DSPEED_ENABLED ) );
-        g_signal_connect( w, "toggled", G_CALLBACK( target_cb ), w2 );
-        hig_workarea_add_row_w( t, &row, w, w2, NULL );
-
-        g_snprintf( buf, sizeof( buf ), _( "Limit _upload speed (%s):" ), _(speed_K_str) );
+        g_snprintf( buf, sizeof( buf ), _( "_Upload (%s):" ), _(speed_K_str) );
         w = new_check_button( buf, TR_PREFS_KEY_USPEED_ENABLED, core );
         w2 = new_spin_button( TR_PREFS_KEY_USPEED_KBps, core, 0, INT_MAX, 5 );
         gtk_widget_set_sensitive( GTK_WIDGET( w2 ), pref_flag_get( TR_PREFS_KEY_USPEED_ENABLED ) );
         g_signal_connect( w, "toggled", G_CALLBACK( target_cb ), w2 );
         hig_workarea_add_row_w( t, &row, w, w2, NULL );
 
+        g_snprintf( buf, sizeof( buf ), _( "_Download (%s):" ), _(speed_K_str) );
+        w = new_check_button( buf, TR_PREFS_KEY_DSPEED_ENABLED, core );
+        w2 = new_spin_button( TR_PREFS_KEY_DSPEED_KBps, core, 0, INT_MAX, 5 );
+        gtk_widget_set_sensitive( GTK_WIDGET( w2 ), pref_flag_get( TR_PREFS_KEY_DSPEED_ENABLED ) );
+        g_signal_connect( w, "toggled", G_CALLBACK( target_cb ), w2 );
+        hig_workarea_add_row_w( t, &row, w, w2, NULL );
+
     hig_workarea_add_section_divider( t, &row );
     h = gtk_hbox_new( FALSE, GUI_PAD );
-    w = gtk_image_new_from_stock( "alt-speed-off", -1 );
+    w = gtk_image_new_from_stock( "alt-speed-on", -1 );
     gtk_box_pack_start( GTK_BOX( h ), w, FALSE, FALSE, 0 );
-    g_snprintf( buf, sizeof( buf ), "<b>%s</b>", _( "Temporary Speed Limits" ) );
+    g_snprintf( buf, sizeof( buf ), "<b>%s</b>", _( "Alternative Speed Limits" ) );
     w = gtk_label_new( buf );
     gtk_misc_set_alignment( GTK_MISC( w ), 0.0f, 0.5f );
     gtk_label_set_use_markup( GTK_LABEL( w ), TRUE );
@@ -1046,12 +1046,12 @@ bandwidthPage( GObject * core )
         gtk_misc_set_alignment( GTK_MISC( w ), 0.5f, 0.5f );
         hig_workarea_add_wide_control( t, &row, w );
 
-        g_snprintf( buf, sizeof( buf ), _( "Limit do_wnload speed (%s):" ), _(speed_K_str) );
-        w = new_spin_button( TR_PREFS_KEY_ALT_SPEED_DOWN_KBps, core, 0, INT_MAX, 5 );
+        g_snprintf( buf, sizeof( buf ), _( "U_pload (%s):" ), _(speed_K_str) );
+        w = new_spin_button( TR_PREFS_KEY_ALT_SPEED_UP_KBps, core, 0, INT_MAX, 5 );
         hig_workarea_add_row( t, &row, buf, w, NULL );
 
-        g_snprintf( buf, sizeof( buf ), _( "Limit u_pload speed (%s):" ), _(speed_K_str) );
-        w = new_spin_button( TR_PREFS_KEY_ALT_SPEED_UP_KBps, core, 0, INT_MAX, 5 );
+        g_snprintf( buf, sizeof( buf ), _( "Do_wnload (%s):" ), _(speed_K_str) );
+        w = new_spin_button( TR_PREFS_KEY_ALT_SPEED_DOWN_KBps, core, 0, INT_MAX, 5 );
         hig_workarea_add_row( t, &row, buf, w, NULL );
 
         s = _( "_Scheduled times:" );
@@ -1181,9 +1181,9 @@ networkPage( GObject * core )
 
     /* build the page */
     t = hig_workarea_create( );
-    hig_workarea_add_section_title( t, &row, _( "Incoming Peers" ) );
+    hig_workarea_add_section_title( t, &row, _( "Listening Port" ) );
 
-    s = _( "_Port for incoming connections:" );
+    s = _( "_Port used for incoming connections:" );
     w = data->portSpin = new_spin_button( TR_PREFS_KEY_PEER_PORT, core, 1, USHRT_MAX, 1 );
     hig_workarea_add_row( t, &row, s, w, NULL );
 
@@ -1207,7 +1207,7 @@ networkPage( GObject * core )
     hig_workarea_add_wide_control( t, &row, w );
 
     hig_workarea_add_section_divider( t, &row );
-    hig_workarea_add_section_title( t, &row, _( "Limits" ) );
+    hig_workarea_add_section_title( t, &row, _( "Peer Limits" ) );
 
     w = new_spin_button( TR_PREFS_KEY_PEER_LIMIT_TORRENT, core, 1, 300, 5 );
     hig_workarea_add_row( t, &row, _( "Maximum peers per _torrent:" ), w, NULL );
@@ -1217,9 +1217,11 @@ networkPage( GObject * core )
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title( t, &row, _( "Options" ) );
 
-    w = gtk_button_new_with_mnemonic( _( "Launch GNOME Network Preferences" ) );
+    w = gtk_button_new_with_mnemonic( _( "Edit GNOME Proxy Settings" ) );
     g_signal_connect( w, "clicked", G_CALLBACK( onGNOMEClicked ), data );
-    hig_workarea_add_row( t, &row, _( "Pro_xies:" ), w, NULL );
+    h = gtk_hbox_new( FALSE, 0 );
+    gtk_box_pack_start( GTK_BOX( h ), w, FALSE, FALSE, 0 );
+    hig_workarea_add_wide_control( t, &row, h );
 
     hig_workarea_finish( t, &row );
     return t;
