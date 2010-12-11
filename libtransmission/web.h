@@ -13,6 +13,10 @@
 #ifndef TR_HTTP_H
 #define TR_HTTP_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct tr_address;
 
 void tr_webInit( tr_session * session );
@@ -57,5 +61,9 @@ struct evbuffer;
 void tr_http_escape( struct evbuffer *out, const char *str, int len, tr_bool escape_slashes );
 
 char* tr_http_unescape( const char * str, int len );
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
