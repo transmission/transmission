@@ -268,6 +268,7 @@ static tr_option opts[] =
     { 700, "bandwidth-high",         "Give this torrent first chance at available bandwidth", "Bh", 0, NULL },
     { 701, "bandwidth-normal",       "Give this torrent bandwidth left over by high priority torrents", "Bn", 0, NULL },
     { 702, "bandwidth-low",          "Give this torrent bandwidth left over by high and normal priority torrents", "Bl", 0, NULL },
+    { 600, "reannounce",             "Reannounce the current torrent(s)", NULL,  0, NULL },
     { 'r', "remove",                 "Remove the current torrent(s)", "r",  0, NULL },
     { 930, "peers",                  "Set the maximum number of peers for the current torrent(s) or globally", "pr", 1, "<max>" },
     { 'R', "remove-and-delete",      "Remove the current torrent(s) and delete local data", NULL, 0, NULL },
@@ -449,6 +450,9 @@ getOptMode( int val )
 
         case 'v': /* verify */
             return MODE_TORRENT_VERIFY;
+
+        case 600: /* reannounce */
+            return MODE_TORRENT_REANNOUNCE;
 
         case 962: /* port-test */
             return MODE_PORT_TEST;
@@ -2191,6 +2195,17 @@ processArgs( const char * host, int port, int argc, const char ** argv )
                 tr_bencInitDict( top, 2 );
                 tr_bencDictAddStr( top, "method", "port-test" );
                 tr_bencDictAddInt( top, "tag", TAG_PORTTEST );
+                status |= flush( host, port, &top );
+                break;
+            }
+            case 600:
+            {
+                tr_benc * top;
+                if( tset != 0 ) { addIdArg( tr_bencDictFind( tset, ARGUMENTS ), id ); status |= flush( host, port, &tset ); }
+                top = tr_new0( tr_benc, 1 );
+                tr_bencInitDict( top, 2 );
+                tr_bencDictAddStr( top, "method", "torrent-reannounce" );
+                addIdArg( tr_bencDictAddDict( top, ARGUMENTS, 1 ), id );
                 status |= flush( host, port, &top );
                 break;
             }
