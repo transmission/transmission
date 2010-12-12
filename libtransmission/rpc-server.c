@@ -61,6 +61,7 @@ struct tr_rpc_server
     tr_bool            isPasswordEnabled;
     tr_bool            isWhitelistEnabled;
     tr_port            port;
+    char *             url;
     struct in_addr     bindAddress;
     struct evhttp *    httpd;
     tr_session *       session;
@@ -466,8 +467,6 @@ handle_web_client( struct evhttp_request * req,
 {
     const char * webClientDir = tr_getWebClientDir( server->session );
 
-    assert( !strncmp( req->uri, "/transmission/web/", 18 ) );
-
     if( !webClientDir || !*webClientDir )
     {
         send_simple_response( req, HTTP_NOTFOUND,
@@ -485,7 +484,7 @@ handle_web_client( struct evhttp_request * req,
         char * pch;
         char * subpath;
 
-        subpath = tr_strdup( req->uri + 18 );
+        subpath = tr_strdup( req->uri + strlen( server->url ) + 4 );
         if(( pch = strchr( subpath, '?' )))
             *pch = '\0';
 
@@ -626,20 +625,18 @@ handle_request( struct evhttp_request * req, void * arg )
                                "Basic realm=\"" MY_REALM "\"" );
             send_simple_response( req, 401, "Unauthorized User" );
         }
-        else if( !strcmp( req->uri, "/transmission/web" )
-               || !strcmp( req->uri, "/transmission/clutch" )
-               || !strcmp( req->uri, "/" ) )
+        else if( strncmp( req->uri, server->url, strlen( server->url ) ) )
         {
-            evhttp_add_header( req->output_headers, "Location", "/transmission/web/" );
+            const char * protocol = "http";
+            const char * host = evhttp_find_header( req->input_headers, "Host" );
+            char * location = tr_strdup_printf( "%s://%s%sweb/", protocol, host, server->url );
+            evhttp_add_header( req->output_headers, "Location", location );
             send_simple_response( req, HTTP_MOVEPERM, NULL );
+            tr_free( location );
         }
-        else if( !strncmp( req->uri, "/transmission/web/", 18 ) )
+        else if( !strncmp( req->uri + strlen( server->url ), "web/", 4 ) )
         {
             handle_web_client( req, server );
-        }
-        else if( !strncmp( req->uri, "/transmission/upload", 20 ) )
-        {
-            handle_upload( req, server );
         }
 #ifdef REQUIRE_SESSION_ID
         else if( !test_session_id( server, req ) )
@@ -662,9 +659,13 @@ handle_request( struct evhttp_request * req, void * arg )
             tr_free( tmp );
         }
 #endif
-        else if( !strncmp( req->uri, "/transmission/rpc", 17 ) )
+        else if( !strncmp( req->uri + strlen( server->url ), "rpc", 3 ) )
         {
             handle_rpc( req, server );
+        }
+        else if( !strncmp( req->uri + strlen( server->url ), "upload", 6 ) )
+        {
+            handle_upload( req, server );
         }
         else
         {
@@ -763,15 +764,30 @@ tr_rpcGetPort( const tr_rpc_server * server )
 }
 
 void
-tr_rpcSetWhitelist( tr_rpc_server * server,
-                    const char    * whitelistStr )
+tr_rpcSetUrl( tr_rpc_server * server, const char * url )
+{
+    char * tmp = server->url;
+    server->url = tr_strdup( url );
+    dbgmsg( "setting our URL to [%s]", server->url );
+    tr_free( tmp );
+}
+
+const char*
+tr_rpcGetUrl( const tr_rpc_server * server )
+{
+    return server->url ? server->url : "";
+}
+
+void
+tr_rpcSetWhitelist( tr_rpc_server * server, const char * whitelistStr )
 {
     void * tmp;
     const char * walk;
 
     /* keep the string */
-    tr_free( server->whitelistStr );
+    tmp = server->whitelistStr;
     server->whitelistStr = tr_strdup( whitelistStr );
+    tr_free( tmp );
 
     /* clear out the old whitelist entries */
     while(( tmp = tr_list_pop_front( &server->whitelist )))
@@ -818,12 +834,12 @@ tr_rpcGetWhitelistEnabled( const tr_rpc_server * server )
 ****/
 
 void
-tr_rpcSetUsername( tr_rpc_server * server,
-                   const char *    username )
+tr_rpcSetUsername( tr_rpc_server * server, const char * username )
 {
-    tr_free( server->username );
+    char * tmp = server->username;
     server->username = tr_strdup( username );
     dbgmsg( "setting our Username to [%s]", server->username );
+    tr_free( tmp );
 }
 
 const char*
@@ -890,6 +906,7 @@ closeServer( void * vserver )
     if( s->isStreamInitialized )
         deflateEnd( &s->stream );
 #endif
+    tr_free( s->url );
     tr_free( s->sessionId );
     tr_free( s->whitelistStr );
     tr_free( s->username );
@@ -925,6 +942,10 @@ tr_rpcInit( tr_session  * session, tr_benc * settings )
     assert( found );
     s->port = i;
 
+    found = tr_bencDictFindStr( settings, TR_PREFS_KEY_RPC_URL, &str );
+    assert( found );
+    s->url = tr_strdup( str );
+
     found = tr_bencDictFindBool( settings, TR_PREFS_KEY_RPC_WHITELIST_ENABLED, &boolVal );
     assert( found );
     tr_rpcSetWhitelistEnabled( s, boolVal );
@@ -959,7 +980,7 @@ tr_rpcInit( tr_session  * session, tr_benc * settings )
 
     if( s->isEnabled )
     {
-        tr_ninf( MY_NAME, _( "Serving RPC and Web requests on port %d" ), (int) s->port );
+        tr_ninf( MY_NAME, _( "Serving RPC and Web requests on port 127.0.0.1:%d%s" ), (int) s->port, s->url );
         tr_runInEventThread( session, startServer, s );
 
         if( s->isWhitelistEnabled )

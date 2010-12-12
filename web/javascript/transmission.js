@@ -1805,7 +1805,7 @@ Transmission.prototype =
 			if ('' != $('#torrent_upload_url').val()) {
 				tr.remote.addTorrentByUrl($('#torrent_upload_url').val(), { paused: paused });
 			} else {
-				args.url = '/transmission/upload?paused=' + paused;
+				args.url = '../upload?paused=' + paused;
 				args.type = 'POST';
 				args.data = { 'X-Transmission-Session-Id' : tr.remote._token };
 				args.dataType = 'xml';

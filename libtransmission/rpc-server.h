@@ -34,6 +34,11 @@ void            tr_rpcSetPort( tr_rpc_server * server,
 
 tr_port         tr_rpcGetPort( const tr_rpc_server * server );
 
+void            tr_rpcSetUrl( tr_rpc_server * server,
+                              const char    * url );
+
+const char *    tr_rpcGetUrl( const tr_rpc_server * server );
+
 int             tr_rpcSetTest( const tr_rpc_server   * server,
                                const char            * whitelist,
                                char                 ** allocme_errmsg );

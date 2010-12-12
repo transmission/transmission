@@ -10,7 +10,7 @@ function RPC() { }
 //Prefs.prototype = { }
 
 // Constants
-RPC._Root                   = '/transmission/rpc';
+RPC._Root                   = '../rpc';
 RPC._DaemonVersion          = 'version';
 RPC._Encryption             = 'encryption';
 RPC._EncryptionPreferred    = 'preferred';
