@@ -633,7 +633,7 @@ test_torrent_activity( tr_torrent * tor, int type )
             return st->activity == TR_STATUS_CHECK_WAIT;
 
         case ACTIVITY_FILTER_VERIFYING:
-            return st->activity == TR_STATUS_CHECK ;
+            return ( st->activity == TR_STATUS_CHECK ) || ( st->activity == TR_STATUS_CHECK_WAIT );
 
         case ACTIVITY_FILTER_ERROR:
             return st->error != 0;

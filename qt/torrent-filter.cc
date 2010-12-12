@@ -159,7 +159,7 @@ TorrentFilter :: activityFilterAcceptsTorrent( const Torrent * tor, const Filter
             accepts = tor->isWaitingToVerify( );
             break;
         case FilterMode::SHOW_VERIFYING:
-            accepts = tor->isVerifying( );
+            accepts = tor->isVerifying( ) || tor->isWaitingToVerify( );
             break;
         case FilterMode::SHOW_ERROR:
             accepts = tor->hasError( );
