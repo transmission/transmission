@@ -33,6 +33,7 @@ and
 .Op Fl l
 .Op Fl m | M
 .Op Fl n Ar user:pass
+.Op Fl ne
 .Op Fl N Ar netrc
 .Op Fl o | O
 .Op Fl p Ar port
@@ -171,6 +172,11 @@ Set the
 and
 .Ar password
 for authentication
+.It Fl ne Fl -authenv
+Set the authentication information from the
+.Ar TRAUTH
+environment variable which must be formatted as
+.Ar username:password.
 .It Fl N Fl -netrc Ar filename
 Set the authentication information from a
 .Ar netrc file.

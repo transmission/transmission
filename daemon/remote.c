@@ -255,6 +255,7 @@ static tr_option opts[] =
     { 'm', "portmap",                "Enable portmapping via NAT-PMP or UPnP", "m",  0, NULL },
     { 'M', "no-portmap",             "Disable portmapping", "M",  0, NULL },
     { 'n', "auth",                   "Set username and password", "n",  1, "<user:pw>" },
+    { 810, "authenv",                "Set authentication info from the TRAUTH environment variable (user:pw)", "ne", 0, NULL },
     { 'N', "netrc",                  "Set authentication info from a .netrc file", "N",  1, "<file>" },
     { 'o', "dht",                    "Enable distributed hash tables (DHT)", "o", 0, NULL },
     { 'O', "no-dht",                 "Disable distributed hash tables (DHT)", "O", 0, NULL },
@@ -350,6 +351,7 @@ getOptMode( int val )
         case 'a': /* add torrent */
         case 'b': /* debug */
         case 'n': /* auth */
+        case 810: /* authenv */
         case 'N': /* netrc */
         case 't': /* set current torrent */
         case 'V': /* show version number */
@@ -1817,6 +1819,17 @@ processArgs( const char * host, int port, int argc, const char ** argv )
 
                 case 'n': /* auth */
                     auth = tr_strdup( optarg );
+                    break;
+
+                case 810: /* authenv */
+                    {
+                        char *authenv = getenv("TRAUTH");
+                        if( !authenv ) {
+                            fprintf( stderr, "The TRAUTH environment variable is not set\n" );
+                            exit( 0 );
+                        }
+                        auth = tr_strdup( authenv );
+                    }
                     break;
 
                 case 'N': /* netrc */
