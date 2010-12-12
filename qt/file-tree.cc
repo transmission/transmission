@@ -696,7 +696,7 @@ FileTreeView :: eventFilter( QObject * o, QEvent * event )
     }
 
     // handle using the keyboard to toggle the
-    // wanted/unwanted state or the file priority 
+    // wanted/unwanted state or the file priority
     else if( event->type() == QEvent::KeyPress )
     {
         switch( dynamic_cast<QKeyEvent*>(event)->key() )

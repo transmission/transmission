@@ -1006,7 +1006,7 @@ printDetails( tr_benc * top )
             if (tr_bencDictFindInt (t, "bandwidthPriority", &i))
                 printf ("  Bandwidth Priority: %s\n",
                         bandwidthPriorityNames[(i + 1) & 3]);
-   
+
             printf( "\n" );
         }
     }
@@ -1885,7 +1885,7 @@ processArgs( const char * host, int port, int argc, const char ** argv )
             fields = tr_bencDictAddList( args, "fields", 0 );
 
             if( tset != 0 ) { addIdArg( tr_bencDictFind( tset, ARGUMENTS ), id ); status |= flush( host, port, &tset ); }
-            
+
             switch( c )
             {
                 case 'i': tr_bencDictAddInt( top, "tag", TAG_DETAILS );
@@ -2008,7 +2008,7 @@ processArgs( const char * host, int port, int argc, const char ** argv )
                 targs = ensure_tset( &tset );
             else
                 sargs = ensure_sset( &sset );
-            
+
             switch( c )
             {
                 case 'd': if( targs ) {
@@ -2077,9 +2077,9 @@ processArgs( const char * host, int port, int argc, const char ** argv )
                 args = tr_bencDictFind( tadd, ARGUMENTS );
             else
                 args = ensure_tset( &tset );
-       
+
             switch( c )
-            {         
+            {
                 case 'g': addFiles( args, "files-wanted", optarg );
                           break;
                 case 'G': addFiles( args, "files-unwanted", optarg );

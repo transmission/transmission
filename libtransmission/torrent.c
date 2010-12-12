@@ -2307,8 +2307,8 @@ tr_torrentPieceNeedsCheck( const tr_torrent * tor, tr_piece_index_t p )
     uint64_t unused;
     tr_file_index_t f;
     const tr_info * inf = tr_torrentInfo( tor );
-  
-    /* if we've never checked this piece, then it needs to be checked */ 
+
+    /* if we've never checked this piece, then it needs to be checked */
     if( !inf->pieces[p].timeChecked ) {
         tr_tordbg( tor, "[LAZY] piece %zu needs to be tested because it's never been tested", (size_t)p );
         return TRUE;

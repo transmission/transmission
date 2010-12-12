@@ -137,7 +137,6 @@ removeURL( tr_benc * metainfo, const char * url )
             }
         }
     }
-        
 
     return changed;
 }

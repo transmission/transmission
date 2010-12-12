@@ -1181,7 +1181,7 @@ tr_core_present_window( TrCore      * core UNUSED,
     /* Setting the toggle-main-window GtkCheckMenuItem to
        make sure its state is correctly set */
     action_toggle( "toggle-main-window", TRUE);
-    
+
     *success = TRUE;
     return TRUE;
 }

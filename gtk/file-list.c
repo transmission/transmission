@@ -295,7 +295,7 @@ getSelectedFilesForeach( GtkTreeModel * model,
     if( is_file )
     {
         struct ActiveData * data = gdata;
-    
+
         /* active means: if it's selected or any ancestor is selected */
 
         gboolean is_active = gtk_tree_selection_iter_is_selected( data->sel, iter );

@@ -303,7 +303,7 @@ updatePiecesLabel( MakeMetaUI * ui )
                                                     builder->fileCount ),
                                 buf, builder->fileCount );
         g_string_append( gstr, "; " );
-  
+
         tr_formatter_mem_B( buf, builder->pieceSize, sizeof( buf ) );
         g_string_append_printf( gstr, gtr_ngettext( "%1$'d Piece @ %2$s",
                                                     "%1$'d Pieces @ %2$s",

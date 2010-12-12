@@ -39,7 +39,6 @@ enum
         most bittorrent clients will reject requests
         larger than this size. */
     MAX_BLOCK_SIZE = ( 1024 * 16 )
-    
 };
 
 typedef enum

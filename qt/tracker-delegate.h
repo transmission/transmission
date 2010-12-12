@@ -38,7 +38,7 @@ class TrackerDelegate: public QItemDelegate
         void setShowMore( bool b );
 
     protected:
-        QString getText( const TrackerInfo& ) const; 
+        QString getText( const TrackerInfo& ) const;
         QSize margin( const QStyle& style ) const;
         virtual QSize sizeHint( const QStyleOptionViewItem&, const TrackerInfo& ) const;
         void drawTracker( QPainter*, const QStyleOptionViewItem&, const TrackerInfo& ) const;

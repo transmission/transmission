@@ -14,7 +14,7 @@
 #include <time.h>
 
 #define CURL_DISABLE_TYPECHECK /* otherwise -Wunreachable-code goes insane */
-#include <curl/curl.h> 
+#include <curl/curl.h>
 
 #include <event.h> /* struct evbuffer */
 
@@ -127,7 +127,7 @@ showInfo( const tr_info * inf )
     **/
 
     printf( "\nTRACKERS\n" );
-    for( i=0; i<(int)inf->trackerCount; ++i ) 
+    for( i=0; i<(int)inf->trackerCount; ++i )
     {
         if( prevTier != inf->trackers[i].tier )
         {

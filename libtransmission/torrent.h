@@ -185,7 +185,7 @@ struct tr_torrent
     time_t                     dhtAnnounce6At;
     tr_bool                    dhtAnnounceInProgress;
     tr_bool                    dhtAnnounce6InProgress;
-    
+
     time_t                     lpdAnnounceAt;
 
     uint64_t                   downloadedCur;
@@ -417,7 +417,7 @@ tr_bool tr_torrentPieceNeedsCheck( const tr_torrent * tor, tr_piece_index_t piec
 /**
  * @brief Test a piece against its info dict checksum
  * @return true if the piece's passes the checksum test
- */ 
+ */
 tr_bool tr_torrentCheckPiece( tr_torrent * tor, tr_piece_index_t pieceIndex );
 
 uint64_t tr_torrentGetCurrentSizeOnDisk( const tr_torrent * tor );

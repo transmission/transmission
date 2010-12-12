@@ -864,7 +864,7 @@ void
 tr_window_set_busy( TrWindow * w, gboolean isBusy )
 {
     if( w && gtr_widget_get_realized( GTK_WIDGET( w ) ) )
-    {    
+    {
         GdkDisplay * display = gtk_widget_get_display( GTK_WIDGET( w ) );
         GdkCursor * cursor = isBusy ? gdk_cursor_new_for_display( display, GDK_WATCH ) : NULL;
 
@@ -872,6 +872,6 @@ tr_window_set_busy( TrWindow * w, gboolean isBusy )
         gdk_display_flush( display );
 
         if( cursor )
-            gdk_cursor_unref( cursor ); 
+            gdk_cursor_unref( cursor );
     }
 }

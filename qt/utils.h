@@ -34,7 +34,7 @@ class Utils: public QObject
         // meh
         static void toStderr( const QString& qstr );
 
-        /// 
+        ///
         /// URLs
         ///
 

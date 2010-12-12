@@ -53,7 +53,7 @@ TrackerDelegate :: sizeHint( const QStyleOptionViewItem& option, const TrackerIn
     Q_UNUSED( option );
 
     QPixmap favicon = info.st.getFavicon( );
-    
+
     const QString text = TrackerDelegate :: getText( info );
     QTextDocument textDoc;
     textDoc.setHtml( text );

@@ -52,7 +52,7 @@ Favicons :: ensureCacheDirHasBeenScanned( )
     if( !hasBeenScanned )
     {
         hasBeenScanned = true;
-   
+
         QDir cacheDir( getCacheDir( ) );
         cacheDir.mkpath( cacheDir.absolutePath( ) );
 

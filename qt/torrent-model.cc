@@ -216,7 +216,7 @@ TorrentModel :: removeTorrent( int id )
 
         beginRemoveRows( QModelIndex(), row, row );
         // make the myIdToRow map consistent with list view/model
-        for( QMap<int,int>::iterator i = myIdToRow.begin(); i != myIdToRow.end(); ++i ) 
+        for( QMap<int,int>::iterator i = myIdToRow.begin(); i != myIdToRow.end(); ++i )
             if( i.value() > row )
                 --i.value();
         myIdToRow.remove( id );

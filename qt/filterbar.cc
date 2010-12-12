@@ -265,7 +265,7 @@ FilterBar :: createActivityCombo( )
 
 /****
 *****
-*****  
+*****
 *****
 ****/
 
@@ -385,7 +385,7 @@ FilterBar :: createTrackerCombo( QStandardItemModel * model )
 
 /****
 *****
-*****  
+*****
 *****
 ****/
 
@@ -413,7 +413,7 @@ FilterBar :: FilterBar( Prefs& prefs, TorrentModel& torrents, TorrentFilter& fil
     myTrackerCombo = createTrackerCombo( myTrackerModel );
     h->addWidget( myTrackerCombo, 1 );
     h->addSpacing( hmargin*2 );
-    
+
     myLineEdit = new QLineEdit( this );
     h->addWidget( myLineEdit );
     connect( myLineEdit, SIGNAL(textChanged(QString)), this, SLOT(onTextChanged(QString)));

@@ -60,7 +60,7 @@ getopts_usage_line( const tr_option * opt,
                     int               shortWidth,
                     int               argWidth )
 {
-    int len; 
+    int len;
     const char * longName   = opt->longName ? opt->longName : "";
     const char * shortName  = opt->shortName ? opt->shortName : "";
     const char * arg        = getArgName( opt );

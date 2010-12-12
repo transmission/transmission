@@ -181,7 +181,7 @@ struct tr_session
     struct tr_bandwidth        * bandwidth;
 
     double                       desiredRatio;
-    
+
     uint16_t                     idleLimitMinutes;
 
     struct tr_bindinfo         * public_ipv4;
@@ -226,7 +226,7 @@ const struct tr_address*  tr_sessionGetPublicAddress( const tr_session *, int tr
 
 struct tr_bindsockets * tr_sessionGetBindSockets( tr_session * );
 
-int tr_sessionCountTorrents( const tr_session * session ); 
+int tr_sessionCountTorrents( const tr_session * session );
 
 enum
 {

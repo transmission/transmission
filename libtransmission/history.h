@@ -20,7 +20,7 @@
 /**
  * A generic short-term memory object that remembers how many times
  * something happened over the last N seconds.
- * 
+ *
  * For example, it could count how many are bytes transferred
  * to estimate the speed over the last N seconds.
  */

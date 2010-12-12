@@ -100,12 +100,12 @@ tr_list* tr_list_find( tr_list *         list,
                        const void *      b,
                        TrListCompareFunc compare_func );
 
-/** 
- * @brief Insert in an ordered list 
- * @param list pointer to the list 
- * @param item the item to be inserted 
- * @param compare the comparison function. 
- */ 
+/**
+ * @brief Insert in an ordered list
+ * @param list pointer to the list
+ * @param item the item to be inserted
+ * @param compare the comparison function.
+ */
 void tr_list_insert_sorted( tr_list          ** list,
                             void              * data,
                             TrListCompareFunc   compare );

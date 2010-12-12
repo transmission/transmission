@@ -123,7 +123,7 @@ gtr_compare_double( const double a, const double b, int decimal_places )
     const int64_t ia = (int64_t)(a * pow( 10, decimal_places ) );
     const int64_t ib = (int64_t)(b * pow( 10, decimal_places ) );
     if( ia < ib ) return -1;
-    if( ia > ib ) return  1; 
+    if( ia > ib ) return  1;
     return 0;
 }
 
