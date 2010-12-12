@@ -538,6 +538,19 @@ applyDesktopProxySettings( CURL * easy, GConfClient * client, const char * host_
 {
     int port;
     GConfValue * value;
+    static gboolean env_set;
+    static gboolean env_checked = FALSE;
+
+    /* Both libcurl and GNOME have hooks for proxy support.
+     * If someone has set the http_proxy environment variable,
+     * don't apply the GNOME settings here.  That way libcurl can override GNOME. */
+    if( !env_checked ) {
+        const char * str = g_getenv( "http_proxy" );
+        env_set = str && *str;
+        env_checked = TRUE;
+    }
+    if( env_set )
+        return;
 
     if(( value = gconf_client_get( client, host_key, NULL )))
     {
