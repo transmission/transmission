@@ -91,6 +91,13 @@ Where to save downloaded data.
 In addition to these options, sending
 .Nm
 a SIGHUP signal will contact the tracker for more peers.
+.Sh ENVIRONMENT
+.Bl -tag -width Fl
+.It Ev TRANSMISSION_HOME
+Sets the default config-dir.
+.It Ev http_proxy
+Sets the proxy to use for http tracker announces.
+.El
 .Sh FILES
 .Bl -tag -width Ds -compact
 .It ~/.config/transmission
