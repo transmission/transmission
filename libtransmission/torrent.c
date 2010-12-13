@@ -2751,7 +2751,6 @@ static void
 setLocation( void * vdata )
 {
     tr_bool err = FALSE;
-    tr_bool verify_needed = FALSE;
     struct LocationData * data = vdata;
     tr_torrent * tor = data->tor;
     const tr_bool do_move = data->move_from_old_location;
@@ -2798,10 +2797,6 @@ setLocation( void * vdata )
                         tr_torerr( tor, "error moving \"%s\" to \"%s\": %s",
                                         oldpath, newpath, tr_strerror( errno ) );
                     }
-                    else if( !renamed )
-                    {
-                        verify_needed = TRUE;
-                    }
                 }
 
                 tr_free( newpath );
@@ -2824,8 +2819,6 @@ setLocation( void * vdata )
 
             /* set the new location and reverify */
             tr_torrentSetDownloadDir( tor, location );
-            if( verify_needed )
-                tr_torrentVerify( tor );
         }
     }
 
