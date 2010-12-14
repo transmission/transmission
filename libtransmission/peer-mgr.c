@@ -1093,8 +1093,9 @@ tr_peerMgrGetNextRequests( tr_torrent           * tor,
     {
         struct weighted_piece * p = pieces + i;
         const int missing = tr_cpMissingBlocksInPiece( &tor->completion, p->index );
+        const int maxDuplicatesPerBlock = endgame ? 3 : 1;
 
-        if( !endgame && ( p->requestCount > missing ) )
+        if( p->requestCount > ( missing * maxDuplicatesPerBlock ) )
             continue;
 
         /* if the peer has this piece that we want... */
@@ -1114,7 +1115,7 @@ tr_peerMgrGetNextRequests( tr_torrent           * tor,
                     continue;
 
                 /* don't send the same request to any peer too many times */
-                if( !endgame && countBlockRequests( t, b ) )
+                if( countBlockRequests( t, b ) >= maxDuplicatesPerBlock )
                     continue;
 
                 /* update the caller's table */
