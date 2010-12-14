@@ -201,8 +201,15 @@ preallocateFileFull( const char * filename, uint64_t length )
 
 /* https://trac.transmissionbt.com/ticket/3826 */
 #ifdef __UCLIBC__
+#define TR_UCLIBC_CHECK_VERSION(major,minor,micro) \
+    (__UCLIBC_MAJOR__ > (major) || \
+     (__UCLIBC_MAJOR__ == (major) && __UCLIBC_MINOR__ > (minor)) || \
+     (__UCLIBC_MAJOR__ == (major) && __UCLIBC_MINOR__ == (minor) && \
+      __UCLIBC_SUBLEVEL__ >= (micro)))
+#if !TR_UCLIBC_CHECK_VERSION(0,9,28)
  #undef HAVE_PREAD
  #undef HAVE_PWRITE
+#endif
 #endif
 
 #ifdef SYS_DARWIN
