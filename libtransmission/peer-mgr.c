@@ -79,10 +79,10 @@ enum
        before it's considered too old and needs to be rebuilt */
     PIECE_LIST_SHELF_LIFE_SECS = 60,
 
-    /* use for bitwise operations w/peer_atom.myflags */
+    /* use for bitwise operations w/peer_atom.flags2 */
     MYFLAG_BANNED = 1,
 
-    /* use for bitwise operations w/peer_atom.myflags */
+    /* use for bitwise operations w/peer_atom.flags2 */
     /* unreachable for now... but not banned.
      * if they try to connect to us it's okay */
     MYFLAG_UNREACHABLE = 2,
@@ -123,7 +123,7 @@ struct peer_atom
 {
     uint8_t     from;
     uint8_t     flags;              /* these match the added_f flags */
-    uint8_t     myflags;            /* flags that aren't defined in added_f */
+    uint8_t     flags2;             /* flags that aren't defined in added_f */
     uint8_t     uploadOnly;         /* UPLOAD_ONLY_ */
     int8_t      seedProbability;    /* how likely is this to be a seed... [0..100] or -1 for unknown */
     int8_t      blocklisted;        /* -1 for unknown, TRUE for blocklisted, FALSE for not blocklisted */
@@ -1241,7 +1241,7 @@ addStrike( Torrent * t, tr_peer * peer )
     if( ++peer->strikes >= MAX_BAD_PIECES_PER_PEER )
     {
         struct peer_atom * atom = peer->atom;
-        atom->myflags |= MYFLAG_BANNED;
+        atom->flags2 |= MYFLAG_BANNED;
         peer->doPurge = 1;
         tordbg( t, "banning peer %s", tr_atomAddrStr( atom ) );
     }
@@ -1649,7 +1649,7 @@ myHandshakeDoneCB( tr_handshake  * handshake,
                 if( !readAnythingFromPeer )
                 {
                     tordbg( t, "marking peer %s as unreachable... numFails is %d", tr_atomAddrStr( atom ), (int)atom->numFails );
-                    atom->myflags |= MYFLAG_UNREACHABLE;
+                    atom->flags2 |= MYFLAG_UNREACHABLE;
                 }
             }
         }
@@ -1663,9 +1663,14 @@ myHandshakeDoneCB( tr_handshake  * handshake,
         atom->time = tr_time( );
         atom->piece_data_time = 0;
         atom->lastConnectionAt = tr_time( );
-        atom->myflags &= ~MYFLAG_UNREACHABLE;
 
-        if( atom->myflags & MYFLAG_BANNED )
+        if( !tr_peerIoIsIncoming( io ) )
+        {
+            atom->flags |= ADDED_F_CONNECTABLE;
+            atom->flags2 &= ~MYFLAG_UNREACHABLE;
+        }
+
+        if( atom->flags2 & MYFLAG_BANNED )
         {
             tordbg( t, "banned peer %s tried to reconnect",
                     tr_atomAddrStr( atom ) );
@@ -2931,7 +2936,7 @@ getReconnectIntervalSecs( const struct peer_atom * atom, const time_t now )
     }
 
     /* penalize peers that were unreachable the last time we tried */
-    if( atom->myflags & MYFLAG_UNREACHABLE )
+    if( atom->flags2 & MYFLAG_UNREACHABLE )
         sec += sec;
 
     dbgmsg( "reconnect interval for %s is %d seconds", tr_atomAddrStr( atom ), sec );
@@ -3376,7 +3381,7 @@ isPeerCandidate( const tr_torrent * tor, struct peer_atom * atom, const time_t n
         return FALSE;
 
     /* not if they're banned... */
-    if( atom->myflags & MYFLAG_BANNED )
+    if( atom->flags2 & MYFLAG_BANNED )
         return FALSE;
 
     return TRUE;
@@ -3433,6 +3438,10 @@ getPeerCandidateScore( const tr_torrent * tor, const struct peer_atom * atom, ui
 
     /* prefer torrents we're downloading with */
     i = tr_torrentIsSeed( tor ) ? 1 : 0;
+    score = addValToKey( score, 1, i );
+
+    /* prefer peers that are known to be connectible */
+    i = ( atom->flags & ADDED_F_CONNECTABLE ) ? 0 : 1;
     score = addValToKey( score, 1, i );
 
     /* prefer peers that we might have a chance of uploading to...
@@ -3560,7 +3569,7 @@ initiateConnection( tr_peerMgr * mgr, Torrent * t, struct peer_atom * atom )
     {
         tordbg( t, "peerIo not created; marking peer %s as unreachable",
                 tr_atomAddrStr( atom ) );
-        atom->myflags |= MYFLAG_UNREACHABLE;
+        atom->flags2 |= MYFLAG_UNREACHABLE;
         atom->numFails++;
     }
     else

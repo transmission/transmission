@@ -38,13 +38,24 @@ struct tr_peer_stat;
 struct tr_torrent;
 typedef struct tr_peerMgr tr_peerMgr;
 
+/* added_f's bitwise-or'ed flags */
 enum
 {
-    /* corresponds to ut_pex's added.f flags */
+    /* true if the peer supports encryption */
     ADDED_F_ENCRYPTION_FLAG = 1,
 
-    /* corresponds to ut_pex's added.f flags */
+    /* true if the peer is a seed or partial seed */
     ADDED_F_SEED_FLAG = 2,
+
+    /* true if the peer supports uTP */
+    ADDED_F_UTP_FLAGS = 4,
+
+    /* true if the peer has holepunch support */
+    ADDED_F_HOLEPUNCH = 8,
+
+    /* true if the peer telling us about this peer 
+     * initiated the connection (implying that it is connectible) */ 
+   ADDED_F_CONNECTABLE = 16 
 };
 
 typedef struct tr_pex
