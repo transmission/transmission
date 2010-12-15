@@ -1850,37 +1850,32 @@ tr_torrentClearIdleLimitHitCallback( tr_torrent * torrent )
 }
 
 static void
-tr_setenv( const char * name, const char * value, tr_bool override )
+torrentCallScript( const tr_torrent * tor, const char * script )
 {
-#ifdef WIN32
-    putenv( tr_strdup_printf( "%s=%s", name, value ) ); /* leaks memory... */
-#else
-    setenv( name, value, override );
-#endif
-}
+    char timeStr[128];
+    const time_t now = tr_time( );
 
-static void
-torrentCallScript( tr_torrent * tor, const char * script )
-{
     assert( tr_isTorrent( tor ) );
+
+    tr_strlcpy( timeStr, ctime( &now ), sizeof( timeStr ) );
+    *strchr( timeStr,'\n' ) = '\0';
 
     if( script && *script )
     {
-        char buf[128];
-        const time_t now = tr_time( );
-
-        tr_setenv( "TR_APP_VERSION", SHORT_VERSION_STRING, 1 );
-
-        tr_snprintf( buf, sizeof( buf ), "%d", tr_torrentId( tor ) );
-        tr_setenv( "TR_TORRENT_ID", buf, 1 );
-        tr_setenv( "TR_TORRENT_NAME", tr_torrentName( tor ), 1 );
-        tr_setenv( "TR_TORRENT_DIR", tor->currentDir, 1 );
-        tr_setenv( "TR_TORRENT_HASH", tor->info.hashString, 1 );
-        tr_strlcpy( buf, ctime( &now ), sizeof( buf ) );
-        *strchr( buf,'\n' ) = '\0';
-        tr_setenv( "TR_TIME_LOCALTIME", buf, 1 );
-        tr_torinf( tor, "Calling script \"%s\"", script );
-        system( script );
+        char * cmd[] = { tr_strdup( script ), NULL };
+        char * env[] = { tr_strdup_printf( "TR_APP_VERSION=%s", SHORT_VERSION_STRING ),
+                         tr_strdup_printf( "TR_TIME_LOCALTIME=%s", timeStr ),
+                         tr_strdup_printf( "TR_TORRENT_DIR=%s", tor->currentDir ),
+                         tr_strdup_printf( "TR_TORRENT_ID=%d", tr_torrentId( tor ) ),
+                         tr_strdup_printf( "TR_TORRENT_HASH=%s", tor->info.hashString ),
+                         tr_strdup_printf( "TR_TORRENT_NAME=%s", tr_torrentName( tor ) ),
+                         NULL };
+        if( !fork( ) )
+        {
+            execve( script, cmd, env );
+            tr_torerr( tor, _( "Script failed with errno %d (%s)" ), errno, strerror(errno) );
+            _exit( 0 );
+        }
     }
 }
 
