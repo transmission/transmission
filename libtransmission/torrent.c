@@ -12,6 +12,7 @@
 
 #include <sys/types.h> /* stat */
 #include <sys/stat.h> /* stat */
+#include <sys/wait.h> /* wait() */
 #include <unistd.h> /* stat */
 #include <dirent.h>
 
@@ -1850,6 +1851,12 @@ tr_torrentClearIdleLimitHitCallback( tr_torrent * torrent )
 }
 
 static void
+onSigCHLD( int i UNUSED )
+{
+    waitpid( -1, 0, WNOHANG );
+}
+
+static void
 torrentCallScript( const tr_torrent * tor, const char * script )
 {
     char timeStr[128];
@@ -1873,6 +1880,7 @@ torrentCallScript( const tr_torrent * tor, const char * script )
             NULL };
 
         tr_torinf( tor, "Calling script \"%s\"", script ); 
+        signal( SIGCHLD, onSigCHLD );
 
         if( !fork( ) )
         {
