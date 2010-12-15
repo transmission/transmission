@@ -1863,17 +1863,20 @@ torrentCallScript( const tr_torrent * tor, const char * script )
     if( script && *script )
     {
         char * cmd[] = { tr_strdup( script ), NULL };
-        char * env[] = { tr_strdup_printf( "TR_APP_VERSION=%s", SHORT_VERSION_STRING ),
-                         tr_strdup_printf( "TR_TIME_LOCALTIME=%s", timeStr ),
-                         tr_strdup_printf( "TR_TORRENT_DIR=%s", tor->currentDir ),
-                         tr_strdup_printf( "TR_TORRENT_ID=%d", tr_torrentId( tor ) ),
-                         tr_strdup_printf( "TR_TORRENT_HASH=%s", tor->info.hashString ),
-                         tr_strdup_printf( "TR_TORRENT_NAME=%s", tr_torrentName( tor ) ),
-                         NULL };
+        char * env[] = {
+            tr_strdup_printf( "TR_APP_VERSION=%s", SHORT_VERSION_STRING ),
+            tr_strdup_printf( "TR_TIME_LOCALTIME=%s", timeStr ),
+            tr_strdup_printf( "TR_TORRENT_DIR=%s", tor->currentDir ),
+            tr_strdup_printf( "TR_TORRENT_ID=%d", tr_torrentId( tor ) ),
+            tr_strdup_printf( "TR_TORRENT_HASH=%s", tor->info.hashString ),
+            tr_strdup_printf( "TR_TORRENT_NAME=%s", tr_torrentName( tor ) ),
+            NULL };
+
+        tr_torinf( tor, "Calling script \"%s\"", script ); 
+
         if( !fork( ) )
         {
             execve( script, cmd, env );
-            tr_torerr( tor, _( "Script failed with errno %d (%s)" ), errno, strerror(errno) );
             _exit( 0 );
         }
     }
