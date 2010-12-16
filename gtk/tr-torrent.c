@@ -41,24 +41,22 @@ struct TrTorrentPrivate
 {
     tr_torrent *  handle;
     gboolean      do_remove;
+    gboolean      delete_local_data;
 };
 
 
 static void
-tr_torrent_init( GTypeInstance *  instance,
-                 gpointer g_class UNUSED )
+tr_torrent_init( GTypeInstance * instance, gpointer g_class UNUSED )
 {
-    TrTorrent *               self = TR_TORRENT( instance );
     struct TrTorrentPrivate * p;
+    TrTorrent * self = TR_TORRENT( instance );
 
-    p = self->priv = G_TYPE_INSTANCE_GET_PRIVATE( self,
-                                                  TR_TORRENT_TYPE,
-                                                  struct TrTorrentPrivate );
+    p = G_TYPE_INSTANCE_GET_PRIVATE( self, TR_TORRENT_TYPE, struct TrTorrentPrivate );
     p->handle = NULL;
+    p->do_remove = FALSE;
+    p->delete_local_data = FALSE;
 
-#ifdef REFDBG
-    g_message( "torrent %p init", self );
-#endif
+    self->priv = p;
 }
 
 static int
@@ -78,7 +76,7 @@ tr_torrent_dispose( GObject * o )
         if( self->priv->handle )
         {
             if( self->priv->do_remove )
-                tr_torrentRemove( self->priv->handle );
+                tr_torrentRemove( self->priv->handle, self->priv->delete_local_data, gtr_file_trash_or_remove );
             else
                 tr_torrentFree( self->priv->handle );
         }
@@ -208,12 +206,19 @@ tr_torrent_new_ctor( tr_session   * session,
 }
 
 void
-tr_torrent_set_remove_flag( TrTorrent * gtor,
-                            gboolean    do_remove )
+tr_torrent_set_remove_flag( TrTorrent * gtor, gboolean flag )
 {
     if( !isDisposed( gtor ) )
-        gtor->priv->do_remove = do_remove;
+        gtor->priv->do_remove = flag;
 }
+
+void
+tr_torrent_set_delete_local_data_flag( TrTorrent * gtor, gboolean flag )
+{
+    if( !isDisposed( gtor ) )
+        gtor->priv->delete_local_data = flag;
+}
+
 
 void
 tr_torrent_open_folder( TrTorrent * gtor )

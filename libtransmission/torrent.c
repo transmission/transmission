@@ -1750,13 +1750,41 @@ tr_torrentFree( tr_torrent * tor )
     }
 }
 
-void
-tr_torrentRemove( tr_torrent * tor )
+struct remove_data
 {
-    assert( tr_isTorrent( tor ) );
+    tr_torrent   * tor;
+    tr_bool        deleteFlag;
+    tr_fileFunc  * deleteFunc;
+};
 
+static void
+removeTorrent( void * vdata )
+{
+    struct remove_data * data = vdata;
+
+    if( data->deleteFlag )
+        tr_torrentDeleteLocalData( data->tor, data->deleteFunc );
+
+    tr_torrentClearCompletenessCallback( data->tor );
+    closeTorrent( data->tor );
+    tr_free( data );
+}
+
+void
+tr_torrentRemove( tr_torrent   * tor,
+                  tr_bool        deleteFlag, 
+                  tr_fileFunc    deleteFunc )
+{
+    struct remove_data * data;
+
+    assert( tr_isTorrent( tor ) );
     tor->isDeleting = 1;
-    tr_torrentFree( tor );
+
+    data = tr_new0( struct remove_data, 1 );
+    data->tor = tor;
+    data->deleteFlag = deleteFlag;
+    data->deleteFunc = deleteFunc;
+    tr_runInEventThread( tor->session, removeTorrent, data );
 }
 
 /**

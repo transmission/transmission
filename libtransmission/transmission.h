@@ -1031,9 +1031,13 @@ tr_torrent * tr_torrentNew( const tr_ctor   * ctor,
            Running torrents are stopped first.  */
 void tr_torrentFree( tr_torrent * torrent );
 
+typedef int tr_fileFunc( const char * filename );
+
 /** @brief Removes our .torrent and .resume files for
            this torrent, then calls tr_torrentFree(). */
-void tr_torrentRemove( tr_torrent * torrent );
+void tr_torrentRemove( tr_torrent  * torrent,
+                       tr_bool       removeLocalData,
+                       tr_fileFunc   removeFunc );
 
 /** @brief Start a torrent */
 void tr_torrentStart( tr_torrent * torrent );
@@ -1060,8 +1064,6 @@ void tr_torrentSetLocation( tr_torrent  * torrent,
                             tr_bool       move_from_previous_location,
                             double      * setme_progress,
                             int         * setme_state );
-
-typedef int tr_fileFunc( const char * filename );
 
 /**
  * @brief Deletes the torrent's local data.

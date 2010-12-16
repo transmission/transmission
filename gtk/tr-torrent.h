@@ -71,7 +71,9 @@ TrTorrent *    tr_torrent_new_ctor( tr_session  * session,
                                     tr_ctor     * ctor,
                                     int         * errcode );
 
-void           tr_torrent_set_remove_flag( TrTorrent *,
-                                           gboolean );
+void tr_torrent_set_remove_flag( TrTorrent *, gboolean );
+
+void tr_torrent_set_delete_local_data_flag( TrTorrent *, gboolean );
+
 
 #endif

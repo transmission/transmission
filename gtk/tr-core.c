@@ -1266,11 +1266,8 @@ tr_core_remove_torrent_from_id( TrCore * core, int id, gboolean deleteFiles )
         /* remove from the gui */
         gtk_list_store_remove( GTK_LIST_STORE( model ), &iter );
 
-        /* maybe delete the downloaded files */
-        if( deleteFiles )
-            tr_torrentDeleteLocalData( tor, gtr_file_trash_or_remove );
-
         /* remove the torrent */
+        tr_torrent_set_delete_local_data_flag( gtor, deleteFiles );
         tr_torrent_set_remove_flag( gtor, TRUE );
         gtr_warn_if_fail( G_OBJECT( gtor )->ref_count == 1 );
         g_object_unref( G_OBJECT( gtor ) ); /* remove the last refcount */
