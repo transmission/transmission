@@ -986,7 +986,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     }
     else
     {
-        [torrent closeRemoveTorrent];
+        [torrent closeRemoveTorrent: NO];
         [torrent release];
     }
 }
@@ -1054,7 +1054,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     }
     else
     {
-        [torrent closeRemoveTorrent];
+        [torrent closeRemoveTorrent: NO];
         [torrent release];
     }
 }
@@ -1457,10 +1457,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         //let's expand all groups that have removed items - they either don't exist anymore, are already expanded, or are collapsed (rpc)
         [fTableView removeCollapsedGroup: [torrent groupValue]];
         
-        if (deleteData)
-            [torrent trashData];
-        
-        [torrent closeRemoveTorrent];
+        [torrent closeRemoveTorrent: deleteData];
     }
     
     [torrents release];

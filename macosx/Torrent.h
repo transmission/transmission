@@ -64,7 +64,7 @@
 
 - (NSDictionary *) history;
 
-- (void) closeRemoveTorrent;
+- (void) closeRemoveTorrent: (BOOL) trashFiles;
 
 - (void) changeDownloadFolderBeforeUsing: (NSString *) folder;
 
@@ -119,7 +119,6 @@
 - (void) setPriority: (tr_priority_t) priority;
 
 + (void) trashFile: (NSString *) path;
-- (void) trashData;
 - (void) moveTorrentDataFileTo: (NSString *) folder;
 - (void) copyTorrentFileTo: (NSString *) path;
 

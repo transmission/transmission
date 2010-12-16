@@ -227,7 +227,7 @@ int trashDataFile(const char * filename)
     return [self retain];
 }
 
-- (void) closeRemoveTorrent
+- (void) closeRemoveTorrent: (BOOL) trashFiles
 {
     //allow the file to be indexed by Time Machine
     if (fTimeMachineExclude)
@@ -237,7 +237,7 @@ int trashDataFile(const char * filename)
         fTimeMachineExclude = nil;
     }
     
-    tr_torrentRemove(fHandle);
+    tr_torrentRemove(fHandle, trashFiles, trashDataFile);
 }
 
 - (void) changeDownloadFolderBeforeUsing: (NSString *) folder
@@ -501,11 +501,6 @@ int trashDataFile(const char * filename)
         if (![[NSFileManager defaultManager] removeItemAtPath: path error: &error])
             NSLog(@"Could not trash %@: %@", path, [error localizedDescription]);
     }
-}
-
-- (void) trashData
-{
-    tr_torrentDeleteLocalData(fHandle, trashDataFile);
 }
 
 - (void) moveTorrentDataFileTo: (NSString *) folder
