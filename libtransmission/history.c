@@ -33,7 +33,7 @@ struct tr_recentHistory
 void
 tr_historyAdd( tr_recentHistory * h, time_t now, unsigned int n )
 {
-    if( h->slices[h->newest].date + h->precision >= now )
+    if( h->slices[h->newest].date + (time_t)h->precision >= now )
         h->slices[h->newest].n += n;
     else {
         if( ++h->newest == h->sliceCount ) h->newest = 0;
