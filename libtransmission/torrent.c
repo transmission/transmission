@@ -1757,6 +1757,8 @@ struct remove_data
     tr_fileFunc  * deleteFunc;
 };
 
+static void tr_torrentDeleteLocalData( tr_torrent *, tr_fileFunc );
+
 static void
 removeTorrent( void * vdata )
 {
@@ -2714,7 +2716,7 @@ deleteLocalData( tr_torrent * tor, tr_fileFunc fileFunc )
     tr_free( tmp );
 }
 
-void
+static void
 tr_torrentDeleteLocalData( tr_torrent * tor, tr_fileFunc fileFunc )
 {
     assert( tr_isTorrent( tor ) );

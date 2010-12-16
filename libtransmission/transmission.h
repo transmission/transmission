@@ -1065,15 +1065,6 @@ void tr_torrentSetLocation( tr_torrent  * torrent,
                             double      * setme_progress,
                             int         * setme_state );
 
-/**
- * @brief Deletes the torrent's local data.
- * @param torrent
- * @param fileFunc Pass in "unlink" to destroy the files or, on platforms with
- *                 recycle bins, pass in a function that uses it instead.
- *                 tr_torrentDeleteLocalData() ignores fileFunc's return value.
- */
-void tr_torrentDeleteLocalData( tr_torrent * torrent, tr_fileFunc fileFunc );
-
 uint64_t tr_torrentGetBytesLeftToAllocate( const tr_torrent * torrent );
 
 /**
