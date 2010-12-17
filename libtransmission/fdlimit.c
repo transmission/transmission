@@ -258,9 +258,29 @@ tr_prefetch( int fd UNUSED, off_t offset UNUSED, size_t count UNUSED )
 #endif
 }
 
+void
+tr_set_file_for_single_pass( int fd )
+{
+    if( fd >= 0 )
+    {
+        /* Set hints about the lookahead buffer and caching. It's okay
+           for these to fail silently, so don't let them affect errno */
+        const int err = errno;
+#ifdef HAVE_POSIX_FADVISE
+        posix_fadvise( fd, 0, 0, POSIX_FADV_SEQUENTIAL );
+#endif
+#ifdef SYS_DARWIN
+        fcntl( fd, F_RDAHEAD, 1 );
+        fcntl( fd, F_NOCACHE, 1 );
+#endif
+        errno = err;
+    }
+}
+
 int
 tr_open_file_for_writing( const char * filename )
 {
+    int fd;
     int flags = O_WRONLY | O_CREAT;
 #ifdef O_BINARY
     flags |= O_BINARY;
@@ -268,7 +288,9 @@ tr_open_file_for_writing( const char * filename )
 #ifdef O_LARGEFILE
     flags |= O_LARGEFILE;
 #endif
-    return open( filename, flags, 0666 );
+    fd = open( filename, flags, 0666 );
+    tr_set_file_for_single_pass( fd );
+    return fd;
 }
 
 int
@@ -291,21 +313,7 @@ tr_open_file_for_scanning( const char * filename )
 
     /* open the file */
     fd = open( filename, flags, 0666 );
-    if( fd >= 0 )
-    {
-        /* Set hints about the lookahead buffer and caching. It's okay
-           for these to fail silently, so don't let them affect errno */
-        const int err = errno;
-#ifdef HAVE_POSIX_FADVISE
-        posix_fadvise( fd, 0, 0, POSIX_FADV_SEQUENTIAL );
-#endif
-#ifdef SYS_DARWIN
-        fcntl( fd, F_NOCACHE, 1 );
-        fcntl( fd, F_RDAHEAD, 1 );
-#endif
-        errno = err;
-    }
-
+    tr_set_file_for_single_pass( fd );
     return fd;
 }
 

@@ -1663,6 +1663,7 @@ tr_bencToFile( const tr_benc * top, tr_fmt_mode mode, const char * filename )
     /* if the file already exists, try to move it out of the way & keep it as a backup */
     tmp = tr_strdup_printf( "%s.tmp.XXXXXX", filename );
     fd = tr_mkstemp( tmp );
+    tr_set_file_for_single_pass( fd );
     if( fd >= 0 )
     {
         int len;

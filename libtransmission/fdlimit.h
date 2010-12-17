@@ -32,6 +32,8 @@ void tr_fdSetGlobalPeerLimit( tr_session * session, int limit );
 ****
 ***/
 
+void tr_set_file_for_single_pass( int fd );
+
 int tr_open_file_for_scanning( const char * filename );
 
 int tr_open_file_for_writing( const char * filename );
