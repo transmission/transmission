@@ -1006,7 +1006,9 @@ info_page_new( struct DetailsImpl * di )
         di->privacy_lb = l;
 
         /* origins */
-        l = gtk_label_new( NULL );
+        l = g_object_new( GTK_TYPE_LABEL, "selectable", TRUE,
+                                          "ellipsize", PANGO_ELLIPSIZE_END,
+                                          NULL );
         hig_workarea_add_row( t, &row, _( "Origin:" ), l, NULL );
         di->origin_lb = l;
 
