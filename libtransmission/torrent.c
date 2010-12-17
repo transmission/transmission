@@ -738,9 +738,30 @@ tr_torrentGotNewInfoDict( tr_torrent * tor )
 }
 
 static tr_bool
+hasAnyLocalData( const tr_torrent * tor )
+{
+    tr_file_index_t i;
+    tr_bool has_local_data = FALSE;
+    const tr_file_index_t n = tor->info.fileCount;
+
+    for( i=0; i<n && !has_local_data; ++i )
+    {
+        struct stat sb;
+        char * filename = tr_torrentFindFile( tor, i );
+
+        if( filename && !stat( filename, &sb ) )
+            has_local_data = TRUE;
+
+        tr_free( filename );
+    }
+
+    return has_local_data;
+}
+
+static tr_bool
 setLocalErrorIfFilesDisappeared( tr_torrent * tor )
 {
-    const tr_bool disappeared = ( tr_cpHaveTotal( &tor->completion ) > 0 ) && ( tr_torrentGetCurrentSizeOnDisk( tor ) == 0 );
+    const tr_bool disappeared = ( tr_cpHaveTotal( &tor->completion ) > 0 ) && !hasAnyLocalData( tor );
 
     if( disappeared )
     {
