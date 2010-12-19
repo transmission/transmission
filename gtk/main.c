@@ -339,8 +339,8 @@ refreshActions( gpointer gdata )
     }
 
     {
-        const int total = tr_core_get_torrent_count( data->core );
-        const int active = tr_core_get_active_torrent_count( data->core );
+        const size_t total = tr_core_get_torrent_count( data->core );
+        const size_t active = tr_core_get_active_torrent_count( data->core );
         action_sensitize( "pause-all-torrents", active != 0 );
         action_sensitize( "start-all-torrents", active != total );
     }
@@ -964,13 +964,8 @@ toggleMainWindow( struct cbdata * cbdata )
 static gboolean
 shouldConfirmBeforeExiting( struct cbdata * data )
 {
-    if( !pref_flag_get( PREF_KEY_ASKQUIT ) )
-        return FALSE;
-    else {
-        struct counts_data counts;
-        getTorrentCounts( data, &counts );
-        return counts.activeCount > 0;
-    }
+    return pref_flag_get( PREF_KEY_ASKQUIT )
+        && tr_core_get_active_torrent_count( data->core );
 }
 
 static void
