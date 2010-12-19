@@ -88,7 +88,7 @@ struct cbdata
     GSList            * dupqueue;
     GSList            * details;
     GtkTreeSelection  * sel;
-    GtkWidget         * quit_dialog;
+    gpointer            quit_dialog;
 };
 
 /**
@@ -974,8 +974,10 @@ maybeaskquit( struct cbdata * cbdata )
     if( !shouldConfirmBeforeExiting( cbdata ) )
         wannaquit( cbdata );
     else {
-        if( cbdata->quit_dialog == NULL )
+        if( cbdata->quit_dialog == NULL ) {
             cbdata->quit_dialog = askquit( cbdata->core, cbdata->wind, wannaquit, cbdata );
+            g_object_add_weak_pointer( G_OBJECT( cbdata->quit_dialog ), &cbdata->quit_dialog );
+        }
         gtk_window_present( GTK_WINDOW( cbdata->quit_dialog ) );
     }
 }
