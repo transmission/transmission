@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <event.h>
+#include <event2/buffer.h>
 
 #include "transmission.h"
 #include "bencode.h"
@@ -325,7 +325,7 @@ testJSONSnippet( const char * benc_str,
 
     tr_bencLoad( benc_str, strlen( benc_str ), &top, NULL );
     tr_bencToBuf( &top, TR_FMT_JSON, buf );
-    serialized = (char*) EVBUFFER_DATA( buf );
+    serialized = (char*) evbuffer_pullup( buf, -1 );
     stripWhitespace( serialized );
 #if 0
     fprintf( stderr, "benc: %s\n", benc_str );

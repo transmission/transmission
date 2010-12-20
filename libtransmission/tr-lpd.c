@@ -42,8 +42,8 @@ THE SOFTWARE.
 #endif
 
 /* third party */
-#include <event.h>
-#include <evutil.h>
+#include <event2/event.h>
+#include <event2/util.h>
 
 /* libT */
 #include "transmission.h"
@@ -70,7 +70,7 @@ static void event_callback( int, short, void* );
 
 static int lpd_socket; /**<separate multicast receive socket */
 static int lpd_socket2; /**<and multicast send socket */
-static struct event lpd_event;
+static struct event * lpd_event = NULL;
 static tr_port lpd_port;
 
 static tr_torrent* lpd_torStaticType UNUSED; /* just a helper for static type analysis */
@@ -338,8 +338,8 @@ int tr_lpdInit( tr_session* ss, tr_address* tr_addr UNUSED )
     /* Note: lpd_unsolicitedMsgCounter remains 0 until the first timeout event, thus
      * any announcement received during the initial interval will be discarded. */
 
-    event_set( &lpd_event, lpd_socket, EV_READ | EV_PERSIST, event_callback, NULL );
-    event_add( &lpd_event, NULL );
+    lpd_event = event_new( NULL, lpd_socket, EV_READ | EV_PERSIST, event_callback, NULL );
+    event_add( lpd_event, NULL );
 
     tr_ndbg( "LPD", "Local Peer Discovery initialised" );
 
@@ -367,7 +367,8 @@ void tr_lpdUninit( tr_session* ss )
 
     tr_ndbg( "LPD", "Uninitialising Local Peer Discovery" );
 
-    event_del( &lpd_event );
+    event_free( lpd_event );
+    lpd_event = NULL;
 
     /* just shut down, we won't remember any former nodes */
     EVUTIL_CLOSESOCKET( lpd_socket );

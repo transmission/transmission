@@ -29,7 +29,7 @@
 #include <locale.h>
 #include <unistd.h> /* stat() */
 
-#include <event.h> /* struct evbuffer */
+#include <event2/buffer.h>
 
 #include "ConvertUTF.h"
 
@@ -1586,7 +1586,7 @@ tr_bencMergeDicts( tr_benc * target, const tr_benc * source )
 void
 tr_bencToBuf( const tr_benc * top, tr_fmt_mode mode, struct evbuffer * buf )
 {
-    evbuffer_drain( buf, EVBUFFER_LENGTH( buf ) );
+    evbuffer_drain( buf, evbuffer_get_length( buf ) );
     evbuffer_expand( buf, 4096 ); /* alloc a little memory to start off with */
 
     switch( mode )
@@ -1602,7 +1602,7 @@ tr_bencToBuf( const tr_benc * top, tr_fmt_mode mode, struct evbuffer * buf )
             data.out = buf;
             data.parents = NULL;
             bencWalk( top, &jsonWalkFuncs, &data );
-            if( EVBUFFER_LENGTH( buf ) )
+            if( evbuffer_get_length( buf ) )
                 evbuffer_add_printf( buf, "\n" );
             break;
         }
@@ -1614,11 +1614,12 @@ tr_bencToStr( const tr_benc * top, tr_fmt_mode mode, int * len )
 {
     char * ret;
     struct evbuffer * buf = evbuffer_new( );
+    size_t n;
     tr_bencToBuf( top, mode, buf );
-    ret = tr_strndup( EVBUFFER_DATA( buf ), EVBUFFER_LENGTH( buf ) );
+    n = evbuffer_get_length( buf );
+    ret = evbuffer_free_to_str( buf );
     if( len != NULL )
-        *len = (int) EVBUFFER_LENGTH( buf );
-    evbuffer_free( buf );
+        *len = (int) n;
     return ret;
 }
 
@@ -1666,10 +1667,34 @@ tr_bencToFile( const tr_benc * top, tr_fmt_mode mode, const char * filename )
     tr_set_file_for_single_pass( fd );
     if( fd >= 0 )
     {
-        int len;
-        char * str = tr_bencToStr( top, mode, &len );
+        int nleft;
 
-        if( write( fd, str, len ) == (ssize_t)len )
+        /* save the benc to a temporary file */
+        {
+            struct evbuffer * buffer = evbuffer_new( );
+            tr_bencToBuf( top, mode, buffer );
+            nleft = evbuffer_get_length( buffer );
+            while( nleft > 0 ) {
+                const int n = evbuffer_write( buffer, fd );
+                if( n < nleft )
+                    fprintf( stderr, "wrote %d of %d to %s\n", n, nleft, tmp );
+                if( n >= 0 )
+                    nleft -= n;
+                else if( errno != EAGAIN ) {
+                    err = errno;
+                    break;
+                }
+            }
+            evbuffer_free( buffer );
+        }
+
+        if( nleft > 0 )
+        {
+            tr_err( _( "Couldn't save temporary file \"%1$s\": %2$s" ), tmp, tr_strerror( err ) );
+            tr_close_file( fd );
+            unlink( tmp );
+        }
+        else
         {
             struct stat sb;
             const tr_bool already_exists = !stat( filename, &sb ) && S_ISREG( sb.st_mode );
@@ -1697,15 +1722,6 @@ tr_bencToFile( const tr_benc * top, tr_fmt_mode mode, const char * filename )
                 unlink( tmp );
             }
         }
-        else
-        {
-            err = errno;
-            tr_err( _( "Couldn't save temporary file \"%1$s\": %2$s" ), tmp, tr_strerror( err ) );
-            tr_close_file( fd );
-            unlink( tmp );
-        }
-
-        tr_free( str );
     }
     else
     {

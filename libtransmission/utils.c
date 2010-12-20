@@ -42,7 +42,8 @@
 #include <sys/stat.h>
 #include <unistd.h> /* stat(), getcwd(), getpagesize() */
 
-#include "event.h"
+#include <event2/buffer.h>
+#include <event2/event.h>
 
 #ifdef WIN32
  #include <w32api.h>
@@ -247,9 +248,9 @@ tr_deepLog( const char  * file,
         va_end( args );
         evbuffer_add_printf( buf, " (%s:%d)\n", base, line );
         /* FIXME(libevent2) ifdef this out for nonwindows platforms */
-        OutputDebugString( EVBUFFER_DATA( buf ) );
+        OutputDebugString( evbuffer_pullup( buf, -1 ) );
         if(fp) /* FIXME(libevent2) tr_getLog() should return an fd, then use evbuffer_write() here ) */
-            (void) fwrite( EVBUFFER_DATA( buf ), 1, EVBUFFER_LENGTH( buf ), fp );
+            (void) fwrite( evbuffer_pullup( buf, -1 ), 1, evbuffer_get_length( buf ), fp );
 
         tr_free( base );
         evbuffer_free( buf );
@@ -690,6 +691,17 @@ tr_buildPath( const char *first_element, ... )
 /****
 *****
 ****/
+
+char*
+evbuffer_free_to_str( struct evbuffer * buf )
+{
+    const size_t n = evbuffer_get_length( buf );
+    char * ret = tr_new( char, n + 1 );
+    evbuffer_copyout( buf, ret, n );
+    evbuffer_free( buf );
+    ret[n] = '\0';
+    return ret;
+}
 
 char*
 tr_strdup( const void * in )
@@ -1249,7 +1261,6 @@ tr_lowerBound( const void * key,
 static char*
 strip_non_utf8( const char * in, size_t inlen )
 {
-    char * ret;
     const char * end;
     const char zero = '\0';
     struct evbuffer * buf = evbuffer_new( );
@@ -1266,9 +1277,7 @@ strip_non_utf8( const char * in, size_t inlen )
 
     evbuffer_add( buf, in, inlen );
     evbuffer_add( buf, &zero, 1 );
-    ret = tr_memdup( EVBUFFER_DATA( buf ), EVBUFFER_LENGTH( buf ) );
-    evbuffer_free( buf );
-    return ret;
+    return evbuffer_free_to_str( buf );
 }
 
 static char*

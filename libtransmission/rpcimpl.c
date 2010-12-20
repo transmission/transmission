@@ -102,8 +102,7 @@ tr_idle_function_done( struct tr_rpc_idle_data * data, const char * result )
     tr_bencDictAddStr( data->response, "result", result );
 
     tr_bencToBuf( data->response, TR_FMT_JSON_LEAN, buf );
-    (*data->callback)( data->session, (const char*)EVBUFFER_DATA(buf),
-                       EVBUFFER_LENGTH(buf), data->callback_user_data );
+    (*data->callback)( data->session, buf, data->callback_user_data );
 
     evbuffer_free( buf );
     tr_bencFree( data->response );
@@ -1647,10 +1646,9 @@ methods[] =
 };
 
 static void
-noop_response_callback( tr_session * session UNUSED,
-                        const char * response UNUSED,
-                        size_t       response_len UNUSED,
-                        void       * user_data UNUSED )
+noop_response_callback( tr_session       * session UNUSED,
+                        struct evbuffer  * response UNUSED,
+                        void             * user_data UNUSED )
 {
 }
 
@@ -1693,8 +1691,7 @@ request_exec( tr_session             * session,
         if( tr_bencDictFindInt( request, "tag", &tag ) )
             tr_bencDictAddInt( &response, "tag", tag );
         tr_bencToBuf( &response, TR_FMT_JSON_LEAN, buf );
-        (*callback)( session, (const char*)EVBUFFER_DATA(buf),
-                     EVBUFFER_LENGTH( buf ), callback_user_data );
+        (*callback)( session, buf, callback_user_data );
 
         evbuffer_free( buf );
         tr_bencFree( &response );
@@ -1715,8 +1712,7 @@ request_exec( tr_session             * session,
         if( tr_bencDictFindInt( request, "tag", &tag ) )
             tr_bencDictAddInt( &response, "tag", tag );
         tr_bencToBuf( &response, TR_FMT_JSON_LEAN, buf );
-        (*callback)( session, (const char*)EVBUFFER_DATA(buf),
-                     EVBUFFER_LENGTH(buf), callback_user_data );
+        (*callback)( session, buf, callback_user_data );
 
         evbuffer_free( buf );
         tr_bencFree( &response );

@@ -303,6 +303,12 @@ void* tr_malloc0( size_t size );
 /** @brief Portability wrapper around free() in which `NULL' is a safe argument */
 void tr_free( void * p );
 
+static inline
+void evbuffer_ref_cleanup_tr_free( const void * data UNUSED, size_t datalen UNUSED, void * extra )
+{
+    tr_free( extra );
+}
+
 /**
  * @brief make a newly-allocated copy of a chunk of memory
  * @param src the memory to copy
@@ -336,6 +342,11 @@ char* tr_strndup( const void * in, int len ) TR_GNUC_MALLOC;
  * @return a newly-allocated copy of `in' that can be freed with tr_free()
  */
 char* tr_strdup( const void * in );
+
+
+struct evbuffer;
+
+char* evbuffer_free_to_str( struct evbuffer * buf );
 
 /** @brief similar to bsearch() but returns the index of the lower bound */
 int tr_lowerBound( const void * key,

@@ -13,8 +13,9 @@
 #include <assert.h>
 #include <limits.h>
 
-#include <event.h>
-#include <evhttp.h> /* for HTTP_OK */
+#include <event2/buffer.h>
+#include <event2/event.h>
+#include <event2/http.h> /* for HTTP_OK */
 
 #include "transmission.h"
 #include "announcer.h"
@@ -263,8 +264,7 @@ tr_announcerInit( tr_session * session )
     a->session = session;
     a->slotsAvailable = MAX_CONCURRENT_TASKS;
     a->lpdHouseKeepingAt = relaxUntil;
-    a->upkeepTimer = tr_new0( struct event, 1 );
-    evtimer_set( a->upkeepTimer, onUpkeepTimer, a );
+    a->upkeepTimer = evtimer_new( NULL, onUpkeepTimer, a );
     tr_timerAdd( a->upkeepTimer, UPKEEP_INTERVAL_SECS, 0 );
 
     session->announcer = a;
@@ -279,8 +279,7 @@ tr_announcerClose( tr_session * session )
 
     flushCloseMessages( announcer );
 
-    evtimer_del( announcer->upkeepTimer );
-    tr_free( announcer->upkeepTimer );
+    event_free( announcer->upkeepTimer );
     announcer->upkeepTimer = NULL;
 
     tr_ptrArrayDestruct( &announcer->stops, NULL );
@@ -724,7 +723,6 @@ createAnnounceURL( const tr_announcer     * announcer,
     const tr_tracker_item  * tracker = tier->currentTracker;
     const char * ann = tracker->announce;
     struct evbuffer * buf = evbuffer_new( );
-    char * ret;
     const char * str;
     const unsigned char * ipv6;
 
@@ -784,10 +782,7 @@ createAnnounceURL( const tr_announcer     * announcer,
         tr_http_escape( buf, ipv6_readable, -1, TRUE );
     }
 
-    ret = tr_strndup( EVBUFFER_DATA( buf ), EVBUFFER_LENGTH( buf ) );
-    dbgmsg( tier, "announce URL is \"%s\"", ret );
-    evbuffer_free( buf );
-    return ret;
+    return evbuffer_free_to_str( buf );
 }
 
 

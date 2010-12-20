@@ -11,8 +11,9 @@
  */
 
 #include <assert.h>
-#include <event.h> /* struct evbuffer */
 #include <stdio.h> /* remove() */
+
+#include <event2/buffer.h>
 
 #include "transmission.h"
 #include "bencode.h"
@@ -370,7 +371,6 @@ char*
 tr_torrentGetMagnetLink( const tr_torrent * tor )
 {
     int i;
-    char * ret;
     const char * name;
     struct evbuffer * s;
 
@@ -390,7 +390,5 @@ tr_torrentGetMagnetLink( const tr_torrent * tor )
         tr_http_escape( s, tor->info.trackers[i].announce, -1, TRUE );
     }
 
-    ret = tr_strndup( EVBUFFER_DATA( s ), EVBUFFER_LENGTH( s ) );
-    evbuffer_free( s );
-    return ret;
+    return evbuffer_free_to_str( s );
 }

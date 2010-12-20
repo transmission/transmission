@@ -19,7 +19,7 @@
 #include <sys/stat.h>
 #include <unistd.h> /* unlink, stat */
 
-#include <event.h> /* struct evbuffer */
+#include <event2/buffer.h>
 
 #include "transmission.h"
 #include "session.h"
@@ -154,6 +154,7 @@ getfile( char ** setme, const char * root, tr_benc * path )
     if( tr_bencIsList( path ) )
     {
         int i;
+        char * tmp;
         const int n = tr_bencListSize( path );
         struct evbuffer * buf = evbuffer_new( );
 
@@ -168,9 +169,10 @@ getfile( char ** setme, const char * root, tr_benc * path )
             }
         }
 
-        *setme = tr_utf8clean( (char*)EVBUFFER_DATA( buf ), EVBUFFER_LENGTH( buf ) );
+        tmp = evbuffer_free_to_str( buf );
+        *setme = tr_utf8clean( tmp, -1 );
+        tr_free( tmp );
         /* fprintf( stderr, "[%s]\n", *setme ); */
-        evbuffer_free( buf );
         success = TRUE;
     }
 

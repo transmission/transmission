@@ -30,6 +30,7 @@
 #include "transmission.h"
 #include "bencode.h"
 #include "crypto.h"
+#include "fdlimit.h"
 #include "list.h"
 #include "net.h"
 #include "platform.h"
@@ -155,12 +156,12 @@ tr_mimepart_free( struct tr_mimepart * p )
 
 static void
 extract_parts_from_multipart( const struct evkeyvalq * headers,
-                              const struct evbuffer * body,
+                              struct evbuffer * body,
                               tr_ptrArray * setme_parts )
 {
     const char * content_type = evhttp_find_header( headers, "Content-Type" );
     const char * in = (const char*) EVBUFFER_DATA( body );
-    size_t inlen = EVBUFFER_LENGTH( body );
+    size_t inlen = evbuffer_get_length( body );
 
     const char * boundary_key = "boundary=";
     const char * boundary_key_begin = strstr( content_type, boundary_key );
@@ -277,7 +278,7 @@ handle_upload( struct evhttp_request * req,
                 tr_bencToBuf( &top, TR_FMT_JSON, json );
                 tr_rpc_request_exec_json( server->session,
                                           EVBUFFER_DATA( json ),
-                                          EVBUFFER_LENGTH( json ),
+                                          evbuffer_get_length( json ),
                                           NULL, NULL );
                 evbuffer_free( json );
             }
@@ -327,14 +328,11 @@ mimetype_guess( const char * path )
 }
 
 static void
-add_response( struct evhttp_request * req,
-              struct tr_rpc_server *  server,
-              struct evbuffer *       out,
-              const void *            content,
-              size_t                  content_len )
+add_response( struct evhttp_request * req, struct tr_rpc_server * server,
+              struct evbuffer * out, struct evbuffer * content )
 {
 #ifndef HAVE_ZLIB
-    evbuffer_add( out, content, content_len );
+    evbuffer_add_buffer( out, content );
 #else
     const char * key = "Accept-Encoding";
     const char * encoding = evhttp_find_header( req->input_headers, key );
@@ -342,14 +340,14 @@ add_response( struct evhttp_request * req,
 
     if( !do_compress )
     {
-        evbuffer_add( out, content, content_len );
+        evbuffer_add_buffer( out, content );
     }
     else
     {
         int state;
-
-        /* FIXME(libevent2): this won't compile under libevent2.
-           but we can use evbuffer_reserve_space() + evbuffer_commit_space() instead */
+        struct evbuffer_iovec iovec[1];
+        void * content_ptr = evbuffer_pullup( content, -1 );
+        const size_t content_len = evbuffer_get_length( content );
 
         if( !server->isStreamInitialized )
         {
@@ -370,36 +368,36 @@ add_response( struct evhttp_request * req,
             deflateInit2( &server->stream, compressionLevel, Z_DEFLATED, 15+16, 8, Z_DEFAULT_STRATEGY );
         }
 
-        server->stream.next_in = (Bytef*) content;
+        server->stream.next_in = content_ptr;
         server->stream.avail_in = content_len;
 
         /* allocate space for the raw data and call deflate() just once --
          * we won't use the deflated data if it's longer than the raw data,
          * so it's okay to let deflate() run out of output buffer space */
-        evbuffer_expand( out, content_len );
-        server->stream.next_out = EVBUFFER_DATA( out );
-        server->stream.avail_out = content_len;
-
+        evbuffer_reserve_space( out, content_len, iovec, 1 );
+        server->stream.next_out = iovec[0].iov_base;
+        server->stream.avail_out = iovec[0].iov_len;
         state = deflate( &server->stream, Z_FINISH );
 
         if( state == Z_STREAM_END )
         {
-            EVBUFFER_LENGTH( out ) = content_len - server->stream.avail_out;
+            iovec[0].iov_len -= server->stream.avail_out;
 
 #if 0
             fprintf( stderr, "compressed response is %.2f of original (raw==%zu bytes; compressed==%zu)\n",
-                             (double)EVBUFFER_LENGTH(out)/content_len,
-                             content_len, EVBUFFER_LENGTH(out) );
+                             (double)evbuffer_get_length(out)/content_len,
+                             content_len, evbuffer_get_length(out) );
 #endif
             evhttp_add_header( req->output_headers,
                                "Content-Encoding", "gzip" );
         }
         else
         {
-            evbuffer_drain( out, EVBUFFER_LENGTH( out ) );
-            evbuffer_add( out, content, content_len );
+            memcpy( iovec[0].iov_base, content_ptr, content_len );
+            iovec[0].iov_len = content_len;
         }
 
+        evbuffer_commit_space( out, iovec, 1 );
         deflateReset( &server->stream );
     }
 #endif
@@ -428,13 +426,16 @@ serve_file( struct evhttp_request * req,
     }
     else
     {
-        size_t content_len;
-        uint8_t * content;
+        void * file;
+        size_t file_len;
+        struct evbuffer * content = evbuffer_new( );
         const int error = errno;
 
         errno = 0;
-        content_len = 0;
-        content = tr_loadFile( filename, &content_len );
+        file_len = 0;
+        file = tr_loadFile( filename, &file_len );
+        content = evbuffer_new( );
+        evbuffer_add_reference( content, file, file_len, evbuffer_ref_cleanup_tr_free, file );
 
         if( errno )
         {
@@ -452,12 +453,13 @@ serve_file( struct evhttp_request * req,
             evhttp_add_header( req->output_headers, "Content-Type", mimetype_guess( filename ) );
             add_time_header( req->output_headers, "Date", now );
             add_time_header( req->output_headers, "Expires", now+(24*60*60) );
-            add_response( req, server, out, content, content_len );
+            add_response( req, server, out, content );
             evhttp_send_reply( req, HTTP_OK, "OK", out );
 
             evbuffer_free( out );
-            tr_free( content );
         }
+
+        evbuffer_free( content );
     }
 }
 
@@ -512,17 +514,15 @@ struct rpc_response_data
     struct tr_rpc_server  * server;
 };
 
-/* FIXME(libevent2): make "response" an evbuffer and remove response_len */
 static void
 rpc_response_func( tr_session      * session UNUSED,
-                   const char      * response,
-                   size_t            response_len,
+                   struct evbuffer * response,
                    void            * user_data )
 {
     struct rpc_response_data * data = user_data;
     struct evbuffer * buf = evbuffer_new( );
 
-    add_response( data->req, data->server, buf, response, response_len );
+    add_response( data->req, data->server, buf, response );
     evhttp_add_header( data->req->output_headers,
                            "Content-Type", "application/json; charset=UTF-8" );
     evhttp_send_reply( data->req, HTTP_OK, "OK", buf );
@@ -551,7 +551,7 @@ handle_rpc( struct evhttp_request * req,
     {
         tr_rpc_request_exec_json( server->session,
                                   EVBUFFER_DATA( req->input_buffer ),
-                                  EVBUFFER_LENGTH( req->input_buffer ),
+                                  evbuffer_get_length( req->input_buffer ),
                                   rpc_response_func, data );
     }
 

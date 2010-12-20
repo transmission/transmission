@@ -12,7 +12,7 @@
 
 #include <string.h> /* strlen */
 
-#include <event.h>
+#include <event2/buffer.h>
 
 #include "transmission.h"
 #include "inout.h"
@@ -97,7 +97,6 @@ static char*
 makeURL( tr_webseed *    w,
          const tr_file * file )
 {
-    char *            ret;
     struct evbuffer * out = evbuffer_new( );
     const char *      url = w->url;
     const size_t      url_len = strlen( url );
@@ -108,9 +107,7 @@ makeURL( tr_webseed *    w,
     if( url[url_len - 1] == '/' && file->name )
         tr_http_escape( out, file->name, strlen(file->name), FALSE );
 
-    ret = tr_strndup( EVBUFFER_DATA( out ), EVBUFFER_LENGTH( out ) );
-    evbuffer_free( out );
-    return ret;
+    return evbuffer_free_to_str( out );
 }
 
 static void requestNextChunk( tr_webseed * w );
@@ -141,11 +138,11 @@ webResponseFunc( tr_session    * session,
             tr_rcTransferred( &w->rateDown, response_byte_count );
         }
 
-        if( EVBUFFER_LENGTH( w->content ) < w->byteCount )
+        if( evbuffer_get_length( w->content ) < w->byteCount )
             requestNextChunk( w );
         else {
-            tr_ioWrite( tor, w->pieceIndex, w->pieceOffset, w->byteCount, EVBUFFER_DATA(w->content) );
-            evbuffer_drain( w->content, EVBUFFER_LENGTH( w->content ) );
+            tr_ioWrite( tor, w->pieceIndex, w->pieceOffset, w->byteCount, evbuffer_pullup( w->content, -1 ) );
+            evbuffer_drain( w->content, evbuffer_get_length( w->content ) );
             w->busy = 0;
             if( w->dead )
                 tr_webseedFree( w );
@@ -165,7 +162,7 @@ requestNextChunk( tr_webseed * w )
     if( tor != NULL )
     {
         const tr_info * inf = tr_torrentInfo( tor );
-        const uint32_t have = EVBUFFER_LENGTH( w->content );
+        const uint32_t have = evbuffer_get_length( w->content );
         const uint32_t left = w->byteCount - have;
         const uint32_t pieceOffset = w->pieceOffset + have;
         tr_file_index_t fileIndex;
@@ -206,7 +203,7 @@ tr_webseedAddRequest( tr_webseed  * w,
         w->pieceIndex = pieceIndex;
         w->pieceOffset = pieceOffset;
         w->byteCount = byteCount;
-        evbuffer_drain( w->content, EVBUFFER_LENGTH( w->content ) );
+        evbuffer_drain( w->content, evbuffer_get_length( w->content ) );
         requestNextChunk( w );
         ret = TR_ADDREQ_OK;
     }

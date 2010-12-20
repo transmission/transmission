@@ -17,7 +17,8 @@
 #endif
 
 #include <curl/curl.h>
-#include <event.h>
+
+#include <event2/buffer.h>
 
 #include "transmission.h"
 #include "list.h"
@@ -192,8 +193,8 @@ task_finish_func( void * vtask )
     if( task->done_func != NULL )
         task->done_func( task->session,
                          task->code,
-                         EVBUFFER_DATA( task->response ),
-                         EVBUFFER_LENGTH( task->response ),
+                         evbuffer_pullup( task->response, -1 ),
+                         evbuffer_get_length( task->response ),
                          task->done_func_user_data );
 
     task_free( task );
@@ -350,7 +351,7 @@ tr_webThreadFunc( void * vsession )
                 curl_easy_getinfo( e, CURLINFO_RESPONSE_CODE, &task->code );
                 curl_multi_remove_handle( multi, e );
                 curl_easy_cleanup( e );
-/*fprintf( stderr, "removing a completed task.. taskCount is now %d (response code: %d, response len: %d)\n", taskCount, (int)task->code, (int)EVBUFFER_LENGTH(task->response) );*/
+/*fprintf( stderr, "removing a completed task.. taskCount is now %d (response code: %d, response len: %d)\n", taskCount, (int)task->code, (int)evbuffer_get_length(task->response) );*/
                 tr_runInEventThread( task->session, task_finish_func, task );
                 --taskCount;
             }

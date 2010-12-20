@@ -12,7 +12,7 @@
 
 #include <stdio.h>
 
-#include <event.h> /* evbuffer */
+#include <event2/buffer.h>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/bencode.h>
@@ -156,9 +156,7 @@ replaceSubstr( const char * str, const char * in, const char * out )
         str = walk + inlen;
     }
 
-    walk = tr_strndup( EVBUFFER_DATA( buf ), EVBUFFER_LENGTH( buf ) );
-    evbuffer_free( buf );
-    return walk;
+    return evbuffer_free_to_str( buf );
 }
 
 static tr_bool

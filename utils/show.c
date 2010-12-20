@@ -16,7 +16,7 @@
 #define CURL_DISABLE_TYPECHECK /* otherwise -Wunreachable-code goes insane */
 #include <curl/curl.h>
 
-#include <event.h> /* struct evbuffer */
+#include <event2/buffer.h>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/bencode.h>
@@ -221,8 +221,8 @@ doScrape( const tr_info * inf )
                 tr_benc top;
                 tr_benc * files;
                 tr_bool matched = FALSE;
-                const char * begin = (const char*) EVBUFFER_DATA( buf );
-                const char * end = begin + EVBUFFER_LENGTH( buf );
+                const char * begin = (const char*) evbuffer_pullup( buf, -1 );
+                const char * end = begin + evbuffer_get_length( buf );
 
                 if( !tr_bencParse( begin, end, &top, NULL ) )
                 {

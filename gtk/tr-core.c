@@ -33,6 +33,8 @@
  #include <dbus/dbus-glib.h>
 #endif
 
+#include <event2/buffer.h>
+
 #include <libtransmission/transmission.h>
 #include <libtransmission/bencode.h>
 #include <libtransmission/rpcimpl.h>
@@ -1597,9 +1599,9 @@ readResponseIdle( void * vresponse )
 {
     tr_benc top;
     int64_t intVal;
-    GByteArray * response = vresponse;
+    struct evbuffer * response = vresponse;
 
-    tr_jsonParse( NULL, response->data, response->len, &top, NULL );
+    tr_jsonParse( NULL, evbuffer_pullup( response, -1 ), evbuffer_get_length( response ), &top, NULL );
 
     if( tr_bencDictFindInt( &top, "tag", &intVal ) )
     {
@@ -1613,22 +1615,18 @@ readResponseIdle( void * vresponse )
     }
 
     tr_bencFree( &top );
-    g_byte_array_free( response, TRUE );
+    evbuffer_free( response );
     return FALSE;
 }
 
 static void
 readResponse( tr_session  * session UNUSED,
-              const char  * response,
-              size_t        response_len,
+              struct evbuffer * response,
               void        * unused UNUSED )
 {
-    GByteArray * bytes = g_byte_array_new( );
-#ifdef DEBUG_RPC
-    g_message( "response: [%*.*s]", (int)response_len, (int)response_len, response );
-#endif
-    g_byte_array_append( bytes, (const uint8_t*)response, response_len );
-    gtr_idle_add( readResponseIdle, bytes );
+    struct evbuffer * buf = evbuffer_new( );
+    evbuffer_add_buffer( buf, response );
+    gtr_idle_add( readResponseIdle, buf );
 }
 
 static void

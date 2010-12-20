@@ -126,8 +126,6 @@ piperead( int s, char *buf, int len )
 
 #include <unistd.h>
 
-#include <event.h>
-
 #include "transmission.h"
 #include "platform.h"
 #include "trevent.h"

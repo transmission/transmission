@@ -22,11 +22,11 @@ extern "C" {
 ***/
 
 struct tr_benc;
+struct evbuffer;
 
 /* FIXME(libevent2): make "response" an evbuffer and remove response_len */
 typedef void( *tr_rpc_response_func )( tr_session      * session,
-                                       const char      * response,
-                                       size_t            response_len,
+                                       struct evbuffer * response,
                                        void            * user_data );
 /* http://www.json.org/ */
 void tr_rpc_request_exec_json( tr_session            * session,
