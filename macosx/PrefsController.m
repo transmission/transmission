@@ -409,6 +409,9 @@ tr_session * fHandle;
             [fPortStatusField setStringValue: NSLocalizedString(@"Port check site is down", "Preferences -> Network -> port status")];
             [fPortStatusImage setImage: [NSImage imageNamed: @"YellowDot.png"]];
             break;
+        default:
+            NSAssert1(NO, @"Port checker returned invalid status: %d", [fPortChecker status]);
+            return;
     }
     [fPortChecker release];
     fPortChecker = nil;
