@@ -9,25 +9,25 @@
 /* config.h.in.  Generated from configure.in by autoheader.  */
 
 /* Define if libevent should build without support for a debug mode */
-/* #under _EVENT_DISABLE_DEBUG_MODE */
+/* #undef _EVENT_DISABLE_DEBUG_MODE */
 
 /* Define if libevent should not allow replacing the mm functions */
-/* #under _EVENT_DISABLE_MM_REPLACEMENT */
+/* #undef _EVENT_DISABLE_MM_REPLACEMENT */
 
 /* Define if libevent should not be compiled with thread support */
-/* #under _EVENT_DISABLE_THREAD_SUPPORT */
+/* #undef _EVENT_DISABLE_THREAD_SUPPORT */
 
 /* Define to 1 if you have the `arc4random' function. */
 #define _EVENT_HAVE_ARC4RANDOM 1
 
 /* Define to 1 if you have the `arc4random_buf' function. */
-/* #under _EVENT_HAVE_ARC4RANDOM_BUF */
+/* #undef _EVENT_HAVE_ARC4RANDOM_BUF */
 
 /* Define to 1 if you have the <arpa/inet.h> header file. */
 #define _EVENT_HAVE_ARPA_INET_H 1
 
 /* Define to 1 if you have the `clock_gettime' function. */
-/* #under _EVENT_HAVE_CLOCK_GETTIME */
+/* #undef _EVENT_HAVE_CLOCK_GETTIME */
 
 /* Define to 1 if you have the declaration of `CTL_KERN', and to 0 if you
    don't. */
@@ -46,22 +46,22 @@
 #define _EVENT_HAVE_DECL_RANDOM_UUID 0
 
 /* Define if /dev/poll is available */
-/* #under _EVENT_HAVE_DEVPOLL */
+/* #undef _EVENT_HAVE_DEVPOLL */
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #define _EVENT_HAVE_DLFCN_H 1
 
 /* Define if your system supports the epoll system calls */
-/* #under _EVENT_HAVE_EPOLL */
+/* #undef _EVENT_HAVE_EPOLL */
 
 /* Define to 1 if you have the `epoll_ctl' function. */
-/* #under _EVENT_HAVE_EPOLL_CTL */
+/* #undef _EVENT_HAVE_EPOLL_CTL */
 
 /* Define to 1 if you have the `eventfd' function. */
-/* #under _EVENT_HAVE_EVENTFD */
+/* #undef _EVENT_HAVE_EVENTFD */
 
 /* Define if your system supports event ports */
-/* #under _EVENT_HAVE_EVENT_PORTS */
+/* #undef _EVENT_HAVE_EVENT_PORTS */
 
 /* Define to 1 if you have the `fcntl' function. */
 #define _EVENT_HAVE_FCNTL 1
@@ -82,16 +82,16 @@
 #define _EVENT_HAVE_GETEUID 1
 
 /* Define this if you have any gethostbyname_r() */
-/* #under _EVENT_HAVE_GETHOSTBYNAME_R */
+/* #undef _EVENT_HAVE_GETHOSTBYNAME_R */
 
 /* Define this if gethostbyname_r takes 3 arguments */
-/* #under _EVENT_HAVE_GETHOSTBYNAME_R_3_ARG */
+/* #undef _EVENT_HAVE_GETHOSTBYNAME_R_3_ARG */
 
 /* Define this if gethostbyname_r takes 5 arguments */
-/* #under _EVENT_HAVE_GETHOSTBYNAME_R_5_ARG */
+/* #undef _EVENT_HAVE_GETHOSTBYNAME_R_5_ARG */
 
 /* Define this if gethostbyname_r takes 6 arguments */
-/* #under _EVENT_HAVE_GETHOSTBYNAME_R_6_ARG */
+/* #undef _EVENT_HAVE_GETHOSTBYNAME_R_6_ARG */
 
 /* Define to 1 if you have the `getnameinfo' function. */
 #define _EVENT_HAVE_GETNAMEINFO 1
@@ -136,7 +136,7 @@
 #define _EVENT_HAVE_NETDB_H 1
 
 /* Define to 1 if you have the <netinet/in6.h> header file. */
-/* #under _EVENT_HAVE_NETINET_IN6_H */
+/* #undef _EVENT_HAVE_NETINET_IN6_H */
 
 /* Define to 1 if you have the <netinet/in.h> header file. */
 #define _EVENT_HAVE_NETINET_IN_H 1
@@ -154,13 +154,13 @@
 #define _EVENT_HAVE_POLL_H 1
 
 /* Define to 1 if you have the `port_create' function. */
-/* #under _EVENT_HAVE_PORT_CREATE */
+/* #undef _EVENT_HAVE_PORT_CREATE */
 
 /* Define to 1 if you have the <port.h> header file. */
-/* #under _EVENT_HAVE_PORT_H */
+/* #undef _EVENT_HAVE_PORT_H */
 
 /* Define if you have POSIX threads libraries and header files. */
-/* #under _EVENT_HAVE_PTHREAD */
+/* #undef _EVENT_HAVE_PTHREAD */
 
 /* Define if we have pthreads on this system */
 #define _EVENT_HAVE_PTHREADS 1
@@ -190,7 +190,7 @@
 #define _EVENT_HAVE_SIGNAL 1
 
 /* Define to 1 if you have the `splice' function. */
-/* #under _EVENT_HAVE_SPLICE */
+/* #undef _EVENT_HAVE_SPLICE */
 
 /* Define to 1 if you have the <stdarg.h> header file. */
 #define _EVENT_HAVE_STDARG_H 1
@@ -229,10 +229,10 @@
 #define _EVENT_HAVE_STRUCT_IN6_ADDR 1
 
 /* Define to 1 if `s6_addr16' is a member of `struct in6_addr'. */
-/* #under _EVENT_HAVE_STRUCT_IN6_ADDR_S6_ADDR16 */
+/* #undef _EVENT_HAVE_STRUCT_IN6_ADDR_S6_ADDR16 */
 
 /* Define to 1 if `s6_addr32' is a member of `struct in6_addr'. */
-/* #under _EVENT_HAVE_STRUCT_IN6_ADDR_S6_ADDR32 */
+/* #undef _EVENT_HAVE_STRUCT_IN6_ADDR_S6_ADDR32 */
 
 /* Define to 1 if the system has the type `struct sockaddr_in6'. */
 #define _EVENT_HAVE_STRUCT_SOCKADDR_IN6 1
@@ -247,16 +247,16 @@
 #define _EVENT_HAVE_STRUCT_SOCKADDR_STORAGE_SS_FAMILY 1
 
 /* Define to 1 if `__ss_family' is a member of `struct sockaddr_storage'. */
-/* #under _EVENT_HAVE_STRUCT_SOCKADDR_STORAGE___SS_FAMILY */
+/* #undef _EVENT_HAVE_STRUCT_SOCKADDR_STORAGE___SS_FAMILY */
 
 /* Define to 1 if you have the <sys/devpoll.h> header file. */
-/* #under _EVENT_HAVE_SYS_DEVPOLL_H */
+/* #undef _EVENT_HAVE_SYS_DEVPOLL_H */
 
 /* Define to 1 if you have the <sys/epoll.h> header file. */
-/* #under _EVENT_HAVE_SYS_EPOLL_H */
+/* #undef _EVENT_HAVE_SYS_EPOLL_H */
 
 /* Define to 1 if you have the <sys/eventfd.h> header file. */
-/* #under _EVENT_HAVE_SYS_EVENTFD_H */
+/* #undef _EVENT_HAVE_SYS_EVENTFD_H */
 
 /* Define to 1 if you have the <sys/event.h> header file. */
 #define _EVENT_HAVE_SYS_EVENT_H 1
@@ -277,7 +277,7 @@
 #define _EVENT_HAVE_SYS_SELECT_H 1
 
 /* Define to 1 if you have the <sys/sendfile.h> header file. */
-/* #under _EVENT_HAVE_SYS_SENDFILE_H */
+/* #undef _EVENT_HAVE_SYS_SENDFILE_H */
 
 /* Define to 1 if you have the <sys/socket.h> header file. */
 #define _EVENT_HAVE_SYS_SOCKET_H 1
@@ -372,7 +372,7 @@
 
 /* Define to necessary symbol if this constant uses a non-standard name on
    your system. */
-/* #under _EVENT_PTHREAD_CREATE_JOINABLE */
+/* #undef _EVENT_PTHREAD_CREATE_JOINABLE */
 
 /* The size of `int', as computed by sizeof. */
 #define _EVENT_SIZEOF_INT 4
@@ -405,26 +405,26 @@
 #define _EVENT_VERSION "2.0.10-stable"
 
 /* Define to appropriate substitue if compiler doesnt have __func__ */
-/* #under _EVENT___func__ */
+/* #undef _EVENT___func__ */
 
 /* Define to empty if `const' does not conform to ANSI C. */
-/* #under _EVENT_const */
+/* #undef _EVENT_const */
 
 /* Define to `__inline__' or `__inline' if that's what the C compiler
    calls it, or to nothing if 'inline' is not supported under any name.  */
 #ifndef __cplusplus
-/* #under _EVENT_inline */
+/* #undef _EVENT_inline */
 #endif
 
 /* Define to `int' if <sys/types.h> does not define. */
-/* #under _EVENT_pid_t */
+/* #undef _EVENT_pid_t */
 
 /* Define to `unsigned int' if <sys/types.h> does not define. */
-/* #under _EVENT_size_t */
+/* #undef _EVENT_size_t */
 
 /* Define to unsigned int if you dont have it */
-/* #under _EVENT_socklen_t */
+/* #undef _EVENT_socklen_t */
 
 /* Define to `int' if <sys/types.h> does not define. */
-/* #under _EVENT_ssize_t */
+/* #undef _EVENT_ssize_t */
 #endif
