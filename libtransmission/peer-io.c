@@ -269,8 +269,6 @@ tr_evbuffer_write( tr_peerIo * io, int fd, size_t howmuch )
     int e;
     int n;
     char errstr[256];
-    const size_t len = evbuffer_get_length( io->outbuf );
-    const int vecCount = evbuffer_peek( io->outbuf, len, NULL, NULL, 0 );
 
     EVUTIL_SET_SOCKET_ERROR( 0 );
     n = evbuffer_write_atmost( io->outbuf, fd, howmuch );
