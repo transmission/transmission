@@ -156,7 +156,12 @@ tr_notify_added( const char * name )
     if( pref_flag_get( PREF_KEY_SHOW_DESKTOP_NOTIFICATION ) )
     {
         NotifyNotification * n = notify_notification_new(
-            _( "Torrent Added" ), name, NULL, NULL );
+            _( "Torrent Added" ), name, NULL
+/* the fourth argument was removed in libnotify 0.7.0 */
+#if !defined(NOTIFY_VERSION_MINOR) || (NOTIFY_VERSION_MAJOR == 0 && NOTIFY_VERSION_MINOR < 7)
+	    , NULL
+#endif
+	    );
         addIcon( n );
         notify_notification_set_timeout( n, NOTIFY_EXPIRES_DEFAULT );
         notify_notification_show( n, NULL );

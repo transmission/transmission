@@ -1745,18 +1745,18 @@ tr_core_torrent_changed( TrCore * core, int id )
     while( gtk_tree_model_iter_next( model, &iter ) );
 }
 
-int
+size_t
 tr_core_get_torrent_count( TrCore * core )
 {
     return gtk_tree_model_iter_n_children( tr_core_model( core ), NULL );
 }
 
-int
+size_t
 tr_core_get_active_torrent_count( TrCore * core )
 {
     GtkTreeIter iter;
     GtkTreeModel * model = tr_core_model( core );
-    int activeCount = 0;
+    size_t activeCount = 0;
 
     if( gtk_tree_model_get_iter_first( model, &iter ) ) do
     {
