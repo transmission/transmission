@@ -3488,7 +3488,7 @@ getPeerCandidates( tr_session * session, int * candidateCount )
     /* leave 5% of connection slots for incoming connections -- ticket #2609 */
     const int maxCandidates = tr_sessionGetPeerLimit( session ) * 0.95;
 
-    /* don't start any new handshakes if we have enough peers */
+    /* don't start any new handshakes if we're full up */
     n = 0;
     tor= NULL;
     while(( tor = tr_torrentNext( session, tor )))
@@ -3510,8 +3510,6 @@ getPeerCandidates( tr_session * session, int * candidateCount )
     while(( tor = tr_torrentNext( session, tor )))
     {
         int i, nAtoms;
-        tr_bool full_up;
-        tr_bool full_dn;
         struct peer_atom ** atoms;
 
         if( !tor->torrentPeers->isRunning )
@@ -3522,11 +3520,7 @@ getPeerCandidates( tr_session * session, int * candidateCount )
             continue;
 
         /* if we've already got enough speed in this torrent... */
-        full_up = isBandwidthMaxedOut( tor->bandwidth, now_msec, TR_UP );
-        full_dn = isBandwidthMaxedOut( tor->bandwidth, now_msec, TR_DOWN );
-        if( full_up && full_dn )
-            continue;
-        if( full_up && tr_torrentIsSeed( tor ) )
+        if( tr_torrentIsSeed( tor ) && isBandwidthMaxedOut( tor->bandwidth, now_msec, TR_UP ) )
             continue;
 
         atoms = (struct peer_atom**) tr_ptrArrayPeek( &tor->torrentPeers->pool, &nAtoms );
