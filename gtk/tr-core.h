@@ -83,9 +83,9 @@ GtkTreeModel * tr_core_model( TrCore * self );
 
 tr_session *   tr_core_session( TrCore * self );
 
-int            tr_core_get_active_torrent_count( TrCore * self );
+size_t         tr_core_get_active_torrent_count( TrCore * self );
 
-int            tr_core_get_torrent_count( TrCore * self );
+size_t         tr_core_get_torrent_count( TrCore * self );
 
 /******
 *******

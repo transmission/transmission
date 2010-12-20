@@ -85,7 +85,7 @@ struct cbdata
     GSList            * dupqueue;
     GSList            * details;
     GtkTreeSelection  * sel;
-    GtkWidget         * quit_dialog;
+    gpointer            quit_dialog;
 };
 
 /**
@@ -336,8 +336,8 @@ refreshActions( gpointer gdata )
     }
 
     {
-        const int total = tr_core_get_torrent_count( data->core );
-        const int active = tr_core_get_active_torrent_count( data->core );
+        const size_t total = tr_core_get_torrent_count( data->core );
+        const size_t active = tr_core_get_active_torrent_count( data->core );
         action_sensitize( "pause-all-torrents", active != 0 );
         action_sensitize( "start-all-torrents", active != total );
     }
@@ -836,13 +836,8 @@ toggleMainWindow( struct cbdata * cbdata )
 static gboolean
 shouldConfirmBeforeExiting( struct cbdata * data )
 {
-    if( !pref_flag_get( PREF_KEY_ASKQUIT ) )
-        return FALSE;
-    else {
-        struct counts_data counts;
-        getTorrentCounts( data, &counts );
-        return counts.activeCount > 0;
-    }
+    return pref_flag_get( PREF_KEY_ASKQUIT )
+        && tr_core_get_active_torrent_count( data->core );
 }
 
 static void
@@ -851,8 +846,10 @@ maybeaskquit( struct cbdata * cbdata )
     if( !shouldConfirmBeforeExiting( cbdata ) )
         wannaquit( cbdata );
     else {
-        if( cbdata->quit_dialog == NULL )
+        if( cbdata->quit_dialog == NULL ) {
             cbdata->quit_dialog = askquit( cbdata->core, cbdata->wind, wannaquit, cbdata );
+            g_object_add_weak_pointer( G_OBJECT( cbdata->quit_dialog ), &cbdata->quit_dialog );
+        }
         gtk_window_present( GTK_WINDOW( cbdata->quit_dialog ) );
     }
 }

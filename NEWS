@@ -1,3 +1,13 @@
+=== Transmission 2.14 (xxxx/yy/zz) ===
+Backport of bugfixes for a maintenance 2.0x release.
+==== All Platforms ====
+  * backport r11530 + r11531 from #3826 "don't use pread() or pwrite() on uClibc"
+==== GTK+ ====
+  * backport r11547 from #3837 "Dangling pointer after quit cancel"
+  * backport r11546 from #3838 "Unselected active torrents not counted for quit check"
+  * backport r11545 from #3834 "'Origin' field in Torrent Properties dialog should be ellipsized"
+  * backport r11511 from #3719 "handle API changes to libnotify"
+
 === Transmission 2.13 (2010/12/09) ===
 [http://trac.transmissionbt.com/query?milestone=2.13&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====

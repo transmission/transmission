@@ -199,6 +199,12 @@ preallocateFileFull( const char * filename, uint64_t length )
 /* Like pread and pwrite, except that the position is undefined afterwards.
    And of course they are not thread-safe. */
 
+/* https://trac.transmissionbt.com/ticket/3826 */
+#ifdef __UCLIBC__
+ #undef HAVE_PREAD
+ #undef HAVE_PWRITE
+#endif
+
 #ifdef SYS_DARWIN
  #define HAVE_PREAD
  #define HAVE_PWRITE
