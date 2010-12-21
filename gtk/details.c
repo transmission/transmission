@@ -2320,7 +2320,7 @@ details_free( gpointer gdata )
 }
 
 GtkWidget*
-torrent_inspector_new( GtkWindow * parent, TrCore * core )
+gtr_torrent_details_dialog_new( GtkWindow * parent, TrCore * core )
 {
     GtkWidget * d, * n, * w, * l;
     struct DetailsImpl * di = g_new0( struct DetailsImpl, 1 );
@@ -2376,7 +2376,7 @@ torrent_inspector_new( GtkWindow * parent, TrCore * core )
 }
 
 void
-torrent_inspector_set_torrents( GtkWidget * w, GSList * ids )
+gtr_torrent_details_dialog_set_torrents( GtkWidget * w, GSList * ids )
 {
     struct DetailsImpl * di = g_object_get_data( G_OBJECT( w ), DETAILS_KEY );
     const int len = g_slist_length( ids );

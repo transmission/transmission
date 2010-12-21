@@ -10,15 +10,15 @@
  * $Id$
  */
 
-#ifndef __TR_NOTIFY_H__
-#define __TR_NOTIFY_H__
+#ifndef GTR_NOTIFY_H
+#define GTR_NOTIFY_H
 
 #include "tr-torrent.h"
 
-void tr_notify_init( void );
+void gtr_notify_init( void );
 
-void tr_notify_send( TrTorrent * tor );
+void gtr_notify_send( TrTorrent * tor );
 
-void tr_notify_added( const char * name );
+void gtr_notify_added( const char * name );
 
 #endif

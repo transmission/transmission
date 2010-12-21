@@ -1232,8 +1232,7 @@ networkPage( GObject * core )
 ****/
 
 GtkWidget *
-tr_prefs_dialog_new( GObject *   core,
-                     GtkWindow * parent )
+gtr_prefs_dialog_new( GtkWindow * parent, GObject * core )
 {
     GtkWidget * d;
     GtkWidget * n;

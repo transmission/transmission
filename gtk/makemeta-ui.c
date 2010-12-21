@@ -421,7 +421,7 @@ on_drag_data_received( GtkWidget         * widget           UNUSED,
 }
 
 GtkWidget*
-make_meta_ui( GtkWindow  * parent, TrCore * core )
+gtr_torrent_creation_dialog_new( GtkWindow  * parent, TrCore * core )
 {
     int row = 0;
     const char * str;
@@ -523,5 +523,6 @@ make_meta_ui( GtkWindow  * parent, TrCore * core )
     gtk_drag_dest_add_uri_targets( d );
     g_signal_connect( d, "drag-data-received", G_CALLBACK( on_drag_data_received ), ui );
 
+    gtk_widget_show_all( t );
     return d;
 }

@@ -24,31 +24,20 @@
 #define ICON_NAME "transmission"
 
 #ifndef STATUS_ICON_SUPPORTED
-
-gpointer
-tr_icon_new( TrCore * core )
-{
-    return NULL;
-}
-
-void
-tr_icon_refresh( gpointer vicon UNUSED )
-{
-}
-
+gpointer gtr_icon_new( TrCore * core UNUSED ) { return NULL; }
+void gtr_icon_refresh( gpointer vicon UNUSED ) { } 
 #else
 
 #ifdef HAVE_LIBAPPINDICATOR
 void
-tr_icon_refresh( gpointer vindicator UNUSED )
+gtr_icon_refresh( gpointer vindicator UNUSED )
 {
 }
 #else
 static void
-activated( GtkStatusIcon   * self      UNUSED,
-           gpointer          user_data UNUSED )
+activated( GtkStatusIcon * self UNUSED, gpointer user_data UNUSED )
 {
-    action_activate ( "toggle-main-window" );
+    gtr_action_activate( "toggle-main-window" );
 }
 
 static void
@@ -57,7 +46,7 @@ popup( GtkStatusIcon *       self,
        guint                 when,
        gpointer         data UNUSED )
 {
-    GtkWidget * w = action_get_widget( "/icon-popup" );
+    GtkWidget * w = gtr_action_get_widget( "/icon-popup" );
 
     gtk_menu_popup ( GTK_MENU( w ), NULL, NULL,
                      gtk_status_icon_position_menu,
@@ -65,7 +54,7 @@ popup( GtkStatusIcon *       self,
 }
 
 void
-tr_icon_refresh( gpointer vicon )
+gtr_icon_refresh( gpointer vicon )
 {
     double KBps;
     double limit;
@@ -147,20 +136,20 @@ getIconName( void )
 
 #ifdef HAVE_LIBAPPINDICATOR
 gpointer
-tr_icon_new( TrCore * core)
+gtr_icon_new( TrCore * core)
 {
     GtkWidget * w;
     const char * icon_name = getIconName( );
     AppIndicator * indicator = app_indicator_new( ICON_NAME, icon_name, APP_INDICATOR_CATEGORY_SYSTEM_SERVICES );
     app_indicator_set_status( indicator, APP_INDICATOR_STATUS_ACTIVE );
-    w = action_get_widget( "/icon-popup" );
+    w = gtr_action_get_widget( "/icon-popup" );
     app_indicator_set_menu( indicator, GTK_MENU ( w ) );
     g_object_set_data( G_OBJECT( indicator ), "tr-core", core );
     return indicator;
 }
 #else
 gpointer
-tr_icon_new( TrCore * core )
+gtr_icon_new( TrCore * core )
 {
     const char * icon_name = getIconName( );
     GtkStatusIcon * icon = gtk_status_icon_new_from_icon_name( icon_name );

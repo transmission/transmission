@@ -22,8 +22,8 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#ifndef TG_CONF_H
-#define TG_CONF_H
+#ifndef GTR_CONFIG_H
+#define GTR_CONFIG_H
 
 #include <inttypes.h>
 #include <libtransmission/transmission.h>
@@ -71,4 +71,4 @@ gboolean cf_init( const char *confdir,
 gboolean cf_lock( gtr_lockfile_state_t  * tr_state,
                   char                 ** errstr );
 
-#endif /* TG_CONF_H */
+#endif /* GTR_CONFIG_H */

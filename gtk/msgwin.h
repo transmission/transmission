@@ -10,9 +10,9 @@
  * $Id$
  */
 
-#ifndef TG_MSGWIN_H
-#define TG_MSGWIN_H
+#ifndef GTR_MSGWIN_H
+#define GTR_MSGWIN_H
 
-GtkWidget * msgwin_new( TrCore * core, GtkWindow * parent );
+GtkWidget * gtr_message_log_window_new( TrCore * core, GtkWindow * parent );
 
 #endif

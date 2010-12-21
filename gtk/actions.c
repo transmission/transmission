@@ -31,15 +31,13 @@
 
 #define UNUSED G_GNUC_UNUSED
 
-static TrCore *         myCore = NULL;
-
+static TrCore * myCore = NULL;
 static GtkActionGroup * myGroup = NULL;
 
 static void
-action_cb( GtkAction * a,
-           gpointer    user_data )
+action_cb( GtkAction * a, gpointer user_data )
 {
-    doAction ( gtk_action_get_name( a ), user_data );
+    gtr_actions_handler( gtk_action_get_name( a ), user_data );
 }
 
 #if !GTK_CHECK_VERSION( 2, 8, 0 )
@@ -193,14 +191,13 @@ register_my_icons( void )
 static GtkUIManager * myUIManager = NULL;
 
 void
-actions_set_core( TrCore * core )
+gtr_actions_set_core( TrCore * core )
 {
     myCore = core;
 }
 
 void
-actions_init( GtkUIManager * ui_manager,
-              gpointer       callback_user_data )
+gtr_actions_init( GtkUIManager * ui_manager, gpointer callback_user_data )
 {
     int              i, n;
     int              active;
@@ -292,7 +289,7 @@ get_action( const char* name )
 }
 
 void
-action_activate( const char * name )
+gtr_action_activate( const char * name )
 {
     GtkAction * action = get_action( name );
 
@@ -301,8 +298,7 @@ action_activate( const char * name )
 }
 
 void
-action_sensitize( const char * name,
-                  gboolean     b )
+gtr_action_set_sensitive( const char * name, gboolean b )
 {
     GtkAction * action = get_action( name );
 
@@ -311,7 +307,7 @@ action_sensitize( const char * name,
 }
 
 void
-action_set_important( const char * name, gboolean b )
+gtr_action_set_important( const char * name, gboolean b )
 {
     GtkAction * action = get_action( name );
 
@@ -320,8 +316,7 @@ action_set_important( const char * name, gboolean b )
 }
 
 void
-action_toggle( const char * name,
-               gboolean     b )
+gtr_action_set_toggled( const char * name, gboolean b )
 {
     GtkAction * action = get_action( name );
 
@@ -329,7 +324,7 @@ action_toggle( const char * name,
 }
 
 GtkWidget*
-action_get_widget( const char * path )
+gtr_action_get_widget( const char * path )
 {
     return gtk_ui_manager_get_widget( myUIManager, path );
 }

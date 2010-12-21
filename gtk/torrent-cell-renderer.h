@@ -10,8 +10,8 @@
  * $Id$
  */
 
-#ifndef TORRENT_CELL_RENDERER_H
-#define TORRENT_CELL_RENDERER_H
+#ifndef GTR_TORRENT_CELL_RENDERER_H
+#define GTR_TORRENT_CELL_RENDERER_H
 
 #include <glib-object.h>
 #include <gtk/gtk.h>
@@ -42,4 +42,4 @@ GType             torrent_cell_renderer_get_type( void );
 
 GtkCellRenderer * torrent_cell_renderer_new( void );
 
-#endif
+#endif /* GTR_TORRENT_CELL_RENDERER_H */

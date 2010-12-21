@@ -10,13 +10,12 @@
  * $Id$
  */
 
-#ifndef __TR_GTK_STATS_H__
-#define __TR_GTK_STATS_H__
+#ifndef GTR_STATS_DIALOG_H
+#define GTR_STATS_DIALOG_H
 
 #include <gtk/gtk.h>
 #include "tr-core.h"
 
-GtkWidget* stats_dialog_create( GtkWindow * parent,
-                                TrCore *    core );
+GtkWidget* gtr_stats_dialog_new( GtkWindow * parent, TrCore * core );
 
-#endif
+#endif /* GTR_STATS_DIALOG_H */

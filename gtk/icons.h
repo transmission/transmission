@@ -5,16 +5,16 @@
  * $Id$
  */
 
-#ifndef ICONS_H
-#define ICONS_H
+#ifndef GTR_ICONS_H
+#define GTR_ICONS_H
 
 #define DIRECTORY_MIME_TYPE "folder"
 #define UNKNOWN_MIME_TYPE "unknown"
 
-const char * get_mime_type_from_filename( const char *file );
+const char * gtr_get_mime_type_from_filename( const char *file );
 
-GdkPixbuf * get_mime_type_icon( const char   * mime_type,
-                                GtkIconSize    icon_size,
-                                GtkWidget    * for_widget );
+GdkPixbuf * gtr_get_mime_type_icon( const char   * mime_type,
+                                    GtkIconSize    icon_size,
+                                    GtkWidget    * for_widget );
 
 #endif

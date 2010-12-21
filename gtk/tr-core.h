@@ -22,8 +22,8 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#ifndef TR_CORE_H
-#define TR_CORE_H
+#ifndef GTR_CORE_H
+#define GTR_CORE_H
 
 #include <glib-object.h>
 #include <gtk/gtk.h>
@@ -202,4 +202,4 @@ enum
     MC_ROW_COUNT
 };
 
-#endif
+#endif /* GTR_CORE_H */

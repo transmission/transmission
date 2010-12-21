@@ -361,9 +361,9 @@ get_icon( const tr_torrent * tor, GtkIconSize icon_size, GtkWidget * for_widget 
     else if( strchr( info->files[0].name, '/' ) != NULL )
         mime_type = DIRECTORY_MIME_TYPE;
     else
-        mime_type = get_mime_type_from_filename( info->files[0].name );
+        mime_type = gtr_get_mime_type_from_filename( info->files[0].name );
 
-    return get_mime_type_icon( mime_type, icon_size, for_widget );
+    return gtr_get_mime_type_icon( mime_type, icon_size, for_widget );
 }
 
 static GtkCellRenderer*

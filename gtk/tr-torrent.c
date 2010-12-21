@@ -147,7 +147,7 @@ tr_torrent_info( TrTorrent * tor )
 static gboolean
 notifyInMainThread( gpointer user_data )
 {
-    tr_notify_send( TR_TORRENT( user_data ) );
+    gtr_notify_send( TR_TORRENT( user_data ) );
     return FALSE;
 }
 

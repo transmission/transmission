@@ -134,8 +134,7 @@ dialogResponse( GtkDialog * dialog,
 }
 
 GtkWidget*
-stats_dialog_create( GtkWindow * parent,
-                     TrCore *    core )
+gtr_stats_dialog_new( GtkWindow * parent, TrCore * core )
 {
     guint            i;
     int              row = 0;

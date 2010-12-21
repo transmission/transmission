@@ -22,21 +22,17 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#ifndef TR_WINDOW_H
-#define TR_WINDOW_H
+#ifndef GTR_WINDOW_H
+#define GTR_WINDOW_H
 
 #include <gtk/gtk.h>
-#include <libtransmission/utils.h> /* tr_formatter_speed_KBps() */
 #include "tr-core.h"
 
 typedef GtkWindow TrWindow;
 
-GtkTreeSelection * tr_window_get_selection( TrWindow * );
+GtkWidget        * gtr_window_new( GtkUIManager * uim, TrCore * core );
+GtkTreeSelection * gtr_window_get_selection( TrWindow * );
+void               gtr_window_set_busy( TrWindow *, gboolean isBusy );
+void               gtr_window_refresh( TrWindow * );
 
-GtkWidget        * tr_window_new( GtkUIManager * uim, TrCore * core );
-
-void               tr_window_update( TrWindow * );
-
-void               tr_window_set_busy( TrWindow *, gboolean isBusy );
-
-#endif
+#endif /* GTR_WINDOW_H */

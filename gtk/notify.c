@@ -29,15 +29,15 @@
 
 #ifndef HAVE_LIBNOTIFY
 
-void tr_notify_init( void ) { }
-void tr_notify_send( TrTorrent * tor UNUSED ) { }
-void tr_notify_added( const char * name UNUSED ) { }
+void gtr_notify_init( void ) { }
+void gtr_notify_send( TrTorrent * tor UNUSED ) { }
+void gtr_notify_added( const char * name UNUSED ) { }
 
 #else
  #include <libnotify/notify.h>
 
 void
-tr_notify_init( void )
+gtr_notify_init( void )
 {
     notify_init( "Transmission" );
 }
@@ -109,7 +109,7 @@ addIcon( NotifyNotification * notify )
 }
 
 void
-tr_notify_send( TrTorrent *tor )
+gtr_notify_send( TrTorrent *tor )
 {
 #ifdef HAVE_LIBCANBERRA
     if( pref_flag_get( PREF_KEY_PLAY_DOWNLOAD_COMPLETE_SOUND ) )
@@ -155,7 +155,7 @@ tr_notify_send( TrTorrent *tor )
 }
 
 void
-tr_notify_added( const char * name )
+gtr_notify_added( const char * name )
 {
     if( pref_flag_get( PREF_KEY_SHOW_DESKTOP_NOTIFICATION ) )
     {

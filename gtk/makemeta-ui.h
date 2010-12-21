@@ -10,12 +10,12 @@
  * $Id$
  */
 
-#ifndef MAKE_META_UI__H
-#define MAKE_META_UI__H
+#ifndef GTR_TORRENT_CREATION_DIALOG_H
+#define GTR_TORRENT_CREATION_DIALOG_H
 
 #include <gtk/gtk.h>
 #include "tr-core.h"
 
-GtkWidget* make_meta_ui( GtkWindow  * parent, TrCore * core );
+GtkWidget* gtr_torrent_creation_dialog_new( GtkWindow * parent, TrCore * core );
 
 #endif

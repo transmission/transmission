@@ -10,8 +10,8 @@
  * $Id$
  */
 
-#ifndef __HIG_H__
-#define __HIG_H__
+#ifndef GTR_HIG_H
+#define GTR_HIG_H
 
 #include <gtk/gtk.h>
 
@@ -83,4 +83,4 @@ enum
     GUI_PAD_LARGE = 12
 };
 
-#endif /* __HIG_H__ */
+#endif /* GTR_HIG_H */

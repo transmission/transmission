@@ -170,9 +170,9 @@ void gtr_unrecognized_url_dialog( GtkWidget * parent, const char * url );
 
 void gtr_http_failure_dialog( GtkWidget * parent, const char * url, long response_code );
 
-void addTorrentErrorDialog( GtkWidget  * window_or_child,
-                            int          err,
-                            const char * filename );
+void gtr_add_torrent_error_dialog( GtkWidget  * window_or_child,
+                                   int          err,
+                                   const char * filename );
 
 /* pop up the context menu if a user right-clicks.
    if the row they right-click on isn't selected, select it. */

@@ -22,8 +22,8 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#ifndef TG_PREFS_H
-#define TG_PREFS_H
+#ifndef GTR_DIALOGS_H
+#define GTR_DIALOGS_H
 
 #include "tr-core.h"
 #include "tr-torrent.h"
@@ -33,15 +33,21 @@
 /* used for a callback function with a data parameter */
 typedef void ( *callbackfunc_t )( gpointer );
 
-/* prompt if the user wants to quit, calls func with cbdata if they do */
-GtkWidget *  askquit( TrCore          * core,
-                      GtkWindow       * parent,
-                      callbackfunc_t    func,
-                      gpointer          cbdata );
+/**
+ * Prompt the user to confirm exiting the app.
+ * Call func(cbdata) if user confirms.
+ */
+GtkWidget * gtr_confirm_quit   ( GtkWindow       * parent,
+                                 TrCore          * core,
+                                 callbackfunc_t    func,
+                                 gpointer          cbdata );
 
-void confirmRemove( GtkWindow * parent,
-                    TrCore    * core,
-                    GSList    * gtorrents,
-                    gboolean    doDelete );
+/**
+ * Prompt the user to confirm removing a torrent.
+ */
+void        gtr_confirm_remove ( GtkWindow * parent,
+                                 TrCore    * core,
+                                 GSList    * gtorrents,
+                                 gboolean    doDelete );
 
-#endif /* TG_PREFS_H */
+#endif /* GTR_DIALOGS_H */

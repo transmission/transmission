@@ -65,10 +65,10 @@ quitresp( GtkWidget * widget,
 }
 
 GtkWidget *
-askquit( TrCore *       core,
-         GtkWindow *    parent,
-         callbackfunc_t func,
-         void *         cbdata )
+gtr_confirm_quit( GtkWindow *    parent,
+                  TrCore *       core,
+                  callbackfunc_t func,
+                  void *         cbdata )
 {
     struct quitdata * stuff;
     GtkWidget *       w;
@@ -168,10 +168,10 @@ countBusyTorrents( gpointer gtor, gpointer gdata )
 }
 
 void
-confirmRemove( GtkWindow * parent,
-               TrCore *    core,
-               GSList *    torrents,
-               gboolean    delete_files )
+gtr_confirm_remove( GtkWindow  * parent,
+                    TrCore     * core,
+                    GSList     * torrents,
+                    gboolean     delete_files )
 {
     GtkWidget *         d;
     const int           count = g_slist_length( torrents );

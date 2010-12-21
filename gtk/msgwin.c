@@ -374,7 +374,7 @@ debug_level_combo_new( void )
 **/
 
 GtkWidget *
-msgwin_new( TrCore * core, GtkWindow * parent )
+gtr_message_log_window_new( TrCore * core, GtkWindow * parent )
 {
     GtkWidget *      win;
     GtkWidget *      vbox;

@@ -428,8 +428,8 @@ buildTree( GNode * node, gpointer gdata )
     struct row_struct *child_data = node->data;
     const gboolean isLeaf = node->children == NULL;
 
-    const char * mime_type = isLeaf ? get_mime_type_from_filename( child_data->name ) : DIRECTORY_MIME_TYPE;
-    GdkPixbuf * icon = get_mime_type_icon( mime_type, GTK_ICON_SIZE_MENU, build->w );
+    const char * mime_type = isLeaf ? gtr_get_mime_type_from_filename( child_data->name ) : DIRECTORY_MIME_TYPE;
+    GdkPixbuf * icon = gtr_get_mime_type_icon( mime_type, GTK_ICON_SIZE_MENU, build->w );
     const tr_info * inf = tr_torrentInfo( build->tor );
     const int priority = isLeaf ? inf->files[ child_data->index ].priority : 0;
     const gboolean enabled = isLeaf ? !inf->files[ child_data->index ].dnd : TRUE;

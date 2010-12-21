@@ -28,6 +28,7 @@
 #include <glib/gi18n.h>
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/utils.h> /* tr_formatter_speed_KBps() */
 
 #include "actions.h"
 #include "conf.h"
@@ -95,7 +96,7 @@ static void
 on_popup_menu( GtkWidget * self UNUSED,
                GdkEventButton * event )
 {
-    GtkWidget * menu = action_get_widget ( "/main-window-popup" );
+    GtkWidget * menu = gtr_action_get_widget ( "/main-window-popup" );
 
     gtk_menu_popup ( GTK_MENU( menu ), NULL, NULL, NULL, NULL,
                     ( event ? event->button : 0 ),
@@ -108,7 +109,7 @@ view_row_activated( GtkTreeView       * tree_view UNUSED,
                     GtkTreeViewColumn * column    UNUSED,
                     gpointer            user_data UNUSED )
 {
-    action_activate( "show-torrent-properties" );
+    gtr_action_activate( "show-torrent-properties" );
 }
 
 static GtkWidget*
@@ -195,7 +196,7 @@ prefsChanged( TrCore * core UNUSED,
     }
     else if( !strcmp( key, PREF_KEY_STATUSBAR_STATS ) )
     {
-        tr_window_update( (TrWindow*)wind );
+        gtr_window_refresh( (TrWindow*)wind );
     }
     else if( !strcmp( key, TR_PREFS_KEY_ALT_SPEED_ENABLED ) ||
              !strcmp( key, TR_PREFS_KEY_ALT_SPEED_UP_KBps ) ||
@@ -564,7 +565,7 @@ onOptionsClicked( GtkButton * button UNUSED, gpointer vp )
 ***/
 
 GtkWidget *
-tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
+gtr_window_new( GtkUIManager * ui_mgr, TrCore * core )
 {
     int           i, n;
     const char  * pch;
@@ -597,17 +598,17 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
     gtk_container_add ( GTK_CONTAINER( self ), vbox );
 
     /* main menu */
-    mainmenu = action_get_widget( "/main-window-menu" );
-    w = action_get_widget( "/main-window-menu/torrent-menu/update-tracker" );
+    mainmenu = gtr_action_get_widget( "/main-window-menu" );
+    w = gtr_action_get_widget( "/main-window-menu/torrent-menu/update-tracker" );
 #if GTK_CHECK_VERSION( 2, 12, 0 )
     g_signal_connect( w, "query-tooltip",
                       G_CALLBACK( onAskTrackerQueryTooltip ), p );
 #endif
 
     /* toolbar */
-    toolbar = p->toolbar = action_get_widget( "/main-window-toolbar" );
-    action_set_important( "add-torrent-toolbar", TRUE );
-    action_set_important( "show-torrent-properties", TRUE );
+    toolbar = p->toolbar = gtr_action_get_widget( "/main-window-toolbar" );
+    gtr_action_set_important( "add-torrent-toolbar", TRUE );
+    gtr_action_set_important( "show-torrent-properties", TRUE );
 
     /* filter */
     h = filter = p->filter = gtr_filter_bar_new( tr_core_session( core ),
@@ -841,7 +842,7 @@ updateSpeeds( PrivateData * p )
 }
 
 void
-tr_window_update( TrWindow * self )
+gtr_window_refresh( TrWindow * self )
 {
     PrivateData * p = get_private_data( self );
 
@@ -855,13 +856,13 @@ tr_window_update( TrWindow * self )
 }
 
 GtkTreeSelection*
-tr_window_get_selection( TrWindow * w )
+gtr_window_get_selection( TrWindow * w )
 {
     return get_private_data( w )->selection;
 }
 
 void
-tr_window_set_busy( TrWindow * w, gboolean isBusy )
+gtr_window_set_busy( TrWindow * w, gboolean isBusy )
 {
     if( w && gtr_widget_get_realized( GTK_WIDGET( w ) ) )
     {

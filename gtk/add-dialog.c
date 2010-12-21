@@ -206,7 +206,7 @@ sourceChanged( GtkFileChooserButton * b, gpointer gdata )
         }
         else if( new_file )
         {
-            addTorrentErrorDialog( GTK_WIDGET( b ), err, data->filename );
+            gtr_add_torrent_error_dialog( GTK_WIDGET( b ), err, data->filename );
         }
 
         updateTorrent( data );
@@ -252,7 +252,7 @@ addTorrentFilters( GtkFileChooser * chooser )
 ****/
 
 GtkWidget*
-addSingleTorrentDialog( GtkWindow * parent, TrCore * core, tr_ctor * ctor )
+gtr_torrent_options_dialog_new( GtkWindow * parent, TrCore * core, tr_ctor * ctor )
 {
     int              row;
     int              col;
@@ -384,7 +384,6 @@ addSingleTorrentDialog( GtkWindow * parent, TrCore * core, tr_ctor * ctor )
     gtk_box_pack_start( GTK_BOX( GTK_DIALOG( d )->vbox ), t, TRUE, TRUE, 0 );
 
     gtk_widget_grab_focus( grab );
-    gtk_widget_show_all( d );
     return d;
 }
 
@@ -423,8 +422,7 @@ onAddDialogResponse( GtkDialog * dialog,
 }
 
 GtkWidget*
-addDialog( GtkWindow * parent,
-           TrCore *    core )
+gtr_torrent_add_from_file_dialog_new( GtkWindow * parent, TrCore * core )
 {
     GtkWidget *  w;
     GtkWidget *  c;
@@ -453,7 +451,6 @@ addDialog( GtkWindow * parent,
     gtk_file_chooser_set_extra_widget( GTK_FILE_CHOOSER( w ), c );
     gtk_widget_show( c );
 
-    gtk_widget_show( w );
     return w;
 }
 
@@ -518,7 +515,7 @@ paste_clipboard_url_into_entry( GtkWidget * e )
 }
 
 GtkWidget*
-addURLDialog( GtkWindow * parent, TrCore * core )
+gtr_torrent_add_from_url_dialog_new( GtkWindow * parent, TrCore * core )
 {
     int row;
     GtkWidget * e;
@@ -547,6 +544,5 @@ addURLDialog( GtkWindow * parent, TrCore * core )
 
     gtk_box_pack_start( GTK_BOX( GTK_DIALOG( w )->vbox ), t, TRUE, TRUE, 0 );
     gtk_widget_show_all( t );
-    gtk_widget_show( w );
     return w;
 }

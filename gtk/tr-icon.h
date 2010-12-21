@@ -10,18 +10,17 @@
  * $Id$
  */
 
-#ifndef TR_ICON_H
-#define TR_ICON_H
+#ifndef GTR_ICON_H
+#define GTR_ICON_H
 
 #include <gtk/gtk.h>
 #include "tr-core.h"
 
-#if GTK_CHECK_VERSION( 2, 10, 0 )
+#if GTK_CHECK_VERSION( 2,10,0 )
  #define STATUS_ICON_SUPPORTED
 #endif
 
-gpointer tr_icon_new( TrCore * core );
+gpointer  gtr_icon_new      ( TrCore * core );
+void      gtr_icon_refresh  ( gpointer );
 
-void tr_icon_refresh( gpointer );
-
-#endif
+#endif /* GTR_ICON_H */

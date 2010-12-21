@@ -904,7 +904,7 @@ tr_core_add_torrent( TrCore     * self,
                                        -1 );
 
     if( doNotify )
-        tr_notify_added( inf->name );
+        gtr_notify_added( inf->name );
 
     /* cleanup */
     g_object_unref( G_OBJECT( gtor ) );
@@ -1180,7 +1180,7 @@ tr_core_present_window( TrCore      * core UNUSED,
 {
     /* Setting the toggle-main-window GtkCheckMenuItem to
        make sure its state is correctly set */
-    action_toggle( "toggle-main-window", TRUE);
+    gtr_action_set_toggled( "toggle-main-window", TRUE);
 
     *success = TRUE;
     return TRUE;

@@ -10,8 +10,8 @@
  * $Id$
  */
 
-#ifndef TR_ACTIONS_H
-#define TR_ACTIONS_H
+#ifndef GTR_ACTIONS_H
+#define GTR_ACTIONS_H
 
 #include <gtk/gtk.h>
 #include "tr-core.h"
@@ -21,25 +21,14 @@
 #define NOTIFICATION_ICON  "transmission-notification-icon"
 
 
-void       actions_init( GtkUIManager * ui_manager,
-                         gpointer       callback_user_data );
+void        gtr_actions_init( GtkUIManager * ui_manager, gpointer callback_user_data );
+void        gtr_actions_set_core( TrCore * core );
+void        gtr_actions_handler( const char * action_name, gpointer user_data );
 
-void       actions_set_core( TrCore * core );
-
-void       action_activate( const char * name );
-
-void       action_sensitize( const char * name,
-                             gboolean     b );
-
-void       action_toggle( const char * name,
-                          gboolean     b );
-
-void       action_set_important( const char * name, gboolean b );
-
-
-GtkWidget* action_get_widget( const char * path );
-
-void       doAction( const char * action_name,
-                     gpointer     user_data );
+void        gtr_action_activate      ( const char * action_name );
+void        gtr_action_set_sensitive ( const char * action_name, gboolean is_sensitive );
+void        gtr_action_set_toggled   ( const char * action_name, gboolean is_toggled );
+void        gtr_action_set_important ( const char * action_name, gboolean is_important );
+GtkWidget*  gtr_action_get_widget    ( const char * path );
 
 #endif

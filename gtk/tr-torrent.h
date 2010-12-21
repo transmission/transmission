@@ -22,8 +22,8 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#ifndef TR_TORRENT_H
-#define TR_TORRENT_H
+#ifndef GTR_TORRENT_H
+#define GTR_TORRENT_H
 
 #include <glib-object.h>
 #include <libtransmission/transmission.h>
