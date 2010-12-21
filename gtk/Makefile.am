@@ -52,7 +52,6 @@ noinst_HEADERS = \
     relocate.h \
     stats.h \
     torrent-cell-renderer.h \
-    tracker-list.h \
     tr-core.h \
     tr-core-dbus.h \
     tr-icon.h \
@@ -84,7 +83,6 @@ transmission_gtk_SOURCES = \
     relocate.c \
     stats.c \
     torrent-cell-renderer.c \
-    tracker-list.c \
     tr-core.c \
     tr-icon.c \
     tr-prefs.c \

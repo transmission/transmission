@@ -14,7 +14,6 @@ gtk/notify.c
 gtk/relocate.c
 gtk/stats.c
 gtk/torrent-cell-renderer.c
-gtk/tracker-list.c
 gtk/transmission-gtk.desktop.in
 gtk/tr-core.c
 gtk/tr-icon.c
