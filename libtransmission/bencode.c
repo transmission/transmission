@@ -1355,41 +1355,54 @@ jsonRealFunc( const tr_benc * val, void * vdata )
 static void
 jsonStringFunc( const tr_benc * val, void * vdata )
 {
+    char * out;
+    char * outwalk;
+    char * outend;
+    struct evbuffer_iovec vec[1];
     struct jsonWalk * data = vdata;
     const unsigned char * it = (const unsigned char *) getStr(val);
     const unsigned char * end = it + val->val.s.len;
+    const int safeguard = 512; /* arbitrary margin for escapes and unicode */
 
-    evbuffer_expand( data->out, val->val.s.len + 2 );
-    evbuffer_add( data->out, "\"", 1 );
+    evbuffer_reserve_space( data->out, val->val.s.len+safeguard, vec, 1 );
+    out = vec[0].iov_base;
+    outend = out + vec[0].iov_len;
+
+    outwalk = out;
+    *outwalk++ = '"';
 
     for( ; it!=end; ++it )
     {
         switch( *it )
         {
-            case '\b': evbuffer_add( data->out, "\\b", 2 ); break;
-            case '\f': evbuffer_add( data->out, "\\f", 2 ); break;
-            case '\n': evbuffer_add( data->out, "\\n", 2 ); break;
-            case '\r': evbuffer_add( data->out, "\\r", 2 ); break;
-            case '\t': evbuffer_add( data->out, "\\t", 2 ); break;
-            case '"': evbuffer_add( data->out, "\\\"", 2 ); break;
-            case '\\': evbuffer_add( data->out, "\\\\", 2 ); break;
+            case '\b': *outwalk++ = '\\'; *outwalk++ = 'b'; break;
+            case '\f': *outwalk++ = '\\'; *outwalk++ = 'f'; break;
+            case '\n': *outwalk++ = '\\'; *outwalk++ = 'n'; break;
+            case '\r': *outwalk++ = '\\'; *outwalk++ = 'r'; break;
+            case '\t': *outwalk++ = '\\'; *outwalk++ = 't'; break;
+            case '"' : *outwalk++ = '\\'; *outwalk++ = '"'; break;
+            case '\\': *outwalk++ = '\\'; *outwalk++ = '\\'; break;
 
             default:
                 if( isascii( *it ) )
-                    evbuffer_add( data->out, it, 1 );
+                    *outwalk++ = *it;
                 else {
                     const UTF8 * tmp = it;
                     UTF32        buf = 0;
                     UTF32 *      u32 = &buf;
                     ConversionResult result = ConvertUTF8toUTF32( &tmp, end, &u32, &buf + 1, 0 );
                     if((( result==conversionOK ) || (result==targetExhausted)) && (tmp!=it)) {
-                        evbuffer_add_printf( data->out, "\\u%04x", (unsigned int)buf );
+                        outwalk += tr_snprintf( outwalk, outend-outwalk, "\\u%04x", (unsigned int)buf );
                         it = tmp - 1;
                     }
                 }
         }
     }
-    evbuffer_add( data->out, "\"", 1 );
+
+    *outwalk++ = '"';
+    vec[0].iov_len = outwalk - out;
+    evbuffer_commit_space( data->out, vec, 1 );
+
     jsonChildFunc( data );
 }
 
