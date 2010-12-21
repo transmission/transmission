@@ -411,7 +411,7 @@ tr_session * fHandle;
             break;
         default:
             NSAssert1(NO, @"Port checker returned invalid status: %d", [fPortChecker status]);
-            return;
+            break;
     }
     [fPortChecker release];
     fPortChecker = nil;
