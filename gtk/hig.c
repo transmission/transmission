@@ -155,7 +155,7 @@ hig_workarea_add_tall_control( GtkWidget * t,
                       0, 0 );
 }
 
-void
+static void
 hig_workarea_add_control( GtkWidget * t,
                           int         row,
                           GtkWidget * control )
@@ -226,13 +226,3 @@ hig_workarea_finish( GtkWidget * t,
 {
     gtk_table_resize( GTK_TABLE( t ), *row, 2 );
 }
-
-void
-hig_message_dialog_set_text( GtkMessageDialog * dialog,
-                             const char *       primary,
-                             const char *       secondary )
-{
-    gtk_message_dialog_set_markup ( dialog, primary );
-    gtk_message_dialog_format_secondary_text ( dialog, "%s", secondary );
-}
-
