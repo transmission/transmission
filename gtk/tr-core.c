@@ -912,13 +912,13 @@ tr_core_add_torrent( TrCore     * self,
     g_free( trackers );
 }
 
-int
+void
 tr_core_load( TrCore * self, gboolean forcePaused )
 {
-    int           i;
-    int           count = 0;
+    int i;
+    tr_ctor * ctor;
     tr_torrent ** torrents;
-    tr_ctor *     ctor;
+    int count = 0;
 
     ctor = tr_ctorNew( tr_core_session( self ) );
     if( forcePaused )
@@ -927,13 +927,11 @@ tr_core_load( TrCore * self, gboolean forcePaused )
                          pref_int_get( TR_PREFS_KEY_PEER_LIMIT_TORRENT ) );
 
     torrents = tr_sessionLoadTorrents ( tr_core_session( self ), ctor, &count );
-    for( i = 0; i < count; ++i )
+    for( i=0; i<count; ++i )
         tr_core_add_torrent( self, tr_torrent_new_preexisting( torrents[i] ), FALSE );
 
     tr_free( torrents );
     tr_ctorFree( ctor );
-
-    return count;
 }
 
 /***

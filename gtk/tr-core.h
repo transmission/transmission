@@ -95,8 +95,7 @@ size_t         tr_core_get_torrent_count( TrCore * self );
  * Load saved state and return number of torrents added.
  * May trigger one or more "error" signals with TR_CORE_ERR_ADD_TORRENT
  */
-int      tr_core_load( TrCore * self,
-                       gboolean forcepaused );
+void tr_core_load( TrCore * self, gboolean forcepaused );
 
 /**
  * Add a list of torrents.
