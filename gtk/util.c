@@ -754,18 +754,6 @@ gtr_widget_set_visible( GtkWidget * w, gboolean b )
 #endif
 }
 
-void
-gtr_toolbar_set_orientation( GtkToolbar      * toolbar,
-                             GtkOrientation    orientation )
-{
-#if GTK_CHECK_VERSION( 2,16,0 )
-    gtk_orientable_set_orientation( GTK_ORIENTABLE( toolbar ), orientation );
-#else
-    gtk_toolbar_set_orientation( toolbar, orientation );
-#endif
-}
-
-
 /***
 ****
 ***/

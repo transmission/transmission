@@ -399,7 +399,6 @@ msgwin_new( TrCore * core, GtkWindow * parent )
     **/
 
     toolbar = gtk_toolbar_new( );
-    gtr_toolbar_set_orientation( GTK_TOOLBAR( toolbar ), GTK_ORIENTATION_HORIZONTAL );
     gtk_toolbar_set_style( GTK_TOOLBAR( toolbar ), GTK_TOOLBAR_BOTH_HORIZ );
 
     item = gtk_tool_button_new_from_stock( GTK_STOCK_SAVE_AS );

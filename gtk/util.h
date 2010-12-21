@@ -132,9 +132,6 @@ guint gtr_timeout_add_seconds( guint seconds, GSourceFunc func, gpointer data );
 /* backwards-compatible wrapper around gdk_threads_add_idle() */
 void gtr_idle_add( GSourceFunc  func, gpointer data );
 
-/* backwards-compatible wrapper around gtk_orientable_set_orientation() */
-void gtr_toolbar_set_orientation( GtkToolbar * tb, GtkOrientation orientation );
-
 /* backwards-compatible wrapper around gtk_widget_set_tooltip_text() */
 void gtr_widget_set_tooltip_text( GtkWidget * w, const char * tip );
 
