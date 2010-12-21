@@ -55,7 +55,7 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
 
     SHA1_Init( &sha );
 
-    tr_tordbg( tor, "%s", "[LAZY] verifying torrent..." );
+    tr_tordbg( tor, "%s", "verifying torrent..." );
     tr_torrentSetChecked( tor, 0 );
     while( !*stopFlag && ( pieceIndex < tor->info.pieceCount ) )
     {
@@ -139,7 +139,6 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
             filePos = 0;
         }
     }
-    tr_tordbg( tor, "%s", "[LAZY] DONE verifying torrent..." );
 
     /* cleanup */
     if( fd >= 0 )
@@ -148,7 +147,7 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
 
     /* stopwatch */
     end = tr_time( );
-    tr_tordbg( tor, "it took %d seconds to verify %"PRIu64" bytes (%"PRIu64" bytes per second)",
+    tr_tordbg( tor, "Verification is done.  It took %d seconds to verify %"PRIu64" bytes (%"PRIu64" bytes per second)",
                (int)(end-begin), tor->info.totalSize,
                (uint64_t)(tor->info.totalSize/(1+(end-begin))) );
 

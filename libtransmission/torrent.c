@@ -2366,25 +2366,18 @@ tr_torrentPieceNeedsCheck( const tr_torrent * tor, tr_piece_index_t p )
     const tr_info * inf = tr_torrentInfo( tor );
 
     /* if we've never checked this piece, then it needs to be checked */
-    if( !inf->pieces[p].timeChecked ) {
-        tr_tordbg( tor, "[LAZY] piece %zu needs to be tested because it's never been tested", (size_t)p );
+    if( !inf->pieces[p].timeChecked )
         return TRUE;
-    }
 
     /* If we think we've completed one of the files in this piece,
      * but it's been modified since we last checked it,
      * then it needs to be rechecked */
     tr_ioFindFileLocation( tor, p, 0, &f, &unused );
-    for( ; f < inf->fileCount && pieceHasFile( p, &inf->files[f] ); ++f ) {
-        if( tr_cpFileIsComplete( &tor->completion, f ) ) {
-            if( getFileMTime( tor, f ) > inf->pieces[p].timeChecked ) {
-                tr_tordbg( tor, "[LAZY] piece %zu needs to be tested because file %zu mtime is newer than check time %zu", (size_t)p, (size_t)f, (size_t)inf->pieces[p].timeChecked );
+    for( ; f < inf->fileCount && pieceHasFile( p, &inf->files[f] ); ++f )
+        if( tr_cpFileIsComplete( &tor->completion, f ) )
+            if( getFileMTime( tor, f ) > inf->pieces[p].timeChecked )
                 return TRUE;
-            }
-        }
-    }
 
-    tr_tordbg( tor, "[LAZY] piece %zu does not need to be tested", (size_t)p );
     return FALSE;
 }
 
